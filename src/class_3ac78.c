@@ -1,3 +1,34 @@
+/*
+ * class_3ac78 -- the front half of Class866E8, the class whose method table is
+ * D_800866E8 (80 slots, header 0x114; tools/classtable.py D_800866E8). It
+ * derives from Class6B5CC (code_d294) through the intermediate base whose
+ * table func_800428E4 returns (D_8006EFAC), and the game builds exactly one,
+ * at boot, in class_39e08's func_80049684 via New_Class866E8(0, 1).
+ *
+ * What it manages is a GRID. The object owns seven elements (elems[7]), each
+ * pairing a target object, a list, a parent node, and a 0x668-byte heap block
+ * holding that element's grid of cell objects; the constructor seeds every
+ * cell with a world position on a 0x800 lattice. Indexing the grid uses a row
+ * stride of 20 cells -- the same 20 that gDefaultGridSpan >> 11 produces
+ * (0xA000 / 0x800, see Class866E8__SetGridSpan) and the same stride
+ * class_3bb8c_b's byte-matched func_8004CE24 walks.
+ *
+ * Work reaches the cells through a rectangle list (rects[4]/rectCount): a
+ * notification arrives at Class866E8__OnNotify or Class866E8__OnCommand,
+ * Class866E8__ForwardAcceptedCommand filters the sender against acceptedTags,
+ * Class866E8__ApplyToSenderFootprint turns the sender's position into one
+ * rectangle, and Class866E8__DispatchToRectCells re-notifies every cell in it
+ * and every cell chained behind it. The queries that build those rectangles,
+ * and an element's resource and GPU sides, live in class_3bb8c*, which keeps
+ * its own independent view of the same object (Obj866E8 / Elem /
+ * GridSlot866E8 in include/class_3bb8c.h).
+ *
+ * Three functions are documented stalls and stay INCLUDE_ASM:
+ * Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
+ * Class866E8__DispatchToRectCells. func_8004B324 keeps its placeholder name
+ * deliberately -- it is an empty vtable stub with no established purpose, the
+ * same case as func_8001D33C in code_d294_b.
+ */
 #include "common.h"
 #include "class_3ac78.h"
 

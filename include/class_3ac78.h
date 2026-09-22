@@ -49,6 +49,16 @@ struct UnkSlotEntry_3ac78 {
      * base-class slot, legitimate for a `Class866E8 *` element since
      * `methods` sits at the same +0x000 offset either way; this does not
      * contradict the 2D-grid-of-Class866E8 reading above. */
+    /* TYPE CAVEAT (round 67, naming pass, NOT fixed here): the element type
+     * below is this unit's own weaker reading. class_3bb8c's independently
+     * derived view calls the same block `EntryChildObj **`, and its evidence
+     * is stronger -- the ctor here ORs 0x80000000 into each freshly-built
+     * cell's +0x010, which is EntryChildObj::unk10 exactly (func_8004C0AC
+     * does the same OR, func_8004CE24 clears the same bit), and the
+     * `flags36`/`nextInCell` fields NotifyGridCell walks line up with
+     * EntryChildObj::unk36/unk38. Unifying the two views is a track-4 job,
+     * not a naming one, so the declared type is left alone; read it as
+     * "a cell object", not as "another Class866E8". */
     Class866E8 **cells;              /* Class866E8__DispatchToRectCells: 2D grid, row stride 20 cells. Class866E8__Class866E8 (ctor): allocates 0x668 raw bytes (func_80017B34) and fills it with pointers built in an inner loop. Class866E8__Finalize (dtor, MATCHED): walks the same 0x668-byte span tearing down each non-NULL cell, then frees it. */
     GenericObject *heldObj;          /* Class866E8__Class866E8 (ctor): zeroed. Class866E8__OnElementEvent releases it through the shared BasicClass `release` slot on event 6 and stores the result back, the project's standard release-and-clear shape. RETYPED from `s32` this round: the only code that touches it dereferences it as an object with a vtable at +0x000. */
     s32 unk18;                       /* Class866E8__Class866E8 (ctor): zeroed */
@@ -155,6 +165,23 @@ struct Vec3_3ac78 {
  * in the symbol file), so it is named by its vtable address, same
  * convention as Class6D3C8.h. Only the slots and fields this round's
  * functions actually reach are typed; the rest stays opaque padding.
+ *
+ * ROUND 67 (naming pass): the class is a GRID MANAGER, and the grid's
+ * geometry is now arithmetic rather than inference. gDefaultGridSpan is
+ * 0xA000; Class866E8__SetGridSpan stores it at +0x74 and derives
+ * gridCells = span >> 11 = 20 and gridHalfCells = span >> 12 = 10. The
+ * ctor spaces cells 0x800 apart (0xA000 / 0x800 == 20), and 20 is also the
+ * row stride class_3bb8c_b's BYTE-MATCHED func_8004CE24 uses over the same
+ * cell block. Three independent facts, one number.
+ *
+ * One thing that does NOT reconcile, recorded rather than resolved: the
+ * ctor's placement loop wraps X after 21 columns, not 20 (it resets when
+ * x > 0xA400, and x runs 0x400 + k * 0x800), and 0x668 bytes is 410 cell
+ * pointers, which is neither 20 * 20 nor a whole number of 21-cell rows.
+ * The ctor is byte-exact, so the constants are certainly right; what the
+ * extra column and the 10 spare pointers are for is unknown. Do not "fix"
+ * the stride to 21 on the strength of the ctor alone -- func_8004CE24's
+ * 20 is the byte-verified one.
  */
 struct Class866E8Methods {
     /* +0x000 */ s32 header;
