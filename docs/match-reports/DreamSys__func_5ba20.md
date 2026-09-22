@@ -1,4 +1,6 @@
-# func_8005BA20
+# DreamSys__func_5ba20
+
+> Renamed from `func_8005BA20` on 2026-09-22 (tools/rename.py). Address 0x8005ba20.
 
 **Unit:** DreamSys · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
@@ -12,7 +14,7 @@ return old;`.
 ## The C
 
 ```c
-s32 func_8005BA20(DreamSys *this, s32 value)
+s32 DreamSys__func_5ba20(DreamSys *this, s32 value)
 {
 	s32 old;
 
@@ -40,12 +42,12 @@ surface shape, different actual source, distinguishable only by counting
 retail's own instruction words (7 vs 8) before choosing which form to
 write.
 
-## Field name kept as `func_228`, not renamed to `func_8005BA20`
+## Field name kept as `func_228`, not renamed to `DreamSys__func_5ba20`
 
 This slot was previously documented as a standalone tail field named
 `func_228` (with an incorrect note that it "lives past the previously-
 documented end of this struct at 0x21c"). `tools/classtable.py
-DREAMSYS_METHODS` resolves it this round to be func_8005BA20's own slot,
+DREAMSYS_METHODS` resolves it this round to be DreamSys__func_5ba20's own slot,
 directly following `ResetFlashbackList`/`DreamSys__SaveLinkSnapshot`/`DreamSys__RestoreLinkSnapshot` --
 no gap, and no "past the end" special case. The field is NOT renamed,
 though: `src/code_1677c.c` (a different unit, out of this runner's scope)

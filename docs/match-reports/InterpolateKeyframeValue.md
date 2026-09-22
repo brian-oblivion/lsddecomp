@@ -22,7 +22,7 @@ Linear interpolation between two "keyframe" points (`DreamSysInterpPoint`,
 each with a `value` at `+0x4` and a `position` at `+0x8`), scaled by `arg2`:
 `(b->value - a->value) * (arg2 / 0x400) / dt + a->value`, where `dt =
 (b->position - a->position) / 0x400`, floored at `1` if it rounds to `0`.
-Called by still-`INCLUDE_ASM` `func_8005942C` as
+Called by still-`INCLUDE_ASM` `DreamSys__ProjectPointAtDistance` as
 `InterpolateKeyframeValue(&this->unk_0x5C->unknown_values_0x0[0x14], ...)`.
 
 ## Round 42's rebuild: 30/33, register-identity residue

@@ -57,7 +57,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 	return this->vt->func_800588EC(this);
 }
 
-void DreamSys__func_588ec(DreamSys *this)
+void DreamSys__ResetSessionState(DreamSys *this)
 {
 	this->vt->func_8001D344(this, 0);
 	this->vt->func_8001CEB4(this, 1, D_80087E08);
@@ -71,7 +71,7 @@ void DreamSys__func_588ec(DreamSys *this)
 	this->unk_0x924 = 0;
 }
 
-void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
+void DreamSys__SpawnAtLink(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 {
 	s32 local[4];
 
@@ -249,7 +249,7 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 void DreamSys__NoOpSlotE8Default(void) {
 }
 
-s32 func_800590E8(DreamSys *this, DreamColors *out, s32 value)
+s32 DreamSys__GetSetFlashbackSession(DreamSys *this, DreamColors *out, s32 value)
 {
 	s32 old;
 
@@ -262,7 +262,7 @@ s32 func_800590E8(DreamSys *this, DreamColors *out, s32 value)
 	return old;
 }
 
-void func_80059148(DreamSys *this, s32 value)
+void DreamSys__SetMoveOverride(DreamSys *this, s32 value)
 {
 	this->unk_0x6c = value;
 	if (value != 0) {
@@ -294,7 +294,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 	this->unk_0x90 = 0;
 	this->unk_0x8C = 0;
 	this->unk_0x94 = 0;
-	this->vt->func_8005A1B0(this, 0, 1, 1, 1);
+	this->vt->DreamSys__SetGateFlags(this, 0, 1, 1, 1);
 
 	this->vt->DreamSys__SetTickPeriod(this, arg2);
 
@@ -341,11 +341,11 @@ void DreamSys__SetSoundObj(DreamSys *this, s32 value)
 {
 	this->unk_0x58 = value;
 }
-void func_80059384(DreamSys *this, void *value)
+void DreamSys__SetHeightCurve(DreamSys *this, void *value)
 {
 	this->unk_0x5C = value;
 }
-void func_8005938C(DreamSys *this, s32 value)
+void DreamSys__func_5938c(DreamSys *this, s32 value)
 {
 	this->unk_0x64 = value;
 }
@@ -373,7 +373,7 @@ extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s3
 extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 day);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
-s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
+s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
 {
 	s32 local[3];
 	s32 ret;
@@ -414,11 +414,11 @@ s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32
 	return (dv * scaledArg2) / dt + a->value;
 }
 
-void func_80059590(DreamSys *this)
+void DreamSys__func_59590(DreamSys *this)
 {
 	this->unk_0x7C = 0;
 }
-void func_80059598(DreamSys *this)
+void DreamSys__func_59598(DreamSys *this)
 {
 	this->unk_0x78 = 0;
 }
@@ -818,7 +818,7 @@ void DreamSys__RestorePreviousMoveMode(DreamSys *this)
 	this->moveMode = this->previousMoveMode;
 }
 
-void func_8005A1B0(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
+void DreamSys__SetGateFlags(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
 {
 	if (a >= 0)
 		this->unk_0x124 = a;
@@ -1047,7 +1047,7 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	result = Test4StageTransition(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
 	if (result < 0)
 		return false;
-	this->unk_0x880 = func_8005BF48();
+	this->unk_0x880 = GetStageLinkAngle();
 	this->unk_0x884 = 0;
 	this->unk_0x888 = 0;
 	ExecuteLink(this, result, 0x10, 0);
@@ -1601,7 +1601,7 @@ void DreamSys__RestoreLinkSnapshot(DreamSys *this)
 	p->unk_0x0 = 0;
 }
 
-s32 func_8005BA20(DreamSys *this, s32 value)
+s32 DreamSys__func_5ba20(DreamSys *this, s32 value)
 {
 	s32 old;
 
@@ -1830,7 +1830,7 @@ merge:
    unit's queued functions. */
 extern s32 D_8008ABF0;
 
-s32 func_8005BF48(void)
+s32 GetStageLinkAngle(void)
 {
 	s32 result;
 

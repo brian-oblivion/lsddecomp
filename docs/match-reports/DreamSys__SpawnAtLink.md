@@ -1,4 +1,6 @@
-# DreamSys__func_58968
+# DreamSys__SpawnAtLink
+
+> Renamed from `DreamSys__func_58968` on 2026-09-22 (tools/rename.py). Address 0x80058968.
 
 **Unit:** DreamSys · **Size:** 75 words (0x12C bytes) · **Status:** MATCHED
 (75/75 words, whole-image `./build-and-verify.sh` green)
@@ -12,7 +14,7 @@ consumes the CURRENT flashback entry's rotation/time-limit and advances the
 flashback playback index:
 
 ```c
-void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
+void DreamSys__SpawnAtLink(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 {
 	s32 local[4];
 
@@ -38,7 +40,7 @@ reading/writing offset `0x87C` in retail versus `0x878` in the build — every
 other word matched, including branch targets, register allocation, and the
 tricky `entry->timeLimit + 4` and 36-byte-stride index computation. `0x878`
 is `DreamSys::unk_0x878`, a field several already-matched functions use
-(`DreamSys__ClearNewGameFlag`, `DreamSys__GetNewGameFlag`, `DreamSys__func_588ec`,
+(`DreamSys__ClearNewGameFlag`, `DreamSys__GetNewGameFlag`, `DreamSys__ResetSessionState`,
 `DreamSys__EndDay`) — so it could not itself be at the wrong offset. The
 actual field at `0x87C` is the VERY NEXT declared field,
 `DreamSys::currentFlashbackIndex`, which is semantically the right one

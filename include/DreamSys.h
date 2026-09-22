@@ -75,7 +75,7 @@ typedef struct D_80087E84Entry {
 } D_80087E84Entry;
 extern D_80087E84Entry D_80087E84[8];
 
-/* Address-of only (never loaded through) by DreamSys__func_588ec, forwarded
+/* Address-of only (never loaded through) by DreamSys__ResetSessionState, forwarded
    as func_8001CEB4's arg2. Still raw `nonmatching` data; element type/count
    unconfirmed (round 2026-08-30-b). */
 extern u8 D_80087E08[];
@@ -184,7 +184,7 @@ typedef struct DreamSysUnk14Tail {
 /* Struct pointed to by DreamSys::unk_0x14. Confirmed fields, all from
    DreamSys__SaveLinkSnapshot/DreamSys__RestoreLinkSnapshot (round 2026-09-02): +0x0 is a word cleared to
    0 by DreamSys__RestoreLinkSnapshot (restore) after the rest of the struct is overwritten;
-   +0x38 is the pre-existing 3-word vector (Class6B5CC__LocalOffsetToWorldPos/func_8005942C,
+   +0x38 is the pre-existing 3-word vector (Class6B5CC__LocalOffsetToWorldPos/DreamSys__ProjectPointAtDistance,
    both MATCHED); +0x44 is a pointer to a DreamSysUnk14Tail, itself
    block-copied (not just followed) by the same two functions. The whole
    0x50-byte struct (this field included, raw) is block-copied to/from
@@ -207,7 +207,7 @@ typedef struct DreamSysUnk14 {
 } DreamSysUnk14;
 
 /* Struct pointed to by DreamSys::unk_0x5C. +0x14 / +0x20 are a pair of
-   two-word (x,y) points per func_8005942C (MATCHED, elsewhere in
+   two-word (x,y) points per DreamSys__ProjectPointAtDistance (MATCHED, elsewhere in
    this unit; not independently re-confirmed this round). +0x24 (the second point's y) is
    confirmed: DreamSys__StepLookOffset (round 2026-08-30) nudges it. +0x18 (the first
    point's y) is also now confirmed: DreamSys__AdvanceMoveCycle (round 2026-09-02) nudges
@@ -270,7 +270,7 @@ typedef struct DreamSysCtorArgObj {
 	DreamSysCtorArgMethods *methods;
 } DreamSysCtorArgObj;
 
-/* Object pointed to by DreamSys__func_58968's `arg1` parameter -- same
+/* Object pointed to by DreamSys__SpawnAtLink's `arg1` parameter -- same
    "vtable pointer at offset 0" shape as this unit's other opaque classes.
    Unidentified; may or may not be the same class as DreamSysCtorArgObj
    above (both are eventually forwarded to vt->slot10, but this one is
@@ -279,7 +279,7 @@ typedef struct DreamSysCtorArgObj {
    table" convention until proven otherwise (round 2026-09-02). */
 typedef struct DreamSysFunc58968ArgMethods {
 	u8 pad00[0xE4];
-	/* Called by DreamSys__func_58968 as (arg1, &local, this,
+	/* Called by DreamSys__SpawnAtLink as (arg1, &local, this,
 	   &this->linkCoordinates); return value discarded. */
 	void (*slot0xE4)(void *self, void *arg1, struct DreamSys *arg2, PlayerSpawnPoint *arg3);
 } DreamSysFunc58968ArgMethods;
@@ -397,7 +397,7 @@ typedef struct DreamSysBaseMethods {
 	/* Shared with Class65650's own inherited "slot4C" at the same offset in
 	   the SAME base table (code_55dd4.h's D800878D4Methods: "called by
 	   func_80065918 as slot4C(self, arg3, arg5)"). Called by
-	   DreamSys__func_58968 as (this, arg1, &local) (round 2026-09-02). */
+	   DreamSys__SpawnAtLink as (this, arg1, &local) (round 2026-09-02). */
 	void (*slot4C)(struct DreamSys *self, void *arg1, void *arg2);
 	/* Deliberately `struct DreamSys *`, not `DreamSys *` -- this precedes
 	   the real `typedef struct DreamSys {...}` below, so GCC 2.6.3 warns
@@ -486,7 +486,7 @@ extern DreamSysVec3 D_80087EA4;
    global scratch vector; the other two words are NOT independently named
    -- splat's dlabel boundary put them inside `D_80087EC8`'s dlabel as
    unlabeled tail bytes (asm/data/783DC.data.s), because nothing took their
-   address directly until func_8005942C (round 19). Do not rename/resegment
+   address directly until DreamSys__ProjectPointAtDistance (round 19). Do not rename/resegment
    this round (config/ out of scope); reach the vector's start with pointer
    arithmetic off this symbol instead: `(DreamSysVec3 *)((s32 *)&D_80087EE8
    - 2)`.
@@ -504,7 +504,7 @@ extern DreamSysVec3 D_80087EA4;
    - `Class6B5CC__LocalOffsetToWorldPos` (code_d294_c, already matched) forwards its own `src`
      parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
      own doc comment (include/code_d294.h) confirms it treats both
-     pointers as 0xC-byte (3-word) elements. `func_8005942C` passes
+     pointers as 0xC-byte (3-word) elements. `DreamSys__ProjectPointAtDistance` passes
      `(s32 *)&D_80087EE8 - 2` as that exact `src` argument, which only
      type-checks sensibly as a 3-word vector's start -- matching the 8
      "spare" bytes above exactly (2 words = 8 bytes immediately before
@@ -543,7 +543,7 @@ extern u8 D_80087F08[];
 
 /* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
-   (unread by this function). Called by still-INCLUDE_ASM func_8005942C as
+   (unread by this function). Called by still-INCLUDE_ASM DreamSys__ProjectPointAtDistance as
    InterpolateKeyframeValue(&this->unk_0x5C->unknown_values_0x0[0x14], arg2, arg3) --
    the first argument is one of DreamSysUnk5C's two documented "point"
    fields (round 2026-08-30-d). */
@@ -594,7 +594,7 @@ typedef struct DreamSys {
 	struct vtable_DreamSys *vt;
 	s8 unknown_values_0x4[8];
 
-	/* Gate observed by Class6B5CC__LocalOffsetToWorldPos and func_8005942C: when nonzero,
+	/* Gate observed by Class6B5CC__LocalOffsetToWorldPos and DreamSys__ProjectPointAtDistance: when nonzero,
 	   unk_0x14 is treated as valid and its "+0x38" vector is used;
 	   otherwise a zero vector is used instead. Meaning of the pointed-to
 	   struct is unidentified. */
@@ -603,7 +603,7 @@ typedef struct DreamSys {
 
 	/* Pointer to DreamSysUnk14 (see that type for confirmed fields); a
 	   3-word vector lives at +0x38 of what this points to (read by
-	   Class6B5CC__LocalOffsetToWorldPos / func_8005942C, guarded by unk_0xC above). The whole
+	   Class6B5CC__LocalOffsetToWorldPos / DreamSys__ProjectPointAtDistance, guarded by unk_0xC above). The whole
 	   struct is saved/restored to/from unk14Snapshot below by
 	   DreamSys__SaveLinkSnapshot/DreamSys__RestoreLinkSnapshot (round 2026-09-02). */
 	DreamSysUnk14 *unk_0x14;
@@ -640,15 +640,15 @@ typedef struct DreamSys {
 
 	/* Set by DreamSys__SetSoundObj(this, value); no other observed use. */
 	s32 unk_0x58;
-	/* Set by func_80059384(this, value); read as a pointer by
-	   func_8005942C (this->unk_0x5C + 0x14 and + 0x20 are passed to
+	/* Set by DreamSys__SetHeightCurve(this, value); read as a pointer by
+	   DreamSys__ProjectPointAtDistance (this->unk_0x5C + 0x14 and + 0x20 are passed to
 	   InterpolateKeyframeValue), so it points to a pair of two-word (x,y) points. */
 	DreamSysUnk5C *unk_0x5C;
 	/* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
 	   (round 2026-09-02) -- see DreamSysCtorArgObj. No other observed use in
 	   this unit's queued functions. */
 	void *unk_0x60;
-	/* Set by func_8005938C(this, value); no other observed use. */
+	/* Set by DreamSys__func_5938c(this, value); no other observed use. */
 	s32 unk_0x64;
 
 	bool isFlashbackSession;
@@ -662,9 +662,9 @@ typedef struct DreamSys {
 	/* Cleared to 0, then set to (dreamTimer % tickPeriod == 0) by
 	   DreamSys__UpdateTickState. */
 	s32 unk_0x74;
-	/* Cleared to 0 by func_80059598; no other observed use. */
+	/* Cleared to 0 by DreamSys__func_59598; no other observed use. */
 	s32 unk_0x78;
-	/* Cleared to 0 by func_80059590; no other observed use. */
+	/* Cleared to 0 by DreamSys__func_59590; no other observed use. */
 	s32 unk_0x7C;
 	/* Set by DreamSys__SelectCallback80(this, arg1): NULL when arg1==0, otherwise one of
 	   three vtable-slot function pointers selected by arg1 (1/2/3). Called
@@ -748,7 +748,7 @@ typedef struct DreamSys {
 	/* Result of DreamSys__UpdateTickState's (dreamTimer % tickPeriod == 0) check. */
 	s32 unk_0x124;
 	/* unk_0x124/0x128/0x12C/0x130 are also bounds-checked-set as a group of
-	   four by func_8005A1B0 (vtable +0x18C): each is overwritten with the
+	   four by DreamSys__SetGateFlags (vtable +0x18C): each is overwritten with the
 	   corresponding argument only when that argument is >= 0
 	   (round 2026-08-30-b). */
 	s32 unk_0x128;
@@ -789,10 +789,10 @@ typedef struct DreamSys {
 
 	s32 newGamePending;
 	s32 currentFlashbackIndex;
-	/* Set (whole word) by DreamSys__TryStageTimerLink to func_8005BF48()'s return value,
+	/* Set (whole word) by DreamSys__TryStageTimerLink to GetStageLinkAngle()'s return value,
 	   right before an ExecuteLink (round 2026-09-02). */
 	s32 unk_0x880;
-	/* Gate flag read by func_80059148 (round 2026-08-30-b): when nonzero
+	/* Gate flag read by DreamSys__SetMoveOverride (round 2026-08-30-b): when nonzero
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
 	   func_8001CEB4's arg2 -- cast from s32 to void*, not dereferenced. */
 	s32 unk_0x884;
@@ -806,7 +806,7 @@ typedef struct DreamSys {
 	   sizeof(DreamSys) via a literal `ori $a0, $zero, 0x928` -- 0x98 bytes
 	   more than any field so far discovered accounts for. Extended to the
 	   allocator's real size (round 2026-08-30-b); the four words
-	   DreamSys__func_588ec clears are named, the rest of the tail is still
+	   DreamSys__ResetSessionState clears are named, the rest of the tail is still
 	   unclaimed.
 
 	   The first 0x78 bytes of that tail are a save/restore scratch buffer
@@ -857,7 +857,7 @@ extern s32 (*D_80087EEC[4])(DreamSys *this);
 /* Called by DreamSys__TryStaircaseLink with NO explicit argument setup (the disassembly's
    call site leaves `$a0` holding an unrelated leftover value from the
    preceding statement, same "empty delay slot, no a0-a3 setup" shape as
-   func_8005BF48 above); return value used as D_80087EEC's index. MATCHED
+   GetStageLinkAngle above); return value used as D_80087EEC's index. MATCHED
    round 43 (2026-09-15) -- both the gp-relative and addiu_at blockers it was
    filed under are resolved (see docs/research/gp-relative-blocker.md and
    docs/research/addiu-at-blocker.md), and the one-line body
@@ -909,7 +909,7 @@ struct vtable_DreamSys{
 	void (*func_58968)(DreamSys *this, DreamSysFunc58968ArgObj *arg1);
 	u32 unknown_functions_0x50[4];
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x060). Called by
-	   DreamSys__func_588ec as (this, 0) (round 2026-08-30-b). Still
+	   DreamSys__ResetSessionState as (this, 0) (round 2026-08-30-b). Still
 	   INCLUDE_ASM; address 0x8001D344 is outside this unit/runner's
 	   range. */
 	void (*func_8001D344)(DreamSys *this, s32 arg1);
@@ -986,7 +986,7 @@ struct vtable_DreamSys{
 	/* This function's OWN slot (+0x0F8, resolved via
 	   tools/classtable.py DREAMSYS_METHODS). A straight-line initializer:
 	   calls LogChunkMood/DreamSys__SelectCallback80/DreamSys__SelectCallback98/DreamSys__GetSetMoveMode/
-	   func_8005A1B0/DreamSys__SetTickPeriod in sequence, then zeroes a large block of
+	   DreamSys__SetGateFlags/DreamSys__SetTickPeriod in sequence, then zeroes a large block of
 	   per-dream state, ending with a Class6B5CC__GetRotationDegrees/func_8001CEB4 pair over a
 	   small local buffer (round 2026-09-02). */
 	void (*DreamSys__ResetLinkState)(DreamSys *this, s32 arg1, s32 arg2);
@@ -995,13 +995,13 @@ struct vtable_DreamSys{
 	s32 (*GetSetDreamTimeLimit)(DreamSys *this, s32 time);
 	s32 (*DreamSys__GetDreamTimerScaled)(DreamSys *this);
 	void (*DreamSys__SetSoundObj)(DreamSys *this, s32 value);
-	void (*func_80059384)(DreamSys *this, void *value);
-	void (*func_8005938C)(DreamSys *this, s32 value);
+	void (*DreamSys__SetHeightCurve)(DreamSys *this, void *value);
+	void (*DreamSys__func_5938c)(DreamSys *this, s32 value);
 	void (*DreamSys__UpdateTickState)(DreamSys *this);
 	void (*DreamSys__RunTickCallbacks)(DreamSys *this);
-	s32 (*func_8005942C)(DreamSys *this, void *out, s32 day, s32 *reference, s32 tolerance);
-	void (*func_80059590)(DreamSys *this);
-	void (*func_80059598)(DreamSys *this);
+	s32 (*DreamSys__ProjectPointAtDistance)(DreamSys *this, void *out, s32 day, s32 *reference, s32 tolerance);
+	void (*DreamSys__func_59590)(DreamSys *this);
+	void (*DreamSys__func_59598)(DreamSys *this);
 	s32 (*DreamSys__NoOpSlot12C)(DreamSys *this);
 	void (*DreamSys__ClearTickCallbacks)(DreamSys *this, bool arg1);
 	/* Chains DreamSys__SelectCallback98(this, arg1) then DreamSys__SelectCallback80(this, arg2)
@@ -1063,12 +1063,12 @@ struct vtable_DreamSys{
 	void (*DreamSys__StopDrift)(DreamSys *this, s32 arg1);
 	/* +0x180..+0x190: resolved via tools/classtable.py DREAMSYS_METHODS,
 	   all five matched this round (2026-08-30-b). DreamSys__GetSetMoveMode is also
-	   called directly (not through the vtable) by func_80059148, as
+	   called directly (not through the vtable) by DreamSys__SetMoveOverride, as
 	   (this, 1). */
 	s32 (*DreamSys__GetSetMoveMode)(DreamSys *this, s32 value);
 	void (*DreamSys__ChangeMoveMode)(DreamSys *this, s32 value);
 	void (*DreamSys__RestorePreviousMoveMode)(DreamSys *this);
-	void (*func_8005A1B0)(DreamSys *this, s32 a, s32 b, s32 c, s32 d);
+	void (*DreamSys__SetGateFlags)(DreamSys *this, s32 a, s32 b, s32 c, s32 d);
 	void (*DreamSys__SetTickPeriod)(DreamSys *this, s32 value);
 	/* Referenced by DreamSys__SelectCallback98's arg1==2 case: its raw address (never
 	   called there) is forwarded as InitSoundCueSet's 5th argument. arg0 is
@@ -1167,8 +1167,8 @@ struct vtable_DreamSys{
 	   for its own bytes, not read as a length. */
 	void (*DreamSys__SaveLinkSnapshot)(DreamSys *this);
 	void (*DreamSys__RestoreLinkSnapshot)(DreamSys *this);
-	/* This field is named `func_228`, not `func_8005BA20`, even though it
-	   IS func_8005BA20's slot (resolved via tools/classtable.py this
+	/* This field is named `func_228`, not `DreamSys__func_5ba20`, even though it
+	   IS DreamSys__func_5ba20's slot (resolved via tools/classtable.py this
 	   round) -- src/code_1677c.c (a different unit, out of this runner's
 	   scope) already references it by this name
 	   (`self->dreamSys->vt->func_228(...)`), and renaming the field would
@@ -1181,7 +1181,7 @@ struct vtable_DreamSys{
 	   constructor (func_80025FDC in src/code_1677c.c), as
 	   this->vt->func_228(this, arg->unk14) right after DreamSys is
 	   allocated by New_DreamSys -- the call site's own signature (single
-	   s32 arg, return value discarded) matches func_8005BA20's own
+	   s32 arg, return value discarded) matches DreamSys__func_5ba20's own
 	   (this, s32 value) -> s32 get/set exactly, hence the retype from
 	   `void (*)(DreamSys*, s32)` to `s32 (*)(DreamSys*, s32)` (a discarded
 	   non-void return in a bare statement is legal C either way, so this
@@ -1271,8 +1271,8 @@ extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawn
    an empty delay slot and no a0-a3 setup); its return value is stored whole
    into this->unk_0x880, hence s32 (round 2026-09-02). MATCHED, defined later
    in this unit's own ROM order -- forward declaration only (gp-relative
-   blocker resolved; see docs/match-reports/func_8005BF48.md). */
-extern s32 func_8005BF48(void);
+   blocker resolved; see docs/match-reports/GetStageLinkAngle.md). */
+extern s32 GetStageLinkAngle(void);
 
 /* Called by DreamSys__TryTunnelLink as (this, &local) where `local` is a 0x10-byte
    stack buffer also forwarded to DreamSys__CheckTunnelHeading below; return value is
@@ -1316,7 +1316,7 @@ extern s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2);
    docs/match-reports/Test4InstantTeleporters.md). */
 extern s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 
-/* Called by DreamSys__TryInstantTeleportLink with NO arguments, same shape as func_8005BF48
+/* Called by DreamSys__TryInstantTeleportLink with NO arguments, same shape as GetStageLinkAngle
    above; return value is forwarded straight into ExecuteLink's stage-type
    argument, hence s32 (round 2026-09-02). MATCHED, defined later in this
    unit's own ROM order -- forward declaration only (gp-relative blocker

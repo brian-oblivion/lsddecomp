@@ -35,7 +35,7 @@ to be exactly the trap; see the residue below.
 `sizeof(DreamSys)` from the allocator's own mouth, and it does NOT match
 what the header modeled at the time (`0x890`, ending at `storedDay`). This
 was the trigger for extending the struct by the missing `0x98` bytes (see
-`DreamSys__func_588ec.md`, which needed four of those newly-uncovered
+`DreamSys__ResetSessionState.md`, which needed four of those newly-uncovered
 fields). The finding stands regardless of this function's own match status
 -- it comes from retail's own INCLUDE_ASM bytes, not from anything this
 round wrote.

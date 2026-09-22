@@ -118,7 +118,7 @@ Two levers closed the last two gaps:
    then copies it into the argument register -- one extra `move`. Retail
    leaves the argument alone unless the condition is true, costing one
    fewer instruction; this is the same class of lesson as
-   `func_8005BF48`'s "two returns vs. default-then-override" fix earlier this
+   `GetStageLinkAngle`'s "two returns vs. default-then-override" fix earlier this
    round, but for a call ARGUMENT rather than a return value.
 
 ## Verification

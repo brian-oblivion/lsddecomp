@@ -1,4 +1,6 @@
-# func_8005BF48 — MATCHED 8/8
+# GetStageLinkAngle — MATCHED 8/8
+
+> Renamed from `func_8005BF48` on 2026-09-22 (tools/rename.py). Address 0x8005bf48.
 
 **Unit:** DreamSys · **Size:** 8 words · **Status:** MATCHED, round 43.
 
@@ -12,12 +14,12 @@ via `%gp_rel`). Round 42 RESOLVED that blocker. Rebuilt fresh this round.
 `if (D_8008ACC4 == 0xC) return 0; else return (s32)&D_8008ABF0;` -- stored
 whole into `this->unk_0x880` by `DreamSys__TryStageTimerLink` right before an ExecuteLink
 (per the existing header comment on that field and on the prototype
-`extern s32 func_8005BF48(void);`).
+`extern s32 GetStageLinkAngle(void);`).
 
 ## First attempt: two `return` statements, WRONG registers (1/8)
 
 ```c
-s32 func_8005BF48(void)
+s32 GetStageLinkAngle(void)
 {
 	if (D_8008ACC4 == 0xC)
 		return 0;
@@ -34,7 +36,7 @@ paths. 1/8 words matched.
 ## Final body: single result variable, matching retail's own idiom (8/8)
 
 ```c
-s32 func_8005BF48(void)
+s32 GetStageLinkAngle(void)
 {
 	s32 result;
 
@@ -57,7 +59,7 @@ only ever address-taken, matching the existing pattern used by
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py func_8005BF48` -> `8/8 words match`.
+`tools/funcdiff.py GetStageLinkAngle` -> `8/8 words match`.
 
 ### Proposed learning
 

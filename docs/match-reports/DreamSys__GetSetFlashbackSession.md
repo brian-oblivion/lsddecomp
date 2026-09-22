@@ -1,4 +1,6 @@
-# func_800590E8
+# DreamSys__GetSetFlashbackSession
+
+> Renamed from `func_800590E8` on 2026-09-22 (tools/rename.py). Address 0x800590e8.
 
 **Unit:** DreamSys · **Size:** 24 instructions · **Status:** MATCHED (24/24 words)
 
@@ -23,7 +25,7 @@ argument type independently.
 ## The C
 
 ```c
-s32 func_800590E8(DreamSys *this, DreamColors *out, s32 value)
+s32 DreamSys__GetSetFlashbackSession(DreamSys *this, DreamColors *out, s32 value)
 {
 	s32 old;
 

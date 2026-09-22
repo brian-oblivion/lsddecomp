@@ -80,7 +80,7 @@ accesses are plain uses of existing fields, not new ones.
   literally world-space.
 - **Corroborated by both callers**, which is what makes the direction
   (offset in, position out) more than a reading: `DreamSys.c`'s
-  `func_8005942C` feeds it a 3-word offset and treats the result as a map
+  `DreamSys__ProjectPointAtDistance` feeds it a 3-word offset and treats the result as a map
   position; `code_4cd08.c`'s `DespawnDreamAuxEntity` does the same for an aux slot.
 
 ## Extern arity (round 59)
@@ -95,7 +95,7 @@ definition in `src/code_d294_c.c` says.
 `$a3` to zero, and that instruction is in retail:
 
 ```
-80059460:  move  a3,zero                                  <- func_8005942C (DreamSys.c)
+80059460:  move  a3,zero                                  <- DreamSys__ProjectPointAtDistance (DreamSys.c)
 80059468:  jal   8001e600 <Class6B5CC__LocalOffsetToWorldPos>
 
 8005cf78:  jal   8001e600 <Class6B5CC__LocalOffsetToWorldPos>

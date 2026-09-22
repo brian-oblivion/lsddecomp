@@ -8,13 +8,13 @@
 
 Vtable slot `+0x180` (first of a five-function run resolved this round via
 `tools/classtable.py DREAMSYS_METHODS` -- see `DreamSys__ChangeMoveMode.md`,
-`DreamSys__RestorePreviousMoveMode.md`, `func_8005A1B0.md`, `DreamSys__SetTickPeriod.md` for the rest;
+`DreamSys__RestorePreviousMoveMode.md`, `DreamSys__SetGateFlags.md`, `DreamSys__SetTickPeriod.md` for the rest;
 `+0x180`..`+0x190` map onto the five functions at consecutive addresses
 `0x8005A168`..`0x8005A1EC`, confirmed by the tool, not assumed). A
 bounds-checked setter that returns the OLD value: if `value >= 0`, writes it
 into BOTH `unk_0xAC` and `unk_0xB0`; always returns the pre-call value of
 `unk_0xAC`. Also called directly (not through the vtable) by
-`func_80059148` as `(this, 1)`.
+`DreamSys__SetMoveOverride` as `(this, 1)`.
 
 ## The C
 

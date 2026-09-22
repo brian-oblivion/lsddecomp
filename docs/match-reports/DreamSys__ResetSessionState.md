@@ -1,4 +1,6 @@
-# DreamSys__func_588ec
+# DreamSys__ResetSessionState
+
+> Renamed from `DreamSys__func_588ec` on 2026-09-22 (tools/rename.py). Address 0x800588ec.
 
 **Unit:** DreamSys · **Size:** 31 instructions · **Status:** MATCHED (31/31 words)
 
@@ -14,7 +16,7 @@ zero: `callback_0x80`, `callback_0x98`, the first word of the still-opaque
 ## The C
 
 ```c
-void DreamSys__func_588ec(DreamSys *this)
+void DreamSys__ResetSessionState(DreamSys *this)
 {
 	this->vt->func_8001D344(this, 0);
 	this->vt->func_8001CEB4(this, 1, D_80087E08);

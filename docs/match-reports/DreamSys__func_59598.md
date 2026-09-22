@@ -1,17 +1,19 @@
-# func_80059590
+# DreamSys__func_59598
+
+> Renamed from `func_80059598` on 2026-09-22 (tools/rename.py). Address 0x80059598.
 
 **Unit:** DreamSys · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 
 ## What it does
 
-Setter clearing `unk_0x7C`.
+Setter clearing `unk_0x78`.
 
 ## The C
 
 ```c
-void func_80059590(DreamSys *this)
+void DreamSys__func_59598(DreamSys *this)
 {
-	this->unk_0x7C = 0;
+	this->unk_0x78 = 0;
 }
 ```
 

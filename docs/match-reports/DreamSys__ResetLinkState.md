@@ -11,7 +11,7 @@ runner BRAVO. Matched on the first attempt — no residue.
 
 Vtable slot `+0x0F8`. A straight-line "start dream" initializer, no
 branches at all: six vtable calls (`LogChunkMood`, `DreamSys__SelectCallback80`,
-`DreamSys__SelectCallback98`, `DreamSys__GetSetMoveMode`, `func_8005A1B0`, `DreamSys__SetTickPeriod`), a large
+`DreamSys__SelectCallback98`, `DreamSys__GetSetMoveMode`, `DreamSys__SetGateFlags`, `DreamSys__SetTickPeriod`), a large
 block of per-dream state zeroed in between/after, and a closing
 `Class6B5CC__GetRotationDegrees`/`func_8001CEB4` pair over a small local buffer — the same
 `func_8001CEB4(this, 1, &local)` shape already established by
@@ -61,7 +61,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 	this->unk_0x90 = 0;
 	this->unk_0x8C = 0;
 	this->unk_0x94 = 0;
-	this->vt->func_8005A1B0(this, 0, 1, 1, 1);
+	this->vt->DreamSys__SetGateFlags(this, 0, 1, 1, 1);
 
 	this->vt->DreamSys__SetTickPeriod(this, arg2);
 
@@ -102,7 +102,7 @@ types but turned out to already exist or need only a minimal local:
   two of its bytes named (`+0x8` and `+0xA`, both `s16`, values `0` and `1`)
   — everything else in it is written by `Class6B5CC__GetRotationDegrees` itself and never
   read back by this function, so it stays `unknown_values_0x0[8]`. The 5th
-  argument to `func_8005A1B0` (a literal `1`, spilled to `sp+0x10` by the
+  argument to `DreamSys__SetGateFlags` (a literal `1`, spilled to `sp+0x10` by the
   O32 ABI) needed no explicit local at all — writing the call with five
   arguments directly let the compiler place it on the stack itself.
 

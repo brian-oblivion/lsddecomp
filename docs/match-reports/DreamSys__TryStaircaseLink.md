@@ -175,7 +175,7 @@ All in `include/DreamSys.h`:
   holding an unrelated leftover value (`currentPos->position.z`, from the
   immediately preceding `lh`) with no explicit argument setup, matching the
   existing "empty delay slot, no a0-a3 setup" shape already documented for
-  `func_8005BF48`.
+  `GetStageLinkAngle`.
 
 ## The residue, precisely
 

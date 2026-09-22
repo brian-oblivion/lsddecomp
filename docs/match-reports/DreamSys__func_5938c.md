@@ -1,4 +1,6 @@
-# func_8005938C
+# DreamSys__func_5938c
+
+> Renamed from `func_8005938C` on 2026-09-22 (tools/rename.py). Address 0x8005938c.
 
 **Unit:** DreamSys · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 
@@ -9,7 +11,7 @@ Setter for `unk_0x64`.
 ## The C
 
 ```c
-void func_8005938C(DreamSys *this, s32 value)
+void DreamSys__func_5938c(DreamSys *this, s32 value)
 {
 	this->unk_0x64 = value;
 }

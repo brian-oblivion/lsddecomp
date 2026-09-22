@@ -94,7 +94,7 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood)
 compiled to a genuinely different branch layout than retail's (inverted
 outer condition sense, an extra `j`, wrong fallthrough) -- same
 "arm-order-must-match-retail's-fallthrough" class as
-`Test4StaircaseNodes` and `func_800590E8` (round 2026-08-30-c). Rewriting
+`Test4StaircaseNodes` and `DreamSys__GetSetFlashbackSession` (round 2026-08-30-c). Rewriting
 as a flat `if (val>=4) 2; else if (val<-3) 0; else 1;` (the ">=4" case
 FIRST, matching retail's actual branch-taken/fallthrough split) fixed the
 whole first half of the function (word 0-22 all match) on one try.

@@ -1,4 +1,6 @@
-# func_80059148
+# DreamSys__SetMoveOverride
+
+> Renamed from `func_80059148` on 2026-09-22 (tools/rename.py). Address 0x80059148.
 
 **Unit:** DreamSys · **Size:** 27 instructions · **Status:** MATCHED (27/27 words)
 
@@ -15,7 +17,7 @@ to `value`; if `value != 0`, calls `this->vt->DreamSys__GetSetMoveMode(this, 1)`
 ## The C
 
 ```c
-void func_80059148(DreamSys *this, s32 value)
+void DreamSys__SetMoveOverride(DreamSys *this, s32 value)
 {
 	this->unk_0x6c = value;
 	if (value != 0) {

@@ -1,4 +1,6 @@
-# func_8005A1B0
+# DreamSys__SetGateFlags
+
+> Renamed from `func_8005A1B0` on 2026-09-22 (tools/rename.py). Address 0x8005a1b0.
 
 **Unit:** DreamSys · **Size:** 15 instructions · **Status:** MATCHED (15/15 words)
 
@@ -15,7 +17,7 @@ for a 5th integer argument (`this` + 4 explicit args already fill
 ## The C
 
 ```c
-void func_8005A1B0(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
+void DreamSys__SetGateFlags(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
 {
 	if (a >= 0)
 		this->unk_0x124 = a;

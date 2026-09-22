@@ -1,4 +1,6 @@
-# func_8005942C — MATCH (56/56 words, whole-image SHA1 confirmed)
+# DreamSys__ProjectPointAtDistance — MATCH (56/56 words, whole-image SHA1 confirmed)
+
+> Renamed from `func_8005942C` on 2026-09-22 (tools/rename.py). Address 0x8005942c.
 
 **Unit:** DreamSys · **Size:** 56 instructions · **Status:** byte-exact.
 
@@ -13,7 +15,7 @@ extern void Class6B5CC__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s3
 extern s32 InterpolateKeyframeValue(void *a, void *b, s32 day);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
-s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
+s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
 {
 	s32 local[3];
 	s32 ret;
@@ -45,7 +47,7 @@ tolerance)` -- 5 parameters, the 5th (`tolerance`) passed on the stack
 (`lw a1, 0x48(sp)` reads it from the caller's incoming-argument area,
 confirmed against the O32 ABI's arithmetic: frame is `-0x38`, +0x10 for the
 reserved a0-a3 spill slots = 0x48). The project's own vtable slot
-(`vtable_DreamSys::func_8005942C`) was declared with only 4 params before
+(`vtable_DreamSys::DreamSys__ProjectPointAtDistance`) was declared with only 4 params before
 this round; corrected in `include/DreamSys.h` (function-pointer prototype
 only, no struct-size change -- verified safe since `DREAMSYS_METHODS`
 itself is not yet a C data definition anywhere, so nothing could break from
@@ -77,7 +79,7 @@ is a `config/` change and out of scope this round.
 2. `Class6B5CC__LocalOffsetToWorldPos` (code_d294_c, already matched) forwards its own `src`
    parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
    own doc comment (`include/code_d294.h`) confirms it treats both pointers
-   as 0xC-byte (3-word) elements. `func_8005942C` passes
+   as 0xC-byte (3-word) elements. `DreamSys__ProjectPointAtDistance` passes
    `(s32 *)&D_80087EE8 - 2` as that exact `src` argument, which only
    type-checks sensibly as a 3-word vector's start -- matching the 8
    "spare" bytes above exactly (2 words = 8 bytes immediately before
@@ -205,7 +207,7 @@ extern s32 Class6B5CC__LocalOffsetToWorldPos();
 extern s32 InterpolateKeyframeValue();
 extern s32 IsVec3WithinRange();
 
-s32 func_8005942C(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
+s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
 {
 	s32 local[3];
 	s32 v0;

@@ -1,17 +1,19 @@
-# func_80059598
+# DreamSys__SetHeightCurve
+
+> Renamed from `func_80059384` on 2026-09-22 (tools/rename.py). Address 0x80059384.
 
 **Unit:** DreamSys · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 
 ## What it does
 
-Setter clearing `unk_0x78`.
+Pointer setter for `unk_0x5C`.
 
 ## The C
 
 ```c
-void func_80059598(DreamSys *this)
+void DreamSys__SetHeightCurve(DreamSys *this, void *value)
 {
-	this->unk_0x78 = 0;
+	this->unk_0x5C = value;
 }
 ```
 
