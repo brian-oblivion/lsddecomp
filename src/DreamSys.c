@@ -1,3 +1,11 @@
+/* This unit: the DreamSys class's constructor, its per-tick update chain
+ * (DreamSys__TimerTick/DreamSys__RunTickCallbacks/DreamSys__UpdateTickState),
+ * the day/mood/flashback bookkeeping (DreamSys__StartDay/EndDay,
+ * DreamSys__UpdateDreamChart and the MoodGraphContributor helpers,
+ * DreamSys__AddFlashback/FlashbackSaving), and the whole "try a link" family
+ * (DreamSys__WallLink/DynamicLink and the "Try...Link"/"Test4..."/
+ * GetStaticSpawn static-link testers). See include/DreamSys.h for what the
+ * class IS as a whole, including the methods implemented in sibling units. */
 #include "common.h"
 #include "DreamSys.h"
 

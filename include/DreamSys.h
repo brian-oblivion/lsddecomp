@@ -1,6 +1,29 @@
 #ifndef CLASS_DREAMSYS
 #define CLASS_DREAMSYS
 
+/* DreamSys is the game's core per-playthrough subsystem: one instance
+ * (constructed by New_DreamSys, called from src/code_1677c.c) owns the day
+ * counter, the current dream's stage/spawn selection, the mood graph (two
+ * MoodGraphContributor accumulators averaged into a DreamColors value),
+ * flashback recording/playback, and the "link" state machine that decides
+ * when the player transitions between stages -- static wall links, dynamic/
+ * instance links, tunnels, staircases, instant teleporters, and a handful of
+ * timed/special-case transitions, each tried in turn from a handler tried by
+ * DreamSys__TimerTick's per-tick update. Every method takes an explicit
+ * `this` through the hand-rolled class framework (CLAUDE.md; NOT C++): the
+ * table is `DREAMSYS_METHODS` (struct vtable_DreamSys, resolved with
+ * tools/classtable.py). Several of DreamSys's OWN methods are implemented in
+ * sibling units that also include this header -- src/class_3bb8c_p.c (the
+ * grid-based nearby-link search and the local-offset/"apply or find nearby"
+ * family), class_3bb8c_t.c, class_3bb8c_r.c and class_3bb8c_o.c -- because
+ * the class's code spans more than one disassembly segment; this header is
+ * their shared, only correct view of `struct DreamSys` and its vtable.
+ * Naming pass, round 65 (2026-09-22): named 42 of the unit's own functions
+ * and 6 struct fields; the remainder of the "unk_0x6c/0x70.../0xBC" link-
+ * timing state machine (func_80059A58/AEC/B50/BD4/BE0/E98 and friends) is
+ * left as `func_` -- mechanics are documented at each site but no name was
+ * confident enough to clear the tier-A/B bar (FINISHING-PLAN track 3). */
+
 #include "common.h"
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood
    (round 2026-08-30-d). */
