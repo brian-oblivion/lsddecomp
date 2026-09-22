@@ -21,14 +21,14 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 	PlayerSpawnPoint *pos;
 
 	if (arg1 != 0) {
-		delta = D_80087E34[arg1] * D_80087E20[this->unk_0xAC];
+		delta = MOVE_COMMAND_SIGNS[arg1] * MOVE_MODE_SPEEDS[this->unk_0xAC];
 		this->vt->DreamSys__NoOpSlot12C(this);
 		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
 		if (!this->vt->DreamSys__TryStaircaseLink(this, pos)
 		 && !this->vt->DreamSys__TryInstantTeleportLink(this, pos)
 		 && !this->vt->DreamSys__TryTunnelLink(this, pos)) {
 			this->vt->DreamSys__SaveLinkSnapshot(this);
-			D_80087E3C[arg1](this, delta, (void *)(this->unk_0x90C < 1));
+			MOVE_COMMAND_DISPATCH[arg1](this, delta, (void *)(this->unk_0x90C < 1));
 			if (this->currentStage == 0
 			 && this->unk_0x14->unk_0x1C < -0x7D0
 			 && this->unk_0x14->unk_0x18 >= -0x1F3) {
@@ -40,11 +40,11 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 }
 ```
 
-`delta` is a signed value (`D_80087E34[arg1]`, a small `{0,1,-1}` sign/step
-table, times `D_80087E20[this->unk_0xAC]`, a `{0,0x18,0x40,0x80,0x180}`
+`delta` is a signed value (`MOVE_COMMAND_SIGNS[arg1]`, a small `{0,1,-1}` sign/step
+table, times `MOVE_MODE_SPEEDS[this->unk_0xAC]`, a `{0,0x18,0x40,0x80,0x180}`
 magnitude table indexed by the OTHER "current mood class" field), forwarded
-into `D_80087E3C[arg1]` -- a genuine dispatch table of function pointers
-(`D_80087E3C[0]` is null; unreachable here since `arg1 == 0` already
+into `MOVE_COMMAND_DISPATCH[arg1]` -- a genuine dispatch table of function pointers
+(`MOVE_COMMAND_DISPATCH[0]` is null; unreachable here since `arg1 == 0` already
 returned). `pos` comes from `this->unk_0x4C->methods->slot0x10C`, already
 typed `PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2)` --
 matches the three "link test" calls that follow, which try
@@ -77,11 +77,11 @@ All in `include/DreamSys.h`:
 - **`DreamSys::unk_0x90C` retyped `s32` -> `u32`.** Retail compares it with
   `sltiu` (unsigned), not `slti`; both existing writers (round 2026-08-30)
   only ever set it to the literal 0, so the retype is safe.
-- **`extern s32 D_80087E20[5]`, `extern s8 D_80087E34[8]`, and
-  `extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra)`**
+- **`extern s32 MOVE_MODE_SPEEDS[5]`, `extern s8 MOVE_COMMAND_SIGNS[8]`, and
+  `extern void (*MOVE_COMMAND_DISPATCH[5])(DreamSys *this, s32 val, void *extra)`**
   (the last declared after the real `DreamSys` typedef, matching
   `DreamSys__DispatchOffsetSlotC4`/`DreamSys__DispatchOffsetSlot0`'s element signature -- those are two of
-  D_80087E3C's five entries).
+  MOVE_COMMAND_DISPATCH's five entries).
 - **`this->unk_0x164` turned out to already be a named field**: offset
   arithmetic through `unknown_values_0x138[12]` + two `MoodGraphContributor`
   members (`areaMoods`, `entityMoods`, each `sizeof` 0x10) lands exactly on

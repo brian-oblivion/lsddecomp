@@ -25,7 +25,7 @@ The first attempt (plain symbol references, shown above) scored 16/17 with
 a `WARNING: the build differs OUTSIDE this range too` -- textbook
 size-drift shape. Checking `build/lsdde.map` for the three new symbols
 showed them ALL 4 bytes past their own name (`D_80088980` linked at
-`0x80088984`), matching the exact `D_80087E84[-1] == D_80087E80` pattern
+`0x80088984`), matching the exact `TURN_ROTATION_YAW[-1] == TURN_ROTATIONS` pattern
 already documented for a different data slot. That pattern looked like a
 strong match, so the natural fix was `&D_80088980[-1]` etc. -- which made
 the score WORSE (14/17, wrong direction). The `.map` being consulted was

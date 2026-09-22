@@ -19,7 +19,7 @@ half-open `[lo, lo+len)` band tests on `this->unk_0x914` to conditionally
 set a flag/fire a call; finish by conditionally setting `this->unk_0x88`,
 unconditionally setting `this->unk_0xA0 = 1;`, bumping `this->unk_0x914`,
 and returning 0). This one has THREE bands per arm (its siblings have two),
-and reuses `D_80087F08` (already named, by `DreamSys__TickStaircaseCase3`) for its
+and reuses `ROTATION_YAW_MINUS45` (already named, by `DreamSys__TickStaircaseCase3`) for its
 `func_8001CEB4` call in the `unk_0xAC == 4` arm.
 
 Both blocker screens are clean: no `gp_rel` hit and no
@@ -27,9 +27,9 @@ Both blocker screens are clean: no `gp_rel` hit and no
 
 ## New knowledge
 
-- `D_8008ABC8` (`struct RelativePos`) — this function's own per-instance
+- `STAIRCASE_OFFSET_1` (`struct RelativePos`) — this function's own per-instance
   constant passed to `DreamSys__ApplyRelativeOffset`, sibling to the already-named
-  `D_8008ABC0`/`D_8008ABD0`/`D_8008ABD8`.
+  `STAIRCASE_OFFSET_0`/`STAIRCASE_OFFSET_2`/`STAIRCASE_OFFSET_3`.
 
 No struct fields needed new names or types — every field this function
 touches (`unk_0x914`, `unk_0xAC`, `unk_0xA4`, `unk_0x88`, `unk_0xA0`,
@@ -44,7 +44,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 	s32 flag;
 
 	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &D_8008ABC8, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_1, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 >= 0x95)
@@ -57,7 +57,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 		if (this->unk_0x914 >= 0x19)
 			return 1;
 		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xB) < 2 || (u32)(this->unk_0x914 - 0x14) < 2) {
-			this->vt->func_8001CEB4(this, 0, &D_80087F08);
+			this->vt->func_8001CEB4(this, 0, &ROTATION_YAW_MINUS45);
 		}
 		flag = (u32)(this->unk_0x914 - 3) < 0xE;
 	}
@@ -103,4 +103,4 @@ matched code for a template.
 
 ## Naming
 
-- **Tier B.** Table index 1 of the same D_80087EEC family as DreamSys__TickStaircaseCase0, against D_8008ABC8; same evidence and same caveat.
+- **Tier B.** Table index 1 of the same STAIRCASE_TICK_FNS family as DreamSys__TickStaircaseCase0, against STAIRCASE_OFFSET_1; same evidence and same caveat.

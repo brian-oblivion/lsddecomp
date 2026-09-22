@@ -8,7 +8,7 @@
 
 Vtable slot `+0x040`. Resets a batch of session/journal state: calls two
 helper methods (`this->vt->func_8001D344(this, 0)` then
-`this->vt->func_8001CEB4(this, 1, D_80087E08)`), then clears eight fields to
+`this->vt->func_8001CEB4(this, 1, ROTATION_YAW_180)`), then clears eight fields to
 zero: `callback_0x80`, `callback_0x98`, the first word of the still-opaque
 `unk_0xCC` block, three fields in the previously-undiscovered struct tail
 (`unk_0x908`, `unk_0x90C`, `unk_0x910`), `unk_0x78`, and `unk_0x924`.
@@ -19,7 +19,7 @@ zero: `callback_0x80`, `callback_0x98`, the first word of the still-opaque
 void DreamSys__ResetSessionState(DreamSys *this)
 {
 	this->vt->func_8001D344(this, 0);
-	this->vt->func_8001CEB4(this, 1, D_80087E08);
+	this->vt->func_8001CEB4(this, 1, ROTATION_YAW_180);
 	this->callback_0x80 = NULL;
 	this->callback_0x98 = NULL;
 	*(s32 *)this->unk_0xCC = 0;

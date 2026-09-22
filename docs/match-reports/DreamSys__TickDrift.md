@@ -7,7 +7,7 @@
 ## What it does
 
 Two independent guarded actions: if `unk_0xC4 != 0`, calls
-`this->vt->BaseObjO__AddVec14(this, &D_80087EA4)` (the same slot `DreamSys__ApplyRelativeOffset`
+`this->vt->BaseObjO__AddVec14(this, &DRIFT_STEP)` (the same slot `DreamSys__ApplyRelativeOffset`
 calls, this time with a static global vector instead of a computed diff)
 and decrements `this->unk_0x5C->unk_0x24` by `0x258` (600); if `unk_0xC8 !=
 0`, calls `func_8002CD08(this->unk_0x58, this->unk_0xCC)`.
@@ -18,7 +18,7 @@ and decrements `this->unk_0x5C->unk_0x24` by `0x258` (600); if `unk_0xC8 !=
 void DreamSys__TickDrift(DreamSys *this)
 {
 	if (this->unk_0xC4 != 0) {
-		this->vt->BaseObjO__AddVec14(this, &D_80087EA4);
+		this->vt->BaseObjO__AddVec14(this, &DRIFT_STEP);
 		this->unk_0x5C->unk_0x24 -= 0x258;
 	}
 	if (this->unk_0xC8 != 0)

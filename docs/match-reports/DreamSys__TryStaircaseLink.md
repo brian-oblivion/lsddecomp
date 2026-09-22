@@ -125,7 +125,7 @@ staircase:
 	this->unk_0x908 = 1;
 	this->unk_0x90C = 1;
 	this->unk_0x914 = 0;
-	this->unk_0x910 = D_80087EEC[GetLastSpawnExtra()];
+	this->unk_0x910 = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
 	this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
 	this->unk_0x910(this);
 	return false;
@@ -159,7 +159,7 @@ All in `include/DreamSys.h`:
   same idiom as the existing `unk_0x91C` (`struct RelativePos`) next to it,
   which already covers `currentPos->position`. No other reader of this
   field existed before this round.
-- **`extern s32 (*D_80087EEC[4])(DreamSys *this)`** -- a table of the four
+- **`extern s32 (*STAIRCASE_TICK_FNS[4])(DreamSys *this)`** -- a table of the four
   already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseCase0`/
   `DreamSys__TickStaircaseCase1`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3`, confirmed by their own
   existing definitions in `src/DreamSys.c`.

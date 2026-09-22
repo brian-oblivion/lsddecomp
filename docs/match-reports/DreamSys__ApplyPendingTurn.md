@@ -7,8 +7,8 @@
 ## What it does
 
 Vtable slot `+0x174`. If `this->unk_0xA4` (a new index field) is nonzero,
-calls `this->vt->func_8001CEB4(this, 0, &D_80087E80[idx])` and resets
-`unk_0xA4` to 0. `D_80087E80` is address-of only here -- never loaded
+calls `this->vt->func_8001CEB4(this, 0, &TURN_ROTATIONS[idx])` and resets
+`unk_0xA4` to 0. `TURN_ROTATIONS` is address-of only here -- never loaded
 through -- so this is safe against the `addiu_at` runtime-indexed-load
 blocker (`docs/research/addiu-at-blocker.md`): "Address-only table
 arithmetic is safe", per `DECOMPILATION_LEARNINGS.md`.
@@ -22,7 +22,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *this)
 
 	idx = this->unk_0xA4;
 	if (idx != 0) {
-		this->vt->func_8001CEB4(this, 0, &D_80087E80[idx]);
+		this->vt->func_8001CEB4(this, 0, &TURN_ROTATIONS[idx]);
 		this->unk_0xA4 = 0;
 	}
 }
@@ -34,16 +34,16 @@ typedef struct D_80087E80Entry {
 	s32 unk4;
 	s32 unk8;
 } D_80087E80Entry;
-extern D_80087E80Entry D_80087E80[];
+extern D_80087E80Entry TURN_ROTATIONS[];
 ```
 
-## Note: `D_80087E80` is splat's auto-generated name for TWO seemingly
+## Note: `TURN_ROTATIONS` is splat's auto-generated name for TWO seemingly
 different things
 
-An earlier round's comment on `D_80087E84` says `&D_80087E84[-1] (==
-&D_80087E80, a distinct label immediately before it)`, describing a
+An earlier round's comment on `TURN_ROTATION_YAW` says `&TURN_ROTATION_YAW[-1] (==
+&TURN_ROTATIONS, a distinct label immediately before it)`, describing a
 4-byte-stride array (`DreamSys__StepLookYaw`, `D_80087E84Entry` = `{s16, s16}`).
-This function's own `lui`/`addiu %hi/%lo(D_80087E80)` uses a 12-byte stride
+This function's own `lui`/`addiu %hi/%lo(TURN_ROTATIONS)` uses a 12-byte stride
 (`idx*12`, from `sll,1` + `addu` + `sll,2`) -- incompatible with a 4-byte
 element. Both call sites reference the SAME linker symbol name (splat picked
 the same label because both point at the same byte address), but the

@@ -26,13 +26,13 @@ typedef struct DirectionTableEntry {
 	u16 unkA;
 } DirectionTableEntry;
 
-extern DirectionTableEntry D_8008875C[];
+extern DirectionTableEntry CARDINAL_ANGLES[];
 
 s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1)
 {
 	s16 diff;
 
-	diff = a0->heading - D_8008875C[a1].angle;
+	diff = a0->heading - CARDINAL_ANGLES[a1].angle;
 	if (diff >= 181) {
 		diff -= 360;
 	} else if (diff < -180) {
@@ -42,7 +42,7 @@ s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1)
 }
 ```
 
-`D_8008875C` (`asm/data/783DC.data.s:1192`) holds 4 entries at a 12-byte
+`CARDINAL_ANGLES` (`asm/data/783DC.data.s:1192`) holds 4 entries at a 12-byte
 (6-halfword) stride; the entries' first halfword is `0, 0x5A, 0xB4, 0x10E`
 (0°, 90°, 180°, 270°) — the four cardinal directions. Only that first field is
 read anywhere in this unit's current queue, so the other five halfwords per

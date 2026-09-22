@@ -7,50 +7,50 @@
 ## History
 
 Filed round 2026-08-30-a as BLOCKED on BOTH `gp_rel` (4 references, the
-first to `D_8008ACBC`) AND `addiu_at` (2 runtime-indexed global loads
+first to `gLinkSrcStage`) AND `addiu_at` (2 runtime-indexed global loads
 through `D_800889B8`/`D_80088858`). Round 21 resolved `addiu_at`; round 42
 resolved `gp_rel`. Attempted fresh this round (a stretch pick beyond the
 assigned queue).
 
 ## What it does
 
-Looks up a "heading" byte from `D_800889B8[D_8008ACBC][D_8008ACC0]`,
+Looks up a "heading" byte from `D_800889B8[gLinkSrcStage][gLinkTriggerIndex]`,
 validates it against `currentPos`'s stored heading via the already-matched
 `IsHeadingAligned` (a cardinal-direction proximity test), and on success
 writes one or two computed pointers (into a `DirectionTableEntry`-strided
-table, `D_80088758`) through its two optional output parameters. Called by
+table, `CARDINAL_ROTATIONS`) through its two optional output parameters. Called by
 `DreamSys__TryTunnelLink` (still `INCLUDE_ASM`) as `DreamSys__CheckTunnelHeading(&this->unk_0x888,
 &this->unk_0x884, local)`.
 
 ## New declarations needed
 
 `D_800889B8` and `D_80088858` are per-stage tables of pointers to byte
-arrays (4-byte stride, indexed by `D_8008ACBC`/`D_8008ACC4` respectively,
-each further indexed by `D_8008ACC0`/`D_8008ACC8` to read a single `u8`):
+arrays (4-byte stride, indexed by `gLinkSrcStage`/`gLinkDstStage` respectively,
+each further indexed by `gLinkTriggerIndex`/`gLinkSpawnIndex` to read a single `u8`):
 
 ```c
 extern u8 *D_800889B8[];
 extern u8 *D_80088858[];
 ```
 
-`D_80088758` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
+`CARDINAL_ROTATIONS` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
 table whose first element sits exactly 4 bytes before the SEPARATELY
-referenced `D_8008875C` (the angle table `IsHeadingAligned` already indexes,
+referenced `CARDINAL_ANGLES` (the angle table `IsHeadingAligned` already indexes,
 matched earlier this round's queue). splat drew a symbol boundary there
-because `D_8008875C` is independently referenced elsewhere, not because the
+because `CARDINAL_ANGLES` is independently referenced elsewhere, not because the
 underlying retail data is genuinely two different tables. This function
-only ever ADDRESS-TAKES an element (`&D_80088758[i]`, storing the pointer
+only ever ADDRESS-TAKES an element (`&CARDINAL_ROTATIONS[i]`, storing the pointer
 into an output parameter) and never dereferences one, so the element type
 only needs to fix the STRIDE -- reusing the already-declared
 `DirectionTableEntry` (12 bytes) is exact and avoids inventing a third
 local type for one call site:
 
 ```c
-extern DirectionTableEntry D_80088758[];
+extern DirectionTableEntry CARDINAL_ROTATIONS[];
 ```
 
 Also moved the `DirectionCheckArg` typedef, the `DirectionTableEntry`
-typedef, `extern DirectionTableEntry D_8008875C[];`, and a new forward
+typedef, `extern DirectionTableEntry CARDINAL_ANGLES[];`, and a new forward
 declaration `extern s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1);` to
 BEFORE `DreamSys__CheckTunnelHeading` (they previously sat between it and
 `IsHeadingAligned`'s own definition) -- `DreamSys__CheckTunnelHeading` needs `DirectionCheckArg`
@@ -67,16 +67,16 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	u8 heading;
 	s32 idx;
 
-	heading = D_800889B8[D_8008ACBC][D_8008ACC0];
+	heading = D_800889B8[gLinkSrcStage][gLinkTriggerIndex];
 	if (!IsHeadingAligned((DirectionCheckArg *)arg2, heading))
 		return 0;
 
 	if (arg1 != NULL)
-		*arg1 = (s32)&D_80088758[heading];
+		*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
 
 	if (arg0 != NULL) {
-		idx = D_80088858[D_8008ACC4][D_8008ACC8];
-		*arg0 = (s32)&D_80088758[idx];
+		idx = D_80088858[gLinkDstStage][gLinkSpawnIndex];
+		*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
 	}
 	return 1;
 }
@@ -101,14 +101,14 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = D_800889B8[D_8008ACBC][D_8008ACC0];
+	heading = D_800889B8[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
-			*arg1 = (s32)&D_80088758[heading];
+			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
 
 		if (arg0 != NULL) {
-			idx = D_80088858[D_8008ACC4][D_8008ACC8];
-			*arg0 = (s32)&D_80088758[idx];
+			idx = D_80088858[gLinkDstStage][gLinkSpawnIndex];
+			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
 		}
 		result = 1;
 	} else {

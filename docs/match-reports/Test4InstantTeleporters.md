@@ -4,14 +4,14 @@
 
 ## History
 
-Filed round 2026-08-30-a as BLOCKED on `gp_rel` (`D_8008ABE4`). Round 42
+Filed round 2026-08-30-a as BLOCKED on `gp_rel` (`gInstantTeleportersEnabled`). Round 42
 RESOLVED that blocker. Rebuilt fresh this round; took three attempts to
 recover retail's exact if/else block ORDER (values were right from the
 first attempt, layout was not).
 
 ## What it does
 
-`if (D_8008ABE4 == 0) return -1; else return GetStaticSpawn(target,
+`if (gInstantTeleportersEnabled == 0) return -1; else return GetStaticSpawn(target,
 currentPos, stage, D_80088B5C, D_80088B24, D_80088A80, 0);` -- same
 forwarding shape as `TestForStaticLink`/`Test4TunnelLinks`/
 `Test4StaircaseNodes` a few hundred lines above/below in this unit, using a
@@ -22,14 +22,14 @@ flag `0` instead of `1`.
 
 ```c
 /* attempt 1 */
-if (D_8008ABE4 == 0)
+if (gInstantTeleportersEnabled == 0)
 	return -1;
 return GetStaticSpawn(target, currentPos, stage, D_80088B5C, D_80088B24, D_80088A80, 0);
 
 /* attempt 2 (same compiled result as attempt 1 -- -O2 normalizes early-return
    to if/else) */
 s32 result;
-if (D_8008ABE4 != 0) {
+if (gInstantTeleportersEnabled != 0) {
 	result = GetStaticSpawn(...);
 } else {
 	result = -1;
@@ -38,7 +38,7 @@ return result;
 
 /* attempt 2b: hoisting the default before the branch, still wrong order */
 result = -1;
-if (D_8008ABE4 != 0) {
+if (gInstantTeleportersEnabled != 0) {
 	result = GetStaticSpawn(...);
 }
 return result;
@@ -69,7 +69,7 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
 {
 	s32 result;
 
-	if (D_8008ABE4 == 0) {
+	if (gInstantTeleportersEnabled == 0) {
 		result = -1;
 	} else {
 		result = GetStaticSpawn(target, currentPos, stage, D_80088B5C,

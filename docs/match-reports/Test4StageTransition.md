@@ -7,7 +7,7 @@
 ## History
 
 Filed round 2026-08-30-a as BLOCKED on `gp_rel` (two references,
-`D_8008ABE8` and `D_8008ACC4`). Round 42 RESOLVED that blocker. This was the
+`STAGE5_TRIGGER_GRIDPOS` and `gLinkDstStage`). Round 42 RESOLVED that blocker. This was the
 hardest function in the round's queue -- 5 attempts across a real control-flow
 puzzle before reaching byte-exact.
 
@@ -17,7 +17,7 @@ A "link type" dispatcher: for `stage` in `{1, 3, 9, 0xC}` (falling through a
 shared body with an extra check when `stage == 9`), or `stage == 5` (its own
 distinct check), validate `currentPos` against a couple of conditions and
 then call `GetRandomSpawnFromStage(target, (timer & 1) ? -0xC : stage,
-timer)`, stashing the result in `D_8008ACC4`. Any other `stage` value
+timer)`, stashing the result in `gLinkDstStage`. Any other `stage` value
 returns `-1` immediately. Called by `DreamSys__TryStageTimerLink` (still `INCLUDE_ASM`) as
 `Test4StageTransition(&this->linkCoordinates, this->currentStage, currentPos,
 this->dreamTimer)`.
@@ -60,7 +60,7 @@ once total length matches.
 ## Final body: same goto structure, blocks reordered to retail's physical layout (46/46)
 
 ```c
-extern s32 D_8008ABE8;
+extern s32 STAGE5_TRIGGER_GRIDPOS;
 
 s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
 {
@@ -83,7 +83,7 @@ shared:
 case5:
 	if (currentPos->position.y < -0xFFF)
 		goto merge;
-	if (*(s32 *)currentPos == D_8008ABE8)
+	if (*(s32 *)currentPos == STAGE5_TRIGGER_GRIDPOS)
 		goto merge;
 	return -1;
 
@@ -97,7 +97,7 @@ merge:
 	if (timer & 1)
 		stage = -0xC;
 	result = GetRandomSpawnFromStage(target, stage, timer);
-	D_8008ACC4 = result;
+	gLinkDstStage = result;
 	return result;
 }
 ```

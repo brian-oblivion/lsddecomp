@@ -6,12 +6,12 @@
 
 ## History
 
-Filed round 2026-08-30-a as BLOCKED on `gp_rel` (sole reference `D_8008ACC4`
+Filed round 2026-08-30-a as BLOCKED on `gp_rel` (sole reference `gLinkDstStage`
 via `%gp_rel`). Round 42 RESOLVED that blocker. Rebuilt fresh this round.
 
 ## What it does
 
-`if (D_8008ACC4 == 0xC) return 0; else return (s32)&D_8008ABF0;` -- stored
+`if (gLinkDstStage == 0xC) return 0; else return (s32)&LINK_ANGLE_180;` -- stored
 whole into `this->unk_0x880` by `DreamSys__TryStageTimerLink` right before an ExecuteLink
 (per the existing header comment on that field and on the prototype
 `extern s32 GetStageLinkAngle(void);`).
@@ -21,9 +21,9 @@ whole into `this->unk_0x880` by `DreamSys__TryStageTimerLink` right before an Ex
 ```c
 s32 GetStageLinkAngle(void)
 {
-	if (D_8008ACC4 == 0xC)
+	if (gLinkDstStage == 0xC)
 		return 0;
-	return (s32)&D_8008ABF0;
+	return (s32)&LINK_ANGLE_180;
 }
 ```
 
@@ -41,8 +41,8 @@ s32 GetStageLinkAngle(void)
 	s32 result;
 
 	result = 0;
-	if (D_8008ACC4 != 0xC)
-		result = (s32)&D_8008ABF0;
+	if (gLinkDstStage != 0xC)
+		result = (s32)&LINK_ANGLE_180;
 	return result;
 }
 ```
@@ -52,9 +52,9 @@ two early returns reproduced retail's exact register choice and its
 delay-slot placement of the zero-initialization. Byte-exact on the second
 attempt.
 
-`D_8008ABF0` (extern `s32`, single `.word` at `asm/data/7B3C0.sdata.s`) is
+`LINK_ANGLE_180` (extern `s32`, single `.word` at `asm/data/7B3C0.sdata.s`) is
 only ever address-taken, matching the existing pattern used by
-`D_8008ABF4`/`IsDaySpecial` a few hundred lines below in this same unit.
+`SPECIAL_DAY_MOOD`/`IsDaySpecial` a few hundred lines below in this same unit.
 
 ## Verification
 

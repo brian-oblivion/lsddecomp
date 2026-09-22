@@ -7,7 +7,7 @@
 ## History
 
 Filed round 2026-08-30-a as BLOCKED on BOTH `gp_rel` (4 references, the
-first to `D_8008ACBC`) AND `addiu_at` (2 runtime-indexed global loads
+first to `gLinkSrcStage`) AND `addiu_at` (2 runtime-indexed global loads
 through `D_80088C84`/`D_80088BDC`). Round 21 resolved `addiu_at`; round 42
 resolved `gp_rel`. Attempted fresh this round (a stretch pick beyond the
 assigned queue).
@@ -35,14 +35,14 @@ s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = D_80088C84[D_8008ACBC][D_8008ACC0];
+	heading = D_80088C84[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
-			*arg1 = (s32)&D_80088758[heading];
+			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
 
 		if (arg0 != NULL) {
-			idx = D_80088BDC[D_8008ACC4][D_8008ACC8];
-			*arg0 = (s32)&D_80088758[idx];
+			idx = D_80088BDC[gLinkDstStage][gLinkSpawnIndex];
+			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
 		}
 		result = 1;
 	} else {

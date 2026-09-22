@@ -60,7 +60,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 void DreamSys__ResetSessionState(DreamSys *this)
 {
 	this->vt->func_8001D344(this, 0);
-	this->vt->func_8001CEB4(this, 1, D_80087E08);
+	this->vt->func_8001CEB4(this, 1, ROTATION_YAW_180);
 	this->callback_0x80 = NULL;
 	this->callback_0x98 = NULL;
 	*(s32 *)this->soundCueSet = 0;
@@ -387,7 +387,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *re
 	s32 *vec;
 	s32 *p;
 
-	p = &D_80087EE8;
+	p = &gProjectOffsetZ;
 	*p = dist;
 	Class6B5CC__LocalOffsetToWorldPos(this, local, p - 2, 0);
 
@@ -506,8 +506,8 @@ void DreamSys__StepLookOffset(DreamSys *this)
 
 	idx = this->lookOffsetCommand;
 	if (idx != 0) {
-		delta = D_80087E50[idx];
-		threshold = D_80087E5C[idx];
+		delta = LOOK_OFFSET_STEPS[idx];
+		threshold = LOOK_OFFSET_LIMITS[idx];
 		sum = delta + this->lookOffset;
 		if (sum >= 0) {
 			if (sum < threshold)
@@ -565,8 +565,8 @@ void DreamSys__StepLookYaw(DreamSys *this)
 	this->moveCommandLatch = (this->moveCommand == 1);
 	idx = this->lookYawCommand;
 	if (idx != 0) {
-		delta = D_80087E68[idx];
-		threshold = D_80087E74[idx];
+		delta = LOOK_YAW_STEPS[idx];
+		threshold = LOOK_YAW_LIMITS[idx];
 		sum = delta + this->lookYaw;
 		if (sum >= 0) {
 			if (sum < threshold)
@@ -579,16 +579,16 @@ void DreamSys__StepLookYaw(DreamSys *this)
 			goto call_tail;
 		}
 	apply:
-		D_80087E84[0].value = delta;
-		this->vt->func_8001CEB4(this, 0, &D_80087E84[-1]);
+		TURN_ROTATION_YAW[0].value = delta;
+		this->vt->func_8001CEB4(this, 0, &TURN_ROTATION_YAW[-1]);
 		this->lookYaw = sum;
 		this->lookYawCommand = 0;
 	} else if (this->lookYaw != 0) {
 		delta = -0x2D;
 		if (this->lookYaw < 0)
 			delta = 0x2D;
-		D_80087E84[0].value = delta;
-		this->vt->func_8001CEB4(this, 0, &D_80087E84[-1]);
+		TURN_ROTATION_YAW[0].value = delta;
+		this->vt->func_8001CEB4(this, 0, &TURN_ROTATION_YAW[-1]);
 		this->lookYaw += delta;
 	} else {
 		return;
@@ -695,7 +695,7 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *this, s32 arg1)
    `headingArg` is a second copy of `heading` used at its two call sites,
    giving the two logical uses disjoint live ranges so GCC 2.6.3's
    allocator lands them in the SAME register retail does; `scratch` plays
-   the same role for the raw `D_80087EB0[idx]` read and, independently, for
+   the same role for the raw `VOICE_BY_SELECT[idx]` read and, independently, for
    the literal `0x90` argument at the very end. Removing either variable
    (rebuilding the "obvious" simpler form) reproduces a real, measured
    regression -- see docs/match-reports/DreamSys__StartVoice.md. */
@@ -715,10 +715,10 @@ void DreamSys__StartVoice(DreamSys *this)
 		return;
 	}
 
-	scratch = D_80087EB0[idx];
+	scratch = VOICE_BY_SELECT[idx];
 	heading = scratch << 4;
 	headingArg = heading;
-	vt->slot0x9C(obj, D_80087EC8[idx]);
+	vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
 	this->voiceIndex = vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
 	if (this->voiceSelect != 0x16) {
 		this->voiceIndex = -1;
@@ -750,14 +750,14 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 	PlayerSpawnPoint *pos;
 
 	if (arg1 != 0) {
-		delta = D_80087E34[arg1] * D_80087E20[this->moveMode];
+		delta = MOVE_COMMAND_SIGNS[arg1] * MOVE_MODE_SPEEDS[this->moveMode];
 		this->vt->DreamSys__NoOpSlot12C(this);
 		pos = this->linkMgr->methods->slot0x10C(this->linkMgr, 0, 0);
 		if (!this->vt->DreamSys__TryStaircaseLink(this, pos)
 		 && !this->vt->DreamSys__TryInstantTeleportLink(this, pos)
 		 && !this->vt->DreamSys__TryTunnelLink(this, pos)) {
 			this->vt->DreamSys__SaveLinkSnapshot(this);
-			D_80087E3C[arg1](this, delta, (void *)(this->staircaseMoveGate < 1));
+			MOVE_COMMAND_DISPATCH[arg1](this, delta, (void *)(this->staircaseMoveGate < 1));
 			if (this->currentStage == 0
 			 && this->unk_0x14->unk_0x1C < -0x7D0
 			 && this->unk_0x14->unk_0x18 >= -0x1F3) {
@@ -774,7 +774,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *this)
 
 	idx = this->turnCommand;
 	if (idx != 0) {
-		this->vt->func_8001CEB4(this, 0, &D_80087E80[idx]);
+		this->vt->func_8001CEB4(this, 0, &TURN_ROTATIONS[idx]);
 		this->turnCommand = 0;
 	}
 }
@@ -782,7 +782,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *this)
 void DreamSys__TickDrift(DreamSys *this)
 {
 	if (this->driftActive != 0) {
-		this->vt->BaseObjO__AddVec14(this, &D_80087EA4);
+		this->vt->BaseObjO__AddVec14(this, &DRIFT_STEP);
 		this->heightCurve->endValue -= 0x258;
 	}
 	if (this->cueServiceActive != 0)
@@ -866,11 +866,11 @@ extern void *memset(unsigned char *dst, unsigned char c, int n);
    this->unknown_sdata_0x178 -- naming convention matches (the field's own
    name already flags it as sdata-sourced). Not dereferenced by this
    function or any other in this unit's queue. */
-extern s32 D_8008ABE0;
+extern s32 SAVE_MAGIC;
 
 void DreamSys__InitNewGame(DreamSys *this)
 {
-	this->unknown_sdata_0x178 = D_8008ABE0;
+	this->unknown_sdata_0x178 = SAVE_MAGIC;
 	this->currentYear = 0;
 	this->currentDay = 0;
 	this->totalFlasbackUnlockScore = 0;
@@ -1168,7 +1168,7 @@ staircase:
 	this->staircaseActive = 1;
 	this->staircaseMoveGate = 1;
 	this->staircaseFrame = 0;
-	this->staircaseTickFn = D_80087EEC[GetLastSpawnExtra()];
+	this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
 	this->vt->func_8001CEB4(this, 1, (void *)this->enterRotation);
 	this->staircaseTickFn(this);
 	return false;
@@ -1179,7 +1179,7 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TryStaircaseLink);
 s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 {
 	if (this->staircaseFrame == 0) {
-		DreamSys__ApplyRelativeOffset(this, &D_8008ABC0, &this->staircaseOrigin);
+		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_0, &this->staircaseOrigin);
 	}
 	if (this->moveMode != 4) {
 		if (this->staircaseFrame >= 0x85)
@@ -1191,7 +1191,7 @@ s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 		if (this->staircaseFrame >= 0x13)
 			return 1;
 		if ((u32)(this->staircaseFrame - 8) < 2 || (u32)(this->staircaseFrame - 0xD) < 2) {
-			this->vt->func_8001CEB4(this, 0, &D_80087EFC);
+			this->vt->func_8001CEB4(this, 0, &ROTATION_YAW_PLUS45);
 		}
 	}
 	this->moveCommand = 1;
@@ -1204,7 +1204,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 	s32 flag;
 
 	if (this->staircaseFrame == 0) {
-		DreamSys__ApplyRelativeOffset(this, &D_8008ABC8, &this->staircaseOrigin);
+		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_1, &this->staircaseOrigin);
 	}
 	if (this->moveMode != 4) {
 		if (this->staircaseFrame >= 0x95)
@@ -1217,7 +1217,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 		if (this->staircaseFrame >= 0x19)
 			return 1;
 		if ((u32)(this->staircaseFrame - 6) < 2 || (u32)(this->staircaseFrame - 0xB) < 2 || (u32)(this->staircaseFrame - 0x14) < 2) {
-			this->vt->func_8001CEB4(this, 0, &D_80087F08);
+			this->vt->func_8001CEB4(this, 0, &ROTATION_YAW_MINUS45);
 		}
 		flag = (u32)(this->staircaseFrame - 3) < 0xE;
 	}
@@ -1232,7 +1232,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 s32 DreamSys__TickStaircaseCase2(DreamSys *this)
 {
 	if (this->staircaseFrame == 0) {
-		DreamSys__ApplyRelativeOffset(this, &D_8008ABD0, &this->staircaseOrigin);
+		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_2, &this->staircaseOrigin);
 	}
 	if (this->moveMode != 4) {
 		if (this->staircaseFrame < 0x65) {
@@ -1245,7 +1245,7 @@ s32 DreamSys__TickStaircaseCase2(DreamSys *this)
 	} else {
 		if (this->staircaseFrame < 15) {
 			if ((u32)(this->staircaseFrame - 8) < 2) {
-				this->vt->func_8001CEB4(this, 0, &D_80087EFC);
+				this->vt->func_8001CEB4(this, 0, &ROTATION_YAW_PLUS45);
 			}
 		} else {
 			return 1;
@@ -1261,7 +1261,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 	s32 flag;
 
 	if (this->staircaseFrame == 0) {
-		DreamSys__ApplyRelativeOffset(this, &D_8008ABD8, &this->staircaseOrigin);
+		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_3, &this->staircaseOrigin);
 	}
 	if (this->moveMode != 4) {
 		if (this->staircaseFrame >= 0x71)
@@ -1274,7 +1274,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 		if (this->staircaseFrame >= 0x13)
 			return 1;
 		if ((u32)(this->staircaseFrame - 6) < 2 || (u32)(this->staircaseFrame - 0xF) < 2) {
-			this->vt->func_8001CEB4(this, 0, &D_80087F08);
+			this->vt->func_8001CEB4(this, 0, &ROTATION_YAW_MINUS45);
 		}
 		flag = (u32)this->staircaseFrame < 9;
 	}
@@ -1499,7 +1499,7 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood)
 		s8 *entry;
 
 		index = local.axis.dynamic * 3;
-		entry = &D_80087E14[index];
+		entry = &DREAM_COLOR_TABLE[index];
 		return entry[local.axis.upper];
 	}
 }
@@ -1729,30 +1729,30 @@ typedef struct DirectionTableEntry {
 	u16 unkA;
 } DirectionTableEntry;
 
-extern DirectionTableEntry D_8008875C[];
+extern DirectionTableEntry CARDINAL_ANGLES[];
 
 /* Forward declaration: defined below in ROM order, called by DreamSys__CheckTunnelHeading
    just above it. */
 extern s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1);
 
 /* D_800889B8: a per-stage table of pointers to byte arrays (4-byte stride,
-   indexed by D_8008ACBC), each further indexed by D_8008ACC0 to read the
+   indexed by gLinkSrcStage), each further indexed by gLinkTriggerIndex to read the
    "heading" byte passed to IsHeadingAligned. D_80088858 is the analogous
-   table for D_8008ACC4/D_8008ACC8. Neither array's own element type is
+   table for gLinkDstStage/gLinkSpawnIndex. Neither array's own element type is
    dereferenced beyond a single `u8` here. */
 extern u8 *D_800889B8[];
 extern u8 *D_80088858[];
 
 /* A `DirectionTableEntry`-STRIDED (12-byte) table whose first element
-   happens to sit 4 bytes before the separately-referenced `D_8008875C`
+   happens to sit 4 bytes before the separately-referenced `CARDINAL_ANGLES`
    (the angle table `IsHeadingAligned` indexes) -- splat drew the boundary
-   there because `D_8008875C` is independently referenced, not because the
+   there because `CARDINAL_ANGLES` is independently referenced, not because the
    underlying data is two different tables. This function only ever
-   ADDRESS-TAKES an element (`&D_80088758[i]`), never dereferences one, so
+   ADDRESS-TAKES an element (`&CARDINAL_ROTATIONS[i]`), never dereferences one, so
    the element type only needs to fix the STRIDE; reusing
    `DirectionTableEntry` for that is exact and avoids inventing a third
    local type for one call site. */
-extern DirectionTableEntry D_80088758[];
+extern DirectionTableEntry CARDINAL_ROTATIONS[];
 
 s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 {
@@ -1760,14 +1760,14 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = D_800889B8[D_8008ACBC][D_8008ACC0];
+	heading = D_800889B8[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
-			*arg1 = (s32)&D_80088758[heading];
+			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
 
 		if (arg0 != NULL) {
-			idx = D_80088858[D_8008ACC4][D_8008ACC8];
-			*arg0 = (s32)&D_80088758[idx];
+			idx = D_80088858[gLinkDstStage][gLinkSpawnIndex];
+			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
 		}
 		result = 1;
 	} else {
@@ -1780,7 +1780,7 @@ s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1)
 {
 	s16 diff;
 
-	diff = a0->heading - D_8008875C[a1].angle;
+	diff = a0->heading - CARDINAL_ANGLES[a1].angle;
 	if (diff >= 181) {
 		diff -= 360;
 	} else if (diff < -180) {
@@ -1791,7 +1791,7 @@ s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1)
 
 /* Compared against the leading 4 bytes (chunk+tile) of `currentPos` as a
    raw word; only ever compared here, never dereferenced field-by-field. */
-extern s32 D_8008ABE8;
+extern s32 STAGE5_TRIGGER_GRIDPOS;
 
 s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
 {
@@ -1814,7 +1814,7 @@ shared:
 case5:
 	if (currentPos->position.y < -0xFFF)
 		goto merge;
-	if (*(s32 *)currentPos == D_8008ABE8)
+	if (*(s32 *)currentPos == STAGE5_TRIGGER_GRIDPOS)
 		goto merge;
 	return -1;
 
@@ -1828,22 +1828,22 @@ merge:
 	if (timer & 1)
 		stage = -0xC;
 	result = GetRandomSpawnFromStage(target, stage, timer);
-	D_8008ACC4 = result;
+	gLinkDstStage = result;
 	return result;
 }
 
 /* Set (whole word) into `this->stageLinkAngle` by DreamSys__TryStageTimerLink just before an
    ExecuteLink; only ever address-taken here, never dereferenced by this
    unit's queued functions. */
-extern s32 D_8008ABF0;
+extern s32 LINK_ANGLE_180;
 
 s32 GetStageLinkAngle(void)
 {
 	s32 result;
 
 	result = 0;
-	if (D_8008ACC4 != 0xC)
-		result = (s32)&D_8008ABF0;
+	if (gLinkDstStage != 0xC)
+		result = (s32)&LINK_ANGLE_180;
 	return result;
 }
 
@@ -1851,11 +1851,11 @@ s32 GetStageLinkAngle(void)
    this unit -- code_4cd08.c calls the setter through its own extern
    (`extern void SetInstantTeleportersEnabled(bool value);`), never touches the flag
    directly. */
-extern s32 D_8008ABE4;
+extern s32 gInstantTeleportersEnabled;
 
 void SetInstantTeleportersEnabled(bool value)
 {
-	D_8008ABE4 = value;
+	gInstantTeleportersEnabled = value;
 }
 
 /* Table triple for Test4InstantTeleporters, same roles as the
@@ -1868,7 +1868,7 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
 {
 	s32 result;
 
-	if (D_8008ABE4 == 0) {
+	if (gInstantTeleportersEnabled == 0) {
 		result = -1;
 	} else {
 		result = GetStaticSpawn(target, currentPos, stage, D_80088B5C,
@@ -1879,7 +1879,7 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
 
 s32 func_8005BFC4(void)
 {
-	return (D_8008ACBC == 0) ? 0xA : 0;
+	return (gLinkSrcStage == 0) ? 0xA : 0;
 }
 
 s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2)
@@ -1891,8 +1891,8 @@ s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, 
 }
 
 /* Same role as D_800889B8/D_80088858 for DreamSys__CheckTunnelHeading above, but for this
-   function's own "link test" (indexed the same way: D_8008ACBC/D_8008ACC0
-   for the heading lookup, D_8008ACC4/D_8008ACC8 for the second table). */
+   function's own "link test" (indexed the same way: gLinkSrcStage/gLinkTriggerIndex
+   for the heading lookup, gLinkDstStage/gLinkSpawnIndex for the second table). */
 extern u8 *D_80088C84[];
 extern u8 *D_80088BDC[];
 
@@ -1902,14 +1902,14 @@ s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = D_80088C84[D_8008ACBC][D_8008ACC0];
+	heading = D_80088C84[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
-			*arg1 = (s32)&D_80088758[heading];
+			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
 
 		if (arg0 != NULL) {
-			idx = D_80088BDC[D_8008ACC4][D_8008ACC8];
-			*arg0 = (s32)&D_80088758[idx];
+			idx = D_80088BDC[gLinkDstStage][gLinkSpawnIndex];
+			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
 		}
 		result = 1;
 	} else {
@@ -1920,7 +1920,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 
 s32 GetLastSpawnExtra(void)
 {
-	return D_80088BA4[D_8008ACC4][D_8008ACC8].extra;
+	return D_80088BA4[gLinkDstStage][gLinkSpawnIndex].extra;
 }
 
 s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
@@ -1944,18 +1944,18 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
 		if (*(s16 *)&currentPos->tile != trig->tile.value && trig->tile.value >= 0)
 			continue;
 
-		D_8008ACBC = stage;
-		D_8008ACC0 = i;
+		gLinkSrcStage = stage;
+		gLinkTriggerIndex = i;
 		triggerStage = trig->stage;
-		D_8008ACC4 = triggerStage;
+		gLinkDstStage = triggerStage;
 		spawnIndex = *(u8 *)&trig->spawnpointIndex;
 		entry = &spawns[triggerStage][spawnIndex];
-		D_8008ACC8 = spawnIndex;
+		gLinkSpawnIndex = spawnIndex;
 		*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
 		target->position = SPAWN_POS_ADJUST[entry->adjustment];
 		if (flag != 0)
 			(*gpNavChallengesComplete)[entry->extra] = 1;
-		return D_8008ACC4;
+		return gLinkDstStage;
 	}
 	return -1;
 }
@@ -2003,7 +2003,7 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day)
 		if (day == SPECIAL_DAYS[i]) {
 			cinematic->entry = rand() % 6;
 			cinematic->bank = i % 12;
-			return &D_8008ABF4;
+			return &SPECIAL_DAY_MOOD;
 		}
 	}
 	return NULL;
