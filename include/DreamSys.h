@@ -19,7 +19,7 @@
  * the class's code spans more than one disassembly segment; this header is
  * their shared, only correct view of `struct DreamSys` and its vtable.
  * Naming pass, round 65 (2026-09-22): named 42 of the unit's own functions
- * and 6 struct fields; the remainder of the "unk_0x6c/0x70.../0xBC" link-
+ * and 6 struct fields; the remainder of the "moveOverride/0x70.../0xBC" link-
  * timing state machine (DreamSys__TickMove/AEC/B50/BD4/BE0/E98 and friends) is
  * left as `func_` -- mechanics are documented at each site but no name was
  * confident enough to clear the tier-A/B bar (FINISHING-PLAN track 3). */
@@ -42,8 +42,8 @@ extern s32 D_8008ACC4;
 extern s32 D_8008ACC8;
 
 /* Delta/threshold table pairs consumed by DreamSys__StepLookOffset (D_80087E50 /
-   D_80087E5C, indexed by DreamSys::unk_0x88) and DreamSys__StepLookYaw (D_80087E68 /
-   D_80087E74, indexed by DreamSys::unk_0x90). Index 0 is unused/zero in both
+   D_80087E5C, indexed by DreamSys::lookOffsetCommand) and DreamSys__StepLookYaw (D_80087E68 /
+   D_80087E74, indexed by DreamSys::lookYawCommand). Index 0 is unused/zero in both
    pairs; indices 1 and 2 are the negative/positive delta and its matching
    threshold. Still raw `nonmatching` data (round 2026-08-30). */
 extern s32 D_80087E50[3];
@@ -81,7 +81,7 @@ extern D_80087E84Entry D_80087E84[8];
 extern u8 D_80087E08[];
 
 /* 12-byte-stride table, address-of only (never loaded through) by
-   DreamSys__ApplyPendingTurn, indexed by DreamSys::unk_0xA4 and forwarded as
+   DreamSys__ApplyPendingTurn, indexed by DreamSys::turnCommand and forwarded as
    func_8001CEB4's arg2. Splat resolves this to the SAME symbol name as
    &D_80087E84[-1] (see that field's comment above), but the two call sites
    use incompatible strides (4 vs 12 bytes) -- likely two unrelated globals
@@ -130,7 +130,7 @@ typedef struct PlayerSpawnPoint {
    one struct so a single whole-struct assignment reproduces retail's
    unaligned 4-byte `lwl`/`lwr` + `swl`/`swr` copy -- DreamSys__TryStaircaseLink (round
    2026-09-06) copies a `PlayerSpawnPoint *currentPos` piecewise into
-   DreamSys::unk_0x918 (this type) and DreamSys::unk_0x91C (a plain
+   DreamSys::staircaseGridPos (this type) and DreamSys::staircaseOrigin (a plain
    `struct RelativePos`, the `position` half) rather than as one 10-byte
    copy, matching retail's own two separate unaligned-copy instruction
    groups. */
@@ -206,7 +206,7 @@ typedef struct DreamSysUnk14 {
 	s32 unknown_values_0x48[0x8 / 4];
 } DreamSysUnk14;
 
-/* Struct pointed to by DreamSys::unk_0x5C. +0x14 / +0x20 are a pair of
+/* Struct pointed to by DreamSys::heightCurve. +0x14 / +0x20 are a pair of
    two-word (x,y) points per DreamSys__ProjectPointAtDistance (MATCHED, elsewhere in
    this unit; not independently re-confirmed this round). +0x24 (the second point's y) is
    confirmed: DreamSys__StepLookOffset (round 2026-08-30) nudges it. +0x18 (the first
@@ -214,20 +214,20 @@ typedef struct DreamSysUnk14 {
    it by the SAME delta as +0x24, in the same statement pair. */
 typedef struct DreamSysUnk5C {
 	s8 unknown_values_0x0[0x18];
-	s32 unk_0x18;
+	s32 startValue;
 	s8 unknown_values_0x1C[8];
-	s32 unk_0x24;
+	s32 endValue;
 } DreamSysUnk5C;
 
-/* Object pointed to by DreamSys::unk_0x58, used by DreamSys__StopVoice (slot
+/* Object pointed to by DreamSys::soundObj, used by DreamSys__StopVoice (slot
    +0x84) and, this round, ExecuteLink (slot +0x80): loaded, dereferenced
    for its own vtable pointer at offset 0, and called through. Everything
    else about this class -- including whether it is the SAME class as
-   DreamSys::unk_0x4C below -- is unknown. Elsewhere in this unit unk_0x58
+   DreamSys::unk_0x4C below -- is unknown. Elsewhere in this unit soundObj
    is set/read as a plain s32 (DreamSys__SetSoundObj, DreamSys__StopDrift's call into
    FlushSoundCueSet), which is consistent with it being a pointer value just
    not typed that way there. slot0x84 takes TWO arguments, not one --
-   head-adjudicated 2026-08-30-c: the guard value (DreamSys::unk_0xBC)
+   head-adjudicated 2026-08-30-c: the guard value (DreamSys::voiceIndex)
    loaded into $a1 by DreamSys__StopVoice is never overwritten before the jalr, so
    it is passed through, not just branched on. See DreamSys__StopVoice.md.
    slot0x80 (ExecuteLink, round 2026-09-02) takes three arguments, all
@@ -235,7 +235,7 @@ typedef struct DreamSysUnk5C {
    suggests what they mean.
 
    DreamSys__StartVoice (round 2026-09-06) adds two more confirmed facts: slot0x80
-   DOES return a value -- it stores the result into DreamSys::unk_0xBC on one
+   DOES return a value -- it stores the result into DreamSys::voiceIndex on one
    call path -- so its return type widens from `void` to `s32` here; this is
    safe for every existing call site (ExecuteLink, DreamSys__DreamSys's own
    slot0x80 use on the DIFFERENT DreamSysCtorArgObj vtable below) because none
@@ -493,11 +493,11 @@ extern DreamSysVec3 D_80087EA4;
 
    Two independent pieces of evidence pin this down, not a guess:
    - `DreamSys__NotifyLinkAttempt` (this unit, already matched) clamps
-     `this->unk_0xB8 = (this->unk_0x28->unk_0x36 & 0x7F); if (unk_0xB8 >=
-     0x18) unk_0xB8 = 0;` -- i.e. `unk_0xB8` is bounded to [0, 0x18). Both
+     `this->voiceSelect = (this->unk_0x28->unk_0x36 & 0x7F); if (voiceSelect >=
+     0x18) voiceSelect = 0;` -- i.e. `voiceSelect` is bounded to [0, 0x18). Both
      `D_80087EB0` and `D_80087EC8` (each already-named 24+-byte byte
      tables) are indexed by this SAME bounded value in `DreamSys__StartVoice`
-     (`D_80087EC8[unk_0xB8]`), so `D_80087EC8`'s real, ever-read extent is
+     (`D_80087EC8[voiceSelect]`), so `D_80087EC8`'s real, ever-read extent is
      exactly 24 bytes (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero
      bytes splat lumped into its dlabel (`0x80087EE0`-`0x80087EE7`) are
      never reached by that indexed access and belong to something else.
@@ -544,7 +544,7 @@ extern u8 D_80087F08[];
 /* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
    (unread by this function). Called by still-INCLUDE_ASM DreamSys__ProjectPointAtDistance as
-   InterpolateKeyframeValue(&this->unk_0x5C->unknown_values_0x0[0x14], arg2, arg3) --
+   InterpolateKeyframeValue(&this->heightCurve->unknown_values_0x0[0x14], arg2, arg3) --
    the first argument is one of DreamSysUnk5C's two documented "point"
    fields (round 2026-08-30-d). */
 typedef struct DreamSysInterpPoint {
@@ -565,11 +565,11 @@ typedef struct DreamSysUnk28Target {
    classified into {0,1,2} by CalcDreamColor first (round 2026-08-30-d). */
 extern s8 D_80087E14[9];
 
-/* Byte tables indexed by DreamSys::unk_0xB8 (already bounded to [0,0x18) at
+/* Byte tables indexed by DreamSys::voiceSelect (already bounded to [0,0x18) at
    the write site -- see that field's own comment). DreamSys__StartVoice
-   (round 2026-09-06) reads both: D_80087EB0[unk_0xB8] (values 0..0x1E) feeds
+   (round 2026-09-06) reads both: D_80087EB0[voiceSelect] (values 0..0x1E) feeds
    DreamSysUnk58Vtable::slot0x80's `a1` argument, left-shifted by 4;
-   D_80087EC8[unk_0xB8] (values include -2..2, hence `s8` not `u8`) feeds
+   D_80087EC8[voiceSelect] (values include -2..2, hence `s8` not `u8`) feeds
    slot0x9C's `a1` argument directly. D_80087EC8's real extent is exactly
    these 24 bytes -- the trailing zero bytes splat lumped into its dlabel
    belong to the D_80087EE8 vector documented above, not to this table. */
@@ -581,12 +581,12 @@ extern const s8 D_80087EC8[0x18];
 extern void *func_80017B34(s32 size);
 
 /* Also declared in Entity.h for a different (Entity) struct's fields; here
-   called by DreamSys__StopDrift as (this->unk_0x58, this->unk_0xCC)
+   called by DreamSys__StopDrift as (this->soundObj, this->soundCueSet)
    (round 2026-08-30-b). */
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
 /* Also declared in Entity.h. Called by DreamSys__TickDrift as
-   (this->unk_0x58, this->unk_0xCC) -- same argument shape as
+   (this->soundObj, this->soundCueSet) -- same argument shape as
    FlushSoundCueSet above (round 2026-08-30-d). */
 extern void func_8002CD08(s32 arg0, void *arg1);
 
@@ -612,11 +612,11 @@ typedef struct DreamSys {
 	s32 dreamTimer;
 	/* Read as a pointer by DreamSys__NotifyLinkAttempt (round 2026-09-02): loaded, then
 	   dereferenced at +0x36 for a `u16` (masked to 0x7F and stashed into
-	   unk_0xB8 below). Target type otherwise unconfirmed. */
+	   voiceSelect below). Target type otherwise unconfirmed. */
 	DreamSysUnk28Target *linkTarget;
 	s8 unknown_values_0x2C[24];
 
-	s32 unknwon_int_0x44;
+	s32 pendingLinkType;
 	/* Written by DreamSys__ApplyOffsetSlotAndNotify (this unit's own helper, invoked via its own
 	   +0x0C8/+0x0CC slots DreamSys__ApplyOffsetSlot0/DreamSys__ApplyOffsetSlot1) and by DreamSys__SetLastOffsetValue
 	   (this unit's own +0x0E4 slot), both as a plain `sh` store of a `s16`
@@ -639,11 +639,11 @@ typedef struct DreamSys {
 	void *pendingExtra;
 
 	/* Set by DreamSys__SetSoundObj(this, value); no other observed use. */
-	s32 unk_0x58;
+	s32 soundObj;
 	/* Set by DreamSys__SetHeightCurve(this, value); read as a pointer by
-	   DreamSys__ProjectPointAtDistance (this->unk_0x5C + 0x14 and + 0x20 are passed to
+	   DreamSys__ProjectPointAtDistance (this->heightCurve + 0x14 and + 0x20 are passed to
 	   InterpolateKeyframeValue), so it points to a pair of two-word (x,y) points. */
-	DreamSysUnk5C *unk_0x5C;
+	DreamSysUnk5C *heightCurve;
 	/* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
 	   (round 2026-09-02) -- see DreamSysCtorArgObj. No other observed use in
 	   this unit's queued functions. */
@@ -654,14 +654,14 @@ typedef struct DreamSys {
 	bool isFlashbackSession;
 	/* Read by DreamSys__TickMove; compared against 0 / 1, else-branch otherwise.
 	   Meaning unidentified beyond that (round 2026-08-30). */
-	s32 unk_0x6c;
+	s32 moveOverride;
 
 	/* Gate flag: DreamSys__BlockMovement sets it to 1; DreamSys__GetLinkCommandFlag reads it back;
 	   DreamSys__UpdateTickState skips its whole body while this is nonzero. */
 	s32 movementBlocked;
 	/* Cleared to 0, then set to (dreamTimer % tickPeriod == 0) by
 	   DreamSys__UpdateTickState. */
-	s32 unk_0x74;
+	s32 linkCommandFlag;
 	/* Cleared to 0 by DreamSys__func_59598; no other observed use. */
 	s32 unk_0x78;
 	/* Cleared to 0 by DreamSys__func_59590; no other observed use. */
@@ -675,17 +675,17 @@ typedef struct DreamSys {
 	s32 callback80Mode;
 	/* Index into the (D_80087E50, D_80087E5C) delta/threshold table pair,
 	   consumed and reset to 0 by DreamSys__StepLookOffset (round 2026-08-30). */
-	s32 unk_0x88;
-	/* Running accumulator nudged by unk_0x88's table entry, or decayed by
-	   600/call towards 0 when unk_0x88 is 0; also propagated into
-	   unk_0x5C->unk_0x24. Set by DreamSys__StepLookOffset (round 2026-08-30). */
-	s32 unk_0x8C;
+	s32 lookOffsetCommand;
+	/* Running accumulator nudged by lookOffsetCommand's table entry, or decayed by
+	   600/call towards 0 when lookOffsetCommand is 0; also propagated into
+	   heightCurve->endValue. Set by DreamSys__StepLookOffset (round 2026-08-30). */
+	s32 lookOffset;
 	/* Index into the (D_80087E68, D_80087E74) delta/threshold table pair,
 	   consumed and reset to 0 by DreamSys__StepLookYaw (round 2026-08-30). */
-	s32 unk_0x90;
-	/* Running delta accumulator paired with unk_0x90; see DreamSys__StepLookYaw
+	s32 lookYawCommand;
+	/* Running delta accumulator paired with lookYawCommand; see DreamSys__StepLookYaw
 	   (round 2026-08-30). */
-	s32 unk_0x94;
+	s32 lookYaw;
 	/* Set by DreamSys__SelectCallback80(this, arg1) exactly like callback_0x80, but from
 	   a *different* trio of vtable slots. Called with (this) by
 	   DreamSys__RunTickCallbacks, if non-NULL. */
@@ -693,17 +693,17 @@ typedef struct DreamSys {
 	/* "Mode" field read/written by DreamSys__SelectCallback98(this, arg1): when ==2 on
 	   entry, this->vt->DreamSys__StopDrift(this, 0) fires first; then it is set
 	   unconditionally to arg1 (round 2026-08-30). */
-	s32 unk_0x9C;
-	/* (this->unk_0xA0 ^ 1) < 1u, i.e. (unk_0xA0 == 1), written by
+	s32 callback98Mode;
+	/* (this->moveCommand ^ 1) < 1u, i.e. (moveCommand == 1), written by
 	   DreamSys__StepLookYaw; also toggled/incremented by DreamSys__FlipMoveCommand and forced
 	   to 1 by DreamSys__TickMoveForced (round 2026-08-30). */
-	s32 unk_0xA0;
+	s32 moveCommand;
 	/* Index into the 12-byte-stride D_80087E80 table; consumed and reset
 	   to 0 by DreamSys__ApplyPendingTurn (round 2026-08-30-b). */
-	s32 unk_0xA4;
-	/* (unk_0xA0 == 1) as computed by DreamSys__StepLookYaw; unconditionally cleared
+	s32 turnCommand;
+	/* (moveCommand == 1) as computed by DreamSys__StepLookYaw; unconditionally cleared
 	   to 0 by DreamSys__FlipMoveCommand on every call (round 2026-08-30). */
-	s32 unk_0xA8;
+	s32 moveCommandLatch;
 	/* "Current" value; DreamSys__RestorePreviousMoveMode overwrites this with previousMoveMode.
 	   DreamSys__GetSetMoveMode's bounds-checked setter (vtable +0x180) writes both
 	   this and previousMoveMode together; DreamSys__ChangeMoveMode copies the OLD value of
@@ -713,41 +713,41 @@ typedef struct DreamSys {
 	/* "Previous"/paired value; see moveMode (round 2026-08-30-b). */
 	s32 previousMoveMode;
 	/* Attempt/beat counter incremented (and bounded to [0,4)) by
-	   DreamSys__AdvanceMoveCycle on every call while unk_0xA0 is nonzero; reset to 0 once
-	   unk_0xA0 goes back to 0. Compared against 3 there to pick a +-50
-	   nudge applied to unk_0x5C's y fields, and against 4 (together with
-	   moveMode) to force unk_0xA0 back to 0 (round 2026-09-02). */
-	s32 unk_0xB4;
+	   DreamSys__AdvanceMoveCycle on every call while moveCommand is nonzero; reset to 0 once
+	   moveCommand goes back to 0. Compared against 3 there to pick a +-50
+	   nudge applied to heightCurve's y fields, and against 4 (together with
+	   moveMode) to force moveCommand back to 0 (round 2026-09-02). */
+	s32 moveCycleTick;
 	/* Derived from `unknown_values_0x28[0x36]` masked to 0x7F, or forced to
-	   0 (if >= 0x18) or 2 (if `unknwon_int_0x44 == 15` and this is still 0)
+	   0 (if >= 0x18) or 2 (if `pendingLinkType == 15` and this is still 0)
 	   by DreamSys__NotifyLinkAttempt's `arg1 == -1` path (round 2026-09-02). Also an index:
 	   DreamSys__StartVoice (round 2026-09-06) does nothing when this is 0, else
 	   uses it to index D_80087EB0/D_80087EC8 (see those externs), compares
 	   it against 0x16 (22) to decide whether to keep or discard
-	   unk_0xBC's new value, and against 0xB (11) to gate two extra vtable
+	   voiceIndex's new value, and against 0xB (11) to gate two extra vtable
 	   calls. */
-	s32 unk_0xB8;
+	s32 voiceSelect;
 	/* Gate flag: DreamSys__StopVoice runs its body (a call through
-	   unk_0x58->vt->slot0x84, then resets this to -1) only while this is
+	   soundObj->vt->slot0x84, then resets this to -1) only while this is
 	   >= 0 (round 2026-08-30-b). */
-	s32 unk_0xBC;
+	s32 voiceIndex;
 	s8 unknown_values_0xC0[4];
-	/* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside unk_0xC8 and
+	/* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside cueServiceActive and
 	   callback_0x98 (round 2026-08-30). */
-	s32 unk_0xC4;
-	/* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside unk_0xC4
+	s32 driftActive;
+	/* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside driftActive
 	   (round 2026-08-30). */
-	s32 unk_0xC8;
+	s32 cueServiceActive;
 	/* Struct initialized in-place by InitSoundCueSet (still INCLUDE_ASM, in
 	   the uncarved code_179d8) via DreamSys__SelectCallback98's arg1==2 case; internal
 	   layout unknown beyond that entry point (round 2026-08-30). */
-	s8 unk_0xCC[0x54];
+	s8 soundCueSet[0x54];
 
 	/* Divisor for DreamSys__UpdateTickState's (dreamTimer % tickPeriod) check. */
 	s32 tickPeriod;
 	/* Result of DreamSys__UpdateTickState's (dreamTimer % tickPeriod == 0) check. */
-	s32 unk_0x124;
-	/* unk_0x124/0x128/0x12C/0x130 are also bounds-checked-set as a group of
+	s32 tickBoundary;
+	/* tickBoundary/0x128/0x12C/0x130 are also bounds-checked-set as a group of
 	   four by DreamSys__SetGateFlags (vtable +0x18C): each is overwritten with the
 	   corresponding argument only when that argument is >= 0
 	   (round 2026-08-30-b). */
@@ -791,14 +791,14 @@ typedef struct DreamSys {
 	s32 currentFlashbackIndex;
 	/* Set (whole word) by DreamSys__TryStageTimerLink to GetStageLinkAngle()'s return value,
 	   right before an ExecuteLink (round 2026-09-02). */
-	s32 unk_0x880;
+	s32 stageLinkAngle;
 	/* Gate flag read by DreamSys__SetMoveOverride (round 2026-08-30-b): when nonzero
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
 	   func_8001CEB4's arg2 -- cast from s32 to void*, not dereferenced. */
-	s32 unk_0x884;
-	/* Zeroed (whole word) by DreamSys__TryStageTimerLink alongside unk_0x884
+	s32 enterRotation;
+	/* Zeroed (whole word) by DreamSys__TryStageTimerLink alongside enterRotation
 	   (round 2026-09-02). */
-	s32 unk_0x888;
+	s32 exitRotation;
 
 	s32 storedDay;
 
@@ -816,29 +816,29 @@ typedef struct DreamSys {
 	   unk_0x14->unk_0x0 to 0 (round 2026-09-02). */
 	DreamSysUnk14 unk14Snapshot;
 	DreamSysUnk14Tail unk14TailSnapshot;
-	s32 unk_0x908;
+	s32 staircaseActive;
 	/* Compared with an UNSIGNED `< 1` (sltiu) by DreamSys__ApplyMoveCommand (round
 	   2026-09-06) -- typed `u32` rather than `s32` to reproduce that,
 	   confirmed safe since its only two writers (round 2026-08-30) both
 	   set it to the literal 0. */
-	u32 unk_0x90C;
-	/* Function pointer, called as `unk_0x910(this)` and its `s32` result
+	u32 staircaseMoveGate;
+	/* Function pointer, called as `staircaseTickFn(this)` and its `s32` result
 	   used as a truth value (DreamSys__TryStaircaseLink, round 2026-09-06); set from
 	   `D_80087EEC[GetLastSpawnExtra()]` (both MATCHED) or NULLed --
 	   0 is a valid state, tested with a plain `!= 0`/`== 0` before ever
 	   being called through. */
-	s32 (*unk_0x910)(struct DreamSys *this);
+	s32 (*staircaseTickFn)(struct DreamSys *this);
 	/* A retry/attempt counter (round 2026-09-02, DreamSys__TickStaircaseCase2): read as a
 	   whole word, compared against several literal bands, and incremented
 	   by 1 at that function's normal exit. */
-	s32 unk_0x914;
+	s32 staircaseFrame;
 	/* See PlayerSpawnGridPos's own comment -- the `chunk`+`tile` half of a
 	   PlayerSpawnPoint whole-struct-copied here by DreamSys__TryStaircaseLink. */
-	PlayerSpawnGridPos unk_0x918;
+	PlayerSpawnGridPos staircaseGridPos;
 	/* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
 	   its `b` argument (round 2026-09-02, DreamSys__TickStaircaseCase2) -- carved out of
-	   what was raw padding in the same 0x10-byte block as unk_0x914 above. */
-	struct RelativePos unk_0x91C;
+	   what was raw padding in the same 0x10-byte block as staircaseFrame above. */
+	struct RelativePos staircaseOrigin;
 	s8 unknown_values_0x922[2];
 	s32 unk_0x924;
 } DreamSys;
@@ -851,7 +851,7 @@ extern void (*D_80087E3C[5])(DreamSys *this, s32 val, void *extra);
 /* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseCase0,
    DreamSys__TickStaircaseCase1, DreamSys__TickStaircaseCase2, DreamSys__TickStaircaseCase3, all already matched with
    exactly that signature), indexed by GetLastSpawnExtra()'s return value and
-   stashed into DreamSys::unk_0x910 by DreamSys__TryStaircaseLink (round 2026-09-06). */
+   stashed into DreamSys::staircaseTickFn by DreamSys__TryStaircaseLink (round 2026-09-06). */
 extern s32 (*D_80087EEC[4])(DreamSys *this);
 
 /* Called by DreamSys__TryStaircaseLink with NO explicit argument setup (the disassembly's
@@ -1026,20 +1026,20 @@ struct vtable_DreamSys{
 	   and DreamSys__ApplyMoveCommand in sequence and returns the latter's result
 	   (round 2026-08-30). */
 	s32 (*DreamSys__TickMoveFree)(DreamSys *this);
-	/* Forces unk_0xA0 to 1; then either calls DreamSys__AdvanceMoveCycle(this, 0) and
+	/* Forces moveCommand to 1; then either calls DreamSys__AdvanceMoveCycle(this, 0) and
 	   returns its result, or chains DreamSys__AdvanceMoveCycle(this, 1) into
 	   DreamSys__ApplyMoveCommand and returns THAT result (round 2026-08-30). */
 	s32 (*DreamSys__TickMoveForced)(DreamSys *this);
-	/* Sets unk_0xA0 to 1 and returns 1 (round 2026-08-30). */
+	/* Sets moveCommand to 1 and returns 1 (round 2026-08-30). */
 	s32 (*DreamSys__TickMoveHeld)(DreamSys *this);
 	/* Referenced by DreamSys__TickMoveFree/DreamSys__TickMoveForced; return value is threaded
 	   into DreamSys__ApplyMoveCommand. MATCHED, round 32 (a permuter-found register-
 	   forcing lever closed the round-2026-09-02 register-identity/delay-
 	   slot-filler residue -- see docs/match-reports/DreamSys__AdvanceMoveCycle.md):
-	   bumps unk_0xB4 while unk_0xA0 is nonzero,
+	   bumps moveCycleTick while moveCommand is nonzero,
 	   conditionally calls DreamSys__StartVoice (slot +0x168) or DreamSys__StopVoice
-	   (slot +0x16C), nudges unk_0x5C's y fields, and always returns the
-	   ORIGINAL unk_0xA0 value read on entry (0 if it was already 0). */
+	   (slot +0x16C), nudges heightCurve's y fields, and always returns the
+	   ORIGINAL moveCommand value read on entry (0 if it was already 0). */
 	s32 (*DreamSys__AdvanceMoveCycle)(DreamSys *this, s32 arg1);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x168). Called by
 	   DreamSys__AdvanceMoveCycle as (this), return value discarded -- MATCHED, round 37
@@ -1058,7 +1058,7 @@ struct vtable_DreamSys{
 	/* Referenced by DreamSys__SelectCallback98's arg1==2 case; stored into
 	   callback_0x98, never called directly by this runner's functions. */
 	void (*DreamSys__TickDrift)(DreamSys *this);
-	/* Referenced by DreamSys__SelectCallback98's entry guard (this->unk_0x9C==2); called
+	/* Referenced by DreamSys__SelectCallback98's entry guard (this->callback98Mode==2); called
 	   as (this, 0). */
 	void (*DreamSys__StopDrift)(DreamSys *this, s32 arg1);
 	/* +0x180..+0x190: resolved via tools/classtable.py DREAMSYS_METHODS,
@@ -1107,7 +1107,7 @@ struct vtable_DreamSys{
 	   DreamSys__TryStaircaseLink below. */
 	bool (*DreamSys__TryTunnelLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D4), this
-	   round. Tests this->unknwon_int_0x44, then a static-link-with-timer
+	   round. Tests this->pendingLinkType, then a static-link-with-timer
 	   test (Test4StageTransition) against this->linkCoordinates/currentStage/
 	   dreamTimer, then ExecuteLinks with literal type 0x10 on success --
 	   see DreamSys__TryStageTimerLink.md. */
@@ -1269,7 +1269,7 @@ extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawn
 
 /* Called by DreamSys__TryStageTimerLink with NO arguments (the disassembly's call site has
    an empty delay slot and no a0-a3 setup); its return value is stored whole
-   into this->unk_0x880, hence s32 (round 2026-09-02). MATCHED, defined later
+   into this->stageLinkAngle, hence s32 (round 2026-09-02). MATCHED, defined later
    in this unit's own ROM order -- forward declaration only (gp-relative
    blocker resolved; see docs/match-reports/GetStageLinkAngle.md). */
 extern s32 GetStageLinkAngle(void);
@@ -1285,7 +1285,7 @@ extern s32 GetStageLinkAngle(void);
    site constrains it further. */
 extern void Class6B5CC__GetRotationDegrees(DreamSys *this, void *arg1);
 
-/* Called by DreamSys__TryTunnelLink as (&this->unk_0x888, &this->unk_0x884, &local) --
+/* Called by DreamSys__TryTunnelLink as (&this->exitRotation, &this->enterRotation, &local) --
    same `local` buffer Class6B5CC__GetRotationDegrees fills above; result used as a truth
    value (`beqz`), so s32 (round 2026-09-02). MATCHED, defined later in
    this unit's own ROM order -- forward declaration only (the gp-relative
@@ -1300,7 +1300,7 @@ extern s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2);
    earlier call site, not a cross-unit prototype. */
 extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2);
 
-/* Called by DreamSys__TryStaircaseLink as (&this->unk_0x888, &this->unk_0x884, &local) --
+/* Called by DreamSys__TryStaircaseLink as (&this->exitRotation, &this->enterRotation, &local) --
    identical call shape to DreamSys__CheckTunnelHeading above (same `local` buffer, same two
    `this` fields), so the same signature. MATCHED, defined later in this
    unit's own ROM order -- forward declaration only (the gp-relative and

@@ -43,15 +43,15 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 
 	DreamSys__GetBaseMethods()->ctor(this);
 	this->vt = Get_vtable_DreamSys();
-	this->unk_0x58 = arg2;
-	this->unk_0x5C = (DreamSysUnk5C *)arg3;
+	this->soundObj = arg2;
+	this->heightCurve = (DreamSysUnk5C *)arg3;
 	this->unk_0x64 = 0;
 	this->unk_0x60 = arg1;
 	val = ((DreamSysCtorArgObj *)arg1)->methods->slot0x80(arg1, 0);
 	this->vt->slot10(this, val);
 	this->vt->GetSetDreamTimeLimit(this, -1);
 	this->movementBlocked = 1;
-	this->unk_0x6c = 0;
+	this->moveOverride = 0;
 	this->newGamePending = 1;
 	this->vt->InitNewGame(this);
 	return this->vt->func_800588EC(this);
@@ -63,10 +63,10 @@ void DreamSys__ResetSessionState(DreamSys *this)
 	this->vt->func_8001CEB4(this, 1, D_80087E08);
 	this->callback_0x80 = NULL;
 	this->callback_0x98 = NULL;
-	*(s32 *)this->unk_0xCC = 0;
-	this->unk_0x908 = 0;
-	this->unk_0x90C = 0;
-	this->unk_0x910 = 0;
+	*(s32 *)this->soundCueSet = 0;
+	this->staircaseActive = 0;
+	this->staircaseMoveGate = 0;
+	this->staircaseTickFn = 0;
 	this->unk_0x78 = 0;
 	this->unk_0x924 = 0;
 }
@@ -78,14 +78,14 @@ void DreamSys__SpawnAtLink(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 	arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates);
 	DreamSys__GetBaseMethods()->slot4C(this, arg1, local);
 	this->vt->slot10(this, arg1);
-	if (this->unknwon_int_0x44 == 0xE) {
+	if (this->pendingLinkType == 0xE) {
 		FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
 		this->vt->func_8001CEB4(this, 1, &entry->rotation);
 		this->vt->GetSetDreamTimeLimit(this, entry->timeLimit + 4);
 		this->currentFlashbackIndex++;
 	}
-	if (this->unk_0x6c != 0 && this->unk_0x888 != 0) {
-		this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x888);
+	if (this->moveOverride != 0 && this->exitRotation != 0) {
+		this->vt->func_8001CEB4(this, 1, (void *)this->exitRotation);
 	}
 }
 
@@ -107,12 +107,12 @@ void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 arg1)
 		return;
 
 	v = this->linkTarget->unk_0x36 & 0x7F;
-	this->unk_0xB8 = v;
+	this->voiceSelect = v;
 	if (v >= 0x18)
-		this->unk_0xB8 = 0;
+		this->voiceSelect = 0;
 
-	if (this->unknwon_int_0x44 == 15 && this->unk_0xB8 == 0)
-		this->unk_0xB8 = 2;
+	if (this->pendingLinkType == 15 && this->voiceSelect == 0)
+		this->voiceSelect = 2;
 
 	if (this->currentStage != 9)
 		return;
@@ -132,50 +132,50 @@ neg2_mismatch:
 
 void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
 {
-	if (this->unk_0x6c != 0)
+	if (this->moveOverride != 0)
 		return;
 	if (this->movementBlocked != 0)
 		return;
-	if (this->unk_0x908 != 0)
+	if (this->staircaseActive != 0)
 		return;
 
 	switch (mode - 2) {
 	case 0:
-		this->unk_0xA0 = 1;
+		this->moveCommand = 1;
 		break;
 	case 1:
-		this->unk_0xA0 = 2;
+		this->moveCommand = 2;
 		break;
 	case 2:
-		this->unk_0xA4 = 1;
+		this->turnCommand = 1;
 		break;
 	case 3:
-		this->unk_0xA4 = 2;
+		this->turnCommand = 2;
 		break;
 	case 4:
-		this->unk_0x88 = 1;
+		this->lookOffsetCommand = 1;
 		break;
 	case 5:
-		if (this->unk_0xA0 == 1)
+		if (this->moveCommand == 1)
 			this->vt->DreamSys__ChangeMoveMode(this, 4);
 		break;
 	case 6:
-		this->unk_0x88 = 2;
+		this->lookOffsetCommand = 2;
 		break;
 	case 11:
-		this->unk_0x90 = 2;
+		this->lookYawCommand = 2;
 		break;
 	case 12:
-		this->unk_0xA0 = 4;
+		this->moveCommand = 4;
 		break;
 	case 13:
-		this->unk_0x90 = 1;
+		this->lookYawCommand = 1;
 		break;
 	case 14:
-		this->unk_0xA0 = 3;
+		this->moveCommand = 3;
 		break;
 	case 23:
-		this->unk_0x74 = 1;
+		this->linkCommandFlag = 1;
 		break;
 	case 32:
 		this->vt->DreamSys__RestorePreviousMoveMode(this);
@@ -198,7 +198,7 @@ void DreamSys__TimerTick(DreamSys *this, s32 arg1, s32 arg2)
 		goto tick_only;
 
 	if (this->isFlashbackSession) {
-		if (this->unknwon_int_0x44 != 0 || this->vt->LoadNextFlashback(this, 0)) {
+		if (this->pendingLinkType != 0 || this->vt->LoadNextFlashback(this, 0)) {
 			__asm__("");
 			this->dreamTimer = 0;
 			return;
@@ -236,10 +236,10 @@ void DreamSys__WallLink(DreamSys *this, void* unk_class_86aa0, int arg2)
 	DreamSys__GetBaseMethods()->slot0xE0(this, unk_class_86aa0, arg2);
 	if (arg2 != 4)
 		return;
-	if (this->unknwon_int_0x44 != 0)
+	if (this->pendingLinkType != 0)
 		return;
 	this->linkCoordinates = *this->linkMgr->methods->slot0xD4(this->linkMgr, unk_class_86aa0);
-	if (!this->vt->StaticWallLink(this, &this->linkCoordinates) && this->unk_0x124 != 0) {
+	if (!this->vt->StaticWallLink(this, &this->linkCoordinates) && this->tickBoundary != 0) {
 		this->vt->DynamicLink(this);
 	}
 	this->vt->DreamSys__RestoreLinkSnapshot(this);
@@ -264,11 +264,11 @@ s32 DreamSys__GetSetFlashbackSession(DreamSys *this, DreamColors *out, s32 value
 
 void DreamSys__SetMoveOverride(DreamSys *this, s32 value)
 {
-	this->unk_0x6c = value;
+	this->moveOverride = value;
 	if (value != 0) {
 		this->vt->DreamSys__GetSetMoveMode(this, 1);
-		if (this->unk_0x884 != 0)
-			this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
+		if (this->enterRotation != 0)
+			this->vt->func_8001CEB4(this, 1, (void *)this->enterRotation);
 	}
 }
 
@@ -285,26 +285,26 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 	this->vt->DreamSys__SelectCallback98(this, 1);
 	this->vt->DreamSys__GetSetMoveMode(this, arg1);
 
-	this->unk_0xBC = -1;
-	this->unk_0xB4 = 0;
-	this->unk_0xB8 = 0;
-	this->unk_0xA0 = 0;
-	this->unk_0xA4 = 0;
-	this->unk_0x88 = 0;
-	this->unk_0x90 = 0;
-	this->unk_0x8C = 0;
-	this->unk_0x94 = 0;
+	this->voiceIndex = -1;
+	this->moveCycleTick = 0;
+	this->voiceSelect = 0;
+	this->moveCommand = 0;
+	this->turnCommand = 0;
+	this->lookOffsetCommand = 0;
+	this->lookYawCommand = 0;
+	this->lookOffset = 0;
+	this->lookYaw = 0;
 	this->vt->DreamSys__SetGateFlags(this, 0, 1, 1, 1);
 
 	this->vt->DreamSys__SetTickPeriod(this, arg2);
 
 	this->nextCinematic.entry = -1;
 	this->movementBlocked = 0;
-	this->unknwon_int_0x44 = 0;
-	this->unk_0x74 = 0;
-	this->unk_0x908 = 0;
-	this->unk_0x90C = 0;
-	this->unk_0x910 = 0;
+	this->pendingLinkType = 0;
+	this->linkCommandFlag = 0;
+	this->staircaseActive = 0;
+	this->staircaseMoveGate = 0;
+	this->staircaseTickFn = 0;
 	this->unk_0x78 = 0;
 	Class6B5CC__GetRotationDegrees(this, &local);
 
@@ -319,7 +319,7 @@ void DreamSys__BlockMovement(DreamSys *this)
 }
 s32 DreamSys__GetLinkCommandFlag(DreamSys *this)
 {
-	return this->unk_0x74;
+	return this->linkCommandFlag;
 }
 s32 DreamSys__GetSetDreamTimeLimit(DreamSys *this, s32 value)
 {
@@ -339,11 +339,11 @@ s32 DreamSys__GetDreamTimerScaled(DreamSys *this)
 }
 void DreamSys__SetSoundObj(DreamSys *this, s32 value)
 {
-	this->unk_0x58 = value;
+	this->soundObj = value;
 }
 void DreamSys__SetHeightCurve(DreamSys *this, void *value)
 {
-	this->unk_0x5C = value;
+	this->heightCurve = value;
 }
 void DreamSys__func_5938c(DreamSys *this, s32 value)
 {
@@ -352,8 +352,8 @@ void DreamSys__func_5938c(DreamSys *this, s32 value)
 void DreamSys__UpdateTickState(DreamSys *this)
 {
 	if (this->movementBlocked == 0) {
-		this->unk_0x74 = 0;
-		this->unk_0x124 = ((u32)this->dreamTimer % (u32)this->tickPeriod) == 0;
+		this->linkCommandFlag = 0;
+		this->tickBoundary = ((u32)this->dreamTimer % (u32)this->tickPeriod) == 0;
 	}
 }
 void DreamSys__RunTickCallbacks(DreamSys *this)
@@ -384,8 +384,8 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *ref
 	*p = day;
 	Class6B5CC__LocalOffsetToWorldPos(this, local, p - 2, 0);
 
-	ret = InterpolateKeyframeValue((void *)((u8 *)this->unk_0x5C + 0x14),
-	                     (void *)((u8 *)this->unk_0x5C + 0x20), day);
+	ret = InterpolateKeyframeValue((void *)((u8 *)this->heightCurve + 0x14),
+	                     (void *)((u8 *)this->heightCurve + 0x20), day);
 
 	vec = this->unk_0xC != 0 ? (s32 *)((u8 *)this->unk_0x14 + 0x38) : 0;
 	local[1] = ret + vec[1];
@@ -465,9 +465,9 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 {
 	struct vtable_DreamSys *vt = this->vt;
 
-	if (this->unk_0x9C == 2)
+	if (this->callback98Mode == 2)
 		vt->DreamSys__StopDrift(this, 0);
-	this->unk_0x9C = arg1;
+	this->callback98Mode = arg1;
 	switch (arg1) {
 	case 0:
 		this->callback_0x98 = NULL;
@@ -477,9 +477,9 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
 		break;
 	case 2:
 		this->callback_0x98 = vt->DreamSys__TickDrift;
-		this->unk_0xC4 = 1;
-		this->unk_0xC8 = 1;
-		InitSoundCueSet(this->unk_0x58, this->unk_0xCC, 1, this, this->vt->DreamSys__SoundCueCallback);
+		this->driftActive = 1;
+		this->cueServiceActive = 1;
+		InitSoundCueSet(this->soundObj, this->soundCueSet, 1, this, this->vt->DreamSys__SoundCueCallback);
 		break;
 	}
 }
@@ -497,33 +497,33 @@ void DreamSys__StepLookOffset(DreamSys *this)
 	s32 threshold;
 	s32 sum;
 
-	idx = this->unk_0x88;
+	idx = this->lookOffsetCommand;
 	if (idx != 0) {
 		delta = D_80087E50[idx];
 		threshold = D_80087E5C[idx];
-		sum = delta + this->unk_0x8C;
+		sum = delta + this->lookOffset;
 		if (sum >= 0) {
 			if (sum < threshold)
 				goto apply;
-			this->unk_0x88 = 0;
+			this->lookOffsetCommand = 0;
 			return;
 		}
 		if ((~sum + 1) >= threshold) {
-			this->unk_0x88 = 0;
+			this->lookOffsetCommand = 0;
 			return;
 		}
 	apply:
-		this->unk_0x5C->unk_0x24 += delta;
-		this->unk_0x8C = sum;
-		this->unk_0x88 = 0;
+		this->heightCurve->endValue += delta;
+		this->lookOffset = sum;
+		this->lookOffsetCommand = 0;
 		return;
 	}
-	if (this->unk_0x8C != 0) {
+	if (this->lookOffset != 0) {
 		delta = -0x258;
-		if (this->unk_0x8C < 0)
+		if (this->lookOffset < 0)
 			delta = 0x258;
-		this->unk_0x5C->unk_0x24 += delta;
-		this->unk_0x8C += delta;
+		this->heightCurve->endValue += delta;
+		this->lookOffset += delta;
 	}
 }
 
@@ -555,34 +555,34 @@ void DreamSys__StepLookYaw(DreamSys *this)
 	s32 threshold;
 	s32 sum;
 
-	this->unk_0xA8 = (this->unk_0xA0 == 1);
-	idx = this->unk_0x90;
+	this->moveCommandLatch = (this->moveCommand == 1);
+	idx = this->lookYawCommand;
 	if (idx != 0) {
 		delta = D_80087E68[idx];
 		threshold = D_80087E74[idx];
-		sum = delta + this->unk_0x94;
+		sum = delta + this->lookYaw;
 		if (sum >= 0) {
 			if (sum < threshold)
 				goto apply;
-			this->unk_0x90 = 0;
+			this->lookYawCommand = 0;
 			goto call_tail;
 		}
 		if ((~sum + 1) >= threshold) {
-			this->unk_0x90 = 0;
+			this->lookYawCommand = 0;
 			goto call_tail;
 		}
 	apply:
 		D_80087E84[0].value = delta;
 		this->vt->func_8001CEB4(this, 0, &D_80087E84[-1]);
-		this->unk_0x94 = sum;
-		this->unk_0x90 = 0;
-	} else if (this->unk_0x94 != 0) {
+		this->lookYaw = sum;
+		this->lookYawCommand = 0;
+	} else if (this->lookYaw != 0) {
 		delta = -0x2D;
-		if (this->unk_0x94 < 0)
+		if (this->lookYaw < 0)
 			delta = 0x2D;
 		D_80087E84[0].value = delta;
 		this->vt->func_8001CEB4(this, 0, &D_80087E84[-1]);
-		this->unk_0x94 += delta;
+		this->lookYaw += delta;
 	} else {
 		return;
 	}
@@ -594,12 +594,12 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StepLookYaw);
 
 void DreamSys__FlipMoveCommand(DreamSys *this)
 {
-	this->unk_0xA8 = 0;
-	if (this->unk_0xA0 != 0) {
-		if (this->unk_0xA0 & 1)
-			this->unk_0xA0 = this->unk_0xA0 + 1;
+	this->moveCommandLatch = 0;
+	if (this->moveCommand != 0) {
+		if (this->moveCommand & 1)
+			this->moveCommand = this->moveCommand + 1;
 		else
-			this->unk_0xA0 = this->unk_0xA0 - 1;
+			this->moveCommand = this->moveCommand - 1;
 	}
 }
 
@@ -611,10 +611,10 @@ void DreamSys__NoOpSlot150(void) {
 
 s32 DreamSys__TickMove(DreamSys *this)
 {
-	if (this->unk_0x6c == 0) {
+	if (this->moveOverride == 0) {
 		this->vt->DreamSys__ApplyPendingTurn(this);
 		return this->vt->DreamSys__TickMoveFree(this);
-	} else if (this->unk_0x6c != 2) {
+	} else if (this->moveOverride != 2) {
 		return this->vt->DreamSys__TickMoveForced(this);
 	} else {
 		return this->vt->DreamSys__TickMoveHeld(this);
@@ -630,7 +630,7 @@ s32 DreamSys__TickMoveFree(DreamSys *this)
 
 s32 DreamSys__TickMoveForced(DreamSys *this)
 {
-	this->unk_0xA0 = 1;
+	this->moveCommand = 1;
 	if (this->movementBlocked != 0)
 		return this->vt->DreamSys__AdvanceMoveCycle(this, 0);
 	return this->vt->DreamSys__ApplyMoveCommand(this, this->vt->DreamSys__AdvanceMoveCycle(this, 1));
@@ -638,7 +638,7 @@ s32 DreamSys__TickMoveForced(DreamSys *this)
 
 s32 DreamSys__TickMoveHeld(DreamSys *this)
 {
-	return this->unk_0xA0 = 1;
+	return this->moveCommand = 1;
 }
 
 s32 DreamSys__AdvanceMoveCycle(DreamSys *this, s32 arg1)
@@ -649,31 +649,31 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *this, s32 arg1)
 	DreamSysUnk5C *p;
 	s32 delta;
 
-	if (this->unk_0xA0 != 0) {
-		ret = this->unk_0xA0;
-		count = this->unk_0xB4 + 1;
-		this->unk_0xB4 = count;
+	if (this->moveCommand != 0) {
+		ret = this->moveCommand;
+		count = this->moveCycleTick + 1;
+		this->moveCycleTick = count;
 		if (count < 4) {
 			doCallback = (this->moveMode == 4) && ((count & 1) == 0);
 		} else {
-			this->unk_0xA0 = 0;
+			this->moveCommand = 0;
 			doCallback = 1;
 		}
 
 		if (doCallback)
 			this->vt->DreamSys__StartVoice(this);
 
-		p = this->unk_0x5C;
+		p = this->heightCurve;
 		if (p != NULL && this->screenShakeOn != 0 && arg1 != 0) {
 			delta = -50;
-			if (this->unk_0xB4 >= 3)
+			if (this->moveCycleTick >= 3)
 				delta = 50;
-			p->unk_0x18 += delta;
-			p->unk_0x24 += delta;
+			p->startValue += delta;
+			p->endValue += delta;
 		}
 
-		if (this->unk_0xA0 == 0)
-			this->unk_0xB4 = 0;
+		if (this->moveCommand == 0)
+			this->moveCycleTick = 0;
 	}
 
 	if (!doCallback)
@@ -701,9 +701,9 @@ void DreamSys__StartVoice(DreamSys *this)
 	s32 headingArg;
 	s32 scratch;
 
-	obj = (DreamSysUnk58 *)this->unk_0x58;
+	obj = (DreamSysUnk58 *)this->soundObj;
 	vt = obj->vt;
-	idx = this->unk_0xB8;
+	idx = this->voiceSelect;
 	if (idx == 0) {
 		return;
 	}
@@ -712,12 +712,12 @@ void DreamSys__StartVoice(DreamSys *this)
 	heading = scratch << 4;
 	headingArg = heading;
 	vt->slot0x9C(obj, D_80087EC8[idx]);
-	this->unk_0xBC = vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
-	if (this->unk_0xB8 != 0x16) {
-		this->unk_0xBC = -1;
+	this->voiceIndex = vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
+	if (this->voiceSelect != 0x16) {
+		this->voiceIndex = -1;
 	}
 
-	if (this->unk_0xB8 == 0xB) {
+	if (this->voiceSelect == 0xB) {
 		vt->slot0x9C(obj, 1);
 		vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
 		vt->slot0x9C(obj, 2);
@@ -730,10 +730,10 @@ void DreamSys__StopVoice(DreamSys *this)
 {
 	DreamSysUnk58 *obj;
 
-	if (this->unk_0xBC >= 0) {
-		obj = (DreamSysUnk58 *)this->unk_0x58;
-		obj->vt->slot0x84(obj, this->unk_0xBC);
-		this->unk_0xBC = -1;
+	if (this->voiceIndex >= 0) {
+		obj = (DreamSysUnk58 *)this->soundObj;
+		obj->vt->slot0x84(obj, this->voiceIndex);
+		this->voiceIndex = -1;
 	}
 }
 
@@ -750,7 +750,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 		 && !this->vt->DreamSys__TryInstantTeleportLink(this, pos)
 		 && !this->vt->DreamSys__TryTunnelLink(this, pos)) {
 			this->vt->DreamSys__SaveLinkSnapshot(this);
-			D_80087E3C[arg1](this, delta, (void *)(this->unk_0x90C < 1));
+			D_80087E3C[arg1](this, delta, (void *)(this->staircaseMoveGate < 1));
 			if (this->currentStage == 0
 			 && this->unk_0x14->unk_0x1C < -0x7D0
 			 && this->unk_0x14->unk_0x18 >= -0x1F3) {
@@ -765,29 +765,29 @@ void DreamSys__ApplyPendingTurn(DreamSys *this)
 {
 	s32 idx;
 
-	idx = this->unk_0xA4;
+	idx = this->turnCommand;
 	if (idx != 0) {
 		this->vt->func_8001CEB4(this, 0, &D_80087E80[idx]);
-		this->unk_0xA4 = 0;
+		this->turnCommand = 0;
 	}
 }
 
 void DreamSys__TickDrift(DreamSys *this)
 {
-	if (this->unk_0xC4 != 0) {
+	if (this->driftActive != 0) {
 		this->vt->BaseObjO__AddVec14(this, &D_80087EA4);
-		this->unk_0x5C->unk_0x24 -= 0x258;
+		this->heightCurve->endValue -= 0x258;
 	}
-	if (this->unk_0xC8 != 0)
-		func_8002CD08(this->unk_0x58, this->unk_0xCC);
+	if (this->cueServiceActive != 0)
+		func_8002CD08(this->soundObj, this->soundCueSet);
 }
 
 void DreamSys__StopDrift(DreamSys *this, s32 arg1)
 {
-	this->unk_0xC4 = 0;
-	this->unk_0xC8 = arg1;
+	this->driftActive = 0;
+	this->cueServiceActive = arg1;
 	if (arg1 != 0)
-		FlushSoundCueSet(this->unk_0x58, this->unk_0xCC);
+		FlushSoundCueSet(this->soundObj, this->soundCueSet);
 }
 
 s32 DreamSys__GetSetMoveMode(DreamSys *this, s32 value)
@@ -821,7 +821,7 @@ void DreamSys__RestorePreviousMoveMode(DreamSys *this)
 void DreamSys__SetGateFlags(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
 {
 	if (a >= 0)
-		this->unk_0x124 = a;
+		this->tickBoundary = a;
 	if (b >= 0)
 		this->unk_0x128 = b;
 	if (c >= 0)
@@ -971,14 +971,14 @@ void DreamSys__InitSpawnLoc(DreamSys *this)
 	this->vt->GetPreviousDayMood(this, &mood, 1);
 	this->currentStage = GenerateInitialSpawn(&this->linkCoordinates, &timeLimit, &mood, this->currentDay);
 	timeLimit = this->vt->GetSetDreamTimeLimit(this, timeLimit);
-	this->unknwon_int_0x44 = 0xB;
+	this->pendingLinkType = 0xB;
 }
 
 void DreamSys__DynamicLink(DreamSys *this)
 {
 	s32 stage;
 
-	if (this->unknwon_int_0x44 == 0) {
+	if (this->pendingLinkType == 0) {
 		stage = GetRandomSpawnFromStage(&this->linkCoordinates, this->currentStage, this->dreamTimer);
 		ExecuteLink(this, stage, 0xC, 1);
 	}
@@ -988,7 +988,7 @@ bool DreamSys__StaticWallLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 
-	if (this->unknwon_int_0x44 != 0)
+	if (this->pendingLinkType != 0)
 		return false;
 	result = TestForStaticLink(&this->linkCoordinates, currentPos, this->currentStage);
 	if (result < 0)
@@ -1006,7 +1006,7 @@ bool DreamSys__LoadNextFlashback(DreamSys *this, bool unknown)
 	if (idx >= this->amountFlashbacksAvailable) {
 		goto fail;
 	}
-	this->unknwon_int_0x44 = 0xE;
+	this->pendingLinkType = 0xE;
 	entry = &this->storedFlasbacks[idx];
 	if (!unknown) {
 		this->vt->slot30(this, 0xE);
@@ -1024,15 +1024,15 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	s32 result;
 	s32 local[4];
 
-	if (this->unknwon_int_0x44 != 0)
+	if (this->pendingLinkType != 0)
 		return false;
 	result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
 	if (result < 0)
 		return false;
 	Class6B5CC__GetRotationDegrees(this, local);
-	if (!DreamSys__CheckTunnelHeading(&this->unk_0x888, &this->unk_0x884, local))
+	if (!DreamSys__CheckTunnelHeading(&this->exitRotation, &this->enterRotation, local))
 		return false;
-	if (this->unk_0xA8 == 0)
+	if (this->moveCommandLatch == 0)
 		return false;
 	ExecuteLink(this, result, 0xF, 0);
 	return true;
@@ -1042,14 +1042,14 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
 
-	if (this->unknwon_int_0x44 != 0)
+	if (this->pendingLinkType != 0)
 		return false;
 	result = Test4StageTransition(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
 	if (result < 0)
 		return false;
-	this->unk_0x880 = GetStageLinkAngle();
-	this->unk_0x884 = 0;
-	this->unk_0x888 = 0;
+	this->stageLinkAngle = GetStageLinkAngle();
+	this->enterRotation = 0;
+	this->exitRotation = 0;
 	ExecuteLink(this, result, 0x10, 0);
 	return true;
 }
@@ -1074,7 +1074,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 	saved = func_8005BFC4();
 	if (!ExecuteLink(this, result, 0x11, 0))
 		return true;
-	this->unknwon_int_0x44 = 0;
+	this->pendingLinkType = 0;
 	this->linkMgr->methods->slot0xE8(this->linkMgr, local, &this->linkCoordinates);
 	this->vt->BaseObjO__SetVec14(this, local);
 	if (saved == 0)
@@ -1091,9 +1091,9 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 {
 	DreamSysUnk58 *obj;
 
-	system->unknwon_int_0x44 = unk1;
+	system->pendingLinkType = unk1;
 	system->vt->slot30(system, unk1);
-	if (system->unknwon_int_0x44 == 0) {
+	if (system->pendingLinkType == 0) {
 		return false;
 	}
 	system->currentStage = stage;
@@ -1101,7 +1101,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 		system->dreamTimer = 0;
 	}
 	if (unk2 != 0) {
-		obj = (DreamSysUnk58 *)system->unk_0x58;
+		obj = (DreamSysUnk58 *)system->soundObj;
 		obj->vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
 	}
 	return true;
@@ -1124,19 +1124,19 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	s32 result;
 	s32 local[4];
 
-	if (this->unknwon_int_0x44 != 0) {
+	if (this->pendingLinkType != 0) {
 		return false;
 	}
 
-	if (this->unk_0x910 == 0) {
+	if (this->staircaseTickFn == 0) {
 		goto staircase;
 	}
-	if (!this->unk_0x910(this)) {
+	if (!this->staircaseTickFn(this)) {
 		return false;
 	}
-	this->unk_0x908 = 0;
-	this->unk_0x910 = 0;
-	this->unk_0x90C = 0;
+	this->staircaseActive = 0;
+	this->staircaseTickFn = 0;
+	this->staircaseMoveGate = 0;
 	if (this->moveMode != 4) {
 		return false;
 	}
@@ -1149,21 +1149,21 @@ staircase:
 		return false;
 	}
 	Class6B5CC__GetRotationDegrees(this, local);
-	if (!DreamSys__CheckStaircaseHeading(&this->unk_0x888, &this->unk_0x884, local)) {
+	if (!DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local)) {
 		return false;
 	}
-	if (this->unk_0xA8 == 0) {
+	if (this->moveCommandLatch == 0) {
 		return false;
 	}
 
-	this->unk_0x918 = *(PlayerSpawnGridPos *)currentPos;
-	this->unk_0x91C = currentPos->position;
-	this->unk_0x908 = 1;
-	this->unk_0x90C = 1;
-	this->unk_0x914 = 0;
-	this->unk_0x910 = D_80087EEC[GetLastSpawnExtra()];
-	this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
-	this->unk_0x910(this);
+	this->staircaseGridPos = *(PlayerSpawnGridPos *)currentPos;
+	this->staircaseOrigin = currentPos->position;
+	this->staircaseActive = 1;
+	this->staircaseMoveGate = 1;
+	this->staircaseFrame = 0;
+	this->staircaseTickFn = D_80087EEC[GetLastSpawnExtra()];
+	this->vt->func_8001CEB4(this, 1, (void *)this->enterRotation);
+	this->staircaseTickFn(this);
 	return false;
 }
 #endif
@@ -1171,24 +1171,24 @@ INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TryStaircaseLink);
 
 s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 {
-	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &D_8008ABC0, &this->unk_0x91C);
+	if (this->staircaseFrame == 0) {
+		DreamSys__ApplyRelativeOffset(this, &D_8008ABC0, &this->staircaseOrigin);
 	}
 	if (this->moveMode != 4) {
-		if (this->unk_0x914 >= 0x85)
+		if (this->staircaseFrame >= 0x85)
 			return 1;
-		if ((u32)(this->unk_0x914 - 0x2B) < 0xF || (u32)(this->unk_0x914 - 0x4B) < 0xF) {
-			this->unk_0xA4 = 2;
+		if ((u32)(this->staircaseFrame - 0x2B) < 0xF || (u32)(this->staircaseFrame - 0x4B) < 0xF) {
+			this->turnCommand = 2;
 		}
 	} else {
-		if (this->unk_0x914 >= 0x13)
+		if (this->staircaseFrame >= 0x13)
 			return 1;
-		if ((u32)(this->unk_0x914 - 8) < 2 || (u32)(this->unk_0x914 - 0xD) < 2) {
+		if ((u32)(this->staircaseFrame - 8) < 2 || (u32)(this->staircaseFrame - 0xD) < 2) {
 			this->vt->func_8001CEB4(this, 0, &D_80087EFC);
 		}
 	}
-	this->unk_0xA0 = 1;
-	this->unk_0x914++;
+	this->moveCommand = 1;
+	this->staircaseFrame++;
 	return 0;
 }
 
@@ -1196,56 +1196,56 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 {
 	s32 flag;
 
-	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &D_8008ABC8, &this->unk_0x91C);
+	if (this->staircaseFrame == 0) {
+		DreamSys__ApplyRelativeOffset(this, &D_8008ABC8, &this->staircaseOrigin);
 	}
 	if (this->moveMode != 4) {
-		if (this->unk_0x914 >= 0x95)
+		if (this->staircaseFrame >= 0x95)
 			return 1;
-		if ((u32)(this->unk_0x914 - 0x16) < 0xF || (u32)(this->unk_0x914 - 0x39) < 0x10 || (u32)(this->unk_0x914 - 0x6E) < 0xF) {
-			this->unk_0xA4 = 1;
+		if ((u32)(this->staircaseFrame - 0x16) < 0xF || (u32)(this->staircaseFrame - 0x39) < 0x10 || (u32)(this->staircaseFrame - 0x6E) < 0xF) {
+			this->turnCommand = 1;
 		}
-		flag = (u32)(this->unk_0x914 - 0x39) < 0x35;
+		flag = (u32)(this->staircaseFrame - 0x39) < 0x35;
 	} else {
-		if (this->unk_0x914 >= 0x19)
+		if (this->staircaseFrame >= 0x19)
 			return 1;
-		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xB) < 2 || (u32)(this->unk_0x914 - 0x14) < 2) {
+		if ((u32)(this->staircaseFrame - 6) < 2 || (u32)(this->staircaseFrame - 0xB) < 2 || (u32)(this->staircaseFrame - 0x14) < 2) {
 			this->vt->func_8001CEB4(this, 0, &D_80087F08);
 		}
-		flag = (u32)(this->unk_0x914 - 3) < 0xE;
+		flag = (u32)(this->staircaseFrame - 3) < 0xE;
 	}
 	if (flag) {
-		this->unk_0x88 = 2;
+		this->lookOffsetCommand = 2;
 	}
-	this->unk_0xA0 = 1;
-	this->unk_0x914++;
+	this->moveCommand = 1;
+	this->staircaseFrame++;
 	return 0;
 }
 
 s32 DreamSys__TickStaircaseCase2(DreamSys *this)
 {
-	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &D_8008ABD0, &this->unk_0x91C);
+	if (this->staircaseFrame == 0) {
+		DreamSys__ApplyRelativeOffset(this, &D_8008ABD0, &this->staircaseOrigin);
 	}
 	if (this->moveMode != 4) {
-		if (this->unk_0x914 < 0x65) {
-			if ((u32)(this->unk_0x914 - 0x2B) < 0xF) {
-				this->unk_0xA4 = 2;
+		if (this->staircaseFrame < 0x65) {
+			if ((u32)(this->staircaseFrame - 0x2B) < 0xF) {
+				this->turnCommand = 2;
 			}
 		} else {
 			return 1;
 		}
 	} else {
-		if (this->unk_0x914 < 15) {
-			if ((u32)(this->unk_0x914 - 8) < 2) {
+		if (this->staircaseFrame < 15) {
+			if ((u32)(this->staircaseFrame - 8) < 2) {
 				this->vt->func_8001CEB4(this, 0, &D_80087EFC);
 			}
 		} else {
 			return 1;
 		}
 	}
-	this->unk_0xA0 = 1;
-	this->unk_0x914++;
+	this->moveCommand = 1;
+	this->staircaseFrame++;
 	return 0;
 }
 
@@ -1253,29 +1253,29 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 {
 	s32 flag;
 
-	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &D_8008ABD8, &this->unk_0x91C);
+	if (this->staircaseFrame == 0) {
+		DreamSys__ApplyRelativeOffset(this, &D_8008ABD8, &this->staircaseOrigin);
 	}
 	if (this->moveMode != 4) {
-		if (this->unk_0x914 >= 0x71)
+		if (this->staircaseFrame >= 0x71)
 			return 1;
-		if ((u32)(this->unk_0x914 - 0x1E) < 0xF || (u32)(this->unk_0x914 - 0x52) < 0xF) {
-			this->unk_0xA4 = 1;
+		if ((u32)(this->staircaseFrame - 0x1E) < 0xF || (u32)(this->staircaseFrame - 0x52) < 0xF) {
+			this->turnCommand = 1;
 		}
-		flag = (u32)(this->unk_0x914 - 0x1E) < 0x34;
+		flag = (u32)(this->staircaseFrame - 0x1E) < 0x34;
 	} else {
-		if (this->unk_0x914 >= 0x13)
+		if (this->staircaseFrame >= 0x13)
 			return 1;
-		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xF) < 2) {
+		if ((u32)(this->staircaseFrame - 6) < 2 || (u32)(this->staircaseFrame - 0xF) < 2) {
 			this->vt->func_8001CEB4(this, 0, &D_80087F08);
 		}
-		flag = (u32)this->unk_0x914 < 9;
+		flag = (u32)this->staircaseFrame < 9;
 	}
 	if (flag) {
-		this->unk_0x88 = 2;
+		this->lookOffsetCommand = 2;
 	}
-	this->unk_0xA0 = 1;
-	this->unk_0x914++;
+	this->moveCommand = 1;
+	this->staircaseFrame++;
 	return 0;
 }
 
@@ -1321,7 +1321,7 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
    source spelling. */
 void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect)
 {
-	if (this->unknwon_int_0x44 != 0) {
+	if (this->pendingLinkType != 0) {
 		return;
 	}
 
@@ -1825,7 +1825,7 @@ merge:
 	return result;
 }
 
-/* Set (whole word) into `this->unk_0x880` by DreamSys__TryStageTimerLink just before an
+/* Set (whole word) into `this->stageLinkAngle` by DreamSys__TryStageTimerLink just before an
    ExecuteLink; only ever address-taken here, never dereferenced by this
    unit's queued functions. */
 extern s32 D_8008ABF0;
