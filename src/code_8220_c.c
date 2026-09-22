@@ -97,14 +97,11 @@ void func_8001989C(void *arg0, void *arg1) {
 
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001989C);
 
-#if 0
-/* STALL snapshot round 2 -- see docs/match-reports/func_800199EC.md.
- * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
- * residue class as func_800197C4: $a2 vs $a1 for the OT high-byte mask,
- * plus one missing `addiu $v0,$s1,0x20` = arg0 + 0x20, one byte past the
- * last self field this function touches (arg0+0x1E, a u16). Matches the
- * verified cross-sibling formula in func_800197C4.md. Not cracked.
- */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 70/78 words, length exact. Residue: register identity
+ * ($a2 vs $a1 for the OT high-byte mask) plus a missing load-delay-slot
+ * filler `addiu $v0,$s1,0x20` (docs/match-reports/func_800199EC.md).
+ * Hand-derived. */
 void func_800199EC(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
@@ -125,9 +122,9 @@ void func_800199EC(void *arg0, void *arg1) {
         RCpolyFT3(arg0, D_8008ACD0);
     }
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800199EC);
+#endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 48/56 words, length exact. Residue: register identity
