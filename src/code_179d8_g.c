@@ -268,7 +268,93 @@ void func_8002A6EC(void)
     InterruptCallback(2, func_8002B3F4);
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 171/196 words, length exact. Residue: pure list-scheduling
+ * (round-25 --debug breakdown: Reorderings: 3, Register Differences: 0) --
+ * retail splits func_80029F10(1,0,0,0)'s argument materialization from its
+ * own a3/jal by ~90 bytes; neither call position tried reproduces the split
+ * (docs/match-reports/func_8002A75C.md). Hand-derived. */
+s32 func_8002A75C(void)
+{
+    s32 *p;
+    s32 i;
+    volatile u8 *q;
+    s32 saved;
+    s32 counter;
+
+    puts(D_80010A94);
+    printf(D_80010AA0, D_8006D90C);
+
+    D_8006D61D = 0;
+    D_8006D61C = 0;
+    D_8006D600 = 0;
+    D_8006D5FC = 0;
+    D_8006D610 = 0;
+    D_8006D60C = 0;
+    p = &D_8006D8DC;
+    for (i = 9; i != -1; i--) {
+        *p = 0;
+        p++;
+    }
+    ResetCallback();
+    InterruptCallback(2, func_8002B3F4);
+
+    *D_8006D8C0 = 1;
+    while (*D_8006D8CC & 7) {
+        *D_8006D8C0 = 1;
+        *D_8006D8CC = 7;
+        *D_8006D8C8 = 7;
+    }
+
+    func_80029F10(1, 0, 0, 0);
+
+    D_8006D8DA = 0;
+    q = &D_8006D8D9;
+    D_8006D61C = 0;
+    *q = D_8006D8DA;
+    __asm__("");
+    D_8006D8D8[0] = 2;
+    *D_8006D8C0 = 0;
+    *D_8006D8CC = 0;
+    *D_8006D8D0 = 0x1325;
+
+    counter = 0;
+    if (D_8006D60C & 0x10) {
+        func_80029F10(1, 0, 0, 0);
+    }
+
+    if (D_8006D904 < D_8006D614) {
+        saved = D_8006D5FC;
+        D_8006D5FC = 0;
+
+        while (D_8006D60C & 0x10) {
+            if ((u8)counter == 0) {
+                puts(D_80010A40);
+            }
+            counter++;
+            func_80029F10(1, 0, 0, 0);
+        }
+
+        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
+            func_80029F10(1, 0, 0, 0);
+            puts(D_80010A50);
+        }
+
+        D_8006D5FC = saved;
+        D_8006D904 = D_8006D614;
+    }
+
+    if (func_80029F10(0xA, 0, 0, 0) != 0) {
+        return -1;
+    }
+    if (func_80029F10(0xC, 0, 0, 0) != 0) {
+        return -1;
+    }
+    return -(func_800299BC(0, 0) != 2);
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A75C);
+#endif
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002AA6C);
 
