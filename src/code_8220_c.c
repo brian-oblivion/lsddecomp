@@ -146,15 +146,11 @@ typedef struct {
     s16 x, y;
 } Vec2s16_C04;
 
-#if 0
-/* STALL snapshot round 2 -- see docs/match-reports/func_80019C04.md.
- * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
- * residue class: $a2 vs $a1 for the OT mask, plus one missing
- * `addiu $v0,$s1,0x24` = one byte past `self+0x20` (the last arg0 field
- * touched, `func_8001A4C0`'s last argument, treated as a PolyUV4-width-4
- * pointer per the cross-sibling formula in func_800197C4.md). Not
- * cracked.
- */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 88/96 words, length exact. Residue: register identity
+ * ($a2 vs $a1 for the OT mask) plus a missing load-delay-slot filler
+ * `addiu $v0,$s1,0x24` (docs/match-reports/func_80019C04.md).
+ * Hand-derived. */
 void func_80019C04(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
@@ -180,9 +176,9 @@ void func_80019C04(void *arg0, void *arg1) {
         RCpolyG4(self, D_8008AEE8);
     }
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019C04);
+#endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 80/88 words, length exact. Residue: register identity
