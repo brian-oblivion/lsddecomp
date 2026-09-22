@@ -173,16 +173,121 @@ void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
 }
 
 
-/* STALL -- see docs/match-reports/StepVoiceFade.md. Round 48 (echo):
- * tested charlie's frame-padding lever (u8 dead[8], sized to the current
- * build's frame gap: -0x10 -> -0x18, byte-exact vs retail). Frame realigns
- * exactly but built length is UNCHANGED (222/228, still 6 words short) --
- * same negative-for-length-closure result as UpdateVoiceEnvelopes. The
- * already-diagnosed missing early-persisted value ($t1 = idx<<3, held live
- * across the whole function) is still the real gap; frame padding does not
- * touch it. Best body (222/228 built words, 6 words short) preserved there
- * in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 222/228 words, 6 words short. Residue: a persisted early
+ * value ($t1 = idx<<3, held live across the whole function) this C does
+ * not reproduce -- confirmed still the real gap after round 48's
+ * frame-padding lever realigned the frame byte-exactly without closing
+ * the length, and after a permuter search (round 37) plateaued at
+ * 2430/4125 with no candidate reaching zero (docs/match-reports/
+ * StepVoiceFade.md). Hand-derived. */
+void StepVoiceFade(s16 a0)
+{
+    s16 idxCopy;
+    s16 step;
+    u16 increment;
+    s16 incrementS;
+    u16 accum;
+    s16 limit;
+    u8 accumByte;
+    u8 tableval;
+    s32 product1;
+    s32 q1;
+    s32 q1b;
+    u32 q1c;
+    u32 q2;
+    u16 val1;
+    u16 val2;
+    s32 tmp;
+    u8 v0;
+
+    idxCopy = a0;
+    step = gVoiceFadeInterval[a0].unk0;
+    if (step != 0) {
+        u16 current = ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0;
+
+        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = current - 1;
+        if ((s16) current > 0) {
+            return;
+        }
+        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = gVoiceFadeInterval[a0].unk0;
+    }
+
+    increment = ((Rec34HalfU *) gVoiceFadeStep)[a0].unk0;
+    accum = ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0;
+    incrementS = gVoiceFadeStep[a0].unk0;
+    accum = accum + increment;
+    ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+
+    if (incrementS > 0) {
+        limit = gVoiceFadeLimit[a0].unk0;
+        if ((s16) accum >= limit) {
+            accum = limit;
+            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+            gVoiceFadeActive[a0].unk0 = 0;
+        }
+    } else if (incrementS < 0) {
+        limit = gVoiceFadeLimit[a0].unk0;
+        if (limit >= (s16) accum) {
+            accum = limit;
+            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+            gVoiceFadeActive[a0].unk0 = 0;
+        }
+    }
+
+    accumByte = *(u8 *) &gVoiceFadeAccum[a0].unk0;
+    D_8008EA11 = accumByte;
+    tableval = D_8008E970->masterVolume;
+
+    product1 = D_8008EA10 * (tableval * 0x3FFF);
+    q1 = product1 / 16129;
+    q1b = q1 * D_8008EA16;
+    q1c = q1b * D_8008EA19;
+    q2 = q1c / 16129u;
+
+    if (D_8008EA1A < 0x40) {
+        tmp = q2 * D_8008EA1A;
+        val2 = (u32) tmp >> 6;
+        val1 = q2;
+    } else {
+        tmp = q2 * (0x7F - D_8008EA1A);
+        val1 = (u32) tmp >> 6;
+        val2 = q2;
+    }
+
+    if (D_8008EA17 < 0x40) {
+        tmp = val2 * D_8008EA17;
+        val2 = tmp / 64;
+    } else {
+        tmp = val1 * (0x7F - D_8008EA17);
+        val1 = tmp / 64;
+    }
+
+    if (accumByte < 0x40) {
+        tmp = val2 * accumByte;
+        val2 = tmp / 64;
+    } else {
+        tmp = val1 * (0x7F - accumByte);
+        val1 = tmp / 64;
+    }
+
+    if (D_8008E8C0 == 1) {
+        if (val1 < val2) {
+            val1 = val2;
+        } else {
+            val2 = val1;
+        }
+    }
+
+    D_8008D7F2[idxCopy].unk0 = val2;
+    v0 = D_8008D970[idxCopy];
+    D_8008D7F0[idxCopy].unk0 = val1;
+    v0 |= 3;
+    D_8008D970[idxCopy] = v0;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceFade);
+#endif
 
 extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
