@@ -832,18 +832,181 @@ s32 ApplyPitchBendToAllVoices(s16 a0, s16 a1, s16 a2, u16 a3) {
     return sum;
 }
 
-/* STALL -- see docs/match-reports/UpdateVoiceEnvelopes.md. Round 48 (echo):
- * tested charlie's func_800351D0 frame-padding lever (u8 dead[8], sized to
- * the CURRENT BUILD's frame gap: -0x30 -> -0x38, byte-exact vs retail) plus
- * an "s32 count" fix (avoid a spurious `andi 0xff` mask GCC inserted for a
- * u8 local). Result: raw word-match improved 49/241 -> 93/241, but total
- * length moved to 236/241 (5 words short, was 4) -- the frame padding
- * recovers BYTE-OFFSET alignment exactly but adds no instructions (an
- * addiu immediate costs the same one word regardless of value), so it
- * does not by itself close a missing-CONTENT gap the way it did for
- * func_800351D0 (which also gained words from tail duplication). Best
- * body (236/241 built words, 5 words short) preserved there in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 236/241 words, 5 words short. Residue: retail's
+ * unconditional `move a2,v0`/`li t0,1`/`move a3,a0` do-while-style setup
+ * before the count>0 loop, which this C's `for` does not reproduce (a
+ * literal do-while conversion was tried and regressed hard, 236/241,
+ * 93/241 raw match -> 233/241, 16/241 -- reverted), plus cosmetic
+ * s0/s1 register-color swaps in phases 2-6. Round 48's frame-padding
+ * lever and an `s32 count` fix (drop a spurious andi mask) already
+ * applied; a permuter search (round 37) plateaued at 1578/2276 with no
+ * candidate reaching zero (docs/match-reports/UpdateVoiceEnvelopes.md).
+ * Hand-derived. */
+
+/* Ring buffer of "channel activity" bitmasks, one slot appended per
+ * call, most-recent index tracked by gVoiceActivityRingIdx (mod 16). */
+extern s32 gVoiceActivityRingIdx;
+extern s32 gVoiceActivityRing[];
+
+/* 0x34-stride record family, UNSIGNED 16-bit view -- this function
+ * writes it via `lhu`-driven re-reads (store, then re-check the SAME
+ * field unsigned) rather than the `Rec34Half` signed view. D_8008D98E
+ * already declared elsewhere in the unit as `Rec34Half`; reinterpreted
+ * here via cast, not redeclared. */
+typedef struct {
+    u16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34HalfU2;
+
+extern void SpuSetNoiseVoice(s32 a0, s32 a1);
+extern void StepVoiceEnvelope(s16 a0);
+extern void StepVoiceFade(s16 a0);
+extern Rec16D7F4 D_8008D7F6[];
+
+/* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
+ * field (declared above, `unk0` only) -- this function ALSO reads this
+ * array's `+0x2`, `+0x8` and `+0xA` sub-fields, so it needs a wider
+ * local view of the same base symbol, reached via a cast per this
+ * project's multiple-independent-local-views convention. */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    s16 unk2; /* +0x2 */
+    u8 pad4[0x8 - 0x4];
+    s16 unk8; /* +0x8 */
+    s16 unkA; /* +0xA */
+    u8 padC[0x10 - 0xC];
+} Rec16D7F0Wide;
+
+/* D_8006DAD4, already declared above as `ObjDAD4 *` (one struct, fields
+ * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
+ * per-channel records here -- another independent local view of the
+ * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
+ * reading of a sibling symbol). */
+typedef struct {
+    s16 unk0; /* +0x0 */
+    s16 unk2; /* +0x2 */
+    s16 unk4; /* +0x4 */
+    s16 unk6; /* +0x6 */
+    s16 unk8; /* +0x8 */
+    s16 unkA; /* +0xA */
+    u16 unkC; /* +0xC */
+    u8 padE[0x10 - 0xE];
+} Rec16DAD4C;
+
+void UpdateVoiceEnvelopes(void) {
+    s32 i = 0;
+    s32 ringIdx;
+    s32 *slot;
+    s32 count;
+    u8 dead[8];
+
+    if (0) {
+        dead[0] = 0;
+    }
+
+    ringIdx = (gVoiceActivityRingIdx + 1) & 0xF;
+    gVoiceActivityRingIdx = ringIdx;
+    slot = &gVoiceActivityRing[ringIdx];
+    count = D_8008E9D0;
+    *slot = 0;
+
+    if (count > 0) {
+        Rec34HalfU2 *p98E = (Rec34HalfU2 *) D_8008D98E;
+        Rec16DAD4C *pDad = (Rec16DAD4C *) D_8006DAD4;
+
+        for (i = 0; i < count; i++) {
+            p98E->unk0 = pDad->unkC;
+            if (p98E->unk0 == 0) {
+                *slot |= 1 << i;
+            }
+            p98E++;
+            pDad++;
+        }
+    }
+
+    if (gDisableVoiceStarveScan == 0) {
+        s32 mask;
+        s32 j;
+
+        mask = -1;
+        for (j = 0; j < 0xF; j++) {
+            mask &= gVoiceActivityRing[j];
+        }
+
+        for (i = 0; i < D_8008E9D0; i++) {
+            s32 bit = 1 << i;
+
+            if (mask & bit) {
+                if (D_8008D9A3[i].unk0 == 2) {
+                    SpuSetNoiseVoice(0, 0xFFFFFF);
+                }
+                D_8008D9A3[i].unk0 = 0;
+            }
+        }
+    }
+
+    D_8008E228 &= ~D_80090C60;
+    D_8008E22C &= ~D_80090C64;
+
+    for (i = 0; i < 0x18; i++) {
+        if (gVoiceEnvActive[i].unk0 != 0) {
+            StepVoiceEnvelope(i);
+        }
+        if (gVoiceFadeActive[i].unk0 != 0) {
+            StepVoiceFade(i);
+        }
+    }
+
+    {
+    Rec16D7F0Wide *p7F0 = D_8008D7F0;
+
+    for (i = 0; i < 0x18; i++) {
+        if (D_8008D970[i] & 1) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk0 = p7F0->unk0;
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk2 = p7F0->unk2;
+        }
+        if (D_8008D970[i] & 4) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = D_8008D7F4[i].unk0;
+        }
+        if (D_8008D970[i] & 8) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = D_8008D7F6[i].unk0;
+        }
+        if (D_8008D970[i] & 0x10) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk8 = p7F0->unk8;
+            ((Rec16DAD4C *) D_8006DAD4)[i].unkA = p7F0->unkA;
+        }
+
+        D_8008D970[i] = 0;
+        p7F0++;
+    }
+    }
+
+    {
+        ObjDAD4 *rec = D_8006DAD4;
+        u16 lowMask = D_80090C60;
+        u16 highMask = D_80090C64;
+        u16 lowActive = D_8008E228;
+        u16 highActive = D_8008E22C;
+        s16 v230 = D_8008E230;
+        s16 v234 = D_8008E234;
+
+        D_80090C60 = 0;
+        D_80090C64 = 0;
+        D_8008E228 = 0;
+        D_8008E22C = 0;
+
+        *(u16 *) ((u8 *) rec + 0x18C) = lowMask;
+        *(u16 *) ((u8 *) rec + 0x18E) = highMask;
+        *(u16 *) ((u8 *) rec + 0x188) = lowActive;
+        *(u16 *) ((u8 *) rec + 0x18A) = highActive;
+        *(s16 *) ((u8 *) rec + 0x198) = v230;
+        *(s16 *) ((u8 *) rec + 0x19A) = v234;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", UpdateVoiceEnvelopes);
+#endif
 
 /* STALL -- see docs/match-reports/StartNote.md. Round 48 (echo):
  * tested charlie's frame-padding lever (u8 dead[8], sized to the build's
