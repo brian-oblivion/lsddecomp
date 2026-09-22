@@ -419,21 +419,16 @@ extern void func_80034D90(s16 a0, s16 a1);
  * through into the shared tail that re-arms the next scheduling delta via
  * func_80035E80; those seven `return` immediately instead.
  *
- * STALL -- see docs/match-reports/func_80034690.md. 5 words SHORT (195/200,
- * compiled length measured directly off build/src/code_179d8_k.c.o, not
- * from funcdiff which cannot read a meaningful word-match number once
- * length drifts). Every other case body's word count matches retail's
- * exactly (verified case by case); the two measured causes are (1) this
- * build allocates one FEWER callee-saved register overall (6 vs retail's
- * 7 -- "val" never gets its own persistent $s6), costing 2 words in the
- * prologue/epilogue, and (2) case 11 (CC 11, Expression) reaches the
- * shared combine-tail by JUMPING INTO retail's default-path widening
- * (saving 3 words) instead of duplicating its own full widening and
- * jumping straight to the call the way retail -- and this file's own
- * cases 7 and 10, which DO match exactly -- do. Register-identity /
- * tail-merge-choice residue, not a logic difference; see report for the
- * reshapes tried. */
-#if 0
+ */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 195/200 words, length 5 SHORT. Residue: register-identity /
+ * tail-merge-choice (this build allocates one fewer callee-saved register
+ * overall -- "val" never gets its own persistent $s6, costing 2 words --
+ * and case 11 reaches the shared combine-tail by jumping into retail's
+ * default-path widening, saving 3 words, instead of duplicating its own
+ * full widening the way retail and this file's own cases 7/10 do); not a
+ * logic difference, reshaping tried and did not move it
+ * (docs/match-reports/func_80034690.md). Hand-derived. */
 void func_80034690(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -512,8 +507,9 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034690);
+#endif
 
 /* A stack-local buffer this function passes to three cross-unit callees:
  * `SsUtGetProgAtr(ch, byte, out)` (established elsewhere as
