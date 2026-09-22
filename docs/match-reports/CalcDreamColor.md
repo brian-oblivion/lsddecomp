@@ -25,7 +25,7 @@
 > length exactly (zero address drift)** -- `funcdiff.py` reports no
 > outside-range warning and a direct `objdump` word count confirms 35 words
 > compiled. First real diff located via `tools/asm-differ/diff.py`: `0x4BD78`,
-> where retail computes the `D_80087E14` table-base address (`lui a0,0x8008`)
+> where retail computes the `DREAM_COLOR_TABLE` table-base address (`lui a0,0x8008`)
 > immediately after reading `dynamic`, while this build instead loads `upper`
 > early (`lb a0,1(sp)`) — exactly the round-20-confirmed "commutative-add
 > operand-order" class this function was already filed under (sixth instance
@@ -48,7 +48,7 @@
 Already documented: `@brief Calculates the DreamColor for a given mood.`
 Classifies each of the mood's two axis bytes into `{0,1,2}` (via
 thresholds `<-3`, `[-3,4)`, `>=4`) in a local copy, then indexes a 3x3
-lookup table `D_80087E14[dynamicClass*3 + upperClass]`.
+lookup table `DREAM_COLOR_TABLE[dynamicClass*3 + upperClass]`.
 
 ## Best-reached body (does NOT compile to retail bytes)
 
@@ -78,14 +78,14 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood)
 		s8 *entry;
 
 		index = local.axis.dynamic * 3;
-		entry = &D_80087E14[index];
+		entry = &DREAM_COLOR_TABLE[index];
 		return entry[local.axis.upper];
 	}
 }
 #endif
 ```
 
-(`D_80087E14`'s `extern s8 D_80087E14[9];` declaration is kept live.)
+(`DREAM_COLOR_TABLE`'s `extern s8 DREAM_COLOR_TABLE[9];` declaration is kept live.)
 
 ## Two real fixes landed; one residue didn't move
 
@@ -94,16 +94,16 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood)
 compiled to a genuinely different branch layout than retail's (inverted
 outer condition sense, an extra `j`, wrong fallthrough) -- same
 "arm-order-must-match-retail's-fallthrough" class as
-`Test4StaircaseNodes` and `func_800590E8` (round 2026-08-30-c). Rewriting
+`Test4StaircaseNodes` and `DreamSys__GetSetFlashbackSession` (round 2026-08-30-c). Rewriting
 as a flat `if (val>=4) 2; else if (val<-3) 0; else 1;` (the ">=4" case
 FIRST, matching retail's actual branch-taken/fallthrough split) fixed the
 whole first half of the function (word 0-22 all match) on one try.
 
 **Fix 2 (worked): splitting the double-indexed table lookup.** The single
-expression `D_80087E14[dynamicClass*3 + upperClass]` computed the FULL
+expression `DREAM_COLOR_TABLE[dynamicClass*3 + upperClass]` computed the FULL
 index before adding the array base, one instruction shorter and 5 words
 off from retail. Splitting into an intermediate `s8 *entry =
-&D_80087E14[dynamicClass*3];` then `entry[upperClass]` matched the total
+&DREAM_COLOR_TABLE[dynamicClass*3];` then `entry[upperClass]` matched the total
 instruction COUNT (28/35 -> correct 35-word size, no more outside-range
 drift) and got 5 more words matching.
 
@@ -118,13 +118,13 @@ all (28/35, same size, same total instruction count).
 
 Reshapes tried on JUST this residue, all four producing the identical
 28/35 result:
-1. `s8 *entry = &D_80087E14[idx]; return entry[upper];` (shown above).
+1. `s8 *entry = &DREAM_COLOR_TABLE[idx]; return entry[upper];` (shown above).
 2. Same, with `upper` pulled into its own named local, assigned AFTER
    `entry` (to force the read to happen later in source order).
 3. `dynamic*3` pulled into its own named `index` local before computing
    `entry` (shown above -- this is what's kept live).
 4. Two independent named index locals (`idx1 = dynamic*3; idx2 = upper;
-   return D_80087E14[idx1+idx2];`) -- this one actually regressed to the
+   return DREAM_COLOR_TABLE[idx1+idx2];`) -- this one actually regressed to the
    single-expression form's 23/35, confirming the intermediate-pointer
    split (attempts 1-3) is the right general shape, just not fully
    reachable.
@@ -199,7 +199,7 @@ assigning it to `entry`:
 	s8 *entry;
 
 	index = local.axis.dynamic * 3;
-	p = &D_80087E14[index];
+	p = &DREAM_COLOR_TABLE[index];
 	entry = p;
 	return entry[local.axis.upper];
 }
@@ -227,7 +227,7 @@ hand (three lines) before reaching for the permuter again.
 
 Re-read `asm/nonmatchings/DreamSys/CalcDreamColor.s` directly (the same
 "verify from raw asm, not from the report" discipline that found a real
-misread bug in `func_8005A1F4` this round). No hidden semantic bug found
+misread bug in `DreamSys__SoundCueCallback` this round). No hidden semantic bug found
 here -- the classification loop and the table lookup are exactly what this
 report already describes. Two concrete follow-ups, both tested against the
 real oracle (`./build-and-verify.sh` + `funcdiff.py`), not just reasoned
@@ -238,7 +238,7 @@ about:
    (renamed `entry`->`base` for local style only):
    ```c
    index = local.axis.dynamic * 3;
-   p = &D_80087E14[index];
+   p = &DREAM_COLOR_TABLE[index];
    base = p;
    return base[local.axis.upper];
    ```
@@ -256,7 +256,7 @@ about:
    after loading `dynamic` and BEFORE the `sll`/`addu` that forms
    `dynamic*3`:**
    ```c
-   base = D_80087E14;
+   base = DREAM_COLOR_TABLE;
    index = local.axis.dynamic * 3;
    return base[index + local.axis.upper];
    ```
@@ -264,7 +264,7 @@ about:
    statement, is not sufficient here -- GCC 2.6.3 schedules the two
    differently depending on how the base and index are FUSED in the source
    expression, not just what order they're written in. The known-good
-   28/35 form (`entry = &D_80087E14[index]; return entry[upper];`, base and
+   28/35 form (`entry = &DREAM_COLOR_TABLE[index]; return entry[upper];`, base and
    index summed in one fused address-of expression rather than as two
    separate prior statements) remains the best C reached; this round did
    not find anything better.
@@ -282,7 +282,7 @@ about the REAL oracle unless it is re-verified end to end, including
 the permuter's internal metric while being a different, WRONG size. This is
 the same caution CLAUDE.md's "four ways a score lies" already states for
 `funcdiff` itself; it applies with equal force to a permuter's own score,
-and this function is a second confirmed instance (after `func_8005A1F4`'s
+and this function is a second confirmed instance (after `DreamSys__SoundCueCallback`'s
 round-18 "50-point candidate" scare, which was structurally different
 rather than size-wrong, but the same "read it back against the disassembly
 before trusting it" discipline caught both).

@@ -41,7 +41,7 @@ Both blocker screens are clean: no `gp_rel` hit and no
   the 28-byte region beyond the pointer's own 4 bytes is still opaque
   padding (`unknown_values_0x2C[24]`).
 - `DreamSys::unk_0xB8` (was folded into `unknown_values_0xB8[4]`, itself
-  carved this round for `func_80059BE0`'s `unk_0xB4`) is a plain `s32`: the
+  carved this round for `DreamSys__AdvanceMoveCycle`'s `unk_0xB4`) is a plain `s32`: the
   masked `unk_0x28->unk_0x36` value, described above.
 - `DreamSys::currentStage` at `+0x164` was ALREADY a named field (derived
   from `MoodGraphContributor areaMoods/entityMoods` sizing) — this function

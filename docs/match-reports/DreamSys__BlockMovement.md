@@ -36,4 +36,4 @@ see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
 ## Naming
 
-- **Tier B.** Sets a flag read by two independent sites: DreamSys__UpdateTickState skips its whole body, and func_80059AEC (not renamed) returns early, both only while it is nonzero.
+- **Tier B.** Sets a flag read by two independent sites: DreamSys__UpdateTickState skips its whole body, and DreamSys__TickMoveFree (not renamed) returns early, both only while it is nonzero.

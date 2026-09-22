@@ -1,0 +1,588 @@
+# DreamSys__StartVoice -- MATCHED (72/72, byte-exact), round 37, via a permuter-found register-forcing lever
+
+> Renamed from `func_80059D1C` on 2026-09-22 (tools/rename.py). Address 0x80059d1c.
+
+> **MATCHED, round 37 (2026-09-12, runner charlie).** This function is now
+> byte-exact (`./build-and-verify.sh` reports `OK: build matches retail
+> SLPS_015.56`). Everything below this banner describes the STALL history
+> (rounds 2026-09-06 through 35) and the round-37 process that closed it; kept
+> for the record and for the generalizable lever it demonstrates. Live C is
+> in `src/DreamSys.c` (no longer `#if 0`/`INCLUDE_ASM`).
+>
+> **How it closed, in two permuter searches.** Round 37 first ran a permuter
+> search (the first ever on this function -- 72/72 exact length, zero drift,
+> the best-posed shape in the corpus) against the 55/72 stalled body. In
+> ~1200 iterations it found a score-30 candidate: add a second local,
+> `new_var = heading;`, and read from it (not `heading`) at both
+> `vt->slot0x80` call sites. Translated to idiomatic C and verified through
+> the full oracle, this closed the WHOLE-FUNCTION `this`/`obj`/`vt`/`heading`
+> register-identity swap outright -- 55/72 -> **68/72**, all four registers
+> now matching retail, with the entire remaining gap confined to one
+> already-documented residue (a two-instruction load-order swap between the
+> `VOICE_BY_SELECT`/`VOICE_PITCH_BY_SELECT` byte-table reads). A second permuter search,
+> seeded from this improved 68/72 body, found a score-0 (byte-exact)
+> candidate in a further ~2500-ish iterations (well within a second
+> 900s/`rc=0` bound). The raw candidate was noisy (a Yoda comparison, an
+> unused literal-holding temp, a mismatched `unsigned int`) but genuinely
+> byte-exact; six individually-verified simplifications reduced it to the
+> clean form now in `src/DreamSys.c`, with two of those simplification
+> attempts caught as real regressions (not permuter noise) and reverted.
+> Full account in "Round 37" at the end of this report.
+>
+> **VERIFIED FRESH, round 32 (2026-09-12, runner alpha2).** Re-measured
+> before touching anything: rebuilding the exact preserved body reproduces
+> 55/72 words, zero address drift, byte-identical to what this report
+> already describes. Two NEW axes were tried this round (informed by this
+> round's finding 2 -- test whether "the registers differ" is really an
+> allocation fact or something in the C failing to force retail's order):
+> inlining the `vt` local away (`obj->vt->slotNN(...)` at every call site)
+> and combining `heading`'s two-statement computation into one expression
+> (`heading = VOICE_BY_SELECT[idx] << 4;`). **Both regressed** (21/72 with real
+> drift, and 50/72, respectively) and were reverted immediately. Neither
+> discriminates the residue as order-forcible; it remains a genuine
+> register-identity stall. See "Round 32" below for the measurements.
+>
+> The section immediately below predates this round.
+
+**Unit:** DreamSys · **Size:** 72 words · **Status:** STALL, best-reached
+55/72, no address drift. Attempted round 2026-09-06 (charlie). Not the same
+issue as the OLD stub filed for this function under round 2026-08-30-a
+(that one cited the `addiu_at` blocker, which is RESOLVED as of round 21 --
+this function was screened clean against both remaining blockers, `gp_rel`
+and `nop_mflo_mfhi`, by the head before assignment).
+
+## What it does
+
+Loads `this->unk_0x58` (an opaque object, `DreamSysUnk58` -- vtable pointer at
+offset 0) and `this->unk_0xB8` (an index, already documented as bounded to
+`[0, 0x18)`); if the index is 0, returns immediately. Otherwise it looks up
+two parallel byte tables by that index (`VOICE_BY_SELECT`, `VOICE_PITCH_BY_SELECT`, both new
+externs added this round) and calls through the object's vtable twice
+(`slot0x9C`, a new slot this round, and `slot0x80`, already known from
+`ExecuteLink`), storing the second call's result into `this->unk_0xBC`. Two
+`this->unk_0xB8` comparisons (`== 0x16`, `== 0xB`) gate a discard of that
+stored result and two more pairs of vtable calls respectively.
+
+```c
+void DreamSys__StartVoice(DreamSys *this)
+{
+	DreamSysUnk58 *obj;
+	s32 idx;
+	DreamSysUnk58Vtable *vt;
+	s32 heading;
+
+	obj = (DreamSysUnk58 *)this->unk_0x58;
+	vt = obj->vt;
+	idx = this->unk_0xB8;
+	if (idx == 0) {
+		return;
+	}
+
+	heading = VOICE_BY_SELECT[idx];
+	heading <<= 4;
+	vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
+	this->unk_0xBC = vt->slot0x80(obj, heading, 0x6E, 0x6E);
+	if (this->unk_0xB8 != 0x16) {
+		this->unk_0xBC = -1;
+	}
+
+	if (this->unk_0xB8 == 0xB) {
+		vt->slot0x9C(obj, 1);
+		vt->slot0x80(obj, heading, 0x6E, 0x6E);
+		vt->slot0x9C(obj, 2);
+		vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+	}
+}
+```
+
+Preserved in `src/DreamSys.c` as `#if 0 ... #endif` immediately above its
+restored `INCLUDE_ASM`, in strict ROM order.
+
+## New struct/extern knowledge committed alongside this report
+
+All in `include/DreamSys.h`, purely additive, byte-verified against this
+function's own load/call instructions before being trusted:
+
+- `DreamSysUnk58Vtable` gains `slot0x80`'s return type widened `void` ->
+  `s32` (this function stores its result into `unk_0xBC`; the widening is
+  safe for every existing call site -- `ExecuteLink` and
+  `DreamSys__DreamSys`'s *different*, unrelated `DreamSysCtorArgObj::slot0x80`
+  -- because none of them ever read `$v0` after the call, so a discarded
+  `s32` return compiles identically to a discarded `void` one), plus a new
+  `slot0x9C` slot (one argument, at `+0x9C`, appended after `pad88[0x14]`).
+- `extern const s8 VOICE_BY_SELECT[0x18]` and `VOICE_PITCH_BY_SELECT[0x18]` -- both already
+  described in prose at `DreamSysUnk28Target`'s neighbourhood
+  (`0x80087EB0`-`0x80087EDF` combined) from an earlier round's analysis of
+  `unk_0xB8`'s bound; this round gives them real extern declarations.
+  `VOICE_PITCH_BY_SELECT`'s real extent is exactly these 24 bytes -- the trailing zero
+  bytes splat lumped into its dlabel belong to the `gProjectOffsetZ` vector
+  documented elsewhere in the header, not to this table.
+- `DreamSys::unk_0xB8`'s comment extended with this function's two literal
+  comparisons (`0x16`, `0xB`).
+
+## The residue, precisely
+
+**Zero address drift, zero missing/extra instructions in the final
+version** -- every mismatch is either a register NUMBER (same instruction,
+same operands otherwise) or two loads swapped past each other. This is the
+project's "register-identity" class, but WHOLE-FUNCTION rather than
+localized: four values (`this`, `obj`, `vt`, `heading`) each need a
+callee-saved register across the vtable calls, and retail's assignment is
+`this=$s2, obj=$s1, vt=$s3, heading=$s0`.
+
+**The single biggest lever found: splitting `heading`'s computation into two
+statements moved the score from 50/72 to 55/72 and fixed `obj` and `vt`'s
+register assignment outright**, going from a 3-way cycle
+(`this=$s0,vt=$s2,heading=$s3` vs. retail's `$s2/$s3/$s0`) down to a clean
+2-way swap (`this=$s0,heading=$s2` vs. retail's `$s2/$s0`) plus one
+independent residue: the two byte-table loads (`VOICE_BY_SELECT`, `VOICE_PITCH_BY_SELECT`)
+land in the opposite order from retail (retail loads the `VOICE_PITCH_BY_SELECT` call
+argument first, this body loads `VOICE_BY_SELECT` first, matching its own source
+statement order) -- see the two-instruction group at file offsets
+`0x4A550`/`0x4A560` in `funcdiff.py`'s output.
+
+**What was tried, all rebuilt and measured, none more than the two given
+above moved the needle:**
+
+- Declaration-order permutations of the four locals (three tried) --
+  **byte-identical every time**, reconfirming
+  `DECOMPILATION_LEARNINGS.md`'s existing "declaration/introduction order is
+  INERT for this class" finding, now for a whole-function 4-register case
+  rather than a 2-register one.
+- Statement-order permutations of the three pre-guard assignments (`obj`,
+  `idx`, `vt`, including recomputing the cast for `vt` instead of chaining
+  through `obj`) -- **also byte-identical every time.** Only moving
+  `heading`'s computation relative to the *guard branch* (before vs. after)
+  changed anything; once it is on the correct side of the branch, its
+  position among the other three has no effect.
+- `heading` retyped `s16` -- unexpectedly fixed ALL FOUR registers (66/72!),
+  but at the cost of two extra truncate-and-sign-extend instructions
+  (`sll $s0,$s0,0x18` / `sra $s0,$s0,0x14` replacing retail's plain
+  `sll $s0,$s0,0x4`) and the same load-order swap. Retail's single plain
+  `sll` proves the true type is NOT narrower than `s32` here, so this is a
+  coincidentally-effective but wrong-shaped lever -- recorded for the next
+  attempt, not adopted.
+- `idx` retyped `s16` (with `heading` back to `s32`) -- **no effect**
+  (50/72, identical byte pattern to the untyped version).
+- Extra `s8 rawByte` local for the table read, `heading` kept `s32` -- **no
+  effect** (50/72).
+- `VOICE_BY_SELECT`/`VOICE_PITCH_BY_SELECT` marked `const` and `heading` removed entirely
+  (both array reads inlined at both use sites, relying on CSE across the
+  vtable call) -- **regressed hard**, 16/72 with 99984 bytes of drift: GCC
+  did not treat the `const` global as safe to cache across an indirect call,
+  reloaded from memory, and produced a shorter/differently-shaped function
+  entirely.
+- Three orderings of `heading`'s two split statements relative to the first
+  `vt->slot0x9C` call (both before, split around it two different ways) --
+  the only one at 55/72 is both `heading` statements immediately before the
+  call; moving either statement to the other side of the call regressed to
+  49/72 or 42/72.
+
+**Reading the residue:** the register cycle (`this`/`vt`/`heading` in the
+3-way case, `this`/`heading` in the 2-way case) never involves any VALUE or
+INSTRUCTION difference -- purely which hard register a live-across-a-call
+local lands in. Per CLAUDE.md's register rule this is explicitly NOT
+fixable with `register T v asm("$N")` or an operand constraint; a bare
+`__asm__("")` scheduling barrier was not attempted because the residue is a
+register-identity difference, not an instruction-order one (the barrier is
+only licensed when removing it changes order, not identity). 20 attempts
+spent; stopping well short of the 30-attempt hard cap because the last ten
+attempts (three type experiments, four statement-order experiments, the
+`const`+no-local experiment, and two declaration-order re-checks) all
+either reproduced an already-seen score exactly or regressed, which is the
+guide's own signal that an attempt axis is exhausted rather than merely
+untried.
+
+### Proposed learning
+
+A whole-FUNCTION register-identity residue (as opposed to the smaller
+localized ones in the existing corpus) can still be partially closed by
+splitting a combined shift-of-a-load expression into two statements --
+here it fixed 2 of 4 registers outright -- even though the overall function
+does not close. Retyping the split variable narrower (`s16`) then closes the
+REMAINING registers too, but only by introducing extra truncation
+instructions retail does not have, which is a strong signal that the type
+lever is fixing register allocation as a SIDE EFFECT of adding RTL
+complexity, not because the narrower type is actually correct -- worth
+recording as a *found-but-rejected* lever distinct from "inert" so a future
+attempt does not have to rediscover both the promise and the trap.
+
+---
+
+## Round 32 (2026-09-12, runner alpha2): re-verified fresh, two new axes tried, both negative
+
+Re-measured before making any change, per the standing "verify a claim before
+building on it" discipline: spliced the exact preserved body (above) back
+into `src/DreamSys.c` and rebuilt. Reproduced **55/72 words, zero address
+drift**, byte-identical diff to what this report already describes (register
+swap: retail's `this`=`$s2`/`heading`=`$s0`, this build's `this`=`$s0`/
+`heading`=`$s2` -- confirmed via `tools/asm-differ/diff.py`, first divergence
+at `0x4A520`, the prologue's very first callee-save `sw`).
+
+This round's brief named a discriminator for exactly this shape: is "the
+registers differ" a hard GCC allocation fact, or is something in the C
+failing to force the order/identity retail's build has? Two axes not
+previously tried:
+
+1. **Remove the `vt` local entirely**, calling `obj->vt->slotNN(...)` directly
+   at each of the four call sites in the `unk_0xB8 == 0xB` block (the two
+   earlier call sites, which already read `this->unk_0xBC` results, were left
+   using `vt` since they need the value before the block). **Regressed
+   sharply**: 21/72 with a genuine 146815-byte outside-range drift (confirmed
+   via `funcdiff.py`'s own warning) -- removing `vt` changed the function's
+   shape, not just its register choice. Reverted immediately.
+2. **Combine `heading`'s two-statement computation into one expression**
+   (`heading = VOICE_BY_SELECT[idx] << 4;` instead of the separate `heading =
+   VOICE_BY_SELECT[idx]; heading <<= 4;`). **Regressed**: 50/72 (down from 55/72),
+   no drift but genuinely worse -- three additional call-site register swaps
+   appeared (`vt`'s calls now read `0x428e`/`0x628e` mismatches at the
+   `slot0x9C`/`slot0x80` loads) that were not present in the two-statement
+   form. Reverted immediately.
+
+Both confirm the existing "declaration/statement order is inert for this
+class" finding rather than contradicting it -- neither axis discriminates
+order-forcing from allocation preference, because both changes altered the
+COMPUTATION shape (removing a temp, merging two statements) rather than
+merely reordering existing statements. Consistent with everything already on
+record: this remains a genuine register-identity stall, not an
+order-fixable one. No further attempts made this round; `INCLUDE_ASM`
+restored, whole-image SHA1 verified green.
+
+### Proposed learning (round 32)
+
+Applying this round's "is it really allocation, or does the C fail to force
+order?" discriminator productively requires the tested change to be a pure
+REORDERING (same statements, different sequence) -- a change that also alters
+which temporaries exist (removing a local, merging two statements into one)
+tests a different axis entirely and, on this function, made things worse both
+times. Two mutually-exclusive-branch functions in this same unit
+(`DreamSys__StepLookOffset`, `DreamSys__StepLookYaw`) closed via a variable-COALESCING rename
+this same round; this function has no comparable mutually-exclusive-branch
+structure for `this`/`heading` to coalesce across (both are live
+simultaneously, in one straight-line flow), which is likely why the same
+family of lever does not apply here -- the discriminator's applicability
+depends on the two conflicting values having non-overlapping lifetimes in the
+first place.
+
+---
+
+## Round 35 (2026-09-12, runner charlie): re-verified fresh, one new axis tried, negative
+
+Re-measured before making any change: rebuilt the exact preserved body and
+reproduced **55/72 words, zero address drift**, byte-identical to what this
+report already describes (same register swap, same first-diff location).
+
+**One new axis tried:** the plain C89 `register` storage-class specifier on
+`heading` (not the banned `register T v asm("$N")` form -- no register is
+named, this is only a hint to the allocator, so it is not the banned lever):
+
+```c
+register s32 heading;
+```
+
+**No effect at all** -- byte-identical 55/72, same diff offsets as the
+untyped version, confirmed via `funcdiff.py` and `asm-differ`. GCC 2.6.3's
+register allocator evidently already treats every local that survives to
+`-O2` as an implicit `register`-class candidate, so the explicit keyword
+adds no information it didn't already have. Reverted immediately.
+
+This adds one more entry to the "declaration-order/storage-hint axis is
+inert for this class" finding already on record (three declaration-order
+permutations, `s16` retyping, and now `register`) -- all either
+byte-identical or, for the one that did move the needle (`s16`), moved it by
+adding truncation instructions retail doesn't have. No further attempts made
+this round; `INCLUDE_ASM` restored, whole-image SHA1 verified green,
+`git diff --stat` empty against `main`.
+
+### Proposed learning (round 35)
+
+`register` as a plain storage-class hint (no asm register name attached) is
+legal C89 and not covered by CLAUDE.md's ban on `register T v asm("$N")` --
+but on this GCC 2.6.3/-O2 pipeline it is also a no-op for allocation
+purposes: the compiler already treats every candidate local as an implicit
+register-class variable at this optimization level, so the hint carries no
+new information for the allocator to act on. Worth knowing before spending a
+round on it as if it were an untried lever -- it inhabits the same "inert"
+bucket as declaration order, not the "found-but-rejected" bucket `s16`
+retyping falls into.
+
+---
+
+## Round 37 (2026-09-12, runner charlie): permuter closes the register-identity residue outright, 55/72 -> 68/72
+
+This round's brief identified this function as never having had a permuter
+search run against it (72/72 exact length, high word-match, zero drift --
+the best-posed permuter shape in the corpus) and named the permuter as the
+round's primary tool. Re-measured before touching anything: rebuilt the
+exact preserved body above and reproduced **55/72 words, zero address
+drift**, byte-identical to rounds 32 and 35.
+
+**Scaffold set up per `tools/setup-permuter.sh DreamSys__StartVoice <seed>`.**
+`--debug --stack-diffs` confirmed the base score (116) matches the residue
+already on record (a whole-function register-identity swap: 20 register-diff
+penalty points, 16 stack-diff points from the `sw`/register-choice
+differences in the prologue, no reorderings/insertions/deletions -- i.e.
+purely an allocation question, exactly as described above).
+
+**Search 1** (`permuter-work/DreamSys__StartVoice`, `-j 6 --stop-on-zero --best-only
+--stack-diffs`, `timeout 900`): ran 76521 iterations before the bound expired
+(`rc=124`, confirmed on the very next command). No zero was reached, but the
+permuter's `--best-only` flag saved every local-best candidate it found, and
+one of them is a genuine, verified improvement:
+
+```
+--- before
++++ after
+@@ -614,6 +614,7 @@
+   DreamSysUnk58 *obj;
+   s32 idx;
+   DreamSysUnk58Vtable *vt;
++  s32 new_var;
+   s32 heading;
+   obj = (DreamSysUnk58 *) this->unk_0x58;
+   vt = obj->vt;
+@@ -624,8 +625,9 @@
+   }
+   heading = VOICE_BY_SELECT[idx];
+   heading <<= 4;
++  new_var = heading;
+   vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
+-  this->unk_0xBC = vt->slot0x80(obj, heading, 0x6E, 0x6E);
++  this->unk_0xBC = vt->slot0x80(obj, new_var, 0x6E, 0x6E);
+   if (this->unk_0xB8 != 0x16)
+   {
+     this->unk_0xBC = -1;
+@@ -633,7 +635,7 @@
+   if (this->unk_0xB8 == 0xB)
+   {
+     vt->slot0x9C(obj, 1);
+-    vt->slot0x80(obj, heading, 0x6E, 0x6E);
++    vt->slot0x80(obj, new_var, 0x6E, 0x6E);
+     vt->slot0x9C(obj, 2);
+     vt->slot0x80(obj, 0x90, 0x6E, 0x6E);
+   }
+```
+
+Found at iteration 1193 (permuter score 30, down from base 116). **Translated
+verbatim to idiomatic C and verified through the full oracle** (this is not a
+UB or duplicate-arm form -- it is ordinary, valid C89): `./build-and-verify.sh`
+gives `build exit=2` (expected, still short of byte-exact) with zero
+compile-error grep hits, and `tools/funcdiff.py` reports **68/72 words, zero
+address drift** -- up from 55/72, with NO regression anywhere else in the
+function.
+
+**Reading it with `tools/asm-differ/diff.py`: all four registers now match
+retail exactly.** `this=$s2`, `obj=$s1`, `vt=$s3`, `heading=$s0` (via
+`new_var`, which the compiler allocates into the SAME register `heading`
+held, since they now have disjoint live ranges the way `DreamSys__StepLookOffset`'s
+`delta`/`step` coalescing worked). The entire function matches
+instruction-for-instruction from the prologue through the epilogue, with
+**one exception**: the two-instruction group at 0x4A550-0x4A568 --
+
+```
+retail:  addiu at,at,%lo(VOICE_PITCH_BY_SELECT) ; lb a1,0(at)   [call arg, evaluated first]
+         addiu at,at,%lo(VOICE_BY_SELECT) ; lb s0,0(at)   [heading's raw byte, second]
+mine:    addiu at,at,%lo(VOICE_BY_SELECT) ; lb s0,0(at)   [heading first -- source order]
+         addiu at,at,%lo(VOICE_PITCH_BY_SELECT) ; lb a1,0(at)   [call arg second]
+```
+
+-- exactly the "one independent residue" the very first (2026-09-06) section
+of this report already named after finding the two-statement split: the two
+byte-table reads land in the opposite order from retail, and this body's
+order matches its own C statement order while retail's does not. This is now
+the ONLY divergence in the entire function (4 words: the 2 `addiu`s + 2
+register choices at the `lb`s that ripple from the swap).
+
+**Tried against the remaining residue, both reverted:**
+
+- **Moving the whole `heading = VOICE_BY_SELECT[idx]; heading <<= 4; new_var =
+  heading;` block to AFTER the `vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);` call**
+  (so the call argument is evaluated first in the C source too, matching
+  retail's apparent order). **Regressed sharply** to 55/72 with real address
+  drift -- reproducing exactly the finding the original (2026-09-06) section
+  of this report already recorded for this axis ("moving either statement to
+  the other side of the call regressed to 49/72 or 42/72"), now confirmed
+  again on top of the `new_var` fix. This axis remains closed off.
+- **A `byteArg` temp for the call argument**, assigned before `heading`
+  (`byteArg = VOICE_PITCH_BY_SELECT[idx]; heading = VOICE_BY_SELECT[idx]; ...;
+  vt->slot0x9C(obj, byteArg);`) while leaving the call in its original
+  position. **Byte-identical to the `new_var`-only form** -- no effect at
+  all. GCC's evaluation order for this pair is apparently insensitive to
+  which C statement introduces the read, only to which SIDE of the call the
+  statement sits on (the previous bullet), consistent with the existing
+  "declaration order is inert" finding extended to this new residue.
+
+**A second permuter scaffold was seeded from the improved (68/72) body**
+(`permuter-work/func_80059D1C_v2`, base score confirmed 30 via `--debug
+--stack-diffs`, matching the 6 register-difference penalty points from the
+two `lb`s) to search the narrower remaining residue.
+
+### The second search closes it: MATCH, 72/72
+
+`timeout 900 ... permuter.py -j 6 --stop-on-zero --best-only --stack-diffs
+permuter-work/func_80059D1C_v2`: found a **score-0 candidate at iteration
+~5900** (well inside the bound; `rc=0`, captured on the very next command
+per protocol). The raw candidate (`permuter-work/func_80059D1C_v2/output-0-1`)
+was noisy but genuinely byte-exact once translated verbatim and run through
+the full oracle -- `build exit=0`, `OK: build matches retail SLPS_015.56`,
+`funcdiff.py` reports **72/72**. The raw form:
+
+```c
+new_var2 = 0x6E;                        /* an unused temp holding a literal */
+...
+new_var3 = VOICE_BY_SELECT[idx];             /* unsigned int, not s32 */
+heading = new_var3;
+heading = heading << 4;
+new_var = heading;
+vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
+this->unk_0xBC = vt->slot0x80(obj, new_var, 0x6E, new_var2);
+if (this->unk_0xB8 != 0x16) { this->unk_0xBC = -1; }
+if (0xB == this->unk_0xB8) {            /* Yoda comparison */
+	vt->slot0x9C(obj, 1);
+	vt->slot0x80(obj, new_var, 0x6E, 0x6E);
+	idx = 0x90;                     /* idx reused as a scratch pad */
+	vt->slot0x9C(obj, 2);
+	new_var3 = idx;
+	vt->slot0x80(obj, new_var3, 0x6E, 0x6E);
+}
+```
+
+**Per CLAUDE.md/the round brief, a permuter zero is a lead, not an answer --
+every simplification below was individually rebuilt and re-verified
+byte-exact before being kept**, never assumed from the permuter's own score
+(which cannot see the whole-image oracle):
+
+1. Retype `new_var3` from `unsigned int` to `s32` (the project's own type,
+   and the natural type for a value read from `const s8 VOICE_BY_SELECT[]`)
+   -- **byte-identical.** Cosmetic; the permuter's type choice was noise.
+2. Rewrite `0xB == this->unk_0xB8` back to `this->unk_0xB8 == 0xB` -- **byte-
+   identical.** Comparison operand order is inert here, as expected.
+3. Delete `new_var2` and its assignment, using the literal `0x6E` directly
+   at the one call site that had used it -- **byte-identical.** The extra
+   temp holding an unused literal was pure noise.
+4. Combine `heading = new_var3; heading = heading << 4;` into
+   `heading = new_var3 << 4;` -- **byte-identical.** A cosmetic merge, safe
+   this time (contrast with the ORIGINAL 55/72-era finding that combining
+   `heading`'s two statements regressed -- that was merging the OTHER,
+   still-load-bearing form; this merge is of an already-safe intermediate).
+5. **Tried and REGRESSED (to 68/72):** replacing `idx = 0x90; ...; new_var3 =
+   idx;` with a plain `vt->slot0x80(obj, 0x90, 0x6E, 0x6E)` (the "obvious"
+   simpler form, and what every prior round's C had). This confirms the
+   `idx`-then-`new_var3` reuse is genuinely load-bearing, not permuter
+   noise -- reverted immediately, keeping the reuse but simplified in the
+   next step.
+6. Simplify that reuse to a direct `scratch = 0x90;` (dropping the
+   intermediate `idx = 0x90` step, keeping only the fact that a THIRD write
+   to the `new_var3`/`scratch` local happens at that point) -- **byte-
+   identical to the full reuse form.** The intermediate `idx` write was
+   noise; only the local's own third assignment mattered.
+7. **Tried and REGRESSED (to 68/72):** dropping the `new_var3`/`scratch`
+   intermediate for the FIRST use too (`heading = VOICE_BY_SELECT[idx] << 4;`
+   directly). Confirms this local is load-bearing on both of its uses, not
+   just the second.
+8. Rename `new_var`/`new_var3` to `headingArg`/`scratch` and reorder
+   declarations for readability (`obj, idx, vt, heading, headingArg,
+   scratch`) -- **byte-identical**, as expected (naming and declaration
+   order are the already-established "inert" axis).
+
+Final clean form (now live in `src/DreamSys.c`, with a comment explaining why
+`headingArg` and `scratch` are load-bearing rather than superfluous):
+
+```c
+void DreamSys__StartVoice(DreamSys *this)
+{
+	DreamSysUnk58 *obj;
+	s32 idx;
+	DreamSysUnk58Vtable *vt;
+	s32 heading;
+	s32 headingArg;
+	s32 scratch;
+
+	obj = (DreamSysUnk58 *)this->unk_0x58;
+	vt = obj->vt;
+	idx = this->unk_0xB8;
+	if (idx == 0) {
+		return;
+	}
+
+	scratch = VOICE_BY_SELECT[idx];
+	heading = scratch << 4;
+	headingArg = heading;
+	vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
+	this->unk_0xBC = vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
+	if (this->unk_0xB8 != 0x16) {
+		this->unk_0xBC = -1;
+	}
+
+	if (this->unk_0xB8 == 0xB) {
+		vt->slot0x9C(obj, 1);
+		vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
+		vt->slot0x9C(obj, 2);
+		scratch = 0x90;
+		vt->slot0x80(obj, scratch, 0x6E, 0x6E);
+	}
+}
+```
+
+**Status: MATCHED.** Whole-image SHA1 verified green with this C live (not
+`INCLUDE_ASM`). No further work needed on this function.
+
+### Proposed learning (round 37)
+
+**A whole-function, multi-register identity swap that resisted 20+ hand
+attempts across three rounds (declaration order, statement order, retyping,
+`register`, inlining `vt` away, merging `heading`'s two statements) closed in
+~1200 permuter iterations via a lever no hand attempt had tried: introduce a
+SECOND same-value local and read from the copy, not the original, at the
+sites that need a different register.** This is mechanically similar to the
+project's known `delta`/`step` coalescing idiom (reusing one variable across
+mutually exclusive branches to force a shared register) but is its mirror
+image -- here a single value is DUPLICATED into two variables with disjoint
+live ranges to let the allocator pick different registers for the same
+underlying quantity at different points in its lifetime, rather than forcing
+one register for two different quantities. Both idioms are instances of the
+same underlying fact (GCC 2.6.3's allocator keys its register choice off the
+NUMBER OF DISTINCT LOCALS AND THEIR LIVE RANGES, not off which values happen
+to be equal), but they are opposite-direction levers and a hand search
+reasoning from "the values are related, merge them" would never try the
+"duplicate them" direction. Worth recording as a named, generalizable lever
+for the next whole-function register-identity stall: if coalescing doesn't
+apply (no mutually-exclusive branches to merge), try the opposite -- copying
+the value read at the END of its life into a fresh local for the later
+use sites -- before concluding the residue is a genuine, unreachable
+allocator preference.
+
+**Second learning: a permuter zero's "noise" is not uniformly noise, and the
+only way to tell which parts are load-bearing is to remove them one at a
+time and re-run the real oracle.** This candidate had FOUR cosmetic changes
+(a Yoda comparison, an unused literal temp, a narrower merge of two
+statements, an unnecessary type) that were all provably inert, and TWO
+changes (an `idx`-as-scratch-pad reuse feeding a local also used for the
+first table read, and using that same local -- not a fresh computation -- for
+the raw table byte) that looked exactly as arbitrary as the cosmetic ones
+but were genuinely load-bearing, confirmed by regressing to 68/72 the moment
+either was removed. Nothing about READING the diff distinguishes the two
+categories in advance; only rebuilding through `./build-and-verify.sh` after
+each individual removal does. This is the same discipline CLAUDE.md already
+requires for a permuter zero in general (translate and re-verify, never
+trust the permuter's own score), extended one level deeper: it applies
+per-simplification during cleanup, not just once at the point of first
+translation.
+
+## Naming
+
+`DreamSys__StartVoice` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059D1C`.
+
+Through `soundObj` (a VabStreamObj*, see
+`DreamSys__SetSoundObj.md` for the three-way identification): sets the pitch offset
+to `VOICE_PITCH_BY_SELECT[voiceSelect]` via +0x9C
+(`VabStreamObj__SetPitchOffset`), starts a voice via +0x80 with
+`VOICE_BY_SELECT[voiceSelect] << 4` and two 0x6E constants, and stores the returned
+voice index in `voiceIndex` -- discarding it (setting -1) unless `voiceSelect` is
+0x16. That +0x80 STARTS something is not an assumption: the value it returns is
+exactly what +0x84 (`VabStreamObj__StopVoice`) is handed later by
+`DreamSys__StopVoice`. Does nothing at all when `voiceSelect` is 0.
+Tier B: the two extra layered voices played when `voiceSelect == 0xB`, and what the
+24 selector values mean, are unexplained.

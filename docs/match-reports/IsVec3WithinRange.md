@@ -64,7 +64,7 @@ retail's literal shape over the "cleaner" idiomatic form.
   +/- `range` of the matching component of `a`, 0 on the first component
   that does not. `Is...` marks the predicate; the two early returns and the
   trailing `return 1` are the whole body.
-- Corroborated by its one caller: `DreamSys.c`'s `func_8005942C` calls it
+- Corroborated by its one caller: `DreamSys.c`'s `DreamSys__ProjectPointAtDistance` calls it
   as `IsVec3WithinRange(local, tolerance, reference)`, where `local` is a
   position it has just computed via `Class6B5CC__LocalOffsetToWorldPos` --
   a tolerance test between two positions, which is what the name says.

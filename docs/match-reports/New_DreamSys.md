@@ -3,7 +3,7 @@
 **Unit:** DreamSys · **Size:** 31 instructions · **Status:** MATCHED (31/31 words)
 
 > **RESOLVED, round 2026-08-30-c.** Head-adjudicated re-check after
-> `func_80059E3C` turned out to be a wrong-parameter-list bug, not a true
+> `DreamSys__StopVoice` turned out to be a wrong-parameter-list bug, not a true
 > register-identity stall (see that report). New_DreamSys does NOT have the
 > same root cause -- the residue register was `$v0` (the return-value
 > register), not an argument register `$a0`-`$a3`, and it was never live
@@ -35,7 +35,7 @@ to be exactly the trap; see the residue below.
 `sizeof(DreamSys)` from the allocator's own mouth, and it does NOT match
 what the header modeled at the time (`0x890`, ending at `storedDay`). This
 was the trigger for extending the struct by the missing `0x98` bytes (see
-`DreamSys__func_588ec.md`, which needed four of those newly-uncovered
+`DreamSys__ResetSessionState.md`, which needed four of those newly-uncovered
 fields). The finding stands regardless of this function's own match status
 -- it comes from retail's own INCLUDE_ASM bytes, not from anything this
 round wrote.

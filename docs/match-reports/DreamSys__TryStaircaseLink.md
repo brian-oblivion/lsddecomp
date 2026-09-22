@@ -77,7 +77,7 @@ below).
 
 ## What it does
 
-Called through `vtable_DreamSys::DreamSys__TryStaircaseLink` (+0x1DC) by `func_80059E98`
+Called through `vtable_DreamSys::DreamSys__TryStaircaseLink` (+0x1DC) by `DreamSys__ApplyMoveCommand`
 (matched this round, see its own report) as the first of three "link test"
 tries. Signature `bool (DreamSys *this, PlayerSpawnPoint *currentPos)`,
 matching its siblings `DreamSys__TryTunnelLink`/`DreamSys__TryStageTimerLink`.
@@ -125,7 +125,7 @@ staircase:
 	this->unk_0x908 = 1;
 	this->unk_0x90C = 1;
 	this->unk_0x914 = 0;
-	this->unk_0x910 = D_80087EEC[GetLastSpawnExtra()];
+	this->unk_0x910 = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
 	this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
 	this->unk_0x910(this);
 	return false;
@@ -136,7 +136,7 @@ staircase:
 assumed: every `j`/fallthrough in the function lands on either an explicit
 `li v0,0` or the shared epilogue label that itself does `li v0,0`. There is
 no path that reaches the epilogue with a nonzero `$v0`. This makes the
-function's practical behavior in its only caller (`func_80059E98`'s
+function's practical behavior in its only caller (`DreamSys__ApplyMoveCommand`'s
 `!this->vt->DreamSys__TryStaircaseLink(...) && ...` chain) equivalent to always
 continuing to the next link test -- a real quirk of retail's own logic, not
 a decompilation error.
@@ -159,7 +159,7 @@ All in `include/DreamSys.h`:
   same idiom as the existing `unk_0x91C` (`struct RelativePos`) next to it,
   which already covers `currentPos->position`. No other reader of this
   field existed before this round.
-- **`extern s32 (*D_80087EEC[4])(DreamSys *this)`** -- a table of the four
+- **`extern s32 (*STAIRCASE_TICK_FNS[4])(DreamSys *this)`** -- a table of the four
   already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseCase0`/
   `DreamSys__TickStaircaseCase1`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3`, confirmed by their own
   existing definitions in `src/DreamSys.c`.
@@ -175,7 +175,7 @@ All in `include/DreamSys.h`:
   holding an unrelated leftover value (`currentPos->position.z`, from the
   immediately preceding `lh`) with no explicit argument setup, matching the
   existing "empty delay slot, no a0-a3 setup" shape already documented for
-  `func_8005BF48`.
+  `GetStageLinkAngle`.
 
 ## The residue, precisely
 
@@ -364,7 +364,7 @@ were tested through the full oracle and all three are false leads**:
   the path that reaches `staircase:` via the EARLIER `goto`, which never
   executes `new_var = this;` at all. This reads `new_var` uninitialized on
   that path: a genuine undefined-behavior form, not the legitimate
-  register-forcing idiom that closed `func_80059D1C` this same round (there,
+  register-forcing idiom that closed `DreamSys__StartVoice` this same round (there,
   the duplicate local was assigned on EVERY path before use). Tested anyway
   out of thoroughness: **regressed to 30/88**, confirming it is not a useful
   lever even ignoring the UB.

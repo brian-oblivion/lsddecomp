@@ -19,7 +19,7 @@ Already forward-declared with this exact signature; only the vtable side
 needed work -- split out of `unknown_functions_0x21c[3]` alongside
 `DreamSys__SaveLinkSnapshot`/`DreamSys__RestoreLinkSnapshot` (named, not typed further; out of scope
 this round) and a correction to the neighboring `func_228` field's comment
-(see `func_8005BA20.md`).
+(see `DreamSys__func_5ba20.md`).
 
 ## Provenance
 

@@ -211,7 +211,7 @@ tools/funcdiff.py DreamSys__BuildLinkQueries   # still INCLUDE_ASM -- do not tru
 Re-derived this function's control flow directly from
 `asm/nonmatchings/class_3bb8c_p/DreamSys__BuildLinkQueries.s`, instruction by
 instruction, as a check against the kind of misread that turned out to be
-real elsewhere this round (`func_8005A1F4`). No discrepancy found -- every
+real elsewhere this round (`DreamSys__SoundCueCallback`). No discrepancy found -- every
 branch, field offset, and the two `getGridArrElemAt` call sites (including the
 confirmed fact that the SECOND call reuses `f3`/`src` in `$a2`/`$a3`
 unchanged from the first call's setup, rather than retail re-loading them)

@@ -28,7 +28,7 @@
 /* Not #included by this unit (only include/psyq/RAND.H and Entity.h declare
    it); forward-declared locally, matching Entity.h's own s32 rand(void). */
 extern s32 rand(void);
-extern MoodGraphPoint D_8008ABF4;
+extern MoodGraphPoint SPECIAL_DAY_MOOD;
 
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day)
 {
@@ -38,7 +38,7 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day)
 		if (day == SPECIAL_DAYS[i]) {
 			cinematic->entry = rand() % 6;
 			cinematic->bank = i % 12;
-			return &D_8008ABF4;
+			return &SPECIAL_DAY_MOOD;
 		}
 	}
 	return NULL;

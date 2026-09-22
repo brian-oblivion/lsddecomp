@@ -56,7 +56,7 @@ so this was done by direct arithmetic on the struct instead):
   0x10-byte `MoodGraphContributor`s, landing exactly on `currentStage`).
 
 `unk_0x58` stays `s32` in the struct itself (matches the established
-dual-typed convention from `func_80059E3C` — cast locally to
+dual-typed convention from `DreamSys__StopVoice` — cast locally to
 `DreamSysUnk58 *` rather than retyping the field project-wide, since other
 call sites in this unit still use it as a plain integer).
 

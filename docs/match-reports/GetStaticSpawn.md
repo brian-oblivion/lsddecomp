@@ -5,7 +5,7 @@
 ## History
 
 Filed round 2026-08-30-a as BLOCKED on `gp_rel` (6 references, the first to
-`D_8008ACBC`). Round 42 RESOLVED that blocker. Attempted fresh this round
+`gLinkSrcStage`). Round 42 RESOLVED that blocker. Attempted fresh this round
 (a stretch pick beyond the assigned queue).
 
 ## What it does
@@ -25,7 +25,7 @@ empty trigger list.
 ## Attempt 1: correct algorithm, one word too long (22/79, ~130KB drift)
 
 The first translation read `trig->stage` and `trig->spawnpointIndex` TWICE
-each -- once to store into `D_8008ACC4`/`D_8008ACC8` and again to index
+each -- once to store into `gLinkDstStage`/`gLinkSpawnIndex` and again to index
 `spawns[trig->stage][trig->spawnpointIndex]` -- as two textually separate
 expressions. GCC 2.6.3 did not common-subexpression-eliminate the second
 read of `trig->stage` (it kept the first in a register but re-issued an
@@ -95,18 +95,18 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
 		if (*(s16 *)&currentPos->tile != trig->tile.value && trig->tile.value >= 0)
 			continue;
 
-		D_8008ACBC = stage;
-		D_8008ACC0 = i;
+		gLinkSrcStage = stage;
+		gLinkTriggerIndex = i;
 		triggerStage = trig->stage;
-		D_8008ACC4 = triggerStage;
+		gLinkDstStage = triggerStage;
 		spawnIndex = *(u8 *)&trig->spawnpointIndex;
 		entry = &spawns[triggerStage][spawnIndex];
-		D_8008ACC8 = spawnIndex;
+		gLinkSpawnIndex = spawnIndex;
 		*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
 		target->position = SPAWN_POS_ADJUST[entry->adjustment];
 		if (flag != 0)
 			(*gpNavChallengesComplete)[entry->extra] = 1;
-		return D_8008ACC4;
+		return gLinkDstStage;
 	}
 	return -1;
 }
@@ -119,7 +119,7 @@ special handling needed, consistent with the already-documented
 "alignment-2 struct assignment compiles to `lwl`/`lwr`+`swl`/`swr`" pattern
 (CLAUDE.md).
 
-`D_8008ACC0` was already declared in `include/DreamSys.h` from earlier
+`gLinkTriggerIndex` was already declared in `include/DreamSys.h` from earlier
 rounds' call-site analysis; no header changes needed.
 
 ## Verification

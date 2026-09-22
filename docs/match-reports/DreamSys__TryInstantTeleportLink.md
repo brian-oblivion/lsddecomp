@@ -220,7 +220,7 @@ CFG, fixed register allocation, only delay-slot scheduling in question.
 
 Re-read `asm/nonmatchings/DreamSys/DreamSys__TryInstantTeleportLink.s` directly (not just this
 report's prose) as a check against the kind of misread that turned out to
-be real in `func_8005A1F4` this same round. No hidden bug found here --
+be real in `DreamSys__SoundCueCallback` this same round. No hidden bug found here --
 every field offset, call target, and the two delay-slot sites this report
 already describes check out exactly against the raw disassembly.
 
@@ -228,7 +228,7 @@ One additional reshape, not previously on record: replacing the three
 literal `return true;` exit points with a single named `bool ret = true;`
 materialized once at function entry and returned from all three sites
 (the same "materialize the value into a named local before the branch"
-idiom that closed `func_8005A1F4` this round). Result: **identical 58/63**,
+idiom that closed `DreamSys__SoundCueCallback` this round). Result: **identical 58/63**,
 same two delay-slot sites diverging the same way. This idiom generalizes
 from "a comparison's boolean result" (where it worked) to "a constant
 return value repeated across multiple exits" (where it does not move
@@ -320,7 +320,7 @@ instruction (the hoisted `li $v0,0x1` return-value constant vs. retail's
 not a commutative `addu`'s operand order or destination register at all.
 No `addu`/`add` instruction appears anywhere in either of the two
 diverging words. Same family as `func_8004ABD0`'s (`class_3ac78`) and
-`func_80059BE0`'s residue #2 (this same unit, this round) -- an
+`DreamSys__AdvanceMoveCycle`'s residue #2 (this same unit, this round) -- an
 independent, dependency-free value getting scheduled into an earlier
 delay slot than retail chose -- but a DIFFERENT class from the
 commutative-add one. Not re-attempted further this round: already

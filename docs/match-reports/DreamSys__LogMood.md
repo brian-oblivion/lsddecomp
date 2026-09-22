@@ -30,7 +30,7 @@ void DreamSys__LogMood(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoi
 This is a straight-line function -- four independent field updates, no
 branches, no calls -- so there is no register-identity or missing-argument
 question (the general lever this round otherwise applied twice
-successfully; see `New_DreamSys.md` and `func_80059E3C.md`). Retail's own
+successfully; see `New_DreamSys.md` and `DreamSys__StopVoice.md`). Retail's own
 instruction order (target column) vs. the direct-translation body's (built
 column), via `tools/asm-differ/diff.py DreamSys__LogMood`:
 

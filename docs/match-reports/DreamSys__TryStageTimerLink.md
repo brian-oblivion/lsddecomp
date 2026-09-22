@@ -12,7 +12,7 @@ in ROM order) and `DreamSys__StaticWallLink`, but using yet another link
 test: `Test4StageTransition` (in-unit, still `INCLUDE_ASM`, gp-relative-blocked),
 which takes FOUR arguments -- `linkCoordinates`, `currentStage`,
 `currentPos`, AND `dreamTimer` -- one more than `TestForStaticLink`'s three.
-On success it also calls `func_8005BF48()` (niladic, still `INCLUDE_ASM`,
+On success it also calls `GetStageLinkAngle()` (niladic, still `INCLUDE_ASM`,
 also gp-relative-blocked) and stores its return alongside clearing two
 adjacent fields, before `ExecuteLink`ing with literal type `0x10`.
 
@@ -28,7 +28,7 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	result = Test4StageTransition(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
 	if (result < 0)
 		return false;
-	this->unk_0x880 = func_8005BF48();
+	this->unk_0x880 = GetStageLinkAngle();
 	this->unk_0x884 = 0;
 	this->unk_0x888 = 0;
 	ExecuteLink(this, result, 0x10, 0);
@@ -40,7 +40,7 @@ Header additions (`include/DreamSys.h`):
 
 ```c
 extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);
-extern s32 func_8005BF48(void);
+extern s32 GetStageLinkAngle(void);
 ```
 
 (The `unk_0x880`/`unk_0x884`/`unk_0x888` retyping is shared with
@@ -50,10 +50,10 @@ fields, `unk_0x880` is written here for the first time.)
 ## Derivation notes
 
 - `Test4StageTransition`'s return is stored in a callee-saved register across the
-  call to `func_8005BF48()`, since `result` (the link-test outcome) is
+  call to `GetStageLinkAngle()`, since `result` (the link-test outcome) is
   still needed afterward as `ExecuteLink`'s second argument. Writing this as
   ordinary sequential C (`result = ...; if (...) return false; this->unk_0x880
-  = func_8005BF48(); ...; ExecuteLink(this, result, ...)`) reproduces this for
+  = GetStageLinkAngle(); ...; ExecuteLink(this, result, ...)`) reproduces this for
   free -- GCC keeps `result` live across the intervening call because it is
   read again afterward; no explicit save/restore needed in source.
 - Matched on the first attempt; no residue.

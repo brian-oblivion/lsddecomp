@@ -394,7 +394,7 @@ function already argued this thoroughly. A permuter scaffold was set up
 preserved body; see the runner's final summary for the search's outcome
 (iteration count and `rc`), since the project's parallel-run discipline
 requires exactly one search running at a time and this function's search was
-queued behind `func_80059D1C`'s and `DreamSys__TryStaircaseLink`'s.
+queued behind `DreamSys__StartVoice`'s and `DreamSys__TryStaircaseLink`'s.
 
 `INCLUDE_ASM` restored immediately after measuring; whole-image SHA1 verified
 green; `git diff --stat` empty against `main` for this unit's non-report
@@ -437,7 +437,7 @@ two different reasons:**
   actually reaches those cases. Rejected on inspection, not tested.
 - **Score 80** targets exactly Residue 2 (case 4's vtable-dereference
   ordering) with a permuter-native form of the same lever that closed
-  `func_80059D1C` this round: `new_var = entity;` unconditionally before the
+  `DreamSys__StartVoice` this round: `new_var = entity;` unconditionally before the
   switch, then `slot0x38(new_var, this)` instead of `slot0x38(entity, this)`
   at case 4. **Translated and run through the full oracle -- and this is the
   interesting negative result.** `funcdiff.py`'s outside-range drift

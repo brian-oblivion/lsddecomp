@@ -17,7 +17,7 @@ void DreamSys__SelectCallback80(DreamSys *this, s32 arg1)
 		this->callback_0x80 = NULL;
 		break;
 	case 1:
-		this->callback_0x80 = vt->func_800597C0;
+		this->callback_0x80 = vt->DreamSys__StepLook;
 		break;
 	case 2:
 		this->callback_0x80 = vt->DreamSys__NoOpSlot14C;
@@ -33,7 +33,7 @@ void DreamSys__SelectCallback80(DreamSys *this, s32 arg1)
 
 `this->unk_0x84 = arg1` is unconditional — retail folds it into the delay slot
 of the very first comparison. The vtable slots (`0x140`/`0x14C`/`0x150`)
-resolved with `tools/classtable.py` to `func_800597C0` / `DreamSys__NoOpSlot14C` /
+resolved with `tools/classtable.py` to `DreamSys__StepLook` / `DreamSys__NoOpSlot14C` /
 `DreamSys__NoOpSlot150`.
 
 ## Residues fixed, in order

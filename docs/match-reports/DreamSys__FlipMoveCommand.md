@@ -1,0 +1,90 @@
+# DreamSys__FlipMoveCommand — MATCHED
+
+> Renamed from `func_80059A1C` on 2026-09-22 (tools/rename.py). Address 0x80059a1c.
+
+Round 2026-08-30, runner ALPHA, unit `DreamSys`. 11/11 words, full match.
+
+## Source
+
+```c
+void DreamSys__FlipMoveCommand(DreamSys *this)
+{
+	this->unk_0xA8 = 0;
+	if (this->unk_0xA0 != 0) {
+		if (this->unk_0xA0 & 1)
+			this->unk_0xA0 = this->unk_0xA0 + 1;
+		else
+			this->unk_0xA0 = this->unk_0xA0 - 1;
+	}
+}
+```
+
+Not a vtable slot — called directly (`jal DreamSys__FlipMoveCommand`) from `DreamSys__StepLookYaw`,
+matched earlier this round. Rounds `unk_0xA0` away from zero to the nearest
+even number... no: rounds it by ±1 to flip its parity (odd → +1, even → −1),
+i.e. drives it towards/through zero one step at a time while always landing
+on an even value, and always clears `unk_0xA8` in passing.
+
+## Residues fixed, in order
+
+1. First three attempts (12-13/11 — i.e. one or two words too many, each
+   time) all modeled `this->unk_0xA8 = 0` as happening ONLY when
+   `this->unk_0xA0 == 0`, guarded by an explicit early return/goto:
+   `if (unk_0xA0 == 0) { unk_0xA8 = 0; return; } if (unk_0xA0 & 1) ...`.
+   Tried this with the check written both ways (`==0` first, `!=0` first)
+   and with an explicit `goto end;` mirroring the head's broadcast #1
+   lever — none of it helped, because **the lever didn't apply: this isn't
+   an early-exit-with-a-different-value shape at all.**
+2. Re-reading the disassembly literally: `sw zero,0xA8($a0)` sits in the
+   delay slot of `beqz $v1,.L80059A40` — and a delay slot executes
+   UNCONDITIONALLY, on both the taken and not-taken paths. I had been
+   reading it as "only clears when zero" because that instruction visually
+   sits inside what looks like the zero-case's block; it does not.
+   **The store is unconditional on every call** — retail's compiler just
+   scheduled it into the branch's delay slot for free, exactly the
+   "default value slides into the guarding branch's delay slot" idiom
+   already documented in CLAUDE.md/DECOMPILATION_LEARNINGS.md for
+   `CheckTriggerParity`, just with the "default" write appearing BEFORE the
+   guard textually instead of after. Rewriting as a single unconditional
+   `this->unk_0xA8 = 0;` followed by a plain (no early-return) `if
+   (this->unk_0xA0 != 0) { ... }` matched immediately.
+
+## Proposed learning
+
+**Before modeling an instruction found in a branch's delay slot as
+conditional on that branch, check whether it's semantically unconditional
+instead.** A delay slot ALWAYS executes, on both branch outcomes — reading
+one as "the true-case's effect" because it sits inside what looks like that
+block is a mis-parse, not a hypothesis to test with control-flow gymnastics
+(`goto`, early `return`, branch-order swaps). The tell here: three different
+`goto`/`return`-based reshapes of the SAME (wrong) unconditional-store
+hypothesis all failed identically, while the fix took zero control-flow
+cleverness once the semantic error was found — a sign the residue was in
+the READING of the disassembly, not in the C's shape.
+
+## Answering HEAD BROADCAST #1/#2/#3 for this function
+
+No early exit returns a different value here (it's `void`); broadcast #1's
+`goto`-vs-`return` lever does not apply, and I confirmed that empirically —
+both spellings of the (wrong) early-return hypothesis cost the identical
+extra word. Broadcast #2's loop-invariant-hoisting lever doesn't apply either
+(no loop). Broadcast #3's branch-target check is exactly what surfaced the
+real bug once I stopped trusting my own control-flow model and reread the
+delay slot literally.
+
+## Naming
+
+`DreamSys__FlipMoveCommand` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059A1C`.
+
+Clears `moveCommandLatch`, then, if `moveCommand` is nonzero,
+swaps it for its pair: odd values +1, even values -1, i.e. 1<->2 and 3<->4. "Flip"
+rather than "advance" because the paired values are OPPOSITE directions on the same
+axis, which the two dispatch tables show directly:
+`MOVE_COMMAND_DISPATCH` is {null, SlotC4, SlotC4, Slot0, Slot0} and
+`MOVE_COMMAND_SIGNS` is {0, +1, -1, -1, +1}, so 1 and 2 are the two directions of
+one mover and 3 and 4 the two directions of the other.
+Tier B: the state change is exact; why a move command should alternate direction
+while a yaw command is active (this is only reached from
+`DreamSys__StepLookYaw`'s two active paths) is not established.

@@ -4,7 +4,7 @@
 
 ## History
 
-Filed round 2026-08-30-a as BLOCKED on `gp_rel` (`D_8008ABE0`). Round 42
+Filed round 2026-08-30-a as BLOCKED on `gp_rel` (`SAVE_MAGIC`). Round 42
 RESOLVED that blocker. Rebuilt fresh this round and matched on the first
 attempt.
 
@@ -31,11 +31,11 @@ project's `_0xNNN` naming convention is reliable for this struct.
 
 ```c
 extern void *memset(unsigned char *dst, unsigned char c, int n);
-extern s32 D_8008ABE0;
+extern s32 SAVE_MAGIC;
 
 void DreamSys__InitNewGame(DreamSys *this)
 {
-	this->unknown_sdata_0x178 = D_8008ABE0;
+	this->unknown_sdata_0x178 = SAVE_MAGIC;
 	this->currentYear = 0;
 	this->currentDay = 0;
 	this->totalFlasbackUnlockScore = 0;
