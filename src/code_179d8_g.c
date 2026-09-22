@@ -268,9 +268,214 @@ void func_8002A6EC(void)
     InterruptCallback(2, func_8002B3F4);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A75C);
+#ifdef NON_MATCHING
+/* NON_MATCHING: 171/196 words, length exact. Residue: pure list-scheduling
+ * (round-25 --debug breakdown: Reorderings: 3, Register Differences: 0) --
+ * retail splits func_80029F10(1,0,0,0)'s argument materialization from its
+ * own a3/jal by ~90 bytes; neither call position tried reproduces the split
+ * (docs/match-reports/func_8002A75C.md). Hand-derived. */
+s32 func_8002A75C(void)
+{
+    s32 *p;
+    s32 i;
+    volatile u8 *q;
+    s32 saved;
+    s32 counter;
 
+    puts(D_80010A94);
+    printf(D_80010AA0, D_8006D90C);
+
+    D_8006D61D = 0;
+    D_8006D61C = 0;
+    D_8006D600 = 0;
+    D_8006D5FC = 0;
+    D_8006D610 = 0;
+    D_8006D60C = 0;
+    p = &D_8006D8DC;
+    for (i = 9; i != -1; i--) {
+        *p = 0;
+        p++;
+    }
+    ResetCallback();
+    InterruptCallback(2, func_8002B3F4);
+
+    *D_8006D8C0 = 1;
+    while (*D_8006D8CC & 7) {
+        *D_8006D8C0 = 1;
+        *D_8006D8CC = 7;
+        *D_8006D8C8 = 7;
+    }
+
+    func_80029F10(1, 0, 0, 0);
+
+    D_8006D8DA = 0;
+    q = &D_8006D8D9;
+    D_8006D61C = 0;
+    *q = D_8006D8DA;
+    __asm__("");
+    D_8006D8D8[0] = 2;
+    *D_8006D8C0 = 0;
+    *D_8006D8CC = 0;
+    *D_8006D8D0 = 0x1325;
+
+    counter = 0;
+    if (D_8006D60C & 0x10) {
+        func_80029F10(1, 0, 0, 0);
+    }
+
+    if (D_8006D904 < D_8006D614) {
+        saved = D_8006D5FC;
+        D_8006D5FC = 0;
+
+        while (D_8006D60C & 0x10) {
+            if ((u8)counter == 0) {
+                puts(D_80010A40);
+            }
+            counter++;
+            func_80029F10(1, 0, 0, 0);
+        }
+
+        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
+            func_80029F10(1, 0, 0, 0);
+            puts(D_80010A50);
+        }
+
+        D_8006D5FC = saved;
+        D_8006D904 = D_8006D614;
+    }
+
+    if (func_80029F10(0xA, 0, 0, 0) != 0) {
+        return -1;
+    }
+    if (func_80029F10(0xC, 0, 0, 0) != 0) {
+        return -1;
+    }
+    return -(func_800299BC(0, 0) != 2);
+}
+#else
+INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A75C);
+#endif
+
+#ifdef NON_MATCHING
+/* NON_MATCHING: 215/223 words, length exact. Residue: two small isolated
+ * clusters -- a loop-setup scheduling swap at 0x8002AABC (p2 computed from
+ * $a0 before vs. after the move into $s5) and a register-identity swap in
+ * the final D_8006D8F4=-1 block at 0x8002ADAC -- neither reachable by any
+ * reorder or spelling variant tried (docs/match-reports/func_8002AA6C.md).
+ * Hand-derived structure (rounds 17-39); the n/saved throwaway-sink reuse
+ * a few lines below is a permuter find (round 41) reviewed here and
+ * confirmed sound (both are freshly written on every path before their
+ * next read) against a rejected sibling candidate that hoisted a value
+ * across a loop boundary unsoundly. */
+s32 func_8002AA6C(void)
+{
+    s32 n;
+    s32 *tmp;
+    s32 *pRetry;
+    volatile s32 *p2;
+    s32 saved;
+    s32 counter;
+    volatile u8 *q;
+    u8 buf;
+
+    tmp = D_8006D8DC;
+    n = *tmp;
+    D_8006D600 = 0;
+    D_8006D5FC = 0;
+    *tmp = n - 1;
+    __asm__("");
+
+    if (n > 0) {
+        pRetry = tmp;
+        p2 = pRetry + 4;
+        do {
+            if (*pRetry < 7) {
+                counter = 0;
+                puts(D_80010AAC);
+                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+
+                if (D_8006D904 < D_8006D614) {
+                    saved = D_8006D5FC;
+                    D_8006D5FC = 0;
+
+                    while (D_8006D60C & 0x10) {
+                        if ((u8)counter == 0) {
+                            puts(D_80010A40);
+                        }
+                        counter++;
+                        func_80029F10(1, 0, 0, 0);
+                    }
+
+                    while (func_80029F10(0x16, D_8006D908, 0, 0)) {
+                        func_80029F10(1, 0, 0, 0);
+                        puts(D_80010A50);
+                    }
+
+                    D_8006D5FC = saved;
+                    D_8006D904 = D_8006D614;
+                }
+
+                if (func_80029F10(9, 0, 0, 0) != 0) {
+                    goto tail;
+                }
+                if (func_80029F10(2, (s32)&D_8006D618, 0, 0) != 0) {
+                    goto tail;
+                }
+            }
+
+            *D_8006D8C0 = 1;
+            while (*D_8006D8CC & 7) {
+                *D_8006D8C0 = 1;
+                *D_8006D8CC = 7;
+                *D_8006D8C8 = 7;
+            }
+
+            D_8006D8DA = 0;
+            q = &D_8006D8D9;
+            D_8006D61C = 0;
+            *q = D_8006D8DA;
+            __asm__("");
+            D_8006D8D8[0] = 2;
+            *D_8006D8C0 = 0;
+            *D_8006D8CC = 0;
+            *D_8006D8D0 = 0x1325;
+
+            {
+                s32 v0 = p2[0];
+                buf = (u8)v0;
+                n = ((u8)v0 != D_8006D61C);
+                if (n) {
+                    saved = (s32)&buf;
+                    if (func_80029F10(0xE, saved, 0, 0) != 0) {
+                        goto tail;
+                    }
+                }
+            }
+
+            D_8006D600 = (s32)func_8002B4D4;
+            p2[-1] = p2[-2];
+            func_80029F10(6, 0, 0, 1);
+            p2[2] = p2[-3];
+            p2[3] = VSync(-1) + 0x1E0;
+            return p2[2];
+
+        tail:
+            tmp = D_8006D8DC;
+            n = *tmp;
+            *tmp = n - 1;
+            __asm__("");
+        } while (n > 0);
+    }
+
+    {
+        volatile s32 *pF4 = &D_8006D8F4;
+        *pF4 = -1;
+        return *pF4;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002AA6C);
+#endif
 
 s32 func_8002ADE8(s32 arg0, s32 arg1, s32 arg2)
 {
@@ -488,7 +693,62 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
     return pF8[-1];
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 49/91 words, length exact. Residue: register identity
+ * (the three hoisted pointers p620/p6A0/p8D8 land in different
+ * callee-saved registers than retail's $s3/$s1/$s0) (docs/match-reports/
+ * func_8002B198.md). Structure is hand-derived; the diagnostic call's
+ * `ok =` sink is a permuter find (round 36), reviewed as a semantically
+ * inert dead-store reuse and oracle-confirmed. */
+s32 func_8002B198(s32 arg0)
+{
+    s32 now;
+    s32 ok;
+    s32 *p620;
+    u8 *p8D8;
+    s32 *p6A0;
+
+    D_8008B3E4 = VSync(-1) + 0x1E0;
+    p620 = D_8006D620;
+    p6A0 = D_8006D6A0;
+    p8D8 = D_8006D8D8;
+    D_8008B3E8 = 0;
+    D_8008B3EC = (s32)D_80010AE0;
+
+    for (;;) {
+        now = VSync(-1);
+        ok = 1;
+        if (D_8008B3E4 < now) {
+            ok = 0;
+        } else {
+            D_8008B3E8 = D_8008B3E8 + 1;
+            if (0x1E0000 < D_8008B3E8) {
+                ok = 0;
+            }
+        }
+        if (!ok) {
+            puts(D_80010984);
+            /* retail reuses the (dead, about-to-be-overwritten) `ok` slot as
+             * the register target for this last argument's value -- a fresh
+             * local here compiles worse (45/91 vs 49/91); see this report's
+             * round-36 entry. */
+            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D],
+                   ok = p6A0[p8D8[0]]);
+            func_8002A510();
+            return -1;
+        }
+        if ((*D_8006D934 & 0x1000000) == 0) {
+            return 0;
+        }
+        if (arg0 == 0) {
+            continue;
+        }
+        return 1;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B198);
+#endif
 
 s32 func_8002B304(s32 arg0, s32 arg1)
 {
@@ -513,7 +773,42 @@ void func_8002B3E4(s32 arg0)
     D_8006D8A4 = arg0;
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 30/56 words, length 1 short. Residue: instruction-selection
+ * (retail computes &D_8006D8D8 unfolded inside the loop; this folds it)
+ * (docs/match-reports/func_8002B3F4.md). Hand-derived. */
+void func_8002B3F4(void)
+{
+    u8 status;
+    s32 flags;
+    s32 handler;
+    u8 *pd9;
+
+    status = (*D_8006D8C0) & 3;
+    pd9 = &D_8006D8D9;
+
+    for (;;) {
+        flags = func_80029478();
+        if (flags == 0) {
+            break;
+        }
+        if (flags & 4) {
+            handler = D_8006D600;
+            if (handler != 0) {
+                ((void (*)(s32, u8 *))handler)(*pd9, D_8008B3D4);
+            }
+        }
+        if (flags & 2) {
+            if (D_8006D5FC != 0) {
+                ((void (*)(s32, u8 *))D_8006D5FC)(D_8006D8D8[0], D_8008B3CC);
+            }
+        }
+    }
+    *D_8006D8C0 = status;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B3F4);
+#endif
 
 void func_8002B4D4(s32 arg0, s32 arg1)
 {
