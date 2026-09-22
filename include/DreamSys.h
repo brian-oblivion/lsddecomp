@@ -681,9 +681,9 @@ typedef struct DreamSys {
 	/* (unk_0xA0 == 1) as computed by func_800598E8; unconditionally cleared
 	   to 0 by func_80059A1C on every call (round 2026-08-30). */
 	s32 unk_0xA8;
-	/* "Current" value; func_8005A1A4 overwrites this with unk_0xB0.
-	   func_8005A168's bounds-checked setter (vtable +0x180) writes both
-	   this and unk_0xB0 together; func_8005A184 copies the OLD value of
+	/* "Current" value; DreamSys__RestorePreviousMoveMode overwrites this with unk_0xB0.
+	   DreamSys__GetSetMoveMode's bounds-checked setter (vtable +0x180) writes both
+	   this and unk_0xB0 together; DreamSys__ChangeMoveMode copies the OLD value of
 	   this into unk_0xB0 before overwriting it, when the new value
 	   differs (round 2026-08-30-b). */
 	s32 unk_0xAC;
@@ -962,8 +962,8 @@ struct vtable_DreamSys{
 	u32 unknown_functions_0xf0[2];
 	/* This function's OWN slot (+0x0F8, resolved via
 	   tools/classtable.py DREAMSYS_METHODS). A straight-line initializer:
-	   calls LogChunkMood/DreamSys__SelectCallback80/DreamSys__SelectCallback98/func_8005A168/
-	   func_8005A1B0/func_8005A1EC in sequence, then zeroes a large block of
+	   calls LogChunkMood/DreamSys__SelectCallback80/DreamSys__SelectCallback98/DreamSys__GetSetMoveMode/
+	   func_8005A1B0/DreamSys__SetTickPeriod in sequence, then zeroes a large block of
 	   per-dream state, ending with a Class6B5CC__GetRotationDegrees/func_8001CEB4 pair over a
 	   small local buffer (round 2026-09-02). */
 	void (*DreamSys__ResetLinkState)(DreamSys *this, s32 arg1, s32 arg2);
@@ -1041,14 +1041,14 @@ struct vtable_DreamSys{
 	   as (this, 0). */
 	void (*func_8005A134)(DreamSys *this, s32 arg1);
 	/* +0x180..+0x190: resolved via tools/classtable.py DREAMSYS_METHODS,
-	   all five matched this round (2026-08-30-b). func_8005A168 is also
+	   all five matched this round (2026-08-30-b). DreamSys__GetSetMoveMode is also
 	   called directly (not through the vtable) by func_80059148, as
 	   (this, 1). */
-	s32 (*func_8005A168)(DreamSys *this, s32 value);
-	void (*func_8005A184)(DreamSys *this, s32 value);
-	void (*func_8005A1A4)(DreamSys *this);
+	s32 (*DreamSys__GetSetMoveMode)(DreamSys *this, s32 value);
+	void (*DreamSys__ChangeMoveMode)(DreamSys *this, s32 value);
+	void (*DreamSys__RestorePreviousMoveMode)(DreamSys *this);
 	void (*func_8005A1B0)(DreamSys *this, s32 a, s32 b, s32 c, s32 d);
-	void (*func_8005A1EC)(DreamSys *this, s32 value);
+	void (*DreamSys__SetTickPeriod)(DreamSys *this, s32 value);
 	/* Referenced by DreamSys__SelectCallback98's arg1==2 case: its raw address (never
 	   called there) is forwarded as InitSoundCueSet's 5th argument. arg0 is
 	   unused in the body; kept generic rather than typed DreamSys* since
@@ -1087,7 +1087,7 @@ struct vtable_DreamSys{
 	bool (*DreamSys__TryTunnelLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x1D4), this
 	   round. Tests this->unknwon_int_0x44, then a static-link-with-timer
-	   test (func_8005BE90) against this->linkCoordinates/currentStage/
+	   test (Test4StageTransition) against this->linkCoordinates/currentStage/
 	   dreamTimer, then ExecuteLinks with literal type 0x10 on success --
 	   see DreamSys__TryStageTimerLink.md. */
 	bool (*DreamSys__TryStageTimerLink)(DreamSys *this, PlayerSpawnPoint *currentPos);
@@ -1237,9 +1237,9 @@ extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos
 /* Called by DreamSys__TryStageTimerLink as (&this->linkCoordinates, this->currentStage,
    currentPos, this->dreamTimer); result compared with `bltz` exactly like
    TestForStaticLink's call site, so s32 (round 2026-09-02). Blocked by the
-   gp-relative addressing blocker -- see docs/match-reports/func_8005BE90.md
+   gp-relative addressing blocker -- see docs/match-reports/Test4StageTransition.md
    -- so it stays INCLUDE_ASM; this prototype only types the call site. */
-extern s32 func_8005BE90(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);
+extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);
 
 /* Called by DreamSys__TryStageTimerLink with NO arguments (the disassembly's call site has
    an empty delay slot and no a0-a3 setup); its return value is stored whole

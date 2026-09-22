@@ -149,7 +149,7 @@ void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
 		break;
 	case 5:
 		if (this->unk_0xA0 == 1)
-			this->vt->func_8005A184(this, 4);
+			this->vt->DreamSys__ChangeMoveMode(this, 4);
 		break;
 	case 6:
 		this->unk_0x88 = 2;
@@ -170,7 +170,7 @@ void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
 		this->unk_0x74 = 1;
 		break;
 	case 32:
-		this->vt->func_8005A1A4(this);
+		this->vt->DreamSys__RestorePreviousMoveMode(this);
 		break;
 	case 47:
 		break;
@@ -258,7 +258,7 @@ void func_80059148(DreamSys *this, s32 value)
 {
 	this->unk_0x6c = value;
 	if (value != 0) {
-		this->vt->func_8005A168(this, 1);
+		this->vt->DreamSys__GetSetMoveMode(this, 1);
 		if (this->unk_0x884 != 0)
 			this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
 	}
@@ -275,7 +275,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 	this->vt->LogChunkMood(this, &this->linkCoordinates);
 	this->vt->DreamSys__SelectCallback80(this, 1);
 	this->vt->DreamSys__SelectCallback98(this, 1);
-	this->vt->func_8005A168(this, arg1);
+	this->vt->DreamSys__GetSetMoveMode(this, arg1);
 
 	this->unk_0xBC = -1;
 	this->unk_0xB4 = 0;
@@ -288,7 +288,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 	this->unk_0x94 = 0;
 	this->vt->func_8005A1B0(this, 0, 1, 1, 1);
 
-	this->vt->func_8005A1EC(this, arg2);
+	this->vt->DreamSys__SetTickPeriod(this, arg2);
 
 	this->nextCinematic.entry = -1;
 	this->unk_0x70 = 0;
@@ -782,7 +782,7 @@ void func_8005A134(DreamSys *this, s32 arg1)
 		FlushSoundCueSet(this->unk_0x58, this->unk_0xCC);
 }
 
-s32 func_8005A168(DreamSys *this, s32 value)
+s32 DreamSys__GetSetMoveMode(DreamSys *this, s32 value)
 {
 	s32 old;
 
@@ -794,7 +794,7 @@ s32 func_8005A168(DreamSys *this, s32 value)
 	return old;
 }
 
-void func_8005A184(DreamSys *this, s32 value)
+void DreamSys__ChangeMoveMode(DreamSys *this, s32 value)
 {
 	s32 old;
 
@@ -805,7 +805,7 @@ void func_8005A184(DreamSys *this, s32 value)
 	}
 }
 
-void func_8005A1A4(DreamSys *this)
+void DreamSys__RestorePreviousMoveMode(DreamSys *this)
 {
 	this->unk_0xAC = this->unk_0xB0;
 }
@@ -822,7 +822,7 @@ void func_8005A1B0(DreamSys *this, s32 a, s32 b, s32 c, s32 d)
 		this->unk_0x130 = d;
 }
 
-void func_8005A1EC(DreamSys *this, s32 value)
+void DreamSys__SetTickPeriod(DreamSys *this, s32 value)
 {
 	this->unk_0x120 = value;
 }
@@ -1036,7 +1036,7 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 
 	if (this->unknwon_int_0x44 != 0)
 		return false;
-	result = func_8005BE90(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
+	result = Test4StageTransition(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
 	if (result < 0)
 		return false;
 	this->unk_0x880 = func_8005BF48();
@@ -1132,7 +1132,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	if (this->unk_0xAC != 4) {
 		return false;
 	}
-	this->vt->func_8005A1A4(this);
+	this->vt->DreamSys__RestorePreviousMoveMode(this);
 	return false;
 
 staircase:
@@ -1778,7 +1778,7 @@ s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1)
    raw word; only ever compared here, never dereferenced field-by-field. */
 extern s32 D_8008ABE8;
 
-s32 func_8005BE90(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
+s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
 {
 	s32 result;
 

@@ -1,18 +1,20 @@
-# func_8005A184
+# DreamSys__ChangeMoveMode
+
+> Renamed from `func_8005A184` on 2026-09-22 (tools/rename.py). Address 0x8005a184.
 
 **Unit:** DreamSys · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
 ## What it does
 
 Vtable slot `+0x184` (second of the five-function run; see
-`func_8005A168.md`). If the new `value` differs from the current
+`DreamSys__GetSetMoveMode.md`). If the new `value` differs from the current
 `unk_0xAC`, copies the OLD `unk_0xAC` into `unk_0xB0` before overwriting
 `unk_0xAC` with `value`. No-op (and no return value used) when equal.
 
 ## The C
 
 ```c
-void func_8005A184(DreamSys *this, s32 value)
+void DreamSys__ChangeMoveMode(DreamSys *this, s32 value)
 {
 	s32 old;
 

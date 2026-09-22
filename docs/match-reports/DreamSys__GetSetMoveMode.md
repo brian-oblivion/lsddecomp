@@ -1,12 +1,14 @@
-# func_8005A168
+# DreamSys__GetSetMoveMode
+
+> Renamed from `func_8005A168` on 2026-09-22 (tools/rename.py). Address 0x8005a168.
 
 **Unit:** DreamSys · **Size:** 7 instructions · **Status:** MATCHED (7/7 words)
 
 ## What it does
 
 Vtable slot `+0x180` (first of a five-function run resolved this round via
-`tools/classtable.py DREAMSYS_METHODS` -- see `func_8005A184.md`,
-`func_8005A1A4.md`, `func_8005A1B0.md`, `func_8005A1EC.md` for the rest;
+`tools/classtable.py DREAMSYS_METHODS` -- see `DreamSys__ChangeMoveMode.md`,
+`DreamSys__RestorePreviousMoveMode.md`, `func_8005A1B0.md`, `DreamSys__SetTickPeriod.md` for the rest;
 `+0x180`..`+0x190` map onto the five functions at consecutive addresses
 `0x8005A168`..`0x8005A1EC`, confirmed by the tool, not assumed). A
 bounds-checked setter that returns the OLD value: if `value >= 0`, writes it
@@ -17,7 +19,7 @@ into BOTH `unk_0xAC` and `unk_0xB0`; always returns the pre-call value of
 ## The C
 
 ```c
-s32 func_8005A168(DreamSys *this, s32 value)
+s32 DreamSys__GetSetMoveMode(DreamSys *this, s32 value)
 {
 	s32 old;
 
@@ -34,7 +36,7 @@ s32 func_8005A168(DreamSys *this, s32 value)
 
 Split out of the old `unknown_values_0xAC[24]` gap, alongside `unk_0xBC`
 (see `func_80059E3C.md`, a STALL touching the same gap). Together with
-`func_8005A184` (paired copy-on-change) and `func_8005A1A4` (unconditional
+`DreamSys__ChangeMoveMode` (paired copy-on-change) and `DreamSys__RestorePreviousMoveMode` (unconditional
 `0xAC = 0xB0` copy), the three functions read like get/set/sync accessors
 on a "target vs. current" pair, but no confirmed semantic name yet.
 

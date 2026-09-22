@@ -9,7 +9,7 @@
 
 Sibling of `DreamSys__TryTunnelLink` (same round, immediately preceding this function
 in ROM order) and `DreamSys__StaticWallLink`, but using yet another link
-test: `func_8005BE90` (in-unit, still `INCLUDE_ASM`, gp-relative-blocked),
+test: `Test4StageTransition` (in-unit, still `INCLUDE_ASM`, gp-relative-blocked),
 which takes FOUR arguments -- `linkCoordinates`, `currentStage`,
 `currentPos`, AND `dreamTimer` -- one more than `TestForStaticLink`'s three.
 On success it also calls `func_8005BF48()` (niladic, still `INCLUDE_ASM`,
@@ -25,7 +25,7 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 
 	if (this->unknwon_int_0x44 != 0)
 		return false;
-	result = func_8005BE90(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
+	result = Test4StageTransition(&this->linkCoordinates, this->currentStage, currentPos, this->dreamTimer);
 	if (result < 0)
 		return false;
 	this->unk_0x880 = func_8005BF48();
@@ -39,7 +39,7 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 Header additions (`include/DreamSys.h`):
 
 ```c
-extern s32 func_8005BE90(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);
+extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);
 extern s32 func_8005BF48(void);
 ```
 
@@ -49,7 +49,7 @@ fields, `unk_0x880` is written here for the first time.)
 
 ## Derivation notes
 
-- `func_8005BE90`'s return is stored in a callee-saved register across the
+- `Test4StageTransition`'s return is stored in a callee-saved register across the
   call to `func_8005BF48()`, since `result` (the link-test outcome) is
   still needed afterward as `ExecuteLink`'s second argument. Writing this as
   ordinary sequential C (`result = ...; if (...) return false; this->unk_0x880

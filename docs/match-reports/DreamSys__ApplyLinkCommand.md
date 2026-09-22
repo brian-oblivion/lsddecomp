@@ -40,7 +40,7 @@ void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
 		break;
 	case 5:
 		if (this->unk_0xA0 == 1)
-			this->vt->func_8005A184(this, 4);
+			this->vt->DreamSys__ChangeMoveMode(this, 4);
 		break;
 	case 6:
 		this->unk_0x88 = 2;
@@ -61,7 +61,7 @@ void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
 		this->unk_0x74 = 1;
 		break;
 	case 32:
-		this->vt->func_8005A1A4(this);
+		this->vt->DreamSys__RestorePreviousMoveMode(this);
 		break;
 	case 47:
 		break;
@@ -104,7 +104,7 @@ signal — no register-identity or block-order issue here, just table span.
 **No such `j` in this function, and the block-order lever from `CheckDreamAuxTriggerCondition`
 does not apply here.** Every one of the 13 real arms in retail ends its own
 block with an explicit `j .L80058D84` (the shared epilogue), except the last
-one (`case 32`, `func_8005A1A4` call), which naturally falls off the end of
+one (`case 32`, `DreamSys__RestorePreviousMoveMode` call), which naturally falls off the end of
 the switch into the epilogue with no `j` at all — a plain "last arm falls
 through" case, not a retail `j`-with-delay-slot the C had to reproduce by
 reordering blocks. Writing `case 32` last in source with no trailing `break`

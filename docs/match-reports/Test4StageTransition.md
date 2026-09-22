@@ -1,4 +1,6 @@
-# func_8005BE90 — MATCHED 46/46
+# Test4StageTransition — MATCHED 46/46
+
+> Renamed from `func_8005BE90` on 2026-09-22 (tools/rename.py). Address 0x8005be90.
 
 **Unit:** DreamSys · **Size:** 46 words · **Status:** MATCHED, round 43.
 
@@ -17,7 +19,7 @@ distinct check), validate `currentPos` against a couple of conditions and
 then call `GetRandomSpawnFromStage(target, (timer & 1) ? -0xC : stage,
 timer)`, stashing the result in `D_8008ACC4`. Any other `stage` value
 returns `-1` immediately. Called by `DreamSys__TryStageTimerLink` (still `INCLUDE_ASM`) as
-`func_8005BE90(&this->linkCoordinates, this->currentStage, currentPos,
+`Test4StageTransition(&this->linkCoordinates, this->currentStage, currentPos,
 this->dreamTimer)`.
 
 ## Attempts 1-4: right VALUES, wrong control-flow SHAPE
@@ -60,7 +62,7 @@ once total length matches.
 ```c
 extern s32 D_8008ABE8;
 
-s32 func_8005BE90(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
+s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
 {
 	s32 result;
 
@@ -122,7 +124,7 @@ Two levers closed the last two gaps:
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py func_8005BE90` -> `46/46 words match`.
+`tools/funcdiff.py Test4StageTransition` -> `46/46 words match`.
 
 ### Proposed learning
 

@@ -104,7 +104,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	if (this->unk_0xAC != 4) {
 		return false;
 	}
-	this->vt->func_8005A1A4(this);
+	this->vt->DreamSys__RestorePreviousMoveMode(this);
 	return false;
 
 staircase:

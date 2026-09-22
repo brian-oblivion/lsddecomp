@@ -11,7 +11,7 @@ runner BRAVO. Matched on the first attempt — no residue.
 
 Vtable slot `+0x0F8`. A straight-line "start dream" initializer, no
 branches at all: six vtable calls (`LogChunkMood`, `DreamSys__SelectCallback80`,
-`DreamSys__SelectCallback98`, `func_8005A168`, `func_8005A1B0`, `func_8005A1EC`), a large
+`DreamSys__SelectCallback98`, `DreamSys__GetSetMoveMode`, `func_8005A1B0`, `DreamSys__SetTickPeriod`), a large
 block of per-dream state zeroed in between/after, and a closing
 `Class6B5CC__GetRotationDegrees`/`func_8001CEB4` pair over a small local buffer — the same
 `func_8001CEB4(this, 1, &local)` shape already established by
@@ -50,7 +50,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 	this->vt->LogChunkMood(this, &this->linkCoordinates);
 	this->vt->DreamSys__SelectCallback80(this, 1);
 	this->vt->DreamSys__SelectCallback98(this, 1);
-	this->vt->func_8005A168(this, arg1);
+	this->vt->DreamSys__GetSetMoveMode(this, arg1);
 
 	this->unk_0xBC = -1;
 	this->unk_0xB4 = 0;
@@ -63,7 +63,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 	this->unk_0x94 = 0;
 	this->vt->func_8005A1B0(this, 0, 1, 1, 1);
 
-	this->vt->func_8005A1EC(this, arg2);
+	this->vt->DreamSys__SetTickPeriod(this, arg2);
 
 	this->nextCinematic.entry = -1;
 	this->unk_0x70 = 0;
