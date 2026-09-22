@@ -275,7 +275,7 @@ void func_8005FC58(Entity *this) {
     s32 arg1a;
     s32 arg1b;
     s32 arg1c;
-    s32 (**slotCC)(Entity *self, s32 arg1, s32 arg2);
+    void (**slotCC)(Entity *self, s32 arg1, s32 arg2);
     void (**slotC8)(Entity *self, s32 arg1, s32 arg2);
     void (**slotC4)(Entity *self, s32 arg1, s32 arg2);
 
@@ -331,8 +331,8 @@ void func_8005FDFC(Entity *this) {
     }
 }
 
-s32 func_8005FEC8(Entity *this) {
-    return this->methods->slotCC(this, -0x5A, 0);
+void func_8005FEC8(Entity *this) {
+    this->methods->slotCC(this, -0x5A, 0);
 }
 
 void func_8005FEF8(Entity *this, EntityMoodHandlerArg *out) {
