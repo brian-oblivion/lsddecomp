@@ -119,3 +119,18 @@ an unsigned-vs-signed COMPARE INSTRUCTION CHOICE (`sltiu` vs `slti`), not
 just register allocation, can hinge on a shared struct field's declared
 signedness -- worth checking any `< 1`/`>= 0`-shaped residue against the
 field's sign before assuming it is a control-flow or register problem.
+
+## Naming
+
+`DreamSys__ApplyMoveCommand` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059E98`.
+
+Given the move command `DreamSys__AdvanceMoveCycle` returned,
+scales it into a delta (`MOVE_COMMAND_SIGNS[cmd] * MOVE_MODE_SPEEDS[moveMode]`),
+fetches the current spawn point from `linkMgr`, and tries the three link tests
+(staircase, instant teleporter, tunnel) BEFORE moving. Only if none of them fires
+does it save the link snapshot and call the mover
+`MOVE_COMMAND_DISPATCH[cmd](this, delta, ...)`, followed by a stage-0-only wall-link
+check on two bounds of `unk_0x14`. "ApplyMoveCommand" names the whole of that: the
+command is what it takes, and applying it may mean linking instead of moving.

@@ -48,3 +48,18 @@ before `storedDay`). `unk_0x884` is nonzero-tested and forwarded, cast to
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+`DreamSys__SetMoveOverride` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059148`.
+
+Sets `moveOverride` and, when the new value is nonzero, forces
+`moveMode` to 1 and applies `enterRotation` absolutely. "Override" is read off
+`DreamSys__TickMove`, which dispatches on exactly this field: 0 runs the free
+movement path (`DreamSys__ApplyPendingTurn` + `DreamSys__TickMoveFree`), 2 runs
+`DreamSys__TickMoveHeld` (set the move command, do not move), anything else runs
+`DreamSys__TickMoveForced` (force the move command to 1 first). So a nonzero value
+replaces the normal per-tick movement with a forced variant -- which is what the
+name says and all it says.

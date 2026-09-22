@@ -57,3 +57,19 @@ cases, just for plain if/else this time.
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+`DreamSys__GetSetFlashbackSession` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_800590E8`.
+
+The unit's established get/set shape (`DreamSys__GetSetDreamTimeLimit`,
+`DreamSys__GetSetMoveMode`, `DreamSys__GetSetScreenShake`): a negative `value` means
+query only. It always returns the OLD `isFlashbackSession`, and on the query path it
+additionally writes today's dream colour
+(`CalcDreamColor(&this->moodPreviousDays[this->currentDay])`) through `out`.
+Tier B, and the name is deliberately incomplete: it says nothing about the colour
+readout, because nothing establishes why a caller asking "am I in a flashback"
+should also be told today's colour. That side effect is documented rather than
+named.

@@ -47,3 +47,18 @@ immediately before `dreamTimeLimit`).
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+`DreamSys__SetGateFlags` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005A1B0`.
+
+Sets four adjacent flags -- `tickBoundary`, `unk_0x128`,
+`unk_0x12C`, `unk_0x130` -- each only when its argument is non-negative, the same
+"negative means leave alone" convention this unit uses for its get/set methods.
+`DreamSys__ResetLinkState` calls it as (0, 1, 1, 1). Only the first has a known
+reader: `DreamSys__WallLink` requires it to try `DreamSys__DynamicLink`, and
+`DreamSys__UpdateTickState` recomputes it every tick as
+`dreamTimer % tickPeriod == 0`. "Gate" is what that one reader shows them being;
+the other three are unread in carved code, so no stronger name is available.

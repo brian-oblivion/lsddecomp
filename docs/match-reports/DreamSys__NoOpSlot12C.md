@@ -33,3 +33,17 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+`DreamSys__NoOpSlot12C` -- tier A (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_800595A0`.
+
+`return 0;` and nothing else. The unit already names its empty
+slots this way (`DreamSys__NoOpSlot14C`, `DreamSys__NoOpSlot150`,
+`DreamSys__NoOpSlotD8`, `DreamSys__NoOpSlotE8Default`); the offset +0x12C is
+`tools/classtable.py DREAMSYS_METHODS`. Its one caller,
+`DreamSys__ApplyMoveCommand`, discards the result, so this is an override hook that
+DreamSys itself declines. Tier A: evident from the body alone, and the name asserts
+nothing the body does not show.

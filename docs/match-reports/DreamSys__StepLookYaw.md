@@ -598,3 +598,21 @@ whether the originally-targeted diff closed -- round 32's full-duplication
 attempt and this round's partial one both demonstrate the same trap at
 different scales (full duplication: +2 words; partial: +2 words as well,
 just relocated to a different spot in the function).
+
+## Naming
+
+`DreamSys__StepLookYaw` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_800598E8`.
+
+Same spring-with-decay shape as `DreamSys__StepLookOffset`, but
+what it steps is a ROTATION, and that is measured rather than inferred:
+`func_8001CEB4` is vtable slot +0x044, matched in src/code_d294.c, and it reads its
+`data` argument as three {numerator, denominator} degree ratios, adding them to the
+object's rotation vector when its `flag` argument is 0 -- which is the flag this
+function passes. The halfword it overwrites first is
+`TURN_ROTATIONS[0].y.numerator`, so the delta is a YAW; the table values are +-0x2D
+(45 degrees) with the accumulator capped at 0xB5 (181).
+Also latches `moveCommandLatch = (moveCommand == 1)` and tail-calls
+`DreamSys__FlipMoveCommand`; that bookkeeping rides along and is not what the name
+describes. Still INCLUDE_ASM (1 word short) -- see the stall analysis above.

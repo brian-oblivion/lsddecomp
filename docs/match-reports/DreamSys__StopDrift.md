@@ -38,3 +38,16 @@ declaration locally to `DreamSys.h` rather than cross-including `Entity.h`.
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+`DreamSys__StopDrift` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005A134`.
+
+Always clears `driftActive`, which is what stops
+`DreamSys__TickDrift`'s vertical step; sets `cueServiceActive` to its argument and
+flushes the sound cue set when that argument is nonzero. Its only carved call site
+(`DreamSys__SelectCallback98`'s entry guard, when the mode being left was 2) passes
+0, so the flush branch is never observed running. Tier B, and the argument is the
+reason: the name describes the unconditional half.

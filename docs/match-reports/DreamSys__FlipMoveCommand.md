@@ -71,3 +71,20 @@ extra word. Broadcast #2's loop-invariant-hoisting lever doesn't apply either
 (no loop). Broadcast #3's branch-target check is exactly what surfaced the
 real bug once I stopped trusting my own control-flow model and reread the
 delay slot literally.
+
+## Naming
+
+`DreamSys__FlipMoveCommand` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059A1C`.
+
+Clears `moveCommandLatch`, then, if `moveCommand` is nonzero,
+swaps it for its pair: odd values +1, even values -1, i.e. 1<->2 and 3<->4. "Flip"
+rather than "advance" because the paired values are OPPOSITE directions on the same
+axis, which the two dispatch tables show directly:
+`MOVE_COMMAND_DISPATCH` is {null, SlotC4, SlotC4, Slot0, Slot0} and
+`MOVE_COMMAND_SIGNS` is {0, +1, -1, -1, +1}, so 1 and 2 are the two directions of
+one mover and 3 and 4 the two directions of the other.
+Tier B: the state change is exact; why a move command should alternate direction
+while a yaw command is active (this is only reached from
+`DreamSys__StepLookYaw`'s two active paths) is not established.

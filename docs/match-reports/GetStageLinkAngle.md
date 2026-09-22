@@ -75,3 +75,20 @@ early-return shape rather than operand order.
 ## Provenance
 
 round 43, runner ALPHA, unit DreamSys.
+
+## Naming
+
+`GetStageLinkAngle` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005BF48`.
+
+A free function (no `this`, and the disassembly's call site sets
+up no arguments): returns `&LINK_ANGLE_180` unless `gLinkDstStage` -- the
+destination stage `GetStaticSpawn` and `Test4StageTransition` record -- is 0xC, in
+which case 0. `DreamSys__TryStageTimerLink` stores the result in
+`stageLinkAngle`, in the same statement group that zeroes `enterRotation` and
+`exitRotation`.
+"Angle" is read off the constant: `LINK_ANGLE_180`'s single word is 0x000100B4, a
+{numerator 0xB4, denominator 1} degree ratio -- byte-identical to the Y word of
+`ROTATION_YAW_180`, and the same encoding as every `CARDINAL_ANGLES` entry. Tier B:
+no carved code reads `stageLinkAngle` back, so the consumer is unobserved.

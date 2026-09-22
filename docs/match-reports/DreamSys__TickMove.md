@@ -52,3 +52,15 @@ shape) and there's no loop. Broadcast #3's branch-target check is exactly
 what caught this residue: comparing `bne` vs `beq` and which target each
 pointed at, not assuming the comparison read one way implies the source was
 written that way.
+
+## Naming
+
+`DreamSys__TickMove` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059A58`.
+
+The function `DreamSys__SelectCallback98(this, 1)` installs in
+`callback_0x98`, so it runs every tick in mode 1. Its whole body is a dispatch on
+`moveOverride`: 0 runs `DreamSys__ApplyPendingTurn` then `DreamSys__TickMoveFree`,
+2 runs `DreamSys__TickMoveHeld`, anything else runs `DreamSys__TickMoveForced`, and
+it returns whichever result. Tier B.

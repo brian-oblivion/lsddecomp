@@ -40,3 +40,16 @@ Reinforces `DreamSys__TickMoveFree`'s finding: for this pair of sibling function
 sharing the same `DreamSys__AdvanceMoveCycle`→`DreamSys__ApplyMoveCommand` call chain), the plain,
 unadorned early-return form is correct, and the `goto`-based lever from
 broadcast #1 would have been the wrong reflex to reach for here too.
+
+## Naming
+
+`DreamSys__TickMoveForced` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059B50`.
+
+The `moveOverride == 1` arm. Forces `moveCommand` to 1 before
+anything else, then -- unlike `DreamSys__TickMoveFree` -- still advances the cycle
+when `movementBlocked` is set, just with `DreamSys__AdvanceMoveCycle`'s `arg1` 0,
+which suppresses the +-50 view bob and skips
+`DreamSys__ApplyMoveCommand` entirely. "Forced" is the contrast with Free: the move
+command is imposed rather than read.

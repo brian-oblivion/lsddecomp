@@ -690,3 +690,21 @@ correct undoes working ground rather than improving it. Before trying the
 default value living in the guard's OWN delay slot (visible directly in
 the `.s`): if so, the big-block-`if`/default-at-top shape is what's needed,
 not an explicit early-return arm.
+
+## Naming
+
+`DreamSys__AdvanceMoveCycle` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059BE0`.
+
+Runs one tick of a four-tick cycle while `moveCommand` is
+nonzero: `moveCycleTick` counts up, the cycle ends on the fourth
+(`moveCommand = 0`, counter reset), a sound voice is started on the last tick --
+or on every even tick when `moveMode == 4`, the fastest of the five speeds in
+`MOVE_MODE_SPEEDS` -- and `DreamSys__StopVoice` runs on every tick that does not
+start one. On the ticks in between it applies a +-50 offset to BOTH of
+`heightCurve`'s keyframe values, negative for the first half of the cycle and
+positive for the second, gated on `screenShakeOn`. Returns the command that was
+live on entry, which is what `DreamSys__ApplyMoveCommand` consumes.
+Tier B: every step above is read off the body and the tables; that the cycle is a
+footstep is the obvious reading and is not asserted by the name.

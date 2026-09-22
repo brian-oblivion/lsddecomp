@@ -33,3 +33,17 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+`DreamSys__GetLinkCommandFlag` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005931C`.
+
+A pure getter for `linkCommandFlag`, so the getter half is
+tier A by the leaf rule; the name of the FIELD is what makes this tier B. The
+field's only setter anywhere in carved code is `DreamSys__ApplyLinkCommand`'s
+`case 23:` (i.e. its `mode` argument == 25); its only other writers clear it --
+`DreamSys__ResetLinkState`, and `DreamSys__UpdateTickState` on every tick the
+object is not movement-blocked. So it is the flag a link command raises and the
+next tick consumes. What command 25 MEANS is not established.

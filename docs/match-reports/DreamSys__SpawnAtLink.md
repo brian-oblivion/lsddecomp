@@ -82,3 +82,21 @@ at that address before assuming the current field's offset is wrong** —
 especially when the current field is independently confirmed correct by
 several already-matched functions. Here the fix was not a struct layout
 correction at all, just picking the right one of two adjacent fields.
+
+## Naming
+
+`DreamSys__SpawnAtLink` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `DreamSys__func_58968`.
+
+Places the object into the world at `this->linkCoordinates`
+(`arg1->methods->slot0xE4(arg1, local, this, &this->linkCoordinates)`), hands the
+result to the shared base's +0x4C slot, links the companion through `slot10`
+(`BaseObjO__LinkCompanion`), and then applies whichever pending orientation the link
+type calls for: when `pendingLinkType == 0xE` (the flashback type `ExecuteLink` is
+given by `DreamSys__LoadNextFlashback`) it applies the stored flashback's own
+`rotation` and time limit and advances `currentFlashbackIndex`; otherwise, while
+`moveOverride` is set, it applies `exitRotation` -- the destination-side cardinal
+rotation `DreamSys__CheckTunnelHeading`/`CheckStaircaseHeading` recorded.
+Tier B: the call shape is unambiguous but nothing here says whether this is entered
+once per stage load or on every re-entry.

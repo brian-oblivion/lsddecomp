@@ -33,3 +33,15 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+`DreamSys__func_5938c` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005938C`.
+
+Kept as a tier-C placeholder in the unit's existing
+`Class__func_xxxxx` form. Known: a one-line setter, `this->unk_0x64 = value`,
+vtable slot +0x114; `DreamSys__DreamSys` initializes the same field to 0. Nothing
+in any carved unit ever READS `unk_0x64`, so there is nothing to name the setter
+after. Name it when a reader turns up.

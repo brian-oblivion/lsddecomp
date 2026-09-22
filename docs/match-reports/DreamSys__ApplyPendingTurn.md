@@ -58,3 +58,16 @@ cross-referencing this; not resolved further this round.
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+`DreamSys__ApplyPendingTurn` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005A050`.
+
+Consumes `turnCommand`: `func_8001CEB4(this, 0,
+&TURN_ROTATIONS[idx])` and reset to 0. That slot is the rotation setter (matched,
+src/code_d294.c) and flag 0 means RELATIVE, so this turns the object; the table
+entries for the only two values `DreamSys__ApplyLinkCommand` ever writes (1 and 2)
+decode to yaw -6 and +6 degrees. Tier B: a 6-degree step per tick is a gradual
+turn, which is the mechanics; nothing establishes what raises the command.

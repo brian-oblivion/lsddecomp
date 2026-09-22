@@ -33,3 +33,13 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+`DreamSys__func_59590` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059590`.
+
+Tier-C placeholder. Known: `this->unk_0x7C = 0`, vtable slot
++0x124. `unk_0x7C` has no other writer and no reader anywhere in carved code -- not
+even a clear at construction -- so nothing names it.

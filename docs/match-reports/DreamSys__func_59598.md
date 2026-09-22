@@ -33,3 +33,14 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+`DreamSys__func_59598` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059598`.
+
+Tier-C placeholder. Known: `this->unk_0x78 = 0`, vtable slot
++0x128. `unk_0x78` is cleared in two other places (`DreamSys__ResetSessionState` and
+`DreamSys__ResetLinkState`) and read nowhere in carved code, so all three writers
+agree it is state to clear and none says what state.

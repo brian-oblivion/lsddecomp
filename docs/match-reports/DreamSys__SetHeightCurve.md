@@ -33,3 +33,20 @@ from a build that had failed to compile (the spliced file was missing echo's
 `#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
+
+## Naming
+
+`DreamSys__SetHeightCurve` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059384`.
+
+A pure setter for `heightCurve`. The name describes what the
+pointed-to object is USED as here and nothing more: `DreamSys__ProjectPointAtDistance`
+reads two `DreamSysInterpPoint`s from it (+0x14 and +0x20) and calls
+`InterpolateKeyframeValue(a, b, dist)`, which linearly interpolates their `value`
+fields against their `position` fields; the result becomes the Y of a world-space
+point. So the object holds a height-versus-distance curve. `DreamSys__StepLookOffset`
+offsets the far point's value (`endValue`) and `DreamSys__AdvanceMoveCycle` nudges
+both by +-50.
+Deliberately NOT called `SetCamera` or `SetView`: nothing establishes that the
+object is a camera, only that this curve is read out of it.

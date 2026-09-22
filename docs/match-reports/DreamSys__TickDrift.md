@@ -36,3 +36,18 @@ earlier in this round.
 ## Provenance
 
 round 2026-08-30-d, runner ALPHA, unit DreamSys (whole-unit, third pass).
+
+## Naming
+
+`DreamSys__TickDrift` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005A0B0`.
+
+The function `DreamSys__SelectCallback98(this, 2)` installs in
+`callback_0x98`. Each tick, while `driftActive`, it adds the constant vector
+`DRIFT_STEP` -- (0, 512, 0), i.e. purely vertical -- to the object's position and
+lowers `heightCurve->endValue` by 600; while `cueServiceActive`, it services the
+sound cue set (`func_8002CD08(soundObj, soundCueSet)`).
+Deliberately NOT called `TickFall` or `TickRise`: this unit never establishes which
+way +Y points, so the name says "drift" and the comment says "+512 on the Y
+axis".

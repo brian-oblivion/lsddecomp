@@ -69,3 +69,16 @@ reach for first. Count words before picking a form.
 ## Provenance
 
 round 2026-08-30-c, runner ALPHA, unit DreamSys (whole-unit second pass).
+
+## Naming
+
+`DreamSys__func_5ba20` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005BA20`.
+
+Tier-C placeholder. Known: the unit's get/set shape over
+`unk_0x924` (negative argument means query only), vtable slot +0x228, which
+src/code_1677c.c reaches by the field name `func_228` -- Class6D3C8's constructor
+calls it once with `arg->unk14` and discards the result. `unk_0x924` is cleared by
+`DreamSys__ResetSessionState` and read by nothing in carved code, and the one caller
+names its argument no better, so there is nothing to name it after.

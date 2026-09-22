@@ -246,3 +246,21 @@ logic.
 Round 17, runner echo (killed mid-attempt, recovered by the head per
 PARALLEL-RUNS 4c). Round 19 second pass, runner delta: named the global,
 fixed three expression-shape bugs, MATCHED 56/56.
+
+## Naming
+
+`DreamSys__ProjectPointAtDistance` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005942C`.
+
+Writes `dist` into the z word of the three-word global scratch
+offset vector, converts that LOCAL offset to a world position through
+`Class6B5CC__LocalOffsetToWorldPos` (code_d294_c, matched), replaces the result's Y
+with `InterpolateKeyframeValue(heightCurve+0x14, heightCurve+0x20, dist)` plus the
+object's own world-base Y, optionally copies the point out, and optionally returns
+whether it lies within `tolerance` of `reference`.
+The same evidence corrects the third parameter's name: it was `day`, an artefact of
+m2c having no caller to type against. It is the abscissa of a curve whose keyframes
+carry `position` fields, and the z component of a local offset -- a distance.
+Tier B: the computation is certain, what the projected point is FOR is not (it has
+no carved caller; the vtable slot is +0x120).

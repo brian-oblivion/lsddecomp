@@ -568,3 +568,21 @@ requires for a permuter zero in general (translate and re-verify, never
 trust the permuter's own score), extended one level deeper: it applies
 per-simplification during cleanup, not just once at the point of first
 translation.
+
+## Naming
+
+`DreamSys__StartVoice` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059D1C`.
+
+Through `soundObj` (a VabStreamObj*, see
+`DreamSys__SetSoundObj.md` for the three-way identification): sets the pitch offset
+to `VOICE_PITCH_BY_SELECT[voiceSelect]` via +0x9C
+(`VabStreamObj__SetPitchOffset`), starts a voice via +0x80 with
+`VOICE_BY_SELECT[voiceSelect] << 4` and two 0x6E constants, and stores the returned
+voice index in `voiceIndex` -- discarding it (setting -1) unless `voiceSelect` is
+0x16. That +0x80 STARTS something is not an assumption: the value it returns is
+exactly what +0x84 (`VabStreamObj__StopVoice`) is handed later by
+`DreamSys__StopVoice`. Does nothing at all when `voiceSelect` is 0.
+Tier B: the two extra layered voices played when `voiceSelect == 0xB`, and what the
+24 selector values mean, are unexplained.

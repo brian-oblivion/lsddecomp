@@ -87,3 +87,15 @@ redundant/missing instruction rather than a block-order or `j`+`nop` pair,
 don't reach for the `goto` lever by pattern-matching on "this is an early
 exit with a different value" — check whether the plain, unadorned form
 (no lever at all) already matches first.
+
+## Naming
+
+`DreamSys__TickMoveFree` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059AEC`.
+
+The `moveOverride == 0` arm of `DreamSys__TickMove`: returns
+`movementBlocked` unchanged when it is set, and otherwise chains
+`DreamSys__AdvanceMoveCycle(this, 1)` into `DreamSys__ApplyMoveCommand`. "Free"
+names the arm, not a game concept -- it is the path taken when no override is in
+force, and the only one that honours `movementBlocked` by refusing to run.

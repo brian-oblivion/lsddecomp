@@ -27,3 +27,24 @@ Retyped the vtable field from `void *DreamSys__GetSaveBlock;` to
 ## Provenance
 
 round 2026-08-30-c, runner ALPHA, unit DreamSys (whole-unit second pass).
+
+## Naming
+
+`DreamSys__GetSaveBlock` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_8005A350`.
+
+Writes 0x700 through `arg1` when non-NULL and returns
+`&this->saveMagic` -- a (pointer, length) accessor for one region of the object.
+Three independent facts say which region:
+  1. 0x178 + 0x700 == 0x878, and the fields in [0x178, 0x878) are exactly the
+     playthrough state: year, day, the three unlock scores, `moodPreviousDays[365]`,
+     the stored flashbacks, the nav-challenge array, the dynamic-link penalty and
+     the screen-shake flag.
+  2. `DreamSys__InitNewGame` initializes precisely that span -- it starts by writing
+     offset 0x178 and ends with `memset(&this->unknown_values_0x684, 0, 0x1F4)`,
+     and 0x684 + 0x1F4 == 0x878.
+  3. The first word of the span is `SAVE_MAGIC`, whose bytes are 4A 30 31 00 --
+     "J01".
+Tier B rather than A: the function has no carved caller, so nothing observed
+actually persists what it hands out.

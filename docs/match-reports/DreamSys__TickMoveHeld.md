@@ -31,3 +31,15 @@ available.
 None — clean first-attempt match, no residue. Filed mainly to record the
 positive-evidence check for the return type, per CLAUDE.md's warning about
 one-line wrappers.
+
+## Naming
+
+`DreamSys__TickMoveHeld` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059BD4`.
+
+The `moveOverride == 2` arm, and the whole body is
+`return this->moveCommand = 1;`. It imposes the same command
+`DreamSys__TickMoveForced` does but runs no cycle and no move, so the object holds
+the command without acting on it. Tier B: the mechanics are a one-liner, the
+name's claim is the relationship to its two siblings.

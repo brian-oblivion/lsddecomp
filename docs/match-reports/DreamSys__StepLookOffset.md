@@ -593,3 +593,17 @@ different C phrasings, and confirmed at the tool-source level, not just by
 behavior. Recommend escalating to the operator: this pattern appears
 (unmatched) in 502 places project-wide, per `grep -rl 'addiu.*\$at, \$at, %lo'
 asm/`, so it will recur.
+
+## Naming
+
+`DreamSys__StepLookOffset` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059814`.
+
+Steps `heightCurve->endValue` (the far keyframe's value) by the
+per-tick delta `LOOK_OFFSET_STEPS[lookOffsetCommand]` (+-600), refuses the step
+once the accumulator `lookOffset` would pass `LOOK_OFFSET_LIMITS` (+-9000), and when
+no command is queued decays `lookOffset` back toward 0 by 600 a tick, applying that
+decay to the curve as well. Consumes the command (resets it to 0) either way.
+Tier B: the arithmetic is exact and measured off the tables; "look" is the shared
+reading described in `DreamSys__StepLook.md`.

@@ -117,3 +117,17 @@ following call).
 round 2026-08-30-b, runner ALPHA, address range `0x80058774`-`0x8005A1EC`
 (misdiagnosed as a stall, reshapes 1-4). Resolved round 2026-08-30-c, same
 runner, address range widened to the whole unit (head-adjudicated fix).
+
+## Naming
+
+`DreamSys__StopVoice` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `func_80059E3C`.
+
+`if (voiceIndex >= 0) { soundObj->vt->slot0x84(soundObj,
+voiceIndex); voiceIndex = -1; }` -- a pure leaf, so the SHAPE is tier A by the leaf
+rule. It is tier B because the word "Voice" comes from another unit, not this body:
+slot +0x84 on `soundObj`'s vtable is `VabStreamObjMethods::slot84` ==
+`VabStreamObj__StopVoice` (src/code_179d8_e.c, matched), at the same offset with
+the same signature, and `FlushSoundCueSet` in that unit guards its own call to it
+with the identical `index >= 0` test.

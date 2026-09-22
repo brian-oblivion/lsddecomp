@@ -51,3 +51,21 @@ need `-m32` to model this 32-bit target correctly).
 
 round 2026-08-30-b, runner ALPHA, address range
 `0x80058774`-`0x8005A1EC`.
+
+## Naming
+
+`DreamSys__ResetSessionState` -- tier B (round 66, runner alpha, FINISHING-PLAN track 3).
+
+Renamed from `DreamSys__func_588ec`.
+
+The constructor's last step (`DreamSys__DreamSys` returns
+`this->vt->DreamSys__ResetSessionState(this)`), and the only thing it does is put the
+object into its idle state: both tick callback slots NULLed directly (not via
+`DreamSys__SelectCallback80/98`), `*(s32 *)this->soundCueSet = 0` -- that word is
+`SoundCueSet::tag`, and `InitSoundCueSet` (src/code_179d8_e.c, matched) refuses to
+run unless it is 0, so this frees the cue set -- the three staircase-walk words
+`staircaseActive`/`staircaseMoveGate`/`staircaseTickFn` cleared, `unk_0x78` and
+`unk_0x924` cleared, and `func_8001CEB4(this, 1, &ROTATION_YAW_180)`, an ABSOLUTE
+rotation to yaw 180.
+"Session" is the soft half: nothing establishes that the state it clears is
+per-dream rather than per-object, so tier B, not A.
