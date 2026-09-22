@@ -2367,7 +2367,7 @@ typedef struct Obj14_3bb8c_l {
  * the exact offsets this unit's functions dispatch (+0x050, +0x074,
  * +0x0FC, +0x104, +0x108, +0x200) against tools/classtable.py's dump of
  * DREAMSYS_METHODS (0x80087BDC, include/DreamSys.h): every one lands on a
- * real occupant there (func_80058A94, Class6B5CC__GetSetUnk10Field0, func_80059310,
+ * real occupant there (DreamSys__UnlinkLinkMgr, Class6B5CC__GetSetUnk10Field0, func_80059310,
  * DreamSys__GetSetDreamTimeLimit, func_80059360, DreamSys__GetDreamColor
  * respectively), and the two whose header signatures are pinned down
  * (+0x104 `s32(DreamSys*, s32)`, +0x108 `s32(DreamSys*)`) match this unit's

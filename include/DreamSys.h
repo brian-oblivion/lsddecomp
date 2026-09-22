@@ -264,7 +264,7 @@ typedef struct DreamSysFunc58968ArgObj {
 	DreamSysFunc58968ArgMethods *methods;
 } DreamSysFunc58968ArgObj;
 
-/* Inner struct chased by func_80058B08's `arg1 == -2` path: the return of
+/* Inner struct chased by DreamSys__NotifyLinkAttempt's `arg1 == -2` path: the return of
    DreamSysUnk4CMethods::slot0x11C (a DreamSysUnk11CResult below) has a
    pointer at +0x4 to one of THESE, and only +0x2C (a `s16`, compared
    against the literal 2) is read (round 2026-09-02). */
@@ -274,13 +274,13 @@ typedef struct DreamSysUnk11CInner {
 } DreamSysUnk11CInner;
 
 /* Return type of DreamSysUnk4CMethods::slot0x11C. Only +0x4 (a pointer to
-   DreamSysUnk11CInner above) is read, by func_80058B08 (round 2026-09-02). */
+   DreamSysUnk11CInner above) is read, by DreamSys__NotifyLinkAttempt (round 2026-09-02). */
 typedef struct DreamSysUnk11CResult {
 	s8 unknown_values_0x0[4];
 	DreamSysUnk11CInner *unk_0x4;
 } DreamSysUnk11CResult;
 
-/* Object pointed to by DreamSys::unk_0x4C, used by func_80058A94 (slot
+/* Object pointed to by DreamSys::unk_0x4C, used by DreamSys__UnlinkLinkMgr (slot
    +0xF0) and func_8005A82C (slot +0xE8, this round): same "vtable pointer
    at offset 0" shape as DreamSysUnk58 above. Unidentified class; unknown if
    related to DreamSysUnk58. */
@@ -307,7 +307,7 @@ typedef struct DreamSysUnk4CMethods {
 	   "multiple local views of the same table" (round 2026-09-02). */
 	/* Called with (this->unk_0x4C, 0, 0) by DreamSys__FlashbackSaving (see
 	   above); ALSO called with the identical (0, 0) argument pair by
-	   func_80058B08's shared tail block, whose return value is forwarded
+	   DreamSys__NotifyLinkAttempt's shared tail block, whose return value is forwarded
 	   straight into vtable slot +0x1D4 (func_8005A7A0)'s `currentPos`
 	   argument (round 2026-09-02) -- same signature, different caller. */
 	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
@@ -333,7 +333,7 @@ typedef struct DreamSysUnk4CMethods {
 	   derivation) and get back the `GridArrElem *` for that index --
 	   accessed only from `class_3bb8c_p.c` (round 57 naming pass). */
 	void *(*getGridArrElemAt)(void *self, s32 arg1, s32 arg2, void *arg3);
-	/* Called by func_80058B08's `arg1 == -2` path as (this->unk_0x4C,
+	/* Called by DreamSys__NotifyLinkAttempt's `arg1 == -2` path as (this->unk_0x4C,
 	   (u8 *)this->unk_0x14 + 0x18); the result's `unk_0x4` is chased and its
 	   `unk_0x2C` compared against the literal 2 (round 2026-09-02). */
 	DreamSysUnk11CResult *(*slot0x11C)(void *self, void *arg1);
@@ -359,7 +359,7 @@ typedef struct DreamSysUnk4CObj {
    which types the same table for Class65650, a sibling of DreamSys under
    this same base). Declared locally here rather than pulled in from
    code_55dd4.h to avoid a cross-unit include; only slot +0x050 is needed by
-   this unit (func_80058A94, this round). */
+   this unit (DreamSys__UnlinkLinkMgr, this round). */
 typedef struct DreamSysBaseMethods {
 	u8 pad00[0x8];
 	/* Shared with Class65650's own inherited "ctor" slot at the same offset
@@ -387,14 +387,14 @@ typedef struct DreamSysBaseMethods {
 	   difference (round 2026-08-30-b). */
 	void (*slot0x50)(struct DreamSys *self);
 	u8 pad54[0x88 - 0x54];
-	/* Called by func_80058B08 (this unit's own +0x088 slot) as
+	/* Called by DreamSys__NotifyLinkAttempt (this unit's own +0x088 slot) as
 	   (this, arg1), return value discarded (round 2026-09-02). */
 	void (*slot0x88)(struct DreamSys *self, s32 arg1);
 	u8 pad8C[0x9C - 0x8C];
-	/* Called by func_80058E8C as (this, arg1, arg2) -- round 2026-08-30-d. */
+	/* Called by DreamSys__DispatchChunkChange as (this, arg1, arg2) -- round 2026-08-30-d. */
 	void (*slot0x9C)(struct DreamSys *self, void *arg1, s32 arg2);
 	u8 padA0[0xDC - 0xA0];
-	/* Called unconditionally by func_80058F18 (this unit's own +0xDC slot)
+	/* Called unconditionally by DreamSys__DispatchInstanceEffect (this unit's own +0xDC slot)
 	   as (this, arg1, arg2) -- same argument shape as slot0x9C above
 	   (round 2026-09-02). Resolves to DreamSys__DispatchLinkCommandAndTryAttach in D_800878D4, out of
 	   this unit's scope. */
@@ -469,7 +469,7 @@ extern DreamSysVec3 D_80087EA4;
    - 2)`.
 
    Two independent pieces of evidence pin this down, not a guess:
-   - `func_80058B08` (this unit, already matched) clamps
+   - `DreamSys__NotifyLinkAttempt` (this unit, already matched) clamps
      `this->unk_0xB8 = (this->unk_0x28->unk_0x36 & 0x7F); if (unk_0xB8 >=
      0x18) unk_0xB8 = 0;` -- i.e. `unk_0xB8` is bounded to [0, 0x18). Both
      `D_80087EB0` and `D_80087EC8` (each already-named 24+-byte byte
@@ -531,7 +531,7 @@ typedef struct DreamSysInterpPoint {
 } DreamSysInterpPoint;
 
 /* Struct pointed to by DreamSys::unk_0x28. Only +0x36 is touched (a `u16`,
-   masked to 0x7F by func_80058B08, round 2026-09-02); everything else is
+   masked to 0x7F by DreamSys__NotifyLinkAttempt, round 2026-09-02); everything else is
    unconfirmed. */
 typedef struct DreamSysUnk28Target {
 	s8 unknown_values_0x0[0x36];
@@ -587,7 +587,7 @@ typedef struct DreamSys {
 	s8 unknown_values_0x18[12];
 
 	s32 dreamTimer;
-	/* Read as a pointer by func_80058B08 (round 2026-09-02): loaded, then
+	/* Read as a pointer by DreamSys__NotifyLinkAttempt (round 2026-09-02): loaded, then
 	   dereferenced at +0x36 for a `u16` (masked to 0x7F and stashed into
 	   unk_0xB8 below). Target type otherwise unconfirmed. */
 	DreamSysUnk28Target *linkTarget;
@@ -606,7 +606,7 @@ typedef struct DreamSys {
 	s8 unknown_values_0x4A[2];
 	/* Pointer to an unidentified object (own vtable at offset 0, slot
 	   +0xF0 called with itself as the sole argument). Used by
-	   func_80058A94 (round 2026-08-30-b); see DreamSysUnk4CObj above. */
+	   DreamSys__UnlinkLinkMgr (round 2026-08-30-b); see DreamSysUnk4CObj above. */
 	DreamSysUnk4CObj *linkMgr;
 	s8 unknown_values_0x50[4];
 	/* Written by this unit's own DreamSys__SetPendingExtra (its own +0x0EC slot), a
@@ -697,7 +697,7 @@ typedef struct DreamSys {
 	s32 unk_0xB4;
 	/* Derived from `unknown_values_0x28[0x36]` masked to 0x7F, or forced to
 	   0 (if >= 0x18) or 2 (if `unknwon_int_0x44 == 15` and this is still 0)
-	   by func_80058B08's `arg1 == -1` path (round 2026-09-02). Also an index:
+	   by DreamSys__NotifyLinkAttempt's `arg1 == -1` path (round 2026-09-02). Also an index:
 	   func_80059D1C (round 2026-09-06) does nothing when this is 0, else
 	   uses it to index D_80087EB0/D_80087EC8 (see those externs), compares
 	   it against 0x16 (22) to decide whether to keep or discard
@@ -862,7 +862,7 @@ struct vtable_DreamSys{
 	void (*slot10)(DreamSys *this, void *arg);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x014); shared
 	   with Class65650's inherited slot14 (code_55dd4.h: "'unlink' companion
-	   of slot10"). Called by func_80058A94 as (this, this->unk_0x4C)
+	   of slot10"). Called by DreamSys__UnlinkLinkMgr as (this, this->unk_0x4C)
 	   (round 2026-08-30-b). Still INCLUDE_ASM; address 0x80057130 is
 	   outside this unit/runner's range. */
 	void (*BaseObjO__UnlinkCompanion)(DreamSys *this, DreamSysUnk4CObj *arg1);
@@ -895,12 +895,12 @@ struct vtable_DreamSys{
 	   tools/classtable.py DREAMSYS_METHODS). Dispatches on `arg1`
 	   (-2 / -1 / anything else) after an unconditional call through the
 	   shared base table's own +0x088 slot (round 2026-09-02). */
-	void (*func_80058B08)(DreamSys *this, s32 arg1);
+	void (*DreamSys__NotifyLinkAttempt)(DreamSys *this, s32 arg1);
 	u32 unknown_functions_0x8c[3];
 	void *TimerTick;
 	/* This function's OWN slot; resolved via tools/classtable.py
 	   (round 2026-08-30-d). */
-	void (*func_80058E8C)(DreamSys *this, void *arg1, s32 arg2);
+	void (*DreamSys__DispatchChunkChange)(DreamSys *this, void *arg1, s32 arg2);
 	/* Called by this unit's own DreamSys__DispatchLinkCommandAndTryAttach as (this, arg1, count) when
 	   `5 <= count < 9` -- dispatched through THIS object's own vtable
 	   (unlike DreamSys__DispatchLinkCommandAndTryAttach's other, unconditional call, which goes
@@ -1106,7 +1106,7 @@ struct vtable_DreamSys{
 	   this slot's real symbol (config/symbols.slps01556.lsdde.txt) is
 	   `DreamSys__InstanceEffectsOnJournal` (see the forward declaration
 	   below and src/DreamSys.c), confirmed via tools/classtable.py
-	   DREAMSYS_METHODS (+0x1E8) while resolving func_80058F18's call
+	   DREAMSYS_METHODS (+0x1E8) while resolving DreamSys__DispatchInstanceEffect's call
 	   through this slot (round 2026-09-02). No call site referenced the
 	   old name, so this is a plain correction, not a rename requiring an
 	   out-of-scope edit elsewhere. */

@@ -81,14 +81,14 @@ void DreamSys__func_58968(DreamSys *this, DreamSysFunc58968ArgObj *arg1)
 	}
 }
 
-void func_80058A94(DreamSys *this)
+void DreamSys__UnlinkLinkMgr(DreamSys *this)
 {
 	this->linkMgr->methods->slot0xF0(this->linkMgr);
 	this->vt->BaseObjO__UnlinkCompanion(this, this->linkMgr);
 	DreamSys__GetBaseMethods()->slot0x50(this);
 }
 
-void func_80058B08(DreamSys *this, s32 arg1)
+void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 arg1)
 {
 	s32 v;
 
@@ -122,7 +122,7 @@ neg2_mismatch:
 	this->vt->func_8005B990(this);
 }
 
-void func_80058C58(DreamSys *this, s32 arg1, s32 mode)
+void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
 {
 	if (this->unk_0x6c != 0)
 		return;
@@ -207,7 +207,7 @@ tick_only:
 	this->vt->func_800593D8(this);
 }
 
-void func_80058E8C(DreamSys *this, void *arg1, s32 arg2)
+void DreamSys__DispatchChunkChange(DreamSys *this, void *arg1, s32 arg2)
 {
 	DreamSys__GetBaseMethods()->slot0x9C(this, arg1, arg2);
 	if ((*(s32 *)(*(void **)arg1) & 0xFFF) == 0x114) {
@@ -215,7 +215,7 @@ void func_80058E8C(DreamSys *this, void *arg1, s32 arg2)
 	}
 }
 
-void func_80058F18(DreamSys *this, void *arg1, s32 arg2)
+void DreamSys__DispatchInstanceEffect(DreamSys *this, void *arg1, s32 arg2)
 {
 	DreamSys__GetBaseMethods()->slot0xDC(this, arg1, arg2);
 	if ((*(s32 *)(*(void **)arg1) & 0xFFFFF) == 0x1F234) {

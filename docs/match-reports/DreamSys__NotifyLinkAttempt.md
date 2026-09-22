@@ -1,4 +1,6 @@
-# func_80058B08 — MATCHED
+# DreamSys__NotifyLinkAttempt — MATCHED
+
+> Renamed from `func_80058B08` on 2026-09-22 (tools/rename.py). Address 0x80058b08.
 
 **Unit:** DreamSys · **Size:** 84 words (97 instructions incl. delay
 slots/nops, `0x49308`-`0x49458`) · **Status:** MATCHED (84/84 words), whole-
@@ -28,7 +30,7 @@ Vtable slot `+0x088`. Dispatches on `arg1`:
    argument instead.
 
 Both blocker screens are clean: no `gp_rel` hit and no
-`addiu $at, $at, %lo` hit anywhere in `func_80058B08.s`.
+`addiu $at, $at, %lo` hit anywhere in `DreamSys__NotifyLinkAttempt.s`.
 
 ## New struct/vtable knowledge
 
@@ -45,7 +47,7 @@ Both blocker screens are clean: no `gp_rel` hit and no
   from `MoodGraphContributor areaMoods/entityMoods` sizing) — this function
   is simply the first one in this unit's queue to actually read it; no
   header change needed there, just confirms the offset arithmetic.
-- `vtable_DreamSys::func_80058B08` (was inside `unknown_functions_0x64[13]`)
+- `vtable_DreamSys::DreamSys__NotifyLinkAttempt` (was inside `unknown_functions_0x64[13]`)
   — this function's own slot, `+0x088`, split out of that array.
 - `DreamSysBaseMethods::slot0x88` (the SHARED base table returned by
   `DreamSys__GetBaseMethods()`, a DIFFERENT table from DreamSys's own vtable despite
@@ -67,7 +69,7 @@ Both blocker screens are clean: no `gp_rel` hit and no
 ## Source
 
 ```c
-void func_80058B08(DreamSys *this, s32 arg1)
+void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 arg1)
 {
 	s32 v;
 

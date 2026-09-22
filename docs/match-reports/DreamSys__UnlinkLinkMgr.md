@@ -1,4 +1,6 @@
-# func_80058A94
+# DreamSys__UnlinkLinkMgr
+
+> Renamed from `func_80058A94` on 2026-09-22 (tools/rename.py). Address 0x80058a94.
 
 **Unit:** DreamSys · **Size:** 29 instructions · **Status:** MATCHED (29/29 words)
 
@@ -23,7 +25,7 @@ class's method table:
 ## The C
 
 ```c
-void func_80058A94(DreamSys *this)
+void DreamSys__UnlinkLinkMgr(DreamSys *this)
 {
 	this->unk_0x4C->methods->slot0xF0(this->unk_0x4C);
 	this->vt->BaseObjO__UnlinkCompanion(this, this->unk_0x4C);

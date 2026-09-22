@@ -1,4 +1,6 @@
-# func_80058E8C
+# DreamSys__DispatchChunkChange
+
+> Renamed from `func_80058E8C` on 2026-09-22 (tools/rename.py). Address 0x80058e8c.
 
 **Unit:** DreamSys · **Size:** 35 instructions · **Status:** MATCHED (35/35 words)
 
@@ -13,7 +15,7 @@ base-class method (`DreamSys__GetBaseMethods()->slot0x9C(this, arg1, arg2)`), th
 ## The C
 
 ```c
-void func_80058E8C(DreamSys *this, void *arg1, s32 arg2)
+void DreamSys__DispatchChunkChange(DreamSys *this, void *arg1, s32 arg2)
 {
 	DreamSys__GetBaseMethods()->slot0x9C(this, arg1, arg2);
 	if ((*(s32 *)(*(void **)arg1) & 0xFFF) == 0x114) {
@@ -48,7 +50,7 @@ inference from the data side.
 ### Proposed learning
 
 Promote to `DECOMPILATION_LEARNINGS.md`'s open-questions entry on the
-class-table header word: `func_80058E8C` (`DreamSys`, vtable `+0x09C`)
+class-table header word: `DreamSys__DispatchChunkChange` (`DreamSys`, vtable `+0x09C`)
 reads `*(*(void**)obj) & 0xFFF` and compares against a literal class id
 (`0x114` here) to decide whether to dispatch a second, class-specific call.
 This is the first confirmed in-game READ of that field, and the pattern

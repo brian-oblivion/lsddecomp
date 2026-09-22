@@ -1,4 +1,6 @@
-# func_80058C58 — MATCHED, 79/79 words, byte-exact
+# DreamSys__ApplyLinkCommand — MATCHED, 79/79 words, byte-exact
+
+> Renamed from `func_80058C58` on 2026-09-22 (tools/rename.py). Address 0x80058c58.
 
 Unit: `DreamSys` · Size: 79 words · Status: MATCH, whole-image SHA1 green
 (`build exit=0`).
@@ -11,7 +13,7 @@ single field stores plus two vtable calls. Pre-analysed by round 24's head
 so it would stay `fresh`.
 
 ```c
-void func_80058C58(DreamSys *this, s32 arg1, s32 mode)
+void DreamSys__ApplyLinkCommand(DreamSys *this, s32 arg1, s32 mode)
 {
 	if (this->unk_0x6c != 0)
 		return;
