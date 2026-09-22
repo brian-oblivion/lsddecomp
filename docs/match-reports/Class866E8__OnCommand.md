@@ -1,4 +1,6 @@
-# func_8004AB88
+# Class866E8__OnCommand
+
+> Renamed from `func_8004AB88` on 2026-09-22 (tools/rename.py). Address 0x8004ab88.
 
 **Unit:** class_3ac78 · **Size:** 18 words · **Status:** MATCHED (18/18 words)
 
@@ -22,7 +24,7 @@ jalr $v0                  ; self->methods->slotD0(self, other, count) -- no
                           ; other and count unchanged from entry
 ```
 
-Slot +0x0D0 is `func_8004ADD8` (also in this unit, still `INCLUDE_ASM`; 0xCC
+Slot +0x0D0 is `Class866E8__ForwardAcceptedCommand` (also in this unit, still `INCLUDE_ASM`; 0xCC
 words, out of this round's budget). Reading its body confirms slot +0x0D0's
 real signature is `(self, void *list, s32 count)` — three genuine register
 arguments (it iterates `list` while comparing against `*(void**)other's
@@ -30,7 +32,7 @@ methods`, using `count` as a loop bound test against a small constant set).
 Since the jalr here sets up no new registers at all, and the callee
 definitely needs three real arguments with no register gap, `$a1`/`$a2` at
 the call site must be this function's own second and third parameters,
-forwarded unchanged — hence `func_8004AB88(Class866E8 *self, GenericObject
+forwarded unchanged — hence `Class866E8__OnCommand(Class866E8 *self, GenericObject
 *other, s32 count)`.
 
 The type-tag check reads the **low byte of `other->methods->header`** (the

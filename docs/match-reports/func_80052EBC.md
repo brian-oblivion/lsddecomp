@@ -8,13 +8,13 @@
 ```c
 void func_80052EBC(Obj87034_3bb8c_l *self) {
     self->methods->slot14(self, self->unk3C);
-    func_8004A4B8()->slot48(self);
+    GetClass86668Methods()->slot48(self);
 }
 ```
 
 Straight-line: dispatch through `self`'s own vtable slot `+0x14`, then
 through the shared BasicClass-family base table's slot `+0x48` (via
-`func_8004A4B8()`, the same accessor `func_80052DE8` uses at a different
+`GetClass86668Methods()`, the same accessor `func_80052DE8` uses at a different
 slot). No branches, matched on the first correctly-typed attempt.
 
 ## Notes

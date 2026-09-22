@@ -1,4 +1,6 @@
-# func_8004B344
+# Class866E8__SetConfig
+
+> Renamed from `func_8004B344` on 2026-09-22 (tools/rename.py). Address 0x8004b344.
 
 **Unit:** class_3ac78 · **Size:** 18 words · **Status:** MATCHED (18/18 words)
 
@@ -17,12 +19,12 @@ jalr $v0                     ; self->methods->slot40(self), no extra args
 sw   $s1, 0x68($s0)          ; self->unk68 = arg1
 ```
 
-Slot +0x040 is `func_8004AA10` — **gp_rel-blocked** (see
+Slot +0x040 is `Class866E8__Reset` — **gp_rel-blocked** (see
 `docs/research/gp-relative-blocker.md`), still `INCLUDE_ASM`. Its own body
 overwrites its incoming `$a1` immediately with a `%gp_rel` global load before
 using it, so it doesn't inform whether this slot's declared type takes a
-second parameter. Since `func_8004B344` has no other use of `$a1` besides
-saving it to `self->unk68` (no forwarding evidence, unlike `func_8004A478`'s
+second parameter. Since `Class866E8__SetConfig` has no other use of `$a1` besides
+saving it to `self->unk68` (no forwarding evidence, unlike `Class86668__SetChildFlag8`'s
 literal-argument pattern — see that report), the call is typed here as
 `slot40(self)`, one argument. The delay-slot `move` saving `arg1` into a
 temp is ordinary scheduling: the same value is needed after the call
@@ -30,4 +32,4 @@ regardless of whether it was also passed into it.
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `func_8004A478.md`.
+None beyond what's already documented for `Class866E8` in `Class86668__SetChildFlag8.md`.

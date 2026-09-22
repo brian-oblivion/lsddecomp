@@ -1,4 +1,6 @@
-# func_8004ACF8 — MATCH
+# Class866E8__SetChildParams — MATCH
+
+> Renamed from `func_8004ACF8` on 2026-09-22 (tools/rename.py). Address 0x8004acf8.
 
 **Unit:** class_3ac78 · **Size:** 51 instructions · **Result:** 51/51 words
 
@@ -17,7 +19,7 @@ only the two slots this function reaches on the child are typed, as
 ## Final source
 
 ```c
-void func_8004ACF8(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
+void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
 {
     s32 i;
     UnkChildObj_3ac78 *child;

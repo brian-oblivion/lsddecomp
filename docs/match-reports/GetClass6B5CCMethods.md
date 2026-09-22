@@ -94,10 +94,10 @@ so the declaration has to keep its arity or the call site's bytes change. Here
 it emits nothing — all three call sites already have the value in the register:
 
 ```
-8004a9a0:  jal   8001e57c <GetClass6B5CCMethods>   ; func_8004A984 (class_3ac78.c, 2-arg call)
+8004a9a0:  jal   8001e57c <GetClass6B5CCMethods>   ; Class866E8__OnNotify (class_3ac78.c, 2-arg call)
 8004a9a4:  move  s2,a2                             ; callee-save SPILL, not argument setup
 
-8004aa88:  jal   8001e57c <GetClass6B5CCMethods>   ; func_8004AA6C (class_3ac78.c, 2-arg call)
+8004aa88:  jal   8001e57c <GetClass6B5CCMethods>   ; Class866E8__OnElementEvent (class_3ac78.c, 2-arg call)
 8004aa8c:  move  s2,a2                             ; ditto
 
 8004d3e8:  jal   8001e57c <GetClass6B5CCMethods>   ; func_8004D3DC (via include/class_3bb8c.h, 1-arg call)

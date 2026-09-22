@@ -4,7 +4,7 @@
 that **`return NULL;` must come textually LAST, after the success return.**
 Five instances matched byte-exact in one pass on that basis. One sub-shape
 remains open — see "What survived" at the bottom, and read
-`docs/match-reports/func_8004A4C8.md` for the canonical account and the
+`docs/match-reports/New_Class866E8.md` for the canonical account and the
 measurement table.
 
 The framing below was written while the class was open. It is kept because its
@@ -108,7 +108,7 @@ Roughly 25 build-and-diff attempts across five functions and four units:
 - `func_80025D10` (two broadcast instances).
 - `func_8004A130` (class_39e08, 26/27) — runner: `__asm__("")` after the malloc;
   early return. Head: result variable (0/27); comma-ternary (16/27).
-- `func_8004A4C8` (class_3ac78, 26/27) — 5 reshapes, two with size regressions.
+- `New_Class866E8` (class_3ac78, 26/27) — 5 reshapes, two with size regressions.
 
 Two runners on different units reached this class independently in one round and
 classified it identically without either seeing the other's work.
@@ -138,7 +138,7 @@ PY
 
 | where | instances |
 | --- | --- |
-| carved, queued now | **5** — `func_80049608`, `func_8004A130` (class_39e08); `func_8004A4C8` (class_3ac78); `func_8003B854`, `func_8003BE94` (code_2c054) |
+| carved, queued now | **5** — `func_80049608`, `func_8004A130` (class_39e08); `New_Class866E8` (class_3ac78); `func_8003B854`, `func_8003BE94` (code_2c054) |
 | `class_3bb8c` (uncarved) | 11 |
 | `code_2cc8c` (uncarved) | 4 |
 | `code_179d8` (uncarved) | 3 |
@@ -151,7 +151,7 @@ yet, so `progress.py` counts them FRESH; they are not.
 ## What survived, and what to do now
 
 **Do not run a permuter on this.** The recommendation that used to stand here —
-permute `func_8004A130` or `func_8004A4C8` — was based on the false
+permute `func_8004A130` or `New_Class866E8` — was based on the false
 discriminator above. Both matched by hand, first attempt, once the statement
 order was the thing being varied.
 
@@ -161,7 +161,7 @@ Five instances, all byte-exact, all with `return NULL;` last:
 
 | function | unit | words |
 | --- | --- | --- |
-| `func_8004A4C8` | class_3ac78 | 27/27 |
+| `New_Class866E8` | class_3ac78 | 27/27 |
 | `func_8004A130` | class_39e08 | 27/27 |
 | `func_80049608` | class_39e08 | 31/31 |
 | `func_8003B854` | code_2c054 | 36/36 |

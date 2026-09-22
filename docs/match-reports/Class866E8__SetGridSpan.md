@@ -1,4 +1,6 @@
-# func_8004B32C
+# Class866E8__SetGridSpan
+
+> Renamed from `func_8004B32C` on 2026-09-22 (tools/rename.py). Address 0x8004b32c.
 
 **Unit:** class_3ac78 · **Size:** 6 words · **Status:** MATCHED (6/6 words)
 
@@ -27,4 +29,4 @@ instruction order without needing the C to mirror it.
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `func_8004A478.md`.
+None beyond what's already documented for `Class866E8` in `Class86668__SetChildFlag8.md`.

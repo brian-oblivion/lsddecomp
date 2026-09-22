@@ -1,4 +1,6 @@
-# func_8004A4B8
+# GetClass86668Methods
+
+> Renamed from `func_8004A4B8` on 2026-09-22 (tools/rename.py). Address 0x8004a4b8.
 
 **Unit:** class_3ac78 · **Size:** 4 words · **Status:** MATCHED (4/4 words)
 
@@ -28,4 +30,4 @@ this function only takes its address).
 ## Proposed learning
 
 None beyond what's already documented for `Class86668`/`Class866E8` in
-`func_8004A478.md` and `func_8004A4C8.md`.
+`Class86668__SetChildFlag8.md` and `New_Class866E8.md`.

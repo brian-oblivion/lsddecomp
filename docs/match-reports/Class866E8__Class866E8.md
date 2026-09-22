@@ -1,7 +1,9 @@
-# func_8004A534 -- MATCH (163/163 words, ~7 real rebuild attempts)
+# Class866E8__Class866E8 -- MATCH (163/163 words, ~7 real rebuild attempts)
+
+> Renamed from `func_8004A534` on 2026-09-22 (tools/rename.py). Address 0x8004a534.
 
 Unit `class_3ac78`, 177-line body, `Class866E8Methods::ctor` (the occupant
-of the ctor slot, dispatched by `func_8004A4C8`'s `New_Class866E8`
+of the ctor slot, dispatched by `New_Class866E8`'s `New_Class866E8`
 allocator). 8 distinct callee-saved registers (`$s0`-`$s7`, fully
 saturated) -- flagged by the head as being in the band that was 0
 matched / 4 stalled across 81 pooled samples from rounds 13-14, sent
@@ -23,7 +25,7 @@ extern GenericObject *func_8004D38C(void);
 extern s32 func_80020C5C(void);
 extern Vec3_3ac78 D_8008682C;
 
-void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
+void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
 {
     s32 i;
     UnkSlotEntry_3ac78 *entry;
@@ -135,7 +137,7 @@ here since this function only DISPATCHES to it, never inlines its body).
   `unk32` (new fields carved out of existing opaque padding).
 - `GenericMethodsHeader::slot4C`/`slot70` and `GenericObject::unk10` --
   additive extensions of a struct already used by two OTHER already-matched
-  functions in this unit (`func_8004A984`, `func_8004AB88`). Verified safe:
+  functions in this unit (`Class866E8__OnNotify`, `Class866E8__OnCommand`). Verified safe:
   neither touches the new slots/fields, and the whole-image SHA1 stayed
   green immediately after this specific edit, before any of this function's
   own body was written.

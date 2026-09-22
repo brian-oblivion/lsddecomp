@@ -1,4 +1,6 @@
-# func_8004AFE0 — MATCH
+# Class866E8__SetFootprintFromCell — MATCH
+
+> Renamed from `func_8004AFE0` on 2026-09-22 (tools/rename.py). Address 0x8004afe0.
 
 **Unit:** class_3ac78 · **Size:** 20 instructions · **Result:** 20/20 words
 
@@ -18,7 +20,7 @@ only the two bytes this function actually reads are typed — added as
 ## Final source
 
 ```c
-void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
+void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
 {
     s16 t;
 

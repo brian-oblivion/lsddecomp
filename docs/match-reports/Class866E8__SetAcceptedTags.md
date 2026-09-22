@@ -1,4 +1,6 @@
-# func_8004ADD0
+# Class866E8__SetAcceptedTags
+
+> Renamed from `func_8004ADD0` on 2026-09-22 (tools/rename.py). Address 0x8004add0.
 
 **Unit:** class_3ac78 · **Size:** 2 words · **Status:** MATCHED (2/2 words)
 
@@ -17,4 +19,4 @@ A one-field `s32` setter, leaf, tail instruction in the delay slot of `jr`.
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `func_8004A478.md`.
+None beyond what's already documented for `Class866E8` in `Class86668__SetChildFlag8.md`.

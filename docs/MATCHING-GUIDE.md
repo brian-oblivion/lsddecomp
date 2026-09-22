@@ -399,7 +399,7 @@ three are live rather than transcribed:
   band, four of them after a runner had been told to expect a stall.
 
   **ROUND 16: the 7+ band is no longer 0-matched, so it is a priority order
-  and nothing more.** `func_8004A534` matched **163/163 with 8 distinct
+  and nothing more.** `Class866E8__Class866E8` matched **163/163 with 8 distinct
   callee-saved registers** — sent in *expecting* a stall, on the strength of
   the 0-matched figure this table used to print. Two other runners the same
   round attempted six more large bodies between them and reported, when asked
@@ -407,7 +407,7 @@ three are live rather than transcribed:
   those needed 0 and 1 s-registers anyway.
 
   Read the count as a **correlate** of "large function needing deep struct
-  reconstruction" — that is what actually costs. `func_8004A534`'s
+  reconstruction" — that is what actually costs. `Class866E8__Class866E8`'s
   load-bearing insight was a struct-shape one (a whole-struct copy misread as
   field-by-field), nothing to do with register pressure. **Never skip a
   function on this screen, and never stop on it: if you stop in this band,

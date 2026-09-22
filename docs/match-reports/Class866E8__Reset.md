@@ -1,4 +1,6 @@
-# func_8004AA10 -- MATCHED, round 45 (2026-09-15)
+# Class866E8__Reset -- MATCHED, round 45 (2026-09-15)
+
+> Renamed from `func_8004AA10` on 2026-09-22 (tools/rename.py). Address 0x8004aa10.
 
 **Unit:** `class_3ac78` · **Size:** 23 words · **Status:** MATCHED, 23/23 exact.
 
@@ -11,7 +13,7 @@ just isn't a blocker any more.
 ## What it does
 
 `Class866E8`'s vtable slot `+0x040` (constructor-adjacent init, called by
-`func_8004B344`): zeroes `unk68`/`unkE8`/`unk88`, dispatches slot `+0x0DC`
+`Class866E8__SetConfig`): zeroes `unk68`/`unkE8`/`unk88`, dispatches slot `+0x0DC`
 with `self` and the loaded value of a lone global word `D_8008A980`, then
 sets four new fields (`unk1CC`/`unk1D0`/`unk1D4`/`unk1D8`) to `-1`.
 
@@ -20,7 +22,7 @@ sets four new fields (`unk1CC`/`unk1D0`/`unk1D4`/`unk1D8`) to `-1`.
 ```c
 extern s32 D_8008A980;
 
-void func_8004AA10(Class866E8 *self)
+void Class866E8__Reset(Class866E8 *self)
 {
     self->unk68 = NULL;
     self->unkE8 = 0;

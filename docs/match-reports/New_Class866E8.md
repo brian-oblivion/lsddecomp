@@ -1,4 +1,6 @@
-# func_8004A4C8
+# New_Class866E8
+
+> Renamed from `func_8004A4C8` on 2026-09-22 (tools/rename.py). Address 0x8004a4c8.
 
 **Unit:** class_3ac78 · **Size:** 27 words · **Status:** MATCHED (27/27 words)
 
@@ -16,7 +18,7 @@ caller-supplied arguments. Returns the new object, or NULL.
 ## The match
 
 ```c
-Class866E8 *func_8004A4C8(s32 arg1, s32 arg2)
+Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
 {
     Class866E8 *self;
 
@@ -68,7 +70,7 @@ Five instances closed in one pass, all byte-exact:
 
 | function | unit | words |
 | --- | --- | --- |
-| `func_8004A4C8` | class_3ac78 | 27/27 |
+| `New_Class866E8` | class_3ac78 | 27/27 |
 | `func_8004A130` | class_39e08 | 27/27 |
 | `func_80049608` | class_39e08 | 31/31 |
 | `func_8003B854` | code_2c054 | 36/36 |

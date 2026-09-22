@@ -1,4 +1,6 @@
-# func_8004B2D4
+# NotifyGridCell
+
+> Renamed from `func_8004B2D4` on 2026-09-22 (tools/rename.py). Address 0x8004b2d4.
 
 **Unit:** class_3ac78 · **Size:** 18 words · **Status:** MATCHED (18/18 words)
 
@@ -19,9 +21,9 @@ lw   $v0, 0x38($v0)           ; ->slot38
 jalr $v0                      ; self->methods->slot38(self), no extra args
 ```
 
-Slot +0x038 is `func_8004A984` (also this unit, still `INCLUDE_ASM`, not
+Slot +0x038 is `Class866E8__OnNotify` (also this unit, still `INCLUDE_ASM`, not
 implemented this round). No literal/forwarded args are set up before the
-`jalr` beyond `self` itself (unlike `func_8004AB88`/`func_8004A478`, this
+`jalr` beyond `self` itself (unlike `Class866E8__OnCommand`/`Class86668__SetChildFlag8`, this
 function has no second parameter to forward — nothing else reads `$a1` in
 its body), so the call is `slot38(self)` only.
 
@@ -30,4 +32,4 @@ round; bit `0x80` gates the dispatch.
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `func_8004A478.md`.
+None beyond what's already documented for `Class866E8` in `Class86668__SetChildFlag8.md`.

@@ -17,7 +17,7 @@ void func_80049684(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
-    func_8004A4B8()->ctor(self, func_80048E08(0), 0);
+    GetClass86668Methods()->ctor(self, func_80048E08(0), 0);
     self->methods = func_8004A060();
     InitDreamAux();
     self->unk44 = func_8003B39C(D_800113EC);
@@ -33,7 +33,7 @@ void func_80049684(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     self->unk0C = arg1;
     arg1->unk10 = func_8004D254();
     arg1->unk8 = func_80042400();
-    arg1->unkC = (SubObjG *)func_8004A4C8(0, 1);
+    arg1->unkC = (SubObjG *)New_Class866E8(0, 1);
     self->unk38 = arg2;
     self->methods->slot10(self, (Obj4C *)arg2);
     arg2->methods->slot10C(arg2, self->subB);
@@ -56,13 +56,13 @@ void func_80049830(Obj865C8 *self) {
     self->unk48->methods->slot4(self->unk48);
     self->unk44->methods->slot4(self->unk44);
     TickDreamAuxSlots();
-    func_8004A4B8()->dtor(self);
+    GetClass86668Methods()->dtor(self);
 }
 
 void func_80049958(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
 
-    func_8004A4B8()->slot38(self, arg1, arg2);
+    GetClass86668Methods()->slot38(self, arg1, arg2);
     tag = arg1->target->header;
     if ((tag & 0xFFFF) == 0x1F34) {
         self->methods->slot80(self, arg1, arg2);
@@ -81,13 +81,13 @@ void func_80049A1C(Obj865C8 *self) {
     sub->methods->slot10(sub, self->unk0C->unk4);
     sub->methods->slot10(sub, (s32)self->unk0C->unk8);
     sub->methods->slot110(sub, (s32)self->unk0C->unk10);
-    func_8004A4B8()->slot44(self, (s32)self->unk0C, 0);
+    GetClass86668Methods()->slot44(self, (s32)self->unk0C, 0);
 }
 
 void func_80049AC0(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
-    func_8004A4B8()->slot48(self);
+    GetClass86668Methods()->slot48(self);
     sub->methods->slot110(sub, 0);
     sub->methods->slot14(sub, self->unk0C->unk4);
     sub->methods->slot14(sub, self->unk10);
@@ -125,7 +125,7 @@ extern void func_80049E20(Obj865C8 *self, s32 arg1);
 void func_80049CA8(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
-    func_8004A4B8()->slot54(self, arg1, arg2);
+    GetClass86668Methods()->slot54(self, arg1, arg2);
     if (arg2 == 2 && self->unk3C != arg2) {
         switch (self->unk3C) {
         case 1:
@@ -264,7 +264,7 @@ Obj865C8 *func_8004A130(s32 arg1, SubObjB *arg2)
 
     self = func_80017B34(0x38);
     if (self != NULL) {
-        func_8004A4B8()->ctor(self, arg1, arg2);
+        GetClass86668Methods()->ctor(self, arg1, arg2);
         return self;
     }
     return NULL;
@@ -272,7 +272,7 @@ Obj865C8 *func_8004A130(s32 arg1, SubObjB *arg2)
 
 void func_8004A19C(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
     Get_vtable_IntermediateBase()->ctor(self);
-    self->methods = (Class865C8Methods *)func_8004A4B8();
+    self->methods = (Class865C8Methods *)GetClass86668Methods();
     if (arg1 != 0) {
         self->subB = New_VabStreamObj(arg1);
     } else {

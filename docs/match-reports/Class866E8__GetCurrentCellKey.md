@@ -1,4 +1,6 @@
-# func_8004B31C
+# Class866E8__GetCurrentCellKey
+
+> Renamed from `func_8004B31C` on 2026-09-22 (tools/rename.py). Address 0x8004b31c.
 
 **Unit:** class_3ac78 · **Size:** 2 words · **Status:** MATCHED (2/2 words)
 
@@ -18,9 +20,9 @@ jr    $ra
 A leaf computing `&self->unk1C0` and returning it. Sized the trailing
 `unk1C0` field as `u8 unk1C0[0x1E8 - 0x1C0]` (0x28 bytes) in
 `include/class_3ac78.h` so `Class866E8`'s total size comes out to exactly
-0x1E8 — the same constant `func_8004A4C8`'s allocator call uses — without
+0x1E8 — the same constant `New_Class866E8`'s allocator call uses — without
 asserting anything about the field's internal structure.
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `func_8004A478.md`.
+None beyond what's already documented for `Class866E8` in `Class86668__SetChildFlag8.md`.

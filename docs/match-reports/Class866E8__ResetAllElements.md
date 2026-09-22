@@ -1,4 +1,6 @@
-# func_8004ABD0 — STALL
+# Class866E8__ResetAllElements — STALL
+
+> Renamed from `func_8004ABD0` on 2026-09-22 (tools/rename.py). Address 0x8004abd0.
 
 **Unit:** class_3ac78 · **Size:** 74 instructions · **Best reached:** 9/74
 words, correct size, no address drift
@@ -12,8 +14,8 @@ Walks a 7-element array of 0x1C-byte "slot" records starting at
 `self->methods->slot108(self, entry)`; if the "list" object's
 (`entry->unk8`) field `+0x2C` is non-NULL, refreshes it through its own
 base-class `unk04` slot (same `GenericObject`/`unk04` pattern already
-established by `func_8004AA6C`); calls `self->methods->slot88(self, 6,
-entry, i)` (dispatches to `func_8004AA6C`, which per its own already-
+established by `Class866E8__OnElementEvent`); calls `self->methods->slot88(self, 6,
+entry, i)` (dispatches to `Class866E8__OnElementEvent`, which per its own already-
 matched signature only reads 2 of these 4 args — the extra ones are dead
 at the callee, consistent with the "argument register carries no meaning
 if unused by callee" case in DECOMPILATION_LEARNINGS); calls
@@ -22,9 +24,9 @@ zeroes `self->unk1B8`/`unk1B4` and calls `self->methods->slot140(self)`.
 
 New struct/vtable knowledge added regardless of the stall (all verified
 straight from the disassembly): `Class866E8Methods::slot88` (declared with
-a 4th `s32 arg3` parameter that the occupant, `func_8004AA6C`, doesn't
+a 4th `s32 arg3` parameter that the occupant, `Class866E8__OnElementEvent`, doesn't
 read — same "field type need not match every occupant's real signature"
-precedent as `func_8004A984`/`func_8004AA6C`'s `GetClass6B5CCMethods`), `slot108`
+precedent as `Class866E8__OnNotify`/`Class866E8__OnElementEvent`'s `GetClass6B5CCMethods`), `slot108`
 (`func_8004C0AC`, not decompiled), `slot140` (`func_8004D088`, not
 decompiled — this promotes what was previously just end-of-struct
 padding into a real slot), `Class866E8::unkEC[7]` (`UnkSlotEntry_3ac78`,
@@ -36,7 +38,7 @@ padding into a real slot), `Class866E8::unkEC[7]` (`UnkSlotEntry_3ac78`,
 
 ```c
 #if 0
-void func_8004ABD0(Class866E8 *self)
+void Class866E8__ResetAllElements(Class866E8 *self)
 {
     s32 i;
     s32 offset;
@@ -124,7 +126,7 @@ The delay-slot filler for `slot74`'s `jalr` is choosing the offset
 increment because it is the FIRST independent, side-effect-only
 instruction reachable in the block, and GCC 2.6.3's `dbr_schedule` pass
 here appears to search past several intervening independent instructions
-(not just the immediately-next one — contrast with `func_8004AFE0`'s
+(not just the immediately-next one — contrast with `Class866E8__SetFootprintFromCell`'s
 residue, which stayed local) to find and hoist it, regardless of textual
 distance from where the C source puts it. A bare `__asm__("")` scheduling
 barrier did NOT block this hoist, which contradicts the working
@@ -145,7 +147,7 @@ changes ordering only, it's allowed" test already implies it's a
 reordering tool, not an ordering GUARANTEE) and should be checked before
 reaching for it as a fix for a "value hoisted too early" residue class,
 which up to this point had only been solved by splitting COMPUTE from
-STORE (`func_8004AFE0`), not by barriers.
+STORE (`Class866E8__SetFootprintFromCell`), not by barriers.
 
 ## Provenance
 
@@ -286,7 +288,7 @@ drift** — matches the report exactly. `INCLUDE_ASM` restored immediately
 after, `git diff --stat` confirmed clean.
 
 Not re-searched or re-attempted this round: this round's assignment staffed
-`func_8004B030` as the priority (a proven-representative permuter target,
+`Class866E8__SetFootprintRect` as the priority (a proven-representative permuter target,
 per its own report), and this function's own history — 8 manual attempts
 across 3 prior rounds plus a 140,928-iteration permuter search that
 improved on its own score but never reached zero — already exhausts every

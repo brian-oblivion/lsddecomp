@@ -1,4 +1,6 @@
-# func_8004B030 — STALL: length EXACT 52/52; 22/52 raw word-match (round 47, up from 19/52); first real diff at word 5 (vram 0x8004B044, the oversized frame)
+# Class866E8__SetFootprintRect — STALL: length EXACT 52/52; 22/52 raw word-match (round 47, up from 19/52); first real diff at word 5 (vram 0x8004B044, the oversized frame)
+
+> Renamed from `func_8004B030` on 2026-09-22 (tools/rename.py). Address 0x8004b030.
 
 **Unit:** class_3ac78 · **Size:** 52 instructions · **Best reached:** 22/52
 words (correct size, no address drift)
@@ -6,8 +8,8 @@ words (correct size, no address drift)
 ## What it does
 
 Reads two signed bytes off the shared `UnkArgObj_3ac78` descriptor
-(`arg1->unk2`, `arg1->unk3` — same buffer type as `func_8004AFE0`/
-`func_8004B030`/`func_8004AEA4` per the header's existing comment).
+(`arg1->unk2`, `arg1->unk3` — same buffer type as `Class866E8__SetFootprintFromCell`/
+`Class866E8__SetFootprintRect`/`Class866E8__ApplyToSenderFootprint` per the header's existing comment).
 For EACH byte independently: if nonzero, store `byte - 1` into one field
 and leave the `count`-derived companion field alone; if zero, store the
 byte as-is (0) and additionally decrement the companion `count`-derived
@@ -28,8 +30,8 @@ match): `Class866E8Methods::slot124` (`func_8004C5D0`, not decompiled),
 and `Class866E8`'s `unk88` (`s32`), `unk8C` (`void *`), `unk90`/`unk92`/
 `unk94`/`unk96` (`s16` each).
 
-**Update (corrected by `func_8004AEA4`, matched later the same round):**
-`self->unk8C` is NOT a standalone 4-byte pointer field. `func_8004AEA4`
+**Update (corrected by `Class866E8__ApplyToSenderFootprint`, matched later the same round):**
+`self->unk8C` is NOT a standalone 4-byte pointer field. `Class866E8__ApplyToSenderFootprint`
 copies the WHOLE region `self+0x8C..self+0xBC` (0x30 bytes) with retail's
 batched 4-word-per-iteration block-move codegen on both a save and a
 restore — the "whole-struct assignment, not an indexed loop" signature
@@ -54,7 +56,7 @@ are unaffected by this correction and still stand as originally reported.
 
 ```c
 #if 0
-void func_8004B030(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
+void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
 {
     s8 b2;
     s8 b3;
@@ -123,7 +125,7 @@ this pattern differently.
 **Attempts and results, in order:**
 
 1. Symmetric `b2`/`b3`, no extra locals: 12/20 → this was actually run on
-   `func_8004AFE0` earlier in the round for a similar-shaped residue, not
+   `Class866E8__SetFootprintFromCell` earlier in the round for a similar-shaped residue, not
    this function — disregard, listed for pattern-recognition only.
 2. Symmetric `b2`/`b3`, no extra locals, on THIS function: redundant
    `lbu`+`sll`+`sra` on `b3` only, function grows to 56 words (4 too many),
@@ -196,7 +198,7 @@ attempts, hard stop not reached but diminishing returns — moved on to stay
 within budget for the remaining assigned functions. Restored to
 `INCLUDE_ASM`.
 
-## Update (corrected AGAIN by func_8004B100, same round, runner delta)
+## Update (corrected AGAIN by Class866E8__DispatchToRectCells, same round, runner delta)
 
 `HistoryEntry_3ac78` (and the field this function writes,
 `unk8C.e[0].unk0`) moved again. The 0x10-byte/3-element model this
@@ -204,8 +206,8 @@ report's own "Update" section fixed to is now ALSO superseded: it is
 0xC bytes/4-elements, and the field this function writes is renamed
 `elemIdx` and RETYPED `void *` -> `s32` (an index into `self->unkEC[]`,
 not a pointer — confirmed by two independent readers, `func_8004C5D0`'s
-own retyped return and this function's own read-back in `func_8004B100`).
-See `docs/match-reports/func_8004B100.md` for the full evidence. This
+own retyped return and this function's own read-back in `Class866E8__DispatchToRectCells`).
+See `docs/match-reports/Class866E8__DispatchToRectCells.md` for the full evidence. This
 function's own write, `self->unk8C = self->methods->slot124(...)`
 (`self->methods->slot124` already returns `s32`), is if anything a
 BETTER fit for the corrected type than the old `void *` was — no `#if 0`
@@ -218,8 +220,8 @@ memory, same value, s32 not pointer.
 
 Re-verified the 19/52 claim by rewriting the preserved body using the
 CURRENT `HistoryEntry_3ac78` field names (`elemIdx`/`col`/`row`/`width`/
-`height`, per the corrections layered on by `func_8004B100` and
-`func_8004AEA4` since this report's original pass) and dropping it in:
+`height`, per the corrections layered on by `Class866E8__DispatchToRectCells` and
+`Class866E8__ApplyToSenderFootprint` since this report's original pass) and dropping it in:
 confirmed **19/52, correct size, no address drift** -- matches exactly,
 no contamination from either struct-shape correction.
 
@@ -310,7 +312,7 @@ cheapest search ground in the queue. Ran all three of this round's
 permuter pre-checks before searching, in order:
 
 **(a) scaffold compiles and scores.** Built via `tools/setup-permuter.sh
-func_8004B030 <seed = round-19/20's preserved attempt-4 body,
+Class866E8__SetFootprintRect <seed = round-19/20's preserved attempt-4 body,
 field names updated to the current `col`/`row`/`width`/`height`/`elemIdx`
 header>`. Base compiles; `--debug --stack-diffs` gives base score 1512
 (via the standalone `--debug` invocation) / 1330 (via the actual search

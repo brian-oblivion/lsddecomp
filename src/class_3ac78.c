@@ -1,7 +1,7 @@
 #include "common.h"
 #include "class_3ac78.h"
 
-void func_8004A478(Class86668 *self, s32 arg1)
+void Class86668__SetChildFlag8(Class86668 *self, s32 arg1)
 {
     Class866E8 *sub = self->unk34;
 
@@ -10,12 +10,12 @@ void func_8004A478(Class86668 *self, s32 arg1)
     }
 }
 
-Class86668Methods *func_8004A4B8(void)
+Class86668Methods *GetClass86668Methods(void)
 {
     return &D_80086668;
 }
 
-Class866E8 *func_8004A4C8(s32 arg1, s32 arg2)
+Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
 {
     Class866E8 *self;
 
@@ -28,14 +28,14 @@ Class866E8 *func_8004A4C8(s32 arg1, s32 arg2)
 }
 
 /*
- * func_8004A534's own helpers -- all still-uncarved elsewhere, typed
+ * Class866E8__Class866E8's own helpers -- all still-uncarved elsewhere, typed
  * purely from this call site's own register usage.
  */
 typedef struct BaseCtorTable_3ac78 BaseCtorTable_3ac78;
 struct BaseCtorTable_3ac78 {
     u8 pad0[0x8];
     void (*ctor)(void *self); /* +0x008, standard "further-base ctor first" slot */
-    void (*dtor)(void *self); /* +0x00C, func_8004A7C0: standard "further-base dtor" slot, mirroring ctor */
+    void (*dtor)(void *self); /* +0x00C, Class866E8__Finalize: standard "further-base dtor" slot, mirroring ctor */
 };
 
 extern BaseCtorTable_3ac78 *func_800428E4(void);
@@ -46,7 +46,7 @@ extern s32 func_80020C5C(void);
 extern void func_80017CFC(void *arg1);
 extern Vec3_3ac78 D_8008682C;
 
-void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
+void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
 {
     s32 i;
     UnkSlotEntry_3ac78 *entry;
@@ -125,7 +125,7 @@ void func_8004A534(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     self->methods->slot40(self);
 }
 
-void func_8004A7C0(Class866E8 *self)
+void Class866E8__Finalize(Class866E8 *self)
 {
     s32 i;
     UnkSlotEntry_3ac78 *entry;
@@ -184,8 +184,8 @@ void func_8004A7C0(Class866E8 *self)
  * the faithful spelling of that is an UNSPECIFIED parameter list, not a
  * fabricated two-parameter prototype -- which is what the line below now is.
  * Measured before changing it: the two arguments this unit passes cost ZERO
- * bytes. Retail's `jal 8001e57c` in func_8004A984 (0x8004A9A0) and
- * func_8004AA6C (0x8004AA88) both carry `move s2,a2` in the delay slot -- a
+ * bytes. Retail's `jal 8001e57c` in Class866E8__OnNotify (0x8004A9A0) and
+ * Class866E8__OnElementEvent (0x8004AA88) both carry `move s2,a2` in the delay slot -- a
  * callee-save spill, NOT argument setup -- and $a0/$a1 still hold each
  * caller's own incoming arguments. So unlike the other round-59 findings,
  * nothing here is byte-load-bearing, and the arity claim was simply false
@@ -193,7 +193,7 @@ void func_8004A7C0(Class866E8 *self)
  * below are UNCHANGED; only this declaration is. */
 extern void *GetClass6B5CCMethods();
 
-void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
+void Class866E8__OnNotify(Class866E8 *self, GenericObject *arg1, s32 arg2)
 {
     void (*fn)(Class866E8 *self, GenericObject *arg1, s32 arg2);
 
@@ -208,7 +208,7 @@ void func_8004A984(Class866E8 *self, GenericObject *arg1, s32 arg2)
 
 extern s32 D_8008A980;
 
-void func_8004AA10(Class866E8 *self)
+void Class866E8__Reset(Class866E8 *self)
 {
     self->unk68 = NULL;
     self->unkE8 = 0;
@@ -220,7 +220,7 @@ void func_8004AA10(Class866E8 *self)
     self->unk1D8 = -1;
 }
 
-void func_8004AA6C(Class866E8 *self, s32 arg1, UnkListObj_3ac78 *arg2)
+void Class866E8__OnElementEvent(Class866E8 *self, s32 arg1, UnkListObj_3ac78 *arg2)
 {
     void (*fn)(Class866E8 *self, s32 arg1);
 
@@ -243,7 +243,7 @@ merge:
     self->methods->slot30(self, arg1);
 }
 
-void func_8004AB24(Class866E8 *self)
+void Class866E8__UpdateIfEnabled(Class866E8 *self)
 {
     if (self->unk70) {
         self->methods->slotF4(self);
@@ -251,19 +251,19 @@ void func_8004AB24(Class866E8 *self)
     }
 }
 
-void func_8004AB88(Class866E8 *self, GenericObject *other, s32 count)
+void Class866E8__OnCommand(Class866E8 *self, GenericObject *other, s32 count)
 {
     if ((u8)other->methods->header == 0x34) {
         self->methods->slotD0(self, other, count);
     }
 }
 
-/* STALL -- see docs/match-reports/func_8004ABD0.md. Best reached: 9/74
+/* STALL -- see docs/match-reports/Class866E8__ResetAllElements.md. Best reached: 9/74
  * words in-range, correct size, no address drift. Residue is a
  * scheduling-only "the offset increment keeps landing in the wrong
  * delay slot" issue. Restored to INCLUDE_ASM per project rule. */
 #if 0
-void func_8004ABD0(Class866E8 *self)
+void Class866E8__ResetAllElements(Class866E8 *self)
 {
     s32 i;
     s32 offset;
@@ -292,9 +292,9 @@ void func_8004ABD0(Class866E8 *self)
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004ABD0);
+INCLUDE_ASM("asm/nonmatchings/class_3ac78", Class866E8__ResetAllElements);
 
-void func_8004ACF8(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
+void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
 {
     s32 i;
     UnkChildObj_3ac78 *child;
@@ -308,18 +308,18 @@ void func_8004ACF8(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
     }
 }
 
-void func_8004ADC4(Class866E8 *self, s32 arg1, s32 arg2)
+void Class866E8__SetCallback(Class866E8 *self, s32 arg1, s32 arg2)
 {
     self->unk60 = arg1;
     self->unk64 = arg2;
 }
 
-void func_8004ADD0(Class866E8 *self, s32 arg1)
+void Class866E8__SetAcceptedTags(Class866E8 *self, s32 arg1)
 {
     self->unkE8 = arg1;
 }
 
-void func_8004ADD8(Class866E8 *self, void *list, s32 count)
+void Class866E8__ForwardAcceptedCommand(Class866E8 *self, void *list, s32 count)
 {
     s32 *p;
     u8 unused[24];
@@ -350,11 +350,11 @@ void func_8004ADD8(Class866E8 *self, void *list, s32 count)
     } while (*p != 0);
 }
 
-extern void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2);
-extern void func_8004B030(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2);
-extern void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
+extern void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2);
+extern void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2);
+extern void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
 
-void func_8004AEA4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
+void Class866E8__ApplyToSenderFootprint(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
 {
     s32 gateArg;
     HistoryBlock_3ac78 saved;
@@ -375,12 +375,12 @@ void func_8004AEA4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
     saved = self->unk8C;
 
     if (self->unk68->unk4 == 0) {
-        func_8004AFE0(self, &buf, 3);
+        Class866E8__SetFootprintFromCell(self, &buf, 3);
     } else {
-        func_8004B030(self, &buf, 3);
+        Class866E8__SetFootprintRect(self, &buf, 3);
     }
 
-    func_8004B100(self, arg1, arg2);
+    Class866E8__DispatchToRectCells(self, arg1, arg2);
 
     self->unk88 = savedUnk88;
     self->unk8C = saved;
@@ -388,7 +388,7 @@ void func_8004AEA4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
 
 extern void func_8004C93C(Class866E8 *self);
 
-void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
+void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
 {
     s16 t;
 
@@ -400,15 +400,15 @@ void func_8004AFE0(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2)
     func_8004C93C(self);
 }
 
-/* STALL -- see docs/match-reports/func_8004B030.md. Best reached: 22/52
+/* STALL -- see docs/match-reports/Class866E8__SetFootprintRect.md. Best reached: 22/52
  * words in-range, correct size, no address drift (round 47, echo --
  * up from 19/52, via a permuter-found lead translated and oracle-
  * verified). Restored to INCLUDE_ASM per project rule. Field names below
  * use the CURRENT HistoryEntry_3ac78 layout (round 19, echo -- was
  * unk90/92/94/96 in the report's own preserved body, before
- * func_8004B100's field-shape correction). */
+ * Class866E8__DispatchToRectCells's field-shape correction). */
 #if 0
-void func_8004B030(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
+void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
 {
     s8 b2;
     s8 b3;
@@ -452,17 +452,17 @@ void func_8004B030(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B030);
+INCLUDE_ASM("asm/nonmatchings/class_3ac78", Class866E8__SetFootprintRect);
 
-extern void func_8004B2D4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
+extern void NotifyGridCell(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2);
 
 /* STALL, round 2026-09-02 (runner delta); re-verified round 19 (echo):
- * best reached 95/117, see docs/match-reports/func_8004B100.md for the
+ * best reached 95/117, see docs/match-reports/Class866E8__DispatchToRectCells.md for the
  * preserved near-miss body and the residue analysis (a single
  * instruction-scheduling swap at the inner loop's tail -- correct
  * branch/register shape everywhere else). */
 #if 0
-void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
+void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
 {
     s32 i;
     s32 row;
@@ -482,9 +482,9 @@ void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
                     self->unk1C0 = self->unkBC;
                     self->unk1C2 = entry->col + col;
                     self->unk1C3 = entry->row + row;
-                    func_8004B2D4(*cell, arg1, arg2);
+                    NotifyGridCell(*cell, arg1, arg2);
                     for (obj = (*cell)->unk38; obj != NULL; obj = obj->unk38) {
-                        func_8004B2D4(obj, arg1, arg2);
+                        NotifyGridCell(obj, arg1, arg2);
                     }
                 }
                 cell += 20 - entry->width;
@@ -494,10 +494,10 @@ void func_8004B100(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B100);
+INCLUDE_ASM("asm/nonmatchings/class_3ac78", Class866E8__DispatchToRectCells);
 
-/* Widened this round (func_8004B100) from a single-param signature to
- * accept two more, unused, forwarded params: func_8004B100's own call
+/* Widened this round (Class866E8__DispatchToRectCells) from a single-param signature to
+ * accept two more, unused, forwarded params: Class866E8__DispatchToRectCells's own call
  * sites explicitly set up $a1/$a2 before every call here (unlike
  * GetClass6B5CCMethods's "leftover, already-there" args -- these are real,
  * explicit `move` instructions), so the call itself needs a matching
@@ -506,14 +506,14 @@ INCLUDE_ASM("asm/nonmatchings/class_3ac78", func_8004B100);
  * reserve stack space for unused trailing integer/pointer args on this
  * target, so the definition's own bytes are unaffected (reverified
  * 18/18 after the widening). */
-void func_8004B2D4(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
+void NotifyGridCell(Class866E8 *self, UnkListObj_3ac78 *arg1, s32 arg2)
 {
     if (self != NULL && (self->flags36 & 0x80)) {
         self->methods->slot38(self);
     }
 }
 
-void *func_8004B31C(Class866E8 *self)
+void *Class866E8__GetCurrentCellKey(Class866E8 *self)
 {
     return &self->unk1C0;
 }
@@ -521,14 +521,14 @@ void *func_8004B31C(Class866E8 *self)
 void func_8004B324(void) {
 }
 
-void func_8004B32C(Class866E8 *self, s32 arg1)
+void Class866E8__SetGridSpan(Class866E8 *self, s32 arg1)
 {
     self->unk74 = arg1;
     self->unk7A = (s16)(arg1 >> 11);
     self->unk78 = (s16)(arg1 >> 12);
 }
 
-void func_8004B344(Class866E8 *self, UnkPtr68Obj_3ac78 *arg1)
+void Class866E8__SetConfig(Class866E8 *self, UnkPtr68Obj_3ac78 *arg1)
 {
     self->methods->slot40(self);
     self->unk68 = arg1;

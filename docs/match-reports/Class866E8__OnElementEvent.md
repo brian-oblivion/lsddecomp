@@ -1,11 +1,13 @@
-# func_8004AA6C — MATCH
+# Class866E8__OnElementEvent — MATCH
+
+> Renamed from `func_8004AA6C` on 2026-09-22 (tools/rename.py). Address 0x8004aa6c.
 
 **Unit:** class_3ac78 · **Size:** 46 instructions · **Result:** 46/46 words
 
 ## What it does
 
 `Class866E8Methods` slot `+0x088`. Calls the same external, not-decompiled
-table lookup as `func_8004A984` (`GetClass6B5CCMethods(self, arg1)`), but through
+table lookup as `Class866E8__OnNotify` (`GetClass6B5CCMethods(self, arg1)`), but through
 that table's slot `+0x088` with only `(self, arg1)` (a genuinely 2-arg
 call — `$a2` is left live/unset). Then:
 
@@ -21,7 +23,7 @@ call — `$a2` is left live/unset). Then:
 ## Final source
 
 ```c
-void func_8004AA6C(Class866E8 *self, s32 arg1, UnkListObj_3ac78 *arg2)
+void Class866E8__OnElementEvent(Class866E8 *self, s32 arg1, UnkListObj_3ac78 *arg2)
 {
     void (*fn)(Class866E8 *self, s32 arg1);
 

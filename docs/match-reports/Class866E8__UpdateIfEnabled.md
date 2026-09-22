@@ -1,4 +1,6 @@
-# func_8004AB24 — MATCH
+# Class866E8__UpdateIfEnabled — MATCH
+
+> Renamed from `func_8004AB24` on 2026-09-22 (tools/rename.py). Address 0x8004ab24.
 
 **Unit:** class_3ac78 · **Size:** 25 instructions · **Result:** 25/25 words
 
@@ -15,7 +17,7 @@ existence/signature (self-only) was needed here.
 ## Final source
 
 ```c
-void func_8004AB24(Class866E8 *self)
+void Class866E8__UpdateIfEnabled(Class866E8 *self)
 {
     if (self->unk70) {
         self->methods->slotF4(self);
