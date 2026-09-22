@@ -159,11 +159,11 @@ extern s32 func_80035E80(s16 channel, s16 slot);
  * characterised since it has not been matched. */
 extern void func_8003424C(s16 channel, s16 slot);
 
-/* STALL -- see docs/match-reports/func_80034138.md. length exact 69/69,
- * 66/69 raw word-match, first real diff at word 22: two pure scheduling
- * residues (a load-pair order swap and one delay-slot filler choice),
- * not a logic or CFG difference. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 66/69 words, length exact. Residue: two pure scheduling
+ * residues in the prologue (a load-pair order swap and one delay-slot
+ * filler choice), not a logic or CFG difference
+ * (docs/match-reports/func_80034138.md). Hand-derived. */
 void func_80034138(s16 a0, s16 a1, s16 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -212,8 +212,9 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
         }
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034138);
+#endif
 
 /* Forward declarations for sibling functions defined later in THIS unit,
  * needed because func_8003424C dispatches to them by MIDI-style status
@@ -239,13 +240,14 @@ extern void func_80035B2C(s16 a0, s16 a1, u8 a2);
  * dispatch, one fewer byte consumed since this byte already stood in for
  * the first data byte.
  *
- * STALL -- see docs/match-reports/func_8003424C.md. length exact 172/172,
- * 122/172 raw word-match, first real diff at word 2: a pure register-identity
- * swap (retail's widened "channel" lives in $s4 and its per-case data byte in
- * $s3; this C's compiles the same roles into $s3/$s4 the other way around).
- * CLAUDE.md's register-identity STALL rule -- reshaping tried and did not
- * move it (see report for the full list of variants). */
-#if 0
+ */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 122/172 words, length exact. Residue: a pure
+ * register-identity swap (retail's widened "channel" lives in $s4 and its
+ * per-case data byte in $s3; this C compiles the same roles into $s3/$s4
+ * the other way around), CLAUDE.md's register-identity STALL rule --
+ * reshaping tried and did not move it (docs/match-reports/func_8003424C.md).
+ * Hand-derived. */
 void func_8003424C(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -324,17 +326,19 @@ void func_8003424C(s16 a0, s16 a1)
         }
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
+#endif
 
-/* STALL -- see docs/match-reports/func_800344FC.md. length exact 70/70,
- * 62/70 raw word-match (round 47, runner echo -- up from 61/70 via a
- * permuter-found `do { return; } while (0)` rewrite of the early return),
- * first real diff at word 1: a register-identity rename ($t0<->$a2 for
- * the a0 copy kept live across the two calls, $a3/$s1<->$t0 for the
- * masked-a3 copy), not a logic or CFG difference -- CLAUDE.md's
- * register-identity STALL rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 62/70 words, length exact. Residue: register-identity
+ * rename ($t0<->$a2 for the a0 copy kept live across the two calls,
+ * $a3/$s1<->$t0 for the masked-a3 copy), not a logic or CFG difference
+ * (docs/match-reports/func_800344FC.md). Permuter candidate, semantics
+ * reviewed round 66: the winning mutation is a bare `return;` rewritten
+ * as `do { return; } while (0);`, which executes its single iteration
+ * unconditionally and returns on it either way -- behaviorally identical
+ * to the statement it replaces, no UB, no dead branch. */
 void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -362,8 +366,9 @@ void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
         StopNote(packed, note, vol, (u8)a3);
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800344FC);
+#endif
 
 void func_80034614(s16 a0, s16 a1, u8 a2)
 {
@@ -414,21 +419,16 @@ extern void func_80034D90(s16 a0, s16 a1);
  * through into the shared tail that re-arms the next scheduling delta via
  * func_80035E80; those seven `return` immediately instead.
  *
- * STALL -- see docs/match-reports/func_80034690.md. 5 words SHORT (195/200,
- * compiled length measured directly off build/src/code_179d8_k.c.o, not
- * from funcdiff which cannot read a meaningful word-match number once
- * length drifts). Every other case body's word count matches retail's
- * exactly (verified case by case); the two measured causes are (1) this
- * build allocates one FEWER callee-saved register overall (6 vs retail's
- * 7 -- "val" never gets its own persistent $s6), costing 2 words in the
- * prologue/epilogue, and (2) case 11 (CC 11, Expression) reaches the
- * shared combine-tail by JUMPING INTO retail's default-path widening
- * (saving 3 words) instead of duplicating its own full widening and
- * jumping straight to the call the way retail -- and this file's own
- * cases 7 and 10, which DO match exactly -- do. Register-identity /
- * tail-merge-choice residue, not a logic difference; see report for the
- * reshapes tried. */
-#if 0
+ */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 195/200 words, length 5 SHORT. Residue: register-identity /
+ * tail-merge-choice (this build allocates one fewer callee-saved register
+ * overall -- "val" never gets its own persistent $s6, costing 2 words --
+ * and case 11 reaches the shared combine-tail by jumping into retail's
+ * default-path widening, saving 3 words, instead of duplicating its own
+ * full widening the way retail and this file's own cases 7/10 do); not a
+ * logic difference, reshaping tried and did not move it
+ * (docs/match-reports/func_80034690.md). Hand-derived. */
 void func_80034690(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -507,8 +507,9 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034690);
+#endif
 
 /* A stack-local buffer this function passes to three cross-unit callees:
  * `SsUtGetProgAtr(ch, byte, out)` (established elsewhere as
@@ -1205,7 +1206,16 @@ extern u32 D_8009024C;
  * the division's remainder). unk6E doubles as a mode flag: -1 means
  * "unk70 holds the reciprocal-regime value", any other value means
  * "unk70 holds the same value unk6E does". */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 211/213 words, length 2 SHORT. Residue: register-identity
+ * re-read of rec->unk4A (retail's second divu re-reads it fresh via a
+ * plain `lh`; this body keeps the first read's value live in a register)
+ * (docs/match-reports/func_80035B2C.md). Hand-derived -- reaches 211/213
+ * via a narrowed `volatile` qualifier on the word-sized field only
+ * (round 26 head ruling, ordinary C semantics defeating div/mod fusion,
+ * not a banned register pin); round 35's permuter search (15862+
+ * iterations) found no zero and never beat the base score, residue
+ * marked permuter-exhausted. */
 void func_80035B2C(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -1287,8 +1297,9 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
         rec->unk88 = rec->unk70;
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035B2C);
+#endif
 
 /* MATCHED -- see docs/match-reports/func_80035E80.md. The `goto combine`
  * is load-bearing: retail keeps the "single-byte" and "loop-exit" `val`
