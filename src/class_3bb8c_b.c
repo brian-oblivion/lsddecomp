@@ -101,7 +101,7 @@ void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     desc = D_8008E98C;
     desc.unk14 = 0;
     desc.unk18 = 0;
-    desc.unk1C = self->unk74;
+    desc.unk1C = self->gridSpan;
     RotMatrix((u8 *)sub + 0x10, &desc);
     ApplyMatrixLV(&desc, &desc.unk14, &desc.unk14);
 
@@ -125,9 +125,9 @@ block1:
     }
     self->unk7C = (s16)v;
     if (desc.unk1C > 0) {
-        v = point1 - (u16)self->unk78 - 1;
+        v = point1 - (u16)self->gridHalfCells - 1;
     } else {
-        v = point1 - (u16)self->unk78 + 1;
+        v = point1 - (u16)self->gridHalfCells + 1;
     }
     self->unk7E = (s16)v;
     flag = 0;
@@ -147,9 +147,9 @@ block2:
     self->unk80 = arg1;
     self->unk84 = arg2;
     if (desc.unk14 > 0) {
-        v = point0 - (u16)self->unk78 - 1;
+        v = point0 - (u16)self->gridHalfCells - 1;
     } else {
-        v = point0 - (u16)self->unk78 + 1;
+        v = point0 - (u16)self->gridHalfCells + 1;
     }
     self->unk7C = (s16)v;
     if (desc.unk1C > 0) {
@@ -161,7 +161,7 @@ block2:
     flag = 1;
 
 shared:
-    v = self->unk78;
+    v = self->gridHalfCells;
     s3 >>= 11;
     if (s3 >= v) {
         s3 = v - 1;
