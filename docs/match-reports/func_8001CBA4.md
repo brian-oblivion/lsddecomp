@@ -40,7 +40,7 @@ Same precedent as `GetClass6B5CCMethods`, documented in `include/class_3bb8c.h`.
 ## Provenance
 
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
-Matched on the first build once `func_8001CAF4`'s size-drift bug (see its
+Matched on the first build once `Class6B5CC__Class6B5CC`'s size-drift bug (see its
 own report) was fixed — this function's own diff was already 41/41 before
 that point; the WARNING about out-of-range bytes was entirely
-`func_8001CAF4`'s doing.
+`Class6B5CC__Class6B5CC`'s doing.

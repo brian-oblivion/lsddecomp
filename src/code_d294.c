@@ -15,7 +15,7 @@ Class6B5CCObj *New_Class6B5CC(void) {
     return NULL;
 }
 
-void *func_8001CAF4(Class6B5CCObj *self) {
+void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     void *blockB;
 
     self->unk14 = func_80017B34(0x50);

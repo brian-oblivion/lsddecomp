@@ -41,8 +41,8 @@ Same shape as `src/Entity.c`'s `New_Entity`.
 (D_8006B5CC); jr $ra`, MEASURED from its own disassembly in
 `asm/code_d294_b.s`, the next uncarved slice). Its whole-file `->ctor`
 call here checked the return with `bnez`, and that observation, combined
-with reading `func_8001CAF4` (this class's ctor, `docs/match-
-reports/func_8001CAF4.md`) confirmed `func_8001CAF4` really does return
+with reading `Class6B5CC__Class6B5CC` (this class's ctor, `docs/match-
+reports/Class6B5CC__Class6B5CC.md`) confirmed `Class6B5CC__Class6B5CC` really does return
 `self` on success and `NULL` on failure — the two reports cross-check
 each other.
 

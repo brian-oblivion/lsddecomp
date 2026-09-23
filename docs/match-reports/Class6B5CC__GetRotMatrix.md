@@ -14,7 +14,7 @@ void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2);
 ## What it does
 
 `self->unk14->unk44` is a 0x28-byte heap block (allocated by the ctor,
-`func_8001CAF4`). Its own offset +0x10 holds a 4-`s16` quad (x, y, z, and an
+`Class6B5CC__Class6B5CC`). Its own offset +0x10 holds a 4-`s16` quad (x, y, z, and an
 unused 4th short) — call it `S16Quad_d294`. `a2` selects one of two ways to
 build a local copy of that quad:
 

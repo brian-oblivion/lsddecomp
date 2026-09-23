@@ -45,7 +45,7 @@ Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 
 
 **1. Cache a re-read field ONLY across the span with no intervening call;
 reload after each call.** First attempt used `self->unk14->unk44 = ...`
-etc. directly (no local), by analogy with `func_8001CAF4`'s round-1
+etc. directly (no local), by analogy with `Class6B5CC__Class6B5CC`'s round-1
 lesson ("don't cache a re-read field across a call, re-derive it fresh
 each time"). That produced THREE separate reloads of `self->unk14`
 (retail has three too, but only where a call actually intervenes) and, in
@@ -54,8 +54,8 @@ caching `self->unk14` into a local `sub` and REUSING it across the
 `unk18`/`unk1C`/`unk20` triple (no call between those three stores), while
 still reloading `sub = self->unk14` fresh right after the ONE call that
 does intervene (`obj->methods->slot10`). **This is not a contradiction of
-`func_8001CAF4`'s lesson -- it's the same rule read in both directions:**
-cache within a call-free span, reload after a call. `func_8001CAF4`'s
+`Class6B5CC__Class6B5CC`'s lesson -- it's the same rule read in both directions:**
+cache within a call-free span, reload after a call. `Class6B5CC__Class6B5CC`'s
 residue happened to need re-deriving because a call sat between the two
 uses; this one needed caching because no call did. Read the disassembly's
 own reload points as the ground truth for where the SOURCE re-mentions

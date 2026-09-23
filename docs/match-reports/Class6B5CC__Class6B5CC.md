@@ -1,11 +1,13 @@
-# func_8001CAF4
+# Class6B5CC__Class6B5CC
+
+> Renamed from `func_8001CAF4` on 2026-09-23 (tools/rename.py). Address 0x8001caf4.
 
 **Unit:** code_d294 · **Size:** 44 words · **Status:** MATCHED (44/44 words)
 
 ## What it does
 
 `Class6B5CC`'s own constructor — vtable slot `+0x008` of `D_8006B5CC`
-(confirmed directly: `tools/classtable.py D_8006B5CC` names `func_8001CAF4`
+(confirmed directly: `tools/classtable.py D_8006B5CC` names `Class6B5CC__Class6B5CC`
 as the occupant of that slot). Takes an already-allocated `self` (the
 allocation itself is `New_Class6B5CC`, a separate `New_X` wrapper, not this
 function). Allocates two sub-blocks (`self->unk14`, 0x50 bytes, then
@@ -20,7 +22,7 @@ freshly-added fields, and finally calls its own virtual init hook
 ## The C
 
 ```c
-void *func_8001CAF4(Class6B5CCObj *self) {
+void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     void *blockB;
 
     self->unk14 = func_80017B34(0x50);

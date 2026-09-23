@@ -6,7 +6,7 @@
 /* code_d294: a FRESH CARVE (round 10), the first 20-function slice of a
  * 55-function segment never carved before. `tools/classtable.py D_8006B5CC`
  * shows this unit's own method table starts at D_8006B5CC and its slots,
- * in order, ARE this unit's functions: +0x008 func_8001CAF4 (ctor),
+ * in order, ARE this unit's functions: +0x008 Class6B5CC__Class6B5CC (ctor),
  * +0x00C func_8001CBA4 (dtor), +0x010 func_8001CC48, +0x014 func_8001CCB4,
  * +0x018 func_8001CD20, [+0x01C..+0x038 seven slots inherited verbatim from
  * BasicClass, D_8006B58C], +0x038 func_8001CD60 (override), +0x03C null,
@@ -120,7 +120,7 @@ struct Class6B5CCBlock44 {
 };
 
 /* self->unk14's target: a 0x50-byte block allocated by the ctor
- * (func_8001CAF4). Round 2 (func_8001D0EC, func_8001CE30, func_8001D1A4)
+ * (Class6B5CC__Class6B5CC). Round 2 (func_8001D0EC, func_8001CE30, func_8001D1A4)
  * filled in most of the rest of this layout:
  *   +0x000  a flag/state word: 1 after func_8001CE30 (the ctor's own init
  *           hook) runs, 0 again after func_8001D0EC's "attach" and after
@@ -419,7 +419,7 @@ struct GenericCountList_d294 {
 struct Class6B5CCMethods {
     s32 header;                              /* +0x000 */
     void *unk04;                              /* +0x004, BasicClass__func_17eb0, inherited, unused here */
-    void *(*ctor)(void *self);                /* +0x008, func_8001CAF4 (this unit) */
+    void *(*ctor)(void *self);                /* +0x008, Class6B5CC__Class6B5CC (this unit) */
     void  (*dtor)(void *self);                /* +0x00C, func_8001CBA4 (this unit) */
     u8 pad010[0x030 - 0x010];
     /* +0x030, BasicClass__NotifyParents, inherited verbatim (per the file
@@ -723,7 +723,7 @@ extern void ApplyMatrixLV(); /* arity-ok: deliberately unprototyped (round 19, s
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 
 extern Class6B5CCObj *New_Class6B5CC(void);
-void *func_8001CAF4(Class6B5CCObj *self);
+void *Class6B5CC__Class6B5CC(Class6B5CCObj *self);
 void func_8001CBA4(Class6B5CCObj *self);
 void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other);
 void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other);
