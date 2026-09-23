@@ -240,6 +240,16 @@
           "note": "REVISIT runner (bravo) on code_179d8_k: func_80034690 MATCHED 200/200 (baseline 195/200 5 short, ins/del 12/12): the round-68 return-type lever did NOT apply (chains type-uniform); the cause was a local prototype narrowing func_80030980's first parameter to s16 while the callee reads a full word, plus a per-case u16 copy. func_80034138 MATCHED 69/69 (baseline 66/69, 1/1): a delay-slot move $a2,$v0 every prior round called dead is read by a later store, so the source stored rec->unk70 not the unused a2 param. func_800351D0 STALL improved 44/376 -> 95/376, 4 long, frame exact, after repairing its stale func_800357B0 call; promoted to NON_MATCHING. No searches spent. Two levers promoted to 3f.",
           "round": 69,
           "runners": 1
+        },
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-23",
+          "matches": 2,
+          "model": "opus",
+          "note": "REVISIT runners bravo (code_179d8_f) and delta (code_179d8_b), 2 attempts, 2 MATCHES. func_80036528 MATCHED 240/240 (rebuilt-as-given 227/240 13 short, ins/del 34/34; three flags since round 25 did not move its length): s16 parameters (not s32 + casts) produce retail's a0->a3->s5 hop, u16 x/y on the func_80030404 extern, s16 unk40 in the unit's local view, control-flow and a permuter-found no-local unk42 read (1326 iterations, Gate 3 AGREE 0/0). func_80029478 MATCHED 337/337 (rebuilt-as-given 159/337 2 LONG, ins/del 71/71, against a round-21 title of 'size exact, register identity'): two inverted-logic defects, a do-while(0) copy macro rewritten as a static inline function (register swap at 10 sites gone), a volatile byte read for a missing andi 0xff. func_80029478 is libcd bios.c getintr by strings (1995-12 build, on no disc).",
+          "round": 70,
+          "runners": 2
         }
       ],
       "status": "open"
@@ -325,6 +335,16 @@
           "model": "sonnet",
           "note": "charlie promoted all 4 preserved bodies in code_d294_b (Class6B5CC__NotifyTaggedParents, __TryAttachNearby, __ClassifyAgainstPlanes, __CheckBoundsOverlap); echo promoted all 3 in code_179d8_l (func_8002DDBC, func_8002CF18, func_8002D1B4). Head corrected two comments at merge: func_8002D1B4's body carries one reviewed permuter hoist (it said Hand-derived only), and func_8002DDBC's order-only barrier was dropped from the reader body. check-nonmatching 34 -> 40 bodies net of bravo's two matches out of NON_MATCHING.",
           "round": 69,
+          "runners": 2
+        },
+        {
+          "attempts": 5,
+          "calibration": true,
+          "date": "2026-09-23",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "charlie promoted func_80030E90, func_8003149C, func_80030980 (code_179d8_j_b) with a head-requested re-measure: under --nop-at-expansion func_80030E90 is LENGTH-EXACT 252/252 (65/252, ins/del 11/11; was 11 short) and func_8003149C 5 short (was 16); both titles blamed the round-63-resolved load-delay nop and were never rebuilt. func_80030980 unchanged 315/324. echo promoted CalcDreamColor and DreamSys__StepLookYaw (figures unchanged since round 49). Head trimmed comments to score/residue/report and rewrote the two stale titles at merge.",
+          "round": 70,
           "runners": 2
         }
       ],
@@ -498,6 +518,16 @@
           "note": "alpha on class_3bb8c_m: 19 of 20 defs named, self->unk3C confirmed DreamSys* by classtable (six slots to real DreamSys methods), review PASSED, unit marked. delta on code_179d8_c_b: 12 functions + 12 globals named, review FAILED and unit NOT marked: ClearSpuMute was named from a stale round-16 description of its callee, which is Sony's SpuQuit (head renamed it QuitSpu); SetIrqMask/ClearIrqMask are Sony's StartRCnt/StopRCnt (libapi/counter by module order + KERNEL.H; head renamed). The unit's SeqTimer* cluster looks like libsnd ssstart/sstick from a build the discs lack -- escalated. Naming runner back to Opus per the model table.",
           "round": 69,
           "runners": 2
+        },
+        {
+          "attempts": 21,
+          "calibration": true,
+          "date": "2026-09-23",
+          "matches": 0,
+          "model": "opus",
+          "note": "alpha (opus) on class_3bb8c_s: 10 functions (4 tier A, 6 tier B) and 11 globals named, local-view fields/slots, header comment; head applied Obj876FC tick/kind/params and Class6B5CCMethods updateRotation/updateScale by type scope. Review PASSED (5 sampled: AddVec3, AttachWithRotScale, ReleaseByKind, ReleaseModelChildren A from body alone; SpawnSprites B on GsSPRITE offsets). First clean Opus unit since the round-69 send-back; naming runner stays opus. Class876FC (here) vs Obj876FC (class_3bb8c_r) is one class under two placeholder names, left for r's pass / track 4.",
+          "round": 70,
+          "runners": 1
         }
       ],
       "status": "open",
@@ -510,6 +540,7 @@
         "class_3bb8c_m": "2026-09-23",
         "class_3bb8c_o": "2026-09-18",
         "class_3bb8c_p": "2026-09-19",
+        "class_3bb8c_s": "2026-09-23",
         "code_171e0": "2026-09-18",
         "code_179d8_e": "2026-09-18",
         "code_179d8_h": "2026-09-21",

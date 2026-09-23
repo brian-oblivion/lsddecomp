@@ -83,13 +83,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   failure in a function that never touched the declaration. `sizeof` is not how this game allocates
   (`New_X` passes a literal byte count), so trailing fields are safe, `DreamSys` excepted. A rodata
   slot holding JUMP TABLES must stay attached to its unit. (a §"Confirmed on this game")
-- **To learn a shape from a MATCHED sibling, diff its compiled OBJECT against your target's retail
-  `.s` -- never its C against your C.** The object comparison shows what the compiler DID, which is
-  the thing that has to agree. Round 62 closed `func_80031890` (73/73, ins 0/del 0) this way after
-  four rounds of comparing C to C had missed that the matched sibling caches nothing. Use it
-  whenever a sibling of the same family is already byte-exact, and read the object, not the source.
-  (a round 62)
-
 ## 3. Source-shape idioms
 
 ### 3a. Control flow and block order
@@ -142,14 +135,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **Two levers that each MEASURE AS A REGRESSION alone can be byte-exact together.**
   `func_8004CFB8`: halves scored 17/28 and 10/28 singly, 28/28 jointly. Try the product before
   discarding either reading. (a round 58, bravo)
-- **2.6.3's `jump_optimize` cross-jumps AFTER register allocation, so identical allocations collapse
-  two identical blocks into one and different colours keep them apart.** Two tells, same mechanism:
-  a body SHORTER than retail by about one repeated block has been tail-merged where retail's CSE
-  made the copies differ (fix at ONE merge input; backwards costs 184 -> 203 words), and being N
-  words SHORT where retail has a bare `j` into a shared tail you reach by falling through is a
-  COLOUR difference, fixed upstream of the colours. Against the fallthrough rule above: there retail
-  jumps and yours falls through; here both sides jump correctly and only duplication differs. (a
-  round 58, a round 61)
 - **A one-instruction `else` arm leaves NO BLOCK**: reorg steals it into the branch's own delay slot
   and the branch targets the outer join, so "retail assigns this in a delay slot, mine assigns it
   plainly" is evidence about if/else shape, not about the scheduler. Tell: a conditional branch
@@ -247,14 +232,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `sll 16`/`sra 16` with the scale), while the `(u16)` spelling above is a mask and stays
   `andi`+`sll 3`. Round 31 spent three attempts on the unsigned spelling alone.
   (a §"The \"split scaled index\"", round 66 bravo)
-- **`(cond ? p : NULL)[i]` and `((T *)(cond ? p : NULL))->field` are NOT the same construct.** An
-  index on a conditional is a tree `PLUS_EXPR` that `fold()` distributes into BOTH arms, combining
-  the offset with the true arm's `addiu` and turning a NULL false arm into the literal `i *
-  sizeof(T)`; a field reference is a `COMPONENT_REF` applied at expand time as the MEM displacement,
-  leaving the arms as written. Discriminator: retail shows a CONSTANT base `addiu` plus a
-  per-element displacement on the far side of a ternary. (a docs/match-reports/func_8001E7BC.md,
-  round 57)
-
 ### 3d. Locals, naming and register identity
 
 - **A named C variable gets ONE storage location for its whole scope, so any new name is a new
@@ -341,6 +318,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `func_8002CF18`. The delete direction needs a CALL-crossing live range, so it does not apply to
   leaves. (a round 65)
 
+- **A register swap that REPEATS at every expansion of a `do { } while (0)` macro closes as a
+  `static __inline__` function.** The inline's parameters get their own pseudos at each call, so
+  the allocation order differs from textual expansion. `func_80029478`'s 8-byte copy, 10 sites
+  with dst/counter swapped, went 253 -> 333/337, ins/del 0/0, on this alone. Discriminator: the
+  SAME swap at every copy of one repeated block. (round 70, delta)
+
 ### 3e. Frames and stack
 
 - **An unused stack frame is reserved by an unused local ARRAY, never a scalar.** `s32 unused[2]`
@@ -416,6 +399,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   fewer callee-saved register. Discriminator: the callee masks the parameter wider than its declared
   type (`0xFF00` on an `s16`). `func_80034690` went 195 -> 190 -> 200/200 on `s16`->`s32`; pair it
   with the return-type listing. (round 69)
+- **The DEFINITION's own parameters narrow too: a parameter that hops `$a0` -> `$a3` -> `$s5`
+  with every use re-sign-extending it is an `s16` parameter, not an allocation residue.** Declaring
+  `(s16 a0, s16 a1)` instead of `(s32, s32)` plus casts reproduced retail's hop in `func_80036528`,
+  then a `u16` callee prototype (the callee reads it with `lhu`) and an `s16` field took a 13-short
+  round-25 stall to 240/240. (round 70, bravo)
 - **A wrong extern arity and the deliberate dead-argument idiom are told apart at the CALL SITE,
   never in the callee** — the callee says "ignores `$a1`" either way. Does retail emit an
   instruction for the extra argument (`move a1,zero`, `li a0,0xff`)? Then the declaration is
@@ -505,6 +493,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   memory-mapped I/O, not whether `volatile` helps**: a documented `I_STAT`/`I_MASK` pair (two
   closes) versus DECLINED on an ordinary global that measured no change — only two units touch
   hardware addresses. (a §"`volatile` is a legitimate, and much NARROWER, tool", §"Round 16")
+- **A missing `andi 0xff` right after an `lbu` whose byte goes to a global and is then masked:
+  read it as `*(volatile u8 *)&x`.** A QImode volatile read keeps the zero-extend as its own
+  instruction; `u8` temporaries in four positions, direct masking and a whole-array `volatile` all
+  missed. Single instance (`func_80029478`, libcd `getintr`), and the MMIO discriminator above is
+  only half met: `resp[]` is a LOCAL buffer filled from the CD response FIFO, and the same body's
+  `volatile u8 cause` compiles alike. (round 70, delta)
 - **NARROW a `volatile` to the exact access that needs it** — qualifying only the WORD-sized field
   un-fused a div/mod pair while preserving retail's `lh` (193/213 -> 211/213). When a qualifier
   lever "works but with a side effect", check whether the side effect is intrinsic to the LEVER or
@@ -600,15 +594,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   length-defective function `insertions/deletions` is the signal and the word count misleads** — a
   correct fix ran 27/27 -> 11/11 -> 7/7 -> 0/0 while the word score went 61 -> 56 -> 91 -> 213. (a
   round 59)
-- **An unexplained RELOAD is evidence of a BLKmode assignment upstream, not of register pressure.**
-  gcc 2.6.3's `cse.c` answers a BLKmode (struct or array) `set` with `invalidate_memory()`, so a
-  whole-struct assignment is a CSE memory barrier and a field-by-field one is transparent.
-  Discriminator, one build: retail re-reads a global it already read, or a stack slot it just wrote,
-  with NO call in between; write the adjacent-globals copy as `pos = *(PairXY *) &D_8008AB68;`. Took
-  `func_80054850` from 6 words short to 1 and closed its sibling `func_800549A8` 93/93 first
-  attempt. **A lever found on one function is worth one build on every recorded sibling first.** (a
-  round 61)
-
 - **On a register-identity residue, vary the NUMBER OF LOCALS before anything else.** Closed
   `func_8004BA40` 63/63 (four locals merged into two) and `func_8004B700` 140/140 (deleted `Elem
   *e2;` so the second loop reuses the first loop's pointer), both after step (a) CONFIRMED the

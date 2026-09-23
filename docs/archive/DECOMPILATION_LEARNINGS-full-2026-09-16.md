@@ -8982,3 +8982,42 @@ lever the sheet still carries.
   `__asm__("")` kept the image green (it was a crutch for a shape that no longer exists); removing
   `func_8004BA40`'s `do {} while (0);` DRIFTED the image. Neither outcome is predictable from
   reading it. (a round 63)
+
+## Distilled round 70 (2026-09-23)
+
+Moved out of DECOMPILATION_LEARNINGS.md §2/§3 to meet its word budget. Each is
+still correct; each was single-instance, narrative-heavy, or a technique
+already covered elsewhere in the sheet.
+
+- **To learn a shape from a MATCHED sibling, diff its compiled OBJECT against your target's retail
+  `.s` -- never its C against your C.** The object comparison shows what the compiler DID, which is
+  the thing that has to agree. Round 62 closed `func_80031890` (73/73, ins 0/del 0) this way after
+  four rounds of comparing C to C had missed that the matched sibling caches nothing. Use it
+  whenever a sibling of the same family is already byte-exact, and read the object, not the source.
+  (a round 62)
+
+- **2.6.3's `jump_optimize` cross-jumps AFTER register allocation, so identical allocations collapse
+  two identical blocks into one and different colours keep them apart.** Two tells, same mechanism:
+  a body SHORTER than retail by about one repeated block has been tail-merged where retail's CSE
+  made the copies differ (fix at ONE merge input; backwards costs 184 -> 203 words), and being N
+  words SHORT where retail has a bare `j` into a shared tail you reach by falling through is a
+  COLOUR difference, fixed upstream of the colours. Against the fallthrough rule above: there retail
+  jumps and yours falls through; here both sides jump correctly and only duplication differs. (a
+  round 58, a round 61)
+
+- **`(cond ? p : NULL)[i]` and `((T *)(cond ? p : NULL))->field` are NOT the same construct.** An
+  index on a conditional is a tree `PLUS_EXPR` that `fold()` distributes into BOTH arms, combining
+  the offset with the true arm's `addiu` and turning a NULL false arm into the literal `i *
+  sizeof(T)`; a field reference is a `COMPONENT_REF` applied at expand time as the MEM displacement,
+  leaving the arms as written. Discriminator: retail shows a CONSTANT base `addiu` plus a
+  per-element displacement on the far side of a ternary. (a docs/match-reports/func_8001E7BC.md,
+  round 57)
+
+- **An unexplained RELOAD is evidence of a BLKmode assignment upstream, not of register pressure.**
+  gcc 2.6.3's `cse.c` answers a BLKmode (struct or array) `set` with `invalidate_memory()`, so a
+  whole-struct assignment is a CSE memory barrier and a field-by-field one is transparent.
+  Discriminator, one build: retail re-reads a global it already read, or a stack slot it just wrote,
+  with NO call in between; write the adjacent-globals copy as `pos = *(PairXY *) &D_8008AB68;`. Took
+  `func_80054850` from 6 words short to 1 and closed its sibling `func_800549A8` 93/93 first
+  attempt. **A lever found on one function is worth one build on every recorded sibling first.** (a
+  round 61)
