@@ -317,14 +317,17 @@ extern s32 strlen(void *arg0);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 extern char *strcpy(char *dest, char *src);
 
-/* STALLED at 6/107 words -- see docs/match-reports/func_80051AC8.md for the
- * full round-19 analysis (round 9's 9-10/107 register-identity diagnosis
- * still holds; this round fixed a genuine independent bug -- a sign/
- * unsigned-promotion mistake in the halving idiom that made a `sra` come
- * out as `srl` -- and matched two more of retail's scheduling choices, but
- * the core register rotation is unmoved). Preserved here per project
- * convention rather than only in the report. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 6/107 words (length exact, 107/107 -- objdump confirms).
+ * Residue: register identity, not instruction count -- retail keeps arg1
+ * live in one register for the whole function and uses a separate cursor
+ * register for both the counting and filling loops, while this body's
+ * allocation rotates self/arg1/count/cursor/index differently, cascading
+ * from partway through the body onward (docs/match-reports/func_80051AC8.md).
+ * Hand-derived; reviewed rounds 9, 13, 19 -- round 19 additionally fixed a
+ * real sign/unsigned-promotion bug in the halving idiom (`sra` vs `srl`)
+ * and matched two more of retail's scheduling choices, neither of which
+ * moved the word count since it is dominated by the register rotation. */
 void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
 {
     void **p;
@@ -370,9 +373,9 @@ void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
     func_80051C74(self);
     self->methods->slot40(self);
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051AC8);
+#endif
 
 void func_80051C74(Class86ED0 *self)
 {
