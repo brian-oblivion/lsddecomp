@@ -227,7 +227,51 @@ typedef struct Ctx278 {
     Ctx278Sub *unk2C; /* +0x2C */
 } Ctx278;
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 75/76 words, one instruction short (retail's own
+ * `move $a3,$a1` parameter eviction is missing). Residue: register
+ * identity -- retail evicts `self` to a fresh register at entry and lets
+ * `desc` inherit `self`'s native parameter register; every C form found
+ * keeps `self` in its native register and gives `desc` the fresh one
+ * instead. Both are valid allocations of the same two long-lived
+ * pointers; no lever changes which one cc1 2.6.3 picks.
+ * docs/match-reports/func_8002C278.md. Hand-derived. */
+s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+{
+    Entry278 *desc;
+    s32 cached;
+    s32 whole;
+    s32 frac;
+
+    if (index < 0x190) {
+        cached = self->unk34;
+        if (cached != 0) {
+            desc = (Entry278 *)(ctx->unk10 + cached);
+            self->unk30 = 1;
+        } else {
+            desc = (Entry278 *)(index * 12 + 8 + ctx->unk10);
+            self->unk30 = 0;
+        }
+        self->unk34 = desc->unk8;
+        if (desc->unk0 != 0) {
+            whole = index / 20;
+            frac = index - whole * 20;
+            self->unkC = (frac << 11) + 0x400;
+            self->unk10 = (s32)desc->unk6 << 11;
+            self->unk14 = (whole << 11) + 0x400;
+            self->unk1A = desc->unk5 << 10;
+            self->unk2C = desc->unk1;
+            self->unk2E = desc->unk4;
+            self->unk38 = desc->unk2;
+            return ctx->unk2C->methods->slot80(ctx->unk2C);
+        }
+        return -1;
+    }
+    return 0;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C278);
+#endif
 
 Table6D940 *func_8002C3A8(void)
 {
