@@ -617,4 +617,37 @@ void func_8002E2F8(void) {
 void func_8002E300(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002E308);
+/* Matched round 73 -- docs/match-reports/func_8002E308.md. Same body as
+ * BeginVoiceFade (code_179d8_m) over the gVoiceEnv* family. */
+typedef struct {
+    s16 unk0;
+    u8 pad2[0x34 - 0x2];
+} Rec34Half_E308;
+extern Rec34Half_E308 gVoiceEnvActive[];
+extern Rec34Half_E308 gVoiceEnvStep[];
+extern Rec34Half_E308 gVoiceEnvInterval[];
+extern Rec34Half_E308 gVoiceEnvCountdown[];
+extern Rec34Half_E308 gVoiceEnvAccum[];
+extern Rec34Half_E308 gVoiceEnvLimit[];
+
+void func_8002E308(s16 voice, s16 from, s16 to, s16 duration) {
+    s16 q;
+
+    if (from == to) {
+        return;
+    }
+    gVoiceEnvActive[voice].unk0 = 1;
+    gVoiceEnvAccum[voice].unk0 = from;
+    gVoiceEnvLimit[voice].unk0 = to;
+    if ((from - to < 0 ? to - from : from - to) < duration) {
+        q = duration / (from - to);
+        gVoiceEnvStep[voice].unk0 = 1;
+        gVoiceEnvInterval[voice].unk0 = q;
+        gVoiceEnvCountdown[voice].unk0 = q;
+    } else {
+        q = (from - to) / duration;
+        gVoiceEnvInterval[voice].unk0 = 0;
+        gVoiceEnvStep[voice].unk0 = q;
+    }
+}
+
