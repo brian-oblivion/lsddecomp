@@ -1,12 +1,14 @@
-# func_8004FF90 -- MATCH
+# Class86E00_3bb8c_g__OnNotify -- MATCH
+
+> Renamed from `func_8004FF90` on 2026-09-23 (tools/rename.py). Address 0x8004ff90.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004FF90`: 25/25 words match.
+SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__OnNotify`: 25/25 words match.
 
 ## Source
 
 ```c
-void func_8004FF90(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
+void Class86E00_3bb8c_g__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
 {
     if (self->unk28 != 0) {
         if (arg2 == 0x19) {
@@ -27,7 +29,7 @@ not using" convention.
 
 - `Class86E00Methods_3bb8c_g::slot90`/`slot94` -- both already declared
   ahead of this function while surveying the whole unit
-  (`func_8004FF40`'s report); this is the function that exercises them.
+  (`Class86E00_3bb8c_g__TickCardIcon`'s report); this is the function that exercises them.
 
 ### Proposed learning
 

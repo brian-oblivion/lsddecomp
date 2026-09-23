@@ -1,4 +1,6 @@
-# func_80050034 -- MATCH (111/111 words, ~4 attempts)
+# Class86E00_3bb8c_g__AdvanceState -- MATCH (111/111 words, ~4 attempts)
+
+> Renamed from `func_80050034` on 2026-09-23 (tools/rename.py). Address 0x80050034.
 
 Unit `class_3bb8c_g`, class `Class86E00_3bb8c_g`. State-transition dispatcher
 driven by `self->unk28` (dense `switch`, retail compiles it to
@@ -7,7 +9,7 @@ driven by `self->unk28` (dense `switch`, retail compiles it to
 additionally rebuilding two path/name buffers first.
 
 ```c
-void func_80050034(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__AdvanceState(Class86E00_3bb8c_g *self)
 {
     Class86E00Methods_3bb8c_g *methods = self->methods;
 
@@ -51,7 +53,7 @@ void func_80050034(Class86E00_3bb8c_g *self)
 
 The dense range check (`(self->unk28 - 2) unsigned < 0xF`, i.e.
 `self->unk28` in `2..0x10`) plus `jtbl_80011594`'s 15 entries in
-`asm/nonmatchings/class_3bb8c_g/func_80050034.s` give the case grouping
+`asm/nonmatchings/class_3bb8c_g/Class86E00_3bb8c_g__AdvanceState.s` give the case grouping
 directly by READING the table, not by guessing: entries land on only four
 distinct labels, so it's four case groups, not fifteen. **The one place
 this cost an attempt: index 11 (`self->unk28==0xD`) lands on the SAME
@@ -66,14 +68,14 @@ it because it's included in the function's line range in the `.s` file.
 
 Every case body's shared tail (`slot8C(self, N); [slot7C(self, M);]`)
 matches the SAME `self->methods->slot8C`/`slot7C` shared-tail idiom
-already established by `func_800501F0`/`func_80050280`/`func_800504D0`/
-`func_80050730` elsewhere in this unit (`slot7C`'s header comment already
+already established by `Class86E00_3bb8c_g__ForceIdleFromState`/`Class86E00_3bb8c_g__TickStateDelay`/`Class86E00_3bb8c_g__OnCommand`/
+`Class86E00_3bb8c_g__OnItemSelected` elsewhere in this unit (`slot7C`'s header comment already
 documents it as a common tail for exactly this reason).
 
 The `self->unk28==0xE` sub-case's three calls read `self->unk40` as a
 `char *` destination and `self->unk44` likewise -- both fields are
-ALREADY typed `s32` in the header (established by `func_80050340`/
-`func_800504D0`, which forward them as opaque `s32` args to
+ALREADY typed `s32` in the header (established by `Class86E00_3bb8c_g__AttachChildA`/
+`Class86E00_3bb8c_g__OnCommand`, which forward them as opaque `s32` args to
 `slot78`/`slot4C`). Cast at the use site (`(char *)self->unk40`) rather
 than retyping the field, per the project's documented
 "reinterpretation is free, retyping a field read elsewhere is not"
@@ -81,7 +83,7 @@ convention -- `self->unk40`/`unk44` are read as plain `s32` by THREE
 already-matched functions in this same file.
 
 `self->unk80` is similarly already typed `void *` in the header
-(`func_80050730`'s own return-value store), but here it's used as an
+(`Class86E00_3bb8c_g__OnItemSelected`'s own return-value store), but here it's used as an
 INTEGER ARRAY INDEX (shifted left 2, added to a base pointer) -- cast
 `(s32)self->unk80` at the use site, same free-reinterpretation reasoning,
 same field, opposite direction (pointer read as an integer here instead

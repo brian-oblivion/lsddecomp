@@ -120,7 +120,7 @@ void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     }
     if (self->unkA4->methods->slot1AC(self->unkA4)) {
         strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14);
-        func_800507F8((s32)D_8008AA18, 0);
+        Class86E00_3bb8c_g__CopyMemcardIconTemplate((s32)D_8008AA18, 0);
     }
     size = strlen((char *)D_8008AA18);
     size = (size >> 1) + 4;
@@ -317,7 +317,7 @@ void *func_8004E2E0(void *arg0, void *arg1)
     if (self == NULL) {
         goto fail;
     }
-    func_800507E8()->ctor(self, arg0, arg1);
+    GetClass86E00Methods()->ctor(self, arg0, arg1);
     return self;
 fail:
     return NULL;
@@ -342,7 +342,7 @@ void func_8004E34C(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
     s32 count;
 
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_800507E8();
+    self->methods = GetClass86E00Methods();
     count = D_8008AA30;
     D_8008AA30 = count + 1;
     if (count == 0) {

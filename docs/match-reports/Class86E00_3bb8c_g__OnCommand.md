@@ -1,12 +1,14 @@
-# func_800504D0 -- MATCH
+# Class86E00_3bb8c_g__OnCommand -- MATCH
+
+> Renamed from `func_800504D0` on 2026-09-23 (tools/rename.py). Address 0x800504d0.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_800504D0`: 54/54 words match.
+SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__OnCommand`: 54/54 words match.
 
 ## Source
 
 ```c
-void func_800504D0(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
+void Class86E00_3bb8c_g__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:
@@ -45,7 +47,7 @@ every value and branch target matches logically.
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 None new -- `slotA0`, `slot78`, and `slot7C` were all already declared
-while surveying the unit (`func_8004FF40`'s report); this is the function
+while surveying the unit (`Class86E00_3bb8c_g__TickCardIcon`'s report); this is the function
 that exercises `slot78`'s full 8-argument (`self`+7) signature and
 confirms `slotA0`'s `(self)`-only arity (called identically from both
 cases).

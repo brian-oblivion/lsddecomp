@@ -1,12 +1,14 @@
-# func_80050340 -- MATCH
+# Class86E00_3bb8c_g__AttachChildA -- MATCH
+
+> Renamed from `func_80050340` on 2026-09-23 (tools/rename.py). Address 0x80050340.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_80050340`: 52/52 words match.
+SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__AttachChildA`: 52/52 words match.
 
 ## Source
 
 ```c
-void func_80050340(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__AttachChildA(Class86E00_3bb8c_g *self)
 {
     if (self->unk68 != 0 && self->unk60 != 0) {
         if (self->unk78 == NULL) {
@@ -57,12 +59,12 @@ unk74 = 1;`) restored.
 
 - `extern void *func_80050BA8(s32 arg0, s32 arg1);` **retyped** from a
   single-argument declaration added while surveying the unit
-  (`func_8004FF40`'s report) -- this function is the only call site in
+  (`Class86E00_3bb8c_g__TickCardIcon`'s report) -- this function is the only call site in
   this unit, so the correction is fully contained.
 - `Class86E00SubObjMethods_3bb8c_g::slot44` **retyped** from `(self)` to
   `(self, s32 arg1)` -- the earlier single-argument declaration (also
   from the initial survey) missed that `self->unk68` is loaded into `$a1`
-  immediately before this call. Confirmed against `func_800505A8`'s own
+  immediately before this call. Confirmed against `Class86E00_3bb8c_g__AttachChildB`'s own
   identical call shape (not yet matched, but its `.s` shows the same
   `lw $a1, 0x68($s0)` pattern), so both callers agree on the corrected
   arity.

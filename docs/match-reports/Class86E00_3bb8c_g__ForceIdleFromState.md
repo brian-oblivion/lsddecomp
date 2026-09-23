@@ -1,12 +1,14 @@
-# func_800501F0 -- MATCH
+# Class86E00_3bb8c_g__ForceIdleFromState -- MATCH
+
+> Renamed from `func_800501F0` on 2026-09-23 (tools/rename.py). Address 0x800501f0.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_800501F0`: 36/36 words match.
+SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__ForceIdleFromState`: 36/36 words match.
 
 ## Source
 
 ```c
-void func_800501F0(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__ForceIdleFromState(Class86E00_3bb8c_g *self)
 {
     switch (self->unk28) {
     case 4:
@@ -34,7 +36,7 @@ cases.
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 None new -- `slot8C`/`slot7C` were both already declared while surveying
-the unit (`func_8004FF40`'s report).
+the unit (`Class86E00_3bb8c_g__TickCardIcon`'s report).
 
 ### Proposed learning
 

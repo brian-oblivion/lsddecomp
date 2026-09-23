@@ -1,12 +1,14 @@
-# func_8004FF40 -- MATCH
+# Class86E00_3bb8c_g__TickCardIcon -- MATCH
+
+> Renamed from `func_8004FF40` on 2026-09-23 (tools/rename.py). Address 0x8004ff40.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004FF40`: 20/20 words match.
+SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__TickCardIcon`: 20/20 words match.
 
 ## Source
 
 ```c
-void func_8004FF40(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__TickCardIcon(Class86E00_3bb8c_g *self)
 {
     if (self->unk70 != NULL) {
         self->unk70 = self->unk70->methods->slot4(self->unk70);
@@ -56,7 +58,7 @@ no existing-declaration retype to flag for this function.
 - Also pre-declared, while surveying the whole unit before writing any
   code, the remaining struct surface this unit's other 11 fresh functions
   need: `Class86E00SubObj_3bb8c_g` (self->unk78/unk7C's shared pointee),
-  `GenericSlot9CObj_3bb8c_g` (func_80050730's arg1), and
+  `GenericSlot9CObj_3bb8c_g` (Class86E00_3bb8c_g__OnItemSelected's arg1), and
   `Class86E00Methods_3bb8c_g`'s `slot10`/`slot78`/`slot7C`/`slot8C`/
   `slot90`/`slot94`/`slotA0`/`slotAC`, plus `extern` declarations for two
   external helpers this unit calls but does not own

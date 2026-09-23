@@ -1,4 +1,6 @@
-# func_800507F8 — MATCHED (round 45, 60/60 words)
+# Class86E00_3bb8c_g__CopyMemcardIconTemplate — MATCHED (round 45, 60/60 words)
+
+> Renamed from `func_800507F8` on 2026-09-23 (tools/rename.py). Address 0x800507f8.
 
 **Unit:** class_3bb8c_g · **Size:** 60 words (0xF0 bytes)
 
@@ -21,7 +23,7 @@ typedef struct {
     s8 a, b;
 } Pair2_3bb8c_g;
 
-s32 func_800507F8(s32 arg0, s32 arg1)
+s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 arg0, s32 arg1)
 {
     u8 *self = (u8 *)arg0;
     u8 *src = (u8 *)arg1;
@@ -49,7 +51,7 @@ s32 func_800507F8(s32 arg0, s32 arg1)
 ```
 
 **Signature was NOT free to choose.** `include/class_3bb8c.h` already
-carries `extern s32 func_800507F8(s32 arg0, s32 arg1);` (`class_3bb8c_m`'s
+carries `extern s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 arg0, s32 arg1);` (`class_3bb8c_m`'s
 own caller, `TaskObjF__WriteMemcardSaveFile`), visible in this same translation unit via the
 shared header, so the definition here has to match it exactly
 (`conflicting types` otherwise) even though every real use inside the body
