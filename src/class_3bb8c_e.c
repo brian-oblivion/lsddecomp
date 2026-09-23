@@ -233,33 +233,12 @@ s32 func_8004E678(Node3bb8cE *self)
 
 extern s32 func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3);
 
-/* STALL -- see docs/match-reports/func_8004E6B8.md. Best reached: correct
- * CONTROL FLOW and correct VALUES (confirmed via objdump against the exact
- * disassembly), but the compiled body is one word short with different
- * callee-saved register numbering and a different call-argument delay-slot
- * split. Restored to INCLUDE_ASM so the correct-length placeholder doesn't
- * cascade drift into func_8004E77C and everything after it in this unit.
- *
- * ROUND 37 (delta): rebuilt this EXACT preserved body against today's
- * pinned toolchain before trusting its recorded score, per this round's
- * own directive -- and it does NOT reproduce the claim above. Confirmed
- * with an isolated cpp|cc1|maspsx|as reproducer (no project headers, just
- * this function and a stub `Node3bb8cE`/`func_8004E77C` declaration) that
- * this exact source, unchanged, compiles with the two `func_8004E77C`
- * call sites CROSS-JUMP MERGED into a single shared `jal` -- the same
- * pathology the report's own attempts 1/2/3 hit and attempt 4 (this body)
- * was written up as having eliminated ("the cross-jump merge disappeared
- * entirely"). It has not: only one `jal` appears in the compiled object,
- * reached by two different paths that set up its argument registers
- * differently beforehand, exactly like the merge the report describes
- * for the REJECTED attempts. This is not a toolchain drift -- the
- * addiu_at flag (round 21) that landed after this stall was written only
- * touches maspsx, never cc1, and the isolated repro used today's cc1 in
- * total isolation from the rest of this file. The report's claim was
- * simply never true of this exact source, or stopped being tested before
- * being written down. See the match report for the corrected residue and
- * this round's re-measurement. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 5/49 words in-range, length 1 short (48/49). Residue: GCC
+ * 2.6.3 cross-jump-merges the two func_8004E77C call sites into a single
+ * shared `jal` reached by two argument-setup paths, where retail keeps two
+ * separate `jal` instructions (docs/match-reports/func_8004E6B8.md, round
+ * 37 remeasurement). Hand-derived. */
 s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 {
     s32 retries;
@@ -290,9 +269,9 @@ done:
     *p2 = *p2 | localFlag;
     return result;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E6B8);
+#endif
 
 extern s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2);
 extern s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2);
