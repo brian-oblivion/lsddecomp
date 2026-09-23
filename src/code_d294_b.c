@@ -683,30 +683,26 @@ void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *ne
 void func_8001E49C(void) {
 }
 
-/* STALL -- see docs/match-reports/Class6B5CC__NotifyTaggedParents.md. Best reached this
- * round: 48/54 words in-range (up from the round-13 best of 47/54), a
- * clean self<->tag register-pair swap in $s1/$s2, no size drift.
- * Restored to INCLUDE_ASM per project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 48/54 words, length exact. Residue: register identity --
+ * self and the literal tag value 4 land in $s1/$s2 swapped from retail's
+ * own assignment (docs/match-reports/Class6B5CC__NotifyTaggedParents.md).
+ * The preserved best-scoring body indirects self/node/the tag literal
+ * through named locals and splits the tag comparison into its own
+ * statement, both purely to influence register allocation; this body
+ * writes the plain, direct form instead -- see the report for the
+ * byte-shaped variant. Hand-derived. */
 void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
-    Class6B5CCObj *s;
-    void *n;
     GenericObj_d294 *entry;
     void *cursor;
-    s32 tag;
-    s32 masked;
 
-    s = self;
-    n = node;
-    tag = 4;
     entry = NULL;
 loop:
-    BasicClass__func_1816c(n, &entry, &cursor);
+    BasicClass__func_1816c(node, &entry, &cursor);
     if (entry == NULL) {
         goto check_cursor;
     }
-    masked = entry->methods->header & 0xF;
-    if (masked == tag) {
+    if ((entry->methods->header & 0xF) == 4) {
         goto dispatch;
     }
 check_cursor:
@@ -721,15 +717,15 @@ dispatch:
     if (*(u8 *)entry->methods != 0x34) {
         goto tail;
     }
-    entry->methods->slot10(entry, s);
+    entry->methods->slot10(entry, self);
 tail:
     if (cursor != NULL) {
         goto loop;
     }
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__NotifyTaggedParents);
+#endif
 
 /* This unit's own no-argument vtable getter -- see the extended note on
  * D_8006B5CC in include/code_d294.h and the file banner up top. */
