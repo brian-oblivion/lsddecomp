@@ -270,6 +270,16 @@
           "note": "REVISIT runner bravo on code_2cc8c_c: Obj86B60__NotifyParents MATCHED 32/32 (rebuilt-as-given 23/32, ins/del 2/2, length exact; plan.py's len-off tag stale). Titled 'register identity, cleanly isolated' since round 13/46 (82k-iteration permuter negative). The cause was global-alloc priority (floor_log2(refs)*refs/live_length, read with cc1 -dl): two separate methods->slotNN(self) calls gave self 6 refs and ; retail picks fn = slot64/slot68 per arm and makes ONE fn(self) call (the shared jalr/move a0 tail), so arg1 outranks self. Round-46 order-only barrier kept.",
           "round": 72,
           "runners": 1
+        },
+        {
+          "attempts": 19,
+          "calibration": false,
+          "date": "2026-09-23",
+          "matches": 16,
+          "model": "opus",
+          "note": "REVISIT runners (8 sessions): code_2cc8c_e 3/3 (Class6E99C StartFadeToIndex/StartFadeDefault: forwarded-parameter arity to configure, parameter reused as result; PushPosition: whole-struct stash, movstrsi clobbers a0/a1); class_3bb8c_j 2/2 (func_80051F24 split reused handle; func_80051AC8 filed register rotation since round 9, really 2 long: unconditional assign, ternary max, inits before call); DreamSys 3/3 (StepLookYaw second name for this; CalcDreamColor row-pointer local; TryInstantTeleportLink early-return restructure); code_179d8_l 3/3 (func_8002CD08 one i++ after the join + arity; func_8002E138 (u8) cast -> & 0xFF; func_8002E308 sibling BeginVoiceFade + s16 params); class_3bb8c 3/3 (func_8004BE54 split local; func_8004BB3C loop-optimiser walker; func_8004C470 field-load operand order fixed at RTL, 183k-iteration negative); code_d294_b 1/1 (CheckBoundsOverlap 21 short -> 243/243: ternary min/max, pointer walkers); code_8220 1/1 (func_80017B34 split rounding statement, one pointer across arms); code_179d8_m 0/3 (StepVoiceFade 220/228 and StepVoiceEnvelope 223/231 length exact, one copy residue, 233k-iteration permuter negative; StartNote stopped: libsnd SpuVmKeyOn by call order + andi run). No match used a permuter.",
+          "round": 73,
+          "runners": 8
         }
       ],
       "status": "open"
@@ -386,6 +396,16 @@
           "note": "charlie promoted OpenCdFile (live 13/43, 1 long; title's 14/43 was a reverted reshape, rewritten) and ReadCdFile (8/56, 1 long, title exact) in code_179d8_h; both hand-derived, no permuter edits.",
           "round": 72,
           "runners": 1
+        },
+        {
+          "attempts": 8,
+          "calibration": true,
+          "date": "2026-09-23",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "8 bodies promoted: VabStreamObj__PlayTone (code_179d8_e), func_80051AC8 + func_80051F24 (class_3bb8c_j), func_8004C470 (class_3bb8c), func_8002C278 (code_179d8_d, reader body B not the alias probe), TaskObjF__func_8004F8A4 (class_3bb8c_f), func_80064E34 (Entity_g); all hand-derived. Three of them (AC8, F24, C470) were then MATCHED by track-1 revisits the same round and their blocks replaced. func_80031A44 (code_179d8_j_c) NOT staffed: sits inside libsnd module range, calls SpuVmVSetUp; escalated.",
+          "round": 73,
+          "runners": 6
         }
       ],
       "status": "auto"
@@ -598,6 +618,16 @@
           "note": "alpha (sonnet) on class_3bb8c_n: 23 functions (22 tier B, Style* vocabulary inherited from round 69's RegisterStyleConfig, itself tier B) + 20 globals + local StyleCueSlot view. Review PASSED with one correction: AdjustRgbByDelta filed tier A, downgraded to B at merge (consumers slotB8/slot64 unestablished, so 'Rgb' is likely, not proven). Head also fixed a new header comment calling the matched TickDreamAuxSlots2 uncarved. Not counted as a send-back.",
           "round": 72,
           "runners": 1
+        },
+        {
+          "attempts": 130,
+          "calibration": true,
+          "date": "2026-09-23",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "Six Sonnet naming units, all reviewed and marked: StageGrid (1 fn + comment fix), class_3bb8c_g (16), code_2cc8c_d (33, Unk18Obj; fields named from GsSetLightMode/SetFarColor/SetFogNear/GsSortClear), code_2c054 (28, StreamTaskObj/TaskCoreObj; type-name collision fixed), class_39e08 (26, Obj865C8/Class86668), class_3bb8c_r (21 + a getter in class_3bb8c_o). No unit sent back; head corrections at merge: class_3bb8c_g's Class86E00_3bb8c_g__* -> TaskObjF__* (0x80086E00 is +0x3C inside gTaskObjFMethods) and a free function unprefixed; class_39e08's 4 inherited base slots Obj865C8__* -> Class86668__*; Unk18Obj setters renamed after their fields; LoadCardIcon tier A -> B.",
+          "round": 73,
+          "runners": 6
         }
       ],
       "status": "open",
