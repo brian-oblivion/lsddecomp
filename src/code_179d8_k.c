@@ -392,7 +392,7 @@ void func_80034614(s16 a0, s16 a1, u8 a2)
 extern void SpuVmDamperOn(void);
 extern void SsUtSetReverbDepth(s16 a0, s16 a1);
 extern s32 SpuVmSetProgVol(s16 p0, s16 p1, s32 p2);
-extern void func_80030980(s16 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
+extern void func_80030980(s32 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
 
 /* Forward declarations for sibling functions defined later in THIS unit's
  * ROM-address order. func_800351D0's signature is this call site's own
@@ -418,16 +418,13 @@ extern void func_80034D90(s16 a0, s16 a1);
  * through into the shared tail that re-arms the next scheduling delta via
  * func_80035E80; those seven `return` immediately instead.
  *
+ * Two choices below are byte-load-bearing (round 69): func_80030980's first
+ * parameter is a full `s32` (its own body masks it with 0xFF/0xFF00), so
+ * `packed` is not narrowed and the widened a0/a1 stay live across the call
+ * for the final func_80035E80; and each case copies `offset` into a
+ * case-local `u16`, which keeps the switch-wide byte in a caller-saved
+ * register and gives each case its own callee-saved copy.
  */
-#ifdef NON_MATCHING
-/* NON_MATCHING: 195/200 words, length 5 SHORT. Residue: register-identity /
- * tail-merge-choice (this build allocates one fewer callee-saved register
- * overall -- "val" never gets its own persistent $s6, costing 2 words --
- * and case 11 reaches the shared combine-tail by jumping into retail's
- * default-path widening, saving 3 words, instead of duplicating its own
- * full widening the way retail and this file's own cases 7/10 do); not a
- * logic difference, reshaping tried and did not move it
- * (docs/match-reports/func_80034690.md). Hand-derived. */
 void func_80034690(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -446,18 +443,20 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
         func_800351D0(a0, a1, val);
         return;
     case 7: {
-        u8 *blk = (u8 *)rec + offset;
-        s16 packed = (a1 << 8) | a0;
+        u16 o = offset;
+        u8 *blk = (u8 *)rec + o;
+        s32 packed = (a1 << 8) | a0;
 
         func_80030980(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
-        *(s16 *)((u8 *)rec + offset * 2 + 0x4E) = val;
+        *(s16 *)((u8 *)rec + o * 2 + 0x4E) = val;
         rec->unk88 = func_80035E80(a0, a1);
         return;
     }
     case 10: {
-        u8 *blk = (u8 *)rec + offset;
-        s16 packed = (a1 << 8) | a0;
-        s16 wide = *(s16 *)((u8 *)rec + offset * 2 + 0x4E);
+        s32 packed = (a1 << 8) | a0;
+        u16 o = offset;
+        u8 *blk = (u8 *)rec + o;
+        s16 wide = *(s16 *)((u8 *)rec + o * 2 + 0x4E);
 
         func_80030980(packed, rec->unk4C, blk[0x2C], wide, val);
         blk[0x17] = val;
@@ -465,11 +464,12 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
         return;
     }
     case 11: {
-        u8 *blk = (u8 *)rec + offset;
+        u16 o = offset;
+        u8 *blk = (u8 *)rec + o;
 
         SpuVmSetProgVol(rec->unk4C, blk[0x2C], val);
         func_80030980((a1 << 8) | a0, rec->unk4C, blk[0x2C],
-                      *(s16 *)((u8 *)rec + offset * 2 + 0x4E), blk[0x17]);
+                      *(s16 *)((u8 *)rec + o * 2 + 0x4E), blk[0x17]);
         rec->unk88 = func_80035E80(a0, a1);
         return;
     }
@@ -506,9 +506,6 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034690);
-#endif
 
 /* A stack-local buffer this function passes to three cross-unit callees:
  * `SsUtGetProgAtr(ch, byte, out)` (established elsewhere as
