@@ -1,4 +1,6 @@
-# func_8001D3CC
+# Class6B5CC__SetLighting
+
+> Renamed from `func_8001D3CC` on 2026-09-23 (tools/rename.py). Address 0x8001d3cc.
 
 **Unit:** code_d294 · **Size:** 11 words · **Status:** MATCHED (11/11 words)
 
@@ -11,7 +13,7 @@
 ## The C
 
 ```c
-u32 func_8001D3CC(Class6B5CCObj *self, s32 a1) {
+u32 Class6B5CC__SetLighting(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 6, 1, a1 == 0);
 }
 ```

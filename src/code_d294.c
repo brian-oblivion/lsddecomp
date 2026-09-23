@@ -224,7 +224,7 @@ u32 Class6B5CC__SetSemiTransRate(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 0x1C, 2, a1);
 }
 
-u32 func_8001D3CC(Class6B5CCObj *self, s32 a1) {
+u32 Class6B5CC__SetLighting(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 6, 1, a1 == 0);
 }
 

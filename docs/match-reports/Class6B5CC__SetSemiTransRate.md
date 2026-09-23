@@ -8,7 +8,7 @@
 
 `Class6B5CC` vtable slot `+0x068`. Sets a 2-bit field at bit 28 of
 `self->unk10` to `a1` (passed through unmodified — no boolean coercion,
-unlike its `Class6B5CC__SetDisplay`/`func_8001D3CC` siblings), tail-returning
+unlike its `Class6B5CC__SetDisplay`/`Class6B5CC__SetLighting` siblings), tail-returning
 `GetSetBitField`'s result. See `Class6B5CC__SetDisplay.md` for the shared
 `GetSetBitField` background.
 
