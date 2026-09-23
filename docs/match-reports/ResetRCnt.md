@@ -372,3 +372,7 @@ Round 69 (delta). `ResetRCnt` (was `func_80032C60`): clears
 `gRCntRegs[idx].count` to 0, guarded by the same range check as `GetRCnt`
 -- tier A (a clamp/reset leaf whose mechanics are its purpose). Name taken
 directly from this report's own heading.
+
+## Identification (round 69, head)
+
+Sony's `ResetRCnt`, `libapi/counter`: the five functions at 0x80032B18 are that module's exports in its own order (SetRCnt, GetRCnt, StartRCnt, StopRCnt, ResetRCnt), with the first three offsets exact against the 3.5/3.6 `counter.o` and the last two 4 and 8 bytes later (a library build the discs do not carry, so no object can be linked); `KERNEL.H` prototypes agree on arity. Two evidence kinds per FINISHING-PLAN track 2. 

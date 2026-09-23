@@ -11,7 +11,7 @@ A one-argument tail-call wrapper around `SeqTimerControl`, called with `1`.
 round, 185-line body) is a CD-audio/root-counter driven playback-rate
 routine: it busy-waits on two software delay loops, reads a CD status
 global (`gSeqTimerRateMode`), branches into several `div`-based rate
-calculations, and conditionally calls `SetRCnt`/`SetIrqMask`/
+calculations, and conditionally calls `SetRCnt`/`StartRCnt`/
 `ResetRCnt` (all in this same unit) among others. It never sets `$v0`
 on any exit path, so it is `void`.
 

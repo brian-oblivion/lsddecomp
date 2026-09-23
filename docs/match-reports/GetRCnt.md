@@ -85,3 +85,7 @@ Round 69 (delta). `GetRCnt` (was `func_80032BB8`): a pure getter (reads
 project's own rule ("a getter ... is tier A by definition"). Name taken
 directly from this report's own heading, which already called it `GetRCnt`
 before the symbol itself was renamed.
+
+## Identification (round 69, head)
+
+Sony's `GetRCnt`, `libapi/counter`: the five functions at 0x80032B18 are that module's exports in its own order (SetRCnt, GetRCnt, StartRCnt, StopRCnt, ResetRCnt), with the first three offsets exact against the 3.5/3.6 `counter.o` and the last two 4 and 8 bytes later (a library build the discs do not carry, so no object can be linked); `KERNEL.H` prototypes agree on arity. Two evidence kinds per FINISHING-PLAN track 2. 

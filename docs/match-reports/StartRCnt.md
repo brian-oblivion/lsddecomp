@@ -1,4 +1,6 @@
-# SetIrqMask -- MATCHED (14/14 words)
+# StartRCnt -- MATCHED (14/14 words)
+
+> Renamed from `SetIrqMask` on 2026-09-23 (tools/rename.py). Address 0x80032bf0.
 
 > Renamed from `func_80032BF0` on 2026-09-23 (tools/rename.py). Address 0x80032bf0.
 
@@ -30,7 +32,7 @@ typedef struct {
 extern IrqRegs *gIrqRegs;
 extern u32 gRCntIrqMasks[4];
 
-s32 SetIrqMask(u16 which)
+s32 StartRCnt(u16 which)
 {
     s32 idx = which;
     IrqRegs *reg = gIrqRegs;
@@ -49,7 +51,7 @@ GCC's delay-slot filler had hoisted the independent `sw $v1, 0x4($a1)` store
 into the `jr $ra` delay slot, dropping the explicit trailing `nop` retail has.
 That makes the compiled function 13 instructions (0x34 bytes) instead of
 retail's 14 (0x38) -- one word of address drift, which shifted every
-following byte in the image and made the following function (`ClearIrqMask`)
+following byte in the image and made the following function (`StopRCnt`)
 compare against nothing meaningful.
 
 Retail does NOT hoist that store. The fix: mark the hardware-register struct
@@ -70,12 +72,16 @@ a scheduling residue to chase with a barrier.
 
 ## Naming
 
-Round 69 (delta). `SetIrqMask` (was `func_80032BF0`): ORs a bit into
+Round 69 (delta). `StartRCnt` (was `func_80032BF0`): ORs a bit into
 `gIrqRegs->mask` (I_MASK), where the bit comes from `gRCntIrqMasks[idx]`.
 Tier A -- a setter whose mechanics are its purpose. `gIrqRegs` (was
 `D_8006DCAC`) and `gRCntIrqMasks` (was `D_8006DCB4`) are named from this
-function's and `ClearIrqMask`'s own pre-existing doc comment in
+function's and `StopRCnt`'s own pre-existing doc comment in
 `src/code_179d8_c_b.c`, which already identified the pair as the PSX
 I_STAT/I_MASK shadow and the per-index Tmr0/Tmr1/Tmr2/VBLANK IRQ bit table
 -- tier B for both (the hardware mapping is established; which game
 subsystem relies on it is not).
+
+## Identification (round 69, head)
+
+Sony's `StartRCnt`, `libapi/counter`: the five functions at 0x80032B18 are that module's exports in its own order (SetRCnt, GetRCnt, StartRCnt, StopRCnt, ResetRCnt), with the first three offsets exact against the 3.5/3.6 `counter.o` and the last two 4 and 8 bytes later (a library build the discs do not carry, so no object can be linked); `KERNEL.H` prototypes agree on arity. Two evidence kinds per FINISHING-PLAN track 2. Delta had named it `SetIrqMask` (mechanically right: it ORs the counter's bit into I_MASK); renamed at merge.

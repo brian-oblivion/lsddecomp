@@ -295,7 +295,7 @@ SpuVmGetProgPan = 0x8003092C; // type:func  (Psy-Q libsnd/vm_prog, from the SDK 
 // ROUND 34 -- code_179d8_j_b middle (0x221B4..0x22244): libsnd/ut_pb. Psy-Q
 // 3.6 only. The tail of that unit became code_179d8_j_c.
 SsUtPitchBend = 0x800319B4; // type:func  (Psy-Q libsnd/ut_pb, from the SDK object)
-SetRCnt = 0x80032B18;
+SetRCnt = 0x80032B18; // identified: position -- libapi/counter module order SetRCnt,GetRCnt,StartRCnt,StopRCnt,ResetRCnt at 0x80032B18 (offsets 0,A0,D8 exact vs 3.5/3.6 counter.o; retail 110/148 vs 10C/140: a build not on the discs), header KERNEL.H prototypes agree on arity
 
 // ROUND 34 -- code_179d8_i prefix (0x2397C..0x24490): ten libsnd objects, the
 // VAB header/attribute getters, the master volume and mute setters, the VAB
@@ -1301,13 +1301,13 @@ SeqTimerControl = 0x80032708; // type:func
 StartSeqTimer = 0x80032998; // type:func
 StopSeqTimer = 0x800329B8; // type:func
 CancelSeqTimer = 0x800329D8; // type:func
-ClearSpuMute = 0x80032A7C; // type:func
+QuitSpu = 0x80032A7C; // type:func
 SeqTimerCallback = 0x80032A9C; // type:func
 SeqTimerDividerCallback = 0x80032AD0; // type:func
-GetRCnt = 0x80032BB8; // type:func
-SetIrqMask = 0x80032BF0; // type:func
-ClearIrqMask = 0x80032C28; // type:func
-ResetRCnt = 0x80032C60; // type:func
+GetRCnt = 0x80032BB8; // type:func  identified: position -- libapi/counter module order SetRCnt,GetRCnt,StartRCnt,StopRCnt,ResetRCnt at 0x80032B18 (offsets 0,A0,D8 exact vs 3.5/3.6 counter.o; retail 110/148 vs 10C/140: a build not on the discs), header KERNEL.H prototypes agree on arity
+StartRCnt = 0x80032BF0; // type:func  identified: position -- libapi/counter module order SetRCnt,GetRCnt,StartRCnt,StopRCnt,ResetRCnt at 0x80032B18 (offsets 0,A0,D8 exact vs 3.5/3.6 counter.o; retail 110/148 vs 10C/140: a build not on the discs), header KERNEL.H prototypes agree on arity
+StopRCnt = 0x80032C28; // type:func  identified: position -- libapi/counter module order SetRCnt,GetRCnt,StartRCnt,StopRCnt,ResetRCnt at 0x80032B18 (offsets 0,A0,D8 exact vs 3.5/3.6 counter.o; retail 110/148 vs 10C/140: a build not on the discs), header KERNEL.H prototypes agree on arity
+ResetRCnt = 0x80032C60; // type:func  identified: position -- libapi/counter module order SetRCnt,GetRCnt,StartRCnt,StopRCnt,ResetRCnt at 0x80032B18 (offsets 0,A0,D8 exact vs 3.5/3.6 counter.o; retail 110/148 vs 10C/140: a build not on the discs), header KERNEL.H prototypes agree on arity
 gVideoMode = 0x8006DC98;
 gSeqTickRate = 0x8009024C;
 gSeqTimerRateMode = 0x8006DCA4;

@@ -310,7 +310,7 @@ extern s32 func_80032368(void);
 extern char *func_8003A068(void);
 extern s32 func_8003A05C(void);
 extern void CancelSeqTimer(void);
-extern void ClearSpuMute(void);
+extern void QuitSpu(void);
 extern void SetSeqTimerMode(s32 a0);
 extern void StartSeqTimer(void);
 extern void *func_80017CFC(void *ptr);
@@ -377,7 +377,7 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
         gVabVolumeInited = 0;
         gVabStreamInited = 0;
         CancelSeqTimer();
-        ClearSpuMute();
+        QuitSpu();
     }
     func_80017CFC(self->vagAttrPool);
     func_80017CFC(self->progVagTable);

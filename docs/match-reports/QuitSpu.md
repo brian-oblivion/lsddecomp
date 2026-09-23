@@ -1,4 +1,6 @@
-# ClearSpuMute
+# QuitSpu
+
+> Renamed from `ClearSpuMute` on 2026-09-23 (tools/rename.py). Address 0x80032a7c.
 
 > Renamed from `func_80032A7C` on 2026-09-23 (tools/rename.py). Address 0x80032a7c.
 
@@ -19,7 +21,7 @@ everywhere it's invoked) and never sets `$v0`, so it is `void(void)`.
 ```c
 extern void func_80038FB0(void);
 
-void ClearSpuMute(void)
+void QuitSpu(void)
 {
     func_80038FB0();
 }
@@ -32,12 +34,14 @@ Matched first attempt.
 
 ## Naming
 
-Round 69 (delta). `ClearSpuMute` (was `func_80032A7C`): a zero-argument
-tail-call wrapper to `func_80038FB0`, an uncarved function this report
-already documents as guarding on an SPU-mute flag and, when set, clearing
-it and resetting several sound globals plus two SPU voice-key helpers.
-Tier B -- the name reflects that callee's documented behaviour (its own
-future name is not this unit's to assign, per FINISHING-PLAN track 3's
-field/function ownership rule extended by analogy: `func_80038FB0` lives
-outside this unit's file). Unrelated to the `SeqTimer*` cluster the rest of
-this unit is about; it only shares this address range.
+Round 69. Tier A: a pure forwarder whose mechanics are its purpose. Its one
+callee is `SpuQuit` (0x80038FB0, Sony's `libspu/s_q`, linked from the SDK
+object; the `func_80038FB0` in "The C" above is its pre-round-34 name). The
+"SPU-mute flag" in "What it does" is the round-16 reading of `SpuQuit`'s
+library-initialised flag.
+
+Head correction at merge: delta named this `ClearSpuMute` (tier B) from that
+round-16 description without resolving the callee's current name, which the
+naming prompt asks for (grep the placeholder callee). `SpuQuit` shuts the SPU
+library down; nothing here clears a mute. Renamed `ClearSpuMute -> QuitSpu`
+with `tools/rename.py`, image byte-identical.

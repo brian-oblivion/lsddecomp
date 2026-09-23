@@ -30,7 +30,7 @@ then dispatches on the CD status global `gSeqTimerRateMode`:
 Then (except the `5`/`arg0==0` and `0` early-outs): if `gSeqTimerStopPending` is
 set, tears down via `func_80024DA0(func_80033738)` and returns; else
 calls `func_80024CE0()`, `ResetRCnt(tag)`, `SetRCnt(tag,
-(s16)rate, 0x1000)`, two more ~2000-cycle busy-waits, `SetIrqMask(tag)`,
+(s16)rate, 0x1000)`, two more ~2000-cycle busy-waits, `StartRCnt(tag)`,
 then the SAME callback-(re)registration shape already matched in
 `CancelSeqTimer` (dispatching on `gSeqTimerId`/`gSeqTimerRateFlag` to pick
 `SeqTimerCallback`/`SeqTimerDividerCallback`/`func_80033738` as the callback for
@@ -65,7 +65,7 @@ extern void func_80024CF0(void);
 extern void SeqTimerCallback(void);
 extern void SeqTimerDividerCallback(void);
 extern void func_80033738(void);
-extern void SetIrqMask(s32 arg0);
+extern void StartRCnt(s32 arg0);
 extern s32 ResetRCnt(s32 n);
 extern s32 SetRCnt(s32 n, s16 target, u32 mode);
 
@@ -137,7 +137,7 @@ merge2:
     for (i = 1999; i >= 0; i--) {
     }
 
-    SetIrqMask(s1);
+    StartRCnt(s1);
 
     rc90 = gSeqTimerId;
     if (rc90 != 0) {

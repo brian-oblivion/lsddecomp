@@ -8,10 +8,12 @@
  * `SeqTimerDividerCallback` are the two interrupt-time handlers it can
  * register (one chains a previously-saved handler, the other halves the
  * firing rate by toggling); `CancelSeqTimer` tears the whole thing down.
- * `GetRCnt`/`ResetRCnt`/`SetIrqMask`/`ClearIrqMask`/`SetRCnt` are the plain
- * register-block accessors everything above is built on. `ClearSpuMute` is
- * unrelated -- a one-line forwarder to an SPU-mute routine in a different,
- * uncarved segment -- kept here only because it falls in this address range.
+ * `SetRCnt`/`GetRCnt`/`StartRCnt`/`StopRCnt`/`ResetRCnt` are Sony's
+ * libapi/counter module compiled into game text from a library build the
+ * SDK discs do not carry (identified by module order and KERNEL.H; see the
+ * symbols file), and everything above is built on them. `QuitSpu` is
+ * unrelated -- a one-line forwarder to Sony's `SpuQuit` (libspu/s_q) -- kept
+ * here only because it falls in this address range.
  *
  * the tail half of the old code_179d8_c slice, split off in round 33
  * (2026-09-12) when Sony's `libsnd/sstable.o` was linked into the middle of
@@ -177,7 +179,7 @@ void CancelSeqTimer(void)
 
 extern void SpuQuit(void);
 
-void ClearSpuMute(void)
+void QuitSpu(void)
 {
     SpuQuit();
 }
@@ -293,7 +295,7 @@ typedef struct {
 extern IrqRegs *gIrqRegs;
 extern u32 gRCntIrqMasks[4];
 
-s32 SetIrqMask(u16 which)
+s32 StartRCnt(u16 which)
 {
     s32 idx = which;
     IrqRegs *reg = gIrqRegs;
@@ -302,7 +304,7 @@ s32 SetIrqMask(u16 which)
     return idx < 3;
 }
 
-s32 ClearIrqMask(u16 which)
+s32 StopRCnt(u16 which)
 {
     s32 idx = which;
     IrqRegs *reg = gIrqRegs;

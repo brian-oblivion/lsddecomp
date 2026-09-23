@@ -32,10 +32,10 @@
  * full window census). This window screened 16/20 clean.
  *
  * STALE CLAIM REMOVED, round 23 (2026-09-07): this comment listed
- * func_80032148, SetSeqTimerMode, SetIrqMask and ClearIrqMask as blocked,
+ * func_80032148, SetSeqTimerMode, StartRCnt and StopRCnt as blocked,
  * "all addiu_at". **`addiu_at` was resolved in round 21** (maspsx
  * `--addiu-at`; docs/research/addiu-at-blocker.md), and round 23 MATCHED
- * SetIrqMask and ClearIrqMask byte-exact and took the other two to
+ * StartRCnt and StopRCnt byte-exact and took the other two to
  * 48/53 and ~90/96 with characterised non-toolchain residues. (The 48/53 was
  * func_80032148 -- round 32 then found it is Sony's, so that effort was spent
  * on library code; see docs/match-reports/func_80032148.md.) Nothing in
