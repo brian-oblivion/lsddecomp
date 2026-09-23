@@ -203,7 +203,9 @@ extern u16 D_8008E234;
 /* NON_MATCHING: 316/316 words, length exact (201/316 raw word-match; funcdiff
  * insertions/deletions 46/46). Residue: frame SIZE only -- addiu sp,sp,-8
  * against retail's -0x10 -- plus this unit's documented register-identity
- * class (docs/match-reports/func_8002D1B4.md). Hand-derived. */
+ * class (docs/match-reports/func_8002D1B4.md). Hand-derived, plus one
+ * permuter hoist (round 65: pan1sq/16383 computed before pan2sq), reviewed
+ * as a pure reordering and kept. */
 /* Object holding a per-note "priority"-ish scale byte at +0x18; only field
  * this function needs. */
 typedef struct {
@@ -354,7 +356,8 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D8E0);
 /* NON_MATCHING: 107/112 words, 5 words short. Residue: the a0/a3 role-swap
  * register-identity class (this unit's documented class) plus an 8-byte
  * frame retail allocates that this shape doesn't reach
- * (docs/match-reports/func_8002DDBC.md). Hand-derived. */
+ * (docs/match-reports/func_8002DDBC.md). Hand-derived. The byte-shaped
+ * body's order-only __asm__("") barrier is omitted here; it is in the report. */
 extern u8 D_8008D98A[];
 
 void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
@@ -372,7 +375,6 @@ void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
     a0 = (u8)a0;
     off16 = a0 << 4;
     *(u16 *)(D_8008D7F2 + off16) = a2;
-    __asm__("");
     v1 = D_8008D970[a0];
     *(u16 *)(D_8008D7F0 + off16) = a1;
     v1 |= 3;
