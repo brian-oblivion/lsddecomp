@@ -6,6 +6,131 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-23 — round 70: two revisits close two old stalls, and two titles still blamed a blocker fixed seven rounds ago
+
+**Five runners, three tracks, five merges, all green. Matched 1154 -> 1156,
+queued 98 -> 96.** Head on Opus; nothing needed Fable, and the plan-level
+findings are ESCALATED below. Gate 0 clean, all five worktrees byte-verified
+before handover. `headercontention.py` reported no header and no call-graph
+contention. The head also checked by hand the gap round 69 escalated (a
+naming runner's global renames): no function or global defined in
+`class_3bb8c_s` appears in any other runner's unit or report.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | opus | 3 | `class_3bb8c_s` | 10 functions + 11 globals named, local-view fields and slots, header comment; review PASSED, unit marked |
+| bravo | opus | 1 revisit | `code_179d8_f` | `func_80036528` MATCHED 240/240 (round-25 stall, 13 short) |
+| charlie | sonnet | 1b | `code_179d8_j_b` | 3 bodies promoted, re-measured under the current flags |
+| delta | opus | 1 revisit | `code_179d8_b` | `func_80029478` MATCHED 337/337 (round-21 stall) |
+| echo | sonnet | 1b | `DreamSys` | 2 bodies promoted |
+
+Revisit yield is 17/33. `check-nonmatching` compiles 45 bodies (was 40).
+Track 3 is 22/75 units passed, 678/1156 defs still `func_`.
+
+**Assignment note.** `plan.py`'s fourth job, a naming pass on
+`code_179d8_c_b` (0 of 12 defs unnamed), was skipped. The reason is round
+69's escalation 2, which is still open: that unit failed review for a reason
+another naming pass cannot fix. The fifth slot took the next job, the
+DreamSys 1b promotion. That job is now FIRST on the list.
+
+### Both revisit verdicts were wrong in CAUSE
+
+Both runners first rebuilt the preserved body exactly as given, and neither
+matched its title.
+
+- **`func_80029478`**, filed in round 21 as "size exact, register-identity
+  residue", rebuilt at **2 words LONG with ins/del 71/71**. Two defects were
+  plain logic errors: an inverted bit test and swapped ternary arms. What
+  closed the register swap was writing the 8-byte copy as a
+  `static __inline__` function instead of a `do{}while(0)` macro. The swap
+  appeared at all 10 sites and is gone at all 10. A `*(volatile u8 *)` read
+  of a local byte restored a missing `andi 0xff`. It is libcd's `getintr`,
+  identified by its strings; that libcd build is on no disc.
+- **`func_80036528`**'s "unresolved a0/a1-to-callee-saved hop" was the
+  definition taking `(s32, s32)` plus casts where retail's parameters are
+  `s16`. Then a `u16` callee prototype, an `s16` field in the unit's own
+  view, and one permuter-found form (1326 iterations, Gate 3 AGREE at 0/0).
+  The report withdraws both of round 25's levers: each was compensating for
+  a wrong type.
+
+All three idioms are promoted (3d, 3f, 3h). The 3h entry is written as a
+single instance: its MMIO discriminator is only half met, since the buffer is
+a local filled from the CD FIFO. Four single-instance entries were distilled
+to the archive to stay under budget; the head verified all 25 removed lines
+verbatim in the archive.
+
+### Two stall titles still blamed the blocker round 63 resolved
+
+`func_80030E90` and `func_8003149C` were titled "BLOCKED below cc1 by a
+load-delay nop maspsx does not emit", and `plan.py` offered them as 1b
+promotions. The flag that emits that nop (`--nop-at-expansion`) landed in
+round 63, and nobody rebuilt either body. The head asked charlie to measure
+each body live before writing its NON_MATCHING comment:
+
+- **`func_80030E90`: 252/252, LENGTH-EXACT** (was 11 short), 65/252,
+  ins/del 11/11 (was 22/22).
+- `func_8003149C`: 5 short (was 16).
+- `func_80030980`: unchanged at 315/324. Its residue was never this
+  construct.
+
+The head checked the lengths independently from the NON_MATCHING object's
+symbol sizes (0x3F0 = 252 words). It then rewrote both titles with the
+round-70 figures, because `plan.py` ranks from titles. It also retracted the
+round-62 "BLOCKED" verdicts in place and cut charlie's comments to
+score/residue/report. This is round 65's finding (a flag shifts LENGTH
+figures silently) showing up as a ranking error.
+
+### Also this round
+
+- The head applied alpha's proposed field names by type scope:
+  `Obj876FC.tick/kind/params` (all accessors in `class_3bb8c_r`) and
+  `Class6B5CCMethods` `slot44/slot48` -> `updateRotation/updateScale`
+  (accessors in `code_d294` and `code_d294_c`). `make` stops at the first
+  failing unit, so the error list for a shared-header slot comes one unit at
+  a time. The head rebuilt until clean, then ran `check-nonmatching`.
+- Merge corrections: echo's CalcDreamColor comment said "PERMUTER-EXHAUSTED"
+  for ~40400 iterations, and the first window was killed from outside
+  (§2.7: "not closed in N"). bravo's permuter-found form got a site comment.
+- Head error, caught by the build: the first version of the comment trim
+  used a non-greedy regex that spanned body boundaries and deleted code
+  (link failed on three symbols). Reverted and redone line by line; the final
+  diff is comment-only.
+- One class, two placeholder names: `class_3bb8c_s` calls D_800876FC's class
+  `Class876FC`, and `class_3bb8c_r` already views it as `Obj876FC`. Both
+  conventions exist in the tree. Left for `class_3bb8c_r`'s naming pass or
+  track 4.
+- `externcheck.py` clean (662 externs); `stalesyms.py` 0 outstanding.
+
+### Escalated — the head did not act on these
+
+1. **`func_80030E90` is now the strongest matching lead among the stalls
+   (length-exact, ins/del 11/11), and no track offers it.** Its one REVISIT
+   was spent in round 62, on the blocked body. The marker table's
+   `REOPENED -- ASSIGNABLE` ("stall verdict invalidated, its blocker died")
+   fits it exactly, and `func_8003149C` likewise. But track 1 is parked, and
+   reopening ground under a parked track is the operator's call.
+2. **Round 65's escalation 2 is now measured on two more functions.** Stall
+   titles recorded before a flag landed carry stale LENGTH figures, and
+   `plan.py`'s `len-exact`/`len-off` tags and the 1b ordering are derived
+   from them. Here that put a length-exact body in the promotion queue. A
+   rebuild-and-re-measure sweep of the remaining pre-round-63 titles is a
+   tool job.
+3. **Round 69's escalation 1 has a third instance.** `func_80029478` is
+   libcd `getintr`, matched as game C and counted as game code. It keeps
+   `func_` because the question is still open.
+4. **Round 69's escalation 2 is now the TOP ready job**: a naming pass on
+   `code_179d8_c_b`, with 0 of 12 defs unnamed.
+5. **Alpha reports game code inside an SDK-named segment.**
+   `D800879C4`'s methods (`func_80042170`, `func_8004220C`, ...) sit in
+   `psyq_322b4` (file 0x322B4), which `progress.py` excludes from game code
+   by name. The head confirmed the position, not the claim. Re-segmenting
+   is the operator's decision.
+6. **The pasted head prompt's default runner cap (5) differs from
+   FINISHING-PLAN §4.1 (3).** The head followed the paste, as §2 says the
+   pasted cap is binding. Whether §4.1 should be updated is a plan change.
+
+---
+
 ## 2026-09-23 — round 69: two "dead" things were live, and a naming pass named Sony's code in the game's words
 
 **Five runners, three tracks, five merges, all green. Matched 1152 -> 1154,
