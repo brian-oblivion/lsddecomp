@@ -412,25 +412,13 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
 #endif
 
-/* STALL -- see docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md. Round 46 (echo):
- * FIRST-EVER build/score for this function -- inherited round 45's
- * structure-only derivation with no C ever attempted. Length EXACT
- * (199/199 words in-range, no drift), 29/199 raw word-match, first real
- * diff at vram 0x8001DDF8 (register identity: `self` lands in $s4 here,
- * $s5 in retail). Two levers found this round: an unaccounted 0x18-byte
- * stack buffer (same "unused padding" shape as Class6B5CC__CheckBoundsOverlap's own
- * history -- fixed the frame size, which was originally 0x18 short) and
- * a resolution of round 45's open Part-3 ambiguity (see the report).
- * Round 55 (charlie, REVISIT): confirmed unchanged at 29/199 -- the
- * residue is a whole-function register-pressure interaction, not a simple
- * self-vs-tag swap; Part 1's own induction-variable decomposition differs
- * from retail's (four raw read pointers + two write pointers instead of
- * indexed mid[row].x/y/z), and reproducing it in isolation regressed the
- * score (16/199) rather than improving it. Gate 3 permuter checks passed
- * (11 insertions/11 deletions -- real structural room) but the bounded
- * search itself was not run this round. See the report for the full
- * derivation. Restored to INCLUDE_ASM per project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 29/199 words, length exact. Residue: whole-function
+ * register-pressure interaction, not a simple two-value swap -- Part 1's
+ * own induction-variable decomposition (four raw read pointers plus two
+ * write pointers in retail, against the indexed mid[row].x/y/z form here)
+ * competes for callee-saved registers with everything else in the function
+ * (docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md). Hand-derived. */
 extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
@@ -517,9 +505,9 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
 
     return (*outFlag != 0);
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__ClassifyAgainstPlanes);
+#endif
 
 /* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
  * tail-merge/shared-block dispatch, see the git history for the full
