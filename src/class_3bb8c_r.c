@@ -41,20 +41,20 @@
  *    list of `gStyleCueCallbacks` (14 slots, header word 0). Despite matching
  *    BasicClassMethods' slot COUNT, these bodies are NOT
  *    add/removeChild-shaped -- every one calls the shared helper
- *    `ComputeStyleCueFalloff(ctx)` then dispatches on `target->unk4` ("kind") to
+ *    `ComputeStyleCueFalloff(ctx)` then dispatches on `target->kind` to
  *    fill in a handful of numeric fields. Kept as its own local view,
- *    `ParamObj`/`ParamMethods` -- nothing here justifies asserting a
+ *    `StyleCueParam`/`StyleCueParamMethods` -- nothing here justifies asserting a
  *    BasicClass relationship just because the slot count coincides.
- *  - Class876FC__Class876FC (ctor) / Class876FC__Finalize (dtor) / Class876FC__SetParams (slot40)
+ *  - Class876FC__Class876FC (ctor) / Class876FC__Finalize (dtor) / Class876FC__SetParams (setParams)
  *    / Class876FC__Update are occupants of `gClass876FCMethods` -- the SAME sibling
  *    table `class_3bb8c_o.c` (round 17, previous pass, already merged)
  *    partly resolved from the OTHER side (its own `func_80056F4C` returns
  *    `&gClass876FCMethods`, and its shared-base slots +0x010/+0x014/+0x018/+0x088/
  *    etc. are INHERITED, not overridden, by this class). This unit
- *    supplies the class's OWN slots (ctor/dtor/slot40), confirmed by both
+ *    supplies the class's OWN slots (ctor/dtor/setParams), confirmed by both
  *    chaining to `DreamSys__GetBaseMethods()` -- the SAME shared-base getter
  *    `class_3bb8c_o.c` already used for its own ctor/New_X pair. Kept as
- *    this unit's own local view, `Obj876FC`/`Obj876FCMethods` --
+ *    this unit's own local view, `Class876FC`/`Class876FCMethods` --
  *    `class_3bb8c_o.c` is not this unit's to edit, and per the
  *    multiple-independent-local-views convention there is no reason a
  *    fresh view here should match its field names field-for-field.
@@ -75,18 +75,31 @@
  * helper ComputeStyleCueFalloff they all call first.
  * ------------------------------------------------------------------ */
 
-typedef struct ParamObj ParamObj;
-typedef struct ParamMethods {
+/* StyleCueParam is used for BOTH parameters of every StyleCueNN occupant
+ * and of ComputeStyleCueFalloff -- `ctx` (a per-tag config carrying `methods`
+ * and `falloff`'s own inputs) and `self` (the live instance whose `kind` and
+ * numeric fields below get set). InitSoundCueSet/TryStartStyleCue
+ * (class_3bb8c_n.c) install gStyleCueCallbacks' occupants as
+ * SoundCueSet::callback (code_179d8_e.c's InitSoundCueSet), the same slot
+ * gEntityMoodHandlerTable's MoodCueNN handlers occupy for Entity -- so this
+ * is very likely a SoundCueSet-shaped object under a different unit's local
+ * view; `falloff`/pad14's offsets line up with SoundCueSet's own
+ * unk4/unk14 (code_179d8_e.c), but nothing here confirms `self` and `ctx`
+ * are the SAME concrete object, so both stay under one local type per this
+ * project's multiple-independent-local-views convention rather than being
+ * asserted identical to SoundCueSet. */
+typedef struct StyleCueParam StyleCueParam;
+typedef struct StyleCueParamMethods {
     u8 pad0[0x6];
     s8 tag; /* +0x006, a small type id -- read signed, used as a NEGATIVE
              * index into gStyleCueDistanceTable (see ComputeStyleCueFalloff). */
-} ParamMethods;
-struct ParamObj {
-    ParamMethods *methods; /* +0x000 */
-    s32 unk4;                /* +0x004, a "kind" selector the 14 slot
+} StyleCueParamMethods;
+struct StyleCueParam {
+    StyleCueParamMethods *methods; /* +0x000 */
+    s32 kind;                /* +0x004, a "kind" selector the 14 slot
                                * occupants below all dispatch on */
     u8 pad8[0x10 - 0x8];        /* +0x008 .. +0x00F, unknown */
-    s32 unk10;                    /* +0x010, ComputeStyleCueFalloff's own result */
+    s32 falloff;                    /* +0x010, ComputeStyleCueFalloff's own result */
     u8 pad14[0x1C - 0x14];          /* +0x014 .. +0x01B, unknown */
     s32 unk1C;
     s32 unk20;
@@ -109,13 +122,13 @@ struct ParamObj {
  * its definition lives in that position further down this file to keep
  * strict ROM-address order -- forward-declared here since every occupant
  * calls it. */
-s32 ComputeStyleCueFalloff(ParamObj *ctx);
+s32 ComputeStyleCueFalloff(StyleCueParam *ctx);
 
-void StyleCue00(ParamObj *ctx, ParamObj *self) {
+void StyleCue00(StyleCueParam *ctx, StyleCueParam *self) {
     s32 kind;
 
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    kind = self->unk4;
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    kind = self->kind;
     if (kind == 0) {
         self->unk1C = 7;
         self->unk20 = 0;
@@ -126,45 +139,45 @@ void StyleCue00(ParamObj *ctx, ParamObj *self) {
         self->unk44 = 7;
         self->unk48 = 0;
     } else if (kind >= 8) {
-        self->unk4 = -1;
+        self->kind = -1;
     }
 }
 
-void StyleCue01(ParamObj *ctx, ParamObj *self) {
+void StyleCue01(StyleCueParam *ctx, StyleCueParam *self) {
     s32 kind;
 
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    kind = self->unk4;
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    kind = self->kind;
     if (kind == 0) {
         self->unk1C = 0x18;
         self->unk20 = -2;
     } else if (kind >= 0x401) {
-        self->unk4 = -1;
+        self->kind = -1;
     }
 }
 
-void StyleCue02(ParamObj *ctx, ParamObj *self) {
+void StyleCue02(StyleCueParam *ctx, StyleCueParam *self) {
     s32 kind;
 
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    kind = self->unk4;
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    kind = self->kind;
     if (kind == 0) {
         self->unk1C = 0xC;
         self->unk20 = 2;
     } else if (kind >= 5) {
-        self->unk4 = -1;
+        self->kind = -1;
     }
 }
 
-void StyleCue03(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    if (self->unk4 % 20 == 0) {
+void StyleCue03(StyleCueParam *ctx, StyleCueParam *self) {
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    if (self->kind % 20 == 0) {
         self->unk1C = 0x1E;
         self->unk24 = 0x20;
         self->unk20 = 0;
         self->unk28 = 0xA;
     }
-    if (self->unk4 % 400 == 0) {
+    if (self->kind % 400 == 0) {
         self->unk30 = 0x1E;
         self->unk34 = 0;
     }
@@ -174,19 +187,19 @@ void StyleCue03(ParamObj *ctx, ParamObj *self) {
     self->unk50 = 0xA;
 }
 
-void StyleCue04(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    if (self->unk4 % 3 == 0) {
+void StyleCue04(StyleCueParam *ctx, StyleCueParam *self) {
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    if (self->kind % 3 == 0) {
         self->unk1C = 0x1E;
         self->unk20 = 0;
     }
-    if (self->unk4 % 5 == 0) {
+    if (self->kind % 5 == 0) {
         self->unk30 = 0x1E;
         self->unk34 = 0;
         self->unk38 = 0x18;
         self->unk3C = 0x18;
     }
-    if (self->unk4 % 7 == 0) {
+    if (self->kind % 7 == 0) {
         self->unk1C = 0x1E;
         self->unk20 = 0;
     }
@@ -196,42 +209,42 @@ void StyleCue04(ParamObj *ctx, ParamObj *self) {
     self->unk50 = 0xA;
 }
 
-void StyleCue05(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    if (self->unk4 == 0) {
+void StyleCue05(StyleCueParam *ctx, StyleCueParam *self) {
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    if (self->kind == 0) {
         self->unk1C = 0x1E;
         self->unk20 = -1;
-    } else if (self->unk4 < 0x32 && self->unk4 % 5 == 4) {
+    } else if (self->kind < 0x32 && self->kind % 5 == 4) {
         self->unk30 = 0x1E;
         self->unk34 = 0;
-        self->unk38 = self->unk38 - self->unk4 * 2;
+        self->unk38 = self->unk38 - self->kind * 2;
         self->unk3C = self->unk38;
-    } else if ((u32)(self->unk4 - 0x65) < 9) {
+    } else if ((u32)(self->kind - 0x65) < 9) {
         self->unk44 = 0xD;
         self->unk48 = 1;
-    } else if (self->unk4 >= 0xC9) {
-        self->unk4 = -1;
+    } else if (self->kind >= 0xC9) {
+        self->kind = -1;
     }
 }
 
-void StyleCue06(ParamObj *ctx, ParamObj *self) {
+void StyleCue06(StyleCueParam *ctx, StyleCueParam *self) {
     s32 kind;
 
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    kind = self->unk4;
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    kind = self->kind;
     if (kind == 0) {
         self->unk1C = 7;
         self->unk20 = 2;
     } else if (kind >= 0x1B) {
-        self->unk4 = -1;
+        self->kind = -1;
     }
 }
 
-void StyleCue07(ParamObj *ctx, ParamObj *self) {
+void StyleCue07(StyleCueParam *ctx, StyleCueParam *self) {
     s32 kind;
 
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    kind = self->unk4;
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    kind = self->kind;
     if (kind == 0) {
         self->unk1C = 0x14;
         self->unk20 = 1;
@@ -241,13 +254,13 @@ void StyleCue07(ParamObj *ctx, ParamObj *self) {
         self->unk1C = kind;
         self->unk28 = 0x14;
     } else if (kind >= 0x33) {
-        self->unk4 = -1;
+        self->kind = -1;
     }
 }
 
-void StyleCue08(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    if (self->unk4 % 20 == 0) {
+void StyleCue08(StyleCueParam *ctx, StyleCueParam *self) {
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    if (self->kind % 20 == 0) {
         self->unk1C = 9;
         self->unk20 = 0;
         self->unk24 = 0x40;
@@ -255,19 +268,19 @@ void StyleCue08(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void StyleCue09(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    if (self->unk4 % 20 == 0) {
+void StyleCue09(StyleCueParam *ctx, StyleCueParam *self) {
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    if (self->kind % 20 == 0) {
         self->unk1C = 9;
         self->unk20 = -2;
     }
 }
 
-void StyleCue10(ParamObj *ctx, ParamObj *self) {
+void StyleCue10(StyleCueParam *ctx, StyleCueParam *self) {
     s32 rem;
 
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    rem = self->unk4 % 20;
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    rem = self->kind % 20;
     if (rem == 1) {
         self->unk1C = 9;
         self->unk20 = -2;
@@ -277,11 +290,11 @@ void StyleCue10(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void StyleCue11(ParamObj *ctx, ParamObj *self) {
+void StyleCue11(StyleCueParam *ctx, StyleCueParam *self) {
     s32 rem;
 
     StyleCue10(ctx, self);
-    rem = self->unk4 % 70;
+    rem = self->kind % 70;
     if (rem == 50) {
         self->unk44 = 0x14;
         self->unk48 = 1;
@@ -294,11 +307,11 @@ void StyleCue11(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void StyleCue12(ParamObj *ctx, ParamObj *self) {
+void StyleCue12(StyleCueParam *ctx, StyleCueParam *self) {
     s32 kind;
 
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    kind = self->unk4;
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    kind = self->kind;
     if (kind == 0) {
         self->unk1C = 0x14;
         self->unk20 = -2;
@@ -313,13 +326,13 @@ void StyleCue12(ParamObj *ctx, ParamObj *self) {
         self->unk30 = 0x12;
         self->unk34 = -2;
     } else if (kind >= 0xC9) {
-        self->unk4 = -1;
+        self->kind = -1;
     }
 }
 
-void StyleCue13(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    if (self->unk4 == 0) {
+void StyleCue13(StyleCueParam *ctx, StyleCueParam *self) {
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    if (self->kind == 0) {
         self->unk1C = 0x18;
         self->unk20 = 0;
     }
@@ -330,11 +343,11 @@ void StyleCue13(ParamObj *ctx, ParamObj *self) {
  * `asm/data/76DC8.data.s` confirms exactly 15 words at this address. */
 extern s32 gStyleCueDistanceTable[];
 
-s32 ComputeStyleCueFalloff(ParamObj *ctx) {
+s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
     s32 t = gStyleCueDistanceTable[-ctx->methods->tag];
     s32 q = t / ctx->unk28;
 
-    return ctx->unk10 / q;
+    return ctx->falloff / q;
 }
 
 extern s32 gStyleVariant;
@@ -344,21 +357,21 @@ s32 IsStyleVariantEven(void) {
 }
 
 /* ------------------------------------------------------------------ *
- * gClass876FCMethods's own slots (ctor/dtor/slot40), plus its `New_X` allocator.
+ * gClass876FCMethods's own slots (ctor/dtor/setParams), plus its `New_X` allocator.
  * See the file banner: this is the SAME sibling table `class_3bb8c_o.c`
  * (round 17, previous pass) already partly resolved; this unit's own
  * local view is kept independent, per the multiple-independent-views
  * convention -- `class_3bb8c_o.c` is not this unit's to edit.
  * ------------------------------------------------------------------ */
 
-typedef struct Obj876FC Obj876FC;
-typedef struct Obj876FCMethods {
+typedef struct Class876FC Class876FC;
+typedef struct Class876FCMethods {
     u8 pad0[0x8];
-    void *(*ctor)(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4); /* +0x008 Class876FC__Class876FC (this unit) */
-    void *(*dtor)(Obj876FC *self);                                                   /* +0x00C Class876FC__Finalize (this unit) */
+    void *(*ctor)(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4); /* +0x008 Class876FC__Class876FC (this unit) */
+    void *(*dtor)(Class876FC *self);                                                   /* +0x00C Class876FC__Finalize (this unit) */
     u8 pad10[0x40 - 0x10];                                                              /* +0x010 .. +0x03F, shared-base slots, not this unit's to name */
-    void (*slot40)(Obj876FC *self, void *arg1);                                           /* +0x040 Class876FC__SetParams (this unit) */
-} Obj876FCMethods;
+    void (*setParams)(Class876FC *self, void *arg1);                                           /* +0x040 Class876FC__SetParams (this unit) */
+} Class876FCMethods;
 
 /* Declared as a WORD array, not a byte array, so a whole-struct assignment
  * reproduces retail's aligned 4-word-per-iteration block-move codegen
@@ -369,8 +382,8 @@ typedef struct Block24 {
     s32 raw[0x24 / 4];
 } Block24;
 
-struct Obj876FC {
-    Obj876FCMethods *methods; /* +0x000 */
+struct Class876FC {
+    Class876FCMethods *methods; /* +0x000 */
     u8 pad4[0x24 - 0x4];        /* +0x004 .. +0x023, unknown */
     s32 tick;                     /* +0x024, cleared by Class876FC__SetParams */
     u8 pad28[0x44 - 0x28];          /* +0x028 .. +0x043, unknown */
@@ -394,12 +407,12 @@ extern FixedBaseTableR *DreamSys__GetBaseMethods(void);
 
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
-extern Obj876FCMethods *func_80056F4C(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &gClass876FCMethods */
-extern void Class876FC__ReleaseByKind(Obj876FC *self);
-extern void *Class876FC__InitByKind(Obj876FC *self, void *arg1, void *arg2);
+extern Class876FCMethods *func_80056F4C(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &gClass876FCMethods */
+extern void Class876FC__ReleaseByKind(Class876FC *self);
+extern void *Class876FC__InitByKind(Class876FC *self, void *arg1, void *arg2);
 
 void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
-    Obj876FC *self = func_80017B34(0x98);
+    Class876FC *self = func_80017B34(0x98);
 
     if (self != NULL) {
         if (func_80056F4C()->ctor(self, arg0, arg1, arg2, arg3) != NULL) {
@@ -411,33 +424,33 @@ void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
     return NULL;
 }
 
-void *Class876FC__Class876FC(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
+void *Class876FC__Class876FC(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
     if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
         goto fail;
     }
     self->methods = func_80056F4C();
     self->unk44 = 0;
     self->kind = arg1;
-    self->methods->slot40(self, arg2);
+    self->methods->setParams(self, arg2);
     Class876FC__InitByKind(self, arg3, arg4);
     return self;
 fail:
     return NULL;
 }
 
-void *Class876FC__Finalize(Obj876FC *self) {
+void *Class876FC__Finalize(Class876FC *self) {
     Class876FC__ReleaseByKind(self);
     return DreamSys__GetBaseMethods()->dtor(self);
 }
 
-void Class876FC__SetParams(Obj876FC *self, Block24 *src) {
+void Class876FC__SetParams(Class876FC *self, Block24 *src) {
     self->params = *src;
     self->tick = 0;
 }
 
-extern void Class876FC__UpdateByKind(Obj876FC *self); /* arity-ok: the definition is 2-parameter and the callee DOES read $a1 (`move s1,a1` at 0x80056650), but Class876FC__Update passes nothing for it -- retail's jal at 0x80056508 has `sw v0,36(a0)` in the delay slot and leaves its own incoming $a1 in place */
+extern void Class876FC__UpdateByKind(Class876FC *self); /* arity-ok: the definition is 2-parameter and the callee DOES read $a1 (`move s1,a1` at 0x80056650), but Class876FC__Update passes nothing for it -- retail's jal at 0x80056508 has `sw v0,36(a0)` in the delay slot and leaves its own incoming $a1 in place */
 
-void Class876FC__Update(Obj876FC *self) {
+void Class876FC__Update(Class876FC *self) {
     self->tick = self->tick + 1;
     Class876FC__UpdateByKind(self);
 }
