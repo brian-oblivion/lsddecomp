@@ -321,6 +321,6 @@ void Obj865C8__OnEventArg(Obj865C8 *self, s32 arg1) {
     }
 }
 
-void func_8004A458(Obj865C8 *self, s32 arg1) {
+void Obj865C8__SetTimeout(Obj865C8 *self, s32 arg1) {
     self->unk2C = (arg1 < 0) ? arg1 : arg1 * 20;
 }

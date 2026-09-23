@@ -1766,3 +1766,4 @@ Class86668__Deinit = 0x8004A324; // type:func
 Obj865C8__Noop58 = 0x8004A35C; // type:func
 Obj865C8__CheckTimeout = 0x8004A364; // type:func
 Obj865C8__OnEventArg = 0x8004A3EC; // type:func
+Obj865C8__SetTimeout = 0x8004A458; // type:func

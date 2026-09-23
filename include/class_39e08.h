@@ -75,7 +75,7 @@ typedef struct Class865C8Methods {
     void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 Obj865C8__OnEventArg */
     void *unk64, *unk68;                           /* shared base slots (Obj86B60__NotifyTargetReset / Obj86B60__NotifyChildReset) */
     /* Also shared with gClass86668Methods at the same offset. */
-    void (*setUnk2C)(Obj865C8 *self, s32 arg1);    /* +0x06C func_8004A458 */
+    void (*setUnk2C)(Obj865C8 *self, s32 arg1);    /* +0x06C Obj865C8__SetTimeout */
     void *unk70;                                   /* Class86668__SetChildFlag8 */
     void *unk74, *unk78;                           /* null slots */
     void (*noop7C)(Obj865C8 *self);                /* +0x07C Obj865C8__Noop7C (no-op, matched) */
@@ -271,7 +271,7 @@ struct Obj865C8 {
     s32 unk1C;                    /* +0x01C, Obj865C8__CheckTimeout (compared against unk2C) */
     u8 pad20[0x28 - 0x20];
     s32 unk28;                    /* +0x028, Obj865C8__OnEventArg */
-    s32 unk2C;                    /* +0x02C, func_8004A458 */
+    s32 unk2C;                    /* +0x02C, Obj865C8__SetTimeout */
     s32 unk30;                    /* +0x030, Class86668__Dtor (guard) */
     SubObjB *subB;                /* +0x034, Class86668__Dtor */
     SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
