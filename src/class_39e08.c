@@ -84,7 +84,7 @@ void Obj865C8__Init(Obj865C8 *self) {
     GetClass86668Methods()->slot44(self, (s32)self->unk0C, 0);
 }
 
-void func_80049AC0(Obj865C8 *self) {
+void Obj865C8__Deinit(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     GetClass86668Methods()->slot48(self);

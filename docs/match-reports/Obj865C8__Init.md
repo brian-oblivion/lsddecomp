@@ -70,7 +70,7 @@ here.
 
 Continues carving `Obj0C` (fields `unk8`, `unk10` added alongside the
 already-known `unk4`) and `SubObjDMethods` (`slot10` added alongside the
-already-known `slot14`/`slot110`), both established by `func_80049AC0` in
+already-known `slot14`/`slot110`), both established by `Obj865C8__Deinit` in
 this same round. `Class86668Methods::slot44` added, typed `s32 (*)(Obj865C8
 *self, s32 arg1, s32 arg2)` from `func_8004A2C4`'s own established
 signature.
@@ -78,11 +78,11 @@ signature.
 ## Attempts
 
 1 (matched on first attempt — straightforward once `unk0C`/`unk38`/
-`SubObjD` were already carved by `func_80049AC0` earlier this round).
+`SubObjD` were already carved by `Obj865C8__Deinit` earlier this round).
 
 ### Proposed learning
 
-None new beyond `func_80049AC0`'s (same session, same fields) — this
+None new beyond `Obj865C8__Deinit`'s (same session, same fields) — this
 function is corroborating evidence for that one's opaque-struct carve, not a
 new lever.
 

@@ -1,4 +1,6 @@
-# func_80049AC0 — MATCHED (37/37 words)
+# Obj865C8__Deinit — MATCHED (37/37 words)
+
+> Renamed from `func_80049AC0` on 2026-09-23 (tools/rename.py). Address 0x80049ac0.
 
 `Obj865C8`'s vtable slot +0x048.
 
@@ -40,14 +42,14 @@ jr $ra
 `func_8004A324` (this unit, already matched:
 `void func_8004A324(Obj865C8 *self) { Get_vtable_IntermediateBase()->slot48(self); }`) —
 i.e. this function forwards to the SIBLING class's slot48 override
-explicitly, not to its own (`func_80049AC0` itself occupies `D_800865C8`'s
+explicitly, not to its own (`Obj865C8__Deinit` itself occupies `D_800865C8`'s
 +0x048 slot — this is a self-referential-looking but actually cross-class
 call, resolved by `tools/classtable.py`, not by inspection).
 
 ## Final C
 
 ```c
-void func_80049AC0(Obj865C8 *self) {
+void Obj865C8__Deinit(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     GetClass86668Methods()->slot48(self);
@@ -92,6 +94,6 @@ pointer, retype the FIELD and add an explicit `(s32)` cast at the older,
 opaque call site rather than leaving the field typed `s32` project-wide —
 the cast reproduces the identical register move, and the field's real type
 carries forward to every future reader. Confirmed here with two functions
-(`func_80049AC0`, `func_80049E20`) sharing `Obj865C8::unk0C`/`unk38` with
+(`Obj865C8__Deinit`, `func_80049E20`) sharing `Obj865C8::unk0C`/`unk38` with
 opposite usage shapes; rebuilding both together after the retype held both
 matches.

@@ -64,7 +64,7 @@ typedef struct Class865C8Methods {
     void *unk3C;                                   /* +0x03C null slot */
     void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 Obj865C8__ResetState */
     void *slot44;                                  /* +0x044 Obj865C8__Init */
-    void *slot48;                                  /* +0x048 func_80049AC0 */
+    void *slot48;                                  /* +0x048 Obj865C8__Deinit */
     void *slot4C;                                  /* +0x04C func_80049B54 */
     void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 func_80049C50 */
     void *slot54;                                  /* +0x054 func_80049CA8 */
@@ -195,13 +195,13 @@ struct SubObjG {
 };
 
 /* Opaque view of whatever object Obj865C8::unk0C points to (used by
- * func_80049AC0/Obj865C8__Init, which read its own +0x004/+0x008/+0x010
+ * Obj865C8__Deinit/Obj865C8__Init, which read its own +0x004/+0x008/+0x010
  * fields, func_80049B54, which dereferences +0x000, and Obj865C8__Dtor,
  * which dereferences +0x008/+0x00C/+0x010 as `SubObjG *` -- no vtable
  * dispatch through Obj0C ITSELF, so no methods pointer is declared for
  * Obj0C; its own fields point at other objects that have one).
  *
- * +0x008/+0x010 were typed `s32` from Obj865C8__Init/func_80049AC0 alone,
+ * +0x008/+0x010 were typed `s32` from Obj865C8__Init/Obj865C8__Deinit alone,
  * which only ever forward them as opaque register values through a vtable
  * call that never dereferences them -- consistent with EITHER a scalar or a
  * pointer. Obj865C8__Dtor dereferences both directly (`->methods->slot4`),
@@ -216,7 +216,7 @@ typedef struct Obj0C {
 } Obj0C;
 
 /* Opaque view of whatever object Obj865C8::unk38 points to (used by
- * func_80049AC0/Obj865C8__Init): same "vtable at offset 0, only the reached
+ * Obj865C8__Deinit/Obj865C8__Init): same "vtable at offset 0, only the reached
  * slots named" policy as SubObjA/SubObjB/Obj4C above. */
 typedef struct SubObjDMethods {
     u8 pad00[0x10];
@@ -262,10 +262,10 @@ struct SubObjD {
 struct Obj865C8 {
     Class865C8Methods *methods;   /* +0x000 */
     u8 pad04[0x0C - 0x04];
-    Obj0C *unk0C;                 /* +0x00C, func_80049AC0 dereferences (->unk4); passed
+    Obj0C *unk0C;                 /* +0x00C, Obj865C8__Deinit dereferences (->unk4); passed
                                       through as a plain register value to
                                       Get_vtable_IntermediateBase()->slot44's 2nd arg by func_80049E20 */
-    s32 unk10;                    /* +0x010, func_80049AC0 (2nd arg to a slot14 call) */
+    s32 unk10;                    /* +0x010, Obj865C8__Deinit (2nd arg to a slot14 call) */
     u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, func_80049C50 */
     s32 unk1C;                    /* +0x01C, func_8004A364 (compared against unk2C) */
@@ -274,7 +274,7 @@ struct Obj865C8 {
     s32 unk2C;                    /* +0x02C, func_8004A458 */
     s32 unk30;                    /* +0x030, func_8004A228 (guard) */
     SubObjB *subB;                /* +0x034, func_8004A228 */
-    SubObjD *unk38;                /* +0x038, func_80049AC0 dereferences (->methods); passed
+    SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
                                        through as a plain register value to
                                        Get_vtable_IntermediateBase()->slot44's 3rd arg by func_80049E20 */
     s32 unk3C;                    /* +0x03C, Obj865C8__ResetState */
@@ -362,7 +362,7 @@ typedef struct Class86668Methods {
      * as GetClass86668Methods()->slot44(self, self->unk0C, 0), return discarded. */
     s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 func_8004A2C4 */
     /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
-     * Get_vtable_IntermediateBase()->slot48(self). Called by func_80049AC0 as
+     * Get_vtable_IntermediateBase()->slot48(self). Called by Obj865C8__Deinit as
      * GetClass86668Methods()->slot48(self). */
     void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
     u8 pad4C[0x54 - 0x4C];
