@@ -7,7 +7,7 @@
  * 55-function segment never carved before. `tools/classtable.py D_8006B5CC`
  * shows this unit's own method table starts at D_8006B5CC and its slots,
  * in order, ARE this unit's functions: +0x008 Class6B5CC__Class6B5CC (ctor),
- * +0x00C Class6B5CC__Finalize (dtor), +0x010 Class6B5CC__AddChild, +0x014 func_8001CCB4,
+ * +0x00C Class6B5CC__Finalize (dtor), +0x010 Class6B5CC__AddChild, +0x014 Class6B5CC__RemoveChild,
  * +0x018 func_8001CD20, [+0x01C..+0x038 seven slots inherited verbatim from
  * BasicClass, D_8006B58C], +0x038 func_8001CD60 (override), +0x03C null,
  * +0x040 func_8001CE30, +0x044 func_8001CEB4, +0x048 func_8001D008,
@@ -281,9 +281,9 @@ struct BasicClassMethodsD294 {
     void *unk04;               /* +0x004 */
     void *(*ctor)(void *self); /* +0x008 */
     void *(*dtor)(void *self); /* +0x00C */
-    /* +0x010/+0x014, both round-2 finds (Class6B5CC__AddChild/func_8001CCB4):
+    /* +0x010/+0x014, both round-2 finds (Class6B5CC__AddChild/Class6B5CC__RemoveChild):
      * a `(self, other)` pair this class's own +0x010/+0x014 overrides
-     * (Class6B5CC__AddChild/func_8001CCB4) forward to unconditionally, after/before
+     * (Class6B5CC__AddChild/Class6B5CC__RemoveChild) forward to unconditionally, after/before
      * their own extra work. Real BasicClass-level meaning unknown from
      * this unit alone. */
     void (*slot10)(void *self, void *other); /* +0x010 */
@@ -726,7 +726,7 @@ extern Class6B5CCObj *New_Class6B5CC(void);
 void *Class6B5CC__Class6B5CC(Class6B5CCObj *self);
 void Class6B5CC__Finalize(Class6B5CCObj *self);
 void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other);
-void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other);
+void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other);
 void func_8001CD20(Class6B5CCObj *self);
 void func_8001CE30(Class6B5CCObj *self);
 Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec);

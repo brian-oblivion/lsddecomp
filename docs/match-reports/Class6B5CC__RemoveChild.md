@@ -1,4 +1,6 @@
-# func_8001CCB4
+# Class6B5CC__RemoveChild
+
+> Renamed from `func_8001CCB4` on 2026-09-23 (tools/rename.py). Address 0x8001ccb4.
 
 **Unit:** code_d294 · **Size:** 27 words · **Status:** MATCHED (27/27 words)
 
@@ -15,7 +17,7 @@ where `Class6B5CC__AddChild` did its post-work after.
 ## The C
 
 ```c
-void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__UnlinkModel(self);
     }

@@ -38,7 +38,7 @@ known to have `unk2C` and implicitly started with `0x2C` bytes of
 padding; now it starts with the shared `methods` pointer instead);
 `UnkSlotChildMethods_3ac78::unk04` (same shared BasicClass slot pattern,
 now confirmed on this class too); `Class866E8Methods::slot14`
-(`func_8001CCB4`, not decompiled). `GenericMethodsHeader`/`GenericObject`
+(`Class6B5CC__RemoveChild`, not decompiled). `GenericMethodsHeader`/`GenericObject`
 were converted from anonymous-struct typedefs to named-struct typedefs
 (zero behavior change) so they could be forward-declared for use inside
 `UnkSlotEntry_3ac78`, which itself has to be defined before `Class866E8`

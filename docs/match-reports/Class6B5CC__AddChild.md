@@ -11,7 +11,7 @@
 to the base class's own `+0x010` slot (`Get_vtable_BasicClass()->slot10`), then, if
 `other`'s own vtable header tag (`other->methods->header & 0xF`) is `9`,
 additionally calls `Class6B5CC__LinkModel(self, other)` (still uncarved, next
-slice). Its sibling `func_8001CCB4` (`+0x014`) is the mirror-image
+slice). Its sibling `Class6B5CC__RemoveChild` (`+0x014`) is the mirror-image
 "detach" of this "attach".
 
 ## The C
@@ -31,4 +31,4 @@ round 11 (2026-09-03), runner charlie, second pass, unit
 code_d294. Matched on the first build. Established
 `BasicClassMethodsD294`'s `+0x010` slot (2-arg, `(self, other)`) and the
 `GenericObj_d294` generic-dispatch type (header tag comparison), reused by
-`func_8001CCB4`/`func_8001D204` below.
+`Class6B5CC__RemoveChild`/`func_8001D204` below.

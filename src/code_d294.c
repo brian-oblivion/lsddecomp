@@ -57,7 +57,7 @@ void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     }
 }
 
-void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__UnlinkModel(self);
     }
