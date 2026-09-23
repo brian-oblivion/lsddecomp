@@ -1749,3 +1749,4 @@ Obj865C8__OnNotify = 0x80049958; // type:func
 Obj865C8__ResetState = 0x80049A14; // type:func
 Obj865C8__Init = 0x80049A1C; // type:func
 Obj865C8__Deinit = 0x80049AC0; // type:func
+Obj865C8__StartSubA = 0x80049B54; // type:func

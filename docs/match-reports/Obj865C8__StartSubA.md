@@ -1,4 +1,6 @@
-# func_80049B54 — MATCHED (63/63 words)
+# Obj865C8__StartSubA — MATCHED (63/63 words)
+
+> Renamed from `func_80049B54` on 2026-09-23 (tools/rename.py). Address 0x80049b54.
 
 `Obj865C8`'s vtable slot +0x04C.
 
@@ -64,7 +66,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_80049B54(Obj865C8 *self) {
+void Obj865C8__StartSubA(Obj865C8 *self) {
     SubObjE *obj;
     SubObjA *subA;
     SubObjF *ret;

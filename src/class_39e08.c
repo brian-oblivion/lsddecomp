@@ -93,7 +93,7 @@ void Obj865C8__Deinit(Obj865C8 *self) {
     sub->methods->slot14(sub, self->unk10);
 }
 
-void func_80049B54(Obj865C8 *self) {
+void Obj865C8__StartSubA(Obj865C8 *self) {
     SubObjE *obj;
     SubObjA *subA;
     SubObjF *ret;

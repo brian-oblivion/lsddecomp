@@ -65,7 +65,7 @@ typedef struct Class865C8Methods {
     void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 Obj865C8__ResetState */
     void *slot44;                                  /* +0x044 Obj865C8__Init */
     void *slot48;                                  /* +0x048 Obj865C8__Deinit */
-    void *slot4C;                                  /* +0x04C func_80049B54 */
+    void *slot4C;                                  /* +0x04C Obj865C8__StartSubA */
     void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 func_80049C50 */
     void *slot54;                                  /* +0x054 func_80049CA8 */
     void (*noop58)(void);                          /* +0x058 func_8004A35C (no-op, matched) */
@@ -100,11 +100,11 @@ extern Class865C8Methods D_800865C8;
  * DreamSysEntityObj in include/DreamSys.h). */
 typedef struct SubObjAMethods {
     u8 pad00[0x44];
-    void (*slot44)(SubObjA *self, s32 arg1);                /* +0x044, func_80049B54 */
+    void (*slot44)(SubObjA *self, s32 arg1);                /* +0x044, Obj865C8__StartSubA */
     u8 pad48[0x4C - 0x48];
-    void (*slot4C)(SubObjA *self, s32 arg1);                /* +0x04C, func_80049B54 */
+    void (*slot4C)(SubObjA *self, s32 arg1);                /* +0x04C, Obj865C8__StartSubA */
     u8 pad50[0x70 - 0x50];
-    /* func_80049B54's 5-arg call: 4 register args plus a literal 0 in the
+    /* Obj865C8__StartSubA's 5-arg call: 4 register args plus a literal 0 in the
      * 5th (stack) slot. arg1/arg2/arg3 types are just "address taken, never
      * dereferenced here" -- SubObjD* for arg1 because that's what
      * Obj865C8::unk38 already is, void* for the two rodata symbol
@@ -112,19 +112,19 @@ typedef struct SubObjAMethods {
     void (*slot70)(SubObjA *self, SubObjD *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070 */
     void (*slot74)(void *self);
     u8 pad78[0x8C - 0x78];
-    void (*slot8C)(SubObjA *self);                          /* +0x08C, func_80049B54 */
+    void (*slot8C)(SubObjA *self);                          /* +0x08C, Obj865C8__StartSubA */
     void (*slot90)(void *self);
     u8 pad94[0xAC - 0x94];
     /* Returns an object with its OWN 1-slot-known vtable (SubObjF below);
-     * func_80049B54 immediately dispatches the result's own +0x060. */
-    SubObjF *(*slot0xAC)(SubObjA *self);                    /* +0x0AC, func_80049B54 */
+     * Obj865C8__StartSubA immediately dispatches the result's own +0x060. */
+    SubObjF *(*slot0xAC)(SubObjA *self);                    /* +0x0AC, Obj865C8__StartSubA */
 } SubObjAMethods;
 struct SubObjA {
     SubObjAMethods *methods;
 };
 
 /* Opaque view of whatever object SubObjAMethods::slot0xAC returns (used
- * only by func_80049B54): same "vtable at offset 0, only the reached slot
+ * only by Obj865C8__StartSubA): same "vtable at offset 0, only the reached slot
  * named" policy as SubObjE above. */
 typedef struct SubObjFMethods {
     u8 pad00[0x60];
@@ -161,7 +161,7 @@ struct Obj4C {
 };
 
 /* Opaque view of whatever object Obj0C::obj (below) points to (used only by
- * func_80049B54): same "vtable at offset 0, only the reached slot named"
+ * Obj865C8__StartSubA): same "vtable at offset 0, only the reached slot named"
  * policy as SubObjA/SubObjB/Obj4C. */
 typedef struct SubObjE SubObjE;
 typedef struct SubObjEMethods {
@@ -196,7 +196,7 @@ struct SubObjG {
 
 /* Opaque view of whatever object Obj865C8::unk0C points to (used by
  * Obj865C8__Deinit/Obj865C8__Init, which read its own +0x004/+0x008/+0x010
- * fields, func_80049B54, which dereferences +0x000, and Obj865C8__Dtor,
+ * fields, Obj865C8__StartSubA, which dereferences +0x000, and Obj865C8__Dtor,
  * which dereferences +0x008/+0x00C/+0x010 as `SubObjG *` -- no vtable
  * dispatch through Obj0C ITSELF, so no methods pointer is declared for
  * Obj0C; its own fields point at other objects that have one).
@@ -208,7 +208,7 @@ struct SubObjG {
  * settling it: they are `SubObjG *`. Obj865C8__Init's own forwarding call
  * sites got an explicit `(s32)` cast rather than staying wrong. */
 typedef struct Obj0C {
-    SubObjE *obj;                 /* +0x000, func_80049B54 */
+    SubObjE *obj;                 /* +0x000, Obj865C8__StartSubA */
     s32 unk4;                     /* +0x004 -- untouched by Obj865C8__Dtor, still unconfirmed either way */
     SubObjG *unk8;                /* +0x008, Obj865C8__Dtor (was s32) */
     SubObjG *unkC;                 /* +0x00C, Obj865C8__Dtor (new) */
@@ -397,7 +397,7 @@ extern SubObjB *New_VabStreamObj(s32 arg1);
 /* Rodata symbols right next to this unit's own gClass86668Methods/D_800865C8
  * vtables (0x80086650, 0x8008665C -- 0x18 and 0xC bytes before gClass86668Methods
  * respectively). Only their ADDRESSES are taken, as the 2nd/3rd args to
- * SubObjAMethods::slot70 (func_80049B54); real element type/size unknown. */
+ * SubObjAMethods::slot70 (Obj865C8__StartSubA); real element type/size unknown. */
 extern u8 D_80086650[];
 extern u8 D_8008665C[];
 

@@ -91,7 +91,7 @@ same root cause:
    AFTER the first call (`self->methods->slot14(...)`) rather than before
    it. Retail loads `self->unk0C` into a register in the delay-adjacent
    slot BEFORE the `slot14` call even happens (same "load early since the
-   register is free and needed soon" scheduling `func_80049B54` showed
+   register is free and needed soon" scheduling `Obj865C8__StartSubA` showed
    earlier this round). My statement order pushed the load after the call,
    and the compiled instruction landed one slot later than retail's,
    shifting everything after it by one word (nop/removed word 8 residue).
