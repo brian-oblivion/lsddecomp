@@ -49,7 +49,7 @@ typedef struct Class865C8Methods {
     void (*dtor)(Obj865C8 *self);                  /* +0x00C Obj865C8__Dtor */
     /* BasicClass-inherited (BasicClass__func_17f98 -- same address as
      * Class6D3C8.h's own local unk10 view of this same shared slot).
-     * Called by func_80049E20 as self->methods->slot10(self, newObj). */
+     * Called by Obj865C8__EnterState2 as self->methods->slot10(self, newObj). */
     void (*slot10)(Obj865C8 *self, Obj4C *arg1);   /* +0x010 */
     /* Called by Obj865C8__Dtor as self->methods->slot14(self, self->unk38). */
     void (*slot14)(Obj865C8 *self, SubObjD *arg1); /* +0x014 */
@@ -146,7 +146,7 @@ typedef struct SubObjB {
 } SubObjB;
 
 /* Opaque view of whatever object func_80052B70 (uncarved, unit class_3bb8c)
- * returns and stores at Obj865C8::unk4C (used only by func_80049E20): same
+ * returns and stores at Obj865C8::unk4C (used only by Obj865C8__EnterState2): same
  * "vtable at offset 0, only the one dispatched slot named" policy as
  * SubObjA/SubObjB above. */
 typedef struct Obj4CMethods {
@@ -249,7 +249,7 @@ typedef struct SubObjDMethods {
     struct SubObjDPos (*slot1BC)(SubObjD *self);
     u8 pad1C0[0x1E0 - 0x1C0];
     /* Obj865C8__AdvanceState's `case 3`: return value used (forwarded straight into
-     * func_80049E20's own 2nd argument). */
+     * Obj865C8__EnterState2's own 2nd argument). */
     s32 (*slot1E0)(SubObjD *self);                 /* +0x1E0 */
 } SubObjDMethods;
 struct SubObjD {
@@ -264,7 +264,7 @@ struct Obj865C8 {
     u8 pad04[0x0C - 0x04];
     Obj0C *unk0C;                 /* +0x00C, Obj865C8__Deinit dereferences (->unk4); passed
                                       through as a plain register value to
-                                      Get_vtable_IntermediateBase()->slot44's 2nd arg by func_80049E20 */
+                                      Get_vtable_IntermediateBase()->slot44's 2nd arg by Obj865C8__EnterState2 */
     s32 unk10;                    /* +0x010, Obj865C8__Deinit (2nd arg to a slot14 call) */
     u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, Obj865C8__RunSubUpdates */
@@ -276,17 +276,17 @@ struct Obj865C8 {
     SubObjB *subB;                /* +0x034, func_8004A228 */
     SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
                                        through as a plain register value to
-                                       Get_vtable_IntermediateBase()->slot44's 3rd arg by func_80049E20 */
+                                       Get_vtable_IntermediateBase()->slot44's 3rd arg by Obj865C8__EnterState2 */
     s32 unk3C;                    /* +0x03C, Obj865C8__ResetState */
-    /* Retyped from `s32` (func_80049E20's own usage only ever forwards
+    /* Retyped from `s32` (Obj865C8__EnterState2's own usage only ever forwards
      * these as opaque register values into func_80052B70, never
      * dereferencing them): Obj865C8__Dtor dereferences all three directly
      * as `SubObjG *` (`self->unkNN->methods->slot4(self->unkNN)`, result
-     * discarded). func_80049E20's call site got an explicit `(s32)` cast. */
-    SubObjG *unk40;                /* +0x040, func_80049E20 (2nd arg to func_80052B70), Obj865C8__Dtor */
-    SubObjG *unk44;                /* +0x044, func_80049E20 (3rd arg to func_80052B70), Obj865C8__Dtor */
-    SubObjG *unk48;                /* +0x048, func_80049E20 (4th arg to func_80052B70), Obj865C8__Dtor */
-    Obj4C *unk4C;                 /* +0x04C, func_80049E20 -- result of func_80052B70 */
+     * discarded). Obj865C8__EnterState2's call site got an explicit `(s32)` cast. */
+    SubObjG *unk40;                /* +0x040, Obj865C8__EnterState2 (2nd arg to func_80052B70), Obj865C8__Dtor */
+    SubObjG *unk44;                /* +0x044, Obj865C8__EnterState2 (3rd arg to func_80052B70), Obj865C8__Dtor */
+    SubObjG *unk48;                /* +0x048, Obj865C8__EnterState2 (4th arg to func_80052B70), Obj865C8__Dtor */
+    Obj4C *unk4C;                 /* +0x04C, Obj865C8__EnterState2 -- result of func_80052B70 */
 };
 
 /* Base class table shared by D_800865C8 and gClass86668Methods (resolved with
@@ -319,7 +319,7 @@ extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);
 /* Allocator in the still-uncarved unit class_3bb8c (asm/class_3bb8c.s):
  * allocates an 0x88-byte instance, ctors it, and dispatches its own slot
  * +0x008 with the 5 forwarded arguments, returning the new instance (or 0
- * on allocation failure). Only the one call site here (func_80049E20)
+ * on allocation failure). Only the one call site here (Obj865C8__EnterState2)
  * cares about its signature; `a0`'s type is inherited from whatever the
  * caller actually passes (this unit's own `SubObjB *`), the remaining
  * scalar args are untyped beyond their register width. */

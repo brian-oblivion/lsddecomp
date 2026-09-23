@@ -79,8 +79,8 @@ jalr  $v0
  nop                          ; result = self->unk38->methods->slot1E0(self->unk38)
 addu  $a0, $s1, $zero
 .L80049DFC:                  ; shared tail
-jal   func_80049E20
- addu $a1, $v0, $zero        ; func_80049E20(self, result)
+jal   Obj865C8__EnterState2
+ addu $a1, $v0, $zero        ; Obj865C8__EnterState2(self, result)
 END:
 ...
 jr $ra
@@ -89,7 +89,7 @@ jr $ra
 ## Final C
 
 ```c
-extern void func_80049E20(Obj865C8 *self, s32 arg1);
+extern void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1);
 
 void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
@@ -105,7 +105,7 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
                 self->methods->onEventArg(self, 3);
                 return;
             }
-            func_80049E20(self, result);
+            Obj865C8__EnterState2(self, result);
             break;
         case 2:
             break;
@@ -113,14 +113,14 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
             self->unk4C->methods->slot48(self->unk4C);
             self->unk4C->methods->slot4(self->unk4C);
             result = self->unk38->methods->slot1E0(self->unk38);
-            func_80049E20(self, result);
+            Obj865C8__EnterState2(self, result);
             break;
         }
     }
 }
 ```
 
-`func_80049E20` is defined LATER in this file (ROM order requires the C
+`Obj865C8__EnterState2` is defined LATER in this file (ROM order requires the C
 definition to stay where it is), so a local `extern` forward prototype was
 added right above this function -- same "calling into a function that is
 still being written elsewhere" convention CLAUDE.md documents, applied to a
@@ -188,7 +188,7 @@ double-branch tail, or vice versa:
 - `SubObjDMethods` extended with `slot1B4` (`s32 (*)(SubObjD *self)`,
   return value used — genuinely non-void) and `slot1B8` (`void (*)(SubObjD
   *self, s32 arg1)`), and `slot1E0` (`s32 (*)(SubObjD *self)`, return value
-  forwarded straight into `func_80049E20`'s own argument).
+  forwarded straight into `Obj865C8__EnterState2`'s own argument).
 - `Obj4CMethods` extended with `slot4` and `slot48` (both `void (*)(Obj4C
   *self)`, return discarded at both call sites here).
 

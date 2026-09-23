@@ -117,14 +117,14 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
   independent call sites in this one function.
 - **Correction to earlier-this-round typings** (see below): `Obj0C::unk8`,
   `Obj0C::unk10`, and `Obj865C8::unk40`/`unk44`/`unk48` were all typed `s32`
-  by `Obj865C8__Init`/`func_80049E20` (earlier this session), whose own call
+  by `Obj865C8__Init`/`Obj865C8__EnterState2` (earlier this session), whose own call
   sites only ever forward these fields as opaque register values through a
   vtable call that never dereferences them — consistent with either a
   scalar or a pointer at the time. This function dereferences all five
   directly (`->methods->slot4`), settling it: they are `SubObjG *`. Added
   `Obj0C::unkC` (brand new field, same type, same pattern). Both older call
   sites (`Obj865C8__Init`'s two `unk8`/`unk10` forwards,
-  `func_80049E20`'s three `unk40`/`unk44`/`unk48` forwards) got explicit
+  `Obj865C8__EnterState2`'s three `unk40`/`unk44`/`unk48` forwards) got explicit
   `(s32)` casts added at their existing call sites — same register value
   either way, confirmed by rebuilding all nine of this unit's matched
   functions together (all still full matches).
@@ -138,7 +138,7 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
   pointer to this report instead, since CLAUDE.md's per-function report
   policy makes each report a record of what THAT function established, not
   a place to retroactively rewrite once a later function adds evidence.
-- `docs/match-reports/func_80049E20.md` — same note for
+- `docs/match-reports/Obj865C8__EnterState2.md` — same note for
   `unk40`/`unk44`/`unk48`.
 
 (Both updates below, appended as a dated addendum rather than editing the

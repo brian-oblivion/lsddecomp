@@ -56,7 +56,7 @@
  *
  * func_80052B70 itself is declared with a NARROWER opaque return type,
  * `Obj4C *`, by the pre-existing prototype in include/class_39e08.h (that
- * unit's own independent view, established from func_80049E20's call
+ * unit's own independent view, established from Obj865C8__EnterState2's call
  * site) -- this file includes class_39e08.h, so func_80052B70's definition
  * below must match that prototype exactly (return type and first-argument
  * type) or the two conflict. The richer view below is used only inside
@@ -275,7 +275,7 @@ void func_80052598(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 }
 
 /* Defined later in this file (ROM order); forward-declared here since
- * func_80052644 calls both, same convention as func_80049E20 in
+ * func_80052644 calls both, same convention as Obj865C8__EnterState2 in
  * src/class_39e08.c. Signatures must match their real definitions below
  * exactly. */
 extern char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);

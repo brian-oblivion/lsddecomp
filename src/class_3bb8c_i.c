@@ -54,7 +54,7 @@ extern s32 strlen(char *s);
 extern u8 *D_8008AAE4;
 
 /* Defined later in this file (ROM order); forward-declared here since
- * func_80050C14 calls it, same convention as func_80049E20 in
+ * func_80050C14 calls it, same convention as Obj865C8__EnterState2 in
  * src/class_39e08.c. */
 extern void func_80050CD8(Obj86ED0 *self);
 

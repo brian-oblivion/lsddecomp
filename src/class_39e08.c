@@ -120,7 +120,7 @@ void Obj865C8__RunSubUpdates(Obj865C8 *self) {
 
 /* Defined later in this file (ROM order); forward-declared here since
  * Obj865C8__AdvanceState calls it. */
-extern void func_80049E20(Obj865C8 *self, s32 arg1);
+extern void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1);
 
 void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
@@ -136,7 +136,7 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
                 self->methods->onEventArg(self, 3);
                 return;
             }
-            func_80049E20(self, result);
+            Obj865C8__EnterState2(self, result);
             break;
         case 2:
             break;
@@ -144,13 +144,13 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
             self->unk4C->methods->slot48(self->unk4C);
             self->unk4C->methods->slot4(self->unk4C);
             result = self->unk38->methods->slot1E0(self->unk38);
-            func_80049E20(self, result);
+            Obj865C8__EnterState2(self, result);
             break;
         }
     }
 }
 
-void func_80049E20(Obj865C8 *self, s32 arg1) {
+void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1) {
     self->unk4C = func_80052B70(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
     self->methods->slot10(self, self->unk4C);
     self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);

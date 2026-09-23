@@ -62,16 +62,16 @@ void Obj865C8__Deinit(Obj865C8 *self) {
 ## New struct knowledge (`include/class_39e08.h`)
 
 - `Obj865C8::unk0C` retyped from `s32` (its only other use so far,
-  `func_80049E20`'s forwarded arg to `Get_vtable_IntermediateBase()->slot44`, a plain
+  `Obj865C8__EnterState2`'s forwarded arg to `Get_vtable_IntermediateBase()->slot44`, a plain
   register-passthrough that never dereferences it) to `Obj0C *` — this
-  function dereferences it (`->unk4`) directly. Updated `func_80049E20`'s
+  function dereferences it (`->unk4`) directly. Updated `Obj865C8__EnterState2`'s
   call site with an explicit `(s32)` cast; same register value either way,
   confirmed by rebuilding both functions together (33/33 and 37/37 both
   hold).
 - `Obj865C8::unk10` (s32, new) — passed as a plain register value to a
   `slot14` call, never dereferenced.
 - `Obj865C8::unk38` retyped from `s32` to `SubObjD *` for the same reason as
-  `unk0C` — `func_80049E20` never dereferences it either, cast added there
+  `unk0C` — `Obj865C8__EnterState2` never dereferences it either, cast added there
   too.
 - New opaque type `Obj0C` (only field known: `unk4`, plain scalar,
   no vtable dispatch through it in this unit).
@@ -94,6 +94,6 @@ pointer, retype the FIELD and add an explicit `(s32)` cast at the older,
 opaque call site rather than leaving the field typed `s32` project-wide —
 the cast reproduces the identical register move, and the field's real type
 carries forward to every future reader. Confirmed here with two functions
-(`Obj865C8__Deinit`, `func_80049E20`) sharing `Obj865C8::unk0C`/`unk38` with
+(`Obj865C8__Deinit`, `Obj865C8__EnterState2`) sharing `Obj865C8::unk0C`/`unk38` with
 opposite usage shapes; rebuilding both together after the retype held both
 matches.
