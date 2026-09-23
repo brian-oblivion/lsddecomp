@@ -33,3 +33,15 @@ void SeqTimerCallback(void)
 
 round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
 Matched first attempt.
+
+## Naming
+
+Round 69 (delta). `SeqTimerCallback` (was `func_80032A9C`): calls
+`gSeqTimerChainedCallback` if one was saved, then unconditionally calls
+`SsSeqCalledTbyT`. This is the callback `SeqTimerControl` installs via
+`InterruptCallback` on the "no id yet" path (see `SeqTimerControl.md`) --
+i.e. it IS the root-counter/vsync interrupt handler that drives the
+sequencer, chaining to whatever handler was previously installed. Tier B:
+the ISR-chaining mechanism is directly evident from the body and the call
+site; "drives the sequencer" rests on `SsSeqCalledTbyT`'s own name (Sony's,
+per round 34's SDK linkage), not re-derived here.

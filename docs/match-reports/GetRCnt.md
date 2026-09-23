@@ -77,3 +77,11 @@ Round 16 (2026-09-04) runner delta, round 19 (2026-09-05) runner charlie,
 plus head-directed attempts: filed as register identity, not fixable.
 Round 32 (2026-09-12), head: matched 14/14 first attempt once the
 `volatile` typing was in place. Whole-image SHA1 green.
+
+## Naming
+
+Round 69 (delta). `GetRCnt` (was `func_80032BB8`): a pure getter (reads
+`gRCntRegs[idx].count`, guarded by a range check) -- tier A by the
+project's own rule ("a getter ... is tier A by definition"). Name taken
+directly from this report's own heading, which already called it `GetRCnt`
+before the symbol itself was renamed.

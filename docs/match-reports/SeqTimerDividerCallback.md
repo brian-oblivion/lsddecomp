@@ -49,3 +49,18 @@ order, not just polarity.**
 
 round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
 Matched second attempt (one branch-direction flip).
+
+## Naming
+
+Round 69 (delta). `SeqTimerDividerCallback` (was `func_80032AD0`): flips
+`gSeqTimerDividerFlag` between 0 and 1, calling `SsSeqCalledTbyT` only on
+the transition back to 0. `SeqTimerControl` installs this as the RCnt/vsync
+ISR callback (in place of `SeqTimerCallback`) exactly when
+`gSeqTimerRateFlag` is set -- i.e. when the timer is running a custom
+(halved) rate, this callback only fires the sequencer tick every OTHER
+interrupt. Tier B: the divide-by-two mechanism and its selection condition
+are both directly evident from `SeqTimerControl`'s body; the previous
+"pause/mute-style toggle" guess in this report's older section is
+superseded by this reading, which is grounded in the actual call site
+rather than the toggle shape alone. `gSeqTimerDividerFlag` (was
+`D_8006DCA0`) is named for the same reason.

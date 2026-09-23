@@ -99,3 +99,14 @@ round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve,
 second pass, head-directed follow-up). Matched second attempt (one
 if/else block-order flip after the head's `SeqTimerDividerCallback` lever
 generalisation request surfaced the same axis here).
+
+## Naming
+
+Round 69 (delta). `CancelSeqTimer` (was `func_800329D8`): guarded by
+`gSeqTimerModeFlag`, clears `gSeqTimerRateFlag`, and either cancels a
+pending stop (`VSyncCallback(0)`, clearing `gSeqTimerStopPending`) or
+deregisters/registers the RCnt interrupt callback via `InterruptCallback`
+and resets `gSeqTimerId` to its `-1` sentinel -- the inverse of what
+`SeqTimerControl` arms. Tier B: the mechanism (tear down whatever
+`SeqTimerControl` set up) is clear from the shared globals; the caller
+that decides WHEN to cancel is outside this unit.

@@ -514,3 +514,18 @@ pipeline -- a permuter score improvement did not correspond to a real
 one here. No source change kept; restored to `INCLUDE_ASM`, still
 65/164, first real diff at vram `0x80032760`. See "Round 41" section
 above for full detail.
+
+## Naming
+
+Round 69 (delta), track 3 pass on `code_179d8_c_b`.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `SeqTimerControl` (was `func_80032708`) | B | arms a PSX root counter at the rate `SetSeqTimerMode` selected (`SetRCnt`), tags a device value, and registers one of two ISR callbacks (`SeqTimerCallback`/`SeqTimerDividerCallback`) via `InterruptCallback` -- an "arm the sequencer's software timer" routine. `arg0` is a start/stop-ish switch (see `StartSeqTimer.md`/`StopSeqTimer.md`) but its exact in-game trigger is not established, hence B not A. |
+| `gSeqTimerId` (was `D_8006DC90`) | B | the value threaded through `InterruptCallback` as a handle: `-1` is checked as a sentinel ("nothing armed") throughout this function and in `CancelSeqTimer`, `0` means "armed but not yet given a real id" (this function then captures one via `InterruptCallback(0, NULL)`), and any other value is passed straight back to `InterruptCallback` to re-target or deregister. |
+| `gSeqTimerRateFlag` (was `D_8006DC94`) | B | set (incremented, never explicitly reset here) only on the branch of the default case that computes the smaller of the two custom rates (`v1 < 0x46`); this function's own callback-selection tail reads it as a boolean to choose `SeqTimerDividerCallback` over `SeqTimerCallback` -- i.e. it selects the half-rate ISR variant. `CancelSeqTimer` clears it back to 0. |
+| `gSeqTimerStopPending` (was `D_8006DC8C`) | B | when set, this function's shared tail skips arming entirely and instead tears down via `VSyncCallback(SsSeqCalledTbyT)`; `CancelSeqTimer` is the other place that reads/clears it, calling `VSyncCallback(0)` first. Named for what it gates (a pending stop/teardown), not for a specific caller's intent. |
+| `gSeqTimerChainedCallback` (was `D_8006DC9C`) | B | captured from `InterruptCallback(0, NULL)`'s return value (the previously-installed handler) right before this function installs `SeqTimerCallback` as the new one; `SeqTimerCallback` calls it first, then always calls `SsSeqCalledTbyT` -- the classic "save old handler, chain to it" ISR-hook idiom. |
+
+`gSeqTimerRateMode`/`gSeqTimerModeFlag`/`gVideoMode`/`gSeqTickRate` are
+established in `SetSeqTimerMode.md`; this function only reads the first two.

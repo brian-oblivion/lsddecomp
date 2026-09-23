@@ -365,3 +365,10 @@ where retail leaves that slot a genuine `nop` and keeps the store
 before the jump) -- everything else byte-identical, confirming this
 report's long-standing characterisation is still accurate. Restored to
 `INCLUDE_ASM` (still not byte-exact).
+
+## Naming
+
+Round 69 (delta). `ResetRCnt` (was `func_80032C60`): clears
+`gRCntRegs[idx].count` to 0, guarded by the same range check as `GetRCnt`
+-- tier A (a clamp/reset leaf whose mechanics are its purpose). Name taken
+directly from this report's own heading.

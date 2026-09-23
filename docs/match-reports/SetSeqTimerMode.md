@@ -207,3 +207,20 @@ against a drifted image.
    (case 3 fell through to case 2's dead code) rather than merely
    changing instruction order, which is exactly what the barrier is
    supposed to be restricted to.
+
+## Naming
+
+Round 69 (delta), track 3 pass on `code_179d8_c_b`.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `SetSeqTimerMode` (was `func_80032588`) | B | mechanics are fully known (splits an input word into a rate-mode selector and a flag, then picks a tick rate from a 6-way table); the in-game reason a caller picks each mode is not established. |
+| `gSeqTimerRateMode` (was `D_8006DCA4`) | B | the "cmd" this function derives from its argument and `SeqTimerControl` (the timer-arming stall) dispatches on for its own device-tag/rate selection -- see that report. |
+| `gSeqTimerModeFlag` (was `D_8006DCA8`) | B | the flag bit (`a0 & 0x1000`) extracted alongside the rate mode; `SeqTimerControl`'s `default:` arm returns immediately without touching the timer when this is set, so it gates whether the computed-rate path runs at all. |
+| `gVideoMode` (was `D_8006DC98`) | A | assigned directly from Psy-Q's `GetVideoMode()` in `func_8003221C` (sibling unit `code_179d8_c.c`, its own match report). This function only reads it, to choose between the two named tick rates. |
+| `gSeqTickRate` (was `D_8009024C`) | B | `src/code_179d8_k.c` (a different, uninvolved unit) independently reads this same global and comments it as "a tick-rate/PPQN-style constant" used in a MIDI Set-Tempo scheduling formula (`func_80035B2C`/`SetTempo`-style handler) -- two unrelated units converging on the same reading. This function is the one that WRITES it, from the 6-way rate table below. |
+| `SEQ_TICKRATE_50`/`_60`/`_120`/`_240` (magic constants `0x32`/`0x3c`/`0x78`/`0xf0`) | B | named by value only (the numbers themselves), not by an NTSC/PAL region claim -- `gVideoMode` (0/1) does select between the 50 and 60 values in three of the six cases, which is suggestive, but this file has no direct evidence pinning which region is which value. |
+
+See `SeqTimerControl.md` for the globals `gSeqTimerId`/`gSeqTimerRateFlag`/
+`gSeqTimerStopPending`/`gSeqTimerChainedCallback`, which this function does
+not touch.

@@ -67,3 +67,15 @@ with the field's store and leaving the `nop` retail has. When a body compiles
 one instruction short with a plausible-looking delay-slot hoist, and the
 field being stored is memory-mapped I/O, try `volatile` before treating it as
 a scheduling residue to chase with a barrier.
+
+## Naming
+
+Round 69 (delta). `SetIrqMask` (was `func_80032BF0`): ORs a bit into
+`gIrqRegs->mask` (I_MASK), where the bit comes from `gRCntIrqMasks[idx]`.
+Tier A -- a setter whose mechanics are its purpose. `gIrqRegs` (was
+`D_8006DCAC`) and `gRCntIrqMasks` (was `D_8006DCB4`) are named from this
+function's and `ClearIrqMask`'s own pre-existing doc comment in
+`src/code_179d8_c_b.c`, which already identified the pair as the PSX
+I_STAT/I_MASK shadow and the per-index Tmr0/Tmr1/Tmr2/VBLANK IRQ bit table
+-- tier B for both (the hardware mapping is established; which game
+subsystem relies on it is not).

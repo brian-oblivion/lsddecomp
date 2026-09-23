@@ -31,6 +31,26 @@ Returns `1` on success, `0` if `n` was out of range.
 
 ## The C
 
+**STALE below (pre-round-32): this block still shows the plain-`u16`,
+`__asm__("")`-barrier form.** `ResetRCnt.md`/`GetRCnt.md` document that round
+32 replaced the barrier with `volatile` on all three `RCntEntry` fields
+(load-bearing for those two functions, and it subsumes this function's own
+barrier -- removed, `SetRCnt` still verifies 40/40). The struct in
+`src/code_179d8_c_b.c` is now:
+
+```c
+typedef struct {
+    volatile u16 count;              /* 0x0 */
+    u8  pad2[0x4 - 0x2];
+    volatile u16 mode;                /* 0x4 */
+    u8  pad6[0x8 - 0x6];
+    volatile u16 target;               /* 0x8 */
+    u8  padA[0x10 - 0xA];
+} RCntEntry;
+```
+and `SetRCnt`'s own body carries no `__asm__("")` at all. The signedness and
+mode-bitmask findings below are unaffected by this and still hold.
+
 ```c
 /* Shadow copy of the three PSX root-counter register blocks (COUNT/MODE/
  * TARGET, each a hardware halfword, 0x10 apart -- matches the real
@@ -60,7 +80,6 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
     isLow = (u32)idx < 2;
     gRCntRegs[idx].mode = 0;
     gRCntRegs[idx].target = target;
-    __asm__("");
 
     if (isLow) {
         if (mode & 0x10) {
@@ -140,3 +159,11 @@ round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
 Matched after ~4 attempts (signedness fix, branch-direction/guard-clause
 shape not needed here since it already matched, and the scheduling
 barrier).
+
+## Naming
+
+Round 69 (delta). `gRCntRegs` (was `D_8006DCB0`): pointer to the 3-entry
+shadow of the PSX root-counter register blocks (COUNT/MODE/TARGET, matching
+the real `0x1F801100`/`0x1F801110`/`0x1F801120` hardware spacing) -- tier B,
+established by this function's own pre-existing doc comment and used
+identically by `GetRCnt`/`ResetRCnt`.

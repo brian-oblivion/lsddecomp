@@ -29,3 +29,15 @@ void ClearSpuMute(void)
 
 round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
 Matched first attempt.
+
+## Naming
+
+Round 69 (delta). `ClearSpuMute` (was `func_80032A7C`): a zero-argument
+tail-call wrapper to `func_80038FB0`, an uncarved function this report
+already documents as guarding on an SPU-mute flag and, when set, clearing
+it and resetting several sound globals plus two SPU voice-key helpers.
+Tier B -- the name reflects that callee's documented behaviour (its own
+future name is not this unit's to assign, per FINISHING-PLAN track 3's
+field/function ownership rule extended by analogy: `func_80038FB0` lives
+outside this unit's file). Unrelated to the `SeqTimer*` cluster the rest of
+this unit is about; it only shares this address range.

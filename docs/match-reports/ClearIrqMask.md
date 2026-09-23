@@ -43,3 +43,9 @@ function needed no extra work. Confirmed byte-exact, `build exit=0`.
 
 See `SetIrqMask.md` -- same idiom, same fix, filed once there to avoid
 duplicating the explanation.
+
+## Naming
+
+Round 69 (delta). `ClearIrqMask` (was `func_80032C28`): the inverse of
+`SetIrqMask` (`gIrqRegs->mask &= ~gRCntIrqMasks[idx]`). Tier A, same
+reasoning as `SetIrqMask.md`.

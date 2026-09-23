@@ -27,3 +27,11 @@ above `StartSeqTimer` in `src/code_179d8_c.c`.)
 
 round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
 Matched first attempt, alongside `StartSeqTimer`.
+
+## Naming
+
+Round 69 (delta). `StopSeqTimer` (was `func_800329B8`): tail-call wrapper
+calling `SeqTimerControl(0)`. Tier B, mirroring `StartSeqTimer` -- see
+`SeqTimerControl.md`'s case-5 description: `arg0==0` increments
+`gSeqTimerStopPending` and falls straight into the teardown path
+(`VSyncCallback(SsSeqCalledTbyT)`) instead of arming a new rate.
