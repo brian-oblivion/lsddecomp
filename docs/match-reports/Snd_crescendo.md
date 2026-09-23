@@ -1,4 +1,6 @@
-# func_80036528
+# Snd_crescendo
+
+> Renamed from `func_80036528` on 2026-09-23 (tools/rename.py). Address 0x80036528.
 
 **Unit:** code_179d8_f · **Size:** 240 words (0x3C0 bytes) · **Status:**
 **MATCHED, round 70 (bravo)** — 240/240, insertions 0 / deletions 0,

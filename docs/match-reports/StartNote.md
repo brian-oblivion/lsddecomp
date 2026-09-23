@@ -334,7 +334,7 @@ ones that look old.
 
 ## Round 48 update (runner echo): tested charlie's frame-padding lever -- THIRD confirmed negative for length closure
 
-Round 48's designated test of charlie's `func_800351D0` frame-padding
+Round 48's designated test of charlie's `ContDataEntry` frame-padding
 discovery, applied here since this function's own title already recorded
 an explicit frame-size gap (`0x140` built vs retail's `0x148`). Rebuilt the
 round-37 preserved body first (with both its stale-symbol fixes:
@@ -375,7 +375,7 @@ across the unit's three tests: every one of this unit's frame gaps is pure
 unaddressed register-save-area padding, with whatever content residue the
 function actually has (a redundant mask, a persisted early value, an
 addressing-cost difference) living entirely independently of the frame
-size. `func_800351D0`'s original length recovery came from a SEPARATE,
+size. `ContDataEntry`'s original length recovery came from a SEPARATE,
 coincidentally-discovered tail-duplication fix, not from the padding move
 itself -- this unit's evidence says that pairing is not the common case.
 **Treat the padding fix as a diagnostic-alignment step to apply cheaply

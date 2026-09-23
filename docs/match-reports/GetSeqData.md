@@ -112,7 +112,7 @@ After fixing block order, the function is 172/172 words long (exact) and
 widened "channel" value (kept live across nearly every call in the
 function) sits in `$s4` in retail and in `$s3` here; the per-case "next
 data byte" value (note/velocity/controller/program/meta byte -- whichever
-one is live across the `func_80035E80` call in the Note-On path, or just
+one is live across the `ReadDeltaValue` call in the Note-On path, or just
 passed straight through in the others) sits in `$s3` in retail and `$s4`
 here. Every one of the ~40-odd `move a0,sN` / `sw sN,offset(sp)`
 instructions that differ is this SAME pair of registers swapped; there is
@@ -130,7 +130,7 @@ after every one of these):**
 3. Dropping the separate `cursor` local for the first byte-read and
    folding it into the same `p`-based idiom the case bodies use.
 4. Introducing a single shared `note` variable used as the argument to
-   `func_80034690`/`SetProgramChange`/`func_80035B2C` in the 0xB0/0xC0/0xF0
+   `func_80034690`/`SetProgramChange`/`GetMetaEvent` in the 0xB0/0xC0/0xF0
    cases (instead of passing `*p` inline), to raise that pseudo's
    reference count closer to "channel"'s.
 5. Declaring `note`/`vel` as `s32` (matching the callee parameter types
@@ -161,8 +161,8 @@ this is ordinary C control flow, not an unrepresentable GTE/COP2 access.
  *   extern void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3);
  *   extern void SetProgramChange(s16 a0, s16 a1, u8 a2);
  *   extern void func_80034690(s16 a0, s16 a1, u8 a2);
- *   extern void func_80035A7C(s16 a0, s16 a1);
- *   extern void func_80035B2C(s16 a0, s16 a1, u8 a2);
+ *   extern void SetPitchBend(s16 a0, s16 a1);
+ *   extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
  */
 void GetSeqData(s16 a0, s16 a1)
 {
@@ -184,7 +184,7 @@ void GetSeqData(s16 a0, s16 a1)
             note = *p;
             rec->unk4 = p + 2;
             vel = *(p + 1);
-            rec->unk88 = func_80035E80(a0, a1);
+            rec->unk88 = ReadDeltaValue(a0, a1);
             NoteOn(a0, a1, note, vel);
             return;
         case 0xB0:
@@ -204,7 +204,7 @@ void GetSeqData(s16 a0, s16 a1)
         case 0xE0:
             rec->unk11 = 0xE0;
             rec->unk4 = rec->unk4 + 1;
-            func_80035A7C(a0, a1);
+            SetPitchBend(a0, a1);
             return;
         case 0xF0:
             p = rec->unk4;
@@ -212,7 +212,7 @@ void GetSeqData(s16 a0, s16 a1)
             rec->unk12 = raw & 0xF;
             rec->unk4 = p + 1;
             note = *p;
-            func_80035B2C(a0, a1, note);
+            GetMetaEvent(a0, a1, note);
             return;
         default:
             return;
@@ -222,7 +222,7 @@ void GetSeqData(s16 a0, s16 a1)
         case 0x90:
             vel = *rec->unk4;
             rec->unk4 = rec->unk4 + 1;
-            rec->unk88 = func_80035E80(a0, a1);
+            rec->unk88 = ReadDeltaValue(a0, a1);
             NoteOn(a0, a1, raw, vel);
             return;
         case 0xB0:
@@ -232,10 +232,10 @@ void GetSeqData(s16 a0, s16 a1)
             SetProgramChange(a0, a1, raw);
             return;
         case 0xE0:
-            func_80035A7C(a0, a1);
+            SetPitchBend(a0, a1);
             return;
         case 0xFF:
-            func_80035B2C(a0, a1, raw);
+            GetMetaEvent(a0, a1, raw);
             return;
         default:
             return;
@@ -332,7 +332,7 @@ all showing the SAME pair swapped, never a reordered load or multiply pair.
 There is no adjacent-load-pair shape anywhere in this residue for the lever
 to act on -- consistent with round 33's own finding that the dead-value-
 reuse lever (which DID apply to this round's `NoteOn`/
-`func_800357B0`) has no candidate here either, since both `a0`/`a1` are
+`Snd_setVabAttr`) has no candidate here either, since both `a0`/`a1` are
 live across the entire function body with no dead parameter or dying local
 to reuse.
 
@@ -340,7 +340,7 @@ Given two independent permuter searches already on file (rounds 31 and 33,
 both plateauing at score 150 with no zero across ~52000-104000 combined
 iterations) and no new axis found this round, not re-running a third
 search against the same categorically-hard whole-function swap; budget
-went to functions with fresh permuter history instead (`func_800357B0`,
+went to functions with fresh permuter history instead (`Snd_setVabAttr`,
 below, which the search DID move). `INCLUDE_ASM` unchanged,
 `build-and-verify.sh` confirmed byte-exact.
 
@@ -351,7 +351,7 @@ exact, the same `channel`($s3 built)/data-byte($s4 built) whole-function
 register-color swap unchanged.
 
 **Motivation for a third search despite rounds 31/33's identical 150
-floor**: this round's head broadcast noted (from `func_800357B0`'s own
+floor**: this round's head broadcast noted (from `Snd_setVabAttr`'s own
 zero-at-iteration-149 result on a scaffold that had plateaued for 33450
 iterations two rounds ago) that decomp-permuter is stochastic and a big
 iteration count on an old search is not proof the space is empty --
@@ -366,7 +366,7 @@ match to rounds 31 and 33's own figures. AGREE; searched with confidence.
 **Search: `timeout 900 -j 8 --stop-on-zero --best-only`, rc=124 (900s
 bound), 163644 iterations** -- roughly 3x rounds 31+33's combined
 iteration count in one run. **Best score: 150 -- the IDENTICAL floor as
-both prior searches, not a new low.** Unlike `func_800357B0`, a bigger
+both prior searches, not a new low.** Unlike `Snd_setVabAttr`, a bigger
 sample from a fresh seed did NOT find anything rounds 31/33 had missed
 here; the "seed axis" finding does not guarantee a payoff, only that it
 is worth checking.
@@ -399,8 +399,8 @@ worse, and the best (150) mixes a safe hunk with a buggy one:**
   (echo's broadcast). **Disqualified by inspection, not built.**
 - **Score 745 (safe, tested)**: caches `a1` into the already-declared
   `note` local (`note = a1;`, unread anywhere else on this path) right
-  before the case-0x90 arm's `func_80035E80(a0, a1)` call, then passes
-  `func_80035E80(a0, note)` instead. `note` is otherwise never assigned
+  before the case-0x90 arm's `ReadDeltaValue(a0, a1)` call, then passes
+  `ReadDeltaValue(a0, note)` instead. `note` is otherwise never assigned
   or read on this control-flow path, so this is behaviorally identical
   to the baseline. Translated to the real function and rebuilt: **118/172
   -- 4 words WORSE than the 122/172 baseline**, with 172/172 length
@@ -422,13 +422,13 @@ function is the COUNTEREXAMPLE that keeps it from being read as "always
 worth a fresh seed": a 163644-iteration fresh-seed search here reproduced
 the identical 150 floor rounds 31 and 33 already found at a combined
 ~156000 iterations, rather than finding something new the way
-`func_800357B0`'s fresh seed did. The two results compose as the head's
+`Snd_setVabAttr`'s fresh seed did. The two results compose as the head's
 own broadcast already said they would ("where it DID beat base but never
 zeroed, a fresh seed is cheap and worth one more run") -- cheap and worth
 trying is not the same as likely to pay off, and this function's
 whole-function (10-case, ~40-instruction) register-color swap may simply
 be too large a search space for decomp-permuter's mutation set to escape
-a 150-score local optimum regardless of seed, unlike `func_800357B0`'s
+a 150-score local optimum regardless of seed, unlike `Snd_setVabAttr`'s
 much smaller (one call, one block) swap.
 
 **NON_MATCHING body promoted, round 66** (runner charlie).

@@ -39,12 +39,12 @@ case 0x1E:
     rec->unk16 = a2;
     if (rec->unk28 == 0) {
         rec->unk10 = 0;
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     }
     if (rec->unk28 < 0x7F) {
         rec->unk28--;
-        result = func_80035E80(a0, a1);
+        result = ReadDeltaValue(a0, a1);
         rec->unk88 = result;
         if (rec->unk28 != 0) {
             rec->unk4 = rec->unkC;
@@ -53,7 +53,7 @@ case 0x1E:
         }
         return;
     }
-    func_80035E80(a0, a1);
+    ReadDeltaValue(a0, a1);
     rec->unk4 = rec->unkC;
     rec->unk88 = 0;
     return;
@@ -95,7 +95,7 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2)
     case 0x14:
         rec->unk16 = a2;
         rec->unk27 = 1;
-        result = func_80035E80(a0, a1);
+        result = ReadDeltaValue(a0, a1);
         rec->unk88 = result;
         rec->unkC = rec->unk4;
         return;
@@ -103,12 +103,12 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2)
         if (rec->unk28 == 0) {
             rec->unk16 = a2;
             rec->unk10 = 0;
-            rec->unk88 = func_80035E80(a0, a1);
+            rec->unk88 = ReadDeltaValue(a0, a1);
             return;
         }
         if (rec->unk28 < 0x7F) {
             rec->unk28--;
-            result = func_80035E80(a0, a1);
+            result = ReadDeltaValue(a0, a1);
             rec->unk88 = result;
             if (rec->unk28 != 0) {
                 rec->unk4 = rec->unkC;
@@ -117,14 +117,14 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2)
             }
             return;
         }
-        func_80035E80(a0, a1);
+        ReadDeltaValue(a0, a1);
         rec->unk4 = rec->unkC;
         rec->unk88 = 0;
         return;
     default:
         rec->unk16 = a2;
         rec->unk2A = rec->unk2A + 1;
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     }
 }
@@ -177,7 +177,7 @@ compiler had a block placed AFTER it in source order -- i.e. the
 `if (rec->unk28 == 0) { ...; break; }` FIRST with the countdown logic
 falling through last, which is the natural reading order but gives GCC
 the fallthrough for the WRONG arm. Restructuring so the `unk28==0` arm's
-own final call (`rec->unk88 = func_80035E80(...); return;`) is written
+own final call (`rec->unk88 = ReadDeltaValue(...); return;`) is written
 out explicitly rather than `break`-ing to a shared tail, and confirming
 the countdown logic remains the block reached by simple fallthrough,
 reproduced retail's jump exactly and took the score from 38/82 to 68/82
@@ -185,7 +185,7 @@ in the same rebuild that also fixed finding 3 below.
 
 **3. Statement order inside an arm matters when a stored value is
 recomputed independently.** The `0x1E`/`unk28<0x7F` arm originally read
-`result = func_80035E80(a0, a1); rec->unk28--; rec->unk88 = result;` --
+`result = ReadDeltaValue(a0, a1); rec->unk28--; rec->unk88 = result;` --
 decrement AFTER the call. Retail decrements BEFORE the call (computing
 the decremented byte into a register that survives into the call's own
 delay slot for the store). Swapping the two statements' order

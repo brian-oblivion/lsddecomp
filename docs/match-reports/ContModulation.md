@@ -60,7 +60,7 @@ void ContModulation(s16 a0, s16 a1, u8 a2)
         scratch.unk8 = a2;
         func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 ```
 
@@ -98,7 +98,7 @@ calling `func_80033260` and `func_80036230` (both still unmatched
 elsewhere, no established prototype) with a per-item scratch struct in
 between which it stamps one byte (`a2`, the function's own third
 parameter) at offset 8. It finishes with the same
-`rec->unk88 = func_80035E80(channel, slot);` tail every function in this
+`rec->unk88 = ReadDeltaValue(channel, slot);` tail every function in this
 family has.
 
 ```c
@@ -131,7 +131,7 @@ void ContModulation(s16 a0, s16 a1, u8 a2)
         scratch.unk8 = a2;
         func_80036230(rec->unk4C, p[0x2C], (s16)i, &scratch);
     }
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 ```
 
@@ -212,13 +212,13 @@ cluster, two further axes against the register-rescue residue, neither
 moving the score:
 
 - **Explicit `s16 ch = a0; s16 slot = a1;` locals, used only at the final
-  `func_80035E80(ch, slot)` call** (mirroring retail's own apparent
+  `ReadDeltaValue(ch, slot)` call** (mirroring retail's own apparent
   channel/slot rescue into `$s5`/`$s6` visible in the disassembly, on the
   theory that reproducing THOSE rescues might shift enough register
   pressure to also reproduce `p`'s). **Inert** -- GCC folds the trivial
   copies away identically to the bare-parameter form; byte-for-byte
   identical output. (Same null result as trying the equivalent lever on
-  `func_800351D0` this round, for what that is worth as a second data
+  `ContDataEntry` this round, for what that is worth as a second data
   point on this class of "does introducing a same-valued named local
   change anything" experiment.)
 - **Inlining `p[0x2C]` as `((u8 *)rec + rec->unk12)[0x2C]` at both call

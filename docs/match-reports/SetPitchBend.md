@@ -1,6 +1,8 @@
-# func_80035A7C -- MATCHED: 44/44, byte-exact
+# SetPitchBend -- MATCHED: 44/44, byte-exact
 
-`asm/nonmatchings/code_179d8_k/func_80035A7C.s`, vram `0x80035A7C`, unit
+> Renamed from `func_80035A7C` on 2026-09-23 (tools/rename.py). Address 0x80035a7c.
+
+`asm/nonmatchings/code_179d8_k/SetPitchBend.s`, vram `0x80035A7C`, unit
 `code_179d8_k`. Round 24, runner alpha (stall); round 25, runner alpha
 (re-verified, additional axes tried, still stalled). Round 31, runner
 bravo (closed via decomp-permuter).
@@ -34,7 +36,7 @@ b = rec->unk12; rec->unk4 = cursor; new_var = (a1 << ((unsigned long long) 8)) |
 vol = *((((u8 *) rec) + b) + 0x2C);
 b = *cursor;
 SpuVmPitchBend(new_var, rec->unk4C, vol, b);
-rec->unk88 = func_80035E80(a0, a1);
+rec->unk88 = ReadDeltaValue(a0, a1);
 ```
 
 **The two ingredients that matter, once the permuter's cosmetic noise
@@ -80,7 +82,7 @@ permuter's own type) and `b` reused for both roles (the permuter's own
 choice) in the version actually verified:
 
 ```c
-void func_80035A7C(s16 a0, s16 a1)
+void SetPitchBend(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;
@@ -95,7 +97,7 @@ void func_80035A7C(s16 a0, s16 a1)
     vol = *((u8 *)rec + b + 0x2C);
     b = *cursor;
     SpuVmPitchBend(packed, rec->unk4C, vol, b);
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 ```
 
@@ -131,11 +133,11 @@ at the sequencer cursor, packs `(slot << 8) | channel` into one word, and
 calls a cross-unit function (`SpuVmPitchBend`, defined in `code_179d8_m`,
 NOT YET MATCHED there as of this round -- so its real prototype is
 unverified) with those four values. It then calls the shared
-`func_80035E80` VLQ-decode helper and caches the return into `rec->unk88`,
+`ReadDeltaValue` VLQ-decode helper and caches the return into `rec->unk88`,
 same pattern as every other function in this family.
 
 ```c
-void func_80035A7C(s16 a0, s16 a1)
+void SetPitchBend(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;
@@ -146,7 +148,7 @@ void func_80035A7C(s16 a0, s16 a1)
     b = *cursor;
     p = (u8 *)rec + rec->unk12;
     SpuVmPitchBend((a1 << 8) | a0, rec->unk4C, p[0x2C], b);
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 ```
 
@@ -203,7 +205,7 @@ the four reads should be structured as a single call expression at all
 through pointer parameters) -- flagging this as the untested axis per
 `docs/MATCHING-GUIDE.md`'s "a long attempt list is not a broad one"
 caution, since three of the four attempts (this report's and the
-`ContResetAll.md`/`func_80035E80.md` companions) share the same "add a
+`ContResetAll.md`/`ReadDeltaValue.md` companions) share the same "add a
 named temporary" axis.
 
 ## Round 25 update (runner alpha): re-verified, one new axis found, still stalled at 36/44
@@ -273,5 +275,5 @@ shape recurs.
 ## Verification
 
 `./build-and-verify.sh` build exit=2 (clean compile, expected -- function
-restored to `INCLUDE_ASM`). `funcdiff.py func_80035A7C`: 36/44 words
+restored to `INCLUDE_ASM`). `funcdiff.py SetPitchBend`: 36/44 words
 match, compiled length exact (44/44, re-verified round 25).

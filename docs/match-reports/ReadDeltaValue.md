@@ -1,6 +1,8 @@
-# func_80035E80 -- MATCHED (47/47)
+# ReadDeltaValue -- MATCHED (47/47)
 
-`asm/nonmatchings/code_179d8_k/func_80035E80.s`, vram `0x80035E80`, unit
+> Renamed from `func_80035E80` on 2026-09-23 (tools/rename.py). Address 0x80035e80.
+
+`asm/nonmatchings/code_179d8_k/ReadDeltaValue.s`, vram `0x80035E80`, unit
 `code_179d8_k`. Carved round 24, closed round 25, runner alpha. This
 unit's one frameless function -- it opens on `sll $a0,$a0,16` (leaf
 argument narrowing, not a caller-frame read), per the unit's own
@@ -20,7 +22,7 @@ past the accumulate-and-store code entirely; this is not merely "the
 value happened to be zero").
 
 ```c
-s32 func_80035E80(s16 a0, s16 a1)
+s32 ReadDeltaValue(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;
@@ -128,5 +130,5 @@ early-return jump itself.
 ## Verification
 
 `./build-and-verify.sh`: **exit 0, `OK: build matches retail
-SLPS_015.56`** -- whole-image byte-exact. `funcdiff.py func_80035E80`:
+SLPS_015.56`** -- whole-image byte-exact. `funcdiff.py ReadDeltaValue`:
 47/47 words match.

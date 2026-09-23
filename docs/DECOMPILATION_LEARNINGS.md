@@ -242,7 +242,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   copies of one literal at a merge point can be TWO stacked sub-mechanisms answering to no one
   lever. (a §"One named C variable gets ONE storage location", round 55)
 - **The SCOPE of a named local is the lever, not the name.** Declaring it INSIDE the block where the
-  value must survive one call closed `func_800357B0` 179/179 after three rounds failed by hoisting
+  value must survive one call closed `Snd_setVabAttr` 179/179 after three rounds failed by hoisting
   to function entry. (a §"The SCOPE of a named local is the lever")
 - **"Name it, THEN barrier it" is two-part and neither half works alone** — a named local plus a
   bare `__asm__("")` immediately after the declaration took `func_8003D73C` to exact length;
@@ -401,7 +401,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   with the return-type listing. (round 69)
 - **The DEFINITION's own parameters narrow too: a parameter that hops `$a0` -> `$a3` -> `$s5`
   with every use re-sign-extending it is an `s16` parameter, not an allocation residue.** Declaring
-  `(s16 a0, s16 a1)` instead of `(s32, s32)` plus casts reproduced retail's hop in `func_80036528`,
+  `(s16 a0, s16 a1)` instead of `(s32, s32)` plus casts reproduced retail's hop in `Snd_crescendo`,
   then a `u16` callee prototype (the callee reads it with `lhu`) and an `s16` field took a 13-short
   round-25 stall to 240/240. (round 70, bravo)
 - **A wrong extern arity and the deliberate dead-argument idiom are told apart at the CALL SITE,

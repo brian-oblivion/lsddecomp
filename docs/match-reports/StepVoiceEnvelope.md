@@ -362,7 +362,7 @@ re-deriving or renaming it.
 
 ## Round 48 update (runner echo): tested charlie's frame-padding lever -- FOURTH confirmed negative for length closure, unit-wide verdict now 4/4
 
-Round 48's designated test of charlie's `func_800351D0` frame-padding
+Round 48's designated test of charlie's `ContDataEntry` frame-padding
 discovery. This function's frame gap was already ON FILE (round 27's
 callee-saved-lever check, above): built `-0x10` vs retail `-0x18`, an
 8-byte gap. Direct grep confirms the textbook shape:
@@ -402,7 +402,7 @@ four cases (`StepVoiceEnvelope`, `SpuVmFlush` here; `StepVoiceFade` and
 confirmed zero stack differences) — with each function's real content
 residue (a redundant mask, a persisted early value, an addressing-cost
 difference, an early-materialization placement) living entirely
-independently of the frame allocation. `func_800351D0`'s original length
+independently of the frame allocation. `ContDataEntry`'s original length
 recovery in a DIFFERENT unit came from a coincidentally-paired
 tail-duplication fix, not from the padding move itself.
 

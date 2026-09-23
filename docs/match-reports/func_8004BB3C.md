@@ -56,7 +56,7 @@
 >
 > This is a THIRD confirmed instance of the scope limitation this round's
 > own broadcast already established on two other functions
-> (`func_800357B0`, `NoteOn`, both in `code_179d8_k`): the
+> (`Snd_setVabAttr`, `NoteOn`, both in `code_179d8_k`): the
 > split-declare lever closes a register-CLASS residue for a value crossing
 > a CALL boundary with independently-confirmed-correct timing
 > (`GetCdFileEntry`'s case), and does nothing for a whole-function

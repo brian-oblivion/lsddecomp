@@ -1,4 +1,6 @@
-# func_80035B2C -- STALL: length 2 words SHORT (compiled 211/213); raw word-match 69/213 (funcdiff, drift-poisoned by the length gap -- see round-26 update below for the trustworthy per-block figure); first real diff at word 56 (`tools/asm-differ/diff.py func_80035B2C`), a register-identity re-read of `rec->unk4A`
+# GetMetaEvent -- STALL: length 2 words SHORT (compiled 211/213); raw word-match 69/213 (funcdiff, drift-poisoned by the length gap -- see round-26 update below for the trustworthy per-block figure); first real diff at word 56 (`tools/asm-differ/diff.py GetMetaEvent`), a register-identity re-read of `rec->unk4A`
+
+> Renamed from `func_80035B2C` on 2026-09-23 (tools/rename.py). Address 0x80035b2c.
 
 **Historical title, superseded by the round-26 update below**: STALL (near
 miss, 20 words short). Kept for history; do not read the 20-word figure as
@@ -9,7 +11,7 @@ current.
 not from `tools/funcdiff.py`, which cannot report a meaningful word-match
 figure once length drifts (confirmed: it printed "the build differs
 OUTSIDE this range too" at every intermediate attempt below).
-**First real diff at word 59** (`tools/funcdiff.py func_80035B2C`), which
+**First real diff at word 59** (`tools/funcdiff.py GetMetaEvent`), which
 is a register-identity symptom (`lui a0` vs `lui a3` for `gSeqTickRate`)
 downstream of the true cause described below -- fixing the real cause
 would very likely move or resolve this word too, so it was not chased
@@ -182,7 +184,7 @@ extern s32 SpuVmSeqKeyOff(s32 a0);
 extern void _SsSndNextSep(s32 a0, s32 a1);
 extern u32 gSeqTickRate;
 
-void func_80035B2C(s16 a0, s16 a1, u8 a2)
+void GetMetaEvent(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
 
@@ -219,7 +221,7 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
                 rec->unk70 = (base * 2 < r) ? q + 1 : q;
             }
         }
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     }
     {
@@ -428,7 +430,7 @@ back to `INCLUDE_ASM` and the whole-image build is confirmed green.
 
 **Process note, not a code finding:** running `make extract` while this
 function was mid-experiment (i.e. NOT wrapped in `INCLUDE_ASM` at that
-moment) silently dropped its own `asm/nonmatchings/.../func_80035B2C.s`
+moment) silently dropped its own `asm/nonmatchings/.../GetMetaEvent.s`
 stub -- splat only regenerates a nonmatching stub for a function that is
 currently `INCLUDE_ASM`'d in `src/`, so extracting while a function is
 live C loses the ability to put it back. Caught immediately (the very
@@ -452,7 +454,7 @@ extern s32 SpuVmSeqKeyOff(s32 a0);
 extern void _SsSndNextSep(s32 a0, s32 a1);
 extern u32 gSeqTickRate;
 
-void func_80035B2C(s16 a0, s16 a1, u8 a2)
+void GetMetaEvent(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
 
@@ -495,7 +497,7 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
                 rec->unk70 = (base * 2 < r) ? q + 1 : q;
             }
         }
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     }
     {
@@ -553,7 +555,7 @@ isolation is not proof a real-file variant will too, and vice versa.
 
 Rebuilt the round-26 preserved body (211/213, narrowed-`volatile` lever) in
 isolation first to reconfirm the recorded score before spending any search
-time: clean build, `funcdiff.py func_80035B2C` reproduces **69/213 words
+time: clean build, `funcdiff.py GetMetaEvent` reproduces **69/213 words
 match** (drift-poisoned by the 2-word length gap, as this report's title
 now states directly rather than quoting the pre-drift 20-word figure), and
 the compiled length cross-checked via `mipsel-linux-gnu-objdump`
@@ -566,10 +568,10 @@ scaffold verbatim via the `PERMUTER`-gated macro, inflating the base score
 by two orders of magnitude; this was hit and corrected on the SAME function's
 scaffold this round before it was reused here) with only the types/externs
 this function's own body needs (`Entry90902E8`, `D_800902E8`,
-`func_80035E80`, `SpuVmSeqKeyOff`, `_SsSndNextSep`, `gSeqTickRate`). Sanity
+`ReadDeltaValue`, `SpuVmSeqKeyOff`, `_SsSndNextSep`, `gSeqTickRate`). Sanity
 check (`--debug --stack-diffs`): **base score 1425**, **`Stack Differences:
 0`** -- a clean, small, register/reordering-only score consistent with a
-narrow residue, unlike `func_800351D0`'s scaffold this same round (rejected
+narrow residue, unlike `ContDataEntry`'s scaffold this same round (rejected
 outright, nonzero stack differences). This one was trusted and searched.
 
 **Searched `-j 4 --stop-on-zero --best-only` for 3 minutes (15862+
@@ -604,7 +606,7 @@ green (`build-and-verify.sh` exit 0) before moving on.
 
 - **Rebuild-before-trust**: done, reconfirmed 211/213 unchanged.
 - **Permuter**: sanity-checked clean (base 1425, zero stack diff, unlike the
-  SAME round's `func_800351D0` scaffold), then SEARCHED (this report's
+  SAME round's `ContDataEntry` scaffold), then SEARCHED (this report's
   queue entry said "ZERO permuter" going in) -- **negative**, no zero in
   15862+ iterations. Marked permuter-exhausted for this residue.
 - **Lever 6 (narrowed-volatile precedent)**: not re-tried; round 26 already
@@ -617,7 +619,7 @@ A clean permuter sanity check (`Stack Differences: 0`, base score in the
 low thousands) is worth building even for a function whose recorded residue
 is described as "register-pressure-sensitive" and therefore seems like a
 poor permuter target on paper -- the sanity check itself is cheap (seconds)
-and, unlike `func_800351D0`'s scaffold the SAME round, this one confirmed
+and, unlike `ContDataEntry`'s scaffold the SAME round, this one confirmed
 the scaffold really was scoring the documented residue before any search
 time was spent. The search coming back negative is still informative: it is
 the second data point (after round 26's own manual reshapes) that this
@@ -629,7 +631,7 @@ which is a stronger claim than either alone.
 
 Rebuilt the round-26 preserved body (narrowed-`volatile` lever) and
 cross-checked compiled length directly via `objdump` symbol-to-symbol
-distance: `func_80035B2C` is `0x34c` bytes (211 words), reproducing
+distance: `GetMetaEvent` is `0x34c` bytes (211 words), reproducing
 "length 2 words SHORT (211/213)" exactly.
 
 **Hoist-both-before-either: not applicable.** The one remaining word is

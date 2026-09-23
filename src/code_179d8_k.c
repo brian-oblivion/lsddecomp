@@ -29,15 +29,15 @@
  *
  * Sizes, cheapest first -- six functions at 31..51 words, which is the
  * cheap seam the `fresh` queue had run out of:
- *   SetProgramChange  31w   func_800350D8  31w   func_80035154  31w
- *   func_80035A7C  44w   func_80035E80  47w   ContResetAll  51w
+ *   SetProgramChange  31w   ContRpn1  31w   ContRpn2  31w
+ *   SetPitchBend  44w   ReadDeltaValue  47w   ContResetAll  51w
  *   SeqPlay  69w   NoteOn  70w   ContNrpn1  77w
  *   ContModulation  79w   ContPortaTime  79w   ContNrpn2  82w
- *   ContPortamento  90w   GetSeqData 172w   func_800357B0 179w
- *   func_80034690 200w   func_80035B2C 213w   func_800351D0 376w
+ *   ContPortamento  90w   GetSeqData 172w   Snd_setVabAttr 179w
+ *   func_80034690 200w   GetMetaEvent 213w   ContDataEntry 376w
  *
  * THIS UNIT OWNS THREE SWITCH JUMP TABLES, not the two the old remainder
- * comment claimed: func_80034690 -> jtbl_80010CF0, and func_800357B0 ->
+ * comment claimed: func_80034690 -> jtbl_80010CF0, and Snd_setVabAttr ->
  * jtbl_80010ED8 AND jtbl_80010F38 (a double switch).  The 0x14F0 rodata
  * slot holds exactly those three tables and nothing else, is referenced
  * from nowhere outside this unit, and is attached whole in the splat yaml.
@@ -46,7 +46,7 @@
  *
  * Boundary checks at carve time, both sides: no function has more than one
  * `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, zero `alabel`,
- * and the one frameless function (func_80035E80) opens on
+ * and the one frameless function (ReadDeltaValue) opens on
  * `sll $a0, $a0, 16` -- leaf argument narrowing, not a caller-frame read.
  *
  * Expect this slice to span more than one class; a ~20-function slice cut
@@ -114,7 +114,7 @@ typedef struct {
     u8 unk29;   /* +0x29: a retrigger/step counter */
     u8 unk2A;   /* +0x2A: a second, independent retrigger/step counter */
     u8 unk2B;   /* +0x2B: cleared on end-of-track stop (redundant double store
-                 * in retail -- see func_80035B2C) */
+                 * in retail -- see GetMetaEvent) */
     u8 pad2C[0x3C - 0x2C];
     u8 unk3C;   /* +0x3C: compared against 0xFF; a "track/channel select" byte
                  * passed to _SsSndNextSep on end-of-track stop */
@@ -150,7 +150,7 @@ extern Entry90902E8 *D_800902E8[];
  * decoded magnitude by 10, adds it to rec->unk80, and returns the scaled
  * delta.  A first byte of 0 is a sentinel for "no delta" -- returns 0
  * without touching rec->unk80 at all. */
-extern s32 func_80035E80(s16 channel, s16 slot);
+extern s32 ReadDeltaValue(s16 channel, s16 slot);
 
 /* Forward declaration for a sibling function defined later in THIS unit
  * (GetSeqData, still INCLUDE_ASM) -- called from SeqPlay's
@@ -212,13 +212,13 @@ void SeqPlay(s16 a0, s16 a1, s16 a2)
  * needed because GetSeqData dispatches to them by MIDI-style status
  * byte before they appear in ROM-address order below.  NoteOn's
  * signature is the one already established in its own (still-stalled) STALL
- * comment above; func_80034690's and func_80035B2C's are this function's own
+ * comment above; func_80034690's and GetMetaEvent's are this function's own
  * reading, derived from the registers loaded before each call below. */
 extern void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3);
 extern void SetProgramChange(s16 a0, s16 a1, u8 a2);
 extern void func_80034690(s16 a0, s16 a1, u8 a2);
-extern void func_80035A7C(s16 a0, s16 a1);
-extern void func_80035B2C(s16 a0, s16 a1, u8 a2);
+extern void SetPitchBend(s16 a0, s16 a1);
+extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
 
 /* A per-channel/slot "sequencer voice" event-stream byte reader.  Reads one
  * byte from rec->unk4 (advancing the cursor); if it has the high bit set it
@@ -260,7 +260,7 @@ void GetSeqData(s16 a0, s16 a1)
             note = *p;
             rec->unk4 = p + 2;
             vel = *(p + 1);
-            rec->unk88 = func_80035E80(a0, a1);
+            rec->unk88 = ReadDeltaValue(a0, a1);
             NoteOn(a0, a1, note, vel);
             return;
         case 0xB0:
@@ -280,7 +280,7 @@ void GetSeqData(s16 a0, s16 a1)
         case 0xE0:
             rec->unk11 = 0xE0;
             rec->unk4 = rec->unk4 + 1;
-            func_80035A7C(a0, a1);
+            SetPitchBend(a0, a1);
             return;
         case 0xF0:
             p = rec->unk4;
@@ -288,7 +288,7 @@ void GetSeqData(s16 a0, s16 a1)
             rec->unk12 = raw & 0xF;
             rec->unk4 = p + 1;
             note = *p;
-            func_80035B2C(a0, a1, note);
+            GetMetaEvent(a0, a1, note);
             return;
         default:
             return;
@@ -298,7 +298,7 @@ void GetSeqData(s16 a0, s16 a1)
         case 0x90:
             vel = *rec->unk4;
             rec->unk4 = rec->unk4 + 1;
-            rec->unk88 = func_80035E80(a0, a1);
+            rec->unk88 = ReadDeltaValue(a0, a1);
             NoteOn(a0, a1, raw, vel);
             return;
         case 0xB0:
@@ -308,10 +308,10 @@ void GetSeqData(s16 a0, s16 a1)
             SetProgramChange(a0, a1, raw);
             return;
         case 0xE0:
-            func_80035A7C(a0, a1);
+            SetPitchBend(a0, a1);
             return;
         case 0xFF:
-            func_80035B2C(a0, a1, raw);
+            GetMetaEvent(a0, a1, raw);
             return;
         default:
             return;
@@ -367,7 +367,7 @@ void SetProgramChange(s16 a0, s16 a1, u8 a2)
     u8 *p = (u8 *)rec + rec->unk12;
 
     p[0x2C] = a2;
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
 /* Cross-unit calls, local guesses per this project's convention (a prototype
@@ -387,15 +387,15 @@ extern s32 SpuVmSetProgVol(s16 p0, s16 p1, s32 p2);
 extern void func_80030980(s32 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
 
 /* Forward declarations for sibling functions defined later in THIS unit's
- * ROM-address order. func_800351D0's signature is this call site's own
+ * ROM-address order. ContDataEntry's signature is this call site's own
  * reading; the rest are already established (matched, or from their own
  * STALL comments) elsewhere in this file. */
-extern void func_800351D0(s16 a0, s16 a1, u8 a2);
+extern void ContDataEntry(s16 a0, s16 a1, u8 a2);
 extern void ContPortamento(s16 a0, s16 a1, s32 a2);
 extern void ContNrpn1(s16 a0, s16 a1, u8 a2);
 extern void ContNrpn2(s16 a0, s16 a1, u8 a2);
-extern void func_800350D8(s16 a0, s16 a1, u8 a2);
-extern void func_80035154(s16 a0, s16 a1, u8 a2);
+extern void ContRpn1(s16 a0, s16 a1, u8 a2);
+extern void ContRpn2(s16 a0, s16 a1, u8 a2);
 extern void ContResetAll(s16 a0, s16 a1);
 
 /* Control-Change dispatcher: reads one data byte from the event stream
@@ -408,12 +408,12 @@ extern void ContResetAll(s16 a0, s16 a1);
  * strong confirmation this really is a MIDI CC handler and not a
  * project-invented numbering. Every arm except 6/65/98/99/100/101/121 falls
  * through into the shared tail that re-arms the next scheduling delta via
- * func_80035E80; those seven `return` immediately instead.
+ * ReadDeltaValue; those seven `return` immediately instead.
  *
  * Two choices below are byte-load-bearing (round 69): func_80030980's first
  * parameter is a full `s32` (its own body masks it with 0xFF/0xFF00), so
  * `packed` is not narrowed and the widened a0/a1 stay live across the call
- * for the final func_80035E80; and each case copies `offset` into a
+ * for the final ReadDeltaValue; and each case copies `offset` into a
  * case-local `u16`, which keeps the switch-wide byte in a caller-saved
  * register and gives each case its own callee-saved copy.
  */
@@ -429,10 +429,10 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
     switch (a2) {
     case 0:
         rec->unk4C = val;
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     case 6:
-        func_800351D0(a0, a1, val);
+        ContDataEntry(a0, a1, val);
         return;
     case 7: {
         u16 o = offset;
@@ -441,7 +441,7 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
 
         func_80030980(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
         *(s16 *)((u8 *)rec + o * 2 + 0x4E) = val;
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     }
     case 10: {
@@ -452,7 +452,7 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
 
         func_80030980(packed, rec->unk4C, blk[0x2C], wide, val);
         blk[0x17] = val;
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     }
     case 11: {
@@ -462,7 +462,7 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
         SpuVmSetProgVol(rec->unk4C, blk[0x2C], val);
         func_80030980((a1 << 8) | a0, rec->unk4C, blk[0x2C],
                       *(s16 *)((u8 *)rec + o * 2 + 0x4E), blk[0x17]);
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     }
     case 64:
@@ -485,10 +485,10 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
         ContNrpn2(a0, a1, val);
         return;
     case 100:
-        func_800350D8(a0, a1, val);
+        ContRpn1(a0, a1, val);
         return;
     case 101:
-        func_80035154(a0, a1, val);
+        ContRpn2(a0, a1, val);
         return;
     case 121:
         ContResetAll(a0, a1);
@@ -496,7 +496,7 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
     default:
         break;
     }
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
 /* A stack-local buffer this function passes to three cross-unit callees:
@@ -549,7 +549,7 @@ void ContModulation(s16 a0, s16 a1, u8 a2)
         scratch.unk8 = a2;
         SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
 /* Same shape as ContModulation -- see that function's own struct comment.
@@ -574,7 +574,7 @@ void ContPortaTime(s16 a0, s16 a1, u8 a2)
         scratch.unkB = a2;
         SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
 /* Same NoteList/callee shape as ContModulation/ContPortaTime, plus a
@@ -608,7 +608,7 @@ void ContPortamento(s16 a0, s16 a1, s32 a2)
         }
         SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
 /* STALL -- see docs/match-reports/ContResetAll.md. length exact 51/51,
@@ -627,7 +627,7 @@ void ContResetAll(s16 a0, s16 a1)
     rec->unk14 = 0;
     *(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2) = 0x7F;
     *((u8 *)rec + rec->unk12 + 0x17) = 0x40;
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
 /* A per-(channel,slot) dispatch table of function pointers, row-major with
@@ -677,7 +677,7 @@ check:
         }
     }
 skip_call:
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 #endif
 INCLUDE_ASM("asm/nonmatchings/code_179d8_k", ContNrpn1);
@@ -698,7 +698,7 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2)
     case 0x14:
         rec->unk16 = a2;
         rec->unk27 = 1;
-        result = func_80035E80(a0, a1);
+        result = ReadDeltaValue(a0, a1);
         rec->unk88 = result;
         rec->unkC = rec->unk4;
         return;
@@ -706,12 +706,12 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2)
         rec->unk16 = a2;
         if (rec->unk28 == 0) {
             rec->unk10 = 0;
-            rec->unk88 = func_80035E80(a0, a1);
+            rec->unk88 = ReadDeltaValue(a0, a1);
             return;
         }
         if (rec->unk28 < 0x7F) {
             rec->unk28--;
-            result = func_80035E80(a0, a1);
+            result = ReadDeltaValue(a0, a1);
             rec->unk88 = result;
             if (rec->unk28 != 0) {
                 rec->unk4 = rec->unkC;
@@ -720,20 +720,20 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2)
             }
             return;
         }
-        func_80035E80(a0, a1);
+        ReadDeltaValue(a0, a1);
         rec->unk4 = rec->unkC;
         rec->unk88 = 0;
         return;
     default:
         rec->unk16 = a2;
         rec->unk2A = rec->unk2A + 1;
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     }
 }
 #endif
 
-void func_800350D8(s16 a0, s16 a1, u8 a2)
+void ContRpn1(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 counter = rec->unk29;
@@ -741,10 +741,10 @@ void func_800350D8(s16 a0, s16 a1, u8 a2)
     rec->unk13 = a2;
     counter = counter + 1;
     rec->unk29 = counter;
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-void func_80035154(s16 a0, s16 a1, u8 a2)
+void ContRpn2(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 counter = rec->unk29;
@@ -752,13 +752,13 @@ void func_80035154(s16 a0, s16 a1, u8 a2)
     rec->unk14 = a2;
     counter = counter + 1;
     rec->unk29 = counter;
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
 /* This unit's own reduced view of the VagAtr SsUtGetVagAtr/SsUtSetVagAtr
  * fill (round 35): only the 8 fields this function actually touches, at
  * their real include/psyq/LIBSND.H VagAtr offsets. Total size (0x20) is
- * load-bearing -- func_800357B0 receives it as a BY-VALUE 4th parameter
+ * load-bearing -- Snd_setVabAttr receives it as a BY-VALUE 4th parameter
  * (its first word arrives in $a3, the rest already spilled to the stack by
  * the caller), and its own incoming value is immediately discarded: every
  * byte is refilled by the unconditional SsUtGetVagAtr call at function
@@ -810,20 +810,20 @@ typedef struct {
 /* SsUtGetProgAtr's fill at function entry. From +0x10 the SAME memory is
  * both the VagAtr buffer the unk29==2 loops hand to SsUtGet/SetVagAtr
  * (retail addresses it at sp+0x58 = list+0x10) and, with the 18 bytes
- * after it, the two by-value arguments of func_800357B0 (round 69). */
+ * after it, the two by-value arguments of Snd_setVabAttr (round 69). */
 typedef struct {
     u8 count;                  /* +0x00: item count, SsUtGetProgAtr's usual field */
     u8 pad1[0x10 - 0x1];
     union {
-        Scratch_800357B0 s;    /* +0x10: passed by value to func_800357B0 */
+        Scratch_800357B0 s;    /* +0x10: passed by value to Snd_setVabAttr */
         Scratch800351D0 v;     /* +0x10: SsUtGet/SetVagAtr's buffer in the unk29==2 loops */
     } scratch;
-    AdsrRaw_800357B0 adsr;     /* +0x30: passed by value to func_800357B0 */
+    AdsrRaw_800357B0 adsr;     /* +0x30: passed by value to Snd_setVabAttr */
 } List_800351D0;
 
-/* func_800357B0 is defined later in this unit; its own definition fixes
+/* Snd_setVabAttr is defined later in this unit; its own definition fixes
  * this signature (round 49). */
-extern void func_800357B0(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
+extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
                           AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
 
 #ifdef NON_MATCHING
@@ -832,10 +832,10 @@ extern void func_800357B0(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scra
  * register ($s5, set and never read) where this body needs `volatile` stack
  * slots, and with $s5 free this build hoists the loop-invariant `a2 & 0x7F`
  * out of the first loop, which renumbers $s3-$s5 through the loops
- * (docs/match-reports/func_800351D0.md). Hand-derived. Written for the
+ * (docs/match-reports/ContDataEntry.md). Hand-derived. Written for the
  * reader: the byte-shaped body's `dead[16]` frame pad and `volatile` on the
  * two `unused` locals are omitted here and kept in the report. */
-void func_800351D0(s16 a0, s16 a1, u8 a2)
+void ContDataEntry(s16 a0, s16 a1, u8 a2)
 {
     s16 ch = a0;
     s16 slot = a1;
@@ -850,13 +850,13 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
     if (rec->unk27 == 1 && rec->unk10 == 0) {
         rec->unk28 = a2;
         rec->unk10 = 1;
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         return;
     }
     if (rec->unk16 != 0x1E && rec->unk16 != 0x14) {
         rec->unk15 = a2;
         rec->unk2A = rec->unk2A + 1;
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         return;
     }
     if (rec->unk29 == 2) {
@@ -897,7 +897,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
                 SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
             }
         }
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk29 = 0;
         return;
     }
@@ -905,28 +905,28 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
         kind = rec->unk16;
         if (kind == 0x10) {
             for (i = 0; i < list.count; i++) {
-                func_800357B0(rec->unk4C, ((u8 *)rec + off)[0x2C], i,
+                Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], i,
                               list.scratch.s, list.adsr, rec->unk15, a2 & 0xFF);
             }
         } else {
-            func_800357B0(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind,
+            Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind,
                           list.scratch.s, list.adsr, rec->unk15, a2 & 0xFF);
         }
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk2A = 0;
         return;
     }
-    rec->unk88 = func_80035E80(ch, slot);
+    rec->unk88 = ReadDeltaValue(ch, slot);
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_k", ContDataEntry);
 #endif
 
 /* STALL (round 39, up from round 35's 163/179): 171/179 words match, zero
  * out-of-range drift, length EXACT (179/179 words). A permuter-found
  * simplification of case 12 (drop the named `s32 t = arg6 - 0x40;` local
  * entirely and recompute `arg6 - 0x40` inline at its one real use) closed
- * 8 of the 16 words round 35 left open -- see docs/match-reports/func_800357B0.md's
+ * 8 of the 16 words round 35 left open -- see docs/match-reports/Snd_setVabAttr.md's
  * round 39 update. Every remaining diff (8 words) is the SAME register-
  * identity swap round 35 already found (this build keeps `channel` in $s2
  * and the cached `arg5` in $s3; retail has them the other way around) --
@@ -945,12 +945,12 @@ extern void SsUtSetReverbFeedback(s16 a0);
 extern void SsUtSetReverbDelay(s16 a0);
 
 /* MIDI CC91 (Reverb Depth)/98/99/100/101 (NRPN/RPN LSB/MSB) and friends'
- * per-parameter handler, reached only from func_800351D0 (still a stall;
+ * per-parameter handler, reached only from ContDataEntry (still a stall;
  * see its own report) via a double jump-table dispatch this unit owns
  * (jtbl_80010ED8 outer, jtbl_80010F38 inner). `kind` selects which VagAtr
  * (per program-tone) is fetched/stored; `arg5` is the outer parameter
  * selector (0..22), `arg6` the value byte nearly every arm uses. */
-void func_800357B0(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
+void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
                     AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6)
 {
     SsUtGetVagAtr(channel, slot, kind, &scratch);
@@ -1079,13 +1079,13 @@ tailA:
     }
 }
 
-/* STALL -- see docs/match-reports/func_80035A7C.md. length exact 44/44,
+/* STALL -- see docs/match-reports/SetPitchBend.md. length exact 44/44,
  * 36/44 raw word-match, first real diff at word 23: an independent value
  * (rec->unk4C) the compiler schedules earlier than retail does, not a
  * logic or CFG difference -- no if/else arm ordering applies here (see
  * report for the round-25 head lever's explicit negative answer). */
 #if 1
-void func_80035A7C(s16 a0, s16 a1)
+void SetPitchBend(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;
@@ -1100,7 +1100,7 @@ void func_80035A7C(s16 a0, s16 a1)
     vol = *((u8 *)rec + b + 0x2C);
     b = *cursor;
     SpuVmPitchBend(packed, rec->unk4C, vol, b);
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 #endif
 
@@ -1123,10 +1123,10 @@ extern u32 gSeqTickRate;
  * meta-event TYPE byte. Only two types are understood; everything else is
  * silently ignored:
  *
- * STALL -- see docs/match-reports/func_80035B2C.md. 2 words SHORT
+ * STALL -- see docs/match-reports/GetMetaEvent.md. 2 words SHORT
  * (211/213, compiled length measured off build/src/code_179d8_k.c.o since
  * funcdiff's word-match number is not trustworthy once length drifts).
- * First real diff at word 56 (`tools/funcdiff.py func_80035B2C`), a
+ * First real diff at word 56 (`tools/funcdiff.py GetMetaEvent`), a
  * register-identity symptom: retail re-reads `rec->unk4A` fresh (a plain
  * `lh`) before EACH of the Set-Tempo rate recompute's two divisions; this
  * body keeps the first read's value live in a register instead. The
@@ -1159,13 +1159,13 @@ extern u32 gSeqTickRate;
 /* NON_MATCHING: 211/213 words, length 2 SHORT. Residue: register-identity
  * re-read of rec->unk4A (retail's second divu re-reads it fresh via a
  * plain `lh`; this body keeps the first read's value live in a register)
- * (docs/match-reports/func_80035B2C.md). Hand-derived -- reaches 211/213
+ * (docs/match-reports/GetMetaEvent.md). Hand-derived -- reaches 211/213
  * via a narrowed `volatile` qualifier on the word-sized field only
  * (round 26 head ruling, ordinary C semantics defeating div/mod fusion,
  * not a banned register pin); round 35's permuter search (15862+
  * iterations) found no zero and never beat the base score, residue
  * marked permuter-exhausted. */
-void func_80035B2C(s16 a0, s16 a1, u8 a2)
+void GetMetaEvent(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
 
@@ -1199,7 +1199,7 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
                  * WORD-sized field needs to be volatile to defeat GCC's
                  * div/mod fusion -- there is no load-width to get wrong for
                  * a full-word read, so retail's plain `lh` for unk4A is
-                 * unaffected. See docs/match-reports/func_80035B2C.md. */
+                 * unaffected. See docs/match-reports/GetMetaEvent.md. */
                 volatile s32 *pbpm = &rec->unk8C;
                 s32 q = (rec->unk4A * *pbpm * 10) / divisor;
                 s32 r = (rec->unk4A * *pbpm * 10) % divisor;
@@ -1208,7 +1208,7 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
                 rec->unk70 = (base * 2 < r) ? q + 1 : q;
             }
         }
-        rec->unk88 = func_80035E80(a0, a1);
+        rec->unk88 = ReadDeltaValue(a0, a1);
         return;
     }
     {
@@ -1247,16 +1247,16 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80035B2C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetMetaEvent);
 #endif
 
-/* MATCHED -- see docs/match-reports/func_80035E80.md. The `goto combine`
+/* MATCHED -- see docs/match-reports/ReadDeltaValue.md. The `goto combine`
  * is load-bearing: retail keeps the "single-byte" and "loop-exit" `val`
  * writes as textually distinct arms reaching one merge point, and this
  * exact shape (jump-arm written explicitly, fallthrough-arm last in
  * source order) is what makes GCC 2.6.3 choose retail's own register for
  * both. See the round-25 head broadcast on if/else arm ordering. */
-s32 func_80035E80(s16 a0, s16 a1)
+s32 ReadDeltaValue(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *cursor = rec->unk4;

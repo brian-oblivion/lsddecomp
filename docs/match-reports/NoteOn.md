@@ -29,7 +29,7 @@ an explicit equivalent dead statement (`if (flag==0) { a3=a2; return;
 }`) with zero effect on the compiled output. No new axis found; not
 re-attempted with `decomp-permuter` this round given the budget went to
 the higher-yield near-miss cluster instead (see `ContPortaTime.md`,
-`ContModulation.md`, `ContPortamento.md`, `func_80035A7C.md`,
+`ContModulation.md`, `ContPortamento.md`, `SetPitchBend.md`,
 `ContNrpn2.md` for this round's five matches). This remains a
 genuine register-identity STALL per `CLAUDE.md`'s explicit rule.
 
@@ -325,7 +325,7 @@ classification already on file, not a semantic mis-transcription).
 
 **Second reshape tried**: an explicit `s16 ch = a0;` local, used for both
 `packed = (a1 << 8) | ch` sites in place of `a0` directly (mirroring
-`func_800357B0`'s round-39 "fresh local" experiment on its own channel/arg5
+`Snd_setVabAttr`'s round-39 "fresh local" experiment on its own channel/arg5
 swap). **Inert** -- byte-identical output, 61/70 unchanged.
 
 **Third reshape tried**: an unconditional dead `a2 = a3;` statement placed
@@ -361,7 +361,7 @@ byte-identical to both the baseline and round 39's combined-form
 attempt** -- no change in either direction. Reverted (`git checkout --
 src/code_179d8_k.c`), `build-and-verify.sh` reconfirmed byte-exact.
 
-Combined with the `func_800357B0` round-46 result (same split-lever
+Combined with the `Snd_setVabAttr` round-46 result (same split-lever
 experiment, there actively REGRESSIVE), this function's result shows the
 lever's effect is not even consistently neutral-vs-harmful across
 functions -- here it is fully inert, there it cost 10 words. The

@@ -306,7 +306,7 @@ existing "two words unaccounted for" conclusion rather than a new lead.
 
 ## Round 48 update (runner echo): tested charlie's frame-padding lever -- realigns the frame exactly, does NOT close the length gap
 
-Round 48's designated test of charlie's `func_800351D0` discovery (a
+Round 48's designated test of charlie's `ContDataEntry` discovery (a
 `u8 dead[N];` local under `if (0) { dead[0] = 0; }`, sized to the gap
 between the CURRENT BUILD's frame and retail's -- not retail's raw
 unaddressed-byte count). Rebuilt the round-37 preserved body first, in
@@ -320,7 +320,7 @@ This build's own frame was `addiu sp,sp,-0x30` (48 bytes); retail's is
 `addiu sp,sp,-0x38` (56 bytes) -- an 8-byte/2-word gap, exactly as this
 report's own pre-round-48 "What's missing" section already named it.
 Grepping the retail `.s` for `($sp)`-relative operands confirms (same
-method as `func_800351D0`'s own derivation) that **nothing in retail
+method as `ContDataEntry`'s own derivation) that **nothing in retail
 addresses anything below `0x20($sp)`** -- the register-save block occupies
 `0x20`-`0x34`, and the remaining `0x20` bytes below that (`0x0`-`0x20`) are
 never touched by any instruction in the whole function. Per charlie's own
@@ -331,7 +331,7 @@ full unaddressed span.
 
 Rebuilt: `addiu sp,sp,-0x38` -- **frame now byte-IDENTICAL to retail**,
 confirmed via `objdump -d`. **Built length: UNCHANGED at 237/241.** This is
-the headline finding: unlike `func_800351D0`, where the frame fix combined
+the headline finding: unlike `ContDataEntry`, where the frame fix combined
 with a SEPARATE tail-duplication fix that added real instructions, here the
 frame-size correction is purely a change to the `addiu`/`sw` immediate
 OPERANDS of already-existing prologue/epilogue instructions -- it costs (and
@@ -342,7 +342,7 @@ realignment lower in the function, not from any new match.
 
 **Read literally: charlie's lever, when the extra frame bytes are pure
 unaddressed register-save-area padding with no companion missing
-instructions elsewhere (unlike `func_800351D0`, which ALSO had a
+instructions elsewhere (unlike `ContDataEntry`, which ALSO had a
 duplicated-tail gap), fixes frame ALIGNMENT exactly but leaves the built
 LENGTH untouched.** It is still worth applying (it makes the rest of the
 disassembly comparison meaningful instead of running through a
@@ -381,7 +381,7 @@ iteration (GCC 2.6.3 does not infer, from the enclosing `if`, that the
 matching the shape retail's control flow implies.** **Hard NEGATIVE**:
 regressed to 233/241 built length and 16/241 raw match (from 236/241 and
 93/241) -- markedly worse in both dimensions. Reverted immediately. Unlike
-the `func_800351D0`/other documented do-while conversions, this one made
+the `ContDataEntry`/other documented do-while conversions, this one made
 the compiler choose a substantially different (and worse) instruction
 sequence rather than the one retail shows; something about this specific
 loop's surrounding pointer/register pressure (`p98E`/`pDad` walking
@@ -412,7 +412,7 @@ ALIGNMENT exactly (sized to the CURRENT BUILD's gap vs retail, confirmed
 again here), but it does not recover missing INSTRUCTION WORDS by itself
 when the extra frame bytes are pure unaddressed register-save-area padding
 with no separate content gap (e.g. no duplicated tail) elsewhere in the
-function.** `func_800351D0`'s own length recovery came from a SEPARATE
+function.** `ContDataEntry`'s own length recovery came from a SEPARATE
 fix (tail duplication) applied alongside the frame padding, not from the
 padding itself -- worth stating explicitly since the padding fix's real
 value here turned out to be diagnostic (it makes the REST of the function's

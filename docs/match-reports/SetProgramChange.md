@@ -12,7 +12,7 @@ pointers to arrays of `Entry90902E8` (a 172/0xAC-byte record), indexed
 `[channel][slot]`. `rec->unk12` is a byte offset (already scaled, not an
 index) to a currently-active embedded state block; `rec + rec->unk12`
 gives a pointer whose `+0x2C` byte is written here, and the shared helper
-`func_80035E80` (this unit's frameless leaf; decodes one VLQ-encoded delta
+`ReadDeltaValue` (this unit's frameless leaf; decodes one VLQ-encoded delta
 from the voice's event stream and adds it to `rec->unk80`) is called for
 its side effect, with its return value cached into `rec->unk88` -- an
 overloaded scratch slot every function in this unit's family stores its
@@ -25,7 +25,7 @@ void SetProgramChange(s16 a0, s16 a1, u8 a2)
     u8 *p = (u8 *)rec + rec->unk12;
 
     p[0x2C] = a2;
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 ```
 
@@ -56,8 +56,8 @@ computes the inner multiply first and keeps IT in the callee-saved
 register instead. Writing the double-index inline lets the compiler order
 the two independently, which reproduced retail's register choice for at
 least 5 of 6 functions in this unit's family (`SetProgramChange`,
-`func_800350D8`, `func_80035154` matched outright; `func_80035A7C` and
-`func_80035E80` still had unrelated residues but this specific prologue
+`ContRpn1`, `ContRpn2` matched outright; `SetPitchBend` and
+`ReadDeltaValue` still had unrelated residues but this specific prologue
 mismatch was gone from all of them).
 
 ## Verification

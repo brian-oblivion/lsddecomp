@@ -1,4 +1,6 @@
-# func_800357B0 -- MATCHED (round 49): 179/179, byte-exact
+# Snd_setVabAttr -- MATCHED (round 49): 179/179, byte-exact
+
+> Renamed from `func_800357B0` on 2026-09-23 (tools/rename.py). Address 0x800357b0.
 
 **ROUND 49: MATCHED.** See the update at the end of this report. Everything
 below this point is the historical derivation that got the function to
@@ -35,9 +37,9 @@ valid) control-flow decode but is superseded on every other point.
 
 ## What settled the 4th-argument / scratch-struct question
 
-`func_800351D0.md`'s "`Blk1`/`Blk2` by-value pair" reading turned out to be
+`ContDataEntry.md`'s "`Blk1`/`Blk2` by-value pair" reading turned out to be
 one struct too many. Reading this function's OWN disassembly directly
-(`asm/nonmatchings/code_179d8_k/func_800357B0.s`) rather than inferring from
+(`asm/nonmatchings/code_179d8_k/Snd_setVabAttr.s`) rather than inferring from
 the caller:
 
 - The incoming 4th parameter's first word lands at `sp+0x3C` (register `$a3`'s
@@ -91,7 +93,7 @@ typedef struct {
     s16 unkA; s16 unkC; s16 unkE; s16 unk10;
 } AdsrRaw_800357B0;   /* same shape as code_179d8_f.c's UnkStruct80035F3C, renamed per unit */
 
-void func_800357B0(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
+void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
                     AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
 ```
 
@@ -138,7 +140,7 @@ already-matched bytes.
    already holds unwidened, matching retail exactly.
 
 ## The one residue that would not move: a dead-value computation, same
-   family as `func_800351D0`'s
+   family as `ContDataEntry`'s
 
 Case 12 (arg5, i.e. the 9th arm of the inner switch, a 3-way range check on
 `arg6` against `0x40`/`0x80`) is the one place retail computes a value it
@@ -155,7 +157,7 @@ unconditional `s32 t = arg6 - 0x40;` BEFORE the `if (arg6 == 0) {} else if
 redundant-computation shape byte for byte (confirmed: this specific block
 now matches 100%, no diff reported anywhere in `case 12`'s bytes). This is
 the same "GCC 2.6.3 keeps a register-only dead value alive across a branch"
-family `func_800351D0.md` documents, just resolved successfully here by
+family `ContDataEntry.md` documents, just resolved successfully here by
 hoisting rather than defeated by it.
 
 ## The one residue that DID NOT resolve: `channel`/`arg5` register swap
@@ -175,7 +177,7 @@ already-correct registers, not a wrong value or a wrong control-flow shape.
 
 **One reshape tried, no effect on this swap:** hoisting `channel` into an
 explicit `s16 ch = channel;` local at function entry and using `ch`
-throughout (matching the pattern that helped `func_800351D0`'s own report)
+throughout (matching the pattern that helped `ContDataEntry`'s own report)
 produced byte-IDENTICAL output -- same 163/179, same swap. Per
 CLAUDE.md's explicit register-identity test ("if removing it changes WHICH
 REGISTER holds a value, it is banned; if it only changes instruction order,
@@ -186,12 +188,12 @@ used or considered.
 ## Verification
 
 `./build-and-verify.sh` exit 0 confirms the whole-image SHA1 is unaffected
-(function restored to `INCLUDE_ASM`). `tools/funcdiff.py func_800357B0`
+(function restored to `INCLUDE_ASM`). `tools/funcdiff.py Snd_setVabAttr`
 reports **163/179 words match**, length exact (no out-of-range drift
 warning). Compiled length cross-checked directly via
 `mipsel-linux-gnu-objdump` symbol-to-symbol distance
-(`build/src/code_179d8_k.c.o`, `func_800357B0`..`func_80035A7C` = `0x2CC` =
-179 words, matching retail's own `nonmatching func_800357B0, 0x2CC` header).
+(`build/src/code_179d8_k.c.o`, `Snd_setVabAttr`..`SetPitchBend` = `0x2CC` =
+179 words, matching retail's own `nonmatching Snd_setVabAttr, 0x2CC` header).
 
 ## Body as reached (163/179, length exact, register-identity residue only)
 
@@ -236,7 +238,7 @@ extern void SsUtSetReverbDelay(s16 a0);
  * verified to leave every OTHER already-matched call site in this unit
  * byte-identical. */
 
-void func_800357B0(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
+void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
                     AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6)
 {
     SsUtGetVagAtr(channel, slot, kind, &scratch);
@@ -385,7 +387,7 @@ tailA:
    instruction ORDER (subtract-then-widen vs widen-then-subtract) for a
    value GCC 2.6.3 would otherwise widen once and cache** -- prefer letting
    switch-lowering do the normalization when the case values permit it.
-4. Extends `func_800351D0.md`'s "dead-value kept live across a branch"
+4. Extends `ContDataEntry.md`'s "dead-value kept live across a branch"
    finding with a case where HOISTING the computation (rather than avoiding
    it) is the fix: a value dead on exactly one of three converging paths,
    computed unconditionally before the branch, reproduces retail exactly;
@@ -502,16 +504,16 @@ calls are unchanged from round 35's body above (still current in
 
 ## Verification
 
-`./build-and-verify.sh` build exit=0 with `func_800357B0` restored to
+`./build-and-verify.sh` build exit=0 with `Snd_setVabAttr` restored to
 `INCLUDE_ASM` (near-miss body preserved in `src/` as `#if 0`, updated to
-the round-39 171/179 version). `funcdiff.py func_800357B0` against the
+the round-39 171/179 version). `funcdiff.py Snd_setVabAttr` against the
 near-miss build (prior to reverting): 171/179 words match, length exact,
 zero out-of-range drift.
 
 ### Proposed learning (round 39)
 
 5. **A hoisted "reproduce retail's redundant dead-value computation"
-   fix (round 35's own lever, `func_800351D0.md`'s family) can itself be
+   fix (round 35's own lever, `ContDataEntry.md`'s family) can itself be
    one register-allocation decision too many.** Naming the hoisted value
    (`s32 t = ...;`) pins it to a register kept live across the branch;
    if retail's OWN redundant computation is never named or kept live (each
@@ -614,7 +616,7 @@ verbatim and rebuilt through the full pipeline:
 ```
 
 **`./build-and-verify.sh`: whole-image SHA1 matches retail. `funcdiff.py
-func_800357B0`: 179/179, no drift warning.** Byte-exact.
+Snd_setVabAttr`: 179/179, no drift warning.** Byte-exact.
 
 **Why this succeeds where rounds 35/39/46's "hoist `channel` (or `arg5`)
 into a fresh named local" attempts all failed.** Every prior attempt
@@ -635,9 +637,9 @@ residue lives in, rather than to the widest scope available, is what
 closed it.
 
 **A latent same-translation-unit prototype conflict, exposed by this
-match, not caused by it.** `func_800351D0` (elsewhere in this same file,
+match, not caused by it.** `ContDataEntry` (elsewhere in this same file,
 still a stall) carries its own still-preserved `#if 0` body with a local
-guess at `func_800357B0`'s signature from the CALLER's side: a
+guess at `Snd_setVabAttr`'s signature from the CALLER's side: a
 three-way decomposition of the by-value argument blob (`u32 a3,
 Blk1_800351D0 blk1, Blk2_800351D0 blk2`) that sums to the same 50 bytes
 as this function's own real two-struct signature (`Scratch_800357B0
@@ -646,9 +648,9 @@ different byte boundary -- both are "correct" in the sense of matching
 the retail stack layout, but they are TWO DIFFERENT extern declarations
 of the SAME identifier in ONE translation unit, which C does not permit
 regardless of ABI compatibility. This never surfaced before because
-`func_800357B0` was always `INCLUDE_ASM` (no real definition to
+`Snd_setVabAttr` was always `INCLUDE_ASM` (no real definition to
 conflict against). Making it live triggered `` conflicting types for
-`func_800357B0' `` against `func_800351D0`'s forward declaration.
+`Snd_setVabAttr' `` against `ContDataEntry`'s forward declaration.
 
 This is NOT the same situation `CLAUDE.md`'s "independent local views"
 convention covers (that convention is explicitly about views split
@@ -656,12 +658,12 @@ across DIFFERENT files/units, e.g. a shared struct read differently by
 each caller's own `.c`) -- two conflicting prototypes for the same
 identifier in ONE file are a hard C constraint violation, not a stylistic
 choice. Resolved by REMOVING the stale forward declaration (dead code:
-`func_800351D0`'s own body that used it is itself inert, wrapped in `#if
+`ContDataEntry`'s own body that used it is itself inert, wrapped in `#if
 0`, so nothing live referenced it) rather than trying to reconcile two
 by-value struct decompositions that would require moving
 `Scratch_800357B0`/`AdsrRaw_800357B0`'s typedefs earlier in the file.
 Left an inline comment at the removal site for whoever next attempts
-`func_800351D0`: its own call site will need reshaping to the two-struct
+`ContDataEntry`: its own call site will need reshaping to the two-struct
 signature, and a fresh forward declaration (declared after the two
 struct typedefs, or with them duplicated/forward-declared earlier) added
 back before that function can build again.

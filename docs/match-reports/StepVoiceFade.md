@@ -381,7 +381,7 @@ reproduces) did not move in ~64k iterations.**
 
 ## Round 48 update (runner echo): tested charlie's frame-padding lever -- second confirmed negative for length closure
 
-Round 48's designated test of charlie's `func_800351D0` frame-padding
+Round 48's designated test of charlie's `ContDataEntry` frame-padding
 discovery (`u8 dead[N];` under `if (0) { dead[0] = 0; }`, sized to THIS
 BUILD's frame gap vs retail, not retail's raw unaddressed-byte count).
 Rebuilt the round-37 preserved body first, in isolation: **reconfirmed
@@ -424,7 +424,7 @@ recovered frame byte-alignment exactly on both `SpuVmFlush` and
 `StepVoiceFade`, and closed the missing-WORD-count gap on NEITHER.** Both
 functions' extra retail frame bytes are pure unaddressed register-save-area
 padding with no companion missing-instruction elsewhere in THIS unit,
-unlike `func_800351D0` (a different unit), whose length recovery came from
+unlike `ContDataEntry` (a different unit), whose length recovery came from
 a separate, coincidental tail-duplication fix applied alongside the
 padding. **The lever's reliable value is diagnostic (realign the frame so
 the rest of the diff reads true), not a length-closing move by itself** --

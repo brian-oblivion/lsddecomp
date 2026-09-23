@@ -1556,3 +1556,34 @@ ContNrpn1 = 0x80034E5C; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContNrpn2
 // (disc 3.3). Round 71 (bravo, track 2).
 ContNrpn2 = 0x80034F90; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContRpn1
+// (disc 3.3), near-identical-shape ContRpn2 candidate only masked 0.97.
+// Round 71 (bravo, track 2).
+ContRpn1 = 0x800350D8; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContRpn2
+// (disc 3.3), near-identical-shape ContRpn1 candidate only masked 0.97.
+// Round 71 (bravo, track 2).
+ContRpn2 = 0x80035154; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContDataEntry
+// (disc 3.3). Round 71 (bravo, track 2).
+ContDataEntry = 0x800351D0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread Snd_setVabAttr
+// (disc 3.3). Round 71 (bravo, track 2).
+Snd_setVabAttr = 0x800357B0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread SetPitchBend
+// (disc 3.3). Round 71 (bravo, track 2).
+SetPitchBend = 0x80035A7C; // type:func
+// identified: AMBIGUOUS fingerprint tie (GetMetaEvent, disc 3.3, EXACT
+// masked 1.00, vs _SsGetMetaEvent, disc 3.5, also EXACT masked 1.00 --
+// same function renamed between SDK versions, not two distinct module
+// candidates). Every neighboring function in this cluster (ContRpn1/2,
+// ContDataEntry, Snd_setVabAttr, SetPitchBend, ReadDeltaValue) matched
+// disc 3.3 exactly, so disc 3.3's name (GetMetaEvent) is used here too.
+// Round 71 (bravo, track 2).
+GetMetaEvent = 0x80035B2C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ReadDeltaValue
+// (disc 3.3). Round 71 (bravo, track 2).
+ReadDeltaValue = 0x80035E80; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address Snd_crescendo by relocation). Round 71 (bravo, track 2).
+Snd_crescendo = 0x80036528; // type:func

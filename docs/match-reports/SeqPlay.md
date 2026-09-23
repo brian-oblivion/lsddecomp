@@ -94,7 +94,7 @@ assigned six functions.
 ## What it is
 
 A per-channel/slot sequencer "tick" function -- the caller of both
-`func_80035E80` (indirectly, via `rec->unk88`) and a sibling helper,
+`ReadDeltaValue` (indirectly, via `rec->unk88`) and a sibling helper,
 `GetSeqData` (still `INCLUDE_ASM` in this unit as of this report, so
 its own signature/behaviour is an educated guess, not established fact).
 Two new fields on this unit's `Entry90902E8` local struct view:
@@ -267,7 +267,7 @@ an equivalent explicit dead statement with zero effect. No new axis
 found this round; not re-attempted with `decomp-permuter` given the
 budget went to the higher-yield near-miss cluster instead (see
 `ContPortaTime.md`, `ContModulation.md`, `ContPortamento.md`,
-`func_80035A7C.md`, `ContNrpn2.md` for this round's five matches, and
+`SetPitchBend.md`, `ContNrpn2.md` for this round's five matches, and
 `GetSeqData.md`/`NoteOn.md` for the round's other two
 register-identity re-verifications). This remains a genuine
 register-identity/scheduling STALL per `CLAUDE.md`'s explicit rule.

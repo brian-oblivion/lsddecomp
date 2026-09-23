@@ -104,7 +104,7 @@ checks whether `rec->unk16 == 0x28` (freshly re-read from memory) and, if
 so, looks up a function pointer in a per-(channel,slot) dispatch table
 (`D_80090368`, 0x40-byte-stride rows of 16 pointers) and calls it with
 `(channel, a2 & 0xFF)`. It finishes by caching
-`func_80035E80(channel, slot)` into `rec->unk88`, the same tail every
+`ReadDeltaValue(channel, slot)` into `rec->unk88`, the same tail every
 sibling function in this file has.
 
 ```c
@@ -139,7 +139,7 @@ check:
         }
     }
 skip_call:
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 ```
 
@@ -337,7 +337,7 @@ regressive), declaration order, `s32` widening, row/column split, a
 second dead reference to inflate use-count (round 39). Re-running an
 already-searched scaffold with no new seed shape or new axis is not a
 good use of this round's one-search-at-a-time budget while
-`func_800351D0`'s newly-discovered frame-size lever (this round, see that
+`ContDataEntry`'s newly-discovered frame-size lever (this round, see that
 report) and `NoteOn`'s freshly re-scaffolded 62/70 body (also this
 round) are live. Treating this function as **SPENT** for this round;
 flagging for the next round that a genuinely different seed framing (not

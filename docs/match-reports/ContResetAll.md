@@ -61,7 +61,7 @@ zero-argument helpers from `code_179d8_f` (`func_80036044`,
 `func_80036518`), then resets several fields of the active embedded state
 block (selected by the runtime byte offset `rec->unk12`, same idiom as
 `SetProgramChange`'s family) to fixed sentinel values, and finally calls the
-shared `func_80035E80` VLQ-decode helper, caching its return into
+shared `ReadDeltaValue` VLQ-decode helper, caching its return into
 `rec->unk88`.
 
 ```c
@@ -77,7 +77,7 @@ void ContResetAll(s16 a0, s16 a1)
     rec->unk14 = 0;
     *(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2) = 0x7F;
     ((u8 *)rec)[rec->unk12 + 0x17] = 0x40;
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 ```
 

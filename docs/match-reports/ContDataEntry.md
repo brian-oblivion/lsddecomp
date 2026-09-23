@@ -1,4 +1,6 @@
-# func_800351D0 -- STALL (4 words LONG, 380/376; 95/376 raw word-match; first real diff at word 83, vram 0x80035B1C, loop register numbering after a hoisted `a2 & 0x7F`)
+# ContDataEntry -- STALL (4 words LONG, 380/376; 95/376 raw word-match; first real diff at word 83, vram 0x80035B1C, loop register numbering after a hoisted `a2 & 0x7F`)
+
+> Renamed from `func_800351D0` on 2026-09-23 (tools/rename.py). Address 0x800351d0.
 
 **REVISITED, round 69: STALL, improved (44/376 rebuilt -> 95/376, ins/del
 21/21 -> 6/6, frame exact) and promoted to `#ifdef NON_MATCHING` in
@@ -10,7 +12,7 @@ union in `List_800351D0`, a loop counter width).
 ### The repair, and the rebuilt figures
 
 Round 66 was right: the preserved body did not compile. It called
-`func_800357B0` with round 48's guessed slice `(u32 hdr, Blk1, Blk2)`,
+`Snd_setVabAttr` with round 48's guessed slice `(u32 hdr, Blk1, Blk2)`,
 while the callee's own matched definition takes
 `(s16, s16, s16, Scratch_800357B0 scratch, AdsrRaw_800357B0 resolved,
 s16, u8)`. **Repair (rebuilding, not changing):** moved the two callee
@@ -86,7 +88,7 @@ No permuter search.
 
 This is the same body now in `src/code_179d8_k.c` under `#ifdef
 NON_MATCHING`. It needs the unit's `Entry90902E8`, `D_800902E8`,
-`func_80035E80` and the `SsUtGetProgAtr`/`SsUtGetVagAtr`/`SsUtSetVagAtr`
+`ReadDeltaValue` and the `SsUtGetProgAtr`/`SsUtGetVagAtr`/`SsUtSetVagAtr`
 externs declared earlier in the unit.
 
 ```c
@@ -138,23 +140,23 @@ typedef struct {
 /* SsUtGetProgAtr's fill at function entry. From +0x10 the SAME memory is
  * both the VagAtr buffer the unk29==2 loops hand to SsUtGet/SetVagAtr
  * (retail addresses it at sp+0x58 = list+0x10) and, with the 18 bytes
- * after it, the two by-value arguments of func_800357B0 (round 69). */
+ * after it, the two by-value arguments of Snd_setVabAttr (round 69). */
 typedef struct {
     u8 count;                  /* +0x00: item count, SsUtGetProgAtr's usual field */
     u8 pad1[0x10 - 0x1];
     union {
-        Scratch_800357B0 s;    /* +0x10: passed by value to func_800357B0 */
+        Scratch_800357B0 s;    /* +0x10: passed by value to Snd_setVabAttr */
         Scratch800351D0 v;     /* +0x10: SsUtGet/SetVagAtr's buffer in the unk29==2 loops */
     } scratch;
-    AdsrRaw_800357B0 adsr;     /* +0x30: passed by value to func_800357B0 */
+    AdsrRaw_800357B0 adsr;     /* +0x30: passed by value to Snd_setVabAttr */
 } List_800351D0;
 
-/* func_800357B0 is defined later in this unit; its own definition fixes
+/* Snd_setVabAttr is defined later in this unit; its own definition fixes
  * this signature (round 49). */
-extern void func_800357B0(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
+extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
                           AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
 
-void func_800351D0(s16 a0, s16 a1, u8 a2)
+void ContDataEntry(s16 a0, s16 a1, u8 a2)
 {
     s16 ch = a0;
     s16 slot = a1;
@@ -173,13 +175,13 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
     if (rec->unk27 == 1 && rec->unk10 == 0) {
         rec->unk28 = a2;
         rec->unk10 = 1;
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         return;
     }
     if (rec->unk16 != 0x1E && rec->unk16 != 0x14) {
         rec->unk15 = a2;
         rec->unk2A = rec->unk2A + 1;
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         return;
     }
     if (rec->unk29 == 2) {
@@ -220,7 +222,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
                 SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
             }
         }
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk29 = 0;
         return;
     }
@@ -228,18 +230,18 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
         kind = rec->unk16;
         if (kind == 0x10) {
             for (i = 0; i < list.count; i++) {
-                func_800357B0(rec->unk4C, ((u8 *)rec + off)[0x2C], i,
+                Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], i,
                               list.scratch.s, list.adsr, rec->unk15, a2 & 0xFF);
             }
         } else {
-            func_800357B0(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind,
+            Snd_setVabAttr(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind,
                           list.scratch.s, list.adsr, rec->unk15, a2 & 0xFF);
         }
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk2A = 0;
         return;
     }
-    rec->unk88 = func_80035E80(ch, slot);
+    rec->unk88 = ReadDeltaValue(ch, slot);
 }
 #endif
 ```
@@ -256,7 +258,7 @@ making them one moved the score from 84 to 95 and fixed every loop offset.
 
 ## History (earlier rounds; figures superseded by the round-69 section above)
 
-Old title: func_800351D0 -- STALL (4 words LONG, 380/376; 18/376 raw word-match; first real diff at word 0, vram 0x800351D0, frame size)
+Old title: ContDataEntry -- STALL (4 words LONG, 380/376; 18/376 raw word-match; first real diff at word 0, vram 0x800351D0, frame size)
 
 > **Round 66 (runner charlie), track 1b: NO NON_MATCHING BODY: preserved
 > body does not compile, and the fix is out of scope for a mechanical
@@ -267,14 +269,14 @@ Old title: func_800351D0 -- STALL (4 words LONG, 380/376; 18/376 raw word-match;
 > below for the current numbers). That is not why this is blocked, though.
 >
 > The body preserved in `src/code_179d8_k.c` (round 48's, `#if 0`-wrapped)
-> calls `func_800357B0` with its OWN pre-round-49 guessed signature -- an
+> calls `Snd_setVabAttr` with its OWN pre-round-49 guessed signature -- an
 > 8-argument slice `(u32 hdr, Blk1_800351D0 blk1, Blk2_800351D0 blk2, ...)`.
-> Round 49 matched `func_800357B0` byte-exact with a DIFFERENT real
+> Round 49 matched `Snd_setVabAttr` byte-exact with a DIFFERENT real
 > signature, `(..., Scratch_800357B0 scratch, AdsrRaw_800357B0 resolved,
 > ...)`, and removed this function's stale forward declaration as
 > conflicting (see the round-49 section below, "will need reshaping on the
 > next attempt"). The preserved body was never updated to match, so it
-> does not compile as `INCLUDE_ASM`'s NON_MATCHING sibling: `func_800357B0`
+> does not compile as `INCLUDE_ASM`'s NON_MATCHING sibling: `Snd_setVabAttr`
 > is declared once, with the real signature, and the preserved body's call
 > sites pass the wrong argument shape (`too many arguments` /
 > `conflicting types`, not tried here since the report already establishes
@@ -300,12 +302,12 @@ Old title: func_800351D0 -- STALL (4 words LONG, 380/376; 18/376 raw word-match;
 **Length**: retail 376 words (0x5E0). This round's best C compiled to 380
 words (measured directly off `build/src/code_179d8_k.c.o` via objdump,
 address-difference to the next function). **Raw word-match**: `18/376`
-(`tools/funcdiff.py func_800351D0`, re-measured against the near-miss body
+(`tools/funcdiff.py ContDataEntry`, re-measured against the near-miss body
 reconstructed for this purpose) -- this number is mostly a symptom of the
 length drift below, not 358 independent mismatches; see caveat. **First
 real diff**: word 0 (vram `0x800351D0`, `addiu sp,sp,-0x108` vs this
 build's `addiu sp,sp,-0xe0`), confirmed via `tools/asm-differ/diff.py
-func_800351D0`, which realigns the rest of the function around the length
+ContDataEntry`, which realigns the rest of the function around the length
 difference and still shows the divergence starting at the function's own
 opening instruction: this build's stack frame is 0x28 bytes smaller than
 retail's, so the two disassemblies run in a different register/offset
@@ -318,7 +320,7 @@ a future attempt should target.
 This is the largest function in the unit (round 27's #1 priority, FRESH
 ground with no prior report) and the CC6 (Data Entry MSB) handler for
 RPN/NRPN parameter writes. The overall control-flow skeleton, all three
-`func_80033260`/`func_80036230` loops, and the `func_800357B0` call's
+`func_80033260`/`func_80036230` loops, and the `Snd_setVabAttr` call's
 struct-marshaling are all now derived and (as far as could be verified
 before the length drift made further comparison unreliable) byte-correct.
 The remaining residue is narrow and specific -- see "What's left" below.
@@ -326,7 +328,7 @@ The remaining residue is narrow and specific -- see "What's left" below.
 ## Signature and struct layout (now settled)
 
 ```c
-void func_800351D0(s16 a0 /* channel */, s16 a1 /* slot */, u8 a2 /* value */);
+void ContDataEntry(s16 a0 /* channel */, s16 a1 /* slot */, u8 a2 /* value */);
 ```
 
 `rec = &D_800902E8[a0][a1]`, `p = (u8 *)rec + rec->unk12` -- same idiom as
@@ -337,7 +339,7 @@ fills a **larger-than-previously-assumed** output record. Every other
 function in this unit that calls `func_800334F0`/`func_80033260` only reads
 the item COUNT (offset 0) from its output; this call site is the first to
 read much further into the same record (up to relative offset 0x41), which
-is what finally settles the open question in `func_800357B0.md` about that
+is what finally settles the open question in `Snd_setVabAttr.md` about that
 function's 4th-argument type and scratch layout:
 
 ```c
@@ -363,7 +365,7 @@ typedef struct {
 `lw`) and combined via `(u32)hdrLo | ((u32)hdrHi << 16)` at the call site --
 this specific shape (rather than a single word load) is what confirms they
 are genuinely two `u16` fields in the source, not one `u32` reinterpreted.
-`blk1`/`blk2` are passed to `func_800357B0` **by value**, which is why they
+`blk1`/`blk2` are passed to `Snd_setVabAttr` **by value**, which is why they
 compile to the project's confirmed alignment-2-struct whole-copy idiom
 (`lwl`/`lwr` + `swl`/`swr` in word-sized chunks, with a plain `lh`/`sh` for
 any 2-byte remainder) -- their internal field breakdown is unconstrained by
@@ -372,11 +374,11 @@ anything observed; only the total size (28 and 18 bytes) and the alignment
 runtime alignment) are load-bearing.
 
 ```c
-extern void func_800357B0(s16 a0, s16 a1, s16 a2, u32 a3, Blk1_800351D0 blk1,
+extern void Snd_setVabAttr(s16 a0, s16 a1, s16 a2, u32 a3, Blk1_800351D0 blk1,
                            Blk2_800351D0 blk2, s16 arg5, u8 arg6);
 ```
 
-This settles `func_800357B0.md`'s open question: its "4th parameter" is
+This settles `Snd_setVabAttr.md`'s open question: its "4th parameter" is
 this `u32` header value (built from two `u16`s, not a pointer or single
 word field), and its scratch struct is the `Blk1_800351D0`/`Blk2_800351D0`
 pair passed by value on the stack (28 + 18 bytes, aligned/padded to a
@@ -405,7 +407,7 @@ typedef struct {
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80033260 -> SsUtGetVagAtr, func_800334F0 -> SsUtGetProgAtr, func_80036230 -> SsUtSetVagAtr -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-void func_800351D0(s16 a0, s16 a1, u8 a2)
+void ContDataEntry(s16 a0, s16 a1, u8 a2)
 {
     s16 ch = a0;
     s16 slot = a1;
@@ -467,7 +469,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
                 SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
             }
         }
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk29 = 0;
         return;
     }
@@ -475,21 +477,21 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
         kind = rec->unk16;
         if (kind == 0x10) {
             for (i = 0; i < list.count; i++) {
-                func_800357B0(rec->unk4C, p[0x2C], i,
+                Snd_setVabAttr(rec->unk4C, p[0x2C], i,
                               (u32)list.hdrLo | ((u32)list.hdrHi << 16),
                               list.blk1, list.blk2, rec->unk15, a2 & 0xFF);
             }
         } else {
-            func_800357B0(rec->unk4C, p[0x2C], (s16)kind,
+            Snd_setVabAttr(rec->unk4C, p[0x2C], (s16)kind,
                           (u32)list.hdrLo | ((u32)list.hdrHi << 16),
                           list.blk1, list.blk2, rec->unk15, a2 & 0xFF);
         }
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk2A = 0;
         return;
     }
 combine:
-    rec->unk88 = func_80035E80(ch, slot);
+    rec->unk88 = ReadDeltaValue(ch, slot);
 }
 ```
 
@@ -498,7 +500,7 @@ Splicing this literal body back into `src/code_179d8_k.c` in place of the
 clean (`build exit=2`, zero compile-error grep hits) at 380/376 words.
 
 An early attempt used the bare parameters `a0`/`a1` directly at every
-`func_80035E80` call site instead of caching them into `ch`/`slot`; this
+`ReadDeltaValue` call site instead of caching them into `ch`/`slot`; this
 produced a WILDLY different, much smaller/differently-allocated function
 (frame `-0x108` retail vs `-0xF8`, fused sign-extend-and-multiply shifts
 where retail keeps a separate persistent register) -- exactly the fused-vs-
@@ -515,7 +517,7 @@ instruction sequences, matching loop shapes).
 Retail computes a value into `$s5` in each of the `unk13==1` and
 `unk13==2` sub-branches (a masked/rounded `val*100` in one, a shifted
 `val*25` in the other) that is **never read anywhere in the function** --
-confirmed with `grep -n '\$s5' asm/nonmatchings/code_179d8_k/func_800351D0.s`,
+confirmed with `grep -n '\$s5' asm/nonmatchings/code_179d8_k/ContDataEntry.s`,
 which shows only the writes (`andi`/`sll`/`addu $s5,zero,zero`) and the
 final callee-save restore (`lw $s5, ...` in the epilogue, which is not a
 real use). Four things were tried, in order:
@@ -590,7 +592,7 @@ than assuming the smallest previously-seen instance is the whole story.
 Also: a `volatile` local is not a universal drop-in replacement for "a
 retail register value that outlives its last real use." It works when the
 retained computation's RESULT truly needs to persist untouched (the
-`func_80035B2C` precedent, round 26), but when the value is genuinely
+`GetMetaEvent` precedent, round 26), but when the value is genuinely
 **dead** (no read anywhere, ever), volatile's memory-observability
 guarantee adds real store/branch overhead that a true register-only dead
 value never had, and the two are not the same lever.
@@ -648,12 +650,12 @@ gap means a future attempt should look for a MISSING local (something
 retail allocates ~10 words of stack for that this reading's `List_800351D0`
 /`Scratch800351D0` pair does not currently account for) before trusting
 ANY of this report's per-block claims about `unk13==1`/`unk13==2` being the
-only residue. The likeliest candidate, given `func_800357B0.md`'s round-35
+only residue. The likeliest candidate, given `Snd_setVabAttr.md`'s round-35
 finding that its own two by-value struct parameters (a `VagAtr` and
 `code_179d8_f.c`'s `UnkStruct80035F3C`) are ENTIRELY caller-marshaled with
 no local frame space of their own, is that THIS function's own construction
 of those two by-value arguments (the `lwl`/`lwr`/`swl`/`swr` copy sequence
-already identified at its two `func_800357B0` call sites) needs MORE stack
+already identified at its two `Snd_setVabAttr` call sites) needs MORE stack
 space to stage than this report's `List_800351D0`/`Blk1`/`Blk2` reading
 currently allocates for it -- not investigated further this round; flagged
 for whoever next stages this function.
@@ -682,10 +684,10 @@ earns its "ALWAYS pass it" status in `docs/MATCHING-GUIDE.md` twice over: it
 catches a false zero (round 18's documented case) AND, as here, it catches a
 report whose own scope was narrower than its title implied.
 
-## Round 39 update (runner alpha): re-verified; hoist-both-before-either checked, not applicable; the func_800357B0 "drop the name" lever checked, does not transfer
+## Round 39 update (runner alpha): re-verified; hoist-both-before-either checked, not applicable; the Snd_setVabAttr "drop the name" lever checked, does not transfer
 
 Rebuilt the preserved near-miss body and cross-checked compiled length
-directly via `objdump` symbol-to-symbol distance: `func_800351D0` is
+directly via `objdump` symbol-to-symbol distance: `ContDataEntry` is
 `0x5f0` bytes (380 words), reproducing "4 words LONG (380/376)" exactly.
 
 **Hoist-both-before-either: not applicable.** The residue is two
@@ -694,10 +696,10 @@ genuinely-dead retail computations (a masked/shifted byte computed into
 anywhere) kept alive across a branch join with zero extra instructions --
 not a pair of adjacent loads/multiplies with a later shared consumer.
 
-**Checked whether this round's `func_800357B0` fix (drop the named local
+**Checked whether this round's `Snd_setVabAttr` fix (drop the named local
 entirely, let the one real consumer recompute the expression inline)
 transfers here** -- it does not, and the reason is the key difference
-between the two residues: `func_800357B0`'s case 12 value IS read, on
+between the two residues: `Snd_setVabAttr`'s case 12 value IS read, on
 exactly one of three converging paths, so "no name, recompute at the one
 real use" reproduces retail exactly. This function's `$s5` values are read
 on **zero** paths -- there is no "one real use" to recompute the
@@ -706,7 +708,7 @@ lever 1 ("a plain dead local... GCC 2.6.3 eliminates the entire
 computation... 26 words SHORT"), which is the same failure mode dropping
 the name here would hit: with no consumer anywhere, unnamed or not, GCC's
 dead-code elimination removes the computation outright. The two residues
-share a family (`docs/match-reports/func_800357B0.md`'s round-39 update
+share a family (`docs/match-reports/Snd_setVabAttr.md`'s round-39 update
 extends this report's own "dead value kept live across a branch" finding)
 but are NOT the same fix -- one has a real consumer that a hoisted name
 over-commits to a register, the other has none at all and needs the value
@@ -735,7 +737,7 @@ Round 35 flagged this as "not investigated further" and no round since
 
 Direct measurement, `python3 -c` on the disassembly's own `$sp`-relative
 literal offsets (every `0x??($sp)` operand in
-`asm/nonmatchings/code_179d8_k/func_800351D0.s`, both loads/stores):
+`asm/nonmatchings/code_179d8_k/ContDataEntry.s`, both loads/stores):
 **the highest offset any instruction in the WHOLE function ever
 addresses is `0x90` (144).** The register-save block occupies the frame's
 top 40 bytes (`0xE0`-`0x108`, confirmed via `objdump`: `s0`-`s8` (9 regs)
@@ -767,10 +769,10 @@ below, found by reading the now-meaningful `asm-differ` output.
 
 ### The second finding: retail does NOT share one `combine:` tail
 
-With the frame fixed, `tools/asm-differ/diff.py func_800351D0` (now
+With the frame fixed, `tools/asm-differ/diff.py ContDataEntry` (now
 alignment-trustworthy near the top of the function) showed the two early
 `goto combine;` sites reaching **two DIFFERENT physical copies** of
-`rec->unk88 = func_80035E80(a0, a1);` in retail, each with its own
+`rec->unk88 = ReadDeltaValue(a0, a1);` in retail, each with its own
 register-widening sequence (one re-widens from `$s8`/reloads from a stack
 slot at `0x90`; the other re-widens from `$s1`/`$s0` directly) -- not one
 shared block reached by two gotos, which is what this report's preserved
@@ -779,7 +781,7 @@ idiom (`func_80034690.md`'s case-11 finding, `DECOMPILATION_LEARNINGS.md`'s
 "an arm that must jump has to be written not-last" family).
 
 **Fix: replaced both `goto combine;` sites with their own inlined
-`rec->unk88 = func_80035E80(ch, slot); return;`, and dropped the `combine:`
+`rec->unk88 = ReadDeltaValue(ch, slot); return;`, and dropped the `combine:`
 label** (the third convergence point -- the implicit fallthrough when
 neither `unk29==2` nor `unk2A==2` -- keeps the single remaining copy at the
 function's natural end, since it is structurally LAST in source order,
@@ -825,14 +827,14 @@ preserved body sat in a plain fenced code block with no `#if 0` markers --
 CLAUDE.md's mandated preservation form -- so it was not literally
 "positioned where it would compile" the way a copy-paste back into
 `src/code_179d8_k.c` needs. No change to the body itself, and see the
-round-49 note above: this body's `func_800357B0` call sites still use the
+round-49 note above: this body's `Snd_setVabAttr` call sites still use the
 now-stale 3-way (`u32`/`Blk1_800351D0`/`Blk2_800351D0`) argument slice and
 will need reshaping to the real `(Scratch_800357B0, AdsrRaw_800357B0)`
 two-struct signature before this body can build again.
 
 ```c
 #if 0
-void func_800351D0(s16 a0, s16 a1, u8 a2)
+void ContDataEntry(s16 a0, s16 a1, u8 a2)
 {
     s16 ch = a0;
     s16 slot = a1;
@@ -852,13 +854,13 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
     if (rec->unk27 == 1 && rec->unk10 == 0) {
         rec->unk28 = a2;
         rec->unk10 = 1;
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         return;
     }
     if (rec->unk16 != 0x1E && rec->unk16 != 0x14) {
         rec->unk15 = a2;
         rec->unk2A = rec->unk2A + 1;
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         return;
     }
     if (rec->unk29 == 2) {
@@ -900,7 +902,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
                 SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
             }
         }
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk29 = 0;
         return;
     }
@@ -908,26 +910,26 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
         kind = rec->unk16;
         if (kind == 0x10) {
             for (i = 0; i < list.count; i++) {
-                func_800357B0(rec->unk4C, p[0x2C], i,
+                Snd_setVabAttr(rec->unk4C, p[0x2C], i,
                               (u32)list.hdrLo | ((u32)list.hdrHi << 16),
                               list.blk1, list.blk2, rec->unk15, a2 & 0xFF);
             }
         } else {
-            func_800357B0(rec->unk4C, p[0x2C], (s16)kind,
+            Snd_setVabAttr(rec->unk4C, p[0x2C], (s16)kind,
                           (u32)list.hdrLo | ((u32)list.hdrHi << 16),
                           list.blk1, list.blk2, rec->unk15, a2 & 0xFF);
         }
-        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk88 = ReadDeltaValue(ch, slot);
         rec->unk2A = 0;
         return;
     }
-    rec->unk88 = func_80035E80(ch, slot);
+    rec->unk88 = ReadDeltaValue(ch, slot);
 }
 #endif
 ```
 
 (Needs the same `Blk1_800351D0`/`Blk2_800351D0`/`List_800351D0`/
-`Scratch800351D0` typedefs and the local `func_800357B0` prototype already
+`Scratch800351D0` typedefs and the local `Snd_setVabAttr` prototype already
 declared earlier in `src/code_179d8_k.c`, unchanged from before this
 round.)
 
@@ -953,7 +955,7 @@ round.)
 - **Frame-size root cause**: found and FIXED (`dead[40]`, this project's
   established idiom, applied at a new size).
 - **Tail-duplication**: found and FIXED for 2 of the (at least) 3
-  convergence points on `rec->unk88 = func_80035E80(...)`.
+  convergence points on `rec->unk88 = ReadDeltaValue(...)`.
 - **`volatile` for LICM-hoisted loop-invariant mask**: tried, NEGATIVE
   (hard regression, 274908 bytes drift) -- the wrong instrument for a
   hoist-out-of-loop residue as opposed to a within-expression fold.
@@ -976,9 +978,9 @@ diff IS the frame-size bug already surfacing, and is worth chasing to a
 root cause with the plain `$sp`-offset census shown above before writing
 the function off to "look for a missing local" without ever doing so.
 
-## Round 49 note (runner charlie): `func_800357B0` MATCHED -- this function's forward declaration of it was REMOVED, will need reshaping on the next attempt
+## Round 49 note (runner charlie): `Snd_setVabAttr` MATCHED -- this function's forward declaration of it was REMOVED, will need reshaping on the next attempt
 
-`func_800357B0` (called from this function's `unk2A==2` dispatch arm, both
+`Snd_setVabAttr` (called from this function's `unk2A==2` dispatch arm, both
 in the preserved body above) matched byte-exact this round (see its own
 report). Its REAL signature is `(s16 channel, s16 slot, s16 kind,
 Scratch_800357B0 scratch, AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6)` --
@@ -986,14 +988,14 @@ a 0x20-byte scratch struct plus an 18-byte ADSR struct, both by value.
 This function's own forward declaration of it (just above this function's
 `#if 0` body in `src/code_179d8_k.c`) instead sliced the same 50 bytes as
 `(u32 a3, Blk1_800351D0 blk1, Blk2_800351D0 blk2)` -- a different, never-
-confirmed guess. Once `func_800357B0` had a real definition, the two
-conflicted (`` conflicting types for `func_800357B0' ``), so the stale
+confirmed guess. Once `Snd_setVabAttr` had a real definition, the two
+conflicted (`` conflicting types for `Snd_setVabAttr' ``), so the stale
 declaration was REMOVED rather than reconciled (removing it is safe: this
 function's own body that used it is itself still `#if 0`, so nothing live
 referenced it).
 
 **Whoever next attempts this function will need to:** reshape the two
-call sites (`func_800357B0(rec->unk4C, p[0x2C], i, (u32)list.hdrLo |
+call sites (`Snd_setVabAttr(rec->unk4C, p[0x2C], i, (u32)list.hdrLo |
 ((u32)list.hdrHi << 16), list.blk1, list.blk2, rec->unk15, a2 & 0xFF);`
 and its non-loop sibling) to pass a `Scratch_800357B0`/`AdsrRaw_800357B0`
 pair instead of the `u32`/`Blk1_800351D0`/`Blk2_800351D0` triple, and add

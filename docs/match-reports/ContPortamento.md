@@ -69,7 +69,7 @@ void ContPortamento(s16 a0, s16 a1, s32 a2)
         }
         func_80036230(rec->unk4C, ((u8 *)rec + offset)[0x2C], (s16)i, &scratch);
     }
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 ```
 
@@ -125,7 +125,7 @@ void ContPortamento(s16 a0, s16 a1, s32 a2)
         }
         func_80036230(rec->unk4C, p[0x2C], (s16)i, &scratch);
     }
-    rec->unk88 = func_80035E80(a0, a1);
+    rec->unk88 = ReadDeltaValue(a0, a1);
 }
 ```
 

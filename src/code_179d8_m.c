@@ -66,7 +66,7 @@
  */
 #include "common.h"
 
-/* Round 48 (echo): testing charlie's func_800351D0 frame-padding lever on
+/* Round 48 (echo): testing charlie's ContDataEntry frame-padding lever on
  * this function's frame gap (0x10 built vs retail's 0x18, 8 bytes; retail
  * saves ZERO callee-saved registers and addresses NOTHING via $sp beyond
  * the prologue/epilogue immediate itself, confirmed via grep -- textbook
