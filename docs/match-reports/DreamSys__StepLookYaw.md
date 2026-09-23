@@ -1,4 +1,78 @@
-# DreamSys__StepLookYaw -- STALL: 1 word SHORT (76/77 instructions), whole CFG matches exactly; register-coalescing fix closed half the prior gap this round; first real diff at 0x4A1EC (`this` register setup for the tail call, hoisted into a different delay slot by retail than by any C tried here)
+# DreamSys__StepLookYaw -- MATCHED 77/77 (round 73, runner bravo): a second name for `this` passed to the shared tail call
+
+REVISITED, round 73: MATCHED 77/77 (was STALL 76/77, 1 word short); names/types not relevant (no field or type changed; one new local, `flipTarget`)
+
+## Round 73 (2026-09-23, runner bravo): MATCHED
+
+**Preserved body rebuilt first**, exactly as the unit's `#ifdef NON_MATCHING`
+block gave it: 76 words (1 short), funcdiff `insertions 6 / deletions 6`,
+positional skeleton diffs 33, window score 39/77 with 139371 bytes drifted
+outside the range (the one-word shortfall shifts everything after it, so the
+in-window N/77 is not a real figure). asm-differ's real residue was as filed:
+retail's decay arm ends `lw v0,0x94(s0); move a0,s0; addu v0,s2,v0;
+sw v0,0x94(a0); jal; nop`, the preserved body's ends `... sw v0,0x94(s0);
+jal; move a0,s0`, and the apply/early-out join differs in which delay slot
+the `move a0,s0` lands in.
+
+**The residue was never scheduling.** The load-bearing retail word is
+`sw v0,0x94($a0)`: the `lookYaw` store is addressed through `$a0`, not
+`$s0`. No scheduling or delay-slot pass renames a base register, so in
+retail's RTL that store's address was a pseudo that was allocated `$a0` --
+a pseudo other than `this`. That is a second C name for `this`, copied just
+before the tail call and passed to it. Once `this` dies at the copy, the
+insns after the last call that used `this` are rewritten to use the copy,
+and the copy is tied to the `$a0` argument register.
+
+Builds, in order (each through `./build-and-verify.sh`):
+
+1. `DreamSys *p;` with `p = this;` before each `goto call_tail` and at the
+   end of apply, tail `FlipMoveCommand(p)`; decay arm
+   `sum = delta + this->lookYaw; p = this; p->lookYaw = sum;` -- decay
+   tail now byte-exact (store via `$a0`, jal delay `nop`); apply's stores
+   went through `$a0` too, and the negative early-out got its own block:
+   80 words (3 long), ins/del 3/3.
+2. Same, with the two early-outs and the apply end merged into ONE
+   `this->lookYawCommand = 0; p = this;` after an `if/else if` (retail's
+   L80059998 is exactly that shared block, and the positive early-out's
+   `sw zero,0x90` in its `j` delay slot is reorg stealing that block's first
+   insn): **exact length, 75/77, ins/del 0/0**, residue only the decay
+   arm's sum held in `$s1` (the reused `sum` pseudo) instead of `$v0`.
+3. `p = this; p->lookYaw = delta + this->lookYaw;` -- worse, ins/del 2/2
+   (the load also moved to `$a0`).
+4. `this->lookYaw += delta; p = this;` -- **77/77, build exit=0, whole-image
+   SHA1 OK.**
+5. Cosmetic: `goto apply` replaced by
+   `if ((sum >= 0) ? (sum < threshold) : ((~sum + 1) < threshold))`, the
+   `call_tail` label dropped, `p` renamed `flipTarget` -- still 77/77,
+   build exit=0.
+
+The round-73 broadcast levers were checked first and did not apply:
+`DreamSys__FlipMoveCommand` reads only `$a0` and `UpdateRotation` (slot
++0x44) is called with `$a0`-`$a2` in retail too (arity correct); no struct
+copy in the function; no dead parameter move. No permuter search was run.
+
+`tools/check-nonmatching.sh` green after the `#ifdef NON_MATCHING` block was
+replaced by the matched C.
+
+### Proposed learning (round 73)
+
+**A load or store whose BASE register is an argument register (`$a0`) while
+the same object is held in `$s0` elsewhere is a second C variable for the
+object, not a scheduling residue.** Scheduling and delay-slot filling move
+instructions; they never change which register an address uses. If retail
+reads `sw v0,off($a0)` right before a `jal` taking that object, write
+`q = this; ... f(q);` with `this` dead after the copy: the uses between the
+last call and the copy are rewritten to `q`, and `q` is tied to `$a0`. This
+closed a 76/77 stall that two permuter searches (117550 and 37781
+iterations) never reached: a permuter does not invent a new variable that
+aliases a parameter on some paths.
+
+---
+
+## Pre-round-73 history
+
+DreamSys__StepLookYaw -- STALL: 1 word SHORT (76/77 instructions), whole CFG matches exactly; register-coalescing fix closed half the prior gap this round; first real diff at 0x4A1EC (`this` register setup for the tail call, hoisted into a different delay slot by retail than by any C tried here)
+
 
 > Renamed from `func_800598E8` on 2026-09-22 (tools/rename.py). Address 0x800598e8.
 

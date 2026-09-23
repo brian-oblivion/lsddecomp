@@ -572,20 +572,19 @@ void DreamSys__StepLookOffset(DreamSys *this)
 	}
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 76/77 instructions, 1 word SHORT. Residue: which delay
- * slot the shared `call_tail: DreamSys__FlipMoveCommand(this);` merge's
- * `this` register setup lands in -- retail hoists `move a0,s0` into a
- * jump's delay slot on one converging path, this build materializes it
- * one instruction later at the shared label instead. Whole CFG matches
- * exactly; permuter-searched twice (round 37, round 49), no zero-scoring
- * candidate; hand-derived. docs/match-reports/DreamSys__StepLookYaw.md. */
 void DreamSys__StepLookYaw(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
 	s32 threshold;
 	s32 sum;
+	/* A second name for `this`, set on each path just before the shared
+	   tail call. It is load-bearing: `this` dies at the copy, so the
+	   decay arm's `lookYaw` store goes through $a0 (retail's
+	   `sw v0,0x94(a0)`) and every path reaches the jal with $a0 already
+	   set. Every earlier body passing `this` directly was one word short
+	   (round 73). */
+	DreamSys *flipTarget;
 
 	this->moveCommandLatch = (this->moveCommand == 1);
 	idx = this->lookYawCommand;
@@ -593,21 +592,13 @@ void DreamSys__StepLookYaw(DreamSys *this)
 		delta = LOOK_YAW_STEPS[idx];
 		threshold = LOOK_YAW_LIMITS[idx];
 		sum = delta + this->lookYaw;
-		if (sum >= 0) {
-			if (sum < threshold)
-				goto apply;
-			this->lookYawCommand = 0;
-			goto call_tail;
+		if ((sum >= 0) ? (sum < threshold) : ((~sum + 1) < threshold)) {
+			TURN_ROTATION_YAW[0].numerator = delta;
+			this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+			this->lookYaw = sum;
 		}
-		if ((~sum + 1) >= threshold) {
-			this->lookYawCommand = 0;
-			goto call_tail;
-		}
-	apply:
-		TURN_ROTATION_YAW[0].numerator = delta;
-		this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
-		this->lookYaw = sum;
 		this->lookYawCommand = 0;
+		flipTarget = this;
 	} else if (this->lookYaw != 0) {
 		delta = -0x2D;
 		if (this->lookYaw < 0)
@@ -615,15 +606,12 @@ void DreamSys__StepLookYaw(DreamSys *this)
 		TURN_ROTATION_YAW[0].numerator = delta;
 		this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
 		this->lookYaw += delta;
+		flipTarget = this;
 	} else {
 		return;
 	}
-call_tail:
-	DreamSys__FlipMoveCommand(this);
+	DreamSys__FlipMoveCommand(flipTarget);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StepLookYaw);
-#endif
 
 void DreamSys__FlipMoveCommand(DreamSys *this)
 {
