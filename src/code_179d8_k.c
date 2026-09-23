@@ -159,15 +159,14 @@ extern s32 func_80035E80(s16 channel, s16 slot);
  * characterised since it has not been matched. */
 extern void func_8003424C(s16 channel, s16 slot);
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 66/69 words, length exact. Residue: two pure scheduling
- * residues in the prologue (a load-pair order swap and one delay-slot
- * filler choice), not a logic or CFG difference
- * (docs/match-reports/func_80034138.md). Hand-derived. */
+/* Catch-up scheduler tick.  When the re-armed counter is still reloading
+ * its threshold (remain == 0) it copies the threshold rec->unk70 into the
+ * counter.  The third parameter is unused; retail reuses its dead register
+ * ($a2) to hold rec->unk70 for that store (round 69,
+ * docs/match-reports/func_80034138.md). */
 void func_80034138(s16 a0, s16 a1, s16 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
-    s32 dead[2];
     s16 last = rec->unk70;
     s32 elapsed = rec->unk88;
     s32 delta = elapsed - last;
@@ -176,10 +175,6 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
     s32 step;
     s16 last2;
 
-    if (0) {
-        dead[0] = 0;
-        dead[1] = 0;
-    }
     if (delta > 0) {
         remain = rec->unk6E;
         if (remain > 0) {
@@ -187,7 +182,7 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
             return;
         }
         if (remain == 0) {
-            rec->unk6E = a2;
+            rec->unk6E = last;
             rec->unk88 = rec->unk88 - 1;
             return;
         }
@@ -212,9 +207,6 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034138);
-#endif
 
 /* Forward declarations for sibling functions defined later in THIS unit,
  * needed because func_8003424C dispatches to them by MIDI-style status
@@ -392,7 +384,7 @@ void func_80034614(s16 a0, s16 a1, u8 a2)
 extern void SpuVmDamperOn(void);
 extern void SsUtSetReverbDepth(s16 a0, s16 a1);
 extern s32 SpuVmSetProgVol(s16 p0, s16 p1, s32 p2);
-extern void func_80030980(s16 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
+extern void func_80030980(s32 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
 
 /* Forward declarations for sibling functions defined later in THIS unit's
  * ROM-address order. func_800351D0's signature is this call site's own
@@ -418,16 +410,13 @@ extern void func_80034D90(s16 a0, s16 a1);
  * through into the shared tail that re-arms the next scheduling delta via
  * func_80035E80; those seven `return` immediately instead.
  *
+ * Two choices below are byte-load-bearing (round 69): func_80030980's first
+ * parameter is a full `s32` (its own body masks it with 0xFF/0xFF00), so
+ * `packed` is not narrowed and the widened a0/a1 stay live across the call
+ * for the final func_80035E80; and each case copies `offset` into a
+ * case-local `u16`, which keeps the switch-wide byte in a caller-saved
+ * register and gives each case its own callee-saved copy.
  */
-#ifdef NON_MATCHING
-/* NON_MATCHING: 195/200 words, length 5 SHORT. Residue: register-identity /
- * tail-merge-choice (this build allocates one fewer callee-saved register
- * overall -- "val" never gets its own persistent $s6, costing 2 words --
- * and case 11 reaches the shared combine-tail by jumping into retail's
- * default-path widening, saving 3 words, instead of duplicating its own
- * full widening the way retail and this file's own cases 7/10 do); not a
- * logic difference, reshaping tried and did not move it
- * (docs/match-reports/func_80034690.md). Hand-derived. */
 void func_80034690(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
@@ -446,18 +435,20 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
         func_800351D0(a0, a1, val);
         return;
     case 7: {
-        u8 *blk = (u8 *)rec + offset;
-        s16 packed = (a1 << 8) | a0;
+        u16 o = offset;
+        u8 *blk = (u8 *)rec + o;
+        s32 packed = (a1 << 8) | a0;
 
         func_80030980(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
-        *(s16 *)((u8 *)rec + offset * 2 + 0x4E) = val;
+        *(s16 *)((u8 *)rec + o * 2 + 0x4E) = val;
         rec->unk88 = func_80035E80(a0, a1);
         return;
     }
     case 10: {
-        u8 *blk = (u8 *)rec + offset;
-        s16 packed = (a1 << 8) | a0;
-        s16 wide = *(s16 *)((u8 *)rec + offset * 2 + 0x4E);
+        s32 packed = (a1 << 8) | a0;
+        u16 o = offset;
+        u8 *blk = (u8 *)rec + o;
+        s16 wide = *(s16 *)((u8 *)rec + o * 2 + 0x4E);
 
         func_80030980(packed, rec->unk4C, blk[0x2C], wide, val);
         blk[0x17] = val;
@@ -465,11 +456,12 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
         return;
     }
     case 11: {
-        u8 *blk = (u8 *)rec + offset;
+        u16 o = offset;
+        u8 *blk = (u8 *)rec + o;
 
         SpuVmSetProgVol(rec->unk4C, blk[0x2C], val);
         func_80030980((a1 << 8) | a0, rec->unk4C, blk[0x2C],
-                      *(s16 *)((u8 *)rec + offset * 2 + 0x4E), blk[0x17]);
+                      *(s16 *)((u8 *)rec + o * 2 + 0x4E), blk[0x17]);
         rec->unk88 = func_80035E80(a0, a1);
         return;
     }
@@ -506,9 +498,6 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
     }
     rec->unk88 = func_80035E80(a0, a1);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034690);
-#endif
 
 /* A stack-local buffer this function passes to three cross-unit callees:
  * `SsUtGetProgAtr(ch, byte, out)` (established elsewhere as
@@ -766,184 +755,6 @@ void func_80035154(s16 a0, s16 a1, u8 a2)
     rec->unk88 = func_80035E80(a0, a1);
 }
 
-/* func_800351D0's own construction of the scratch/argument blob that feeds
- * func_800357B0 -- see docs/match-reports/func_800357B0.md, which stalled
- * partly for lack of this derivation.  A single SsUtGetProgAtr fill at
- * function entry writes a LARGER-than-usual record here (count at +0, then
- * a 4-byte "header" pair of u16s and two more alignment-2 chunks used only
- * by the unk2A==2 dispatch below); Blk1/Blk2 exist purely to be whole-
- * struct-copied byte for byte into func_800357B0's outgoing stack args,
- * per this project's confirmed alignment-2-struct-assignment idiom -- their
- * internal field breakdown is unconstrained by anything observed so far. */
-typedef struct {
-    s16 raw[14];    /* 28 bytes, alignment 2: whole-struct-copied verbatim */
-} Blk1_800351D0;
-
-typedef struct {
-    s16 raw[9];     /* 18 bytes, alignment 2: whole-struct-copied verbatim */
-} Blk2_800351D0;
-
-typedef struct {
-    u8 count;             /* +0x00: item count, SsUtGetProgAtr's usual field */
-    u8 pad1[0x10 - 0x1];
-    u16 hdrLo;            /* +0x10 */
-    u16 hdrHi;            /* +0x12 */
-    Blk1_800351D0 blk1;   /* +0x14 */
-    Blk2_800351D0 blk2;   /* +0x30 */
-} List_800351D0;
-
-/* Same per-item scratch role as NoteList_800349B0's sibling Scratch_* types
- * (filled by SsUtGetVagAtr, consumed by SsUtSetVagAtr); this call site's
- * own fields happen to share stack space with List_800351D0's tail fields
- * above since the two never have overlapping lifetimes at runtime (mutually
- * exclusive unk29==2 / unk2A==2 dispatch arms). */
-typedef struct {
-    u8 pad0[0x4];
-    u8 unk4;      /* +0x4: read back and stored unchanged in the unk13==2 loop -- see report */
-    u8 unk5;      /* +0x5: read back and stored unchanged in the unk13==1 loop -- see report */
-    u8 pad6[0xC - 0x6];
-    u8 unkC;      /* +0xC */
-    u8 unkD;      /* +0xD */
-    u8 pad0E[0x20 - 0xE];
-} Scratch800351D0;
-
-/* Round 49 (runner charlie): func_800357B0's OWN definition, later in this
- * same file, settles this signature for real as (channel, slot, kind,
- * Scratch_800357B0 scratch, AdsrRaw_800357B0 resolved, arg5, arg6) -- the
- * 0x20-byte scratch blob and the 18-byte ADSR scratch passed by value as
- * TWO params, not this function's own earlier three-way slice (a3/blk1/
- * blk2) of the same 50 total bytes. Two conflicting extern declarations of
- * the same identifier in one translation unit is a hard C constraint, not
- * a per-file "independent local view" case (that convention is for
- * readings split across DIFFERENT files/units), so the stale guess is
- * removed here rather than left to conflict -- `Scratch_800357B0`/
- * `AdsrRaw_800357B0` are declared later in this file (next to
- * func_800357B0's own definition), after this point, so a same-shaped
- * forward declaration cannot be written here without moving those
- * typedefs earlier. func_800351D0's still-stalled preserved body (below)
- * will need its own call site reshaped to the real signature, and a
- * forward declaration re-added above it, when it is next attempted; not
- * done here since that body is currently inert (#if 0) and calls nothing
- * live. */
-
-/* STALL -- see docs/match-reports/func_800351D0.md. Round 48 (runner
- * charlie): SOLVED the 13-round-standing frame-size mystery (a `u8
- * dead[40]` under `if (0)`, this project's established frame-padding
- * idiom, recovers retail's exact -0x108 frame -- was -0xE0, a 40-byte/
- * 10-word gap round 35 measured but never chased down) and replaced the
- * shared `goto combine;` tail with two independently-duplicated
- * `rec->unk88 = func_80035E80(ch, slot); return;` copies (matching this
- * project's documented tail-duplication idiom). Together: 18/376 -> 48/376
- * raw word-match, with the frame now byte-exact. Still NOT byte-exact
- * (compiled length 386/376, 10 words over) -- do not trust the raw
- * word-match figure alone, see report for the residue that remains. */
-#if 0
-void func_800351D0(s16 a0, s16 a1, u8 a2)
-{
-    s16 ch = a0;
-    s16 slot = a1;
-    Entry90902E8 *rec = &D_800902E8[ch][slot];
-    u8 *p = (u8 *)rec + rec->unk12;
-    List_800351D0 list;
-    Scratch800351D0 scratch;
-    s16 i;
-    u8 kind;
-    u8 dead[40];
-
-    if (0) {
-        dead[0] = 0;
-    }
-    SsUtGetProgAtr(rec->unk4C, p[0x2C], &list);
-
-    if (rec->unk27 == 1 && rec->unk10 == 0) {
-        rec->unk28 = a2;
-        rec->unk10 = 1;
-        rec->unk88 = func_80035E80(ch, slot);
-        return;
-    }
-    if (rec->unk16 != 0x1E && rec->unk16 != 0x14) {
-        rec->unk15 = a2;
-        rec->unk2A = rec->unk2A + 1;
-        rec->unk88 = func_80035E80(ch, slot);
-        return;
-    }
-    if (rec->unk29 == 2) {
-        if (rec->unk13 == 0 && rec->unk14 == 0) {
-            for (i = 0; i < list.count; i++) {
-                SsUtGetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
-                scratch.unkC = a2 & 0x7F;
-                scratch.unkD = a2 & 0x7F;
-                SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
-            }
-        }
-        if (rec->unk13 == 1 && rec->unk14 == 0) {
-            volatile s32 unused;
-            if ((u8)(a2 - 0x41) < 0x3F) {
-                if (((a2 & 0xFF) * 100) >= 0) {
-                    unused = ((a2 & 0xFF) * 100) & 0xE000;
-                } else {
-                    unused = (((a2 & 0xFF) * 100) + 0x1FFF) & 0xE000;
-                }
-            } else {
-                unused = 0;
-            }
-            for (i = 0; i < list.count; i++) {
-                SsUtGetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
-                scratch.unk5 = scratch.unk5;
-                SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
-            }
-        }
-        if (rec->unk13 == 2 && rec->unk14 == 0) {
-            volatile s32 unused;
-            if ((u8)(a2 - 0x40) < 0x40) {
-                unused = ((a2 & 0xFF) * 25) << 8;
-            } else {
-                unused = 0;
-            }
-            for (i = 0; i < list.count; i++) {
-                SsUtGetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
-                scratch.unk4 = scratch.unk4;
-                SsUtSetVagAtr(rec->unk4C, p[0x2C], i, &scratch);
-            }
-        }
-        rec->unk88 = func_80035E80(ch, slot);
-        rec->unk29 = 0;
-        return;
-    }
-    if (rec->unk2A == 2) {
-        kind = rec->unk16;
-        if (kind == 0x10) {
-            for (i = 0; i < list.count; i++) {
-                func_800357B0(rec->unk4C, p[0x2C], i,
-                              (u32)list.hdrLo | ((u32)list.hdrHi << 16),
-                              list.blk1, list.blk2, rec->unk15, a2 & 0xFF);
-            }
-        } else {
-            func_800357B0(rec->unk4C, p[0x2C], (s16)kind,
-                          (u32)list.hdrLo | ((u32)list.hdrHi << 16),
-                          list.blk1, list.blk2, rec->unk15, a2 & 0xFF);
-        }
-        rec->unk88 = func_80035E80(ch, slot);
-        rec->unk2A = 0;
-        return;
-    }
-    rec->unk88 = func_80035E80(ch, slot);
-}
-#endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
-
-/* STALL (round 39, up from round 35's 163/179): 171/179 words match, zero
- * out-of-range drift, length EXACT (179/179 words). A permuter-found
- * simplification of case 12 (drop the named `s32 t = arg6 - 0x40;` local
- * entirely and recompute `arg6 - 0x40` inline at its one real use) closed
- * 8 of the 16 words round 35 left open -- see docs/match-reports/func_800357B0.md's
- * round 39 update. Every remaining diff (8 words) is the SAME register-
- * identity swap round 35 already found (this build keeps `channel` in $s2
- * and the cached `arg5` in $s3; retail has them the other way around) --
- * CLAUDE.md's register-identity STALL class, not a banned-fix target. Both
- * directions of "hoist through a fresh local" (channel, round 35; arg5,
- * round 39) are confirmed inert against it. See the match report for the
- * full derivation and the preserved near-miss body. */
 /* This unit's own reduced view of the VagAtr SsUtGetVagAtr/SsUtSetVagAtr
  * fill (round 35): only the 8 fields this function actually touches, at
  * their real include/psyq/LIBSND.H VagAtr offsets. Total size (0x20) is
@@ -984,6 +795,147 @@ typedef struct {
     s16 unk10;
 } AdsrRaw_800357B0;
 
+/* This function's own view of the same VagAtr buffer: only the four bytes
+ * its unk29==2 loops touch. */
+typedef struct {
+    u8 pad0[0x4];
+    u8 unk4;      /* +0x4: read back and stored unchanged in the unk13==2 loop -- see report */
+    u8 unk5;      /* +0x5: read back and stored unchanged in the unk13==1 loop -- see report */
+    u8 pad6[0xC - 0x6];
+    u8 unkC;      /* +0xC */
+    u8 unkD;      /* +0xD */
+    u8 pad0E[0x20 - 0xE];
+} Scratch800351D0;
+
+/* SsUtGetProgAtr's fill at function entry. From +0x10 the SAME memory is
+ * both the VagAtr buffer the unk29==2 loops hand to SsUtGet/SetVagAtr
+ * (retail addresses it at sp+0x58 = list+0x10) and, with the 18 bytes
+ * after it, the two by-value arguments of func_800357B0 (round 69). */
+typedef struct {
+    u8 count;                  /* +0x00: item count, SsUtGetProgAtr's usual field */
+    u8 pad1[0x10 - 0x1];
+    union {
+        Scratch_800357B0 s;    /* +0x10: passed by value to func_800357B0 */
+        Scratch800351D0 v;     /* +0x10: SsUtGet/SetVagAtr's buffer in the unk29==2 loops */
+    } scratch;
+    AdsrRaw_800357B0 adsr;     /* +0x30: passed by value to func_800357B0 */
+} List_800351D0;
+
+/* func_800357B0 is defined later in this unit; its own definition fixes
+ * this signature (round 49). */
+extern void func_800357B0(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scratch,
+                          AdsrRaw_800357B0 resolved, s16 arg5, u8 arg6);
+
+#ifdef NON_MATCHING
+/* NON_MATCHING: 380/376 words, 4 LONG; 95/376 raw, frame exact (-0x108).
+ * Residue: retail keeps the two dead `unused` values in a callee-saved
+ * register ($s5, set and never read) where this body needs `volatile` stack
+ * slots, and with $s5 free this build hoists the loop-invariant `a2 & 0x7F`
+ * out of the first loop, which renumbers $s3-$s5 through the loops
+ * (docs/match-reports/func_800351D0.md). Hand-derived. */
+void func_800351D0(s16 a0, s16 a1, u8 a2)
+{
+    s16 ch = a0;
+    s16 slot = a1;
+    Entry90902E8 *rec = &D_800902E8[ch][slot];
+    u8 off = rec->unk12;
+    List_800351D0 list;
+    s32 i;
+    u8 kind;
+    u8 dead[16];
+
+    if (0) {
+        dead[0] = 0;
+    }
+    SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], &list);
+
+    if (rec->unk27 == 1 && rec->unk10 == 0) {
+        rec->unk28 = a2;
+        rec->unk10 = 1;
+        rec->unk88 = func_80035E80(ch, slot);
+        return;
+    }
+    if (rec->unk16 != 0x1E && rec->unk16 != 0x14) {
+        rec->unk15 = a2;
+        rec->unk2A = rec->unk2A + 1;
+        rec->unk88 = func_80035E80(ch, slot);
+        return;
+    }
+    if (rec->unk29 == 2) {
+        if (rec->unk13 == 0 && rec->unk14 == 0) {
+            for (i = 0; i < list.count; i++) {
+                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
+                list.scratch.v.unkC = list.scratch.v.unkD = a2 & 0x7F;
+                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
+            }
+        }
+        if (rec->unk13 == 1 && rec->unk14 == 0) {
+            volatile s32 unused;
+            if ((u8)(a2 - 0x41) < 0x3F) {
+                if (((a2 & 0xFF) * 100) >= 0) {
+                    unused = ((a2 & 0xFF) * 100) & 0xE000;
+                } else {
+                    unused = (((a2 & 0xFF) * 100) + 0x1FFF) & 0xE000;
+                }
+            } else {
+                unused = 0;
+            }
+            for (i = 0; i < list.count; i++) {
+                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
+                list.scratch.v.unk5 = list.scratch.v.unk5;
+                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
+            }
+        }
+        if (rec->unk13 == 2 && rec->unk14 == 0) {
+            volatile s32 unused;
+            if ((u8)(a2 - 0x40) < 0x40) {
+                unused = ((a2 & 0xFF) * 25) << 8;
+            } else {
+                unused = 0;
+            }
+            for (i = 0; i < list.count; i++) {
+                SsUtGetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
+                list.scratch.v.unk4 = list.scratch.v.unk4;
+                SsUtSetVagAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], i, &list.scratch.v);
+            }
+        }
+        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk29 = 0;
+        return;
+    }
+    if (rec->unk2A == 2) {
+        kind = rec->unk16;
+        if (kind == 0x10) {
+            for (i = 0; i < list.count; i++) {
+                func_800357B0(rec->unk4C, ((u8 *)rec + off)[0x2C], i,
+                              list.scratch.s, list.adsr, rec->unk15, a2 & 0xFF);
+            }
+        } else {
+            func_800357B0(rec->unk4C, ((u8 *)rec + off)[0x2C], (s16)kind,
+                          list.scratch.s, list.adsr, rec->unk15, a2 & 0xFF);
+        }
+        rec->unk88 = func_80035E80(ch, slot);
+        rec->unk2A = 0;
+        return;
+    }
+    rec->unk88 = func_80035E80(ch, slot);
+}
+#else
+INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800351D0);
+#endif
+
+/* STALL (round 39, up from round 35's 163/179): 171/179 words match, zero
+ * out-of-range drift, length EXACT (179/179 words). A permuter-found
+ * simplification of case 12 (drop the named `s32 t = arg6 - 0x40;` local
+ * entirely and recompute `arg6 - 0x40` inline at its one real use) closed
+ * 8 of the 16 words round 35 left open -- see docs/match-reports/func_800357B0.md's
+ * round 39 update. Every remaining diff (8 words) is the SAME register-
+ * identity swap round 35 already found (this build keeps `channel` in $s2
+ * and the cached `arg5` in $s3; retail has them the other way around) --
+ * CLAUDE.md's register-identity STALL class, not a banned-fix target. Both
+ * directions of "hoist through a fresh local" (channel, round 35; arg5,
+ * round 39) are confirmed inert against it. See the match report for the
+ * full derivation and the preserved near-miss body. */
 /* Both linked from Sony's `libsnd/adsr.o` (round 34) -- see
  * func_80035F3C.md / func_80035F98.md for the derivation of this shape,
  * fixed as those units' independent local views: */
