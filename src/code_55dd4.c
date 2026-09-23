@@ -264,11 +264,10 @@ void func_80065DEC(Class65650 *self)
     }
 }
 
-/* STALL -- see docs/match-reports/func_80065E1C.md. Best reached: 49/68
- * words in-range, no size drift, residue is a whole-function self<->p
- * register-identity swap ($s1/$s2). Restored to INCLUDE_ASM per project
- * rule. */
-#if 0
+/* NON_MATCHING: 49/68 words, length exact (no drift). Residue: whole-function
+ * self<->p register-identity swap ($s1/$s2), CLAUDE.md rule 6
+ * (docs/match-reports/func_80065E1C.md). Hand-derived. */
+#ifdef NON_MATCHING
 s32 func_80065E1C(Class65650 *self)
 {
     s32 buf[4];
@@ -311,9 +310,9 @@ fail:
     func_80065F2C(self);
     return 1;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065E1C);
+#endif
 
 void func_80065F2C(Class65650 *self)
 {
