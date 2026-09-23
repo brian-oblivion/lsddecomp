@@ -7,15 +7,15 @@ Unit: `code_179d8_c`. Round 23, runner bravo.
 ## What it does
 
 Clears an IRQ mask bit in the same shadow interrupt-controller pair as
-`SetIrqMask` above (`D_8006DCAC` -> I_STAT/I_MASK pair, `+0x4` is I_MASK;
-`D_8006DCB4[which]` selects the bit). Unlike its sibling, the return value is
+`SetIrqMask` above (`gIrqRegs` -> I_STAT/I_MASK pair, `+0x4` is I_MASK;
+`gRCntIrqMasks[which]` selects the bit). Unlike its sibling, the return value is
 an unconditional `1` (`ori $v0, $zero, 0x1` sitting in the `jr $ra` delay
 slot) -- there is no `slti` bounds check computed here at all, dead or
 otherwise.
 
 ## Final C
 
-Reuses the `IrqRegs` type and `D_8006DCAC`/`D_8006DCB4` externs declared for
+Reuses the `IrqRegs` type and `gIrqRegs`/`gRCntIrqMasks` externs declared for
 `SetIrqMask` immediately above it in the unit (see that report for the
 struct and the field's `volatile` rationale).
 
@@ -23,9 +23,9 @@ struct and the field's `volatile` rationale).
 s32 ClearIrqMask(u16 which)
 {
     s32 idx = which;
-    IrqRegs *reg = D_8006DCAC;
+    IrqRegs *reg = gIrqRegs;
 
-    reg->mask &= ~D_8006DCB4[idx];
+    reg->mask &= ~gRCntIrqMasks[idx];
     return 1;
 }
 ```

@@ -9,7 +9,7 @@
 Calls through a global callback pointer if one is registered, then always
 calls `func_80033738` (external, lives in the still-uncarved
 `asm/code_179d8_tail.s` monolith -- declared `extern` locally per this
-unit's own-declarations convention, not shared). `D_8006DC9C` is set
+unit's own-declarations convention, not shared). `gSeqTimerChainedCallback` is set
 elsewhere (by `SeqTimerControl`, not attempted this round) to either `0` or
 the address of a callback such as this very function's sibling
 `SeqTimerDividerCallback`.
@@ -18,12 +18,12 @@ the address of a callback such as this very function's sibling
 
 ```c
 extern void func_80033738(void);
-extern void (*D_8006DC9C)(void);
+extern void (*gSeqTimerChainedCallback)(void);
 
 void SeqTimerCallback(void)
 {
-    if (D_8006DC9C != NULL) {
-        D_8006DC9C();
+    if (gSeqTimerChainedCallback != NULL) {
+        gSeqTimerChainedCallback();
     }
     func_80033738();
 }

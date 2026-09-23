@@ -6,7 +6,7 @@
 
 ## What it does
 
-A toggle: flips the global flag `D_8006DCA0` between `0` and `1`, and
+A toggle: flips the global flag `gSeqTimerDividerFlag` between `0` and `1`, and
 whenever it transitions back to `0` also calls `func_80033738` (the same
 external cleanup/teardown routine `SeqTimerCallback` calls unconditionally
 -- see that report). Reads naturally as a pause/mute-style toggle: "turn
@@ -15,14 +15,14 @@ on" just sets the flag, "turn off" clears it and runs the teardown.
 ## The C
 
 ```c
-extern s32 D_8006DCA0;
+extern s32 gSeqTimerDividerFlag;
 
 void SeqTimerDividerCallback(void)
 {
-    if (D_8006DCA0 == 0) {
-        D_8006DCA0 = 1;
+    if (gSeqTimerDividerFlag == 0) {
+        gSeqTimerDividerFlag = 1;
     } else {
-        D_8006DCA0 = 0;
+        gSeqTimerDividerFlag = 0;
         func_80033738();
     }
 }

@@ -70,13 +70,13 @@ extern void InitSpuDriver(s32 arg0);
 extern s32 GetVideoMode(void);
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
-extern s32 D_8009024C;
+extern s32 gSeqTickRate;
 extern s32 D_8008EA00;
-extern s32 D_8006DC8C;
-extern s32 D_8006DC90;
-extern s32 D_8006DC94;
-extern void (*D_8006DC9C)(void);
-extern s32 D_8006DC98;
+extern s32 gSeqTimerStopPending;
+extern s32 gSeqTimerId;
+extern s32 gSeqTimerRateFlag;
+extern void (*gSeqTimerChainedCallback)(void);
+extern s32 gVideoMode;
 extern s32 D_8008E934;
 
 /* One 0x40-byte per-voice software state slot; the init below just zeroes it. */
@@ -148,13 +148,13 @@ void func_8003221C(s32 arg0)
         }
     }
 
-    D_8009024C = 0x3C;
+    gSeqTickRate = 0x3C;
     D_8008EA00 = 0;
-    D_8006DC8C = 0;
-    D_8006DC90 = -1;
-    D_8006DC94 = 0;
-    D_8006DC9C = NULL;
-    D_8006DC98 = GetVideoMode();
+    gSeqTimerStopPending = 0;
+    gSeqTimerId = -1;
+    gSeqTimerRateFlag = 0;
+    gSeqTimerChainedCallback = NULL;
+    gVideoMode = GetVideoMode();
     D_8008E934 = 0;
 }
 

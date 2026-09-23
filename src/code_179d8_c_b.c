@@ -43,75 +43,75 @@
  */
 #include "common.h"
 
-extern s32 D_8006DCA8;
-extern s32 D_8006DCA4;
-extern s32 D_8006DC98;
-extern u32 D_8009024C;
+extern s32 gSeqTimerModeFlag;
+extern s32 gSeqTimerRateMode;
+extern s32 gVideoMode;
+extern u32 gSeqTickRate;
 
 void SetSeqTimerMode(s32 a0)
 {
     s32 cmd;
 
     if (a0 & 0x1000) {
-        D_8006DCA8 = 1;
-        D_8006DCA4 = a0 & 0xFFF;
+        gSeqTimerModeFlag = 1;
+        gSeqTimerRateMode = a0 & 0xFFF;
     } else {
-        D_8006DCA8 = 0;
-        D_8006DCA4 = a0;
+        gSeqTimerModeFlag = 0;
+        gSeqTimerRateMode = a0;
     }
 
-    cmd = D_8006DCA4;
+    cmd = gSeqTimerRateMode;
 
     if (cmd < 6) {
         if ((u32)cmd < 6) {
             switch (cmd) {
             case 4:
-                D_8009024C = 0x32;
-                if (D_8006DC98 == 1) {
-                    D_8006DCA4 = 5;
+                gSeqTickRate = 0x32;
+                if (gVideoMode == 1) {
+                    gSeqTimerRateMode = 5;
                 } else {
-                    D_8006DCA4 = 0x32;
+                    gSeqTimerRateMode = 0x32;
                 }
                 return;
             case 1:
-                D_8009024C = 0x3c;
-                if (D_8006DC98 == 0) {
-                    D_8006DCA4 = 5;
+                gSeqTickRate = 0x3c;
+                if (gVideoMode == 0) {
+                    gSeqTimerRateMode = 5;
                 } else {
-                    D_8006DCA4 = 0x3c;
+                    gSeqTimerRateMode = 0x3c;
                 }
                 return;
             case 3:
-                D_8009024C = 0x78;
+                gSeqTickRate = 0x78;
                 return;
             case 2:
-                D_8009024C = 0xf0;
+                gSeqTickRate = 0xf0;
                 return;
             case 5:
-                if (D_8006DC98 == 0) {
-                    D_8009024C = 0x3c;
-                } else if (D_8006DC98 == 1) {
-                    D_8009024C = 0x32;
+                if (gVideoMode == 0) {
+                    gSeqTickRate = 0x3c;
+                } else if (gVideoMode == 1) {
+                    gSeqTickRate = 0x32;
                 } else {
-                    D_8009024C = 0x3c;
+                    gSeqTickRate = 0x3c;
                 }
                 return;
             case 0:
-                if (D_8006DC98 == 0) {
-                    D_8009024C = 0x3c;
-                } else if (D_8006DC98 == 1) {
-                    D_8009024C = 0x32;
+                if (gVideoMode == 0) {
+                    gSeqTickRate = 0x3c;
+                } else if (gVideoMode == 1) {
+                    gSeqTickRate = 0x32;
                 } else {
-                    D_8009024C = 0x3c;
+                    gSeqTickRate = 0x3c;
                 }
                 return;
             }
         } else {
-            D_8009024C = 0x3c;
+            gSeqTickRate = 0x3c;
             return;
         }
     }
-    D_8009024C = cmd;
+    gSeqTickRate = cmd;
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", SeqTimerControl);
@@ -132,35 +132,35 @@ extern void EnterCriticalSection(void);
 extern void VSyncCallback(void (*cb)(void));
 extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void);
 extern void ExitCriticalSection(void);
-extern s32 D_8006DCA8;
-extern s32 D_8006DC94;
-extern s32 D_8006DC8C;
-extern s32 D_8006DC90;
-extern void (*D_8006DC9C)(void);
+extern s32 gSeqTimerModeFlag;
+extern s32 gSeqTimerRateFlag;
+extern s32 gSeqTimerStopPending;
+extern s32 gSeqTimerId;
+extern void (*gSeqTimerChainedCallback)(void);
 
 void CancelSeqTimer(void)
 {
     s32 v;
 
-    if (D_8006DCA8 != 0) {
+    if (gSeqTimerModeFlag != 0) {
         return;
     }
 
-    D_8006DC94 = 0;
+    gSeqTimerRateFlag = 0;
     EnterCriticalSection();
 
-    if (D_8006DC8C != 0) {
+    if (gSeqTimerStopPending != 0) {
         VSyncCallback(0);
-        D_8006DC8C = 0;
+        gSeqTimerStopPending = 0;
     } else {
-        v = D_8006DC90;
+        v = gSeqTimerId;
         if (v != -1) {
             if (v != 0) {
                 InterruptCallback(v, NULL);
             } else {
-                InterruptCallback(0, D_8006DC9C);
+                InterruptCallback(0, gSeqTimerChainedCallback);
             }
-            D_8006DC90 = -1;
+            gSeqTimerId = -1;
         }
     }
 
@@ -177,31 +177,31 @@ void ClearSpuMute(void)
 /* Sony's `SsSeqCalledTbyT` (`libsnd/sscall`), linked from the SDK object
  * since round 34. Local view, never a shared header. */
 extern void SsSeqCalledTbyT(void);
-extern void (*D_8006DC9C)(void);
+extern void (*gSeqTimerChainedCallback)(void);
 
 void SeqTimerCallback(void)
 {
-    if (D_8006DC9C != NULL) {
-        D_8006DC9C();
+    if (gSeqTimerChainedCallback != NULL) {
+        gSeqTimerChainedCallback();
     }
     SsSeqCalledTbyT();
 }
 
-extern s32 D_8006DCA0;
+extern s32 gSeqTimerDividerFlag;
 
 void SeqTimerDividerCallback(void)
 {
-    if (D_8006DCA0 == 0) {
-        D_8006DCA0 = 1;
+    if (gSeqTimerDividerFlag == 0) {
+        gSeqTimerDividerFlag = 1;
     } else {
-        D_8006DCA0 = 0;
+        gSeqTimerDividerFlag = 0;
         SsSeqCalledTbyT();
     }
 }
 
 /* Shadow copy of the three PSX root-counter register blocks (COUNT/MODE/
  * TARGET, each a hardware halfword, 0x10 apart -- matches the real
- * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). D_8006DCB0 is a
+ * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). gRCntRegs is a
  * pointer to this table, not the table itself.
  *
  * The three hardware fields are `volatile` because they ARE memory-mapped
@@ -222,7 +222,7 @@ typedef struct {
     u8  padA[0x10 - 0xA];
 } RCntEntry;
 
-extern RCntEntry *D_8006DCB0;
+extern RCntEntry *gRCntRegs;
 
 s32 SetRCnt(s32 n, s16 target, u32 mode)
 {
@@ -235,8 +235,8 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
     }
 
     isLow = (u32)idx < 2;
-    D_8006DCB0[idx].mode = 0;
-    D_8006DCB0[idx].target = target;
+    gRCntRegs[idx].mode = 0;
+    gRCntRegs[idx].target = target;
 
     if (isLow) {
         if (mode & 0x10) {
@@ -255,7 +255,7 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
         md |= 0x10;
     }
 
-    D_8006DCB0[idx].mode = md;
+    gRCntRegs[idx].mode = md;
     return 1;
 }
 
@@ -267,14 +267,14 @@ s32 GetRCnt(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = D_8006DCB0;
+    base = gRCntRegs;
     return base[idx].count;
 }
 
 /* Shadow of the PSX interrupt controller pair at 0x1F801070/0x1F801074
- * (I_STAT/I_MASK). D_8006DCAC is a pointer to this pair, not the pair
- * itself -- same "pointer-to-hardware-block" idiom as D_8006DCB0 above.
- * D_8006DCB4 holds the per-index IRQ mask bit (root counters 0/1/2 use
+ * (I_STAT/I_MASK). gIrqRegs is a pointer to this pair, not the pair
+ * itself -- same "pointer-to-hardware-block" idiom as gRCntRegs above.
+ * gRCntIrqMasks holds the per-index IRQ mask bit (root counters 0/1/2 use
  * indices 0-2 -> Tmr0/Tmr1/Tmr2 IRQ bits 0x10/0x20/0x40; index 3 is the
  * 0x1 VBLANK bit). */
 typedef struct {
@@ -282,24 +282,24 @@ typedef struct {
     volatile u32 mask; /* 0x4, I_MASK */
 } IrqRegs;
 
-extern IrqRegs *D_8006DCAC;
-extern u32 D_8006DCB4[4];
+extern IrqRegs *gIrqRegs;
+extern u32 gRCntIrqMasks[4];
 
 s32 SetIrqMask(u16 which)
 {
     s32 idx = which;
-    IrqRegs *reg = D_8006DCAC;
+    IrqRegs *reg = gIrqRegs;
 
-    reg->mask |= D_8006DCB4[idx];
+    reg->mask |= gRCntIrqMasks[idx];
     return idx < 3;
 }
 
 s32 ClearIrqMask(u16 which)
 {
     s32 idx = which;
-    IrqRegs *reg = D_8006DCAC;
+    IrqRegs *reg = gIrqRegs;
 
-    reg->mask &= ~D_8006DCB4[idx];
+    reg->mask &= ~gRCntIrqMasks[idx];
     return 1;
 }
 
@@ -311,7 +311,7 @@ s32 ResetRCnt(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = D_8006DCB0;
+    base = gRCntRegs;
     base[idx].count = 0;
     return 1;
 }

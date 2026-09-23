@@ -1164,9 +1164,9 @@ extern s32 func_8003069C(s32 a0);
 extern void _SsSndNextSep(s32 a0, s32 a1);
 
 /* This unit's own reading of the same global code_179d8_i.c already reads
- * as `D_8009024C` (a tick-rate/PPQN-style constant) -- independent local
+ * as `gSeqTickRate` (a tick-rate/PPQN-style constant) -- independent local
  * view, per project convention. */
-extern u32 D_8009024C;
+extern u32 gSeqTickRate;
 
 /* Meta-event handler, reached from func_8003424C's 0xFF ("running status
  * for a 0xF0 event") and new-status 0xF0 dispatch arms with `a2` = the
@@ -1200,7 +1200,7 @@ extern u32 D_8009024C;
  * value, converts it to a BPM-like rate (60000000 / value -- the standard
  * MIDI tempo formula) into unk8C, then recomputes the scheduling
  * threshold (unk6E/unk70) against unk4A and the global tick-rate constant
- * D_8009024C, in whichever of two regimes avoids losing precision to
+ * gSeqTickRate, in whichever of two regimes avoids losing precision to
  * integer truncation (the `else` regime also derives a rounding bit from
  * the division's remainder). unk6E doubles as a mode flag: -1 means
  * "unk70 holds the reciprocal-regime value", any other value means
@@ -1238,11 +1238,11 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
             tempo |= p[2];
 
             bpm = 60000000 / tempo;
-            base = D_8009024C * 15;
+            base = gSeqTickRate * 15;
             divisor = base * 4;
             rec->unk8C = bpm;
             if (rec->unk4A * rec->unk8C * 10 < divisor) {
-                rec->unk6E = (D_8009024C * 600) / (rec->unk4A * rec->unk8C);
+                rec->unk6E = (gSeqTickRate * 600) / (rec->unk4A * rec->unk8C);
                 rec->unk70 = rec->unk6E;
             } else {
                 /* Narrowed volatile lever (round 26 head ruling): only the

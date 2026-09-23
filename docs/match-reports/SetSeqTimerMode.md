@@ -17,26 +17,26 @@ recorded below for completeness (it was superseded mid-run, not exhausted).
 `void SetSeqTimerMode(s32 a0)`. Two parts, unchanged from the round-23
 description:
 
-1. Splits `a0` into a "cmd" value stored in `D_8006DCA4` and a flag in
-   `D_8006DCA8`: if `a0 & 0x1000`, `D_8006DCA8 = 1` and `D_8006DCA4 = a0 &
-   0xFFF`; else `D_8006DCA8 = 0` and `D_8006DCA4 = a0` (the raw value).
-2. Reloads `cmd = D_8006DCA4` and dispatches:
-   - `cmd >= 6` (signed): `D_8009024C = cmd` (raw passthrough).
-   - `cmd < 0` (falls out of the unsigned `cmd < 6` recheck): `D_8009024C
+1. Splits `a0` into a "cmd" value stored in `gSeqTimerRateMode` and a flag in
+   `gSeqTimerModeFlag`: if `a0 & 0x1000`, `gSeqTimerModeFlag = 1` and `gSeqTimerRateMode = a0 &
+   0xFFF`; else `gSeqTimerModeFlag = 0` and `gSeqTimerRateMode = a0` (the raw value).
+2. Reloads `cmd = gSeqTimerRateMode` and dispatches:
+   - `cmd >= 6` (signed): `gSeqTickRate = cmd` (raw passthrough).
+   - `cmd < 0` (falls out of the unsigned `cmd < 6` recheck): `gSeqTickRate
      = 0x3c`.
    - `0 <= cmd < 6`: a genuine `switch` over `jtbl_80010CD8` (6 dense
-     cases), each setting `D_8009024C` to a per-case tempo/rate constant,
-     and cases 1 and 4 additionally rewriting `D_8006DCA4` based on
-     `D_8006DC98` (a play-state flag: 0/1/other).
+     cases), each setting `gSeqTickRate` to a per-case tempo/rate constant,
+     and cases 1 and 4 additionally rewriting `gSeqTimerRateMode` based on
+     `gVideoMode` (a play-state flag: 0/1/other).
 
-| case | D_8009024C | D_8006DCA4 side effect |
+| case | gSeqTickRate | gSeqTimerRateMode side effect |
 | --- | --- | --- |
-| 0 | `(D_8006DC98==1) ? 0x32 : 0x3c` | none |
-| 1 | `0x3c` (always) | `(D_8006DC98==0) ? 5 : 0x3c` |
+| 0 | `(gVideoMode==1) ? 0x32 : 0x3c` | none |
+| 1 | `0x3c` (always) | `(gVideoMode==0) ? 5 : 0x3c` |
 | 2 | `0xf0` | none |
 | 3 | `0x78` | none |
-| 4 | `0x32` (always) | `(D_8006DC98==1) ? 5 : 0x32` |
-| 5 | `(D_8006DC98==1) ? 0x32 : 0x3c` | none |
+| 4 | `0x32` (always) | `(gVideoMode==1) ? 5 : 0x32` |
+| 5 | `(gVideoMode==1) ? 0x32 : 0x3c` | none |
 
 Round 23's two structural findings both still hold and were not touched
 this round:
@@ -71,11 +71,11 @@ was **half right and half wrong**:
 
   ```c
   if (cmd >= 6) {
-      D_8009024C = cmd;
+      gSeqTickRate = cmd;
       return;
   }
   if ((u32)cmd >= 6) {
-      D_8009024C = 0x3c;
+      gSeqTickRate = 0x3c;
       return;
   }
   switch (cmd) { ... }
@@ -86,7 +86,7 @@ was **half right and half wrong**:
   (fallthrough) immediately after the test, and reaches `rest` via a
   branch-away when the test is false. Retail's actual layout is the
   **opposite polarity**: the test's fallthrough (not-taken) case continues
-  inline into the next check, and the `D_8009024C = cmd; ` passthrough
+  inline into the next check, and the `gSeqTickRate = cmd; ` passthrough
   store is placed at the very END of the function (`.L800326F8`,
   immediately before the shared epilogue), reached only via a
   branch-when-true. Reading `asm-differ`'s realigned output made this
@@ -104,15 +104,15 @@ if (cmd < 6) {
         /* ... six cases, unchanged from round 23 ... */
         }
     } else {
-        D_8009024C = 0x3c;
+        gSeqTickRate = 0x3c;
         return;
     }
 }
-D_8009024C = cmd;
+gSeqTickRate = cmd;
 ```
 
 This reproduces retail's layout exactly: the passthrough store
-(`D_8009024C = cmd;`) is now the code that FOLLOWS the whole `if` block in
+(`gSeqTickRate = cmd;`) is now the code that FOLLOWS the whole `if` block in
 source order, so GCC places it physically at the end of the function
 (reached by branch-when-`cmd>=6`, i.e. exactly `.L800326F8`) instead of
 inline. The `(u32)cmd >= 6` case's `0x3c` store also moved from an early

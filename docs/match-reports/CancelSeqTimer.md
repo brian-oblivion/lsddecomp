@@ -7,15 +7,15 @@
 ## What it does
 
 A callback-registration teardown/re-arm routine, guarded by
-`D_8006DCA8` (returns immediately, doing nothing, if it's nonzero).
-Clears `D_8006DC94`, calls `func_80024CE0` (unconditional per-call
+`gSeqTimerModeFlag` (returns immediately, doing nothing, if it's nonzero).
+Clears `gSeqTimerRateFlag`, calls `func_80024CE0` (unconditional per-call
 setup), then:
 
-- if `D_8006DC8C` is set, calls `func_80024DA0(0)` and clears it;
-- otherwise, if `D_8006DC90` isn't the sentinel `-1`: when it holds a
+- if `gSeqTimerStopPending` is set, calls `func_80024DA0(0)` and clears it;
+- otherwise, if `gSeqTimerId` isn't the sentinel `-1`: when it holds a
   real id (`!= 0`) deregisters via `func_80024D40(id, NULL)`, else
-  registers the callback `D_8006DC9C` via `func_80024D40(0,
-  D_8006DC9C)`; either way resets `D_8006DC90` to `-1` afterward.
+  registers the callback `gSeqTimerChainedCallback` via `func_80024D40(0,
+  gSeqTimerChainedCallback)`; either way resets `gSeqTimerId` to `-1` afterward.
 
 Both paths fall through to a final `func_80024CF0()` call before
 returning.
@@ -27,35 +27,35 @@ extern void func_80024CE0(void);
 extern void func_80024DA0(s32 arg0);
 extern void func_80024D40(s32 arg0, void (*callback)(void));
 extern void func_80024CF0(void);
-extern s32 D_8006DCA8;
-extern s32 D_8006DC94;
-extern s32 D_8006DC8C;
-extern s32 D_8006DC90;
-extern void (*D_8006DC9C)(void);
+extern s32 gSeqTimerModeFlag;
+extern s32 gSeqTimerRateFlag;
+extern s32 gSeqTimerStopPending;
+extern s32 gSeqTimerId;
+extern void (*gSeqTimerChainedCallback)(void);
 
 void CancelSeqTimer(void)
 {
     s32 v;
 
-    if (D_8006DCA8 != 0) {
+    if (gSeqTimerModeFlag != 0) {
         return;
     }
 
-    D_8006DC94 = 0;
+    gSeqTimerRateFlag = 0;
     func_80024CE0();
 
-    if (D_8006DC8C != 0) {
+    if (gSeqTimerStopPending != 0) {
         func_80024DA0(0);
-        D_8006DC8C = 0;
+        gSeqTimerStopPending = 0;
     } else {
-        v = D_8006DC90;
+        v = gSeqTimerId;
         if (v != -1) {
             if (v != 0) {
                 func_80024D40(v, NULL);
             } else {
-                func_80024D40(0, D_8006DC9C);
+                func_80024D40(0, gSeqTimerChainedCallback);
             }
-            D_8006DC90 = -1;
+            gSeqTimerId = -1;
         }
     }
 
@@ -65,13 +65,13 @@ void CancelSeqTimer(void)
 
 ## Residue note: another instance of the `SeqTimerDividerCallback` block-order lever
 
-First attempt wrote the if/else in "natural" order (`if (D_8006DC8C ==
-0) { the D_8006DC90 logic } else { the func_80024DA0 teardown }`), which
+First attempt wrote the if/else in "natural" order (`if (gSeqTimerStopPending ==
+0) { the gSeqTimerId logic } else { the func_80024DA0 teardown }`), which
 compiled with the WRONG block placed inline: GCC 2.6.3 put the `==0`
 branch inline/fallthrough and the `!=0` branch out-of-line, where retail
 does the opposite (the `!=0`/teardown branch is the fallthrough, the
 `==0`/re-arm branch is reached by a taken `beqz`). Swapping the C to test
-`D_8006DC8C != 0` first (matching which block retail places first)
+`gSeqTimerStopPending != 0` first (matching which block retail places first)
 reproduced the exact instruction sequence with no other change --
 consistent with the `SeqTimerDividerCallback` finding, though note this is a
 *different* shape than that one: this is a full `if/else` where BOTH

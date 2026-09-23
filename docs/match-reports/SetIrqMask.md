@@ -7,8 +7,8 @@ Unit: `code_179d8_c`. Round 23, runner bravo.
 ## What it does
 
 Sets an IRQ mask bit in the shadow interrupt-controller pair pointed to by
-`D_8006DCAC` (base `0x1F801070` = I_STAT; `+0x4` = I_MASK). `which` selects
-which bit out of the `D_8006DCB4` table (`{0x10, 0x20, 0x40, 0x1}` --
+`gIrqRegs` (base `0x1F801070` = I_STAT; `+0x4` = I_MASK). `which` selects
+which bit out of the `gRCntIrqMasks` table (`{0x10, 0x20, 0x40, 0x1}` --
 Tmr0/Tmr1/Tmr2 IRQ bits for indices 0-2, VBLANK for index 3; this table is
 also the one `SetRCnt` a few functions up implicitly matches against, since
 that function manages root counters 0-2).
@@ -27,15 +27,15 @@ typedef struct {
     volatile u32 mask; /* 0x4, I_MASK */
 } IrqRegs;
 
-extern IrqRegs *D_8006DCAC;
-extern u32 D_8006DCB4[4];
+extern IrqRegs *gIrqRegs;
+extern u32 gRCntIrqMasks[4];
 
 s32 SetIrqMask(u16 which)
 {
     s32 idx = which;
-    IrqRegs *reg = D_8006DCAC;
+    IrqRegs *reg = gIrqRegs;
 
-    reg->mask |= D_8006DCB4[idx];
+    reg->mask |= gRCntIrqMasks[idx];
     return idx < 3;
 }
 ```

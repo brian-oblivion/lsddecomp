@@ -14,7 +14,7 @@
 ## What it does
 
 `GetRCnt`: reads the `count` field (offset `0x0`) of root-counter block
-`D_8006DCB0[idx]`, where `idx = (u16)n`. Returns `0` without touching the
+`gRCntRegs[idx]`, where `idx = (u16)n`. Returns `0` without touching the
 table if `idx >= 3`.
 
 ## The match
@@ -28,7 +28,7 @@ s32 GetRCnt(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = D_8006DCB0;
+    base = gRCntRegs;
     return base[idx].count;
 }
 ```

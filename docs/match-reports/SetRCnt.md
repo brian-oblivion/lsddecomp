@@ -34,7 +34,7 @@ Returns `1` on success, `0` if `n` was out of range.
 ```c
 /* Shadow copy of the three PSX root-counter register blocks (COUNT/MODE/
  * TARGET, each a hardware halfword, 0x10 apart -- matches the real
- * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). D_8006DCB0 is a
+ * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). gRCntRegs is a
  * pointer to this table, not the table itself. */
 typedef struct {
     u16 count;              /* 0x0 */
@@ -45,7 +45,7 @@ typedef struct {
     u8  padA[0x10 - 0xA];
 } RCntEntry;
 
-extern RCntEntry *D_8006DCB0;
+extern RCntEntry *gRCntRegs;
 
 s32 SetRCnt(s32 n, s16 target, u32 mode)
 {
@@ -58,8 +58,8 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
     }
 
     isLow = (u32)idx < 2;
-    D_8006DCB0[idx].mode = 0;
-    D_8006DCB0[idx].target = target;
+    gRCntRegs[idx].mode = 0;
+    gRCntRegs[idx].target = target;
     __asm__("");
 
     if (isLow) {
@@ -79,7 +79,7 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
         md |= 0x10;
     }
 
-    D_8006DCB0[idx].mode = md;
+    gRCntRegs[idx].mode = md;
     return 1;
 }
 ```
@@ -98,7 +98,7 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
   16-bit immediate range: worth checking on any sibling function with
   more than one range check on the same masked index.
 - **A store got hoisted into a jump's delay slot when retail leaves it a
-  real `nop`.** Without intervention, `D_8006DCB0[idx].target = target;`
+  real `nop`.** Without intervention, `gRCntRegs[idx].target = target;`
   (an ordinary, independent store) got scheduled by cc1's delay-slot
   filler to execute *after* the following `beqz`, i.e. into its delay
   slot -- legal (the store doesn't affect the branch condition) but not

@@ -11,28 +11,28 @@ the head's question" below).
 
 A CD-audio/root-counter rate-selection dispatcher, called with `arg0`
 from `StartSeqTimer`/`StopSeqTimer` (`1`/`0`). Busy-waits ~1000 cycles,
-then dispatches on the CD status global `D_8006DCA4`:
+then dispatches on the CD status global `gSeqTimerRateMode`:
 
 - `2`/`3`: fixed device tag `0xF2000002` with a fixed rate constant
-  (`0x44E8`/`0x89D0`), then a shared `D_8006DC90 = 6`.
-- `5`: if `arg0 != 0`, sets tag `0xF2000003`, clears `D_8006DC90`, rate
-  `1`; if `arg0 == 0`, just increments `D_8006DC8C` and jumps straight
+  (`0x44E8`/`0x89D0`), then a shared `gSeqTimerId = 6`.
+- `5`: if `arg0 != 0`, sets tag `0xF2000003`, clears `gSeqTimerId`, rate
+  `1`; if `arg0 == 0`, just increments `gSeqTimerStopPending` and jumps straight
   to the shared teardown-check near the end (skipping the whole
   SetRCnt/delay-loop/callback body below).
 - `0`: returns immediately, doing nothing at all (not even the trailing
   `func_80024CF0()`).
-- `1` or anything else (default): guarded by `D_8006DCA8`; computes a
+- `1` or anything else (default): guarded by `gSeqTimerModeFlag`; computes a
   rate via one of two divisions (`0x204CC0/v1` or `0x409980/v1`,
   selected by `v1 < 0x46`) with the classic PSX `div`+`break 7`/`break 6`
   overflow-trap idiom, and only the `< 0x46` branch additionally ORs `2`
-  into the device tag and increments `D_8006DC94`.
+  into the device tag and increments `gSeqTimerRateFlag`.
 
-Then (except the `5`/`arg0==0` and `0` early-outs): if `D_8006DC8C` is
+Then (except the `5`/`arg0==0` and `0` early-outs): if `gSeqTimerStopPending` is
 set, tears down via `func_80024DA0(func_80033738)` and returns; else
 calls `func_80024CE0()`, `ResetRCnt(tag)`, `SetRCnt(tag,
 (s16)rate, 0x1000)`, two more ~2000-cycle busy-waits, `SetIrqMask(tag)`,
 then the SAME callback-(re)registration shape already matched in
-`CancelSeqTimer` (dispatching on `D_8006DC90`/`D_8006DC94` to pick
+`CancelSeqTimer` (dispatching on `gSeqTimerId`/`gSeqTimerRateFlag` to pick
 `SeqTimerCallback`/`SeqTimerDividerCallback`/`func_80033738` as the callback for
 `func_80024D40`), and finally `func_80024CF0()`.
 
@@ -52,12 +52,12 @@ then the SAME callback-(re)registration shape already matched in
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-extern s32 D_8006DCA4;
-extern s32 D_8006DCA8;
-extern s32 D_8006DC90;
-extern s32 D_8006DC94;
-extern s32 D_8006DC8C;
-extern void (*D_8006DC9C)(void);
+extern s32 gSeqTimerRateMode;
+extern s32 gSeqTimerModeFlag;
+extern s32 gSeqTimerId;
+extern s32 gSeqTimerRateFlag;
+extern s32 gSeqTimerStopPending;
+extern void (*gSeqTimerChainedCallback)(void);
 extern void func_80024CE0(void);
 extern void func_80024DA0(void (*cb)(void));
 extern void (*func_80024D40(s32 arg0, void (*callback)(void)))(void);
@@ -80,39 +80,39 @@ void SeqTimerControl(s32 arg0)
     for (i = 999; i >= 0; i--) {
     }
 
-    v1 = D_8006DCA4;
+    v1 = gSeqTimerRateMode;
     switch (v1) {
     case 2:
         s1 = 0xF2000002;
         s0 = 0x44E8;
-        D_8006DC90 = 6;
+        gSeqTimerId = 6;
         break;
     case 3:
         s1 = 0xF2000002;
         s0 = 0x89D0;
-        D_8006DC90 = 6;
+        gSeqTimerId = 6;
         break;
     case 5:
         if (arg0 != 0) {
             s1 = 0xF2000003;
-            D_8006DC90 = 0;
+            gSeqTimerId = 0;
             s0 = 1;
         } else {
-            D_8006DC8C++;
+            gSeqTimerStopPending++;
             goto merge2;
         }
         break;
     case 0:
         return;
     default:
-        if (D_8006DCA8 != 0) {
+        if (gSeqTimerModeFlag != 0) {
             return;
         }
         s1 = 0xF2000002;
-        D_8006DC90 = 6;
+        gSeqTimerId = 6;
         if (v1 < 0x46) {
             v1 = 0x204CC0 / v1;
-            D_8006DC94++;
+            gSeqTimerRateFlag++;
             s0 = v1;
         } else {
             s1 = 0xF2000000;
@@ -123,7 +123,7 @@ void SeqTimerControl(s32 arg0)
     }
 
 merge2:
-    if (D_8006DC8C != 0) {
+    if (gSeqTimerStopPending != 0) {
         func_80024DA0(func_80033738);
         return;
     }
@@ -139,16 +139,16 @@ merge2:
 
     SetIrqMask(s1);
 
-    rc90 = D_8006DC90;
+    rc90 = gSeqTimerId;
     if (rc90 != 0) {
-        if (D_8006DC94 != 0) {
+        if (gSeqTimerRateFlag != 0) {
             cb = SeqTimerDividerCallback;
         } else {
             cb = func_80033738;
         }
     } else {
-        D_8006DC9C = func_80024D40(0, NULL);
-        rc90 = D_8006DC90;
+        gSeqTimerChainedCallback = func_80024D40(0, NULL);
+        rc90 = gSeqTimerId;
         cb = SeqTimerCallback;
     }
     func_80024D40(rc90, cb);
@@ -341,7 +341,7 @@ it directly: reordered the `switch`'s `case` clauses from source order
 `2, 3, 5, 0, default` to `5, 3, 2, 0, default`, matching the physical
 address order of the case BODIES in retail's `.s` (case5's `arg0!=0`
 body at `.L80032790`, case3 at `.L800327A8`, case2 at `.L800327B8`, then
-the shared `D_8006DC90=6` tail, then `default` at `.L800327D8`).
+the shared `gSeqTimerId=6` tail, then `default` at `.L800327D8`).
 
 **Result: regressed hard, 65/164 -> 36/164, WITH real outside-range
 drift** (function length changed). `asm-differ` showed the regression
