@@ -1,4 +1,6 @@
-# Obj865C8__OnEventArg
+# Class86668__OnEventArg
+
+> Renamed from `Obj865C8__OnEventArg` on 2026-09-23 (tools/rename.py). Address 0x8004a3ec.
 
 > Renamed from `func_8004A3EC` on 2026-09-23 (tools/rename.py). Address 0x8004a3ec.
 
@@ -8,7 +10,7 @@
 
 Method-table slot +0x060, shared VERBATIM (same function address) between
 `D_800865C8` and its sibling `gClass86668Methods` -- confirmed by
-`tools/classtable.py`, both tables list `Obj865C8__OnEventArg` at +0x060. Always
+`tools/classtable.py`, both tables list `Class86668__OnEventArg` at +0x060. Always
 forwards to the BASE class's own +0x060 implementation first (return value
 discarded), then -- based on the ORIGINAL argument, not the base call's
 return -- sets a flag and notifies through the class's own +0x07C slot.
@@ -36,7 +38,7 @@ jalr  $v0
 Written as:
 
 ```c
-void Obj865C8__OnEventArg(Obj865C8 *self, s32 arg1) {
+void Class86668__OnEventArg(Obj865C8 *self, s32 arg1) {
     Get_vtable_IntermediateBase()->slot60(self, arg1);
     if (arg1 == 4) {
         self->unk28 = 1;
@@ -63,4 +65,4 @@ not a real retail fact.
 
 ## Naming
 
-`Obj865C8__OnEventArg` -- tier B. Occupies +0x060 (matches the header's pre-existing `onEventArg` field name, shared verbatim with `gClass86668Methods` at the same offset). Forwards to the base, and on `arg1 == 4` (the code `CheckTimeout` raises) sets `eventCode = 1` and calls `Noop7C`.
+`Class86668__OnEventArg` -- tier B. Occupies +0x060 (matches the header's pre-existing `onEventArg` field name, shared verbatim with `gClass86668Methods` at the same offset). Forwards to the base, and on `arg1 == 4` (the code `CheckTimeout` raises) sets `eventCode = 1` and calls `Noop7C`.

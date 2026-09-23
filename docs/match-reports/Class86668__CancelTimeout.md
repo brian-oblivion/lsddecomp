@@ -30,7 +30,7 @@ void Class86668__CancelTimeout(Obj865C8 *self) {
 
 Return type is `void`, not "unknown wrapper, assume the callee's type" --
 this is NOT the ambiguous one-line-wrapper case CLAUDE.md warns about,
-because the callee (`+0x06C`, `Obj865C8__SetTimeout`, this unit's own function,
+because the callee (`+0x06C`, `Class86668__SetTimeout`, this unit's own function,
 matched the same round) is confirmed void from its own disassembly: it ends
 `jr $ra` / `nop` with no `$v0` ever set. Positive evidence, not silence.
 

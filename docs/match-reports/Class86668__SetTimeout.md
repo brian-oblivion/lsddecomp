@@ -1,4 +1,6 @@
-# Obj865C8__SetTimeout
+# Class86668__SetTimeout
+
+> Renamed from `Obj865C8__SetTimeout` on 2026-09-23 (tools/rename.py). Address 0x8004a458.
 
 > Renamed from `func_8004A458` on 2026-09-23 (tools/rename.py). Address 0x8004a458.
 
@@ -28,7 +30,7 @@ jr    $ra
 Written as:
 
 ```c
-void Obj865C8__SetTimeout(Obj865C8 *self, s32 arg1) {
+void Class86668__SetTimeout(Obj865C8 *self, s32 arg1) {
     self->unk2C = (arg1 < 0) ? arg1 : arg1 * 20;
 }
 ```
@@ -45,4 +47,4 @@ None beyond what's already documented.
 
 ## Naming
 
-`Obj865C8__SetTimeout` -- tier A. Pure setter/converter: stores its argument verbatim if negative, else multiplied by 20 (a units-to-frames conversion) into `timeoutFrames`; mechanics are its purpose.
+`Class86668__SetTimeout` -- tier A. Pure setter/converter: stores its argument verbatim if negative, else multiplied by 20 (a units-to-frames conversion) into `timeoutFrames`; mechanics are its purpose.

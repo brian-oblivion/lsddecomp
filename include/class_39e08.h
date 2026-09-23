@@ -3,6 +3,12 @@
 
 #include "common.h"
 
+/* Round 73 head correction: slots +0x058..+0x06C (Noop58, CheckTimeout,
+ * OnEventArg, SetTimeout) sit at the same offsets in BOTH gClass86668Methods
+ * (0x80086668, 28 slots, the base) and Obj865C8's table (0x800865C8, 33
+ * slots), and lie in ROM between Class86668's dtor and
+ * Class86668__SetChildFlag8: they are Class86668 methods that Obj865C8
+ * inherits, so they carry the Class86668__ prefix. */
 /*
  * round 73 (alpha), track-3 naming pass: 25 of this unit's 26 functions
  * renamed (func_8004A070 left as-is, see below); no INCLUDE_ASM remained to
@@ -24,7 +30,7 @@
  * The object also carries a small state machine (`state`, 0-3, advanced by
  * `Obj865C8__AdvanceState`/`Obj865C8__OnTag2Notify`) and a frame-based
  * timeout (`frameCounter`/`timeoutFrames`, checked by
- * `Obj865C8__CheckTimeout`, set by `Obj865C8__SetTimeout`/
+ * `Class86668__CheckTimeout`, set by `Class86668__SetTimeout`/
  * `Class86668__CancelTimeout`) whose in-game purpose is not established
  * beyond that mechanism. `Obj865C8__OnNotify` dispatches by a header tag
  * (0x1F34 / 0x2F230) to `Obj865C8__Noop80`/`Obj865C8__OnTag2Notify`
@@ -94,14 +100,14 @@ typedef struct Class865C8Methods {
     void *slot4C;                                  /* +0x04C Obj865C8__StartSubA */
     void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 Obj865C8__RunSubUpdates */
     void *slot54;                                  /* +0x054 Obj865C8__AdvanceState */
-    void (*noop58)(void);                          /* +0x058 Obj865C8__Noop58 (no-op, matched) */
-    void *slot5C;                                  /* +0x05C Obj865C8__CheckTimeout */
+    void (*noop58)(void);                          /* +0x058 Class86668__Noop58 (no-op, matched) */
+    void *slot5C;                                  /* +0x05C Class86668__CheckTimeout */
     /* Shared with gClass86668Methods (see Class86668Methods below) -- literally the
      * same function address at the same offset in both tables. */
-    void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 Obj865C8__OnEventArg */
+    void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 Class86668__OnEventArg */
     void *unk64, *unk68;                           /* shared base slots (Obj86B60__NotifyTargetReset / Obj86B60__NotifyChildReset) */
     /* Also shared with gClass86668Methods at the same offset. */
-    void (*setTimeout)(Obj865C8 *self, s32 arg1);    /* +0x06C Obj865C8__SetTimeout */
+    void (*setTimeout)(Obj865C8 *self, s32 arg1);    /* +0x06C Class86668__SetTimeout */
     void *unk70;                                   /* Class86668__SetChildFlag8 */
     void *unk74, *unk78;                           /* null slots */
     void (*noop7C)(Obj865C8 *self);                /* +0x07C Obj865C8__Noop7C (no-op, matched) */
@@ -296,21 +302,21 @@ struct Obj865C8 {
     SubObjA *subA;                /* +0x018, Obj865C8__RunSubUpdates */
     /* +0x01C. Renamed from `unk1C`: code_2cc8c.h's own local view of this
      * SAME base offset (Obj86B60, the ultimate base class) already names it
-     * `frameCounter` (round 12, "a running count"). Obj865C8__CheckTimeout
+     * `frameCounter` (round 12, "a running count"). Class86668__CheckTimeout
      * reads it directly after forwarding to the base's own +0x05C
      * (IncrementFrameCounter), and compares it against `timeoutFrames`. */
-    s32 frameCounter;              /* +0x01C, Obj865C8__CheckTimeout */
+    s32 frameCounter;              /* +0x01C, Class86668__CheckTimeout */
     u8 pad20[0x28 - 0x20];
     /* +0x028. Renamed from `unk28`: carries a small code (1/2/3) that
-     * Obj865C8__OnTag2Notify and Obj865C8__OnEventArg set before dispatching
+     * Obj865C8__OnTag2Notify and Class86668__OnEventArg set before dispatching
      * `self->methods->onEventArg(self, 3)` -- an event/result code, not a
      * state (see `state` below, a separate field). */
-    s32 eventCode;                 /* +0x028, Obj865C8__OnEventArg */
-    /* +0x02C. Renamed from `unk2C`: set only by Obj865C8__SetTimeout, which
+    s32 eventCode;                 /* +0x028, Class86668__OnEventArg */
+    /* +0x02C. Renamed from `unk2C`: set only by Class86668__SetTimeout, which
      * stores its argument verbatim if negative (disabled) or multiplied by
      * 20 otherwise (a units-to-frames conversion); compared against
-     * `frameCounter` by Obj865C8__CheckTimeout. */
-    s32 timeoutFrames;             /* +0x02C, Obj865C8__SetTimeout */
+     * `frameCounter` by Class86668__CheckTimeout. */
+    s32 timeoutFrames;             /* +0x02C, Class86668__SetTimeout */
     s32 unk30;                    /* +0x030, Class86668__Dtor (guard) */
     SubObjB *subB;                /* +0x034, Class86668__Dtor */
     SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
@@ -349,7 +355,7 @@ typedef struct IntermediateBaseMethods {
     void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
     void (*slot48)(void *self);            /* +0x048 */
     u8 pad4C[0x5C - 0x4C];
-    void (*slot5C)(void *self, s32 arg1, s32 arg2); /* +0x05C, called by Obj865C8__CheckTimeout */
+    void (*slot5C)(void *self, s32 arg1, s32 arg2); /* +0x05C, called by Class86668__CheckTimeout */
     void (*slot60)(void *self, s32 arg1);  /* +0x060 */
 } IntermediateBaseMethods;
 

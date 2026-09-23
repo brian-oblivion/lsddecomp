@@ -303,17 +303,17 @@ void Class86668__Deinit(Obj865C8 *self) {
     Get_vtable_IntermediateBase()->slot48(self);
 }
 
-void Obj865C8__Noop58(void) {
+void Class86668__Noop58(void) {
 }
 
-void Obj865C8__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Class86668__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
     Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
     if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
         self->methods->onEventArg(self, 4);
     }
 }
 
-void Obj865C8__OnEventArg(Obj865C8 *self, s32 arg1) {
+void Class86668__OnEventArg(Obj865C8 *self, s32 arg1) {
     Get_vtable_IntermediateBase()->slot60(self, arg1);
     if (arg1 == 4) {
         self->eventCode = 1;
@@ -321,6 +321,6 @@ void Obj865C8__OnEventArg(Obj865C8 *self, s32 arg1) {
     }
 }
 
-void Obj865C8__SetTimeout(Obj865C8 *self, s32 arg1) {
+void Class86668__SetTimeout(Obj865C8 *self, s32 arg1) {
     self->timeoutFrames = (arg1 < 0) ? arg1 : arg1 * 20;
 }
