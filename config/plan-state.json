@@ -1,7 +1,7 @@
 {
   "models": {
     "match_runner": "opus",
-    "naming_runner": "sonnet"
+    "naming_runner": "opus"
   },
   "stop_rule": {
     "attempts_per_model": 6,
@@ -230,6 +230,16 @@
           "note": "REVISIT runner (bravo) on func_80061778, Entity_d: MATCHED 198/198 on the first build after retyping EntityMethods::slotCC s32 -> void. The inherited 'tail-merge granularity' cause was wrong; it was a TYPE. Baseline rebuild recorded first as the revisit rule requires (115/198, ins 8/del 8, 78 positional skeleton diffs, built 6 words LONG). Unit Entity_d now has zero INCLUDE_ASM. No searches spent.",
           "round": 68,
           "runners": 1
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-23",
+          "matches": 2,
+          "model": "opus",
+          "note": "REVISIT runner (bravo) on code_179d8_k: func_80034690 MATCHED 200/200 (baseline 195/200 5 short, ins/del 12/12): the round-68 return-type lever did NOT apply (chains type-uniform); the cause was a local prototype narrowing func_80030980's first parameter to s16 while the callee reads a full word, plus a per-case u16 copy. func_80034138 MATCHED 69/69 (baseline 66/69, 1/1): a delay-slot move $a2,$v0 every prior round called dead is read by a later store, so the source stored rec->unk70 not the unused a2 param. func_800351D0 STALL improved 44/376 -> 95/376, 4 long, frame exact, after repairing its stale func_800357B0 call; promoted to NON_MATCHING. No searches spent. Two levers promoted to 3f.",
+          "round": 69,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -306,6 +316,16 @@
           "note": "charlie promoted all 4 preserved bodies in code_179d8_g (func_8002B3F4, func_8002B198, func_8002A75C, func_8002AA6C) to #ifdef NON_MATCHING. Per-function hand-derived vs reviewed-permuter split recorded in each report; two hybrids endorsed a named permuter find after review, and unsound/UB candidates were listed as rejected.",
           "round": 68,
           "runners": 1
+        },
+        {
+          "attempts": 7,
+          "calibration": true,
+          "date": "2026-09-23",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "charlie promoted all 4 preserved bodies in code_d294_b (Class6B5CC__NotifyTaggedParents, __TryAttachNearby, __ClassifyAgainstPlanes, __CheckBoundsOverlap); echo promoted all 3 in code_179d8_l (func_8002DDBC, func_8002CF18, func_8002D1B4). Head corrected two comments at merge: func_8002D1B4's body carries one reviewed permuter hoist (it said Hand-derived only), and func_8002DDBC's order-only barrier was dropped from the reader body. check-nonmatching 34 -> 40 bodies net of bravo's two matches out of NON_MATCHING.",
+          "round": 69,
+          "runners": 2
         }
       ],
       "status": "auto"
@@ -468,6 +488,16 @@
           "note": "alpha naming pass on class_3bb8c_c: 14 of 20 defs named across three sibling classes, 3 vtable-data globals, 2 slots -> onConstruct via the compiler-ownership recipe, unit header comment, 6 new reports for empty stubs. Head review sampled six names; both tier-B names explicitly refuse the available purpose-guess. Sonnet retained.",
           "round": 68,
           "runners": 1
+        },
+        {
+          "attempts": 32,
+          "calibration": true,
+          "date": "2026-09-23",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "alpha on class_3bb8c_m: 19 of 20 defs named, self->unk3C confirmed DreamSys* by classtable (six slots to real DreamSys methods), review PASSED, unit marked. delta on code_179d8_c_b: 12 functions + 12 globals named, review FAILED and unit NOT marked: ClearSpuMute was named from a stale round-16 description of its callee, which is Sony's SpuQuit (head renamed it QuitSpu); SetIrqMask/ClearIrqMask are Sony's StartRCnt/StopRCnt (libapi/counter by module order + KERNEL.H; head renamed). The unit's SeqTimer* cluster looks like libsnd ssstart/sstick from a build the discs lack -- escalated. Naming runner back to Opus per the model table.",
+          "round": 69,
+          "runners": 2
         }
       ],
       "status": "open",
@@ -477,6 +507,7 @@
         "class_3ac78": "2026-09-22",
         "class_3bb8c_c": "2026-09-22",
         "class_3bb8c_f": "2026-09-20",
+        "class_3bb8c_m": "2026-09-23",
         "class_3bb8c_o": "2026-09-18",
         "class_3bb8c_p": "2026-09-19",
         "code_171e0": "2026-09-18",

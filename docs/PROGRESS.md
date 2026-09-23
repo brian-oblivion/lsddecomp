@@ -6,6 +6,127 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-23 — round 69: two "dead" things were live, and a naming pass named Sony's code in the game's words
+
+**Five runners, three tracks, five merges, all green. Matched 1152 -> 1154,
+queued 100 -> 98.** Head on Opus; nothing needed Fable, and the three
+plan-level findings are ESCALATED below rather than acted on. Gate 0 clean,
+all five worktrees byte-verified before handover, `headercontention.py`
+reported no header and no call-graph contention among the five units.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | sonnet | 3 | `class_3bb8c_m` | 19 of 20 defs named, `self->unk3C` confirmed `DreamSys*` by `classtable.py`, own-view fields and slots renamed, unit header comment; review PASSED, unit marked |
+| bravo | opus | 1 revisit | `code_179d8_k` | `func_80034690` MATCHED 200/200, `func_80034138` MATCHED 69/69, `func_800351D0` 44 -> 95/376 and promoted |
+| charlie | sonnet | 1b | `code_d294_b` | all 4 preserved bodies promoted |
+| delta | sonnet | 3 | `code_179d8_c_b` | 12 functions + 12 globals named, tick-rate constants, header comment; review FAILED, unit NOT marked |
+| echo | sonnet | 1b | `code_179d8_l` | all 3 preserved bodies promoted |
+
+Track 3 is 21/75 units passed, 685/1154 defs still `func_` (was 713).
+`check-nonmatching` 34 -> 40 bodies (seven promoted, one new from bravo, two
+left NON_MATCHING by matching). Revisit yield 15/31. **The naming runner goes
+back to Opus**: delta's unit is a Sonnet unit sent back, which is what the
+model table asks for.
+
+**Assignment note.** `plan.py`'s second and fifth jobs were both REVISIT
+batches on `code_179d8_k`; one unit per runner took the first, and the fifth
+slot went to the next job (the 1b promotion in `code_179d8_l`).
+
+### Two "dead" values were live, and the round-68 lead did not apply
+
+Bravo was briefed with round 68's return-type lever for `func_80034690`, a
+5-short "tail-merge-choice" stall. It listed every call's return type first,
+as 3f now says to, and the chains were type-uniform: a clean negative in 30
+seconds. The cause was the sibling mistake one line down in the same
+prototype: this unit's local `extern` declared `func_80030980`'s first
+parameter `s16` while the callee masks it with `0xFF00`. Widening it to `s32`
+keeps the sign-extended inputs in callee-saved registers across the call for
+later calls to reuse; the 7th saved register appeared and the build went to
+exact length, then 200/200 with a per-case `u16` copy of a switch-wide `u8`.
+
+`func_80034138` had been adjudicated by the head in round 24, searched for
+55027 iterations and carried four rounds as "scheduling". A delay-slot
+`move $a2,$v0` every reading had called dead filler is read by a store two
+blocks later: the source stored `rec->unk70` into `unk6E`, not the unused
+parameter `a2`, and 2.6.3 had simply reused the dead parameter's register.
+One token, then removing round 24's frame pad, and byte-exact. A permuter
+cannot find this class: it never changes WHICH variable a statement stores.
+
+Both are promoted to 3f; three single-instance entries were distilled to
+the archive to stay inside the budget.
+
+### A naming pass named Sony's code in the game's words
+
+Delta's pass on `code_179d8_c_b` was careful work with one wrong name, and the
+review turned up something larger underneath it.
+
+- **The wrong name.** `ClearSpuMute` was named from round 16's description of
+  its callee, "an SPU-mute flag". The callee has been Sony's `SpuQuit`
+  (`libspu/s_q`, linked from the SDK object) since round 34. The naming prompt
+  says to grep placeholder callees for their current names; that grep would
+  have shown it. Renamed `QuitSpu` at merge.
+- **Two names that are Sony's.** `SetRCnt` already sat at 0x80032B18. The five
+  functions from there are `libapi/counter`'s exports in module order
+  (`SetRCnt, GetRCnt, StartRCnt, StopRCnt, ResetRCnt`): offsets 0/0xA0/0xD8
+  exact against the 3.5/3.6 `counter.o`, 0x110/0x148 against their
+  0x10C/0x140. That is a build the discs do not carry, so there is no object
+  to link. With `KERNEL.H`'s prototypes agreeing on arity, that is track 2's
+  two evidence kinds. Delta's `SetIrqMask`/`ClearIrqMask` were mechanically
+  right; renamed `StartRCnt`/`StopRCnt`, with an identification comment.
+- **The larger thing, escalated below.** Delta's `SEQ_TICKRATE_50/60/120/240`
+  are libsnd's `SS_TICK50/60/120/240`, and the cluster's shape matches libsnd's
+  `sstick.o` (`SsSetTickMode`) and `ssstart.o` (`_SsStart, SsStart, SsStart2,
+  _SsTrapIntrVSync, _SsSeqCalledTbyT_1per2`), again at offsets no disc build
+  has. So the unit is probably Sony code, not game code, and the head did not
+  rename further: each name needs its own evidence.
+
+### Also this round
+
+- **Head error, caught at the next merge.** The RCnt identification text went
+  on the symbols-file line as a trailing `// identified: ...` comment. splat
+  parses `key:value` pairs in a trailing comment and refuses the line. The
+  commit that introduced it built green because nothing re-extracted between
+  editing the symbols file and building. `make extract` failed at the alpha
+  merge, and the text moved to its own comment line, which is the existing
+  precedent (DrawSync). After a hand edit to the symbols file, re-extract
+  before believing the build.
+- `externcheck.py` found `func_80034138` defined with three parameters and
+  declared with two in `code_179d8_i_b.c`. The callee never reads the third,
+  so it is the idiom and is annotated `arity-ok`. The same extern declares an
+  `s32` return where the definition is `void`, and `code_179d8_i_b`'s wrapper
+  returns it. The byte oracle cannot see this. It is a type correction for
+  that unit's naming pass, not made here.
+- Track 1b bodies are written for the reader. At merge the head dropped
+  `func_8002DDBC`'s order-only barrier and `func_800351D0`'s `dead[16]` pad
+  and `volatile` locals (both kept in the reports), and corrected
+  `func_8002D1B4`'s "Hand-derived." to record its one reviewed permuter hoist.
+- `class_3bb8c_m`'s `func_800541CC` stays `func_`: an empty stub with no
+  callers.
+
+### Escalated — the head did not act on these
+
+1. **Sony code compiled into game text is invisible to track 2.** `plan.py`
+   and `sdkname.py` look only at `psyq_*` segments and still-asm functions,
+   so a matched C function that is really a Sony export from a
+   library build no disc carries (`libapi/counter` here, probably
+   `libsnd/sstick`+`ssstart` beside it) is counted as game code, offered for a
+   game-style naming pass, and can only be caught by a reviewer who knows the
+   SDK. Whether these count as game code, whether they get Sony's names under
+   track 2's rules, and whether a tool should screen matched game functions
+   by module-order position against the SDK corpus, is a plan and tool
+   change.
+2. **`plan.py` now re-offers `code_179d8_c_b` as a naming job with 0 of 12
+   defs unnamed**, because an unmarked unit stays on the list. The useful next
+   job for it is item 1, not another naming pass. The head did not want to
+   mark a failed-review unit or skip a top job by hand without it written
+   down.
+3. **`headercontention.py` missed a global-symbol collision.** It reported
+   no call-graph contention, but delta's `rename.py` of `D_8009024C` rewrote
+   `code_179d8_k.c`, bravo's live unit. The merge order the head chose made
+   it clean. Measured: `call_contention` matches C function DEFINITIONS in
+   one unit against the other's text, and a splat-owned global is defined in
+   no unit, so a naming runner's global renames are never priced.
+
 ## 2026-09-22 — round 68: a wrong CAUSE cost two rounds, and a green oracle hid a red one for a whole round
 
 **Three runners, three tracks, three merges, all green. Matched 1151 -> 1152,
