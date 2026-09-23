@@ -30,3 +30,7 @@ None — matched on the first attempt.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__HandleEvent7** -- tier B. `arg1` is dead; if `arg2 == 7`, dispatches `self->methods->checkAuxTrigger(self)` (CONFIRMED as this unit's own `ObjM__CheckAuxTrigger` via `tools/classtable.py 0x80087034`, +0x0B8), otherwise a no-op. Named for the mechanical event-code gate.

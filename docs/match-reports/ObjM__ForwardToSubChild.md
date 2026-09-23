@@ -47,3 +47,7 @@ either guard.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__ForwardToSubChild** -- tier B. Shared helper for the three `EnterState*` functions: fetches a `ChildM_AC` from `self->unk18`'s `slotAC`, optionally sets it up (`slotD0`) and notifies the base (`self->methods->slot10`), then dispatches `slotD8(self->unk10, arg1, arg2)`. Mechanically clear; what the pushed value represents in-game is not established.

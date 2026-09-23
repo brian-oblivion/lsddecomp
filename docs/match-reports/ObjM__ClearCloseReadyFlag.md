@@ -23,3 +23,7 @@ None.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__ClearCloseReadyFlag** -- tier A. Trivial single-statement setter, `self->unk84 = 0` -- the whole body is `jr $ra` / `sw $zero`. A plain setter is tier A by the FINISHING-PLAN definition (mechanics ARE the purpose).

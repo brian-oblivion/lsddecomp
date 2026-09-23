@@ -60,3 +60,7 @@ field types were in place.
 ## Provenance
 
 round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__TeardownPauseOverlay** -- tier B. Mirror of `ObjM__AdvancePauseSetup`: if the pause-setup counter is non-zero, destroys the "Pause"-named object (`self->unk7C`'s `slot4`) and notifies the same siblings (`unk34`/`unk54`/`unk10`/`unk18`), then resets the counter. Same evidence and tier as its counterpart.

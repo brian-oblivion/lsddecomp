@@ -28,3 +28,7 @@ None — matched on the first attempt.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__EnterStateA** -- tier B. Same shape again for `ObjM::mode = 0xA`, forwarding request code 6, then `dreamSys->selectCallback98(dreamSys, 2)` and `setMoveOverride(dreamSys, 2)`. Tier B for the same reason as its two siblings.

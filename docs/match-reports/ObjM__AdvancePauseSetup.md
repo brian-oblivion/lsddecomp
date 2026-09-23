@@ -131,3 +131,7 @@ round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_m`.
 Permuter transcript and the 18 reproducers referenced above were run
 in this session; the reproducers themselves were scratch files under
 `/tmp`, not preserved.
+
+## Naming
+
+**ObjM__AdvancePauseSetup** -- tier B. A 5-step counter (`self->unk80`, 0..4) driving a state machine: on step 0, builds an object literally named "Pause" (`New_Obj6EAC0(self->unk74, 5, &D_8008AB44[0])`, `D_8008AB44` == "Pause", asm/data/7B008.sdata.s); on the final step (4), notifies several sibling components. The literal string is strong, concrete evidence for the "pause overlay" reading, but the class's exact game role stays tier B.

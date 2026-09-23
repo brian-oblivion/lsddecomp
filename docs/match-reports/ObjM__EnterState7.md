@@ -57,3 +57,7 @@ straightforward once the struct layout is right.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__EnterState7** -- tier B. Sets `ObjM::mode = 7`, queries `dreamSys->getSetFlashbackSession(dreamSys, &val, -1)` (offset +0xF0, confirmed via `tools/classtable.py 0x80087BDC`), forwards the result into `ObjM__ForwardToSubChild`, then calls `dreamSys->blockMovement`. Mechanics are fully pinned down; the game-level meaning of "mode 7" is not, so this stays tier B rather than a guessed purpose name.

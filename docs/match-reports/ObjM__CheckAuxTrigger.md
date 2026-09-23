@@ -76,3 +76,7 @@ call.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__CheckAuxTrigger** -- tier B. Fetches a `ChildM114` via `self->unk14`'s `slot114`, reads the current day/year from `dreamSys->getCurrentDayAndYear`, calls the uncarved `TryDreamAuxTrigger` with both, stores the result, and finalizes the child (`slot84`) on failure. Named for its one external call; the gameplay trigger itself is still uncarved (`src/code_4cd08.c`), so this stays tier B.

@@ -88,3 +88,7 @@ Two things follow, and the second is the general one:
   and points at `tools/nearmiss.py` — so the next reader can tell whether it
   predates a fix instead of having to re-derive it. Record the method next to
   the verdict, or the verdict outlives its method.
+
+## Naming
+
+**FillStyleFromConfig** -- tier A. Pure field-fill: copies four bytes of `cfg` into the four fields of a `StyleM` (two directly as colour-table lookups, one as a `D_8008730C` table lookup, one as a plain sign-extended byte). No branching, deterministic, mechanics are the entire function -- tier A.

@@ -87,3 +87,7 @@ once. When a near-miss is exactly one word short and the only reg swaps are
 around a computation that feeds a value already sitting in the return
 register from an earlier branch, try collapsing to a single join point
 before anything more invasive.
+
+## Naming
+
+**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`D_800873EC[D_8008AC6C]`), falling back to the uncarved `func_80054758` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.

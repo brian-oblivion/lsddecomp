@@ -30,3 +30,7 @@ it before any build was attempted.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__EnterState8** -- tier B. Same shape as `ObjM__EnterState7` for `ObjM::mode = 8`, forwarding request code 6 and then `dreamSys->setMoveOverride(dreamSys, 1)`. Mechanically described, purpose (why 8) not established.

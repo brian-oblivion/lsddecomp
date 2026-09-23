@@ -29,3 +29,7 @@ None — matched on the first attempt.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__NotifyParentsCodeB** -- tier A. Pure one-line dispatch: `self->methods->notifyParents(self, 0xB)`. `notifyParents` is CONFIRMED as `BasicClass__NotifyParents` via `tools/classtable.py 0x80087034` (+0x030), so every byte of this function's behaviour is known even though the game-level meaning of event code 0xB is not -- a pure leaf whose mechanics ARE its purpose, tier A by the FINISHING-PLAN definition.

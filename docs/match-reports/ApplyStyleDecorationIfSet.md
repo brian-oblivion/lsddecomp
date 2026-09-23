@@ -123,3 +123,7 @@ round 44's other two levers this session (guard-clause direction in
 cases where semantically-identical C phrasings hand GCC 2.6.3's allocator
 and scheduler different amounts of freedom, and the fix was never new
 logic, only a different way of naming the same values.
+
+## Naming
+
+**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `D_8008AB54` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_ClassEAC0`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`D_8008AC7C`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.

@@ -28,3 +28,7 @@ exact idiom before deriving anything").
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__CloseAndNotifyC** -- tier B. Identical shape to `ObjM__CloseAndNotifyD`, differing only in the notify code (0xC). Same tier and same caveat.

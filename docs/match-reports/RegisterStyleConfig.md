@@ -81,3 +81,7 @@ loop over two or more of them, seed with `tools/m2ctx.py --sig ... --run`
 before hand-writing anything -- the pointer-decrement loop shape it recovers
 is not the same code a straightforward per-field-assignment reading would
 produce, and the difference changes the instruction count.
+
+## Naming
+
+**RegisterStyleConfig** -- tier B. Free function (VerbNoun, unrelated to the `ObjM`/`DreamSys` cluster above): a register-once guard over a `.sdata` flag word (`D_8008AB4C`), stashing five style-config arguments into `.sbss` globals and zeroing two more before tail-calling `ApplyStyleConfig`. Mechanically well understood from the disassembly; "style" describes the data it touches (color/config table consumed by `FillStyleFromConfig`/`StyleM`), not a confirmed game concept.
