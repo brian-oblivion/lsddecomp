@@ -1,4 +1,6 @@
-# func_80049958 — MATCHED (47/47 words)
+# Obj865C8__OnNotify — MATCHED (47/47 words)
+
+> Renamed from `func_80049958` on 2026-09-23 (tools/rename.py). Address 0x80049958.
 
 `Class865C8Methods` slot +0x038.
 
@@ -54,7 +56,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_80049958(Obj865C8 *self, EventArg *arg1, s32 arg2) {
+void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
 
     GetClass86668Methods()->slot38(self, arg1, arg2);

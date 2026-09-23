@@ -24,7 +24,7 @@ typedef struct SubObjA SubObjA;
 typedef struct SubObjD SubObjD;
 typedef struct SubObjF SubObjF;
 
-/* What func_80049958 (Class865C8Methods slot +0x038) inspects: `arg1` is a
+/* What Obj865C8__OnNotify (Class865C8Methods slot +0x038) inspects: `arg1` is a
  * pointer to a small wrapper whose own field 0 is a pointer to some OTHER,
  * unrelated header-tagged object (double indirection confirmed by the
  * disassembly's two chained `lw ..., 0x0(reg)`). Only the one word each
@@ -56,11 +56,11 @@ typedef struct Class865C8Methods {
     void *unk18, *unk1C;                           /* BasicClass, inherited */
     void *unk20, *unk24, *unk28, *unk2C;           /* BasicClass, inherited */
     void *unk30, *unk34;                           /* BasicClass, inherited */
-    /* Occupied here by func_80049958 itself; only reachable from THIS
+    /* Occupied here by Obj865C8__OnNotify itself; only reachable from THIS
      * struct via GetClass86668Methods()'s own gClass86668Methods view of the same offset
      * (Class86668Methods::slot38 below), where it forwards to the inherited
      * Obj86B60__OnNotify. */
-    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 func_80049958 */
+    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj865C8__OnNotify */
     void *unk3C;                                   /* +0x03C null slot */
     void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 func_80049A14 */
     void *slot44;                                  /* +0x044 func_80049A1C */
@@ -79,14 +79,14 @@ typedef struct Class865C8Methods {
     void *unk70;                                   /* Class86668__SetChildFlag8 */
     void *unk74, *unk78;                           /* null slots */
     void (*noop7C)(Obj865C8 *self);                /* +0x07C func_80049EA4 (no-op, matched) */
-    /* Retyped from `void (*noop80)(void)`: func_80049958 dispatches this
+    /* Retyped from `void (*noop80)(void)`: Obj865C8__OnNotify dispatches this
      * slot as `self->methods->slot80(self, arg1, arg2)` with real
      * arguments loaded into $a1/$a2 -- func_80049EAC (D_800865C8's own
      * occupant, still matched, `void func_80049EAC(void) {}`) simply
      * ignores them. A no-op BODY is not evidence the SLOT's signature takes
      * no arguments; only THIS slot's other occupants would be. */
     void (*slot80)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x080 func_80049EAC (no-op body, matched) */
-    /* Same signature as slot80 by the same call site (func_80049958's other
+    /* Same signature as slot80 by the same call site (Obj865C8__OnNotify's other
      * branch); occupant func_80049EB4 is still addiu_at-blocked. */
     void (*slot84)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x084 func_80049EB4, addiu_at-blocked */
 } Class865C8Methods;
@@ -352,9 +352,9 @@ typedef struct Class86668Methods {
     void (*dtor)(Obj865C8 *self);                          /* +0x00C func_8004A228 */
     u8 pad10[0x38 - 0x10];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
-     * offset (func_80049958, this unit): gClass86668Methods's own +0x038 is
+     * offset (Obj865C8__OnNotify, this unit): gClass86668Methods's own +0x038 is
      * Obj86B60__OnNotify (a base/inherited slot, out of this unit's scope).
-     * Called by func_80049958 as GetClass86668Methods()->slot38(self, arg1, arg2). */
+     * Called by Obj865C8__OnNotify as GetClass86668Methods()->slot38(self, arg1, arg2). */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj86B60__OnNotify */
     u8 pad3C[0x44 - 0x3C];
     /* func_8004A2C4 (this unit, matched): zeroes self->unk28, forwards to

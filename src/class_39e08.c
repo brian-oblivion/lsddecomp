@@ -59,7 +59,7 @@ void Obj865C8__Dtor(Obj865C8 *self) {
     GetClass86668Methods()->dtor(self);
 }
 
-void func_80049958(Obj865C8 *self, EventArg *arg1, s32 arg2) {
+void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
 
     GetClass86668Methods()->slot38(self, arg1, arg2);
