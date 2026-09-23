@@ -1,29 +1,28 @@
-/* COMPLETE as of round 23 (2026-09-07) -- no queue left in this unit.
+/* StageGrid: the world map's per-stage grid layout, and the two-way lookup
+ * between a mood-graph value and the grid cell (stage + chunk) that owns it.
  *
- * The last two functions (GetStageChunkFromMood / GetMoodFromStageChunk) were
- * banked from round 2026-08-29-a (with the banked marker `progress.py` keys on,
- * deliberately not spelled out again here -- see below) on the grounds that both
- * needed the STAGE_CHUNK_MOODS data slot understood first. That was correct: the
- * slot is 14 pointers to per-stage row-major arrays of the 2-byte MoodGraphPoint
- * union, dimensioned by STAGE_GRID_DIMENSIONS (14 x 8-byte entries, `bool` = int).
- * Once read out of the executable both functions were shape-correct on the first
- * attempt; see docs/match-reports/ for the two local-type residues that remained.
+ * Each of the game's stages divides into a `columns` x `rows` grid of chunks
+ * (StageGridDimensions, one entry per stage in STAGE_GRID_DIMENSIONS), and
+ * every chunk owns one MoodGraphPoint in a row-major per-stage table
+ * (STAGE_CHUNK_MOODS -- 14 pointers to the per-stage STGnn_CHUNK_MOODS
+ * arrays). GetMoodFromStageChunk and GetStageChunkFromMood convert between a
+ * mood value and its owning (stage, chunk); DreamSys (src/DreamSys.c) is the
+ * only caller of either, using them to read the mood at the player's current
+ * grid position and to place a mood value back onto the grid.
+ * GetStageGridDimensions(Table/Count) are plain accessors over the
+ * dimensions table itself.
  *
- * The phrase above is NOT written out in full on purpose. `progress.py` matches
- * the banked marker as a bare whole-file substring, so a sentence merely
- * DESCRIBING the marker banks the unit exactly as the marker would -- round 46
- * lost a whole unit's `fresh` count to that. This unit has no queue today, so
- * quoting it here would have cost nothing; it would have cost the next person
- * who adds one. Refer to the marker, do not quote it.
+ * Every function in this unit is matched byte-exact; see
+ * docs/match-reports/ for each function's derivation.
  */
 #include "common.h"
 #include "StageGrid.h"
 
-/* The dimensions table has 14 entries; func_800494B4 and the guard in
+/* The dimensions table has 14 entries; GetStageGridDimensionsCount and the guard in
  * GetStageGridDimensionsTable are the only two places that constant appears. */
 #define STAGE_GRID_DIMENSIONS_COUNT 14
 
-s32 func_800494B4(void) {
+s32 GetStageGridDimensionsCount(void) {
     return STAGE_GRID_DIMENSIONS_COUNT;
 }
 

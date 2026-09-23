@@ -22,8 +22,14 @@ extern StageGridDimensions STAGE_GRID_DIMENSIONS[];
 
 extern MoodGraphPoint* STAGE_CHUNK_MOODS[];
 
-extern StageGridDimensions *GetStageGridDimensionsTable(s32 *unknown);
+/* @brief Number of entries in STAGE_GRID_DIMENSIONS / STAGE_CHUNK_MOODS (14). */
+extern s32 GetStageGridDimensionsCount(void);
 
+/* @brief Gets the stage-dimensions table, optionally writing its length out. */
+/* @param count Optional out-parameter; unwritten if NULL. */
+extern StageGridDimensions *GetStageGridDimensionsTable(s32 *count);
+
+/* @brief Gets the dimensions entry for a single stage. */
 extern StageGridDimensions *GetStageGridDimensions(s32 index);
 
 /* @brief Gets the stage and chunk associated with a given point on the mood graph. */

@@ -1,4 +1,6 @@
-# func_800494B4
+# GetStageGridDimensionsCount
+
+> Renamed from `func_800494B4` on 2026-09-23 (tools/rename.py). Address 0x800494b4.
 
 **Unit:** StageGrid · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 
@@ -26,3 +28,15 @@ Written as a shared `STAGE_GRID_DIMENSIONS_COUNT` define for that reason.
 Two functions materialising the same magic number four bytes apart is evidence
 about what the number MEANS, not just what it is — worth grepping for a
 constant's other uses before naming it.
+
+## Naming
+
+**`GetStageGridDimensionsCount`, tier A.** A pure leaf returning a constant is
+a getter, tier A by definition. Evidence: the constant it returns is the same
+`0xE` the sibling `GetStageGridDimensionsTable` writes through its `count`
+out-parameter, so the value IS the table's length, not an arbitrary number;
+the name follows the `Get<X>Table` / `Get<X>Count` pairing this unit already
+has, and the wider codebase's existing `Get*Count(void)` convention
+(`GetFileTableCount`, `GetOpenVabCount`). No caller exists anywhere in the
+extracted asm (checked: no `jal` to its address outside its own `.s`), so the
+name rests on behaviour alone, not on a call site.
