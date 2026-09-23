@@ -8957,3 +8957,28 @@ single-instance or a caveat on a lever documented there.
   longer fits an `addiu` immediate. Fix: move it INSIDE the subtracted group -- `x - (y + K)`, never
   `(x - K) - y`; GCC reassociates it back out at full width. Greppable straight from a diff. (a
   round 63)
+
+
+## Distilled out on 2026-09-23 (round 69)
+
+Moved out of DECOMPILATION_LEARNINGS.md §3 to meet its word budget after round 69
+promoted the dead-parameter-register trace and the narrowed-callee-parameter
+stall. Each is still correct; each was single-instance or a special case of a
+lever the sheet still carries.
+
+- **Two long-standing near-misses closed by DELETING a named value:** removing a decrementing
+  pointer local that lives across loop iterations (177/177), and writing a division in place into
+  its dying dividend — when the result went to the wrong register and one operand is dead after,
+  assign the result back into that operand. Keep a pointer computation that is one retail expression
+  as ONE C statement (47/117 -> 95/117), and compute a value LAZILY where control flow first needs
+  it. (a §"Two levers that closed long-standing near-misses by DELETING a named value")
+
+- **When the residue is a lone scheduling difference, sweep one statement's PLACEMENT.** Eight
+  placements of a single `sw`, one build each, body otherwise byte-identical: 80, 82, 82, 83, 83,
+  83, 92, then 106/106 at "last statement in the block". Mechanical and cheap; it found the zero on
+  `func_8004C1C0`. (a round 63)
+
+- **Inherited no-op statements must be tested in BOTH directions.** Removing `func_8004B700`'s
+  `__asm__("")` kept the image green (it was a crutch for a shape that no longer exists); removing
+  `func_8004BA40`'s `do {} while (0);` DRIFTED the image. Neither outcome is predictable from
+  reading it. (a round 63)

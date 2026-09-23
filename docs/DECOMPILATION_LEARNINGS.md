@@ -308,12 +308,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   registers, and a value you WROTE and reuse needs a named local. Whether to cache `self->methods`
   tends to be constant PER CLASS, determined from a matched sibling but kept conditional. (a §"A
   same-size pointer cast in a FUNCTION-SCOPE local", §"Round 11", §"Round 12")
-- **Two long-standing near-misses closed by DELETING a named value:** removing a decrementing
-  pointer local that lives across loop iterations (177/177), and writing a division in place into
-  its dying dividend — when the result went to the wrong register and one operand is dead after,
-  assign the result back into that operand. Keep a pointer computation that is one retail expression
-  as ONE C statement (47/117 -> 95/117), and compute a value LAZILY where control flow first needs
-  it. (a §"Two levers that closed long-standing near-misses by DELETING a named value")
 - **`do { } while (0)` is a REGISTER-PRESSURE lever, not a scheduling lever** — inert across four
   delay-slot-fill sites and regressive on an unrelated matched sequence elsewhere, but catastrophic
   (66/69 -> 1/69) applied whole-function. Small straight-line bodies only, per-return, never
@@ -375,6 +369,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   one merely surviving an intervening call is NOT this. The cause is usually a vtable slot typed
   with too few parameters — `grep -rn 'slotNN' src/` across units first. (a §"Confirmed on this
   game", §"A delay-slot residue writing `$a0`-`$a3`")
+- **The same forward trace applies to a DEAD PARAMETER's register, which 2.6.3 reuses as scratch.**
+  A delay-slot `move $aN, $vM` is filler only once `$aN`'s next READ on every path is found; in
+  `func_80034138` a store two blocks on read it, so the source stored the wrong value (the unused
+  parameter instead of a local). A permuter never swaps which variable a statement stores, so
+  no search finds this. (round 69)
 - **A bare `nop` in a call's delay slot establishes arity ONLY when the argument is not already in
   the right register** — those two cases are BYTE-IDENTICAL. **MIPS o32 fills argument registers
   strictly left to right**, so untouched `$a1` with `$a2`/`$a3` set PROVES a forwarded parameter;
@@ -411,6 +410,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   over-narrow `s8` parameter costs a sign-extend at every call site, a `u8` lvalue passed to `s32`
   costs a redundant `andi 0xff`, and an unsigned narrow STACK argument loads as one `lhu` where a
   signed one is `lw`+`sll`+`sra`. (a §"A symbol accessed at TWO WIDTHS")
+- **A caller's local prototype that NARROWS a parameter the callee reads as a full word looks like a
+  tail-merge or register-identity stall.** Beyond the sign-extend pair, the narrowed argument is not
+  CSE'd with the widened value later calls reuse, so the build comes out N words short with one
+  fewer callee-saved register. Discriminator: the callee masks the parameter wider than its declared
+  type (`0xFF00` on an `s16`). `func_80034690` went 195 -> 190 -> 200/200 on `s16`->`s32`; run it
+  beside the return-type listing above. (round 69)
 - **A wrong extern arity and the deliberate dead-argument idiom are told apart at the CALL SITE,
   never in the callee** — the callee says "ignores `$a1`" either way. Does retail emit an
   instruction for the extra argument (`move a1,zero`, `li a0,0xff`)? Then the declaration is
@@ -613,10 +618,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   ~330k prior iterations missed both: a permuter mutates a body but never merges or deletes its
   locals, so local count is a PARAMETER of the search space, not a point in it. A validated
   high-iteration negative bounds the search, not the function.** (a round 63)
-- **When the residue is a lone scheduling difference, sweep one statement's PLACEMENT.** Eight
-  placements of a single `sw`, one build each, body otherwise byte-identical: 80, 82, 82, 83, 83,
-  83, 92, then 106/106 at "last statement in the block". Mechanical and cheap; it found the zero on
-  `func_8004C1C0`. (a round 63)
 - **A narrow signed field may need an `s32` LOCAL rather than a cast to get retail's `lb` + `sll
   0xb`, but ONLY under aliasing -- this does NOT reproduce in isolation.** In `func_8004C1C0`
   (fields re-read after a callee writes the struct through `u8 *`), `s32 t = o->b2; t << 11` and
@@ -625,10 +626,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   reproducers, one plain and one replicating the store-then-reload shape (reload confirmed present,
   `sb` then `lb`), emit identical `lb` + `sll 0xb` for all spellings. So the trigger is the aliasing
   context, not the spelling -- do not "fix" a spelling that is already correct. (a round 63)
-- **Inherited no-op statements must be tested in BOTH directions.** Removing `func_8004B700`'s
-  `__asm__("")` kept the image green (it was a crutch for a shape that no longer exists); removing
-  `func_8004BA40`'s `do {} while (0);` DRIFTED the image. Neither outcome is predictable from
-  reading it. (a round 63)
 
 ## 4. Verdict classes and how far to trust them
 
@@ -750,4 +747,7 @@ otherwise coalesce away", §"Retail reuses the same counter pseudo-registers acr
 loops and SWAPS their outer/inner roles". Distilled out round 68: §"Two independent
 CFG/scheduling levers, both from `func_8002C278`", §"The `mention a value twice` lever needs a
 genuine SECOND, INDEPENDENT USE POINT" (it reconciles the round-19 close with the INERT entry in
-3d), §"HImode constant narrowing".
+3d), §"HImode constant narrowing". Distilled out round 69: §"Two long-standing near-misses closed by
+DELETING a named value" (the local-count entries in 3d carry the lever), §"When the residue
+is a lone scheduling difference, sweep one statement's PLACEMENT", §"Inherited no-op
+statements must be tested in BOTH directions".
