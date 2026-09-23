@@ -75,7 +75,7 @@ void Obj865C8__ResetState(Obj865C8 *self) {
     self->unk3C = 0;
 }
 
-void func_80049A1C(Obj865C8 *self) {
+void Obj865C8__Init(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     sub->methods->slot10(sub, self->unk0C->unk4);

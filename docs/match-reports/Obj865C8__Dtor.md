@@ -117,13 +117,13 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
   independent call sites in this one function.
 - **Correction to earlier-this-round typings** (see below): `Obj0C::unk8`,
   `Obj0C::unk10`, and `Obj865C8::unk40`/`unk44`/`unk48` were all typed `s32`
-  by `func_80049A1C`/`func_80049E20` (earlier this session), whose own call
+  by `Obj865C8__Init`/`func_80049E20` (earlier this session), whose own call
   sites only ever forward these fields as opaque register values through a
   vtable call that never dereferences them — consistent with either a
   scalar or a pointer at the time. This function dereferences all five
   directly (`->methods->slot4`), settling it: they are `SubObjG *`. Added
   `Obj0C::unkC` (brand new field, same type, same pattern). Both older call
-  sites (`func_80049A1C`'s two `unk8`/`unk10` forwards,
+  sites (`Obj865C8__Init`'s two `unk8`/`unk10` forwards,
   `func_80049E20`'s three `unk40`/`unk44`/`unk48` forwards) got explicit
   `(s32)` casts added at their existing call sites — same register value
   either way, confirmed by rebuilding all nine of this unit's matched
@@ -131,7 +131,7 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
 
 ## Match reports updated (not replaced) for this correction
 
-- `docs/match-reports/func_80049A1C.md` — `Obj0C::unk8`/`unk10` were
+- `docs/match-reports/Obj865C8__Init.md` — `Obj0C::unk8`/`unk10` were
   documented there as "plain scalar register-passthrough"; this function
   proves they are pointers. Report NOT rewritten (still an accurate
   description of THAT function's own call sites); adding a short forward

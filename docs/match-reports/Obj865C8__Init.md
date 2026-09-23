@@ -1,4 +1,6 @@
-# func_80049A1C — MATCHED (41/41 words)
+# Obj865C8__Init — MATCHED (41/41 words)
+
+> Renamed from `func_80049A1C` on 2026-09-23 (tools/rename.py). Address 0x80049a1c.
 
 `Obj865C8`'s vtable slot +0x044.
 
@@ -43,7 +45,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_80049A1C(Obj865C8 *self) {
+void Obj865C8__Init(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     sub->methods->slot10(sub, self->unk0C->unk4);

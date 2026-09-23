@@ -63,7 +63,7 @@ typedef struct Class865C8Methods {
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj865C8__OnNotify */
     void *unk3C;                                   /* +0x03C null slot */
     void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 Obj865C8__ResetState */
-    void *slot44;                                  /* +0x044 func_80049A1C */
+    void *slot44;                                  /* +0x044 Obj865C8__Init */
     void *slot48;                                  /* +0x048 func_80049AC0 */
     void *slot4C;                                  /* +0x04C func_80049B54 */
     void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 func_80049C50 */
@@ -195,17 +195,17 @@ struct SubObjG {
 };
 
 /* Opaque view of whatever object Obj865C8::unk0C points to (used by
- * func_80049AC0/func_80049A1C, which read its own +0x004/+0x008/+0x010
+ * func_80049AC0/Obj865C8__Init, which read its own +0x004/+0x008/+0x010
  * fields, func_80049B54, which dereferences +0x000, and Obj865C8__Dtor,
  * which dereferences +0x008/+0x00C/+0x010 as `SubObjG *` -- no vtable
  * dispatch through Obj0C ITSELF, so no methods pointer is declared for
  * Obj0C; its own fields point at other objects that have one).
  *
- * +0x008/+0x010 were typed `s32` from func_80049A1C/func_80049AC0 alone,
+ * +0x008/+0x010 were typed `s32` from Obj865C8__Init/func_80049AC0 alone,
  * which only ever forward them as opaque register values through a vtable
  * call that never dereferences them -- consistent with EITHER a scalar or a
  * pointer. Obj865C8__Dtor dereferences both directly (`->methods->slot4`),
- * settling it: they are `SubObjG *`. func_80049A1C's own forwarding call
+ * settling it: they are `SubObjG *`. Obj865C8__Init's own forwarding call
  * sites got an explicit `(s32)` cast rather than staying wrong. */
 typedef struct Obj0C {
     SubObjE *obj;                 /* +0x000, func_80049B54 */
@@ -216,7 +216,7 @@ typedef struct Obj0C {
 } Obj0C;
 
 /* Opaque view of whatever object Obj865C8::unk38 points to (used by
- * func_80049AC0/func_80049A1C): same "vtable at offset 0, only the reached
+ * func_80049AC0/Obj865C8__Init): same "vtable at offset 0, only the reached
  * slots named" policy as SubObjA/SubObjB/Obj4C above. */
 typedef struct SubObjDMethods {
     u8 pad00[0x10];
@@ -358,7 +358,7 @@ typedef struct Class86668Methods {
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj86B60__OnNotify */
     u8 pad3C[0x44 - 0x3C];
     /* func_8004A2C4 (this unit, matched): zeroes self->unk28, forwards to
-     * the base's own slot44, returns self->unk28. Called by func_80049A1C
+     * the base's own slot44, returns self->unk28. Called by Obj865C8__Init
      * as GetClass86668Methods()->slot44(self, self->unk0C, 0), return discarded. */
     s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 func_8004A2C4 */
     /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
