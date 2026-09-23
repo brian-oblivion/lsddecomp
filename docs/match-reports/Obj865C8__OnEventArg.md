@@ -1,4 +1,6 @@
-# func_8004A3EC
+# Obj865C8__OnEventArg
+
+> Renamed from `func_8004A3EC` on 2026-09-23 (tools/rename.py). Address 0x8004a3ec.
 
 **Unit:** class_39e08 · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
 
@@ -6,7 +8,7 @@
 
 Method-table slot +0x060, shared VERBATIM (same function address) between
 `D_800865C8` and its sibling `gClass86668Methods` -- confirmed by
-`tools/classtable.py`, both tables list `func_8004A3EC` at +0x060. Always
+`tools/classtable.py`, both tables list `Obj865C8__OnEventArg` at +0x060. Always
 forwards to the BASE class's own +0x060 implementation first (return value
 discarded), then -- based on the ORIGINAL argument, not the base call's
 return -- sets a flag and notifies through the class's own +0x07C slot.
@@ -34,7 +36,7 @@ jalr  $v0
 Written as:
 
 ```c
-void func_8004A3EC(Obj865C8 *self, s32 arg1) {
+void Obj865C8__OnEventArg(Obj865C8 *self, s32 arg1) {
     Get_vtable_IntermediateBase()->slot60(self, arg1);
     if (arg1 == 4) {
         self->unk28 = 1;

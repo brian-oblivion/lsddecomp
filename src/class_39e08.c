@@ -313,7 +313,7 @@ void Obj865C8__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
     }
 }
 
-void func_8004A3EC(Obj865C8 *self, s32 arg1) {
+void Obj865C8__OnEventArg(Obj865C8 *self, s32 arg1) {
     Get_vtable_IntermediateBase()->slot60(self, arg1);
     if (arg1 == 4) {
         self->unk28 = 1;
