@@ -49,7 +49,7 @@ No existing field was retyped or renamed.
   space, not evidence of a specific larger type.
 - The `dst->unk0/unk4/unk8 = src[i]` triple is the same "three `s32`
   fields populated from a 3-element `s16` source" shape as
-  `func_8001D008`/`Class6B5CC__UpdateRotation` (both of which populate the SAME
+  `Class6B5CC__UpdateScale`/`Class6B5CC__UpdateRotation` (both of which populate the SAME
   `Class6B5CCSub44` fields via a fixed-point conversion instead) --
   here the source values are used directly, no `RatioToFixed12` call.
 - First-try match once the buffer size was corrected; no register-order

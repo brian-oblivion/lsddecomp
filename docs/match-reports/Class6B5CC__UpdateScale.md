@@ -1,17 +1,19 @@
-# func_8001D008 -- MATCHED (57/57 words)
+# Class6B5CC__UpdateScale -- MATCHED (57/57 words)
+
+> Renamed from `func_8001D008` on 2026-09-23 (tools/rename.py). Address 0x8001d008.
 
 Unit: `code_d294` (round 14). Occupies `Class6B5CCMethods` vtable slot
 `+0x048` (already typed as `slot48` before this round, per the header's
 own note pointing at this function). Reads a 3-entry `{s16 whole; s16
 frac}` fixed-point table via three calls to `RatioToFixed12`, then either
 overwrites or accumulates the (16-bit-truncated) results into
-`self->unk14->unk44`'s first three words. `void func_8001D008(Class6B5CCObj
+`self->unk14->unk44`'s first three words. `void Class6B5CC__UpdateScale(Class6B5CCObj
 *self, s32 flag, void *data)`.
 
 ## Final source
 
 ```c
-void func_8001D008(Class6B5CCObj *self, s32 flag, void *data) {
+void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
     s32 r0, r1, r2;
     Class6B5CCSub44 *dst;
 
@@ -53,7 +55,7 @@ struct comment across two reports).
   dst->fieldN + (s16)rN` -- old value read, added, stored back). No
   residue -- matched clean on the first attempt.
 - `self->unk14->unk0 = 0` at the end matches the header's own standing
-  note ("Class6B5CC__UpdateRotation/func_8001D008 ... own tails both end
+  note ("Class6B5CC__UpdateRotation/Class6B5CC__UpdateScale ... own tails both end
   `self->unk14->unk0 = 0`").
 - `(u8 *)data + N` pointer arithmetic on the `void *data` parameter needs
   an explicit cast (arithmetic directly on `void *` is not standard C89);

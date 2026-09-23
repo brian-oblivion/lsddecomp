@@ -122,7 +122,7 @@ void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
     self->unk14->unk0 = 0;
 }
 
-void func_8001D008(Class6B5CCObj *self, s32 flag, void *data) {
+void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
     s32 r0, r1, r2;
     Class6B5CCSub44 *dst;
 

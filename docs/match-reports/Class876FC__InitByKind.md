@@ -176,7 +176,7 @@ method signatures; zero bytes changed.
 | +0x07C | arr7C | modelChildren | B | New_BaseObjO objects, linked to the owner's model |
 | +0x084 | arr84 | sprites | B | New_D800879C4 objects (GsSPRITE at +0x64, see Class876FC__SpawnSprites) |
 | slot +0x044 | slot44 | updateRotation | B | Class6B5CC__UpdateRotation (set/add GsCOORD2PARAM.rotate, degrees) |
-| slot +0x048 | slot48 | updateScale | B | func_8001D008 (set/add .scale); sprite override func_80057DF4 also a scale |
+| slot +0x048 | slot48 | updateScale | B | Class6B5CC__UpdateScale (set/add .scale); sprite override func_80057DF4 also a scale |
 | slot +0x04C | slot4C | attachToParent | B | func_8001D0EC (parent link, coord2 super, coord.t) |
 | slot +0x060 | slot60 | setDisplay | B | func_8001D344 / func_8004220C: attribute bit 31 = !on (GsDOFF) |
 | slot +0x064 | slot64 | setSemiTrans | B | func_8001D374 / func_8004223C: bit 30 (GsALON) |
@@ -197,5 +197,5 @@ For the HEAD, by type scope; none applied here (other units' views).
   unit reads as offset/rotation/scale/modelChildLayout/tableIndex/color/
   altColor).
 - `include/code_d294.h` `Class6B5CCMethods`: `slot44` -> `updateRotation`,
-  `slot48` -> `updateScale` (B; Class6B5CC__UpdateRotation / func_8001D008 bodies, both
+  `slot48` -> `updateScale` (B; Class6B5CC__UpdateRotation / Class6B5CC__UpdateScale bodies, both
   matched since those comments said "still queued").

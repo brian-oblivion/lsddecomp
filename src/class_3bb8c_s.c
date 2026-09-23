@@ -40,7 +40,7 @@ typedef struct Vec3S {
 typedef struct LinkNodeMethods {
     u8 pad0[0x44];
     void (*updateRotation)(LinkNode *self, s32 set, s32 data);  /* +0x044, Class6B5CC__UpdateRotation (degrees; sprites: func_80042170, rotate) */
-    void (*updateScale)(LinkNode *self, s32 set, void *data);   /* +0x048, func_8001D008 (GsCOORD2PARAM.scale; sprites: func_80057DF4) */
+    void (*updateScale)(LinkNode *self, s32 set, void *data);   /* +0x048, Class6B5CC__UpdateScale (GsCOORD2PARAM.scale; sprites: func_80057DF4) */
     void (*attachToParent)(LinkNode *self, void *parent, void *trans); /* +0x04C, func_8001D0EC (coord2 super = parent's, coord.t = trans) */
     u8 pad50[0x60 - 0x50];
     void (*setDisplay)(LinkNode *self, s32 on);                 /* +0x060, func_8001D344: GsDOFF = !on */
