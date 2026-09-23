@@ -108,10 +108,10 @@ void func_80053ACC(Obj87034_3bb8c_l *self) {
             arg3 = 5;
             break;
         }
-        func_80053EB4(self, local18, 0, arg3, 1);
+        ObjM__ForwardToSubChild(self, local18, 0, arg3, 1);
         return;
     }
-    func_80053EB4(self, 0, 0, 5, 1);
+    ObjM__ForwardToSubChild(self, 0, 0, 5, 1);
 }
 ```
 
@@ -126,7 +126,7 @@ void func_80053ACC(Obj87034_3bb8c_l *self) {
   question, not the struct layout.
 - All literal values (`unk20=4`, mask `&3`, case values 0/4/7, `arg3`
   0xA/5, the trailing `1`/`0`) are confirmed against the raw bytes.
-- `func_80053EB4` (the sibling-unit helper from `class_3bb8c_m`, matched by
+- `ObjM__ForwardToSubChild` (the sibling-unit helper from `class_3bb8c_m`, matched by
   echo round 15) is called TWICE in source -- once at the end of the
   `ret==0`+switch path, once for the `ret!=0` path -- not once after a
   shared if/else. This was itself a finding: see "the two-call lever" below.
@@ -171,7 +171,7 @@ not force from any source variant tried.
 ## What was tried (12+ distinct builds)
 
 1. **If/else with a single shared call at the end** (`arg1 = local18` /
-   `arg1 = 0` merging into one `func_80053EB4(...)` call) -- 66/71 total
+   `arg1 = 0` merging into one `ObjM__ForwardToSubChild(...)` call) -- 66/71 total
    function length (5 words SHORT). GCC CSE'd the `ret==0` and `ret!=0`
    paths' call setup (`a0=self`, `sp[0x10]=1`, `a2=0`) into one shared tail,
    which retail does NOT do -- retail duplicates that setup once per path,

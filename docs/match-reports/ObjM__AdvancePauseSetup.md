@@ -1,4 +1,6 @@
-# func_800542D0
+# ObjM__AdvancePauseSetup
+
+> Renamed from `func_800542D0` on 2026-09-23 (tools/rename.py). Address 0x800542d0.
 
 **Unit:** class_3bb8c_m · **Size:** 75 instructions · **Status:** MATCHED (75/75 words)
 
@@ -7,7 +9,7 @@
 Establishes `ObjM::unk74` (`void *`, forwarded opaquely to
 `New_Obj6EAC0`'s `ctx` argument) and `ObjM::unk7C` (`FieldM7C *`, first
 WRITTEN here from `New_Obj6EAC0`'s return, then dispatched in
-`func_800543FC`). Also the first function in this unit to call the
+`ObjM__TeardownPauseOverlay`). Also the first function in this unit to call the
 already-matched-elsewhere `New_Obj6EAC0` (`src/code_2cc8c_f.c`,
 established there with return type `Unk64Elem *` -- this unit keeps its
 own independent local return type `FieldM7C *` for the same external
@@ -19,7 +21,7 @@ external is independent and does not touch the other unit's bytes).
 A small state machine gated on `self->unk80`:
 
 ```c
-void func_800542D0(ObjM *self) {
+void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->unk80;
     if (state == 0) {
         self->unk7C = New_Obj6EAC0(self->unk74, 5, &D_8008AB44[0]);
@@ -96,7 +98,7 @@ verbatim, which also scores 0 -- this report's idiomatic version splits
 it into `self->unk80 = state + 1; return;` for clarity, verified to
 score identically.
 
-Nothing in this unit calls `func_800542D0` (still uncalled within
+Nothing in this unit calls `ObjM__AdvancePauseSetup` (still uncalled within
 `class_3bb8c_m`), so there is no caller evidence either way about the
 return type -- the toolchain fact above (only `void` reproduces the
 byte sequence) IS the evidence.

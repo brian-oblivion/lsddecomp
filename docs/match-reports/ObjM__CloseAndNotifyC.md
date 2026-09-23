@@ -1,14 +1,16 @@
-# func_8005426C
+# ObjM__CloseAndNotifyC
+
+> Renamed from `func_8005426C` on 2026-09-23 (tools/rename.py). Address 0x8005426c.
 
 **Unit:** class_3bb8c_m · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
 
 ## What this function does
 
-Same shape as `func_80054208` (this round), differing only in the literal
+Same shape as `ObjM__CloseAndNotifyD` (this round), differing only in the literal
 passed to `slot30` (`0xC` here vs `0xD` there):
 
 ```c
-void func_8005426C(ObjM *self) {
+void ObjM__CloseAndNotifyC(ObjM *self) {
     if (self->unk84) {
         self->methods->slotD4(self);
         self->methods->slot30(self, 0xC);
@@ -18,7 +20,7 @@ void func_8005426C(ObjM *self) {
 
 ## Residue
 
-None — matched on the first attempt, by copying `func_80054208`'s already-
+None — matched on the first attempt, by copying `ObjM__CloseAndNotifyD`'s already-
 confirmed shape and changing the one literal (per DECOMPILATION_LEARNINGS'
 "when a function closely resembles an already-matched sibling, copy its
 exact idiom before deriving anything").

@@ -1,4 +1,6 @@
-# func_80054120
+# ObjM__CheckAuxTrigger
+
+> Renamed from `func_80054120` on 2026-09-23 (tools/rename.py). Address 0x80054120.
 
 **Unit:** class_3bb8c_m · **Size:** 43 instructions · **Status:** MATCHED (43/43 words)
 
@@ -15,7 +17,7 @@ from this call site's own register setup.
 ## What this function does
 
 ```c
-s32 func_80054120(ObjM *self) {
+s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
     ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);

@@ -1,4 +1,6 @@
-# func_80053D18
+# ObjM__EnterState7
+
+> Renamed from `func_80053D18` on 2026-09-23 (tools/rename.py). Address 0x80053d18.
 
 **Unit:** class_3bb8c_m · **Size:** 33 instructions · **Status:** MATCHED (33/33 words)
 
@@ -19,23 +21,23 @@ vtable; this function reaches two of its slots (`0xF0`, `0xFC`).
 
 Sets `self`'s mode/state field to 7, asks `self->unk3C` to resolve some
 value into a stack out-param via slot `0xF0`, forwards that value into the
-unit's shared helper `func_80053EB4` (matched this round, see its own
+unit's shared helper `ObjM__ForwardToSubChild` (matched this round, see its own
 report) along with fixed literals `(0, 5, 1)`, then tells `self->unk3C` to
 do something with no arguments via slot `0xFC`.
 
 ## The C
 
 ```c
-void func_80053D18(ObjM *self) {
+void ObjM__EnterState7(ObjM *self) {
     s32 val;
     self->unk20 = 7;
     self->unk3C->methods->slotF0(self->unk3C, &val, -1);
-    func_80053EB4(self, val, 0, 5, 1);
+    ObjM__ForwardToSubChild(self, val, 0, 5, 1);
     self->unk3C->methods->slotFC(self->unk3C);
 }
 ```
 
-`func_80053EB4` is defined later in this same file (ROM order), so a local
+`ObjM__ForwardToSubChild` is defined later in this same file (ROM order), so a local
 forward `extern` prototype is added at the top of `class_3bb8c_m.c` ahead
 of this function's definition (calling a not-yet-defined-in-this-TU
 function is fine per DECOMPILATION_LEARNINGS' "Calling into a function

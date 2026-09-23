@@ -42,7 +42,7 @@
 
 /*
  * class_3bb8c_k's own view of the class whose method table is D_80087034
- * (func_800544D4's return value) -- a DIFFERENT class from Class86F88
+ * (GetObjMMethods's return value) -- a DIFFERENT class from Class86F88
  * above, and a DIFFERENT (disjoint-slot) view from class_3bb8c_l's own
  * Obj87034_3bb8c_l/Obj87034Methods_3bb8c_l (see include/class_3bb8c.h):
  * that unit reaches slots 0x004/0x010/0x014/0x048/0x074/0x07C/0x080/0x084/
@@ -477,7 +477,7 @@ Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
 
     self = func_80017B34(0x88);
     if (self != NULL) {
-        methods = func_800544D4();
+        methods = GetObjMMethods();
         methods->ctor(self, a0, a1, a2, a3, a4);
         return self;
     }
@@ -487,7 +487,7 @@ Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
 void func_80052C10(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
     GetClass86668Methods()->ctor((Obj865C8 *)self, 0, arg1);
-    self->methods = func_800544D4();
+    self->methods = GetObjMMethods();
     self->unk64 = 0;
     self->unk68 = 0;
     self->unk60 = 1;

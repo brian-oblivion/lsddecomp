@@ -1,4 +1,6 @@
-# func_80053E84
+# ObjM__NotifyParentsCodeB
+
+> Renamed from `func_80053E84` on 2026-09-23 (tools/rename.py). Address 0x80053e84.
 
 **Unit:** class_3bb8c_m · **Size:** 12 instructions · **Status:** MATCHED (12/12 words)
 
@@ -11,13 +13,13 @@ directly throughout rather than being saved to `$s0`.
 ## The C
 
 ```c
-void func_80053E84(ObjM *self) {
+void ObjM__NotifyParentsCodeB(ObjM *self) {
     self->methods->slot30(self, 0xB);
 }
 ```
 
 This establishes `ObjMMethods::slot30(ObjM*, s32)`, later reused by
-`func_80053F84`, `func_80054208` and `func_8005426C` (this round, same
+`ObjM__HandleEvent5Or6`, `ObjM__CloseAndNotifyD` and `ObjM__CloseAndNotifyC` (this round, same
 slot, different literal arguments each time).
 
 ## Residue

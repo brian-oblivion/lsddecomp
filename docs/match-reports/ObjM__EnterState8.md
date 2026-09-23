@@ -1,19 +1,21 @@
-# func_80053D9C
+# ObjM__EnterState8
+
+> Renamed from `func_80053D9C` on 2026-09-23 (tools/rename.py). Address 0x80053d9c.
 
 **Unit:** class_3bb8c_m · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
 
 ## What this function does
 
-Sets `self->unk20` (the same mode/state field `func_80053D18` writes) to 8,
-calls the shared helper `func_80053EB4(self, 0, 0, 6, 1)`, then tells
+Sets `self->unk20` (the same mode/state field `ObjM__EnterState7` writes) to 8,
+calls the shared helper `ObjM__ForwardToSubChild(self, 0, 0, 6, 1)`, then tells
 `self->unk3C` (via vtable slot `0xF4`) to run with argument 1.
 
 ## The C
 
 ```c
-void func_80053D9C(ObjM *self) {
+void ObjM__EnterState8(ObjM *self) {
     self->unk20 = 8;
-    func_80053EB4(self, 0, 0, 6, 1);
+    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
     self->unk3C->methods->slotF4(self->unk3C, 1);
 }
 ```

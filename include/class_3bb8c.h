@@ -2091,40 +2091,40 @@ typedef struct FieldM50Methods FieldM50Methods;
 typedef struct FieldM7C FieldM7C;
 typedef struct FieldM7CMethods FieldM7CMethods;
 
-/* self->unk3C's target (func_80053D18/func_80053D9C/func_80053E00/
- * func_80053F84/func_80054120). Rich vtable; only the slots this unit's
+/* self->unk3C's target (ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/
+ * ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger). Rich vtable; only the slots this unit's
  * functions actually dispatch are typed. */
 struct FieldM3CMethods {
     u8 pad000[0x0F0];
-    void (*slotF0)(FieldM3C *self, s32 *out, s32 arg2); /* +0x0F0, func_80053D18: writes *out */
-    void (*slotF4)(FieldM3C *self, s32 arg1);           /* +0x0F4, func_80053D9C/func_80053E00/func_80053F84 */
+    void (*slotF0)(FieldM3C *self, s32 *out, s32 arg2); /* +0x0F0, ObjM__EnterState7: writes *out */
+    void (*slotF4)(FieldM3C *self, s32 arg1);           /* +0x0F4, ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6 */
     u8 pad0F8[0x0FC - 0x0F8];
-    void (*slotFC)(FieldM3C *self);                     /* +0x0FC, func_80053D18 */
+    void (*slotFC)(FieldM3C *self);                     /* +0x0FC, ObjM__EnterState7 */
     u8 pad100[0x13C - 0x100];
-    void (*slot13C)(FieldM3C *self, s32 arg1);          /* +0x13C, func_80053E00 */
+    void (*slot13C)(FieldM3C *self, s32 arg1);          /* +0x13C, ObjM__EnterStateA */
     u8 pad140[0x17C - 0x140];
-    void (*slot17C)(FieldM3C *self, s32 arg1);          /* +0x17C, func_80053F84 */
+    void (*slot17C)(FieldM3C *self, s32 arg1);          /* +0x17C, ObjM__HandleEvent5Or6 */
     u8 pad180[0x1A0 - 0x180];
-    void *(*slot1A0)(FieldM3C *self, s32 arg1);         /* +0x1A0, func_80054120 (return discarded there) */
+    void *(*slot1A0)(FieldM3C *self, s32 arg1);         /* +0x1A0, ObjM__CheckAuxTrigger (return discarded there) */
 };
 struct FieldM3C {
     FieldM3CMethods *methods;   /* +0x000 */
 };
 
-/* self->unk18's target (func_80053EB4/func_80053F84). */
+/* self->unk18's target (ObjM__ForwardToSubChild/ObjM__HandleEvent5Or6). */
 struct FieldM18Methods {
     u8 pad000[0x064];
-    void (*slot64)(FieldM18 *self, s32 arg1);   /* +0x064, func_80053F84 */
+    void (*slot64)(FieldM18 *self, s32 arg1);   /* +0x064, ObjM__HandleEvent5Or6 */
     u8 pad068[0x0AC - 0x068];
-    ChildM_AC *(*slotAC)(FieldM18 *self);       /* +0x0AC, func_80053EB4 */
+    ChildM_AC *(*slotAC)(FieldM18 *self);       /* +0x0AC, ObjM__ForwardToSubChild */
     u8 pad0B0[0x0B4 - 0x0B0];
-    void (*slotB4)(FieldM18 *self, s32 arg1);   /* +0x0B4, func_800543FC (not this round's target) */
+    void (*slotB4)(FieldM18 *self, s32 arg1);   /* +0x0B4, ObjM__TeardownPauseOverlay (not this round's target) */
 };
 struct FieldM18 {
     FieldM18Methods *methods;   /* +0x000 */
 };
 
-/* Returned by FieldM18Methods::slotAC (func_80053EB4). */
+/* Returned by FieldM18Methods::slotAC (ObjM__ForwardToSubChild). */
 struct ChildM_ACMethods {
     u8 pad000[0x0D0];
     void (*slotD0)(ChildM_AC *self, s32 arg1);                      /* +0x0D0 */
@@ -2135,44 +2135,44 @@ struct ChildM_AC {
     ChildM_ACMethods *methods;  /* +0x000 */
 };
 
-/* self->unk14's target (func_80054120). */
+/* self->unk14's target (ObjM__CheckAuxTrigger). */
 struct FieldM14Methods {
     u8 pad000[0x114];
-    ChildM114 *(*slot114)(FieldM14 *self, s32 *out);  /* +0x114, func_80054120 */
+    ChildM114 *(*slot114)(FieldM14 *self, s32 *out);  /* +0x114, ObjM__CheckAuxTrigger */
 };
 struct FieldM14 {
     FieldM14Methods *methods;   /* +0x000 */
 };
 
-/* Returned by FieldM14Methods::slot114 (func_80054120). */
+/* Returned by FieldM14Methods::slot114 (ObjM__CheckAuxTrigger). */
 struct SubM4Methods {
     u8 pad000[0x084];
-    void (*slot84)(SubM4 *self);  /* +0x084, func_80054120 */
+    void (*slot84)(SubM4 *self);  /* +0x084, ObjM__CheckAuxTrigger */
 };
 struct SubM4 {
     SubM4Methods *methods;      /* +0x000 */
     u8 pad004[0x034 - 0x004];
-    s32 unk34;                   /* +0x034, func_80054120 */
+    s32 unk34;                   /* +0x034, ObjM__CheckAuxTrigger */
 };
 struct ChildM114 {
     u8 pad0[0x004];
-    SubM4 *unk4;                 /* +0x004, func_80054120 */
+    SubM4 *unk4;                 /* +0x004, ObjM__CheckAuxTrigger */
     u8 pad8[0x014 - 0x008];
-    s32 unk14;                    /* +0x014, func_80054120: set from TryDreamAuxTrigger's return */
+    s32 unk14;                    /* +0x014, ObjM__CheckAuxTrigger: set from TryDreamAuxTrigger's return */
 };
 
-/* func_80053F84's own arg1 parameter -- dispatched via its own vtable
+/* ObjM__HandleEvent5Or6's own arg1 parameter -- dispatched via its own vtable
  * slot 0xE4. Independent of FieldM14 above (unrelated numeric slot
  * range, nothing ties the two together). */
 struct ParamMMethods {
     u8 pad000[0x0E4];
-    s32 (*slotE4)(ParamM *self);  /* +0x0E4, func_80053F84 */
+    s32 (*slotE4)(ParamM *self);  /* +0x0E4, ObjM__HandleEvent5Or6 */
 };
 struct ParamM {
     ParamMMethods *methods;      /* +0x000 */
 };
 
-/* Uncarved sibling (src/code_4cd08.c, still INCLUDE_ASM), func_80054120's
+/* Uncarved sibling (src/code_4cd08.c, still INCLUDE_ASM), ObjM__CheckAuxTrigger's
  * only external call. Typed purely from that call site's own register
  * setup: (value, out-pointer, opaque-object) -> s32, whose result is
  * stored into a ChildM114's unk14 and tested for zero. The third arg is
@@ -2181,34 +2181,34 @@ struct ParamM {
  * two together. */
 extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
 
-/* self->unk34's target (func_800543FC/func_800542D0). */
+/* self->unk34's target (ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup). */
 struct FieldM34Methods {
     u8 pad000[0x088];
-    void (*slot88)(FieldM34 *self);  /* +0x088, func_800542D0 */
-    void (*slot8C)(FieldM34 *self);  /* +0x08C, func_800543FC */
+    void (*slot88)(FieldM34 *self);  /* +0x088, ObjM__AdvancePauseSetup */
+    void (*slot8C)(FieldM34 *self);  /* +0x08C, ObjM__TeardownPauseOverlay */
 };
 struct FieldM34 {
     FieldM34Methods *methods;   /* +0x000 */
 };
 
-/* self->unk10/self->unk54's shared target (func_800543FC/func_800542D0).
+/* self->unk10/self->unk54's shared target (ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup).
  * Distinct from `Unk64Elem` (include/code_2cc8c.h) despite sharing slot
  * NUMBERS with it (0x4C/0x50): self->unk10's own slot4C call site here
- * (func_800542D0) sets up only ONE argument (self), which conflicts with
+ * (ObjM__AdvancePauseSetup) sets up only ONE argument (self), which conflicts with
  * `Unk64ElemMethods::slot4C`'s already-established 3-argument signature
  * (from that unit's own call sites) -- real counter-evidence against
  * unifying the two, per this project's established arity-conflict rule.
  * Kept as its own type. */
 struct FieldM50Methods {
     u8 pad000[0x04C];
-    void (*slot4C)(FieldM50 *self);  /* +0x04C, func_800542D0 */
-    void (*slot50)(FieldM50 *self);  /* +0x050, func_800543FC */
+    void (*slot4C)(FieldM50 *self);  /* +0x04C, ObjM__AdvancePauseSetup */
+    void (*slot50)(FieldM50 *self);  /* +0x050, ObjM__TeardownPauseOverlay */
 };
 struct FieldM50 {
     FieldM50Methods *methods;   /* +0x000 */
 };
 
-/* self->unk7C's target (func_800543FC/func_800542D0). Returned by
+/* self->unk7C's target (ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup). Returned by
  * New_Obj6EAC0, matched elsewhere (src/code_2cc8c_f.c) with return type
  * `Unk64Elem *` (include/code_2cc8c.h). This unit keeps its own
  * independent local view rather than including code_2cc8c.h, per the
@@ -2220,11 +2220,11 @@ struct FieldM50 {
  * code_2cc8c_f.c's already-matched bytes. */
 struct FieldM7CMethods {
     u8 pad000[0x004];
-    void (*slot4)(FieldM7C *self);                              /* +0x004, func_800543FC */
+    void (*slot4)(FieldM7C *self);                              /* +0x004, ObjM__TeardownPauseOverlay */
     u8 pad008[0x04C - 0x008];
-    void (*slot4C)(FieldM7C *self, FieldM14 *arg1, void *arg2); /* +0x04C, func_800542D0 */
+    void (*slot4C)(FieldM7C *self, FieldM14 *arg1, void *arg2); /* +0x04C, ObjM__AdvancePauseSetup */
     u8 pad050[0x0B8 - 0x050];
-    void (*slotB8)(FieldM7C *self, void *arg1);                  /* +0x0B8, func_800542D0 */
+    void (*slotB8)(FieldM7C *self, void *arg1);                  /* +0x0B8, ObjM__AdvancePauseSetup */
 };
 struct FieldM7C {
     FieldM7CMethods *methods;   /* +0x000 */
@@ -2235,56 +2235,56 @@ struct FieldM7C {
  * already-matched view of the same external symbol). */
 extern FieldM7C *New_Obj6EAC0(void *ctx, s32 len, char *name);
 
-/* func_800542D0's own literal arguments -- a "Pause" name string plus two
+/* ObjM__AdvancePauseSetup's own literal arguments -- a "Pause" name string plus two
  * small opaque blocks, all reached only by address (never dereferenced in
  * this unit). */
 extern char D_8008AB44[];   /* "Pause" (asm/data/7B008.sdata.s) */
 extern s32 D_8008AB38;      /* two-word opaque block, address-only here */
 extern s32 D_8008AB40;      /* one-word opaque block, address-only here */
 
-/* The self type for this unit's func_80053D18..func_8005426C cluster.
+/* The self type for this unit's ObjM__EnterState7..ObjM__CloseAndNotifyC cluster.
  * Only the slots/fields these functions actually reach are typed. */
 struct ObjMMethods {
     u8 pad000[0x010];
-    void (*slot10)(ObjM *self, ChildM_AC *arg1);  /* +0x010, func_80053EB4 */
-    void (*slot14)(ObjM *self, ParamM *arg1);     /* +0x014, func_80053F84 */
+    void (*slot10)(ObjM *self, ChildM_AC *arg1);  /* +0x010, ObjM__ForwardToSubChild */
+    void (*slot14)(ObjM *self, ParamM *arg1);     /* +0x014, ObjM__HandleEvent5Or6 */
     u8 pad018[0x030 - 0x018];
-    void (*slot30)(ObjM *self, s32 arg1);          /* +0x030, func_80053E84/func_80053F84/func_80054208/func_8005426C */
+    void (*slot30)(ObjM *self, s32 arg1);          /* +0x030, ObjM__NotifyParentsCodeB/ObjM__HandleEvent5Or6/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
     u8 pad034[0x0B8 - 0x034];
-    void (*slotB8)(ObjM *self);                     /* +0x0B8, func_800540E8 */
+    void (*slotB8)(ObjM *self);                     /* +0x0B8, ObjM__HandleEvent7 */
     u8 pad0BC[0x0D4 - 0x0BC];
-    void (*slotD4)(ObjM *self);                     /* +0x0D4, func_80054208/func_8005426C */
+    void (*slotD4)(ObjM *self);                     /* +0x0D4, ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
 };
 
 struct ObjM {
     ObjMMethods *methods;   /* +0x000 */
     u8 pad004[0x010 - 0x004];
-    /* RETYPED round 15b (func_800542D0/func_800543FC): was `s32 unk10`,
-     * established from func_80053EB4's OWN call site as a plain forwarded
-     * register value (never dereferenced there). func_800543FC/
-     * func_800542D0 dereference this same field's vtable directly, so it
-     * IS a pointer -- func_80053EB4 forwards it opaquely either way, and
+    /* RETYPED round 15b (ObjM__AdvancePauseSetup/ObjM__TeardownPauseOverlay): was `s32 unk10`,
+     * established from ObjM__ForwardToSubChild's OWN call site as a plain forwarded
+     * register value (never dereferenced there). ObjM__TeardownPauseOverlay/
+     * ObjM__AdvancePauseSetup dereference this same field's vtable directly, so it
+     * IS a pointer -- ObjM__ForwardToSubChild forwards it opaquely either way, and
      * a pointer-typed argument passed as a raw register value compiles to
      * the identical `lw`/`move` regardless of C-level pointer-vs-s32
      * typing (ABI-neutral retype, zero byte cost -- verified: full
      * rebuild stays whole-image green after this change). */
-    FieldM50 *unk10;         /* +0x010, func_80053EB4 (opaque forward)/func_800543FC/func_800542D0 */
-    FieldM14 *unk14;         /* +0x014, func_80054120 */
-    FieldM18 *unk18;         /* +0x018, func_80053EB4/func_80053F84 */
+    FieldM50 *unk10;         /* +0x010, ObjM__ForwardToSubChild (opaque forward)/ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup */
+    FieldM14 *unk14;         /* +0x014, ObjM__CheckAuxTrigger */
+    FieldM18 *unk18;         /* +0x018, ObjM__ForwardToSubChild/ObjM__HandleEvent5Or6 */
     u8 pad01C[0x020 - 0x01C];
-    s32 unk20;                /* +0x020, func_80053D18/func_80053D9C/func_80053E00/func_80053F84: a mode/state code */
+    s32 unk20;                /* +0x020, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6: a mode/state code */
     u8 pad024[0x034 - 0x024];
-    FieldM34 *unk34;          /* +0x034, func_800543FC/func_800542D0 */
+    FieldM34 *unk34;          /* +0x034, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup */
     u8 pad038[0x03C - 0x038];
-    FieldM3C *unk3C;          /* +0x03C, func_80053D18/func_80053D9C/func_80053E00/func_80053F84/func_80054120 */
+    FieldM3C *unk3C;          /* +0x03C, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger */
     u8 pad040[0x054 - 0x040];
-    FieldM50 *unk54;          /* +0x054, func_800543FC/func_800542D0 -- same type as unk10 above */
+    FieldM50 *unk54;          /* +0x054, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup -- same type as unk10 above */
     u8 pad058[0x074 - 0x058];
-    void *unk74;               /* +0x074, func_800542D0: forwarded opaquely to New_Obj6EAC0's ctx arg */
+    void *unk74;               /* +0x074, ObjM__AdvancePauseSetup: forwarded opaquely to New_Obj6EAC0's ctx arg */
     u8 pad078[0x07C - 0x078];
-    FieldM7C *unk7C;          /* +0x07C, func_800542D0 (written)/func_800543FC (dispatched) */
-    s32 unk80;                 /* +0x080, func_800541D4/func_800542D0 */
-    s32 unk84;                 /* +0x084, func_800541D4/func_80054200/func_80054208/func_8005426C */
+    FieldM7C *unk7C;          /* +0x07C, ObjM__AdvancePauseSetup (written)/ObjM__TeardownPauseOverlay (dispatched) */
+    s32 unk80;                 /* +0x080, ObjM__UpdateCloseReadyFlag/ObjM__AdvancePauseSetup */
+    s32 unk84;                 /* +0x084, ObjM__UpdateCloseReadyFlag/ObjM__ClearCloseReadyFlag/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
 };
 
 /* -------------------------------------------------------------------
@@ -2293,7 +2293,7 @@ struct ObjM {
  * Both units independently reached method table D_80087034, which is
  * exactly the collision runner delta anticipated when it suffixed its
  * type names. The proof is a cross-unit call, not a guess:
- * func_80053EB4 is DEFINED in class_3bb8c_m.c taking `ObjM *self` and
+ * ObjM__ForwardToSubChild is DEFINED in class_3bb8c_m.c taking `ObjM *self` and
  * CALLED from class_3bb8c_l.c (func_80053C94) passing its own
  * `Obj87034_3bb8c_l *self` as the same first argument.
  *
@@ -2516,7 +2516,7 @@ struct Obj87034_3bb8c_l {
     s32 unk60;                                 /* +0x060, func_800531CC: has-a-target gate, cleared after detaching */
     s32 unk64;                                  /* +0x064, func_800531CC: set to 1 */
     s32 unk68;                                   /* +0x068, func_800531CC/func_80053358/func_800533F0: zero-checked gate */
-    s32 unk6C;                                    /* +0x06C, func_80052F10: out-parameter address passed to func_800544E4, own type unknown */
+    s32 unk6C;                                    /* +0x06C, func_80052F10: out-parameter address passed to RegisterStyleConfig, own type unknown */
     u8 pad70[0x078 - 0x070];
     DreamSysObj_3bb8c_l *unk78;                    /* +0x078, func_80052F10: cached copy of self->unk18 */
     u8 pad7C[0x080 - 0x07C];
@@ -2928,13 +2928,13 @@ extern s32 D_8008AB0C;
  * dispatch (the element at the "new" index, after the increment/decrement). */
 extern s32 D_8008AB10;
 
-/* func_800544D4: a plain class-vtable getter (`lui`/`addiu`, no
+/* GetObjMMethods: a plain class-vtable getter (`lui`/`addiu`, no
  * `lw`/`sw`), returns `&D_80087034` verbatim. Confirmed a BasicClass-
  * derived vtable with `tools/classtable.py 0x80087034` (header word then
  * `BasicClass__func_17eb0` at +4, the class-framework fingerprint) --
  * nothing in this unit dereferences it, so it stays untyped beyond the
  * address itself, same convention as `D_80086904` above. */
 extern s32 D_80087034;
-extern void *func_800544D4(void);
+extern void *GetObjMMethods(void);
 
 #endif

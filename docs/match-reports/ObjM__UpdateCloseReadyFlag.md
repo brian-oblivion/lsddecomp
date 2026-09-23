@@ -1,4 +1,6 @@
-# func_800541D4
+# ObjM__UpdateCloseReadyFlag
+
+> Renamed from `func_800541D4` on 2026-09-23 (tools/rename.py). Address 0x800541d4.
 
 **Unit:** class_3bb8c_m · **Size:** 11 instructions · **Status:** MATCHED (11/11 words)
 
@@ -9,7 +11,7 @@ No frame at all — `self` is used directly via `$a0` throughout (no calls).
 `s32` fields, not vtable slots.
 
 ```c
-void func_800541D4(ObjM *self) {
+void ObjM__UpdateCloseReadyFlag(ObjM *self) {
     if (self->unk80 != 0 && self->unk20 == 0) {
         self->unk84 = 1;
     }

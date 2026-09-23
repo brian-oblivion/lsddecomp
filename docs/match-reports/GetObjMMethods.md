@@ -1,4 +1,6 @@
-# func_800544D4
+# GetObjMMethods
+
+> Renamed from `func_800544D4` on 2026-09-23 (tools/rename.py). Address 0x800544d4.
 
 **Unit:** class_3bb8c_m · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
@@ -12,7 +14,7 @@ this unit dereferences the returned table, so it stays untyped beyond the
 pointer itself.
 
 ```c
-void *func_800544D4(void) {
+void *GetObjMMethods(void) {
     return &D_80087034;
 }
 ```

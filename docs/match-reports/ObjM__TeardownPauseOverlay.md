@@ -1,24 +1,26 @@
-# func_800543FC
+# ObjM__TeardownPauseOverlay
+
+> Renamed from `func_800543FC` on 2026-09-23 (tools/rename.py). Address 0x800543fc.
 
 **Unit:** class_3bb8c_m · **Size:** 54 instructions · **Status:** MATCHED (54/54 words)
 
 ## Context
 
 Establishes three new `ObjM` fields and their target types: `unk34`
-(`FieldM34`, vtable slot `0x8C` here, `0x88` in `func_800542D0`), `unk54`
-(`FieldM50`, vtable slot `0x50` here, `0x4C` in `func_800542D0`), and
+(`FieldM34`, vtable slot `0x8C` here, `0x88` in `ObjM__AdvancePauseSetup`), `unk54`
+(`FieldM50`, vtable slot `0x50` here, `0x4C` in `ObjM__AdvancePauseSetup`), and
 `unk7C` (`FieldM7C`, vtable slot `0x4` here, `0x4C`/`0xB8` in
-`func_800542D0`).
+`ObjM__AdvancePauseSetup`).
 
 **One RETYPE of an existing field, flagged explicitly (per the shared-
 header rule):** `ObjM::unk10` was `s32` from round 15a's
-`func_80053EB4` (established there as a plain forwarded register value,
+`ObjM__ForwardToSubChild` (established there as a plain forwarded register value,
 never dereferenced). This function dereferences the SAME field's vtable
 directly (`self->unk10->methods->slot50(self->unk10)`), so it IS a
 pointer -- retyped to `FieldM50 *`. This is the established ABI-neutral
 retype pattern: a pointer value forwarded as a raw register argument
 compiles identically whether declared `s32` or a pointer type. Verified:
-full rebuild stays whole-image green, and `func_80053EB4` itself still
+full rebuild stays whole-image green, and `ObjM__ForwardToSubChild` itself still
 scores 52/52 unchanged.
 
 `FieldM50` is deliberately NOT unified with `include/code_2cc8c.h`'s
@@ -26,7 +28,7 @@ scores 52/52 unchanged.
 it (0x004/0x04C/0x0B8) -- see the `FieldM7C` comment in
 `include/class_3bb8c.h` for the reasoning (this unit keeps its own
 independent view per the multiple-independent-local-views convention,
-and `func_800542D0`'s own call to `self->unk10->methods->slot4C` sets up
+and `ObjM__AdvancePauseSetup`'s own call to `self->unk10->methods->slot4C` sets up
 only ONE argument, an arity conflict with `Unk64ElemMethods::slot4C`'s
 established 3-argument signature -- real counter-evidence against
 unifying `unk10`/`unk54`'s type with `Unk64Elem`).
@@ -34,7 +36,7 @@ unifying `unk10`/`unk54`'s type with `Unk64Elem`).
 ## What this function does
 
 ```c
-void func_800543FC(ObjM *self) {
+void ObjM__TeardownPauseOverlay(ObjM *self) {
     if (self->unk80 != 0) {
         self->unk7C->methods->slot4(self->unk7C);
     }
@@ -47,7 +49,7 @@ void func_800543FC(ObjM *self) {
 ```
 
 `self->unk18->methods->slotB4` confirms the slot round 15a's
-`FieldM18Methods` comment anticipated ("func_800543FC (not this round's
+`FieldM18Methods` comment anticipated ("ObjM__TeardownPauseOverlay (not this round's
 target)").
 
 ## Residue

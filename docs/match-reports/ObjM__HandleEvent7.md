@@ -1,4 +1,6 @@
-# func_800540E8
+# ObjM__HandleEvent7
+
+> Renamed from `func_800540E8` on 2026-09-23 (tools/rename.py). Address 0x800540e8.
 
 **Unit:** class_3bb8c_m · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
 
@@ -10,7 +12,7 @@
 ## The C
 
 ```c
-void func_800540E8(ObjM *self, s32 arg1, s32 arg2) {
+void ObjM__HandleEvent7(ObjM *self, s32 arg1, s32 arg2) {
     if (arg2 == 7) {
         self->methods->slotB8(self);
     }

@@ -1,4 +1,6 @@
-# func_80054558 -- MATCHED, round 44 (2026-09-15)
+# ApplyStyleConfig -- MATCHED, round 44 (2026-09-15)
+
+> Renamed from `func_80054558` on 2026-09-23 (tools/rename.py). Address 0x80054558.
 
 Unit `class_3bb8c_m`. **41/41 words, byte-exact.** Reopened (both `gp_rel`
 and `addiu_at` are resolved), never attempted before this round.
@@ -6,9 +8,9 @@ and `addiu_at` are resolved), never attempted before this round.
 ## What it does
 
 Looks up a "cfg" byte-array pointer for the current style index
-(`D_8008AC6C`, set by `func_800544E4`) in the 14-entry pointer table
+(`D_8008AC6C`, set by `RegisterStyleConfig`) in the 14-entry pointer table
 `D_800873EC`; if the slot is NULL, falls back to `func_80054758()` to
-produce one. Feeds `cfg` into the already-matched `func_800545FC(style,
+produce one. Feeds `cfg` into the already-matched `FillStyleFromConfig(style,
 cfg)` against the fixed global `D_80087424` (a `StyleM` instance, split by
 splat into two adjacent labels `D_80087424`/`D_80087430` purely because
 something else references the middle of it -- the object is one 0x20-byte
@@ -18,22 +20,22 @@ struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
 
 ```c
 struct StyleM;   /* forward tag; full definition stays where it already is,
-                  * right before func_800545FC further down this unit */
+                  * right before FillStyleFromConfig further down this unit */
 
 extern s32 D_80087424;
 extern s8 *D_800873EC[];
 extern s8 *func_80054758(void);
-extern void func_800545FC(struct StyleM *style, s8 *cfg);
+extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
 extern u8 D_800872C4[][3];
 extern const u8 *D_8008AB54;
 
-void *func_80054558(void) {
+void *ApplyStyleConfig(void) {
     s8 *cfg = D_800873EC[D_8008AC6C];
 
     if (cfg == 0) {
         cfg = func_80054758();
     }
-    func_800545FC((struct StyleM *) &D_80087424, cfg);
+    FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
     if (cfg[1] >= 4) {
         D_8008AB54 = D_800872C4[cfg[2]];
     }

@@ -1,11 +1,13 @@
-# func_80053EB4
+# ObjM__ForwardToSubChild
+
+> Renamed from `func_80053EB4` on 2026-09-23 (tools/rename.py). Address 0x80053eb4.
 
 **Unit:** class_3bb8c_m · **Size:** 52 instructions · **Status:** MATCHED (52/52 words)
 
 ## Context
 
-This is the shared helper called by `func_80053D18`, `func_80053D9C` and
-`func_80053E00` (all matched this round, see their own reports). Its
+This is the shared helper called by `ObjM__EnterState7`, `ObjM__EnterState8` and
+`ObjM__EnterStateA` (all matched this round, see their own reports). Its
 5th argument arrives on the stack in the standard o32 convention (caller
 reserves 0x10 bytes for `$a0`-`$a3`, so a 5th argument lands at
 `0x10($sp)` from the caller's own frame).
@@ -17,7 +19,7 @@ whose own vtable exposes `slotD0` and `slotD8`.
 ## What this function does
 
 ```c
-void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     ChildM_AC *obj = self->unk18->methods->slotAC(self->unk18);
     if (arg3 != 0) {
         obj->methods->slotD0(obj, arg3);

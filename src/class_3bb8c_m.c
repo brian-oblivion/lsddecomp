@@ -19,10 +19,10 @@
  * `--addiu-at`; docs/research/addiu-at-blocker.md) and screening for it now
  * INVENTS blockers, so the live screen is TWO greps -- `gp_rel` and
  * `nop_mflo_mfhi`. Current state:
- *   func_800544E4  was gp_rel            -- MATCHED round 44, 29/29.
- *   func_80054558  was gp_rel (+ addiu-$at) -- MATCHED round 44, 41/41.
- *   func_800545FC  was addiu-$at ONLY    -- NOT BLOCKED. MATCHED round 23, 25/25.
- *   func_80054660  was gp_rel            -- MATCHED round 44, 45/45.
+ *   RegisterStyleConfig  was gp_rel            -- MATCHED round 44, 29/29.
+ *   ApplyStyleConfig  was gp_rel (+ addiu-$at) -- MATCHED round 44, 41/41.
+ *   FillStyleFromConfig  was addiu-$at ONLY    -- NOT BLOCKED. MATCHED round 23, 25/25.
+ *   ApplyStyleDecorationIfSet  was gp_rel            -- MATCHED round 44, 45/45.
  * The old profile said "all four have stub reports; do not attempt them",
  * which was true when written and became a false blocker on one of the four
  * the moment `addiu_at` was fixed. Screen with `python3 tools/nearmiss.py`
@@ -36,35 +36,35 @@
 #include "class_3bb8c.h"
 
 /* Forward declaration: defined later in this same unit, but called by
- * func_80053D18/func_80053D9C/func_80053E00 above its own definition. */
-extern void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+ * ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA above its own definition. */
+extern void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
-void func_80053D18(ObjM *self) {
+void ObjM__EnterState7(ObjM *self) {
     s32 val;
     self->unk20 = 7;
     self->unk3C->methods->slotF0(self->unk3C, &val, -1);
-    func_80053EB4(self, val, 0, 5, 1);
+    ObjM__ForwardToSubChild(self, val, 0, 5, 1);
     self->unk3C->methods->slotFC(self->unk3C);
 }
 
-void func_80053D9C(ObjM *self) {
+void ObjM__EnterState8(ObjM *self) {
     self->unk20 = 8;
-    func_80053EB4(self, 0, 0, 6, 1);
+    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
     self->unk3C->methods->slotF4(self->unk3C, 1);
 }
 
-void func_80053E00(ObjM *self) {
+void ObjM__EnterStateA(ObjM *self) {
     self->unk20 = 0xA;
-    func_80053EB4(self, 0, 0, 6, 1);
+    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
     self->unk3C->methods->slot13C(self->unk3C, 2);
     self->unk3C->methods->slotF4(self->unk3C, 2);
 }
 
-void func_80053E84(ObjM *self) {
+void ObjM__NotifyParentsCodeB(ObjM *self) {
     self->methods->slot30(self, 0xB);
 }
 
-void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     ChildM_AC *obj = self->unk18->methods->slotAC(self->unk18);
     if (arg3 != 0) {
         obj->methods->slotD0(obj, arg3);
@@ -75,7 +75,7 @@ void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     obj->methods->slotD8(obj, self->unk10, arg1, arg2);
 }
 
-void func_80053F84(ObjM *self, ParamM *p1, s32 sel) {
+void ObjM__HandleEvent5Or6(ObjM *self, ParamM *p1, s32 sel) {
     s32 v;
     switch (sel) {
     case 5:
@@ -97,13 +97,13 @@ void func_80053F84(ObjM *self, ParamM *p1, s32 sel) {
     }
 }
 
-void func_800540E8(ObjM *self, s32 arg1, s32 arg2) {
+void ObjM__HandleEvent7(ObjM *self, s32 arg1, s32 arg2) {
     if (arg2 == 7) {
         self->methods->slotB8(self);
     }
 }
 
-s32 func_80054120(ObjM *self) {
+s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
     ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
@@ -120,31 +120,31 @@ s32 func_80054120(ObjM *self) {
 void func_800541CC(void) {
 }
 
-void func_800541D4(ObjM *self) {
+void ObjM__UpdateCloseReadyFlag(ObjM *self) {
     if (self->unk80 != 0 && self->unk20 == 0) {
         self->unk84 = 1;
     }
 }
 
-void func_80054200(ObjM *self) {
+void ObjM__ClearCloseReadyFlag(ObjM *self) {
     self->unk84 = 0;
 }
 
-void func_80054208(ObjM *self) {
+void ObjM__CloseAndNotifyD(ObjM *self) {
     if (self->unk84) {
         self->methods->slotD4(self);
         self->methods->slot30(self, 0xD);
     }
 }
 
-void func_8005426C(ObjM *self) {
+void ObjM__CloseAndNotifyC(ObjM *self) {
     if (self->unk84) {
         self->methods->slotD4(self);
         self->methods->slot30(self, 0xC);
     }
 }
 
-void func_800542D0(ObjM *self) {
+void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->unk80;
     if (state == 0) {
         self->unk7C = New_Obj6EAC0(self->unk74, 5, &D_8008AB44[0]);
@@ -163,7 +163,7 @@ void func_800542D0(ObjM *self) {
     self->unk34->methods->slot88(self->unk34);
 }
 
-void func_800543FC(ObjM *self) {
+void ObjM__TeardownPauseOverlay(ObjM *self) {
     if (self->unk80 != 0) {
         self->unk7C->methods->slot4(self->unk7C);
     }
@@ -174,7 +174,7 @@ void func_800543FC(ObjM *self) {
     self->unk80 = 0;
 }
 
-void *func_800544D4(void) {
+void *GetObjMMethods(void) {
     return &D_80087034;
 }
 
@@ -189,9 +189,9 @@ extern s32 D_8008AC7C;
 extern s32 D_8008AC80;
 extern s32 D_8008ACA0;
 
-extern void *func_80054558(void);
+extern void *ApplyStyleConfig(void);
 
-s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
+s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
     s32 i;
 
@@ -210,7 +210,7 @@ s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
             i--;
             p--;
         } while (i >= 0);
-        return func_80054558();
+        return ApplyStyleConfig();
     }
     return 0;
 }
@@ -218,24 +218,24 @@ s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
 extern s32 D_80087424;
 extern s8 *D_800873EC[];
 extern s8 *func_80054758(void);
-extern void func_800545FC(struct StyleM *style, s8 *cfg);
+extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
 extern u8 D_800872C4[][3];
 extern const u8 *D_8008AB54;
 
-void *func_80054558(void) {
+void *ApplyStyleConfig(void) {
     s8 *cfg = D_800873EC[D_8008AC6C];
 
     if (cfg == 0) {
         cfg = func_80054758();
     }
-    func_800545FC((struct StyleM *) &D_80087424, cfg);
+    FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
     if (cfg[1] >= 4) {
         D_8008AB54 = D_800872C4[cfg[2]];
     }
     return &D_80087424;
 }
 
-/* func_800545FC's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
+/* FillStyleFromConfig's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
  * are already established as unrelated object pointers by five other functions
  * in this unit (`FieldM14 *`/`FieldM18 *`), whereas this function writes a
  * colour-table POINTER to +0x018 and a plain sign-extended byte to +0x014. So
@@ -260,7 +260,7 @@ struct StyleM {
 extern u8 D_800872C4[][3];
 extern s32 D_8008730C[];
 
-void func_800545FC(struct StyleM *style, s8 *cfg) {
+void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
     style->unkC = D_800872C4[cfg[3]];
     style->unk18 = D_800872C4[cfg[2]];
     style->unk1C = D_8008730C[cfg[1]];
@@ -307,7 +307,7 @@ extern s32 D_8008AB60;
 extern s32 D_8008AB58;
 extern LocalM4D0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
 
-void func_80054660(void) {
+void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
     if (D_8008AB54 != 0) {

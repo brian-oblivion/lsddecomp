@@ -1,15 +1,17 @@
-# func_80054208
+# ObjM__CloseAndNotifyD
+
+> Renamed from `func_80054208` on 2026-09-23 (tools/rename.py). Address 0x80054208.
 
 **Unit:** class_3bb8c_m · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
 
 ## What this function does
 
-If `self->unk84` (the flag `func_800541D4`/`func_80054200` set/clear) is
+If `self->unk84` (the flag `ObjM__UpdateCloseReadyFlag`/`ObjM__ClearCloseReadyFlag` set/clear) is
 nonzero, dispatch `self->methods->slotD4(self)` then
 `self->methods->slot30(self, 0xD)`.
 
 ```c
-void func_80054208(ObjM *self) {
+void ObjM__CloseAndNotifyD(ObjM *self) {
     if (self->unk84) {
         self->methods->slotD4(self);
         self->methods->slot30(self, 0xD);
@@ -17,7 +19,7 @@ void func_80054208(ObjM *self) {
 }
 ```
 
-Nearly identical to `func_8005426C` (this round), differing only in the
+Nearly identical to `ObjM__CloseAndNotifyC` (this round), differing only in the
 literal passed to `slot30` (`0xD` here, `0xC` there).
 
 ## Residue
