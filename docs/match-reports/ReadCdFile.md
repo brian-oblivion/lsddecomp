@@ -1,4 +1,24 @@
-# ReadCdFile -- STALL (best: 8/56 words at length 57/56 [1 word long], structural / block-layout)
+# ReadCdFile -- STALL, NON_MATCHING body promoted round 72 (best: 8/56 words at length 57/56 [1 word long], structural / block-layout)
+
+> **ROUND 72 (2026-09-23), runner charlie -- NON_MATCHING body promoted.**
+> Per `docs/FINISHING-PLAN.md` track 1b: the "## Result" body (the one the
+> round-64 note says is kept current against the present struct field
+> names) is hand-derived across rounds 17/36/47/54 -- no permuter-found
+> edit is in it; round 47's permuter check (b) explicitly DECLINED the
+> search (insertions=5, deletions=4, reorderings=6, base score 1333), so
+> nothing from a search ever entered this body. Live-measured this round
+> under the current pinned maspsx flags (rounds 42/63) by making the body
+> live C in place of `INCLUDE_ASM` (with `OpenCdFile` held at `INCLUDE_ASM`
+> so the window isn't contaminated by that sibling stall's own drift) and
+> reading `funcdiff.py`: **8/56 raw word-match, length 57/56 words (one
+> word long)** -- `build/lsdde.map` confirms `NoOp4 - ReadCdFile = 0xE4` =
+> 57 words against retail's 56, identical to the figure already in this
+> report's title, so no title rewrite needed. Restored to the
+> `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif` shape (not left as
+> live C, since it is not byte-exact) with a comment carrying this score,
+> its residue class (block-placement + register-role rotation), and this
+> report. `./build-and-verify.sh` and `tools/check-nonmatching.sh` both
+> green afterward; verified build bytes unchanged.
 
 > Renamed from `func_80028A84` on 2026-09-21 (tools/rename.py). Address 0x80028a84.
 

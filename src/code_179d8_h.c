@@ -299,7 +299,47 @@ extern s32 CdReadSync(s32 arg0, s32 arg1);
  * statements -- identical compiled length and shape, no improvement.
  * Still genuinely stalled; restored to INCLUDE_ASM. The report carries the
  * corrected, linkable body. */
+/* NON_MATCHING body promoted, round 72 (charlie), per docs/FINISHING-PLAN.md
+ * track 1b. Hand-derived (round 17/36/47/54/64, no permuter-found edit --
+ * round 47's permuter check (b) declined the search: insertions=5,
+ * deletions=4, reorderings=6, base score 1333). Live-measured under current
+ * maspsx flags this round: 8/56 raw word-match, length 57/56 words (one
+ * word long, unchanged) -- docs/match-reports/ReadCdFile.md. */
+#ifdef NON_MATCHING
+s32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32 arg2) {
+    s32 hi;
+    s32 status;
+    char scratch[0x800];
+    char buf[0x10];
+
+    if (self->isOpen == 0) {
+        self->methods->onError(self);
+        return 0;
+    }
+    do {
+        CdControl(2, &self->pos, 0);
+        hi = (u32)arg2 >> 11;
+        do {
+            status = CdSync(0, buf);
+        } while (status == 0);
+        if (status == 5) {
+            continue;
+        }
+        if (hi == 0) {
+            return 0;
+        }
+        CdRead(hi, arg1, 0x80);
+        do {
+            status = CdReadSync(0, 0);
+        } while (status > 0);
+        if (status != -1) {
+            return 0;
+        }
+    } while (1);
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", ReadCdFile);
+#endif
 
 void NoOp4(void) {
 }
