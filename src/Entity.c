@@ -1,6 +1,6 @@
 /* The Entity class -- fully matched, no INCLUDE_ASM left (round 56 was a
  * track 3 naming pass, not matching work). This is the first 25 of a
- * 142-function block split at func_8005DE18; the rest (Entity_b through
+ * 142-function block split at Entity__UpdateTargetProximity; the rest (Entity_b through
  * Entity_g, all sharing include/Entity.h) hold the mood-dispatch handler
  * tables and the per-frame behaviour those handlers run.
  *
@@ -350,7 +350,7 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
     if (this->active != 0) {
         row = &gEntityMoodTable[this->moodIndex];
         doDetach = 0;
-        func_8005DF9C(this, 0);
+        Entity__NotifyIfTargetInRange(this, 0);
         if (row->linkKind != 0 && row->linkKind != 3) {
             if (row->linkKind >= 10) {
                 scaled = this->unk24;

@@ -1,4 +1,6 @@
-# func_8005DEE0
+# Entity__UpdateSoundCueStart
+
+> Renamed from `func_8005DEE0` on 2026-09-23 (tools/rename.py). Address 0x8005dee0.
 
 **Unit:** Entity_b · **Size:** 47 words · **Status:** MATCHED (47/47 words,
 whole-image build verified byte-exact)
@@ -15,14 +17,14 @@ from `row->unkB` (absolute value), calls `Entity__IsNearTarget(this,
 `this->methods->slot168(this)` if that returned non-zero. Always returns
 `this->unkF8`.
 
-Same overall shape as its sibling `func_8005DE18`, but note `row->unkB` is a
-genuinely SEPARATE `EntityMoodRow` field from `func_8005DE18`'s `row->unk6` —
+Same overall shape as its sibling `Entity__UpdateTargetProximity`, but note `row->unkB` is a
+genuinely SEPARATE `EntityMoodRow` field from `Entity__UpdateTargetProximity`'s `row->unk6` —
 different offset (`+0xB` vs `+0x6`), not the same byte reinterpreted.
 
 ## Final C
 
 ```c
-s32 func_8005DEE0(Entity *this) {
+s32 Entity__UpdateSoundCueStart(Entity *this) {
     EntityMoodRow *row;
     s32 *xptr;
     s32 dist;
@@ -46,7 +48,7 @@ s32 func_8005DEE0(Entity *this) {
 
 ## Attempt log
 
-Written immediately after `func_8005DE18` established the shape; needed the
+Written immediately after `Entity__UpdateTargetProximity` established the shape; needed the
 exact same two fixes carried over directly:
 
 1. The `s32`-not-`s8` retype of `Entity__IsNearTarget`'s parameters
@@ -60,7 +62,7 @@ applying both.
 
 ## Proposed learning
 
-See `func_8005DE18`'s report for the two levers (`Entity__IsNearTarget`'s real
+See `Entity__UpdateTargetProximity`'s report for the two levers (`Entity__IsNearTarget`'s real
 parameter width, and the "eager pointer into its own local, in statement
 order" scheduling lever) — both generalized cleanly to this sibling with zero
 adaptation needed.

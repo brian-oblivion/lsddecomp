@@ -1,4 +1,6 @@
-# func_8005E02C
+# Entity__IsTargetInRange
+
+> Renamed from `func_8005E02C` on 2026-09-23 (tools/rename.py). Address 0x8005e02c.
 
 **Unit:** Entity_b · **Size:** 33 words · **Status:** MATCHED (33/33 words,
 whole-image build verified byte-exact). Superseded a prior STALL
@@ -25,7 +27,7 @@ this one) for why it is nonetheless NOT another `Entity`, and for the
 ## Final C
 
 ```c
-s32 func_8005E02C(Entity *this, s32 arg1) {
+s32 Entity__IsTargetInRange(Entity *this, s32 arg1) {
     Unk94Obj *other;
     s32 oy, ty;
 
@@ -94,10 +96,10 @@ slot of a LATER, unrelated branch, i.e. after the call already returned).
 Per this unit's own `docs/DECOMPILATION_LEARNINGS.md` rule ("a value in an
 argument register live at the next call IS an argument"), that is direct
 proof `slot144` takes a second argument at `func_8005EA94`'s call site.
-`func_8005E02C`'s OWN call site (same slot, same table) shows a plain `nop`
+`Entity__IsTargetInRange`'s OWN call site (same slot, same table) shows a plain `nop`
 in the delay slot with no fresh `$a1` load — which looked like a
 CONTRADICTION (the same function pointer can't have two arities) until
-re-reading `func_8005E02C`'s own preceding code: `this->unk94` is loaded
+re-reading `Entity__IsTargetInRange`'s own preceding code: `this->unk94` is loaded
 into `$a1` at the TOP of the function and NOTHING overwrites it before the
 `slot144` call — so `$a1` already holds the right value, and no fresh load
 instruction is needed. The "plain nop" wasn't evidence of a 1-argument call;

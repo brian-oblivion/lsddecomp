@@ -496,7 +496,7 @@ void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
 
 void func_80061778(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0) {
-        if (func_8005E02C(this, 0x800) != 0) {
+        if (Entity__IsTargetInRange(this, 0x800) != 0) {
             this->unk44 = 0xB;
             Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
             Class6B5CC__FaceTarget(this->target, this, 1, 1, 0);

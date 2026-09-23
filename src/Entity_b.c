@@ -16,7 +16,7 @@ extern u8 D_80089DA8[];
 extern u8 D_80089CE8[];
 extern u8 D_80089CF4[];
 
-s32 func_8005DE18(Entity *this) {
+s32 Entity__UpdateTargetProximity(Entity *this) {
     EntityMoodRow *row;
     s32 *xptr;
     s32 dist;
@@ -40,7 +40,7 @@ s32 func_8005DE18(Entity *this) {
     return this->unkF4;
 }
 
-s32 func_8005DEE0(Entity *this) {
+s32 Entity__UpdateSoundCueStart(Entity *this) {
     EntityMoodRow *row;
     s32 *xptr;
     s32 dist;
@@ -64,19 +64,19 @@ s32 func_8005DEE0(Entity *this) {
 /* Defined immediately after this function in ROM order, in this same unit;
  * declared here rather than in include/Entity.h, which seven units share. Its
  * return value is tested (`beqz` straight off the `jal`), so it is not void. */
-extern s32 func_8005E02C(Entity *this, s32 arg1);
+extern s32 Entity__IsTargetInRange(Entity *this, s32 arg1);
 
 /* arg1 is unused here; the canonical declaration in include/Entity.h has it
  * and func_8005DABC passes 0. Do not drop it -- `conflicting types`. */
-void func_8005DF9C(Entity *this, s32 arg1) {
+void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
     if (gEntityLinkStageTable[this->moodIndex * 0x10] < 0 &&
         gEntityEventVideoTable[this->moodIndex * 0x10] != 0 &&
-        func_8005E02C(this, gEntityEventVideoTable[this->moodIndex * 0x10] << 9)) {
+        Entity__IsTargetInRange(this, gEntityEventVideoTable[this->moodIndex * 0x10] << 9)) {
         this->methods->notifyParents(this, 0xA);
     }
 }
 
-s32 func_8005E02C(Entity *this, s32 arg1) {
+s32 Entity__IsTargetInRange(Entity *this, s32 arg1) {
     Unk94Obj *other;
     s32 oy, ty;
 
@@ -97,7 +97,7 @@ fail:
     return 0;
 }
 
-s32 func_8005E0B0(Entity *this) {
+s32 Entity__UpdateSoundCueStop(Entity *this) {
     EntityMoodRow *row;
     s32 *xptr;
     s32 dist;

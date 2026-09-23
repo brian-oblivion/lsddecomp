@@ -4,7 +4,7 @@
 #include "common.h"
 
 /* The Entity class. `src/Entity.c` is the first 25 of a 142-function block
- * split at func_8005DE18; the remainder is Entity_b, still a monolithic asm
+ * split at Entity__UpdateTargetProximity; the remainder is Entity_b, still a monolithic asm
  * segment. Its own vtable is fetched via `Get_vtable_Entity` (still asm,
  * address 0x8005E150, per config/symbols.slps01556.lsdde.txt -- New_Entity's
  * disassembly calls it directly by name, `jal Get_vtable_Entity`, the same
@@ -60,7 +60,7 @@ struct EntityMethods {
     /* +0x04 */ void *unk04;
     /* +0x08 */ void *(*ctor)(Entity *self, void *arg0, void *arg1, void *arg2); /* New_Entity's call */
     /* +0x0C */ u8 pad0C[0x30 - 0x0C];
-    /* +0x30 */ void (*notifyParents)(Entity *self, s32 arg1);   /* called by Entity__SetUnkF4, func_8005DF9C */
+    /* +0x30 */ void (*notifyParents)(Entity *self, s32 arg1);   /* called by Entity__SetUnkF4, Entity__NotifyIfTargetInRange */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
     /* +0x40 */ void (*initState)(Entity *self);              /* self-only slot: occupant is Entity__InitState (tools/classtable.py), called by Entity__Entity right after this->methods is (re)assigned */
     /* +0x44 */ void (*slot44)(Entity *self, s32 arg1, void *arg2); /* called by func_8005E4D0 as slot44(this, 0, D_80089CA0) */
@@ -87,18 +87,18 @@ struct EntityMethods {
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by Entity__StopSoundCue, func_800603C4 */
     /* +0x134 */ s32 (*slot134)(Entity *self, s32 arg1, s32 arg2); /* called by func_80063ED4 and func_80064078 (both Entity_f) in an identical loop, `this->unk88 = slot134(this, this->unk88, 0)` while `this->unk84++ < 0x18` -- value-returning, not void */
     /* +0x138 */ u8 pad138[0x144 - 0x138];
-    /* +0x144 */ s32 (*slot144)(Entity *self, Unk94Obj *arg1); /* called by func_8005E02C, as slot144(this, this->target) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->target in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
+    /* +0x144 */ s32 (*slot144)(Entity *self, Unk94Obj *arg1); /* called by Entity__IsTargetInRange, as slot144(this, this->target) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->target in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
     /* +0x148 */ s32 (*getProximityRatio)(Entity *self);            /* called by func_8005E480; holds Entity__GetProximityRatio (this unit, MATCHED round 44) */
     /* +0x14C */ u8 pad14C[0x15C - 0x14C];
     /* +0x15C */ void (*activate)(Entity *self);            /* self-only slot: occupant is Entity__Activate (tools/classtable.py -- a self-referential vtable dispatch, same idiom initState/slot60/etc. use throughout this table). Called by Entity__AttachUnk4C (unconditionally once its two per-mood skip-flag gates pass) and by Entity__UpdateActivationState (when its detachKind-derived condition fires) */
     /* +0x160 */ void (*deactivate)(Entity *self);             /* CROSS-UNIT (Entity_c/d/e/f/g also dispatch through this slot -- see docs/match-reports/Entity__Deactivate.md's Proposed field names) -- occupant is Entity__Deactivate, same self-referential idiom as slot15C above. Called by Entity__DetachUnk4C, Entity__NotifyReset, Entity__UpdateDeactivationState */
-    /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by Entity__Deactivate and func_8005DE18 (as slot164(self, 1)) */
-    /* +0x168 */ void (*startSoundCue)(Entity *self);               /* called by func_8005DEE0 */
-    /* +0x16C */ void (*stopSoundCue)(Entity *self);                /* called by Entity__Deactivate, func_8005E0B0, func_80062A40 (Entity_e) */
+    /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by Entity__Deactivate and Entity__UpdateTargetProximity (as slot164(self, 1)) */
+    /* +0x168 */ void (*startSoundCue)(Entity *self);               /* called by Entity__UpdateSoundCueStart */
+    /* +0x16C */ void (*stopSoundCue)(Entity *self);                /* called by Entity__Deactivate, Entity__UpdateSoundCueStop, func_80062A40 (Entity_e) */
     /* +0x170 */ s32 (*activationState)(Entity *self);                  /* self-only slot: occupant is Entity__UpdateActivationState, called by Entity__Update as `if (this->methods->activationState(this) != 0) ...` */
     /* +0x174 */ s32 (*deactivationState)(Entity *self);                  /* self-only slot: occupant is Entity__UpdateDeactivationState, which returns s32 (`this->unkF0`) -- retyped from `void` to `s32` to match (CLAUDE.md: a discarded return, which is all Entity__Update does with it, is never evidence of void). Retype re-verified byte-exact; this slot has no other caller to perturb. Called by Entity__Update */
-    /* +0x178 */ s32 (*slot178)(Entity *self);                    /* called by Entity__Update; holds func_8005DE18, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
-    /* +0x17C */ s32 (*slot17C)(Entity *self);                     /* called by Entity__Update; holds func_8005DEE0, which ends `return this->unkF8;` */
+    /* +0x178 */ s32 (*slot178)(Entity *self);                    /* called by Entity__Update; holds Entity__UpdateTargetProximity, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
+    /* +0x17C */ s32 (*slot17C)(Entity *self);                     /* called by Entity__Update; holds Entity__UpdateSoundCueStart, which ends `return this->unkF8;` */
     /* +0x180 */ void (*slot180)(Entity *self);                     /* called by Entity__Update */
 };
 
@@ -189,7 +189,7 @@ struct Unk94Methods {
 struct Unk94Obj {
     Unk94Methods *methods; /* +0x00 */
     u8 pad04[0x14 - 0x04];
-    EntityPos *unk14;        /* +0x14, read by func_8005E02C (its own +0x1C, i.e. y) */
+    EntityPos *unk14;        /* +0x14, read by Entity__IsTargetInRange (its own +0x1C, i.e. y) */
     u8 pad18[0x5C - 0x18];
     Unk5CObj *unk5C;          /* +0x5C, dereferenced through its OWN vtable (see Unk5CObj's own comment) by func_80062730 (Entity_e) -- yet another instance of the class-framework object-pointer-at-a-field convention, same shape as Entity::unk4C/Entity::unk100 */
 };
@@ -250,7 +250,7 @@ extern s32 gEntityDefaultOffset[2];
 
 /* A 3-word (x, y, z) position, pointed to by `Entity::unk14` (and by
  * `Unk94Obj::unk14`, same convention). +0x1C (y) is now confirmed by a
- * direct reader: func_8005E02C's own disassembly compares `this->unk14->y`
+ * direct reader: Entity__IsTargetInRange's own disassembly compares `this->unk14->y`
  * against `this->target->unk14->y` +/- 0x200 (that function itself stalled
  * on a register-identity residue, see its match report, but this field
  * derivation is unaffected). It is also inferred from Entity__IsNearTarget
@@ -260,7 +260,7 @@ extern s32 gEntityDefaultOffset[2];
 struct EntityPos {
     u8 pad00[0x18];
     s32 x; /* +0x18 */
-    s32 y; /* +0x1C, read by func_8005E02C */
+    s32 y; /* +0x1C, read by Entity__IsTargetInRange */
     s32 z; /* +0x20 */
 };
 
@@ -315,7 +315,7 @@ struct Entity {
     /* +0x88 */ s32 unk88;             /* func_80063ED4/func_80064078 (Entity_f): threaded through the slot134 loop as its own running arg1/return value */
     /* +0x8C */ u8 pad8C[0x90 - 0x8C];
     /* +0x90 */ s32 unk90;             /* func_80062C58 (Entity_e): nonzero gates `out->unk1C = 0x1C` when `out->unk4 & 3` is also 0 */
-    /* +0x94 */ Unk94Obj *target;         /* passed as Class6B5CC__FaceTarget's (still INCLUDE_ASM, code_d294.s) second argument by func_8005DE18/func_8005E3C4; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
+    /* +0x94 */ Unk94Obj *target;         /* passed as Class6B5CC__FaceTarget's (still INCLUDE_ASM, code_d294.s) second argument by Entity__UpdateTargetProximity/func_8005E3C4; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
     /* +0x98 */ s32 moodIndex;         /* selects a 16-byte row in the D_80089EAxx tables */
     /* +0x9C */ s32 soundCueSet;             /* zeroed by Entity__Entity; address-taken by Entity__TickSoundCue/Entity__StopSoundCue */
     /* +0xA0 */ u8 padA0[0xB0 - 0xA0];
@@ -341,18 +341,18 @@ extern void func_80017CFC(void *arg);
  * this unit; its param shape is read directly off that disassembly: a0 is
  * `this` (dereferences ->0x98/->0x94, both known Entity fields), a1 points
  * at a 3-word vector copied onto its own stack. a2/a3 are `s32`, NOT `s8`:
- * every known caller (Entity__UpdateDeactivationState, func_8005DE18, func_8005DEE0) happens
+ * every known caller (Entity__UpdateDeactivationState, Entity__UpdateTargetProximity, Entity__UpdateSoundCueStart) happens
  * to pass a byte-range value, but Entity__IsNearTarget's own body (dividing 0x800
  * by a3 and shifting the quotient by 11) treats them as full words with no
  * narrowing on entry, and declaring them `s8` forces a spurious sign-extend
  * at any call site whose argument is already a full-width computed `s32`
- * (found via func_8005DE18's own residue -- see its match report).
+ * (found via Entity__UpdateTargetProximity's own residue -- see its match report).
  * func_8002CD08/FlushSoundCueSet's return values are unused at both call
  * sites, so void is a safe read regardless of the real return type. */
 extern void func_8002CD08(s32 arg0, void *arg1);
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 extern s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3);
-extern void func_8005DF9C(Entity *this, s32 arg1);
+extern void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1);
 extern s32 rand(void);
 
 /* The mood-indexed table lookups. `gEntityMoodTable` is a real struct array (16
@@ -373,11 +373,11 @@ struct EntityMoodRow {
     s8 detachKind;   /* +0x03, read by Entity__UpdateActivationState */
     u8 linkKind;      /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
     s8 unk5;           /* +0x05 */
-    s8 unk6;            /* +0x06, read by func_8005DE18: sign selects whether Class6B5CC__FaceTarget also fires, magnitude (after abs) is Entity__IsNearTarget's distance arg */
+    s8 unk6;            /* +0x06, read by Entity__UpdateTargetProximity: sign selects whether Class6B5CC__FaceTarget also fires, magnitude (after abs) is Entity__IsNearTarget's distance arg */
     u8 pad07[0x02];
-    s8 unk9;              /* +0x09, distance-fixup byte shared by func_8005DE18/func_8005DEE0/func_8005E0B0 */
+    s8 unk9;              /* +0x09, distance-fixup byte shared by Entity__UpdateTargetProximity/Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop */
     u8 pad0A[0x01];
-    s8 unkB;                /* +0x0B, read by func_8005DEE0/func_8005E0B0 -- SEPARATE field from unk6, not the same byte reread (different functions, different offsets) */
+    s8 unkB;                /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop -- SEPARATE field from unk6, not the same byte reread (different functions, different offsets) */
     u8 pad0C[0x04];
 };
 
@@ -399,7 +399,7 @@ s32 Entity__GetLinkStage(Entity *this);
  * extern of the right TYPE is needed here, the bytes stay splat-generated. */
 extern EntityMethods ENTITY_METHODS;
 
-/* Still uncarved (code_d294.s). func_8005DE18 calls it with this->target as
+/* Still uncarved (code_d294.s). Entity__UpdateTargetProximity calls it with this->target as
  * the second argument, a literal 1 as the third, and 0 for both the fourth
  * argument and a fifth argument passed on the stack; the callee itself
  * dereferences that second argument at +0xC/+0x14, confirming it is a
@@ -411,7 +411,7 @@ extern void Class6B5CC__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3,
 /* Already matched in Entity_b.c (not INCLUDE_ASM), but not previously called
  * from outside that unit -- func_80061778 (Entity_d) is its first cross-unit
  * caller. */
-extern s32 func_8005E02C(Entity *this, s32 arg1);
+extern s32 Entity__IsTargetInRange(Entity *this, s32 arg1);
 
 /* Second argument threaded through the moodIndex-selected event-dispatch
  * handlers (func_8005ED10, func_8005E480, func_8005E7A8, and the sibling

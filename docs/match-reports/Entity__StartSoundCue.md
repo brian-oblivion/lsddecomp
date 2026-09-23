@@ -56,7 +56,7 @@ just being one of its handler bodies. Declared a minimal
 `EntityMoodHandlerRow` (only the first word named) directly in `Entity.c`,
 not `Entity.h` -- the only field this function needs is the handler pointer,
 treated opaquely (passed straight through to `InitSoundCueSet` as a `void *`,
-never called here). Whoever carves `func_8005DE18` (the actual table
+never called here). Whoever carves `Entity__UpdateTargetProximity` (the actual table
 dispatcher, still in the uncarved `Entity_b`) should check whether this
 minimal row type is enough or needs the data words added, and should
 probably promote it to `Entity.h` at that point since it would then have
@@ -90,7 +90,7 @@ sets `this->unkF8 = 1`. Pairs with `Entity__StopSoundCue`.
   than applied.
 - `EntityMethods::slot168` -> `startSoundCue` -- **tier B.** `tools/
   classtable.py` resolves +0x168 to this very function (self-referential
-  dispatch). CROSS-UNIT: called by `func_8005DEE0` (Entity_b.c), whose own
+  dispatch). CROSS-UNIT: called by `Entity__UpdateSoundCueStart` (Entity_b.c), whose own
   gate (`this->unkF8 == 0`, i.e. sound cue not yet active) is exactly
   consistent with "start the sound cue when a proximity condition fires."
   Proposed rather than applied.

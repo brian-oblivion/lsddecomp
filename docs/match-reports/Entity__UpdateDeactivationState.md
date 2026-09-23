@@ -10,7 +10,7 @@
 
 Gated by `this->unkF0` (set by `Entity__Activate`, cleared by `Entity__Deactivate`):
 looks up this entity's mood row (`gEntityMoodTable[this->moodIndex]`), calls
-`func_8005DF9C(this, 0)` (still-uncarved, in `Entity_b` — see "Proposed
+`Entity__NotifyIfTargetInRange(this, 0)` (still-uncarved, in `Entity_b` — see "Proposed
 learning" below for the second argument), then decides whether to detach
 based on `row->linkKind`:
 
@@ -37,7 +37,7 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
     if (this->unkF0 != 0) {
         row = &gEntityMoodTable[this->moodIndex];
         doDetach = 0;
-        func_8005DF9C(this, 0);
+        Entity__NotifyIfTargetInRange(this, 0);
         if (row->linkKind != 0 && row->linkKind != 3) {
             if (row->linkKind >= 10) {
                 scaled = this->unk24;
@@ -93,11 +93,11 @@ report). Three separate residues, closed one at a time:
    instruction never moved no matter how `doDetach`/`row` were reshaped —
    retail's very first branch (`beqz $v0,SKIP` on `this->unkF0`) fills its
    delay slot with `move $a1,zero`, and `$a1` is never overwritten before
-   the next `jal` (`func_8005DF9C`). Tracing forward per the lever's test:
+   the next `jal` (`Entity__NotifyIfTargetInRange`). Tracing forward per the lever's test:
    `$a1` is live into that call, so it's an ARGUMENT, not scheduler filler —
-   even though `func_8005DF9C`'s own body immediately overwrites its
+   even though `Entity__NotifyIfTargetInRange`'s own body immediately overwrites its
    incoming `$a1` with `sll $a1,$v0,4` and so provably never reads the
-   caller's value. Changing the call to `func_8005DF9C(this, 0)` (and its
+   caller's value. Changing the call to `Entity__NotifyIfTargetInRange(this, 0)` (and its
    extern prototype to take the unused second `s32` parameter) closed the
    very last word.
 
@@ -107,11 +107,11 @@ report). Three separate residues, closed one at a time:
 argument-register test (trace forward from a suspicious load/const-set to
 the next `jal`; if the register is `$a0`-`$a3` and nothing overwrites it
 first, it's an argument) caught a real case here — but the callee
-(`func_8005DF9C`) *does not use* the parameter internally at all (it's
+(`Entity__NotifyIfTargetInRange`) *does not use* the parameter internally at all (it's
 clobbered as scratch before any read). A function can have a dead parameter
 that's still part of its real signature and must still be passed by every
 caller; "the callee doesn't seem to read it" is not evidence the caller
-doesn't pass it. Anyone carving `func_8005DF9C` out of `Entity_b` should
+doesn't pass it. Anyone carving `Entity__NotifyIfTargetInRange` out of `Entity_b` should
 give it a real 2-parameter signature (`Entity *this, s32 arg1`) even though
 `arg1` looks unused in its body — other call sites may rely on side effects
 this one doesn't need, or it may simply be dead in the source too.

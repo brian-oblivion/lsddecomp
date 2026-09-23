@@ -1,4 +1,6 @@
-# func_8005DE18
+# Entity__UpdateTargetProximity
+
+> Renamed from `func_8005DE18` on 2026-09-23 (tools/rename.py). Address 0x8005de18.
 
 **Unit:** Entity_b · **Size:** 50 words · **Status:** MATCHED (50/50 words,
 whole-image build verified byte-exact)
@@ -24,7 +26,7 @@ never evidence of `void` (see CLAUDE.md); the disassembly's own final
 ## Final C
 
 ```c
-s32 func_8005DE18(Entity *this) {
+s32 Entity__UpdateTargetProximity(Entity *this) {
     EntityMoodRow *row;
     s32 *xptr;
     s32 dist;
@@ -52,7 +54,7 @@ s32 func_8005DE18(Entity *this) {
 ## Attempt log
 
 This was the first function tackled this round, and it (plus its immediate
-sibling `func_8005DEE0`) surfaced three reusable residues:
+sibling `Entity__UpdateSoundCueStart`) surfaced three reusable residues:
 
 1. **`row` must be computed OUTSIDE the `if (this->unkF0 != 0)` guard.**
    Retail computes `&gEntityMoodTable[this->moodIndex]` unconditionally, right at
