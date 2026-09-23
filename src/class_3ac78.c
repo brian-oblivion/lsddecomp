@@ -23,9 +23,9 @@
  * its own independent view of the same object (Obj866E8 / Elem /
  * GridSlot866E8 in include/class_3bb8c.h).
  *
- * Class866E8__DispatchToRectCells is a documented stall and stays
- * INCLUDE_ASM (Class866E8__SetFootprintRect and Class866E8__ResetAllElements
- * were matched in round 71). func_8004B324 keeps its placeholder name
+ * Every function in the unit is matched C; the last three stalls
+ * (Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
+ * Class866E8__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
  * deliberately -- it is an empty vtable stub with no established purpose, the
  * same case as func_8001D33C in code_d294_b.
  */
@@ -469,12 +469,10 @@ void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 s
 
 extern void NotifyGridCell(Class866E8 *cell, UnkListObj_3ac78 *sender, s32 command);
 
-/* STALL, round 2026-09-02 (runner delta); re-verified round 19 (echo):
- * best reached 95/117, see docs/match-reports/Class866E8__DispatchToRectCells.md for the
- * preserved near-miss body and the residue analysis (a single
- * instruction-scheduling swap at the inner loop's tail -- correct
- * branch/register shape everywhere else). */
-#if 0
+/* Notify every cell of every rectangle, and every object chained behind
+ * each cell. Matched round 71: the ORDER of the comma-separated increments
+ * is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the
+ * reverse order was the whole 95/117 residue. */
 void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender, s32 command)
 {
     s32 i;
@@ -486,12 +484,12 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender,
     Class866E8 *obj;
 
     entry = self->rects.e;
-    for (i = 0; i < self->rectCount; i++, entry++) {
+    for (i = 0; i < self->rectCount; entry++, i++) {
         slot = &self->elems[entry->elemIdx];
         if (slot->target->unk2C != 0) {
             cell = (slot->cells + entry->col) + entry->row * 20;
             for (row = 0; row < entry->height; row++) {
-                for (col = 0; col < entry->width; col++, cell++) {
+                for (col = 0; col < entry->width; cell++, col++) {
                     self->curCellTag = self->cellTag;
                     self->curCellCol = entry->col + col;
                     self->curCellRow = entry->row + row;
@@ -505,9 +503,6 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender,
         }
     }
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", Class866E8__DispatchToRectCells);
 
 /* Widened this round (Class866E8__DispatchToRectCells) from a single-param signature to
  * accept two more, unused, forwarded params: Class866E8__DispatchToRectCells's own call

@@ -1,4 +1,59 @@
-# Class866E8__DispatchToRectCells
+# Class866E8__DispatchToRectCells — MATCHED round 71 (charlie): 117/117, byte-exact, whole-image SHA1 green
+
+REVISITED, round 71: MATCHED (3 builds); names/types not relevant (the
+fix was the order of loop increments; no field, type or name changed).
+
+## Round 71 (charlie) — the match
+
+**Rebuilt as given first.** The preserved body rebuilt at **95/117,
+insertions 3 / deletions 3, 21 positional skeleton diffs**, correct length.
+Both the score and the "instruction-scheduling residue" class were
+accurate; what nobody had tried is that the residue was the ORDER of the
+comma-separated `for` increments, which GCC 2.6.3 emits in source order and
+which the scheduler then cannot fully undo.
+
+Controlled, one change per build:
+
+| build | change | result |
+| --- | --- | --- |
+| 1 | preserved body as given | 95/117, ins/del 3/3 |
+| 2 | outer `i++, entry++` -> `entry++, i++` | outer tail exact; ins/del 1/1 (one extra `nop` in the inner tail, which drifts the rest of the function, hence a raw 74/117) |
+| 3 | inner `col++, cell++` -> `cell++, col++` | **117/117, 0/0, whole image green** |
+
+Also measured: moving `cell++` to the END of the inner body (after the
+chain walk) instead of the increment clause is ALSO byte-exact. The live
+source uses the increment-clause spelling because it matches the outer
+loop's.
+
+What the two orders do to the asm:
+
+- **Outer:** with `entry++` first, the spilled `entry` (`0x10($sp)`) is
+  reloaded on the fall-through path BEFORE the join label and incremented
+  first; `i++` follows the `rectCount` load and `s2 += 0xC` lands in the
+  delay slot. With `i++` first, the reload sits after the label and the
+  store lands in the delay slot.
+- **Inner:** with `cell++` first, the `lh width` reload is scheduled ahead
+  of `addiu s1, s1, 1` and fills its own load delay; with `col++` first
+  the load follows the increment and costs a `nop`.
+
+The matched C is the live definition in `src/class_3ac78.c`.
+
+### Proposed learning
+
+The order of comma-separated expressions in a `for` increment clause is a
+scheduling lever in GCC 2.6.3: the increments are emitted in source order,
+and when one of them is a spilled pointer or feeds a reload of the loop
+bound, the scheduler does not reorder it back. A residue of "one
+increment on the wrong side of a load / label" at a loop tail should try
+swapping the clause's order before any permuter run. (Round 19's permuter
+ran 140k+ iterations on a sibling without finding this; a permuter mutates
+expressions, and may not reorder a comma expression.)
+
+---
+
+## Historical record (superseded by the match above)
+
+### (old title) Class866E8__DispatchToRectCells
 
 > Renamed from `func_8004B100` on 2026-09-22 (tools/rename.py). Address 0x8004b100.
 

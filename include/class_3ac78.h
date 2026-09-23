@@ -88,7 +88,7 @@ struct UnkSlotEntry_3ac78 {
  *    recognizing the shape is what caught the stale trailing-padding
  *    guess here.
  * Renamed accordingly (`unk0`->`elemIdx`, `unk4`->`col`, `unk6`->`row`,
- * `unk8`->`width`, `unkA`->`height`); `Class866E8__SetFootprintRect.md`'s STALL report
+ * `unk8`->`width`, `unkA`->`height`); `Class866E8__SetFootprintRect.md`'s historical (pre-round-71) STALL record
  * keeps its OLD field names in its preserved best-attempt body (per this
  * project's "preserved code, not doctrine" policy) with a note pointing
  * here.
