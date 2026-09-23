@@ -78,22 +78,22 @@ void func_80061E60(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0xA, 0);
 }
 
-extern u8 D_80089DD8[];
-extern u8 D_80089C88[];
-extern u8 D_80089C94[];
+extern u8 SCALE_HALF[];
+extern u8 ROTATION_YAW_PLUS90[];
+extern u8 ROTATION_YAW_MINUS90[];
 
 void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->methods->slot48(this, 1, D_80089DD8);
+            this->methods->slot48(this, 1, SCALE_HALF);
             this->methods->slotCC(this, -0x12C, 0);
-            this->methods->slot44(this, 1, D_80089C88);
+            this->methods->slot44(this, 1, ROTATION_YAW_PLUS90);
             this->unk44 = 0xB;
         }
     }
     if (this->unk44 == 0xB) {
         if (this->moodTimer == 0x7D0) {
-            this->methods->slot44(this, 0, D_80089C94);
+            this->methods->slot44(this, 0, ROTATION_YAW_MINUS90);
         }
         this->methods->slotC4(this, -0x14, 0);
     }
@@ -219,12 +219,12 @@ void func_80062570(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x1E, 0);
 }
 
-extern u8 D_80089C88[];
+extern u8 ROTATION_YAW_PLUS90[];
 
 void func_80062660(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (out->unk4 == 0) {
-        this->target->methods->slot44(this->target, 1, D_80089C88);
+        this->target->methods->slot44(this->target, 1, ROTATION_YAW_PLUS90);
         this->target->methods->slot130(this->target, 1);
         out->unk1C = 0x19;
         out->unk30 = 0x19;
@@ -318,16 +318,16 @@ void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0) {
         if (this->moodTimer == 0x3C || this->moodTimer == 0xD4 || this->moodTimer == 0x122 || this->moodTimer == 0x140) {
-            this->methods->slot44(this, 0, D_80089C88);
+            this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);
         }
         if (this->moodTimer == 0x18E) {
-            this->methods->slot44(this, 0, D_80089C94);
+            this->methods->slot44(this, 0, ROTATION_YAW_MINUS90);
         }
         this->methods->slotD0(this, -0x32, 0);
         return;
     }
     if (this->moodTimer == 0x3C || this->moodTimer == 0x8C) {
-        this->methods->slot44(this, 0, D_80089C88);
+        this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);
     }
     if (this->moodTimer < 0xAE) {
         this->methods->slotD0(this, -0x32, 0);
@@ -412,7 +412,7 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 
-extern u8 D_80089CA0[];
+extern u8 ROTATION_YAW_PLUS2[];
 
 void func_80062FAC(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
@@ -420,7 +420,7 @@ void func_80062FAC(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0x19;
         out->unk20 = 2;
     }
-    this->methods->slot44(this, 0, D_80089CA0);
+    this->methods->slot44(this, 0, ROTATION_YAW_PLUS2);
     if (this->unk44 == 0 && this->unkF4 != 0) {
         this->methods->notifyParents(this, 0xB);
         this->unk44 = 0xB;

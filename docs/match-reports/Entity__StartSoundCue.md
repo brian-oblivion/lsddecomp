@@ -50,13 +50,13 @@ different unit).
 
 `gEntityMoodHandlerTable` is the mood-index-selected event-dispatch table (16-byte rows:
 handler fn ptr + 3 data words) already referenced by name in several match
-reports for `Entity_b`'s handler functions (e.g. `func_8005E480`), but this
+reports for `Entity_b`'s handler functions (e.g. `Entity__MoodCue05`), but this
 is the first place any unit indexes the RAW TABLE itself in C rather than
 just being one of its handler bodies. Declared a minimal
 `EntityMoodHandlerRow` (only the first word named) directly in `Entity.c`,
 not `Entity.h` -- the only field this function needs is the handler pointer,
 treated opaquely (passed straight through to `InitSoundCueSet` as a `void *`,
-never called here). Whoever carves `func_8005DE18` (the actual table
+never called here). Whoever carves `Entity__UpdateTargetProximity` (the actual table
 dispatcher, still in the uncarved `Entity_b`) should check whether this
 minimal row type is enough or needs the data words added, and should
 probably promote it to `Entity.h` at that point since it would then have
@@ -90,7 +90,7 @@ sets `this->unkF8 = 1`. Pairs with `Entity__StopSoundCue`.
   than applied.
 - `EntityMethods::slot168` -> `startSoundCue` -- **tier B.** `tools/
   classtable.py` resolves +0x168 to this very function (self-referential
-  dispatch). CROSS-UNIT: called by `func_8005DEE0` (Entity_b.c), whose own
+  dispatch). CROSS-UNIT: called by `Entity__UpdateSoundCueStart` (Entity_b.c), whose own
   gate (`this->unkF8 == 0`, i.e. sound cue not yet active) is exactly
   consistent with "start the sound cue when a proximity condition fires."
   Proposed rather than applied.

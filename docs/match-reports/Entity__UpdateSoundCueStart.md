@@ -1,4 +1,6 @@
-# func_8005DEE0
+# Entity__UpdateSoundCueStart
+
+> Renamed from `func_8005DEE0` on 2026-09-23 (tools/rename.py). Address 0x8005dee0.
 
 **Unit:** Entity_b · **Size:** 47 words · **Status:** MATCHED (47/47 words,
 whole-image build verified byte-exact)
@@ -15,14 +17,14 @@ from `row->unkB` (absolute value), calls `Entity__IsNearTarget(this,
 `this->methods->slot168(this)` if that returned non-zero. Always returns
 `this->unkF8`.
 
-Same overall shape as its sibling `func_8005DE18`, but note `row->unkB` is a
-genuinely SEPARATE `EntityMoodRow` field from `func_8005DE18`'s `row->unk6` —
+Same overall shape as its sibling `Entity__UpdateTargetProximity`, but note `row->unkB` is a
+genuinely SEPARATE `EntityMoodRow` field from `Entity__UpdateTargetProximity`'s `row->unk6` —
 different offset (`+0xB` vs `+0x6`), not the same byte reinterpreted.
 
 ## Final C
 
 ```c
-s32 func_8005DEE0(Entity *this) {
+s32 Entity__UpdateSoundCueStart(Entity *this) {
     EntityMoodRow *row;
     s32 *xptr;
     s32 dist;
@@ -46,7 +48,7 @@ s32 func_8005DEE0(Entity *this) {
 
 ## Attempt log
 
-Written immediately after `func_8005DE18` established the shape; needed the
+Written immediately after `Entity__UpdateTargetProximity` established the shape; needed the
 exact same two fixes carried over directly:
 
 1. The `s32`-not-`s8` retype of `Entity__IsNearTarget`'s parameters
@@ -60,7 +62,21 @@ applying both.
 
 ## Proposed learning
 
-See `func_8005DE18`'s report for the two levers (`Entity__IsNearTarget`'s real
+See `Entity__UpdateTargetProximity`'s report for the two levers (`Entity__IsNearTarget`'s real
 parameter width, and the "eager pointer into its own local, in statement
 order" scheduling lever) — both generalized cleanly to this sibling with zero
 adaptation needed.
+
+## Naming
+
+`Entity__UpdateSoundCueStart` -- tier A (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005DEE0`.
+
+ENTITY_METHODS +0x17C; `Entity__Update` calls it every tick and runs slot +0x180 (`Entity__UpdateSoundCueStop`) when it returns non-zero. The body does exactly what the name says: while `active`, no cue running (`soundCueActive == 0`) and `unk44 != 1`, if the row's `cueRange` is non-zero and the target is within `|cueRange|` (`Entity__IsNearTarget`), it calls `startSoundCue` (+0x168, `Entity__StartSoundCue`). It returns `soundCueActive`. It is the start half of a pair, like `Entity__UpdateActivationState`/`DeactivationState` at +0x170/+0x174.
+
+Also renamed here: `EntityMoodRow::unkB` -> `cueRange` (compiler-checked: only this function and `Entity__UpdateSoundCueStop` access it).
+
+## Proposed field names
+
+| member | proposed | tier | evidence |
+| --- | --- | --- | --- |
+| `EntityMethods::slot17C` (+0x17C) | `updateSoundCueStart` | A | occupant is this function; only accessor is Entity__Update (Entity.c), so it is cross-unit |

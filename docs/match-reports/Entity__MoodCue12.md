@@ -1,4 +1,6 @@
-# func_8005EA94
+# Entity__MoodCue12
+
+> Renamed from `func_8005EA94` on 2026-09-23 (tools/rename.py). Address 0x8005ea94.
 
 **Unit:** Entity_b · **Size:** 72 words · **Status:** MATCHED (72/72 words,
 whole-image build verified byte-exact)
@@ -7,7 +9,7 @@ whole-image build verified byte-exact)
 
 `(Entity *this) -> void`. A state-machine step for `this->unk44` (the same
 small state code this unit's mood-dispatch handlers write literals into —
-see `func_8005EBB4.md`):
+see `Entity__MoodCue13.md`):
 
 1. If `this->unkFC == 0` and a coin flip (`rand() & 1 == 0`) lands, sets
    `this->unk44 = 0xB`.
@@ -41,10 +43,10 @@ struct Unk4CObj {
 };
 ```
 
-## `EntityMethods::slot144` — the retyping that unblocked BOTH this function and `func_8005E02C`
+## `EntityMethods::slot144` — the retyping that unblocked BOTH this function and `Entity__IsTargetInRange`
 
 This function's OWN call to `slot144` is what settled a stall from the
-previous round (see `func_8005E02C.md`, now matched). Retail sets `$a1`
+previous round (see `Entity__IsTargetInRange.md`, now matched). Retail sets `$a1`
 explicitly right before the `jalr`:
 
 ```
@@ -57,16 +59,16 @@ jalr $v0
 
 — proof, per `docs/DECOMPILATION_LEARNINGS.md`'s "value in an argument
 register live at the next call IS an argument" rule, that `slot144` takes a
-second parameter. `func_8005E02C`'s own call to the SAME slot looked
+second parameter. `Entity__IsTargetInRange`'s own call to the SAME slot looked
 1-argument (a plain `nop` delay slot) only because that function already had
 `this->unk94` resident in `$a1` from earlier in its own body — no fresh load
-needed. Fixing the signature here is what let `func_8005E02C` finally match
+needed. Fixing the signature here is what let `Entity__IsTargetInRange` finally match
 too; see that report for the full account.
 
 ## Final C
 
 ```c
-void func_8005EA94(Entity *this) {
+void Entity__MoodCue12(Entity *this) {
     s32 y;
     s32 result;
     s32 oldFC;
@@ -101,12 +103,20 @@ void func_8005EA94(Entity *this) {
 
 Matched on the first attempt, once `Unk4CObj`/`Unk4CMethods` existed and
 `slot144` was retyped to two arguments (both landed in the same working
-session as this function, see `func_8005E02C.md`).
+session as this function, see `Entity__IsTargetInRange.md`).
 
 ## Proposed learning
 
-Already captured in full in `func_8005E02C.md`'s "Round 8" section: cross-
+Already captured in full in `Entity__IsTargetInRange.md`'s "Round 8" section: cross-
 check every caller of a shared vtable slot before accepting a 1-argument
 signature on the strength of one call site's unremarkable-looking bytes.
 This function was the SECOND caller that exposed the gap the first caller's
 own bytes couldn't.
+
+## Naming
+
+`Entity__MoodCue12` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005EA94`.
+
+`gEntityMoodHandlerTable` row 12. Body (takes only `this`): on moodTimer 0 a coin flip may set phase `unk44 = 0xB`. It faces the target while its own y is below 0x7D0. In phase 0xB, once `distanceToRegion` to the target is below 0xA00, it calls `unk4C`'s slot +0x138(1, 1), sets moodTimer to 1 and enters phase 0xC. In phase 0xC it advances moodTimer itself and calls `notifyParents(this, 0xC)` at 300.
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `func_8002CD08` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.

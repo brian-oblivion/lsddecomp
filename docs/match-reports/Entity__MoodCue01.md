@@ -1,4 +1,6 @@
-# func_8005E3C4
+# Entity__MoodCue01
+
+> Renamed from `func_8005E3C4` on 2026-09-23 (tools/rename.py). Address 0x8005e3c4.
 
 **Unit:** Entity_b · **Size:** 47 words · **Status:** MATCHED (47/47 words,
 whole-image build verified byte-exact)
@@ -6,7 +8,7 @@ whole-image build verified byte-exact)
 ## What it does
 
 One of this unit's `gEntityMoodHandlerTable` mood-dispatch handlers (same family as
-`func_8005E480`/`func_8005E7A8`/`func_8005ED10`), taking `(Entity *this,
+`Entity__MoodCue05`/`Entity__MoodCue10`/`Entity__MoodCue15`), taking `(Entity *this,
 EntityMoodHandlerArg *out)`. Unconditionally zeroes `out->unk10`, then — only
 when `out->unk4 == 0` — sets three `out` fields to `0x14` and fires a call
 through a SECOND, DIFFERENT object's vtable: `this->unk94->methods->slot130`,
@@ -26,7 +28,7 @@ broken that OTHER unit's already-matched function.
 ## New struct: `Unk94Obj`/`Unk94Methods` (`include/Entity.h`)
 
 `Entity::unk94` was previously `void *`, described only as "a pointer to SOME
-object, real type unconfirmed" (known from `func_8005DE18`'s call into the
+object, real type unconfirmed" (known from `Entity__UpdateTargetProximity`'s call into the
 still-uncarved `Class6B5CC__FaceTarget`, which dereferences it at `+0xC`/`+0x14`).
 This function's own disassembly resolves two more facts about it:
 
@@ -40,20 +42,20 @@ This function's own disassembly resolves two more facts about it:
 
 Since `Class6B5CC__FaceTarget`'s body dereferences this object at `+0xC` as a pointer,
 and `Entity::unk0C` (`this`'s OWN `+0xC`) is a plain `s32` flag, `unk94` is
-provably NOT another `Entity` — despite `func_8005E02C` (attempted the same
+provably NOT another `Entity` — despite `Entity__IsTargetInRange` (attempted the same
 round, see its stall report) also reading `+0x14` off it as an `EntityPos *`,
 the SAME convention `Entity::unk14` uses. Modeled as its own minimal type:
 
 ```c
 struct Unk94Methods {
     u8 pad000[0x130];
-    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
+    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by Entity__MoodCue01 */
 };
 
 struct Unk94Obj {
     Unk94Methods *methods; /* +0x00 */
     u8 pad04[0x14 - 0x04];
-    EntityPos *unk14;        /* +0x14, read by func_8005E02C */
+    EntityPos *unk14;        /* +0x14, read by Entity__IsTargetInRange */
 };
 ```
 
@@ -62,7 +64,7 @@ struct Unk94Obj {
 ## Final C
 
 ```c
-void func_8005E3C4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue01(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (out->unk4 == 0) {
         out->unk1C = 0x14;
@@ -102,3 +104,11 @@ through a field whose OWN class isn't pinned down, check whether the same
 offset is already spoken for on `this`'s own table — and if the two call
 sites disagree on arity, that is itself evidence they are different tables,
 not evidence one of them is wrong.
+
+## Naming
+
+`Entity__MoodCue01` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E3C4`.
+
+`gEntityMoodHandlerTable` row 1. Body: attenuation 0. On tick 0 it requests tone 0x14 on all three voices and calls the target's slot +0x130 with 1. Every tick it faces the target and moves -0x5A along local z. At moodTimer 30 it calls `notifyParents(this, 0xA)`.
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `func_8002CD08` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.

@@ -25,8 +25,8 @@ extern u8 D_80089DC0[];
 extern u8 D_80089E50[];
 extern u8 D_80089E38[];
 extern u8 D_80089C7C[];
-extern u8 D_80089C94[];
-extern u8 D_80089C88[];
+extern u8 ROTATION_YAW_MINUS90[];
+extern u8 ROTATION_YAW_PLUS90[];
 extern u8 D_80089E5C[];
 extern u8 D_80089D24[];
 
@@ -70,11 +70,11 @@ void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
         out->unk28 = 0x40;
     }
     if (this->moodTimer == 0xC8) {
-        table = D_80089C94;
+        table = ROTATION_YAW_MINUS90;
     } else if (this->moodTimer == 0x190) {
         table = D_80089C7C;
     } else if (this->moodTimer == 0x258) {
-        table = D_80089C88;
+        table = ROTATION_YAW_PLUS90;
     } else if (this->moodTimer == 0x320) {
         table = D_80089C7C;
         this->moodTimer = -1;
@@ -288,7 +288,7 @@ void func_80060B34(Entity *this, EntityMoodHandlerArg *out) {
                 methods94 = this->target->methods;
                 a1 = this->unk0C ? (u8 *)this->unk14 + 0x38 : NULL;
                 methods94->slotB8(this->target, a1);
-                this->target->methods->slot44(this->target, 1, D_80089C94);
+                this->target->methods->slot44(this->target, 1, ROTATION_YAW_MINUS90);
                 this->target->methods->slot130(this->target, 0);
                 this->moodTimer = 0;
                 this->unk44 = 0xB;
@@ -333,9 +333,9 @@ void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 8;
     }
     if (this->moodTimer == 0x5A) {
-        table = D_80089C94;
+        table = ROTATION_YAW_MINUS90;
     } else if (this->moodTimer == 0xA0) {
-        table = D_80089C88;
+        table = ROTATION_YAW_PLUS90;
     } else if (this->moodTimer == 0xDC) {
         if (rand() & 1) {
             table = D_80089C7C;
@@ -496,7 +496,7 @@ void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
 
 void func_80061778(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0) {
-        if (func_8005E02C(this, 0x800) != 0) {
+        if (Entity__IsTargetInRange(this, 0x800) != 0) {
             this->unk44 = 0xB;
             Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
             Class6B5CC__FaceTarget(this->target, this, 1, 1, 0);

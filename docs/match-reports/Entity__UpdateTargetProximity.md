@@ -1,4 +1,6 @@
-# func_8005DE18
+# Entity__UpdateTargetProximity
+
+> Renamed from `func_8005DE18` on 2026-09-23 (tools/rename.py). Address 0x8005de18.
 
 **Unit:** Entity_b · **Size:** 50 words · **Status:** MATCHED (50/50 words,
 whole-image build verified byte-exact)
@@ -24,7 +26,7 @@ never evidence of `void` (see CLAUDE.md); the disassembly's own final
 ## Final C
 
 ```c
-s32 func_8005DE18(Entity *this) {
+s32 Entity__UpdateTargetProximity(Entity *this) {
     EntityMoodRow *row;
     s32 *xptr;
     s32 dist;
@@ -52,7 +54,7 @@ s32 func_8005DE18(Entity *this) {
 ## Attempt log
 
 This was the first function tackled this round, and it (plus its immediate
-sibling `func_8005DEE0`) surfaced three reusable residues:
+sibling `Entity__UpdateSoundCueStart`) surfaced three reusable residues:
 
 1. **`row` must be computed OUTSIDE the `if (this->unkF0 != 0)` guard.**
    Retail computes `&gEntityMoodTable[this->moodIndex]` unconditionally, right at
@@ -103,3 +105,21 @@ than a loop-hoisted value: writing `&this->unk14->x` inline at the call site
 let the compiler treat the add-immediate as free to schedule anywhere before
 the call, while assigning it to a named local pinned it to the point of
 assignment.
+
+## Naming
+
+`Entity__UpdateTargetProximity` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005DE18`.
+
+ENTITY_METHODS +0x178 (`tools/classtable.py ENTITY_METHODS`); its one caller is `Entity__Update`, every tick. While `active`, and only while `unkF4` is still 0, it calls `Entity__IsNearTarget` with `|row->proximityRange|` and `row->unk9`; on a hit it calls slot +0x164 (occupant `Entity__SetUnkF4`) with 1, which notifies parents with 9 and latches `unkF4`. A negative `proximityRange` also makes the entity face its target (`Class6B5CC__FaceTarget`) every active tick. It returns `unkF4`. Tier B: what the code does is clear, what the `unkF4` latch means in the game is not.
+
+Also renamed here: `EntityMoodRow::unk6` -> `proximityRange` (compiler-checked: this function is its only accessor in the default and NON_MATCHING builds).
+
+## Proposed field names
+
+Cross-unit (the compiler lists accessors outside Entity_b), so these are proposals only:
+
+| member | proposed | tier | evidence |
+| --- | --- | --- | --- |
+| `EntityMethods::slot164` (+0x164) | `setUnkF4` | B | occupant `Entity__SetUnkF4` (Entity.c); accessors are Entity.c's Entity__Deactivate and this function |
+| `EntityMethods::slot178` (+0x178) | `updateTargetProximity` | B | occupant is this function; only accessor is Entity__Update (Entity.c) |
+| `Entity::unkF4` (+0xF4) | `targetReached` | B | latched to 1 by this function (via setUnkF4, which also notifies parents with 9) once the target is within proximityRange; cleared only by Entity__Deactivate (setUnkF4(0)); returned by this slot |

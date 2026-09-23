@@ -34,7 +34,7 @@ arg2, 6)` written left-to-right in C.
 -- per CLAUDE.md's own explicit warning about this exact slot.**
 `Entity.h`'s comment on `EntityMethods::slotC4` documents that retyping
 this SHARED slot to a non-`void` return breaks an ALREADY-MATCHED sibling
-function (`func_8005E160`, which relies on GCC tail-merging two identical
+function (`Entity__MoodCue00`, which relies on GCC tail-merging two identical
 `void`-typed `slotC4(this,0x32,0)` call sites reached from different
 branches -- a non-`void` return stops the merge and costs that function 4
 words). `DreamSys__ApplyOffsetSlotAndNotify` itself is declared `void` here purely as a local
@@ -49,7 +49,7 @@ since only its address is ever taken here, never its value.
 
 None -- a direct application of the already-documented `slotC4`-must-stay-
 `void` constraint to a NEW occupant of the same shared slot, confirming it
-generalizes past the two instances (`func_8005FA64`, `func_8005E160`)
+generalizes past the two instances (`func_8005FA64`, `Entity__MoodCue00`)
 `Entity.h` already names.
 
 ## Naming

@@ -1,4 +1,6 @@
-# func_8005E02C
+# Entity__IsTargetInRange
+
+> Renamed from `func_8005E02C` on 2026-09-23 (tools/rename.py). Address 0x8005e02c.
 
 **Unit:** Entity_b · **Size:** 33 words · **Status:** MATCHED (33/33 words,
 whole-image build verified byte-exact). Superseded a prior STALL
@@ -15,7 +17,7 @@ this->unk94)` and returns `1` if the result is `< arg1`, else `0`.
 
 This function is the primary evidence that `Entity::unk94` is a POINTER TYPE
 with its own `+0x14` field readable as `EntityPos *` (same convention as
-`Entity::unk14` itself) — see `func_8005E3C4.md` (matched the round before
+`Entity::unk14` itself) — see `Entity__MoodCue01.md` (matched the round before
 this one) for why it is nonetheless NOT another `Entity`, and for the
 `Unk94Obj`/`Unk94Methods` struct this function's own evidence fed into.
 
@@ -25,7 +27,7 @@ this one) for why it is nonetheless NOT another `Entity`, and for the
 ## Final C
 
 ```c
-s32 func_8005E02C(Entity *this, s32 arg1) {
+s32 Entity__IsTargetInRange(Entity *this, s32 arg1) {
     Unk94Obj *other;
     s32 oy, ty;
 
@@ -76,7 +78,7 @@ value) as `slot144`'s second argument reproduces this immediately: with the
 function unprompted — no barrier, no reshape, first try once the signature
 was right.
 
-**How the missing argument was found.** While working `func_8005EA94` (a
+**How the missing argument was found.** While working `Entity__MoodCue12` (a
 DIFFERENT, LARGER function in this unit, same round) its own call to the
 SAME vtable offset —
 
@@ -93,11 +95,11 @@ in between (the very next instruction that touches `$a1` is in the delay
 slot of a LATER, unrelated branch, i.e. after the call already returned).
 Per this unit's own `docs/DECOMPILATION_LEARNINGS.md` rule ("a value in an
 argument register live at the next call IS an argument"), that is direct
-proof `slot144` takes a second argument at `func_8005EA94`'s call site.
-`func_8005E02C`'s OWN call site (same slot, same table) shows a plain `nop`
+proof `slot144` takes a second argument at `Entity__MoodCue12`'s call site.
+`Entity__IsTargetInRange`'s OWN call site (same slot, same table) shows a plain `nop`
 in the delay slot with no fresh `$a1` load — which looked like a
 CONTRADICTION (the same function pointer can't have two arities) until
-re-reading `func_8005E02C`'s own preceding code: `this->unk94` is loaded
+re-reading `Entity__IsTargetInRange`'s own preceding code: `this->unk94` is loaded
 into `$a1` at the TOP of the function and NOTHING overwrites it before the
 `slot144` call — so `$a1` already holds the right value, and no fresh load
 instruction is needed. The "plain nop" wasn't evidence of a 1-argument call;
@@ -160,3 +162,11 @@ true arity. Cross-check every caller of a vtable slot before accepting a
 register-identity classification, not just the one function currently being
 matched — this cost fourteen attempts and one full round before a second,
 unrelated function in the same unit surfaced the missing parameter.
+
+## Naming
+
+`Entity__IsTargetInRange` -- tier A (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E02C`.
+
+A pure predicate leaf: returns 1 when `this->target`'s y is within +/-0x200 of this entity's y AND slot +0x144 (`distanceToRegion`, occupant `Entity__DistanceToRegion`) from this entity to the target is below `range`, else 0. Callers agree: `Entity__NotifyIfTargetInRange` (range = eventVideo << 9) and `func_80061778` (Entity_d, range 0x800, then faces the target). The parameter `arg1` is renamed `range` at the definition.
+
+Observation for the head, outside this unit: `Entity__DistanceToRegion` (Entity.c) is called with `this->target` as its `EntityRegionRef *` at every call site this pass found (here, Entity__GetProximityRatio, Entity__MoodCue11/12, Entity_c..g). With that reading, `region->slots` at +0x14 is the target's GsCOORDINATE2 (the same +0x14 pointer `EntityPos` models), and `slots[1].x0`/`z0` at +0x38/+0x40 are `workm.t[0]`/`t[2]`. So the function returns |dx| + |dz| between this entity's local x/z and the other object's world x/z, and `flag` (+0xC) is the other object's +0xC word. `Entity__DistanceToRegion` may deserve a sharper name and type. I left it alone because Entity.c owns it.

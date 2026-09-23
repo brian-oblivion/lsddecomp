@@ -42,7 +42,7 @@ Two new vtable slots, both already partly informed by the batch's earlier
 functions: `BasicClassMethods::slot4C` (5 args: `self, s32, s32, void*,
 s32` -- the last real gap in the low offsets of that shared-ancestor table
 this unit has needed so far) and `EntityMethods::slot15C`/`slot168` were
-already documented (called by `Entity__UpdateActivationState`/`func_8005DEE0`
+already documented (called by `Entity__UpdateActivationState`/`Entity__UpdateSoundCueStart`
 respectively) -- this is just their second known caller.
 
 `D_80089EA7` and `D_80089EAF` are two more single-byte, `moodIndex*0x10`-
@@ -79,6 +79,6 @@ answer too" instruction.
 mechanic is a leaf-simple field set (`this->unk4C = arg3`) past a gate, so
 the name says exactly that -- "Attach" for the store, "Unk4C" because the
 field's own real-world purpose is still open (its only other known reader,
-`func_8005EA94`, dereferences it as a vtable-holding object but that alone
+`Entity__MoodCue12`, dereferences it as a vtable-holding object but that alone
 doesn't say what it IS). Pairs with `Entity__DetachUnk4C` below under the
 same `this->unk0C` gate.

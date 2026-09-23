@@ -139,5 +139,5 @@ claim.
 - `EntityMethods::slot148` -> `getProximityRatio` -- **tier A.** Its
   occupant IS this very function (self-referential dispatch, the same idiom
   every other named slot in this table uses). CROSS-UNIT caller (already
-  noted in `Entity.h`'s existing comment: "called by func_8005E480"),
+  noted in `Entity.h`'s existing comment: "called by Entity__MoodCue05"),
   proposed rather than applied.

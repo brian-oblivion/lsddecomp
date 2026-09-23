@@ -65,5 +65,5 @@ own broader significance (read by every Entity_x unit) is not established.
   ancestor `func_80066818()` also returns -- same idiom, confirmed by
   offset match against that table). CROSS-UNIT: `slot30` is dispatched from
   every one of Entity_b/c/d/e/f/g (`grep -rn -- '->slot30(' src/Entity_*.c`)
-  as well as this unit's own `Entity__SetUnkF4`/`func_8005DF9C` (the latter
+  as well as this unit's own `Entity__SetUnkF4`/`Entity__NotifyIfTargetInRange` (the latter
   in Entity_b.c), so proposed rather than applied.

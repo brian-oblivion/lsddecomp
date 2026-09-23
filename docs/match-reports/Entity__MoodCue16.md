@@ -1,4 +1,6 @@
-# func_8005ED30
+# Entity__MoodCue16
+
+> Renamed from `func_8005ED30` on 2026-09-23 (tools/rename.py). Address 0x8005ed30.
 
 **Unit:** Entity_b · **Size:** 124 words · **Status:** MATCHED (124/124
 words, whole-image build verified byte-exact)
@@ -6,20 +8,20 @@ words, whole-image build verified byte-exact)
 ## What it does
 
 `(Entity *this) -> void`. Another `this->unk44` state-machine step (see
-`func_8005EBB4.md`/`func_8005EA94.md` for siblings):
+`Entity__MoodCue13.md`/`Entity__MoodCue12.md` for siblings):
 
 1. If `this->unkFC == 0` and `(rand() & 1) != 0` (odd — NOTE the opposite
-   polarity from `func_8005EA94`'s `== 0`/even check; do not assume symmetry
+   polarity from `Entity__MoodCue12`'s `== 0`/even check; do not assume symmetry
    between sibling coin-flip gates), sets `this->unk44 = 0xB`.
 2. If `this->unk44 == 0`, three-way dispatch on `this->unkFC`:
    - `< 0x40` (64): `this->methods->slotC4(this, -0x5A, 0);`
    - `== 0x40`: rolls `rand() & 1` to pick between two data rows
-     (`D_80089C94` default, `D_80089C88` on a hit), calls
+     (`ROTATION_YAW_MINUS90` default, `ROTATION_YAW_PLUS90` on a hit), calls
      `this->methods->slot44(this, 0, arg2);` then
-     `this->methods->slotBC(this, D_80089D3C);`
+     `this->methods->slotBC(this, TRANSLATE_Y_PLUS256);`
    - `> 0x40`: `this->methods->slotD0(this, -0x176, rand() % 2);`
 3. Else if `this->unk44 == 0xB`: if `this->unkFC % 5 == 0`, calls
-   `this->methods->slot44(this, 0, D_80089C88);`; unconditionally calls
+   `this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);`; unconditionally calls
    `this->methods->slotC4(this, -0x800, 0);` then
    `this->methods->slot60(this, (rand() % 7) == 0);`.
 
@@ -28,7 +30,7 @@ words, whole-image build verified byte-exact)
 `void (*)(Entity *self, s32 arg1, s32 arg2)`, called as `slotD0(this,
 -0x176, rand() % 2)`. New slot; the offset's numeric proximity to
 `Unk100Methods::slotD0` (a completely different struct/table) is coincidence
-— see `func_8005E3C4.md` for why shared offsets across different tables
+— see `Entity__MoodCue01.md` for why shared offsets across different tables
 don't imply a shared occupant.
 
 `EntityMethods::slot60` (already declared, 2-arg) is reused here as-is —
@@ -36,12 +38,12 @@ don't imply a shared occupant.
 directly against the existing `void (*slot60)(Entity *self, s32 arg1)`.
 
 Three more `D_8008xxxx` opaque data rows declared at the top of this file:
-`D_80089C94`, `D_80089C88`, `D_80089D3C`.
+`ROTATION_YAW_MINUS90`, `ROTATION_YAW_PLUS90`, `TRANSLATE_Y_PLUS256`.
 
 ## Final C
 
 ```c
-void func_8005ED30(Entity *this) {
+void Entity__MoodCue16(Entity *this) {
     u8 *arg2;
     s32 roll;
 
@@ -55,18 +57,18 @@ void func_8005ED30(Entity *this) {
             this->methods->slotC4(this, -0x5A, 0);
         } else if (this->unkFC == 0x40) {
             roll = rand() & 1;
-            arg2 = D_80089C94;
+            arg2 = ROTATION_YAW_MINUS90;
             if (roll != 0) {
-                arg2 = D_80089C88;
+                arg2 = ROTATION_YAW_PLUS90;
             }
             this->methods->slot44(this, 0, arg2);
-            this->methods->slotBC(this, D_80089D3C);
+            this->methods->slotBC(this, TRANSLATE_Y_PLUS256);
         } else {
             this->methods->slotD0(this, -0x176, rand() % 2);
         }
     } else if (this->unk44 == 0xB) {
         if (this->unkFC % 5 == 0) {
-            this->methods->slot44(this, 0, D_80089C88);
+            this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);
         }
         this->methods->slotC4(this, -0x800, 0);
         this->methods->slot60(this, (rand() % 7) == 0);
@@ -76,18 +78,18 @@ void func_8005ED30(Entity *this) {
 
 ## Attempt log
 
-Two attempts. First attempt wrote `arg2 = D_80089C94; if ((rand() & 1) !=
-0) { arg2 = D_80089C88; }` directly (default assignment textually before the
+Two attempts. First attempt wrote `arg2 = ROTATION_YAW_MINUS90; if ((rand() & 1) !=
+0) { arg2 = ROTATION_YAW_PLUS90; }` directly (default assignment textually before the
 `rand()` call). This compiled the default assignment BEFORE the `jal rand`
 in the RTL, forcing `arg2`'s live range across the call and promoting it
 into a callee-saved register (`$s1`) — 2 extra words (a spurious
 `sw`/`lw $s1` prologue/epilogue pair) that shifted every later function's
 address (funcdiff read `2/124` with a 6-figure "outside range" count; `nm`
-on the built ELF confirmed `func_8005EF20` landed 8 bytes past retail).
+on the built ELF confirmed `Entity__MoodCue17` landed 8 bytes past retail).
 Retail computes the default assignment AFTER `rand()` returns, keeping
 `arg2` entirely in caller-saved `$a2` with no register pressure across the
 call. Hoisting the `rand()` call into its own statement BEFORE the default
-assignment (`roll = rand() & 1; arg2 = D_80089C94; if (roll != 0) ...`)
+assignment (`roll = rand() & 1; arg2 = ROTATION_YAW_MINUS90; if (roll != 0) ...`)
 matched immediately — with the call now textually first, GCC's RTL for the
 default assignment falls after it, and no callee-saved register is needed.
 
@@ -108,3 +110,11 @@ need to survive it. This is a new, sharper case of the existing
 `docs/DECOMPILATION_LEARNINGS.md` "let GCC hoist its own loop invariants"
 family of lessons, but for a straight-line default-value assignment rather
 than a loop.
+
+## Naming
+
+`Entity__MoodCue16` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005ED30`.
+
+`gEntityMoodHandlerTable` row 16. Body (takes only `this`): on moodTimer 0 a coin flip may set phase `unk44 = 0xB`. In phase 0 it moves -0x5A below moodTimer 64; at 64 it turns +/-90 degrees at random and steps `TRANSLATE_Y_PLUS256`; after that it runs slot +0xD0(-0x176, rand() % 2). In phase 0xB it turns +90 every 5 ticks, moves -0x800, and calls slot +0x60 with `rand() % 7 == 0`.
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `func_8002CD08` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.

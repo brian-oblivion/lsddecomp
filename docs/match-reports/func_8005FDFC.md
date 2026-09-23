@@ -13,7 +13,7 @@ void func_8005FDFC(Entity *this) {
         roll = rand();
         arg2 = D_80089E38;
         if ((roll & 1) != 0) {
-            arg2 = D_80089DF0;
+            arg2 = SCALE_DOUBLE;
         }
         this->methods->slot48(this, 1, arg2);
         this->unk44 = 0xB;
@@ -46,8 +46,8 @@ void func_8005FDFC(Entity *this) {
   five-argument call shape already used throughout `Entity_b.c`.
 - `this->methods->slot144(this, this->unk94)` matches the two-argument
   `slot144` signature already established in `include/Entity.h`
-  (`func_8005E02C`'s residue).
-- Extern added: `D_80089DF0` (already declared as `u8[]` in `Entity_b.c`;
+  (`Entity__IsTargetInRange`'s residue).
+- Extern added: `SCALE_DOUBLE` (already declared as `u8[]` in `Entity_b.c`;
   this unit needs its own file-scope declaration).
 - Clean of both open toolchain blockers.
 

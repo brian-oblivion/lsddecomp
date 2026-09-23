@@ -58,5 +58,5 @@ this table, even though neither is called from this unit.
   same-shape argument at `Entity__IsNearTarget`'s still-`INCLUDE_ASM` call
   site) -- not renamed here, proposed for the head to apply by type scope.
 - `EntityMethods::slotBC` -> `addVec14` -- **tier A.** Same audit, +0x0BC
-  occupied by `BaseObjO__AddVec14`. Called by `func_8005E694` (unit not
+  occupied by `BaseObjO__AddVec14`. Called by `Entity__MoodCue08` (unit not
   identified from this file alone). Proposed, not applied.

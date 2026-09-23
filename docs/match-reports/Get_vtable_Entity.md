@@ -41,3 +41,9 @@ it resolved to byte-exact as soon as every other function this round matched.
 
 None beyond what's already documented (`lui`/`addiu` with no surrounding
 `lw`/`sw` is `&symbol`, already in `docs/DECOMPILATION_LEARNINGS.md`).
+
+## Naming
+
+`Get_vtable_Entity` -- tier A (round 71, runner echo, FINISHING-PLAN track 3).
+
+Kept. A getter returning `&ENTITY_METHODS`. `New_Entity` calls it directly by name, and it follows the project's `Get_vtable_X` accessor convention (`Get_vtable_DreamSys`). Tier A by definition, since the mechanics of a pure getter are its purpose.

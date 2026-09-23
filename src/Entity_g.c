@@ -9,7 +9,7 @@
 extern u8 D_80089CAC[];
 extern u8 D_80089E14[];
 extern u8 D_80089DE4[];
-extern u8 D_80089DD8[];
+extern u8 SCALE_HALF[];
 extern u8 D_80089E20[];
 extern u8 D_80089DCC[];
 extern u8 D_80089CB8[];
@@ -63,7 +63,7 @@ void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
         } else if (this->moodTimer >= 0x78B) {
             a2 = D_80089DE4;
         } else if (this->moodTimer >= 0x786) {
-            a2 = D_80089DD8;
+            a2 = SCALE_HALF;
         } else if (this->moodTimer >= 0x781) {
             a2 = D_80089DCC;
         } else {
@@ -149,7 +149,7 @@ void func_80064CA4(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void func_80064CEC(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089DD8);
+    this->methods->slot48(this, 1, SCALE_HALF);
     this->methods->slotC4(this, -0xA, 0);
 }
 

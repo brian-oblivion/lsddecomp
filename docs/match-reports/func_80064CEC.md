@@ -8,14 +8,14 @@ No hits.
 
 ## What it does
 
-`gEntityMoodHandlerTable` handler row; `out` unused. `slot48(this, 1, D_80089DD8)` then
+`gEntityMoodHandlerTable` handler row; `out` unused. `slot48(this, 1, SCALE_HALF)` then
 `slotC4(this, -0xA, 0)`.
 
 ## The C
 
 ```c
 void func_80064CEC(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089DD8);
+    this->methods->slot48(this, 1, SCALE_HALF);
     this->methods->slotC4(this, -0xA, 0);
 }
 ```

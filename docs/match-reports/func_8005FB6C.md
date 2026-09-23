@@ -88,7 +88,7 @@ void func_8005FB6C(Entity *this) {
   label (`.L8005FBD4`) confirms retail's source reaches the same call site
   from two different tests, matching the two-arm duplication above.
 - `(u32)(x - LOW) < COUNT` is the established unsigned-range-check idiom
-  already used in `Entity_b.c` (`func_8005E7F8`'s
+  already used in `Entity_b.c` (`Entity__MoodCue11`'s
   `(u32)(this->unkFC - 0xD5D) < 0x78`).
 - Externs added: `D_80089C64`, `D_80089C70`.
 - Clean of both open toolchain blockers.
