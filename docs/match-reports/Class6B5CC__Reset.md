@@ -1,4 +1,6 @@
-# func_8001CE30
+# Class6B5CC__Reset
+
+> Renamed from `func_8001CE30` on 2026-09-23 (tools/rename.py). Address 0x8001ce30.
 
 **Unit:** code_d294 · **Size:** 33 words · **Status:** MATCHED (33/33 words)
 
@@ -18,7 +20,7 @@ with a literal flag `1` and one of two rodata tables
 ## The C
 
 ```c
-void func_8001CE30(Class6B5CCObj *self) {
+void Class6B5CC__Reset(Class6B5CCObj *self) {
     self->unk24 = 0;
     self->unk10 = 0;
     func_80012838(0, self->unk14);

@@ -10,7 +10,7 @@
  * +0x00C Class6B5CC__Finalize (dtor), +0x010 Class6B5CC__AddChild, +0x014 Class6B5CC__RemoveChild,
  * +0x018 Class6B5CC__RemoveAllChildren, [+0x01C..+0x038 seven slots inherited verbatim from
  * BasicClass, D_8006B58C], +0x038 Class6B5CC__OnNotify (override), +0x03C null,
- * +0x040 func_8001CE30, +0x044 func_8001CEB4, +0x048 func_8001D008,
+ * +0x040 Class6B5CC__Reset, +0x044 func_8001CEB4, +0x048 func_8001D008,
  * +0x04C func_8001D0EC, +0x050 func_8001D1A4, +0x054 func_8001D204,
  * +0x058 func_8001D280, +0x05C func_8001D33C (already-matched no-op stub),
  * +0x060 func_8001D344, +0x064 func_8001D374, +0x068 func_8001D3A0,
@@ -120,9 +120,9 @@ struct Class6B5CCBlock44 {
 };
 
 /* self->unk14's target: a 0x50-byte block allocated by the ctor
- * (Class6B5CC__Class6B5CC). Round 2 (func_8001D0EC, func_8001CE30, func_8001D1A4)
+ * (Class6B5CC__Class6B5CC). Round 2 (func_8001D0EC, Class6B5CC__Reset, func_8001D1A4)
  * filled in most of the rest of this layout:
- *   +0x000  a flag/state word: 1 after func_8001CE30 (the ctor's own init
+ *   +0x000  a flag/state word: 1 after Class6B5CC__Reset (the ctor's own init
  *           hook) runs, 0 again after func_8001D0EC's "attach" and after
  *           func_8001CEB4/func_8001D008 (still queued, but their own tails
  *           both end `self->unk14->unk0 = 0` per their disassembly) do
@@ -428,8 +428,8 @@ struct Class6B5CCMethods {
      * this unit) dispatches through it as `(self, s32 arg1)`. */
     void (*slot30)(Class6B5CCObj *self, s32 arg1);
     u8 pad034[0x040 - 0x034];
-    void (*slot40)(Class6B5CCObj *self);      /* +0x040, func_8001CE30 (this unit) */
-    /* +0x044/+0x048, a `(self, s32 flag, void *data)` pair -- func_8001CE30
+    void (*slot40)(Class6B5CCObj *self);      /* +0x040, Class6B5CC__Reset (this unit) */
+    /* +0x044/+0x048, a `(self, s32 flag, void *data)` pair -- Class6B5CC__Reset
      * calls both with flag=1 and `data` pointing at a 3-entry table of
      * {s16,s16} pairs (D_8006B684/D_8006B690, 0xC bytes each). func_8001D008
      * (slot +0x048's own occupant, still queued) confirms the `data` shape:
@@ -551,7 +551,7 @@ struct Class6B5CCObj {
      * genuinely a pointer, not an always-zero s32. Still opaque: nothing
      * this unit's chosen functions dereference through it directly. */
     void *unk20;
-    s32 unk24;                  /* +0x024, zeroed by func_8001CE30 (this unit) */
+    s32 unk24;                  /* +0x024, zeroed by Class6B5CC__Reset (this unit) */
     /* +0x028, round 12 (code_d294_b): Class6B5CC__DispatchLinkCommand sets this to its own
      * `a1` (a plain `s32`, per m2c's own inference) when called with
      * a2==4. RETYPED round 13 (Class6B5CC__TryAttachNearby): `self->unk28 = other;`
@@ -601,7 +601,7 @@ struct WholeFrac_d294 {
 extern s32 RatioToFixed12(void *pair);
 
 /* D_8006B684/D_8006B690 (rodata): two 3-entry, 0xC-byte tables in the shape
- * RatioToFixed12 reads (see above) -- func_8001CE30's own literal `data`
+ * RatioToFixed12 reads (see above) -- Class6B5CC__Reset's own literal `data`
  * arguments to slot +0x044/+0x048. Declared as opaque byte blobs since
  * nothing this unit's chosen functions read out of them directly (only
  * their address is taken and forwarded). */
@@ -728,7 +728,7 @@ void Class6B5CC__Finalize(Class6B5CCObj *self);
 void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other);
 void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other);
 void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self);
-void func_8001CE30(Class6B5CCObj *self);
+void Class6B5CC__Reset(Class6B5CCObj *self);
 Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec);
 Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self);
 void func_8001D204(Class6B5CCObj *self);

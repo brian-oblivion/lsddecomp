@@ -16,7 +16,7 @@ second allocation fails, otherwise calls the BasicClass base constructor
 (`Get_vtable_BasicClass()->ctor(self)`), overwrites `self->methods` with this
 class's own vtable (`GetClass6B5CCMethods()`, i.e. `&D_8006B5CC`), zeroes several
 freshly-added fields, and finally calls its own virtual init hook
-(`self->methods->slot40`, `func_8001CE30` — still queued) before returning
+(`self->methods->slot40`, `Class6B5CC__Reset` — still queued) before returning
 `self` unconditionally.
 
 ## The C

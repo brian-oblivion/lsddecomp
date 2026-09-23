@@ -83,7 +83,7 @@ void Class6B5CC__OnNotify(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2)
     }
 }
 
-void func_8001CE30(Class6B5CCObj *self) {
+void Class6B5CC__Reset(Class6B5CCObj *self) {
     self->unk24 = 0;
     self->unk10 = 0;
     GsInitCoordinate2(0, self->unk14);
