@@ -1,4 +1,93 @@
-# func_8003ECD0 -- STALL: length EXACT (73/73 words, no drift); 71/73 raw word-match; first real diff at vram 0x8003ED18 (the `addu`/`addiu` pairing). ATTEMPT 6'S VERDICT IS CORRECTED BELOW.
+# func_8003ECD0 -- MATCHED 73/73 (round 71, runner charlie; revisit). Byte-exact whole image.
+
+REVISITED, round 71: MATCHED 73/73 in 6 builds; names/types not relevant (the
+lever is a local holding the constant, not a type or a name).
+
+## ROUND 71 (runner charlie): the recorded CAUSE was incomplete -- it is fold(), and a local defeats it
+
+**Rebuilt as given first.** The round-36 linkable body (below, `#if 0`), spliced
+in place of the `INCLUDE_ASM`: **71/73, insertions 0 / deletions 0,
+positional skeleton diffs 2**, first real diff at vram `0x8003ED18` -- the
+title's figures exactly, and a true alignment (0/0 at equal length).
+
+**What the old attempts measured without naming it.** Every source grouping
+that contained the LITERAL `0x14` came out with the constant applied LAST
+(`addu` of the two variable terms, then `addiu 0x14`, or `sllv; addiu 0x14`
+on the shift before the `mflo`). That is GCC 2.6.3's `fold()` associating a
+constant term outward -- `(x + C) + y` is rebuilt as `(x + y) + C` -- before
+RTL exists. So retail's tree `shift + (prod + 0x14)` is unreachable from ANY
+spelling with a literal, which is why fourteen hand groupings and ~89k
+permuter iterations all failed: they only permuted the spelling fold then
+normalised. Splitting into two statements (attempts 5, 8, 13) does dodge
+fold, but changes the statement order and therefore the `mult`/`lw`/`sllv`
+head schedule -- the "head regresses" signature every round recorded.
+
+**The lever: hide the constant from fold in a local.** `s32 hdrSize = 0x14;`
+is a variable at tree level (fold leaves the grouping alone) and a constant
+again after RTL cse, so the `addiu` survives, applied where the source put it.
+
+| build | variant | score |
+| --- | --- | --- |
+| 1 | rebuilt as given | 71/73 (0/0) |
+| 2 | `0x14U + prod + (4 << c)` | 69/73 |
+| 3 | `(4U << c) + prod + 0x14U` | 68/73 |
+| 4 | `prod + 0x14U + (4U << c)`, and `(prod + 0x14U) + (4U << c)` | 69/73 each |
+| 5 | two statements, `size = prod + 0x14; size = (4 << c) + size;` | 67/73 |
+| 5 | block-local `area = prod + 0x14; size = (4 << c) + area;` (attempt 8 again) | 68/73 |
+| 5 | block-local `hdr = 0x14; size = (4 << c) + (prod + hdr);` | **73/73, build exit 0** |
+| 5 | block-local `hdr = 0x14; size = prod + hdr + (4 << c);` | 69/73 -- the grouping still matters, the local only lets it through |
+| 6 | `hdrSize` hoisted to the function's declarations (committed form) | **73/73, OK: build matches retail** |
+
+The unsigned-constant rows (`0x14U`, `4U`, trying `sizeof`-style
+`size_t` arithmetic as a GsOT-header reading) are all negative: the
+signedness does not change the fold.
+
+`0x14` is `sizeof(GsOT)` (length, org, offset, point, tag: five words), and
+`unk80 = buf + 0x14` is that header's tag array -- consistent with the
+buffer being two GsOT headers plus tags plus packet area, and with both
+halves being handed to `GsClearOt`. Left as an `s32` field layout (no
+struct edit this round).
+
+### Matched body (as committed in `src/code_2cc8c_d.c`)
+
+```c
+extern void GsClearOt(s32 a0, s32 a1, s32 a2);
+extern void *func_80017B34(s32 size);
+
+void func_8003ECD0(Unk18Obj *self) {
+    s32 size;
+    s32 buf;
+    s32 hdrSize = 0x14; /* sizeof(GsOT) */
+
+    if (self->unk70 != 0) {
+        return;
+    }
+
+    size = (4 << self->unk3C) + (self->unk48 * self->unk44 + hdrSize);
+    /* ... remainder identical to the round-36 body below ... */
+}
+```
+
+### Proposed learning
+
+**A literal constant in a sum is placed by `fold()`, not by the source
+grouping.** GCC 2.6.3 reassociates `(x + C) + y` to `(x + y) + C`, so when
+retail shows the constant `addiu` applied to an INNER partial sum (here
+`mflo; addiu 0x14; addu`) no parenthesisation of a literal reaches it.
+Discriminator: every grouping of the literal yields the constant as the
+LAST (or shift-adjacent) operation, and statement splits fix the tail but
+disturb the head. Lever: `s32 k = C;` then write retail's grouping with `k`.
+Distinct from the scheduling-barrier lever (3x): the expression tree itself
+is what changes.
+
+---
+
+## Prior history (the stall, rounds 14-49)
+
+The pre-round-71 title read: STALL: length EXACT (73/73 words, no drift);
+71/73 raw word-match; first real diff at vram 0x8003ED18 (the `addu`/`addiu`
+pairing). ATTEMPT 6'S VERDICT IS CORRECTED BELOW.
+
 
 ## ROUND 49 (runner delta): a bigger permuter search (~49k more iterations) and the sibling's new lever, both negative -- residue class confirmed to be REGROUPING, not ordering
 

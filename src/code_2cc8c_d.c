@@ -168,28 +168,25 @@ void func_8003ECC0(void) {
 void func_8003ECC8(void) {
 }
 
-/* STALL -- see docs/match-reports/func_8003ECD0.md. Round 49 (delta):
- * re-verified 71/73 exactly, no drift; a ~49k-iteration permuter search
- * (49,430 iterations, timeout rc=124, base score 215 agreeing with the
- * real build's signature) found nothing below baseline besides the same
- * spurious integer-truncation candidates already fingerprinted round 36.
- * The named-temp+barrier lever that closed a sibling scheduling swap in
- * this unit's own func_8003D73C this round does NOT transfer here either
- * (regresses to 67/73) -- this residue is an arithmetic REGROUPING, not
- * an independent-computation ordering swap. Still the same 2-word
- * instruction-order residue at vram 0x8003ED18/0x8003ED1C. */
-#if 0
+/* One-time allocation of this object's two ordering tables (see
+ * docs/match-reports/func_8003ECD0.md). Each half of the buffer is a
+ * 0x14-byte GsOT header, 4 << unk3C bytes of OT tags, then unk48 * unk44
+ * bytes of packet area. The header size is a LOCAL on purpose: written as a
+ * literal, fold() reassociates the constant to the outside of the sum and
+ * the final addu/addiu pair swaps (round 71). */
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
+extern void *func_80017B34(s32 size);
 
 void func_8003ECD0(Unk18Obj *self) {
     s32 size;
     s32 buf;
+    s32 hdrSize = 0x14; /* sizeof(GsOT) */
 
     if (self->unk70 != 0) {
         return;
     }
 
-    size = self->unk48 * self->unk44 + (4 << self->unk3C) + 0x14;
+    size = (4 << self->unk3C) + (self->unk48 * self->unk44 + hdrSize);
 
     buf = (s32)func_80017B34(size * 2);
     if (buf == 0) {
@@ -216,9 +213,6 @@ void func_8003ECD0(Unk18Obj *self) {
     self->unk70 = 1;
     self->unk74 = 0;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_d", func_8003ECD0);
 
 /* Sony's `DrawSync` (libgpu/sys, fingerprint exact vs the disc corpus, not
  * yet linked from an SDK object). LOCAL to this unit, not code_2cc8c.h --
