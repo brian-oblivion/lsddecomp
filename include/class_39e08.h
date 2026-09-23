@@ -135,7 +135,7 @@ struct SubObjF {
 };
 
 /* Opaque view of whatever object Obj865C8::subB points to (used only by
- * func_8004A228, guarded by Obj865C8::unk30): same "vtable at offset 0,
+ * Class86668__Dtor, guarded by Obj865C8::unk30): same "vtable at offset 0,
  * only slot +0x004 named" policy. */
 typedef struct SubObjBMethods {
     u8 pad00[0x04];
@@ -272,8 +272,8 @@ struct Obj865C8 {
     u8 pad20[0x28 - 0x20];
     s32 unk28;                    /* +0x028, func_8004A3EC */
     s32 unk2C;                    /* +0x02C, func_8004A458 */
-    s32 unk30;                    /* +0x030, func_8004A228 (guard) */
-    SubObjB *subB;                /* +0x034, func_8004A228 */
+    s32 unk30;                    /* +0x030, Class86668__Dtor (guard) */
+    SubObjB *subB;                /* +0x034, Class86668__Dtor */
     SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
                                        through as a plain register value to
                                        Get_vtable_IntermediateBase()->slot44's 3rd arg by Obj865C8__EnterState2 */
@@ -344,12 +344,12 @@ extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 typedef struct Class86668Methods {
     u8 pad00[0x08];
     void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 Class86668__Class86668 */
-    /* func_8004A228 (this unit, matched): the sibling class's own dtor
+    /* Class86668__Dtor (this unit, matched): the sibling class's own dtor
      * override. Called by Obj865C8__Dtor (D_800865C8's own dtor) as
      * GetClass86668Methods()->dtor(self) -- a base-class dtor forwarding to a
      * DIFFERENT sibling's override, same shape as slot38/slot44/slot48
      * below. */
-    void (*dtor)(Obj865C8 *self);                          /* +0x00C func_8004A228 */
+    void (*dtor)(Obj865C8 *self);                          /* +0x00C Class86668__Dtor */
     u8 pad10[0x38 - 0x10];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
      * offset (Obj865C8__OnNotify, this unit): gClass86668Methods's own +0x038 is

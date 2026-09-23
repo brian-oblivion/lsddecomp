@@ -282,7 +282,7 @@ void Class86668__Class86668(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
     self->methods->resetUnk3C(self);
 }
 
-void func_8004A228(Obj865C8 *self) {
+void Class86668__Dtor(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }
