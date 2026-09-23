@@ -464,7 +464,43 @@ extern s32 D_80087028;
 extern s32 D_8008AAF8;
 extern s32 D_800116E4;
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 75/95 words. Residue: pure register-identity rotation, not
+ * a size/instruction defect -- compiled length is exactly 95 words on the
+ * first attempt (funcdiff reports no drift), and a permuter --debug run
+ * confirms 0 reorderings/insertions/deletions, only 28 register diffs: a
+ * clean three-way rotation of the same three long-lived values (the two
+ * repeated global addresses feeding BuildFileName, plus the handle) across
+ * the same three registers, while self/arg1 already match retail exactly
+ * (docs/match-reports/func_80051F24.md). Hand-derived; reviewed rounds 18,
+ * 19 -- ten attempts across four functions now confirm declaration/
+ * introduction-order reshaping is inert for this residue class. */
+void func_80051F24(Class86ED0 *self, void *arg1)
+{
+    s32 local[8];
+    Class86ED0Handle *h;
+
+    if (!arg1) {
+        return;
+    }
+    if (self->unk50) {
+        return;
+    }
+
+    h = func_8003B39C(BuildFileName(local, &D_8008AB14, &D_8008AB1C, &D_8008AB24));
+    h->methods->slot78(h);
+    self->unk50 = func_80041C9C(h, &D_80087028, 0);
+    h->methods->slot4(h);
+    self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
+
+    h = func_8003B39C(BuildFileName(local, &D_800116E4, &D_8008AB1C, &D_8008AB24));
+    h->methods->slot78(h);
+    self->methods->slot8C(self, arg1, h, self->unk20, self->unk24, self->unk28);
+    h->methods->slot4(h);
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051F24);
+#endif
 
 void func_800520A0(Class86ED0 *self)
 {
