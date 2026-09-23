@@ -73,7 +73,99 @@
  * (110/132 built words, length EXACT at 132/132) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CD08);
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 167/167 words, length exact (74/167 raw word-match; funcdiff
+ * insertions/deletions 16/16). Residue: a systematic register rotation
+ * (t3/t0/a2/a3 family) running through nearly the whole function, visible
+ * from the very first instruction (docs/match-reports/func_8002CF18.md).
+ * Hand-derived. */
+extern u8 D_8008D9A3[];
+extern u8 D_8008D98E[];
+extern u8 D_8008D98A[];
+extern u8 D_8008D9A0[];
+extern u8 D_8008D988[];
+extern u8 D_8008E9D0;
+extern u8 D_8008EA1B;
+extern void SpuSetNoiseVoice(s32 a0, s32 a1);
+
+s32 func_8002CF18(void)
+{
+    s32 chosen;
+    u16 bestSec;
+    s32 found;
+    s32 bestTer;
+    s32 bestIdx;
+    u32 idx;
+    s32 threshold;
+    s32 pri;
+    u32 newSec;
+    u32 count;
+    u8 *p988;
+
+    chosen = 0x63;
+    bestSec = 0xFFFF;
+    found = 0;
+    bestTer = 0;
+    bestIdx = 0x63;
+    threshold = D_8008EA1B;
+
+    for (idx = 0; (u8) idx < D_8008E9D0; idx++) {
+        if (D_8008D9A3[(u8) idx * 0x34] != 0
+            || *(u16 *)(D_8008D98E + (u8) idx * 0x34) != 0) {
+            pri = *(s16 *)(D_8008D9A0 + (u8) idx * 0x34);
+            if (pri < (s32)(u16) threshold) {
+                threshold = pri;
+                bestIdx = idx;
+                bestSec = *(u16 *)(D_8008D98E + (u8) idx * 0x34);
+                bestTer = *(u16 *)(D_8008D98A + (u8) idx * 0x34);
+                found = 1;
+            } else if (pri == (s32)(u16) threshold) {
+                found++;
+                newSec = *(u16 *)(D_8008D98E + (u8) idx * 0x34);
+                if (newSec < bestSec) {
+                    bestTer = *(u16 *)(D_8008D98A + (u8) idx * 0x34);
+                    bestSec = newSec;
+                    bestIdx = idx;
+                } else if (newSec == bestSec) {
+                    if (bestTer < (s16) *(u16 *)(D_8008D98A + (u8) idx * 0x34)) {
+                        bestTer = (s16) *(u16 *)(D_8008D98A + (u8) idx * 0x34);
+                        bestIdx = idx;
+                    }
+                }
+            }
+        } else {
+            chosen = idx;
+        }
+    }
+
+    if ((u8) chosen == 0x63) {
+        if ((u8) found != 0) {
+            chosen = bestIdx;
+        } else {
+            chosen = D_8008E9D0;
+        }
+    }
+
+    count = D_8008E9D0;
+    if ((u8) chosen < count) {
+        if (count != 0) {
+            p988 = D_8008D988;
+            for (idx = 0; (u8) idx < count; idx++) {
+                *(u16 *)(p988 + (u8) idx * 0x34 + 2) =
+                    *(u16 *)(D_8008D98A + (u8) idx * 0x34) + 1;
+            }
+        }
+        *(u16 *)(D_8008D98A + (u8) chosen * 0x34) = 0;
+        *(s16 *)(D_8008D9A0 + (u8) chosen * 0x34) = D_8008EA1B;
+        if (D_8008D9A3[(u8) chosen * 0x34] == 2) {
+            SpuSetNoiseVoice(0, 0xFFFFFF);
+        }
+    }
+    return (u8) chosen;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);
+#endif
 
 /* Shared with func_8002D8E0 below (same two-level entry table, same
  * blend-cascade shape); declared once here since func_8002D1B4 is
@@ -107,7 +199,118 @@ extern u16 D_8008E234;
 /* STALL -- see docs/match-reports/func_8002D1B4.md. Best body reached
  * (332/316 built words, 16 words LONG; 33/316 raw word-match, drift-
  * affected) preserved there in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 316/316 words, length exact (201/316 raw word-match; funcdiff
+ * insertions/deletions 46/46). Residue: frame SIZE only -- addiu sp,sp,-8
+ * against retail's -0x10 -- plus this unit's documented register-identity
+ * class (docs/match-reports/func_8002D1B4.md). Hand-derived. */
+/* Object holding a per-note "priority"-ish scale byte at +0x18; only field
+ * this function needs. */
+typedef struct {
+    u8 pad0[0x18];
+    u8 unk18; /* +0x18 */
+} ObjE970;
+extern ObjE970 *D_8008E970;
+
+extern u8 D_8008EA10;
+/* NOT volatile, and declared as an incomplete ARRAY on purpose: the array
+ * spelling is what makes GCC 2.6.3 materialise the address once into a GPR
+ * and spend one word per read, which is retail. Retail's five reloads come
+ * from ordinary CSE invalidation by the stores between them. */
+extern s16 D_8008EA26[];
+
+/* Independent 0x10-byte-stride s16 array. */
+extern s16 D_8008D7F4[];
+
+void func_8002D1B4(s32 a0, s32 a1) {
+    D800902E8Entry *e;
+    s32 prio;
+    s32 lvl0;
+    u32 lvl1;
+    u32 pan1;
+    u32 pan2;
+    u32 pan1sq;
+    u32 pan2sq;
+    s16 pan1out;
+    s32 chanIdx;
+    s32 lowBit;
+    s32 highBit;
+
+    prio = D_8008E970->unk18 * 0x3FFF;
+    lvl0 = D_8008EA10 * prio / 16129;
+    lvl1 = (u32)lvl0 * D_8008EA16 * D_8008EA19 / 16129;
+
+    chanIdx = D_8008EA26[0] * 8;
+
+    e = &D_800902E8[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
+    pan1 = lvl1;
+    pan2 = lvl1;
+    if ((s16)D_8008EA22 != 0x21) {
+        pan1 = lvl1 * e->unk74 / 127;
+        pan2 = lvl1 * e->unk76 / 127;
+    }
+
+    if ((u8)D_8008EA1A < 0x40) {
+        pan2 = (pan2 * D_8008EA1A) / 63;
+    } else {
+        pan1 = (pan1 * (0x7F - D_8008EA1A)) / 63;
+    }
+
+    if ((u8)D_8008EA17 < 0x40) {
+        pan2 = (pan2 * D_8008EA17) / 63;
+    } else {
+        pan1 = (pan1 * (0x7F - D_8008EA17)) / 63;
+    }
+
+    if ((u8)D_8008EA11 < 0x40) {
+        pan2 = (D_8008EA11 * pan2) / 63;
+    } else {
+        pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
+    }
+
+    if (D_8008E8C0 == 1) {
+        if (pan1 < pan2) {
+            pan1 = pan2;
+        } else {
+            pan2 = pan1;
+        }
+    }
+    pan1sq = pan1 * pan1;
+    pan1out = (s16)(pan1sq / 16383);
+    pan2sq = pan2 * pan2;
+
+    D_8008D7F4[(u16)chanIdx] = (s16)a1;
+    D_8008D7F4[(u16)chanIdx - 2] = pan1out;
+    D_8008D7F4[(u16)chanIdx - 1] = (s16)(pan2sq / 16383);
+
+    D_8008D970[D_8008EA26[0]] |= 7;
+    *(u16 *)(D_8008D98C + D_8008EA26[0] * 0x34) = (s16)a1;
+    *(u8 *)(D_8008D9A3 + D_8008EA26[0] * 0x34) = 1;
+
+    if (D_8008EA26[0] < 0x10) {
+        lowBit = 1 << D_8008EA26[0];
+        highBit = 0;
+    } else {
+        lowBit = 0;
+        highBit = 1 << (D_8008EA26[0] - 0x10);
+    }
+
+    if (D_8008EA20 & 4) {
+        D_8008E230 = lowBit | D_8008E230;
+        D_8008E234 = highBit | D_8008E234;
+    } else {
+        D_8008E230 = D_8008E230 & ~lowBit;
+        D_8008E234 = D_8008E234 & ~highBit;
+    }
+
+    D_8008E228 = lowBit | D_8008E228;
+    D_8008E22C = highBit | D_8008E22C;
+    D_80090C60 = D_80090C60 & ~D_8008E228;
+    D_80090C64 = D_80090C64 & ~D_8008E22C;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D1B4);
+#endif
 
 extern u8 D_8008EA13;
 extern u8 D_8008EA18;
@@ -147,7 +350,66 @@ extern u8 D_8008E9D0;
  * (309/311 built words, 2 words SHORT) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D8E0);
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 107/112 words, 5 words short. Residue: the a0/a3 role-swap
+ * register-identity class (this unit's documented class) plus an 8-byte
+ * frame retail allocates that this shape doesn't reach
+ * (docs/match-reports/func_8002DDBC.md). Hand-derived. */
+extern u8 D_8008D98A[];
+
+void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
+    s32 a3;
+    s32 off16;
+    s32 v1;
+    s32 lowBit;
+    s32 highBit;
+    s32 idx52;
+    s32 li;
+    s32 i;
+    s32 n;
+
+    a3 = a0;
+    a0 = (u8)a0;
+    off16 = a0 << 4;
+    *(u16 *)(D_8008D7F2 + off16) = a2;
+    __asm__("");
+    v1 = D_8008D970[a0];
+    *(u16 *)(D_8008D7F0 + off16) = a1;
+    v1 |= 3;
+    D_8008D970[a0] = v1;
+    if ((u32)a0 < 16) {
+        lowBit = 1 << a0;
+        highBit = 0;
+    } else {
+        lowBit = 0;
+        highBit = 1 << (a0 - 16);
+    }
+
+    idx52 = (u8)a3 * 52;
+    n = D_8008E9D0;
+    *(u16 *)(D_8008D98C + idx52) = 10;
+    if (n != 0) {
+        i = 0;
+        do {
+            li = (u16)i * 52;
+            *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
+            i++;
+        } while ((u16)i < D_8008E9D0);
+    }
+    idx52 = (u8)a3 * 52;
+    *(u8 *)(D_8008D9A3 + idx52) = 2;
+
+    *(u16 *)(D_8008D98A + idx52) = 0;
+    D_8008E228 = lowBit | D_8008E228;
+    D_8008E22C = highBit | D_8008E22C;
+    D_80090C60 = D_80090C60 & ~D_8008E228;
+    D_80090C64 = D_80090C64 & ~D_8008E22C;
+    D_8006DAD4[0xCA] = lowBit;
+    D_8006DAD4[0xCB] = highBit;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002DDBC);
+#endif
 
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;

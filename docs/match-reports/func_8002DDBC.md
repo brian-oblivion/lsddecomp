@@ -683,3 +683,7 @@ predicts exactly the thing you see (lots of `r` rows) without predicting
 anything you could falsify. When a report says "the rest is cascade", the
 cheap test is to read the surviving rows' OPCODES with the registers ignored;
 two of the three findings above fall straight out of that.
+
+## NON_MATCHING body promoted, round 69
+
+Promoted the round-65 preserved body into `src/code_179d8_l.c` under `#ifdef NON_MATCHING` (verified build unchanged, keeps `INCLUDE_ASM`); `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
