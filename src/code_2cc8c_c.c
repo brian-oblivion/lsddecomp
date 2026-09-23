@@ -10,7 +10,7 @@
  * helper objects), its `OnNotify` override (dispatches on an incoming
  * `EventArg`'s dynamic class tag to `onTag1Notify`/an external func_8003C48C
  * STALL/func_8003C51C), and its `NotifyParents` override (`Obj86B60__
- * NotifyParents`, still a register-identity STALL -- see its match report)
+ * NotifyParents`, matched round 72 -- see its match report)
  * with the two small helpers it forwards to on mode 2/3.
  *
  * The remaining functions are `Unk18Obj`'s own constructor chain (`New_
@@ -172,31 +172,28 @@ void Obj86B60__IncrementFrameCounter(Obj86B60 *self)
     self->frameCounter++;
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 23/32 words, length exact, zero drift. Residue: register
- * identity (self/arg1 land in $s0/$s1 here vs retail's $s1/$s0,
- * consistently through every later use.  HARD RULE 6 bans FIXING that with a
- * register pin or an operand constraint and calls the mismatch a STALL; it
- * does NOT certify the function unmatchable from C, and register-identity
- * titles on this corpus have been falsified by a fresh re-read before)
- * (docs/match-reports/Obj86B60__NotifyParents.md). Hand-derived. */
+/* Matched round 72: the two mode-dependent calls are ONE call through a
+ * slot picked per arm (self then has 5 refs, not 6, so global-alloc ranks
+ * arg1 above it: arg1 -> $s0, self -> $s1).  The barrier only moves arg1's
+ * copy into the prologue (instruction order, not register identity). */
 void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
 {
     Obj86B60Methods *methods;
+    void (*fn)(Obj86B60 *);
 
     methods = self->methods;
     __asm__("" ::: "memory");
     self->unk20 = arg1;
     methods->slot30(self);
     if (arg1 == 2) {
-        methods->slot64(self);
+        fn = methods->slot64;
     } else if (arg1 == 3) {
-        methods->slot68(self);
+        fn = methods->slot68;
+    } else {
+        return;
     }
+    fn(self);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_c", Obj86B60__NotifyParents);
-#endif
 
 void Obj86B60__NotifyTargetReset(Obj86B60 *self)
 {
