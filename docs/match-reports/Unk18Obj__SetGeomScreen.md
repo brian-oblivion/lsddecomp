@@ -27,3 +27,7 @@ void Unk18Obj__SetGeomScreen(Unk18Obj *self) {
 
 `include/code_2cc8c.h`: new extern `func_80024B90(Unk18Obj *self)` (PsyQ
 library, `asm/psyq_GsLinkObject4.s`, not decompiled in this project).
+
+## Naming
+
+`Unk18Obj__SetGeomScreen` -- tier A. Trivial one-line forwarding wrapper to Sony's `SetGeomScreen(self)`; mechanics are the entire function.

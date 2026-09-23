@@ -44,3 +44,7 @@ void Unk18Obj__SetViewPos(Unk18Obj *self, Vec3_2cc8c *a1) {
   byte-exact.
 - `Unk18ObjMethods::slot78` retyped from `void *` to `Vec3_2cc8c *` to
   match its own occupant's real signature.
+
+## Naming
+
+`Unk18Obj__SetViewPos` -- tier B. Copies `a1` wholesale into `self->unk14`, guarded by `self->unk10`. The ONLY other reader of `unk14` in this unit is `Unk18Obj__Update`, which hands `&self->unk14` straight to Sony's `GsSetRefView2` (a GPU reference-viewpoint setter) -- a real, identified consumer, which is why this crosses from a bare `SetUnk14` into a purpose-carrying name, but still tier B (the consumer establishes 'some kind of view position', not the field's full meaning).

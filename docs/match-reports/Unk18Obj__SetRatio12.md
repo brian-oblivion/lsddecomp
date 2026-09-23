@@ -56,3 +56,7 @@ the split-division idiom for 20.12 fixed-point (`q,r = a/b, a%b; return (q
 independent occupants of unrelated class hierarchies, same idiom -- this
 reads like a shared runtime helper pattern the original codebase used
 often, not a coincidence.
+
+## Naming
+
+`Unk18Obj__SetRatio12` -- tier B. Computes a 20.12 fixed-point value from a caller-supplied `{s16 whole; s16 frac;}` pair via the same split-division idiom as `code_d294_c`'s `RatioToFixed12` (divide for quotient+remainder, divide the shifted remainder again for the fraction), guarded by `self->unk10`, stores to `unk2C`. Named after the identified idiom (matches an existing, already-named sibling function's own algorithm), not after any established in-game meaning for the ratio.

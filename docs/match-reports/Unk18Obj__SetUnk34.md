@@ -50,3 +50,7 @@ which usually means the DESTINATION fields need to be combined into one
 struct field too** — not just casting the source pointer to a struct type
 while leaving two separate scalar destination fields, which still compiles
 to sequential per-field code.
+
+## Naming
+
+`Unk18Obj__SetUnk34` -- tier A. Whole-struct-assignment setter for `unk34` (a `Pair32_d294`); one instruction group, no guard, no other effect. Field's own real meaning is not established (kept `unk34`, not renamed -- see `## Proposed field names`), so the function is named after its mechanics only.

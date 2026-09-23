@@ -663,3 +663,7 @@ itself, not general local declaration order). Worth demoting from "try
 early" to "cheap dead end" for this specific residue shape (multiply/shift
 combined into one word-sized outer sum) unless a future case shows
 otherwise.
+
+## Naming
+
+`Unk18Obj__InitOt` -- tier A. One-time allocator/init guarded by `self->unk70`: allocates one buffer sized for two `GsOT` headers (`0x14` bytes each, `sizeof(GsOT)`) plus tag arrays plus packet area, carves it into the `unk78`/`unk80`/`unk88` and `unk7C`/`unk84`/`unk8C` base/size pairs, writes each `GsOT` header, and calls Sony's `GsClearOt` on both halves. "Ot" (ordering table) is Sony's own GPU term for exactly this structure, evident from the `GsClearOt`/`GsOT` shape itself.

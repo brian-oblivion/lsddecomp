@@ -29,3 +29,7 @@ void Unk18Obj__SetUnk48(Unk18Obj *self, s32 a1) {
 
 `include/code_2cc8c.h`: `Unk18Obj` gains `unk48` (`+0x048`), part of the
 same carve pass as `Unk18Obj__SetUnk44`.
+
+## Naming
+
+`Unk18Obj__SetUnk48` -- tier A. Sibling of `Unk18Obj__SetUnk44`: same `unk70`-guarded setter shape, writes `unk48`.

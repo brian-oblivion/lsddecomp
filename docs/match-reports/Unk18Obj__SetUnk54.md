@@ -25,3 +25,7 @@ void Unk18Obj__SetUnk54(Unk18Obj *self, s32 a1) {
 ## Header changes
 
 `include/code_2cc8c.h`: `Unk18Obj` gains `unk54` (`+0x054`).
+
+## Naming
+
+`Unk18Obj__SetUnk54` -- tier A. One-instruction plain field setter for `unk54`, no guard.

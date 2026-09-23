@@ -354,3 +354,7 @@ C89 idiom for "recompute this address, don't cache it" that this project
 hasn't tried yet, or is this a genuine case where GCC 2.6.3's CSE pass
 cannot be defeated from the C source at all (making it a to-be-escalated
 toolchain question, not a per-function one)?
+
+## Naming
+
+`Unk18Obj__InitDefaults` -- tier A. Slot40 occupant, called once from `Unk18Obj__Unk18Obj`'s own constructor tail (`self->methods->slot40(self)`, `code_2cc8c_c.c`) immediately after the base ctor. Body is straight-line field initialization to constants. Mechanics (post-ctor default init) are the whole of its purpose.

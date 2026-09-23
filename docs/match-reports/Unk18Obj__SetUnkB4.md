@@ -26,3 +26,7 @@ void Unk18Obj__SetUnkB4(Unk18Obj *self, s32 a1) {
 
 `include/code_2cc8c.h`: `Unk18Obj` gains `unkB4` (`+0x0B4`), after the
 existing `unkB0` field.
+
+## Naming
+
+`Unk18Obj__SetUnkB4` -- tier A. One-instruction plain field setter for `unkB4`, no guard.

@@ -149,3 +149,7 @@ end offset equal the very next field's start offset, by inspection, not
 just by trusting the `[hi - lo]` macro syntax to be self-correcting — it
 computes the SPAN correctly but does nothing to catch a missing span
 between two named fields).
+
+## Naming
+
+`Unk18Obj__Update` -- tier A. The `slot9C` occupant, dispatched by `Unk18Obj__OnNotifyTag5`; the existing (pre-round-73) report already described it in these exact terms as a "per-frame update" (light mode, fog, ref view, both `GsClearOt` halves, notifying child objects through `slotA0`), independently of this round's naming pass -- a description of MECHANICS, evident from the body, which is what a tier-A name requires.

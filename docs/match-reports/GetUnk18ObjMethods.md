@@ -34,3 +34,7 @@ comment accordingly rather than leaving the stale "external" note.
 table itself, `tools/classtable.py D_8006E8E4`, needed so this definition
 can return `&D_8006E8E4`) and updated the `GetUnk18ObjMethods` extern's own
 comment to reflect it is now matched, not external.
+
+## Naming
+
+`GetUnk18ObjMethods` -- tier A. Plain no-argument getter, `return &D_8006E8E4;` -- `Unk18Obj`'s own class table. Named to match the established sibling convention for this exact shape (`Get_vtable_BasicClass`, `GetClass6E99CMethods`, `GetClass86AA0Methods`), which is a free function (no `self`), not a `Class__Method`.

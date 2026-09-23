@@ -32,3 +32,7 @@ void Unk18Obj__DeinitOt(Unk18Obj *self) {
 
 `include/code_2cc8c.h`: new extern `DrawSync(s32 a0)` (PsyQ library,
 `asm/psyq_GsLinkObject4.s`, not decompiled).
+
+## Naming
+
+`Unk18Obj__DeinitOt` -- tier A. Teardown counterpart of `Unk18Obj__InitOt`, guarded by the same `unk70` latch: calls Sony's `DrawSync(0)`, frees the `unk78` buffer, clears `unk70`.

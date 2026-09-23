@@ -27,3 +27,7 @@ void Unk18Obj__SetUnk5B(Unk18Obj *self, SByte3_d294 *src) {
 ## Header changes
 
 `include/code_2cc8c.h`: `Unk18Obj` gains `unk5B` (`+0x05B`, `SByte3_d294`).
+
+## Naming
+
+`Unk18Obj__SetUnk5B` -- tier A. Sibling of `Unk18Obj__SetUnk58`: same whole-struct-assignment shape, writes `unk5B`.

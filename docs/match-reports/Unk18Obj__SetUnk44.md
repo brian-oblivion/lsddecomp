@@ -33,3 +33,7 @@ void Unk18Obj__SetUnk44(Unk18Obj *self, s32 a1) {
 unit). Same carve pass as `Unk18Obj__SetUnk3C`/`EA48`/`EA64`/`EA7C`/`EAC4`
 (`+0x03C..+0x060` span), all typed `s32` for lack of further evidence
 beyond "a stored word".
+
+## Naming
+
+`Unk18Obj__SetUnk44` -- tier A. Plain setter for `unk44`, guarded by the `unk70` one-time-init latch (only writes the first time). The guard is part of the mechanics; the field's real meaning is unestablished.

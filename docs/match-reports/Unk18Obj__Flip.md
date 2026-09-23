@@ -89,3 +89,7 @@ exactly, and is simpler than the first attempt besides.
   reads `self->unk58`'s bytes UNSIGNED — same "writer reads signed, this
   reader reads unsigned" situation as `unk5B`/`Unk18Obj__Update`, this
   round), `func_8003FBF4` (next slice, uncarved).
+
+## Naming
+
+`Unk18Obj__Flip` -- tier A. The `slotA4` occupant: recomputes `unk74` (a 0/1 double-buffer index) from a child object's own method, optionally resets the graphics context, clears+draws the CURRENT OT half (`GsSortClear`+`GsDrawOt`, both indexed by `unk74`), then collapses `unk74` to the other of 0/1 for next call -- the standard double-buffer flip shape (recompute index, drain current buffer, toggle for next frame).

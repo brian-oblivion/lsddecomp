@@ -25,3 +25,7 @@ void Unk18Obj__SetUnk40(Unk18Obj *self, s32 a1) {
 ## Header changes
 
 `include/code_2cc8c.h`: `Unk18Obj` gains `unk40` (`+0x040`).
+
+## Naming
+
+`Unk18Obj__SetUnk40` -- tier A. One-instruction plain field setter for `unk40`, no guard.

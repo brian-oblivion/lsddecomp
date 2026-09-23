@@ -26,3 +26,7 @@ SubHandleObj *Unk18Obj__GetSubHandle(Unk18Obj *self) {
 ## Header changes
 
 None beyond the prototype — `unkB0` was already typed `SubHandleObj *`.
+
+## Naming
+
+`Unk18Obj__GetSubHandle` -- tier A. Plain no-guard getter, `return self->unkB0;` -- the pure-leaf-getter case the tiering rule names explicitly as tier A by definition.

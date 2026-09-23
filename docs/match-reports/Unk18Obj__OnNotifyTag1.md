@@ -28,3 +28,7 @@ void Unk18Obj__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
 `include/code_2cc8c.h`: `Unk18ObjMethods` gains `slotA4` (`+0x0A4`,
 `void (*)(Unk18Obj*)`), splitting the pad between `slot9C` and the
 already-typed `slotA8`.
+
+## Naming
+
+`Unk18Obj__OnNotifyTag1` -- tier B. The `slot98` occupant `Unk18Obj__OnNotify` dispatches to when the sender's tag is 1; dispatches `slotA4` (`Unk18Obj__Flip`) only when `event == 2`. Same tier-B reasoning as `Unk18Obj__OnNotifyTag5`: named after the dispatch mechanism, not an unestablished event meaning.

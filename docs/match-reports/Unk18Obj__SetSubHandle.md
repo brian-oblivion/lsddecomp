@@ -59,3 +59,7 @@ guard's own C source structure has to reflect directly.
 `include/code_2cc8c.h`: `SubHandleObjMethods` gains `slot4`
 (`void (*)(SubHandleObj*)`, release-shaped, no extra args), splitting the
 old `pad000[0x04C]` span ahead of the already-typed `slot4C`.
+
+## Naming
+
+`Unk18Obj__SetSubHandle` -- tier A. Guarded by `self->unk10 == NULL`: releases the current `self->unkB0` via its own `slot4` if set, installs `a1`, and notifies it (`slot4C`) with `self->unkAC` and the shared `D_8008A904` constant. Plain "replace the held sub-handle" mechanics.

@@ -91,3 +91,7 @@ default as a ternary passed directly into the call, without reassigning
 the parameter, avoids the promotion.** Same family as this round's
 `Class6B5CC__ComposeAndApplyRotation` (declaration-order-driven register hoisting) but a
 different lever (expression form, not declaration order).
+
+## Naming
+
+`Unk18Obj__AttachViewChild` -- tier B. One-time init guarded by `self->unk10`: registers `a1` through the inherited `addChild` slot (which, per `Unk18Obj__AddChild` in `code_2cc8c_c.c`, sets `self->unk10` itself when `a1`'s dynamic-class tag is 4), forwards `a2`/`a3` to `slot78`/`slot7C` (this unit's own `Unk18Obj__SetViewPos`/`Unk18Obj__SetUnk20`), then hands `&self->unk14` to Sony's `GsSetRefView2`. "View" is inferred from that GsSetRefView2 hand-off, not proven for the field itself -- tier B, not A, per round 72's rule on asserting what data means.

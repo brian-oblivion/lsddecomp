@@ -58,3 +58,7 @@ finding.
 `void (*)(Unk18Obj*, GenericObj*, s32)`, occupants `Unk18Obj__OnNotifyTag5`/
 `Unk18Obj__OnNotifyTag1`, still queued as of this report) plus the corrective
 `pad09C` gap described above.
+
+## Naming
+
+`Unk18Obj__OnNotify` -- tier A. Body is a supercall to `Get_vtable_BasicClass()->onNotify` followed by dispatch on the sender's dynamic-class tag nibble (5 -> slot94, 1 -> slot98) -- the exact override shape already established and named for `BasicClass__OnNotify`/`Class6B5CC__OnNotify` (`include/code_8220.h`, `src/code_d294.c`). Matching an adopted, cross-class convention rather than a fresh guess.

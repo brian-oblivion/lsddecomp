@@ -41,3 +41,7 @@ what retail's own disassembly shows, not a general rule either way.
 - `Unk18ObjMethods` gains `slot9C` (`+0x09C`, `void (*)(Unk18Obj*)`),
   splitting the `pad09C` span added alongside `slot94`/`slot98` earlier
   this round.
+
+## Naming
+
+`Unk18Obj__OnNotifyTag5` -- tier B. The `slot94` occupant `Unk18Obj__OnNotify` dispatches to when the sender's dynamic-class tag is 5. Body always increments `unk90` and additionally dispatches `slot9C` (`Unk18Obj__Update`) when `event` is 2 or 3. Named after the dispatch mechanism (which tag reaches it), not after what tag 5 or event codes 2/3 mean in the game -- that is not established.

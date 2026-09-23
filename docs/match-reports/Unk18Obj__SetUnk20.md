@@ -30,3 +30,7 @@ void Unk18Obj__SetUnk20(Unk18Obj *self, Vec3_2cc8c *a1) {
 `include/code_2cc8c.h`: `Unk18Obj` gains `unk20` (`+0x020`, `Vec3_2cc8c`,
 immediately after `unk14`, no gap); `Unk18ObjMethods::slot7C` retyped from
 `void *` to `Vec3_2cc8c *`.
+
+## Naming
+
+`Unk18Obj__SetUnk20` -- tier A. Sibling of `Unk18Obj__SetViewPos`: same whole-Vec3-copy shape guarded by `self->unk10`, writes `unk20`. No consumer of `unk20` was found anywhere in this unit (unlike `unk14`), so kept as a plain mechanical name rather than guessing a role.

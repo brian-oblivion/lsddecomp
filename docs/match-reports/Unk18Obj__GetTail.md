@@ -66,3 +66,7 @@ retail's assembly shows" even when the disassembly visually looks like
 one; GCC gets to that shape by ROTATING a `while`, and handing it an
 already-rotated source can make it add a further redundant jump on top
 rather than recognizing the guard as already covered by the loop.
+
+## Naming
+
+`Unk18Obj__GetTail` -- tier A. Walks `self->unkC` while non-NULL to find the tail of a singly-linked chain rooted at `self`; a pure leaf whose mechanics (list-tail walk) are its whole purpose.

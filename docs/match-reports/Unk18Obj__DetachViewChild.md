@@ -29,3 +29,7 @@ void Unk18Obj__DetachViewChild(Unk18Obj *self) {
 ## Header changes
 
 None beyond the prototype — `slot14` was already typed from round 13.
+
+## Naming
+
+`Unk18Obj__DetachViewChild` -- tier B. Teardown counterpart of `Unk18Obj__AttachViewChild`: removes `self->unk10` as a child through the inherited `removeChild` slot, only if it was ever set. Same tier-B caveat on "view" as the attach side.

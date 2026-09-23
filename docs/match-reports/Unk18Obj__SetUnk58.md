@@ -53,3 +53,7 @@ idiom — but this one doesn't need `lwl`/`lwr` at all (3 plain byte
 ops); the tell here is purely the LOAD-then-STORE ORDERING, not the
 instruction form. Worth checking register order (not just opcode choice)
 when a small fixed-size field-by-field copy doesn't match.
+
+## Naming
+
+`Unk18Obj__SetUnk58` -- tier A. Whole-struct-assignment setter for `unk58` (a 3-signed-byte `SByte3_d294`).

@@ -27,3 +27,7 @@ void Unk18Obj__SetUnk3C(Unk18Obj *self, s32 a1) {
 `include/code_2cc8c.h`: `Unk18Obj` gains `s32 unk3C` at `+0x03C` (splits the
 `pad034[0x0AC-0x034]` span). See `Unk18Obj__SetUnk44`'s report for the sibling
 setters carved from the same span in one pass.
+
+## Naming
+
+`Unk18Obj__SetUnk3C` -- tier A. One-instruction (`sw $a1, 0x3C($a0)`) plain field setter, no guard.
