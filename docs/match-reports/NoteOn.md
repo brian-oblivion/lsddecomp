@@ -17,20 +17,20 @@ remaining mismatch is a same-opcode, same-operand REGISTER RENAME
 exactly as this report's original derivation found. Checked this
 function's delay-slot filler (`move $a3,$a2` in the `flag==0` early
 return's delay slot) against the possibility raised by
-`func_80034F90.md`'s round-31 finding -- that a delay-slot filler which
+`ContNrpn2.md`'s round-31 finding -- that a delay-slot filler which
 "looks dead" can actually be a hidden UNCONDITIONAL memory write the
 stalled C only modeled on one branch arm. **That possibility does not
 apply here**: this delay slot's instruction is a bare GPR-to-GPR `move`
 with no memory effect at all, so there is no hidden write to relocate --
-unlike `func_80034F90`'s `sb $a2,0x16($s0)`, a register move that is
+unlike `ContNrpn2`'s `sb $a2,0x16($s0)`, a register move that is
 never read again has no observable effect on ANY path, taken or not, and
 this report's original derivation already confirmed as much by testing
 an explicit equivalent dead statement (`if (flag==0) { a3=a2; return;
 }`) with zero effect on the compiled output. No new axis found; not
 re-attempted with `decomp-permuter` this round given the budget went to
-the higher-yield near-miss cluster instead (see `func_80034AEC.md`,
-`func_800349B0.md`, `func_80034C28.md`, `func_80035A7C.md`,
-`func_80034F90.md` for this round's five matches). This remains a
+the higher-yield near-miss cluster instead (see `ContPortaTime.md`,
+`ContModulation.md`, `ContPortamento.md`, `func_80035A7C.md`,
+`ContNrpn2.md` for this round's five matches). This remains a
 genuine register-identity STALL per `CLAUDE.md`'s explicit rule.
 
 ## Round 32 update (runner bravo): dead-value reuse closed 17 of 26 residue words -- 44/70 -> 61/70
@@ -229,7 +229,7 @@ this project (`SpuVmSeKeyOn`, `func_800319B4`, and this unit's own
   performs the SAME mask operation independently at each site (`andi
   t1,s1,0xff` for the multiply, then a SEPARATE `andi a3,a3,0xff` at each
   call site) rather than reusing one cached value. Same family as this
-  unit's other "redundant re-read" idiom (`func_80034D90`'s quadruple
+  unit's other "redundant re-read" idiom (`ContResetAll`'s quadruple
   `rec->unk12` reads).
 - **The packed dispatch id (`(a1<<8)|a0`) needs an explicit `s16`
   truncate-and-sign-extend, not a bare `s32`.** Declaring `packed` as

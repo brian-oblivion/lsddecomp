@@ -1,4 +1,6 @@
-# func_80034D90 -- MATCHED 51/51, round 24 (head)
+# ContResetAll -- MATCHED 51/51, round 24 (head)
+
+> Renamed from `func_80034D90` on 2026-09-23 (tools/rename.py). Address 0x80034d90.
 
 > **VERDICT OVERTURNED, round 24 (2026-09-08). This function is MATCHED, and
 > the class it was filed under needed a SCOPE BOUNDARY rather than another
@@ -49,7 +51,7 @@
 > idiom before accepting a class verdict.
 
 
-`asm/nonmatchings/code_179d8_k/func_80034D90.s`, vram `0x80034D90`, unit
+`asm/nonmatchings/code_179d8_k/ContResetAll.s`, vram `0x80034D90`, unit
 `code_179d8_k`. Round 24, runner alpha.
 
 ## What it is
@@ -63,7 +65,7 @@ shared `func_80035E80` VLQ-decode helper, caching its return into
 `rec->unk88`.
 
 ```c
-void func_80034D90(s16 a0, s16 a1)
+void ContResetAll(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
 
@@ -114,4 +116,4 @@ reordering commutative operands.
 ## Verification
 
 `./build-and-verify.sh` build exit=2 (clean compile). `funcdiff.py
-func_80034D90`: 49/51 words match, compiled length exact.
+ContResetAll`: 49/51 words match, compiled length exact.

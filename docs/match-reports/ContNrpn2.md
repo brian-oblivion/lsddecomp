@@ -1,6 +1,8 @@
-# func_80034F90 -- MATCHED: 82/82, byte-exact
+# ContNrpn2 -- MATCHED: 82/82, byte-exact
 
-`asm/nonmatchings/code_179d8_k/func_80034F90.s`, vram `0x80034F90`, unit
+> Renamed from `func_80034F90` on 2026-09-23 (tools/rename.py). Address 0x80034f90.
+
+`asm/nonmatchings/code_179d8_k/ContNrpn2.s`, vram `0x80034F90`, unit
 `code_179d8_k`. Round 25, runner alpha (stall). Round 31, runner bravo
 (closed).
 
@@ -83,7 +85,7 @@ A per-(channel, slot) "note-off / control" dispatcher, switching on the
 low byte of its third parameter (`a2 & 0xFF`):
 
 ```c
-void func_80034F90(s16 a0, s16 a1, u8 a2)
+void ContNrpn2(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 kind = a2;
@@ -241,5 +243,5 @@ after three real structural fixes already landed 77/82.
 ## Verification
 
 `./build-and-verify.sh` build exit=2 (clean compile, expected -- function
-restored to `INCLUDE_ASM`). `funcdiff.py func_80034F90`: 77/82 words
+restored to `INCLUDE_ASM`). `funcdiff.py ContNrpn2`: 77/82 words
 match, compiled length exact (82/82, no outside-range drift).

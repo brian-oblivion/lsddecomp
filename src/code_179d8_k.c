@@ -30,10 +30,10 @@
  * Sizes, cheapest first -- six functions at 31..51 words, which is the
  * cheap seam the `fresh` queue had run out of:
  *   SetProgramChange  31w   func_800350D8  31w   func_80035154  31w
- *   func_80035A7C  44w   func_80035E80  47w   func_80034D90  51w
- *   SeqPlay  69w   NoteOn  70w   func_80034E5C  77w
- *   func_800349B0  79w   func_80034AEC  79w   func_80034F90  82w
- *   func_80034C28  90w   GetSeqData 172w   func_800357B0 179w
+ *   func_80035A7C  44w   func_80035E80  47w   ContResetAll  51w
+ *   SeqPlay  69w   NoteOn  70w   ContNrpn1  77w
+ *   ContModulation  79w   ContPortaTime  79w   ContNrpn2  82w
+ *   ContPortamento  90w   GetSeqData 172w   func_800357B0 179w
  *   func_80034690 200w   func_80035B2C 213w   func_800351D0 376w
  *
  * THIS UNIT OWNS THREE SWITCH JUMP TABLES, not the two the old remainder
@@ -391,12 +391,12 @@ extern void func_80030980(s32 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
  * reading; the rest are already established (matched, or from their own
  * STALL comments) elsewhere in this file. */
 extern void func_800351D0(s16 a0, s16 a1, u8 a2);
-extern void func_80034C28(s16 a0, s16 a1, s32 a2);
-extern void func_80034E5C(s16 a0, s16 a1, u8 a2);
-extern void func_80034F90(s16 a0, s16 a1, u8 a2);
+extern void ContPortamento(s16 a0, s16 a1, s32 a2);
+extern void ContNrpn1(s16 a0, s16 a1, u8 a2);
+extern void ContNrpn2(s16 a0, s16 a1, u8 a2);
 extern void func_800350D8(s16 a0, s16 a1, u8 a2);
 extern void func_80035154(s16 a0, s16 a1, u8 a2);
-extern void func_80034D90(s16 a0, s16 a1);
+extern void ContResetAll(s16 a0, s16 a1);
 
 /* Control-Change dispatcher: reads one data byte from the event stream
  * (the CC value) and routes on `a2`, the CC NUMBER, through a dense 0..121
@@ -473,16 +473,16 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
         }
         break;
     case 65:
-        func_80034C28(a0, a1, val);
+        ContPortamento(a0, a1, val);
         return;
     case 91:
         SsUtSetReverbDepth(val, val);
         break;
     case 98:
-        func_80034E5C(a0, a1, val);
+        ContNrpn1(a0, a1, val);
         return;
     case 99:
-        func_80034F90(a0, a1, val);
+        ContNrpn2(a0, a1, val);
         return;
     case 100:
         func_800350D8(a0, a1, val);
@@ -491,7 +491,7 @@ void func_80034690(s16 a0, s16 a1, u8 a2)
         func_80035154(a0, a1, val);
         return;
     case 121:
-        func_80034D90(a0, a1);
+        ContResetAll(a0, a1);
         return;
     default:
         break;
@@ -525,7 +525,7 @@ typedef struct {
     u8 pad0[0x8];
     u8 unk8;    /* +0x08: byte stamped between the two per-item calls -- the
                  * struct's TOTAL size is 0x20, not the 0x28 that offset
-                 * alone would suggest; see func_800349B0.md's round-31
+                 * alone would suggest; see ContModulation.md's round-31
                  * update for why the two are decoupled once the
                  * register-rescue fix below is applied. */
     u8 pad9[0x20 - 0x9];
@@ -535,7 +535,7 @@ extern s16 SsUtGetProgAtr(s16 a0, s16 a1, void *out);
 extern void SsUtGetVagAtr(s16 a0, s16 a1, s16 a2, void *out);
 extern void SsUtSetVagAtr(s16 a0, s16 a1, s16 a2, void *out);
 
-void func_800349B0(s16 a0, s16 a1, u8 a2)
+void ContModulation(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
@@ -552,7 +552,7 @@ void func_800349B0(s16 a0, s16 a1, u8 a2)
     rec->unk88 = func_80035E80(a0, a1);
 }
 
-/* Same shape as func_800349B0 -- see that function's own struct comment.
+/* Same shape as ContModulation -- see that function's own struct comment.
  * Only the scratch byte's offset differs (0xB here vs 0x8 there). */
 typedef struct {
     u8 pad0[0xB];
@@ -560,7 +560,7 @@ typedef struct {
     u8 pad9[0x20 - 0xC];
 } Scratch_80034AEC;
 
-void func_80034AEC(s16 a0, s16 a1, u8 a2)
+void ContPortaTime(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
@@ -577,7 +577,7 @@ void func_80034AEC(s16 a0, s16 a1, u8 a2)
     rec->unk88 = func_80035E80(a0, a1);
 }
 
-/* Same NoteList/callee shape as func_800349B0/func_80034AEC, plus a
+/* Same NoteList/callee shape as ContModulation/ContPortaTime, plus a
  * range check on this function's own third parameter that picks a
  * one-byte flag written into the scratch buffer at relative offset 1. */
 typedef struct {
@@ -586,7 +586,7 @@ typedef struct {
     u8 pad2[0x20 - 0x2];
 } Scratch_80034C28;
 
-void func_80034C28(s16 a0, s16 a1, s32 a2)
+void ContPortamento(s16 a0, s16 a1, s32 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
@@ -611,11 +611,11 @@ void func_80034C28(s16 a0, s16 a1, s32 a2)
     rec->unk88 = func_80035E80(a0, a1);
 }
 
-/* STALL -- see docs/match-reports/func_80034D90.md. length exact 51/51,
+/* STALL -- see docs/match-reports/ContResetAll.md. length exact 51/51,
  * 49/51 raw word-match, residue is the project's settled commutative-
  * operand-order canonicalization class (2 words). Near-miss body preserved
  * in the report; #if 0 body kept here too so it travels with this .c. */
-void func_80034D90(s16 a0, s16 a1)
+void ContResetAll(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
 
@@ -637,7 +637,7 @@ void func_80034D90(s16 a0, s16 a1)
 typedef void (*Fn80090368)(s32 channel, u8 arg1);
 extern Fn80090368 D_80090368[][16];
 
-/* STALL -- see docs/match-reports/func_80034E5C.md. Compiled length ONE WORD
+/* STALL -- see docs/match-reports/ContNrpn1.md. Compiled length ONE WORD
  * SHORT (76/77), 54/77 raw word-match, first real content diff at word 55/56:
  * GCC folds the "slot" array-index multiply into the sign-extension in one
  * shift pair because the slot value is used exactly once, where retail
@@ -646,7 +646,7 @@ extern Fn80090368 D_80090368[][16];
  * the "channel" index, which IS reused later and so never gets fused here
  * either) -- a register/instruction-count residue, not a logic difference. */
 #if 0
-void func_80034E5C(s16 a0, s16 a1, u8 a2)
+void ContNrpn1(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 kind;
@@ -680,15 +680,15 @@ skip_call:
     rec->unk88 = func_80035E80(a0, a1);
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034E5C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_k", ContNrpn1);
 
-/* STALL -- see docs/match-reports/func_80034F90.md. Compiled length EXACT
+/* STALL -- see docs/match-reports/ContNrpn2.md. Compiled length EXACT
  * (82/82), 77/82 raw word-match, first real diff at word 40: a single
  * independent instruction (`sltiu`) the compiler hoists into a branch
  * delay slot one branch earlier than retail places it -- a pure
  * instruction-scheduling residue, not a logic or CFG difference. */
 #if 1
-void func_80034F90(s16 a0, s16 a1, u8 a2)
+void ContNrpn2(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 kind = a2;

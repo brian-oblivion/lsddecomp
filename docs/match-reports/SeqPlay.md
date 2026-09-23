@@ -252,12 +252,12 @@ Rebuilt the preserved near-miss body and reproduced the title figures
 exactly: 66/69, length exact, first real diff at word 22 (the swapped
 `unk70`/`unk88` load pair), plus the `move $a2,$v0` delay-slot residue.
 
-Checked this function's delay-slot filler against `func_80034F90.md`'s
+Checked this function's delay-slot filler against `ContNrpn2.md`'s
 round-31 finding that a "dead" delay-slot filler can actually be a hidden
 UNCONDITIONAL write the stalled C mis-scoped to one branch arm only.
 **Does not apply here**: `addu $a2,$v0,$zero` (disassembly line 34,
 `asm/nonmatchings/code_179d8_k/SeqPlay.s`) is a bare GPR-to-GPR
-move with no memory effect. Unlike `func_80034F90`'s `sb` store (which
+move with no memory effect. Unlike `ContNrpn2`'s `sb` store (which
 persists past the branch and is observable from other code paths or a
 later read of the same struct field), a register move that is never read
 again cannot have a hidden effect on ANY path -- there is nothing further
@@ -266,8 +266,8 @@ original derivation already established the same conclusion by testing
 an equivalent explicit dead statement with zero effect. No new axis
 found this round; not re-attempted with `decomp-permuter` given the
 budget went to the higher-yield near-miss cluster instead (see
-`func_80034AEC.md`, `func_800349B0.md`, `func_80034C28.md`,
-`func_80035A7C.md`, `func_80034F90.md` for this round's five matches, and
+`ContPortaTime.md`, `ContModulation.md`, `ContPortamento.md`,
+`func_80035A7C.md`, `ContNrpn2.md` for this round's five matches, and
 `GetSeqData.md`/`NoteOn.md` for the round's other two
 register-identity re-verifications). This remains a genuine
 register-identity/scheduling STALL per `CLAUDE.md`'s explicit rule.

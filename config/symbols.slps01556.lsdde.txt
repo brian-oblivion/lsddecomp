@@ -1534,3 +1534,25 @@ NoteOn = 0x800344FC; // type:func
 // SetProgramChange (disc 3.3); the near-identical-shape ContRpn1/ContRpn2
 // candidates score only masked 0.87. Round 71 (bravo, track 2).
 SetProgramChange = 0x80034614; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContModulation
+// (disc 3.3), near-identical-shape ContPortaTime candidate only masked 0.99;
+// module order (objdump -t sdk/work/3.3/elf/libsnd/seqread.o) confirms
+// ContModulation (0x8f4) precedes ContPortaTime (0xa30), matching retail's
+// address order here. Round 71 (bravo, track 2).
+ContModulation = 0x800349B0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContPortaTime
+// (disc 3.3), near-identical-shape ContModulation candidate only masked
+// 0.99; module order agrees (see ContModulation, above). Round 71 (bravo, track 2).
+ContPortaTime = 0x80034AEC; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContPortamento
+// (disc 3.3). Round 71 (bravo, track 2).
+ContPortamento = 0x80034C28; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContResetAll
+// (disc 3.3). Round 71 (bravo, track 2).
+ContResetAll = 0x80034D90; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContNrpn1
+// (disc 3.3). Round 71 (bravo, track 2).
+ContNrpn1 = 0x80034E5C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContNrpn2
+// (disc 3.3). Round 71 (bravo, track 2).
+ContNrpn2 = 0x80034F90; // type:func

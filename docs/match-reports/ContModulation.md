@@ -1,6 +1,8 @@
-# func_800349B0 -- MATCHED: 79/79, byte-exact
+# ContModulation -- MATCHED: 79/79, byte-exact
 
-`asm/nonmatchings/code_179d8_k/func_800349B0.s`, vram `0x800349B0`, unit
+> Renamed from `func_800349B0` on 2026-09-23 (tools/rename.py). Address 0x800349b0.
+
+`asm/nonmatchings/code_179d8_k/ContModulation.s`, vram `0x800349B0`, unit
 `code_179d8_k`. Round 25, runner alpha (stall). Round 31, runner bravo
 (closed).
 
@@ -11,8 +13,8 @@ anything: 28/79 raw word-match with the correct-offset (0x28-total)
 struct, drift warning present exactly as this report already documents
 (the 8-byte frame overshoot shifts everything downstream).
 
-**Fix 1 -- the register-rescue residue, shared with `func_80034AEC` and
-`func_80034C28` (see `func_80034AEC.md` for the decomp-permuter derivation
+**Fix 1 -- the register-rescue residue, shared with `ContPortaTime` and
+`ContPortamento` (see `ContPortaTime.md` for the decomp-permuter derivation
 that found it first).** Caching the raw byte offset (`u8 offset =
 rec->unk12;`) instead of a persistent pointer (`u8 *p = (u8 *)rec +
 rec->unk12;`), and recomputing `((u8 *)rec + offset)[0x2C]` at each of the
@@ -44,7 +46,7 @@ typedef struct {
     u8 pad9[0x20 - 0x9];   /* struct total is 0x20, NOT 0x28 -- see above */
 } Scratch_800349B0;
 
-void func_800349B0(s16 a0, s16 a1, u8 a2)
+void ContModulation(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
@@ -115,7 +117,7 @@ extern s16 func_800334F0(s16 a0, s16 a1, void *out);
 extern void func_80033260(s16 a0, u8 a1, s16 a2, void *out);
 extern void func_80036230(s16 a0, u8 a1, s16 a2, void *out);
 
-void func_800349B0(s16 a0, s16 a1, u8 a2)
+void ContModulation(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
@@ -167,7 +169,7 @@ counter's sign-extended holding register. This build's allocator picks
 `$s4` for `p` DIRECTLY from the point it is computed, never touching `$s0`
 for that value at all, so the rescue copy has nothing to do and is elided
 -- one fewer instruction, everything after ripples by a word. This is the
-same class of residue as `func_80034E5C`'s (an allocator choosing a more
+same class of residue as `ContNrpn1`'s (an allocator choosing a more
 economical register path than retail's), not a logic difference, and none
 of the usual source-shape levers changed it: neither reordering the local
 declarations (`p` before/after `list`/`scratch`/`i`) nor changing the loop
@@ -225,7 +227,7 @@ moving the score:
   18/79, with the compiled length unchanged (still 79 words total) but
   a different, worse register allocation throughout -- reverted.
 
-**Cross-cluster answer (this round's explicit ask):** `func_80034E5C`'s
+**Cross-cluster answer (this round's explicit ask):** `ContNrpn1`'s
 residue (a fused sign-extend-and-multiply shift, see that report) is
 CONFIRMED NOT the same cause as this family's register-rescue residue --
 the two are structurally unrelated (one is about an index multiply
@@ -237,7 +239,7 @@ either transferred to the other.
 ## Verification
 
 `./build-and-verify.sh` build exit=2 (clean compile, expected -- function
-restored to `INCLUDE_ASM`). `funcdiff.py func_800349B0`: compiled length
+restored to `INCLUDE_ASM`). `funcdiff.py ContModulation`: compiled length
 78/79 words (one short) with the correct-offset struct above; raw
 word-match figures cited per variant above were all measured before
 reverting.

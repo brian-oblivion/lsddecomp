@@ -1,6 +1,8 @@
-# func_80034E5C -- STALL: length ONE WORD SHORT (76/77); 54/77 raw word-match; first real diff at word 55 (vram 0x80034F38)
+# ContNrpn1 -- STALL: length ONE WORD SHORT (76/77); 54/77 raw word-match; first real diff at word 55 (vram 0x80034F38)
 
-`asm/nonmatchings/code_179d8_k/func_80034E5C.s`, vram `0x80034E5C`, unit
+> Renamed from `func_80034E5C` on 2026-09-23 (tools/rename.py). Address 0x80034e5c.
+
+`asm/nonmatchings/code_179d8_k/ContNrpn1.s`, vram `0x80034E5C`, unit
 `code_179d8_k`. Round 25, runner alpha. Round 31, runner bravo
 (re-verified, permuter search negative, still stalled).
 
@@ -106,7 +108,7 @@ so, looks up a function pointer in a per-(channel,slot) dispatch table
 sibling function in this file has.
 
 ```c
-void func_80034E5C(s16 a0, s16 a1, u8 a2)
+void ContNrpn1(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 kind;
@@ -256,7 +258,7 @@ of the barrier for the scheduler to move anything across.
 
 **Cross-cluster answer:** this function's cause (a sign-extend/multiply
 fusion peephole triggered by `sl` being used exactly once) does **NOT**
-explain `func_800349B0`/`func_80034AEC`/`func_80034C28`'s shared residue
+explain `ContModulation`/`ContPortaTime`/`ContPortamento`'s shared residue
 (a `move`-based register rescue before a loop counter reclaims a register)
 -- confirmed by inspection, not just by absence of a shared fix: this
 function has no loop and no register reuse for a counter at all, so the
@@ -268,7 +270,7 @@ a real (but still unresolved) class among themselves.
 ## Verification
 
 `./build-and-verify.sh` build exit=2 (clean compile, expected -- this
-function restored to `INCLUDE_ASM`). `funcdiff.py func_80034E5C`: 54/77
+function restored to `INCLUDE_ASM`). `funcdiff.py ContNrpn1`: 54/77
 words match at the point the residue was last measured (before reverting),
 compiled length 76/77 words (one short). The struct-field additions above
 were verified independently safe via a whole-image byte-exact rebuild before

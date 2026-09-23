@@ -1,6 +1,8 @@
-# func_80034AEC -- MATCHED: 79/79, byte-exact
+# ContPortaTime -- MATCHED: 79/79, byte-exact
 
-`asm/nonmatchings/code_179d8_k/func_80034AEC.s`, vram `0x80034AEC`, unit
+> Renamed from `func_80034AEC` on 2026-09-23 (tools/rename.py). Address 0x80034aec.
+
+`asm/nonmatchings/code_179d8_k/ContPortaTime.s`, vram `0x80034AEC`, unit
 `code_179d8_k`. Round 25, runner alpha (stall). Round 31, runner bravo
 (closed).
 
@@ -42,7 +44,7 @@ which is exactly the condition under which retail's own compile needed
 the full pipeline:
 
 ```c
-void func_80034AEC(s16 a0, s16 a1, u8 a2)
+void ContPortaTime(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
@@ -63,8 +65,8 @@ void func_80034AEC(s16 a0, s16 a1, u8 a2)
 Byte-exact, 79/79, no drift; `./build-and-verify.sh` whole-image SHA1
 green. This SAME fix (same `offset`-not-`p` idiom) also closed the two
 sibling functions sharing this residue class this round --
-`func_800349B0` (which additionally needed a struct-size fix, see that
-report) and `func_80034C28` (which additionally needed an
+`ContModulation` (which additionally needed a struct-size fix, see that
+report) and `ContPortamento` (which additionally needed an
 immediate-canonicalization fix, see that report).
 
 ### Proposed learning
@@ -85,11 +87,11 @@ already exhausted.
 
 ## What it is
 
-Structurally IDENTICAL to `func_800349B0` (same unit, immediately
+Structurally IDENTICAL to `ContModulation` (same unit, immediately
 following it in ROM order): a per-(channel, slot) "dispatch note events"
 loop calling `func_800334F0` to get an item count, then `func_80033260`
 and `func_80036230` once per item with a scratch struct stamped with `a2`
-in between. The only difference from `func_800349B0` is WHERE the stamped
+in between. The only difference from `ContModulation` is WHERE the stamped
 byte lands in the scratch struct: offset `0x2B` (relative to the stack
 frame) here instead of `0x28` there -- i.e. the scratch struct's stamped
 field is at relative offset `0xB` instead of `0x8`.
@@ -101,11 +103,11 @@ typedef struct {
     u8 pad9[0x20 - 0xC];
 } Scratch_80034AEC;
 
-void func_80034AEC(s16 a0, s16 a1, u8 a2)
+void ContPortaTime(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
-    NoteList_800349B0 list;    /* shared with func_800349B0, see that report */
+    NoteList_800349B0 list;    /* shared with ContModulation, see that report */
     Scratch_80034AEC scratch;
     s32 i;
 
@@ -119,7 +121,7 @@ void func_80034AEC(s16 a0, s16 a1, u8 a2)
 }
 ```
 
-## Residue -- see `func_800349B0.md` for the full derivation
+## Residue -- see `ContModulation.md` for the full derivation
 
 Both of this function's residues are the exact same two identified in the
 sibling report, reproduced here confirming they are a CLASS (a shared root
@@ -140,13 +142,13 @@ cause across at least two functions in this unit), not a one-off:
    byte delta, as the sibling function.
 
 No new axes were tried here beyond confirming the sibling's two findings
-reproduce -- see `func_800349B0.md` for the full list of axes already
+reproduce -- see `ContModulation.md` for the full list of axes already
 tried and ruled inert/regressive for this residue class, which applies
 unchanged to this function.
 
 ## Verification
 
 `./build-and-verify.sh` build exit=2 (clean compile, expected -- function
-restored to `INCLUDE_ASM`). `funcdiff.py func_80034AEC`: compiled length
+restored to `INCLUDE_ASM`). `funcdiff.py ContPortaTime`: compiled length
 78/79 words (one short) with the correct-offset, 0x20-sized scratch struct
 above (38/79 raw word-match at that configuration).

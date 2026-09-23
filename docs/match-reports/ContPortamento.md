@@ -1,6 +1,8 @@
-# func_80034C28 -- MATCHED: 90/90, byte-exact
+# ContPortamento -- MATCHED: 90/90, byte-exact
 
-`asm/nonmatchings/code_179d8_k/func_80034C28.s`, vram `0x80034C28`, unit
+> Renamed from `func_80034C28` on 2026-09-23 (tools/rename.py). Address 0x80034c28.
+
+`asm/nonmatchings/code_179d8_k/ContPortamento.s`, vram `0x80034C28`, unit
 `code_179d8_k`. Round 25, runner alpha (stall). Round 31, runner bravo
 (closed).
 
@@ -9,13 +11,13 @@
 Re-verified round 25's baseline reproduces exactly: 38/90 raw word-match,
 compiled length 89/90 (one short).
 
-**Residue 1 (register-rescue class) -- same fix as `func_80034AEC` and
-`func_800349B0`.** Caching the byte offset (`u8 offset = rec->unk12;`)
+**Residue 1 (register-rescue class) -- same fix as `ContPortaTime` and
+`ContModulation`.** Caching the byte offset (`u8 offset = rec->unk12;`)
 instead of a persistent pointer and recomputing `((u8 *)rec +
 offset)[0x2C]` at each of the three use sites closed the missing-word
 residue on its own: 89/90 raw match with length now EXACT at 90/90 (the
 one remaining word is residue 2 below, an encoding difference, not a
-missing instruction). See `func_80034AEC.md` for the decomp-permuter
+missing instruction). See `ContPortaTime.md` for the decomp-permuter
 derivation that found this fix.
 
 **Residue 2 (immediate-constant canonicalization) -- closed via
@@ -45,7 +47,7 @@ both failed to stop the canonicalization -- the untried axis was the
 constant's own source form, not the mask's. Translated to idiomatic C:
 
 ```c
-void func_80034C28(s16 a0, s16 a1, s32 a2)
+void ContPortamento(s16 a0, s16 a1, s32 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset;
@@ -92,7 +94,7 @@ attempts (varying the mask) explored the wrong half of the expression.
 ## What it is
 
 The same `func_800334F0`-count / `func_80033260`+`func_80036230`-per-item
-shape as `func_800349B0`/`func_80034AEC`, plus a genuinely new piece of
+shape as `ContModulation`/`ContPortaTime`, plus a genuinely new piece of
 logic: a range check on this function's OWN third parameter (`a2`, wider
 than a byte -- retail explicitly `andi`s it, which a true `u8` parameter
 would never need) that picks a one-byte "velocity curve" flag written into
@@ -105,11 +107,11 @@ typedef struct {
     u8 pad2[0x20 - 0x2];
 } Scratch_80034C28;
 
-void func_80034C28(s16 a0, s16 a1, s32 a2)
+void ContPortamento(s16 a0, s16 a1, s32 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
-    NoteList_800349B0 list;    /* shared with func_800349B0, see that report */
+    NoteList_800349B0 list;    /* shared with ContModulation, see that report */
     Scratch_80034C28 scratch;
     s32 i;
 
@@ -143,7 +145,7 @@ non-hoist is not itself a residue.
 
 ## Residue 1 -- the family's register-rescue class, confirmed a THIRD time
 
-Identical in shape to `func_800349B0`/`func_80034AEC` (see those reports
+Identical in shape to `ContModulation`/`ContPortaTime` (see those reports
 for the full derivation): retail computes the "state block" pointer
 (`p`) into `$s0` first, then explicitly rescues it into `$s3`
 (`move $s3,$s0`) before repurposing `$s0` as the loop's fixed-point
@@ -152,9 +154,9 @@ position accumulator (incremented by `0x10000` per iteration rather than
 idiom already documented for this family). This build's allocator assigns
 `$s3` to `p` directly, eliding the rescue -- one word short, matching the
 sibling functions' residue exactly. Three instances now (this one,
-`func_800349B0`, `func_80034AEC`) confirm this is a genuine CLASS specific
+`ContModulation`, `ContPortaTime`) confirm this is a genuine CLASS specific
 to this "count-then-per-item-loop-with-a-rescued-state-pointer" shape, not
-a one-off; see `func_800349B0.md` for the axes already tried and ruled out
+a one-off; see `ContModulation.md` for the axes already tried and ruled out
 against it.
 
 ## Residue 2 -- a NEW class: immediate-constant canonicalization
@@ -198,6 +200,6 @@ open, flagged rather than asserted.
 ## Verification
 
 `./build-and-verify.sh` build exit=2 (clean compile, expected -- function
-restored to `INCLUDE_ASM`). `funcdiff.py func_80034C28`: 38/90 words
+restored to `INCLUDE_ASM`). `funcdiff.py ContPortamento`: 38/90 words
 match, compiled length 89/90 (one short, from residue 1 above; residue 2
 is a same-length byte mismatch that does not itself change the count).
