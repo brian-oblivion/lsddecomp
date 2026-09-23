@@ -6,6 +6,134 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-23 — round 71: six of seven revisits match, track 2 closes, and a pinned-name rename silently moves Sony code back into the game counts
+
+**Five slots, eight runner sessions, four tracks, all merges green.** The
+head ran on Opus; nothing needed Fable, and the plan-level findings are
+ESCALATED below. Gate 0 was clean, and every worktree byte-verified before
+handover. `headercontention.py` found no header or call-graph contention
+among the units assigned. The operator's pasted cap was 5; three slots were
+refilled as runners finished (§3.8), each after re-reading the ready list and
+re-pricing contention.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | opus | 3 | `code_d294` | 20 functions + 3 globals named (the Class6B5CC base class), 18 own-unit fields/slots, header comment; review PASSED, marked |
+| bravo | sonnet | 2 | `code_179d8_*` | all 61 unnamed SDK functions identified and renamed |
+| charlie | opus | 1 revisit | `class_3ac78` | 3 MATCHED: SetFootprintRect 52/52, ResetAllElements 74/74, DispatchToRectCells 117/117 |
+| delta | sonnet | 1b | `class_3bb8c_e` | 2 bodies promoted |
+| echo | opus | 3 | `Entity_b` | 19 functions + 10 constants + 2 fields named; review PASSED, marked |
+| charlie (re-send) | opus | 1 revisit | `code_2cc8c_d` | `func_8003ECD0` MATCHED 73/73 |
+| delta (re-send) | opus | 1 revisit | `class_3bb8c_b` | `func_8004CAF0` 97/97 and `func_8004C6A8` 165/165 MATCHED; `func_8004CD38` STALL 2/27, length exact |
+| charlie (re-send) | sonnet | 1b | `code_55dd4` | 2 bodies promoted |
+
+Revisits went **6 for 7**; the revisit yield is now 23/40. Track 2 is
+**done** (`plan.py`: 0 still `func_`). Track 3 is at 27/75 units: the two
+naming passes, plus three review-only units the head marked (`class_3bb8c_v`,
+`code_179d8_c_b`, `code_179d8_n`). After alpha and echo, three Opus units in a
+row have passed review, so the **naming runner moves to Sonnet** as the model
+table says. `check-nonmatching` now compiles 49 bodies (was 45).
+`externcheck.py` is clean (664 externs) and `stalesyms.py` has 0 outstanding.
+
+### Every revisit's recorded CAUSE was wrong or incomplete
+
+Each runner rebuilt the preserved body as given first. Each rebuild matched
+its title's figures, so the SCORES were honest. The explanations were not:
+
+- **"Oversized frame" (SetFootprintRect)** was seven locals and a dead tail
+  assignment. What fixed it: the shape of the locals, the zero case written as
+  the then-arm, and the `span` parameter used as the height.
+- **"Delay-slot scheduling" (ResetAllElements)** was a hand-rolled
+  `(u8 *)self + off` walk. Writing `&self->elems[i]` let strength reduction
+  produce retail's walk on the first build.
+- **"Scheduling residue" (DispatchToRectCells) was the right class, but the
+  lever was never tried**: the order of the comma expressions in the two
+  `for` increment clauses.
+- **"Regrouping" (`func_8003ECD0`, ~89k permuter iterations)** is the tree
+  `fold()` pulling a literal to the outside of a sum. A local
+  `hdrSize = 0x14` survives the fold.
+- **`func_8004CAF0`**: the same fold, beaten by splitting one expression into
+  two statements, plus one store written in both arms so GCC merges it into
+  the join. The two barriers and the `do{}while(0)` it had carried were
+  compensating for the label that merge creates.
+- **`func_8004C6A8`, filed in round 34 as a HARD RULE 6 register-class
+  stall**, was an assignment that belonged BEFORE a call. GCC had sunk it into
+  a delay slot after the call. Then a separate clamp local, and `u16 angle`
+  (found by the permuter at iteration 2260; the oracle decides).
+- `func_8004CD38` stays a stall. Its residue is narrowed to one allocation
+  decision (retail keeps the block temporaries out of `$v0`); a 376,191-
+  iteration search, Gate 3 AGREE at 1/1, closed nothing.
+
+Four idioms were promoted (3a ×2, 3d ×2), and the existing 3g
+constant-canonicalization entry was extended with the fold() mechanism and
+both new instances. One single-instance entry (round 63's aliasing-only
+`s32` local) was distilled verbatim to the archive to stay inside the budget.
+
+### Also this round
+
+- **The head applied cross-unit proposals by type scope**: 13 of alpha's
+  (`Class6B5CCObj` parent/attribute/coord2, `Class6B5CCSub14`
+  param/tx/ty/tz, `Class6B5CCSub44.rotate`, `notifyParents`, `onNotify`, the
+  `UnkOwner_d294`/`GenericObj_d294` views) and 6 of echo's (`EntityMethods`
+  updateRotation/updateScale/setUnkF4/updateTargetProximity/
+  updateSoundCueStart/updateSoundCueStop). The rest of echo's proposals
+  (`Entity` fields, `moveLocal*`, a `SoundCueSet` view for track 4) are still
+  in its reports. The accessor list came from a one-pass `cpp | cc1` over every
+  unit, default and `-DNON_MATCHING`, rather than from `make`, which stops at
+  the first failing unit. One line held two `unk14` accesses on different
+  structs, which is why every rewrite was re-checked by the compiler.
+- **Head track-2 additions**: `StartSeqTimer`/`StopSeqTimer` ->
+  `SsStart`/`SsStart2`. They are `_SsStart(1)` and `_SsStart(0)`, sit between
+  `_SsStart` and `SsEnd`, and are 4-way EXACT ties that position settles.
+  `plan.py`'s list could not see them (see escalation 2). `QuitSpu` (an
+  18-way tie) is left game-named.
+- **Merge corrections**: two `rename.py` rewrites broke meaning in shared
+  docs and were undone. FINISHING-PLAN's example had become "`SsSetTickMode`
+  for `SsSetTickMode`", and a learnings line read "`getintr`, libcd
+  `getintr`". An order-only barrier was dropped from `func_80065E1C`'s 1b
+  body; the byte form stays in its report. Two symbols-file union conflicts
+  (both branches appending at EOF) were resolved as unions and rebuilt from
+  clean objects.
+- `sdkname.py --game --check` reported `sdk-in-game.txt` stale after the
+  renames and it was regenerated. Every entry it dropped is also covered by an
+  ld pin.
+
+### Escalated — the head did not act on these
+
+1. **Renaming a function onto its own `psyq-objects.ld` pin name drops it
+   from `progress.py` entirely.** The linker-script assignment
+   (`CD_sync = 0x800299BC;`) wins, so `nm` reports the symbol as `A`, not
+   `T`, and `text_symbols()` reads only `T`/`t`. The function then has no
+   address: it is not counted as library, and its `INCLUDE_ASM` counts as a
+   game stall. Measured: library 502 -> 483 across the round; game queued
+   reads 83 where the round's work implies about 73. Ten Sony functions
+   (`CD_sync`, `CD_ready`, `CD_cw`, `CD_init`, `CD_datasync`,
+   `Snd_decrescendo`, `SpuVmPBVoice`, `SpuVmFlush`, `SpuVmSetSeqVol`,
+   `SpuVmSeqKeyOff`) now sit in game queues. The image is byte-exact, and
+   revision 13's "renaming onto a pinned name is byte-identical" is true; the
+   counts were never measured. **So this round's headline numbers are
+   UNDERSTATED and should not be read as a regression.** It is a tool fix
+   (accept `A` symbols inside text segments, or key on address), and `plan.py`
+   inherits it.
+2. **Track 2's unnamed list cannot see a GAME-named Sony function that has no
+   pin, no fingerprint entry and no `identified` comment.** The head found
+   `SsStart`/`SsStart2` by reading a review-only unit's code, not from any
+   list. `QuitSpu` is probably a third. A screen of game-named functions in
+   `code_179d8_*` against `sdkname.py`'s ties would find the rest.
+3. **`rename.py`'s existing-name check is a whole-file text match**, so a
+   name mentioned in prose in a symbols-file comment blocks it (bravo worked
+   around this repeatedly), and a name that is also a common local
+   (`callback`) cannot go through the tool at all (bravo mirrored its steps by
+   hand). `rename.py` also rewrites shared docs whole-word, which produced the
+   two meaning-breaking edits above.
+4. **Round 70's escalation 6 stands**: the pasted cap (5) still differs from
+   §4.1's written default (3).
+5. **Round 70's escalation 1 is still open** (`func_80030E90`,
+   length-exact, no track offers it).
+
+---
+
+
 ## 2026-09-23 — round 70: two revisits close two old stalls, and two titles still blamed a blocker fixed seven rounds ago
 
 **Five runners, three tracks, five merges, all green. Matched 1154 -> 1156,
