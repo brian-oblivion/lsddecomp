@@ -33,7 +33,7 @@ None -- see `LinkOwnerObj__ReleaseLinks`.
 **`LinkOwnerObj__ReleaseLinksB` -- tier A.** Byte-identical body to
 `LinkOwnerObj__ReleaseLinks` (see that report), but a genuinely different
 ROM function, reached from a different dispatch state
-(`class_3bb8c_s.c:func_80056718`'s `case 3` vs. `ReleaseLinks`'s `case 2`).
+(`class_3bb8c_s.c:Class876FC__ReleaseByKind`'s `case 3` vs. `ReleaseLinks`'s `case 2`).
 No evidence distinguishes what the two states mean, so the name only marks
 this as the second, otherwise-identical, release entry point (suffix `B`)
 rather than asserting a state-specific purpose that isn't established.

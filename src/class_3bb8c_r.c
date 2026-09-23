@@ -395,8 +395,8 @@ extern FixedBaseTableR *DreamSys__GetBaseMethods(void);
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
 extern Obj876FCMethods *func_80056F4C(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &D_800876FC */
-extern void func_80056718(Obj876FC *self);
-extern void *func_80056520(Obj876FC *self, void *arg1, void *arg2);
+extern void Class876FC__ReleaseByKind(Obj876FC *self);
+extern void *Class876FC__InitByKind(Obj876FC *self, void *arg1, void *arg2);
 
 void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3) {
     Obj876FC *self = func_80017B34(0x98);
@@ -419,14 +419,14 @@ void *func_800563C0(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *ar
     self->unk44 = 0;
     self->unk54 = arg1;
     self->methods->slot40(self, arg2);
-    func_80056520(self, arg3, arg4);
+    Class876FC__InitByKind(self, arg3, arg4);
     return self;
 fail:
     return NULL;
 }
 
 void *func_80056464(Obj876FC *self) {
-    func_80056718(self);
+    Class876FC__ReleaseByKind(self);
     return DreamSys__GetBaseMethods()->dtor(self);
 }
 
@@ -435,9 +435,9 @@ void func_800564A4(Obj876FC *self, Block24 *src) {
     self->unk24 = 0;
 }
 
-extern void func_80056640(Obj876FC *self); /* arity-ok: the definition is 2-parameter and the callee DOES read $a1 (`move s1,a1` at 0x80056650), but func_800564F4 passes nothing for it -- retail's jal at 0x80056508 has `sw v0,36(a0)` in the delay slot and leaves its own incoming $a1 in place */
+extern void Class876FC__UpdateByKind(Obj876FC *self); /* arity-ok: the definition is 2-parameter and the callee DOES read $a1 (`move s1,a1` at 0x80056650), but func_800564F4 passes nothing for it -- retail's jal at 0x80056508 has `sw v0,36(a0)` in the delay slot and leaves its own incoming $a1 in place */
 
 void func_800564F4(Obj876FC *self) {
     self->unk24 = self->unk24 + 1;
-    func_80056640(self);
+    Class876FC__UpdateByKind(self);
 }

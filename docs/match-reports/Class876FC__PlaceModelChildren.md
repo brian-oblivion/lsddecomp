@@ -1,8 +1,10 @@
-# func_80056858 -- MATCHED (84/84 words)
+# Class876FC__PlaceModelChildren -- MATCHED (84/84 words)
+
+> Renamed from `func_80056858` on 2026-09-23 (tools/rename.py). Address 0x80056858.
 
 Unit `class_3bb8c_s`. `self` is the owning `LinkNode`; this is the function
 that either attaches a fresh child (via `class_3bb8c_o.c`'s
-`New_BaseObjO`/`Class6B5CC__LinkModel` plus this unit's own `func_800567D4`) or
+`New_BaseObjO`/`Class6B5CC__LinkModel` plus this unit's own `AttachWithRotScale`) or
 re-touches an existing one (`self->arr7C[i]->methods->slotB8`), driven by its
 own `reuse` argument.
 
@@ -18,7 +20,7 @@ through the pointer each time.
 extern Vec3S D_800877EC;
 extern s32 D_800877F8[];
 
-void func_80056858(LinkNode *self, s32 reuse) {
+void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse) {
     Vec3S accum;
     LinkNode **p;
     s32 i;
@@ -42,7 +44,7 @@ void func_80056858(LinkNode *self, s32 reuse) {
             LinkNode *child = New_BaseObjO();
             *p = child;
             Class6B5CC__LinkModel(child, self->unk20);
-            func_800567D4(*p, self, &accum, self->unk64, self->unk68);
+            AttachWithRotScale(*p, self, &accum, self->unk64, self->unk68);
         }
     }
 }
@@ -66,7 +68,7 @@ fixed it outright -- one word.
 
 The three-word residue seen along the way (`D_800877EC`'s/`D_800877F8`'s own
 `%lo` immediates and one `jal` target, all off by exactly 4) was pure address
-drift from `func_80056BBC` (this unit's sixth function this round) not yet
+drift from `Class876FC__BuildRandomSprites` (this unit's sixth function this round) not yet
 being byte-exact -- not a real defect in this function. `./build-and-verify.sh`
 confirmed 0 bytes differing once that stall was resolved by restoring its
 `INCLUDE_ASM`.

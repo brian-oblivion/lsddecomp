@@ -1,4 +1,6 @@
-# func_80056D18 -- MATCHED (54/54 words)
+# Class876FC__SpawnSprites -- MATCHED (54/54 words)
+
+> Renamed from `func_80056D18` on 2026-09-23 (tools/rename.py). Address 0x80056d18.
 
 **Unit:** class_3bb8c_s · **Round:** 44 (2026-09-15)
 
@@ -20,7 +22,7 @@ Populates all 5 slots of `self->arr84` (already known from
 ## C
 
 ```c
-void func_80056D18(void *self, s32 a1, s32 a2, void *tbl) {
+void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl) {
     LinkNode **p = (LinkNode **)((u8 *)self + 0x84);
     LinkNode *node;
     s32 i;
@@ -39,7 +41,7 @@ void func_80056D18(void *self, s32 a1, s32 a2, void *tbl) {
 
 `self`'s type (`void *`) and the unused `a1` parameter match the
 already-established forward declaration at the top of this file (used by
-`func_80056BBC`'s existing call, `func_80056D18(self, 0, 0, tblOrNull)`), so
+`Class876FC__BuildRandomSprites`'s existing call, `Class876FC__SpawnSprites(self, 0, 0, tblOrNull)`), so
 no signature change was needed anywhere else.
 
 ## A whole-image SHA1 failure with no compile error and no in-range diff
@@ -47,9 +49,9 @@ no signature change was needed anywhere else.
 The FIRST attempt at this function used `LinkNode *sn = self;` at the top
 (to avoid repeating `((LinkNode *)self)->unk74` inline) and passed `sn->unk74`
 to `slotB8`. That version compiled cleanly, `funcdiff.py` reported large,
-scattered residues in `func_80056520` (5 words) and `func_80056640` (4
+scattered residues in `Class876FC__InitByKind` (5 words) and `Class876FC__UpdateByKind` (4
 words) — TWO OTHER, already-believed-correct functions in this same unit —
-and `func_80056D18` ITSELF showed near-total misalignment starting from word
+and `Class876FC__SpawnSprites` ITSELF showed near-total misalignment starting from word
 0 (`addiu $sp,$sp,-0x28` vs `-0x30`, a bigger stack frame).
 
 Per CLAUDE.md's own recipe for exactly this signature (`cmp -l` +
@@ -68,7 +70,7 @@ early enough shifts every subsequent address, including unrelated units'
 `.rodata` — which is exactly what the map showed, even though nothing in
 this session touched `DreamSys.c.o` or its rodata. The actual cause was
 local: `LinkNode *sn = self;` added ONE extra callee-saved register to
-`func_80056D18`'s own prologue (bigger `-0x30` frame vs retail's `-0x28`),
+`Class876FC__SpawnSprites`'s own prologue (bigger `-0x30` frame vs retail's `-0x28`),
 growing THIS function by exactly 12 bytes/3 words and cascading forward
 through the whole link. Removing the alias and casting `self` inline at
 each use dropped the frame back to `-0x28` and the function, and the whole
@@ -78,7 +80,7 @@ image, matched byte-exact on the next build.
 
 **This is the THIRD independent confirmation of MATCHING-GUIDE.md's
 "adding or removing any local variable can renumber every saved register"
-finding** (previously: `func_800569A8`'s own report, this unit; a second,
+finding** (previously: `Class876FC__DriftModelChildren`'s own report, this unit; a second,
 unrelated function elsewhere) — but with a new twist worth recording
 explicitly: the growth doesn't have to just *renumber* registers, it can
 add a WHOLE EXTRA saved register/stack slot, which changes the function's

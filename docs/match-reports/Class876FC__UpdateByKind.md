@@ -1,4 +1,6 @@
-# func_80056640 -- MATCHED (54/54 words)
+# Class876FC__UpdateByKind -- MATCHED (54/54 words)
+
+> Renamed from `func_80056640` on 2026-09-23 (tools/rename.py). Address 0x80056640.
 
 **Unit:** class_3bb8c_s · **Round:** 44 (2026-09-15)
 
@@ -8,30 +10,30 @@ Round-42's "REOPENED -- ASSIGNABLE" banner applies: stub-stalled as
 `gp_rel`-blocked on `D_8008ACAC`/`D_8008ACB0`, both already present in
 `config/gp-symbols.txt`. Matched byte-exact this round (after fixing an
 unrelated whole-image size regression caused by a sibling function in the
-same session -- see `func_80056D18`'s report).
+same session -- see `Class876FC__SpawnSprites`'s report).
 
 ## What it is
 
 The second of this unit's three `self->unk54`-dispatch handlers (see
-`func_80056718`'s comment and `func_80056520`, the first). Folds
+`Class876FC__ReleaseByKind`'s comment and `Class876FC__InitByKind`, the first). Folds
 `*(Vec3S*)arg1 + self->unk58` into a stack-local, adds the delta between
-`D_8008ACAC`'s pointee's `+0x18` field and the snapshot `func_80056520` left
+`D_8008ACAC`'s pointee's `+0x18` field and the snapshot `Class876FC__InitByKind` left
 in `D_8008ACB0`, forwards the result through `slotB8`, then dispatches on
-`unk54` to one of three different callees than `func_80056520`'s own switch.
+`unk54` to one of three different callees than `Class876FC__InitByKind`'s own switch.
 
 ## C
 
 ```c
-void func_80056640(LinkNode *self, void *arg1) {
+void Class876FC__UpdateByKind(LinkNode *self, void *arg1) {
     Vec3S local;
 
-    func_80056794(&local, (Vec3S *)arg1, &self->unk58);
+    AddVec3(&local, (Vec3S *)arg1, &self->unk58);
     local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - D_8008ACB0;
     self->methods->slotB8(self, &local);
 
     switch (self->unk54) {
     case 0:
-        func_800569A8(self, arg1);
+        Class876FC__DriftModelChildren(self, arg1);
         break;
     case 2:
         NoOpIgnoreArgs(self, arg1);
@@ -54,14 +56,14 @@ void func_80056640(LinkNode *self, void *arg1) {
   Declared old-style (`extern void NoOpIgnoreArgs(); extern void
   LinkOwnerObj__RandomizeLinks();`) local to this file so the extra argument doesn't
   trigger a parameter-count error against their real definitions elsewhere.
-- **`func_800569A8` is defined later in this SAME file** (still
+- **`Class876FC__DriftModelChildren` is defined later in this SAME file** (still
   `INCLUDE_ASM` as of this report) and is likewise called here with a dead
   second argument; same old-style-declaration treatment, needed so the
   eventual real (one-argument) definition doesn't conflict.
-- This function and `func_80056520` share the `D_8008ACAC`/`D_8008ACB0`
-  snapshot-and-diff pattern; `func_80056520` always runs first for a given
+- This function and `Class876FC__InitByKind` share the `D_8008ACAC`/`D_8008ACB0`
+  snapshot-and-diff pattern; `Class876FC__InitByKind` always runs first for a given
   node (it's the one that WRITES `D_8008ACB0`), so the diff computed here is
-  "how much did the tracked field move since the last time `func_80056520`
+  "how much did the tracked field move since the last time `Class876FC__InitByKind`
   ran" -- descriptive only, doesn't affect the C shape.
 
 ### Proposed learning
@@ -69,7 +71,7 @@ void func_80056640(LinkNode *self, void *arg1) {
 Same session, same unit: an old-style (`extern void f();`) declaration is
 the right tool whenever a call site sets up more argument registers than a
 callee's real, already-established prototype takes, whether the callee
-lives in this file (forward reference, `func_800569A8`) or in a sibling unit
+lives in this file (forward reference, `Class876FC__DriftModelChildren`) or in a sibling unit
 already matched elsewhere (`NoOpIgnoreArgs`, `LinkOwnerObj__RandomizeLinks`). It reproduces
 retail's caller-side register setup without touching the callee's real
 signature, and avoids the C89 "too many arguments to function" error a full
@@ -89,13 +91,13 @@ them, and forwards `$a1` straight on:
 80056648:  move  s0,a0
 80056650:  move  s1,a1            <- $a1 read
 80056654:  addiu a0,sp,16
-8005665c:  jal   80056794 <func_80056794>   ; func_80056794(&local, arg1, &self->unk58)
+8005665c:  jal   80056794 <AddVec3>   ; AddVec3(&local, arg1, &self->unk58)
 80056660:  addiu a2,s0,88
 ```
 
 `s1` is later re-forwarded to every arm of the unit's switch
 (`move a1,s1` at `0x800566D8`, `0x800566EC`, `0x800566FC`). So the definition's
-`void func_80056640(LinkNode *self, void *arg1)` is right: two real arguments.
+`void Class876FC__UpdateByKind(LinkNode *self, void *arg1)` is right: two real arguments.
 
 **Why `src/class_3bb8c_r.c`'s one-parameter declaration stays.** Its caller
 `func_800564F4` passes only `self`, and retail sets up nothing else:
@@ -103,13 +105,13 @@ them, and forwards `$a1` straight on:
 ```
 800564fc:  lw    v0,36(a0)
 80056504:  addiu v0,v0,1
-80056508:  jal   80056640 <func_80056640>
+80056508:  jal   80056640 <Class876FC__UpdateByKind>
 8005650c:  sw    v0,36(a0)         <- the delay slot is the `self->unk24 + 1`
                                       store, not argument setup
 ```
 
 `$a1` at the `jal` is whatever `func_800564F4`'s own caller left there, and
-`func_80056640` consumes it as `arg1`. This is the same register-forwarding
+`Class876FC__UpdateByKind` consumes it as `arg1`. This is the same register-forwarding
 trap that `externcheck.py` was written for (round 57, `func_8001E7BC`) —
 with the difference that here it reproduces retail, so the narrow declaration
 is correct for this unit and must not be widened.

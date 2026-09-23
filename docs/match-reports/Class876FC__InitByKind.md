@@ -1,4 +1,6 @@
-# func_80056520 -- MATCHED (72/72 words)
+# Class876FC__InitByKind -- MATCHED (72/72 words)
+
+> Renamed from `func_80056520` on 2026-09-23 (tools/rename.py). Address 0x80056520.
 
 **Unit:** class_3bb8c_s · **Round:** 44 (2026-09-15)
 
@@ -12,8 +14,8 @@ already present in `config/gp-symbols.txt`. Matched byte-exact this round.
 ## What it is
 
 One of this unit's three `self->unk54`-dispatch handlers (see
-`func_80056718`'s comment). Folds `*arg2 + self->unk58` into a stack-local
-Vec3, forwards it through `func_800567D4`, snapshots a lookup table's current
+`Class876FC__ReleaseByKind`'s comment). Folds `*arg2 + self->unk58` into a stack-local
+Vec3, forwards it through `AttachWithRotScale`, snapshots a lookup table's current
 value into `D_8008ACB0`, and — only when `unk54` is 0 or 1 — calls through a
 NEW cross-class vtable slot (`+0x080` on the object pointed to by the global
 `D_8008ACA4`) before dispatching on `unk54` a second time.
@@ -21,13 +23,13 @@ NEW cross-class vtable slot (`+0x080` on the object pointed to by the global
 ## C
 
 ```c
-void func_80056520(LinkNode *self, void *arg1, Vec3S *arg2) {
+void Class876FC__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
     Vec3S local;
     s32 state;
 
     D_8008ACB0 = *(s32 *)((u8 *)D_8008ACAC + 0x18);
-    func_80056794(&local, arg2, &self->unk58);
-    func_800567D4(self, arg1, &local, self->unk64, self->unk68);
+    AddVec3(&local, arg2, &self->unk58);
+    AttachWithRotScale(self, arg1, &local, self->unk64, self->unk68);
 
     state = self->unk54;
     if (state < 2) {
@@ -38,10 +40,10 @@ void func_80056520(LinkNode *self, void *arg1, Vec3S *arg2) {
 
     switch (state) {
     case 0:
-        func_80056858(self, 0);
+        Class876FC__PlaceModelChildren(self, 0);
         break;
     case 2:
-        func_80056BBC(self, 0);
+        Class876FC__BuildRandomSprites(self, 0);
         break;
     case 3:
         LinkOwnerObj__func_56e1c(self, 0);
@@ -88,8 +90,8 @@ green).
   object's true type belongs to a different, uncarved unit and there is no
   shared header to extend, so this stays a local, minimal view (project's
   multiple-independent-local-views convention).
-- **Two functions called here (`func_80056BBC`, `LinkOwnerObj__func_56e1c`) are defined
-  with a NARROWER real prototype than this call site uses** (`func_80056BBC`
+- **Two functions called here (`Class876FC__BuildRandomSprites`, `LinkOwnerObj__func_56e1c`) are defined
+  with a NARROWER real prototype than this call site uses** (`Class876FC__BuildRandomSprites`
   takes only `self`; `LinkOwnerObj__func_56e1c` — defined in `class_3bb8c_o.c` — takes
   only `this`). Retail's own call sites still set up a dead second argument
   register for both. Reproduced with old-style (unprototyped) `extern void
@@ -100,22 +102,22 @@ green).
 
 ### Struct edit surfaced a broader hazard: SIZE DRIFT via an unnecessary local variable
 
-Building this function alongside `func_80056D18` (same session) surfaced a
+Building this function alongside `Class876FC__SpawnSprites` (same session) surfaced a
 whole-image SHA1 failure that was NOT a compile error and NOT a diff in
 either function's own instruction stream — a first from-scratch instance of
 CLAUDE.md's "shared-struct hazard is broader than retyping" class, but the
 trigger here was a LOCAL VARIABLE choice, not a struct edit: an
-unnecessary `LinkNode *sn = self;` alias in `func_80056D18` (written to
+unnecessary `LinkNode *sn = self;` alias in `Class876FC__SpawnSprites` (written to
 avoid repeating a cast) added ONE extra callee-saved register to that
 function's own prologue, growing it by 12 bytes (3 words) and shifting
 EVERY function and rodata blob after it in the whole link — including,
 misleadingly, this function's own funcdiff window, which then reported 5
 scattered "residue" words that were pure ripple and vanished the moment the
-alias was removed. See `func_80056D18`'s own report for the mechanism.
+alias was removed. See `Class876FC__SpawnSprites`'s own report for the mechanism.
 
 ### Proposed learning
 
-Confirms MATCHING-GUIDE.md's own recorded lesson (`func_800569A8`'s report,
+Confirms MATCHING-GUIDE.md's own recorded lesson (`Class876FC__DriftModelChildren`'s report,
 same unit) a THIRD time in a different function: a spurious local variable
 can change a function's own register allocation footprint enough to grow
 its instruction count, and because `.rodata` is linked before `.text`, that

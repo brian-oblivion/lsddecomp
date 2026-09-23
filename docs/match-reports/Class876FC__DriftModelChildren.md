@@ -1,4 +1,6 @@
-# func_800569A8 -- STALL (length now EXACT: 121/121 words emitted, no address drift; raw word-match 117/121; first real diff at word 12, `asm-differ` offset 0x471d8, the same commutative register-identity swap in the very first pointer computation as before)
+# Class876FC__DriftModelChildren -- STALL (length now EXACT: 121/121 words emitted, no address drift; raw word-match 117/121; first real diff at word 12, `asm-differ` offset 0x471d8, the same commutative register-identity swap in the very first pointer computation as before)
+
+> Renamed from `func_800569A8` on 2026-09-23 (tools/rename.py). Address 0x800569a8.
 
 Unit `class_3bb8c_s`, round 44 (2026-09-15), building on round 26's derivation
 (see the git history of this file for the prior 120/121, 23/121-raw state).
@@ -9,7 +11,7 @@ both guards and a third bound check on `self->unk24` pass, it forwards a
 table handle to `self` and to each of the two `arr7C` children, folds a
 per-child Vec3 offset and dispatches it through vtable slot `slotBC`, then
 runs a modulus check against a `24500 / D_8008780C[idx]` quotient to decide
-whether to call `func_80056858(self, 1)`. Always zeroes `*self->unk14` on
+whether to call `Class876FC__PlaceModelChildren(self, 1)`. Always zeroes `*self->unk14` on
 every exit path.
 
 ## Round 44 correction to round 26's field reading
@@ -29,7 +31,7 @@ from what round 26 assumed.
 
 ```c
 #if 0
-void func_800569A8(LinkNode *self)
+void Class876FC__DriftModelChildren(LinkNode *self)
 {
     s32 idx;
     s32 *tab70;
@@ -63,12 +65,12 @@ void func_800569A8(LinkNode *self)
             modend = self->unk24;
             if (divq >= 0) {
                 if ((u32) modend % (u32) divq == 0) {
-                    func_80056858(self, 1);
+                    Class876FC__PlaceModelChildren(self, 1);
                 }
             } else {
                 u32 adivq = ~divq + 1;
                 if ((u32) modend % adivq == 0) {
-                    func_80056858(self, 1);
+                    Class876FC__PlaceModelChildren(self, 1);
                 }
             }
         }
@@ -122,7 +124,7 @@ before the next was tried:
    existed) and it regressed the score, which is why the report at the time
    concluded "neither ordering is reliably predictable." In the CURRENT
    context it closed the entire back half of the function (the whole
-   divide/modulo/`func_80056858`-call tail) — 96 -> 109/121. **This directly
+   divide/modulo/`Class876FC__PlaceModelChildren`-call tail) — 96 -> 109/121. **This directly
    confirms MATCHING-GUIDE.md's own caution that the "arm that must jump"
    polarity is not context-independent**: the same source-level change was a
    regression in one register-allocation context and the correct fix in
@@ -173,7 +175,7 @@ Tried this round, both inert (byte-identical output to the array form):
 This is the same "commutative operand order, not independently reachable"
 class as `code_179d8_j`'s `func_80031280` (per round 26's own note), which
 needed the permuter to close. Set up this round with
-`tools/setup-permuter.sh func_800569A8 <seed>` using the 117/121 body above
+`tools/setup-permuter.sh Class876FC__DriftModelChildren <seed>` using the 117/121 body above
 as the seed. `--debug --stack-diffs` measured a base score of 30 (a single,
 tightly-scoped residue — a MUCH better-posed base than round 26's 790,
 consistent with the three levers above having eliminated everything else).
@@ -182,7 +184,7 @@ this round's own correction to round 26's unbounded-search mistake) and
 reached **19712 iterations with zero errors on most candidates, but the
 score never dropped below its starting value of 30** — i.e. **not closed in
 ~19700 iterations under this session's load**, not "permuter-exhausted."
-The search process was scoped to this worktree (`permuter-work/func_800569A8`
+The search process was scoped to this worktree (`permuter-work/Class876FC__DriftModelChildren`
 under `lsddecomp2-wt-charlie`) and left to self-terminate on its own
 `timeout` rather than killed by PID-guessing.
 

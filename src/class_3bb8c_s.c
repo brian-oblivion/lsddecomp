@@ -18,26 +18,26 @@
  * docs/research/addiu-at-blocker.md) and is no longer a blocker at all -- the
  * 3 functions previously counted against it are workable, and their stub
  * reports were retired. Only `gp_rel` remains live in this unit, on
- * func_80056520, func_80056640 and func_80056D18 -- each still carries a
+ * Class876FC__InitByKind, Class876FC__UpdateByKind and Class876FC__SpawnSprites -- each still carries a
  * current stall report and none of the three is touched here.
  *
- * MATCHED this round: func_80056718, func_80056794, func_800567D4,
- * func_80056858, func_80056B8C -- byte-exact, see docs/match-reports/.
+ * MATCHED this round: Class876FC__ReleaseByKind, AddVec3, AttachWithRotScale,
+ * Class876FC__PlaceModelChildren, Class876FC__ReleaseModelChildren -- byte-exact, see docs/match-reports/.
  *
- * func_80056BBC was attempted (the addiu_at hit in it is the now-resolved
+ * Class876FC__BuildRandomSprites was attempted (the addiu_at hit in it is the now-resolved
  * construct, not a real blocker) and got to a one-instruction residue -- a
  * retail dead store (`li $a1, 1`) that never gets read on either branch it
  * precedes, the same "redundant move" class MATCHING-GUIDE.md already
  * documents as permuter territory. ~8000 permuter iterations did not find a
  * zero; restored to INCLUDE_ASM per the hard rule. See its match report.
  *
- * func_800569A8 is still untouched (its only screen hit is the same
+ * Class876FC__DriftModelChildren is still untouched (its only screen hit is the same
  * now-resolved addiu_at construct; it remains fresh ground).
  *
  * This slice spans (at least) parts of the same class as the neighbouring
  * `class_3bb8c_o` slice: `self` here is the SAME kind of node as that unit's
  * `LinkOwnerObj` (a 5-element `arr84` link array is confirmed via
- * func_80056D18's occupancy of it), extended with more fields this unit
+ * Class876FC__SpawnSprites's occupancy of it), extended with more fields this unit
  * actually reads (+0x054 dispatch state, +0x064/+0x068/+0x06C/+0x070/+0x074/
  * +0x078 and a 2-element +0x07C array). Kept as this unit's OWN local view,
  * `LinkNode`/`LinkNodeMethods` -- `class_3bb8c_o.c`'s `LinkOwnerObj` is not
@@ -79,23 +79,23 @@ typedef struct LinkNodeMethods {
     void (*slotB8)(LinkNode *self, void *arg1);                          /* +0x0B8 */
     void (*slotBC)(LinkNode *self, void *arg1);                          /* +0x0BC, called on each
                                                                              arr7C child by
-                                                                             func_800569A8 */
+                                                                             Class876FC__DriftModelChildren */
 } LinkNodeMethods;
 
 struct LinkNode {
     LinkNodeMethods *methods; /* +0x000 */
     u8 pad4[0x14 - 0x4];         /* +0x004 .. +0x013, unknown */
-    s32 *unk14;                    /* +0x014, zeroed by func_800569A8 on
+    s32 *unk14;                    /* +0x014, zeroed by Class876FC__DriftModelChildren on
                                        every exit path */
     u8 pad18[0x20 - 0x18];           /* +0x018 .. +0x01F, unknown */
     s32 unk20;                     /* +0x020, forwarded to Class6B5CC__LinkModel */
     s32 unk24;                       /* +0x024, bounded < 0x1F5 and used as a
-                                         modulus dividend by func_800569A8 */
+                                         modulus dividend by Class876FC__DriftModelChildren */
     u8 pad28[0x54 - 0x28];              /* +0x028 .. +0x053, unknown */
     s32 unk54;                         /* +0x054, a dispatch "state" selector */
     Vec3S unk58;                     /* +0x058, added into the passed-in Vec3
-                                         (arg1/arg2) by func_80056520/
-                                         func_80056640 before dispatch */
+                                         (arg1/arg2) by Class876FC__InitByKind/
+                                         Class876FC__UpdateByKind before dispatch */
     s32 unk64;                         /* +0x064 */
     void *unk68;                         /* +0x068, ptr to an object whose
                                              first field is a signed s16 */
@@ -115,17 +115,17 @@ struct LinkNode {
 extern void LinkOwnerObj__ReleaseLinks(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void LinkOwnerObj__ReleaseLinksB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void BaseObjO__AddVec14(void *self, Vec3S *v);   /* class_3bb8c_t.c */
-extern void func_80056D18(void *self, s32 a1, s32 a2, void *tbl); /* below */
+extern void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl); /* below */
 extern s32 D_80087844[];
 extern s32 D_8008785C[];
 extern s32 D_80087868[];
 extern s32 D_80087874[];
 extern Vec3S D_80087880;
 
-void func_80056B8C(LinkNode *self);
-void func_80056858(LinkNode *self, s32 reuse);
-void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b);
-void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4);
+void Class876FC__ReleaseModelChildren(LinkNode *self);
+void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse);
+void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b);
+void AttachWithRotScale(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4);
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 
 /* NoOpIgnoreArgs/LinkOwnerObj__func_56e1c/LinkOwnerObj__RandomizeLinks are defined in class_3bb8c_o.c
@@ -136,15 +136,15 @@ extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55d
  * -- so these are declared here the same old-style (unprototyped) way,
  * which is what lets this file's calls pass the extra dead argument without
  * a parameter-count mismatch against their real, narrower definitions
- * elsewhere. func_80056BBC is this same idiom but for a function defined
- * later IN THIS FILE (func_80056520 calls it, ROM-earlier than its own
- * definition). func_800569A8 is likewise defined later in this file, and
- * func_80056640 forwards a dead second argument to it the same way. */
+ * elsewhere. Class876FC__BuildRandomSprites is this same idiom but for a function defined
+ * later IN THIS FILE (Class876FC__InitByKind calls it, ROM-earlier than its own
+ * definition). Class876FC__DriftModelChildren is likewise defined later in this file, and
+ * Class876FC__UpdateByKind forwards a dead second argument to it the same way. */
 extern void NoOpIgnoreArgs();
-extern void LinkOwnerObj__func_56e1c(); /* arity-ok: definition is 1-parameter and the body WRITES $a1/$a2/$a3 to zero before any read, but func_80056520's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056624 */
-extern void LinkOwnerObj__RandomizeLinks(); /* arity-ok: definition is 1-parameter and the body reads only $a0 (`addiu s0,a0,136`), but func_80056640's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` at 0x800566FC */
-extern void func_80056BBC(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body reading only $a0 (`move s1,a0`); func_80056520's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056614 */
-extern void func_800569A8();
+extern void LinkOwnerObj__func_56e1c(); /* arity-ok: definition is 1-parameter and the body WRITES $a1/$a2/$a3 to zero before any read, but Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056624 */
+extern void LinkOwnerObj__RandomizeLinks(); /* arity-ok: definition is 1-parameter and the body reads only $a0 (`addiu s0,a0,136`), but Class876FC__UpdateByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` at 0x800566FC */
+extern void Class876FC__BuildRandomSprites(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body reading only $a0 (`move s1,a0`); Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056614 */
+extern void Class876FC__DriftModelChildren();
 
 /* class_3bb8c_p.c; fully prototyped since every call site here uses all
  * three arguments for real. */
@@ -155,7 +155,7 @@ extern void *New_D800879C4(void *arg1, void *arg2, void *arg3);
  * some other object (first field a methods pointer, called through a new
  * +0x080 slot below), D_8008ACA8 is forwarded opaquely to New_D800879C4 as
  * its own third argument, and D_8008ACAC's pointee has a lookup field at
- * +0x018 that func_80056520/func_80056640 snapshot/diff via D_8008ACB0. */
+ * +0x018 that Class876FC__InitByKind/Class876FC__UpdateByKind snapshot/diff via D_8008ACB0. */
 typedef struct {
     u8 pad0[0x80];
     s32 (*slot80)(void *self, s32 arg);
@@ -169,13 +169,13 @@ extern void *D_8008ACAC;
 extern s32 D_8008ACB0;
 extern s32 D_8008AB98[];
 
-void func_80056520(LinkNode *self, void *arg1, Vec3S *arg2) {
+void Class876FC__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
     Vec3S local;
     s32 state;
 
     D_8008ACB0 = *(s32 *)((u8 *)D_8008ACAC + 0x18);
-    func_80056794(&local, arg2, &self->unk58);
-    func_800567D4(self, arg1, &local, self->unk64, self->unk68);
+    AddVec3(&local, arg2, &self->unk58);
+    AttachWithRotScale(self, arg1, &local, self->unk64, self->unk68);
 
     state = self->unk54;
     if (state < 2) {
@@ -186,10 +186,10 @@ void func_80056520(LinkNode *self, void *arg1, Vec3S *arg2) {
 
     switch (state) {
     case 0:
-        func_80056858(self, 0);
+        Class876FC__PlaceModelChildren(self, 0);
         break;
     case 2:
-        func_80056BBC(self, 0);
+        Class876FC__BuildRandomSprites(self, 0);
         break;
     case 3:
         LinkOwnerObj__func_56e1c(self, 0);
@@ -199,16 +199,16 @@ void func_80056520(LinkNode *self, void *arg1, Vec3S *arg2) {
     }
 }
 
-void func_80056640(LinkNode *self, void *arg1) {
+void Class876FC__UpdateByKind(LinkNode *self, void *arg1) {
     Vec3S local;
 
-    func_80056794(&local, (Vec3S *)arg1, &self->unk58);
+    AddVec3(&local, (Vec3S *)arg1, &self->unk58);
     local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - D_8008ACB0;
     self->methods->slotB8(self, &local);
 
     switch (self->unk54) {
     case 0:
-        func_800569A8(self, arg1);
+        Class876FC__DriftModelChildren(self, arg1);
         break;
     case 2:
         NoOpIgnoreArgs(self, arg1);
@@ -221,15 +221,15 @@ void func_80056640(LinkNode *self, void *arg1) {
     }
 }
 
-/* func_80056718 -- dispatch on self->unk54, one of three such handlers in
- * this slice (func_80056520/func_80056640 are the other two, each mapping
+/* Class876FC__ReleaseByKind -- dispatch on self->unk54, one of three such handlers in
+ * this slice (Class876FC__InitByKind/Class876FC__UpdateByKind are the other two, each mapping
  * the same state values to a DIFFERENT set of callees -- consistent with
  * three separate per-phase handlers, e.g. update/draw/free, sharing one
  * state field). */
-void func_80056718(LinkNode *self) {
+void Class876FC__ReleaseByKind(LinkNode *self) {
     switch (self->unk54) {
     case 0:
-        func_80056B8C(self);
+        Class876FC__ReleaseModelChildren(self);
         break;
     case 2:
         LinkOwnerObj__ReleaseLinks(self);
@@ -243,7 +243,7 @@ void func_80056718(LinkNode *self) {
 }
 
 /* Plain Vec3 add: dst = a + b. Frameless -- no self/vtable involved. */
-void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b) {
+void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b) {
     dst->x = a->x + b->x;
     dst->y = a->y + b->y;
     dst->z = a->z + b->z;
@@ -251,9 +251,9 @@ void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b) {
 
 /* Forwards straight through to a child's own slot4C/slot44/slot48, using
  * whatever the caller already set up in arg1/arg2 (an outer node pointer and
- * an accumulator Vec3, respectively -- see func_80056858's own two call
+ * an accumulator Vec3, respectively -- see Class876FC__PlaceModelChildren's own two call
  * sites) plus its own arg3/arg4. */
-void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4) {
+void AttachWithRotScale(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4) {
     self->methods->slot4C(self, arg1, arg2);
     self->methods->slot44(self, 1, arg3);
     self->methods->slot48(self, 1, arg4);
@@ -263,13 +263,13 @@ void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4)
  * arr7C slots, fold a table-driven contribution into a local Vec3 (either
  * into .x, scaled by *self->unk68, or straight into .y, depending on
  * self->unk6C), then either forward it to an existing child's slotB8 or
- * spin up a brand new child via New_BaseObjO/Class6B5CC__LinkModel/func_800567D4. */
+ * spin up a brand new child via New_BaseObjO/Class6B5CC__LinkModel/AttachWithRotScale. */
 extern void *New_BaseObjO(void);        /* class_3bb8c_o.c, New_X allocator */
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 extern Vec3S D_800877EC;
 extern s32 D_800877F8[];
 
-void func_80056858(LinkNode *self, s32 reuse) {
+void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse) {
     Vec3S accum;
     LinkNode **p;
     s32 i;
@@ -293,12 +293,12 @@ void func_80056858(LinkNode *self, s32 reuse) {
             LinkNode *child = New_BaseObjO();
             *p = child;
             Class6B5CC__LinkModel(child, self->unk20);
-            func_800567D4(*p, self, &accum, self->unk64, self->unk68);
+            AttachWithRotScale(*p, self, &accum, self->unk64, self->unk68);
         }
     }
 }
 
-/* Per-`unk70`-slot table (same index space `func_80056BBC` reads through
+/* Per-`unk70`-slot table (same index space `Class876FC__BuildRandomSprites` reads through
  * D_80087844/D_8008785C/D_80087868/D_80087874); used both as a "channel
  * active" guard (nonzero test) and as a divisor for the two modulus checks
  * below. */
@@ -308,16 +308,16 @@ extern s32 D_8008780C[];
 extern Vec3S D_8008782C;
 /* Opaque table handle, forwarded unchanged to slot44 for self and for each
  * arr7C child -- passed as a plain s32 per the slot's established
- * signature (see func_800567D4's use of the same slot with an s32
+ * signature (see AttachWithRotScale's use of the same slot with an s32
  * argument), not dereferenced anywhere in this function. */
 extern s32 D_80087838[];
 
 #if 0
 /* round 44 (2026-09-15): best-reached body, 117/121 words, NOT byte-exact.
- * See docs/match-reports/func_800569A8.md for the residue and what was
+ * See docs/match-reports/Class876FC__DriftModelChildren.md for the residue and what was
  * tried. Kept here per the hard rule -- restore this ahead of any future
  * attempt rather than re-deriving from scratch. */
-void func_800569A8(LinkNode *self)
+void Class876FC__DriftModelChildren(LinkNode *self)
 {
     s32 idx;
     s32 *tab70;
@@ -351,12 +351,12 @@ void func_800569A8(LinkNode *self)
             modend = self->unk24;
             if (divq >= 0) {
                 if ((u32) modend % (u32) divq == 0) {
-                    func_80056858(self, 1);
+                    Class876FC__PlaceModelChildren(self, 1);
                 }
             } else {
                 u32 adivq = ~divq + 1;
                 if ((u32) modend % adivq == 0) {
-                    func_80056858(self, 1);
+                    Class876FC__PlaceModelChildren(self, 1);
                 }
             }
         }
@@ -365,24 +365,24 @@ void func_800569A8(LinkNode *self)
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_800569A8);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", Class876FC__DriftModelChildren);
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 
 /* self->unk6C-guarded release of the fixed 2-element arr7C array. */
-void func_80056B8C(LinkNode *self) {
+void Class876FC__ReleaseModelChildren(LinkNode *self) {
     if (self->unk6C != 0) {
         ReleaseBasicClassArray((void **)self->arr7C, 2);
     }
 }
 
-void func_80056BBC(LinkNode *self) {
+void Class876FC__BuildRandomSprites(LinkNode *self) {
     s32 parity = rand() % 2;
     void *tblOrNull = parity ? NULL : D_80087868;
     LinkNode *child;
     void *arg;
 
-    func_80056D18(self, 0, 0, tblOrNull);
+    Class876FC__SpawnSprites(self, 0, 0, tblOrNull);
 
     if (self->unk70 >= 2) {
         LinkNodeMethods *m;
@@ -403,7 +403,7 @@ void func_80056BBC(LinkNode *self) {
     self->arr84[2]->methods->slot60(self->arr84[2], 0);
 }
 
-void func_80056D18(void *self, s32 a1, s32 a2, void *tbl) {
+void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl) {
     LinkNode **p = (LinkNode **)((u8 *)self + 0x84);
     LinkNode *node;
     s32 i;

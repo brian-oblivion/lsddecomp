@@ -81,10 +81,10 @@ void LinkOwnerObj__ReleaseLinks(LinkOwnerObj *this) {
     ReleaseBasicClassArray((void **)this->links, 5);
 }
 
-extern void func_80056D18(void *arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void Class876FC__SpawnSprites(void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
 void LinkOwnerObj__func_56e1c(void *this) {
-    func_80056D18(this, 0, 0, 0);
+    Class876FC__SpawnSprites(this, 0, 0, 0);
 }
 
 void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this) {

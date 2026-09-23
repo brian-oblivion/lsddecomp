@@ -1,4 +1,6 @@
-# func_80056BBC -- MATCHED 87/87 (head adjudication of a mis-classified stall)
+# Class876FC__BuildRandomSprites -- MATCHED 87/87 (head adjudication of a mis-classified stall)
+
+> Renamed from `func_80056BBC` on 2026-09-23 (tools/rename.py). Address 0x80056bbc.
 
 Unit `class_3bb8c_s`. Round 22. Runner delta reached 86/87 and filed this as a
 **stall of the documented "redundant move" class** -- "a genuine dead store in
@@ -110,8 +112,8 @@ own entry point and would not have resolved for the next reader.
 
 ## Final body
 
-Lives in `src/class_3bb8c_s.c` in ROM order between `func_80056B8C` and
-`func_80056D18`.
+Lives in `src/class_3bb8c_s.c` in ROM order between `Class876FC__ReleaseModelChildren` and
+`Class876FC__SpawnSprites`.
 
 ### Proposed learning
 
@@ -133,14 +135,14 @@ stays.
 
 **Callee evidence** (`0x80056BBC`, and the matched definition *in this same
 file*, ROM-later at line 379): entry is `move s1,a0` and `$a1` is never read —
-one real argument, as `void func_80056BBC(LinkNode *self)` says.
+one real argument, as `void Class876FC__BuildRandomSprites(LinkNode *self)` says.
 
-**Why the extern must stay unprototyped.** `func_80056520`'s dispatch passes a
+**Why the extern must stay unprototyped.** `Class876FC__InitByKind`'s dispatch passes a
 second argument, and retail emits it:
 
 ```
 8005660c:  move  a0,s1
-80056610:  jal   80056bbc <func_80056BBC>
+80056610:  jal   80056bbc <Class876FC__BuildRandomSprites>
 80056614:  move  a1,zero          <- the dead 2nd argument, in retail
 ```
 
@@ -149,12 +151,12 @@ arm two cases down (`move a1,zero` at `0x80056624`).
 
 **What makes this one different from the rest of the round.** The declaration
 and the definition are in the SAME translation unit — the extern at line 146
-exists only because `func_80056520` (ROM-earlier) calls a function defined
+exists only because `Class876FC__InitByKind` (ROM-earlier) calls a function defined
 ROM-later in the file, and CLAUDE.md requires strict ROM-address order. So
 this is not two units holding different views; it is one unit that must
 declare its own function with an argument list its own definition contradicts.
 The unspecified parameter list is what lets both coexist: a full prototype at
-line 146 would make the `func_80056BBC(self, 0)` call at line 192 a
+line 146 would make the `Class876FC__BuildRandomSprites(self, 0)` call at line 192 a
 `too many arguments` error against the definition 187 lines further down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`

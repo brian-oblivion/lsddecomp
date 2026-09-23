@@ -1,4 +1,6 @@
-# func_80056794 -- MATCHED (16/16 words)
+# AddVec3 -- MATCHED (16/16 words)
+
+> Renamed from `func_80056794` on 2026-09-23 (tools/rename.py). Address 0x80056794.
 
 Unit `class_3bb8c_s`. Frameless, no self/vtable involved.
 
@@ -15,7 +17,7 @@ typedef struct Vec3S {
     s32 x, y, z;
 } Vec3S;
 
-void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b) {
+void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b) {
     dst->x = a->x + b->x;
     dst->y = a->y + b->y;
     dst->z = a->z + b->z;
