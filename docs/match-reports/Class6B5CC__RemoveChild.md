@@ -38,3 +38,7 @@ simply always live in a register here.
 ## Provenance
 
 round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build.
+
+## Naming
+
+Round 71 (alpha). `func_8001CCB4` -> `Class6B5CC__RemoveChild`, **tier A**. Overrides BasicClass slot +0x014 `removeChild`. If the child's tag is 9, Class6B5CC__UnlinkModel first, then forwards to the base. Mirror of Class6B5CC__AddChild; class_3ac78.h already calls this address `removeChild`.

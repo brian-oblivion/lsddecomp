@@ -64,3 +64,7 @@ struct comment across two reports).
 
 No other new struct or vtable-slot knowledge; `slot48`'s own signature was
 already correct from earlier work.
+
+## Naming
+
+Round 71 (alpha). `func_8001D008` -> `Class6B5CC__UpdateScale`, **tier A**. Table slot +0x048 (`updateScale`). Three RatioToFixed12 values assigned (flag != 0) or added into GsCOORD2PARAM.scale.vx/vy/vz (Class6B5CCSub44 unk0/4/8), then flg = 0. Reset passes SCALE_ONE ({1/1}x3), i.e. unit scale.

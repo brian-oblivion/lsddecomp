@@ -25,3 +25,7 @@ round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on t
 `Class6B5CC__UnlinkModel`'s own (measured) body is what confirmed
 `Class6B5CCObj::unk18`/`unk20` independently of the ctor's own zeroing —
 see `include/code_d294.h`.
+
+## Naming
+
+Round 71 (alpha). `func_8001CD20` -> `Class6B5CC__RemoveAllChildren`, **tier A**. Overrides BasicClass slot +0x018 `removeAllChildren`: Class6B5CC__UnlinkModel, then the base implementation.

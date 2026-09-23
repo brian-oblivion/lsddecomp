@@ -23,3 +23,7 @@ u32 Class6B5CC__SetLighting(Class6B5CCObj *self, s32 a1) {
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Matched on the first build (part of the five-function bitfield-setter
 group; see `Class6B5CC__SetDisplay.md`).
+
+## Naming
+
+Round 71 (alpha). `func_8001D3CC` -> `Class6B5CC__SetLighting`, **tier A**. Table slot +0x06C. Sets attribute bit 6, GsLOFF, to on == 0 (lighting on when on != 0) and returns the old LOFF bit (not inverted, unlike SetDisplay). No caller dispatches this slot by name yet.

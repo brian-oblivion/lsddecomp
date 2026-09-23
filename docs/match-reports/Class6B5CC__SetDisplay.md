@@ -47,3 +47,7 @@ the previous bitfield value shifted back to bit 0) recurs as a project-wide
 idiom for this game's flag words — worth grepping for the same
 call-shape (`addiu $a0,$a0,N; li $a1,shift; li $a2,width; ...; jal`)
 elsewhere before re-deriving it from scratch.
+
+## Naming
+
+Round 71 (alpha). `func_8001D344` -> `Class6B5CC__SetDisplay`, **tier A**. Table slot +0x060. GetSetBitField(&attribute, 31, 1, on == 0): bit 31 of GsDOBJ2.attribute is GsDOFF (LIBGS.H), so on=0 hides the object; returns the previous display state (old DOFF == 0). DreamSys calls it with 0; class_3bb8c_s calls the slot setDisplay.

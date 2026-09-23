@@ -32,3 +32,7 @@ code_d294. Matched on the first build. Established
 `BasicClassMethodsD294`'s `+0x010` slot (2-arg, `(self, other)`) and the
 `GenericObj_d294` generic-dispatch type (header tag comparison), reused by
 `Class6B5CC__RemoveChild`/`Class6B5CC__DetachAttachedChildren` below.
+
+## Naming
+
+Round 71 (alpha). `func_8001CC48` -> `Class6B5CC__AddChild`, **tier A**. Overrides BasicClass slot +0x010 `addChild` (include/code_8220.h). Forwards to the base first, then if the child's class tag is 9 (D_8006BEA0) calls Class6B5CC__LinkModel on it. Class6B5CC__AttachToParent reaches this slot on the parent with `self` as the child.

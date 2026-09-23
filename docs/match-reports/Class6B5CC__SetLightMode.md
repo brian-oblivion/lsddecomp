@@ -30,3 +30,7 @@ bit ranges: `[3,6)` (3 bits, this function), bit 6 (1 bit,
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Matched on the first build (part of the five-function bitfield-setter
 group; see `Class6B5CC__SetDisplay.md`).
+
+## Naming
+
+Round 71 (alpha). `func_8001D3F8` -> `Class6B5CC__SetLightMode`, **tier B**. Table slot +0x070. Writes the 3-bit field at attribute bits 3-5, which LIBGS.H defines bit by bit as GsFOG, GsMATE and GsLLMOD, and returns the old value. Tier B: the field is the light-mode group by bit position, but no caller in src/ shows which values the game writes.

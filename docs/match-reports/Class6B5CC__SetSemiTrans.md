@@ -27,3 +27,7 @@ x!=0" lowering), matching retail's `sltu $a3,$zero,$a1`.
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Matched on the first build (part of the five-function bitfield-setter
 group; see `Class6B5CC__SetDisplay.md`).
+
+## Naming
+
+Round 71 (alpha). `func_8001D374` -> `Class6B5CC__SetSemiTrans`, **tier A**. Table slot +0x064. Sets attribute bit 30, GsALON (semi-transparency on), to on != 0 and returns the old bit. class_3bb8c_s calls the slot setSemiTrans.

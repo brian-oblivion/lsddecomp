@@ -45,3 +45,7 @@ round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on t
 iteration needed). Cross-checks `Class6B5CC__AttachToParent`'s `UnkOwner_d294` type:
 both functions dispatch through the identical `+0x010`/`+0x014` slot
 shape on whatever `self->unkC` points to.
+
+## Naming
+
+Round 71 (alpha). `func_8001D1A4` -> `Class6B5CC__DetachFromParent`, **tier A**. Table slot +0x050. If attached: parent->removeChild(self) (BasicClass slot +0x014), coord2->super = 0, self->unkC = NULL. Exact inverse of Class6B5CC__AttachToParent. Finalize calls it first.

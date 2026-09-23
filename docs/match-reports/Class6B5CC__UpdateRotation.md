@@ -106,3 +106,7 @@ loop-shape fix, not just a rebuild" pattern this round (see also the
 round-42 reopen notes generally) -- worth checking on any other queued
 function whose STALL predates round 42 and involves a pointer-walking loop
 over a small fixed count.
+
+## Naming
+
+Round 71 (alpha). `func_8001CEB4` -> `Class6B5CC__UpdateRotation`, **tier A**. Table slot +0x044 (round 70 named the slot `updateRotation`). Converts a ratio triple of degrees (RatioToFixed12, /360) into 4096-per-turn units and either assigns (flag != 0) or accumulates mod 4096 into GsCOORD2PARAM.rotate, then clears coord2 flg. Callers agree: DreamSys turns (ROTATION_YAW_PLUS45 etc., accumulate) and sets headings (assign); class_3bb8c_s calls the slot updateRotation.

@@ -56,3 +56,7 @@ combined `&&`, to keep each branch target lined up with retail's own).
 Established `GetNextBasicClass`'s call shape from this unit's own vantage,
 `Class6B5CCObj::unk4` (split out of the previously-opaque BasicClass field
 blob), and `GenericObj_d294::unkC`.
+
+## Naming
+
+Round 71 (alpha). `func_8001D280` -> `Class6B5CC__GetNextAttachedChild`, **tier A**. Table slot +0x058. Walks self->children (BasicClass +0x004, seeded when *entry is NULL) with GetNextBasicClass and stops at the next child whose tag is 4 (Class6B5CC family) and whose +0x00C parent pointer is self; sets *entry = NULL when the list ends. A list iterator whose mechanics are its purpose.

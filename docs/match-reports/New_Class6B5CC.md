@@ -52,3 +52,7 @@ census this unit's header is built from.
 ## Provenance
 
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
+
+## Naming
+
+Round 71 (alpha). `func_8001CA94` -> `New_Class6B5CC`, **tier A**. Allocates 0x44 bytes, runs `GetClass6B5CCMethods()->ctor` on it, frees and returns NULL if the ctor fails. The project's `New_Class` allocator convention (New_Entity, New_BaseObjO). Not a table slot. Caller: Unk18Obj__Unk18Obj (code_2cc8c_c) stores the result.

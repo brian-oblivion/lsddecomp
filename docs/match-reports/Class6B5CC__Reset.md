@@ -38,3 +38,7 @@ still-queued occupants `Class6B5CC__UpdateRotation`/`Class6B5CC__UpdateScale`) a
 `ROTATION_ZERO`/`SCALE_ONE` rodata tables (0xC bytes each, shape confirmed
 independently by `Class6B5CC__UpdateScale`'s own disassembly reading three
 `{s16,s16}` pairs out of its 3rd argument via `RatioToFixed12`).
+
+## Naming
+
+Round 71 (alpha). `func_8001CE30` -> `Class6B5CC__Reset`, **tier B**. Table slot +0x040, called last by the ctor. Zeroes `tick` and the GsDOBJ2 attribute, GsInitCoordinate2(0, coord2) (no parent), sets rotation to ROTATION_ZERO ({0/1}x3) and scale to SCALE_ONE ({1/1}x3), flg = 1. Mechanics are a full reset to an identity transform; tier B because what the game uses a re-run of slot +0x040 for is not established here. Subclass overrides of this slot are named FinishConstruct / Reset / InitDefaults / InitState in other units, all consistent.

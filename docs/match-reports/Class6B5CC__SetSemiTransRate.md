@@ -25,3 +25,7 @@ u32 Class6B5CC__SetSemiTransRate(Class6B5CCObj *self, u32 a1) {
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Matched on the first build (part of the five-function bitfield-setter
 group; see `Class6B5CC__SetDisplay.md`).
+
+## Naming
+
+Round 71 (alpha). `func_8001D3A0` -> `Class6B5CC__SetSemiTransRate`, **tier A**. Table slot +0x068. Writes the 2-bit field at attribute bits 28-29 (GsAZERO..GsATHREE, the semi-transparency rate) and returns the old value. class_3bb8c_s calls the slot setSemiTransRate.

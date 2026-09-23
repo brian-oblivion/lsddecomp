@@ -88,3 +88,7 @@ ctor-like/`+0x014` dtor-like slots) and `Class6B5CCSub14`'s
 `unk18`/`unk1C`/`unk20` Vec3 fields, and retyped `Class6B5CCObj::unkC`
 from an untyped `void *` to `UnkOwner_d294 *` (see header comment on that
 field for the cross-check with `Class6B5CC__DetachFromParent`).
+
+## Naming
+
+Round 71 (alpha). `func_8001D0EC` -> `Class6B5CC__AttachToParent`, **tier A**. Table slot +0x04C. Only when not already attached: stores the parent in self->unkC, sets coord2->super to the parent's coordinate, calls parent->addChild(self) (BasicClass slot +0x010), copies the optional translation into coord2 (coord.t, +0x18..+0x20) or zeroes it, flg = 0. class_3bb8c_s independently calls this slot `attachToParent`.

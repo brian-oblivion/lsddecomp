@@ -81,3 +81,7 @@ void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Both fixes above were found within the 30-attempt budget (2 rebuild
 iterations total).
+
+## Naming
+
+Round 71 (alpha). `func_8001CAF4` -> `Class6B5CC__Class6B5CC`, **tier A**. Table slot +0x008 (ctor) of gClass6B5CCMethods. Allocates the 0x50-byte GsCOORDINATE2 and 0x28-byte GsCOORD2PARAM, runs the BasicClass ctor, installs gClass6B5CCMethods, zeroes fields, then calls `reset`. `Class__Class` constructor convention (BasicClass__BasicClass).

@@ -50,3 +50,7 @@ round 11 (2026-09-03), runner charlie, unit code_d294, second pass. 2 build iter
 initializer fix above). Established `Class6B5CCMethods::slot58`'s call
 shape (`self, GenericObj_d294 **outEntry, s32 *outCont`) and
 `GenericMethods_d294::slot50` (1-arg, `entry` itself).
+
+## Naming
+
+Round 71 (alpha). `func_8001D204` -> `Class6B5CC__DetachAttachedChildren`, **tier A**. Table slot +0x054. Loops getNextAttachedChild and calls each returned entry's slot +0x050 (Class6B5CC__DetachFromParent on this class) until the cursor runs out. Finalize calls it right after detaching self.
