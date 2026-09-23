@@ -1,4 +1,6 @@
-# func_8001D280
+# Class6B5CC__GetNextAttachedChild
+
+> Renamed from `func_8001D280` on 2026-09-23 (tools/rename.py). Address 0x8001d280.
 
 **Unit:** code_d294 · **Size:** 47 words · **Status:** MATCHED (47/47 words)
 
@@ -23,7 +25,7 @@ round-1 reports).
 ## The C
 
 ```c
-void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
+void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
     s32 tag;
 
     tag = 4;

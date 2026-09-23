@@ -8,7 +8,7 @@
 
 `Class6B5CC` vtable slot `+0x054`, called by this unit's own dtor
 (`Class6B5CC__Finalize`). Repeatedly calls `self->methods->slot58` (`+0x058`,
-`func_8001D280`, also matched this round -- see its own report), which
+`Class6B5CC__GetNextAttachedChild`, also matched this round -- see its own report), which
 writes a found-entry pointer and advances a persistent list cursor through
 its 2nd/3rd arguments, and for each non-NULL entry found calls
 `entry->methods->slot50(entry)` on it. Loops until the cursor (reused as

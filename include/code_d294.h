@@ -12,7 +12,7 @@
  * BasicClass, D_8006B58C], +0x038 Class6B5CC__OnNotify (override), +0x03C null,
  * +0x040 Class6B5CC__Reset, +0x044 Class6B5CC__UpdateRotation, +0x048 Class6B5CC__UpdateScale,
  * +0x04C Class6B5CC__AttachToParent, +0x050 Class6B5CC__DetachFromParent, +0x054 Class6B5CC__DetachAttachedChildren,
- * +0x058 func_8001D280, +0x05C func_8001D33C (already-matched no-op stub),
+ * +0x058 Class6B5CC__GetNextAttachedChild, +0x05C func_8001D33C (already-matched no-op stub),
  * +0x060 func_8001D344, +0x064 func_8001D374, +0x068 func_8001D3A0,
  * +0x06C func_8001D3CC, +0x070 func_8001D3F8, and continuing past this
  * unit's slice into the next carve (code_d294_b) up to +0x0B4
@@ -382,7 +382,7 @@ struct GenericMethods_d294 {
 struct GenericObj_d294 {
     GenericMethods_d294 *methods; /* +0x000 */
     u8 pad04[0x00C - 0x004];
-    void *unkC;                    /* +0x00C, func_8001D280 (still queued) compares this to a Class6B5CCObj* */
+    void *unkC;                    /* +0x00C, Class6B5CC__GetNextAttachedChild (still queued) compares this to a Class6B5CCObj* */
     s32 unk10;                     /* +0x010, round 13 (code_d294_c, Class6B5CC__LinkModel): read into self->unk18 */
     /* +0x014, round 13 (Class6B5CC__TryAttachNearby): same role as Class6B5CCObj's own
      * `unk14` -- `other->unk14`'s +0x038 is subtracted from
@@ -439,7 +439,7 @@ struct Class6B5CCMethods {
     u8 pad04C[0x050 - 0x04C];
     void (*slot50)(Class6B5CCObj *self);      /* +0x050, Class6B5CC__DetachFromParent (this unit) */
     void (*slot54)(Class6B5CCObj *self);      /* +0x054, Class6B5CC__DetachAttachedChildren (this unit) */
-    /* +0x058, func_8001D280 (still queued). Class6B5CC__DetachAttachedChildren's own call site
+    /* +0x058, Class6B5CC__GetNextAttachedChild (still queued). Class6B5CC__DetachAttachedChildren's own call site
      * establishes its signature: writes an output entry pointer and an
      * output "more remain" flag through its 2nd/3rd arguments. */
     void (*slot58)(Class6B5CCObj *self, GenericObj_d294 **outEntry, s32 *outCont); /* +0x058 */
@@ -523,7 +523,7 @@ struct Class6B5CCObj {
     Class6B5CCMethods *methods; /* +0x000 */
     /* +0x004..+0x00C: BasicClass instance fields, owned by whatever unit
      * decompiles BasicClass itself -- EXCEPT +0x004, read directly by
-     * func_8001D280 (this unit) as a list-head pointer (seeded into its
+     * Class6B5CC__GetNextAttachedChild (this unit) as a list-head pointer (seeded into its
      * search cursor whenever the caller hasn't found an entry yet). Split
      * out of the opaque blob for that one reason; still don't know
      * BasicClass's own name for it. */
@@ -630,7 +630,7 @@ extern void GsInitCoordinate2(s32 arg0, void *dest);
  * (the node's own "next" field) and `*cursor = (*cursor)->unk0` (some
  * other per-node link -- NOT necessarily the same "next" field, going by
  * its own disassembly). If `*cursor` is NULL, `*out = NULL`. Declared
- * here typed to func_8001D280's own call site (the only caller reachable
+ * here typed to Class6B5CC__GetNextAttachedChild's own call site (the only caller reachable
  * from this unit) rather than generically. */
 extern void GetNextBasicClass(GenericObj_d294 **out, GenericObj_d294 **cursor);
 
@@ -732,7 +732,7 @@ void Class6B5CC__Reset(Class6B5CCObj *self);
 Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec);
 Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self);
 void Class6B5CC__DetachAttachedChildren(Class6B5CCObj *self);
-void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor);
+void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor);
 
 /* GetSetBitField (round 54 correction: this banner was STALE -- it is
  * now carved and MATCHED in src/code_d294_c.c, not code_d294_b): a

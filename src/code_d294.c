@@ -189,7 +189,7 @@ void Class6B5CC__DetachAttachedChildren(Class6B5CCObj *self) {
     } while (cont);
 }
 
-void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
+void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
     s32 tag;
 
     tag = 4;
