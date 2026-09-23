@@ -68,7 +68,7 @@ typedef struct Class865C8Methods {
     void *slot4C;                                  /* +0x04C Obj865C8__StartSubA */
     void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 Obj865C8__RunSubUpdates */
     void *slot54;                                  /* +0x054 Obj865C8__AdvanceState */
-    void (*noop58)(void);                          /* +0x058 func_8004A35C (no-op, matched) */
+    void (*noop58)(void);                          /* +0x058 Obj865C8__Noop58 (no-op, matched) */
     void *slot5C;                                  /* +0x05C func_8004A364 */
     /* Shared with gClass86668Methods (see Class86668Methods below) -- literally the
      * same function address at the same offset in both tables. */

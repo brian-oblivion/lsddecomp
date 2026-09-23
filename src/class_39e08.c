@@ -303,7 +303,7 @@ void Class86668__Deinit(Obj865C8 *self) {
     Get_vtable_IntermediateBase()->slot48(self);
 }
 
-void func_8004A35C(void) {
+void Obj865C8__Noop58(void) {
 }
 
 void func_8004A364(Obj865C8 *self, s32 arg1, s32 arg2) {
