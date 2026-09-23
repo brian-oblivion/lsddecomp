@@ -147,7 +147,7 @@ typedef struct Vec3_d294 {
 } Vec3_d294;
 
 struct Class6B5CCSub14 {
-    s32 unk0;                    /* +0x000, state/pending flag -- see above */
+    s32 flg;                    /* +0x000, state/pending flag -- see above */
     u8 pad04[0x018 - 0x004];
     s32 unk18;                   /* +0x018, Vec3.x */
     s32 unk1C;                   /* +0x01C, Vec3.y */
@@ -186,7 +186,7 @@ struct Class6B5CCSub14 {
      * narrows what is KNOWN about its contents, it does not change the
      * allocation. */
     Class6B5CCSub44 *unk44;
-    s32 unk48;    /* +0x048, zeroed by the ctor and by Class6B5CC__DetachFromParent (slot +0x050);
+    s32 super;    /* +0x048, zeroed by the ctor and by Class6B5CC__DetachFromParent (slot +0x050);
                    * set to `obj->unk14` by Class6B5CC__AttachToParent's "attach" */
 };
 
@@ -280,22 +280,22 @@ struct BasicClassMethodsD294 {
     s32 header;               /* +0x000 */
     void *unk04;               /* +0x004 */
     void *(*ctor)(void *self); /* +0x008 */
-    void *(*dtor)(void *self); /* +0x00C */
+    void *(*finalize)(void *self); /* +0x00C */
     /* +0x010/+0x014, both round-2 finds (Class6B5CC__AddChild/Class6B5CC__RemoveChild):
      * a `(self, other)` pair this class's own +0x010/+0x014 overrides
      * (Class6B5CC__AddChild/Class6B5CC__RemoveChild) forward to unconditionally, after/before
      * their own extra work. Real BasicClass-level meaning unknown from
      * this unit alone. */
-    void (*slot10)(void *self, void *other); /* +0x010 */
-    void (*slot14)(void *self, void *other); /* +0x014 */
-    void (*slot18)(void *self);              /* +0x018, Class6B5CC__RemoveAllChildren's forward target */
+    void (*addChild)(void *self, void *other); /* +0x010 */
+    void (*removeChild)(void *self, void *other); /* +0x014 */
+    void (*removeAllChildren)(void *self);              /* +0x018, Class6B5CC__RemoveAllChildren's forward target */
     u8 pad01C[0x038 - 0x01C];
     /* +0x038, Class6B5CC__OnNotify's (this unit) own forward target -- called
      * unconditionally as its very first action, `(self, other, arg2)`,
      * same three-argument shape as Class6B5CC__OnNotify itself. Real BasicClass-
      * level meaning unknown from this unit alone, same caveat as
      * slot10/slot14 above. */
-    void (*slot38)(void *self, void *other, s32 arg2);
+    void (*onNotify)(void *self, void *other, s32 arg2);
 };
 
 extern BasicClassMethodsD294 *Get_vtable_BasicClass(void);
@@ -323,8 +323,8 @@ typedef struct UnkOwner_d294 UnkOwner_d294;
 typedef struct UnkOwnerMethods_d294 UnkOwnerMethods_d294;
 struct UnkOwnerMethods_d294 {
     u8 pad0[0x010];
-    void (*slot10)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x010, "attach" */
-    void (*slot14)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x014, "detach" */
+    void (*addChild)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x010, "attach" */
+    void (*removeChild)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x014, "detach" */
     /* +0x084, Class6B5CC__ComposeAndApplyRotation's own call target on each list node (round 13).
      * `out` is a 0x20-byte buffer (MATRIX-shaped -- MulMatrix2, this
      * call site's own consumer, loads it into GTE control regs 0-4 via
@@ -377,7 +377,7 @@ struct GenericMethods_d294 {
      * real meaning of the literal unknown. */
     void (*slot38)(GenericObj_d294 *self, Class6B5CCObj *arg1, s32 arg2); /* +0x038 */
     u8 pad03C[0x050 - 0x03C];
-    void (*slot50)(GenericObj_d294 *self); /* +0x050, Class6B5CC__DetachAttachedChildren's call target */
+    void (*detachFromParent)(GenericObj_d294 *self); /* +0x050, Class6B5CC__DetachAttachedChildren's call target */
 };
 struct GenericObj_d294 {
     GenericMethods_d294 *methods; /* +0x000 */
@@ -420,7 +420,7 @@ struct Class6B5CCMethods {
     s32 header;                              /* +0x000 */
     void *unk04;                              /* +0x004, BasicClass__func_17eb0, inherited, unused here */
     void *(*ctor)(void *self);                /* +0x008, Class6B5CC__Class6B5CC (this unit) */
-    void  (*dtor)(void *self);                /* +0x00C, Class6B5CC__Finalize (this unit) */
+    void  (*finalize)(void *self);                /* +0x00C, Class6B5CC__Finalize (this unit) */
     u8 pad010[0x030 - 0x010];
     /* +0x030, BasicClass__NotifyParents, inherited verbatim (per the file
      * banner's `--vs D_8006B58C` census) -- NOT decompiled here, BasicClass
@@ -428,7 +428,7 @@ struct Class6B5CCMethods {
      * this unit) dispatches through it as `(self, s32 arg1)`. */
     void (*slot30)(Class6B5CCObj *self, s32 arg1);
     u8 pad034[0x040 - 0x034];
-    void (*slot40)(Class6B5CCObj *self);      /* +0x040, Class6B5CC__Reset (this unit) */
+    void (*reset)(Class6B5CCObj *self);      /* +0x040, Class6B5CC__Reset (this unit) */
     /* +0x044/+0x048, a `(self, s32 flag, void *data)` pair -- Class6B5CC__Reset
      * calls both with flag=1 and `data` pointing at a 3-entry table of
      * {s16,s16} pairs (ROTATION_ZERO/SCALE_ONE, 0xC bytes each). Class6B5CC__UpdateScale
@@ -437,12 +437,12 @@ struct Class6B5CCMethods {
     void (*updateRotation)(Class6B5CCObj *self, s32 flag, void *data); /* +0x044, Class6B5CC__UpdateRotation */
     void (*updateScale)(Class6B5CCObj *self, s32 flag, void *data); /* +0x048, Class6B5CC__UpdateScale */
     u8 pad04C[0x050 - 0x04C];
-    void (*slot50)(Class6B5CCObj *self);      /* +0x050, Class6B5CC__DetachFromParent (this unit) */
-    void (*slot54)(Class6B5CCObj *self);      /* +0x054, Class6B5CC__DetachAttachedChildren (this unit) */
+    void (*detachFromParent)(Class6B5CCObj *self);      /* +0x050, Class6B5CC__DetachFromParent (this unit) */
+    void (*detachAttachedChildren)(Class6B5CCObj *self);      /* +0x054, Class6B5CC__DetachAttachedChildren (this unit) */
     /* +0x058, Class6B5CC__GetNextAttachedChild (still queued). Class6B5CC__DetachAttachedChildren's own call site
      * establishes its signature: writes an output entry pointer and an
      * output "more remain" flag through its 2nd/3rd arguments. */
-    void (*slot58)(Class6B5CCObj *self, GenericObj_d294 **outEntry, s32 *outCont); /* +0x058 */
+    void (*getNextAttachedChild)(Class6B5CCObj *self, GenericObj_d294 **outEntry, s32 *outCont); /* +0x058 */
     /* +0x05C, Class6B5CC__func_1d33c -- already matched as a no-op `void(void)`
      * body, but THIS call site (Class6B5CC__Finalize's dtor) passes it 2 args
      * (self, 0). Both are right about their own codegen: the callee body
@@ -482,7 +482,7 @@ struct Class6B5CCMethods {
      * Real per-slot meaning unknown from that call site alone. */
     void (*slot94)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
     void (*slot98)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
-    void (*slot9C)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
+    void (*dispatchLinkCommand)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
     /* +0x0A0, Class6B5CC__DispatchLinkCommand's own call target (round 12): dispatched with
      * only `self`, per that function's own disassembly (`jalr $v0` with
      * `$a0` untouched since function entry). Class6B5CC__TryAttachNearby (still queued)
@@ -527,7 +527,7 @@ struct Class6B5CCObj {
      * search cursor whenever the caller hasn't found an entry yet). Split
      * out of the opaque blob for that one reason; still don't know
      * BasicClass's own name for it. */
-    void *unk4;
+    void *children;
     u8 unk8[0x00C - 0x008];
     /* +0x00C, an owner back-reference. RETYPED round 2 from an untyped
      * `void *` to `UnkOwner_d294 *` once Class6B5CC__AttachToParent (this unit's own
@@ -551,7 +551,7 @@ struct Class6B5CCObj {
      * genuinely a pointer, not an always-zero s32. Still opaque: nothing
      * this unit's chosen functions dereference through it directly. */
     void *unk20;
-    s32 unk24;                  /* +0x024, zeroed by Class6B5CC__Reset (this unit) */
+    s32 tick;                  /* +0x024, zeroed by Class6B5CC__Reset (this unit) */
     /* +0x028, round 12 (code_d294_b): Class6B5CC__DispatchLinkCommand sets this to its own
      * `a1` (a plain `s32`, per m2c's own inference) when called with
      * a2==4. RETYPED round 13 (Class6B5CC__TryAttachNearby): `self->unk28 = other;`

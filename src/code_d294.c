@@ -33,25 +33,25 @@ void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     self->unk20 = 0;
     self->unk18 = 0;
     self->unkC = NULL;
-    self->unk14->unk48 = 0;
-    self->methods->slot40(self);
+    self->unk14->super = 0;
+    self->methods->reset(self);
     return self;
 }
 
 void Class6B5CC__Finalize(Class6B5CCObj *self) {
     Class6B5CCSub14 *sub;
 
-    self->methods->slot50(self);
-    self->methods->slot54(self);
+    self->methods->detachFromParent(self);
+    self->methods->detachAttachedChildren(self);
     self->methods->slot5C(self, 0);
     sub = self->unk14;
     func_80017CFC(sub->unk44);
     func_80017CFC(self->unk14);
-    Get_vtable_BasicClass()->dtor(self);
+    Get_vtable_BasicClass()->finalize(self);
 }
 
 void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other) {
-    Get_vtable_BasicClass()->slot10(self, other);
+    Get_vtable_BasicClass()->addChild(self, other);
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__LinkModel(self, other);
     }
@@ -61,35 +61,35 @@ void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__UnlinkModel(self);
     }
-    Get_vtable_BasicClass()->slot14(self, other);
+    Get_vtable_BasicClass()->removeChild(self, other);
 }
 
 void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self) {
     Class6B5CC__UnlinkModel(self);
-    Get_vtable_BasicClass()->slot18(self);
+    Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
 void Class6B5CC__OnNotify(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
     s32 tag;
 
-    Get_vtable_BasicClass()->slot38(self, other, arg2);
+    Get_vtable_BasicClass()->onNotify(self, other, arg2);
     tag = other->methods->header & 0xF;
     if (tag == 2) {
         self->methods->slot94(self, other, arg2);
     } else if (tag == 5) {
         self->methods->slot98(self, other, arg2);
     } else if (tag == 4) {
-        self->methods->slot9C(self, other, arg2);
+        self->methods->dispatchLinkCommand(self, other, arg2);
     }
 }
 
 void Class6B5CC__Reset(Class6B5CCObj *self) {
-    self->unk24 = 0;
+    self->tick = 0;
     self->unk10 = 0;
     GsInitCoordinate2(0, self->unk14);
     self->methods->updateRotation(self, 1, ROTATION_ZERO);
     self->methods->updateScale(self, 1, SCALE_ONE);
-    self->unk14->unk0 = 1;
+    self->unk14->flg = 1;
 }
 
 void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
@@ -119,7 +119,7 @@ void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
             *cur = (*cur + vals[i]) % 4096;
         }
     }
-    self->unk14->unk0 = 0;
+    self->unk14->flg = 0;
 }
 
 void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
@@ -139,7 +139,7 @@ void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
         dst->unk4 += (s16)r1;
         dst->unk8 += (s16)r2;
     }
-    self->unk14->unk0 = 0;
+    self->unk14->flg = 0;
 }
 
 Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
@@ -148,8 +148,8 @@ Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *ob
     if (self->unkC == NULL) {
         self->unkC = obj;
         sub = self->unk14;
-        sub->unk48 = obj->unk14;
-        obj->methods->slot10(obj, self);
+        sub->super = obj->unk14;
+        obj->methods->addChild(obj, self);
         sub = self->unk14;
         if (vec != NULL) {
             sub->unk18 = vec->x;
@@ -160,7 +160,7 @@ Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *ob
             sub->unk1C = 0;
             sub->unk20 = 0;
         }
-        self->unk14->unk0 = 0;
+        self->unk14->flg = 0;
     }
     return self;
 }
@@ -170,8 +170,8 @@ Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self) {
 
     owner = self->unkC;
     if (owner != NULL) {
-        owner->methods->slot14(owner, self);
-        self->unk14->unk48 = 0;
+        owner->methods->removeChild(owner, self);
+        self->unk14->super = 0;
         self->unkC = NULL;
     }
     return self;
@@ -182,9 +182,9 @@ void Class6B5CC__DetachAttachedChildren(Class6B5CCObj *self) {
     s32 cont;
 
     do {
-        self->methods->slot58(self, &entry, &cont);
+        self->methods->getNextAttachedChild(self, &entry, &cont);
         if (entry != NULL) {
-            entry->methods->slot50(entry);
+            entry->methods->detachFromParent(entry);
         }
     } while (cont);
 }
@@ -195,7 +195,7 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **ent
     tag = 4;
     do {
         if (*entry == NULL) {
-            *cursor = self->unk4;
+            *cursor = self->children;
         }
         GetNextBasicClass(entry, cursor);
         if (*entry != NULL) {
