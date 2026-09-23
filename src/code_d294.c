@@ -228,6 +228,6 @@ u32 Class6B5CC__SetLighting(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 6, 1, a1 == 0);
 }
 
-u32 func_8001D3F8(Class6B5CCObj *self, u32 a1) {
+u32 Class6B5CC__SetLightMode(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 3, 3, a1);
 }

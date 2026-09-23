@@ -1,4 +1,6 @@
-# func_8001D3F8
+# Class6B5CC__SetLightMode
+
+> Renamed from `func_8001D3F8` on 2026-09-23 (tools/rename.py). Address 0x8001d3f8.
 
 **Unit:** code_d294 · **Size:** 11 words · **Status:** MATCHED (11/11 words)
 
@@ -12,7 +14,7 @@
 ## The C
 
 ```c
-u32 func_8001D3F8(Class6B5CCObj *self, u32 a1) {
+u32 Class6B5CC__SetLightMode(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 3, 3, a1);
 }
 ```

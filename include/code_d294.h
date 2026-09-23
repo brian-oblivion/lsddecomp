@@ -14,7 +14,7 @@
  * +0x04C Class6B5CC__AttachToParent, +0x050 Class6B5CC__DetachFromParent, +0x054 Class6B5CC__DetachAttachedChildren,
  * +0x058 Class6B5CC__GetNextAttachedChild, +0x05C Class6B5CC__func_1d33c (already-matched no-op stub),
  * +0x060 Class6B5CC__SetDisplay, +0x064 Class6B5CC__SetSemiTrans, +0x068 Class6B5CC__SetSemiTransRate,
- * +0x06C Class6B5CC__SetLighting, +0x070 func_8001D3F8, and continuing past this
+ * +0x06C Class6B5CC__SetLighting, +0x070 Class6B5CC__SetLightMode, and continuing past this
  * unit's slice into the next carve (code_d294_b) up to +0x0B4
  * Class6B5CC__NotifyTaggedParents (45 slots total). This is proof, not a guess -- `--vs
  * D_8006B58C` confirms the class overrides 5 BasicClass slots (+0x008,
@@ -756,7 +756,7 @@ s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1);
 u32 Class6B5CC__SetSemiTrans(Class6B5CCObj *self, s32 a1);
 u32 Class6B5CC__SetSemiTransRate(Class6B5CCObj *self, u32 a1);
 u32 Class6B5CC__SetLighting(Class6B5CCObj *self, s32 a1);
-u32 func_8001D3F8(Class6B5CCObj *self, u32 a1);
+u32 Class6B5CC__SetLightMode(Class6B5CCObj *self, u32 a1);
 
 /* Round 12 (code_d294_b): four more self->unk10 bitfield siblings, same
  * family as the five above. See src/code_d294_b.c for the per-function
