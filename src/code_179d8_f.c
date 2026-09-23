@@ -57,9 +57,8 @@
  *
  * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
  * re-implementing the greps and never for `addiu_at` (resolved round 21).
- * func_80036528 (240w) is now this unit's ONLY function; it has been attempted
- * and carries a full worked report (docs/match-reports/func_80036528.md) with
- * its 227/240 near-miss body preserved below.  It is not cold ground.
+ * func_80036528 (240w) is this unit's ONLY function and is MATCHED (round
+ * 70); docs/match-reports/func_80036528.md has the derivation.
  *
  * Expect low-level driver-shaped code rather than class-framework code, as
  * elsewhere in code_179d8; confirm with tools/classtable.py, do not assume.
@@ -90,7 +89,7 @@ typedef struct {
     u8 unk2C[0x10];
     u8 pad3C[0x3E - 0x3C];
     s16 unk3E;
-    u16 unk40;
+    s16 unk40;
     s16 unk42;
     u8 pad44[0x46 - 0x44];
     s16 unk46;
@@ -116,77 +115,64 @@ typedef struct {
 
 extern Entry90902E8 *D_800902E8[];
 
-/* STALL -- see docs/match-reports/func_80036528.md. Best reached: 227/240
- * words compiled (13 words SHORT of retail's length; whole-image red).
- * Frame size, control flow and field layout are all confirmed correct;
- * the residue is a parameter-to-callee-saved-register allocation choice
- * (a0/a1 hop through the plain argument registers for longer than this
- * body reproduces) this round's attempts could not close.
- * Restored to INCLUDE_ASM per project rule. */
-#if 0
-extern s32 func_80030404(s16 a0, s16 a1, s16 a2, s32 a3);
+/* func_80036528: per-slot beat tick. Matched round 70 -- see
+ * docs/match-reports/func_80036528.md. The parameters really are s16 (that
+ * is what produces retail's move a3,a0 ... move s5,a3 argument hop), and
+ * func_80030404's x/y parameters are u16 (retail masks them andi 0xFFFF). */
+extern s32 func_80030404(s16 a0, u16 a1, u16 a2, s32 a3);
 extern s32 func_80030584(s32 a0, s16 *out1, s16 *out2);
 
-void func_80036528(s32 a0, s32 a1)
+void func_80036528(s16 a0, s16 a1)
 {
     Entry90902E8 **arr;
     Entry90902E8 *entry;
-    s16 count;
     s16 thresh;
-    s16 sp10;
-    s16 sp12;
+    u16 sp10;
+    u16 sp12;
 
-    arr = &D_800902E8[(s16)a0];
-    entry = &(*arr)[(s16)a1];
-    count = entry->unk42;
+    entry = &D_800902E8[a0][a1];
+    arr = &D_800902E8[a0];
     entry->unk98 = entry->unk98 - 1;
-    if (count > 0) {
-        if ((u32)entry->unk98 % (u32)entry->unk42 == 0) {
-            if (entry->unk3E > 0) {
-                entry->unk40 = entry->unk40 - 1;
-                if ((s16)entry->unk40 >= 0) {
-                    func_80030584((s16)(a0 | (a1 << 8)), &sp10, &sp12);
-                    if ((sp10 + 1) < 0x80 && (sp12 + 1) < 0x80) {
-                        func_80030404((s16)(a0 | (a1 << 8)), (sp10 + 1) & 0xFFFF, sp12 + 1, 0);
-                        goto end;
-                    }
+    if (entry->unk42 > 0) {
+        if ((u32)entry->unk98 % (u32)entry->unk42 != 0) {
+            goto end;
+        }
+        if (entry->unk3E > 0) {
+            entry->unk40 = entry->unk40 - 1;
+            if (entry->unk40 >= 0) {
+                func_80030584((s16)(a0 | (a1 << 8)), (s16 *)&sp10, (s16 *)&sp12);
+                if ((sp10 + 1) < 0x80 && (sp12 + 1) < 0x80) {
+                    func_80030404((s16)(a0 | (a1 << 8)), sp10 + 1, sp12 + 1, 0);
+                } else {
                     func_80030404((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
-                    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x10;
-                    goto end;
+                    D_800902E8[a0][a1].unk90 &= ~0x10;
                 }
+            } else {
                 func_80030404((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
-                (*arr)[(s16)a1].unk90 &= ~0x10;
+                (*arr)[a1].unk90 &= ~0x10;
             }
         }
     } else {
         if (entry->unk3E > 0) {
-            entry->unk40 = entry->unk40 + count;
-            func_80030584((s16)(a0 | (a1 << 8)), &sp10, &sp12);
-            if ((s16)entry->unk40 >= 0) {
-                s16 d1;
-                s16 d2;
-
+            entry->unk40 = entry->unk40 + entry->unk42;
+            func_80030584((s16)(a0 | (a1 << 8)), (s16 *)&sp10, (s16 *)&sp12);
+            if (entry->unk40 >= 0) {
                 thresh = entry->unk42;
-                d1 = sp10 - thresh;
-                d2 = sp12 - thresh;
-                if (d1 < 0x80 && d2 < 0x80) {
-                    func_80030404((s16)(a0 | (a1 << 8)), d1 & 0xFFFF, d2, 0);
+                if ((sp10 - thresh) < 0x80 && (sp12 - thresh) < 0x80) {
+                    func_80030404((s16)(a0 | (a1 << 8)), sp10 - thresh, sp12 - thresh, 0);
                 } else {
                     func_80030404((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
-                    D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x10;
+                    D_800902E8[a0][a1].unk90 &= ~0x10;
                 }
             } else {
                 func_80030404((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
-                (*arr)[(s16)a1].unk90 &= ~0x10;
+                (*arr)[a1].unk90 &= ~0x10;
             }
         }
-        if (entry->unk98 == 0 || (s16)entry->unk40 == 0) {
-            D_800902E8[(s16)a0][(s16)a1].unk90 &= ~0x10;
-        }
+    }
+    if (entry->unk98 == 0 || entry->unk40 == 0) {
+        D_800902E8[a0][a1].unk90 &= ~0x10;
     }
 end:
     func_80030584((s16)(a0 | (a1 << 8)), &entry->unk78, &entry->unk7A);
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_179d8_f", func_80036528);
