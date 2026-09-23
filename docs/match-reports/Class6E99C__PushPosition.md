@@ -1,4 +1,80 @@
-# Class6E99C__PushPosition -- STALL, corrected (was misfiled as unfixable register-identity; real fix narrowed the function to a 3-word permuter-exhausted "redundant move" residue -- 22/25, NOT the "1 word remaining" (i.e. implied 24/25) figure this report previously stated, which propagated into PROGRESS.md and round 19's assignment)
+# Class6E99C__PushPosition -- MATCHED (25/25, round 73; was STALL 22/25, "permuter-exhausted redundant move")
+
+REVISITED, round 73: MATCHED 25/25 (whole-image SHA1 green); names/types not relevant (the existing `SkipShort2 *a1` / `Pair32E99C *a2` signature was kept; retyping `a1` as `Pair32E99C *` measured byte-identical)
+
+## Round 73 (runner bravo): MATCHED -- the "redundant move" is a block-move CLOBBER
+
+**Preserved body rebuilt first, unchanged** (the round-59 `#ifdef
+NON_MATCHING` block): `22/25 words match (file 0x30C2C-0x30C90)`,
+`insertions 0 / deletions 0`, `positional skeleton diffs 3`, no
+outside-range drift. The three differing words are exactly the missing
+delay-slot `move $t0,$a1` (word 4, built `nop`) and the two `lhu` that
+read `$a1` instead of `$t0` (words 13, 16).
+
+**Changed state that licensed the re-read:** none in the tree -- the
+state that changed was the question. Every prior round treated `move
+$t0,$a1` as a scheduling/"redundant move" artifact and searched source
+shapes around `a1` (76k permuter iterations, 11 hand attempts). This round
+asked instead why `self` is ALSO moved (`move $a3,$a0`) in a leaf
+function, which round bravo had reached by accident with the `*a2` struct
+copy and recorded as "cross-value" luck.
+
+**Measured with an isolated reproducer and `cc1 -dl -dg`** (pinned cc1,
+same flags). The `lreg` dump shows the `*a2` struct assignment as
+`movstrsi_internal`, a `parallel` that CLOBBERS `(reg 2 v0) (reg 3 v1)
+(reg 4 a0) (reg 5 a1)`. `greg` then shows `self`'s pseudo conflicting with
+hard regs 4/5/6 and holding no preference -> it takes the first free, `$a3`
+(7). `a1`'s pseudo, dead before that copy, kept its preference for `$a1`.
+Retail's `$t0` for `a1` therefore means `a1` is live across ANOTHER block
+move earlier in the body -- it conflicts with 4/5, 6 (`a2`, live) and 7
+(`self`), so it lands in 8 (`$t0`). The only candidate is the batched
+`lw 0x50 / lw 0x54 / sw 0x90 / sw 0x94` stash, which is exactly the
+batched shape a two-word `movstrsi` emits.
+
+**The lever, one build:** write the stash as a whole-struct assignment,
+`*(Pair32E99C *)&self->unk90 = *(Pair32E99C *)&self->unk50;`. 25/25, ins
+0 / del 0, skeleton 0, `build exit=0`. The three `__asm__("" ::: "memory")`
+barriers the body carried are then unnecessary (removed: still 25/25,
+green).
+
+Builds this round: 1 (preserved body) + 1 (retype `a1` to `Pair32E99C *`,
+inert, 22/25) + 1 (stash as struct copy: 25/25) + 2 cleanups (no
+barriers; `a1` back to `SkipShort2 *`), all 25/25 after the lever.
+
+### Matched body
+
+```c
+void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+    if (self->unkC != 0) {
+        self->unk88 = self->unk60;
+        self->unk8C = self->unk62;
+        *(Pair32E99C *)&self->unk90 = *(Pair32E99C *)&self->unk50;
+        self->unk60 = a1->x;
+        self->unk62 = a1->y;
+        *(Pair32E99C *)&self->unk50 = *a2;
+    }
+}
+```
+
+Everything used is already declared in `include/code_2cc8c.h`; no header
+or struct change.
+
+### Proposed learning
+
+**On MIPS, GCC 2.6.3's inline struct copy (`movstrsi_internal`) clobbers
+`$v0`/`$v1`/`$a0`/`$a1`, so a parameter LIVE ACROSS a whole-struct
+assignment cannot keep its incoming `$a0`/`$a1`.** Tell: in a LEAF
+function, an entry `move $a3,$a0` and/or a delay-slot `move $tN,$a1` that
+nothing in the C explains, next to batched `lw/lw/sw/sw` pairs. Each such
+batched pair is a candidate struct assignment; the parameters that got
+moved are exactly those live across one. It turns "redundant move" /
+"register identity" into an ordinary source shape, and a permuter cannot
+find it (it does not convert scalar copies into aggregate copies). Measure
+with `cc1 -dl`: the clobber list is printed on the `parallel`. Extends 3c's
+"whole-struct assignment" and 3d's "three scalar assignments and ONE struct
+assignment can allocate a different register to the POINTER" -- this is the
+mechanism behind the latter.
+
 
 > Renamed from `func_8004042C` on 2026-09-20 (tools/rename.py). Address 0x8004042c.
 

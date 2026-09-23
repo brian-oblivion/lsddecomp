@@ -243,31 +243,20 @@ void *Class6E99C__GetColor(Class6E99CObj *self) {
     return &D_8006EA90[self->unk78 * 3];
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 22/25 words, length exact. Residue: redundant-move
- * register residue -- retail additionally does `move $t0,$a1`
- * unconditionally in a branch delay slot and uses $t0 for both a1->x/
- * a1->y loads; nothing in the C forces an early copy of a1, so no
- * source shape tried reproduces the extra move. Permuter-exhausted
- * (~76k combined iterations, two independent runs)
- * (docs/match-reports/Class6E99C__PushPosition.md). Hand-derived. */
+/* Both s32 pairs are copied as whole structs. GCC 2.6.3's MIPS
+ * `movstrsi_internal` clobbers $v0/$v1/$a0/$a1, so `self` and `a1`, live
+ * across the first copy, cannot stay in their incoming registers: that is
+ * retail's entry `move $a3,$a0` / delay-slot `move $t0,$a1` (round 73). */
 void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
-        __asm__("" ::: "memory");
-        self->unk90 = self->unk50;
-        self->unk94 = self->unk54;
-        __asm__("" ::: "memory");
+        *(Pair32E99C *)&self->unk90 = *(Pair32E99C *)&self->unk50;
         self->unk60 = a1->x;
         self->unk62 = a1->y;
-        __asm__("" ::: "memory");
         *(Pair32E99C *)&self->unk50 = *a2;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__PushPosition);
-#endif
 
 void Class6E99C__PopPosition(Class6E99CObj *self) {
     s32 t0, t1;
