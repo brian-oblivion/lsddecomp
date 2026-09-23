@@ -1,15 +1,17 @@
-# func_80055B6C -- MATCHED (23/23 words)
+# StyleCue02 -- MATCHED (23/23 words)
+
+> Renamed from `func_80055B6C` on 2026-09-23 (tools/rename.py). Address 0x80055b6c.
 
 Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #3 of
-`D_800874B0`. Same shape as `func_80055B10`.
+`gStyleCueCallbacks`. Same shape as `StyleCue01`.
 
 ## Final source
 
 ```c
-void func_80055B6C(ParamObj *ctx, ParamObj *self) {
+void StyleCue02(ParamObj *ctx, ParamObj *self) {
     s32 kind;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     kind = self->unk4;
     if (kind == 0) {
         self->unk1C = 0xC;
@@ -26,4 +28,4 @@ Direct transcription, matched first try.
 
 ### Proposed learning
 
-None -- see `func_8005627C`'s and `func_80055EF0`'s reports.
+None -- see `ComputeStyleCueFalloff`'s and `StyleCue07`'s reports.

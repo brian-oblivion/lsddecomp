@@ -40,7 +40,7 @@ confirmed with `grep -rl ObjN14 src/ include/` before editing.
 ## Body
 
 ```c
-extern s32 D_80087474[];
+extern s32 gStyleCueDistanceTable[];
 
 s32 IsStyleCueNear(ObjN14 *arg0, void *arg1) {
     s32 dx, dy, dist;
@@ -61,7 +61,7 @@ s32 IsStyleCueNear(ObjN14 *arg0, void *arg1) {
     }
     arg0->unk10 = dist;
     idx = arg0->unk0->unk6;
-    if (dist < D_80087474[-idx]) {
+    if (dist < gStyleCueDistanceTable[-idx]) {
         dist = 1;
         return dist;
     }
@@ -71,9 +71,9 @@ s32 IsStyleCueNear(ObjN14 *arg0, void *arg1) {
 
 `arg1` is read only at offsets +0x000 and +0x008 (both `s32`), most likely a
 position/vector pointer whose middle (Y?) field is skipped -- consistent with
-a 2D (X/Z) proximity check. `D_80087474` is a 15-entry `s32[]` in
+a 2D (X/Z) proximity check. `gStyleCueDistanceTable` is a 15-entry `s32[]` in
 `asm/data/76DC8.data.s` (dlabel, offsets 0x77C74-0x77CAC) indexed *backward*
-from `idx` (`D_80087474[-idx]`), which is an `ObjN14Sub::unk6` (`s8`,
+from `idx` (`gStyleCueDistanceTable[-idx]`), which is an `ObjN14Sub::unk6` (`s8`,
 presumably a small negative "type" tag, 0..-14).
 
 ## Two levers found closing this one -- both needed, in this order
@@ -139,7 +139,7 @@ after the pinned-pipeline reproducers converged).
 
 Computes a Manhattan-style X/Z distance from `arg0`'s own position
 (`posX`/`posZ`) to `arg1`, stores it into `arg0->lastDist`, and returns 1 if
-under the `D_80087474[-idx]` threshold (`idx` from the claimed entry's
+under the `gStyleCueDistanceTable[-idx]` threshold (`idx` from the claimed entry's
 `countSign`) else 0. Not tier A despite the boolean-getter shape: it has a
 real side effect (`lastDist` write) beyond the return value, so it is not a
 "pure leaf" by track 3's tier-A test. MATCHED, 31/31.

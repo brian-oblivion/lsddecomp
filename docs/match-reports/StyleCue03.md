@@ -1,15 +1,17 @@
-# func_80055BC8 -- MATCHED (56/56 words)
+# StyleCue03 -- MATCHED (56/56 words)
+
+> Renamed from `func_80055BC8` on 2026-09-23 (tools/rename.py). Address 0x80055bc8.
 
 Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #4 of
-`D_800874B0`. Divisibility-gated instead of discrete-`kind`-gated: two
+`gStyleCueCallbacks`. Divisibility-gated instead of discrete-`kind`-gated: two
 independent `% N == 0` checks on `self->unk4`, plus unconditional trailing
 writes.
 
 ## Final source
 
 ```c
-void func_80055BC8(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = func_8005627C(ctx);
+void StyleCue03(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     if (self->unk4 % 20 == 0) {
         self->unk1C = 0x1E;
         self->unk24 = 0x20;

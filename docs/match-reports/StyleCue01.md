@@ -1,16 +1,18 @@
-# func_80055B10 -- MATCHED (23/23 words)
+# StyleCue01 -- MATCHED (23/23 words)
+
+> Renamed from `func_80055B10` on 2026-09-23 (tools/rename.py). Address 0x80055b10.
 
 Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #2 of
-`D_800874B0`. Same shape as `func_80055A88` (see that report and the
+`gStyleCueCallbacks`. Same shape as `StyleCue00` (see that report and the
 file banner) with a two-way `kind` dispatch instead of four-way.
 
 ## Final source
 
 ```c
-void func_80055B10(ParamObj *ctx, ParamObj *self) {
+void StyleCue01(ParamObj *ctx, ParamObj *self) {
     s32 kind;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     kind = self->unk4;
     if (kind == 0) {
         self->unk1C = 0x18;
@@ -24,9 +26,9 @@ void func_80055B10(ParamObj *ctx, ParamObj *self) {
 ## Derivation
 
 Direct transcription; matched first try once the shared `ParamObj`/
-`func_8005627C` groundwork (established from `func_80055A88`) was in
+`ComputeStyleCueFalloff` groundwork (established from `StyleCue00`) was in
 place.
 
 ### Proposed learning
 
-None -- see `func_8005627C`'s and `func_80055EF0`'s reports.
+None -- see `ComputeStyleCueFalloff`'s and `StyleCue07`'s reports.

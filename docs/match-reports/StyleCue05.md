@@ -1,7 +1,9 @@
-# func_80055DB4 -- MATCHED (56/56 words)
+# StyleCue05 -- MATCHED (56/56 words)
+
+> Renamed from `func_80055DB4` on 2026-09-23 (tools/rename.py). Address 0x80055db4.
 
 Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #6 of
-`D_800874B0`, and the most structurally involved of the fourteen: a
+`gStyleCueCallbacks`, and the most structurally involved of the fourteen: a
 four-way `if`/`else-if` mixing a discrete check, a range+modulo
 condition, an unsigned-range trick, and a plain threshold, with a
 field that both READS and WRITES `self->unk4` inside one arm.
@@ -9,8 +11,8 @@ field that both READS and WRITES `self->unk4` inside one arm.
 ## Final source
 
 ```c
-void func_80055DB4(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = func_8005627C(ctx);
+void StyleCue05(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     if (self->unk4 == 0) {
         self->unk1C = 0x1E;
         self->unk20 = -1;
@@ -31,7 +33,7 @@ void func_80055DB4(ParamObj *ctx, ParamObj *self) {
 ## Derivation
 
 - **No cached `kind` local -- every branch re-reads `self->unk4`
-  directly.** Unlike the discrete-`kind` siblings (`func_80055A88` etc.),
+  directly.** Unlike the discrete-`kind` siblings (`StyleCue00` etc.),
   this function's disassembly reloads `self->unk4` from memory at the
   START of the range+modulo arm, again inside that arm (for the
   `unk38 -= unk4*2` arithmetic), and again in the unsigned-range arm --
@@ -52,7 +54,7 @@ void func_80055DB4(ParamObj *ctx, ParamObj *self) {
   comparisons (which would cost an extra instruction).
 - **`self->unk4 % 5 == 4`**, not a hand-expanded remainder-4 test,
   matches the `mult`/`mfhi`/recombination chain for divisor 5 (same
-  magic+shift already confirmed in `func_80055CA8`'s report).
+  magic+shift already confirmed in `StyleCue04`'s report).
 
 ### Proposed learning
 

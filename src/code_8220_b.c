@@ -56,7 +56,7 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event)
  * The body is empty, and of the 60 method tables tools/classtable.py finds,
  * 58 have this exact address in slot +0x034; the two that differ
  * (D_8006C0F8, whose header word is a pointer and which is probably a
- * mis-detected table start, and D_800874B0, a wholly independent 14-slot
+ * mis-detected table start, and gStyleCueCallbacks, a wholly independent 14-slot
  * class that overrides every slot) are not BasicClass-derived. Nothing in
  * the game overrides it, so nothing establishes what it is for. */
 void BasicClass__func_18350(void) {

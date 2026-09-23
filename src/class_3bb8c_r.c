@@ -18,9 +18,9 @@
  * 20 of 21 clean, and ZERO trivial leaves -- every one is a real body, several
  * in the 40-70 instruction range.
  *
- * func_8005630C: MATCHED round 44 (was filed BLOCKED/gp_rel; reopened and
+ * IsStyleVariantEven: MATCHED round 44 (was filed BLOCKED/gp_rel; reopened and
  * closed 5/5 on the first build after the fix -- see
- * docs/match-reports/func_8005630C.md).
+ * docs/match-reports/IsStyleVariantEven.md).
  *
  * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
  * rodata sub-slot is attached to this unit.
@@ -37,11 +37,11 @@
  * `tools/classtable.py --scan` plus a direct read of `asm/data/76DC8.data.s`
  * since one table's own slot count coincides with (but is NOT) BasicClass's:
  *
- *  - func_80055A88 .. func_80056238 (14 functions) are the complete slot
- *    list of `D_800874B0` (14 slots, header word 0). Despite matching
+ *  - StyleCue00 .. StyleCue13 (14 functions) are the complete slot
+ *    list of `gStyleCueCallbacks` (14 slots, header word 0). Despite matching
  *    BasicClassMethods' slot COUNT, these bodies are NOT
  *    add/removeChild-shaped -- every one calls the shared helper
- *    `func_8005627C(ctx)` then dispatches on `target->unk4` ("kind") to
+ *    `ComputeStyleCueFalloff(ctx)` then dispatches on `target->unk4` ("kind") to
  *    fill in a handful of numeric fields. Kept as its own local view,
  *    `ParamObj`/`ParamMethods` -- nothing here justifies asserting a
  *    BasicClass relationship just because the slot count coincides.
@@ -62,31 +62,31 @@
  *    `D_800876FC` class, dispatching through `func_80056F4C()->ctor`
  *    (cross-unit call into the ALREADY-MATCHED `class_3bb8c_o.c` symbol)
  *    rather than calling `func_800563C0` by name.
- *  - func_8005627C is the shared helper every `D_800874B0` occupant calls
- *    first (and `func_800560E4` reaches transitively, via a plain call to
- *    `func_80056054`): reads a small tag byte off `ctx->methods`, looks it
+ *  - ComputeStyleCueFalloff is the shared helper every `gStyleCueCallbacks` occupant calls
+ *    first (and `StyleCue11` reaches transitively, via a plain call to
+ *    `StyleCue10`): reads a small tag byte off `ctx->methods`, looks it
  *    up (with a NEGATIVE index) into a global table, and returns a
  *    chained division result.
  */
 #include "common.h"
 
 /* ------------------------------------------------------------------ *
- * D_800874B0's 14 slots (func_80055A88..func_80056238) plus the shared
- * helper func_8005627C they all call first.
+ * gStyleCueCallbacks's 14 slots (StyleCue00..StyleCue13) plus the shared
+ * helper ComputeStyleCueFalloff they all call first.
  * ------------------------------------------------------------------ */
 
 typedef struct ParamObj ParamObj;
 typedef struct ParamMethods {
     u8 pad0[0x6];
     s8 tag; /* +0x006, a small type id -- read signed, used as a NEGATIVE
-             * index into D_80087474 (see func_8005627C). */
+             * index into gStyleCueDistanceTable (see ComputeStyleCueFalloff). */
 } ParamMethods;
 struct ParamObj {
     ParamMethods *methods; /* +0x000 */
     s32 unk4;                /* +0x004, a "kind" selector the 14 slot
                                * occupants below all dispatch on */
     u8 pad8[0x10 - 0x8];        /* +0x008 .. +0x00F, unknown */
-    s32 unk10;                    /* +0x010, func_8005627C's own result */
+    s32 unk10;                    /* +0x010, ComputeStyleCueFalloff's own result */
     u8 pad14[0x1C - 0x14];          /* +0x014 .. +0x01B, unknown */
     s32 unk1C;
     s32 unk20;
@@ -104,17 +104,17 @@ struct ParamObj {
     s32 unk50;
 };
 
-/* func_8005627C's own ROM address (0x8005627C) is AFTER all 14 slot
- * occupants below (it sits right before the blocked func_8005630C), so
+/* ComputeStyleCueFalloff's own ROM address (0x8005627C) is AFTER all 14 slot
+ * occupants below (it sits right before the blocked IsStyleVariantEven), so
  * its definition lives in that position further down this file to keep
  * strict ROM-address order -- forward-declared here since every occupant
  * calls it. */
-s32 func_8005627C(ParamObj *ctx);
+s32 ComputeStyleCueFalloff(ParamObj *ctx);
 
-void func_80055A88(ParamObj *ctx, ParamObj *self) {
+void StyleCue00(ParamObj *ctx, ParamObj *self) {
     s32 kind;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     kind = self->unk4;
     if (kind == 0) {
         self->unk1C = 7;
@@ -130,10 +130,10 @@ void func_80055A88(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_80055B10(ParamObj *ctx, ParamObj *self) {
+void StyleCue01(ParamObj *ctx, ParamObj *self) {
     s32 kind;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     kind = self->unk4;
     if (kind == 0) {
         self->unk1C = 0x18;
@@ -143,10 +143,10 @@ void func_80055B10(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_80055B6C(ParamObj *ctx, ParamObj *self) {
+void StyleCue02(ParamObj *ctx, ParamObj *self) {
     s32 kind;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     kind = self->unk4;
     if (kind == 0) {
         self->unk1C = 0xC;
@@ -156,8 +156,8 @@ void func_80055B6C(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_80055BC8(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = func_8005627C(ctx);
+void StyleCue03(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     if (self->unk4 % 20 == 0) {
         self->unk1C = 0x1E;
         self->unk24 = 0x20;
@@ -174,8 +174,8 @@ void func_80055BC8(ParamObj *ctx, ParamObj *self) {
     self->unk50 = 0xA;
 }
 
-void func_80055CA8(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = func_8005627C(ctx);
+void StyleCue04(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     if (self->unk4 % 3 == 0) {
         self->unk1C = 0x1E;
         self->unk20 = 0;
@@ -196,8 +196,8 @@ void func_80055CA8(ParamObj *ctx, ParamObj *self) {
     self->unk50 = 0xA;
 }
 
-void func_80055DB4(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = func_8005627C(ctx);
+void StyleCue05(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     if (self->unk4 == 0) {
         self->unk1C = 0x1E;
         self->unk20 = -1;
@@ -214,10 +214,10 @@ void func_80055DB4(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_80055E94(ParamObj *ctx, ParamObj *self) {
+void StyleCue06(ParamObj *ctx, ParamObj *self) {
     s32 kind;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     kind = self->unk4;
     if (kind == 0) {
         self->unk1C = 7;
@@ -227,10 +227,10 @@ void func_80055E94(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_80055EF0(ParamObj *ctx, ParamObj *self) {
+void StyleCue07(ParamObj *ctx, ParamObj *self) {
     s32 kind;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     kind = self->unk4;
     if (kind == 0) {
         self->unk1C = 0x14;
@@ -245,8 +245,8 @@ void func_80055EF0(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_80055F74(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = func_8005627C(ctx);
+void StyleCue08(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     if (self->unk4 % 20 == 0) {
         self->unk1C = 9;
         self->unk20 = 0;
@@ -255,18 +255,18 @@ void func_80055F74(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_80055FE8(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = func_8005627C(ctx);
+void StyleCue09(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     if (self->unk4 % 20 == 0) {
         self->unk1C = 9;
         self->unk20 = -2;
     }
 }
 
-void func_80056054(ParamObj *ctx, ParamObj *self) {
+void StyleCue10(ParamObj *ctx, ParamObj *self) {
     s32 rem;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     rem = self->unk4 % 20;
     if (rem == 1) {
         self->unk1C = 9;
@@ -277,10 +277,10 @@ void func_80056054(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_800560E4(ParamObj *ctx, ParamObj *self) {
+void StyleCue11(ParamObj *ctx, ParamObj *self) {
     s32 rem;
 
-    func_80056054(ctx, self);
+    StyleCue10(ctx, self);
     rem = self->unk4 % 70;
     if (rem == 50) {
         self->unk44 = 0x14;
@@ -294,10 +294,10 @@ void func_800560E4(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_80056194(ParamObj *ctx, ParamObj *self) {
+void StyleCue12(ParamObj *ctx, ParamObj *self) {
     s32 kind;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     kind = self->unk4;
     if (kind == 0) {
         self->unk1C = 0x14;
@@ -317,8 +317,8 @@ void func_80056194(ParamObj *ctx, ParamObj *self) {
     }
 }
 
-void func_80056238(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = func_8005627C(ctx);
+void StyleCue13(ParamObj *ctx, ParamObj *self) {
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     if (self->unk4 == 0) {
         self->unk1C = 0x18;
         self->unk20 = 0;
@@ -326,12 +326,12 @@ void func_80056238(ParamObj *ctx, ParamObj *self) {
 }
 
 /* A 15-entry table indexed with the NEGATIVE of `ctx->methods->tag`
- * (`D_80087474 - tag*4`, i.e. `D_80087474[-tag]` for `tag` in [-14, 0]).
+ * (`gStyleCueDistanceTable - tag*4`, i.e. `gStyleCueDistanceTable[-tag]` for `tag` in [-14, 0]).
  * `asm/data/76DC8.data.s` confirms exactly 15 words at this address. */
-extern s32 D_80087474[];
+extern s32 gStyleCueDistanceTable[];
 
-s32 func_8005627C(ParamObj *ctx) {
-    s32 t = D_80087474[-ctx->methods->tag];
+s32 ComputeStyleCueFalloff(ParamObj *ctx) {
+    s32 t = gStyleCueDistanceTable[-ctx->methods->tag];
     s32 q = t / ctx->unk28;
 
     return ctx->unk10 / q;
@@ -339,7 +339,7 @@ s32 func_8005627C(ParamObj *ctx) {
 
 extern s32 gStyleVariant;
 
-s32 func_8005630C(void) {
+s32 IsStyleVariantEven(void) {
     return (gStyleVariant & 1) ^ 1;
 }
 

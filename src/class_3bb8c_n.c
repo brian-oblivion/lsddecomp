@@ -688,7 +688,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
 
 extern s32 gStyleTargetObj;
 extern void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);
-extern s32 D_800874B0[];
+extern s32 gStyleCueCallbacks[];
 extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 
 StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, void *arg2, void *arg3) {
@@ -697,7 +697,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, void *arg2, void *
     sub = (StyleCueEntryView *) FindNearestStyleCueEntry(&arg0->posX, &arg0->lastDist, arg2);
     if (sub != 0) {
         arg0->entry = sub;
-        InitSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->cueSet, sub->countSign, arg0, D_800874B0[sub->countSign]);
+        InitSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->cueSet, sub->countSign, arg0, gStyleCueCallbacks[sub->countSign]);
         if (sub->countSign == *arg1) {
             *arg1 = -sub->countSign;
         }
@@ -712,7 +712,7 @@ extern s32 gStyleCueRecordIndex;
 extern u8 *D_800876B4[];
 extern u8 D_800876EC[];
 extern u8 D_800874EC[];
-extern s32 D_80087474[];
+extern s32 gStyleCueDistanceTable[];
 
 /* Local view only: `gStyleCueSelf`'s value is another "pointer stored as a
  * plain s32" (same idiom as `gStyleTargetObj`), here treated as a "self" object
@@ -796,7 +796,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
                 dist = d1 - d2;
             }
             *arg1 = dist;
-            if (dist < D_80087474[entry->count]) {
+            if (dist < gStyleCueDistanceTable[entry->count]) {
                 return entry;
             }
         }
@@ -825,7 +825,7 @@ s32 StopStyleCueIfNear(StyleCueSlot *arg0, void *arg1, void *arg2) {
     return 0;
 }
 
-extern s32 D_80087474[];
+extern s32 gStyleCueDistanceTable[];
 
 s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1) {
     s32 dx, dy, dist;
@@ -846,7 +846,7 @@ s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1) {
     }
     arg0->lastDist = dist;
     idx = arg0->entry->countSign;
-    if (dist < D_80087474[-idx]) {
+    if (dist < gStyleCueDistanceTable[-idx]) {
         dist = 1;
         return dist;
     }

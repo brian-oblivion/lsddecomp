@@ -1,7 +1,9 @@
-# func_8005627C -- MATCHED (36/36 words)
+# ComputeStyleCueFalloff -- MATCHED (36/36 words)
+
+> Renamed from `func_8005627C` on 2026-09-23 (tools/rename.py). Address 0x8005627c.
 
 Unit: `class_3bb8c_r` (round 17 continuation). The shared helper every
-`D_800874B0` slot occupant calls first: reads a small signed tag byte off
+`gStyleCueCallbacks` slot occupant calls first: reads a small signed tag byte off
 `ctx->methods`, looks it up with a NEGATIVE index into a 15-entry global
 table, and returns a chained division result.
 
@@ -24,10 +26,10 @@ struct ParamObj {
     s32 unk44, unk48, unk4C, unk50;
 };
 
-extern s32 D_80087474[];
+extern s32 gStyleCueDistanceTable[];
 
-s32 func_8005627C(ParamObj *ctx) {
-    s32 t = D_80087474[-ctx->methods->tag];
+s32 ComputeStyleCueFalloff(ParamObj *ctx) {
+    s32 t = gStyleCueDistanceTable[-ctx->methods->tag];
     s32 q = t / ctx->unk28;
 
     return ctx->unk10 / q;
@@ -37,21 +39,21 @@ s32 func_8005627C(ParamObj *ctx) {
 ## Derivation
 
 - **Placement.** This function's own ROM address, `0x8005627C`, is AFTER
-  all 14 `D_800874B0` occupants that call it (they run `0x80055A88` ..
+  all 14 `gStyleCueCallbacks` occupants that call it (they run `0x80055A88` ..
   `0x80056238`; this function sits right before the blocked
-  `func_8005630C`). Its definition lives at that later position in the
-  file, with a forward declaration (`s32 func_8005627C(ParamObj *ctx);`)
+  `IsStyleVariantEven`). Its definition lives at that later position in the
+  file, with a forward declaration (`s32 ComputeStyleCueFalloff(ParamObj *ctx);`)
   near the top where `ParamObj` is defined -- getting this wrong the first
   time (defining it inline with the struct, ahead of the 14 callers)
   miscompiled the whole file: every one of the 14 callers' own bodies
-  still matched byte-for-byte, but every `jal func_8005627C` in them
+  still matched byte-for-byte, but every `jal ComputeStyleCueFalloff` in them
   encoded the WRONG target address, and `funcdiff`'s per-function windows
   read as near-total garbage until the ordering was fixed. Round 17's own
   hard rule about strict ROM-address order is not decorative.
-- **`D_80087474[-tag]`, not a hand-transcribed `base - tag*4`.** Retail
-  computes `&D_80087474 - tag*4` via `sll`/`subu` (tag is small and
+- **`gStyleCueDistanceTable[-tag]`, not a hand-transcribed `base - tag*4`.** Retail
+  computes `&gStyleCueDistanceTable - tag*4` via `sll`/`subu` (tag is small and
   negative, e.g. -1..-14, landing INSIDE the 15-word table declared at
-  `D_80087474` itself, confirmed directly against
+  `gStyleCueDistanceTable` itself, confirmed directly against
   `asm/data/76DC8.data.s`). Writing the array-index form with a negated
   index lets GCC regenerate the identical `sll`/`subu` address
   computation, rather than transcribing the lowering by hand.

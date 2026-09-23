@@ -1,7 +1,9 @@
-# func_80055EF0 -- MATCHED (33/33 words)
+# StyleCue07 -- MATCHED (33/33 words)
+
+> Renamed from `func_80055EF0` on 2026-09-23 (tools/rename.py). Address 0x80055ef0.
 
 Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #8 of
-`D_800874B0`. Three-way discrete-`kind` dispatch, and the function whose
+`gStyleCueCallbacks`. Three-way discrete-`kind` dispatch, and the function whose
 derivation errors were caught and fixed during this round -- documented
 here in detail since the same two mistakes are easy to repeat on any
 sibling.
@@ -9,10 +11,10 @@ sibling.
 ## Final source
 
 ```c
-void func_80055EF0(ParamObj *ctx, ParamObj *self) {
+void StyleCue07(ParamObj *ctx, ParamObj *self) {
     s32 kind;
 
-    self->unk10 = func_8005627C(ctx);
+    self->unk10 = ComputeStyleCueFalloff(ctx);
     kind = self->unk4;
     if (kind == 0) {
         self->unk1C = 0x14;
@@ -58,7 +60,7 @@ void func_80055EF0(ParamObj *ctx, ParamObj *self) {
    reload. Writing `self->unk1C = self->unk4;` directly (without a
    `kind` local) triggered an unwanted extra `lw` reload, costing one
    word, for the same "intervening scalar store defeats the next
-   unrelated-field read" reason documented in `func_80055DB4`'s report.
+   unrelated-field read" reason documented in `StyleCue05`'s report.
    Introducing the `kind` local (already used by the SIMPLER two-way
    siblings) fixed it, closing 17/33 -> 33/33 in one step.
 
