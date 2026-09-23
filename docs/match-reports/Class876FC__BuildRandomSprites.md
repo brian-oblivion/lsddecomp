@@ -1,4 +1,6 @@
-# func_80056BBC -- MATCHED 87/87 (head adjudication of a mis-classified stall)
+# Class876FC__BuildRandomSprites -- MATCHED 87/87 (head adjudication of a mis-classified stall)
+
+> Renamed from `func_80056BBC` on 2026-09-23 (tools/rename.py). Address 0x80056bbc.
 
 Unit `class_3bb8c_s`. Round 22. Runner delta reached 86/87 and filed this as a
 **stall of the documented "redundant move" class** -- "a genuine dead store in
@@ -17,7 +19,7 @@ branch:
 ```
 
 The stall report argued `$a1` is never read on either path. That is right for
-the fallthrough (`$a1` is overwritten by `%hi(D_80087880)` in the very next
+the fallthrough (`$a1` is overwritten by `%hi(gSpriteShiftScratch)` in the very next
 instruction) and **wrong for the branch-taken path**, which is the half that
 decides. Read `.L80056C78` forward to its first call:
 
@@ -74,7 +76,7 @@ siblings cheap and non-binding.
 
 Delta's other two findings were correct and are kept: the `child->methods`
 hoist that fills an earlier load-delay slot, and the `(parity != 0) ?
-D_8008785C : D_80087874` branch sense. Without those this is 84/87, not 86/87 --
+gSpriteScaleLarge : gSpriteScaleSmall` branch sense. Without those this is 84/87, not 86/87 --
 the head's contribution here is the last word, not the body.
 
 ## Adjudication: why the class was wrong, and the discriminator that catches it
@@ -110,8 +112,8 @@ own entry point and would not have resolved for the next reader.
 
 ## Final body
 
-Lives in `src/class_3bb8c_s.c` in ROM order between `func_80056B8C` and
-`func_80056D18`.
+Lives in `src/class_3bb8c_s.c` in ROM order between `Class876FC__ReleaseModelChildren` and
+`Class876FC__SpawnSprites`.
 
 ### Proposed learning
 
@@ -133,14 +135,14 @@ stays.
 
 **Callee evidence** (`0x80056BBC`, and the matched definition *in this same
 file*, ROM-later at line 379): entry is `move s1,a0` and `$a1` is never read —
-one real argument, as `void func_80056BBC(LinkNode *self)` says.
+one real argument, as `void Class876FC__BuildRandomSprites(LinkNode *self)` says.
 
-**Why the extern must stay unprototyped.** `func_80056520`'s dispatch passes a
+**Why the extern must stay unprototyped.** `Class876FC__InitByKind`'s dispatch passes a
 second argument, and retail emits it:
 
 ```
 8005660c:  move  a0,s1
-80056610:  jal   80056bbc <func_80056BBC>
+80056610:  jal   80056bbc <Class876FC__BuildRandomSprites>
 80056614:  move  a1,zero          <- the dead 2nd argument, in retail
 ```
 
@@ -149,13 +151,33 @@ arm two cases down (`move a1,zero` at `0x80056624`).
 
 **What makes this one different from the rest of the round.** The declaration
 and the definition are in the SAME translation unit — the extern at line 146
-exists only because `func_80056520` (ROM-earlier) calls a function defined
+exists only because `Class876FC__InitByKind` (ROM-earlier) calls a function defined
 ROM-later in the file, and CLAUDE.md requires strict ROM-address order. So
 this is not two units holding different views; it is one unit that must
 declare its own function with an argument list its own definition contradicts.
 The unspecified parameter list is what lets both coexist: a full prototype at
-line 146 would make the `func_80056BBC(self, 0)` call at line 192 a
+line 146 would make the `Class876FC__BuildRandomSprites(self, 0)` call at line 192 a
 `too many arguments` error against the definition 187 lines further down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/class_3bb8c_s.c:146`. Oracle green.
+
+## Naming
+
+Round 70 (alpha). `func_80056BBC` -> `Class876FC__BuildRandomSprites`, **tier B**.
+
+Only caller Class876FC__InitByKind, kind 2. Body: parity = rand() % 2;
+Class876FC__SpawnSprites with gSpriteScaleHalf on parity 0, NULL otherwise;
+then tableIndex >= 2: sprites[1] gets BaseObjO__AddVec14 by
+(gSpriteShiftX[tableIndex], 0, 0) and slotB8 with altColor or color; else
+sprites[1] gets setSemiTrans(1), setSemiTransRate(0) and updateScale(set,
+parity ? gSpriteScaleLarge : gSpriteScaleSmall); finally sprites[2]
+setDisplay(0). "Sprites" rests on the D800879C4 reading (see
+Class876FC__SpawnSprites); B.
+
+Globals named in this pass (only this unit references them, tier B, named by
+their ratio-triple values): `gSpriteShiftX` (was D_80087844, s32[6]),
+`gSpriteScaleLarge` (was D_8008785C, {6/5, 6/5, 1/1}), `gSpriteScaleHalf`
+(was D_80087868, {3/6, 3/6, 1/1}), `gSpriteScaleSmall` (was D_80087874,
+{4/6, 4/6, 1/1}), `gSpriteShiftScratch` (was D_80087880, a zero Vec3S whose
+.x is overwritten before each use).

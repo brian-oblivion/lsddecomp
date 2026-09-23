@@ -101,7 +101,7 @@ stays.
 one real argument, exactly as `void LinkOwnerObj__RandomizeLinks(LinkOwnerObj *this)`
 says.
 
-**Why the extern must stay unprototyped.** `func_80056640`'s dispatch passes a
+**Why the extern must stay unprototyped.** `Class876FC__UpdateByKind`'s dispatch passes a
 second argument, and retail emits it:
 
 ```
@@ -109,8 +109,8 @@ second argument, and retail emits it:
 800566fc:  move  a1,s1            <- the dead 2nd argument, in retail
 ```
 
-`s1` is `func_80056640`'s own `arg1`. Its two sibling arms in the same switch
-do the same thing (`jal func_800569A8` / `move a1,s1` at `0x800566D8`,
+`s1` is `Class876FC__UpdateByKind`'s own `arg1`. Its two sibling arms in the same switch
+do the same thing (`jal Class876FC__DriftModelChildren` / `move a1,s1` at `0x800566D8`,
 `jal NoOpIgnoreArgs` / `move a1,s1` at `0x800566EC`), so the whole dispatch
 forwards `(self, arg1)` uniformly regardless of what each target reads. A
 one-parameter prototype here would make every arm a `too many arguments`

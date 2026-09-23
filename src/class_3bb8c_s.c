@@ -1,131 +1,100 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * class_3bb8c_s -- 0x46D20..0x475F0, the private methods of the class whose
+ * table is D_800876FC (called Class876FC here; class_3bb8c_r.c's Obj876FC).
+ * A 0x98-byte scene object built by func_80056320 with a `kind` 0..3: it
+ * attaches itself under a parent at pos + offset, links a model for kinds
+ * 0-1, and owns up to two child arrays -- two BaseObjO model children laid
+ * out in a row that spin and drift along z after frame 500 (kind 0), or
+ * five D800879C4 sprites (a GsSPRITE at +0x64) that are randomised at build
+ * time (kind 2) or every frame (kind 3, class_3bb8c_o.c). Entry points are
+ * the class's ctor, update slot (+0x0EC) and dtor in class_3bb8c_r.c, via
+ * Class876FC__InitByKind / __UpdateByKind / __ReleaseByKind.
  *
- * class_3bb8c_s -- functions 44..53 of the class_3bb8c remainder,
- * 0x46D20..0x475F0 (10 functions).  Carved round 21 (2026-09-06).
- *
- * Blocker census at carve time (four screens, canonical shell forms), fixed
- * up per the round 22 Gate 1 screen: `addiu_at` was RESOLVED in round 21 (see
- * docs/research/addiu-at-blocker.md) and is no longer a blocker at all -- the
- * 3 functions previously counted against it are workable, and their stub
- * reports were retired. Only `gp_rel` remains live in this unit, on
- * func_80056520, func_80056640 and func_80056D18 -- each still carries a
- * current stall report and none of the three is touched here.
- *
- * MATCHED this round: func_80056718, func_80056794, func_800567D4,
- * func_80056858, func_80056B8C -- byte-exact, see docs/match-reports/.
- *
- * func_80056BBC was attempted (the addiu_at hit in it is the now-resolved
- * construct, not a real blocker) and got to a one-instruction residue -- a
- * retail dead store (`li $a1, 1`) that never gets read on either branch it
- * precedes, the same "redundant move" class MATCHING-GUIDE.md already
- * documents as permuter territory. ~8000 permuter iterations did not find a
- * zero; restored to INCLUDE_ASM per the hard rule. See its match report.
- *
- * func_800569A8 is still untouched (its only screen hit is the same
- * now-resolved addiu_at construct; it remains fresh ground).
- *
- * This slice spans (at least) parts of the same class as the neighbouring
- * `class_3bb8c_o` slice: `self` here is the SAME kind of node as that unit's
- * `LinkOwnerObj` (a 5-element `arr84` link array is confirmed via
- * func_80056D18's occupancy of it), extended with more fields this unit
- * actually reads (+0x054 dispatch state, +0x064/+0x068/+0x06C/+0x070/+0x074/
- * +0x078 and a 2-element +0x07C array). Kept as this unit's OWN local view,
- * `LinkNode`/`LinkNodeMethods` -- `class_3bb8c_o.c`'s `LinkOwnerObj` is not
- * this unit's to edit, and per the multiple-independent-local-views
- * convention there is no reason a fresh view here should match its fields.
- * Confirmed with a straight read of this unit's own asm/nonmatchings .s files,
- * cross-checked against the (read-only, not edited) disassembly of the three
- * still-blocked functions in this same unit, which occupy the same self and
- * establish the +0x084 5-element array and the class_3bb8c_o.c call targets.
+ * 9 of 10 matched; Class876FC__DriftModelChildren is a stall (body kept
+ * below). Named round 70; tiers in the reports. Game-level role unknown.
  */
-
 #include "common.h"
 
 /* ------------------------------------------------------------------ *
- * Shared node type for this unit. `self` in every function below (and the
- * three still gp_rel-blocked ones left as INCLUDE_ASM) is the same kind of
- * node: it owns a small fixed vtable (LinkNodeMethods) and is ALSO the
- * element type of its own two child arrays, `arr7C` (2 elements) and
- * `arr84` (5 elements, the same array class_3bb8c_o.c's `LinkOwnerObj`
- * already established under its own local name).
+ * LinkNode is this unit's ONE local view of every object it touches: the
+ * owner (a D_800876FC instance, 0x98 bytes -- the size func_80056320
+ * allocates, which is exactly where `sprites` ends) and, for vtable
+ * calls only, its children (`modelChildren`: BaseObjO, table D_800878D4;
+ * `sprites`: D800879C4 objects). Class876FC is the same struct under the
+ * owner's name, used in the owner's method signatures. Fields +0x058..
+ * +0x07B are the 0x24-byte parameter block the class's slot +0x040
+ * (func_800564A4, class_3bb8c_r.c) copies in whole.
  * ------------------------------------------------------------------ */
 
 typedef struct LinkNode LinkNode;
+typedef struct LinkNode Class876FC;
 
 typedef struct Vec3S {
     s32 x, y, z;
 } Vec3S;
 
+/* Slot names follow the base implementation they dispatch to (resolved with
+ * tools/classtable.py on D_800876FC / D_800878D4 / D_800879C4). `set` is
+ * 1 = assign, 0 = accumulate; `data` is a triple of s16 num/den ratios
+ * (RatioToFixed12). */
 typedef struct LinkNodeMethods {
     u8 pad0[0x44];
-    void (*slot44)(LinkNode *self, s32 flag, s32 val);      /* +0x044 */
-    void (*slot48)(LinkNode *self, s32 flag, void *arg);      /* +0x048 */
-    void (*slot4C)(LinkNode *self, void *arg1, void *arg2);     /* +0x04C */
+    void (*updateRotation)(LinkNode *self, s32 set, s32 data);  /* +0x044, func_8001CEB4 (degrees; sprites: func_80042170, rotate) */
+    void (*updateScale)(LinkNode *self, s32 set, void *data);   /* +0x048, func_8001D008 (GsCOORD2PARAM.scale; sprites: func_80057DF4) */
+    void (*attachToParent)(LinkNode *self, void *parent, void *trans); /* +0x04C, func_8001D0EC (coord2 super = parent's, coord.t = trans) */
     u8 pad50[0x60 - 0x50];
-    void (*slot60)(LinkNode *self, s32 arg1);                     /* +0x060 */
-    void (*slot64)(LinkNode *self, s32 arg1);                       /* +0x064 */
-    void (*slot68)(LinkNode *self, s32 arg1);                         /* +0x068 */
+    void (*setDisplay)(LinkNode *self, s32 on);                 /* +0x060, func_8001D344: GsDOFF = !on */
+    void (*setSemiTrans)(LinkNode *self, s32 on);               /* +0x064, func_8001D374: GsALON */
+    void (*setSemiTransRate)(LinkNode *self, s32 rate);         /* +0x068, func_8001D3A0: attribute bits 28-29 (GsAZERO..GsATHREE) */
     u8 pad6C[0xB8 - 0x6C];
-    void (*slotB8)(LinkNode *self, void *arg1);                          /* +0x0B8 */
-    void (*slotBC)(LinkNode *self, void *arg1);                          /* +0x0BC, called on each
-                                                                             arr7C child by
-                                                                             func_800569A8 */
+    /* +0x0B8 is CLASS-DEPENDENT, so it keeps its placeholder: on the owner
+     * and on modelChildren it is BaseObjO__SetVec14 (set translation); on
+     * sprites it is func_8004229C, which copies three bytes into the
+     * embedded GsSPRITE's r,g,b. */
+    void (*slotB8)(LinkNode *self, void *arg1);                 /* +0x0B8 */
+    void (*addTranslation)(LinkNode *self, void *delta);        /* +0x0BC, BaseObjO__AddVec14; only called on modelChildren */
 } LinkNodeMethods;
 
 struct LinkNode {
-    LinkNodeMethods *methods; /* +0x000 */
-    u8 pad4[0x14 - 0x4];         /* +0x004 .. +0x013, unknown */
-    s32 *unk14;                    /* +0x014, zeroed by func_800569A8 on
-                                       every exit path */
-    u8 pad18[0x20 - 0x18];           /* +0x018 .. +0x01F, unknown */
-    s32 unk20;                     /* +0x020, forwarded to Class6B5CC__LinkModel */
-    s32 unk24;                       /* +0x024, bounded < 0x1F5 and used as a
-                                         modulus dividend by func_800569A8 */
-    u8 pad28[0x54 - 0x28];              /* +0x028 .. +0x053, unknown */
-    s32 unk54;                         /* +0x054, a dispatch "state" selector */
-    Vec3S unk58;                     /* +0x058, added into the passed-in Vec3
-                                         (arg1/arg2) by func_80056520/
-                                         func_80056640 before dispatch */
-    s32 unk64;                         /* +0x064 */
-    void *unk68;                         /* +0x068, ptr to an object whose
-                                             first field is a signed s16 */
-    s32 unk6C;                              /* +0x06C, an index (0..4) into
-                                                D_800877F8 */
-    s32 unk70;                                 /* +0x070, an index into
-                                                   D_8008780C */
-    void *unk74;                                  /* +0x074 */
-    void *unk78;                                     /* +0x078 */
-    LinkNode *arr7C[2];                                 /* +0x07C..+0x083 */
-    LinkNode *arr84[5];                                    /* +0x084..+0x097,
-                                                                same array as
-                                                                class_3bb8c_o.c's
-                                                                LinkOwnerObj::arr84 */
+    LinkNodeMethods *methods;   /* +0x000 */
+    u8 pad4[0x14 - 0x4];        /* +0x004 .. +0x013, unknown */
+    s32 *coord2;                /* +0x014, the GsDOBJ2's GsCOORDINATE2 (code_d294.h);
+                                   `*coord2 = 0` is its flg (recompute) */
+    u8 pad18[0x20 - 0x18];      /* +0x018 .. +0x01F, unknown */
+    s32 model;                  /* +0x020, the object Class6B5CC__LinkModel linked */
+    s32 tick;                   /* +0x024, zeroed by slot +0x040, incremented once per
+                                   slot +0x0EC update (func_800564F4) */
+    u8 pad28[0x54 - 0x28];      /* +0x028 .. +0x053, unknown */
+    s32 kind;                   /* +0x054, 0..3: New's first argument, stored by the ctor */
+    Vec3S offset;               /* +0x058, added to the caller's position */
+    s32 rotation;               /* +0x064, ratio triple for updateRotation */
+    void *scale;                /* +0x068, ratio triple for updateScale; its first
+                                   s16 (x numerator) also scales the child spacing */
+    s32 modelChildLayout;       /* +0x06C, 0 = no modelChildren, else an index
+                                   (1..4) into gModelChildSpacing: 1-2 space along x,
+                                   3-4 along y */
+    s32 tableIndex;             /* +0x070, index into gModelChildDriftZ and gSpriteShiftX */
+    void *color;                /* +0x074, passed to every sprite's slotB8 (RGB) */
+    void *altColor;             /* +0x078, sprites[1]'s colour instead, when non-NULL */
+    LinkNode *modelChildren[2]; /* +0x07C..+0x083, BaseObjO children */
+    LinkNode *sprites[5];       /* +0x084..+0x097, D800879C4 children; class_3bb8c_o.c's
+                                   LinkOwnerObj::links is the same array */
 };
 
 extern void LinkOwnerObj__ReleaseLinks(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void LinkOwnerObj__ReleaseLinksB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
-extern void BaseObjO__AddVec14(void *self, Vec3S *v);   /* class_3bb8c_t.c */
-extern void func_80056D18(void *self, s32 a1, s32 a2, void *tbl); /* below */
-extern s32 D_80087844[];
-extern s32 D_8008785C[];
-extern s32 D_80087868[];
-extern s32 D_80087874[];
-extern Vec3S D_80087880;
+extern void BaseObjO__AddVec14(void *self, Vec3S *v);   /* class_3bb8c_o.c */
+extern void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl); /* below */
+extern s32 gSpriteShiftX[];
+extern s32 gSpriteScaleLarge[];
+extern s32 gSpriteScaleHalf[];
+extern s32 gSpriteScaleSmall[];
+extern Vec3S gSpriteShiftScratch;
 
-void func_80056B8C(LinkNode *self);
-void func_80056858(LinkNode *self, s32 reuse);
-void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b);
-void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4);
+void Class876FC__ReleaseModelChildren(Class876FC *self);
+void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse);
+void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b);
+void AttachWithRotScale(LinkNode *node, void *parent, void *trans, s32 rotation, void *scale);
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
 
 /* NoOpIgnoreArgs/LinkOwnerObj__func_56e1c/LinkOwnerObj__RandomizeLinks are defined in class_3bb8c_o.c
@@ -136,15 +105,15 @@ extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55d
  * -- so these are declared here the same old-style (unprototyped) way,
  * which is what lets this file's calls pass the extra dead argument without
  * a parameter-count mismatch against their real, narrower definitions
- * elsewhere. func_80056BBC is this same idiom but for a function defined
- * later IN THIS FILE (func_80056520 calls it, ROM-earlier than its own
- * definition). func_800569A8 is likewise defined later in this file, and
- * func_80056640 forwards a dead second argument to it the same way. */
+ * elsewhere. Class876FC__BuildRandomSprites is this same idiom but for a function defined
+ * later IN THIS FILE (Class876FC__InitByKind calls it, ROM-earlier than its own
+ * definition). Class876FC__DriftModelChildren is likewise defined later in this file, and
+ * Class876FC__UpdateByKind forwards a dead second argument to it the same way. */
 extern void NoOpIgnoreArgs();
-extern void LinkOwnerObj__func_56e1c(); /* arity-ok: definition is 1-parameter and the body WRITES $a1/$a2/$a3 to zero before any read, but func_80056520's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056624 */
-extern void LinkOwnerObj__RandomizeLinks(); /* arity-ok: definition is 1-parameter and the body reads only $a0 (`addiu s0,a0,136`), but func_80056640's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` at 0x800566FC */
-extern void func_80056BBC(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body reading only $a0 (`move s1,a0`); func_80056520's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056614 */
-extern void func_800569A8();
+extern void LinkOwnerObj__func_56e1c(); /* arity-ok: definition is 1-parameter and the body WRITES $a1/$a2/$a3 to zero before any read, but Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056624 */
+extern void LinkOwnerObj__RandomizeLinks(); /* arity-ok: definition is 1-parameter and the body reads only $a0 (`addiu s0,a0,136`), but Class876FC__UpdateByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` at 0x800566FC */
+extern void Class876FC__BuildRandomSprites(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body reading only $a0 (`move s1,a0`); Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056614 */
+extern void Class876FC__DriftModelChildren();
 
 /* class_3bb8c_p.c; fully prototyped since every call site here uses all
  * three arguments for real. */
@@ -155,7 +124,7 @@ extern void *New_D800879C4(void *arg1, void *arg2, void *arg3);
  * some other object (first field a methods pointer, called through a new
  * +0x080 slot below), D_8008ACA8 is forwarded opaquely to New_D800879C4 as
  * its own third argument, and D_8008ACAC's pointee has a lookup field at
- * +0x018 that func_80056520/func_80056640 snapshot/diff via D_8008ACB0. */
+ * +0x018 that Class876FC__InitByKind/Class876FC__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
 typedef struct {
     u8 pad0[0x80];
     s32 (*slot80)(void *self, s32 arg);
@@ -166,30 +135,36 @@ typedef struct {
 extern D_8008ACA4Obj *D_8008ACA4;
 extern void *D_8008ACA8;
 extern void *D_8008ACAC;
-extern s32 D_8008ACB0;
+extern s32 gTrackedYSnapshot;
 extern s32 D_8008AB98[];
 
-void func_80056520(LinkNode *self, void *arg1, Vec3S *arg2) {
+/* Called once, from the class's ctor (func_800563C0): place self under
+ * `parent` at pos + offset, then build the per-kind parts. Kinds 0 and 1
+ * link a model fetched from D_8008ACA4 by D_8008AB98[kind]; kind 0 also
+ * gets two model children, kind 2 five randomised sprites, kind 3 five
+ * plain sprites (LinkOwnerObj__func_56e1c is Class876FC__SpawnSprites(self,
+ * 0, 0, NULL)). */
+void Class876FC__InitByKind(Class876FC *self, void *parent, Vec3S *pos) {
     Vec3S local;
     s32 state;
 
-    D_8008ACB0 = *(s32 *)((u8 *)D_8008ACAC + 0x18);
-    func_80056794(&local, arg2, &self->unk58);
-    func_800567D4(self, arg1, &local, self->unk64, self->unk68);
+    gTrackedYSnapshot = *(s32 *)((u8 *)D_8008ACAC + 0x18);
+    AddVec3(&local, pos, &self->offset);
+    AttachWithRotScale(self, parent, &local, self->rotation, self->scale);
 
-    state = self->unk54;
+    state = self->kind;
     if (state < 2) {
         s32 ret = D_8008ACA4->methods->slot80(D_8008ACA4, D_8008AB98[state]);
         Class6B5CC__LinkModel(self, ret);
-        state = self->unk54;
+        state = self->kind;
     }
 
     switch (state) {
     case 0:
-        func_80056858(self, 0);
+        Class876FC__PlaceModelChildren(self, 0);
         break;
     case 2:
-        func_80056BBC(self, 0);
+        Class876FC__BuildRandomSprites(self, 0);
         break;
     case 3:
         LinkOwnerObj__func_56e1c(self, 0);
@@ -199,37 +174,40 @@ void func_80056520(LinkNode *self, void *arg1, Vec3S *arg2) {
     }
 }
 
-void func_80056640(LinkNode *self, void *arg1) {
+/* Called every frame from the class's slot +0x0EC (func_800564F4, right
+ * after it increments `tick`): set self's translation (owner's slotB8 is
+ * BaseObjO__SetVec14) to pos + offset, plus however far D_8008ACAC's +0x018
+ * word has moved since Class876FC__InitByKind snapshotted it, then run the
+ * per-kind update. */
+void Class876FC__UpdateByKind(Class876FC *self, void *pos) {
     Vec3S local;
 
-    func_80056794(&local, (Vec3S *)arg1, &self->unk58);
-    local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - D_8008ACB0;
+    AddVec3(&local, (Vec3S *)pos, &self->offset);
+    local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - gTrackedYSnapshot;
     self->methods->slotB8(self, &local);
 
-    switch (self->unk54) {
+    switch (self->kind) {
     case 0:
-        func_800569A8(self, arg1);
+        Class876FC__DriftModelChildren(self, pos);
         break;
     case 2:
-        NoOpIgnoreArgs(self, arg1);
+        NoOpIgnoreArgs(self, pos);
         break;
     case 3:
-        LinkOwnerObj__RandomizeLinks(self, arg1);
+        LinkOwnerObj__RandomizeLinks(self, pos);
         break;
     default:
         break;
     }
 }
 
-/* func_80056718 -- dispatch on self->unk54, one of three such handlers in
- * this slice (func_80056520/func_80056640 are the other two, each mapping
- * the same state values to a DIFFERENT set of callees -- consistent with
- * three separate per-phase handlers, e.g. update/draw/free, sharing one
- * state field). */
-void func_80056718(LinkNode *self) {
-    switch (self->unk54) {
+/* Called from the class's dtor (func_80056464): release whichever child
+ * array this kind built (kinds 2 and 3 both release `sprites`, through two
+ * identical class_3bb8c_o.c functions). */
+void Class876FC__ReleaseByKind(Class876FC *self) {
+    switch (self->kind) {
     case 0:
-        func_80056B8C(self);
+        Class876FC__ReleaseModelChildren(self);
         break;
     case 2:
         LinkOwnerObj__ReleaseLinks(self);
@@ -243,48 +221,47 @@ void func_80056718(LinkNode *self) {
 }
 
 /* Plain Vec3 add: dst = a + b. Frameless -- no self/vtable involved. */
-void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b) {
+void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b) {
     dst->x = a->x + b->x;
     dst->y = a->y + b->y;
     dst->z = a->z + b->z;
 }
 
-/* Forwards straight through to a child's own slot4C/slot44/slot48, using
- * whatever the caller already set up in arg1/arg2 (an outer node pointer and
- * an accumulator Vec3, respectively -- see func_80056858's own two call
- * sites) plus its own arg3/arg4. */
-void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4) {
-    self->methods->slot4C(self, arg1, arg2);
-    self->methods->slot44(self, 1, arg3);
-    self->methods->slot48(self, 1, arg4);
+/* Attach `node` under `parent` at translation `trans`, then assign (set = 1)
+ * its rotation and scale. Used on the owner itself and on each model child. */
+void AttachWithRotScale(LinkNode *node, void *parent, void *trans, s32 rotation, void *scale) {
+    node->methods->attachToParent(node, parent, trans);
+    node->methods->updateRotation(node, 1, rotation);
+    node->methods->updateScale(node, 1, scale);
 }
 
-/* A rand()-free Vec3 accumulate/attach helper: for each of self's two
- * arr7C slots, fold a table-driven contribution into a local Vec3 (either
- * into .x, scaled by *self->unk68, or straight into .y, depending on
- * self->unk6C), then either forward it to an existing child's slotB8 or
- * spin up a brand new child via New_BaseObjO/Class6B5CC__LinkModel/func_800567D4. */
+/* Lay the two model children out in a row: child i sits at (i + 1) *
+ * gModelChildSpacing[modelChildLayout], along x (scaled by scale's x
+ * numerator) for layouts 1-2 and along y for 3-4. reuse = 0 creates them
+ * (New_BaseObjO, sharing the owner's model, attached to the owner);
+ * reuse = 1 only resets their translation (their slotB8 is
+ * BaseObjO__SetVec14). */
 extern void *New_BaseObjO(void);        /* class_3bb8c_o.c, New_X allocator */
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
-extern Vec3S D_800877EC;
-extern s32 D_800877F8[];
+extern Vec3S gModelChildOffsetInit;
+extern s32 gModelChildSpacing[];
 
-void func_80056858(LinkNode *self, s32 reuse) {
+void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
     Vec3S accum;
     LinkNode **p;
     s32 i;
-    s32 count = self->unk6C;
+    s32 count = self->modelChildLayout;
 
     if (count == 0) {
         return;
     }
-    accum = D_800877EC;
-    p = self->arr7C;
+    accum = gModelChildOffsetInit;
+    p = self->modelChildren;
     for (i = 0; i < 2; i++, p++) {
         if (count < 3) {
-            accum.x += *(s16 *)self->unk68 * D_800877F8[count];
+            accum.x += *(s16 *)self->scale * gModelChildSpacing[count];
         } else {
-            accum.y += D_800877F8[count];
+            accum.y += gModelChildSpacing[count];
         }
         if (reuse) {
             LinkNode *child = *p;
@@ -292,32 +269,33 @@ void func_80056858(LinkNode *self, s32 reuse) {
         } else {
             LinkNode *child = New_BaseObjO();
             *p = child;
-            Class6B5CC__LinkModel(child, self->unk20);
-            func_800567D4(*p, self, &accum, self->unk64, self->unk68);
+            Class6B5CC__LinkModel(child, self->model);
+            AttachWithRotScale(*p, self, &accum, self->rotation, self->scale);
         }
     }
 }
 
-/* Per-`unk70`-slot table (same index space `func_80056BBC` reads through
- * D_80087844/D_8008785C/D_80087868/D_80087874); used both as a "channel
- * active" guard (nonzero test) and as a divisor for the two modulus checks
- * below. */
-extern s32 D_8008780C[];
-/* A Vec3S "base offset" constant, added (via its .z only) to a per-child
- * accumulator before being forwarded to each arr7C child's slotB8. */
-extern Vec3S D_8008782C;
-/* Opaque table handle, forwarded unchanged to slot44 for self and for each
- * arr7C child -- passed as a plain s32 per the slot's established
- * signature (see func_800567D4's use of the same slot with an s32
- * argument), not dereferenced anywhere in this function. */
-extern s32 D_80087838[];
+/* Per-`tableIndex` z step for the model children (0 = no drift), also the
+ * divisor of the 24500 / step reset period below. Same index space as
+ * gSpriteShiftX. */
+extern s32 gModelChildDriftZ[];
+/* All-zero Vec3S, the start value of each child's per-frame z delta. */
+extern Vec3S gModelChildDriftInit;
+/* Ratio triple {0/1, 1/10, 0/1}: the per-frame rotation increment
+ * updateRotation(.., 0, ..) adds to self and to each model child. */
+extern s32 gSpinRotStep[];
 
 #if 0
-/* round 44 (2026-09-15): best-reached body, 117/121 words, NOT byte-exact.
- * See docs/match-reports/func_800569A8.md for the residue and what was
+/* After 500 frames (tick >= 0x1F5), for kinds with model children and a
+ * nonzero gModelChildDriftZ step: spin self and both children, move the
+ * children along z, and every 24500 / step frames snap them back to their
+ * layout. Always marks self's coord2 for recompute.
+ *
+ * round 44 (2026-09-15): best-reached body, 117/121 words, NOT byte-exact.
+ * See docs/match-reports/Class876FC__DriftModelChildren.md for the residue and what was
  * tried. Kept here per the hard rule -- restore this ahead of any future
  * attempt rather than re-deriving from scratch. */
-void func_800569A8(LinkNode *self)
+void Class876FC__DriftModelChildren(Class876FC *self)
 {
     s32 idx;
     s32 *tab70;
@@ -328,82 +306,91 @@ void func_800569A8(LinkNode *self)
     LinkNode **p;
     s32 i;
 
-    idx = self->unk70;
-    if (self->unk6C != 0) {
-        tab70 = &D_8008780C[idx];
-        if (*tab70 != 0 && (u32) self->unk24 >= 0x1F5) {
-            p = self->arr7C;
-            self->methods->slot44(self, 0, (s32) D_80087838);
+    idx = self->tableIndex;
+    if (self->modelChildLayout != 0) {
+        tab70 = &gModelChildDriftZ[idx];
+        if (*tab70 != 0 && (u32) self->tick >= 0x1F5) {
+            p = self->modelChildren;
+            self->methods->updateRotation(self, 0, (s32) gSpinRotStep);
 
             i = 0;
             tab70b = tab70;
             accumOffset = 0;
             for (; i < 2; i++) {
-                Vec3S local = D_8008782C;
+                Vec3S local = gModelChildDriftInit;
                 local.z += accumOffset + *tab70b;
-                (*p)->methods->slotBC(*p, &local);
+                (*p)->methods->addTranslation(*p, &local);
                 accumOffset += 3;
-                (*p)->methods->slot44(*p, 0, (s32) D_80087838);
+                (*p)->methods->updateRotation(*p, 0, (s32) gSpinRotStep);
                 p++;
             }
 
-            divq = 24500 / D_8008780C[idx];
-            modend = self->unk24;
+            divq = 24500 / gModelChildDriftZ[idx];
+            modend = self->tick;
             if (divq >= 0) {
                 if ((u32) modend % (u32) divq == 0) {
-                    func_80056858(self, 1);
+                    Class876FC__PlaceModelChildren(self, 1);
                 }
             } else {
                 u32 adivq = ~divq + 1;
                 if ((u32) modend % adivq == 0) {
-                    func_80056858(self, 1);
+                    Class876FC__PlaceModelChildren(self, 1);
                 }
             }
         }
     }
-    *self->unk14 = 0;
+    *self->coord2 = 0;
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", func_800569A8);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", Class876FC__DriftModelChildren);
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 
-/* self->unk6C-guarded release of the fixed 2-element arr7C array. */
-void func_80056B8C(LinkNode *self) {
-    if (self->unk6C != 0) {
-        ReleaseBasicClassArray((void **)self->arr7C, 2);
+/* Release the two model children, if this layout made any. */
+void Class876FC__ReleaseModelChildren(Class876FC *self) {
+    if (self->modelChildLayout != 0) {
+        ReleaseBasicClassArray((void **)self->modelChildren, 2);
     }
 }
 
-void func_80056BBC(LinkNode *self) {
+/* Kind 2's init: five sprites, all scaled by gSpriteScaleHalf on an even
+ * rand(); then sprites[1] is either shifted along x by
+ * gSpriteShiftX[tableIndex] and recoloured (tableIndex >= 2) or made
+ * semi-transparent (rate 0) and rescaled, and sprites[2] is hidden. */
+void Class876FC__BuildRandomSprites(Class876FC *self) {
     s32 parity = rand() % 2;
-    void *tblOrNull = parity ? NULL : D_80087868;
+    void *tblOrNull = parity ? NULL : gSpriteScaleHalf;
     LinkNode *child;
     void *arg;
 
-    func_80056D18(self, 0, 0, tblOrNull);
+    Class876FC__SpawnSprites(self, 0, 0, tblOrNull);
 
-    if (self->unk70 >= 2) {
+    if (self->tableIndex >= 2) {
         LinkNodeMethods *m;
 
-        child = self->arr84[1];
-        D_80087880.x = D_80087844[self->unk70];
-        BaseObjO__AddVec14(child, &D_80087880);
+        child = self->sprites[1];
+        gSpriteShiftScratch.x = gSpriteShiftX[self->tableIndex];
+        BaseObjO__AddVec14(child, &gSpriteShiftScratch);
         m = child->methods;
-        arg = (self->unk78 != NULL) ? self->unk78 : self->unk74;
+        arg = (self->altColor != NULL) ? self->altColor : self->color;
         m->slotB8(child, arg);
     } else {
-        child = self->arr84[1];
-        child->methods->slot64(child, 1);
-        child->methods->slot68(child, 0);
-        child->methods->slot48(child, 1, (parity != 0) ? D_8008785C : D_80087874);
+        child = self->sprites[1];
+        child->methods->setSemiTrans(child, 1);
+        child->methods->setSemiTransRate(child, 0);
+        child->methods->updateScale(child, 1, (parity != 0) ? gSpriteScaleLarge : gSpriteScaleSmall);
     }
 
-    self->arr84[2]->methods->slot60(self->arr84[2], 0);
+    self->sprites[2]->methods->setDisplay(self->sprites[2], 0);
 }
 
-void func_80056D18(void *self, s32 a1, s32 a2, void *tbl) {
+/* Create the five sprites (New_D800879C4), attach each to self at no offset,
+ * give each self's colour (a sprite's slotB8 sets GsSPRITE r,g,b), and
+ * assign `tbl` as their scale when non-NULL. `self` stays `void *`: it is
+ * the prototype class_3bb8c_o.c calls through, and a typed local alias of
+ * it costs a callee-saved register (see this function's report). */
+void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl) {
     LinkNode **p = (LinkNode **)((u8 *)self + 0x84);
     LinkNode *node;
     s32 i;
@@ -411,10 +398,10 @@ void func_80056D18(void *self, s32 a1, s32 a2, void *tbl) {
     for (i = 0; i < 5; i++, p++) {
         node = New_D800879C4((void *)a2, 0, D_8008ACA8);
         *p = node;
-        node->methods->slot4C(node, self, 0);
-        (*p)->methods->slotB8(*p, ((LinkNode *)self)->unk74);
+        node->methods->attachToParent(node, self, 0);
+        (*p)->methods->slotB8(*p, ((LinkNode *)self)->color);
         if (tbl != 0) {
-            (*p)->methods->slot48(*p, 1, tbl);
+            (*p)->methods->updateScale(*p, 1, tbl);
         }
     }
 }

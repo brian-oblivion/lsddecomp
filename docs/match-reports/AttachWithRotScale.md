@@ -1,8 +1,10 @@
-# func_800567D4 -- MATCHED (33/33 words)
+# AttachWithRotScale -- MATCHED (33/33 words)
+
+> Renamed from `func_800567D4` on 2026-09-23 (tools/rename.py). Address 0x800567d4.
 
 Unit `class_3bb8c_s`. `self` here is a `LinkNode` in the CALLEE role (a
 child, e.g. `self->arr7C[i]`), not the owning node -- see
-`func_80056520`/`func_80056858`'s call sites, which both pass one of the
+`Class876FC__InitByKind`/`Class876FC__PlaceModelChildren`'s call sites, which both pass one of the
 owner's own child pointers as `self` here.
 
 ## Classification
@@ -16,7 +18,7 @@ more calls with a literal flag `1` and its own `arg3`/`arg4`.
 ## Body
 
 ```c
-void func_800567D4(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4) {
+void AttachWithRotScale(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *arg4) {
     self->methods->slot4C(self, arg1, arg2);
     self->methods->slot44(self, 1, arg3);
     self->methods->slot48(self, 1, arg4);
@@ -36,7 +38,20 @@ no evidence either way for a 4th parameter from this call site alone.
 ### Proposed learning
 
 Confirms (again) that "a register is preserved across a call" is NOT evidence
-that the callee reads it -- see the `func_80056D18` read-only cross-check
+that the callee reads it -- see the `Class876FC__SpawnSprites` read-only cross-check
 (still `INCLUDE_ASM`/`gp_rel`-blocked in this same unit), which calls the same
 kind of `slot4C` with a completely different, and clearly unrelated, `$a3`
 value sitting stale in the register from far earlier in that function.
+
+## Naming
+
+Round 70 (alpha). `func_800567D4` -> `AttachWithRotScale`, **tier A**.
+
+Pure forwarder: slot +0x04C (func_8001D0EC: sets the parent link and
+coord2 `super`, writes `trans` into coord.t), then slots +0x044 and +0x048
+with set = 1 (func_8001CEB4 assigns GsCOORD2PARAM.rotate from a degree ratio
+triple; func_8001D008 assigns .scale). Both callers
+(Class876FC__InitByKind on the owner, Class876FC__PlaceModelChildren on
+each BaseObjO child) pass objects whose tables resolve those three slots to
+exactly those functions (tools/classtable.py on D_800876FC and D_800878D4).
+Free function because `node` is not always the owner.

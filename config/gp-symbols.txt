@@ -162,7 +162,6 @@ D_8008ACA0
 D_8008ACA4
 D_8008ACA8
 D_8008ACAC
-D_8008ACB0
 D_8008ACCC
 D_8008ACD0
 D_8008AEE8
@@ -208,6 +207,7 @@ gLinkSrcStage
 gLinkTriggerIndex
 gOpenVabCount
 gPendingVabBuffer
+gTrackedYSnapshot
 gVabBodySuffix
 gVabDriverMode
 gVabDriverModeArg

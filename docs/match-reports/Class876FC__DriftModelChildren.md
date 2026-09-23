@@ -1,4 +1,6 @@
-# func_800569A8 -- STALL (length now EXACT: 121/121 words emitted, no address drift; raw word-match 117/121; first real diff at word 12, `asm-differ` offset 0x471d8, the same commutative register-identity swap in the very first pointer computation as before)
+# Class876FC__DriftModelChildren -- STALL (length now EXACT: 121/121 words emitted, no address drift; raw word-match 117/121; first real diff at word 12, `asm-differ` offset 0x471d8, the same commutative register-identity swap in the very first pointer computation as before)
+
+> Renamed from `func_800569A8` on 2026-09-23 (tools/rename.py). Address 0x800569a8.
 
 Unit `class_3bb8c_s`, round 44 (2026-09-15), building on round 26's derivation
 (see the git history of this file for the prior 120/121, 23/121-raw state).
@@ -8,8 +10,8 @@ an "active" guard and `self->unk70` as an index into a small lookup table; if
 both guards and a third bound check on `self->unk24` pass, it forwards a
 table handle to `self` and to each of the two `arr7C` children, folds a
 per-child Vec3 offset and dispatches it through vtable slot `slotBC`, then
-runs a modulus check against a `24500 / D_8008780C[idx]` quotient to decide
-whether to call `func_80056858(self, 1)`. Always zeroes `*self->unk14` on
+runs a modulus check against a `24500 / gModelChildDriftZ[idx]` quotient to decide
+whether to call `Class876FC__PlaceModelChildren(self, 1)`. Always zeroes `*self->unk14` on
 every exit path.
 
 ## Round 44 correction to round 26's field reading
@@ -29,7 +31,16 @@ from what round 26 assumed.
 
 ```c
 #if 0
-void func_800569A8(LinkNode *self)
+/* After 500 frames (tick >= 0x1F5), for kinds with model children and a
+ * nonzero gModelChildDriftZ step: spin self and both children, move the
+ * children along z, and every 24500 / step frames snap them back to their
+ * layout. Always marks self's coord2 for recompute.
+ *
+ * round 44 (2026-09-15): best-reached body, 117/121 words, NOT byte-exact.
+ * See docs/match-reports/Class876FC__DriftModelChildren.md for the residue and what was
+ * tried. Kept here per the hard rule -- restore this ahead of any future
+ * attempt rather than re-deriving from scratch. */
+void Class876FC__DriftModelChildren(Class876FC *self)
 {
     s32 idx;
     s32 *tab70;
@@ -40,40 +51,40 @@ void func_800569A8(LinkNode *self)
     LinkNode **p;
     s32 i;
 
-    idx = self->unk70;
-    if (self->unk6C != 0) {
-        tab70 = &D_8008780C[idx];
-        if (*tab70 != 0 && (u32) self->unk24 >= 0x1F5) {
-            p = self->arr7C;
-            self->methods->slot44(self, 0, (s32) D_80087838);
+    idx = self->tableIndex;
+    if (self->modelChildLayout != 0) {
+        tab70 = &gModelChildDriftZ[idx];
+        if (*tab70 != 0 && (u32) self->tick >= 0x1F5) {
+            p = self->modelChildren;
+            self->methods->updateRotation(self, 0, (s32) gSpinRotStep);
 
             i = 0;
             tab70b = tab70;
             accumOffset = 0;
             for (; i < 2; i++) {
-                Vec3S local = D_8008782C;
+                Vec3S local = gModelChildDriftInit;
                 local.z += accumOffset + *tab70b;
-                (*p)->methods->slotBC(*p, &local);
+                (*p)->methods->addTranslation(*p, &local);
                 accumOffset += 3;
-                (*p)->methods->slot44(*p, 0, (s32) D_80087838);
+                (*p)->methods->updateRotation(*p, 0, (s32) gSpinRotStep);
                 p++;
             }
 
-            divq = 24500 / D_8008780C[idx];
-            modend = self->unk24;
+            divq = 24500 / gModelChildDriftZ[idx];
+            modend = self->tick;
             if (divq >= 0) {
                 if ((u32) modend % (u32) divq == 0) {
-                    func_80056858(self, 1);
+                    Class876FC__PlaceModelChildren(self, 1);
                 }
             } else {
                 u32 adivq = ~divq + 1;
                 if ((u32) modend % adivq == 0) {
-                    func_80056858(self, 1);
+                    Class876FC__PlaceModelChildren(self, 1);
                 }
             }
         }
     }
-    *self->unk14 = 0;
+    *self->coord2 = 0;
 }
 #endif
 ```
@@ -82,18 +93,21 @@ Declarations this needs (already committed in `src/class_3bb8c_s.c`, kept
 regardless of this function's match state):
 
 ```c
-/* LinkNodeMethods gains: */
-void (*slotBC)(LinkNode *self, void *arg1);  /* +0x0BC */
+/* LinkNodeMethods (round 70 names): */
+void (*updateRotation)(LinkNode *self, s32 set, s32 data);  /* +0x044 */
+void (*addTranslation)(LinkNode *self, void *delta);        /* +0x0BC */
 
-/* LinkNode gains: */
-s32 *unk14;   /* +0x014, zeroed on every exit path */
-s32 unk24;    /* +0x024, used as a modulus dividend -- entry guard is
-                 `>= 0x1F5`, NOT `< 0x1F5` (round 26's reading corrected
-                 above) */
+/* LinkNode (round 70 names; round 44 called them unk14/unk24/unk6C/unk70/arr7C): */
+s32 *coord2;                /* +0x014, `*coord2 = 0` on every exit path */
+s32 tick;                   /* +0x024, entry guard is `>= 0x1F5`, NOT `< 0x1F5` */
+s32 modelChildLayout;       /* +0x06C */
+s32 tableIndex;             /* +0x070 */
+LinkNode *modelChildren[2]; /* +0x07C */
 
-extern s32 D_8008780C[];
-extern Vec3S D_8008782C;
-extern s32 D_80087838[];
+typedef struct LinkNode Class876FC;
+extern s32 gModelChildDriftZ[];
+extern Vec3S gModelChildDriftInit;
+extern s32 gSpinRotStep[];
 ```
 
 ## What round 44 fixed (from 23/121 raw / 1-word-short, to 117/121 raw / length-exact)
@@ -122,7 +136,7 @@ before the next was tried:
    existed) and it regressed the score, which is why the report at the time
    concluded "neither ordering is reliably predictable." In the CURRENT
    context it closed the entire back half of the function (the whole
-   divide/modulo/`func_80056858`-call tail) — 96 -> 109/121. **This directly
+   divide/modulo/`Class876FC__PlaceModelChildren`-call tail) — 96 -> 109/121. **This directly
    confirms MATCHING-GUIDE.md's own caution that the "arm that must jump"
    polarity is not context-independent**: the same source-level change was a
    regression in one register-allocation context and the correct fix in
@@ -153,27 +167,27 @@ None of these four changed the function's WORD COUNT — length has been exact
 
 ## NOT CLOSED this round: one residue, 4 words, pure commutative register identity
 
-**The `&D_8008780C[idx]` pointer computation's TWO temp registers are still
+**The `&gModelChildDriftZ[idx]` pointer computation's TWO temp registers are still
 swapped** at the FIRST occurrence only (before `tab70b` exists) — `v0`/`v1`
 hold the shift-result and the base address in the opposite roles from
 retail:
 
 ```
-retail:  sll v1,s5,2 / lui v0,%hi(D_8008780C) / addiu v0,v0,%lo(...) / addu s1,v1,v0
-built:   sll v0,s5,2 / lui v1,%hi(D_8008780C) / addiu v1,v1,%lo(...) / addu s1,v0,v1
+retail:  sll v1,s5,2 / lui v0,%hi(gModelChildDriftZ) / addiu v0,v0,%lo(...) / addu s1,v1,v0
+built:   sll v0,s5,2 / lui v1,%hi(gModelChildDriftZ) / addiu v1,v1,%lo(...) / addu s1,v0,v1
 ```
 
 Tried this round, both inert (byte-identical output to the array form):
-- `tab70 = D_8008780C + idx;` (pointer-arithmetic form) — confirms round
+- `tab70 = gModelChildDriftZ + idx;` (pointer-arithmetic form) — confirms round
   26's own finding still holds under the new context.
-- `tab70 = (s32 *)((u8 *)D_8008780C + (idx << 2));` (explicit byte-offset
+- `tab70 = (s32 *)((u8 *)gModelChildDriftZ + (idx << 2));` (explicit byte-offset
   cast form) — also no effect, ruling out the array-vs-pointer-vs-manual-shift
   surface syntax entirely as a lever for THIS specific commutative pair.
 
 This is the same "commutative operand order, not independently reachable"
 class as `code_179d8_j`'s `func_80031280` (per round 26's own note), which
 needed the permuter to close. Set up this round with
-`tools/setup-permuter.sh func_800569A8 <seed>` using the 117/121 body above
+`tools/setup-permuter.sh Class876FC__DriftModelChildren <seed>` using the 117/121 body above
 as the seed. `--debug --stack-diffs` measured a base score of 30 (a single,
 tightly-scoped residue — a MUCH better-posed base than round 26's 790,
 consistent with the three levers above having eliminated everything else).
@@ -182,13 +196,13 @@ this round's own correction to round 26's unbounded-search mistake) and
 reached **19712 iterations with zero errors on most candidates, but the
 score never dropped below its starting value of 30** — i.e. **not closed in
 ~19700 iterations under this session's load**, not "permuter-exhausted."
-The search process was scoped to this worktree (`permuter-work/func_800569A8`
+The search process was scoped to this worktree (`permuter-work/Class876FC__DriftModelChildren`
 under `lsddecomp2-wt-charlie`) and left to self-terminate on its own
 `timeout` rather than killed by PID-guessing.
 
 ## Do not re-try, without a new idea
 
-- Any resyntax of `&D_8008780C[idx]` vs `D_8008780C + idx` vs explicit
+- Any resyntax of `&gModelChildDriftZ[idx]` vs `gModelChildDriftZ + idx` vs explicit
   pointer-cast-and-shift: three surface spellings tried across two rounds,
   byte-identical machine code every time. The RTL this lowers to is fixed
   regardless of source spelling; the swap is a register-allocator choice made
@@ -225,3 +239,25 @@ call, mirroring retail's own explicit register-to-register copy) to jump
 residue-classification attempts; the latter are worth re-running whenever
 context changes, which here was simply "one more lever landed earlier in
 the same function."
+
+## Naming
+
+Round 70 (alpha). `func_800569A8` -> `Class876FC__DriftModelChildren`, **tier B**.
+
+Named from its preserved body and asm (still a stall, so B): gated on
+modelChildLayout != 0, gModelChildDriftZ[tableIndex] != 0 and tick >= 501;
+adds gSpinRotStep via updateRotation(.., 0, ..) to self and both children,
+adds a z delta via each child's slot +0x0BC (BaseObjO__AddVec14 in
+D_800878D4), and every 24500 / step frames calls
+Class876FC__PlaceModelChildren(self, 1) to snap them back. Always stores 0
+to `*coord2` (GsCOORDINATE2.flg). Caller: Class876FC__UpdateByKind, kind 0.
+
+Globals named in this pass (only this unit references them, tier B):
+`gModelChildDriftZ` (was D_8008780C, s32[8] = {0, 0, 0, -1, -2, -4, -16,
+-256}), `gModelChildDriftInit` (was D_8008782C, all-zero Vec3S) and
+`gSpinRotStep` (was D_80087838, ratio triple {0/1, 1/10, 0/1}, read by
+RatioToFixed12).
+
+The preserved `#if 0` body (in the .c and above) was renamed with the unit's
+fields and slots; it was pushed through cpp | cc1 once afterwards and still
+compiles.

@@ -1,4 +1,6 @@
-# func_80056794 -- MATCHED (16/16 words)
+# AddVec3 -- MATCHED (16/16 words)
+
+> Renamed from `func_80056794` on 2026-09-23 (tools/rename.py). Address 0x80056794.
 
 Unit `class_3bb8c_s`. Frameless, no self/vtable involved.
 
@@ -15,7 +17,7 @@ typedef struct Vec3S {
     s32 x, y, z;
 } Vec3S;
 
-void func_80056794(Vec3S *dst, Vec3S *a, Vec3S *b) {
+void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b) {
     dst->x = a->x + b->x;
     dst->y = a->y + b->y;
     dst->z = a->z + b->z;
@@ -30,3 +32,11 @@ multiple-independent-local-views convention (this unit is not
 ### Proposed learning
 
 None -- a plain three-field vector add, no residue.
+
+## Naming
+
+Round 70 (alpha). `func_80056794` -> `AddVec3`, **tier A**.
+
+Pure leaf, `dst = a + b` over three s32 components; the mechanics are its
+purpose. Free function (no `self`), VerbNoun. Checked no `AddVec3` or
+similar existed in the symbols file (only BaseObjO__AddVec14, a method).
