@@ -1,4 +1,54 @@
-# Class866E8__SetFootprintRect — STALL: length EXACT 52/52; 22/52 raw word-match (round 47, up from 19/52); first real diff at word 5 (vram 0x8004B044, the oversized frame)
+# Class866E8__SetFootprintRect — MATCHED round 71 (charlie): 52/52, byte-exact, whole-image SHA1 green
+
+REVISITED, round 71: MATCHED (4 builds); names/types used (parameters renamed
+`desc`/`span`; the fix was local-variable SHAPE, not a type change).
+
+## Round 71 (charlie) — the match
+
+**Rebuilt as given first.** The round-47 preserved body (the `#if 0` block
+that sat in `src/class_3ac78.c`) rebuilt at **22/52, insertions 5 /
+deletions 5, 18 positional skeleton diffs** — the recorded score was
+current, but the recorded CAUSE ("the oversized frame") was a symptom: the
+old body carried four `s16` locals, two `s8` locals and a dead trailing
+`col = b2;`, and its frame (0x38) was oversized because of those, not
+because of anything the permuter could reach.
+
+**What retail actually says**, read straight from the asm:
+
+- `lb s2,2(a1)` / `lb s3,3(a1)` then `move v1,s2` / `move a0,s3`: each byte
+  is loaded once into the variable that gets decremented AND copied into a
+  temp that the `== 0x13` edge test reads. So two locals per byte: `col` and
+  `origCol` (build 3 fixed the length: re-reading `desc->unk2` for the edge
+  test cost a reload).
+- `bnez s2, dec; j; addiu s4,s1,-1`: the ZERO case is the then-arm, so the
+  source is `if (col == 0) width = span - 1; else col--;` (build 4 fixed the
+  branch sense and the register assignment in one go).
+- `addiu s1,s1,-1` twice for the height: the height companion is the `span`
+  PARAMETER itself (`span--`), not a separate local initialised from it.
+  `width` is the separate copy (`move s4,s1`).
+- The second byte's zero test reads the COPY (`bnez a0`), the first byte's
+  reads the variable (`bnez s2`) — asymmetric, measured: testing `row`
+  instead of `origRow` gave 51/52 with the single diff at word 22.
+
+Build history: 22/52 (as given) -> 11/52 length-off (reload) -> 4/4
+ins/del (copies added) -> 51/52 (branch sense + span as height) -> 52/52.
+
+The matched C is the live definition in `src/class_3ac78.c`; not repeated
+here.
+
+### Proposed learning
+
+A stall whose first diff is "the frame is too big" is usually telling you
+the body has too many locals, not that the permuter should search harder.
+Count retail's saved registers against the values that are live across the
+call before anything else; here 5 saved regs = self, col, row, width, span,
+and the old body had seven named locals competing for them.
+
+---
+
+## Historical record (rounds up to 47; superseded by the match above)
+
+### (old title) Class866E8__SetFootprintRect — STALL: length EXACT 52/52; 22/52 raw word-match (round 47, up from 19/52); first real diff at word 5 (vram 0x8004B044, the oversized frame)
 
 > Renamed from `func_8004B030` on 2026-09-22 (tools/rename.py). Address 0x8004b030.
 

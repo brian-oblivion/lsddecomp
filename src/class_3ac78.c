@@ -23,9 +23,9 @@
  * its own independent view of the same object (Obj866E8 / Elem /
  * GridSlot866E8 in include/class_3bb8c.h).
  *
- * Three functions are documented stalls and stay INCLUDE_ASM:
- * Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
- * Class866E8__DispatchToRectCells. func_8004B324 keeps its placeholder name
+ * Every function in the unit is matched C; the last three stalls
+ * (Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
+ * Class866E8__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
  * deliberately -- it is an empty vtable stub with no established purpose, the
  * same case as func_8001D33C in code_d294_b.
  */
@@ -289,29 +289,24 @@ void Class866E8__OnCommand(Class866E8 *self, GenericObject *sender, s32 command)
     }
 }
 
-/* STALL -- see docs/match-reports/Class866E8__ResetAllElements.md. Best reached: 9/74
- * words in-range, correct size, no address drift. Residue is a
- * scheduling-only "the offset increment keeps landing in the wrong
- * delay slot" issue. Restored to INCLUDE_ASM per project rule. */
-#if 0
+/* Reset every one of the seven grid elements, then the two counters.
+ * Matched round 71: `&self->elems[i]` is what produces retail's
+ * base + running-offset walk (GCC's strength reduction), not a hand-rolled
+ * byte offset. */
 void Class866E8__ResetAllElements(Class866E8 *self)
 {
     s32 i;
-    s32 offset;
     UnkSlotEntry_3ac78 *entry;
+    UnkSlotListObj_3ac78 *list;
 
-    offset = 0xEC;
     for (i = 0; i < 7; i++) {
-        GenericObject *check;
-
-        entry = (UnkSlotEntry_3ac78 *)((u8 *)self + offset);
+        entry = &self->elems[i];
         entry->target->methods->slot74(entry->target);
         entry->flag = 0;
         self->methods->slot108(self, entry);
-        check = entry->list->unk2C;
-        offset += 0x1C;
-        if (check != NULL) {
-            entry->list->unk2C = check->methods->release(check);
+        list = entry->list;
+        if (list->unk2C != NULL) {
+            list->unk2C = list->unk2C->methods->release(list->unk2C);
         }
         self->methods->onElementEvent(self, 6, entry, i);
         entry->target->methods->slot84(entry->target);
@@ -321,9 +316,6 @@ void Class866E8__ResetAllElements(Class866E8 *self)
     self->unk1B4 = 0;
     self->methods->slot140(self);
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", Class866E8__ResetAllElements);
 
 void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
 {
@@ -431,68 +423,56 @@ void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *desc, s
     func_8004C93C(self);
 }
 
-/* STALL -- see docs/match-reports/Class866E8__SetFootprintRect.md. Best reached: 22/52
- * words in-range, correct size, no address drift (round 47, echo --
- * up from 19/52, via a permuter-found lead translated and oracle-
- * verified). Restored to INCLUDE_ASM per project rule. Field names below
- * use the CURRENT GridRect_3ac78 layout (round 19, echo -- was
- * unk90/92/94/96 in the report's own preserved body, before
- * Class866E8__DispatchToRectCells's field-shape correction). */
-#if 0
-void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 count)
+/* Clamp a span x span footprint centred on desc's cell to the 20 x 20 grid:
+ * a cell on the low edge (0) loses one row/column, one on the high edge
+ * (0x13) loses one too. The edge tests read a COPY of each byte taken before
+ * the decrement, and the height companion is `span` itself. Matched round 71. */
+void Class866E8__SetFootprintRect(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 span)
 {
-    s8 b2;
-    s8 b3;
-    s32 raw3;
-    s16 col;
-    s16 row;
-    s16 width;
-    s16 height;
+    s32 col;
+    s32 row;
+    s32 width;
+    s32 origCol;
+    s32 origRow;
 
-    b2 = arg1->unk2;
-    b3 = arg1->unk3;
-    raw3 = b3;
-    width = (height = count);
+    width = span;
+    col = desc->unk2;
+    row = desc->unk3;
+    origCol = col;
+    origRow = row;
 
-    if (b2 != 0) {
-        col = b2 - 1;
+    if (col == 0) {
+        width = span - 1;
     } else {
-        width = count - 1;
+        col--;
     }
-    if (b2 == 0x13) {
-        width -= 1;
+    if (origCol == 0x13) {
+        width--;
     }
 
-    if (raw3 != 0) {
-        row = raw3 - 1;
+    if (origRow == 0) {
+        span--;
     } else {
-        row = b3;
-        height = count - 1;
+        row--;
     }
-    if (raw3 == 0x13) {
-        height -= 1;
+    if (origRow == 0x13) {
+        span--;
     }
 
     self->rectCount = 1;
-    self->rects.e[0].elemIdx = self->methods->slot124(self, arg1->unk28);
+    self->rects.e[0].elemIdx = self->methods->slot124(self, desc->unk28);
     self->rects.e[0].col = col;
     self->rects.e[0].row = row;
     self->rects.e[0].width = width;
-    self->rects.e[0].height = height;
-    col = b2;
+    self->rects.e[0].height = span;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", Class866E8__SetFootprintRect);
 
 extern void NotifyGridCell(Class866E8 *cell, UnkListObj_3ac78 *sender, s32 command);
 
-/* STALL, round 2026-09-02 (runner delta); re-verified round 19 (echo):
- * best reached 95/117, see docs/match-reports/Class866E8__DispatchToRectCells.md for the
- * preserved near-miss body and the residue analysis (a single
- * instruction-scheduling swap at the inner loop's tail -- correct
- * branch/register shape everywhere else). */
-#if 0
+/* Notify every cell of every rectangle, and every object chained behind
+ * each cell. Matched round 71: the ORDER of the comma-separated increments
+ * is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the
+ * reverse order was the whole 95/117 residue. */
 void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender, s32 command)
 {
     s32 i;
@@ -504,12 +484,12 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender,
     Class866E8 *obj;
 
     entry = self->rects.e;
-    for (i = 0; i < self->rectCount; i++, entry++) {
+    for (i = 0; i < self->rectCount; entry++, i++) {
         slot = &self->elems[entry->elemIdx];
         if (slot->target->unk2C != 0) {
             cell = (slot->cells + entry->col) + entry->row * 20;
             for (row = 0; row < entry->height; row++) {
-                for (col = 0; col < entry->width; col++, cell++) {
+                for (col = 0; col < entry->width; cell++, col++) {
                     self->curCellTag = self->cellTag;
                     self->curCellCol = entry->col + col;
                     self->curCellRow = entry->row + row;
@@ -523,9 +503,6 @@ void Class866E8__DispatchToRectCells(Class866E8 *self, UnkListObj_3ac78 *sender,
         }
     }
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", Class866E8__DispatchToRectCells);
 
 /* Widened this round (Class866E8__DispatchToRectCells) from a single-param signature to
  * accept two more, unused, forwarded params: Class866E8__DispatchToRectCells's own call
