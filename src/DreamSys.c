@@ -1075,14 +1075,11 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return true;
 }
 
-#if 0
-/* Best-reached body, 58/63 words, exact length (zero address drift) -- see
-   docs/match-reports/DreamSys__TryInstantTeleportLink.md for the residue analysis (delay-slot
-   fillers around the constant "return true" materialization;
-   PERMUTER-EXHAUSTED, ~49300 iterations). Restored to INCLUDE_ASM below per
-   project rule (no score short of byte-exact stays in src/). Re-verified
-   fresh round 39 (2026-09-14, runner echo); two new reshapes tried, neither
-   moved it -- see the round 39 note in the report. */
+/* The whole body sits inside `if (result >= 0)` with `return false` last.
+ * The early-return spelling (`if (result < 0) return false;`) compiles to
+ * the same instructions, but reorg fills two branch delay slots
+ * differently: it puts `li v0,1` into both slots, where retail has an
+ * `addiu a1,sp,0x10` and a `nop` (58/63, rounds 2026-08-30..49). Round 73. */
 bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
@@ -1090,23 +1087,19 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 	s32 local[4];
 
 	result = Test4InstantTeleporters(&this->linkCoordinates, currentPos, this->currentStage);
-	if (result < 0)
-		return false;
-	saved = func_8005BFC4();
-	if (!ExecuteLink(this, result, 0x11, 0))
+	if (result >= 0) {
+		saved = func_8005BFC4();
+		if (ExecuteLink(this, result, 0x11, 0)) {
+			this->pendingLinkType = 0;
+			this->linkMgr->methods->slot0xE8(this->linkMgr, local, &this->linkCoordinates);
+			this->vt->BaseObjO__SetVec14(this, local);
+			if (saved != 0 && !this->isFlashbackSession)
+				this->vt->GetSetDreamTimeLimit(this, this->vt->DreamSys__GetDreamTimerScaled(this) + saved);
+		}
 		return true;
-	this->pendingLinkType = 0;
-	this->linkMgr->methods->slot0xE8(this->linkMgr, local, &this->linkCoordinates);
-	this->vt->BaseObjO__SetVec14(this, local);
-	if (saved == 0)
-		return true;
-	if (this->isFlashbackSession)
-		return true;
-	this->vt->GetSetDreamTimeLimit(this, this->vt->DreamSys__GetDreamTimerScaled(this) + saved);
-	return true;
+	}
+	return false;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TryInstantTeleportLink);
 
 bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 {

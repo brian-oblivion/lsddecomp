@@ -1,4 +1,72 @@
-# DreamSys__TryInstantTeleportLink -- STALL: exact length (63/63 instructions, zero address drift), 58/63 raw word-match, first real diff at 0x4B080 (two swapped delay-slot fillers around the `ExecuteLink` result branch -- a scheduling residue, PERMUTER-EXHAUSTED)
+# DreamSys__TryInstantTeleportLink -- MATCHED 63/63 (round 73, runner bravo): the whole body inside `if (result >= 0)`, `return false` last
+
+REVISITED, round 73: MATCHED 63/63 (was STALL 58/63, exact length); names/types not relevant (no field or type changed)
+
+## Round 73 (2026-09-23, runner bravo): MATCHED
+
+**Preserved body rebuilt first**, from the unit's `#if 0` block verbatim:
+exact length, **58/63**, funcdiff `insertions 0 / deletions 0`, positional
+skeleton diffs 3. asm-differ: the `beqz v0` after `ExecuteLink` has
+`li v0,1` in its delay slot and branches straight to the epilogue, where
+retail has `addiu a1,sp,0x10` (taken from the fallthrough) and branches to
+the `li v0,1` at L8005A908. The `bnez` on `isFlashbackSession` has `li v0,1`
+stolen from the target, where retail has a `nop`. Everything else matches,
+so this really is a delay-slot residue, filled by reorg (`dbr`).
+
+The round-73 broadcast levers were checked first and did not apply. Every
+callee's argument registers are written by the caller in retail
+(`Test4InstantTeleporters` a0-a2 with a1 forwarded, `func_8005BFC4` void,
+`ExecuteLink` a0-a3, slot 0xE8 a0-a2), there is no struct copy, and the
+shared `$s1` (result, then saved) is two pseudos with disjoint lives, the
+same in both builds.
+
+Builds, in order:
+
+1. Nested form: `if (ExecuteLink(...)) { ...; if (saved != 0 &&
+   !this->isFlashbackSession) ...; } return true;`, with the early
+   `if (result < 0) return false;` kept: 58/63, identical residue (this was
+   rounds 2026-08-30's attempt 1, re-measured).
+2. **Same, with the early `return false` removed too: the whole body goes
+   inside `if (result >= 0) { ... return true; }` and `return false;` comes
+   last. 63/63, build exit=0, whole-image SHA1 OK.**
+3. For comparison, 2 with a single `bool ret` (false, set to true inside
+   the if): 3 words long, ins/del 3/3. Reverted.
+
+**Hypothesis for the cause (partly checked).** The instructions are the
+same. What changes is how reorg judges liveness at the branch targets.
+Read against the 2.8.1 `reorg.c` source (the nearest source on hand; 2.6.3
+may differ in detail): `fill_eager_delay_slots` tries the fallthrough first
+for both jumps (the `return true` target runs straight into the epilogue,
+so `rare_destination` marks it unlikely). It takes a fallthrough insn only
+if the insn sets nothing that `mark_target_live_regs` says is live at the
+target. That function locates the target's basic block by scanning back to
+the nearest BARRIER. An early `return false;` puts a jump plus a barrier
+right after the first test, which changes the block that scan finds and so
+how precise the liveness answer is. Retail's `addiu a1` in the first slot
+means reorg knew `$a1` was dead at L8005A908. The early-return build chose
+the target's `li v0,1` instead. Moving the `return false` to the end removes
+that barrier, and both slots then come out as retail's. Measured here:
+build 1 (barrier present) against build 2 (barrier absent), no other
+change. Not measured: the internals of 2.6.3's reorg.
+
+### Proposed learning (round 73)
+
+**A delay-slot-filler residue at `return <const>` branches can be decided
+by WHERE THE EARLY `return` SITS, even when the instructions are identical.**
+If an early `if (x < 0) return false;` precedes branches whose delay slots
+retail filled from the fallthrough (while this build steals the target's
+`li v0,<const>`), wrap the rest of the body in `if (x >= 0) { ... }` and put
+the early return last. That removes the barrier after the early jump, and
+reorg's target-liveness answer changes with it. Spelling the exits as
+goto, nested if, several returns or a named `ret` does not do this. It was
+a 49300-iteration permuter-exhausted stall: a permuter keeps the early
+return where it is.
+
+---
+
+## Pre-round-73 history
+
+DreamSys__TryInstantTeleportLink -- STALL: exact length (63/63 instructions, zero address drift), 58/63 raw word-match, first real diff at 0x4B080 (two swapped delay-slot fillers around the `ExecuteLink` result branch -- a scheduling residue, PERMUTER-EXHAUSTED)
 
 > Renamed from `func_8005A82C` on 2026-09-22 (tools/rename.py). Address 0x8005a82c.
 
