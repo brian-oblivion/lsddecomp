@@ -260,6 +260,16 @@
           "note": "REVISIT runners charlie (class_3ac78), charlie re-send (code_2cc8c_d), delta re-send (class_3bb8c_b): 7 attempts, 6 MATCHES. Class866E8__SetFootprintRect 52/52 (rebuilt-as-given 22/52 ins/del 5/5; locals shape, zero-case then-arm, span as height), Class866E8__ResetAllElements 74/74 (9/74, 45/45; &self->elems[i] not a hand-rolled offset), Class866E8__DispatchToRectCells 117/117 (95/117, 3/3; for-increment comma order), func_8003ECD0 73/73 (71/73, 0/0; constant hidden from fold() in a local), func_8004CAF0 97/97 (62/97, 0/0; split (w+20)-span against fold, store in both arms), func_8004C6A8 165/165 (85/165 3 short, 8/8; rot taken before the call, separate clamp local, u16 angle from a 2260-iteration permuter). func_8004CD38 STALL 2/27 length-exact (6/6; retail's block temps avoid v0; 376191-iteration permuter negative). Every recorded CAUSE among the six was wrong or incomplete.",
           "round": 71,
           "runners": 3
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-23",
+          "matches": 1,
+          "model": "opus",
+          "note": "REVISIT runner bravo on code_2cc8c_c: Obj86B60__NotifyParents MATCHED 32/32 (rebuilt-as-given 23/32, ins/del 2/2, length exact; plan.py's len-off tag stale). Titled 'register identity, cleanly isolated' since round 13/46 (82k-iteration permuter negative). The cause was global-alloc priority (floor_log2(refs)*refs/live_length, read with cc1 -dl): two separate methods->slotNN(self) calls gave self 6 refs and ; retail picks fn = slot64/slot68 per arm and makes ONE fn(self) call (the shared jalr/move a0 tail), so arg1 outranks self. Round-46 order-only barrier kept.",
+          "round": 72,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -366,6 +376,16 @@
           "note": "delta promoted func_8004EA38 (40/41) and func_8004E6B8 (48/49; title rewritten to the round-37 cross-jump-merge residue) in class_3bb8c_e; charlie promoted func_80065E1C (49/68) and func_80066340 (252/258) in code_55dd4, both live-remeasured equal to their titles. Head dropped one order-only barrier from func_80065E1C's src body (reader form).",
           "round": 71,
           "runners": 2
+        },
+        {
+          "attempts": 2,
+          "calibration": true,
+          "date": "2026-09-23",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "charlie promoted OpenCdFile (live 13/43, 1 long; title's 14/43 was a reverted reshape, rewritten) and ReadCdFile (8/56, 1 long, title exact) in code_179d8_h; both hand-derived, no permuter edits.",
+          "round": 72,
+          "runners": 1
         }
       ],
       "status": "auto"
@@ -568,6 +588,16 @@
           "note": "alpha (opus) on code_d294: 20 functions (Class6B5CC base: New/ctor/Finalize/child overrides/OnNotify/Reset/UpdateRotation/UpdateScale/attach-detach/attribute setters; 17 A, 2 B, 1 C) + 3 globals + 18 own-unit fields/slots; echo (opus) on Entity_b: 19 functions (mood-row sound-cue callbacks Entity__MoodCueNN tier B, 5 slot/helper functions), 10 constants, 2 fields. Both reviews PASSED (5 names sampled each). Head applied 13 of alpha's and 6 of echo's cross-unit proposals by type scope; the rest of echo's (Entity fields, moveLocal*, SoundCueSet view) left for later. Review-only units class_3bb8c_v, code_179d8_c_b, code_179d8_n marked.",
           "round": 71,
           "runners": 2
+        },
+        {
+          "attempts": 23,
+          "calibration": true,
+          "date": "2026-09-23",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "alpha (sonnet) on class_3bb8c_n: 23 functions (22 tier B, Style* vocabulary inherited from round 69's RegisterStyleConfig, itself tier B) + 20 globals + local StyleCueSlot view. Review PASSED with one correction: AdjustRgbByDelta filed tier A, downgraded to B at merge (consumers slotB8/slot64 unestablished, so 'Rgb' is likely, not proven). Head also fixed a new header comment calling the matched TickDreamAuxSlots2 uncarved. Not counted as a send-back.",
+          "round": 72,
+          "runners": 1
         }
       ],
       "status": "open",
@@ -579,6 +609,7 @@
         "class_3bb8c_c": "2026-09-22",
         "class_3bb8c_f": "2026-09-20",
         "class_3bb8c_m": "2026-09-23",
+        "class_3bb8c_n": "2026-09-23",
         "class_3bb8c_o": "2026-09-18",
         "class_3bb8c_p": "2026-09-19",
         "class_3bb8c_s": "2026-09-23",

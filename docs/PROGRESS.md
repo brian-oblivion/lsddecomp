@@ -6,6 +6,71 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-23 — round 72: a "cleanly isolated register identity" stall was one call too many
+
+**Three runners, three tracks, all merges green.** The operator asked for
+three more agents after round 71, so this round ran straight after it, on the
+same protocol. The head ran on Opus. Gate 0 was clean, and all three
+worktrees verified. `headercontention.py`: no contention. The 1b job
+(`OpenCdFile`/`ReadCdFile`, next to libcd code) was screened with
+`sdkname.py` first, because of round 71's escalation 2. Both score masked
+under 0.1 against every SDK body, so they are game code.
+
+| runner | model | track | unit | outcome |
+| --- | --- | --- | --- | --- |
+| alpha | sonnet | 3 | `class_3bb8c_n` | 23 functions + 20 globals + a local `StyleCueSlot` view named; review PASSED with one tier correction; marked |
+| bravo | opus | 1 revisit | `code_2cc8c_c` | `Obj86B60__NotifyParents` MATCHED 32/32 |
+| charlie | sonnet | 1b | `code_179d8_h` | `OpenCdFile`, `ReadCdFile` promoted |
+
+The revisit yield is 24/41. Track 3 is at 28/75 units. `check-nonmatching`
+compiles 49 bodies in 14 units: two promotions here, after round 71's two
+matches retired two bodies.
+
+### The stall
+
+`Obj86B60__NotifyParents` had been titled "register identity, now CLEANLY
+isolated" since round 46, after an 82k-iteration permuter negative.
+Rebuilt as given, it measured 23/32 at exact length, ins/del 2/2, so the
+figures were honest (and `plan.py`'s `len-off` tag was stale). Bravo read
+global-alloc's priority for each pseudo off `cc1 -dl`:
+`floor_log2(refs) * refs / live_length`. `self` outranked `arg1` for `$s0`
+by one reference, and that reference came from writing the mode-2 and mode-3
+calls as two `methods->slotNN(self)` calls. Retail chooses a function
+pointer in each arm and makes ONE call; the shared `jalr; move a0,s1` tail
+had been read as the compiler merging two calls. Matched after 5 image
+builds. Promoted to 3d. A permuter cannot find this class, because it never
+changes how many calls a body makes.
+
+### Review note (Sonnet naming unit)
+
+Five names were sampled. The `Style*` vocabulary is round 69's tier-B
+`RegisterStyleConfig` family carried through consistently, and it is
+recorded as tier B. `AdjustRgbByDelta` was filed as tier A. Its mechanics are
+a pure leaf, but "Rgb" asserts what the bytes MEAN, and neither consumer
+(`slotB8(obj, 1, rgb)`, `slot64(self, rgb)`) is identified. The head
+downgraded it to B in the report. The head judged this an overclaimed TIER
+on a probably-right name, not a wrong name. So it did NOT count it as a
+send-back, and the naming runner stays Sonnet. The operator may read the
+rule more strictly. A new header comment calling the matched
+`TickDreamAuxSlots2` "still-uncarved" was corrected at merge.
+
+### Also
+
+- One single-instance learning (3h, the getintr `andi 0xff` entry) was
+  distilled to the archive to stay under budget. Section 6 now points at it
+  and at round 71's.
+- `externcheck.py` is clean, `stalesyms.py` has 0 outstanding, and
+  `gpsyms.py --check` is current after alpha's sdata renames.
+
+### Escalated
+
+Nothing new. Round 71's five escalations stand. The first of them (pinned-name
+renames leaving `progress.py`'s counts) still understates the headline
+figures.
+
+---
+
+
 ## 2026-09-23 — round 71: six of seven revisits match, track 2 closes, and a pinned-name rename silently moves Sony code back into the game counts
 
 **Five slots, eight runner sessions, four tracks, all merges green.** The

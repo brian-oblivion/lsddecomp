@@ -341,6 +341,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   promotion. Move the assignment to right after its input is loaded (`func_8004C6A8`, filed as a
   HARD RULE 6 stall in round 34, 85/165 -> 131/165 length-exact). (round 71)
 
+- **A full parameter register swap at 0/0 can be global-alloc PRIORITY, and `cc1 -dl` measures
+  it**: `floor_log2(refs) * refs / live_length` per pseudo, highest takes `$s0`. Two separate
+  `methods->slotNN(self)` calls gave `self` one reference too many; retail picks `fn` per arm and
+  makes ONE `fn(self)` call (its tell: a shared `jalr; move a0,sN` tail), so `arg1` outranks it
+  (`Obj86B60__NotifyParents` 32/32, "unreachable" since round 13). (round 72)
+
 ### 3e. Frames and stack
 
 - **An unused stack frame is reserved by an unused local ARRAY, never a scalar.** `s32 unused[2]`
@@ -514,12 +520,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   memory-mapped I/O, not whether `volatile` helps**: a documented `I_STAT`/`I_MASK` pair (two
   closes) versus DECLINED on an ordinary global that measured no change — only two units touch
   hardware addresses. (a §"`volatile` is a legitimate, and much NARROWER, tool", §"Round 16")
-- **A missing `andi 0xff` right after an `lbu` whose byte goes to a global and is then masked:
-  read it as `*(volatile u8 *)&x`.** A QImode volatile read keeps the zero-extend as its own
-  instruction; `u8` temporaries in four positions, direct masking and a whole-array `volatile` all
-  missed. Single instance (`getintr`, libcd), and the MMIO discriminator above is
-  only half met: `resp[]` is a LOCAL buffer filled from the CD response FIFO, and the same body's
-  `volatile u8 cause` compiles alike. (round 70, delta)
 - **NARROW a `volatile` to the exact access that needs it** — qualifying only the WORD-sized field
   un-fused a div/mod pair while preserving retail's `lh` (193/213 -> 211/213). When a qualifier
   lever "works but with a side effect", check whether the side effect is intrinsic to the LEVER or
@@ -748,4 +748,4 @@ genuine SECOND, INDEPENDENT USE POINT" (it reconciles the round-19 close with th
 3d), §"HImode constant narrowing". Distilled out round 69: §"Two long-standing near-misses closed by
 DELETING a named value" (the local-count entries in 3d carry the lever), §"When the residue
 is a lone scheduling difference, sweep one statement's PLACEMENT", §"Inherited no-op
-statements must be tested in BOTH directions".
+statements must be tested in BOTH directions". Distilled out rounds 71-72: §"A narrow signed field may need an `s32` LOCAL", §"A missing `andi 0xff`" (getintr).

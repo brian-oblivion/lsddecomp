@@ -9032,3 +9032,12 @@ already covered elsewhere in the sheet.
   reproducers, one plain and one replicating the store-then-reload shape (reload confirmed present,
   `sb` then `lb`), emit identical `lb` + `sll 0xb` for all spellings. So the trigger is the aliasing
   context, not the spelling -- do not "fix" a spelling that is already correct. (a round 63)
+
+## Distilled round 72 (2026-09-23)
+
+- **A missing `andi 0xff` right after an `lbu` whose byte goes to a global and is then masked:
+  read it as `*(volatile u8 *)&x`.** A QImode volatile read keeps the zero-extend as its own
+  instruction; `u8` temporaries in four positions, direct masking and a whole-array `volatile` all
+  missed. Single instance (`getintr`, libcd), and the MMIO discriminator above is
+  only half met: `resp[]` is a LOCAL buffer filled from the CD response FIFO, and the same body's
+  `volatile u8 cause` compiles alike. (round 70, delta)
