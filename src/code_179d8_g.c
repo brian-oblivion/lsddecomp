@@ -147,7 +147,7 @@ extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
 extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
 extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
-extern s32 func_80029478(void);                                /* code_179d8_b.c, MATCHED round 70
+extern s32 getintr(void);                                /* code_179d8_b.c, MATCHED round 70
                                                                    (libcd getintr by its strings) */
 extern s32 CheckCallback(void);                                /* lib/libetc/intr.o -- trivial
                                                                    (u16)D_8006C272 getter */
@@ -598,7 +598,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         if (CheckCallback() != 0) {
             status = (u8)(*D_8006D8C0 & 3);
             for (;;) {
-                flags = func_80029478();
+                flags = getintr();
                 if (flags == 0) {
                     break;
                 }
@@ -788,7 +788,7 @@ void func_8002B3F4(void)
     pd9 = &D_8006D8D9;
 
     for (;;) {
-        flags = func_80029478();
+        flags = getintr();
         if (flags == 0) {
             break;
         }

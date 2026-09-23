@@ -270,11 +270,6 @@ CdReadSync = 0x80029254; // type:func  (Psy-Q libcd/sys, from the SDK object)
 CdRead = 0x80029274; // type:func  (Psy-Q libcd/sys, from the SDK object)
 CdIntToPos = 0x800292F4; // type:func  (Psy-Q libcd/sys, from the SDK object)
 CdPosToInt = 0x800293F8; // type:func  (Psy-Q libcd/sys, from the SDK object)
-// libcd/bios getintr, identified: shape 0.92 vs the 3.5/3.6 bios.o getintr (masked
-// 0.00, a build no disc carries); position right after libcd/sys and before the
-// pinned CD_sync, bios.o's own order; libcd's CDROM/DiskError strings (report).
-// Matched as C in round 70. Name pending for track 2's rename.py run.
-func_80029478 = 0x80029478; // type:func
 CdSearchFile = 0x8002B640; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
 _cmp = 0x8002B928; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
 CD_newmedia = 0x8002B94C; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
@@ -1373,3 +1368,8 @@ gSpriteScaleLarge = 0x8008785C;
 gSpriteScaleHalf = 0x80087868;
 gSpriteScaleSmall = 0x80087874;
 gSpriteShiftScratch = 0x80087880;
+// libcd/bios getintr, identified: shape 0.92 vs the 3.5/3.6 bios.o getintr (masked
+// 0.00, a build no disc carries); position right after libcd/sys and before the
+// pinned CD_sync, bios.o's own order; libcd's CDROM/DiskError strings (report).
+// Matched as C in round 70. Renamed round 71 (bravo, track 2).
+getintr = 0x80029478; // type:func  (Psy-Q libcd/bios, shape match, no linked object)

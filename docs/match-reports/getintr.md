@@ -1,4 +1,6 @@
-# func_80029478 -- MATCHED (337/337, byte-exact, round 70)
+# getintr -- MATCHED (337/337, byte-exact, round 70)
+
+> Renamed from `func_80029478` on 2026-09-23 (tools/rename.py). Address 0x80029478.
 
 REVISITED, round 70: MATCHED (337/337, whole-image SHA1 green); names/types not relevant.
 
@@ -106,11 +108,11 @@ missed condition or wrong constant anywhere):
    caller sites in `asm/code_179d8_mid.s`, which `andi` the result against
    `0x2` and `0x4`, consistent with a flag word.
 
-`s32 func_80029478(void)` -- confirmed against three call sites
+`s32 getintr(void)` -- confirmed against three call sites
 (`asm/code_179d8_mid.s`, `asm/nonmatchings/code_179d8_g/func_8002B3F4.s`,
 `asm/nonmatchings/code_179d8_g/func_8002AEE0.s`), all `jal` with a `nop`
 delay slot and no argument setup, and against `code_179d8_g.c`'s own
-existing forward declaration (`extern s32 func_80029478(void);`).
+existing forward declaration (`extern s32 getintr(void);`).
 
 
 ## The source as matched

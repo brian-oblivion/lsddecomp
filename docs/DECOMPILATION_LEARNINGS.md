@@ -320,7 +320,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 - **A register swap that REPEATS at every expansion of a `do { } while (0)` macro closes as a
   `static __inline__` function.** The inline's parameters get their own pseudos at each call, so
-  the allocation order differs from textual expansion. `func_80029478`'s 8-byte copy, 10 sites
+  the allocation order differs from textual expansion. `getintr`'s 8-byte copy, 10 sites
   with dst/counter swapped, went 253 -> 333/337, ins/del 0/0, on this alone. Discriminator: the
   SAME swap at every copy of one repeated block. (round 70, delta)
 
@@ -496,7 +496,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **A missing `andi 0xff` right after an `lbu` whose byte goes to a global and is then masked:
   read it as `*(volatile u8 *)&x`.** A QImode volatile read keeps the zero-extend as its own
   instruction; `u8` temporaries in four positions, direct masking and a whole-array `volatile` all
-  missed. Single instance (`func_80029478`, libcd `getintr`), and the MMIO discriminator above is
+  missed. Single instance (`getintr`, libcd `getintr`), and the MMIO discriminator above is
   only half met: `resp[]` is a LOCAL buffer filled from the CD response FIFO, and the same body's
   `volatile u8 cause` compiles alike. (round 70, delta)
 - **NARROW a `volatile` to the exact access that needs it** — qualifying only the WORD-sized field

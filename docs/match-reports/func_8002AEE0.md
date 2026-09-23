@@ -212,7 +212,7 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
   `*D_8006D8C0 & 3`, runs the same button-dispatch loop as
   `func_8002B3F4`/`func_8002B198` (bit 4 → `D_8006D600(D_8006D8D8[1],
   D_8008B3D4)`, bit 2 → `D_8006D5FC(D_8006D8D8[0], D_8008B3CC)`, until
-  `func_80029478()` returns 0), then restores the saved status byte.
+  `getintr()` returns 0), then restores the saved status byte.
 - Copies 8 bytes from `D_8008B3D4` into `*(u8 *)arg1` — but ONLY if `arg1 !=
   0` (a null-destination guard retail has that is easy to miss reading the
   raw disassembly out of order).
@@ -298,7 +298,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         if (func_80024E64() != 0) {
             status = (u8)(*D_8006D8C0 & 3);
             for (;;) {
-                flags = func_80029478();
+                flags = getintr();
                 if (flags == 0) {
                     break;
                 }
@@ -711,7 +711,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         if (CheckCallback() != 0) {
             status = (u8)(*D_8006D8C0 & 3);
             for (;;) {
-                flags = func_80029478();
+                flags = getintr();
                 if (flags == 0) {
                     break;
                 }
@@ -934,7 +934,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         if (CheckCallback() != 0) {
             status = (u8)(*D_8006D8C0 & 3);
             for (;;) {
-                flags = func_80029478();
+                flags = getintr();
                 if (flags == 0) {
                     break;
                 }

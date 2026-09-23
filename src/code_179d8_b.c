@@ -23,7 +23,7 @@
  * The C is gone because Sony's object owns those bytes now (CLAUDE.md: never
  * write C for a function a Sony object owns); the reports are kept, retitled
  * CONVERTED.  The unit is now 0x19C78..0x1A1BC and holds ONE function,
- * func_80029478, which still owns jtbl_800109F8 and so the 0x11F8 rodata
+ * getintr, which still owns jtbl_800109F8 and so the 0x11F8 rodata
  * attach.  The "low-level serial/link driver" reading below was written
  * about the whole window and is now mostly a reading of libcd itself.
  *
@@ -35,7 +35,7 @@
  * (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md).  Re-screened
  * with `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
  *   func_80028CF8  MATCHED    func_80028D30  MATCHED
- *   func_80029478  MATCHED round 70 (docs/match-reports/func_80029478.md)
+ *   getintr  MATCHED round 70 (docs/match-reports/getintr.md)
  * The previous version of this comment said all three "are already stubbed
  * as match reports", which by round 24 was a stale DIRECTIVE over free
  * ground; their stubs are gone.
@@ -44,7 +44,7 @@
  * contains mult->mfhi (the hazard-slot direction, not a blocker), retail's
  * signed-divide-by-constant idiom.
  *
- * func_80029478 owns jtbl_800109F8, whose sub-slot of the 0xFD8 rodata
+ * getintr owns jtbl_800109F8, whose sub-slot of the 0xFD8 rodata
  * region is ATTACHED to this unit in the splat yaml. Leave that alone.
  *
  * This slice was cut at ROM-address boundaries, so it has no reason to
@@ -58,7 +58,7 @@
  */
 #include "common.h"
 
-/* func_80029478 -- CD-ROM interrupt-cause dispatcher.  This is libcd's
+/* getintr -- CD-ROM interrupt-cause dispatcher.  This is libcd's
  * bios.c `getintr` (build 1.71, 1995-12, on no SDK disc, so it cannot be
  * linked as an object -- docs/research/psyq-sdk-objects.md) and is matched
  * as C instead.  Declarations are this unit's own view. */
@@ -109,7 +109,7 @@ static __inline__ void copy8(u8 *d, const u8 *s)
     }
 }
 
-s32 func_80029478(void)
+s32 getintr(void)
 {
     volatile u8 cause;
     u8 resp[8];

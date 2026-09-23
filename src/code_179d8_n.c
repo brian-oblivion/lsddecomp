@@ -62,7 +62,7 @@
  * same globals). Round 26's bodies, spliced verbatim, would not have LINKED
  * under today's tree -- the "a preserved body's `jal` targets can go STALE
  * across an SDK-object round" hazard from round 31 (DECOMPILATION_LEARNINGS.md).
- * `func_8002A510` and `func_80029478` were NOT renamed (still real game
+ * `func_8002A510` and `getintr` were NOT renamed (still real game
  * code, still INCLUDE_ASM/matched under those names in sibling units).
  *
  * All three bodies were rebuilt this round with the four names corrected,
@@ -119,7 +119,7 @@ extern void (*D_8006D600)(s32 arg0, void *arg1);
 extern void (*D_8006D5FC)(s32 arg0, void *arg1);
 
 extern void func_8002A510(void);
-extern s32 func_80029478(void);
+extern s32 getintr(void);
 
 extern const char D_80010984[];
 extern const char D_80010994[];
@@ -175,7 +175,7 @@ skip_timeout:
         if (CheckCallback() != 0) {
             savedState = *D_8006D8C0 & 3;
             for (;;) {
-                flags = func_80029478();
+                flags = getintr();
                 if (flags == 0) {
                     break;
                 }
@@ -280,7 +280,7 @@ extern void (*D_8006D600)(s32 arg0, void *arg1);
 extern void (*D_8006D5FC)(s32 arg0, void *arg1);
 
 extern void func_8002A510(void);
-extern s32 func_80029478(void);
+extern s32 getintr(void);
 extern s32 func_800299BC(s32 arg0, s32 arg1);          /* defined earlier in this unit, ROM order */
 
 extern const char D_80010984[];
@@ -378,7 +378,7 @@ skip_timeout3:
             if (CheckCallback() != 0) {
                 savedState = *D_8006D8C0 & 3;
                 for (;;) {
-                    flags = func_80029478();
+                    flags = getintr();
                     if (flags == 0) {
                         break;
                     }
