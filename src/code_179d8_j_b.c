@@ -239,22 +239,112 @@ extern u8 D_8008D970[];
  * (324/324 words, zero drift outside the function), 7/324 raw word-match,
  * best body preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
-/* STALL, TOOLCHAIN-BLOCKED -- see docs/match-reports/func_80030E90.md.
- * Round 62 (REVISIT): 241/252 built words (11 short), 36/252 raw, ins 22/del
- * 22, and the 11-word gap is now accounted for EXACTLY: 9 words are a
- * load-delay `nop` that ASPSX 2.34 emits and maspsx does not (cc1 emits the
- * bare `sb $3,G` macro; ASPSX decides the hazard before expanding it, maspsx
- * after, and the interposed `lui $at` then satisfies the hazard). Retail
- * image-wide census: 40 sites with the nop, 0 without. Not reachable from C
- * at any shape -- the best possible score here is 250/252 until the blocker
- * is resolved, so DO NOT staff another source attempt. The remaining 2 words
- * are the busy-lock guard polarity (retail `bne` NEAR, ours `beq` FAR), which
- * two byte-exact siblings in this same file -- func_80031280 and
- * func_80031890 -- both compile as `beq` FAR, so it is not how the guard is
- * written. Round 26's attribution of the nops to "GCC's delay-slot filler"
- * is RETRACTED: cc1 never emits the `lui` that attribution depends on.
- * Same blocker, 11 sites, on this file's func_8003149C below. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 252/252 words, LENGTH-EXACT as of round 70 -- the
+ * round-63 `--nop-at-expansion` maspsx flag closed the 9/11-word
+ * load-delay-nop gap this report's round-62 section attributed to a
+ * below-cc1 blocker (see docs/match-reports/func_80030E90.md); that
+ * blocker is RESOLVED and this title is no longer "TOOLCHAIN-BLOCKED".
+ * Re-measured round 70: raw word-match 65/252, insertions 11 / deletions
+ * 11 (was 241/252 11-short, raw 36/252, ins22/del22 before the flag).
+ * Residue: the busy-lock guard polarity (retail `bne` NEAR, ours `beq`
+ * FAR) plus whatever the flag's extra nops reshuffled elsewhere in the
+ * function -- not yet re-characterized past the raw figures. See
+ * docs/match-reports/func_80030E90.md's "Round 70 re-measure" section.
+ * Hand-derived. */
+s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
+{
+    SlotE968 *slot;
+    RecordE978 *rec;
+    s32 result;
+    u16 note;
+    u8 pending18;
+
+    if (D_8008E934 == 1) {
+        goto fail_nolock;
+    }
+    D_8008E934 = 1;
+    if (SpuVmVSetUp(p0, p1) != 0) {
+        goto fail;
+    }
+    D_8008EA22 = 0x21;
+    D_8008EA0E = (u8) p3;
+    D_8008EA0F = (u8) p4;
+    D_8008EA18 = (u8) p2;
+    if (p5 == p6) {
+        D_8008EA11 = 0x40;
+        D_8008EA10 = p5;
+    } else if (p6 < p5) {
+        D_8008EA10 = p5;
+        D_8008EA11 = (p6 << 6) / p5;
+    } else {
+        D_8008EA10 = p6;
+        D_8008EA11 = 0x7F - ((p5 << 6) / p6);
+    }
+
+    slot = D_8008E968;
+    D_8008EA16 = slot[p1].unk1;
+    D_8008EA17 = slot[p1].unk4;
+    D_8008EA0C = slot[p1].unk0;
+
+    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    D_8008EA1B = rec->unk0;
+    note = rec->unk16;
+    D_8008EA24 = note;
+    D_8008EA19 = rec->unk2;
+    D_8008EA1A = rec->unk3;
+    D_8008EA1C = rec->unk4;
+    D_8008EA1D = rec->unk5;
+    D_8008EA20 = rec->unk1;
+    D_8008EA1E = rec->unk6;
+    D_8008EA1F = rec->unk7;
+
+    if ((s16) note == 0) {
+        goto fail;
+    }
+    result = (s32)(u8) func_8002CF18();
+    if ((u8) result == D_8008E9D0) {
+        goto fail;
+    }
+    __asm__("");
+    D_8008EA26 = (u8) result;
+    __asm__("");
+    D_8008D996[(u8) result].unk0 = 0x21;
+    __asm__("");
+    D_8008D99E[(u8) result].unk0 = p0;
+    __asm__("");
+    D_8008D99A[(u8) result].unk0 = p1;
+    __asm__("");
+    D_8008D998[(u8) result].unk0 = D_8008EA13;
+    __asm__("");
+    D_8008D988[(u8) result].unk0 = D_8008EA24;
+    __asm__("");
+    pending18 = D_8008EA18;
+    D_8008D994[(u8) result].unk0 = p3;
+    D_8008D9A3[(u8) result].unk0 = 1;
+    __asm__("");
+    D_8008D98A[(u8) result].unk0 = 0;
+    __asm__("");
+    D_8008D99C[(u8) result].unk0 = pending18;
+
+    func_8002D6A4();
+    if ((s16) D_8008EA24 == 0xFF) {
+        func_8002D8E0((u8) result);
+    } else {
+        s32 ret = func_8002E038((u16) p3, p4);
+        func_8002D1B4(1, (u16) ret);
+    }
+    D_8008E934 = 0;
+    return (u8) result;
+
+fail:
+    D_8008E934 = 0;
+fail_nolock:
+    return -1;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030E90);
+#endif
 
 s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
 {
