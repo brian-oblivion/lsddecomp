@@ -1,13 +1,15 @@
-# func_80031E94 -- MATCH (21/21 words, 2 rebuild attempts)
+# SsUtAutoVol -- MATCH (21/21 words, 2 rebuild attempts)
+
+> Renamed from `func_80031E94` on 2026-09-23 (tools/rename.py). Address 0x80031e94.
 
 Unit `code_179d8_j`, round 21 (2026-09-06). Not a class method (calls a
-plain function, no vtable dereference). Sibling of `func_80031EE8`
+plain function, no vtable dereference). Sibling of `SsUtAutoPan`
 (identical shape, different callee).
 
 ```c
 extern void func_8002E308(s16 a0, s16 a1, s16 a2, s16 a3);
 
-s32 func_80031E94(s16 p0, s16 p1, s16 p2, s16 p3)
+s32 SsUtAutoVol(s16 p0, s16 p1, s16 p2, s16 p3)
 {
     if ((u16) p0 < 0x18) {
         func_8002E308(p0, p1, p2, p3);
@@ -26,11 +28,11 @@ $v0,$zero,$zero` executes right after the call, overwriting whatever
 all; this function always returns 0 on the valid path regardless of
 what the callee produced.
 
-Same branch-polarity fix as `func_80031C98` was needed on the first
+Same branch-polarity fix as `SsUtGetDetVVol` was needed on the first
 attempt: `if (valid) { call; return 0; } return -1;`, not the inverted
 guard-clause form. See that report for the general note.
 
 ### Proposed learning
 
-None beyond `func_80031C98.md`'s branch-polarity note, which this
+None beyond `SsUtGetDetVVol.md`'s branch-polarity note, which this
 confirms a second time in the same unit.

@@ -186,7 +186,7 @@ struct VabStreamObj {
  * an established prototype anywhere yet. */
 extern void *func_80017B34(s32 size);
 extern s16 func_80030E90(s16 a0, s16 hi, s16 lo, s16 a3, s32 b5, s32 argA, s32 argB);
-extern void func_80031E94(s16 a0, s16 a1, s16 a2, s32 a3);
+extern void SsUtAutoVol(s16 a0, s16 a1, s16 a2, s32 a3);
 extern void func_80031890(s16 index);
 extern void func_80031F3C(s32 arg0);
 /* Sony's `SsVabTransCompleted` (`libsnd/vs_vtc`) and `SsSetMute`

@@ -1,4 +1,6 @@
-# func_80031CF0 — MATCHED, 31/31 words byte-exact (round 38)
+# SsUtSetDetVVol — MATCHED, 31/31 words byte-exact (round 38)
+
+> Renamed from `func_80031CF0` on 2026-09-23 (tools/rename.py). Address 0x80031cf0.
 
 Unit: `src/code_179d8_j_c.c` · vram `0x80031CF0` · file `0x224F0-0x2256C` · 31 words.
 
@@ -18,7 +20,7 @@ charlie's; the simplification and this report are the head's.
 ## The C
 
 ```c
-s32 func_80031CF0(s16 idx, s16 p1, s16 p2)
+s32 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2)
 {
     /* Retail reserves an 8-byte frame it never touches. Only an unused local
      * ARRAY of that size reproduces it -- a scalar is register-allocated and
@@ -37,7 +39,7 @@ s32 func_80031CF0(s16 idx, s16 p1, s16 p2)
 
 A bounds-checked setter over the same 16-byte-stride SPU voice-parameter
 table (`D_8008D7F0`) and per-voice flag byte (`D_8008D970`) that this unit's
-already-matched `func_80031C98` reads. Note the store ORDER: retail writes
+already-matched `SsUtGetDetVVol` reads. Note the store ORDER: retail writes
 `unk2` first, then OR's the flag byte, then writes `unk0`. Writing the two
 `D_8008D7F0` fields adjacently does not reproduce it.
 

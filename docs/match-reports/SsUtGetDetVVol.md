@@ -1,9 +1,11 @@
-# func_80031C98 -- MATCH (22/22 words, 2 rebuild attempts)
+# SsUtGetDetVVol -- MATCH (22/22 words, 2 rebuild attempts)
+
+> Renamed from `func_80031C98` on 2026-09-23 (tools/rename.py). Address 0x80031c98.
 
 Unit `code_179d8_j`, round 21 (2026-09-06). Not a class method
 (`D_8006DAD4` is a plain global pointer variable, no `classtable.py`
-hit). This is the "raw getter" half of a pair with `func_80031D6C`
-(same table, same bounds, `func_80031D6C` divides each field by 129
+hit). This is the "raw getter" half of a pair with `SsUtGetVVol`
+(same table, same bounds, `SsUtGetVVol` divides each field by 129
 before returning it -- see that function's stall report).
 
 ```c
@@ -17,7 +19,7 @@ typedef struct EntryDAD4 {
 } EntryDAD4;
 extern EntryDAD4 *D_8006DAD4;
 
-s32 func_80031C98(s16 idx, s16 *out1, s16 *out2)
+s32 SsUtGetDetVVol(s16 idx, s16 *out1, s16 *out2)
 {
     if ((u16) idx < 0x18) {
         *out1 = D_8006DAD4[idx].unk0;
@@ -49,7 +51,7 @@ guard-clause form (`if (invalid) return X;` followed by the body) is NOT
 always what retail's branch polarity implies -- check whether the VALID
 path is the one that branches AWAY (to a label) while the invalid path
 falls straight through into an inline `j end; li v0,X`.** When it is (as
-here, and in the two siblings `func_80031E94`/`func_80031EE8`), the
+here, and in the two siblings `SsUtAutoVol`/`SsUtAutoPan`), the
 `if (valid) { body; return 0; } return X;` form is what reproduces it.
 This is the opposite of MATCHING-GUIDE's usual "write early exits as
 guard clauses" advice for LARGE bodies -- for a body this small, retail

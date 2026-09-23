@@ -128,7 +128,7 @@ this same unit.
   `volatile u16 *chanPtr = &D_8008EA26;` local declared before the loop --
   this reintroduced an 8-byte dead stack frame (regressing to 12/85 with
   285KB+ of drift), the same unexplained-frame artifact documented in
-  `func_80031CF0`'s report, apparently triggered here by the combination of
+  `SsUtSetDetVVol`'s report, apparently triggered here by the combination of
   a loop-carried pointer local plus the `volatile` qualifier. Reverted.
 - **`loBit`/`hiBit` land in the wrong scratch registers**, same class,
   same unresolved status, as `func_80031890`'s report already documents

@@ -56,7 +56,7 @@ this function in the unit -- both leading `s16` fields at `+0x74`/`+0x76`.
 Retail reuses ONE computed entry-pointer for both `unk74`/`unk76` reads;
 writing the same `(p0 & 0xFF00) >> 8` index expression at both textual
 sites was sufficient for GCC to CSE it into a single address computation,
-same as the already-matched `func_80031C98`'s double-field read of
+same as the already-matched `SsUtGetDetVVol`'s double-field read of
 `D_8006DAD4[idx]`.)
 
 ### Proposed learning

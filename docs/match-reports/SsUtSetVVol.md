@@ -1,4 +1,6 @@
-# func_80031DF8 -- MATCHED, 39/39 words byte-exact (round 38)
+# SsUtSetVVol -- MATCHED, 39/39 words byte-exact (round 38)
+
+> Renamed from `func_80031DF8` on 2026-09-23 (tools/rename.py). Address 0x80031df8.
 
 Unit: `src/code_179d8_j_c.c` · vram `0x80031DF8` · file `0x225F8-0x22694` · 39 words.
 
@@ -9,8 +11,8 @@ out-of-range bytes.
 
 Filed as a STALL since round 22 (2026-09-06), "1 word OVER at 40/39",
 re-verified (still 40/39, out-of-range drift confirming it) in round 31.
-Round 38's assignment asked whether this and `func_80031CF0` are really one
-class, given `func_80031CF0` closed on the unused-frame lever rather than
+Round 38's assignment asked whether this and `SsUtSetDetVVol` are really one
+class, given `SsUtSetDetVVol` closed on the unused-frame lever rather than
 the register-rescue residue both reports described. Rebuilding this
 function's preserved body confirmed the title figure and then two
 independent, separable levers closed it -- see below for the verdict.
@@ -18,10 +20,10 @@ independent, separable levers closed it -- see below for the verdict.
 ## The C
 
 ```c
-s32 func_80031DF8(s16 idx, s16 p1, s16 p2)
+s32 SsUtSetVVol(s16 idx, s16 p1, s16 p2)
 {
     /* Retail reserves an 8-byte frame it never touches, same idiom as
-     * func_80031CF0. */
+     * SsUtSetDetVVol. */
     s32 unused[2];
     s16 t1, t2;
 
@@ -37,32 +39,32 @@ s32 func_80031DF8(s16 idx, s16 p1, s16 p2)
 }
 ```
 
-The multiply-by-129 sibling of `func_80031CF0`'s setter and the counterpart
-of `func_80031D6C`'s divide-by-129 getter -- same bounds check, same
+The multiply-by-129 sibling of `SsUtSetDetVVol`'s setter and the counterpart
+of `SsUtGetVVol`'s divide-by-129 getter -- same bounds check, same
 `D_8008D7F0` table (this unit's shared `Rec16D7F0`, `unk0`/`unk2` two
 `s16` fields per 0x10-byte slot; splat's `D_8008D7F2` symbol used in the raw
 `.s` is simply `&D_8008D7F0[idx].unk2`, confirmed by the identical address
 computation and by `config/symbols.slps01556.lsdde.txt` carrying no manual
 entry for it -- it is an auto-named address, not a distinct object), same
-`D_8008D970` per-slot flag byte `func_80031CF0` also touches.
+`D_8008D970` per-slot flag byte `SsUtSetDetVVol` also touches.
 
 ## Two separable levers, found in sequence
 
 ### Lever 1 -- the unused-frame idiom, WITHOUT the `if (0)` dead-code hack
 
-The round-22/31 preserved body used `func_80031CF0`'s ORIGINAL (pre-round-38)
+The round-22/31 preserved body used `SsUtSetDetVVol`'s ORIGINAL (pre-round-38)
 idiom: an `s32 dead[2]` local plus a leading `__asm__("")` barrier plus
 `if (0) { dead[0] = 1; }`, and statement-separating `__asm__("")` barriers
 between all three field/flag writes. That reached **40 words against
 retail's 39** -- one word OVER.
 
-Rebuilding with `func_80031CF0`'s round-38 correction applied (a bare
+Rebuilding with `SsUtSetDetVVol`'s round-38 correction applied (a bare
 `s32 unused[2];`, no `if (0)`, no barriers at all) immediately dropped the
 built length to the **exact retail 39 words** (confirmed via
-`build/lsdde.map`: the next function, `func_80031E94`, now lands at its
+`build/lsdde.map`: the next function, `SsUtAutoVol`, now lands at its
 correct retail address `0x80031e94`). This by itself is strong evidence the
 two functions ARE the same class for the FRAME part of the residue --
-`func_80031CF0`'s round-38 finding (array-vs-scalar-and-size, not usedness,
+`SsUtSetDetVVol`'s round-38 finding (array-vs-scalar-and-size, not usedness,
 is the discriminator; the `if (0)` guard was inert overhead) transfers
 directly and immediately fixed the length component of this function's
 gap.
@@ -77,7 +79,7 @@ diagnosis picks up).
 With the frame fixed, `asm-differ` showed retail computes `p1 * 129` AND
 `p2 * 129` **both**, back-to-back, before touching the `D_8008D7F0` index
 arithmetic or writing anything -- the same "load/compute both values before
-consuming either" shape that closed `func_80031D6C` this round (see that
+consuming either" shape that closed `SsUtGetVVol` this round (see that
 report). The direct-computation form (`D_8008D7F0[idx].unk2 = p2 * 129;`
 inline, `D_8008D7F0[idx].unk0 = p1 * 129;` inline) computes each value
 immediately before its own store, interleaved with that store's own index
@@ -93,40 +95,40 @@ reached 26/39: better than lever-1-alone's 17/39, but still short, because
 retail computes `p2 * 129` before the index arithmetic too, not just
 `p1 * 129`. Hoisting both closed it completely.
 
-## Verdict on the `func_80031CF0`/`func_80031DF8` "one class" question
+## Verdict on the `SsUtSetDetVVol`/`SsUtSetVVol` "one class" question
 
 **Partially one class, and the report titles undersold which part.** Both
 functions needed the SAME unused-frame idiom (lever 1), and that idiom
 transferred without modification -- so for the FRAME component of the
-residue, yes, one class, and `func_80031CF0`'s round-38 correction (drop
+residue, yes, one class, and `SsUtSetDetVVol`'s round-38 correction (drop
 the `if (0)` hack) was directly load-bearing here too, cutting one whole
 word off the build before anything else changed.
 
 But the frame was never the only thing wrong with this function -- the
 round-22/31 reports' own "register-rescue residue" language was about a
-SECOND, independent problem that `func_80031CF0`'s closure never touched
+SECOND, independent problem that `SsUtSetDetVVol`'s closure never touched
 (that function has no multi-value computation to reorder; it's a straight
 three-field store with no arithmetic on the stored values). That second
-problem turned out to be the SAME mechanism that closed `func_80031D6C`
+problem turned out to be the SAME mechanism that closed `SsUtGetVVol`
 this round (hoist-both-values-before-either-use), not a new one. So the
 real shape is: **three siblings, two independent lever classes, and each
 sibling needed a different subset**:
 
 | function | unused frame? | hoist-both-values lever? |
 | --- | --- | --- |
-| `func_80031CF0` | yes (closed round 38) | n/a -- no computed values to hoist |
-| `func_80031D6C` | no frame in its `.s` at all | yes (closed round 38) |
-| `func_80031DF8` | yes (closed round 38) | yes (closed round 38) |
+| `SsUtSetDetVVol` | yes (closed round 38) | n/a -- no computed values to hoist |
+| `SsUtGetVVol` | no frame in its `.s` at all | yes (closed round 38) |
+| `SsUtSetVVol` | yes (closed round 38) | yes (closed round 38) |
 
 Filing these as "one class" without this table would have predicted
-`func_80031DF8` needed only the frame fix (as `func_80031CF0` did) or only
-the hoist fix (as `func_80031D6C` did); it needed both, applied together.
+`SsUtSetVVol` needed only the frame fix (as `SsUtSetDetVVol` did) or only
+the hoist fix (as `SsUtGetVVol` did); it needed both, applied together.
 
 ### Proposed learning
 
 **When a residue report says "same class as sibling X", check whether the
 sibling's own closure touched every part of the STATED residue, not just
-whether it closed.** `func_80031CF0`'s round-38 report closed on the
+whether it closed.** `SsUtSetDetVVol`'s round-38 report closed on the
 unused-frame lever alone because that function had nothing else wrong; its
 report never claimed to have tested a hoist-order lever because there was
 no multi-value computation in that function to test it on. Reading its

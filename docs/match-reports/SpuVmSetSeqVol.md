@@ -89,7 +89,7 @@ shared globals/typedefs `D_8008EA22`, `D_8008E9D0`, `D_8008D996`
 
 ## One CLOSED finding
 
-**The empty stack frame is the SAME dead-local idiom as `func_80031CF0`,
+**The empty stack frame is the SAME dead-local idiom as `SsUtSetDetVVol`,
 and a SCALAR dead local (not an array) is enough here.** This function
 makes no calls, so retail's `addiu $sp,$sp,-8`/`+8` around the whole body,
 with nothing ever read from or written to that frame, needed the
@@ -185,7 +185,7 @@ function, it is a large one.
 remaining plausible lever is register-pressure-side rather than
 expression-side -- e.g. deliberately extending or shortening `p0`'s live
 range with an unrelated dummy use, the same class of lever
-`func_80031CF0`'s report flagged as untested for its own delay-slot
+`SsUtSetDetVVol`'s report flagged as untested for its own delay-slot
 residue. Not attempted this round for lack of remaining budget.
 
 ### Proposed learning

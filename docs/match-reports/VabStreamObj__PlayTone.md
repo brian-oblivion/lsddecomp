@@ -25,7 +25,7 @@ if (index >= 0) {
                             (s16)(entry->center + self->pitchOffset), entry->shift,
                             (s16)arg2, (s16)arg2);   /* NOTE: arg2 passed TWICE */
     if (result >= 0) {
-        func_80031E94(result, (s16)arg2, (s16)arg3, 2);
+        SsUtAutoVol(result, (s16)arg2, (s16)arg3, 2);
         return result;
     }
 }
@@ -172,7 +172,7 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
         result = func_80030E90(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
                                 entry->shift, (s16)arg2, (s16)arg2);
         if (result >= 0) {
-            func_80031E94(result, (s16)arg2, (s16)arg3, 2);
+            SsUtAutoVol(result, (s16)arg2, (s16)arg3, 2);
             return result;
         }
     }
@@ -190,7 +190,7 @@ same-named bytes. Bytes/derivation unchanged.)
 
 Needs, from this unit's top-of-file scaffolding: `VabStreamObj`,
 `VagAtrView`, `extern s16 func_80030E90(s16, s16, s16, s16, s32, s32,
-s32);`, `extern void func_80031E94(s16, s16, s16, s32);` -- all already
+s32);`, `extern void SsUtAutoVol(s16, s16, s16, s32);` -- all already
 present in `src/code_179d8_e.c`.
 
 ### Proposed learning
@@ -323,7 +323,7 @@ uses elsewhere in this unit), looks up the matching `VagAtrView` entry,
 adds `self->pitchOffset` to its `center` note, and dispatches
 `func_80030E90(vabId, hi, lo, pitch, shift, arg2, arg2)` -- a "start
 playing this program/tone" call whose result (a voice/handle number) is
-then registered via `func_80031E94`. `VabStreamObj__StopVoice`'s own
+then registered via `SsUtAutoVol`. `VabStreamObj__StopVoice`'s own
 "index < 0x18" guard (0x18 == 24, the PS1 SPU's own voice count) is the
 other half of this same "select a tone/voice" vocabulary, which is why
 "PlayTone" rather than a more generic "Dispatch" or "Trigger" name --

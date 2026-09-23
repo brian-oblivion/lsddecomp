@@ -1471,3 +1471,29 @@ SpuVmGetSeqRVol = 0x80030648; // type:func
 // identified: config/psyq-objects.ld pin (linked Sony object calls this
 // address SpuVmSeqKeyOff by relocation). Round 71 (bravo, track 2).
 SpuVmSeqKeyOff = 0x8003069C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SsUtGetDetVVol
+// (all discs); module order (objdump libsnd/vmanager.o) has GetDetVVol
+// before SetDetVVol, matching retail's address order. Round 71 (bravo, track 2).
+SsUtGetDetVVol = 0x80031C98; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SsUtSetDetVVol
+// (disc 3.3); module order confirms it follows GetDetVVol. Round 71 (bravo, track 2).
+SsUtSetDetVVol = 0x80031CF0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SsUtGetVVol
+// (discs 3.3,3.5; libsnd/ut_vvol on 3.6); module order has GetVVol before
+// SetVVol, matching retail. Round 71 (bravo, track 2).
+SsUtGetVVol = 0x80031D6C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SsUtSetVVol
+// (disc 3.3); module order confirms it follows GetVVol. Round 71 (bravo, track 2).
+SsUtSetVVol = 0x80031DF8; // type:func
+// identified: AMBIGUOUS fingerprint tie (SsUtAutoVol/SsUtAutoPan, both
+// EXACT masked 1.00, identical 21-word bodies) resolved by position: in
+// sdk/work/3.3/elf/libsnd/vmanager.o (objdump -t), AutoVol (0x4b54)
+// precedes AutoPan (0x4ba8), the same order retail's addresses show here
+// (0x80031E94 < 0x80031EE8) -- the same discriminator that confirmed the
+// Get/Set VVol and DetVVol pairs above. Round 71 (bravo, track 2).
+SsUtAutoVol = 0x80031E94; // type:func
+// identified: AMBIGUOUS fingerprint tie (SsUtAutoVol/SsUtAutoPan, both
+// EXACT masked 1.00, identical 21-word bodies) resolved by position:
+// libsnd/vmanager.o module order has AutoPan (0x4ba8) after AutoVol
+// (0x4b54), matching retail's address order. Round 71 (bravo, track 2).
+SsUtAutoPan = 0x80031EE8; // type:func

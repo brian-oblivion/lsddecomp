@@ -1,4 +1,6 @@
-# func_80031D6C -- MATCHED, 35/35 words byte-exact (round 38)
+# SsUtGetVVol -- MATCHED, 35/35 words byte-exact (round 38)
+
+> Renamed from `func_80031D6C` on 2026-09-23 (tools/rename.py). Address 0x80031d6c.
 
 Unit: `src/code_179d8_j_c.c` · vram `0x80031D6C` · file `0x2256C-0x225F8` · 35 words.
 
@@ -9,14 +11,14 @@ out-of-range bytes.
 
 This was filed as a STALL since round 21 (2026-09-06), corrected for length in
 round 31, and reassigned this round with a stale cross-reference in its own
-line 5/9 ("`func_80031C98`/`func_80031280` (blocked, elsewhere)") -- both are
-now MATCHED (`func_80031C98` in this same unit, `func_80031280` in
+line 5/9 ("`SsUtGetDetVVol`/`func_80031280` (blocked, elsewhere)") -- both are
+now MATCHED (`SsUtGetDetVVol` in this same unit, `func_80031280` in
 `code_179d8_j_b`), which is corrected below.
 
 ## The C
 
 ```c
-s32 func_80031D6C(s16 idx, s16 *out1, s16 *out2)
+s32 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2)
 {
     EntryDAD4 *e;
     s16 f0, f2;
@@ -33,7 +35,7 @@ s32 func_80031D6C(s16 idx, s16 *out1, s16 *out2)
 }
 ```
 
-The "divide by 129" sibling of `func_80031C98`'s raw getter: same 0x18-entry
+The "divide by 129" sibling of `SsUtGetDetVVol`'s raw getter: same 0x18-entry
 bounds check on `idx`, same cached `D_8006DAD4[idx]` entry pointer (confirmed
 via `asm-differ` back in round 21 to be load-bearing over double-indexing),
 but each field is divided by 129 before being written to `*out1`/`*out2`.
@@ -101,11 +103,11 @@ asm("$N")` are banned; this is ordinary C reordering that changes GCC's own
 scheduling decision, and GCC's decision is what then determines register
 identity as an effect, not a cause we forced).
 
-## Verdict on the `func_80031CF0`/`func_80031DF8` "one class" question
+## Verdict on the `SsUtSetDetVVol`/`SsUtSetVVol` "one class" question
 
 Not applicable to this function's own closure (this one closed on a
-load-scheduling lever, not the unused-frame lever that closed `func_80031CF0`)
--- see `func_80031DF8.md` for the verdict on that specific pairing, since this
+load-scheduling lever, not the unused-frame lever that closed `SsUtSetDetVVol`)
+-- see `SsUtSetVVol.md` for the verdict on that specific pairing, since this
 function has no unused frame in its own prologue at all (no `addiu $sp` in its
 `.s`) and was never claimed to share that residue class.
 
