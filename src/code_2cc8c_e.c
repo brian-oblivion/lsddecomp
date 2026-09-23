@@ -132,26 +132,26 @@ void Class6E99C__SetStep(Class6E99CObj *self, s32 a1) {
     self->step = a1;
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 29/35 words, length exact. Residue: instruction
- * scheduling (retail materializes `li $a1,1` immediately after the
- * configure dispatch, before computing idx*3; this body defers it to just
- * before the slotB8 call) (docs/match-reports/Class6E99C__StartFadeToIndex.md).
- * Hand-derived. */
-void Class6E99C__StartFadeToIndex(Class6E99CObj *self) {
+/* `configure`'s occupant, Class6E99C__Configure, reads all four argument
+ * registers, and both StartFade* functions forward their own a1..a3 to it
+ * untouched (no argument register is set before that jalr). The shared
+ * Class6E99CMethods slot is declared `(self)` only, so the call goes through
+ * this file-local view instead of retyping the shared header. Spelling the
+ * forward is load-bearing: the `(self)`-only call compiles to the same
+ * instructions in a different order (29/35; round 73). */
+typedef s32 (*Configure6E99CFn)(Class6E99CObj *self, s32 a1, s32 a2, s32 a3);
+
+void Class6E99C__StartFadeToIndex(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     s32 idx;
 
     if (self->state != 0) {
         return;
     }
-    idx = self->methods->configure(self);
+    idx = ((Configure6E99CFn)self->methods->configure)(self, a1, a2, a3);
     self->methods->slotB8(self, 1, &D_8006EA90[idx * 3]);
     self->state = 1;
     self->step = -self->step;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeToIndex);
-#endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 40/41 words, 1 word short. Residue: two residues --

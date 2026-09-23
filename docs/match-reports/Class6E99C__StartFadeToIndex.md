@@ -1,4 +1,83 @@
-# Class6E99C__StartFadeToIndex -- STALL (scheduling residue, 29/35)
+# Class6E99C__StartFadeToIndex -- MATCHED (35/35, round 73; was STALL "scheduling residue, 29/35")
+
+REVISITED, round 73: MATCHED 35/35 (whole-image SHA1 green); names/types used
+
+## Round 73 (runner bravo): MATCHED -- the residue was ARITY, not scheduling
+
+**Preserved body rebuilt first, unchanged** (the `#ifdef NON_MATCHING` block,
+identical to "Best body reached" below): `29/35 words match`,
+`insertions 2 / deletions 2`, `positional skeleton diffs 6`, no outside-range
+drift. So the round-14 description "zero insertions/deletions" was a reading
+of the diff, not funcdiff's opcode-level figure: at 2/2 the `ori $a1` and the
+`lw` of `self->methods` genuinely sit in different slots of the sequence.
+
+**Re-derived class.** Retail sets NO argument register before the
+`configure` `jalr` except `$a0` (which already holds `self`), and
+`configure`'s occupant, `Class6E99C__Configure`, reads `$a1`..`$a3` (it is
+defined `(self, a1, a2, a3)`: a2 is the returned index, a3 is stored to
+`unk7C`). Per LEARNINGS 3f ("MIPS o32 fills argument registers strictly left
+to right... untouched `$a1` with `$a2`/`$a3` set PROVES a forwarded
+parameter; the converse fails, so type a slot from its CALL SITES" -- here,
+from the callee's BODY), untouched `$a1`-`$a3` at a call whose callee reads
+them means the caller forwards its own parameters. The slot and this
+function had both been typed `(self)` only since round 14.
+
+**The one lever, one build:** declare `(self, s32 a1, s32 a2, s32 a3)` and
+call `configure(self, a1, a2, a3)`. 35/35, ins 0 / del 0, skeleton 0,
+`build exit=0` (whole image). No other change to the body. The 29/35 body's
+compiled instructions are the SAME SET; only the order moved, which is why
+this read as scheduling for 59 rounds and why ~94,000 permuter iterations
+could not find it (a permuter never changes a function's parameter list or
+a call's arity).
+
+The shared `Class6E99CMethods::configure` slot (`include/code_2cc8c.h`) is
+NOT retyped: the call goes through a file-local
+`typedef s32 (*Configure6E99CFn)(Class6E99CObj *, s32, s32, s32)` cast, per
+3f's "prefer a LOCAL function-pointer view over retyping a shared slot". A
+comment-only note was added under that slot in the header.
+
+### Matched body
+
+```c
+typedef s32 (*Configure6E99CFn)(Class6E99CObj *self, s32 a1, s32 a2, s32 a3);
+
+void Class6E99C__StartFadeToIndex(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+    s32 idx;
+
+    if (self->state != 0) {
+        return;
+    }
+    idx = ((Configure6E99CFn)self->methods->configure)(self, a1, a2, a3);
+    self->methods->slotB8(self, 1, &D_8006EA90[idx * 3]);
+    self->state = 1;
+    self->step = -self->step;
+}
+```
+
+### Why the arity moves the `li` (checked hypothesis, not measured further)
+
+With the forwarded parameters, `$a1`-`$a3` are USES of incoming pseudos at
+the first call, so the hard registers are live up to that `jalr` and the
+parameter pseudos have real live ranges; without them the call has only a
+`$a0` use. That changes pseudo numbering and the scheduler's dependence
+graph in the block after the call, which is where the `ori $a1,1` landed.
+Discriminator for the class: an argument register the callee's body READS
+is not written before the call. This instance has it (`$a1`-`$a3`, callee
+`Class6E99C__Configure`); the sibling `Class6E99C__StartFadeDefault` has it
+too and closed on the same lever plus parameter reuse.
+
+### Proposed learning
+
+**A "literal argument scheduled late" residue after a call that sets only
+`$a0` can be a FORWARDED-PARAMETER arity defect.** Before calling a residue
+scheduling, check the PREVIOUS call in the function: if its callee reads
+`$aN` and the caller never writes `$aN`, the caller forwards its own
+parameter -- declare it and pass it. Same instruction set, different order,
+so it reads as pure scheduling at ins/del 2/2 and is invisible to the
+permuter (it never edits a parameter list). `Class6E99C__StartFadeToIndex`
+35/35 and `Class6E99C__StartFadeDefault` 41/41, both in one build each,
+after 94k and 280 s of search respectively.
+
 
 > Renamed from `func_80040024` on 2026-09-20 (tools/rename.py). Address 0x80040024.
 
