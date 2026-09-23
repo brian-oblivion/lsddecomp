@@ -17,8 +17,8 @@ through the pointer each time.
 ## Body
 
 ```c
-extern Vec3S D_800877EC;
-extern s32 D_800877F8[];
+extern Vec3S gModelChildOffsetInit;
+extern s32 gModelChildSpacing[];
 
 void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse) {
     Vec3S accum;
@@ -29,13 +29,13 @@ void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse) {
     if (count == 0) {
         return;
     }
-    accum = D_800877EC;
+    accum = gModelChildOffsetInit;
     p = self->arr7C;
     for (i = 0; i < 2; i++, p++) {
         if (count < 3) {
-            accum.x += *(s16 *)self->unk68 * D_800877F8[count];
+            accum.x += *(s16 *)self->unk68 * gModelChildSpacing[count];
         } else {
-            accum.y += D_800877F8[count];
+            accum.y += gModelChildSpacing[count];
         }
         if (reuse) {
             LinkNode *child = *p;
@@ -66,7 +66,7 @@ instead of retail's `-0x48`) because two fewer registers needed saving.
 Caching `count = self->unk6C` up front and using `count` everywhere else
 fixed it outright -- one word.
 
-The three-word residue seen along the way (`D_800877EC`'s/`D_800877F8`'s own
+The three-word residue seen along the way (`gModelChildOffsetInit`'s/`gModelChildSpacing`'s own
 `%lo` immediates and one `jal` target, all off by exactly 4) was pure address
 drift from `Class876FC__BuildRandomSprites` (this unit's sixth function this round) not yet
 being byte-exact -- not a real defect in this function. `./build-and-verify.sh`

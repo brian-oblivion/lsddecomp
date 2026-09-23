@@ -100,9 +100,9 @@ struct LinkNode {
     void *unk68;                         /* +0x068, ptr to an object whose
                                              first field is a signed s16 */
     s32 unk6C;                              /* +0x06C, an index (0..4) into
-                                                D_800877F8 */
+                                                gModelChildSpacing */
     s32 unk70;                                 /* +0x070, an index into
-                                                   D_8008780C */
+                                                   gModelChildDriftZ */
     void *unk74;                                  /* +0x074 */
     void *unk78;                                     /* +0x078 */
     LinkNode *arr7C[2];                                 /* +0x07C..+0x083 */
@@ -116,11 +116,11 @@ extern void LinkOwnerObj__ReleaseLinks(void *self);   /* class_3bb8c_o.c, LinkOw
 extern void LinkOwnerObj__ReleaseLinksB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void BaseObjO__AddVec14(void *self, Vec3S *v);   /* class_3bb8c_t.c */
 extern void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl); /* below */
-extern s32 D_80087844[];
-extern s32 D_8008785C[];
-extern s32 D_80087868[];
-extern s32 D_80087874[];
-extern Vec3S D_80087880;
+extern s32 gSpriteShiftX[];
+extern s32 gSpriteScaleLarge[];
+extern s32 gSpriteScaleHalf[];
+extern s32 gSpriteScaleSmall[];
+extern Vec3S gSpriteShiftScratch;
 
 void Class876FC__ReleaseModelChildren(LinkNode *self);
 void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse);
@@ -155,7 +155,7 @@ extern void *New_D800879C4(void *arg1, void *arg2, void *arg3);
  * some other object (first field a methods pointer, called through a new
  * +0x080 slot below), D_8008ACA8 is forwarded opaquely to New_D800879C4 as
  * its own third argument, and D_8008ACAC's pointee has a lookup field at
- * +0x018 that Class876FC__InitByKind/Class876FC__UpdateByKind snapshot/diff via D_8008ACB0. */
+ * +0x018 that Class876FC__InitByKind/Class876FC__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
 typedef struct {
     u8 pad0[0x80];
     s32 (*slot80)(void *self, s32 arg);
@@ -166,14 +166,14 @@ typedef struct {
 extern D_8008ACA4Obj *D_8008ACA4;
 extern void *D_8008ACA8;
 extern void *D_8008ACAC;
-extern s32 D_8008ACB0;
+extern s32 gTrackedYSnapshot;
 extern s32 D_8008AB98[];
 
 void Class876FC__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
     Vec3S local;
     s32 state;
 
-    D_8008ACB0 = *(s32 *)((u8 *)D_8008ACAC + 0x18);
+    gTrackedYSnapshot = *(s32 *)((u8 *)D_8008ACAC + 0x18);
     AddVec3(&local, arg2, &self->unk58);
     AttachWithRotScale(self, arg1, &local, self->unk64, self->unk68);
 
@@ -203,7 +203,7 @@ void Class876FC__UpdateByKind(LinkNode *self, void *arg1) {
     Vec3S local;
 
     AddVec3(&local, (Vec3S *)arg1, &self->unk58);
-    local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - D_8008ACB0;
+    local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - gTrackedYSnapshot;
     self->methods->slotB8(self, &local);
 
     switch (self->unk54) {
@@ -266,8 +266,8 @@ void AttachWithRotScale(LinkNode *self, void *arg1, void *arg2, s32 arg3, void *
  * spin up a brand new child via New_BaseObjO/Class6B5CC__LinkModel/AttachWithRotScale. */
 extern void *New_BaseObjO(void);        /* class_3bb8c_o.c, New_X allocator */
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* established, code_55dd4.h */
-extern Vec3S D_800877EC;
-extern s32 D_800877F8[];
+extern Vec3S gModelChildOffsetInit;
+extern s32 gModelChildSpacing[];
 
 void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse) {
     Vec3S accum;
@@ -278,13 +278,13 @@ void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse) {
     if (count == 0) {
         return;
     }
-    accum = D_800877EC;
+    accum = gModelChildOffsetInit;
     p = self->arr7C;
     for (i = 0; i < 2; i++, p++) {
         if (count < 3) {
-            accum.x += *(s16 *)self->unk68 * D_800877F8[count];
+            accum.x += *(s16 *)self->unk68 * gModelChildSpacing[count];
         } else {
-            accum.y += D_800877F8[count];
+            accum.y += gModelChildSpacing[count];
         }
         if (reuse) {
             LinkNode *child = *p;
@@ -299,18 +299,18 @@ void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse) {
 }
 
 /* Per-`unk70`-slot table (same index space `Class876FC__BuildRandomSprites` reads through
- * D_80087844/D_8008785C/D_80087868/D_80087874); used both as a "channel
+ * gSpriteShiftX/gSpriteScaleLarge/gSpriteScaleHalf/gSpriteScaleSmall); used both as a "channel
  * active" guard (nonzero test) and as a divisor for the two modulus checks
  * below. */
-extern s32 D_8008780C[];
+extern s32 gModelChildDriftZ[];
 /* A Vec3S "base offset" constant, added (via its .z only) to a per-child
  * accumulator before being forwarded to each arr7C child's slotB8. */
-extern Vec3S D_8008782C;
+extern Vec3S gModelChildDriftInit;
 /* Opaque table handle, forwarded unchanged to slot44 for self and for each
  * arr7C child -- passed as a plain s32 per the slot's established
  * signature (see AttachWithRotScale's use of the same slot with an s32
  * argument), not dereferenced anywhere in this function. */
-extern s32 D_80087838[];
+extern s32 gSpinRotStep[];
 
 #if 0
 /* round 44 (2026-09-15): best-reached body, 117/121 words, NOT byte-exact.
@@ -330,24 +330,24 @@ void Class876FC__DriftModelChildren(LinkNode *self)
 
     idx = self->unk70;
     if (self->unk6C != 0) {
-        tab70 = &D_8008780C[idx];
+        tab70 = &gModelChildDriftZ[idx];
         if (*tab70 != 0 && (u32) self->unk24 >= 0x1F5) {
             p = self->arr7C;
-            self->methods->slot44(self, 0, (s32) D_80087838);
+            self->methods->slot44(self, 0, (s32) gSpinRotStep);
 
             i = 0;
             tab70b = tab70;
             accumOffset = 0;
             for (; i < 2; i++) {
-                Vec3S local = D_8008782C;
+                Vec3S local = gModelChildDriftInit;
                 local.z += accumOffset + *tab70b;
                 (*p)->methods->slotBC(*p, &local);
                 accumOffset += 3;
-                (*p)->methods->slot44(*p, 0, (s32) D_80087838);
+                (*p)->methods->slot44(*p, 0, (s32) gSpinRotStep);
                 p++;
             }
 
-            divq = 24500 / D_8008780C[idx];
+            divq = 24500 / gModelChildDriftZ[idx];
             modend = self->unk24;
             if (divq >= 0) {
                 if ((u32) modend % (u32) divq == 0) {
@@ -378,7 +378,7 @@ void Class876FC__ReleaseModelChildren(LinkNode *self) {
 
 void Class876FC__BuildRandomSprites(LinkNode *self) {
     s32 parity = rand() % 2;
-    void *tblOrNull = parity ? NULL : D_80087868;
+    void *tblOrNull = parity ? NULL : gSpriteScaleHalf;
     LinkNode *child;
     void *arg;
 
@@ -388,8 +388,8 @@ void Class876FC__BuildRandomSprites(LinkNode *self) {
         LinkNodeMethods *m;
 
         child = self->arr84[1];
-        D_80087880.x = D_80087844[self->unk70];
-        BaseObjO__AddVec14(child, &D_80087880);
+        gSpriteShiftScratch.x = gSpriteShiftX[self->unk70];
+        BaseObjO__AddVec14(child, &gSpriteShiftScratch);
         m = child->methods;
         arg = (self->unk78 != NULL) ? self->unk78 : self->unk74;
         m->slotB8(child, arg);
@@ -397,7 +397,7 @@ void Class876FC__BuildRandomSprites(LinkNode *self) {
         child = self->arr84[1];
         child->methods->slot64(child, 1);
         child->methods->slot68(child, 0);
-        child->methods->slot48(child, 1, (parity != 0) ? D_8008785C : D_80087874);
+        child->methods->slot48(child, 1, (parity != 0) ? gSpriteScaleLarge : gSpriteScaleSmall);
     }
 
     self->arr84[2]->methods->slot60(self->arr84[2], 0);

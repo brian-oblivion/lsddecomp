@@ -10,7 +10,7 @@ an "active" guard and `self->unk70` as an index into a small lookup table; if
 both guards and a third bound check on `self->unk24` pass, it forwards a
 table handle to `self` and to each of the two `arr7C` children, folds a
 per-child Vec3 offset and dispatches it through vtable slot `slotBC`, then
-runs a modulus check against a `24500 / D_8008780C[idx]` quotient to decide
+runs a modulus check against a `24500 / gModelChildDriftZ[idx]` quotient to decide
 whether to call `Class876FC__PlaceModelChildren(self, 1)`. Always zeroes `*self->unk14` on
 every exit path.
 
@@ -44,24 +44,24 @@ void Class876FC__DriftModelChildren(LinkNode *self)
 
     idx = self->unk70;
     if (self->unk6C != 0) {
-        tab70 = &D_8008780C[idx];
+        tab70 = &gModelChildDriftZ[idx];
         if (*tab70 != 0 && (u32) self->unk24 >= 0x1F5) {
             p = self->arr7C;
-            self->methods->slot44(self, 0, (s32) D_80087838);
+            self->methods->slot44(self, 0, (s32) gSpinRotStep);
 
             i = 0;
             tab70b = tab70;
             accumOffset = 0;
             for (; i < 2; i++) {
-                Vec3S local = D_8008782C;
+                Vec3S local = gModelChildDriftInit;
                 local.z += accumOffset + *tab70b;
                 (*p)->methods->slotBC(*p, &local);
                 accumOffset += 3;
-                (*p)->methods->slot44(*p, 0, (s32) D_80087838);
+                (*p)->methods->slot44(*p, 0, (s32) gSpinRotStep);
                 p++;
             }
 
-            divq = 24500 / D_8008780C[idx];
+            divq = 24500 / gModelChildDriftZ[idx];
             modend = self->unk24;
             if (divq >= 0) {
                 if ((u32) modend % (u32) divq == 0) {
@@ -93,9 +93,9 @@ s32 unk24;    /* +0x024, used as a modulus dividend -- entry guard is
                  `>= 0x1F5`, NOT `< 0x1F5` (round 26's reading corrected
                  above) */
 
-extern s32 D_8008780C[];
-extern Vec3S D_8008782C;
-extern s32 D_80087838[];
+extern s32 gModelChildDriftZ[];
+extern Vec3S gModelChildDriftInit;
+extern s32 gSpinRotStep[];
 ```
 
 ## What round 44 fixed (from 23/121 raw / 1-word-short, to 117/121 raw / length-exact)
@@ -155,20 +155,20 @@ None of these four changed the function's WORD COUNT — length has been exact
 
 ## NOT CLOSED this round: one residue, 4 words, pure commutative register identity
 
-**The `&D_8008780C[idx]` pointer computation's TWO temp registers are still
+**The `&gModelChildDriftZ[idx]` pointer computation's TWO temp registers are still
 swapped** at the FIRST occurrence only (before `tab70b` exists) — `v0`/`v1`
 hold the shift-result and the base address in the opposite roles from
 retail:
 
 ```
-retail:  sll v1,s5,2 / lui v0,%hi(D_8008780C) / addiu v0,v0,%lo(...) / addu s1,v1,v0
-built:   sll v0,s5,2 / lui v1,%hi(D_8008780C) / addiu v1,v1,%lo(...) / addu s1,v0,v1
+retail:  sll v1,s5,2 / lui v0,%hi(gModelChildDriftZ) / addiu v0,v0,%lo(...) / addu s1,v1,v0
+built:   sll v0,s5,2 / lui v1,%hi(gModelChildDriftZ) / addiu v1,v1,%lo(...) / addu s1,v0,v1
 ```
 
 Tried this round, both inert (byte-identical output to the array form):
-- `tab70 = D_8008780C + idx;` (pointer-arithmetic form) — confirms round
+- `tab70 = gModelChildDriftZ + idx;` (pointer-arithmetic form) — confirms round
   26's own finding still holds under the new context.
-- `tab70 = (s32 *)((u8 *)D_8008780C + (idx << 2));` (explicit byte-offset
+- `tab70 = (s32 *)((u8 *)gModelChildDriftZ + (idx << 2));` (explicit byte-offset
   cast form) — also no effect, ruling out the array-vs-pointer-vs-manual-shift
   surface syntax entirely as a lever for THIS specific commutative pair.
 
@@ -190,7 +190,7 @@ under `lsddecomp2-wt-charlie`) and left to self-terminate on its own
 
 ## Do not re-try, without a new idea
 
-- Any resyntax of `&D_8008780C[idx]` vs `D_8008780C + idx` vs explicit
+- Any resyntax of `&gModelChildDriftZ[idx]` vs `gModelChildDriftZ + idx` vs explicit
   pointer-cast-and-shift: three surface spellings tried across two rounds,
   byte-identical machine code every time. The RTL this lowers to is fixed
   regardless of source spelling; the swap is a register-allocator choice made

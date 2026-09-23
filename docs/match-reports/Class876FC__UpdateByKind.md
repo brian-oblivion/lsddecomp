@@ -7,7 +7,7 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies: stub-stalled as
-`gp_rel`-blocked on `D_8008ACAC`/`D_8008ACB0`, both already present in
+`gp_rel`-blocked on `D_8008ACAC`/`gTrackedYSnapshot`, both already present in
 `config/gp-symbols.txt`. Matched byte-exact this round (after fixing an
 unrelated whole-image size regression caused by a sibling function in the
 same session -- see `Class876FC__SpawnSprites`'s report).
@@ -18,7 +18,7 @@ The second of this unit's three `self->unk54`-dispatch handlers (see
 `Class876FC__ReleaseByKind`'s comment and `Class876FC__InitByKind`, the first). Folds
 `*(Vec3S*)arg1 + self->unk58` into a stack-local, adds the delta between
 `D_8008ACAC`'s pointee's `+0x18` field and the snapshot `Class876FC__InitByKind` left
-in `D_8008ACB0`, forwards the result through `slotB8`, then dispatches on
+in `gTrackedYSnapshot`, forwards the result through `slotB8`, then dispatches on
 `unk54` to one of three different callees than `Class876FC__InitByKind`'s own switch.
 
 ## C
@@ -28,7 +28,7 @@ void Class876FC__UpdateByKind(LinkNode *self, void *arg1) {
     Vec3S local;
 
     AddVec3(&local, (Vec3S *)arg1, &self->unk58);
-    local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - D_8008ACB0;
+    local.y += *(s32 *)((u8 *)D_8008ACAC + 0x18) - gTrackedYSnapshot;
     self->methods->slotB8(self, &local);
 
     switch (self->unk54) {
@@ -60,9 +60,9 @@ void Class876FC__UpdateByKind(LinkNode *self, void *arg1) {
   `INCLUDE_ASM` as of this report) and is likewise called here with a dead
   second argument; same old-style-declaration treatment, needed so the
   eventual real (one-argument) definition doesn't conflict.
-- This function and `Class876FC__InitByKind` share the `D_8008ACAC`/`D_8008ACB0`
+- This function and `Class876FC__InitByKind` share the `D_8008ACAC`/`gTrackedYSnapshot`
   snapshot-and-diff pattern; `Class876FC__InitByKind` always runs first for a given
-  node (it's the one that WRITES `D_8008ACB0`), so the diff computed here is
+  node (it's the one that WRITES `gTrackedYSnapshot`), so the diff computed here is
   "how much did the tracked field move since the last time `Class876FC__InitByKind`
   ran" -- descriptive only, doesn't affect the C shape.
 

@@ -7,7 +7,7 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies: stub-stalled as
-`gp_rel`-blocked on `D_8008ACAC`/`D_8008ACB0` (and, in an even older revision
+`gp_rel`-blocked on `D_8008ACAC`/`gTrackedYSnapshot` (and, in an even older revision
 of this report, `addiu_at`, itself resolved round 21). Both globals were
 already present in `config/gp-symbols.txt`. Matched byte-exact this round.
 
@@ -16,7 +16,7 @@ already present in `config/gp-symbols.txt`. Matched byte-exact this round.
 One of this unit's three `self->unk54`-dispatch handlers (see
 `Class876FC__ReleaseByKind`'s comment). Folds `*arg2 + self->unk58` into a stack-local
 Vec3, forwards it through `AttachWithRotScale`, snapshots a lookup table's current
-value into `D_8008ACB0`, and — only when `unk54` is 0 or 1 — calls through a
+value into `gTrackedYSnapshot`, and — only when `unk54` is 0 or 1 — calls through a
 NEW cross-class vtable slot (`+0x080` on the object pointed to by the global
 `D_8008ACA4`) before dispatching on `unk54` a second time.
 
@@ -27,7 +27,7 @@ void Class876FC__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
     Vec3S local;
     s32 state;
 
-    D_8008ACB0 = *(s32 *)((u8 *)D_8008ACAC + 0x18);
+    gTrackedYSnapshot = *(s32 *)((u8 *)D_8008ACAC + 0x18);
     AddVec3(&local, arg2, &self->unk58);
     AttachWithRotScale(self, arg1, &local, self->unk64, self->unk68);
 
@@ -68,7 +68,7 @@ typedef struct {
 extern D_8008ACA4Obj *D_8008ACA4;
 extern void *D_8008ACA8;
 extern void *D_8008ACAC;
-extern s32 D_8008ACB0;
+extern s32 gTrackedYSnapshot;
 extern s32 D_8008AB98[];
 ```
 

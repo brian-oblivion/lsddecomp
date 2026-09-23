@@ -19,7 +19,7 @@ branch:
 ```
 
 The stall report argued `$a1` is never read on either path. That is right for
-the fallthrough (`$a1` is overwritten by `%hi(D_80087880)` in the very next
+the fallthrough (`$a1` is overwritten by `%hi(gSpriteShiftScratch)` in the very next
 instruction) and **wrong for the branch-taken path**, which is the half that
 decides. Read `.L80056C78` forward to its first call:
 
@@ -76,7 +76,7 @@ siblings cheap and non-binding.
 
 Delta's other two findings were correct and are kept: the `child->methods`
 hoist that fills an earlier load-delay slot, and the `(parity != 0) ?
-D_8008785C : D_80087874` branch sense. Without those this is 84/87, not 86/87 --
+gSpriteScaleLarge : gSpriteScaleSmall` branch sense. Without those this is 84/87, not 86/87 --
 the head's contribution here is the last word, not the body.
 
 ## Adjudication: why the class was wrong, and the discriminator that catches it
