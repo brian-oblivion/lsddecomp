@@ -53,7 +53,7 @@ return 1;
     not `u32`) -- gates the entire "accumulate list into `unk38`" block
     (only runs when `< 0`).
   - `+0xC`: **CONFLICTS with the ALREADY-TYPED `UnkOwner_d294 *unkC`**
-    (an owner back-reference, established by `func_8001D0EC`/
+    (an owner back-reference, established by `Class6B5CC__AttachToParent`/
     `func_8001D1A4` in `code_d294.c`). This function's OWN use --
     null-checked, then (when non-null) `self->unk14` is read and treated
     as the base for a `+0x38` sub-table, exactly the SAME
@@ -217,18 +217,18 @@ live, not dead code).
 unk14` needs to be usable as a POINTER here** (`node->unk14->unk18/
 unk1C/unk20`, the same "position" shape as `Class6B5CCObj::unk14`'s own
 `Class6B5CCSub14 *`), but it is currently typed `s32` in
-`include/code_d294.h`, established by `func_8001D0EC` (already matched,
+`include/code_d294.h`, established by `Class6B5CC__AttachToParent` (already matched,
 this unit) which only ever COPIES the raw value
 (`self->unk14->unk48 = owner->unk14;`, both currently `s32`) and never
 dereferences it. A straight `lw`/`sw` word copy is emitted identically
 whether the field is `s32` or a pointer, so retyping it to
 `Class6B5CCSub14 *` (matching the exact field-access shape this function
-needs) is very likely SAFE for `func_8001D0EC`'s existing match -- but
+needs) is very likely SAFE for `Class6B5CC__AttachToParent`'s existing match -- but
 "very likely safe" is exactly the kind of shared-struct-edit CLAUDE.md
 says to verify with the full oracle before trusting, not assume. This is
 the concrete next step for whoever attempts the C: retype
 `UnkOwner_d294::unk14`, immediately re-run `./build-and-verify.sh` to
-confirm `func_8001D0EC` (and anything else touching that field) is
+confirm `Class6B5CC__AttachToParent` (and anything else touching that field) is
 unaffected, THEN write this function's body using the four-buffer stack
 layout and the four-times-repeated ternary above.
 
@@ -250,7 +250,7 @@ before real C-writing can start, not more open-ended derivation.
 
 Went ahead with the retype flagged above: `UnkOwner_d294::unk14` changed
 from `s32` to `Class6B5CCSub14 *` in `include/code_d294.h`. **Verified
-safe immediately** -- `func_8001D0EC` (`src/code_d294.c`, a DIFFERENT
+safe immediately** -- `Class6B5CC__AttachToParent` (`src/code_d294.c`, a DIFFERENT
 unit this runner does not own for editing, but the shared header is
 owned by this runner this round) still compiles (one new warning,
 "assignment makes integer from pointer without a cast", not an error --

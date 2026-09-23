@@ -1383,3 +1383,4 @@ Class6B5CC__OnNotify = 0x8001CD60; // type:func
 Class6B5CC__Reset = 0x8001CE30; // type:func
 Class6B5CC__UpdateRotation = 0x8001CEB4; // type:func
 Class6B5CC__UpdateScale = 0x8001D008; // type:func
+Class6B5CC__AttachToParent = 0x8001D0EC; // type:func

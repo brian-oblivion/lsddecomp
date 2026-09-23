@@ -1,4 +1,6 @@
-# func_8001D0EC
+# Class6B5CC__AttachToParent
+
+> Renamed from `func_8001D0EC` on 2026-09-23 (tools/rename.py). Address 0x8001d0ec.
 
 **Unit:** code_d294 · **Size:** 46 words · **Status:** MATCHED (46/46 words)
 
@@ -17,7 +19,7 @@ zeroes those three fields if `vec` is `NULL`, and finally clears
 ## The C
 
 ```c
-Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
+Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
     Class6B5CCSub14 *sub;
 
     if (self->unkC == NULL) {

@@ -47,7 +47,7 @@ value sitting stale in the register from far earlier in that function.
 
 Round 70 (alpha). `func_800567D4` -> `AttachWithRotScale`, **tier A**.
 
-Pure forwarder: slot +0x04C (func_8001D0EC: sets the parent link and
+Pure forwarder: slot +0x04C (Class6B5CC__AttachToParent: sets the parent link and
 coord2 `super`, writes `trans` into coord.t), then slots +0x044 and +0x048
 with set = 1 (Class6B5CC__UpdateRotation assigns GsCOORD2PARAM.rotate from a degree ratio
 triple; Class6B5CC__UpdateScale assigns .scale). Both callers

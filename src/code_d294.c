@@ -142,7 +142,7 @@ void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
     self->unk14->unk0 = 0;
 }
 
-Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
+Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
     Class6B5CCSub14 *sub;
 
     if (self->unkC == NULL) {

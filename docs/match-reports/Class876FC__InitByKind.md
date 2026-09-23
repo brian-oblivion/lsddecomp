@@ -177,7 +177,7 @@ method signatures; zero bytes changed.
 | +0x084 | arr84 | sprites | B | New_D800879C4 objects (GsSPRITE at +0x64, see Class876FC__SpawnSprites) |
 | slot +0x044 | slot44 | updateRotation | B | Class6B5CC__UpdateRotation (set/add GsCOORD2PARAM.rotate, degrees) |
 | slot +0x048 | slot48 | updateScale | B | Class6B5CC__UpdateScale (set/add .scale); sprite override func_80057DF4 also a scale |
-| slot +0x04C | slot4C | attachToParent | B | func_8001D0EC (parent link, coord2 super, coord.t) |
+| slot +0x04C | slot4C | attachToParent | B | Class6B5CC__AttachToParent (parent link, coord2 super, coord.t) |
 | slot +0x060 | slot60 | setDisplay | B | func_8001D344 / func_8004220C: attribute bit 31 = !on (GsDOFF) |
 | slot +0x064 | slot64 | setSemiTrans | B | func_8001D374 / func_8004223C: bit 30 (GsALON) |
 | slot +0x068 | slot68 | setSemiTransRate | B | func_8001D3A0 / func_80042268: bits 28-29 (GsAZERO..GsATHREE) |
