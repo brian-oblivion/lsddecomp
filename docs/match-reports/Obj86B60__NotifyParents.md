@@ -1,4 +1,86 @@
-# Obj86B60__NotifyParents — STALL, IMPROVED round 46 (register identity, now CLEANLY isolated; best 23/32, up from 21/32)
+# Obj86B60__NotifyParents — MATCHED round 72 (32/32, length exact; was STALL 23/32 "register identity")
+
+REVISITED, round 72: MATCHED 32/32, whole image green; names/types not relevant (the lever was call structure, not a type or a name).
+
+## ROUND 72 (runner bravo): MATCHED -- the "register identity" was a global-alloc PRIORITY, set by how many times `self` is referenced
+
+**Rebuilt as given first** (the round-46/62 NON_MATCHING body, barrier
+variant, spliced live): **23/32, insertions 2 / deletions 2**, positional
+skeleton diffs 9, no drift -- the title's figures reproduce; plan.py's
+`len-off` tag is stale (length was already exact).
+
+**Discriminator.** `cc1 -dl` on a standalone reproducer (pinned
+pipeline, same output as the image) prints the pseudo stats global-alloc
+ranks by, priority = `floor_log2(refs) * refs / live_length`:
+
+```
+Register 71 (self)    used 6 times across 14 insns  -> 2*6/14 = 0.857
+Register 72 (arg1)    used 4 times across 10 insns  -> 2*4/10 = 0.800
+Register 73 (methods) used 4 times across 12 insns  -> 2*4/12 = 0.667
+```
+
+Highest priority takes the first free callee-saved register, so `self`
+-> `$s0`, `arg1` -> `$s1`, `methods` -> `$s2`. Retail has `arg1` in
+`$s0`, so in retail `self` has FEWER references. Six refs = the copy
+from `$a0`, the `methods` load, the `unk20` store, and one `move a0`
+per call -- THREE calls. But retail's two mode calls end in one shared
+`jalr v0; move a0,$s1` (what looked like cross-jumping). If the source
+itself has one call there, `self` has 5 refs, 2*5/14 = 0.714 < 0.800,
+and the order flips.
+
+**The match:**
+
+```c
+void Obj86B60__NotifyParents(Obj86B60 *self, s32 arg1)
+{
+    Obj86B60Methods *methods;
+    void (*fn)(Obj86B60 *);
+
+    methods = self->methods;
+    __asm__("" ::: "memory");
+    self->unk20 = arg1;
+    methods->slot30(self);
+    if (arg1 == 2) {
+        fn = methods->slot64;
+    } else if (arg1 == 3) {
+        fn = methods->slot68;
+    } else {
+        return;
+    }
+    fn(self);
+}
+```
+
+Without the barrier the register identity is already right
+(`self`->`$s1`, `arg1`->`$s0`), but `move s0,a1` lands late, after the
+`lw s2,0(s1)`. The round-46 barrier puts it back in the prologue. That
+is instruction ORDER only (it is the same barrier the stall body already
+carried), so HARD RULE 6 allows it. Two barrier-free spellings were tried
+standalone and both left the move late: `self->unk20 = arg1;` before the
+`methods` load, and `methods` initialised at its declaration. So the
+barrier stays.
+
+Builds this round: 5 image builds, 7 standalone. No permuter search (the
+first structural lever matched), so Gate 3 was not needed.
+
+The round-13/46 conclusion that this signature (a full swap, 0
+insertions/deletions, frame exact) is "outside source-mutation reach" was
+WRONG. The swap came from the source's CALL COUNT, which a permuter
+rarely changes. That is also why round 46's 82k-iteration search found
+nothing.
+
+### Proposed learning (round 72)
+
+**A full callee-saved swap between two parameters, with the frame exact,
+is a global-alloc priority tie-break. Measure it with `cc1 -dl`; don't
+reason about it.** The `.lreg` dump gives each pseudo's refs and live
+length, and priority `floor_log2(refs)*refs/live_length` decides who gets
+`$s0`. So the question to ask is "which value does retail reference more
+or less often". A shared `jalr; move a0,sN` tail across two `if` arms,
+where each arm only differs in the slot loaded, is the tell that the
+source had ONE call through a function pointer chosen per arm. Two calls
+merged by cross-jumping still count as two references.
+
 
 > Renamed from `func_8003E4B8` on 2026-09-19 (tools/rename.py). Address 0x8003e4b8.
 
