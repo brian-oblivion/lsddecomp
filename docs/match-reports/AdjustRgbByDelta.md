@@ -43,7 +43,9 @@ None -- routine leaf match, no lever needed.
 
 ## Naming
 
-**`AdjustRgbByDelta`, tier A.**
+**`AdjustRgbByDelta`, tier B** (head, round 72 merge: runner filed it tier A). The mechanics are a pure leaf, but "Rgb" asserts what the three bytes MEAN, and neither consumer (`slotB8(obj, 1, rgb)`, `slot64(self, rgb)`) has an established meaning yet. Stride-3 byte tables make colour likely, not proven; promote to A when either slot is identified as a colour setter.
+
+Runner's original entry, kept for the record:
 
 Pure 3-line leaf: `dst[0]=src[0]-delta; dst[1]=src[1]-delta;
 dst[2]=src[2]+delta;` -- no globals, no calls, no control flow. Per track 3's

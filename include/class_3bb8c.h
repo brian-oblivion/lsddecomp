@@ -2591,7 +2591,7 @@ extern void func_80049098(void *arg0, s32 arg1, s32 arg2);
 extern void TickStyle(void *arg0, void *arg1, s32 arg2);
 
 /* func_80053134's own helpers -- MATCHED, src/class_3bb8c_n.c (StyleTeardown)
- * and still-uncarved ground (TickDreamAuxSlots2), called with no arguments
+ * and src/code_4cd08.c (TickDreamAuxSlots2), both matched, called with no arguments
  * and their return values unused. */
 extern void TickDreamAuxSlots2(void);
 extern void StyleTeardown(void);
