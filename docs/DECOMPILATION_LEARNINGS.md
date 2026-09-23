@@ -373,7 +373,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   A delay-slot `move $aN, $vM` is filler only once `$aN`'s next READ on every path is found; in
   `func_80034138` a store two blocks on read it, so the source stored the wrong value (the unused
   parameter instead of a local). A permuter never swaps which variable a statement stores, so
-  no search finds this. (round 69)
+  searching cannot find it. (round 69)
 - **A bare `nop` in a call's delay slot establishes arity ONLY when the argument is not already in
   the right register** — those two cases are BYTE-IDENTICAL. **MIPS o32 fills argument registers
   strictly left to right**, so untouched `$a1` with `$a2`/`$a3` set PROVES a forwarded parameter;
@@ -414,8 +414,8 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   tail-merge or register-identity stall.** Beyond the sign-extend pair, the narrowed argument is not
   CSE'd with the widened value later calls reuse, so the build comes out N words short with one
   fewer callee-saved register. Discriminator: the callee masks the parameter wider than its declared
-  type (`0xFF00` on an `s16`). `func_80034690` went 195 -> 190 -> 200/200 on `s16`->`s32`; run it
-  beside the return-type listing above. (round 69)
+  type (`0xFF00` on an `s16`). `func_80034690` went 195 -> 190 -> 200/200 on `s16`->`s32`; pair it
+  with the return-type listing. (round 69)
 - **A wrong extern arity and the deliberate dead-argument idiom are told apart at the CALL SITE,
   never in the callee** — the callee says "ignores `$a1`" either way. Does retail emit an
   instruction for the extra argument (`move a1,zero`, `li a0,0xff`)? Then the declaration is
