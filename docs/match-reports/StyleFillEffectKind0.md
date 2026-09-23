@@ -79,7 +79,7 @@ extern u8 D_8008E0A4[];
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* this unit, cold */
 extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);   /* this unit, cold,
                                                          signature widened */
-extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
+extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
 
 void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     void **arr;
@@ -100,7 +100,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = func_80056320((void *) 0, D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        *arr = New_Class876FC((void *) 0, D_8008E0A4, (void *) gStyleCueSelf, arg2);
         arr++;
     }
     return (void *) arr;
@@ -180,9 +180,9 @@ runner/round rather than re-deriving the structure.
 **`StyleFillEffectKind0`, tier B.**
 
 Fills `arg1` slots of `gStyleEffectSlots` by repeatedly calling
-`class_3bb8c_r.c`'s `func_80056320` (New_X for the `Obj876FC` class) with a
+`class_3bb8c_r.c`'s `New_Class876FC` (New_X for the `Obj876FC` class) with a
 literal FIRST argument of `0`. That argument is confirmed (by reading
-`func_80056320`'s own ctor chain, `class_3bb8c_r.c`) to become the new
+`New_Class876FC`'s own ctor chain, `class_3bb8c_r.c`) to become the new
 object's `kind` field -- so "Kind0" in the name is the literal tag value
 this function passes, not a guessed category. Selects which of two
 "spawn-parameter" setup functions (`SetupStyleSpawnParamsA`/`B`) to call each

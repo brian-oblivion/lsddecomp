@@ -61,7 +61,7 @@ u8 **q;
 q = &D_8008E0B0;
 *q = D_80087174;
 ...
-func_80056320((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
+New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
 ```
 
 **16/79 and 1 short -> 42/79 and LENGTH EXACT**, skeleton diffs 59 -> 35.
@@ -86,7 +86,7 @@ Retyping to the sibling's shape:
 ```c
 void **StyleFillEffectKind2(void **arg0, void *arg1) {
     ...
-    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
@@ -230,7 +230,7 @@ local COUNT (this session's other two matches) or a declaration.
 - **(a)** an explicit alias for the first store:
   `new_var = slot; *new_var = (s32) (D_80087228 + idx * 3);`
 - **(b)** a named local for the `gStyleCueSelf` load, passed as
-  `func_80056320`'s third argument.
+  `New_Class876FC`'s third argument.
 
 Screened for UB first (no use-before-init, no staleness across a back-edge,
 each assignment consumed immediately -- it passes the forward-trace screen),
@@ -283,7 +283,7 @@ extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0BC;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
-extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
+extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
 
 void **StyleFillEffectKind2(void **arg0, void *arg1) {
     s32 idx;
@@ -307,7 +307,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     *q = D_80087174;
     randval = rand();
     D_8008E0BC = randval - (randval / 3) * 6;
-    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
@@ -388,5 +388,5 @@ record of what someone did, not a proof of what does not work.
 Called only when `gStyleVariant == 2`, from `StyleBuildEffectSlots`, as
 the kind-2-exclusive finishing fill (the sibling of `StyleFillEffectKind3`,
 mirrored for the other variant). Passes a literal kind argument of `2` to
-`func_80056320`. STALL, 49/79 words (length exact), residue at ins 3/del 3
+`New_Class876FC`. STALL, 49/79 words (length exact), residue at ins 3/del 3
 per the round-64 revisit.

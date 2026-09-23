@@ -20,7 +20,7 @@
  * decoration object (`gStyleDecorObj`, `New_ClassEAC0`-allocated), an
  * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
  * `Obj876FC`-class "effect slots" array (`gStyleEffectSlots`,
- * `class_3bb8c_r.c`'s `func_80056320` allocator, kind-tagged 0..3 by
+ * `class_3bb8c_r.c`'s `New_Class876FC` allocator, kind-tagged 0..3 by
  * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
  * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
  * `FindNearestStyleCueEntry`/`FlushStyleCue`/`StopStyleCueIfNear`/
@@ -443,7 +443,7 @@ extern s32 D_8008E0BC;
 extern s32 D_8008E0A4;
 extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);
-extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
+extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
 
 /* STALL, 93/99 words (length matches, 0x18C, re-measured round 48; earlier
  * round 47 report recorded 87/99), whole-function arg0/arg1/arg2
@@ -472,7 +472,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = func_80056320((void *) 0, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        *arr = New_Class876FC((void *) 0, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
         arr++;
     }
     return (void *) arr;
@@ -491,7 +491,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     D_8008E0B4 = D_80087204;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *) val);
-        *arg0 = func_80056320((void *) 1, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC((void *) 1, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -551,7 +551,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     t = gStyleCueSelf;
     q = &D_8008E0B0;
     *q = D_80087174;
-    *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
+    *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
     arg0++;
     return arg0;
 }
@@ -606,7 +606,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     *q = D_80087174;
     randval = rand();
     D_8008E0BC = randval - (randval / 3) * 6;
-    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
+    *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }

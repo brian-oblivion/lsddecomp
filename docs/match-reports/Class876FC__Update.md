@@ -1,4 +1,6 @@
-# func_800564F4 -- MATCHED (11/11 words)
+# Class876FC__Update -- MATCHED (11/11 words)
+
+> Renamed from `func_800564F4` on 2026-09-23 (tools/rename.py). Address 0x800564f4.
 
 Unit: `class_3bb8c_r` (round 17 continuation). Increments `self->unk24`
 and forwards to `Class876FC__UpdateByKind` (a plain statement call, not a tail-call
@@ -9,7 +11,7 @@ whose return is forwarded -- the function itself is `void`).
 ```c
 extern void Class876FC__UpdateByKind(Obj876FC *self);
 
-void func_800564F4(Obj876FC *self) {
+void Class876FC__Update(Obj876FC *self) {
     self->unk24 = self->unk24 + 1;
     Class876FC__UpdateByKind(self);
 }
@@ -17,7 +19,7 @@ void func_800564F4(Obj876FC *self) {
 
 ## Derivation
 
-`self->unk24` (the SAME field `func_800564A4` clears to 0, confirming
+`self->unk24` (the SAME field `Class876FC__SetParams` clears to 0, confirming
 it's a plain counter this class maintains) is loaded, incremented, and
 stored back BEFORE the call to `Class876FC__UpdateByKind` -- the store sits in the
 `jal`'s own delay slot in the disassembly, matching a normal C statement

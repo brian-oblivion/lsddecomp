@@ -1,7 +1,9 @@
-# func_800563C0 -- MATCHED (41/41 words)
+# Class876FC__Class876FC -- MATCHED (41/41 words)
+
+> Renamed from `func_800563C0` on 2026-09-23 (tools/rename.py). Address 0x800563c0.
 
 Unit: `class_3bb8c_r` (round 17 continuation). `Obj876FCMethods::ctor`
-(vtable offset `+0x008` of `D_800876FC`) -- chains to the shared base
+(vtable offset `+0x008` of `gClass876FCMethods`) -- chains to the shared base
 class's own ctor (`DreamSys__GetBaseMethods()->ctor`, the SAME shared-base getter
 `class_3bb8c_o.c` already used for its own `BaseObjO__BaseObjO`/
 `New_BaseObjO` last pass), installs this class's own vtable, sets two
@@ -11,7 +13,7 @@ its return value's side effect only.
 ## Final source
 
 ```c
-void *func_800563C0(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
+void *Class876FC__Class876FC(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
     if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
         goto fail;
     }

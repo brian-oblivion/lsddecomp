@@ -45,11 +45,11 @@
  *    fill in a handful of numeric fields. Kept as its own local view,
  *    `ParamObj`/`ParamMethods` -- nothing here justifies asserting a
  *    BasicClass relationship just because the slot count coincides.
- *  - func_800563C0 (ctor) / func_80056464 (dtor) / func_800564A4 (slot40)
- *    / func_800564F4 are occupants of `D_800876FC` -- the SAME sibling
+ *  - Class876FC__Class876FC (ctor) / Class876FC__Finalize (dtor) / Class876FC__SetParams (slot40)
+ *    / Class876FC__Update are occupants of `gClass876FCMethods` -- the SAME sibling
  *    table `class_3bb8c_o.c` (round 17, previous pass, already merged)
  *    partly resolved from the OTHER side (its own `func_80056F4C` returns
- *    `&D_800876FC`, and its shared-base slots +0x010/+0x014/+0x018/+0x088/
+ *    `&gClass876FCMethods`, and its shared-base slots +0x010/+0x014/+0x018/+0x088/
  *    etc. are INHERITED, not overridden, by this class). This unit
  *    supplies the class's OWN slots (ctor/dtor/slot40), confirmed by both
  *    chaining to `DreamSys__GetBaseMethods()` -- the SAME shared-base getter
@@ -58,10 +58,10 @@
  *    `class_3bb8c_o.c` is not this unit's to edit, and per the
  *    multiple-independent-local-views convention there is no reason a
  *    fresh view here should match its field names field-for-field.
- *  - func_80056320 is a plain `New_X` allocator (0x98 bytes) for the
- *    `D_800876FC` class, dispatching through `func_80056F4C()->ctor`
+ *  - New_Class876FC is a plain `New_X` allocator (0x98 bytes) for the
+ *    `gClass876FCMethods` class, dispatching through `func_80056F4C()->ctor`
  *    (cross-unit call into the ALREADY-MATCHED `class_3bb8c_o.c` symbol)
- *    rather than calling `func_800563C0` by name.
+ *    rather than calling `Class876FC__Class876FC` by name.
  *  - ComputeStyleCueFalloff is the shared helper every `gStyleCueCallbacks` occupant calls
  *    first (and `StyleCue11` reaches transitively, via a plain call to
  *    `StyleCue10`): reads a small tag byte off `ctx->methods`, looks it
@@ -344,7 +344,7 @@ s32 IsStyleVariantEven(void) {
 }
 
 /* ------------------------------------------------------------------ *
- * D_800876FC's own slots (ctor/dtor/slot40), plus its `New_X` allocator.
+ * gClass876FCMethods's own slots (ctor/dtor/slot40), plus its `New_X` allocator.
  * See the file banner: this is the SAME sibling table `class_3bb8c_o.c`
  * (round 17, previous pass) already partly resolved; this unit's own
  * local view is kept independent, per the multiple-independent-views
@@ -354,10 +354,10 @@ s32 IsStyleVariantEven(void) {
 typedef struct Obj876FC Obj876FC;
 typedef struct Obj876FCMethods {
     u8 pad0[0x8];
-    void *(*ctor)(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4); /* +0x008 func_800563C0 (this unit) */
-    void *(*dtor)(Obj876FC *self);                                                   /* +0x00C func_80056464 (this unit) */
+    void *(*ctor)(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4); /* +0x008 Class876FC__Class876FC (this unit) */
+    void *(*dtor)(Obj876FC *self);                                                   /* +0x00C Class876FC__Finalize (this unit) */
     u8 pad10[0x40 - 0x10];                                                              /* +0x010 .. +0x03F, shared-base slots, not this unit's to name */
-    void (*slot40)(Obj876FC *self, void *arg1);                                           /* +0x040 func_800564A4 (this unit) */
+    void (*slot40)(Obj876FC *self, void *arg1);                                           /* +0x040 Class876FC__SetParams (this unit) */
 } Obj876FCMethods;
 
 /* Declared as a WORD array, not a byte array, so a whole-struct assignment
@@ -372,19 +372,19 @@ typedef struct Block24 {
 struct Obj876FC {
     Obj876FCMethods *methods; /* +0x000 */
     u8 pad4[0x24 - 0x4];        /* +0x004 .. +0x023, unknown */
-    s32 tick;                     /* +0x024, cleared by func_800564A4 */
+    s32 tick;                     /* +0x024, cleared by Class876FC__SetParams */
     u8 pad28[0x44 - 0x28];          /* +0x028 .. +0x043, unknown */
     s32 unk44;                        /* +0x044 */
     u8 pad48[0x54 - 0x48];               /* +0x048 .. +0x053, unknown */
     void *kind;                            /* +0x054, the ctor's own arg1, stashed verbatim */
-    Block24 params;                          /* +0x058, func_800564A4's own 0x24-byte block-copy target */
+    Block24 params;                          /* +0x058, Class876FC__SetParams's own 0x24-byte block-copy target */
 };
 
 /* The shared base-class table getter, SAME symbol `class_3bb8c_o.c`
  * already established as `DreamSys__GetBaseMethods` there (also MEASURED to take no
  * real arguments). Fresh local reading here: this unit needs both `ctor`
  * (+0x008, checked against NULL) and `dtor` (+0x00C, its return value
- * forwarded by func_80056464). */
+ * forwarded by Class876FC__Finalize). */
 typedef struct FixedBaseTableR {
     u8 pad0[0x8];
     void *(*ctor)(void *self); /* +0x008 */
@@ -394,11 +394,11 @@ extern FixedBaseTableR *DreamSys__GetBaseMethods(void);
 
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
-extern Obj876FCMethods *func_80056F4C(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &D_800876FC */
+extern Obj876FCMethods *func_80056F4C(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &gClass876FCMethods */
 extern void Class876FC__ReleaseByKind(Obj876FC *self);
 extern void *Class876FC__InitByKind(Obj876FC *self, void *arg1, void *arg2);
 
-void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3) {
+void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
     Obj876FC *self = func_80017B34(0x98);
 
     if (self != NULL) {
@@ -411,7 +411,7 @@ void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3) {
     return NULL;
 }
 
-void *func_800563C0(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
+void *Class876FC__Class876FC(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
     if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
         goto fail;
     }
@@ -425,19 +425,19 @@ fail:
     return NULL;
 }
 
-void *func_80056464(Obj876FC *self) {
+void *Class876FC__Finalize(Obj876FC *self) {
     Class876FC__ReleaseByKind(self);
     return DreamSys__GetBaseMethods()->dtor(self);
 }
 
-void func_800564A4(Obj876FC *self, Block24 *src) {
+void Class876FC__SetParams(Obj876FC *self, Block24 *src) {
     self->params = *src;
     self->tick = 0;
 }
 
-extern void Class876FC__UpdateByKind(Obj876FC *self); /* arity-ok: the definition is 2-parameter and the callee DOES read $a1 (`move s1,a1` at 0x80056650), but func_800564F4 passes nothing for it -- retail's jal at 0x80056508 has `sw v0,36(a0)` in the delay slot and leaves its own incoming $a1 in place */
+extern void Class876FC__UpdateByKind(Obj876FC *self); /* arity-ok: the definition is 2-parameter and the callee DOES read $a1 (`move s1,a1` at 0x80056650), but Class876FC__Update passes nothing for it -- retail's jal at 0x80056508 has `sw v0,36(a0)` in the delay slot and leaves its own incoming $a1 in place */
 
-void func_800564F4(Obj876FC *self) {
+void Class876FC__Update(Obj876FC *self) {
     self->tick = self->tick + 1;
     Class876FC__UpdateByKind(self);
 }

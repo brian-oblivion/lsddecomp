@@ -132,7 +132,7 @@ the wrong function.
 
 Round 70 (alpha). `func_80056520` -> `Class876FC__InitByKind`, **tier B**.
 
-Only caller is the class's ctor `func_800563C0` (class_3bb8c_r.c), with the
+Only caller is the class's ctor `Class876FC__Class876FC` (class_3bb8c_r.c), with the
 ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(D_8008ACAC + 0x18)`
 into gTrackedYSnapshot; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `Class6B5CC__LinkModel(self,
@@ -141,10 +141,10 @@ Class876FC__PlaceModelChildren(self, 0), 2 -> Class876FC__BuildRandomSprites,
 3 -> LinkOwnerObj__func_56e1c (= Class876FC__SpawnSprites(self, 0, 0, NULL)).
 "Init" rests on the one ctor caller, so B.
 
-The class: every function here runs on a D_800876FC instance.
-`func_80056320` allocates 0x98 bytes (where `sprites[5]` ends) and passes a
+The class: every function here runs on a gClass876FCMethods instance.
+`New_Class876FC` allocates 0x98 bytes (where `sprites[5]` ends) and passes a
 kind 0..3 as its first argument (class_3bb8c_n.c passes 0, 1, 2, 3 at its
-four call sites); `func_800563C0` (table +0x008, the ctor) stores it at
+four call sites); `Class876FC__Class876FC` (table +0x008, the ctor) stores it at
 +0x054. `Class876FC` is the table-address class name, the
 `Class6B5CC`/`Class65650` convention.
 
@@ -164,7 +164,7 @@ method signatures; zero bytes changed.
 | --- | --- | --- | --- | --- |
 | +0x014 | unk14 | coord2 | B | code_d294.h maps Class6B5CCObj +0x14 to GsDOBJ2.coord2; `*coord2 = 0` is its flg |
 | +0x020 | unk20 | model | A | Class6B5CC__LinkModel stores its 2nd argument here; PlaceModelChildren hands it to each child |
-| +0x024 | unk24 | tick | B | func_800564A4 zeroes it, func_800564F4 (slot +0x0EC) increments it before every update |
+| +0x024 | unk24 | tick | B | Class876FC__SetParams zeroes it, Class876FC__Update (slot +0x0EC) increments it before every update |
 | +0x054 | unk54 | kind | B | ctor stores New's first argument, 0..3 at the four class_3bb8c_n.c call sites; three switches on it |
 | +0x058 | unk58 | offset | B | added to the caller's position in Init and Update |
 | +0x064 | unk64 | rotation | B | passed as updateRotation's data |
@@ -192,7 +192,7 @@ different object (captured by BaseObjO__func_56f5c) whose class is unknown.
 For the HEAD, by type scope; none applied here (other units' views).
 
 - `class_3bb8c_r.c` `Obj876FC` (same object): `unk24` -> `tick` (B, same
-  evidence as above: zeroed by func_800564A4, incremented by func_800564F4);
+  evidence as above: zeroed by Class876FC__SetParams, incremented by Class876FC__Update);
   `unk54` -> `kind` (B); `block58` -> `params` (B: the 0x24-byte block this
   unit reads as offset/rotation/scale/modelChildLayout/tableIndex/color/
   altColor).

@@ -1,7 +1,9 @@
-# func_800564A4 -- MATCHED (20/20 words)
+# Class876FC__SetParams -- MATCHED (20/20 words)
+
+> Renamed from `func_800564A4` on 2026-09-23 (tools/rename.py). Address 0x800564a4.
 
 Unit: `class_3bb8c_r` (round 17 continuation). `Obj876FCMethods::slot40`
-(vtable offset `+0x040` of `D_800876FC`) -- a plain 0x24-byte block copy
+(vtable offset `+0x040` of `gClass876FCMethods`) -- a plain 0x24-byte block copy
 from the caller's argument into `self+0x58`, plus a single word clear.
 
 ## Final source
@@ -15,7 +17,7 @@ typedef struct Block24 {
     s32 raw[0x24 / 4];
 } Block24;
 
-void func_800564A4(Obj876FC *self, Block24 *src) {
+void Class876FC__SetParams(Obj876FC *self, Block24 *src) {
     self->block58 = *src;
     self->unk24 = 0;
 }
@@ -29,7 +31,7 @@ void func_800564A4(Obj876FC *self, Block24 *src) {
   `self->methods->slot40(self)` (a plain no-argument dispatch, since its
   OWN concrete class -- a different sibling -- happens to call slot40
   with no extra argument); THIS class's own ctor
-  (`func_800563C0`, this unit) calls the SAME shared slot with a real
+  (`Class876FC__Class876FC`, this unit) calls the SAME shared slot with a real
   second argument, `slot40(self, arg2)`. Both are correct about their own
   call sites: the slot's real arity is 1 argument beyond `self`, and the
   DreamSys-family sibling in `class_3bb8c_o.c` simply never had a value

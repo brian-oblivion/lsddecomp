@@ -44,7 +44,7 @@ void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
 
 ## New vtable slot
 
-`tools/classtable.py D_800876FC` shows `+0x080` occupied by
+`tools/classtable.py gClass876FCMethods` shows `+0x080` occupied by
 `Class6B5CC__GetSetUnk10Flag8` (a `BasicClass`-range function outside this unit, same
 inherited-base pattern as the sibling occupied slots already documented on
 `BaseObjOMethods`). That offset previously sat inside this unit's own

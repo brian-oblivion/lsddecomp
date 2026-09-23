@@ -550,7 +550,7 @@ struct Class6B5CCObj {
      * genuinely a pointer, not an always-zero s32. Still opaque: nothing
      * this unit's chosen functions dereference through it directly. */
     void *unk20;
-    s32 tick;                  /* +0x024, zeroed by Class6B5CC__Reset; tier B name: D_800876FC's update slot increments it once per call (class_3bb8c_s.c LinkNode.tick) */
+    s32 tick;                  /* +0x024, zeroed by Class6B5CC__Reset; tier B name: gClass876FCMethods's update slot increments it once per call (class_3bb8c_s.c LinkNode.tick) */
     /* +0x028, round 12 (code_d294_b): Class6B5CC__DispatchLinkCommand sets this to its own
      * `a1` (a plain `s32`, per m2c's own inference) when called with
      * a2==4. RETYPED round 13 (Class6B5CC__TryAttachNearby): `self->unk28 = other;`

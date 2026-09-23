@@ -17,7 +17,7 @@
  *    convention, unrelated to the class below.
  *  - `BaseObjO`/`BaseObjOMethods` (`New_BaseObjO` onward): the shared
  *    INTERMEDIATE BASE class of `DreamSys` (`DreamSys.h`), `Class65650`
- *    (`code_55dd4.h`'s `D800878D4Methods`), and `D_800876FC`'s own sibling
+ *    (`code_55dd4.h`'s `D800878D4Methods`), and `gClass876FCMethods`'s own sibling
  *    concrete class (`func_80056F4C` is that sibling's own vtable getter,
  *    kept unnamed for consistency with the codebase's other unnamed
  *    singleton getters). `BaseObjO__BaseObjO` is proven to be the BASE's
@@ -183,7 +183,7 @@ struct BaseObjOMethods {
     u8 pad1C[0x40 - 0x1C];                                            /* +0x01C .. +0x03F */
     void (*slot40)(BaseObjO *self);                                     /* +0x040, called by BaseObjO__BaseObjO's own ctor; occupant outside this unit */
     u8 pad44[0x80 - 0x44];                                                /* +0x044 .. +0x07F */
-    void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by BaseObjO__func_56f5c (this unit); occupant outside this unit (D_800876FC's slot80 is Class6B5CC__GetSetUnk10Flag8, a BasicClass-range function) */
+    void *(*slot80)(BaseObjO *self, s32 arg1);                              /* +0x080, called by BaseObjO__func_56f5c (this unit); occupant outside this unit (gClass876FCMethods's slot80 is Class6B5CC__GetSetUnk10Flag8, a BasicClass-range function) */
     u8 pad84[0x8C - 0x84];                                                /* +0x084 .. +0x08B */
     void (*slot8C)(BaseObjO *self, Buf38O *arg1);                            /* +0x08C, called by BaseObjO__func_571f8 */
     void (*slot90)(BaseObjO *self, Buf38O *arg1, s32 arg2);                    /* +0x090, called by BaseObjO__func_571f8 */
@@ -208,10 +208,10 @@ struct BaseObjO {
     s32 unk54;                                          /* +0x054 */
 };
 
-extern BaseObjOMethods D_800876FC;
+extern BaseObjOMethods gClass876FCMethods;
 
 BaseObjOMethods *func_80056F4C(void) {
-    return &D_800876FC;
+    return &gClass876FCMethods;
 }
 
 extern s32 D_8008ACA4;
