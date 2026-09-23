@@ -468,8 +468,8 @@ def main():
           f"  (excluded from game %; NOT a matching goal, see FINISHING-PLAN.md)")
     if library_matched or library_queued:
         print(f"    of which in C units:      {library_matched + library_queued:5d}  ({library_matched} written as C,"
-              f" {library_queued} INCLUDE_ASM; Sony code in game segments: config/sdk-in-game.txt"
-              f" and `identified` symbols)")
+              f" {library_queued} INCLUDE_ASM; Sony code in game segments: config/sdk-in-game.txt,"
+              f" psyq-objects.ld pins, `identified` symbols)")
     # Functions inside `o` segments have no asm and are not counted above: the
     # linker takes them straight from Sony's objects. Report the objects.
     o_text = len(re.findall(r"^\s+- \[\s*0x[0-9A-Fa-f]+\s*,\s*o\s*,\s*[\w/]+\s*\]", YAML.read_text(), re.M))

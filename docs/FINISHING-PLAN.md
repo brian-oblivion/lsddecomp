@@ -19,9 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 12 (2026-09-22, after round 68: the compiler's post-rename
-error list covers only what the default build compiles, so
-`check-nonmatching.sh` is required after every field or slot rename).
+Plan revision: 13 (2026-09-23, after rounds 69 and 70: Sony code inside
+game segments is library at function grain, measured by tools, and belongs
+to track 2, not to tracks 1, 1b or 3).
 Changing the plan is a Fable head task; record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -196,8 +196,23 @@ BODY: <reason>` line in its report title region and is done.
 ### Track 2: the SDK call surface
 
 **Goal.** Every function game code calls whose address lies in a Psy-Q
-segment carries Sony's name. `plan.py --json` lists the unnamed ones under
-`tracks.2.unnamed_list`. Nothing else in the SDK is a goal.
+segment, and every Sony function inside a game segment, carries Sony's name.
+`plan.py --json` lists the unnamed ones under `tracks.2.unnamed_list`. Nothing
+else in the SDK is a goal.
+
+**Sony code in game segments.** A segment's name is not evidence at function
+grain: an object whose build differs in one function never places, and its
+other functions sit in game units as C or as stalls (round 69 found
+`code_179d8_*` holding libsnd, libcd and libapi). `progress.py` counts a
+game-segment function as library when any of three records says so: an exact
+fingerprint in `config/sdk-in-game.txt` (generated: `sdkname.py --game
+--write`, rerun when `sdk/` changes; `--check` says whether it is current), a
+`config/psyq-objects.ld` pin (a linked Sony object calls that address by
+name), or an `identified` comment on its symbols entry (position plus header
+or strings, recorded by the evidence rule below). Such a function leaves the
+game counts and every track 1, 1b and 3 queue, and a game-style name on one
+(`SetSeqTimerMode` for `SsSetTickMode`) counts as unnamed here. Renaming onto
+a pinned name is byte-identical and keeps the ld fragment current (measured).
 
 **The tool:** `.venv/bin/python3 tools/sdkname.py <func>...` (or `--all`)
 scores each unnamed SDK function against every function in every object on
@@ -224,7 +239,8 @@ fingerprint above the threshold the tool's self-check established:
 4. strings, BIOS call numbers, or hardware register addresses in the body.
 
 **Recording.** The name goes in the symbols file via `tools/rename.py` with a
-trailing comment: `// identified: fingerprint 0.96 vs libsnd/ss_xxx.o (3.3), header LIBSND.H`.
+comment LINE above the entry (splat rejects `key: value` in a trailing
+comment, round 69): `// identified: fingerprint 0.96 vs libsnd/ss_xxx.o (3.3), header LIBSND.H`.
 Declare it where the game calls it as a local `extern` copied from the Psy-Q
 header's prototype, citing the header in a comment. Game units do NOT include
 `psyq/*.H` and shared project headers do NOT carry Sony prototypes: that is
@@ -317,7 +333,8 @@ propagates everywhere.
   the method they dispatch to. Do not invent a new style.
 - **Every inherited name (FirecatFG's, `CREDITS.md`) is a tier-B hypothesis.**
   Confirm it with evidence or rename it; either way, record it.
-- **Do not rename a Sony symbol.** Those names are Sony's.
+- **Do not rename a Sony symbol**, and give no game name to a function
+  `progress.py` counts as library: both are track 2's.
 
 **Head at merge.** Apply the runner's proposed cross-unit field names one at
 a time by type scope (definition first, compiler lists the accessors, fix

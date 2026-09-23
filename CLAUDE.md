@@ -308,7 +308,14 @@ Gate 2.
     ```
 
     `nearmiss.py` runs it for you and excludes the hits from `ASSIGN FROM
-    HERE`, so a Gate 1b assignment is safe without thinking about it. Run
+    HERE`, so a Gate 1b assignment is safe without thinking about it.
+    **An object that never placed can still own functions one at a time**:
+    retail's `libsnd/seqread` is the 3.3 build with one function changed, so
+    it never placed, and 16 of its 18 functions were matched or stalled as
+    game C. `progress.py` counts those as library by address
+    (`config/sdk-in-game.txt` from `sdkname.py --game --write`, the
+    `psyq-objects.ld` pins, `identified` symbols entries), and every queue
+    follows (FINISHING-PLAN revision 13). Run
     `sdkstalls.py` directly when you carve, or before believing any single
     report's verdict.
 

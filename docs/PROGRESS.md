@@ -2769,6 +2769,54 @@ step and the naming prompt now require `tools/check-nonmatching.sh` after
 every field or slot rename, and the head's merge-time type-scoped rename
 rebuilds both. Nothing else changed.
 
+**Revision 13 (2026-09-23, after rounds 69 and 70).** Round 69's first
+escalation was measured, and it is larger than either head saw. The library
+boundary was drawn by segment name, and at function grain it is wrong.
+`sdkname.py --game` fingerprints every game-segment function, matched C
+included, by exact lookup in two seconds. It finds 47 exact against disc
+objects, all in `code_179d8_*`. Retail's `libsnd/seqread` is the 3.3 build
+with SetControlChange changed, so the object never placed, and 16 of its 18
+functions sat in `code_179d8_k` as matches and stalls, `func_800351D0`
+(376w) among them. `config/psyq-objects.ld` had already named about 25 more
+game-segment functions, because linked Sony objects call them by name. One is
+`func_80036528`, round 70's revisit match: it is `Snd_crescendo`. Of rounds
+69 and 70's four revisit matches, three are now recorded as Sony code
+(SeqPlay, Snd_crescendo, getintr), and the fourth (`func_80034690`) sits at
+seqread's SetControlChange slot. `progress.py` now counts a function as
+library if it appears in the generated `config/sdk-in-game.txt`, in a
+`psyq-objects.ld` pin, or with an `identified` symbols comment. That moves 66
+functions (49 of them C) out of game code, and `nearmiss.py`, the revisit, 1b and
+naming queues follow. Track 2 reopens with 61 functions, the game-worded ones
+included (`SetSeqTimerMode` is SsSetTickMode, and `code_179d8_m`'s marked
+`PlaySound` is SpuVmNoiseOnWithAdsr). `sdkname.py <func>` now takes matched
+C and prints the ld pin as evidence. A rename onto a pinned name was measured
+byte-identical with the fragment still current. `getintr` got its
+`identified` entry by shape 0.92, position before the pinned CD_sync, and
+strings. Round 69's second escalation dissolves: `code_179d8_c_b` has zero
+game debt left, and `plan.py` lists zero-debt unmarked units as REVIEW-ONLY
+for the head instead of as naming jobs. Its third: `headercontention.py`
+prices placeholder `D_` globals two units share, and reproduces the round-69
+miss on the pre-merge tree. The track-2 recording rule now says a comment
+LINE, which is the form splat accepts. NOT adopted: reopening `func_80030E90`
+and `func_8003149C` (round 70, 1). Both sit between placed libsnd objects,
+and the first shapes 0.77 against SsUtKeyOnV at its exact 252 words, so they
+are track 2 leads, not matching ground. The stale-title sweep (round 70, 2):
+of the five stalls with the round-63 construct, two were re-measured in round
+70, two have reports touched after round 63, and `func_80031A44` already
+reads length-exact, while no round-42-sensitive stall has an older report.
+There is nothing left to sweep. The runner-cap line (round 70, 6): the plan's
+default is three and PARALLEL-RUNS' hard cap is five, and the operator's
+paste is binding either way; `plan.py`'s "at most 5" now says exactly that.
+LEFT FOR THE OPERATOR (round 70, 5): `psyq_322b4` has no Sony fingerprint
+beyond 2-4 word stubs, and 38 of its 51 functions sit in `.data` method tables that
+game units dispatch through (`func_800428E4` returns class_3ac78's base
+table). It looks like uncarved game code carrying a `psyq_` name. The same
+screen flags `psyq_33808` (76 of 113 in tables), `psyq_10ee0`,
+`psyq_3770c` and `psyq_39094`. But libgs also dispatches through tables, and a
+`jal`-into-game test is contaminated by the Sony code in game units, so no
+re-segmentation is made on this evidence. It needs a per-function audit,
+whose `jal` half is now clean.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

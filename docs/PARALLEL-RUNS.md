@@ -199,9 +199,11 @@ diff (archive §Gate 1, round 46).
    round acts on.
 2. Sony ownership by placed object (`tools/sdkstalls.py`). These pass every
    other screen and read as the cleanest ground in the queue.
-3. Sony ownership with NO object on any disc: the `NOT GAME CODE` marker,
-   a head decision backed by segment topology and the `addiu`/`ori` assembler
-   fingerprint, never by smell.
+3. Sony ownership with NO placed object: the `NOT GAME CODE` marker (a head
+   decision backed by segment topology and the `addiu`/`ori` assembler
+   fingerprint, never by smell), or `progress.py`'s function-grain library
+   set: an exact fingerprint in `config/sdk-in-game.txt`, a
+   `psyq-objects.ld` pin, an `identified` symbols entry (plan revision 13).
 4. Rank from TITLE lines only. A report body is full of figures describing
    variants that were thrown away, and three consecutive heads pulled a wrong
    one. A title is only as good as the last person who rebuilt it; rebuild
