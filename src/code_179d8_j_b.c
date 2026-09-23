@@ -235,10 +235,114 @@ extern s16 D_8008E8C0;
 extern u8 D_8008D7F0[];
 extern u8 D_8008D970[];
 
-/* STALL -- see docs/match-reports/func_80030980.md. Round 50: LENGTH-EXACT
- * (324/324 words, zero drift outside the function), 7/324 raw word-match,
- * best body preserved there in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 315/324 words, 9 words short as of round 62 (re-measured
+ * round 70, unchanged -- this residue is a GCC 2.6.3 CSE decision on the
+ * `D_8008E978[D_8008D99C[i].unk0]` address, not the load-delay-nop
+ * construct round 63's `--nop-at-expansion` flag resolved, so that flag
+ * does not touch this function). Raw word-match 10/324, insertions 76 /
+ * deletions 76. Round 50's earlier 324/324 "length-exact" body is
+ * FALSIFIED at ins101/del101 -- more structurally wrong despite the
+ * matching word count -- and is not used here; this is round 62's
+ * better-characterized body. See docs/match-reports/func_80030980.md.
+ * Hand-derived. */
+s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
+    D800902E8Entry *e;
+    u8 i;
+    s32 result;
+    u32 pan1;
+    u32 pan2;
+
+    result = 0;
+    e = &D_800902E8[a0 & 0xFF][(a0 & 0xFF00) >> 8];
+    SpuVmVSetUp((s16)a1, (s16)a2);
+    D_8008EA22 = (u16)a0;
+
+    if (D_8008E9D0 != 0) {
+        i = 0;
+        do {
+            if (D_8008D996[i].unk0 == (s16)a0) {
+                s32 t0 = D_8008D99A[i].unk0;
+                if (t0 == (s16)a2 && D_8008D99E[i].unk0 == (s16)a1) {
+                    u8 e968FromD998 = D_8008E968[D_8008D998[i].unk0].unk1;
+                    u8 e968FromT0 = D_8008E968[t0].unk1;
+                    s32 lvl0;
+                    s32 prio;
+                    s32 lvl1;
+                    u32 lvl1b;
+                    u32 lvl1c;
+                    u32 lvl2;
+                    u8 e978c;
+                    u8 e978d;
+                    u8 e968d;
+                    u32 pan1sq;
+                    u32 pan2sq;
+                    s32 off16;
+
+                    lvl0 = D_8008D990[i].unk0 * (u16)a3 / 127;
+                    prio = lvl0 * 0x3FFF;
+                    lvl1 = D_8008E970->unk18 * prio / 16129;
+
+                    if (e968FromD998 != e968FromT0) {
+                        lvl1b = lvl1 * e968FromT0;
+                    } else {
+                        lvl1b = lvl1 * e968FromD998;
+                    }
+
+                    e978c = D_8008E978[D_8008D99C[i].unk0].unk2;
+                    lvl1c = lvl1b * e978c;
+                    lvl2 = lvl1c / 16129;
+
+                    pan1 = (lvl2 * e->unk74) / 127;
+                    pan2 = (lvl2 * e->unk76) / 127;
+
+                    e978d = D_8008E978[D_8008D99C[i].unk0].unk3;
+                    if (e978d < 0x40) {
+                        pan2 = (pan2 * e978d) / 63;
+                    } else {
+                        pan1 = (pan1 * (0x7F - e978d)) / 63;
+                    }
+
+                    e968d = D_8008E968[D_8008D998[i].unk0].unk4;
+                    if (e968d < 0x40) {
+                        pan2 = (pan2 * e968d) / 63;
+                    } else {
+                        pan1 = (pan1 * (0x7F - e968d)) / 63;
+                    }
+
+                    if ((u8)a4 < 0x40) {
+                        pan2 = (pan2 * (u8)a4) / 63;
+                    } else {
+                        pan1 = (pan1 * (0x7F - (u8)a4)) / 63;
+                    }
+
+                    pan1sq = pan1 * pan1;
+                    if (D_8008E8C0 == 1) {
+                        if (pan1 < pan2) {
+                            pan1 = pan2;
+                        } else {
+                            pan2 = pan1;
+                        }
+                        pan1sq = pan1 * pan1;
+                    }
+                    pan2sq = pan2 * pan2;
+
+                    off16 = i << 4;
+                    *(u16 *)(D_8008D7F0 + off16) = (u16)(pan1sq / 16383);
+                    *(u16 *)(D_8008D7F0 + off16 + 2) = (u16)(pan2sq / 16383);
+
+                    result++;
+                    D_8008D970[i] |= 3;
+                }
+            }
+            i++;
+        } while (i < D_8008E9D0);
+    }
+    return result;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
+#endif
 #ifdef NON_MATCHING
 /* NON_MATCHING: 252/252 words, LENGTH-EXACT as of round 70 -- the
  * round-63 `--nop-at-expansion` maspsx flag closed the 9/11-word
