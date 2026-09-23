@@ -23,9 +23,9 @@
  *     velocity and a computed stereo pan split, StartNote registers a new
  *     active-voice record; StopNote scans every voice for one whose
  *     identity fields match and releases it, returning the count released.
- *   - PlaySound / PlayFixedSound: find a free voice (func_8002CF18, in
+ *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (func_8002CF18, in
  *     code_179d8_l) and, if one exists, key it on (func_8002DDBC, also
- *     code_179d8_l) with the caller's parameters or, for PlayFixedSound,
+ *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
  *     two hardcoded constants.
  *   - BeginVoiceFade / StepVoiceFade: a linear-ramp pair over the
  *     gVoiceFade* per-voice arrays -- Begin sets a start/target/step-rate;
@@ -38,7 +38,7 @@
  *     is still undecompiled elsewhere. func_8002E308 in code_179d8_l opens
  *     with the identical prologue/argument-narrowing shape and is worth
  *     checking as that counterpart.
- *   - UpdateVoiceEnvelopes: the per-tick dispatcher. Maintains a 16-slot
+ *   - SpuVmFlush: the per-tick dispatcher. Maintains a 16-slot
  *     ring buffer of per-tick voice-activity bitmasks; when a voice has
  *     shown no activity for 16 consecutive ticks it force-releases it
  *     (disabling the SPU noise generator if that voice was in noise
@@ -47,9 +47,9 @@
  *     InitSpuDriver and, going by its own ring-buffer/mask-clearing logic,
  *     meant to run every frame thereafter.
  *   - ClearNoiseVoices: releases every voice whose state byte reads
- *     exactly 2 (the same value StopNote/UpdateVoiceEnvelopes/func_8002CF18
+ *     exactly 2 (the same value StopNote/SpuVmFlush/func_8002CF18
  *     treat as "noise voice needing SpuSetNoiseVoice/func_800375E8 cleanup").
- *   - ApplyVoicePitchBend / ApplyPitchBendToAllVoices: match a voice by
+ *   - SpuVmPBVoice / SpuVmPitchBend: match a voice by
  *     identity and apply a curve-table-driven pitch bend from a 0-127
  *     depth value centered at 0x40, writing the result through
  *     note2pitch2; the "AllVoices" wrapper calls Sony's SpuVmVSetUp once
@@ -57,9 +57,9 @@
  *   - InitSpuDriver: the SPU driver's init call -- _spu_setInTransfer,
  *     SpuInitMalloc, zeroes every per-voice table and the two master
  *     volume globals (reset to 0x3FFF, the SPU's real max), then calls
- *     UpdateVoiceEnvelopes once.
+ *     SpuVmFlush once.
  *
- * STALLS: ApplyVoicePitchBend, StartNote, UpdateVoiceEnvelopes,
+ * STALLS: SpuVmPBVoice, StartNote, SpuVmFlush,
  * StepVoiceEnvelope, StepVoiceFade -- all five are the same "whole-function
  * register-count decision predates any of the function's own locals"
  * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
@@ -408,7 +408,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceFade);
 
 extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
-extern void UpdateVoiceEnvelopes(void);
+extern void SpuVmFlush(void);
 
 extern u8 gSpuMallocArea[];
 extern s16 D_8008E9FC;
@@ -586,7 +586,7 @@ void InitSpuDriver(s32 a0) {
     gDisableVoiceStarveScan = 0;
     D_8008E8C0 = 0;
     D_8008E938 = 0x80;
-    UpdateVoiceEnvelopes();
+    SpuVmFlush();
 }
 
 /* "Currently selected channel" scratch global: written as a side
@@ -613,7 +613,7 @@ extern u8 D_8008EA1B;
 extern s32 func_8002CF18(s32 a0); /* arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244 */
 extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
-void PlaySound(s32 a0, s32 a1, s32 a2, s32 a3) {
+void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
@@ -661,7 +661,7 @@ void ClearNoiseVoices(void) {
     }
 }
 
-void PlayFixedSound(s32 a0, s32 a1) {
+void SpuVmNoiseOn(s32 a0, s32 a1) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
@@ -706,7 +706,7 @@ extern Rec34U16 D_8008D99C[];
 extern u8 D_8008EA13;
 
 /* Pointer to a 0x20-byte-stride table. Originally only the two
- * trailing byte fields ApplyVoicePitchBend reads (unkC/unkD) were named;
+ * trailing byte fields SpuVmPBVoice reads (unkC/unkD) were named;
  * StartNote (below) additionally needs unk0/unk1/unk2/unk3/unk4/
  * unk5/unk6/unk7/unk16, all in the same struct (no offset conflicts,
  * per this project's convention of extending rather than duplicating
@@ -721,7 +721,7 @@ typedef struct {
     u8 unk6; /* +0x6 */
     u8 unk7; /* +0x7 */
     u8 pad8[0xC - 0x8];
-    u8 bendCurveUp; /* +0xC -- multiplier used when the bend threshold is positive, per ApplyVoicePitchBend's report */
+    u8 bendCurveUp; /* +0xC -- multiplier used when the bend threshold is positive, per SpuVmPBVoice's report */
     u8 bendCurveDown; /* +0xD -- multiplier used when the bend threshold is negative */
     u8 pad0E[0x16 - 0xE];
     u8 unk16; /* +0x16 */
@@ -751,8 +751,8 @@ extern s16 note2pitch2(u16 a0, u16 a1);
  * renumbering plus one deferred `& 0xFFFF` mask on the second
  * note2pitch2 argument -- a banned-to-fix register-identity case, per
  * a permuter search that plateaued at 485/770 with no candidate reaching
- * zero (docs/match-reports/ApplyVoicePitchBend.md). Hand-derived. */
-s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
+ * zero (docs/match-reports/SpuVmPBVoice.md). Hand-derived. */
+s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
 {
     s16 threshold;
     u16 someTotal;
@@ -808,7 +808,7 @@ s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", ApplyVoicePitchBend);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmPBVoice);
 #endif
 
 /* "Currently selected channel" scratch global -- same idiom as
@@ -817,9 +817,9 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", ApplyVoicePitchBend);
 extern u16 D_8008EA22;
 
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-extern s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
+extern s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
 
-s32 ApplyPitchBendToAllVoices(s16 a0, s16 a1, s16 a2, u16 a3) {
+s32 SpuVmPitchBend(s16 a0, s16 a1, s16 a2, u16 a3) {
     s16 i;
     s32 sum;
 
@@ -827,7 +827,7 @@ s32 ApplyPitchBendToAllVoices(s16 a0, s16 a1, s16 a2, u16 a3) {
     D_8008EA22 = a0;
     sum = 0;
     for (i = 0; i < D_8008E9D0; i++) {
-        sum += ApplyVoicePitchBend(i, a0, a1, a2, a3);
+        sum += SpuVmPBVoice(i, a0, a1, a2, a3);
     }
     return sum;
 }
@@ -841,7 +841,7 @@ s32 ApplyPitchBendToAllVoices(s16 a0, s16 a1, s16 a2, u16 a3) {
  * s0/s1 register-color swaps in phases 2-6. Round 48's frame-padding
  * lever and an `s32 count` fix (drop a spurious andi mask) already
  * applied; a permuter search (round 37) plateaued at 1578/2276 with no
- * candidate reaching zero (docs/match-reports/UpdateVoiceEnvelopes.md).
+ * candidate reaching zero (docs/match-reports/SpuVmFlush.md).
  * Hand-derived. */
 
 /* Ring buffer of "channel activity" bitmasks, one slot appended per
@@ -894,7 +894,7 @@ typedef struct {
     u8 padE[0x10 - 0xE];
 } Rec16DAD4C;
 
-void UpdateVoiceEnvelopes(void) {
+void SpuVmFlush(void) {
     s32 i = 0;
     s32 ringIdx;
     s32 *slot;
@@ -1005,7 +1005,7 @@ void UpdateVoiceEnvelopes(void) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", UpdateVoiceEnvelopes);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmFlush);
 #endif
 
 #ifdef NON_MATCHING

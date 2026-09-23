@@ -77,7 +77,7 @@ mystery this report already documents below.
 
 **This is a substantially harder function than anything else in this unit
 so far, and it did not reach a "clean length, register-only residue" state
-the way `ApplyVoicePitchBend` did.** What follows is a full structural derivation
+the way `SpuVmPBVoice` did.** What follows is a full structural derivation
 (believed correct in its BROAD SHAPE -- every branch target and field
 access matches something in the disassembly) with a genuine, unresolved gap
 in one specific spot (see "What's missing" below).
@@ -396,7 +396,7 @@ is `-0x18`. Applied `u8 dead[8];` under the established `if (0)` guard.
 objdump), but built LENGTH is UNCHANGED at 222/228 (still 6 words
 short).** Raw word-match barely moved (13/228 -> 14/228, noise-level).
 This is the SAME negative shape found this round on this unit's sibling
-`UpdateVoiceEnvelopes`: charlie's padding idiom rewrites only the `addiu
+`SpuVmFlush`: charlie's padding idiom rewrites only the `addiu
 sp,sp,-N` / `sw $sN,N(sp)` IMMEDIATE operands of already-existing
 prologue/epilogue instructions, which costs the same instruction count
 regardless of the immediate value -- it cannot by itself manufacture
@@ -408,7 +408,7 @@ retail computing `t1 = v1 << 3` (the sign-extended `a0`, shifted) as its
 THIRD instruction and holding it live, exactly as this report's own "What's
 missing" section already diagnosed from the un-realigned disassembly —
 **the frame fix did not surface any NEW residue here** (unlike
-`UpdateVoiceEnvelopes`, where realignment revealed a fresh, fixable `andi 0xff`
+`SpuVmFlush`, where realignment revealed a fresh, fixable `andi 0xff`
 mask). The already-tried-and-regressed `$t1` transcription (rounds 30 and
 32, both confirmed negative) remains the actual open gap; frame padding
 does not touch it and this report's existing conclusion stands unchanged.
@@ -420,7 +420,7 @@ Reverted to `INCLUDE_ASM`; whole-image SHA1 reconfirmed green.
 ### Proposed learning (same lever, second data point)
 
 **Two-for-two this round: charlie's `dead[N]`/`if(0)` frame-padding idiom
-recovered frame byte-alignment exactly on both `UpdateVoiceEnvelopes` and
+recovered frame byte-alignment exactly on both `SpuVmFlush` and
 `StepVoiceFade`, and closed the missing-WORD-count gap on NEITHER.** Both
 functions' extra retail frame bytes are pure unaddressed register-save-area
 padding with no companion missing-instruction elsewhere in THIS unit,

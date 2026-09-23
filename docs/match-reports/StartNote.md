@@ -91,7 +91,7 @@ until you diff registers, not just word counts.
   a per-voice "speed" `s16` at `*(s16*)((u8*)rec + 0x4E + rec->unk12*2)` --
   the SAME access shape `code_179d8_k.c`'s `func_800344FC` already uses on
   the identical field, corroborating both units' independent readings.
-- `Tbl32E978` (already declared for `ApplyVoicePitchBend`'s stall) needed
+- `Tbl32E978` (already declared for `SpuVmPBVoice`'s stall) needed
   EXTENDING, not a second conflicting type: this function additionally
   touches `unk0`/`unk1`/`unk2`/`unk3`/`unk4`/`unk5`/`unk6`/`unk7` (a
   per-channel byte-field block used in bulk) alongside the existing
@@ -247,7 +247,7 @@ it was written:
    Sony's own `SpuVmVSetUp` (`code_179d8_c.c`'s own header comment: "round
    32 then found it is Sony's ... see docs/match-reports/func_80032148.md"),
    already declared and called with this exact signature
-   (`s32 SpuVmVSetUp(s16 a0, s16 a1)`) by `ApplyPitchBendToAllVoices` earlier in this
+   (`s32 SpuVmVSetUp(s16 a0, s16 a1)`) by `SpuVmPitchBend` earlier in this
    same file. Fixed by calling `SpuVmVSetUp(a1, a2)` instead.
 2. **`D_8008EA0D` is not a real symbol.** The disassembly reads it as
    `lbu $v1, -0x17($s0)` where `$s0 = &D_8008EA24` -- a raw negative
@@ -350,7 +350,7 @@ confirmed via objdump) **but built length is UNCHANGED at 402/387 (still
 
 This is the THIRD function on this unit this round where the lever
 produces the identical shape: exact frame-byte recovery, zero effect on
-word count. Unlike `UpdateVoiceEnvelopes` (where the same fix's realignment
+word count. Unlike `SpuVmFlush` (where the same fix's realignment
 surfaced a fresh, fixable `andi` mask), realigning this function's frame
 did not surface anything new beyond what this report's own two residues
 already diagnose -- the early-materialization scheduling point (~2-3
@@ -368,7 +368,7 @@ SHA1 reconfirmed green.
 **Three for three on `code_179d8_m` this round: charlie's `dead[N]`/`if(0)`
 frame-padding idiom recovers frame byte-alignment exactly every time it is
 applied to a measured frame-size gap, and it has closed a missing-WORD-COUNT
-gap ZERO of three times on this unit** (`UpdateVoiceEnvelopes`, `StepVoiceFade`,
+gap ZERO of three times on this unit** (`SpuVmFlush`, `StepVoiceFade`,
 `StartNote`) -- including on a function that is overall LONG (this one,
 15 words over) as readily as on the two that are SHORT. The common thread
 across the unit's three tests: every one of this unit's frame gaps is pure
@@ -610,7 +610,7 @@ velocity, pan-split pair, status).
 `masterVolume` field names this round) and `D_8008E978`/`Tbl32E978`
 (`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
 declared in this unit but only used by functions still `INCLUDE_ASM`
-(StepVoiceEnvelope, StepVoiceFade, ApplyVoicePitchBend, and this
+(StepVoiceEnvelope, StepVoiceFade, SpuVmPBVoice, and this
 function) -- the field renames are live in `src/code_179d8_m.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
 themselves (`D_8008E970`, `D_8008E978`) were not renamed since
@@ -624,7 +624,7 @@ kept in `#else`. Applied both stale-symbol fixes this report's round-37
 update already diagnosed but the preserved `#if 0` text above still shows
 literally: `func_80032148(a1, a2)` -> `SpuVmVSetUp(a1, a2)` (already
 declared earlier in the unit, called the same way by
-`ApplyPitchBendToAllVoices`), and `D_8008EA0D` (no linker symbol of its
+`SpuVmPitchBend`), and `D_8008EA0D` (no linker symbol of its
 own) -> `*((u8 *) &D_8008EA24 - 0x17)`. Also dropped four locally-redundant
 declarations that collide with types the unit's shared prelude already
 established under different typedef names for the same symbols

@@ -1062,12 +1062,29 @@ BeginVoiceFade = 0x8002E874; // type:func
 StepVoiceFade = 0x8002EA44; // type:func
 StepVoiceEnvelope = 0x8002E4D8; // type:func
 InitSpuDriver = 0x8002EDD4; // type:func
-PlaySound = 0x8002F20C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
+// SpuVmNoiseOnWithAdsr (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded
+// game-style name PlaySound. Round 71 (bravo, track 2).
+SpuVmNoiseOnWithAdsr = 0x8002F20C; // type:func
 ClearNoiseVoices = 0x8002F2A4; // type:func
-PlayFixedSound = 0x8002F368; // type:func
-ApplyVoicePitchBend = 0x8002F3E8; // type:func
-ApplyPitchBendToAllVoices = 0x8002F610; // type:func
-UpdateVoiceEnvelopes = 0x8002F700; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmNoiseOn
+// (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded game-style name
+// PlayFixedSound. Round 71 (bravo, track 2).
+SpuVmNoiseOn = 0x8002F368; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address SpuVmPBVoice by relocation), shape 0.97-0.99 vs libsnd/vmanager
+// SpuVmPBVoice. Superseded game-style name ApplyVoicePitchBend.
+// Round 71 (bravo, track 2).
+SpuVmPBVoice = 0x8002F3E8; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
+// SpuVmPitchBend (discs 3.3,3.5; libsnd/vm_pb on 3.6). Superseded
+// game-style name ApplyPitchBendToAllVoices. Round 71 (bravo, track 2).
+SpuVmPitchBend = 0x8002F610; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address SpuVmFlush by relocation), fingerprint masked 0.99 vs
+// libsnd/vmanager SpuVmFlush (disc 3.3). Superseded game-style name
+// UpdateVoiceEnvelopes. Round 71 (bravo, track 2).
+SpuVmFlush = 0x8002F700; // type:func
 StartNote = 0x8002FAC4; // type:func
 StopNote = 0x800300D0; // type:func
 gVoiceEnvActive = 0x8008D9A4;

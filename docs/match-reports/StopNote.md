@@ -112,8 +112,8 @@ reset.
 
 1. **`D_8008EA26` genuinely needs `volatile`, and this function is what
    proves it (see the promoted declaration and its comment, moved above
-   `PlaySound` since this function is the third user in ROM order).**
-   Every earlier user of this symbol (`PlayFixedSound`, `PlaySound`)
+   `SpuVmNoiseOnWithAdsr` since this function is the third user in ROM order).**
+   Every earlier user of this symbol (`SpuVmNoiseOn`, `SpuVmNoiseOnWithAdsr`)
    only ever read it back through a BYTE-narrowing pointer cast
    (`*(u8 *)&D_8008EA26`), and a plain non-volatile declaration was
    sufficient there. This function is the first to read it back at its
@@ -130,7 +130,7 @@ reset.
    **Getting `volatile` right took a wrong turn first.** The natural
    instinct -- forcing the reload via a pointer cast, `*(volatile u16
    *)&D_8008EA26` on a non-volatile object -- reproduces the SAME failure
-   mode `PlayFixedSound`'s report already found for a byte-width volatile
+   mode `SpuVmNoiseOn`'s report already found for a byte-width volatile
    pointer cast: it defeats the compiler's addressing-mode fold, emitting
    `lui`/`addiu`/`lhu` (compute the pointer, then dereference) instead of
    retail's compact `lui`/`lhu %lo(sym)(reg)` two-instruction form.
@@ -145,12 +145,12 @@ reset.
    | `chan = D_8008EA26;` (plain scalar) | no | n/a | yes, but elides the reload entirely (wrong) |
    | `chan = D_8008EA26;` (plain scalar) | **yes** | n/a | **yes, and reload happens (right)** |
    | `*(volatile u16 *)&D_8008EA26` | no | yes | no -- 3 extra instructions |
-   | `*(u8 *)&D_8008EA26` (PlayFixedSound's read) | **yes** | no | **yes** (unaffected by the object's own volatility) |
+   | `*(u8 *)&D_8008EA26` (SpuVmNoiseOn's read) | **yes** | no | **yes** (unaffected by the object's own volatility) |
 
    So the one-line fix, once isolated, is simply: promote the shared
    `D_8008EA26` declaration to `extern volatile u16 D_8008EA26;` (matching
    `code_179d8_j.c`'s own declaration for this symbol) and read it plainly
-   everywhere. `PlayFixedSound`/`PlaySound`'s byte-cast reads were
+   everywhere. `SpuVmNoiseOn`/`SpuVmNoiseOnWithAdsr`'s byte-cast reads were
    re-verified to still match after this change -- their `*(u8 *)&...`
    pattern is unaffected by the object gaining `volatile`, because the
    pointer type itself was never volatile-qualified.
@@ -189,7 +189,7 @@ on the already-documented but here-ineffective axes.
 
 **`volatile` on a pointer TYPE and `volatile` on the underlying OBJECT are
 different levers with opposite failure modes, and the existing project note
-(`PlayFixedSound`'s report) only demonstrated one side of this.** That report
+(`SpuVmNoiseOn`'s report) only demonstrated one side of this.** That report
 established "a volatile pointer cast breaks the addressing fold"; this
 function needed the complementary fact -- "a volatile OBJECT read through a
 plain non-volatile pointer/cast does NOT break the fold, and is the

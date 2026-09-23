@@ -1,4 +1,6 @@
-# PlaySound -- MATCHED (38/38 words)
+# SpuVmNoiseOnWithAdsr -- MATCHED (38/38 words)
+
+> Renamed from `PlaySound` on 2026-09-23 (tools/rename.py). Address 0x8002f20c.
 
 > Renamed from `func_8002F20C` on 2026-09-20 (tools/rename.py). Address 0x8002f20c.
 
@@ -20,7 +22,7 @@ extern u8 D_8008EA1B;
 extern s32 func_8002CF18(s32 a0);
 extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
-void PlaySound(s32 a0, s32 a1, s32 a2, s32 a3) {
+void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
@@ -34,14 +36,14 @@ void PlaySound(s32 a0, s32 a1, s32 a2, s32 a3) {
 
 ## Shape
 
-The 4-argument sibling of `PlayFixedSound` (same report has the full
+The 4-argument sibling of `SpuVmNoiseOn` (same report has the full
 derivation of the mixed-width `D_8008EA26` access and the two wrong turns
 that preceded the working form -- read that first). Same gate: force
 `D_8008EA1B`, call `func_8002CF18(0xFF)`, mask, stash into `D_8008EA26`,
 compare to `D_8008E9D0`, and conditionally forward into `func_8002DDBC`.
 
-The only structural difference from `PlayFixedSound` is the callee's
-argument SOURCE: where `PlayFixedSound` passed two of its own narrowed
+The only structural difference from `SpuVmNoiseOn` is the callee's
+argument SOURCE: where `SpuVmNoiseOn` passed two of its own narrowed
 arguments plus two hardcoded constants (`0x80FF`, `0x5FC8`), this function
 passes all four of ITS OWN arguments, each independently narrowed to
 `u16`, as the callee's four non-channel arguments (`a0&0xFFFF`,
@@ -50,25 +52,31 @@ positions). Confirms `func_8002DDBC`'s signature derived from the sibling:
 `(channel_byte, s32, s32, s32, s32)`.
 
 Reused the `D_8008EA26`/`D_8008E9D0`/`D_8008EA1B`/`func_8002CF18`/
-`func_8002DDBC` declarations verbatim from `PlayFixedSound` (moved up to
-before `PlaySound`, the first user in ROM order -- these two functions
+`func_8002DDBC` declarations verbatim from `SpuVmNoiseOn` (moved up to
+before `SpuVmNoiseOnWithAdsr`, the first user in ROM order -- these two functions
 are adjacent modulo the frameless `ClearNoiseVoices` between them). One build
-snag along the way: declaring them only immediately above `PlayFixedSound`
-left `PlaySound` (earlier in file/ROM order) compiling against
+snag along the way: declaring them only immediately above `SpuVmNoiseOn`
+left `SpuVmNoiseOnWithAdsr` (earlier in file/ROM order) compiling against
 undeclared identifiers -- `undeclared (first use this function)` on
 `D_8008EA1B` et al. Fixed by hoisting the shared declarations to above the
 first (ROM-order-earliest) user instead of duplicating them.
 
-No new learning beyond `PlayFixedSound`'s report; this one is corroborating
+No new learning beyond `SpuVmNoiseOn`'s report; this one is corroborating
 evidence for that report's `sh`-then-`lbu` idiom and for `func_8002DDBC`'s
 signature.
 
 ## Naming
 
-**PlaySound** (was `func_8002F20C`) -- Tier B. Allocates a free voice via
+**Superseded, round 71 (track 2):** the track-3 game name `PlaySound` is
+replaced by Sony's own name -- fingerprint EXACT masked 1.00 vs
+libsnd/vmanager `SpuVmNoiseOnWithAdsr` (discs 3.3/3.5; `libsnd/vm_noise` on
+3.6). This is Sony's SDK code, not decompiled game logic; track 2 names
+those functions and moves them out of tracks 1/1b/3.
+
+**SpuVmNoiseOnWithAdsr** (was `func_8002F20C`) -- Tier B. Allocates a free voice via
 `func_8002CF18` (code_179d8_l, "voice-steal candidate scan") and, if one
 is available (`v0 < D_8008E9D0`, the voice count), keys it on via
 `func_8002DDBC` (code_179d8_l, confirmed to write the PS1 SPU's key-on
 registers) forwarding all four caller-supplied parameters unchanged. The
 generic name reflects that this is the "just play it" wrapper, in
-contrast to PlayFixedSound's hardcoded-parameter variant.
+contrast to SpuVmNoiseOn's hardcoded-parameter variant.

@@ -63,7 +63,7 @@
  * guesses, not authoritative.  Per this project's convention, a prototype
  * for a function ANOTHER unit defines stays in this .c, not in a shared
  * header. */
-extern void ApplyPitchBendToAllVoices(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
+extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
 extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
 extern s32 StopNote(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
 /* Psy-Q libsnd, linked from the SDK objects (round 34): `ut_rev` and
@@ -1099,7 +1099,7 @@ void func_80035A7C(s16 a0, s16 a1)
     rec->unk4 = rec->unk4 + 1;
     vol = *((u8 *)rec + b + 0x2C);
     b = *cursor;
-    ApplyPitchBendToAllVoices(packed, rec->unk4C, vol, b);
+    SpuVmPitchBend(packed, rec->unk4C, vol, b);
     rec->unk88 = func_80035E80(a0, a1);
 }
 #endif

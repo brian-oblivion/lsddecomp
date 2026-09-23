@@ -1,4 +1,6 @@
-# PlayFixedSound -- MATCHED (32/32 words)
+# SpuVmNoiseOn -- MATCHED (32/32 words)
+
+> Renamed from `PlayFixedSound` on 2026-09-23 (tools/rename.py). Address 0x8002f368.
 
 > Renamed from `func_8002F368` on 2026-09-20 (tools/rename.py). Address 0x8002f368.
 
@@ -20,7 +22,7 @@ extern u8 D_8008EA1B;
 extern s32 func_8002CF18(s32 a0);
 extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
-void PlayFixedSound(s32 a0, s32 a1) {
+void SpuVmNoiseOn(s32 a0, s32 a1) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
@@ -110,11 +112,17 @@ trying either.
 
 ## Naming
 
-**PlayFixedSound** (was `func_8002F368`) -- Tier B. Identical shape to
-PlaySound (allocate a free voice, key it on) but with the trailing two
+**Superseded, round 71 (track 2):** the track-3 game name `PlayFixedSound`
+is replaced by Sony's own name -- fingerprint EXACT masked 1.00 vs
+libsnd/vmanager `SpuVmNoiseOn` (discs 3.3/3.5; `libsnd/vm_noise` on 3.6).
+This is Sony's SDK code, not decompiled game logic; track 2 names those
+functions and moves them out of tracks 1/1b/3.
+
+**SpuVmNoiseOn** (was `func_8002F368`) -- Tier B. Identical shape to
+SpuVmNoiseOnWithAdsr (allocate a free voice, key it on) but with the trailing two
 `func_8002DDBC` parameters replaced by the constants `0x80FF`/`0x5FC8`
 rather than forwarded from the caller -- i.e. a specific always-the-same
 sound rather than a general playback entry point. What that fixed sound
 IS (a UI cue? a fixed sample?) is not established from this function's
-body; "Fixed" names the mechanical distinction from PlaySound, not the
+body; "Fixed" names the mechanical distinction from SpuVmNoiseOnWithAdsr, not the
 sound's identity.

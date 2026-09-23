@@ -1,4 +1,6 @@
-# ApplyVoicePitchBend -- STALL: exact length (138/138 words), 77/138 raw word-match, first diff at file 0x1FBEC / vram 0x8002F3EC (word 1, `move t2,a0` vs `move t1,a0`)
+# SpuVmPBVoice -- STALL: exact length (138/138 words), 77/138 raw word-match, first diff at file 0x1FBEC / vram 0x8002F3EC (word 1, `move t2,a0` vs `move t1,a0`)
+
+> Renamed from `ApplyVoicePitchBend` on 2026-09-23 (tools/rename.py). Address 0x8002f3e8.
 
 > Renamed from `func_8002F3E8` on 2026-09-20 (tools/rename.py). Address 0x8002f3e8.
 
@@ -7,7 +9,7 @@ Unit: `src/code_179d8_m.c`. Round 24 (second pass), runner bravo.
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/ApplyVoicePitchBend.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SpuVmPBVoice.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -73,14 +75,14 @@ value would have — reinforcing, rather than resolving, the open
 "undentified caller-visible register" hypothesis already in this report.
 Reverted (no improvement to keep).
 
-## Signature (derived, and cross-checked against `ApplyPitchBendToAllVoices`'s call site)
+## Signature (derived, and cross-checked against `SpuVmPitchBend`'s call site)
 
 ```c
-s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
+s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
 ```
 
-`ApplyPitchBendToAllVoices` (matched 60/60 this round, unchanged) calls this function as
-`ApplyVoicePitchBend(i, a0, a1, a2, a3)` and its own report originally reasoned the
+`SpuVmPitchBend` (matched 60/60 this round, unchanged) calls this function as
+`SpuVmPBVoice(i, a0, a1, a2, a3)` and its own report originally reasoned the
 second parameter must be `s32` (to explain a per-iteration re-sign-extension
 at the call site). **That reasoning was re-examined and retracted this
 round**: the MIPS o32 ABI represents an `s16` argument as a properly
@@ -88,12 +90,12 @@ sign-extended 32-bit value regardless of whether the callee declares it
 `s16` or `s32`, so the caller-side widening instructions do not distinguish
 the two. Declaring it `s16` here (matching every neighbouring parameter, and
 matching this function's own single, once-only use of it) does not change
-`ApplyPitchBendToAllVoices`'s compiled bytes at all -- re-verified 60/60 with zero drift
+`SpuVmPitchBend`'s compiled bytes at all -- re-verified 60/60 with zero drift
 after the change. The comparison against the field it is checked against
 needs an explicit `(s16)` cast on the OLD `s32` typing; once retyped `s16`
-the cast is redundant and was dropped. This did not move `ApplyVoicePitchBend`'s
+the cast is redundant and was dropped. This did not move `SpuVmPBVoice`'s
 own score (77/138 before and after), so it is recorded as a correction to
-`ApplyPitchBendToAllVoices`'s report, not a lever for this one.
+`SpuVmPitchBend`'s report, not a lever for this one.
 
 ## Struct/global knowledge derived this round (kept in `src/`, unused while stalled)
 
@@ -106,7 +108,7 @@ own score (77/138 before and after), so it is recorded as a correction to
   unsigned view is reached with a pointer-cast reinterpretation:
   `((Rec34U16 *) D_8008D994)[a0].unk0`. `D_8008D99C` is ALSO read at a
   SECOND, BYTE width (`lbu`, same offset 0) later in this same function --
-  the established `*(u8 *)&sym` idiom (see `PlayFixedSound`'s report)
+  the established `*(u8 *)&sym` idiom (see `SpuVmNoiseOn`'s report)
   applies again, on top of the signed/unsigned split.
 - `Tbl32E978` / `D_8008E978` (pointer variable, `lw`-loaded): a 0x20
   (32)-byte-stride table; only two trailing byte fields are read,
@@ -186,9 +188,9 @@ return `1`.
    shows; declaring it its true narrow unsigned width forced the genuine
    copy to reappear, closing the drift entirely and moving the score from
    50 to 77 in one change.
-7. **Retyped `ApplyVoicePitchBend`'s own second parameter from `s32` to `s16`**
+7. **Retyped `SpuVmPBVoice`'s own second parameter from `s32` to `s16`**
    (see the signature section above): **no change (77/138)**, confirmed
-   `ApplyPitchBendToAllVoices` unaffected. Kept as the more honest typing regardless.
+   `SpuVmPitchBend` unaffected. Kept as the more honest typing regardless.
 8. **Retyped `outA2`/`outA1` from `s32` to `u16`**: **WORSE, 67/138 with
    280490-byte drift reappearing.** Reverted.
 9. **Hoisted the `outA2 & 0xFFFF` call-argument mask into an explicit named
@@ -291,7 +293,7 @@ extern u8 D_8008EA18;
 
 extern s16 note2pitch2(u16 a0, u16 a1);
 
-s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
+s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     s16 threshold;
     u16 someTotal;
     u16 baseValue;
@@ -426,7 +428,7 @@ instruction (`move t2,a0` retail vs `move t1,a0` built).
 
 ### Permuter search
 
-`tools/setup-permuter.sh ApplyVoicePitchBend <seed>`, seed built from this
+`tools/setup-permuter.sh SpuVmPBVoice <seed>`, seed built from this
 report's preserved body (all needed struct/extern declarations already
 present in the live unit above this function's position, so no renamed
 local types were needed this time -- this function is not first in the
@@ -446,7 +448,7 @@ proceeded on the unit's other four functions.
 captured (see the process-lifetime finding below).** The search ran with
 `-j 6 --stop-on-zero --best-only --stack-diffs` under a `timeout 900`
 bound. The best score reached was **485** (from base 770), saved at
-`permuter-work/ApplyVoicePitchBend/output-485-1/`; no candidate ever reached
+`permuter-work/SpuVmPBVoice/output-485-1/`; no candidate ever reached
 zero across the whole run. Diffing that candidate against `base.c` shows
 the improvement came from dropping the `& 0xFFFF` mask on the SECOND
 `note2pitch2` call argument (relying on the value's already-narrow
@@ -503,14 +505,21 @@ the report thinks it is.
 
 ## Naming
 
-**ApplyVoicePitchBend** (was `func_8002F3E8`) -- Tier A. Body fully
+**Superseded, round 71 (track 2):** the track-3 game name
+`ApplyVoicePitchBend` is replaced by Sony's own name -- `psyq-objects.ld`
+pins this address to `SpuVmPBVoice` (a linked Sony object calls it by that
+name), and it also shape-matches libsnd/vmanager `SpuVmPBVoice` at 0.97-0.99.
+This is Sony's SDK code, not decompiled game logic; track 2 names those
+functions and moves them out of tracks 1/1b/3.
+
+**SpuVmPBVoice** (was `func_8002F3E8`) -- Tier A. Body fully
 evident (preserved below, exact length): matches a voice by its
 (track/note/program) identity fields, then computes a curve-table-driven
 bend from a 0-127 depth value centered at `0x40` (`threshold = a4 - 0x40`,
 looked up in `D_8008E978`'s `bendCurveUp`/`bendCurveDown` fields depending
 on sign) applied to a base value, writes the result through
 `note2pitch2`, and returns `1` on match / `0` otherwise -- the return
-value is what `ApplyPitchBendToAllVoices` sums into its own return.
+value is what `SpuVmPitchBend` sums into its own return.
 "PitchBend" rather than a vaguer name because the `a4-0x40`-centered,
 signed-threshold, curve-table shape is the textbook MIDI pitch-bend-depth
 computation, not merely "some per-voice adjustment".
