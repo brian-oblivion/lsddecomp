@@ -1,4 +1,6 @@
-# func_8004A364 — MATCHED (34/34 words)
+# Obj865C8__CheckTimeout — MATCHED (34/34 words)
+
+> Renamed from `func_8004A364` on 2026-09-23 (tools/rename.py). Address 0x8004a364.
 
 ## Disassembly shape
 
@@ -36,7 +38,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_8004A364(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
     Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
     if ((u32)self->unk1C > (u32)self->unk2C) {
         self->methods->onEventArg(self, 4);

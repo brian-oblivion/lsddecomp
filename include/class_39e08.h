@@ -69,7 +69,7 @@ typedef struct Class865C8Methods {
     void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 Obj865C8__RunSubUpdates */
     void *slot54;                                  /* +0x054 Obj865C8__AdvanceState */
     void (*noop58)(void);                          /* +0x058 Obj865C8__Noop58 (no-op, matched) */
-    void *slot5C;                                  /* +0x05C func_8004A364 */
+    void *slot5C;                                  /* +0x05C Obj865C8__CheckTimeout */
     /* Shared with gClass86668Methods (see Class86668Methods below) -- literally the
      * same function address at the same offset in both tables. */
     void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 func_8004A3EC */
@@ -268,7 +268,7 @@ struct Obj865C8 {
     s32 unk10;                    /* +0x010, Obj865C8__Deinit (2nd arg to a slot14 call) */
     u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, Obj865C8__RunSubUpdates */
-    s32 unk1C;                    /* +0x01C, func_8004A364 (compared against unk2C) */
+    s32 unk1C;                    /* +0x01C, Obj865C8__CheckTimeout (compared against unk2C) */
     u8 pad20[0x28 - 0x20];
     s32 unk28;                    /* +0x028, func_8004A3EC */
     s32 unk2C;                    /* +0x02C, func_8004A458 */
@@ -307,7 +307,7 @@ typedef struct IntermediateBaseMethods {
     void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
     void (*slot48)(void *self);            /* +0x048 */
     u8 pad4C[0x5C - 0x4C];
-    void (*slot5C)(void *self, s32 arg1, s32 arg2); /* +0x05C, called by func_8004A364 */
+    void (*slot5C)(void *self, s32 arg1, s32 arg2); /* +0x05C, called by Obj865C8__CheckTimeout */
     void (*slot60)(void *self, s32 arg1);  /* +0x060 */
 } IntermediateBaseMethods;
 

@@ -1764,3 +1764,4 @@ Class86668__CancelTimeout = 0x8004A294; // type:func
 Class86668__Init = 0x8004A2C4; // type:func
 Class86668__Deinit = 0x8004A324; // type:func
 Obj865C8__Noop58 = 0x8004A35C; // type:func
+Obj865C8__CheckTimeout = 0x8004A364; // type:func

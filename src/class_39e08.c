@@ -306,7 +306,7 @@ void Class86668__Deinit(Obj865C8 *self) {
 void Obj865C8__Noop58(void) {
 }
 
-void func_8004A364(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
     Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
     if ((u32)self->unk1C > (u32)self->unk2C) {
         self->methods->onEventArg(self, 4);
