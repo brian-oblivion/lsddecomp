@@ -575,7 +575,7 @@ typedef struct {
 extern Rec34B_E138 D_8008D998[];
 extern Rec34B_E138 D_8008D99C[];
 extern Rec34H_E138 D_8008D994[];
-extern u16 D_8008EA26;
+extern s16 D_8008EA26[];
 extern u8 D_8008D970[];
 
 void func_8002E138(s32 chan, s32 bend) {
@@ -593,7 +593,7 @@ void func_8002E138(s32 chan, s32 bend) {
         p = &D_8008EA13;
         *p = D_8008D998[(chan & 0xFF)].unk0;
         D_8008EA18 = D_8008D99C[(chan & 0xFF)].unk0;
-        D_8008EA26 = (u8)chan;
+        D_8008EA26[0] = (u8)chan;
         idx = D_8008EA18 + (*p << 4);
         b = bend;
         if (b >= 0) {
