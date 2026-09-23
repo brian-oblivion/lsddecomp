@@ -18,8 +18,9 @@
 #include "common.h"
 #include "StageGrid.h"
 
-/* The dimensions table has 14 entries; GetStageGridDimensionsCount and the guard in
- * GetStageGridDimensionsTable are the only two places that constant appears. */
+/* The dimensions table has 14 entries: GetStageGridDimensionsCount returns it,
+ * GetStageGridDimensionsTable writes it out, and GetStageChunkFromMood bounds its
+ * stage loop by it. */
 #define STAGE_GRID_DIMENSIONS_COUNT 14
 
 s32 GetStageGridDimensionsCount(void) {
