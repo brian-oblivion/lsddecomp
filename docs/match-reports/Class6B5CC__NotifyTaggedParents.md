@@ -602,3 +602,5 @@ function's own symbol set" before spending a build, not as a blanket
 license to assume new shape exists -- confirming absence by reading the
 symbol list cost nothing, re-deriving blind would have cost a full attempt
 cycle for a function whose inputs provably did not change.
+
+NON_MATCHING body promoted, round 69

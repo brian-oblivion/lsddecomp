@@ -171,23 +171,21 @@ void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2) {
  * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = Class6B5CC__ClassifyAgainstPlanes)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->unk28 and notifying it via its own +0x038 slot. */
-/* STALL -- see docs/match-reports/Class6B5CC__TryAttachNearby.md. Round 55
- * (charlie, REVISIT): closed the LENGTH exactly (141 -> 143/143) via a
- * plain goto-CFG rewrite mirroring retail's actual jump graph on all three
- * axes (X/Y/Z), then closed 2 more words (138 -> 140/143) via a
- * permuter-found lever caching other->unk30 into a local before the
- * composeAndApplyRotation call. Remaining 2-word residue is a pure
- * stack-slot-address swap between buf54 and count's own address-taken
- * slot -- unresponsive to declaration-order variants and ~132000 combined
- * permuter iterations. Restored to INCLUDE_ASM per project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 140/143 words, length exact. Residue: a pure stack-slot-
+ * address swap between buf54 and count's own address-taken slot
+ * (docs/match-reports/Class6B5CC__TryAttachNearby.md). The preserved
+ * best-scoring body reaches this axis-by-axis range check with a literal
+ * goto-CFG mirroring retail's jump graph and a cached other->unk30 pointer;
+ * both are byte-shaped levers with no effect on behavior, so this body
+ * writes the plain if/else form and the direct other->unk30->unk4 access
+ * instead -- see the report for the byte-shaped variant. Hand-derived. */
 void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     Vec3_d294 *posA;
     Vec3_d294 *posB;
     Vec3_d294 diffRaw;
     Vec3S16_d294 diff;
     s32 count;
-    s32 abs;
     u8 buf54[0x4C];
 
     if (self->unk20 == NULL) {
@@ -205,55 +203,34 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;
 
-    if (diffRaw.x < 0) {
-        goto x_neg;
-    }
-    if (diffRaw.x < 0x4001) {
-        goto x_done;
-    }
-    return;
-x_neg:
-    abs = ~diffRaw.x + 1;
-    if (abs >= 0x4001) {
+    if (diffRaw.x >= 0) {
+        if (diffRaw.x >= 0x4001) {
+            return;
+        }
+    } else if (-diffRaw.x >= 0x4001) {
         return;
     }
-x_done:
-    if (diffRaw.y < 0) {
-        goto y_neg;
-    }
-    if (diffRaw.y < 0x4001) {
-        goto y_done;
-    }
-    return;
-y_neg:
-    abs = ~diffRaw.y + 1;
-    if (abs >= 0x4001) {
+    if (diffRaw.y >= 0) {
+        if (diffRaw.y >= 0x4001) {
+            return;
+        }
+    } else if (-diffRaw.y >= 0x4001) {
         return;
     }
-y_done:
-    if (diffRaw.z < 0) {
-        goto z_neg;
-    }
-    if (diffRaw.z < 0x4001) {
-        goto z_done;
-    }
-    return;
-z_neg:
-    abs = ~diffRaw.z + 1;
-    if (abs >= 0x4001) {
+    if (diffRaw.z >= 0) {
+        if (diffRaw.z >= 0x4001) {
+            return;
+        }
+    } else if (-diffRaw.z >= 0x4001) {
         return;
     }
-z_done:
 
     diff.x = diffRaw.x;
     diff.y = diffRaw.y;
     diff.z = diffRaw.z;
 
     count = other->unk30->unk0;
-    {
-        GenericCountList_d294 *countList = other->unk30;
-        self->methods->composeAndApplyRotation(self, &diff, buf54, &countList->unk4, count * 8);
-    }
+    self->methods->composeAndApplyRotation(self, &diff, buf54, &other->unk30->unk4, count * 8);
 
     if (!self->methods->checkBoundsOverlap(self, &count, &diff)) {
         return;
@@ -265,9 +242,9 @@ z_done:
     self->unk28 = other;
     other->methods->slot38(other, self, 4);
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__TryAttachNearby);
+#endif
 
 /* Fills buf1 from self's own +0x84 slot, then folds in every node of the
  * self->unkC list (each node's own +0x84 slot combined into buf1 via
@@ -296,15 +273,16 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *
     }
 }
 
-/* STALL -- see docs/match-reports/Class6B5CC__CheckBoundsOverlap.md. Round 20: reached
- * 14/243 words in-range (up from round 13's 6/243) after fixing the
- * frame size (0x98 -> 0xF8, a 24-word unused-buffer padding) and a
- * deferred-self-materialization residue (barrier as first statement).
- * Remaining residue: arg2 gets copied into a scratch register ($t2)
- * where retail keeps it in $a2 throughout, plus substantial further
- * structural work in the two loop bodies and tail comparison.
- * Restored to INCLUDE_ASM per project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 14/243 words in-range, 21 words short overall (built
+ * 222/retail 243 words). Residue: substantial structural work remains in
+ * the two loop bodies and tail comparison, beyond a register-identity
+ * detail (arg2 kept live in $a2 throughout retail, copied to a scratch
+ * register here) (docs/match-reports/Class6B5CC__CheckBoundsOverlap.md).
+ * The preserved best-scoring body opens with a bare __asm__("") scheduling
+ * barrier to force self's early materialization; that barrier has no
+ * meaning beyond bytes and is omitted here -- see the report for the
+ * byte-shaped variant. Hand-derived. */
 s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
     CornerList_d294 *list;
     Vec3S16_d294 *cur;
@@ -321,7 +299,6 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
     s16 v;
     u8 pad[0x60];
 
-    __asm__("");
     list = (CornerList_d294 *)arg1;
     list->hdr.x = list->hdr.x + arg2->x;
     list->hdr.y = list->hdr.y + arg2->y;
@@ -431,29 +408,17 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
     }
     return mm.hi.x >= track.f0;
 }
+#else
+INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
-
-/* STALL -- see docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md. Round 46 (echo):
- * FIRST-EVER build/score for this function -- inherited round 45's
- * structure-only derivation with no C ever attempted. Length EXACT
- * (199/199 words in-range, no drift), 29/199 raw word-match, first real
- * diff at vram 0x8001DDF8 (register identity: `self` lands in $s4 here,
- * $s5 in retail). Two levers found this round: an unaccounted 0x18-byte
- * stack buffer (same "unused padding" shape as Class6B5CC__CheckBoundsOverlap's own
- * history -- fixed the frame size, which was originally 0x18 short) and
- * a resolution of round 45's open Part-3 ambiguity (see the report).
- * Round 55 (charlie, REVISIT): confirmed unchanged at 29/199 -- the
- * residue is a whole-function register-pressure interaction, not a simple
- * self-vs-tag swap; Part 1's own induction-variable decomposition differs
- * from retail's (four raw read pointers + two write pointers instead of
- * indexed mid[row].x/y/z), and reproducing it in isolation regressed the
- * score (16/199) rather than improving it. Gate 3 permuter checks passed
- * (11 insertions/11 deletions -- real structural room) but the bounded
- * search itself was not run this round. See the report for the full
- * derivation. Restored to INCLUDE_ASM per project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 29/199 words, length exact. Residue: whole-function
+ * register-pressure interaction, not a simple two-value swap -- Part 1's
+ * own induction-variable decomposition (four raw read pointers plus two
+ * write pointers in retail, against the indexed mid[row].x/y/z form here)
+ * competes for callee-saved registers with everything else in the function
+ * (docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md). Hand-derived. */
 extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
@@ -540,9 +505,9 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
 
     return (*outFlag != 0);
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__ClassifyAgainstPlanes);
+#endif
 
 /* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
  * tail-merge/shared-block dispatch, see the git history for the full
@@ -683,30 +648,26 @@ void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *ne
 void func_8001E49C(void) {
 }
 
-/* STALL -- see docs/match-reports/Class6B5CC__NotifyTaggedParents.md. Best reached this
- * round: 48/54 words in-range (up from the round-13 best of 47/54), a
- * clean self<->tag register-pair swap in $s1/$s2, no size drift.
- * Restored to INCLUDE_ASM per project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 48/54 words, length exact. Residue: register identity --
+ * self and the literal tag value 4 land in $s1/$s2 swapped from retail's
+ * own assignment (docs/match-reports/Class6B5CC__NotifyTaggedParents.md).
+ * The preserved best-scoring body indirects self/node/the tag literal
+ * through named locals and splits the tag comparison into its own
+ * statement, both purely to influence register allocation; this body
+ * writes the plain, direct form instead -- see the report for the
+ * byte-shaped variant. Hand-derived. */
 void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
-    Class6B5CCObj *s;
-    void *n;
     GenericObj_d294 *entry;
     void *cursor;
-    s32 tag;
-    s32 masked;
 
-    s = self;
-    n = node;
-    tag = 4;
     entry = NULL;
 loop:
-    BasicClass__func_1816c(n, &entry, &cursor);
+    BasicClass__func_1816c(node, &entry, &cursor);
     if (entry == NULL) {
         goto check_cursor;
     }
-    masked = entry->methods->header & 0xF;
-    if (masked == tag) {
+    if ((entry->methods->header & 0xF) == 4) {
         goto dispatch;
     }
 check_cursor:
@@ -721,15 +682,15 @@ dispatch:
     if (*(u8 *)entry->methods != 0x34) {
         goto tail;
     }
-    entry->methods->slot10(entry, s);
+    entry->methods->slot10(entry, self);
 tail:
     if (cursor != NULL) {
         goto loop;
     }
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__NotifyTaggedParents);
+#endif
 
 /* This unit's own no-argument vtable getter -- see the extended note on
  * D_8006B5CC in include/code_d294.h and the file banner up top. */
