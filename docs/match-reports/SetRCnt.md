@@ -2,16 +2,14 @@
 
 **Unit:** code_179d8_c · **Size:** 40 instructions · **Status:** MATCHED (40/40 words)
 
-Not a `psyq_*` segment function -- this and its neighbours
-(`GetRCnt`, `ResetRCnt`, `SeqTimerDividerCallback`) look like Psy-Q
-root-counter (hardware timer) routines linked directly into game text
-rather than into a separate SDK segment. Per the assignment note: this is
-ordinary work, but do not generalise anything found here to the game's
-own code -- the real Psy-Q `SETRCNT.H`/prototype is not present anywhere
-in `include/psyq/` in this tree (checked: no `RCnt` hits in `LIBETC.H`,
-`KERNEL.H`, or anywhere else under `include/`), so there is no SDK
-prototype to match against; the signature below is derived purely from
-the call site in `SeqTimerControl` and from this function's own body.
+Not a `psyq_*` segment function, but Sony's `SetRCnt` all the same: see
+"Identification (round 69, head)" at the end. It and its four neighbours are
+`libapi/counter` compiled into game text from a library build the SDK discs
+do not carry. (Superseded round-16 note, corrected round 69: this report said
+the prototype was absent from `include/psyq/`. `KERNEL.H` lines 156-160
+declare all five, `extern long SetRCnt(unsigned long, unsigned short, long);`
+among them. The signature below was derived from the call site and body and
+agrees with it on arity.)
 
 ## What it does
 
