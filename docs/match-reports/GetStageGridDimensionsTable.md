@@ -40,3 +40,13 @@ StageGridDimensions *GetStageGridDimensionsTable(s32 *count) {
 
 Returning the bare array name (not `&STAGE_GRID_DIMENSIONS`, not a cast) is what
 produces the plain `lui`/`addiu` pair.
+
+## Naming
+
+**`GetStageGridDimensionsTable`, tier A.** A getter over the module's one
+dimensions table, tier A by definition. The name and the parameter rename
+(`unknown` -> `count`) both come from the body: the pointer is only ever
+written a length through, never read, so it is an out-parameter, and `count`
+is what it counts (confirmed against `GetStageGridDimensionsCount`, which
+returns the identical `0xE`). Fixed the header prototype this round, which
+still said `s32 *unknown` after the definition had already moved to `count`.

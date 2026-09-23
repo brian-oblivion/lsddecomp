@@ -91,3 +91,18 @@ Second, smaller: **`sltiu` on a loop bound means an UNSIGNED counter.** Retail's
 `sltiu $v0, $t2, 0xE` against a signed `s32` counter's `slti` is a one-word
 residue with a one-word fix (`u32`), and it survives `return stage;` from an
 `s32` function unchanged.
+
+## Naming
+
+**`GetStageChunkFromMood`, tier A.** Inherited from lsddecomp, confirmed:
+the body's own name (`Get<output>From<input>`) matches what it does — search
+every stage's mood table for a value equal to `*mood` and return the owning
+chunk — and the one call site outside this unit, `src/DreamSys.c:2003`
+inside `GenerateInitialSpawn` (`stage = GetStageChunkFromMood(&chunk,
+mood);`), passes a `MoodGraphPoint *mood` and uses the returned stage to
+index `STAGE_TIME_LIMITS`/`STAGE_SPAWNPOINTS` and the returned `chunk` to
+match a spawn point's own chunk, agreeing with "find the (stage, chunk) a
+mood value belongs to". Confirmed, not renamed. (`include/DreamSys.h:43`'s
+comment attributing `StageChunk`/`GetMoodFromStageChunk` usage to
+`DreamSys__LogChunkMood` is about the *other* function in this unit, not this
+one — see `GetMoodFromStageChunk.md`.)
