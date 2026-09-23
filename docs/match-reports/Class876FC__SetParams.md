@@ -2,7 +2,7 @@
 
 > Renamed from `func_800564A4` on 2026-09-23 (tools/rename.py). Address 0x800564a4.
 
-Unit: `class_3bb8c_r` (round 17 continuation). `Obj876FCMethods::slot40`
+Unit: `class_3bb8c_r` (round 17 continuation). `Class876FCMethods::slot40`
 (vtable offset `+0x040` of `gClass876FCMethods`) -- a plain 0x24-byte block copy
 from the caller's argument into `self+0x58`, plus a single word clear.
 
@@ -17,7 +17,7 @@ typedef struct Block24 {
     s32 raw[0x24 / 4];
 } Block24;
 
-void Class876FC__SetParams(Obj876FC *self, Block24 *src) {
+void Class876FC__SetParams(Class876FC *self, Block24 *src) {
     self->block58 = *src;
     self->unk24 = 0;
 }
@@ -62,3 +62,7 @@ void Class876FC__SetParams(Obj876FC *self, Block24 *src) {
   `or`/`andi`/`beqz` alignment-checking preamble instead of a flat
   `lw`/`sw` sequence, the target type's alignment is the first thing to
   check, not the copy logic itself.
+
+## Naming
+
+**Tier A.** Renamed from the report's own `Obj876FCMethods::slot40` description: the body sets the class's own param block from the caller's argument and resets the tick counter -- "SetParams" is what the body does, not a guess at why. Struct field `setParams` (this unit's `Class876FCMethods` local view) renamed to match.

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80056464` on 2026-09-23 (tools/rename.py). Address 0x80056464.
 
-Unit: `class_3bb8c_r` (round 17 continuation). `Obj876FCMethods::dtor`
+Unit: `class_3bb8c_r` (round 17 continuation). `Class876FCMethods::dtor`
 (vtable offset `+0x00C` of `gClass876FCMethods`) -- calls a teardown helper, then
 tail-calls the shared base class's own dtor (`DreamSys__GetBaseMethods()->dtor`) and
 forwards its return.
@@ -10,7 +10,7 @@ forwards its return.
 ## Final source
 
 ```c
-void *Class876FC__Finalize(Obj876FC *self) {
+void *Class876FC__Finalize(Class876FC *self) {
     Class876FC__ReleaseByKind(self);
     return DreamSys__GetBaseMethods()->dtor(self);
 }
@@ -35,3 +35,7 @@ notes on the sibling symbol `GetClass6B5CCMethods`).
 
 None -- confirms the tail-call-forwarding case that `Class876FC__Class876FC`'s
 report explicitly contrasts against.
+
+## Naming
+
+**Tier A.** `+0x00C` is the "finalize" slot convention this project already uses (`Class6B5CC__Finalize`, `Class866E8__Finalize`, `Unk18Obj__Finalize`), and the body matches: teardown helper then forward the shared base dtor's return.

@@ -6,16 +6,16 @@ Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #1 of
 `gStyleCueCallbacks` (14 slots, header word 0 -- see the unit's own file banner
 for why this is NOT a BasicClass override despite the matching slot
 count). Calls the shared helper `ComputeStyleCueFalloff`, stores its result, then
-dispatches on `self->unk4` ("kind") to fill in a handful of fields.
+dispatches on `self->kind` ("kind") to fill in a handful of fields.
 
 ## Final source
 
 ```c
-void StyleCue00(ParamObj *ctx, ParamObj *self) {
+void StyleCue00(StyleCueParam *ctx, StyleCueParam *self) {
     s32 kind;
 
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    kind = self->unk4;
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    kind = self->kind;
     if (kind == 0) {
         self->unk1C = 7;
         self->unk20 = 0;
@@ -26,7 +26,7 @@ void StyleCue00(ParamObj *ctx, ParamObj *self) {
         self->unk44 = 7;
         self->unk48 = 0;
     } else if (kind >= 8) {
-        self->unk4 = -1;
+        self->kind = -1;
     }
 }
 ```
@@ -46,3 +46,7 @@ field write).
 
 None -- the discriminating levers for this whole 14-function family are
 written up once, in `ComputeStyleCueFalloff`'s and `StyleCue07`'s reports.
+
+## Naming
+
+**Tier B.** `StyleCue00` is row +0x004 of `gStyleCueCallbacks` (`tools/classtable.py 0x800874B0`, round 73). `TryStartStyleCue` (class_3bb8c_n.c) installs `gStyleCueCallbacks[sub->countSign]` as `SoundCueSet::callback` via `InitSoundCueSet` (code_179d8_e.c) -- the same per-tag sound-cue-callback slot `gEntityMoodHandlerTable`'s `MoodCueNN` occupants hold for `Entity` (`Entity__MoodCueNN` match reports). The `StyleCueNN` numbering follows table row order, same convention as `MoodCueNN`. Mechanics are established (a per-tag callback that reads `self->kind` and writes a handful of numeric fields, calling `ComputeStyleCueFalloff` first); which dream/style object or which field means what in the running game is not, so the specific `kind` branches and the numeric literals they write stay unnamed.

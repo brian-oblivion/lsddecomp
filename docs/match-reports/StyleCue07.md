@@ -11,11 +11,11 @@ sibling.
 ## Final source
 
 ```c
-void StyleCue07(ParamObj *ctx, ParamObj *self) {
+void StyleCue07(StyleCueParam *ctx, StyleCueParam *self) {
     s32 kind;
 
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    kind = self->unk4;
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    kind = self->kind;
     if (kind == 0) {
         self->unk1C = 0x14;
         self->unk20 = 1;
@@ -25,7 +25,7 @@ void StyleCue07(ParamObj *ctx, ParamObj *self) {
         self->unk1C = kind;
         self->unk28 = 0x14;
     } else if (kind >= 0x33) {
-        self->unk4 = -1;
+        self->kind = -1;
     }
 }
 ```
@@ -54,10 +54,10 @@ void StyleCue07(ParamObj *ctx, ParamObj *self) {
    rather than trust an earlier paraphrase of them** -- this is the
    single most effective check across this whole 14-function family.
 2. **The `kind==3` arm needs `self->unk1C = kind;` (a cached local),
-   not `self->unk1C = self->unk4;` (a fresh field read).** The
+   not `self->unk1C = self->kind;` (a fresh field read).** The
    disassembly reuses the SAME register (`$v1`, still holding the value
    loaded for the `kind==3` comparison) for the `unk1C` store -- no
-   reload. Writing `self->unk1C = self->unk4;` directly (without a
+   reload. Writing `self->unk1C = self->kind;` directly (without a
    `kind` local) triggered an unwanted extra `lw` reload, costing one
    word, for the same "intervening scalar store defeats the next
    unrelated-field read" reason documented in `StyleCue05`'s report.
@@ -78,3 +78,7 @@ void StyleCue07(ParamObj *ctx, ParamObj *self) {
   oracle catches it), but it burned an avoidable iteration that a
   slower, line-by-line re-read of the `.s` file would have caught before
   ever writing the C.
+
+## Naming
+
+**Tier B.** `StyleCue07` is row +0x020 of `gStyleCueCallbacks` (`tools/classtable.py 0x800874B0`, round 73). `TryStartStyleCue` (class_3bb8c_n.c) installs `gStyleCueCallbacks[sub->countSign]` as `SoundCueSet::callback` via `InitSoundCueSet` (code_179d8_e.c) -- the same per-tag sound-cue-callback slot `gEntityMoodHandlerTable`'s `MoodCueNN` occupants hold for `Entity` (`Entity__MoodCueNN` match reports). The `StyleCueNN` numbering follows table row order, same convention as `MoodCueNN`. Mechanics are established (a per-tag callback that reads `self->kind` and writes a handful of numeric fields, calling `ComputeStyleCueFalloff` first); which dream/style object or which field means what in the running game is not, so the specific `kind` branches and the numeric literals they write stay unnamed.

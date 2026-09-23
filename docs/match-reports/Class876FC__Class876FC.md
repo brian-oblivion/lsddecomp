@@ -2,7 +2,7 @@
 
 > Renamed from `func_800563C0` on 2026-09-23 (tools/rename.py). Address 0x800563c0.
 
-Unit: `class_3bb8c_r` (round 17 continuation). `Obj876FCMethods::ctor`
+Unit: `class_3bb8c_r` (round 17 continuation). `Class876FCMethods::ctor`
 (vtable offset `+0x008` of `gClass876FCMethods`) -- chains to the shared base
 class's own ctor (`DreamSys__GetBaseMethods()->ctor`, the SAME shared-base getter
 `class_3bb8c_o.c` already used for its own `BaseObjO__BaseObjO`/
@@ -13,7 +13,7 @@ its return value's side effect only.
 ## Final source
 
 ```c
-void *Class876FC__Class876FC(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
+void *Class876FC__Class876FC(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
     if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
         goto fail;
     }
@@ -70,3 +70,7 @@ fail:
   it cost one build/diff iteration to notice; a direct read of the
   disassembly's trailing instructions (past the `jal`) would have caught
   it without spending the attempt.
+
+## Naming
+
+**Tier A.** `Class876FC` is the class name class_3bb8c_s.c already uses for `gClass876FCMethods` (its own comment: "`Class876FC` here; class_3bb8c_r.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `Class6B5CC__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `BaseObjO__BaseObjO`/`Class6B5CC__Class6B5CC`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.

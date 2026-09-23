@@ -12,7 +12,7 @@ bytes) for the `gClass876FCMethods` class, dispatching through
 
 ```c
 void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
-    Obj876FC *self = func_80017B34(0x98);
+    Class876FC *self = func_80017B34(0x98);
 
     if (self != NULL) {
         if (GetClass876FCMethods()->ctor(self, arg0, arg1, arg2, arg3) != NULL) {
@@ -36,7 +36,7 @@ where `GetClass876FCMethods` is `class_3bb8c_o.c`'s already-matched getter for
 `&gClass876FCMethods`) rather than by a direct `jal` to `Class876FC__Class876FC` -- both
 resolve to the same function at runtime, but the disassembly's own
 `jal GetClass876FCMethods` / `lw v0,8(v0)` / `jalr v0` sequence requires the
-vtable form, not a direct call. `Obj876FCMethods::ctor` (declared in this
+vtable form, not a direct call. `Class876FCMethods::ctor` (declared in this
 unit, see `Class876FC__Class876FC`'s report) is 5-argument (`self` + 4 forwarded
 parameters), matching this allocator's own 4 incoming parameters plus
 `self`.
@@ -45,3 +45,7 @@ parameters), matching this allocator's own 4 incoming parameters plus
 
 None -- confirms the `New_X` sub-shape #3 pattern established last pass,
 this time reached through a vtable dispatch rather than a bare `jal`.
+
+## Naming
+
+**Tier A.** `New_X` allocator convention (`New_BaseObjO`, `New_Class6B5CC`, `New_Class866E8`, `New_ClassEAC0`, `New_VabStreamObj`), matching this unit's own established allocator shape and `Class876FC` (see below).

@@ -4,24 +4,24 @@
 
 Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #5 of
 `gStyleCueCallbacks`. Three independent divisibility checks (`% 3`, `% 5`, `% 7`)
-on `self->unk4`.
+on `self->kind`.
 
 ## Final source
 
 ```c
-void StyleCue04(ParamObj *ctx, ParamObj *self) {
-    self->unk10 = ComputeStyleCueFalloff(ctx);
-    if (self->unk4 % 3 == 0) {
+void StyleCue04(StyleCueParam *ctx, StyleCueParam *self) {
+    self->falloff = ComputeStyleCueFalloff(ctx);
+    if (self->kind % 3 == 0) {
         self->unk1C = 0x1E;
         self->unk20 = 0;
     }
-    if (self->unk4 % 5 == 0) {
+    if (self->kind % 5 == 0) {
         self->unk30 = 0x1E;
         self->unk34 = 0;
         self->unk38 = 0x18;
         self->unk3C = 0x18;
     }
-    if (self->unk4 % 7 == 0) {
+    if (self->kind % 7 == 0) {
         self->unk1C = 0x1E;
         self->unk20 = 0;
     }
@@ -47,3 +47,7 @@ confirmed by both write blocks being byte-identical in the disassembly.
 ### Proposed learning
 
 None beyond what's already written up in `StyleCue03`'s report.
+
+## Naming
+
+**Tier B.** `StyleCue04` is row +0x014 of `gStyleCueCallbacks` (`tools/classtable.py 0x800874B0`, round 73). `TryStartStyleCue` (class_3bb8c_n.c) installs `gStyleCueCallbacks[sub->countSign]` as `SoundCueSet::callback` via `InitSoundCueSet` (code_179d8_e.c) -- the same per-tag sound-cue-callback slot `gEntityMoodHandlerTable`'s `MoodCueNN` occupants hold for `Entity` (`Entity__MoodCueNN` match reports). The `StyleCueNN` numbering follows table row order, same convention as `MoodCueNN`. Mechanics are established (a per-tag callback that reads `self->kind` and writes a handful of numeric fields, calling `ComputeStyleCueFalloff` first); which dream/style object or which field means what in the running game is not, so the specific `kind` branches and the numeric literals they write stay unnamed.
