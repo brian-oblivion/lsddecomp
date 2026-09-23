@@ -46,12 +46,12 @@ typedef struct Class865C8Methods {
      * func_8004A060()->ctor(self, arg1, arg2, arg3); the signature is
      * Obj865C8__Obj865C8's own, defined just below. */
     void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, SubObjD *arg2, s32 arg3); /* +0x008 Obj865C8__Obj865C8 */
-    void (*dtor)(Obj865C8 *self);                  /* +0x00C func_80049830 */
+    void (*dtor)(Obj865C8 *self);                  /* +0x00C Obj865C8__Dtor */
     /* BasicClass-inherited (BasicClass__func_17f98 -- same address as
      * Class6D3C8.h's own local unk10 view of this same shared slot).
      * Called by func_80049E20 as self->methods->slot10(self, newObj). */
     void (*slot10)(Obj865C8 *self, Obj4C *arg1);   /* +0x010 */
-    /* Called by func_80049830 as self->methods->slot14(self, self->unk38). */
+    /* Called by Obj865C8__Dtor as self->methods->slot14(self, self->unk38). */
     void (*slot14)(Obj865C8 *self, SubObjD *arg1); /* +0x014 */
     void *unk18, *unk1C;                           /* BasicClass, inherited */
     void *unk20, *unk24, *unk28, *unk2C;           /* BasicClass, inherited */
@@ -174,7 +174,7 @@ struct SubObjE {
 
 /* Opaque view of an object family that gets "stepped" through a single
  * self-consuming call, `obj = obj->methods->slot4(obj)` -- confirmed at SIX
- * independent call sites in func_80049830 alone (three `Obj0C` fields below,
+ * independent call sites in Obj865C8__Dtor alone (three `Obj0C` fields below,
  * plus `Obj865C8::unk40/unk44/unk48`), all identical shape. Same "vtable at
  * offset 0, only the reached slot named" policy as SubObjA/SubObjB/Obj4C. */
 typedef struct SubObjG SubObjG;
@@ -196,7 +196,7 @@ struct SubObjG {
 
 /* Opaque view of whatever object Obj865C8::unk0C points to (used by
  * func_80049AC0/func_80049A1C, which read its own +0x004/+0x008/+0x010
- * fields, func_80049B54, which dereferences +0x000, and func_80049830,
+ * fields, func_80049B54, which dereferences +0x000, and Obj865C8__Dtor,
  * which dereferences +0x008/+0x00C/+0x010 as `SubObjG *` -- no vtable
  * dispatch through Obj0C ITSELF, so no methods pointer is declared for
  * Obj0C; its own fields point at other objects that have one).
@@ -204,15 +204,15 @@ struct SubObjG {
  * +0x008/+0x010 were typed `s32` from func_80049A1C/func_80049AC0 alone,
  * which only ever forward them as opaque register values through a vtable
  * call that never dereferences them -- consistent with EITHER a scalar or a
- * pointer. func_80049830 dereferences both directly (`->methods->slot4`),
+ * pointer. Obj865C8__Dtor dereferences both directly (`->methods->slot4`),
  * settling it: they are `SubObjG *`. func_80049A1C's own forwarding call
  * sites got an explicit `(s32)` cast rather than staying wrong. */
 typedef struct Obj0C {
     SubObjE *obj;                 /* +0x000, func_80049B54 */
-    s32 unk4;                     /* +0x004 -- untouched by func_80049830, still unconfirmed either way */
-    SubObjG *unk8;                /* +0x008, func_80049830 (was s32) */
-    SubObjG *unkC;                 /* +0x00C, func_80049830 (new) */
-    SubObjG *unk10;                /* +0x010, func_80049830 (was s32) */
+    s32 unk4;                     /* +0x004 -- untouched by Obj865C8__Dtor, still unconfirmed either way */
+    SubObjG *unk8;                /* +0x008, Obj865C8__Dtor (was s32) */
+    SubObjG *unkC;                 /* +0x00C, Obj865C8__Dtor (new) */
+    SubObjG *unk10;                /* +0x010, Obj865C8__Dtor (was s32) */
 } Obj0C;
 
 /* Opaque view of whatever object Obj865C8::unk38 points to (used by
@@ -280,12 +280,12 @@ struct Obj865C8 {
     s32 unk3C;                    /* +0x03C, func_80049A14 */
     /* Retyped from `s32` (func_80049E20's own usage only ever forwards
      * these as opaque register values into func_80052B70, never
-     * dereferencing them): func_80049830 dereferences all three directly
+     * dereferencing them): Obj865C8__Dtor dereferences all three directly
      * as `SubObjG *` (`self->unkNN->methods->slot4(self->unkNN)`, result
      * discarded). func_80049E20's call site got an explicit `(s32)` cast. */
-    SubObjG *unk40;                /* +0x040, func_80049E20 (2nd arg to func_80052B70), func_80049830 */
-    SubObjG *unk44;                /* +0x044, func_80049E20 (3rd arg to func_80052B70), func_80049830 */
-    SubObjG *unk48;                /* +0x048, func_80049E20 (4th arg to func_80052B70), func_80049830 */
+    SubObjG *unk40;                /* +0x040, func_80049E20 (2nd arg to func_80052B70), Obj865C8__Dtor */
+    SubObjG *unk44;                /* +0x044, func_80049E20 (3rd arg to func_80052B70), Obj865C8__Dtor */
+    SubObjG *unk48;                /* +0x048, func_80049E20 (4th arg to func_80052B70), Obj865C8__Dtor */
     Obj4C *unk4C;                 /* +0x04C, func_80049E20 -- result of func_80052B70 */
 };
 
@@ -345,7 +345,7 @@ typedef struct Class86668Methods {
     u8 pad00[0x08];
     void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 func_8004A19C */
     /* func_8004A228 (this unit, matched): the sibling class's own dtor
-     * override. Called by func_80049830 (D_800865C8's own dtor) as
+     * override. Called by Obj865C8__Dtor (D_800865C8's own dtor) as
      * GetClass86668Methods()->dtor(self) -- a base-class dtor forwarding to a
      * DIFFERENT sibling's override, same shape as slot38/slot44/slot48
      * below. */

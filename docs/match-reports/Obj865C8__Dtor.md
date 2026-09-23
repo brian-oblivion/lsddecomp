@@ -1,4 +1,6 @@
-# func_80049830 — MATCHED (74/74 words)
+# Obj865C8__Dtor — MATCHED (74/74 words)
+
+> Renamed from `func_80049830` on 2026-09-23 (tools/rename.py). Address 0x80049830.
 
 `Class865C8Methods` slot +0x00C (the dtor).
 
@@ -58,7 +60,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_80049830(Obj865C8 *self) {
+void Obj865C8__Dtor(Obj865C8 *self) {
     Obj0C *o = self->unk0C;
     SubObjG *g;
 

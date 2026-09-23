@@ -41,7 +41,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     self->methods->resetUnk3C(self);
 }
 
-void func_80049830(Obj865C8 *self) {
+void Obj865C8__Dtor(Obj865C8 *self) {
     Obj0C *o = self->unk0C;
     SubObjG *g;
 
