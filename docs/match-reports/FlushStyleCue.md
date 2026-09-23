@@ -1,18 +1,20 @@
-# func_800557DC -- MATCHED, round 46 (2026-09-15)
+# FlushStyleCue -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `func_800557DC` on 2026-09-23 (tools/rename.py). Address 0x800557dc.
 
 Unit `class_3bb8c_n`. **20/20 words, byte-exact.** First build.
 
 ## What it was
 
 Fresh ground, carved round 45, never attempted. Already forward-declared
-by `func_80054D30` earlier in this unit (`extern s32 func_800557DC(ObjN14
+by `StyleTeardown` earlier in this unit (`extern s32 FlushStyleCue(ObjN14
 *arg0);`), which fixed the parameter type before this function's own
 derivation started.
 
 ## Derivation
 
 ```
-/* 45FDC 800557DC 7404828F */  lw   $v0, %gp_rel(D_8008AC7C)($gp)
+/* 45FDC 800557DC 7404828F */  lw   $v0, %gp_rel(gStyleTargetObj)($gp)
 /* 45FE4 800557E4 1000B0AF */  sw   $s0, 0x10($sp)
 /* 45FE8 800557E8 21808000 */  addu $s0, $a0, $zero
 /* 45FF0 800557F0 0000448C */  lw   $a0, 0x0($v0)
@@ -27,7 +29,7 @@ derivation started.
 jr $ra
 ```
 
-`D_8008AC7C` is a plain `s32` (established in `class_3bb8c_m.c`) holding the
+`gStyleTargetObj` is a plain `s32` (established in `class_3bb8c_m.c`) holding the
 address of a small descriptor object; this function reads *that object's*
 own offset 0 (a value, not the `FieldAC7CHolder.unkC` field
 `class_3bb8c_m.c` names at +0xC -- a different offset of the same base
@@ -39,16 +41,16 @@ arg0, void *arg1);`) -- each caller already carries its own local reading of
 `self`'s real type, so this unit does the same rather than pulling in
 `ObjDA34`.
 
-`arg0` (this unit's own `ObjN14`, introduced by `func_80054D30`) supplies
+`arg0` (this unit's own `ObjN14`, introduced by `StyleTeardown`) supplies
 both the embedded sub-object handed to `FlushSoundCueSet` (`&arg0->unk14`) and
 the byte toggled after the call (`arg0->unk0->unk6`, negated in place).
 
 ```c
-extern s32 D_8008AC7C;
+extern s32 gStyleTargetObj;
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
-s32 func_800557DC(ObjN14 *arg0) {
-    FlushSoundCueSet(*(s32 *) D_8008AC7C, &arg0->unk14);
+s32 FlushStyleCue(ObjN14 *arg0) {
+    FlushSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->unk14);
     arg0->unk0->unk6 = -arg0->unk0->unk6;
     return 0;
 }
@@ -62,6 +64,18 @@ straddling the call.
 ### Proposed learning
 
 None beyond confirming the multiple-independent-local-views convention:
-`D_8008AC7C`'s pointed-to object is read at offset 0 here and offset 0xC in
+`gStyleTargetObj`'s pointed-to object is read at offset 0 here and offset 0xC in
 a sibling unit, with two unrelated local structs describing it -- both
 correct locally, neither claiming to be the whole object.
+
+## Naming
+
+**`FlushStyleCue`, tier B.**
+
+`FlushSoundCueSet` on the slot's embedded `cueSet`, then toggles the
+claimed entry's sign tag back (releasing it for reuse), always returns 0.
+Name mirrors the already-established `FlushSoundCueSet` it calls, for the
+same "flush this slot's pending sound state" mechanic. Called from
+`StyleTeardown` (unconditionally, both slots) and from `TickStyle` (per
+slot, when `StopStyleCueIfNear` reports the cue is no longer near). MATCHED,
+20/20, first build.

@@ -1,4 +1,6 @@
-# func_80054C74 -- MATCHED (34/34 words), class_3bb8c_n
+# StyleUpdateEffectSlots -- MATCHED (34/34 words), class_3bb8c_n
+
+> Renamed from `func_80054C74` on 2026-09-23 (tools/rename.py). Address 0x80054c74.
 
 Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 Matched on the first build.
@@ -6,14 +8,14 @@ Matched on the first build.
 ## Signature
 
 ```c
-void func_80054C74(void *arg0);
+void StyleUpdateEffectSlots(void *arg0);
 ```
 
 ## Struct: new local view `ObjE0C8`
 
-`D_8008E0C8` (already declared `extern void *D_8008E0C8[];` for the
-already-matched `func_80054CFC`, which just forwards it to
-`ReleaseBasicClassArray(D_8008E0C8, D_8008AC88)`) holds pointers to objects that this
+`gStyleEffectSlots` (already declared `extern void *gStyleEffectSlots[];` for the
+already-matched `StyleReleaseEffectSlots`, which just forwards it to
+`ReleaseBasicClassArray(gStyleEffectSlots, gStyleEffectSlotCount)`) holds pointers to objects that this
 function dispatches *directly*, one at a time, through a method table at
 object offset 0 -- the same `ObjAB54`-style pattern already established
 earlier in this unit, just at a different slot offset:
@@ -35,9 +37,9 @@ local-views convention applies, and this is the only place in the executable
 that dispatches slot `+0xEC` on this array's elements (no other caller found
 via `grep -rn 80054C74`).
 
-`D_8008AC80`/`D_8008AC88`/`D_8008E0C8` are declared `extern` a second time,
-verbatim, ahead of this function -- ROM order puts `func_80054C74` textually
-*before* `func_80054CFC`'s own copy of the same three externs, so a fresh set
+`gStyleVariant`/`gStyleEffectSlotCount`/`gStyleEffectSlots` are declared `extern` a second time,
+verbatim, ahead of this function -- ROM order puts `StyleUpdateEffectSlots` textually
+*before* `StyleReleaseEffectSlots`'s own copy of the same three externs, so a fresh set
 was added here rather than hoisting the existing ones (repeated identical
 `extern` declarations are legal C89 and this keeps each function's own
 declarations next to it, matching the file's existing style).
@@ -45,15 +47,15 @@ declarations next to it, matching the file's existing style).
 ## Body
 
 ```c
-void func_80054C74(void *arg0) {
+void StyleUpdateEffectSlots(void *arg0) {
     s32 i;
     ObjE0C8 *obj;
 
-    if (D_8008AC80 < 0) {
+    if (gStyleVariant < 0) {
         return;
     }
-    for (i = 0; i < D_8008AC88; i++) {
-        obj = (ObjE0C8 *) D_8008E0C8[i];
+    for (i = 0; i < gStyleEffectSlotCount; i++) {
+        obj = (ObjE0C8 *) gStyleEffectSlots[i];
         obj->methods->slotEC(obj, arg0);
     }
 }
@@ -67,3 +69,12 @@ needed, matched directly from the natural C shape.
 ## Attempts
 
 1 (matched on the first build).
+
+## Naming
+
+**`StyleUpdateEffectSlots`, tier B.**
+
+Iterates `gStyleEffectSlots[0 .. gStyleEffectSlotCount)` dispatching
+`slotEC(obj, arg0)` on each -- the per-frame update half of the
+`StyleBuildEffectSlots`/`StyleUpdateEffectSlots`/`StyleReleaseEffectSlots`
+triad. MATCHED, 34/34, first build.

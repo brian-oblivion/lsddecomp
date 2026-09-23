@@ -1,24 +1,26 @@
-# func_800549A8 -- MATCHED, 93/93 words, insertions 0 / deletions 0, whole-image SHA1 green
+# StyleUpdateDecorSet -- MATCHED, 93/93 words, insertions 0 / deletions 0, whole-image SHA1 green
+
+> Renamed from `func_800549A8` on 2026-09-23 (tools/rename.py). Address 0x800549a8.
 
 REVISITED, round 61: STALL (24/93, ~4 words short, two rounds' "same
-register-pressure residue as `func_80054850`") -> **MATCHED on the first
+register-pressure residue as `StyleBuildDecorSet`") -> **MATCHED on the first
 attempt**; names/types not relevant (unit has not passed track 3).
 
 ## What closed it
 
-One construct, carried over from `func_80054850` earlier in this same session:
+One construct, carried over from `StyleBuildDecorSet` earlier in this same session:
 **the pair of adjacent globals is copied into the local pair by a WHOLE-STRUCT
 assignment, not field by field.**
 
 ```c
-pos = *(PairXY *) &D_8008AB68;      /* NOT pos.x = D_8008AB68; pos.y = D_8008AB6C; */
+pos = *(PairXY *) &gStyleDecorPosAX;      /* NOT pos.x = gStyleDecorPosAX; pos.y = gStyleDecorPosAY; */
 ```
 
 A struct assignment is a BLKmode `set`, and gcc 2.6.3's `cse.c` answers a
 BLKmode destination by calling `invalidate_memory()` -- it discards **every**
 cached memory value rather than the ones that might overlap. That is the
-entire reason retail reloads `D_8008AB50` for its `== 2` test (`lw v1,
-%gp_rel(D_8008AB50)` at 0x45220, after the guard already read it at 0x451A8)
+entire reason retail reloads `gStyleDecorVariant` for its `== 2` test (`lw v1,
+%gp_rel(gStyleDecorVariant)` at 0x45220, after the guard already read it at 0x451A8)
 and reloads `pos.y` from the stack immediately after writing it (`lw v0,
 0x1C(sp)` at 0x45230). Rounds 46 and 47 both classified those two reloads as
 *"register-pressure-driven, not something a source rewrite obviously
@@ -26,7 +28,7 @@ controls"* and stalled the function on them. They were one source-shape
 difference and cost one build to fix.
 
 Full derivation of the mechanism, and the measurements that established it,
-are in `docs/match-reports/func_80054850.md` (round 61). This function is the
+are in `docs/match-reports/StyleBuildDecorSet.md` (round 61). This function is the
 confirmation: the lever was derived on a sibling and transferred unchanged.
 
 Three smaller corrections to round 46's body went in at the same time, all
@@ -36,11 +38,11 @@ read off the raw `.s` rather than guessed:
 | --- | --- |
 | the array is walked with a pointer (`wp++`), not indexed by the loop counter (`arr[i]`) | `addiu s0,s0,4` in the `bnez`'s delay slot at 0x452CC; `lw a0,0(s0)` twice per iteration |
 | the two per-iteration dispatch receivers are two separate `*wp` reads | `lw a0,0(s0)` at 0x45274 **and again** at 0x45294 -- the intervening call clobbers memory, so both are real loads, not a CSE failure |
-| the output buffer is 8 bytes, not 3 or 4 | it occupies sp+0x10..0x17, because `pos` sits at sp+0x18. `func_80054B1C` writes only `[0..2]`, so the SIZE is inferred from the stack layout and nothing else -- see the comment at the definition. |
+| the output buffer is 8 bytes, not 3 or 4 | it occupies sp+0x10..0x17, because `pos` sits at sp+0x18. `AdjustRgbByDelta` writes only `[0..2]`, so the SIZE is inferred from the stack layout and nothing else -- see the comment at the definition. |
 
 Round 46's `s3` name is kept as `shift` and `s1` as `srcOfs`; `srcOfs` walks a
-3-byte-stride table (the same stride `func_80054FD8` uses on `D_8008721C`),
-which is consistent with `func_80054B1C`'s three byte writes.
+3-byte-stride table (the same stride `StyleFillEffectKind3` uses on `D_8008721C`),
+which is consistent with `AdjustRgbByDelta`'s three byte writes.
 
 ## What round 46 got right, and is worth keeping
 
@@ -52,7 +54,7 @@ proposed -- brute-force the divisor rather than reverse the reciprocal math --
 stands.
 
 The struct-and-flow recovery (call targets, method slots +0xB8/+0xBC/+0x64,
-`D_8008AC7C + 0xC` chased one field further, the loop bounds) was also correct
+`gStyleTargetObj + 0xC` chased one field further, the loop bounds) was also correct
 throughout. **What was wrong was only the VERDICT**, and specifically the part
 of it that named an unfalsifiable cause. "Register pressure" identifies no
 construct, suggests no experiment, and ends the investigation; two rounds
@@ -61,7 +63,7 @@ stopped there.
 ## The matched body
 
 ```c
-void func_800549A8(void) {
+void StyleUpdateDecorSet(void) {
     ObjAC7CSub *self;
     s32 delta;
     s32 shift;
@@ -72,25 +74,25 @@ void func_800549A8(void) {
     void **wp;
     ObjSlotB8B8 *obj;
 
-    if (D_8008AB50 == 0) {
+    if (gStyleDecorVariant == 0) {
         return;
     }
-    self = *(ObjAC7CSub **) (D_8008AC7C + 0xC);
+    self = *(ObjAC7CSub **) (gStyleTargetObj + 0xC);
     delta = self->field18 - self->field24;
     shift = (delta / 600) * 3;
     if (shift <= 0) {
         return;
     }
-    pos = *(PairXY *) &D_8008AB68;
+    pos = *(PairXY *) &gStyleDecorPosAX;
     i = 0;
-    if (D_8008AB50 == 2) {
+    if (gStyleDecorVariant == 2) {
         pos.y += 0x1E;
     }
-    wp = D_8008E10C;
+    wp = gStyleDecorSlots;
     srcOfs = 0;
     pos.y += shift * 3;
     do {
-        func_80054B1C(rgb, (u8 *) (srcOfs + D_8008AC8C), shift);
+        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + gStyleColorTable), shift);
         obj = (ObjSlotB8B8 *) *wp;
         obj->methods->slotB8(obj, 1, rgb);
         obj = (ObjSlotB8B8 *) *wp;
@@ -100,12 +102,12 @@ void func_800549A8(void) {
         pos.y += 3;
         wp++;
     } while (i < 0x12);
-    func_80054B1C(rgb, (u8 *) D_8008AC90, shift);
+    AdjustRgbByDelta(rgb, (u8 *) gStyleFlushColor, shift);
     self->methods->slot64(self, rgb);
 }
 ```
 
-`PairXY` is declared in the unit just above `func_80054850`, with the reason
+`PairXY` is declared in the unit just above `StyleBuildDecorSet`, with the reason
 it must be a struct written next to it.
 
 ### Proposed learning
@@ -119,10 +121,21 @@ already read, or of a stack slot just written, with no call in between -- is
 evidence of a BLKmode (struct or array) assignment upstream**, because
 `cse.c` handles a BLKmode set by throwing away every cached memory value.
 
-The transfer is the point. The lever was derived on `func_80054850`, where it
+The transfer is the point. The lever was derived on `StyleBuildDecorSet`, where it
 took the body from 6 words short to 1 and did not close it; it closed this
 one outright, first attempt. **Sibling functions share source idioms, so a
 lever found on one is worth spending a build on for every sibling before
 anything else is tried** -- and the sibling relationship was already recorded
-in both reports ("structurally the sibling of `func_80054850`"), which is what
+in both reports ("structurally the sibling of `StyleBuildDecorSet`"), which is what
 made this cheap.
+
+## Naming
+
+**`StyleUpdateDecorSet`, tier B.**
+
+Sibling of `StyleBuildDecorSet` (same `gStyleDecorVariant` guard, same
+`gStyleDecorSlots` array, same `paramA`/`paramB`-shaped position pair).
+Computes a time-based `shift` from an `ObjAC7CSub` object's `field18`/
+`field24` delta, then per-element recolors (`AdjustRgbByDelta`) and
+repositions (`slotB8`/`slotBC`) all 18 objects every frame. MATCHED,
+93/93.

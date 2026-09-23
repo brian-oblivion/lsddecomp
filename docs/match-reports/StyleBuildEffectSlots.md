@@ -1,0 +1,95 @@
+# StyleBuildEffectSlots -- MATCHED (60/60 words), class_3bb8c_n
+
+> Renamed from `func_80054B84` on 2026-09-23 (tools/rename.py). Address 0x80054b84.
+
+Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
+Matched on the first build.
+
+## Signature
+
+```c
+void StyleBuildEffectSlots(void *arg0);
+```
+
+## New externs
+
+```c
+extern void BaseObjO__func_56f5c(s32 arg0, void *arg1, s32 arg2, s32 arg3); /* class_3bb8c_o.c, ALREADY MATCHED */
+extern s32 rand(void);                                               /* libc, shared local view used project-wide */
+extern s8 D_80087324[];                                              /* 4-entry table, forward-indexed by rand()&3 */
+extern void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);        /* forward decl, own unit, cold */
+extern void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);      /* forward decl, own unit, ALREADY MATCHED this round */
+extern void StyleFillEffectKind3(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
+extern void StyleFillEffectKind2(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
+```
+
+`BaseObjO__func_56f5c` is `class_3bb8c_o.c`'s already-matched
+`void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3)`; this
+call site only needs the ABI shape (`s32,void*,s32,s32`), matching the
+project's convention of a looser cross-unit local signature. `gStyleVariant`,
+`gStyleTargetObj`, `gStyleEffectSlotCount` and `gStyleEffectSlots` are fresh copies of externs
+already declared later in this file, needed here because this function's
+ROM address is earlier (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`).
+
+## Body
+
+```c
+void StyleBuildEffectSlots(void *arg0) {
+    s32 base;
+    s32 val;
+    s32 count;
+    void **filled;
+
+    if (gStyleVariant < 0) {
+        return;
+    }
+    base = gStyleTargetObj;
+    BaseObjO__func_56f5c(gStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
+    val = D_80087324[rand() & 3];
+    count = (gStyleVariant == 2) ? 0x10 - val : 0;
+    gStyleEffectSlotCount = val + count;
+    filled = (void **) StyleFillEffectKind0(gStyleEffectSlots, val, arg0);
+    filled = StyleFillEffectKind1(filled, count, arg0);
+    if (gStyleVariant == 0) {
+        StyleFillEffectKind3(filled, arg0);
+    } else if (gStyleVariant == 2) {
+        StyleFillEffectKind2(filled, arg0);
+    } else {
+        return;
+    }
+    gStyleEffectSlotCount = gStyleEffectSlotCount + 1;
+}
+```
+
+`base = gStyleTargetObj;` reads the "pointer stored as a plain `s32`" global once
+(matching this unit's established `gStyleTargetObj` idiom, e.g.
+`FlushSoundCueSet(*(s32 *) gStyleTargetObj, ...)`), then indexes off it with plain
+integer arithmetic (`*(s32 *) (base + 4)`, etc.) -- GCC keeps the single
+load in a register and reuses it for all three offset reads, matching
+retail's `lw v0, gStyleTargetObj; lw a1,4(v0); lw a2,8(v0); lw a3,0xC(v0)`
+without needing to fight CSE.
+
+The trailing `if (gStyleVariant == 0) {...} else if (gStyleVariant == 2) {...}
+else { return; }` (rather than three independent `if`s) is what reproduces
+retail's shared "both branches converge, third one skips straight past" tail
+exactly: the `gStyleEffectSlotCount = gStyleEffectSlotCount + 1;` increment is genuinely SKIPPED
+when `gStyleVariant` is neither 0 nor 2 (retail's third path jumps directly to
+the epilogue, bypassing the increment block entirely) -- an early `return`
+in the `else` reproduces that skip.
+
+## Attempts
+
+1 (matched on the first build).
+
+## Naming
+
+**`StyleBuildEffectSlots`, tier B.**
+
+Dispatches on `gStyleVariant` (`PickStyleFallbackConfig`'s "kind") to
+`BaseObjO__func_56f5c`, then fills `gStyleEffectSlots` via
+`StyleFillEffectKind0`/`StyleFillEffectKind1`, then finishes via
+`StyleFillEffectKind3` (variant 0) or `StyleFillEffectKind2` (variant 2).
+The build/update/release triad naming mirrors `StyleBuildDecorSet` above,
+for the SEPARATE `gStyleEffectSlots` array (a different object class --
+`Obj876FC`, allocated through `class_3bb8c_r.c`'s `func_80056320`, not
+`New_ClassEAC0`). MATCHED, 60/60, first build.

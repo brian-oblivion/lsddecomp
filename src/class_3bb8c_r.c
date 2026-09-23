@@ -337,10 +337,10 @@ s32 func_8005627C(ParamObj *ctx) {
     return ctx->unk10 / q;
 }
 
-extern s32 D_8008AC80;
+extern s32 gStyleVariant;
 
 s32 func_8005630C(void) {
-    return (D_8008AC80 & 1) ^ 1;
+    return (gStyleVariant & 1) ^ 1;
 }
 
 /* ------------------------------------------------------------------ *

@@ -1,4 +1,8 @@
-# func_80055258 -- MATCHED round 64, 110/110 words, ins 0 / del 0, length exact (0x1B8)
+# SetupStyleSpawnParamsA -- MATCHED round 64, 110/110 words, ins 0 / del 0, length exact (0x1B8)
+
+> Renamed from `SetupStyleKind0Params` on 2026-09-23 (tools/rename.py). Address 0x80055258.
+
+> Renamed from `func_80055258` on 2026-09-23 (tools/rename.py). Address 0x80055258.
 
 ## Round 64 (charlie) -- REVISIT, closed in ONE build
 
@@ -146,8 +150,8 @@ so the retype is not local to this function. The two live pointer-take call
 sites were rewritten `func_80056320(..., D_8008E0A4, ...)` ->
 `func_80056320(..., &D_8008E0A4, ...)` (array decay and `&scalar` both
 compile to `lui`/`addiu`, so this is free), and the two preserved `#if 0`
-bodies that use the symbol (`func_80054FD8`, `func_80055410`) were updated
-to the same spelling. **`func_80054F30` is live and already matched and
+bodies that use the symbol (`StyleFillEffectKind3`, `SetupStyleSpawnParamsB`) were updated
+to the same spelling. **`StyleFillEffectKind1` is live and already matched and
 contains one of those call sites** -- the whole-image oracle is green after
 the retype, so the retype cost it nothing.
 
@@ -162,7 +166,7 @@ extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0B8;
 
-void func_80055258(void *arg0, void *arg1) {
+void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (arg1 == 0) {
         arg1 = (void *) D_80087328[rand() & 3];
     }
@@ -235,7 +239,7 @@ declaration. Retype the declaration to the accessed scalar type and assign by
 name. The retype is file-scope, so it touches siblings -- but a pointer-take
 site (`D_X` -> `&D_X`) is byte-identical, which makes the conversion free in
 practice. Confirmed here whole-image green with an already-matched sibling
-(`func_80054F30`) holding one of those sites.
+(`StyleFillEffectKind1`) holding one of those sites.
 
 **Discriminators, so this is not applied blind:**
 
@@ -274,7 +278,7 @@ practice. Confirmed here whole-image green with an already-matched sibling
 preprocessor awareness, so while iterating with the body live under `#if 1`
 and the `INCLUDE_ASM` parked in `#else`, it printed its "a full match means
 NOTHING" warning on a genuine 110/110. Harmless here because
-`build-and-verify.sh` went green and `nm` showed a real `T func_80055258` in
+`build-and-verify.sh` went green and `nm` showed a real `T SetupStyleSpawnParamsA` in
 the object, but the warning is the exact opposite of reassuring at the moment
 you close a function. Reported, not acted on -- it is a tool heuristic, and
 the safe iteration form is `#if 1` / `#else` / `#endif` with the guard
@@ -292,3 +296,20 @@ removed on the way to commit, which is what shipped.
   idiom, the dead `arg0`, the `void` return; length exact at 0x1B8/110 words.
   First real diff at word 2, `sw $ra,0x14($sp)` vs `sw $ra,0x18($sp)` --
   correctly identified as an extra saved register in the prologue.
+
+## Naming
+
+**`SetupStyleSpawnParamsA`, tier B.**
+
+One of two function-pointer targets `StyleFillEffectKind0` dispatches
+through per iteration, selected when `gStyleCounter % 7 != 0` (the more
+common ~6/7 branch; the other is `SetupStyleSpawnParamsB`). Sets a cluster of
+`gStyleE0*`-region scratch globals (spawn range/offset parameters consumed
+by the `func_80056320` allocator's `ctx` argument) from `rand()`. Named "A"
+rather than by its selection condition because the condition is a plain
+modulo test with no established game meaning -- naming it "the common one"
+or "the 6/7 one" would assert more than the mechanics show. Renamed away
+from an earlier `SetupStyleKind0Params`, which wrongly implied a link to the
+`Obj876FC` kind-tag axis (`StyleFillEffectKind0`/`1`/`2`/`3`'s literal
+first-argument values) -- this function has no such tag, it is selected by
+an unrelated modulo test. MATCHED, 110/110, ins 0/del 0.

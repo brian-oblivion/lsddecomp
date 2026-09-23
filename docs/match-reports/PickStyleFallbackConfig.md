@@ -1,39 +1,41 @@
-# func_80054758 -- MATCHED (62/62 words), class_3bb8c_n
+# PickStyleFallbackConfig -- MATCHED (62/62 words), class_3bb8c_n
+
+> Renamed from `func_80054758` on 2026-09-23 (tools/rename.py). Address 0x80054758.
 
 Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 
 ## Signature
 
 ```c
-void *func_80054758(void);
+void *PickStyleFallbackConfig(void);
 ```
 
 The first function in the unit (ROM order), so every extern it needs is a
-fresh copy (same reasoning as `func_80054C74`/`func_8005556C`/
-`func_80054B84`).
+fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
+`StyleBuildEffectSlots`).
 
 ## New externs
 
 ```c
-extern s32 D_8008AC74;         /* already s32 in class_3bb8c_m.c */
-extern s32 D_8008AC6C;         /* already s32 in class_3bb8c_m.c and this unit's own func_80055A24 */
-extern s8 D_800873DC[];        /* 16-entry table, indexed by (D_8008AC74+D_8008AC6C)&0xF */
-extern s32 D_8008AC80;
+extern s32 gStyleCounter;         /* already s32 in class_3bb8c_m.c */
+extern s32 gStyleKind;         /* already s32 in class_3bb8c_m.c and this unit's own DrawStyleTables */
+extern s8 D_800873DC[];        /* 16-entry table, indexed by (gStyleCounter+gStyleKind)&0xF */
+extern s32 gStyleVariant;
 extern s8 D_800873D8[];        /* divisor table, indexed by "kind" -- raw index, no scale */
 extern s32 D_8008AC84;
 extern s32 D_800873C8[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
-extern s32 D_8008AC90;
+extern s32 gStyleFlushColor;
 extern u8 D_8008726C[];        /* address only taken */
 extern u8 D_800872C4[];        /* 3-byte-stride table, indexed by a byte field */
-extern s32 D_8008AC8C;
+extern s32 gStyleColorTable;
 extern u8 D_80087234[];        /* address only taken */
-extern s32 D_8008AB50;
+extern s32 gStyleDecorVariant;
 ```
 
 ## Body
 
 ```c
-void *func_80054758(void) {
+void *PickStyleFallbackConfig(void) {
     s32 sum;
     s32 kind;
     s32 divisor;
@@ -43,26 +45,26 @@ void *func_80054758(void) {
     s32 b2;
     u8 *tab;
 
-    sum = D_8008AC74 + D_8008AC6C;
+    sum = gStyleCounter + gStyleKind;
     kind = D_800873DC[sum & 0xF];
-    D_8008AC80 = kind;
+    gStyleVariant = kind;
     divisor = D_800873D8[kind];
     remainder = sum % divisor;
     D_8008AC84 = remainder;
     result = (s8 *) D_800873C8[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
-        D_8008AC90 = (s32) (D_800872C4 + b3 * 3);
+        gStyleFlushColor = (s32) (D_800872C4 + b3 * 3);
         b2 = result[2];
         tab = D_8008726C;
         if (b2 != 0x12) {
             tab = D_80087234;
         }
-        D_8008AC8C = (s32) tab;
+        gStyleColorTable = (s32) tab;
         if (remainder < 4) {
-            D_8008AB50 = 1;
+            gStyleDecorVariant = 1;
         } else if (remainder < 6) {
-            D_8008AB50 = 2;
+            gStyleDecorVariant = 2;
         }
     }
     return result;
@@ -73,7 +75,7 @@ Notes:
 
 - `D_800873C8[kind]` is loaded as a raw `s32` *value* (not an address-of),
   then used as a base address for further byte-granular pointer arithmetic
-  (`+ remainder * 4`) -- exactly the `D_8008AC7C` "pointer stored as a plain
+  (`+ remainder * 4`) -- exactly the `gStyleTargetObj` "pointer stored as a plain
   scalar" idiom already established elsewhere in this unit, just for a
   different global.
 - The `sum % divisor` compiles to the standard MIPS `div`/`break 7`
@@ -124,3 +126,17 @@ mirror) matching whichever operand retail's bytes show being computed
 
 2 (first: ternary form, 59/62 with two swapped-constant words and one
 inverted branch; second: explicit default-then-override, byte-exact).
+
+## Naming
+
+**`PickStyleFallbackConfig`, tier B.**
+
+Literal call site in `ApplyStyleConfig` (class_3bb8c_m.c, already matched):
+`cfg = func_80054758();`, used only when the direct per-`gStyleKind` config
+table entry (`D_800873EC[gStyleKind]`) is NULL -- i.e. this is the fallback
+path. Body hashes `gStyleCounter + gStyleKind` into a 16-entry table to pick
+a `gStyleVariant` ("kind"), then a per-variant divisor/remainder select a
+config row. "Fallback" is evidenced by the call site; "kind"/variant
+selection mechanics are evidenced by the body; WHY a fallback is needed, or
+what the variant means in gameplay terms, is not established (tier B, not
+A).

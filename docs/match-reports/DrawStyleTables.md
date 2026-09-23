@@ -1,4 +1,6 @@
-# func_80055A24 -- MATCHED, round 46 (2026-09-15)
+# DrawStyleTables -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `func_80055A24` on 2026-09-23 (tools/rename.py). Address 0x80055a24.
 
 Unit `class_3bb8c_n`. **25/25 words, byte-exact.** Second build (one lever).
 
@@ -10,7 +12,7 @@ Fresh ground, carved round 45, never attempted. No blockers.
 
 ```
 /* 46224 80055A24 E8FFBD27 */  addiu $sp, $sp, -0x18
-/* 46228 80055A28 6404838F */  lw    $v1, %gp_rel(D_8008AC6C)($gp)
+/* 46228 80055A28 6404838F */  lw    $v1, %gp_rel(gStyleKind)($gp)
 /* 4622C 80055A2C 02000234 */  ori   $v0, $zero, 0x2
 /* 46230 80055A30 07006214 */  bne   $v1, $v0, .L80055A50
 /* 46238 80055A38 0880043C */  lui   $a0, %hi(D_80087444)
@@ -35,8 +37,8 @@ Fresh ground, carved round 45, never attempted. No blockers.
 jr $ra
 ```
 
-`D_8008AC6C` is a plain `s32` (already established as such in
-`class_3bb8c_m.c`, `RegisterStyleConfig`). `(D_8008AC6C - 3)` cast to unsigned and
+`gStyleKind` is a plain `s32` (already established as such in
+`class_3bb8c_m.c`, `RegisterStyleConfig`). `(gStyleKind - 3)` cast to unsigned and
 compared `< 3` is the standard idiom for a closed range test, matching
 retail's `sltiu` exactly. `func_8003B624` is a not-yet-carved,
 still-`INCLUDE_ASM` function in `asm/psyq_2bb9c.s` (a 4-argument draw-style
@@ -46,22 +48,22 @@ matters here, declared loosely as `void func_8003B624(void *arg0, s32 arg1,
 void *arg2);`.
 
 ```c
-extern s32 D_8008AC6C;
+extern s32 gStyleKind;
 extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
 extern s32 D_80087444[];
 extern s32 D_80087450[];
 extern s32 D_8008745C[];
 extern s32 D_80087468[];
 
-void func_80055A24(void) {
+void DrawStyleTables(void) {
     void *a0, *a2;
     s32 a1;
 
-    if (D_8008AC6C == 2) {
+    if (gStyleKind == 2) {
         a0 = D_80087444;
         a2 = D_80087450;
         a1 = 1;
-    } else if ((u32) (D_8008AC6C - 3) < 3) {
+    } else if ((u32) (gStyleKind - 3) < 3) {
         a1 = 1;
         a0 = D_8008745C;
         a2 = D_80087468;
@@ -94,3 +96,16 @@ inside each branch is the fix -- it lets the scheduler place each
 branch's `ori` where that branch's own tail already sits, rather than
 collapsing all paths' constant into one shared load ahead of the merged
 call.
+
+## Naming
+
+**`DrawStyleTables`, tier B.**
+
+Selects one of two 12-byte-tuple table pairs by `gStyleKind` (`== 2`, or
+`3..5`) and forwards them to `func_8003B624`, a not-yet-carved routine this
+unit's OWN header comment (round 45) already characterizes as "a 4-argument
+draw-style routine reading 12-byte tuples through a0/a2" -- that
+characterization, on file before this naming pass, is the evidence for
+"Draw" rather than a guess made now. Called as the last step of `TickStyle`
+every frame. MATCHED, 25/25, second build (one lever: hoist the shared `a1
+= 1` literal into each branch).

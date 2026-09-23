@@ -170,7 +170,7 @@ void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, 
 void func_80053134(Obj87034_3bb8c_l *self) {
     self->methods->slot84(self);
     TickDreamAuxSlots2();
-    func_80054D30();
+    StyleTeardown();
     self->unk54->methods->slot48(self->unk54);
 }
 
@@ -402,7 +402,7 @@ void func_80053764(Obj87034_3bb8c_l *self) {
 }
 
 void func_8005393C(Obj87034_3bb8c_l *self) {
-    func_800558F0(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
+    TickStyle(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
 }
 
 void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {

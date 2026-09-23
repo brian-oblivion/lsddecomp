@@ -277,7 +277,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   if a residue MOVES rather than SHRINKS, revert before the next. (a §"The combination corollary",
   §"Levers do not commute")
 - **And the MIRROR, which is the more surprising half: two levers each measured BYTE-INERT
-  are not jointly inert.** On `func_8005511C` a 495/1900 permuter candidate split into (a) a
+  are not jointly inert.** On `StyleFillEffectKind2` a 495/1900 permuter candidate split into (a) a
   single-use store alias and (b) a named local for a global load passed as an argument: each
   alone byte-identical in-tree, the two together moved ins 7/7 -> 3/3. The same pseudo then
   carries two unrelated values in two DISJOINT live ranges, which splits its lifetime, and
@@ -497,7 +497,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 - **An INCOMPLETE-ARRAY global declaration makes 2.6.3 CSE the address-take into a
   callee-saved register; a SCALAR declaration of the same symbol emits absolute-per-access.**
-  Four in-tree points on `func_80055258`: `extern u8 D_X[]` + `*(s32 *) D_X = v` and
+  Four in-tree points on `SetupStyleSpawnParamsA`: `extern u8 D_X[]` + `*(s32 *) D_X = v` and
   `extern s32 D_X[]` + `D_X[0] = v` both 5/110 RED, carrying an extra `$s1` and 8 more frame
   bytes; `extern s32 D_X;` assigned either by name or through `*(s32 *) &D_X` both 110/110
   GREEN. So ELEMENT TYPE and CAST SPELLING are inert and ARRAYNESS is the whole axis.

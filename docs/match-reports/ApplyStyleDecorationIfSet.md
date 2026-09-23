@@ -7,14 +7,14 @@ before this round.
 
 ## What it does
 
-Takes no arguments; gated entirely on the global `D_8008AB54` (set by
+Takes no arguments; gated entirely on the global `gStyleDecorColor` (set by
 `ApplyStyleConfig`, matched earlier this round). If it's non-NULL: builds an
-object via `New_ClassEAC0(&D_8008AB60, D_8008AB54, 0)` (already known
+object via `New_ClassEAC0(&D_8008AB60, gStyleDecorColor, 0)` (already known
 elsewhere as returning `ClassEAC0Obj *` from `include/code_2cc8c.h`, a header
-this unit doesn't own -- see below), stashes it in `D_8008AC94`, and
+this unit doesn't own -- see below), stashes it in `gStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
 `slot4C(obj,tmp,&D_8008AB58)`) plus one call on a completely different
-object reached through `D_8008AC7C->unkC` (`slotAC(sub)`, whose return
+object reached through `gStyleTargetObj->unkC` (`slotAC(sub)`, whose return
 feeds the `slot4C` call's middle argument).
 
 ```c
@@ -49,7 +49,7 @@ typedef struct FieldAC7CHolder {
     LocalSubObj *unkC;
 } FieldAC7CHolder;
 
-extern s32 D_8008AC94;
+extern s32 gStyleDecorObj;
 extern s32 D_8008AB60;
 extern s32 D_8008AB58;
 extern LocalM4D0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
@@ -57,15 +57,15 @@ extern LocalM4D0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
 void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
-    if (D_8008AB54 != 0) {
-        D_8008AC94 = (s32) New_ClassEAC0(&D_8008AB60, (void *) D_8008AB54, 0);
-        ((LocalM4D0Obj *) D_8008AC94)->methods->slot64((LocalM4D0Obj *) D_8008AC94, 1);
-        ((LocalM4D0Obj *) D_8008AC94)->methods->slot68((LocalM4D0Obj *) D_8008AC94, 0);
+    if (gStyleDecorColor != 0) {
+        gStyleDecorObj = (s32) New_ClassEAC0(&D_8008AB60, (void *) gStyleDecorColor, 0);
+        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
+        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
 
-        tmp = ((FieldAC7CHolder *) D_8008AC7C)->unkC->methods->slotAC(
-                ((FieldAC7CHolder *) D_8008AC7C)->unkC);
+        tmp = ((FieldAC7CHolder *) gStyleTargetObj)->unkC->methods->slotAC(
+                ((FieldAC7CHolder *) gStyleTargetObj)->unkC);
 
-        ((LocalM4D0Obj *) D_8008AC94)->methods->slot4C((LocalM4D0Obj *) D_8008AC94, tmp, &D_8008AB58);
+        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) gStyleDecorObj, tmp, &D_8008AB58);
     }
 }
 ```
@@ -76,7 +76,7 @@ First attempt used the obvious local-variable idiom:
 
 ```c
 LocalM4D0Obj *obj = New_ClassEAC0(...);
-D_8008AC94 = (s32) obj;
+gStyleDecorObj = (s32) obj;
 obj->methods->slot64(obj, 1);
 ```
 
@@ -90,15 +90,15 @@ retail's first load off the freshly-returned object (`lw v1,0(v0)`, reading
 and that `move` lands in the FIRST load's delay slot, for free. Every
 local-variable version instead emitted `move a0,v0` FIRST, then dereferenced
 through `a0`, leaving the first load's delay slot with nothing to fill but
-an explicit `nop`. Moving `D_8008AC94`'s assignment or the method lookup
+an explicit `nop`. Moving `gStyleDecorObj`'s assignment or the method lookup
 earlier/later in the C never changed which register got promoted first --
 GCC 2.6.3's allocator had already picked `a0` as `obj`'s home the moment a
 named local variable existed for it, independent of source statement order.
 
 **The fix was to never name it.** Storing the call's return value straight
-into the global (`D_8008AC94 = (s32) New_ClassEAC0(...);`) and then
-re-deriving the pointer from `D_8008AC94` at every subsequent use point
-(`((LocalM4D0Obj *) D_8008AC94)->methods->...`) let the compiler's local
+into the global (`gStyleDecorObj = (s32) New_ClassEAC0(...);`) and then
+re-deriving the pointer from `gStyleDecorObj` at every subsequent use point
+(`((LocalM4D0Obj *) gStyleDecorObj)->methods->...`) let the compiler's local
 value-numbering recognize that the gp-relative load it would otherwise need
 for the FIRST use is redundant right after the store (the value is still in
 `$v0`), so it read `$v0` directly there and only introduced the `a0` copy
@@ -126,4 +126,4 @@ logic, only a different way of naming the same values.
 
 ## Naming
 
-**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `D_8008AB54` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_ClassEAC0`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`D_8008AC7C`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
+**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `gStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_ClassEAC0`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleTargetObj`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.

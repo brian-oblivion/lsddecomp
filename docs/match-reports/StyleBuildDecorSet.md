@@ -1,4 +1,6 @@
-# func_80054850 -- STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first real diff at word 15 (0x4508C / vram 0x8005488C)
+# StyleBuildDecorSet -- STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first real diff at word 15 (0x4508C / vram 0x8005488C)
+
+> Renamed from `func_80054850` on 2026-09-23 (tools/rename.py). Address 0x80054850.
 
 REVISITED, round 61: 12/86 and 6 words short -> 17/86 and 1 word short; the
 two residues rounds 46/47 classified as uncontrollable register pressure were
@@ -10,10 +12,10 @@ both a single source-shape difference and are CLOSED; names/types not relevant
 Round 46 named two effects and round 47 re-affirmed both:
 
 1. *"A stack-resident local (`paramA[1]`) gets reloaded from memory in retail
-   immediately after an intervening `D_8008AB50` check reuses the register that
+   immediately after an intervening `gStyleDecorVariant` check reuses the register that
    held it ... register-pressure-driven, not something a source rewrite
    obviously controls."*
-2. Retail also reloads `D_8008AB50` itself for the `== 2` test rather than
+2. Retail also reloads `gStyleDecorVariant` itself for the `== 2` test rather than
    reusing the value the guard already read.
 
 Neither is register pressure and both are the same thing: **retail copies each
@@ -25,18 +27,18 @@ typedef struct PairXY { s32 x; s32 y; } PairXY;
 
 PairXY paramA, paramB;
 
-paramA = *(PairXY *) &D_8008AB68;      /* NOT paramA[0] = ..; paramA[1] = ..; */
-if (D_8008AB50 == 2) {
+paramA = *(PairXY *) &gStyleDecorPosAX;      /* NOT paramA[0] = ..; paramA[1] = ..; */
+if (gStyleDecorVariant == 2) {
     paramA.y += 0x1E;
 }
-paramB = *(PairXY *) &D_8008AB70;
+paramB = *(PairXY *) &gStyleDecorPosBX;
 ```
 
 **Mechanism.** A struct assignment is a BLKmode `set`. gcc 2.6.3's `cse.c`
 cannot reason about the extent of a BLKmode destination, so `invalidate()`
 falls back to `invalidate_memory()` -- it throws away **every** cached memory
 value in the hash table, not just the ones that could overlap. So the read of
-`D_8008AB50` the guard performed is no longer available for the `== 2` test
+`gStyleDecorVariant` the guard performed is no longer available for the `== 2` test
 (reload 2), and the value just written into `paramA.y` is no longer available
 for the `+= 0x1E` (reload 1). Written as scalar stores, the stack slot is a
 fixed frame address, CSE keeps everything, and **both reloads vanish** -- which
@@ -46,9 +48,9 @@ With that one change, retail's whole setup block matches byte for byte,
 reloads, load-delay `nop` and all:
 
 ```
-45070  lw    v0,%gp_rel(D_8008AB68)     45078  sw  v0,0x10(sp)
-45074  lw    v1,%gp_rel(D_8008AB6C)     4507c  sw  v1,0x14(sp)
-45080  lw    v1,%gp_rel(D_8008AB50)   <-- reload 2
+45070  lw    v0,%gp_rel(gStyleDecorPosAX)     45078  sw  v0,0x10(sp)
+45074  lw    v1,%gp_rel(gStyleDecorPosAY)     4507c  sw  v1,0x14(sp)
+45080  lw    v1,%gp_rel(gStyleDecorVariant)   <-- reload 2
 45084  li    v0,0x2
 45088  bne   v1,v0,450a0
 4508c   li   a2,0x1fff
@@ -66,7 +68,7 @@ read straight off the raw `.s`:
 | # | correction | evidence in retail |
 | --- | --- | --- |
 | 1 | the pair copies are struct assignments (above) | the two reloads |
-| 2 | the trailing double dispatch reads the GLOBAL `D_8008E10C[0]` twice, not the cached `arr[0]` | `lui v1/lw %lo(D_8008E10C)` at 45160 **and again** `lui a0/lw %lo` at 45170, where the loop body uses `lw a1,0(s3)` |
+| 2 | the trailing double dispatch reads the GLOBAL `gStyleDecorSlots[0]` twice, not the cached `arr[0]` | `lui v1/lw %lo(gStyleDecorSlots)` at 45160 **and again** `lui a0/lw %lo` at 45170, where the loop body uses `lw a1,0(s3)` |
 | 3 | the array is walked with a separate pointer starting at `arr + 1`, not indexed by the loop counter | `addiu s0,s3,4` before the loop; `sw a0,0(s0); addiu s0,s0,4` inside |
 | 4 | `arr` is assigned AFTER the first call, not before | `lui v1/addiu v1` sit at 450c4, past the `jal` at 450bc |
 
@@ -100,10 +102,10 @@ register, same value, branch targets agreeing"), and it is the whole of the
 byte-identical output, i.e. the residue is invariant to all of them rather
 than merely unimproved:
 
-- `arr = D_8008E10C; wp = arr + 1;`
-- `wp = D_8008E10C; arr = wp; wp = arr + 1;`
-- an extra `void **base;` temp: `base = D_8008E10C; arr = base;`
-- `wp = D_8008E10C + 1;` (derive the walker from the global, not from `arr`)
+- `arr = gStyleDecorSlots; wp = arr + 1;`
+- `wp = gStyleDecorSlots; arr = wp; wp = arr + 1;`
+- an extra `void **base;` temp: `base = gStyleDecorSlots; arr = base;`
+- `wp = gStyleDecorSlots + 1;` (derive the walker from the global, not from `arr`)
 - `wp[0] = obj; wp = wp + 1;` instead of `*wp = obj; wp++;`
 - `obj` typed `ObjSlot4C *` instead of `void *`, dropping the cast at the
   dispatch
@@ -133,8 +135,8 @@ side effect of the image moving. The honest figures are the two in the title:
 ## Preserved near-miss body (1 word short, `#if 0` in `src/class_3bb8c_n.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
-`extern s32 D_8008AB50, D_8008AB68, D_8008AB6C, D_8008AB70, D_8008AB74,
-D_8008AC7C, D_8008AC8C;`, `extern void *D_8008E10C[];`,
+`extern s32 gStyleDecorVariant, gStyleDecorPosAX, gStyleDecorPosAY, gStyleDecorPosBX, gStyleDecorPosBY,
+gStyleTargetObj, gStyleColorTable;`, `extern void *gStyleDecorSlots[];`,
 `extern void *New_ClassEAC0(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
 the function in the unit.
@@ -146,7 +148,7 @@ struct PairXY {
     s32 y; /* +0x004 */
 };
 
-void func_80054850(void) {
+void StyleBuildDecorSet(void) {
     PairXY paramA;
     PairXY paramB;
     s32 i;
@@ -157,23 +159,23 @@ void func_80054850(void) {
     ObjSlotAC *self2;
     void *result;
 
-    if (D_8008AB50 == 0) {
+    if (gStyleDecorVariant == 0) {
         return;
     }
-    paramA = *(PairXY *) &D_8008AB68;
-    if (D_8008AB50 == 2) {
+    paramA = *(PairXY *) &gStyleDecorPosAX;
+    if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &D_8008AB70;
+    paramB = *(PairXY *) &gStyleDecorPosBX;
     i = 1;
     s1 = 3;
-    obj = New_ClassEAC0(&paramB, (void *) D_8008AC8C, 0x1FFF);
+    obj = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
     __asm__("");
-    arr = D_8008E10C;
+    arr = gStyleDecorSlots;
     wp = arr + 1;
     *arr = obj;
     do {
-        obj = New_ClassEAC0(&paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
+        obj = New_ClassEAC0(&paramB, (void *) (s1 + gStyleColorTable), 0x1FFF);
         *wp = obj;
         wp++;
         ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], &paramA);
@@ -183,16 +185,16 @@ void func_80054850(void) {
         i++;
     } while (i < 0x12);
 
-    self2 = *(ObjSlotAC **) (D_8008AC7C + 0xC);
+    self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) D_8008E10C[0])->methods->slot4C(D_8008E10C[0], result, &paramA);
+    ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
 }
 ```
 
 ## Gate 3 / permuter
 
 **Not run this round, and deliberately.** One bounded search was spent on
-`func_80054FD8` (this session's first assignment, one search at a time), and
+`StyleFillEffectKind3` (this session's first assignment, one search at a time), and
 by the time this body reached 1 word short that search was still live. This
 function is now a much better search candidate than it was when rounds 46 and
 47 recommended one: the base has gone from 6 words short with a mis-derived
@@ -219,3 +221,17 @@ The reason this is worth writing down as a rule rather than an anecdote is the
 failure mode it replaces. "Register pressure" is unfalsifiable and terminal: it
 names no construct, suggests no experiment, and both round 46 and round 47
 stopped on it. The discriminator here costs one build.
+
+## Naming
+
+**`StyleBuildDecorSet`, tier B.**
+
+Guarded by `gStyleDecorVariant` (set only for `gStyleVariant == 0` by
+`PickStyleFallbackConfig`). Allocates 18 `New_ClassEAC0` instances into
+`gStyleDecorSlots`, walking two position pairs (`paramA`/`paramB`) that step
+by a fixed per-iteration delta. Released by `StyleReleaseDecorSet`,
+per-frame-updated by `StyleUpdateDecorSet` (sibling report; same guard, same
+array). "DecorSet" names the mechanics (a released/updated SET of objects
+gated by the decor variant flag) without asserting what the 18 objects
+represent visually -- no string or other-unit evidence establishes that.
+STALL, 1 word short; naming is unaffected by match state per track 3.

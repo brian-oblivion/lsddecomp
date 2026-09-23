@@ -14,7 +14,7 @@ result plus `&D_8008AB94` (a 1-word `.sdata` constant, address-only, never
 loaded) to library function `func_80020510` (still `psyq_fa50.s`, unrenamed
 Psy-Q object; called with an unused return value). `arg0` (the function's
 first parameter) is never read anywhere in the body -- it is discarded, the
-same as its caller (`func_80054B84`, unaddressed `class_3bb8c_n.s`) passes
+same as its caller (`StyleBuildEffectSlots`, unaddressed `class_3bb8c_n.s`) passes
 its own unrelated `self` there without any indication of shared meaning.
 
 ```c

@@ -206,13 +206,13 @@ void *GetObjMMethods(void) {
 
 struct StyleM;
 
-extern s32 D_8008AB4C;
-extern s32 D_8008AC6C;
-extern s32 D_8008AC70;
-extern s32 D_8008AC74;
+extern s32 gStyleCueSelf;
+extern s32 gStyleKind;
+extern s32 gStyleTickCount;
+extern s32 gStyleCounter;
 extern s32 D_8008AC78;
-extern s32 D_8008AC7C;
-extern s32 D_8008AC80;
+extern s32 gStyleTargetObj;
+extern s32 gStyleVariant;
 extern s32 D_8008ACA0;
 
 extern void *ApplyStyleConfig(void);
@@ -221,16 +221,16 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
     s32 i;
 
-    if (D_8008AB4C == 0) {
+    if (gStyleCueSelf == 0) {
         i = 1;
         p = &D_8008ACA0;
-        D_8008AB4C = a0;
-        D_8008AC6C = a1;
-        D_8008AC7C = a2;
-        D_8008AC80 = -1;
-        D_8008AC74 = a3;
+        gStyleCueSelf = a0;
+        gStyleKind = a1;
+        gStyleTargetObj = a2;
+        gStyleVariant = -1;
+        gStyleCounter = a3;
         D_8008AC78 = arg4;
-        D_8008AC70 = 0;
+        gStyleTickCount = 0;
         do {
             *p = 0;
             i--;
@@ -243,20 +243,20 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
 
 extern s32 D_80087424;
 extern s8 *D_800873EC[];
-extern s8 *func_80054758(void);
+extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
 extern u8 D_800872C4[][3];
-extern const u8 *D_8008AB54;
+extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
-    s8 *cfg = D_800873EC[D_8008AC6C];
+    s8 *cfg = D_800873EC[gStyleKind];
 
     if (cfg == 0) {
-        cfg = func_80054758();
+        cfg = PickStyleFallbackConfig();
     }
     FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
     if (cfg[1] >= 4) {
-        D_8008AB54 = D_800872C4[cfg[2]];
+        gStyleDecorColor = D_800872C4[cfg[2]];
     }
     return &D_80087424;
 }
@@ -311,7 +311,7 @@ struct LocalM4D0Obj {
     LocalM4D0Methods *methods;
 };
 
-/* D_8008AC7C's own local reading here: only its +0xC field (a "self"
+/* gStyleTargetObj's own local reading here: only its +0xC field (a "self"
  * pointer into a THIRD object, dispatched only through +0xAC) is ever
  * touched by this function. */
 typedef struct LocalSubObj LocalSubObj;
@@ -328,7 +328,7 @@ typedef struct FieldAC7CHolder {
     LocalSubObj *unkC;
 } FieldAC7CHolder;
 
-extern s32 D_8008AC94;
+extern s32 gStyleDecorObj;
 extern s32 D_8008AB60;
 extern s32 D_8008AB58;
 extern LocalM4D0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
@@ -336,14 +336,14 @@ extern LocalM4D0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
 void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
-    if (D_8008AB54 != 0) {
-        D_8008AC94 = (s32) New_ClassEAC0(&D_8008AB60, (void *) D_8008AB54, 0);
-        ((LocalM4D0Obj *) D_8008AC94)->methods->slot64((LocalM4D0Obj *) D_8008AC94, 1);
-        ((LocalM4D0Obj *) D_8008AC94)->methods->slot68((LocalM4D0Obj *) D_8008AC94, 0);
+    if (gStyleDecorColor != 0) {
+        gStyleDecorObj = (s32) New_ClassEAC0(&D_8008AB60, (void *) gStyleDecorColor, 0);
+        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
+        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
 
-        tmp = ((FieldAC7CHolder *) D_8008AC7C)->unkC->methods->slotAC(
-                ((FieldAC7CHolder *) D_8008AC7C)->unkC);
+        tmp = ((FieldAC7CHolder *) gStyleTargetObj)->unkC->methods->slotAC(
+                ((FieldAC7CHolder *) gStyleTargetObj)->unkC);
 
-        ((LocalM4D0Obj *) D_8008AC94)->methods->slot4C((LocalM4D0Obj *) D_8008AC94, tmp, &D_8008AB58);
+        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) gStyleDecorObj, tmp, &D_8008AB58);
     }
 }
