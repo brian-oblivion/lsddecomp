@@ -317,14 +317,17 @@ extern s32 strlen(void *arg0);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 extern char *strcpy(char *dest, char *src);
 
-/* STALLED at 6/107 words -- see docs/match-reports/func_80051AC8.md for the
- * full round-19 analysis (round 9's 9-10/107 register-identity diagnosis
- * still holds; this round fixed a genuine independent bug -- a sign/
- * unsigned-promotion mistake in the halving idiom that made a `sra` come
- * out as `srl` -- and matched two more of retail's scheduling choices, but
- * the core register rotation is unmoved). Preserved here per project
- * convention rather than only in the report. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 6/107 words (length exact, 107/107 -- objdump confirms).
+ * Residue: register identity, not instruction count -- retail keeps arg1
+ * live in one register for the whole function and uses a separate cursor
+ * register for both the counting and filling loops, while this body's
+ * allocation rotates self/arg1/count/cursor/index differently, cascading
+ * from partway through the body onward (docs/match-reports/func_80051AC8.md).
+ * Hand-derived; reviewed rounds 9, 13, 19 -- round 19 additionally fixed a
+ * real sign/unsigned-promotion bug in the halving idiom (`sra` vs `srl`)
+ * and matched two more of retail's scheduling choices, neither of which
+ * moved the word count since it is dominated by the register rotation. */
 void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
 {
     void **p;
@@ -370,9 +373,9 @@ void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
     func_80051C74(self);
     self->methods->slot40(self);
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051AC8);
+#endif
 
 void func_80051C74(Class86ED0 *self)
 {
@@ -461,7 +464,43 @@ extern s32 D_80087028;
 extern s32 D_8008AAF8;
 extern s32 D_800116E4;
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 75/95 words. Residue: pure register-identity rotation, not
+ * a size/instruction defect -- compiled length is exactly 95 words on the
+ * first attempt (funcdiff reports no drift), and a permuter --debug run
+ * confirms 0 reorderings/insertions/deletions, only 28 register diffs: a
+ * clean three-way rotation of the same three long-lived values (the two
+ * repeated global addresses feeding BuildFileName, plus the handle) across
+ * the same three registers, while self/arg1 already match retail exactly
+ * (docs/match-reports/func_80051F24.md). Hand-derived; reviewed rounds 18,
+ * 19 -- ten attempts across four functions now confirm declaration/
+ * introduction-order reshaping is inert for this residue class. */
+void func_80051F24(Class86ED0 *self, void *arg1)
+{
+    s32 local[8];
+    Class86ED0Handle *h;
+
+    if (!arg1) {
+        return;
+    }
+    if (self->unk50) {
+        return;
+    }
+
+    h = func_8003B39C(BuildFileName(local, &D_8008AB14, &D_8008AB1C, &D_8008AB24));
+    h->methods->slot78(h);
+    self->unk50 = func_80041C9C(h, &D_80087028, 0);
+    h->methods->slot4(h);
+    self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
+
+    h = func_8003B39C(BuildFileName(local, &D_800116E4, &D_8008AB1C, &D_8008AB24));
+    h->methods->slot78(h);
+    self->methods->slot8C(self, arg1, h, self->unk20, self->unk24, self->unk28);
+    h->methods->slot4(h);
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051F24);
+#endif
 
 void func_800520A0(Class86ED0 *self)
 {
