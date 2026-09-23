@@ -361,10 +361,10 @@ typedef struct Class86668Methods {
      * the base's own slot44, returns self->unk28. Called by Obj865C8__Init
      * as GetClass86668Methods()->slot44(self, self->unk0C, 0), return discarded. */
     s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 Class86668__Init */
-    /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
+    /* Class86668__Deinit (this unit, matched): a thin wrapper forwarding to
      * Get_vtable_IntermediateBase()->slot48(self). Called by Obj865C8__Deinit as
      * GetClass86668Methods()->slot48(self). */
-    void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
+    void (*slot48)(Obj865C8 *self);                        /* +0x048 Class86668__Deinit */
     u8 pad4C[0x54 - 0x4C];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
      * offset (Obj865C8__AdvanceState, this unit): gClass86668Methods's own +0x054 is

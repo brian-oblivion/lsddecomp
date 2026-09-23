@@ -1,4 +1,6 @@
-# func_8004A324
+# Class86668__Deinit
+
+> Renamed from `func_8004A324` on 2026-09-23 (tools/rename.py). Address 0x8004a324.
 
 **Unit:** class_39e08 · **Size:** 14 words (0x38 bytes) · **Status:** MATCHED (14/14 words)
 
@@ -22,7 +24,7 @@ jalr  $v0
 Written as:
 
 ```c
-void func_8004A324(Obj865C8 *self) {
+void Class86668__Deinit(Obj865C8 *self) {
     Get_vtable_IntermediateBase()->slot48(self);
 }
 ```

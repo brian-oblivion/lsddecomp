@@ -1762,3 +1762,4 @@ Class86668__Class86668 = 0x8004A19C; // type:func
 Class86668__Dtor = 0x8004A228; // type:func
 Class86668__CancelTimeout = 0x8004A294; // type:func
 Class86668__Init = 0x8004A2C4; // type:func
+Class86668__Deinit = 0x8004A324; // type:func

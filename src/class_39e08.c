@@ -299,7 +299,7 @@ s32 Class86668__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
     return self->unk28;
 }
 
-void func_8004A324(Obj865C8 *self) {
+void Class86668__Deinit(Obj865C8 *self) {
     Get_vtable_IntermediateBase()->slot48(self);
 }
 

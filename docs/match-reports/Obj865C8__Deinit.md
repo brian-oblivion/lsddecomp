@@ -39,8 +39,8 @@ jr $ra
 ```
 
 `GetClass86668Methods()->slot48` is gClass86668Methods's own +0x048, which is
-`func_8004A324` (this unit, already matched:
-`void func_8004A324(Obj865C8 *self) { Get_vtable_IntermediateBase()->slot48(self); }`) —
+`Class86668__Deinit` (this unit, already matched:
+`void Class86668__Deinit(Obj865C8 *self) { Get_vtable_IntermediateBase()->slot48(self); }`) —
 i.e. this function forwards to the SIBLING class's slot48 override
 explicitly, not to its own (`Obj865C8__Deinit` itself occupies `D_800865C8`'s
 +0x048 slot — this is a self-referential-looking but actually cross-class
@@ -79,7 +79,7 @@ void Obj865C8__Deinit(Obj865C8 *self) {
   `+0x014` and `+0x110` reached here), same "only the dispatched slots
   named" policy as `SubObjA`/`SubObjB`/`Obj4C`.
 - `Class86668Methods::slot48` added at +0x048, typed `void (*)(Obj865C8
-  *self)` — occupied by this unit's own already-matched `func_8004A324`.
+  *self)` — occupied by this unit's own already-matched `Class86668__Deinit`.
 
 ## Attempts
 
