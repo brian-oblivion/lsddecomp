@@ -45,7 +45,7 @@ typedef struct LinkNodeMethods {
     u8 pad50[0x60 - 0x50];
     void (*setDisplay)(LinkNode *self, s32 on);                 /* +0x060, Class6B5CC__SetDisplay: GsDOFF = !on */
     void (*setSemiTrans)(LinkNode *self, s32 on);               /* +0x064, Class6B5CC__SetSemiTrans: GsALON */
-    void (*setSemiTransRate)(LinkNode *self, s32 rate);         /* +0x068, func_8001D3A0: attribute bits 28-29 (GsAZERO..GsATHREE) */
+    void (*setSemiTransRate)(LinkNode *self, s32 rate);         /* +0x068, Class6B5CC__SetSemiTransRate: attribute bits 28-29 (GsAZERO..GsATHREE) */
     u8 pad6C[0xB8 - 0x6C];
     /* +0x0B8 is CLASS-DEPENDENT, so it keeps its placeholder: on the owner
      * and on modelChildren it is BaseObjO__SetVec14 (set translation); on
