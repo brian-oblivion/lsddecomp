@@ -115,7 +115,7 @@ Retail's block layout is unambiguous -- the `D_80087430` load is physically
 FIRST and jumps (`j` with a `nop` delay), the `move v0,zero` arm is physically
 LAST and falls through -- which by section 3a's rule ("GCC 2.6.3 gives the
 fallthrough to whichever candidate is LAST in source order") says retail's
-source is `if (D_8008AC74 % 20 != 0) { v0 = D_80087430; } else { v0 = 0; }`,
+source is `if (gStyleCounter % 20 != 0) { v0 = D_80087430; } else { v0 = 0; }`,
 the inverse of the inherited body. Applying it:
 
 | body it was applied to | before | after |
@@ -170,7 +170,7 @@ length-exact, so round 48's negative does not cover it.
    within one. Search is meaningful.
 
 The `Reorderings: 3` matches the diff by eye exactly: retail hoists
-`ori v1,v1,0x6667`, `mfhi a0`, `lw a1,%gp_rel(D_8008AC74)` and `mult a1,v1`
+`ori v1,v1,0x6667`, `mfhi a0`, `lw a1,%gp_rel(gStyleCounter)` and `mult a1,v1`
 into the `/3` `multu`'s latency window, *ahead* of the `lui/addiu` for
 `&D_8008E0C0`, and finishes the `/3` chain afterwards. The build computes
 `&D_8008E0C0` first and defers the `/20` `mult` until after the first store.
@@ -273,7 +273,7 @@ window.
 ## Preserved near-miss body (49/79, length exact, `#if 0` in src/class_3bb8c_n.c)
 
 ```c
-extern s32 D_8008AC74;
+extern s32 gStyleCounter;
 extern s32 gStyleCueSelf;
 extern s32 D_80087430;
 extern s32 D_80087330;
@@ -296,7 +296,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     slot = D_8008E0C0;
     *slot = (s32) (D_80087228 + idx * 3);
     slot++;
-    if (D_8008AC74 % 20 == 0) {
+    if (gStyleCounter % 20 == 0) {
         v0 = 0;
     } else {
         v0 = D_80087430;

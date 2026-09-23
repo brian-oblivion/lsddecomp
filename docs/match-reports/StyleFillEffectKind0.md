@@ -95,7 +95,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
         t3 = D_80087328[t3];
     }
     fp = SetupStyleSpawnParamsB;
-    if (D_8008AC74 % 7 != 0) {
+    if (gStyleCounter % 7 != 0) {
         fp = SetupStyleSpawnParamsA;
     }
     for (i = 0; i < arg1; i++) {
@@ -120,7 +120,7 @@ Every value confirmed directly off the raw bytes:
   `s3` is reused: first as the `%7` magic constant, then unconditionally
   loaded with `&SetupStyleSpawnParamsB` (filling the `mult`'s latency slot for free),
   then conditionally overwritten to `&SetupStyleSpawnParamsA` if
-  `D_8008AC74 % 7 != 0`. This is the **same shared-dispatch idiom
+  `gStyleCounter % 7 != 0`. This is the **same shared-dispatch idiom
   `TickStyle` uses via `ObjAB4C::slotE8`**, except here the two
   candidates are plain functions (not vtable slots), selected by a modulo
   test rather than a self-object's own state.

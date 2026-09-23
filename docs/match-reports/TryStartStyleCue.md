@@ -40,7 +40,7 @@ the epilogue: the null path sets `v0 = 0`, the success path sets
 ## New externs
 
 ```c
-extern s32 D_8008AC7C;                                 /* fresh copy -- see below */
+extern s32 gStyleTargetObj;                                 /* fresh copy -- see below */
 extern void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);  /* forward decl, own unit,
                                                           111w, STALL -- widened round 47,
                                                           see FindNearestStyleCueEntry.md */
@@ -53,9 +53,9 @@ extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4)
 arg4)`); this call site only needs `void *`/`s32` at the ABI level (matches
 the looser local signatures `Entity.c` and `DreamSys.c` already use for the
 same cross-unit call, per the multiple-independent-local-views convention).
-`D_8008AC7C` is redeclared fresh here (not reusing the copy later in this
+`gStyleTargetObj` is redeclared fresh here (not reusing the copy later in this
 file for `FlushStyleCue`/`StopStyleCueIfNear`) because this function's ROM
-address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `D_8008AC80`
+address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `gStyleVariant`
 copy. `D_800874B0` is `class_3bb8c_r.c`'s already-identified 14-function
 table (its own `ParamMethods` slot list); here it is read as a raw `s32`
 bit pattern (a function pointer forwarded opaquely as `InitSoundCueSet`'s 5th
@@ -72,7 +72,7 @@ ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     sub = (ObjN14Sub *) FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2);
     if (sub != 0) {
         arg0->unk0 = sub;
-        InitSoundCueSet(*(s32 *) D_8008AC7C, &arg0->unk14, sub->unk6, arg0, D_800874B0[sub->unk6]);
+        InitSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->unk14, sub->unk6, arg0, D_800874B0[sub->unk6]);
         if (sub->unk6 == *arg1) {
             *arg1 = -sub->unk6;
         }

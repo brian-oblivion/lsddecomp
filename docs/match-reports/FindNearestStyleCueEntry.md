@@ -45,13 +45,13 @@ changes, read straight off that candidate's mutated source:
 2. **The `entry` pointer's address computation needed a different operand
    ORDER, not a different value.** The one remaining word after removing
    the redundant guard was `addu $s1,$a0,$v0` (retail) vs `addu
-   $s1,$v0,$a0` (mine) -- `$a0` held `D_8008AC98 * 8` and `$v0` held
+   $s1,$v0,$a0` (mine) -- `$a0` held `gStyleCueRecordIndex * 8` and `$v0` held
    `base`, both correctly, just encoded in the opposite operand order.
-   **Four different C spellings of `base + D_8008AC98 * 8` (the original
-   form, `D_8008AC98 * 8 + base`, `(EntrySlot *) base + D_8008AC98`, and
-   `&((EntrySlot *) base)[D_8008AC98]`) all produced the SAME operand
+   **Four different C spellings of `base + gStyleCueRecordIndex * 8` (the original
+   form, `gStyleCueRecordIndex * 8 + base`, `(EntrySlot *) base + gStyleCueRecordIndex`, and
+   `&((EntrySlot *) base)[gStyleCueRecordIndex]`) all produced the SAME operand
    order** -- this is not a simple "write the addends in the other order"
-   fix. What worked: `(EntrySlot *) (D_8008AC98 * 8 + (s32) base)`, casting
+   fix. What worked: `(EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base)`, casting
    `base` to `s32` explicitly before the addition rather than letting the
    pointer-plus-integer arithmetic happen implicitly. Confirmed byte-exact:
    `build exit=0`, `OK: build matches retail SLPS_015.56`,
@@ -71,11 +71,11 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = D_800876B4[D_8008AC6C];
-    n = D_800876EC[D_8008AC6C] - D_8008AC98;
-    entry = (EntrySlot *) (D_8008AC98 * 8 + (s32) base);
+    base = D_800876B4[gStyleKind];
+    n = D_800876EC[gStyleKind] - gStyleCueRecordIndex;
+    entry = (EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base);
     for (j = 0; j < n; j++, entry++) {
-        D_8008AC98++;
+        gStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
@@ -104,7 +104,7 @@ fail:
 
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
-`extern s32 D_8008AC6C, D_8008AC98, gStyleCueSelf, D_80087474[];`,
+`extern s32 gStyleKind, gStyleCueRecordIndex, gStyleCueSelf, D_80087474[];`,
 `extern u8 *D_800876B4[], D_800876EC[], D_800874EC[];` (all already
 declared in `src/class_3bb8c_n.c` ahead of this function).
 
@@ -175,9 +175,9 @@ Scans a run of 8-byte records starting at a base pointer for one whose
 returning the first such record or `NULL`.
 
 ```c
-extern s32 D_8008AC6C;
-extern s32 D_8008AC98;
-extern u8 *D_800876B4[];    /* word array of base pointers, indexed by D_8008AC6C */
+extern s32 gStyleKind;
+extern s32 gStyleCueRecordIndex;
+extern u8 *D_800876B4[];    /* word array of base pointers, indexed by gStyleKind */
 extern u8 D_800876EC[];    /* byte array of counts, same index */
 extern u8 D_800874EC[];    /* table, 6-byte stride entries */
 extern s32 D_80087474[];   /* word table, indexed by entry->count */
@@ -200,14 +200,14 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = D_800876B4[D_8008AC6C];
-    n = D_800876EC[D_8008AC6C] - D_8008AC98;
+    base = D_800876B4[gStyleKind];
+    n = D_800876EC[gStyleKind] - gStyleCueRecordIndex;
     if (n <= 0) {
         goto fail;
     }
-    entry = (EntrySlot *) (base + D_8008AC98 * 8);
+    entry = (EntrySlot *) (base + gStyleCueRecordIndex * 8);
     for (j = 0; j < n; j++, entry++) {
-        D_8008AC98++;
+        gStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
@@ -260,7 +260,7 @@ Notes on the recovery:
 ## The stall: preamble scheduling order
 
 Retail places `j = 0` (as `move $s2,zero`) as the literal first instruction
-after the `ctx == 0` guard, BEFORE either of the two `D_8008AC6C`-indexed
+after the `ctx == 0` guard, BEFORE either of the two `gStyleKind`-indexed
 lookups. My build computes both lookups first and initializes `j` last
 (as part of the `for`'s own init clause), which is semantically identical
 but produces a different instruction SCHEDULE around the two lookups (see

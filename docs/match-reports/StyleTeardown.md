@@ -23,8 +23,8 @@ jal   StyleFlushDecoration
 jal   StyleReleaseDecorSet
  addu $s1, $zero, $zero
 jal   StyleReleaseEffectSlots
-lui   $s0, %hi(D_8008AC9C)
-addiu $s0, $s0, %lo(D_8008AC9C)
+lui   $s0, %hi(gStyleCueSlots)
+addiu $s0, $s0, %lo(gStyleCueSlots)
 .L80054D5C:
 lw    $a0, 0x0($s0)
 jal   FlushStyleCue
@@ -42,18 +42,18 @@ jr $ra
 ```
 
 Calls the three just-matched one-shot-flag helpers unconditionally, then
-loops twice over `D_8008AC9C[i]`, replacing each element with
+loops twice over `gStyleCueSlots[i]`, replacing each element with
 `FlushStyleCue`'s return (`FlushStyleCue` always returns 0, so this clears
 the two-slot array), then clears the `gStyleCueSelf` flag if set. Since
 `FlushStyleCue` is defined later in this unit (higher ROM address) but
 called here, it needs a forward declaration -- matching the pattern already
 used for `ObjM__ForwardToSubChild` in `src/class_3bb8c_m.c`.
 
-`D_8008AC9C` holds two elements of a local per-unit type introduced here,
+`gStyleCueSlots` holds two elements of a local per-unit type introduced here,
 `ObjN14` (named for its two accessed fields: `unk0`, address-taken then
 chased for a byte at `+0x6`; `unk14`, only ever address-taken and handed to
 `FlushSoundCueSet`/`func_8002CD08` by `FlushStyleCue` and `StopStyleCueIfNear`
-respectively -- see their own reports). `D_8008AC9C` is `.sbss`
+respectively -- see their own reports). `gStyleCueSlots` is `.sbss`
 (`asm/data/7B46C.sbss.s`), adjacent to the other `D_8008ACxx` globals this
 class family already uses.
 
@@ -74,7 +74,7 @@ struct ObjN14 {
 extern s32 FlushStyleCue(ObjN14 *arg0);
 
 extern s32 gStyleCueSelf;
-extern ObjN14 *D_8008AC9C[2];
+extern ObjN14 *gStyleCueSlots[2];
 
 void StyleTeardown(void) {
     s32 i;
@@ -83,7 +83,7 @@ void StyleTeardown(void) {
     StyleReleaseDecorSet();
     StyleReleaseEffectSlots();
     for (i = 0; i < 2; i++) {
-        D_8008AC9C[i] = (ObjN14 *) FlushStyleCue(D_8008AC9C[i]);
+        gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
     }
     if (gStyleCueSelf != 0) {
         gStyleCueSelf = 0;
@@ -91,7 +91,7 @@ void StyleTeardown(void) {
 }
 ```
 
-An ordinary indexed `for` loop over `D_8008AC9C[i]` compiled to retail's
+An ordinary indexed `for` loop over `gStyleCueSlots[i]` compiled to retail's
 pointer-increment loop (`$s0 += 4` each iteration) with no rewriting needed
 -- GCC 2.6.3 -O2 does that strength reduction on its own here.
 

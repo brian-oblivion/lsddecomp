@@ -11,19 +11,19 @@ Fresh ground, carved round 45, never attempted. No blockers.
 ## Derivation
 
 ```
-/* 45350 80054B50 4803828F */  lw    $v0, %gp_rel(D_8008AB50)($gp)
+/* 45350 80054B50 4803828F */  lw    $v0, %gp_rel(gStyleDecorVariant)($gp)
 /* 45358 80054B58 06004010 */  beqz  $v0, .L80054B74
 /* 45360 80054B60 0980043C */  lui   $a0, %hi(D_8008E10C)
 /* 45364 80054B64 0CE18424 */  addiu $a0, $a0, %lo(D_8008E10C)
 /* 45368 80054B68 F760000C */  jal   ReleaseBasicClassArray
 /* 4536C 80054B6C 12000534 */   ori  $a1, $zero, 0x12
-/* 45370 80054B70 480380AF */  sw    $zero, %gp_rel(D_8008AB50)($gp)
+/* 45370 80054B70 480380AF */  sw    $zero, %gp_rel(gStyleDecorVariant)($gp)
 .L80054B74:
 ...
 jr $ra
 ```
 
-Same one-shot-flag shape as `StyleFlushDecoration`: test `D_8008AB50`, act, then
+Same one-shot-flag shape as `StyleFlushDecoration`: test `gStyleDecorVariant`, act, then
 clear the flag. `ReleaseBasicClassArray` is already established across the codebase
 (`src/code_8220_b.c`, `src/class_3bb8c_o.c`, `src/class_3bb8c_s.c`) as
 `void ReleaseBasicClassArray(void **array, s32 count)`. `D_8008E10C` is plain `.bss`
@@ -36,13 +36,13 @@ toolchain blockers"), and this symbol isn't one.
 
 ```c
 extern void ReleaseBasicClassArray(void **array, s32 count);
-extern s32 D_8008AB50;
+extern s32 gStyleDecorVariant;
 extern void *D_8008E10C[];
 
 void StyleReleaseDecorSet(void) {
-    if (D_8008AB50 != 0) {
+    if (gStyleDecorVariant != 0) {
         ReleaseBasicClassArray(D_8008E10C, 0x12);
-        D_8008AB50 = 0;
+        gStyleDecorVariant = 0;
     }
 }
 ```

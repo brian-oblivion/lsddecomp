@@ -35,7 +35,7 @@ worth translating).
 
 **The lever, translated and verified against the REAL build (not just the
 scaffold):** a dead `i++; i--;` pair, placed as the LAST two statements
-inside the `if (D_8008AC9C[i] != 0) { ... }` arm (after the
+inside the `if (gStyleCueSlots[i] != 0) { ... }` arm (after the
 `StopStyleCueIfNear`/`FlushStyleCue` handling, before that arm's closing brace),
 perturbs GCC 2.6.3's register allocator enough to swap `ctx`/`i` back into
 retail's colours -- with zero net effect on either variable's value at any
@@ -132,7 +132,7 @@ struct ObjAB4C {
 ```
 
 `gStyleCueSelf`'s value is another "pointer stored as a plain `s32`" global
-(same idiom as `D_8008AC7C`), dispatched here as a self object through
+(same idiom as `gStyleTargetObj`), dispatched here as a self object through
 method slot `+0xE8` -- the third such `ObjXXXX`/`ObjXXXXMethods` local view
 in this unit (`ObjAB54`, `ObjE0C8`, now `ObjAB4C`).
 
@@ -184,7 +184,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
         ctx = buf;
         ((ObjAB4C *) gStyleCueSelf)->methods->slotE8((ObjAB4C *) gStyleCueSelf, ctx, arg0);
     }
-    if (D_8008AC70++ == 0) {
+    if (gStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
         StyleBuildDecorSet();
         StyleBuildEffectSlots(ctx);
@@ -192,14 +192,14 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     StyleUpdateDecorSet();
     StyleUpdateEffectSlots(ctx);
     DrawStyleTables();
-    D_8008AC98 = 0;
+    gStyleCueRecordIndex = 0;
     for (i = 0; i < 2; i++) {
-        if (D_8008AC9C[i] != 0) {
-            if (StopStyleCueIfNear(D_8008AC9C[i], ctx, arg1) == 0) {
-                D_8008AC9C[i] = (ObjN14 *) FlushStyleCue(D_8008AC9C[i]);
+        if (gStyleCueSlots[i] != 0) {
+            if (StopStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
+                gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
             }
         } else {
-            D_8008AC9C[i] = TryStartStyleCue((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
+            gStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;
@@ -209,13 +209,13 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
 
 Needs (already present earlier in the unit, in strict ROM order, at the
 point this body would compile): the `ObjAB4C`/`ObjAB4CMethods` local view
-above; `extern s32 gStyleCueSelf;`, `extern s32 D_8008AC70;`,
+above; `extern s32 gStyleCueSelf;`, `extern s32 gStyleTickCount;`,
 `extern void ApplyStyleDecorationIfSet(void);` (matched, `class_3bb8c_m.c`),
 `extern void StyleBuildDecorSet(void);`/`extern void StyleUpdateDecorSet(void);`
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
 earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matched,
 this unit), `extern void DrawStyleTables(void);` (forward, matched, this
-unit, defined later), `extern s32 D_8008AC98;`, `extern u8 D_8008E154[];`,
+unit, defined later), `extern s32 gStyleCueRecordIndex;`, `extern u8 D_8008E154[];`,
 `extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void
 *arg3);`, `extern s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void
 *arg2);`.

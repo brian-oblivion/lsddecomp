@@ -15,7 +15,7 @@ void StyleUpdateEffectSlots(void *arg0);
 
 `D_8008E0C8` (already declared `extern void *D_8008E0C8[];` for the
 already-matched `StyleReleaseEffectSlots`, which just forwards it to
-`ReleaseBasicClassArray(D_8008E0C8, D_8008AC88)`) holds pointers to objects that this
+`ReleaseBasicClassArray(D_8008E0C8, gStyleEffectSlotCount)`) holds pointers to objects that this
 function dispatches *directly*, one at a time, through a method table at
 object offset 0 -- the same `ObjAB54`-style pattern already established
 earlier in this unit, just at a different slot offset:
@@ -37,7 +37,7 @@ local-views convention applies, and this is the only place in the executable
 that dispatches slot `+0xEC` on this array's elements (no other caller found
 via `grep -rn 80054C74`).
 
-`D_8008AC80`/`D_8008AC88`/`D_8008E0C8` are declared `extern` a second time,
+`gStyleVariant`/`gStyleEffectSlotCount`/`D_8008E0C8` are declared `extern` a second time,
 verbatim, ahead of this function -- ROM order puts `StyleUpdateEffectSlots` textually
 *before* `StyleReleaseEffectSlots`'s own copy of the same three externs, so a fresh set
 was added here rather than hoisting the existing ones (repeated identical
@@ -51,10 +51,10 @@ void StyleUpdateEffectSlots(void *arg0) {
     s32 i;
     ObjE0C8 *obj;
 
-    if (D_8008AC80 < 0) {
+    if (gStyleVariant < 0) {
         return;
     }
-    for (i = 0; i < D_8008AC88; i++) {
+    for (i = 0; i < gStyleEffectSlotCount; i++) {
         obj = (ObjE0C8 *) D_8008E0C8[i];
         obj->methods->slotEC(obj, arg0);
     }

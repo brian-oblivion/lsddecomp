@@ -19,8 +19,8 @@ pos = *(PairXY *) &D_8008AB68;      /* NOT pos.x = D_8008AB68; pos.y = D_8008AB6
 A struct assignment is a BLKmode `set`, and gcc 2.6.3's `cse.c` answers a
 BLKmode destination by calling `invalidate_memory()` -- it discards **every**
 cached memory value rather than the ones that might overlap. That is the
-entire reason retail reloads `D_8008AB50` for its `== 2` test (`lw v1,
-%gp_rel(D_8008AB50)` at 0x45220, after the guard already read it at 0x451A8)
+entire reason retail reloads `gStyleDecorVariant` for its `== 2` test (`lw v1,
+%gp_rel(gStyleDecorVariant)` at 0x45220, after the guard already read it at 0x451A8)
 and reloads `pos.y` from the stack immediately after writing it (`lw v0,
 0x1C(sp)` at 0x45230). Rounds 46 and 47 both classified those two reloads as
 *"register-pressure-driven, not something a source rewrite obviously
@@ -54,7 +54,7 @@ proposed -- brute-force the divisor rather than reverse the reciprocal math --
 stands.
 
 The struct-and-flow recovery (call targets, method slots +0xB8/+0xBC/+0x64,
-`D_8008AC7C + 0xC` chased one field further, the loop bounds) was also correct
+`gStyleTargetObj + 0xC` chased one field further, the loop bounds) was also correct
 throughout. **What was wrong was only the VERDICT**, and specifically the part
 of it that named an unfalsifiable cause. "Register pressure" identifies no
 construct, suggests no experiment, and ends the investigation; two rounds
@@ -74,10 +74,10 @@ void StyleUpdateDecorSet(void) {
     void **wp;
     ObjSlotB8B8 *obj;
 
-    if (D_8008AB50 == 0) {
+    if (gStyleDecorVariant == 0) {
         return;
     }
-    self = *(ObjAC7CSub **) (D_8008AC7C + 0xC);
+    self = *(ObjAC7CSub **) (gStyleTargetObj + 0xC);
     delta = self->field18 - self->field24;
     shift = (delta / 600) * 3;
     if (shift <= 0) {
@@ -85,14 +85,14 @@ void StyleUpdateDecorSet(void) {
     }
     pos = *(PairXY *) &D_8008AB68;
     i = 0;
-    if (D_8008AB50 == 2) {
+    if (gStyleDecorVariant == 2) {
         pos.y += 0x1E;
     }
     wp = D_8008E10C;
     srcOfs = 0;
     pos.y += shift * 3;
     do {
-        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + D_8008AC8C), shift);
+        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + gStyleColorTable), shift);
         obj = (ObjSlotB8B8 *) *wp;
         obj->methods->slotB8(obj, 1, rgb);
         obj = (ObjSlotB8B8 *) *wp;
@@ -102,7 +102,7 @@ void StyleUpdateDecorSet(void) {
         pos.y += 3;
         wp++;
     } while (i < 0x12);
-    AdjustRgbByDelta(rgb, (u8 *) D_8008AC90, shift);
+    AdjustRgbByDelta(rgb, (u8 *) gStyleFlushColor, shift);
     self->methods->slot64(self, rgb);
 }
 ```

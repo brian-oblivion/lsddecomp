@@ -12,7 +12,7 @@ Fresh ground, carved round 45, never attempted. No blockers.
 
 ```
 /* 46224 80055A24 E8FFBD27 */  addiu $sp, $sp, -0x18
-/* 46228 80055A28 6404838F */  lw    $v1, %gp_rel(D_8008AC6C)($gp)
+/* 46228 80055A28 6404838F */  lw    $v1, %gp_rel(gStyleKind)($gp)
 /* 4622C 80055A2C 02000234 */  ori   $v0, $zero, 0x2
 /* 46230 80055A30 07006214 */  bne   $v1, $v0, .L80055A50
 /* 46238 80055A38 0880043C */  lui   $a0, %hi(D_80087444)
@@ -37,8 +37,8 @@ Fresh ground, carved round 45, never attempted. No blockers.
 jr $ra
 ```
 
-`D_8008AC6C` is a plain `s32` (already established as such in
-`class_3bb8c_m.c`, `RegisterStyleConfig`). `(D_8008AC6C - 3)` cast to unsigned and
+`gStyleKind` is a plain `s32` (already established as such in
+`class_3bb8c_m.c`, `RegisterStyleConfig`). `(gStyleKind - 3)` cast to unsigned and
 compared `< 3` is the standard idiom for a closed range test, matching
 retail's `sltiu` exactly. `func_8003B624` is a not-yet-carved,
 still-`INCLUDE_ASM` function in `asm/psyq_2bb9c.s` (a 4-argument draw-style
@@ -48,7 +48,7 @@ matters here, declared loosely as `void func_8003B624(void *arg0, s32 arg1,
 void *arg2);`.
 
 ```c
-extern s32 D_8008AC6C;
+extern s32 gStyleKind;
 extern void func_8003B624(void *arg0, s32 arg1, void *arg2);
 extern s32 D_80087444[];
 extern s32 D_80087450[];
@@ -59,11 +59,11 @@ void DrawStyleTables(void) {
     void *a0, *a2;
     s32 a1;
 
-    if (D_8008AC6C == 2) {
+    if (gStyleKind == 2) {
         a0 = D_80087444;
         a2 = D_80087450;
         a1 = 1;
-    } else if ((u32) (D_8008AC6C - 3) < 3) {
+    } else if ((u32) (gStyleKind - 3) < 3) {
         a1 = 1;
         a0 = D_8008745C;
         a2 = D_80087468;

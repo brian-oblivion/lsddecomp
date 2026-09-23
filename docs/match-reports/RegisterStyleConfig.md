@@ -10,18 +10,18 @@ before this round.
 Register-once initializer: if `gStyleCueSelf` (a `.sdata` flag word, zero at
 boot) is already set, return 0. Otherwise stash the 5 arguments (4 in
 registers, 1 on the stack at `0x28($sp)`) into a scatter of `.sbss` globals,
-zero two adjacent words (`D_8008ACA0`, and `D_8008AC9C` immediately below it
+zero two adjacent words (`D_8008ACA0`, and `gStyleCueSlots` immediately below it
 by pointer decrement), then tail-call `ApplyStyleConfig()` and return its
 result.
 
 ```c
 extern s32 gStyleCueSelf;
-extern s32 D_8008AC6C;
-extern s32 D_8008AC70;
-extern s32 D_8008AC74;
+extern s32 gStyleKind;
+extern s32 gStyleTickCount;
+extern s32 gStyleCounter;
 extern s32 D_8008AC78;
-extern s32 D_8008AC7C;
-extern s32 D_8008AC80;
+extern s32 gStyleTargetObj;
+extern s32 gStyleVariant;
 extern s32 D_8008ACA0;
 
 extern s32 ApplyStyleConfig(void);
@@ -34,12 +34,12 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
         i = 1;
         p = &D_8008ACA0;
         gStyleCueSelf = a0;
-        D_8008AC6C = a1;
-        D_8008AC7C = a2;
-        D_8008AC80 = -1;
-        D_8008AC74 = a3;
+        gStyleKind = a1;
+        gStyleTargetObj = a2;
+        gStyleVariant = -1;
+        gStyleCounter = a3;
         D_8008AC78 = arg4;
-        D_8008AC70 = 0;
+        gStyleTickCount = 0;
         do {
             *p = 0;
             i--;
@@ -54,14 +54,14 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
 ## Two levers, both worth generalizing
 
 1. **The 2-word zero loop is NOT two scalar assignments.** Writing
-   `D_8008ACA0 = 0; D_8008AC9C = 0;` directly compiles to two `gp_rel` stores
+   `D_8008ACA0 = 0; gStyleCueSlots = 0;` directly compiles to two `gp_rel` stores
    (both symbols are `.sbss`, both are in `config/gp-symbols.txt`) -- a
    completely different, shorter instruction sequence than retail's
    absolute-address `lui`/`addiu` pointer with a decrementing `do`/`while`
    loop. `tools/m2ctx.py --run` was decisive here: it recovers the loop shape
    (`s32 *p = &D_8008ACA0; do { *p = 0; i--; p--; } while (i >= 0);`)
    directly from the asm, which a from-scratch reading of two adjacent `sw`s
-   would not suggest. **`D_8008AC9C` is never named in the C** -- it is
+   would not suggest. **`gStyleCueSlots` is never named in the C** -- it is
    reached purely by decrementing `p` from `&D_8008ACA0`, relying on the
    linker's real (fixed, splat-derived) placement of the two words adjacent
    in `.sbss`.

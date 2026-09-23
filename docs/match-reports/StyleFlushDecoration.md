@@ -13,25 +13,25 @@ no `mflo`/`mfhi` hazard, not a trampoline).
 ## Derivation
 
 ```
-/* 44F14 80054714 4C03828F */  lw    $v0, %gp_rel(D_8008AB54)($gp)
+/* 44F14 80054714 4C03828F */  lw    $v0, %gp_rel(gStyleDecorColor)($gp)
 /* 44F18 80054718 E8FFBD27 */  addiu $sp, $sp, -0x18
 /* 44F1C 8005471C 0A004010 */  beqz  $v0, .L80054748
 /* 44F20 80054720 1000BFAF */   sw   $ra, 0x10($sp)
-/* 44F24 80054724 8C04848F */  lw    $a0, %gp_rel(D_8008AC94)($gp)
+/* 44F24 80054724 8C04848F */  lw    $a0, %gp_rel(gStyleDecorObj)($gp)
 /* 44F2C 8005472C 0000828C */  lw    $v0, 0x0($a0)
 /* 44F34 80054734 0400428C */  lw    $v0, 0x4($v0)
 /* 44F3C 8005473C 09F84000 */  jalr  $v0
-/* 44F44 80054744 4C0380AF */  sw    $zero, %gp_rel(D_8008AB54)($gp)
+/* 44F44 80054744 4C0380AF */  sw    $zero, %gp_rel(gStyleDecorColor)($gp)
 .L80054748:
 ...
 jr $ra
 ```
 
-`D_8008AB54` is a `.sdata` pointer, already established in
-`src/class_3bb8c_m.c` as `extern const u8 *D_8008AB54;`, and used there as an
-actual colour-table pointer (`D_8008AB54 = D_800872C4[cfg[2]];`). Here it is
+`gStyleDecorColor` is a `.sdata` pointer, already established in
+`src/class_3bb8c_m.c` as `extern const u8 *gStyleDecorColor;`, and used there as an
+actual colour-table pointer (`gStyleDecorColor = D_800872C4[cfg[2]];`). Here it is
 only ever tested against zero, so it reads as a one-shot "pending" flag on
-top of the same storage. `D_8008AC94` is that unit's `LocalM4D0Obj *`
+top of the same storage. `gStyleDecorObj` is that unit's `LocalM4D0Obj *`
 (round 15's own local type, unrelated to this unit) with named slots at
 `+0x04C`/`+0x064`/`+0x068`. This function dispatches `+0x004`, a slot that
 unit never names, so it gets its own minimal local view here rather than
@@ -49,13 +49,13 @@ struct ObjAB54 {
     ObjAB54Methods *methods; /* +0x000 */
 };
 
-extern const u8 *D_8008AB54;
-extern s32 D_8008AC94;
+extern const u8 *gStyleDecorColor;
+extern s32 gStyleDecorObj;
 
 void StyleFlushDecoration(void) {
-    if (D_8008AB54 != 0) {
-        ((ObjAB54 *) D_8008AC94)->methods->slot4((ObjAB54 *) D_8008AC94);
-        D_8008AB54 = 0;
+    if (gStyleDecorColor != 0) {
+        ((ObjAB54 *) gStyleDecorObj)->methods->slot4((ObjAB54 *) gStyleDecorObj);
+        gStyleDecorColor = 0;
     }
 }
 ```

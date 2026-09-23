@@ -17,19 +17,19 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 ## New externs
 
 ```c
-extern s32 D_8008AC74;         /* already s32 in class_3bb8c_m.c */
-extern s32 D_8008AC6C;         /* already s32 in class_3bb8c_m.c and this unit's own DrawStyleTables */
-extern s8 D_800873DC[];        /* 16-entry table, indexed by (D_8008AC74+D_8008AC6C)&0xF */
-extern s32 D_8008AC80;
+extern s32 gStyleCounter;         /* already s32 in class_3bb8c_m.c */
+extern s32 gStyleKind;         /* already s32 in class_3bb8c_m.c and this unit's own DrawStyleTables */
+extern s8 D_800873DC[];        /* 16-entry table, indexed by (gStyleCounter+gStyleKind)&0xF */
+extern s32 gStyleVariant;
 extern s8 D_800873D8[];        /* divisor table, indexed by "kind" -- raw index, no scale */
 extern s32 D_8008AC84;
 extern s32 D_800873C8[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
-extern s32 D_8008AC90;
+extern s32 gStyleFlushColor;
 extern u8 D_8008726C[];        /* address only taken */
 extern u8 D_800872C4[];        /* 3-byte-stride table, indexed by a byte field */
-extern s32 D_8008AC8C;
+extern s32 gStyleColorTable;
 extern u8 D_80087234[];        /* address only taken */
-extern s32 D_8008AB50;
+extern s32 gStyleDecorVariant;
 ```
 
 ## Body
@@ -45,26 +45,26 @@ void *PickStyleFallbackConfig(void) {
     s32 b2;
     u8 *tab;
 
-    sum = D_8008AC74 + D_8008AC6C;
+    sum = gStyleCounter + gStyleKind;
     kind = D_800873DC[sum & 0xF];
-    D_8008AC80 = kind;
+    gStyleVariant = kind;
     divisor = D_800873D8[kind];
     remainder = sum % divisor;
     D_8008AC84 = remainder;
     result = (s8 *) D_800873C8[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
-        D_8008AC90 = (s32) (D_800872C4 + b3 * 3);
+        gStyleFlushColor = (s32) (D_800872C4 + b3 * 3);
         b2 = result[2];
         tab = D_8008726C;
         if (b2 != 0x12) {
             tab = D_80087234;
         }
-        D_8008AC8C = (s32) tab;
+        gStyleColorTable = (s32) tab;
         if (remainder < 4) {
-            D_8008AB50 = 1;
+            gStyleDecorVariant = 1;
         } else if (remainder < 6) {
-            D_8008AB50 = 2;
+            gStyleDecorVariant = 2;
         }
     }
     return result;
@@ -75,7 +75,7 @@ Notes:
 
 - `D_800873C8[kind]` is loaded as a raw `s32` *value* (not an address-of),
   then used as a base address for further byte-granular pointer arithmetic
-  (`+ remainder * 4`) -- exactly the `D_8008AC7C` "pointer stored as a plain
+  (`+ remainder * 4`) -- exactly the `gStyleTargetObj` "pointer stored as a plain
   scalar" idiom already established elsewhere in this unit, just for a
   different global.
 - The `sum % divisor` compiles to the standard MIPS `div`/`break 7`

@@ -258,8 +258,8 @@ done would have produced.
 ## Preserved near-miss body (79/81, `#if 0` in `src/class_3bb8c_n.c`)
 
 ```c
-extern s32 D_8008AB50;
-extern s32 D_8008AC8C;
+extern s32 gStyleDecorVariant;
+extern s32 gStyleColorTable;
 extern u8 D_8008726C[];
 extern u8 D_8008E0A4[];
 extern s32 gStyleCueSelf;
@@ -280,7 +280,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     u8 **q;
 
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
-    if (D_8008AB50 != 0 && D_8008AC8C == (s32) D_8008726C) {
+    if (gStyleDecorVariant != 0 && gStyleColorTable == (s32) D_8008726C) {
         *(s32 *) D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
         D_8008E0AC = 0;

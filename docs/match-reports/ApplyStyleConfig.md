@@ -8,7 +8,7 @@ and `addiu_at` are resolved), never attempted before this round.
 ## What it does
 
 Looks up a "cfg" byte-array pointer for the current style index
-(`D_8008AC6C`, set by `RegisterStyleConfig`) in the 14-entry pointer table
+(`gStyleKind`, set by `RegisterStyleConfig`) in the 14-entry pointer table
 `D_800873EC`; if the slot is NULL, falls back to `PickStyleFallbackConfig()` to
 produce one. Feeds `cfg` into the already-matched `FillStyleFromConfig(style,
 cfg)` against the fixed global `D_80087424` (a `StyleM` instance, split by
@@ -16,7 +16,7 @@ splat into two adjacent labels `D_80087424`/`D_80087430` purely because
 something else references the middle of it -- the object is one 0x20-byte
 struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
 `cfg[1] >= 4`, stores a `D_800872C4[cfg[2]]` colour-table entry pointer into
-`D_8008AB54`. Always returns `&D_80087424`.
+`gStyleDecorColor`. Always returns `&D_80087424`.
 
 ```c
 struct StyleM;   /* forward tag; full definition stays where it already is,
@@ -27,17 +27,17 @@ extern s8 *D_800873EC[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
 extern u8 D_800872C4[][3];
-extern const u8 *D_8008AB54;
+extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
-    s8 *cfg = D_800873EC[D_8008AC6C];
+    s8 *cfg = D_800873EC[gStyleKind];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
     }
     FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
     if (cfg[1] >= 4) {
-        D_8008AB54 = D_800872C4[cfg[2]];
+        gStyleDecorColor = D_800872C4[cfg[2]];
     }
     return &D_80087424;
 }
@@ -51,7 +51,7 @@ First attempt wrote the natural-looking guard form:
 if (cfg[1] < 4) {
     return &D_80087424;
 }
-D_8008AB54 = D_800872C4[cfg[2]];
+gStyleDecorColor = D_800872C4[cfg[2]];
 return &D_80087424;
 ```
 
@@ -90,4 +90,4 @@ before anything more invasive.
 
 ## Naming
 
-**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`D_800873EC[D_8008AC6C]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.
+**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`D_800873EC[gStyleKind]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.

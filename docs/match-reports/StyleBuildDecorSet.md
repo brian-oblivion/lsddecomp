@@ -12,10 +12,10 @@ both a single source-shape difference and are CLOSED; names/types not relevant
 Round 46 named two effects and round 47 re-affirmed both:
 
 1. *"A stack-resident local (`paramA[1]`) gets reloaded from memory in retail
-   immediately after an intervening `D_8008AB50` check reuses the register that
+   immediately after an intervening `gStyleDecorVariant` check reuses the register that
    held it ... register-pressure-driven, not something a source rewrite
    obviously controls."*
-2. Retail also reloads `D_8008AB50` itself for the `== 2` test rather than
+2. Retail also reloads `gStyleDecorVariant` itself for the `== 2` test rather than
    reusing the value the guard already read.
 
 Neither is register pressure and both are the same thing: **retail copies each
@@ -28,7 +28,7 @@ typedef struct PairXY { s32 x; s32 y; } PairXY;
 PairXY paramA, paramB;
 
 paramA = *(PairXY *) &D_8008AB68;      /* NOT paramA[0] = ..; paramA[1] = ..; */
-if (D_8008AB50 == 2) {
+if (gStyleDecorVariant == 2) {
     paramA.y += 0x1E;
 }
 paramB = *(PairXY *) &D_8008AB70;
@@ -38,7 +38,7 @@ paramB = *(PairXY *) &D_8008AB70;
 cannot reason about the extent of a BLKmode destination, so `invalidate()`
 falls back to `invalidate_memory()` -- it throws away **every** cached memory
 value in the hash table, not just the ones that could overlap. So the read of
-`D_8008AB50` the guard performed is no longer available for the `== 2` test
+`gStyleDecorVariant` the guard performed is no longer available for the `== 2` test
 (reload 2), and the value just written into `paramA.y` is no longer available
 for the `+= 0x1E` (reload 1). Written as scalar stores, the stack slot is a
 fixed frame address, CSE keeps everything, and **both reloads vanish** -- which
@@ -50,7 +50,7 @@ reloads, load-delay `nop` and all:
 ```
 45070  lw    v0,%gp_rel(D_8008AB68)     45078  sw  v0,0x10(sp)
 45074  lw    v1,%gp_rel(D_8008AB6C)     4507c  sw  v1,0x14(sp)
-45080  lw    v1,%gp_rel(D_8008AB50)   <-- reload 2
+45080  lw    v1,%gp_rel(gStyleDecorVariant)   <-- reload 2
 45084  li    v0,0x2
 45088  bne   v1,v0,450a0
 4508c   li   a2,0x1fff
@@ -135,8 +135,8 @@ side effect of the image moving. The honest figures are the two in the title:
 ## Preserved near-miss body (1 word short, `#if 0` in `src/class_3bb8c_n.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
-`extern s32 D_8008AB50, D_8008AB68, D_8008AB6C, D_8008AB70, D_8008AB74,
-D_8008AC7C, D_8008AC8C;`, `extern void *D_8008E10C[];`,
+`extern s32 gStyleDecorVariant, D_8008AB68, D_8008AB6C, D_8008AB70, D_8008AB74,
+gStyleTargetObj, gStyleColorTable;`, `extern void *D_8008E10C[];`,
 `extern void *New_ClassEAC0(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
 the function in the unit.
@@ -159,23 +159,23 @@ void StyleBuildDecorSet(void) {
     ObjSlotAC *self2;
     void *result;
 
-    if (D_8008AB50 == 0) {
+    if (gStyleDecorVariant == 0) {
         return;
     }
     paramA = *(PairXY *) &D_8008AB68;
-    if (D_8008AB50 == 2) {
+    if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *) &D_8008AB70;
     i = 1;
     s1 = 3;
-    obj = New_ClassEAC0(&paramB, (void *) D_8008AC8C, 0x1FFF);
+    obj = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
     __asm__("");
     arr = D_8008E10C;
     wp = arr + 1;
     *arr = obj;
     do {
-        obj = New_ClassEAC0(&paramB, (void *) (s1 + D_8008AC8C), 0x1FFF);
+        obj = New_ClassEAC0(&paramB, (void *) (s1 + gStyleColorTable), 0x1FFF);
         *wp = obj;
         wp++;
         ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], &paramA);
@@ -185,7 +185,7 @@ void StyleBuildDecorSet(void) {
         i++;
     } while (i < 0x12);
 
-    self2 = *(ObjSlotAC **) (D_8008AC7C + 0xC);
+    self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
     result = self2->methods->slotAC(self2);
     ((ObjSlot4C *) D_8008E10C[0])->methods->slot4C(D_8008E10C[0], result, &paramA);
 }

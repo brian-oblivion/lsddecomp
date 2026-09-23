@@ -14,7 +14,7 @@ derivation started.
 ## Derivation
 
 ```
-/* 45FDC 800557DC 7404828F */  lw   $v0, %gp_rel(D_8008AC7C)($gp)
+/* 45FDC 800557DC 7404828F */  lw   $v0, %gp_rel(gStyleTargetObj)($gp)
 /* 45FE4 800557E4 1000B0AF */  sw   $s0, 0x10($sp)
 /* 45FE8 800557E8 21808000 */  addu $s0, $a0, $zero
 /* 45FF0 800557F0 0000448C */  lw   $a0, 0x0($v0)
@@ -29,7 +29,7 @@ derivation started.
 jr $ra
 ```
 
-`D_8008AC7C` is a plain `s32` (established in `class_3bb8c_m.c`) holding the
+`gStyleTargetObj` is a plain `s32` (established in `class_3bb8c_m.c`) holding the
 address of a small descriptor object; this function reads *that object's*
 own offset 0 (a value, not the `FieldAC7CHolder.unkC` field
 `class_3bb8c_m.c` names at +0xC -- a different offset of the same base
@@ -46,11 +46,11 @@ both the embedded sub-object handed to `FlushSoundCueSet` (`&arg0->unk14`) and
 the byte toggled after the call (`arg0->unk0->unk6`, negated in place).
 
 ```c
-extern s32 D_8008AC7C;
+extern s32 gStyleTargetObj;
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
 s32 FlushStyleCue(ObjN14 *arg0) {
-    FlushSoundCueSet(*(s32 *) D_8008AC7C, &arg0->unk14);
+    FlushSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->unk14);
     arg0->unk0->unk6 = -arg0->unk0->unk6;
     return 0;
 }
@@ -64,6 +64,6 @@ straddling the call.
 ### Proposed learning
 
 None beyond confirming the multiple-independent-local-views convention:
-`D_8008AC7C`'s pointed-to object is read at offset 0 here and offset 0xC in
+`gStyleTargetObj`'s pointed-to object is read at offset 0 here and offset 0xC in
 a sibling unit, with two unrelated local structs describing it -- both
 correct locally, neither claiming to be the whole object.

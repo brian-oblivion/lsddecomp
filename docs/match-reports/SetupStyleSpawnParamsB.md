@@ -75,7 +75,7 @@ merely holds a value in transit.
 extern s32 D_8008E0A8;
 extern s32 D_8008732C;
 extern s32 D_8008E0A4;
-extern s32 D_8008AC74;
+extern s32 gStyleCounter;
 extern s32 D_8008E0AC;
 extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
@@ -87,7 +87,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     rand();
     D_8008E0A8 = D_8008732C;
     D_8008E0A4 = (rand() % 20) << 11;
-    mod3 = D_8008AC74 % 3;
+    mod3 = gStyleCounter % 3;
     D_8008E0AC = 0xA000;
     if (mod3 == 1) {
         D_8008E0AC = -0xA000;
