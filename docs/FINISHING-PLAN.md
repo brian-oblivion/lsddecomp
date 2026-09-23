@@ -211,7 +211,7 @@ fingerprint in `config/sdk-in-game.txt` (generated: `sdkname.py --game
 name), or an `identified` comment on its symbols entry (position plus header
 or strings, recorded by the evidence rule below). Such a function leaves the
 game counts and every track 1, 1b and 3 queue, and a game-style name on one
-(`SsSetTickMode` for `SsSetTickMode`) counts as unnamed here. Renaming onto
+(`SetSeqTimerMode` for `SsSetTickMode`) counts as unnamed here. Renaming onto
 a pinned name is byte-identical and keeps the ld fragment current (measured).
 
 **The tool:** `.venv/bin/python3 tools/sdkname.py <func>...` (or `--all`)

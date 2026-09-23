@@ -496,7 +496,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **A missing `andi 0xff` right after an `lbu` whose byte goes to a global and is then masked:
   read it as `*(volatile u8 *)&x`.** A QImode volatile read keeps the zero-extend as its own
   instruction; `u8` temporaries in four positions, direct masking and a whole-array `volatile` all
-  missed. Single instance (`getintr`, libcd `getintr`), and the MMIO discriminator above is
+  missed. Single instance (`getintr`, libcd), and the MMIO discriminator above is
   only half met: `resp[]` is a LOCAL buffer filled from the CD response FIFO, and the same body's
   `volatile u8 cause` compiles alike. (round 70, delta)
 - **NARROW a `volatile` to the exact access that needs it** — qualifying only the WORD-sized field
