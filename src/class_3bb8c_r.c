@@ -372,12 +372,12 @@ typedef struct Block24 {
 struct Obj876FC {
     Obj876FCMethods *methods; /* +0x000 */
     u8 pad4[0x24 - 0x4];        /* +0x004 .. +0x023, unknown */
-    s32 unk24;                    /* +0x024, cleared by func_800564A4 */
+    s32 tick;                     /* +0x024, cleared by func_800564A4 */
     u8 pad28[0x44 - 0x28];          /* +0x028 .. +0x043, unknown */
     s32 unk44;                        /* +0x044 */
     u8 pad48[0x54 - 0x48];               /* +0x048 .. +0x053, unknown */
-    void *unk54;                           /* +0x054, the ctor's own arg1, stashed verbatim */
-    Block24 block58;                         /* +0x058, func_800564A4's own 0x24-byte block-copy target */
+    void *kind;                            /* +0x054, the ctor's own arg1, stashed verbatim */
+    Block24 params;                          /* +0x058, func_800564A4's own 0x24-byte block-copy target */
 };
 
 /* The shared base-class table getter, SAME symbol `class_3bb8c_o.c`
@@ -417,7 +417,7 @@ void *func_800563C0(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *ar
     }
     self->methods = func_80056F4C();
     self->unk44 = 0;
-    self->unk54 = arg1;
+    self->kind = arg1;
     self->methods->slot40(self, arg2);
     Class876FC__InitByKind(self, arg3, arg4);
     return self;
@@ -431,13 +431,13 @@ void *func_80056464(Obj876FC *self) {
 }
 
 void func_800564A4(Obj876FC *self, Block24 *src) {
-    self->block58 = *src;
-    self->unk24 = 0;
+    self->params = *src;
+    self->tick = 0;
 }
 
 extern void Class876FC__UpdateByKind(Obj876FC *self); /* arity-ok: the definition is 2-parameter and the callee DOES read $a1 (`move s1,a1` at 0x80056650), but func_800564F4 passes nothing for it -- retail's jal at 0x80056508 has `sw v0,36(a0)` in the delay slot and leaves its own incoming $a1 in place */
 
 void func_800564F4(Obj876FC *self) {
-    self->unk24 = self->unk24 + 1;
+    self->tick = self->tick + 1;
     Class876FC__UpdateByKind(self);
 }
