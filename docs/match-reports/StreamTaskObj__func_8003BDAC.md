@@ -29,3 +29,10 @@ Added `TaskCoreMethods::slot84` alongside `slot80` in
 ## Proposed learning
 
 None beyond `StreamTaskObj__func_8003BD74`'s -- same shape, same open return-type flag.
+
+## Naming
+
+**StreamTaskObj__func_8003BDAC** -- tier C. Occupies `gStreamTaskObjMethods`
+slot `+0x084`; identical pure up-call shape to
+`StreamTaskObj__func_8003BD74` one slot over. Same reasoning, left
+`Class__func_xxxxx`.

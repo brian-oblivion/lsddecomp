@@ -51,3 +51,13 @@ local view of `gTaskCoreMethods`, see `StreamTaskObj__func_8003BD74`'s report).
 Same open return-type question as `StreamTaskObj__func_8003BD74`/`StreamTaskObj__func_8003BDAC` for the
 tail call through `slot0C` -- typed `void` on the same sibling-slot-
 convention basis, unconfirmed by any found caller.
+
+## Naming
+
+**StreamTaskObj__Destroy** -- tier A. Occupies `gStreamTaskObjMethods`'s dtor
+slot `+0x00C` (a base-class layout convention independently confirmed in
+`include/class_39e08.h`'s own `ctor`/`dtor` pair at `+0x008`/`+0x00C`, and in
+`include/code_171e0.h`'s `Class6D430__Destroy`). Tears down the private
+`unkB4` sub-object, then up-calls `TaskCoreObj__Destroy` at the same slot --
+the "override, do extra work, call the base" shape this whole unit's slot
+comparison confirms (see the unit header comment).

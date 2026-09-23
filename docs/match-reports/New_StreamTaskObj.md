@@ -54,3 +54,10 @@ slot did not exist in the header before this match; it was inside `pad04`.
 Matched by the head during divergence resolution, 2026-09-02, as part of
 closing the epilogue-merge class. `docs/research/epilogue-merge-residue.md` is
 updated with what survived and what did not.
+
+## Naming
+
+**New_StreamTaskObj** -- tier A. Canonical `New_X` allocator shape (allocate,
+dispatch the ctor slot, return); the class is independently established both
+by `gStreamTaskObjMethods`'s own ctor-slot dispatch (`classtable.py`) and by
+`include/Class6D3C8.h`'s cross-unit `StreamTask` view of the same call site.

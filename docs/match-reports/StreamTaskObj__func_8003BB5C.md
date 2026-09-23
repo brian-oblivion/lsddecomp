@@ -49,3 +49,11 @@ Matched cleanly on the first attempt once `StreamTaskObj__func_8003BAB4`'s slot4
 distinction (tested-not-stored vs. stored) was already sorted out — this is
 the confirming positive case for that report's "reread, don't backfill by
 analogy" note.
+
+## Naming
+
+**StreamTaskObj__func_8003BB5C** -- tier C. Occupies `gStreamTaskObjMethods`
+slot `+0x05C`; three sequential early-return guards around a cached status
+field (`unkA4`) and a completion flag (`unkD8`). Mechanics are fully
+described in the report above; nothing pins down what the guarded operation
+actually represents in the game, so left `Class__func_xxxxx`.

@@ -97,3 +97,10 @@ Three separate C assignments cost an extra word versus one struct
 assignment; the register-batching pattern is the tell, distinguishable from
 an ordinary "3 fields happen to be adjacent" case by whether retail loads
 all sources before storing any of them.
+
+## Naming
+
+**StreamTaskObj__StreamTaskObj** -- tier A. Occupies `gStreamTaskObjMethods`'s
+own ctor slot `+0x008` (`classtable.py`), matching the established
+`Class__Class` constructor convention already used elsewhere in this
+codebase (`IntermediateBase__IntermediateBase`, `Class866E8__Class866E8`).

@@ -59,3 +59,10 @@ different functions from `gStreamTaskObjMethods`'s). Worth knowing before assumi
 accessor-returned table is always the object's *own* class: sometimes a
 class's own vtable slot body reaches for a *different* class's table via a
 second accessor and calls straight through it.
+
+## Naming
+
+**Get_vtable_StreamTaskObj** -- tier A. The class's own "GetMethods"
+accessor (returns `&gStreamTaskObjMethods`, no other side effect), matching
+the established `Get_vtable_<Class>` convention exactly
+(`Get_vtable_Entity`, `Get_vtable_TaskCore`, `Get_vtable_IntermediateBase`).

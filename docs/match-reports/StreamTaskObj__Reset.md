@@ -47,3 +47,12 @@ with the setters' report).
 ## Proposed learning
 
 None new beyond `StreamTaskObj__SetUnkC4`'s.
+
+## Naming
+
+**StreamTaskObj__Reset** -- tier A. Occupies `gStreamTaskObjMethods` slot
+`+0x040`, the SAME numbered slot independently named `Reset` in two other,
+unrelated classes in this codebase (`Class866E8__Reset`,
+`include/class_3ac78.h`; `Class6B5CC__Reset`, `include/code_d294.h`) --
+both also called from their own class's ctor chain, both also just a run of
+fixed-literal field stores, exactly this function's own shape.

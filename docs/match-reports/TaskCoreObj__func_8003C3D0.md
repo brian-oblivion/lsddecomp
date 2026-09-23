@@ -86,3 +86,17 @@ vtable slot might write back into the caller's object, so a bare repeated
 value in a register (callee-saved, if it must survive the call) instead. The
 frame-size mismatch (fewer/more saved registers than retail) is the fast
 tell for this class, distinguishable at a glance from a same-size residue.
+
+## Naming
+
+**TaskCoreObj__func_8003C3D0** -- tier C. Occupies slot `+0x050` in BOTH
+`gTaskCoreMethods` and `gStreamTaskObjMethods` at the identical address --
+i.e. StreamTaskObj does NOT override this slot, so the function genuinely
+belongs to `TaskCoreObj` (confirmed by `classtable.py`'s slot-for-slot
+comparison, see the unit header comment), not to `StreamTaskObj` despite its
+`self` parameter being typed `StreamTaskObj *` (the common-caller
+convention, per `TaskCoreMethods`'s own established parameter typing). Tears
+down `self->unk18` through two slots, then `unk78`'s own slot `+0x050`,
+then conditionally the `TaskText` sub-object -- teardown-shaped but not the
+dtor slot, so left `Class__func_xxxxx` rather than assert "Stop" or
+"Deactivate".

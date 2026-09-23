@@ -56,3 +56,10 @@ setters), not case (b) (BIOS trampoline) — worth checking `jr $t2` first,
 but don't assume every such run is a trap; sometimes it really is just
 setters, and `tools/classtable.py` on the enclosing method table confirms it
 cheaply (all five sit in five consecutive table slots).
+
+## Naming
+
+**StreamTaskObj__SetUnkC4** -- tier A. Plain single-field setter (one of a
+run of five identical-shape setters at consecutive table slots
+`+0x124`..`+0x134`); `Class__SetUnkNN` convention, same precedent as
+`StreamTaskObj__SetUnk40`.

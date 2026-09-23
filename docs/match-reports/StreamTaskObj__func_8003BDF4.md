@@ -35,3 +35,13 @@ void StreamTaskObj__func_8003BDF4(StreamTaskObj *self) {
 ## Proposed learning
 
 None beyond what `StreamTaskObj__func_8003BD10`'s report already states.
+
+## Naming
+
+**StreamTaskObj__func_8003BDF4** -- tier C. Occupies `gStreamTaskObjMethods`
+slot `+0x094`; an `if`/`else` choosing between tearing down through the
+private `unkB4` sub-object's slot `+0x04C` or re-entering this class's own
+state-7 transition, gated by `unkD4` -- the same `unkB4->methods->slot4C`
+call `StreamTaskObj__func_8003BC14`'s `case 8` makes under the inverse
+condition. Neither `unkD4`'s nor "state 7"'s game meaning is confirmed, so
+left `Class__func_xxxxx`.

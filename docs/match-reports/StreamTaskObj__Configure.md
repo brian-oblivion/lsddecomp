@@ -74,3 +74,15 @@ signature against an already-established header (here, `Class6D3C8.h`) before
 typing it from scratch is worth doing whenever the class or table is shared
 across units -- it turned an otherwise-unverifiable parameter-name guess
 into a corroborated one.
+
+## Naming
+
+**StreamTaskObj__Configure** -- tier B. Occupies `gStreamTaskObjMethods` slot
+`+0x044`. Cross-unit call sites in `src/code_1677c.c`
+(`func_80026170`/`func_80026348`, via `include/Class6D3C8.h`'s independent
+`StreamTaskMethods::slot44` view) show this stores a resource
+name-or-derived-value, a type lookup and a flag before up-calling the base
+slot -- the mechanics (store configuration words, then delegate) are clear,
+but the game meaning of the second argument varies by caller (a filename in
+one call, a plain derived count in another), so no more specific verb is
+supported yet.

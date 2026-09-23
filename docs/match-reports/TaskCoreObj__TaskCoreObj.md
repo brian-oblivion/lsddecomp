@@ -132,3 +132,12 @@ shape that needs a local — the disassembly tell is a literal duplicated
 which reads as obviously wrong once you see it side by side in
 `asm-differ`, but is easy to write by reflex when translating two
 back-to-back C statements that both mention `Get_vtable_TaskCore()`.
+
+## Naming
+
+**TaskCoreObj__TaskCoreObj** -- tier A. Occupies `gTaskCoreMethods`'s own
+ctor slot `+0x008`; confirmed a base-class constructor by its own body
+(`self->methods = (StreamTaskObjMethods *)core;`, temporarily pointing the
+object at its own table before the derived `StreamTaskObj__StreamTaskObj`
+overwrites it). `Class__Class` convention, same precedent as
+`StreamTaskObj__StreamTaskObj`.

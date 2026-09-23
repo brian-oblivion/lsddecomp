@@ -48,3 +48,11 @@ Another confirmed instance of the "default value, conditionally overwritten,
 no `else`" idiom from `docs/DECOMPILATION_LEARNINGS.md` -- worth keeping on
 the shortlist of shapes to try first when the residue is "one extra
 instruction" or a delay-slot store that looks unconditional at a glance.
+
+## Naming
+
+**StreamTaskObj__SetUnk40** -- tier A. Plain setter (with a `* 15` scale
+when the argument is non-negative) for `self->unk40`; a pure leaf whose
+mechanics are its whole purpose, matching the `Class__SetUnkNN` convention
+already used elsewhere for a field of unconfirmed game meaning
+(`Entity__SetUnkF4`, `src/Entity.c`).

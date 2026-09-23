@@ -64,3 +64,11 @@ how many words are at stake if it's missed (2 calls cost 44 words in
 build). Suspect this reflexively whenever a `self->field` (or
 `self->a->field`) appears more than once with a `jalr` between the
 occurrences.
+
+## Naming
+
+**TaskCoreObj__Reset** -- tier A. Occupies `gTaskCoreMethods` slot `+0x040`,
+the same cross-class "Reset" slot number as `StreamTaskObj__Reset`
+(`Class866E8__Reset`/`Class6B5CC__Reset` precedent); sets eight fields to
+fixed literal defaults, the same shape as every other confirmed `Reset` in
+this codebase.

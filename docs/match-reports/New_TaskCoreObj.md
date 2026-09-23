@@ -54,3 +54,11 @@ plus three.
 Matched by the head during divergence resolution, 2026-09-02, as part of
 closing the epilogue-merge class. `docs/research/epilogue-merge-residue.md` is
 updated with what survived and what did not.
+
+## Naming
+
+**New_TaskCoreObj** -- tier A. Canonical `New_X` allocator shape for
+`TaskCoreObj` (0xA4 bytes), matching `New_StreamTaskObj`'s own shape one
+class down; the "TaskCore" name is this unit's own local view, kept
+independent of `include/Class6D3C8.h`'s `LoaderTask` view of the identical
+table (per this unit's header comment).

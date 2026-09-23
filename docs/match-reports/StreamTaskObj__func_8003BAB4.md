@@ -61,3 +61,14 @@ argument setup: if retail schedules an unconditional value (like the callee's
 `self` argument) into the guarding branch's own delay slot, the source is not
 storing the tested value to a struct field — it is testing a live temporary
 directly.
+
+## Naming
+
+**StreamTaskObj__func_8003BAB4** -- tier C (class known, purpose not
+established). Occupies `gStreamTaskObjMethods` slot `+0x04C`; up-calls
+`TaskCoreObj__func_8003C238` at the same slot, then forwards the fields
+`StreamTaskObj__Configure` set into the private `unkB4` sub-object and
+conditionally resets a value. No external caller was found (dispatched only
+through the vtable), and no single verb for the combined effect is
+confidently supported by the body alone -- kept `Class__func_xxxxx` rather
+than guess.

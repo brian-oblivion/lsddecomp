@@ -32,3 +32,8 @@ See `StreamTaskObj__SetUnkC4`'s report — same header, `include/code_2c054.h`.
 ## Proposed learning
 
 None beyond `StreamTaskObj__SetUnkC4`'s.
+
+## Naming
+
+**StreamTaskObj__SetUnkCC** -- tier A. Plain setter, third of the run of
+five described in `StreamTaskObj__SetUnkC4`'s report; same convention.

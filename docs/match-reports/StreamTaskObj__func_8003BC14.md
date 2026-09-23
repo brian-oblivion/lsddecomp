@@ -63,3 +63,15 @@ head's request to record where the lever was and wasn't needed.
 None new — this function is a clean confirmation of the pre-existing
 "switch body order is source order, comparison order is the compiler's own
 pivot choice" idiom, now with a 4-way switch instead of a 2-3 way one.
+
+## Naming
+
+**StreamTaskObj__func_8003BC14** -- tier C. Occupies `gStreamTaskObjMethods`
+slot `+0x060`; a `switch` on its own second argument over four literal codes
+(5/7/8/0x12), each toggling `unkD8` or forwarding through a couple of other
+slots, after up-calling the base slot unconditionally. Reads like a small
+state dispatcher, but nothing consumes or documents what the four codes
+themselves mean in the game (no caller was found), so a name like
+`SetState` would assert more than the body supports -- kept
+`Class__func_xxxxx` per round 72's tier-B ceiling for unconfirmed data
+meaning.

@@ -97,3 +97,10 @@ open until a caller (or another accessor) proves it one way or the other —
 and when the correction comes, retype-and-rebuild-full-unit is cheap
 (seconds) and worth doing immediately rather than leaving two different
 "true types" on record for the same bytes.
+
+## Naming
+
+**TaskCoreObj__Destroy** -- tier A. Occupies `gTaskCoreMethods`'s dtor slot
+`+0x00C`; tears down five sub-objects then up-calls `IntermediateBase`'s own
+dtor at the same slot. Same `Class__Destroy` convention as
+`StreamTaskObj__Destroy`.

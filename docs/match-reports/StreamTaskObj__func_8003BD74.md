@@ -54,3 +54,11 @@ precedent as `Get_vtable_StreamTaskObj`'s report) with slot `+0x080` typed
 
 See `StreamTaskObj__func_8003BDAC`'s report (same shape, slot `+0x084`) and
 `Get_vtable_StreamTaskObj`'s (the delegation pattern itself).
+
+## Naming
+
+**StreamTaskObj__func_8003BD74** -- tier C. Occupies `gStreamTaskObjMethods`
+slot `+0x080`; a pure one-line up-call to the base slot with no
+StreamTaskObj-specific logic at all (see the report's own return-type
+discussion). There is nothing here to name beyond "this class's own
+override of that slot," so left `Class__func_xxxxx`.

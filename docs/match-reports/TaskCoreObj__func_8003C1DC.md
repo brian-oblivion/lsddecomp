@@ -79,3 +79,13 @@ unit needs to write already occupies a slot typed elsewhere, read the
 occupant's OWN disassembly before trusting the existing slot typing at face
 value; the existing typing can be right for its own call site and still
 under-describe the function.
+
+## Naming
+
+**TaskCoreObj__func_8003C1DC** -- tier C. Occupies `gTaskCoreMethods` slot
+`+0x044`; up-calls `IntermediateBase`'s own slot `+0x044`, then returns
+`self->unk38` as a status/result word (the report's own "return-type
+discrepancy" section). The mechanics are fully known (an up-call followed
+by a status read), but neither `unk38` nor the base slot's own game meaning
+is established, so left `Class__func_xxxxx` rather than name it as a getter
+for something unconfirmed.

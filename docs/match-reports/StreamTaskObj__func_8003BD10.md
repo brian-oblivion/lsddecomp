@@ -42,3 +42,12 @@ slot is often another function already queued (sometimes in the same unit,
 sometimes not), and its own parameter list is direct evidence for the slot's
 signature — cheaper than deriving the slot purely from the caller's register
 setup.
+
+## Naming
+
+**StreamTaskObj__func_8003BD10** -- tier C. Occupies `gStreamTaskObjMethods`
+slot `+0x078`; up-calls the base slot, then if `unkCC` is set, marks
+`unk38 = 2` and re-enters this class's own state-transition slot with code
+`0x12`. Neither `unk38` nor "state `0x12`" has a confirmed game meaning
+(see `TaskCoreObj__func_8003C1DC`'s report for the same `unk38` field from
+the other side), so left `Class__func_xxxxx`.

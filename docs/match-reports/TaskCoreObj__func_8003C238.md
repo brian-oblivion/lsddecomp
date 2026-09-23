@@ -139,3 +139,13 @@ same caller is strong positive evidence," this function's residue-free match
 teaches the complementary negative: a single conflicting arity at that same
 slot number is enough to override it, because a class's vtable ABI must be
 uniform across every instance and override.
+
+## Naming
+
+**TaskCoreObj__func_8003C238** -- tier C. Occupies `gTaskCoreMethods` slot
+`+0x04C`, the unit's largest function: commits several previously-configured
+fields into `self->unk18` (`StreamTaskUnk18Obj`, this same round's type
+rename -- see the note above) and drives the `TaskText` sub-object twice.
+Every individual call is understood (see "Summary" above), but no single
+verb covers what the function accomplishes as a whole, so left
+`Class__func_xxxxx`.
