@@ -212,9 +212,9 @@ struct Class6B5CCSub14 {
  * of the three functions); the block is 0x28 bytes total per the ctor's own
  * allocation size, so the tail past +0x018 is still opaque padding. */
 struct Class6B5CCSub44 {
-    s32 unk0;   /* +0x000 */
-    s32 unk4;   /* +0x004 */
-    s32 unk8;   /* +0x008 */
+    s32 scaleX;  /* +0x000, GsCOORD2PARAM.scale.vx (round 71) */
+    s32 scaleY;  /* +0x004, scale.vy */
+    s32 scaleZ;  /* +0x008, scale.vz */
     u8 padC[0x010 - 0x00C];
     S16Quad_d294 vec;  /* +0x010, x/y/z/w at +0x010/+0x012/+0x014/+0x016 */
     u8 pad18[0x028 - 0x018];

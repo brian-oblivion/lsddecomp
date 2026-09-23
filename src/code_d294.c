@@ -161,13 +161,13 @@ void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
     r2 = RatioToFixed12((u8 *)data + 8);
     dst = self->unk14->unk44;
     if (flag) {
-        dst->unk0 = (s16)r0;
-        dst->unk4 = (s16)r1;
-        dst->unk8 = (s16)r2;
+        dst->scaleX = (s16)r0;
+        dst->scaleY = (s16)r1;
+        dst->scaleZ = (s16)r2;
     } else {
-        dst->unk0 += (s16)r0;
-        dst->unk4 += (s16)r1;
-        dst->unk8 += (s16)r2;
+        dst->scaleX += (s16)r0;
+        dst->scaleY += (s16)r1;
+        dst->scaleZ += (s16)r2;
     }
     self->unk14->flg = 0;
 }
