@@ -83,3 +83,20 @@ and your C reads the SAME pointer-dereferenced field at each use site instead
 of caching it in a local first, expect a wrong (smaller) stack frame and a
 wrong register-saved set, not just a content residue -- the missing local
 changes how many callee-saved registers the function needs at all.
+
+## Naming
+
+Round 70 (alpha). `func_80056858` -> `Class876FC__PlaceModelChildren`, **tier B**.
+
+Two callers: Class876FC__InitByKind with reuse = 0 (creates both children:
+New_BaseObjO, Class6B5CC__LinkModel with the owner's `model`,
+AttachWithRotScale under the owner) and Class876FC__DriftModelChildren with
+reuse = 1 (only slotB8 = BaseObjO__SetVec14, set translation). Both place
+child i at (i+1) * gModelChildSpacing[modelChildLayout] along x (layouts 1-2,
+scaled by the scale triple's first s16) or y (3-4). "Place" covers both
+paths; B because the layout's purpose on screen is not known.
+
+Globals named in this pass (only this unit references them, tier B):
+`gModelChildOffsetInit` (was D_800877EC, all-zero Vec3S, the accumulator's
+start value) and `gModelChildSpacing` (was D_800877F8, s32[5] = {0, -0x80,
+0x80, -0x100, 0x40}, indexed by modelChildLayout).

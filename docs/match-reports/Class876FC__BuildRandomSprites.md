@@ -161,3 +161,23 @@ line 146 would make the `Class876FC__BuildRandomSprites(self, 0)` call at line 1
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/class_3bb8c_s.c:146`. Oracle green.
+
+## Naming
+
+Round 70 (alpha). `func_80056BBC` -> `Class876FC__BuildRandomSprites`, **tier B**.
+
+Only caller Class876FC__InitByKind, kind 2. Body: parity = rand() % 2;
+Class876FC__SpawnSprites with gSpriteScaleHalf on parity 0, NULL otherwise;
+then tableIndex >= 2: sprites[1] gets BaseObjO__AddVec14 by
+(gSpriteShiftX[tableIndex], 0, 0) and slotB8 with altColor or color; else
+sprites[1] gets setSemiTrans(1), setSemiTransRate(0) and updateScale(set,
+parity ? gSpriteScaleLarge : gSpriteScaleSmall); finally sprites[2]
+setDisplay(0). "Sprites" rests on the D800879C4 reading (see
+Class876FC__SpawnSprites); B.
+
+Globals named in this pass (only this unit references them, tier B, named by
+their ratio-triple values): `gSpriteShiftX` (was D_80087844, s32[6]),
+`gSpriteScaleLarge` (was D_8008785C, {6/5, 6/5, 1/1}), `gSpriteScaleHalf`
+(was D_80087868, {3/6, 3/6, 1/1}), `gSpriteScaleSmall` (was D_80087874,
+{4/6, 4/6, 1/1}), `gSpriteShiftScratch` (was D_80087880, a zero Vec3S whose
+.x is overwritten before each use).

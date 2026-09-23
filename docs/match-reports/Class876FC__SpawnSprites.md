@@ -97,3 +97,20 @@ alone — `cmp -l` plus the map turned it into an exact byte-length culprit in
 under a minute. Recommend generalizing the existing hazard note (currently
 scoped to struct edits) to also cover "a from-scratch local variable that
 merely aliases an existing pointer/value for readability."
+
+## Naming
+
+Round 70 (alpha). `func_80056D18` -> `Class876FC__SpawnSprites`, **tier B**.
+
+Two callers: Class876FC__BuildRandomSprites (tbl = gSpriteScaleHalf or NULL)
+and class_3bb8c_o.c's LinkOwnerObj__func_56e1c (tbl = NULL, kind 3). Body:
+five `New_D800879C4(a2, 0, D_8008ACA8)` into +0x084, each attachToParent(self,
+no offset), slotB8(self->color), and updateScale(1, tbl) when tbl != NULL.
+
+Why "sprites": in D800879C4's table (tools/classtable.py D_800879C4) slots
++0x060/+0x064/+0x068 set bits 31/30/28-29 of a word at +0x064 (GsDOFF,
+GsALON, semitrans rate: LIBGS.H:303-308), slot +0x0B8 (func_8004229C)
+copies three bytes to +0x078..+0x07A and slot +0x044 writes +0x084. Those
+are GsSPRITE's attribute, r/g/b and rotate offsets (LIBGS.H:111-122) for a
+GsSPRITE embedded at +0x064; LinkOwnerObj__RandomizeLinks' `angle` at +0x084
+is the same rotate. The D800879C4 class itself is still unnamed, so B.

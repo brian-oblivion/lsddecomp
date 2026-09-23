@@ -127,3 +127,75 @@ functions — not as an obvious diff in the function that actually grew.
 `cmp -l` plus the map (CLAUDE.md's own recipe) found the true culprit in
 under a minute; funcdiff's per-function window alone would have pointed at
 the wrong function.
+
+## Naming
+
+Round 70 (alpha). `func_80056520` -> `Class876FC__InitByKind`, **tier B**.
+
+Only caller is the class's ctor `func_800563C0` (class_3bb8c_r.c), with the
+ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(D_8008ACAC + 0x18)`
+into gTrackedYSnapshot; `AttachWithRotScale(self, parent, pos + offset,
+rotation, scale)`; for kind < 2, `Class6B5CC__LinkModel(self,
+D_8008ACA4->slot80(D_8008AB98[kind]))`; then kind 0 ->
+Class876FC__PlaceModelChildren(self, 0), 2 -> Class876FC__BuildRandomSprites,
+3 -> LinkOwnerObj__func_56e1c (= Class876FC__SpawnSprites(self, 0, 0, NULL)).
+"Init" rests on the one ctor caller, so B.
+
+The class: every function here runs on a D_800876FC instance.
+`func_80056320` allocates 0x98 bytes (where `sprites[5]` ends) and passes a
+kind 0..3 as its first argument (class_3bb8c_n.c passes 0, 1, 2, 3 at its
+four call sites); `func_800563C0` (table +0x008, the ctor) stores it at
++0x054. `Class876FC` is the table-address class name, the
+`Class6B5CC`/`Class65650` convention.
+
+Globals named in this pass: `gTrackedYSnapshot` (was D_8008ACB0, tier B:
+written here from D_8008ACAC's +0x018 word, subtracted from it again by
+Class876FC__UpdateByKind; only this unit references it).
+
+### Field and slot names in this unit's local view (applied, round 70)
+
+`LinkNode` and `LinkNodeMethods` are defined only in `src/class_3bb8c_s.c`,
+so the compiler's accessor list after renaming the definition was entirely in
+this unit (34 errors, all fixed; build and `tools/check-nonmatching.sh`
+green). `typedef struct LinkNode Class876FC;` was added for the owner's
+method signatures; zero bytes changed.
+
+| offset | old | new | tier | evidence |
+| --- | --- | --- | --- | --- |
+| +0x014 | unk14 | coord2 | B | code_d294.h maps Class6B5CCObj +0x14 to GsDOBJ2.coord2; `*coord2 = 0` is its flg |
+| +0x020 | unk20 | model | A | Class6B5CC__LinkModel stores its 2nd argument here; PlaceModelChildren hands it to each child |
+| +0x024 | unk24 | tick | B | func_800564A4 zeroes it, func_800564F4 (slot +0x0EC) increments it before every update |
+| +0x054 | unk54 | kind | B | ctor stores New's first argument, 0..3 at the four class_3bb8c_n.c call sites; three switches on it |
+| +0x058 | unk58 | offset | B | added to the caller's position in Init and Update |
+| +0x064 | unk64 | rotation | B | passed as updateRotation's data |
+| +0x068 | unk68 | scale | B | passed as updateScale's data |
+| +0x06C | unk6C | modelChildLayout | B | 0 = no model children; index into gModelChildSpacing |
+| +0x070 | unk70 | tableIndex | C-ish | only ever an index (gModelChildDriftZ, gSpriteShiftX) |
+| +0x074 | unk74 | color | B | every sprite's slotB8 (func_8004229C copies 3 bytes to GsSPRITE r,g,b) |
+| +0x078 | unk78 | altColor | B | sprites[1]'s slotB8 argument instead of color when non-NULL |
+| +0x07C | arr7C | modelChildren | B | New_BaseObjO objects, linked to the owner's model |
+| +0x084 | arr84 | sprites | B | New_D800879C4 objects (GsSPRITE at +0x64, see Class876FC__SpawnSprites) |
+| slot +0x044 | slot44 | updateRotation | B | func_8001CEB4 (set/add GsCOORD2PARAM.rotate, degrees) |
+| slot +0x048 | slot48 | updateScale | B | func_8001D008 (set/add .scale); sprite override func_80057DF4 also a scale |
+| slot +0x04C | slot4C | attachToParent | B | func_8001D0EC (parent link, coord2 super, coord.t) |
+| slot +0x060 | slot60 | setDisplay | B | func_8001D344 / func_8004220C: attribute bit 31 = !on (GsDOFF) |
+| slot +0x064 | slot64 | setSemiTrans | B | func_8001D374 / func_8004223C: bit 30 (GsALON) |
+| slot +0x068 | slot68 | setSemiTransRate | B | func_8001D3A0 / func_80042268: bits 28-29 (GsAZERO..GsATHREE) |
+| slot +0x0B8 | slotB8 | kept | C | class-dependent: BaseObjO__SetVec14 (translation) on the owner and model children, RGB on sprites |
+| slot +0x0BC | slotBC | addTranslation | B | BaseObjO__AddVec14; only called on model children (sprite override is a no-op) |
+
+The unused `D_8008ACA4Methods::slot80` is left alone: D_8008ACA4 is a
+different object (captured by BaseObjO__func_56f5c) whose class is unknown.
+
+## Proposed field names
+
+For the HEAD, by type scope; none applied here (other units' views).
+
+- `class_3bb8c_r.c` `Obj876FC` (same object): `unk24` -> `tick` (B, same
+  evidence as above: zeroed by func_800564A4, incremented by func_800564F4);
+  `unk54` -> `kind` (B); `block58` -> `params` (B: the 0x24-byte block this
+  unit reads as offset/rotation/scale/modelChildLayout/tableIndex/color/
+  altColor).
+- `include/code_d294.h` `Class6B5CCMethods`: `slot44` -> `updateRotation`,
+  `slot48` -> `updateScale` (B; func_8001CEB4 / func_8001D008 bodies, both
+  matched since those comments said "still queued").

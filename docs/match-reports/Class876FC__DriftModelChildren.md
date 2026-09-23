@@ -31,7 +31,16 @@ from what round 26 assumed.
 
 ```c
 #if 0
-void Class876FC__DriftModelChildren(LinkNode *self)
+/* After 500 frames (tick >= 0x1F5), for kinds with model children and a
+ * nonzero gModelChildDriftZ step: spin self and both children, move the
+ * children along z, and every 24500 / step frames snap them back to their
+ * layout. Always marks self's coord2 for recompute.
+ *
+ * round 44 (2026-09-15): best-reached body, 117/121 words, NOT byte-exact.
+ * See docs/match-reports/Class876FC__DriftModelChildren.md for the residue and what was
+ * tried. Kept here per the hard rule -- restore this ahead of any future
+ * attempt rather than re-deriving from scratch. */
+void Class876FC__DriftModelChildren(Class876FC *self)
 {
     s32 idx;
     s32 *tab70;
@@ -42,12 +51,12 @@ void Class876FC__DriftModelChildren(LinkNode *self)
     LinkNode **p;
     s32 i;
 
-    idx = self->unk70;
-    if (self->unk6C != 0) {
+    idx = self->tableIndex;
+    if (self->modelChildLayout != 0) {
         tab70 = &gModelChildDriftZ[idx];
-        if (*tab70 != 0 && (u32) self->unk24 >= 0x1F5) {
-            p = self->arr7C;
-            self->methods->slot44(self, 0, (s32) gSpinRotStep);
+        if (*tab70 != 0 && (u32) self->tick >= 0x1F5) {
+            p = self->modelChildren;
+            self->methods->updateRotation(self, 0, (s32) gSpinRotStep);
 
             i = 0;
             tab70b = tab70;
@@ -55,14 +64,14 @@ void Class876FC__DriftModelChildren(LinkNode *self)
             for (; i < 2; i++) {
                 Vec3S local = gModelChildDriftInit;
                 local.z += accumOffset + *tab70b;
-                (*p)->methods->slotBC(*p, &local);
+                (*p)->methods->addTranslation(*p, &local);
                 accumOffset += 3;
-                (*p)->methods->slot44(*p, 0, (s32) gSpinRotStep);
+                (*p)->methods->updateRotation(*p, 0, (s32) gSpinRotStep);
                 p++;
             }
 
             divq = 24500 / gModelChildDriftZ[idx];
-            modend = self->unk24;
+            modend = self->tick;
             if (divq >= 0) {
                 if ((u32) modend % (u32) divq == 0) {
                     Class876FC__PlaceModelChildren(self, 1);
@@ -75,7 +84,7 @@ void Class876FC__DriftModelChildren(LinkNode *self)
             }
         }
     }
-    *self->unk14 = 0;
+    *self->coord2 = 0;
 }
 #endif
 ```
@@ -84,15 +93,18 @@ Declarations this needs (already committed in `src/class_3bb8c_s.c`, kept
 regardless of this function's match state):
 
 ```c
-/* LinkNodeMethods gains: */
-void (*slotBC)(LinkNode *self, void *arg1);  /* +0x0BC */
+/* LinkNodeMethods (round 70 names): */
+void (*updateRotation)(LinkNode *self, s32 set, s32 data);  /* +0x044 */
+void (*addTranslation)(LinkNode *self, void *delta);        /* +0x0BC */
 
-/* LinkNode gains: */
-s32 *unk14;   /* +0x014, zeroed on every exit path */
-s32 unk24;    /* +0x024, used as a modulus dividend -- entry guard is
-                 `>= 0x1F5`, NOT `< 0x1F5` (round 26's reading corrected
-                 above) */
+/* LinkNode (round 70 names; round 44 called them unk14/unk24/unk6C/unk70/arr7C): */
+s32 *coord2;                /* +0x014, `*coord2 = 0` on every exit path */
+s32 tick;                   /* +0x024, entry guard is `>= 0x1F5`, NOT `< 0x1F5` */
+s32 modelChildLayout;       /* +0x06C */
+s32 tableIndex;             /* +0x070 */
+LinkNode *modelChildren[2]; /* +0x07C */
 
+typedef struct LinkNode Class876FC;
 extern s32 gModelChildDriftZ[];
 extern Vec3S gModelChildDriftInit;
 extern s32 gSpinRotStep[];
@@ -227,3 +239,25 @@ call, mirroring retail's own explicit register-to-register copy) to jump
 residue-classification attempts; the latter are worth re-running whenever
 context changes, which here was simply "one more lever landed earlier in
 the same function."
+
+## Naming
+
+Round 70 (alpha). `func_800569A8` -> `Class876FC__DriftModelChildren`, **tier B**.
+
+Named from its preserved body and asm (still a stall, so B): gated on
+modelChildLayout != 0, gModelChildDriftZ[tableIndex] != 0 and tick >= 501;
+adds gSpinRotStep via updateRotation(.., 0, ..) to self and both children,
+adds a z delta via each child's slot +0x0BC (BaseObjO__AddVec14 in
+D_800878D4), and every 24500 / step frames calls
+Class876FC__PlaceModelChildren(self, 1) to snap them back. Always stores 0
+to `*coord2` (GsCOORDINATE2.flg). Caller: Class876FC__UpdateByKind, kind 0.
+
+Globals named in this pass (only this unit references them, tier B):
+`gModelChildDriftZ` (was D_8008780C, s32[8] = {0, 0, 0, -1, -2, -4, -16,
+-256}), `gModelChildDriftInit` (was D_8008782C, all-zero Vec3S) and
+`gSpinRotStep` (was D_80087838, ratio triple {0/1, 1/10, 0/1}, read by
+RatioToFixed12).
+
+The preserved `#if 0` body (in the .c and above) was renamed with the unit's
+fields and slots; it was pushed through cpp | cc1 once afterwards and still
+compiles.

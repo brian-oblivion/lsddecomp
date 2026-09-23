@@ -24,3 +24,11 @@ void Class876FC__ReleaseModelChildren(LinkNode *self) {
 ### Proposed learning
 
 None -- a plain guarded release, no residue.
+
+## Naming
+
+Round 70 (alpha). `func_80056B8C` -> `Class876FC__ReleaseModelChildren`, **tier A**.
+
+Body: `if (modelChildLayout != 0) ReleaseBasicClassArray(modelChildren, 2)`,
+the exact inverse of Class876FC__PlaceModelChildren's creation guard. Only
+caller Class876FC__ReleaseByKind (kind 0), itself called from the dtor.

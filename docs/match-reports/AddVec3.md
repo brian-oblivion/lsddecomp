@@ -32,3 +32,11 @@ multiple-independent-local-views convention (this unit is not
 ### Proposed learning
 
 None -- a plain three-field vector add, no residue.
+
+## Naming
+
+Round 70 (alpha). `func_80056794` -> `AddVec3`, **tier A**.
+
+Pure leaf, `dst = a + b` over three s32 components; the mechanics are its
+purpose. Free function (no `self`), VerbNoun. Checked no `AddVec3` or
+similar existed in the symbols file (only BaseObjO__AddVec14, a method).

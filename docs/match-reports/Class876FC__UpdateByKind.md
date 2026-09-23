@@ -118,3 +118,15 @@ is correct for this unit and must not be widened.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/class_3bb8c_r.c:438`. Oracle green.
+
+## Naming
+
+Round 70 (alpha). `func_80056640` -> `Class876FC__UpdateByKind`, **tier B**.
+
+Only caller is `func_800564F4`, which sits in D_800876FC's slot +0x0EC
+(asm/data/76DC8.data.s, the table's last word) and increments `tick` (+0x024)
+before the call. Body: owner's slotB8 (BaseObjO__SetVec14 in D_800876FC,
+i.e. set translation) with pos + offset + (D_8008ACAC's +0x018 word now -
+gTrackedYSnapshot); then kind 0 -> Class876FC__DriftModelChildren, 2 ->
+NoOpIgnoreArgs, 3 -> LinkOwnerObj__RandomizeLinks. "Update" rests on the
+per-frame counter in its one caller, so B.
