@@ -48,22 +48,22 @@ Class6B5CCObj *New_Class6B5CC(void) {
 void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     void *blockB;
 
-    self->unk14 = func_80017B34(0x50);
-    if (self->unk14 == NULL) {
+    self->coord2 = func_80017B34(0x50);
+    if (self->coord2 == NULL) {
         return NULL;
     }
     blockB = func_80017B34(0x28);
-    self->unk14->unk44 = blockB;
+    self->coord2->param = blockB;
     if (blockB == NULL) {
-        func_80017CFC(self->unk14);
+        func_80017CFC(self->coord2);
         return NULL;
     }
     Get_vtable_BasicClass()->ctor(self);
     self->methods = GetClass6B5CCMethods();
     self->unk20 = 0;
     self->unk18 = 0;
-    self->unkC = NULL;
-    self->unk14->super = 0;
+    self->parent = NULL;
+    self->coord2->super = 0;
     self->methods->reset(self);
     return self;
 }
@@ -74,9 +74,9 @@ void Class6B5CC__Finalize(Class6B5CCObj *self) {
     self->methods->detachFromParent(self);
     self->methods->detachAttachedChildren(self);
     self->methods->slot5C(self, 0);
-    sub = self->unk14;
-    func_80017CFC(sub->unk44);
-    func_80017CFC(self->unk14);
+    sub = self->coord2;
+    func_80017CFC(sub->param);
+    func_80017CFC(self->coord2);
     Get_vtable_BasicClass()->finalize(self);
 }
 
@@ -115,11 +115,11 @@ void Class6B5CC__OnNotify(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2)
 
 void Class6B5CC__Reset(Class6B5CCObj *self) {
     self->tick = 0;
-    self->unk10 = 0;
-    GsInitCoordinate2(0, self->unk14);
+    self->attribute = 0;
+    GsInitCoordinate2(0, self->coord2);
     self->methods->updateRotation(self, 1, ROTATION_ZERO);
     self->methods->updateScale(self, 1, SCALE_ONE);
-    self->unk14->flg = 1;
+    self->coord2->flg = 1;
 }
 
 void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
@@ -133,12 +133,12 @@ void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
     vals[0] /= 360;
     vals[1] /= 360;
     vals[2] /= 360;
-    dst = self->unk14->unk44;
-    field = &dst->vec.x;
+    dst = self->coord2->param;
+    field = &dst->rotate.x;
     if (flag) {
-        dst->vec.x = vals[0];
-        dst->vec.y = vals[1];
-        dst->vec.z = vals[2];
+        dst->rotate.x = vals[0];
+        dst->rotate.y = vals[1];
+        dst->rotate.z = vals[2];
     } else {
         s32 i;
         s16 *cur;
@@ -149,7 +149,7 @@ void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
             *cur = (*cur + vals[i]) % 4096;
         }
     }
-    self->unk14->flg = 0;
+    self->coord2->flg = 0;
 }
 
 void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
@@ -159,7 +159,7 @@ void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
     r0 = RatioToFixed12(data);
     r1 = RatioToFixed12((u8 *)data + 4);
     r2 = RatioToFixed12((u8 *)data + 8);
-    dst = self->unk14->unk44;
+    dst = self->coord2->param;
     if (flag) {
         dst->scaleX = (s16)r0;
         dst->scaleY = (s16)r1;
@@ -169,28 +169,28 @@ void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
         dst->scaleY += (s16)r1;
         dst->scaleZ += (s16)r2;
     }
-    self->unk14->flg = 0;
+    self->coord2->flg = 0;
 }
 
 Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
     Class6B5CCSub14 *sub;
 
-    if (self->unkC == NULL) {
-        self->unkC = obj;
-        sub = self->unk14;
-        sub->super = obj->unk14;
+    if (self->parent == NULL) {
+        self->parent = obj;
+        sub = self->coord2;
+        sub->super = obj->coord2;
         obj->methods->addChild(obj, self);
-        sub = self->unk14;
+        sub = self->coord2;
         if (vec != NULL) {
-            sub->unk18 = vec->x;
-            sub->unk1C = vec->y;
-            sub->unk20 = vec->z;
+            sub->tx = vec->x;
+            sub->ty = vec->y;
+            sub->tz = vec->z;
         } else {
-            sub->unk18 = 0;
-            sub->unk1C = 0;
-            sub->unk20 = 0;
+            sub->tx = 0;
+            sub->ty = 0;
+            sub->tz = 0;
         }
-        self->unk14->flg = 0;
+        self->coord2->flg = 0;
     }
     return self;
 }
@@ -198,11 +198,11 @@ Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *ob
 Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self) {
     UnkOwner_d294 *owner;
 
-    owner = self->unkC;
+    owner = self->parent;
     if (owner != NULL) {
         owner->methods->removeChild(owner, self);
-        self->unk14->super = 0;
-        self->unkC = NULL;
+        self->coord2->super = 0;
+        self->parent = NULL;
     }
     return self;
 }
@@ -230,7 +230,7 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **ent
         GetNextBasicClass(entry, cursor);
         if (*entry != NULL) {
             if ((((*entry)->methods->header) & CLASS_TAG_MASK) == tag) {
-                if ((*entry)->unkC == self) {
+                if ((*entry)->parent == self) {
                     return;
                 }
             }
@@ -243,21 +243,21 @@ void Class6B5CC__func_1d33c(void) {
 }
 
 s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, ATTR_DOFF_SHIFT, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->attribute, ATTR_DOFF_SHIFT, 1, a1 == 0) == 0;
 }
 
 u32 Class6B5CC__SetSemiTrans(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, ATTR_ALON_SHIFT, 1, a1 != 0);
+    return GetSetBitField(&self->attribute, ATTR_ALON_SHIFT, 1, a1 != 0);
 }
 
 u32 Class6B5CC__SetSemiTransRate(Class6B5CCObj *self, u32 a1) {
-    return GetSetBitField(&self->unk10, ATTR_ABR_SHIFT, 2, a1);
+    return GetSetBitField(&self->attribute, ATTR_ABR_SHIFT, 2, a1);
 }
 
 u32 Class6B5CC__SetLighting(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, ATTR_LOFF_SHIFT, 1, a1 == 0);
+    return GetSetBitField(&self->attribute, ATTR_LOFF_SHIFT, 1, a1 == 0);
 }
 
 u32 Class6B5CC__SetLightMode(Class6B5CCObj *self, u32 a1) {
-    return GetSetBitField(&self->unk10, ATTR_LIGHTMODE_SHIFT, 3, a1);
+    return GetSetBitField(&self->attribute, ATTR_LIGHTMODE_SHIFT, 3, a1);
 }

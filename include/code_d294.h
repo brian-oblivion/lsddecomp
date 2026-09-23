@@ -150,9 +150,9 @@ typedef struct Vec3_d294 {
 struct Class6B5CCSub14 {
     s32 flg;                    /* +0x000, state/pending flag -- see above */
     u8 pad04[0x018 - 0x004];
-    s32 unk18;                   /* +0x018, Vec3.x */
-    s32 unk1C;                   /* +0x01C, Vec3.y */
-    s32 unk20;                   /* +0x020, Vec3.z */
+    s32 tx;                   /* +0x018, Vec3.x */
+    s32 ty;                   /* +0x01C, Vec3.y */
+    s32 tz;                   /* +0x020, Vec3.z */
     /* +0x024, round 12 (code_d294_b, Class6B5CC__TransformAndNotifyParents): only its ADDRESS is
      * taken (`&self->unk14->unk24`, forwarded to ApplyMatrixToSVArray as a
      * write-destination base) -- nothing dereferences through it in this
@@ -186,7 +186,7 @@ struct Class6B5CCSub14 {
      * second heap block (0x28 bytes, alloc'd by the ctor); the retype only
      * narrows what is KNOWN about its contents, it does not change the
      * allocation. */
-    Class6B5CCSub44 *unk44;
+    Class6B5CCSub44 *param;
     s32 super;    /* +0x048, zeroed by the ctor and by Class6B5CC__DetachFromParent (slot +0x050);
                    * set to `obj->unk14` by Class6B5CC__AttachToParent's "attach" */
 };
@@ -216,7 +216,7 @@ struct Class6B5CCSub44 {
     s32 scaleY;  /* +0x004, scale.vy */
     s32 scaleZ;  /* +0x008, scale.vz */
     u8 padC[0x010 - 0x00C];
-    S16Quad_d294 vec;  /* +0x010, x/y/z/w at +0x010/+0x012/+0x014/+0x016 */
+    S16Quad_d294 rotate;  /* +0x010, x/y/z/w at +0x010/+0x012/+0x014/+0x016 */
     u8 pad18[0x028 - 0x018];
 };
 
@@ -347,7 +347,7 @@ struct UnkOwner_d294 {
      * never dereferenced there) -- reverified after this retype,
      * Class6B5CC__AttachToParent's own match is unaffected (whole-image SHA1 stays
      * green with it still compiled as real C). */
-    Class6B5CCSub14 *unk14;        /* +0x014 */
+    Class6B5CCSub14 *coord2;        /* +0x014 */
 };
 
 /* A generic "just enough to dispatch" view of some OTHER class, used where
@@ -376,21 +376,21 @@ struct GenericMethods_d294 {
      * `(other, self, 4)` where `self` is Class6B5CC__TryAttachNearby's own Class6B5CCObj*
      * parameter and `4` a literal -- MEASURED from that call site alone,
      * real meaning of the literal unknown. */
-    void (*slot38)(GenericObj_d294 *self, Class6B5CCObj *arg1, s32 arg2); /* +0x038 */
+    void (*onNotify)(GenericObj_d294 *self, Class6B5CCObj *arg1, s32 arg2); /* +0x038 */
     u8 pad03C[0x050 - 0x03C];
     void (*detachFromParent)(GenericObj_d294 *self); /* +0x050, Class6B5CC__DetachAttachedChildren's call target */
 };
 struct GenericObj_d294 {
     GenericMethods_d294 *methods; /* +0x000 */
     u8 pad04[0x00C - 0x004];
-    void *unkC;                    /* +0x00C, Class6B5CC__GetNextAttachedChild compares this to a Class6B5CCObj* */
+    void *parent;                    /* +0x00C, Class6B5CC__GetNextAttachedChild compares this to a Class6B5CCObj* */
     s32 unk10;                     /* +0x010, round 13 (code_d294_c, Class6B5CC__LinkModel): read into self->unk18 */
     /* +0x014, round 13 (Class6B5CC__TryAttachNearby): same role as Class6B5CCObj's own
      * `unk14` -- `other->unk14`'s +0x038 is subtracted from
      * `self->unk14`'s. MEASURED, not a name unification guess: both call
      * sites reach the identical +0x038 field through this one, at the same
      * offset, in the same function. */
-    Class6B5CCSub14 *unk14;
+    Class6B5CCSub14 *coord2;
     u8 pad18[0x02C - 0x018];
     /* +0x02C, round 13 (Class6B5CC__TryAttachNearby): only its ADDRESS is taken
      * (forwarded as a vtable call's own opaque argument) -- real shape
@@ -427,7 +427,7 @@ struct Class6B5CCMethods {
      * banner's `--vs D_8006B58C` census) -- NOT decompiled here, BasicClass
      * is a different unit's own ancestor code. Class6B5CC__TransformAndNotifyParents (round 12,
      * this unit) dispatches through it as `(self, s32 arg1)`. */
-    void (*slot30)(Class6B5CCObj *self, s32 arg1);
+    void (*notifyParents)(Class6B5CCObj *self, s32 arg1);
     u8 pad034[0x040 - 0x034];
     void (*reset)(Class6B5CCObj *self);      /* +0x040, Class6B5CC__Reset (this unit) */
     /* +0x044/+0x048, a `(self, s32 flag, void *data)` pair -- Class6B5CC__Reset
@@ -536,9 +536,9 @@ struct Class6B5CCObj {
      * shape, `UnkOwnerMethods_d294`, at the exact same slot offsets. Not
      * just a plausible guess -- the two call sites agree byte-for-byte on
      * what lives at +0x010/+0x014 of whatever this points to. */
-    UnkOwner_d294 *unkC;
-    u32 unk10;                  /* +0x010, a packed bit-flags word -- see GetSetBitField below */
-    Class6B5CCSub14 *unk14;     /* +0x014, the ctor's 0x50-byte allocation */
+    UnkOwner_d294 *parent;
+    u32 attribute;                  /* +0x010, a packed bit-flags word -- see GetSetBitField below */
+    Class6B5CCSub14 *coord2;     /* +0x014, the ctor's 0x50-byte allocation */
     s32 unk18;                  /* +0x018, zeroed by the ctor */
     u8 unk1C[0x020 - 0x01C];    /* unknown; not touched by this unit's chosen functions */
     /* +0x020, zeroed by the ctor. Class6B5CC__AddChild's still-queued forward

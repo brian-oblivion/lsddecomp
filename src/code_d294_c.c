@@ -57,13 +57,13 @@ void Class6B5CC__LocalOffsetToWorldPos(Class6B5CCObj *self, s32 *dst, s32 *src) 
     self->methods->getRotMatrix(self, buf, 0);
     ApplyMatrixToLVArray(dst, src, 1, buf);
 
-    table = self->unkC != 0 ? self->unk14->unk38 : 0;
+    table = self->parent != 0 ? self->coord2->unk38 : 0;
     dst[0] = dst[0] + table[0];
 
-    table = self->unkC != 0 ? self->unk14->unk38 : 0;
+    table = self->parent != 0 ? self->coord2->unk38 : 0;
     dst[1] = dst[1] + table[1];
 
-    table = self->unkC != 0 ? self->unk14->unk38 : 0;
+    table = self->parent != 0 ? self->coord2->unk38 : 0;
     dst[2] = dst[2] + table[2];
 }
 
@@ -81,12 +81,12 @@ void Class6B5CC__LocalOffsetToWorldPos(Class6B5CCObj *self, s32 *dst, s32 *src) 
 void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294 *out) {
     Class6B5CCSub44 *src;
 
-    src = self->unk14->unk44;
-    out[0].whole = src->vec.x * 45 >> 9;
+    src = self->coord2->param;
+    out[0].whole = src->rotate.x * 45 >> 9;
     out[0].frac = 1;
-    out[1].whole = src->vec.y * 45 >> 9;
+    out[1].whole = src->rotate.y * 45 >> 9;
     out[1].frac = 1;
-    out[2].whole = src->vec.z * 45 >> 9;
+    out[2].whole = src->rotate.z * 45 >> 9;
     out[2].frac = 1;
 }
 
@@ -102,7 +102,7 @@ void Class6B5CC__GetRotationDegrees(Class6B5CCObj *self, WholeFrac_d294 *out) {
 void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other) {
     self->unk20 = other;
     self->unk18 = other->unk10;
-    GsLinkObject4((u8 *)((GenericObj_d294 *)self->unk20)->unkC + 0xC, &self->unk10, 0);
+    GsLinkObject4((u8 *)((GenericObj_d294 *)self->unk20)->parent + 0xC, &self->attribute, 0);
 }
 
 /* Clears exactly the two fields Class6B5CC__LinkModel sets: the GsDOBJ2's
@@ -170,20 +170,20 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     UnkOwner_d294 *cur;
 
     if (self->unk20 != NULL) {
-        if ((s32)self->unk10 < 0 && self->unkC != NULL) {
-            node = self->unk14;
+        if ((s32)self->attribute < 0 && self->parent != NULL) {
+            node = self->coord2;
             if ((u8 *)node + 0x38 != NULL) {
-                *(Vec3_d294 *)node->unk38 = *(Vec3_d294 *)&node->unk18;
+                *(Vec3_d294 *)node->unk38 = *(Vec3_d294 *)&node->tx;
 
-                cur = self->unkC;
+                cur = self->parent;
                 if (cur != NULL) {
                     do {
-                        ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->x =
-                            ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->x + cur->unk14->unk18;
-                        ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->y =
-                            ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->y + cur->unk14->unk1C;
-                        ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->z =
-                            ((Vec3_d294 *)(self->unkC != 0 ? self->unk14->unk38 : (s32 *)0))->z + cur->unk14->unk20;
+                        ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x =
+                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x + cur->coord2->tx;
+                        ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y =
+                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y + cur->coord2->ty;
+                        ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z =
+                            ((Vec3_d294 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z + cur->coord2->tz;
 
                         cur = cur->next;
                     } while (cur != NULL);
@@ -191,7 +191,7 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
             }
         }
 
-        table = self->unkC != 0 ? self->unk14->unk38 : 0;
+        table = self->parent != 0 ? self->coord2->unk38 : 0;
         delta[0] = (u16)arg2[0] - (u16)table[0];
         delta[1] = (u16)arg2[1] - (u16)table[1];
         delta[2] = (u16)arg2[2] - (u16)table[2];
@@ -246,8 +246,8 @@ void Class6B5CC__FaceTarget(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2
     s32 dz;
     WholeFrac_d294 out[3];
 
-    pos = &self->unk14->unk18;
-    table = target->unkC != 0 ? target->unk14->unk38 : 0;
+    pos = &self->coord2->tx;
+    table = target->parent != 0 ? target->coord2->unk38 : 0;
 
     if (table[0] != pos[0]) {
         dx = table[0] - pos[0];

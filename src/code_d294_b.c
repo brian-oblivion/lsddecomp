@@ -45,7 +45,7 @@
  * pass-through value and raw pass-through result -- same shape as
  * Class6B5CC__SetSemiTrans/D3A0/D3F8 (no `== 0` on either side). */
 u32 Class6B5CC__GetSetUnk10Field0(Class6B5CCObj *self, u32 a1) {
-    return GetSetBitField(&self->unk10, 0, 3, a1);
+    return GetSetBitField(&self->attribute, 0, 3, a1);
 }
 
 /* Sibling of Class6B5CC__SetDisplay (the ONLY one of the five already-matched
@@ -55,17 +55,17 @@ u32 Class6B5CC__GetSetUnk10Field0(Class6B5CCObj *self, u32 a1) {
  * return type as Class6B5CC__SetDisplay rather than the plain `u32` of the other
  * three siblings. */
 s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, 7, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->attribute, 7, 1, a1 == 0) == 0;
 }
 
 /* Same family as Class6B5CC__GetSetUnk10Field0, shift 9 width 3. Raw pass-through. */
 u32 Class6B5CC__GetSetUnk10Field9(Class6B5CCObj *self, u32 a1) {
-    return GetSetBitField(&self->unk10, 9, 3, a1);
+    return GetSetBitField(&self->attribute, 9, 3, a1);
 }
 
 /* Same family as Class6B5CC__GetSetUnk10Flag7: double-inversion shape, shift 8 width 1. */
 s32 Class6B5CC__GetSetUnk10Flag8(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, 8, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->attribute, 8, 1, a1 == 0) == 0;
 }
 
 /* self->unk14->unk44 is a 0x28-byte heap block whose +0x10 holds an
@@ -76,7 +76,7 @@ s32 Class6B5CC__GetSetUnk10Flag8(Class6B5CCObj *self, s32 a1) {
  * helper RotMatrix. */
 void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2) {
     S16Quad_d294 buf;
-    S16Quad_d294 *src = &self->unk14->unk44->vec;
+    S16Quad_d294 *src = &self->coord2->param->rotate;
 
     if (a2) {
         buf.x = -src->x;
@@ -137,11 +137,11 @@ void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest) {
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
 void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
-    ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->unk14->unk24);
+    ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->coord2->unk24);
     self->unk28 = 0;
     self->unk2C = 0;
     self->unk30 = a1;
-    self->methods->slot30(self, a2);
+    self->methods->notifyParents(self, a2);
     self->unk30 = NULL;
 }
 
@@ -195,10 +195,10 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
         return;
     }
 
-    posA = (other->unkC != NULL) ? (Vec3_d294 *)other->unk14->unk38 : NULL;
+    posA = (other->parent != NULL) ? (Vec3_d294 *)other->coord2->unk38 : NULL;
     diffRaw = *posA;
 
-    posB = (self->unkC != NULL) ? (Vec3_d294 *)self->unk14->unk38 : NULL;
+    posB = (self->parent != NULL) ? (Vec3_d294 *)self->coord2->unk38 : NULL;
     diffRaw.x = diffRaw.x - posB->x;
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;
@@ -240,7 +240,7 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     }
 
     self->unk28 = other;
-    other->methods->slot38(other, self, 4);
+    other->methods->onNotify(other, self, 4);
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__TryAttachNearby);
@@ -258,7 +258,7 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *
 
     self->methods->getRotMatrix(self, buf1, 1);
 
-    node = self->unkC;
+    node = self->parent;
     if (node != NULL) {
         do {
             node->methods->slot84(node, buf2, 1);
