@@ -292,7 +292,6 @@ s32 func_80065E1C(Class65650 *self)
     if (count != 0) {
         do {
             *p = New_BaseObjO();
-            __asm__("");
             if (*p == NULL) {
                 goto fail;
             }
