@@ -188,10 +188,9 @@ typedef struct Class86ED0 Class86ED0;
 
 /*
  * Class86ED0's own opaque "handle" object (self->unk50's pointee, built by
- * func_80051F24 via BuildFileName/func_8003B39C/func_80041C9C -- none of
- * which are this round's functions, so `local`'s own real structure and
- * these three helpers' precise semantics are unestablished beyond their
- * register-level call shape). Only the three slots this unit's own
+ * func_80051F24 via BuildFileName/func_8003B39C/func_80041C9C: a
+ * "CARD\\<name>.TIM" path is built and loaded, as in class_3bb8c_i's
+ * func_80050F98). Only the three slots this unit's own
  * functions dispatch through are named.
  */
 typedef struct Class86ED0Handle Class86ED0Handle;
@@ -454,53 +453,51 @@ void func_80051F14(Class86ED0 *self)
     self->unk28 = 0;
 }
 
-extern void *BuildFileName(void *out, void *a1, void *a2, void *a3);
-extern Class86ED0Handle *func_8003B39C(void *arg0);
+extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
+extern Class86ED0Handle *func_8003B39C(char *path);
 extern Class86ED0Handle *func_80041C9C(Class86ED0Handle *arg0, void *arg1, s32 arg2);
-extern s32 D_8008AB14;
-extern s32 D_8008AB1C;
-extern s32 D_8008AB24;
+extern const char D_8008AB14[]; /* "SELECT" */
+extern const char D_8008AB1C[]; /* "CARD\\" */
+extern const char D_8008AB24[]; /* ".TIM" */
 extern s32 D_80087028;
 extern s32 D_8008AAF8;
-extern s32 D_800116E4;
+extern const char D_800116E4[]; /* "FONTICON" */
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 75/95 words. Residue: pure register-identity rotation, not
- * a size/instruction defect -- compiled length is exactly 95 words on the
- * first attempt (funcdiff reports no drift), and a permuter --debug run
- * confirms 0 reorderings/insertions/deletions, only 28 register diffs: a
- * clean three-way rotation of the same three long-lived values (the two
- * repeated global addresses feeding BuildFileName, plus the handle) across
- * the same three registers, while self/arg1 already match retail exactly
- * (docs/match-reports/func_80051F24.md). Hand-derived; reviewed rounds 18,
- * 19 -- ten attempts across four functions now confirm declaration/
- * introduction-order reshaping is inert for this residue class. */
+/*
+ * Two handle variables, not one: handle1 and handle2 are disjoint live
+ * ranges, and merging them into one `h` gives the rotation filed as the
+ * round-18/19 stall (75/95, both addresses and the handle swapped among
+ * $s0-$s2). Same shape as class_3bb8c_i's func_80050F98.
+ */
 void func_80051F24(Class86ED0 *self, void *arg1)
 {
-    s32 local[8];
-    Class86ED0Handle *h;
+    char path[0x20];
+    const char *dir;
+    const char *ext;
+    Class86ED0Handle *handle1;
+    Class86ED0Handle *handle2;
 
-    if (!arg1) {
+    if (arg1 == NULL) {
         return;
     }
-    if (self->unk50) {
+    if (self->unk50 != NULL) {
         return;
     }
 
-    h = func_8003B39C(BuildFileName(local, &D_8008AB14, &D_8008AB1C, &D_8008AB24));
-    h->methods->slot78(h);
-    self->unk50 = func_80041C9C(h, &D_80087028, 0);
-    h->methods->slot4(h);
+    dir = D_8008AB1C;
+    ext = D_8008AB24;
+
+    handle1 = func_8003B39C(BuildFileName(path, D_8008AB14, dir, ext));
+    handle1->methods->slot78(handle1);
+    self->unk50 = func_80041C9C(handle1, &D_80087028, 0);
+    handle1->methods->slot4(handle1);
     self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
 
-    h = func_8003B39C(BuildFileName(local, &D_800116E4, &D_8008AB1C, &D_8008AB24));
-    h->methods->slot78(h);
-    self->methods->slot8C(self, arg1, h, self->unk20, self->unk24, self->unk28);
-    h->methods->slot4(h);
+    handle2 = func_8003B39C(BuildFileName(path, D_800116E4, dir, ext));
+    handle2->methods->slot78(handle2);
+    self->methods->slot8C(self, arg1, handle2, self->unk20, self->unk24, self->unk28);
+    handle2->methods->slot4(handle2);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051F24);
-#endif
 
 void func_800520A0(Class86ED0 *self)
 {
