@@ -330,3 +330,18 @@ other half of this same "select a tone/voice" vocabulary, which is why
 mechanics are concrete enough to earn tier B, but the exact GAME-level
 event that calls this (a footstep, an ambient loop, dialogue) is not
 established from this unit alone, so not tier A.
+
+## Track 1b (round 73)
+
+Promoted the "Preserved best-effort body" above (the `hi = index / 16;
+lo = index - hi * 16;` form, 5/55 words, byte-drift outside range) into
+`src/code_179d8_e.c` under `#ifdef NON_MATCHING ... #else INCLUDE_ASM ...
+#endif`, per docs/FINISHING-PLAN.md track 1b. This is the body actually
+verified against the real function in this unit; the HEAD ADJUDICATION's
+narrowing probe above it is a generic reproducer that was never re-applied
+to `VabStreamObj__PlayTone` itself, so it is not a promotable body yet.
+Hand-derived (m2c-assisted, manually read, seven build-verified probes
+against the real function) -- not a permuter candidate. `./build-and-verify.sh`
+stayed green (no bytes changed) and `tools/check-nonmatching.sh` passed.
+
+NON_MATCHING body promoted, round 73.
