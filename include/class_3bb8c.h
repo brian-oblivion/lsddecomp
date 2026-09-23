@@ -1598,8 +1598,8 @@ struct GenericCtorTable_3bb8c_d {
     void (*slot40)(void *self, s32 arg1);
 };
 
-extern GenericCtorTable_3bb8c_d D_80086DC4;
-extern GenericCtorTable_3bb8c_d *GetClass86E00Methods(void); /* returns &D_80086DC4; matched in class_3bb8c_g */
+extern GenericCtorTable_3bb8c_d gClass86E00Methods;
+extern GenericCtorTable_3bb8c_d *GetClass86E00Methods(void); /* returns &gClass86E00Methods; matched in class_3bb8c_g */
 
 /*
  * The object instance itself -- established this round by func_8004E34C,
@@ -1620,7 +1620,7 @@ struct GenericCtorObj_3bb8c_d {
  * Class86E00 -- a large NEW class table, `D_80086E00` (29 slots + header,
  * resolved with `tools/classtable.py 0x80086E00`), unrelated by
  * inheritance to any of `D_8006B58C`/`D_800866E8`/`gClass86B60Methods`/
- * `D_80086DC4` already known in this header (`--vs` against all four
+ * `gClass86E00Methods` already known in this header (`--vs` against all four
  * found no matching run of slots -- an independent class, not a
  * subclass of anything else this header names).
  *

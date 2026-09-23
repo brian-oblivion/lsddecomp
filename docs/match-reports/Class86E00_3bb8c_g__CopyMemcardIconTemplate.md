@@ -11,7 +11,7 @@ round 42 (`--gp-symbols`, pinned in the Makefile).
 
 ```c
 extern s32 atoi(char *s);
-extern u8 *D_8008AAC4;
+extern u8 *gMemcardIconTemplate;
 
 typedef struct {
     s8 raw[6];
@@ -34,15 +34,15 @@ s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 arg0, s32 arg1)
     if (src != NULL) {
         t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
-        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(D_8008AAC4 + 0x1E);
-        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(D_8008AAC4 + 0x1E);
+        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
+        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
 
         idx = atoi((char *)(src + t0)) - 1;
-        p = D_8008AAC4 + idx * 2;
+        p = gMemcardIconTemplate + idx * 2;
         *(Pair2_3bb8c_g *)(self + 0x8) = *(Pair2_3bb8c_g *)p;
         return (s32)p;
     } else {
-        u8 *q = D_8008AAC4;
+        u8 *q = gMemcardIconTemplate;
 
         *(Buf6_3bb8c_g *)(self + 0x6) = *(Buf6_3bb8c_g *)(q + 0x1E);
         return (s32)q;
@@ -63,26 +63,26 @@ alignment is 1, which is what makes GCC use the unaligned `lwl`/`lwr` word
 chunk(s) retail has, with any leftover non-multiple-of-4 bytes as
 individual loads/stores rather than a merged halfword.
 - `Pair2_3bb8c_g` (2 bytes) — used twice: copying the raw 2-byte prefix
-  `D_8008AAC4[0x1E..0x20)` into `self[0x18..0x1A)`, and copying a 2-byte
-  entry out of a `D_8008AAC4`-relative lookup table (indexed by
+  `gMemcardIconTemplate[0x1E..0x20)` into `self[0x18..0x1A)`, and copying a 2-byte
+  entry out of a `gMemcardIconTemplate`-relative lookup table (indexed by
   `atoi(...)  - 1`, doubled) into `self[0x8..0xA)`.
 - `Buf12_3bb8c_g` (12 bytes, exactly 3 word chunks, no tail) — the `src !=
-  NULL` path's bulk copy `self[0x6..0x12) = D_8008AAC4[0x1E..0x2A)`.
+  NULL` path's bulk copy `self[0x6..0x12) = gMemcardIconTemplate[0x1E..0x2A)`.
 - `Buf6_3bb8c_g` (6 bytes, one word chunk + 2 tail bytes) — the `src ==
-  NULL` path's shorter copy `self[0x6..0xC) = D_8008AAC4[0x1E..0x24)`,
+  NULL` path's shorter copy `self[0x6..0xC) = gMemcardIconTemplate[0x1E..0x24)`,
   identical shape to `FormatNumberIntoBuffer`'s own struct this round.
 
 **The one register-identity trap, closed on the third attempt:** the
-function's return value is a POINTER into the `D_8008AAC4` template
+function's return value is a POINTER into the `gMemcardIconTemplate` template
 (confirmed from retail's own register content at `jr $ra` — whichever
-branch runs, `$v0` still holds a `D_8008AAC4`-derived pointer, never
-reloaded fresh at the very end). Writing `return (s32)D_8008AAC4;` as a
+branch runs, `$v0` still holds a `gMemcardIconTemplate`-derived pointer, never
+reloaded fresh at the very end). Writing `return (s32)gMemcardIconTemplate;` as a
 fresh expression in the `else` branch cost one extra word: the compiler
 reloads the global via a second `%gp_rel` `lw` rather than reusing the
 value already sitting in a register from the struct-copy statement just
 above it. The fix was a local pointer variable holding the SAME value,
 reused for both the copy and the return — but that variable had to be
-scoped to the `else` block alone (`u8 *q = D_8008AAC4;` declared at the top
+scoped to the `else` block alone (`u8 *q = gMemcardIconTemplate;` declared at the top
 of that block, not the function's own top-level locals): sharing ONE
 function-wide local across both branches for two semantically different
 pointers (the template base in one branch, an indexed lookup pointer in
@@ -106,7 +106,7 @@ declared at the top of just the branch that needs it.
 ## Naming
 
 `Class86E00_3bb8c_g__CopyMemcardIconTemplate` (was `func_800507F8`), tier B:
-copies one or more fixed byte ranges out of the `D_8008AAC4` template into
+copies one or more fixed byte ranges out of the `gMemcardIconTemplate` template into
 the caller's buffer, optionally selecting a table entry via
 `atoi()` on a field of the caller-supplied `src` when one is given. Named
 from its one real caller context established elsewhere in this project

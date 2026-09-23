@@ -93,9 +93,6 @@ D_8008AA94
 D_8008AA9C
 D_8008AAA4
 D_8008AAAC
-D_8008AAB4
-D_8008AABC
-D_8008AAC4
 D_8008AAC8
 D_8008AACC
 D_8008AAD4
@@ -158,6 +155,8 @@ STAIRCASE_OFFSET_3
 Small__rand
 gActiveDataSource
 gBMemPMgrBusy
+gCardPathPrefix
+gCardPathSuffix
 gCdAsyncEnabled
 gCdBusy
 gCdCallbackInstalled
@@ -187,6 +186,7 @@ gLinkDstStage
 gLinkSpawnIndex
 gLinkSrcStage
 gLinkTriggerIndex
+gMemcardIconTemplate
 gOpenVabCount
 gPendingVabBuffer
 gStyleColorTable

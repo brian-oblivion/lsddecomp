@@ -72,9 +72,9 @@ extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 /* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
  * mostly `char *` string pointers into rodata, a few raw literal words at
  * indices never reached from this call site. `asm/data/76DC8.data.s`. */
-extern char *D_80086E80[];
-extern const char D_8008AAB4[]; /* "CARD\\" */
-extern const char D_8008AABC[]; /* ".TIM" */
+extern char *gCardIconNames[];
+extern const char gCardPathPrefix[]; /* "CARD\\" */
+extern const char gCardPathSuffix[]; /* ".TIM" */
 /* 3-word opaque block, `func_80041C9C`'s arg1, address-only here. */
 extern s32 D_80086EC4;
 /* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
@@ -99,11 +99,11 @@ void Class86E00_3bb8c_g__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     }
 
     buf = path;
-    name = D_80086E80[arg1];
+    name = gCardIconNames[arg1];
     buf[0] = '\0';
-    strcat(buf, D_8008AAB4);
+    strcat(buf, gCardPathPrefix);
     strcat(buf, name);
-    strcat(buf, D_8008AABC);
+    strcat(buf, gCardPathSuffix);
 
     handle = func_8003B39C(buf);
     handle->methods->slot78(handle);
@@ -306,7 +306,7 @@ void Class86E00_3bb8c_g__OnItemSelected(Class86E00_3bb8c_g *self, GenericSlot9CO
 
 GenericCtorTable_3bb8c_d *GetClass86E00Methods(void)
 {
-    return &D_80086DC4;
+    return &gClass86E00Methods;
 }
 
 /* Sony's, from libc2 (round 45's own local view -- this unit's first use). */
@@ -316,7 +316,7 @@ extern s32 atoi(char *s);
  * (ROM image still-uncarved, `asm/data/1C34.rodata.s` region) this
  * function copies raw byte ranges out of; also read by
  * `class_3bb8c_d.c`'s own (differently-typed) local view. */
-extern u8 *D_8008AAC4;
+extern u8 *gMemcardIconTemplate;
 
 /* Struct-copy helper types for round 45's Class86E00_3bb8c_g__CopyMemcardIconTemplate, all deliberately
  * all-`s8` (alignment 1) per this round's FormatNumberIntoBuffer lever: retail
@@ -339,7 +339,7 @@ typedef struct {
  * caller, TaskObjF__WriteMemcardSaveFile), matched exactly -- this unit's own definition
  * must agree with that declaration since both are visible in this
  * translation unit. Cast to `u8 *` internally; retail's own register
- * content at exit (`$v0` left holding a pointer into the `D_8008AAC4`
+ * content at exit (`$v0` left holding a pointer into the `gMemcardIconTemplate`
  * template in every path) confirms the real return type is a pointer,
  * loosely read as `s32` by the caller that never dereferences it. */
 s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 arg0, s32 arg1)
@@ -353,15 +353,15 @@ s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 arg0, s32 arg1)
     if (src != NULL) {
         t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
-        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(D_8008AAC4 + 0x1E);
-        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(D_8008AAC4 + 0x1E);
+        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
+        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
 
         idx = atoi((char *)(src + t0)) - 1;
-        p = D_8008AAC4 + idx * 2;
+        p = gMemcardIconTemplate + idx * 2;
         *(Pair2_3bb8c_g *)(self + 0x8) = *(Pair2_3bb8c_g *)p;
         return (s32)p;
     } else {
-        u8 *q = D_8008AAC4;
+        u8 *q = gMemcardIconTemplate;
 
         *(Buf6_3bb8c_g *)(self + 0x6) = *(Buf6_3bb8c_g *)(q + 0x1E);
         return (s32)q;

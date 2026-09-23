@@ -10,7 +10,7 @@ SHA1 matches retail. `funcdiff.py GetClass86E00Methods`: 4/4 words match.
 ```c
 GenericCtorTable_3bb8c_d *GetClass86E00Methods(void)
 {
-    return &D_80086DC4;
+    return &gClass86E00Methods;
 }
 ```
 
@@ -23,8 +23,8 @@ that calls `GetClass86E00Methods()->ctor(...)`) last round -- that declaration
 predicted exactly this shape (a trivial vtable-getter, same pattern as
 `func_8004E2D0`/`gClass86B60Methods` and `Get_vtable_TaskCore`/`gTaskCoreMethods` elsewhere in
 this header) before this function's own body was ever read. Confirmed
-correct on the first attempt: the real global is `D_80086DC4`, added here
-as `extern GenericCtorTable_3bb8c_d D_80086DC4;` right next to the getter's
+correct on the first attempt: the real global is `gClass86E00Methods`, added here
+as `extern GenericCtorTable_3bb8c_d gClass86E00Methods;` right next to the getter's
 own declaration.
 
 First attempt, byte-exact.
@@ -32,7 +32,7 @@ First attempt, byte-exact.
 ## Naming
 
 `GetClass86E00Methods` (was `func_800507E8`), tier A: a bare
-`return &D_80086DC4;` vtable-getter, the exact `GetClass<X>Methods` shape
+`return &gClass86E00Methods;` vtable-getter, the exact `GetClass<X>Methods` shape
 already used tree-wide for this pattern (`GetClass86668Methods`,
 `GetClass869D8Methods`, `GetClass6B5CCMethods`) -- mechanics fully IS the
 name for a pure getter.
