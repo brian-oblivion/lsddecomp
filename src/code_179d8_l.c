@@ -199,7 +199,118 @@ extern u16 D_8008E234;
 /* STALL -- see docs/match-reports/func_8002D1B4.md. Best body reached
  * (332/316 built words, 16 words LONG; 33/316 raw word-match, drift-
  * affected) preserved there in #if 0. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 316/316 words, length exact (201/316 raw word-match; funcdiff
+ * insertions/deletions 46/46). Residue: frame SIZE only -- addiu sp,sp,-8
+ * against retail's -0x10 -- plus this unit's documented register-identity
+ * class (docs/match-reports/func_8002D1B4.md). Hand-derived. */
+/* Object holding a per-note "priority"-ish scale byte at +0x18; only field
+ * this function needs. */
+typedef struct {
+    u8 pad0[0x18];
+    u8 unk18; /* +0x18 */
+} ObjE970;
+extern ObjE970 *D_8008E970;
+
+extern u8 D_8008EA10;
+/* NOT volatile, and declared as an incomplete ARRAY on purpose: the array
+ * spelling is what makes GCC 2.6.3 materialise the address once into a GPR
+ * and spend one word per read, which is retail. Retail's five reloads come
+ * from ordinary CSE invalidation by the stores between them. */
+extern s16 D_8008EA26[];
+
+/* Independent 0x10-byte-stride s16 array. */
+extern s16 D_8008D7F4[];
+
+void func_8002D1B4(s32 a0, s32 a1) {
+    D800902E8Entry *e;
+    s32 prio;
+    s32 lvl0;
+    u32 lvl1;
+    u32 pan1;
+    u32 pan2;
+    u32 pan1sq;
+    u32 pan2sq;
+    s16 pan1out;
+    s32 chanIdx;
+    s32 lowBit;
+    s32 highBit;
+
+    prio = D_8008E970->unk18 * 0x3FFF;
+    lvl0 = D_8008EA10 * prio / 16129;
+    lvl1 = (u32)lvl0 * D_8008EA16 * D_8008EA19 / 16129;
+
+    chanIdx = D_8008EA26[0] * 8;
+
+    e = &D_800902E8[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
+    pan1 = lvl1;
+    pan2 = lvl1;
+    if ((s16)D_8008EA22 != 0x21) {
+        pan1 = lvl1 * e->unk74 / 127;
+        pan2 = lvl1 * e->unk76 / 127;
+    }
+
+    if ((u8)D_8008EA1A < 0x40) {
+        pan2 = (pan2 * D_8008EA1A) / 63;
+    } else {
+        pan1 = (pan1 * (0x7F - D_8008EA1A)) / 63;
+    }
+
+    if ((u8)D_8008EA17 < 0x40) {
+        pan2 = (pan2 * D_8008EA17) / 63;
+    } else {
+        pan1 = (pan1 * (0x7F - D_8008EA17)) / 63;
+    }
+
+    if ((u8)D_8008EA11 < 0x40) {
+        pan2 = (D_8008EA11 * pan2) / 63;
+    } else {
+        pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
+    }
+
+    if (D_8008E8C0 == 1) {
+        if (pan1 < pan2) {
+            pan1 = pan2;
+        } else {
+            pan2 = pan1;
+        }
+    }
+    pan1sq = pan1 * pan1;
+    pan1out = (s16)(pan1sq / 16383);
+    pan2sq = pan2 * pan2;
+
+    D_8008D7F4[(u16)chanIdx] = (s16)a1;
+    D_8008D7F4[(u16)chanIdx - 2] = pan1out;
+    D_8008D7F4[(u16)chanIdx - 1] = (s16)(pan2sq / 16383);
+
+    D_8008D970[D_8008EA26[0]] |= 7;
+    *(u16 *)(D_8008D98C + D_8008EA26[0] * 0x34) = (s16)a1;
+    *(u8 *)(D_8008D9A3 + D_8008EA26[0] * 0x34) = 1;
+
+    if (D_8008EA26[0] < 0x10) {
+        lowBit = 1 << D_8008EA26[0];
+        highBit = 0;
+    } else {
+        lowBit = 0;
+        highBit = 1 << (D_8008EA26[0] - 0x10);
+    }
+
+    if (D_8008EA20 & 4) {
+        D_8008E230 = lowBit | D_8008E230;
+        D_8008E234 = highBit | D_8008E234;
+    } else {
+        D_8008E230 = D_8008E230 & ~lowBit;
+        D_8008E234 = D_8008E234 & ~highBit;
+    }
+
+    D_8008E228 = lowBit | D_8008E228;
+    D_8008E22C = highBit | D_8008E22C;
+    D_80090C60 = D_80090C60 & ~D_8008E228;
+    D_80090C64 = D_80090C64 & ~D_8008E22C;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D1B4);
+#endif
 
 extern u8 D_8008EA13;
 extern u8 D_8008EA18;
