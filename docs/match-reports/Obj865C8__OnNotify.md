@@ -92,7 +92,7 @@ void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
   identically (`jr $ra; nop`) whether its C prototype declares 0 or 3
   parameters, so the previous typing was invisible until a second caller
   that DOES pass real arguments showed up. `slot84`'s occupant
-  (`func_80049EB4`) is still addiu_at-blocked and unverified beyond this
+  (`Obj865C8__OnTag2Notify`) is still addiu_at-blocked and unverified beyond this
   call site, but the signature here is well-established from the two
   register loads (`a1`/`a2`) immediately preceding the shared `jalr`.
 

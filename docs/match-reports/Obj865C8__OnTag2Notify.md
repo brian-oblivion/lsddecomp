@@ -1,4 +1,6 @@
-# func_80049EB4 — MATCHED (byte-exact, whole-image `build exit=0`)
+# Obj865C8__OnTag2Notify — MATCHED (byte-exact, whole-image `build exit=0`)
+
+> Renamed from `func_80049EB4` on 2026-09-23 (tools/rename.py). Address 0x80049eb4.
 
 Unit: `class_39e08` · Size: 107 words (0x1AC bytes) · Round 23 (2026-09-07),
 head. **Third of the five `REOPENED -- ASSIGNABLE` functions closed this round**
@@ -13,7 +15,7 @@ untouched and nothing here is toolchain-blocked.
 ## The match
 
 ```c
-void func_80049EB4(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
     struct SubObjDPos pos;
     s32 result;
 
@@ -93,7 +95,7 @@ Two corroborating details, both needed before writing it that way:
 
 - **`SubObjDMethods::slot1BC`** carved out of `pad1BC[0x1E0 - 0x1BC]`. Split is
   additive and preserves the 0x24 total (4 + `pad1C0` of 0x20).
-- **`SubObjDMethods::slot1B8` RETYPED `void` -> `s32`.** `func_80049EB4`
+- **`SubObjDMethods::slot1B8` RETYPED `void` -> `s32`.** `Obj865C8__OnTag2Notify`
   branches on the return value directly off the `jalr` (`bnez $v0`), which is
   positive evidence the slot is non-void.
 

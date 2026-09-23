@@ -87,8 +87,8 @@ typedef struct Class865C8Methods {
      * no arguments; only THIS slot's other occupants would be. */
     void (*slot80)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x080 Obj865C8__Noop80 (no-op body, matched) */
     /* Same signature as slot80 by the same call site (Obj865C8__OnNotify's other
-     * branch); occupant func_80049EB4 is still addiu_at-blocked. */
-    void (*slot84)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x084 func_80049EB4, addiu_at-blocked */
+     * branch); occupant Obj865C8__OnTag2Notify is still addiu_at-blocked. */
+    void (*slot84)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x084 Obj865C8__OnTag2Notify, addiu_at-blocked */
 } Class865C8Methods;
 
 extern Class865C8Methods D_800865C8;
@@ -234,7 +234,7 @@ typedef struct SubObjDMethods {
     /* Obj865C8__AdvanceState's `case 1`: return value used (`>= 0` check), so this
      * is genuinely non-void. */
     s32 (*slot1B4)(SubObjD *self);                /* +0x1B4 */
-    /* +0x1B8. RETYPED void -> s32 in round 23: func_80049EB4 branches on the
+    /* +0x1B8. RETYPED void -> s32 in round 23: Obj865C8__OnTag2Notify branches on the
      * return value (`bnez $v0` straight off the `jalr`), which is positive
      * evidence the slot is non-void. Obj865C8__AdvanceState, the other caller in this
      * unit and already matched, DISCARDS it -- so this is the round-7 shared-slot
@@ -242,7 +242,7 @@ typedef struct SubObjDMethods {
     s32 (*slot1B8)(SubObjD *self, s32 arg1);
     /* +0x1BC. Returns an 8-byte struct BY VALUE. GCC 2.6.3 returns any struct
      * through a hidden pointer passed as the invisible FIRST argument, which is
-     * why func_80049EB4's call site reads `(&buf, sub)` and not `(sub)` -- the
+     * why Obj865C8__OnTag2Notify's call site reads `(&buf, sub)` and not `(sub)` -- the
      * object is arg2 in the bytes. The struct's own shape is a unit-local view
      * (SubObjDPos in src/class_39e08.c); only its size and the s16 at +2 are
      * established. Pad split below is additive and preserves the 0x24 total. */

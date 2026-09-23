@@ -164,7 +164,7 @@ void Obj865C8__Noop80(void) {
 }
 
 /* Returned BY VALUE from SubObjDMethods::slot1BC. Kept LOCAL to this unit --
- * it encodes only what func_80049EB4 establishes (8 bytes, an s16 at +2 whose
+ * it encodes only what Obj865C8__OnTag2Notify establishes (8 bytes, an s16 at +2 whose
  * sign selects between two unk28 codes), which is not enough for a sibling to
  * reuse unchanged. */
 struct SubObjDPos {
@@ -174,7 +174,7 @@ struct SubObjDPos {
     s16 unk6;
 };
 
-void func_80049EB4(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
     struct SubObjDPos pos;
     s32 result;
 
