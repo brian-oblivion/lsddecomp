@@ -1,4 +1,4 @@
-# Class6B5CC__CheckBoundsOverlap — STALL (21 words SHORT: built 222/retail 243 words; 14/243 raw words match per funcdiff; first diff read off asm-differ at file offset 0xE238 / vram 0x8001DA38 — `addiu $t4, $a3, 4` (materializing the `cur` corner-loop pointer into its own register) where this build instead re-uses `arg2` copied into a scratch register at that point; see the round-37 addendum for how this title was rebuilt and what it supersedes)
+# Class6B5CC__CheckBoundsOverlap — MATCHED round 73 (243/243, bravo; was STALL rounds 13-54: 21 words SHORT, built 222/retail 243, 14/243 raw, first diff at vram 0x8001DA38 `addiu $t4, $a3, 4`)
 
 > Renamed from `func_8001DA28` on 2026-09-18 (tools/rename.py). Address 0x8001da28.
 
@@ -708,3 +708,124 @@ this unit + its header for the FUNCTION rename; the vtable FIELD name
 (`slotA8`) is proposed, not renamed.
 
 NON_MATCHING body promoted, round 69
+
+## Round 73 (bravo): MATCHED 243/243, first rebuild of a fresh re-read
+
+REVISITED, round 73: MATCHED 243/243; names/types used (the second record is a `BoundsBox_d294`, not six opaque `f0..f5` -- see below).
+
+**Preserved body rebuilt first (round-20 body verbatim from this report, with
+its `__asm__("")` and `u8 pad[0x60]`):** 14/243, `insertions 63 / deletions 63`,
+positional skeleton diffs 229, built 222 words. Matches the title.
+
+**Then written fresh from the asm, block by block.** Builds, one lever each:
+
+1. Loops as `for (v++; v < end; v++)` over the parameter-derived pointer
+   (no hand-built second `zview` walker -- GCC's loop optimiser makes the
+   `+4` giv itself), every min/max as a ternary stored back unconditionally
+   (`f = (v < f) ? v : f`), `u8 pad[0x60]` kept: 2/243, ins 42/del 42, built
+   239 words, frame `-0x158`. **The ternary closed 17 of the 21 missing words**:
+   retail stores every box field every iteration (`lhu tK,off(box)` default,
+   conditional `move tK,..`, unconditional `sh tK`), which the `if (v < f) f = v;`
+   form never emits.
+2. `u8 pad[0x60]` deleted: frame `-0xF8` exactly. The pad had only ever
+   compensated for the missing ternary temporaries. (Score unreadable, same
+   window.)
+3. `b = &mm;` pointer local used in the corner loop only: 140/243, ins 22/del
+   22, 241 words. Retail's loop-invariant `addiu $t3, $sp, 0x10` is that
+   pointer.
+4. Min ternaries spelled `f = (f > v) ? v : f` instead of `(v < f) ? v : f`:
+   184/243, ins 19/del 19. The comparison's operand LOAD order follows the
+   source operand order; retail loads the box default, then the element.
+5. Pass 2 fields 3..5 are a running MAX, not a min (the round-13 trace
+   misread them), and the tail tests on the lo side spelled `mm.lo.z >
+   box.hi.z` etc. (load order again): 224/243, ins 1/del 1, 242 words.
+6. Tail as `ret = 0; if (!c1 && !c2 && !c3 && !c4 && !c5) ret = !c6; return ret;`
+   (retail: `a0 = 0` in the first delay slot, `move v0,a0` at the join,
+   final `xori a0,v0,1`): **243/243, build exit=0, whole-image OK.**
+7. Reader form (second record typed `BoundsBox_d294`, fields `lo`/`hi`,
+   `Sixteen6_d294 *` return cast): 243/243, whole-image OK. No header edit.
+
+The round-13 pairing note ("scrambled" `f5<->lo.z` ...) is not scrambled:
+`func_8001F50C`'s records are `BoundsBox_d294` boxes (`f0..f2` = lo, `f3..f5`
+= hi), pass 2 grows their union, and the tail is an ordinary per-axis AABB
+overlap in z, x, y order. The header comment on `Sixteen6_d294` still says
+otherwise; left untouched (shared header, comment only).
+
+No permuter, no Gate 3 search spent. Signature unchanged.
+
+### Matched body
+
+```c
+/* Offsets arg1's corner list by `d` and grows a box `mm` over the moved
+ * corners, grows a second box `box` over the model's own bounds records
+ * (func_8001F50C's array), and returns 1 if the two boxes overlap on all
+ * three axes. Each running min/max is a ternary stored back unconditionally
+ * (retail stores every field every iteration), and the source compares
+ * with `>` for a min so the slt operands load in retail's order. */
+s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *d) {
+    CornerList_d294 *list;
+    Vec3S16_d294 *v;
+    Vec3S16_d294 *end;
+    BoundsBox_d294 mm;
+    BoundsBox_d294 *b;
+    BoundsBox_d294 *p;
+    BoundsBox_d294 *end2;
+    s32 n;
+    s32 ret;
+    BoundsBox_d294 box;
+
+    list = (CornerList_d294 *)arg1;
+    v = &list->hdr;
+    v->x += d->x;
+    v->y += d->y;
+    end = v + list->count * 8;
+    v->z += d->z;
+    mm.lo = *v;
+    mm.hi = *v;
+    b = &mm;
+    for (v++; v < end; v++) {
+        v->x += d->x;
+        v->y += d->y;
+        v->z += d->z;
+        b->lo.x = (b->lo.x > v->x) ? v->x : b->lo.x;
+        b->lo.y = (b->lo.y > v->y) ? v->y : b->lo.y;
+        b->lo.z = (b->lo.z > v->z) ? v->z : b->lo.z;
+        b->hi.x = (b->hi.x < v->x) ? v->x : b->hi.x;
+        b->hi.y = (b->hi.y < v->y) ? v->y : b->hi.y;
+        b->hi.z = (b->hi.z < v->z) ? v->z : b->hi.z;
+    }
+
+    func_8001F4E4(self->unk20);
+    p = (BoundsBox_d294 *)func_8001F50C(self->unk20, 0);
+    n = func_8001F3A4(self->unk20);
+    box = *p;
+    end2 = p + n;
+    for (p++; p < end2; p++) {
+        box.lo.x = (box.lo.x > p->lo.x) ? p->lo.x : box.lo.x;
+        box.lo.y = (box.lo.y > p->lo.y) ? p->lo.y : box.lo.y;
+        box.lo.z = (box.lo.z > p->lo.z) ? p->lo.z : box.lo.z;
+        box.hi.x = (box.hi.x < p->hi.x) ? p->hi.x : box.hi.x;
+        box.hi.y = (box.hi.y < p->hi.y) ? p->hi.y : box.hi.y;
+        box.hi.z = (box.hi.z < p->hi.z) ? p->hi.z : box.hi.z;
+    }
+
+    ret = 0;
+    if (!(mm.lo.z > box.hi.z) && !(mm.hi.z < box.lo.z) && !(mm.lo.x > box.hi.x) &&
+        !(mm.hi.x < box.lo.x) && !(mm.lo.y > box.hi.y)) {
+        ret = !(mm.hi.y < box.lo.y);
+    }
+    return ret;
+}
+```
+
+### Proposed learning (round 73)
+
+**A running min/max whose retail form loads the field as a default, moves
+the new value in conditionally and stores UNCONDITIONALLY is a ternary
+store-back, and the `if (v < f) f = v;` form costs a store and its temps per
+field** -- here 21 words over twelve fields, which an earlier round had
+"fixed" at the frame level with a fake `u8 pad[0x60]` local. A pad local that
+exists only to make `addiu $sp` agree is a symptom to explain, not a fix.
+Discriminator: `lhu tK,off(box)` before the compare, `sh tK,off(box)` after
+the join, every field. Companion: the compare's two loads come in source
+operand order, so a min whose default is loaded first is spelled `f > v`.

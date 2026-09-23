@@ -19,7 +19,7 @@
  * a proximity-attach attempt (`Class6B5CC__TryAttachNearby`, STALL, proposed
  * `Class6B5CC__TryAttachNearby`) that hands off to a rotation compose-and-
  * apply step (`Class6B5CC__ComposeAndApplyRotation`), a corner-list AABB
- * overlap test (`Class6B5CC__CheckBoundsOverlap`, STALL, name only), and a
+ * overlap test (`Class6B5CC__CheckBoundsOverlap`, MATCHED round 73), and a
  * plane-classification test (`Class6B5CC__ClassifyAgainstPlanes`, STALL, proposed
  * `Class6B5CC__ClassifyAgainstPlanes` -- the RESOLVED former `gp_rel`
  * blocker, ordinary matching work now); a third no-op stub
@@ -31,10 +31,10 @@
  * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
  * all) that `Class6B5CC__CheckBoundsOverlap` and `Class6B5CC__ClassifyAgainstPlanes` build on.
  *
- * Four functions remain INCLUDE_ASM: `Class6B5CC__TryAttachNearby`, `Class6B5CC__CheckBoundsOverlap`,
+ * Three functions remain INCLUDE_ASM: `Class6B5CC__TryAttachNearby`,
  * `Class6B5CC__ClassifyAgainstPlanes`, `Class6B5CC__NotifyTaggedParents` -- all documented stalls, see
- * docs/match-reports/. This round (54, bravo, track 3) is a NAMING pass
- * only: no match was attempted on any of them.
+ * docs/match-reports/. (`Class6B5CC__CheckBoundsOverlap` was the fourth
+ * until round 73.)
  */
 
 #include "common.h"
@@ -273,144 +273,67 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 14/243 words in-range, 21 words short overall (built
- * 222/retail 243 words). Residue: substantial structural work remains in
- * the two loop bodies and tail comparison, beyond a register-identity
- * detail (arg2 kept live in $a2 throughout retail, copied to a scratch
- * register here) (docs/match-reports/Class6B5CC__CheckBoundsOverlap.md).
- * The preserved best-scoring body opens with a bare __asm__("") scheduling
- * barrier to force self's early materialization; that barrier has no
- * meaning beyond bytes and is omitted here -- see the report for the
- * byte-shaped variant. Hand-derived. */
-s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
+/* Offsets arg1's corner list by `d` and grows a box `mm` over the moved
+ * corners, grows a second box `box` over the model's own bounds records
+ * (func_8001F50C's array), and returns 1 if the two boxes overlap on all
+ * three axes. Each running min/max is a ternary stored back unconditionally
+ * (retail stores every field every iteration), and the source compares
+ * with `>` for a min so the slt operands load in retail's order. */
+s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *d) {
     CornerList_d294 *list;
-    Vec3S16_d294 *cur;
-    s16 *zview;
-    u8 *end;
-    s32 count;
+    Vec3S16_d294 *v;
+    Vec3S16_d294 *end;
     BoundsBox_d294 mm;
-    Sixteen6_d294 *arr;
-    s16 *cur2;
-    s16 *view2;
-    u8 *end2;
-    s32 cnt2;
-    Sixteen6_d294 track;
-    s16 v;
-    u8 pad[0x60];
+    BoundsBox_d294 *b;
+    BoundsBox_d294 *p;
+    BoundsBox_d294 *end2;
+    s32 n;
+    s32 ret;
+    BoundsBox_d294 box;
 
     list = (CornerList_d294 *)arg1;
-    list->hdr.x = list->hdr.x + arg2->x;
-    list->hdr.y = list->hdr.y + arg2->y;
-    list->hdr.z = list->hdr.z + arg2->z;
-
-    count = list->count;
-    end = (u8 *)&list->hdr + count * 48;
-
-    mm.lo = list->hdr;
-    mm.hi = list->hdr;
-
-    cur = (Vec3S16_d294 *)((u8 *)&list->hdr + 6);
-    zview = (s16 *)((u8 *)cur + 4);
-
-    if ((u8 *)cur < end) {
-        do {
-            cur->x = cur->x + arg2->x;
-            *(zview - 1) = *(zview - 1) + arg2->y;
-            *zview = *zview + arg2->z;
-
-            v = cur->x;
-            if (v < mm.lo.x) {
-                mm.lo.x = v;
-            }
-            v = *(zview - 1);
-            if (v < mm.lo.y) {
-                mm.lo.y = v;
-            }
-            v = *zview;
-            if (v < mm.lo.z) {
-                mm.lo.z = v;
-            }
-            v = cur->x;
-            if (mm.hi.x < v) {
-                mm.hi.x = v;
-            }
-            v = *(zview - 1);
-            if (mm.hi.y < v) {
-                mm.hi.y = v;
-            }
-            v = *zview;
-            if (mm.hi.z < v) {
-                mm.hi.z = v;
-            }
-
-            cur = (Vec3S16_d294 *)((u8 *)cur + 6);
-            zview = (s16 *)((u8 *)zview + 6);
-        } while ((u8 *)cur < end);
+    v = &list->hdr;
+    v->x += d->x;
+    v->y += d->y;
+    end = v + list->count * 8;
+    v->z += d->z;
+    mm.lo = *v;
+    mm.hi = *v;
+    b = &mm;
+    for (v++; v < end; v++) {
+        v->x += d->x;
+        v->y += d->y;
+        v->z += d->z;
+        b->lo.x = (b->lo.x > v->x) ? v->x : b->lo.x;
+        b->lo.y = (b->lo.y > v->y) ? v->y : b->lo.y;
+        b->lo.z = (b->lo.z > v->z) ? v->z : b->lo.z;
+        b->hi.x = (b->hi.x < v->x) ? v->x : b->hi.x;
+        b->hi.y = (b->hi.y < v->y) ? v->y : b->hi.y;
+        b->hi.z = (b->hi.z < v->z) ? v->z : b->hi.z;
     }
 
     func_8001F4E4(self->unk20);
-    arr = func_8001F50C(self->unk20, 0);
-    cnt2 = func_8001F3A4(self->unk20);
-
-    track = *arr;
-
-    end2 = (u8 *)arr + cnt2 * 12;
-    cur2 = (s16 *)((u8 *)arr + 12);
-    view2 = cur2 + 5;
-
-    if ((u8 *)cur2 < end2) {
-        do {
-            v = cur2[0];
-            if (v < track.f0) {
-                track.f0 = v;
-            }
-            v = view2[-4];
-            if (v < track.f1) {
-                track.f1 = v;
-            }
-            v = view2[-3];
-            if (v < track.f2) {
-                track.f2 = v;
-            }
-            v = view2[-2];
-            if (v < track.f3) {
-                track.f3 = v;
-            }
-            v = view2[-1];
-            if (v < track.f4) {
-                track.f4 = v;
-            }
-            v = view2[0];
-            if (v < track.f5) {
-                track.f5 = v;
-            }
-
-            cur2 = (s16 *)((u8 *)cur2 + 12);
-            view2 = (s16 *)((u8 *)view2 + 12);
-        } while ((u8 *)cur2 < end2);
+    p = (BoundsBox_d294 *)func_8001F50C(self->unk20, 0);
+    n = func_8001F3A4(self->unk20);
+    box = *p;
+    end2 = p + n;
+    for (p++; p < end2; p++) {
+        box.lo.x = (box.lo.x > p->lo.x) ? p->lo.x : box.lo.x;
+        box.lo.y = (box.lo.y > p->lo.y) ? p->lo.y : box.lo.y;
+        box.lo.z = (box.lo.z > p->lo.z) ? p->lo.z : box.lo.z;
+        box.hi.x = (box.hi.x < p->hi.x) ? p->hi.x : box.hi.x;
+        box.hi.y = (box.hi.y < p->hi.y) ? p->hi.y : box.hi.y;
+        box.hi.z = (box.hi.z < p->hi.z) ? p->hi.z : box.hi.z;
     }
 
-    if (track.f5 < mm.lo.z) {
-        return 0;
+    ret = 0;
+    if (!(mm.lo.z > box.hi.z) && !(mm.hi.z < box.lo.z) && !(mm.lo.x > box.hi.x) &&
+        !(mm.hi.x < box.lo.x) && !(mm.lo.y > box.hi.y)) {
+        ret = !(mm.hi.y < box.lo.y);
     }
-    if (mm.hi.z < track.f2) {
-        return 0;
-    }
-    if (track.f3 < mm.lo.x) {
-        return 0;
-    }
-    if (track.f4 < mm.lo.y) {
-        return 0;
-    }
-    if (mm.hi.y < track.f1) {
-        return 0;
-    }
-    return mm.hi.x >= track.f0;
+    return ret;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
-#endif
+
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 29/199 words, length exact. Residue: whole-function
