@@ -109,19 +109,19 @@ void func_8003EA6C(void) {
 void func_8003EA74(void) {
 }
 
-void Unk18Obj__SetUnk54(Unk18Obj *self, s32 a1) {
+void Unk18Obj__SetLightMode(Unk18Obj *self, s32 a1) {
     self->lightMode = a1;
 }
 
-void Unk18Obj__SetUnk58(Unk18Obj *self, SByte3_d294 *src) {
+void Unk18Obj__SetClearColor(Unk18Obj *self, SByte3_d294 *src) {
     self->clearColor = *src;
 }
 
-void Unk18Obj__SetUnk5B(Unk18Obj *self, SByte3_d294 *src) {
+void Unk18Obj__SetFarColor(Unk18Obj *self, SByte3_d294 *src) {
     self->farColor = *src;
 }
 
-void Unk18Obj__SetUnk60(Unk18Obj *self, s32 a1) {
+void Unk18Obj__SetFogNear(Unk18Obj *self, s32 a1) {
     self->fogNear = a1;
 }
 
@@ -280,7 +280,7 @@ void Unk18Obj__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
 /* Psy-Q's GTE far-colour register writer (libgte/reg03, linked from Sony's
  * own SDK object). LOCAL to this unit, not code_2cc8c.h -- see the note on
  * SetGeomScreen below. This call site reads self->farColor's own three bytes
- * UNSIGNED (`lbu`, not `lb`) even though Unk18Obj__SetUnk5B writes them as signed
+ * UNSIGNED (`lbu`, not `lb`) even though Unk18Obj__SetFarColor writes them as signed
  * bytes; the disagreement is kept as a local cast rather than a retype of the
  * field. Sony's own argument type is `long` for each. */
 extern void SetFarColor(u8 a0, u8 a1, u8 a2);

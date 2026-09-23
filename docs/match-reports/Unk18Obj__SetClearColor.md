@@ -1,4 +1,6 @@
-# Unk18Obj__SetUnk58 — MATCHED
+# Unk18Obj__SetClearColor — MATCHED
+
+> Renamed from `Unk18Obj__SetUnk58` on 2026-09-23 (tools/rename.py). Address 0x8003ea84.
 
 > Renamed from `func_8003EA84` on 2026-09-23 (tools/rename.py). Address 0x8003ea84.
 
@@ -8,7 +10,7 @@ attempts).
 ## Signature
 
 ```c
-void Unk18Obj__SetUnk58(Unk18Obj *self, SByte3_d294 *src);
+void Unk18Obj__SetClearColor(Unk18Obj *self, SByte3_d294 *src);
 ```
 
 `Unk18ObjMethods`'s own `+0x064` slot occupant.
@@ -19,7 +21,7 @@ Copies a 3-byte record from `src` into `self->unk58`, as one whole-struct
 assignment.
 
 ```c
-void Unk18Obj__SetUnk58(Unk18Obj *self, SByte3_d294 *src) {
+void Unk18Obj__SetClearColor(Unk18Obj *self, SByte3_d294 *src) {
     self->unk58 = *src;
 }
 ```
@@ -42,7 +44,7 @@ void Unk18Obj__SetUnk58(Unk18Obj *self, SByte3_d294 *src) {
 
 `include/code_2cc8c.h`: new `SByte3_d294` type; `Unk18Obj` gains `unk58`
 (`+0x058`, `SByte3_d294`) and its sibling `unk5B` (`+0x05B`, see
-`Unk18Obj__SetUnk5B`'s report).
+`Unk18Obj__SetFarColor`'s report).
 
 ## Proposed learning
 
@@ -56,4 +58,6 @@ when a small fixed-size field-by-field copy doesn't match.
 
 ## Naming
 
-`Unk18Obj__SetUnk58` -- tier A. Whole-struct-assignment setter for `unk58` (a 3-signed-byte `SByte3_d294`).
+`Unk18Obj__SetClearColor` -- tier A. Whole-struct-assignment setter for `unk58` (a 3-signed-byte `SByte3_d294`).
+
+**Head review, round 73:** renamed to `Unk18Obj__SetClearColor` at merge, tier A: a plain setter of the `clearColor` field, whose name the runner established from its Sony consumer (`GsSortClear` in `Unk18Obj__Update`/`Unk18Obj__Flip`). Any line above saying the function name pre-dates the field rename is superseded.

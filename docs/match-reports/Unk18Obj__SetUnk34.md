@@ -25,7 +25,7 @@ void Unk18Obj__SetUnk34(Unk18Obj *self, Pair32_d294 *pair) {
 
 ## What the first attempt got wrong
 
-Same tell as `Unk18Obj__SetUnk58`/`Unk18Obj__SetUnk5B` (this unit, this round):
+Same tell as `Unk18Obj__SetClearColor`/`Unk18Obj__SetFarColor` (this unit, this round):
 retail loads BOTH source words into registers before storing either
 (`lw v0,0(a1); lw v1,4(a1); sw v0,0x34(a0); sw v1,0x38(a0)`), which only a
 whole-struct assignment reproduces. A first attempt writing two sequential
@@ -43,7 +43,7 @@ gains `unk34` (`+0x034`, `Pair32_d294`, spanning what would have been
 ## Proposed learning
 
 Third instance this unit of the same tell (after `Class6B5CC__GetRotMatrix`'s
-all-`s16` `lwl`/`lwr` case last round and `Unk18Obj__SetUnk58` earlier this
+all-`s16` `lwl`/`lwr` case last round and `Unk18Obj__SetClearColor` earlier this
 round): **when retail's disassembly loads every source field into a
 register before storing any of them, the fix is a whole-struct assignment,
 which usually means the DESTINATION fields need to be combined into one

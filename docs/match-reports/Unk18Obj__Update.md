@@ -96,7 +96,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
    it. One inline expression `(self->unk50 - self->unk4C) / (1 <<
    self->unk3C)` reproduces retail's own instruction order.
 4. **`self->unk5B`'s three bytes are read UNSIGNED here (`lbu`), despite
-   being SIGNED (`lb`) at their own writer, `Unk18Obj__SetUnk5B`.** The same
+   being SIGNED (`lb`) at their own writer, `Unk18Obj__SetFarColor`.** The same
    memory, read from two different call sites, disagrees on signedness —
    not a contradiction, just two independent readings of an opaque field.
    Cast to `u8 *` at this call site rather than retyping `SByte3_d294`

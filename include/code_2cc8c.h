@@ -664,7 +664,7 @@ struct Unk18Obj {
                                     only written when `self->otReady == 0` */
     s32 unk4C;                  /* +0x04C, OBSERVED: Unk18Obj__Update (round 14) */
     s32 unk50;                  /* +0x050, OBSERVED: Unk18Obj__Update (round 14) */
-    s32 lightMode;              /* +0x054, OBSERVED: Unk18Obj__SetUnk54 (round 13).
+    s32 lightMode;              /* +0x054, OBSERVED: Unk18Obj__SetLightMode (round 13).
                                     RENAMED round 73 (charlie): the sole real
                                     consumer is Unk18Obj__Update's own
                                     `GsSetLightMode(self->lightMode)` call,
@@ -674,7 +674,7 @@ struct Unk18Obj {
                                     code_2cc8c_d.c. */
     /* +0x058/+0x05B, round 13 (code_2cc8c_d): two 3-byte fields, each
        copied wholesale from a caller-supplied 3-byte source via a WHOLE
-       struct assignment (Unk18Obj__SetUnk58/Unk18Obj__SetUnk5B -- MEASURED:
+       struct assignment (Unk18Obj__SetClearColor/Unk18Obj__SetFarColor -- MEASURED:
        retail loads all three source bytes before storing any of them, ruling
        out a sequential per-field copy). Bytes are signed (`lb`, not `lbu`),
        though both are also READ unsigned (`lbu`) at their one real consumer
@@ -683,16 +683,16 @@ struct Unk18Obj {
        respectively (see each field's own comment) -- tier B, not tier A,
        since the RGB-triple reading is inferred from the consuming Sony API's
        own shape, not proven for the field's bit-level meaning. */
-    SByte3_d294 clearColor;     /* +0x058, OBSERVED: Unk18Obj__SetUnk58 (round
+    SByte3_d294 clearColor;     /* +0x058, OBSERVED: Unk18Obj__SetClearColor (round
                                    13). Sole real consumer: Unk18Obj__Flip's
                                    `GsSortClear(rawBytes[0..2], ...)` --
                                    Sony's own screen-clear-color argument. */
-    SByte3_d294 farColor;       /* +0x05B, OBSERVED: Unk18Obj__SetUnk5B (round
+    SByte3_d294 farColor;       /* +0x05B, OBSERVED: Unk18Obj__SetFarColor (round
                                    13). Sole real consumer: Unk18Obj__Update's
                                    `SetFarColor(rawBytes[0..2])` -- Sony's own
                                    GTE far-color register writer. */
     u8 pad05E[0x060 - 0x05E];
-    s32 fogNear;                /* +0x060, OBSERVED: Unk18Obj__SetUnk60 (round
+    s32 fogNear;                /* +0x060, OBSERVED: Unk18Obj__SetFogNear (round
                                    13). RENAMED round 73 (charlie): sole real
                                    consumer is Unk18Obj__Update's own
                                    `SetFogNear(self->fogNear, self->unk40)`
@@ -860,10 +860,10 @@ void Unk18Obj__SetUnk3C(Unk18Obj *self, s32 a1);
 void Unk18Obj__SetUnk44(Unk18Obj *self, s32 a1);
 void Unk18Obj__SetUnk48(Unk18Obj *self, s32 a1);
 void Unk18Obj__SetUnk40(Unk18Obj *self, s32 a1);
-void Unk18Obj__SetUnk54(Unk18Obj *self, s32 a1);
-void Unk18Obj__SetUnk58(Unk18Obj *self, SByte3_d294 *src);
-void Unk18Obj__SetUnk5B(Unk18Obj *self, SByte3_d294 *src);
-void Unk18Obj__SetUnk60(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetLightMode(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetClearColor(Unk18Obj *self, SByte3_d294 *src);
+void Unk18Obj__SetFarColor(Unk18Obj *self, SByte3_d294 *src);
+void Unk18Obj__SetFogNear(Unk18Obj *self, s32 a1);
 SubHandleObj *Unk18Obj__GetSubHandle(Unk18Obj *self);
 void Unk18Obj__SetUnkB4(Unk18Obj *self, s32 a1);
 void Unk18Obj__SetUnkB8(Unk18Obj *self, s32 a1);
