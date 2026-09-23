@@ -168,6 +168,11 @@ typedef struct QueryPos866E8 {
  * element pointer, a nested `arr1[i].sub.field`) all collapse to one
  * induction variable; byte-cast walking regresses further. The remaining
  * residue is a `$s3`/`$s4` identity swap. See the match report.
+ *
+ * MATCHED round 73: the second walker is `sp = (SetupSub866E8 *)&arr1->rate`
+ * assigned INSIDE the loop, with `arr1` itself advanced (no `ep` copy);
+ * loop.c's strength reduction then produces the `+4` register. The note
+ * above is kept as history.
  */
 typedef struct SetupEntry866E8 {
     void *ptr0;     /* +0x0 */

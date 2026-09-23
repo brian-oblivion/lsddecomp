@@ -267,48 +267,29 @@ storeKey:
 }
 
 
-#if 0
-/* STALL snapshot -- see docs/match-reports/func_8004BB3C.md. 90/105 words
- * with CORRECT total length: every instruction in the loop body and the
- * epilogue matches retail one-for-one, including BOTH `addiu sN,sN,0xc`
- * walker increments. The residue is a whole-function $s3<->$s4 identity
- * swap plus the prologue scheduling that follows from it -- a
- * register-identity stall, which project rule 6 forbids fixing with a
- * register pin. The two-differently-BASED-walker shape below is what
- * recovered the previously-missing second increment; do not go back to a
- * single indexed base.
- *
- * ROUND 19 (bravo): re-verified per the head's mid-round drift-check
- * broadcast. Rebuilt exactly as below: 90/105, ZERO drift, compiled
- * length 0x1A4 (105 words) matching retail's own `.s` header exactly.
- * The claim in this report ("correct total length, no insertions or
- * deletions") is CONFIRMED accurate, unlike two other reports' claims
- * the same broadcast flagged as wrong. Not re-attempted further this
- * round -- the residue matches this round's independently-confirmed
- * "declaration order is inert" finding for this exact class.
- *
- * ROUND 27 (delta): re-verified per the head's callee-saved-registers
- * broadcast -- compiled prologue saves the IDENTICAL set to retail (s0-s6,
- * ra, no fp, same stack slots for every register), only the ORDER of the
- * `sw` instructions and which C variable maps to which physical register
- * differ. The "extra callee-saved parameter" lever does NOT apply.
- * Verdict (pure register identity) CONFIRMED, not just plausible.
- */
+/* MATCH, round 73 (bravo): 105/105. Retail's `+4` walker is a
+ * strength-reduced giv of the walked PARAMETER, not a second user
+ * pointer: its init (`addiu s3,a1,4`) sits in the loop preheader after
+ * the count guard and reads $a1, which is what loop.c emits when the biv
+ * is `arr1` itself (initial value = the incoming argument register).
+ * `sp` is therefore assigned from `arr1` inside the body and `arr1` is
+ * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
+ * See docs/match-reports/func_8004BB3C.md. */
 void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
-    SetupEntry866E8 *ep = arr1;
     s32 i;
     Elem *e;
-    SetupSub866E8 *sp = (SetupSub866E8 *)((u8 *)arr1 + 4);
+    SetupSub866E8 *sp;
 
     for (i = 0; i < count; i++) {
+        sp = (SetupSub866E8 *)&arr1->rate;
         e = self->methods->slot118(self, sp->id);
         self->methods->slot88(self, 6, e, i);
-        if (ep->ptr0 != 0) {
+        if (arr1->ptr0 != 0) {
             if (e->unk4->unk2C != 0) {
                 self->methods->slot108(self, e);
             }
             e->unk4->unk30 = sp->rate;
-            e->unk4->methods->slot78(e->unk4, ep->ptr0);
+            e->unk4->methods->slot78(e->unk4, arr1->ptr0);
             e->flag = 1;
             self->unk1B0 = 1;
         } else {
@@ -320,14 +301,10 @@ void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
                 e->flag = 0;
             }
         }
-        ep++;
-        sp++;
+        arr1++;
     }
     self->unk1B4 = func_8004BCE0(self);
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BB3C);
 
 s32 func_8004BCE0(Obj866E8 *self) {
     s32 count;
@@ -374,34 +351,11 @@ void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
     }
 }
 
-/* STALL snapshot -- see docs/match-reports/func_8004BE54.md. 142/150 words
- * at CORRECT total length (no address drift), up from 132/150 this round.
- * Preserved here per convention -- not live C.
- *
- * ROUND 40 (bravo): first-ever permuter search on this function (34293
- * iterations, no rc captured -- same "wrapping shell torn down before the
- * trailing echo" trap as func_8004B700 this same round). Best candidate
- * dropped the permuter score 135 -> 65 across four improving steps
- * (135->85->75->70->65) and never reached 0. Two changes, both applied:
- * (1) the `gpu = (*slot)->unk14; gpu->unk0 = 0;` reload replaced with a
- * direct `(*slot)->unk14->unk0 = 0;` (the exact same lever that closed
- * func_8004B700's own residue this round); (2) the `found`-path tail's
- * pointer cast hoisted into a named local (`EntryChildObj **next = ...;
- * (*slot)->unk38 = *next;`) instead of one combined expression. Together
- * these closed 10 of the 18 remaining words. Everything from
- * `0x8004BEE0` through the epilogue now matches retail byte-for-byte
- * (confirmed via asm-differ) -- the entire remaining 8-word residue is
- * the ALREADY-DOCUMENTED `info`/`hdr` register-identity chain at the very
- * top of the function (`0x8004BE84`-`0x8004BEDC`), untouched by this
- * round's fix and unchanged from prior rounds' description.
- *
- * ROUND 32 (bravo2): re-verified, 130/150, no drift, identical residue.
- * ROUND 39 (charlie): 130/150 -> 132/150. Both `(*slot)->unk10 |= flagBit;`
- * sites closed by hoisting the reloaded field into its own named local
- * BEFORE the `|=` (`s32 t = (*slot)->unk10; (*slot)->unk10 = t | flagBit;`)
- * -- operand-order-alone was already confirmed inert (round 32); the hoist
- * is what moves it, same combinatorial shape as func_8004C470's fix. */
-#if 0
+/* MATCH, round 73 (bravo): 150/150. The 142/150 residue carried since
+ * round 40 (`info` in $a1 where retail has $v0) was ONE `info` local
+ * assigned on both sides of the slot4 call. Two locals (`info`, `info2`)
+ * make each block-local, so local-alloc ties each to its addu result.
+ * See docs/match-reports/func_8004BE54.md. */
 /* func_8004BE54 (Obj866E8Methods::slot104) -- own local view of several
  * classes reached only from here. Kept in this .c, not class_3bb8c.h: none
  * of the 11 sibling units sharing that header touch these. */
@@ -488,6 +442,7 @@ extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
 void func_8004BE54(Obj866E8 *self, Elem *entry) {
     ResInfo866E8 *info;
+    ResInfo866E8 *info2;
     ElemTarget *hdr;
     LinkTarget866E8 *target;
     LinkResource *res;
@@ -516,8 +471,8 @@ void func_8004BE54(Obj866E8 *self, Elem *entry) {
     if (res != 0) {
         res->methods->slot4(res);
     }
-    info = hdr->field10;
-    req.field0 = (s32)info + info->unk4 + info->unk8;
+    info2 = hdr->field10;
+    req.field0 = (s32)info2 + info2->unk4 + info2->unk8;
     target->unk2C = func_80043840(&req);
     outBuf.found = 0;
 
@@ -578,9 +533,6 @@ void func_8004BE54(Obj866E8 *self, Elem *entry) {
         i++;
     }
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BE54);
 
 void func_8004C0AC(Obj866E8 *self, Elem *entry) {
     EntryChildObj **p;
@@ -698,21 +650,15 @@ Elem *func_8004C434(Obj866E8 *self, s32 key) {
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 69/70 words, length EXACT, zero drift outside range.
- * Residue: register identity, a single commutative `addu` whose operand
- * order this compiler will not take from source order alone (vram
- * 0x8004C500, second bounds comparison) -- CLAUDE.md HARD RULE 6 marks
- * this a STALL by definition, not a judgement call. Survived ~183,331
- * permuter iterations across two independent seeded searches, both never
- * beating the base score; see docs/match-reports/func_8004C470.md for the
- * full history (round 20 through round 47). Hand-derived: the lever that
- * closed the first instance of this same residue (hoist the field into a
- * local AND write `w + tol`, both together) was translated from a
- * permuter lead into idiomatic C and confirmed by hand against the
- * whole-image oracle across a table of variants (round 38); applying the
- * same transform to the second comparison regresses instead of improving
- * it, so only the first is hoisted here. */
+/* MATCH, round 73 (bravo): 70/70. The last word was the operand order
+ * of the second bounds `addu`. At expand time a MEM operand of a
+ * commutative `+` is placed second whatever the source order, while a
+ * named variable keeps its source position; retail's `field + tol` order
+ * therefore needs the field in a named local at the add. Assigning `w`
+ * INSIDE the upper-bound test keeps the `arg1` load ahead of the field
+ * load, as retail schedules it (a `w = ...;` statement before the `if`
+ * fixes the add but swaps those two loads). See
+ * docs/match-reports/func_8004C470.md. */
 Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     s32 i;
     s32 tol;
@@ -727,9 +673,8 @@ Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     for (; i < 7; i++, threshold -= 0x800) {
         candidate = self->methods->slot118(self, i);
         r = candidate->unkC->unk14;
-        w = r->unk18.w;
-        if (arg1->unk0 >= w && arg1->unk0 < w + tol) {
-            if (arg1->unk8 >= r->unk20.w && arg1->unk8 < tol + r->unk20.w) {
+        if (arg1->unk0 >= r->unk18.w && arg1->unk0 < (w = r->unk18.w) + tol) {
+            if (arg1->unk8 >= r->unk20.w && arg1->unk8 < (w = r->unk20.w) + tol) {
                 if (self->unk68->unk4 == 0) {
                     return candidate;
                 }
@@ -744,6 +689,3 @@ Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C470);
-#endif
