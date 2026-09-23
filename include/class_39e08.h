@@ -4,10 +4,36 @@
 #include "common.h"
 
 /*
- * The class whose method table is D_800865C8 (33 slots, resolved with
- * tools/classtable.py 0x800865C8 -- diff against 0x8006E878 to see the
- * override set). No FirecatFG name survives for this class, so fields are
- * named by offset until real names are known.
+ * round 73 (alpha), track-3 naming pass: 25 of this unit's 26 functions
+ * renamed (func_8004A070 left as-is, see below); no INCLUDE_ASM remained to
+ * carry over. All tier B unless noted.
+ *
+ * The class whose method table is D_800865C8 (33 slots, `Obj865C8` --
+ * resolved with tools/classtable.py 0x800865C8 -- diff against 0x8006E878
+ * to see the override set), plus a sibling table gClass86668Methods
+ * (`Class86668`, 28 slots, named by class_3ac78.c which reached it first)
+ * whose instances share `Obj865C8`'s own layout. Both extend the shared
+ * `IntermediateBase`/`Obj86B60` base (code_2cc8c_c.c / code_2cc8c.h). No
+ * FirecatFG name survives for either class, so fields are named by offset
+ * until real names are known.
+ *
+ * `Obj865C8__Obj865C8` (the ctor) constructs one `SubObjD` handed in by the
+ * caller, one `SubObjB` VAB sound stream (`New_VabStreamObj`), and loads two
+ * named resources verbatim from the ctor body -- "ETC\ETC.TIM" and
+ * "ETC\DREAMER.TMD" (`D_800113EC`/`D_800113F8`) -- into `unk44`/`unk48`.
+ * The object also carries a small state machine (`state`, 0-3, advanced by
+ * `Obj865C8__AdvanceState`/`Obj865C8__OnTag2Notify`) and a frame-based
+ * timeout (`frameCounter`/`timeoutFrames`, checked by
+ * `Obj865C8__CheckTimeout`, set by `Obj865C8__SetTimeout`/
+ * `Class86668__CancelTimeout`) whose in-game purpose is not established
+ * beyond that mechanism. `Obj865C8__OnNotify` dispatches by a header tag
+ * (0x1F34 / 0x2F230) to `Obj865C8__Noop80`/`Obj865C8__OnTag2Notify`
+ * respectively; neither tag's game meaning is known.
+ *
+ * `func_8004A070` (this unit, called once from the ctor) is left unrenamed:
+ * it manages a pair of file-scope globals (`D_8008A978`/`D_8008A97C`) and
+ * loops on `RegisterFileTableEntries`, but nothing in its own body or its
+ * one other caller (`code_1677c.c`) pins down what it is registering.
  *
  * Only the slots this unit's functions actually call through are given
  * concrete field types; the rest stay opaque `void *`/`u8 pad` so the
