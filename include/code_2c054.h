@@ -4,23 +4,32 @@
 #include "common.h"
 
 /*
- * The class allocated by New_StreamTaskObj (0xDC bytes, still INCLUDE_ASM in
- * this unit) and constructed through Get_vtable_StreamTaskObj's slot +0x008
- * (StreamTaskObj__StreamTaskObj). This is the SAME class `include/Class6D3C8.h` calls
- * `StreamTask`/`StreamTaskMethods` (established there from func_80026170's
- * and friends' call sites in a different unit, code_1677c). Per the
- * convention `include/Entity.h` documents for `BasicClassMethods` vs.
- * `code_55dd4.h`'s `Class65650Methods` -- two independent local views of the
- * identical table are normal and deliberately NOT unified into one shared
- * header, to keep each unit's own edits out of the other's file. This is
- * this unit's own local view: only the vtable slots and object fields this
- * unit's queued functions actually touch are given concrete types.
+ * code_2c054: StreamTaskObj, the streaming-task class (`New_StreamTaskObj`,
+ * 0xDC bytes) used to load and drive named "ETC\*.STR" stream files, plus
+ * its own base class TaskCoreObj (`New_TaskCoreObj`, 0xA4 bytes). Every
+ * function in this unit is fully matched, all 28 named this round (track 3
+ * naming pass); there are no `INCLUDE_ASM` bodies left to carve here.
  *
- * Method table is gStreamTaskObjMethods (77 slots, see `tools/classtable.py
- * gStreamTaskObjMethods`). Slots +0x004, +0x044, +0x06C, +0x12C already have an
- * established signature in `Class6D3C8.h`'s `StreamTaskMethods` (all void);
- * +0x00C, +0x080, +0x084 are new here and typed void by the same
- * established-sibling-slot convention (no counter-evidence found).
+ * The class hierarchy, confirmed by `classtable.py` comparing StreamTaskObj's
+ * own vtable (`gStreamTaskObjMethods`) against TaskCoreObj's
+ * (`gTaskCoreMethods`) slot-for-slot: every slot StreamTaskObj does NOT
+ * override still points at the exact same function in both tables, and every
+ * slot it DOES override (008/00C/040/044/04C/05C/060/06C/078/080/084/088/
+ * 08C/094) is a real StreamTaskObj-level override that explicitly up-calls
+ * the base implementation at the same slot number where it needs to (the
+ * `Get_vtable_TaskCore()->slotXX(self)` calls throughout this unit) -- an
+ * ordinary override-and-call-super pattern, not delegation between unrelated
+ * siblings as an earlier round's comments described it. TaskCoreObj is in
+ * turn built the same way over `IntermediateBase`/`Obj86B60` (a further
+ * base class, `code_2cc8c`'s own unit, reached via `Get_vtable_IntermediateBase()`).
+ *
+ * `include/Class6D3C8.h` independently names the SAME StreamTaskObj/TaskCoreObj
+ * tables `StreamTask`/`LoaderTask` from a different unit's call sites
+ * (`code_1677c`) -- deliberately kept as two separate local views rather
+ * than unified, per the convention `include/Entity.h` documents for
+ * `BasicClassMethods` vs. `code_55dd4.h`'s `Class65650Methods`. Only the
+ * vtable slots and object fields this unit's own functions actually touch
+ * are given concrete types here.
  */
 typedef struct StreamTaskObj StreamTaskObj;
 typedef struct StreamTaskObjMethods StreamTaskObjMethods;
