@@ -1,4 +1,4 @@
-# StepVoiceFade -- STALL: 6 words short (222/228 built length -- corrected round 37, was recorded 223), 13/228 raw word-match, first diff at file 0x1F244 / vram 0x8002EA44 (frame gap fixable with the dead[8] padding idiom -- round 48 confirmed byte-exact frame recovery -- but real first-content diff is the persisted `$t1 = idx<<3` value at file 0x1F250, still unresolved)
+# StepVoiceFade -- STALL: length exact (228/228, round 73), 220/228 raw word-match, first diff at vram 0x8002EC6C (the pan split: retail copies the volume into $a1 and multiplies the copy; this body masks val1). libsnd SetAutoPan.
 
 > Renamed from `func_8002EA44` on 2026-09-20 (tools/rename.py). Address 0x8002ea44.
 
@@ -432,7 +432,7 @@ whether it ALSO closes a length gap depends on whether retail's extra bytes
 correlate with extra addressed content elsewhere in the SAME function,
 which has to be checked separately, not assumed from the frame gap itself.
 
-## Preserved body (best attempt, 222/228 built words -- 6 short, structurally believed correct except for the missing early-persisted value noted above)
+## Superseded preserved body (pre-round-73 best attempt, 222/228 built words -- 6 short, structurally believed correct except for the missing early-persisted value noted above)
 
 ```c
 #if 0
@@ -616,3 +616,251 @@ update: the body's own local `ObjE970` (`unk18`) collided with the shared
 `masterVolume`; the access was changed to `D_8008E970->masterVolume`, same
 offset, no behavior change. `./build-and-verify.sh` green (zero bytes
 changed) and `tools/check-nonmatching.sh code_179d8_m` green.
+
+## Round 73 (delta): REVISIT -- 13/228 (6 short) -> 220/228 length-exact, ins 1 / del 1
+
+REVISITED, round 73: STALL improved to length-exact 220/228 (ins 1 / del 1), residue is one register copy in the pan split; names/types used (param renamed `voice`, locals `v`/`off`/`acc`/`vol`/`q2`/`p`/`val1`/`val2`; SPU shadow stores spelled through `D_8008D7F0[off + 1]`).
+
+### Ownership, read before spending more on this
+
+`sdkname.py` puts its sibling `StepVoiceEnvelope` at **shape 0.99** against
+libsnd `SetAutoVol` (3.3 `vmanager`), and Sony's 3.3 `SetAutoPan` has this
+function's opening skeleton (224w; the 0x30 voice stride there vs 0x34 here
+accounts for the length). This is libsnd's `SetAutoPan` in a build no disc
+carries -- the `seqread` situation, where the project does match as C and
+counts it as library by address. `StartNote.md` (round 73) has the unit-wide
+evidence (StartNote is `SpuVmKeyOn`).
+
+### Preserved body rebuilt first
+
+The round-67 `#ifdef NON_MATCHING` body, switched live: `build exit=2`, no
+compile-error hits, built length **222 words** (6 short, confirmed),
+`funcdiff`: **13/228**, **insertions 39 / deletions 39**, positional
+skeleton diffs **212**, out-of-range drift warning firing (238642 bytes).
+
+### What moved it, one lever per line
+
+Measured with a standalone scaffold through the pinned pipeline (the
+CLAUDE.md recipe, maspsx flags read from the Makefile), scored by a
+line-level diff against the retail `.s` ("lines" below is that scaffold
+metric, out of 228; not funcdiff words), then anchored in-tree.
+
+1. Every record access written as a plain field op, no cached u16 locals:
+   `if (gVoiceFadeCountdown[voice].unk0-- > 0) return;`,
+   `gVoiceFadeAccum[voice].unk0 += gVoiceFadeStep[voice].unk0;`,
+   `if (accum[voice] >= limit[voice]) { accum[voice] = limit[voice]; ... }`.
+   **222 -> 228 words, length exact.** Cause, checked in the `-ds` dump: the
+   old body's `current`/`accum` locals made CSE share the element ADDRESS
+   (`lui/addiu/addu aN` once, then `0(aN)`); retail re-derives
+   `sym(off)` through `$at` at every access, i.e. no address pseudo exists.
+2. Separate index names: `voice` for the head, `v = voice` for the tail.
+   Retail recomputes `idx*0x34` from the raw copy in `$t0` for the byte
+   reload of the accumulator and for `D_8008D970` -- the tail really uses a
+   second variable.
+3. SPU-shadow stores as `D_8008D7F0[off + 1] = val2; D_8008D7F0[off] = val1;`
+   (the `D_8008D7F2` of the asm is the `+2` of the same record) and
+   `D_8008D970[v] |= 3` last: the `D_8008D970` load then stays AFTER the
+   first store, as retail has it (this morning's const-plus-address lever).
+4. `off = voice * 8;` instead of `voice << 3`: retail's `$t1` is shifted from
+   the NARROWED voice (`sll t1,v1,3`); `<< 3` let combine read raw `$a0`.
+   Same edit took the frame from 0x10 to retail's **0x18**: the leaf's dead
+   frame is one stack slot per sign-extension pseudo that combine folded
+   away (`-dg`: pseudos with zero conflicts and no hard reg, "ST_REGS or
+   none"), and `* 8` leaves one more of them. No `dead[]` padding needed.
+5. Pan is a reused `s32 p` (`p = D_8008EA1A; ... p = D_8008EA17; ...
+   p = acc;`) with `(u32) p < 0x40` bound tests: the third test reading the
+   byte through `p` is what produces retail's `move a0,a3` join copy, and
+   `(u32)` keeps `sltiu`. `u8` p gave `andi a0,a3,0xff`, u16 `andi 0xffff`,
+   u32 lost the signed rounding of the `/ 64`s (216 words).
+6. `acc = *(u8 *) &gVoiceFadeAccum[v].unk0` into an `s32` (plain `lbu`);
+   using the global `D_8008EA11` for the third test reloads it (230 words).
+7. Volume chain `vol = D_8008E970->masterVolume * 0x3FFF;
+   q2 = (D_8008EA10 * vol) / 16129; q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;`
+   -- `vol` as its own statement fixes the load order (`lw` ptr, `lbu +0x18`
+   before `lbu D_8008EA10`), reusing `q2` for both quotients fixes the
+   `subu v1`/`mult v1` register of the first quotient. Associativity inside
+   one expression changes nothing (three variants, identical).
+8. `if (val2 > val1)` rather than `val1 < val2` for the stereo max: fixes the
+   order of the two `andi 0xffff`.
+
+In-tree with all of it (the body now in the unit's `#ifdef NON_MATCHING`):
+`build exit=2`, no grep hits, **220/228**, **insertions 1 / deletions 1**,
+positional skeleton diffs 7, no out-of-range drift.
+
+### The residue (checked hypothesis, not closed)
+
+Only the pan split's first `if` differs. Retail:
+
+```
+beqz  v0, ARM2
+ addu a1,v1,zero        ; stolen by reorg from ARM2's first insn
+mult  v1,a0 ; addu a1,v1,zero ; mflo v0 ; j JOIN ; srl a2,v0,6
+ARM2: li v0,127 ; subu v0,v0,a0 ; mult a1,v0 ; addu a2,a1,zero ; mflo v0 ; srl a1,v0,6
+```
+
+The `else` arm copies the volume (`v1`) into `a1` -- the register that then
+receives `val1` -- and multiplies THAT, unmasked. So the multiply's operand
+is a 32-bit SImode pseudo equal to `q2` that is not `q2`, and that pseudo
+won CSE's canonical-register choice (cse.c `make_regs_eqv`: the copy's
+destination becomes canonical only if it lives outside the CSE block and
+dies after the source). Every C spelling tried either lets CSE fold the
+copy away (the multiply reads `v1`) or reads `val1` as u16 (an `andi`).
+The Sony 3.3 `SetAutoVol` object shows the identical sequence, so it is
+the natural compile of Sony's source, not a toolchain effect.
+
+Negatives, each in scaffold lines/228 (length in words):
+
+| lever tried on section 1 | words | lines |
+| --- | --- | --- |
+| best: `val1 = q2;` before the if, `else { val2 = val1; val1 = (val1*(0x7F-p))>>6; }` | 228 | 219 |
+| plain two-arm `val2=...; val1=q2` / `val1=...; val2=q2` (either order) | 227 | 220 |
+| same with an `s32 tmp` holding each product | 227 | 220 |
+| `x = q2` (u32) in the else arm, or before the if | 227 | 217 |
+| copy through `vol` (set earlier, so CSE-canonical): copy folds into `v1` | 227 | 216 |
+| copy through `q1` / `tmp` (first set there) | 227 | 220 |
+| `val1 = val2 = q2;` then one-sided updates | 227 | 216-219 |
+| u32/s32 `L`,`R` for section 1 then `val1 = L; val2 = R` (4 shapes) | 227-228 | 200-218 |
+| val1/val2 as u32/s32 with `(u16)` casts in sections 2/3 | 226 | 211 |
+| assignment-as-value `((val2 = q2) * (0x7F - p))` (3 shapes) | 228-229 | 200-219 |
+| q2 in {u32,s32,u16,s16} x val in {u16,s16} | 227-239 | 205-220 |
+| `tmp` reused as the section 2/3 product temporary | 228 | 185-211 |
+
+That is more than 30 consecutive builds after the best body without
+improvement: this function stopped by the budget rule.
+
+### Permuter search (one, bounded)
+
+Gate 3, all three checks run: (1) scaffold from this body via
+`tools/setup-permuter.sh` compiles and scores, base 235; (2) its
+`--debug --stack-diffs`: insertions 1 / deletions 1, register differences
+7; (3) in-tree `funcdiff`: insertions 1 / deletions 1, 7 positional
+skeleton diffs -- AGREE, search meaningful. `timeout 1500 permuter.py -j 6
+--stop-on-zero --best-only`: **rc 124 (timeout), 232,988 iterations, no
+zero.** Outputs: 225 (`p = 0x7F - p; val1 = (val1 * p) >> 6;` -- legal,
+but rebuilt it keeps the same `andi`, only the subtraction's register
+moves: not adopted), 195 (drops the pre-branch `val1 = q2`, leaving val1
+uninitialised on the else path: UB, rejected), 120 (`val1 = p`: changes
+semantics, rejected).
+
+### Proposed learning
+
+- **A load/store that retail reaches through `lui at/addiu at/addu at,at,aK`
+  at every access, where yours hoists one `addu aN,aK,vX` and then uses
+  `0(aN)`, means your C cached a VALUE in a local and CSE then shared the
+  ADDRESS.** Write the field access each time (`x[i].f--`, `x[i].f += ...`).
+  Closed 6 words here and 6 in `StepVoiceEnvelope`.
+- **A leaf function's dead frame (no `$sp` access, frame > 0) counts the
+  sign-extension pseudos that combine folded into loads/compares.** Each
+  keeps its register-allocation record and gets a stack slot. A frame
+  smaller than retail's = one such pseudo missing; `x * 8` vs `x << 3` was
+  one of them here. Prefer this to `dead[]` padding, which only fixes the
+  immediate.
+
+## Preserved body (round 73 best -- compiles standalone through the pinned pipeline)
+
+```c
+#if 0
+#include "common.h"
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34Half;
+typedef struct {
+    u8 pad[0x18];
+    u8 masterVolume; /* +0x18 */
+} ObjE970;
+extern ObjE970 *D_8008E970;
+extern s16 D_8008D7F0[];   /* SPU voice-register shadow, 8 halfwords per voice */
+extern u8 D_8008D970[];
+extern u8 D_8008EA10;
+extern u8 D_8008EA11;
+extern u8 D_8008EA16;
+extern u8 D_8008EA17;
+extern u8 D_8008EA19;
+extern u8 D_8008EA1A;
+extern s16 D_8008E8C0;
+extern Rec34Half gVoiceFadeActive[];
+extern Rec34Half gVoiceFadeStep[];
+extern Rec34Half gVoiceFadeInterval[];
+extern Rec34Half gVoiceFadeCountdown[];
+extern Rec34Half gVoiceFadeAccum[];
+extern Rec34Half gVoiceFadeLimit[];
+
+void StepVoiceFade(s16 voice)
+{
+    s16 v;
+    s16 off;
+    s32 p;
+    s32 acc;
+    s32 vol;
+    s32 q1;
+    u16 val1;
+    u16 val2;
+    u32 q2;
+    s32 tmp;
+
+    v = voice;
+    off = voice * 8;
+    if (gVoiceFadeInterval[voice].unk0 != 0) {
+        if (gVoiceFadeCountdown[voice].unk0-- > 0) {
+            return;
+        }
+        gVoiceFadeCountdown[voice].unk0 = gVoiceFadeInterval[voice].unk0;
+    }
+    gVoiceFadeAccum[voice].unk0 += gVoiceFadeStep[voice].unk0;
+    if (gVoiceFadeStep[voice].unk0 > 0) {
+        if (gVoiceFadeAccum[voice].unk0 >= gVoiceFadeLimit[voice].unk0) {
+            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
+            gVoiceFadeActive[voice].unk0 = 0;
+        }
+    } else if (gVoiceFadeStep[voice].unk0 < 0) {
+        if (gVoiceFadeAccum[voice].unk0 <= gVoiceFadeLimit[voice].unk0) {
+            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
+            gVoiceFadeActive[voice].unk0 = 0;
+        }
+    }
+
+    acc = *(u8 *) &gVoiceFadeAccum[v].unk0;
+    D_8008EA11 = acc;
+
+    vol = D_8008E970->masterVolume * 0x3FFF;
+    q2 = (D_8008EA10 * vol) / 16129;
+    q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
+
+    p = D_8008EA1A;
+    val1 = q2;
+    if ((u32) p < 0x40) {
+        val2 = (q2 * p) >> 6;
+        val1 = q2;
+    } else {
+        val2 = val1;
+        val1 = (val1 * (0x7F - p)) >> 6;
+    }
+
+    p = D_8008EA17;
+    if ((u32) p < 0x40) {
+        val2 = (val2 * p) / 64;
+    } else {
+        val1 = (val1 * (0x7F - p)) / 64;
+    }
+
+    p = acc;
+    if ((u32) p < 0x40) {
+        val2 = (val2 * p) / 64;
+    } else {
+        val1 = (val1 * (0x7F - p)) / 64;
+    }
+
+    if (D_8008E8C0 == 1) {
+        if (val2 > val1) {
+            val1 = val2;
+        } else {
+            val2 = val1;
+        }
+    }
+
+    D_8008D7F0[off + 1] = val2;
+    D_8008D7F0[off] = val1;
+    D_8008D970[v] |= 3;
+}#endif
+```

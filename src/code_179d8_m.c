@@ -126,13 +126,13 @@ extern u8 D_8008EA1A;
 extern s16 D_8008E8C0;
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 237/231 words, 6 words long. Residue: a redundant
- * sign-extension around the incU/incS accumulator add -- confirmed still
- * the real gap after round 48's frame-padding lever realigned the frame
- * byte-exactly without closing the length, and after a permuter search
- * (round 37) plateaued at 2105/4155 across 80,882 iterations with no
- * candidate reaching zero (docs/match-reports/StepVoiceEnvelope.md).
- * Hand-derived. */
+/* NON_MATCHING: 231/231 words, length exact, 223/231 raw, funcdiff
+ * insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoVol
+ * (sdkname shape 0.99). Residue: in the pan split's `else` arm retail
+ * copies the volume into $a1 first and multiplies THAT register (no
+ * andi); this body multiplies the volume register directly and masks
+ * val1 -- same residue as StepVoiceFade below
+ * (docs/match-reports/StepVoiceEnvelope.md). */
 void StepVoiceEnvelope(s16 voice)
 {
     s16 v;
@@ -249,13 +249,11 @@ void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
 
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 222/228 words, 6 words short. Residue: a persisted early
- * value ($t1 = idx<<3, held live across the whole function) this C does
- * not reproduce -- confirmed still the real gap after round 48's
- * frame-padding lever realigned the frame byte-exactly without closing
- * the length, and after a permuter search (round 37) plateaued at
- * 2430/4125 with no candidate reaching zero (docs/match-reports/
- * StepVoiceFade.md). Hand-derived. */
+/* NON_MATCHING: 228/228 words, length exact, 220/228 raw, funcdiff
+ * insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoPan.
+ * Residue: the pan split's `else` arm -- retail copies the volume into
+ * $a1 and multiplies that copy unmasked; this body masks val1 instead
+ * (docs/match-reports/StepVoiceFade.md). */
 void StepVoiceFade(s16 voice)
 {
     s16 v;
