@@ -71,7 +71,7 @@ void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     }
 }
 
-void func_80049A14(Obj865C8 *self) {
+void Obj865C8__ResetState(Obj865C8 *self) {
     self->unk3C = 0;
 }
 

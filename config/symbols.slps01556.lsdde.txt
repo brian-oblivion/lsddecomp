@@ -1746,3 +1746,4 @@ New_Obj865C8 = 0x80049608; // type:func
 Obj865C8__Obj865C8 = 0x80049684; // type:func
 Obj865C8__Dtor = 0x80049830; // type:func
 Obj865C8__OnNotify = 0x80049958; // type:func
+Obj865C8__ResetState = 0x80049A14; // type:func

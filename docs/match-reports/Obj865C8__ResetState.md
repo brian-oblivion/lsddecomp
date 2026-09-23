@@ -1,4 +1,6 @@
-# func_80049A14
+# Obj865C8__ResetState
+
+> Renamed from `func_80049A14` on 2026-09-23 (tools/rename.py). Address 0x80049a14.
 
 **Unit:** class_39e08 · **Size:** 2 words (0x8 bytes) · **Status:** MATCHED (2/2 words)
 
@@ -17,7 +19,7 @@ jr    $ra
 A one-instruction leaf, the store living in the branch delay slot. Written as:
 
 ```c
-void func_80049A14(Obj865C8 *self) {
+void Obj865C8__ResetState(Obj865C8 *self) {
     self->unk3C = 0;
 }
 ```

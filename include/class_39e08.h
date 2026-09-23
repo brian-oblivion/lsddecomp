@@ -62,7 +62,7 @@ typedef struct Class865C8Methods {
      * Obj86B60__OnNotify. */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj865C8__OnNotify */
     void *unk3C;                                   /* +0x03C null slot */
-    void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 func_80049A14 */
+    void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 Obj865C8__ResetState */
     void *slot44;                                  /* +0x044 func_80049A1C */
     void *slot48;                                  /* +0x048 func_80049AC0 */
     void *slot4C;                                  /* +0x04C func_80049B54 */
@@ -277,7 +277,7 @@ struct Obj865C8 {
     SubObjD *unk38;                /* +0x038, func_80049AC0 dereferences (->methods); passed
                                        through as a plain register value to
                                        Get_vtable_IntermediateBase()->slot44's 3rd arg by func_80049E20 */
-    s32 unk3C;                    /* +0x03C, func_80049A14 */
+    s32 unk3C;                    /* +0x03C, Obj865C8__ResetState */
     /* Retyped from `s32` (func_80049E20's own usage only ever forwards
      * these as opaque register values into func_80052B70, never
      * dereferencing them): Obj865C8__Dtor dereferences all three directly
