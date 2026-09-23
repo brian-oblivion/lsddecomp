@@ -63,123 +63,70 @@ void func_8004C620(Obj866E8 *self) {
  * func_8004CAF0), but tail-called here before its own definition appears. */
 extern void func_8004C93C(Obj866E8 *self);
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 85/165 words, 3 words (12 bytes) short (round 34) -- see
- * docs/match-reports/func_8004C6A8.md. Every branch TARGET in the
- * raw-range dispatch now agrees with retail (previously 60/165 with a
- * different, wrong-polarity CFG shape). Residue: a register-class choice
- * -- retail promotes a value that is never live across a CALL (the
- * RotMatrix pointer argument, `(u8 *)sub + 0x10`) into its own
- * callee-saved register anyway, which saturates all nine $s/$fp slots and
- * forces `flag` to spill to the stack (an extra sw/lw pair retail has and
- * this body does not); nothing tried reproduces that promotion. This is a
- * HARD RULE 6 register-identity residue -- not closeable with a
- * `register`/asm-constraint fix. Hand-derived. */
 void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
     s32 point0;
     s32 point1;
-    s32 raw;
-    QueryTemplate866E8 desc;
-    s32 v1;
-    s32 v2;
-    s32 v3;
-    s32 s3;
-    s32 v;
+    u16 angle;      /* u16, not s32: the s32 form is byte-identical except
+                     * for an 8-byte-smaller frame (round 71) */
+    QueryTemplate866E8 mat;
+    s32 offset;
     s32 flag;
+    s32 half;
+    void *rot;
 
     sub = self->unk6C->unk14->unk44;
+    rot = (u8 *)sub + 0x10;
     self->methods->slot10C(self, &buf, 0);
     point0 = buf.point[0];
     point1 = buf.point[1];
-    raw = sub->unk12;
+    angle = sub->unk12;
     if ((s16)sub->unk12 < 0) {
-        raw += 0x1000;
+        angle += 0x1000;
     }
 
-    desc = D_8008E98C;
-    desc.unk14 = 0;
-    desc.unk18 = 0;
-    desc.unk1C = self->gridSpan;
-    RotMatrix((u8 *)sub + 0x10, &desc);
-    ApplyMatrixLV(&desc, &desc.unk14, &desc.unk14);
+    mat = D_8008E98C;
+    mat.unk14 = 0;
+    mat.unk18 = 0;
+    mat.unk1C = self->gridSpan;
+    RotMatrix(rot, &mat);
+    ApplyMatrixLV(&mat, &mat.unk14, &mat.unk14);
 
-    v1 = raw - 0x200;
-    if ((u16)v1 < 0x400) {
-        goto block1;
-    }
-    v2 = raw - 0xA00;
-    if ((u16)v2 >= 0x400) {
-        goto continue_dispatch;
-    }
-
-block1:
-    s3 = desc.unk1C;
-    self->unk80 = arg2;
-    self->unk84 = arg1;
-    if (desc.unk14 > 0) {
-        v = point0;
-    } else {
-        v = point0 - arg1 + 1;
-    }
-    self->unk7C = (s16)v;
-    if (desc.unk1C > 0) {
-        v = point1 - (u16)self->gridHalfCells - 1;
-    } else {
-        v = point1 - (u16)self->gridHalfCells + 1;
-    }
-    self->unk7E = (s16)v;
-    flag = 0;
-    goto shared;
-
-continue_dispatch:
-    v3 = raw - 0x600;
-    if ((u16)v3 < 0x400) {
-        goto block2;
-    }
-    if ((u16)v1 < 0xC00) {
-        goto shared;
+    if ((u16)(angle - 0x200) < 0x400 || (u16)(angle - 0xA00) < 0x400) {
+        offset = mat.unk1C;
+        self->unk80 = arg2;
+        self->unk84 = arg1;
+        self->unk7C = (mat.unk14 > 0) ? point0 : point0 - arg1 + 1;
+        self->unk7E = (mat.unk1C > 0) ? point1 - (u16)self->gridHalfCells - 1
+                                      : point1 - (u16)self->gridHalfCells + 1;
+        flag = 0;
+    } else if ((u16)(angle - 0x600) < 0x400 || (u16)(angle - 0x200) >= 0xC00) {
+        offset = mat.unk14;
+        self->unk80 = arg1;
+        self->unk84 = arg2;
+        self->unk7C = (mat.unk14 > 0) ? point0 - (u16)self->gridHalfCells - 1
+                                      : point0 - (u16)self->gridHalfCells + 1;
+        self->unk7E = (mat.unk1C > 0) ? point1 : point1 - arg2 + 1;
+        flag = 1;
     }
 
-block2:
-    s3 = desc.unk14;
-    self->unk80 = arg1;
-    self->unk84 = arg2;
-    if (desc.unk14 > 0) {
-        v = point0 - (u16)self->gridHalfCells - 1;
-    } else {
-        v = point0 - (u16)self->gridHalfCells + 1;
+    half = self->gridHalfCells;
+    offset >>= 11;
+    if (offset >= half) {
+        offset = half - 1;
     }
-    self->unk7C = (s16)v;
-    if (desc.unk1C > 0) {
-        v = point1;
-    } else {
-        v = point1 - arg2 + 1;
-    }
-    self->unk7E = (s16)v;
-    flag = 1;
-
-shared:
-    v = self->gridHalfCells;
-    s3 >>= 11;
-    if (s3 >= v) {
-        s3 = v - 1;
-    }
-    v = -v;
-    if (v >= s3) {
-        s3 = v + 1;
+    half = -half;
+    if (half >= offset) {
+        offset = half + 1;
     }
     if (flag) {
-        self->unk7C = (u16)self->unk7C + s3;
+        self->unk7C = (u16)self->unk7C + offset;
     } else {
-        self->unk7E = (u16)self->unk7E + s3;
+        self->unk7E = (u16)self->unk7E + offset;
     }
     func_8004C93C(self);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
-#endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 45/109 words, length exact, zero drift. Residue: register
@@ -261,74 +208,60 @@ void func_8004C93C(Obj866E8 *self) {
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
 #endif
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 62/97 words, length exact, zero drift (round 58, up from
- * 55/97). Residue: an arithmetic reassociation plus a 3-register rotation
- * (self/slot/temp among $s0/$s1/$s3) that round 58 argues is DOWNSTREAM of
- * it -- not yet established as a HARD RULE 6 register-identity stall
- * (docs/match-reports/func_8004CAF0.md). Frame size, callee-saved register
- * SET and CFG shape match retail exactly. Round 58 retired the "permuter
- * scaffold is untrustworthy" blocker that rounds 19 and 33 had recorded
- * (it was a unit error: funcdiff reports no insertion/deletion counts at
- * all, so the "0 ins / 0 del" those rounds weighed against the permuter
- * was never measured), ran this function's first search, and closed two
- * of its three structural diffs with the pair of levers in the body below
- * -- the do-while(0) around the first half AND the named h8Val temp,
- * which only work JOINTLY (either alone changes the function's length).
- * Hand-derived. */
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
-    s32 hSpan;
-    s32 hSpan2;
-    s32 h4;
-    s32 nextArg;
-    s32 h8Val;
+s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
+    s32 overflow;
+    s32 span;
+    s32 elemArg;
+    s32 widthLeft;
 
-    if (p6 + p8 >= 21) {
-        do {
-            hSpan = (p6 + p8) - 20;
-            hSpan2 = hSpan;
-            slot->hA = p8 - hSpan;
-            count = count + 1;
-            slot = &self->slots8C[count];
+    if (row + height >= 21) {
+        /* The rectangle runs past the bottom edge (row 20): clip this slot
+         * and open a new one for the part below. */
+        overflow = (row + height) - 20;
+        span = overflow;
+        slot->hA = height - overflow;
+        count = count + 1;
+        slot = &self->slots8C[count];
 
-            if (p5 < 10) {
-                nextArg = baseIdx + 2;
-                slot->elemIdx = self->methods->slot120(self, nextArg);
-                __asm__("");
-                h4 = p5 + 10;
-            } else {
-                nextArg = baseIdx + 3;
-                slot->elemIdx = self->methods->slot120(self, nextArg);
-                __asm__("");
-                h4 = p5 - 10;
-            }
-            slot->h4 = h4;
-            slot->hA = hSpan2;
-        } while (0);
+        if (col < 10) {
+            elemArg = baseIdx + 2;
+            slot->elemIdx = self->methods->slot120(self, elemArg);
+            slot->h4 = col + 10;
+            /* Stored in BOTH arms: cross-jumping merges the copies, and
+             * the join label keeps the h4 reload below after it. */
+            slot->hA = span;
+        } else {
+            elemArg = baseIdx + 3;
+            slot->elemIdx = self->methods->slot120(self, elemArg);
+            slot->h4 = col - 10;
+            slot->hA = span;
+        }
 
-        hSpan2 = slot->h4 + p7;
+        span = slot->h4 + width;
         slot->h6 = 0;
-        if (hSpan2 >= 21) {
+        if (span >= 21) {
+            /* ...and past the right edge (column 20) too. */
             count = count + 1;
-            h8Val = (p7 + 20) - hSpan2;
-            slot->h8 = h8Val;
+            /* Two statements, not `(width + 20) - span`: fold rewrites
+             * that tree as `width - (span - 20)` and CSE then shares
+             * `span - 20` with the store below (round 71). */
+            widthLeft = width + 20;
+            widthLeft = widthLeft - span;
+            slot->h8 = widthLeft;
             slot = &self->slots8C[count];
-            slot->elemIdx = self->methods->slot120(self, nextArg + 1);
+            slot->elemIdx = self->methods->slot120(self, elemArg + 1);
             slot->h4 = 0;
             slot->h6 = 0;
-            slot->h8 = hSpan2 - 20;
-            slot->hA = hSpan;
-            return count;
+            slot->h8 = span - 20;
+            slot->hA = overflow;
+        } else {
+            slot->h8 = width;
         }
-        slot->h8 = p7;
-        return count;
+    } else {
+        slot->hA = height;
     }
-    slot->hA = p8;
     return count;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CAF0);
-#endif
 
 /* Forward declaration: defined later in this file (in ROM order, after
  * func_8004CC74), and EXCLUDED from this round's targets (documented
@@ -360,7 +293,9 @@ void func_8004CC74(Obj866E8 *self) {
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 2/27 words, length exact, zero drift. Residue: register
+/* NON_MATCHING: 2/27 words, length exact, zero drift (re-measured round 71;
+ * round 71 traced every diff to one root: retail's block-local temps avoid
+ * $v0; 376k more permuter iterations, no zero). Residue: register
  * identity (retail copies `bounds` into $a2 with an unconditional `move
  * a2,a0` before the null check, dedicates $v0 to the constant 1 for the
  * whole body, and re-extracts point[0] from the saved-but-unshifted $a3 in
