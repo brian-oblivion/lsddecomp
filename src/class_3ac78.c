@@ -27,7 +27,7 @@
  * Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
  * Class866E8__DispatchToRectCells. func_8004B324 keeps its placeholder name
  * deliberately -- it is an empty vtable stub with no established purpose, the
- * same case as func_8001D33C in code_d294_b.
+ * same case as Class6B5CC__func_1d33c in code_d294_b.
  */
 #include "common.h"
 #include "class_3ac78.h"

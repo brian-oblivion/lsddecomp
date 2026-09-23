@@ -12,7 +12,7 @@
  * BasicClass, D_8006B58C], +0x038 Class6B5CC__OnNotify (override), +0x03C null,
  * +0x040 Class6B5CC__Reset, +0x044 Class6B5CC__UpdateRotation, +0x048 Class6B5CC__UpdateScale,
  * +0x04C Class6B5CC__AttachToParent, +0x050 Class6B5CC__DetachFromParent, +0x054 Class6B5CC__DetachAttachedChildren,
- * +0x058 Class6B5CC__GetNextAttachedChild, +0x05C func_8001D33C (already-matched no-op stub),
+ * +0x058 Class6B5CC__GetNextAttachedChild, +0x05C Class6B5CC__func_1d33c (already-matched no-op stub),
  * +0x060 func_8001D344, +0x064 func_8001D374, +0x068 func_8001D3A0,
  * +0x06C func_8001D3CC, +0x070 func_8001D3F8, and continuing past this
  * unit's slice into the next carve (code_d294_b) up to +0x0B4
@@ -443,7 +443,7 @@ struct Class6B5CCMethods {
      * establishes its signature: writes an output entry pointer and an
      * output "more remain" flag through its 2nd/3rd arguments. */
     void (*slot58)(Class6B5CCObj *self, GenericObj_d294 **outEntry, s32 *outCont); /* +0x058 */
-    /* +0x05C, func_8001D33C -- already matched as a no-op `void(void)`
+    /* +0x05C, Class6B5CC__func_1d33c -- already matched as a no-op `void(void)`
      * body, but THIS call site (Class6B5CC__Finalize's dtor) passes it 2 args
      * (self, 0). Both are right about their own codegen: the callee body
      * ignores every argument, so the caller's arity is unconstrained. Same
@@ -831,7 +831,7 @@ extern s32 ratan2(s32 dy, s32 dx);
  * Entity_b/c/d/e.c call via their own separate `Entity.h` declaration,
  * `Class6B5CC__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32
  * arg4)`; same "per-call-site signature, not a callee property"
- * precedent as `GetClass6B5CCMethods`/`func_8001D33C` above -- this unit's own
+ * precedent as `GetClass6B5CCMethods`/`Class6B5CC__func_1d33c` above -- this unit's own
  * view differs in the first two parameters' types only, see below).
  *
  * A "face target" orientation setter: computes yaw/pitch from `self` to

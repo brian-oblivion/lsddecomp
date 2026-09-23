@@ -1387,3 +1387,4 @@ Class6B5CC__AttachToParent = 0x8001D0EC; // type:func
 Class6B5CC__DetachFromParent = 0x8001D1A4; // type:func
 Class6B5CC__DetachAttachedChildren = 0x8001D204; // type:func
 Class6B5CC__GetNextAttachedChild = 0x8001D280; // type:func
+Class6B5CC__func_1d33c = 0x8001D33C; // type:func

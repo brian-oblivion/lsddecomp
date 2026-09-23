@@ -107,7 +107,7 @@ same base class?**
    because that's what THIS unit's body actually needs and what's
    locally available (matching the `+0xC`/`+0x14` layout used), per the
    project's established "per-call-site signature, not a callee
-   property" precedent (same as `GetClass6B5CCMethods`/`func_8001D33C`). Full
+   property" precedent (same as `GetClass6B5CCMethods`/`Class6B5CC__func_1d33c`). Full
    writeup left in `include/code_d294.h`'s own comment on this function,
    so the next reader doesn't have to re-derive it.
 

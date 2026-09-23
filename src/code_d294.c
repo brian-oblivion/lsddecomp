@@ -209,7 +209,7 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **ent
     *entry = NULL;
 }
 
-void func_8001D33C(void) {
+void Class6B5CC__func_1d33c(void) {
 }
 
 s32 func_8001D344(Class6B5CCObj *self, s32 a1) {

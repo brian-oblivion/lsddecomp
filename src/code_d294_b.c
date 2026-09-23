@@ -14,7 +14,7 @@
  * (`Class6B5CC__ReadUnk20Data` -> `Class6B5CC__NotifyIfUnk20Active` ->
  * `Class6B5CC__TransformAndNotifyParents`); two vtable no-op stubs
  * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
- * `func_8001D33C` no-op precedent); a command dispatcher over the same
+ * `Class6B5CC__func_1d33c` no-op precedent); a command dispatcher over the same
  * "attach" state (`Class6B5CC__DispatchLinkCommand`, proposed `Class6B5CC__DispatchLinkCommand`);
  * a proximity-attach attempt (`Class6B5CC__TryAttachNearby`, STALL, proposed
  * `Class6B5CC__TryAttachNearby`) that hands off to a rotation compose-and-

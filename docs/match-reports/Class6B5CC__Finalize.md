@@ -9,8 +9,8 @@
 `Class6B5CC`'s own destructor — vtable slot `+0x00C` of `D_8006B5CC`
 (confirmed via `tools/classtable.py D_8006B5CC`). Calls three of its own
 virtual teardown hooks in order (`slot50` = `Class6B5CC__DetachFromParent`, `slot54` =
-`Class6B5CC__DetachAttachedChildren`, `slot5C` = `func_8001D33C` — all three still queued or,
-for `func_8001D33C`, already a matched no-op stub elsewhere), frees the two
+`Class6B5CC__DetachAttachedChildren`, `slot5C` = `Class6B5CC__func_1d33c` — all three still queued or,
+for `Class6B5CC__func_1d33c`, already a matched no-op stub elsewhere), frees the two
 sub-blocks the constructor allocated (`self->unk14->unk44`, then
 `self->unk14` itself), then tail-calls the BasicClass base destructor
 (`Get_vtable_BasicClass()->dtor(self)`).
@@ -31,12 +31,12 @@ void Class6B5CC__Finalize(Class6B5CCObj *self) {
 ## Note: `slot5C`'s local declared arity does not match its current occupant
 
 This call site passes 2 arguments (`self`, `0`) to `self->methods->slot5C`.
-That slot's CURRENT occupant, `func_8001D33C`, is already matched
+That slot's CURRENT occupant, `Class6B5CC__func_1d33c`, is already matched
 elsewhere in this unit as a no-argument `void(void)` body (`{}`, a bare
 `jr $ra`). Both are right about their own codegen — the callee ignores
 every argument it's given, so the caller's arity is unconstrained. Typed
 `slot5C` as `void (*)(Class6B5CCObj *, s32)` in `include/code_d294.h`
-to match THIS call site; did not touch `func_8001D33C`'s own declaration.
+to match THIS call site; did not touch `Class6B5CC__func_1d33c`'s own declaration.
 Same precedent as `GetClass6B5CCMethods`, documented in `include/class_3bb8c.h`.
 
 ## Provenance
