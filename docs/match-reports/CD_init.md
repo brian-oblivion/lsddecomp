@@ -294,7 +294,7 @@ relative to a reused tail block, and guard polarity on two later
 checks) that combined to look like "58/196, one big diffuse residue";
 fixing them dropped the function to a single, narrow, well-characterized
 2-instruction scheduling gap. The guard-polarity fix in particular is
-the same lever documented elsewhere this round (`SeqTimerDividerCallback`'s
+the same lever documented elsewhere this round (`_SsSeqCalledTbyT_1per2`'s
 block-order finding and its several confirmations) -- worth checking on
 ANY `== 0` / `!= 0` return-early guard before assuming a residue is
 something more exotic, even deep in a large function's tail where the

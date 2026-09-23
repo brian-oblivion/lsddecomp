@@ -1,4 +1,6 @@
-# SeqTimerControl -- STALL (exact length 164/164 words; 65/164 raw word match; first real diff at vram 0x80032760)
+# _SsStart -- STALL (exact length 164/164 words; 65/164 raw word match; first real diff at vram 0x80032760)
+
+> Renamed from `SeqTimerControl` on 2026-09-23 (tools/rename.py). Address 0x80032708.
 
 > Renamed from `func_80032708` on 2026-09-23 (tools/rename.py). Address 0x80032708.
 
@@ -32,8 +34,8 @@ set, tears down via `func_80024DA0(func_80033738)` and returns; else
 calls `func_80024CE0()`, `ResetRCnt(tag)`, `SetRCnt(tag,
 (s16)rate, 0x1000)`, two more ~2000-cycle busy-waits, `StartRCnt(tag)`,
 then the SAME callback-(re)registration shape already matched in
-`CancelSeqTimer` (dispatching on `gSeqTimerId`/`gSeqTimerRateFlag` to pick
-`SeqTimerCallback`/`SeqTimerDividerCallback`/`func_80033738` as the callback for
+`SsEnd` (dispatching on `gSeqTimerId`/`gSeqTimerRateFlag` to pick
+`_SsTrapIntrVSync`/`_SsSeqCalledTbyT_1per2`/`func_80033738` as the callback for
 `func_80024D40`), and finally `func_80024CF0()`.
 
 ## Best C reached: 65/164 words, correct dispatch VALUES, wrong physical case-body/test layout
@@ -62,14 +64,14 @@ extern void func_80024CE0(void);
 extern void func_80024DA0(void (*cb)(void));
 extern void (*func_80024D40(s32 arg0, void (*callback)(void)))(void);
 extern void func_80024CF0(void);
-extern void SeqTimerCallback(void);
-extern void SeqTimerDividerCallback(void);
+extern void _SsTrapIntrVSync(void);
+extern void _SsSeqCalledTbyT_1per2(void);
 extern void func_80033738(void);
 extern void StartRCnt(s32 arg0);
 extern s32 ResetRCnt(s32 n);
 extern s32 SetRCnt(s32 n, s16 target, u32 mode);
 
-void SeqTimerControl(s32 arg0)
+void _SsStart(s32 arg0)
 {
     s32 i;
     s32 v1;
@@ -142,14 +144,14 @@ merge2:
     rc90 = gSeqTimerId;
     if (rc90 != 0) {
         if (gSeqTimerRateFlag != 0) {
-            cb = SeqTimerDividerCallback;
+            cb = _SsSeqCalledTbyT_1per2;
         } else {
             cb = func_80033738;
         }
     } else {
         gSeqTimerChainedCallback = func_80024D40(0, NULL);
         rc90 = gSeqTimerId;
-        cb = SeqTimerCallback;
+        cb = _SsTrapIntrVSync;
     }
     func_80024D40(rc90, cb);
     func_80024CF0();
@@ -174,7 +176,7 @@ top-level construct** -- it took the diff to 65/164 by fixing every
 dispatch COMPARISON to match retail exactly (`beq v1,2`, `slti
 v1,3`+`beqz`, `beq v1,3`, `beq v1,5`, fallthrough to default) with the
 correct instruction count for the comparison chain. This is a
-meaningfully different signal from the `SeqTimerDividerCallback`/`CancelSeqTimer`
+meaningfully different signal from the `_SsSeqCalledTbyT_1per2`/`SsEnd`
 block-order lever (which is about if/else with a RAW value, not a
 multi-way dispatch) -- for a genuine multi-way integer dispatch on a
 small, non-dense case set, write a C `switch`, not a chain of
@@ -226,7 +228,7 @@ class of register permutation seen throughout this unit this round
 registers (`$s0`/`$s1`, `$v0`/`$v1`), plus the two `div`/`break`
 overflow-trap blocks and the final callback-dispatch tail (which is
 structurally the exact same shape already matched byte-for-byte in
-`CancelSeqTimer` -- so the logic there is very likely right, and any
+`SsEnd` -- so the logic there is very likely right, and any
 remaining diff there is register permutation, not a different C shape).
 None of these were separately isolated given the size of the case-body-
 order problem still unresolved; a future attempt should fix case body
@@ -313,14 +315,14 @@ spend on one function. No source change kept.
 ## Round 41 (runner delta): the case-body-reorder lever NEGATIVE, first-ever permuter search NEGATIVE
 
 Round 41's assignment named this function specifically because it (and
-its sibling `SetSeqTimerMode` in the same unit) had **never been
+its sibling `SsSetTickMode` in the same unit) had **never been
 permuter-searched**. Restored the round-16/19/20 65/164 body verbatim
 (after renaming the five SDK-retargeted symbols per the round-39 warning
 above -- confirmed it still builds clean and reproduces exactly 65/164,
 no drift, matching this report's own recorded figure before touching
 anything).
 
-**First real diff, read off `tools/asm-differ/diff.py SeqTimerControl`
+**First real diff, read off `tools/asm-differ/diff.py _SsStart`
 directly (not inferred):** at file offset `0x22f60` / vram `0x80032760`,
 retail has `bne v1,v0,.L800327D8` (branch AWAY to `default` when
 `v1 != 5`, so the `v1 == 5` case's own dispatch falls through inline to
@@ -330,7 +332,7 @@ the very next instruction) while this build has `beq v1,v0,<case5 body>`
 (`v1 == 5`); the polarity and which side is placed inline differs. This
 is the exact `if (cond) {A; return;} rest;` vs `if (cond) {...} else
 {B; return;}` polarity question that closed the OTHER function in this
-round's assignment (`SetSeqTimerMode`, see that report) -- but attempting
+round's assignment (`SsSetTickMode`, see that report) -- but attempting
 the analogous fix here (below) did not transfer.
 
 ### Lever 1 tried: reorder switch cases to retail's physical body order (5, 3, 2, 0, default) -- NEGATIVE, confirms a real project rule the hard way
@@ -367,9 +369,9 @@ ORDER is recoverable from the binary`, round 23): **for a JUMP-TABLE
 SPARSE switch lowered to a compare chain (no jump table -- exactly this
 function's shape), the compiler "picks its own comparison order" and
 source declaration order is NOT reliably recoverable from body layout
-either.** `SetSeqTimerMode` (this round's OTHER assignment, in the SAME
+either.** `SsSetTickMode` (this round's OTHER assignment, in the SAME
 unit) is a jump-table switch and the body-order lever closed it
-cleanly. `SeqTimerControl` has no jump table (a straight `beq`/`bne`/`slti`
+cleanly. `_SsStart` has no jump table (a straight `beq`/`bne`/`slti`
 compare chain, confirmed in the `.s`) and the SAME lever, tried the same
 way, made things categorically worse rather than incrementally worse --
 strong evidence the two functions are on opposite sides of the
@@ -383,7 +385,7 @@ too large to treat as a "trailing" arm).
 
 ### Lever 2 tried: first-ever permuter search -- ran to its time bound, best score found is NEGATIVE when translated
 
-Set up with `tools/setup-permuter.sh SeqTimerControl <65/164 seed>`.
+Set up with `tools/setup-permuter.sh _SsStart <65/164 seed>`.
 `--debug --stack-diffs` validation matched this report's own recorded
 residue shape (base score 3735; the visible diff was exactly the
 case-5/default polarity region above plus a register-permutation tail
@@ -392,7 +394,7 @@ consistent with "Residue not further chased" section above) --
 
 Launched: `PATH=.../permuter-work/bin:$PATH .venv/bin/python3
 tools/decomp-permuter/permuter.py -j 4 --stop-on-zero --best-only
-permuter-work/SeqTimerControl`, bounded at 900s (the machine was also
+permuter-work/_SsStart`, bounded at 900s (the machine was also
 running alpha's and charlie's own `-j 6` permuter searches concurrently
 in sibling worktrees this round -- real contention, not idle).
 
@@ -440,7 +442,7 @@ project's oracle.**
 
 Restored to `INCLUDE_ASM`; `git status --porcelain` clean for this
 function. Whole-image build verified green (`./build-and-verify.sh`
-passes) with this function as `INCLUDE_ASM` and `SetSeqTimerMode` (this
+passes) with this function as `INCLUDE_ASM` and `SsSetTickMode` (this
 round's other assignment) as a genuine byte-exact match -- so the only
 thing blocking a fully-matching image in this unit right now is this
 function.
@@ -450,9 +452,9 @@ function.
 1. **The "case order is recoverable from body layout" lever is
    confirmed, empirically and by direct A/B regression in this round,
    to be SCOPED to jump-table (dense) switches and not to transfer to a
-   sparse switch lowered to a compare chain** -- `SetSeqTimerMode` (dense,
+   sparse switch lowered to a compare chain** -- `SsSetTickMode` (dense,
    jump table) closed cleanly on this lever in this same round;
-   `SeqTimerControl` (sparse, compare chain) regressed by nearly half its
+   `_SsStart` (sparse, compare chain) regressed by nearly half its
    already-matched words on the identical technique, twice (with and
    without also swapping local declaration order). `docs/DECOMPILATION_LEARNINGS.md`
    already states this boundary in prose (round 23); this is a second,
@@ -517,15 +519,21 @@ above for full detail.
 
 ## Naming
 
+**Superseded, round 71 (track 2):** the track-3 game name `SeqTimerControl`
+is replaced by Sony's own name -- fingerprint EXACT masked 1.00 vs
+libsnd/ssinit's internal `_SsStart` (disc 3.3). This is Sony's SDK code, not
+decompiled game logic; track 2 names those functions and moves them out of
+tracks 1/1b/3.
+
 Round 69 (delta), track 3 pass on `code_179d8_c_b`.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `SeqTimerControl` (was `func_80032708`) | B | arms a PSX root counter at the rate `SetSeqTimerMode` selected (`SetRCnt`), tags a device value, and registers one of two ISR callbacks (`SeqTimerCallback`/`SeqTimerDividerCallback`) via `InterruptCallback` -- an "arm the sequencer's software timer" routine. `arg0` is a start/stop-ish switch (see `StartSeqTimer.md`/`StopSeqTimer.md`) but its exact in-game trigger is not established, hence B not A. |
-| `gSeqTimerId` (was `D_8006DC90`) | B | the value threaded through `InterruptCallback` as a handle: `-1` is checked as a sentinel ("nothing armed") throughout this function and in `CancelSeqTimer`, `0` means "armed but not yet given a real id" (this function then captures one via `InterruptCallback(0, NULL)`), and any other value is passed straight back to `InterruptCallback` to re-target or deregister. |
-| `gSeqTimerRateFlag` (was `D_8006DC94`) | B | set (incremented, never explicitly reset here) only on the branch of the default case that computes the smaller of the two custom rates (`v1 < 0x46`); this function's own callback-selection tail reads it as a boolean to choose `SeqTimerDividerCallback` over `SeqTimerCallback` -- i.e. it selects the half-rate ISR variant. `CancelSeqTimer` clears it back to 0. |
-| `gSeqTimerStopPending` (was `D_8006DC8C`) | B | when set, this function's shared tail skips arming entirely and instead tears down via `VSyncCallback(SsSeqCalledTbyT)`; `CancelSeqTimer` is the other place that reads/clears it, calling `VSyncCallback(0)` first. Named for what it gates (a pending stop/teardown), not for a specific caller's intent. |
-| `gSeqTimerChainedCallback` (was `D_8006DC9C`) | B | captured from `InterruptCallback(0, NULL)`'s return value (the previously-installed handler) right before this function installs `SeqTimerCallback` as the new one; `SeqTimerCallback` calls it first, then always calls `SsSeqCalledTbyT` -- the classic "save old handler, chain to it" ISR-hook idiom. |
+| `_SsStart` (was `func_80032708`) | B | arms a PSX root counter at the rate `SsSetTickMode` selected (`SetRCnt`), tags a device value, and registers one of two ISR callbacks (`_SsTrapIntrVSync`/`_SsSeqCalledTbyT_1per2`) via `InterruptCallback` -- an "arm the sequencer's software timer" routine. `arg0` is a start/stop-ish switch (see `StartSeqTimer.md`/`StopSeqTimer.md`) but its exact in-game trigger is not established, hence B not A. |
+| `gSeqTimerId` (was `D_8006DC90`) | B | the value threaded through `InterruptCallback` as a handle: `-1` is checked as a sentinel ("nothing armed") throughout this function and in `SsEnd`, `0` means "armed but not yet given a real id" (this function then captures one via `InterruptCallback(0, NULL)`), and any other value is passed straight back to `InterruptCallback` to re-target or deregister. |
+| `gSeqTimerRateFlag` (was `D_8006DC94`) | B | set (incremented, never explicitly reset here) only on the branch of the default case that computes the smaller of the two custom rates (`v1 < 0x46`); this function's own callback-selection tail reads it as a boolean to choose `_SsSeqCalledTbyT_1per2` over `_SsTrapIntrVSync` -- i.e. it selects the half-rate ISR variant. `SsEnd` clears it back to 0. |
+| `gSeqTimerStopPending` (was `D_8006DC8C`) | B | when set, this function's shared tail skips arming entirely and instead tears down via `VSyncCallback(SsSeqCalledTbyT)`; `SsEnd` is the other place that reads/clears it, calling `VSyncCallback(0)` first. Named for what it gates (a pending stop/teardown), not for a specific caller's intent. |
+| `gSeqTimerChainedCallback` (was `D_8006DC9C`) | B | captured from `InterruptCallback(0, NULL)`'s return value (the previously-installed handler) right before this function installs `_SsTrapIntrVSync` as the new one; `_SsTrapIntrVSync` calls it first, then always calls `SsSeqCalledTbyT` -- the classic "save old handler, chain to it" ISR-hook idiom. |
 
 `gSeqTimerRateMode`/`gSeqTimerModeFlag`/`gVideoMode`/`gSeqTickRate` are
-established in `SetSeqTimerMode.md`; this function only reads the first two.
+established in `SsSetTickMode.md`; this function only reads the first two.

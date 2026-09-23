@@ -309,9 +309,9 @@ extern void SsSetTableSize(char *a0, s16 a1, s16 a2);
 extern s32 func_80032368(void);
 extern char *func_8003A068(void);
 extern s32 func_8003A05C(void);
-extern void CancelSeqTimer(void);
+extern void SsEnd(void);
 extern void QuitSpu(void);
-extern void SetSeqTimerMode(s32 a0);
+extern void SsSetTickMode(s32 a0);
 extern void StartSeqTimer(void);
 extern void *func_80017CFC(void *ptr);
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
@@ -351,7 +351,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     }
     if (gVabStreamInited == 0) {
         D_8008A8CC = 0x3C;
-        SetSeqTimerMode(1);
+        SsSetTickMode(1);
         gVabStreamInited = 1;
     }
     gOpenVabCount++;
@@ -376,7 +376,7 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
         gVabSizeTableInited = 0;
         gVabVolumeInited = 0;
         gVabStreamInited = 0;
-        CancelSeqTimer();
+        SsEnd();
         QuitSpu();
     }
     func_80017CFC(self->vagAttrPool);

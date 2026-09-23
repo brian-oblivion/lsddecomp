@@ -1,4 +1,6 @@
-# SetSeqTimerMode -- MATCH (96/96 words, byte-exact)
+# SsSetTickMode -- MATCH (96/96 words, byte-exact)
+
+> Renamed from `SetSeqTimerMode` on 2026-09-23 (tools/rename.py). Address 0x80032588.
 
 > Renamed from `func_80032588` on 2026-09-23 (tools/rename.py). Address 0x80032588.
 
@@ -14,7 +16,7 @@ recorded below for completeness (it was superseded mid-run, not exhausted).
 
 ## What it does
 
-`void SetSeqTimerMode(s32 a0)`. Two parts, unchanged from the round-23
+`void SsSetTickMode(s32 a0)`. Two parts, unchanged from the round-23
 description:
 
 1. Splits `a0` into a "cmd" value stored in `gSeqTimerRateMode` and a flag in
@@ -146,7 +148,7 @@ Set up per `tools/setup-permuter.sh` against the round-23 90/96 preserved
 body (i.e. before the fix above was found):
 
 ```
-tools/setup-permuter.sh SetSeqTimerMode <seed with round-23 body>
+tools/setup-permuter.sh SsSetTickMode <seed with round-23 body>
 ```
 
 `--debug --stack-diffs` validation against the scaffold matched the
@@ -156,7 +158,7 @@ polarity, matching the round-23 prose). The scaffold was trustworthy.
 
 Launched: `PATH=.../permuter-work/bin:$PATH .venv/bin/python3
 tools/decomp-permuter/permuter.py -j 4 --stop-on-zero --best-only
-permuter-work/SetSeqTimerMode`, bounded at 900s. **Killed by PID (not
+permuter-work/SsSetTickMode`, bounded at 900s. **Killed by PID (not
 `pkill -f`) partway through, once the manual structural fix above reached
 96/96 independently** -- the search was still running against the OLD
 (pre-fix) scaffold and could not have found the outer-bound-check
@@ -169,7 +171,7 @@ negative permuter result.
 
 ```
 ./build-and-verify.sh   ->  build exit=0, "OK: build matches retail SLPS_015.56"
-tools/funcdiff.py SetSeqTimerMode  ->  96/96 words match (file 0x22D88-0x22F08)
+tools/funcdiff.py SsSetTickMode  ->  96/96 words match (file 0x22D88-0x22F08)
 ```
 
 Whole-image SHA1 passes. This is a genuine match, not a per-function read
@@ -210,17 +212,23 @@ against a drifted image.
 
 ## Naming
 
+**Superseded, round 71 (track 2):** the track-3 game name `SetSeqTimerMode`
+is replaced by Sony's own name -- fingerprint EXACT masked 1.00 vs
+libsnd/ssinit `SsSetTickMode` (disc 3.3), confirming the hypothesis round 69
+already recorded below. This is Sony's SDK code, not decompiled game logic;
+track 2 names those functions and moves them out of tracks 1/1b/3.
+
 Round 69 (delta), track 3 pass on `code_179d8_c_b`.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `SetSeqTimerMode` (was `func_80032588`) | B | mechanics are fully known (splits an input word into a rate-mode selector and a flag, then picks a tick rate from a 6-way table); the in-game reason a caller picks each mode is not established. |
-| `gSeqTimerRateMode` (was `D_8006DCA4`) | B | the "cmd" this function derives from its argument and `SeqTimerControl` (the timer-arming stall) dispatches on for its own device-tag/rate selection -- see that report. |
-| `gSeqTimerModeFlag` (was `D_8006DCA8`) | B | the flag bit (`a0 & 0x1000`) extracted alongside the rate mode; `SeqTimerControl`'s `default:` arm returns immediately without touching the timer when this is set, so it gates whether the computed-rate path runs at all. |
+| `SsSetTickMode` (was `func_80032588`) | B | mechanics are fully known (splits an input word into a rate-mode selector and a flag, then picks a tick rate from a 6-way table); the in-game reason a caller picks each mode is not established. |
+| `gSeqTimerRateMode` (was `D_8006DCA4`) | B | the "cmd" this function derives from its argument and `_SsStart` (the timer-arming stall) dispatches on for its own device-tag/rate selection -- see that report. |
+| `gSeqTimerModeFlag` (was `D_8006DCA8`) | B | the flag bit (`a0 & 0x1000`) extracted alongside the rate mode; `_SsStart`'s `default:` arm returns immediately without touching the timer when this is set, so it gates whether the computed-rate path runs at all. |
 | `gVideoMode` (was `D_8006DC98`) | A | assigned directly from Psy-Q's `GetVideoMode()` in `func_8003221C` (sibling unit `code_179d8_c.c`, its own match report). This function only reads it, to choose between the two named tick rates. |
 | `gSeqTickRate` (was `D_8009024C`) | B | `src/code_179d8_k.c` (a different, uninvolved unit) independently reads this same global and comments it as "a tick-rate/PPQN-style constant" used in a MIDI Set-Tempo scheduling formula (`func_80035B2C`/`SetTempo`-style handler) -- two unrelated units converging on the same reading. This function is the one that WRITES it, from the 6-way rate table below. |
 | `SEQ_TICKRATE_50`/`_60`/`_120`/`_240` (magic constants `0x32`/`0x3c`/`0x78`/`0xf0`) | B | named by value only (the numbers themselves), not by an NTSC/PAL region claim -- `gVideoMode` (0/1) does select between the 50 and 60 values in three of the six cases, which is suggestive, but this file has no direct evidence pinning which region is which value. |
 
-See `SeqTimerControl.md` for the globals `gSeqTimerId`/`gSeqTimerRateFlag`/
+See `_SsStart.md` for the globals `gSeqTimerId`/`gSeqTimerRateFlag`/
 `gSeqTimerStopPending`/`gSeqTimerChainedCallback`, which this function does
 not touch.

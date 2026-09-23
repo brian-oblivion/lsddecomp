@@ -253,7 +253,7 @@ jump target. Net effect: a WORSE diff than the delay-slot-only residue
 hoisted store), even though the SPECIFIC "j 32c90 delay slot" symptom is
 gone. Confirms the same boundary found on `GetRCnt`: guard clauses
 of the "range check, then bail" shape want negative-first in this
-project's compiled output, and `SeqTimerDividerCallback`'s raw-flag lever does not
+project's compiled output, and `_SsSeqCalledTbyT_1per2`'s raw-flag lever does not
 transfer to them. Reverted; no change kept in `src/`.
 
 ### Proposed learning
@@ -262,7 +262,7 @@ transfer to them. Reverted; no change kept in `src/`.
    evidence the same placement (relative to the same kind of store/jump
    pair) will work in a sibling function with a different amount of
    surrounding code. Confirm per-function; do not batch-apply.
-2. **Boundary on the `SeqTimerDividerCallback` block-order finding** (same
+2. **Boundary on the `_SsSeqCalledTbyT_1per2` block-order finding** (same
    conclusion independently reached via `GetRCnt`): it applies to a
    raw truthy/flag value feeding `beqz`/`bnez` directly, not to a "guard
    clause + range comparison" (`slti`/`sltiu` against a small constant).

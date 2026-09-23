@@ -2,12 +2,12 @@
  * code_179d8_c_b -- the sound-driver "sequencer timer" cluster: a software
  * playback clock built on the PSX root counters (RCnt) and interrupt
  * controller (IRQ), used to pace the game's music sequencer independently
- * of vsync. `SetSeqTimerMode`/`SeqTimerControl` (the latter still a stall)
+ * of vsync. `SsSetTickMode`/`_SsStart` (the latter still a stall)
  * pick a tick rate and arm a root counter at it; `StartSeqTimer`/
- * `StopSeqTimer` are its two callers' one-line wrappers; `SeqTimerCallback`/
- * `SeqTimerDividerCallback` are the two interrupt-time handlers it can
+ * `StopSeqTimer` are its two callers' one-line wrappers; `_SsTrapIntrVSync`/
+ * `_SsSeqCalledTbyT_1per2` are the two interrupt-time handlers it can
  * register (one chains a previously-saved handler, the other halves the
- * firing rate by toggling); `CancelSeqTimer` tears the whole thing down.
+ * firing rate by toggling); `SsEnd` tears the whole thing down.
  * `SetRCnt`/`GetRCnt`/`StartRCnt`/`StopRCnt`/`ResetRCnt` are Sony's
  * libapi/counter module compiled into game text from a library build the
  * SDK discs do not carry (identified by module order and KERNEL.H; see the
@@ -20,15 +20,15 @@
  * it. File 0x22D88..0x23500, vram 0x80032588..0x80032D00.
  *
  * WHY THE SPLIT EXISTS. `func_800323A8` (120w) sat between func_80032388 and
- * SetSeqTimerMode and is Sony's `SsSetTableSize`; the object covers exactly
+ * SsSetTickMode and is Sony's `SsSetTableSize`; the object covers exactly
  * those 120 words. A placed object cannot live inside a `c` segment, so the
  * slice had to become [c][o][c] and the second `c` needed its own name. The
  * first half kept `code_179d8_c`.
  *
  * THE RODATA ATTACH CAME WITH THIS HALF, AND THAT IS THE WHOLE REASON THIS
- * COMMENT EXISTS. `SetSeqTimerMode` owns `jtbl_80010CD8`, whose sub-slot of the
+ * COMMENT EXISTS. `SsSetTickMode` owns `jtbl_80010CD8`, whose sub-slot of the
  * 0xFD8 rodata region is attached in the splat yaml. That attach pointed at
- * `code_179d8_c`; SetSeqTimerMode is now HERE, so the attach was moved to
+ * `code_179d8_c`; SsSetTickMode is now HERE, so the attach was moved to
  * `code_179d8_c_b`. Left behind it would have produced
  * `undefined reference to '.L800325xx'` -- the routine carve failure Gate 2
  * in docs/PARALLEL-RUNS.md documents. Leave it alone.
@@ -49,7 +49,7 @@ extern s32 gSeqTimerRateMode;
 extern s32 gVideoMode;
 extern u32 gSeqTickRate;
 
-/* gSeqTickRate values SetSeqTimerMode's rate table selects between.
+/* gSeqTickRate values SsSetTickMode's rate table selects between.
  * gVideoMode (Psy-Q `GetVideoMode`) is 0/1, and cases 0/4/5 pick between
  * SEQ_TICKRATE_50/SEQ_TICKRATE_60 by it -- named by value only, not by an
  * NTSC/PAL claim this file has no direct evidence for. */
@@ -58,7 +58,7 @@ extern u32 gSeqTickRate;
 #define SEQ_TICKRATE_120 0x78
 #define SEQ_TICKRATE_240 0xf0
 
-void SetSeqTimerMode(s32 a0)
+void SsSetTickMode(s32 a0)
 {
     s32 cmd;
 
@@ -124,18 +124,18 @@ void SetSeqTimerMode(s32 a0)
     gSeqTickRate = cmd;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", SeqTimerControl);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", _SsStart);
 
-extern void SeqTimerControl(s32 arg0);
+extern void _SsStart(s32 arg0);
 
 void StartSeqTimer(void)
 {
-    SeqTimerControl(1);
+    _SsStart(1);
 }
 
 void StopSeqTimer(void)
 {
-    SeqTimerControl(0);
+    _SsStart(0);
 }
 
 extern void EnterCriticalSection(void);
@@ -148,7 +148,7 @@ extern s32 gSeqTimerStopPending;
 extern s32 gSeqTimerId;
 extern void (*gSeqTimerChainedCallback)(void);
 
-void CancelSeqTimer(void)
+void SsEnd(void)
 {
     s32 v;
 
@@ -189,7 +189,7 @@ void QuitSpu(void)
 extern void SsSeqCalledTbyT(void);
 extern void (*gSeqTimerChainedCallback)(void);
 
-void SeqTimerCallback(void)
+void _SsTrapIntrVSync(void)
 {
     if (gSeqTimerChainedCallback != NULL) {
         gSeqTimerChainedCallback();
@@ -199,7 +199,7 @@ void SeqTimerCallback(void)
 
 extern s32 gSeqTimerDividerFlag;
 
-void SeqTimerDividerCallback(void)
+void _SsSeqCalledTbyT_1per2(void)
 {
     if (gSeqTimerDividerFlag == 0) {
         gSeqTimerDividerFlag = 1;

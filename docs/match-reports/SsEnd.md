@@ -1,4 +1,6 @@
-# CancelSeqTimer
+# SsEnd
+
+> Renamed from `CancelSeqTimer` on 2026-09-23 (tools/rename.py). Address 0x800329d8.
 
 > Renamed from `func_800329D8` on 2026-09-23 (tools/rename.py). Address 0x800329d8.
 
@@ -33,7 +35,7 @@ extern s32 gSeqTimerStopPending;
 extern s32 gSeqTimerId;
 extern void (*gSeqTimerChainedCallback)(void);
 
-void CancelSeqTimer(void)
+void SsEnd(void)
 {
     s32 v;
 
@@ -63,7 +65,7 @@ void CancelSeqTimer(void)
 }
 ```
 
-## Residue note: another instance of the `SeqTimerDividerCallback` block-order lever
+## Residue note: another instance of the `_SsSeqCalledTbyT_1per2` block-order lever
 
 First attempt wrote the if/else in "natural" order (`if (gSeqTimerStopPending ==
 0) { the gSeqTimerId logic } else { the func_80024DA0 teardown }`), which
@@ -73,7 +75,7 @@ does the opposite (the `!=0`/teardown branch is the fallthrough, the
 `==0`/re-arm branch is reached by a taken `beqz`). Swapping the C to test
 `gSeqTimerStopPending != 0` first (matching which block retail places first)
 reproduced the exact instruction sequence with no other change --
-consistent with the `SeqTimerDividerCallback` finding, though note this is a
+consistent with the `_SsSeqCalledTbyT_1per2` finding, though note this is a
 *different* shape than that one: this is a full `if/else` where BOTH
 arms do real work and rejoin at a shared tail (not a guard-clause-with-
 early-return), so the "boundary" written up in `GetRCnt.md` /
@@ -84,12 +86,12 @@ plain two-sided `if/else` compiled from a raw loaded value, just not to
 
 ### Proposed learning
 
-`SeqTimerDividerCallback`'s block-order lever generalises to any two-sided `if
+`_SsSeqCalledTbyT_1per2`'s block-order lever generalises to any two-sided `if
 (rawValue) {A} else {B}` where GCC needs to decide which arm is
 fallthrough vs. out-of-line -- not just single-sided toggles. The
 distinguishing factor found so far across four instances this round: it
-applies to raw-value/full-if-else shapes (`SeqTimerDividerCallback`,
-`CancelSeqTimer`), NOT to guard-clause range-check-then-bail shapes
+applies to raw-value/full-if-else shapes (`_SsSeqCalledTbyT_1per2`,
+`SsEnd`), NOT to guard-clause range-check-then-bail shapes
 (`GetRCnt`, `ResetRCnt`, `SetRCnt`), where negative-first is
 already what retail compiles to and flipping regresses.
 
@@ -97,16 +99,22 @@ already what retail compiles to and flipping regresses.
 
 round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve,
 second pass, head-directed follow-up). Matched second attempt (one
-if/else block-order flip after the head's `SeqTimerDividerCallback` lever
+if/else block-order flip after the head's `_SsSeqCalledTbyT_1per2` lever
 generalisation request surfaced the same axis here).
 
 ## Naming
 
-Round 69 (delta). `CancelSeqTimer` (was `func_800329D8`): guarded by
+**Superseded, round 71 (track 2):** the track-3 game name `CancelSeqTimer`
+is replaced by Sony's own name -- fingerprint EXACT masked 1.00 vs
+libsnd/ssinit `SsEnd` (disc 3.3). This is Sony's SDK code, not decompiled
+game logic; track 2 names those functions and moves them out of tracks
+1/1b/3.
+
+Round 69 (delta). `SsEnd` (was `func_800329D8`): guarded by
 `gSeqTimerModeFlag`, clears `gSeqTimerRateFlag`, and either cancels a
 pending stop (`VSyncCallback(0)`, clearing `gSeqTimerStopPending`) or
 deregisters/registers the RCnt interrupt callback via `InterruptCallback`
 and resets `gSeqTimerId` to its `-1` sentinel -- the inverse of what
-`SeqTimerControl` arms. Tier B: the mechanism (tear down whatever
-`SeqTimerControl` set up) is clear from the shared globals; the caller
+`_SsStart` arms. Tier B: the mechanism (tear down whatever
+`_SsStart` set up) is clear from the shared globals; the caller
 that decides WHEN to cancel is outside this unit.

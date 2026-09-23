@@ -1317,14 +1317,29 @@ FormatNumberIntoBuffer = 0x8004D6AC; // type:func
 gClass869D8Methods = 0x800869D8;
 gClass86AA0Methods = 0x80086AA0;
 gClass86B60Methods = 0x80086B60;
-SetSeqTimerMode = 0x80032588; // type:func
-SeqTimerControl = 0x80032708; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit SsSetTickMode
+// (disc 3.3). Superseded game-style name SetSeqTimerMode. Round 71
+// (bravo, track 2).
+SsSetTickMode = 0x80032588; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit's internal
+// _SsStart (disc 3.3). Superseded game-style name SeqTimerControl.
+// Round 71 (bravo, track 2).
+_SsStart = 0x80032708; // type:func
 StartSeqTimer = 0x80032998; // type:func
 StopSeqTimer = 0x800329B8; // type:func
-CancelSeqTimer = 0x800329D8; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit SsEnd
+// (disc 3.3). Superseded game-style name CancelSeqTimer. Round 71
+// (bravo, track 2).
+SsEnd = 0x800329D8; // type:func
 QuitSpu = 0x80032A7C; // type:func
-SeqTimerCallback = 0x80032A9C; // type:func
-SeqTimerDividerCallback = 0x80032AD0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit's internal
+// _SsTrapIntrVSync (disc 3.3). Superseded game-style name SeqTimerCallback.
+// Round 71 (bravo, track 2).
+_SsTrapIntrVSync = 0x80032A9C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit's internal
+// _SsSeqCalledTbyT_1per2 (disc 3.3). Superseded game-style name
+// SeqTimerDividerCallback. Round 71 (bravo, track 2).
+_SsSeqCalledTbyT_1per2 = 0x80032AD0; // type:func
 // libapi/counter, identified: see SetRCnt (round 69)
 GetRCnt = 0x80032BB8; // type:func
 // libapi/counter, identified: see SetRCnt (round 69)
