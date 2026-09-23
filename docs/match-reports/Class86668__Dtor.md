@@ -62,3 +62,7 @@ those slots with the SAME shared implementation while diverging elsewhere,
 e.g. +0x008/+0x00C/+0x040/+0x044/+0x048). Diffing both against their common
 base (`gIntermediateBaseMethods`) rather than against each other avoids misreading shared
 inherited/override code as a subclass relationship.
+
+## Naming
+
+`Class86668__Dtor` -- tier A. The sibling class's own dtor override (+0x00C), releasing `subB` when owned and forwarding to the base dtor.

@@ -53,3 +53,7 @@ report for the distinction.
 Matched by the head during divergence resolution, 2026-09-02, as part of
 closing the epilogue-merge class. `docs/research/epilogue-merge-residue.md` is
 updated with what survived and what did not.
+
+## Naming
+
+`New_Class86668` -- tier A. Allocator (0x38 bytes) for the sibling class, dispatching `GetClass86668Methods()->ctor`: matches the `New_X` idiom.

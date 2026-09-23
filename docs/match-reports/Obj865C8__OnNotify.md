@@ -118,3 +118,7 @@ real `a1`/`a2` before the `jalr`, proving the slot's true signature carries
 as CLAUDE.md's existing "a discarded return is never evidence of void" rule,
 generalized from return values to arguments. Check a slot's CALL SITES for
 the full signature before trusting an empty-body occupant's parameter count.
+
+## Naming
+
+`Obj865C8__OnNotify` -- tier B. Overrides the base's +0x038 `Obj86B60__OnNotify` slot (confirmed by `tools/classtable.py` diff) and, after forwarding to the base, dispatches by `arg1->target->header` tag (0x1F34 / 0x2F230) to the class's own `Noop80`/`OnTag2Notify`. The dispatch mechanism is evident from the body; what the two tag values MEAN in-game is not.

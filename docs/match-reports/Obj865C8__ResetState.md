@@ -30,3 +30,7 @@ void Obj865C8__ResetState(Obj865C8 *self) {
 ## Proposed learning
 
 None beyond what's already documented for this residue-free shape.
+
+## Naming
+
+`Obj865C8__ResetState` -- tier A. Pure one-line setter (`state = 0`); mechanics are its purpose. Occupies the class's own +0x040 override; the field it resets is used as a 0-3 state code by `Obj865C8__AdvanceState`/`Obj865C8__OnTag2Notify`.

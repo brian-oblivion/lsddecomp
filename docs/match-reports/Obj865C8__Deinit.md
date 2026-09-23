@@ -97,3 +97,7 @@ carries forward to every future reader. Confirmed here with two functions
 (`Obj865C8__Deinit`, `Obj865C8__EnterState2`) sharing `Obj865C8::unk0C`/`unk38` with
 opposite usage shapes; rebuilding both together after the retype held both
 matches.
+
+## Naming
+
+`Obj865C8__Deinit` -- tier B. Occupies +0x048, the mirror of Init's slot (`gIntermediateBaseMethods`'s +0x048 forwards to `Obj86B60__Deinit`). Undoes what Init configured on the sub-object and forwards to `Class86668__Deinit`; the same caveat as Init applies to its specific purpose here.

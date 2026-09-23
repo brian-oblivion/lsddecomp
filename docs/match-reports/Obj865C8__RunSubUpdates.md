@@ -45,3 +45,7 @@ concrete class `subA` points to; both slot numbers exceed `D_800865C8`'s own
 ## Proposed learning
 
 None beyond what's already documented.
+
+## Naming
+
+`Obj865C8__RunSubUpdates` -- tier A. Ticks `subA` (`slot90`/`slot74`) every call; matches the existing `runSubUpdates` field name already on file. A pure per-frame forwarding leaf: mechanics are its purpose.

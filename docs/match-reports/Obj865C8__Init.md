@@ -99,3 +99,7 @@ remains, an accurate account of what THIS function's disassembly shows);
 the field type in `include/class_39e08.h` and the two call-site casts above
 have been updated to match the corrected type, and the build/funcdiff for
 this function was reconfirmed at 41/41 after the change.
+
+## Naming
+
+`Obj865C8__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `Obj86B60__Init` (code_2cc8c.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`Class86668__Init`); what 'init' accomplishes for THIS class beyond that is not established.

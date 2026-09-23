@@ -118,3 +118,7 @@ types in `include/class_39e08.h` and this function's own call sites (both
 the `func_80052B70` call and the `slot44` call) now carry explicit `(s32)`
 casts to preserve the byte-identical register-passthrough behavior; funcdiff
 was reconfirmed at 33/33 after each retyping pass.
+
+## Naming
+
+`Obj865C8__EnterState2` -- tier B. Unconditionally sets `state = 2` at the end and constructs a new object via `func_80052B70`, stored at `unk4C`; called from both `Obj865C8__AdvanceState` and `Obj865C8__OnTag2Notify`. Named for the one state transition its body always performs.

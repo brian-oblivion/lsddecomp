@@ -42,3 +42,7 @@ structure byte for byte.
 ## Proposed learning
 
 None beyond what's already documented.
+
+## Naming
+
+`Obj865C8__SetTimeout` -- tier A. Pure setter/converter: stores its argument verbatim if negative, else multiplied by 20 (a units-to-frames conversion) into `timeoutFrames`; mechanics are its purpose.

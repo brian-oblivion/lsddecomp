@@ -219,3 +219,7 @@ CLAUDE.md switch note ("picks its own comparison order... do not transcribe
 the observed order as case order") — it now also says: don't transcribe
 the observed VALUE SET as the real case set either; a gap in the middle of
 the visible cases is itself informative about a missing empty case.
+
+## Naming
+
+`Obj865C8__AdvanceState` -- tier B. Occupies +0x054, `Obj86B60__OnTag1Notify`'s slot in the base -- the state machine's main per-tag transition function (cases on `state` 1/2/3, transitioning via `Obj865C8__EnterState2`). The state machine's shape is clear from the body; what each state represents in-game is not.

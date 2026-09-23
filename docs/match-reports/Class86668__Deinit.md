@@ -32,3 +32,7 @@ void Class86668__Deinit(Obj865C8 *self) {
 ## Proposed learning
 
 None beyond what's already documented.
+
+## Naming
+
+`Class86668__Deinit` -- tier B. Occupies +0x048 (the mirror of Class86668__Init): a thin wrapper forwarding to `Get_vtable_IntermediateBase()->slot48(self)`.

@@ -143,3 +143,7 @@ fix applied twice at different nesting levels, so this is now three instances in
 one round. **The cheap tell is that only the branch mnemonic and the two literal
 immediates differ, with everything else exact** — that pattern is always
 polarity and never scheduling.
+
+## Naming
+
+`Obj865C8__OnTag2Notify` -- tier B. Occupies +0x084, dispatched by `Obj865C8__OnNotify`'s other tag branch (0x2F230). A `switch` over small integer codes (4, 5-8/0xA, 0xC/0xD) that queries/reconfigures `subD` and sets `eventCode`/`state`; the dispatch shape is clear, the meaning of the tag and its sub-codes is not.

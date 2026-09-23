@@ -168,3 +168,7 @@ common-subexpression-eliminate repeated STRUCT FIELD reads within a single
 statement as aggressively as retail's source apparently avoided needing to,
 and the fix is the same discipline (name the value once, don't re-derive it
 from memory each time it's used).
+
+## Naming
+
+`Obj865C8__Dtor` -- tier A. Releases every owned sub-object (`unk0C`'s own three `SubObjG` fields, `unk40`/`unk44`/`unk48`) via their `slot4` release method, then forwards to the base dtor: a pure teardown leaf, mechanics are its purpose.

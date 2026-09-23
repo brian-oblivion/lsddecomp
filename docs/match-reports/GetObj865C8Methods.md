@@ -37,3 +37,7 @@ type needed for callers is declared.
 ## Proposed learning
 
 None beyond what's already documented.
+
+## Naming
+
+`GetObj865C8Methods` -- tier A. Plain accessor, `return &D_800865C8;` -- matches the established `GetXMethods`/`Get_vtable_X` accessor convention used site-wide for vtable getters (e.g. `GetClass86668Methods`, `Get_vtable_IntermediateBase`).

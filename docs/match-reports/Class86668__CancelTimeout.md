@@ -44,3 +44,7 @@ without needing a full second method-table type.
 ## Proposed learning
 
 None beyond what's already documented.
+
+## Naming
+
+`Class86668__CancelTimeout` -- tier A. Occupies `gClass86668Methods` +0x040; one-line wrapper calling `self->methods->setTimeout(self, -1)` (the sentinel `SetTimeout` itself documents as 'disabled'). Mechanics are its purpose.

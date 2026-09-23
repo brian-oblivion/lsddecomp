@@ -79,3 +79,7 @@ two different units (`code_2c054.c`'s `func_8003C1DC`, this unit's
 arguments into the call and immediately read a `self`-relative `s32` field
 back out. Worth typing consistently anywhere else this same accessor/slot
 pair turns up.
+
+## Naming
+
+`Class86668__Init` -- tier B. Occupies +0x044 (the same Init-slot convention as `Obj865C8__Init`, see above): zeroes `eventCode`, forwards to the base's own +0x044, returns `eventCode`. Named by slot-offset convention, not by an established in-game meaning.

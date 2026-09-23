@@ -60,3 +60,7 @@ confirmed to exist at the same offset in both.** Worth checking before
 reusing a shared-slot function's disassembly as "generic" — if it touched a
 field unique to one subclass, sharing the slot would be a decompilation bug,
 not a real retail fact.
+
+## Naming
+
+`Obj865C8__OnEventArg` -- tier B. Occupies +0x060 (matches the header's pre-existing `onEventArg` field name, shared verbatim with `gClass86668Methods` at the same offset). Forwards to the base, and on `arg1 == 4` (the code `CheckTimeout` raises) sets `eventCode = 1` and calls `Noop7C`.

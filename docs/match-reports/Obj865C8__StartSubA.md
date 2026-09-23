@@ -141,3 +141,7 @@ time at its definition site produces a C89 parse error whose reported
 location is unrelated later lines, not the duplicate itself — always define
 forward-declared struct bodies as a bare `struct X { ... };`, never repeat
 `typedef struct X { ... } X;`.
+
+## Naming
+
+`Obj865C8__StartSubA` -- tier B. Sets up `subA` with a fixed constant (0x4B0) and two rodata addresses, then unconditionally sets `state = 1`: a clear 'begin' step for the state machine, but what `subA` itself represents in the game is not established (opaque vtable-only view).

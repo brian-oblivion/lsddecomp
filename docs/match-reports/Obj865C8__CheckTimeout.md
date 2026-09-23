@@ -79,3 +79,7 @@ for which one it loads first; if retail's load order doesn't match your
 comparison's source order, try swapping which side is written first (and
 flipping the operator to preserve the same logical meaning) rather than
 assuming a scheduling quirk.
+
+## Naming
+
+`Obj865C8__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`Obj86B60__IncrementFrameCounter`, code_2cc8c.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.

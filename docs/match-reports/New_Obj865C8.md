@@ -57,3 +57,7 @@ the function that dispatches through it.
 Matched by the head during divergence resolution, 2026-09-02, as part of
 closing the epilogue-merge class. `docs/research/epilogue-merge-residue.md` is
 updated with what survived and what did not.
+
+## Naming
+
+`New_Obj865C8` -- tier A. Allocator, matches the established `New_X` idiom used everywhere else in this project (allocate fixed size, ctor via the class's own vtable accessor, return NULL on failure): mechanics are its purpose.
