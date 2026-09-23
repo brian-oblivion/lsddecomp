@@ -66,7 +66,7 @@ typedef struct Class865C8Methods {
     void *slot44;                                  /* +0x044 Obj865C8__Init */
     void *slot48;                                  /* +0x048 Obj865C8__Deinit */
     void *slot4C;                                  /* +0x04C Obj865C8__StartSubA */
-    void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 func_80049C50 */
+    void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 Obj865C8__RunSubUpdates */
     void *slot54;                                  /* +0x054 func_80049CA8 */
     void (*noop58)(void);                          /* +0x058 func_8004A35C (no-op, matched) */
     void *slot5C;                                  /* +0x05C func_8004A364 */
@@ -94,8 +94,8 @@ typedef struct Class865C8Methods {
 extern Class865C8Methods D_800865C8;
 
 /* Opaque view of whatever object Obj865C8::subA points to (used only by
- * func_80049C50): its own vtable pointer sits at offset 0, and only the two
- * slots func_80049C50 dispatches through are named here -- declared
+ * Obj865C8__RunSubUpdates): its own vtable pointer sits at offset 0, and only the two
+ * slots Obj865C8__RunSubUpdates dispatches through are named here -- declared
  * minimally, locally, for this one call site (same policy as
  * DreamSysEntityObj in include/DreamSys.h). */
 typedef struct SubObjAMethods {
@@ -267,7 +267,7 @@ struct Obj865C8 {
                                       Get_vtable_IntermediateBase()->slot44's 2nd arg by func_80049E20 */
     s32 unk10;                    /* +0x010, Obj865C8__Deinit (2nd arg to a slot14 call) */
     u8 pad14[0x18 - 0x14];
-    SubObjA *subA;                /* +0x018, func_80049C50 */
+    SubObjA *subA;                /* +0x018, Obj865C8__RunSubUpdates */
     s32 unk1C;                    /* +0x01C, func_8004A364 (compared against unk2C) */
     u8 pad20[0x28 - 0x20];
     s32 unk28;                    /* +0x028, func_8004A3EC */

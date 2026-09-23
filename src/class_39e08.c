@@ -111,7 +111,7 @@ void Obj865C8__StartSubA(Obj865C8 *self) {
     self->unk3C = 1;
 }
 
-void func_80049C50(Obj865C8 *self) {
+void Obj865C8__RunSubUpdates(Obj865C8 *self) {
     SubObjA *sub = self->subA;
 
     sub->methods->slot90(sub);
