@@ -42,7 +42,7 @@ falling off the end of the function relying on the allocator's own `$v0`)
 was chosen over the `new_class_6d3c8`/no-explicit-return idiom because
 retail's own `beqz`-delay-slot zeroes `$v0` explicitly right at the branch
 (redundant with the allocator's own already-zero return on failure) --
-the same explicit-return shape `class_39e08.c`'s `func_80049608` uses, and
+the same explicit-return shape `class_39e08.c`'s `New_Obj865C8` uses, and
 the byte match confirms the reading.
 
 ## Provenance

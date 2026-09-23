@@ -42,7 +42,7 @@ typedef struct EventArg {
 typedef struct Class865C8Methods {
     s32 header;                                   /* +0x000 */
     void *unk04;                                   /* +0x004 BasicClass__func_17eb0 */
-    /* Typed because func_80049608 (this unit) dispatches it as
+    /* Typed because New_Obj865C8 (this unit) dispatches it as
      * func_8004A060()->ctor(self, arg1, arg2, arg3); the signature is
      * func_80049684's own, defined just below. */
     void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, SubObjD *arg2, s32 arg3); /* +0x008 func_80049684 */
@@ -378,7 +378,7 @@ typedef struct Class86668Methods {
  * class_3ac78 unit, not this one -- matched there as C in round 2026-09-02,
  * so it is no longer INCLUDE_ASM. Declared here only because this unit
  * dispatches through it; class_3ac78.h holds its owning view. */
-/* Defined in this unit at ROM order 0x3A860, i.e. AFTER func_80049608,
+/* Defined in this unit at ROM order 0x3A860, i.e. AFTER New_Obj865C8,
  * which dispatches through it -- so it needs a prototype here. */
 extern Class865C8Methods *func_8004A060(void);
 

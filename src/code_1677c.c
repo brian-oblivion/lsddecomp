@@ -231,7 +231,7 @@ s32 func_80026698(Class6D3C8 *self) {
     s32 check;
     s32 result;
 
-    obj = func_80049608(self->unk1C, self->dreamSys, self->arg->unk04);
+    obj = New_Obj865C8(self->unk1C, self->dreamSys, self->arg->unk04);
     status = obj->methods->slot44(obj);
     obj->methods->slot4(obj);
 

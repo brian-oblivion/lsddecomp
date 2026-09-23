@@ -1,4 +1,6 @@
-# func_80049608
+# New_Obj865C8
+
+> Renamed from `func_80049608` on 2026-09-23 (tools/rename.py). Address 0x80049608.
 
 **Unit:** class_39e08 · **Status:** MATCHED (31/31 words)
 
@@ -9,7 +11,7 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-Obj865C8 *func_80049608(Obj0C *arg1, SubObjD *arg2, s32 arg3)
+Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 {
     ...
 

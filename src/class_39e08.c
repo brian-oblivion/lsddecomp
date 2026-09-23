@@ -1,7 +1,7 @@
 #include "common.h"
 #include "class_39e08.h"
 
-Obj865C8 *func_80049608(Obj0C *arg1, SubObjD *arg2, s32 arg3)
+Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 {
     Obj865C8 *self;
 

@@ -138,7 +138,7 @@ PY
 
 | where | instances |
 | --- | --- |
-| carved, queued now | **5** — `func_80049608`, `func_8004A130` (class_39e08); `New_Class866E8` (class_3ac78); `func_8003B854`, `func_8003BE94` (code_2c054) |
+| carved, queued now | **5** — `New_Obj865C8`, `func_8004A130` (class_39e08); `New_Class866E8` (class_3ac78); `func_8003B854`, `func_8003BE94` (code_2c054) |
 | `class_3bb8c` (uncarved) | 11 |
 | `code_2cc8c` (uncarved) | 4 |
 | `code_179d8` (uncarved) | 3 |
@@ -163,7 +163,7 @@ Five instances, all byte-exact, all with `return NULL;` last:
 | --- | --- | --- |
 | `New_Class866E8` | class_3ac78 | 27/27 |
 | `func_8004A130` | class_39e08 | 27/27 |
-| `func_80049608` | class_39e08 | 31/31 |
+| `New_Obj865C8` | class_39e08 | 31/31 |
 | `func_8003B854` | code_2c054 | 36/36 |
 | `func_8003BE94` | code_2c054 | 31/31 |
 
