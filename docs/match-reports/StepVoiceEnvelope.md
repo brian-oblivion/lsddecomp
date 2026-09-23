@@ -1,4 +1,4 @@
-# StepVoiceEnvelope -- STALL: 6 words long (237/231 built length) -- the HEAD-diagnosed halfword-index idiom was applied and DOES close the early-`sll`/mid-block-mask gap, but this function's NON-LOOP context surfaces a residual sign-extension/scheduling issue the same fix left behind in InitSpuDriver's loop context. Round 48: frame gap (-0x10 vs retail -0x18) confirmed pure unaddressed padding and closed byte-exact with charlie's dead[8] idiom, but length unaffected -- 4th unit-wide confirmation this round that the lever does not close length by itself.
+# StepVoiceEnvelope -- STALL: length exact (231/231, round 73), 223/231 raw word-match, first diff at vram 0x8002E700 (the pan split: retail copies the volume into $a1 and multiplies the copy; this body masks val1). libsnd SetAutoVol.
 
 > Renamed from `func_8002E4D8` on 2026-09-20 (tools/rename.py). Address 0x8002e4d8.
 
@@ -442,7 +442,7 @@ NEW residues — but do not expect the built LENGTH to move unless a
 SEPARATE piece of evidence (a duplicated tail, a missing call, extra
 addressed content) is also found.
 
-## Preserved body (best attempt, 237/231 built words -- 6 words long; split-index gap CLOSED, sign-extension residue REMAINS)
+## Superseded preserved body (pre-round-73 best attempt, 237/231 built words -- 6 words long; split-index gap CLOSED, sign-extension residue REMAINS)
 
 ```c
 #if 0
@@ -643,3 +643,165 @@ dropped -- the shared prelude already declares both as `Rec16D7F0[]`, and
 the body already casts to `(s16 *)` before indexing, so no code change was
 needed there. `./build-and-verify.sh` green (zero bytes changed) and
 `tools/check-nonmatching.sh code_179d8_m` green.
+
+## Round 73 (delta): REVISIT -- 238/231 (7 long) -> 231/231 length-exact, ins 1 / del 1
+
+REVISITED, round 73: STALL improved to length-exact 223/231 (ins 1 / del 1), residue is the same single pan-split register copy as StepVoiceFade; names/types used (same locals as StepVoiceFade's round-73 body).
+
+### Ownership
+
+`sdkname.py StepVoiceEnvelope`: **masked 0.00, shape 0.99** against libsnd
+`SetAutoVol` (3.3 `vmanager`, 227w). This is Sony's `SetAutoVol` in a build
+no disc carries (the `seqread` situation; matching as C is the project's
+practice for those, counted as library by address). See `StartNote.md`,
+round 73, for the rest of the unit.
+
+### Preserved body rebuilt first
+
+The round-67 `#ifdef NON_MATCHING` body, switched live: `build exit=2`, no
+compile-error hits, built length **238 words** (`objdump -t`: 0x3b8 bytes)
+-- 7 long, not the 6 the title carried -- `funcdiff`: **43/231**,
+**insertions 28 / deletions 28**, positional skeleton diffs 185, drift
+warning firing (278258 bytes).
+
+### What moved it
+
+Retail StepVoiceEnvelope and StepVoiceFade are the same code with a
+different array family (a normalised `diff` of the two `.s` files differs
+only in: `$t0`/`$t1` naming, `lhu` of the accumulator stored to
+`D_8008EA10` and multiplied as `s16`, and a reload of `D_8008EA11` for the
+third pan test). So this body is StepVoiceFade's round-73 body ported with:
+
+- `acc` is `s16`, `acc = gVoiceEnvAccum[v].unk0; D_8008EA10 = acc;`
+- first quotient `q2 = (acc * vol) / 16129;`
+- third pan test `p = D_8008EA11;` (the global, reloaded -- retail's
+  `lui a0; lbu a0; nop`).
+
+Every lever in StepVoiceFade.md's round-73 list applies unchanged (field ops
+instead of cached locals, `v` for the tail, `off = voice * 8`,
+`D_8008D7F0[off + 1]`, reused `s32 p` with `(u32)` bound tests, `q2` reused
+for both quotients, `val2 > val1`). The old report's "redundant
+sign-extension around the incU/incS accumulator add" was the cached-local
+residue: it disappears with lever 1. Frame is 0x18 without padding.
+
+In-tree: `build exit=2`, no grep hits, **223/231**, **insertions 1 /
+deletions 1**, positional skeleton diffs 7, no out-of-range drift.
+
+### Residue
+
+Identical to StepVoiceFade's and at the same place (vram 0x8002E6FC..
+0x8002E724): retail copies the volume into `$a1` in the `else` arm of the
+first pan test and multiplies that copy unmasked; this body masks `val1`
+(`andi`). The shapes tried against it are tabulated in StepVoiceFade.md's
+round-73 section; they were not re-run here, since the two functions'
+section 1 is byte-identical in retail and in both bodies. No permuter spent
+on this function (StepVoiceFade's search covers the shared residue).
+
+## Preserved body (round 73 best -- compiles standalone through the pinned pipeline)
+
+```c
+#if 0
+#include "common.h"
+typedef struct {
+    s16 unk0; /* +0x0 */
+    u8 pad2[0x34 - 0x2];
+} Rec34Half;
+typedef struct {
+    u8 pad[0x18];
+    u8 masterVolume; /* +0x18 */
+} ObjE970;
+extern ObjE970 *D_8008E970;
+extern s16 D_8008D7F0[];   /* SPU voice-register shadow, 8 halfwords per voice */
+extern u8 D_8008D970[];
+extern u8 D_8008EA10;
+extern u8 D_8008EA11;
+extern u8 D_8008EA16;
+extern u8 D_8008EA17;
+extern u8 D_8008EA19;
+extern u8 D_8008EA1A;
+extern s16 D_8008E8C0;
+extern Rec34Half gVoiceEnvActive[];
+extern Rec34Half gVoiceEnvStep[];
+extern Rec34Half gVoiceEnvInterval[];
+extern Rec34Half gVoiceEnvCountdown[];
+extern Rec34Half gVoiceEnvAccum[];
+extern Rec34Half gVoiceEnvLimit[];
+
+void StepVoiceEnvelope(s16 voice)
+{
+    s16 v;
+    s16 off;
+    s32 p;
+    s16 acc;
+    s32 vol;
+    s32 q1;
+    u16 val1;
+    u16 val2;
+    u32 q2;
+    s32 tmp;
+
+    v = voice;
+    off = voice * 8;
+    if (gVoiceEnvInterval[voice].unk0 != 0) {
+        if (gVoiceEnvCountdown[voice].unk0-- > 0) {
+            return;
+        }
+        gVoiceEnvCountdown[voice].unk0 = gVoiceEnvInterval[voice].unk0;
+    }
+    gVoiceEnvAccum[voice].unk0 += gVoiceEnvStep[voice].unk0;
+    if (gVoiceEnvStep[voice].unk0 > 0) {
+        if (gVoiceEnvAccum[voice].unk0 >= gVoiceEnvLimit[voice].unk0) {
+            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
+            gVoiceEnvActive[voice].unk0 = 0;
+        }
+    } else if (gVoiceEnvStep[voice].unk0 < 0) {
+        if (gVoiceEnvAccum[voice].unk0 <= gVoiceEnvLimit[voice].unk0) {
+            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
+            gVoiceEnvActive[voice].unk0 = 0;
+        }
+    }
+
+    acc = gVoiceEnvAccum[v].unk0;
+    D_8008EA10 = acc;
+
+    vol = D_8008E970->masterVolume * 0x3FFF;
+    q2 = (acc * vol) / 16129;
+    q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
+
+    p = D_8008EA1A;
+    val1 = q2;
+    if ((u32) p < 0x40) {
+        val2 = (q2 * p) >> 6;
+        val1 = q2;
+    } else {
+        val2 = val1;
+        val1 = (val1 * (0x7F - p)) >> 6;
+    }
+
+    p = D_8008EA17;
+    if ((u32) p < 0x40) {
+        val2 = (val2 * p) / 64;
+    } else {
+        val1 = (val1 * (0x7F - p)) / 64;
+    }
+
+    p = D_8008EA11;
+    if ((u32) p < 0x40) {
+        val2 = (val2 * p) / 64;
+    } else {
+        val1 = (val1 * (0x7F - p)) / 64;
+    }
+
+    if (D_8008E8C0 == 1) {
+        if (val2 > val1) {
+            val1 = val2;
+        } else {
+            val2 = val1;
+        }
+    }
+
+    D_8008D7F0[off + 1] = val2;
+    D_8008D7F0[off] = val1;
+    D_8008D970[v] |= 3;
+}#endif
+```

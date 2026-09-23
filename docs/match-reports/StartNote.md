@@ -1,4 +1,4 @@
-# StartNote -- STALL: 15 words LONG (402/387 built length), first real diff at vram 0x8002FAC4 (function entry, differing register-save set / frame size 0x140 vs retail's 0x148)
+# StartNote -- STALL, SDK-OWNED (libsnd SpuVmKeyOn, round 73): 27 words LONG (414/387 rebuilt round 73; previously recorded 402), 14/387 raw word-match, first diff at vram 0x8002FAC4 (function entry, register-save set / frame size)
 
 > Renamed from `func_8002FAC4` on 2026-09-20 (tools/rename.py). Address 0x8002fac4.
 
@@ -641,3 +641,67 @@ implies). `./build-and-verify.sh` green (zero bytes changed);
 shows no stale references left in `src/code_179d8_m.c` (only the report's
 own preserved-block text still carries the old name, expected and
 harmless).
+
+## Round 73 (delta): REVISIT -- stopped on ownership, not matched
+
+REVISITED, round 73: stopped -- the function is Sony's libsnd `SpuVmKeyOn` (a build no SDK disc carries, so no object places); names/types not relevant.
+
+### Preserved body rebuilt first (as the assignment requires)
+
+The unit's `#ifdef NON_MATCHING` body, switched live for one build and
+reverted: `build exit=2`, no compile-error grep hits.
+
+- built length **414 words** (`objdump -t build/src/code_179d8_m.c.o`,
+  `0x678` bytes) against retail's 387 -- **27 long**, not the 402 the title
+  used to carry. The NON_MATCHING body has evidently drifted from the one
+  the 402 figure was measured on (two stale-symbol fixes landed in round
+  37 and the body was promoted in round 67); the figure above is this
+  round's measurement.
+- `funcdiff.py StartNote`: `14/387`, `insertions 123 / deletions 123`,
+  positional skeleton diffs 371 -- untrustworthy by construction with a
+  27-word length gap (funcdiff's own out-of-range warning fired).
+
+### Why it is Sony's code
+
+The assignment's ownership note gave `sdkname.py` shape 0.76 against
+`SpuVmKeyOn` (libsnd/vmanager, 3.3) and asked for a reading. The reading
+says it IS that function, a different build of it:
+
+1. **Signature.** `StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)`
+   is libsnd's `SpuVmKeyOn(seq_sep_no, vabId, prog, note, voll, pan)`
+   argument-for-argument: `a0` packs `[sep|seq]` and indexes
+   `D_800902E8[seq][sep]` (`_ss_score`, 0xAC-byte score records), `a1`/`a2`
+   go straight to `SpuVmVSetUp(vabId, prog)`, `a3` is compared against each
+   tone's min/max note, `a4 == 0` routes to key-off, `a5` is the pan.
+2. **Call sequence.** Sony's 3.3 `vmanager.o` `SpuVmKeyOn` calls, in
+   order, `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`, `SpuVmDoAllocate`.
+   StartNote calls `SpuVmVSetUp`, `StopNote`, `func_8002CF18`,
+   `func_8002D6A4`, then `func_8002D8E0`/`note2pitch`+`func_8002D1B4`. The
+   callee names this project already carries for the first and last
+   (`SpuVmVSetUp`, `note2pitch`) are Sony's own.
+3. **Tone-scan loop.** Sony's 3.3 body has the six-`andi 0xff` run
+   (`andi v1,a1,0xff; andi v0,a2,0xff; andi v1,v1,0xff; andi v0,a1,0xff;
+   andi v0,a2,0xff; andi v1,s1,0xff`) followed by `sll v0,v0,4` tone
+   indexing; retail StartNote has the identical six-`andi` run at 0x2044C..
+   0x204F4 with the same registers.
+4. **The `0x21` test.** Sony's 3.6 `vm_key.o` `SpuVmKeyOn` has
+   `li v0,0x21` -- libsnd's "seq_sep_no 33 = not a sequence" marker;
+   StartNote's `if ((s16) a0 != 0x21)` at 0x206CC is the same test.
+
+`masked 0.00` against every disc only says no disc carries THIS build;
+the game's libsnd matches neither 3.3 nor 3.6 here, the same situation as
+`libsnd/seqread` (CLAUDE.md). Per the assignment ("if your reading finds it
+IS a libsnd function body ... STOP on it and report that instead of
+matching") no matching was attempted.
+
+### Consequences the head may want (nothing renamed here)
+
+- By the same call-slot correspondence: `StopNote` = `SpuVmKeyOff`,
+  `func_8002CF18` = `SpuVmAlloc`, `func_8002D6A4` = `SpuVmDoAllocate`.
+- `sdkname.py` also gives `StepVoiceEnvelope` **shape 0.99** against
+  libsnd `SetAutoVol` (3.3 vmanager, 227w vs 231w). Its sibling
+  `StepVoiceFade` is `SetAutoPan` (3.3: 224w, same opening skeleton), and
+  `BeginVoiceFade`/`func_8002E308` are then `SsUtAutoPan`/`SsUtAutoVol`.
+  This whole unit is libsnd's voice manager. `progress.py` should count it
+  as library by address (`config/sdk-in-game.txt` / `identified` symbols),
+  which is a head decision.

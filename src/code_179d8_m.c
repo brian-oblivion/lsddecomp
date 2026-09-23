@@ -126,131 +126,89 @@ extern u8 D_8008EA1A;
 extern s16 D_8008E8C0;
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 237/231 words, 6 words long. Residue: a redundant
- * sign-extension around the incU/incS accumulator add -- confirmed still
- * the real gap after round 48's frame-padding lever realigned the frame
- * byte-exactly without closing the length, and after a permuter search
- * (round 37) plateaued at 2105/4155 across 80,882 iterations with no
- * candidate reaching zero (docs/match-reports/StepVoiceEnvelope.md).
- * Hand-derived. */
-void StepVoiceEnvelope(s16 a0)
+/* NON_MATCHING: 231/231 words, length exact, 223/231 raw, funcdiff
+ * insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoVol
+ * (sdkname shape 0.99). Residue: in the pan split's `else` arm retail
+ * copies the volume into $a1 first and multiplies THAT register (no
+ * andi); this body multiplies the volume register directly and masks
+ * val1 -- same residue as StepVoiceFade below
+ * (docs/match-reports/StepVoiceEnvelope.md). */
+void StepVoiceEnvelope(s16 voice)
 {
-    s16 idxCopy;
-    s16 accum;
-    u8 flagByte;
+    s16 v;
+    s16 off;
+    s32 p;
+    s16 acc;
+    s32 vol;
+    s32 q1;
     u16 val1;
     u16 val2;
-    s32 product1;
-    s32 q1;
-    s32 q1b;
-    u32 q1c;
     u32 q2;
     s32 tmp;
-    u8 tableval;
-    s16 limit;
-    s16 woff;
 
-    /* Halfword-indexed byte-offset for the D_8008D7F2/D_8008D7F0 stores
-     * near the end of this function: idx*8 computed here, kept `s16`
-     * (matching retail's dependency -- its early `sll #3` reads the
-     * sign-extended parameter and stays a plain register value, with no
-     * separate unsigned materialization at this point), before the
-     * 0x34-stride record accesses even start. Masked to `u16` only at
-     * the point of use (indexing an `s16 *`, which then scales by 2),
-     * reaching idx*16 -- the real per-channel byte stride for these two
-     * 0x10-stride, single-field arrays. Same base idiom as
-     * InitSpuDriver's D_8006DAD4 fix, but kept `s16` (not `u16`) until
-     * point of use -- see this report's "non-loop" analysis for why the
-     * loop-context version of the idiom does not transfer directly. */
-    idxCopy = a0;
-    woff = idxCopy << 3;
-
-    if (gVoiceEnvInterval[idxCopy].unk0 != 0) {
-        s16 orig = gVoiceEnvCountdown[idxCopy].unk0;
-
-        gVoiceEnvCountdown[idxCopy].unk0 = orig - 1;
-        if (orig > 0) {
+    v = voice;
+    off = voice * 8;
+    if (gVoiceEnvInterval[voice].unk0 != 0) {
+        if (gVoiceEnvCountdown[voice].unk0-- > 0) {
             return;
         }
-        gVoiceEnvCountdown[idxCopy].unk0 = gVoiceEnvInterval[idxCopy].unk0;
+        gVoiceEnvCountdown[voice].unk0 = gVoiceEnvInterval[voice].unk0;
     }
-
-    {
-        u16 accumU = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
-        u16 incU = ((Rec34HalfU *) gVoiceEnvStep)[idxCopy].unk0;
-        s16 incS = gVoiceEnvStep[idxCopy].unk0;
-        s16 accumS;
-
-        accumU = accumU + incU;
-        gVoiceEnvAccum[idxCopy].unk0 = accumU;
-        accumS = gVoiceEnvAccum[idxCopy].unk0;
-
-        if (incS > 0) {
-            limit = gVoiceEnvLimit[idxCopy].unk0;
-            if (accumS >= limit) {
-                accumU = limit;
-                gVoiceEnvAccum[idxCopy].unk0 = accumU;
-                gVoiceEnvActive[idxCopy].unk0 = 0;
-            }
-        } else if (incS < 0) {
-            limit = gVoiceEnvLimit[idxCopy].unk0;
-            if (limit >= accumS) {
-                accumU = limit;
-                gVoiceEnvAccum[idxCopy].unk0 = accumU;
-                gVoiceEnvActive[idxCopy].unk0 = 0;
-            }
+    gVoiceEnvAccum[voice].unk0 += gVoiceEnvStep[voice].unk0;
+    if (gVoiceEnvStep[voice].unk0 > 0) {
+        if (gVoiceEnvAccum[voice].unk0 >= gVoiceEnvLimit[voice].unk0) {
+            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
+            gVoiceEnvActive[voice].unk0 = 0;
+        }
+    } else if (gVoiceEnvStep[voice].unk0 < 0) {
+        if (gVoiceEnvAccum[voice].unk0 <= gVoiceEnvLimit[voice].unk0) {
+            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
+            gVoiceEnvActive[voice].unk0 = 0;
         }
     }
 
-    accum = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
-    D_8008EA10 = (u8) accum;
-    tableval = D_8008E970->masterVolume;
+    acc = gVoiceEnvAccum[v].unk0;
+    D_8008EA10 = acc;
 
-    product1 = accum * (tableval * 0x3FFF);
-    q1 = product1 / 16129;
-    q1b = q1 * D_8008EA16;
-    q1c = q1b * D_8008EA19;
-    q2 = q1c / 16129u;
+    vol = D_8008E970->masterVolume * 0x3FFF;
+    q2 = (acc * vol) / 16129;
+    q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
 
-    if (D_8008EA1A < 0x40) {
-        tmp = q2 * D_8008EA1A;
-        val2 = (u32) tmp >> 6;
+    p = D_8008EA1A;
+    val1 = q2;
+    if ((u32) p < 0x40) {
+        val2 = (q2 * p) >> 6;
         val1 = q2;
     } else {
-        tmp = q2 * (0x7F - D_8008EA1A);
-        val1 = (u32) tmp >> 6;
-        val2 = q2;
+        val2 = val1;
+        val1 = (val1 * (0x7F - p)) >> 6;
     }
 
-    if (D_8008EA17 < 0x40) {
-        tmp = val2 * D_8008EA17;
-        val2 = tmp / 64;
+    p = D_8008EA17;
+    if ((u32) p < 0x40) {
+        val2 = (val2 * p) / 64;
     } else {
-        tmp = val1 * (0x7F - D_8008EA17);
-        val1 = tmp / 64;
+        val1 = (val1 * (0x7F - p)) / 64;
     }
 
-    if (D_8008EA11 < 0x40) {
-        tmp = val2 * D_8008EA11;
-        val2 = tmp / 64;
+    p = D_8008EA11;
+    if ((u32) p < 0x40) {
+        val2 = (val2 * p) / 64;
     } else {
-        tmp = val1 * (0x7F - D_8008EA11);
-        val1 = tmp / 64;
+        val1 = (val1 * (0x7F - p)) / 64;
     }
 
     if (D_8008E8C0 == 1) {
-        if (val1 < val2) {
+        if (val2 > val1) {
             val1 = val2;
         } else {
             val2 = val1;
         }
     }
 
-    ((s16 *) D_8008D7F2)[(u16) woff] = val2;
-    flagByte = D_8008D970[idxCopy];
-    ((s16 *) D_8008D7F0)[(u16) woff] = val1;
-    flagByte |= 3;
-    D_8008D970[idxCopy] = flagByte;
+    ((s16 *) D_8008D7F0)[off + 1] = val2;
+    ((s16 *) D_8008D7F0)[off] = val1;
+    D_8008D970[v] |= 3;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceEnvelope);
@@ -291,116 +249,87 @@ void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
 
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 222/228 words, 6 words short. Residue: a persisted early
- * value ($t1 = idx<<3, held live across the whole function) this C does
- * not reproduce -- confirmed still the real gap after round 48's
- * frame-padding lever realigned the frame byte-exactly without closing
- * the length, and after a permuter search (round 37) plateaued at
- * 2430/4125 with no candidate reaching zero (docs/match-reports/
- * StepVoiceFade.md). Hand-derived. */
-void StepVoiceFade(s16 a0)
+/* NON_MATCHING: 228/228 words, length exact, 220/228 raw, funcdiff
+ * insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoPan.
+ * Residue: the pan split's `else` arm -- retail copies the volume into
+ * $a1 and multiplies that copy unmasked; this body masks val1 instead
+ * (docs/match-reports/StepVoiceFade.md). */
+void StepVoiceFade(s16 voice)
 {
-    s16 idxCopy;
-    s16 step;
-    u16 increment;
-    s16 incrementS;
-    u16 accum;
-    s16 limit;
-    u8 accumByte;
-    u8 tableval;
-    s32 product1;
+    s16 v;
+    s16 off;
+    s32 p;
+    s32 acc;
+    s32 vol;
     s32 q1;
-    s32 q1b;
-    u32 q1c;
-    u32 q2;
     u16 val1;
     u16 val2;
+    u32 q2;
     s32 tmp;
-    u8 v0;
 
-    idxCopy = a0;
-    step = gVoiceFadeInterval[a0].unk0;
-    if (step != 0) {
-        u16 current = ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0;
-
-        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = current - 1;
-        if ((s16) current > 0) {
+    v = voice;
+    off = voice * 8;
+    if (gVoiceFadeInterval[voice].unk0 != 0) {
+        if (gVoiceFadeCountdown[voice].unk0-- > 0) {
             return;
         }
-        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = gVoiceFadeInterval[a0].unk0;
+        gVoiceFadeCountdown[voice].unk0 = gVoiceFadeInterval[voice].unk0;
     }
-
-    increment = ((Rec34HalfU *) gVoiceFadeStep)[a0].unk0;
-    accum = ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0;
-    incrementS = gVoiceFadeStep[a0].unk0;
-    accum = accum + increment;
-    ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
-
-    if (incrementS > 0) {
-        limit = gVoiceFadeLimit[a0].unk0;
-        if ((s16) accum >= limit) {
-            accum = limit;
-            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
-            gVoiceFadeActive[a0].unk0 = 0;
+    gVoiceFadeAccum[voice].unk0 += gVoiceFadeStep[voice].unk0;
+    if (gVoiceFadeStep[voice].unk0 > 0) {
+        if (gVoiceFadeAccum[voice].unk0 >= gVoiceFadeLimit[voice].unk0) {
+            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
+            gVoiceFadeActive[voice].unk0 = 0;
         }
-    } else if (incrementS < 0) {
-        limit = gVoiceFadeLimit[a0].unk0;
-        if (limit >= (s16) accum) {
-            accum = limit;
-            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
-            gVoiceFadeActive[a0].unk0 = 0;
+    } else if (gVoiceFadeStep[voice].unk0 < 0) {
+        if (gVoiceFadeAccum[voice].unk0 <= gVoiceFadeLimit[voice].unk0) {
+            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
+            gVoiceFadeActive[voice].unk0 = 0;
         }
     }
 
-    accumByte = *(u8 *) &gVoiceFadeAccum[a0].unk0;
-    D_8008EA11 = accumByte;
-    tableval = D_8008E970->masterVolume;
+    acc = *(u8 *) &gVoiceFadeAccum[v].unk0;
+    D_8008EA11 = acc;
 
-    product1 = D_8008EA10 * (tableval * 0x3FFF);
-    q1 = product1 / 16129;
-    q1b = q1 * D_8008EA16;
-    q1c = q1b * D_8008EA19;
-    q2 = q1c / 16129u;
+    vol = D_8008E970->masterVolume * 0x3FFF;
+    q2 = (D_8008EA10 * vol) / 16129;
+    q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
 
-    if (D_8008EA1A < 0x40) {
-        tmp = q2 * D_8008EA1A;
-        val2 = (u32) tmp >> 6;
+    p = D_8008EA1A;
+    val1 = q2;
+    if ((u32) p < 0x40) {
+        val2 = (q2 * p) >> 6;
         val1 = q2;
     } else {
-        tmp = q2 * (0x7F - D_8008EA1A);
-        val1 = (u32) tmp >> 6;
-        val2 = q2;
+        val2 = val1;
+        val1 = (val1 * (0x7F - p)) >> 6;
     }
 
-    if (D_8008EA17 < 0x40) {
-        tmp = val2 * D_8008EA17;
-        val2 = tmp / 64;
+    p = D_8008EA17;
+    if ((u32) p < 0x40) {
+        val2 = (val2 * p) / 64;
     } else {
-        tmp = val1 * (0x7F - D_8008EA17);
-        val1 = tmp / 64;
+        val1 = (val1 * (0x7F - p)) / 64;
     }
 
-    if (accumByte < 0x40) {
-        tmp = val2 * accumByte;
-        val2 = tmp / 64;
+    p = acc;
+    if ((u32) p < 0x40) {
+        val2 = (val2 * p) / 64;
     } else {
-        tmp = val1 * (0x7F - accumByte);
-        val1 = tmp / 64;
+        val1 = (val1 * (0x7F - p)) / 64;
     }
 
     if (D_8008E8C0 == 1) {
-        if (val1 < val2) {
+        if (val2 > val1) {
             val1 = val2;
         } else {
             val2 = val1;
         }
     }
 
-    D_8008D7F2[idxCopy].unk0 = val2;
-    v0 = D_8008D970[idxCopy];
-    D_8008D7F0[idxCopy].unk0 = val1;
-    v0 |= 3;
-    D_8008D970[idxCopy] = v0;
+    ((s16 *) D_8008D7F0)[off + 1] = val2;
+    ((s16 *) D_8008D7F0)[off] = val1;
+    D_8008D970[v] |= 3;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceFade);
