@@ -373,11 +373,11 @@ struct EntityMoodRow {
     s8 detachKind;   /* +0x03, read by Entity__UpdateActivationState */
     u8 linkKind;      /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
     s8 unk5;           /* +0x05 */
-    s8 unk6;            /* +0x06, read by Entity__UpdateTargetProximity: sign selects whether Class6B5CC__FaceTarget also fires, magnitude (after abs) is Entity__IsNearTarget's distance arg */
+    s8 proximityRange;  /* +0x06, read by Entity__UpdateTargetProximity only (compiler-checked, round 71): magnitude (after abs) is Entity__IsNearTarget's distance arg for raising unkF4 via setUnkF4 (slot164); a NEGATIVE value also makes the entity face its target every tick */
     u8 pad07[0x02];
     s8 unk9;              /* +0x09, distance-fixup byte shared by Entity__UpdateTargetProximity/Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop */
     u8 pad0A[0x01];
-    s8 unkB;                /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop -- SEPARATE field from unk6, not the same byte reread (different functions, different offsets) */
+    s8 cueRange;            /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop only (compiler-checked, round 71): 0 = the cue never auto-starts; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
     u8 pad0C[0x04];
 };
 

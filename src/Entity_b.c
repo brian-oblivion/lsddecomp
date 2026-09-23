@@ -25,7 +25,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
     if (this->active != 0) {
         if (this->unkF4 == 0) {
             xptr = &this->unk14->x;
-            dist = row->unk6;
+            dist = row->proximityRange;
             if (dist < 0) {
                 dist = ~dist + 1;
             }
@@ -33,7 +33,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
                 this->methods->slot164(this, 1);
             }
         }
-        if (row->unk6 < 0) {
+        if (row->proximityRange < 0) {
             Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         }
     }
@@ -47,9 +47,9 @@ s32 Entity__UpdateSoundCueStart(Entity *this) {
 
     if (this->active != 0 && this->soundCueActive == 0 && this->unk44 != 1) {
         row = &gEntityMoodTable[this->moodIndex];
-        if (row->unkB != 0) {
+        if (row->cueRange != 0) {
             xptr = &this->unk14->x;
-            dist = row->unkB;
+            dist = row->cueRange;
             if (dist < 0) {
                 dist = ~dist + 1;
             }
@@ -104,7 +104,7 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
 
     if (this->active != 0 && this->soundCueActive != 0) {
         row = &gEntityMoodTable[this->moodIndex];
-        dist = row->unkB;
+        dist = row->cueRange;
         if (dist < 0) {
             dist = ~dist + 1;
             xptr = &this->unk14->x;
