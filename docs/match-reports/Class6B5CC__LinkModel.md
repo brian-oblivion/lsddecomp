@@ -57,7 +57,7 @@ functions have moved into this unit -- prototype/type unchanged.
 uses that SAME value again, check whether retail re-reads it through the
 field rather than reusing the parameter's own register.** This is a
 sibling of the already-promoted "direct calls beat caching a resolved
-pointer" learning from `func_8001CD60`: GCC 2.6.3 does not always keep a
+pointer" learning from `Class6B5CC__OnNotify`: GCC 2.6.3 does not always keep a
 just-stored value live in its original register when a memory read of the
 same value is available and the source re-mentions the field rather than
 the parameter -- write the SOURCE the way retail's disassembly reads

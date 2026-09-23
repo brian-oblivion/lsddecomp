@@ -65,7 +65,7 @@ void BasicClass__func_18350(void) {
 /* BasicClassMethods slot +0x038, the receiving half of NotifyParents:
  * `sender` is telling `self` that `event` happened. The base class treats
  * event 1 as "sender is going away" and drops it from its own children.
- * Subclasses override this and forward to the base first -- func_8001CD60
+ * Subclasses override this and forward to the base first -- Class6B5CC__OnNotify
  * (code_d294) then dispatches on the sender's class tag, func_80065790
  * (code_55dd4) then checks the sender's tag and the same event == 1 -- so
  * `event` is a general notification code, not a boolean. */

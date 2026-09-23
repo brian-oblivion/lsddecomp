@@ -1,17 +1,19 @@
-# func_8001CD60 -- MATCHED (52/52 words)
+# Class6B5CC__OnNotify -- MATCHED (52/52 words)
+
+> Renamed from `func_8001CD60` on 2026-09-23 (tools/rename.py). Address 0x8001cd60.
 
 Unit: `code_d294` (round 14, first function of a fresh 3-function queue in
 this carve). Occupies `Class6B5CCMethods` vtable slot `+0x038` (an
 override, per the file banner's `classtable.py` census). Forwards
 unconditionally to a new `BasicClassMethodsD294` slot, then dispatches to
 one of three new `Class6B5CCMethods` slots based on `other`'s own
-vtable-header tag nibble. `void func_8001CD60(Class6B5CCObj *self,
+vtable-header tag nibble. `void Class6B5CC__OnNotify(Class6B5CCObj *self,
 GenericObj_d294 *other, s32 arg2)`.
 
 ## Final source
 
 ```c
-void func_8001CD60(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
+void Class6B5CC__OnNotify(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
     s32 tag;
 
     Get_vtable_BasicClass()->slot38(self, other, arg2);

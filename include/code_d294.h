@@ -9,7 +9,7 @@
  * in order, ARE this unit's functions: +0x008 Class6B5CC__Class6B5CC (ctor),
  * +0x00C Class6B5CC__Finalize (dtor), +0x010 Class6B5CC__AddChild, +0x014 Class6B5CC__RemoveChild,
  * +0x018 Class6B5CC__RemoveAllChildren, [+0x01C..+0x038 seven slots inherited verbatim from
- * BasicClass, D_8006B58C], +0x038 func_8001CD60 (override), +0x03C null,
+ * BasicClass, D_8006B58C], +0x038 Class6B5CC__OnNotify (override), +0x03C null,
  * +0x040 func_8001CE30, +0x044 func_8001CEB4, +0x048 func_8001D008,
  * +0x04C func_8001D0EC, +0x050 func_8001D1A4, +0x054 func_8001D204,
  * +0x058 func_8001D280, +0x05C func_8001D33C (already-matched no-op stub),
@@ -290,9 +290,9 @@ struct BasicClassMethodsD294 {
     void (*slot14)(void *self, void *other); /* +0x014 */
     void (*slot18)(void *self);              /* +0x018, Class6B5CC__RemoveAllChildren's forward target */
     u8 pad01C[0x038 - 0x01C];
-    /* +0x038, func_8001CD60's (this unit) own forward target -- called
+    /* +0x038, Class6B5CC__OnNotify's (this unit) own forward target -- called
      * unconditionally as its very first action, `(self, other, arg2)`,
-     * same three-argument shape as func_8001CD60 itself. Real BasicClass-
+     * same three-argument shape as Class6B5CC__OnNotify itself. Real BasicClass-
      * level meaning unknown from this unit alone, same caveat as
      * slot10/slot14 above. */
     void (*slot38)(void *self, void *other, s32 arg2);
@@ -476,7 +476,7 @@ struct Class6B5CCMethods {
     void (*readUnk20Data)(Class6B5CCObj *self, void *dest); /* +0x08C, Class6B5CC__ReadUnk20Data */
     void (*transformAndNotifyParents)(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2); /* +0x090, Class6B5CC__TransformAndNotifyParents */
     /* +0x094/+0x098/+0x09C, a `(self, GenericObj_d294 *other, s32 arg2)`
-     * triple -- func_8001CD60 (code_d294) dispatches to exactly one of
+     * triple -- Class6B5CC__OnNotify (code_d294) dispatches to exactly one of
      * these three depending on `other->methods->header & 0xF` (2 -> +0x094,
      * 5 -> +0x098, 4 -> +0x09C; any other tag value fires none of them).
      * Real per-slot meaning unknown from that call site alone. */

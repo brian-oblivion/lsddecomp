@@ -1379,3 +1379,4 @@ Class6B5CC__Finalize = 0x8001CBA4; // type:func
 Class6B5CC__AddChild = 0x8001CC48; // type:func
 Class6B5CC__RemoveChild = 0x8001CCB4; // type:func
 Class6B5CC__RemoveAllChildren = 0x8001CD20; // type:func
+Class6B5CC__OnNotify = 0x8001CD60; // type:func

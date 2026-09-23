@@ -166,7 +166,7 @@ here exactly as already declared.
   retail, which duplicates that load independently in EACH arm and
   shares only the final `ratan2` call (the SAME "GCC tail-merges an
   identical trailing call, but does not otherwise fuse the branches"
-  shape already documented in `func_8001CD60`'s report). Restructuring
+  shape already documented in `Class6B5CC__OnNotify`'s report). Restructuring
   as `if (table[0] != pos[0]) { ...normal, with its OWN duplicate
   table[2]/pos[2] load... } else { ...special... }` (note the INVERTED
   condition, `!=` not `==`) matched exactly: both the word count and the
@@ -196,7 +196,7 @@ here exactly as already declared.
    new, general lever: prefer "compute in place on the field" over
    "compute in a local, then assign" whenever the local would otherwise
    be used exactly once.
-3. Confirms and extends `func_8001CD60`'s "GCC tail-merges an identical
+3. Confirms and extends `Class6B5CC__OnNotify`'s "GCC tail-merges an identical
    trailing call, but does not fuse the whole branch" finding: the
    merge-vs-duplicate boundary is sensitive to which arm of an `if`/`else`
    is written as the `if` (taken-first) vs the `else` -- swapping the
