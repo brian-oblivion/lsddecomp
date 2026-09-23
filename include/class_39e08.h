@@ -78,7 +78,7 @@ typedef struct Class865C8Methods {
     void (*setUnk2C)(Obj865C8 *self, s32 arg1);    /* +0x06C func_8004A458 */
     void *unk70;                                   /* Class86668__SetChildFlag8 */
     void *unk74, *unk78;                           /* null slots */
-    void (*noop7C)(Obj865C8 *self);                /* +0x07C func_80049EA4 (no-op, matched) */
+    void (*noop7C)(Obj865C8 *self);                /* +0x07C Obj865C8__Noop7C (no-op, matched) */
     /* Retyped from `void (*noop80)(void)`: Obj865C8__OnNotify dispatches this
      * slot as `self->methods->slot80(self, arg1, arg2)` with real
      * arguments loaded into $a1/$a2 -- func_80049EAC (D_800865C8's own

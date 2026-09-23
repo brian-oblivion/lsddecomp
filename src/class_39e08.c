@@ -157,7 +157,7 @@ void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1) {
     self->unk3C = 2;
 }
 
-void func_80049EA4(void) {
+void Obj865C8__Noop7C(void) {
 }
 
 void func_80049EAC(void) {
