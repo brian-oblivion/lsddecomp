@@ -6,7 +6,7 @@
 
 `Class6B5CC` vtable slot `+0x06C`. Sets bit 6 (a 1-bit field) of
 `self->unk10` to `(a1 == 0)`, tail-returning `GetSetBitField`'s result. See
-`func_8001D344.md` for the shared `GetSetBitField` background.
+`Class6B5CC__SetDisplay.md` for the shared `GetSetBitField` background.
 
 ## The C
 
@@ -20,4 +20,4 @@ u32 func_8001D3CC(Class6B5CCObj *self, s32 a1) {
 
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Matched on the first build (part of the five-function bitfield-setter
-group; see `func_8001D344.md`).
+group; see `Class6B5CC__SetDisplay.md`).

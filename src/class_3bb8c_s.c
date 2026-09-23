@@ -43,7 +43,7 @@ typedef struct LinkNodeMethods {
     void (*updateScale)(LinkNode *self, s32 set, void *data);   /* +0x048, Class6B5CC__UpdateScale (GsCOORD2PARAM.scale; sprites: func_80057DF4) */
     void (*attachToParent)(LinkNode *self, void *parent, void *trans); /* +0x04C, Class6B5CC__AttachToParent (coord2 super = parent's, coord.t = trans) */
     u8 pad50[0x60 - 0x50];
-    void (*setDisplay)(LinkNode *self, s32 on);                 /* +0x060, func_8001D344: GsDOFF = !on */
+    void (*setDisplay)(LinkNode *self, s32 on);                 /* +0x060, Class6B5CC__SetDisplay: GsDOFF = !on */
     void (*setSemiTrans)(LinkNode *self, s32 on);               /* +0x064, func_8001D374: GsALON */
     void (*setSemiTransRate)(LinkNode *self, s32 rate);         /* +0x068, func_8001D3A0: attribute bits 28-29 (GsAZERO..GsATHREE) */
     u8 pad6C[0xB8 - 0x6C];

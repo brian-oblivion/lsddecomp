@@ -97,7 +97,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 
 void DreamSys__ResetSessionState(DreamSys *this)
 {
-	this->vt->func_8001D344(this, 0);
+	this->vt->Class6B5CC__SetDisplay(this, 0);
 	this->vt->Class6B5CC__UpdateRotation(this, 1, &ROTATION_YAW_180);
 	this->callback_0x80 = NULL;
 	this->callback_0x98 = NULL;

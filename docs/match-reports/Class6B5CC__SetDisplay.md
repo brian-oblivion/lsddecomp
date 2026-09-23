@@ -1,4 +1,6 @@
-# func_8001D344
+# Class6B5CC__SetDisplay
+
+> Renamed from `func_8001D344` on 2026-09-23 (tools/rename.py). Address 0x8001d344.
 
 **Unit:** code_d294 · **Size:** 12 words · **Status:** MATCHED (12/12 words)
 
@@ -9,7 +11,7 @@
 value was 0 (i.e. it returns the logical negation of the old bit).
 
 See `include/code_d294.h` for `GetSetBitField`, the generic packed-bitfield
-accessor all five sibling functions in this file (`func_8001D344`,
+accessor all five sibling functions in this file (`Class6B5CC__SetDisplay`,
 `func_8001D374`, `func_8001D3A0`, `func_8001D3CC`, `func_8001D3F8`) wrap.
 It lives in the next, still-uncarved slice (`asm/code_d294_b.s`) and was
 read directly off its own disassembly rather than decompiled here.
@@ -17,7 +19,7 @@ read directly off its own disassembly rather than decompiled here.
 ## The C
 
 ```c
-s32 func_8001D344(Class6B5CCObj *self, s32 a1) {
+s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;
 }
 ```

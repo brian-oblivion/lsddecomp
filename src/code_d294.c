@@ -212,7 +212,7 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **ent
 void Class6B5CC__func_1d33c(void) {
 }
 
-s32 func_8001D344(Class6B5CCObj *self, s32 a1) {
+s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;
 }
 

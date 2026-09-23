@@ -7,7 +7,7 @@
 ## What it does
 
 Vtable slot `+0x040`. Resets a batch of session/journal state: calls two
-helper methods (`this->vt->func_8001D344(this, 0)` then
+helper methods (`this->vt->Class6B5CC__SetDisplay(this, 0)` then
 `this->vt->Class6B5CC__UpdateRotation(this, 1, ROTATION_YAW_180)`), then clears eight fields to
 zero: `callback_0x80`, `callback_0x98`, the first word of the still-opaque
 `unk_0xCC` block, three fields in the previously-undiscovered struct tail
@@ -18,7 +18,7 @@ zero: `callback_0x80`, `callback_0x98`, the first word of the still-opaque
 ```c
 void DreamSys__ResetSessionState(DreamSys *this)
 {
-	this->vt->func_8001D344(this, 0);
+	this->vt->Class6B5CC__SetDisplay(this, 0);
 	this->vt->Class6B5CC__UpdateRotation(this, 1, ROTATION_YAW_180);
 	this->callback_0x80 = NULL;
 	this->callback_0x98 = NULL;

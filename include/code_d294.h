@@ -13,7 +13,7 @@
  * +0x040 Class6B5CC__Reset, +0x044 Class6B5CC__UpdateRotation, +0x048 Class6B5CC__UpdateScale,
  * +0x04C Class6B5CC__AttachToParent, +0x050 Class6B5CC__DetachFromParent, +0x054 Class6B5CC__DetachAttachedChildren,
  * +0x058 Class6B5CC__GetNextAttachedChild, +0x05C Class6B5CC__func_1d33c (already-matched no-op stub),
- * +0x060 func_8001D344, +0x064 func_8001D374, +0x068 func_8001D3A0,
+ * +0x060 Class6B5CC__SetDisplay, +0x064 func_8001D374, +0x068 func_8001D3A0,
  * +0x06C func_8001D3CC, +0x070 func_8001D3F8, and continuing past this
  * unit's slice into the next carve (code_d294_b) up to +0x0B4
  * Class6B5CC__NotifyTaggedParents (45 slots total). This is proof, not a guess -- `--vs
@@ -449,7 +449,7 @@ struct Class6B5CCMethods {
      * ignores every argument, so the caller's arity is unconstrained. Same
      * "per-call-site signature" precedent as GetClass6B5CCMethods above. */
     void (*slot5C)(Class6B5CCObj *self, s32 arg1);
-    /* +0x060..+0x084: func_8001D344/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
+    /* +0x060..+0x084: Class6B5CC__SetDisplay/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
      * (all this unit, all already matched) -- not typed here as struct
      * fields because nothing dispatches through the table at these offsets;
      * every call site invokes them directly by symbol name. */
@@ -745,14 +745,14 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **ent
  * `(1<<width)-1` closed form -- retail's own source apparently spelled it
  * as the loop), then shifts that mask into position, clears/sets, and
  * shifts the old value back down. Five of this unit's own functions
- * (func_8001D344/D374/D3A0/D3CC/D3F8) are thin wrappers around this,
+ * (Class6B5CC__SetDisplay/D374/D3A0/D3CC/D3F8) are thin wrappers around this,
  * always over `&self->unk10`, at five non-overlapping bit positions
  * (shift 3 width 3, shift 6 width 1, shift 28 width 2, shift 30 width 1,
  * shift 31 width 1) -- i.e. self->unk10 is a packed flags/small-fields
  * register and these five functions are its per-field setters. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
-s32 func_8001D344(Class6B5CCObj *self, s32 a1);
+s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1);
 u32 func_8001D374(Class6B5CCObj *self, s32 a1);
 u32 func_8001D3A0(Class6B5CCObj *self, u32 a1);
 u32 func_8001D3CC(Class6B5CCObj *self, s32 a1);

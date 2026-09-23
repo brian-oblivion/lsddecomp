@@ -936,7 +936,7 @@ struct vtable_DreamSys{
 	   DreamSys__ResetSessionState as (this, 0) (round 2026-08-30-b). Still
 	   INCLUDE_ASM; address 0x8001D344 is outside this unit/runner's
 	   range. */
-	void (*func_8001D344)(DreamSys *this, s32 arg1);
+	void (*Class6B5CC__SetDisplay)(DreamSys *this, s32 arg1);
 	u32 unknown_functions_0x64[9];
 	/* This function's OWN slot (+0x088, resolved via
 	   tools/classtable.py DREAMSYS_METHODS). Dispatches on `arg1`
