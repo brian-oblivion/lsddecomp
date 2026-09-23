@@ -1512,3 +1512,25 @@ SsUtAutoVol = 0x80031E94; // type:func
 // libsnd/vmanager.o module order has AutoPan (0x4ba8) after AutoVol
 // (0x4b54), matching retail's address order. Round 71 (bravo, track 2).
 SsUtAutoPan = 0x80031EE8; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address Snd_decrescendo by relocation). Round 71 (bravo, track 2).
+Snd_decrescendo = 0x80033C90; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address Snd_play by relocation), resolving a 7-way AMBIGUOUS fingerprint
+// tie (an 11-word trivial-wrapper body shared by Snd_play/SsSepSetAccelerando/
+// SsSepPause/SsSepReplay/SsSepSetRitardando/SsSepStop/_SsSndPlay across
+// several modules). Round 71 (bravo, track 2).
+Snd_play = 0x8003410C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread SeqPlay
+// (disc 3.3). Round 71 (bravo, track 2).
+SeqPlay = 0x80034138; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread GetSeqData
+// (disc 3.3). Round 71 (bravo, track 2).
+GetSeqData = 0x8003424C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread NoteOn
+// (disc 3.3). Round 71 (bravo, track 2).
+NoteOn = 0x800344FC; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread
+// SetProgramChange (disc 3.3); the near-identical-shape ContRpn1/ContRpn2
+// candidates score only masked 0.87. Round 71 (bravo, track 2).
+SetProgramChange = 0x80034614; // type:func

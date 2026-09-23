@@ -1,4 +1,6 @@
-# func_80034138 -- MATCHED (round 69, runner bravo): 69/69, byte-exact, whole-image SHA1 green
+# SeqPlay -- MATCHED (round 69, runner bravo): 69/69, byte-exact, whole-image SHA1 green
+
+> Renamed from `func_80034138` on 2026-09-23 (tools/rename.py). Address 0x80034138.
 
 **REVISITED, round 69: MATCHED; names/types not relevant** (a one-token
 semantic fix in the body, plus the frame pad removed).
@@ -50,7 +52,7 @@ variable a statement stores.
 
 ## History (superseded -- the stall verdict below is retired by the match above)
 
-Old title: func_80034138 -- STALL: length EXACT 69/69; 66/69 raw word-match; first real diff at word 22
+Old title: SeqPlay -- STALL: length EXACT 69/69; 66/69 raw word-match; first real diff at word 22
 
 > **HEAD ADJUDICATION, round 24 (2026-09-08). Classification CONFIRMED. The
 > one axis this report left "not attempted" was attempted by the head and is
@@ -85,7 +87,7 @@ Old title: func_80034138 -- STALL: length EXACT 69/69; 66/69 raw word-match; fir
 >   NOT install a dead computation into a delay slot. Those are different
 >   asks, and only the first is what the lever does.
 
-`asm/nonmatchings/code_179d8_k/func_80034138.s`, vram `0x80034138`, unit
+`asm/nonmatchings/code_179d8_k/SeqPlay.s`, vram `0x80034138`, unit
 `code_179d8_k`. Round 24, runner alpha. Continuation past this unit's
 assigned six functions.
 
@@ -93,7 +95,7 @@ assigned six functions.
 
 A per-channel/slot sequencer "tick" function -- the caller of both
 `func_80035E80` (indirectly, via `rec->unk88`) and a sibling helper,
-`func_8003424C` (still `INCLUDE_ASM` in this unit as of this report, so
+`GetSeqData` (still `INCLUDE_ASM` in this unit as of this report, so
 its own signature/behaviour is an educated guess, not established fact).
 Two new fields on this unit's `Entry90902E8` local struct view:
 
@@ -104,7 +106,7 @@ Two new fields on this unit's `Entry90902E8` local struct view:
   unit's family).
 
 ```c
-void func_80034138(s16 a0, s16 a1, s16 a2)
+void SeqPlay(s16 a0, s16 a1, s16 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     s32 dead[2];
@@ -139,7 +141,7 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
     }
     sum = elapsed;
     for (;;) {
-        func_8003424C(a0, a1);
+        GetSeqData(a0, a1);
         step = rec->unk88;
         if (step != 0) {
             last2 = rec->unk70;
@@ -230,9 +232,9 @@ attempted, flagging as the class rather than guessing at a lever.
 
 ## Verification
 
-`./build-and-verify.sh` build exit=0 with `func_80034138` restored to
+`./build-and-verify.sh` build exit=0 with `SeqPlay` restored to
 `INCLUDE_ASM` (near-miss body preserved above and in `src/` as `#if 0`).
-`funcdiff.py func_80034138` against the near-miss build (prior to
+`funcdiff.py SeqPlay` against the near-miss build (prior to
 reverting): 66/69 words match, compiled length exact.
 
 ### Proposed learning
@@ -254,7 +256,7 @@ Checked this function's delay-slot filler against `func_80034F90.md`'s
 round-31 finding that a "dead" delay-slot filler can actually be a hidden
 UNCONDITIONAL write the stalled C mis-scoped to one branch arm only.
 **Does not apply here**: `addu $a2,$v0,$zero` (disassembly line 34,
-`asm/nonmatchings/code_179d8_k/func_80034138.s`) is a bare GPR-to-GPR
+`asm/nonmatchings/code_179d8_k/SeqPlay.s`) is a bare GPR-to-GPR
 move with no memory effect. Unlike `func_80034F90`'s `sb` store (which
 persists past the branch and is observable from other code paths or a
 later read of the same struct field), a register move that is never read
@@ -266,7 +268,7 @@ found this round; not re-attempted with `decomp-permuter` given the
 budget went to the higher-yield near-miss cluster instead (see
 `func_80034AEC.md`, `func_800349B0.md`, `func_80034C28.md`,
 `func_80035A7C.md`, `func_80034F90.md` for this round's five matches, and
-`func_8003424C.md`/`func_800344FC.md` for the round's other two
+`GetSeqData.md`/`NoteOn.md` for the round's other two
 register-identity re-verifications). This remains a genuine
 register-identity/scheduling STALL per `CLAUDE.md`'s explicit rule.
 
@@ -368,7 +370,7 @@ Rebuilt the preserved body verbatim in isolation first: `build exit=2`, no
 compile errors, `funcdiff.py` reports 66/69, no staleness warning, first
 real diff at word 22 -- matches every prior round's figure exactly.
 
-This same round's `func_800344FC.md` found that wrapping a single-
+This same round's `NoteOn.md` found that wrapping a single-
 statement early `return;` in `do { return; } while (0);` is not always a
 no-op for GCC 2.6.3 -- it closed 1 real word there by perturbing register
 allocation elsewhere in the function. Tried the same wrapper here, on all
@@ -378,13 +380,13 @@ guard immediately after).
 
 **Result: hard regression, not neutral.** `1/69` words match with
 `build-and-verify.sh` showing **210365 bytes of whole-image drift** -- the
-function's compiled LENGTH itself changed, unlike `func_800344FC`'s clean
+function's compiled LENGTH itself changed, unlike `NoteOn`'s clean
 same-length improvement. Reverted immediately; `git status --porcelain`
 confirmed clean, `build-and-verify.sh` re-confirmed byte-exact after
 revert.
 
 **Not a like-for-like test of the other function's lever, and worth
-saying why**: `func_800344FC` wrapped exactly ONE return, in a function
+saying why**: `NoteOn` wrapped exactly ONE return, in a function
 whose residue was a pure register rotation with no length change
 possible. This function's four returns sit across three different
 control-flow depths (nested inside `if (delta > 0)`, and a sibling
@@ -395,7 +397,7 @@ was not isolated this round (this function's residue -- a load-pair
 scheduling order plus one delay-slot filler, both confirmed pure-
 scheduling by rounds 24/31/32 -- sits in the function's PROLOGUE, before
 any of the four returns are reached, so there is no obviously-adjacent
-single return to target the way `func_800344FC`'s residue sat right next
+single return to target the way `NoteOn`'s residue sat right next
 to its own early return).
 
 **No new attempt beyond this one negative.** Given this function's
@@ -407,7 +409,7 @@ independent axes tried and failed. `INCLUDE_ASM` unchanged, still 66/69.
 
 ### Proposed learning
 
-The `do { return; } while (0)` lever (`func_800344FC.md`, this round) is
+The `do { return; } while (0)` lever (`NoteOn.md`, this round) is
 NOT a blanket "always worth trying on any early return" move -- applying
 it to FOUR returns at once, in a function whose actual residue sits in
 the prologue rather than adjacent to any of those returns, produced a
@@ -432,7 +434,7 @@ length exact, first real diff at word 22 -- matches the title and every
 prior round exactly.
 
 **Check 3, run fresh:** built a new scaffold from this report's own
-preserved body (`tools/setup-permuter.sh func_80034138 <seed>`); base
+preserved body (`tools/setup-permuter.sh SeqPlay <seed>`); base
 compiles. `--debug --stack-diffs`: **base score 260** -- `Stack
 Differences: 0`, `Branch Differences: 0`, `Register Differences: 0`,
 `Reorderings: 1`, `Insertions: 1`, `Deletions: 1`. This is an EXACT match

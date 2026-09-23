@@ -29,11 +29,11 @@
  *
  * Sizes, cheapest first -- six functions at 31..51 words, which is the
  * cheap seam the `fresh` queue had run out of:
- *   func_80034614  31w   func_800350D8  31w   func_80035154  31w
+ *   SetProgramChange  31w   func_800350D8  31w   func_80035154  31w
  *   func_80035A7C  44w   func_80035E80  47w   func_80034D90  51w
- *   func_80034138  69w   func_800344FC  70w   func_80034E5C  77w
+ *   SeqPlay  69w   NoteOn  70w   func_80034E5C  77w
  *   func_800349B0  79w   func_80034AEC  79w   func_80034F90  82w
- *   func_80034C28  90w   func_8003424C 172w   func_800357B0 179w
+ *   func_80034C28  90w   GetSeqData 172w   func_800357B0 179w
  *   func_80034690 200w   func_80035B2C 213w   func_800351D0 376w
  *
  * THIS UNIT OWNS THREE SWITCH JUMP TABLES, not the two the old remainder
@@ -153,18 +153,18 @@ extern Entry90902E8 *D_800902E8[];
 extern s32 func_80035E80(s16 channel, s16 slot);
 
 /* Forward declaration for a sibling function defined later in THIS unit
- * (func_8003424C, still INCLUDE_ASM) -- called from func_80034138's
+ * (GetSeqData, still INCLUDE_ASM) -- called from SeqPlay's
  * catch-up loop below with the same (channel, slot) pair as every other
  * helper in this file; its own return/side effects are not yet
  * characterised since it has not been matched. */
-extern void func_8003424C(s16 channel, s16 slot);
+extern void GetSeqData(s16 channel, s16 slot);
 
 /* Catch-up scheduler tick.  When the re-armed counter is still reloading
  * its threshold (remain == 0) it copies the threshold rec->unk70 into the
  * counter.  The third parameter is unused; retail reuses its dead register
  * ($a2) to hold rec->unk70 for that store (round 69,
- * docs/match-reports/func_80034138.md). */
-void func_80034138(s16 a0, s16 a1, s16 a2)
+ * docs/match-reports/SeqPlay.md). */
+void SeqPlay(s16 a0, s16 a1, s16 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     s16 last = rec->unk70;
@@ -194,7 +194,7 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
     }
     sum = elapsed;
     for (;;) {
-        func_8003424C(a0, a1);
+        GetSeqData(a0, a1);
         step = rec->unk88;
         if (step != 0) {
             last2 = rec->unk70;
@@ -209,13 +209,13 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
 }
 
 /* Forward declarations for sibling functions defined later in THIS unit,
- * needed because func_8003424C dispatches to them by MIDI-style status
- * byte before they appear in ROM-address order below.  func_800344FC's
+ * needed because GetSeqData dispatches to them by MIDI-style status
+ * byte before they appear in ROM-address order below.  NoteOn's
  * signature is the one already established in its own (still-stalled) STALL
  * comment above; func_80034690's and func_80035B2C's are this function's own
  * reading, derived from the registers loaded before each call below. */
-extern void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3);
-extern void func_80034614(s16 a0, s16 a1, u8 a2);
+extern void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3);
+extern void SetProgramChange(s16 a0, s16 a1, u8 a2);
 extern void func_80034690(s16 a0, s16 a1, u8 a2);
 extern void func_80035A7C(s16 a0, s16 a1);
 extern void func_80035B2C(s16 a0, s16 a1, u8 a2);
@@ -238,9 +238,9 @@ extern void func_80035B2C(s16 a0, s16 a1, u8 a2);
  * register-identity swap (retail's widened "channel" lives in $s4 and its
  * per-case data byte in $s3; this C compiles the same roles into $s3/$s4
  * the other way around), CLAUDE.md's register-identity STALL rule --
- * reshaping tried and did not move it (docs/match-reports/func_8003424C.md).
+ * reshaping tried and did not move it (docs/match-reports/GetSeqData.md).
  * Hand-derived. */
-void func_8003424C(s16 a0, s16 a1)
+void GetSeqData(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p;
@@ -261,7 +261,7 @@ void func_8003424C(s16 a0, s16 a1)
             rec->unk4 = p + 2;
             vel = *(p + 1);
             rec->unk88 = func_80035E80(a0, a1);
-            func_800344FC(a0, a1, note, vel);
+            NoteOn(a0, a1, note, vel);
             return;
         case 0xB0:
             p = rec->unk4;
@@ -275,7 +275,7 @@ void func_8003424C(s16 a0, s16 a1)
             rec->unk11 = 0xC0;
             rec->unk4 = p + 1;
             note = *p;
-            func_80034614(a0, a1, note);
+            SetProgramChange(a0, a1, note);
             return;
         case 0xE0:
             rec->unk11 = 0xE0;
@@ -299,13 +299,13 @@ void func_8003424C(s16 a0, s16 a1)
             vel = *rec->unk4;
             rec->unk4 = rec->unk4 + 1;
             rec->unk88 = func_80035E80(a0, a1);
-            func_800344FC(a0, a1, raw, vel);
+            NoteOn(a0, a1, raw, vel);
             return;
         case 0xB0:
             func_80034690(a0, a1, raw);
             return;
         case 0xC0:
-            func_80034614(a0, a1, raw);
+            SetProgramChange(a0, a1, raw);
             return;
         case 0xE0:
             func_80035A7C(a0, a1);
@@ -319,18 +319,18 @@ void func_8003424C(s16 a0, s16 a1)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_8003424C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetSeqData);
 #endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 62/70 words, length exact. Residue: register-identity
  * rename ($t0<->$a2 for the a0 copy kept live across the two calls,
  * $a3/$s1<->$t0 for the masked-a3 copy), not a logic or CFG difference
- * (docs/match-reports/func_800344FC.md). Permuter candidate, semantics
+ * (docs/match-reports/NoteOn.md). Permuter candidate, semantics
  * reviewed round 66; its winning mutation (`return;` as
  * `do { return; } while (0);`) is in the report, not here: this body is
  * for the reader and the verified build never compiles it. */
-void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
+void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset = rec->unk12;
@@ -358,10 +358,10 @@ void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_800344FC);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_k", NoteOn);
 #endif
 
-void func_80034614(s16 a0, s16 a1, u8 a2)
+void SetProgramChange(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
@@ -1118,7 +1118,7 @@ extern void _SsSndNextSep(s32 a0, s32 a1);
  * view, per project convention. */
 extern u32 gSeqTickRate;
 
-/* Meta-event handler, reached from func_8003424C's 0xFF ("running status
+/* Meta-event handler, reached from GetSeqData's 0xFF ("running status
  * for a 0xF0 event") and new-status 0xF0 dispatch arms with `a2` = the
  * meta-event TYPE byte. Only two types are understood; everything else is
  * silently ignored:

@@ -59,7 +59,7 @@ with concrete argument roles:
   StartNote(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
   0x21` is a real sentinel value this function itself branches on (see
   below).
-- `code_179d8_k.c`'s `func_800344FC` (its own report, STALL):
+- `code_179d8_k.c`'s `NoteOn` (its own report, STALL):
   `StartNote(packed, note, vol, (u8)a3, (u16)divided, status)` where
   `packed = (a1<<8)|a0` is a `[screen | slot<<8]` pair into the SAME
   `D_800902E8[][]` array this function itself indexes with `a0`. This
@@ -89,7 +89,7 @@ until you diff registers, not just word counts.
   document with their own reduced view. This function only needs
   `unk12` (a byte OFFSET, per `code_179d8_k.c`'s fuller struct) and reads
   a per-voice "speed" `s16` at `*(s16*)((u8*)rec + 0x4E + rec->unk12*2)` --
-  the SAME access shape `code_179d8_k.c`'s `func_800344FC` already uses on
+  the SAME access shape `code_179d8_k.c`'s `NoteOn` already uses on
   the identical field, corroborating both units' independent readings.
 - `Tbl32E978` (already declared for `SpuVmPBVoice`'s stall) needed
   EXTENDING, not a second conflicting type: this function additionally
@@ -420,7 +420,7 @@ extern SlotE968M *D_8008E968;
  * (see code_179d8_k.c's fuller Entry90902E8 for what it points at:
  * `*(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2)` is a per-voice "speed"
  * table this function also reads, same access shape as that unit's own
- * func_800344FC). */
+ * NoteOn). */
 typedef struct {
     u8 pad0[0x12];
     u8 unk12; /* +0x12 */
@@ -454,7 +454,7 @@ extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
 /* Called as `StartNote(0x21, p0, p1, p2, outA, outB)` from
  * code_179d8_j.c's SpuVmSeKeyOn and as
  * `StartNote(packed, note, vol, (u8)a3, (u16)divided, status)` from
- * code_179d8_k.c's func_800344FC -- signature confirmed independently
+ * code_179d8_k.c's NoteOn -- signature confirmed independently
  * by three sibling units' own extern guesses (code_179d8_i/_j/_k all
  * agree on this exact shape). `a0` is a packed [screen | slot<<8]
  * dispatch id into `D_800902E8`; `a1`/`a2` are the "key" values
@@ -595,7 +595,7 @@ it again.
 corroborated independently by three sibling units (`code_179d8_i.c`,
 `code_179d8_j.c`, `code_179d8_k.c`, per this report's own "Signature"
 section) before any body-level derivation: `code_179d8_k.c`'s
-`func_800344FC` calls this in its nonzero-velocity branch and StopNote in
+`NoteOn` calls this in its nonzero-velocity branch and StopNote in
 its zero-velocity branch of the SAME MIDI-status-byte switch, and
 `code_179d8_j.c` wraps both with the same fixed leading identity constant
 (`0x21`) -- a clean NoteOn/NoteOff symmetry, which is the primary evidence

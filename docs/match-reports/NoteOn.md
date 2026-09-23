@@ -1,6 +1,8 @@
-# func_800344FC -- STALL: length EXACT 70/70; 62/70 raw word-match (round 47, up from 61/70); first real diff at word 1
+# NoteOn -- STALL: length EXACT 70/70; 62/70 raw word-match (round 47, up from 61/70); first real diff at word 1
 
-`asm/nonmatchings/code_179d8_k/func_800344FC.s`, vram `0x800344FC`, unit
+> Renamed from `func_800344FC` on 2026-09-23 (tools/rename.py). Address 0x800344fc.
+
+`asm/nonmatchings/code_179d8_k/NoteOn.s`, vram `0x800344FC`, unit
 `code_179d8_k`. Round 24, runner alpha. Continuation past this unit's
 assigned six functions. Round 31, runner bravo (re-verified, still
 stalled).
@@ -9,7 +11,7 @@ stalled).
 
 Rebuilt the preserved near-miss body and reproduced the title figures
 exactly: 44/70 raw word-match, compiled length exact (70/70), first real
-diff at word 1. `tools/asm-differ/diff.py func_800344FC` confirms every
+diff at word 1. `tools/asm-differ/diff.py NoteOn` confirms every
 remaining mismatch is a same-opcode, same-operand REGISTER RENAME
 (`$t0`<->`$a2`, `$s0`<->`$s1`, `$t1`/`$t2`/`$t3`<->`$t0`/`$t1`/`$t2`),
 exactly as this report's original derivation found. Checked this
@@ -143,7 +145,7 @@ Body as originally reached (round 24/31, 44/70 -- **superseded, see the round
 32 update above for the current 61/70 body preserved in `src/`**):
 
 ```c
-void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
+void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset = rec->unk12;
@@ -175,7 +177,7 @@ Current best body (round 32, 61/70 -- this is what `src/code_179d8_k.c`
 actually preserves in `#if 0` now):
 
 ```c
-void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
+void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 offset = rec->unk12;
@@ -207,7 +209,7 @@ void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3)
 The 3rd parameter (`a2`) is genuinely unused in every reachable path --
 same "silent ABI waste" idiom already documented for other functions in
 this project (`SpuVmSeKeyOn`, `func_800319B4`, and this unit's own
-`func_80034138`).
+`SeqPlay`).
 
 ## Levers that mattered
 
@@ -260,7 +262,7 @@ The mechanism is visible in one delay slot: retail's `beqz $v0,END`
 (the `flag == 0` early return) has `move $a3,$a2` in its delay slot --
 a value that is providably NEVER READ again on that path, since the
 function returns immediately after. This is the SAME class this
-session's `func_80034138` hit (a delay slot filled with a
+session's `SeqPlay` hit (a delay slot filled with a
 computation that only APPEARS meaningful, reusing the caller's
 otherwise-dead 3rd argument register because it happened to be free).
 Tried (round 31): writing the equivalent dead statement explicitly in C
@@ -280,9 +282,9 @@ round.
 
 ## Verification
 
-`./build-and-verify.sh` build exit=0 with `func_800344FC` restored to
+`./build-and-verify.sh` build exit=0 with `NoteOn` restored to
 `INCLUDE_ASM` (near-miss body preserved above and in `src/` as `#if 0`, now
-the round-32 61/70 version). `funcdiff.py func_800344FC` against the
+the round-32 61/70 version). `funcdiff.py NoteOn` against the
 near-miss build (prior to reverting): 61/70 words match, compiled length
 exact (70/70). Whole-image `build-and-verify.sh` re-confirmed byte-exact
 after reverting to `INCLUDE_ASM`.
@@ -379,7 +381,7 @@ fresh search target for exactly that reason.
 
 **All three pre-checks run, in order:**
 - **(a)** Scaffold built from the current 61/70 body (`tools/setup-
-  permuter.sh func_800344FC <seed>`); base compiles.
+  permuter.sh NoteOn <seed>`); base compiles.
 - **(b)** `--debug --stack-diffs`: base score 50, **`Insertions: 0`,
   `Deletions: 0`, Register Differences: 10, Reorderings: 0** -- a clean
   0/0, matching this report's own characterization of the residue as a
@@ -505,7 +507,7 @@ scaffold figures. AGREE case; searched with confidence.
 exit via the 900s bound (rc=124, own file). 35666 iterations** (this
 round ran with more contention than round 48's own 81231-iteration run
 at `-j 6` -- lower `-j` chosen deliberately to leave headroom for a
-concurrent search this round on `func_80034138`, see that report). **No
+concurrent search this round on `SeqPlay`, see that report). **No
 output directory was created** -- the held best remained the base score
 of 45 for the entire run, i.e. not even a single sub-45 candidate was
 found this time, matching round 48's own outcome exactly.
@@ -544,7 +546,7 @@ The head's round-49 "a recorded negative is scoped to the state it was
 measured in" discipline is worth applying systematically, but it is a
 lead to CHECK, not a lever to trust -- of the two functions in this unit
 where an old negative was re-tried against a since-changed state this
-round (this one, and `func_80034138`'s duplicate-branch permuter
+round (this one, and `SeqPlay`'s duplicate-branch permuter
 candidates), both re-confirmed negative rather than being unlocked. The
 discipline earns its keep by ruling things back in cheaply, not by
 guaranteeing they will move.

@@ -2,7 +2,7 @@
  * code_179d8_i -- what is LEFT of functions 220..237 of the original
  * code_179d8 monolith after round 34 gave fourteen of its sixteen functions
  * back to Sony.  Now 0x24490..0x247B8 (vram 0x80033C90..0x80033FB8), a
- * ONE-function unit holding func_80033C90 alone.
+ * ONE-function unit holding Snd_decrescendo alone.
  *
  * ROUND 34 (2026-09-12): 0x2397C..0x24490 is TEN linked `libsnd` objects
  * (all Psy-Q 3.3) covering ELEVEN functions, every one of which had been
@@ -33,7 +33,7 @@
  * previously MATCHED as C and all three now deleted from here.  That run sat
  * in the MIDDLE of what the prefix trim had left, so the slice became
  * [c][o][o][c] and the tail half became the one-function unit
- * `src/code_179d8_i_b.c` (func_8003410C).  Nothing moved with it: this unit
+ * `src/code_179d8_i_b.c` (Snd_play).  Nothing moved with it: this unit
  * never owned a rodata attach.
  *
  * `libsnd/pause` is taken from the 3.3 disc ON PURPOSE: 3.5/3.6 split that
@@ -112,7 +112,7 @@ extern Entry90902E8 *D_800902E8[];
  * `sll 16`/`bltz` idiom for checking a 16-bit value's sign without a
  * plain `lh`.
  *
- * STALL -- see docs/match-reports/func_80033C90.md for the full
+ * STALL -- see docs/match-reports/Snd_decrescendo.md for the full
  * algorithm derivation (correct, byte-verified block-by-block against
  * the asm) and the best C body reached (18/202 words, first diff at
  * word 1 -- the prologue's own `-0x40` vs `-0x38` frame size). The
@@ -121,7 +121,7 @@ extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
 extern s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2);
 
 #if 0
-void func_80033C90(s16 a0, s16 a1)
+void Snd_decrescendo(s16 a0, s16 a1)
 {
     Entry90902E8 **row = &D_800902E8[a0];
     s32 off = a1 * sizeof(Entry90902E8);
@@ -197,4 +197,4 @@ tailFinal:
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", func_80033C90);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_i", Snd_decrescendo);

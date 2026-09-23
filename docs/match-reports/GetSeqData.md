@@ -1,7 +1,9 @@
-# func_8003424C -- STALL (register identity)
+# GetSeqData -- STALL (register identity)
+
+> Renamed from `func_8003424C` on 2026-09-23 (tools/rename.py). Address 0x8003424c.
 
 **Length exact 172/172. Raw word-match 122/172. First real diff at word 2**
-(`tools/asm-differ/diff.py func_8003424C`, which realigns -- confirmed no
+(`tools/asm-differ/diff.py GetSeqData`, which realigns -- confirmed no
 address drift: `funcdiff.py` printed no "differs OUTSIDE this range" warning).
 
 Round 31, runner bravo: re-verified, `decomp-permuter` searched, no zero
@@ -72,7 +74,7 @@ byte.
 running-status byte. It was previously unnamed padding
 (`pad11[0x12-0x11]`, exactly 1 byte, so this is a rename, not a shift --
 confirmed no other field moved and the whole-image build still verifies
-with `func_8003424C` still `INCLUDE_ASM`'d, i.e. before any of this
+with `GetSeqData` still `INCLUDE_ASM`'d, i.e. before any of this
 function's own C was trusted).
 
 ## The block-order lever, and why it mattered here
@@ -100,7 +102,7 @@ were byte-identical.
 
 The same phenomenon applies to the second (running-status) dispatch on
 `rec->unk11`, with the extra wrinkle that its "F0" kind is checked as
-`0xFF` (matching the cached value `func_8003424C` itself writes on the
+`0xFF` (matching the cached value `GetSeqData` itself writes on the
 status-byte path) rather than `0xF0`.
 
 ## The residue that would not move
@@ -128,7 +130,7 @@ after every one of these):**
 3. Dropping the separate `cursor` local for the first byte-read and
    folding it into the same `p`-based idiom the case bodies use.
 4. Introducing a single shared `note` variable used as the argument to
-   `func_80034690`/`func_80034614`/`func_80035B2C` in the 0xB0/0xC0/0xF0
+   `func_80034690`/`SetProgramChange`/`func_80035B2C` in the 0xB0/0xC0/0xF0
    cases (instead of passing `*p` inline), to raise that pseudo's
    reference count closer to "channel"'s.
 5. Declaring `note`/`vel` as `s32` (matching the callee parameter types
@@ -156,13 +158,13 @@ this is ordinary C control flow, not an unrepresentable GTE/COP2 access.
  *
  * Forward declarations needed because this function dispatches to siblings
  * defined later in the same unit's ROM-address order:
- *   extern void func_800344FC(s16 a0, s16 a1, s32 a2, s32 a3);
- *   extern void func_80034614(s16 a0, s16 a1, u8 a2);
+ *   extern void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3);
+ *   extern void SetProgramChange(s16 a0, s16 a1, u8 a2);
  *   extern void func_80034690(s16 a0, s16 a1, u8 a2);
  *   extern void func_80035A7C(s16 a0, s16 a1);
  *   extern void func_80035B2C(s16 a0, s16 a1, u8 a2);
  */
-void func_8003424C(s16 a0, s16 a1)
+void GetSeqData(s16 a0, s16 a1)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p;
@@ -183,7 +185,7 @@ void func_8003424C(s16 a0, s16 a1)
             rec->unk4 = p + 2;
             vel = *(p + 1);
             rec->unk88 = func_80035E80(a0, a1);
-            func_800344FC(a0, a1, note, vel);
+            NoteOn(a0, a1, note, vel);
             return;
         case 0xB0:
             p = rec->unk4;
@@ -197,7 +199,7 @@ void func_8003424C(s16 a0, s16 a1)
             rec->unk11 = 0xC0;
             rec->unk4 = p + 1;
             note = *p;
-            func_80034614(a0, a1, note);
+            SetProgramChange(a0, a1, note);
             return;
         case 0xE0:
             rec->unk11 = 0xE0;
@@ -221,13 +223,13 @@ void func_8003424C(s16 a0, s16 a1)
             vel = *rec->unk4;
             rec->unk4 = rec->unk4 + 1;
             rec->unk88 = func_80035E80(a0, a1);
-            func_800344FC(a0, a1, raw, vel);
+            NoteOn(a0, a1, raw, vel);
             return;
         case 0xB0:
             func_80034690(a0, a1, raw);
             return;
         case 0xC0:
-            func_80034614(a0, a1, raw);
+            SetProgramChange(a0, a1, raw);
             return;
         case 0xE0:
             func_80035A7C(a0, a1);
@@ -264,13 +266,13 @@ whole-function register-color swap is a categorically harder target than
 the single-instruction residues the permuter is proven to close.
 
 **Considered, not attempted: the "dead-value reuse" lever that closed 17
-words on `func_800344FC` this same round.** That lever needs a value that
+words on `NoteOn` this same round.** That lever needs a value that
 goes genuinely dead at some point so its storage can be reused for another
 value without adding a competing allocno. This function's parameters (`a0`,
 `a1`) are both live for the ENTIRE function body (every case reads `rec` via
 `a0`/`a1`, and four of five case bodies pass one or both straight through to
 a callee) -- there is no dead parameter or dead intermediate to reuse the way
-`func_800344FC`'s unused 3rd parameter or dying `speed` local provided.
+`NoteOn`'s unused 3rd parameter or dying `speed` local provided.
 Confirmed by inspection rather than by trying and failing: this lever's own
 documented discriminator ("a local that exists ONLY to carry one branch's
 result to a single later use, with a provably dead parameter in scope") is
@@ -285,7 +287,7 @@ the lever's stated applicability.
   allocator's global coloring decision.
 - **Lever 2 (register-identity verdict is a hypothesis)**: **checked, DID
   NOT apply.** Looked specifically for the scratch-value-reuse discriminator this round
-  already applied successfully on `func_800344FC` and found no candidate -- see above. The verdict
+  already applied successfully on `NoteOn` and found no candidate -- see above. The verdict
   stands as filed: a genuine register-identity STALL, not a mislabeled
   simpler defect.
 - **Lever 3 (emission order != source order)**: not newly tested; the six
@@ -329,7 +331,7 @@ parameters (`channel` and the per-case data byte), confirmed by
 all showing the SAME pair swapped, never a reordered load or multiply pair.
 There is no adjacent-load-pair shape anywhere in this residue for the lever
 to act on -- consistent with round 33's own finding that the dead-value-
-reuse lever (which DID apply to this round's `func_800344FC`/
+reuse lever (which DID apply to this round's `NoteOn`/
 `func_800357B0`) has no candidate here either, since both `a0`/`a1` are
 live across the entire function body with no dead parameter or dying local
 to reuse.

@@ -131,7 +131,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **`do { ... } while (0)` is a REAL RTL construct to 2.6.3, not a no-op brace block.** The loop
   pass runs over it, so it can change code a plain `{ }` in the identical place does not, and that
   bare-brace control IS the discriminator. Its effect is not fixed: scheduling on `func_8004CAF0`,
-  global register allocation on `func_80033C90`. (a round 58, bravo + charlie)
+  global register allocation on `Snd_decrescendo`. (a round 58, bravo + charlie)
 - **Two levers that each MEASURE AS A REGRESSION alone can be byte-exact together.**
   `func_8004CFB8`: halves scored 17/28 and 10/28 singly, 28/28 jointly. Try the product before
   discarding either reading. (a round 58, bravo)
@@ -354,7 +354,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   game", §"A delay-slot residue writing `$a0`-`$a3`")
 - **The same forward trace applies to a DEAD PARAMETER's register, which 2.6.3 reuses as scratch.**
   A delay-slot `move $aN, $vM` is filler only once `$aN`'s next READ on every path is found; in
-  `func_80034138` a store two blocks on read it, so the source stored the wrong value (the unused
+  `SeqPlay` a store two blocks on read it, so the source stored the wrong value (the unused
   parameter instead of a local). A permuter never swaps which variable a statement stores, so
   searching cannot find it. (round 69)
 - **A bare `nop` in a call's delay slot establishes arity ONLY when the argument is not already in

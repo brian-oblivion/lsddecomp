@@ -1,6 +1,8 @@
-# func_80034614 -- MATCHED (31/31 words)
+# SetProgramChange -- MATCHED (31/31 words)
 
-`asm/nonmatchings/code_179d8_k/func_80034614.s`, vram `0x80034614`, unit
+> Renamed from `func_80034614` on 2026-09-23 (tools/rename.py). Address 0x80034614.
+
+`asm/nonmatchings/code_179d8_k/SetProgramChange.s`, vram `0x80034614`, unit
 `code_179d8_k`. Round 24, runner alpha.
 
 ## What it is
@@ -17,7 +19,7 @@ overloaded scratch slot every function in this unit's family stores its
 own last-computed value into.
 
 ```c
-void func_80034614(s16 a0, s16 a1, u8 a2)
+void SetProgramChange(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = (u8 *)rec + rec->unk12;
@@ -53,7 +55,7 @@ force it to be evaluated FIRST and pin it to a temp register, when retail
 computes the inner multiply first and keeps IT in the callee-saved
 register instead. Writing the double-index inline lets the compiler order
 the two independently, which reproduced retail's register choice for at
-least 5 of 6 functions in this unit's family (`func_80034614`,
+least 5 of 6 functions in this unit's family (`SetProgramChange`,
 `func_800350D8`, `func_80035154` matched outright; `func_80035A7C` and
 `func_80035E80` still had unrelated residues but this specific prologue
 mismatch was gone from all of them).
@@ -62,4 +64,4 @@ mismatch was gone from all of them).
 
 `./build-and-verify.sh` build exit=2 (clean compile, whole-image SHA1 not
 yet green -- other functions in this unit and others are still queued).
-`funcdiff.py func_80034614`: 31/31 words match, no drift.
+`funcdiff.py SetProgramChange`: 31/31 words match, no drift.

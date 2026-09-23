@@ -21,7 +21,7 @@
  * reclassifying them out of the game count is the correction CLAUDE.md asks
  * for, not a regression. A placed object cannot live inside a `c` segment, so
  * the slice had to become [c][o][o][c] and the second `c` needed its own name.
- * The first half kept `code_179d8_i` and is now func_80033C90 alone.
+ * The first half kept `code_179d8_i` and is now Snd_decrescendo alone.
  *
  * A ONE-FUNCTION UNIT IS FINE and has precedent (`class_3bb8c_v`, and
  * `code_179d8_f_b` earlier in this same round).
@@ -44,9 +44,9 @@
  */
 #include "common.h"
 
-extern s32 func_80034138(s16 a0, s16 a1); /* arity-ok: the definition's third parameter is never read (round 69, docs/match-reports/func_80034138.md); its return type is void there, see PROGRESS round 69 */
+extern s32 SeqPlay(s16 a0, s16 a1); /* arity-ok: the definition's third parameter is never read (round 69, docs/match-reports/SeqPlay.md); its return type is void there, see PROGRESS round 69 */
 
-s32 func_8003410C(s16 a0, s16 a1)
+s32 Snd_play(s16 a0, s16 a1)
 {
-    return func_80034138(a0, a1);
+    return SeqPlay(a0, a1);
 }

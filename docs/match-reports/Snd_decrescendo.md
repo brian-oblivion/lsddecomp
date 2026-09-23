@@ -1,4 +1,6 @@
-# func_80033C90 — STALL (re-derived round 58; register-identity residue)
+# Snd_decrescendo — STALL (re-derived round 58; register-identity residue)
+
+> Renamed from `func_80033C90` on 2026-09-23 (tools/rename.py). Address 0x80033c90.
 
 **Two bodies were measured and BOTH are preserved below, because on this
 function the two title figures rank them in opposite orders.** Read this
@@ -24,7 +26,7 @@ every structural measure and needs the negHandler lever re-applied. Do not
 
 **First real diff (both bodies):** word 0 — the prologue.
 Retail `addiu $sp,$sp,-0x40`, built `addiu $sp,$sp,-0x38`. Read off
-`tools/asm-differ/diff.py func_80033C90`, not inferred.
+`tools/asm-differ/diff.py Snd_decrescendo`, not inferred.
 
 **On the pre-round-58 title, and why "length exact" and "M/N" must be stated
 separately.** It read "Length: exact, 202/202 words" and "Raw word-match:
@@ -96,11 +98,11 @@ with `code_179d8_j.c`'s established `SpuVmGetSeqVol(s32 p0, s16 *, s16 *)`.
    is what produced the `ori $zero,0xFFFF`-in-a-callee-saved-register shape
    the old report attributed to allocation pressure.
 
-4. **"the signature `void func_80033C90(s32, s32)` is already fixed by that
+4. **"the signature `void Snd_decrescendo(s32, s32)` is already fixed by that
    caller's own extern declaration" — there is no such caller and no such
    declaration.** `func_80033738` became `libsnd/sscall` (`SsSeqCalledTbyT`)
    in round 34, in this very file's own header comment. `grep -rn
-   func_80033C90 src/ include/ config/` finds NOTHING outside this unit. The
+   Snd_decrescendo src/ include/ config/` finds NOTHING outside this unit. The
    parameter types were free the whole time, and `s16` parameters build 1 word
    closer than `s32`-plus-casts. **A "fixed by the caller" claim has a
    lifetime: it dies when the caller leaves the game count.**
@@ -223,15 +225,15 @@ Gate 3, all three checks run 2026-09-19, on body A:
 2. **`--debug --stack-diffs`** — Insertions 9, Deletions 11, Stack
    Differences 96. Net `-2` insns, which is the real tree's `200 vs 202`.
 3. **agreement — run the BYTES way, per bravo's round-58 correction.**
-   `objdump -d` of `permuter-work/func_80033C90/base.o` against
+   `objdump -d` of `permuter-work/Snd_decrescendo/base.o` against
    `build/src/code_179d8_i.c.o` built from the same body: 201 disassembly
    lines each, `diff` **EMPTY** — not even branch targets differ, because
    here the function is the whole object's `.text`. **AGREE.**
 
    ```sh
    OD=tools/binutils/bin/mipsel-linux-gnu-objdump
-   for o in build/src/code_179d8_i.c.o permuter-work/func_80033C90/base.o; do
-       $OD -d $o | sed -n '/<func_80033C90>:/,/^$/p' | sed 's/^ *[0-9a-f]*:\t//'
+   for o in build/src/code_179d8_i.c.o permuter-work/Snd_decrescendo/base.o; do
+       $OD -d $o | sed -n '/<Snd_decrescendo>:/,/^$/p' | sed 's/^ *[0-9a-f]*:\t//'
    done   # ... diff the two
    ```
 
@@ -284,7 +286,7 @@ callee-saved permutation and the 8-byte `vars` gap.
 
 ```c
 #if 0
-void func_80033C90(s16 a0, s16 a1)
+void Snd_decrescendo(s16 a0, s16 a1)
 {
     Entry90902E8 **row = &D_800902E8[a0];
     s32 off = a1 * sizeof(Entry90902E8);
@@ -374,7 +376,7 @@ so nobody re-derives it as a discovery.
 
 ```c
 #if 0
-void func_80033C90(s16 a0, s16 a1)
+void Snd_decrescendo(s16 a0, s16 a1)
 {
     Entry90902E8 **row = &D_800902E8[a0];
     s32 off = a1 * sizeof(Entry90902E8);
