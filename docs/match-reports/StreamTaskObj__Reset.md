@@ -8,7 +8,7 @@
 
 Resets the five fields the `StreamTaskObj__SetUnkC4`.."`7C`" setters (see that
 report) write individually: `self->unkC4=0; unkC8=-1; unkCC=1; unkD0=0;
-unkD4=1;`. Slot `+0x040` of `D_8006E5F8` (`Get_vtable_StreamTaskObj`'s report), so
+unkD4=1;`. Slot `+0x040` of `gStreamTaskObjMethods` (`Get_vtable_StreamTaskObj`'s report), so
 presumably an "init"/"reset" method for this `StreamTaskObj` class.
 
 ## Derivation

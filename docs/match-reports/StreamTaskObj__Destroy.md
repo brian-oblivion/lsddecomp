@@ -12,7 +12,7 @@ side effect. First, a genuine virtual call through `self->unkB4`'s own
 here for the first time in this unit); second, the same
 `Get_vtable_TaskCore()`-mediated delegation to the sibling class `gTaskCoreMethods`
 (`LoaderTaskMethods`) used by `StreamTaskObj__func_8003BD74`/`StreamTaskObj__func_8003BDAC`, this time
-slot `+0x00C`. Occupies `D_8006E5F8` slot `+0x00C` itself.
+slot `+0x00C`. Occupies `gStreamTaskObjMethods` slot `+0x00C` itself.
 
 ## Derivation
 

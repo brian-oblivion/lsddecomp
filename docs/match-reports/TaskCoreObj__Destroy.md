@@ -72,8 +72,8 @@ Beyond the correction:
 - New fields `unk70` (`+0x070`, `s32`, boolean guard) and `unk74` (`+0x074`,
   `StreamTaskUnkB4Obj *`).
 - New `StreamTaskObjMethods` slot `+0x0DC`, called (not occupied) by this
-  function: `D_8006E5F8+0x0DC = func_8003D050`, extern, void, confirmed to
-  exist via `classtable.py D_8006E5F8`.
+  function: `gStreamTaskObjMethods+0x0DC = func_8003D050`, extern, void, confirmed to
+  exist via `classtable.py gStreamTaskObjMethods`.
 - New `TaskUtilMethods` slot `+0x00C` (`gIntermediateBaseMethods+0x00C =
   BasicClass__func_17f2c`, extern, void — the generic base-class slot name
   already seen elsewhere in this game).

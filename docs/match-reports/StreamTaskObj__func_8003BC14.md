@@ -40,7 +40,7 @@ void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
   `classtable.py gTaskCoreMethods` confirms it's occupied (`func_8003C63C`, a
   different unit) — result discarded, typed `void`.
 - `self->methods->slot94(self)`: new `StreamTaskObjMethods` slot `+0x094`.
-  `classtable.py D_8006E5F8` shows it occupied by **this unit's own,
+  `classtable.py gStreamTaskObjMethods` shows it occupied by **this unit's own,
   already-matched `StreamTaskObj__func_8003BDF4`** — `void StreamTaskObj__func_8003BDF4(StreamTaskObj
   *self)`, single argument, which is exactly the arity the disassembly here
   needs (only `a0` set before the `jalr`, no `a1`).

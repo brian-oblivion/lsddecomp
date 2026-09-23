@@ -9,7 +9,7 @@
 Identical shape to `StreamTaskObj__func_8003BD74` (see that report for the full
 derivation and the return-type discussion) one slot over: forwards to
 `Get_vtable_TaskCore()`'s (i.e. `gTaskCoreMethods`'s / `LoaderTaskMethods`'s) slot
-`+0x084` instead of `+0x080`. Occupies `D_8006E5F8` slot `+0x084` itself.
+`+0x084` instead of `+0x080`. Occupies `gStreamTaskObjMethods` slot `+0x084` itself.
 
 ## Derivation
 

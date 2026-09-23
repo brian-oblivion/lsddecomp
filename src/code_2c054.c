@@ -148,7 +148,7 @@ void StreamTaskObj__SetUnkD4(StreamTaskObj *self, s32 a1) {
 }
 
 StreamTaskObjMethods *Get_vtable_StreamTaskObj(void) {
-    return &D_8006E5F8;
+    return &gStreamTaskObjMethods;
 }
 
 /* The TaskCore allocator: 0xA4 bytes, constructed through the base class's

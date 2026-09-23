@@ -6,8 +6,8 @@
 
 ## Summary
 
-This is `StreamTaskObj`'s constructor — occupies `D_8006E5F8`'s own slot
-`+0x008` (per `classtable.py D_8006E5F8`, confirming the earlier header
+This is `StreamTaskObj`'s constructor — occupies `gStreamTaskObjMethods`'s own slot
+`+0x008` (per `classtable.py gStreamTaskObjMethods`, confirming the earlier header
 comment that named this function as the ctor reached through
 `Get_vtable_StreamTaskObj()`'s slot).
 
@@ -34,7 +34,7 @@ void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, S
   `(self, a1, a2, a3)` signature ahead of writing that function.
 - `self->methods->slot40(self)`: new `StreamTaskObjMethods` slot `+0x040`,
   occupied by this unit's own already-matched `StreamTaskObj__Reset` (per
-  `classtable.py D_8006E5F8`) — confirms single-argument arity.
+  `classtable.py gStreamTaskObjMethods`) — confirms single-argument arity.
 - `StreamTaskInitData` (new type): a plain 3-word struct. Both the
   function's optional 5th (stack) argument `a4` and `GetDefaultStreamTaskInitData()`'s
   return value are this shape — retail copies whichever one applies

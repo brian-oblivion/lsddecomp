@@ -40,7 +40,7 @@ void TaskCoreObj__Reset(StreamTaskObj *self) {
   local, or GCC reloads it from memory instead of keeping it live in a
   register, changing the instruction count.
 - Three new `StreamTaskObjMethods` slots, all void-returning (discarded
-  results), confirmed to exist via `tools/classtable.py D_8006E5F8`:
+  results), confirmed to exist via `tools/classtable.py gStreamTaskObjMethods`:
   `+0x09C = func_8003CAF8`, `+0x0A0 = func_8003CB30`,
   `+0x0A4 = func_8003CB68` (all extern, other units).
 - `slotA4`'s three pointer arguments are `&D_8006E860[0]`, `&D_8006E860[3]`,

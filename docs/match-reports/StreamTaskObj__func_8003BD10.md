@@ -26,8 +26,8 @@ void StreamTaskObj__func_8003BD10(StreamTaskObj *self) {
   elsewhere in `code_2c054.h`). `tools/classtable.py gTaskCoreMethods` shows slot
   `+0x078 = func_8003C858` (a different unit, not touched here — only the
   slot's existence and signature matter for this call site).
-- `self->methods` is `StreamTaskObjMethods*` (`D_8006E5F8`).
-  `tools/classtable.py D_8006E5F8` shows slot `+0x060 = StreamTaskObj__func_8003BC14`, which
+- `self->methods` is `StreamTaskObjMethods*` (`gStreamTaskObjMethods`).
+  `tools/classtable.py gStreamTaskObjMethods` shows slot `+0x060 = StreamTaskObj__func_8003BC14`, which
   is this unit's own queued `StreamTaskObj__func_8003BC14` — confirms the slot exists and
   that its signature is `(StreamTaskObj *self, s32 a1)`.
 - Both call results are discarded in the disassembly, so both slots are typed
@@ -36,7 +36,7 @@ void StreamTaskObj__func_8003BD10(StreamTaskObj *self) {
 ## Proposed learning
 
 `tools/classtable.py <table>` cross-referenced against the OTHER known table
-(`D_8006E5F8` vs `gTaskCoreMethods`) is a fast way to confirm a newly-added vtable
+(`gStreamTaskObjMethods` vs `gTaskCoreMethods`) is a fast way to confirm a newly-added vtable
 slot's existence and arity before writing the call: the callee occupying that
 slot is often another function already queued (sometimes in the same unit,
 sometimes not), and its own parameter list is direct evidence for the slot's

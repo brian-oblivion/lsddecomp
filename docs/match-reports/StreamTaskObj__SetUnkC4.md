@@ -13,8 +13,8 @@ toolchain-blocked (checked first per the runner brief: no `jr $t2`, no
 `gp_rel`, no `addiu $at,$at,%lo`).
 
 All five (plus `Get_vtable_StreamTaskObj` right after them) are consecutive slots
-`+0x124`.."+0x134` of this class's own method table `D_8006E5F8` (confirmed
-with `tools/classtable.py D_8006E5F8`), which is how their object type was
+`+0x124`.."+0x134` of this class's own method table `gStreamTaskObjMethods` (confirmed
+with `tools/classtable.py gStreamTaskObjMethods`), which is how their object type was
 identified: `New_StreamTaskObj`'s allocator call sizes the object at `0xDC`
 bytes and constructs it through `Get_vtable_StreamTaskObj`'s slot `+0x008`, so all five
 setters, plus `Get_vtable_StreamTaskObj` itself, operate on that same `0xDC`-byte

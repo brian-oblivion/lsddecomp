@@ -16,8 +16,8 @@
  * this unit's own local view: only the vtable slots and object fields this
  * unit's queued functions actually touch are given concrete types.
  *
- * Method table is D_8006E5F8 (77 slots, see `tools/classtable.py
- * D_8006E5F8`). Slots +0x004, +0x044, +0x06C, +0x12C already have an
+ * Method table is gStreamTaskObjMethods (77 slots, see `tools/classtable.py
+ * gStreamTaskObjMethods`). Slots +0x004, +0x044, +0x06C, +0x12C already have an
  * established signature in `Class6D3C8.h`'s `StreamTaskMethods` (all void);
  * +0x00C, +0x080, +0x084 are new here and typed void by the same
  * established-sibling-slot convention (no counter-evidence found).
@@ -60,34 +60,34 @@ struct StreamTaskObjMethods {
     u8 pad0C[0x040 - 0x00C];
     void (*slot40)(StreamTaskObj *self); /* +0x040, StreamTaskObj__StreamTaskObj's forward target;
                                               occupied by this unit's own StreamTaskObj__Reset
-                                              (per tools/classtable.py D_8006E5F8) --
+                                              (per tools/classtable.py gStreamTaskObjMethods) --
                                               confirms the single-argument signature */
     u8 pad44[0x060 - 0x044];
     void (*slot60)(StreamTaskObj *self, s32 a1); /* +0x060, StreamTaskObj__func_8003BC14 occupies this slot
-                                                      (per tools/classtable.py D_8006E5F8) */
+                                                      (per tools/classtable.py gStreamTaskObjMethods) */
     u8 pad64[0x06C - 0x064];
     void (*slot6C)(StreamTaskObj *self, s32 a1); /* +0x06C, StreamTaskObj__SetUnk40 occupies this slot
-                                                      (per tools/classtable.py D_8006E5F8);
+                                                      (per tools/classtable.py gStreamTaskObjMethods);
                                                       StreamTaskObj__func_8003BAB4 dispatches through it rather
                                                       than calling StreamTaskObj__SetUnk40 directly */
     u8 pad70[0x094 - 0x070];
     void (*slot94)(StreamTaskObj *self); /* +0x094, StreamTaskObj__func_8003BC14's forward target;
-                                                D_8006E5F8+0x094 = StreamTaskObj__func_8003BDF4, this unit's
+                                                gStreamTaskObjMethods+0x094 = StreamTaskObj__func_8003BDF4, this unit's
                                                 own already-matched function (single-arg
                                                 signature confirms the arity here) */
     u8 pad98[0x09C - 0x098];
     void (*slot9C)(StreamTaskObj *self, s32 a1); /* +0x09C, TaskCoreObj__Reset's forward target
-                                                      (D_8006E5F8+0x09C = func_8003CAF8) */
+                                                      (gStreamTaskObjMethods+0x09C = func_8003CAF8) */
     void (*slotA0)(StreamTaskObj *self, s32 a1); /* +0x0A0, TaskCoreObj__Reset's forward target
-                                                      (D_8006E5F8+0x0A0 = func_8003CB30) */
+                                                      (gStreamTaskObjMethods+0x0A0 = func_8003CB30) */
     void (*slotA4)(StreamTaskObj *self, u8 *a1, u8 *a2, u8 *a3); /* +0x0A4, TaskCoreObj__Reset's
-                                                      forward target (D_8006E5F8+0x0A4 = func_8003CB68) */
+                                                      forward target (gStreamTaskObjMethods+0x0A4 = func_8003CB68) */
     u8 padA8[0x0D4 - 0x0A8];
     void (*slotD4)(StreamTaskObj *self, s32 a1, s32 a2); /* +0x0D4, TaskCoreObj__TaskCoreObj's forward
-                                                      target (D_8006E5F8+0x0D4 = func_8003CDE0) */
+                                                      target (gStreamTaskObjMethods+0x0D4 = func_8003CDE0) */
     u8 padD8[0x0DC - 0x0D8];
     void (*slotDC)(StreamTaskObj *self); /* +0x0DC, TaskCoreObj__Destroy's forward target
-                                                      (D_8006E5F8+0x0DC = func_8003D050) */
+                                                      (gStreamTaskObjMethods+0x0DC = func_8003D050) */
     void (*slotE0)(StreamTaskObj *self, s32 a1); /* +0x0E0, TaskCoreObj__func_8003C238's forward target */
     void (*slotE4)(StreamTaskObj *self, u8 *a1); /* +0x0E4, TaskCoreObj__func_8003C238's forward target;
                                                       a1 is `&self->unk90`, an address into self */
@@ -182,11 +182,11 @@ struct StreamTaskObj {
 };
 
 /* This class's own "GetMethods" accessor (compare `Get_vtable_Entity` in
- * Entity.h) -- returns &D_8006E5F8 with no other side effect. Called by
+ * Entity.h) -- returns &gStreamTaskObjMethods with no other side effect. Called by
  * New_StreamTaskObj/StreamTaskObj__StreamTaskObj (both still INCLUDE_ASM, not this batch) to
  * fetch the ctor at slot +0x008. */
 extern StreamTaskObjMethods *Get_vtable_StreamTaskObj(void);
-extern StreamTaskObjMethods D_8006E5F8;
+extern StreamTaskObjMethods gStreamTaskObjMethods;
 
 /* A rodata table TaskCoreObj__Reset reaches only by ADDRESS (`lui`/`addiu`, no
  * `lw`/`sw` here) -- passed to slotA4 as three pointers 3 bytes apart

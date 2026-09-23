@@ -10,9 +10,9 @@ Forwards to a SECOND sibling class's table (`Get_vtable_IntermediateBase()`, ret
 `&gIntermediateBaseMethods`) at slot `+0x044`, passing `self` and both of its own
 arguments unchanged, discards that call's return, then reads and returns
 `self->unk38`. This function itself occupies `gTaskCoreMethods` slot `+0x044` --
-i.e. it is the delegation TARGET that `StreamTaskObj__Configure` (`D_8006E5F8::slot44`)
+i.e. it is the delegation TARGET that `StreamTaskObj__Configure` (`gStreamTaskObjMethods::slot44`)
 calls into (see that report). One level further down the same chain:
-`D_8006E5F8::slot44` (`StreamTaskObj__Configure`) -> `gTaskCoreMethods::slot44`
+`gStreamTaskObjMethods::slot44` (`StreamTaskObj__Configure`) -> `gTaskCoreMethods::slot44`
 (`TaskCoreObj__func_8003C1DC`, this function) -> `gIntermediateBaseMethods::slot44` (unnamed,
 uncarved).
 

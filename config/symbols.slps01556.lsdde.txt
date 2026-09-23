@@ -1720,3 +1720,4 @@ TaskCoreObj__Reset = 0x8003C11C; // type:func
 TaskCoreObj__func_8003C1DC = 0x8003C1DC; // type:func
 TaskCoreObj__func_8003C238 = 0x8003C238; // type:func
 TaskCoreObj__func_8003C3D0 = 0x8003C3D0; // type:func
+gStreamTaskObjMethods = 0x8006E5F8;

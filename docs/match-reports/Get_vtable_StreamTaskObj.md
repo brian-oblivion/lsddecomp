@@ -6,14 +6,14 @@
 
 ## What it does
 
-The class's own "GetMethods" accessor -- returns `&D_8006E5F8` and nothing
+The class's own "GetMethods" accessor -- returns `&gStreamTaskObjMethods` and nothing
 else, the same shape as `Get_vtable_Entity` in `include/Entity.h` and
 `func_80066818` in `include/code_55dd4.h`. Called (still `INCLUDE_ASM`, not
 this batch) by `New_StreamTaskObj` (the allocator) and `StreamTaskObj__StreamTaskObj` (the
 constructor) to fetch the class's ctor at slot `+0x008` and to install the
 methods pointer at object offset 0, respectively.
 
-`D_8006E5F8` (`tools/classtable.py D_8006E5F8`, 77 slots) is this unit's
+`gStreamTaskObjMethods` (`tools/classtable.py gStreamTaskObjMethods`, 77 slots) is this unit's
 biggest single piece of context this round: five of its slots
 (`+0x124`..`+0x134`) are the plain setters `StreamTaskObj__SetUnkC4`.."`7C`", and
 several more (`+0x00C`, `+0x040`, `+0x044`, `+0x080`, `+0x084`) are other
@@ -23,15 +23,15 @@ functions matched in this same batch (`StreamTaskObj__Destroy`, `StreamTaskObj__
 ## Derivation
 
 ```
-lui   $v0, %hi(D_8006E5F8)
-addiu $v0, $v0, %lo(D_8006E5F8)
+lui   $v0, %hi(gStreamTaskObjMethods)
+addiu $v0, $v0, %lo(gStreamTaskObjMethods)
 jr    $ra
  nop
 ```
 
 ```c
 StreamTaskObjMethods *Get_vtable_StreamTaskObj(void) {
-    return &D_8006E5F8;
+    return &gStreamTaskObjMethods;
 }
 ```
 
@@ -43,11 +43,11 @@ Matches the `lui`/`addiu` idiom already confirmed elsewhere in this project:
 
 Added `include/code_2c054.h`'s `StreamTaskObjMethods` (currently just the
 header word -- no other slot of this table is dereferenced by anything in
-this unit's queue) and `extern StreamTaskObjMethods D_8006E5F8;`.
+this unit's queue) and `extern StreamTaskObjMethods gStreamTaskObjMethods;`.
 
 ## Proposed learning
 
-`D_8006E5F8` sits right next to a second class's table, `gTaskCoreMethods`
+`gStreamTaskObjMethods` sits right next to a second class's table, `gTaskCoreMethods`
 (`Class6D3C8.h`'s `LoaderTaskMethods`, established from a completely
 different allocator/unit, `New_TaskCoreObj`). `StreamTaskObj`'s own slots
 `+0x00C`/`+0x080`/`+0x084` (`StreamTaskObj__Destroy`/`StreamTaskObj__func_8003BD74`/`StreamTaskObj__func_8003BDAC`)
@@ -55,7 +55,7 @@ forward straight through to `gTaskCoreMethods`'s implementations of the *same*
 offsets, passing `self` on unchanged -- a delegation pattern between two
 independent sibling classes, not inheritance (confirmed because `gTaskCoreMethods`
 has its own distinct overrides elsewhere, e.g. `+0x040`/`+0x044` are
-different functions from `D_8006E5F8`'s). Worth knowing before assuming an
+different functions from `gStreamTaskObjMethods`'s). Worth knowing before assuming an
 accessor-returned table is always the object's *own* class: sometimes a
 class's own vtable slot body reaches for a *different* class's table via a
 second accessor and calls straight through it.

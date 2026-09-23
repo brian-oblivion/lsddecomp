@@ -11,7 +11,7 @@ This occupies `TaskCoreMethods`'s (`gTaskCoreMethods`) own slot `+0x008` (per
 (`StreamTaskObj`'s own ctor) as `Get_vtable_TaskCore()->slot08(self, a1, a2, a3)`.
 It is a **base-class constructor**: it briefly points `self->methods` at its
 own table (`gTaskCoreMethods`) before the derived ctor (`StreamTaskObj__StreamTaskObj`)
-overwrites it with the real `D_8006E5F8` table right after this call
+overwrites it with the real `gStreamTaskObjMethods` table right after this call
 returns — the classic constructor-chaining shape, now confirmed directly
 rather than inferred.
 
@@ -53,7 +53,7 @@ only the header's declared types.
 - `Get_vtable_TaskCore()->slotD8(self, a1)`: new `TaskCoreMethods` slot `+0x0D8`
   (`gTaskCoreMethods+0x0D8 = func_8003CE98`, extern, void).
 - `self->methods->slotD4(self, 0, 0)`: new `StreamTaskObjMethods` slot
-  `+0x0D4` (`D_8006E5F8+0x0D4 = func_8003CDE0`, extern, void).
+  `+0x0D4` (`gStreamTaskObjMethods+0x0D4 = func_8003CDE0`, extern, void).
 - New fields: `unk44` (`+0x044`, `s32`, set from `a2`), `unk48` (`+0x048`,
   originally guessed `s32`, either a call result or `a3` verbatim), `unk7C`
   (`+0x07C`, originally guessed `s32`, call result), `unk80` (`+0x080`,

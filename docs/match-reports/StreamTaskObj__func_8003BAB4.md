@@ -29,7 +29,7 @@ void StreamTaskObj__func_8003BAB4(StreamTaskObj *self) {
   plus one stack-spilled 5th, `self->unkC8`), **return value tested directly
   by the following `beqz`, never stored anywhere** — typed `s32`.
 - `self->methods->slot6C(self, 0)`: reuses the slot established to be
-  `StreamTaskObj__SetUnk40`'s occupied slot (`+0x06C` on `D_8006E5F8`), called only
+  `StreamTaskObj__SetUnk40`'s occupied slot (`+0x06C` on `gStreamTaskObjMethods`), called only
   when `slot40`'s result is nonzero.
 - New field `self->unkA4` (`+0x0A4`, `s32`): reset to 0 unconditionally here;
   a different function (`StreamTaskObj__func_8003BB5C`, this same round) both reads it and

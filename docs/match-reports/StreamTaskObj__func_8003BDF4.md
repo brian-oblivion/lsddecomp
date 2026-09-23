@@ -30,7 +30,7 @@ void StreamTaskObj__func_8003BDF4(StreamTaskObj *self) {
   counter-evidence.
 - `self->methods->slot60(self, 7)` reuses the slot established matching
   `StreamTaskObj__func_8003BD10` in the same round (`StreamTaskObjMethods::slot60`,
-  occupied by `StreamTaskObj__func_8003BC14` per `classtable.py D_8006E5F8`).
+  occupied by `StreamTaskObj__func_8003BC14` per `classtable.py gStreamTaskObjMethods`).
 
 ## Proposed learning
 

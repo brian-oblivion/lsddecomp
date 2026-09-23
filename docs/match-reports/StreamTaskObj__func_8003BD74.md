@@ -10,7 +10,7 @@ A one-line forwarder: fetches the sibling class's method table via
 `Get_vtable_TaskCore()` (returns `&gTaskCoreMethods`, `Class6D3C8.h`'s `LoaderTaskMethods`
 -- see `Get_vtable_StreamTaskObj`'s report for how the delegation between the two
 sibling classes was established) and calls its slot `+0x080`, passing
-`self` straight through. Occupies `D_8006E5F8` slot `+0x080` itself.
+`self` straight through. Occupies `gStreamTaskObjMethods` slot `+0x080` itself.
 
 ## Derivation
 
