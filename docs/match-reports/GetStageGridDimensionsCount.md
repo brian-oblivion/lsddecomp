@@ -1,4 +1,6 @@
-# func_800494B4
+# GetStageGridDimensionsCount
+
+> Renamed from `func_800494B4` on 2026-09-23 (tools/rename.py). Address 0x800494b4.
 
 **Unit:** StageGrid · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 

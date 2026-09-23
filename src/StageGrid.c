@@ -19,11 +19,11 @@
 #include "common.h"
 #include "StageGrid.h"
 
-/* The dimensions table has 14 entries; func_800494B4 and the guard in
+/* The dimensions table has 14 entries; GetStageGridDimensionsCount and the guard in
  * GetStageGridDimensionsTable are the only two places that constant appears. */
 #define STAGE_GRID_DIMENSIONS_COUNT 14
 
-s32 func_800494B4(void) {
+s32 GetStageGridDimensionsCount(void) {
     return STAGE_GRID_DIMENSIONS_COUNT;
 }
 

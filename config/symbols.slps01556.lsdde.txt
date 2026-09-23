@@ -1691,3 +1691,4 @@ gStyleDecorPosBY = 0x8008AB74;
 gStyleDecorSlots = 0x8008E10C;
 gStyleEffectSlots = 0x8008E0C8;
 gStyleCueSlotPool = 0x8008E154;
+GetStageGridDimensionsCount = 0x800494B4; // type:func

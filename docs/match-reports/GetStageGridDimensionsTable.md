@@ -23,7 +23,7 @@ jr    $ra
 `$a0` is a nullable `s32 *`: tested against zero, and on the non-null path a
 full word is stored, so the pointee is 4 bytes. lsddecomp's header named the
 parameter `unknown`; `count` is better supported by what the code does with it,
-and the length is the same `0xE` `func_800494B4` returns.
+and the length is the same `0xE` `GetStageGridDimensionsCount` returns.
 
 Note the `ori` sits in the branch's DELAY SLOT, so it executes on both paths —
 which is why the value is computed before the null test in the assembly but
