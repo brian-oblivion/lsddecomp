@@ -1,4 +1,6 @@
-# func_8003F1A8 — MATCHED
+# Unk18Obj__SetSubHandle — MATCHED
+
+> Renamed from `func_8003F1A8` on 2026-09-23 (tools/rename.py). Address 0x8003f1a8.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 34/34 words, full match (2
 real attempts).
@@ -6,7 +8,7 @@ real attempts).
 ## Signature
 
 ```c
-void func_8003F1A8(Unk18Obj *self, SubHandleObj *arg1);
+void Unk18Obj__SetSubHandle(Unk18Obj *self, SubHandleObj *arg1);
 ```
 
 `Unk18ObjMethods`'s own `+0x0A8` slot occupant (`slotA8`) — a DIFFERENT
@@ -25,7 +27,7 @@ shared `D_8008A904` constant (already known from round 13's
 `Unk18Obj__Unk18Obj`, the same 3rd argument).
 
 ```c
-void func_8003F1A8(Unk18Obj *self, SubHandleObj *arg1) {
+void Unk18Obj__SetSubHandle(Unk18Obj *self, SubHandleObj *arg1) {
     if (self->unk10 != NULL) {
         return;
     }

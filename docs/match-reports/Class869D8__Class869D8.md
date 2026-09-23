@@ -8,7 +8,7 @@
 
 The constructor (`ctor`, slot +0x008) for `Class869D8`. Standard
 class-framework shape, same as e.g. class_39e08.c's `func_8004A19C`: chain
-to a base class's ctor (fetched via `func_8003F24C()`), install this
+to a base class's ctor (fetched via `GetUnk18ObjMethods()`), install this
 class's own vtable, then call the just-installed vtable's own
 post-construct hook (slot +0x040, currently `func_8004D2F8` -- already
 matched, an empty body).
@@ -18,7 +18,7 @@ matched, an empty body).
 ```c
 void Class869D8__Class869D8(Class869D8 *self)
 {
-    func_8003F24C()->ctor(self);
+    GetUnk18ObjMethods()->ctor(self);
     self->methods = GetClass869D8Methods();
     self->methods->slot40(self);
 }
@@ -26,11 +26,11 @@ void Class869D8__Class869D8(Class869D8 *self)
 
 ## Notes
 
-`func_8003F24C` is a base-ctor-table getter this unit has no other
+`GetUnk18ObjMethods` is a base-ctor-table getter this unit has no other
 evidence about beyond this one call site: the retail instruction sequence
 sets up only `self` for the ctor call (no second argument register is
 touched), so it's declared minimally as
-`extern BaseCtorTable_3bb8c_c *func_8003F24C(void);` with
+`extern BaseCtorTable_3bb8c_c *GetUnk18ObjMethods(void);` with
 `BaseCtorTable_3bb8c_c` holding only a `ctor(void *self)` field at +0x008
 (see `include/class_3bb8c.h`). This is a fresh, file-local extern
 declaration -- it does not need to agree with any other unit's own

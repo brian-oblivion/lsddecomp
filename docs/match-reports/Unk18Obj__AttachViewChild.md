@@ -1,4 +1,6 @@
-# func_8003EACC — MATCHED
+# Unk18Obj__AttachViewChild — MATCHED
+
+> Renamed from `func_8003EACC` on 2026-09-23 (tools/rename.py). Address 0x8003eacc.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 46/46 words, full match (3
 real attempts).
@@ -6,7 +8,7 @@ real attempts).
 ## Signature
 
 ```c
-void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
+void Unk18Obj__AttachViewChild(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
 ```
 
 `Unk18ObjMethods`'s own `+0x044` slot occupant. `arg5` is the 5th
@@ -23,7 +25,7 @@ dispatches `slot80` with `arg5` (or a default global, `D_8008A8F4`, when
 still-uncarved slice). Does nothing once `self->unk10` is already set.
 
 ```c
-void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5) {
+void Unk18Obj__AttachViewChild(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5) {
     Unk18ObjMethods *m = self->methods;
 
     if (self->unk10 != NULL) {
@@ -69,8 +71,8 @@ void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5) {
   address-only — `func_8003F2AC` isn't decompiled in this project).
 - `Unk18ObjMethods` gains `slot78`/`slot7C`/`slot80` (all `void (*)
   (Unk18Obj*, void*)`), splitting the old `pad078` span. Occupants (this
-  unit): `func_8003EBC4`/`func_8003EBF8` (both still queued as of this
-  report) and `func_8003EC2C` (the documented `gp_rel` blocker, not
+  unit): `Unk18Obj__SetViewPos`/`Unk18Obj__SetUnk20` (both still queued as of this
+  report) and `Unk18Obj__SetRatio12` (the documented `gp_rel` blocker, not
   decompiled).
 - New externs `D_8008A8F4` (`asm/data/7B008.sdata.s`, address-only) and
   `func_8003F2AC` (`asm/code_2cc8c_e.s`, the next uncarved slice).

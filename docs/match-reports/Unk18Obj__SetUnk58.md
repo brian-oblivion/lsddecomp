@@ -1,4 +1,6 @@
-# func_8003EA84 — MATCHED
+# Unk18Obj__SetUnk58 — MATCHED
+
+> Renamed from `func_8003EA84` on 2026-09-23 (tools/rename.py). Address 0x8003ea84.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 8/8 words, full match (2 real
 attempts).
@@ -6,7 +8,7 @@ attempts).
 ## Signature
 
 ```c
-void func_8003EA84(Unk18Obj *self, SByte3_d294 *src);
+void Unk18Obj__SetUnk58(Unk18Obj *self, SByte3_d294 *src);
 ```
 
 `Unk18ObjMethods`'s own `+0x064` slot occupant.
@@ -17,7 +19,7 @@ Copies a 3-byte record from `src` into `self->unk58`, as one whole-struct
 assignment.
 
 ```c
-void func_8003EA84(Unk18Obj *self, SByte3_d294 *src) {
+void Unk18Obj__SetUnk58(Unk18Obj *self, SByte3_d294 *src) {
     self->unk58 = *src;
 }
 ```
@@ -40,7 +42,7 @@ void func_8003EA84(Unk18Obj *self, SByte3_d294 *src) {
 
 `include/code_2cc8c.h`: new `SByte3_d294` type; `Unk18Obj` gains `unk58`
 (`+0x058`, `SByte3_d294`) and its sibling `unk5B` (`+0x05B`, see
-`func_8003EAA4`'s report).
+`Unk18Obj__SetUnk5B`'s report).
 
 ## Proposed learning
 

@@ -7,15 +7,15 @@
 ## What it does
 
 The `New_X` allocator for the class whose table is returned by
-`func_8003F24C` (external, still-uncarved remainder of this segment): the
+`GetUnk18ObjMethods` (external, still-uncarved remainder of this segment): the
 same allocator `Obj86B60__Init` calls to fill `self->unk18` when no override
 was supplied. Allocates a 0xBC-byte instance and, on success, runs the
 class's own constructor through the table's slot +0x008
-(`func_8003F24C()->ctor(self)`), returning the new instance; returns `NULL`
+(`GetUnk18ObjMethods()->ctor(self)`), returning the new instance; returns `NULL`
 explicitly on allocation failure.
 
 This unit's SECOND shared-table region: `D_8006E8E4` (`tools/classtable.py
-D_8006E8E4`, 45 slots) is the table `func_8003F24C` returns and this
+D_8006E8E4`, 45 slots) is the table `GetUnk18ObjMethods` returns and this
 function constructs an instance of, and it accounts for the rest of this
 round's queue (`Unk18Obj__Unk18Obj`/`Unk18Obj__Finalize`/`Unk18Obj__AddChild`/
 `Unk18Obj__RemoveChild` = its own slots `+0x008`/`+0x00C`/`+0x010`/`+0x014`) --
@@ -30,7 +30,7 @@ Unk18Obj *New_Unk18Obj(void)
 
     self = func_80017B34(0xBC);
     if (self != NULL) {
-        func_8003F24C()->ctor(self);
+        GetUnk18ObjMethods()->ctor(self);
         return self;
     }
     return NULL;

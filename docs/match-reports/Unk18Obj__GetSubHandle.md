@@ -1,11 +1,13 @@
-# func_8003F230 — MATCHED
+# Unk18Obj__GetSubHandle — MATCHED
+
+> Renamed from `func_8003F230` on 2026-09-23 (tools/rename.py). Address 0x8003f230.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 3/3 words, full match.
 
 ## Signature
 
 ```c
-SubHandleObj *func_8003F230(Unk18Obj *self);
+SubHandleObj *Unk18Obj__GetSubHandle(Unk18Obj *self);
 ```
 
 `Unk18ObjMethods`'s own `+0x0AC` slot occupant.
@@ -16,7 +18,7 @@ A plain getter for the already-typed `unkB0` field (established by alpha's
 round-13 `Unk18Obj__Unk18Obj`).
 
 ```c
-SubHandleObj *func_8003F230(Unk18Obj *self) {
+SubHandleObj *Unk18Obj__GetSubHandle(Unk18Obj *self) {
     return self->unkB0;
 }
 ```

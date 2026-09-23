@@ -1,4 +1,6 @@
-# func_8003F04C — MATCHED
+# Unk18Obj__Flip — MATCHED
+
+> Renamed from `func_8003F04C` on 2026-09-23 (tools/rename.py). Address 0x8003f04c.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 87/87 words, full match (2
 real attempts).
@@ -6,11 +8,11 @@ real attempts).
 ## Signature
 
 ```c
-void func_8003F04C(Unk18Obj *self);
+void Unk18Obj__Flip(Unk18Obj *self);
 ```
 
 `Unk18ObjMethods`'s own `+0x0A4` slot occupant (`slotA4`, dispatched by
-`func_8003EE88`, this round).
+`Unk18Obj__OnNotifyTag1`, this round).
 
 ## What it does
 
@@ -23,7 +25,7 @@ slot to two rendering helpers. If `self->unkB4` is also set, notifies
 `self->unk74` to a plain boolean: 1 if it's 0, else 0.
 
 ```c
-void func_8003F04C(Unk18Obj *self) {
+void Unk18Obj__Flip(Unk18Obj *self) {
     s32 idx;
     u8 *rawBytes;
 
@@ -85,5 +87,5 @@ exactly, and is simpler than the first attempt besides.
   declared locally rather than including the whole SDK header, matching
   this unit's existing style for PsyQ calls), `GsSortClear` (PsyQ,
   reads `self->unk58`'s bytes UNSIGNED — same "writer reads signed, this
-  reader reads unsigned" situation as `unk5B`/`func_8003EEC0`, this
+  reader reads unsigned" situation as `unk5B`/`Unk18Obj__Update`, this
   round), `func_8003FBF4` (next slice, uncarved).

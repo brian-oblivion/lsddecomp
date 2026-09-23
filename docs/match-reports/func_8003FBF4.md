@@ -41,7 +41,7 @@ independent local view per this project's convention.
 
 ## Existing-declaration retype
 
-`code_2cc8c_d.c`'s `func_8003F04C` already forward-declared this function
+`code_2cc8c_d.c`'s `Unk18Obj__Flip` already forward-declared this function
 (`extern void func_8003FBF4(s32 a0);`) before this unit was carved. Retyped
 the header declaration to `extern void func_8003FBF4(Class6E99CObj *self);`
 to match the real signature -- ABI-identical (both a plain word register),

@@ -1,11 +1,13 @@
-# func_8003F28C — MATCHED
+# Unk18Obj__SetGeomScreen — MATCHED
+
+> Renamed from `func_8003F28C` on 2026-09-23 (tools/rename.py). Address 0x8003f28c.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 8/8 words, full match.
 
 ## Signature
 
 ```c
-void func_8003F28C(Unk18Obj *self);
+void Unk18Obj__SetGeomScreen(Unk18Obj *self);
 ```
 
 Not a `D_8006E8E4` vtable slot — called directly by symbol.
@@ -16,7 +18,7 @@ A thin wrapper forwarding `self` unexamined to a PsyQ library call, return
 ignored.
 
 ```c
-void func_8003F28C(Unk18Obj *self) {
+void Unk18Obj__SetGeomScreen(Unk18Obj *self) {
     func_80024B90(self);
 }
 ```

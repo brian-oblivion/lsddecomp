@@ -1,4 +1,6 @@
-# func_8003EEC0 — MATCHED
+# Unk18Obj__Update — MATCHED
+
+> Renamed from `func_8003EEC0` on 2026-09-23 (tools/rename.py). Address 0x8003eec0.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 99/99 words, full match (4
 real attempts).
@@ -6,16 +8,16 @@ real attempts).
 ## Signature
 
 ```c
-void func_8003EEC0(Unk18Obj *self);
+void Unk18Obj__Update(Unk18Obj *self);
 ```
 
 `Unk18ObjMethods`'s own `+0x09C` slot occupant (`slot9C`, dispatched by
-`func_8003EE40`, this round).
+`Unk18Obj__OnNotifyTag5`, this round).
 
 ## What it does
 
 Per-frame update, guarded by `self->unk70` (only runs once
-`func_8003ECD0`'s init has succeeded — that function stalled this round,
+`Unk18Obj__InitOt`'s init has succeeded — that function stalled this round,
 see its report, but this one is unaffected). Notifies `slotA0` if
 `self->unk10->unkC` is set (passing `self->unk10` itself as the 2nd arg —
 see below), updates three sub-objects (`unk40`/`unk4C`/`unk54`),
@@ -23,12 +25,12 @@ conditionally re-notifies a PsyQ helper when `unk54` is 1 or 3, resets
 `self->unk30`'s pointee, recomputes `self->unk98` from `(unk50-unk4C) /
 (1<<unk3C)`, forwards the current `unk74`-indexed slot to two more
 helpers, dispatches `slotA0` again with `self->unkAC`, and finally — if
-`self->unk10` is set — walks it to its list tail (`func_8003F25C`,
+`self->unk10` is set — walks it to its list tail (`Unk18Obj__GetTail`,
 already matched this round) and dispatches `slotA0` a third time with that
 tail.
 
 ```c
-void func_8003EEC0(Unk18Obj *self) {
+void Unk18Obj__Update(Unk18Obj *self) {
     s32 idx;
     Unk18Obj *tail;
 
@@ -40,7 +42,7 @@ void func_8003EEC0(Unk18Obj *self) {
         ((void (*)(Unk18Obj *, GenericObj *))self->methods->slotA0)(self, self->unk10);
     }
 
-    func_8003F28C((Unk18Obj *)self->unk40);
+    Unk18Obj__SetGeomScreen((Unk18Obj *)self->unk40);
     func_8003FB0C(self->unk4C);
     func_8003FC70(self->unk54);
 
@@ -64,7 +66,7 @@ void func_8003EEC0(Unk18Obj *self) {
     ((void (*)(Unk18Obj *, void *))self->methods->slotA0)(self, self->unkAC);
 
     if (self->unk10 != NULL) {
-        tail = func_8003F25C((Unk18Obj *)self->unk10);
+        tail = Unk18Obj__GetTail((Unk18Obj *)self->unk10);
         ((void (*)(Unk18Obj *, Unk18Obj *))self->methods->slotA0)(self, tail);
     }
 }
@@ -94,7 +96,7 @@ void func_8003EEC0(Unk18Obj *self) {
    it. One inline expression `(self->unk50 - self->unk4C) / (1 <<
    self->unk3C)` reproduces retail's own instruction order.
 4. **`self->unk5B`'s three bytes are read UNSIGNED here (`lbu`), despite
-   being SIGNED (`lb`) at their own writer, `func_8003EAA4`.** The same
+   being SIGNED (`lb`) at their own writer, `Unk18Obj__SetUnk5B`.** The same
    memory, read from two different call sites, disagrees on signedness —
    not a contradiction, just two independent readings of an opaque field.
    Cast to `u8 *` at this call site rather than retyping `SByte3_d294`
@@ -107,7 +109,7 @@ Adding `unkC` to `GenericObj` (needed for the `self->unk10->unkC` check
 above) left a 4-byte gap unaccounted: `unkC` (`void *`, 4 bytes at `+0x00C`)
 ends at `+0x010`, but the already-existing `unk14` (round 13) needs
 `+0x014` — a forgotten `u8 pad010[0x014-0x010];`. Same failure mode as
-`func_8003E8B8`'s report earlier this round (compiles clean, `build exit`
+`Unk18Obj__OnNotify`'s report earlier this round (compiles clean, `build exit`
 non-zero, whole-image SHA1 off by one byte, `cmp -l` + `lsdde.map`
 localizes it — this time inside `Unk18Obj__AddChild`, round 13). Third live
 instance of this exact bug class within two rounds; see the Proposed
@@ -127,8 +129,8 @@ learning below.
   `self`+`Unk18Obj*` all appear).
 - Corrected two earlier comments that conflated "which function OBSERVED
   this slot" with "which function OCCUPIES it" — `slot9C`'s real occupant
-  is this function (not `func_8003EE40`, which only dispatches it), and
-  `slotA4`'s real occupant is `func_8003F04C` (not `func_8003EE88`, ditto).
+  is this function (not `Unk18Obj__OnNotifyTag5`, which only dispatches it), and
+  `slotA4`'s real occupant is `Unk18Obj__Flip` (not `Unk18Obj__OnNotifyTag1`, ditto).
 - New externs: `func_8003FB0C`/`func_8003FC70`/`func_8003FD4C`/
   `func_8003FBE4` (all `asm/code_2cc8c_e.s`, next slice, uncarved) and
   `func_80024AE4` (PsyQ, `asm/psyq_GsLinkObject4.s`).
@@ -138,7 +140,7 @@ learning below.
 **Third instance in two rounds of "insert a new field, forget the leading
 pad, break a DIFFERENT already-matched function silently."** (First:
 `Class6B5CC__DetachAttachedChildren`/round 13's delta, a different unit entirely. Second:
-`Unk18Obj__Finalize`/this round's `func_8003E8B8`. Third: this report.) All
+`Unk18Obj__Finalize`/this round's `Unk18Obj__OnNotify`. Third: this report.) All
 three were caught the same way — `build exit` non-zero with no compile
 error, localized via `cmp -l` (1-based!) + `lsdde.map`. This is now
 clearly not a one-off: **any struct field insertion in this project should

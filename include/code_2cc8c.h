@@ -410,7 +410,7 @@ extern char D_8008A8F0[4];  /* address-taken only by this unit */
  */
 struct SubHandleObjMethods {
     u8 pad000[0x004];
-    void (*slot4)(SubHandleObj *self); /* +0x004, OBSERVED: func_8003F1A8
+    void (*slot4)(SubHandleObj *self); /* +0x004, OBSERVED: Unk18Obj__SetSubHandle
                                     (round 14) -- release-shaped, no extra
                                     args */
     u8 pad008[0x04C - 0x008];
@@ -449,7 +449,7 @@ extern u8 D_8008A904[]; /* address-taken only by this unit, passed as
                             SubHandleObjMethods::slot4C's 3rd argument */
 extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
                             not decompiled): address-taken only, passed as
-                            func_8003EACC's own default value for slot80's
+                            Unk18Obj__AttachViewChild's own default value for slot80's
                             2nd argument when its own arg5 is NULL. */
 
 /*
@@ -489,7 +489,7 @@ struct Unk18AcObj {
  */
 struct GenericObjMethods {
     s32 header; /* +0x000 */
-    /* +0x050/+0x054, round 14 (func_8003F04C's own call site): dispatched
+    /* +0x050/+0x054, round 14 (Unk18Obj__Flip's own call site): dispatched
        as `(self)` only. Occupants unknown (self->unkC's real class is not
        otherwise identified in this unit). */
     u8 pad004[0x050 - 0x004];
@@ -499,7 +499,7 @@ struct GenericObjMethods {
 struct GenericObj {
     GenericObjMethods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    void *unkC;                 /* +0x00C, OBSERVED: func_8003EEC0 (round 14),
+    void *unkC;                 /* +0x00C, OBSERVED: Unk18Obj__Update (round 14),
                                     truthy-tested only */
     u8 pad010[0x014 - 0x010];
     s32 unk14;                  /* +0x014, OBSERVED: Unk18Obj__AddChild */
@@ -509,14 +509,14 @@ struct GenericObj {
  * self->viewport's pointee (field renamed from unk18 round 55), round 13
  * (Obj86B60__Init). Constructed by a
  * New_X allocator this unit itself carves (New_Unk18Obj, 0xBC bytes) via
- * `func_8003F24C()->ctor(self)` -- func_8003F24C lives in a still-uncarved
+ * `GetUnk18ObjMethods()->ctor(self)` -- GetUnk18ObjMethods lives in a still-uncarved
  * remainder of this segment (not this unit's function to write), so it is
  * declared here only as an external returning this unit's own local view
  * of the class table it constructs. Only the one slot Obj86B60__Init
  * dispatches through is modelled.
  */
 /* Round 14 (code_2cc8c_d): a plain 3-word vector, copied wholesale from a
- * caller-supplied source into Unk18Obj::unk14 (func_8003EBC4). Local view,
+ * caller-supplied source into Unk18Obj::unk14 (Unk18Obj__SetViewPos). Local view,
  * same shape as code_d294.h's own Vec3_d294 but this project's convention
  * is not to unify independent per-unit views of an unnamed shape. Declared
  * here (ahead of Unk18ObjMethods) since that struct's own slot78 needs it.
@@ -564,44 +564,44 @@ struct Unk18ObjMethods {
                                                     Obj86B60Methods's own
                                                     slot40 (`D_8006E8E4`'s
                                                     own occupant here is
-                                                    `func_8003E968`, not
+                                                    `Unk18Obj__InitDefaults`, not
                                                     `Obj86B60__ResetCounters`) */
     u8 pad044[0x074 - 0x044];
     void (*slot74)(Unk18Obj *self);            /* +0x074, OBSERVED:
                                                     Unk18Obj__Finalize (round 13) */
-    /* +0x078/+0x07C/+0x080, round 14 (func_8003EACC's own call site,
+    /* +0x078/+0x07C/+0x080, round 14 (Unk18Obj__AttachViewChild's own call site,
        guarded by `self->unk10 == NULL`): dispatched as `(self, a2)`,
        `(self, a3)`, `(self, a1_or_default)` respectively. Occupants (this
-       unit, per tools/classtable.py D_8006E8E4): func_8003EBC4 (+0x078,
-       still queued), func_8003EBF8 (+0x07C, still queued), func_8003EC2C
+       unit, per tools/classtable.py D_8006E8E4): Unk18Obj__SetViewPos (+0x078,
+       still queued), Unk18Obj__SetUnk20 (+0x07C, still queued), Unk18Obj__SetRatio12
        (+0x080, the documented gp_rel blocker -- NOT decompiled here). */
-    void (*slot78)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x078, retyped round 14 once func_8003EBC4 (its own occupant) confirmed the shape */
-    void (*slot7C)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x07C, retyped round 14 once func_8003EBF8 (its own occupant) confirmed the shape */
+    void (*slot78)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x078, retyped round 14 once Unk18Obj__SetViewPos (its own occupant) confirmed the shape */
+    void (*slot7C)(Unk18Obj *self, Vec3_2cc8c *a1); /* +0x07C, retyped round 14 once Unk18Obj__SetUnk20 (its own occupant) confirmed the shape */
     void (*slot80)(Unk18Obj *self, void *a1); /* +0x080 */
     u8 pad084[0x090 - 0x084];
     void (*slot90)(Unk18Obj *self);            /* +0x090, OBSERVED:
                                                     Unk18Obj__Finalize (round 13) */
-    /* +0x094/+0x098, round 14 (code_2cc8c_d): func_8003E8B8's own call
+    /* +0x094/+0x098, round 14 (code_2cc8c_d): Unk18Obj__OnNotify's own call
        site -- dispatched as `(self, arg1, arg2)` when a GenericObj arg1's
        header tag is 5 (slot94) or 1 (slot98). Occupants (this unit, still
-       queued as of this comment): func_8003EE40 (+0x094), func_8003EE88
+       queued as of this comment): Unk18Obj__OnNotifyTag5 (+0x094), Unk18Obj__OnNotifyTag1
        (+0x098). */
     void (*slot94)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x094 */
     void (*slot98)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x098 */
-    void (*slot9C)(Unk18Obj *self); /* +0x09C, occupant func_8003EEC0 (round 14); dispatched by func_8003EE40 */
+    void (*slot9C)(Unk18Obj *self); /* +0x09C, occupant Unk18Obj__Update (round 14); dispatched by Unk18Obj__OnNotifyTag5 */
     /* +0x0A0, occupant func_80012064 (asm/psyq_2864.s, PsyQ library that no
        SDK disc places, so it stays disassembly -- not
-       decompiled) -- dispatched by func_8003EEC0 (round 14) at three call
+       decompiled) -- dispatched by Unk18Obj__Update (round 14) at three call
        sites with different arities (self alone; self+unkAC; self+another
        Unk18Obj*), so kept as an untyped function pointer and cast per
        call site rather than picking one fixed signature. */
     void *slotA0;
-    void (*slotA4)(Unk18Obj *self); /* +0x0A4, occupant func_8003F04C (round 14, still queued as of this comment); dispatched by func_8003EE88 */
+    void (*slotA4)(Unk18Obj *self); /* +0x0A4, occupant Unk18Obj__Flip (round 14, still queued as of this comment); dispatched by Unk18Obj__OnNotifyTag1 */
     void (*slotA8)(Unk18Obj *self, s32 a1);    /* +0x0A8, OBSERVED:
                                                     Unk18Obj__Finalize (round 13) */
 };
 /* Round 14 (code_2cc8c_d): a plain 2-word record, copied as one whole-
-   struct assignment (see Unk18Obj::unk34/unk38, func_8003EA0C) --
+   struct assignment (see Unk18Obj::unk34/unk38, Unk18Obj__SetUnk34) --
    MEASURED, retail loads both source words before storing either, ruling
    out sequential per-field copies same as the SByte3_d294 tell below. */
 typedef struct Pair32_d294 {
@@ -628,16 +628,16 @@ struct Unk18Obj {
                                   (Unk18Obj__Unk18Obj); OBSERVED (round 13,
                                   set to `arg1`) by Unk18Obj__AddChild when
                                   `arg1->methods->header & 0xF == 4` */
-    /* +0x014, round 14: a Vec3, written wholesale by func_8003EBC4 from
+    /* +0x014, round 14: a Vec3, written wholesale by Unk18Obj__SetViewPos from
        its own arg1 -- RETYPED from an opaque byte span once
-       func_8003EBC4's own store pattern (3 plain word stores at +0x14/
-       +0x18/+0x1C) confirmed the shape; func_8003EACC's own use (only the
+       Unk18Obj__SetViewPos's own store pattern (3 plain word stores at +0x14/
+       +0x18/+0x1C) confirmed the shape; Unk18Obj__AttachViewChild's own use (only the
        address, forwarded to GsSetRefView2) is unaffected by the retype. */
     Vec3_2cc8c unk14;
-    /* +0x020, round 14: another Vec3, written wholesale by func_8003EBF8
+    /* +0x020, round 14: another Vec3, written wholesale by Unk18Obj__SetUnk20
        from its own arg1 -- same shape/evidence as unk14 just above. */
     Vec3_2cc8c unk20;
-    /* +0x02C, round 44 (func_8003EC2C): a 20.12 fixed-point value, set from
+    /* +0x02C, round 44 (Unk18Obj__SetRatio12): a 20.12 fixed-point value, set from
        a caller-supplied `{s16 whole; s16 frac;}` pair via the same
        split-division idiom as code_d294_c's RatioToFixed12 (divide once for
        quotient+remainder, then divide the shifted remainder again for the
@@ -648,44 +648,44 @@ struct Unk18Obj {
     s32 unk30;                 /* +0x030, OBSERVED: Unk18Obj__AddChild (round
                                   13), set from `arg1->unk14` on the same
                                   `header == 4` path that sets `unk10` */
-    /* +0x034, round 14 (func_8003EA0C): copied wholesale from a caller-
+    /* +0x034, round 14 (Unk18Obj__SetUnk34): copied wholesale from a caller-
        supplied Pair32_d294 -- MEASURED, retail loads both source words
        before storing either, ruling out sequential per-field stores. */
     Pair32_d294 unk34;
     /* +0x03C..+0x048, round 13 (code_2cc8c_d): four plain field setters
-       (func_8003EA24/EA2C/EA48/EA64), all `sw $a1, N($a0)` or the same
+       (Unk18Obj__SetUnk3C/EA2C/EA48/EA64), all `sw $a1, N($a0)` or the same
        guarded by `if (self->unk70 == 0)`. No further evidence of real
        type/meaning beyond "a stored word", so kept `s32`. */
-    s32 unk3C;                  /* +0x03C, OBSERVED: func_8003EA24 (round 13) */
-    s32 unk40;                  /* +0x040, OBSERVED: func_8003EA64 (round 13) */
-    s32 unk44;                  /* +0x044, OBSERVED: func_8003EA2C (round 13),
+    s32 unk3C;                  /* +0x03C, OBSERVED: Unk18Obj__SetUnk3C (round 13) */
+    s32 unk40;                  /* +0x040, OBSERVED: Unk18Obj__SetUnk40 (round 13) */
+    s32 unk44;                  /* +0x044, OBSERVED: Unk18Obj__SetUnk44 (round 13),
                                     only written when `self->unk70 == 0` */
-    s32 unk48;                  /* +0x048, OBSERVED: func_8003EA48 (round 13),
+    s32 unk48;                  /* +0x048, OBSERVED: Unk18Obj__SetUnk48 (round 13),
                                     only written when `self->unk70 == 0` */
-    s32 unk4C;                  /* +0x04C, OBSERVED: func_8003EEC0 (round 14) */
-    s32 unk50;                  /* +0x050, OBSERVED: func_8003EEC0 (round 14) */
-    s32 unk54;                  /* +0x054, OBSERVED: func_8003EA7C (round 13) */
+    s32 unk4C;                  /* +0x04C, OBSERVED: Unk18Obj__Update (round 14) */
+    s32 unk50;                  /* +0x050, OBSERVED: Unk18Obj__Update (round 14) */
+    s32 unk54;                  /* +0x054, OBSERVED: Unk18Obj__SetUnk54 (round 13) */
     /* +0x058/+0x05B, round 13 (code_2cc8c_d): two 3-byte fields, each
        copied wholesale from a caller-supplied 3-byte source via a WHOLE
-       struct assignment (func_8003EA84/EAA4 -- MEASURED: retail loads all
+       struct assignment (Unk18Obj__SetUnk58/EAA4 -- MEASURED: retail loads all
        three source bytes before storing any of them, ruling out a
        sequential per-field copy). Bytes are signed (`lb`, not `lbu`).
        Real element type unknown, so named generically rather than guessed
        as e.g. an RGB triple. */
-    SByte3_d294 unk58;          /* +0x058, OBSERVED: func_8003EA84 (round 13) */
-    SByte3_d294 unk5B;          /* +0x05B, OBSERVED: func_8003EAA4 (round 13) */
+    SByte3_d294 unk58;          /* +0x058, OBSERVED: Unk18Obj__SetUnk58 (round 13) */
+    SByte3_d294 unk5B;          /* +0x05B, OBSERVED: Unk18Obj__SetUnk5B (round 13) */
     u8 pad05E[0x060 - 0x05E];
-    s32 unk60;                  /* +0x060, OBSERVED: func_8003EAC4 (round 13) */
+    s32 unk60;                  /* +0x060, OBSERVED: Unk18Obj__SetUnk60 (round 13) */
     u8 pad064[0x070 - 0x064];
-    /* +0x070, round 13 (code_2cc8c_d): a guard flag -- func_8003EA2C/EA48
+    /* +0x070, round 13 (code_2cc8c_d): a guard flag -- Unk18Obj__SetUnk44/EA48
        (above) only write unk44/unk48 when this is zero/NULL, i.e. a
-       "already initialized" latch. RESOLVED round 14: func_8003ECD0 is its
+       "already initialized" latch. RESOLVED round 14: Unk18Obj__InitOt is its
        own set site -- a one-time allocator/init routine, guarded by this
        same flag, that sets it to 1 (and zeroes unk74) once it succeeds. */
     s32 unk70;
-    s32 unk74;                  /* +0x074, OBSERVED: func_8003ECD0 (round 14),
+    s32 unk74;                  /* +0x074, OBSERVED: Unk18Obj__InitOt (round 14),
                                     zeroed alongside unk70 */
-    /* +0x078..+0x08C, round 14 (func_8003ECD0): seven `s32`-typed
+    /* +0x078..+0x08C, round 14 (Unk18Obj__InitOt): seven `s32`-typed
        addresses/sizes carved out of one `func_80017B34` allocation --
        MEASURED, not modeled as real pointer types since retail computes
        every one of them via plain word arithmetic (not pointer-typed
@@ -699,10 +699,10 @@ struct Unk18Obj {
     s32 unk84;
     s32 unk88;
     s32 unk8C;
-    s32 unk90;                  /* +0x090, OBSERVED: func_8003EE40 (round 14),
+    s32 unk90;                  /* +0x090, OBSERVED: Unk18Obj__OnNotifyTag5 (round 14),
                                     incremented unconditionally every call */
     u8 pad094[0x098 - 0x094];
-    s32 unk98;                  /* +0x098, OBSERVED: func_8003EEC0 (round 14),
+    s32 unk98;                  /* +0x098, OBSERVED: Unk18Obj__Update (round 14),
                                     a running count incremented by 1 each call */
     u8 pad09C[0x0AC - 0x09C];
     Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: Unk18Obj__Unk18Obj (round 13,
@@ -713,14 +713,14 @@ struct Unk18Obj {
                                   comment) */
     SubHandleObj *unkB0;        /* +0x0B0, OBSERVED: Unk18Obj__Unk18Obj (round
                                   13) -- set from `New_Class6E99C`; also read
-                                  back by func_8003F230 (round 13, this
+                                  back by Unk18Obj__GetSubHandle (round 13, this
                                   unit) as a plain getter */
-    s32 unkB4;                  /* +0x0B4, OBSERVED: func_8003F23C (round 13) */
-    s32 unkB8;                  /* +0x0B8, OBSERVED: func_8003F244 (round 13) */
+    s32 unkB4;                  /* +0x0B4, OBSERVED: Unk18Obj__SetUnkB4 (round 13) */
+    s32 unkB8;                  /* +0x0B8, OBSERVED: Unk18Obj__SetUnkB8 (round 13) */
 };
 
-extern Unk18ObjMethods D_8006E8E4; /* the table itself (Unk18ObjMethods, resolved via tools/classtable.py D_8006E8E4), so func_8003F24C's own definition (code_2cc8c_d.c) can return &D_8006E8E4 */
-extern Unk18ObjMethods *func_8003F24C(void); /* getter for Unk18Obj's own
+extern Unk18ObjMethods D_8006E8E4; /* the table itself (Unk18ObjMethods, resolved via tools/classtable.py D_8006E8E4), so GetUnk18ObjMethods's own definition (code_2cc8c_d.c) can return &D_8006E8E4 */
+extern Unk18ObjMethods *GetUnk18ObjMethods(void); /* getter for Unk18Obj's own
                                     class table (returns &D_8006E8E4);
                                     used by New_Unk18Obj's own New_X
                                     allocator. RETARGETED round 13: this
@@ -739,14 +739,14 @@ extern Unk18Obj *New_Unk18Obj(void); /* this unit's own New_X allocator for
    occupants this unit carves. Trivial setters/getters typed straight to
    Unk18Obj's own newly-discovered fields above; see the field comments
    for what each was OBSERVED from. */
-void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void Unk18Obj__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 
 /* GsSetRefView2 is NO LONGER DECLARED HERE, round 33. It is Sony's
    (`libgs/gs_131.o`, linked from the SDK object) and will one day sit next to
    `include/psyq/LIBGS.H`'s own prototype for it -- two declarations of one
    Sony name in a header six units include is the `conflicting types` failure
    that CLAUDE.md and the SDK guide both warn about, and it would surface in a
-   unit that never touched this line. Its one caller, func_8003EACC, now
+   unit that never touched this line. Its one caller, Unk18Obj__AttachViewChild, now
    declares it locally in src/code_2cc8c_d.c with that call site's own shape. */
 
 /* func_8003FC18 is NO LONGER DECLARED HERE, round 34 -- exactly the
@@ -765,10 +765,10 @@ void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
    GsClearOt above: LIBGPU.H carries its own prototype (`extern int
    DrawSync(int mode);`), and a second declaration of that name in a header
    six units include is the `conflicting types` failure CLAUDE.md and the SDK
-   guide both warn about. Its one caller, func_8003EDF4, now declares it
+   guide both warn about. Its one caller, Unk18Obj__DeinitOt, now declares it
    locally in src/code_2cc8c_d.c with that call site's own shape. */
 
-/* The following are called only from func_8003EEC0 (this unit). They are
+/* The following are called only from Unk18Obj__Update (this unit). They are
    plain `void *` global setters (this call site happens to pass an
    already-`s32`-shaped value, which is an ordinary int-to-pointer conversion
    with identical codegen, same precedent as Class6B5CC__DispatchLinkCommand/Class6B5CC__TryAttachNearby in
@@ -791,7 +791,7 @@ extern void func_8003FBE4(void *a0);
 /* ResetGraph (asm/psyq_10ee0.s, PsyQ library, LIBGPU.H's own
    declared signature is `extern int ResetGraph(int mode);` -- declared
    locally here rather than including the whole SDK header, matching this
-   unit's existing PsyQ-declaration style). func_8003F04C calls it with a
+   unit's existing PsyQ-declaration style). Unk18Obj__Flip calls it with a
    literal 1 and ignores the return. */
 extern s32 ResetGraph(s32 mode);
 
@@ -801,43 +801,43 @@ extern s32 ResetGraph(s32 mode);
    LIBGS.H carries its own prototype (`void GsSortClear(u_char r, u_char g,
    u_char b, GsOT *ot);`), and a second declaration of that name in a header
    six units include is the `conflicting types` failure CLAUDE.md and the SDK
-   guide both warn about. Its one caller, func_8003F04C, now declares it
+   guide both warn about. Its one caller, Unk18Obj__Flip, now declares it
    locally in src/code_2cc8c_d.c with that call site's own shape (self->unk58's
    three bytes read unsigned, same "writer reads signed, this reader reads
-   unsigned" situation as unk5B/func_8003EEC0, plus one more word). */
+   unsigned" situation as unk5B/Unk18Obj__Update, plus one more word). */
 
 /* func_8003FBF4 is NO LONGER DECLARED HERE, round 34. It is Sony's
    `GsDrawOt` (`libgs/gs_111.o`, linked from the SDK object) -- same
    collision reason as GsSetRefView2/GsClearOt above. Its one caller,
-   func_8003F04C, declares it locally in src/code_2cc8c_d.c with that call
+   Unk18Obj__Flip, declares it locally in src/code_2cc8c_d.c with that call
    site's own shape. */
 
-void func_8003EACC(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
-void func_8003EB84(Unk18Obj *self);
-void func_8003EBC4(Unk18Obj *self, Vec3_2cc8c *a1);
-void func_8003EBF8(Unk18Obj *self, Vec3_2cc8c *a1);
-void func_8003ECD0(Unk18Obj *self);
-void func_8003EDF4(Unk18Obj *self);
-void func_8003EE40(Unk18Obj *self, GenericObj *arg1, s32 arg2);
-void func_8003EE88(Unk18Obj *self, GenericObj *arg1, s32 arg2);
-void func_8003EEC0(Unk18Obj *self);
-void func_8003F04C(Unk18Obj *self);
-void func_8003F1A8(Unk18Obj *self, SubHandleObj *arg1);
-void func_8003EA0C(Unk18Obj *self, Pair32_d294 *pair);
-void func_8003EA24(Unk18Obj *self, s32 a1);
-void func_8003EA2C(Unk18Obj *self, s32 a1);
-void func_8003EA48(Unk18Obj *self, s32 a1);
-void func_8003EA64(Unk18Obj *self, s32 a1);
-void func_8003EA7C(Unk18Obj *self, s32 a1);
-void func_8003EA84(Unk18Obj *self, SByte3_d294 *src);
-void func_8003EAA4(Unk18Obj *self, SByte3_d294 *src);
-void func_8003EAC4(Unk18Obj *self, s32 a1);
-SubHandleObj *func_8003F230(Unk18Obj *self);
-void func_8003F23C(Unk18Obj *self, s32 a1);
-void func_8003F244(Unk18Obj *self, s32 a1);
-Unk18Obj *func_8003F25C(Unk18Obj *self);
+void Unk18Obj__AttachViewChild(Unk18Obj *self, void *a1, void *a2, void *a3, void *arg5);
+void Unk18Obj__DetachViewChild(Unk18Obj *self);
+void Unk18Obj__SetViewPos(Unk18Obj *self, Vec3_2cc8c *a1);
+void Unk18Obj__SetUnk20(Unk18Obj *self, Vec3_2cc8c *a1);
+void Unk18Obj__InitOt(Unk18Obj *self);
+void Unk18Obj__DeinitOt(Unk18Obj *self);
+void Unk18Obj__OnNotifyTag5(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void Unk18Obj__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void Unk18Obj__Update(Unk18Obj *self);
+void Unk18Obj__Flip(Unk18Obj *self);
+void Unk18Obj__SetSubHandle(Unk18Obj *self, SubHandleObj *arg1);
+void Unk18Obj__SetUnk34(Unk18Obj *self, Pair32_d294 *pair);
+void Unk18Obj__SetUnk3C(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetUnk44(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetUnk48(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetUnk40(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetUnk54(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetUnk58(Unk18Obj *self, SByte3_d294 *src);
+void Unk18Obj__SetUnk5B(Unk18Obj *self, SByte3_d294 *src);
+void Unk18Obj__SetUnk60(Unk18Obj *self, s32 a1);
+SubHandleObj *Unk18Obj__GetSubHandle(Unk18Obj *self);
+void Unk18Obj__SetUnkB4(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetUnkB8(Unk18Obj *self, s32 a1);
+Unk18Obj *Unk18Obj__GetTail(Unk18Obj *self);
 
-void func_8003F28C(Unk18Obj *self);
+void Unk18Obj__SetGeomScreen(Unk18Obj *self);
 
 extern void *func_80042400(void); /* external, no args; local view returns
                                     void* (used as a generic word/child
@@ -1311,7 +1311,7 @@ struct Obj86B60 {
                                     manages a 3-word position/rotation pair
                                     (its own unk14/unk20, both Vec3) and
                                     calls GsSetRefView2 (code_2cc8c_d.c,
-                                    func_8003EACC) -- a PSX GPU "set
+                                    Unk18Obj__AttachViewChild) -- a PSX GPU "set
                                     reference viewport" call -- so the
                                     pointee is a camera/viewport object, even
                                     though what specifically the *game*
@@ -1490,7 +1490,7 @@ struct BasicClassMethodsCC8C {
     void (*onNotify)(void *self, void *arg1, s32 arg2); /* +0x038, IS
                                   BasicClass__OnNotify (code_8220_b);
                                   OBSERVED: Obj86B60__OnNotify. NOT renamed:
-                                  code_2cc8c_d.c's func_8003E8B8 also
+                                  code_2cc8c_d.c's Unk18Obj__OnNotify also
                                   dispatches through this exact slot (its
                                   own Get_vtable_BasicClass() call), so this
                                   field is shared -- PROPOSED (round 55,

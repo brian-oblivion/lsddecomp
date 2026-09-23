@@ -1,4 +1,6 @@
-# func_8003ECD0 -- MATCHED 73/73 (round 71, runner charlie; revisit). Byte-exact whole image.
+# Unk18Obj__InitOt -- MATCHED 73/73 (round 71, runner charlie; revisit). Byte-exact whole image.
+
+> Renamed from `func_8003ECD0` on 2026-09-23 (tools/rename.py). Address 0x8003ecd0.
 
 REVISITED, round 71: MATCHED 73/73 in 6 builds; names/types not relevant (the
 lever is a local holding the constant, not a type or a name).
@@ -54,7 +56,7 @@ struct edit this round).
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
 extern void *func_80017B34(s32 size);
 
-void func_8003ECD0(Unk18Obj *self) {
+void Unk18Obj__InitOt(Unk18Obj *self) {
     s32 size;
     s32 buf;
     s32 hdrSize = 0x14; /* sizeof(GsOT) */
@@ -308,7 +310,7 @@ in-range, build clean at that score. ~14 real attempts, all on the SAME
 ## Signature (as attempted)
 
 ```c
-void func_8003ECD0(Unk18Obj *self);
+void Unk18Obj__InitOt(Unk18Obj *self);
 ```
 
 `Unk18ObjMethods`'s own `+0x08C`... no — not a vtable slot found in
@@ -318,7 +320,7 @@ void func_8003ECD0(Unk18Obj *self);
 ## What it does
 
 One-time allocation/init, guarded by `self->unk70` (the same latch
-`func_8003EA2C`/`func_8003EA48` check, this round): allocates one buffer
+`Unk18Obj__SetUnk44`/`Unk18Obj__SetUnk48` check, this round): allocates one buffer
 sized to fit two internal records plus a `4 << self->unk3C`-sized payload
 each, carves it into `unk78`/`unk80`/`unk88` (bases) and
 `unk7C`/`unk84`/`unk8C` (bases + size), writes a 2-word header into each of
@@ -327,7 +329,7 @@ uncarved).
 
 ```c
 /* stalesyms --fix 2026-09-22: func_8003FC18 -> GsClearOt -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-void func_8003ECD0(Unk18Obj *self) {
+void Unk18Obj__InitOt(Unk18Obj *self) {
     s32 size;
     s32 buf;
 
@@ -488,7 +490,7 @@ figure was correct but unverified against the current tree.
 **Rebuilt with the corrected name.** `extern void GsClearOt(s32, s32, s32);`
 already existed in `src/code_2cc8c_d.c` (added when round 34 retyped this
 unit's other Sony calls), just declared after this function's own call
-sites; added a second, identical declaration ahead of `func_8003ECD0`
+sites; added a second, identical declaration ahead of `Unk18Obj__InitOt`
 itself (same pattern this unit already uses for its other local externs)
 rather than hoisting the existing one. `func_80017B34` also needed its own
 extern (not previously declared in this unit). Build: clean compile
@@ -513,7 +515,7 @@ are the documented instruction-order residue at vram `0x8003ED18`/`0x8003ED1C`.
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
 extern void *func_80017B34(s32 size);
 
-void func_8003ECD0(Unk18Obj *self) {
+void Unk18Obj__InitOt(Unk18Obj *self) {
     s32 size;
     s32 buf;
 

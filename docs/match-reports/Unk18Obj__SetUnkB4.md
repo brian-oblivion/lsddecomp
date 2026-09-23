@@ -1,11 +1,13 @@
-# func_8003F23C — MATCHED
+# Unk18Obj__SetUnkB4 — MATCHED
+
+> Renamed from `func_8003F23C` on 2026-09-23 (tools/rename.py). Address 0x8003f23c.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 2/2 words, full match.
 
 ## Signature
 
 ```c
-void func_8003F23C(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetUnkB4(Unk18Obj *self, s32 a1);
 ```
 
 `Unk18ObjMethods`'s own `+0x0B0` slot occupant.
@@ -15,7 +17,7 @@ void func_8003F23C(Unk18Obj *self, s32 a1);
 One-instruction field setter.
 
 ```c
-void func_8003F23C(Unk18Obj *self, s32 a1) {
+void Unk18Obj__SetUnkB4(Unk18Obj *self, s32 a1) {
     self->unkB4 = a1;
 }
 ```

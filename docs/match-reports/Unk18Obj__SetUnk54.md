@@ -1,11 +1,13 @@
-# func_8003EA7C — MATCHED
+# Unk18Obj__SetUnk54 — MATCHED
+
+> Renamed from `func_8003EA7C` on 2026-09-23 (tools/rename.py). Address 0x8003ea7c.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 2/2 words, full match.
 
 ## Signature
 
 ```c
-void func_8003EA7C(Unk18Obj *self, s32 a1);
+void Unk18Obj__SetUnk54(Unk18Obj *self, s32 a1);
 ```
 
 `Unk18ObjMethods`'s own `+0x060` slot occupant.
@@ -15,7 +17,7 @@ void func_8003EA7C(Unk18Obj *self, s32 a1);
 One-instruction field setter.
 
 ```c
-void func_8003EA7C(Unk18Obj *self, s32 a1) {
+void Unk18Obj__SetUnk54(Unk18Obj *self, s32 a1) {
     self->unk54 = a1;
 }
 ```

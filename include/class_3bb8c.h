@@ -845,7 +845,7 @@ typedef struct BaseCtorTable_3bb8c_c {
                                       Class869D8::unk10/unk70 both being nonzero) */
 } BaseCtorTable_3bb8c_c;
 
-extern BaseCtorTable_3bb8c_c *func_8003F24C(void);
+extern BaseCtorTable_3bb8c_c *GetUnk18ObjMethods(void);
 
 extern void *func_80017B34(s32 size);
 
@@ -912,7 +912,7 @@ extern Class86AA0Methods *GetClass86AA0Methods(void);
  * the argument setup the caller emits and breaks the match. See
  * docs/match-reports/Class86AA0__Class86AA0.md.
  *
- * Return type: round 10 split this OFF `BaseCtorTable_3bb8c_c` (func_8003F24C's
+ * Return type: round 10 split this OFF `BaseCtorTable_3bb8c_c` (GetUnk18ObjMethods's
  * own return type) into its own `BaseCtorTableB_3bb8c_c`. (The split is round
  * 10's -- round 9 settled only the ARITY question above. The comment here
  * originally credited round 9 with both, which would have made this a settled
@@ -922,7 +922,7 @@ extern Class86AA0Methods *GetClass86AA0Methods(void);
  * getter's table with a 3-argument call (self, arg1, arg2) -- a genuine arity
  * conflict with
  * `BaseCtorTable_3bb8c_c::slot9C` (1-argument, established from
- * Class869D8__ForwardIfUnk10AndUnk70 via the OTHER getter, func_8003F24C). Same-offset arity
+ * Class869D8__ForwardIfUnk10AndUnk70 via the OTHER getter, GetUnk18ObjMethods). Same-offset arity
  * conflict means different table/different class, per this project's
  * established split policy (see e.g. TaskCoreObjMethods in
  * include/code_2c054.h). Purely a type-name change here -- Class86AA0__Class86AA0's
@@ -932,7 +932,7 @@ extern Class86AA0Methods *GetClass86AA0Methods(void);
  *
  * Head-verified round 10 by measuring both callees rather than reasoning from
  * the arity conflict: GetClass6B5CCMethods returns &gClass6B5CCMethods (asm/code_d294.s) and
- * func_8003F24C returns &D_8006E8E4 (asm/code_2cc8c_b.s). Different globals,
+ * GetUnk18ObjMethods returns &D_8006E8E4 (asm/code_2cc8c_b.s). Different globals,
  * so genuinely different tables -- one type could not have carried both, and
  * the split would have been right even without the arity conflict that
  * prompted it.

@@ -495,7 +495,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (cond) return 1; return 0;` with `flag = 1; return flag;`. (a §"Defeat 2.6.3's constant
   canonicalization") The mechanism is the TREE folder, before RTL: it hoists a literal out of a sum
   (`s + (p + 0x14)` -> `(s + p) + 0x14`), so no spelling containing the literal reaches retail's
-  grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`func_8003ECD0`,
+  grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`Unk18Obj__InitOt`,
   73/73 after 14 groupings and ~89k permuter iterations); splitting `(w + 20) - span` into two
   statements closed `func_8004CAF0`. (round 71)
 
@@ -546,7 +546,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **`volatile` is the WRONG tool for an ADDRESS CSE, and it is NON-MONOTONIC** — it acts on the
   VALUE CSE and regresses a LICM residue (48/376 -> 6/376). **The address CSE yields to the
   asm-label alias**: `extern T D_8008A8F8_b __asm__("D_8008A8F8");` leaves nothing to fold and
-  closed `func_8003E968` 41/41; six byte-verified uses exist, and it renames a linker symbol, so it
+  closed `Unk18Obj__InitDefaults` 41/41; six byte-verified uses exist, and it renames a linker symbol, so it
   is not HARD RULE 6's banned construct. Cheaper still, **try REORDERING first**. (a §"Negatives
   worth not re-deriving", §"A repeated-global-address CSE is defeatable from C89")
 
@@ -724,7 +724,7 @@ entries below: archive, "Distilled out on 2026-09-22").
 - §"Two DISTINCT permuter false-lead patterns" and §"A residue next to a just-fixed defect" —
   libcd instances only, illustrations not measurements.
 - §"NEW STALL CLASS: retail recomputes an address our GCC CSEs away" — original example Sony's
-  `strcmp`; `func_8003E968` is game code, CLOSED (3h).
+  `strcmp`; `Unk18Obj__InitDefaults` is game code, CLOSED (3h).
 - **Not a fifth way a score lies** (forgotten-`padNN` pad, drift misattributed to the cursor
   function, jump-table funcdiff window, `.bss`-shifting length-short function): CLAUDE.md covers
   all four by name; do not re-propose.

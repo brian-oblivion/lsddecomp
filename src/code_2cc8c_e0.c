@@ -11,7 +11,7 @@
  * C segment.
  *
  * Deliberately includes only common.h. func_8003FB0C is also declared in
- * include/code_2cc8c.h for its one caller (func_8003EEC0, in code_2cc8c_d),
+ * include/code_2cc8c.h for its one caller (Unk18Obj__Update, in code_2cc8c_d),
  * and that declaration -- `extern void func_8003FB0C(void *a0);` -- agrees
  * with the definition below; this unit does not pull the header in, so it
  * shares none and is free to staff alongside anything. Check with
