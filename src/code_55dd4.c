@@ -444,11 +444,11 @@ void *func_800662BC(Class65650 *self, void *hdr, void *extra)
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
 #endif
 
-/* STALL -- see docs/match-reports/func_80066340.md. Best reached: 252/258
- * words in-range, no size drift, residue is two symmetric 3-word
- * instruction-scheduling clusters around a compiler-synthesized
- * magic-multiply constant. Restored to INCLUDE_ASM per project rule. */
-#if 0
+/* NON_MATCHING: 252/258 words, length exact (no drift). Residue: two
+ * symmetric 3-word instruction-scheduling clusters around a compiler-
+ * synthesized magic-multiply constant (docs/match-reports/func_80066340.md).
+ * Hand-derived. */
+#ifdef NON_MATCHING
 void *func_80066340(Class65650 *self, void *acc, void *extra)
 {
     u8 outbuf[4];
@@ -622,9 +622,9 @@ void *func_80066340(Class65650 *self, void *acc, void *extra)
 end:
     return (u8 *)acc + outbuf[3] * 4;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066340);
+#endif
 
 void func_80066748(Class65650 *self, Class65650 *other)
 {
