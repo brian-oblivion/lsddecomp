@@ -156,7 +156,7 @@ Class876FC__UpdateByKind; only this unit references it).
 
 `LinkNode` and `LinkNodeMethods` are defined only in `src/class_3bb8c_s.c`,
 so the compiler's accessor list after renaming the definition was entirely in
-this unit (34 errors, all fixed; build and `tools/check-nonmatching.sh`
+this unit (every `has no member` error was in src/class_3bb8c_s.c, all fixed; build and `tools/check-nonmatching.sh`
 green). `typedef struct LinkNode Class876FC;` was added for the owner's
 method signatures; zero bytes changed.
 
