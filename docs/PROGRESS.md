@@ -6,6 +6,126 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-23 — round 73: sixteen of nineteen revisits match, none by permuter, and "register identity" was mostly shape
+
+**Five slots, twenty runner sessions, three tracks, every merge green.** The
+head ran on Opus. Nothing needed Fable; the plan-level findings are ESCALATED
+below. Gate 0 was clean, and every worktree byte-verified before handover.
+The operator's cap was 5 and was refilled as runners finished (§3.8), each
+time after re-reading the ready list and re-pricing contention. Three jobs
+were skipped for documented reasons: the DreamSys revisit while StageGrid's
+naming runner was live (call-graph), class_3bb8c_f 1b while class_3bb8c_g's
+naming runner was live (call-graph), code_179d8_l naming while code_179d8_m
+was live (27-28 shared symbols); and `func_80031A44`'s 1b promotion was not
+staffed at all (escalation 3).
+
+| track | sessions | model | outcome |
+| --- | --- | --- | --- |
+| 1 revisit | 8 | opus | **16 MATCHED of 19**: Class6E99C StartFadeToIndex 35/35, StartFadeDefault 41/41, PushPosition 25/25; func_80051F24 95/95, func_80051AC8 107/107; DreamSys__StepLookYaw 77/77, CalcDreamColor 35/35, DreamSys__TryInstantTeleportLink 63/63; func_8002CD08 132/132, func_8002E138 112/112, func_8002E308 116/116; func_8004BE54 150/150, func_8004BB3C 105/105, func_8004C470 70/70; Class6B5CC__CheckBoundsOverlap 243/243; func_80017B34 114/114. StepVoiceFade 220/228 and StepVoiceEnvelope 223/231 now length-exact STALLs; StartNote stopped as Sony code |
+| 1b | 6 | sonnet | 8 bodies promoted (three then matched the same round) |
+| 3 | 6 | sonnet | StageGrid, class_3bb8c_g, code_2cc8c_d, code_2c054, class_39e08, class_3bb8c_r named, reviewed, marked |
+
+Revisit yield is now 40/60. Track 3 is at 34/75 units. `progress.py` reads
+1127 matched; the true figure is 1129 (escalation 2). Track 2 reads "open"
+again with two names, because `CheckBoundsOverlap` now calls
+`func_8001F4E4`/`func_8001F50C` (`asm/psyq_fa50.s`) from C.
+
+### What the revisits say
+
+Every one of the sixteen matched on a SOURCE-SHAPE lever, within about a
+dozen builds, and none on a permuter. Several had spent 90k to 230k
+permuter iterations. The recorded CAUSE was wrong in most of them.
+`func_80051AC8` had been filed "register rotation" since round 9, and it
+compiled two words long. The levers are promoted to LEARNINGS 3a/3d/3f/3g:
+- a length-off stall is control flow first;
+- forwarded-parameter arity presenting as scheduling;
+- a variable reused for two values;
+- a second name for `this`;
+- one statement after the join, not one per arm;
+- `(u8)x` keeping a temporary alive;
+- a field-load operand's position fixed at RTL generation;
+- walkers made by the loop optimiser;
+- a row-pointer local;
+- struct copies clobbering `$a0`/`$a1`.
+A permuter can reach none of these, because it never changes a parameter
+list, a local count, or which variable a statement uses.
+
+### Head corrections at merge (Sonnet naming units)
+
+No unit was sent back under §3 track 3's review rule, and none carried a
+wrong tier-A PURPOSE name. Two carried a wrong CLASS prefix:
+- class_3bb8c_g named 15 methods `Class86E00_3bb8c_g__*`. `0x80086E00` is
+  +0x3C inside `gTaskObjFMethods` (0x80086DC4, 44 slots, whose +0x64..+0x78
+  are class_3bb8c_f's `TaskObjF__*`), and nothing addresses it. The head
+  renamed them `TaskObjF__*`, gave `CopyMemcardIconTemplate` a free-function
+  name, renamed the table/getter, and rewrote the header's "independent
+  class" comment. `LoadCardIcon` went from tier A to tier B.
+- class_39e08 named four inherited base-class slots `Obj865C8__*`. They sit
+  at the same offsets in both tables, among Class86668's methods in ROM, so
+  the head renamed them `Class86668__*`.
+
+The head also renamed Unk18Obj's four setters after the fields charlie
+named from Sony consumers (`GsSetLightMode`, `SetFarColor`, `SetFogNear`,
+`GsSortClear`). Later naming prompts carried the class-table lesson.
+
+### Merge hazards measured this round
+
+- **`config/gp-symbols.txt` is not a make prerequisite, and `gpsyms.py`
+  reads `asm/`.** At alpha's merge the head regenerated it BEFORE `make
+  extract`. The regenerated list carried the pre-rename `D_8008AAB4`-style
+  names, so alpha's renamed sdata globals lost `$gp` addressing. The image
+  came out 16 bytes long (class_3bb8c_g +4 words), with no compile error.
+  After regenerating it post-extract the build was still red, because no
+  object depended on the file; `rm -f build/src/*.o` made it green. The
+  merge commit had captured the stale list, and a follow-up commit fixed it.
+  Order that works: resolve, `make extract`, `gpsyms.py`, recompile, oracle.
+- **The session scratchpad is shared by every runner (delta).** Bravo's
+  helper `b.sh` overwrote delta's, and delta's builds briefly ran in bravo's
+  worktree. Delta and bravo re-measured every figure directly. Later
+  prompts put helpers in per-runner subdirectories.
+- Every naming merge conflicted in the symbols file (append/append; union).
+  Two naming passes' `rename.py` prose rewrites collided in four docs;
+  resolved by taking one side and re-applying the other's renames.
+
+### Escalated
+
+1. **Track 1's stop rule versus the revisit yield (FINISHING-PLAN §6).**
+   Revisits have paid 40/60, and 16/19 this round. The parked band's figure
+   is 1/13. That is far outside a factor of two, and the revisits ARE the
+   band's stalls re-read. The revisit list shrinks by what it pays, so
+   whether the one-revisit cap, or the band's parking, still fits is the
+   operator's decision.
+2. **`progress.py` cannot see K&R-style definitions.** Its regex needs `{`
+   right after `)`. `func_80017B34` (matched this round) and `func_80017CFC`,
+   both in code_8220, are counted as neither matched nor queued: the matched
+   headline is 2 low and total functions dropped 1677 -> 1676. Tool fix, not
+   done.
+3. **Sony code still counted as game in code_179d8_*.**
+   - Delta's evidence: `StartNote` is libsnd `SpuVmKeyOn` (call order
+     `SpuVmVSetUp`/`SpuVmKeyOff`/`SpuVmAlloc`/`SpuVmDoAllocate` with
+     `StopNote`/`func_8002CF18`/`func_8002D6A4`, the six-`andi` run, the
+     `0x21` test). `StepVoiceEnvelope` scores shape 0.99 against `SetAutoVol`.
+     `func_8002D8E0` scores shape 0.98 against `vmNoiseOn`.
+   - `func_80031A44` sits between libsnd `ut_pb` and `vm_vsu` in a unit of
+     `SsUt*` functions and calls `SpuVmVSetUp`.
+   - All score masked ~0, i.e. a build no disc carries. By §3 track 2 only
+     position plus header can name them. Track 2 is closed, and naming these
+     reopens it. The head's own `sdkname.py` screen read only the top line
+     (sorted by masked score) and missed the 0.99.
+4. **Two procedure gaps**, left unwritten because they are rules:
+   - PARALLEL-RUNS §3.9 should say "after `make extract`, `gpsyms.py`, then
+     force a recompile".
+   - §2.7 should name the session scratchpad next to `/tmp`.
+   The Makefile could also list `config/gp-symbols.txt` as a compile
+   prerequisite (a build-system change).
+5. **Naming-runner model.** Six Sonnet units, none sent back. But two needed
+   class-prefix corrections that the §3 track 3 review rule does not list
+   as a send-back. The head kept Sonnet; a stricter reading would move
+   naming back to Opus.
+
+---
+
+
 ## 2026-09-23 — round 72: a "cleanly isolated register identity" stall was one call too many
 
 **Three runners, three tracks, all merges green.** The operator asked for
