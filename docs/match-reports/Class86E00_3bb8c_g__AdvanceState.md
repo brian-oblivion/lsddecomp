@@ -128,3 +128,14 @@ GCC 2.6.3 appears to normalize small non-table switches to ascending
 value order for the sequential compares. If retail's compare order
 doesn't match ascending, use `if`/`else if` instead, which does preserve
 source order literally.
+
+## Naming
+
+`Class86E00_3bb8c_g__AdvanceState` (was `func_80050034`), tier B: dispatch
+on the CURRENT `self->unk28`, with one group (`0xE`) additionally rebuilding
+two path/name buffers before firing the shared `slot8C`/`slot78`-or-`slot74`
+tail -- the same "reset then transition" mechanics `Class86E00_3bb8c_g__SetState`
+already fires from the opposite direction (after choosing a NEW state).
+Named for the mechanics (moves the state machine forward from wherever it
+currently is); which real transition each of the four case groups performs
+in game terms is not established.

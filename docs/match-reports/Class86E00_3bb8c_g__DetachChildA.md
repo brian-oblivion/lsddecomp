@@ -41,3 +41,10 @@ surveying the unit (`Class86E00_3bb8c_g__TickCardIcon`'s report).
 ### Proposed learning
 
 None new.
+
+## Naming
+
+`Class86E00_3bb8c_g__DetachChildA` (was `func_80050410`), tier B: the
+teardown counterpart of `Class86E00_3bb8c_g__AttachChildA` -- same guard,
+tears down `self->unk78` through the fixed `slot50`/`slot48`/`release`
+sequence, one-shot gated by the same `unk74` flag `AttachChildA` sets.

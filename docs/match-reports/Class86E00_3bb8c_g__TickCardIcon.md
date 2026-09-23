@@ -71,3 +71,13 @@ None new -- the "release slot's return value can be used or discarded
 per-caller" pattern is already implicit in the existing "empty-bodied
 vtable occupant is not evidence the slot takes no arguments" family, just
 applied to a return value instead of a parameter.
+
+## Naming
+
+`Class86E00_3bb8c_g__TickCardIcon` (was `func_8004FF40`), tier B: calls
+`self->unk70`'s own generic per-step "advance" slot and stores the
+result back (the same `self->field = self->field->methods->slot4(...)`
+shape recurring across many unrelated classes in this project, e.g.
+`class_39e08.c`, `code_2cc8c_b.c`, `code_55dd4.c` -- read here as an
+ordinary per-frame/per-step tick of the loaded card icon object). What
+"advancing" the icon actually changes on screen is not established.

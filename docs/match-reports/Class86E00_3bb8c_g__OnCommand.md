@@ -64,3 +64,13 @@ branches (switch) even for as few as two values. When a residue's
 FIRST diff word is a flipped branch condition (`beq`<->`bne`) with a
 completely different offset immediately after a comparison chain, try the
 `switch` spelling before reshaping the conditions further.
+
+## Naming
+
+`Class86E00_3bb8c_g__OnCommand` (was `func_800504D0`), tier B: dispatches
+on a small externally-supplied code (`arg2` in `{2, 3}`, `arg1` unread) into
+`slotA0` plus either the full `slot78` transition or a `slot7C(self, 0x17)`
+("force idle", per `Class86E00_3bb8c_g__ForceIdleFromState`'s own naming
+evidence) -- read as an external caller telling this object to act (2:
+proceed / 3: cancel), though nothing in the body itself says who calls it
+or what the two codes represent in the game.

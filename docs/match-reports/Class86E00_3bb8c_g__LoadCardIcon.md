@@ -136,3 +136,12 @@ the field, and drive every later use through the local. The struct field
 gets re-read from memory each time it's referenced source-level; retail
 consistently keeps the value in a register instead once it has been
 computed.
+
+## Naming
+
+`Class86E00_3bb8c_g__LoadCardIcon` (was `func_8004FE24`), tier A: the
+whole body is the load itself (three early-return guards, then build
+`CARD\<name>.TIM`, load it through the generic resource-handle idiom, and
+stash the result in `self->unk70` if not already loaded) -- a load-if-
+absent action whose mechanics ARE its purpose, same standard as a getter
+or cache-fill.

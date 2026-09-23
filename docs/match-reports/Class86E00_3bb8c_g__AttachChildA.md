@@ -80,3 +80,15 @@ one function's own body; this instance shows it working identically when
 the "next call" is to an external helper this unit does not own the body
 of. The reflex to try statement reordering first (rather than checking
 call arity) cost one wasted, and materially WORSE, attempt.
+
+## Naming
+
+`Class86E00_3bb8c_g__AttachChildA` (was `func_80050340`), tier B: lazily
+allocates `self->unk78` via `func_80050BA8` (an already-named `New_X`-shaped
+factory for the same real class the sibling `class_3bb8c_i`/`class_3bb8c_j`
+units call `Obj86ED0`/`Class86ED0`, vtable `D_80086ED0`) on first use, then
+attaches and configures it through this class's own vtable. Named "A" to
+distinguish it from the identically-shaped `AttachChildB`
+(`self->unk7C`, `func_80051A5C`) below -- nothing in either function's own
+body says what makes the two children functionally different, so the
+suffixes are arbitrary labels, not a claim about purpose.

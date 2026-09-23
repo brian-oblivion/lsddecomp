@@ -165,3 +165,13 @@ reconstructing a dense switch, read the `.s` file's LABEL ORDER (not just
 which value maps to which label) and write the `case` clauses in that
 same order, even though a value-sorted `case` listing would produce an
 identical jump table and looks more natural to write.
+
+## Naming
+
+`Class86E00_3bb8c_g__SetState` (was `func_8004FBE4`), tier B. Mechanics
+clear (normalizes the requested state, fires the three transition-entry
+callbacks, computes a possibly-replaced state code for five specific
+requested values, then either commits `self->unk28` or tears the object
+down and resets to 0), but which real-world states `0x11`-`0x17` and the
+switch's case values name is not established -- the numeric state codes
+are kept as literals rather than invented enum names.

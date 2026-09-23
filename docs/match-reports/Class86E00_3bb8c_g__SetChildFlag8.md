@@ -47,3 +47,14 @@ internal to `class_3bb8c_g`'s own work.
 ### Proposed learning
 
 None new.
+
+## Naming
+
+`Class86E00_3bb8c_g__SetChildFlag8` (was `func_8004FFF4`), tier B: forwards
+`(self->unk6C, arg1, 0x7F, 0x7F)` to `self->unk6C`'s own vtable slot,
+the exact call shape of the already-named `Class86668__SetChildFlag8`
+(`src/class_3ac78.c`: `sub->methods->setFlag8(sub, value, 0x7F, 0x7F)`,
+that slot itself named `Class6B5CC__GetSetUnk10Flag8`) -- same argument
+count, same two trailing literals. Named by analogy to that established
+shape rather than from an independent derivation of what `0x7F, 0x7F`
+means here, so kept at tier B rather than A.

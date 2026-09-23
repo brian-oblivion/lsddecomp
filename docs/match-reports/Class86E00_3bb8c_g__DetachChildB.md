@@ -34,3 +34,9 @@ None new -- everything was already declared.
 None new. A second confirming instance of "when a function closely
 resembles an already-matched sibling, copy its exact idiom before
 deriving anything" -- cheaper than re-deriving, as already documented.
+
+## Naming
+
+`Class86E00_3bb8c_g__DetachChildB` (was `func_80050670`), tier B: the
+teardown counterpart of `Class86E00_3bb8c_g__AttachChildB`, exact twin of
+`Class86E00_3bb8c_g__DetachChildA` operating on `self->unk7C`.

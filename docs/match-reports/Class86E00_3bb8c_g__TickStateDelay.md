@@ -102,3 +102,12 @@ applies from the disassembly's OWN duplication pattern (are the fetch
 instructions repeated per branch, or does only the final call repeat?)
 before choosing a lever, rather than always reaching for the fanciest
 merge idiom on sight of a shared tail.
+
+## Naming
+
+`Class86E00_3bb8c_g__TickStateDelay` (was `func_80050280`), tier B: for
+three specific states (`7`, `0xB`, `0xF`) increments a per-object counter
+(`self->unk5C`) every call and only fires the state transition once the
+counter reaches 6 -- read as a per-call (per-frame) wait/delay gate ahead
+of a state change, hence "Tick". Which real-world delay this counts down
+(and why exactly 6) is not established.

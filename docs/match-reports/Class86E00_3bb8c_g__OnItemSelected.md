@@ -41,3 +41,12 @@ this is the function that exercises both.
 ### Proposed learning
 
 None new.
+
+## Naming
+
+`Class86E00_3bb8c_g__OnItemSelected` (was `func_80050730`), tier B: same
+external `arg2 in {2, 3}` dispatch shape as `Class86E00_3bb8c_g__OnCommand`,
+but its `2` case additionally reads a return value off its own `arg1`
+(a `GenericSlot9CObj_3bb8c_g *`) into `self->unk80` before transitioning --
+read as "an item was chosen, and here it is" rather than a plain command,
+though which UI concept `arg1` represents is not established.

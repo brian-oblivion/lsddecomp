@@ -102,3 +102,19 @@ same statement shape) pins one register for the variable's entire lifetime
 across the whole function and can cost far more in register-allocation
 ripple than the reload it was meant to save. Prefer a block-scoped local
 declared at the top of just the branch that needs it.
+
+## Naming
+
+`Class86E00_3bb8c_g__CopyMemcardIconTemplate` (was `func_800507F8`), tier B:
+copies one or more fixed byte ranges out of the `D_8008AAC4` template into
+the caller's buffer, optionally selecting a table entry via
+`atoi()` on a field of the caller-supplied `src` when one is given. Named
+from its one real caller context established elsewhere in this project
+(`TaskObjF__WriteMemcardSaveFile`, `class_3bb8c_m`, and `class_3bb8c_d`'s
+own call site) -- a memcard save-file writer building the save's on-card
+icon/header block from a shared template. The exact semantic meaning of
+each copied range (icon pixels vs. a formatted date/glyph, per the
+sibling `D_8008AA18`/`DecodeFullWidthSjis` context nearby in
+`class_3bb8c_d.c`) is not established, so this is named for the
+mechanism (template copy) plus its one known call context rather than a
+specific claim about pixel vs. text content.

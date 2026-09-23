@@ -41,3 +41,15 @@ the unit (`Class86E00_3bb8c_g__TickCardIcon`'s report).
 ### Proposed learning
 
 None new.
+
+## Naming
+
+`Class86E00_3bb8c_g__ForceIdleFromState` (was `func_800501F0`), tier B:
+for the sparse state set `{4, 6, 0xA, 0xE}` unconditionally resets
+(`slot8C(self, 0x10)`) and transitions to state `0x17` -- the same literal
+`0x17` that `Class86E00_3bb8c_g__SetState` also falls back to when the
+caller requests the CURRENT state again, and that several other functions
+in this unit transition to as their own "give up" outcome, so `0x17` reads
+as an idle/reset target rather than an ordinary destination. Kept tier B:
+the "idle" reading is consistent across several call sites but never
+confirmed against anything outside this unit's own numbers.

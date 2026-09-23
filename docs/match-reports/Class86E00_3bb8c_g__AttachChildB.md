@@ -43,3 +43,11 @@ report, applied here without needing its own derivation).
 None new. Worth noting as a case where reading a SIBLING function's match
 report before starting paid off directly -- no repeat of the arity
 mistake that cost `Class86E00_3bb8c_g__AttachChildA` an extra attempt.
+
+## Naming
+
+`Class86E00_3bb8c_g__AttachChildB` (was `func_800505A8`), tier B: the
+"B" twin of `Class86E00_3bb8c_g__AttachChildA` -- identical guard and
+attach sequence, operating on `self->unk7C` via `func_80051A5C` instead of
+`self->unk78` via `func_80050BA8`. See `AttachChildA`'s naming note: the
+A/B suffixes are positional labels, not an established functional split.

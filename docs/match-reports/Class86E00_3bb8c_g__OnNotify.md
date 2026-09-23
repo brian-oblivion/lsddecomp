@@ -34,3 +34,14 @@ not using" convention.
 ### Proposed learning
 
 None new.
+
+## Naming
+
+`Class86E00_3bb8c_g__OnNotify` (was `func_8004FF90`), tier B: signature
+shape `(self, arg1, arg2)` with `arg1` unread and `arg2` a small dispatch
+code (`0x19`/`0x17`) gated on `self->unk28 != 0` matches this project's
+established `(self, sender, event)` notify-receiver shape
+(`BasicClass__OnNotify`/`slot38`, `include/code_8220.h`) closely enough to
+use the same verb, though this class's own table is not BasicClass's and
+`arg1` is never read as a sender here. What the two event codes mean is
+not established.
