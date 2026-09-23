@@ -1,4 +1,6 @@
-# func_80032C60 -- MATCHED (byte-exact, 14/14 words). Round 32, head.
+# ResetRCnt -- MATCHED (byte-exact, 14/14 words). Round 32, head.
+
+> Renamed from `func_80032C60` on 2026-09-23 (tools/rename.py). Address 0x80032c60.
 
 > **ROUND 32 (2026-09-12), head. CLOSED. The residue was real and correctly
 > characterised for three rounds; what was missing was not a better SHAPE but
@@ -15,13 +17,13 @@
 ## What it does
 
 `ResetRCnt`: clears the `count` field (offset `0x0`) of root-counter block
-`D_8006DCB0[idx]` to `0` and returns `1`; returns `0` without touching the
+`gRCntRegs[idx]` to `0` and returns `1`; returns `0` without touching the
 table if `idx >= 3`, where `idx = (u16)n`.
 
 ## The match
 
 ```c
-s32 func_80032C60(s32 n)
+s32 ResetRCnt(s32 n)
 {
     s32 idx = (u16)n;
     RCntEntry *base;
@@ -29,7 +31,7 @@ s32 func_80032C60(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = D_8006DCB0;
+    base = gRCntRegs;
     base[idx].count = 0;
     return 1;
 }
@@ -82,9 +84,9 @@ was removed and `SetRCnt` still verifies at 40/40 on a green whole-image SHA1.
 It is gone from the source, because leaving both would tell the next reader the
 barrier is doing work that the type is doing.
 
-**And the same typing closed the sibling `func_80032BB8` the same day**, which
+**And the same typing closed the sibling `GetRCnt` the same day**, which
 had been filed as "register identity, not fixable by reshaping" — a terminal
-verdict under HARD RULE 6. See `func_80032BB8.md`; that is the more expensive
+verdict under HARD RULE 6. See `GetRCnt.md`; that is the more expensive
 half of this finding.
 
 ### Proposed learning
@@ -121,7 +123,7 @@ to `INCLUDE_ASM`.**
 ## What it does
 
 Setter/clear for the `count` field (offset `0x0`) of the root-counter
-shadow table entry `D_8006DCB0[idx]` (see `SetRCnt.md` for the table
+shadow table entry `gRCntRegs[idx]` (see `SetRCnt.md` for the table
 layout), where `idx = (u16)n`. Clears the field to `0` and returns `1` if
 `idx < 3`, else returns `0` without touching the table.
 
@@ -129,7 +131,7 @@ layout), where `idx = (u16)n`. Clears the field to `0` and returns `1` if
 
 ```c
 #if 0
-s32 func_80032C60(s32 n)
+s32 ResetRCnt(s32 n)
 {
     s32 idx = (u16)n;
     RCntEntry *base;
@@ -137,7 +139,7 @@ s32 func_80032C60(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = D_8006DCB0;
+    base = gRCntRegs;
     base[idx].count = 0;
     return 1;
 }
@@ -145,15 +147,15 @@ s32 func_80032C60(s32 n)
 ```
 
 This gets register allocation, comparison signedness (`slti`, matching
-`func_80032BB8`'s and `SetRCnt`'s pattern) and every operand exactly
-right. The `base = D_8006DCB0;` split (rather than inlining
-`D_8006DCB0[idx]` directly) was load-bearing: without it, GCC evaluated
+`GetRCnt`'s and `SetRCnt`'s pattern) and every operand exactly
+right. The `base = gRCntRegs;` split (rather than inlining
+`gRCntRegs[idx]` directly) was load-bearing: without it, GCC evaluated
 the shift (`idx*16`) before the pointer load instead of after, which
-ALSO scrambled register allocation the same way `func_80032BB8` is stuck
-(see that report) -- so this split may be the fix `func_80032BB8` itself
-is missing, except `func_80032BB8` has no assignment to split the same
-way (it only reads). Worth trying on `func_80032BB8` as e.g. `base =
-D_8006DCB0; return base[idx].count;` -- **tried, no change there**, so
+ALSO scrambled register allocation the same way `GetRCnt` is stuck
+(see that report) -- so this split may be the fix `GetRCnt` itself
+is missing, except `GetRCnt` has no assignment to split the same
+way (it only reads). Worth trying on `GetRCnt` as e.g. `base =
+gRCntRegs; return base[idx].count;` -- **tried, no change there**, so
 the technique doesn't transfer; noted for whoever picks this back up.
 
 ## Residue: one instruction misplaced across a jump, register-identity NOT involved
@@ -183,7 +185,7 @@ structurally similar hoist:
 - Barrier immediately after the store, before `return 1;`: reintroduced
   the register swap AND moved the early `li $v0,1` to the very end of the
   function (past the store), a strictly worse diff.
-- Barrier immediately before the store (after `base = D_8006DCB0;`):
+- Barrier immediately before the store (after `base = gRCntRegs;`):
   produced a redundant extra instruction (`move v0,zero` AND `li v0,1`
   both present -- CSE broke), 4 bytes longer than retail.
 
@@ -207,12 +209,12 @@ into:
 
 ```c
 #if 0
-s32 func_80032C60(s32 n)
+s32 ResetRCnt(s32 n)
 {
     s32 idx = (u16)n;
 
     if (idx < 3) {
-        D_8006DCB0[idx].count = 0;
+        gRCntRegs[idx].count = 0;
         return 1;
     }
     return 0;
@@ -249,9 +251,9 @@ guard test and reaches the valid body via a backward-labelled `~>`
 jump target. Net effect: a WORSE diff than the delay-slot-only residue
 (new content mismatch spanning most of the function, not just the one
 hoisted store), even though the SPECIFIC "j 32c90 delay slot" symptom is
-gone. Confirms the same boundary found on `func_80032BB8`: guard clauses
+gone. Confirms the same boundary found on `GetRCnt`: guard clauses
 of the "range check, then bail" shape want negative-first in this
-project's compiled output, and `func_80032AD0`'s raw-flag lever does not
+project's compiled output, and `SeqTimerDividerCallback`'s raw-flag lever does not
 transfer to them. Reverted; no change kept in `src/`.
 
 ### Proposed learning
@@ -260,8 +262,8 @@ transfer to them. Reverted; no change kept in `src/`.
    evidence the same placement (relative to the same kind of store/jump
    pair) will work in a sibling function with a different amount of
    surrounding code. Confirm per-function; do not batch-apply.
-2. **Boundary on the `func_80032AD0` block-order finding** (same
-   conclusion independently reached via `func_80032BB8`): it applies to a
+2. **Boundary on the `SeqTimerDividerCallback` block-order finding** (same
+   conclusion independently reached via `GetRCnt`): it applies to a
    raw truthy/flag value feeding `beqz`/`bnez` directly, not to a "guard
    clause + range comparison" (`slti`/`sltiu` against a small constant).
    For THAT shape, retail's own compiled form is negative-first
@@ -275,7 +277,7 @@ Re-verified the 1-instruction residue is still exactly as documented
 (confirmed with `asm-differ`: only the `sh zero,0(v1)` hoisted into the
 `j`'s delay slot where retail leaves a genuine `nop`, everything else
 byte-identical including operands and the register allocation the
-sibling `func_80032BB8` cannot reach). The whole-file 268446-byte "drift"
+sibling `GetRCnt` cannot reach). The whole-file 268446-byte "drift"
 funcdiff reports is not a regression signal here -- it's the same
 1-instruction/4-byte size difference propagating through every
 downstream address in the image, which is what this exact residue has
@@ -285,7 +287,7 @@ raw-offset dump.
 
 Tried a third barrier placement not in the round-16 list: `__asm__("")`
 as the very first statement of the valid branch, before `base =
-D_8006DCB0;` (rather than after it, or after the store). **Worse, not
+gRCntRegs;` (rather than after it, or after the store). **Worse, not
 neutral**: the compiler now drops the `j` entirely and duplicates
 `move v0,zero` (both the early-return path's implicit zero AND a second
 redundant zero-move appear), a strictly worse diff than the 1-instruction
@@ -315,15 +317,15 @@ round 19 (2026-09-05), runner charlie. Re-confirmed the 1-instruction
 residue with asm-differ; tried a third barrier placement (before the
 block), regressed like the other two; restored to `INCLUDE_ASM`.
 
-## ROUND 20 (runner echo): re-tested with the extra-temp lever that helped `func_80032BB8` -- regressed, confirmed negative
+## ROUND 20 (runner echo): re-tested with the extra-temp lever that helped `GetRCnt` -- regressed, confirmed negative
 
-Following this round's `func_80032BB8` finding (splitting a combined
-`base = D_8006DCB0; return D_8006DCB0[idx].count;` into a THIRD,
+Following this round's `GetRCnt` finding (splitting a combined
+`base = gRCntRegs; return gRCntRegs[idx].count;` into a THIRD,
 independently-live `entry` pointer local closed most of that function's
 register-identity residue), tested the same lever here:
 
 ```c
-s32 func_80032C60(s32 n)
+s32 ResetRCnt(s32 n)
 {
     s32 idx = (u16)n;
     RCntEntry *base;
@@ -332,7 +334,7 @@ s32 func_80032C60(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = D_8006DCB0;
+    base = gRCntRegs;
     entry = &base[idx];
     entry->count = 0;
     return 1;
@@ -342,15 +344,15 @@ s32 func_80032C60(s32 n)
 **Regressed badly: `funcdiff.py` reports 2/14 words with a genuine 268446-
 byte outside-range drift** (a real size/shape change, not the expected
 "same length, different order" residue this function otherwise has).
-This function already has one more live value than `func_80032BB8`
+This function already has one more live value than `GetRCnt`
 (the store's own operands, plus the already-load-bearing `base` split
 from this function's existing best body) -- adding a THIRD live pointer
 pushed register pressure past what this function's existing register
-file can absorb without changing shape, unlike `func_80032BB8` where the
+file can absorb without changing shape, unlike `GetRCnt` where the
 same lever had slack to use. Reverted immediately; confirms this round's
-`func_80032BB8.md` note that the lever is not universal and must be
+`GetRCnt.md` note that the lever is not universal and must be
 tested per-function. This function's own best body remains the
-already-documented `base = D_8006DCB0; base[idx].count = 0;` (13/14
+already-documented `base = gRCntRegs; base[idx].count = 0;` (13/14
 content-correct per `asm-differ`'s aligned view, one missing `nop`/
 hoisted-store-into-delay-slot residue) -- re-confirmed this round via
 direct rebuild (see below), unchanged from round 19.
@@ -363,3 +365,10 @@ where retail leaves that slot a genuine `nop` and keeps the store
 before the jump) -- everything else byte-identical, confirming this
 report's long-standing characterisation is still accurate. Restored to
 `INCLUDE_ASM` (still not byte-exact).
+
+## Naming
+
+Round 69 (delta). `ResetRCnt` (was `func_80032C60`): clears
+`gRCntRegs[idx].count` to 0, guarded by the same range check as `GetRCnt`
+-- tier A (a clamp/reset leaf whose mechanics are its purpose). Name taken
+directly from this report's own heading.

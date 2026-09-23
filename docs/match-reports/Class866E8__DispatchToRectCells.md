@@ -250,10 +250,10 @@ residue as a scheduler-internal decision with no direct C-source lever,
 now with a large-sample-size permuter result agreeing rather than
 merely a manual attempt list agreeing with itself.
 
-## ROUND 20 (runner echo): tested the `func_80032BB8` two-independently-live-locals lever -- regressed, negative
+## ROUND 20 (runner echo): tested the `GetRCnt` two-independently-live-locals lever -- regressed, negative
 
 Per the coordinator's cross-unit transferability question (does the lever
-that closed 5/7 residue words on `code_179d8_c`'s `func_80032BB8` --
+that closed 5/7 residue words on `code_179d8_c`'s `GetRCnt` --
 splitting a combined `base = tableBase; entry = &base[idx];` into two
 independently-live locals instead of one combined expression -- transfer
 to `class_3ac78`), tested it against this function's own base+index
@@ -269,7 +269,7 @@ cell = (base + entry->col) + entry->row * 20;
 (kept as one combined STATEMENT for `cell` itself, per this report's own
 already-established finding that splitting `cell`'s assignment across two
 statements regresses -- only `slot->unk10` was pulled out into its own
-named local, exactly mirroring `func_80032BB8`'s `base`/`entry` shape.)
+named local, exactly mirroring `GetRCnt`'s `base`/`entry` shape.)
 
 **Result: regressed, 95/117 -> 92/117, same size (no drift, confirmed --
 `0x3B900-0x3BAD4`, 117 words both sides).** The extra live pointer
@@ -279,15 +279,15 @@ present, still the same shape) -- a strictly worse result, not a neutral
 rephrasing. Reverted immediately; `git diff --stat` confirmed clean.
 
 **Transferability verdict for this function: negative.** This is the
-SECOND unit-specific negative for the lever (after `func_80032C60` in
+SECOND unit-specific negative for the lever (after `ResetRCnt` in
 `code_179d8_c` itself), and the failure mode is the same shape both
 times: introducing a new independently-live local costs register
 pressure this function's existing allocation doesn't have slack for, even
 though the underlying address computation LOOKS structurally identical
-to `func_80032BB8`'s. This function's own already-established fix (keep
+to `GetRCnt`'s. This function's own already-established fix (keep
 the base+index arithmetic as ONE C statement, no intermediate name at
-all) is the opposite lever from the one that helped `func_80032BB8` --
-worth noting as a discriminator: `func_80032BB8`'s starting point was a
+all) is the opposite lever from the one that helped `GetRCnt` --
+worth noting as a discriminator: `GetRCnt`'s starting point was a
 single combined expression that NEEDED splitting to free up allocator
 slack; this function's starting point already required staying combined
 to AVOID an early register commit. The two functions differ in which

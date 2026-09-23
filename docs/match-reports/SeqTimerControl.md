@@ -1,4 +1,6 @@
-# func_80032708 -- STALL (exact length 164/164 words; 65/164 raw word match; first real diff at vram 0x80032760)
+# SeqTimerControl -- STALL (exact length 164/164 words; 65/164 raw word match; first real diff at vram 0x80032760)
+
+> Renamed from `func_80032708` on 2026-09-23 (tools/rename.py). Address 0x80032708.
 
 Unit `code_179d8_c`, carved round 16 (2026-09-04). **Attempted, restored
 to `INCLUDE_ASM`.** Callee-saved register screen: 2 (`$s0`, `$s1`) --
@@ -8,30 +10,30 @@ the head's question" below).
 ## What it does
 
 A CD-audio/root-counter rate-selection dispatcher, called with `arg0`
-from `func_80032998`/`func_800329B8` (`1`/`0`). Busy-waits ~1000 cycles,
-then dispatches on the CD status global `D_8006DCA4`:
+from `StartSeqTimer`/`StopSeqTimer` (`1`/`0`). Busy-waits ~1000 cycles,
+then dispatches on the CD status global `gSeqTimerRateMode`:
 
 - `2`/`3`: fixed device tag `0xF2000002` with a fixed rate constant
-  (`0x44E8`/`0x89D0`), then a shared `D_8006DC90 = 6`.
-- `5`: if `arg0 != 0`, sets tag `0xF2000003`, clears `D_8006DC90`, rate
-  `1`; if `arg0 == 0`, just increments `D_8006DC8C` and jumps straight
+  (`0x44E8`/`0x89D0`), then a shared `gSeqTimerId = 6`.
+- `5`: if `arg0 != 0`, sets tag `0xF2000003`, clears `gSeqTimerId`, rate
+  `1`; if `arg0 == 0`, just increments `gSeqTimerStopPending` and jumps straight
   to the shared teardown-check near the end (skipping the whole
   SetRCnt/delay-loop/callback body below).
 - `0`: returns immediately, doing nothing at all (not even the trailing
   `func_80024CF0()`).
-- `1` or anything else (default): guarded by `D_8006DCA8`; computes a
+- `1` or anything else (default): guarded by `gSeqTimerModeFlag`; computes a
   rate via one of two divisions (`0x204CC0/v1` or `0x409980/v1`,
   selected by `v1 < 0x46`) with the classic PSX `div`+`break 7`/`break 6`
   overflow-trap idiom, and only the `< 0x46` branch additionally ORs `2`
-  into the device tag and increments `D_8006DC94`.
+  into the device tag and increments `gSeqTimerRateFlag`.
 
-Then (except the `5`/`arg0==0` and `0` early-outs): if `D_8006DC8C` is
+Then (except the `5`/`arg0==0` and `0` early-outs): if `gSeqTimerStopPending` is
 set, tears down via `func_80024DA0(func_80033738)` and returns; else
-calls `func_80024CE0()`, `func_80032C60(tag)`, `SetRCnt(tag,
-(s16)rate, 0x1000)`, two more ~2000-cycle busy-waits, `func_80032BF0(tag)`,
+calls `func_80024CE0()`, `ResetRCnt(tag)`, `SetRCnt(tag,
+(s16)rate, 0x1000)`, two more ~2000-cycle busy-waits, `SetIrqMask(tag)`,
 then the SAME callback-(re)registration shape already matched in
-`func_800329D8` (dispatching on `D_8006DC90`/`D_8006DC94` to pick
-`func_80032A9C`/`func_80032AD0`/`func_80033738` as the callback for
+`CancelSeqTimer` (dispatching on `gSeqTimerId`/`gSeqTimerRateFlag` to pick
+`SeqTimerCallback`/`SeqTimerDividerCallback`/`func_80033738` as the callback for
 `func_80024D40`), and finally `func_80024CF0()`.
 
 ## Best C reached: 65/164 words, correct dispatch VALUES, wrong physical case-body/test layout
@@ -50,24 +52,24 @@ then the SAME callback-(re)registration shape already matched in
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-extern s32 D_8006DCA4;
-extern s32 D_8006DCA8;
-extern s32 D_8006DC90;
-extern s32 D_8006DC94;
-extern s32 D_8006DC8C;
-extern void (*D_8006DC9C)(void);
+extern s32 gSeqTimerRateMode;
+extern s32 gSeqTimerModeFlag;
+extern s32 gSeqTimerId;
+extern s32 gSeqTimerRateFlag;
+extern s32 gSeqTimerStopPending;
+extern void (*gSeqTimerChainedCallback)(void);
 extern void func_80024CE0(void);
 extern void func_80024DA0(void (*cb)(void));
 extern void (*func_80024D40(s32 arg0, void (*callback)(void)))(void);
 extern void func_80024CF0(void);
-extern void func_80032A9C(void);
-extern void func_80032AD0(void);
+extern void SeqTimerCallback(void);
+extern void SeqTimerDividerCallback(void);
 extern void func_80033738(void);
-extern void func_80032BF0(s32 arg0);
-extern s32 func_80032C60(s32 n);
+extern void SetIrqMask(s32 arg0);
+extern s32 ResetRCnt(s32 n);
 extern s32 SetRCnt(s32 n, s16 target, u32 mode);
 
-void func_80032708(s32 arg0)
+void SeqTimerControl(s32 arg0)
 {
     s32 i;
     s32 v1;
@@ -78,39 +80,39 @@ void func_80032708(s32 arg0)
     for (i = 999; i >= 0; i--) {
     }
 
-    v1 = D_8006DCA4;
+    v1 = gSeqTimerRateMode;
     switch (v1) {
     case 2:
         s1 = 0xF2000002;
         s0 = 0x44E8;
-        D_8006DC90 = 6;
+        gSeqTimerId = 6;
         break;
     case 3:
         s1 = 0xF2000002;
         s0 = 0x89D0;
-        D_8006DC90 = 6;
+        gSeqTimerId = 6;
         break;
     case 5:
         if (arg0 != 0) {
             s1 = 0xF2000003;
-            D_8006DC90 = 0;
+            gSeqTimerId = 0;
             s0 = 1;
         } else {
-            D_8006DC8C++;
+            gSeqTimerStopPending++;
             goto merge2;
         }
         break;
     case 0:
         return;
     default:
-        if (D_8006DCA8 != 0) {
+        if (gSeqTimerModeFlag != 0) {
             return;
         }
         s1 = 0xF2000002;
-        D_8006DC90 = 6;
+        gSeqTimerId = 6;
         if (v1 < 0x46) {
             v1 = 0x204CC0 / v1;
-            D_8006DC94++;
+            gSeqTimerRateFlag++;
             s0 = v1;
         } else {
             s1 = 0xF2000000;
@@ -121,13 +123,13 @@ void func_80032708(s32 arg0)
     }
 
 merge2:
-    if (D_8006DC8C != 0) {
+    if (gSeqTimerStopPending != 0) {
         func_80024DA0(func_80033738);
         return;
     }
 
     func_80024CE0();
-    func_80032C60(s1);
+    ResetRCnt(s1);
     SetRCnt(s1, (s16)s0, 0x1000);
 
     for (i = 1999; i >= 0; i--) {
@@ -135,19 +137,19 @@ merge2:
     for (i = 1999; i >= 0; i--) {
     }
 
-    func_80032BF0(s1);
+    SetIrqMask(s1);
 
-    rc90 = D_8006DC90;
+    rc90 = gSeqTimerId;
     if (rc90 != 0) {
-        if (D_8006DC94 != 0) {
-            cb = func_80032AD0;
+        if (gSeqTimerRateFlag != 0) {
+            cb = SeqTimerDividerCallback;
         } else {
             cb = func_80033738;
         }
     } else {
-        D_8006DC9C = func_80024D40(0, NULL);
-        rc90 = D_8006DC90;
-        cb = func_80032A9C;
+        gSeqTimerChainedCallback = func_80024D40(0, NULL);
+        rc90 = gSeqTimerId;
+        cb = SeqTimerCallback;
     }
     func_80024D40(rc90, cb);
     func_80024CF0();
@@ -172,7 +174,7 @@ top-level construct** -- it took the diff to 65/164 by fixing every
 dispatch COMPARISON to match retail exactly (`beq v1,2`, `slti
 v1,3`+`beqz`, `beq v1,3`, `beq v1,5`, fallthrough to default) with the
 correct instruction count for the comparison chain. This is a
-meaningfully different signal from the `func_80032AD0`/`func_800329D8`
+meaningfully different signal from the `SeqTimerDividerCallback`/`CancelSeqTimer`
 block-order lever (which is about if/else with a RAW value, not a
 multi-way dispatch) -- for a genuine multi-way integer dispatch on a
 small, non-dense case set, write a C `switch`, not a chain of
@@ -208,7 +210,7 @@ the first statement of the `v1 < 0x46` arm, no `else` assignment) was
 tried and **regressed hard, 65/164 -> 25/164** -- it flipped which
 physical register (`$s0` vs `$s1`) several LATER, unrelated call
 argument's rely on (visible as `move a0,$s1` becoming `move a0,$s0` at
-the `func_80032C60`/`SetRCnt` call sites, and the `SetRCnt` target
+the `ResetRCnt`/`SetRCnt` call sites, and the `SetRCnt` target
 argument's cast changing from a `andi ...,0xffff` zero-mask to a
 `sll/sra` sign-extend). Reverted immediately. Filed as a caution: a
 "more literal" transcription of retail's instruction-level composition
@@ -224,7 +226,7 @@ class of register permutation seen throughout this unit this round
 registers (`$s0`/`$s1`, `$v0`/`$v1`), plus the two `div`/`break`
 overflow-trap blocks and the final callback-dispatch tail (which is
 structurally the exact same shape already matched byte-for-byte in
-`func_800329D8` -- so the logic there is very likely right, and any
+`CancelSeqTimer` -- so the logic there is very likely right, and any
 remaining diff there is register permutation, not a different C shape).
 None of these were separately isolated given the size of the case-body-
 order problem still unresolved; a future attempt should fix case body
@@ -311,14 +313,14 @@ spend on one function. No source change kept.
 ## Round 41 (runner delta): the case-body-reorder lever NEGATIVE, first-ever permuter search NEGATIVE
 
 Round 41's assignment named this function specifically because it (and
-its sibling `func_80032588` in the same unit) had **never been
+its sibling `SetSeqTimerMode` in the same unit) had **never been
 permuter-searched**. Restored the round-16/19/20 65/164 body verbatim
 (after renaming the five SDK-retargeted symbols per the round-39 warning
 above -- confirmed it still builds clean and reproduces exactly 65/164,
 no drift, matching this report's own recorded figure before touching
 anything).
 
-**First real diff, read off `tools/asm-differ/diff.py func_80032708`
+**First real diff, read off `tools/asm-differ/diff.py SeqTimerControl`
 directly (not inferred):** at file offset `0x22f60` / vram `0x80032760`,
 retail has `bne v1,v0,.L800327D8` (branch AWAY to `default` when
 `v1 != 5`, so the `v1 == 5` case's own dispatch falls through inline to
@@ -328,7 +330,7 @@ the very next instruction) while this build has `beq v1,v0,<case5 body>`
 (`v1 == 5`); the polarity and which side is placed inline differs. This
 is the exact `if (cond) {A; return;} rest;` vs `if (cond) {...} else
 {B; return;}` polarity question that closed the OTHER function in this
-round's assignment (`func_80032588`, see that report) -- but attempting
+round's assignment (`SetSeqTimerMode`, see that report) -- but attempting
 the analogous fix here (below) did not transfer.
 
 ### Lever 1 tried: reorder switch cases to retail's physical body order (5, 3, 2, 0, default) -- NEGATIVE, confirms a real project rule the hard way
@@ -339,7 +341,7 @@ it directly: reordered the `switch`'s `case` clauses from source order
 `2, 3, 5, 0, default` to `5, 3, 2, 0, default`, matching the physical
 address order of the case BODIES in retail's `.s` (case5's `arg0!=0`
 body at `.L80032790`, case3 at `.L800327A8`, case2 at `.L800327B8`, then
-the shared `D_8006DC90=6` tail, then `default` at `.L800327D8`).
+the shared `gSeqTimerId=6` tail, then `default` at `.L800327D8`).
 
 **Result: regressed hard, 65/164 -> 36/164, WITH real outside-range
 drift** (function length changed). `asm-differ` showed the regression
@@ -365,9 +367,9 @@ ORDER is recoverable from the binary`, round 23): **for a JUMP-TABLE
 SPARSE switch lowered to a compare chain (no jump table -- exactly this
 function's shape), the compiler "picks its own comparison order" and
 source declaration order is NOT reliably recoverable from body layout
-either.** `func_80032588` (this round's OTHER assignment, in the SAME
+either.** `SetSeqTimerMode` (this round's OTHER assignment, in the SAME
 unit) is a jump-table switch and the body-order lever closed it
-cleanly. `func_80032708` has no jump table (a straight `beq`/`bne`/`slti`
+cleanly. `SeqTimerControl` has no jump table (a straight `beq`/`bne`/`slti`
 compare chain, confirmed in the `.s`) and the SAME lever, tried the same
 way, made things categorically worse rather than incrementally worse --
 strong evidence the two functions are on opposite sides of the
@@ -381,7 +383,7 @@ too large to treat as a "trailing" arm).
 
 ### Lever 2 tried: first-ever permuter search -- ran to its time bound, best score found is NEGATIVE when translated
 
-Set up with `tools/setup-permuter.sh func_80032708 <65/164 seed>`.
+Set up with `tools/setup-permuter.sh SeqTimerControl <65/164 seed>`.
 `--debug --stack-diffs` validation matched this report's own recorded
 residue shape (base score 3735; the visible diff was exactly the
 case-5/default polarity region above plus a register-permutation tail
@@ -390,7 +392,7 @@ consistent with "Residue not further chased" section above) --
 
 Launched: `PATH=.../permuter-work/bin:$PATH .venv/bin/python3
 tools/decomp-permuter/permuter.py -j 4 --stop-on-zero --best-only
-permuter-work/func_80032708`, bounded at 900s (the machine was also
+permuter-work/SeqTimerControl`, bounded at 900s (the machine was also
 running alpha's and charlie's own `-j 6` permuter searches concurrently
 in sibling worktrees this round -- real contention, not idle).
 
@@ -438,7 +440,7 @@ project's oracle.**
 
 Restored to `INCLUDE_ASM`; `git status --porcelain` clean for this
 function. Whole-image build verified green (`./build-and-verify.sh`
-passes) with this function as `INCLUDE_ASM` and `func_80032588` (this
+passes) with this function as `INCLUDE_ASM` and `SetSeqTimerMode` (this
 round's other assignment) as a genuine byte-exact match -- so the only
 thing blocking a fully-matching image in this unit right now is this
 function.
@@ -448,9 +450,9 @@ function.
 1. **The "case order is recoverable from body layout" lever is
    confirmed, empirically and by direct A/B regression in this round,
    to be SCOPED to jump-table (dense) switches and not to transfer to a
-   sparse switch lowered to a compare chain** -- `func_80032588` (dense,
+   sparse switch lowered to a compare chain** -- `SetSeqTimerMode` (dense,
    jump table) closed cleanly on this lever in this same round;
-   `func_80032708` (sparse, compare chain) regressed by nearly half its
+   `SeqTimerControl` (sparse, compare chain) regressed by nearly half its
    already-matched words on the identical technique, twice (with and
    without also swapping local declaration order). `docs/DECOMPILATION_LEARNINGS.md`
    already states this boundary in prose (round 23); this is a second,
@@ -486,7 +488,7 @@ change kept.
 Reviewed fresh this round per the coordinator's "re-derive from scratch,
 skeptical of any not-fixable verdict" standard (the same standard that
 found real progress on `func_8001A4C0` in a different unit and on this
-unit's own `func_80032BB8`). This function's residue (case-body physical
+unit's own `GetRCnt`). This function's residue (case-body physical
 ordering plus a register cascade sensitive to how the default case's
 value composition is written) is a different, larger-scoped class than
 either of those two fixes -- not a simple register-identity swap or a
@@ -512,3 +514,18 @@ pipeline -- a permuter score improvement did not correspond to a real
 one here. No source change kept; restored to `INCLUDE_ASM`, still
 65/164, first real diff at vram `0x80032760`. See "Round 41" section
 above for full detail.
+
+## Naming
+
+Round 69 (delta), track 3 pass on `code_179d8_c_b`.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `SeqTimerControl` (was `func_80032708`) | B | arms a PSX root counter at the rate `SetSeqTimerMode` selected (`SetRCnt`), tags a device value, and registers one of two ISR callbacks (`SeqTimerCallback`/`SeqTimerDividerCallback`) via `InterruptCallback` -- an "arm the sequencer's software timer" routine. `arg0` is a start/stop-ish switch (see `StartSeqTimer.md`/`StopSeqTimer.md`) but its exact in-game trigger is not established, hence B not A. |
+| `gSeqTimerId` (was `D_8006DC90`) | B | the value threaded through `InterruptCallback` as a handle: `-1` is checked as a sentinel ("nothing armed") throughout this function and in `CancelSeqTimer`, `0` means "armed but not yet given a real id" (this function then captures one via `InterruptCallback(0, NULL)`), and any other value is passed straight back to `InterruptCallback` to re-target or deregister. |
+| `gSeqTimerRateFlag` (was `D_8006DC94`) | B | set (incremented, never explicitly reset here) only on the branch of the default case that computes the smaller of the two custom rates (`v1 < 0x46`); this function's own callback-selection tail reads it as a boolean to choose `SeqTimerDividerCallback` over `SeqTimerCallback` -- i.e. it selects the half-rate ISR variant. `CancelSeqTimer` clears it back to 0. |
+| `gSeqTimerStopPending` (was `D_8006DC8C`) | B | when set, this function's shared tail skips arming entirely and instead tears down via `VSyncCallback(SsSeqCalledTbyT)`; `CancelSeqTimer` is the other place that reads/clears it, calling `VSyncCallback(0)` first. Named for what it gates (a pending stop/teardown), not for a specific caller's intent. |
+| `gSeqTimerChainedCallback` (was `D_8006DC9C`) | B | captured from `InterruptCallback(0, NULL)`'s return value (the previously-installed handler) right before this function installs `SeqTimerCallback` as the new one; `SeqTimerCallback` calls it first, then always calls `SsSeqCalledTbyT` -- the classic "save old handler, chain to it" ISR-hook idiom. |
+
+`gSeqTimerRateMode`/`gSeqTimerModeFlag`/`gVideoMode`/`gSeqTickRate` are
+established in `SetSeqTimerMode.md`; this function only reads the first two.

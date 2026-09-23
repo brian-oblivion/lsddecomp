@@ -20,8 +20,8 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
         gVabSizeTableInited = 0;
         gVabVolumeInited = 0;
         gVabStreamInited = 0;
-        func_800329D8();
-        func_80032A7C();
+        CancelSeqTimer();
+        ClearSpuMute();
     }
     func_80017CFC(self->vagAttrPool);
     func_80017CFC(self->progVagTable);

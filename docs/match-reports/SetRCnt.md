@@ -3,7 +3,7 @@
 **Unit:** code_179d8_c · **Size:** 40 instructions · **Status:** MATCHED (40/40 words)
 
 Not a `psyq_*` segment function -- this and its neighbours
-(`func_80032BB8`, `func_80032C60`, `func_80032AD0`) look like Psy-Q
+(`GetRCnt`, `ResetRCnt`, `SeqTimerDividerCallback`) look like Psy-Q
 root-counter (hardware timer) routines linked directly into game text
 rather than into a separate SDK segment. Per the assignment note: this is
 ordinary work, but do not generalise anything found here to the game's
@@ -11,7 +11,7 @@ own code -- the real Psy-Q `SETRCNT.H`/prototype is not present anywhere
 in `include/psyq/` in this tree (checked: no `RCnt` hits in `LIBETC.H`,
 `KERNEL.H`, or anywhere else under `include/`), so there is no SDK
 prototype to match against; the signature below is derived purely from
-the call site in `func_80032708` and from this function's own body.
+the call site in `SeqTimerControl` and from this function's own body.
 
 ## What it does
 
@@ -31,10 +31,30 @@ Returns `1` on success, `0` if `n` was out of range.
 
 ## The C
 
+**STALE below (pre-round-32): this block still shows the plain-`u16`,
+`__asm__("")`-barrier form.** `ResetRCnt.md`/`GetRCnt.md` document that round
+32 replaced the barrier with `volatile` on all three `RCntEntry` fields
+(load-bearing for those two functions, and it subsumes this function's own
+barrier -- removed, `SetRCnt` still verifies 40/40). The struct in
+`src/code_179d8_c_b.c` is now:
+
+```c
+typedef struct {
+    volatile u16 count;              /* 0x0 */
+    u8  pad2[0x4 - 0x2];
+    volatile u16 mode;                /* 0x4 */
+    u8  pad6[0x8 - 0x6];
+    volatile u16 target;               /* 0x8 */
+    u8  padA[0x10 - 0xA];
+} RCntEntry;
+```
+and `SetRCnt`'s own body carries no `__asm__("")` at all. The signedness and
+mode-bitmask findings below are unaffected by this and still hold.
+
 ```c
 /* Shadow copy of the three PSX root-counter register blocks (COUNT/MODE/
  * TARGET, each a hardware halfword, 0x10 apart -- matches the real
- * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). D_8006DCB0 is a
+ * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). gRCntRegs is a
  * pointer to this table, not the table itself. */
 typedef struct {
     u16 count;              /* 0x0 */
@@ -45,7 +65,7 @@ typedef struct {
     u8  padA[0x10 - 0xA];
 } RCntEntry;
 
-extern RCntEntry *D_8006DCB0;
+extern RCntEntry *gRCntRegs;
 
 s32 SetRCnt(s32 n, s16 target, u32 mode)
 {
@@ -58,9 +78,8 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
     }
 
     isLow = (u32)idx < 2;
-    D_8006DCB0[idx].mode = 0;
-    D_8006DCB0[idx].target = target;
-    __asm__("");
+    gRCntRegs[idx].mode = 0;
+    gRCntRegs[idx].target = target;
 
     if (isLow) {
         if (mode & 0x10) {
@@ -79,7 +98,7 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
         md |= 0x10;
     }
 
-    D_8006DCB0[idx].mode = md;
+    gRCntRegs[idx].mode = md;
     return 1;
 }
 ```
@@ -98,7 +117,7 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
   16-bit immediate range: worth checking on any sibling function with
   more than one range check on the same masked index.
 - **A store got hoisted into a jump's delay slot when retail leaves it a
-  real `nop`.** Without intervention, `D_8006DCB0[idx].target = target;`
+  real `nop`.** Without intervention, `gRCntRegs[idx].target = target;`
   (an ordinary, independent store) got scheduled by cc1's delay-slot
   filler to execute *after* the following `beqz`, i.e. into its delay
   slot -- legal (the store doesn't affect the branch condition) but not
@@ -140,3 +159,11 @@ round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
 Matched after ~4 attempts (signedness fix, branch-direction/guard-clause
 shape not needed here since it already matched, and the scheduling
 barrier).
+
+## Naming
+
+Round 69 (delta). `gRCntRegs` (was `D_8006DCB0`): pointer to the 3-entry
+shadow of the PSX root-counter register blocks (COUNT/MODE/TARGET, matching
+the real `0x1F801100`/`0x1F801110`/`0x1F801120` hardware spacing) -- tier B,
+established by this function's own pre-existing doc comment and used
+identically by `GetRCnt`/`ResetRCnt`.

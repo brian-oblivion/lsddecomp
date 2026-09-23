@@ -1,12 +1,14 @@
-# func_80032BF0 -- MATCHED (14/14 words)
+# SetIrqMask -- MATCHED (14/14 words)
+
+> Renamed from `func_80032BF0` on 2026-09-23 (tools/rename.py). Address 0x80032bf0.
 
 Unit: `code_179d8_c`. Round 23, runner bravo.
 
 ## What it does
 
 Sets an IRQ mask bit in the shadow interrupt-controller pair pointed to by
-`D_8006DCAC` (base `0x1F801070` = I_STAT; `+0x4` = I_MASK). `which` selects
-which bit out of the `D_8006DCB4` table (`{0x10, 0x20, 0x40, 0x1}` --
+`gIrqRegs` (base `0x1F801070` = I_STAT; `+0x4` = I_MASK). `which` selects
+which bit out of the `gRCntIrqMasks` table (`{0x10, 0x20, 0x40, 0x1}` --
 Tmr0/Tmr1/Tmr2 IRQ bits for indices 0-2, VBLANK for index 3; this table is
 also the one `SetRCnt` a few functions up implicitly matches against, since
 that function manages root counters 0-2).
@@ -25,15 +27,15 @@ typedef struct {
     volatile u32 mask; /* 0x4, I_MASK */
 } IrqRegs;
 
-extern IrqRegs *D_8006DCAC;
-extern u32 D_8006DCB4[4];
+extern IrqRegs *gIrqRegs;
+extern u32 gRCntIrqMasks[4];
 
-s32 func_80032BF0(u16 which)
+s32 SetIrqMask(u16 which)
 {
     s32 idx = which;
-    IrqRegs *reg = D_8006DCAC;
+    IrqRegs *reg = gIrqRegs;
 
-    reg->mask |= D_8006DCB4[idx];
+    reg->mask |= gRCntIrqMasks[idx];
     return idx < 3;
 }
 ```
@@ -47,7 +49,7 @@ GCC's delay-slot filler had hoisted the independent `sw $v1, 0x4($a1)` store
 into the `jr $ra` delay slot, dropping the explicit trailing `nop` retail has.
 That makes the compiled function 13 instructions (0x34 bytes) instead of
 retail's 14 (0x38) -- one word of address drift, which shifted every
-following byte in the image and made the following function (`func_80032C28`)
+following byte in the image and made the following function (`ClearIrqMask`)
 compare against nothing meaningful.
 
 Retail does NOT hoist that store. The fix: mark the hardware-register struct
@@ -65,3 +67,15 @@ with the field's store and leaving the `nop` retail has. When a body compiles
 one instruction short with a plausible-looking delay-slot hoist, and the
 field being stored is memory-mapped I/O, try `volatile` before treating it as
 a scheduling residue to chase with a barrier.
+
+## Naming
+
+Round 69 (delta). `SetIrqMask` (was `func_80032BF0`): ORs a bit into
+`gIrqRegs->mask` (I_MASK), where the bit comes from `gRCntIrqMasks[idx]`.
+Tier A -- a setter whose mechanics are its purpose. `gIrqRegs` (was
+`D_8006DCAC`) and `gRCntIrqMasks` (was `D_8006DCB4`) are named from this
+function's and `ClearIrqMask`'s own pre-existing doc comment in
+`src/code_179d8_c_b.c`, which already identified the pair as the PSX
+I_STAT/I_MASK shadow and the per-index Tmr0/Tmr1/Tmr2/VBLANK IRQ bit table
+-- tier B for both (the hardware mapping is established; which game
+subsystem relies on it is not).

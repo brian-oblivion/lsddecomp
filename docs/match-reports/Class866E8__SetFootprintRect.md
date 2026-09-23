@@ -269,7 +269,7 @@ frame does.
 
 ## ROUND 20 (runner echo): lever not applicable; one fresh structural idea tried, negative
 
-**The `func_80032BB8` two-independently-live-locals lever does not apply
+**The `GetRCnt` two-independently-live-locals lever does not apply
 to this function at all** -- there is no table/struct-base address
 computation anywhere in its body (it is pure byte-field reads, sign
 extension, and conditional decrements; the only pointer dereference is

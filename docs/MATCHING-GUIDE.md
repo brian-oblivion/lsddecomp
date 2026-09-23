@@ -354,7 +354,7 @@ three are live rather than transcribed:
   **Round 16 hit this twice in one round, which makes it a standing check
   rather than an anecdote: a long attempt list is not a broad one.**
 
-  - `func_80032BB8` — seven reshapes, every one varying the *expression* form
+  - `GetRCnt` — seven reshapes, every one varying the *expression* form
     (array index vs pointer arithmetic, temp vs no temp, declaration split,
     parameter type). None changed the CONTROL FLOW.
   - `func_8002C048` — twenty-five variations, every one keeping the cached

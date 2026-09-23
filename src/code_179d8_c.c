@@ -19,12 +19,12 @@
  *   - func_800323A8 (120w) is `SsSetTableSize` (`libsnd/sstable.o`, Psy-Q
  *     3.5), linked from the object. It sat in the MIDDLE, so the slice became
  *     [c code_179d8_c][o sstable][c code_179d8_c_b] and everything from
- *     func_80032588 on now lives in `src/code_179d8_c_b.c`.
+ *     SetSeqTimerMode on now lives in `src/code_179d8_c_b.c`.
  * Neither was ever matchable as C; both stall reports are kept, re-titled
  * CONVERTED. This unit is now three functions: func_8003221C and its two
  * one-line callers.
  *
- * THE 0x14D8 RODATA ATTACH IS NO LONGER OURS. It belongs to func_80032588
+ * THE 0x14D8 RODATA ATTACH IS NO LONGER OURS. It belongs to SetSeqTimerMode
  * (jtbl_80010CD8), which went to code_179d8_c_b, and the yaml attach moved
  * with it. Do not move it back.
  *
@@ -32,10 +32,10 @@
  * full window census). This window screened 16/20 clean.
  *
  * STALE CLAIM REMOVED, round 23 (2026-09-07): this comment listed
- * func_80032148, func_80032588, func_80032BF0 and func_80032C28 as blocked,
+ * func_80032148, SetSeqTimerMode, SetIrqMask and ClearIrqMask as blocked,
  * "all addiu_at". **`addiu_at` was resolved in round 21** (maspsx
  * `--addiu-at`; docs/research/addiu-at-blocker.md), and round 23 MATCHED
- * func_80032BF0 and func_80032C28 byte-exact and took the other two to
+ * SetIrqMask and ClearIrqMask byte-exact and took the other two to
  * 48/53 and ~90/96 with characterised non-toolchain residues. (The 48/53 was
  * func_80032148 -- round 32 then found it is Sony's, so that effort was spent
  * on library code; see docs/match-reports/func_80032148.md.) Nothing in
@@ -46,7 +46,7 @@
  * Round 23's runner bravo spotted this line as stale and correctly did not
  * edit it (parallel-mode rules); the head fixed it at consolidation.
  *
- * Note func_80032AD0/SetRCnt: this window holds what look like Psy-Q root
+ * Note SeqTimerDividerCallback/SetRCnt: this window holds what look like Psy-Q root
  * counter routines linked into game text rather than into a psyq_* segment.
  * They are ordinary work, but do not generalise a finding from them to the
  * game's own code.
@@ -70,13 +70,13 @@ extern void InitSpuDriver(s32 arg0);
 extern s32 GetVideoMode(void);
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
-extern s32 D_8009024C;
+extern s32 gSeqTickRate;
 extern s32 D_8008EA00;
-extern s32 D_8006DC8C;
-extern s32 D_8006DC90;
-extern s32 D_8006DC94;
-extern void (*D_8006DC9C)(void);
-extern s32 D_8006DC98;
+extern s32 gSeqTimerStopPending;
+extern s32 gSeqTimerId;
+extern s32 gSeqTimerRateFlag;
+extern void (*gSeqTimerChainedCallback)(void);
+extern s32 gVideoMode;
 extern s32 D_8008E934;
 
 /* One 0x40-byte per-voice software state slot; the init below just zeroes it. */
@@ -148,13 +148,13 @@ void func_8003221C(s32 arg0)
         }
     }
 
-    D_8009024C = 0x3C;
+    gSeqTickRate = 0x3C;
     D_8008EA00 = 0;
-    D_8006DC8C = 0;
-    D_8006DC90 = -1;
-    D_8006DC94 = 0;
-    D_8006DC9C = NULL;
-    D_8006DC98 = GetVideoMode();
+    gSeqTimerStopPending = 0;
+    gSeqTimerId = -1;
+    gSeqTimerRateFlag = 0;
+    gSeqTimerChainedCallback = NULL;
+    gVideoMode = GetVideoMode();
     D_8008E934 = 0;
 }
 
