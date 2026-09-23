@@ -563,7 +563,53 @@ s32 note2pitch2(s32 a0, s32 a1) {
     return v1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002E138);
+/* Matched round 73 -- docs/match-reports/func_8002E138.md. */
+typedef struct {
+    u8 unk0;
+    u8 pad1[0x34 - 0x1];
+} Rec34B_E138;
+typedef struct {
+    u16 unk0;
+    u8 pad2[0x34 - 0x2];
+} Rec34H_E138;
+extern Rec34B_E138 D_8008D998[];
+extern Rec34B_E138 D_8008D99C[];
+extern Rec34H_E138 D_8008D994[];
+extern u16 D_8008EA26;
+extern u8 D_8008D970[];
+
+void func_8002E138(s32 chan, s32 bend) {
+    s32 off;
+    s32 prod;
+    s32 q;
+    s32 note;
+    s32 fine;
+    s16 b;
+    s32 idx;
+    u8 *p;
+
+    off = (chan & 0xFF) * 8;
+    if ((u32)(chan & 0xFF) < 24) {
+        p = &D_8008EA13;
+        *p = D_8008D998[(chan & 0xFF)].unk0;
+        D_8008EA18 = D_8008D99C[(chan & 0xFF)].unk0;
+        D_8008EA26 = (u8)chan;
+        idx = D_8008EA18 + (*p << 4);
+        b = bend;
+        if (b >= 0) {
+            prod = b * D_8008E978[idx].unk13;
+            note = D_8008D994[(chan & 0xFF)].unk0 + prod / 127;
+            fine = prod % 127;
+        } else {
+            q = (b * D_8008E978[idx].unk12) / 127;
+            note = D_8008D994[(chan & 0xFF)].unk0 + q - 1;
+            fine = q + 127;
+        }
+        ((u16 *)D_8008D7F0)[off + 2] = note2pitch2((u16)note, (u16)fine);
+        D_8008D970[(chan & 0xFF)] |= 4;
+    }
+}
+
 
 void func_8002E2F8(void) {
 }
