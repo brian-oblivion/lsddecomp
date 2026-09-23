@@ -1,13 +1,37 @@
+/*
+ * class_3bb8c_g -- this unit's own slots (+0x048 and up) of the shared
+ * Class86E00 vtable (D_80086E00; +0x004..+0x03C belong to class_3bb8c_e/f,
+ * this header's other two owners of the same table), plus one standalone
+ * helper (CopyMemcardIconTemplate) reused by class_3bb8c_m's memcard save
+ * writer.
+ *
+ * Class86E00 runs a `state` machine: SetState/AdvanceState fire a fixed
+ * set of transition-entry callbacks and either commit a new `state` or
+ * tear the object down; ForceIdleFromState and TickStateDelay drive two
+ * more paths into the same shared slot7C/slot8C tail; OnCommand and
+ * OnItemSelected forward an externally supplied 2/3 dispatch code the
+ * same way. Two lazily-attached child sub-objects (childA/childB, the
+ * same real class the sibling units call Obj86ED0/Class86ED0 via
+ * D_80086ED0) are attached/detached in mirrored pairs. A third,
+ * independent child (cardIcon) is a memcard-icon TIM image, loaded once
+ * by LoadCardIcon and stepped by TickCardIcon.
+ *
+ * Every function in the unit is matched C. What each numeric `state`
+ * code and each OnCommand/OnItemSelected dispatch code means in game
+ * terms is not established -- names below describe mechanics, not
+ * purpose (tier B throughout except the two pure getter/loader
+ * functions). See each function's own match report for its evidence.
+ */
 #include "common.h"
 #include "class_3bb8c.h"
 
-void func_8004FBE4(Class86E00_3bb8c_g *self, s32 arg1)
+void Class86E00_3bb8c_g__SetState(Class86E00_3bb8c_g *self, s32 arg1)
 {
     Class86E00Methods_3bb8c_g *methods = self->methods;
     s32 ret;
     s32 i;
 
-    if (self->unk28 == arg1) {
+    if (self->state == arg1) {
         arg1 = 0x17;
     }
 
@@ -15,7 +39,7 @@ void func_8004FBE4(Class86E00_3bb8c_g *self, s32 arg1)
     methods->slot84(self);
     methods->slot80(self, arg1);
 
-    self->unk5C = 0;
+    self->waitCounter = 0;
     switch (arg1) {
     case 0x13:
         arg1 = methods->slot50(self) ? 0x11 : 8;
@@ -44,7 +68,7 @@ void func_8004FBE4(Class86E00_3bb8c_g *self, s32 arg1)
     }
 
     if ((u32)(arg1 - 0x16) < 2) {
-        if (self->unk24 == 1 && self->unk38 != NULL) {
+        if (self->secondaryMode == 1 && self->unk38 != NULL) {
             func_80017CFC(self->unk3C);
             for (i = 0; i < self->unk2C; i++) {
                 func_80017CFC(((void **)self->unk38)[i]);
@@ -52,10 +76,10 @@ void func_8004FBE4(Class86E00_3bb8c_g *self, s32 arg1)
             func_80017CFC(self->unk38);
             self->unk38 = NULL;
         }
-        self->unk28 = 0;
-        self->unk24 = 0;
+        self->state = 0;
+        self->secondaryMode = 0;
     } else {
-        self->unk28 = arg1;
+        self->state = arg1;
     }
 }
 
@@ -66,21 +90,21 @@ void func_8004FBE4(Class86E00_3bb8c_g *self, s32 arg1)
  * local view per this project's established convention. */
 extern ChildObj86ED0 *func_8003B39C(char *path);
 /* Not this round's function -- consumes the short-lived handle above and
- * produces the object stored into `self->unk70`. */
+ * produces the object stored into `self->cardIcon`. */
 extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
 /* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
  * mostly `char *` string pointers into rodata, a few raw literal words at
  * indices never reached from this call site. `asm/data/76DC8.data.s`. */
-extern char *D_80086E80[];
-extern const char D_8008AAB4[]; /* "CARD\\" */
-extern const char D_8008AABC[]; /* ".TIM" */
+extern char *gCardIconNames[];
+extern const char gCardPathPrefix[]; /* "CARD\\" */
+extern const char gCardPathSuffix[]; /* ".TIM" */
 /* 3-word opaque block, `func_80041C9C`'s arg1, address-only here. */
 extern s32 D_80086EC4;
-/* opaque block, the fresh `unk70`'s own `slot4C` arg2, address-only here. */
+/* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
 extern s32 D_8008AA94;
 
-void func_8004FE24(Class86E00_3bb8c_g *self, s32 arg1)
+void Class86E00_3bb8c_g__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
 {
     char path[0x20];
     char *buf;
@@ -91,38 +115,38 @@ void func_8004FE24(Class86E00_3bb8c_g *self, s32 arg1)
     if (arg1 >= 0x11) {
         return;
     }
-    if (self->unk68 == 0) {
+    if (self->childReady == 0) {
         return;
     }
-    if (self->unk70 != NULL) {
+    if (self->cardIcon != NULL) {
         return;
     }
 
     buf = path;
-    name = D_80086E80[arg1];
+    name = gCardIconNames[arg1];
     buf[0] = '\0';
-    strcat(buf, D_8008AAB4);
+    strcat(buf, gCardPathPrefix);
     strcat(buf, name);
-    strcat(buf, D_8008AABC);
+    strcat(buf, gCardPathSuffix);
 
     handle = func_8003B39C(buf);
     handle->methods->slot78(handle);
     newVal = func_80041C9C(handle, (void *)&D_80086EC4, 0);
-    self->unk70 = newVal;
+    self->cardIcon = newVal;
     handle->methods->release(handle);
-    newVal->methods->slot4C(newVal, self->unk68, (void *)&D_8008AA94);
+    newVal->methods->slot4C(newVal, self->childReady, (void *)&D_8008AA94);
 }
 
-void func_8004FF40(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__TickCardIcon(Class86E00_3bb8c_g *self)
 {
-    if (self->unk70 != NULL) {
-        self->unk70 = self->unk70->methods->slot4(self->unk70);
+    if (self->cardIcon != NULL) {
+        self->cardIcon = self->cardIcon->methods->slot4(self->cardIcon);
     }
 }
 
-void func_8004FF90(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
+void Class86E00_3bb8c_g__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
 {
-    if (self->unk28 != 0) {
+    if (self->state != 0) {
         if (arg2 == 0x19) {
             self->methods->slot90(self);
         } else if (arg2 == 0x17) {
@@ -131,32 +155,32 @@ void func_8004FF90(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
     }
 }
 
-void func_8004FFF4(Class86E00_3bb8c_g *self, s32 arg1)
+void Class86E00_3bb8c_g__SetChildFlag8(Class86E00_3bb8c_g *self, s32 arg1)
 {
-    if (self->unk6C != NULL) {
-        self->unk6C->methods->slot80(self->unk6C, arg1, 0x7F, 0x7F);
+    if (self->childC != NULL) {
+        self->childC->methods->slot80(self->childC, arg1, 0x7F, 0x7F);
     }
 }
 
-void func_80050034(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__AdvanceState(Class86E00_3bb8c_g *self)
 {
     Class86E00Methods_3bb8c_g *methods = self->methods;
 
-    switch (self->unk28) {
+    switch (self->state) {
     case 2:
     case 4:
     case 0xA:
     case 0xE:
         methods->slot8C(self, 0);
-        if (self->unk28 == 0xE) {
+        if (self->state == 0xE) {
             strcpy((char *)self->unk40, self->unk30);
-            strcat((char *)self->unk40, ((char **)self->unk3C)[(s32)self->unk80]);
-            strcpy((char *)self->unk44, ((char **)self->unk38)[(s32)self->unk80]);
+            strcat((char *)self->unk40, ((char **)self->unk3C)[(s32)self->selectedItem]);
+            strcpy((char *)self->unk44, ((char **)self->unk38)[(s32)self->selectedItem]);
         }
-        if (self->unk24 == 2) {
+        if (self->secondaryMode == 2) {
             methods->slot78(self, self->unk40, self->unk44, self->unk48,
                              self->unk4C, self->unk50, self->unk54, self->unk58);
-        } else if (self->unk24 == 1) {
+        } else if (self->secondaryMode == 1) {
             methods->slot74(self, self->unk40, self->unk44, self->unk54, self->unk58);
         }
         break;
@@ -177,9 +201,9 @@ void func_80050034(Class86E00_3bb8c_g *self)
     }
 }
 
-void func_800501F0(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__ForceIdleFromState(Class86E00_3bb8c_g *self)
 {
-    switch (self->unk28) {
+    switch (self->state) {
     case 4:
     case 6:
     case 0xA:
@@ -192,31 +216,31 @@ void func_800501F0(Class86E00_3bb8c_g *self)
     }
 }
 
-void func_80050280(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__TickStateDelay(Class86E00_3bb8c_g *self)
 {
     s32 old;
     s32 newVal;
 
-    if (self->unk28 == 7) {
-        old = self->unk5C;
+    if (self->state == 7) {
+        old = self->waitCounter;
         newVal = old + 1;
-        self->unk5C = newVal;
+        self->waitCounter = newVal;
         if (old < 6) {
             return;
         }
         self->methods->slot7C(self, 0x13);
-    } else if (self->unk28 == 0xB) {
-        old = self->unk5C;
+    } else if (self->state == 0xB) {
+        old = self->waitCounter;
         newVal = old + 1;
-        self->unk5C = newVal;
+        self->waitCounter = newVal;
         if (old < 6) {
             return;
         }
         self->methods->slot7C(self, 0x14);
-    } else if (self->unk28 == 0xF) {
-        old = self->unk5C;
+    } else if (self->state == 0xF) {
+        old = self->waitCounter;
         newVal = old + 1;
-        self->unk5C = newVal;
+        self->waitCounter = newVal;
         if (old < 6) {
             return;
         }
@@ -224,32 +248,32 @@ void func_80050280(Class86E00_3bb8c_g *self)
     }
 }
 
-void func_80050340(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__AttachChildA(Class86E00_3bb8c_g *self)
 {
-    if (self->unk68 != 0 && self->unk60 != 0) {
-        if (self->unk78 == NULL) {
-            self->unk78 = func_80050BA8((self->unk48 << 1) + self->unk44, 1);
-            self->unk74 = 1;
+    if (self->childReady != 0 && self->unk60 != 0) {
+        if (self->childA == NULL) {
+            self->childA = func_80050BA8((self->unk48 << 1) + self->unk44, 1);
+            self->childAttached = 1;
         }
-        self->methods->slot10(self, self->unk78);
-        self->unk78->methods->slot44(self->unk78, self->unk68);
-        self->unk78->methods->slot4C(self->unk78, self->unk60, self->unk64, self->unk6C);
+        self->methods->slot10(self, self->childA);
+        self->childA->methods->slot44(self->childA, self->childReady);
+        self->childA->methods->slot4C(self->childA, self->unk60, self->unk64, self->childC);
     }
 }
 
-void func_80050410(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__DetachChildA(Class86E00_3bb8c_g *self)
 {
-    if (self->unk68 != 0 && self->unk60 != 0 && self->unk78 != NULL) {
-        self->unk78->methods->slot50(self->unk78);
-        self->unk78->methods->slot48(self->unk78);
-        if (self->unk74 != 0) {
-            self->unk78->methods->release(self->unk78);
-            self->unk78 = NULL;
+    if (self->childReady != 0 && self->unk60 != 0 && self->childA != NULL) {
+        self->childA->methods->slot50(self->childA);
+        self->childA->methods->slot48(self->childA);
+        if (self->childAttached != 0) {
+            self->childA->methods->release(self->childA);
+            self->childA = NULL;
         }
     }
 }
 
-void func_800504D0(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
+void Class86E00_3bb8c_g__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:
@@ -264,36 +288,36 @@ void func_800504D0(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
     }
 }
 
-void func_800505A8(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__AttachChildB(Class86E00_3bb8c_g *self)
 {
-    if (self->unk68 != 0 && self->unk60 != 0) {
-        if (self->unk7C == NULL) {
-            self->unk7C = func_80051A5C(self->unk38, 1);
-            self->unk74 = 1;
+    if (self->childReady != 0 && self->unk60 != 0) {
+        if (self->childB == NULL) {
+            self->childB = func_80051A5C(self->unk38, 1);
+            self->childAttached = 1;
         }
-        self->methods->slot10(self, self->unk7C);
-        self->unk7C->methods->slot44(self->unk7C, self->unk68);
-        self->unk7C->methods->slot4C(self->unk7C, self->unk60, self->unk64, self->unk6C);
+        self->methods->slot10(self, self->childB);
+        self->childB->methods->slot44(self->childB, self->childReady);
+        self->childB->methods->slot4C(self->childB, self->unk60, self->unk64, self->childC);
     }
 }
 
-void func_80050670(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__DetachChildB(Class86E00_3bb8c_g *self)
 {
-    if (self->unk68 != 0 && self->unk60 != 0 && self->unk7C != NULL) {
-        self->unk7C->methods->slot50(self->unk7C);
-        self->unk7C->methods->slot48(self->unk7C);
-        if (self->unk74 != 0) {
-            self->unk7C->methods->release(self->unk7C);
-            self->unk7C = NULL;
+    if (self->childReady != 0 && self->unk60 != 0 && self->childB != NULL) {
+        self->childB->methods->slot50(self->childB);
+        self->childB->methods->slot48(self->childB);
+        if (self->childAttached != 0) {
+            self->childB->methods->release(self->childB);
+            self->childB = NULL;
         }
     }
 }
 
-void func_80050730(Class86E00_3bb8c_g *self, GenericSlot9CObj_3bb8c_g *arg1, s32 arg2)
+void Class86E00_3bb8c_g__OnItemSelected(Class86E00_3bb8c_g *self, GenericSlot9CObj_3bb8c_g *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:
-        self->unk80 = arg1->methods->slot9C(arg1);
+        self->selectedItem = arg1->methods->slot9C(arg1);
         self->methods->slotAC(self);
         self->methods->slot7C(self, 0xE);
         break;
@@ -304,9 +328,9 @@ void func_80050730(Class86E00_3bb8c_g *self, GenericSlot9CObj_3bb8c_g *arg1, s32
     }
 }
 
-GenericCtorTable_3bb8c_d *func_800507E8(void)
+GenericCtorTable_3bb8c_d *GetClass86E00Methods(void)
 {
-    return &D_80086DC4;
+    return &gClass86E00Methods;
 }
 
 /* Sony's, from libc2 (round 45's own local view -- this unit's first use). */
@@ -316,9 +340,9 @@ extern s32 atoi(char *s);
  * (ROM image still-uncarved, `asm/data/1C34.rodata.s` region) this
  * function copies raw byte ranges out of; also read by
  * `class_3bb8c_d.c`'s own (differently-typed) local view. */
-extern u8 *D_8008AAC4;
+extern u8 *gMemcardIconTemplate;
 
-/* Struct-copy helper types for round 45's func_800507F8, all deliberately
+/* Struct-copy helper types for round 45's Class86E00_3bb8c_g__CopyMemcardIconTemplate, all deliberately
  * all-`s8` (alignment 1) per this round's FormatNumberIntoBuffer lever: retail
  * copies these ranges as one unaligned `lwl`/`lwr` word chunk per 4 bytes,
  * with any non-multiple-of-4 remainder as INDIVIDUAL byte loads/stores,
@@ -335,14 +359,14 @@ typedef struct {
 } Pair2_3bb8c_g;
 
 /* Signature is `include/class_3bb8c.h`'s ALREADY-shared
- * `extern s32 func_800507F8(s32 arg0, s32 arg1);` (class_3bb8c_m's own
+ * `extern s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 arg0, s32 arg1);` (class_3bb8c_m's own
  * caller, TaskObjF__WriteMemcardSaveFile), matched exactly -- this unit's own definition
  * must agree with that declaration since both are visible in this
  * translation unit. Cast to `u8 *` internally; retail's own register
- * content at exit (`$v0` left holding a pointer into the `D_8008AAC4`
+ * content at exit (`$v0` left holding a pointer into the `gMemcardIconTemplate`
  * template in every path) confirms the real return type is a pointer,
  * loosely read as `s32` by the caller that never dereferences it. */
-s32 func_800507F8(s32 arg0, s32 arg1)
+s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 arg0, s32 arg1)
 {
     u8 *self = (u8 *)arg0;
     u8 *src = (u8 *)arg1;
@@ -353,15 +377,15 @@ s32 func_800507F8(s32 arg0, s32 arg1)
     if (src != NULL) {
         t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
-        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(D_8008AAC4 + 0x1E);
-        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(D_8008AAC4 + 0x1E);
+        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
+        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
 
         idx = atoi((char *)(src + t0)) - 1;
-        p = D_8008AAC4 + idx * 2;
+        p = gMemcardIconTemplate + idx * 2;
         *(Pair2_3bb8c_g *)(self + 0x8) = *(Pair2_3bb8c_g *)p;
         return (s32)p;
     } else {
-        u8 *q = D_8008AAC4;
+        u8 *q = gMemcardIconTemplate;
 
         *(Buf6_3bb8c_g *)(self + 0x6) = *(Buf6_3bb8c_g *)(q + 0x1E);
         return (s32)q;

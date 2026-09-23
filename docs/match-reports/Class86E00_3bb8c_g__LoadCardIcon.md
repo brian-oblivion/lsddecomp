@@ -1,4 +1,6 @@
-# func_8004FE24 -- MATCH (71/71 words, ~3 attempts)
+# Class86E00_3bb8c_g__LoadCardIcon -- MATCH (71/71 words, ~3 attempts)
+
+> Renamed from `func_8004FE24` on 2026-09-23 (tools/rename.py). Address 0x8004fe24.
 
 Unit `class_3bb8c_g`, class `Class86E00_3bb8c_g`. "Load a card-slot resource
 by index, if not already loaded" -- builds a `CARD\<NAME>.TIM` path (same
@@ -10,13 +12,13 @@ the derived object into `self->unk70`.
 extern ChildObj86ED0 *func_8003B39C(char *path);
 extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
-extern char *D_80086E80[];
-extern const char D_8008AAB4[]; /* "CARD\\" */
-extern const char D_8008AABC[]; /* ".TIM" */
+extern char *gCardIconNames[];
+extern const char gCardPathPrefix[]; /* "CARD\\" */
+extern const char gCardPathSuffix[]; /* ".TIM" */
 extern s32 D_80086EC4; /* 3-word opaque block, func_80041C9C's arg1, address-only here */
 extern s32 D_8008AA94; /* opaque block, the fresh unk70's own slot4C arg2, address-only here */
 
-void func_8004FE24(Class86E00_3bb8c_g *self, s32 arg1)
+void Class86E00_3bb8c_g__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
 {
     char path[0x20];
     char *buf;
@@ -35,11 +37,11 @@ void func_8004FE24(Class86E00_3bb8c_g *self, s32 arg1)
     }
 
     buf = path;
-    name = D_80086E80[arg1];
+    name = gCardIconNames[arg1];
     buf[0] = '\0';
-    strcat(buf, D_8008AAB4);
+    strcat(buf, gCardPathPrefix);
     strcat(buf, name);
-    strcat(buf, D_8008AABC);
+    strcat(buf, gCardPathSuffix);
 
     handle = func_8003B39C(buf);
     handle->methods->slot78(handle);
@@ -64,17 +66,17 @@ shape directly with no null-guard on the first strcat, which is what rules
 out an actual call to that helper (a call would need the conditional
 branch). Reading the `strcat` argument order off the delay slots
 (`strcat(buf,"CARD\\")`, `strcat(buf,name)`, `strcat(buf,".TIM")`) gives
-`buf = "CARD\" + name + ".TIM"`, `name = D_80086E80[arg1]` -- the same
+`buf = "CARD\" + name + ".TIM"`, `name = gCardIconNames[arg1]` -- the same
 `CARD\<NAME>.TIM` shape as `func_80050F98`'s `CARD\COMINPUT.TIM` (that
 unit builds it via a real `BuildFileName` call instead; this one just
 happens to inline the identical three-piece concatenation).
 
-`D_80086E80` (`asm/data/76DC8.data.s`) is a flat 17-word (`0x11`, matching
+`gCardIconNames` (`asm/data/76DC8.data.s`) is a flat 17-word (`0x11`, matching
 the `arg1 >= 0x11` guard) array; most entries are `D_8008AAxx` rodata
 string pointers, a handful are raw non-pointer literal words (`0x100`,
 `0x2000`, and three bare `0x800115xx` addresses) that this call site never
 reaches for the `arg1` values this function is actually invoked with --
-declared as a plain `extern char *D_80086E80[];`, which is enough to index
+declared as a plain `extern char *gCardIconNames[];`, which is enough to index
 without needing the full contents.
 
 The `func_8003B39C` / `slot78` / `func_80041C9C` / `release` sequence on
@@ -84,7 +86,7 @@ the temp `handle` is the exact idiom already established by
 type from `class_3bb8c.h` (`slot78`/`release` already declared there).
 
 `self->unk70` is ALREADY typed `Class86E00Unk70Obj_3bb8c_g *` in this unit
-(established by the already-matched `func_8004FF40`, same file). Assigning
+(established by the already-matched `Class86E00_3bb8c_g__TickCardIcon`, same file). Assigning
 `func_80041C9C`'s `ChildObj86ED0 *` return into it is the same
 implicit-pointer-type-mismatch-is-harmless pattern already documented in
 `func_80050F98`'s own report (`self->unk44 = New_Obj6EAC0(...)` there) --
@@ -134,3 +136,12 @@ the field, and drive every later use through the local. The struct field
 gets re-read from memory each time it's referenced source-level; retail
 consistently keeps the value in a register instead once it has been
 computed.
+
+## Naming
+
+`Class86E00_3bb8c_g__LoadCardIcon` (was `func_8004FE24`), tier A: the
+whole body is the load itself (three early-return guards, then build
+`CARD\<name>.TIM`, load it through the generic resource-handle idiom, and
+stash the result in `self->unk70` if not already loaded) -- a load-if-
+absent action whose mechanics ARE its purpose, same standard as a getter
+or cache-fill.

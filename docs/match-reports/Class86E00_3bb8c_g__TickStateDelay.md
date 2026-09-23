@@ -1,12 +1,14 @@
-# func_80050280 -- MATCH
+# Class86E00_3bb8c_g__TickStateDelay -- MATCH
+
+> Renamed from `func_80050280` on 2026-09-23 (tools/rename.py). Address 0x80050280.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_80050280`: 48/48 words match.
+SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__TickStateDelay`: 48/48 words match.
 
 ## Source
 
 ```c
-void func_80050280(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__TickStateDelay(Class86E00_3bb8c_g *self)
 {
     s32 old;
     s32 newVal;
@@ -83,7 +85,7 @@ notification call only fires once the counter has reached 6 or more.
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 None new -- `slot7C` was already declared while surveying the unit
-(`func_8004FF40`'s report).
+(`Class86E00_3bb8c_g__TickCardIcon`'s report).
 
 ### Proposed learning
 
@@ -100,3 +102,12 @@ applies from the disassembly's OWN duplication pattern (are the fetch
 instructions repeated per branch, or does only the final call repeat?)
 before choosing a lever, rather than always reaching for the fanciest
 merge idiom on sight of a shared tail.
+
+## Naming
+
+`Class86E00_3bb8c_g__TickStateDelay` (was `func_80050280`), tier B: for
+three specific states (`7`, `0xB`, `0xF`) increments a per-object counter
+(`self->unk5C`) every call and only fires the state transition once the
+counter reaches 6 -- read as a per-call (per-frame) wait/delay gate ahead
+of a state change, hence "Tick". Which real-world delay this counts down
+(and why exactly 6) is not established.

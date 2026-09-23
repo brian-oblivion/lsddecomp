@@ -1,12 +1,14 @@
-# func_8004FF40 -- MATCH
+# Class86E00_3bb8c_g__TickCardIcon -- MATCH
+
+> Renamed from `func_8004FF40` on 2026-09-23 (tools/rename.py). Address 0x8004ff40.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004FF40`: 20/20 words match.
+SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__TickCardIcon`: 20/20 words match.
 
 ## Source
 
 ```c
-void func_8004FF40(Class86E00_3bb8c_g *self)
+void Class86E00_3bb8c_g__TickCardIcon(Class86E00_3bb8c_g *self)
 {
     if (self->unk70 != NULL) {
         self->unk70 = self->unk70->methods->slot4(self->unk70);
@@ -26,7 +28,7 @@ reusing the shared release-only view.
 This is the first function in a brand new 29-slot class table
 (`D_80086E00`, resolved with `tools/classtable.py 0x80086E00`), unrelated
 by inheritance to any table already known in this header (`--vs` against
-`D_8006B58C`/`D_800866E8`/`gClass86B60Methods`/`D_80086DC4` showed no shared run of
+`D_8006B58C`/`D_800866E8`/`gClass86B60Methods`/`gClass86E00Methods` showed no shared run of
 slots). Found by searching the retail binary for raw pointer values
 matching this unit's own function addresses (each of the 12 fresh
 functions plus the 3 non-`gp_rel` blocked ones appears EXACTLY ONCE, in one
@@ -56,7 +58,7 @@ no existing-declaration retype to flag for this function.
 - Also pre-declared, while surveying the whole unit before writing any
   code, the remaining struct surface this unit's other 11 fresh functions
   need: `Class86E00SubObj_3bb8c_g` (self->unk78/unk7C's shared pointee),
-  `GenericSlot9CObj_3bb8c_g` (func_80050730's arg1), and
+  `GenericSlot9CObj_3bb8c_g` (Class86E00_3bb8c_g__OnItemSelected's arg1), and
   `Class86E00Methods_3bb8c_g`'s `slot10`/`slot78`/`slot7C`/`slot8C`/
   `slot90`/`slot94`/`slotA0`/`slotAC`, plus `extern` declarations for two
   external helpers this unit calls but does not own
@@ -69,3 +71,13 @@ None new -- the "release slot's return value can be used or discarded
 per-caller" pattern is already implicit in the existing "empty-bodied
 vtable occupant is not evidence the slot takes no arguments" family, just
 applied to a return value instead of a parameter.
+
+## Naming
+
+`Class86E00_3bb8c_g__TickCardIcon` (was `func_8004FF40`), tier B: calls
+`self->unk70`'s own generic per-step "advance" slot and stores the
+result back (the same `self->field = self->field->methods->slot4(...)`
+shape recurring across many unrelated classes in this project, e.g.
+`class_39e08.c`, `code_2cc8c_b.c`, `code_55dd4.c` -- read here as an
+ordinary per-frame/per-step tick of the loaded card icon object). What
+"advancing" the icon actually changes on screen is not established.
