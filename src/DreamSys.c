@@ -1500,19 +1500,14 @@ DreamColors DreamSys__GetDreamColor(DreamSys *this)
 	return CalcDreamColor(&local);
 }
 
-#if 0
-/* Best-reached body, 28/35 words, exact length (zero address drift) -- see
-   docs/match-reports/CalcDreamColor.md. Residue is the sixth confirmed
-   instance of the project-wide commutative-add operand-order/register-
-   identity class (round 20): retail computes the table-base address early,
-   this build loads `upper` early instead, both `addu`s register-swapped.
-   PERMUTER-EXHAUSTED (~40400 iterations). Restored to INCLUDE_ASM below per
-   project rule. Re-verified fresh round 39 (2026-09-14, runner echo);
-   round 39 also tried the hoist-both-values-before-either-is-consumed lever
-   (explicit `dynamic`/`upper` locals read before either is used) alone and
-   combined with the operand-order reversal -- both byte-identical to this
-   kept form, confirming the residue is compiler-level register allocation,
-   not reachable by either lever alone or combined. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 28/35 words, exact length (zero address drift). Residue:
+ * the sixth confirmed instance of the project-wide commutative-add
+ * operand-order/register-identity class (round 20) -- retail computes the
+ * table-base address early, this build loads `upper` early instead, both
+ * final `addu`s register-swapped. PERMUTER-EXHAUSTED (~40400 iterations,
+ * no zero-scoring candidate); hand-derived.
+ * docs/match-reports/CalcDreamColor.md. */
 DreamColors CalcDreamColor(MoodGraphPoint *mood)
 {
 	MoodGraphPoint local;
@@ -1541,8 +1536,9 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood)
 		return entry[local.axis.upper];
 	}
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcDreamColor);
+#endif
 
 void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor)
 {
