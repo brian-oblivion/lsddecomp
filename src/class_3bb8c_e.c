@@ -376,22 +376,14 @@ extern s32 open(void *arg0, s32 arg1);
 extern s32 read(s32 arg0, void *arg1, s32 arg2);
 extern s32 close(s32 arg0);
 
-/* STALL -- see docs/match-reports/func_8004EA38.md. Best reached: 1/41
- * words in-range, but with ZERO instruction-count drift (40 vs retail's
- * 41 -- confirmed via objdump on the compiled .o) caused by one missing
- * redundant register move; every semantic value and branch is right.
- * Preserved body below, restored to INCLUDE_ASM so this correct-length
- * placeholder doesn't cascade drift into every function after it in this
- * unit.
- *
- * ROUND 37 (delta): rebuilt this EXACT preserved body before trusting its
- * score -- reproduces 1/41 in-range, 40 vs 41 words (missing redundant
- * move), exactly as recorded. Lowest priority on this round's list (an
- * already-permuter-searched function, twice: round 14 ~4600 iterations
- * and round 19 ~130,167 iterations, both converging on the same floor of
- * 5 with no zero); not re-searched this round in favour of the two
- * never-searched functions this round's own thesis prioritized. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 1/41 words in-range, length 1 short (40/41). Residue: a
+ * single missing redundant register move -- retail copies `self` into
+ * `$v0` (`addu $v0, $a0, $zero`) and reads `self->unkC` through that copy
+ * before `$a0` is reused for the local buffer's address; this compiles to
+ * reading it directly through `$a0` instead. Every value, branch and call
+ * is otherwise correct (docs/match-reports/func_8004EA38.md). Hand-derived;
+ * permuter-searched twice (rounds 14, 19) with no zero found. */
 s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
 {
     s32 pathBuf[8];
@@ -413,9 +405,9 @@ s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
     close(handle);
     return 1;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EA38);
+#endif
 
 char *func_8004EADC(Node3bb8cE *self, char *buf, char *middle, char **entries)
 {
