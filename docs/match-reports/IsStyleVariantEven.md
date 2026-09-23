@@ -1,4 +1,6 @@
-# func_8005630C -- MATCHED, round 44 (2026-09-15)
+# IsStyleVariantEven -- MATCHED, round 44 (2026-09-15)
+
+> Renamed from `func_8005630C` on 2026-09-23 (tools/rename.py). Address 0x8005630c.
 
 Unit `class_3bb8c_r`. **5/5 words, byte-exact.** First build after reopening.
 
@@ -31,7 +33,7 @@ carry its own local view later).
 ```c
 extern s32 gStyleVariant;
 
-s32 func_8005630C(void) {
+s32 IsStyleVariantEven(void) {
     return (gStyleVariant & 1) ^ 1;
 }
 ```
@@ -49,3 +51,7 @@ reopening.
 For a 2-instruction `andi $r,$r,1` / `xori $r,$r,1` pair feeding a `jr`, write
 `(x & 1) ^ 1`, not `!(x & 1)` -- same semantics, but GCC 2.6.3 schedules the
 two into opposite instruction order depending on which C spelling you use.
+
+## Naming
+
+**Tier A.** Free function, pure leaf: a getter whose mechanics ARE its purpose (`(gStyleVariant & 1) ^ 1`, i.e. true when `gStyleVariant` is even). No caller-side evidence needed beyond the body itself.

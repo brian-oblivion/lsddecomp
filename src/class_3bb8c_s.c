@@ -1,7 +1,7 @@
 /*
  * class_3bb8c_s -- 0x46D20..0x475F0, the private methods of the class whose
- * table is D_800876FC (called Class876FC here; class_3bb8c_r.c's Obj876FC).
- * A 0x98-byte scene object built by func_80056320 with a `kind` 0..3: it
+ * table is gClass876FCMethods (called Class876FC here; class_3bb8c_r.c's Obj876FC).
+ * A 0x98-byte scene object built by New_Class876FC with a `kind` 0..3: it
  * attaches itself under a parent at pos + offset, links a model for kinds
  * 0-1, and owns up to two child arrays -- two BaseObjO model children laid
  * out in a row that spin and drift along z after frame 500 (kind 0), or
@@ -17,13 +17,13 @@
 
 /* ------------------------------------------------------------------ *
  * LinkNode is this unit's ONE local view of every object it touches: the
- * owner (a D_800876FC instance, 0x98 bytes -- the size func_80056320
+ * owner (a gClass876FCMethods instance, 0x98 bytes -- the size New_Class876FC
  * allocates, which is exactly where `sprites` ends) and, for vtable
  * calls only, its children (`modelChildren`: BaseObjO, table D_800878D4;
  * `sprites`: D800879C4 objects). Class876FC is the same struct under the
  * owner's name, used in the owner's method signatures. Fields +0x058..
  * +0x07B are the 0x24-byte parameter block the class's slot +0x040
- * (func_800564A4, class_3bb8c_r.c) copies in whole.
+ * (Class876FC__SetParams, class_3bb8c_r.c) copies in whole.
  * ------------------------------------------------------------------ */
 
 typedef struct LinkNode LinkNode;
@@ -34,7 +34,7 @@ typedef struct Vec3S {
 } Vec3S;
 
 /* Slot names follow the base implementation they dispatch to (resolved with
- * tools/classtable.py on D_800876FC / D_800878D4 / D_800879C4). `set` is
+ * tools/classtable.py on gClass876FCMethods / D_800878D4 / D_800879C4). `set` is
  * 1 = assign, 0 = accumulate; `data` is a triple of s16 num/den ratios
  * (RatioToFixed12). */
 typedef struct LinkNodeMethods {
@@ -63,7 +63,7 @@ struct LinkNode {
     u8 pad18[0x20 - 0x18];      /* +0x018 .. +0x01F, unknown */
     s32 model;                  /* +0x020, the object Class6B5CC__LinkModel linked */
     s32 tick;                   /* +0x024, zeroed by slot +0x040, incremented once per
-                                   slot +0x0EC update (func_800564F4) */
+                                   slot +0x0EC update (Class876FC__Update) */
     u8 pad28[0x54 - 0x28];      /* +0x028 .. +0x053, unknown */
     s32 kind;                   /* +0x054, 0..3: New's first argument, stored by the ctor */
     Vec3S offset;               /* +0x058, added to the caller's position */
@@ -138,7 +138,7 @@ extern void *D_8008ACAC;
 extern s32 gTrackedYSnapshot;
 extern s32 D_8008AB98[];
 
-/* Called once, from the class's ctor (func_800563C0): place self under
+/* Called once, from the class's ctor (Class876FC__Class876FC): place self under
  * `parent` at pos + offset, then build the per-kind parts. Kinds 0 and 1
  * link a model fetched from D_8008ACA4 by D_8008AB98[kind]; kind 0 also
  * gets two model children, kind 2 five randomised sprites, kind 3 five
@@ -174,7 +174,7 @@ void Class876FC__InitByKind(Class876FC *self, void *parent, Vec3S *pos) {
     }
 }
 
-/* Called every frame from the class's slot +0x0EC (func_800564F4, right
+/* Called every frame from the class's slot +0x0EC (Class876FC__Update, right
  * after it increments `tick`): set self's translation (owner's slotB8 is
  * BaseObjO__SetVec14) to pos + offset, plus however far D_8008ACAC's +0x018
  * word has moved since Class876FC__InitByKind snapshotted it, then run the
@@ -201,7 +201,7 @@ void Class876FC__UpdateByKind(Class876FC *self, void *pos) {
     }
 }
 
-/* Called from the class's dtor (func_80056464): release whichever child
+/* Called from the class's dtor (Class876FC__Finalize): release whichever child
  * array this kind built (kinds 2 and 3 both release `sprites`, through two
  * identical class_3bb8c_o.c functions). */
 void Class876FC__ReleaseByKind(Class876FC *self) {

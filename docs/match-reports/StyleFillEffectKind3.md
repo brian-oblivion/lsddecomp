@@ -110,7 +110,7 @@ retail                              built
 458e8  addiu v0,v0,%lo(D_80087174)  458e8  addiu v0,v0,%lo(D_80087174)
 458ec  lw    a2,%gp_rel(gStyleCueSelf) 458ec  sw    v0,0(v1)          <-- here
 458f0  move  a3,s1                  458f0  lw    a2,%gp_rel(gStyleCueSelf)
-458f4  jal   func_80056320          458f4  jal   func_80056320
+458f4  jal   New_Class876FC          458f4  jal   New_Class876FC
 458f8   sw   v0,0(v1)   (delay)     458f8   move a3,s1   (delay)
 ```
 
@@ -146,7 +146,7 @@ as a limit.
     q = &D_8008E0B0;
     t = gStyleCueSelf;                                    /* s32 t; */
     *q = D_80087174;
-    *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
+    *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
 ```
 
 Every instruction and every placement matches retail. The only diff is a
@@ -272,7 +272,7 @@ extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
 extern u8 D_8008721C[];
 extern s32 rand(void);
-extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
+extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
 
 void **StyleFillEffectKind3(void **arg0, void *arg1) {
     s32 t;
@@ -299,7 +299,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     t = gStyleCueSelf;
     q = &D_8008E0B0;
     *q = D_80087174;
-    *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
+    *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
     arg0++;
     return arg0;
 }
@@ -361,7 +361,7 @@ means the real difference is upstream of the schedule.
 
 Called only when `gStyleVariant == 0`, from `StyleBuildEffectSlots`, as
 the kind-0-exclusive finishing fill. Passes a literal kind argument of `3`
-to `func_80056320` and appends exactly one slot (`*arg0 = ...; arg0++;
+to `New_Class876FC` and appends exactly one slot (`*arg0 = ...; arg0++;
 return arg0;`). STALL, 79/81 words (length exact), register-identity
 residue only; naming from the literal `3` argument, confirmed the same way
 as `StyleFillEffectKind0`/`1`/`2`.

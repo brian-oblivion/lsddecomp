@@ -42,7 +42,7 @@ void StyleReleaseEffectSlots(void) {
 ```
 
 `gStyleVariant` is the same global already read elsewhere in this class family
-(`class_3bb8c_m.c`, `class_3bb8c_r.c func_8005630C`) as a plain `s32`.
+(`class_3bb8c_m.c`, `class_3bb8c_r.c IsStyleVariantEven`) as a plain `s32`.
 
 ### Proposed learning
 

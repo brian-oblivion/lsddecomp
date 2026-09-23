@@ -1,7 +1,9 @@
-# func_800563C0 -- MATCHED (41/41 words)
+# Class876FC__Class876FC -- MATCHED (41/41 words)
 
-Unit: `class_3bb8c_r` (round 17 continuation). `Obj876FCMethods::ctor`
-(vtable offset `+0x008` of `D_800876FC`) -- chains to the shared base
+> Renamed from `func_800563C0` on 2026-09-23 (tools/rename.py). Address 0x800563c0.
+
+Unit: `class_3bb8c_r` (round 17 continuation). `Class876FCMethods::ctor`
+(vtable offset `+0x008` of `gClass876FCMethods`) -- chains to the shared base
 class's own ctor (`DreamSys__GetBaseMethods()->ctor`, the SAME shared-base getter
 `class_3bb8c_o.c` already used for its own `BaseObjO__BaseObjO`/
 `New_BaseObjO` last pass), installs this class's own vtable, sets two
@@ -11,11 +13,11 @@ its return value's side effect only.
 ## Final source
 
 ```c
-void *func_800563C0(Obj876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
+void *Class876FC__Class876FC(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
     if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
         goto fail;
     }
-    self->methods = func_80056F4C();
+    self->methods = GetClass876FCMethods();
     self->unk44 = 0;
     self->unk54 = arg1;
     self->methods->slot40(self, arg2);
@@ -51,7 +53,7 @@ fail:
   by a real word-count mismatch (28/41 with `return Class876FC__InitByKind(...)`,
   worse yet with the wrong exit-value idiom on top) -- the fix was two
   statements, `Class876FC__InitByKind(self, arg3, arg4); return self;`, not one.
-- `func_80056F4C` (installing this class's own vtable) and
+- `GetClass876FCMethods` (installing this class's own vtable) and
   `Class876FC__InitByKind` (this class's own post-init hook, still `INCLUDE_ASM`
   outside this unit's range) are both declared as local externs, per the
   established "calling into a function in another/uncarved unit is fine"
@@ -68,3 +70,7 @@ fail:
   it cost one build/diff iteration to notice; a direct read of the
   disassembly's trailing instructions (past the `jal`) would have caught
   it without spending the attempt.
+
+## Naming
+
+**Tier A.** `Class876FC` is the class name class_3bb8c_s.c already uses for `gClass876FCMethods` (its own comment: "`Class876FC` here; class_3bb8c_r.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `Class6B5CC__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `BaseObjO__BaseObjO`/`Class6B5CC__Class6B5CC`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.

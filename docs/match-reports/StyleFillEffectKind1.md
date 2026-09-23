@@ -11,7 +11,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);
 ```
 
 Fills `arg1` slots of the array at `arg0` (advancing it by one pointer each
-time) with `func_80056320(...)` results, and returns the pointer one past
+time) with `New_Class876FC(...)` results, and returns the pointer one past
 the last slot written -- the classic "array fill, return next free slot"
 idiom (matches this unit's already-established preference for that shape;
 see `StyleTeardown`'s per-index rewrite of `gStyleCueSlots`).
@@ -24,14 +24,14 @@ extern u8 D_80087204[];            /* address only taken, never indexed */
 extern u8 D_8008E0A4[];            /* address only taken, passed to New_X */
 extern u8 *D_8008E0B4;             /* set to &D_80087204 unconditionally */
 extern void *SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* forward decl, own unit, cold */
-extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3); /* class_3bb8c_r.c, ALREADY MATCHED */
+extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3); /* class_3bb8c_r.c, ALREADY MATCHED */
 ```
 
 `D_80087330` is a 2-word dlabel in `asm/data/76DC8.data.s`; only the first
 word is read here (`lw`, not indexed), so it is declared scalar rather than
 an array -- if a sibling function later indexes `[1]`, retype there, not
 here (no other unit references any of these four symbols currently).
-`func_80056320` is `class_3bb8c_r.c`'s already-matched `New_X`-style
+`New_Class876FC` is `class_3bb8c_r.c`'s already-matched `New_X`-style
 allocator (`void *(void*,void*,void*,void*)`), called cross-unit by
 prototype only. `SetupStyleSpawnParamsA` is one of this unit's own still-cold
 functions (110w, queued later); its return value is discarded here (`jal`
@@ -50,7 +50,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     D_8008E0B4 = D_80087204;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsA(arg2, (void *) val);
-        *arg0 = func_80056320((void *) 1, D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        *arg0 = New_Class876FC((void *) 1, D_8008E0A4, (void *) gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -91,7 +91,7 @@ change; second attempt: hoisted to a local before the loop, byte-exact).
 **`StyleFillEffectKind1`, tier B.**
 
 Sibling of `StyleFillEffectKind0`: fills `arg1` slots of `gStyleEffectSlots`
-via the same `func_80056320` allocator, this time with a literal kind
+via the same `New_Class876FC` allocator, this time with a literal kind
 argument of `1`. Called unconditionally (every `gStyleVariant`) from
 `StyleBuildEffectSlots`, right after `StyleFillEffectKind0`. MATCHED,
 42/42, second build (one lever: hoist the read of `D_80087330` out of the

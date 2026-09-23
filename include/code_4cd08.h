@@ -172,7 +172,7 @@ extern bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record);
  * 2nd argument; its own outgoing buffer is a separate local `outBuf[4]`. */
 extern bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry);
 extern void EnableTeleportsForKind(s32 kind);
-extern bool func_8005630C(void);
+extern bool IsStyleVariantEven(void);
 extern bool CheckDreamAuxWorldState(s32 idx);
 extern bool MatchesDreamAuxProgression(s32 a0, s32 a1);
 

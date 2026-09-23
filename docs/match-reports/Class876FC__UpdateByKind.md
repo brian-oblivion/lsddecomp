@@ -100,7 +100,7 @@ them, and forwards `$a1` straight on:
 `void Class876FC__UpdateByKind(LinkNode *self, void *arg1)` is right: two real arguments.
 
 **Why `src/class_3bb8c_r.c`'s one-parameter declaration stays.** Its caller
-`func_800564F4` passes only `self`, and retail sets up nothing else:
+`Class876FC__Update` passes only `self`, and retail sets up nothing else:
 
 ```
 800564fc:  lw    v0,36(a0)
@@ -110,7 +110,7 @@ them, and forwards `$a1` straight on:
                                       store, not argument setup
 ```
 
-`$a1` at the `jal` is whatever `func_800564F4`'s own caller left there, and
+`$a1` at the `jal` is whatever `Class876FC__Update`'s own caller left there, and
 `Class876FC__UpdateByKind` consumes it as `arg1`. This is the same register-forwarding
 trap that `externcheck.py` was written for (round 57, `func_8001E7BC`) —
 with the difference that here it reproduces retail, so the narrow declaration
@@ -123,9 +123,9 @@ added to `src/class_3bb8c_r.c:438`. Oracle green.
 
 Round 70 (alpha). `func_80056640` -> `Class876FC__UpdateByKind`, **tier B**.
 
-Only caller is `func_800564F4`, which sits in D_800876FC's slot +0x0EC
+Only caller is `Class876FC__Update`, which sits in gClass876FCMethods's slot +0x0EC
 (asm/data/76DC8.data.s, the table's last word) and increments `tick` (+0x024)
-before the call. Body: owner's slotB8 (BaseObjO__SetVec14 in D_800876FC,
+before the call. Body: owner's slotB8 (BaseObjO__SetVec14 in gClass876FCMethods,
 i.e. set translation) with pos + offset + (D_8008ACAC's +0x018 word now -
 gTrackedYSnapshot); then kind 0 -> Class876FC__DriftModelChildren, 2 ->
 NoOpIgnoreArgs, 3 -> LinkOwnerObj__RandomizeLinks. "Update" rests on the

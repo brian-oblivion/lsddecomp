@@ -92,7 +92,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
                 dist = d1 - d2;
             }
             *arg1 = dist;
-            if (dist < D_80087474[entry->count]) {
+            if (dist < gStyleCueDistanceTable[entry->count]) {
                 return entry;
             }
         }
@@ -104,7 +104,7 @@ fail:
 
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
-`extern s32 gStyleKind, gStyleCueRecordIndex, gStyleCueSelf, D_80087474[];`,
+`extern s32 gStyleKind, gStyleCueRecordIndex, gStyleCueSelf, gStyleCueDistanceTable[];`,
 `extern u8 *D_800876B4[], D_800876EC[], D_800874EC[];` (all already
 declared in `src/class_3bb8c_n.c` ahead of this function).
 
@@ -180,7 +180,7 @@ extern s32 gStyleCueRecordIndex;
 extern u8 *D_800876B4[];    /* word array of base pointers, indexed by gStyleKind */
 extern u8 D_800876EC[];    /* byte array of counts, same index */
 extern u8 D_800874EC[];    /* table, 6-byte stride entries */
-extern s32 D_80087474[];   /* word table, indexed by entry->count */
+extern s32 gStyleCueDistanceTable[];   /* word table, indexed by entry->count */
 
 typedef struct Pos4 { s16 hi, lo; } Pos4;              /* 4B, alignment 2 */
 typedef struct TabEntry { Pos4 head; s16 tail; } TabEntry;   /* 6B */
@@ -224,7 +224,7 @@ void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
                 dist = d1 - d2;
             }
             *arg1 = dist;
-            if (dist < D_80087474[entry->count]) {
+            if (dist < gStyleCueDistanceTable[entry->count]) {
                 return entry;
             }
         }
@@ -254,7 +254,7 @@ Notes on the recovery:
   the explicit if/else "combine" shape `IsStyleCueNear` already uses for an
   identical Manhattan-distance pattern in this same unit).
 - `entry->count` is read from memory **twice** by retail (once for the
-  `> 0` guard, again for the `D_80087474[entry->count]` index) rather than
+  `> 0` guard, again for the `gStyleCueDistanceTable[entry->count]` index) rather than
   cached in a local -- matched by not caching it in the C either.
 
 ## The stall: preamble scheduling order
@@ -313,7 +313,7 @@ shared-label unification still doesn't happen for free.
 
 Scans a run of 8-byte `EntrySlot` records (`gStyleCueRecordIndex` onward)
 for one whose `count` field is positive and whose Manhattan-style distance
-to `arg2` is under a per-record threshold (`D_80087474[entry->count]`),
+to `arg2` is under a per-record threshold (`gStyleCueDistanceTable[entry->count]`),
 returning the first such record or `NULL` and writing the computed distance
 through `arg1`. "Nearest" is a simplification: it is actually the FIRST
 record under threshold in scan order, not a true nearest-of-all-candidates

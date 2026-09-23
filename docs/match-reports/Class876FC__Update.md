@@ -1,4 +1,6 @@
-# func_800564F4 -- MATCHED (11/11 words)
+# Class876FC__Update -- MATCHED (11/11 words)
+
+> Renamed from `func_800564F4` on 2026-09-23 (tools/rename.py). Address 0x800564f4.
 
 Unit: `class_3bb8c_r` (round 17 continuation). Increments `self->unk24`
 and forwards to `Class876FC__UpdateByKind` (a plain statement call, not a tail-call
@@ -7,9 +9,9 @@ whose return is forwarded -- the function itself is `void`).
 ## Final source
 
 ```c
-extern void Class876FC__UpdateByKind(Obj876FC *self);
+extern void Class876FC__UpdateByKind(Class876FC *self);
 
-void func_800564F4(Obj876FC *self) {
+void Class876FC__Update(Class876FC *self) {
     self->unk24 = self->unk24 + 1;
     Class876FC__UpdateByKind(self);
 }
@@ -17,7 +19,7 @@ void func_800564F4(Obj876FC *self) {
 
 ## Derivation
 
-`self->unk24` (the SAME field `func_800564A4` clears to 0, confirming
+`self->unk24` (the SAME field `Class876FC__SetParams` clears to 0, confirming
 it's a plain counter this class maintains) is loaded, incremented, and
 stored back BEFORE the call to `Class876FC__UpdateByKind` -- the store sits in the
 `jal`'s own delay slot in the disassembly, matching a normal C statement
@@ -47,7 +49,11 @@ at the call, not a value this function ever sets up -- confirmed by
 signature turns the build red (`too few arguments to function
 'Class876FC__UpdateByKind'`), i.e. this is a genuine caller/callee arity
 disagreement, not one of the project's documented "extra dead argument"
-idioms. Left as `extern void Class876FC__UpdateByKind(Obj876FC *self);` /
+idioms. Left as `extern void Class876FC__UpdateByKind(Class876FC *self);` /
 `Class876FC__UpdateByKind(self);` (unchanged) because a call-site fix is out of
 scope for the extern-hygiene pass that found it -- flagged for whoever
 next touches this function or its caller.
+
+## Naming
+
+**Tier A.** `+0x0EC`, the class's own per-frame slot per class_3bb8c_s.c's banner ("update slot (+0x0EC)"); the body ticks a counter and forwards to `Class876FC__UpdateByKind` every call, which is what "Update" names.

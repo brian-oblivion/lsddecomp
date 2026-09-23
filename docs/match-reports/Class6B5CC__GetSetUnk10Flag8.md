@@ -50,6 +50,6 @@ boolean -- same shape as the renamed `Class6B5CC__GetSetUnk10Flag7`).
 Held back because this symbol is name-checked (in comments, not calls)
 from `src/class_3bb8c_o.c:186` and `include/class_3ac78.h:173` -- two
 different units' own vtable-slot census comments, both discussing a
-coincidental address match in an unrelated table (`D_800876FC`'s own
+coincidental address match in an unrelated table (`gClass876FCMethods`'s own
 slot80, a different class entirely). Renaming would edit those files
 too, out of this round's scope. Posted to the broadcast.

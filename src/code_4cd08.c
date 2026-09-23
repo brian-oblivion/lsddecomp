@@ -313,7 +313,7 @@ have_idx:
         }
         break;
     case 5:
-        if (!func_8005630C()) {
+        if (!IsStyleVariantEven()) {
             return false;
         }
         break;

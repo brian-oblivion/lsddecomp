@@ -1,14 +1,16 @@
-# func_80056464 -- MATCHED (16/16 words)
+# Class876FC__Finalize -- MATCHED (16/16 words)
 
-Unit: `class_3bb8c_r` (round 17 continuation). `Obj876FCMethods::dtor`
-(vtable offset `+0x00C` of `D_800876FC`) -- calls a teardown helper, then
+> Renamed from `func_80056464` on 2026-09-23 (tools/rename.py). Address 0x80056464.
+
+Unit: `class_3bb8c_r` (round 17 continuation). `Class876FCMethods::dtor`
+(vtable offset `+0x00C` of `gClass876FCMethods`) -- calls a teardown helper, then
 tail-calls the shared base class's own dtor (`DreamSys__GetBaseMethods()->dtor`) and
 forwards its return.
 
 ## Final source
 
 ```c
-void *func_80056464(Obj876FC *self) {
+void *Class876FC__Finalize(Class876FC *self) {
     Class876FC__ReleaseByKind(self);
     return DreamSys__GetBaseMethods()->dtor(self);
 }
@@ -19,10 +21,10 @@ void *func_80056464(Obj876FC *self) {
 `Class876FC__ReleaseByKind` (a plain teardown helper, still `INCLUDE_ASM` outside
 this unit's range, declared as a local extern) is called first as a
 statement, THEN `DreamSys__GetBaseMethods()->dtor(self)`'s return value genuinely IS
-forwarded here (unlike `func_800563C0`'s tail call to `Class876FC__InitByKind` --
+forwarded here (unlike `Class876FC__Class876FC`'s tail call to `Class876FC__InitByKind` --
 confirmed by the disassembly falling straight through the epilogue with
 `$v0` untouched after the `jalr`, no extra `move` the way
-`func_800563C0` had). `FixedBaseTableR::dtor` needed a non-void, checkable
+`Class876FC__Class876FC` had). `FixedBaseTableR::dtor` needed a non-void, checkable
 return type in this unit's own local reading (a fresh `void *` field
 alongside `ctor`) purely because THIS call site's return value is used;
 per the shared getter's already-established per-call-site-typing
@@ -31,5 +33,9 @@ notes on the sibling symbol `GetClass6B5CCMethods`).
 
 ### Proposed learning
 
-None -- confirms the tail-call-forwarding case that `func_800563C0`'s
+None -- confirms the tail-call-forwarding case that `Class876FC__Class876FC`'s
 report explicitly contrasts against.
+
+## Naming
+
+**Tier A.** `+0x00C` is the "finalize" slot convention this project already uses (`Class6B5CC__Finalize`, `Class866E8__Finalize`, `Unk18Obj__Finalize`), and the body matches: teardown helper then forward the shared base dtor's return.

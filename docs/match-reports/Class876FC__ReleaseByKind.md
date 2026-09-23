@@ -54,5 +54,5 @@ Round 70 (alpha). `func_80056718` -> `Class876FC__ReleaseByKind`, **tier A**.
 Body releases exactly the child array each kind built (kind 0 ->
 Class876FC__ReleaseModelChildren, 2 and 3 -> LinkOwnerObj__ReleaseLinks[B],
 both `ReleaseBasicClassArray(self+0x84, 5)`), and its only caller is the
-class's dtor `func_80056464` (table +0x00C), which calls it before chaining
+class's dtor `Class876FC__Finalize` (table +0x00C), which calls it before chaining
 to the base dtor. Body and caller agree.
