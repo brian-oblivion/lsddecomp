@@ -1,10 +1,29 @@
+/* Entity_b -- second slice of the Entity class (include/Entity.h, table
+ * ENTITY_METHODS; `tools/classtable.py ENTITY_METHODS`).
+ *
+ *  - ENTITY_METHODS' last three slots, run every tick by Entity__Update:
+ *    Entity__UpdateTargetProximity (+0x178, raises unkF4 via setUnkF4 once
+ *    the target is within the mood row's proximityRange) and
+ *    Entity__UpdateSoundCueStart/Stop (+0x17C/+0x180, start the sound cue
+ *    when the target enters the row's cueRange, stop it when it leaves);
+ *    two range helpers; the vtable accessor Get_vtable_Entity.
+ *  - Entity__MoodCue00..17: gEntityMoodHandlerTable's callbacks, NN = the
+ *    row. Entity__StartSoundCue gives the row's callback to InitSoundCueSet,
+ *    and func_8002CD08 calls it once per tick as callback(owner, set): it
+ *    picks tones for the set's three voices and moves/rotates/scales the
+ *    entity on moodTimer thresholds. Which dream object owns each row is
+ *    not established.
+ */
 #include "common.h"
 #include "Entity.h"
 
-/* Data rows this unit's mood-dispatch handlers pass through to a vtable
- * call as an opaque argument -- never dereferenced here, so an opaque byte
- * array is enough to form &D_8008xxxx correctly. Real element type/count
- * unknown. */
+/* Constant transform triples passed to updateRotation (slot +0x44,
+ * func_8001CEB4: three {s16 num, s16 den} ratios in degrees), updateScale
+ * (+0x48, func_8001D008: three ratios) and addVec14 (+0xBC,
+ * BaseObjO__AddVec14: three s32 deltas), named by value. Only the address
+ * is taken here, so a byte array is enough; the RotationRatios type in
+ * DreamSys.h is the real shape of the rotation and scale ones.
+ * TRANSLATE_Y_MINUS64's label also holds a second triple, (0, -0x20, 0). */
 extern u8 SCALE_HALF[];
 extern u8 SCALE_DOUBLE[];
 extern u8 TRANSLATE_Y_MINUS64[];
@@ -64,10 +83,11 @@ s32 Entity__UpdateSoundCueStart(Entity *this) {
 /* Defined immediately after this function in ROM order, in this same unit;
  * declared here rather than in include/Entity.h, which seven units share. Its
  * return value is tested (`beqz` straight off the `jal`), so it is not void. */
-extern s32 Entity__IsTargetInRange(Entity *this, s32 arg1);
+extern s32 Entity__IsTargetInRange(Entity *this, s32 range);
 
 /* arg1 is unused here; the canonical declaration in include/Entity.h has it
- * and func_8005DABC passes 0. Do not drop it -- `conflicting types`. */
+ * and its one caller, Entity__UpdateDeactivationState, passes 0. Do not drop
+ * it -- `conflicting types`. */
 void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
     if (gEntityLinkStageTable[this->moodIndex * 0x10] < 0 &&
         gEntityEventVideoTable[this->moodIndex * 0x10] != 0 &&
@@ -76,7 +96,7 @@ void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
     }
 }
 
-s32 Entity__IsTargetInRange(Entity *this, s32 arg1) {
+s32 Entity__IsTargetInRange(Entity *this, s32 range) {
     Unk94Obj *other;
     s32 oy, ty;
 
@@ -90,7 +110,7 @@ s32 Entity__IsTargetInRange(Entity *this, s32 arg1) {
     if (ty < oy - 0x200) {
         goto fail;
     }
-    if (this->methods->slot144(this, other) < arg1) {
+    if (this->methods->slot144(this, other) < range) {
         return 1;
     }
 fail:
