@@ -832,7 +832,9 @@ extern void func_800357B0(s16 channel, s16 slot, s16 kind, Scratch_800357B0 scra
  * register ($s5, set and never read) where this body needs `volatile` stack
  * slots, and with $s5 free this build hoists the loop-invariant `a2 & 0x7F`
  * out of the first loop, which renumbers $s3-$s5 through the loops
- * (docs/match-reports/func_800351D0.md). Hand-derived. */
+ * (docs/match-reports/func_800351D0.md). Hand-derived. Written for the
+ * reader: the byte-shaped body's `dead[16]` frame pad and `volatile` on the
+ * two `unused` locals are omitted here and kept in the report. */
 void func_800351D0(s16 a0, s16 a1, u8 a2)
 {
     s16 ch = a0;
@@ -842,11 +844,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
     List_800351D0 list;
     s32 i;
     u8 kind;
-    u8 dead[16];
 
-    if (0) {
-        dead[0] = 0;
-    }
     SsUtGetProgAtr(rec->unk4C, ((u8 *)rec + off)[0x2C], &list);
 
     if (rec->unk27 == 1 && rec->unk10 == 0) {
@@ -870,7 +868,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
             }
         }
         if (rec->unk13 == 1 && rec->unk14 == 0) {
-            volatile s32 unused;
+            s32 unused; /* computed and never read, as in retail */
             if ((u8)(a2 - 0x41) < 0x3F) {
                 if (((a2 & 0xFF) * 100) >= 0) {
                     unused = ((a2 & 0xFF) * 100) & 0xE000;
@@ -887,7 +885,7 @@ void func_800351D0(s16 a0, s16 a1, u8 a2)
             }
         }
         if (rec->unk13 == 2 && rec->unk14 == 0) {
-            volatile s32 unused;
+            s32 unused; /* computed and never read, as in retail */
             if ((u8)(a2 - 0x40) < 0x40) {
                 unused = ((a2 & 0xFF) * 25) << 8;
             } else {
