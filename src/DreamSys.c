@@ -1493,8 +1493,8 @@ DreamColors DreamSys__GetDreamColor(DreamSys *this)
  * the sixth confirmed instance of the project-wide commutative-add
  * operand-order/register-identity class (round 20) -- retail computes the
  * table-base address early, this build loads `upper` early instead, both
- * final `addu`s register-swapped. PERMUTER-EXHAUSTED (~40400 iterations,
- * no zero-scoring candidate); hand-derived.
+ * final `addu`s register-swapped. Permuter-searched ~40400 iterations in
+ * two windows (the first killed from outside), not closed; hand-derived.
  * docs/match-reports/CalcDreamColor.md. */
 DreamColors CalcDreamColor(MoodGraphPoint *mood)
 {
