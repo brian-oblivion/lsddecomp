@@ -6,11 +6,11 @@ Round 12, runner delta. `code_d294_b`.
 
 ## Summary
 
-Sibling of `func_8001D344` (the ONLY one of the five already-matched
+Sibling of `Class6B5CC__SetDisplay` (the ONLY one of the five already-matched
 `self->unk10` bitfield accessors that both converts its input to a boolean
 (`a1 == 0`) AND inverts its own result (`== 0`) -- every other sibling does
 at most one of those). This function does exactly that double-inversion, at
-shift 7 width 1, so it takes the same `s32` return type as `func_8001D344`
+shift 7 width 1, so it takes the same `s32` return type as `Class6B5CC__SetDisplay`
 rather than the plain `u32` of the other three siblings.
 
 ```c
@@ -41,7 +41,7 @@ siblings that use it; the other 7 don't).
 
 Renamed from `func_8001D450` via `tools/rename.py`. **Tier A** -- pure
 `GetSetBitField` wrapper over `self->unk10`, shift 7 width 1,
-double-inverted boolean shape (same as sibling `func_8001D344` in
+double-inverted boolean shape (same as sibling `Class6B5CC__SetDisplay` in
 `code_d294.c`, still unrenamed there). Mechanics are the whole of what
 this function does (a getter/setter over a known bit range), which
 qualifies as tier A "by definition" per FINISHING-PLAN.md track 3 even

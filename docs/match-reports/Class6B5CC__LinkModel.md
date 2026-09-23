@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001E770` on 2026-09-17 (tools/rename.py). Address 0x8001e770.
 
-Unit: `code_d294_c` (round 14). Called by `func_8001CC48` (`code_d294.c`)
+Unit: `code_d294_c` (round 14). Called by `Class6B5CC__AddChild` (`code_d294.c`)
 as its conditional forward target when `other`'s vtable-header tag is 9.
 Stores `other` into `self->unk20`, copies one field out of it, then calls
 the Psy-Q `GsLinkObject4` through a pointer computed off `other->unkC`.
@@ -57,7 +57,7 @@ functions have moved into this unit -- prototype/type unchanged.
 uses that SAME value again, check whether retail re-reads it through the
 field rather than reusing the parameter's own register.** This is a
 sibling of the already-promoted "direct calls beat caching a resolved
-pointer" learning from `func_8001CD60`: GCC 2.6.3 does not always keep a
+pointer" learning from `Class6B5CC__OnNotify`: GCC 2.6.3 does not always keep a
 just-stored value live in its original register when a memory read of the
 same value is available and the source re-mentions the field rather than
 the parameter -- write the SOURCE the way retail's disassembly reads

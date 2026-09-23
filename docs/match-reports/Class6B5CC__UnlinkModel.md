@@ -3,7 +3,7 @@
 > Renamed from `func_8001E7B0` on 2026-09-17 (tools/rename.py). Address 0x8001e7b0.
 
 Unit: `code_d294_c` (round 14, first slice-3 carve). Called by
-`func_8001CD20` (`code_d294.c`) as its forward target for
+`Class6B5CC__RemoveAllChildren` (`code_d294.c`) as its forward target for
 `Class6B5CCMethods::slot18`. `void Class6B5CC__UnlinkModel(Class6B5CCObj *self)`.
 
 ## Final source
@@ -36,7 +36,7 @@ No new struct or vtable-slot knowledge.
   is the inverse of its pair BY CONSTRUCTION, not because any Sony call
   pins it -- there is no GS call here at all, which is why this is B where
   `Class6B5CC__LinkModel` is A.
-- Its one dispatch path supports the pairing: `func_8001CD20` (code_d294.c)
+- Its one dispatch path supports the pairing: `Class6B5CC__RemoveAllChildren` (code_d294.c)
   forwards `Class6B5CCMethods::slot18` straight into it, while
-  `func_8001CC48` -- the +0x010 slot -- is what forwards into
+  `Class6B5CC__AddChild` -- the +0x010 slot -- is what forwards into
   `Class6B5CC__LinkModel`.

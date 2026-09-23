@@ -28,7 +28,7 @@ void Class6B5CC__RotateLocalVector(Class6B5CCObj *self, Class6B5CCSub44 *dst, s1
 - **`Class6B5CCMethods` gains `slot84`** (`void(Class6B5CCObj*, void*,
   s32)`), split out of the `pad060[0x094-0x060]` range this round
   established (now `pad060[0x084-0x060]` + `slot84` + `pad088[0x094-
-  0x088]`). Confirmed against `tools/classtable.py D_8006B5CC`: the
+  0x088]`). Confirmed against `tools/classtable.py gClass6B5CCMethods`: the
   occupant is `Class6B5CC__GetRotMatrix`, in `code_d294_b` (out of this carve's
   scope, not decompiled here).
 - **New forward declaration for `ApplyMatrixToLVArray`** (this unit, matched
@@ -49,7 +49,7 @@ No existing field was retyped or renamed.
   space, not evidence of a specific larger type.
 - The `dst->unk0/unk4/unk8 = src[i]` triple is the same "three `s32`
   fields populated from a 3-element `s16` source" shape as
-  `func_8001D008`/`func_8001CEB4` (both of which populate the SAME
+  `Class6B5CC__UpdateScale`/`Class6B5CC__UpdateRotation` (both of which populate the SAME
   `Class6B5CCSub44` fields via a fixed-point conversion instead) --
   here the source values are used directly, no `RatioToFixed12` call.
 - First-try match once the buffer size was corrected; no register-order
@@ -75,7 +75,7 @@ larger, partially-opaque) extent.
   of `Class6B5CC__GetRotMatrix`, which is why this is B and not A.
 - **Method prefix `Class6B5CC__`:** the first parameter is a
   `Class6B5CCObj *` and the body dispatches through its method table. The
-  function is NOT itself a vtable slot (`tools/classtable.py D_8006B5CC`
+  function is NOT itself a vtable slot (`tools/classtable.py gClass6B5CCMethods`
   ends at `Class6B5CC__NotifyTaggedParents`); the prefix records the receiver, matching
   `BasicClass__*` and `DreamSys__*` already in the symbols file.
 - **Parameter `dst` retyped `Class6B5CCSub44 *` -> `Vec3_d294 *`.** Evidence:

@@ -1,11 +1,13 @@
-# func_8001D0EC
+# Class6B5CC__AttachToParent
+
+> Renamed from `func_8001D0EC` on 2026-09-23 (tools/rename.py). Address 0x8001d0ec.
 
 **Unit:** code_d294 · **Size:** 46 words · **Status:** MATCHED (46/46 words)
 
 ## What it does
 
 `Class6B5CC` vtable slot `+0x04C`, the "attach" half of an attach/detach
-pair with `func_8001D1A4` (`+0x050`, this unit's own report). If
+pair with `Class6B5CC__DetachFromParent` (`+0x050`, this unit's own report). If
 `self->unkC` is already set, does nothing and returns `self` unchanged
 (already attached). Otherwise: stores `obj` into `self->unkC`, copies
 `obj->unk14` into `self->unk14->unk48`, calls `obj->methods->slot10(obj,
@@ -17,7 +19,7 @@ zeroes those three fields if `vec` is `NULL`, and finally clears
 ## The C
 
 ```c
-Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
+Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
     Class6B5CCSub14 *sub;
 
     if (self->unkC == NULL) {
@@ -45,7 +47,7 @@ Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 
 
 **1. Cache a re-read field ONLY across the span with no intervening call;
 reload after each call.** First attempt used `self->unk14->unk44 = ...`
-etc. directly (no local), by analogy with `func_8001CAF4`'s round-1
+etc. directly (no local), by analogy with `Class6B5CC__Class6B5CC`'s round-1
 lesson ("don't cache a re-read field across a call, re-derive it fresh
 each time"). That produced THREE separate reloads of `self->unk14`
 (retail has three too, but only where a call actually intervenes) and, in
@@ -54,8 +56,8 @@ caching `self->unk14` into a local `sub` and REUSING it across the
 `unk18`/`unk1C`/`unk20` triple (no call between those three stores), while
 still reloading `sub = self->unk14` fresh right after the ONE call that
 does intervene (`obj->methods->slot10`). **This is not a contradiction of
-`func_8001CAF4`'s lesson -- it's the same rule read in both directions:**
-cache within a call-free span, reload after a call. `func_8001CAF4`'s
+`Class6B5CC__Class6B5CC`'s lesson -- it's the same rule read in both directions:**
+cache within a call-free span, reload after a call. `Class6B5CC__Class6B5CC`'s
 residue happened to need re-deriving because a call sat between the two
 uses; this one needed caching because no call did. Read the disassembly's
 own reload points as the ground truth for where the SOURCE re-mentions
@@ -85,4 +87,15 @@ attempt, then one fix per residue above). Established `UnkOwner_d294`/
 ctor-like/`+0x014` dtor-like slots) and `Class6B5CCSub14`'s
 `unk18`/`unk1C`/`unk20` Vec3 fields, and retyped `Class6B5CCObj::unkC`
 from an untyped `void *` to `UnkOwner_d294 *` (see header comment on that
-field for the cross-check with `func_8001D1A4`).
+field for the cross-check with `Class6B5CC__DetachFromParent`).
+
+## Naming
+
+Round 71 (alpha). `func_8001D0EC` -> `Class6B5CC__AttachToParent`, **tier A**. Table slot +0x04C. Only when not already attached: stores the parent in self->unkC, sets coord2->super to the parent's coordinate, calls parent->addChild(self) (BasicClass slot +0x010), copies the optional translation into coord2 (coord.t, +0x18..+0x20) or zeroes it, flg = 0. class_3bb8c_s independently calls this slot `attachToParent`.
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `Class6B5CCObj.unkC` -> `parent` (tier A): AttachToParent stores the object it then calls addChild on; DetachFromParent calls removeChild on it and clears it. Accessors: code_d294, code_d294_b, code_d294_c.
+- `Class6B5CCSub14.unk18/unk1C/unk20` -> `tx/ty/tz` (tier A): GsCOORDINATE2.coord.t[0..2] (+0x04 + 0x14), written from AttachToParent's translation argument. Accessors: code_d294, code_d294_c.

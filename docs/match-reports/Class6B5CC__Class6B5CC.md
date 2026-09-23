@@ -1,26 +1,28 @@
-# func_8001CAF4
+# Class6B5CC__Class6B5CC
+
+> Renamed from `func_8001CAF4` on 2026-09-23 (tools/rename.py). Address 0x8001caf4.
 
 **Unit:** code_d294 · **Size:** 44 words · **Status:** MATCHED (44/44 words)
 
 ## What it does
 
-`Class6B5CC`'s own constructor — vtable slot `+0x008` of `D_8006B5CC`
-(confirmed directly: `tools/classtable.py D_8006B5CC` names `func_8001CAF4`
+`Class6B5CC`'s own constructor — vtable slot `+0x008` of `gClass6B5CCMethods`
+(confirmed directly: `tools/classtable.py gClass6B5CCMethods` names `Class6B5CC__Class6B5CC`
 as the occupant of that slot). Takes an already-allocated `self` (the
-allocation itself is `func_8001CA94`, a separate `New_X` wrapper, not this
+allocation itself is `New_Class6B5CC`, a separate `New_X` wrapper, not this
 function). Allocates two sub-blocks (`self->unk14`, 0x50 bytes, then
 `self->unk14->unk44`, 0x28 bytes), frees the first and bails out if the
 second allocation fails, otherwise calls the BasicClass base constructor
 (`Get_vtable_BasicClass()->ctor(self)`), overwrites `self->methods` with this
-class's own vtable (`GetClass6B5CCMethods()`, i.e. `&D_8006B5CC`), zeroes several
+class's own vtable (`GetClass6B5CCMethods()`, i.e. `&gClass6B5CCMethods`), zeroes several
 freshly-added fields, and finally calls its own virtual init hook
-(`self->methods->slot40`, `func_8001CE30` — still queued) before returning
+(`self->methods->slot40`, `Class6B5CC__Reset` — still queued) before returning
 `self` unconditionally.
 
 ## The C
 
 ```c
-void *func_8001CAF4(Class6B5CCObj *self) {
+void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     void *blockB;
 
     self->unk14 = func_80017B34(0x50);
@@ -79,3 +81,15 @@ void *func_8001CAF4(Class6B5CCObj *self) {
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Both fixes above were found within the 30-attempt budget (2 rebuild
 iterations total).
+
+## Naming
+
+Round 71 (alpha). `func_8001CAF4` -> `Class6B5CC__Class6B5CC`, **tier A**. Table slot +0x008 (ctor) of gClass6B5CCMethods. Allocates the 0x50-byte GsCOORDINATE2 and 0x28-byte GsCOORD2PARAM, runs the BasicClass ctor, installs gClass6B5CCMethods, zeroes fields, then calls `reset`. `Class__Class` constructor convention (BasicClass__BasicClass).
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `Class6B5CCObj.unk14` -> `coord2` (tier A): the ctor allocates exactly sizeof(GsCOORDINATE2) = 0x50 for it and Reset runs GsInitCoordinate2 on it; +0x14 of the embedded GsDOBJ2 is `coord2` in LIBGS.H. Accessors: code_d294, code_d294_b, code_d294_c (compiler-measured).
+- `UnkOwner_d294.unk14` and `GenericObj_d294.unk14` -> `coord2` (tier A): the same field on the parent and on a sibling object (AttachToParent copies the parent's into `super`). Accessors: code_d294, code_d294_c.
+- `Class6B5CCSub14.unk44` -> `param` (tier A): GsCOORDINATE2.param, the 0x28-byte GsCOORD2PARAM the ctor allocates. Accessors: code_d294, code_d294_b, code_d294_c.

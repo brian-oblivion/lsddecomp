@@ -4,7 +4,7 @@
  * base class, MEASURED onto Psy-Q's GsDOBJ2/GsCOORDINATE2/GsCOORD2PARAM).
  *
  * Covers method-table slots +0x074 through +0x0B4 (tools/classtable.py
- * D_8006B5CC) -- the table's own LAST 17 slots. In ROM order: four more
+ * gClass6B5CCMethods) -- the table's own LAST 17 slots. In ROM order: four more
  * self->unk10 bitfield accessors (the sibling family code_d294.c starts;
  * two renamed this round, `Class6B5CC__GetSetUnk10Flag7`/`Field9`, two
  * held back as `func_` -- proposed `Field0`/`Flag8` -- because their
@@ -14,7 +14,7 @@
  * (`Class6B5CC__ReadUnk20Data` -> `Class6B5CC__NotifyIfUnk20Active` ->
  * `Class6B5CC__TransformAndNotifyParents`); two vtable no-op stubs
  * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
- * `func_8001D33C` no-op precedent); a command dispatcher over the same
+ * `Class6B5CC__func_1d33c` no-op precedent); a command dispatcher over the same
  * "attach" state (`Class6B5CC__DispatchLinkCommand`, proposed `Class6B5CC__DispatchLinkCommand`);
  * a proximity-attach attempt (`Class6B5CC__TryAttachNearby`, STALL, proposed
  * `Class6B5CC__TryAttachNearby`) that hands off to a rotation compose-and-
@@ -40,19 +40,19 @@
 #include "common.h"
 #include "code_d294.h"
 
-/* Sibling of func_8001D344/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
+/* Sibling of Class6B5CC__SetDisplay/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
  * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
  * pass-through value and raw pass-through result -- same shape as
- * func_8001D374/D3A0/D3F8 (no `== 0` on either side). */
+ * Class6B5CC__SetSemiTrans/D3A0/D3F8 (no `== 0` on either side). */
 u32 Class6B5CC__GetSetUnk10Field0(Class6B5CCObj *self, u32 a1) {
     return GetSetBitField(&self->unk10, 0, 3, a1);
 }
 
-/* Sibling of func_8001D344 (the ONLY one of the five already-matched
+/* Sibling of Class6B5CC__SetDisplay (the ONLY one of the five already-matched
  * self->unk10 bitfield accessors that both converts its input to a boolean
  * (`a1 == 0`) AND inverts its own result (`== 0`)). This function does
  * exactly that double-inversion, at shift 7 width 1, hence the same `s32`
- * return type as func_8001D344 rather than the plain `u32` of the other
+ * return type as Class6B5CC__SetDisplay rather than the plain `u32` of the other
  * three siblings. */
 s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 7, 1, a1 == 0) == 0;
@@ -693,7 +693,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__NotifyTaggedParents);
 #endif
 
 /* This unit's own no-argument vtable getter -- see the extended note on
- * D_8006B5CC in include/code_d294.h and the file banner up top. */
+ * gClass6B5CCMethods in include/code_d294.h and the file banner up top. */
 Class6B5CCMethods *GetClass6B5CCMethods(void) {
-    return &D_8006B5CC;
+    return &gClass6B5CCMethods;
 }

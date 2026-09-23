@@ -47,10 +47,10 @@ value sitting stale in the register from far earlier in that function.
 
 Round 70 (alpha). `func_800567D4` -> `AttachWithRotScale`, **tier A**.
 
-Pure forwarder: slot +0x04C (func_8001D0EC: sets the parent link and
+Pure forwarder: slot +0x04C (Class6B5CC__AttachToParent: sets the parent link and
 coord2 `super`, writes `trans` into coord.t), then slots +0x044 and +0x048
-with set = 1 (func_8001CEB4 assigns GsCOORD2PARAM.rotate from a degree ratio
-triple; func_8001D008 assigns .scale). Both callers
+with set = 1 (Class6B5CC__UpdateRotation assigns GsCOORD2PARAM.rotate from a degree ratio
+triple; Class6B5CC__UpdateScale assigns .scale). Both callers
 (Class876FC__InitByKind on the owner, Class876FC__PlaceModelChildren on
 each BaseObjO child) pass objects whose tables resolve those three slots to
 exactly those functions (tools/classtable.py on D_800876FC and D_800878D4).

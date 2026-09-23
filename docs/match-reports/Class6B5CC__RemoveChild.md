@@ -1,21 +1,23 @@
-# func_8001CCB4
+# Class6B5CC__RemoveChild
+
+> Renamed from `func_8001CCB4` on 2026-09-23 (tools/rename.py). Address 0x8001ccb4.
 
 **Unit:** code_d294 · **Size:** 27 words · **Status:** MATCHED (27/27 words)
 
 ## What it does
 
-`Class6B5CC` vtable slot `+0x014`, mirror of `func_8001CC48` (`+0x010`).
+`Class6B5CC` vtable slot `+0x014`, mirror of `Class6B5CC__AddChild` (`+0x010`).
 If `other`'s vtable header tag is `9`, first calls `Class6B5CC__UnlinkModel(self)`
 (zeroes `self->unk18`/`self->unk20` -- MEASURED from its own disassembly,
 see `include/code_d294.h`), THEN unconditionally forwards to the base
 class's own `+0x014` slot (`Get_vtable_BasicClass()->slot14`). "Detach" to
-`func_8001CC48`'s "attach": the pre-work happens before the base call here,
-where `func_8001CC48` did its post-work after.
+`Class6B5CC__AddChild`'s "attach": the pre-work happens before the base call here,
+where `Class6B5CC__AddChild` did its post-work after.
 
 ## The C
 
 ```c
-void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__UnlinkModel(self);
     }
@@ -36,3 +38,7 @@ simply always live in a register here.
 ## Provenance
 
 round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build.
+
+## Naming
+
+Round 71 (alpha). `func_8001CCB4` -> `Class6B5CC__RemoveChild`, **tier A**. Overrides BasicClass slot +0x014 `removeChild`. If the child's tag is 9, Class6B5CC__UnlinkModel first, then forwards to the base. Mirror of Class6B5CC__AddChild; class_3ac78.h already calls this address `removeChild`.

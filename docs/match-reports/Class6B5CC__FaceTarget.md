@@ -107,7 +107,7 @@ same base class?**
    because that's what THIS unit's body actually needs and what's
    locally available (matching the `+0xC`/`+0x14` layout used), per the
    project's established "per-call-site signature, not a callee
-   property" precedent (same as `GetClass6B5CCMethods`/`func_8001D33C`). Full
+   property" precedent (same as `GetClass6B5CCMethods`/`Class6B5CC__func_1d33c`). Full
    writeup left in `include/code_d294.h`'s own comment on this function,
    so the next reader doesn't have to re-derive it.
 
@@ -166,7 +166,7 @@ here exactly as already declared.
   retail, which duplicates that load independently in EACH arm and
   shares only the final `ratan2` call (the SAME "GCC tail-merges an
   identical trailing call, but does not otherwise fuse the branches"
-  shape already documented in `func_8001CD60`'s report). Restructuring
+  shape already documented in `Class6B5CC__OnNotify`'s report). Restructuring
   as `if (table[0] != pos[0]) { ...normal, with its OWN duplicate
   table[2]/pos[2] load... } else { ...special... }` (note the INVERTED
   condition, `!=` not `==`) matched exactly: both the word count and the
@@ -196,7 +196,7 @@ here exactly as already declared.
    new, general lever: prefer "compute in place on the field" over
    "compute in a local, then assign" whenever the local would otherwise
    be used exactly once.
-3. Confirms and extends `func_8001CD60`'s "GCC tail-merges an identical
+3. Confirms and extends `Class6B5CC__OnNotify`'s "GCC tail-merges an identical
    trailing call, but does not fuse the whole branch" finding: the
    merge-vs-duplicate boundary is sensitive to which arm of an `if`/`else`
    is written as the `if` (taken-first) vs the `else` -- swapping the
@@ -213,7 +213,7 @@ here exactly as already declared.
   both are converted to degrees by the same `* 360 / 4096` this unit's
   `Class6B5CC__GetRotationDegrees` uses; they are packed as a
   `WholeFrac_d294[3]` and dispatched to `slot44`, whose occupant is
-  `func_8001CEB4` (code_d294.c, matched) -- the setter that writes
+  `Class6B5CC__UpdateRotation` (code_d294.c, matched) -- the setter that writes
   `GsCOORD2PARAM.rotate`, i.e. the object's own rotation. Compute an
   orientation from self toward a target and install it as the object's
   rotation is the whole function.

@@ -137,7 +137,7 @@ learning below.
 
 **Third instance in two rounds of "insert a new field, forget the leading
 pad, break a DIFFERENT already-matched function silently."** (First:
-`func_8001D204`/round 13's delta, a different unit entirely. Second:
+`Class6B5CC__DetachAttachedChildren`/round 13's delta, a different unit entirely. Second:
 `Unk18Obj__Finalize`/this round's `func_8003E8B8`. Third: this report.) All
 three were caught the same way — `build exit` non-zero with no compile
 error, localized via `cmp -l` (1-based!) + `lsdde.map`. This is now

@@ -126,7 +126,7 @@ staircase:
 	this->unk_0x90C = 1;
 	this->unk_0x914 = 0;
 	this->unk_0x910 = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
-	this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
+	this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->unk_0x884);
 	this->unk_0x910(this);
 	return false;
 }

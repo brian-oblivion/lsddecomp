@@ -1,6 +1,6 @@
 /* code_d294_c -- the third and last carve of the Class6B5CC segment.
  *
- * Class6B5CC (method table D_8006B5CC, class tag 4) is this game's
+ * Class6B5CC (method table gClass6B5CCMethods, class tag 4) is this game's
  * POSITIONED 3D OBJECT base class. Every instance embeds a Psy-Q `GsDOBJ2`
  * at +0x10 (attribute / coord2 / tmd) and owns the `GsCOORDINATE2` that
  * GsDOBJ2 points at -- MEASURED, see the "PSY-Q IDENTIFICATION" note in
@@ -10,7 +10,7 @@
  * unit's helpers are called from a dozen other units.
  *
  * NONE of this unit's functions is a vtable slot (`tools/classtable.py
- * D_8006B5CC` stops at Class6B5CC__NotifyTaggedParents). It is the class's FREE-FUNCTION tail:
+ * gClass6B5CCMethods` stops at Class6B5CC__NotifyTaggedParents). It is the class's FREE-FUNCTION tail:
  * five instance helpers that dispatch through the table (`Class6B5CC__*`)
  * and eight standalone leaves -- vector, matrix, fixed-point, bounding-box
  * and bitfield primitives -- that the rest of the game calls by symbol.
@@ -229,7 +229,7 @@ void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
 /* Points the object at `target`: two ratan2 calls over `target`'s world
  * position minus `self`'s own coord translation give yaw and pitch, both
  * converted to degrees, packed into a {pitch, yaw, 0} ratio triple and
- * dispatched to updateRotation (func_8001CEB4, the rotation setter that writes
+ * dispatched to updateRotation (Class6B5CC__UpdateRotation, the rotation setter that writes
  * GsCOORD2PARAM.rotate). `arg2 != 0` zeroes the pitch entry; `arg3 == 0`
  * adds 180 degrees to yaw; a non-NULL `arg4` fires a second updateRotation with the
  * caller's own table forwarded verbatim.

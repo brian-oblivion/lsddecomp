@@ -154,11 +154,11 @@ whether the function itself matched)
   at this edit put `slot10` immediately after `header` with no padding,
   silently shifting the already-matched `slot50` from its correct `+0x050`
   to `+0x044`. This didn't fail the build (compiles clean either way) —it
-  broke the WHOLE-IMAGE SHA1 by one byte, in `func_8001D204` (`code_d294.c`,
+  broke the WHOLE-IMAGE SHA1 by one byte, in `Class6B5CC__DetachAttachedChildren` (`code_d294.c`,
   a different unit, already matched, calling `entry->methods->slot50`).
   Caught by running the full `./build-and-verify.sh` and then `cmp -l
   build/SLPS_015.56 disk/SLPS_015.56` to localize the single differing byte
-  to `0x8001D24C`, inside `func_8001D204`. Fixed with the missing
+  to `0x8001D24C`, inside `Class6B5CC__DetachAttachedChildren`. Fixed with the missing
   `pad004[0x010-0x004]`. **This is exactly the scenario CLAUDE.md's vtable
   slot-retype warning describes** ("check every other caller first... a
   slot retype that breaks another function shows up as a red build, not as
@@ -530,7 +530,7 @@ mechanics (scan parents, filter by a tag byte, dispatch to matches);
 the game-level meaning of tag `4`/`0x34` and what the `+0x010`
 dispatch actually does to `entry` is not established. This is also the
 class's own table-slot BOUNDARY -- `code_d294_c.c`'s own file banner
-already documents "`tools/classtable.py D_8006B5CC` stops at
+already documents "`tools/classtable.py gClass6B5CCMethods` stops at
 Class6B5CC__NotifyTaggedParents" -- i.e. it is `Class6B5CCMethods`'s LAST slot
 (`+0x0B4`), not evidence of anything about this function's own
 purpose beyond position. Held back from an actual rename because this

@@ -135,7 +135,7 @@ declaration both called it `count`, and that was wrong. Three independent
 witnesses: this function gates it on a small non-contiguous set (a count would
 not skip 4); the base occupant of the sibling slot `+0x09C`,
 `Class6B5CC__DispatchLinkCommand(self, a1, a2)`, switches on the same-position
-parameter over `{2,3,4}`; and `func_8001CD60` in `code_d294` dispatches these
+parameter over `{2,3,4}`; and `Class6B5CC__OnNotify` in `code_d294` dispatches these
 slots as `(self, sender, event)`. Renamed `list` -> `sender`,
 `count` -> `command`, in the definition, the slot declarations and the two
 callers. Byte-neutral, oracle green.

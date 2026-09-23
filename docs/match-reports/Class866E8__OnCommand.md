@@ -61,7 +61,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AB88` | `Class866E8__OnCommand` | B | Occupant of vtable slot `+0x09C`. The base occupant of that slot is `Class6B5CC__DispatchLinkCommand(self, a1, a2)`, which switches on `a2` in `{2,3,4}` -- so the slot's third parameter is a COMMAND CODE, not the `count` this report previously called it. `func_8001CD60` (code_d294) dispatches `+0x09C` as `slot9C(self, sender, event)` when the sender's class tag is 4, which fixes the second parameter as the sender. This override accepts only senders whose vtable header low byte is `0x34` and forwards `(sender, command)` to `forwardAcceptedCommand`. Tier B: the filter and the forward are certain, the meaning of tag `0x34` and of the command numbering is not. |
+| `func_8004AB88` | `Class866E8__OnCommand` | B | Occupant of vtable slot `+0x09C`. The base occupant of that slot is `Class6B5CC__DispatchLinkCommand(self, a1, a2)`, which switches on `a2` in `{2,3,4}` -- so the slot's third parameter is a COMMAND CODE, not the `count` this report previously called it. `Class6B5CC__OnNotify` (code_d294) dispatches `+0x09C` as `slot9C(self, sender, event)` when the sender's class tag is 4, which fixes the second parameter as the sender. This override accepts only senders whose vtable header low byte is `0x34` and forwards `(sender, command)` to `forwardAcceptedCommand`. Tier B: the filter and the forward are certain, the meaning of tag `0x34` and of the command numbering is not. |
 
 Parameters renamed: `other` -> `sender`, `count` -> `command`. This is the
 same parameter that `Class866E8__ForwardAcceptedCommand` gates on

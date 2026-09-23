@@ -1,4 +1,6 @@
-# func_8001CEB4 -- MATCHED, round 45 (2026-09-15)
+# Class6B5CC__UpdateRotation -- MATCHED, round 45 (2026-09-15)
+
+> Renamed from `func_8001CEB4` on 2026-09-23 (tools/rename.py). Address 0x8001ceb4.
 
 **Unit:** `code_d294` · **Size:** 85 words · **Status:** MATCHED, 85/85 exact,
 whole-image SHA1 green.
@@ -14,7 +16,7 @@ beyond the flag, described below.
 ## Body
 
 ```c
-void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
+void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
     s32 vals[3];
     Class6B5CCSub44 *dst;
     s16 *field;
@@ -104,3 +106,13 @@ loop-shape fix, not just a rebuild" pattern this round (see also the
 round-42 reopen notes generally) -- worth checking on any other queued
 function whose STALL predates round 42 and involves a pointer-walking loop
 over a small fixed count.
+
+## Naming
+
+Round 71 (alpha). `func_8001CEB4` -> `Class6B5CC__UpdateRotation`, **tier A**. Table slot +0x044 (round 70 named the slot `updateRotation`). Converts a ratio triple of degrees (RatioToFixed12, /360) into 4096-per-turn units and either assigns (flag != 0) or accumulates mod 4096 into GsCOORD2PARAM.rotate, then clears coord2 flg. Callers agree: DreamSys turns (ROTATION_YAW_PLUS45 etc., accumulate) and sets headings (assign); class_3bb8c_s calls the slot updateRotation.
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `Class6B5CCSub44.vec` -> `rotate` (tier A): GsCOORD2PARAM.rotate (SVECTOR at +0x10), which UpdateRotation writes in 4096-per-turn units. Accessors: code_d294, code_d294_b, code_d294_c.

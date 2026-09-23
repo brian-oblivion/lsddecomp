@@ -330,7 +330,7 @@ identity vs. pair-swap) before reaching for an axis that closed a
   `WholeFrac_d294[3]`, the same {value, 1} ratio shape
   `Class6B5CC__FaceTarget` builds and `slot44` consumes.
 - The 4096-per-turn reading was already independently established in this
-  header by `func_8001CEB4`'s full-turn wrap (modulo 4096) on the same
+  header by `Class6B5CC__UpdateRotation`'s full-turn wrap (modulo 4096) on the same
   field, before the Sony identification existed.
 - No parameter retyped. The statement-order finding above (`.whole` before
   `.frac`) is unaffected by the rename.

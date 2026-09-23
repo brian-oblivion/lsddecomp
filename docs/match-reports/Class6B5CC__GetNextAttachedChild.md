@@ -1,10 +1,12 @@
-# func_8001D280
+# Class6B5CC__GetNextAttachedChild
+
+> Renamed from `func_8001D280` on 2026-09-23 (tools/rename.py). Address 0x8001d280.
 
 **Unit:** code_d294 · **Size:** 47 words · **Status:** MATCHED (47/47 words)
 
 ## What it does
 
-`Class6B5CC` vtable slot `+0x058`, `func_8001D204`'s (`+0x054`) own call
+`Class6B5CC` vtable slot `+0x058`, `Class6B5CC__DetachAttachedChildren`'s (`+0x054`) own call
 target -- searches an intrusive list (starting from `self->unk4`, a
 BasicClass-owned field this unit reads directly) for the first entry whose
 vtable header tag is `4` AND whose own `+0x00C` field equals `self`, using
@@ -12,7 +14,7 @@ the generic list-pop helper `GetNextBasicClass` (a DIFFERENT still-uncarved
 unit, `code_8220_b.s`) to advance. On a match, leaves `*entry` pointing at
 it and returns. If the list runs out first, sets `*entry = NULL`.
 
-`entry` and `cursor` are the SAME two stack slots `func_8001D204` passes
+`entry` and `cursor` are the SAME two stack slots `Class6B5CC__DetachAttachedChildren` passes
 by reference on every iteration of its own loop -- `cursor`'s truthiness
 is what that caller's loop treats as "keep going", but inside THIS
 function it is the actual list-traversal cursor, not a boolean. Two
@@ -23,7 +25,7 @@ round-1 reports).
 ## The C
 
 ```c
-void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
+void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
     s32 tag;
 
     tag = 4;
@@ -54,3 +56,13 @@ combined `&&`, to keep each branch target lined up with retail's own).
 Established `GetNextBasicClass`'s call shape from this unit's own vantage,
 `Class6B5CCObj::unk4` (split out of the previously-opaque BasicClass field
 blob), and `GenericObj_d294::unkC`.
+
+## Naming
+
+Round 71 (alpha). `func_8001D280` -> `Class6B5CC__GetNextAttachedChild`, **tier A**. Table slot +0x058. Walks self->children (BasicClass +0x004, seeded when *entry is NULL) with GetNextBasicClass and stops at the next child whose tag is 4 (Class6B5CC family) and whose +0x00C parent pointer is self; sets *entry = NULL when the list ends. A list iterator whose mechanics are its purpose.
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `GenericObj_d294.unkC` -> `parent` (tier A): the same +0x00C parent pointer on the child, compared against self to pick attached children. Accessors: code_d294, code_d294_c, plus a NON_MATCHING body in code_d294_b.

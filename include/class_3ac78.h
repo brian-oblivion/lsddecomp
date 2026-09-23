@@ -189,7 +189,7 @@ struct Class866E8Methods {
     /* +0x008 */ void (*ctor)(Class866E8 *self, s32 arg1, s32 arg2);            /* Class866E8__Class866E8; called by New_Class866E8 */
     /* +0x00C */ void *finalize;                                                    /* Class866E8__Finalize (MATCHED); not dispatched by any of this project's decompiled callers yet */
     /* +0x010 */ void (*addChild)(Class866E8 *self, s32 arg1);                    /* Class866E8__Class866E8 (ctor); called with func_80020C5C()'s return, after the 7-entry elems[] init loop */
-    /* +0x014 */ void (*removeChild)(Class866E8 *self, void *arg1);                  /* func_8001CCB4; called by Class866E8__Finalize */
+    /* +0x014 */ void (*removeChild)(Class866E8 *self, void *arg1);                  /* Class6B5CC__RemoveChild; called by Class866E8__Finalize */
     /* +0x018 */ u8 pad018[0x030 - 0x018];
     /* +0x030 */ void (*notifyParents)(Class866E8 *self, s32 command);                    /* BasicClass__NotifyParents; called by Class866E8__OnElementEvent */
     /* +0x034 */ u8 pad034[0x038 - 0x034];

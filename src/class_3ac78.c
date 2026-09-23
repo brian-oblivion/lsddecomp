@@ -27,7 +27,7 @@
  * (Class866E8__ResetAllElements, Class866E8__SetFootprintRect and
  * Class866E8__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
  * deliberately -- it is an empty vtable stub with no established purpose, the
- * same case as func_8001D33C in code_d294_b.
+ * same case as Class6B5CC__func_1d33c in code_d294_b.
  */
 #include "common.h"
 #include "class_3ac78.h"
@@ -204,7 +204,7 @@ void Class866E8__Finalize(Class866E8 *self)
 }
 
 /* MEASURED, round 9: GetClass6B5CCMethods TAKES NO ARGUMENTS -- its body is
- * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` and it reads neither $a0 nor $a1
+ * `lui/addiu %hi/%lo(gClass6B5CCMethods); jr $ra` and it reads neither $a0 nor $a1
  * (asm/code_d294.s). The two args below are what THIS call site passes, not
  * the callee's signature; include/class_3bb8c.h passes ONE to the same symbol
  * and is equally byte-exact. Retail's source called one zero-argument getter

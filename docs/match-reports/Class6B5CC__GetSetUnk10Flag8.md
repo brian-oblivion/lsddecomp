@@ -36,7 +36,7 @@ argument count per call site" precedent already established for
 `GetClass6B5CCMethods` elsewhere in this unit -- it does not affect this unit's own
 implementation, which is typed only to this unit's own call sites
 (`GetSetBitField` and the vtable slot `Class6B5CCMethods::+0x080`, confirmed
-via `tools/classtable.py D_8006B5CC`).
+via `tools/classtable.py gClass6B5CCMethods`).
 
 ### Proposed learning
 

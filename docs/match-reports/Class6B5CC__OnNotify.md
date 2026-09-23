@@ -1,17 +1,19 @@
-# func_8001CD60 -- MATCHED (52/52 words)
+# Class6B5CC__OnNotify -- MATCHED (52/52 words)
+
+> Renamed from `func_8001CD60` on 2026-09-23 (tools/rename.py). Address 0x8001cd60.
 
 Unit: `code_d294` (round 14, first function of a fresh 3-function queue in
 this carve). Occupies `Class6B5CCMethods` vtable slot `+0x038` (an
 override, per the file banner's `classtable.py` census). Forwards
 unconditionally to a new `BasicClassMethodsD294` slot, then dispatches to
 one of three new `Class6B5CCMethods` slots based on `other`'s own
-vtable-header tag nibble. `void func_8001CD60(Class6B5CCObj *self,
+vtable-header tag nibble. `void Class6B5CC__OnNotify(Class6B5CCObj *self,
 GenericObj_d294 *other, s32 arg2)`.
 
 ## Final source
 
 ```c
-void func_8001CD60(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
+void Class6B5CC__OnNotify(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
     s32 tag;
 
     Get_vtable_BasicClass()->slot38(self, other, arg2);
@@ -44,8 +46,8 @@ No existing field was retyped or renamed.
 
 - The tag dispatch (`other->methods->header & 0xF`) reuses the existing
   `GenericMethods_d294::header` field and its documented "low nibble is a
-  class-tag" convention (already established by `func_8001CC48`/
-  `func_8001CCB4` comparing the same nibble against `9`).
+  class-tag" convention (already established by `Class6B5CC__AddChild`/
+  `Class6B5CC__RemoveChild` comparing the same nibble against `9`).
 - **Residue: a function-pointer local (`fn = self->methods->slot94; ...;
   fn(self, other, arg2);`) scored 23/52 with a redundant `move a0,s0`
   retail has in each branch that the function-pointer-variable version
@@ -75,3 +77,14 @@ are textually identical (same arguments) across every branch.** GCC 2.6.3
 tail-merges the identical trailing call sequence across branches on its
 own; caching the pointer in a variable first changes the code shape
 (loses a redundant-but-retail-has-it `move`) rather than reproducing it.
+
+## Naming
+
+Round 71 (alpha). `func_8001CD60` -> `Class6B5CC__OnNotify`, **tier A**. Overrides BasicClass slot +0x038, BasicClass__OnNotify (receiving half of notifyParents; include/code_8220.h). Forwards to the base first, then dispatches on the SENDER's class tag: 2 (the pad class D_8006D370) -> slot +0x094, 5 (D_8006EF50) -> +0x098, 4 (Class6B5CC family) -> +0x09C dispatchLinkCommand. Slots 94/98 keep placeholders: their occupants (func_8001D6A4/func_8001D6AC, code_d294_b) are not named.
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `Class6B5CCMethods.slot30` -> `notifyParents` (tier A): the occupant is BasicClass__NotifyParents (inherited verbatim), and BasicClassMethods names the slot notifyParents. Accessor: code_d294_b (TransformAndNotifyParents).
+- `GenericMethods_d294.slot38` -> `onNotify` (tier A): BasicClass slot +0x038, called as `(other, self, 4)`, i.e. sender self, event 4. Accessor: only the NON_MATCHING body of Class6B5CC__TryAttachNearby in code_d294_b (the default build does not see it; check-nonmatching does).

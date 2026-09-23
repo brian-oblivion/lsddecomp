@@ -54,7 +54,7 @@ image SHA1 is green).
 
 - `Class6B5CCMethods::slotA0` (+0x0A0, new field): dispatched with only
   `self` (the `jalr` leaves `$a0` untouched from function entry).
-  `tools/classtable.py D_8006B5CC` confirms this slot's occupant is
+  `tools/classtable.py gClass6B5CCMethods` confirms this slot's occupant is
   `Class6B5CC__TryAttachNearby` (still queued, this unit).
 - `Class6B5CCObj::unk28` (new field, `s32`): m2c inferred `s32` from `a1`'s
   own usage; never dereferenced by this unit's chosen functions, so nothing

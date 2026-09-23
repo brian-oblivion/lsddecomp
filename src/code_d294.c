@@ -1,7 +1,37 @@
+/*
+ * code_d294 -- 0xD294.., the first 20 methods of Class6B5CC (method table
+ * gClass6B5CCMethods, class tag 4), a BasicClass subclass and the base of
+ * every class table whose tag nibble is 4 (DreamSys, Entity, BaseObjO and
+ * about a dozen more, per tools/classtable.py --scan). An instance embeds a libgs GsDOBJ2 at +0x10
+ * (attribute, coord2, tmd) and owns its GsCOORDINATE2 and GsCOORD2PARAM.
+ * This slice holds: New / ctor / Finalize; the BasicClass child-list
+ * overrides, which link or unlink a tag-9 model child as it is added or
+ * removed; OnNotify, which fans a notification out by the sender's tag;
+ * Reset (identity transform); UpdateRotation / UpdateScale (set or
+ * accumulate a ratio triple into the GsCOORD2PARAM); attach to and detach
+ * from a parent's coordinate; and five setters over GsDOBJ2.attribute.
+ * The class continues in code_d294_b (slots +0x074..+0x0B4) and its free
+ * helpers in code_d294_c. All 20 functions are matched. Named round 71;
+ * tiers and evidence in each function's match report.
+ */
 #include "common.h"
 #include "code_d294.h"
 
-Class6B5CCObj *func_8001CA94(void) {
+/* The low nibble of a class table's header word is its class tag. */
+#define CLASS_TAG_MASK   0xF
+#define TAG_PAD          2   /* D_8006D370, PadMethods (class_16334.h) */
+#define TAG_CLASS6B5CC   4   /* this class and every subclass of it */
+#define TAG_CLASS6EF50   5   /* D_8006EF50 */
+#define TAG_CLASS6BEA0   9   /* D_8006BEA0: the object Class6B5CC__LinkModel links */
+
+/* Bit positions in GsDOBJ2.attribute (self->unk10), include/psyq/LIBGS.H. */
+#define ATTR_LIGHTMODE_SHIFT  3   /* GsFOG|GsMATE|GsLLMOD, 3 bits */
+#define ATTR_LOFF_SHIFT       6   /* GsLOFF */
+#define ATTR_ABR_SHIFT        28  /* GsAZERO..GsATHREE, 2 bits */
+#define ATTR_ALON_SHIFT       30  /* GsALON */
+#define ATTR_DOFF_SHIFT       31  /* GsDOFF */
+
+Class6B5CCObj *New_Class6B5CC(void) {
     Class6B5CCObj *obj;
 
     obj = func_80017B34(0x44);
@@ -15,7 +45,7 @@ Class6B5CCObj *func_8001CA94(void) {
     return NULL;
 }
 
-void *func_8001CAF4(Class6B5CCObj *self) {
+void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     void *blockB;
 
     self->unk14 = func_80017B34(0x50);
@@ -33,66 +63,66 @@ void *func_8001CAF4(Class6B5CCObj *self) {
     self->unk20 = 0;
     self->unk18 = 0;
     self->unkC = NULL;
-    self->unk14->unk48 = 0;
-    self->methods->slot40(self);
+    self->unk14->super = 0;
+    self->methods->reset(self);
     return self;
 }
 
-void func_8001CBA4(Class6B5CCObj *self) {
+void Class6B5CC__Finalize(Class6B5CCObj *self) {
     Class6B5CCSub14 *sub;
 
-    self->methods->slot50(self);
-    self->methods->slot54(self);
+    self->methods->detachFromParent(self);
+    self->methods->detachAttachedChildren(self);
     self->methods->slot5C(self, 0);
     sub = self->unk14;
     func_80017CFC(sub->unk44);
     func_80017CFC(self->unk14);
-    Get_vtable_BasicClass()->dtor(self);
+    Get_vtable_BasicClass()->finalize(self);
 }
 
-void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other) {
-    Get_vtable_BasicClass()->slot10(self, other);
-    if ((other->methods->header & 0xF) == 9) {
+void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other) {
+    Get_vtable_BasicClass()->addChild(self, other);
+    if ((other->methods->header & CLASS_TAG_MASK) == TAG_CLASS6BEA0) {
         Class6B5CC__LinkModel(self, other);
     }
 }
 
-void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other) {
-    if ((other->methods->header & 0xF) == 9) {
+void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other) {
+    if ((other->methods->header & CLASS_TAG_MASK) == TAG_CLASS6BEA0) {
         Class6B5CC__UnlinkModel(self);
     }
-    Get_vtable_BasicClass()->slot14(self, other);
+    Get_vtable_BasicClass()->removeChild(self, other);
 }
 
-void func_8001CD20(Class6B5CCObj *self) {
+void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self) {
     Class6B5CC__UnlinkModel(self);
-    Get_vtable_BasicClass()->slot18(self);
+    Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
-void func_8001CD60(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
+void Class6B5CC__OnNotify(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
     s32 tag;
 
-    Get_vtable_BasicClass()->slot38(self, other, arg2);
-    tag = other->methods->header & 0xF;
-    if (tag == 2) {
+    Get_vtable_BasicClass()->onNotify(self, other, arg2);
+    tag = other->methods->header & CLASS_TAG_MASK;
+    if (tag == TAG_PAD) {
         self->methods->slot94(self, other, arg2);
-    } else if (tag == 5) {
+    } else if (tag == TAG_CLASS6EF50) {
         self->methods->slot98(self, other, arg2);
-    } else if (tag == 4) {
-        self->methods->slot9C(self, other, arg2);
+    } else if (tag == TAG_CLASS6B5CC) {
+        self->methods->dispatchLinkCommand(self, other, arg2);
     }
 }
 
-void func_8001CE30(Class6B5CCObj *self) {
-    self->unk24 = 0;
+void Class6B5CC__Reset(Class6B5CCObj *self) {
+    self->tick = 0;
     self->unk10 = 0;
     GsInitCoordinate2(0, self->unk14);
-    self->methods->updateRotation(self, 1, D_8006B684);
-    self->methods->updateScale(self, 1, D_8006B690);
-    self->unk14->unk0 = 1;
+    self->methods->updateRotation(self, 1, ROTATION_ZERO);
+    self->methods->updateScale(self, 1, SCALE_ONE);
+    self->unk14->flg = 1;
 }
 
-void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
+void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
     s32 vals[3];
     Class6B5CCSub44 *dst;
     s16 *field;
@@ -119,10 +149,10 @@ void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
             *cur = (*cur + vals[i]) % 4096;
         }
     }
-    self->unk14->unk0 = 0;
+    self->unk14->flg = 0;
 }
 
-void func_8001D008(Class6B5CCObj *self, s32 flag, void *data) {
+void Class6B5CC__UpdateScale(Class6B5CCObj *self, s32 flag, void *data) {
     s32 r0, r1, r2;
     Class6B5CCSub44 *dst;
 
@@ -131,25 +161,25 @@ void func_8001D008(Class6B5CCObj *self, s32 flag, void *data) {
     r2 = RatioToFixed12((u8 *)data + 8);
     dst = self->unk14->unk44;
     if (flag) {
-        dst->unk0 = (s16)r0;
-        dst->unk4 = (s16)r1;
-        dst->unk8 = (s16)r2;
+        dst->scaleX = (s16)r0;
+        dst->scaleY = (s16)r1;
+        dst->scaleZ = (s16)r2;
     } else {
-        dst->unk0 += (s16)r0;
-        dst->unk4 += (s16)r1;
-        dst->unk8 += (s16)r2;
+        dst->scaleX += (s16)r0;
+        dst->scaleY += (s16)r1;
+        dst->scaleZ += (s16)r2;
     }
-    self->unk14->unk0 = 0;
+    self->unk14->flg = 0;
 }
 
-Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
+Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec) {
     Class6B5CCSub14 *sub;
 
     if (self->unkC == NULL) {
         self->unkC = obj;
         sub = self->unk14;
-        sub->unk48 = obj->unk14;
-        obj->methods->slot10(obj, self);
+        sub->super = obj->unk14;
+        obj->methods->addChild(obj, self);
         sub = self->unk14;
         if (vec != NULL) {
             sub->unk18 = vec->x;
@@ -160,46 +190,46 @@ Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 
             sub->unk1C = 0;
             sub->unk20 = 0;
         }
-        self->unk14->unk0 = 0;
+        self->unk14->flg = 0;
     }
     return self;
 }
 
-Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self) {
+Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self) {
     UnkOwner_d294 *owner;
 
     owner = self->unkC;
     if (owner != NULL) {
-        owner->methods->slot14(owner, self);
-        self->unk14->unk48 = 0;
+        owner->methods->removeChild(owner, self);
+        self->unk14->super = 0;
         self->unkC = NULL;
     }
     return self;
 }
 
-void func_8001D204(Class6B5CCObj *self) {
+void Class6B5CC__DetachAttachedChildren(Class6B5CCObj *self) {
     GenericObj_d294 *entry = NULL;
     s32 cont;
 
     do {
-        self->methods->slot58(self, &entry, &cont);
+        self->methods->getNextAttachedChild(self, &entry, &cont);
         if (entry != NULL) {
-            entry->methods->slot50(entry);
+            entry->methods->detachFromParent(entry);
         }
     } while (cont);
 }
 
-void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
+void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
     s32 tag;
 
-    tag = 4;
+    tag = TAG_CLASS6B5CC;
     do {
         if (*entry == NULL) {
-            *cursor = self->unk4;
+            *cursor = self->children;
         }
         GetNextBasicClass(entry, cursor);
         if (*entry != NULL) {
-            if ((((*entry)->methods->header) & 0xF) == tag) {
+            if ((((*entry)->methods->header) & CLASS_TAG_MASK) == tag) {
                 if ((*entry)->unkC == self) {
                     return;
                 }
@@ -209,25 +239,25 @@ void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294
     *entry = NULL;
 }
 
-void func_8001D33C(void) {
+void Class6B5CC__func_1d33c(void) {
 }
 
-s32 func_8001D344(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;
+s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1) {
+    return GetSetBitField(&self->unk10, ATTR_DOFF_SHIFT, 1, a1 == 0) == 0;
 }
 
-u32 func_8001D374(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, 0x1E, 1, a1 != 0);
+u32 Class6B5CC__SetSemiTrans(Class6B5CCObj *self, s32 a1) {
+    return GetSetBitField(&self->unk10, ATTR_ALON_SHIFT, 1, a1 != 0);
 }
 
-u32 func_8001D3A0(Class6B5CCObj *self, u32 a1) {
-    return GetSetBitField(&self->unk10, 0x1C, 2, a1);
+u32 Class6B5CC__SetSemiTransRate(Class6B5CCObj *self, u32 a1) {
+    return GetSetBitField(&self->unk10, ATTR_ABR_SHIFT, 2, a1);
 }
 
-u32 func_8001D3CC(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, 6, 1, a1 == 0);
+u32 Class6B5CC__SetLighting(Class6B5CCObj *self, s32 a1) {
+    return GetSetBitField(&self->unk10, ATTR_LOFF_SHIFT, 1, a1 == 0);
 }
 
-u32 func_8001D3F8(Class6B5CCObj *self, u32 a1) {
-    return GetSetBitField(&self->unk10, 3, 3, a1);
+u32 Class6B5CC__SetLightMode(Class6B5CCObj *self, u32 a1) {
+    return GetSetBitField(&self->unk10, ATTR_LIGHTMODE_SHIFT, 3, a1);
 }

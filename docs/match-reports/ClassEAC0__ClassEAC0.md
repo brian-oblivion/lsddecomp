@@ -16,7 +16,7 @@ void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) 
 ```
 
 `GetClass6B5CCMethods` is `code_d294.h`'s own bare getter for the ACTUAL
-`Class6B5CCObj` table (`D_8006B5CC`) -- this is the point where the chain
+`Class6B5CCObj` table (`gClass6B5CCMethods`) -- this is the point where the chain
 bottoms out at the REAL base class two units over. Its `ctor` slot there
 takes only `self` (`void *(*ctor)(void *self)`, `code_d294.h`), matching
 this call site's own single-argument setup.

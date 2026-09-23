@@ -14,7 +14,7 @@ void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2);
 ## What it does
 
 `self->unk14->unk44` is a 0x28-byte heap block (allocated by the ctor,
-`func_8001CAF4`). Its own offset +0x10 holds a 4-`s16` quad (x, y, z, and an
+`Class6B5CC__Class6B5CC`). Its own offset +0x10 holds a 4-`s16` quad (x, y, z, and an
 unused 4th short) — call it `S16Quad_d294`. `a2` selects one of two ways to
 build a local copy of that quad:
 
@@ -89,7 +89,7 @@ project).
 ## Naming (round 54, bravo, track 3)
 
 **Not renamed -- PROPOSED only.** Proposed name: `Class6B5CC__GetRotMatrix`
-(tier B). Slot `+0x084` occupant (`tools/classtable.py D_8006B5CC`),
+(tier B). Slot `+0x084` occupant (`tools/classtable.py gClass6B5CCMethods`),
 dispatched as `slot84(self, out, flag)` from both this unit's own
 `Class6B5CC__ComposeAndApplyRotation` (`self` as receiver) and
 `code_d294_c.c`'s `Class6B5CC__RotateLocalVector` (a different

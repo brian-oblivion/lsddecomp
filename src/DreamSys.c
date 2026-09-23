@@ -97,8 +97,8 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 
 void DreamSys__ResetSessionState(DreamSys *this)
 {
-	this->vt->func_8001D344(this, 0);
-	this->vt->func_8001CEB4(this, 1, &ROTATION_YAW_180);
+	this->vt->Class6B5CC__SetDisplay(this, 0);
+	this->vt->Class6B5CC__UpdateRotation(this, 1, &ROTATION_YAW_180);
 	this->callback_0x80 = NULL;
 	this->callback_0x98 = NULL;
 	*(s32 *)this->soundCueSet = 0;
@@ -118,12 +118,12 @@ void DreamSys__SpawnAtLink(DreamSys *this, DreamSysSpawnArgObj *arg1)
 	this->vt->slot10(this, arg1);
 	if (this->pendingLinkType == 0xE) {
 		FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
-		this->vt->func_8001CEB4(this, 1, &entry->rotation);
+		this->vt->Class6B5CC__UpdateRotation(this, 1, &entry->rotation);
 		this->vt->GetSetDreamTimeLimit(this, entry->timeLimit + 4);
 		this->currentFlashbackIndex++;
 	}
 	if (this->moveOverride != 0 && this->exitRotation != 0) {
-		this->vt->func_8001CEB4(this, 1, (void *)this->exitRotation);
+		this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->exitRotation);
 	}
 }
 
@@ -306,7 +306,7 @@ void DreamSys__SetMoveOverride(DreamSys *this, s32 value)
 	if (value != 0) {
 		this->vt->DreamSys__GetSetMoveMode(this, 1);
 		if (this->enterRotation != 0)
-			this->vt->func_8001CEB4(this, 1, (void *)this->enterRotation);
+			this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->enterRotation);
 	}
 }
 
@@ -348,7 +348,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 
 	local.field_0x8 = 0;
 	local.field_0xA = 1;
-	this->vt->func_8001CEB4(this, 1, &local);
+	this->vt->Class6B5CC__UpdateRotation(this, 1, &local);
 }
 
 void DreamSys__BlockMovement(DreamSys *this)
@@ -605,7 +605,7 @@ void DreamSys__StepLookYaw(DreamSys *this)
 		}
 	apply:
 		TURN_ROTATION_YAW[0].numerator = delta;
-		this->vt->func_8001CEB4(this, 0, &TURN_ROTATION_YAW[-1]);
+		this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
 		this->lookYaw = sum;
 		this->lookYawCommand = 0;
 	} else if (this->lookYaw != 0) {
@@ -613,7 +613,7 @@ void DreamSys__StepLookYaw(DreamSys *this)
 		if (this->lookYaw < 0)
 			delta = 0x2D;
 		TURN_ROTATION_YAW[0].numerator = delta;
-		this->vt->func_8001CEB4(this, 0, &TURN_ROTATION_YAW[-1]);
+		this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
 		this->lookYaw += delta;
 	} else {
 		return;
@@ -800,7 +800,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *this)
 
 	idx = this->turnCommand;
 	if (idx != 0) {
-		this->vt->func_8001CEB4(this, 0, &TURN_ROTATIONS[idx]);
+		this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATIONS[idx]);
 		this->turnCommand = 0;
 	}
 }
@@ -1195,7 +1195,7 @@ staircase:
 	this->staircaseMoveGate = 1;
 	this->staircaseFrame = 0;
 	this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
-	this->vt->func_8001CEB4(this, 1, (void *)this->enterRotation);
+	this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->enterRotation);
 	this->staircaseTickFn(this);
 	return false;
 }
@@ -1217,7 +1217,7 @@ s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 		if (this->staircaseFrame >= 0x13)
 			return 1;
 		if ((u32)(this->staircaseFrame - 8) < 2 || (u32)(this->staircaseFrame - 0xD) < 2) {
-			this->vt->func_8001CEB4(this, 0, &ROTATION_YAW_PLUS45);
+			this->vt->Class6B5CC__UpdateRotation(this, 0, &ROTATION_YAW_PLUS45);
 		}
 	}
 	this->moveCommand = 1;
@@ -1243,7 +1243,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 		if (this->staircaseFrame >= 0x19)
 			return 1;
 		if ((u32)(this->staircaseFrame - 6) < 2 || (u32)(this->staircaseFrame - 0xB) < 2 || (u32)(this->staircaseFrame - 0x14) < 2) {
-			this->vt->func_8001CEB4(this, 0, &ROTATION_YAW_MINUS45);
+			this->vt->Class6B5CC__UpdateRotation(this, 0, &ROTATION_YAW_MINUS45);
 		}
 		flag = (u32)(this->staircaseFrame - 3) < 0xE;
 	}
@@ -1271,7 +1271,7 @@ s32 DreamSys__TickStaircaseCase2(DreamSys *this)
 	} else {
 		if (this->staircaseFrame < 15) {
 			if ((u32)(this->staircaseFrame - 8) < 2) {
-				this->vt->func_8001CEB4(this, 0, &ROTATION_YAW_PLUS45);
+				this->vt->Class6B5CC__UpdateRotation(this, 0, &ROTATION_YAW_PLUS45);
 			}
 		} else {
 			return 1;
@@ -1300,7 +1300,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 		if (this->staircaseFrame >= 0x13)
 			return 1;
 		if ((u32)(this->staircaseFrame - 6) < 2 || (u32)(this->staircaseFrame - 0xF) < 2) {
-			this->vt->func_8001CEB4(this, 0, &ROTATION_YAW_MINUS45);
+			this->vt->Class6B5CC__UpdateRotation(this, 0, &ROTATION_YAW_MINUS45);
 		}
 		flag = (u32)this->staircaseFrame < 9;
 	}
@@ -1747,7 +1747,7 @@ typedef struct DirectionCheckArg {
    CARDINAL_ROTATIONS[i].y.numerator, and `unk2` is its denominator (always
    1). The two views are kept separate because this one reads the angle as a
    bare u16 for arithmetic while the other is only ever address-taken and
-   handed to func_8001CEB4 as a rotation. */
+   handed to Class6B5CC__UpdateRotation as a rotation. */
 typedef struct DirectionTableEntry {
 	u16 angle;
 	u16 unk2;
@@ -1777,11 +1777,11 @@ extern u8 *TUNNEL_EXIT_HEADINGS[];
    underlying data is two different tables. Round 66 types it
    `RotationRatios` (include/DreamSys.h) rather than as a stride-only
    placeholder: every entry is three {numerator, denominator} degree ratios
-   in exactly the form func_8001CEB4 consumes, and the four entries' yaw
+   in exactly the form Class6B5CC__UpdateRotation consumes, and the four entries' yaw
    numerators are 0, 0x5A, 0xB4, 0x10E -- 0, 90, 180 and 270 degrees. That is
    also what the two functions below do with an element: they store its
    ADDRESS into DreamSys::enterRotation / ::exitRotation, and the only things
-   those two fields are ever used for are func_8001CEB4(this, 1, ptr) calls
+   those two fields are ever used for are Class6B5CC__UpdateRotation(this, 1, ptr) calls
    in DreamSys__SetMoveOverride, DreamSys__SpawnAtLink and
    DreamSys__TryStaircaseLink. */
 extern RotationRatios CARDINAL_ROTATIONS[];

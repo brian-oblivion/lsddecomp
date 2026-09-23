@@ -1,4 +1,6 @@
-# func_8001D374
+# Class6B5CC__SetSemiTrans
+
+> Renamed from `func_8001D374` on 2026-09-23 (tools/rename.py). Address 0x8001d374.
 
 **Unit:** code_d294 · **Size:** 11 words · **Status:** MATCHED (11/11 words)
 
@@ -6,13 +8,13 @@
 
 `Class6B5CC` vtable slot `+0x064`. Sets bit 30 (a 1-bit field) of
 `self->unk10` to `(a1 != 0)`, tail-returning `GetSetBitField`'s result (the
-field's previous value) directly. See `func_8001D344.md` for the shared
+field's previous value) directly. See `Class6B5CC__SetDisplay.md` for the shared
 `GetSetBitField` background.
 
 ## The C
 
 ```c
-u32 func_8001D374(Class6B5CCObj *self, s32 a1) {
+u32 Class6B5CC__SetSemiTrans(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 0x1E, 1, a1 != 0);
 }
 ```
@@ -24,4 +26,8 @@ x!=0" lowering), matching retail's `sltu $a3,$zero,$a1`.
 
 round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
 Matched on the first build (part of the five-function bitfield-setter
-group; see `func_8001D344.md`).
+group; see `Class6B5CC__SetDisplay.md`).
+
+## Naming
+
+Round 71 (alpha). `func_8001D374` -> `Class6B5CC__SetSemiTrans`, **tier A**. Table slot +0x064. Sets attribute bit 30, GsALON (semi-transparency on), to on != 0 and returns the old bit. class_3bb8c_s calls the slot setSemiTrans.
