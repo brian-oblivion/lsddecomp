@@ -109,7 +109,7 @@ void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->unk44 == 0xA) {
         if (this->moodTimer < 0xA) {
-            this->methods->slot44(this, 0, D_80089C64);
+            this->methods->updateRotation(this, 0, D_80089C64);
             if (this->target->methods->slot100(this->target) != 0) {
                 func_80063C84(out);
                 this->unk44 = 0xC;
@@ -148,7 +148,7 @@ void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->unk44 == 0xC) {
         if (this->moodTimer < 0xA) {
-            this->methods->slot44(this, 0, D_80089CDC);
+            this->methods->updateRotation(this, 0, D_80089CDC);
         } else {
             func_80063CAC(out);
             this->methods->stopSoundCue(this);
@@ -259,7 +259,7 @@ void func_80063ED4(Entity *this, EntityMoodHandlerArg *out) {
         out->unk10 = 0;
         out->unk1C = 0x15;
     }
-    this->methods->slot48(this, 1, D_80089DE4);
+    this->methods->updateScale(this, 1, D_80089DE4);
 }
 
 void func_80064078(Entity *this, EntityMoodHandlerArg *out) {
@@ -284,7 +284,7 @@ void func_80064078(Entity *this, EntityMoodHandlerArg *out) {
             this->methods->notifyParents(this, 0xA);
         }
     }
-    this->methods->slot48(this, 1, D_80089DE4);
+    this->methods->updateScale(this, 1, D_80089DE4);
 }
 
 void func_800641C0(Entity *this, EntityMoodHandlerArg *out) {
@@ -314,12 +314,12 @@ void func_80064294(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot128(this, 1);
         if (this->unk44 != 0) {
             if ((rand() & 1) == 0) {
-                this->methods->slot48(this, 1, D_80089E38);
+                this->methods->updateScale(this, 1, D_80089E38);
                 this->methods->slotCC(this, 0x800, 0);
             }
         }
         if (rand() % 3 == 0) {
-            this->methods->slot44(this, 0, D_80089C7C);
+            this->methods->updateRotation(this, 0, D_80089C7C);
         }
     }
     if (this->unk7C != 0) {

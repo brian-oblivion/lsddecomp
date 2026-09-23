@@ -131,10 +131,10 @@ void Entity__Update(Entity *this, s32 a1, s32 a2) {
     if (this->methods->activationState(this) != 0) {
         this->methods->deactivationState(this);
     }
-    if (this->methods->slot17C(this) != 0) {
-        this->methods->slot180(this);
+    if (this->methods->updateSoundCueStart(this) != 0) {
+        this->methods->updateSoundCueStop(this);
     }
-    this->methods->slot178(this);
+    this->methods->updateTargetProximity(this);
     func_80066818()->slot98(this, a1, a2);
 }
 
@@ -268,7 +268,7 @@ void Entity__Activate(Entity *this) {
 void Entity__Deactivate(Entity *this) {
     this->methods->slot60(this, 0);
     this->methods->stopSoundCue(this);
-    this->methods->slot164(this, 0);
+    this->methods->setUnkF4(this, 0);
     this->active = 0;
 }
 

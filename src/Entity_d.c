@@ -46,7 +46,7 @@ void func_8005FF7C(Entity *this, EntityMoodHandlerArg *out) {
         } else if (r != 2) {
             goto skip48;
         }
-        this->methods->slot48(this, 1, D_80089E5C);
+        this->methods->updateScale(this, 1, D_80089E5C);
     }
 skip48:
     if (out->unk4 % 22 == 0) {
@@ -80,7 +80,7 @@ void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
         this->moodTimer = -1;
     }
     if (table != NULL) {
-        this->methods->slot44(this, 0, table);
+        this->methods->updateRotation(this, 0, table);
     }
     this->methods->slotD0(this, -0x1E, 0);
     if (this->unk28 != 0) {
@@ -104,7 +104,7 @@ void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
             rv = rand();
             tablePtr = &D_80089EA2;
             *tablePtr = rv % 32 + 1;
-            this->methods->slot48(this, 1, (u8 *)tablePtr - 0xA);
+            this->methods->updateScale(this, 1, (u8 *)tablePtr - 0xA);
         }
     }
 }
@@ -147,7 +147,7 @@ void func_800604DC(Entity *this, EntityMoodHandlerArg *out) {
         if ((r2 & 3) != 0) {
             table = D_80089C70;
         }
-        this->methods->slot44(this, 0, table);
+        this->methods->updateRotation(this, 0, table);
     }
 }
 
@@ -165,7 +165,7 @@ void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
     if ((u32)(this->moodTimer - 0x12C) < 0x14) {
         this->methods->slotC4(this, -0x3C, 0);
     } else if ((u32)(this->moodTimer - 0x141) < 0x13) {
-        this->methods->slot44(this, 0, D_80089C70);
+        this->methods->updateRotation(this, 0, D_80089C70);
     } else if (this->moodTimer >= 0x141) {
         r1 = rand();
         a1val = -0x80;
@@ -178,7 +178,7 @@ void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
         if ((r2 & 3) != 0) {
             table = D_80089C70;
         }
-        this->methods->slot44(this, 0, table);
+        this->methods->updateRotation(this, 0, table);
     }
 }
 
@@ -188,7 +188,7 @@ void func_80060710(Entity *this) {
     if (this->moodTimer == 0) {
         r = rand() % 10;
         if (r >= 8) {
-            this->methods->slot48(this, 1, D_80089E8C);
+            this->methods->updateScale(this, 1, D_80089E8C);
         } else if (r >= 5) {
             this->unk44 = 0xA;
         }
@@ -213,7 +213,7 @@ void func_80060800(Entity *this, EntityMoodHandlerArg *out) {
         } else if (r != 1) {
             goto skip48;
         }
-        this->methods->slot48(this, 1, D_80089E38);
+        this->methods->updateScale(this, 1, D_80089E38);
     }
 skip48:
     if (out->unk4 == 0) {
@@ -323,7 +323,7 @@ void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
     void *table;
 
     if (this->moodTimer == 0 && rand() % 5 == 0 && this->unk44 == 0) {
-        this->methods->slot48(this, 1, D_80089E38);
+        this->methods->updateScale(this, 1, D_80089E38);
         this->methods->slotCC(this, 0x320, 0);
         this->unk44 = 0xB;
     }
@@ -342,7 +342,7 @@ void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
     if (table != NULL) {
-        this->methods->slot44(this, 0, table);
+        this->methods->updateRotation(this, 0, table);
     }
     this->methods->slotC4(this, -0x50, 1);
 }
@@ -351,13 +351,13 @@ void func_80060F38(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->moodTimer < 0xBC) {
         if (this->moodTimer == 0x54) {
-            this->methods->slot44(this, 0, D_80089C7C);
+            this->methods->updateRotation(this, 0, D_80089C7C);
         }
         if (out->unk4 % 20 == 0) {
             out->unk1C = 9;
         }
     } else if (this->moodTimer < 0xC8) {
-        this->methods->slot44(this, 0, D_80089C64);
+        this->methods->updateRotation(this, 0, D_80089C64);
     } else {
         this->methods->deactivate(this);
         out->unk30 = 0x1E;
@@ -371,7 +371,7 @@ void func_80061070(Entity *this, EntityMoodHandlerArg *out) {
 
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->methods->slot48(this, 1, D_80089E50);
+            this->methods->updateScale(this, 1, D_80089E50);
         }
     }
     out->unk10 = this->methods->getProximityRatio(this);
@@ -485,7 +485,7 @@ void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
             out->unk1C = 0x12;
             out->unk10 = 0;
             out->unk30 = 3;
-            this->methods->slot44(this, 1, D_80089D24);
+            this->methods->updateRotation(this, 1, D_80089D24);
             this->methods->slotC8(this, 0x960, 0);
             this->methods->slotCC(this, 0x5DC, 0);
             this->unk70->unk4->methods->slot60(this->unk70->unk4, 0);

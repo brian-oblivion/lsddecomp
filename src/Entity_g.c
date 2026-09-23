@@ -54,7 +54,7 @@ void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
         out->unk34 = -2;
     }
     if (this->moodTimer >= 0x33) {
-        this->methods->slot44(this, 0, D_80089CAC);
+        this->methods->updateRotation(this, 0, D_80089CAC);
     }
     if (this->moodTimer >= 0x30D) {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
@@ -69,7 +69,7 @@ void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
         } else {
             a2 = D_80089E20;
         }
-        this->methods->slot48(this, 1, a2);
+        this->methods->updateScale(this, 1, a2);
         if (this->moodTimer < 0x7D0) {
             this->methods->slotC4(this, -0x40, 0);
         } else {
@@ -96,7 +96,7 @@ void func_80064928(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xB) {
         if (this->moodTimer < 0x3FC) {
-            this->methods->slot44(this, 0, D_80089CB8);
+            this->methods->updateRotation(this, 0, D_80089CB8);
             this->methods->slotCC(this, 0x1E, 0);
         }
         if (this->moodTimer == 0x3A2) {
@@ -111,7 +111,7 @@ void func_80064928(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void func_80064AA4(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089DCC);
+    this->methods->updateScale(this, 1, D_80089DCC);
     if ((u32)(this->moodTimer - 0xC9) < 0x63) {
         this->methods->slotCC(this, -0x20, 0);
     }
@@ -133,7 +133,7 @@ void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer == 0) {
             this->methods->slot130(this);
         }
-        fn = this->methods->slot48;
+        fn = this->methods->updateScale;
         ((void (*)(Entity *, s32, void *))fn)(this, 1, D_80089E2C);
         return;
     }
@@ -145,16 +145,16 @@ void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
 
 void func_80064CA4(Entity *this, EntityMoodHandlerArg *out) {
     func_80062570(this, out);
-    this->methods->slot48(this, 1, D_80089E38);
+    this->methods->updateScale(this, 1, D_80089E38);
 }
 
 void func_80064CEC(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, SCALE_HALF);
+    this->methods->updateScale(this, 1, SCALE_HALF);
     this->methods->slotC4(this, -0xA, 0);
 }
 
 void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089E44);
+    this->methods->updateScale(this, 1, D_80089E44);
     this->methods->slot130(this);
     if (this->unk44 == 0) {
         if (this->methods->slot144(this, this->target) < 0x800) {
@@ -164,7 +164,7 @@ void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xA) {
         if (this->moodTimer < 0x2D) {
-            this->methods->slot44(this, 0, D_80089D00);
+            this->methods->updateRotation(this, 0, D_80089D00);
         }
         if (this->moodTimer >= 0x1F5) {
             this->unk44 = 0;
@@ -205,7 +205,7 @@ L34:
         goto L74;
     }
 L50:
-    this->methods->slot44(this, 0, D_80089D18);
+    this->methods->updateRotation(this, 0, D_80089D18);
 L74:
     this->methods->slotC4(this, arg4, 0);
     if (this->moodTimer == arg3) {
@@ -229,19 +229,19 @@ void func_800650F4(Entity *this, EntityMoodHandlerArg *out) {
     } else {
         a2 = D_80089C70;
     }
-    this->methods->slot44(this, 0, a2);
+    this->methods->updateRotation(this, 0, a2);
 }
 
 void func_8006519C(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089E38);
+    this->methods->updateScale(this, 1, D_80089E38);
 }
 
 void func_800651D0(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089E38);
+    this->methods->updateScale(this, 1, D_80089E38);
 }
 
 void func_80065204(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089DCC);
+    this->methods->updateScale(this, 1, D_80089DCC);
 }
 
 void func_80065238(Entity *this, EntityMoodHandlerArg *out) {
@@ -277,7 +277,7 @@ trigger:
     this->methods->deactivate(this);
     this->unk44 = 1;
 merge:
-    this->methods->slot48(this, 1, D_80089E44);
+    this->methods->updateScale(this, 1, D_80089E44);
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 % (this->unk80 / 2) == 0) {
         out->unk1C = 0xA;
@@ -288,7 +288,7 @@ merge:
 
 void func_800654A0(Entity *this, EntityMoodHandlerArg *out) {
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-    this->methods->slot48(this, 1, D_80089E80);
+    this->methods->updateScale(this, 1, D_80089E80);
     this->methods->slotC4(this, -0x1E, 1);
 }
 

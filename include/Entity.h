@@ -63,8 +63,8 @@ struct EntityMethods {
     /* +0x30 */ void (*notifyParents)(Entity *self, s32 arg1);   /* called by Entity__SetUnkF4, Entity__NotifyIfTargetInRange */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
     /* +0x40 */ void (*initState)(Entity *self);              /* self-only slot: occupant is Entity__InitState (tools/classtable.py), called by Entity__Entity right after this->methods is (re)assigned */
-    /* +0x44 */ void (*slot44)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue07 as slot44(this, 0, ROTATION_YAW_PLUS2) */
-    /* +0x48 */ s32 (*slot48)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue08 (result discarded) and Entity__MoodCue17 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, Entity__MoodCue17 has no positive evidence of void */
+    /* +0x44 */ void (*updateRotation)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue07 as slot44(this, 0, ROTATION_YAW_PLUS2) */
+    /* +0x48 */ s32 (*updateScale)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue08 (result discarded) and Entity__MoodCue17 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, Entity__MoodCue17 has no positive evidence of void */
     /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by Entity__Activate, Entity__Deactivate */
     /* +0x64 */ u8 pad64[0x70 - 0x64];
@@ -92,14 +92,14 @@ struct EntityMethods {
     /* +0x14C */ u8 pad14C[0x15C - 0x14C];
     /* +0x15C */ void (*activate)(Entity *self);            /* self-only slot: occupant is Entity__Activate (tools/classtable.py -- a self-referential vtable dispatch, same idiom initState/slot60/etc. use throughout this table). Called by Entity__AttachUnk4C (unconditionally once its two per-mood skip-flag gates pass) and by Entity__UpdateActivationState (when its detachKind-derived condition fires) */
     /* +0x160 */ void (*deactivate)(Entity *self);             /* CROSS-UNIT (Entity_c/d/e/f/g also dispatch through this slot -- see docs/match-reports/Entity__Deactivate.md's Proposed field names) -- occupant is Entity__Deactivate, same self-referential idiom as slot15C above. Called by Entity__DetachUnk4C, Entity__NotifyReset, Entity__UpdateDeactivationState */
-    /* +0x164 */ void (*slot164)(Entity *self, s32 arg1);    /* called by Entity__Deactivate and Entity__UpdateTargetProximity (as slot164(self, 1)) */
+    /* +0x164 */ void (*setUnkF4)(Entity *self, s32 arg1);    /* called by Entity__Deactivate and Entity__UpdateTargetProximity (as slot164(self, 1)) */
     /* +0x168 */ void (*startSoundCue)(Entity *self);               /* called by Entity__UpdateSoundCueStart */
     /* +0x16C */ void (*stopSoundCue)(Entity *self);                /* called by Entity__Deactivate, Entity__UpdateSoundCueStop, func_80062A40 (Entity_e) */
     /* +0x170 */ s32 (*activationState)(Entity *self);                  /* self-only slot: occupant is Entity__UpdateActivationState, called by Entity__Update as `if (this->methods->activationState(this) != 0) ...` */
     /* +0x174 */ s32 (*deactivationState)(Entity *self);                  /* self-only slot: occupant is Entity__UpdateDeactivationState, which returns s32 (`this->unkF0`) -- retyped from `void` to `s32` to match (CLAUDE.md: a discarded return, which is all Entity__Update does with it, is never evidence of void). Retype re-verified byte-exact; this slot has no other caller to perturb. Called by Entity__Update */
-    /* +0x178 */ s32 (*slot178)(Entity *self);                    /* called by Entity__Update; holds Entity__UpdateTargetProximity, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
-    /* +0x17C */ s32 (*slot17C)(Entity *self);                     /* called by Entity__Update; holds Entity__UpdateSoundCueStart, which ends `return this->unkF8;` */
-    /* +0x180 */ void (*slot180)(Entity *self);                     /* called by Entity__Update */
+    /* +0x178 */ s32 (*updateTargetProximity)(Entity *self);                    /* called by Entity__Update; holds Entity__UpdateTargetProximity, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
+    /* +0x17C */ s32 (*updateSoundCueStart)(Entity *self);                     /* called by Entity__Update; holds Entity__UpdateSoundCueStart, which ends `return this->unkF8;` */
+    /* +0x180 */ void (*updateSoundCueStop)(Entity *self);                     /* called by Entity__Update */
 };
 
 /* Entity's own local view of the shared "BasicClass" ancestor vtable

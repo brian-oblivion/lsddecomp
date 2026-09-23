@@ -85,15 +85,15 @@ extern u8 ROTATION_YAW_MINUS90[];
 void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->methods->slot48(this, 1, SCALE_HALF);
+            this->methods->updateScale(this, 1, SCALE_HALF);
             this->methods->slotCC(this, -0x12C, 0);
-            this->methods->slot44(this, 1, ROTATION_YAW_PLUS90);
+            this->methods->updateRotation(this, 1, ROTATION_YAW_PLUS90);
             this->unk44 = 0xB;
         }
     }
     if (this->unk44 == 0xB) {
         if (this->moodTimer == 0x7D0) {
-            this->methods->slot44(this, 0, ROTATION_YAW_MINUS90);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
         }
         this->methods->slotC4(this, -0x14, 0);
     }
@@ -155,7 +155,7 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotC4(this, this->unk48, 1);
     } else if (this->unk44 == 0xA) {
         if (this->moodTimer < 8) {
-            this->methods->slot44(this, 0, D_80089CC4);
+            this->methods->updateRotation(this, 0, D_80089CC4);
             this->methods->addVec14(this, D_80089D6C);
         } else {
             u32 r;
@@ -197,7 +197,7 @@ void func_800624BC(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
     if (this->moodTimer == 0x12C) {
-        this->methods->slot44(this, 0, D_80089C7C);
+        this->methods->updateRotation(this, 0, D_80089C7C);
     }
     if (this->moodTimer < 0x258) {
         this->methods->slotC4(this, this->unk44 == 0 ? -0x100 : 0x100, 0);
@@ -289,13 +289,13 @@ void func_80062970(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot12C(this);
         if (this->unk84 == this->unk80 - 1) {
             this->methods->slot130(this);
-            fn = (void (*)(Entity *, s32, void *))this->methods->slot48;
+            fn = (void (*)(Entity *, s32, void *))this->methods->updateScale;
             table = D_80089DFC;
             fn(this, 0, table);
         }
     } else {
         this->methods->slot130(this);
-        fn = this->methods->slot44;
+        fn = this->methods->updateRotation;
         table = D_80089C64;
         fn(this, 0, table);
     }
@@ -318,16 +318,16 @@ void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0) {
         if (this->moodTimer == 0x3C || this->moodTimer == 0xD4 || this->moodTimer == 0x122 || this->moodTimer == 0x140) {
-            this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
         }
         if (this->moodTimer == 0x18E) {
-            this->methods->slot44(this, 0, ROTATION_YAW_MINUS90);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
         }
         this->methods->slotD0(this, -0x32, 0);
         return;
     }
     if (this->moodTimer == 0x3C || this->moodTimer == 0x8C) {
-        this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
     }
     if (this->moodTimer < 0xAE) {
         this->methods->slotD0(this, -0x32, 0);
@@ -384,7 +384,7 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
 
     if (this->unk44 == 0xB && out->unk4 == 0x1FE) {
         this->methods->slotCC(this, -0x17C, 0);
-        this->methods->slot44(this, 0, D_80089D0C);
+        this->methods->updateRotation(this, 0, D_80089D0C);
         this->methods->stopSoundCue(this);
         this->unk44 = 1;
         D_8008ACCC = 1;
@@ -401,7 +401,7 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
             }
             this->unk44 = 0xC;
         }
-        this->methods->slot48(this, 1, table);
+        this->methods->updateScale(this, 1, table);
         this->methods->slotCC(this, tmp, 0);
     }
 
@@ -420,7 +420,7 @@ void func_80062FAC(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0x19;
         out->unk20 = 2;
     }
-    this->methods->slot44(this, 0, ROTATION_YAW_PLUS2);
+    this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
     if (this->unk44 == 0 && this->unkF4 != 0) {
         this->methods->notifyParents(this, 0xB);
         this->unk44 = 0xB;
@@ -472,7 +472,7 @@ void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, D_80089E08);
+            this->methods->updateScale(this, 0, D_80089E08);
             mod = -0x176;
             if (this->methods->slot144(this, this->target) < 0x200) {
                 this->methods->deactivate(this);

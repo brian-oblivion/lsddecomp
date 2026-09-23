@@ -49,7 +49,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
                 dist = ~dist + 1;
             }
             if (Entity__IsNearTarget(this, xptr, dist, row->unk9) != 0) {
-                this->methods->slot164(this, 1);
+                this->methods->setUnkF4(this, 1);
             }
         }
         if (row->proximityRange < 0) {
@@ -174,9 +174,9 @@ void Entity__MoodCue00(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = -2;
     } else if (this->moodTimer >= 0x105 && this->moodTimer < 0x238) {
         this->methods->slotC4(this, -0x32, 0);
-        this->methods->slot44(this, 1, ROTATION_YAW_MINUS120);
+        this->methods->updateRotation(this, 1, ROTATION_YAW_MINUS120);
     } else if (this->moodTimer >= 0x239) {
-        this->methods->slot44(this, 1, ROTATION_X50_YMINUS120_Z30);
+        this->methods->updateRotation(this, 1, ROTATION_X50_YMINUS120_Z30);
     }
 }
 
@@ -215,7 +215,7 @@ void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
         out->unk48 = -0x1;
     }
     if (this->moodTimer >= 0x79) {
-        this->methods->slot44(this, 0, ROTATION_YAW_PLUS2);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
         this->methods->slotC4(this, -0x140, 0);
     } else if (this->moodTimer >= 0x38 ||
                Entity__IsNearTarget(this, &this->unk14->x, 1, 1) != 0) {
@@ -229,7 +229,7 @@ void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue08(Entity *this) {
-    this->methods->slot48(this, 1, SCALE_DOUBLE);
+    this->methods->updateScale(this, 1, SCALE_DOUBLE);
     this->methods->addVec14(this, TRANSLATE_Y_MINUS64);
 }
 
@@ -284,7 +284,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
     } else if (this->unk44 == 0xD) {
         this->unk48 = -0x78;
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-        this->methods->slot48(this, 1, SCALE_HALF);
+        this->methods->updateScale(this, 1, SCALE_HALF);
         if (this->methods->slot144(this, this->target) < 0x400) {
             this->methods->notifyParents(this, 0xB);
         }
@@ -299,7 +299,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
     if (row != 0) {
-        this->methods->slot44(this, 0, row);
+        this->methods->updateRotation(this, 0, row);
     }
     this->methods->slotD0(this, this->unk48, 0);
     if (this->unk44 != 0xC) {
@@ -387,14 +387,14 @@ void Entity__MoodCue16(Entity *this) {
             if (roll != 0) {
                 arg2 = ROTATION_YAW_PLUS90;
             }
-            this->methods->slot44(this, 0, arg2);
+            this->methods->updateRotation(this, 0, arg2);
             this->methods->addVec14(this, TRANSLATE_Y_PLUS256);
         } else {
             this->methods->slotD0(this, -0x176, rand() % 2);
         }
     } else if (this->unk44 == 0xB) {
         if (this->moodTimer % 5 == 0) {
-            this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
         }
         this->methods->slotC4(this, -0x800, 0);
         this->methods->slot60(this, (rand() % 7) == 0);
@@ -402,5 +402,5 @@ void Entity__MoodCue16(Entity *this) {
 }
 
 s32 Entity__MoodCue17(Entity *this) {
-    return this->methods->slot48(this, 1, SCALE_HALF);
+    return this->methods->updateScale(this, 1, SCALE_HALF);
 }
