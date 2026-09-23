@@ -616,3 +616,31 @@ function passes. The halfword it overwrites first is
 Also latches `moveCommandLatch = (moveCommand == 1)` and tail-calls
 `DreamSys__FlipMoveCommand`; that bookkeeping rides along and is not what the name
 describes. Still INCLUDE_ASM (1 word short) -- see the stall analysis above.
+
+## Round 70 (runner echo): NON_MATCHING body promoted
+
+Re-measured fresh before promoting: spliced the round-32 preserved body
+live in place of `INCLUDE_ASM` and rebuilt. Compiled length **76/77
+instructions (1 word short)**, confirmed by direct `objdump` instruction
+count on the fresh object -- matches this report's title exactly (last
+measured round 49; unchanged). `funcdiff.py`'s own positional word-match
+score reads much lower (39/77) with a large outside-range byte count, but
+that is the expected shape for a length-short function once its internal
+branch targets fall out of position-for-position alignment with retail
+past the missing word (CLAUDE.md's "address drift" caution) -- not a
+different residue, and `tools/asm-differ/diff.py` confirms the CFG and
+every instruction still line up one-for-one except the single missing
+`move a0,s0` delay-slot fill this report already documents. No compile
+errors. Reverted, then placed the body under `#ifdef NON_MATCHING ...
+#else INCLUDE_ASM ... #endif` in `src/DreamSys.c`, written in its plain
+form -- the kept body already had no byte-shaped constructs (no
+`do {...} while(0)`, no scheduling barrier; the round-47 do-while(0) lever
+mentioned in round 49's entry above was tried as an experiment and found
+inert, never adopted, so there was nothing to strip). `./build-and-verify.sh`
+green (whole-image SHA1 unchanged) and `tools/check-nonmatching.sh` green.
+This body is hand-derived (rounds 25/32/39/49's manual reshapes, most
+recently the round-32 delta/step register-coalescing fix) plus two
+permuter searches (round 37, round 49) that both converged on the same
+uninitialized-alias candidate and rejected it -- not a permuter output.
+
+NON_MATCHING body promoted, round 70.

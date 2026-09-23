@@ -572,27 +572,14 @@ void DreamSys__StepLookOffset(DreamSys *this)
 	}
 }
 
-#if 0
-/* best-reached body, round 32 (2026-09-12, runner alpha2): the delta/step
-   register-coalescing fix that closed DreamSys__StepLookOffset (reusing the SAME `delta`
-   local across both mutually exclusive branches instead of a separate `step`)
-   applies here too and closes ONE of the two previously-missing words: 76/77
-   words, 1 word SHORT (was 75/77, 2 words short). See
-   docs/match-reports/DreamSys__StepLookYaw.md for the residue that's left -- it is a
-   different, deeper mechanism (opportunistic delay-slot placement of the
-   `this` register setup across multiple converging paths into the shared
-   `DreamSys__FlipMoveCommand(this)` tail call), not reachable by the rename lever nor by
-   a scheduling barrier at the merge point (tried, no effect). Re-verified
-   fresh round 37 (2026-09-12, runner charlie); a permuter search was run
-   this round and found no improvement -- see the report's round 37
-   addendum. Re-verified fresh again round 39 (2026-09-14, runner echo); one
-   new reshape tried (duplicating the tail call at just the decay branch's
-   own exit, rather than at all three converging paths as round 32 already
-   tried and rejected) -- this DOES fix the a0-vs-s0 register mismatch at the
-   store immediately before the call, but GCC does not cross-jump-merge the
-   duplicated call site back down, so the function grows to 78 words (1 word
-   LONG) instead of 76 (1 word SHORT): trades one residue for a different,
-   equally-real one rather than closing it. Reverted immediately. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 76/77 instructions, 1 word SHORT. Residue: which delay
+ * slot the shared `call_tail: DreamSys__FlipMoveCommand(this);` merge's
+ * `this` register setup lands in -- retail hoists `move a0,s0` into a
+ * jump's delay slot on one converging path, this build materializes it
+ * one instruction later at the shared label instead. Whole CFG matches
+ * exactly; permuter-searched twice (round 37, round 49), no zero-scoring
+ * candidate; hand-derived. docs/match-reports/DreamSys__StepLookYaw.md. */
 void DreamSys__StepLookYaw(DreamSys *this)
 {
 	s32 idx;
@@ -634,8 +621,9 @@ void DreamSys__StepLookYaw(DreamSys *this)
 call_tail:
 	DreamSys__FlipMoveCommand(this);
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StepLookYaw);
+#endif
 
 void DreamSys__FlipMoveCommand(DreamSys *this)
 {
@@ -1500,19 +1488,14 @@ DreamColors DreamSys__GetDreamColor(DreamSys *this)
 	return CalcDreamColor(&local);
 }
 
-#if 0
-/* Best-reached body, 28/35 words, exact length (zero address drift) -- see
-   docs/match-reports/CalcDreamColor.md. Residue is the sixth confirmed
-   instance of the project-wide commutative-add operand-order/register-
-   identity class (round 20): retail computes the table-base address early,
-   this build loads `upper` early instead, both `addu`s register-swapped.
-   PERMUTER-EXHAUSTED (~40400 iterations). Restored to INCLUDE_ASM below per
-   project rule. Re-verified fresh round 39 (2026-09-14, runner echo);
-   round 39 also tried the hoist-both-values-before-either-is-consumed lever
-   (explicit `dynamic`/`upper` locals read before either is used) alone and
-   combined with the operand-order reversal -- both byte-identical to this
-   kept form, confirming the residue is compiler-level register allocation,
-   not reachable by either lever alone or combined. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 28/35 words, exact length (zero address drift). Residue:
+ * the sixth confirmed instance of the project-wide commutative-add
+ * operand-order/register-identity class (round 20) -- retail computes the
+ * table-base address early, this build loads `upper` early instead, both
+ * final `addu`s register-swapped. PERMUTER-EXHAUSTED (~40400 iterations,
+ * no zero-scoring candidate); hand-derived.
+ * docs/match-reports/CalcDreamColor.md. */
 DreamColors CalcDreamColor(MoodGraphPoint *mood)
 {
 	MoodGraphPoint local;
@@ -1541,8 +1524,9 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood)
 		return entry[local.axis.upper];
 	}
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcDreamColor);
+#endif
 
 void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor)
 {

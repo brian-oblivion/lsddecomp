@@ -399,3 +399,20 @@ address computation, so combining them tests the same thing twice rather
 than two different axes. Worth checking, before combining two levers, that
 each targets a distinct choice the compiler makes -- otherwise the
 combination is not a new experiment.
+
+## Round 70 (runner echo): NON_MATCHING body promoted
+
+Re-measured fresh before promoting (per this round's instruction): spliced
+the preserved body live in place of `INCLUDE_ASM` and rebuilt --
+byte-identical **28/35 words, zero address drift**, matching this report's
+title exactly (last measured round 49; unchanged). No compile errors.
+Reverted, then placed the body under `#ifdef NON_MATCHING ... #else
+INCLUDE_ASM ... #endif` in `src/DreamSys.c`, written in its plain form (no
+byte-shaped constructs to strip -- the kept body never needed a
+`do {...} while(0)` or similar). `./build-and-verify.sh` green (whole-image
+SHA1 unchanged) and `tools/check-nonmatching.sh` green. This body is
+hand-derived (four manual reshapes plus a ~40400-iteration permuter search
+that never promoted a candidate -- see "Permuter run" above), not a
+permuter output.
+
+NON_MATCHING body promoted, round 70.
