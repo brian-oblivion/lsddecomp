@@ -293,7 +293,7 @@ void Class86668__CancelTimeout(Obj865C8 *self) {
     self->methods->setUnk2C(self, -1);
 }
 
-s32 func_8004A2C4(Obj865C8 *self, s32 arg1, s32 arg2) {
+s32 Class86668__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
     self->unk28 = 0;
     Get_vtable_IntermediateBase()->slot44(self, arg1, arg2);
     return self->unk28;

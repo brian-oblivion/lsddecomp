@@ -61,7 +61,7 @@ void Obj865C8__Init(Obj865C8 *self) {
 CURRENT committed source, not what compiled at the time this report was
 first written.)
 
-`GetClass86668Methods()->slot44` resolves to this unit's own `func_8004A2C4`
+`GetClass86668Methods()->slot44` resolves to this unit's own `Class86668__Init`
 (`gClass86668Methods`'s +0x044, already matched: zeroes `self->unk28`, forwards to
 the base's own slot44, returns `self->unk28`) — its `s32` return is discarded
 here.
@@ -72,7 +72,7 @@ Continues carving `Obj0C` (fields `unk8`, `unk10` added alongside the
 already-known `unk4`) and `SubObjDMethods` (`slot10` added alongside the
 already-known `slot14`/`slot110`), both established by `Obj865C8__Deinit` in
 this same round. `Class86668Methods::slot44` added, typed `s32 (*)(Obj865C8
-*self, s32 arg1, s32 arg2)` from `func_8004A2C4`'s own established
+*self, s32 arg1, s32 arg2)` from `Class86668__Init`'s own established
 signature.
 
 ## Attempts

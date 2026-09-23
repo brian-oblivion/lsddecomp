@@ -301,7 +301,7 @@ typedef struct IntermediateBaseMethods {
     /* Same accessor/slot combination code_2c054.h calls
      * `TaskUtilMethods::slot44` on -- there it forwards to
      * `self->unk38 = <base result>` (func_8003C1DC). Here the caller
-     * (func_8004A2C4, gClass86668Methods's own +0x044 override) zeroes
+     * (Class86668__Init, gClass86668Methods's own +0x044 override) zeroes
      * `self->unk28` immediately before the call and reads it back
      * immediately after: same "default, then base may overwrite" shape. */
     void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
@@ -357,10 +357,10 @@ typedef struct Class86668Methods {
      * Called by Obj865C8__OnNotify as GetClass86668Methods()->slot38(self, arg1, arg2). */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj86B60__OnNotify */
     u8 pad3C[0x44 - 0x3C];
-    /* func_8004A2C4 (this unit, matched): zeroes self->unk28, forwards to
+    /* Class86668__Init (this unit, matched): zeroes self->unk28, forwards to
      * the base's own slot44, returns self->unk28. Called by Obj865C8__Init
      * as GetClass86668Methods()->slot44(self, self->unk0C, 0), return discarded. */
-    s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 func_8004A2C4 */
+    s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 Class86668__Init */
     /* func_8004A324 (this unit, matched): a thin wrapper forwarding to
      * Get_vtable_IntermediateBase()->slot48(self). Called by Obj865C8__Deinit as
      * GetClass86668Methods()->slot48(self). */
