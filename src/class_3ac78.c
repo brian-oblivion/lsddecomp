@@ -3,7 +3,7 @@
  * D_800866E8 (80 slots, header 0x114; tools/classtable.py D_800866E8). It
  * derives from Class6B5CC (code_d294) through the intermediate base whose
  * table func_800428E4 returns (D_8006EFAC), and the game builds exactly one,
- * at boot, in class_39e08's func_80049684 via New_Class866E8(0, 1).
+ * at boot, in class_39e08's Obj865C8__Obj865C8 via New_Class866E8(0, 1).
  *
  * What it manages is a GRID. The object owns seven elements (elems[7]), each
  * pairing a target object, a list, a parent node, and a 0x668-byte heap block

@@ -13,7 +13,7 @@ Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
     return NULL;
 }
 
-void func_80049684(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
+void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 

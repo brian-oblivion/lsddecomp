@@ -37,15 +37,15 @@ typedef struct EventArg {
 } EventArg;
 
 /* +0x008 (ctor) and most BasicClass-inherited slots are not this round's
- * functions (func_80049684, still INCLUDE_ASM elsewhere in this unit) --
+ * functions (Obj865C8__Obj865C8, still INCLUDE_ASM elsewhere in this unit) --
  * left untyped. */
 typedef struct Class865C8Methods {
     s32 header;                                   /* +0x000 */
     void *unk04;                                   /* +0x004 BasicClass__func_17eb0 */
     /* Typed because New_Obj865C8 (this unit) dispatches it as
      * func_8004A060()->ctor(self, arg1, arg2, arg3); the signature is
-     * func_80049684's own, defined just below. */
-    void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, SubObjD *arg2, s32 arg3); /* +0x008 func_80049684 */
+     * Obj865C8__Obj865C8's own, defined just below. */
+    void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, SubObjD *arg2, s32 arg3); /* +0x008 Obj865C8__Obj865C8 */
     void (*dtor)(Obj865C8 *self);                  /* +0x00C func_80049830 */
     /* BasicClass-inherited (BasicClass__func_17f98 -- same address as
      * Class6D3C8.h's own local unk10 view of this same shared slot).
@@ -182,11 +182,11 @@ typedef struct SubObjGMethods {
     u8 pad00[0x04];
     SubObjG *(*slot4)(SubObjG *self);
     u8 pad8[0x5C - 0x8];
-    /* func_80049684 (ctor): called on a just-constructed instance,
+    /* Obj865C8__Obj865C8 (ctor): called on a just-constructed instance,
      * return discarded. */
     void (*slot5C)(SubObjG *self);         /* +0x05C */
     u8 pad60[0x78 - 0x60];
-    /* func_80049684 (ctor): called immediately after construction on
+    /* Obj865C8__Obj865C8 (ctor): called immediately after construction on
      * self->unk44, return discarded. */
     void (*slot78)(SubObjG *self);         /* +0x078 */
 } SubObjGMethods;
@@ -223,11 +223,11 @@ typedef struct SubObjDMethods {
     void (*slot10)(SubObjD *self, s32 arg1);
     void (*slot14)(SubObjD *self, s32 arg1);
     u8 pad18[0x10C - 0x18];
-    /* func_80049684 (ctor): called as arg2->methods->slot10C(arg2,
+    /* Obj865C8__Obj865C8 (ctor): called as arg2->methods->slot10C(arg2,
      * self->subB). */
     void (*slot10C)(SubObjD *self, SubObjB *arg1);   /* +0x10C */
     void (*slot110)(SubObjD *self, s32 arg1);
-    /* func_80049684 (ctor): called as arg2->methods->slot114(arg2,
+    /* Obj865C8__Obj865C8 (ctor): called as arg2->methods->slot114(arg2,
      * self->unk44). */
     void (*slot114)(SubObjD *self, SubObjG *arg1);   /* +0x114 */
     u8 pad118[0x1B4 - 0x118];
@@ -407,7 +407,7 @@ extern u8 D_8008665C[];
  * only a local extern prototype is needed). No return value used. */
 extern void TickDreamAuxSlots(void);
 
-/* The ctor, func_80049684. A large web of external calls; each is declared
+/* The ctor, Obj865C8__Obj865C8. A large web of external calls; each is declared
  * locally with the minimal signature its call site here demonstrates (per
  * CLAUDE.md's "calling into a function that is still INCLUDE_ASM elsewhere
  * is fine" convention -- several of these ARE already declared, with a

@@ -48,7 +48,7 @@ now obsolete.
 
 Typing this one needed two small header changes, both recorded in
 `include/class_39e08.h`: `Class865C8Methods::ctor` was `void *` and is now a
-typed pointer carrying func_80049684's own signature, and `func_8004A060`
+typed pointer carrying Obj865C8__Obj865C8's own signature, and `func_8004A060`
 gained a prototype because it is defined later in the unit (ROM order) than
 the function that dispatches through it.
 

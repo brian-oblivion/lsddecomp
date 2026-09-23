@@ -127,6 +127,6 @@ Round 67 (track 3, naming pass).
 | --- | --- | --- | --- |
 | `func_8004A4C8` | `New_Class866E8` | A | Body is the project's established `New_X` shape: allocate `0x1E8` via `func_80017B34`, and on success dispatch the class's ctor slot `+0x008` with the caller's two arguments, else return NULL. `New_Class` is the convention named in FINISHING-PLAN.md track 3, and this report already used the phrase before the rename. |
 
-The one call site is `src/class_39e08.c`'s `func_80049684`, the boot path:
+The one call site is `src/class_39e08.c`'s `Obj865C8__Obj865C8`, the boot path:
 `arg1->unkC = (SubObjG *)New_Class866E8(0, 1);`. So exactly one instance of
 this class exists, created at game start.

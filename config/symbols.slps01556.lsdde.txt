@@ -1743,3 +1743,4 @@ GetUnk18ObjMethods = 0x8003F24C; // type:func
 Unk18Obj__GetTail = 0x8003F25C; // type:func
 Unk18Obj__SetGeomScreen = 0x8003F28C; // type:func
 New_Obj865C8 = 0x80049608; // type:func
+Obj865C8__Obj865C8 = 0x80049684; // type:func
