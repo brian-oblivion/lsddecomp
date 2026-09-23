@@ -1,4 +1,77 @@
-# CalcDreamColor — STALL: exact length (35/35 instructions, zero address drift), 28/35 raw word-match, first real diff at 0x4BD78 (retail computes the table base address early; this build loads `upper` early instead -- the commutative-add operand-order class, sixth confirmed instance project-wide)
+# CalcDreamColor -- MATCHED 35/35 (round 73, runner bravo): a 2-D subscript through a named `s8 (*)[3]` row-pointer local
+
+REVISITED, round 73: MATCHED 35/35 (was STALL 28/35, exact length); names/types used (DREAM_COLOR_TABLE read as the 3x3 [dynamic][upper] table it is, through a local `s8 (*table)[3]` view; the shared header's `s8 DREAM_COLOR_TABLE[9]` is untouched)
+
+## Round 73 (2026-09-23, runner bravo): MATCHED
+
+**Preserved body rebuilt first** (the unit's `#ifdef NON_MATCHING` block,
+verbatim): exact length, **28/35**, funcdiff `insertions 2 / deletions 2`,
+positional skeleton diffs 7. asm-differ residue as filed: retail
+`lb v1,0(sp); la a0,TABLE; sll; addu; lb v1,1(sp); addu v0,v0,a0;
+addu v0,v0,v1`, this build `lb v1,0(sp); lb a0,1(sp); sll; addu; la v1;
+addu v0,v0,v1; addu v0,v0,a0`. The adds associate the same way,
+`((d*3) + base) + upper`, in both. Only the order sched1 left the `la` and
+the `upper` load in differs, and local-alloc hands out `$v1`/`$a0`
+according to that order: whichever of the two is live while `dynamic` still
+holds `$v1` gets `$a0`. Reproduced standalone through the pinned cc1 with
+`-dS -dl -dc`: the pre-sched RTL order is `dyn, sll, add, la, add, upper,
+add, lb`, and the backward list scheduler moves the `upper` load up.
+
+The round-73 broadcast levers were checked and did not apply: no call
+(arity n/a), no struct copy, and the `$a0` reuse (param -> constant 1 ->
+table base) is ordinary allocation after `mood` dies, the same in both builds.
+
+Builds, in order (the flat-table forms each through `./build-and-verify.sh`):
+
+1. `return ((s8 (*)[3])DREAM_COLOR_TABLE)[dynamic][upper];` (cast inline):
+   26/35, ins/del 0/0. The symbol folds into `%lo(TABLE)($at)` addressing.
+2. `return (DREAM_COLOR_TABLE + dynamic * 3)[upper];`: 26/35, same fold.
+3. `return *(DREAM_COLOR_TABLE + dynamic * 3 + upper);`: 26/35, same fold.
+4. `entry = DREAM_COLOR_TABLE; entry += dynamic * 3; return entry[upper];`:
+   26/35, ins/del 2/2.
+5. Same as 4 with `index` split out before `entry = TABLE`: 26/35.
+6. Same as 4 with `index` split out after `entry = TABLE`: 26/35.
+7. `entry = &DREAM_COLOR_TABLE[dynamic * 3]; return entry[upper];` (no
+   `index` local): 28/35, the old residue.
+8. **`s8 (*tbl)[3] = (void *)DREAM_COLOR_TABLE; entry = tbl[dynamic];
+   return entry[upper];`: 35/35, build exit=0.**
+9. `(d << 1) + d` as the index: 28/35. `d + d * 2`: 27/35.
+10. `*(entry + upper)`: 28/35. `upper` hoisted into its own `s32 u`: 28/35.
+11. **`s8 (*table)[3] = (s8 (*)[3])DREAM_COLOR_TABLE;
+    return table[dynamic][upper];`: 35/35, build exit=0.** Kept: it reads
+    as what the table is.
+12. `row = ((s8 (*)[3])DREAM_COLOR_TABLE)[dynamic]; return row[upper];`
+    (the cast inline, no pointer local): 28/35. So the NAMED pointer local is
+    the load-bearing part, not the 2-D subscript by itself.
+
+Checked hypothesis for why 11 works: the row pointer is a pseudo of its own,
+assigned from the symbol BEFORE the index is computed, so the `la` is
+emitted ahead of `dynamic * 3` in the RTL. That is retail's order (the `la`
+fills the `dynamic` load's delay slot), and the `upper` load then comes
+after `dynamic` dies and takes `$v1`. An inline cast (1, 12) either folds
+the symbol into the address or leaves the `la` after the index.
+
+`tools/check-nonmatching.sh` green after the `#ifdef NON_MATCHING` block was
+replaced by the matched C.
+
+### Proposed learning (round 73)
+
+**Commutative-add "register-identity" residues on a table lookup can be an
+RTL EMISSION-ORDER problem, and the fix is a named row-pointer local.** When
+a flat `T x[R*C]` is indexed `&x[r*C]` then `[c]` and the base-address `la`
+lands on the wrong side of the other operand's load, assign
+`T (*tbl)[C] = (T (*)[C])x;` first and write `tbl[r][c]`. The early
+assignment puts the `la` ahead of the index computation. The inline cast
+does not do the same thing. This was filed as the sixth instance of the
+"commutative-add operand-order class" and called permuter-exhausted
+(~40400 iterations): a permuter does not introduce a pointer-to-array local.
+Worth re-reading the other five instances with this in mind.
+
+---
+
+## Pre-round-73 history
+
+CalcDreamColor — STALL: exact length (35/35 instructions, zero address drift), 28/35 raw word-match, first real diff at 0x4BD78 (retail computes the table base address early; this build loads `upper` early instead -- the commutative-add operand-order class, sixth confirmed instance project-wide)
 
 > **ROUND 49 (2026-09-16, runner bravo): re-verified fresh, no new attempt.**
 > This unit had not been touched since round 39. Spliced the exact preserved

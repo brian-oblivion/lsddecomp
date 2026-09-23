@@ -572,20 +572,19 @@ void DreamSys__StepLookOffset(DreamSys *this)
 	}
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 76/77 instructions, 1 word SHORT. Residue: which delay
- * slot the shared `call_tail: DreamSys__FlipMoveCommand(this);` merge's
- * `this` register setup lands in -- retail hoists `move a0,s0` into a
- * jump's delay slot on one converging path, this build materializes it
- * one instruction later at the shared label instead. Whole CFG matches
- * exactly; permuter-searched twice (round 37, round 49), no zero-scoring
- * candidate; hand-derived. docs/match-reports/DreamSys__StepLookYaw.md. */
 void DreamSys__StepLookYaw(DreamSys *this)
 {
 	s32 idx;
 	s32 delta;
 	s32 threshold;
 	s32 sum;
+	/* A second name for `this`, set on each path just before the shared
+	   tail call. It is load-bearing: `this` dies at the copy, so the
+	   decay arm's `lookYaw` store goes through $a0 (retail's
+	   `sw v0,0x94(a0)`) and every path reaches the jal with $a0 already
+	   set. Every earlier body passing `this` directly was one word short
+	   (round 73). */
+	DreamSys *flipTarget;
 
 	this->moveCommandLatch = (this->moveCommand == 1);
 	idx = this->lookYawCommand;
@@ -593,21 +592,13 @@ void DreamSys__StepLookYaw(DreamSys *this)
 		delta = LOOK_YAW_STEPS[idx];
 		threshold = LOOK_YAW_LIMITS[idx];
 		sum = delta + this->lookYaw;
-		if (sum >= 0) {
-			if (sum < threshold)
-				goto apply;
-			this->lookYawCommand = 0;
-			goto call_tail;
+		if ((sum >= 0) ? (sum < threshold) : ((~sum + 1) < threshold)) {
+			TURN_ROTATION_YAW[0].numerator = delta;
+			this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+			this->lookYaw = sum;
 		}
-		if ((~sum + 1) >= threshold) {
-			this->lookYawCommand = 0;
-			goto call_tail;
-		}
-	apply:
-		TURN_ROTATION_YAW[0].numerator = delta;
-		this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
-		this->lookYaw = sum;
 		this->lookYawCommand = 0;
+		flipTarget = this;
 	} else if (this->lookYaw != 0) {
 		delta = -0x2D;
 		if (this->lookYaw < 0)
@@ -615,15 +606,12 @@ void DreamSys__StepLookYaw(DreamSys *this)
 		TURN_ROTATION_YAW[0].numerator = delta;
 		this->vt->Class6B5CC__UpdateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
 		this->lookYaw += delta;
+		flipTarget = this;
 	} else {
 		return;
 	}
-call_tail:
-	DreamSys__FlipMoveCommand(this);
+	DreamSys__FlipMoveCommand(flipTarget);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__StepLookYaw);
-#endif
 
 void DreamSys__FlipMoveCommand(DreamSys *this)
 {
@@ -1087,14 +1075,11 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return true;
 }
 
-#if 0
-/* Best-reached body, 58/63 words, exact length (zero address drift) -- see
-   docs/match-reports/DreamSys__TryInstantTeleportLink.md for the residue analysis (delay-slot
-   fillers around the constant "return true" materialization;
-   PERMUTER-EXHAUSTED, ~49300 iterations). Restored to INCLUDE_ASM below per
-   project rule (no score short of byte-exact stays in src/). Re-verified
-   fresh round 39 (2026-09-14, runner echo); two new reshapes tried, neither
-   moved it -- see the round 39 note in the report. */
+/* The whole body sits inside `if (result >= 0)` with `return false` last.
+ * The early-return spelling (`if (result < 0) return false;`) compiles to
+ * the same instructions, but reorg fills two branch delay slots
+ * differently: it puts `li v0,1` into both slots, where retail has an
+ * `addiu a1,sp,0x10` and a `nop` (58/63, rounds 2026-08-30..49). Round 73. */
 bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
 	s32 result;
@@ -1102,23 +1087,19 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 	s32 local[4];
 
 	result = Test4InstantTeleporters(&this->linkCoordinates, currentPos, this->currentStage);
-	if (result < 0)
-		return false;
-	saved = func_8005BFC4();
-	if (!ExecuteLink(this, result, 0x11, 0))
+	if (result >= 0) {
+		saved = func_8005BFC4();
+		if (ExecuteLink(this, result, 0x11, 0)) {
+			this->pendingLinkType = 0;
+			this->linkMgr->methods->slot0xE8(this->linkMgr, local, &this->linkCoordinates);
+			this->vt->BaseObjO__SetVec14(this, local);
+			if (saved != 0 && !this->isFlashbackSession)
+				this->vt->GetSetDreamTimeLimit(this, this->vt->DreamSys__GetDreamTimerScaled(this) + saved);
+		}
 		return true;
-	this->pendingLinkType = 0;
-	this->linkMgr->methods->slot0xE8(this->linkMgr, local, &this->linkCoordinates);
-	this->vt->BaseObjO__SetVec14(this, local);
-	if (saved == 0)
-		return true;
-	if (this->isFlashbackSession)
-		return true;
-	this->vt->GetSetDreamTimeLimit(this, this->vt->DreamSys__GetDreamTimerScaled(this) + saved);
-	return true;
+	}
+	return false;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TryInstantTeleportLink);
 
 bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 {
@@ -1488,20 +1469,18 @@ DreamColors DreamSys__GetDreamColor(DreamSys *this)
 	return CalcDreamColor(&local);
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 28/35 words, exact length (zero address drift). Residue:
- * the sixth confirmed instance of the project-wide commutative-add
- * operand-order/register-identity class (round 20) -- retail computes the
- * table-base address early, this build loads `upper` early instead, both
- * final `addu`s register-swapped. Permuter-searched ~40400 iterations in
- * two windows (the first killed from outside), not closed; hand-derived.
- * docs/match-reports/CalcDreamColor.md. */
+/* DREAM_COLOR_TABLE is a 3x3 table, [dynamic class][upper class]. The
+ * row-pointer view is load-bearing: indexing the flat s8[9] as
+ * `&TABLE[d * 3]` then `[u]` loads `upper` early and swaps the two final
+ * `addu` registers; a 2-D subscript through a named `s8 (*)[3]` local is
+ * byte-exact (round 73). */
 DreamColors CalcDreamColor(MoodGraphPoint *mood)
 {
 	MoodGraphPoint local;
 	s8 *p;
 	s32 i;
 	s8 val;
+	s8 (*table)[3];
 
 	local.value = mood->value;
 	p = (s8 *)&local;
@@ -1515,18 +1494,9 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood)
 			*p = 1;
 		}
 	}
-	{
-		s32 index;
-		s8 *entry;
-
-		index = local.axis.dynamic * 3;
-		entry = &DREAM_COLOR_TABLE[index];
-		return entry[local.axis.upper];
-	}
+	table = (s8 (*)[3])DREAM_COLOR_TABLE;
+	return table[local.axis.dynamic][local.axis.upper];
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcDreamColor);
-#endif
 
 void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor)
 {
