@@ -73,7 +73,7 @@ DEF_RE = re.compile(r"^\w[^;=]*?\b(\w+)\s*\([^;{]*\)\s*\{", re.M)
 
 def call_contention(units):
     """Pairs (A, B, [symbols]) where unit A DEFINES a function that unit B
-    references. A NAMING runner on A renames those symbols tree-wide through
+    references, or both reference one placeholder D_ global. A NAMING runner on A renames those symbols tree-wide through
     rename.py, so B's file changes under whoever holds B (round 61: alpha's
     renames touched bravo's live unit and two of its reports; a three-file
     conflict). Headers cannot see this; the call graph can."""
@@ -84,12 +84,18 @@ def call_contention(units):
         texts[u] = progress.strip_dead_code(p.read_text(errors="replace")) if p else ""
     defs = {u: {d for d in DEF_RE.findall(t) if d not in ("if", "while", "for", "switch", "do", "return")}
             for u, t in texts.items()}
+    # Placeholder GLOBALS too (round 69): a splat-owned D_ symbol is defined in
+    # no unit, so the definition test above never sees it, yet a naming
+    # runner renames it tree-wide with rename.py exactly like a function
+    # (delta's D_8009024C -> gSeqTickRate rewrote bravo's live unit).
+    globs = {u: set(re.findall(r"\bD_800[0-9A-Fa-f]{5}\b", t)) for u, t in texts.items()}
     out = []
     for a in units:
         for b in units:
             if a == b:
                 continue
             hits = sorted(d for d in defs[a] if re.search(rf"\b{re.escape(d)}\b", texts[b]))
+            hits += sorted(globs[a] & globs[b])
             if hits:
                 out.append((a, b, hits))
     return out

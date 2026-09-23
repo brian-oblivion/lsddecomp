@@ -1310,8 +1310,11 @@ SeqTimerCallback = 0x80032A9C; // type:func
 SeqTimerDividerCallback = 0x80032AD0; // type:func
 // libapi/counter, identified: see SetRCnt (round 69)
 GetRCnt = 0x80032BB8; // type:func
+// libapi/counter, identified: see SetRCnt (round 69)
 StartRCnt = 0x80032BF0; // type:func
+// libapi/counter, identified: see SetRCnt (round 69)
 StopRCnt = 0x80032C28; // type:func
+// libapi/counter, identified: see SetRCnt (round 69)
 ResetRCnt = 0x80032C60; // type:func
 gVideoMode = 0x8006DC98;
 gSeqTickRate = 0x8009024C;

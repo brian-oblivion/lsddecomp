@@ -256,6 +256,23 @@ def not_game_code():
     return marked
 
 
+def sony_by_address(rows):
+    """Queued functions whose START address progress.py counts as Sony code
+    inside a game segment (config/sdk-in-game.txt, `identified` symbols)."""
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import progress
+    insn = re.compile(r"^\s*/\* [0-9A-F]+ ([0-9A-F]{8}) [0-9A-F]{8} \*/", re.M)
+    out = set()
+    for _, unit, func, _, _ in rows:
+        spath = os.path.join(ROOT, "asm", "nonmatchings", unit, f"{func}.s")
+        if not os.path.exists(spath):
+            continue
+        m = insn.search(open(spath, encoding="utf-8", errors="replace").read())
+        if m and int(m.group(1), 16) in progress.SONY_IN_GAME:
+            out.add(func)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", action="store_true",
@@ -305,9 +322,13 @@ def main():
 
     # ...and a FOURTH partition, for Sony code with no object to prove it.
     # See not_game_code() for why this cannot be folded into the screen above.
+    # progress.SONY_IN_GAME joins it (plan revision 13): an exact per-function
+    # fingerprint (config/sdk-in-game.txt) or an `identified` symbols entry
+    # is the same verdict, reached by a tool instead of a report title.
     nogame = not_game_code()
-    notgame = [r for r in rest if r[2] in nogame]
-    rest = [r for r in rest if r[2] not in nogame]
+    sony = sony_by_address(rows)
+    notgame = [r for r in rest if r[2] in nogame or r[2] in sony]
+    rest = [r for r in rest if r[2] not in nogame and r[2] not in sony]
 
     clean = [r for r in rest if not real_blockers(r[3])]
     blocked = [r for r in rest if real_blockers(r[3])]
@@ -320,10 +341,11 @@ def main():
         print("  match as C -- excluded from the assignable list below. Convert them")
         print("  per docs/SDK-OBJECTS-GUIDE.md; see `python3 tools/sdkstalls.py`.")
     if notgame:
-        print(f"  {len(notgame)} function(s) are marked NOT GAME CODE by their own report --")
-        print("  Sony library code with no object on any disc in sdk/, so no placed")
-        print("  object can prove it and no source shape can ever reach those bytes.")
-        print("  Excluded from the assignable list below. See Gate 1b's eighth screen.")
+        print(f"  {len(notgame)} function(s) are NOT GAME CODE, by their own report or by")
+        print("  config/sdk-in-game.txt / an `identified` symbols entry --")
+        print("  Sony library code no placed object owns. Matching it is not a goal")
+        print("  (FINISHING-PLAN section 1); naming it is track 2's. Excluded from the")
+        print("  assignable list below. See Gate 1b's eighth screen.")
         for words, unit, func, _, v in sorted(notgame):
             print(f"    {words:5d}w  {unit:<16} {func:<16} {v[:70]}")
     if blocked:

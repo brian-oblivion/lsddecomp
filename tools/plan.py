@@ -162,8 +162,12 @@ def unit_metrics(info):
         live = progress.strip_dead_code(raw)
         defs = [d for d in DEF_RE.findall(live) if d not in NOT_DEF]
         if info:
-            defs = [d for d in defs if d in info]
+            # Sony code in a game unit is track 2's to name, never track 3's
+            # (revision 13: code_179d8_c_b's pass named libsnd in game words).
+            defs = [d for d in defs if d in info and not progress.is_library(info[d][0])]
         inc = progress.INCLUDE_RE.findall(live)
+        if info:
+            inc = [f for f in inc if not (f in info and progress.is_library(info[f][0]))]
         nm = nm_bodies(raw)
         units[c.stem] = {
             "defs": len(defs),
@@ -238,17 +242,46 @@ def sdk_surface(info, units):
         referenced.update(re.findall(r"\b([A-Za-z_]\w*)\s*\(", live))
     named, unnamed, parked = [], [], []
     closed = parked_sdk_names()
+    sony = sdk_in_game_names()
     for name in sorted(referenced):
         a = info.get(name, (None, 0))[0]
         if a is None or not progress.is_library(a):
             continue
+        if a in sony and name not in sony[a]:
+            continue            # counted below, whether or not game code calls it
         if not FUNC_PH.match(name):
             named.append(name)
         elif name in closed:
             parked.append(name)
         else:
             unnamed.append(name)
+    # A function config/sdk-in-game.txt fingerprints EXACTLY is unnamed until it
+    # carries one of its candidates' Sony names, however readable the game-style
+    # name it has now (SetSeqTimerMode is libsnd's SsSetTickMode).
+    by_addr = {a: n for n, (a, _) in progress.text_symbols().items()}
+    for a, cands in sorted(sony.items()):
+        name = by_addr.get(a)
+        if name is None:
+            continue
+        if name in cands:
+            if name not in named:
+                named.append(name)
+        elif name not in closed and name not in unnamed:
+            unnamed.append(name)
     return named, unnamed, parked
+
+
+def sdk_in_game_names():
+    """{vram: {candidate Sony names}} from config/sdk-in-game.txt and the
+    externals config/psyq-objects.ld pins in game segments."""
+    out = {a: {n} for a, n in progress.ld_pinned_externals().items()}
+    if progress.SDK_IN_GAME.exists():
+        for line in progress.SDK_IN_GAME.read_text().splitlines():
+            m = re.match(r"^(0x[0-9A-Fa-f]{8})\s+\d+\s+(.*)$", line)
+            if m:
+                out.setdefault(int(m.group(1), 16), set()).update(
+                    c.split(":", 1)[1].split("@")[0] for c in m.group(2).split())
+    return out
 
 
 def report_state(func):
@@ -371,7 +404,7 @@ def collect(st):
 
     # track 3
     done = st["tracks"]["3"]["units_done"]
-    todo3 = sorted((u for u in units if u not in done),
+    todo3 = sorted((u for u in units if u not in done and (units[u]["defs"] or units[u]["include_asm"])),
                    key=lambda u: (-units[u]["centrality"], -units[u]["func_named"]))
     pct3 = len(done) / max(1, len(units))
 
@@ -440,7 +473,7 @@ def collect(st):
                   "next_match_model": mm, "why": mm_why, "revisit": len(revisit)},
             "1b": {"status": t1b_status, "promotable": len(promotable),
                    "nm_bodies": sum(u["nm_bodies"] for u in units.values())},
-            "2": {"status": st["tracks"]["2"]["status"] if unnamed_sdk else "done",
+            "2": {"status": "open" if unnamed_sdk else "done",
                   "named": len(named_sdk), "unnamed": len(unnamed_sdk), "parked": len(parked_sdk),
                   "unnamed_list": unnamed_sdk},
             "3": {"status": "done" if not todo3 else st["tracks"]["3"]["status"],
@@ -511,6 +544,8 @@ def jobs(d, n):
     q_naming = []
     for unit in d["_todo3"]:
         u = d["units"][unit]
+        if not (u["func_named"] or u["unk_refs"] or u["slot_refs"] or u["d_refs"]):
+            continue        # nothing a naming pass can measure: review-only, listed below
         q_naming.append(("3", f"naming pass on {unit} (centrality {u['centrality']}, "
                               f"{u['func_named']}/{u['defs']} defs unnamed, {u['unk_refs']} unk, "
                               f"{u['slot_refs']} slot calls, {u['d_refs']} D_)", t["3"]["naming_model"]))
@@ -596,9 +631,15 @@ def print_status(d, n, st):
         for k, v in over:
             print(f"    {k}: {v['words']} words, budget {v['budget']} (distil to docs/archive/; a reflow changes nothing here)")
         print()
-    print(f"  READY JOBS (top {n}; head fills at most 5 runner slots from the top, one unit per runner):")
+    print(f"  READY JOBS (top {n}; head fills the operator's runner cap from the top, 3 if none is stated,"
+          f" never more than 5; one unit per runner):")
     for track, desc, model in jobs(d, n):
         print(f"    [{track:<2}] {model:<7} {desc}")
+    review = [u for u in d["_todo3"] if not any(d["units"][u][k] for k in
+              ("func_named", "unk_refs", "slot_refs", "d_refs"))]
+    if review:
+        print(f"  REVIEW-ONLY (unmarked, zero measured naming debt; the head reviews and mark-units, no runner):")
+        print(f"    {' '.join(review)}")
     print()
     print("  Models: head runs on", MODELS["head"], "unless the round writes a new procedure, tool or doc,",
           "or adjudicates a HARD RULE or toolchain lead: then", MODELS["head_when_new_procedure"] + ".")
