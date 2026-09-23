@@ -106,7 +106,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, 
     s32 result;
 
     count = 10;
-    Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle, a1);
+    CopyMemcardIconTemplate(handle, a1);
     do {
         result = TaskObjF__TryWriteMemcardSaveFile(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
         if (result != 0) {
@@ -114,7 +114,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, 
         }
     } while (count-- != 0);
     if (result == 0) {
-        Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle, 0);
+        CopyMemcardIconTemplate(handle, 0);
     }
     return result;
 }

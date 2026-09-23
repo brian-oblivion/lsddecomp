@@ -1,4 +1,6 @@
-# Class86E00_3bb8c_g__LoadCardIcon -- MATCH (71/71 words, ~3 attempts)
+# TaskObjF__LoadCardIcon -- MATCH (71/71 words, ~3 attempts)
+
+> Renamed from `Class86E00_3bb8c_g__LoadCardIcon` on 2026-09-23 (tools/rename.py). Address 0x8004fe24.
 
 > Renamed from `func_8004FE24` on 2026-09-23 (tools/rename.py). Address 0x8004fe24.
 
@@ -18,7 +20,7 @@ extern const char gCardPathSuffix[]; /* ".TIM" */
 extern s32 D_80086EC4; /* 3-word opaque block, func_80041C9C's arg1, address-only here */
 extern s32 D_8008AA94; /* opaque block, the fresh unk70's own slot4C arg2, address-only here */
 
-void Class86E00_3bb8c_g__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
+void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
 {
     char path[0x20];
     char *buf;
@@ -86,7 +88,7 @@ the temp `handle` is the exact idiom already established by
 type from `class_3bb8c.h` (`slot78`/`release` already declared there).
 
 `self->unk70` is ALREADY typed `Class86E00Unk70Obj_3bb8c_g *` in this unit
-(established by the already-matched `Class86E00_3bb8c_g__TickCardIcon`, same file). Assigning
+(established by the already-matched `TaskObjF__TickCardIcon`, same file). Assigning
 `func_80041C9C`'s `ChildObj86ED0 *` return into it is the same
 implicit-pointer-type-mismatch-is-harmless pattern already documented in
 `func_80050F98`'s own report (`self->unk44 = New_Obj6EAC0(...)` there) --
@@ -139,7 +141,9 @@ computed.
 
 ## Naming
 
-`Class86E00_3bb8c_g__LoadCardIcon` (was `func_8004FE24`), tier A: the
+`TaskObjF__LoadCardIcon` (was `func_8004FE24`), tier B (head review, round 73:
+the body proves "load `CARD\<name>.TIM` once"; that the image is an ICON is
+inferred from the memcard context, not shown by a consumer). Original filing, tier A: the
 whole body is the load itself (three early-return guards, then build
 `CARD\<name>.TIM`, load it through the generic resource-handle idiom, and
 stash the result in `self->unk70` if not already loaded) -- a load-if-

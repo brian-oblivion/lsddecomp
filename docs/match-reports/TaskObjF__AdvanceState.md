@@ -1,4 +1,6 @@
-# Class86E00_3bb8c_g__AdvanceState -- MATCH (111/111 words, ~4 attempts)
+# TaskObjF__AdvanceState -- MATCH (111/111 words, ~4 attempts)
+
+> Renamed from `Class86E00_3bb8c_g__AdvanceState` on 2026-09-23 (tools/rename.py). Address 0x80050034.
 
 > Renamed from `func_80050034` on 2026-09-23 (tools/rename.py). Address 0x80050034.
 
@@ -9,7 +11,7 @@ driven by `self->unk28` (dense `switch`, retail compiles it to
 additionally rebuilding two path/name buffers first.
 
 ```c
-void Class86E00_3bb8c_g__AdvanceState(Class86E00_3bb8c_g *self)
+void TaskObjF__AdvanceState(Class86E00_3bb8c_g *self)
 {
     Class86E00Methods_3bb8c_g *methods = self->methods;
 
@@ -53,7 +55,7 @@ void Class86E00_3bb8c_g__AdvanceState(Class86E00_3bb8c_g *self)
 
 The dense range check (`(self->unk28 - 2) unsigned < 0xF`, i.e.
 `self->unk28` in `2..0x10`) plus `jtbl_80011594`'s 15 entries in
-`asm/nonmatchings/class_3bb8c_g/Class86E00_3bb8c_g__AdvanceState.s` give the case grouping
+`asm/nonmatchings/class_3bb8c_g/TaskObjF__AdvanceState.s` give the case grouping
 directly by READING the table, not by guessing: entries land on only four
 distinct labels, so it's four case groups, not fifteen. **The one place
 this cost an attempt: index 11 (`self->unk28==0xD`) lands on the SAME
@@ -68,14 +70,14 @@ it because it's included in the function's line range in the `.s` file.
 
 Every case body's shared tail (`slot8C(self, N); [slot7C(self, M);]`)
 matches the SAME `self->methods->slot8C`/`slot7C` shared-tail idiom
-already established by `Class86E00_3bb8c_g__ForceIdleFromState`/`Class86E00_3bb8c_g__TickStateDelay`/`Class86E00_3bb8c_g__OnCommand`/
-`Class86E00_3bb8c_g__OnItemSelected` elsewhere in this unit (`slot7C`'s header comment already
+already established by `TaskObjF__ForceIdleFromState`/`TaskObjF__TickStateDelay`/`TaskObjF__OnCommand`/
+`TaskObjF__OnItemSelected` elsewhere in this unit (`slot7C`'s header comment already
 documents it as a common tail for exactly this reason).
 
 The `self->unk28==0xE` sub-case's three calls read `self->unk40` as a
 `char *` destination and `self->unk44` likewise -- both fields are
-ALREADY typed `s32` in the header (established by `Class86E00_3bb8c_g__AttachChildA`/
-`Class86E00_3bb8c_g__OnCommand`, which forward them as opaque `s32` args to
+ALREADY typed `s32` in the header (established by `TaskObjF__AttachChildA`/
+`TaskObjF__OnCommand`, which forward them as opaque `s32` args to
 `slot78`/`slot4C`). Cast at the use site (`(char *)self->unk40`) rather
 than retyping the field, per the project's documented
 "reinterpretation is free, retyping a field read elsewhere is not"
@@ -83,7 +85,7 @@ convention -- `self->unk40`/`unk44` are read as plain `s32` by THREE
 already-matched functions in this same file.
 
 `self->unk80` is similarly already typed `void *` in the header
-(`Class86E00_3bb8c_g__OnItemSelected`'s own return-value store), but here it's used as an
+(`TaskObjF__OnItemSelected`'s own return-value store), but here it's used as an
 INTEGER ARRAY INDEX (shifted left 2, added to a base pointer) -- cast
 `(s32)self->unk80` at the use site, same free-reinterpretation reasoning,
 same field, opposite direction (pointer read as an integer here instead
@@ -131,10 +133,10 @@ source order literally.
 
 ## Naming
 
-`Class86E00_3bb8c_g__AdvanceState` (was `func_80050034`), tier B: dispatch
+`TaskObjF__AdvanceState` (was `func_80050034`), tier B: dispatch
 on the CURRENT `self->unk28`, with one group (`0xE`) additionally rebuilding
 two path/name buffers before firing the shared `slot8C`/`slot78`-or-`slot74`
-tail -- the same "reset then transition" mechanics `Class86E00_3bb8c_g__SetState`
+tail -- the same "reset then transition" mechanics `TaskObjF__SetState`
 already fires from the opposite direction (after choosing a NEW state).
 Named for the mechanics (moves the state machine forward from wherever it
 currently is); which real transition each of the four case groups performs

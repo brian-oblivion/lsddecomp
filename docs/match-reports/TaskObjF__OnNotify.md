@@ -1,14 +1,16 @@
-# Class86E00_3bb8c_g__OnNotify -- MATCH
+# TaskObjF__OnNotify -- MATCH
+
+> Renamed from `Class86E00_3bb8c_g__OnNotify` on 2026-09-23 (tools/rename.py). Address 0x8004ff90.
 
 > Renamed from `func_8004FF90` on 2026-09-23 (tools/rename.py). Address 0x8004ff90.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__OnNotify`: 25/25 words match.
+SHA1 matches retail. `funcdiff.py TaskObjF__OnNotify`: 25/25 words match.
 
 ## Source
 
 ```c
-void Class86E00_3bb8c_g__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
+void TaskObjF__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
 {
     if (self->unk28 != 0) {
         if (arg2 == 0x19) {
@@ -29,7 +31,7 @@ not using" convention.
 
 - `Class86E00Methods_3bb8c_g::slot90`/`slot94` -- both already declared
   ahead of this function while surveying the whole unit
-  (`Class86E00_3bb8c_g__TickCardIcon`'s report); this is the function that exercises them.
+  (`TaskObjF__TickCardIcon`'s report); this is the function that exercises them.
 
 ### Proposed learning
 
@@ -37,7 +39,7 @@ None new.
 
 ## Naming
 
-`Class86E00_3bb8c_g__OnNotify` (was `func_8004FF90`), tier B: signature
+`TaskObjF__OnNotify` (was `func_8004FF90`), tier B: signature
 shape `(self, arg1, arg2)` with `arg1` unread and `arg2` a small dispatch
 code (`0x19`/`0x17`) gated on `self->unk28 != 0` matches this project's
 established `(self, sender, event)` notify-receiver shape

@@ -8,12 +8,12 @@
 
 `s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5,
 s32 arg6, s32 arg7)`. The same bounded-retry shape as `TaskObjF__ReadMemcardFile`
-(this unit, matched): calls `Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle, a1)` once up front,
+(this unit, matched): calls `CopyMemcardIconTemplate(handle, a1)` once up front,
 then retries `TaskObjF__TryWriteMemcardSaveFile(self, a1, handle, a3 & 0xFF, arg5, arg6,
 arg7)` (this unit, also a predicted-hard stall — see its own report) up
 to 11 times via the identical `do { ...; if (result) break; } while
 (count-- != 0);` idiom, and — only if every attempt returned 0 — calls
-`Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle, 0)` before returning the last result.
+`CopyMemcardIconTemplate(handle, 0)` before returning the last result.
 
 Register census: **9 distinct callee-saved registers, fully saturated**
 (`$fp`/`$s8` + `$s0`-`$s7` — confirmed with the `$fp`-vs-`$s8` naming
@@ -42,7 +42,7 @@ not a missing or extra value.
    proven correct there). Score 31/51, full permutation as described
    above.
 2. **Reordering the two independent top-of-function statements**
-   (`count = 10;` before vs. after the initial `Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle,
+   (`count = 10;` before vs. after the initial `CopyMemcardIconTemplate(handle,
    a1);` call) — moved the score from 31/51 to 33/51 (2 more words) but
    did NOT change which register any of the 9 live values landed in; the
    2 extra matching words are incidental instruction-encoding overlap,
@@ -69,7 +69,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s
     s32 result;
 
     count = 10;
-    Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle, a1);
+    CopyMemcardIconTemplate(handle, a1);
     do {
         result = TaskObjF__TryWriteMemcardSaveFile(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
         if (result != 0) {
@@ -77,7 +77,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s
         }
     } while (count-- != 0);
     if (result == 0) {
-        Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle, 0);
+        CopyMemcardIconTemplate(handle, 0);
     }
     return result;
 }
@@ -86,11 +86,11 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s
 
 Needs a forward declaration of `TaskObjF__TryWriteMemcardSaveFile` (defined later in this
 unit's ROM order; already present near the top of `src/class_3bb8c_f.c`)
-and `Class86E00_3bb8c_g__CopyMemcardIconTemplate`'s extern (declared in `include/class_3bb8c.h`).
+and `CopyMemcardIconTemplate`'s extern (declared in `include/class_3bb8c.h`).
 
 ## Header additions (`include/class_3bb8c.h`, additive only)
 
-- `extern s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 handle, s32 flag);` — **an extern for a
+- `extern s32 CopyMemcardIconTemplate(s32 handle, s32 flag);` — **an extern for a
   function outside this unit**, typed from this call site's own register
   usage (the pre-loop call's `a1` is EEA0's OWN incoming `a1` parameter,
   left untouched in its hardware register rather than re-set, which is
@@ -117,7 +117,7 @@ independently by `func_8004C93C`, 7 variants, zero movement), a permuter
 run was set up with TARGETED `PERM_GENERAL` macros over the two axes
 round-17's manual attempts had already identified as levers (declaration
 order of `count`/`result`; statement order of `count = 10;` vs. the
-pre-loop `Class86E00_3bb8c_g__CopyMemcardIconTemplate` call), wrapped in `PERM_RANDOMIZE` for open
+pre-loop `CopyMemcardIconTemplate` call), wrapped in `PERM_RANDOMIZE` for open
 search beyond those two switches.
 
 **Note on setup:** `tools/setup-permuter.sh` pipes the seed through the
@@ -165,7 +165,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, 
     s32 result;
 
     count = 10;
-    Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle, a1);
+    CopyMemcardIconTemplate(handle, a1);
     do {
         result = TaskObjF__TryWriteMemcardSaveFile(self, a1, handle, a3 & 0xFF, arg5, arg6, arg7);
         if (result != 0) {
@@ -173,7 +173,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, 
         }
     } while (count-- != 0);
     if (result == 0) {
-        Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle, 0);
+        CopyMemcardIconTemplate(handle, 0);
     }
     return result;
 }
@@ -224,7 +224,7 @@ bounded (11-attempt) retry wrapper around
 `TaskObjF__TryWriteMemcardSaveFile` (see that function's own report for
 why "SaveFile": the 0x200-byte buffer it submits is structurally exact
 to the documented PS1 memory-card save file header format), bracketed by
-a `Class86E00_3bb8c_g__CopyMemcardIconTemplate(handle, ...)` registry mark/unmark call (mark before
+a `CopyMemcardIconTemplate(handle, ...)` registry mark/unmark call (mark before
 the retry loop, unmark only if every attempt failed). The registry call
 itself is a different unit's own helper (`src/class_3bb8c_g.c`) and its
 exact purpose is not re-derived here.

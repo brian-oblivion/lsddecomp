@@ -1,14 +1,16 @@
-# Class86E00_3bb8c_g__OnCommand -- MATCH
+# TaskObjF__OnCommand -- MATCH
+
+> Renamed from `Class86E00_3bb8c_g__OnCommand` on 2026-09-23 (tools/rename.py). Address 0x800504d0.
 
 > Renamed from `func_800504D0` on 2026-09-23 (tools/rename.py). Address 0x800504d0.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__OnCommand`: 54/54 words match.
+SHA1 matches retail. `funcdiff.py TaskObjF__OnCommand`: 54/54 words match.
 
 ## Source
 
 ```c
-void Class86E00_3bb8c_g__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
+void TaskObjF__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:
@@ -47,7 +49,7 @@ every value and branch target matches logically.
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 None new -- `slotA0`, `slot78`, and `slot7C` were all already declared
-while surveying the unit (`Class86E00_3bb8c_g__TickCardIcon`'s report); this is the function
+while surveying the unit (`TaskObjF__TickCardIcon`'s report); this is the function
 that exercises `slot78`'s full 8-argument (`self`+7) signature and
 confirms `slotA0`'s `(self)`-only arity (called identically from both
 cases).
@@ -67,10 +69,10 @@ completely different offset immediately after a comparison chain, try the
 
 ## Naming
 
-`Class86E00_3bb8c_g__OnCommand` (was `func_800504D0`), tier B: dispatches
+`TaskObjF__OnCommand` (was `func_800504D0`), tier B: dispatches
 on a small externally-supplied code (`arg2` in `{2, 3}`, `arg1` unread) into
 `slotA0` plus either the full `slot78` transition or a `slot7C(self, 0x17)`
-("force idle", per `Class86E00_3bb8c_g__ForceIdleFromState`'s own naming
+("force idle", per `TaskObjF__ForceIdleFromState`'s own naming
 evidence) -- read as an external caller telling this object to act (2:
 proceed / 3: cancel), though nothing in the body itself says who calls it
 or what the two codes represent in the game.

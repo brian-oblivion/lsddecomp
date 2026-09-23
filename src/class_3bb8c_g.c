@@ -1,11 +1,12 @@
 /*
- * class_3bb8c_g -- this unit's own slots (+0x048 and up) of the shared
- * Class86E00 vtable (D_80086E00; +0x004..+0x03C belong to class_3bb8c_e/f,
- * this header's other two owners of the same table), plus one standalone
+ * class_3bb8c_g -- TaskObjF methods, slots +0x07C..+0x0B0 of gTaskObjFMethods
+ * (0x80086DC4; class_3bb8c_f holds +0x064..+0x078), plus one standalone
  * helper (CopyMemcardIconTemplate) reused by class_3bb8c_m's memcard save
- * writer.
+ * writer. The local view type is still called Class86E00_3bb8c_g, after a
+ * mid-table address an earlier round took for a separate class table (see
+ * include/class_3bb8c.h).
  *
- * Class86E00 runs a `state` machine: SetState/AdvanceState fire a fixed
+ * TaskObjF runs a `state` machine: SetState/AdvanceState fire a fixed
  * set of transition-entry callbacks and either commit a new `state` or
  * tear the object down; ForceIdleFromState and TickStateDelay drive two
  * more paths into the same shared slot7C/slot8C tail; OnCommand and
@@ -19,13 +20,12 @@
  * Every function in the unit is matched C. What each numeric `state`
  * code and each OnCommand/OnItemSelected dispatch code means in game
  * terms is not established -- names below describe mechanics, not
- * purpose (tier B throughout except the two pure getter/loader
- * functions). See each function's own match report for its evidence.
+ * purpose (tier B throughout except the pure getter GetTaskObjFMethods). See each function's own match report for its evidence.
  */
 #include "common.h"
 #include "class_3bb8c.h"
 
-void Class86E00_3bb8c_g__SetState(Class86E00_3bb8c_g *self, s32 arg1)
+void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
 {
     Class86E00Methods_3bb8c_g *methods = self->methods;
     s32 ret;
@@ -104,7 +104,7 @@ extern s32 D_80086EC4;
 /* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
 extern s32 D_8008AA94;
 
-void Class86E00_3bb8c_g__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
+void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
 {
     char path[0x20];
     char *buf;
@@ -137,14 +137,14 @@ void Class86E00_3bb8c_g__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     newVal->methods->slot4C(newVal, self->childReady, (void *)&D_8008AA94);
 }
 
-void Class86E00_3bb8c_g__TickCardIcon(Class86E00_3bb8c_g *self)
+void TaskObjF__TickCardIcon(Class86E00_3bb8c_g *self)
 {
     if (self->cardIcon != NULL) {
         self->cardIcon = self->cardIcon->methods->slot4(self->cardIcon);
     }
 }
 
-void Class86E00_3bb8c_g__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
+void TaskObjF__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
 {
     if (self->state != 0) {
         if (arg2 == 0x19) {
@@ -155,14 +155,14 @@ void Class86E00_3bb8c_g__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
     }
 }
 
-void Class86E00_3bb8c_g__SetChildFlag8(Class86E00_3bb8c_g *self, s32 arg1)
+void TaskObjF__SetChildFlag8(Class86E00_3bb8c_g *self, s32 arg1)
 {
     if (self->childC != NULL) {
         self->childC->methods->slot80(self->childC, arg1, 0x7F, 0x7F);
     }
 }
 
-void Class86E00_3bb8c_g__AdvanceState(Class86E00_3bb8c_g *self)
+void TaskObjF__AdvanceState(Class86E00_3bb8c_g *self)
 {
     Class86E00Methods_3bb8c_g *methods = self->methods;
 
@@ -201,7 +201,7 @@ void Class86E00_3bb8c_g__AdvanceState(Class86E00_3bb8c_g *self)
     }
 }
 
-void Class86E00_3bb8c_g__ForceIdleFromState(Class86E00_3bb8c_g *self)
+void TaskObjF__ForceIdleFromState(Class86E00_3bb8c_g *self)
 {
     switch (self->state) {
     case 4:
@@ -216,7 +216,7 @@ void Class86E00_3bb8c_g__ForceIdleFromState(Class86E00_3bb8c_g *self)
     }
 }
 
-void Class86E00_3bb8c_g__TickStateDelay(Class86E00_3bb8c_g *self)
+void TaskObjF__TickStateDelay(Class86E00_3bb8c_g *self)
 {
     s32 old;
     s32 newVal;
@@ -248,7 +248,7 @@ void Class86E00_3bb8c_g__TickStateDelay(Class86E00_3bb8c_g *self)
     }
 }
 
-void Class86E00_3bb8c_g__AttachChildA(Class86E00_3bb8c_g *self)
+void TaskObjF__AttachChildA(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0) {
         if (self->childA == NULL) {
@@ -261,7 +261,7 @@ void Class86E00_3bb8c_g__AttachChildA(Class86E00_3bb8c_g *self)
     }
 }
 
-void Class86E00_3bb8c_g__DetachChildA(Class86E00_3bb8c_g *self)
+void TaskObjF__DetachChildA(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0 && self->childA != NULL) {
         self->childA->methods->slot50(self->childA);
@@ -273,7 +273,7 @@ void Class86E00_3bb8c_g__DetachChildA(Class86E00_3bb8c_g *self)
     }
 }
 
-void Class86E00_3bb8c_g__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
+void TaskObjF__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:
@@ -288,7 +288,7 @@ void Class86E00_3bb8c_g__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg
     }
 }
 
-void Class86E00_3bb8c_g__AttachChildB(Class86E00_3bb8c_g *self)
+void TaskObjF__AttachChildB(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0) {
         if (self->childB == NULL) {
@@ -301,7 +301,7 @@ void Class86E00_3bb8c_g__AttachChildB(Class86E00_3bb8c_g *self)
     }
 }
 
-void Class86E00_3bb8c_g__DetachChildB(Class86E00_3bb8c_g *self)
+void TaskObjF__DetachChildB(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0 && self->childB != NULL) {
         self->childB->methods->slot50(self->childB);
@@ -313,7 +313,7 @@ void Class86E00_3bb8c_g__DetachChildB(Class86E00_3bb8c_g *self)
     }
 }
 
-void Class86E00_3bb8c_g__OnItemSelected(Class86E00_3bb8c_g *self, GenericSlot9CObj_3bb8c_g *arg1, s32 arg2)
+void TaskObjF__OnItemSelected(Class86E00_3bb8c_g *self, GenericSlot9CObj_3bb8c_g *arg1, s32 arg2)
 {
     switch (arg2) {
     case 2:
@@ -328,9 +328,9 @@ void Class86E00_3bb8c_g__OnItemSelected(Class86E00_3bb8c_g *self, GenericSlot9CO
     }
 }
 
-GenericCtorTable_3bb8c_d *GetClass86E00Methods(void)
+GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void)
 {
-    return &gClass86E00Methods;
+    return &gTaskObjFMethods;
 }
 
 /* Sony's, from libc2 (round 45's own local view -- this unit's first use). */
@@ -342,7 +342,7 @@ extern s32 atoi(char *s);
  * `class_3bb8c_d.c`'s own (differently-typed) local view. */
 extern u8 *gMemcardIconTemplate;
 
-/* Struct-copy helper types for round 45's Class86E00_3bb8c_g__CopyMemcardIconTemplate, all deliberately
+/* Struct-copy helper types for round 45's CopyMemcardIconTemplate, all deliberately
  * all-`s8` (alignment 1) per this round's FormatNumberIntoBuffer lever: retail
  * copies these ranges as one unaligned `lwl`/`lwr` word chunk per 4 bytes,
  * with any non-multiple-of-4 remainder as INDIVIDUAL byte loads/stores,
@@ -359,14 +359,14 @@ typedef struct {
 } Pair2_3bb8c_g;
 
 /* Signature is `include/class_3bb8c.h`'s ALREADY-shared
- * `extern s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 arg0, s32 arg1);` (class_3bb8c_m's own
+ * `extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);` (class_3bb8c_m's own
  * caller, TaskObjF__WriteMemcardSaveFile), matched exactly -- this unit's own definition
  * must agree with that declaration since both are visible in this
  * translation unit. Cast to `u8 *` internally; retail's own register
  * content at exit (`$v0` left holding a pointer into the `gMemcardIconTemplate`
  * template in every path) confirms the real return type is a pointer,
  * loosely read as `s32` by the caller that never dereferences it. */
-s32 Class86E00_3bb8c_g__CopyMemcardIconTemplate(s32 arg0, s32 arg1)
+s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1)
 {
     u8 *self = (u8 *)arg0;
     u8 *src = (u8 *)arg1;

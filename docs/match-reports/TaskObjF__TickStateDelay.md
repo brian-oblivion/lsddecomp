@@ -1,14 +1,16 @@
-# Class86E00_3bb8c_g__TickStateDelay -- MATCH
+# TaskObjF__TickStateDelay -- MATCH
+
+> Renamed from `Class86E00_3bb8c_g__TickStateDelay` on 2026-09-23 (tools/rename.py). Address 0x80050280.
 
 > Renamed from `func_80050280` on 2026-09-23 (tools/rename.py). Address 0x80050280.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py Class86E00_3bb8c_g__TickStateDelay`: 48/48 words match.
+SHA1 matches retail. `funcdiff.py TaskObjF__TickStateDelay`: 48/48 words match.
 
 ## Source
 
 ```c
-void Class86E00_3bb8c_g__TickStateDelay(Class86E00_3bb8c_g *self)
+void TaskObjF__TickStateDelay(Class86E00_3bb8c_g *self)
 {
     s32 old;
     s32 newVal;
@@ -85,7 +87,7 @@ notification call only fires once the counter has reached 6 or more.
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 None new -- `slot7C` was already declared while surveying the unit
-(`Class86E00_3bb8c_g__TickCardIcon`'s report).
+(`TaskObjF__TickCardIcon`'s report).
 
 ### Proposed learning
 
@@ -105,7 +107,7 @@ merge idiom on sight of a shared tail.
 
 ## Naming
 
-`Class86E00_3bb8c_g__TickStateDelay` (was `func_80050280`), tier B: for
+`TaskObjF__TickStateDelay` (was `func_80050280`), tier B: for
 three specific states (`7`, `0xB`, `0xF`) increments a per-object counter
 (`self->unk5C`) every call and only fires the state transition once the
 counter reaches 6 -- read as a per-call (per-frame) wait/delay gate ahead
