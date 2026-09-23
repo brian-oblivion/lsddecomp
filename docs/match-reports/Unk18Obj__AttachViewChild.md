@@ -95,3 +95,16 @@ different lever (expression form, not declaration order).
 ## Naming
 
 `Unk18Obj__AttachViewChild` -- tier B. One-time init guarded by `self->unk10`: registers `a1` through the inherited `addChild` slot (which, per `Unk18Obj__AddChild` in `code_2cc8c_c.c`, sets `self->unk10` itself when `a1`'s dynamic-class tag is 4), forwards `a2`/`a3` to `slot78`/`slot7C` (this unit's own `Unk18Obj__SetViewPos`/`Unk18Obj__SetUnk20`), then hands `&self->unk14` to Sony's `GsSetRefView2`. "View" is inferred from that GsSetRefView2 hand-off, not proven for the field itself -- tier B, not A, per round 72's rule on asserting what data means.
+
+## Proposed field names
+
+Not applied -- `unk10` is shared with `code_2cc8c_c.c` (`Unk18Obj__AddChild`/
+`Unk18Obj__RemoveChild`/`Unk18Obj__Unk18Obj`/`Unk18Obj__Finalize` all touch
+it), so this unit does not own it per track 3's ownership rule.
+
+- `unk10` -> `viewChild` (tier B). Set by `Unk18Obj__AddChild` (sibling unit)
+  when a `GenericObj` child's dynamic-class tag is 4; every guard in THIS
+  unit that reads it (`Unk18Obj__SetViewPos`, `Unk18Obj__SetUnk20`,
+  `Unk18Obj__DetachViewChild`, `Unk18Obj__AttachViewChild` itself) gates on
+  whether a "view" is attached. Posted to the round-73 broadcast for the
+  head to apply by type scope.

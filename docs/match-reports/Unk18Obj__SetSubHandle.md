@@ -63,3 +63,17 @@ old `pad000[0x04C]` span ahead of the already-typed `slot4C`.
 ## Naming
 
 `Unk18Obj__SetSubHandle` -- tier A. Guarded by `self->unk10 == NULL`: releases the current `self->unkB0` via its own `slot4` if set, installs `a1`, and notifies it (`slot4C`) with `self->unkAC` and the shared `D_8008A904` constant. Plain "replace the held sub-handle" mechanics.
+
+## Proposed field names
+
+Not applied -- `unkB0`/`unkAC` are both shared with `code_2cc8c_c.c`
+(`Unk18Obj__Unk18Obj` sets both, `Unk18Obj__Finalize` releases `unkAC`), so
+outside this unit's ownership per track 3's rule.
+
+- `unkB0` -> `subHandle` (tier B): the field this function and
+  `Unk18Obj__GetSubHandle` (this unit) exclusively set/get; matches
+  `SubHandleObj`'s own existing type name.
+- `unkAC` -> not proposed beyond the existing `Unk18AcObj` typedef's own
+  documentation; this unit only forwards it opaquely (`arg1->methods->
+  slot4C(arg1, self->unkAC, D_8008A904)`), no new evidence over what
+  `include/code_2cc8c.h`'s own comment on `Unk18Obj::unkAC` already records.

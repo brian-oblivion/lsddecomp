@@ -153,3 +153,56 @@ between two named fields).
 ## Naming
 
 `Unk18Obj__Update` -- tier A. The `slot9C` occupant, dispatched by `Unk18Obj__OnNotifyTag5`; the existing (pre-round-73) report already described it in these exact terms as a "per-frame update" (light mode, fog, ref view, both `GsClearOt` halves, notifying child objects through `slotA0`), independently of this round's naming pass -- a description of MECHANICS, evident from the body, which is what a tier-A name requires.
+
+## Proposed field names
+
+Not applied -- these fields are exclusive to this unit (confirmed: grepped
+every other unit that includes `code_2cc8c.h`, none touch `Unk18Obj`), so
+by the letter of track 3's rule they COULD be renamed here; left as
+proposals instead because their own evidence is materially weaker than the
+six fields this round did rename (`lightMode`/`clearColor`/`farColor`/
+`fogNear`/`otReady`/`otIndex`, all with an unambiguous single Sony-API
+consumer) -- these have no such single clean consumer, several are read at
+MULTIPLE sites with different apparent roles, and the project's own
+guidance is that a wrong tier-A name is worse than `func_`/`unkNN`. Left for
+a future pass (or track 4) with more time to cross-check every call site.
+
+- `unk3C` -> `otLenShift` (tier B): `4 << unk3C` is the OT tag-array byte
+  size at both allocation sites in `Unk18Obj__InitOt`, i.e. `unk3C` is
+  log2(OT entry count). Also gates `Unk18Obj__SetUnk44`/`Unk18Obj__SetUnk48`
+  indirectly via `otReady`, and feeds `Unk18Obj__Update`'s own
+  `unk98 = (unk50-unk4C)/(1<<unk3C)+1` -- consistent with "a shift/step
+  size", but the exact unit (bytes? OT slots? something else) is not
+  proven.
+- `unk40` -> not proposed. Overloaded: `Unk18Obj__Update` both passes it as
+  a plain value to `SetFogNear`'s 2nd argument AND casts it to
+  `(Unk18Obj *)` for `Unk18Obj__SetGeomScreen`. Either it is genuinely two
+  different things depending on caller-supplied contents (a raw word the
+  caller sometimes puts a pointer in), or one of the two call sites is
+  itself worth a second look before naming the field.
+- `unk44`/`unk48` -> `otPacketSize`/`otPacketCount` or the reverse (tier C):
+  `unk48 * unk44` is the packet-area byte size in `Unk18Obj__InitOt`; which
+  operand is "count" and which is "stride" is not distinguishable from a
+  commutative multiply alone.
+- `unk4C` -> not proposed. Sole use is `func_8003FB0C(self->unk4C)`, an
+  UNCARVED callee (still `func_`, no signature evidence beyond "takes one
+  word"), so naming the field ahead of that callee would be a pure guess.
+- `unk50` -> `otPacketLimit` or similar (tier C): only use is
+  `unk98 = (unk50 - unk4C) / (1 << unk3C) + 1` in `Unk18Obj__Update`, i.e.
+  a range endpoint paired with `unk4C`. No stronger evidence than that.
+- `unk78`/`unk7C` -> `otA`/`otB` (tier B): the two `GsOT` header base
+  addresses `Unk18Obj__InitOt` builds and `Unk18Obj__Update`/
+  `Unk18Obj__Flip` index by `otIndex`.
+- `unk80`/`unk84` -> `otATags`/`otBTags` (tier B): the two tag arrays
+  (`base + 0x14`), same pairing.
+- `unk88`/`unk8C` -> `otAPackets`/`otBPackets` (tier B): the two packet
+  areas (`base + 0x14 + (4 << unk3C)`), same pairing.
+- `unk90` -> `notifyCount` (tier B): incremented unconditionally, once per
+  call, by `Unk18Obj__OnNotifyTag5`. Never read anywhere in this unit.
+- `unk98` -> `otPacketRange` or similar (tier C): `(unk50-unk4C) /
+  (1<<unk3C) + 1`, computed each `Unk18Obj__Update` call; never read back
+  anywhere in this unit either, so it may be purely an out-parameter for a
+  caller this unit does not see.
+
+Posted to the round-73 broadcast for visibility; not applied by this
+runner.

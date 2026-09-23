@@ -1,6 +1,28 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
+/*
+ * The rest of `Unk18Obj`'s own vtable (`D_8006E8E4`): the constructor chain
+ * itself (`Unk18Obj__Unk18Obj`, `Unk18Obj__Finalize`, `Unk18Obj__AddChild`/
+ * `Unk18Obj__RemoveChild`) lives in the sibling unit `code_2cc8c_c.c`; this
+ * unit carves everything after that -- the `OnNotify` override and its two
+ * tag-dispatched handlers, the plain field setters/getters, the paired
+ * "view child" attach/detach (registers a `GenericObj` child and its
+ * position, then hands it to Sony's `GsSetRefView2`), the paired OT
+ * (ordering-table) init/deinit that allocates a double-buffered `GsOT` pair
+ * for `GsClearOt`, and the two per-frame methods that drive them:
+ * `Unk18Obj__Update` (light mode, fog, ref view, both OT halves, notifies
+ * children) and `Unk18Obj__Flip` (drains the current OT half via
+ * `GsSortClear`+`GsDrawOt` and toggles the double-buffer index for next
+ * frame). In short: `Unk18Obj` is the scene's GPU-facing viewport/renderer
+ * object -- `Obj86B60::viewport`'s pointee (`code_2cc8c_c.c`) -- and this
+ * unit is its rendering half. NAMING PARKED: the `Unk18Obj` type name itself,
+ * several fields shared with `code_2cc8c_c.c` (unkC/unk10/unk30/unkAC/unkB0),
+ * and the OT-internals field cluster (unk3C/unk44/unk48/unk78/unk7C/unk80/
+ * unk84/unk88/unk8C/unk90/unk98) are all PROPOSED, not renamed here -- see
+ * each function's own `## Proposed field names` and the round-73 broadcast.
+ */
+
 /* Forwards to the inherited BasicClass slot38, then dispatches self's OWN
  * slot94 or slot98 depending on arg1's dynamic class tag (5 or 1
  * respectively, per its header nibble -- same tag idiom as Unk18Obj__AddChild,
