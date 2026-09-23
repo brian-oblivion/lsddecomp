@@ -23,9 +23,9 @@
  * its own independent view of the same object (Obj866E8 / Elem /
  * GridSlot866E8 in include/class_3bb8c.h).
  *
- * Two functions are documented stalls and stay INCLUDE_ASM:
- * Class866E8__ResetAllElements and Class866E8__DispatchToRectCells
- * (Class866E8__SetFootprintRect was matched in round 71). func_8004B324 keeps its placeholder name
+ * Class866E8__DispatchToRectCells is a documented stall and stays
+ * INCLUDE_ASM (Class866E8__SetFootprintRect and Class866E8__ResetAllElements
+ * were matched in round 71). func_8004B324 keeps its placeholder name
  * deliberately -- it is an empty vtable stub with no established purpose, the
  * same case as func_8001D33C in code_d294_b.
  */
@@ -289,29 +289,24 @@ void Class866E8__OnCommand(Class866E8 *self, GenericObject *sender, s32 command)
     }
 }
 
-/* STALL -- see docs/match-reports/Class866E8__ResetAllElements.md. Best reached: 9/74
- * words in-range, correct size, no address drift. Residue is a
- * scheduling-only "the offset increment keeps landing in the wrong
- * delay slot" issue. Restored to INCLUDE_ASM per project rule. */
-#if 0
+/* Reset every one of the seven grid elements, then the two counters.
+ * Matched round 71: `&self->elems[i]` is what produces retail's
+ * base + running-offset walk (GCC's strength reduction), not a hand-rolled
+ * byte offset. */
 void Class866E8__ResetAllElements(Class866E8 *self)
 {
     s32 i;
-    s32 offset;
     UnkSlotEntry_3ac78 *entry;
+    UnkSlotListObj_3ac78 *list;
 
-    offset = 0xEC;
     for (i = 0; i < 7; i++) {
-        GenericObject *check;
-
-        entry = (UnkSlotEntry_3ac78 *)((u8 *)self + offset);
+        entry = &self->elems[i];
         entry->target->methods->slot74(entry->target);
         entry->flag = 0;
         self->methods->slot108(self, entry);
-        check = entry->list->unk2C;
-        offset += 0x1C;
-        if (check != NULL) {
-            entry->list->unk2C = check->methods->release(check);
+        list = entry->list;
+        if (list->unk2C != NULL) {
+            list->unk2C = list->unk2C->methods->release(list->unk2C);
         }
         self->methods->onElementEvent(self, 6, entry, i);
         entry->target->methods->slot84(entry->target);
@@ -321,9 +316,6 @@ void Class866E8__ResetAllElements(Class866E8 *self)
     self->unk1B4 = 0;
     self->methods->slot140(self);
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3ac78", Class866E8__ResetAllElements);
 
 void Class866E8__SetChildParams(Class866E8 *self, s32 count, s32 arg2, s32 arg3)
 {

@@ -48,7 +48,7 @@ and the old body had seven named locals competing for them.
 
 ## Historical record (rounds up to 47; superseded by the match above)
 
-# Class866E8__SetFootprintRect — STALL: length EXACT 52/52; 22/52 raw word-match (round 47, up from 19/52); first real diff at word 5 (vram 0x8004B044, the oversized frame)
+### (old title) Class866E8__SetFootprintRect — STALL: length EXACT 52/52; 22/52 raw word-match (round 47, up from 19/52); first real diff at word 5 (vram 0x8004B044, the oversized frame)
 
 > Renamed from `func_8004B030` on 2026-09-22 (tools/rename.py). Address 0x8004b030.
 

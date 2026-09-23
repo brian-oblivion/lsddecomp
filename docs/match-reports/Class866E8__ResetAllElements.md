@@ -1,4 +1,47 @@
-# Class866E8__ResetAllElements — STALL
+# Class866E8__ResetAllElements — MATCHED round 71 (charlie): 74/74, byte-exact, whole-image SHA1 green
+
+REVISITED, round 71: MATCHED (first build of a rewrite); names/types used
+(existing `UnkSlotEntry_3ac78` / `UnkSlotListObj_3ac78` fields, no struct edit).
+
+## Round 71 (charlie) — the match
+
+**Rebuilt as given first.** The preserved `#if 0` body from `src/` rebuilt
+at **9/74, insertions 45 / deletions 45, 64 positional skeleton diffs**,
+correct length. The title's "correct size" was current; its CAUSE
+("scheduling-only, the offset increment keeps landing in the wrong delay
+slot") was wrong. Reading the diff: the whole register assignment was
+shifted by one saved register (retail uses five: self, i, offset, entry,
+list; the old body used four), and `entry->list` was reloaded after the
+release call instead of held.
+
+**Two levers, both source-shape, no permuter:**
+
+1. Write `entry = &self->elems[i];`, not
+   `entry = (UnkSlotEntry_3ac78 *)((u8 *)self + offset); offset += 0x1C;`.
+   GCC 2.6.3's loop strength reduction turns the array index into exactly
+   retail's `addu s0, s2, s4` with a running `0xEC + 0x1C*i` in `s4`, and
+   it schedules the `addiu s4, s4, 0x1C` into the `beqz` delay slot on its
+   own. The hand-rolled offset was a transcription of the strength-reduced
+   asm, and GCC does not re-derive the same schedule from it.
+2. Hold `list = entry->list;` in a local: retail loads it once into `s1`
+   and reuses it for the store-back after `release`.
+
+The matched C is the live definition in `src/class_3ac78.c`.
+
+### Proposed learning
+
+A base-plus-running-offset loop in the asm (`addu sN, self, sOff` with
+`sOff` stepping by the element size) is GCC's strength reduction of
+`&self->array[i]`, and the source should say `&self->array[i]`. Writing the
+byte offset by hand reproduces the arithmetic but not the schedule. (Candidate
+for DECOMPILATION_LEARNINGS if it has not already been written down; check
+for an existing entry on strength reduction first.)
+
+---
+
+## Historical record (superseded by the match above)
+
+### (old title) Class866E8__ResetAllElements — STALL
 
 > Renamed from `func_8004ABD0` on 2026-09-22 (tools/rename.py). Address 0x8004abd0.
 
