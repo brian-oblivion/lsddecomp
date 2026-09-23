@@ -26,7 +26,7 @@ smaller handlers established individually:
      (`Unk94Methods::slot100`) that can reset `this->unkFC`/`this->unk44`.
    - `== 0xC`: single `unkFC == 0x7BC` check, sets `row`.
    - `== 0xD`: `this->unk48 = -0x78;` + `Class6B5CC__FaceTarget(...)` +
-     `slot48(this, 1, D_80089DD8)` (return discarded) + a `slot144`
+     `slot48(this, 1, SCALE_HALF)` (return discarded) + a `slot144`
      threshold check (the SAME 2-argument `slot144` established in
      `Entity__IsTargetInRange`/`Entity__MoodCue12`) gating a `slot30(this, 0xB)` call.
 4. `if (this->unkFC == 0x618) { ... coin flip sets unk44/row ... }`
@@ -89,13 +89,13 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xB) {
         if (this->unkFC == 0xA8C) {
-            row = D_80089C94;
+            row = ROTATION_YAW_MINUS90;
         }
         if (this->unkFC == 0xC6C) {
-            row = D_80089C88;
+            row = ROTATION_YAW_PLUS90;
         }
         if (this->unkFC == 0xE10) {
-            row = D_80089C94;
+            row = ROTATION_YAW_MINUS90;
         }
         if ((u32)(this->unkFC - 0xD5D) < 0x78) {
             if (this->unk94->methods->slot100(this->unk94) != 0) {
@@ -105,22 +105,22 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->unk44 == 0xC) {
         if (this->unkFC == 0x7BC) {
-            row = D_80089C94;
+            row = ROTATION_YAW_MINUS90;
         }
     } else if (this->unk44 == 0xD) {
         this->unk48 = -0x78;
         Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
-        this->methods->slot48(this, 1, D_80089DD8);
+        this->methods->slot48(this, 1, SCALE_HALF);
         if (this->methods->slot144(this, this->unk94) < 0x400) {
             this->methods->slot30(this, 0xB);
         }
     }
     if (this->unkFC == 0x618) {
         if ((rand() & 1) != 0) {
-            row = D_80089C88;
+            row = ROTATION_YAW_PLUS90;
             this->unk44 = 0xB;
         } else {
-            row = D_80089C94;
+            row = ROTATION_YAW_MINUS90;
             this->unk44 = 0xC;
         }
     }

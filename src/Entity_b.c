@@ -5,16 +5,16 @@
  * call as an opaque argument -- never dereferenced here, so an opaque byte
  * array is enough to form &D_8008xxxx correctly. Real element type/count
  * unknown. */
-extern u8 D_80089DD8[];
-extern u8 D_80089DF0[];
-extern u8 D_80089D78[];
-extern u8 D_80089CA0[];
-extern u8 D_80089C94[];
-extern u8 D_80089C88[];
-extern u8 D_80089D3C[];
-extern u8 D_80089DA8[];
-extern u8 D_80089CE8[];
-extern u8 D_80089CF4[];
+extern u8 SCALE_HALF[];
+extern u8 SCALE_DOUBLE[];
+extern u8 TRANSLATE_Y_MINUS64[];
+extern u8 ROTATION_YAW_PLUS2[];
+extern u8 ROTATION_YAW_MINUS90[];
+extern u8 ROTATION_YAW_PLUS90[];
+extern u8 TRANSLATE_Y_PLUS256[];
+extern u8 TRANSLATE_Y_PLUS64_Z_MINUS64[];
+extern u8 ROTATION_YAW_MINUS120[];
+extern u8 ROTATION_X50_YMINUS120_Z30[];
 
 s32 Entity__UpdateTargetProximity(Entity *this) {
     EntityMoodRow *row;
@@ -147,16 +147,16 @@ void Entity__MoodCue00(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer < 0x64) {
             this->methods->slotC4(this, 0x32, 0);
         } else if (this->moodTimer < 0xFA) {
-            this->methods->addVec14(this, D_80089DA8);
+            this->methods->addVec14(this, TRANSLATE_Y_PLUS64_Z_MINUS64);
         }
     } else if (this->moodTimer == 0xFA) {
         this->methods->slot130(this);
         out->unk1C = -2;
     } else if (this->moodTimer >= 0x105 && this->moodTimer < 0x238) {
         this->methods->slotC4(this, -0x32, 0);
-        this->methods->slot44(this, 1, D_80089CE8);
+        this->methods->slot44(this, 1, ROTATION_YAW_MINUS120);
     } else if (this->moodTimer >= 0x239) {
-        this->methods->slot44(this, 1, D_80089CF4);
+        this->methods->slot44(this, 1, ROTATION_X50_YMINUS120_Z30);
     }
 }
 
@@ -195,11 +195,11 @@ void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
         out->unk48 = -0x1;
     }
     if (this->moodTimer >= 0x79) {
-        this->methods->slot44(this, 0, D_80089CA0);
+        this->methods->slot44(this, 0, ROTATION_YAW_PLUS2);
         this->methods->slotC4(this, -0x140, 0);
     } else if (this->moodTimer >= 0x38 ||
                Entity__IsNearTarget(this, &this->unk14->x, 1, 1) != 0) {
-        this->methods->addVec14(this, D_80089D78);
+        this->methods->addVec14(this, TRANSLATE_Y_MINUS64);
     } else if (this->moodTimer >= 0xA) {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         this->methods->slotC4(this, -0x100, 0);
@@ -209,8 +209,8 @@ void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue08(Entity *this) {
-    this->methods->slot48(this, 1, D_80089DF0);
-    this->methods->addVec14(this, D_80089D78);
+    this->methods->slot48(this, 1, SCALE_DOUBLE);
+    this->methods->addVec14(this, TRANSLATE_Y_MINUS64);
 }
 
 void Entity__MoodCue09(Entity *this, EntityMoodHandlerArg *out) {
@@ -243,13 +243,13 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xB) {
         if (this->moodTimer == 0xA8C) {
-            row = D_80089C94;
+            row = ROTATION_YAW_MINUS90;
         }
         if (this->moodTimer == 0xC6C) {
-            row = D_80089C88;
+            row = ROTATION_YAW_PLUS90;
         }
         if (this->moodTimer == 0xE10) {
-            row = D_80089C94;
+            row = ROTATION_YAW_MINUS90;
         }
         if ((u32)(this->moodTimer - 0xD5D) < 0x78) {
             if (this->target->methods->slot100(this->target) != 0) {
@@ -259,22 +259,22 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->unk44 == 0xC) {
         if (this->moodTimer == 0x7BC) {
-            row = D_80089C94;
+            row = ROTATION_YAW_MINUS90;
         }
     } else if (this->unk44 == 0xD) {
         this->unk48 = -0x78;
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-        this->methods->slot48(this, 1, D_80089DD8);
+        this->methods->slot48(this, 1, SCALE_HALF);
         if (this->methods->slot144(this, this->target) < 0x400) {
             this->methods->notifyParents(this, 0xB);
         }
     }
     if (this->moodTimer == 0x618) {
         if ((rand() & 1) != 0) {
-            row = D_80089C88;
+            row = ROTATION_YAW_PLUS90;
             this->unk44 = 0xB;
         } else {
-            row = D_80089C94;
+            row = ROTATION_YAW_MINUS90;
             this->unk44 = 0xC;
         }
     }
@@ -363,18 +363,18 @@ void Entity__MoodCue16(Entity *this) {
             this->methods->slotC4(this, -0x5A, 0);
         } else if (this->moodTimer == 0x40) {
             roll = rand() & 1;
-            arg2 = D_80089C94;
+            arg2 = ROTATION_YAW_MINUS90;
             if (roll != 0) {
-                arg2 = D_80089C88;
+                arg2 = ROTATION_YAW_PLUS90;
             }
             this->methods->slot44(this, 0, arg2);
-            this->methods->addVec14(this, D_80089D3C);
+            this->methods->addVec14(this, TRANSLATE_Y_PLUS256);
         } else {
             this->methods->slotD0(this, -0x176, rand() % 2);
         }
     } else if (this->unk44 == 0xB) {
         if (this->moodTimer % 5 == 0) {
-            this->methods->slot44(this, 0, D_80089C88);
+            this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);
         }
         this->methods->slotC4(this, -0x800, 0);
         this->methods->slot60(this, (rand() % 7) == 0);
@@ -382,5 +382,5 @@ void Entity__MoodCue16(Entity *this) {
 }
 
 s32 Entity__MoodCue17(Entity *this) {
-    return this->methods->slot48(this, 1, D_80089DD8);
+    return this->methods->slot48(this, 1, SCALE_HALF);
 }

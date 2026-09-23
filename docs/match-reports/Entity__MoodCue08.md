@@ -9,8 +9,8 @@ whole-image build verified byte-exact)
 
 A short two-call dispatcher, not itself a `gEntityMoodHandlerTable` table entry (no
 `EntityMoodHandlerArg` argument): `this->methods->slot48(this, 1,
-D_80089DF0)` followed by `this->methods->slotBC(this, D_80089D78)`. Both
-`D_80089DD8`/`D_80089DF0`/`D_80089D78` are opaque data blobs only ever
+SCALE_DOUBLE)` followed by `this->methods->slotBC(this, TRANSLATE_Y_MINUS64)`. Both
+`SCALE_HALF`/`SCALE_DOUBLE`/`TRANSLATE_Y_MINUS64` are opaque data blobs only ever
 address-taken (never dereferenced) by this unit's functions, so they are
 declared as plain `u8[]` in `Entity_b.c`.
 
@@ -22,8 +22,8 @@ than `void`.
 
 ```c
 void Entity__MoodCue08(Entity *this) {
-    this->methods->slot48(this, 1, D_80089DF0);
-    this->methods->slotBC(this, D_80089D78);
+    this->methods->slot48(this, 1, SCALE_DOUBLE);
+    this->methods->slotBC(this, TRANSLATE_Y_MINUS64);
 }
 ```
 

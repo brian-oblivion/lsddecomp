@@ -63,7 +63,7 @@ struct EntityMethods {
     /* +0x30 */ void (*notifyParents)(Entity *self, s32 arg1);   /* called by Entity__SetUnkF4, Entity__NotifyIfTargetInRange */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
     /* +0x40 */ void (*initState)(Entity *self);              /* self-only slot: occupant is Entity__InitState (tools/classtable.py), called by Entity__Entity right after this->methods is (re)assigned */
-    /* +0x44 */ void (*slot44)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue07 as slot44(this, 0, D_80089CA0) */
+    /* +0x44 */ void (*slot44)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue07 as slot44(this, 0, ROTATION_YAW_PLUS2) */
     /* +0x48 */ s32 (*slot48)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue08 (result discarded) and Entity__MoodCue17 (a tail call that returns it), both with arg1==1 -- see CLAUDE.md's "one-line wrapper" rule, Entity__MoodCue17 has no positive evidence of void */
     /* +0x4C */ u8 pad4C[0x60 - 0x4C];
     /* +0x60 */ void (*slot60)(Entity *self, s32 arg1);   /* called by Entity__Activate, Entity__Deactivate */
@@ -162,7 +162,7 @@ extern Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2
  * share a numeric offset; do not conflate them. */
 struct Unk94Methods {
     u8 pad000[0x44];
-    void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by func_80060B34 (Entity_d) as slot44(target, 1, D_80089C94); return value unused at this, its only known call site */
+    void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by func_80060B34 (Entity_d) as slot44(target, 1, ROTATION_YAW_MINUS90); return value unused at this, its only known call site */
     u8 pad048[0x94 - 0x48];
     void (*slot94)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80065238 (Entity_g), twice, as slot94(target, 0, 2) and slot94(target, 0, 7); return value unused at either call site */
     u8 pad098[0xB8 - 0x98];

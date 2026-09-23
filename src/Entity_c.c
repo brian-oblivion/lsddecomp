@@ -12,16 +12,16 @@
 
 extern u8 D_80089E38[];
 extern u8 D_80089E50[];
-extern u8 D_80089DF0[];
+extern u8 SCALE_DOUBLE[];
 extern u8 D_80089DCC[];
-extern u8 D_80089CA0[];
+extern u8 ROTATION_YAW_PLUS2[];
 extern u8 D_80089C64[];
 extern u8 D_80089C70[];
 extern u8 D_80089C58[];
 extern u8 D_80089E74[];
 extern u8 D_80089D18[];
 extern u8 D_80089DB4[];
-extern u8 D_80089D78[];
+extern u8 TRANSLATE_Y_MINUS64[];
 extern u8 D_80089D9C[];
 extern u8 D_80089D48[];
 extern u8 D_80089D60[];
@@ -74,7 +74,7 @@ void func_8005F1D4(Entity *this) {
             this->moodTimer = 0;
         }
         if (this->moodTimer >= 7) {
-            this->methods->addVec14(this, D_80089D78);
+            this->methods->addVec14(this, TRANSLATE_Y_MINUS64);
             this->methods->slotC4(this, 0xA, 0);
         } else {
             this->methods->addVec14(this, D_80089D9C);
@@ -84,7 +84,7 @@ void func_8005F1D4(Entity *this) {
     } else if (this->moodTimer < 0x41) {
         this->methods->addVec14(this, D_80089D60);
     } else if (this->moodTimer < 0x47) {
-        this->methods->addVec14(this, D_80089D78);
+        this->methods->addVec14(this, TRANSLATE_Y_MINUS64);
         this->methods->slotC4(this, -0x1E, 0);
     } else {
         EntityMethods *methods = this->methods;
@@ -104,8 +104,8 @@ void func_8005F368(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 7;
         out->unk20 = -2;
     }
-    this->methods->slot48(this, 1, D_80089DF0);
-    this->methods->slot44(this, 0, D_80089CA0);
+    this->methods->slot48(this, 1, SCALE_DOUBLE);
+    this->methods->slot44(this, 0, ROTATION_YAW_PLUS2);
     this->methods->slotC4(this, -0x200, 0);
 }
 
@@ -199,7 +199,7 @@ void func_8005F800(Entity *this) {
     }
 
     if (this->unk44 == 0xC) {
-        this->methods->slot48(this, 1, D_80089DF0);
+        this->methods->slot48(this, 1, SCALE_DOUBLE);
         this->methods->slotCC(this, -0x1E, 0);
     } else {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
@@ -306,7 +306,7 @@ void func_8005FC58(Entity *this) {
     (*slotC4)(this, arg1c, 0);
 
     if (rem500 < 0x20) {
-        this->methods->addVec14(this, D_80089D78);
+        this->methods->addVec14(this, TRANSLATE_Y_MINUS64);
     } else if (rem500 < 0x40) {
         this->methods->addVec14(this, D_80089D60);
     }
@@ -320,7 +320,7 @@ void func_8005FDFC(Entity *this) {
         roll = rand();
         arg2 = D_80089E38;
         if ((roll & 1) != 0) {
-            arg2 = D_80089DF0;
+            arg2 = SCALE_DOUBLE;
         }
         this->methods->slot48(this, 1, arg2);
         this->unk44 = 0xB;

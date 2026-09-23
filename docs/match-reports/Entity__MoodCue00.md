@@ -21,11 +21,11 @@ range test that turned out to be exactly what retail compiled:
 4. Else (`this->unk44 != 0`), a four-way `this->unkFC` dispatch:
    - `< 0xFA` (250): the SAME `out->unk4 % 10` check as step 3, THEN its own
      inner two-way split (`< 0x64` -> `slotC4(this, 0x32, 0)`; else
-     `slotBC(this, D_80089DA8)`).
+     `slotBC(this, TRANSLATE_Y_PLUS64_Z_MINUS64)`).
    - `== 0xFA`: `slot130(this)`, `out->unk1C = -2`.
    - `>= 0x105 && < 0x238`: `slotC4(this, -0x32, 0)` then
-     `slot44(this, 1, D_80089CE8)`.
-   - `>= 0x239`: `slot44(this, 1, D_80089CF4)`.
+     `slot44(this, 1, ROTATION_YAW_MINUS120)`.
+   - `>= 0x239`: `slot44(this, 1, ROTATION_X50_YMINUS120_Z30)`.
 
 ## The "redundant" range test that isn't reachable-code noise
 
@@ -49,8 +49,8 @@ needed since the literal transcription matched immediately.
   the same `Unk94Obj` vtable `Entity__MoodCue01.md`/`Entity__IsTargetInRange.md`
   established; padded out to `+0x200` with no other slots resolved in
   between (nothing else in this unit reaches that far into the table yet).
-- Three more `D_8008xxxx` opaque data-row externs: `D_80089DA8`,
-  `D_80089CE8`, `D_80089CF4`.
+- Three more `D_8008xxxx` opaque data-row externs: `TRANSLATE_Y_PLUS64_Z_MINUS64`,
+  `ROTATION_YAW_MINUS120`, `ROTATION_X50_YMINUS120_Z30`.
 
 ## Final C
 
@@ -82,16 +82,16 @@ void Entity__MoodCue00(Entity *this, EntityMoodHandlerArg *out) {
         if (this->unkFC < 0x64) {
             this->methods->slotC4(this, 0x32, 0);
         } else if (this->unkFC < 0xFA) {
-            this->methods->slotBC(this, D_80089DA8);
+            this->methods->slotBC(this, TRANSLATE_Y_PLUS64_Z_MINUS64);
         }
     } else if (this->unkFC == 0xFA) {
         this->methods->slot130(this);
         out->unk1C = -2;
     } else if (this->unkFC >= 0x105 && this->unkFC < 0x238) {
         this->methods->slotC4(this, -0x32, 0);
-        this->methods->slot44(this, 1, D_80089CE8);
+        this->methods->slot44(this, 1, ROTATION_YAW_MINUS120);
     } else if (this->unkFC >= 0x239) {
-        this->methods->slot44(this, 1, D_80089CF4);
+        this->methods->slot44(this, 1, ROTATION_X50_YMINUS120_Z30);
     }
 }
 ```

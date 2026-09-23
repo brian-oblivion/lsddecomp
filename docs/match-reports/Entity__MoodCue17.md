@@ -9,7 +9,7 @@ whole-image build verified byte-exact)
 
 Another `gEntityMoodHandlerTable` mood-dispatch table entry (see `Entity__MoodCue05`'s
 report), but a one-line tail-call wrapper: `return this->methods->slot48(this,
-1, D_80089DD8);`. `slot48` is shared with `Entity__MoodCue08` (same offset, same
+1, SCALE_HALF);`. `slot48` is shared with `Entity__MoodCue08` (same offset, same
 literal `1` first argument), which discards the result — but per CLAUDE.md's
 "one-line wrapper" rule, a discarded return at ONE call site is never evidence
 the callee is `void`, and this call site's own bytes (the vtable call is the
@@ -21,7 +21,7 @@ afterward) are consistent with the return value flowing straight through.
 
 ```c
 s32 Entity__MoodCue17(Entity *this) {
-    return this->methods->slot48(this, 1, D_80089DD8);
+    return this->methods->slot48(this, 1, SCALE_HALF);
 }
 ```
 

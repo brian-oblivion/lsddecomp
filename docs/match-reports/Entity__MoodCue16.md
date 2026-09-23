@@ -16,12 +16,12 @@ words, whole-image build verified byte-exact)
 2. If `this->unk44 == 0`, three-way dispatch on `this->unkFC`:
    - `< 0x40` (64): `this->methods->slotC4(this, -0x5A, 0);`
    - `== 0x40`: rolls `rand() & 1` to pick between two data rows
-     (`D_80089C94` default, `D_80089C88` on a hit), calls
+     (`ROTATION_YAW_MINUS90` default, `ROTATION_YAW_PLUS90` on a hit), calls
      `this->methods->slot44(this, 0, arg2);` then
-     `this->methods->slotBC(this, D_80089D3C);`
+     `this->methods->slotBC(this, TRANSLATE_Y_PLUS256);`
    - `> 0x40`: `this->methods->slotD0(this, -0x176, rand() % 2);`
 3. Else if `this->unk44 == 0xB`: if `this->unkFC % 5 == 0`, calls
-   `this->methods->slot44(this, 0, D_80089C88);`; unconditionally calls
+   `this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);`; unconditionally calls
    `this->methods->slotC4(this, -0x800, 0);` then
    `this->methods->slot60(this, (rand() % 7) == 0);`.
 
@@ -38,7 +38,7 @@ don't imply a shared occupant.
 directly against the existing `void (*slot60)(Entity *self, s32 arg1)`.
 
 Three more `D_8008xxxx` opaque data rows declared at the top of this file:
-`D_80089C94`, `D_80089C88`, `D_80089D3C`.
+`ROTATION_YAW_MINUS90`, `ROTATION_YAW_PLUS90`, `TRANSLATE_Y_PLUS256`.
 
 ## Final C
 
@@ -57,18 +57,18 @@ void Entity__MoodCue16(Entity *this) {
             this->methods->slotC4(this, -0x5A, 0);
         } else if (this->unkFC == 0x40) {
             roll = rand() & 1;
-            arg2 = D_80089C94;
+            arg2 = ROTATION_YAW_MINUS90;
             if (roll != 0) {
-                arg2 = D_80089C88;
+                arg2 = ROTATION_YAW_PLUS90;
             }
             this->methods->slot44(this, 0, arg2);
-            this->methods->slotBC(this, D_80089D3C);
+            this->methods->slotBC(this, TRANSLATE_Y_PLUS256);
         } else {
             this->methods->slotD0(this, -0x176, rand() % 2);
         }
     } else if (this->unk44 == 0xB) {
         if (this->unkFC % 5 == 0) {
-            this->methods->slot44(this, 0, D_80089C88);
+            this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);
         }
         this->methods->slotC4(this, -0x800, 0);
         this->methods->slot60(this, (rand() % 7) == 0);
@@ -78,8 +78,8 @@ void Entity__MoodCue16(Entity *this) {
 
 ## Attempt log
 
-Two attempts. First attempt wrote `arg2 = D_80089C94; if ((rand() & 1) !=
-0) { arg2 = D_80089C88; }` directly (default assignment textually before the
+Two attempts. First attempt wrote `arg2 = ROTATION_YAW_MINUS90; if ((rand() & 1) !=
+0) { arg2 = ROTATION_YAW_PLUS90; }` directly (default assignment textually before the
 `rand()` call). This compiled the default assignment BEFORE the `jal rand`
 in the RTL, forcing `arg2`'s live range across the call and promoting it
 into a callee-saved register (`$s1`) — 2 extra words (a spurious
@@ -89,7 +89,7 @@ on the built ELF confirmed `Entity__MoodCue17` landed 8 bytes past retail).
 Retail computes the default assignment AFTER `rand()` returns, keeping
 `arg2` entirely in caller-saved `$a2` with no register pressure across the
 call. Hoisting the `rand()` call into its own statement BEFORE the default
-assignment (`roll = rand() & 1; arg2 = D_80089C94; if (roll != 0) ...`)
+assignment (`roll = rand() & 1; arg2 = ROTATION_YAW_MINUS90; if (roll != 0) ...`)
 matched immediately — with the call now textually first, GCC's RTL for the
 default assignment falls after it, and no callee-saved register is needed.
 
