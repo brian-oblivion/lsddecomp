@@ -4,13 +4,13 @@
 
 ## What it does
 
-`Class6B5CC` vtable slot `+0x014`, mirror of `func_8001CC48` (`+0x010`).
+`Class6B5CC` vtable slot `+0x014`, mirror of `Class6B5CC__AddChild` (`+0x010`).
 If `other`'s vtable header tag is `9`, first calls `Class6B5CC__UnlinkModel(self)`
 (zeroes `self->unk18`/`self->unk20` -- MEASURED from its own disassembly,
 see `include/code_d294.h`), THEN unconditionally forwards to the base
 class's own `+0x014` slot (`Get_vtable_BasicClass()->slot14`). "Detach" to
-`func_8001CC48`'s "attach": the pre-work happens before the base call here,
-where `func_8001CC48` did its post-work after.
+`Class6B5CC__AddChild`'s "attach": the pre-work happens before the base call here,
+where `Class6B5CC__AddChild` did its post-work after.
 
 ## The C
 

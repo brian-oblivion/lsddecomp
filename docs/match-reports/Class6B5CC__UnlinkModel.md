@@ -38,5 +38,5 @@ No new struct or vtable-slot knowledge.
   `Class6B5CC__LinkModel` is A.
 - Its one dispatch path supports the pairing: `func_8001CD20` (code_d294.c)
   forwards `Class6B5CCMethods::slot18` straight into it, while
-  `func_8001CC48` -- the +0x010 slot -- is what forwards into
+  `Class6B5CC__AddChild` -- the +0x010 slot -- is what forwards into
   `Class6B5CC__LinkModel`.

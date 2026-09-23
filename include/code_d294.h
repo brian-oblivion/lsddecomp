@@ -7,7 +7,7 @@
  * 55-function segment never carved before. `tools/classtable.py D_8006B5CC`
  * shows this unit's own method table starts at D_8006B5CC and its slots,
  * in order, ARE this unit's functions: +0x008 Class6B5CC__Class6B5CC (ctor),
- * +0x00C Class6B5CC__Finalize (dtor), +0x010 func_8001CC48, +0x014 func_8001CCB4,
+ * +0x00C Class6B5CC__Finalize (dtor), +0x010 Class6B5CC__AddChild, +0x014 func_8001CCB4,
  * +0x018 func_8001CD20, [+0x01C..+0x038 seven slots inherited verbatim from
  * BasicClass, D_8006B58C], +0x038 func_8001CD60 (override), +0x03C null,
  * +0x040 func_8001CE30, +0x044 func_8001CEB4, +0x048 func_8001D008,
@@ -281,9 +281,9 @@ struct BasicClassMethodsD294 {
     void *unk04;               /* +0x004 */
     void *(*ctor)(void *self); /* +0x008 */
     void *(*dtor)(void *self); /* +0x00C */
-    /* +0x010/+0x014, both round-2 finds (func_8001CC48/func_8001CCB4):
+    /* +0x010/+0x014, both round-2 finds (Class6B5CC__AddChild/func_8001CCB4):
      * a `(self, other)` pair this class's own +0x010/+0x014 overrides
-     * (func_8001CC48/func_8001CCB4) forward to unconditionally, after/before
+     * (Class6B5CC__AddChild/func_8001CCB4) forward to unconditionally, after/before
      * their own extra work. Real BasicClass-level meaning unknown from
      * this unit alone. */
     void (*slot10)(void *self, void *other); /* +0x010 */
@@ -361,7 +361,7 @@ typedef struct GenericObj_d294 GenericObj_d294;
  * Class6B5CC__TryAttachNearby) can be typed to it. */
 typedef struct GenericCountList_d294 GenericCountList_d294;
 struct GenericMethods_d294 {
-    s32 header;                  /* +0x000, low nibble is a class-tag; func_8001CC48/CCB4 compare it against 9 */
+    s32 header;                  /* +0x000, low nibble is a class-tag; Class6B5CC__AddChild/CCB4 compare it against 9 */
     u8 pad004[0x010 - 0x004];
     /* +0x010, round 13 (Class6B5CC__NotifyTaggedParents): dispatched as `(entry, arg)` where
      * `entry` is the receiver itself and `arg` is Class6B5CC__NotifyTaggedParents's own
@@ -542,7 +542,7 @@ struct Class6B5CCObj {
     Class6B5CCSub14 *unk14;     /* +0x014, the ctor's 0x50-byte allocation */
     s32 unk18;                  /* +0x018, zeroed by the ctor */
     u8 unk1C[0x020 - 0x01C];    /* unknown; not touched by this unit's chosen functions */
-    /* +0x020, zeroed by the ctor. func_8001CC48's still-queued forward
+    /* +0x020, zeroed by the ctor. Class6B5CC__AddChild's still-queued forward
      * target Class6B5CC__LinkModel (code_d294_b.s) stores its own 2nd argument into
      * this offset. RETYPED round 12 (code_d294_b, Class6B5CC__ReadUnk20Data): that
      * function passes `self->unk20` straight through as func_8001F51C's own
@@ -725,7 +725,7 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 extern Class6B5CCObj *New_Class6B5CC(void);
 void *Class6B5CC__Class6B5CC(Class6B5CCObj *self);
 void Class6B5CC__Finalize(Class6B5CCObj *self);
-void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other);
+void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other);
 void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other);
 void func_8001CD20(Class6B5CCObj *self);
 void func_8001CE30(Class6B5CCObj *self);

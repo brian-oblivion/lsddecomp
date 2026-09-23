@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001E770` on 2026-09-17 (tools/rename.py). Address 0x8001e770.
 
-Unit: `code_d294_c` (round 14). Called by `func_8001CC48` (`code_d294.c`)
+Unit: `code_d294_c` (round 14). Called by `Class6B5CC__AddChild` (`code_d294.c`)
 as its conditional forward target when `other`'s vtable-header tag is 9.
 Stores `other` into `self->unk20`, copies one field out of it, then calls
 the Psy-Q `GsLinkObject4` through a pointer computed off `other->unkC`.

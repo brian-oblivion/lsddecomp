@@ -1,4 +1,6 @@
-# func_8001CC48
+# Class6B5CC__AddChild
+
+> Renamed from `func_8001CC48` on 2026-09-23 (tools/rename.py). Address 0x8001cc48.
 
 **Unit:** code_d294 · **Size:** 27 words · **Status:** MATCHED (27/27 words)
 
@@ -15,7 +17,7 @@ slice). Its sibling `func_8001CCB4` (`+0x014`) is the mirror-image
 ## The C
 
 ```c
-void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     Get_vtable_BasicClass()->slot10(self, other);
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__LinkModel(self, other);

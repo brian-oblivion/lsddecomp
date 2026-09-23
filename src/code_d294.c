@@ -50,7 +50,7 @@ void Class6B5CC__Finalize(Class6B5CCObj *self) {
     Get_vtable_BasicClass()->dtor(self);
 }
 
-void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other) {
+void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     Get_vtable_BasicClass()->slot10(self, other);
     if ((other->methods->header & 0xF) == 9) {
         Class6B5CC__LinkModel(self, other);
