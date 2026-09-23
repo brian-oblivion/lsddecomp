@@ -174,3 +174,24 @@ Two, both stated above as the generalizable versions:
   consequence at all. When two writes to different fields/locals show up
   swapped in a residue, try swapping their SOURCE statement order before
   reaching for anything more elaborate.
+
+## Naming
+
+`Entity__MoodCue11` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E7F8`.
+
+`gEntityMoodHandlerTable` row 11. Body: `unk48 = -20`, sets the attenuation, and requests voice 0 tone 10 (pitch 1) every half `unk80` period. A three-phase `unk44` machine: phase 0xB turns +/-90 degrees at fixed moodTimer values and, inside a 0x78-tick window from 0xD5D, moves to phase 0xD (moodTimer reset) when the target's slot +0x100 is non-zero. Phase 0xC turns at 0x7BC. Phase 0xD sets `unk48 = -120`, faces the target, sets `updateScale(1, SCALE_HALF)`, and calls `notifyParents(this, 0xB)` once `distanceToRegion` to the target is below 0x400. At 0x618 a coin flip picks phase 0xB (+90) or 0xC (-90). Each tick it applies the chosen turn with `updateRotation(0, row)`, runs slot +0xD0 with `unk48`, and outside phase 0xC runs slot +0xCC(-0xC8) when `unk28` is set.
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `func_8002CD08` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.
+
+## Proposed field names
+
+All of these are cross-unit (the compiler lists accessors in several Entity_* units), so they are proposals only:
+
+| member | proposed | tier | evidence |
+| --- | --- | --- | --- |
+| `EntityMethods::slotC4` (+0xC4) | `moveLocalZ` | B | occupant `BaseObjO__func_5748c` = `DreamSys__ApplyOffsetSlotAndNotify(self, &D_8008ABA8, v, extra, 6)`. D_8008ABA8 is element [2] of the s16 triple at D_8008ABA4 that the helper hands to `BaseObjO__ApplyRotatedVec14`, so it is a translation of `v` along local z. Handlers call it with small signed speeds every tick |
+| `EntityMethods::slotCC` (+0xCC) | `moveLocalY` | B | occupant `DreamSys__ApplyOffsetSlot1`: element [1] of the same triple |
+| `EntityMethods::slotD0` (+0xD0) | `moveLocalZAndLink` | B | occupant `DreamSys__DispatchOffsetSlotC4`: runs +0xC4 (moveLocalZ) through `DreamSys__ApplyOffsetOrFindNearby`, which falls back to `DreamSys__FindNearbyLink` |
+| `EntityMethods::slot144` (+0x144) | `distanceToRegion` | B | occupant `Entity__DistanceToRegion`, named after the method per the slot convention. See `Entity__IsTargetInRange.md` for why that occupant's own name may need sharpening |
+| `Entity::unk44` (+0x44) | `moodState` | B | a small per-mood phase code: set to 0xB/0xC/0xD/100 and compared by the MoodCue callbacks, incremented by MoodCue13, and ==1 gates Entity__UpdateActivationState and Entity__UpdateSoundCueStart |
+| `Entity::unk48` (+0x48, s16) | `moveStep` | B | written -20/-120 by this function and passed as slot +0xD0's distance. Only if slotD0 = moveLocalZAndLink is accepted |

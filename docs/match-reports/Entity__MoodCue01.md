@@ -104,3 +104,11 @@ through a field whose OWN class isn't pinned down, check whether the same
 offset is already spoken for on `this`'s own table — and if the two call
 sites disagree on arity, that is itself evidence they are different tables,
 not evidence one of them is wrong.
+
+## Naming
+
+`Entity__MoodCue01` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E3C4`.
+
+`gEntityMoodHandlerTable` row 1. Body: attenuation 0. On tick 0 it requests tone 0x14 on all three voices and calls the target's slot +0x130 with 1. Every tick it faces the target and moves -0x5A along local z. At moodTimer 30 it calls `notifyParents(this, 0xA)`.
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `func_8002CD08` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.

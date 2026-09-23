@@ -116,3 +116,20 @@ first result, the straightforward reading (transcribe both tests as
 written) is correct and should be tried BEFORE reaching for a `goto`,
 `switch`, or collapsed `else` — collapsing it is tempting because it reads
 as "cleaner" C, but it changes the source shape retail actually has.
+
+## Naming
+
+`Entity__MoodCue00` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E160`.
+
+`gEntityMoodHandlerTable` row 0. Body: on tick 0, if the target's slot +0x200 returns 5, it sets `unk44 = 100`. It sets the attenuation. With `unk44 == 0` it requests voice 0 tone 5 (pitch -2) every 10th tick and moves along local z (slot +0xC4) +0x32 below moodTimer 0x4B0 and -0x32 from there, resetting moodTimer to -1 at 0x960, so it paces back and forth. With `unk44 != 0` it runs a timeline: below 250 the same tone plus a +0x32 move (below 100) or a `TRANSLATE_Y_PLUS64_Z_MINUS64` step; at 250 slot +0x130 and voice 0 stop (-2); from 0x105 to 0x237 a -0x32 move and `updateRotation(1, ROTATION_YAW_MINUS120)`; from 0x239 `updateRotation(1, ROTATION_X50_YMINUS120_Z30)`.
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `func_8002CD08` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.
+
+## Proposed field names
+
+Slots of `EntityMethods` (include/Entity.h). The compiler lists accessors in Entity_b through Entity_g for each of them, so they are proposals only:
+
+| slot | proposed | tier | evidence |
+| --- | --- | --- | --- |
+| `slot44` (+0x44) | `updateRotation` | B | occupant `func_8001CEB4` (`tools/classtable.py ENTITY_METHODS`), the same function the head named `Class6B5CCMethods::updateRotation` in round 70. Every data argument here is a {num, den} degree triple (ROTATION_YAW_*), flag 1 = set, 0 = add |
+| `slot48` (+0x48) | `updateScale` | B | occupant `func_8001D008`, round 70's `Class6B5CCMethods::updateScale`; arguments SCALE_HALF / SCALE_DOUBLE |

@@ -63,3 +63,15 @@ comparison's polarity.** `Entity__UpdateTargetProximity`/`Entity__UpdateSoundCue
 calls its own (`slot16C`) when the SAME callee returns `== 0`. Do not
 transcribe a sibling's condition polarity without checking the actual
 `bnez`/`beqz` in the function under test.
+
+## Naming
+
+`Entity__UpdateSoundCueStop` -- tier A (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E0B0`.
+
+ENTITY_METHODS +0x180; `Entity__Update` calls it only when +0x17C (`Entity__UpdateSoundCueStart`) returned non-zero. While `active` with a cue running, and only when the row's `cueRange` is NEGATIVE, it calls `stopSoundCue` (+0x16C, `Entity__StopSoundCue`) once the target is no longer within `|cueRange|`. It returns `soundCueActive`. The stop half of the pair named above.
+
+## Proposed field names
+
+| member | proposed | tier | evidence |
+| --- | --- | --- | --- |
+| `EntityMethods::slot180` (+0x180) | `updateSoundCueStop` | A | occupant is this function; only accessor is Entity__Update (Entity.c), so it is cross-unit |

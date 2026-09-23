@@ -66,3 +66,17 @@ See `Entity__UpdateTargetProximity`'s report for the two levers (`Entity__IsNear
 parameter width, and the "eager pointer into its own local, in statement
 order" scheduling lever) — both generalized cleanly to this sibling with zero
 adaptation needed.
+
+## Naming
+
+`Entity__UpdateSoundCueStart` -- tier A (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005DEE0`.
+
+ENTITY_METHODS +0x17C; `Entity__Update` calls it every tick and runs slot +0x180 (`Entity__UpdateSoundCueStop`) when it returns non-zero. The body does exactly what the name says: while `active`, no cue running (`soundCueActive == 0`) and `unk44 != 1`, if the row's `cueRange` is non-zero and the target is within `|cueRange|` (`Entity__IsNearTarget`), it calls `startSoundCue` (+0x168, `Entity__StartSoundCue`). It returns `soundCueActive`. It is the start half of a pair, like `Entity__UpdateActivationState`/`DeactivationState` at +0x170/+0x174.
+
+Also renamed here: `EntityMoodRow::unkB` -> `cueRange` (compiler-checked: only this function and `Entity__UpdateSoundCueStop` access it).
+
+## Proposed field names
+
+| member | proposed | tier | evidence |
+| --- | --- | --- | --- |
+| `EntityMethods::slot17C` (+0x17C) | `updateSoundCueStart` | A | occupant is this function; only accessor is Entity__Update (Entity.c), so it is cross-unit |

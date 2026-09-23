@@ -110,3 +110,11 @@ need to survive it. This is a new, sharper case of the existing
 `docs/DECOMPILATION_LEARNINGS.md` "let GCC hoist its own loop invariants"
 family of lessons, but for a straight-line default-value assignment rather
 than a loop.
+
+## Naming
+
+`Entity__MoodCue16` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005ED30`.
+
+`gEntityMoodHandlerTable` row 16. Body (takes only `this`): on moodTimer 0 a coin flip may set phase `unk44 = 0xB`. In phase 0 it moves -0x5A below moodTimer 64; at 64 it turns +/-90 degrees at random and steps `TRANSLATE_Y_PLUS256`; after that it runs slot +0xD0(-0x176, rand() % 2). In phase 0xB it turns +90 every 5 ticks, moves -0x800, and calls slot +0x60 with `rand() % 7 == 0`.
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `func_8002CD08` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.

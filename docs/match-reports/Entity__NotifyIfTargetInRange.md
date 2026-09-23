@@ -70,3 +70,9 @@ invisible to the text patterns in the oracle grep. **That makes this a
 compile-time argument for keeping `\*\*\* \[[^]]*\.o\]` in the chain**, not a
 style preference: the two cheapest signature mistakes available both fail
 silently without it.
+
+## Naming
+
+`Entity__NotifyIfTargetInRange` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005DF9C`.
+
+Called by `Entity__UpdateDeactivationState` (Entity.c) every active tick, with arg1 = 0 (unused). If the row's `gEntityLinkStageTable` byte is negative and its `gEntityEventVideoTable` byte is non-zero, and `Entity__IsTargetInRange(this, eventVideo << 9)` holds, it calls `notifyParents(this, 0xA)`. Tier B: the mechanics are clear. What event 0xA means is not, and both table names are inherited hypotheses (`Entity__GetEventVideo`/`GetLinkStage`), so the name deliberately does not lean on them.

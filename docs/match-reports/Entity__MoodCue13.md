@@ -62,3 +62,11 @@ the fall-through. When a residue is "right content, wrong position, same
 register set, same instruction count," check whether the retail branch
 TESTS THE OPPOSITE of what was written, not just whether the branch target
 label matches.
+
+## Naming
+
+`Entity__MoodCue13` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005EBB4`.
+
+`gEntityMoodHandlerTable` row 13. Body: sets the attenuation. On tick 0 it requests voice 0 tone 0xC and increments `unk44`. At tick `unk80 - 1` it sets the set's tick back to -1, which restarts the loop. When `unk44` reaches 36, a 1-in-3 roll calls `notifyParents(this, 0xB)`.
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `func_8002CD08` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.
