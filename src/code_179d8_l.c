@@ -69,9 +69,89 @@
  */
 #include "common.h"
 
-/* STALL -- see docs/match-reports/func_8002CD08.md. Best body reached
- * (110/132 built words, length EXACT at 132/132) preserved there in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CD08);
+/* Matched round 73 -- docs/match-reports/func_8002CD08.md. */
+typedef struct Obj179D8CD08 Obj179D8CD08;
+
+typedef struct {
+    u8 pad0[0x80];
+    s32 (*slot80)(Obj179D8CD08 *self, s32 arg1, s32 arg2, s32 arg3);
+    void (*slot84)(Obj179D8CD08 *self, s32 handle);
+    u8 pad88[0x9C - 0x88];
+    void (*slot9C)(Obj179D8CD08 *self, s32 arg1);
+} Obj179D8CD08Methods;
+
+struct Obj179D8CD08 {
+    Obj179D8CD08Methods *methods;
+};
+
+typedef struct {
+    s32 result;
+    s32 word0;
+    s32 word1;
+    s32 word2;
+    s32 word3;
+} Entry179D8CD08;
+
+typedef struct S179D8CD08 S179D8CD08;
+
+struct S179D8CD08 {
+    s32 unk0;
+    s32 unk4;
+    s32 unk8;
+    void (*callback)(s32 arg0, S179D8CD08 *self);
+    s32 unk10;
+    s32 unk14;
+    Entry179D8CD08 entries[3];
+};
+
+void func_8002CD08(Obj179D8CD08 *a0, S179D8CD08 *a1) {
+    s32 i;
+    Entry179D8CD08 *e;
+    s32 rem1;
+    s32 rem2;
+    s32 note;
+
+    if (a1->unk0 > 0) {
+        i = 0;
+        e = &a1->entries[0];
+        do {
+            i++;
+            e->word0 = -1;
+            e->word1 = 0;
+            e->word2 = 0x7F;
+            e->word3 = 0x40;
+            e++;
+        } while (i < 3);
+
+        a1->unk10 = 0;
+        if (a1->callback != NULL) {
+            a1->callback(a1->unk8, a1);
+        }
+
+        if (a1->unk10 >= 0) {
+            e = &a1->entries[0];
+            i = 0;
+            do {
+                if (e->word0 >= 0) {
+                    if (e->result >= 0) {
+                        a0->methods->slot84(a0, e->result);
+                    }
+                    a0->methods->slot9C(a0, e->word1);
+                    note = e->word0 * 16;
+                    rem1 = e->word2 - (e->word2 / a1->unk14) * a1->unk10;
+                    rem2 = e->word3 - (e->word3 / a1->unk14) * a1->unk10;
+                    e->result = a0->methods->slot80(a0, note, rem1, rem2);
+                } else if (e->word0 == -2 && e->result >= 0) {
+                    a0->methods->slot84(a0, e->result);
+                }
+                i++;
+                e++;
+            } while (i < 3);
+        }
+        a1->unk4++;
+    }
+}
+
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 167/167 words, length exact (74/167 raw word-match; funcdiff
