@@ -215,7 +215,39 @@ void NoOp2(void) {
  * confirmed via asm-differ) -- the previously recorded figure is now
  * measured, not carried forward. Still genuinely stalled; restored to
  * INCLUDE_ASM. The report carries the corrected, linkable body. */
+/* NON_MATCHING body promoted, round 72 (charlie), per docs/FINISHING-PLAN.md
+ * track 1b. Hand-derived (round 17/36/47/54/64, no permuter-found edit --
+ * round 47's permuter check (b) declined the search: insertions=4,
+ * deletions=3, base score 863). Live-measured under current maspsx flags
+ * this round: 13/43 raw word-match, length 44/43 words (one word long,
+ * unchanged) -- docs/match-reports/OpenCdFile.md. */
+#ifdef NON_MATCHING
+void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
+    s32 i;
+    StatBuf179D8H statBuf;
+    char path[0x40];
+
+    i = 0;
+    if (self->isOpen == 0) {
+        BuildCdFilePath(path, suffix);
+        while (1) {
+            if (CdSearchFile(&statBuf, path) != 0) {
+                break;
+            }
+            i++;
+            if (i >= 100) {
+                printf(gCdFileNotFoundFmt, path);
+                return;
+            }
+        }
+        self->pos = statBuf.pos;
+        self->isOpen = 1;
+        self->size = statBuf.size;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_h", OpenCdFile);
+#endif
 
 char *BuildCdFilePath(char *dest, char *suffix) {
     dest[0] = '\\';
