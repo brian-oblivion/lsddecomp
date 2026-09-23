@@ -44,7 +44,7 @@
  */
 #include "common.h"
 
-extern s32 func_80034138(s16 a0, s16 a1);
+extern s32 func_80034138(s16 a0, s16 a1); /* arity-ok: the definition's third parameter is never read (round 69, docs/match-reports/func_80034138.md); its return type is void there, see PROGRESS round 69 */
 
 s32 func_8003410C(s16 a0, s16 a1)
 {
