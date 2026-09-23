@@ -1,6 +1,8 @@
-# func_80030648 -- MATCH (21/21 words)
+# SpuVmGetSeqRVol -- MATCH (21/21 words)
 
-Unit `code_179d8_j`, round 22 (2026-09-06). Sibling of `func_800305F4` (see
+> Renamed from `func_80030648` on 2026-09-23 (tools/rename.py). Address 0x80030648.
+
+Unit `code_179d8_j`, round 22 (2026-09-06). Sibling of `SpuVmGetSeqLVol` (see
 that report for the shared `D_800902E8[screen][slot]` shape and the
 inline-vs-named `sra`/`srl` finding). This one reads the OTHER leading
 field (`+0x76` instead of `+0x74`) and stores the FULL packed `p0` into
@@ -8,7 +10,7 @@ field (`+0x76` instead of `+0x74`) and stores the FULL packed `p0` into
 
 ## The residue, and what closed it
 
-Same class as `func_800305F4`: right instruction count, wrong order. GCC
+Same class as `SpuVmGetSeqLVol`: right instruction count, wrong order. GCC
 initially hoisted the `D_8008EA22` store immediately after the table
 lookup and allocated `channel` into `$v1` for the whole function, where
 retail allocates it into `$v0` and defers the store. A bare `__asm__("")`
@@ -20,7 +22,7 @@ duplication to work around.
 ## Final source
 
 ```c
-s32 func_80030648(s32 p0)
+s32 SpuVmGetSeqRVol(s32 p0)
 {
     Entry90902E8 *tbl = D_800902E8[(u8) p0];
 
@@ -30,5 +32,5 @@ s32 func_80030648(s32 p0)
 }
 ```
 
-(`Entry90902E8` is declared once, above `func_80030584` in the unit --
-see that function's or `func_800305F4`'s report for the full typedef.)
+(`Entry90902E8` is declared once, above `SpuVmGetSeqVol` in the unit --
+see that function's or `SpuVmGetSeqLVol`'s report for the full typedef.)

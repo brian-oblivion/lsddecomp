@@ -1,11 +1,13 @@
-# func_80030404 -- STALL (length EXACT at 96/96 words; 89/96 raw word-match; first real diff at word 18 / retail 0x8003044C -- the `entry` pointer's register, RECLASSIFIED round 57: reachable from source shape, but the correct program is then 97 words because the table base takes `$a1` from parameter `p1`)
+# SpuVmSetSeqVol -- STALL (length EXACT at 96/96 words; 89/96 raw word-match; first real diff at word 18 / retail 0x8003044C -- the `entry` pointer's register, RECLASSIFIED round 57: reachable from source shape, but the correct program is then 97 words because the table base takes `$a1` from parameter `p1`)
+
+> Renamed from `func_80030404` on 2026-09-23 (tools/rename.py). Address 0x80030404.
 
 **ROUND 57 CORRECTION -- READ THIS BEFORE THE PARAGRAPH BELOW.** The
 "measurement note" that follows is a ROUND 23 paragraph describing the
 round-23 body (91 words, 5 short, 21/96 raw, first real diff at word 0).
 Round 56 replaced that body and the TITLE above is the current figure;
 round 57 rebuilt round 56's body in-tree and reproduced it exactly --
-**length EXACT at 96 words** (`build/lsdde.map` puts `func_80030584` at
+**length EXACT at 96 words** (`build/lsdde.map` puts `SpuVmGetSeqVol` at
 its retail `0x80030584`, zero drift), **89/96 raw**, first real diff at
 word 18 / `0x8003044C`. Every figure in the next paragraph and in the
 three sections after it is superseded; they are kept because their
@@ -32,14 +34,14 @@ writes/clamps two fields of the found `Entry90902E8` record, computes two
 `0x81`-scaled values from `p1`/`p2`, and -- gated on `p3 == 1` -- runs this
 unit's now-familiar "scan `D_8008D996` for a 16-bit key, set two fields of a
 16-byte-stride table plus an OR'd flag byte" loop (same idiom as
-`func_8003069C`, including the `(u8)` index-mask lever that function's
+`SpuVmSeqKeyOff`, including the `(u8)` index-mask lever that function's
 report documents for defeating strength reduction, applied here too).
 
 ## What it is (best-reached body: 91/96 words compiled -- 5 words short -- 21/96 raw match, first real diff at word 0)
 
 ```c
 #if 0
-s32 func_80030404(s32 p0, s16 p1, s16 p2, s16 p3)
+s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
 {
     s32 dead;
     Entry90902E8 *tbl = D_800902E8[(u8) p0];
@@ -151,8 +153,8 @@ the baseline above):
   extra `move`, same reordered store), though it is arguably cleaner
   source.
 
-Both of these are the SAME class of finding as `func_80030404`'s siblings
-in this unit (`func_80031890`, `func_8003069C`): a value provably
+Both of these are the SAME class of finding as `SpuVmSetSeqVol`'s siblings
+in this unit (`func_80031890`, `SpuVmSeqKeyOff`): a value provably
 derivable from an already-live register gets recomputed via a fresh
 extraction/copy instead of reusing the exact bit-manipulation sequence
 retail's compiler happened to choose, and no legal source reshaping tried
@@ -217,7 +219,7 @@ diff happens to stop being interesting.
 ## ROUND 31 (runner delta): rebuild confirms both title figures exactly
 
 Rebuilt the preserved body verbatim through the current pinned pipeline.
-`build/lsdde.map` puts the next function, `func_80030584`, at built
+`build/lsdde.map` puts the next function, `SpuVmGetSeqVol`, at built
 address `0x80030570` against its own retail address `0x80030584` -- a
 20-byte (5-word) deficit, confirming **91/96 words, 5 SHORT**, exactly as
 this report's (already-corrected) title states. `funcdiff.py`'s raw count
@@ -232,13 +234,13 @@ report's own warning). Restored to `INCLUDE_ASM`; still a STALL.
 ## ROUND 32 (runner alpha): rebuild confirms both figures exactly; sibling-derived barrier axis tried and rejected
 
 Rebuilt the preserved body verbatim through the current pinned pipeline.
-`build/lsdde.map` confirms `func_80030584` still lands 20 bytes (5 words)
+`build/lsdde.map` confirms `SpuVmGetSeqVol` still lands 20 bytes (5 words)
 after its own retail address, and `tools/funcdiff.py` reproduces **21/96
 raw match with the expected out-of-range drift warning** -- both figures
 match this report's title exactly.
 
-Noticed this unit's ALREADY-MATCHED siblings `func_800305F4` and
-`func_80030648` (both accessing the same `D_800902E8` table, both storing
+Noticed this unit's ALREADY-MATCHED siblings `SpuVmGetSeqLVol` and
+`SpuVmGetSeqRVol` (both accessing the same `D_800902E8` table, both storing
 to `D_8008EA22` from their own `p0`) place a bare `__asm__("");` barrier
 immediately before their `D_8008EA22 = ...` store, after computing their
 table pointer/index locals -- and this function's preserved body has that
@@ -249,8 +251,8 @@ tried adding the identical barrier immediately before `D_8008EA22 = p0;`.
 **Result: regressed to 16/96 (from 21/96), with MORE out-of-range drift**
 (confirmed via `tools/funcdiff.py`'s drift warning firing both before and
 after, size unchanged at ~286KB but the in-range match got worse, not
-better) -- rejected and reverted immediately. Unlike `func_800305F4`/
-`func_80030648` (both simple single-field getters/setters with nothing
+better) -- rejected and reverted immediately. Unlike `SpuVmGetSeqLVol`/
+`SpuVmGetSeqRVol` (both simple single-field getters/setters with nothing
 else live across the barrier), this function has FIVE more live locals
 (`entry`, `recIdx`, `key`, plus the two `t1v`/`t0v` products computed later)
 whose liveness the barrier's scheduling boundary interacts with -- the
@@ -290,7 +292,7 @@ body into `src/code_179d8_j.c` (local reduced-view declarations for
 own already-declared `Entry90902E8`/`D_8008EA22`) and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `funcdiff.py` reproduces
 **21/96 raw word-match with the expected out-of-range drift warning**.
-`build/lsdde.map` (`func_80030584 - func_80030404 = 0x16C` = 91 words)
+`build/lsdde.map` (`SpuVmGetSeqVol - SpuVmSetSeqVol = 0x16C` = 91 words)
 confirms **91/96, 5 words short**, exactly this report's title. Restored
 to `INCLUDE_ASM` immediately after (diff against the pre-splice copy:
 byte-identical); `./build-and-verify.sh` confirms `OK: build matches
@@ -342,7 +344,7 @@ right untested lever for a future hand attempt.
 amount of reshaping the early section was ever going to fix it.** Every
 previous round (23, 31, 32, 47) treated this function's scan loop as
 `u32 i` with `(u8) i` index masking -- copied by analogy from its sibling
-`func_8003069C`, whose loop really is byte-masked. Read off the ROM, THIS
+`SpuVmSeqKeyOff`, whose loop really is byte-masked. Read off the ROM, THIS
 loop's counter is a **`s16`**:
 
 ```
@@ -357,7 +359,7 @@ loop's counter is a **`s16`**:
 
 `sll 16`/`sra 16` is a sign-extension, and `slt` is the SIGNED compare -- a
 `(u8)`-masked counter gives `andi 0xff` and `sltu`, which is exactly what
-`func_8003069C` has four hundred bytes later and what this function does
+`SpuVmSeqKeyOff` has four hundred bytes later and what this function does
 NOT. With `s16 i` and a plain `for (i = 0; i < D_8008E9D0; i++)`, GCC 2.6.3's
 loop inversion emits retail's guard (`lbu`/`beqz`) and loop test verbatim.
 
@@ -390,7 +392,7 @@ The whole remaining residue is a single register-identity difference.
    stops GCC sinking the `D_800902E8` table load past the shift block, giving
    retail's "lookup first, store second, shift third" order. Round 32 tried
    this barrier BEFORE that store (copying matched siblings
-   `func_800305F4`/`func_80030648`) and regressed 21/96 -> 16/96; after is
+   `SpuVmGetSeqLVol`/`SpuVmGetSeqRVol`) and regressed 21/96 -> 16/96; after is
    right and before is still wrong (2145 vs 2085 permuter units on the
    round-56 body). Dropping the `tbl` local and writing
    `entry = D_800902E8[(u8) p0]; ... entry += (u32) shifted >> 24;` is worth
@@ -407,7 +409,7 @@ The whole remaining residue is a single register-identity difference.
    (or inside the `if`), loop-invariant motion hoists it into the preheader
    AFTER the guard, which is retail. That placement alone is worth 1085 ->
    610 permuter units. This is the same pointer-hoist lever round 56 found on
-   `func_8003069C`, applied to a second function in the same unit.
+   `SpuVmSeqKeyOff`, applied to a second function in the same unit.
 6. **The `D_8008D7F0` index is a `s16`, not an `int`.** Retail's byte offset
    is `sll v0,a1,0x13` / `sra v0,v0,0xf` -- a sign-extension from 16 bits
    FUSED with the scale, i.e. `(s16)(i * 8)` used as a `u16 *` index, not
@@ -428,7 +430,7 @@ delay slot for the `sh a2,0x76` the way retail has it, and it moved 610 ->
 
 ```c
 #if 0
-/* ---- func_80030404 local reduced view (round 56) ---- */
+/* ---- SpuVmSetSeqVol local reduced view (round 56) ---- */
 extern u8 D_8008E9D0;
 
 /* 0x34-byte-stride channel-configuration record; only the leading s16 this
@@ -449,7 +451,7 @@ extern Rec16D7F0 D_8008D7F0[];
 
 extern u8 D_8008D970[];
 
-s32 func_80030404(s32 p0, s16 p1, s16 p2, s16 p3)
+s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
 {
     s32 dead[2];
     s32 shifted;
@@ -554,7 +556,7 @@ the counter's type against the compare instruction before inheriting it.**
 `slt` is a `short`. Those are two instructions to look at, they are in the
 loop's last three words, and getting it wrong here cost four rounds of
 reshaping an early section that was never the main problem. The sibling
-analogy was the trap: `func_8003069C`, 0x298 bytes later in the same unit,
+analogy was the trap: `SpuVmSeqKeyOff`, 0x298 bytes later in the same unit,
 really IS byte-masked, and this report inherited its `(u8) i` wholesale.
 
 **2. A blacklisted spelling is blacklisted RELATIVE TO A BODY.** Round 23
@@ -568,7 +570,7 @@ condition still holds. Round 23's did name it, which is why it could be
 discharged rather than just disobeyed.
 
 **3. The same round-56 pointer-hoist lever now has two independent
-confirmations in this unit** (`func_8003069C`'s `&D_8008EA26`, this
+confirmations in this unit** (`SpuVmSeqKeyOff`'s `&D_8008EA26`, this
 function's `&D_8008D7F0[0].unk0`/`.unk2`), plus a new rider: **for a global
 whose address must be hoisted into the PREHEADER of a `for` loop -- i.e.
 after the loop-inversion guard, not before it -- the pointer local must be
@@ -591,7 +593,7 @@ compile-error grep hits.
 
 - **Length EXACT at 96 words.** `funcdiff.py` gives the range
   `0x20C04-0x20D84` (`0x180` bytes / 4 = 96) with **no out-of-range drift
-  warning**, and `build/lsdde.map` puts the next function, `func_80030584`,
+  warning**, and `build/lsdde.map` puts the next function, `SpuVmGetSeqVol`,
   at its retail `0x80030584`.
 - **89/96 raw word-match**, and the seven differing words are exactly the
   seven this report's round-56 section tabulates.
@@ -615,8 +617,8 @@ changed that completely, and the decline does not survive it.
   `Reorderings: 0 (60)`, **`Insertions: 0 (100)`**, **`Deletions: 0 (100)`**,
   **base score = 45**. Zero of everything except register differences. This is
   the cleanest check (b) recorded anywhere in this corpus: round 47 declined
-  this same function at 4350 and declined `func_8003069C` at 1210; round 56
-  searched `func_8003069C` at 870.
+  this same function at 4350 and declined `SpuVmSeqKeyOff` at 1210; round 56
+  searched `SpuVmSeqKeyOff` at 870.
 - **(c) scaffold-vs-real-build agreement: AGREE.** The scaffold's debug diff
   shows the `addu` and the six `0x74`/`0x76` accesses differing by `$v1`
   vs `$t0` and nothing else -- the same seven words, in the same places, as
@@ -624,15 +626,15 @@ changed that completely, and the decline does not survive it.
 
 **Verdict: SEARCH.** A pure register-identity residue with zero
 insertions, deletions and reorderings is precisely the shape a source-mutation
-search can move -- round 56 proved that on this unit's `func_8003069C`, where
+search can move -- round 56 proved that on this unit's `SpuVmSeqKeyOff`, where
 the permuter found a `u16` intermediate that hand work had declared
 unreachable. Note this is not a HARD RULE 6 problem: the ban is on fixing
 register identity with `register T v asm("$N")` or an operand constraint, and
 a source-shape mutation is neither.
 
-### The round-57 hand attempt: `func_8003069C`'s round-57 lever does NOT transfer here
+### The round-57 hand attempt: `SpuVmSeqKeyOff`'s round-57 lever does NOT transfer here
 
-Round 57 found on this unit's `func_8003069C` that **which existing local you
+Round 57 found on this unit's `SpuVmSeqKeyOff` that **which existing local you
 reuse as a carrier is an allocation-priority lever** -- reusing `hiBit`, the
 local assigned in both arms of a later if/else, extended that pseudo's live
 range backwards and moved three registers into retail's assignment, worth ten
@@ -657,7 +659,7 @@ nothing at all** (byte-identical output), and **reusing a later-assigned local
 as the carrier, which is exactly the `hiBit` mechanism, makes it worse here.**
 
 The difference between the two functions is worth stating because it bounds
-the new lever: on `func_8003069C` the reused local (`hiBit`) is a **value**
+the new lever: on `SpuVmSeqKeyOff` the reused local (`hiBit`) is a **value**
 that genuinely is assigned later in the same block, so the extended live range
 is real and costs no instruction. Here the "reuse" has to go through a
 pointer cast of an unrelated type, which is a different program, and the
@@ -750,7 +752,7 @@ attempt is looking for:
 > how to keep `p1` in `$a1` while the base is live**, not which register
 > `entry` gets.
 
-The `func_8003069C` carrier-local lever was already tried against the OLD
+The `SpuVmSeqKeyOff` carrier-local lever was already tried against the OLD
 reading and failed (table above); against the NEW reading the untried axes are
 the ones that touch `p1`'s liveness -- the same "register-pressure-side" axis
 this report has flagged as untested since round 23, but now with a named

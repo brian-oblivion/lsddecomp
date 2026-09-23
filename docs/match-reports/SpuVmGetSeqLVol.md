@@ -1,7 +1,9 @@
-# func_800305F4 -- MATCH (21/21 words)
+# SpuVmGetSeqLVol -- MATCH (21/21 words)
+
+> Renamed from `func_800305F4` on 2026-09-23 (tools/rename.py). Address 0x800305f4.
 
 Unit `code_179d8_j`, round 22 (2026-09-06). Not a class method. Sibling of
-`func_80030648` and `func_80030584` -- all three index the same
+`SpuVmGetSeqRVol` and `SpuVmGetSeqVol` -- all three index the same
 `D_800902E8[screen][slot]` array already established in `code_179d8_f.c` /
 `code_179d8_i.c` (an array of pointers to 172 (0xAC)-byte records), reading
 the two leading `s16` fields at `+0x74`/`+0x76` this unit hadn't named yet.
@@ -56,7 +58,7 @@ not committed) before applying here.
  * these, indexed [screen][slot]-style by a packed argument (slot in the
  * high byte, screen in the low byte) -- see code_179d8_i.c's own
  * func_800339AC, which builds exactly this packing before calling into
- * this unit's func_8003069C. Reduced local view: only the two leading s16
+ * this unit's SpuVmSeqKeyOff. Reduced local view: only the two leading s16
  * fields this unit's own accessors touch are named. See code_179d8_f.c /
  * code_179d8_i.c's own Entry90902E8 for a fuller layout of the same array;
  * each unit keeps its own independent reading, per project convention. */
@@ -68,7 +70,7 @@ typedef struct {
 } Entry90902E8;
 extern Entry90902E8 *D_800902E8[];
 
-s32 func_800305F4(s32 p0)
+s32 SpuVmGetSeqLVol(s32 p0)
 {
     s32 channel = p0 & 0xFF;
     Entry90902E8 *tbl = D_800902E8[channel];
@@ -87,5 +89,5 @@ for a masked-and-shifted extraction can flip GCC 2.6.3's instruction choice
 between `sra` and `srl`, even though both are provably identical given the
 mask.** Writing the same expression inline at the use site (no named local)
 preserves the signed-shift form. Confirmed on three sibling functions in
-this unit (`func_800305F4`, `func_80030648`, `func_80030584`) and
+this unit (`SpuVmGetSeqLVol`, `SpuVmGetSeqRVol`, `SpuVmGetSeqVol`) and
 independently reproduced in isolation through the pinned pipeline.

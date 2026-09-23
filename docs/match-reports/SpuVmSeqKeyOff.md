@@ -1,4 +1,6 @@
-# func_8003069C -- STALL (length EXACT at 85/85 words; 73/85 raw word-match; first real diff at word 4 / retail 0x800306AC -- a one-instruction ROTATION of the branch-delay fill, not a shift)
+# SpuVmSeqKeyOff -- STALL (length EXACT at 85/85 words; 73/85 raw word-match; first real diff at word 4 / retail 0x800306AC -- a one-instruction ROTATION of the branch-delay fill, not a shift)
+
+> Renamed from `func_8003069C` on 2026-09-23 (tools/rename.py). Address 0x8003069c.
 
 **Measurement note (both numbers, not conflated):** compiled LENGTH is
 exactly retail's 85 words (funcdiff reports no out-of-range drift). The
@@ -16,13 +18,13 @@ Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Scans
 runs this unit's "clear channel bits" tail (the same block as
 `func_80031890`, see that function's report) keyed by the loop index. Called
 from `code_179d8_i.c`'s `func_800339AC` as
-`func_8003069C((sa1 << 8) | sa0)`.
+`SpuVmSeqKeyOff((sa1 << 8) | sa0)`.
 
 ## What it is (best-reached body, 45/85 words, correct length, no drift)
 
 ```c
 #if 0
-void func_8003069C(s32 p0)
+void SpuVmSeqKeyOff(s32 p0)
 {
     s32 key;
     u32 i;
@@ -109,7 +111,7 @@ word 0). Splitting the declaration from the initialization and moving the
 assignment to AFTER `if (D_8008E9D0 == 0) return;` reproduces retail's
 placement exactly and moved the residue's start from word 0 to word 4 (and
 the raw count from 41/85 to 45/85). This is the same-shaped lesson as
-`func_80030404`'s report (a value that COULD be computed early, matching
+`SpuVmSetSeqVol`'s report (a value that COULD be computed early, matching
 where it's textually declared, should instead be computed lazily, at the
 point retail's control flow first needs it) confirmed a second time in
 this same unit.
@@ -357,7 +359,7 @@ the same `andi` duplicated into the backedge delay slot by the delay-slot
 filler's fill-from-target retarget.
 
 **This is the exact opposite of what this unit's other reports recommend.**
-`func_8003069C`'s own round-23 section closed "index with `(u8) i`, not bare
+`SpuVmSeqKeyOff`'s own round-23 section closed "index with `(u8) i`, not bare
 `i`, to block strength reduction" -- that finding still stands, the mask is
 still required. What round 56 adds is that the mask must be applied ONCE,
 through a named local, not written inline at each use: inline it costs a
@@ -390,7 +392,7 @@ typedef struct {
 } Rec34Byte;
 extern Rec34Byte D_8008D9A3[];
 
-void func_8003069C(s32 p0)
+void SpuVmSeqKeyOff(s32 p0)
 {
     s32 key;
     u32 i;
@@ -500,8 +502,8 @@ void func_8003069C(s32 p0)
 - **Three bare `__asm__("")` scheduling-barrier placements** in the tail
   (before the pre-loads, between the E228 and C64 statements, after the
   E228 store): 45/85, 36/85, 36/85 -- all worse. The barrier idiom that is
-  load-bearing for this unit's matched `func_800305F4`/`func_80030648` does
-  not transfer into this loop body, consistent with `func_80030404`'s
+  load-bearing for this unit's matched `SpuVmGetSeqLVol`/`SpuVmGetSeqRVol` does
+  not transfer into this loop body, consistent with `SpuVmSetSeqVol`'s
   round-32 finding about donor register pressure.
 
 ### Proposed learning
@@ -625,7 +627,7 @@ target than a scatter of individual mismatches.
 #if 0
 /* file-local reduced view -- see the round-56 section above for the full
  * declaration block; only the function body changes here. */
-void func_8003069C(s32 p0)
+void SpuVmSeqKeyOff(s32 p0)
 {
     s32 key;
     u32 i;
@@ -833,7 +835,7 @@ typedef struct {
 } Rec34Byte;
 extern Rec34Byte D_8008D9A3[];
 
-void func_8003069C(s32 p0)
+void SpuVmSeqKeyOff(s32 p0)
 {
     s32 key;
     u32 i;
@@ -918,8 +920,8 @@ streams one-for-one from 0x20EB4 to the end.
   changed the length outright (funcdiff refused the score). Round 56 found the
   same for its three tail placements; this is now nine measured placements
   across two rounds and the conclusion is stable -- **the barrier idiom that is
-  load-bearing for this unit's matched `func_800305F4`/`func_80030648` does not
-  transfer into this loop at any point**, consistent with `func_80030404`'s
+  load-bearing for this unit's matched `SpuVmGetSeqLVol`/`SpuVmGetSeqRVol` does not
+  transfer into this loop at any point**, consistent with `SpuVmSetSeqVol`'s
   round-32 donor-register-pressure finding.
 - **Reversing the two tail pairs** (C64/E22C chain written before C60/E228):
   45/85.

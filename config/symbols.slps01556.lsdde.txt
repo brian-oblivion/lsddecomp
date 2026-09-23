@@ -1448,3 +1448,26 @@ note2pitch2 = 0x8002E038; // type:func
 // collision -- those are a different C namespace and shadow harmlessly).
 // Round 71 (bravo, track 2). Still NON_MATCHING (30/56 words); unaffected.
 callback = 0x8002B3F4; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmSeKeyOn
+// (discs 3.3,3.5; libsnd/vm_key on 3.6). Round 71 (bravo, track 2).
+SpuVmSeKeyOn = 0x800302DC; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmSeKeyOff
+// (discs 3.3,3.5; libsnd/vm_key on 3.6). Round 71 (bravo, track 2).
+SpuVmSeKeyOff = 0x800303C8; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address SpuVmSetSeqVol by relocation). Round 71 (bravo, track 2).
+SpuVmSetSeqVol = 0x80030404; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libsnd/vmanager SpuVmGetSeqVol (disc 3.3). Round 71 (bravo, track 2).
+SpuVmGetSeqVol = 0x80030584; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
+// SpuVmGetSeqLVol (disc 3.3); the mirror-shape SpuVmGetSeqRVol candidate
+// scores only masked 0.24. Round 71 (bravo, track 2).
+SpuVmGetSeqLVol = 0x800305F4; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
+// SpuVmGetSeqRVol (disc 3.3); the mirror-shape SpuVmGetSeqLVol candidate
+// scores only masked 0.24. Round 71 (bravo, track 2).
+SpuVmGetSeqRVol = 0x80030648; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address SpuVmSeqKeyOff by relocation). Round 71 (bravo, track 2).
+SpuVmSeqKeyOff = 0x8003069C; // type:func

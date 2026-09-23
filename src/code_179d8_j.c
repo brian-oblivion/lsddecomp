@@ -79,7 +79,7 @@ extern u16 D_8008EA22;
  * high byte, screen in the low byte) -- see Sony's `Snd_pause`
  * (`libsnd/pause`, linked since round 34; it was code_179d8_i.c's matched
  * func_800339AC), which builds exactly this packing before calling into
- * this unit's func_8003069C. Reduced local view: only the two leading s16
+ * this unit's SpuVmSeqKeyOff. Reduced local view: only the two leading s16
  * fields this unit's own accessors touch are named. See code_179d8_f.c /
  * code_179d8_i.c's own Entry90902E8 for a fuller layout of the same array;
  * each unit keeps its own independent reading, per project convention. */
@@ -91,7 +91,7 @@ typedef struct {
 } Entry90902E8;
 extern Entry90902E8 *D_800902E8[];
 
-s32 func_800302DC(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
+s32 SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
 {
     u16 outA;
     u16 outB;
@@ -109,7 +109,7 @@ s32 func_800302DC(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
     return StartNote(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);
 }
 
-s32 func_800303C8(s16 p0, s16 p1, u16 p2)
+s32 SpuVmSeKeyOff(s16 p0, s16 p1, u16 p2)
 {
     return StopNote(0x21, p0, p1, p2);
 }
@@ -117,9 +117,9 @@ s32 func_800303C8(s16 p0, s16 p1, u16 p2)
 void func_800303FC(void) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_80030404);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_j", SpuVmSetSeqVol);
 
-s32 func_80030584(s32 p0, s16 *out1, s16 *out2)
+s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2)
 {
     Entry90902E8 *tbl = D_800902E8[(u8) p0];
     s16 *cur = (s16 *) &D_8008EA22;
@@ -130,7 +130,7 @@ s32 func_80030584(s32 p0, s16 *out1, s16 *out2)
     return *cur;
 }
 
-s32 func_800305F4(s32 p0)
+s32 SpuVmGetSeqLVol(s32 p0)
 {
     s32 channel = p0 & 0xFF;
     Entry90902E8 *tbl = D_800902E8[channel];
@@ -141,7 +141,7 @@ s32 func_800305F4(s32 p0)
     return tbl[recIdx].unk74;
 }
 
-s32 func_80030648(s32 p0)
+s32 SpuVmGetSeqRVol(s32 p0)
 {
     Entry90902E8 *tbl = D_800902E8[(u8) p0];
 
@@ -150,4 +150,4 @@ s32 func_80030648(s32 p0)
     return tbl[(p0 & 0xFF00) >> 8].unk76;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j", func_8003069C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_j", SpuVmSeqKeyOff);

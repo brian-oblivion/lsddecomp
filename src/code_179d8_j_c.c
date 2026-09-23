@@ -99,7 +99,7 @@ extern Rec34D994 D_8008D99E[];
 
 /* 16 (0x10)-byte-stride record with two s16 fields 2 bytes apart --
  * modeled as ONE struct here (not two independent arrays) because
- * func_80030404 computes the second field's address as the first
+ * SpuVmSetSeqVol computes the second field's address as the first
  * field's cached base register plus a compile-time +0x2, which only
  * happens when the compiler knows both offsets belong to the same
  * object. */

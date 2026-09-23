@@ -55,7 +55,7 @@ turned up this **exact** signature already guessed independently by
 function and typed it from its own call site), plus two live call sites
 with concrete argument roles:
 
-- `code_179d8_j.c`'s `func_800302DC` (matched): `return
+- `code_179d8_j.c`'s `SpuVmSeKeyOn` (matched): `return
   StartNote(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
   0x21` is a real sentinel value this function itself branches on (see
   below).
@@ -452,7 +452,7 @@ extern void func_8002D1B4(s32 a0, u16 a1);
 extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
 
 /* Called as `StartNote(0x21, p0, p1, p2, outA, outB)` from
- * code_179d8_j.c's func_800302DC and as
+ * code_179d8_j.c's SpuVmSeKeyOn and as
  * `StartNote(packed, note, vol, (u8)a3, (u16)divided, status)` from
  * code_179d8_k.c's func_800344FC -- signature confirmed independently
  * by three sibling units' own extern guesses (code_179d8_i/_j/_k all

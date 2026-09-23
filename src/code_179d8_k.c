@@ -1104,13 +1104,13 @@ void func_80035A7C(s16 a0, s16 a1)
 }
 #endif
 
-/* Cross-unit calls, local guesses per project convention. func_8003069C is
+/* Cross-unit calls, local guesses per project convention. SpuVmSeqKeyOff is
  * matched in code_179d8_j.c and already has this exact "(slot<<8)|channel"
  * single-argument reading in both code_179d8_f.c and code_179d8_i.c;
  * _SsSndNextSep is Sony's `libsnd/next`, linked from the SDK object since
  * round 34; this signature is the one code_179d8_f.c's matched C used
  * before the conversion. */
-extern s32 func_8003069C(s32 a0);
+extern s32 SpuVmSeqKeyOff(s32 a0);
 extern void _SsSndNextSep(s32 a0, s32 a1);
 
 /* This unit's own reading of the same global code_179d8_i.c already reads
@@ -1143,7 +1143,7 @@ extern u32 gSeqTickRate;
  * rewind BOTH unk4 and unkC. Once the limit is reached, clear the
  * playback-state flags (unk90), rewind unkC one more time, and run the
  * stop-sequence callbacks (_SsSndNextSep gated on unk3C != 0xFF, then an
- * unconditional func_8003069C notify) before priming unk88 from unk70 for
+ * unconditional SpuVmSeqKeyOff notify) before priming unk88 from unk70 for
  * the next tick.
  *
  * 0x51 (Set Tempo): reads a 3-byte big-endian microseconds-per-quarter-note
@@ -1242,7 +1242,7 @@ void func_80035B2C(s16 a0, s16 a1, u8 a2)
             _SsSndNextSep(rec->unk3C, rec->unk0);
             rec->unk2B = 0;
         }
-        func_8003069C((a1 << 8) | a0);
+        SpuVmSeqKeyOff((a1 << 8) | a0);
         rec->unk88 = rec->unk70;
     }
 }

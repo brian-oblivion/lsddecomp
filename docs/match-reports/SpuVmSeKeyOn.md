@@ -1,10 +1,12 @@
-# func_800302DC -- MATCH (59/59 words, 2 rebuild attempts)
+# SpuVmSeKeyOn -- MATCH (59/59 words, 2 rebuild attempts)
+
+> Renamed from `func_800302DC` on 2026-09-23 (tools/rename.py). Address 0x800302dc.
 
 Unit `code_179d8_j`, round 21 (2026-09-06). Not a class method (no
 `classtable.py` hit on either global it touches) -- plain utility code.
 
 m2c's seed (`.venv/bin/python3 tools/m2ctx.py code_179d8_j --sig 's32
-func_800302DC(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)' --run`)
+SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)' --run`)
 came back essentially byte-identical to the final source on the first
 try; only the local variable names were changed for clarity.
 
@@ -20,7 +22,7 @@ that reproduces retail's silent register waste exactly.
 ```c
 extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 
-s32 func_800302DC(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
+s32 SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
 {
     u16 outA;
     u16 outB;

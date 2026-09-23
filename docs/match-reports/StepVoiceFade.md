@@ -161,7 +161,7 @@ obvious from context.
   > function that proves the record is one object elsewhere.
   >
   > Against that, round 23 adjudicated these same two symbols from
-  > `func_80030404`/`func_80031CF0` on CONCLUSIVE evidence: an
+  > `SpuVmSetSeqVol`/`func_80031CF0` on CONCLUSIVE evidence: an
   > `addiu $t2, $a3, 0x2` folding the second base off the first symbol's
   > already-materialised address, which cc1 can only emit if the two are one
   > object. **Conclusive evidence in one function beats non-conclusive

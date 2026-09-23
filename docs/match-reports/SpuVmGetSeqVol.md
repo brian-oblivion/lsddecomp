@@ -1,7 +1,9 @@
-# func_80030584 -- MATCH (28/28 words)
+# SpuVmGetSeqVol -- MATCH (28/28 words)
+
+> Renamed from `func_80030584` on 2026-09-23 (tools/rename.py). Address 0x80030584.
 
 Unit `code_179d8_j`, round 22 (2026-09-06). Third sibling of
-`func_800305F4`/`func_80030648` -- the "get both fields" form: writes both
+`SpuVmGetSeqLVol`/`SpuVmGetSeqRVol` -- the "get both fields" form: writes both
 `+0x74` and `+0x76` through output pointers, and returns the full packed
 `p0` (read back from `D_8008EA22` rather than the parameter register
 directly -- confirmed via `asm-differ` that retail genuinely reloads it
@@ -12,7 +14,7 @@ rather than reusing `$a0`).
 Two independent issues, both from the same family as the two sibling
 reports:
 
-1. **The `sra`/`srl` instruction-choice issue** (see `func_800305F4`'s
+1. **The `sra`/`srl` instruction-choice issue** (see `SpuVmGetSeqLVol`'s
    report) -- fixed the same way, by writing the high-byte extraction
    inline at both use sites rather than through a named `recIdx` local.
 2. **`D_8008EA22`'s address needs to be CACHED as a real pointer, not
@@ -37,7 +39,7 @@ reports:
 ## Final source
 
 ```c
-s32 func_80030584(s32 p0, s16 *out1, s16 *out2)
+s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2)
 {
     Entry90902E8 *tbl = D_800902E8[(u8) p0];
     s16 *cur = (s16 *) &D_8008EA22;

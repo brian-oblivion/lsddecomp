@@ -117,8 +117,8 @@ extern Entry90902E8 *D_800902E8[];
  * the asm) and the best C body reached (18/202 words, first diff at
  * word 1 -- the prologue's own `-0x40` vs `-0x38` frame size). The
  * residue is register/stack allocation, not logic. */
-extern s32 func_80030404(s16 a0, u16 a1, u16 a2, s32 a3);
-extern s32 func_80030584(s32 p0, s16 *out1, s16 *out2);
+extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
+extern s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2);
 
 #if 0
 void func_80033C90(s16 a0, s16 a1)
@@ -146,7 +146,7 @@ void func_80033C90(s16 a0, s16 a1)
             goto negHandler;
         }
         pk = (s16)(a0 | (a1 << 8));
-        func_80030584(pk, (s16 *)&sp10, (s16 *)&sp12);
+        SpuVmGetSeqVol(pk, (s16 *)&sp10, (s16 *)&sp12);
         if (sp10 == 0) {
             goto clearHandler;
         }
@@ -164,7 +164,7 @@ void func_80033C90(s16 a0, s16 a1)
             goto negHandler;
         }
         pk = (s16)(a0 | (a1 << 8));
-        func_80030584(pk, (s16 *)&sp10, (s16 *)&sp12);
+        SpuVmGetSeqVol(pk, (s16 *)&sp10, (s16 *)&sp12);
         if ((s32)sp10 < -(s32)p->unk42) {
             goto clearHandler;
         }
@@ -175,16 +175,16 @@ void func_80033C90(s16 a0, s16 a1)
         hi = sp12 + p->unk42;
     }
     } while (0);
-    func_80030404(pk, lo, hi, 0);
+    SpuVmSetSeqVol(pk, lo, hi, 0);
     goto tailCheck;
 
 clearHandler:
-    func_80030404((s16)(a0 | (a1 << 8)), 0, 0, 0);
+    SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0, 0, 0);
     D_800902E8[a0][a1].unk90 &= ~0x20;
     goto tailCheck;
 
 negHandler:
-    func_80030404((s16)(a0 | (a1 << 8)), 0, 0, 0);
+    SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0, 0, 0);
     ((Entry90902E8 *)((u8 *)*row + off))->unk90 &= ~0x20;
 
 tailCheck:
@@ -193,7 +193,7 @@ tailCheck:
     }
 
 tailFinal:
-    func_80030584((s16)(a0 | (a1 << 8)), &p->unk78, &p->unk7A);
+    SpuVmGetSeqVol((s16)(a0 | (a1 << 8)), &p->unk78, &p->unk7A);
 }
 #endif
 

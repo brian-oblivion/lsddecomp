@@ -29,7 +29,7 @@
  * DELETED, not commented out.
  *
  * `D_8008EA22`'S OWN COMMENT WAS WRONG AND IS CORRECTED HERE (round 36): it
- * used to claim `SsUtPitchBend` and the deleted `func_80030648` were its
+ * used to claim `SsUtPitchBend` and the deleted `SpuVmGetSeqRVol` were its
  * only readers in this family, and dropped the extern on that basis. That
  * was never true of this file's own two remaining stalls -- func_80030E90
  * and func_8003149C both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
