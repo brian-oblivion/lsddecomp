@@ -24,7 +24,7 @@
  * enough to clear the bar; round 66 found one, and the thing that unlocked it
  * was NOT reading those functions harder. It was two cross-unit
  * identifications that turn opaque call sites into evidence:
- *   - func_8001CEB4, the inherited slot +0x044, is MATCHED in src/code_d294.c
+ *   - Class6B5CC__UpdateRotation, the inherited slot +0x044, is MATCHED in src/code_d294.c
  *     and is the ROTATION SETTER. Every `void *` constant this unit hands it
  *     is therefore three {numerator, denominator} degree ratios, and every one
  *     of them decodes to a round angle. That converts "opaque generic
@@ -82,7 +82,7 @@ extern s8 MOVE_COMMAND_SIGNS[8];
    holds pointers to. */
 
 /* A single {numerator, denominator} degree ratio. This is not a guess about
-   the LAYOUT any more (round 66): func_8001CEB4 -- vtable slot +0x044, the
+   the LAYOUT any more (round 66): Class6B5CC__UpdateRotation -- vtable slot +0x044, the
    inherited rotation setter, MATCHED in src/code_d294.c -- reads exactly
    three of these from its `data` argument, one per axis, converts each with
    RatioToFixed12 and divides by 360, then either STORES them into the
@@ -95,7 +95,7 @@ typedef struct RotationRatio {
 	s16 denominator;
 } RotationRatio;
 
-/* The x/y/z triple func_8001CEB4 actually consumes. */
+/* The x/y/z triple Class6B5CC__UpdateRotation actually consumes. */
 typedef struct RotationRatios {
 	RotationRatio x;
 	RotationRatio y;
@@ -114,7 +114,7 @@ typedef struct RotationRatios {
 extern RotationRatio TURN_ROTATION_YAW[]; /* == &TURN_ROTATIONS[0].y */
 extern RotationRatios TURN_ROTATIONS[];
 
-/* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as func_8001CEB4's
+/* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as Class6B5CC__UpdateRotation's
    arg2 with flag 1 (absolute) by DreamSys__ResetSessionState. */
 extern RotationRatios ROTATION_YAW_180;
 
@@ -553,7 +553,7 @@ extern struct RelativePos STAIRCASE_OFFSET_1;
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos STAIRCASE_OFFSET_3;
 
-/* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (func_8001CEB4)
+/* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (Class6B5CC__UpdateRotation)
    arg2 with flag 0 (relative) by DreamSys__TickStaircaseCase0 and
    DreamSys__TickStaircaseCase2. Typed RotationRatios round 66: its three
    {numerator, denominator} words are {0,1} {0x2D,1} {0,1}, byte-identical in
@@ -818,7 +818,7 @@ typedef struct DreamSys {
 	s32 stageLinkAngle;
 	/* Gate flag read by DreamSys__SetMoveOverride (round 2026-08-30-b): when nonzero
 	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
-	   func_8001CEB4's arg2 -- cast from s32 to void*, not dereferenced. */
+	   Class6B5CC__UpdateRotation's arg2 -- cast from s32 to void*, not dereferenced. */
 	s32 enterRotation;
 	/* Zeroed (whole word) by DreamSys__TryStageTimerLink alongside enterRotation
 	   (round 2026-09-02). */
@@ -927,7 +927,7 @@ struct vtable_DreamSys{
 	DreamSys *(*DreamSys__ResetSessionState)(DreamSys *this);
 	/* Called by DreamSys__StepLookYaw as (this, 0, &TURN_ROTATION_YAW[-1]); return value,
 	   if any, unused (round 2026-08-30). */
-	void (*func_8001CEB4)(DreamSys *this, s32 arg1, void *arg2);
+	void (*Class6B5CC__UpdateRotation)(DreamSys *this, s32 arg1, void *arg2);
 	u32 unknown_functions_0x48[1];
 	/* This function's OWN slot; called this round (round 2026-09-02). */
 	void (*DreamSys__SpawnAtLink)(DreamSys *this, DreamSysSpawnArgObj *arg1);
@@ -1011,7 +1011,7 @@ struct vtable_DreamSys{
 	   tools/classtable.py DREAMSYS_METHODS). A straight-line initializer:
 	   calls LogChunkMood/DreamSys__SelectCallback80/DreamSys__SelectCallback98/DreamSys__GetSetMoveMode/
 	   DreamSys__SetGateFlags/DreamSys__SetTickPeriod in sequence, then zeroes a large block of
-	   per-dream state, ending with a Class6B5CC__GetRotationDegrees/func_8001CEB4 pair over a
+	   per-dream state, ending with a Class6B5CC__GetRotationDegrees/Class6B5CC__UpdateRotation pair over a
 	   small local buffer (round 2026-09-02). */
 	void (*DreamSys__ResetLinkState)(DreamSys *this, s32 arg1, s32 arg2);
 	void (*DreamSys__BlockMovement)(DreamSys *this);

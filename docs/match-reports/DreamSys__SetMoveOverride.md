@@ -12,7 +12,7 @@ to `value`; if `value != 0`, calls `this->vt->DreamSys__GetSetMoveMode(this, 1)`
 (resolved via `tools/classtable.py`, vtable `+0x180` -- see
 `DreamSys__GetSetMoveMode.md`, matched in the same round), then, if `this->unk_0x884 !=
 0`, forwards that SAME loaded value on to
-`this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884)`.
+`this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->unk_0x884)`.
 
 ## The C
 
@@ -23,12 +23,12 @@ void DreamSys__SetMoveOverride(DreamSys *this, s32 value)
 	if (value != 0) {
 		this->vt->DreamSys__GetSetMoveMode(this, 1);
 		if (this->unk_0x884 != 0)
-			this->vt->func_8001CEB4(this, 1, (void *)this->unk_0x884);
+			this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->unk_0x884);
 	}
 }
 ```
 
-## Note: `func_8001CEB4`'s third argument is a REUSED register, not a fresh load
+## Note: `Class6B5CC__UpdateRotation`'s third argument is a REUSED register, not a fresh load
 
 Retail sets up `$a2` once (loading `this->unk_0x884` for the `beqz`
 comparison) and never reloads it before the `jalr` -- the same register value

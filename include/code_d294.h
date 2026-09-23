@@ -10,7 +10,7 @@
  * +0x00C Class6B5CC__Finalize (dtor), +0x010 Class6B5CC__AddChild, +0x014 Class6B5CC__RemoveChild,
  * +0x018 Class6B5CC__RemoveAllChildren, [+0x01C..+0x038 seven slots inherited verbatim from
  * BasicClass, D_8006B58C], +0x038 Class6B5CC__OnNotify (override), +0x03C null,
- * +0x040 Class6B5CC__Reset, +0x044 func_8001CEB4, +0x048 func_8001D008,
+ * +0x040 Class6B5CC__Reset, +0x044 Class6B5CC__UpdateRotation, +0x048 func_8001D008,
  * +0x04C func_8001D0EC, +0x050 func_8001D1A4, +0x054 func_8001D204,
  * +0x058 func_8001D280, +0x05C func_8001D33C (already-matched no-op stub),
  * +0x060 func_8001D344, +0x064 func_8001D374, +0x068 func_8001D3A0,
@@ -67,7 +67,7 @@
  *     +0x10 vec            == rotate        (SVECTOR; x/y/z/w == vx/vy/vz/pad)
  *     +0x18 pad18          == trans         (VECTOR)
  *   so S16Quad_d294 is an SVECTOR, and the 4096-per-turn angle reading
- *   func_8001CEB4's full-turn wrap already established is Sony's own.
+ *   Class6B5CC__UpdateRotation's full-turn wrap already established is Sony's own.
  *
  *   Class6B5CCObj +0x10 .. +0x1C  ==  an embedded GsDOBJ2
  *     +0x10 unk10 == attribute  (the packed flags word the GetSetBitField
@@ -124,7 +124,7 @@ struct Class6B5CCBlock44 {
  * filled in most of the rest of this layout:
  *   +0x000  a flag/state word: 1 after Class6B5CC__Reset (the ctor's own init
  *           hook) runs, 0 again after func_8001D0EC's "attach" and after
- *           func_8001CEB4/func_8001D008 (still queued, but their own tails
+ *           Class6B5CC__UpdateRotation/func_8001D008 (still queued, but their own tails
  *           both end `self->unk14->unk0 = 0` per their disassembly) do
  *           their work -- reads like a "pending update" flag.
  *   +0x018..+0x020  a Vec3 (x,y,z), written wholesale by func_8001D0EC from
@@ -177,7 +177,7 @@ struct Class6B5CCSub14 {
     /* +0x044, RETYPED (round 13) from an opaque `void *` to
      * `Class6B5CCSub44 *`. Two runners retyped this field in the same round
      * from different call sites and gave the type two different NAMES
-     * (`Class6B5CCSub44` from func_8001D008/func_8001CEB4, and
+     * (`Class6B5CCSub44` from func_8001D008/Class6B5CC__UpdateRotation, and
      * `Class6B5CCBlock44` from Class6B5CC__GetRotMatrix); the head unified them on
      * `Class6B5CCSub44`, which matches the sibling `Class6B5CCSub14`'s
      * naming and is the one already referenced from src/code_d294.c. Their
@@ -191,7 +191,7 @@ struct Class6B5CCSub14 {
 };
 
 /* Class6B5CCSub14::unk44's target (round 13). Two independent derivations,
- * unioned by the head: func_8001D008/func_8001CEB4 established the three
+ * unioned by the head: func_8001D008/Class6B5CC__UpdateRotation established the three
  * s32 words at the base, and Class6B5CC__GetRotMatrix established that +0x010 holds an
  * S16Quad_d294 -- which subsumes the first derivation's separate
  * `unk10`/`unk12`/`unk14` s16 fields as `vec.x`/`vec.y`/`vec.z` and adds
@@ -199,11 +199,11 @@ struct Class6B5CCSub14 {
  * still opaque. Exactly one name per field, deliberately: two names for one
  * field inside a single header is a trap for the next reader.
  *
- * func_8001D008 and func_8001CEB4 both apply `RatioToFixed12` three times to
+ * func_8001D008 and Class6B5CC__UpdateRotation both apply `RatioToFixed12` three times to
  * a 3-entry `{s16,s16}` table (their own 3rd argument, `data`) and write the
  * three s32 results into this block -- func_8001D008 into
  * +0x000/+0x004/+0x008 (either overwriting or accumulating, per its own
- * `flag` argument); func_8001CEB4 into `vec.x`/`vec.y`/`vec.z` as u16
+ * `flag` argument); Class6B5CC__UpdateRotation into `vec.x`/`vec.y`/`vec.z` as u16
  * (either overwriting after dividing each result by 360, or accumulating a
  * /360'd delta into the existing value and wrapping the sum modulo 4096 -- a
  * full-turn wrap, consistent with these being PSX-native 4096-per-circle
@@ -434,7 +434,7 @@ struct Class6B5CCMethods {
      * {s16,s16} pairs (D_8006B684/D_8006B690, 0xC bytes each). func_8001D008
      * (slot +0x048's own occupant, still queued) confirms the `data` shape:
      * it reads three such pairs via RatioToFixed12. */
-    void (*updateRotation)(Class6B5CCObj *self, s32 flag, void *data); /* +0x044, func_8001CEB4 */
+    void (*updateRotation)(Class6B5CCObj *self, s32 flag, void *data); /* +0x044, Class6B5CC__UpdateRotation */
     void (*updateScale)(Class6B5CCObj *self, s32 flag, void *data); /* +0x048, func_8001D008 */
     u8 pad04C[0x050 - 0x04C];
     void (*slot50)(Class6B5CCObj *self);      /* +0x050, func_8001D1A4 (this unit) */
@@ -593,7 +593,7 @@ struct WholeFrac_d294 {
  * given pointer and returns a 20.12 fixed-point value (`whole << 12 |
  * frac`'s own division-derived low bits) -- read off its own
  * disassembly (a `div` by the pair's own two fields, not decompiled
- * here). `func_8001D008`/`func_8001CEB4` (both matched, this unit) apply
+ * here). `func_8001D008`/`Class6B5CC__UpdateRotation` (both matched, this unit) apply
  * it three times in a row, at offsets +0x0/+0x4/+0x8 of their own 3rd
  * argument. Declared here with a `void *` argument since this unit's
  * chosen functions only ever pass the pointer through, never dereference

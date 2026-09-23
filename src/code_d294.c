@@ -92,7 +92,7 @@ void Class6B5CC__Reset(Class6B5CCObj *self) {
     self->unk14->unk0 = 1;
 }
 
-void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
+void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
     s32 vals[3];
     Class6B5CCSub44 *dst;
     s16 *field;

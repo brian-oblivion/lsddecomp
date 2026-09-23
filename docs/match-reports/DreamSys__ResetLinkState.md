@@ -13,8 +13,8 @@ Vtable slot `+0x0F8`. A straight-line "start dream" initializer, no
 branches at all: six vtable calls (`LogChunkMood`, `DreamSys__SelectCallback80`,
 `DreamSys__SelectCallback98`, `DreamSys__GetSetMoveMode`, `DreamSys__SetGateFlags`, `DreamSys__SetTickPeriod`), a large
 block of per-dream state zeroed in between/after, and a closing
-`Class6B5CC__GetRotationDegrees`/`func_8001CEB4` pair over a small local buffer — the same
-`func_8001CEB4(this, 1, &local)` shape already established by
+`Class6B5CC__GetRotationDegrees`/`Class6B5CC__UpdateRotation` pair over a small local buffer — the same
+`Class6B5CC__UpdateRotation(this, 1, &local)` shape already established by
 `DreamSys__GetSetDreamTimeLimit` a few functions earlier in this unit.
 
 Every vtable slot and struct field this function touches was ALREADY named
@@ -77,7 +77,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 
 	local.field_0x8 = 0;
 	local.field_0xA = 1;
-	this->vt->func_8001CEB4(this, 1, &local);
+	this->vt->Class6B5CC__UpdateRotation(this, 1, &local);
 }
 ```
 
@@ -98,7 +98,7 @@ types but turned out to already exist or need only a minimal local:
   — the second half of the already-typed `CinematicCall` struct
   (`+0x168` = `bank`, `+0x16A` = `entry`).
 - The stack buffer at `sp+0x18`, passed to both `Class6B5CC__GetRotationDegrees` (as an
-  output buffer) and the closing `func_8001CEB4` (as `arg2`), only needed
+  output buffer) and the closing `Class6B5CC__UpdateRotation` (as `arg2`), only needed
   two of its bytes named (`+0x8` and `+0xA`, both `s16`, values `0` and `1`)
   — everything else in it is written by `Class6B5CC__GetRotationDegrees` itself and never
   read back by this function, so it stays `unknown_values_0x0[8]`. The 5th

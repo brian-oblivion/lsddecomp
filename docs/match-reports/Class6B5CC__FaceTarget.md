@@ -213,7 +213,7 @@ here exactly as already declared.
   both are converted to degrees by the same `* 360 / 4096` this unit's
   `Class6B5CC__GetRotationDegrees` uses; they are packed as a
   `WholeFrac_d294[3]` and dispatched to `slot44`, whose occupant is
-  `func_8001CEB4` (code_d294.c, matched) -- the setter that writes
+  `Class6B5CC__UpdateRotation` (code_d294.c, matched) -- the setter that writes
   `GsCOORD2PARAM.rotate`, i.e. the object's own rotation. Compute an
   orientation from self toward a target and install it as the object's
   rotation is the whole function.

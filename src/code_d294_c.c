@@ -229,7 +229,7 @@ void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
 /* Points the object at `target`: two ratan2 calls over `target`'s world
  * position minus `self`'s own coord translation give yaw and pitch, both
  * converted to degrees, packed into a {pitch, yaw, 0} ratio triple and
- * dispatched to updateRotation (func_8001CEB4, the rotation setter that writes
+ * dispatched to updateRotation (Class6B5CC__UpdateRotation, the rotation setter that writes
  * GsCOORD2PARAM.rotate). `arg2 != 0` zeroes the pitch entry; `arg3 == 0`
  * adds 180 degrees to yaw; a non-NULL `arg4` fires a second updateRotation with the
  * caller's own table forwarded verbatim.

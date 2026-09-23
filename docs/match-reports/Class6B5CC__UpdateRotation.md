@@ -1,4 +1,6 @@
-# func_8001CEB4 -- MATCHED, round 45 (2026-09-15)
+# Class6B5CC__UpdateRotation -- MATCHED, round 45 (2026-09-15)
+
+> Renamed from `func_8001CEB4` on 2026-09-23 (tools/rename.py). Address 0x8001ceb4.
 
 **Unit:** `code_d294` · **Size:** 85 words · **Status:** MATCHED, 85/85 exact,
 whole-image SHA1 green.
@@ -14,7 +16,7 @@ beyond the flag, described below.
 ## Body
 
 ```c
-void func_8001CEB4(Class6B5CCObj *self, s32 flag, void *data) {
+void Class6B5CC__UpdateRotation(Class6B5CCObj *self, s32 flag, void *data) {
     s32 vals[3];
     Class6B5CCSub44 *dst;
     s16 *field;

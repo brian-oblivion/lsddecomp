@@ -13,7 +13,7 @@ ctor's (`Class6B5CC__Class6B5CC`) last action before returning `self`. Zeroes
 zero), copies a fixed engine matrix/table into `self->unk14` via the
 Psy-Q library helper `func_80012838` (`the 0x2258..0x8220 Psy-Q block (now linked from lib/, formerly asm/psyq_2258.s)`, not decompiled --
 out of game-code scope), then calls its own two newly-discovered slots
-`+0x044`/`+0x048` (`func_8001CEB4`/`func_8001D008`, both still queued)
+`+0x044`/`+0x048` (`Class6B5CC__UpdateRotation`/`func_8001D008`, both still queued)
 with a literal flag `1` and one of two rodata tables
 (`D_8006B684`/`D_8006B690`), and finally sets `self->unk14->unk0 = 1`.
 
@@ -34,7 +34,7 @@ void Class6B5CC__Reset(Class6B5CCObj *self) {
 
 round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build.
 Established `Class6B5CCMethods::slot44`/`slot48` (`(self, s32, void*)`,
-still-queued occupants `func_8001CEB4`/`func_8001D008`) and the
+still-queued occupants `Class6B5CC__UpdateRotation`/`func_8001D008`) and the
 `D_8006B684`/`D_8006B690` rodata tables (0xC bytes each, shape confirmed
 independently by `func_8001D008`'s own disassembly reading three
 `{s16,s16}` pairs out of its 3rd argument via `RatioToFixed12`).
