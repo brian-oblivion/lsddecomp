@@ -698,25 +698,21 @@ Elem *func_8004C434(Obj866E8 *self, s32 key) {
     }
 }
 
-#if 0
-/* STALL, round 32 (bravo2): 68/70, CORRECT length (0x118). Up from 63/70 --
- * see docs/match-reports/func_8004C470.md for the full history this builds
- * on. Fix this round: moved `threshold -= 0x800` into the for-loop's own
- * increment-expression (alongside `i++`) instead of a trailing body
- * statement, so that `continue` on the deep-threshold path applies it too.
- * This closed "Residue 2" (the increment/decrement scheduling residue)
- * completely. Remaining residue is ONLY "Residue 1": a commutative `addu`
- * whose register-operand order the report already confirmed (twice, both
- * operand-textual-orders tried) is immune to source reordering -- a
- * project-wide confirmed class, not re-attempted this round.
- * ROUND 38 (alpha + head): 68/70 -> 69/70. The "immune to source reordering"
- * claim above is WRONG as stated -- it was tested by flipping operand order
- * alone, which is indeed inert (measured again: 68/70). What moves it is
- * HOISTING the field into a local AND writing `w + tol`: both together, and
- * only on the FIRST comparison. Hoisting the second as well REGRESSES to
- * 68/70 (67/70 if its operand order is left as `tol + h`). One word remains,
- * at vram 0x8004C500 -- the mirror `addu` in the second comparison.
- * See docs/match-reports/func_8004C470.md. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 69/70 words, length EXACT, zero drift outside range.
+ * Residue: register identity, a single commutative `addu` whose operand
+ * order this compiler will not take from source order alone (vram
+ * 0x8004C500, second bounds comparison) -- CLAUDE.md HARD RULE 6 marks
+ * this a STALL by definition, not a judgement call. Survived ~183,331
+ * permuter iterations across two independent seeded searches, both never
+ * beating the base score; see docs/match-reports/func_8004C470.md for the
+ * full history (round 20 through round 47). Hand-derived: the lever that
+ * closed the first instance of this same residue (hoist the field into a
+ * local AND write `w + tol`, both together) was translated from a
+ * permuter lead into idiomatic C and confirmed by hand against the
+ * whole-image oracle across a table of variants (round 38); applying the
+ * same transform to the second comparison regresses instead of improving
+ * it, so only the first is hoisted here. */
 Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     s32 i;
     s32 tol;
@@ -748,6 +744,6 @@ Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     }
     return 0;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C470);
+#endif
