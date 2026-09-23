@@ -66,7 +66,6 @@ void func_80017AC8(BMemPMgr *pool)
     *(u32 *)end = 0x80000000;
 }
 
-#if 0
 void *func_80017B34(size, pool)
     s32 size;
     void *pool;
@@ -75,10 +74,9 @@ void *func_80017B34(size, pool)
     BMemBlockHdr *cursor;
     BMemBlockHdr *result;
     BMemBlockHdr *remainder;
-    u32 *next;
     BMemBlockHdr *unused;
     u32 blockSize;
-    u32 word;
+    u32 padded;
 
     SetBMemPMgrBusy(1);
     result = NULL;
@@ -88,7 +86,8 @@ void *func_80017B34(size, pool)
     }
     if (size != 0) {
         if (size & 0x3) {
-            size = size + 4 - (size & 0x3);
+            padded = size + 4;
+            size = padded - (size & 0x3);
         }
         if ((u32)size < 0xC) {
             size = 0xC;
@@ -100,9 +99,9 @@ void *func_80017B34(size, pool)
             if (blockSize >= (u32)size) {
                 cursor->sizeAndFlags &= 0xBFFFFFFF;
                 result = (BMemBlockHdr *)((u8 *)cursor + 4);
-                next = (u32 *)((u8 *)cursor + (cursor->sizeAndFlags & 0xFFFFFFF));
                 if (blockSize < (u32)size + 0x10) {
-                    *next &= 0x7FFFFFFF;
+                    remainder = (BMemBlockHdr *)((u8 *)cursor + (cursor->sizeAndFlags & 0xFFFFFFF));
+                    remainder->sizeAndFlags &= 0x7FFFFFFF;
                     {
                         BMemBlockHdr *n = cursor->next;
                         BMemBlockHdr *p = cursor->prev;
@@ -125,9 +124,8 @@ void *func_80017B34(size, pool)
                         }
                     }
                 } else {
-                    word = (cursor->sizeAndFlags & 0xF0000000) | (u32)size;
-                    remainder = (BMemBlockHdr *)((u8 *)cursor + (word & 0xFFFFFFF));
-                    cursor->sizeAndFlags = word;
+                    cursor->sizeAndFlags = (cursor->sizeAndFlags & 0xF0000000) | (u32)size;
+                    remainder = (BMemBlockHdr *)((u8 *)cursor + (cursor->sizeAndFlags & 0xFFFFFFF));
                     remainder->sizeAndFlags = (blockSize - (u32)size) | 0x40000000;
                     remainder->prev = cursor->prev;
                     remainder->next = cursor->next;
@@ -159,9 +157,6 @@ void *func_80017B34(size, pool)
     SetBMemPMgrBusy(0);
     return result;
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_8220", func_80017B34);
 
 void *func_80017CFC(ptr, pool)
     void *ptr;
