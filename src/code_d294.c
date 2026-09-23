@@ -88,7 +88,7 @@ void Class6B5CC__Reset(Class6B5CCObj *self) {
     self->unk10 = 0;
     GsInitCoordinate2(0, self->unk14);
     self->methods->updateRotation(self, 1, ROTATION_ZERO);
-    self->methods->updateScale(self, 1, D_8006B690);
+    self->methods->updateScale(self, 1, SCALE_ONE);
     self->unk14->unk0 = 1;
 }
 

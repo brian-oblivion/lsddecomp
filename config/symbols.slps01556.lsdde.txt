@@ -1395,3 +1395,4 @@ Class6B5CC__SetLighting = 0x8001D3CC; // type:func
 Class6B5CC__SetLightMode = 0x8001D3F8; // type:func
 gClass6B5CCMethods = 0x8006B5CC;
 ROTATION_ZERO = 0x8006B684;
+SCALE_ONE = 0x8006B690;

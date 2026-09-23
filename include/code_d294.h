@@ -431,7 +431,7 @@ struct Class6B5CCMethods {
     void (*slot40)(Class6B5CCObj *self);      /* +0x040, Class6B5CC__Reset (this unit) */
     /* +0x044/+0x048, a `(self, s32 flag, void *data)` pair -- Class6B5CC__Reset
      * calls both with flag=1 and `data` pointing at a 3-entry table of
-     * {s16,s16} pairs (ROTATION_ZERO/D_8006B690, 0xC bytes each). Class6B5CC__UpdateScale
+     * {s16,s16} pairs (ROTATION_ZERO/SCALE_ONE, 0xC bytes each). Class6B5CC__UpdateScale
      * (slot +0x048's own occupant, still queued) confirms the `data` shape:
      * it reads three such pairs via RatioToFixed12. */
     void (*updateRotation)(Class6B5CCObj *self, s32 flag, void *data); /* +0x044, Class6B5CC__UpdateRotation */
@@ -573,7 +573,7 @@ struct Class6B5CCObj {
 /* The `{s16 whole; s16 frac;}` pair `RatioToFixed12` (below) reads and
  * `Class6B5CC__GetRotationDegrees` (round 14, code_d294_c) writes, three-in-a-row, at
  * +0x0/+0x4/+0x8 of a 3-entry table (an angle-like x/y/z triple,
- * degrees-and-fraction each -- `ROTATION_ZERO`/`D_8006B690` are exactly this
+ * degrees-and-fraction each -- `ROTATION_ZERO`/`SCALE_ONE` are exactly this
  * shape). `Class6B5CC__GetRotationDegrees` writes `frac` as a constant `1` in every entry
  * it produces; real per-field meaning of `frac` beyond that one producer
  * is still only inferred from `RatioToFixed12`'s own `div`-by-`frac` body,
@@ -600,13 +600,13 @@ struct WholeFrac_d294 {
  * the pair themselves. */
 extern s32 RatioToFixed12(void *pair);
 
-/* ROTATION_ZERO/D_8006B690 (rodata): two 3-entry, 0xC-byte tables in the shape
+/* ROTATION_ZERO/SCALE_ONE (rodata): two 3-entry, 0xC-byte tables in the shape
  * RatioToFixed12 reads (see above) -- Class6B5CC__Reset's own literal `data`
  * arguments to slot +0x044/+0x048. Declared as opaque byte blobs since
  * nothing this unit's chosen functions read out of them directly (only
  * their address is taken and forwarded). */
 extern u8 ROTATION_ZERO[0xC];
-extern u8 D_8006B690[0xC];
+extern u8 SCALE_ONE[0xC];
 
 /* Class6B5CC__LinkModel/Class6B5CC__UnlinkModel -- now carved (round 14, src/code_d294_c.c),
  * and GsInitCoordinate2 (Psy-Q libgs/matrix, linked from Sony's object,
