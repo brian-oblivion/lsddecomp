@@ -434,29 +434,19 @@ void TaskObjF__FreeBuffers(TaskObjF *self) {
     }
 }
 
-#if 0
-/* STALL snapshot -- see docs/match-reports/TaskObjF__func_8004F8A4.md. Best reached
- * this round (delta): 63/77 words, 0x140/0x134 (3 words / 12 bytes TOO
- * LONG, address drift beyond that -- opposite direction from the previous
- * 36/77-at-1-word-short best). Caching `self->methods` into a local
- * `TaskObjFMethods *m` right where retail does (in the `slot60`-returned-
- * nonzero tail, before its own 2-way `statusCode` check) took this from 36/77
- * to 63/77 -- reproduces retail's whole body byte-for-byte up through the
- * final shared `jalr`. The residue is now isolated entirely to the
- * function's OWN early-exit tail (see report): retail reuses
- * `TaskObjF__Validate`'s own false(0) return value directly as the function's
- * return with zero extra instructions, but this build always
- * re-materializes an explicit `v0=0` plus a skip-jump around it,
- * regardless of whether the C returns a literal `0` or a captured
- * variable holding the same value. Preserved here per convention -- not
- * live C.
- *
- * ROUND 37 (delta): re-verified by splicing this exact body back in --
- * rebuilds to 63/77 words at 0x140/0x134 (3 words too long), first real
- * diff at file 0x40158 / vram 0x8004F958 (delay-slot fill: retail
- * `move $a0,$s0`, built `nop`), matching this report exactly. Seeded a
- * permuter search (never run before this round) -- see the report for
- * iteration count and result. Restored here, not left live. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 63/77 words, 0x140/0x134 (3 words / 12 bytes too long).
+ * Residue: early-exit tail re-materialization -- retail reuses
+ * `TaskObjF__Validate`'s own false(0) return value directly as the
+ * function's return with zero extra instructions, but this build always
+ * re-materializes an explicit `v0=0` plus a skip-jump around it, whether
+ * the C returns a literal `0` or a captured variable holding the same
+ * value (docs/match-reports/TaskObjF__func_8004F8A4.md). Hand-derived:
+ * caching `self->methods` into a local `TaskObjFMethods *m` right where
+ * retail does (in the `slot60`-returned-nonzero tail, before its own
+ * 2-way `statusCode` check) reproduces retail's whole dispatch structure
+ * byte-for-byte up through the final shared `jalr`; only the early-exit
+ * tail remains unmatched. */
 s32 TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
     s32 code;
     s32 (*dispatch)(TaskObjF *, s32);
@@ -504,9 +494,9 @@ s32 TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a
     }
     return 0;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", TaskObjF__func_8004F8A4);
+#endif
 
 
 s32 TaskObjF__Validate(TaskObjF *self) {
