@@ -73,7 +73,99 @@
  * (110/132 built words, length EXACT at 132/132) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CD08);
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 167/167 words, length exact (74/167 raw word-match; funcdiff
+ * insertions/deletions 16/16). Residue: a systematic register rotation
+ * (t3/t0/a2/a3 family) running through nearly the whole function, visible
+ * from the very first instruction (docs/match-reports/func_8002CF18.md).
+ * Hand-derived. */
+extern u8 D_8008D9A3[];
+extern u8 D_8008D98E[];
+extern u8 D_8008D98A[];
+extern u8 D_8008D9A0[];
+extern u8 D_8008D988[];
+extern u8 D_8008E9D0;
+extern u8 D_8008EA1B;
+extern void SpuSetNoiseVoice(s32 a0, s32 a1);
+
+s32 func_8002CF18(void)
+{
+    s32 chosen;
+    u16 bestSec;
+    s32 found;
+    s32 bestTer;
+    s32 bestIdx;
+    u32 idx;
+    s32 threshold;
+    s32 pri;
+    u32 newSec;
+    u32 count;
+    u8 *p988;
+
+    chosen = 0x63;
+    bestSec = 0xFFFF;
+    found = 0;
+    bestTer = 0;
+    bestIdx = 0x63;
+    threshold = D_8008EA1B;
+
+    for (idx = 0; (u8) idx < D_8008E9D0; idx++) {
+        if (D_8008D9A3[(u8) idx * 0x34] != 0
+            || *(u16 *)(D_8008D98E + (u8) idx * 0x34) != 0) {
+            pri = *(s16 *)(D_8008D9A0 + (u8) idx * 0x34);
+            if (pri < (s32)(u16) threshold) {
+                threshold = pri;
+                bestIdx = idx;
+                bestSec = *(u16 *)(D_8008D98E + (u8) idx * 0x34);
+                bestTer = *(u16 *)(D_8008D98A + (u8) idx * 0x34);
+                found = 1;
+            } else if (pri == (s32)(u16) threshold) {
+                found++;
+                newSec = *(u16 *)(D_8008D98E + (u8) idx * 0x34);
+                if (newSec < bestSec) {
+                    bestTer = *(u16 *)(D_8008D98A + (u8) idx * 0x34);
+                    bestSec = newSec;
+                    bestIdx = idx;
+                } else if (newSec == bestSec) {
+                    if (bestTer < (s16) *(u16 *)(D_8008D98A + (u8) idx * 0x34)) {
+                        bestTer = (s16) *(u16 *)(D_8008D98A + (u8) idx * 0x34);
+                        bestIdx = idx;
+                    }
+                }
+            }
+        } else {
+            chosen = idx;
+        }
+    }
+
+    if ((u8) chosen == 0x63) {
+        if ((u8) found != 0) {
+            chosen = bestIdx;
+        } else {
+            chosen = D_8008E9D0;
+        }
+    }
+
+    count = D_8008E9D0;
+    if ((u8) chosen < count) {
+        if (count != 0) {
+            p988 = D_8008D988;
+            for (idx = 0; (u8) idx < count; idx++) {
+                *(u16 *)(p988 + (u8) idx * 0x34 + 2) =
+                    *(u16 *)(D_8008D98A + (u8) idx * 0x34) + 1;
+            }
+        }
+        *(u16 *)(D_8008D98A + (u8) chosen * 0x34) = 0;
+        *(s16 *)(D_8008D9A0 + (u8) chosen * 0x34) = D_8008EA1B;
+        if (D_8008D9A3[(u8) chosen * 0x34] == 2) {
+            SpuSetNoiseVoice(0, 0xFFFFFF);
+        }
+    }
+    return (u8) chosen;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);
+#endif
 
 /* Shared with func_8002D8E0 below (same two-level entry table, same
  * blend-cascade shape); declared once here since func_8002D1B4 is
