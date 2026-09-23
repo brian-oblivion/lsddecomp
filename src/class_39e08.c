@@ -119,10 +119,10 @@ void Obj865C8__RunSubUpdates(Obj865C8 *self) {
 }
 
 /* Defined later in this file (ROM order); forward-declared here since
- * func_80049CA8 calls it. */
+ * Obj865C8__AdvanceState calls it. */
 extern void func_80049E20(Obj865C8 *self, s32 arg1);
 
-void func_80049CA8(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
     GetClass86668Methods()->slot54(self, arg1, arg2);

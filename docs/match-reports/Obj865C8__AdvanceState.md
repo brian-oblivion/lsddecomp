@@ -1,4 +1,6 @@
-# func_80049CA8 — MATCHED (94/94 words)
+# Obj865C8__AdvanceState — MATCHED (94/94 words)
+
+> Renamed from `func_80049CA8` on 2026-09-23 (tools/rename.py). Address 0x80049ca8.
 
 `Class865C8Methods` slot +0x054.
 
@@ -89,7 +91,7 @@ jr $ra
 ```c
 extern void func_80049E20(Obj865C8 *self, s32 arg1);
 
-void func_80049CA8(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
     GetClass86668Methods()->slot54(self, arg1, arg2);

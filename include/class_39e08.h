@@ -67,7 +67,7 @@ typedef struct Class865C8Methods {
     void *slot48;                                  /* +0x048 Obj865C8__Deinit */
     void *slot4C;                                  /* +0x04C Obj865C8__StartSubA */
     void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 Obj865C8__RunSubUpdates */
-    void *slot54;                                  /* +0x054 func_80049CA8 */
+    void *slot54;                                  /* +0x054 Obj865C8__AdvanceState */
     void (*noop58)(void);                          /* +0x058 func_8004A35C (no-op, matched) */
     void *slot5C;                                  /* +0x05C func_8004A364 */
     /* Shared with gClass86668Methods (see Class86668Methods below) -- literally the
@@ -151,10 +151,10 @@ typedef struct SubObjB {
  * SubObjA/SubObjB above. */
 typedef struct Obj4CMethods {
     u8 pad00[0x4];
-    void (*slot4)(Obj4C *self);                       /* +0x004, func_80049CA8, return discarded */
+    void (*slot4)(Obj4C *self);                       /* +0x004, Obj865C8__AdvanceState, return discarded */
     u8 pad8[0x44 - 0x8];
     void (*slot44)(Obj4C *self, s32 arg1, s32 arg2);
-    void (*slot48)(Obj4C *self);                       /* +0x048, func_80049CA8, return discarded */
+    void (*slot48)(Obj4C *self);                       /* +0x048, Obj865C8__AdvanceState, return discarded */
 } Obj4CMethods;
 struct Obj4C {
     Obj4CMethods *methods;
@@ -231,12 +231,12 @@ typedef struct SubObjDMethods {
      * self->unk44). */
     void (*slot114)(SubObjD *self, SubObjG *arg1);   /* +0x114 */
     u8 pad118[0x1B4 - 0x118];
-    /* func_80049CA8's `case 1`: return value used (`>= 0` check), so this
+    /* Obj865C8__AdvanceState's `case 1`: return value used (`>= 0` check), so this
      * is genuinely non-void. */
     s32 (*slot1B4)(SubObjD *self);                /* +0x1B4 */
     /* +0x1B8. RETYPED void -> s32 in round 23: func_80049EB4 branches on the
      * return value (`bnez $v0` straight off the `jalr`), which is positive
-     * evidence the slot is non-void. func_80049CA8, the other caller in this
+     * evidence the slot is non-void. Obj865C8__AdvanceState, the other caller in this
      * unit and already matched, DISCARDS it -- so this is the round-7 shared-slot
      * hazard; re-verified byte-exact after the retype (whole-image SHA1). */
     s32 (*slot1B8)(SubObjD *self, s32 arg1);
@@ -248,7 +248,7 @@ typedef struct SubObjDMethods {
      * established. Pad split below is additive and preserves the 0x24 total. */
     struct SubObjDPos (*slot1BC)(SubObjD *self);
     u8 pad1C0[0x1E0 - 0x1C0];
-    /* func_80049CA8's `case 3`: return value used (forwarded straight into
+    /* Obj865C8__AdvanceState's `case 3`: return value used (forwarded straight into
      * func_80049E20's own 2nd argument). */
     s32 (*slot1E0)(SubObjD *self);                 /* +0x1E0 */
 } SubObjDMethods;
@@ -367,9 +367,9 @@ typedef struct Class86668Methods {
     void (*slot48)(Obj865C8 *self);                        /* +0x048 func_8004A324 */
     u8 pad4C[0x54 - 0x4C];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
-     * offset (func_80049CA8, this unit): gClass86668Methods's own +0x054 is
+     * offset (Obj865C8__AdvanceState, this unit): gClass86668Methods's own +0x054 is
      * Obj86B60__OnTag1Notify (a base/inherited slot, out of this unit's scope).
-     * Called by func_80049CA8 as GetClass86668Methods()->slot54(self, arg1,
+     * Called by Obj865C8__AdvanceState as GetClass86668Methods()->slot54(self, arg1,
      * arg2), return discarded. */
     void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 Obj86B60__OnTag1Notify */
 } Class86668Methods;
