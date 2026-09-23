@@ -1,4 +1,24 @@
-# OpenCdFile -- STALL (best: 14/43 words at length 44/43 [1 word long], structural, first real diff at file offset 0x19124 per asm-differ)
+# OpenCdFile -- STALL, NON_MATCHING body promoted round 72 (promoted body: 13/43 words at length 44/43 [1 word long], structural; round-54 reshape 2 measured 14/43 at the same length but was reverted and is NOT the promoted body -- see round-72 note)
+
+> **ROUND 72 (2026-09-23), runner charlie -- NON_MATCHING body promoted.**
+> Per `docs/FINISHING-PLAN.md` track 1b: the "## Best result" body (the one
+> the round-64 note says is kept current against the present struct field
+> names) is hand-derived across rounds 17/36/47/54 -- no permuter-found edit
+> is in it; round 47's permuter check (b) explicitly DECLINED the search
+> (insertions=4, deletions=3, reorderings=1, base score 863), so nothing
+> from a search ever entered this body. Live-measured this round under the
+> current pinned maspsx flags (rounds 42/63) by making the body live C in
+> place of `INCLUDE_ASM`, running the real oracle, and reading
+> `funcdiff.py`: **13/43 raw word-match, length 44/43 words (one word
+> long)** -- `build/lsdde.map` confirms `BuildCdFilePath - OpenCdFile =
+> 0xB0` = 44 words against retail's 43, unchanged from every prior
+> measurement. This is NOT byte-exact, so it was restored to the
+> `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif` shape (not left as
+> live C) with a comment carrying this score, its residue class
+> (structural: path-address CSE across the loop's calls + a register-role
+> rotation), and this report. `./build-and-verify.sh` and
+> `tools/check-nonmatching.sh` both green afterward; verified build bytes
+> unchanged (INCLUDE_ASM still drives the linked build).
 
 > Renamed from `func_80028920` on 2026-09-21 (tools/rename.py). Address 0x80028920.
 
