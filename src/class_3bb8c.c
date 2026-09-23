@@ -650,21 +650,15 @@ Elem *func_8004C434(Obj866E8 *self, s32 key) {
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 69/70 words, length EXACT, zero drift outside range.
- * Residue: register identity, a single commutative `addu` whose operand
- * order this compiler will not take from source order alone (vram
- * 0x8004C500, second bounds comparison) -- CLAUDE.md HARD RULE 6 marks
- * this a STALL by definition, not a judgement call. Survived ~183,331
- * permuter iterations across two independent seeded searches, both never
- * beating the base score; see docs/match-reports/func_8004C470.md for the
- * full history (round 20 through round 47). Hand-derived: the lever that
- * closed the first instance of this same residue (hoist the field into a
- * local AND write `w + tol`, both together) was translated from a
- * permuter lead into idiomatic C and confirmed by hand against the
- * whole-image oracle across a table of variants (round 38); applying the
- * same transform to the second comparison regresses instead of improving
- * it, so only the first is hoisted here. */
+/* MATCH, round 73 (bravo): 70/70. The last word was the operand order
+ * of the second bounds `addu`. At expand time a MEM operand of a
+ * commutative `+` is placed second whatever the source order, while a
+ * named variable keeps its source position; retail's `field + tol` order
+ * therefore needs the field in a named local at the add. Assigning `w`
+ * INSIDE the upper-bound test keeps the `arg1` load ahead of the field
+ * load, as retail schedules it (a `w = ...;` statement before the `if`
+ * fixes the add but swaps those two loads). See
+ * docs/match-reports/func_8004C470.md. */
 Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     s32 i;
     s32 tol;
@@ -679,9 +673,8 @@ Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     for (; i < 7; i++, threshold -= 0x800) {
         candidate = self->methods->slot118(self, i);
         r = candidate->unkC->unk14;
-        w = r->unk18.w;
-        if (arg1->unk0 >= w && arg1->unk0 < w + tol) {
-            if (arg1->unk8 >= r->unk20.w && arg1->unk8 < tol + r->unk20.w) {
+        if (arg1->unk0 >= r->unk18.w && arg1->unk0 < (w = r->unk18.w) + tol) {
+            if (arg1->unk8 >= r->unk20.w && arg1->unk8 < (w = r->unk20.w) + tol) {
                 if (self->unk68->unk4 == 0) {
                     return candidate;
                 }
@@ -696,6 +689,3 @@ Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004C470);
-#endif
