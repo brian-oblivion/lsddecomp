@@ -1,3 +1,27 @@
+/*
+ * class_3bb8c_g -- this unit's own slots (+0x048 and up) of the shared
+ * Class86E00 vtable (D_80086E00; +0x004..+0x03C belong to class_3bb8c_e/f,
+ * this header's other two owners of the same table), plus one standalone
+ * helper (CopyMemcardIconTemplate) reused by class_3bb8c_m's memcard save
+ * writer.
+ *
+ * Class86E00 runs a `state` machine: SetState/AdvanceState fire a fixed
+ * set of transition-entry callbacks and either commit a new `state` or
+ * tear the object down; ForceIdleFromState and TickStateDelay drive two
+ * more paths into the same shared slot7C/slot8C tail; OnCommand and
+ * OnItemSelected forward an externally supplied 2/3 dispatch code the
+ * same way. Two lazily-attached child sub-objects (childA/childB, the
+ * same real class the sibling units call Obj86ED0/Class86ED0 via
+ * D_80086ED0) are attached/detached in mirrored pairs. A third,
+ * independent child (cardIcon) is a memcard-icon TIM image, loaded once
+ * by LoadCardIcon and stepped by TickCardIcon.
+ *
+ * Every function in the unit is matched C. What each numeric `state`
+ * code and each OnCommand/OnItemSelected dispatch code means in game
+ * terms is not established -- names below describe mechanics, not
+ * purpose (tier B throughout except the two pure getter/loader
+ * functions). See each function's own match report for its evidence.
+ */
 #include "common.h"
 #include "class_3bb8c.h"
 
