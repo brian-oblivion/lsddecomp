@@ -1,4 +1,6 @@
-# func_8003B8E4
+# StreamTaskObj__StreamTaskObj
+
+> Renamed from `func_8003B8E4` on 2026-09-23 (tools/rename.py). Address 0x8003b8e4.
 
 **Unit:** code_2c054 · **Size:** 62 words · **Status:** MATCHED (62/62)
 
@@ -7,12 +9,12 @@
 This is `StreamTaskObj`'s constructor — occupies `D_8006E5F8`'s own slot
 `+0x008` (per `classtable.py D_8006E5F8`, confirming the earlier header
 comment that named this function as the ctor reached through
-`func_8003BE84()`'s slot).
+`Get_vtable_StreamTaskObj()`'s slot).
 
 ```c
-void func_8003B8E4(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
+void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
     Get_vtable_TaskCore()->slot08(self, a1, a2, a3);
-    self->methods = func_8003BE84();
+    self->methods = Get_vtable_StreamTaskObj();
     if (a4 != NULL) {
         self->unkA8 = *a4;
     } else {
@@ -27,11 +29,11 @@ void func_8003B8E4(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitDa
 ## New structure discovered
 
 - `Get_vtable_TaskCore()->slot08(...)`: new `TaskCoreMethods` slot `+0x008`.
-  `classtable.py gTaskCoreMethods` shows it occupied by `func_8003BF10` — **this
+  `classtable.py gTaskCoreMethods` shows it occupied by `TaskCoreObj__TaskCoreObj` — **this
   unit's own next queued function**, confirming the 4-argument
   `(self, a1, a2, a3)` signature ahead of writing that function.
 - `self->methods->slot40(self)`: new `StreamTaskObjMethods` slot `+0x040`,
-  occupied by this unit's own already-matched `func_8003BA38` (per
+  occupied by this unit's own already-matched `StreamTaskObj__Reset` (per
   `classtable.py D_8006E5F8`) — confirms single-argument arity.
 - `StreamTaskInitData` (new type): a plain 3-word struct. Both the
   function's optional 5th (stack) argument `a4` and `GetDefaultStreamTaskInitData()`'s
@@ -72,12 +74,12 @@ load-all-then-store-all form exactly.
 ## Third-learning check (per head's request)
 
 **Not needed here** in the "value read then re-read after a `jalr`" sense —
-`self->methods` IS written mid-function (`self->methods = func_8003BE84();`)
+`self->methods` IS written mid-function (`self->methods = Get_vtable_StreamTaskObj();`)
 and read again at the very end after two more calls
 (`GetDefaultStreamTaskInitData`/`func_80045438`) for `self->methods->slot40(self)`, but that
 final read is a **plain, single, natural field dereference** with no earlier
 same-expression read to conflict with — nothing needed caching because
-nothing was read twice. The lever from `func_8003C3D0`/`func_8003C11C` is
+nothing was read twice. The lever from `TaskCoreObj__func_8003C3D0`/`TaskCoreObj__Reset` is
 specifically about *reusing an already-loaded value* across a call; here the
 value is simply read once, fresh, at its point of use, which needs no local.
 The residue this function actually had was the sibling lesson from the same

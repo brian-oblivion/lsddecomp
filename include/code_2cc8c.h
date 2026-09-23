@@ -1038,7 +1038,7 @@ struct Obj86B60Methods {
                                                       exclusivity as
                                                       resetCounters above. */
     void (*slot4C)(Obj86B60 *self, s32 a1, s32 a2, s32 a3); /* +0x04C,
-                                                      external (func_8003C238);
+                                                      external (TaskCoreObj__func_8003C238);
                                                       OBSERVED: Obj86B60__Init */
     void (*slot50)(Obj86B60 *self);               /* +0x050, external
                                                       (func_8004D898);

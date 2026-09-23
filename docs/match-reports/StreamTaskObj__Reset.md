@@ -1,12 +1,14 @@
-# func_8003BA38
+# StreamTaskObj__Reset
+
+> Renamed from `func_8003BA38` on 2026-09-23 (tools/rename.py). Address 0x8003ba38.
 
 **Unit:** code_2c054 · **Size:** 8 instructions (0x20 bytes) · **Status:** MATCHED (8/8 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
-Resets the five fields the `func_8003BE5C`.."`7C`" setters (see that
+Resets the five fields the `StreamTaskObj__SetUnkC4`.."`7C`" setters (see that
 report) write individually: `self->unkC4=0; unkC8=-1; unkCC=1; unkD0=0;
-unkD4=1;`. Slot `+0x040` of `D_8006E5F8` (`func_8003BE84`'s report), so
+unkD4=1;`. Slot `+0x040` of `D_8006E5F8` (`Get_vtable_StreamTaskObj`'s report), so
 presumably an "init"/"reset" method for this `StreamTaskObj` class.
 
 ## Derivation
@@ -23,7 +25,7 @@ jr    $ra
 ```
 
 ```c
-void func_8003BA38(StreamTaskObj *self) {
+void StreamTaskObj__Reset(StreamTaskObj *self) {
     self->unkC8 = -1;
     self->unkC4 = 0;
     self->unkCC = 1;
@@ -44,4 +46,4 @@ with the setters' report).
 
 ## Proposed learning
 
-None new beyond `func_8003BE5C`'s.
+None new beyond `StreamTaskObj__SetUnkC4`'s.

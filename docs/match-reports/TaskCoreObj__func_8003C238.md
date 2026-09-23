@@ -1,9 +1,11 @@
-# func_8003C238
+# TaskCoreObj__func_8003C238
+
+> Renamed from `func_8003C238` on 2026-09-23 (tools/rename.py). Address 0x8003c238.
 
 **Unit:** code_2c054 · **Size:** 102 words · **Status:** MATCHED (102/102)
 
 This occupies `TaskCoreMethods`'s (`gTaskCoreMethods`) own slot `+0x04C` (per
-`classtable.py gTaskCoreMethods`, and confirmed by `func_8003BAB4`'s own
+`classtable.py gTaskCoreMethods`, and confirmed by `StreamTaskObj__func_8003BAB4`'s own
 single-argument call into this exact function). It is the unit's largest
 queued function and the round's last one; the head flagged it as likely to
 carry a surviving residue. It matched byte-exact on the first real attempt
@@ -13,7 +15,7 @@ mistakes before any bytes were compared.
 ## Summary
 
 ```c
-void func_8003C238(StreamTaskObj *self) {
+void TaskCoreObj__func_8003C238(StreamTaskObj *self) {
     TaskCoreObj *unk18;
     TaskCoreObjMethods *core;
 
@@ -47,34 +49,34 @@ before touching the header, is what surfaced them; neither was visible from
 only retyped existing fields/slots, never changed a compiled instruction).
 
 **1. `self->unk18` is NOT an instance of `TaskCoreMethods`'s class.**
-`func_8003C3D0` (earlier this round) modeled `self->unk18->methods` as
+`TaskCoreObj__func_8003C3D0` (earlier this round) modeled `self->unk18->methods` as
 sharing `TaskCoreMethods` (`gTaskCoreMethods`'s own vtable shape), on the strength
 of `gTaskCoreMethods` happening to have non-null entries at the two offsets
 (`+0x074`, `+0x090`) that function called. This function calls THREE MORE
 slots on `self->unk18` -- `+0x048`, `+0x04C`, `+0x050`, all 2-argument
-setters. `gTaskCoreMethods`'s own `+0x04C` is `func_8003C238` -- this very
+setters. `gTaskCoreMethods`'s own `+0x04C` is `TaskCoreObj__func_8003C238` -- this very
 function -- and it is unambiguously single-argument (confirmed by
-`func_8003BAB4`'s already byte-exact call). A vtable slot's signature has to
+`StreamTaskObj__func_8003BAB4`'s already byte-exact call). A vtable slot's signature has to
 agree across every instance of one class; a genuine arity conflict at a
 shared offset is proof `self->unk18` is a sibling class, not the same one.
 Split into a new `TaskCoreObjMethods` type (`include/code_2c054.h`), moving
 `slot74`/`slot90` out of `TaskCoreMethods` into it and adding the three new
-slots plus `+0x08C`. **Updated `func_8003C3D0.md`'s "New structure
+slots plus `+0x08C`. **Updated `TaskCoreObj__func_8003C3D0.md`'s "New structure
 discovered" section with a correction note** rather than rewriting it.
 
 **2. `self->unk78` is NOT the same class as `StreamTaskUnkB4Obj`.**
-`func_8003C008` (this round, function before this one) unified
+`TaskCoreObj__Destroy` (this round, function before this one) unified
 `self->unk78` into `StreamTaskUnkB4Obj` on 5-way evidence: five sibling
 fields all torn down identically via a 1-argument `slot04`. This function
 calls `self->unk78`'s own slot `+0x04C` with **3 arguments**
 (`self->unk78->methods->slot4C(self->unk78, self->unk14, 0)`), where
-`StreamTaskUnkB4Methods::slot4C` (from the already-matched `func_8003BDF4`,
+`StreamTaskUnkB4Methods::slot4C` (from the already-matched `StreamTaskObj__func_8003BDF4`,
 called on `self->unkB4`) is fixed at 1 argument. Same reasoning as above:
 real arity conflict at a shared offset means these are sibling classes that
 happen to agree at `slot04` (likely via a shared base), not one class.
 Reverted `self->unk78` to its own `StreamTaskUnk78Obj/Methods` type, now
-with three known slots (`04`, `4C` here, `50` from `func_8003C3D0`, `B8`
-here). **Updated `func_8003C008.md` with a correction note** rather than
+with three known slots (`04`, `4C` here, `50` from `TaskCoreObj__func_8003C3D0`, `B8`
+here). **Updated `TaskCoreObj__Destroy.md` with a correction note** rather than
 rewriting it, and left `unk48`/`unk74`/`unk7C`/`unk80` unified with
 `StreamTaskUnkB4Obj` as-is -- no function has yet called a conflicting slot
 on any of those four, so there is no counter-evidence to act on there.
@@ -88,7 +90,7 @@ on any of those four, so there is no counter-evidence to act on there.
   guard), `unk90` (`+0x090`, `u8`, address-only -- 3 bytes before `unk93`,
   same buffer).
 - `TaskTextMethods::slot78`'s 3rd parameter widened from `s32 flag` to
-  `u8 *flag`: `func_8003C3D0`'s call passes literal `0` (valid for either
+  `u8 *flag`: `TaskCoreObj__func_8003C3D0`'s call passes literal `0` (valid for either
   type, unchanged bytes there), this function's own call passes
   `gDefaultStreamTaskInitData`, a real rodata address.
 - Two new rodata externs, address-only: `gDefaultStreamTaskInitData`, and `D_8006E86C`
@@ -121,7 +123,7 @@ produced two: `self->unk18` vs. `TaskCoreMethods`, and `self->unk78` vs.
 list for every `jalr` in the raw disassembly before touching the header --
 an arity that doesn't match an already-established slot's signature is a
 hard stop, not a detail to gloss over. Where the round's earlier unification
-lessons (`func_8003C008`) taught "same slot number + same access pattern +
+lessons (`TaskCoreObj__Destroy`) taught "same slot number + same access pattern +
 same caller is strong positive evidence," this function's residue-free match
 teaches the complementary negative: a single conflicting arity at that same
 slot number is enough to override it, because a class's vtable ABI must be

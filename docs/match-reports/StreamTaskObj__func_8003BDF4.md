@@ -1,4 +1,6 @@
-# func_8003BDF4
+# StreamTaskObj__func_8003BDF4
+
+> Renamed from `func_8003BDF4` on 2026-09-23 (tools/rename.py). Address 0x8003bdf4.
 
 **Unit:** code_2c054 · **Size:** 26 words · **Status:** MATCHED (26/26)
 
@@ -7,7 +9,7 @@
 An `if`/`else` selecting one of two forwarding calls based on `self->unkD4`.
 
 ```c
-void func_8003BDF4(StreamTaskObj *self) {
+void StreamTaskObj__func_8003BDF4(StreamTaskObj *self) {
     if (self->unkD4 != 0) {
         self->unkB4->methods->slot4C(self->unkB4);
     } else {
@@ -18,7 +20,7 @@ void func_8003BDF4(StreamTaskObj *self) {
 
 ## Evidence
 
-- `self->unkD4` is the field set by this unit's `func_8003BE7C` (already
+- `self->unkD4` is the field set by this unit's `StreamTaskObj__SetUnkD4` (already
   established).
 - `self->unkB4->methods->slot4C(self->unkB4)`: `self->unkB4` is
   `StreamTaskUnkB4Obj*` (established). Its vtable had only slot `+0x004`
@@ -27,9 +29,9 @@ void func_8003BDF4(StreamTaskObj *self) {
   return, so it is typed `void (*)(StreamTaskUnkB4Obj *self)` here, no
   counter-evidence.
 - `self->methods->slot60(self, 7)` reuses the slot established matching
-  `func_8003BD10` in the same round (`StreamTaskObjMethods::slot60`,
-  occupied by `func_8003BC14` per `classtable.py D_8006E5F8`).
+  `StreamTaskObj__func_8003BD10` in the same round (`StreamTaskObjMethods::slot60`,
+  occupied by `StreamTaskObj__func_8003BC14` per `classtable.py D_8006E5F8`).
 
 ## Proposed learning
 
-None beyond what `func_8003BD10`'s report already states.
+None beyond what `StreamTaskObj__func_8003BD10`'s report already states.

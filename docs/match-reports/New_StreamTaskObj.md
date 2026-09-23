@@ -1,4 +1,6 @@
-# func_8003B854
+# New_StreamTaskObj
+
+> Renamed from `func_8003B854` on 2026-09-23 (tools/rename.py). Address 0x8003b854.
 
 **Unit:** code_2c054 · **Status:** MATCHED (36/36 words)
 
@@ -9,13 +11,13 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-StreamTaskObj *func_8003B854(s32 a1, s32 a2, s32 a3, s32 a4)
+StreamTaskObj *New_StreamTaskObj(s32 a1, s32 a2, s32 a3, s32 a4)
 {
     ...
 
     self = func_80017B34(0xDC);
     if (self != NULL) {
-        func_8003BE84()->slot08(self, a1, a2, a3, a4);
+        Get_vtable_StreamTaskObj()->slot08(self, a1, a2, a3, a4);
         return self;
     }
     return NULL;

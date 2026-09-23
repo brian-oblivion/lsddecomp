@@ -769,7 +769,7 @@ jr    v0
   sites, 30 are `jtbl_*`. All 505 count.
 - **Corroborating negative:** no matched C function in the project owns a dense
   `switch` jump table. The matched `switch` statements that do exist are sparse
-  (e.g. `func_8003BC14`'s cases 5/7/8/0x12), which GCC 2.6.3 compiles to a
+  (e.g. `StreamTaskObj__func_8003BC14`'s cases 5/7/8/0x12), which GCC 2.6.3 compiles to a
   compare chain and which matches fine. That is consistent with dense switches
   being unreachable under the pin, and it is the reason the gap went unnoticed.
 

@@ -1,4 +1,6 @@
-# func_8003BD10
+# StreamTaskObj__func_8003BD10
+
+> Renamed from `func_8003BD10` on 2026-09-23 (tools/rename.py). Address 0x8003bd10.
 
 **Unit:** code_2c054 · **Size:** 25 words · **Status:** MATCHED (25/25)
 
@@ -9,7 +11,7 @@ Straight-line forward: call the shared `TaskCoreMethods` singleton's slot
 call `self->methods->slot60(self, 0x12)`.
 
 ```c
-void func_8003BD10(StreamTaskObj *self) {
+void StreamTaskObj__func_8003BD10(StreamTaskObj *self) {
     Get_vtable_TaskCore()->slot78(self);
     if (self->unkCC != 0) {
         self->unk38 = 2;
@@ -25,8 +27,8 @@ void func_8003BD10(StreamTaskObj *self) {
   `+0x078 = func_8003C858` (a different unit, not touched here — only the
   slot's existence and signature matter for this call site).
 - `self->methods` is `StreamTaskObjMethods*` (`D_8006E5F8`).
-  `tools/classtable.py D_8006E5F8` shows slot `+0x060 = func_8003BC14`, which
-  is this unit's own queued `func_8003BC14` — confirms the slot exists and
+  `tools/classtable.py D_8006E5F8` shows slot `+0x060 = StreamTaskObj__func_8003BC14`, which
+  is this unit's own queued `StreamTaskObj__func_8003BC14` — confirms the slot exists and
   that its signature is `(StreamTaskObj *self, s32 a1)`.
 - Both call results are discarded in the disassembly, so both slots are typed
   `void` here (no counter-evidence).

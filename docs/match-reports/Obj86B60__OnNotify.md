@@ -44,7 +44,7 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
   Only the one field each touches is modelled.
 - `Obj86B60Methods`: added `slot10` (BasicClass addChild, inherited,
   `Obj86B60__Init`), `slot40` (`Obj86B60__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
-  (`Obj86B60__Deinit`, `Obj86B60__Init`), `slot4C` (external `func_8003C238`,
+  (`Obj86B60__Deinit`, `Obj86B60__Init`), `slot4C` (external `TaskCoreObj__func_8003C238`,
   `Obj86B60__Init`), `slot54` (`Obj86B60__OnTag1Notify`), `slot58` (external
   `func_8003C48C`, STALL in unit `code_2cc8c` -- its own report confirms
   signature `(Obj86B60 *, s32 a1, s32 a2)`; this call site's `a1` is

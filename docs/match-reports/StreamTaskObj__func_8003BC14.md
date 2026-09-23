@@ -1,4 +1,6 @@
-# func_8003BC14
+# StreamTaskObj__func_8003BC14
+
+> Renamed from `func_8003BC14` on 2026-09-23 (tools/rename.py). Address 0x8003bc14.
 
 **Unit:** code_2c054 · **Size:** 56 words · **Status:** MATCHED (56/56)
 
@@ -11,7 +13,7 @@ classic binary-search pivot, matches the already-documented
 "switch case order != comparison order" idiom from earlier rounds).
 
 ```c
-void func_8003BC14(StreamTaskObj *self, s32 a1) {
+void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
     Get_vtable_TaskCore()->slot60(self, a1);
     switch (a1) {
     case 5:
@@ -39,11 +41,11 @@ void func_8003BC14(StreamTaskObj *self, s32 a1) {
   different unit) — result discarded, typed `void`.
 - `self->methods->slot94(self)`: new `StreamTaskObjMethods` slot `+0x094`.
   `classtable.py D_8006E5F8` shows it occupied by **this unit's own,
-  already-matched `func_8003BDF4`** — `void func_8003BDF4(StreamTaskObj
+  already-matched `StreamTaskObj__func_8003BDF4`** — `void StreamTaskObj__func_8003BDF4(StreamTaskObj
   *self)`, single argument, which is exactly the arity the disassembly here
   needs (only `a0` set before the `jalr`, no `a1`).
 - `case 8`'s `self->unkB4->methods->slot4C(self->unkB4)` reuses the slot
-  established for `func_8003BDF4`'s own body this same round.
+  established for `StreamTaskObj__func_8003BDF4`'s own body this same round.
 - `self->unkD4`/`self->unkD8` are both pre-existing fields.
 
 ## Third-learning check (per head's request)

@@ -1,4 +1,6 @@
-# func_8003BE94
+# New_TaskCoreObj
+
+> Renamed from `func_8003BE94` on 2026-09-23 (tools/rename.py). Address 0x8003be94.
 
 **Unit:** code_2c054 · **Status:** MATCHED (31/31 words)
 
@@ -9,7 +11,7 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-TaskCoreObj *func_8003BE94(s32 a1, s32 a2, s32 a3)
+TaskCoreObj *New_TaskCoreObj(s32 a1, s32 a2, s32 a3)
 {
     ...
 

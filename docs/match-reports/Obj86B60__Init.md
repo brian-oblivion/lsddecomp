@@ -100,7 +100,7 @@ the next build.
   types, one dispatch slot (`slot10`) each, both OBSERVED only by this
   function.
 - `Obj86B60Methods`: added `slot10` (inherited BasicClass `addChild`),
-  `slot4C` (external `func_8003C238`), `slot48` (`Obj86B60__Deinit`, next in
+  `slot4C` (external `TaskCoreObj__func_8003C238`), `slot48` (`Obj86B60__Deinit`, next in
   this queue).
 
 ### Proposed learning

@@ -1,11 +1,13 @@
-# func_8003C3D0
+# TaskCoreObj__func_8003C3D0
+
+> Renamed from `func_8003C3D0` on 2026-09-23 (tools/rename.py). Address 0x8003c3d0.
 
 **Unit:** code_2c054 · **Size:** 47 words · **Status:** MATCHED (47/47)
 
 ## Summary
 
 ```c
-void func_8003C3D0(StreamTaskObj *self) {
+void TaskCoreObj__func_8003C3D0(StreamTaskObj *self) {
     TaskCoreObj *obj = self->unk18;
     obj->methods->slot90(obj);
     obj->methods->slot74(obj);
@@ -27,16 +29,16 @@ ties them to the same concrete class beyond the shared idiom):
   word 0 (`unk0`) is the real dispatch target, `TaskTextObj *`. Two levels of
   indirection: `self->unkC->unk0->methods->slot78(...)`.
 - `self->unk18` (`+0x018`, `TaskCoreObj *`): a per-instance object.
-  **CORRECTED (later this round, by `func_8003C238`):** originally modeled
+  **CORRECTED (later this round, by `TaskCoreObj__func_8003C238`):** originally modeled
   as sharing `TaskCoreMethods` itself (the class `Get_vtable_TaskCore()`'s
   gTaskCoreMethods singleton belongs to), on the strength of `classtable.py
   gTaskCoreMethods` having non-null entries at the two offsets (`+0x074`,
   `+0x090`) called here. That agreement was coincidence, not evidence:
-  `func_8003C238` calls three more slots on `self->unk18`
+  `TaskCoreObj__func_8003C238` calls three more slots on `self->unk18`
   (`+0x048`/`+0x04C`/`+0x050`) with an arity `TaskCoreMethods`'s own
-  `+0x04C` (occupied by `func_8003C238` itself, confirmed single-argument by
-  `func_8003BAB4`'s byte-exact call) cannot have. `self->unk18`'s vtable is
-  now its own separate type, `TaskCoreObjMethods` — see `func_8003C238.md`
+  `+0x04C` (occupied by `TaskCoreObj__func_8003C238` itself, confirmed single-argument by
+  `StreamTaskObj__func_8003BAB4`'s byte-exact call) cannot have. `self->unk18`'s vtable is
+  now its own separate type, `TaskCoreObjMethods` — see `TaskCoreObj__func_8003C238.md`
   for the full reasoning. `slot74`/`slot90` (below) now live there, not in
   `TaskCoreMethods`.
 - `self->unk34` (`+0x034`, `s32`): a boolean-ish guard.

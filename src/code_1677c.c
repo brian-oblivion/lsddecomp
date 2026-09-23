@@ -73,7 +73,7 @@ void func_80026170(Class6D3C8 *self) {
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         func_80026254(self, D_800107B4);
-        task = func_8003B854(0, 0, 0, 0);
+        task = New_StreamTaskObj(0, 0, 0, 0);
         streamName = func_800490F4(&typeCode);
         typeLookup = func_800493C8(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
@@ -87,7 +87,7 @@ void func_80026170(Class6D3C8 *self) {
  * (self), then sets its remaining parameters (path, self->unk1C) and
  * starts it. */
 void func_80026254(Class6D3C8 *self, const char *path) {
-    LoaderTask *task = func_8003BE94(0, 0, 0);
+    LoaderTask *task = New_TaskCoreObj(0, 0, 0);
 
     task->methods->slot98(task, func_80026328, self);
     task->methods->slot6C(task, 0);
@@ -114,7 +114,7 @@ void func_80026348(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = func_8003B854(0, 0, 0, 0);
+        task = New_StreamTaskObj(0, 0, 0, 0);
         derivedValue = func_8004913C(&typeCode, 0);
         typeLookup = func_800493C8(typeCode);
         task->methods->slot44(task, self->unk1C, derivedValue, typeLookup, 1);
@@ -187,7 +187,7 @@ void func_8002658C(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = func_8003B854(0, 0, 0, 0);
+        task = New_StreamTaskObj(0, 0, 0, 0);
         extra = func_800493E4(&buf.count, 0, 10);
         task->methods->slot6C(task, buf.count / 15);
         task->methods->slot12C(task, 0);
@@ -274,7 +274,7 @@ void func_8002677C(Class6D3C8 *self) {
 
     if (chanBuf.chan != -1) {
         if (self->arg->unk08 != 0) {
-            StreamTask *streamTask = func_8003B854(0, 0, 0, 0);
+            StreamTask *streamTask = New_StreamTaskObj(0, 0, 0, 0);
 
             streamTask->methods->slot12C(streamTask, 0);
             lookup = func_800493C8(chanBuf.chan);
@@ -282,7 +282,7 @@ void func_8002677C(Class6D3C8 *self) {
             streamTask->methods->slot4(streamTask);
         }
     } else {
-        task = func_8003BE94(0, 0, 0);
+        task = New_TaskCoreObj(0, 0, 0);
         task->methods->slot6C(task, 10);
         task->methods->slotD4(task, groupId, 0);
         task->methods->slot44(task, self->unk1C, 0);
@@ -304,7 +304,7 @@ void func_80026900(Class6D3C8 *self) {
 
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        task = func_8003B854(0, 0, 0, 0);
+        task = New_StreamTaskObj(0, 0, 0, 0);
         task->methods->slot12C(task, 0);
         outerValue = func_800491FC(&typeCode, 0);
         typeLookup = func_800493C8(typeCode);
