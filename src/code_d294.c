@@ -1,5 +1,35 @@
+/*
+ * code_d294 -- 0xD294.., the first 20 methods of Class6B5CC (method table
+ * gClass6B5CCMethods, class tag 4), a BasicClass subclass and the base of
+ * every class table whose tag nibble is 4 (DreamSys, Entity, BaseObjO and
+ * about a dozen more, per tools/classtable.py --scan). An instance embeds a libgs GsDOBJ2 at +0x10
+ * (attribute, coord2, tmd) and owns its GsCOORDINATE2 and GsCOORD2PARAM.
+ * This slice holds: New / ctor / Finalize; the BasicClass child-list
+ * overrides, which link or unlink a tag-9 model child as it is added or
+ * removed; OnNotify, which fans a notification out by the sender's tag;
+ * Reset (identity transform); UpdateRotation / UpdateScale (set or
+ * accumulate a ratio triple into the GsCOORD2PARAM); attach to and detach
+ * from a parent's coordinate; and five setters over GsDOBJ2.attribute.
+ * The class continues in code_d294_b (slots +0x074..+0x0B4) and its free
+ * helpers in code_d294_c. All 20 functions are matched. Named round 71;
+ * tiers and evidence in each function's match report.
+ */
 #include "common.h"
 #include "code_d294.h"
+
+/* The low nibble of a class table's header word is its class tag. */
+#define CLASS_TAG_MASK   0xF
+#define TAG_PAD          2   /* D_8006D370, PadMethods (class_16334.h) */
+#define TAG_CLASS6B5CC   4   /* this class and every subclass of it */
+#define TAG_CLASS6EF50   5   /* D_8006EF50 */
+#define TAG_CLASS6BEA0   9   /* D_8006BEA0: the object Class6B5CC__LinkModel links */
+
+/* Bit positions in GsDOBJ2.attribute (self->unk10), include/psyq/LIBGS.H. */
+#define ATTR_LIGHTMODE_SHIFT  3   /* GsFOG|GsMATE|GsLLMOD, 3 bits */
+#define ATTR_LOFF_SHIFT       6   /* GsLOFF */
+#define ATTR_ABR_SHIFT        28  /* GsAZERO..GsATHREE, 2 bits */
+#define ATTR_ALON_SHIFT       30  /* GsALON */
+#define ATTR_DOFF_SHIFT       31  /* GsDOFF */
 
 Class6B5CCObj *New_Class6B5CC(void) {
     Class6B5CCObj *obj;
@@ -52,13 +82,13 @@ void Class6B5CC__Finalize(Class6B5CCObj *self) {
 
 void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     Get_vtable_BasicClass()->addChild(self, other);
-    if ((other->methods->header & 0xF) == 9) {
+    if ((other->methods->header & CLASS_TAG_MASK) == TAG_CLASS6BEA0) {
         Class6B5CC__LinkModel(self, other);
     }
 }
 
 void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other) {
-    if ((other->methods->header & 0xF) == 9) {
+    if ((other->methods->header & CLASS_TAG_MASK) == TAG_CLASS6BEA0) {
         Class6B5CC__UnlinkModel(self);
     }
     Get_vtable_BasicClass()->removeChild(self, other);
@@ -73,12 +103,12 @@ void Class6B5CC__OnNotify(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2)
     s32 tag;
 
     Get_vtable_BasicClass()->onNotify(self, other, arg2);
-    tag = other->methods->header & 0xF;
-    if (tag == 2) {
+    tag = other->methods->header & CLASS_TAG_MASK;
+    if (tag == TAG_PAD) {
         self->methods->slot94(self, other, arg2);
-    } else if (tag == 5) {
+    } else if (tag == TAG_CLASS6EF50) {
         self->methods->slot98(self, other, arg2);
-    } else if (tag == 4) {
+    } else if (tag == TAG_CLASS6B5CC) {
         self->methods->dispatchLinkCommand(self, other, arg2);
     }
 }
@@ -192,14 +222,14 @@ void Class6B5CC__DetachAttachedChildren(Class6B5CCObj *self) {
 void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor) {
     s32 tag;
 
-    tag = 4;
+    tag = TAG_CLASS6B5CC;
     do {
         if (*entry == NULL) {
             *cursor = self->children;
         }
         GetNextBasicClass(entry, cursor);
         if (*entry != NULL) {
-            if ((((*entry)->methods->header) & 0xF) == tag) {
+            if ((((*entry)->methods->header) & CLASS_TAG_MASK) == tag) {
                 if ((*entry)->unkC == self) {
                     return;
                 }
@@ -213,21 +243,21 @@ void Class6B5CC__func_1d33c(void) {
 }
 
 s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;
+    return GetSetBitField(&self->unk10, ATTR_DOFF_SHIFT, 1, a1 == 0) == 0;
 }
 
 u32 Class6B5CC__SetSemiTrans(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, 0x1E, 1, a1 != 0);
+    return GetSetBitField(&self->unk10, ATTR_ALON_SHIFT, 1, a1 != 0);
 }
 
 u32 Class6B5CC__SetSemiTransRate(Class6B5CCObj *self, u32 a1) {
-    return GetSetBitField(&self->unk10, 0x1C, 2, a1);
+    return GetSetBitField(&self->unk10, ATTR_ABR_SHIFT, 2, a1);
 }
 
 u32 Class6B5CC__SetLighting(Class6B5CCObj *self, s32 a1) {
-    return GetSetBitField(&self->unk10, 6, 1, a1 == 0);
+    return GetSetBitField(&self->unk10, ATTR_LOFF_SHIFT, 1, a1 == 0);
 }
 
 u32 Class6B5CC__SetLightMode(Class6B5CCObj *self, u32 a1) {
-    return GetSetBitField(&self->unk10, 3, 3, a1);
+    return GetSetBitField(&self->unk10, ATTR_LIGHTMODE_SHIFT, 3, a1);
 }
