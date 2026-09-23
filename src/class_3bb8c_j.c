@@ -307,74 +307,57 @@ fail:
  * (0 or 1) also stashed into self->unkC. First pass counts entries; then
  * allocates two parallel self->unk10-length arrays (self->unk18: one
  * individually-allocated buffer per entry; self->unk1C: one s32 length
- * per entry, computed by strlen -- halved when arg2==1, via the
- * standard truncating-division-by-2 idiom). Each buffer is filled either
- * via DecodeFullWidthSjis (arg2==1) or strcpy (otherwise), and self->unk14
- * tracks the running max of the computed lengths.
+ * per entry, computed by strlen -- halved when arg2==1). Each buffer is
+ * filled either via DecodeFullWidthSjis (arg2==1) or strcpy (otherwise),
+ * and self->unk14 tracks the running max of the computed lengths. The max
+ * is a ternary, not an `if`: retail stores the old value back
+ * unconditionally before the conditional store of len.
  */
 extern s32 strlen(void *arg0);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 extern char *strcpy(char *dest, char *src);
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 6/107 words (length exact, 107/107 -- objdump confirms).
- * Residue: register identity, not instruction count -- retail keeps arg1
- * live in one register for the whole function and uses a separate cursor
- * register for both the counting and filling loops, while this body's
- * allocation rotates self/arg1/count/cursor/index differently, cascading
- * from partway through the body onward (docs/match-reports/func_80051AC8.md).
- * Hand-derived; reviewed rounds 9, 13, 19 -- round 19 additionally fixed a
- * real sign/unsigned-promotion bug in the halving idiom (`sra` vs `srl`)
- * and matched two more of retail's scheduling choices, neither of which
- * moved the word count since it is dominated by the register rotation. */
 void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
 {
     void **p;
-    s32 count;
-    s32 index;
+    s32 i;
     s32 len;
 
+    i = 0;
+    p = arg1;
     Get_vtable_BasicClass()->ctor(self);
     self->methods = func_80052B60();
 
-    count = 0;
-    for (p = arg1; *p != NULL; p++) {
-        count++;
+    while (*p++ != NULL) {
+        i++;
     }
 
-    self->unk10 = count;
-    self->unk18 = func_80017B34(count * 4);
+    self->unk10 = i;
+    self->unk18 = func_80017B34(i * 4);
     p = arg1;
     self->unk1C = func_80017B34(self->unk10 * 4);
+    self->unk14 = 0;
 
-    if (count > 0) {
-        self->unk14 = 0;
-        for (index = 0; index < self->unk10; index++) {
-            len = strlen(*p);
-            if (arg2 == 1) {
-                len = (s32)(len + ((u32)len >> 31)) >> 1;
-            }
-            self->unk1C[index] = len;
-            self->unk18[index] = func_80017B34(len + 4);
-            if (arg2 == 1) {
-                DecodeFullWidthSjis(self->unk18[index], *p);
-            } else {
-                strcpy(self->unk18[index], *p);
-            }
-            if (self->unk14 < len) {
-                self->unk14 = len;
-            }
-            p++;
+    for (i = 0; i < self->unk10; i++) {
+        len = strlen(*p);
+        if (arg2 == 1) {
+            len /= 2;
         }
+        self->unk1C[i] = len;
+        self->unk18[i] = func_80017B34(len + 4);
+        if (arg2 == 1) {
+            DecodeFullWidthSjis(self->unk18[i], *p);
+        } else {
+            strcpy(self->unk18[i], *p);
+        }
+        self->unk14 = (self->unk14 < len) ? len : self->unk14;
+        p++;
     }
 
     self->unkC = arg2;
     func_80051C74(self);
     self->methods->slot40(self);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051AC8);
-#endif
 
 void func_80051C74(Class86ED0 *self)
 {
