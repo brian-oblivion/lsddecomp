@@ -1476,20 +1476,18 @@ DreamColors DreamSys__GetDreamColor(DreamSys *this)
 	return CalcDreamColor(&local);
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 28/35 words, exact length (zero address drift). Residue:
- * the sixth confirmed instance of the project-wide commutative-add
- * operand-order/register-identity class (round 20) -- retail computes the
- * table-base address early, this build loads `upper` early instead, both
- * final `addu`s register-swapped. Permuter-searched ~40400 iterations in
- * two windows (the first killed from outside), not closed; hand-derived.
- * docs/match-reports/CalcDreamColor.md. */
+/* DREAM_COLOR_TABLE is a 3x3 table, [dynamic class][upper class]. The
+ * row-pointer view is load-bearing: indexing the flat s8[9] as
+ * `&TABLE[d * 3]` then `[u]` loads `upper` early and swaps the two final
+ * `addu` registers; a 2-D subscript through a named `s8 (*)[3]` local is
+ * byte-exact (round 73). */
 DreamColors CalcDreamColor(MoodGraphPoint *mood)
 {
 	MoodGraphPoint local;
 	s8 *p;
 	s32 i;
 	s8 val;
+	s8 (*table)[3];
 
 	local.value = mood->value;
 	p = (s8 *)&local;
@@ -1503,18 +1501,9 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood)
 			*p = 1;
 		}
 	}
-	{
-		s32 index;
-		s8 *entry;
-
-		index = local.axis.dynamic * 3;
-		entry = &DREAM_COLOR_TABLE[index];
-		return entry[local.axis.upper];
-	}
+	table = (s8 (*)[3])DREAM_COLOR_TABLE;
+	return table[local.axis.dynamic][local.axis.upper];
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/DreamSys", CalcDreamColor);
-#endif
 
 void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor)
 {
