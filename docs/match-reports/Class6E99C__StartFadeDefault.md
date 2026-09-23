@@ -1,4 +1,65 @@
-# Class6E99C__StartFadeDefault -- STALL, PRIOR "29/41, same length" CLAIM CORRECTED (real one-word length regression, not a pure register/scheduling residue)
+# Class6E99C__StartFadeDefault -- MATCHED (41/41, round 73; was STALL, 1 word short, 40/41 compiled)
+
+REVISITED, round 73: MATCHED 41/41 (whole-image SHA1 green); names/types used
+
+## Round 73 (runner bravo): MATCHED -- forwarded parameters plus dead-parameter reuse
+
+**Preserved body rebuilt first, unchanged** (the round-59 `#ifdef
+NON_MATCHING` block): `20/41 words match (file 0x308B0-0x30954)`,
+`insertions 3 / deletions 3`, `positional skeleton diffs 19`,
+`WARNING: the build differs OUTSIDE this range too (224445 bytes)` --
+the round-21/46 figures exactly (the body compiles one word short, so the
+in-window 20/41 is mostly ripple).
+
+**Re-derived class.** Both "residues" are one defect. Retail's
+`addu $t0, $a2, $zero` in the entry guard's delay slot and the later
+`addu $t0, $v0, $zero` are the SAME pseudo: parameter `a2`'s home is `$t0`,
+it is forwarded to `configure` (no argument register is written before that
+`jalr`; `Class6E99C__Configure` reads `a1`..`a3`), and the call's result is
+then stored back into that same pseudo and used as the table index. So the
+source reuses the dead parameter (LEARNINGS 3d, "Reuse a provably dead
+PARAMETER instead of a fresh local") and forwards all three parameters (the
+arity fix that closed `Class6E99C__StartFadeToIndex` the same round). The
+round-21 reading -- "a register-only dead store GCC eliminates before
+scheduling" -- was a correct observation that the `move` could not come from
+a dead C statement, and the wrong conclusion that it therefore could not come
+from C: it is a LIVE copy of a forwarded parameter.
+
+Builds this round: 1 (preserved body) + 1 (lever) = 2.
+
+### Matched body
+
+```c
+typedef s32 (*Configure6E99CFn)(Class6E99CObj *self, s32 a1, s32 a2, s32 a3);
+
+void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
+    if (self->state != 0) {
+        return;
+    }
+    a2 = ((Configure6E99CFn)self->methods->configure)(self, a1, a2, a3);
+    if (self->altMode != 0) {
+        self->unk80--;
+    } else {
+        self->methods->slotB8(self, 1, &D_8006EAA8[a2 * 3]);
+    }
+    self->state = 2;
+}
+```
+
+`Configure6E99CFn` is defined once in `src/code_2cc8c_e.c`, above
+`Class6E99C__StartFadeToIndex`; the shared `Class6E99CMethods::configure`
+slot is not retyped.
+
+### Proposed learning
+
+**A retail `move $tN, $aK` in an entry delay slot, with `$tN` later
+overwritten by a call's return value and then used, is a FORWARDED
+PARAMETER reused as the result's variable** -- not a dead store and not
+reorg inventing a filler. Write `aK = callee(self, ..., aK, ...);` and use
+`aK`. Discriminator: `$aK` is not written before the call (so it is being
+forwarded) and the result lands in the same `$tN`. Pairs with the
+forwarded-arity entry proposed in `Class6E99C__StartFadeToIndex.md`.
+
 
 > Renamed from `func_800400B0` on 2026-09-20 (tools/rename.py). Address 0x800400b0.
 

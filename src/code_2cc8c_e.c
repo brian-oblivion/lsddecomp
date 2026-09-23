@@ -153,31 +153,18 @@ void Class6E99C__StartFadeToIndex(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     self->step = -self->step;
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 40/41 words, 1 word short. Residue: two residues --
- * the shared `li $a1,1`-scheduling class with Class6E99C__StartFadeToIndex, plus a
- * genuinely missing register-only dead-store delay-slot filler
- * (retail copies its unread 3rd argument into $t0 in a branch delay
- * slot; GCC 2.6.3 eliminates the equivalent C statement as dead code
- * before scheduling ever sees it) (docs/match-reports/Class6E99C__StartFadeDefault.md).
- * Hand-derived. */
-void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
-    s32 idx;
-
+void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     if (self->state != 0) {
         return;
     }
-    idx = self->methods->configure(self);
+    a2 = ((Configure6E99CFn)self->methods->configure)(self, a1, a2, a3);
     if (self->altMode != 0) {
         self->unk80--;
     } else {
-        self->methods->slotB8(self, 1, &D_8006EAA8[idx * 3]);
+        self->methods->slotB8(self, 1, &D_8006EAA8[a2 * 3]);
     }
     self->state = 2;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeDefault);
-#endif
 
 s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     Class6E99CMethods *methods;
