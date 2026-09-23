@@ -354,3 +354,14 @@ residue is "one instruction is in the wrong place near a call, everything else
 exact", check whether you introduced a pointer store that retail does not
 have -- or, as here, whether retail has one and got the motion anyway, which
 means the real difference is upstream of the schedule.
+
+## Naming
+
+**`StyleFillEffectKind3`, tier B.**
+
+Called only when `gStyleVariant == 0`, from `StyleBuildEffectSlots`, as
+the kind-0-exclusive finishing fill. Passes a literal kind argument of `3`
+to `func_80056320` and appends exactly one slot (`*arg0 = ...; arg0++;
+return arg0;`). STALL, 79/81 words (length exact), register-identity
+residue only; naming from the literal `3` argument, confirmed the same way
+as `StyleFillEffectKind0`/`1`/`2`.

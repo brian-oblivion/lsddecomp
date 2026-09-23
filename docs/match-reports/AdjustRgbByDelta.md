@@ -40,3 +40,16 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
 ### Proposed learning
 
 None -- routine leaf match, no lever needed.
+
+## Naming
+
+**`AdjustRgbByDelta`, tier A.**
+
+Pure 3-line leaf: `dst[0]=src[0]-delta; dst[1]=src[1]-delta;
+dst[2]=src[2]+delta;` -- no globals, no calls, no control flow. Per track 3's
+tier rule, "a pure leaf whose mechanics ARE its purpose (a getter, a clamp,
+a list push) is tier A by definition." The two-subtract-one-add pattern on
+two 3-byte buffers with a shared delta is exactly what the name says and
+nothing more is claimed (not named e.g. "ApplyColorFade", which would assert
+a purpose the body alone does not establish). MATCHED, 13/13, first
+build.

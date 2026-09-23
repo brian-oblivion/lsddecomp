@@ -243,3 +243,18 @@ swap, no change; (3) `D8154Entry`-typed pointer-walk loop, 44/77 worse; (4)
 regression; (5) reverted to multiply form, confirmed back to 63/77; (6)
 named `ObjAB4C *self` local, no change (still 63/77, byte-identical
 residue); reverted to the best body and restored `INCLUDE_ASM`.
+
+## Naming
+
+**`TickStyle`, tier B.**
+
+The per-frame orchestrator: on the FIRST call (`gStyleTickCount++ == 0`)
+runs `ApplyStyleDecorationIfSet`/`StyleBuildDecorSet`/`StyleBuildEffectSlots`
+(one-time setup), then every call runs `StyleUpdateDecorSet`/
+`StyleUpdateEffectSlots`/`DrawStyleTables` and the two `gStyleCueSlots`
+flush-or-start steps. Called from `src/class_3bb8c_l.c`'s `func_8005393C`
+(the call this unit had already forward-declared as its own entry point),
+which is a genuine per-tick call site -- the evidence for "Tick" over a
+generic "Update", matching this codebase's existing `TickDreamAuxSlots2`
+convention. MATCHED, 77/77 (round 47, permuter-closed register-colour
+swap).

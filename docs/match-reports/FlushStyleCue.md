@@ -67,3 +67,15 @@ None beyond confirming the multiple-independent-local-views convention:
 `gStyleTargetObj`'s pointed-to object is read at offset 0 here and offset 0xC in
 a sibling unit, with two unrelated local structs describing it -- both
 correct locally, neither claiming to be the whole object.
+
+## Naming
+
+**`FlushStyleCue`, tier B.**
+
+`FlushSoundCueSet` on the slot's embedded `cueSet`, then toggles the
+claimed entry's sign tag back (releasing it for reuse), always returns 0.
+Name mirrors the already-established `FlushSoundCueSet` it calls, for the
+same "flush this slot's pending sound state" mechanic. Called from
+`StyleTeardown` (unconditionally, both slots) and from `TickStyle` (per
+slot, when `StopStyleCueIfNear` reports the cue is no longer near). MATCHED,
+20/20, first build.

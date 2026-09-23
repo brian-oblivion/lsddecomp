@@ -174,3 +174,17 @@ allocator) is worth trying before declaring it unfixable by hand** -- see
 `TickStyle` in this unit for a confirmed instance of the technique
 working. Not yet tried here for lack of round budget; flagging for the next
 runner/round rather than re-deriving the structure.
+
+## Naming
+
+**`StyleFillEffectKind0`, tier B.**
+
+Fills `arg1` slots of `gStyleEffectSlots` by repeatedly calling
+`class_3bb8c_r.c`'s `func_80056320` (New_X for the `Obj876FC` class) with a
+literal FIRST argument of `0`. That argument is confirmed (by reading
+`func_80056320`'s own ctor chain, `class_3bb8c_r.c`) to become the new
+object's `kind` field -- so "Kind0" in the name is the literal tag value
+this function passes, not a guessed category. Selects which of two
+"spawn-parameter" setup functions (`SetupStyleSpawnParamsA`/`B`) to call each
+iteration via a `gStyleCounter % 7` test. STALL, 93/99, whole-function
+3-register rotation; naming from mechanics, unaffected by match state.

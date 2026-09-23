@@ -132,3 +132,14 @@ Two direct pipeline reproducers (negation idiom, boolean-collapse family) plus
 one bounded permuter search (60 iterations, found score 0 at iteration 60).
 Well under the 30-*build* cap (this was 1 real `build-and-verify.sh` run
 after the pinned-pipeline reproducers converged).
+
+## Naming
+
+**`IsStyleCueNear`, tier B.**
+
+Computes a Manhattan-style X/Z distance from `arg0`'s own position
+(`posX`/`posZ`) to `arg1`, stores it into `arg0->lastDist`, and returns 1 if
+under the `D_80087474[-idx]` threshold (`idx` from the claimed entry's
+`countSign`) else 0. Not tier A despite the boolean-getter shape: it has a
+real side effect (`lastDist` write) beyond the return value, so it is not a
+"pure leaf" by track 3's tier-A test. MATCHED, 31/31.

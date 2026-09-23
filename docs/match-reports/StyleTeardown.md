@@ -101,3 +101,16 @@ None beyond confirming the standing forward-declaration idiom
 (`class_3bb8c_m.c`'s `ObjM__ForwardToSubChild` precedent) generalises cleanly to a
 function defined in the SAME slice rather than the same file examined
 before.
+
+## Naming
+
+**`StyleTeardown`, tier B.**
+
+Calls `StyleFlushDecoration`, `StyleReleaseDecorSet`, `StyleReleaseEffectSlots`
+unconditionally, then flushes both `gStyleCueSlots[2]` entries via
+`FlushStyleCue`, then clears `gStyleCueSelf`. Called from
+`src/class_3bb8c_l.c`'s `func_80053134` (itself calling `self->methods->slot84`
+and `TickDreamAuxSlots2()`, an end-of-scene-style teardown), which is the
+evidence for "Teardown" over a narrower "Reset" -- it releases every
+resource `TickStyle` builds, matching a scene-exit shape rather than a
+per-frame reset. MATCHED, 29/29, first build.

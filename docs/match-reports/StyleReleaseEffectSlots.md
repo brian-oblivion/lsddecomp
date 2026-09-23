@@ -48,3 +48,11 @@ void StyleReleaseEffectSlots(void) {
 
 None new -- confirms the `StyleReleaseDecorSet` pattern generalises (flag test,
 optional clear, `ReleaseBasicClassArray` call) rather than needing its own lever.
+
+## Naming
+
+**`StyleReleaseEffectSlots`, tier B.**
+
+Guarded by `gStyleVariant >= 0`; `ReleaseBasicClassArray(gStyleEffectSlots,
+gStyleEffectSlotCount)` -- the release half of the triad, called from
+`StyleTeardown`. MATCHED, 13/13, first build.

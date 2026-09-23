@@ -380,3 +380,13 @@ record of what someone did, not a proof of what does not work.
   pointer-walk (3/79 -> 16/79) is also correct and still in the body: two
   array-element stores compile to two independent address computations, where
   retail reuses one base with a `+4`.
+
+## Naming
+
+**`StyleFillEffectKind2`, tier B.**
+
+Called only when `gStyleVariant == 2`, from `StyleBuildEffectSlots`, as
+the kind-2-exclusive finishing fill (the sibling of `StyleFillEffectKind3`,
+mirrored for the other variant). Passes a literal kind argument of `2` to
+`func_80056320`. STALL, 49/79 words (length exact), residue at ins 3/del 3
+per the round-64 revisit.

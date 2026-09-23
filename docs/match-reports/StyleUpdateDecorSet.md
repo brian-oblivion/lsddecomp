@@ -128,3 +128,14 @@ lever found on one is worth spending a build on for every sibling before
 anything else is tried** -- and the sibling relationship was already recorded
 in both reports ("structurally the sibling of `StyleBuildDecorSet`"), which is what
 made this cheap.
+
+## Naming
+
+**`StyleUpdateDecorSet`, tier B.**
+
+Sibling of `StyleBuildDecorSet` (same `gStyleDecorVariant` guard, same
+`gStyleDecorSlots` array, same `paramA`/`paramB`-shaped position pair).
+Computes a time-based `shift` from an `ObjAC7CSub` object's `field18`/
+`field24` delta, then per-element recolors (`AdjustRgbByDelta`) and
+repositions (`slotB8`/`slotBC`) all 18 objects every frame. MATCHED,
+93/93.

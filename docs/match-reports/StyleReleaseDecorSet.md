@@ -58,3 +58,12 @@ explains, mechanically, why such a symbol takes the absolute `lui`/`addiu`
 form even when numerically within gp-relative range of `$gp`: the
 `--gp-symbols` table is populated only from `.sdata`/`.sbss` segment
 members, and a `.bss` symbol is neither.
+
+## Naming
+
+**`StyleReleaseDecorSet`, tier B.**
+
+Guarded by `gStyleDecorVariant`; calls `ReleaseBasicClassArray(gStyleDecorSlots,
+0x12)` and clears the guard -- the release half of the `StyleBuildDecorSet`/
+`StyleUpdateDecorSet`/`StyleReleaseDecorSet` triad, called from
+`StyleTeardown`. MATCHED, 13/13, first build.

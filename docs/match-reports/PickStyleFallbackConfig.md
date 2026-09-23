@@ -126,3 +126,17 @@ mirror) matching whichever operand retail's bytes show being computed
 
 2 (first: ternary form, 59/62 with two swapped-constant words and one
 inverted branch; second: explicit default-then-override, byte-exact).
+
+## Naming
+
+**`PickStyleFallbackConfig`, tier B.**
+
+Literal call site in `ApplyStyleConfig` (class_3bb8c_m.c, already matched):
+`cfg = func_80054758();`, used only when the direct per-`gStyleKind` config
+table entry (`D_800873EC[gStyleKind]`) is NULL -- i.e. this is the fallback
+path. Body hashes `gStyleCounter + gStyleKind` into a 16-entry table to pick
+a `gStyleVariant` ("kind"), then a per-variant divisor/remainder select a
+config row. "Fallback" is evidenced by the call site; "kind"/variant
+selection mechanics are evidenced by the body; WHY a fallback is needed, or
+what the variant means in gameplay terms, is not established (tier B, not
+A).

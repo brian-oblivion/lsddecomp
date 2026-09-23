@@ -71,3 +71,21 @@ Adding the pad matched on the next build.
 None beyond the routine "an ordinary field/slot offset miss reads as a
 single-instruction diff with the rest of the function byte-identical" --
 already well covered by existing entries on struct-offset mistakes.
+
+## Naming
+
+**`StyleFlushDecoration`, tier B.**
+
+Guards `gStyleDecorColor` (formerly `D_8008AB54`), dispatches
+`gStyleDecorObj->methods->slot4()`, then clears the guard -- the same
+test/dispatch/clear shape as `StyleReleaseDecorSet`/`StyleReleaseEffectSlots`
+below (all three called together, in this order, from `StyleTeardown`).
+`gStyleDecorColor` and `gStyleDecorObj` are both established members of
+class_3bb8c_m.c's already-named "Style" subsystem
+(`RegisterStyleConfig`/`ApplyStyleConfig`/`ApplyStyleDecorationIfSet`, round
+69) -- that cross-unit naming is the evidence for the `Style` prefix, not a
+guess. "Flush" mirrors this file's own `FlushSoundCueSet`/`FlushStyleCue`
+naming for the identical mechanical shape (consume pending state, dispatch,
+clear). The target's own purpose (what `slot4` does) is not established
+beyond "dispatch", so the verb describes the CALLER's mechanics, not the
+callee's.

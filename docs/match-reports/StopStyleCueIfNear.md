@@ -58,3 +58,17 @@ s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1) {
 
 None -- straightforward given `FlushStyleCue`'s already-established
 `gStyleTargetObj`/`FlushSoundCueSet` shape to mirror onto `func_8002CD08`.
+
+## Naming
+
+**`StopStyleCueIfNear`, tier B.**
+
+If `IsStyleCueNear` reports true, calls `func_8002CD08` (an established
+sibling of `FlushSoundCueSet`, same `(s32, void *)` shape, still unnamed
+itself -- not this unit's to name, per track 3's "do not rename a Sony
+symbol" analog for a cross-unit function this unit only calls) on the slot's
+`cueSet`, and returns 1; otherwise returns 0. `func_8002CD08` is read here
+as "stop" by the established pairing with `FlushSoundCueSet`/`InitSoundCueSet`
+(init/flush/stop triad) documented in `include/Entity.h`/`include/DreamSys.h`,
+which is cross-unit evidence, not a single-call-site guess. MATCHED,
+18/18, first build.

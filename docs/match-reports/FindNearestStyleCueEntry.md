@@ -306,3 +306,17 @@ producing a SIZE change (4 extra bytes) rather than a near-miss. This is a
 same-value variant of the already-documented "different value needs
 `goto`" lever (`func_80025B34`): here the values are identical, but the
 shared-label unification still doesn't happen for free.
+
+## Naming
+
+**`FindNearestStyleCueEntry`, tier B.**
+
+Scans a run of 8-byte `EntrySlot` records (`gStyleCueRecordIndex` onward)
+for one whose `count` field is positive and whose Manhattan-style distance
+to `arg2` is under a per-record threshold (`D_80087474[entry->count]`),
+returning the first such record or `NULL` and writing the computed distance
+through `arg1`. "Nearest" is a simplification: it is actually the FIRST
+record under threshold in scan order, not a true nearest-of-all-candidates
+search -- named for the dominant behaviour (early-return on first hit) since
+no caller distinguishes "first under threshold" from "globally nearest".
+MATCHED, 111/111.

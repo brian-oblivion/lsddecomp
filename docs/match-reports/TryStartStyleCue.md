@@ -131,3 +131,17 @@ epilogue, and it cost a real word here.
 
 2 (first: null-check-first idiom, one word short/shifted; second: success-
 first idiom, byte-exact).
+
+## Naming
+
+**`TryStartStyleCue`, tier B.**
+
+Looks up a nearby record via `FindNearestStyleCueEntry`; on success,
+claims it into `arg0->entry`, starts `InitSoundCueSet` on the slot's
+embedded `cueSet`, and toggles the claimed entry's sign tag so it will not
+be picked twice. Called from `TickStyle` for each of the two
+`gStyleCueSlots` when that slot is empty. "TryStart" over a bare "Start"
+because failure (returning `NULL`) is a real, handled path, not an error --
+the slot stays empty and `TickStyle` retries next frame (implicit from the
+call site's `gStyleCueSlots[i] = TryStartStyleCue(...)` pattern, no
+error-log or assert on failure). MATCHED, 45/45.

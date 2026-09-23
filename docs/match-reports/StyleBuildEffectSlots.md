@@ -80,3 +80,16 @@ in the `else` reproduces that skip.
 ## Attempts
 
 1 (matched on the first build).
+
+## Naming
+
+**`StyleBuildEffectSlots`, tier B.**
+
+Dispatches on `gStyleVariant` (`PickStyleFallbackConfig`'s "kind") to
+`BaseObjO__func_56f5c`, then fills `gStyleEffectSlots` via
+`StyleFillEffectKind0`/`StyleFillEffectKind1`, then finishes via
+`StyleFillEffectKind3` (variant 0) or `StyleFillEffectKind2` (variant 2).
+The build/update/release triad naming mirrors `StyleBuildDecorSet` above,
+for the SEPARATE `gStyleEffectSlots` array (a different object class --
+`Obj876FC`, allocated through `class_3bb8c_r.c`'s `func_80056320`, not
+`New_ClassEAC0`). MATCHED, 60/60, first build.

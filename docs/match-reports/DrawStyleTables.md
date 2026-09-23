@@ -96,3 +96,16 @@ inside each branch is the fix -- it lets the scheduler place each
 branch's `ori` where that branch's own tail already sits, rather than
 collapsing all paths' constant into one shared load ahead of the merged
 call.
+
+## Naming
+
+**`DrawStyleTables`, tier B.**
+
+Selects one of two 12-byte-tuple table pairs by `gStyleKind` (`== 2`, or
+`3..5`) and forwards them to `func_8003B624`, a not-yet-carved routine this
+unit's OWN header comment (round 45) already characterizes as "a 4-argument
+draw-style routine reading 12-byte tuples through a0/a2" -- that
+characterization, on file before this naming pass, is the evidence for
+"Draw" rather than a guess made now. Called as the last step of `TickStyle`
+every frame. MATCHED, 25/25, second build (one lever: hoist the shared `a1
+= 1` literal into each branch).

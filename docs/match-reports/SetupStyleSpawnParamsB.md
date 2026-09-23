@@ -206,3 +206,12 @@ use.
   evaluated as the full 32-bit signed value because the wrong value is also
   the wrong instruction COUNT. **Every one of these was correct**; none of
   them was the residue.
+
+## Naming
+
+**`SetupStyleSpawnParamsB`, tier B.**
+
+The other function-pointer target `StyleFillEffectKind0` dispatches
+through (selected when `gStyleCounter % 7 == 0`, the ~1/7 branch). Same
+scratch-global cluster as `SetupStyleSpawnParamsA`, different constants.
+MATCHED, 87/87, ins 0/del 0.

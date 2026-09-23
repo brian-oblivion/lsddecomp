@@ -296,3 +296,20 @@ removed on the way to commit, which is what shipped.
   idiom, the dead `arg0`, the `void` return; length exact at 0x1B8/110 words.
   First real diff at word 2, `sw $ra,0x14($sp)` vs `sw $ra,0x18($sp)` --
   correctly identified as an extra saved register in the prologue.
+
+## Naming
+
+**`SetupStyleSpawnParamsA`, tier B.**
+
+One of two function-pointer targets `StyleFillEffectKind0` dispatches
+through per iteration, selected when `gStyleCounter % 7 != 0` (the more
+common ~6/7 branch; the other is `SetupStyleSpawnParamsB`). Sets a cluster of
+`gStyleE0*`-region scratch globals (spawn range/offset parameters consumed
+by the `func_80056320` allocator's `ctx` argument) from `rand()`. Named "A"
+rather than by its selection condition because the condition is a plain
+modulo test with no established game meaning -- naming it "the common one"
+or "the 6/7 one" would assert more than the mechanics show. Renamed away
+from an earlier `SetupStyleKind0Params`, which wrongly implied a link to the
+`Obj876FC` kind-tag axis (`StyleFillEffectKind0`/`1`/`2`/`3`'s literal
+first-argument values) -- this function has no such tag, it is selected by
+an unrelated modulo test. MATCHED, 110/110, ins 0/del 0.

@@ -1,50 +1,50 @@
 /*
  * class_3bb8c_n -- functions 0..22 of the old 113-function class_3bb8c
- * remainder, 0x44F14..0x46288.  23 functions, 1245 words.
- * Carved round 45 (2026-09-15) by the head.
+ * remainder, 0x44F14..0x46288.  23 functions (19 matched, 4 STALL), 1245
+ * words.  Carved round 45 (2026-09-15); staffed round 46.
  *
- * STAFFED IN ROUND 46.  Carved round 45 to BANK ground, carrying the banked
- * marker `progress.py` keys on; the round-46 head removed it when staffing a
- * runner here, as that header instructed.  If this unit is ever un-staffed
- * with functions left over, put the marker back -- `banked` and `fresh` are
- * different claims and only the marker distinguishes them.
+ * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
+ * globals its functions set up or gate on, renamed via `tools/rename.py`,
+ * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
+ * cluster (`gStyleKind`/`gStyleCounter`/`gStyleTargetObj`/`gStyleVariant`/
+ * `gStyleDecorObj`/`gStyleCueSelf`/`gStyleTickCount`, formerly
+ * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
+ * `class_3bb8c_m.c`'s already-confirmed "Style" subsystem sets
+ * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/
+ * `ApplyStyleDecorationIfSet`, round 69) -- a cross-unit fact, not a guess
+ * made here.
  *
- * DO NOT WRITE THAT MARKER PHRASE OUT IN FULL ANYWHERE IN THIS FILE, even to
- * quote it or to say it was removed.  `progress.py` tests
- * `"<phrase>" in text` over the whole unit source -- a bare substring, with
- * no line anchor and no notion of quoting -- so a sentence ABOUT the marker
- * re-banks the unit exactly as the marker itself would.  The round-46 head
- * did this on its first edit and the `banked` column did not move; the
- * phrase is spelled out in `tools/progress.py` and in docs/PARALLEL-RUNS.md,
- * which is where to go read it.
+ * None of this unit's functions are themselves class methods (no vtable
+ * self-dispatch on their OWN symbol); they are free functions dispatching
+ * into THREE separate object families through local method-table views: a
+ * decoration object (`gStyleDecorObj`, `New_ClassEAC0`-allocated), an
+ * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
+ * `Obj876FC`-class "effect slots" array (`gStyleEffectSlots`,
+ * `class_3bb8c_r.c`'s `func_80056320` allocator, kind-tagged 0..3 by
+ * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
+ * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
+ * `FindNearestStyleCueEntry`/`FlushStyleCue`/`StopStyleCueIfNear`/
+ * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
+ * `src/class_3bb8c_l.c`); `StyleTeardown` is the scene-exit release of
+ * everything `TickStyle` builds.
  *
- * WHY IT WAS UNCARVED UNTIL NOW, and why that reason is dead.  The splat
- * yaml called this segment "the gp_rel-densest ground in the executable",
- * censused it at 3 of 23 clean in round 26, and ended with a directive:
- * "Not worth a runner until the gp-relative blocker moves."  It moved --
- * round 42, maspsx `--gp-symbols`, pinned in the Makefile, whole image
- * byte-exact (CLAUDE.md, "Open toolchain blockers").  `tools/uncarved.py`
- * measures this segment at **23 of 23 blocker-clean**.  Both the census and
- * the directive are retracted in the yaml entry; if you find either quoted
- * anywhere else, it is stale.
+ * What the "Style" subsystem is FOR in gameplay terms -- which dream/link
+ * property `gStyleKind` actually selects -- remains UNESTABLISHED; every
+ * name above describes MECHANICS, not a guessed purpose, per track 3's
+ * naming rule. Full evidence and tier per function: `docs/match-reports/
+ * <name>.md`, `## Naming`.
  *
- * Carve-time screens, four per function over the live segment: 23 of 23
- * clean; zero `jr $t2` BIOS trampolines; zero `jtbl_` references; zero
- * `alabel`; zero non-`.L` alt-entry labels; zero `.word .L`; no function
- * with more than one `addiu $sp, $sp, -N` prologue.  So NO rodata attach --
- * every `%hi` here is a named dlabel in the D_80087xxx class-table region,
- * which a standalone data segment resolves.  Sizes run 13w..111w with no
- * trivial leaves: every one is a real body.
- *
- * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM
- * addresses, not at class boundaries.  Identify each with
- * `tools/classtable.py`, never by counting slots -- and note the game is
- * plain C with a hand-rolled class framework, not C++.
+ * Owns NO switch jump table (zero `jtbl_` references). All four blocker
+ * constructs (`gp_rel`, `addiu_at`, `nop_mflo_mfhi`, `nop_at_expansion`) are
+ * RESOLVED project-wide (CLAUDE.md, "Open toolchain blockers"); this unit's
+ * four STALLs (`StyleBuildDecorSet`, `StyleFillEffectKind0`/`2`/`3`) are
+ * ordinary register-identity residues, not toolchain blockers -- see their
+ * own reports.
  *
  * This unit includes include/class_3bb8c.h, which eleven other units also
- * include.  Whoever is staffed here should be the ONLY runner in the
- * class_3bb8c block that round, or the head should price the contention
- * with `python3 tools/headercontention.py` first.
+ * include. Whoever edits this unit's C should be the ONLY runner in the
+ * class_3bb8c block that round, or price the contention with
+ * `python3 tools/headercontention.py` first.
  */
 
 #include "common.h"
@@ -386,32 +386,41 @@ void StyleReleaseEffectSlots(void) {
 }
 
 /* Local view only: `FlushStyleCue` (defined later in this unit, in strict
- * ROM order) takes one of these two per-slot objects. `unk0` is address-
- * taken then chased for a single byte at +0x6 (toggled there); `unk14` is
- * only ever address-taken, as an embedded sub-object handed to
- * `FlushSoundCueSet`/`func_8002CD08` (same discard-return caveat as
- * `include/Entity.h`'s `unk9C` -- a field only ever address-taken carries
- * no evidence about its own declared type). */
-typedef struct ObjN14Sub ObjN14Sub;
-struct ObjN14Sub {
+ * ROM order) takes one of these two per-slot objects. `StyleCueEntryView`
+ * is the SAME record `FindNearestStyleCueEntry` returns as `EntrySlot *`
+ * below -- a second independent local view of one struct, per the
+ * multiple-independent-local-views convention, not merged with it: this
+ * view only ever touches `countSign` (+0x6, an `EntrySlot::count`-typed
+ * byte, address-taken then chased and toggled), where `EntrySlot` names the
+ * rest. `StyleCueSlot::entry` is that claimed record, released by
+ * `FlushStyleCue`/`StopStyleCueIfNear`. `posX`/`posZ` are the slot's own 2D
+ * (X/Z) position, read by `IsStyleCueNear`'s distance check; `lastDist` is
+ * that check's own last-computed distance (also the out-parameter
+ * `FindNearestStyleCueEntry` writes). `cueSet` is only ever address-taken,
+ * as an embedded sub-object handed to `FlushSoundCueSet`/`func_8002CD08`
+ * (same discard-return caveat as `include/Entity.h`'s `unk9C` -- a field
+ * only ever address-taken carries no evidence about its own declared
+ * type). */
+typedef struct StyleCueEntryView StyleCueEntryView;
+struct StyleCueEntryView {
     u8 pad0[0x6];
-    s8 unk6; /* +0x006 */
+    s8 countSign; /* +0x006 */
 };
 
-typedef struct ObjN14 ObjN14;
-struct ObjN14 {
-    ObjN14Sub *unk0; /* +0x000 */
-    s32 unk4; /* +0x004 */
+typedef struct StyleCueSlot StyleCueSlot;
+struct StyleCueSlot {
+    StyleCueEntryView *entry; /* +0x000 */
+    s32 posX; /* +0x004 */
     u8 pad8[0x4];
-    s32 unkC; /* +0x00C */
-    s32 unk10; /* +0x010 */
-    s32 unk14; /* +0x014 */
+    s32 posZ; /* +0x00C */
+    s32 lastDist; /* +0x010 */
+    s32 cueSet; /* +0x014 */
 };
 
-extern s32 FlushStyleCue(ObjN14 *arg0);
+extern s32 FlushStyleCue(StyleCueSlot *arg0);
 
 extern s32 gStyleCueSelf;
-extern ObjN14 *gStyleCueSlots[2];
+extern StyleCueSlot *gStyleCueSlots[2];
 
 void StyleTeardown(void) {
     s32 i;
@@ -420,7 +429,7 @@ void StyleTeardown(void) {
     StyleReleaseDecorSet();
     StyleReleaseEffectSlots();
     for (i = 0; i < 2; i++) {
-        gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
+        gStyleCueSlots[i] = (StyleCueSlot *) FlushStyleCue(gStyleCueSlots[i]);
     }
     if (gStyleCueSelf != 0) {
         gStyleCueSelf = 0;
@@ -682,17 +691,17 @@ extern void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);
 extern s32 D_800874B0[];
 extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 
-ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
-    ObjN14Sub *sub;
+StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, void *arg2, void *arg3) {
+    StyleCueEntryView *sub;
 
-    sub = (ObjN14Sub *) FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2);
+    sub = (StyleCueEntryView *) FindNearestStyleCueEntry(&arg0->posX, &arg0->lastDist, arg2);
     if (sub != 0) {
-        arg0->unk0 = sub;
-        InitSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->unk14, sub->unk6, arg0, D_800874B0[sub->unk6]);
-        if (sub->unk6 == *arg1) {
-            *arg1 = -sub->unk6;
+        arg0->entry = sub;
+        InitSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->cueSet, sub->countSign, arg0, D_800874B0[sub->countSign]);
+        if (sub->countSign == *arg1) {
+            *arg1 = -sub->countSign;
         }
-        sub->unk6 = -sub->unk6;
+        sub->countSign = -sub->countSign;
         return arg0;
     }
     return 0;
@@ -799,18 +808,18 @@ fail:
 extern s32 gStyleTargetObj;
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
-s32 FlushStyleCue(ObjN14 *arg0) {
-    FlushSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->unk14);
-    arg0->unk0->unk6 = -arg0->unk0->unk6;
+s32 FlushStyleCue(StyleCueSlot *arg0) {
+    FlushSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->cueSet);
+    arg0->entry->countSign = -arg0->entry->countSign;
     return 0;
 }
 
-extern s32 IsStyleCueNear(ObjN14 *arg0, void *arg1);
+extern s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1);
 extern void func_8002CD08(s32 arg0, void *arg1);
 
-s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void *arg2) {
+s32 StopStyleCueIfNear(StyleCueSlot *arg0, void *arg1, void *arg2) {
     if (IsStyleCueNear(arg0, arg1) != 0) {
-        func_8002CD08(*(s32 *) gStyleTargetObj, &arg0->unk14);
+        func_8002CD08(*(s32 *) gStyleTargetObj, &arg0->cueSet);
         return 1;
     }
     return 0;
@@ -818,25 +827,25 @@ s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void *arg2) {
 
 extern s32 D_80087474[];
 
-s32 IsStyleCueNear(ObjN14 *arg0, void *arg1) {
+s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1) {
     s32 dx, dy, dist;
     s8 idx;
 
     if (arg1 == 0) {
         return 0;
     }
-    dx = arg0->unk4 - *(s32 *) arg1;
+    dx = arg0->posX - *(s32 *) arg1;
     if (dx < 0) {
         dx = ~dx + 1;
     }
-    dy = arg0->unkC - *(s32 *) ((u8 *) arg1 + 0x8);
+    dy = arg0->posZ - *(s32 *) ((u8 *) arg1 + 0x8);
     if (dy >= 0) {
         dist = dx + dy;
     } else {
         dist = dx - dy;
     }
-    arg0->unk10 = dist;
-    idx = arg0->unk0->unk6;
+    arg0->lastDist = dist;
+    idx = arg0->entry->countSign;
     if (dist < D_80087474[-idx]) {
         dist = 1;
         return dist;
@@ -850,8 +859,8 @@ extern void DrawStyleTables(void);
 extern s32 gStyleTickCount;
 extern s32 gStyleCueRecordIndex;
 extern u8 gStyleCueSlotPool[];
-extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3);
-extern s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void *arg2);
+extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *arg0, s32 *arg1, void *arg2, void *arg3);
+extern s32 StopStyleCueIfNear(StyleCueSlot *arg0, void *arg1, void *arg2);
 
 s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     void *ctx;
@@ -875,7 +884,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     for (i = 0; i < 2; i++) {
         if (gStyleCueSlots[i] != 0) {
             if (StopStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
-                gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
+                gStyleCueSlots[i] = (StyleCueSlot *) FlushStyleCue(gStyleCueSlots[i]);
             }
             /* INERT ON PURPOSE -- DO NOT DELETE. This pair is a semantic
              * no-op (`i` is the initialized loop counter, so nothing here is
@@ -889,7 +898,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
             i++;
             i--;
         } else {
-            gStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (gStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
+            gStyleCueSlots[i] = TryStartStyleCue((StyleCueSlot *) (gStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;

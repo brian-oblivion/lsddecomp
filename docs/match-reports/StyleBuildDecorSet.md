@@ -221,3 +221,17 @@ The reason this is worth writing down as a rule rather than an anecdote is the
 failure mode it replaces. "Register pressure" is unfalsifiable and terminal: it
 names no construct, suggests no experiment, and both round 46 and round 47
 stopped on it. The discriminator here costs one build.
+
+## Naming
+
+**`StyleBuildDecorSet`, tier B.**
+
+Guarded by `gStyleDecorVariant` (set only for `gStyleVariant == 0` by
+`PickStyleFallbackConfig`). Allocates 18 `New_ClassEAC0` instances into
+`gStyleDecorSlots`, walking two position pairs (`paramA`/`paramB`) that step
+by a fixed per-iteration delta. Released by `StyleReleaseDecorSet`,
+per-frame-updated by `StyleUpdateDecorSet` (sibling report; same guard, same
+array). "DecorSet" names the mechanics (a released/updated SET of objects
+gated by the decor variant flag) without asserting what the 18 objects
+represent visually -- no string or other-unit evidence establishes that.
+STALL, 1 word short; naming is unaffected by match state per track 3.

@@ -69,3 +69,12 @@ needed, matched directly from the natural C shape.
 ## Attempts
 
 1 (matched on the first build).
+
+## Naming
+
+**`StyleUpdateEffectSlots`, tier B.**
+
+Iterates `gStyleEffectSlots[0 .. gStyleEffectSlotCount)` dispatching
+`slotEC(obj, arg0)` on each -- the per-frame update half of the
+`StyleBuildEffectSlots`/`StyleUpdateEffectSlots`/`StyleReleaseEffectSlots`
+triad. MATCHED, 34/34, first build.

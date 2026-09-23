@@ -85,3 +85,14 @@ be captured into a local *before* the loop starts.
 2 (first attempt: global read inside the loop, wrong -- one fewer saved
 register, 3-word-short mismatch, out-of-range drift as expected for a size
 change; second attempt: hoisted to a local before the loop, byte-exact).
+
+## Naming
+
+**`StyleFillEffectKind1`, tier B.**
+
+Sibling of `StyleFillEffectKind0`: fills `arg1` slots of `gStyleEffectSlots`
+via the same `func_80056320` allocator, this time with a literal kind
+argument of `1`. Called unconditionally (every `gStyleVariant`) from
+`StyleBuildEffectSlots`, right after `StyleFillEffectKind0`. MATCHED,
+42/42, second build (one lever: hoist the read of `D_80087330` out of the
+loop).
