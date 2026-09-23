@@ -7,7 +7,7 @@
 ## What it does
 
 `Class6B5CC` vtable slot `+0x04C`, the "attach" half of an attach/detach
-pair with `func_8001D1A4` (`+0x050`, this unit's own report). If
+pair with `Class6B5CC__DetachFromParent` (`+0x050`, this unit's own report). If
 `self->unkC` is already set, does nothing and returns `self` unchanged
 (already attached). Otherwise: stores `obj` into `self->unkC`, copies
 `obj->unk14` into `self->unk14->unk48`, calls `obj->methods->slot10(obj,
@@ -87,4 +87,4 @@ attempt, then one fix per residue above). Established `UnkOwner_d294`/
 ctor-like/`+0x014` dtor-like slots) and `Class6B5CCSub14`'s
 `unk18`/`unk1C`/`unk20` Vec3 fields, and retyped `Class6B5CCObj::unkC`
 from an untyped `void *` to `UnkOwner_d294 *` (see header comment on that
-field for the cross-check with `func_8001D1A4`).
+field for the cross-check with `Class6B5CC__DetachFromParent`).

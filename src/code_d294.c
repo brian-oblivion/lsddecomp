@@ -165,7 +165,7 @@ Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *ob
     return self;
 }
 
-Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self) {
+Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self) {
     UnkOwner_d294 *owner;
 
     owner = self->unkC;

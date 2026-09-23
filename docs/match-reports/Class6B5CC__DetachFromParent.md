@@ -1,4 +1,6 @@
-# func_8001D1A4
+# Class6B5CC__DetachFromParent
+
+> Renamed from `func_8001D1A4` on 2026-09-23 (tools/rename.py). Address 0x8001d1a4.
 
 **Unit:** code_d294 · **Size:** 24 words · **Status:** MATCHED (24/24 words)
 
@@ -13,7 +15,7 @@ Always returns `self`.
 ## The C
 
 ```c
-Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self) {
+Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self) {
     UnkOwner_d294 *owner;
 
     owner = self->unkC;

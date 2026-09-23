@@ -54,7 +54,7 @@ return 1;
     (only runs when `< 0`).
   - `+0xC`: **CONFLICTS with the ALREADY-TYPED `UnkOwner_d294 *unkC`**
     (an owner back-reference, established by `Class6B5CC__AttachToParent`/
-    `func_8001D1A4` in `code_d294.c`). This function's OWN use --
+    `Class6B5CC__DetachFromParent` in `code_d294.c`). This function's OWN use --
     null-checked, then (when non-null) `self->unk14` is read and treated
     as the base for a `+0x38` sub-table, exactly the SAME
     `Class6B5CCSub14::unk38` field `Class6B5CC__LocalOffsetToWorldPos`/`Class6B5CC__FaceTarget`

@@ -8,7 +8,7 @@
 
 `Class6B5CC`'s own destructor — vtable slot `+0x00C` of `D_8006B5CC`
 (confirmed via `tools/classtable.py D_8006B5CC`). Calls three of its own
-virtual teardown hooks in order (`slot50` = `func_8001D1A4`, `slot54` =
+virtual teardown hooks in order (`slot50` = `Class6B5CC__DetachFromParent`, `slot54` =
 `func_8001D204`, `slot5C` = `func_8001D33C` — all three still queued or,
 for `func_8001D33C`, already a matched no-op stub elsewhere), frees the two
 sub-blocks the constructor allocated (`self->unk14->unk44`, then

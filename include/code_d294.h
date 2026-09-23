@@ -11,7 +11,7 @@
  * +0x018 Class6B5CC__RemoveAllChildren, [+0x01C..+0x038 seven slots inherited verbatim from
  * BasicClass, D_8006B58C], +0x038 Class6B5CC__OnNotify (override), +0x03C null,
  * +0x040 Class6B5CC__Reset, +0x044 Class6B5CC__UpdateRotation, +0x048 Class6B5CC__UpdateScale,
- * +0x04C Class6B5CC__AttachToParent, +0x050 func_8001D1A4, +0x054 func_8001D204,
+ * +0x04C Class6B5CC__AttachToParent, +0x050 Class6B5CC__DetachFromParent, +0x054 func_8001D204,
  * +0x058 func_8001D280, +0x05C func_8001D33C (already-matched no-op stub),
  * +0x060 func_8001D344, +0x064 func_8001D374, +0x068 func_8001D3A0,
  * +0x06C func_8001D3CC, +0x070 func_8001D3F8, and continuing past this
@@ -120,7 +120,7 @@ struct Class6B5CCBlock44 {
 };
 
 /* self->unk14's target: a 0x50-byte block allocated by the ctor
- * (Class6B5CC__Class6B5CC). Round 2 (Class6B5CC__AttachToParent, Class6B5CC__Reset, func_8001D1A4)
+ * (Class6B5CC__Class6B5CC). Round 2 (Class6B5CC__AttachToParent, Class6B5CC__Reset, Class6B5CC__DetachFromParent)
  * filled in most of the rest of this layout:
  *   +0x000  a flag/state word: 1 after Class6B5CC__Reset (the ctor's own init
  *           hook) runs, 0 again after Class6B5CC__AttachToParent's "attach" and after
@@ -131,7 +131,7 @@ struct Class6B5CCBlock44 {
  *           its optional 3rd argument (or zeroed if that argument is NULL).
  *   +0x044  a second heap block (0x28 bytes, alloc'd by the ctor).
  *   +0x048  a flag/back-reference word: zeroed by the ctor and by
- *           func_8001D1A4 (slot +0x050), set to `obj->unk14` by
+ *           Class6B5CC__DetachFromParent (slot +0x050), set to `obj->unk14` by
  *           Class6B5CC__AttachToParent's "attach".
  * +0x004..+0x018 and +0x024..+0x044 are still unknown -- not padded out
  * field-by-field, since nothing this unit's chosen functions touch reads
@@ -186,7 +186,7 @@ struct Class6B5CCSub14 {
      * narrows what is KNOWN about its contents, it does not change the
      * allocation. */
     Class6B5CCSub44 *unk44;
-    s32 unk48;    /* +0x048, zeroed by the ctor and by func_8001D1A4 (slot +0x050);
+    s32 unk48;    /* +0x048, zeroed by the ctor and by Class6B5CC__DetachFromParent (slot +0x050);
                    * set to `obj->unk14` by Class6B5CC__AttachToParent's "attach" */
 };
 
@@ -305,7 +305,7 @@ extern void func_80017CFC(void *arg);
 /* A second small class, only ever seen through self->unkC (see
  * Class6B5CCObj below) and through Class6B5CC__AttachToParent's 2nd argument -- an
  * "owner" this class can register/unregister with. Two slots seen so far,
- * `slot10`/`slot14` (Class6B5CC__AttachToParent/func_8001D1A4's call sites), both
+ * `slot10`/`slot14` (Class6B5CC__AttachToParent/Class6B5CC__DetachFromParent's call sites), both
  * `(owner, Class6B5CCObj *self)` -- read as an attach/detach pair. `unk14`
  * is a plain data field (Class6B5CC__AttachToParent reads it into
  * `self->unk14->unk48`); real meaning unknown. Real class identity
@@ -437,7 +437,7 @@ struct Class6B5CCMethods {
     void (*updateRotation)(Class6B5CCObj *self, s32 flag, void *data); /* +0x044, Class6B5CC__UpdateRotation */
     void (*updateScale)(Class6B5CCObj *self, s32 flag, void *data); /* +0x048, Class6B5CC__UpdateScale */
     u8 pad04C[0x050 - 0x04C];
-    void (*slot50)(Class6B5CCObj *self);      /* +0x050, func_8001D1A4 (this unit) */
+    void (*slot50)(Class6B5CCObj *self);      /* +0x050, Class6B5CC__DetachFromParent (this unit) */
     void (*slot54)(Class6B5CCObj *self);      /* +0x054, func_8001D204 (this unit) */
     /* +0x058, func_8001D280 (still queued). func_8001D204's own call site
      * establishes its signature: writes an output entry pointer and an
@@ -532,7 +532,7 @@ struct Class6B5CCObj {
     /* +0x00C, an owner back-reference. RETYPED round 2 from an untyped
      * `void *` to `UnkOwner_d294 *` once Class6B5CC__AttachToParent (this unit's own
      * "attach" -- sets `self->unkC = obj` and calls `obj->methods->slot10`)
-     * and func_8001D1A4 (the "detach", `self->unkC->methods->slot14`)
+     * and Class6B5CC__DetachFromParent (the "detach", `self->unkC->methods->slot14`)
      * were both matched: both dispatch through the exact same 2-slot
      * shape, `UnkOwnerMethods_d294`, at the exact same slot offsets. Not
      * just a plausible guess -- the two call sites agree byte-for-byte on
@@ -730,7 +730,7 @@ void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other);
 void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self);
 void Class6B5CC__Reset(Class6B5CCObj *self);
 Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec);
-Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self);
+Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self);
 void func_8001D204(Class6B5CCObj *self);
 void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor);
 
