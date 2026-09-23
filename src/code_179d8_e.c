@@ -312,7 +312,7 @@ extern s32 func_8003A05C(void);
 extern void SsEnd(void);
 extern void QuitSpu(void);
 extern void SsSetTickMode(s32 a0);
-extern void StartSeqTimer(void);
+extern void SsStart(void);
 extern void *func_80017CFC(void *ptr);
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern s32 strlen(char *s);
@@ -489,7 +489,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
         }
     }
     if (gVabVolumeInited == 0) {
-        StartSeqTimer();
+        SsStart();
         SsSetMVol(0x78, 0x78);
         gVabVolumeInited = 1;
     }

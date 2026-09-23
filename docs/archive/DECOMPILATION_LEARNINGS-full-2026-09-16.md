@@ -9021,3 +9021,14 @@ already covered elsewhere in the sheet.
   `func_80054850` from 6 words short to 1 and closed its sibling `func_800549A8` 93/93 first
   attempt. **A lever found on one function is worth one build on every recorded sibling first.** (a
   round 61)
+
+## Distilled round 71 (2026-09-23)
+
+- **A narrow signed field may need an `s32` LOCAL rather than a cast to get retail's `lb` + `sll
+  0xb`, but ONLY under aliasing -- this does NOT reproduce in isolation.** In `func_8004C1C0`
+  (fields re-read after a callee writes the struct through `u8 *`), `s32 t = o->b2; t << 11` and
+  `o->b2 * 2048` gave retail's form while `(s32)o->b2 << 11` and an `s8` local gave `lbu` + `sll
+  0x18` + `sra 0xd`. **The head could not reproduce any difference on the pinned pipeline**: two
+  reproducers, one plain and one replicating the store-then-reload shape (reload confirmed present,
+  `sb` then `lb`), emit identical `lb` + `sll 0xb` for all spellings. So the trigger is the aliasing
+  context, not the spelling -- do not "fix" a spelling that is already correct. (a round 63)

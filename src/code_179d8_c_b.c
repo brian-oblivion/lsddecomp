@@ -3,8 +3,8 @@
  * playback clock built on the PSX root counters (RCnt) and interrupt
  * controller (IRQ), used to pace the game's music sequencer independently
  * of vsync. `SsSetTickMode`/`_SsStart` (the latter still a stall)
- * pick a tick rate and arm a root counter at it; `StartSeqTimer`/
- * `StopSeqTimer` are its two callers' one-line wrappers; `_SsTrapIntrVSync`/
+ * pick a tick rate and arm a root counter at it; `SsStart`/
+ * `SsStart2` are its two callers' one-line wrappers; `_SsTrapIntrVSync`/
  * `_SsSeqCalledTbyT_1per2` are the two interrupt-time handlers it can
  * register (one chains a previously-saved handler, the other halves the
  * firing rate by toggling); `SsEnd` tears the whole thing down.
@@ -128,12 +128,12 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", _SsStart);
 
 extern void _SsStart(s32 arg0);
 
-void StartSeqTimer(void)
+void SsStart(void)
 {
     _SsStart(1);
 }
 
-void StopSeqTimer(void)
+void SsStart2(void)
 {
     _SsStart(0);
 }

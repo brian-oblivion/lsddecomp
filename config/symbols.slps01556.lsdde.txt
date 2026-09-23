@@ -1325,8 +1325,16 @@ SsSetTickMode = 0x80032588; // type:func
 // _SsStart (disc 3.3). Superseded game-style name SeqTimerControl.
 // Round 71 (bravo, track 2).
 _SsStart = 0x80032708; // type:func
-StartSeqTimer = 0x80032998; // type:func
-StopSeqTimer = 0x800329B8; // type:func
+// identified: EXACT masked 1.00 vs libsnd/ssinit SsStart (3.3; ssstart on 3.5/3.6),
+// AMBIGUOUS 4-way tie settled by position (between _SsStart and SsEnd, ssinit's
+// own order) and body (_SsStart(1)); header LIBSND.H void SsStart(void).
+// Superseded game-style name StartSeqTimer. Round 71 (head, track 2).
+SsStart = 0x80032998; // type:func
+// identified: EXACT masked 1.00 vs libsnd/ssinit SsStart2 (3.3; ssstart on 3.5/3.6),
+// AMBIGUOUS 4-way tie settled by position (between SsStart and SsEnd) and body
+// (_SsStart(0)); header LIBSND.H void SsStart2(void).
+// Superseded game-style name StopSeqTimer. Round 71 (head, track 2).
+SsStart2 = 0x800329B8; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit SsEnd
 // (disc 3.3). Superseded game-style name CancelSeqTimer. Round 71
 // (bravo, track 2).

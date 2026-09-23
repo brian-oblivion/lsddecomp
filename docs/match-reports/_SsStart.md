@@ -12,7 +12,7 @@ the head's question" below).
 ## What it does
 
 A CD-audio/root-counter rate-selection dispatcher, called with `arg0`
-from `StartSeqTimer`/`StopSeqTimer` (`1`/`0`). Busy-waits ~1000 cycles,
+from `SsStart`/`SsStart2` (`1`/`0`). Busy-waits ~1000 cycles,
 then dispatches on the CD status global `gSeqTimerRateMode`:
 
 - `2`/`3`: fixed device tag `0xF2000002` with a fixed rate constant
@@ -529,7 +529,7 @@ Round 69 (delta), track 3 pass on `code_179d8_c_b`.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `_SsStart` (was `func_80032708`) | B | arms a PSX root counter at the rate `SsSetTickMode` selected (`SetRCnt`), tags a device value, and registers one of two ISR callbacks (`_SsTrapIntrVSync`/`_SsSeqCalledTbyT_1per2`) via `InterruptCallback` -- an "arm the sequencer's software timer" routine. `arg0` is a start/stop-ish switch (see `StartSeqTimer.md`/`StopSeqTimer.md`) but its exact in-game trigger is not established, hence B not A. |
+| `_SsStart` (was `func_80032708`) | B | arms a PSX root counter at the rate `SsSetTickMode` selected (`SetRCnt`), tags a device value, and registers one of two ISR callbacks (`_SsTrapIntrVSync`/`_SsSeqCalledTbyT_1per2`) via `InterruptCallback` -- an "arm the sequencer's software timer" routine. `arg0` is a start/stop-ish switch (see `SsStart.md`/`SsStart2.md`) but its exact in-game trigger is not established, hence B not A. |
 | `gSeqTimerId` (was `D_8006DC90`) | B | the value threaded through `InterruptCallback` as a handle: `-1` is checked as a sentinel ("nothing armed") throughout this function and in `SsEnd`, `0` means "armed but not yet given a real id" (this function then captures one via `InterruptCallback(0, NULL)`), and any other value is passed straight back to `InterruptCallback` to re-target or deregister. |
 | `gSeqTimerRateFlag` (was `D_8006DC94`) | B | set (incremented, never explicitly reset here) only on the branch of the default case that computes the smaller of the two custom rates (`v1 < 0x46`); this function's own callback-selection tail reads it as a boolean to choose `_SsSeqCalledTbyT_1per2` over `_SsTrapIntrVSync` -- i.e. it selects the half-rate ISR variant. `SsEnd` clears it back to 0. |
 | `gSeqTimerStopPending` (was `D_8006DC8C`) | B | when set, this function's shared tail skips arming entirely and instead tears down via `VSyncCallback(SsSeqCalledTbyT)`; `SsEnd` is the other place that reads/clears it, calling `VSyncCallback(0)` first. Named for what it gates (a pending stop/teardown), not for a specific caller's intent. |

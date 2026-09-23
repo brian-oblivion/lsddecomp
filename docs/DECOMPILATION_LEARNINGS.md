@@ -146,6 +146,14 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   orders that block's statements, but at a join it denies the scheduler the instruction it would have
   hoisted into the branch's delay slot, costing a nop per join. A barrier that makes the body LONGER
   is this, not a block-order result. (a round 65)
+- **The ORDER of comma expressions in a `for` increment clause is a scheduling lever**: swapping
+  `i++, p++` to `p++, i++` fixed a loop tail's `addu`/`addiu` pairing, and the inner loop's swap
+  closed `Class866E8__DispatchToRectCells` 117/117 after a round-19 permuter bound fired. Try it by
+  hand at any loop-tail residue before a search. (round 71)
+- **One store retail shows at a join may be the SAME store written in both arms**: GCC merges the
+  identical stores into the join block, and the label that merge creates stops a following reload
+  from hoisting above it. `func_8004CAF0` 97/97; the barriers and `do{}while(0)` it had carried were
+  compensating for that missing label. (round 71)
 
 ### 3b. Switch and jump tables
 
@@ -324,6 +332,15 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   with dst/counter swapped, went 253 -> 333/337, ins/del 0/0, on this alone. Discriminator: the
   SAME swap at every copy of one repeated block. (round 70, delta)
 
+- **A base-plus-running-offset walk in retail is strength reduction of `&self->arr[i]`**: write
+  the index and let GCC produce the walk and its delay-slot increment. Hand-rolling `(u8 *)self +
+  off; off += 0x1C` reproduces the arithmetic but not the schedule (`Class866E8__ResetAllElements`,
+  9/74 -> 74/74 on the first build). (round 71)
+- **A value in a callee-saved register with no call visibly crossing it was ASSIGNED before a
+  call**: GCC sank the computation into a delay slot after the call, which reads as a pointless
+  promotion. Move the assignment to right after its input is loaded (`func_8004C6A8`, filed as a
+  HARD RULE 6 stall in round 34, 85/165 -> 131/165 length-exact). (round 71)
+
 ### 3e. Frames and stack
 
 - **An unused stack frame is reserved by an unused local ARRAY, never a scalar.** `s32 unused[2]`
@@ -470,7 +487,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `-0x40`); GCC re-associates constant multiplies across a whole expression tree regardless of
   parenthesization, and only a STATEMENT BOUNDARY stops it. Defeat the store-flag collapse of `if
   (cond) return 1; return 0;` with `flag = 1; return flag;`. (a §"Defeat 2.6.3's constant
-  canonicalization")
+  canonicalization") The mechanism is the TREE folder, before RTL: it hoists a literal out of a sum
+  (`s + (p + 0x14)` -> `(s + p) + 0x14`), so no spelling containing the literal reaches retail's
+  grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`func_8003ECD0`,
+  73/73 after 14 groupings and ~89k permuter iterations); splitting `(w + 20) - span` into two
+  statements closed `func_8004CAF0`. (round 71)
 
 ### 3h. volatile and memory
 
@@ -603,14 +624,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   ~330k prior iterations missed both: a permuter mutates a body but never merges or deletes its
   locals, so local count is a PARAMETER of the search space, not a point in it. A validated
   high-iteration negative bounds the search, not the function.** (a round 63)
-- **A narrow signed field may need an `s32` LOCAL rather than a cast to get retail's `lb` + `sll
-  0xb`, but ONLY under aliasing -- this does NOT reproduce in isolation.** In `func_8004C1C0`
-  (fields re-read after a callee writes the struct through `u8 *`), `s32 t = o->b2; t << 11` and
-  `o->b2 * 2048` gave retail's form while `(s32)o->b2 << 11` and an `s8` local gave `lbu` + `sll
-  0x18` + `sra 0xd`. **The head could not reproduce any difference on the pinned pipeline**: two
-  reproducers, one plain and one replicating the store-then-reload shape (reload confirmed present,
-  `sb` then `lb`), emit identical `lb` + `sll 0xb` for all spellings. So the trigger is the aliasing
-  context, not the spelling -- do not "fix" a spelling that is already correct. (a round 63)
 
 ## 4. Verdict classes and how far to trust them
 

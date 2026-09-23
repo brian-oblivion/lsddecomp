@@ -60,7 +60,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
         }
     }
     if (gVabVolumeInited == 0) {
-        StartSeqTimer();
+        SsStart();
         SsSetMVol(0x78, 0x78);
         gVabVolumeInited = 1;
     }
@@ -82,7 +82,7 @@ byte matters here), then walks that many `VagAtr` entries out of the pool via
 `SsUtGetVagAtr`, advancing the shared pool pointer once per tone (not once
 per program -- confirmed by where retail's `addiu $s2,$s2,0x20` actually sits,
 in the INNER loop's own branch-delay slot). On first successful pass through
-the whole bank, calls `StartSeqTimer` and sets the shared master volume once
+the whole bank, calls `SsStart` and sets the shared master volume once
 (`gVabVolumeInited` guards it from repeating).
 
 ## Result
