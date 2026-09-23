@@ -7,7 +7,7 @@
 ## What it does
 
 The constructor (`ctor`, slot +0x008) for `Class869D8`. Standard
-class-framework shape, same as e.g. class_39e08.c's `func_8004A19C`: chain
+class-framework shape, same as e.g. class_39e08.c's `Class86668__Class86668`: chain
 to a base class's ctor (fetched via `GetUnk18ObjMethods()`), install this
 class's own vtable, then call the just-installed vtable's own
 post-construct hook (slot +0x040, currently `func_8004D2F8` -- already

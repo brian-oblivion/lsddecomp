@@ -153,7 +153,7 @@ original derivation, so the original reasoning stays intact and inspectable.)
 **Still no instance of "field name describes layout, not which function
 runs once `self->methods` is reassigned"** in this function — the dtor's
 `self->methods->slot14` call happens BEFORE `GetClass86668Methods()->dtor(self)`,
-and nothing here reassigns `self->methods` at all (unlike `func_8004A19C`'s
+and nothing here reassigns `self->methods` at all (unlike `Class86668__Class86668`'s
 ctor, which is the one confirmed instance so far, from the earlier round).
 Three functions in, reporting negative again as requested.
 

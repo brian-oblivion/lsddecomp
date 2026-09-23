@@ -295,7 +295,7 @@ struct Obj865C8 {
  * implementation are typed. */
 typedef struct IntermediateBaseMethods {
     u8 pad00[0x008];
-    void *(*ctor)(void *self);             /* +0x008, called by func_8004A19C with only `self` set up */
+    void *(*ctor)(void *self);             /* +0x008, called by Class86668__Class86668 with only `self` set up */
     void (*dtor)(void *self);              /* +0x00C */
     u8 pad10[0x44 - 0x10];
     /* Same accessor/slot combination code_2c054.h calls
@@ -330,12 +330,12 @@ extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
  * the rest verbatim (+0x058..+0x070, confirmed identical function
  * addresses in both tables by tools/classtable.py). Constructed by
  * New_Class86668, a New_X allocator (0x38-byte instance). Instances share
- * `Obj865C8`'s own layout (func_8004A19C writes `unk30`/`subB` at the exact
+ * `Obj865C8`'s own layout (Class86668__Class86668 writes `unk30`/`subB` at the exact
  * same offsets `Obj865C8`'s other functions already use), so this class's
  * own instances are typed `Obj865C8 *` too rather than inventing a second,
  * parallel struct.
  *
- * `ctor` (+0x008, func_8004A19C) never uses its own return value at either
+ * `ctor` (+0x008, Class86668__Class86668) never uses its own return value at either
  * of its two call sites (its own body sets no explicit `$v0` before
  * returning either -- CLAUDE.md's "discarded return is never evidence of
  * void" rule is about NOT assuming void from a discarding caller alone, but
@@ -343,7 +343,7 @@ extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
  * `void` is the callee-side reading, not an inference from the caller). */
 typedef struct Class86668Methods {
     u8 pad00[0x08];
-    void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 func_8004A19C */
+    void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 Class86668__Class86668 */
     /* func_8004A228 (this unit, matched): the sibling class's own dtor
      * override. Called by Obj865C8__Dtor (D_800865C8's own dtor) as
      * GetClass86668Methods()->dtor(self) -- a base-class dtor forwarding to a
@@ -390,7 +390,7 @@ extern void *func_80017B34(s32 size);
 
 /* Allocator in the still-uncarved unit code_179d8 (asm/code_179d8.s):
  * allocates a 0x64-byte instance and, on success, ctors it with the single
- * forwarded argument. Only call site here is func_8004A19C, which stores
+ * forwarded argument. Only call site here is Class86668__Class86668, which stores
  * the result straight into `Obj865C8::subB` (`SubObjB *`). */
 extern SubObjB *New_VabStreamObj(s32 arg1);
 

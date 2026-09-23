@@ -201,7 +201,7 @@ double-branch tail, or vice versa:
 **Still no instance of "field name describes layout, not which function
 runs once `self->methods` is reassigned"** — no vtable-pointer reassignment
 anywhere in this function. Five functions into this round now, reporting
-negative consistently; the one confirmed instance remains `func_8004A19C`'s
+negative consistently; the one confirmed instance remains `Class86668__Class86668`'s
 ctor from the earlier round.
 
 **New, well-tested lever worth generalizing:** for a small dense-ish switch

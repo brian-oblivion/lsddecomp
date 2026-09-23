@@ -270,7 +270,7 @@ Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
     return NULL;
 }
 
-void func_8004A19C(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
+void Class86668__Class86668(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
     Get_vtable_IntermediateBase()->ctor(self);
     self->methods = (Class865C8Methods *)GetClass86668Methods();
     if (arg1 != 0) {
