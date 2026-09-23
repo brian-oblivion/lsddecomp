@@ -9041,3 +9041,43 @@ already covered elsewhere in the sheet.
   missed. Single instance (`getintr`, libcd), and the MMIO discriminator above is
   only half met: `resp[]` is a LOCAL buffer filled from the CD response FIFO, and the same body's
   `volatile u8 cause` compiles alike. (round 70, delta)
+
+## Distilled round 73 (2026-09-23)
+
+- **An INCOMPLETE-ARRAY global declaration makes 2.6.3 CSE the address-take into a
+  callee-saved register; a SCALAR declaration of the same symbol emits absolute-per-access.**
+  Four in-tree points on `SetupStyleSpawnParamsA`: `extern u8 D_X[]` + `*(s32 *) D_X = v` and
+  `extern s32 D_X[]` + `D_X[0] = v` both 5/110 RED, carrying an extra `$s1` and 8 more frame
+  bytes; `extern s32 D_X;` assigned either by name or through `*(s32 *) &D_X` both 110/110
+  GREEN. So ELEMENT TYPE and CAST SPELLING are inert and ARRAYNESS is the whole axis.
+  **The effect is CONTEXTUAL and does NOT reproduce in isolation** — a five-line file emits
+  `lui $at` per access for `u8[]`, `int[]` and `int` alike, with or without intervening calls
+  (four pinned-pipeline variants), so the real body's context is part of the trigger and a
+  reproducer cannot screen this for you. Round 48 filed the residue as register identity and
+  recorded "`volatile` does not stop address caching": a correct negative about the wrong
+  instrument. (a round 64, charlie + head)
+
+- **A same-size pointer cast in a FUNCTION-SCOPE local can cost a callee-saved register — the cost
+  is LIFETIME, not the name** (inline casts took a function to 106/110; a case-local temp was
+  byte-identical). Splitting a combined declaration (`T x; x = expr;`) is a real lever for a value
+  crossing a CALL boundary (19/19), inert on parameter colour swaps; a uniform register-slot shift
+  signals ONE EXTRA PERSISTENT LOCAL. Relatedly, **cache a re-read struct field only across a
+  CALL-FREE span, reload after any intervening call** — the tell is the wrong NUMBER of callee-saved
+  registers, and a value you WROTE and reuse needs a named local. Whether to cache `self->methods`
+  tends to be constant PER CLASS, determined from a matched sibling but kept conditional. (a §"A
+  same-size pointer cast in a FUNCTION-SCOPE local", §"Round 11", §"Round 12")
+
+- **A permuter run that plateaus with NO MOVEMENT AT ALL points AWAY from the residue you
+  measured**: it mutates expressions, operand order and temporaries within the statements given, and
+  never moves a statement into an else arm absent from its base (`func_80063144`, 30485 iterations
+  plateaued, real defect two statement placements, closed in 2 builds). **Corollary: on a
+  length-defective function `insertions/deletions` is the signal and the word count misleads** — a
+  correct fix ran 27/27 -> 11/11 -> 7/7 -> 0/0 while the word score went 61 -> 56 -> 91 -> 213. (a
+  round 59)
+
+- **The frame size bounds how many spilled locals a body can have, so it screens whole source shapes
+  before you build one.** Retail's `func_80030980` frame is `-0x38` = 0x18 outgoing args + 0x20
+  saved registers = ZERO spill bytes, so no body that forces seven scalars to memory can be its
+  shape -- round 50's seven-`volatile` sweep was structurally excluded by a number already printed
+  at the top of the `.s`. Read the frame first and subtract args and saves; what remains is the
+  spill budget your C must fit. (a round 62)

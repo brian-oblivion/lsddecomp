@@ -154,6 +154,14 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   identical stores into the join block, and the label that merge creates stops a following reload
   from hoisting above it. `func_8004CAF0` 97/97; the barriers and `do{}while(0)` it had carried were
   compensating for that missing label. (round 71)
+- **A stall whose compiled LENGTH differs from retail is a control-flow defect until shown
+  otherwise, whatever its title calls it.** `func_80051AC8`, filed "register rotation, 6/107" since
+  round 9, compiled 2 long: an assignment retail runs unconditionally sat under a guard; a running
+  max needed a ternary (a field load stored straight back to the same field = `x = (x < y) ? y :
+  x`); two initialisations belonged before a call. (PROGRESS round 73)
+- **An early `return <const>` near the top can decide delay-slot fillers at LATER branches.**
+  Same instructions, equal length, fillers swapped: rewrite as `if (ok) { ...; return 1; } return
+  0;`. Closed `DreamSys__TryInstantTeleportLink` 58/63. (PROGRESS round 73)
 
 ### 3b. Switch and jump tables
 
@@ -284,15 +292,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   REUSE is a property of the PAIR — a single-use alias is copy-propagated away. Consequence:
   screening a candidate by halves, two inert halves do NOT license discarding it.
   (a round 64, charlie)
-- **A same-size pointer cast in a FUNCTION-SCOPE local can cost a callee-saved register — the cost
-  is LIFETIME, not the name** (inline casts took a function to 106/110; a case-local temp was
-  byte-identical). Splitting a combined declaration (`T x; x = expr;`) is a real lever for a value
-  crossing a CALL boundary (19/19), inert on parameter colour swaps; a uniform register-slot shift
-  signals ONE EXTRA PERSISTENT LOCAL. Relatedly, **cache a re-read struct field only across a
-  CALL-FREE span, reload after any intervening call** — the tell is the wrong NUMBER of callee-saved
-  registers, and a value you WROTE and reuse needs a named local. Whether to cache `self->methods`
-  tends to be constant PER CLASS, determined from a matched sibling but kept conditional. (a §"A
-  same-size pointer cast in a FUNCTION-SCOPE local", §"Round 11", §"Round 12")
 - **`do { } while (0)` is a REGISTER-PRESSURE lever, not a scheduling lever** — inert across four
   delay-slot-fill sites and regressive on an unrelated matched sequence elsewhere, but catastrophic
   (66/69 -> 1/69) applied whole-function. Small straight-line bodies only, per-return, never
@@ -307,7 +306,10 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   still allocate a different register to the POINTER they go through.** `emit_block_move` expands a
   small struct copy as a single unit, so the base pointer's pseudo has a different reference count
   and live shape than when three statements each mention it. Worth one struct-assignment attempt on
-  a register-identity residue on a pointer used by a run of same-shaped field copies. (a
+  a register-identity residue on a pointer used by a run of same-shaped field copies. The mechanism
+  (round 73): the inline copy (`movstrsi_internal`) CLOBBERS `$v0`/`$v1`/`$a0`/`$a1`, so a parameter
+  live across a whole-struct assignment loses its incoming register; an unexplained entry `move
+  $a3,$a0` next to batched `lw/lw/sw/sw` is the tell (`Class6E99C__PushPosition`). (a
   docs/match-reports/func_8001E7BC.md, round 57)
 - **When a residue is a missing register-to-register COPY, try DELETING the named local and
   inlining the expression** — the inverse of the "name the subexpression" lever. 2.6.3's
@@ -324,7 +326,9 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   blocks UPSTREAM of the deletion; reusing an already-dead local in `func_8002D1B4` was worth 1700
   asm-differ points where a fresh one was worth 500; ADDING a hoisted base pointer moved
   `func_8002CF18`. The delete direction needs a CALL-crossing live range, so it does not apply to
-  leaves. (a round 65)
+  leaves. A permuter never merges or deletes locals, so local count is a PARAMETER of its search
+  space: `func_8004BA40` (four locals into two) and `func_8004B700` (one deleted) closed after ~330k
+  iterations missed both. (a round 65; round 63)
 
 - **A register swap that REPEATS at every expansion of a `do { } while (0)` macro closes as a
   `static __inline__` function.** The inline's parameters get their own pseudos at each call, so
@@ -346,6 +350,28 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `methods->slotNN(self)` calls gave `self` one reference too many; retail picks `fn` per arm and
   makes ONE `fn(self)` call (its tell: a shared `jalr; move a0,sN` tail), so `arg1` outranks it
   (`Obj86B60__NotifyParents` 32/32, "unreachable" since round 13). (round 72)
+- **Split a variable REUSED for two unrelated values** — the inverse of the delete-a-local lever.
+  Discriminator: an equal-length rotation among saved registers, one local assigned in two
+  independent halves. Closed `func_80051F24` (three-way rotation, 75/95) on the
+  first build and `func_8004BE54` 142/150. (PROGRESS round 73)
+- **An address whose BASE is `$a0` while the object lives in `$s0` means a second C variable
+  aliasing `this`.** Scheduling and delay-slot filling move instructions but never change which
+  register an address uses. Closed `DreamSys__StepLookYaw` (1 short). (PROGRESS round 73)
+- **The same instruction in BOTH arms' delay slots is ONE source statement after the join**, copied
+  by reorg; writing it per arm adds references, raises that pseudo's global-alloc priority and
+  rotates every saved register. Also: two loops may share ONE counter. Closed `func_8002CD08`
+  110/132. (PROGRESS round 73)
+- **`(u8)x` creates an 8-bit temporary that stays live in a saved register; `x & 0xFF` does not.**
+  The tell is an entry `move aN,sM` nothing explains; a bound test may then need `(u32)`. Closed
+  `func_8002E138` after four rounds. (PROGRESS round 73)
+- **Commutative `+` operand order is fixed at RTL generation: a FIELD-LOAD operand goes second
+  whatever the source order; a NAMED local keeps its source position** (`cc1 -dr`). So flipping
+  textual order is inert, and a field load FIRST in retail means the source had it in a local;
+  assign it inside the expression (`a < (w = r->f) + tol`) to keep load order. Closed
+  `func_8004C470` 69/70 after ~183k permuter iterations. (PROGRESS round 73)
+- **A `+4` walker set up from an ARGUMENT register after a loop's count check is GCC's loop
+  optimiser, not a C pointer**: advance the parameter itself and take `&p->field` inside the body; a
+  C-initialised second pointer always lands before the check. Closed `func_8004BB3C`. (round 73)
 
 ### 3e. Frames and stack
 
@@ -358,12 +384,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   exact, word count unmoved. Use it FIRST as a cheap diagnostic realignment, then look for a
   separate companion fix. An allocated-but-unused frame on a leaf function is not a residue at all.
   (a §"The frame-padding idiom recovers frame ALIGNMENT", §"An allocated-but-unused stack frame")
-- **The frame size bounds how many spilled locals a body can have, so it screens whole source shapes
-  before you build one.** Retail's `func_80030980` frame is `-0x38` = 0x18 outgoing args + 0x20
-  saved registers = ZERO spill bytes, so no body that forces seven scalars to memory can be its
-  shape -- round 50's seven-`volatile` sweep was structurally excluded by a number already printed
-  at the top of the `.s`. Read the frame first and subtract args and saves; what remains is the
-  spill budget your C must fit. (a round 62)
 
 ### 3f. Calls, arguments and return types
 
@@ -434,6 +454,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   bare `nop` with the register already loaded? Then a disagreement with the definition is false. 15
   of 17 were the idiom (round 59; 11 of 18 in round 58). **The fix that touches no call site is an
   unspecified list `()`, not `(void)`.** (a docs/match-reports/GetClass6B5CCMethods.md, round 59)
+- **A literal argument "scheduled late" after a call that sets only `$a0` can be a
+  FORWARDED-PARAMETER arity defect.** Check the previous call: if its callee reads `$aN` and the
+  caller never writes it, declare and pass the caller's own parameter (a file-local fn-pointer view
+  if the shared slot is under-declared); a `move $tN,$aK` whose `$tN` later takes a call result is
+  the parameter reused as the result (`aK = f(..., aK)`). Closed `Class6E99C__StartFadeToIndex`/
+  `StartFadeDefault` after 94k permuter iterations. (PROGRESS round 73)
 
 ### 3g. Delay slots, arithmetic, one-instruction residues
 
@@ -498,21 +524,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`Unk18Obj__InitOt`,
   73/73 after 14 groupings and ~89k permuter iterations); splitting `(w + 20) - span` into two
   statements closed `func_8004CAF0`. (round 71)
+- **A flat table indexed `&T[r*C]` then `[c]` wants a named row-pointer local, `T (*tbl)[C] = ...;
+  tbl[r][c]`**: the local puts the table-address load before the index arithmetic; the inline
+  cast does not. Closed `CalcDreamColor` 28/35. (round 73)
 
 ### 3h. volatile and memory
 
-- **An INCOMPLETE-ARRAY global declaration makes 2.6.3 CSE the address-take into a
-  callee-saved register; a SCALAR declaration of the same symbol emits absolute-per-access.**
-  Four in-tree points on `SetupStyleSpawnParamsA`: `extern u8 D_X[]` + `*(s32 *) D_X = v` and
-  `extern s32 D_X[]` + `D_X[0] = v` both 5/110 RED, carrying an extra `$s1` and 8 more frame
-  bytes; `extern s32 D_X;` assigned either by name or through `*(s32 *) &D_X` both 110/110
-  GREEN. So ELEMENT TYPE and CAST SPELLING are inert and ARRAYNESS is the whole axis.
-  **The effect is CONTEXTUAL and does NOT reproduce in isolation** — a five-line file emits
-  `lui $at` per access for `u8[]`, `int[]` and `int` alike, with or without intervening calls
-  (four pinned-pipeline variants), so the real body's context is part of the trigger and a
-  reproducer cannot screen this for you. Round 48 filed the residue as register identity and
-  recorded "`volatile` does not stop address caching": a correct negative about the wrong
-  instrument. (a round 64, charlie + head)
 - **`volatile` is the NARROW instrument for the instruction-ORDER class, not the banned construct**
   — it names no register, exactly like the sanctioned bare `__asm__("")`. Where three barrier
   placements across two rounds all regressed, declaring three hardware-shadow fields `volatile`
@@ -608,22 +625,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   at iteration 149 where a 33,480-iteration search had plateaued; elsewhere 163,644 fresh iterations
   reproduced an identical floor. Rank on whether a search EVER beat base, and track a manual
   `PERM_GENERAL` enumeration separately. (a §"A permuter negative is ONE SAMPLE")
-- **A permuter run that plateaus with NO MOVEMENT AT ALL points AWAY from the residue you
-  measured**: it mutates expressions, operand order and temporaries within the statements given, and
-  never moves a statement into an else arm absent from its base (`func_80063144`, 30485 iterations
-  plateaued, real defect two statement placements, closed in 2 builds). **Corollary: on a
-  length-defective function `insertions/deletions` is the signal and the word count misleads** — a
-  correct fix ran 27/27 -> 11/11 -> 7/7 -> 0/0 while the word score went 61 -> 56 -> 91 -> 213. (a
-  round 59)
-- **On a register-identity residue, vary the NUMBER OF LOCALS before anything else.** Closed
-  `func_8004BA40` 63/63 (four locals merged into two) and `func_8004B700` 140/140 (deleted `Elem
-  *e2;` so the second loop reuses the first loop's pointer), both after step (a) CONFIRMED the
-  register-identity cause at ins 0 / del 0. Discriminator: on B700, all 8 loop-SHAPE variants --
-  declaration order included -- were inert at exactly 137/140, and both variants that reached
-  140/140 differ only in local COUNT. Shape and order are not this axis. **Corollary, and it is why
-  ~330k prior iterations missed both: a permuter mutates a body but never merges or deletes its
-  locals, so local count is a PARAMETER of the search space, not a point in it. A validated
-  high-iteration negative bounds the search, not the function.** (a round 63)
 
 ## 4. Verdict classes and how far to trust them
 
@@ -748,4 +749,7 @@ genuine SECOND, INDEPENDENT USE POINT" (it reconciles the round-19 close with th
 3d), §"HImode constant narrowing". Distilled out round 69: §"Two long-standing near-misses closed by
 DELETING a named value" (the local-count entries in 3d carry the lever), §"When the residue
 is a lone scheduling difference, sweep one statement's PLACEMENT", §"Inherited no-op
-statements must be tested in BOTH directions". Distilled out rounds 71-72: §"A narrow signed field may need an `s32` LOCAL", §"A missing `andi 0xff`" (getintr).
+statements must be tested in BOTH directions". Distilled out rounds 71-72: §"A narrow signed field may need an `s32` LOCAL", §"A missing `andi 0xff`" (getintr). Distilled out round 73: §"An INCOMPLETE-ARRAY global declaration" (contextual, single
+instance), §"A same-size pointer cast in a FUNCTION-SCOPE local", §"A permuter run that plateaus
+with NO MOVEMENT AT ALL", §"The frame size bounds how many spilled locals"; the 3j local-count entry
+folded into 3d's.
