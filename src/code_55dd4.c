@@ -264,11 +264,10 @@ void func_80065DEC(Class65650 *self)
     }
 }
 
-/* STALL -- see docs/match-reports/func_80065E1C.md. Best reached: 49/68
- * words in-range, no size drift, residue is a whole-function self<->p
- * register-identity swap ($s1/$s2). Restored to INCLUDE_ASM per project
- * rule. */
-#if 0
+/* NON_MATCHING: 49/68 words, length exact (no drift). Residue: whole-function
+ * self<->p register-identity swap ($s1/$s2), CLAUDE.md rule 6
+ * (docs/match-reports/func_80065E1C.md). Hand-derived. */
+#ifdef NON_MATCHING
 s32 func_80065E1C(Class65650 *self)
 {
     s32 buf[4];
@@ -311,9 +310,9 @@ fail:
     func_80065F2C(self);
     return 1;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065E1C);
+#endif
 
 void func_80065F2C(Class65650 *self)
 {
@@ -445,11 +444,11 @@ void *func_800662BC(Class65650 *self, void *hdr, void *extra)
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
 #endif
 
-/* STALL -- see docs/match-reports/func_80066340.md. Best reached: 252/258
- * words in-range, no size drift, residue is two symmetric 3-word
- * instruction-scheduling clusters around a compiler-synthesized
- * magic-multiply constant. Restored to INCLUDE_ASM per project rule. */
-#if 0
+/* NON_MATCHING: 252/258 words, length exact (no drift). Residue: two
+ * symmetric 3-word instruction-scheduling clusters around a compiler-
+ * synthesized magic-multiply constant (docs/match-reports/func_80066340.md).
+ * Hand-derived. */
+#ifdef NON_MATCHING
 void *func_80066340(Class65650 *self, void *acc, void *extra)
 {
     u8 outbuf[4];
@@ -623,9 +622,9 @@ void *func_80066340(Class65650 *self, void *acc, void *extra)
 end:
     return (u8 *)acc + outbuf[3] * 4;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066340);
+#endif
 
 void func_80066748(Class65650 *self, Class65650 *other)
 {
