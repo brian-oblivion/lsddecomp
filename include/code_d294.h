@@ -243,12 +243,12 @@ typedef struct BoundsBox_d294 {
 /* Round 13 (Class6B5CC__CheckBoundsOverlap): a 12-byte, all-s16, 6-field record -- MEASURED,
  * same all-s16-struct-copy idiom as Vec3S16_d294 (whole-value assignment
  * compiles to unaligned lwl/lwr). Used as func_8001F50C's own return-array
- * element type and as this function's own second running-tracker. Field
- * names are placeholders; the tail comparison pairs them with
- * BoundsBox_d294 fields in a scrambled order (f5<->lo.z, f2<->hi.z,
- * f3<->lo.x, f4<->lo.y, f1<->hi.y, f0<->hi.x) consistent with `f0..f2`
- * being some OTHER box's hi corner and `f3..f5` its lo corner, but this is
- * not confirmed beyond the offsets themselves. */
+ * element type and as this function's own second running-tracker. Round 73
+ * (the match): the pairing is NOT scrambled -- func_8001F50C's records are
+ * BoundsBox_d294 boxes (f0..f2 = lo, f3..f5 = hi), the matched body reads
+ * them through that type, and its tail is an ordinary per-axis AABB overlap
+ * (docs/match-reports/Class6B5CC__CheckBoundsOverlap.md). This view is kept
+ * only for any remaining accessor; track 4 folds it into BoundsBox_d294. */
 typedef struct Sixteen6_d294 {
     s16 f0;
     s16 f1;
