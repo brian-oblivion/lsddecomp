@@ -41,27 +41,27 @@ extern void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s3
 
 void ObjM__EnterState7(ObjM *self) {
     s32 val;
-    self->unk20 = 7;
-    self->unk3C->methods->slotF0(self->unk3C, &val, -1);
+    self->mode = 7;
+    self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &val, -1);
     ObjM__ForwardToSubChild(self, val, 0, 5, 1);
-    self->unk3C->methods->slotFC(self->unk3C);
+    self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
 void ObjM__EnterState8(ObjM *self) {
-    self->unk20 = 8;
+    self->mode = 8;
     ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
-    self->unk3C->methods->slotF4(self->unk3C, 1);
+    self->dreamSys->methods->setMoveOverride(self->dreamSys, 1);
 }
 
 void ObjM__EnterStateA(ObjM *self) {
-    self->unk20 = 0xA;
+    self->mode = 0xA;
     ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
-    self->unk3C->methods->slot13C(self->unk3C, 2);
-    self->unk3C->methods->slotF4(self->unk3C, 2);
+    self->dreamSys->methods->selectCallback98(self->dreamSys, 2);
+    self->dreamSys->methods->setMoveOverride(self->dreamSys, 2);
 }
 
 void ObjM__NotifyParentsCodeB(ObjM *self) {
-    self->methods->slot30(self, 0xB);
+    self->methods->notifyParents(self, 0xB);
 }
 
 void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
@@ -80,26 +80,26 @@ void ObjM__HandleEvent5Or6(ObjM *self, ParamM *p1, s32 sel) {
     switch (sel) {
     case 5:
         self->methods->slot14(self, p1);
-        self->unk3C->methods->slotF4(self->unk3C, 0);
-        self->unk20 = 0;
+        self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
+        self->mode = 0;
         break;
     case 6:
         self->methods->slot14(self, p1);
         v = p1->methods->slotE4(p1);
         self->unk18->methods->slot64(self->unk18, v);
-        if (self->unk20 != 5 && self->unk20 != 8 && self->unk20 == 0xA) {
-            self->unk3C->methods->slot17C(self->unk3C, 1);
-            self->unk3C->methods->slotF4(self->unk3C, 0);
-            self->unk20 = 4;
+        if (self->mode != 5 && self->mode != 8 && self->mode == 0xA) {
+            self->dreamSys->methods->stopDrift(self->dreamSys, 1);
+            self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
+            self->mode = 4;
         }
-        self->methods->slot30(self, self->unk20);
+        self->methods->notifyParents(self, self->mode);
         break;
     }
 }
 
 void ObjM__HandleEvent7(ObjM *self, s32 arg1, s32 arg2) {
     if (arg2 == 7) {
-        self->methods->slotB8(self);
+        self->methods->checkAuxTrigger(self);
     }
 }
 
@@ -107,7 +107,7 @@ s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
     ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
-    void *thing = self->unk3C->methods->slot1A0(self->unk3C, 0);
+    void *thing = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     result = TryDreamAuxTrigger(child->unk4->unk34, &out, thing);
     child->unk14 = result;
     if (result != 0) {
@@ -121,7 +121,7 @@ void func_800541CC(void) {
 }
 
 void ObjM__UpdateCloseReadyFlag(ObjM *self) {
-    if (self->unk80 != 0 && self->unk20 == 0) {
+    if (self->unk80 != 0 && self->mode == 0) {
         self->unk84 = 1;
     }
 }
@@ -132,15 +132,15 @@ void ObjM__ClearCloseReadyFlag(ObjM *self) {
 
 void ObjM__CloseAndNotifyD(ObjM *self) {
     if (self->unk84) {
-        self->methods->slotD4(self);
-        self->methods->slot30(self, 0xD);
+        self->methods->teardownPauseOverlay(self);
+        self->methods->notifyParents(self, 0xD);
     }
 }
 
 void ObjM__CloseAndNotifyC(ObjM *self) {
     if (self->unk84) {
-        self->methods->slotD4(self);
-        self->methods->slot30(self, 0xC);
+        self->methods->teardownPauseOverlay(self);
+        self->methods->notifyParents(self, 0xC);
     }
 }
 

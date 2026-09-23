@@ -2075,8 +2075,8 @@ typedef struct FieldM14 FieldM14;
 typedef struct FieldM14Methods FieldM14Methods;
 typedef struct FieldM18 FieldM18;
 typedef struct FieldM18Methods FieldM18Methods;
-typedef struct FieldM3C FieldM3C;
-typedef struct FieldM3CMethods FieldM3CMethods;
+typedef struct DreamSysObj_3bb8c_m DreamSysObj_3bb8c_m;
+typedef struct DreamSysMethods_3bb8c_m DreamSysMethods_3bb8c_m;
 typedef struct ChildM_AC ChildM_AC;
 typedef struct ChildM_ACMethods ChildM_ACMethods;
 typedef struct ChildM114 ChildM114;
@@ -2092,23 +2092,38 @@ typedef struct FieldM7C FieldM7C;
 typedef struct FieldM7CMethods FieldM7CMethods;
 
 /* self->unk3C's target (ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/
- * ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger). Rich vtable; only the slots this unit's
- * functions actually dispatch are typed. */
-struct FieldM3CMethods {
+ * ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger). CONFIRMED DreamSys*, not just
+ * a plausible guess: `tools/classtable.py 0x80087BDC` (DreamSys's real vtable,
+ * include/DreamSys.h) resolves every one of the six offsets this unit
+ * dispatches to a REAL, already-named DreamSys method, exact offset and exact
+ * argument count both:
+ *   +0x0F0 DreamSys__GetSetFlashbackSession   +0x0F4 DreamSys__SetMoveOverride
+ *   +0x0FC DreamSys__BlockMovement            +0x13C DreamSys__SelectCallback98
+ *   +0x17C DreamSys__StopDrift                +0x1A0 DreamSys__GetCurrentDayAndYear
+ * DreamSys.h is a different, actively-shared unit's header (its own six
+ * offsets above sit inside ITS padding arrays, so nothing there collides),
+ * so this keeps its own minimal, independently-named LOCAL view rather than
+ * `#include "DreamSys.h"`, per the project's established
+ * multiple-independent-local-views convention -- the same choice
+ * class_3bb8c_l already made for its own partial DreamSys view
+ * (DreamSysMethods_3bb8c_l, matched against six DIFFERENT confirmed
+ * offsets). Field names below are DreamSys's own REAL method names,
+ * lower-camel-cased, not invented ones. */
+struct DreamSysMethods_3bb8c_m {
     u8 pad000[0x0F0];
-    void (*slotF0)(FieldM3C *self, s32 *out, s32 arg2); /* +0x0F0, ObjM__EnterState7: writes *out */
-    void (*slotF4)(FieldM3C *self, s32 arg1);           /* +0x0F4, ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6 */
+    void (*getSetFlashbackSession)(DreamSysObj_3bb8c_m *self, s32 *out, s32 arg2); /* +0x0F0, ObjM__EnterState7: writes *out */
+    void (*setMoveOverride)(DreamSysObj_3bb8c_m *self, s32 arg1);           /* +0x0F4, ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6 */
     u8 pad0F8[0x0FC - 0x0F8];
-    void (*slotFC)(FieldM3C *self);                     /* +0x0FC, ObjM__EnterState7 */
+    void (*blockMovement)(DreamSysObj_3bb8c_m *self);                     /* +0x0FC, ObjM__EnterState7 */
     u8 pad100[0x13C - 0x100];
-    void (*slot13C)(FieldM3C *self, s32 arg1);          /* +0x13C, ObjM__EnterStateA */
+    void (*selectCallback98)(DreamSysObj_3bb8c_m *self, s32 arg1);          /* +0x13C, ObjM__EnterStateA */
     u8 pad140[0x17C - 0x140];
-    void (*slot17C)(FieldM3C *self, s32 arg1);          /* +0x17C, ObjM__HandleEvent5Or6 */
+    void (*stopDrift)(DreamSysObj_3bb8c_m *self, s32 arg1);                 /* +0x17C, ObjM__HandleEvent5Or6 */
     u8 pad180[0x1A0 - 0x180];
-    void *(*slot1A0)(FieldM3C *self, s32 arg1);         /* +0x1A0, ObjM__CheckAuxTrigger (return discarded there) */
+    void *(*getCurrentDayAndYear)(DreamSysObj_3bb8c_m *self, s32 arg1);     /* +0x1A0, ObjM__CheckAuxTrigger (return discarded there) */
 };
-struct FieldM3C {
-    FieldM3CMethods *methods;   /* +0x000 */
+struct DreamSysObj_3bb8c_m {
+    DreamSysMethods_3bb8c_m *methods;   /* +0x000 */
 };
 
 /* self->unk18's target (ObjM__ForwardToSubChild/ObjM__HandleEvent5Or6). */
@@ -2176,7 +2191,7 @@ struct ParamM {
  * only external call. Typed purely from that call site's own register
  * setup: (value, out-pointer, opaque-object) -> s32, whose result is
  * stored into a ChildM114's unk14 and tested for zero. The third arg is
- * FieldM3CMethods::slot1A0's own return value (not `self->unk14`'s
+ * DreamSysMethods_3bb8c_m::getCurrentDayAndYear's own return value (not `self->unk14`'s
  * child), so it stays void* rather than ChildM114* -- nothing ties the
  * two together. */
 extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
@@ -2249,11 +2264,15 @@ struct ObjMMethods {
     void (*slot10)(ObjM *self, ChildM_AC *arg1);  /* +0x010, ObjM__ForwardToSubChild */
     void (*slot14)(ObjM *self, ParamM *arg1);     /* +0x014, ObjM__HandleEvent5Or6 */
     u8 pad018[0x030 - 0x018];
-    void (*slot30)(ObjM *self, s32 arg1);          /* +0x030, ObjM__NotifyParentsCodeB/ObjM__HandleEvent5Or6/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
+    /* +0x030 == BasicClass__NotifyParents's own slot (confirmed with
+     * `tools/classtable.py 0x80087034`, same table as the rest of ObjMMethods
+     * -- self->methods IS D_80087034), so this is a plain notify-parents
+     * dispatch with a class-specific event code, not an unknown slot. */
+    void (*notifyParents)(ObjM *self, s32 code);   /* +0x030, ObjM__NotifyParentsCodeB/ObjM__HandleEvent5Or6/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
     u8 pad034[0x0B8 - 0x034];
-    void (*slotB8)(ObjM *self);                     /* +0x0B8, ObjM__HandleEvent7 */
+    void (*checkAuxTrigger)(ObjM *self);            /* +0x0B8, ObjM__HandleEvent7: this class's OWN ObjM__CheckAuxTrigger, confirmed via classtable.py against D_80087034 */
     u8 pad0BC[0x0D4 - 0x0BC];
-    void (*slotD4)(ObjM *self);                     /* +0x0D4, ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
+    void (*teardownPauseOverlay)(ObjM *self);       /* +0x0D4, ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC: this class's OWN ObjM__TeardownPauseOverlay, confirmed via classtable.py */
 };
 
 struct ObjM {
@@ -2272,11 +2291,11 @@ struct ObjM {
     FieldM14 *unk14;         /* +0x014, ObjM__CheckAuxTrigger */
     FieldM18 *unk18;         /* +0x018, ObjM__ForwardToSubChild/ObjM__HandleEvent5Or6 */
     u8 pad01C[0x020 - 0x01C];
-    s32 unk20;                /* +0x020, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6: a mode/state code */
+    s32 mode;                 /* +0x020, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6: a mode/state code (already documented as such before this round; renamed from unk20 since every accessor is exclusively this unit's -- called `mode` rather than `state` to avoid colliding, in a reader's head, with ObjM__AdvancePauseSetup's own local `state` variable, which is `self->unk80`'s step counter, an unrelated field) */
     u8 pad024[0x034 - 0x024];
     FieldM34 *unk34;          /* +0x034, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup */
     u8 pad038[0x03C - 0x038];
-    FieldM3C *unk3C;          /* +0x03C, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger */
+    DreamSysObj_3bb8c_m *dreamSys; /* +0x03C, ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA/ObjM__HandleEvent5Or6/ObjM__CheckAuxTrigger -- CONFIRMED DreamSys* via classtable.py, see DreamSysMethods_3bb8c_m above */
     u8 pad040[0x054 - 0x040];
     FieldM50 *unk54;          /* +0x054, ObjM__TeardownPauseOverlay/ObjM__AdvancePauseSetup -- same type as unk10 above */
     u8 pad058[0x074 - 0x058];
