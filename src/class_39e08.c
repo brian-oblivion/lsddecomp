@@ -38,7 +38,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     self->methods->slot10(self, (Obj4C *)arg2);
     arg2->methods->slot10C(arg2, self->subB);
     arg2->methods->slot114(arg2, self->unk44);
-    self->methods->resetUnk3C(self);
+    self->methods->resetState(self);
 }
 
 void Obj865C8__Dtor(Obj865C8 *self) {
@@ -72,7 +72,7 @@ void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
 }
 
 void Obj865C8__ResetState(Obj865C8 *self) {
-    self->unk3C = 0;
+    self->state = 0;
 }
 
 void Obj865C8__Init(Obj865C8 *self) {
@@ -108,7 +108,7 @@ void Obj865C8__StartSubA(Obj865C8 *self) {
     subA->methods->slot4C(subA, 0x4B0);
     subA->methods->slot70(subA, self->unk38, D_80086650, D_8008665C, 0);
     subA->methods->slot8C(subA);
-    self->unk3C = 1;
+    self->state = 1;
 }
 
 void Obj865C8__RunSubUpdates(Obj865C8 *self) {
@@ -126,13 +126,13 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
     GetClass86668Methods()->slot54(self, arg1, arg2);
-    if (arg2 == 2 && self->unk3C != arg2) {
-        switch (self->unk3C) {
+    if (arg2 == 2 && self->state != arg2) {
+        switch (self->state) {
         case 1:
             result = self->unk38->methods->slot1B4(self->unk38);
             if (result < 0) {
                 self->unk38->methods->slot1B8(self->unk38, 0);
-                self->unk28 = arg2;
+                self->eventCode = arg2;
                 self->methods->onEventArg(self, 3);
                 return;
             }
@@ -154,7 +154,7 @@ void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1) {
     self->unk4C = func_80052B70(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
     self->methods->slot10(self, self->unk4C);
     self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);
-    self->unk3C = 2;
+    self->state = 2;
 }
 
 void Obj865C8__Noop7C(void) {
@@ -165,7 +165,7 @@ void Obj865C8__Noop80(void) {
 
 /* Returned BY VALUE from SubObjDMethods::slot1BC. Kept LOCAL to this unit --
  * it encodes only what Obj865C8__OnTag2Notify establishes (8 bytes, an s16 at +2 whose
- * sign selects between two unk28 codes), which is not enough for a sibling to
+ * sign selects between two eventCode codes), which is not enough for a sibling to
  * reuse unchanged. */
 struct SubObjDPos {
     s16 unk0;
@@ -185,9 +185,9 @@ void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
         result = self->unk38->methods->slot1B8(self->unk38, 0);
         if (result == 0) {
             pos = self->unk38->methods->slot1BC(self->unk38);
-            self->unk28 = pos.unk2 < 0 ? 1 : 2;
+            self->eventCode = pos.unk2 < 0 ? 1 : 2;
         } else {
-            self->unk28 = 3;
+            self->eventCode = 3;
         }
         self->methods->onEventArg(self, 3);
         break;
@@ -196,14 +196,14 @@ void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
     case 7:
     case 8:
     case 0xA:
-        self->unk3C = 3;
+        self->state = 3;
         break;
     case 0xC:
     case 0xD:
         self->unk4C->methods->slot48(self->unk4C);
         self->unk4C->methods->slot4(self->unk4C);
         self->unk38->methods->slot1B8(self->unk38, arg2 != 0xC ? 2 : 1);
-        self->unk28 = 3;
+        self->eventCode = 3;
         self->methods->onEventArg(self, 3);
         break;
     }
@@ -279,7 +279,7 @@ void Class86668__Class86668(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
         self->subB = arg2;
     }
     self->unk30 = arg1;
-    self->methods->resetUnk3C(self);
+    self->methods->resetState(self);
 }
 
 void Class86668__Dtor(Obj865C8 *self) {
@@ -290,13 +290,13 @@ void Class86668__Dtor(Obj865C8 *self) {
 }
 
 void Class86668__CancelTimeout(Obj865C8 *self) {
-    self->methods->setUnk2C(self, -1);
+    self->methods->setTimeout(self, -1);
 }
 
 s32 Class86668__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
-    self->unk28 = 0;
+    self->eventCode = 0;
     Get_vtable_IntermediateBase()->slot44(self, arg1, arg2);
-    return self->unk28;
+    return self->eventCode;
 }
 
 void Class86668__Deinit(Obj865C8 *self) {
@@ -308,7 +308,7 @@ void Obj865C8__Noop58(void) {
 
 void Obj865C8__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
     Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
-    if ((u32)self->unk1C > (u32)self->unk2C) {
+    if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
         self->methods->onEventArg(self, 4);
     }
 }
@@ -316,11 +316,11 @@ void Obj865C8__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
 void Obj865C8__OnEventArg(Obj865C8 *self, s32 arg1) {
     Get_vtable_IntermediateBase()->slot60(self, arg1);
     if (arg1 == 4) {
-        self->unk28 = 1;
+        self->eventCode = 1;
         self->methods->noop7C(self);
     }
 }
 
 void Obj865C8__SetTimeout(Obj865C8 *self, s32 arg1) {
-    self->unk2C = (arg1 < 0) ? arg1 : arg1 * 20;
+    self->timeoutFrames = (arg1 < 0) ? arg1 : arg1 * 20;
 }

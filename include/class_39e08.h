@@ -62,7 +62,7 @@ typedef struct Class865C8Methods {
      * Obj86B60__OnNotify. */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj865C8__OnNotify */
     void *unk3C;                                   /* +0x03C null slot */
-    void (*resetUnk3C)(Obj865C8 *self);            /* +0x040 Obj865C8__ResetState */
+    void (*resetState)(Obj865C8 *self);            /* +0x040 Obj865C8__ResetState */
     void *slot44;                                  /* +0x044 Obj865C8__Init */
     void *slot48;                                  /* +0x048 Obj865C8__Deinit */
     void *slot4C;                                  /* +0x04C Obj865C8__StartSubA */
@@ -75,7 +75,7 @@ typedef struct Class865C8Methods {
     void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 Obj865C8__OnEventArg */
     void *unk64, *unk68;                           /* shared base slots (Obj86B60__NotifyTargetReset / Obj86B60__NotifyChildReset) */
     /* Also shared with gClass86668Methods at the same offset. */
-    void (*setUnk2C)(Obj865C8 *self, s32 arg1);    /* +0x06C Obj865C8__SetTimeout */
+    void (*setTimeout)(Obj865C8 *self, s32 arg1);    /* +0x06C Obj865C8__SetTimeout */
     void *unk70;                                   /* Class86668__SetChildFlag8 */
     void *unk74, *unk78;                           /* null slots */
     void (*noop7C)(Obj865C8 *self);                /* +0x07C Obj865C8__Noop7C (no-op, matched) */
@@ -268,16 +268,32 @@ struct Obj865C8 {
     s32 unk10;                    /* +0x010, Obj865C8__Deinit (2nd arg to a slot14 call) */
     u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, Obj865C8__RunSubUpdates */
-    s32 unk1C;                    /* +0x01C, Obj865C8__CheckTimeout (compared against unk2C) */
+    /* +0x01C. Renamed from `unk1C`: code_2cc8c.h's own local view of this
+     * SAME base offset (Obj86B60, the ultimate base class) already names it
+     * `frameCounter` (round 12, "a running count"). Obj865C8__CheckTimeout
+     * reads it directly after forwarding to the base's own +0x05C
+     * (IncrementFrameCounter), and compares it against `timeoutFrames`. */
+    s32 frameCounter;              /* +0x01C, Obj865C8__CheckTimeout */
     u8 pad20[0x28 - 0x20];
-    s32 unk28;                    /* +0x028, Obj865C8__OnEventArg */
-    s32 unk2C;                    /* +0x02C, Obj865C8__SetTimeout */
+    /* +0x028. Renamed from `unk28`: carries a small code (1/2/3) that
+     * Obj865C8__OnTag2Notify and Obj865C8__OnEventArg set before dispatching
+     * `self->methods->onEventArg(self, 3)` -- an event/result code, not a
+     * state (see `state` below, a separate field). */
+    s32 eventCode;                 /* +0x028, Obj865C8__OnEventArg */
+    /* +0x02C. Renamed from `unk2C`: set only by Obj865C8__SetTimeout, which
+     * stores its argument verbatim if negative (disabled) or multiplied by
+     * 20 otherwise (a units-to-frames conversion); compared against
+     * `frameCounter` by Obj865C8__CheckTimeout. */
+    s32 timeoutFrames;             /* +0x02C, Obj865C8__SetTimeout */
     s32 unk30;                    /* +0x030, Class86668__Dtor (guard) */
     SubObjB *subB;                /* +0x034, Class86668__Dtor */
     SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
                                        through as a plain register value to
                                        Get_vtable_IntermediateBase()->slot44's 3rd arg by Obj865C8__EnterState2 */
-    s32 unk3C;                    /* +0x03C, Obj865C8__ResetState */
+    /* +0x03C. Renamed from `unk3C`: the class's own small state machine
+     * (0/1/2/3), reset by Obj865C8__ResetState and advanced by
+     * Obj865C8__AdvanceState/Obj865C8__OnTag2Notify. */
+    s32 state;                     /* +0x03C, Obj865C8__ResetState */
     /* Retyped from `s32` (Obj865C8__EnterState2's own usage only ever forwards
      * these as opaque register values into func_80052B70, never
      * dereferencing them): Obj865C8__Dtor dereferences all three directly
@@ -302,7 +318,7 @@ typedef struct IntermediateBaseMethods {
      * `TaskUtilMethods::slot44` on -- there it forwards to
      * `self->unk38 = <base result>` (func_8003C1DC). Here the caller
      * (Class86668__Init, gClass86668Methods's own +0x044 override) zeroes
-     * `self->unk28` immediately before the call and reads it back
+     * `self->eventCode` immediately before the call and reads it back
      * immediately after: same "default, then base may overwrite" shape. */
     void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
     void (*slot48)(void *self);            /* +0x048 */
@@ -357,8 +373,8 @@ typedef struct Class86668Methods {
      * Called by Obj865C8__OnNotify as GetClass86668Methods()->slot38(self, arg1, arg2). */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj86B60__OnNotify */
     u8 pad3C[0x44 - 0x3C];
-    /* Class86668__Init (this unit, matched): zeroes self->unk28, forwards to
-     * the base's own slot44, returns self->unk28. Called by Obj865C8__Init
+    /* Class86668__Init (this unit, matched): zeroes self->eventCode, forwards to
+     * the base's own slot44, returns self->eventCode. Called by Obj865C8__Init
      * as GetClass86668Methods()->slot44(self, self->unk0C, 0), return discarded. */
     s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 Class86668__Init */
     /* Class86668__Deinit (this unit, matched): a thin wrapper forwarding to
