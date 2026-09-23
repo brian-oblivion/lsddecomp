@@ -397,29 +397,106 @@ fail_nolock:
     return -1;
 }
 
-/* STALL, TOOLCHAIN-BLOCKED by the same maspsx load-delay-nop difference as
- * func_80030E90 above, with 11 sites here against that function's 9 -- see
- * docs/match-reports/func_80030E90.md's round-62 section for the reproducer
- * and the retail-wide census. Its own report's residues predate that finding.
- * DO NOT staff another source attempt until the blocker is resolved.
- * ORIGINAL NOTE FOLLOWS.
-STALL -- see docs/match-reports/func_8003149C.md. func_80030E90's near
- * twin. Round 26: 236/253 words (17 short). Round 36: rebuilt with
- * SpuVmVSetUp's real name (was func_80032148 -- round 34's SDK conversion
- * renamed the callee, report's preserved body never corrected). Measured
- * 237/253 words this round (16 short), raw match 33/253 -- close to but
- * not an exact reproduction of round 26's 236/253, same barrier-placement
- * recovery caveat as func_80030E90's round-36 note. Same three residue
- * classes as func_80030E90 plus two more this function's own report
- * documents (a second, independent guard-polarity flip on the "note == 0"
- * check; a one-statement-shifted D_8008EA13 fresh-read position), all
- * confirmed non-source-derivable by the sibling report's exhaustive
- * investigation. Round 40: rebuild confirms 237/253 (33/253 raw) exactly,
- * isolated from the sibling stall's own shortfall; first real permuter
- * search (48k+ iterations), three sub-base leads found and all confirmed
- * NOT to reproduce on the real oracle -- see
- * docs/match-reports/func_8003149C.md's round-40 addendum. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 248/253 words, 5 words short as of round 70 -- the
+ * round-63 `--nop-at-expansion` maspsx flag narrowed this from 16 words
+ * short (11 of its 16 missing words were the same below-cc1 load-delay
+ * nop func_80030E90's report documents, 11 sites here vs that function's
+ * 9); that blocker is RESOLVED and this title is no longer
+ * "TOOLCHAIN-BLOCKED". Re-measured round 70 via build/lsdde.map (raw
+ * word-match and ins/del are drift-contaminated while the length gap is
+ * nonzero, per CLAUDE.md's "address drift" guard -- see
+ * docs/match-reports/func_8003149C.md's "Round 70 re-measure" section for
+ * the upper-bound figures). Residue: the remaining 5-word gap plus the
+ * two guard-polarity residues this report already documents, not yet
+ * re-characterized past the length figure. Hand-derived. */
+s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
+{
+    RecordE978 *rec;
+    u16 note;
+    u8 pending18;
+
+    if (D_8008E934 == 1) {
+        return -1;
+    }
+    D_8008E934 = 1;
+    if ((u16) idx >= 0x18) {
+        goto fail;
+    }
+    if (SpuVmVSetUp(p0, p1) != 0) {
+        goto fail;
+    }
+    D_8008EA22 = 0x21;
+    D_8008EA0E = (u8) p3;
+    D_8008EA0F = (u8) p4;
+    D_8008EA18 = (u8) p2;
+    if (p5 == p6) {
+        D_8008EA11 = 0x40;
+        D_8008EA10 = p5;
+    } else if (p6 < p5) {
+        D_8008EA10 = p5;
+        D_8008EA11 = (p6 << 6) / p5;
+    } else {
+        D_8008EA10 = p6;
+        D_8008EA11 = 0x7F - ((p5 << 6) / p6);
+    }
+
+    D_8008EA16 = D_8008E968[p1].unk1;
+    D_8008EA17 = D_8008E968[p1].unk4;
+    D_8008EA0C = D_8008E968[p1].unk0;
+
+    rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
+    D_8008EA1B = rec->unk0;
+    note = rec->unk16;
+    D_8008EA24 = note;
+    D_8008EA19 = rec->unk2;
+    D_8008EA1A = rec->unk3;
+    D_8008EA1C = rec->unk4;
+    D_8008EA1D = rec->unk5;
+    D_8008EA20 = rec->unk1;
+    D_8008EA1E = rec->unk6;
+    D_8008EA1F = rec->unk7;
+
+    if ((s16) note == 0) {
+        goto fail;
+    }
+    __asm__("");
+    D_8008EA26 = idx;
+    __asm__("");
+    D_8008D996[idx].unk0 = 0x21;
+    __asm__("");
+    D_8008D99E[idx].unk0 = p0;
+    __asm__("");
+    D_8008D99A[idx].unk0 = p1;
+    __asm__("");
+    D_8008D998[idx].unk0 = D_8008EA13;
+    __asm__("");
+    D_8008D988[idx].unk0 = D_8008EA24;
+    __asm__("");
+    pending18 = D_8008EA18;
+    D_8008D994[idx].unk0 = p3;
+    D_8008D9A3[idx].unk0 = 1;
+    __asm__("");
+    D_8008D98A[idx].unk0 = 0;
+    __asm__("");
+    D_8008D99C[idx].unk0 = pending18;
+    func_8002D6A4();
+    if ((s16) D_8008EA24 == 0xFF) {
+        func_8002D8E0((u8) idx);
+    } else {
+        s32 ret = func_8002E038(p3, p4);
+        func_8002D1B4(1, (u16) ret);
+    }
+    D_8008E934 = 0;
+    return idx;
+
+fail:
+    D_8008E934 = 0;
+    return -1;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
+#endif
 
 /* The "release channel" twin of func_80031280's else-branch above: same
  * D_8008E934 lock, same (mask0, mask1) split of a 0..0x17 channel across two
