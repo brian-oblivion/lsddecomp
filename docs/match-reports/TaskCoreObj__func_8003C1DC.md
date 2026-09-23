@@ -1,4 +1,6 @@
-# func_8003C1DC
+# TaskCoreObj__func_8003C1DC
+
+> Renamed from `func_8003C1DC` on 2026-09-23 (tools/rename.py). Address 0x8003c1dc.
 
 **Unit:** code_2c054 · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
 
@@ -8,10 +10,10 @@ Forwards to a SECOND sibling class's table (`Get_vtable_IntermediateBase()`, ret
 `&gIntermediateBaseMethods`) at slot `+0x044`, passing `self` and both of its own
 arguments unchanged, discards that call's return, then reads and returns
 `self->unk38`. This function itself occupies `gTaskCoreMethods` slot `+0x044` --
-i.e. it is the delegation TARGET that `func_8003BA58` (`D_8006E5F8::slot44`)
+i.e. it is the delegation TARGET that `StreamTaskObj__Configure` (`gStreamTaskObjMethods::slot44`)
 calls into (see that report). One level further down the same chain:
-`D_8006E5F8::slot44` (`func_8003BA58`) -> `gTaskCoreMethods::slot44`
-(`func_8003C1DC`, this function) -> `gIntermediateBaseMethods::slot44` (unnamed,
+`gStreamTaskObjMethods::slot44` (`StreamTaskObj__Configure`) -> `gTaskCoreMethods::slot44`
+(`TaskCoreObj__func_8003C1DC`, this function) -> `gIntermediateBaseMethods::slot44` (unnamed,
 uncarved).
 
 ## Derivation
@@ -31,7 +33,7 @@ lw   $v0, 0x38($s2)              ; v0 = self->unk38, AFTER the call returns
 ```
 
 ```c
-s32 func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
+s32 TaskCoreObj__func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
     Get_vtable_IntermediateBase()->slot44(self, a1, a2);
     return self->unk38;
 }
@@ -77,3 +79,13 @@ unit needs to write already occupies a slot typed elsewhere, read the
 occupant's OWN disassembly before trusting the existing slot typing at face
 value; the existing typing can be right for its own call site and still
 under-describe the function.
+
+## Naming
+
+**TaskCoreObj__func_8003C1DC** -- tier C. Occupies `gTaskCoreMethods` slot
+`+0x044`; up-calls `IntermediateBase`'s own slot `+0x044`, then returns
+`self->unk38` as a status/result word (the report's own "return-type
+discrepancy" section). The mechanics are fully known (an up-call followed
+by a status read), but neither `unk38` nor the base slot's own game meaning
+is established, so left `Class__func_xxxxx` rather than name it as a getter
+for something unconfirmed.

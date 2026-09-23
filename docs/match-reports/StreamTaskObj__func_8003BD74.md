@@ -1,4 +1,6 @@
-# func_8003BD74
+# StreamTaskObj__func_8003BD74
+
+> Renamed from `func_8003BD74` on 2026-09-23 (tools/rename.py). Address 0x8003bd74.
 
 **Unit:** code_2c054 · **Size:** 14 instructions (0x38 bytes) · **Status:** MATCHED (14/14 words, whole-image SHA1 green), first attempt
 
@@ -6,9 +8,9 @@
 
 A one-line forwarder: fetches the sibling class's method table via
 `Get_vtable_TaskCore()` (returns `&gTaskCoreMethods`, `Class6D3C8.h`'s `LoaderTaskMethods`
--- see `func_8003BE84`'s report for how the delegation between the two
+-- see `Get_vtable_StreamTaskObj`'s report for how the delegation between the two
 sibling classes was established) and calls its slot `+0x080`, passing
-`self` straight through. Occupies `D_8006E5F8` slot `+0x080` itself.
+`self` straight through. Occupies `gStreamTaskObjMethods` slot `+0x080` itself.
 
 ## Derivation
 
@@ -25,7 +27,7 @@ jalr  $v0
 ```
 
 ```c
-void func_8003BD74(StreamTaskObj *self) {
+void StreamTaskObj__func_8003BD74(StreamTaskObj *self) {
     Get_vtable_TaskCore()->slot80(self);
 }
 ```
@@ -45,10 +47,18 @@ specifically was found to confirm either way -- flagged for whoever adds one.
 
 Added `include/code_2c054.h`'s `TaskCoreMethods` (this unit's own local view
 of `gTaskCoreMethods`, independent of `Class6D3C8.h`'s `LoaderTaskMethods`, same
-precedent as `func_8003BE84`'s report) with slot `+0x080` typed
+precedent as `Get_vtable_StreamTaskObj`'s report) with slot `+0x080` typed
 `void (*)(StreamTaskObj *self)`.
 
 ## Proposed learning
 
-See `func_8003BDAC`'s report (same shape, slot `+0x084`) and
-`func_8003BE84`'s (the delegation pattern itself).
+See `StreamTaskObj__func_8003BDAC`'s report (same shape, slot `+0x084`) and
+`Get_vtable_StreamTaskObj`'s (the delegation pattern itself).
+
+## Naming
+
+**StreamTaskObj__func_8003BD74** -- tier C. Occupies `gStreamTaskObjMethods`
+slot `+0x080`; a pure one-line up-call to the base slot with no
+StreamTaskObj-specific logic at all (see the report's own return-type
+discussion). There is nothing here to name beyond "this class's own
+override of that slot," so left `Class__func_xxxxx`.

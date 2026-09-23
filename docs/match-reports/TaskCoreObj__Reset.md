@@ -1,4 +1,6 @@
-# func_8003C11C
+# TaskCoreObj__Reset
+
+> Renamed from `func_8003C11C` on 2026-09-23 (tools/rename.py). Address 0x8003c11c.
 
 **Unit:** code_2c054 · **Size:** 48 words · **Status:** MATCHED (48/48)
 
@@ -8,7 +10,7 @@ An "init defaults" function: four forwarding calls through `self->methods`,
 then eight literal field stores.
 
 ```c
-void func_8003C11C(StreamTaskObj *self) {
+void TaskCoreObj__Reset(StreamTaskObj *self) {
     StreamTaskObjMethods *methods = self->methods;
     methods->slot6C(self, -1);
     methods->slotA4(self, &D_8006E860[0], &D_8006E860[3], &D_8006E860[6]);
@@ -33,12 +35,12 @@ void func_8003C11C(StreamTaskObj *self) {
   build (47/48, and everything downstream shifted, tripping funcdiff's
   "differs outside range" warning). A local `StreamTaskObjMethods *methods =
   self->methods;` fixed it in one step — same root cause as
-  `func_8003C3D0`'s `TaskCoreObj *obj` local this round: a value read once
+  `TaskCoreObj__func_8003C3D0`'s `TaskCoreObj *obj` local this round: a value read once
   and used again after an intervening indirect call needs to be pinned in a
   local, or GCC reloads it from memory instead of keeping it live in a
   register, changing the instruction count.
 - Three new `StreamTaskObjMethods` slots, all void-returning (discarded
-  results), confirmed to exist via `tools/classtable.py D_8006E5F8`:
+  results), confirmed to exist via `tools/classtable.py gStreamTaskObjMethods`:
   `+0x09C = func_8003CAF8`, `+0x0A0 = func_8003CB30`,
   `+0x0A4 = func_8003CB68` (all extern, other units).
 - `slotA4`'s three pointer arguments are `&D_8006E860[0]`, `&D_8006E860[3]`,
@@ -47,7 +49,7 @@ void func_8003C11C(StreamTaskObj *self) {
   with unknown real element shape.
 - Eight new `s32` fields carved out of what was padding: `unk28`, `unk2C`,
   `unk30`, `unk3C`, `unk84`, `unk9C`, `unkA0`, plus `unk34` (a field already
-  named from `func_8003C3D0` in this round, here just given its default
+  named from `TaskCoreObj__func_8003C3D0` in this round, here just given its default
   value `1`, confirming the two functions' guesses agree).
 
 ## Proposed learning
@@ -58,7 +60,15 @@ of 2:** any field read through an unknown indirect call chain (`self->methods
 explicit local, full stop — not just "when it looks expensive to
 re-fetch". The number of calls it must survive doesn't change the fix, only
 how many words are at stake if it's missed (2 calls cost 44 words in
-`func_8003C3D0`; here, 4 calls cost 1 word and shifted the whole rest of the
+`TaskCoreObj__func_8003C3D0`; here, 4 calls cost 1 word and shifted the whole rest of the
 build). Suspect this reflexively whenever a `self->field` (or
 `self->a->field`) appears more than once with a `jalr` between the
 occurrences.
+
+## Naming
+
+**TaskCoreObj__Reset** -- tier A. Occupies `gTaskCoreMethods` slot `+0x040`,
+the same cross-class "Reset" slot number as `StreamTaskObj__Reset`
+(`Class866E8__Reset`/`Class6B5CC__Reset` precedent); sets eight fields to
+fixed literal defaults, the same shape as every other confirmed `Reset` in
+this codebase.

@@ -1,4 +1,6 @@
-# func_8003BCF4
+# StreamTaskObj__SetUnk40
+
+> Renamed from `func_8003BCF4` on 2026-09-23 (tools/rename.py). Address 0x8003bcf4.
 
 **Unit:** code_2c054 · **Size:** 7 instructions (0x1C bytes) · **Status:** MATCHED (7/7 words, whole-image SHA1 green), first attempt
 
@@ -24,7 +26,7 @@ jr    $ra
 ```
 
 ```c
-void func_8003BCF4(StreamTaskObj *self, s32 a1) {
+void StreamTaskObj__SetUnk40(StreamTaskObj *self, s32 a1) {
     self->unk40 = a1;
     if (a1 >= 0) {
         self->unk40 = a1 * 15;
@@ -46,3 +48,11 @@ Another confirmed instance of the "default value, conditionally overwritten,
 no `else`" idiom from `docs/DECOMPILATION_LEARNINGS.md` -- worth keeping on
 the shortlist of shapes to try first when the residue is "one extra
 instruction" or a delay-slot store that looks unconditional at a glance.
+
+## Naming
+
+**StreamTaskObj__SetUnk40** -- tier A. Plain setter (with a `* 15` scale
+when the argument is non-negative) for `self->unk40`; a pure leaf whose
+mechanics are its whole purpose, matching the `Class__SetUnkNN` convention
+already used elsewhere for a field of unconfirmed game meaning
+(`Entity__SetUnkF4`, `src/Entity.c`).

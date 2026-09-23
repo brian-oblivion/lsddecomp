@@ -1,4 +1,6 @@
-# func_8003B9DC
+# StreamTaskObj__Destroy
+
+> Renamed from `func_8003B9DC` on 2026-09-23 (tools/rename.py). Address 0x8003b9dc.
 
 **Unit:** code_2c054 · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
 
@@ -9,8 +11,8 @@ side effect. First, a genuine virtual call through `self->unkB4`'s own
 1-slot vtable (a small object type distinct from `StreamTaskObj`, discovered
 here for the first time in this unit); second, the same
 `Get_vtable_TaskCore()`-mediated delegation to the sibling class `gTaskCoreMethods`
-(`LoaderTaskMethods`) used by `func_8003BD74`/`func_8003BDAC`, this time
-slot `+0x00C`. Occupies `D_8006E5F8` slot `+0x00C` itself.
+(`LoaderTaskMethods`) used by `StreamTaskObj__func_8003BD74`/`StreamTaskObj__func_8003BDAC`, this time
+slot `+0x00C`. Occupies `gStreamTaskObjMethods` slot `+0x00C` itself.
 
 ## Derivation
 
@@ -27,7 +29,7 @@ jalr $v0
 ```
 
 ```c
-void func_8003B9DC(StreamTaskObj *self) {
+void StreamTaskObj__Destroy(StreamTaskObj *self) {
     self->unkB4->methods->slot04(self->unkB4);
     Get_vtable_TaskCore()->slot0C(self);
 }
@@ -42,10 +44,20 @@ is `self->unkB4` itself (a virtual self-call on the sub-object), not `self`.
 Added `include/code_2c054.h`'s `StreamTaskUnkB4Obj`/`StreamTaskUnkB4Methods`
 (a new, previously-unseen 1-slot-vtable object reached through
 `StreamTaskObj::unkB4`, `+0x0B4`) and `TaskCoreMethods::slot0C` (this unit's
-local view of `gTaskCoreMethods`, see `func_8003BD74`'s report).
+local view of `gTaskCoreMethods`, see `StreamTaskObj__func_8003BD74`'s report).
 
 ## Proposed learning
 
-Same open return-type question as `func_8003BD74`/`func_8003BDAC` for the
+Same open return-type question as `StreamTaskObj__func_8003BD74`/`StreamTaskObj__func_8003BDAC` for the
 tail call through `slot0C` -- typed `void` on the same sibling-slot-
 convention basis, unconfirmed by any found caller.
+
+## Naming
+
+**StreamTaskObj__Destroy** -- tier A. Occupies `gStreamTaskObjMethods`'s dtor
+slot `+0x00C` (a base-class layout convention independently confirmed in
+`include/class_39e08.h`'s own `ctor`/`dtor` pair at `+0x008`/`+0x00C`, and in
+`include/code_171e0.h`'s `Class6D430__Destroy`). Tears down the private
+`unkB4` sub-object, then up-calls `TaskCoreObj__Destroy` at the same slot --
+the "override, do extra work, call the base" shape this whole unit's slot
+comparison confirms (see the unit header comment).

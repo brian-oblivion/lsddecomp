@@ -1,24 +1,26 @@
-# func_8003BE5C
+# StreamTaskObj__SetUnkC4
+
+> Renamed from `func_8003BE5C` on 2026-09-23 (tools/rename.py). Address 0x8003be5c.
 
 **Unit:** code_2c054 · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
 A plain setter: `self->unkC4 = value;`. One of a run of five consecutive
-9-line, 2-instruction `.s` bodies (`func_8003BE5C`/`64`/`6C`/`74`/`7C`) that
+9-line, 2-instruction `.s` bodies (`StreamTaskObj__SetUnkC4`/`64`/`6C`/`74`/`7C`) that
 turned out to be ordinary field setters, not BIOS trampolines or anything
 toolchain-blocked (checked first per the runner brief: no `jr $t2`, no
 `gp_rel`, no `addiu $at,$at,%lo`).
 
-All five (plus `func_8003BE84` right after them) are consecutive slots
-`+0x124`.."+0x134` of this class's own method table `D_8006E5F8` (confirmed
-with `tools/classtable.py D_8006E5F8`), which is how their object type was
-identified: `func_8003B854`'s allocator call sizes the object at `0xDC`
-bytes and constructs it through `func_8003BE84`'s slot `+0x008`, so all five
-setters, plus `func_8003BE84` itself, operate on that same `0xDC`-byte
+All five (plus `Get_vtable_StreamTaskObj` right after them) are consecutive slots
+`+0x124`.."+0x134` of this class's own method table `gStreamTaskObjMethods` (confirmed
+with `tools/classtable.py gStreamTaskObjMethods`), which is how their object type was
+identified: `New_StreamTaskObj`'s allocator call sizes the object at `0xDC`
+bytes and constructs it through `Get_vtable_StreamTaskObj`'s slot `+0x008`, so all five
+setters, plus `Get_vtable_StreamTaskObj` itself, operate on that same `0xDC`-byte
 class (already named `StreamTask`/`StreamTaskMethods` in
 `include/Class6D3C8.h`, established independently by a different unit from
-`func_8003B854`'s cross-unit call site).
+`New_StreamTaskObj`'s cross-unit call site).
 
 ## Derivation
 
@@ -28,7 +30,7 @@ jr   $ra
 ```
 
 ```c
-void func_8003BE5C(StreamTaskObj *self, s32 a1) {
+void StreamTaskObj__SetUnkC4(StreamTaskObj *self, s32 a1) {
     self->unkC4 = a1;
 }
 ```
@@ -54,3 +56,10 @@ setters), not case (b) (BIOS trampoline) — worth checking `jr $t2` first,
 but don't assume every such run is a trap; sometimes it really is just
 setters, and `tools/classtable.py` on the enclosing method table confirms it
 cheaply (all five sit in five consecutive table slots).
+
+## Naming
+
+**StreamTaskObj__SetUnkC4** -- tier A. Plain single-field setter (one of a
+run of five identical-shape setters at consecutive table slots
+`+0x124`..`+0x134`); `Class__SetUnkNN` convention, same precedent as
+`StreamTaskObj__SetUnk40`.

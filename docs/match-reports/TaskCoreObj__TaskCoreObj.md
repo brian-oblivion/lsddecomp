@@ -1,20 +1,22 @@
-# func_8003BF10
+# TaskCoreObj__TaskCoreObj
+
+> Renamed from `func_8003BF10` on 2026-09-23 (tools/rename.py). Address 0x8003bf10.
 
 **Unit:** code_2c054 · **Size:** 62 words · **Status:** MATCHED (62/62)
 
 ## Summary
 
 This occupies `TaskCoreMethods`'s (`gTaskCoreMethods`) own slot `+0x008` (per
-`classtable.py gTaskCoreMethods`), and is called from this unit's `func_8003B8E4`
+`classtable.py gTaskCoreMethods`), and is called from this unit's `StreamTaskObj__StreamTaskObj`
 (`StreamTaskObj`'s own ctor) as `Get_vtable_TaskCore()->slot08(self, a1, a2, a3)`.
 It is a **base-class constructor**: it briefly points `self->methods` at its
-own table (`gTaskCoreMethods`) before the derived ctor (`func_8003B8E4`)
-overwrites it with the real `D_8006E5F8` table right after this call
+own table (`gTaskCoreMethods`) before the derived ctor (`StreamTaskObj__StreamTaskObj`)
+overwrites it with the real `gStreamTaskObjMethods` table right after this call
 returns — the classic constructor-chaining shape, now confirmed directly
 rather than inferred.
 
 ```c
-void func_8003BF10(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj *a3) {
+void TaskCoreObj__TaskCoreObj(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj *a3) {
     StreamTaskUnkB4Obj *tmp;
     TaskCoreMethods *core;
 
@@ -38,7 +40,7 @@ void func_8003BF10(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj *a3) 
 }
 ```
 
-**UPDATE (this same round, after `func_8003C008`):** `a3`, `tmp`,
+**UPDATE (this same round, after `TaskCoreObj__Destroy`):** `a3`, `tmp`,
 `unk48`, `unk7C`, and `unk80` are shown here already retyped from the
 original `s32` guess to `StreamTaskUnkB4Obj *`/`StreamTaskUnkB4Obj *`. See
 the "Field-type correction" section below — this changed no compiled bytes,
@@ -51,13 +53,13 @@ only the header's declared types.
 - `Get_vtable_TaskCore()->slotD8(self, a1)`: new `TaskCoreMethods` slot `+0x0D8`
   (`gTaskCoreMethods+0x0D8 = func_8003CE98`, extern, void).
 - `self->methods->slotD4(self, 0, 0)`: new `StreamTaskObjMethods` slot
-  `+0x0D4` (`D_8006E5F8+0x0D4 = func_8003CDE0`, extern, void).
+  `+0x0D4` (`gStreamTaskObjMethods+0x0D4 = func_8003CDE0`, extern, void).
 - New fields: `unk44` (`+0x044`, `s32`, set from `a2`), `unk48` (`+0x048`,
   originally guessed `s32`, either a call result or `a3` verbatim), `unk7C`
   (`+0x07C`, originally guessed `s32`, call result), `unk80` (`+0x080`,
   originally guessed `s32`, call result). **See "Field-type correction"
   below — all three are actually `StreamTaskUnkB4Obj *`.**
-- `self->unk78` (already `StreamTaskUnk78Obj *` from `func_8003C3D0`) is set
+- `self->unk78` (already `StreamTaskUnk78Obj *` from `TaskCoreObj__func_8003C3D0`) is set
   here from `func_800441B4`'s return — confirms the pointer type again.
   **`StreamTaskUnk78Obj` itself was later folded into `StreamTaskUnkB4Obj`,
   see below.**
@@ -65,27 +67,27 @@ only the header's declared types.
   `func_800441B4`), none in this unit; typed purely from this call site's own
   register usage. **Return types corrected, see below.**
 
-## Field-type correction (added after `func_8003C008`, same round)
+## Field-type correction (added after `TaskCoreObj__Destroy`, same round)
 
 `unk48`, `unk7C`, and `unk80` were typed `s32` here purely because nothing
 available at the time contradicted it — they're only ever *written* in this
-function, never dereferenced. `func_8003C008` (this unit's next queued
+function, never dereferenced. `TaskCoreObj__Destroy` (this unit's next queued
 function, address order 0x8003C008, right after this one) reads all three
 back and dereferences each as `field->methods->slot04(field)`, which is
-impossible for a plain integer. Retyped all three (and `func_8003BF10`'s own
+impossible for a plain integer. Retyped all three (and `TaskCoreObj__TaskCoreObj`'s own
 `a3` parameter and `tmp` local, and `New_VabStreamObj`/`func_80044F30`/
 `func_80044CD4`/`func_800441B4`'s signatures) to `StreamTaskUnkB4Obj *` in
 `include/code_2c054.h`. Also, `StreamTaskUnk78Obj`/`StreamTaskUnk78Methods`
 (the type `unk78` used up to this point) is retired and folded into
-`StreamTaskUnkB4Obj` — see `func_8003C008.md` for the five-way evidence.
+`StreamTaskUnkB4Obj` — see `TaskCoreObj__Destroy.md` for the five-way evidence.
 
 **None of this changed a single compiled byte.** A pointer and an `s32` are
 the same register width; the retype is pure relabeling. A full rebuild after
 the change reconfirmed all nine of this round's prior matches
-(`func_8003BD10` through this function) byte-exact before writing
-`func_8003C008`'s own body. This is the concrete instance of this round's
+(`StreamTaskObj__func_8003BD10` through this function) byte-exact before writing
+`TaskCoreObj__Destroy`'s own body. This is the concrete instance of this round's
 "field whose only known use is a call result carries no type evidence"
-lesson — see `func_8003C008.md`'s own proposed learning.
+lesson — see `TaskCoreObj__Destroy.md`'s own proposed learning.
 
 ## Two residues, same root cause, both from this round's "value reused after
 a `jalr`" lever
@@ -115,7 +117,7 @@ form slightly — the actual rule is *any* live value used again after an
 intervening `jalr` needs a local, whether that value came from a struct field
 or, as here, directly from a call's return register. `self->methods` itself
 was never re-read across a call in this function (it's read fresh once,
-right before the final `slot40` call, same as `func_8003B8E4`); the residue
+right before the final `slot40` call, same as `StreamTaskObj__StreamTaskObj`); the residue
 was entirely about the `Get_vtable_TaskCore()` return value's reuse.
 
 ## Proposed learning
@@ -130,3 +132,12 @@ shape that needs a local — the disassembly tell is a literal duplicated
 which reads as obviously wrong once you see it side by side in
 `asm-differ`, but is easy to write by reflex when translating two
 back-to-back C statements that both mention `Get_vtable_TaskCore()`.
+
+## Naming
+
+**TaskCoreObj__TaskCoreObj** -- tier A. Occupies `gTaskCoreMethods`'s own
+ctor slot `+0x008`; confirmed a base-class constructor by its own body
+(`self->methods = (StreamTaskObjMethods *)core;`, temporarily pointing the
+object at its own table before the derived `StreamTaskObj__StreamTaskObj`
+overwrites it). `Class__Class` convention, same precedent as
+`StreamTaskObj__StreamTaskObj`.

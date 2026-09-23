@@ -8,7 +8,7 @@
 
 A tiny getter: returns the address of the static table `gTaskCoreMethods`
 (`TaskCoreMethods`, per `include/code_2c054.h`'s own richer local view of
-the same table -- that unit's `func_8003BAB4`/`func_8003BB5C`/etc. dispatch
+the same table -- that unit's `StreamTaskObj__func_8003BAB4`/`StreamTaskObj__func_8003BB5C`/etc. dispatch
 through several of its slots). This unit never dereferences the table, only
 returns its address, so it is declared here as an opaque `u8[]`.
 

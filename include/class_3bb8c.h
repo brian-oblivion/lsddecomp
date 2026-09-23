@@ -1404,7 +1404,7 @@ struct DreamSysView_3bb8c_c {
  * Class86B60__Class86B60's own local view of `Get_vtable_TaskCore`'s return type -- ALSO
  * independently declared, with a DIFFERENT 4-argument signature, as
  * `TaskCoreMethods` in include/code_2c054.h (`slot08`, confirmed 3-argument-
- * plus-self there from func_8003B8E4's own byte-exact call). Same real
+ * plus-self there from StreamTaskObj__StreamTaskObj's own byte-exact call). Same real
  * global (`gTaskCoreMethods`) two units deep, two independent arities recorded
  * from two real call sites -- the identical situation already documented
  * for GetClass6B5CCMethods above and for Class86AA0__Class86AA0's report. Kept local

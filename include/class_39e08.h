@@ -300,7 +300,7 @@ typedef struct IntermediateBaseMethods {
     u8 pad10[0x44 - 0x10];
     /* Same accessor/slot combination code_2c054.h calls
      * `TaskUtilMethods::slot44` on -- there it forwards to
-     * `self->unk38 = <base result>` (func_8003C1DC). Here the caller
+     * `self->unk38 = <base result>` (TaskCoreObj__func_8003C1DC). Here the caller
      * (func_8004A2C4, gClass86668Methods's own +0x044 override) zeroes
      * `self->unk28` immediately before the call and reads it back
      * immediately after: same "default, then base may overwrite" shape. */

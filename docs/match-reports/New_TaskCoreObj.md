@@ -1,4 +1,6 @@
-# func_8003BE94
+# New_TaskCoreObj
+
+> Renamed from `func_8003BE94` on 2026-09-23 (tools/rename.py). Address 0x8003be94.
 
 **Unit:** code_2c054 · **Status:** MATCHED (31/31 words)
 
@@ -9,7 +11,7 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-TaskCoreObj *func_8003BE94(s32 a1, s32 a2, s32 a3)
+TaskCoreObj *New_TaskCoreObj(s32 a1, s32 a2, s32 a3)
 {
     ...
 
@@ -52,3 +54,11 @@ plus three.
 Matched by the head during divergence resolution, 2026-09-02, as part of
 closing the epilogue-merge class. `docs/research/epilogue-merge-residue.md` is
 updated with what survived and what did not.
+
+## Naming
+
+**New_TaskCoreObj** -- tier A. Canonical `New_X` allocator shape for
+`TaskCoreObj` (0xA4 bytes), matching `New_StreamTaskObj`'s own shape one
+class down; the "TaskCore" name is this unit's own local view, kept
+independent of `include/Class6D3C8.h`'s `LoaderTask` view of the identical
+table (per this unit's header comment).

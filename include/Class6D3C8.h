@@ -129,8 +129,8 @@ extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so 
 extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
 extern void *func_80043840(void *arg); /* code_1677c's own alloc+ctor shape, uncarved (psyq_memset.s); not this unit's to write */
 
-/* A "New_X"-shaped task object allocated by func_8003B854 (uncarved,
- * asm/code_2c054.s) -- 0xDC bytes, constructed through func_8003BE84's
+/* A "New_X"-shaped task object allocated by New_StreamTaskObj (uncarved,
+ * asm/code_2c054.s) -- 0xDC bytes, constructed through Get_vtable_StreamTaskObj's
  * slot +0x008. Only the two slots func_80026170 dispatches through are
  * typed; everything else about this class is unknown. */
 typedef struct StreamTaskMethods {
@@ -157,7 +157,7 @@ typedef struct StreamTask {
     StreamTaskMethods *methods;
 } StreamTask;
 
-extern StreamTask *func_8003B854(s32 a0, s32 a1, s32 a2, s32 a3);
+extern StreamTask *New_StreamTaskObj(s32 a0, s32 a1, s32 a2, s32 a3);
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --
@@ -174,7 +174,7 @@ extern const char D_800107C8[]; /* "ETC\OSDLOGO.TIM" */
  * order) is called by func_80026170, which comes first in the file. */
 void func_80026254(Class6D3C8 *self, const char *path);
 
-/* A second "New_X"-shaped task object, allocated by func_8003BE94
+/* A second "New_X"-shaped task object, allocated by New_TaskCoreObj
  * (uncarved, asm/code_2c054.s) -- 0xA4 bytes, constructed through
  * Get_vtable_TaskCore's slot +0x008. Different class from StreamTaskMethods
  * above (different allocator, different slot signatures at the same
@@ -184,7 +184,7 @@ typedef struct LoaderTaskMethods {
     s32 header;                                              /* +0x000 */
     void (*slot4)(void *self);                                 /* +0x004 */
     u8 pad08[0x044 - 0x008];                                     /* +0x008 .. +0x043 */
-    /* +0x044: RETURNS s32, not void. This slot's occupant is func_8003C1DC
+    /* +0x044: RETURNS s32, not void. This slot's occupant is TaskCoreObj__func_8003C1DC
      * (matched in code_2c054), and its own body loads self->unk38 into $v0
      * immediately before the epilogue with nothing else consuming it -- a
      * load whose only purpose is to be the return value. The earlier `void`
@@ -206,7 +206,7 @@ typedef struct LoaderTask {
     LoaderTaskMethods *methods;
 } LoaderTask;
 
-extern LoaderTask *func_8003BE94(s32 a0, s32 a1, s32 a2);
+extern LoaderTask *New_TaskCoreObj(s32 a0, s32 a1, s32 a2);
 
 /* Forward declaration: func_80026328 (this unit, defined right after
  * func_80026254 in ROM order) is used by func_80026254 as a completion
