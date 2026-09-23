@@ -93,7 +93,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `CheckDreamAuxTriggerCondition` 100/100. (a §"An arm that must JUMP")
 - **"A barrier had no effect" is positive evidence FOR block order**, as is a flat permuter plateau.
   But "a barrier does not transfer" has three causes — block order, intra-block scheduling, and DCE
-  (barrier-proof; `func_80029C40`) — and an `mflo`/`mfhi` is a NEGATIVE indicator. Once block order
+  (barrier-proof; `CD_ready`) — and an `mflo`/`mfhi` is a NEGATIVE indicator. Once block order
   is RIGHT, splitting into two C variables is actively harmful. (a §"\"A barrier had no effect\"")
 - **A shared `return` block lands where the FIRST `return` sits, and two early exits need an
   explicit `goto` to a hand-placed label** — even when both return the SAME value. Diagnostic:
@@ -131,7 +131,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **`do { ... } while (0)` is a REAL RTL construct to 2.6.3, not a no-op brace block.** The loop
   pass runs over it, so it can change code a plain `{ }` in the identical place does not, and that
   bare-brace control IS the discriminator. Its effect is not fixed: scheduling on `func_8004CAF0`,
-  global register allocation on `func_80033C90`. (a round 58, bravo + charlie)
+  global register allocation on `Snd_decrescendo`. (a round 58, bravo + charlie)
 - **Two levers that each MEASURE AS A REGRESSION alone can be byte-exact together.**
   `func_8004CFB8`: halves scored 17/28 and 10/28 singly, 28/28 jointly. Try the product before
   discarding either reading. (a round 58, bravo)
@@ -164,7 +164,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   SCOPE: needs at least THREE explicit case values; at two-plus-default, `switch` and `if`-chain are
   byte-identical. (a §"A `switch`'s CASE ORDER is recoverable from the binary")
 - **A genuine `switch` and a logically identical if/else chain are not interchangeable, and neither
-  is "the" answer** — a real `switch` moved `SeqTimerControl` 24 -> 65/164 and closed `func_8004A070`
+  is "the" answer** — a real `switch` moved `_SsStart` 24 -> 65/164 and closed `func_8004A070`
   48/48, while elsewhere a sparse switch beat a chain that would not converge; `if`/`else-if` and a
   `return`-terminated sequential-`if` compile IDENTICALLY. Never size a residue with the whole-image
   byte count when a `switch` is present — compiling it relocates rodata. (a §"Round 16", §"Round
@@ -242,7 +242,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   copies of one literal at a merge point can be TWO stacked sub-mechanisms answering to no one
   lever. (a §"One named C variable gets ONE storage location", round 55)
 - **The SCOPE of a named local is the lever, not the name.** Declaring it INSIDE the block where the
-  value must survive one call closed `func_800357B0` 179/179 after three rounds failed by hoisting
+  value must survive one call closed `Snd_setVabAttr` 179/179 after three rounds failed by hoisting
   to function entry. (a §"The SCOPE of a named local is the lever")
 - **"Name it, THEN barrier it" is two-part and neither half works alone** — a named local plus a
   bare `__asm__("")` immediately after the declaration took `func_8003D73C` to exact length;
@@ -320,7 +320,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 - **A register swap that REPEATS at every expansion of a `do { } while (0)` macro closes as a
   `static __inline__` function.** The inline's parameters get their own pseudos at each call, so
-  the allocation order differs from textual expansion. `func_80029478`'s 8-byte copy, 10 sites
+  the allocation order differs from textual expansion. `getintr`'s 8-byte copy, 10 sites
   with dst/counter swapped, went 253 -> 333/337, ins/del 0/0, on this alone. Discriminator: the
   SAME swap at every copy of one repeated block. (round 70, delta)
 
@@ -354,7 +354,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   game", §"A delay-slot residue writing `$a0`-`$a3`")
 - **The same forward trace applies to a DEAD PARAMETER's register, which 2.6.3 reuses as scratch.**
   A delay-slot `move $aN, $vM` is filler only once `$aN`'s next READ on every path is found; in
-  `func_80034138` a store two blocks on read it, so the source stored the wrong value (the unused
+  `SeqPlay` a store two blocks on read it, so the source stored the wrong value (the unused
   parameter instead of a local). A permuter never swaps which variable a statement stores, so
   searching cannot find it. (round 69)
 - **A bare `nop` in a call's delay slot establishes arity ONLY when the argument is not already in
@@ -401,7 +401,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   with the return-type listing. (round 69)
 - **The DEFINITION's own parameters narrow too: a parameter that hops `$a0` -> `$a3` -> `$s5`
   with every use re-sign-extending it is an `s16` parameter, not an allocation residue.** Declaring
-  `(s16 a0, s16 a1)` instead of `(s32, s32)` plus casts reproduced retail's hop in `func_80036528`,
+  `(s16 a0, s16 a1)` instead of `(s32, s32)` plus casts reproduced retail's hop in `Snd_crescendo`,
   then a `u16` callee prototype (the callee reads it with `lhu`) and an `s16` field took a 13-short
   round-25 stall to 240/240. (round 70, bravo)
 - **A wrong extern arity and the deliberate dead-argument idiom are told apart at the CALL SITE,
@@ -496,7 +496,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **A missing `andi 0xff` right after an `lbu` whose byte goes to a global and is then masked:
   read it as `*(volatile u8 *)&x`.** A QImode volatile read keeps the zero-extend as its own
   instruction; `u8` temporaries in four positions, direct masking and a whole-array `volatile` all
-  missed. Single instance (`func_80029478`, libcd `getintr`), and the MMIO discriminator above is
+  missed. Single instance (`getintr`, libcd `getintr`), and the MMIO discriminator above is
   only half met: `resp[]` is a LOCAL buffer filled from the CD response FIFO, and the same body's
   `volatile u8 cause` compiles alike. (round 70, delta)
 - **NARROW a `volatile` to the exact access that needs it** — qualifying only the WORD-sized field

@@ -1,0 +1,642 @@
+# CD_datasync -- STALL (length EXACT 91/91, 49/91 words match, first real diff at vram 0x8002B1C8)
+
+> Renamed from `func_8002B198` on 2026-09-23 (tools/rename.py). Address 0x8002b198.
+
+**Unit:** code_179d8_g · **Size:** 91 words · **Status:** STALL (length EXACT 364/364 bytes; best 49/91 words match, up from 45/91 in round 36; first real diff at vram 0x8002B1C8 -- see below)
+
+## What it does
+
+Polls `func_80025900(-1)` against a deadline (`D_8008B3E4 = now + 0x1E0`) and
+a retry counter (`D_8008B3E8`, capped at `0x1E0000`) in a loop; on
+timeout/overflow it prints a diagnostic (`func_80025AE4` + `func_80012C20`
+with four values pulled from `D_8006D8D8[0..1]`, `D_8006D6A0[]` and
+`D_8006D620[D_8006D61D]`), calls `CD_flush()`, and returns -1. On
+success it checks a hardware status bit through `D_8006D934`; if clear it
+returns 0, if set and `arg0 == 0` it loops again, otherwise returns 1.
+
+## Best C reached (35/91 words -- restored to INCLUDE_ASM)
+
+```c
+#if 0
+/* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
+s32 CD_datasync(s32 arg0)
+{
+    s32 now;
+    s32 ok;
+    s32 *p620;
+    u8 *p8D8;
+    s32 *p6A0;
+
+    p620 = D_8006D620;
+    p8D8 = D_8006D8D8;
+    p6A0 = D_8006D6A0;
+
+    D_8008B3E4 = VSync(-1) + 0x1E0;
+    D_8008B3E8 = 0;
+    D_8008B3EC = (s32)D_80010AE0;
+
+    for (;;) {
+        now = VSync(-1);
+        ok = 1;
+        if (D_8008B3E4 < now) {
+            ok = 0;
+        } else {
+            D_8008B3E8 = D_8008B3E8 + 1;
+            if (0x1E0000 < D_8008B3E8) {
+                ok = 0;
+            }
+        }
+        if (!ok) {
+            puts(D_80010984);
+            printf(D_80010994, p8D8[0], p6A0[p8D8[1]],
+                          p620[D_8006D61D], p6A0[p8D8[0]]);
+            CD_flush();
+            return -1;
+        }
+        if ((*D_8006D934 & 0x1000000) == 0) {
+            return 0;
+        }
+        if (arg0 == 0) {
+            continue;
+        }
+        return 1;
+    }
+}
+#endif
+```
+
+## Residue and what was learned
+
+**This is the SAME "loop-invariant address hoisting" class as
+`callback`, but bigger: retail hoists THREE addresses
+(`&D_8006D620`, `&D_8006D8D8`, `&D_8006D6A0`) into `$s3`/`$s1`/`$s0`
+respectively, computed once before the retry loop.** Unlike
+`callback`'s single stubborn case, a genuine `for (;;)` loop
+(replacing an earlier `goto`-based attempt that scored much worse -- see
+axis note below) DOES let GCC hoist these correctly when the addresses are
+assigned to local pointer variables (`s32 *p620 = D_8006D620;` etc.)
+declared before the loop. Length converged exactly (364/364 bytes) with
+this shape, which rules out a structural/control-flow mismatch.
+
+**What's left is register NUMBERING, not hoisting-or-not**: retail assigns
+`$s3` to `D_8006D620`'s address, `$s1` to `D_8006D8D8`'s, `$s0` to
+`D_8006D6A0`'s (in that specific, non-sequential order); this attempt's
+build assigned different registers to the same three values (confirmed via
+`objdump` -- the `sw $sN` prologue and the `lui $sN` initializations are
+present for all three like retail, but numbered differently), which
+cascades into every later instruction that references them by register
+name (the front two-thirds of the diff is entirely register-identity
+noise from this, not new logic). Reordering the three local-pointer
+declarations to `p620; p8D8; p6A0` (matching retail's assignment order)
+did not change which physical register each got.
+
+**Two axes tried, one not yet tried:**
+1. `goto`-based control flow with two "trouble" targets sharing one label
+   (mirrors `CD_readm`'s successful shape) -- scored far worse (5/91,
+   20+ bytes short) because `goto`-linked basic blocks did not get
+   recognized as a loop for LICM purposes at all; none of the three
+   addresses were hoisted.
+2. A real `for (;;)` loop with local pointer variables for the three
+   hoisted bases -- closed the length gap completely (364/364) and fixed
+   the loop-recognition problem, but leaves a pure register-numbering
+   residue.
+3. **Not yet tried**: reordering the *body* references (which pointer is
+   used FIRST inside the `if (!ok)` block) rather than the top-of-function
+   declaration order, since GCC's local-register-class assignment is
+   sometimes driven by first-use order within the function rather than
+   declaration order. Also not tried: swapping `arg0`'s parameter register
+   assumption (retail's `$s2` for `arg0` matched immediately, so this is
+   unlikely to be the cause, but the three-value swap was not isolated one
+   pointer at a time -- next attempt should change ONE local's declared
+   type/position per build rather than all three at once, to find which
+   one drives the reassignment.
+
+Also worth carrying forward: `D_8006D8D8` needed reclassifying from
+`extern u8 D_8006D8D8;` (as used by the already-matched `CD_flush`,
+which only ever touches index 0) to `extern u8 D_8006D8D8[2];` -- this
+function indexes both `[0]` and `[1]`. The retype is transparent to
+`CD_flush`'s own byte-exact match (`D_8006D8D8[0] = 2;` compiles
+identically to the old `D_8006D8D8 = 2;`), confirmed by rebuilding and
+re-diffing that function after the change. This is now the live
+declaration in `code_179d8_g.c`.
+
+### Proposed learning
+
+**A `for (;;)`/`while` loop is sometimes REQUIRED (not just idiomatic) to
+get GCC 2.6.3 -O2 to perform loop-invariant address hoisting** --
+`goto`-threaded control flow that is semantically a loop does not
+reliably get recognized as one for this optimization, even when the
+`goto` targets are identical to what a real loop construct would produce.
+When a residue's shape is "retail hoists an address into a callee-saved
+register across iterations, mine recomputes it every time" and the
+current source uses `goto`, try a real loop construct before doing
+anything else.
+
+## Round 19: closed the register-mapping puzzle (35/91 -> 45/91), one residue remains
+
+Per the head's mid-round drift-check broadcast: first rebuilt the exact
+35/91 body above and confirmed it via `objdump` (91 real instructions,
+no drift) -- the recorded score was sound. Then acted on this report's
+own "not yet tried" note: isolate ONE local's declared type/position per
+build rather than swapping all three at once.
+
+**Moving the three pointer assignments (`p620`/`p8D8`/`p6A0`) to AFTER
+the initial `func_80025900(-1)` call (matching retail's own instruction
+order exactly -- retail interleaves the call with the pointer setup,
+computing `D_8006D620`'s address before the call and the other two
+after) improved `D_8006D620`'s mapping to the correct `$s3` immediately**
+(35 -> 43/91). **Reordering just the `p6A0`/`p8D8` assignment statements
+(not their declarations -- declaration order alone was retried and,
+confirming the original report, made no difference) then fixed BOTH
+remaining pointers to their correct registers** (43 -> 45/91,
+`$s1`=`D_8006D8D8`, `$s0`=`D_8006D6A0`, matching retail exactly). The
+whole prologue and all three hoisted-pointer initializations are now
+byte-identical to retail; verified with `objdump`, still 91 real
+instructions, zero drift.
+
+```c
+#if 0
+/* stalesyms --fix 2026-09-22: func_80025900 -> VSync -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
+/* the fix, relative to the original best-C body: */
+    D_8008B3E4 = VSync(-1) + 0x1E0;   /* call FIRST */
+    p620 = D_8006D620;                         /* THEN the three pointers, */
+    p6A0 = D_8006D6A0;                         /* in THIS specific order   */
+    p8D8 = D_8006D8D8;                         /* (not declaration order)  */
+    D_8008B3E8 = 0;
+    D_8008B3EC = (s32)D_80010AE0;
+#endif
+```
+
+**What's left, at 45/91, is a genuinely different, separate residue** in
+the loop body -- NOT register identity, confirmed by `asm-differ`: retail
+does not materialize the `ok` flag this report's body uses at all. Where
+this body computes `ok = 1; if (cond1) ok = 0; else { ...; if (cond2) ok
+= 0; } if (!ok) { timeout-path }`, retail instead runs each condition's
+`slt` directly into ITS OWN early branch to the timeout handler (two
+separate `bnez`/`beqz` sites, no shared flag variable), and the final
+success-path return-value construction (`li v0,-1` / `move v0,zero`
+around an unconditional `j`) has a redundant-move-style shape this
+report's `ok`-flag body doesn't reproduce either. **Tried inlining the
+guard as nested early-exit ifs instead of the `ok` flag** (`if
+(D_8008B3E4 >= now) { D_8008B3E8++; if (D_8008B3E8 <= 0x1E0000) {
+success-path} } timeout-path;`, avoiding the flag variable entirely and
+matching retail's positive-first framing) -- **regressed badly** (30/91
+with real drift, 304005 bytes outside-range) -- the `ok`-flag form is
+better, not worse, despite not matching retail's exact shape. Reverted;
+`ok`-flag form (45/91) is now this report's best.
+
+### Proposed learning (adds to the one above)
+
+**When a register-mapping residue involves MULTIPLE hoisted values, vary
+the ASSIGNMENT STATEMENT order one pointer at a time, not the
+declaration order** (which this report and `func_80029074`'s independently
+confirm is inert) **and match retail's own interleaving of the hoist
+with any intervening call** -- retail does not always finish all
+prologue setup before its first call; sometimes a call sits in the
+MIDDLE of the pointer-hoisting sequence, and reproducing that exact
+interleaving order (not just getting all the right values assigned
+before the loop) is what fixes the register mapping. This closed 2 of 3
+registers in one move here, and the remaining 1 followed once the other
+two were extracted from a single "swap all three" experiment into a
+"reorder these two, holding the third fixed" one.
+
+## Round 20 (runner bravo): two more axes tried, both regress -- 45/91 confirmed as the current ceiling
+
+Rebuilt round 19's 45/91 body fresh and confirmed it via `funcdiff.py`
+(no drift-outside-range warning, length still matches at 364/364 bytes).
+Tried the two levers this report's round-19 entry flagged as
+plausible-but-untested:
+
+1. **Isolating the `p6A0`/`p8D8` assignment-statement swap one at a
+   time** (swap ONLY their order, holding `p620` fixed) -- regressed to
+   43/91. This is the OPPOSITE of round 19's finding that this exact
+   order (`p620; p6A0; p8D8;`, matching the call-then-hoist
+   interleaving) gives the correct register mapping; re-swapping it back
+   confirmed 45/91 again. So the current order is a confirmed local
+   optimum on this axis, not an arbitrary snapshot -- do not re-try
+   swapping these two without a reason to expect a different outcome.
+
+2. **A `goto`-based direct-branch reshape of the two timeout guards**,
+   different in kind from round 19's already-rejected nested-if
+   inversion (that attempt inverted the conditions and merged the
+   success path into one nested block; this one keeps the conditions in
+   their original polarity and jumps forward to a shared `timeout:`
+   label instead of using an `ok` flag):
+
+   ```c
+/* stalesyms --fix 2026-09-22: func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
+   if (D_8008B3E4 < now) {
+       goto timeout;
+   }
+   D_8008B3E8 = D_8008B3E8 + 1;
+   if (0x1E0000 < D_8008B3E8) {
+       goto timeout;
+   }
+   /* success path unchanged */
+   ...
+   timeout:
+       puts(D_80010984);
+       ...
+       return -1;
+   ```
+
+   **Regressed just as badly as the nested-if attempt** -- 30/91 with
+   304005 bytes of outside-range drift (i.e. the compiled length grew,
+   same failure signature as round 19's rejected attempt). This rules
+   out "it was specifically the nested-if inversion" as the cause of
+   round 19's regression; ANY restructuring away from the `ok`-flag form
+   tried so far regresses, for at least two structurally different
+   reshapes now.
+
+Reverted both; `INCLUDE_ASM` restored, build verified clean
+(`./build-and-verify.sh` exit 0). No change to the recorded best (still
+45/91, body unchanged from round 19's).
+
+### Proposed learning
+
+**When a flag-variable-vs-direct-branch residue has already failed once
+under one restructuring (nested-if), try to vary the STRUCTURAL FORM,
+not just the polarity, before concluding the class is merely "haven't
+found the right inversion yet."** Here two structurally distinct
+reshapes (nested-if with inverted conditions, and goto-to-shared-label
+with original conditions) both regressed to a similar severity (~30/91
+with real drift), which is stronger evidence that the `ok`-flag
+materialization is genuinely what GCC 2.6.3 needs to see for this
+function's specific register/scheduling shape, than either single
+attempt alone would suggest. This narrows the honest characterization
+from "not yet tried the right form" to "two different forms tried, both
+worse" -- worth recording so a future attempt does not re-spend budget
+on a third syntactic variant of the same "avoid the flag" idea before
+trying something orthogonal to it (e.g. attacking the argument
+evaluation order for the `func_80012C20` call directly, which the
+residue's remaining diff still shows differs from retail independently
+of the flag question).
+
+## Round 36 (runner bravo): stale-symbol trap check, re-verified 45/91 in isolation, permuter run improves it to 49/91
+
+`tools/stalesyms.py` flagged this report's preserved body for three raw
+Psy-Q names predating this unit's rename: `func_80025AE4`->`puts`,
+`func_80012C20`->`printf`, `func_80025900`->`VSync`. Translated all three,
+rebuilt **in isolation (all five other stalled siblings in this unit reverted
+to `INCLUDE_ASM`)** and confirmed: `build exit=2`, no compile errors,
+`funcdiff.py` reports **45/91 words, no staleness warning, compiled length
+exact at 364/364 bytes** -- matches round 20's recorded figure exactly, no
+discrepancy between claimed and measured.
+
+**Isolation matters in this unit specifically.** With this unit's known
+1-word-short sibling (`callback`) ALSO live at the same time, this same
+body reads as only 44/91 with a whole-image drift warning -- not because
+anything about this function changed, but because `callback`'s 4-byte
+shortfall shifts this project's single contiguous `.main`-section `.bss`
+placement project-wide (see `CD_init.md`'s round-36 entry for the full
+mechanism). Every score in this report from here on was read with all other
+unit siblings reverted.
+
+### Permuter run: found a real, oracle-confirmed improvement (45/91 -> 49/91), from an anomaly this unit's `CD_readsync.md` had already flagged but never tested here
+
+`CD_readsync.md` (this same unit) recorded an "anomaly spotted in passing":
+this report's diagnostic call, `func_80012C20(D_80010994, p8D8[0],
+p6A0[p8D8[1]], p620[D_8006D61D], p6A0[p8D8[0]])`, looked structurally wrong
+compared to `CD_readsync`'s own byte-verified analog of the same block
+(which uses `D_8008B3EC` -- not `p8D8[0]` -- as the first `%s` argument).
+**Tried the direct fix first** (swap the first argument to `D_8008B3EC`,
+matching `CD_readsync`'s shape exactly) -- this REGRESSED: the function
+compiled 2 instructions LONGER than retail (93 vs 91, confirmed via
+`build/lsdde.map`: `CD_getsector` landed at `0x8002b30c`, 8 bytes past its
+correct `0x8002b304`). Reverted immediately. **The anomaly note describes
+what the call SHOULD semantically pass, per the diagnostic string's `%s`
+formatting, but retail's actual compiled bytes for THIS function are not
+simply `CD_readsync`'s block transplanted -- the two diagnostic blocks are
+independently scheduled, and copying one function's argument list onto the
+other's call site does not reproduce retail here.** Left as a caution for
+whoever next reads that anomaly note: it is real (the string/argument
+semantics genuinely look mismatched against the format string), but it is
+not this function's residue.
+
+**Ran the permuter instead**, against the current 45/91 seed (never
+previously searched -- round 19/20's restructuring experiments were manual,
+not permuter-driven). Base score confirmed via `--debug`: 1930 (`Register
+Differences: 22, Reorderings: 7, Insertions: 7, Deletions: 7` -- a much
+messier residue class than `cb_read`'s, consistent with this being the
+"ok-flag vs direct branch" structural class rather than a pure scheduling
+one). Searched `timeout 300 ... -j 4 --stop-on-zero --best-only`, ~28,873
+iterations, best found **1605** (five successive improvements: 1895, 1770,
+1710, 1650, 1605) -- no zero.
+
+**Verified the winning candidate against the REAL oracle** (learned from
+this same round's `cb_read` experience that a lower permuter score is a
+LEAD, not a result). The winning mutation is a single, narrow change: the
+diagnostic `printf` call's last argument becomes an assignment expression,
+`printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], ok =
+p6A0[p8D8[0]])`, reusing the ALREADY-LIVE `ok` flag variable as a throwaway
+sink for the same value that was already being computed there (`ok` is
+reassigned again on the next loop iteration before its old value is ever
+read, so this is a legal, harmless, semantically-inert store). Built in
+isolation: **49/91 words, length still EXACT at 364/364 bytes, no drift
+warning** -- a genuine, oracle-confirmed 4-word improvement, not a permuter
+scorer artifact this time.
+
+**Tried making it cleaner (a fresh `s32 dummy;` local instead of reusing
+`ok`)** -- regressed straight back to 45/91, byte-identical to the
+pre-permuter body. **The specific choice of sink matters: writing into an
+ALREADY-ALLOCATED, already-hot register (`ok`, live across the whole loop
+body) differs from introducing a new local that competes for a fresh
+register.** This is consistent with this project's broader "unfolded
+addressing via a local pointer" and "redundant reload" idioms: retail
+appears to reuse a register that is already resident rather than spend a new
+one, and reproducing that from C requires writing to a variable already in
+scope, not a semantically-cleaner fresh one. Kept the `ok =` form as the new
+best despite its slightly odd reading; a comment was added at the call site
+explaining why.
+
+**First real diff, read off `tools/asm-differ/diff.py CD_datasync`
+(isolated build): file offset `0x1B9C8`, vram `0x8002B1C8`** -- the
+`p620`/`p6A0` hoisted-pointer register-numbering swap this report's round-19
+entry already documents (`$s3`/`$s0` this time, not the earlier `$s1`
+instance -- the specific registers shift because the argument-list change
+altered downstream allocation pressure, but the CLASS of residue is
+unchanged). The four already-tried reorder axes for this class (declaration
+order, assignment order, first-use order, spelling) remain untested against
+THIS exact register pairing; not re-attempted this round given the
+established "this class is inert to reordering" finding from the earlier
+91-word residue and this round's own limited remaining budget (spent
+verifying the isolation hazard and the permuter result instead).
+
+**Restored to `INCLUDE_ASM`** -- 49/91 is still short of byte-exact, so per
+the hard rule no score short of that stays live in `src/`; the corrected,
+linkable 49/91 body is preserved below for the next attempt.
+
+### Corrected, linkable body (current best, 49/91 words, length EXACT)
+
+```c
+#if 0
+s32 CD_datasync(s32 arg0)
+{
+    s32 now;
+    s32 ok;
+    s32 *p620;
+    u8 *p8D8;
+    s32 *p6A0;
+
+    D_8008B3E4 = VSync(-1) + 0x1E0;
+    p620 = D_8006D620;
+    p6A0 = D_8006D6A0;
+    p8D8 = D_8006D8D8;
+    D_8008B3E8 = 0;
+    D_8008B3EC = (s32)D_80010AE0;
+
+    for (;;) {
+        now = VSync(-1);
+        ok = 1;
+        if (D_8008B3E4 < now) {
+            ok = 0;
+        } else {
+            D_8008B3E8 = D_8008B3E8 + 1;
+            if (0x1E0000 < D_8008B3E8) {
+                ok = 0;
+            }
+        }
+        if (!ok) {
+            puts(D_80010984);
+            /* retail reuses the (dead, about-to-be-overwritten) `ok` slot as
+             * the register target for this last argument's value -- a fresh
+             * local here compiles worse (45/91 vs 49/91); see this report's
+             * round-36 entry. */
+            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D],
+                   ok = p6A0[p8D8[0]]);
+            CD_flush();
+            return -1;
+        }
+        if ((*D_8006D934 & 0x1000000) == 0) {
+            return 0;
+        }
+        if (arg0 == 0) {
+            continue;
+        }
+        return 1;
+    }
+}
+#endif
+```
+
+### Proposed learning
+
+**A permuter-found "improvement" needs the same real-oracle re-verification
+in BOTH directions this project already applies to a permuter ZERO** --
+this round's `cb_read` entry found a lower permuter-metric score that
+turned out to be a genuine regression (shorter compiled length) against the
+real oracle; this function's own permuter result is the mirror case, a
+lower-metric-score candidate that DID hold up. The permuter's own penalty
+score and this project's `funcdiff.py` word-match are measuring different
+things (alignment-based instruction penalty vs. raw per-word byte identity),
+and neither predicts the other reliably enough to skip the real-oracle
+check -- verify every permuter candidate against `./build-and-verify.sh` /
+`funcdiff.py` before trusting it, whether the permuter's own number went up
+or down.
+
+Also: **an anomaly flagged in one function's report, describing what a
+SIBLING function's analogous call site "should" look like by structural
+comparison, is a lead worth testing directly and quickly rejecting if it
+regresses the LENGTH -- it does not automatically transfer even when the
+two blocks are otherwise near-identical.** `CD_readsync.md`'s anomaly note
+about this exact call was correct as an observation (the argument list does
+look semantically mismatched against the format string) but wrong as a
+prescription for this function's specific compiled residue.
+
+## Round 39 (runner delta): re-verified 49/91, permuter re-run against the current seed -- no improvement holds up
+
+Rebuilt the round-36 49/91 body verbatim: `build exit=2`, no compile errors,
+`funcdiff.py` reports **49/91 words, no staleness warning, compiled length
+exact at 364/364 bytes** -- matches round 36's recorded figure exactly.
+
+**Tried the register-pairing reorder axis once more against the CURRENT
+seed** (round 36's permuter fix changed the diagnostic call's last argument,
+which shifted the register-numbering residue from `func_8002AA6C`-style
+`p6A0`/`p8D8` at `$s1`/`$s0` to a NEW pairing, `p620`/`p6A0` swapped at
+`$s3`/`$s1`/`$s0` -- confirmed via `objdump -dr build/src/code_179d8_g.c.o`:
+this build assigns `s3=p620` correctly but `s1=p6A0`/`s0=p8D8` where retail
+wants `s1=p8D8`/`s0=p6A0`). Swapped the `p6A0`/`p8D8` assignment-statement
+order to `p620; p8D8; p6A0;` (retail's own instruction order, confirmed off
+the raw `.s`) -- **regressed to 47/91**, a different, WORSE swap (register
+mapping changed but in the wrong direction). Reverted immediately; the
+current order (`p620; p6A0; p8D8;`) remains the local optimum.
+
+**Ran a fresh permuter search against the 49/91 seed** (never previously
+searched -- round 36's only permuter run was against the STALE 45/91 seed,
+before that round's own fix). Base score 1405 (`--debug --stack-diffs`:
+`Register Differences: 21, Reorderings: 5, Insertions: 5, Deletions: 5` --
+messier than `func_8002AA6C`'s pure-register residue, consistent with this
+being the same "ok-flag vs direct branch" structural class this unit's other
+reports already document). Searched `timeout 600 ... -j 6 --stack-diffs
+--stop-on-zero --best-only`, ~95,476 iterations, best found **995** (four
+successive improvements: 1405 -> 1185 -> 995), no zero.
+
+**Verified every improving candidate against the real oracle before trusting
+it** (per this unit's own standing caution that a permuter score move is a
+lead in EITHER direction). Two forms tested at the 995 level:
+
+1. `ok = D_8008B3E4 < now; if (ok) { ok = 0; } else {...}` (replacing the
+   plain `if (D_8008B3E4 < now) { ok = 0; }`) -- **neutral**: rebuilt alone,
+   still exactly 49/91, byte-identical diff set (just a few positions moved
+   within the same residue, no net change). Not kept (no reason to carry a
+   less-readable form for zero gain).
+2. `if (D_8006D934) { return 1; } else { return 1; }` (the AEE0/round-36-style
+   branch trick, applied to the function's own final `return 1;`) --
+   **regressed to 39/91 with 302094 bytes of real drift** (confirmed via
+   `funcdiff.py`'s own outside-range warning, not just the in-range score).
+   Reverted immediately. Also tried the analogous trick on `D_8006D620`
+   around the `D_8008B3E8 = D_8008B3E8 + 1;` statement (a different
+   candidate from the same 995-scoring diff) and on `arg0` around the
+   `continue;` statement -- **both independently regressed with real drift**
+   (38/91 and 39/91 respectively, both flagged by the outside-range
+   warning). All three reverted.
+
+**Unlike `CD_readsync`'s and this same function's own round-36 result**,
+none of this round's permuter-found candidates held up against the real
+oracle. Score unchanged at 49/91.
+
+### Proposed learning
+
+A third data point for "verify every permuter candidate regardless of which
+direction the metric moved": this round's `CD_readsync` had a permuter
+candidate (also an always-true-branch trick) that held up and closed 6
+words; this same function's OWN three candidates from an equally deep
+search, using the identical trick shape, all failed against the real
+oracle. The trick is not reliable by construction -- it happened to line up
+with retail's actual register-pressure shape in one case and not in three
+others from the same search. There is no shortcut around rebuilding and
+running the full oracle on every one.
+
+### Final disposition (unchanged, 49/91, restored to `INCLUDE_ASM`)
+
+Body unchanged from round 36's preserved best; not re-pasted here since
+nothing in it changed this round. Full whole-image `./build-and-verify.sh`
+re-confirmed `OK: build matches retail SLPS_015.56` (exit 0) with this
+function and every other unit stall reverted to `INCLUDE_ASM` and only
+`CD_readsync` live as matched C -- see that report's round-39 entry for
+the corresponding confirmation.
+
+## Round 41 (runner charlie): title rebuilt with the required figures; manual reorder axes reconfirmed inert; a second fresh permuter search, still negative -- unchanged at 49/91
+
+**Title rebuilt** per this round's assignment (the previous title carried no
+LENGTH/MATCH/LOCATION figures, exactly the gap flagged when this function
+was assigned). No other change to this line's content.
+
+Rebuilt the round-36/39 49/91 body verbatim into `src/` in isolation: `build
+exit=2`, no compile errors, `funcdiff.py` reports **49/91 words, no
+staleness warning, compiled length exact at 364/364 bytes** -- matches
+every prior round's recorded figure exactly.
+
+### Manual reorder axes against the current `p620`/`p6A0` pairing: two tried, both reconfirm round 39's own findings rather than adding anything new
+
+Round 39's own text flags this residue ("first real diff... the `p620`/
+`p6A0` hoisted-pointer register-numbering swap... The four already-tried
+reorder axes for this class remain untested against THIS exact register
+pairing") but then declines to spend the budget on them. Spent it here:
+
+1. **Assignment-statement order** (`p620; p8D8; p6A0;`, matching retail's
+   own instruction order off the raw `.s`) -- this is the EXACT experiment
+   round 39 already ran and reported as "regressed to 47/91". Reproduced
+   the identical figure independently: **47/91**. Reverted.
+2. **Declaration order** (`p620; p6A0; p8D8;` -> `p620; p8D8; p6A0;` at
+   the point of declaration only, assignment order unchanged) -- **inert,
+   still 49/91**, consistent with the standing "declaration order alone
+   does not affect this class" finding from round 19.
+3. **One genuinely new axis**: hoisting the four diagnostic-call values
+   into locals evaluated in a fixed order before the call (`t0 = p8D8[0];
+   t1 = p6A0[p8D8[1]]; t2 = p620[D_8006D61D]; printf(..., t0, t1, t2, ok =
+   p6A0[p8D8[0]]);`) -- **regressed with drift** (294938 bytes
+   outside-range). Reverted.
+
+No new lever found on this axis; the `p620`/`p6A0` pairing remains inert to
+every reorder tried across two rounds now.
+
+### Second fresh permuter search against the current seed: negative, and this round's best-scoring candidates are the clearest illustration yet in this unit of "permuter score improved, real oracle regressed"
+
+Round 39 already ran one fresh search against this exact 49/91 seed
+(~95,476 iterations, best permuter score 995, three candidates verified
+and all rejected). Re-ran it here (base score confirmed **1405** via
+`--debug`, matching round 39's figure exactly) for a second full 900s pass
+(`-j 6 --stop-on-zero --best-only`), ~116,000 more iterations, no zero.
+`--best-only` saved four improvements: 1405 -> 1185 -> 1095 -> 1085 ->
+1065.
+
+**Every one of these, checked against the real oracle, is WORSE than the
+49/91 baseline, several substantially so:**
+
+| candidate (permuter score) | mutation | real score |
+| --- | --- | --- |
+| 1065 | `0x1E0000 < D_8008B3E8` -> `0x1E0000 < (D_8008B3E8 + 1)` (an off-by-one on the retry cap -- tested ALONE) | 33/91, drift |
+| 1065's other half | duplicate-arm `if (D_8008B3E8 \|\| ok) {return 0;} else {return 0;}` around the success return (tested ALONE) | 39/91, drift |
+| 1065 (both together, as the permuter found it) | both of the above combined | 33/91, drift |
+| 1095 | duplicate-arm around the final `return 1;` (`arg0` is provably nonzero there, so this half is a legitimate always-true-branch trick) plus a `new_var`-sink restructuring of the FIRST timeout guard | 27/91, drift |
+| 1085 | moves the `CD_flush()` diagnostic call from before the `return -1;` to AFTER the success-path `return 0;` -- **not even semantically safe to consider**, this reorders when a real side-effecting function actually runs relative to two different return paths | not tested further, rejected on inspection |
+
+**This is the starkest confirmation yet in this unit that the permuter's
+own alignment-penalty score and this project's real word-match/byte-length
+are uncorrelated when the search is this deep into a hard residue class**:
+every surviving candidate from ~211,000 combined iterations across two
+separate searches (round 39 and this round) that the permuter itself
+ranks as an improvement is a real regression, several with genuine
+length drift. `CD_datasync.md`'s own round-36 entry already drew this
+lesson once (for `cb_read`'s candidate); this round supplies four
+more data points in the SAME direction for THIS function specifically,
+which round 39's three data points had already suggested but not yet
+this strongly.
+
+**No further attempt.** Restored to `INCLUDE_ASM`; full
+`./build-and-verify.sh` re-confirmed `OK: build matches retail
+SLPS_015.56`, exit 0, after reverting. Body unchanged from round 36's
+preserved best (49/91, reproduced above in that round's own entry).
+
+### Proposed learning
+
+For a residue class that has ALREADY absorbed one full permuter search
+with no oracle-confirmed improvement (round 39's 95k iterations here), a
+second full search against the identical, unchanged seed is a legitimate
+thing to try (permuter search is stochastic and a different run explores
+different mutations) but should be budgeted with correspondingly lower
+expectation -- this round's second pass explored roughly as many
+iterations as the first and surfaced a DIFFERENT set of candidates, but
+every one of them was worse against the real oracle than the first
+search's own rejected candidates, not better. When a class has already
+produced multiple independently-rejected permuter leads, the next lever
+worth spending budget on is a genuinely CHANGED state (a data-model
+correction, a fix elsewhere in the function, a structurally different
+manual reshape) rather than a repeat search against the same source, per
+this round's assignment note -- confirmed here by getting nothing new
+from the repeat.
+
+## Round 68 (runner charlie): NON_MATCHING body promoted
+
+Track 1b. Promoted round 36's corrected 49/91-word body (length exact,
+364/364 bytes) -- the current best. This body is a hybrid, and both halves
+are reviewed here explicitly:
+
+- **The control-flow/hoisting structure is hand-derived**: the `for (;;)`
+  loop and the three local pointers (`p620`/`p6A0`/`p8D8`) hoisting
+  `D_8006D620`/`D_8006D6A0`/`D_8006D8D8` were arrived at through rounds
+  0/19/20/39/41's manual reordering experiments (declaration order,
+  assignment-statement order, call interleaving), not the permuter.
+- **The diagnostic call's `ok = p6A0[p8D8[0]]` sink IS a permuter find**
+  (round 36, base score 1930 -> 1605 best), and it is the one piece of this
+  body that was not hand-written. Reviewed here for semantics against the
+  disassembly and against round 36's own analysis: `ok` is a loop-scoped
+  `s32` that is unconditionally reassigned (`ok = 1` or `ok = 0`) at the
+  top of every subsequent iteration before its next read, and the timeout
+  branch that contains this call always either `return`s or falls through
+  to the top of the loop where `ok` is immediately overwritten -- there is
+  no path that reads `ok` under this stale value. The store is a legal,
+  semantically-inert register reuse, not UB or a dead-branch exploit, and
+  it was independently oracle-confirmed (`funcdiff.py`, 45/91 -> 49/91,
+  no drift) rather than accepted on the permuter's own alignment score.
+  Every other permuter candidate found against this seed across three
+  separate searches (rounds 36, 39, 39-again, 41) regressed against the
+  real oracle and was rejected; only this one held up.
+
+Residue at 49/91: register identity (the three hoisted pointers land in
+different callee-saved registers than retail's `$s3`/`$s1`/`$s0`),
+confirmed inert to every reorder axis tried (declaration order, assignment
+order, first-use order) across rounds 19/20/39/41.
+
+NON_MATCHING body promoted, round 68.

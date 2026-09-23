@@ -362,7 +362,7 @@ re-deriving or renaming it.
 
 ## Round 48 update (runner echo): tested charlie's frame-padding lever -- FOURTH confirmed negative for length closure, unit-wide verdict now 4/4
 
-Round 48's designated test of charlie's `func_800351D0` frame-padding
+Round 48's designated test of charlie's `ContDataEntry` frame-padding
 discovery. This function's frame gap was already ON FILE (round 27's
 callee-saved-lever check, above): built `-0x10` vs retail `-0x18`, an
 8-byte gap. Direct grep confirms the textbook shape:
@@ -387,22 +387,22 @@ section already explored from three different placements: this build's
 function entry (word 2), before the sign-extension chain (`sll/sra v1`)
 the 0x34-stride record accesses need; retail computes the equivalent
 value only AFTER that sign-extension, sharing it with the record-index
-multiply chain. **No new residue surfaced** — unlike `UpdateVoiceEnvelopes`
+multiply chain. **No new residue surfaced** — unlike `SpuVmFlush`
 (this unit's other post-realignment win), realigning this function's
 frame did not reveal anything beyond what was already on file.
 
 **This unit is now 4-for-4 this round: charlie's `dead[N]`/`if(0)`
 padding idiom recovers frame byte-alignment exactly every time (four
-measured cases: `UpdateVoiceEnvelopes`, `StepVoiceFade`, `StartNote`, and
+measured cases: `SpuVmFlush`, `StepVoiceFade`, `StartNote`, and
 this function), and has closed a missing-WORD-COUNT gap on none of them.**
 Every one of `code_179d8_m`'s frame gaps is pure unaddressed
 register-save-area padding — confirmed directly by grep in three of the
-four cases (`StepVoiceEnvelope`, `UpdateVoiceEnvelopes` here; `StepVoiceFade` and
+four cases (`StepVoiceEnvelope`, `SpuVmFlush` here; `StepVoiceFade` and
 `StartNote`'s own permuter `--stack-diffs` runs independently
 confirmed zero stack differences) — with each function's real content
 residue (a redundant mask, a persisted early value, an addressing-cost
 difference, an early-materialization placement) living entirely
-independently of the frame allocation. `func_800351D0`'s original length
+independently of the frame allocation. `ContDataEntry`'s original length
 recovery in a DIFFERENT unit came from a coincidentally-paired
 tail-duplication fix, not from the padding move itself.
 
@@ -431,7 +431,7 @@ green after the revert.
 on length closure, 4-for-4 on frame-byte-alignment recovery.** The lever's
 reliable, repeatable value on this unit was diagnostic — it makes an
 otherwise length-misaligned diff readable — and it directly PAID OFF once
-(`UpdateVoiceEnvelopes`'s `andi 0xff` mask, found only after realignment). But
+(`SpuVmFlush`'s `andi 0xff` mask, found only after realignment). But
 treating it as a length-closing move in its own right would have been
 wrong all four times here. The generalizable rule for the next runner:
 apply the padding cheaply whenever a frame gap is confirmed pure

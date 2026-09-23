@@ -15,8 +15,8 @@
  * (2026-09-04) off the back of what was then `code_179d8_mid`, the three
  * functions in front of this slice. Those three were left as "all addiu-$at
  * blocked, so there is nothing left to staff there"; re-censused round 24
- * (2026-09-08) that is FALSE -- func_800299BC (161w), func_80029C40 (180w)
- * and func_80029F10 (282w) are ALL THREE blocker-clean now that `addiu_at`
+ * (2026-09-08) that is FALSE -- CD_sync (161w), CD_ready (180w)
+ * and CD_cw (282w) are ALL THREE blocker-clean now that `addiu_at`
  * is resolved. Round 26 (2026-09-09) acted on that and CARVED them as the
  * C unit `code_179d8_n`; no `code_179d8_mid` segment exists any more.
  *
@@ -30,7 +30,7 @@
  * blocked on `addiu_at` ALONE, and `addiu_at` was RESOLVED in round 21
  * (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
  * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   func_8002AEE0 (174w)  func_8002B640 (186w)  func_8002B94C (189w)
+ *   CD_readsync (174w)  func_8002B640 (186w)  func_8002B94C (189w)
  * The previous version of this comment read "BLOCKED, stub reports already
  * filed, do NOT spend attempts on these" -- a stale DIRECTIVE over free
  * ground.
@@ -51,7 +51,7 @@
  * inside `libcd/iso9660.o` (Psy-Q 3.3), an object already placed in
  * config/psyq-objects.txt and verified against retail. No C matches them;
  * the correct disposition is conversion per docs/SDK-OBJECTS-GUIDE.md.
- * Only func_8002AEE0 of the three is real game ground.
+ * Only CD_readsync of the three is real game ground.
  *
  * ROUND 34 (head): CONVERTED. The unit's last three functions -- CdSearchFile
  * (func_8002B640), _cmp (func_8002B928, which had been matched as C) and
@@ -91,7 +91,7 @@ extern u8 D_8006D61A;
 extern u8 D_8006D61C;
 extern u8 D_8006D61D;
 extern s32 D_8006D620[4];      /* read-only here; formerly noted BLOCKED (addiu_at) in
-                                 * func_8002AEE0 -- addiu_at was RESOLVED round 21, dead cause */
+                                 * CD_readsync -- addiu_at was RESOLVED round 21, dead cause */
 extern s32 D_8006D6A0[];       /* lookup table, indexed by a byte field << 2 */
 
 extern volatile u8 *D_8006D8C0;
@@ -145,25 +145,25 @@ extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib
 extern s32 VSync(s32 arg0);                            /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
-extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
-extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
-extern s32 func_80029478(void);                                /* code_179d8_b.c, MATCHED round 70
+extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
+extern s32 CD_sync(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
+extern s32 getintr(void);                                /* code_179d8_b.c, MATCHED round 70
                                                                    (libcd getintr by its strings) */
 extern s32 CheckCallback(void);                                /* lib/libetc/intr.o -- trivial
                                                                    (u16)D_8006C272 getter */
 /* Still INCLUDE_ASM in THIS unit (not yet converted) -- INCLUDE_ASM leaves no
  * C-level prototype of its own, so callers within this file need one. */
 extern s32 func_8002AA6C(void);
-extern s32 func_8002B198(s32 arg0);
+extern s32 CD_datasync(s32 arg0);
 
 /* Forward declarations: taken by address before their own ROM-order definition
- * further down this file (func_8002A6EC/func_8002A75C hand func_8002B3F4 to
- * InterruptCallback as a thread entry; func_8002AA6C hands func_8002B4D4 to
+ * further down this file (CD_initintr/CD_init hand callback to
+ * InterruptCallback as a thread entry; func_8002AA6C hands cb_read to
  * D_8006D600 as a callback). */
-void func_8002B3F4(void);
-void func_8002B4D4(s32 arg0, s32 arg1);
+void callback(void);
+void cb_read(s32 arg0, s32 arg1);
 
-s32 func_8002A378(u8 *arg0)
+s32 CD_vol(u8 *arg0)
 {
     *D_8006D8C0 = 2;
     *D_8006D8C8 = arg0[0];
@@ -175,7 +175,7 @@ s32 func_8002A378(u8 *arg0)
     return 0;
 }
 
-void func_8002A400(void)
+void CD_shell(void)
 {
     s32 saved;
     s32 counter = 0;
@@ -189,11 +189,11 @@ void func_8002A400(void)
                 puts(D_80010A40);
             }
             counter++;
-            func_80029F10(1, 0, 0, 0);
+            CD_cw(1, 0, 0, 0);
         }
 
-        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-            func_80029F10(1, 0, 0, 0);
+        while (CD_cw(0x16, D_8006D908, 0, 0)) {
+            CD_cw(1, 0, 0, 0);
             puts(D_80010A50);
         }
 
@@ -202,7 +202,7 @@ void func_8002A400(void)
     }
 }
 
-void func_8002A510(void)
+void CD_flush(void)
 {
     volatile u8 *q;
 
@@ -224,7 +224,7 @@ void func_8002A510(void)
     *D_8006D8D0 = 0x1325;
 }
 
-s32 func_8002A5F8(void)
+s32 CD_initvol(void)
 {
     u8 buf[4];
 
@@ -250,7 +250,7 @@ s32 func_8002A5F8(void)
     return 0;
 }
 
-void func_8002A6EC(void)
+void CD_initintr(void)
 {
     s32 *p;
     s32 i;
@@ -265,16 +265,16 @@ void func_8002A6EC(void)
         p++;
     }
     ResetCallback();
-    InterruptCallback(2, func_8002B3F4);
+    InterruptCallback(2, callback);
 }
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 171/196 words, length exact. Residue: pure list-scheduling
  * (round-25 --debug breakdown: Reorderings: 3, Register Differences: 0) --
- * retail splits func_80029F10(1,0,0,0)'s argument materialization from its
+ * retail splits CD_cw(1,0,0,0)'s argument materialization from its
  * own a3/jal by ~90 bytes; neither call position tried reproduces the split
- * (docs/match-reports/func_8002A75C.md). Hand-derived. */
-s32 func_8002A75C(void)
+ * (docs/match-reports/CD_init.md). Hand-derived. */
+s32 CD_init(void)
 {
     s32 *p;
     s32 i;
@@ -297,7 +297,7 @@ s32 func_8002A75C(void)
         p++;
     }
     ResetCallback();
-    InterruptCallback(2, func_8002B3F4);
+    InterruptCallback(2, callback);
 
     *D_8006D8C0 = 1;
     while (*D_8006D8CC & 7) {
@@ -306,7 +306,7 @@ s32 func_8002A75C(void)
         *D_8006D8C8 = 7;
     }
 
-    func_80029F10(1, 0, 0, 0);
+    CD_cw(1, 0, 0, 0);
 
     D_8006D8DA = 0;
     q = &D_8006D8D9;
@@ -320,7 +320,7 @@ s32 func_8002A75C(void)
 
     counter = 0;
     if (D_8006D60C & 0x10) {
-        func_80029F10(1, 0, 0, 0);
+        CD_cw(1, 0, 0, 0);
     }
 
     if (D_8006D904 < D_8006D614) {
@@ -332,11 +332,11 @@ s32 func_8002A75C(void)
                 puts(D_80010A40);
             }
             counter++;
-            func_80029F10(1, 0, 0, 0);
+            CD_cw(1, 0, 0, 0);
         }
 
-        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-            func_80029F10(1, 0, 0, 0);
+        while (CD_cw(0x16, D_8006D908, 0, 0)) {
+            CD_cw(1, 0, 0, 0);
             puts(D_80010A50);
         }
 
@@ -344,16 +344,16 @@ s32 func_8002A75C(void)
         D_8006D904 = D_8006D614;
     }
 
-    if (func_80029F10(0xA, 0, 0, 0) != 0) {
+    if (CD_cw(0xA, 0, 0, 0) != 0) {
         return -1;
     }
-    if (func_80029F10(0xC, 0, 0, 0) != 0) {
+    if (CD_cw(0xC, 0, 0, 0) != 0) {
         return -1;
     }
-    return -(func_800299BC(0, 0) != 2);
+    return -(CD_sync(0, 0) != 2);
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A75C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_g", CD_init);
 #endif
 
 #ifdef NON_MATCHING
@@ -403,11 +403,11 @@ s32 func_8002AA6C(void)
                             puts(D_80010A40);
                         }
                         counter++;
-                        func_80029F10(1, 0, 0, 0);
+                        CD_cw(1, 0, 0, 0);
                     }
 
-                    while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-                        func_80029F10(1, 0, 0, 0);
+                    while (CD_cw(0x16, D_8006D908, 0, 0)) {
+                        CD_cw(1, 0, 0, 0);
                         puts(D_80010A50);
                     }
 
@@ -415,10 +415,10 @@ s32 func_8002AA6C(void)
                     D_8006D904 = D_8006D614;
                 }
 
-                if (func_80029F10(9, 0, 0, 0) != 0) {
+                if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (func_80029F10(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -446,15 +446,15 @@ s32 func_8002AA6C(void)
                 n = ((u8)v0 != D_8006D61C);
                 if (n) {
                     saved = (s32)&buf;
-                    if (func_80029F10(0xE, saved, 0, 0) != 0) {
+                    if (CD_cw(0xE, saved, 0, 0) != 0) {
                         goto tail;
                     }
                 }
             }
 
-            D_8006D600 = (s32)func_8002B4D4;
+            D_8006D600 = (s32)cb_read;
             p2[-1] = p2[-2];
-            func_80029F10(6, 0, 0, 1);
+            CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
             p2[3] = VSync(-1) + 0x1E0;
             return p2[2];
@@ -477,7 +477,7 @@ s32 func_8002AA6C(void)
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002AA6C);
 #endif
 
-s32 func_8002ADE8(s32 arg0, s32 arg1, s32 arg2)
+s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
 {
     s32 t;
     volatile s32 *p;
@@ -527,13 +527,13 @@ join:
     D_8006D900 = D_8006D600;
 
     if (D_8006D60C & 0xE0) {
-        func_80029F10(9, 0, 0, 0);
+        CD_cw(9, 0, 0, 0);
     }
-    func_800299BC(0, 0);
+    CD_sync(0, 0);
     return -(func_8002AA6C() < 1);
 }
 
-s32 func_8002AEE0(s32 arg0, s32 arg1)
+s32 CD_readsync(s32 arg0, s32 arg1)
 {
     s32 now;
     s32 old;
@@ -580,11 +580,11 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         /* &D_8008B3EC routed through a local pointer -- forces the same
          * unfolded lui/addiu addressing retail uses for this argument;
          * a plain `D_8008B3EC` reference here compiles FOLDED instead.
-         * See docs/match-reports/func_8002AEE0.md's round-36 entry. */
+         * See docs/match-reports/CD_readsync.md's round-36 entry. */
         pEC = &D_8008B3EC;
         printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
                p6A0[idx0], p6A0[idx1]);
-        func_8002A510();
+        CD_flush();
         result = -1;
         goto after_diag;
 
@@ -598,7 +598,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         if (CheckCallback() != 0) {
             status = (u8)(*D_8006D8C0 & 3);
             for (;;) {
-                flags = func_80029478();
+                flags = getintr();
                 if (flags == 0) {
                     break;
                 }
@@ -640,8 +640,8 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
              *   - D_8006D6A0 is a fixed 8-element table of rodata string
              *     addresses (asm/data/5DDFC.data.s:121). An array.
              *   - D_8006D8F8 is one zero word that the sibling
-             *     func_8002B4D4 stores VSync()'s return into
-             *     (func_8002B4D4.s:49-51). An s32 timestamp.
+             *     cb_read stores VSync()'s return into
+             *     (cb_read.s:49-51). An s32 timestamp.
              *
              * Neither is a pointer global, so the condition CANNOT become
              * an honest null test by that route. That half is closed.
@@ -650,7 +650,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
              * `pF8[-1]` (used four times below) reaches D_8006D8F4 by
              * negative indexing off D_8006D8F8, which nobody writes -- the
              * ten consecutive words ARE one array, as the zeroing walk in
-             * func_8002ADE8 already implied. They are now declared
+             * CD_readm already implied. They are now declared
              * `s32 D_8006D8DC[10]` and indexed, and that model is
              * BYTE-IDENTICAL (174/174, whole image green).
              *
@@ -683,7 +683,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
             func_8002AA6C();
         }
         if (pF8[-1] == 0) {
-            func_8002B198(0);
+            CD_datasync(0);
         }
         if (arg0 != 0 || pF8[-1] <= 0) {
             break;
@@ -697,10 +697,10 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
 /* NON_MATCHING: 49/91 words, length exact. Residue: register identity
  * (the three hoisted pointers p620/p6A0/p8D8 land in different
  * callee-saved registers than retail's $s3/$s1/$s0) (docs/match-reports/
- * func_8002B198.md). Structure is hand-derived; the diagnostic call's
+ * CD_datasync.md). Structure is hand-derived; the diagnostic call's
  * `ok =` sink is a permuter find (round 36), reviewed as a semantically
  * inert dead-store reuse and oracle-confirmed. */
-s32 func_8002B198(s32 arg0)
+s32 CD_datasync(s32 arg0)
 {
     s32 now;
     s32 ok;
@@ -734,7 +734,7 @@ s32 func_8002B198(s32 arg0)
              * round-36 entry. */
             printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D],
                    ok = p6A0[p8D8[0]]);
-            func_8002A510();
+            CD_flush();
             return -1;
         }
         if ((*D_8006D934 & 0x1000000) == 0) {
@@ -747,10 +747,10 @@ s32 func_8002B198(s32 arg0)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B198);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_g", CD_datasync);
 #endif
 
-s32 func_8002B304(s32 arg0, s32 arg1)
+s32 CD_getsector(s32 arg0, s32 arg1)
 {
     *D_8006D8C0 = 0;
     *D_8006D8CC = 0x80;
@@ -776,8 +776,8 @@ void func_8002B3E4(s32 arg0)
 #ifdef NON_MATCHING
 /* NON_MATCHING: 30/56 words, length 1 short. Residue: instruction-selection
  * (retail computes &D_8006D8D8 unfolded inside the loop; this folds it)
- * (docs/match-reports/func_8002B3F4.md). Hand-derived. */
-void func_8002B3F4(void)
+ * (docs/match-reports/callback.md). Hand-derived. */
+void callback(void)
 {
     u8 status;
     s32 flags;
@@ -788,7 +788,7 @@ void func_8002B3F4(void)
     pd9 = &D_8006D8D9;
 
     for (;;) {
-        flags = func_80029478();
+        flags = getintr();
         if (flags == 0) {
             break;
         }
@@ -807,10 +807,10 @@ void func_8002B3F4(void)
     *D_8006D8C0 = status;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002B3F4);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_g", callback);
 #endif
 
-void func_8002B4D4(s32 arg0, s32 arg1)
+void cb_read(s32 arg0, s32 arg1)
 {
     volatile s32 *p;
     s32 code;
@@ -824,7 +824,7 @@ void func_8002B4D4(s32 arg0, s32 arg1)
     if (*p <= 0) {
         goto shared;
     }
-    func_8002B304(D_8006D8E8, D_8006D8F0);
+    CD_getsector(D_8006D8E8, D_8006D8F0);
     D_8006D8E8 = D_8006D8E8 + D_8006D8F0 * 4;
     *p = *p - 1;
     dummy = *p;
@@ -848,7 +848,7 @@ shared:
     if ((*(new_var = &D_8006D8F4)) <= 0) {
         D_8006D5FC = D_8006D8FC;
         D_8006D600 = D_8006D900;
-        func_80029F10(9, 0, 0, 0);
+        CD_cw(9, 0, 0, 0);
         if (D_8006D604 != 0) {
             if ((*new_var) == 0) {
                 code = 2;

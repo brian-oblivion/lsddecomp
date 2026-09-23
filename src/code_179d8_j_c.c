@@ -13,7 +13,7 @@
  * code_179d8_j_c -- the TAIL of the old code_179d8_j slice, split off in round
  * 34 (2026-09-12) when Sony's `libsnd/ut_pb.o` was linked into the middle of
  * `code_179d8_j_b`.  Now 0x22244..0x2273C (vram 0x80031A44..0x80031F3C), eight
- * functions (func_80031A44 .. func_80031EE8).
+ * functions (func_80031A44 .. SsUtAutoPan).
  *
  * WHY THE SPLIT EXISTS.  `func_800319B4` is Sony's `SsUtPitchBend`
  * (`libsnd/ut_pb`, Psy-Q 3.6 -- the only disc carrying the module; 0x90 text
@@ -64,7 +64,7 @@
 extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 extern s32 StopNote(s32 a0, s16 a1, s16 a2, u16 a3);
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-extern s16 ApplyVoicePitchBend(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
+extern s16 SpuVmPBVoice(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
 extern void func_8002E308(s16 a0, s16 a1, s16 a2, s16 a3);
 extern void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3);
 
@@ -99,7 +99,7 @@ extern Rec34D994 D_8008D99E[];
 
 /* 16 (0x10)-byte-stride record with two s16 fields 2 bytes apart --
  * modeled as ONE struct here (not two independent arrays) because
- * func_80030404 computes the second field's address as the first
+ * SpuVmSetSeqVol computes the second field's address as the first
  * field's cached base register plus a compile-time +0x2, which only
  * happens when the compiler knows both offsets belong to the same
  * object. */
@@ -128,7 +128,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", func_80031A44);
 /* Rec34D994 (D_8008D994/99A/99E) and Rec16D7F0 (D_8008D7F8/D_8008D7FA
  * below) are declared once, near the top of this file, and shared by
  * every function in this unit that needs them -- see the comment there.
- * See func_80031CF0's report for why D_8008D7F8/D_8008D7FA are modeled
+ * See SsUtSetDetVVol's report for why D_8008D7F8/D_8008D7FA are modeled
  * as independent arrays rather than fields of one struct (each access
  * computes its own address), unlike D_8008D7F0/D_8008D7F4 above. */
 extern Rec16D7F0 D_8008D7F8[];
@@ -165,7 +165,7 @@ s32 func_80031BA4(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
     return -1;
 }
 
-s32 func_80031C98(s16 idx, s16 *out1, s16 *out2)
+s32 SsUtGetDetVVol(s16 idx, s16 *out1, s16 *out2)
 {
     if ((u16) idx < 0x18) {
         *out1 = D_8006DAD4[idx].unk0;
@@ -175,7 +175,7 @@ s32 func_80031C98(s16 idx, s16 *out1, s16 *out2)
     return -1;
 }
 
-s32 func_80031CF0(s16 idx, s16 p1, s16 p2)
+s32 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2)
 {
     /* Retail reserves an 8-byte frame it never touches. Only an unused local
      * ARRAY of that size reproduces it -- a scalar is register-allocated and
@@ -191,7 +191,7 @@ s32 func_80031CF0(s16 idx, s16 p1, s16 p2)
     return -1;
 }
 
-s32 func_80031D6C(s16 idx, s16 *out1, s16 *out2)
+s32 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2)
 {
     EntryDAD4 *e;
     s16 f0, f2;
@@ -207,10 +207,10 @@ s32 func_80031D6C(s16 idx, s16 *out1, s16 *out2)
     return -1;
 }
 
-s32 func_80031DF8(s16 idx, s16 p1, s16 p2)
+s32 SsUtSetVVol(s16 idx, s16 p1, s16 p2)
 {
     /* Retail reserves an 8-byte frame it never touches, same idiom as
-     * func_80031CF0. */
+     * SsUtSetDetVVol. */
     s32 unused[2];
     s16 t1, t2;
 
@@ -225,7 +225,7 @@ s32 func_80031DF8(s16 idx, s16 p1, s16 p2)
     return -1;
 }
 
-s32 func_80031E94(s16 p0, s16 p1, s16 p2, s16 p3)
+s32 SsUtAutoVol(s16 p0, s16 p1, s16 p2, s16 p3)
 {
     if ((u16) p0 < 0x18) {
         func_8002E308(p0, p1, p2, p3);
@@ -234,7 +234,7 @@ s32 func_80031E94(s16 p0, s16 p1, s16 p2, s16 p3)
     return -1;
 }
 
-s32 func_80031EE8(s16 p0, s16 p1, s16 p2, s16 p3)
+s32 SsUtAutoPan(s16 p0, s16 p1, s16 p2, s16 p3)
 {
     if ((u16) p0 < 0x18) {
         BeginVoiceFade(p0, p1, p2, p3);

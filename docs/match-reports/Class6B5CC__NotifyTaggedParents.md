@@ -404,7 +404,7 @@ value across the entire run is 38, and `permuter-work/Class6B5CC__NotifyTaggedPa
 contains no `output-*` directories at all (the permuter only creates one
 when `--best-only` finds something strictly better than the running
 best). This is the same "no candidate ever improved on the seed" signature
-`func_80029C40` produced earlier this round.
+`CD_ready` produced earlier this round.
 
 **Verdict: not closed in 73118 iterations under load (rc=124); the
 permuter found nothing better than the base score at any point.** This is

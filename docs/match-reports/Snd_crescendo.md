@@ -1,0 +1,127 @@
+# Snd_crescendo
+
+> Renamed from `func_80036528` on 2026-09-23 (tools/rename.py). Address 0x80036528.
+
+**Unit:** code_179d8_f · **Size:** 240 words (0x3C0 bytes) · **Status:**
+**MATCHED, round 70 (bravo)** — 240/240, insertions 0 / deletions 0,
+whole image `OK: build matches retail`.
+
+REVISITED, round 70: MATCHED (from 13 words short); names/types used — the
+two things that closed it were a parameter TYPE (`s16`, not `s32`) and a
+callee-prototype TYPE (`u16` x/y), not an allocation lever.
+
+## History
+
+- **Round 25** (fresh): stalled 13 words SHORT (227/240), first real diff at
+  the first instruction after frame setup (retail's `move $a3,$a0` argument
+  register hop). Recorded two "levers" and an unresolved "a0/a1 hop".
+- **Round 70** (bravo, revisit): matched. See below for what the round-25
+  body got wrong; both of its recorded levers are withdrawn.
+
+## Rebuilt-as-given figure (round 70, before any change)
+
+The preserved round-25 body, rebuilt unchanged against the current pinned
+toolchain (all four maspsx flags in): **still 13 words SHORT (227/240 built,
+epilogue `jr` at 0x800368B0 against retail's 0x800368E0); funcdiff
+`insertions 34 / deletions 34`, positional skeleton diffs 236, 3/240 raw
+(window misaligned).** So the flags that landed after round 25 did not move
+this body's length.
+
+## What it does
+
+Per-slot "beat" tick on `D_800902E8[screen][slot]` (172-byte
+`Entry90902E8`). Decrements `unk98`; if the period `unk42 > 0` and
+`unk98 % unk42 == 0`, decrements `unk40` and pushes an XY step (`+1`) through
+`SpuVmGetSeqVol` (read) / `SpuVmSetSeqVol` (write), clamping to `(0x7F,0x7F)`
+and clearing bit `0x10` of `unk90` when out of range or out of beats. If
+`unk42 <= 0` the same happens with `unk40 += unk42` and a `- unk42` step.
+Then, unless the modulo missed, clears bit `0x10` when `unk98 == 0` or
+`unk40 == 0`. Always finishes by reading the XY into `entry->unk78/unk7A`.
+
+## What closed it, in order of impact (each measured in-tree)
+
+| step | change | result |
+| --- | --- | --- |
+| 0 | round-25 body as given | 227/240 (13 short), ins/del 34/34 |
+| 1 | definition `(s32 a0, s32 a1)` -> `(s16 a0, s16 a1)`, drop the `(s16)` casts | 12 short; retail's `move a3,a0` ... `move s5,a3` hop reproduced exactly |
+| 2 | local extern `SpuVmSetSeqVol(s16,s16,s16,s32)` -> `(s16,u16,u16,s32)`; `sp10/sp12` `s16` -> `u16`; drop round-25's `d1/d2` named locals | ins/del 17/17 |
+| 3 | local struct view `unk40` `u16` -> `s16`, drop the `(s16)` casts on it | the `li v1,0xffff; addu` decrement became retail's `addiu -1` |
+| 4 | control flow: the `unk98 == 0 || unk40 == 0` clear is OUTSIDE the `unk42 > 0` if/else, and the modulo miss is `goto end` (skips it) | **1 word short**, ins/del 2/2 |
+| 5 | `s16 count` read AFTER the `unk98` store, guard and divisor on `entry->unk42` directly | exact length (236/240); retail's `lh a2` + `move v1,a2` pair appears |
+| 6 | compute `entry = &D_800902E8[a0][a1]` BEFORE `arr = &D_800902E8[a0]` | 239/240; prologue `lui/addiu` now scheduled between `sll` and `sra 14`, as retail |
+| 7 | delete `count`; the `<= 0` arm adds `entry->unk42` (permuter find, below) | last `addu v0,v0,v1` operand order fixed: **240/240, whole image green** |
+
+Evidence for each type from the callee/caller bytes, not from guessing:
+
+- **`s16` parameters**: retail sign-extends `a0`/`a1` at EVERY use
+  (`sll 16; sra 14` for the index, `sll 16; sra 16` for the slot), holds the
+  raw incoming `a0` in `a3` first and only moves it to callee-saved `s5`
+  after the slot-offset arithmetic. That two-step is what GCC 2.6.3 emits
+  for a HImode parameter (incoming SImode register copied to a pseudo, then
+  promoted to a callee-saved home); an `s32` parameter goes straight to
+  `s3`. Round 25 tried several restructurings of the index expressions and none
+  could move it, because the cause was the declaration.
+- **`SpuVmSetSeqVol(s16, u16, u16, s32)`**: retail masks both XY arguments
+  `andi 0xFFFF` at the call; the callee (`code_179d8_j`, still
+  `INCLUDE_ASM`) stores them with `sh` and re-reads with `lhu` +
+  `sltiu 0x80`, i.e. unsigned. `code_179d8_i.c` already carried
+  `(s16 a0, u16 a1, u16 a2, s32 a3)`.
+- **`u16 sp10/sp12`**: retail reads them with `lhu` and compares
+  `(x + 1) < 0x80` / `(x - unk42) < 0x80` with `slti` on the int-promoted
+  value, never truncating to 16 bits before the compare.
+
+## Both round-25 levers are WITHDRAWN
+
+- **"Lever 1" (bind `sp10 - thresh` to named `s16 d1/d2` locals to fix a
+  `vars=48` frame inflation)** was compensating for `s16` stack locals and
+  an `s16`-parameter prototype. With `u16` locals and a `u16` prototype the
+  plain inline `(sp10 - thresh) < 0x80 ... SpuVmSetSeqVol(..., sp10 - thresh,
+  ...)` is the matching form and the frame comes out at retail's
+  `vars=24` with no named temporaries.
+- **"Lever 2" (an unsigned cast on a named `s16` local contaminates its
+  load to `lhu`)** is real GCC behaviour but the wrong reading of THIS
+  function: the `lhu` came from the `s16 count` local being used in a
+  HImode add (`unk40 + count`), which only needs the low 16 bits. Retail has
+  no such local at all; `unk42` is read directly in all three places.
+
+The round-69 levers named in the brief were checked: the narrowed-callee
+lever DID apply here, as a signedness rather than a width error (the
+round-25 local extern said `s16` where the callee reads
+`u16`, which cost a sign-extend pair per argument instead of an `andi`).
+The dead-delay-slot lever did not apply: no delay-slot `move` in retail is
+dead.
+
+## Search
+
+One bounded permuter search, run AFTER the in-tree body reached 239/240
+(last residue: one `addu v0,v0,v1` operand order). Gate 3 checks run: (1)
+scaffold compiled and scored, base score 10; (2) `--debug --stack-diffs`
+insertions 0 / deletions 0; (3) real-build funcdiff `insertions 0 /
+deletions 0` — AGREE. `timeout 2400`, `-j 6 --stop-on-zero`; exited rc 0 at
+iteration 1326 with a zero whose only material change was deleting the
+`count` local and reading `entry->unk42` in the `<= 0` arm. Translated and
+verified in-tree: 240/240, whole image green. (Independently, an in-tree
+variant keeping `count` and routing the add through a block-local
+`s16 t = entry->unk40; entry->unk40 = t + count;` also matched byte-exact;
+the permuter's form is adopted because it has fewer names, not because it
+scores better.)
+
+## Struct knowledge (this unit's local view of `Entry90902E8`)
+
+`unk40` is `s16`, not `u16` (retail decrements with `addiu -1` and tests the
+sign with `sll 16; bltz`/`lh`). Only this function reads it in this unit;
+whole-image oracle green after the edit.
+
+### Proposed learning
+
+**A "parameter hops through an argument register before reaching its
+callee-saved home" residue (`move $a3,$a0` ... later `move $s5,$a3`) is the
+signature of a NARROW (`s16`/`s8`) PARAMETER DECLARATION, not an allocation
+choice.** Discriminator: every use of the parameter re-sign-extends it
+(`sll 16; sra N`) and the source you have writes `(s16)a0` casts on an
+`s32` parameter. Retype the definition, drop the casts. Round 25 spent a
+whole derivation on index-expression restructurings that could not touch
+it; retyping took 13-short to 12-short and unlocked every later step.
+Corollary: when a stall report's "lever" is a named temporary that fixes a
+frame-size inflation, re-check the types of the values it names before
+trusting it — here both round-25 levers were compensations for wrong types.

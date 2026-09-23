@@ -257,7 +257,7 @@ RECOMPUTES `4 << self->unk3C` at the `unk88` site rather than keeping one
 value live.** Naming it once and reusing it forces GCC to hold it across the
 allocation and rewrites the whole function. This is round 39's alpha lever
 arriving as a CONSTRAINT rather than an opportunity -- alpha closed 8 words on
-`func_800357B0` by *dropping* a named local and recomputing inline at its one
+`Snd_setVabAttr` by *dropping* a named local and recomputing inline at its one
 real use, on the same principle. Here the recomputation is already correct and
 naming it is what breaks.
 

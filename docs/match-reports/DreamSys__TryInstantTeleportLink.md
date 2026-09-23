@@ -12,7 +12,7 @@
 > Round 47 found `do { return; } while(0)` around a single-statement early
 > return changes GCC 2.6.3's basic-block shape enough to move an UNRELATED
 > register-rotation residue elsewhere in the same function
-> (`func_800344FC`), scoped as "a per-return experiment, never a
+> (`NoteOn`), scoped as "a per-return experiment, never a
 > whole-function rewrite." That axis had never been tried on this function's
 > own three `return true;` exits, so it was tried here, in two shapes:
 >

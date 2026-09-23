@@ -1,0 +1,746 @@
+# callback -- STALL: length 1 word SHORT (220/224 bytes); 30/56 raw word-match; first real diff at vram 0x8002B484
+
+**Unit:** code_179d8_g · **Size:** 56 words · **Status:** STALL (1 word short: 220/224 bytes, 30/56 words match, first real diff at vram 0x8002B484)
+
+## What it does
+
+Thread entry point registered by `CD_initintr`/`CD_init` via
+`func_80024D40(2, callback)`. Loops on `getintr()` (still
+`INCLUDE_ASM`/BLOCKED in `code_179d8_b`) dispatching two optional callbacks
+(`D_8006D600` and `D_8006D5FC`, both function pointers) based on flag bits,
+until `getintr()` returns 0, then restores the driver's saved status
+byte into `*D_8006D8C0`.
+
+## Best C reached (near miss, 30/56 words -- restored to INCLUDE_ASM)
+
+```c
+#if 0
+void callback(void)
+{
+    u8 status;
+    s32 flags;
+    s32 handler;
+    u8 *pd9;
+    u8 tmp;
+
+    tmp = *D_8006D8C0;
+    status = tmp & 3;
+    pd9 = &D_8006D8D9;
+
+    for (;;) {
+        flags = getintr();
+        if (flags == 0) {
+            break;
+        }
+        if (flags & 4) {
+            handler = D_8006D600;
+            if (handler != 0) {
+                ((void (*)(s32, u8 *))handler)(*pd9, D_8008B3D4);
+            }
+        }
+        if (flags & 2) {
+            if (D_8006D5FC != 0) {
+                ((void (*)(s32, u8 *))D_8006D5FC)(D_8006D8D8, D_8008B3CC);
+            }
+        }
+    }
+    *D_8006D8C0 = status;
+}
+#endif
+```
+
+## Residue
+
+Length was correct-to-within-4-bytes and register allocation matched
+essentially everywhere EXCEPT one instruction: retail computes
+`D_8006D8D8`'s address for the second callback's first argument
+**unfolded** (`lui v0,%hi(D_8006D8D8); addiu v0,%lo(D_8006D8D8); lbu
+a0,0(v0)` -- 3 instructions), while a plain `D_8006D8D8` reference here
+compiles to the ordinary **folded** form (`lui at,%hi(D_8006D8D8); lbu
+a0,%lo(D_8006D8D8)(at)` -- 2 instructions), 4 bytes short.
+
+This is the SAME "force unfolded addressing" need documented in
+`CD_readm.md` and `CD_flush.md`'s reports (there: a local
+`volatile T *q = &sym; *q = val;`), but it does not transfer here, and the
+reason is a genuine difference from those two cases: **this access is
+INSIDE a loop**, and `&D_8006D8D8` is trivially loop-invariant, so ANY
+form that takes its address as a real pointer expression gets hoisted by
+GCC's loop-invariant-code-motion into a callee-saved register OUTSIDE the
+loop (confirmed: it grew the frame by 8-12 bytes and added an `s2`/`s3`
+save, overshooting retail's length in the other direction). This happened
+regardless of whether the pointer was a function-top local, a
+block-nested local, or an anonymous `*(volatile u8 *)&D_8006D8D8`
+expression -- LICM operates on the RTL address-of, not on C-level scoping,
+so no source-level scoping trick suppressed it.
+
+**What DID work in this function**: `D_8006D8D9`'s address genuinely IS
+hoisted in retail (into `$s2`, computed once before the loop) -- the
+`u8 *pd9 = &D_8006D8D9;` local reproduces that half exactly, including the
+loop-invariant hoist. It is specifically `D_8006D8D8` -- used inside the
+OTHER branch, and NOT hoisted in retail despite being equally
+loop-invariant -- that resisted every lever tried.
+
+**Attempts, all tried and rejected (see axes, not just count):**
+1. Plain `D_8006D8D8` reference (folded, 220 bytes, this report's body).
+2. Local `volatile u8 *pd8` declared at function top alongside `pd9`
+   (matched pd9's shape) -- GCC hoisted it too (232 bytes, +12, both `s2`
+   and `s3` used across the whole function).
+3. Local `volatile u8 *pd8` declared nested inside the `if` block
+   (matching where it is USED, not function scope) -- same hoist, same
+   232 bytes; C-level scope did not change RTL-level LICM eligibility.
+4. Anonymous `*(volatile u8 *)&D_8006D8D8` expression, no named local at
+   all -- identical 232-byte hoist.
+5. A bare `__asm__("")` barrier immediately before the plain
+   `D_8006D8D8` reference (in the 220-byte, non-pointer form) -- no change
+   at all; a barrier does not affect instruction SELECTION (folded vs
+   unfolded), only ORDERING, and this residue is a selection difference,
+   not an ordering one.
+
+None of the five is a register-identity fix (no `register T v asm("$N")`,
+no operand constraint used) -- all are legitimate C. The residue is
+specifically GCC's choice of address-computation STRATEGY for one
+`lui`/lo-immediate pair among several structurally similar ones in the
+same function, and it is not reachable from the C forms tried.
+
+### Proposed learning
+
+**The "force an unfolded address via a local `volatile T *` pointer" lever
+(documented in `CD_readm`/`CD_flush`) does not transfer inside a
+loop when the target is loop-invariant** -- GCC's LICM hoists the pointer
+itself regardless of C-level scope, growing the frame instead of just
+changing instruction selection. If a residue looks like "retail computes
+this address unfolded, I get folded" AND the access sits inside a loop,
+check whether the address is loop-invariant before reaching for the
+pointer-local lever: if it is, the lever very likely produces a *worse*
+divergence (extra saved register) rather than the intended one.
+
+## Round: hand analysis (runner delta), permuter queued but not yet run
+
+Re-read `asm/nonmatchings/code_179d8_g/callback.s` directly to
+confirm the report's residue reading byte-for-byte (not just trust the
+prose). Confirmed exactly as described:
+
+```
+/* 1BC84 8002B484 */  lui   $v0, %hi(D_8006D8D8)
+/* 1BC88 8002B488 */  addiu $v0, $v0, %lo(D_8006D8D8)
+/* 1BC8C 8002B48C */  lbu   $a0, 0x0($v0)
+```
+
+Three instructions, INSIDE the loop body, immediately before the
+`jalr $v1` call -- recomputed every iteration (no callee-saved register
+holds it across iterations, unlike `D_8006D8D9` -> `$s2`). This matches
+the report's claim precisely: retail does NOT hoist `D_8006D8D8`'s
+address despite it being loop-invariant (apparently a register-pressure
+choice, not a correctness one -- `$s0`/`$s1`/`$s2` are already spoken for
+by `flags`/`status`/`pd9`, leaving no fourth callee-saved slot, and
+retail's compiler evidently preferred to keep `D_8006D600`/`D_8006D5FC`
+un-hoisted too rather than hoist a fourth value), and just needs the
+UNFOLDED 3-instruction address-then-load shape reproduced without
+inviting the hoist.
+
+**One correction to the report's preserved "best C" body**: it calls
+`((void (*)(s32, u8 *))D_8006D5FC)(D_8006D8D8, D_8008B3CC);` -- passing
+the bare array (decaying to a pointer, then implicit-int-truncated by the
+call, with a compiler warning) rather than `D_8006D8D8[0]` (a dereferenced
+byte, matching retail's `lbu`). Checked whether this was the actual
+residue cause: it is NOT -- `permuter.py --debug` on both forms gives an
+*identical* base score of 140 (`Register Differences: 8, Deletions: 1`,
+no reorderings/insertions), so GCC 2.6.3 apparently generates identical
+code for both at `-O2` here. Still worth writing `D_8006D8D8[0]` going
+forward since it is the semantically-correct spelling of what retail's
+`lbu` actually loads, and the bare-array form only reads correctly by an
+implicit-conversion coincidence that a stricter compiler would flag.
+
+**Permuter scaffold prepared and validated** (`permuter-work/callback`,
+seed uses the corrected `D_8006D8D8[0]` form) -- `--debug` base score
+140, matching the report's characterization (a single-value residue, not
+a control-flow one). Not yet searched under `-j 6`: only one search runs
+at a time this round and `DreamSys__SoundCueCallback` currently holds that slot. Queued
+next.
+
+**A `PERM_GENERAL` seed offering six alternate spellings of the one access
+(`D_8006D8D8[0]`, `*(volatile u8*)&D_8006D8D8[0]`, `*(u8*)&D_6D8D8[0]`, a
+block-scoped `volatile u8 *pd8` temp, a block-scoped plain `u8 *pd8` temp,
+and `*(D_8006D8D8+0)`) was drafted but could not be validated through
+`tools/setup-permuter.sh`** -- the script's own "prove the scaffold"
+step runs the RAW seed through the pinned `cc1` directly (via
+`compile.sh`) before any PERM-macro substitution happens, and `cc1`
+naturally rejects the literal `PERM_GENERAL(...)` syntax (it is
+recognized by `permuter.py`'s own candidate generator, not by `cpp`/`cc1`).
+Using PERM macros with this project's `setup-permuter.sh` therefore needs
+either a script change (out of scope for a single runner mid-round) or
+manually replicating the script's `target.o`/`target.s`/`base.c` steps
+while skipping its `compile.sh` pre-validation call specifically for a
+PERM-macro seed. Left as a plain (non-PERM) seed for now; flagging the
+limitation rather than silently working around it.
+
+### Proposed learning
+
+**A residue class ("force unfolded addressing") that is a known, working
+lever elsewhere in the same unit does not transfer past a loop-invariant
+address without care, and the failure modes are symmetric**: forcing the
+unfolded form via a named/typed local pointer risks OVER-hoisting (as
+this report's five attempts found -- LICM operates on the RTL address-of
+regardless of C-level scope), while doing nothing under-folds. Both
+failure directions were already documented; this pass adds that the
+BARE-ARRAY-DECAY vs EXPLICIT-INDEX spelling of the same access is NOT the
+axis that matters here (confirmed identical `--debug` scores), which
+narrows the next attempt's search to expression SHAPE at the point of use
+rather than array-vs-index syntax.
+
+## Round: coordinator-directed type-axis test (runner delta) -- negative, evidence attached
+
+Directly tested the type/width lever against this function's own
+disassembly. `D_8006D8D8` loads via `lbu` (unsigned byte, matching its
+`u8[2]` declaration exactly); the OTHER callback's argument,
+`D_8006D8D9`, also loads via `lbu` (matching its `u8` declaration);
+`D_8006D5FC`/`D_8006D600` (function-pointer globals) and
+`D_8006D8C0` (a `volatile u8 *`, itself loaded via `lw` since it is a
+POINTER, then dereferenced via `lbu`/`sb` for the byte it points to) all
+match their current declared types exactly, opcode for opcode. No room
+for a hidden width/signedness bug on any value this function touches.
+Verdict unchanged: this is the loop-invariant-hoisting-vs-folded-address
+residue already documented, not a type mismatch. No source changes.
+
+## Round 19: permuter run completed -- found score 0, but the fix is UNSAFE and was rejected
+
+The permuter scaffold this report describes as "prepared but not yet
+searched" was finally run this round. Rebuilt the scaffold fresh
+(`tools/setup-permuter.sh callback <seed>`, seed = this report's
+corrected `D_8006D8D8[0]` body), confirmed base score 140 via `--debug
+--stack-diffs` (matches this report's earlier characterization exactly:
+`Register Differences: 8, Deletions: 1`), then searched with
+`timeout 300 ... permuter.py -j 6 --stop-on-zero --best-only` in the
+background per the round's process rules. **It found a genuine zero at
+iteration 2095** (`permuter-work/callback/output-0-1`), well within
+the 300s bound.
+
+The winning source makes two substantive changes beyond this report's
+body (plus assorted permuter noise -- a pointless `if (D_8008B3CC) {...}
+else {...}` duplicating the `getintr()` call, and a dead
+`if (1) {}` after the `break` -- neither of these two noise items changed
+the score either way when isolated, but see the caution below about
+assuming that generalizes):
+
+1. **`D_8006D8D8`'s extern declaration retyped `volatile`** (`extern
+   volatile u8 D_8006D8D8[2];` instead of plain `u8[2]`).
+2. Both callback pointers precomputed **before** their null-check
+   (`handler = D_8006D600; if (handler != 0) { cb = (cast)handler; ... }`
+   for one branch, `cb = (cast)D_8006D5FC; if (D_8006D5FC != 0) {
+   cb(...); }` for the other -- note the asymmetry between the two
+   branches is itself part of the winning shape, not noise).
+
+**Verified via `permuter.py --debug`: this source genuinely scores 0
+against retail's own assembled bytes for this function in isolation.**
+That part of the "permuter score is a LEAD, not a RESULT" caution
+checked out fine. But re-verifying against the REAL oracle
+(`./build-and-verify.sh`) surfaced something the permuter's isolated
+per-function scorer cannot see and that funcdiff's usual four ways-a-
+score-lies list doesn't quite name either:
+
+**Declaring `D_8006D8D8` `volatile` shifts a NEIGHBORING global's
+address by 4 bytes, corrupting `CD_flush` -- an unrelated,
+already-matched sibling in the SAME file that references a different
+symbol in the same `D_8006D8xx` block.** Verified directly, twice, with
+`asm/` freshly re-extracted so there was no stale-`.s` confound:
+
+```
+$ grep 'D_8006D8C0\b' build/lsdde.map      # plain `u8 D_8006D8D8[2]` (baseline)
+                0x8006d8c0                D_8006D8C0
+
+$ grep 'D_8006D8C0\b' build/lsdde.map      # `volatile u8 D_8006D8D8[2]`, callback
+                0x8006d8c4                D_8006D8C0        # <- shifted +4
+```
+
+With `callback` left safely as `INCLUDE_ASM` (contributing zero
+drift of its own) and ONLY the `volatile` qualifier changed,
+`CD_flush` -- fully matched (58/58) on `main` -- regresses to
+34/59 words, and `asm-differ` confirms it is a REAL codegen change, not
+a benign immediate-shift artifact: a store's low-half immediate moves
+by exactly 4 (`-0x29e4` -> `-0x29e0`) because some later symbol in the
+same block shifted address, consistent with `volatile` changing GCC
+2.6.3's assumed alignment for the 2-byte array (likely rounding it up
+to 4-byte alignment for atomic-access purposes) and pushing everything
+declared contiguously after it forward by the padding. This is CLAUDE.md's
+"any struct/global edit can break an already-matched function in ANOTHER
+unit" hazard, generalized one step further: it is not only a struct
+FIELD insertion that does this -- a bare QUALIFIER change on a plain
+global array, with no size change at all, reproduces the identical
+failure mode (compiles clean, oracle-verified red only at the
+whole-image level, invisible from the target function's own diff).
+
+**This makes the permuter's zero-score fix inapplicable, not just
+risky.** The two non-`volatile`-dependent forms of the same idea were
+already tried and independently rejected in the original report's
+attempts 2-4 (named local pointer at various scopes, and an anonymous
+`*(volatile u8 *)&D_8006D8D8` cast at the use site with no named local
+at all) -- both get hoisted out of the loop by LICM regardless of
+naming, which is the ORIGINAL residue this report documents. The
+permuter's route around that (qualify the DECLARATION instead of the
+expression) avoids the hoist but breaks a sibling instead. Both routes
+to "force unfolded, un-hoisted addressing for this one access" are now
+tried and both fail, for different reasons. **Reverted; `src/` still
+carries plain `INCLUDE_ASM` for this function, confirmed via a full
+`./build-and-verify.sh` (exit 0) after reverting.**
+
+### Proposed learning (supersedes/extends the earlier one in this file)
+
+A permuter zero score is validated against the TARGET FUNCTION'S OWN
+bytes in isolation and cannot see cross-translation-unit linker effects.
+When a winning candidate retypes a GLOBAL (not just a local), re-verify
+with more than `funcdiff.py` on the one function: check whether the
+retype shifts a neighboring symbol's map address
+(`grep '<neighbor_symbol>\b' build/lsdde.map` before and after) and spot-
+check at least one sibling function that touches a nearby symbol in the
+same block. This is a materially different failure mode from the
+already-documented "permuter-local improvement is false against the real
+oracle" caution -- here the TARGET function's own score is genuinely and
+correctly zero; the collateral damage is entirely outside it, in a
+sibling the permuter never compiled or scored.
+
+### Proposed learning: `make clean` + `make extract` desync with in-progress `src/` edits
+
+Diagnosed while chasing the `volatile`-retype experiment above, and
+worth its own entry since it is a pure tooling/workflow trap, not
+specific to this function.
+
+**Symptom.** After `make clean` (which removes `asm/` entirely) followed
+by `make extract` (which regenerates it from the retail binary), a build
+hard-fails with an assembler error like:
+
+```
+{standard input}: Assembler messages:
+{standard input}:497: Error: can't open asm/nonmatchings/<unit>/<func>.s for reading: No such file or directory
+```
+
+on a function that a moment ago was building fine as `INCLUDE_ASM`.
+
+**Cause.** `make extract`'s underlying `splat` invocation does not
+disassemble unconditionally for every function in the segment -- for at
+least some configurations it appears to skip regenerating a
+`nonmatchings/<unit>/<func>.s` file for any function whose `src/*.c`
+currently holds a REAL C definition rather than an `INCLUDE_ASM(...)`
+call for it. If `make extract` is run at a moment when a function is
+mid-experiment (a real C body sitting in `src/` in place of its
+`INCLUDE_ASM`, exactly the state every attempt in this workflow passes
+through), the regenerated `asm/` tree comes out MISSING that function's
+`.s` file entirely. The build then works fine as long as `src/` keeps
+the C body -- but the moment that body is reverted back to
+`INCLUDE_ASM("asm/nonmatchings/<unit>/<func>", <func>)` (the mandatory
+end state for anything short of byte-exact), the `INCLUDE_ASM` macro has
+nothing to include, and the assembler fails outright. This can happen
+purely as a side effect of an unrelated accident earlier in the session
+(here: a `make clean` run to recover from a different problem) landing
+at the wrong moment relative to an in-progress attempt.
+
+**Recovery.** Re-run `make extract` with EVERY function in the affected
+unit(s) back in its normal `INCLUDE_ASM` (or byte-exact matched) state
+first -- i.e. finish or revert whatever experiment was in progress
+before re-extracting. `make extract` regenerates whichever `.s` files
+are missing once `src/` reflects the real, checked-in state; there is
+no separate recovery command needed, just the ordering constraint.
+Verify with `./build-and-verify.sh` (exit 0) afterward, not just "the
+error went away."
+
+**Takeaway.** `make extract`/`make clean` are listed in CLAUDE.md as safe
+to run standalone, and they are -- but they are NOT safe to interleave
+with an in-progress, uncommitted `src/` experiment. Finish reverting
+(or matching) whatever function you're mid-attempt on BEFORE running
+either, not after. This cost real time in this session only because the
+symptom (a missing-file assembler error on an unrelated-looking function)
+gives no hint that the actual trigger was an extract run minutes earlier
+while a different function was mid-edit.
+
+## Round 20 (runner bravo): re-verified the volatile-retype shift is real, tested one new axis -- still STALL
+
+Two things done this round, both negative but load-bearing (they close off
+questions the report otherwise leaves open).
+
+**1. Re-verified the round-19 "volatile retype shifts a sibling" finding from
+scratch**, because that same round's write-up diagnosed a `make clean` +
+`make extract` desync bug *while chasing this exact experiment*, which left
+open the possibility the shift was itself a symptom of that desync rather
+than a genuine C-level effect. Reproduced independently this round: changed
+ONLY `extern u8 D_8006D8D8[2];` to `extern volatile u8 D_8006D8D8[2];` in this
+file (no other change, `callback` still plain `INCLUDE_ASM`), rebuilt
+clean, and got the identical result reported in round 19 -- `D_8006D8C0` moves
+from `0x8006d8c0` to `0x8006d8c4` in `build/lsdde.map`, and `CD_flush`
+(otherwise 58/58-matched) regresses to `34/59`, `asm-differ`-confirmed as a
+real codegen change (the `-0x29e4`/`-0x29e0` immediate shift, same as
+before). **Not a desync artifact -- the shift is real and reproducible.**
+This route stays closed; do not re-attempt the volatile-global retype.
+
+**2. New axis (not previously tried): applied the permuter's OTHER change --
+precomputing the second callback pointer before its null-check,
+asymmetrically vs the first branch -- WITHOUT the volatile retype**, to test
+whether that restructuring alone (rather than the type change) was what let
+the permuter's winning candidate reach the unfolded address form:
+
+```c
+if (flags & 2) {
+    cb2 = (void (*)(s32, u8 *))D_8006D5FC;
+    if (D_8006D5FC != 0) {
+        cb2(D_8006D8D8[0], D_8008B3CC);
+    }
+}
+```
+
+Result: still 30/56 words, still the folded 2-instruction `D_8006D8D8`
+access, no change at all from the baseline body in this report. The
+restructuring by itself does nothing; the permuter's zero depended
+specifically on the (unsafe) volatile retype, not on this reordering.
+
+**Conclusion: both known routes to retail's unfolded `D_8006D8D8` address
+are now confirmed dead ends** -- pointer-local hoisting (rounds prior) and
+global retype (round 19, re-confirmed round 20) both fail, for different
+reasons, and the reordering axis this round adds produces no third option.
+No untested axis identified this round. Reverted to `INCLUDE_ASM`
+(`build-and-verify.sh` exit 0 confirmed after revert). Status unchanged:
+STALL, 30/56 words / 220/224 bytes, one instruction short.
+
+### Proposed learning
+
+A prior round's own bug discovery (here: the extract/clean desync) can look
+like it retroactively casts doubt on an EARLIER finding from the same
+investigation, especially when both surfaced from the same experiment
+session. It is worth a cheap, direct re-reproduction rather than either
+(a) trusting the earlier finding blindly or (b) discounting it because a
+later, unrelated bug was found nearby in the same narrative. Here the
+re-check cost one clean build and confirmed the original finding stood.
+
+## Round 33 (runner charlie): re-verified 30/56, title rebuilt with the true isolated diff site, no new attempt
+
+Re-compiled the preserved body verbatim and confirmed independently:
+`build exit=2`, no compile errors, `funcdiff.py` reports **30/56 words, no
+staleness warning, 220/224 bytes (1 instruction short of retail's 56)**.
+Matches this report's own claim exactly.
+
+**First real diff.** With this function's siblings (`CD_init`,
+`func_8002AA6C`, `CD_readsync`) also mid-experiment in the same session,
+`asm-differ`'s naive read was polluted by their own still-open residues
+upstream (a genuine instance of CLAUDE.md's "drift need not come from the
+function you're editing" attribution hazard -- checked `build/lsdde.map` and
+confirmed the apparent first diff at file offset 0x1BBF8 was a 4-byte
+immediate shift caused by upstream drift, not this function's own residue).
+Read the true site directly off retail's own `.s` instead, which this
+report's prose already pinpoints precisely: `asm/nonmatchings/code_179d8_g/
+callback.s` line 46, **file offset `0x1BC84`, vram `0x8002B484`** --
+the `lui $v0,%hi(D_8006D8D8) / addiu $v0,$v0,%lo(D_8006D8D8) / lbu $a0,0x0
+($v0)` unfolded 3-instruction sequence this build's plain `D_8006D8D8[0]`
+reference folds to 2. The title above had a byte-count but no location
+figure before this round.
+
+**No new attempt.** Both known routes to retail's unfolded address (pointer-
+local hoisting, which regresses via LICM since the target is loop-invariant;
+and a global `volatile` retype, which scores 0 locally but corrupts a
+sibling function's linked address, confirmed twice across rounds 19-20) are
+dead ends for reasons independent of each other, and this round's own
+`CD_readsync` investigation (see that report) found the SAME class of
+"redundant reload vs. register-pressure choice" resistant to reordering too
+-- consistent with this being a genuine instruction-SELECTION residue
+(explicitly not a scheduling one: a bare `__asm__("")` barrier was already
+tried here and did nothing, matching the general rule that a barrier only
+reorders within a block and cannot change which addressing mode cc1 selects).
+No new idea to try; re-running an already-exhausted axis would not add
+information.
+
+### Round-32 lever checklist
+1. `volatile`-as-narrower-instrument: already tried at both granularities
+   (local pointer -- over-hoists; global retype -- breaks a sibling) with
+   neither being the ordinary-barrier case this lever targets. Not
+   applicable to a selection residue.
+2. Register-identity verdict as hypothesis: N/A -- this residue is
+   confirmed instruction SELECTION (folded vs. unfolded addressing), not
+   register identity; no register is misassigned.
+3. Emission-order vs. source-order: N/A this round.
+4. Permuter negative is one search: a permuter run in an earlier round DID
+   find a genuine zero (iteration 2095) via the volatile-retype route, and
+   it was independently confirmed unsafe against the real oracle (breaks
+   `CD_flush`) rather than merely untested -- this is the rarer case
+   where the permuter's positive result is the one that had to be rejected,
+   not a negative search to re-extend.
+5. asm-differ/permuter text-vs-encoding gap: checked directly -- the folded
+   (`lui $at,.../ lbu $a0,%lo(...)($at)`, 2 instructions) vs. unfolded
+   (`lui $v0,.../ addiu $v0,.../ lbu $a0,0x0($v0)`, 3 instructions) forms
+   are genuinely different instruction counts, not an `addiu`/`ori`
+   rendering coincidence.
+
+### Proposed learning
+When multiple sibling functions in the same unit are mid-experiment at once
+(a normal state for a multi-function pass), `asm-differ`'s raw first-diff
+read for one of them can be polluted by an upstream sibling's own open
+residue shifting later addresses by a few bytes -- even though each
+individual function's OWN compiled length is unaffected. Cross-check a
+surprising "first diff" against the RAW retail `.s` (or re-run with the
+siblings reverted to `INCLUDE_ASM`) before trusting it, the same discipline
+CLAUDE.md already prescribes for whole-image drift, just at per-function
+diff granularity.
+
+## Round 36 (runner bravo): re-verified 30/56 in isolation -- SKIPPED as exhausted, no new attempt
+
+This report's preserved body carries no stale Psy-Q names (`tools/
+stalesyms.py` does not flag it, unlike its five siblings in this unit).
+Rebuilt verbatim, in isolation from the other five stalled siblings (see
+`CD_init.md`'s round-36 entry: this exact function is the one whose
+own 4-byte shortfall causes the cross-contamination that entry documents,
+so it is doubly important to check IT in isolation from itself, i.e. with
+no other sibling's independent near-miss also live): `build exit=2`, no
+compile errors, `funcdiff.py` reports **30/56 words, no staleness warning,
+220/224 bytes (1 instruction short)** -- matches this report's own claim
+exactly, no discrepancy.
+
+**SKIPPED as exhausted, no new attempt.** This function's history is the
+most heavily worked in this unit: both known routes to retail's unfolded
+`D_8006D8D8` address (a local pointer, which over-hoists via LICM since the
+target is loop-invariant; and a global `volatile` retype, which scores a
+permuter-confirmed ZERO but corrupts a sibling function's bss address,
+independently reproduced across rounds 19 and 20) are DEAD ENDS for
+different, well-characterized reasons, and a bare `__asm__("")` barrier
+(the remaining lever HARD RULE 6 would permit) was already tried and does
+nothing (this is a selection residue -- folded vs. unfolded addressing --
+not an ordering one). Given this round's budget went to running fresh
+permuter searches on the two SMALLEST siblings (`CD_datasync`,
+`cb_read`, per this round's own instructions to prefer the smallest
+measured gap) plus `CD_readsync` (which had never seen ANY permuter run
+at all), and this function already HAS a permuter-confirmed result that is
+unsafe rather than merely untested, there was no new lever to spend an
+attempt on here. Restored to `INCLUDE_ASM` (unchanged, was already there).
+
+## Round 39 (runner delta): re-verified 30/56 in isolation -- SKIPPED as exhausted, no new attempt
+
+Rebuilt the preserved body verbatim (no stale-name issue -- `tools/
+stalesyms.py` does not flag this report): `build exit=2`, no compile errors,
+`funcdiff.py` reports **30/56 words, 220/224 bytes (1 instruction short)** --
+matches every prior round's recorded figure exactly, no discrepancy.
+
+Checked this round's two new levers against the residue before declining to
+spend an attempt:
+
+- **Hoist-both-before-either**: does not apply. The residue is a single
+  address (`&D_8006D8D8`) computed once per loop iteration for one callback
+  argument -- there is no second, independently-producible value it competes
+  with for consumption order. This is confirmed instruction-SELECTION
+  (folded vs. unfolded addressing), not a two-value scheduling question.
+- **The unused-frame lever**: N/A, retail's own frame here is what this
+  body already reproduces exactly except for the one addressing-mode word;
+  no missing `addiu $sp,$sp,-N` is involved.
+- **The permuter's "always-true either-branch" trick** (this round's
+  `CD_readsync`/`CD_datasync` findings, same unit): this function's
+  own history already has the analogous case tried and REJECTED for a
+  different reason -- round 19's permuter search found a genuine zero via
+  RETYPING the global `D_8006D8D8` `volatile`, which is a stronger move
+  than a branch trick and still failed (it shifts a sibling's `.bss`
+  address and corrupts an unrelated, already-matched function). A
+  same-function branch-trick placement was not separately re-tried this
+  round given that the underlying mechanism (LICM hoisting the address
+  regardless of how it's referenced) is a control/optimizer-level effect a
+  branch on an unrelated variable would not plausibly touch, and this
+  function's dead ends are already the most heavily characterized in the
+  unit (two independent routes, both confirmed broken for unrelated
+  reasons, across rounds 19-20).
+
+**No new attempt.** Restored to `INCLUDE_ASM`; body unchanged from the
+original report's preserved best.
+
+### Proposed learning
+
+Not every register/addressing-mode residue is reachable by the
+"branch-trick"/"reuse a hot register" family of permuter-found levers that
+closed two other stalls in this same unit this round -- when the underlying
+mechanism is the OPTIMIZER'S OWN control/data-flow analysis (LICM deciding
+whether an address is worth hoisting) rather than the REGISTER ALLOCATOR'S
+naming choice, forcing extra liveness at an unrelated program point has no
+obvious lever to pull, because the loop-invariant address in question is
+already provably live for the whole loop regardless of what else is live
+around it.
+
+## Round 41 (runner charlie): reconfirmed 30/56, checked this round's dead-reload lever -- does not apply, no new attempt
+
+Rebuilt the preserved 30/56 body verbatim into `src/` in isolation: `build
+exit=2`, no compile errors, `funcdiff.py` reports **30/56 words, 220/224
+bytes (1 instruction short)** -- matches every prior round's recorded
+figure exactly, no discrepancy. The drift warning this build produces is
+this function's OWN documented 4-byte shortfall (it shifts `.bss`
+project-wide when live alongside anything else -- see round 36's entry),
+not a new problem.
+
+**Checked this round's flagged lever (the "dead reload" pattern -- `p =
+x->y; p->z = 0;` where `p` already holds `x->y` from earlier in the same
+block) against this function's body before spending an attempt, per this
+round's own instruction to read a register-identity/addressing residue for
+it first.** It does not apply: every value this function touches
+(`D_8006D8C0`, `D_8006D8D9`/`pd9`, `D_8006D600`, `D_8006D5FC`,
+`D_8006D8D8`) is read exactly once per site with no earlier same-block load
+of the same address to make redundant. The residue here is confirmed
+instruction-SELECTION (folded vs. unfolded addressing for `D_8006D8D8`'s
+loop-body access), not a redundant-load-elimination opportunity -- the
+"dead reload" lever is a different mechanism (it worked on
+`func_8004B700`/`func_8004BE54` in a different unit this round by removing
+an already-redundant fetch, not by changing which addressing mode a fresh
+fetch compiles to) and has no site to attach to here.
+
+**No new attempt.** This function's two known routes to retail's unfolded
+`D_8006D8D8` address (a local pointer, which LICM over-hoists since the
+target is loop-invariant; and a global `volatile` retype, which scores a
+permuter-confirmed ZERO but shifts a sibling function's `.bss` address by
+4 bytes, corrupting `CD_flush`) are independently confirmed dead
+ends across rounds 19-20, for two different and unrelated reasons, and no
+third route has been identified in three subsequent re-verification
+passes (36, 39, 41). Restored to `INCLUDE_ASM` (unchanged, was already
+there); full `./build-and-verify.sh` re-confirmed `OK: build matches
+retail SLPS_015.56`, exit 0.
+
+### Proposed learning
+
+Extends this unit's own catalogue of "not every register/addressing
+residue is reachable by every permuter-found lever family" -- the
+dead-reload-removal lever (found productive in a different unit this
+round) requires an actual redundant load to remove; a residue that is
+pure ADDRESSING-MODE selection on a load that happens exactly once has no
+analogous move. Screening a residue against a new lever before spending an
+attempt on it (as this round's brief asked) is cheap and, here, correctly
+predicts a miss rather than costing a wasted build.
+
+## Round 49 (runner echo): fresh permuter search (first ever, per this round's assignment) -- negative, one candidate is UB, a safe hand variant of the same idiom regresses
+
+Rebuilt the preserved 30/56 body verbatim in isolation (`func_8002AA6C` also
+mid-experiment in the same session; checked `build/lsdde.map`/`objdump`
+directly rather than trusting `funcdiff.py`'s own outside-range warning to
+distinguish the two, per this report's own round-33 caution): `build exit=2`,
+no compile errors, `funcdiff.py` reports **30/56 words, 220/224 bytes (1
+instruction short)** -- matches every prior round's recorded figure exactly.
+
+### Permuter scaffold validated (check 3: AGREE)
+
+`tools/setup-permuter.sh callback permuter-seeds/callback.c`
+(seed = the corrected `D_8006D8D8[0]` body already established by this
+report's earlier rounds). `--debug --stack-diffs`: base score **140**
+(`Register Differences: 8, Deletions: 1`, no reorderings/insertions) --
+matches this report's own repeatedly-confirmed characterization exactly
+(a single-deletion, pure-register residue = the one-instruction addressing
+shortfall). AGREE per check 3 -- this function had genuinely never been
+searched by the permuter before (confirmed by grep across every prior round
+section in this file; round 20's note about a queued-but-blocked
+`PERM_GENERAL` seed never actually ran, and no later round mentions running
+one either).
+
+### Search: ~28,927 iterations, process exited at its own 600s bound
+
+```
+timeout 600 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/callback
+```
+
+**Process-compliance gap, noted rather than hidden**: this run's `rc` was not
+captured to its own file as this round's broadcast instructs (a plain
+backgrounded `&` job was used instead of the `timeout ...; rc=$?; printf
+'%s\n' "$rc" > rc.txt` form) -- the search log shows exactly 28927 iterations
+and no further lines after the process's own multiprocessing
+resource-tracker shutdown warning, consistent with the 600s bound firing
+naturally, but the exit code itself was not recorded. Iteration count is the
+recorded fallback per this round's own logging guidance.
+
+`--best-only` saved two improvements over the 140 base: 140 -> 115 -> 75.
+No zero found.
+
+### The 75-candidate is UNSOUND -- a live variable read under its old meaning, not a dead-sink reuse
+
+The winning mutation reuses `pd9` (already hoisted into a persistent
+register for `&D_8006D8D9`, live across the WHOLE loop) as a throwaway
+pointer for `D_8006D8D8`'s address in the second callback branch:
+
+```c
+if (flags & 2) {
+    if (D_8006D5FC != 0) {
+        pd9 = D_8006D8D8;
+        ((void (*)(s32, u8 *))D_8006D5FC)(pd9[0], D_8008B3CC);
+    }
+}
+```
+
+This LOOKS like the unit's established "reuse an already-hot register as a
+throwaway sink" idiom (`func_8002AA6C`, `CD_datasync`, `CD_readsync` all
+confirmed instances), but tracing `pd9` FORWARD to its next use (per this
+round's broadcast lever 3, from delta's round-48 finding) shows it is NOT a
+dead sink: `pd9` is set ONCE before the loop and read on EVERY iteration's
+`flags & 4` branch via `*pd9`. If `flags & 2` ever fires (reassigning `pd9`
+to `&D_8006D8D8`), every SUBSEQUENT iteration's `flags & 4` branch reads the
+WRONG address -- a genuine, real logic bug, not a semantically-inert store.
+This is exactly the class of trap this round's broadcast names: the
+permuter's scorer only diffs compiled bytes and cannot see that this
+"improvement" changes the function's actual behavior. **Rejected without
+even building it into the real oracle** -- the forward-trace already proves
+it unsound, and the earlier three confirmed instances of this idiom in this
+unit all have the property that the reused variable is fully overwritten
+before its next read (verified in each of their own reports); `pd9` here
+does not have that property.
+
+### Hand variant: the same idiom with a genuinely safe sink (`handler`) -- tried, regresses with drift
+
+`handler` (`s32 handler;`) IS a safe reuse target: it is assigned fresh from
+`D_8006D600` at the top of every `flags & 4` branch, immediately before its
+only read, so any value left in it from a previous iteration (including one
+written by a different branch) is never read under a stale meaning. Tried
+reusing it for the same address-computation idiom instead of `pd9`:
+
+```c
+if (flags & 2) {
+    if (D_8006D5FC != 0) {
+        handler = (s32)D_8006D8D8;
+        ((void (*)(s32, u8 *))D_8006D5FC)(((u8 *)handler)[0], D_8008B3CC);
+    }
+}
+```
+
+Result: **regressed with drift** (the function's own compiled length grew,
+294558 bytes outside-range per `funcdiff.py`'s own warning -- consistent
+with this function's own known 4-byte shortfall PLUS additional growth from
+this change, not just the baseline shortfall alone). Reverted immediately.
+This safe variant does not reproduce retail's addressing shape; `handler`'s
+register is evidently not the one retail's scheduler wanted for this
+address, unlike `pd9`'s (which produced the closer, but unsound, byte
+alignment).
+
+**No safe new lever found.** Restored to `INCLUDE_ASM` (unchanged from every
+prior round's preserved 30/56 best); full `./build-and-verify.sh`
+re-confirmed `OK: build matches retail SLPS_015.56`, exit 0, after
+reverting all of this session's siblings.
+
+### Proposed learning
+
+- **The unit's own "reuse an already-hot register as sink" idiom has a
+  necessary precondition this report's earlier rounds never had to state
+  explicitly because it was always satisfied by construction: the reused
+  variable's OLD value must be dead at every point reachable from the reuse
+  site, not merely "not read immediately after."** `pd9` fails this (read
+  again on a LATER loop iteration under its old meaning); `func_8002AA6C`'s
+  `n`/`saved` and `CD_datasync`'s `ok` all pass it (each is either about
+  to `return` or is unconditionally overwritten before the next read, with
+  no loop-carried path back to a stale read). Before adopting ANY
+  permuter-found reuse-as-sink candidate, trace the reused variable forward
+  across a loop boundary specifically, not just to the next textual
+  statement -- a single straight-line trace can miss a loop-carried stale
+  read entirely.
+- A CORRECT choice of reuse target does not automatically reproduce
+  retail's bytes -- `handler` is genuinely safe here (unlike `pd9`) but
+  produces worse alignment, confirming (again) that this residue is a
+  specific REGISTER IDENTITY question, not merely "any reuse of any already
+  hot register helps."
+
+## Round 68 (runner charlie): NON_MATCHING body promoted
+
+Track 1b. This report's "Best C reached" body (30/56 words, 220/224 bytes,
+1 word short) is hand-derived, not a permuter candidate -- every permuter
+search run against this function either found nothing (round 49's 300s/600s
+searches) or found a zero that was independently confirmed UNSAFE against the
+real oracle (round 19: the winning candidate retypes the global `D_8006D8D8`
+`volatile`, which shifts a sibling symbol's `.bss` address by 4 bytes and
+corrupts the already-matched `CD_flush`; reverted, re-confirmed round
+20) or UNSOUND (round 49's 75-score candidate reuses `pd9` across a
+loop-carried stale read, a real logic bug the scorer cannot see). No
+permuter output was ever adopted. Placed in `src/code_179d8_g.c` under
+`#ifdef NON_MATCHING`, using this report's own corrected `D_8006D8D8[0]`
+spelling (runner delta's correction, identical `--debug` score to the
+bare-array form) rather than the original body's implicit-truncation
+decay, since the promoted body is read, not scored.
+
+NON_MATCHING body promoted, round 68.

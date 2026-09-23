@@ -272,7 +272,7 @@ and stored identically to retail.
 5. **A preserved body's `jal` targets can go stale when they were written
    before an SDK-object round gave the target a real symbol.** This
    report's own `func_80039228`/`func_80039104` (round 26) and
-   `UpdateVoiceEnvelopes.md`'s `func_800375E8` (round 26) were both placeholder
+   `SpuVmFlush.md`'s `func_800375E8` (round 26) were both placeholder
    `func_ADDRESS` names at write time; `asm/nonmatchings/.../<func>.s`
    itself now names them `_spu_setInTransfer`/`SpuInitMalloc`/
    `SpuSetNoiseVoice` per `config/symbols.slps01556.lsdde.txt`. The score
@@ -291,7 +291,7 @@ and stored identically to retail.
 #if 0
 extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
-extern void UpdateVoiceEnvelopes(void);
+extern void SpuVmFlush(void);
 
 extern u8 gSpuMallocArea[];
 extern s16 D_8008E9FC;
@@ -470,7 +470,7 @@ void InitSpuDriver(s32 a0) {
     gDisableVoiceStarveScan = 0;
     D_8008E8C0 = 0;
     D_8008E938 = 0x80;
-    UpdateVoiceEnvelopes();
+    SpuVmFlush();
 }
 #endif
 ```
@@ -711,7 +711,7 @@ pointless assignment) by ordinary C style standards.
 unit owns plus `gMasterVolL`/`gMasterVolR` (reset to `0x3FFF`, the PS1
 SPU's actual 14-bit max volume register value -- strong corroborating
 evidence for those two names, tier B on their own), and calls
-UpdateVoiceEnvelopes once at the end. This is squarely "initialize the
+SpuVmFlush once at the end. This is squarely "initialize the
 sound driver"; nothing about it is guessed beyond what the body does.
 
 ## Proposed field names

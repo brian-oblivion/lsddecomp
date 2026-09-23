@@ -323,7 +323,7 @@ form only in operand/branch order.
 
 Re-read `asm/nonmatchings/DreamSys/DreamSys__AdvanceMoveCycle.s` directly against this
 report's two documented residues. Both check out exactly as described --
-no transcription errors found (unlike `func_8002B3F4` this same round,
+no transcription errors found (unlike `callback` this same round,
 where the preserved C had a bare-array-vs-dereference bug): the prologue
 really is `sw s0 / addu s0,a0,zero / sw s2 / addu s2,a1,zero / sw s1 /
 addu s1,zero,zero / sw ra / sw s3`, with the entry-branch's delay slot
@@ -335,7 +335,7 @@ finding precisely. And `count` (`this->unk_0xB4 + 1`) really does live in
 `slti $v0,$a0,0x4`. No new lead found by re-reading; the report's own
 "for the next attempt" guidance stands. Seed already validated
 (`--debug` base 640: 8 register differences, 4 insertions, 2 deletions,
-0 reorderings/stack/branch). Queued behind `DreamSys__SoundCueCallback`, `func_8002B3F4`
+0 reorderings/stack/branch). Queued behind `DreamSys__SoundCueCallback`, `callback`
 and `func_80064E34` for a search slot. No source changes; `INCLUDE_ASM`
 untouched.
 
@@ -420,7 +420,7 @@ permuter run seeded on this exact body (`tools/setup-permuter.sh
 DreamSys__AdvanceMoveCycle <this body>`) is the next reasonable step, and should now
 also close the tail-merge residue in addition to the two previously known
 ones -- it was not tried this round due to time budget, and the seed used
-for a PRIOR round's queued-but-not-yet-run permuter mention (`func_8002B3F4`,
+for a PRIOR round's queued-but-not-yet-run permuter mention (`callback`,
 `func_80064E34`) never actually included this residue since it wasn't known
 to exist yet.
 

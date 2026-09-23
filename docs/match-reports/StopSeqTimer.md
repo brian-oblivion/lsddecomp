@@ -7,8 +7,8 @@
 ## What it does
 
 Sibling of `StartSeqTimer`: the same one-argument tail-call wrapper
-around `SeqTimerControl`, called with `0` instead of `1`. See
-`StartSeqTimer.md` for what `SeqTimerControl` itself does and why it is
+around `_SsStart`, called with `0` instead of `1`. See
+`StartSeqTimer.md` for what `_SsStart` itself does and why it is
 `void`.
 
 ## The C
@@ -16,11 +16,11 @@ around `SeqTimerControl`, called with `0` instead of `1`. See
 ```c
 void StopSeqTimer(void)
 {
-    SeqTimerControl(0);
+    _SsStart(0);
 }
 ```
 
-(shares the `extern void SeqTimerControl(s32 arg0);` prototype declared
+(shares the `extern void _SsStart(s32 arg0);` prototype declared
 above `StartSeqTimer` in `src/code_179d8_c.c`.)
 
 ## Provenance
@@ -31,7 +31,7 @@ Matched first attempt, alongside `StartSeqTimer`.
 ## Naming
 
 Round 69 (delta). `StopSeqTimer` (was `func_800329B8`): tail-call wrapper
-calling `SeqTimerControl(0)`. Tier B, mirroring `StartSeqTimer` -- see
-`SeqTimerControl.md`'s case-5 description: `arg0==0` increments
+calling `_SsStart(0)`. Tier B, mirroring `StartSeqTimer` -- see
+`_SsStart.md`'s case-5 description: `arg0==0` increments
 `gSeqTimerStopPending` and falls straight into the teardown path
 (`VSyncCallback(SsSeqCalledTbyT)`) instead of arming a new rate.

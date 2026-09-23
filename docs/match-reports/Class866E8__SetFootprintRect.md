@@ -373,7 +373,7 @@ paths, both consistent within themselves).
 penalty list: `Insertions: 6 (100)`, `Deletions: 6 (100)`, `Register
 Differences: 28 (5)`, `Stack Differences: 172 (1)`. This is FAR from
 0/0 -- on its own, this would usually mean decline the search (see
-`func_800344FC`'s round-47 entry for the contrasting clean case).
+`NoteOn`'s round-47 entry for the contrasting clean case).
 
 **(c) does the scaffold's signature agree with the real build's own
 residue -- checked instead of declining outright, and this is the

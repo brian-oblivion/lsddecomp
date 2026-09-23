@@ -29,7 +29,7 @@
  * DELETED, not commented out.
  *
  * `D_8008EA22`'S OWN COMMENT WAS WRONG AND IS CORRECTED HERE (round 36): it
- * used to claim `SsUtPitchBend` and the deleted `func_80030648` were its
+ * used to claim `SsUtPitchBend` and the deleted `SpuVmGetSeqRVol` were its
  * only readers in this family, and dropped the extern on that basis. That
  * was never true of this file's own two remaining stalls -- func_80030E90
  * and func_8003149C both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
@@ -155,7 +155,7 @@ extern u16 D_8008EA24;
 extern s32 func_8002CF18(void);
 extern void func_8002D6A4(void);
 extern void func_8002D8E0(s32 a0);
-extern s32 func_8002E038(u16 a0, u16 a1);
+extern s32 note2pitch2(u16 a0, u16 a1);
 extern void func_8002D1B4(s32 a0, u16 a1);
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 
@@ -423,7 +423,7 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     if ((s16) D_8008EA24 == 0xFF) {
         func_8002D8E0((u8) result);
     } else {
-        s32 ret = func_8002E038((u16) p3, p4);
+        s32 ret = note2pitch2((u16) p3, p4);
         func_8002D1B4(1, (u16) ret);
     }
     D_8008E934 = 0;
@@ -569,7 +569,7 @@ s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p
     if ((s16) D_8008EA24 == 0xFF) {
         func_8002D8E0((u8) idx);
     } else {
-        s32 ret = func_8002E038(p3, p4);
+        s32 ret = note2pitch2(p3, p4);
         func_8002D1B4(1, (u16) ret);
     }
     D_8008E934 = 0;

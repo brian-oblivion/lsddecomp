@@ -270,11 +270,6 @@ CdReadSync = 0x80029254; // type:func  (Psy-Q libcd/sys, from the SDK object)
 CdRead = 0x80029274; // type:func  (Psy-Q libcd/sys, from the SDK object)
 CdIntToPos = 0x800292F4; // type:func  (Psy-Q libcd/sys, from the SDK object)
 CdPosToInt = 0x800293F8; // type:func  (Psy-Q libcd/sys, from the SDK object)
-// libcd/bios getintr, identified: shape 0.92 vs the 3.5/3.6 bios.o getintr (masked
-// 0.00, a build no disc carries); position right after libcd/sys and before the
-// pinned CD_sync, bios.o's own order; libcd's CDROM/DiskError strings (report).
-// Matched as C in round 70. Name pending for track 2's rename.py run.
-func_80029478 = 0x80029478; // type:func
 CdSearchFile = 0x8002B640; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
 _cmp = 0x8002B928; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
 CD_newmedia = 0x8002B94C; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
@@ -1067,12 +1062,29 @@ BeginVoiceFade = 0x8002E874; // type:func
 StepVoiceFade = 0x8002EA44; // type:func
 StepVoiceEnvelope = 0x8002E4D8; // type:func
 InitSpuDriver = 0x8002EDD4; // type:func
-PlaySound = 0x8002F20C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
+// SpuVmNoiseOnWithAdsr (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded
+// game-style name PlaySound. Round 71 (bravo, track 2).
+SpuVmNoiseOnWithAdsr = 0x8002F20C; // type:func
 ClearNoiseVoices = 0x8002F2A4; // type:func
-PlayFixedSound = 0x8002F368; // type:func
-ApplyVoicePitchBend = 0x8002F3E8; // type:func
-ApplyPitchBendToAllVoices = 0x8002F610; // type:func
-UpdateVoiceEnvelopes = 0x8002F700; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmNoiseOn
+// (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded game-style name
+// PlayFixedSound. Round 71 (bravo, track 2).
+SpuVmNoiseOn = 0x8002F368; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address SpuVmPBVoice by relocation), shape 0.97-0.99 vs libsnd/vmanager
+// SpuVmPBVoice. Superseded game-style name ApplyVoicePitchBend.
+// Round 71 (bravo, track 2).
+SpuVmPBVoice = 0x8002F3E8; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
+// SpuVmPitchBend (discs 3.3,3.5; libsnd/vm_pb on 3.6). Superseded
+// game-style name ApplyPitchBendToAllVoices. Round 71 (bravo, track 2).
+SpuVmPitchBend = 0x8002F610; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address SpuVmFlush by relocation), fingerprint masked 0.99 vs
+// libsnd/vmanager SpuVmFlush (disc 3.3). Superseded game-style name
+// UpdateVoiceEnvelopes. Round 71 (bravo, track 2).
+SpuVmFlush = 0x8002F700; // type:func
 StartNote = 0x8002FAC4; // type:func
 StopNote = 0x800300D0; // type:func
 gVoiceEnvActive = 0x8008D9A4;
@@ -1305,14 +1317,29 @@ FormatNumberIntoBuffer = 0x8004D6AC; // type:func
 gClass869D8Methods = 0x800869D8;
 gClass86AA0Methods = 0x80086AA0;
 gClass86B60Methods = 0x80086B60;
-SetSeqTimerMode = 0x80032588; // type:func
-SeqTimerControl = 0x80032708; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit SsSetTickMode
+// (disc 3.3). Superseded game-style name SetSeqTimerMode. Round 71
+// (bravo, track 2).
+SsSetTickMode = 0x80032588; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit's internal
+// _SsStart (disc 3.3). Superseded game-style name SeqTimerControl.
+// Round 71 (bravo, track 2).
+_SsStart = 0x80032708; // type:func
 StartSeqTimer = 0x80032998; // type:func
 StopSeqTimer = 0x800329B8; // type:func
-CancelSeqTimer = 0x800329D8; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit SsEnd
+// (disc 3.3). Superseded game-style name CancelSeqTimer. Round 71
+// (bravo, track 2).
+SsEnd = 0x800329D8; // type:func
 QuitSpu = 0x80032A7C; // type:func
-SeqTimerCallback = 0x80032A9C; // type:func
-SeqTimerDividerCallback = 0x80032AD0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit's internal
+// _SsTrapIntrVSync (disc 3.3). Superseded game-style name SeqTimerCallback.
+// Round 71 (bravo, track 2).
+_SsTrapIntrVSync = 0x80032A9C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit's internal
+// _SsSeqCalledTbyT_1per2 (disc 3.3). Superseded game-style name
+// SeqTimerDividerCallback. Round 71 (bravo, track 2).
+_SsSeqCalledTbyT_1per2 = 0x80032AD0; // type:func
 // libapi/counter, identified: see SetRCnt (round 69)
 GetRCnt = 0x80032BB8; // type:func
 // libapi/counter, identified: see SetRCnt (round 69)
@@ -1425,3 +1452,190 @@ Class6B5CC__SetLightMode = 0x8001D3F8; // type:func
 gClass6B5CCMethods = 0x8006B5CC;
 ROTATION_ZERO = 0x8006B684;
 SCALE_ONE = 0x8006B690;
+// libcd/bios getintr, identified: shape 0.92 vs the 3.5/3.6 bios.o getintr (masked
+// 0.00, a build no disc carries); position right after libcd/sys and before the
+// pinned CD_sync, bios.o's own order; libcd's CDROM/DiskError strings (report).
+// Matched as C in round 70. Renamed round 71 (bravo, track 2).
+getintr = 0x80029478; // type:func  (Psy-Q libcd/bios, shape match, no linked object)
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_ready by relocation), shape 1.00 vs libcd/bios CD_ready. Round 71 (bravo, track 2).
+CD_ready = 0x80029C40; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_cw by relocation), shape 0.99-1.00 vs libcd/bios CD_cw. Round 71 (bravo, track 2).
+CD_cw = 0x80029F10; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libcd/bios CD_vol (discs 3.3,3.5,3.6). Round 71 (bravo, track 2).
+CD_vol = 0x8002A378; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_shell by relocation), position in libcd/bios. Round 71 (bravo, track 2).
+CD_shell = 0x8002A400; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_flush by relocation), position in libcd/bios. Round 71 (bravo, track 2).
+CD_flush = 0x8002A510; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libcd/bios CD_initvol (discs 3.3,3.5,3.6). Round 71 (bravo, track 2).
+CD_initvol = 0x8002A5F8; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_initintr by relocation), position in libcd/bios. Round 71 (bravo, track 2).
+CD_initintr = 0x8002A6EC; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_init by relocation), position in libcd/bios. Round 71 (bravo, track 2).
+CD_init = 0x8002A75C; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libcd/bios CD_readm (disc 3.3). Round 71 (bravo, track 2).
+CD_readm = 0x8002ADE8; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_sync by relocation), shape 0.99-1.00 vs libcd/bios CD_sync. Round 71 (bravo, track 2).
+CD_sync = 0x800299BC; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libcd/bios cb_read (disc 3.3).
+// Round 71 (bravo, track 2).
+cb_read = 0x8002B4D4; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_readsync by relocation), shape 0.99 vs libcd/bios CD_readsync.
+// Round 71 (bravo, track 2).
+CD_readsync = 0x8002AEE0; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_datasync by relocation), fingerprint masked 0.98 vs libcd/bios
+// CD_datasync (discs 3.5,3.6). Round 71 (bravo, track 2).
+CD_datasync = 0x8002B198; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libcd/bios CD_getsector (disc 3.3). Round 71 (bravo, track 2).
+CD_getsector = 0x8002B304; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager note2pitch
+// (disc 3.3); position between libc2/strncmp and libsnd/vm_prog agrees.
+// Round 71 (bravo, track 2).
+note2pitch = 0x8002DF7C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager note2pitch2
+// (disc 3.3); position between libc2/strncmp and libsnd/vm_prog agrees.
+// Round 71 (bravo, track 2).
+note2pitch2 = 0x8002E038; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libcd/bios callback (discs
+// 3.3,3.5,3.6). Renamed by hand (rename.py refuses: "callback" is a
+// pervasive local-variable/field name elsewhere in src/, a false-positive
+// collision -- those are a different C namespace and shadow harmlessly).
+// Round 71 (bravo, track 2). Still NON_MATCHING (30/56 words); unaffected.
+callback = 0x8002B3F4; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmSeKeyOn
+// (discs 3.3,3.5; libsnd/vm_key on 3.6). Round 71 (bravo, track 2).
+SpuVmSeKeyOn = 0x800302DC; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmSeKeyOff
+// (discs 3.3,3.5; libsnd/vm_key on 3.6). Round 71 (bravo, track 2).
+SpuVmSeKeyOff = 0x800303C8; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address SpuVmSetSeqVol by relocation). Round 71 (bravo, track 2).
+SpuVmSetSeqVol = 0x80030404; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libsnd/vmanager SpuVmGetSeqVol (disc 3.3). Round 71 (bravo, track 2).
+SpuVmGetSeqVol = 0x80030584; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
+// SpuVmGetSeqLVol (disc 3.3); the mirror-shape SpuVmGetSeqRVol candidate
+// scores only masked 0.24. Round 71 (bravo, track 2).
+SpuVmGetSeqLVol = 0x800305F4; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
+// SpuVmGetSeqRVol (disc 3.3); the mirror-shape SpuVmGetSeqLVol candidate
+// scores only masked 0.24. Round 71 (bravo, track 2).
+SpuVmGetSeqRVol = 0x80030648; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address SpuVmSeqKeyOff by relocation). Round 71 (bravo, track 2).
+SpuVmSeqKeyOff = 0x8003069C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SsUtGetDetVVol
+// (all discs); module order (objdump libsnd/vmanager.o) has GetDetVVol
+// before SetDetVVol, matching retail's address order. Round 71 (bravo, track 2).
+SsUtGetDetVVol = 0x80031C98; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SsUtSetDetVVol
+// (disc 3.3); module order confirms it follows GetDetVVol. Round 71 (bravo, track 2).
+SsUtSetDetVVol = 0x80031CF0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SsUtGetVVol
+// (discs 3.3,3.5; libsnd/ut_vvol on 3.6); module order has GetVVol before
+// SetVVol, matching retail. Round 71 (bravo, track 2).
+SsUtGetVVol = 0x80031D6C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SsUtSetVVol
+// (disc 3.3); module order confirms it follows GetVVol. Round 71 (bravo, track 2).
+SsUtSetVVol = 0x80031DF8; // type:func
+// identified: AMBIGUOUS fingerprint tie (SsUtAutoVol/SsUtAutoPan, both
+// EXACT masked 1.00, identical 21-word bodies) resolved by position: in
+// sdk/work/3.3/elf/libsnd/vmanager.o (objdump -t), AutoVol (0x4b54)
+// precedes AutoPan (0x4ba8), the same order retail's addresses show here
+// (0x80031E94 < 0x80031EE8) -- the same discriminator that confirmed the
+// Get/Set VVol and DetVVol pairs above. Round 71 (bravo, track 2).
+SsUtAutoVol = 0x80031E94; // type:func
+// identified: AMBIGUOUS fingerprint tie (SsUtAutoVol/SsUtAutoPan, both
+// EXACT masked 1.00, identical 21-word bodies) resolved by position:
+// libsnd/vmanager.o module order has AutoPan (0x4ba8) after AutoVol
+// (0x4b54), matching retail's address order. Round 71 (bravo, track 2).
+SsUtAutoPan = 0x80031EE8; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address Snd_decrescendo by relocation). Round 71 (bravo, track 2).
+Snd_decrescendo = 0x80033C90; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address Snd_play by relocation), resolving a 7-way AMBIGUOUS fingerprint
+// tie (an 11-word trivial-wrapper body shared by Snd_play/SsSepSetAccelerando/
+// SsSepPause/SsSepReplay/SsSepSetRitardando/SsSepStop/_SsSndPlay across
+// several modules). Round 71 (bravo, track 2).
+Snd_play = 0x8003410C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread SeqPlay
+// (disc 3.3). Round 71 (bravo, track 2).
+SeqPlay = 0x80034138; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread GetSeqData
+// (disc 3.3). Round 71 (bravo, track 2).
+GetSeqData = 0x8003424C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread NoteOn
+// (disc 3.3). Round 71 (bravo, track 2).
+NoteOn = 0x800344FC; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread
+// SetProgramChange (disc 3.3); the near-identical-shape ContRpn1/ContRpn2
+// candidates score only masked 0.87. Round 71 (bravo, track 2).
+SetProgramChange = 0x80034614; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContModulation
+// (disc 3.3), near-identical-shape ContPortaTime candidate only masked 0.99;
+// module order (objdump -t sdk/work/3.3/elf/libsnd/seqread.o) confirms
+// ContModulation (0x8f4) precedes ContPortaTime (0xa30), matching retail's
+// address order here. Round 71 (bravo, track 2).
+ContModulation = 0x800349B0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContPortaTime
+// (disc 3.3), near-identical-shape ContModulation candidate only masked
+// 0.99; module order agrees (see ContModulation, above). Round 71 (bravo, track 2).
+ContPortaTime = 0x80034AEC; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContPortamento
+// (disc 3.3). Round 71 (bravo, track 2).
+ContPortamento = 0x80034C28; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContResetAll
+// (disc 3.3). Round 71 (bravo, track 2).
+ContResetAll = 0x80034D90; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContNrpn1
+// (disc 3.3). Round 71 (bravo, track 2).
+ContNrpn1 = 0x80034E5C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContNrpn2
+// (disc 3.3). Round 71 (bravo, track 2).
+ContNrpn2 = 0x80034F90; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContRpn1
+// (disc 3.3), near-identical-shape ContRpn2 candidate only masked 0.97.
+// Round 71 (bravo, track 2).
+ContRpn1 = 0x800350D8; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContRpn2
+// (disc 3.3), near-identical-shape ContRpn1 candidate only masked 0.97.
+// Round 71 (bravo, track 2).
+ContRpn2 = 0x80035154; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ContDataEntry
+// (disc 3.3). Round 71 (bravo, track 2).
+ContDataEntry = 0x800351D0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread Snd_setVabAttr
+// (disc 3.3). Round 71 (bravo, track 2).
+Snd_setVabAttr = 0x800357B0; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread SetPitchBend
+// (disc 3.3). Round 71 (bravo, track 2).
+SetPitchBend = 0x80035A7C; // type:func
+// identified: AMBIGUOUS fingerprint tie (GetMetaEvent, disc 3.3, EXACT
+// masked 1.00, vs _SsGetMetaEvent, disc 3.5, also EXACT masked 1.00 --
+// same function renamed between SDK versions, not two distinct module
+// candidates). Every neighboring function in this cluster (ContRpn1/2,
+// ContDataEntry, Snd_setVabAttr, SetPitchBend, ReadDeltaValue) matched
+// disc 3.3 exactly, so disc 3.3's name (GetMetaEvent) is used here too.
+// Round 71 (bravo, track 2).
+GetMetaEvent = 0x80035B2C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/seqread ReadDeltaValue
+// (disc 3.3). Round 71 (bravo, track 2).
+ReadDeltaValue = 0x80035E80; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address Snd_crescendo by relocation). Round 71 (bravo, track 2).
+Snd_crescendo = 0x80036528; // type:func

@@ -55,11 +55,11 @@ turned up this **exact** signature already guessed independently by
 function and typed it from its own call site), plus two live call sites
 with concrete argument roles:
 
-- `code_179d8_j.c`'s `func_800302DC` (matched): `return
+- `code_179d8_j.c`'s `SpuVmSeKeyOn` (matched): `return
   StartNote(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
   0x21` is a real sentinel value this function itself branches on (see
   below).
-- `code_179d8_k.c`'s `func_800344FC` (its own report, STALL):
+- `code_179d8_k.c`'s `NoteOn` (its own report, STALL):
   `StartNote(packed, note, vol, (u8)a3, (u16)divided, status)` where
   `packed = (a1<<8)|a0` is a `[screen | slot<<8]` pair into the SAME
   `D_800902E8[][]` array this function itself indexes with `a0`. This
@@ -89,9 +89,9 @@ until you diff registers, not just word counts.
   document with their own reduced view. This function only needs
   `unk12` (a byte OFFSET, per `code_179d8_k.c`'s fuller struct) and reads
   a per-voice "speed" `s16` at `*(s16*)((u8*)rec + 0x4E + rec->unk12*2)` --
-  the SAME access shape `code_179d8_k.c`'s `func_800344FC` already uses on
+  the SAME access shape `code_179d8_k.c`'s `NoteOn` already uses on
   the identical field, corroborating both units' independent readings.
-- `Tbl32E978` (already declared for `ApplyVoicePitchBend`'s stall) needed
+- `Tbl32E978` (already declared for `SpuVmPBVoice`'s stall) needed
   EXTENDING, not a second conflicting type: this function additionally
   touches `unk0`/`unk1`/`unk2`/`unk3`/`unk4`/`unk5`/`unk6`/`unk7` (a
   per-channel byte-field block used in bulk) alongside the existing
@@ -247,7 +247,7 @@ it was written:
    Sony's own `SpuVmVSetUp` (`code_179d8_c.c`'s own header comment: "round
    32 then found it is Sony's ... see docs/match-reports/func_80032148.md"),
    already declared and called with this exact signature
-   (`s32 SpuVmVSetUp(s16 a0, s16 a1)`) by `ApplyPitchBendToAllVoices` earlier in this
+   (`s32 SpuVmVSetUp(s16 a0, s16 a1)`) by `SpuVmPitchBend` earlier in this
    same file. Fixed by calling `SpuVmVSetUp(a1, a2)` instead.
 2. **`D_8008EA0D` is not a real symbol.** The disassembly reads it as
    `lbu $v1, -0x17($s0)` where `$s0 = &D_8008EA24` -- a raw negative
@@ -334,7 +334,7 @@ ones that look old.
 
 ## Round 48 update (runner echo): tested charlie's frame-padding lever -- THIRD confirmed negative for length closure
 
-Round 48's designated test of charlie's `func_800351D0` frame-padding
+Round 48's designated test of charlie's `ContDataEntry` frame-padding
 discovery, applied here since this function's own title already recorded
 an explicit frame-size gap (`0x140` built vs retail's `0x148`). Rebuilt the
 round-37 preserved body first (with both its stale-symbol fixes:
@@ -350,7 +350,7 @@ confirmed via objdump) **but built length is UNCHANGED at 402/387 (still
 
 This is the THIRD function on this unit this round where the lever
 produces the identical shape: exact frame-byte recovery, zero effect on
-word count. Unlike `UpdateVoiceEnvelopes` (where the same fix's realignment
+word count. Unlike `SpuVmFlush` (where the same fix's realignment
 surfaced a fresh, fixable `andi` mask), realigning this function's frame
 did not surface anything new beyond what this report's own two residues
 already diagnose -- the early-materialization scheduling point (~2-3
@@ -368,14 +368,14 @@ SHA1 reconfirmed green.
 **Three for three on `code_179d8_m` this round: charlie's `dead[N]`/`if(0)`
 frame-padding idiom recovers frame byte-alignment exactly every time it is
 applied to a measured frame-size gap, and it has closed a missing-WORD-COUNT
-gap ZERO of three times on this unit** (`UpdateVoiceEnvelopes`, `StepVoiceFade`,
+gap ZERO of three times on this unit** (`SpuVmFlush`, `StepVoiceFade`,
 `StartNote`) -- including on a function that is overall LONG (this one,
 15 words over) as readily as on the two that are SHORT. The common thread
 across the unit's three tests: every one of this unit's frame gaps is pure
 unaddressed register-save-area padding, with whatever content residue the
 function actually has (a redundant mask, a persisted early value, an
 addressing-cost difference) living entirely independently of the frame
-size. `func_800351D0`'s original length recovery came from a SEPARATE,
+size. `ContDataEntry`'s original length recovery came from a SEPARATE,
 coincidentally-discovered tail-duplication fix, not from the padding move
 itself -- this unit's evidence says that pairing is not the common case.
 **Treat the padding fix as a diagnostic-alignment step to apply cheaply
@@ -420,7 +420,7 @@ extern SlotE968M *D_8008E968;
  * (see code_179d8_k.c's fuller Entry90902E8 for what it points at:
  * `*(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2)` is a per-voice "speed"
  * table this function also reads, same access shape as that unit's own
- * func_800344FC). */
+ * NoteOn). */
 typedef struct {
     u8 pad0[0x12];
     u8 unk12; /* +0x12 */
@@ -447,14 +447,14 @@ extern Rec34Half D_8008D9A0[];
 
 extern void func_8002D6A4(void);
 extern void func_8002D8E0(s32 a0);
-extern s32 func_8002DF7C(void);
+extern s32 note2pitch(void);
 extern void func_8002D1B4(s32 a0, u16 a1);
 extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
 
 /* Called as `StartNote(0x21, p0, p1, p2, outA, outB)` from
- * code_179d8_j.c's func_800302DC and as
+ * code_179d8_j.c's SpuVmSeKeyOn and as
  * `StartNote(packed, note, vol, (u8)a3, (u16)divided, status)` from
- * code_179d8_k.c's func_800344FC -- signature confirmed independently
+ * code_179d8_k.c's NoteOn -- signature confirmed independently
  * by three sibling units' own extern guesses (code_179d8_i/_j/_k all
  * agree on this exact shape). `a0` is a packed [screen | slot<<8]
  * dispatch id into `D_800902E8`; `a1`/`a2` are the "key" values
@@ -567,7 +567,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                     if (D_8008EA24 == 0xFF) {
                         func_8002D8E0(*(u8 *) &D_8008EA26);
                     } else {
-                        func_8002D1B4(matchCount, func_8002DF7C());
+                        func_8002D1B4(matchCount, note2pitch());
                     }
                     s3 = (s3 << 4) | D_8008EA26;
                 }
@@ -595,7 +595,7 @@ it again.
 corroborated independently by three sibling units (`code_179d8_i.c`,
 `code_179d8_j.c`, `code_179d8_k.c`, per this report's own "Signature"
 section) before any body-level derivation: `code_179d8_k.c`'s
-`func_800344FC` calls this in its nonzero-velocity branch and StopNote in
+`NoteOn` calls this in its nonzero-velocity branch and StopNote in
 its zero-velocity branch of the SAME MIDI-status-byte switch, and
 `code_179d8_j.c` wraps both with the same fixed leading identity constant
 (`0x21`) -- a clean NoteOn/NoteOff symmetry, which is the primary evidence
@@ -610,7 +610,7 @@ velocity, pan-split pair, status).
 `masterVolume` field names this round) and `D_8008E978`/`Tbl32E978`
 (`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
 declared in this unit but only used by functions still `INCLUDE_ASM`
-(StepVoiceEnvelope, StepVoiceFade, ApplyVoicePitchBend, and this
+(StepVoiceEnvelope, StepVoiceFade, SpuVmPBVoice, and this
 function) -- the field renames are live in `src/code_179d8_m.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
 themselves (`D_8008E970`, `D_8008E978`) were not renamed since
@@ -624,7 +624,7 @@ kept in `#else`. Applied both stale-symbol fixes this report's round-37
 update already diagnosed but the preserved `#if 0` text above still shows
 literally: `func_80032148(a1, a2)` -> `SpuVmVSetUp(a1, a2)` (already
 declared earlier in the unit, called the same way by
-`ApplyPitchBendToAllVoices`), and `D_8008EA0D` (no linker symbol of its
+`SpuVmPitchBend`), and `D_8008EA0D` (no linker symbol of its
 own) -> `*((u8 *) &D_8008EA24 - 0x17)`. Also dropped four locally-redundant
 declarations that collide with types the unit's shared prelude already
 established under different typedef names for the same symbols

@@ -186,7 +186,7 @@ into one of these. This list is short because this project is young — add to i
     the disassembly ALREADY shows first.
   - **"Give the duplicate its own C variable" is NOT the fix** once block
     order is already right — twice-reproduced regressions on
-    `func_8002B4D4`. A second named variable re-allocates the WHOLE function.
+    `cb_read`. A second named variable re-allocates the WHOLE function.
   - **An `mflo`/`mfhi` residue is a counter-indication.** cc1 expands
     `mult`/`mflo` together during RTL expansion, before any layout decision.
 

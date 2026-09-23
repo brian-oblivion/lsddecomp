@@ -49,7 +49,7 @@
  * unit `src/code_179d8_f_b.c` (func_80036AA8).  Nothing moved with it: this
  * unit never owned a rodata attach.
  *
- * WHAT IS LEFT OF THIS UNIT IS ONE FUNCTION, func_80036528.
+ * WHAT IS LEFT OF THIS UNIT IS ONE FUNCTION, Snd_crescendo.
  *
  * Owns NO switch jump table (zero `jtbl_` in its disassembly, and the splat
  * yaml's rodata slot list names no `.rodata, code_179d8_f` line), so no
@@ -57,8 +57,8 @@
  *
  * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
  * re-implementing the greps and never for `addiu_at` (resolved round 21).
- * func_80036528 (240w) is this unit's ONLY function and is MATCHED (round
- * 70); docs/match-reports/func_80036528.md has the derivation.
+ * Snd_crescendo (240w) is this unit's ONLY function and is MATCHED (round
+ * 70); docs/match-reports/Snd_crescendo.md has the derivation.
  *
  * Expect low-level driver-shaped code rather than class-framework code, as
  * elsewhere in code_179d8; confirm with tools/classtable.py, do not assume.
@@ -115,14 +115,14 @@ typedef struct {
 
 extern Entry90902E8 *D_800902E8[];
 
-/* func_80036528: per-slot beat tick. Matched round 70 -- see
- * docs/match-reports/func_80036528.md. The parameters really are s16 (that
+/* Snd_crescendo: per-slot beat tick. Matched round 70 -- see
+ * docs/match-reports/Snd_crescendo.md. The parameters really are s16 (that
  * is what produces retail's move a3,a0 ... move s5,a3 argument hop), and
- * func_80030404's x/y parameters are u16 (retail masks them andi 0xFFFF). */
-extern s32 func_80030404(s16 a0, u16 a1, u16 a2, s32 a3);
-extern s32 func_80030584(s32 a0, s16 *out1, s16 *out2);
+ * SpuVmSetSeqVol's x/y parameters are u16 (retail masks them andi 0xFFFF). */
+extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
+extern s32 SpuVmGetSeqVol(s32 a0, s16 *out1, s16 *out2);
 
-void func_80036528(s16 a0, s16 a1)
+void Snd_crescendo(s16 a0, s16 a1)
 {
     Entry90902E8 **arr;
     Entry90902E8 *entry;
@@ -142,32 +142,32 @@ void func_80036528(s16 a0, s16 a1)
         if (entry->unk3E > 0) {
             entry->unk40 = entry->unk40 - 1;
             if (entry->unk40 >= 0) {
-                func_80030584((s16)(a0 | (a1 << 8)), (s16 *)&sp10, (s16 *)&sp12);
+                SpuVmGetSeqVol((s16)(a0 | (a1 << 8)), (s16 *)&sp10, (s16 *)&sp12);
                 if ((sp10 + 1) < 0x80 && (sp12 + 1) < 0x80) {
-                    func_80030404((s16)(a0 | (a1 << 8)), sp10 + 1, sp12 + 1, 0);
+                    SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), sp10 + 1, sp12 + 1, 0);
                 } else {
-                    func_80030404((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
+                    SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
                     D_800902E8[a0][a1].unk90 &= ~0x10;
                 }
             } else {
-                func_80030404((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
+                SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
                 (*arr)[a1].unk90 &= ~0x10;
             }
         }
     } else {
         if (entry->unk3E > 0) {
             entry->unk40 = entry->unk40 + entry->unk42;
-            func_80030584((s16)(a0 | (a1 << 8)), (s16 *)&sp10, (s16 *)&sp12);
+            SpuVmGetSeqVol((s16)(a0 | (a1 << 8)), (s16 *)&sp10, (s16 *)&sp12);
             if (entry->unk40 >= 0) {
                 thresh = entry->unk42;
                 if ((sp10 - thresh) < 0x80 && (sp12 - thresh) < 0x80) {
-                    func_80030404((s16)(a0 | (a1 << 8)), sp10 - thresh, sp12 - thresh, 0);
+                    SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), sp10 - thresh, sp12 - thresh, 0);
                 } else {
-                    func_80030404((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
+                    SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
                     D_800902E8[a0][a1].unk90 &= ~0x10;
                 }
             } else {
-                func_80030404((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
+                SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0x7F, 0x7F, 0);
                 (*arr)[a1].unk90 &= ~0x10;
             }
         }
@@ -176,5 +176,5 @@ void func_80036528(s16 a0, s16 a1)
         D_800902E8[a0][a1].unk90 &= ~0x10;
     }
 end:
-    func_80030584((s16)(a0 | (a1 << 8)), &entry->unk78, &entry->unk7A);
+    SpuVmGetSeqVol((s16)(a0 | (a1 << 8)), &entry->unk78, &entry->unk7A);
 }
