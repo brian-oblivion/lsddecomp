@@ -48,6 +48,15 @@ extern s32 gSeqTimerRateMode;
 extern s32 gVideoMode;
 extern u32 gSeqTickRate;
 
+/* gSeqTickRate values SetSeqTimerMode's rate table selects between.
+ * gVideoMode (Psy-Q `GetVideoMode`) is 0/1, and cases 0/4/5 pick between
+ * SEQ_TICKRATE_50/SEQ_TICKRATE_60 by it -- named by value only, not by an
+ * NTSC/PAL claim this file has no direct evidence for. */
+#define SEQ_TICKRATE_50  0x32
+#define SEQ_TICKRATE_60  0x3c
+#define SEQ_TICKRATE_120 0x78
+#define SEQ_TICKRATE_240 0xf0
+
 void SetSeqTimerMode(s32 a0)
 {
     s32 cmd;
@@ -66,48 +75,48 @@ void SetSeqTimerMode(s32 a0)
         if ((u32)cmd < 6) {
             switch (cmd) {
             case 4:
-                gSeqTickRate = 0x32;
+                gSeqTickRate = SEQ_TICKRATE_50;
                 if (gVideoMode == 1) {
                     gSeqTimerRateMode = 5;
                 } else {
-                    gSeqTimerRateMode = 0x32;
+                    gSeqTimerRateMode = SEQ_TICKRATE_50;
                 }
                 return;
             case 1:
-                gSeqTickRate = 0x3c;
+                gSeqTickRate = SEQ_TICKRATE_60;
                 if (gVideoMode == 0) {
                     gSeqTimerRateMode = 5;
                 } else {
-                    gSeqTimerRateMode = 0x3c;
+                    gSeqTimerRateMode = SEQ_TICKRATE_60;
                 }
                 return;
             case 3:
-                gSeqTickRate = 0x78;
+                gSeqTickRate = SEQ_TICKRATE_120;
                 return;
             case 2:
-                gSeqTickRate = 0xf0;
+                gSeqTickRate = SEQ_TICKRATE_240;
                 return;
             case 5:
                 if (gVideoMode == 0) {
-                    gSeqTickRate = 0x3c;
+                    gSeqTickRate = SEQ_TICKRATE_60;
                 } else if (gVideoMode == 1) {
-                    gSeqTickRate = 0x32;
+                    gSeqTickRate = SEQ_TICKRATE_50;
                 } else {
-                    gSeqTickRate = 0x3c;
+                    gSeqTickRate = SEQ_TICKRATE_60;
                 }
                 return;
             case 0:
                 if (gVideoMode == 0) {
-                    gSeqTickRate = 0x3c;
+                    gSeqTickRate = SEQ_TICKRATE_60;
                 } else if (gVideoMode == 1) {
-                    gSeqTickRate = 0x32;
+                    gSeqTickRate = SEQ_TICKRATE_50;
                 } else {
-                    gSeqTickRate = 0x3c;
+                    gSeqTickRate = SEQ_TICKRATE_60;
                 }
                 return;
             }
         } else {
-            gSeqTickRate = 0x3c;
+            gSeqTickRate = SEQ_TICKRATE_60;
             return;
         }
     }
