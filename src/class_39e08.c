@@ -258,7 +258,7 @@ s32 func_8004A070(s32 arg0)
     return result;
 }
 
-Obj865C8 *func_8004A130(s32 arg1, SubObjB *arg2)
+Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
 {
     Obj865C8 *self;
 

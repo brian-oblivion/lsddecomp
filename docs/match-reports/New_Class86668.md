@@ -1,4 +1,6 @@
-# func_8004A130
+# New_Class86668
+
+> Renamed from `func_8004A130` on 2026-09-23 (tools/rename.py). Address 0x8004a130.
 
 **Unit:** class_39e08 · **Status:** MATCHED (27/27 words)
 
@@ -9,7 +11,7 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-Obj865C8 *func_8004A130(s32 arg1, SubObjB *arg2)
+Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
 {
     ...
 

@@ -257,7 +257,7 @@ struct SubObjD {
 };
 
 /* Object size unconfirmed (this unit never allocates one of these itself --
- * func_8004A130 allocates the SIBLING class below instead). Field offsets
+ * New_Class86668 allocates the SIBLING class below instead). Field offsets
  * are only the ones this round's functions touch. */
 struct Obj865C8 {
     Class865C8Methods *methods;   /* +0x000 */
@@ -329,7 +329,7 @@ extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
  * D_800865C8's slots (+0x008, +0x00C, +0x040, +0x044, +0x048) while sharing
  * the rest verbatim (+0x058..+0x070, confirmed identical function
  * addresses in both tables by tools/classtable.py). Constructed by
- * func_8004A130, a New_X allocator (0x38-byte instance). Instances share
+ * New_Class86668, a New_X allocator (0x38-byte instance). Instances share
  * `Obj865C8`'s own layout (func_8004A19C writes `unk30`/`subB` at the exact
  * same offsets `Obj865C8`'s other functions already use), so this class's
  * own instances are typed `Obj865C8 *` too rather than inventing a second,
