@@ -64,116 +64,72 @@ void func_8004C620(Obj866E8 *self) {
 extern void func_8004C93C(Obj866E8 *self);
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 85/165 words, 3 words (12 bytes) short (round 34) -- see
- * docs/match-reports/func_8004C6A8.md. Every branch TARGET in the
- * raw-range dispatch now agrees with retail (previously 60/165 with a
- * different, wrong-polarity CFG shape). Residue: a register-class choice
- * -- retail promotes a value that is never live across a CALL (the
- * RotMatrix pointer argument, `(u8 *)sub + 0x10`) into its own
- * callee-saved register anyway, which saturates all nine $s/$fp slots and
- * forces `flag` to spill to the stack (an extra sw/lw pair retail has and
- * this body does not); nothing tried reproduces that promotion. This is a
- * HARD RULE 6 register-identity residue -- not closeable with a
- * `register`/asm-constraint fix. Hand-derived. */
+/* NON_MATCHING: 143/165 words, length exact, zero drift (round 71, up from
+ * 85/165 three words short) -- see docs/match-reports/func_8004C6A8.md.
+ * Residue: frame size only (retail -0x98, this body -0x90: retail's
+ * spill/local area runs 8 bytes past `flag`'s slot at sp+0x60), which moves
+ * every callee-saved save/restore slot by 8; every instruction and register
+ * outside the prologue/epilogue agrees. Hand-derived. */
 void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
     s32 point0;
     s32 point1;
-    s32 raw;
-    QueryTemplate866E8 desc;
-    s32 v1;
-    s32 v2;
-    s32 v3;
-    s32 s3;
-    s32 v;
+    s32 angle;
+    QueryTemplate866E8 mat;
+    s32 offset;
     s32 flag;
+    s32 half;
+    void *rot;
 
     sub = self->unk6C->unk14->unk44;
+    rot = (u8 *)sub + 0x10;
     self->methods->slot10C(self, &buf, 0);
     point0 = buf.point[0];
     point1 = buf.point[1];
-    raw = sub->unk12;
+    angle = sub->unk12;
     if ((s16)sub->unk12 < 0) {
-        raw += 0x1000;
+        angle += 0x1000;
     }
 
-    desc = D_8008E98C;
-    desc.unk14 = 0;
-    desc.unk18 = 0;
-    desc.unk1C = self->gridSpan;
-    RotMatrix((u8 *)sub + 0x10, &desc);
-    ApplyMatrixLV(&desc, &desc.unk14, &desc.unk14);
+    mat = D_8008E98C;
+    mat.unk14 = 0;
+    mat.unk18 = 0;
+    mat.unk1C = self->gridSpan;
+    RotMatrix(rot, &mat);
+    ApplyMatrixLV(&mat, &mat.unk14, &mat.unk14);
 
-    v1 = raw - 0x200;
-    if ((u16)v1 < 0x400) {
-        goto block1;
-    }
-    v2 = raw - 0xA00;
-    if ((u16)v2 >= 0x400) {
-        goto continue_dispatch;
-    }
-
-block1:
-    s3 = desc.unk1C;
-    self->unk80 = arg2;
-    self->unk84 = arg1;
-    if (desc.unk14 > 0) {
-        v = point0;
-    } else {
-        v = point0 - arg1 + 1;
-    }
-    self->unk7C = (s16)v;
-    if (desc.unk1C > 0) {
-        v = point1 - (u16)self->gridHalfCells - 1;
-    } else {
-        v = point1 - (u16)self->gridHalfCells + 1;
-    }
-    self->unk7E = (s16)v;
-    flag = 0;
-    goto shared;
-
-continue_dispatch:
-    v3 = raw - 0x600;
-    if ((u16)v3 < 0x400) {
-        goto block2;
-    }
-    if ((u16)v1 < 0xC00) {
-        goto shared;
+    if ((u16)(angle - 0x200) < 0x400 || (u16)(angle - 0xA00) < 0x400) {
+        offset = mat.unk1C;
+        self->unk80 = arg2;
+        self->unk84 = arg1;
+        self->unk7C = (mat.unk14 > 0) ? point0 : point0 - arg1 + 1;
+        self->unk7E = (mat.unk1C > 0) ? point1 - (u16)self->gridHalfCells - 1
+                                      : point1 - (u16)self->gridHalfCells + 1;
+        flag = 0;
+    } else if ((u16)(angle - 0x600) < 0x400 || (u16)(angle - 0x200) >= 0xC00) {
+        offset = mat.unk14;
+        self->unk80 = arg1;
+        self->unk84 = arg2;
+        self->unk7C = (mat.unk14 > 0) ? point0 - (u16)self->gridHalfCells - 1
+                                      : point0 - (u16)self->gridHalfCells + 1;
+        self->unk7E = (mat.unk1C > 0) ? point1 : point1 - arg2 + 1;
+        flag = 1;
     }
 
-block2:
-    s3 = desc.unk14;
-    self->unk80 = arg1;
-    self->unk84 = arg2;
-    if (desc.unk14 > 0) {
-        v = point0 - (u16)self->gridHalfCells - 1;
-    } else {
-        v = point0 - (u16)self->gridHalfCells + 1;
+    half = self->gridHalfCells;
+    offset >>= 11;
+    if (offset >= half) {
+        offset = half - 1;
     }
-    self->unk7C = (s16)v;
-    if (desc.unk1C > 0) {
-        v = point1;
-    } else {
-        v = point1 - arg2 + 1;
-    }
-    self->unk7E = (s16)v;
-    flag = 1;
-
-shared:
-    v = self->gridHalfCells;
-    s3 >>= 11;
-    if (s3 >= v) {
-        s3 = v - 1;
-    }
-    v = -v;
-    if (v >= s3) {
-        s3 = v + 1;
+    half = -half;
+    if (half >= offset) {
+        offset = half + 1;
     }
     if (flag) {
-        self->unk7C = (u16)self->unk7C + s3;
+        self->unk7C = (u16)self->unk7C + offset;
     } else {
-        self->unk7E = (u16)self->unk7E + s3;
+        self->unk7E = (u16)self->unk7E + offset;
     }
     func_8004C93C(self);
 }
