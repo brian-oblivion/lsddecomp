@@ -110,3 +110,9 @@ over a small fixed count.
 ## Naming
 
 Round 71 (alpha). `func_8001CEB4` -> `Class6B5CC__UpdateRotation`, **tier A**. Table slot +0x044 (round 70 named the slot `updateRotation`). Converts a ratio triple of degrees (RatioToFixed12, /360) into 4096-per-turn units and either assigns (flag != 0) or accumulates mod 4096 into GsCOORD2PARAM.rotate, then clears coord2 flg. Callers agree: DreamSys turns (ROTATION_YAW_PLUS45 etc., accumulate) and sets headings (assign); class_3bb8c_s calls the slot updateRotation.
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `Class6B5CCSub44.vec` -> `rotate` (tier A): GsCOORD2PARAM.rotate (SVECTOR at +0x10), which UpdateRotation writes in 4096-per-turn units. Accessors: code_d294, code_d294_b, code_d294_c.

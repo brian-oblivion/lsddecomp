@@ -36,3 +36,10 @@ code_d294. Matched on the first build. Established
 ## Naming
 
 Round 71 (alpha). `func_8001CC48` -> `Class6B5CC__AddChild`, **tier A**. Overrides BasicClass slot +0x010 `addChild` (include/code_8220.h). Forwards to the base first, then if the child's class tag is 9 (D_8006BEA0) calls Class6B5CC__LinkModel on it. Class6B5CC__AttachToParent reaches this slot on the parent with `self` as the child.
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `Class6B5CCObj.unk18` -> `tmd` (tier B): GsDOBJ2.tmd by offset. Class6B5CC__LinkModel stores the tag-9 child's +0x10 word there and UnlinkModel clears it. Accessors: code_d294, code_d294_c.
+- `Class6B5CCObj.unk20` -> `linkedModel` (tier B): Class6B5CC__LinkModel stores the tag-9 child object itself; code_d294_b passes it to the psyq_fa50 helpers. Accessors: code_d294, code_d294_b, code_d294_c.

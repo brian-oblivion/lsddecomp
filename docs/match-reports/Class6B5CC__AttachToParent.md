@@ -92,3 +92,10 @@ field for the cross-check with `Class6B5CC__DetachFromParent`).
 ## Naming
 
 Round 71 (alpha). `func_8001D0EC` -> `Class6B5CC__AttachToParent`, **tier A**. Table slot +0x04C. Only when not already attached: stores the parent in self->unkC, sets coord2->super to the parent's coordinate, calls parent->addChild(self) (BasicClass slot +0x010), copies the optional translation into coord2 (coord.t, +0x18..+0x20) or zeroes it, flg = 0. class_3bb8c_s independently calls this slot `attachToParent`.
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `Class6B5CCObj.unkC` -> `parent` (tier A): AttachToParent stores the object it then calls addChild on; DetachFromParent calls removeChild on it and clears it. Accessors: code_d294, code_d294_b, code_d294_c.
+- `Class6B5CCSub14.unk18/unk1C/unk20` -> `tx/ty/tz` (tier A): GsCOORDINATE2.coord.t[0..2] (+0x04 + 0x14), written from AttachToParent's translation argument. Accessors: code_d294, code_d294_c.

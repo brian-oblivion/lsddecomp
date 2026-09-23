@@ -51,3 +51,9 @@ elsewhere before re-deriving it from scratch.
 ## Naming
 
 Round 71 (alpha). `func_8001D344` -> `Class6B5CC__SetDisplay`, **tier A**. Table slot +0x060. GetSetBitField(&attribute, 31, 1, on == 0): bit 31 of GsDOBJ2.attribute is GsDOFF (LIBGS.H), so on=0 hides the object; returns the previous display state (old DOFF == 0). DreamSys calls it with 0; class_3bb8c_s calls the slot setDisplay.
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `Class6B5CCObj.unk10` -> `attribute` (tier A): GsDOBJ2.attribute. Class6B5CC__LinkModel passes `&self->unk10` to GsLinkObject4 as the GsDOBJ2, and the five setters here write it at GsDOFF/GsALON/GsA*/GsLOFF/light-mode bit positions. Accessors: code_d294, code_d294_b, code_d294_c.

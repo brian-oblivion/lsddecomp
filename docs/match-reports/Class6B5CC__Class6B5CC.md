@@ -85,3 +85,11 @@ iterations total).
 ## Naming
 
 Round 71 (alpha). `func_8001CAF4` -> `Class6B5CC__Class6B5CC`, **tier A**. Table slot +0x008 (ctor) of gClass6B5CCMethods. Allocates the 0x50-byte GsCOORDINATE2 and 0x28-byte GsCOORD2PARAM, runs the BasicClass ctor, installs gClass6B5CCMethods, zeroes fields, then calls `reset`. `Class__Class` constructor convention (BasicClass__BasicClass).
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `Class6B5CCObj.unk14` -> `coord2` (tier A): the ctor allocates exactly sizeof(GsCOORDINATE2) = 0x50 for it and Reset runs GsInitCoordinate2 on it; +0x14 of the embedded GsDOBJ2 is `coord2` in LIBGS.H. Accessors: code_d294, code_d294_b, code_d294_c (compiler-measured).
+- `UnkOwner_d294.unk14` and `GenericObj_d294.unk14` -> `coord2` (tier A): the same field on the parent and on a sibling object (AttachToParent copies the parent's into `super`). Accessors: code_d294, code_d294_c.
+- `Class6B5CCSub14.unk44` -> `param` (tier A): GsCOORDINATE2.param, the 0x28-byte GsCOORD2PARAM the ctor allocates. Accessors: code_d294, code_d294_b, code_d294_c.

@@ -60,3 +60,9 @@ blob), and `GenericObj_d294::unkC`.
 ## Naming
 
 Round 71 (alpha). `func_8001D280` -> `Class6B5CC__GetNextAttachedChild`, **tier A**. Table slot +0x058. Walks self->children (BasicClass +0x004, seeded when *entry is NULL) with GetNextBasicClass and stops at the next child whose tag is 4 (Class6B5CC family) and whose +0x00C parent pointer is self; sets *entry = NULL when the list ends. A list iterator whose mechanics are its purpose.
+
+## Proposed field names
+
+For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
+
+- `GenericObj_d294.unkC` -> `parent` (tier A): the same +0x00C parent pointer on the child, compared against self to pick attached children. Accessors: code_d294, code_d294_c, plus a NON_MATCHING body in code_d294_b.
