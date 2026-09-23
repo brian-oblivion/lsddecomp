@@ -89,7 +89,7 @@ project).
 ## Naming (round 54, bravo, track 3)
 
 **Not renamed -- PROPOSED only.** Proposed name: `Class6B5CC__GetRotMatrix`
-(tier B). Slot `+0x084` occupant (`tools/classtable.py D_8006B5CC`),
+(tier B). Slot `+0x084` occupant (`tools/classtable.py gClass6B5CCMethods`),
 dispatched as `slot84(self, out, flag)` from both this unit's own
 `Class6B5CC__ComposeAndApplyRotation` (`self` as receiver) and
 `code_d294_c.c`'s `Class6B5CC__RotateLocalVector` (a different

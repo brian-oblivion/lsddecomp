@@ -4,7 +4,7 @@ Round 54 (bravo, track 3). `code_d294_b`.
 
 ## What it does
 
-Slot `+0x098` occupant (`tools/classtable.py D_8006B5CC`) -- one of the
+Slot `+0x098` occupant (`tools/classtable.py gClass6B5CCMethods`) -- one of the
 three `(self, GenericObj_d294 *other, s32 arg2)` slots `Class6B5CC__OnNotify`
 (`code_d294.c`) dispatches to depending on `other->methods->header & 0xF`
 (this slot fires for tag `5`). Whole body is `{}` (`jr $ra; nop`,

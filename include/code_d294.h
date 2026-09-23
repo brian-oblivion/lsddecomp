@@ -4,8 +4,8 @@
 #include "common.h"
 
 /* code_d294: a FRESH CARVE (round 10), the first 20-function slice of a
- * 55-function segment never carved before. `tools/classtable.py D_8006B5CC`
- * shows this unit's own method table starts at D_8006B5CC and its slots,
+ * 55-function segment never carved before. `tools/classtable.py gClass6B5CCMethods`
+ * shows this unit's own method table starts at gClass6B5CCMethods and its slots,
  * in order, ARE this unit's functions: +0x008 Class6B5CC__Class6B5CC (ctor),
  * +0x00C Class6B5CC__Finalize (dtor), +0x010 Class6B5CC__AddChild, +0x014 Class6B5CC__RemoveChild,
  * +0x018 Class6B5CC__RemoveAllChildren, [+0x01C..+0x038 seven slots inherited verbatim from
@@ -30,7 +30,7 @@
  * New_Class6B5CC is NOT a table slot -- it is the `New_Class6B5CC` allocator
  * wrapper (allocates 0x44 bytes, calls the ctor via `GetClass6B5CCMethods()->ctor`,
  * frees and returns NULL on ctor failure). GetClass6B5CCMethods is a plain
- * no-argument getter, `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` -- MEASURED,
+ * no-argument getter, `lui/addiu %hi/%lo(gClass6B5CCMethods); jr $ra` -- MEASURED,
  * see include/class_3bb8c.h's own note on this exact symbol for the
  * "arity/signature is per-call-site, not a callee property" precedent this
  * follows: other units call the same GetClass6B5CCMethods symbol with a different
@@ -413,7 +413,7 @@ struct GenericCountList_d294 {
     u8 unk4;   /* +0x004, address-only */
 };
 
-/* Class6B5CC's own table (D_8006B5CC). Only the slots this unit's chosen
+/* Class6B5CC's own table (gClass6B5CCMethods). Only the slots this unit's chosen
  * functions actually dispatch through are typed; see the file banner above
  * for the full slot census from classtable.py. */
 struct Class6B5CCMethods {
@@ -455,7 +455,7 @@ struct Class6B5CCMethods {
      * every call site invokes them directly by symbol name. */
     u8 pad060[0x084 - 0x060];
     /* +0x084, occupant `Class6B5CC__GetRotMatrix` per `tools/classtable.py
-     * D_8006B5CC` (it lives in code_d294_b). Class6B5CC__RotateLocalVector (code_d294_c)
+     * gClass6B5CCMethods` (it lives in code_d294_b). Class6B5CC__RotateLocalVector (code_d294_c)
      * dispatches to it as `slot84(self, out, 0)`, `out` pointing at a
      * 0x20-byte stack buffer -- MEASURED from the caller's own frame size:
      * Class6B5CC__RotateLocalVector's stack layout only closes if `out` is a full 0x20
@@ -472,7 +472,7 @@ struct Class6B5CCMethods {
      * as `(self, dest)` and `(self, a1, a2)` respectively, matching
      * Class6B5CC__ReadUnk20Data/Class6B5CC__TransformAndNotifyParents's own direct-call prototypes below
      * exactly (both already matched, code_d294_b) -- `tools/classtable.py
-     * D_8006B5CC` confirms they occupy these two slots. */
+     * gClass6B5CCMethods` confirms they occupy these two slots. */
     void (*readUnk20Data)(Class6B5CCObj *self, void *dest); /* +0x08C, Class6B5CC__ReadUnk20Data */
     void (*transformAndNotifyParents)(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2); /* +0x090, Class6B5CC__TransformAndNotifyParents */
     /* +0x094/+0x098/+0x09C, a `(self, GenericObj_d294 *other, s32 arg2)`
@@ -486,10 +486,10 @@ struct Class6B5CCMethods {
     /* +0x0A0, Class6B5CC__DispatchLinkCommand's own call target (round 12): dispatched with
      * only `self`, per that function's own disassembly (`jalr $v0` with
      * `$a0` untouched since function entry). Class6B5CC__TryAttachNearby (still queued)
-     * is this slot's occupant per `tools/classtable.py D_8006B5CC`. */
+     * is this slot's occupant per `tools/classtable.py gClass6B5CCMethods`. */
     void (*tryAttachNearby)(Class6B5CCObj *self);
     /* +0x0A4, round 13 (Class6B5CC__TryAttachNearby's own call site): this slot's
-     * occupant is Class6B5CC__ComposeAndApplyRotation itself (`tools/classtable.py D_8006B5CC`),
+     * occupant is Class6B5CC__ComposeAndApplyRotation itself (`tools/classtable.py gClass6B5CCMethods`),
      * already matched this round -- dispatched indirectly (through the
      * vtable, not a direct `jal`) since the slot is polymorphic even
      * though this class's own table happens to point at it. Signature
@@ -506,18 +506,18 @@ struct Class6B5CCMethods {
     s32 (*classifyAgainstPlanes)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2, void *arg3);
 };
 
-/* MEASURED: GetClass6B5CCMethods's whole body is `lui/addiu %hi/%lo(D_8006B5CC);
+/* MEASURED: GetClass6B5CCMethods's whole body is `lui/addiu %hi/%lo(gClass6B5CCMethods);
  * jr $ra` (asm/code_d294_b.s) -- a plain no-argument getter for this unit's
  * own vtable. See the file banner for the cross-unit precedent on why this
  * local 0-argument declaration doesn't need to agree with other units'. */
 extern Class6B5CCMethods *GetClass6B5CCMethods(void);
 
-/* This unit's own vtable data, D_8006B5CC (see `tools/classtable.py
- * D_8006B5CC` in the file banner above) -- GetClass6B5CCMethods (round 12,
- * code_d294_b) just returns `&D_8006B5CC`. Still rodata (not carved as C
+/* This unit's own vtable data, gClass6B5CCMethods (see `tools/classtable.py
+ * gClass6B5CCMethods` in the file banner above) -- GetClass6B5CCMethods (round 12,
+ * code_d294_b) just returns `&gClass6B5CCMethods`. Still rodata (not carved as C
  * here), so only the address is declared, typed to the return of the one
  * getter this unit implements. */
-extern Class6B5CCMethods D_8006B5CC;
+extern Class6B5CCMethods gClass6B5CCMethods;
 
 struct Class6B5CCObj {
     Class6B5CCMethods *methods; /* +0x000 */

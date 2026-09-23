@@ -106,7 +106,7 @@ return 1;
   inference, not confirmed.
 - **New `Class6B5CCMethods` slot needed: `+0xA4`** (occupant
   `Class6B5CC__ComposeAndApplyRotation`, `code_d294_b`, confirmed via `tools/classtable.py
-  D_8006B5CC`, out of this carve's scope) -- called with 5 arguments
+  gClass6B5CCMethods`, out of this carve's scope) -- called with 5 arguments
   (`self`, `0`, two scratch pointers, `1`), signature not yet pinned down
   precisely enough to commit.
 

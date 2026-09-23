@@ -6,8 +6,8 @@
 
 ## What it does
 
-`Class6B5CC`'s own destructor — vtable slot `+0x00C` of `D_8006B5CC`
-(confirmed via `tools/classtable.py D_8006B5CC`). Calls three of its own
+`Class6B5CC`'s own destructor — vtable slot `+0x00C` of `gClass6B5CCMethods`
+(confirmed via `tools/classtable.py gClass6B5CCMethods`). Calls three of its own
 virtual teardown hooks in order (`slot50` = `Class6B5CC__DetachFromParent`, `slot54` =
 `Class6B5CC__DetachAttachedChildren`, `slot5C` = `Class6B5CC__func_1d33c` — all three still queued or,
 for `Class6B5CC__func_1d33c`, already a matched no-op stub elsewhere), frees the two

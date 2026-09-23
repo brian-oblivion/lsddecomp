@@ -77,7 +77,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
   void*)`, occupant `Class6B5CC__ReadUnk20Data`) and `+0x090` (`slot90`, `void (*)
   (Class6B5CCObj*, GenericCountList_d294*, s32)`, occupant `Class6B5CC__TransformAndNotifyParents`).
   Both already-matched functions in this unit; confirmed occupants via
-  `tools/classtable.py D_8006B5CC`. Split out of the `pad060[0x0A0-0x060]`
+  `tools/classtable.py gClass6B5CCMethods`. Split out of the `pad060[0x0A0-0x060]`
   span that previously covered them (that pad's own comment claimed nothing
   dispatched through it — no longer true once this call site was written).
 - New extern `func_8001F3A4(void *arg0)` returning `s32`, PsyQ library

@@ -55,14 +55,14 @@ Here that read settles it flatly. `GetClass6B5CCMethods`'s entire body
 (`asm/code_d294.s`) is:
 
 ```
-lui   $v0, %hi(D_8006B5CC)
-addiu $v0, $v0, %lo(D_8006B5CC)
+lui   $v0, %hi(gClass6B5CCMethods)
+addiu $v0, $v0, %lo(gClass6B5CCMethods)
 jr    $ra
  nop
 ```
 
 It reads **neither `$a0` nor `$a1`**. It takes **no arguments** and returns
-`&D_8006B5CC` — the plain no-parameter vtable getter already documented in
+`&gClass6B5CCMethods` — the plain no-parameter vtable getter already documented in
 `docs/research/class-framework.md`, the same shape as `GetClass6D3C8Methods`. So the
 2-argument declaration in `src/class_3ac78.c` and the 1-argument declaration
 in `include/class_3bb8c.h` are **both wrong about the function**, and both are

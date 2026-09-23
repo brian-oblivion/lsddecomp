@@ -4,7 +4,7 @@
  * base class, MEASURED onto Psy-Q's GsDOBJ2/GsCOORDINATE2/GsCOORD2PARAM).
  *
  * Covers method-table slots +0x074 through +0x0B4 (tools/classtable.py
- * D_8006B5CC) -- the table's own LAST 17 slots. In ROM order: four more
+ * gClass6B5CCMethods) -- the table's own LAST 17 slots. In ROM order: four more
  * self->unk10 bitfield accessors (the sibling family code_d294.c starts;
  * two renamed this round, `Class6B5CC__GetSetUnk10Flag7`/`Field9`, two
  * held back as `func_` -- proposed `Field0`/`Flag8` -- because their
@@ -693,7 +693,7 @@ INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__NotifyTaggedParents);
 #endif
 
 /* This unit's own no-argument vtable getter -- see the extended note on
- * D_8006B5CC in include/code_d294.h and the file banner up top. */
+ * gClass6B5CCMethods in include/code_d294.h and the file banner up top. */
 Class6B5CCMethods *GetClass6B5CCMethods(void) {
-    return &D_8006B5CC;
+    return &gClass6B5CCMethods;
 }

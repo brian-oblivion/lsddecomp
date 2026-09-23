@@ -899,8 +899,8 @@ extern Class86AA0Methods gClass86AA0Methods;
 extern Class86AA0Methods *GetClass86AA0Methods(void);
 
 /* MEASURED, round 9: GetClass6B5CCMethods TAKES NO ARGUMENTS. Its whole body is
- * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` (asm/code_d294.s) -- it reads
- * neither $a0 nor $a1, and just returns &D_8006B5CC. It is the plain
+ * `lui/addiu %hi/%lo(gClass6B5CCMethods); jr $ra` (asm/code_d294.s) -- it reads
+ * neither $a0 nor $a1, and just returns &gClass6B5CCMethods. It is the plain
  * no-parameter vtable getter documented in docs/research/class-framework.md,
  * the same shape as GetClass6D3C8Methods.
  *
@@ -931,7 +931,7 @@ extern Class86AA0Methods *GetClass86AA0Methods(void);
  * renaming changes no bytes.
  *
  * Head-verified round 10 by measuring both callees rather than reasoning from
- * the arity conflict: GetClass6B5CCMethods returns &D_8006B5CC (asm/code_d294.s) and
+ * the arity conflict: GetClass6B5CCMethods returns &gClass6B5CCMethods (asm/code_d294.s) and
  * func_8003F24C returns &D_8006E8E4 (asm/code_2cc8c_b.s). Different globals,
  * so genuinely different tables -- one type could not have carried both, and
  * the split would have been right even without the arity conflict that

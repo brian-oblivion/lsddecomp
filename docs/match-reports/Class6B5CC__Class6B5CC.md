@@ -6,15 +6,15 @@
 
 ## What it does
 
-`Class6B5CC`'s own constructor — vtable slot `+0x008` of `D_8006B5CC`
-(confirmed directly: `tools/classtable.py D_8006B5CC` names `Class6B5CC__Class6B5CC`
+`Class6B5CC`'s own constructor — vtable slot `+0x008` of `gClass6B5CCMethods`
+(confirmed directly: `tools/classtable.py gClass6B5CCMethods` names `Class6B5CC__Class6B5CC`
 as the occupant of that slot). Takes an already-allocated `self` (the
 allocation itself is `New_Class6B5CC`, a separate `New_X` wrapper, not this
 function). Allocates two sub-blocks (`self->unk14`, 0x50 bytes, then
 `self->unk14->unk44`, 0x28 bytes), frees the first and bails out if the
 second allocation fails, otherwise calls the BasicClass base constructor
 (`Get_vtable_BasicClass()->ctor(self)`), overwrites `self->methods` with this
-class's own vtable (`GetClass6B5CCMethods()`, i.e. `&D_8006B5CC`), zeroes several
+class's own vtable (`GetClass6B5CCMethods()`, i.e. `&gClass6B5CCMethods`), zeroes several
 freshly-added fields, and finally calls its own virtual init hook
 (`self->methods->slot40`, `Class6B5CC__Reset` — still queued) before returning
 `self` unconditionally.

@@ -292,7 +292,7 @@ void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2) {
  * sites, which is fine because the actual callee ignores unused trailing
  * register arguments). Kept local rather than added to code_d294.h.
  *
- * `+0x09C` resolves via `tools/classtable.py D_8006B5CC` (the fixed table
+ * `+0x09C` resolves via `tools/classtable.py gClass6B5CCMethods` (the fixed table
  * GetClass6B5CCMethods() returns) to `Class6B5CC__DispatchLinkCommand` --
  * named `dispatchLinkCommand` here to match (round 57 naming pass). */
 typedef struct Class6B5CCBaseTable {

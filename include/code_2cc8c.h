@@ -1749,7 +1749,7 @@ extern Obj6EAC0 *func_80041AB4(s32 a1, s32 a2); /* another New_X-shaped
 /*
  * MEASURED elsewhere (round 9, include/class_3bb8c.h / src/class_3ac78.c):
  * GetClass6B5CCMethods takes NO arguments and its whole body is a fixed
- * `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` -- it always returns the SAME
+ * `lui/addiu %hi/%lo(gClass6B5CCMethods); jr $ra` -- it always returns the SAME
  * global table regardless of caller, a shared "default handler" utility
  * reached the same way IntermediateBaseMethods/TaskUtilMethods are
  * reached elsewhere in this project. This unit's own call touches only
@@ -1783,7 +1783,7 @@ extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
  * carving the segment's remaining 60-function tail. `tools/classtable.py
  * D_8006E99C --vs D_8006B58C` shows D_8006E99C shares its dtor (+0x00C)
  * and three more slots (+0x010/+0x014/+0x018) plus all seven BasicClass-
- * inherited slots (+0x01C..+0x038) with D_8006B5CC (code_d294.h's own
+ * inherited slots (+0x01C..+0x038) with gClass6B5CCMethods (code_d294.h's own
  * `Class6B5CCMethods`) -- the same base-class fingerprint code_d294.h
  * already established, so D_8006E99C is a Class6B5CCObj descendant. It is
  * NOT a direct child, though: its own ctor (Class6E99C__Class6E99C, this unit)
@@ -1793,7 +1793,7 @@ extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
  * then dispatch through it" idiom (see e.g. Class86B60__Class86B60's entry in
  * DECOMPILATION_LEARNINGS). `Obj6EAC0__GetBaseMethods` (code_2cc8c_f, bravo's own
  * function) is a bare no-argument getter for a SECOND table, D_8006EAC0
- * -- itself sharing the identical fingerprint with D_8006B5CC, so the
+ * -- itself sharing the identical fingerprint with gClass6B5CCMethods, so the
  * real chain is Class6B5CCObj -> "ClassEAC0" -> "Class6E99C". Two
  * `New_X`-shaped allocators confirm the two concrete sizes: New_Class6E99C
  * allocates 0xA0 bytes for a Class6E99C instance (getting its own table
@@ -1804,7 +1804,7 @@ extern D6B5CCGetterMethodsCC8C *GetClass6B5CCMethods(void);
  * ClassEAC0's OWN ctor, sharing the identical "call a further-base ctor,
  * reset methods, redispatch slot40" shape one level up: it calls
  * `GetClass6B5CCMethods()->ctor(self)` (GetClass6B5CCMethods, code_d294.h's own getter
- * for the ACTUAL Class6B5CCObj table, D_8006B5CC) first.
+ * for the ACTUAL Class6B5CCObj table, gClass6B5CCMethods) first.
  *
  * Per this project's established multiple-independent-local-views
  * convention, these are THIS unit's own flat views -- no attempt is made
@@ -2117,7 +2117,7 @@ extern Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void);  /* code_2cc8c_f (bravo'
                                                     for &D_8006EAC0 */
 
 /* This unit's own local view of the REAL base, `Class6B5CCObj`'s own table
-   (code_d294.h's `GetClass6B5CCMethods`/`D_8006B5CC`) -- ClassEAC0__ClassEAC0 (this
+   (code_d294.h's `GetClass6B5CCMethods`/`gClass6B5CCMethods`) -- ClassEAC0__ClassEAC0 (this
    unit) dispatches only the ctor slot, so only that one is modelled here,
    per this project's independent-local-views convention. */
 /* (code_2cc8c_e's own view of GetClass6B5CCMethods's return type was merged

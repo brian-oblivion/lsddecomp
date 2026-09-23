@@ -10,26 +10,26 @@ This unit's own no-argument vtable getter, already well documented in
 `include/code_d294.h`'s file banner and in `include/class_3bb8c.h` (which
 calls the same symbol with a different arity from a different unit --
 established cross-unit precedent, not new). Whole body is `lui/addiu
-%hi/%lo(D_8006B5CC); jr $ra`.
+%hi/%lo(gClass6B5CCMethods); jr $ra`.
 
 ```c
 Class6B5CCMethods *GetClass6B5CCMethods(void) {
-    return &D_8006B5CC;
+    return &gClass6B5CCMethods;
 }
 ```
 
-`D_8006B5CC` itself is still rodata (not carved as C in this round) -- only
-its address is declared, `extern Class6B5CCMethods D_8006B5CC;`, typed to
+`gClass6B5CCMethods` itself is still rodata (not carved as C in this round) -- only
+its address is declared, `extern Class6B5CCMethods gClass6B5CCMethods;`, typed to
 this getter's own return type. Confirmed against `tools/classtable.py
-D_8006B5CC`, which shows the table starting exactly there with 45 slots,
+gClass6B5CCMethods`, which shows the table starting exactly there with 45 slots,
 all of which belong to this and the sibling `code_d294`/`code_d294_c` units.
 
 ## Evidence
 
 Disassembly (`asm/nonmatchings/code_d294_b/GetClass6B5CCMethods.s`):
 ```
-lui   $v0, %hi(D_8006B5CC)
-addiu $v0, $v0, %lo(D_8006B5CC)
+lui   $v0, %hi(gClass6B5CCMethods)
+addiu $v0, $v0, %lo(gClass6B5CCMethods)
 jr    $ra
  nop
 ```
@@ -76,7 +76,7 @@ deliberate.
 
 ```
 8001e57c:  lui   v0,0x8007
-8001e580:  addiu v0,v0,-18996     ; &D_8006B5CC
+8001e580:  addiu v0,v0,-18996     ; &gClass6B5CCMethods
 8001e584:  jr    ra
 8001e588:  nop
 ```

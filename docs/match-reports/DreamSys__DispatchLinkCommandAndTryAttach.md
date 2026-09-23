@@ -31,7 +31,7 @@ Two calls with the SAME (self, arg1, count) shape but through DIFFERENT
 tables:
 - The first, unconditional, dispatches through
   `GetClass6B5CCMethods()`'s return -- the shared base-class table at
-  `D_8006B5CC` (already established with the project's "per-call-site
+  `gClass6B5CCMethods` (already established with the project's "per-call-site
   signature" precedent in `include/code_d294.h`) -- at its `+0x09C` slot.
   This unit's own local view (`Class6B5CCBaseTable`, declared in this file)
   types only that one slot.
@@ -70,7 +70,7 @@ confirmed (33/33): unconditionally forwards through the shared
 `Class6B5CCBaseTable::dispatchLinkCommand` slot, then -- only for
 `5 <= count < 9` -- ALSO dispatches through the object's own inherited
 `vt->slotA0` (resolves to `Class6B5CC__TryAttachNearby` via
-`tools/classtable.py D_8006B5CC`, confirmed this round). The name states
+`tools/classtable.py gClass6B5CCMethods`, confirmed this round). The name states
 both calls and their conditional relationship; why `[5,9)` specifically
 gates the attach attempt is not established.
 
@@ -84,7 +84,7 @@ FINISHING-PLAN.md track 3 step 3 it is proposed here, not renamed, and
 posted to the broadcast for the head to apply at merge.
 
 - **`vtable_DreamSys::slotA0` -> `tryAttachNearby`** (tier B). Evidence:
-  `tools/classtable.py D_8006B5CC` resolves the SAME offset (`+0x0A0`) in
+  `tools/classtable.py gClass6B5CCMethods` resolves the SAME offset (`+0x0A0`) in
   the fixed base table `GetClass6B5CCMethods()` returns to
   `Class6B5CC__TryAttachNearby`, and this function's own report already
   established the slot is unoverridden at the `DreamSys` level (still

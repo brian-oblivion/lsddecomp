@@ -530,7 +530,7 @@ mechanics (scan parents, filter by a tag byte, dispatch to matches);
 the game-level meaning of tag `4`/`0x34` and what the `+0x010`
 dispatch actually does to `entry` is not established. This is also the
 class's own table-slot BOUNDARY -- `code_d294_c.c`'s own file banner
-already documents "`tools/classtable.py D_8006B5CC` stops at
+already documents "`tools/classtable.py gClass6B5CCMethods` stops at
 Class6B5CC__NotifyTaggedParents" -- i.e. it is `Class6B5CCMethods`'s LAST slot
 (`+0x0B4`), not evidence of anything about this function's own
 purpose beyond position. Held back from an actual rename because this

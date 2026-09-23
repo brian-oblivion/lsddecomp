@@ -1393,3 +1393,4 @@ Class6B5CC__SetSemiTrans = 0x8001D374; // type:func
 Class6B5CC__SetSemiTransRate = 0x8001D3A0; // type:func
 Class6B5CC__SetLighting = 0x8001D3CC; // type:func
 Class6B5CC__SetLightMode = 0x8001D3F8; // type:func
+gClass6B5CCMethods = 0x8006B5CC;

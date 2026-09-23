@@ -7,9 +7,9 @@
 ## What it does
 
 `New_Class6B5CC`: the allocator wrapper for the unnamed class whose method
-table is `D_8006B5CC` (`tools/classtable.py D_8006B5CC`). Allocates 0x44
+table is `gClass6B5CCMethods` (`tools/classtable.py gClass6B5CCMethods`). Allocates 0x44
 bytes, calls the class's own constructor slot (found through the
-no-argument getter `GetClass6B5CCMethods`, which just returns `&D_8006B5CC`) on
+no-argument getter `GetClass6B5CCMethods`, which just returns `&gClass6B5CCMethods`) on
 the fresh block, and on constructor failure frees the block and returns
 `NULL`. This is NOT itself a vtable slot — it is the standalone `New_X`
 entry point that callers elsewhere in the game presumably use to spawn an
@@ -38,7 +38,7 @@ Same shape as `src/Entity.c`'s `New_Entity`.
 ## Establishing the class
 
 `GetClass6B5CCMethods()` is a plain no-argument getter (`lui/addiu %hi/%lo
-(D_8006B5CC); jr $ra`, MEASURED from its own disassembly in
+(gClass6B5CCMethods); jr $ra`, MEASURED from its own disassembly in
 `asm/code_d294_b.s`, the next uncarved slice). Its whole-file `->ctor`
 call here checked the return with `bnez`, and that observation, combined
 with reading `Class6B5CC__Class6B5CC` (this class's ctor, `docs/match-
