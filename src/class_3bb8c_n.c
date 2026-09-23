@@ -864,7 +864,7 @@ s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
         ((ObjAB4C *) D_8008AB4C)->methods->slotE8((ObjAB4C *) D_8008AB4C, ctx, arg0);
     }
     if (D_8008AC70++ == 0) {
-        func_80054660();
+        ApplyStyleDecorationIfSet();
         func_80054850();
         func_80054B84(ctx);
     }

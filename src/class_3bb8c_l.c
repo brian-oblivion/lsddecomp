@@ -90,7 +90,7 @@ extern s32 func_80048F84(void *arg0, s32 arg1);
 extern s32 func_80048EA0(void *arg0, s32 arg1, s32 arg2);
 extern s32 func_80043008(s32 arg0);
 extern void func_8001EF60(s32 arg0);
-extern s32 func_800544E4(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
+extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
 
 /* Opaque data blobs, referenced only by address (never loaded here) and
  * forwarded to method-table calls of unidentified classes. */
@@ -117,7 +117,7 @@ void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, 
 
     self->unk78 = unk18;
     ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
-    self->unk50 = (Unk50Struct_3bb8c_l *) func_800544E4(self->unk14, self->unk38, &self->unk6C, ret1, 0);
+    self->unk50 = (Unk50Struct_3bb8c_l *) RegisterStyleConfig(self->unk14, self->unk38, &self->unk6C, ret1, 0);
     if (arg2 != 0) {
         self->unk50 = arg2;
     }
@@ -439,14 +439,14 @@ void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
 
 /* func_80053ACC's (and func_80053BE8's/func_80053C94's, further below) own
  * helper, and it lives in the sibling slice class_3bb8c_m, where round 15's
- * runner echo matched it byte-exact as `void func_80053EB4(ObjM *self, s32,
+ * runner echo matched it byte-exact as `void ObjM__ForwardToSubChild(ObjM *self, s32,
  * s32, s32, s32)`. Declared locally rather than in include/class_3bb8c.h on
  * purpose: this unit's view of the class is `Obj87034_3bb8c_l` and echo's is
  * `ObjM`, the two are the same class (see the HEAD NOTE in that header), and
  * a shared-header declaration would put two incompatible prototypes for one
  * function in front of both translation units. The return type is echo's,
  * from the definition. */
-extern void func_80053EB4(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+extern void ObjM__ForwardToSubChild(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
 void func_80053ACC(Obj87034_3bb8c_l *self) {
     s32 local18;
@@ -475,10 +475,10 @@ void func_80053ACC(Obj87034_3bb8c_l *self) {
             arg3 = 5;
             break;
         }
-        func_80053EB4(self, local18, 0, arg3, 1);
+        ObjM__ForwardToSubChild(self, local18, 0, arg3, 1);
         return;
     }
-    func_80053EB4(self, 0, 0, 5, 1);
+    ObjM__ForwardToSubChild(self, 0, 0, 5, 1);
 }
 
 void func_80053BE8(Obj87034_3bb8c_l *self) {
@@ -489,7 +489,7 @@ void func_80053BE8(Obj87034_3bb8c_l *self) {
     } else {
         self->unk20 = 5;
         color = self->unk3C->methods->slot200(self->unk3C);
-        func_80053EB4(self, color, 0, 0xA, 1);
+        ObjM__ForwardToSubChild(self, color, 0, 0xA, 1);
         self->unk3C->methods->slotFC(self->unk3C);
     }
 }
@@ -499,6 +499,6 @@ void func_80053C94(Obj87034_3bb8c_l *self) {
 
     self->unk20 = 6;
     color = self->unk3C->methods->slot200(self->unk3C);
-    func_80053EB4(self, color, 0, 0x1E, 1);
+    ObjM__ForwardToSubChild(self, color, 0, 0x1E, 1);
     self->unk3C->methods->slotFC(self->unk3C);
 }

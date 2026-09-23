@@ -1,4 +1,6 @@
-# func_80054120
+# ObjM__CheckAuxTrigger
+
+> Renamed from `func_80054120` on 2026-09-23 (tools/rename.py). Address 0x80054120.
 
 **Unit:** class_3bb8c_m · **Size:** 43 instructions · **Status:** MATCHED (43/43 words)
 
@@ -15,7 +17,7 @@ from this call site's own register setup.
 ## What this function does
 
 ```c
-s32 func_80054120(ObjM *self) {
+s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
     ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
@@ -74,3 +76,7 @@ call.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__CheckAuxTrigger** -- tier B. Fetches a `ChildM114` via `self->unk14`'s `slot114`, reads the current day/year from `dreamSys->getCurrentDayAndYear`, calls the uncarved `TryDreamAuxTrigger` with both, stores the result, and finalizes the child (`slot84`) on failure. Named for its one external call; the gameplay trigger itself is still uncarved (`src/code_4cd08.c`), so this stays tier B.

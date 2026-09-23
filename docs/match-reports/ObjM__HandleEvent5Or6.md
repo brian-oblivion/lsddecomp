@@ -1,4 +1,6 @@
-# func_80053F84
+# ObjM__HandleEvent5Or6
+
+> Renamed from `func_80053F84` on 2026-09-23 (tools/rename.py). Address 0x80053f84.
 
 **Unit:** class_3bb8c_m · **Size:** 89 instructions · **Status:** MATCHED (89/89 words)
 
@@ -14,7 +16,7 @@ proximity of "14"; nothing ties the two together).
 ## The C
 
 ```c
-void func_80053F84(ObjM *self, ParamM *p1, s32 sel) {
+void ObjM__HandleEvent5Or6(ObjM *self, ParamM *p1, s32 sel) {
     s32 v;
     switch (sel) {
     case 5:
@@ -87,6 +89,10 @@ pattern per arm.
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`. This
 residue's fix unblocked accurate scoring for the rest of the unit's
-functions in ROM order after it (`func_800540E8` onward), which had all
+functions in ROM order after it (`ObjM__HandleEvent7` onward), which had all
 been reading as near-total mismatches purely from this function's address
 drift.
+
+## Naming
+
+**ObjM__HandleEvent5Or6** -- tier B. Two-case switch on its own `sel` parameter (5 and 6), each calling `self->methods->slot14` then adjusting `dreamSys`/`ObjM::mode`, ending case 6 by forwarding the (possibly just updated) mode to `notifyParents`. Named for the mechanical shape (a selector-driven event handler on two codes); the codes' own meaning is unknown.

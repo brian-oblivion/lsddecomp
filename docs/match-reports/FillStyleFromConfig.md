@@ -1,4 +1,6 @@
-# func_800545FC — MATCHED (byte-exact, whole-image `build exit=0`)
+# FillStyleFromConfig — MATCHED (byte-exact, whole-image `build exit=0`)
+
+> Renamed from `func_800545FC` on 2026-09-23 (tools/rename.py). Address 0x800545fc.
 
 Unit: `class_3bb8c_m` · Size: 25 words · Round 23 (2026-09-07), head.
 **Matched on the FIRST attempt.** This function's prior disposition was a
@@ -8,7 +10,7 @@ carve-time stub saying "do not attempt"; see below.
 
 `src/class_3bb8c_m.c`'s carve-time header comment (round 15) listed four
 functions with a blocker profile and the instruction *"All four have stub
-reports; do not attempt them."* `func_800545FC`'s entry was **`addiu-$at`, and
+reports; do not attempt them."* `FillStyleFromConfig`'s entry was **`addiu-$at`, and
 nothing else.**
 
 `addiu_at` was resolved in round 21. From that moment this was matchable ground
@@ -24,7 +26,7 @@ place and now says which screen it was run with and when.
 ## The match
 
 ```c
-void func_800545FC(struct StyleM *style, s8 *cfg) {
+void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
     style->unkC  = D_800872C4[cfg[3]];
     style->unk18 = D_800872C4[cfg[2]];
     style->unk1C = D_8008730C[cfg[1]];
@@ -86,3 +88,7 @@ Two things follow, and the second is the general one:
   and points at `tools/nearmiss.py` — so the next reader can tell whether it
   predates a fix instead of having to re-derive it. Record the method next to
   the verdict, or the verdict outlives its method.
+
+## Naming
+
+**FillStyleFromConfig** -- tier A. Pure field-fill: copies four bytes of `cfg` into the four fields of a `StyleM` (two directly as colour-table lookups, one as a `D_8008730C` table lookup, one as a plain sign-extended byte). No branching, deterministic, mechanics are the entire function -- tier A.

@@ -1,0 +1,35 @@
+# ObjM__NotifyParentsCodeB
+
+> Renamed from `func_80053E84` on 2026-09-23 (tools/rename.py). Address 0x80053e84.
+
+**Unit:** class_3bb8c_m · **Size:** 12 instructions · **Status:** MATCHED (12/12 words)
+
+## What this function does
+
+One-line dispatch: `self->methods->slot30(self, 0xB)`. No frame variable
+needed for `self` — the function has no other calls, so `$a0` is used
+directly throughout rather than being saved to `$s0`.
+
+## The C
+
+```c
+void ObjM__NotifyParentsCodeB(ObjM *self) {
+    self->methods->slot30(self, 0xB);
+}
+```
+
+This establishes `ObjMMethods::slot30(ObjM*, s32)`, later reused by
+`ObjM__HandleEvent5Or6`, `ObjM__CloseAndNotifyD` and `ObjM__CloseAndNotifyC` (this round, same
+slot, different literal arguments each time).
+
+## Residue
+
+None — matched on the first attempt.
+
+## Provenance
+
+round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__NotifyParentsCodeB** -- tier A. Pure one-line dispatch: `self->methods->notifyParents(self, 0xB)`. `notifyParents` is CONFIRMED as `BasicClass__NotifyParents` via `tools/classtable.py 0x80087034` (+0x030), so every byte of this function's behaviour is known even though the game-level meaning of event code 0xB is not -- a pure leaf whose mechanics ARE its purpose, tier A by the FINISHING-PLAN definition.

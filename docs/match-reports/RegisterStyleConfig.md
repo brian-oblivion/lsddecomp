@@ -1,4 +1,6 @@
-# func_800544E4 -- MATCHED, round 44 (2026-09-15)
+# RegisterStyleConfig -- MATCHED, round 44 (2026-09-15)
+
+> Renamed from `func_800544E4` on 2026-09-23 (tools/rename.py). Address 0x800544e4.
 
 Unit `class_3bb8c_m`. **29/29 words, byte-exact.** Reopened, never attempted
 before this round.
@@ -9,7 +11,7 @@ Register-once initializer: if `D_8008AB4C` (a `.sdata` flag word, zero at
 boot) is already set, return 0. Otherwise stash the 5 arguments (4 in
 registers, 1 on the stack at `0x28($sp)`) into a scatter of `.sbss` globals,
 zero two adjacent words (`D_8008ACA0`, and `D_8008AC9C` immediately below it
-by pointer decrement), then tail-call `func_80054558()` and return its
+by pointer decrement), then tail-call `ApplyStyleConfig()` and return its
 result.
 
 ```c
@@ -22,9 +24,9 @@ extern s32 D_8008AC7C;
 extern s32 D_8008AC80;
 extern s32 D_8008ACA0;
 
-extern s32 func_80054558(void);
+extern s32 ApplyStyleConfig(void);
 
-s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
+s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
     s32 i;
 
@@ -43,7 +45,7 @@ s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
             i--;
             p--;
         } while (i >= 0);
-        return func_80054558();
+        return ApplyStyleConfig();
     }
     return 0;
 }
@@ -79,3 +81,7 @@ loop over two or more of them, seed with `tools/m2ctx.py --sig ... --run`
 before hand-writing anything -- the pointer-decrement loop shape it recovers
 is not the same code a straightforward per-field-assignment reading would
 produce, and the difference changes the instruction count.
+
+## Naming
+
+**RegisterStyleConfig** -- tier B. Free function (VerbNoun, unrelated to the `ObjM`/`DreamSys` cluster above): a register-once guard over a `.sdata` flag word (`D_8008AB4C`), stashing five style-config arguments into `.sbss` globals and zeroing two more before tail-calling `ApplyStyleConfig`. Mechanically well understood from the disassembly; "style" describes the data it touches (color/config table consumed by `FillStyleFromConfig`/`StyleM`), not a confirmed game concept.

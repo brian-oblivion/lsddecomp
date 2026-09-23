@@ -1,33 +1,59 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
- *
  * class_3bb8c_m -- seventh carved slice of the class_3bb8c block
- * (0x44518..0x44F14, vram 0x80053D18..0x80054714), 20 functions.
- * Carved round 15.
+ * (0x44518..0x44F14, vram 0x80053D18..0x80054714), 20 functions, ALL 20
+ * MATCHED (0 INCLUDE_ASM, 0 NON_MATCHING). Carved round 15; all four former
+ * toolchain-blocker functions matched round 23/44, once `addiu_at` and
+ * `gp_rel` were resolved project-wide (CLAUDE.md, "Open toolchain
+ * blockers"). This unit owns no switch jump table.
  *
- * Blocker profile -- RE-SCREENED round 23 (2026-09-07). The carve-time screen
- * was a THREE-grep screen; `addiu_at` was resolved in round 21 (maspsx
- * `--addiu-at`; docs/research/addiu-at-blocker.md) and screening for it now
- * INVENTS blockers, so the live screen is TWO greps -- `gp_rel` and
- * `nop_mflo_mfhi`. Current state:
- *   func_800544E4  was gp_rel            -- MATCHED round 44, 29/29.
- *   func_80054558  was gp_rel (+ addiu-$at) -- MATCHED round 44, 41/41.
- *   func_800545FC  was addiu-$at ONLY    -- NOT BLOCKED. MATCHED round 23, 25/25.
- *   func_80054660  was gp_rel            -- MATCHED round 44, 45/45.
- * The old profile said "all four have stub reports; do not attempt them",
- * which was true when written and became a false blocker on one of the four
- * the moment `addiu_at` was fixed. Screen with `python3 tools/nearmiss.py`
- * rather than trusting any transcribed profile, this one included.
- * This unit owns NO switch jump table.
+ * NAMING PASS, round 69 (runner alpha). Two class identifications drive
+ * every name below, both confirmed with `tools/classtable.py`, never by
+ * guessing from a slot number:
+ *
+ *   - This unit's `self` (`ObjM`) is a subclass whose OWN vtable is
+ *     `D_80087034` (`tools/classtable.py 0x80087034`, 53 slots) -- the same
+ *     class as class_3bb8c_l's `Obj87034_3bb8c_l` (see that HEAD NOTE in
+ *     include/class_3bb8c.h; NOT unified with it here, a struct-merge is its
+ *     own change per that note). This unit's own 14 functions occupy that
+ *     table's tail, offsets +0xA0..+0xD4, i.e. this class's own new virtual
+ *     methods (the base Class86668/Obj865C8 table --
+ *     docs/match-reports/func_80052CD8.md -- only goes up to about +0x88).
+ *     `ObjMMethods::notifyParents`/`checkAuxTrigger`/`teardownPauseOverlay`
+ *     (+0x030/+0x0B8/+0x0D4) are confirmed the same way: +0x030 is
+ *     `BasicClass__NotifyParents`, and +0x0B8/+0x0D4 are this unit's own
+ *     `ObjM__CheckAuxTrigger`/`ObjM__TeardownPauseOverlay`.
+ *   - `self->dreamSys` (formerly `unk3C`) is `DreamSys*`
+ *     (`tools/classtable.py 0x80087BDC`, DreamSys's real vtable,
+ *     include/DreamSys.h): the six offsets this unit dispatches
+ *     (0xF0/0xF4/0xFC/0x13C/0x17C/0x1A0) land EXACTLY on
+ *     DreamSys__GetSetFlashbackSession/SetMoveOverride/BlockMovement/
+ *     SelectCallback98/StopDrift/GetCurrentDayAndYear, both offset and
+ *     argument count. Kept as this unit's own minimal local view
+ *     (`DreamSysObj_3bb8c_m`/`DreamSysMethods_3bb8c_m` in
+ *     include/class_3bb8c.h) rather than `#include "DreamSys.h"`, per the
+ *     project's multiple-independent-local-views convention -- the same
+ *     choice class_3bb8c_l already made for a different six DreamSys
+ *     offsets of its own.
+ *
+ * What the class itself IS remains TIER B, not asserted further:
+ * `ObjM__AdvancePauseSetup`/`ObjM__TeardownPauseOverlay` build and tear down
+ * an object literally constructed with the name "Pause"
+ * (`D_8008AB44`, "Pause", asm/data/7B008.sdata.s), gated by a 5-step
+ * counter and a `mode` field (`ObjM::mode`, ex-`unk20`) that other
+ * functions here set to fixed small codes (0,4,5,6,7,8,0xA,0xB,0xC,0xD) and
+ * forward to `ObjMMethods::notifyParents` -- consistent with a pause/dialog
+ * overlay controller driving a small state machine and notifying its
+ * parent object of transitions, but nothing here pins down the exact
+ * gameplay meaning of any one mode code. `func_800541CC` (vtable slot
+ * +0x0BC) is an empty `{}` body with no further evidence and is left
+ * unnamed.
+ *
+ * A separate, unrelated cluster of free functions (RegisterStyleConfig /
+ * ApplyStyleConfig / FillStyleFromConfig / ApplyStyleDecorationIfSet) reads
+ * and writes a small set of `.sdata`/`.sbss` globals to configure a
+ * `StyleM` colour/config descriptor (struct defined below, own comment) --
+ * unrelated to the ObjM/DreamSys machinery above beyond living in the same
+ * carved address range.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
@@ -36,35 +62,35 @@
 #include "class_3bb8c.h"
 
 /* Forward declaration: defined later in this same unit, but called by
- * func_80053D18/func_80053D9C/func_80053E00 above its own definition. */
-extern void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+ * ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA above its own definition. */
+extern void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
-void func_80053D18(ObjM *self) {
+void ObjM__EnterState7(ObjM *self) {
     s32 val;
-    self->unk20 = 7;
-    self->unk3C->methods->slotF0(self->unk3C, &val, -1);
-    func_80053EB4(self, val, 0, 5, 1);
-    self->unk3C->methods->slotFC(self->unk3C);
+    self->mode = 7;
+    self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &val, -1);
+    ObjM__ForwardToSubChild(self, val, 0, 5, 1);
+    self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
-void func_80053D9C(ObjM *self) {
-    self->unk20 = 8;
-    func_80053EB4(self, 0, 0, 6, 1);
-    self->unk3C->methods->slotF4(self->unk3C, 1);
+void ObjM__EnterState8(ObjM *self) {
+    self->mode = 8;
+    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
+    self->dreamSys->methods->setMoveOverride(self->dreamSys, 1);
 }
 
-void func_80053E00(ObjM *self) {
-    self->unk20 = 0xA;
-    func_80053EB4(self, 0, 0, 6, 1);
-    self->unk3C->methods->slot13C(self->unk3C, 2);
-    self->unk3C->methods->slotF4(self->unk3C, 2);
+void ObjM__EnterStateA(ObjM *self) {
+    self->mode = 0xA;
+    ObjM__ForwardToSubChild(self, 0, 0, 6, 1);
+    self->dreamSys->methods->selectCallback98(self->dreamSys, 2);
+    self->dreamSys->methods->setMoveOverride(self->dreamSys, 2);
 }
 
-void func_80053E84(ObjM *self) {
-    self->methods->slot30(self, 0xB);
+void ObjM__NotifyParentsCodeB(ObjM *self) {
+    self->methods->notifyParents(self, 0xB);
 }
 
-void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+void ObjM__ForwardToSubChild(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     ChildM_AC *obj = self->unk18->methods->slotAC(self->unk18);
     if (arg3 != 0) {
         obj->methods->slotD0(obj, arg3);
@@ -75,39 +101,39 @@ void func_80053EB4(ObjM *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     obj->methods->slotD8(obj, self->unk10, arg1, arg2);
 }
 
-void func_80053F84(ObjM *self, ParamM *p1, s32 sel) {
+void ObjM__HandleEvent5Or6(ObjM *self, ParamM *p1, s32 sel) {
     s32 v;
     switch (sel) {
     case 5:
         self->methods->slot14(self, p1);
-        self->unk3C->methods->slotF4(self->unk3C, 0);
-        self->unk20 = 0;
+        self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
+        self->mode = 0;
         break;
     case 6:
         self->methods->slot14(self, p1);
         v = p1->methods->slotE4(p1);
         self->unk18->methods->slot64(self->unk18, v);
-        if (self->unk20 != 5 && self->unk20 != 8 && self->unk20 == 0xA) {
-            self->unk3C->methods->slot17C(self->unk3C, 1);
-            self->unk3C->methods->slotF4(self->unk3C, 0);
-            self->unk20 = 4;
+        if (self->mode != 5 && self->mode != 8 && self->mode == 0xA) {
+            self->dreamSys->methods->stopDrift(self->dreamSys, 1);
+            self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
+            self->mode = 4;
         }
-        self->methods->slot30(self, self->unk20);
+        self->methods->notifyParents(self, self->mode);
         break;
     }
 }
 
-void func_800540E8(ObjM *self, s32 arg1, s32 arg2) {
+void ObjM__HandleEvent7(ObjM *self, s32 arg1, s32 arg2) {
     if (arg2 == 7) {
-        self->methods->slotB8(self);
+        self->methods->checkAuxTrigger(self);
     }
 }
 
-s32 func_80054120(ObjM *self) {
+s32 ObjM__CheckAuxTrigger(ObjM *self) {
     s32 out;
     s32 result;
     ChildM114 *child = self->unk14->methods->slot114(self->unk14, &out);
-    void *thing = self->unk3C->methods->slot1A0(self->unk3C, 0);
+    void *thing = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     result = TryDreamAuxTrigger(child->unk4->unk34, &out, thing);
     child->unk14 = result;
     if (result != 0) {
@@ -120,31 +146,31 @@ s32 func_80054120(ObjM *self) {
 void func_800541CC(void) {
 }
 
-void func_800541D4(ObjM *self) {
-    if (self->unk80 != 0 && self->unk20 == 0) {
+void ObjM__UpdateCloseReadyFlag(ObjM *self) {
+    if (self->unk80 != 0 && self->mode == 0) {
         self->unk84 = 1;
     }
 }
 
-void func_80054200(ObjM *self) {
+void ObjM__ClearCloseReadyFlag(ObjM *self) {
     self->unk84 = 0;
 }
 
-void func_80054208(ObjM *self) {
+void ObjM__CloseAndNotifyD(ObjM *self) {
     if (self->unk84) {
-        self->methods->slotD4(self);
-        self->methods->slot30(self, 0xD);
+        self->methods->teardownPauseOverlay(self);
+        self->methods->notifyParents(self, 0xD);
     }
 }
 
-void func_8005426C(ObjM *self) {
+void ObjM__CloseAndNotifyC(ObjM *self) {
     if (self->unk84) {
-        self->methods->slotD4(self);
-        self->methods->slot30(self, 0xC);
+        self->methods->teardownPauseOverlay(self);
+        self->methods->notifyParents(self, 0xC);
     }
 }
 
-void func_800542D0(ObjM *self) {
+void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->unk80;
     if (state == 0) {
         self->unk7C = New_Obj6EAC0(self->unk74, 5, &D_8008AB44[0]);
@@ -163,7 +189,7 @@ void func_800542D0(ObjM *self) {
     self->unk34->methods->slot88(self->unk34);
 }
 
-void func_800543FC(ObjM *self) {
+void ObjM__TeardownPauseOverlay(ObjM *self) {
     if (self->unk80 != 0) {
         self->unk7C->methods->slot4(self->unk7C);
     }
@@ -174,7 +200,7 @@ void func_800543FC(ObjM *self) {
     self->unk80 = 0;
 }
 
-void *func_800544D4(void) {
+void *GetObjMMethods(void) {
     return &D_80087034;
 }
 
@@ -189,9 +215,9 @@ extern s32 D_8008AC7C;
 extern s32 D_8008AC80;
 extern s32 D_8008ACA0;
 
-extern void *func_80054558(void);
+extern void *ApplyStyleConfig(void);
 
-s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
+s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
     s32 i;
 
@@ -210,7 +236,7 @@ s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
             i--;
             p--;
         } while (i >= 0);
-        return func_80054558();
+        return ApplyStyleConfig();
     }
     return 0;
 }
@@ -218,24 +244,24 @@ s32 func_800544E4(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
 extern s32 D_80087424;
 extern s8 *D_800873EC[];
 extern s8 *func_80054758(void);
-extern void func_800545FC(struct StyleM *style, s8 *cfg);
+extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
 extern u8 D_800872C4[][3];
 extern const u8 *D_8008AB54;
 
-void *func_80054558(void) {
+void *ApplyStyleConfig(void) {
     s8 *cfg = D_800873EC[D_8008AC6C];
 
     if (cfg == 0) {
         cfg = func_80054758();
     }
-    func_800545FC((struct StyleM *) &D_80087424, cfg);
+    FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
     if (cfg[1] >= 4) {
         D_8008AB54 = D_800872C4[cfg[2]];
     }
     return &D_80087424;
 }
 
-/* func_800545FC's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
+/* FillStyleFromConfig's destination is NOT an `ObjM`. That struct's +0x014 and +0x018
  * are already established as unrelated object pointers by five other functions
  * in this unit (`FieldM14 *`/`FieldM18 *`), whereas this function writes a
  * colour-table POINTER to +0x018 and a plain sign-extended byte to +0x014. So
@@ -260,7 +286,7 @@ struct StyleM {
 extern u8 D_800872C4[][3];
 extern s32 D_8008730C[];
 
-void func_800545FC(struct StyleM *style, s8 *cfg) {
+void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
     style->unkC = D_800872C4[cfg[3]];
     style->unk18 = D_800872C4[cfg[2]];
     style->unk1C = D_8008730C[cfg[1]];
@@ -307,7 +333,7 @@ extern s32 D_8008AB60;
 extern s32 D_8008AB58;
 extern LocalM4D0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
 
-void func_80054660(void) {
+void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
     if (D_8008AB54 != 0) {

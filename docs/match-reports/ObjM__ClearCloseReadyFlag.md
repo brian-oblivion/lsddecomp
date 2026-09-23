@@ -1,4 +1,6 @@
-# func_80054200
+# ObjM__ClearCloseReadyFlag
+
+> Renamed from `func_80054200` on 2026-09-23 (tools/rename.py). Address 0x80054200.
 
 **Unit:** class_3bb8c_m · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 
@@ -9,7 +11,7 @@ Trivial single-statement setter, whole body is `jr $ra` / `sw $zero,
 return completes).
 
 ```c
-void func_80054200(ObjM *self) {
+void ObjM__ClearCloseReadyFlag(ObjM *self) {
     self->unk84 = 0;
 }
 ```
@@ -21,3 +23,7 @@ None.
 ## Provenance
 
 round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+
+## Naming
+
+**ObjM__ClearCloseReadyFlag** -- tier A. Trivial single-statement setter, `self->unk84 = 0` -- the whole body is `jr $ra` / `sw $zero`. A plain setter is tier A by the FINISHING-PLAN definition (mechanics ARE the purpose).

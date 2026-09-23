@@ -1,4 +1,6 @@
-# func_80054660 -- MATCHED, round 44 (2026-09-15)
+# ApplyStyleDecorationIfSet -- MATCHED, round 44 (2026-09-15)
+
+> Renamed from `func_80054660` on 2026-09-23 (tools/rename.py). Address 0x80054660.
 
 Unit `class_3bb8c_m`. **45/45 words, byte-exact.** Reopened, never attempted
 before this round.
@@ -6,7 +8,7 @@ before this round.
 ## What it does
 
 Takes no arguments; gated entirely on the global `D_8008AB54` (set by
-`func_80054558`, matched earlier this round). If it's non-NULL: builds an
+`ApplyStyleConfig`, matched earlier this round). If it's non-NULL: builds an
 object via `New_ClassEAC0(&D_8008AB60, D_8008AB54, 0)` (already known
 elsewhere as returning `ClassEAC0Obj *` from `include/code_2cc8c.h`, a header
 this unit doesn't own -- see below), stashes it in `D_8008AC94`, and
@@ -52,7 +54,7 @@ extern s32 D_8008AB60;
 extern s32 D_8008AB58;
 extern LocalM4D0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
 
-void func_80054660(void) {
+void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
     if (D_8008AB54 != 0) {
@@ -117,7 +119,11 @@ schedule GCC 2.6.3 -O2 produced, because it lets the compiler's own local
 CSE decide when the raw call-return register is still cheaper to reuse than
 copying it to the argument register early. This is the same family as
 round 44's other two levers this session (guard-clause direction in
-`func_800544E4`, join-point count in `func_80054558`) -- all three are
+`RegisterStyleConfig`, join-point count in `ApplyStyleConfig`) -- all three are
 cases where semantically-identical C phrasings hand GCC 2.6.3's allocator
 and scheduler different amounts of freedom, and the fix was never new
 logic, only a different way of naming the same values.
+
+## Naming
+
+**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `D_8008AB54` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_ClassEAC0`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`D_8008AC7C`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
