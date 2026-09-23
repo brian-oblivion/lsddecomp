@@ -1,72 +1,29 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * class_3bb8c_r -- 0x46288..0x46D20 (vram 0x80055A88..0x80056520), the tail
+ * of the `class_3bb8c_n` remainder (carved round 17). All 21 functions are
+ * MATCHED. Two unrelated classes share the slice, cut at ROM addresses
+ * rather than at a class boundary (tools/classtable.py, round 17):
  *
- * class_3bb8c_r -- functions 23..43 of the 113-function `class_3bb8c_n`
- * remainder, 0x46288..0x46D20 (vram 0x80055A88..0x80056520).  Carved MID-round
- * 17 (2026-09-04) to re-staff a runner whose own unit was exhausted.
+ *  - StyleCue00..StyleCue13, the complete 14-slot table `gStyleCueCallbacks`.
+ *    TryStartStyleCue (class_3bb8c_n.c) installs each occupant as
+ *    SoundCueSet::callback via InitSoundCueSet (code_179d8_e.c) -- the same
+ *    per-tag sound-cue-callback mechanism `gEntityMoodHandlerTable`'s
+ *    MoodCueNN occupants use for Entity. Each occupant dispatches on
+ *    `self->kind` (its own tag) to fill in a handful of numeric fields, and
+ *    all 14 call the shared helper `ComputeStyleCueFalloff` first. Local
+ *    view `StyleCueParam`/`StyleCueParamMethods`; tier B throughout --
+ *    the callback mechanism is established, which specific numeric fields
+ *    mean in the running game is not.
+ *  - `Class876FCMethods` (`gClass876FCMethods`), a `DreamSys`-derived
+ *    concrete class whose PRIVATE methods live in class_3bb8c_s.c (round
+ *    70/round 17, `Class876FC` there is the same struct under the owner's
+ *    name). This unit supplies its ctor/dtor/setParams/update
+ *    (Class876FC__Class876FC/__Finalize/__SetParams/__Update) plus the
+ *    `New_Class876FC` allocator; local view kept independent of
+ *    class_3bb8c_s.c's per the multiple-independent-local-views convention.
  *
- * Blocker census, three-grep screen run per function at carve time:
- * 20 of 21 clean, and ZERO trivial leaves -- every one is a real body, several
- * in the 40-70 instruction range.
- *
- * IsStyleVariantEven: MATCHED round 44 (was filed BLOCKED/gp_rel; reopened and
- * closed 5/5 on the first build after the fix -- see
- * docs/match-reports/IsStyleVariantEven.md).
- *
- * Owns NO switch jump table -- zero `jtbl_` references in the slice -- so no
- * rodata sub-slot is attached to this unit.
- *
- * The 23 functions in FRONT of this slice (still `class_3bb8c_n`) are the
- * gp_rel-densest ground in the executable -- exactly two of them are clean --
- * which is why the cut is here rather than at the segment start.
- *
- * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM addresses,
- * not at class boundaries.  Identify each class with tools/classtable.py
- * rather than assuming the unit has one.
- *
- * Confirmed round 17 continuation (runner bravo): TWO classes, resolved with
- * `tools/classtable.py --scan` plus a direct read of `asm/data/76DC8.data.s`
- * since one table's own slot count coincides with (but is NOT) BasicClass's:
- *
- *  - StyleCue00 .. StyleCue13 (14 functions) are the complete slot
- *    list of `gStyleCueCallbacks` (14 slots, header word 0). Despite matching
- *    BasicClassMethods' slot COUNT, these bodies are NOT
- *    add/removeChild-shaped -- every one calls the shared helper
- *    `ComputeStyleCueFalloff(ctx)` then dispatches on `target->kind` to
- *    fill in a handful of numeric fields. Kept as its own local view,
- *    `StyleCueParam`/`StyleCueParamMethods` -- nothing here justifies asserting a
- *    BasicClass relationship just because the slot count coincides.
- *  - Class876FC__Class876FC (ctor) / Class876FC__Finalize (dtor) / Class876FC__SetParams (setParams)
- *    / Class876FC__Update are occupants of `gClass876FCMethods` -- the SAME sibling
- *    table `class_3bb8c_o.c` (round 17, previous pass, already merged)
- *    partly resolved from the OTHER side (its own `GetClass876FCMethods` returns
- *    `&gClass876FCMethods`, and its shared-base slots +0x010/+0x014/+0x018/+0x088/
- *    etc. are INHERITED, not overridden, by this class). This unit
- *    supplies the class's OWN slots (ctor/dtor/setParams), confirmed by both
- *    chaining to `DreamSys__GetBaseMethods()` -- the SAME shared-base getter
- *    `class_3bb8c_o.c` already used for its own ctor/New_X pair. Kept as
- *    this unit's own local view, `Class876FC`/`Class876FCMethods` --
- *    `class_3bb8c_o.c` is not this unit's to edit, and per the
- *    multiple-independent-local-views convention there is no reason a
- *    fresh view here should match its field names field-for-field.
- *  - New_Class876FC is a plain `New_X` allocator (0x98 bytes) for the
- *    `gClass876FCMethods` class, dispatching through `GetClass876FCMethods()->ctor`
- *    (cross-unit call into the ALREADY-MATCHED `class_3bb8c_o.c` symbol)
- *    rather than calling `Class876FC__Class876FC` by name.
- *  - ComputeStyleCueFalloff is the shared helper every `gStyleCueCallbacks` occupant calls
- *    first (and `StyleCue11` reaches transitively, via a plain call to
- *    `StyleCue10`): reads a small tag byte off `ctx->methods`, looks it
- *    up (with a NEGATIVE index) into a global table, and returns a
- *    chained division result.
+ * Named round 73 (charlie); tiers and evidence in each function's match
+ * report.
  */
 #include "common.h"
 
