@@ -1,4 +1,59 @@
-# func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
+# func_8004BB3C -- MATCHED round 73 (105/105, exact length, whole-image SHA1 green)
+
+REVISITED, round 73: MATCHED 105/105 (walker is a strength-reduced giv of the walked parameter); names/types not relevant (existing SetupEntry866E8/SetupSub866E8 views reused unchanged)
+
+## Round 73 (bravo) -- revisit, MATCHED
+
+**Preserved body rebuilt first, unchanged from the `#if 0` block:** 90/105,
+`insertions 4 / deletions 4`, positional skeleton diffs 15, exact length.
+Residue as filed: `ep`/`sp` in `$s3`/`$s4` where retail has `$s4`/`$s3`,
+and the `sp` initialiser scheduled in the prologue BEFORE the `blez`
+guard, where retail has it after the guard.
+
+**The word that decided it:** retail's `addiu $s3, $a1, 4` sits in the
+loop PREHEADER (after `blez $s5`, next to the hoisted `li $s6, 1`) and it
+reads `$a1`, not the callee-saved register that holds `arr1`. A user
+variable initialised in C lands before the guard; only loop.c puts code in
+the preheader. So the `+4` register is a strength-reduced giv, and a giv
+whose init reads the INCOMING argument register means the biv's
+initial value was that register: the biv is the parameter `arr1` itself,
+not a copy.
+
+Builds, one per line (funcdiff score):
+- preserved two-walker body (`ep = arr1`, `sp = arr1 + 4`, both `++`): 90/105, ins/del 4/4
+- `ep` walker + indexed `arr1[i].id` / `arr1[i].rate`: 93/105, ins/del 2/2 (giv anchored at +0, `id` at +8)
+- `sp = (Sub *)&arr1[i].rate` inside the loop: 93/105, byte-identical to the previous (CSE folds to one base)
+- `sp = &((Sub *)((u8 *)arr1 + 4))[i]`: longer (drift); the +4 base stays a separate invariant register, `sp = s6 + s5` recomputed each pass, but the s3/s4 roles came out like retail's
+- same with a hoisted `sub = arr1 + 4` local: one word longer (a `move` from the pre-guard copy)
+- same inlined with no `sp` local: 93/105, folds back to the +0 anchor
+- `ep` walker + `sp = (Sub *)&ep->rate` inside the loop: 90/105 at retail's SHAPE (init now in the preheader) but reading `$s3` (= `ep`) and roles still swapped
+- **walk `arr1` itself (no `ep`), `sp = (Sub *)&arr1->rate` inside the loop: 105/105, `build exit=0`, OK: build matches retail**
+
+Checked hypothesis for why the `ep` copy swapped the registers: with
+`ep = arr1`, the giv init reads `ep`'s pseudo, which ties `arr1`/`ep`
+together into the first-allocated callee-saved register; with the
+parameter as the biv, the giv is seeded from `$a1` directly and the
+parameter pseudo's live range and priority change, so the giv outranks
+it for `$s3`.
+
+Header: one additive comment paragraph in `include/class_3bb8c.h` after
+the existing SetupEntry866E8 note; no declaration changed.
+
+### Proposed learning
+
+**A walker initialised in the loop PREHEADER (after the count guard, next
+to hoisted constants) is a strength-reduced giv, not a user pointer; if
+its init reads an ARGUMENT register, the biv is the parameter itself.**
+Write `arr1++` on the parameter and assign `sub = (T *)&arr1->field`
+inside the body. A second walker declared and initialised in C always
+lands BEFORE the guard; a `ep = arr1` copy makes the init read the copy's
+s-register instead of `$aN`. Distinct from the "two differently-based
+walkers" shape round 13 found, which gets the increments right and the
+allocation wrong.
+
+## Earlier history (superseded by the match above)
+
+#### Old title: func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
 
 > **ROUND 47 (charlie): Gate 1b re-verified 90/105, no drift** (rebuild via
 > `make clean && make extract` then the standard `#if 0`->`#if 1` swap,

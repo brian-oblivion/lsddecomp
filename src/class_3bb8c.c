@@ -267,48 +267,29 @@ storeKey:
 }
 
 
-#if 0
-/* STALL snapshot -- see docs/match-reports/func_8004BB3C.md. 90/105 words
- * with CORRECT total length: every instruction in the loop body and the
- * epilogue matches retail one-for-one, including BOTH `addiu sN,sN,0xc`
- * walker increments. The residue is a whole-function $s3<->$s4 identity
- * swap plus the prologue scheduling that follows from it -- a
- * register-identity stall, which project rule 6 forbids fixing with a
- * register pin. The two-differently-BASED-walker shape below is what
- * recovered the previously-missing second increment; do not go back to a
- * single indexed base.
- *
- * ROUND 19 (bravo): re-verified per the head's mid-round drift-check
- * broadcast. Rebuilt exactly as below: 90/105, ZERO drift, compiled
- * length 0x1A4 (105 words) matching retail's own `.s` header exactly.
- * The claim in this report ("correct total length, no insertions or
- * deletions") is CONFIRMED accurate, unlike two other reports' claims
- * the same broadcast flagged as wrong. Not re-attempted further this
- * round -- the residue matches this round's independently-confirmed
- * "declaration order is inert" finding for this exact class.
- *
- * ROUND 27 (delta): re-verified per the head's callee-saved-registers
- * broadcast -- compiled prologue saves the IDENTICAL set to retail (s0-s6,
- * ra, no fp, same stack slots for every register), only the ORDER of the
- * `sw` instructions and which C variable maps to which physical register
- * differ. The "extra callee-saved parameter" lever does NOT apply.
- * Verdict (pure register identity) CONFIRMED, not just plausible.
- */
+/* MATCH, round 73 (bravo): 105/105. Retail's `+4` walker is a
+ * strength-reduced giv of the walked PARAMETER, not a second user
+ * pointer: its init (`addiu s3,a1,4`) sits in the loop preheader after
+ * the count guard and reads $a1, which is what loop.c emits when the biv
+ * is `arr1` itself (initial value = the incoming argument register).
+ * `sp` is therefore assigned from `arr1` inside the body and `arr1` is
+ * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
+ * See docs/match-reports/func_8004BB3C.md. */
 void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
-    SetupEntry866E8 *ep = arr1;
     s32 i;
     Elem *e;
-    SetupSub866E8 *sp = (SetupSub866E8 *)((u8 *)arr1 + 4);
+    SetupSub866E8 *sp;
 
     for (i = 0; i < count; i++) {
+        sp = (SetupSub866E8 *)&arr1->rate;
         e = self->methods->slot118(self, sp->id);
         self->methods->slot88(self, 6, e, i);
-        if (ep->ptr0 != 0) {
+        if (arr1->ptr0 != 0) {
             if (e->unk4->unk2C != 0) {
                 self->methods->slot108(self, e);
             }
             e->unk4->unk30 = sp->rate;
-            e->unk4->methods->slot78(e->unk4, ep->ptr0);
+            e->unk4->methods->slot78(e->unk4, arr1->ptr0);
             e->flag = 1;
             self->unk1B0 = 1;
         } else {
@@ -320,14 +301,10 @@ void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
                 e->flag = 0;
             }
         }
-        ep++;
-        sp++;
+        arr1++;
     }
     self->unk1B4 = func_8004BCE0(self);
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BB3C);
 
 s32 func_8004BCE0(Obj866E8 *self) {
     s32 count;
