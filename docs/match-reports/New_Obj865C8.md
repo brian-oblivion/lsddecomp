@@ -17,7 +17,7 @@ Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 
     self = func_80017B34(0x50);
     if (self != NULL) {
-        func_8004A060()->ctor(self, arg1, arg2, arg3);
+        GetObj865C8Methods()->ctor(self, arg1, arg2, arg3);
         return self;
     }
     return NULL;
@@ -48,7 +48,7 @@ now obsolete.
 
 Typing this one needed two small header changes, both recorded in
 `include/class_39e08.h`: `Class865C8Methods::ctor` was `void *` and is now a
-typed pointer carrying Obj865C8__Obj865C8's own signature, and `func_8004A060`
+typed pointer carrying Obj865C8__Obj865C8's own signature, and `GetObj865C8Methods`
 gained a prototype because it is defined later in the unit (ROM order) than
 the function that dispatches through it.
 

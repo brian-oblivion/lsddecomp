@@ -217,7 +217,7 @@ build will fail at link with `undefined reference to gMomPathSymSpy`.
 
 **InitDreamAux** — tier B. Called exactly once, as the first DreamAux-specific
 call inside `Obj865C8__Obj865C8` (a constructor: `GetClass86668Methods()->ctor(self,...);
-self->methods = func_8004A060(); InitDreamAux(); ...`), before the rest of
+self->methods = GetObj865C8Methods(); InitDreamAux(); ...`), before the rest of
 that object's own fields are set up. Clears every `gDreamAuxGroupRecord`'s
 `flag` across all 14 groups and loads the initial MOM audio-stream object
 into `gDreamAuxSlots[0].obj`. "Init" fits the one-shot, construction-time

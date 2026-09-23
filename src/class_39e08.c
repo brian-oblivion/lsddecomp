@@ -7,7 +7,7 @@ Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 
     self = func_80017B34(0x50);
     if (self != NULL) {
-        func_8004A060()->ctor(self, arg1, arg2, arg3);
+        GetObj865C8Methods()->ctor(self, arg1, arg2, arg3);
         return self;
     }
     return NULL;
@@ -18,7 +18,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     s32 tmp;
 
     GetClass86668Methods()->ctor(self, func_80048E08(0), 0);
-    self->methods = func_8004A060();
+    self->methods = GetObj865C8Methods();
     InitDreamAux();
     self->unk44 = func_8003B39C(D_800113EC);
     self->unk44->methods->slot78(self->unk44);
@@ -209,7 +209,7 @@ void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
     }
 }
 
-Class865C8Methods *func_8004A060(void) {
+Class865C8Methods *GetObj865C8Methods(void) {
     return &D_800865C8;
 }
 

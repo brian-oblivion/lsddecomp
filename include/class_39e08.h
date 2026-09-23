@@ -43,7 +43,7 @@ typedef struct Class865C8Methods {
     s32 header;                                   /* +0x000 */
     void *unk04;                                   /* +0x004 BasicClass__func_17eb0 */
     /* Typed because New_Obj865C8 (this unit) dispatches it as
-     * func_8004A060()->ctor(self, arg1, arg2, arg3); the signature is
+     * GetObj865C8Methods()->ctor(self, arg1, arg2, arg3); the signature is
      * Obj865C8__Obj865C8's own, defined just below. */
     void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, SubObjD *arg2, s32 arg3); /* +0x008 Obj865C8__Obj865C8 */
     void (*dtor)(Obj865C8 *self);                  /* +0x00C Obj865C8__Dtor */
@@ -380,7 +380,7 @@ typedef struct Class86668Methods {
  * dispatches through it; class_3ac78.h holds its owning view. */
 /* Defined in this unit at ROM order 0x3A860, i.e. AFTER New_Obj865C8,
  * which dispatches through it -- so it needs a prototype here. */
-extern Class865C8Methods *func_8004A060(void);
+extern Class865C8Methods *GetObj865C8Methods(void);
 
 extern Class86668Methods *GetClass86668Methods(void);
 
