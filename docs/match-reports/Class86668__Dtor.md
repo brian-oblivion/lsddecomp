@@ -1,4 +1,6 @@
-# func_8004A228
+# Class86668__Dtor
+
+> Renamed from `func_8004A228` on 2026-09-23 (tools/rename.py). Address 0x8004a228.
 
 **Unit:** class_39e08 · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
 
@@ -37,7 +39,7 @@ jalr  $v0
 Written as:
 
 ```c
-void func_8004A228(Obj865C8 *self) {
+void Class86668__Dtor(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }
@@ -60,3 +62,7 @@ those slots with the SAME shared implementation while diverging elsewhere,
 e.g. +0x008/+0x00C/+0x040/+0x044/+0x048). Diffing both against their common
 base (`gIntermediateBaseMethods`) rather than against each other avoids misreading shared
 inherited/override code as a subclass relationship.
+
+## Naming
+
+`Class86668__Dtor` -- tier A. The sibling class's own dtor override (+0x00C), releasing `subB` when owned and forwarding to the base dtor.

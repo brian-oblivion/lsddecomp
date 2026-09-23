@@ -1,4 +1,6 @@
-# func_80049958 — MATCHED (47/47 words)
+# Obj865C8__OnNotify — MATCHED (47/47 words)
+
+> Renamed from `func_80049958` on 2026-09-23 (tools/rename.py). Address 0x80049958.
 
 `Class865C8Methods` slot +0x038.
 
@@ -54,7 +56,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_80049958(Obj865C8 *self, EventArg *arg1, s32 arg2) {
+void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
 
     GetClass86668Methods()->slot38(self, arg1, arg2);
@@ -84,13 +86,13 @@ void func_80049958(Obj865C8 *self, EventArg *arg1, s32 arg2) {
   (*noop80)(void)` / opaque `void *slot84` to `void (*)(Obj865C8 *self,
   EventArg *arg1, s32 arg2)`. This is the significant correction: `slot80`
   was typed as a no-arg no-op purely because its one known occupant,
-  `func_80049EAC` (`void func_80049EAC(void) {}`, already matched), ignores
+  `Obj865C8__Noop80` (`void Obj865C8__Noop80(void) {}`, already matched), ignores
   everything. This function proves the SLOT itself takes 3 arguments —
-  `func_80049EAC` just happens to not read them, and an empty body compiles
+  `Obj865C8__Noop80` just happens to not read them, and an empty body compiles
   identically (`jr $ra; nop`) whether its C prototype declares 0 or 3
   parameters, so the previous typing was invisible until a second caller
   that DOES pass real arguments showed up. `slot84`'s occupant
-  (`func_80049EB4`) is still addiu_at-blocked and unverified beyond this
+  (`Obj865C8__OnTag2Notify`) is still addiu_at-blocked and unverified beyond this
   call site, but the signature here is well-established from the two
   register loads (`a1`/`a2`) immediately preceding the shared `jalr`.
 
@@ -110,9 +112,13 @@ specific lever this round.
 recording as its own entry:** a no-op-bodied occupant is not evidence a
 vtable SLOT takes no arguments, only that THAT occupant ignores whatever
 it's given. `Class865C8Methods::slot80` was typed `void (*)(void)` from
-`func_80049EAC`'s empty body alone; this function's own disassembly loads
+`Obj865C8__Noop80`'s empty body alone; this function's own disassembly loads
 real `a1`/`a2` before the `jalr`, proving the slot's true signature carries
 2 more parameters that this particular occupant simply discards. Same shape
 as CLAUDE.md's existing "a discarded return is never evidence of void" rule,
 generalized from return values to arguments. Check a slot's CALL SITES for
 the full signature before trusting an empty-body occupant's parameter count.
+
+## Naming
+
+`Obj865C8__OnNotify` -- tier B. Overrides the base's +0x038 `Obj86B60__OnNotify` slot (confirmed by `tools/classtable.py` diff) and, after forwarding to the base, dispatches by `arg1->target->header` tag (0x1F34 / 0x2F230) to the class's own `Noop80`/`OnTag2Notify`. The dispatch mechanism is evident from the body; what the two tag values MEAN in-game is not.

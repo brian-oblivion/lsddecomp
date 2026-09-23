@@ -259,7 +259,7 @@ extern s32 func_80049334(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resol
     back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
     func_8002677C. */
 
-/* A fourth small class, allocated by func_80049608 (uncarved,
+/* A fourth small class, allocated by New_Obj865C8 (uncarved,
  * asm/class_39e08.s, New_X shape, 0x50 bytes). slot4 here is called with
  * ONLY self (no extra args) and its return is used as a small status
  * code -- a different signature from every other class's slot4 in this
@@ -279,7 +279,7 @@ typedef struct StatusObj {
     StatusObjMethods *methods;
 } StatusObj;
 
-extern StatusObj *func_80049608(s32 a0, void *dreamSys, s32 a2);
+extern StatusObj *New_Obj865C8(s32 a0, void *dreamSys, s32 a2);
 
 /* This unit's own function, defined later in ROM order (forward declared
  * for func_80026698, which comes first). */

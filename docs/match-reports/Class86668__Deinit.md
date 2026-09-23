@@ -1,11 +1,13 @@
-# func_8004A324
+# Class86668__Deinit
+
+> Renamed from `func_8004A324` on 2026-09-23 (tools/rename.py). Address 0x8004a324.
 
 **Unit:** class_39e08 · **Size:** 14 words (0x38 bytes) · **Status:** MATCHED (14/14 words)
 
 ## What it does
 
 Method-table slot +0x048 of `gClass86668Methods` (the sibling class; see
-`func_8004A228.md`). Calls the BASE class's own +0x048 slot (fetched through
+`Class86668__Dtor.md`). Calls the BASE class's own +0x048 slot (fetched through
 `Get_vtable_IntermediateBase()`) directly on `self` -- an explicit "call the base
 implementation" pattern, not a self-vtable dispatch.
 
@@ -22,7 +24,7 @@ jalr  $v0
 Written as:
 
 ```c
-void func_8004A324(Obj865C8 *self) {
+void Class86668__Deinit(Obj865C8 *self) {
     Get_vtable_IntermediateBase()->slot48(self);
 }
 ```
@@ -30,3 +32,7 @@ void func_8004A324(Obj865C8 *self) {
 ## Proposed learning
 
 None beyond what's already documented.
+
+## Naming
+
+`Class86668__Deinit` -- tier B. Occupies +0x048 (the mirror of Class86668__Init): a thin wrapper forwarding to `Get_vtable_IntermediateBase()->slot48(self)`.

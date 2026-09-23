@@ -1,4 +1,6 @@
-# func_8004A364 — MATCHED (34/34 words)
+# Obj865C8__CheckTimeout — MATCHED (34/34 words)
+
+> Renamed from `func_8004A364` on 2026-09-23 (tools/rename.py). Address 0x8004a364.
 
 ## Disassembly shape
 
@@ -36,7 +38,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_8004A364(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
     Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
     if ((u32)self->unk1C > (u32)self->unk2C) {
         self->methods->onEventArg(self, 4);
@@ -77,3 +79,7 @@ for which one it loads first; if retail's load order doesn't match your
 comparison's source order, try swapping which side is written first (and
 flipping the operator to preserve the same logical meaning) rather than
 assuming a scheduling quirk.
+
+## Naming
+
+`Obj865C8__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`Obj86B60__IncrementFrameCounter`, code_2cc8c.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.

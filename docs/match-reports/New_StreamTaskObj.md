@@ -44,7 +44,7 @@ epilogue merge. Put it first and it costs an extra `j`.
 Previously filed as **NOT ATTEMPTED**, a predicted instance.
 
 This one is also a **five-argument** dispatch, and worth reading alongside
-`docs/match-reports/func_80049E20.md` for that reason. Retail stores the
+`docs/match-reports/Obj865C8__EnterState2.md` for that reason. Retail stores the
 fifth argument with `sw $s1, 0x10($sp)` -- the o32 stack-argument slot -- so
 `StreamTaskObjMethods::slot08` is typed with self plus four arguments. The
 slot did not exist in the header before this match; it was inside `pad04`.

@@ -1,4 +1,6 @@
-# func_80049608
+# New_Obj865C8
+
+> Renamed from `func_80049608` on 2026-09-23 (tools/rename.py). Address 0x80049608.
 
 **Unit:** class_39e08 · **Status:** MATCHED (31/31 words)
 
@@ -9,13 +11,13 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-Obj865C8 *func_80049608(Obj0C *arg1, SubObjD *arg2, s32 arg3)
+Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 {
     ...
 
     self = func_80017B34(0x50);
     if (self != NULL) {
-        func_8004A060()->ctor(self, arg1, arg2, arg3);
+        GetObj865C8Methods()->ctor(self, arg1, arg2, arg3);
         return self;
     }
     return NULL;
@@ -46,7 +48,7 @@ now obsolete.
 
 Typing this one needed two small header changes, both recorded in
 `include/class_39e08.h`: `Class865C8Methods::ctor` was `void *` and is now a
-typed pointer carrying func_80049684's own signature, and `func_8004A060`
+typed pointer carrying Obj865C8__Obj865C8's own signature, and `GetObj865C8Methods`
 gained a prototype because it is defined later in the unit (ROM order) than
 the function that dispatches through it.
 
@@ -55,3 +57,7 @@ the function that dispatches through it.
 Matched by the head during divergence resolution, 2026-09-02, as part of
 closing the epilogue-merge class. `docs/research/epilogue-merge-residue.md` is
 updated with what survived and what did not.
+
+## Naming
+
+`New_Obj865C8` -- tier A. Allocator, matches the established `New_X` idiom used everywhere else in this project (allocate fixed size, ctor via the class's own vtable accessor, return NULL on failure): mechanics are its purpose.

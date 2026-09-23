@@ -1,4 +1,6 @@
-# func_8004A060
+# GetObj865C8Methods
+
+> Renamed from `func_8004A060` on 2026-09-23 (tools/rename.py). Address 0x8004a060.
 
 **Unit:** class_39e08 · **Size:** 4 words (0x10 bytes) · **Status:** MATCHED (4/4 words)
 
@@ -22,7 +24,7 @@ jr    $ra
 Written as:
 
 ```c
-Class865C8Methods *func_8004A060(void) {
+Class865C8Methods *GetObj865C8Methods(void) {
     return &D_800865C8;
 }
 ```
@@ -35,3 +37,7 @@ type needed for callers is declared.
 ## Proposed learning
 
 None beyond what's already documented.
+
+## Naming
+
+`GetObj865C8Methods` -- tier A. Plain accessor, `return &D_800865C8;` -- matches the established `GetXMethods`/`Get_vtable_X` accessor convention used site-wide for vtable getters (e.g. `GetClass86668Methods`, `Get_vtable_IntermediateBase`).

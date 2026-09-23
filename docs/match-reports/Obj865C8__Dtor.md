@@ -1,4 +1,6 @@
-# func_80049830 — MATCHED (74/74 words)
+# Obj865C8__Dtor — MATCHED (74/74 words)
+
+> Renamed from `func_80049830` on 2026-09-23 (tools/rename.py). Address 0x80049830.
 
 `Class865C8Methods` slot +0x00C (the dtor).
 
@@ -58,7 +60,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_80049830(Obj865C8 *self) {
+void Obj865C8__Dtor(Obj865C8 *self) {
     Obj0C *o = self->unk0C;
     SubObjG *g;
 
@@ -89,7 +91,7 @@ same root cause:
    AFTER the first call (`self->methods->slot14(...)`) rather than before
    it. Retail loads `self->unk0C` into a register in the delay-adjacent
    slot BEFORE the `slot14` call even happens (same "load early since the
-   register is free and needed soon" scheduling `func_80049B54` showed
+   register is free and needed soon" scheduling `Obj865C8__StartSubA` showed
    earlier this round). My statement order pushed the load after the call,
    and the compiled instruction landed one slot later than retail's,
    shifting everything after it by one word (nop/removed word 8 residue).
@@ -108,35 +110,35 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
 - `Class865C8Methods::dtor` (+0x00C) and `::slot14` (+0x014) typed (were
   untyped placeholders / grouped `void *` padding).
 - `Class86668Methods::dtor` added at +0x00C, typed from this function's own
-  `GetClass86668Methods()->dtor(self)` call — occupied by `func_8004A228`
+  `GetClass86668Methods()->dtor(self)` call — occupied by `Class86668__Dtor`
   (already matched), the sibling class's own dtor override.
 - New opaque type `SubObjG`/`SubObjGMethods` — a self-consuming "step"
   object: `slot4` takes and returns the same type. Confirmed at SIX
   independent call sites in this one function.
 - **Correction to earlier-this-round typings** (see below): `Obj0C::unk8`,
   `Obj0C::unk10`, and `Obj865C8::unk40`/`unk44`/`unk48` were all typed `s32`
-  by `func_80049A1C`/`func_80049E20` (earlier this session), whose own call
+  by `Obj865C8__Init`/`Obj865C8__EnterState2` (earlier this session), whose own call
   sites only ever forward these fields as opaque register values through a
   vtable call that never dereferences them — consistent with either a
   scalar or a pointer at the time. This function dereferences all five
   directly (`->methods->slot4`), settling it: they are `SubObjG *`. Added
   `Obj0C::unkC` (brand new field, same type, same pattern). Both older call
-  sites (`func_80049A1C`'s two `unk8`/`unk10` forwards,
-  `func_80049E20`'s three `unk40`/`unk44`/`unk48` forwards) got explicit
+  sites (`Obj865C8__Init`'s two `unk8`/`unk10` forwards,
+  `Obj865C8__EnterState2`'s three `unk40`/`unk44`/`unk48` forwards) got explicit
   `(s32)` casts added at their existing call sites — same register value
   either way, confirmed by rebuilding all nine of this unit's matched
   functions together (all still full matches).
 
 ## Match reports updated (not replaced) for this correction
 
-- `docs/match-reports/func_80049A1C.md` — `Obj0C::unk8`/`unk10` were
+- `docs/match-reports/Obj865C8__Init.md` — `Obj0C::unk8`/`unk10` were
   documented there as "plain scalar register-passthrough"; this function
   proves they are pointers. Report NOT rewritten (still an accurate
   description of THAT function's own call sites); adding a short forward
   pointer to this report instead, since CLAUDE.md's per-function report
   policy makes each report a record of what THAT function established, not
   a place to retroactively rewrite once a later function adds evidence.
-- `docs/match-reports/func_80049E20.md` — same note for
+- `docs/match-reports/Obj865C8__EnterState2.md` — same note for
   `unk40`/`unk44`/`unk48`.
 
 (Both updates below, appended as a dated addendum rather than editing the
@@ -151,7 +153,7 @@ original derivation, so the original reasoning stays intact and inspectable.)
 **Still no instance of "field name describes layout, not which function
 runs once `self->methods` is reassigned"** in this function — the dtor's
 `self->methods->slot14` call happens BEFORE `GetClass86668Methods()->dtor(self)`,
-and nothing here reassigns `self->methods` at all (unlike `func_8004A19C`'s
+and nothing here reassigns `self->methods` at all (unlike `Class86668__Class86668`'s
 ctor, which is the one confirmed instance so far, from the earlier round).
 Three functions in, reporting negative again as requested.
 
@@ -166,3 +168,7 @@ common-subexpression-eliminate repeated STRUCT FIELD reads within a single
 statement as aggressively as retail's source apparently avoided needing to,
 and the fix is the same discipline (name the value once, don't re-derive it
 from memory each time it's used).
+
+## Naming
+
+`Obj865C8__Dtor` -- tier A. Releases every owned sub-object (`unk0C`'s own three `SubObjG` fields, `unk40`/`unk44`/`unk48`) via their `slot4` release method, then forwards to the base dtor: a pure teardown leaf, mechanics are its purpose.

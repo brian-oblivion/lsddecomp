@@ -1,4 +1,6 @@
-# func_80049B54 — MATCHED (63/63 words)
+# Obj865C8__StartSubA — MATCHED (63/63 words)
+
+> Renamed from `func_80049B54` on 2026-09-23 (tools/rename.py). Address 0x80049b54.
 
 `Obj865C8`'s vtable slot +0x04C.
 
@@ -64,7 +66,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_80049B54(Obj865C8 *self) {
+void Obj865C8__StartSubA(Obj865C8 *self) {
     SubObjE *obj;
     SubObjA *subA;
     SubObjF *ret;
@@ -139,3 +141,7 @@ time at its definition site produces a C89 parse error whose reported
 location is unrelated later lines, not the duplicate itself — always define
 forward-declared struct bodies as a bare `struct X { ... };`, never repeat
 `typedef struct X { ... } X;`.
+
+## Naming
+
+`Obj865C8__StartSubA` -- tier B. Sets up `subA` with a fixed constant (0x4B0) and two rodata addresses, then unconditionally sets `state = 1`: a clear 'begin' step for the state machine, but what `subA` itself represents in the game is not established (opaque vtable-only view).

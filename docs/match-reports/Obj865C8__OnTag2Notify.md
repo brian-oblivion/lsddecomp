@@ -1,4 +1,6 @@
-# func_80049EB4 — MATCHED (byte-exact, whole-image `build exit=0`)
+# Obj865C8__OnTag2Notify — MATCHED (byte-exact, whole-image `build exit=0`)
+
+> Renamed from `func_80049EB4` on 2026-09-23 (tools/rename.py). Address 0x80049eb4.
 
 Unit: `class_39e08` · Size: 107 words (0x1AC bytes) · Round 23 (2026-09-07),
 head. **Third of the five `REOPENED -- ASSIGNABLE` functions closed this round**
@@ -13,7 +15,7 @@ untouched and nothing here is toolchain-blocked.
 ## The match
 
 ```c
-void func_80049EB4(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
     struct SubObjDPos pos;
     s32 result;
 
@@ -50,7 +52,7 @@ void func_80049EB4(Obj865C8 *self, s32 arg1, s32 arg2) {
 ```
 
 `arg1` is genuinely unused — same shape as the already-matched sibling
-`func_80049CA8`, which this function closely parallels. Codes 9 and 0xB map to
+`Obj865C8__AdvanceState`, which this function closely parallels. Codes 9 and 0xB map to
 the epilogue (no-ops). The two `onEventArg(self, 3)` calls cross-jump into one
 site, which falls out of the shape and needed no encouragement.
 
@@ -93,16 +95,16 @@ Two corroborating details, both needed before writing it that way:
 
 - **`SubObjDMethods::slot1BC`** carved out of `pad1BC[0x1E0 - 0x1BC]`. Split is
   additive and preserves the 0x24 total (4 + `pad1C0` of 0x20).
-- **`SubObjDMethods::slot1B8` RETYPED `void` -> `s32`.** `func_80049EB4`
+- **`SubObjDMethods::slot1B8` RETYPED `void` -> `s32`.** `Obj865C8__OnTag2Notify`
   branches on the return value directly off the `jalr` (`bnez $v0`), which is
   positive evidence the slot is non-void.
 
   **This is the round-7 shared-vtable-slot hazard and it was checked as such,
-  not assumed.** The unit's other caller, `func_80049CA8`, is already matched
+  not assumed.** The unit's other caller, `Obj865C8__AdvanceState`, is already matched
   and DISCARDS the return — exactly the configuration where retyping
   `void` -> `s32` stopped GCC tail-merging two identical discarded calls and
   cost 4 words. Here it came back clean: whole-image SHA1 green, and
-  `func_80049CA8` (94/94) and `func_80049E20` (33/33) re-verified individually
+  `Obj865C8__AdvanceState` (94/94) and `Obj865C8__EnterState2` (33/33) re-verified individually
   after the retype. The check is per-slot and cannot be reasoned by analogy —
   round 7 had two symmetric slots that needed opposite answers.
 
@@ -141,3 +143,7 @@ fix applied twice at different nesting levels, so this is now three instances in
 one round. **The cheap tell is that only the branch mnemonic and the two literal
 immediates differ, with everything else exact** — that pattern is always
 polarity and never scheduling.
+
+## Naming
+
+`Obj865C8__OnTag2Notify` -- tier B. Occupies +0x084, dispatched by `Obj865C8__OnNotify`'s other tag branch (0x2F230). A `switch` over small integer codes (4, 5-8/0xA, 0xC/0xD) that queries/reconfigures `subD` and sets `eventCode`/`state`; the dispatch shape is clear, the meaning of the tag and its sub-codes is not.

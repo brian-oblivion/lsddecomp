@@ -1,4 +1,6 @@
-# func_8004A2C4 — MATCHED (24/24 words)
+# Class86668__Init — MATCHED (24/24 words)
+
+> Renamed from `func_8004A2C4` on 2026-09-23 (tools/rename.py). Address 0x8004a2c4.
 
 `Obj865C8`'s vtable slot +0x044 (`Class86668Methods`, i.e. the sibling class
 `gClass86668Methods` overriding `D_800865C8`'s +0x044 — see `class_39e08.h`'s existing
@@ -34,7 +36,7 @@ jr    $ra
 ## Final C
 
 ```c
-s32 func_8004A2C4(Obj865C8 *self, s32 arg1, s32 arg2) {
+s32 Class86668__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
     self->unk28 = 0;
     Get_vtable_IntermediateBase()->slot44(self, arg1, arg2);
     return self->unk28;
@@ -59,7 +61,7 @@ different delegation chain: `Get_vtable_IntermediateBase()->slot44(self, a1, a2)
 self->unk38;` — no pre-zero, just call-then-return. This function pre-zeroes
 `self->unk28` in the `jal`'s own delay slot before the call and reads it back
 after, i.e. "default value, base call may overwrite" rather than "base call
-always sets it" — consistent with `func_8004A2C4` being an *override* of this
+always sets it" — consistent with `Class86668__Init` being an *override* of this
 slot for `gClass86668Methods` while `TaskCoreObj__func_8003C1DC` is a different class occupying
 the analogous position in its own chain.
 
@@ -73,7 +75,11 @@ the analogous position in its own chain.
 `Get_vtable_IntermediateBase()` (table `gIntermediateBaseMethods`) slot +0x044 is confirmed
 `void (*)(void *self, s32 arg1, s32 arg2)` from two independent call sites in
 two different units (`code_2c054.c`'s `TaskCoreObj__func_8003C1DC`, this unit's
-`func_8004A2C4`) — both immediately store the same two register-passed
+`Class86668__Init`) — both immediately store the same two register-passed
 arguments into the call and immediately read a `self`-relative `s32` field
 back out. Worth typing consistently anywhere else this same accessor/slot
 pair turns up.
+
+## Naming
+
+`Class86668__Init` -- tier B. Occupies +0x044 (the same Init-slot convention as `Obj865C8__Init`, see above): zeroes `eventCode`, forwards to the base's own +0x044, returns `eventCode`. Named by slot-offset convention, not by an established in-game meaning.

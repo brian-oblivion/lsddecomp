@@ -1,4 +1,6 @@
-# func_80049E20 — MATCHED (33/33 words)
+# Obj865C8__EnterState2 — MATCHED (33/33 words)
+
+> Renamed from `func_80049E20` on 2026-09-23 (tools/rename.py). Address 0x80049e20.
 
 ## Disassembly shape
 
@@ -33,7 +35,7 @@ sw    $v0, 0x3C($s0)         ; self->unk3C = 2
 jr    $ra
 ```
 
-The key to the residue-free read: `func_80049E20`'s own incoming `arg1`
+The key to the residue-free read: `Obj865C8__EnterState2`'s own incoming `arg1`
 ($a1) is stored at `0x10($sp)` in the prologue — not as a dead argument
 spill, but because that slot IS the o32 outgoing-argument home for a call's
 5th parameter, and `func_80052B70` takes 5 args (4 in `$a0-$a3`, the 5th on
@@ -45,7 +47,7 @@ inside this function's body.
 ## Final C
 
 ```c
-void func_80049E20(Obj865C8 *self, s32 arg1) {
+void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1) {
     self->unk4C = func_80052B70(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
     self->methods->slot10(self, self->unk4C);
     self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);
@@ -54,8 +56,8 @@ void func_80049E20(Obj865C8 *self, s32 arg1) {
 ```
 
 (The `(s32)` casts were added across two later passes in round 2026-09-02
-— `unk0C`/`unk38` when `func_80049AC0` proved those two fields are really
-pointers, and `unk40`/`unk44`/`unk48` when `func_80049830` proved those
+— `unk0C`/`unk38` when `Obj865C8__Deinit` proved those two fields are really
+pointers, and `unk40`/`unk44`/`unk48` when `Obj865C8__Dtor` proved those
 three are too. See "Correction" below. This snippet reflects the CURRENT
 committed source.)
 
@@ -97,7 +99,7 @@ An incoming register argument stored to `sp+0x10` in the prologue with no
 later load from that slot is not necessarily a dead/unused-parameter spill —
 check whether the same offset is the o32 outgoing-argument home (args 5+ go
 at `$sp+0x10` in the CALLER's own frame) for a call made later in the same
-function. Here it was `func_80049E20` silently forwarding its own 2nd
+function. Here it was `Obj865C8__EnterState2` silently forwarding its own 2nd
 parameter as the 5th argument to `func_80052B70`. Worth checking cross-call
 argument counts (via the callee's own prologue, e.g. how far up its stack it
 loads incoming args from) before writing off such a store as inert.
@@ -106,8 +108,8 @@ loads incoming args from) before writing off such a store as inert.
 
 All five of this function's opaquely-forwarded fields (`unk0C`, `unk38`,
 `unk40`, `unk44`, `unk48`) were later proven to be real pointer types by
-functions that DO dereference them: `func_80049AC0`/`func_80049A1C` settled
-`unk0C` (`Obj0C *`) and `unk38` (`SubObjD *`); `func_80049830` settled
+functions that DO dereference them: `Obj865C8__Deinit`/`Obj865C8__Init` settled
+`unk0C` (`Obj0C *`) and `unk38` (`SubObjD *`); `Obj865C8__Dtor` settled
 `unk40`/`unk44`/`unk48` (all `SubObjG *`). This function's own derivation
 above is left as originally written — it was, and remains, an accurate
 account of what THIS function's disassembly alone shows, which cannot
@@ -116,3 +118,7 @@ types in `include/class_39e08.h` and this function's own call sites (both
 the `func_80052B70` call and the `slot44` call) now carry explicit `(s32)`
 casts to preserve the byte-identical register-passthrough behavior; funcdiff
 was reconfirmed at 33/33 after each retyping pass.
+
+## Naming
+
+`Obj865C8__EnterState2` -- tier B. Unconditionally sets `state = 2` at the end and constructs a new object via `func_80052B70`, stored at `unk4C`; called from both `Obj865C8__AdvanceState` and `Obj865C8__OnTag2Notify`. Named for the one state transition its body always performs.

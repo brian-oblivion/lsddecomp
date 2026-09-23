@@ -1,11 +1,13 @@
-# func_8004A294
+# Class86668__CancelTimeout
+
+> Renamed from `func_8004A294` on 2026-09-23 (tools/rename.py). Address 0x8004a294.
 
 **Unit:** class_39e08 · **Size:** 12 words (0x30 bytes) · **Status:** MATCHED (12/12 words)
 
 ## What it does
 
 Method-table slot +0x040 of `gClass86668Methods` (the sibling class, see
-`func_8004A228.md` for how the sibling relationship was established). A
+`Class86668__Dtor.md` for how the sibling relationship was established). A
 one-line wrapper: dispatches through `self->methods` at +0x06C with a
 sentinel argument of -1.
 
@@ -21,14 +23,14 @@ jalr  $v0
 Written as:
 
 ```c
-void func_8004A294(Obj865C8 *self) {
+void Class86668__CancelTimeout(Obj865C8 *self) {
     self->methods->setUnk2C(self, -1);
 }
 ```
 
 Return type is `void`, not "unknown wrapper, assume the callee's type" --
 this is NOT the ambiguous one-line-wrapper case CLAUDE.md warns about,
-because the callee (`+0x06C`, `func_8004A458`, this unit's own function,
+because the callee (`+0x06C`, `Obj865C8__SetTimeout`, this unit's own function,
 matched the same round) is confirmed void from its own disassembly: it ends
 `jr $ra` / `nop` with no `$v0` ever set. Positive evidence, not silence.
 
@@ -42,3 +44,7 @@ without needing a full second method-table type.
 ## Proposed learning
 
 None beyond what's already documented.
+
+## Naming
+
+`Class86668__CancelTimeout` -- tier A. Occupies `gClass86668Methods` +0x040; one-line wrapper calling `self->methods->setTimeout(self, -1)` (the sentinel `SetTimeout` itself documents as 'disabled'). Mechanics are its purpose.

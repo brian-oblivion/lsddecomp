@@ -6,7 +6,7 @@
 
 This is the **canonical account of how the `New_X` epilogue-merge residue
 class was closed.** Four other reports point here:
-`func_80049608`, `func_8004A130` (class_39e08), `New_StreamTaskObj`,
+`New_Obj865C8`, `New_Class86668` (class_39e08), `New_StreamTaskObj`,
 `New_TaskCoreObj` (code_2c054).
 
 ## What it does
@@ -71,8 +71,8 @@ Five instances closed in one pass, all byte-exact:
 | function | unit | words |
 | --- | --- | --- |
 | `New_Class866E8` | class_3ac78 | 27/27 |
-| `func_8004A130` | class_39e08 | 27/27 |
-| `func_80049608` | class_39e08 | 31/31 |
+| `New_Class86668` | class_39e08 | 27/27 |
+| `New_Obj865C8` | class_39e08 | 31/31 |
 | `New_StreamTaskObj` | code_2c054 | 36/36 |
 | `New_TaskCoreObj` | code_2c054 | 31/31 |
 
@@ -127,6 +127,6 @@ Round 67 (track 3, naming pass).
 | --- | --- | --- | --- |
 | `func_8004A4C8` | `New_Class866E8` | A | Body is the project's established `New_X` shape: allocate `0x1E8` via `func_80017B34`, and on success dispatch the class's ctor slot `+0x008` with the caller's two arguments, else return NULL. `New_Class` is the convention named in FINISHING-PLAN.md track 3, and this report already used the phrase before the rename. |
 
-The one call site is `src/class_39e08.c`'s `func_80049684`, the boot path:
+The one call site is `src/class_39e08.c`'s `Obj865C8__Obj865C8`, the boot path:
 `arg1->unkC = (SubObjG *)New_Class866E8(0, 1);`. So exactly one instance of
 this class exists, created at game start.

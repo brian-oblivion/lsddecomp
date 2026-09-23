@@ -1,4 +1,6 @@
-# func_80049C50
+# Obj865C8__RunSubUpdates
+
+> Renamed from `func_80049C50` on 2026-09-23 (tools/rename.py). Address 0x80049c50.
 
 **Unit:** class_39e08 · **Size:** 22 words (0x58 bytes) · **Status:** MATCHED (22/22 words)
 
@@ -26,7 +28,7 @@ jalr  $v0
 Written as:
 
 ```c
-void func_80049C50(Obj865C8 *self) {
+void Obj865C8__RunSubUpdates(Obj865C8 *self) {
     SubObjA *sub = self->subA;
 
     sub->methods->slot90(sub);
@@ -43,3 +45,7 @@ concrete class `subA` points to; both slot numbers exceed `D_800865C8`'s own
 ## Proposed learning
 
 None beyond what's already documented.
+
+## Naming
+
+`Obj865C8__RunSubUpdates` -- tier A. Ticks `subA` (`slot90`/`slot74`) every call; matches the existing `runSubUpdates` field name already on file. A pure per-frame forwarding leaf: mechanics are its purpose.

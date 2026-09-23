@@ -1,24 +1,24 @@
 #include "common.h"
 #include "class_39e08.h"
 
-Obj865C8 *func_80049608(Obj0C *arg1, SubObjD *arg2, s32 arg3)
+Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 {
     Obj865C8 *self;
 
     self = func_80017B34(0x50);
     if (self != NULL) {
-        func_8004A060()->ctor(self, arg1, arg2, arg3);
+        GetObj865C8Methods()->ctor(self, arg1, arg2, arg3);
         return self;
     }
     return NULL;
 }
 
-void func_80049684(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
+void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
     GetClass86668Methods()->ctor(self, func_80048E08(0), 0);
-    self->methods = func_8004A060();
+    self->methods = GetObj865C8Methods();
     InitDreamAux();
     self->unk44 = func_8003B39C(D_800113EC);
     self->unk44->methods->slot78(self->unk44);
@@ -38,10 +38,10 @@ void func_80049684(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     self->methods->slot10(self, (Obj4C *)arg2);
     arg2->methods->slot10C(arg2, self->subB);
     arg2->methods->slot114(arg2, self->unk44);
-    self->methods->resetUnk3C(self);
+    self->methods->resetState(self);
 }
 
-void func_80049830(Obj865C8 *self) {
+void Obj865C8__Dtor(Obj865C8 *self) {
     Obj0C *o = self->unk0C;
     SubObjG *g;
 
@@ -59,7 +59,7 @@ void func_80049830(Obj865C8 *self) {
     GetClass86668Methods()->dtor(self);
 }
 
-void func_80049958(Obj865C8 *self, EventArg *arg1, s32 arg2) {
+void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
 
     GetClass86668Methods()->slot38(self, arg1, arg2);
@@ -71,11 +71,11 @@ void func_80049958(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     }
 }
 
-void func_80049A14(Obj865C8 *self) {
-    self->unk3C = 0;
+void Obj865C8__ResetState(Obj865C8 *self) {
+    self->state = 0;
 }
 
-void func_80049A1C(Obj865C8 *self) {
+void Obj865C8__Init(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     sub->methods->slot10(sub, self->unk0C->unk4);
@@ -84,7 +84,7 @@ void func_80049A1C(Obj865C8 *self) {
     GetClass86668Methods()->slot44(self, (s32)self->unk0C, 0);
 }
 
-void func_80049AC0(Obj865C8 *self) {
+void Obj865C8__Deinit(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
     GetClass86668Methods()->slot48(self);
@@ -93,7 +93,7 @@ void func_80049AC0(Obj865C8 *self) {
     sub->methods->slot14(sub, self->unk10);
 }
 
-void func_80049B54(Obj865C8 *self) {
+void Obj865C8__StartSubA(Obj865C8 *self) {
     SubObjE *obj;
     SubObjA *subA;
     SubObjF *ret;
@@ -108,10 +108,10 @@ void func_80049B54(Obj865C8 *self) {
     subA->methods->slot4C(subA, 0x4B0);
     subA->methods->slot70(subA, self->unk38, D_80086650, D_8008665C, 0);
     subA->methods->slot8C(subA);
-    self->unk3C = 1;
+    self->state = 1;
 }
 
-void func_80049C50(Obj865C8 *self) {
+void Obj865C8__RunSubUpdates(Obj865C8 *self) {
     SubObjA *sub = self->subA;
 
     sub->methods->slot90(sub);
@@ -119,24 +119,24 @@ void func_80049C50(Obj865C8 *self) {
 }
 
 /* Defined later in this file (ROM order); forward-declared here since
- * func_80049CA8 calls it. */
-extern void func_80049E20(Obj865C8 *self, s32 arg1);
+ * Obj865C8__AdvanceState calls it. */
+extern void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1);
 
-void func_80049CA8(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
     GetClass86668Methods()->slot54(self, arg1, arg2);
-    if (arg2 == 2 && self->unk3C != arg2) {
-        switch (self->unk3C) {
+    if (arg2 == 2 && self->state != arg2) {
+        switch (self->state) {
         case 1:
             result = self->unk38->methods->slot1B4(self->unk38);
             if (result < 0) {
                 self->unk38->methods->slot1B8(self->unk38, 0);
-                self->unk28 = arg2;
+                self->eventCode = arg2;
                 self->methods->onEventArg(self, 3);
                 return;
             }
-            func_80049E20(self, result);
+            Obj865C8__EnterState2(self, result);
             break;
         case 2:
             break;
@@ -144,28 +144,28 @@ void func_80049CA8(Obj865C8 *self, s32 arg1, s32 arg2) {
             self->unk4C->methods->slot48(self->unk4C);
             self->unk4C->methods->slot4(self->unk4C);
             result = self->unk38->methods->slot1E0(self->unk38);
-            func_80049E20(self, result);
+            Obj865C8__EnterState2(self, result);
             break;
         }
     }
 }
 
-void func_80049E20(Obj865C8 *self, s32 arg1) {
+void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1) {
     self->unk4C = func_80052B70(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
     self->methods->slot10(self, self->unk4C);
     self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);
-    self->unk3C = 2;
+    self->state = 2;
 }
 
-void func_80049EA4(void) {
+void Obj865C8__Noop7C(void) {
 }
 
-void func_80049EAC(void) {
+void Obj865C8__Noop80(void) {
 }
 
 /* Returned BY VALUE from SubObjDMethods::slot1BC. Kept LOCAL to this unit --
- * it encodes only what func_80049EB4 establishes (8 bytes, an s16 at +2 whose
- * sign selects between two unk28 codes), which is not enough for a sibling to
+ * it encodes only what Obj865C8__OnTag2Notify establishes (8 bytes, an s16 at +2 whose
+ * sign selects between two eventCode codes), which is not enough for a sibling to
  * reuse unchanged. */
 struct SubObjDPos {
     s16 unk0;
@@ -174,7 +174,7 @@ struct SubObjDPos {
     s16 unk6;
 };
 
-void func_80049EB4(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__OnTag2Notify(Obj865C8 *self, s32 arg1, s32 arg2) {
     struct SubObjDPos pos;
     s32 result;
 
@@ -185,9 +185,9 @@ void func_80049EB4(Obj865C8 *self, s32 arg1, s32 arg2) {
         result = self->unk38->methods->slot1B8(self->unk38, 0);
         if (result == 0) {
             pos = self->unk38->methods->slot1BC(self->unk38);
-            self->unk28 = pos.unk2 < 0 ? 1 : 2;
+            self->eventCode = pos.unk2 < 0 ? 1 : 2;
         } else {
-            self->unk28 = 3;
+            self->eventCode = 3;
         }
         self->methods->onEventArg(self, 3);
         break;
@@ -196,20 +196,20 @@ void func_80049EB4(Obj865C8 *self, s32 arg1, s32 arg2) {
     case 7:
     case 8:
     case 0xA:
-        self->unk3C = 3;
+        self->state = 3;
         break;
     case 0xC:
     case 0xD:
         self->unk4C->methods->slot48(self->unk4C);
         self->unk4C->methods->slot4(self->unk4C);
         self->unk38->methods->slot1B8(self->unk38, arg2 != 0xC ? 2 : 1);
-        self->unk28 = 3;
+        self->eventCode = 3;
         self->methods->onEventArg(self, 3);
         break;
     }
 }
 
-Class865C8Methods *func_8004A060(void) {
+Class865C8Methods *GetObj865C8Methods(void) {
     return &D_800865C8;
 }
 
@@ -258,7 +258,7 @@ s32 func_8004A070(s32 arg0)
     return result;
 }
 
-Obj865C8 *func_8004A130(s32 arg1, SubObjB *arg2)
+Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
 {
     Obj865C8 *self;
 
@@ -270,7 +270,7 @@ Obj865C8 *func_8004A130(s32 arg1, SubObjB *arg2)
     return NULL;
 }
 
-void func_8004A19C(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
+void Class86668__Class86668(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
     Get_vtable_IntermediateBase()->ctor(self);
     self->methods = (Class865C8Methods *)GetClass86668Methods();
     if (arg1 != 0) {
@@ -279,48 +279,48 @@ void func_8004A19C(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
         self->subB = arg2;
     }
     self->unk30 = arg1;
-    self->methods->resetUnk3C(self);
+    self->methods->resetState(self);
 }
 
-void func_8004A228(Obj865C8 *self) {
+void Class86668__Dtor(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }
     Get_vtable_IntermediateBase()->dtor(self);
 }
 
-void func_8004A294(Obj865C8 *self) {
-    self->methods->setUnk2C(self, -1);
+void Class86668__CancelTimeout(Obj865C8 *self) {
+    self->methods->setTimeout(self, -1);
 }
 
-s32 func_8004A2C4(Obj865C8 *self, s32 arg1, s32 arg2) {
-    self->unk28 = 0;
+s32 Class86668__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
+    self->eventCode = 0;
     Get_vtable_IntermediateBase()->slot44(self, arg1, arg2);
-    return self->unk28;
+    return self->eventCode;
 }
 
-void func_8004A324(Obj865C8 *self) {
+void Class86668__Deinit(Obj865C8 *self) {
     Get_vtable_IntermediateBase()->slot48(self);
 }
 
-void func_8004A35C(void) {
+void Obj865C8__Noop58(void) {
 }
 
-void func_8004A364(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
     Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
-    if ((u32)self->unk1C > (u32)self->unk2C) {
+    if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
         self->methods->onEventArg(self, 4);
     }
 }
 
-void func_8004A3EC(Obj865C8 *self, s32 arg1) {
+void Obj865C8__OnEventArg(Obj865C8 *self, s32 arg1) {
     Get_vtable_IntermediateBase()->slot60(self, arg1);
     if (arg1 == 4) {
-        self->unk28 = 1;
+        self->eventCode = 1;
         self->methods->noop7C(self);
     }
 }
 
-void func_8004A458(Obj865C8 *self, s32 arg1) {
-    self->unk2C = (arg1 < 0) ? arg1 : arg1 * 20;
+void Obj865C8__SetTimeout(Obj865C8 *self, s32 arg1) {
+    self->timeoutFrames = (arg1 < 0) ? arg1 : arg1 * 20;
 }

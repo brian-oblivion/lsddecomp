@@ -1,4 +1,6 @@
-# func_80049CA8 — MATCHED (94/94 words)
+# Obj865C8__AdvanceState — MATCHED (94/94 words)
+
+> Renamed from `func_80049CA8` on 2026-09-23 (tools/rename.py). Address 0x80049ca8.
 
 `Class865C8Methods` slot +0x054.
 
@@ -77,8 +79,8 @@ jalr  $v0
  nop                          ; result = self->unk38->methods->slot1E0(self->unk38)
 addu  $a0, $s1, $zero
 .L80049DFC:                  ; shared tail
-jal   func_80049E20
- addu $a1, $v0, $zero        ; func_80049E20(self, result)
+jal   Obj865C8__EnterState2
+ addu $a1, $v0, $zero        ; Obj865C8__EnterState2(self, result)
 END:
 ...
 jr $ra
@@ -87,9 +89,9 @@ jr $ra
 ## Final C
 
 ```c
-extern void func_80049E20(Obj865C8 *self, s32 arg1);
+extern void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1);
 
-void func_80049CA8(Obj865C8 *self, s32 arg1, s32 arg2) {
+void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
     GetClass86668Methods()->slot54(self, arg1, arg2);
@@ -103,7 +105,7 @@ void func_80049CA8(Obj865C8 *self, s32 arg1, s32 arg2) {
                 self->methods->onEventArg(self, 3);
                 return;
             }
-            func_80049E20(self, result);
+            Obj865C8__EnterState2(self, result);
             break;
         case 2:
             break;
@@ -111,14 +113,14 @@ void func_80049CA8(Obj865C8 *self, s32 arg1, s32 arg2) {
             self->unk4C->methods->slot48(self->unk4C);
             self->unk4C->methods->slot4(self->unk4C);
             result = self->unk38->methods->slot1E0(self->unk38);
-            func_80049E20(self, result);
+            Obj865C8__EnterState2(self, result);
             break;
         }
     }
 }
 ```
 
-`func_80049E20` is defined LATER in this file (ROM order requires the C
+`Obj865C8__EnterState2` is defined LATER in this file (ROM order requires the C
 definition to stay where it is), so a local `extern` forward prototype was
 added right above this function -- same "calling into a function that is
 still being written elsewhere" convention CLAUDE.md documents, applied to a
@@ -186,7 +188,7 @@ double-branch tail, or vice versa:
 - `SubObjDMethods` extended with `slot1B4` (`s32 (*)(SubObjD *self)`,
   return value used — genuinely non-void) and `slot1B8` (`void (*)(SubObjD
   *self, s32 arg1)`), and `slot1E0` (`s32 (*)(SubObjD *self)`, return value
-  forwarded straight into `func_80049E20`'s own argument).
+  forwarded straight into `Obj865C8__EnterState2`'s own argument).
 - `Obj4CMethods` extended with `slot4` and `slot48` (both `void (*)(Obj4C
   *self)`, return discarded at both call sites here).
 
@@ -199,7 +201,7 @@ double-branch tail, or vice versa:
 **Still no instance of "field name describes layout, not which function
 runs once `self->methods` is reassigned"** — no vtable-pointer reassignment
 anywhere in this function. Five functions into this round now, reporting
-negative consistently; the one confirmed instance remains `func_8004A19C`'s
+negative consistently; the one confirmed instance remains `Class86668__Class86668`'s
 ctor from the earlier round.
 
 **New, well-tested lever worth generalizing:** for a small dense-ish switch
@@ -217,3 +219,7 @@ CLAUDE.md switch note ("picks its own comparison order... do not transcribe
 the observed order as case order") — it now also says: don't transcribe
 the observed VALUE SET as the real case set either; a gap in the middle of
 the visible cases is itself informative about a missing empty case.
+
+## Naming
+
+`Obj865C8__AdvanceState` -- tier B. Occupies +0x054, `Obj86B60__OnTag1Notify`'s slot in the base -- the state machine's main per-tag transition function (cases on `state` 1/2/3, transitioning via `Obj865C8__EnterState2`). The state machine's shape is clear from the body; what each state represents in-game is not.

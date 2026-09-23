@@ -1,4 +1,6 @@
-# func_8004A130
+# New_Class86668
+
+> Renamed from `func_8004A130` on 2026-09-23 (tools/rename.py). Address 0x8004a130.
 
 **Unit:** class_39e08 · **Status:** MATCHED (27/27 words)
 
@@ -9,7 +11,7 @@ unchanged. Returns the new object, or NULL.
 ## The match
 
 ```c
-Obj865C8 *func_8004A130(s32 arg1, SubObjB *arg2)
+Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
 {
     ...
 
@@ -51,3 +53,7 @@ report for the distinction.
 Matched by the head during divergence resolution, 2026-09-02, as part of
 closing the epilogue-merge class. `docs/research/epilogue-merge-residue.md` is
 updated with what survived and what did not.
+
+## Naming
+
+`New_Class86668` -- tier A. Allocator (0x38 bytes) for the sibling class, dispatching `GetClass86668Methods()->ctor`: matches the `New_X` idiom.

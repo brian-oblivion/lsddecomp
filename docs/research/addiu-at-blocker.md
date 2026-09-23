@@ -95,7 +95,7 @@ unchanged.
   remaining `gp_rel` hit. Five substantive reports KEPT — their structural
   analysis is still good — with a banner saying the verdict is stale and the
   function is assignable: `func_80018464`, `func_8003C48C`, `func_8003C63C`,
-  `FormatFullWidthNumber`, `func_80049EB4`.
+  `FormatFullWidthNumber`, `Obj865C8__OnTag2Notify`.
 
   `func_8003C63C` is worth singling out: CLAUDE.md cites it as the case where
   **seven attempts went into the wrong half** of a two-word residue because an
@@ -419,7 +419,7 @@ lets a runner look at a plain C `switch` with no array in sight and conclude the
 blocker cannot apply.
 
 A dense `switch` compiles to a jump table, and the dispatch is the same indexed
-load through `$at`. Retail, at `func_80049EB4` in the newly carved
+load through `$at`. Retail, at `Obj865C8__OnTag2Notify` in the newly carved
 `class_39e08`:
 
 ```
