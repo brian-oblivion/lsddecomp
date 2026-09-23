@@ -225,8 +225,8 @@ s32 TaskCoreObj__func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
 }
 
 void TaskCoreObj__func_8003C238(StreamTaskObj *self) {
-    TaskCoreObj *unk18;
-    TaskCoreObjMethods *core;
+    StreamTaskUnk18Obj *unk18;
+    StreamTaskUnk18Methods *core;
 
     unk18 = self->unk18;
     core = unk18->methods;
@@ -249,7 +249,7 @@ void TaskCoreObj__func_8003C238(StreamTaskObj *self) {
 }
 
 void TaskCoreObj__func_8003C3D0(StreamTaskObj *self) {
-    TaskCoreObj *obj = self->unk18;
+    StreamTaskUnk18Obj *obj = self->unk18;
     obj->methods->slot90(obj);
     obj->methods->slot74(obj);
     self->unk78->methods->slot50(self->unk78);

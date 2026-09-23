@@ -2,6 +2,17 @@
 
 > Renamed from `func_8003C238` on 2026-09-23 (tools/rename.py). Address 0x8003c238.
 
+> **Type rename note (round 73, track 3):** every `TaskCoreObjMethods` /
+> `TaskCoreObj` below (the type this function's own body split off from
+> `TaskCoreMethods`) was renamed to `StreamTaskUnk18Methods` /
+> `StreamTaskUnk18Obj` in `include/code_2c054.h` -- `TaskCoreObj` was doing
+> double duty for two unrelated classes (this one, and New_TaskCoreObj's own
+> 0xA4-byte allocation), and freeing the name for the latter matches the
+> `StreamTaskUnkNNObj` convention already used for this class's other private
+> sub-objects. Pure type rename, no compiled bytes changed; not done through
+> `tools/rename.py` since C type names carry no address for it to resolve.
+> The text below is left as originally written for the history.
+
 **Unit:** code_2c054 · **Size:** 102 words · **Status:** MATCHED (102/102)
 
 This occupies `TaskCoreMethods`'s (`gTaskCoreMethods`) own slot `+0x04C` (per

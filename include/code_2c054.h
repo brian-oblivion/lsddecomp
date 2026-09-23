@@ -29,7 +29,8 @@ typedef struct StreamTaskUnkB4Methods StreamTaskUnkB4Methods;
 typedef struct StreamTaskUnk78Obj StreamTaskUnk78Obj;
 typedef struct StreamTaskUnk78Methods StreamTaskUnk78Methods;
 typedef struct StreamTaskUnkCObj StreamTaskUnkCObj;
-typedef struct TaskCoreObjMethods TaskCoreObjMethods;
+typedef struct StreamTaskUnk18Obj StreamTaskUnk18Obj;
+typedef struct StreamTaskUnk18Methods StreamTaskUnk18Methods;
 typedef struct TaskTextObj TaskTextObj;
 typedef struct TaskTextMethods TaskTextMethods;
 typedef struct TaskCoreObj TaskCoreObj;
@@ -104,10 +105,17 @@ struct StreamTaskObj {
     s32 unk14;                      /* +0x014, an argument forwarded to self->methods'
                                         slotE0 and (reloaded) unk78's slot4C by
                                         TaskCoreObj__func_8003C238 */
-    TaskCoreObj *unk18;             /* +0x018, an object whose vtable is
-                                        TaskCoreObjMethods -- NOT the same struct as
-                                        TaskCoreMethods (see TaskCoreObj below for the
-                                        correction) */
+    StreamTaskUnk18Obj *unk18;      /* +0x018, an object whose vtable is
+                                        StreamTaskUnk18Methods -- NOT the same struct as
+                                        TaskCoreMethods (see StreamTaskUnk18Obj below for
+                                        the correction). Renamed off the collision with
+                                        `TaskCoreObj` this round: that name is now reserved
+                                        for New_TaskCoreObj's own 0xA4-byte allocation
+                                        (whose real vtable is TaskCoreMethods/gTaskCoreMethods,
+                                        confirmed by TaskCoreObj__TaskCoreObj's own
+                                        `self->methods = (StreamTaskObjMethods *)core;`)
+                                        -- a genuinely different class that happened to
+                                        share the same struct name. */
     u8 pad1C[0x028 - 0x01C];
     s32 unk28;                        /* +0x028, set to 3 by TaskCoreObj__Reset */
     s32 unk2C;                         /* +0x02C, set to 0x12C by TaskCoreObj__Reset */
@@ -188,7 +196,7 @@ extern u8 D_8006E860[];
 
 /* Two more rodata symbols reached only by address (round 2, TaskCoreObj__func_8003C238):
  * `gDefaultStreamTaskInitData`, passed as `TaskTextMethods::slot78`'s 3rd argument, and
- * `D_8006E86C`, passed TWICE (same address) as `TaskCoreObjMethods::slot70`'s
+ * `D_8006E86C`, passed TWICE (same address) as `StreamTaskUnk18Methods::slot70`'s
  * 3rd AND 4th arguments. Neither is ever dereferenced by this unit's queued
  * functions. */
 extern u8 gDefaultStreamTaskInitData[];
@@ -335,7 +343,7 @@ struct TaskCoreMethods {
 
 extern TaskCoreMethods *Get_vtable_TaskCore(void); /* returns &gTaskCoreMethods */
 
-/* `StreamTaskObj::unk18` and its vtable, `TaskCoreObjMethods`.
+/* `StreamTaskObj::unk18` and its vtable, `StreamTaskUnk18Methods`.
  *
  * ORIGINALLY modeled (TaskCoreObj__func_8003C3D0, round 1) as sharing `TaskCoreMethods`
  * itself -- self->unk18's own slots +0x074/+0x090, called there, happened to
@@ -350,27 +358,52 @@ extern TaskCoreMethods *Get_vtable_TaskCore(void); /* returns &gTaskCoreMethods 
  * a genuine arity conflict at a shared offset means self->unk18 is a
  * DIFFERENT class that merely happens to also be a `BasicClass` descendant
  * (hence the shared low slots every table in this game has) -- not an
- * instance of gTaskCoreMethods's own class. Split into its own
- * `TaskCoreObjMethods` type; see TaskCoreObj__func_8003C238's report. */
+ * instance of gTaskCoreMethods's own class. Split into its own type,
+ * originally spelled `TaskCoreObjMethods`; see TaskCoreObj__func_8003C238's
+ * report for the original discovery.
+ *
+ * RENAMED to `StreamTaskUnk18Obj`/`StreamTaskUnk18Methods` this round (track
+ * 3, naming pass): the name `TaskCoreObj` was doing double duty for two
+ * unrelated classes -- this one (self->unk18, vtable split from
+ * `TaskCoreMethods` right here) and New_TaskCoreObj's own 0xA4-byte
+ * allocation (whose real vtable is `TaskCoreMethods`/`gTaskCoreMethods`
+ * itself, confirmed by TaskCoreObj__TaskCoreObj's own
+ * `self->methods = (StreamTaskObjMethods *)core;`, `core` being
+ * `Get_vtable_TaskCore()`). Nothing dereferenced `struct TaskCoreObj`'s body
+ * except through self->unk18, so freeing the name costs nothing: `TaskCoreObj`
+ * stays reserved for New_TaskCoreObj's own class (now a plain opaque pointer
+ * type below, since nothing needs its body), and this sub-object gets the
+ * same `StreamTaskUnkNNObj` spelling already used for the other private
+ * sub-objects on this class (`StreamTaskUnkB4Obj`, `StreamTaskUnk78Obj`,
+ * `StreamTaskUnkCObj`). No compiled byte changes -- pure type renaming. */
 
-struct TaskCoreObjMethods {
+struct StreamTaskUnk18Methods {
     u8 pad00[0x048];
-    void (*slot48)(TaskCoreObj *self, s32 a1); /* +0x048, TaskCoreObj__func_8003C238's forward target */
-    void (*slot4C)(TaskCoreObj *self, s32 a1); /* +0x04C, TaskCoreObj__func_8003C238's forward target */
-    void (*slot50)(TaskCoreObj *self, s32 a1); /* +0x050, TaskCoreObj__func_8003C238's forward target */
+    void (*slot48)(StreamTaskUnk18Obj *self, s32 a1); /* +0x048, TaskCoreObj__func_8003C238's forward target */
+    void (*slot4C)(StreamTaskUnk18Obj *self, s32 a1); /* +0x04C, TaskCoreObj__func_8003C238's forward target */
+    void (*slot50)(StreamTaskUnk18Obj *self, s32 a1); /* +0x050, TaskCoreObj__func_8003C238's forward target */
     u8 pad54[0x070 - 0x054];
-    void (*slot70)(TaskCoreObj *self, s32 a1, u8 *a2, u8 *a3, s32 a4); /* +0x070,
+    void (*slot70)(StreamTaskUnk18Obj *self, s32 a1, u8 *a2, u8 *a3, s32 a4); /* +0x070,
                                         TaskCoreObj__func_8003C238's forward target; a2 and a3 are
                                         the SAME address (&D_8006E86C) at that call site */
-    void (*slot74)(TaskCoreObj *self); /* +0x074, TaskCoreObj__func_8003C3D0's forward target */
+    void (*slot74)(StreamTaskUnk18Obj *self); /* +0x074, TaskCoreObj__func_8003C3D0's forward target */
     u8 pad78[0x08C - 0x078];
-    void (*slot8C)(TaskCoreObj *self); /* +0x08C, TaskCoreObj__func_8003C238's forward target */
-    void (*slot90)(TaskCoreObj *self); /* +0x090, TaskCoreObj__func_8003C3D0's forward target */
+    void (*slot8C)(StreamTaskUnk18Obj *self); /* +0x08C, TaskCoreObj__func_8003C238's forward target */
+    void (*slot90)(StreamTaskUnk18Obj *self); /* +0x090, TaskCoreObj__func_8003C3D0's forward target */
 };
 
-struct TaskCoreObj {
-    TaskCoreObjMethods *methods; /* +0x000 */
+struct StreamTaskUnk18Obj {
+    StreamTaskUnk18Methods *methods; /* +0x000 */
 };
+
+/* New_TaskCoreObj's own class: opaque here on purpose. Its ctor
+ * (TaskCoreObj__TaskCoreObj) points its `methods` field at
+ * `Get_vtable_TaskCore()` (`TaskCoreMethods *`, cast from
+ * `StreamTaskObj *`, see that function's report), and nothing in this
+ * unit ever dereferences a bare `TaskCoreObj *` -- New_TaskCoreObj
+ * returns it untouched. A real `struct TaskCoreObj { TaskCoreMethods
+ * *methods; }` body would just restate that cast, so it is left as a
+ * pointer-only type instead of asserting a body nothing here checks. */
 
 /* A second sibling table (gIntermediateBaseMethods, `tools/classtable.py gIntermediateBaseMethods`),
  * used by TaskCoreObj__func_8003C1DC to forward its own work one level further down the

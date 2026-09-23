@@ -2,6 +2,12 @@
 
 > Renamed from `func_8003C3D0` on 2026-09-23 (tools/rename.py). Address 0x8003c3d0.
 
+> **Type rename note (round 73, track 3):** `self->unk18`'s type
+> (`TaskCoreObj *` / `TaskCoreObjMethods *` below) was renamed to
+> `StreamTaskUnk18Obj *` / `StreamTaskUnk18Methods *` in
+> `include/code_2c054.h` -- see `TaskCoreObj__func_8003C238.md`'s own note
+> for why. The text below is left as originally written for the history.
+
 **Unit:** code_2c054 · **Size:** 47 words · **Status:** MATCHED (47/47)
 
 ## Summary
