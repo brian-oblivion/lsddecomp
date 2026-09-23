@@ -495,7 +495,37 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
     }
 }
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 5/55 words match, length NOT exact (out-of-range byte drift).
+ * Residue: compiler div/mod-fold residue -- GCC 2.6.3 -O2 folds
+ * `index - (index>>4)*16` into `index & 0xF` once it can prove index >= 0,
+ * and no plain-C spelling of the guarded hi/lo split reproduced here keeps
+ * the unfolded `sll`+`subu` retail has; a later probe (in the same report)
+ * gets every other instruction byte-identical and narrows the gap to one
+ * operand, but has not been re-applied to this function's own body.
+ * (docs/match-reports/VabStreamObj__PlayTone.md). Hand-derived. */
+s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
+    s32 hi;
+    s32 lo;
+    VagAtrView *entry;
+    s16 result;
+
+    if (index >= 0) {
+        hi = index / 16;
+        lo = index - hi * 16;
+        entry = &self->progVagTable[hi][lo];
+        result = func_80030E90(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
+                                entry->shift, (s16)arg2, (s16)arg2);
+        if (result >= 0) {
+            SsUtAutoVol(result, (s16)arg2, (s16)arg3, 2);
+            return result;
+        }
+    }
+    return -1;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_e", VabStreamObj__PlayTone);
+#endif
 
 /* The PS1 SPU's own hardware voice count -- the boundary VabStreamObj__StopVoice
  * checks `index` against. */
