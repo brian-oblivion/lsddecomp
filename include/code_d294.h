@@ -434,8 +434,8 @@ struct Class6B5CCMethods {
      * {s16,s16} pairs (D_8006B684/D_8006B690, 0xC bytes each). func_8001D008
      * (slot +0x048's own occupant, still queued) confirms the `data` shape:
      * it reads three such pairs via RatioToFixed12. */
-    void (*slot44)(Class6B5CCObj *self, s32 flag, void *data); /* +0x044, func_8001CEB4 -- still queued */
-    void (*slot48)(Class6B5CCObj *self, s32 flag, void *data); /* +0x048, func_8001D008 -- still queued */
+    void (*updateRotation)(Class6B5CCObj *self, s32 flag, void *data); /* +0x044, func_8001CEB4 */
+    void (*updateScale)(Class6B5CCObj *self, s32 flag, void *data); /* +0x048, func_8001D008 */
     u8 pad04C[0x050 - 0x04C];
     void (*slot50)(Class6B5CCObj *self);      /* +0x050, func_8001D1A4 (this unit) */
     void (*slot54)(Class6B5CCObj *self);      /* +0x054, func_8001D204 (this unit) */
@@ -839,9 +839,9 @@ extern s32 ratan2(s32 dy, s32 dx);
  * `Class6B5CC__GetRotationDegrees`'s same `x*360>>12` idiom -- pitch gets an EXTRA `+
  * 0x400` [90 degrees] added before conversion, yaw does not), builds a
  * `WholeFrac_d294[3]` {pitch, yaw, 0} table (each `.frac = 1`), and
- * dispatches it to `slot44`. `arg2 != 0` forces the pitch entry to 0
+ * dispatches it to `updateRotation`. `arg2 != 0` forces the pitch entry to 0
  * (a "yaw only" mode); `arg3 == 0` adds 180 degrees to yaw (see below);
- * a non-NULL `arg4` fires a SECOND `slot44(self, 0, arg4)` call with the
+ * a non-NULL `arg4` fires a SECOND `updateRotation(self, 0, arg4)` call with the
  * caller's own table forwarded as-is.
  *
  * THE ARGUMENT-SWAP FINDING, CONFIRMED FROM THIS FUNCTION'S OWN BODY:

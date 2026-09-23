@@ -72,7 +72,7 @@ void Class6B5CC__LocalOffsetToWorldPos(Class6B5CCObj *self, s32 *dst, s32 *src) 
  * as a 3-entry ratio table in DEGREES: `whole = angle * 45 >> 9`, which is
  * exactly `angle * 360 / 4096`, with `frac` (the denominator RatioToFixed12
  * divides by, below) a constant 1. The same {degrees, 1} shape
- * Class6B5CC__FaceTarget builds and slot44 consumes.
+ * Class6B5CC__FaceTarget builds and updateRotation consumes.
  *
  * Statement order is load-bearing and counter-intuitive: `.whole` is
  * written BEFORE `.frac` even though retail EMITS the `frac` store first
@@ -229,9 +229,9 @@ void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
 /* Points the object at `target`: two ratan2 calls over `target`'s world
  * position minus `self`'s own coord translation give yaw and pitch, both
  * converted to degrees, packed into a {pitch, yaw, 0} ratio triple and
- * dispatched to slot44 (func_8001CEB4, the rotation setter that writes
+ * dispatched to updateRotation (func_8001CEB4, the rotation setter that writes
  * GsCOORD2PARAM.rotate). `arg2 != 0` zeroes the pitch entry; `arg3 == 0`
- * adds 180 degrees to yaw; a non-NULL `arg4` fires a second slot44 with the
+ * adds 180 degrees to yaw; a non-NULL `arg4` fires a second updateRotation with the
  * caller's own table forwarded verbatim.
  *
  * `self` and `target` are used SYMMETRICALLY -- the subtraction is always
@@ -281,9 +281,9 @@ void Class6B5CC__FaceTarget(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2
         out[1].whole = out[1].whole + 0xB4;
     }
 
-    self->methods->slot44(self, 1, out);
+    self->methods->updateRotation(self, 1, out);
     if (arg4 != 0) {
-        self->methods->slot44(self, 0, arg4);
+        self->methods->updateRotation(self, 0, arg4);
     }
 }
 
