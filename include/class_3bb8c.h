@@ -1645,9 +1645,9 @@ typedef struct Class86E00_3bb8c_g Class86E00_3bb8c_g;
 typedef struct Class86E00Methods_3bb8c_g Class86E00Methods_3bb8c_g;
 
 /*
- * self->unk6C's pointee. Class86E00_3bb8c_g__SetChildFlag8 is the function that PROVES this
+ * self->childC's pointee. Class86E00_3bb8c_g__SetChildFlag8 is the function that PROVES this
  * is a pointer (dereferences its `+0x080` vtable slot) -- before that
- * function was read, `unk6C` looked like a plain `s32` value forwarded
+ * function was read, `childC` looked like a plain `s32` value forwarded
  * opaquely to `Class86E00SubObj_3bb8c_g::slot4C`'s 3rd argument, which is
  * why that parameter is typed with this pointer rather than `s32` below.
  */
@@ -1666,9 +1666,9 @@ struct Class86E00Unk6CObj_3bb8c_g {
 };
 
 /*
- * self->unk78's and self->unk7C's shared pointee -- two parallel fields
+ * self->childA's and self->childB's shared pointee -- two parallel fields
  * of the SAME sub-object shape (Class86E00_3bb8c_g__AttachChildA/Class86E00_3bb8c_g__DetachChildA exercise
- * `unk78`; Class86E00_3bb8c_g__AttachChildB/Class86E00_3bb8c_g__DetachChildB exercise `unk7C` the identical
+ * `childA`; Class86E00_3bb8c_g__AttachChildB/Class86E00_3bb8c_g__DetachChildB exercise `childB` the identical
  * way), each independently attached via `Class86E00Methods_3bb8c_g::
  * slot10` and torn down via a fixed `slot50`/`slot48`/`release` sequence.
  */
@@ -1679,12 +1679,12 @@ struct Class86E00SubObjMethods_3bb8c_g {
     u8 pad000[0x004];
     void (*release)(Class86E00SubObj_3bb8c_g *self); /* +0x004, Class86E00_3bb8c_g__DetachChildA/Class86E00_3bb8c_g__DetachChildB */
     u8 pad008[0x044 - 0x008];
-    /* +0x044, Class86E00_3bb8c_g__AttachChildA/Class86E00_3bb8c_g__AttachChildB's own call: `(self, unk68)`
+    /* +0x044, Class86E00_3bb8c_g__AttachChildA/Class86E00_3bb8c_g__AttachChildB's own call: `(self, childReady)`
      * from the OWNING `Class86E00_3bb8c_g`. */
     void (*slot44)(Class86E00SubObj_3bb8c_g *self, s32 arg1);
     void (*slot48)(Class86E00SubObj_3bb8c_g *self); /* +0x048, Class86E00_3bb8c_g__DetachChildA/Class86E00_3bb8c_g__DetachChildB */
     /* +0x04C, Class86E00_3bb8c_g__AttachChildA/Class86E00_3bb8c_g__AttachChildB's own call:
-     * `(self, unk60, unk64, unk6C)` from the OWNING `Class86E00_3bb8c_g`. */
+     * `(self, unk60, unk64, childC)` from the OWNING `Class86E00_3bb8c_g`. */
     void (*slot4C)(Class86E00SubObj_3bb8c_g *self, s32 a1, s32 a2, Class86E00Unk6CObj_3bb8c_g *a3);
     void (*slot50)(Class86E00SubObj_3bb8c_g *self); /* +0x050, Class86E00_3bb8c_g__DetachChildA/Class86E00_3bb8c_g__DetachChildB */
 };
@@ -1694,11 +1694,11 @@ struct Class86E00SubObj_3bb8c_g {
 };
 
 /*
- * self->unk70's pointee -- a DIFFERENT sub-object from
+ * self->cardIcon's pointee -- a DIFFERENT sub-object from
  * `Class86E00SubObj_3bb8c_g` above. It shares the same `+0x004` slot
  * offset only because every BasicClass-family table keeps a slot there
  * (see `BasicClassMethods::release` in code_8220.h) -- the USAGE differs:
- * Class86E00_3bb8c_g__TickCardIcon assigns this call's RETURN VALUE back into `unk70` (an
+ * Class86E00_3bb8c_g__TickCardIcon assigns this call's RETURN VALUE back into `cardIcon` (an
  * "advance" pattern), where `Class86E00SubObj_3bb8c_g::release`'s callers
  * (Class86E00_3bb8c_g__DetachChildA/Class86E00_3bb8c_g__DetachChildB) discard the return and unconditionally
  * null the field afterward instead. Different enough to keep separate
@@ -1710,11 +1710,11 @@ typedef struct Class86E00Unk70ObjMethods_3bb8c_g Class86E00Unk70ObjMethods_3bb8c
 struct Class86E00Unk70ObjMethods_3bb8c_g {
     u8 pad000[0x004];
     /* +0x004, Class86E00_3bb8c_g__TickCardIcon's own call: return value stored back into
-     * `Class86E00_3bb8c_g::unk70` itself. */
+     * `Class86E00_3bb8c_g::cardIcon` itself. */
     Class86E00Unk70Obj_3bb8c_g *(*slot4)(Class86E00Unk70Obj_3bb8c_g *self);
     u8 pad008[0x04C - 0x008];
-    /* +0x04C, Class86E00_3bb8c_g__LoadCardIcon's own call on a FRESH `unk70` right after
-     * assigning it: `(self, self->unk68, &D_8008AA94)`. `unk68` is
+    /* +0x04C, Class86E00_3bb8c_g__LoadCardIcon's own call on a FRESH `cardIcon` right after
+     * assigning it: `(self, self->childReady, &D_8008AA94)`. `childReady` is
      * forwarded verbatim -- kept as the owning struct's established
      * bare `s32` reading of that field, not retyped to a pointer here. */
     void (*slot4C)(Class86E00Unk70Obj_3bb8c_g *self, s32 arg1, void *arg2);
@@ -1727,7 +1727,7 @@ struct Class86E00Unk70Obj_3bb8c_g {
 /*
  * Class86E00_3bb8c_g__OnItemSelected's own `arg1` -- a third, unrelated small object, reached
  * only through its own `+0x09C` slot, whose return value is stored into
- * `Class86E00_3bb8c_g::unk80`.
+ * `Class86E00_3bb8c_g::selectedItem`.
  */
 typedef struct GenericSlot9CObj_3bb8c_g GenericSlot9CObj_3bb8c_g;
 typedef struct GenericSlot9CMethods_3bb8c_g GenericSlot9CMethods_3bb8c_g;
@@ -1744,7 +1744,7 @@ struct GenericSlot9CObj_3bb8c_g {
 struct Class86E00Methods_3bb8c_g {
     u8 pad000[0x010];
     /* +0x010, Class86E00_3bb8c_g__AttachChildA/Class86E00_3bb8c_g__AttachChildB's own first call: `(self,
-     * subObj)`, registering/attaching whichever of `unk78`/`unk7C` that
+     * subObj)`, registering/attaching whichever of `childA`/`childB` that
      * function owns. */
     void (*slot10)(Class86E00_3bb8c_g *self, Class86E00SubObj_3bb8c_g *arg1);
     u8 pad014[0x030 - 0x014];
@@ -1771,7 +1771,7 @@ struct Class86E00Methods_3bb8c_g {
      * codes, same shape as `slot64` above. */
     s32 (*slot68)(Class86E00_3bb8c_g *self, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6);
     u8 pad06C[0x074 - 0x06C];
-    /* +0x074, Class86E00_3bb8c_g__AdvanceState's own `self->unk24==1` case: 4 extra
+    /* +0x074, Class86E00_3bb8c_g__AdvanceState's own `self->secondaryMode==1` case: 4 extra
      * arguments (`unk40`, `unk44`, `unk54`, `unk58`), same shape as
      * `slot78` just below but with only the last two of that call's
      * trailing four. */
@@ -1809,22 +1809,22 @@ struct Class86E00_3bb8c_g {
     Class86E00Methods_3bb8c_g *methods; /* +0x000 */
     u8 pad004[0x024 - 0x004];
     /* +0x024, Class86E00_3bb8c_g__AdvanceState's own secondary dispatch code (nested inside
-     * the `unk28`-driven switch's shared `2`/`4`/`0xA`/`0xE` case),
+     * the `state`-driven switch's shared `2`/`4`/`0xA`/`0xE` case),
      * tested against literals `2` and `1`. */
-    s32 unk24;
-    s32 unk28;   /* +0x028, dispatch/state code tested by several functions */
+    s32 secondaryMode;
+    s32 state;   /* +0x028, dispatch/state code tested by several functions */
     /* +0x02C, Class86E00_3bb8c_g__SetState's own loop bound: frees `self->unk38[0..
      * unk2C)` when tearing down (see `unk38`'s own comment below). */
     s32 unk2C;
     /* +0x030, Class86E00_3bb8c_g__AdvanceState's own `strcpy` source into `self->unk40`,
-     * in its `self->unk28==0xE` sub-case. */
+     * in its `self->state==0xE` sub-case. */
     char *unk30;
     /* +0x034, Class86E00_3bb8c_g__SetState's own `slot58` arg3, forwarded verbatim
      * alongside `unk30` above. */
     s32 unk34;
     void *unk38; /* +0x038, Class86E00_3bb8c_g__AttachChildB: forwarded opaquely to `func_80051A5C`'s arg0 */
-    /* +0x03C, Class86E00_3bb8c_g__AdvanceState's own `self->unk28==0xE` sub-case: base of a
-     * pointer array indexed by `(s32)self->unk80`, `strcat`ed onto
+    /* +0x03C, Class86E00_3bb8c_g__AdvanceState's own `self->state==0xE` sub-case: base of a
+     * pointer array indexed by `(s32)self->selectedItem`, `strcat`ed onto
      * `self->unk40` -- same shape as `unk38` just below, indexed the
      * same way for `self->unk44`'s own `strcpy`. */
     void *unk3C;
@@ -1836,32 +1836,32 @@ struct Class86E00_3bb8c_g {
     s32 unk50;   /* +0x050, Class86E00_3bb8c_g__OnCommand */
     s32 unk54;   /* +0x054, Class86E00_3bb8c_g__OnCommand */
     s32 unk58;   /* +0x058, Class86E00_3bb8c_g__OnCommand */
-    s32 unk5C;   /* +0x05C, Class86E00_3bb8c_g__TickStateDelay: incremented, capped at 6 */
-    s32 unk60;   /* +0x060, forwarded to `unk78`/`unk7C`'s own `slot4C` arg1 */
-    s32 unk64;   /* +0x064, forwarded to `unk78`/`unk7C`'s own `slot4C` arg2 */
+    s32 waitCounter;   /* +0x05C, Class86E00_3bb8c_g__TickStateDelay: incremented, capped at 6 */
+    s32 unk60;   /* +0x060, forwarded to `childA`/`childB`'s own `slot4C` arg1 */
+    s32 unk64;   /* +0x064, forwarded to `childA`/`childB`'s own `slot4C` arg2 */
     /* +0x068, a readiness gate checked alongside `unk60` in four
      * functions (Class86E00_3bb8c_g__AttachChildA/Class86E00_3bb8c_g__DetachChildA/Class86E00_3bb8c_g__AttachChildB/
      * Class86E00_3bb8c_g__DetachChildB) -- both must be non-zero before the body runs.
      * Kept a bare `s32`; never dereferenced in this unit. */
-    s32 unk68;
-    /* +0x06C, forwarded to `unk78`/`unk7C`'s own `slot4C` arg3.
+    s32 childReady;
+    /* +0x06C, forwarded to `childA`/`childB`'s own `slot4C` arg3.
      * Class86E00_3bb8c_g__SetChildFlag8 proves this is a pointer (dereferences its `+0x080`
      * vtable slot), not the plain `s32` it looked like from the slot4C
      * call site alone -- retyped here, same size, no layout change. */
-    Class86E00Unk6CObj_3bb8c_g *unk6C;
-    Class86E00Unk70Obj_3bb8c_g *unk70; /* +0x070, Class86E00_3bb8c_g__TickCardIcon */
+    Class86E00Unk6CObj_3bb8c_g *childC;
+    Class86E00Unk70Obj_3bb8c_g *cardIcon; /* +0x070, Class86E00_3bb8c_g__TickCardIcon */
     /* +0x074, a one-shot flag set to 1 by Class86E00_3bb8c_g__AttachChildA/Class86E00_3bb8c_g__AttachChildB
-     * right after attaching `unk78`/`unk7C`, and consumed (guarding a
+     * right after attaching `childA`/`childB`, and consumed (guarding a
      * teardown callback) by Class86E00_3bb8c_g__DetachChildA/Class86E00_3bb8c_g__DetachChildB. */
-    s32 unk74;
-    Class86E00SubObj_3bb8c_g *unk78; /* +0x078, Class86E00_3bb8c_g__AttachChildA/Class86E00_3bb8c_g__DetachChildA */
-    Class86E00SubObj_3bb8c_g *unk7C; /* +0x07C, Class86E00_3bb8c_g__AttachChildB/Class86E00_3bb8c_g__DetachChildB */
-    void *unk80; /* +0x080, Class86E00_3bb8c_g__OnItemSelected: set from `arg1->methods->slot9C(arg1)`'s return */
+    s32 childAttached;
+    Class86E00SubObj_3bb8c_g *childA; /* +0x078, Class86E00_3bb8c_g__AttachChildA/Class86E00_3bb8c_g__DetachChildA */
+    Class86E00SubObj_3bb8c_g *childB; /* +0x07C, Class86E00_3bb8c_g__AttachChildB/Class86E00_3bb8c_g__DetachChildB */
+    void *selectedItem; /* +0x080, Class86E00_3bb8c_g__OnItemSelected: set from `arg1->methods->slot9C(arg1)`'s return */
 };
 
 /* Address-of only in this unit's own screening -- Class86E00_3bb8c_g__AttachChildB forwards
  * `self->unk38` and the literal `1` to this external helper; return
- * value stored into `self->unk7C`. Not this round's function here -- it
+ * value stored into `self->childB`. Not this round's function here -- it
  * is class_3bb8c_j's New_Class86ED0 (matched round 15, src/class_3bb8c_j.c):
  * `func_80017B34(0x54)` then, on success, its own ctor-table getter's
  * `+0x008` slot called `(self, arg0, arg1)`. This call site's own
@@ -1871,9 +1871,9 @@ extern void *func_80051A5C(void *arg0, s32 arg1);
 
 /* Not this round's function (lives outside this unit's slice) --
  * Class86E00_3bb8c_g__AttachChildA's own external helper, called with `((self->unk48 << 1)
- * + self->unk44, 1)`; return value stored into `self->unk78`. The 2nd
+ * + self->unk44, 1)`; return value stored into `self->childA`. The 2nd
  * argument (a literal `1`) is materialized EARLY, in the delay slot of
- * the guard testing `self->unk78 == NULL` several instructions before
+ * the guard testing `self->childA == NULL` several instructions before
  * this call -- nothing overwrites `$a1` in between, which is what
  * reveals it as a real 2nd argument rather than a scheduling artifact
  * (see Class86E00_3bb8c_g__AttachChildA's report). */

@@ -7,7 +7,7 @@ void Class86E00_3bb8c_g__SetState(Class86E00_3bb8c_g *self, s32 arg1)
     s32 ret;
     s32 i;
 
-    if (self->unk28 == arg1) {
+    if (self->state == arg1) {
         arg1 = 0x17;
     }
 
@@ -15,7 +15,7 @@ void Class86E00_3bb8c_g__SetState(Class86E00_3bb8c_g *self, s32 arg1)
     methods->slot84(self);
     methods->slot80(self, arg1);
 
-    self->unk5C = 0;
+    self->waitCounter = 0;
     switch (arg1) {
     case 0x13:
         arg1 = methods->slot50(self) ? 0x11 : 8;
@@ -44,7 +44,7 @@ void Class86E00_3bb8c_g__SetState(Class86E00_3bb8c_g *self, s32 arg1)
     }
 
     if ((u32)(arg1 - 0x16) < 2) {
-        if (self->unk24 == 1 && self->unk38 != NULL) {
+        if (self->secondaryMode == 1 && self->unk38 != NULL) {
             func_80017CFC(self->unk3C);
             for (i = 0; i < self->unk2C; i++) {
                 func_80017CFC(((void **)self->unk38)[i]);
@@ -52,10 +52,10 @@ void Class86E00_3bb8c_g__SetState(Class86E00_3bb8c_g *self, s32 arg1)
             func_80017CFC(self->unk38);
             self->unk38 = NULL;
         }
-        self->unk28 = 0;
-        self->unk24 = 0;
+        self->state = 0;
+        self->secondaryMode = 0;
     } else {
-        self->unk28 = arg1;
+        self->state = arg1;
     }
 }
 
@@ -66,7 +66,7 @@ void Class86E00_3bb8c_g__SetState(Class86E00_3bb8c_g *self, s32 arg1)
  * local view per this project's established convention. */
 extern ChildObj86ED0 *func_8003B39C(char *path);
 /* Not this round's function -- consumes the short-lived handle above and
- * produces the object stored into `self->unk70`. */
+ * produces the object stored into `self->cardIcon`. */
 extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
 /* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
@@ -77,7 +77,7 @@ extern const char D_8008AAB4[]; /* "CARD\\" */
 extern const char D_8008AABC[]; /* ".TIM" */
 /* 3-word opaque block, `func_80041C9C`'s arg1, address-only here. */
 extern s32 D_80086EC4;
-/* opaque block, the fresh `unk70`'s own `slot4C` arg2, address-only here. */
+/* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
 extern s32 D_8008AA94;
 
 void Class86E00_3bb8c_g__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
@@ -91,10 +91,10 @@ void Class86E00_3bb8c_g__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     if (arg1 >= 0x11) {
         return;
     }
-    if (self->unk68 == 0) {
+    if (self->childReady == 0) {
         return;
     }
-    if (self->unk70 != NULL) {
+    if (self->cardIcon != NULL) {
         return;
     }
 
@@ -108,21 +108,21 @@ void Class86E00_3bb8c_g__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     handle = func_8003B39C(buf);
     handle->methods->slot78(handle);
     newVal = func_80041C9C(handle, (void *)&D_80086EC4, 0);
-    self->unk70 = newVal;
+    self->cardIcon = newVal;
     handle->methods->release(handle);
-    newVal->methods->slot4C(newVal, self->unk68, (void *)&D_8008AA94);
+    newVal->methods->slot4C(newVal, self->childReady, (void *)&D_8008AA94);
 }
 
 void Class86E00_3bb8c_g__TickCardIcon(Class86E00_3bb8c_g *self)
 {
-    if (self->unk70 != NULL) {
-        self->unk70 = self->unk70->methods->slot4(self->unk70);
+    if (self->cardIcon != NULL) {
+        self->cardIcon = self->cardIcon->methods->slot4(self->cardIcon);
     }
 }
 
 void Class86E00_3bb8c_g__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
 {
-    if (self->unk28 != 0) {
+    if (self->state != 0) {
         if (arg2 == 0x19) {
             self->methods->slot90(self);
         } else if (arg2 == 0x17) {
@@ -133,8 +133,8 @@ void Class86E00_3bb8c_g__OnNotify(Class86E00_3bb8c_g *self, s32 arg1, s32 arg2)
 
 void Class86E00_3bb8c_g__SetChildFlag8(Class86E00_3bb8c_g *self, s32 arg1)
 {
-    if (self->unk6C != NULL) {
-        self->unk6C->methods->slot80(self->unk6C, arg1, 0x7F, 0x7F);
+    if (self->childC != NULL) {
+        self->childC->methods->slot80(self->childC, arg1, 0x7F, 0x7F);
     }
 }
 
@@ -142,21 +142,21 @@ void Class86E00_3bb8c_g__AdvanceState(Class86E00_3bb8c_g *self)
 {
     Class86E00Methods_3bb8c_g *methods = self->methods;
 
-    switch (self->unk28) {
+    switch (self->state) {
     case 2:
     case 4:
     case 0xA:
     case 0xE:
         methods->slot8C(self, 0);
-        if (self->unk28 == 0xE) {
+        if (self->state == 0xE) {
             strcpy((char *)self->unk40, self->unk30);
-            strcat((char *)self->unk40, ((char **)self->unk3C)[(s32)self->unk80]);
-            strcpy((char *)self->unk44, ((char **)self->unk38)[(s32)self->unk80]);
+            strcat((char *)self->unk40, ((char **)self->unk3C)[(s32)self->selectedItem]);
+            strcpy((char *)self->unk44, ((char **)self->unk38)[(s32)self->selectedItem]);
         }
-        if (self->unk24 == 2) {
+        if (self->secondaryMode == 2) {
             methods->slot78(self, self->unk40, self->unk44, self->unk48,
                              self->unk4C, self->unk50, self->unk54, self->unk58);
-        } else if (self->unk24 == 1) {
+        } else if (self->secondaryMode == 1) {
             methods->slot74(self, self->unk40, self->unk44, self->unk54, self->unk58);
         }
         break;
@@ -179,7 +179,7 @@ void Class86E00_3bb8c_g__AdvanceState(Class86E00_3bb8c_g *self)
 
 void Class86E00_3bb8c_g__ForceIdleFromState(Class86E00_3bb8c_g *self)
 {
-    switch (self->unk28) {
+    switch (self->state) {
     case 4:
     case 6:
     case 0xA:
@@ -197,26 +197,26 @@ void Class86E00_3bb8c_g__TickStateDelay(Class86E00_3bb8c_g *self)
     s32 old;
     s32 newVal;
 
-    if (self->unk28 == 7) {
-        old = self->unk5C;
+    if (self->state == 7) {
+        old = self->waitCounter;
         newVal = old + 1;
-        self->unk5C = newVal;
+        self->waitCounter = newVal;
         if (old < 6) {
             return;
         }
         self->methods->slot7C(self, 0x13);
-    } else if (self->unk28 == 0xB) {
-        old = self->unk5C;
+    } else if (self->state == 0xB) {
+        old = self->waitCounter;
         newVal = old + 1;
-        self->unk5C = newVal;
+        self->waitCounter = newVal;
         if (old < 6) {
             return;
         }
         self->methods->slot7C(self, 0x14);
-    } else if (self->unk28 == 0xF) {
-        old = self->unk5C;
+    } else if (self->state == 0xF) {
+        old = self->waitCounter;
         newVal = old + 1;
-        self->unk5C = newVal;
+        self->waitCounter = newVal;
         if (old < 6) {
             return;
         }
@@ -226,25 +226,25 @@ void Class86E00_3bb8c_g__TickStateDelay(Class86E00_3bb8c_g *self)
 
 void Class86E00_3bb8c_g__AttachChildA(Class86E00_3bb8c_g *self)
 {
-    if (self->unk68 != 0 && self->unk60 != 0) {
-        if (self->unk78 == NULL) {
-            self->unk78 = func_80050BA8((self->unk48 << 1) + self->unk44, 1);
-            self->unk74 = 1;
+    if (self->childReady != 0 && self->unk60 != 0) {
+        if (self->childA == NULL) {
+            self->childA = func_80050BA8((self->unk48 << 1) + self->unk44, 1);
+            self->childAttached = 1;
         }
-        self->methods->slot10(self, self->unk78);
-        self->unk78->methods->slot44(self->unk78, self->unk68);
-        self->unk78->methods->slot4C(self->unk78, self->unk60, self->unk64, self->unk6C);
+        self->methods->slot10(self, self->childA);
+        self->childA->methods->slot44(self->childA, self->childReady);
+        self->childA->methods->slot4C(self->childA, self->unk60, self->unk64, self->childC);
     }
 }
 
 void Class86E00_3bb8c_g__DetachChildA(Class86E00_3bb8c_g *self)
 {
-    if (self->unk68 != 0 && self->unk60 != 0 && self->unk78 != NULL) {
-        self->unk78->methods->slot50(self->unk78);
-        self->unk78->methods->slot48(self->unk78);
-        if (self->unk74 != 0) {
-            self->unk78->methods->release(self->unk78);
-            self->unk78 = NULL;
+    if (self->childReady != 0 && self->unk60 != 0 && self->childA != NULL) {
+        self->childA->methods->slot50(self->childA);
+        self->childA->methods->slot48(self->childA);
+        if (self->childAttached != 0) {
+            self->childA->methods->release(self->childA);
+            self->childA = NULL;
         }
     }
 }
@@ -266,25 +266,25 @@ void Class86E00_3bb8c_g__OnCommand(Class86E00_3bb8c_g *self, void *arg1, s32 arg
 
 void Class86E00_3bb8c_g__AttachChildB(Class86E00_3bb8c_g *self)
 {
-    if (self->unk68 != 0 && self->unk60 != 0) {
-        if (self->unk7C == NULL) {
-            self->unk7C = func_80051A5C(self->unk38, 1);
-            self->unk74 = 1;
+    if (self->childReady != 0 && self->unk60 != 0) {
+        if (self->childB == NULL) {
+            self->childB = func_80051A5C(self->unk38, 1);
+            self->childAttached = 1;
         }
-        self->methods->slot10(self, self->unk7C);
-        self->unk7C->methods->slot44(self->unk7C, self->unk68);
-        self->unk7C->methods->slot4C(self->unk7C, self->unk60, self->unk64, self->unk6C);
+        self->methods->slot10(self, self->childB);
+        self->childB->methods->slot44(self->childB, self->childReady);
+        self->childB->methods->slot4C(self->childB, self->unk60, self->unk64, self->childC);
     }
 }
 
 void Class86E00_3bb8c_g__DetachChildB(Class86E00_3bb8c_g *self)
 {
-    if (self->unk68 != 0 && self->unk60 != 0 && self->unk7C != NULL) {
-        self->unk7C->methods->slot50(self->unk7C);
-        self->unk7C->methods->slot48(self->unk7C);
-        if (self->unk74 != 0) {
-            self->unk7C->methods->release(self->unk7C);
-            self->unk7C = NULL;
+    if (self->childReady != 0 && self->unk60 != 0 && self->childB != NULL) {
+        self->childB->methods->slot50(self->childB);
+        self->childB->methods->slot48(self->childB);
+        if (self->childAttached != 0) {
+            self->childB->methods->release(self->childB);
+            self->childB = NULL;
         }
     }
 }
@@ -293,7 +293,7 @@ void Class86E00_3bb8c_g__OnItemSelected(Class86E00_3bb8c_g *self, GenericSlot9CO
 {
     switch (arg2) {
     case 2:
-        self->unk80 = arg1->methods->slot9C(arg1);
+        self->selectedItem = arg1->methods->slot9C(arg1);
         self->methods->slotAC(self);
         self->methods->slot7C(self, 0xE);
         break;
