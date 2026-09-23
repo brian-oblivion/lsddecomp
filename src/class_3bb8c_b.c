@@ -63,19 +63,13 @@ void func_8004C620(Obj866E8 *self) {
  * func_8004CAF0), but tail-called here before its own definition appears. */
 extern void func_8004C93C(Obj866E8 *self);
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 143/165 words, length exact, zero drift (round 71, up from
- * 85/165 three words short) -- see docs/match-reports/func_8004C6A8.md.
- * Residue: frame size only (retail -0x98, this body -0x90: retail's
- * spill/local area runs 8 bytes past `flag`'s slot at sp+0x60), which moves
- * every callee-saved save/restore slot by 8; every instruction and register
- * outside the prologue/epilogue agrees. Hand-derived. */
 void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
     s32 point0;
     s32 point1;
-    s32 angle;
+    u16 angle;      /* u16, not s32: the s32 form is byte-identical except
+                     * for an 8-byte-smaller frame (round 71) */
     QueryTemplate866E8 mat;
     s32 offset;
     s32 flag;
@@ -133,9 +127,6 @@ void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     }
     func_8004C93C(self);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C6A8);
-#endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 45/109 words, length exact, zero drift. Residue: register
