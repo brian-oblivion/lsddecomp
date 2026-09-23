@@ -1,23 +1,25 @@
-# func_8003EDF4 — MATCHED
+# Unk18Obj__DeinitOt — MATCHED
+
+> Renamed from `func_8003EDF4` on 2026-09-23 (tools/rename.py). Address 0x8003edf4.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 19/19 words, full match.
 
 ## Signature
 
 ```c
-void func_8003EDF4(Unk18Obj *self);
+void Unk18Obj__DeinitOt(Unk18Obj *self);
 ```
 
 Not a `D_8006E8E4` vtable slot; called directly by symbol.
 
 ## What it does
 
-Teardown counterpart to `func_8003ECD0`'s init (this round, stalled at
+Teardown counterpart to `Unk18Obj__InitOt`'s init (this round, stalled at
 71/73 — see that report; this function is unaffected by the stall, its
 own logic is independent).
 
 ```c
-void func_8003EDF4(Unk18Obj *self) {
+void Unk18Obj__DeinitOt(Unk18Obj *self) {
     if (self->unk70 != 0) {
         DrawSync(0);
         func_80017CFC((void *)self->unk78);
@@ -30,3 +32,7 @@ void func_8003EDF4(Unk18Obj *self) {
 
 `include/code_2cc8c.h`: new extern `DrawSync(s32 a0)` (PsyQ library,
 `asm/psyq_GsLinkObject4.s`, not decompiled).
+
+## Naming
+
+`Unk18Obj__DeinitOt` -- tier A. Teardown counterpart of `Unk18Obj__InitOt`, guarded by the same `unk70` latch: calls Sony's `DrawSync(0)`, frees the `unk78` buffer, clears `unk70`.

@@ -1,4 +1,6 @@
-# func_8003EC2C -- MATCHED 37/37 words
+# Unk18Obj__SetRatio12 -- MATCHED 37/37 words
+
+> Renamed from `func_8003EC2C` on 2026-09-23 (tools/rename.py). Address 0x8003ec2c.
 
 Unit `code_2cc8c_d`, carved round 13. Reopened round 42 as
 `nop_mflo_mfhi`-blocked (the blocker is RESOLVED, see CLAUDE.md); the stub
@@ -14,7 +16,7 @@ exactly the 4 bytes between `unk20` (`Vec3_2cc8c`, ending at +0x02C) and the
 already-known `unk30`).
 
 ```c
-void func_8003EC2C(Unk18Obj *self, s16 *pair) {
+void Unk18Obj__SetRatio12(Unk18Obj *self, s16 *pair) {
     s32 q1, r1, q2;
 
     if (self->unk10 != NULL) {
@@ -54,3 +56,7 @@ the split-division idiom for 20.12 fixed-point (`q,r = a/b, a%b; return (q
 independent occupants of unrelated class hierarchies, same idiom -- this
 reads like a shared runtime helper pattern the original codebase used
 often, not a coincidence.
+
+## Naming
+
+`Unk18Obj__SetRatio12` -- tier B. Computes a 20.12 fixed-point value from a caller-supplied `{s16 whole; s16 frac;}` pair via the same split-division idiom as `code_d294_c`'s `RatioToFixed12` (divide for quotient+remainder, divide the shifted remainder again for the fraction), guarded by `self->unk10`, stores to `unk2C`. Named after the identified idiom (matches an existing, already-named sibling function's own algorithm), not after any established in-game meaning for the ratio.

@@ -224,7 +224,7 @@ Unk18Obj *New_Unk18Obj(void)
 
     self = func_80017B34(0xBC);
     if (self != NULL) {
-        func_8003F24C()->ctor(self);
+        GetUnk18ObjMethods()->ctor(self);
         return self;
     }
     return NULL;
@@ -235,7 +235,7 @@ void Unk18Obj__Unk18Obj(Unk18Obj *self)
     SubHandleObj *obj;
 
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_8003F24C();
+    self->methods = GetUnk18ObjMethods();
     self->unkC = 0;
     self->unk10 = 0;
     self->unkAC = New_Class6B5CC();

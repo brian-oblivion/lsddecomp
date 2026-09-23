@@ -1,11 +1,13 @@
-# func_8003F24C — MATCHED
+# GetUnk18ObjMethods — MATCHED
+
+> Renamed from `func_8003F24C` on 2026-09-23 (tools/rename.py). Address 0x8003f24c.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 4/4 words, full match.
 
 ## Signature
 
 ```c
-Unk18ObjMethods *func_8003F24C(void);
+Unk18ObjMethods *GetUnk18ObjMethods(void);
 ```
 
 Plain no-argument getter for `Unk18Obj`'s own vtable.
@@ -13,7 +15,7 @@ Plain no-argument getter for `Unk18Obj`'s own vtable.
 ## What it does
 
 ```c
-Unk18ObjMethods *func_8003F24C(void) {
+Unk18ObjMethods *GetUnk18ObjMethods(void) {
     return &D_8006E8E4;
 }
 ```
@@ -30,5 +32,9 @@ comment accordingly rather than leaving the stale "external" note.
 
 `include/code_2cc8c.h`: added `extern Unk18ObjMethods D_8006E8E4;` (the
 table itself, `tools/classtable.py D_8006E8E4`, needed so this definition
-can return `&D_8006E8E4`) and updated the `func_8003F24C` extern's own
+can return `&D_8006E8E4`) and updated the `GetUnk18ObjMethods` extern's own
 comment to reflect it is now matched, not external.
+
+## Naming
+
+`GetUnk18ObjMethods` -- tier A. Plain no-argument getter, `return &D_8006E8E4;` -- `Unk18Obj`'s own class table. Named to match the established sibling convention for this exact shape (`Get_vtable_BasicClass`, `GetClass6E99CMethods`, `GetClass86AA0Methods`), which is a free function (no `self`), not a `Class__Method`.

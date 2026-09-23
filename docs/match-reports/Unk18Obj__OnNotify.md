@@ -1,11 +1,13 @@
-# func_8003E8B8 — MATCHED
+# Unk18Obj__OnNotify — MATCHED
+
+> Renamed from `func_8003E8B8` on 2026-09-23 (tools/rename.py). Address 0x8003e8b8.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 44/44 words, full match.
 
 ## Signature
 
 ```c
-void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void Unk18Obj__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 ```
 
 `Unk18ObjMethods`'s own `+0x038` slot occupant.
@@ -18,7 +20,7 @@ respectively, read off its header nibble — same idiom already established
 by round 13's `Unk18Obj__AddChild`).
 
 ```c
-void func_8003E8B8(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
+void Unk18Obj__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     s32 tag;
 
     Get_vtable_BasicClass()->slot38(self, arg1, arg2);
@@ -39,7 +41,7 @@ Adding `slot94`/`slot98` to `Unk18ObjMethods` (splitting the old
 `slot98` (`+0x098`) only account for 8 of the 20 bytes that pad used to
 cover, so `slotA8` silently landed at struct offset `+0x09C` instead of its
 real `+0x0A8`. Compiled clean; the failure showed up only as a whole-image
-SHA1 mismatch with `build exit=2` and no diff in `func_8003E8B8` itself.
+SHA1 mismatch with `build exit=2` and no diff in `Unk18Obj__OnNotify` itself.
 Localized with the corrected recipe from `CLAUDE.md`'s fifth-way-a-score-
 lies-that-wasn't entry (`cmp -l`, 1-based, then `lsdde.map`): the single
 differing byte fell inside `Unk18Obj__Finalize` (round 13, alpha — dispatches
@@ -53,6 +55,10 @@ finding.
 ## Header changes
 
 `include/code_2cc8c.h`: `Unk18ObjMethods` gains `slot94`/`slot98` (both
-`void (*)(Unk18Obj*, GenericObj*, s32)`, occupants `func_8003EE40`/
-`func_8003EE88`, still queued as of this report) plus the corrective
+`void (*)(Unk18Obj*, GenericObj*, s32)`, occupants `Unk18Obj__OnNotifyTag5`/
+`Unk18Obj__OnNotifyTag1`, still queued as of this report) plus the corrective
 `pad09C` gap described above.
+
+## Naming
+
+`Unk18Obj__OnNotify` -- tier A. Body is a supercall to `Get_vtable_BasicClass()->onNotify` followed by dispatch on the sender's dynamic-class tag nibble (5 -> slot94, 1 -> slot98) -- the exact override shape already established and named for `BasicClass__OnNotify`/`Class6B5CC__OnNotify` (`include/code_8220.h`, `src/code_d294.c`). Matching an adopted, cross-class convention rather than a fresh guess.

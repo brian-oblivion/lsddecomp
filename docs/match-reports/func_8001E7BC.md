@@ -339,7 +339,7 @@ piece of the residue, not the guards or the tail.
 **Levers tried and REJECTED for reproducing the double evaluation without
 writing it out literally, all measured, none matched retail's own timing:**
 - A bare `__asm__ __volatile__("" ::: "memory")` between per-axis
-  assignments of a named `table` -- irrelevant here (see func_8003E968's
+  assignments of a named `table` -- irrelevant here (see Unk18Obj__InitDefaults's
   report this same round: a memory clobber does not force recomputation of
   a pure address constant).
 - Two SEPARATE named variables (`dst`/`src`), each independently assigned
@@ -351,7 +351,7 @@ writing it out literally, all measured, none matched retail's own timing:**
   write -- **worse** (31/180, drift). Same story.
 - Declaration order of `table`/`node`/`cur` (several permutations) --
   **completely inert** on this residue, consistent with round 44's other
-  finding on this exact axis (`func_8003ECD0`'s report, same round):
+  finding on this exact axis (`Unk18Obj__InitOt`'s report, same round):
   declaration order is not a reliable lever for a CSE/materialization
   residue, only for certain register-preference ones.
 
@@ -444,7 +444,7 @@ in this unit. This round is pure codegen-shape derivation.
 out twice at the SOURCE level -- caching it in one variable, however
 plausible-looking, reliably comes out 2 fewer instructions per occurrence
 and desyncs the whole function's length.** This is the same family as
-func_8003E968's CSE finding this round (GCC not merging what looks
+Unk18Obj__InitDefaults's CSE finding this round (GCC not merging what looks
 mergeable) but the INVERSE direction: there, GCC merged what retail did NOT;
 here, GCC would happily merge what retail also did NOT, and the fix in both
 cases is to give the compiler no plausible-looking single value to (fail

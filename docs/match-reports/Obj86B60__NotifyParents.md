@@ -173,7 +173,7 @@ markedly WORSE than the 21/32 baseline**, despite scoring better on the
 permuter's own heuristic. The extra alias apparently gives cc1 enough
 freedom to allocate a genuinely different (larger) frame. This is the
 same class of permuter false-lead this project's other reports already
-document (`func_8003ECD0.md` round 36, `func_80031A44.md`): a heuristic
+document (`Unk18Obj__InitOt.md` round 36, `func_80031A44.md`): a heuristic
 score below baseline is a LEAD to verify, never a result to adopt
 un-translated.
 
@@ -182,7 +182,7 @@ reasons, confirmed by inspection alone (no rebuild needed):
 - `output-239-1`/`-2`: retypes `arg1` from `s32` to `unsigned short` --
   a real truncation bug (this call site's actual argument range is
   unknown), the same "narrows a parameter's width" artifact class
-  documented in `func_8003ECD0.md`.
+  documented in `Unk18Obj__InitOt.md`.
 - `output-261-1`: reads `new_var` (an aliased copy of `methods`) BEFORE
   `methods` itself is ever assigned -- literal undefined behaviour (use
   of an uninitialised value), exactly the "reject UB, a candidate

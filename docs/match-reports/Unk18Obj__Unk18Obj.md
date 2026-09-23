@@ -24,7 +24,7 @@ void Unk18Obj__Unk18Obj(Unk18Obj *self)
     SubHandleObj *obj;
 
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_8003F24C();
+    self->methods = GetUnk18ObjMethods();
     self->unkC = 0;
     self->unk10 = 0;
     self->unkAC = New_Class6B5CC();
@@ -59,7 +59,7 @@ before the byte-level score did.
   `unkB0` (`SubHandleObj *`, from `New_Class6E99C`).
 - `Unk18ObjMethods`: added `slot40` -- a DIFFERENT function from
   `Obj86B60Methods::slot40` despite the identical offset; `D_8006E8E4`'s own
-  `+0x040` occupant is `func_8003E968` (per `tools/classtable.py
+  `+0x040` occupant is `Unk18Obj__InitDefaults` (per `tools/classtable.py
   D_8006E8E4`), not `Obj86B60__ResetCounters`. Two unrelated tables, same offset,
   different occupants -- ordinary vtable-layout coincidence, not evidence
   of a shared ancestor at this slot (contrast with the GENUINELY shared
@@ -88,8 +88,8 @@ first build (after correctly re-reading the delay-slot ordering above).
 **Unk18Obj__Unk18Obj** (renamed from `func_8003E628`, round 55, runner
 alpha). Tier A: the `Class__Class` constructor convention (matching
 `BasicClass__BasicClass`) -- confirmed as `Unk18ObjMethods::ctor`'s
-occupant (called by `New_Unk18Obj` via `func_8003F24C()->ctor(self)`,
-`func_8003F24C` being this class's own vtable getter, code_2cc8c_d.c).
+occupant (called by `New_Unk18Obj` via `GetUnk18ObjMethods()->ctor(self)`,
+`GetUnk18ObjMethods` being this class's own vtable getter, code_2cc8c_d.c).
 Chains `Get_vtable_BasicClass()->ctor` first, then installs its own vtable
 and sets up `self->unkAC`/`self->unkB0` -- the standard base-then-derived
 construction shape.

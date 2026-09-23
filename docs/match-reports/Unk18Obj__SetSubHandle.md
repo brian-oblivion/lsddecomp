@@ -1,4 +1,6 @@
-# func_8003F1A8 — MATCHED
+# Unk18Obj__SetSubHandle — MATCHED
+
+> Renamed from `func_8003F1A8` on 2026-09-23 (tools/rename.py). Address 0x8003f1a8.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 34/34 words, full match (2
 real attempts).
@@ -6,7 +8,7 @@ real attempts).
 ## Signature
 
 ```c
-void func_8003F1A8(Unk18Obj *self, SubHandleObj *arg1);
+void Unk18Obj__SetSubHandle(Unk18Obj *self, SubHandleObj *arg1);
 ```
 
 `Unk18ObjMethods`'s own `+0x0A8` slot occupant (`slotA8`) — a DIFFERENT
@@ -25,7 +27,7 @@ shared `D_8008A904` constant (already known from round 13's
 `Unk18Obj__Unk18Obj`, the same 3rd argument).
 
 ```c
-void func_8003F1A8(Unk18Obj *self, SubHandleObj *arg1) {
+void Unk18Obj__SetSubHandle(Unk18Obj *self, SubHandleObj *arg1) {
     if (self->unk10 != NULL) {
         return;
     }
@@ -57,3 +59,21 @@ guard's own C source structure has to reflect directly.
 `include/code_2cc8c.h`: `SubHandleObjMethods` gains `slot4`
 (`void (*)(SubHandleObj*)`, release-shaped, no extra args), splitting the
 old `pad000[0x04C]` span ahead of the already-typed `slot4C`.
+
+## Naming
+
+`Unk18Obj__SetSubHandle` -- tier A. Guarded by `self->unk10 == NULL`: releases the current `self->unkB0` via its own `slot4` if set, installs `a1`, and notifies it (`slot4C`) with `self->unkAC` and the shared `D_8008A904` constant. Plain "replace the held sub-handle" mechanics.
+
+## Proposed field names
+
+Not applied -- `unkB0`/`unkAC` are both shared with `code_2cc8c_c.c`
+(`Unk18Obj__Unk18Obj` sets both, `Unk18Obj__Finalize` releases `unkAC`), so
+outside this unit's ownership per track 3's rule.
+
+- `unkB0` -> `subHandle` (tier B): the field this function and
+  `Unk18Obj__GetSubHandle` (this unit) exclusively set/get; matches
+  `SubHandleObj`'s own existing type name.
+- `unkAC` -> not proposed beyond the existing `Unk18AcObj` typedef's own
+  documentation; this unit only forwards it opaquely (`arg1->methods->
+  slot4C(arg1, self->unkAC, D_8008A904)`), no new evidence over what
+  `include/code_2cc8c.h`'s own comment on `Unk18Obj::unkAC` already records.

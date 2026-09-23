@@ -1,4 +1,6 @@
-# func_8003E968 -- MATCHED round 49 (41/41 words, whole-image byte-exact)
+# Unk18Obj__InitDefaults -- MATCHED round 49 (41/41 words, whole-image byte-exact)
+
+> Renamed from `func_8003E968` on 2026-09-23 (tools/rename.py). Address 0x8003e968.
 
 ## ROUND 49 (runner delta): MATCHED -- the asm-label alias defeats the address CSE, then a second independent scheduling residue is exposed and closed by two bare barriers
 
@@ -99,7 +101,7 @@ extern s32 D_8008A900;
 extern SByte3_d294 D_8008A8F8;
 extern SByte3_d294 D_8008A8F8_b __asm__("D_8008A8F8");
 
-void func_8003E968(Unk18Obj *self) {
+void Unk18Obj__InitDefaults(Unk18Obj *self) {
     self->unk90 = 0;
     self->unk70 = 0;
     __asm__("");
@@ -230,7 +232,7 @@ extern s32 D_8008A8FC;
 extern s32 D_8008A900;
 extern SByte3_d294 D_8008A8F8;
 
-void func_8003E968(Unk18Obj *self) {
+void Unk18Obj__InitDefaults(Unk18Obj *self) {
     self->unk90 = 0;
     self->unk70 = 0;
     self->unk34.a = D_8008A8FC;
@@ -352,3 +354,7 @@ C89 idiom for "recompute this address, don't cache it" that this project
 hasn't tried yet, or is this a genuine case where GCC 2.6.3's CSE pass
 cannot be defeated from the C source at all (making it a to-be-escalated
 toolchain question, not a per-function one)?
+
+## Naming
+
+`Unk18Obj__InitDefaults` -- tier A. Slot40 occupant, called once from `Unk18Obj__Unk18Obj`'s own constructor tail (`self->methods->slot40(self)`, `code_2cc8c_c.c`) immediately after the base ctor. Body is straight-line field initialization to constants. Mechanics (post-ctor default init) are the whole of its purpose.

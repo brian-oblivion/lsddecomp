@@ -1,4 +1,6 @@
-# func_8003F25C — MATCHED
+# Unk18Obj__GetTail — MATCHED
+
+> Renamed from `func_8003F25C` on 2026-09-23 (tools/rename.py). Address 0x8003f25c.
 
 Unit: `code_2cc8c_d`. Round 14, runner delta. 12/12 words, full match (3
 real attempts).
@@ -6,7 +8,7 @@ real attempts).
 ## Signature
 
 ```c
-Unk18Obj *func_8003F25C(Unk18Obj *self);
+Unk18Obj *Unk18Obj__GetTail(Unk18Obj *self);
 ```
 
 Not a `D_8006E8E4` vtable slot (not present in `tools/classtable.py`'s
@@ -21,7 +23,7 @@ to find the tail of a singly-linked list rooted at `self`. Returns `self`
 itself unchanged if `self->unkC` is already `NULL`.
 
 ```c
-Unk18Obj *func_8003F25C(Unk18Obj *self) {
+Unk18Obj *Unk18Obj__GetTail(Unk18Obj *self) {
     while (self->unkC != NULL) {
         self = (Unk18Obj *)self->unkC;
     }
@@ -64,3 +66,7 @@ retail's assembly shows" even when the disassembly visually looks like
 one; GCC gets to that shape by ROTATING a `while`, and handing it an
 already-rotated source can make it add a further redundant jump on top
 rather than recognizing the guard as already covered by the loop.
+
+## Naming
+
+`Unk18Obj__GetTail` -- tier A. Walks `self->unkC` while non-NULL to find the tail of a singly-linked chain rooted at `self`; a pure leaf whose mechanics (list-tail walk) are its whole purpose.
