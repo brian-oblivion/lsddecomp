@@ -289,7 +289,7 @@ void Class86668__Dtor(Obj865C8 *self) {
     Get_vtable_IntermediateBase()->dtor(self);
 }
 
-void func_8004A294(Obj865C8 *self) {
+void Class86668__CancelTimeout(Obj865C8 *self) {
     self->methods->setUnk2C(self, -1);
 }
 

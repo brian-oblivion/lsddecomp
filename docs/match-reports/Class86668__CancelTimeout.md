@@ -1,4 +1,6 @@
-# func_8004A294
+# Class86668__CancelTimeout
+
+> Renamed from `func_8004A294` on 2026-09-23 (tools/rename.py). Address 0x8004a294.
 
 **Unit:** class_39e08 · **Size:** 12 words (0x30 bytes) · **Status:** MATCHED (12/12 words)
 
@@ -21,7 +23,7 @@ jalr  $v0
 Written as:
 
 ```c
-void func_8004A294(Obj865C8 *self) {
+void Class86668__CancelTimeout(Obj865C8 *self) {
     self->methods->setUnk2C(self, -1);
 }
 ```

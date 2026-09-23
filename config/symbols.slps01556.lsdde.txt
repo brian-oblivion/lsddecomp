@@ -1760,3 +1760,4 @@ GetObj865C8Methods = 0x8004A060; // type:func
 New_Class86668 = 0x8004A130; // type:func
 Class86668__Class86668 = 0x8004A19C; // type:func
 Class86668__Dtor = 0x8004A228; // type:func
+Class86668__CancelTimeout = 0x8004A294; // type:func
