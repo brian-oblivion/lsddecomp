@@ -273,15 +273,16 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *
     }
 }
 
-/* STALL -- see docs/match-reports/Class6B5CC__CheckBoundsOverlap.md. Round 20: reached
- * 14/243 words in-range (up from round 13's 6/243) after fixing the
- * frame size (0x98 -> 0xF8, a 24-word unused-buffer padding) and a
- * deferred-self-materialization residue (barrier as first statement).
- * Remaining residue: arg2 gets copied into a scratch register ($t2)
- * where retail keeps it in $a2 throughout, plus substantial further
- * structural work in the two loop bodies and tail comparison.
- * Restored to INCLUDE_ASM per project rule. */
-#if 0
+#ifdef NON_MATCHING
+/* NON_MATCHING: 14/243 words in-range, 21 words short overall (built
+ * 222/retail 243 words). Residue: substantial structural work remains in
+ * the two loop bodies and tail comparison, beyond a register-identity
+ * detail (arg2 kept live in $a2 throughout retail, copied to a scratch
+ * register here) (docs/match-reports/Class6B5CC__CheckBoundsOverlap.md).
+ * The preserved best-scoring body opens with a bare __asm__("") scheduling
+ * barrier to force self's early materialization; that barrier has no
+ * meaning beyond bytes and is omitted here -- see the report for the
+ * byte-shaped variant. Hand-derived. */
 s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2) {
     CornerList_d294 *list;
     Vec3S16_d294 *cur;
@@ -298,7 +299,6 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
     s16 v;
     u8 pad[0x60];
 
-    __asm__("");
     list = (CornerList_d294 *)arg1;
     list->hdr.x = list->hdr.x + arg2->x;
     list->hdr.y = list->hdr.y + arg2->y;
@@ -408,9 +408,9 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
     }
     return mm.hi.x >= track.f0;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__CheckBoundsOverlap);
+#endif
 
 /* STALL -- see docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md. Round 46 (echo):
  * FIRST-EVER build/score for this function -- inherited round 45's

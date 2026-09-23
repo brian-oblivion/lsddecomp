@@ -706,3 +706,5 @@ measured tail comparison; the real identity of the second box (what
 offsets, per this report's own "What it does" section. Purely local to
 this unit + its header for the FUNCTION rename; the vtable FIELD name
 (`slotA8`) is proposed, not renamed.
+
+NON_MATCHING body promoted, round 69
