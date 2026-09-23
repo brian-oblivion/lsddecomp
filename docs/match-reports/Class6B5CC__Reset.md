@@ -15,7 +15,7 @@ Psy-Q library helper `func_80012838` (`the 0x2258..0x8220 Psy-Q block (now linke
 out of game-code scope), then calls its own two newly-discovered slots
 `+0x044`/`+0x048` (`Class6B5CC__UpdateRotation`/`Class6B5CC__UpdateScale`, both still queued)
 with a literal flag `1` and one of two rodata tables
-(`D_8006B684`/`D_8006B690`), and finally sets `self->unk14->unk0 = 1`.
+(`ROTATION_ZERO`/`D_8006B690`), and finally sets `self->unk14->unk0 = 1`.
 
 ## The C
 
@@ -24,7 +24,7 @@ void Class6B5CC__Reset(Class6B5CCObj *self) {
     self->unk24 = 0;
     self->unk10 = 0;
     func_80012838(0, self->unk14);
-    self->methods->slot44(self, 1, D_8006B684);
+    self->methods->slot44(self, 1, ROTATION_ZERO);
     self->methods->slot48(self, 1, D_8006B690);
     self->unk14->unk0 = 1;
 }
@@ -35,6 +35,6 @@ void Class6B5CC__Reset(Class6B5CCObj *self) {
 round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build.
 Established `Class6B5CCMethods::slot44`/`slot48` (`(self, s32, void*)`,
 still-queued occupants `Class6B5CC__UpdateRotation`/`Class6B5CC__UpdateScale`) and the
-`D_8006B684`/`D_8006B690` rodata tables (0xC bytes each, shape confirmed
+`ROTATION_ZERO`/`D_8006B690` rodata tables (0xC bytes each, shape confirmed
 independently by `Class6B5CC__UpdateScale`'s own disassembly reading three
 `{s16,s16}` pairs out of its 3rd argument via `RatioToFixed12`).
