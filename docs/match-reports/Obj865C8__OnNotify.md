@@ -86,9 +86,9 @@ void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
   (*noop80)(void)` / opaque `void *slot84` to `void (*)(Obj865C8 *self,
   EventArg *arg1, s32 arg2)`. This is the significant correction: `slot80`
   was typed as a no-arg no-op purely because its one known occupant,
-  `func_80049EAC` (`void func_80049EAC(void) {}`, already matched), ignores
+  `Obj865C8__Noop80` (`void Obj865C8__Noop80(void) {}`, already matched), ignores
   everything. This function proves the SLOT itself takes 3 arguments —
-  `func_80049EAC` just happens to not read them, and an empty body compiles
+  `Obj865C8__Noop80` just happens to not read them, and an empty body compiles
   identically (`jr $ra; nop`) whether its C prototype declares 0 or 3
   parameters, so the previous typing was invisible until a second caller
   that DOES pass real arguments showed up. `slot84`'s occupant
@@ -112,7 +112,7 @@ specific lever this round.
 recording as its own entry:** a no-op-bodied occupant is not evidence a
 vtable SLOT takes no arguments, only that THAT occupant ignores whatever
 it's given. `Class865C8Methods::slot80` was typed `void (*)(void)` from
-`func_80049EAC`'s empty body alone; this function's own disassembly loads
+`Obj865C8__Noop80`'s empty body alone; this function's own disassembly loads
 real `a1`/`a2` before the `jalr`, proving the slot's true signature carries
 2 more parameters that this particular occupant simply discards. Same shape
 as CLAUDE.md's existing "a discarded return is never evidence of void" rule,

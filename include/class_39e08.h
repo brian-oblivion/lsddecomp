@@ -81,11 +81,11 @@ typedef struct Class865C8Methods {
     void (*noop7C)(Obj865C8 *self);                /* +0x07C Obj865C8__Noop7C (no-op, matched) */
     /* Retyped from `void (*noop80)(void)`: Obj865C8__OnNotify dispatches this
      * slot as `self->methods->slot80(self, arg1, arg2)` with real
-     * arguments loaded into $a1/$a2 -- func_80049EAC (D_800865C8's own
-     * occupant, still matched, `void func_80049EAC(void) {}`) simply
+     * arguments loaded into $a1/$a2 -- Obj865C8__Noop80 (D_800865C8's own
+     * occupant, still matched, `void Obj865C8__Noop80(void) {}`) simply
      * ignores them. A no-op BODY is not evidence the SLOT's signature takes
      * no arguments; only THIS slot's other occupants would be. */
-    void (*slot80)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x080 func_80049EAC (no-op body, matched) */
+    void (*slot80)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x080 Obj865C8__Noop80 (no-op body, matched) */
     /* Same signature as slot80 by the same call site (Obj865C8__OnNotify's other
      * branch); occupant func_80049EB4 is still addiu_at-blocked. */
     void (*slot84)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x084 func_80049EB4, addiu_at-blocked */

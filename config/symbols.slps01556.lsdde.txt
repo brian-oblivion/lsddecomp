@@ -1754,3 +1754,4 @@ Obj865C8__RunSubUpdates = 0x80049C50; // type:func
 Obj865C8__AdvanceState = 0x80049CA8; // type:func
 Obj865C8__EnterState2 = 0x80049E20; // type:func
 Obj865C8__Noop7C = 0x80049EA4; // type:func
+Obj865C8__Noop80 = 0x80049EAC; // type:func

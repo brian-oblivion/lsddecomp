@@ -160,7 +160,7 @@ void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1) {
 void Obj865C8__Noop7C(void) {
 }
 
-void func_80049EAC(void) {
+void Obj865C8__Noop80(void) {
 }
 
 /* Returned BY VALUE from SubObjDMethods::slot1BC. Kept LOCAL to this unit --
