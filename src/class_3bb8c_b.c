@@ -293,7 +293,9 @@ void func_8004CC74(Obj866E8 *self) {
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 2/27 words, length exact, zero drift. Residue: register
+/* NON_MATCHING: 2/27 words, length exact, zero drift (re-measured round 71;
+ * round 71 traced every diff to one root: retail's block-local temps avoid
+ * $v0; 376k more permuter iterations, no zero). Residue: register
  * identity (retail copies `bounds` into $a2 with an unconditional `move
  * a2,a0` before the null check, dedicates $v0 to the constant 1 for the
  * whole body, and re-extracts point[0] from the saved-but-unshifted $a3 in
