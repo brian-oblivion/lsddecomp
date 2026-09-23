@@ -133,6 +133,8 @@ void func_80036528(s16 a0, s16 a1)
     entry = &D_800902E8[a0][a1];
     arr = &D_800902E8[a0];
     entry->unk98 = entry->unk98 - 1;
+    /* unk42 read directly at each use, no local copy: that is what gives
+     * retail's `lh a2` + `move v1,a2` (permuter-found, round 70, verified in-tree). */
     if (entry->unk42 > 0) {
         if ((u32)entry->unk98 % (u32)entry->unk42 != 0) {
             goto end;
