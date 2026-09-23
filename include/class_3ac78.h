@@ -69,7 +69,7 @@ struct UnkSlotEntry_3ac78 {
  * Class866E8__DispatchToRectCells). 0xC bytes, densely packed -- REVISED this round
  * (Class866E8__DispatchToRectCells) from an earlier 0x10-byte/3-element guess. Two
  * independent pieces of evidence now agree:
- *  - Class866E8__SetFootprintRect (STALLED) writes `self->rects.e[0].elemIdx = self->methods->
+ *  - Class866E8__SetFootprintRect (matched round 71) writes `self->rects.e[0].elemIdx = self->methods->
  *    slot124(...)` into element [0]'s first field; `slot124`'s real
  *    occupant (func_8004C5D0) was independently retyped, round 8, to
  *    return an s32 LOOP INDEX, never a pointer (see Class866E8Methods::
@@ -221,9 +221,9 @@ struct Class866E8Methods {
                   * `s32 func_8004C5D0(Obj866E8 *self, s32 key)`: it returns a loop INDEX
                   * (`move v0,a2`) or -1, never a pointer, and `key` is compared against a
                   * s16 field so it is a scalar. Safe to change because slot124 has no C call
-                  * site yet -- its only caller, Class866E8__SetFootprintRect, is still INCLUDE_ASM -- and the
-                  * whole-image SHA1 was re-verified after the change. Whoever matches
-                  * Class866E8__SetFootprintRect should treat THIS as the signature to write against. */
+                  * site yet, and the whole-image SHA1 was re-verified after the change.
+                  * Confirmed round 71: Class866E8__SetFootprintRect matched byte-exact calling it
+                  * with this signature. */
     /* +0x128 */ u8 pad128[0x12C - 0x128];
     /* +0x12C */ void (*applyToSenderFootprint)(Class866E8 *self, void *sender, s32 command);       /* Class866E8__ApplyToSenderFootprint; called by Class866E8__ForwardAcceptedCommand */
     /* +0x130 */ u8 pad130[0x13C - 0x130];
@@ -252,8 +252,8 @@ struct Class866E8 {
     /* +0x07E */ s16 footprintRow;                  /* Class866E8__SetFootprintFromCell: (s8)arg1->unk3 - 1 */
     /* +0x080 */ s32 footprintW;                  /* Class866E8__SetFootprintFromCell's `span`, stored raw */
     /* +0x084 */ s32 footprintH;                  /* Class866E8__SetFootprintFromCell's `span`, stored raw (same value as footprintW) */
-    /* +0x088 */ s32 rectCount;                  /* Class866E8__SetFootprintRect (STALLED): always set to 1; Class866E8__ApplyToSenderFootprint saves/restores it around a pair of calls */
-    /* +0x08C */ GridRectList_3ac78 rects;   /* Class866E8__ApplyToSenderFootprint: saved/restored via whole-struct assignment; Class866E8__SetFootprintRect (STALLED) writes element [0]'s fields directly -- see GridRect_3ac78 */
+    /* +0x088 */ s32 rectCount;                  /* Class866E8__SetFootprintRect (matched round 71): always set to 1; Class866E8__ApplyToSenderFootprint saves/restores it around a pair of calls */
+    /* +0x08C */ GridRectList_3ac78 rects;   /* Class866E8__ApplyToSenderFootprint: saved/restored via whole-struct assignment; Class866E8__SetFootprintRect (matched round 71) writes element [0]'s fields directly -- see GridRect_3ac78 */
     /* +0x0BC */ u16 cellTag;                  /* Class866E8__DispatchToRectCells: copied verbatim into curCellTag on every grid cell visited (a "current pass" tag, plausibly) */
     /* +0x0BE */ u8 pad0BE_tail[0x0E8 - 0x0BE];
     /* +0x0E8 */ s32 acceptedTags;                  /* Class866E8__SetAcceptedTags arg1; Class866E8__ForwardAcceptedCommand reads it back as a NUL-terminated s32 tag array -- true element type still s32, only usage differs per call site */
@@ -306,7 +306,7 @@ extern Class86668Methods gClass86668Methods;
 /*
  * Opaque descriptor buffer passed as Class866E8__SetFootprintFromCell's arg1, Class866E8__ApplyToSenderFootprint's
  * stack-local `buf` (passed on to slot110/Class866E8__SetFootprintFromCell/Class866E8__SetFootprintRect),
- * and Class866E8__SetFootprintRect's arg1 (STALLED). Populated by a call through
+ * and Class866E8__SetFootprintRect's desc. Populated by a call through
  * Class866E8Methods slot +0x110 (func_8004C1C0, not decompiled anywhere
  * yet), so only the bytes those functions actually read are typed. Named
  * after the convention in code_171e0.h (`Unk*Obj_<unit>`).
@@ -316,7 +316,7 @@ struct UnkArgObj_3ac78 {
     s8 unk2;
     s8 unk3;
     u8 pad4[0x28 - 0x4];
-    s32 unk28;     /* Class866E8__SetFootprintRect (STALLED): reread and forwarded to self->methods->slot124
+    s32 unk28;     /* Class866E8__SetFootprintRect (matched round 71): reread and forwarded to self->methods->slot124
                     * as its `key` argument -- scalar, not a pointer; see slot124 above. */
 };
 
