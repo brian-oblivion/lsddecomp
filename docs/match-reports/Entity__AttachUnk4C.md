@@ -79,6 +79,6 @@ answer too" instruction.
 mechanic is a leaf-simple field set (`this->unk4C = arg3`) past a gate, so
 the name says exactly that -- "Attach" for the store, "Unk4C" because the
 field's own real-world purpose is still open (its only other known reader,
-`func_8005EA94`, dereferences it as a vtable-holding object but that alone
+`Entity__MoodCue12`, dereferences it as a vtable-holding object but that alone
 doesn't say what it IS). Pairs with `Entity__DetachUnk4C` below under the
 same `this->unk0C` gate.

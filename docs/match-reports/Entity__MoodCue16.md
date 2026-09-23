@@ -1,4 +1,6 @@
-# func_8005ED30
+# Entity__MoodCue16
+
+> Renamed from `func_8005ED30` on 2026-09-23 (tools/rename.py). Address 0x8005ed30.
 
 **Unit:** Entity_b · **Size:** 124 words · **Status:** MATCHED (124/124
 words, whole-image build verified byte-exact)
@@ -6,10 +8,10 @@ words, whole-image build verified byte-exact)
 ## What it does
 
 `(Entity *this) -> void`. Another `this->unk44` state-machine step (see
-`func_8005EBB4.md`/`func_8005EA94.md` for siblings):
+`Entity__MoodCue13.md`/`Entity__MoodCue12.md` for siblings):
 
 1. If `this->unkFC == 0` and `(rand() & 1) != 0` (odd — NOTE the opposite
-   polarity from `func_8005EA94`'s `== 0`/even check; do not assume symmetry
+   polarity from `Entity__MoodCue12`'s `== 0`/even check; do not assume symmetry
    between sibling coin-flip gates), sets `this->unk44 = 0xB`.
 2. If `this->unk44 == 0`, three-way dispatch on `this->unkFC`:
    - `< 0x40` (64): `this->methods->slotC4(this, -0x5A, 0);`
@@ -28,7 +30,7 @@ words, whole-image build verified byte-exact)
 `void (*)(Entity *self, s32 arg1, s32 arg2)`, called as `slotD0(this,
 -0x176, rand() % 2)`. New slot; the offset's numeric proximity to
 `Unk100Methods::slotD0` (a completely different struct/table) is coincidence
-— see `func_8005E3C4.md` for why shared offsets across different tables
+— see `Entity__MoodCue01.md` for why shared offsets across different tables
 don't imply a shared occupant.
 
 `EntityMethods::slot60` (already declared, 2-arg) is reused here as-is —
@@ -41,7 +43,7 @@ Three more `D_8008xxxx` opaque data rows declared at the top of this file:
 ## Final C
 
 ```c
-void func_8005ED30(Entity *this) {
+void Entity__MoodCue16(Entity *this) {
     u8 *arg2;
     s32 roll;
 
@@ -83,7 +85,7 @@ in the RTL, forcing `arg2`'s live range across the call and promoting it
 into a callee-saved register (`$s1`) — 2 extra words (a spurious
 `sw`/`lw $s1` prologue/epilogue pair) that shifted every later function's
 address (funcdiff read `2/124` with a 6-figure "outside range" count; `nm`
-on the built ELF confirmed `func_8005EF20` landed 8 bytes past retail).
+on the built ELF confirmed `Entity__MoodCue17` landed 8 bytes past retail).
 Retail computes the default assignment AFTER `rand()` returns, keeping
 `arg2` entirely in caller-saved `$a2` with no register pressure across the
 call. Hoisting the `rand()` call into its own statement BEFORE the default

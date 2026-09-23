@@ -12,9 +12,9 @@ this->methods->slotCC(this, -0x5A, 0);`.
 
 Same "one-line wrapper" situation as `func_8005FA64`/`slotC4`
 (`func_8005FA64.md`, same round) — `slotCC`'s only other known caller
-(`func_8005E7F8`, matched the previous round) discards the result, and this
+(`Entity__MoodCue11`, matched the previous round) discards the result, and this
 tail call is the first positive evidence either way. UNLIKE `slotC4`,
-retyping `slotCC` to `s32` was verified NOT to perturb `func_8005E7F8`'s own
+retyping `slotCC` to `s32` was verified NOT to perturb `Entity__MoodCue11`'s own
 compiled output (isolated `cpp | cc1` recompile of `Entity_b.c`, diffed
 line-for-line against the unmodified baseline — zero differences). With no
 conflicting evidence, `slotCC` follows the ordinary "one-line wrapper" rule
@@ -68,7 +68,7 @@ are in `docs/match-reports/func_80061778.md`.
 
 **The gap in this report's original verification is the transferable part.**
 The retype was checked against "every OTHER known caller's compiled output" —
-but that check recompiled `Entity_b.c` only, because `func_8005E7F8` was the
+but that check recompiled `Entity_b.c` only, because `Entity__MoodCue11` was the
 only *known* caller at the time. `func_80061778` was still `INCLUDE_ASM`, so
 it was not a known caller and could not be checked, and an `INCLUDE_ASM`
 function contributes retail's own bytes and therefore cannot register the

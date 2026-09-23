@@ -6,7 +6,7 @@ whole-image build verified byte-exact)
 ## What it does
 
 `(Entity *this, EntityMoodHandlerArg *out) -> void`. Another mood-dispatch
-handler, same family as `Entity_b`'s `func_8005EC98`/`func_8005E6F0`/etc,
+handler, same family as `Entity_b`'s `Entity__MoodCue14`/`Entity__MoodCue09`/etc,
 but with the `slot148` opener made CONDITIONAL rather than unconditional:
 
 ```c
@@ -21,8 +21,8 @@ void func_8005FEF8(Entity *this, EntityMoodHandlerArg *out) {
 The magic-multiply constant `0x88888889` at shift 6, reconstructed by
 retail's own multiply-back (`*16` via `sll 4` minus itself = `*15`, then
 `*8` via `sll 3` = `*120`), is division by 120 -- `out->unk4 % 120`
-reproduces it directly, same idiom as `Entity_b`'s `func_8005E4D0` (divisor
-90) and `func_8005E160`/`func_8005EBB4` (divisor 10/3).
+reproduces it directly, same idiom as `Entity_b`'s `Entity__MoodCue07` (divisor
+90) and `Entity__MoodCue00`/`Entity__MoodCue13` (divisor 10/3).
 
 ## Attempt log
 

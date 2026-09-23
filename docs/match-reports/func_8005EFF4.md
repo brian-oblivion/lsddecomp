@@ -21,7 +21,7 @@ void func_8005EFF4(Entity *this, EntityMoodHandlerArg *out) {
 
 - The first gate is `rand() % 7 == 0`, guarded by `this->unkFC == 0` -- the
   usual "one-shot random effect on entry" shape already seen in
-  `func_8005ED30`/`func_8005EA94` in `src/Entity_b.c`.
+  `Entity__MoodCue16`/`Entity__MoodCue12` in `src/Entity_b.c`.
 - **`out->unk4 & 3`, not `% 4`.** Retail emits a bare `andi $v0,$v0,0x3` with
   no sign-correction shift, unlike every modulus-by-non-power-of-2 gate in
   this unit (which all carry the mult/mfhi/sra/subu chain). Writing `% 4`

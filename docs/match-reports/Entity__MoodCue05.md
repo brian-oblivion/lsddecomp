@@ -1,4 +1,6 @@
-# func_8005E480
+# Entity__MoodCue05
+
+> Renamed from `func_8005E480` on 2026-09-23 (tools/rename.py). Address 0x8005e480.
 
 **Unit:** Entity_b · **Size:** 20 words · **Status:** MATCHED (20/20 words,
 whole-image build verified byte-exact)
@@ -20,7 +22,7 @@ site's own register usage (a1/a2 not used, `$v0` consumed as a stored value).
 ## Final C
 
 ```c
-void func_8005E480(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue05(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 == 0) {
         out->unk1C = 0x17;
@@ -43,9 +45,9 @@ directly onto the call expression closed it on the second attempt.
 
 **`EntityMoodHandlerArg`** (see `include/Entity.h`) is the second argument to
 every entry of the `gEntityMoodHandlerTable` table (confirmed so far by
-`func_8005E480`/`func_8005E7A8`/`func_8005ED10`) — an opaque state/result
+`Entity__MoodCue05`/`Entity__MoodCue10`/`Entity__MoodCue15`) — an opaque state/result
 buffer, not an `Entity`. Whoever carves the remaining table entries
-(`func_8005E4D0`, `func_8005E6F0`, `func_8005E7F8`, `func_8005EA94`,
-`func_8005EBB4`, `func_8005EC98`, `func_8005ED30` — all still `INCLUDE_ASM` in
+(`Entity__MoodCue07`, `Entity__MoodCue09`, `Entity__MoodCue11`, `Entity__MoodCue12`,
+`Entity__MoodCue13`, `Entity__MoodCue14`, `Entity__MoodCue16` — all still `INCLUDE_ASM` in
 this unit) should check whether they share this same second-parameter type
 before inventing a new one.

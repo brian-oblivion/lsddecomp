@@ -1,13 +1,15 @@
-# func_8005EF20
+# Entity__MoodCue17
+
+> Renamed from `func_8005EF20` on 2026-09-23 (tools/rename.py). Address 0x8005ef20.
 
 **Unit:** Entity_b · **Size:** 13 words · **Status:** MATCHED (13/13 words,
 whole-image build verified byte-exact)
 
 ## What it does
 
-Another `gEntityMoodHandlerTable` mood-dispatch table entry (see `func_8005E480`'s
+Another `gEntityMoodHandlerTable` mood-dispatch table entry (see `Entity__MoodCue05`'s
 report), but a one-line tail-call wrapper: `return this->methods->slot48(this,
-1, D_80089DD8);`. `slot48` is shared with `func_8005E694` (same offset, same
+1, D_80089DD8);`. `slot48` is shared with `Entity__MoodCue08` (same offset, same
 literal `1` first argument), which discards the result — but per CLAUDE.md's
 "one-line wrapper" rule, a discarded return at ONE call site is never evidence
 the callee is `void`, and this call site's own bytes (the vtable call is the
@@ -18,7 +20,7 @@ afterward) are consistent with the return value flowing straight through.
 ## Final C
 
 ```c
-s32 func_8005EF20(Entity *this) {
+s32 Entity__MoodCue17(Entity *this) {
     return this->methods->slot48(this, 1, D_80089DD8);
 }
 ```

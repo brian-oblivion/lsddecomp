@@ -1,4 +1,6 @@
-# func_8005E160
+# Entity__MoodCue00
+
+> Renamed from `func_8005E160` on 2026-09-23 (tools/rename.py). Address 0x8005e160.
 
 **Unit:** Entity_b · **Size:** 153 words · **Status:** MATCHED (153/153
 words, whole-image build verified byte-exact)
@@ -44,7 +46,7 @@ needed since the literal transcription matched immediately.
 ## New symbols
 
 - `Unk94Methods::slot200`, `s32 (*)(Unk94Obj *self)` — a new, far-out slot in
-  the same `Unk94Obj` vtable `func_8005E3C4.md`/`Entity__IsTargetInRange.md`
+  the same `Unk94Obj` vtable `Entity__MoodCue01.md`/`Entity__IsTargetInRange.md`
   established; padded out to `+0x200` with no other slots resolved in
   between (nothing else in this unit reaches that far into the table yet).
 - Three more `D_8008xxxx` opaque data-row externs: `D_80089DA8`,
@@ -53,7 +55,7 @@ needed since the literal transcription matched immediately.
 ## Final C
 
 ```c
-void func_8005E160(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue00(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 == 0) {
         if (this->unk94->methods->slot200(this->unk94) == 5) {
             this->unk44 = 0x64;

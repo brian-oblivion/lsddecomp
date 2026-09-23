@@ -50,7 +50,7 @@ different unit).
 
 `gEntityMoodHandlerTable` is the mood-index-selected event-dispatch table (16-byte rows:
 handler fn ptr + 3 data words) already referenced by name in several match
-reports for `Entity_b`'s handler functions (e.g. `func_8005E480`), but this
+reports for `Entity_b`'s handler functions (e.g. `Entity__MoodCue05`), but this
 is the first place any unit indexes the RAW TABLE itself in C rather than
 just being one of its handler bodies. Declared a minimal
 `EntityMoodHandlerRow` (only the first word named) directly in `Entity.c`,

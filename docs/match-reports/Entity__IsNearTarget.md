@@ -15,7 +15,7 @@ abs(arg3)` depending on sign), and tail-calls `this->unk94`'s vtable slot
 `+0x120` with the scaled vector, `arg2 << 11`, and that distance. This
 function was already extensively cross-validated by header comments and
 five other units' match reports (`Entity__UpdateTargetProximity`, `Entity__UpdateSoundCueStart`,
-`Entity__UpdateActivationState`, `func_80061198`, `Entity__UpdateSoundCueStop`, `func_8005E4D0`, plus
+`Entity__UpdateActivationState`, `func_80061198`, `Entity__UpdateSoundCueStop`, `Entity__MoodCue07`, plus
 `Entity_b`/`Entity_d`) that all already call it with `s32`-not-`s8`
 parameters and treat its return as a real value compared against 0 -- this
 round only had to supply the BODY, the signature was already settled.

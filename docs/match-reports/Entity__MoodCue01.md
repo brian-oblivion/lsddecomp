@@ -1,4 +1,6 @@
-# func_8005E3C4
+# Entity__MoodCue01
+
+> Renamed from `func_8005E3C4` on 2026-09-23 (tools/rename.py). Address 0x8005e3c4.
 
 **Unit:** Entity_b · **Size:** 47 words · **Status:** MATCHED (47/47 words,
 whole-image build verified byte-exact)
@@ -6,7 +8,7 @@ whole-image build verified byte-exact)
 ## What it does
 
 One of this unit's `gEntityMoodHandlerTable` mood-dispatch handlers (same family as
-`func_8005E480`/`func_8005E7A8`/`func_8005ED10`), taking `(Entity *this,
+`Entity__MoodCue05`/`Entity__MoodCue10`/`Entity__MoodCue15`), taking `(Entity *this,
 EntityMoodHandlerArg *out)`. Unconditionally zeroes `out->unk10`, then — only
 when `out->unk4 == 0` — sets three `out` fields to `0x14` and fires a call
 through a SECOND, DIFFERENT object's vtable: `this->unk94->methods->slot130`,
@@ -47,7 +49,7 @@ the SAME convention `Entity::unk14` uses. Modeled as its own minimal type:
 ```c
 struct Unk94Methods {
     u8 pad000[0x130];
-    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by func_8005E3C4 */
+    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by Entity__MoodCue01 */
 };
 
 struct Unk94Obj {
@@ -62,7 +64,7 @@ struct Unk94Obj {
 ## Final C
 
 ```c
-void func_8005E3C4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue01(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (out->unk4 == 0) {
         out->unk1C = 0x14;

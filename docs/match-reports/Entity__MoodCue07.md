@@ -1,4 +1,6 @@
-# func_8005E4D0
+# Entity__MoodCue07
+
+> Renamed from `func_8005E4D0` on 2026-09-23 (tools/rename.py). Address 0x8005e4d0.
 
 **Unit:** Entity_b · **Size:** 113 words · **Status:** MATCHED (113/113
 words, whole-image build verified byte-exact)
@@ -42,7 +44,7 @@ exactly with no manual constant derivation needed.
 ## Final C
 
 ```c
-void func_8005E4D0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (this->unk84 == this->unk80 / 2) {
         out->unk1C = 0x7;
@@ -83,13 +85,13 @@ order, `<0x79` case first) — 59/113, diverging right at that branch. Reading
 the raw disassembly showed retail places the `>= 0x79` body as the
 PHYSICAL FALL-THROUGH (no jump) and reaches the `< 0x79` body via an
 explicit forward branch — the same "GCC lays the WRITTEN condition's true
-branch as fall-through" shape from `func_8005EBB4.md` in this same round.
+branch as fall-through" shape from `Entity__MoodCue13.md` in this same round.
 Swapping to test `>= 0x79` FIRST (as the primary `if`, with the `< 0x79`
 logic as the `else`) matched immediately, with every inner branch unchanged.
 
 ## Proposed learning
 
-A second confirming instance of `func_8005EBB4.md`'s finding, now definitely
+A second confirming instance of `Entity__MoodCue13.md`'s finding, now definitely
 a pattern rather than a one-off: **when a residue is "right content, wrong
 physical position, otherwise byte-identical," try testing the OPPOSITE
 condition as the primary `if`** — GCC 2.6.3 consistently lays the written

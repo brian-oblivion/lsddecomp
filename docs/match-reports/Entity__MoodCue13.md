@@ -1,4 +1,6 @@
-# func_8005EBB4
+# Entity__MoodCue13
+
+> Renamed from `func_8005EBB4` on 2026-09-23 (tools/rename.py). Address 0x8005ebb4.
 
 **Unit:** Entity_b · **Size:** 57 words · **Status:** MATCHED (57/57 words,
 whole-image build verified byte-exact)
@@ -15,7 +17,7 @@ rolls `rand() % 3 == 0` and calls `this->methods->slot30(this, 0xB)` on a hit.
 ## Final C
 
 ```c
-void func_8005EBB4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue13(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 == 0) {
         out->unk1C = 0xC;
@@ -32,7 +34,7 @@ void func_8005EBB4(Entity *this, EntityMoodHandlerArg *out) {
 ```
 
 `this->unk80` reuses the field established the same round in
-`func_8005E6F0.md`. `rand() % 3` reproduces retail's magic-multiply
+`Entity__MoodCue09.md`. `rand() % 3` reproduces retail's magic-multiply
 sign-corrected remainder exactly, per the `x % N` idiom already confirmed in
 `docs/DECOMPILATION_LEARNINGS.md`.
 

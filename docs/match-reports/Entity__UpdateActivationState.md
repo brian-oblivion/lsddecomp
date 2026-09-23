@@ -283,7 +283,7 @@ identical blocks regardless of how they are spelled.
 
 There IS one known precedent for suppressing this on this project, and it is
 not a shape change: round 7 found that `EntityMethods::slotC4` typed `void`
-made GCC tail-merge two identical discarded calls in `func_8005E160`, and
+made GCC tail-merge two identical discarded calls in `Entity__MoodCue00`, and
 retyping the slot to `s32` stopped the merge. **So the lever for tail-merge
 suppression here, if one exists, is more likely to be a TYPE change than a
 control-flow change** — something that makes the two blocks non-identical at
@@ -298,7 +298,7 @@ other caller and the whole-image SHA1 before believing it.
 ## ROUND 20 (runner echo): tested the type-retype lever flagged above -- negative
 
 Tested the specific untried lever this report's round-8 section flagged
-(the `func_8005E160`/`EntityMethods::slotC4` precedent: retyping a slot's
+(the `Entity__MoodCue00`/`EntityMethods::slotC4` precedent: retyping a slot's
 return type suppressed an unwanted tail-merge of two identical discarded
 calls). The only retypeable value in THIS function's residue is
 `doDetach` itself (there is no discarded call return in play here, unlike

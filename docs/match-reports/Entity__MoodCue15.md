@@ -1,18 +1,20 @@
-# func_8005ED10
+# Entity__MoodCue15
+
+> Renamed from `func_8005ED10` on 2026-09-23 (tools/rename.py). Address 0x8005ed10.
 
 **Unit:** Entity_b · **Size:** 8 words · **Status:** MATCHED (8/8 words,
 whole-image build verified byte-exact)
 
 ## What it does
 
-Smallest `gEntityMoodHandlerTable` mood-dispatch table entry (see `func_8005E480`'s
+Smallest `gEntityMoodHandlerTable` mood-dispatch table entry (see `Entity__MoodCue05`'s
 report). No vtable call at all: if `this->unkFC == 0`, sets `out->unk10 = 0`
 and `out->unk1C = 0xF`.
 
 ## Final C
 
 ```c
-void func_8005ED10(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue15(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         out->unk10 = 0;
         out->unk1C = 0xF;

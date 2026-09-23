@@ -17,7 +17,7 @@ this->unk94)` and returns `1` if the result is `< arg1`, else `0`.
 
 This function is the primary evidence that `Entity::unk94` is a POINTER TYPE
 with its own `+0x14` field readable as `EntityPos *` (same convention as
-`Entity::unk14` itself) — see `func_8005E3C4.md` (matched the round before
+`Entity::unk14` itself) — see `Entity__MoodCue01.md` (matched the round before
 this one) for why it is nonetheless NOT another `Entity`, and for the
 `Unk94Obj`/`Unk94Methods` struct this function's own evidence fed into.
 
@@ -78,7 +78,7 @@ value) as `slot144`'s second argument reproduces this immediately: with the
 function unprompted — no barrier, no reshape, first try once the signature
 was right.
 
-**How the missing argument was found.** While working `func_8005EA94` (a
+**How the missing argument was found.** While working `Entity__MoodCue12` (a
 DIFFERENT, LARGER function in this unit, same round) its own call to the
 SAME vtable offset —
 
@@ -95,7 +95,7 @@ in between (the very next instruction that touches `$a1` is in the delay
 slot of a LATER, unrelated branch, i.e. after the call already returned).
 Per this unit's own `docs/DECOMPILATION_LEARNINGS.md` rule ("a value in an
 argument register live at the next call IS an argument"), that is direct
-proof `slot144` takes a second argument at `func_8005EA94`'s call site.
+proof `slot144` takes a second argument at `Entity__MoodCue12`'s call site.
 `Entity__IsTargetInRange`'s OWN call site (same slot, same table) shows a plain `nop`
 in the delay slot with no fresh `$a1` load — which looked like a
 CONTRADICTION (the same function pointer can't have two arities) until

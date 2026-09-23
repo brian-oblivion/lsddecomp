@@ -1,4 +1,6 @@
-# func_8005E7F8
+# Entity__MoodCue11
+
+> Renamed from `func_8005E7F8` on 2026-09-23 (tools/rename.py). Address 0x8005e7f8.
 
 **Unit:** Entity_b · **Size:** 167 words · **Status:** MATCHED (167/167
 words, whole-image build verified byte-exact) — the unit's largest function
@@ -16,7 +18,7 @@ smaller handlers established individually:
    `lw` every other Entity field here uses).
 2. `row = NULL;` then `if (out->unk4 % (this->unk80 / 2) == 0) { out->unk1C
    = 0xA; out->unk20 = 1; }` (same div-by-`unk80/2` idiom as
-   `func_8005E6F0`).
+   `Entity__MoodCue09`).
 3. Three-way dispatch on `this->unk44`:
    - `== 0xB`: THREE INDEPENDENT (not `else if`-chained) `unkFC` literal
      checks that each unconditionally overwrite `row` when matched (see
@@ -26,7 +28,7 @@ smaller handlers established individually:
    - `== 0xD`: `this->unk48 = -0x78;` + `Class6B5CC__FaceTarget(...)` +
      `slot48(this, 1, D_80089DD8)` (return discarded) + a `slot144`
      threshold check (the SAME 2-argument `slot144` established in
-     `Entity__IsTargetInRange`/`func_8005EA94`) gating a `slot30(this, 0xB)` call.
+     `Entity__IsTargetInRange`/`Entity__MoodCue12`) gating a `slot30(this, 0xB)` call.
 4. `if (this->unkFC == 0x618) { ... coin flip sets unk44/row ... }`
    (unconditional, independent of step 3's outcome).
 5. `if (row != NULL) { slot44(this, 0, row); }`, then unconditionally
@@ -60,7 +62,7 @@ the actual byte order at that specific address run settled it.) The
 generalizable point: this compiler does not reorder two independent,
 side-effect-only assignments within a basic block — whichever order they
 are WRITTEN in a source statement sequence is the order they compile in,
-same finding as `func_8005ED30.md`'s "textual order controls register
+same finding as `Entity__MoodCue16.md`'s "textual order controls register
 pressure," now confirmed for plain store ordering with no register
 pressure question at all.
 
@@ -75,7 +77,7 @@ pressure question at all.
 ## Final C
 
 ```c
-void func_8005E7F8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
     u8 *row;
 
     this->unk48 = -0x14;
@@ -135,7 +137,7 @@ void func_8005E7F8(Entity *this, EntityMoodHandlerArg *out) {
 ```
 
 The `(u32)(this->unkFC - 0xD5D) < 0x78` range check compiles directly to
-retail's unsigned-subtraction idiom, same as `func_8005E160`'s `>= 0x105 &&
+retail's unsigned-subtraction idiom, same as `Entity__MoodCue00`'s `>= 0x105 &&
 < 0x238`, but written as an explicit cast this time since it's a single
 range test rather than a two-constant `&&`.
 
@@ -162,12 +164,12 @@ Two, both stated above as the generalizable versions:
   independently tested) means separate `if`s; `beq`-jumps-past-the-rest
   after the first match means `else if`. This project's units have used
   redundant/independent tests like this at least twice now (also
-  `func_8005E160.md`'s literal re-test); the safe default when several
+  `Entity__MoodCue00.md`'s literal re-test); the safe default when several
   checks target the same field with mutually-exclusive constants is to
   look at the bytes before assuming `else if`.
 - **This compiler does not reorder two independent single-assignment
   statements within a basic block on its own** — confirms and generalizes
-  `func_8005ED30.md`'s finding beyond the "value needs a callee-saved
+  `Entity__MoodCue16.md`'s finding beyond the "value needs a callee-saved
   register" case to plain store ordering with no register-pressure
   consequence at all. When two writes to different fields/locals show up
   swapped in a residue, try swapping their SOURCE statement order before

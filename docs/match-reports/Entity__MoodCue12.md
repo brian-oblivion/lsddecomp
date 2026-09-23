@@ -1,4 +1,6 @@
-# func_8005EA94
+# Entity__MoodCue12
+
+> Renamed from `func_8005EA94` on 2026-09-23 (tools/rename.py). Address 0x8005ea94.
 
 **Unit:** Entity_b · **Size:** 72 words · **Status:** MATCHED (72/72 words,
 whole-image build verified byte-exact)
@@ -7,7 +9,7 @@ whole-image build verified byte-exact)
 
 `(Entity *this) -> void`. A state-machine step for `this->unk44` (the same
 small state code this unit's mood-dispatch handlers write literals into —
-see `func_8005EBB4.md`):
+see `Entity__MoodCue13.md`):
 
 1. If `this->unkFC == 0` and a coin flip (`rand() & 1 == 0`) lands, sets
    `this->unk44 = 0xB`.
@@ -66,7 +68,7 @@ too; see that report for the full account.
 ## Final C
 
 ```c
-void func_8005EA94(Entity *this) {
+void Entity__MoodCue12(Entity *this) {
     s32 y;
     s32 result;
     s32 oldFC;

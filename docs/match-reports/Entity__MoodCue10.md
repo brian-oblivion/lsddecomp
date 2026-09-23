@@ -1,11 +1,13 @@
-# func_8005E7A8
+# Entity__MoodCue10
+
+> Renamed from `func_8005E7A8` on 2026-09-23 (tools/rename.py). Address 0x8005e7a8.
 
 **Unit:** Entity_b · **Size:** 20 words · **Status:** MATCHED (20/20 words,
 whole-image build verified byte-exact)
 
 ## What it does
 
-Another `gEntityMoodHandlerTable` mood-dispatch table entry (see `func_8005E480`'s report
+Another `gEntityMoodHandlerTable` mood-dispatch table entry (see `Entity__MoodCue05`'s report
 for the table). Takes `this` and an `EntityMoodHandlerArg *out`:
 unconditionally clears `out->unk10`, then, only if `out->unk4 == 0`, sets
 `out->unk1C`/`out->unk30`/`out->unk44` all to `0xB`. Finally, unconditionally,
@@ -23,7 +25,7 @@ unrelated classes.
 ## Final C
 
 ```c
-void func_8005E7A8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue10(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (out->unk4 == 0) {
         out->unk1C = 0xB;
@@ -39,7 +41,7 @@ void func_8005E7A8(Entity *this, EntityMoodHandlerArg *out) {
 Matched on the first attempt — the `out->unk10 = 0;` unconditional store
 ahead of the gated block was read directly off the disassembly's delay-slot
 placement (the branch's delay slot performs the store regardless of which way
-the branch goes), so no reshaping was needed here (unlike `func_8005E480`,
+the branch goes), so no reshaping was needed here (unlike `Entity__MoodCue05`,
 which needed a correction for the analogous shape).
 
 ## Proposed learning
