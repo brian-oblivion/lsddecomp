@@ -1,18 +1,21 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * code_179d8_c_b -- the sound-driver "sequencer timer" cluster: a software
+ * playback clock built on the PSX root counters (RCnt) and interrupt
+ * controller (IRQ), used to pace the game's music sequencer independently
+ * of vsync. `SetSeqTimerMode`/`SeqTimerControl` (the latter still a stall)
+ * pick a tick rate and arm a root counter at it; `StartSeqTimer`/
+ * `StopSeqTimer` are its two callers' one-line wrappers; `SeqTimerCallback`/
+ * `SeqTimerDividerCallback` are the two interrupt-time handlers it can
+ * register (one chains a previously-saved handler, the other halves the
+ * firing rate by toggling); `CancelSeqTimer` tears the whole thing down.
+ * `GetRCnt`/`ResetRCnt`/`SetIrqMask`/`ClearIrqMask`/`SetRCnt` are the plain
+ * register-block accessors everything above is built on. `ClearSpuMute` is
+ * unrelated -- a one-line forwarder to an SPU-mute routine in a different,
+ * uncarved segment -- kept here only because it falls in this address range.
  *
- * code_179d8_c_b -- the tail half of the old code_179d8_c slice, split off in
- * round 33 (2026-09-12) when Sony's `libsnd/sstable.o` was linked into the
- * middle of it. File 0x22D88..0x23500, vram 0x80032588..0x80032D00.
+ * the tail half of the old code_179d8_c slice, split off in round 33
+ * (2026-09-12) when Sony's `libsnd/sstable.o` was linked into the middle of
+ * it. File 0x22D88..0x23500, vram 0x80032588..0x80032D00.
  *
  * WHY THE SPLIT EXISTS. `func_800323A8` (120w) sat between func_80032388 and
  * SetSeqTimerMode and is Sony's `SsSetTableSize`; the object covers exactly
@@ -27,10 +30,6 @@
  * `code_179d8_c_b`. Left behind it would have produced
  * `undefined reference to '.L800325xx'` -- the routine carve failure Gate 2
  * in docs/PARALLEL-RUNS.md documents. Leave it alone.
- *
- * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
- * re-implementing the greps and never for `addiu_at` (resolved round 21).
- * The two live blockers are `gp_rel` and `nop_mflo_mfhi`.
  *
  * This slice was cut at ROM-address boundaries, so it has no reason to align
  * with class boundaries -- expect it to span more than one class, and
