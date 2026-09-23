@@ -374,34 +374,11 @@ void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
     }
 }
 
-/* STALL snapshot -- see docs/match-reports/func_8004BE54.md. 142/150 words
- * at CORRECT total length (no address drift), up from 132/150 this round.
- * Preserved here per convention -- not live C.
- *
- * ROUND 40 (bravo): first-ever permuter search on this function (34293
- * iterations, no rc captured -- same "wrapping shell torn down before the
- * trailing echo" trap as func_8004B700 this same round). Best candidate
- * dropped the permuter score 135 -> 65 across four improving steps
- * (135->85->75->70->65) and never reached 0. Two changes, both applied:
- * (1) the `gpu = (*slot)->unk14; gpu->unk0 = 0;` reload replaced with a
- * direct `(*slot)->unk14->unk0 = 0;` (the exact same lever that closed
- * func_8004B700's own residue this round); (2) the `found`-path tail's
- * pointer cast hoisted into a named local (`EntryChildObj **next = ...;
- * (*slot)->unk38 = *next;`) instead of one combined expression. Together
- * these closed 10 of the 18 remaining words. Everything from
- * `0x8004BEE0` through the epilogue now matches retail byte-for-byte
- * (confirmed via asm-differ) -- the entire remaining 8-word residue is
- * the ALREADY-DOCUMENTED `info`/`hdr` register-identity chain at the very
- * top of the function (`0x8004BE84`-`0x8004BEDC`), untouched by this
- * round's fix and unchanged from prior rounds' description.
- *
- * ROUND 32 (bravo2): re-verified, 130/150, no drift, identical residue.
- * ROUND 39 (charlie): 130/150 -> 132/150. Both `(*slot)->unk10 |= flagBit;`
- * sites closed by hoisting the reloaded field into its own named local
- * BEFORE the `|=` (`s32 t = (*slot)->unk10; (*slot)->unk10 = t | flagBit;`)
- * -- operand-order-alone was already confirmed inert (round 32); the hoist
- * is what moves it, same combinatorial shape as func_8004C470's fix. */
-#if 0
+/* MATCH, round 73 (bravo): 150/150. The 142/150 residue carried since
+ * round 40 (`info` in $a1 where retail has $v0) was ONE `info` local
+ * assigned on both sides of the slot4 call. Two locals (`info`, `info2`)
+ * make each block-local, so local-alloc ties each to its addu result.
+ * See docs/match-reports/func_8004BE54.md. */
 /* func_8004BE54 (Obj866E8Methods::slot104) -- own local view of several
  * classes reached only from here. Kept in this .c, not class_3bb8c.h: none
  * of the 11 sibling units sharing that header touch these. */
@@ -488,6 +465,7 @@ extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
 void func_8004BE54(Obj866E8 *self, Elem *entry) {
     ResInfo866E8 *info;
+    ResInfo866E8 *info2;
     ElemTarget *hdr;
     LinkTarget866E8 *target;
     LinkResource *res;
@@ -516,8 +494,8 @@ void func_8004BE54(Obj866E8 *self, Elem *entry) {
     if (res != 0) {
         res->methods->slot4(res);
     }
-    info = hdr->field10;
-    req.field0 = (s32)info + info->unk4 + info->unk8;
+    info2 = hdr->field10;
+    req.field0 = (s32)info2 + info2->unk4 + info2->unk8;
     target->unk2C = func_80043840(&req);
     outBuf.found = 0;
 
@@ -578,9 +556,6 @@ void func_8004BE54(Obj866E8 *self, Elem *entry) {
         i++;
     }
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c", func_8004BE54);
 
 void func_8004C0AC(Obj866E8 *self, Elem *entry) {
     EntryChildObj **p;
