@@ -17,7 +17,7 @@ void *Class876FC__Class876FC(Obj876FC *self, void *arg1, void *arg2, void *arg3,
     if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
         goto fail;
     }
-    self->methods = func_80056F4C();
+    self->methods = GetClass876FCMethods();
     self->unk44 = 0;
     self->unk54 = arg1;
     self->methods->slot40(self, arg2);
@@ -53,7 +53,7 @@ fail:
   by a real word-count mismatch (28/41 with `return Class876FC__InitByKind(...)`,
   worse yet with the wrong exit-value idiom on top) -- the fix was two
   statements, `Class876FC__InitByKind(self, arg3, arg4); return self;`, not one.
-- `func_80056F4C` (installing this class's own vtable) and
+- `GetClass876FCMethods` (installing this class's own vtable) and
   `Class876FC__InitByKind` (this class's own post-init hook, still `INCLUDE_ASM`
   outside this unit's range) are both declared as local externs, per the
   established "calling into a function in another/uncarved unit is fine"

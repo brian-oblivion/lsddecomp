@@ -48,7 +48,7 @@
  *  - Class876FC__Class876FC (ctor) / Class876FC__Finalize (dtor) / Class876FC__SetParams (setParams)
  *    / Class876FC__Update are occupants of `gClass876FCMethods` -- the SAME sibling
  *    table `class_3bb8c_o.c` (round 17, previous pass, already merged)
- *    partly resolved from the OTHER side (its own `func_80056F4C` returns
+ *    partly resolved from the OTHER side (its own `GetClass876FCMethods` returns
  *    `&gClass876FCMethods`, and its shared-base slots +0x010/+0x014/+0x018/+0x088/
  *    etc. are INHERITED, not overridden, by this class). This unit
  *    supplies the class's OWN slots (ctor/dtor/setParams), confirmed by both
@@ -59,7 +59,7 @@
  *    multiple-independent-local-views convention there is no reason a
  *    fresh view here should match its field names field-for-field.
  *  - New_Class876FC is a plain `New_X` allocator (0x98 bytes) for the
- *    `gClass876FCMethods` class, dispatching through `func_80056F4C()->ctor`
+ *    `gClass876FCMethods` class, dispatching through `GetClass876FCMethods()->ctor`
  *    (cross-unit call into the ALREADY-MATCHED `class_3bb8c_o.c` symbol)
  *    rather than calling `Class876FC__Class876FC` by name.
  *  - ComputeStyleCueFalloff is the shared helper every `gStyleCueCallbacks` occupant calls
@@ -407,7 +407,7 @@ extern FixedBaseTableR *DreamSys__GetBaseMethods(void);
 
 extern void *func_80017B34(s32 size);
 extern void *func_80017CFC(void *ptr);
-extern Class876FCMethods *func_80056F4C(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &gClass876FCMethods */
+extern Class876FCMethods *GetClass876FCMethods(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &gClass876FCMethods */
 extern void Class876FC__ReleaseByKind(Class876FC *self);
 extern void *Class876FC__InitByKind(Class876FC *self, void *arg1, void *arg2);
 
@@ -415,7 +415,7 @@ void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
     Class876FC *self = func_80017B34(0x98);
 
     if (self != NULL) {
-        if (func_80056F4C()->ctor(self, arg0, arg1, arg2, arg3) != NULL) {
+        if (GetClass876FCMethods()->ctor(self, arg0, arg1, arg2, arg3) != NULL) {
             return self;
         }
         func_80017CFC(self);
@@ -428,7 +428,7 @@ void *Class876FC__Class876FC(Class876FC *self, void *arg1, void *arg2, void *arg
     if (DreamSys__GetBaseMethods()->ctor(self) == NULL) {
         goto fail;
     }
-    self->methods = func_80056F4C();
+    self->methods = GetClass876FCMethods();
     self->unk44 = 0;
     self->kind = arg1;
     self->methods->setParams(self, arg2);

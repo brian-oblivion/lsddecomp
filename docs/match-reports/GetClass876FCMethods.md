@@ -1,4 +1,6 @@
-# func_80056F4C -- MATCHED (4/4 words)
+# GetClass876FCMethods -- MATCHED (4/4 words)
+
+> Renamed from `func_80056F4C` on 2026-09-23 (tools/rename.py). Address 0x80056f4c.
 
 Unit: `class_3bb8c_o` (round 17). A sibling class's own method-table
 getter, analogous to `DreamSys__GetBaseMethods`/`func_80066818` already documented in
@@ -9,7 +11,7 @@ getter, analogous to `DreamSys__GetBaseMethods`/`func_80066818` already document
 ```c
 extern BaseObjOMethods gClass876FCMethods;
 
-BaseObjOMethods *func_80056F4C(void) {
+BaseObjOMethods *GetClass876FCMethods(void) {
     return &gClass876FCMethods;
 }
 ```
@@ -39,7 +41,7 @@ reasoning this getter's typing depends on.
 
 ## Naming
 
-**`func_80056F4C` -- NOT renamed, tier C.** A pure singleton vtable getter
+**`GetClass876FCMethods` -- NOT renamed, tier C.** A pure singleton vtable getter
 (`return &gClass876FCMethods;`), exactly the same shape as this codebase's other
 unnamed getters this unit calls but does not define --
 `GetClass6B5CCMethods`/`DreamSys__GetBaseMethods`/`func_80066818` -- none of which carry a

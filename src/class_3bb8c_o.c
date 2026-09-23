@@ -18,7 +18,7 @@
  *  - `BaseObjO`/`BaseObjOMethods` (`New_BaseObjO` onward): the shared
  *    INTERMEDIATE BASE class of `DreamSys` (`DreamSys.h`), `Class65650`
  *    (`code_55dd4.h`'s `D800878D4Methods`), and `gClass876FCMethods`'s own sibling
- *    concrete class (`func_80056F4C` is that sibling's own vtable getter,
+ *    concrete class (`GetClass876FCMethods` is that sibling's own vtable getter,
  *    kept unnamed for consistency with the codebase's other unnamed
  *    singleton getters). `BaseObjO__BaseObjO` is proven to be the BASE's
  *    own constructor, not `Class65650`'s: `code_55dd4.c`'s real
@@ -104,7 +104,7 @@ void LinkOwnerObj__ReleaseLinksB(LinkOwnerObj *this) {
 }
 
 /* ------------------------------------------------------------------ *
- * Group 2: func_80056F4C onward -- the shared intermediate base class,
+ * Group 2: GetClass876FCMethods onward -- the shared intermediate base class,
  * see the file banner.  BaseObjO/BaseObjOMethods is THIS unit's own view
  * (established here, not copied from either sibling header).
  * ------------------------------------------------------------------ */
@@ -210,7 +210,7 @@ struct BaseObjO {
 
 extern BaseObjOMethods gClass876FCMethods;
 
-BaseObjOMethods *func_80056F4C(void) {
+BaseObjOMethods *GetClass876FCMethods(void) {
     return &gClass876FCMethods;
 }
 
