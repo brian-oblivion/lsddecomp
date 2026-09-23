@@ -1,54 +1,18 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * class_3bb8c_s -- 0x46D20..0x475F0, the private methods of the class whose
+ * table is D_800876FC (called Class876FC here; class_3bb8c_r.c's Obj876FC).
+ * A 0x98-byte scene object built by func_80056320 with a `kind` 0..3: it
+ * attaches itself under a parent at pos + offset, links a model for kinds
+ * 0-1, and owns up to two child arrays -- two BaseObjO model children laid
+ * out in a row that spin and drift along z after frame 500 (kind 0), or
+ * five D800879C4 sprites (a GsSPRITE at +0x64) that are randomised at build
+ * time (kind 2) or every frame (kind 3, class_3bb8c_o.c). Entry points are
+ * the class's ctor, update slot (+0x0EC) and dtor in class_3bb8c_r.c, via
+ * Class876FC__InitByKind / __UpdateByKind / __ReleaseByKind.
  *
- * class_3bb8c_s -- functions 44..53 of the class_3bb8c remainder,
- * 0x46D20..0x475F0 (10 functions).  Carved round 21 (2026-09-06).
- *
- * Blocker census at carve time (four screens, canonical shell forms), fixed
- * up per the round 22 Gate 1 screen: `addiu_at` was RESOLVED in round 21 (see
- * docs/research/addiu-at-blocker.md) and is no longer a blocker at all -- the
- * 3 functions previously counted against it are workable, and their stub
- * reports were retired. Only `gp_rel` remains live in this unit, on
- * Class876FC__InitByKind, Class876FC__UpdateByKind and Class876FC__SpawnSprites -- each still carries a
- * current stall report and none of the three is touched here.
- *
- * MATCHED this round: Class876FC__ReleaseByKind, AddVec3, AttachWithRotScale,
- * Class876FC__PlaceModelChildren, Class876FC__ReleaseModelChildren -- byte-exact, see docs/match-reports/.
- *
- * Class876FC__BuildRandomSprites was attempted (the addiu_at hit in it is the now-resolved
- * construct, not a real blocker) and got to a one-instruction residue -- a
- * retail dead store (`li $a1, 1`) that never gets read on either branch it
- * precedes, the same "redundant move" class MATCHING-GUIDE.md already
- * documents as permuter territory. ~8000 permuter iterations did not find a
- * zero; restored to INCLUDE_ASM per the hard rule. See its match report.
- *
- * Class876FC__DriftModelChildren is still untouched (its only screen hit is the same
- * now-resolved addiu_at construct; it remains fresh ground).
- *
- * This slice spans (at least) parts of the same class as the neighbouring
- * `class_3bb8c_o` slice: `self` here is the SAME kind of node as that unit's
- * `LinkOwnerObj` (a 5-element `arr84` link array is confirmed via
- * Class876FC__SpawnSprites's occupancy of it), extended with more fields this unit
- * actually reads (+0x054 dispatch state, +0x064/+0x068/+0x06C/+0x070/+0x074/
- * +0x078 and a 2-element +0x07C array). Kept as this unit's OWN local view,
- * `LinkNode`/`LinkNodeMethods` -- `class_3bb8c_o.c`'s `LinkOwnerObj` is not
- * this unit's to edit, and per the multiple-independent-local-views
- * convention there is no reason a fresh view here should match its fields.
- * Confirmed with a straight read of this unit's own asm/nonmatchings .s files,
- * cross-checked against the (read-only, not edited) disassembly of the three
- * still-blocked functions in this same unit, which occupy the same self and
- * establish the +0x084 5-element array and the class_3bb8c_o.c call targets.
+ * 9 of 10 matched; Class876FC__DriftModelChildren is a stall (body kept
+ * below). Named round 70; tiers in the reports. Game-level role unknown.
  */
-
 #include "common.h"
 
 /* ------------------------------------------------------------------ *
@@ -119,7 +83,7 @@ struct LinkNode {
 
 extern void LinkOwnerObj__ReleaseLinks(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void LinkOwnerObj__ReleaseLinksB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
-extern void BaseObjO__AddVec14(void *self, Vec3S *v);   /* class_3bb8c_t.c */
+extern void BaseObjO__AddVec14(void *self, Vec3S *v);   /* class_3bb8c_o.c */
 extern void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl); /* below */
 extern s32 gSpriteShiftX[];
 extern s32 gSpriteScaleLarge[];
