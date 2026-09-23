@@ -1,4 +1,6 @@
-# func_8002A75C
+# CD_init
+
+> Renamed from `func_8002A75C` on 2026-09-23 (tools/rename.py). Address 0x8002a75c.
 
 > **HEAD CORRECTION, round 33 — THE STATED SEARCH DURATION IS OVERSTATED AND
 > THE NEGATIVE IS CORRESPONDINGLY WEAKER.** This report claims the search ran
@@ -29,23 +31,23 @@ of three ALREADY-MATCHED siblings in this unit, plus one new tail:
 
 1. Two debug prints (`func_80025AE4(D_80010A94)`,
    `func_80012C20(D_80010AA0, D_8006D90C)`).
-2. The zero-loop + thread-start sequence from `func_8002A6EC`, prefixed with
+2. The zero-loop + thread-start sequence from `CD_initintr`, prefixed with
    `D_8006D61D = 0; D_8006D61C = 0;`.
-3. The link-wait loop + "close port" tail from `func_8002A510`, followed by
-   one extra `func_80029F10(1, 0, 0, 0)` call this function adds on top.
-4. A conditional `func_80029F10(1, 0, 0, 0)` guarded by `D_8006D60C & 0x10`.
-5. The ENTIRE body of `func_8002A400` (the `D_8006D904 < D_8006D614`
+3. The link-wait loop + "close port" tail from `CD_flush`, followed by
+   one extra `CD_cw(1, 0, 0, 0)` call this function adds on top.
+4. A conditional `CD_cw(1, 0, 0, 0)` guarded by `D_8006D60C & 0x10`.
+5. The ENTIRE body of `CD_shell` (the `D_8006D904 < D_8006D614`
    catch-up block), byte-for-byte.
-6. A new tail: two `func_80029F10` retry checks (codes `0xA`, `0xC`, each
+6. A new tail: two `CD_cw` retry checks (codes `0xA`, `0xC`, each
    returning -1 on failure) then
-   `return -(func_800299BC(0, 0) != 2);`.
+   `return -(CD_sync(0, 0) != 2);`.
 
 ## Best C reached (58/196 words -- restored to INCLUDE_ASM)
 
 ```c
 #if 0
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024D10 -> ResetCallback, func_80024D40 -> InterruptCallback, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_8002A75C(void)
+s32 CD_init(void)
 {
     s32 *p;
     s32 i;
@@ -86,11 +88,11 @@ s32 func_8002A75C(void)
     *D_8006D8C0 = 0;
     *D_8006D8CC = 0;
     *D_8006D8D0 = 0x1325;
-    func_80029F10(1, 0, 0, 0);
+    CD_cw(1, 0, 0, 0);
 
     counter = 0;
     if (D_8006D60C & 0x10) {
-        func_80029F10(1, 0, 0, 0);
+        CD_cw(1, 0, 0, 0);
     }
 
     if (D_8006D904 < D_8006D614) {
@@ -102,11 +104,11 @@ s32 func_8002A75C(void)
                 puts(D_80010A40);
             }
             counter++;
-            func_80029F10(1, 0, 0, 0);
+            CD_cw(1, 0, 0, 0);
         }
 
-        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-            func_80029F10(1, 0, 0, 0);
+        while (CD_cw(0x16, D_8006D908, 0, 0)) {
+            CD_cw(1, 0, 0, 0);
             puts(D_80010A50);
         }
 
@@ -114,13 +116,13 @@ s32 func_8002A75C(void)
         D_8006D904 = D_8006D614;
     }
 
-    if (func_80029F10(0xA, 0, 0, 0) == 0) {
+    if (CD_cw(0xA, 0, 0, 0) == 0) {
         return -1;
     }
-    if (func_80029F10(0xC, 0, 0, 0) == 0) {
+    if (CD_cw(0xC, 0, 0, 0) == 0) {
         return -1;
     }
-    return -(func_800299BC(0, 0) != 2);
+    return -(CD_sync(0, 0) != 2);
 }
 #endif
 ```
@@ -141,7 +143,7 @@ does not auto-inline.
 `counter = 0;` immediately before the `D_8006D60C & 0x10` check that follows
 the port-close tail -- NOT at function entry -- because retail's `move
 $s0, $zero` sits at that exact point (in the `beqz`'s delay slot), the same
-lesson as `func_8002A400`'s report but applied at a different point in a
+lesson as `CD_shell`'s report but applied at a different point in a
 much larger function.
 
 ## The one remaining residue
@@ -151,7 +153,7 @@ matches retail byte-for-byte (confirmed via direct `objdump` comparison of
 this build's `.o`, independent of the whole-image address drift). The first
 divergence is exactly at the "close port" tail's lead-in:
 
-**Retail materializes the FIRST `func_80029F10(1, 0, 0, 0)` call's `$a0=1`,
+**Retail materializes the FIRST `CD_cw(1, 0, 0, 0)` call's `$a0=1`,
 `$a1=0`, `$a2=0` THREE INSTRUCTIONS EARLY** -- immediately after the
 link-wait loop's join point (`.L8002A87C`), a full ~30 instructions before
 that call executes, BEFORE `D_8006D8DA = 0;` even begins. This is true even
@@ -164,13 +166,13 @@ SOURCE literally mentioning the constant again at that point, not of an
 optimizer choice.
 
 This function's second, structurally identical
-`func_80029F10(1, 0, 0, 0)` call (inside `if (D_8006D60C & 0x10)`) does NOT
+`CD_cw(1, 0, 0, 0)` call (inside `if (D_8006D60C & 0x10)`) does NOT
 show this behavior -- its args materialize normally, right before its own
 call, exactly like ordinary C compiles. So the anomaly is specific to the
 FIRST call, immediately following the loop.
 
 **Four attempts, all rejected:**
-1. Plain `func_80029F10(1, 0, 0, 0);` written after the tail (natural
+1. Plain `CD_cw(1, 0, 0, 0);` written after the tail (natural
    source position) -- args materialize late, matching the SECOND call's
    shape but not the first's. This is the body preserved above.
 2. A bare `__asm__("")` barrier immediately after the link-wait loop (before
@@ -213,10 +215,10 @@ as a single 1-instruction scheduling gap; it is actually two separate,
 much larger structural mistakes in this report's preserved body, both
 now fixed.
 
-### Fix 1: the first `func_80029F10(1, 0, 0, 0)` belongs BEFORE the close-port tail, not after (58 -> 161/196)
+### Fix 1: the first `CD_cw(1, 0, 0, 0)` belongs BEFORE the close-port tail, not after (58 -> 161/196)
 
 The preserved body called it as "one extra call this function adds on
-top" of the reused `func_8002A510` tail -- i.e. positioned AFTER the
+top" of the reused `CD_flush` tail -- i.e. positioned AFTER the
 whole `D_8006D8DA = 0; ... *D_8006D8D0 = 0x1325;` sequence. Moving it to
 immediately after the link-wait loop, BEFORE that sequence, produced a
 huge jump: 58 -> 161/196, with the compiled length still exactly
@@ -227,7 +229,7 @@ something else: reverting ONLY the call's position (putting it back
 after the tail, keeping everything else identical) reproduces the
 original 58/196 exactly. Moving it forward again restores 161/196
 exactly. The position of this one call, relative to the reused
-`func_8002A510` tail, is the dominant defect in the original body -- not
+`CD_flush` tail, is the dominant defect in the original body -- not
 the 1-instruction scheduling gap the original report focused on (that
 gap is real but secondary, see below).
 
@@ -235,20 +237,20 @@ gap is real but secondary, see below).
 
 The preserved body's tail:
 ```c
-if (func_80029F10(0xA, 0, 0, 0) == 0) { return -1; }
-if (func_80029F10(0xC, 0, 0, 0) == 0) { return -1; }
+if (CD_cw(0xA, 0, 0, 0) == 0) { return -1; }
+if (CD_cw(0xC, 0, 0, 0) == 0) { return -1; }
 ```
 Reading the disassembly at this point directly (`bnez v0,<epilogue>`
 immediately after each call, with `li v0,-1` in the delay slot) shows
 retail returns -1 when the call result is **non-zero**, and falls
-through to the NEXT check (or the final `func_800299BC` call) only when
+through to the NEXT check (or the final `CD_sync` call) only when
 the result is zero -- the exact opposite of what the preserved body
 tests. Flipping both to `!= 0` closed this entire tail region exactly:
 161 -> 171/196, and this is now the ONLY residue left in the function.
 
 ### What's left: the same call, split by the compiler across ~90 bytes -- neither position tried reproduces it
 
-With fix 1 applied, `func_80029F10(1, 0, 0, 0);` sits as one statement
+With fix 1 applied, `CD_cw(1, 0, 0, 0);` sits as one statement
 right after the link-wait loop. Retail's actual instruction layout at
 that exact point is stranger than either position this report has
 tried: it loads `a0=1, a1=0, a2=0` RIGHT THERE (matching this fix
@@ -304,7 +306,7 @@ was first found.
 Round 19 left this at 171/196 with the residue confined to exactly 2
 instructions (`jal`/`move a3,zero`) landing 8 bytes early relative to
 retail, and flagged it as a good permuter candidate not yet run. Set up
-the scaffold this round (`tools/setup-permuter.sh func_8002A75C <seed>`,
+the scaffold this round (`tools/setup-permuter.sh CD_init <seed>`,
 seed = this report's fix-1+fix-2 body verbatim) and confirmed the base
 score matches the report's own characterization exactly before searching:
 
@@ -315,7 +317,7 @@ Register Differences:          0  (5)
 Reorderings:                   3  (60)
 Insertions:                    0  (100)
 Deletions:                     0  (100)
-[func_8002A75C] base score = 180
+[CD_init] base score = 180
 ```
 
 Pure reordering, no register/insertion/deletion residue -- confirms this
@@ -332,13 +334,13 @@ this is NOT a claim the function is unmatchable.
 
 Also independently confirmed by hand (before setting up the permuter):
 the actual instruction-level cause is `a0,a1,a2` for
-`func_80029F10(1,0,0,0)` materializing together right after the link-wait
+`CD_cw(1,0,0,0)` materializing together right after the link-wait
 loop (matching retail's ARGS position exactly, confirmed via direct
 `objdump` read of both the retail `.s` and the built `.o`), while retail
 additionally defers `a3=0` to a point 24 bytes/6 instructions before the
 `jal`, itself deferred ~104 bytes/26 instructions after the args --
 i.e. retail's own list-scheduler interleaves `a3=0`'s zero-cost, no-
-dependency move into an unrelated stretch of the reused `func_8002A510`
+dependency move into an unrelated stretch of the reused `CD_flush`
 tail (right after the `D_8006D8D8[0]=2` store, before the `D_8006D8CC=0`
 store), rather than emitting it adjacent to `a0/a1/a2` or adjacent to the
 `jal`. This is not reachable by writing the call statement at either
@@ -368,10 +370,10 @@ Re-compiled the round-19 fix-1+fix-2 body verbatim (symbol names translated
 errors, `funcdiff.py` reports **171/196 words, no staleness warning,
 compiled length exact at 196/196**. Matches this report's own claim exactly.
 
-**First real diff, read off `tools/asm-differ/diff.py func_8002A75C` on a
+**First real diff, read off `tools/asm-differ/diff.py CD_init` on a
 clean isolated build: file offset `0x1B088`, vram `0x8002A888`** -- retail's
-`jal func_80029F10` / `move a3,zero` pair for the post-loop
-`func_80029F10(1,0,0,0)` call, present at this point in retail but deferred
+`jal CD_cw` / `move a3,zero` pair for the post-loop
+`CD_cw(1,0,0,0)` call, present at this point in retail but deferred
 ~90 bytes later in this build (round 19/20's already-documented residue).
 The title above had no location figure before this round.
 
@@ -385,7 +387,7 @@ base score matches exactly:
 ```
 Stack Differences: 0  Branch Differences: 0  Register Differences: 0
 Reorderings: 3  Insertions: 0  Deletions: 0
-[func_8002A75C] base score = 180
+[CD_init] base score = 180
 ```
 
 then searched `timeout 1800 ... permuter.py -j 6 --stop-on-zero --best-only`
@@ -475,7 +477,7 @@ this project's `.bss` placement (the whole game links as one contiguous
 `.main` section in `lsdde.ld`, so ANY length mismatch anywhere earlier in
 the image moves every later `.bss` symbol, not just later `.text`) --
 confirmed directly: with `func_8002B3F4` reverted to `INCLUDE_ASM` and every
-OTHER already-matched sibling in this exact unit (`func_8002A400`, untouched
+OTHER already-matched sibling in this exact unit (`CD_shell`, untouched
 this round) suddenly regressed from 68/68 to 58/68 the moment all six
 functions were live together. This is CLAUDE.md's "address drift need not
 come from the function you're editing" hazard (round 20's own entry in that
@@ -505,7 +507,7 @@ now-superseded seeds).
 
 ```c
 #if 0
-s32 func_8002A75C(void)
+s32 CD_init(void)
 {
     s32 *p;
     s32 i;
@@ -537,7 +539,7 @@ s32 func_8002A75C(void)
         *D_8006D8C8 = 7;
     }
 
-    func_80029F10(1, 0, 0, 0);
+    CD_cw(1, 0, 0, 0);
 
     D_8006D8DA = 0;
     q = &D_8006D8D9;
@@ -551,7 +553,7 @@ s32 func_8002A75C(void)
 
     counter = 0;
     if (D_8006D60C & 0x10) {
-        func_80029F10(1, 0, 0, 0);
+        CD_cw(1, 0, 0, 0);
     }
 
     if (D_8006D904 < D_8006D614) {
@@ -563,11 +565,11 @@ s32 func_8002A75C(void)
                 puts(D_80010A40);
             }
             counter++;
-            func_80029F10(1, 0, 0, 0);
+            CD_cw(1, 0, 0, 0);
         }
 
-        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-            func_80029F10(1, 0, 0, 0);
+        while (CD_cw(0x16, D_8006D908, 0, 0)) {
+            CD_cw(1, 0, 0, 0);
             puts(D_80010A50);
         }
 
@@ -575,13 +577,13 @@ s32 func_8002A75C(void)
         D_8006D904 = D_8006D614;
     }
 
-    if (func_80029F10(0xA, 0, 0, 0) != 0) {
+    if (CD_cw(0xA, 0, 0, 0) != 0) {
         return -1;
     }
-    if (func_80029F10(0xC, 0, 0, 0) != 0) {
+    if (CD_cw(0xC, 0, 0, 0) != 0) {
         return -1;
     }
-    return -(func_800299BC(0, 0) != 2);
+    return -(CD_sync(0, 0) != 2);
 }
 #endif
 ```
@@ -598,7 +600,7 @@ mismatch shifts data addresses project-wide, not just code addresses later
 in the same file. When a unit assignment covers several stalls at once (the
 normal shape of a multi-function round), read every function's `funcdiff.py`
 score with ALL its unit-mates reverted to `INCLUDE_ASM`, and spot-check one
-already-matched, untouched sibling (here `func_8002A400`) to catch
+already-matched, untouched sibling (here `CD_shell`) to catch
 contamination that isn't visible from the target function's own diff.
 
 ## Round 39 (runner delta): re-verified 171/196, no new attempt -- confirmed-pure-scheduling residue, new levers don't apply
@@ -609,7 +611,7 @@ staleness warning, compiled length exact at 196/196** -- matches every prior
 round's recorded figure exactly.
 
 Checked this round's new levers against the residue (the `jal`/`move
-a3,zero` pair for `func_80029F10(1,0,0,0)` that retail schedules ~90 bytes
+a3,zero` pair for `CD_cw(1,0,0,0)` that retail schedules ~90 bytes
 after its own arguments materialize) before declining to spend an attempt:
 
 - **Hoist-both-before-either**: does not apply. This is ONE call's
@@ -658,14 +660,14 @@ report, the real figure is ~1342s/~156k iterations, not the claimed full
 1800s) came back negative, and neither result was ever incorporated into
 the body. The `--debug` breakdown for the residue is pure `Reorderings: 3,
 Register Differences: 0` -- a genuine list-scheduling tie-break (retail
-splits one `func_80029F10(1,0,0,0)` call's argument materialization from
+splits one `CD_cw(1,0,0,0)` call's argument materialization from
 its own `a3`/`jal` by ~90 bytes), not a register-identity or structural
 gap, and no source form tried (four levers in the original report, plus
 the two structural fixes rounds 19 found and the two permuter searches)
 reproduces it. Compiles clean under `-DNON_MATCHING` (two warnings, no
 errors: an incompatible-pointer-type assignment for `p = &D_8006D8DC;` --
 same address as the sibling's plain-decay `p = D_8006D8DC;`, differs only
-in C type -- and the pre-existing `func_80029F10` int-from-pointer warning
-this unit already carries in `func_8002A400`).
+in C type -- and the pre-existing `CD_cw` int-from-pointer warning
+this unit already carries in `CD_shell`).
 
 NON_MATCHING body promoted, round 68.

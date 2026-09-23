@@ -1,4 +1,6 @@
-# func_8002A510
+# CD_flush
+
+> Renamed from `func_8002A510` on 2026-09-23 (tools/rename.py). Address 0x8002a510.
 
 **Unit:** code_179d8_g · **Size:** 58 words · **Status:** MATCHED (58/58 words)
 
@@ -6,7 +8,7 @@
 
 Drains the link driver's status byte (`*D_8006D8CC & 7`) by repeatedly
 poking mode byte 1 and status 7 into the staging pointers until it clears,
-then runs the same "close port" tail seen in `func_8002A75C`'s middle and
+then runs the same "close port" tail seen in `CD_init`'s middle and
 `func_8002AA6C`'s tail: clear `D_8006D8DA`, mirror it into `D_8006D8D9`,
 clear `D_8006D61C`, set `D_8006D8D8 = 2`, zero `*D_8006D8C0`/`*D_8006D8CC`,
 and program `*D_8006D8D0 = 0x1325`.
@@ -14,7 +16,7 @@ and program `*D_8006D8D0 = 0x1325`.
 ## The C
 
 ```c
-void func_8002A510(void)
+void CD_flush(void)
 {
     volatile u8 *q;
 
@@ -49,7 +51,7 @@ returning 0 compiled a full match everywhere EXCEPT the final delay slot
 (`move v0,zero` vs retail's `nop`), which was the tell.
 
 **`D_8006D8DA` needed `volatile` for the same reason `D_8006D8EC` did in
-`func_8002ADE8`**: without it, `D_8006D8D9 = D_8006D8DA;` right after
+`CD_readm`**: without it, `D_8006D8D9 = D_8006D8DA;` right after
 `D_8006D8DA = 0;` constant-propagates to `D_8006D8D9 = 0;` and drops the
 reload retail's disassembly shows.
 
@@ -70,7 +72,7 @@ local (not nested in a block), reproduces retail's *unfolded* address
 computation for `D_8006D8D9` (`lui`+`addiu` into a real register, rather than
 the folded `lui $at`/`sw ...(at)` form GCC otherwise prefers for the plain
 `D_8006D8D9 = ...;` when it doesn't need to keep the address around). This is
-the same lever documented in `func_8002ADE8`'s report.
+the same lever documented in `CD_readm`'s report.
 
 ### Proposed learning
 

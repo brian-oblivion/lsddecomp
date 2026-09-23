@@ -15,8 +15,8 @@
  * (2026-09-04) off the back of what was then `code_179d8_mid`, the three
  * functions in front of this slice. Those three were left as "all addiu-$at
  * blocked, so there is nothing left to staff there"; re-censused round 24
- * (2026-09-08) that is FALSE -- func_800299BC (161w), func_80029C40 (180w)
- * and func_80029F10 (282w) are ALL THREE blocker-clean now that `addiu_at`
+ * (2026-09-08) that is FALSE -- CD_sync (161w), CD_ready (180w)
+ * and CD_cw (282w) are ALL THREE blocker-clean now that `addiu_at`
  * is resolved. Round 26 (2026-09-09) acted on that and CARVED them as the
  * C unit `code_179d8_n`; no `code_179d8_mid` segment exists any more.
  *
@@ -145,8 +145,8 @@ extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib
 extern s32 VSync(s32 arg0);                            /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                   /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
-extern s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
-extern s32 func_800299BC(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
+extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in code_179d8_n */
+extern s32 CD_sync(s32 arg0, s32 arg1);                   /* defined in code_179d8_n, per code_179d8_b.c */
 extern s32 getintr(void);                                /* code_179d8_b.c, MATCHED round 70
                                                                    (libcd getintr by its strings) */
 extern s32 CheckCallback(void);                                /* lib/libetc/intr.o -- trivial
@@ -157,13 +157,13 @@ extern s32 func_8002AA6C(void);
 extern s32 func_8002B198(s32 arg0);
 
 /* Forward declarations: taken by address before their own ROM-order definition
- * further down this file (func_8002A6EC/func_8002A75C hand func_8002B3F4 to
+ * further down this file (CD_initintr/CD_init hand func_8002B3F4 to
  * InterruptCallback as a thread entry; func_8002AA6C hands func_8002B4D4 to
  * D_8006D600 as a callback). */
 void func_8002B3F4(void);
 void func_8002B4D4(s32 arg0, s32 arg1);
 
-s32 func_8002A378(u8 *arg0)
+s32 CD_vol(u8 *arg0)
 {
     *D_8006D8C0 = 2;
     *D_8006D8C8 = arg0[0];
@@ -175,7 +175,7 @@ s32 func_8002A378(u8 *arg0)
     return 0;
 }
 
-void func_8002A400(void)
+void CD_shell(void)
 {
     s32 saved;
     s32 counter = 0;
@@ -189,11 +189,11 @@ void func_8002A400(void)
                 puts(D_80010A40);
             }
             counter++;
-            func_80029F10(1, 0, 0, 0);
+            CD_cw(1, 0, 0, 0);
         }
 
-        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-            func_80029F10(1, 0, 0, 0);
+        while (CD_cw(0x16, D_8006D908, 0, 0)) {
+            CD_cw(1, 0, 0, 0);
             puts(D_80010A50);
         }
 
@@ -202,7 +202,7 @@ void func_8002A400(void)
     }
 }
 
-void func_8002A510(void)
+void CD_flush(void)
 {
     volatile u8 *q;
 
@@ -224,7 +224,7 @@ void func_8002A510(void)
     *D_8006D8D0 = 0x1325;
 }
 
-s32 func_8002A5F8(void)
+s32 CD_initvol(void)
 {
     u8 buf[4];
 
@@ -250,7 +250,7 @@ s32 func_8002A5F8(void)
     return 0;
 }
 
-void func_8002A6EC(void)
+void CD_initintr(void)
 {
     s32 *p;
     s32 i;
@@ -271,10 +271,10 @@ void func_8002A6EC(void)
 #ifdef NON_MATCHING
 /* NON_MATCHING: 171/196 words, length exact. Residue: pure list-scheduling
  * (round-25 --debug breakdown: Reorderings: 3, Register Differences: 0) --
- * retail splits func_80029F10(1,0,0,0)'s argument materialization from its
+ * retail splits CD_cw(1,0,0,0)'s argument materialization from its
  * own a3/jal by ~90 bytes; neither call position tried reproduces the split
- * (docs/match-reports/func_8002A75C.md). Hand-derived. */
-s32 func_8002A75C(void)
+ * (docs/match-reports/CD_init.md). Hand-derived. */
+s32 CD_init(void)
 {
     s32 *p;
     s32 i;
@@ -306,7 +306,7 @@ s32 func_8002A75C(void)
         *D_8006D8C8 = 7;
     }
 
-    func_80029F10(1, 0, 0, 0);
+    CD_cw(1, 0, 0, 0);
 
     D_8006D8DA = 0;
     q = &D_8006D8D9;
@@ -320,7 +320,7 @@ s32 func_8002A75C(void)
 
     counter = 0;
     if (D_8006D60C & 0x10) {
-        func_80029F10(1, 0, 0, 0);
+        CD_cw(1, 0, 0, 0);
     }
 
     if (D_8006D904 < D_8006D614) {
@@ -332,11 +332,11 @@ s32 func_8002A75C(void)
                 puts(D_80010A40);
             }
             counter++;
-            func_80029F10(1, 0, 0, 0);
+            CD_cw(1, 0, 0, 0);
         }
 
-        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-            func_80029F10(1, 0, 0, 0);
+        while (CD_cw(0x16, D_8006D908, 0, 0)) {
+            CD_cw(1, 0, 0, 0);
             puts(D_80010A50);
         }
 
@@ -344,16 +344,16 @@ s32 func_8002A75C(void)
         D_8006D904 = D_8006D614;
     }
 
-    if (func_80029F10(0xA, 0, 0, 0) != 0) {
+    if (CD_cw(0xA, 0, 0, 0) != 0) {
         return -1;
     }
-    if (func_80029F10(0xC, 0, 0, 0) != 0) {
+    if (CD_cw(0xC, 0, 0, 0) != 0) {
         return -1;
     }
-    return -(func_800299BC(0, 0) != 2);
+    return -(CD_sync(0, 0) != 2);
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002A75C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_g", CD_init);
 #endif
 
 #ifdef NON_MATCHING
@@ -403,11 +403,11 @@ s32 func_8002AA6C(void)
                             puts(D_80010A40);
                         }
                         counter++;
-                        func_80029F10(1, 0, 0, 0);
+                        CD_cw(1, 0, 0, 0);
                     }
 
-                    while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-                        func_80029F10(1, 0, 0, 0);
+                    while (CD_cw(0x16, D_8006D908, 0, 0)) {
+                        CD_cw(1, 0, 0, 0);
                         puts(D_80010A50);
                     }
 
@@ -415,10 +415,10 @@ s32 func_8002AA6C(void)
                     D_8006D904 = D_8006D614;
                 }
 
-                if (func_80029F10(9, 0, 0, 0) != 0) {
+                if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (func_80029F10(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -446,7 +446,7 @@ s32 func_8002AA6C(void)
                 n = ((u8)v0 != D_8006D61C);
                 if (n) {
                     saved = (s32)&buf;
-                    if (func_80029F10(0xE, saved, 0, 0) != 0) {
+                    if (CD_cw(0xE, saved, 0, 0) != 0) {
                         goto tail;
                     }
                 }
@@ -454,7 +454,7 @@ s32 func_8002AA6C(void)
 
             D_8006D600 = (s32)func_8002B4D4;
             p2[-1] = p2[-2];
-            func_80029F10(6, 0, 0, 1);
+            CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
             p2[3] = VSync(-1) + 0x1E0;
             return p2[2];
@@ -477,7 +477,7 @@ s32 func_8002AA6C(void)
 INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002AA6C);
 #endif
 
-s32 func_8002ADE8(s32 arg0, s32 arg1, s32 arg2)
+s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
 {
     s32 t;
     volatile s32 *p;
@@ -527,9 +527,9 @@ join:
     D_8006D900 = D_8006D600;
 
     if (D_8006D60C & 0xE0) {
-        func_80029F10(9, 0, 0, 0);
+        CD_cw(9, 0, 0, 0);
     }
-    func_800299BC(0, 0);
+    CD_sync(0, 0);
     return -(func_8002AA6C() < 1);
 }
 
@@ -584,7 +584,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         pEC = &D_8008B3EC;
         printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
                p6A0[idx0], p6A0[idx1]);
-        func_8002A510();
+        CD_flush();
         result = -1;
         goto after_diag;
 
@@ -650,7 +650,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
              * `pF8[-1]` (used four times below) reaches D_8006D8F4 by
              * negative indexing off D_8006D8F8, which nobody writes -- the
              * ten consecutive words ARE one array, as the zeroing walk in
-             * func_8002ADE8 already implied. They are now declared
+             * CD_readm already implied. They are now declared
              * `s32 D_8006D8DC[10]` and indexed, and that model is
              * BYTE-IDENTICAL (174/174, whole image green).
              *
@@ -734,7 +734,7 @@ s32 func_8002B198(s32 arg0)
              * round-36 entry. */
             printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D],
                    ok = p6A0[p8D8[0]]);
-            func_8002A510();
+            CD_flush();
             return -1;
         }
         if ((*D_8006D934 & 0x1000000) == 0) {
@@ -848,7 +848,7 @@ shared:
     if ((*(new_var = &D_8006D8F4)) <= 0) {
         D_8006D5FC = D_8006D8FC;
         D_8006D600 = D_8006D900;
-        func_80029F10(9, 0, 0, 0);
+        CD_cw(9, 0, 0, 0);
         if (D_8006D604 != 0) {
             if ((*new_var) == 0) {
                 code = 2;

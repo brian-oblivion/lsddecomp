@@ -1,14 +1,16 @@
-# func_80029F10 -- STALL (LENGTH EXACT: built 282/retail 282 words, up from 278/282 this round via two stacked permuter-found levers; 98/282 raw words match per funcdiff -- now a TRUSTWORTHY figure, since length carries zero drift -- so roughly 184 individual words still differ, spread across what looks like a register-allocation cascade from the second lever; see the round-37 addenda for both levers and an honest discussion of the raw-match tradeoff)
+# CD_cw -- STALL (LENGTH EXACT: built 282/retail 282 words, up from 278/282 this round via two stacked permuter-found levers; 98/282 raw words match per funcdiff -- now a TRUSTWORTHY figure, since length carries zero drift -- so roughly 184 individual words still differ, spread across what looks like a register-allocation cascade from the second lever; see the round-37 addenda for both levers and an honest discussion of the raw-match tradeoff)
+
+> Renamed from `func_80029F10` on 2026-09-23 (tools/rename.py). Address 0x80029f10.
 
 Unit `code_179d8_n`. Runner echo, round 26. Carved this round; no prior report exists.
 
 ## Signature
 
 ```c
-s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 ```
 
-Confirmed by two already-matched call sites in the sibling unit `code_179d8_g.c`: `func_8002A400` (`func_80029F10(1, 0, 0, 0);` and `func_80029F10(0x16, D_8006D908, 0, 0)` used as a `while` condition -- i.e. the return value IS a truth value) and `func_8002ADE8` (`func_80029F10(9, 0, 0, 0);`). This function is itself called by `func_800299BC`... no -- by NOTHING inside this unit; it is the unit's own entry point CALLED BY `func_8002A400`/`func_8002ADE8` above, and it itself calls `func_800299BC(0, 0)` (blocking wait for CD sync) partway through its own body.
+Confirmed by two already-matched call sites in the sibling unit `code_179d8_g.c`: `CD_shell` (`CD_cw(1, 0, 0, 0);` and `CD_cw(0x16, D_8006D908, 0, 0)` used as a `while` condition -- i.e. the return value IS a truth value) and `CD_readm` (`CD_cw(9, 0, 0, 0);`). This function is itself called by `CD_sync`... no -- by NOTHING inside this unit; it is the unit's own entry point CALLED BY `CD_shell`/`CD_readm` above, and it itself calls `CD_sync(0, 0)` (blocking wait for CD sync) partway through its own body.
 
 ## What this function does
 
@@ -16,12 +18,12 @@ The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looke
 
 1. If verbosity (`D_8006D608`) is `>= 2`, prints `"%s...\n"` with the command's name.
 2. Looks up `D_8006D840[cmd]` -- "does this command need a parameter" -- and if it does and `arg1 == 0`, prints (when verbosity is on) `"%s: no param\n"` and returns `-2`.
-3. Calls `func_800299BC(0, 0)` -- blocks until CD sync (see that report).
+3. Calls `CD_sync(0, 0)` -- blocks until CD sync (see that report).
 4. If `cmd == 2`, copies 4 bytes from `arg1` into `D_8006D618`.
 5. Clears the driver-state byte `D_8006D8D8[0]`, conditionally clears `D_8006D8D9` (gated by `D_8006D740[cmd]`), clears the hardware-register-ish `*D_8006D8C0`, and if `D_8006D740[cmd + 0x40]` is positive, streams that many bytes from `arg1` through `*D_8006D8C8` one at a time.
 6. Records the command byte itself into `D_8006D61D` (used by the OTHER two functions' printf as the "current wait's name" selector) and `*D_8006D8C4`.
 7. If `arg3 != 0` (fire-and-forget), returns `0` immediately.
-8. Otherwise runs the SAME timeout/print/flush-loop idiom as `func_800299BC`/`func_80029C40` (see those reports), polling `D_8006D8D8[0]` until nonzero, printing `"CD_cw"` on timeout.
+8. Otherwise runs the SAME timeout/print/flush-loop idiom as `CD_sync`/`CD_ready` (see those reports), polling `D_8006D8D8[0]` until nonzero, printing `"CD_cw"` on timeout.
 9. Once `D_8006D8D8[0]` is nonzero: if it is exactly `2` AND `cmd == 0xE`, snapshots `*(u8*)arg1` into `D_8006D61C`; unconditionally (if `arg2 != 0`) copies the 8-byte `D_8008B3CC` snapshot into `arg2`; returns `-1` if the final state is `5`, else `0`.
 
 ## A real, measured finding about `D_8006D840`/`D_6D740` addressing (documented so nobody re-derives it)
@@ -30,7 +32,7 @@ The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looke
 
 ## Why this is a STALL and not a match
 
-**All three of this function's own residues are already-characterized, not-fixable-by-hand classes documented in `docs/DECOMPILATION_LEARNINGS.md` and in this unit's sibling reports (`func_800299BC.md`, `func_80029C40.md`):**
+**All three of this function's own residues are already-characterized, not-fixable-by-hand classes documented in `docs/DECOMPILATION_LEARNINGS.md` and in this unit's sibling reports (`CD_sync.md`, `CD_ready.md`):**
 
 1. **A missing delay-slot `andi $v0, $s3, 0xFF`** at retail vram `0x80029FF8`, immediately after the `bne $v1, $v0, .L8002A02C` that decides whether `cmd == 2`. Retail fills this branch's delay slot with a re-materialization of `cmd & 0xFF` (unused at the jump target, which immediately recomputes its own fresh `&D_8006D8D8`); this build leaves a plain `move $a0, zero` there instead. This is the delay-slot-fill family DECOMPILATION_LEARNINGS calls out as separate from block-order and explicitly still open: *"the compiler schedules an independent instruction into a delay slot that retail leaves empty or fills differently... that family remains open and is worth its own investigation; do not spend block-order attempts on it."*
 2. **A missing MIPS-I load-delay `nop`** inside the 4-byte `D_8006D618` copy loop (retail: `lbu $v0, 0($v1)` / `nop` / `lui $at, ...`; this build's scheduler fills the slot differently and drops the `nop` entirely since nothing in this build's ordering needs it). Tried an explicit incrementing-pointer rewrite of the loop (`src++` each iteration instead of `arg1[i]`, per the project's own "inner loops want INCREMENTING POINTERS" idiom) -- no change; the scheduler's choice here is independent of that idiom.
@@ -38,7 +40,7 @@ The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looke
 
 Given three independent, already-catalogued "not worth further hand attempts" residue classes account for essentially the entire remaining 4-word gap (1 + 1 + 2, matching exactly), and the whole rest of the 282-word function -- every branch, every call, every global read in the retail order -- is structurally accounted for, this is being filed as a characterized stall rather than continuing to search for a fourth C-level lever.
 
-One real structural fix IS folded into the body and is worth keeping on record: **the timeout/print/flush-loop section (step 8) needs the SAME `goto timeout3`/`goto success3`/shared `result` block-order as `func_800299BC`/`func_80029C40`, even though the CALLER-VISIBLE behavior is "return -1 immediately on error, otherwise keep going"** -- i.e. it is NOT sufficient to write `return -1;` directly inside the timeout arm. Retail's actual bytes still materialize `result` at a shared join (`j 2A1F0; li v0,-1` / `2A1EC: move v0,zero` / `2A1F0: bnez v0,epilogue`) even though nothing downstream of that join ever re-reads `result` for a value other than "branch to the epilogue or don't" -- the shared-join SHAPE is present regardless of how trivial the consumer is. Writing `return -1;` inline in the timeout arm compiled 3 words short until this was corrected.
+One real structural fix IS folded into the body and is worth keeping on record: **the timeout/print/flush-loop section (step 8) needs the SAME `goto timeout3`/`goto success3`/shared `result` block-order as `CD_sync`/`CD_ready`, even though the CALLER-VISIBLE behavior is "return -1 immediately on error, otherwise keep going"** -- i.e. it is NOT sufficient to write `return -1;` directly inside the timeout arm. Retail's actual bytes still materialize `result` at a shared join (`j 2A1F0; li v0,-1` / `2A1EC: move v0,zero` / `2A1F0: bnez v0,epilogue`) even though nothing downstream of that join ever re-reads `result` for a value other than "branch to the epilogue or don't" -- the shared-join SHAPE is present regardless of how trivial the consumer is. Writing `return -1;` inline in the timeout arm compiled 3 words short until this was corrected.
 
 ## Body, as reached (278/282 words, near-miss)
 
@@ -74,10 +76,10 @@ extern void (*D_8006D5FC)(s32 arg0, void *arg1);
 extern s32 VSync(s32 arg0);
 extern void puts(const char *arg0);
 extern void printf(const char *fmt, ...);
-extern void func_8002A510(void);
+extern void CD_flush(void);
 extern s32 CheckCallback(void);
 extern s32 getintr(void);
-extern s32 func_800299BC(s32 arg0, s32 arg1);          /* defined earlier in this unit, ROM order */
+extern s32 CD_sync(s32 arg0, s32 arg1);          /* defined earlier in this unit, ROM order */
 
 extern const char D_80010984[];
 extern const char D_80010994[];
@@ -85,7 +87,7 @@ extern const char D_80010A20[];        /* "%s...\n" */
 extern const char D_80010A28[];        /* "%s: no param\n" */
 extern const char D_80010A38[];        /* "CD_cw" */
 
-s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
+s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
 {
     const char **table;
     u8 *state;
@@ -109,7 +111,7 @@ s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
         return -2;
     }
 
-    func_800299BC(0, 0);
+    CD_sync(0, 0);
 
     if ((arg0 & 0xFF) == 2) {
         src = (const u8 *)arg1;
@@ -161,7 +163,7 @@ timeout3:
             puts(D_80010984);
             printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
                           table[state[0]], table[state[1]]);
-            func_8002A510();
+            CD_flush();
             result = -1;
             goto skip_timeout3;
 success3:
@@ -214,7 +216,7 @@ skip_timeout3:
 ## What is known independently of this body
 
 - Screened blocker-clean at carve time (round 26). Biggest function in the unit (282 retail words).
-- Calling convention confirmed against two ALREADY-MATCHED call sites in `code_179d8_g.c` (`func_8002A400`, `func_8002ADE8`) -- both pass `0`/constant literals for `arg2`/`arg3` and use the return value as a truth value in one case (`while (func_80029F10(0x16, D_8006D908, 0, 0))`), confirming `s32` return, not `void`.
+- Calling convention confirmed against two ALREADY-MATCHED call sites in `code_179d8_g.c` (`CD_shell`, `CD_readm`) -- both pass `0`/constant literals for `arg2`/`arg3` and use the return value as a truth value in one case (`while (CD_cw(0x16, D_8006D908, 0, 0))`), confirming `s32` return, not `void`.
 - `D_8006D618` is this unit's own local reading of a symbol `code_179d8_g.c` declares as a bare `extern u8 D_8006D618;` (singular) -- this function indexes it `[0..3]`, a genuinely different (but not conflicting, since neither file shares a header) local view. Flagged per the project's multiple-independent-local-views convention.
 
 ### Proposed learning
@@ -227,7 +229,7 @@ Same stale-symbol-name hazard as this unit's other two reports: the body
 above calls `func_80025900`/`func_80025AE4`/`func_80024E64`/`func_80012C20`
 under round-26's placeholder names, all four since renamed to
 `VSync`/`puts`/`CheckCallback`/`printf`. Rebuilt this round with the four
-names corrected (plus the sibling call `func_800299BC`, which is this
+names corrected (plus the sibling call `CD_sync`, which is this
 unit's own already-carved neighbour and was never renamed) and verified
 against the whole-image oracle: **reproduces exactly** -- 278/282 words
 (4 words short), raw 34/282.
@@ -244,7 +246,7 @@ counter-experiments already run. Re-reading the raw `.s` and this round's
 rebuild's `asm-differ` output against the report's own three claims found
 no discrepancy and no new angle; the residues sit downstream of roughly a
 combined 1-word deficit already banked in this unit's two EARLIER functions
-(`func_800299BC` +1, `func_80029C40` -2, net -1 word / -4 bytes before this
+(`CD_sync` +1, `CD_ready` -2, net -1 word / -4 bytes before this
 function's own code even starts), which shifts every address `asm-differ`
 prints for this function and makes its OWN diff noisy with register-rename
 artifacts that are pure address-drift noise, not real residues -- exactly
@@ -253,11 +255,11 @@ as the existing title already documents. Verdict stands: STALL.
 ## Round 37 addendum (echo) -- first permuter search finds a real 3-word gain (278/282 -> 281/282)
 
 Rebuilt the round-35 body live first, confirmed it reproduces 278/282
-exactly (`build/lsdde.map`: `func_80029F10` at the correct retail address
-`0x80029f10`, next function `func_8002A378` landing 16 bytes/4 words early
+exactly (`build/lsdde.map`: `CD_cw` at the correct retail address
+`0x80029f10`, next function `CD_vol` landing 16 bytes/4 words early
 at `0x8002a368`). This was this function's **first-ever permuter search**.
 
-`tools/setup-permuter.sh func_80029F10 <seed>` scaffolded cleanly.
+`tools/setup-permuter.sh CD_cw <seed>` scaffolded cleanly.
 `--debug --stack-diffs`: base score = 2451 (56 stack-difference points, 55
 register-difference points, 0 top-level insertions/deletions -- consistent
 with this report's own framing of three separate already-characterized
@@ -265,9 +267,9 @@ residues rather than one clean isolated diff).
 
 Ran the bounded search (`timeout 900 ... -j 6 --stop-on-zero --best-only
 --stack-diffs`), rc captured on the next command: **rc=124** (900s bound),
-**57462 iterations**. Unlike `func_80029C40`'s search this same round, this
+**57462 iterations**. Unlike `CD_ready`'s search this same round, this
 one found real improvement: **best score 1511** (down from base 2451),
-saved automatically under `permuter-work/func_80029F10/output-1511-1/`.
+saved automatically under `permuter-work/CD_cw/output-1511-1/`.
 
 **The entire mutation, isolated by diffing the saved candidate against the
 seed, is one change: the global `D_8006D8D8[3]` gains a `volatile`
@@ -282,7 +284,7 @@ and re-verified with `funcdiff.py` and `build/lsdde.map`, per CLAUDE.md's
 "a permuter score drop is a LEAD, not a RESULT" discipline.
 
 **Result: a genuine 3-word gain.** `build/lsdde.map` now shows
-`func_8002A378` landing at `0x8002a374` -- only 4 bytes/1 word short of
+`CD_vol` landing at `0x8002a374` -- only 4 bytes/1 word short of
 retail's `0x8002a378`, where it was 16 bytes/4 words short before. `nm`equivalent
 word-count confirms: **281/282 words**, i.e. only 1 word remains missing,
 down from 4.
@@ -381,7 +383,7 @@ consistent with a smaller remaining gap. Ran a second bounded search
 (`timeout 900 ... -j 6 --stop-on-zero --best-only --stack-diffs`), rc
 captured on the next command: **rc=124** (900s bound), **70560
 iterations**. Best score found: **926** (down from 1506), saved under
-`permuter-work/func_80029F10/output-926-1/`.
+`permuter-work/CD_cw/output-926-1/`.
 
 **The mutation, isolated by diffing against the seed:** a spurious
 assignment inserted as the printf call's 4th argument --
@@ -399,7 +401,7 @@ statement form was kept as cleaner and more readable.
 
 **Result, verified via `build/lsdde.map` and `funcdiff.py` (not the
 permuter's own score): this function's next-symbol address
-(`func_8002A378`) now lands EXACTLY at retail's `0x8002a378` -- LENGTH IS
+(`CD_vol`) now lands EXACTLY at retail's `0x8002a378` -- LENGTH IS
 NOW EXACT, 282/282, zero drift into anything downstream.** This is a real,
 oracle-confirmed improvement on the metric CLAUDE.md's own diagnostic
 chain checks first (address/length), and it means this unit contributes

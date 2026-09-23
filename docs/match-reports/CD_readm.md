@@ -1,4 +1,6 @@
-# func_8002ADE8
+# CD_readm
+
+> Renamed from `func_8002ADE8` on 2026-09-23 (tools/rename.py). Address 0x8002ade8.
 
 **Unit:** code_179d8_g · **Size:** 62 words · **Status:** MATCHED (62/62 words)
 
@@ -7,14 +9,14 @@
 Configures the link driver's mode word (`D_8006D8F0`) from `(arg2 & 0x30)`,
 stages the three call arguments and the current `D_8006D5FC`/`D_8006D600`
 callback pointers into the driver's staging globals, resets the retry
-counter (`D_8006D8DC = 8`), optionally kicks `func_80029F10(9, 0, 0, 0)` if
-`D_8006D60C & 0xE0`, then calls `func_800299BC(0, 0)` and
+counter (`D_8006D8DC = 8`), optionally kicks `CD_cw(9, 0, 0, 0)` if
+`D_8006D60C & 0xE0`, then calls `CD_sync(0, 0)` and
 `func_8002AA6C()`, reducing the latter's result to a `0`/`-1` status.
 
 ## The C
 
 ```c
-s32 func_8002ADE8(s32 arg0, s32 arg1, s32 arg2)
+s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
 {
     s32 t;
     volatile s32 *p;
@@ -64,9 +66,9 @@ join:
     D_8006D900 = D_8006D600;
 
     if (D_8006D60C & 0xE0) {
-        func_80029F10(9, 0, 0, 0);
+        CD_cw(9, 0, 0, 0);
     }
-    func_800299BC(0, 0);
+    CD_sync(0, 0);
     return -(func_8002AA6C() < 1);
 }
 ```

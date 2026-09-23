@@ -1,4 +1,6 @@
-# func_8002A5F8
+# CD_initvol
+
+> Renamed from `func_8002A5F8` on 2026-09-23 (tools/rename.py). Address 0x8002a5f8.
 
 **Unit:** code_179d8_g · **Size:** 61 words · **Status:** MATCHED (61/61 words)
 
@@ -8,12 +10,12 @@ Programs a block of hardware registers through the `D_8006D8D4` pointer
 (halfword offsets 0x180/0x182/0x1AA/0x1B0/0x1B2/0x1B8/0x1BA), conditionally
 resetting two of them to `0x3FFF` if both status halfwords are already zero,
 then stages a fixed 4-byte sequence (`0x80, 0, 0x80, 0`) through the same
-byte pointer dance as `func_8002A378`.
+byte pointer dance as `CD_vol`.
 
 ## The C
 
 ```c
-s32 func_8002A5F8(void)
+s32 CD_initvol(void)
 {
     u8 buf[4];
 
@@ -44,7 +46,7 @@ s32 func_8002A5F8(void)
 
 Matched on the first attempt -- straightforward translation once
 `D_8006D8D4` was already established as `volatile u16 *` in this unit's
-header (declared while matching `func_8002A378`/`func_8002B304`'s neighbours;
+header (declared while matching `CD_vol`/`func_8002B304`'s neighbours;
 see `code_179d8_g.c`'s extern block). Indices are the halfword offsets
 divided by 2 (`0x180/2 = 0xC0`, etc), matching retail's byte-offset
 immediates exactly through ordinary `u16 *` pointer arithmetic -- no cast

@@ -1,20 +1,22 @@
-# func_800299BC -- STALL (1 word LONG: built 162/retail 161 words; 19/161 raw words match per funcdiff, unreliable due to length drift; first diff read off asm-differ at file offset 0x1A1BC / vram 0x800299BC, `addiu sp,sp,-0x38` vs built `-0x40`; round-37 permuter search ran 102842 iterations, rc=124, best candidate NOT adopted -- see that round's addendum for why)
+# CD_sync -- STALL (1 word LONG: built 162/retail 161 words; 19/161 raw words match per funcdiff, unreliable due to length drift; first diff read off asm-differ at file offset 0x1A1BC / vram 0x800299BC, `addiu sp,sp,-0x38` vs built `-0x40`; round-37 permuter search ran 102842 iterations, rc=124, best candidate NOT adopted -- see that round's addendum for why)
+
+> Renamed from `func_800299BC` on 2026-09-23 (tools/rename.py). Address 0x800299bc.
 
 Unit `code_179d8_n`. Runner echo, round 26. Carved this round; no prior report exists.
 
 ## Signature
 
 ```c
-s32 func_800299BC(s32 arg0, s32 arg1);
+s32 CD_sync(s32 arg0, s32 arg1);
 ```
 
-Confirmed by two already-matched call sites: `src/code_179d8_b.c:110` (`return func_800299BC(arg0, arg1);`) and `src/code_179d8_n.c`'s own sibling `func_80029F10` (`func_800299BC(0, 0);`).
+Confirmed by two already-matched call sites: `src/code_179d8_b.c:110` (`return CD_sync(arg0, arg1);`) and `src/code_179d8_n.c`'s own sibling `CD_cw` (`CD_sync(0, 0);`).
 
 ## What this function does
 
 Waits for CD-ROM "Sync" status (`D_8008B3EC` is set to `D_80010A0C`, the string `"CD_sync"`). A `do`/`while` loop:
 
-1. Checks a deadline (`D_8008B3E4`, set to `func_80025900(-1) + 0x1E0` before the loop) and a spin counter (`D_8008B3E8`) against a `0x1E0000` threshold. On either timeout condition it prints `"CD timeout: "` + a formatted diagnostic (`"%s:(%s) Sync=%s, Ready=%s\n"`), calls `func_8002A510()` (a reset, matched in `code_179d8_g.c`), and returns `-1`.
+1. Checks a deadline (`D_8008B3E4`, set to `func_80025900(-1) + 0x1E0` before the loop) and a spin counter (`D_8008B3E8`) against a `0x1E0000` threshold. On either timeout condition it prints `"CD timeout: "` + a formatted diagnostic (`"%s:(%s) Sync=%s, Ready=%s\n"`), calls `CD_flush()` (a reset, matched in `code_179d8_g.c`), and returns `-1`.
 2. Otherwise, if `func_80024E64()` (a busy/status getter) is nonzero, drains a message-flush loop (`getintr()`, still `INCLUDE_ASM` in `code_179d8_b.c` but blocker-clean) that dispatches through two global callback pointers, `D_8006D600` and `D_8006D5FC`.
 3. Reads the CD-ROM's driver state byte `D_8006D8D8[0]`. If it is `2` or `5`, normalizes it to `2`, optionally copies an 8-byte snapshot (`D_8008B3CC`) into `arg1`, and returns the ORIGINAL state value.
 4. Otherwise, loops again if `arg0 == 0` (blocking wait), or returns `0` immediately (single non-blocking poll) if `arg0 != 0`.
@@ -63,7 +65,7 @@ extern void (*D_8006D5FC)(s32 arg0, void *arg1);
 extern s32 VSync(s32 arg0);                             /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                    /* asm/psyq_15d04.s */
 extern void printf(const char *fmt, ...);                /* Psy-Q printf wrapper */
-extern void func_8002A510(void);                                /* code_179d8_g.c, matched */
+extern void CD_flush(void);                                /* code_179d8_g.c, matched */
 extern s32 CheckCallback(void);                                 /* asm/psyq_GsLinkObject4.s */
 extern s32 getintr(void);                                 /* code_179d8_b.c, still INCLUDE_ASM there */
 
@@ -71,7 +73,7 @@ extern const char D_80010984[];        /* "CD timeout: " */
 extern const char D_80010994[];        /* "%s:(%s) Sync=%s, Ready=%s\n" */
 extern const char D_80010A0C[];        /* "CD_sync" */
 
-s32 func_800299BC(s32 arg0, s32 arg1)
+s32 CD_sync(s32 arg0, s32 arg1)
 {
     const char **table;
     u8 *state;
@@ -105,7 +107,7 @@ timeout:
         puts(D_80010984);
         printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
                       table[state[0]], table[state[1]]);
-        func_8002A510();
+        CD_flush();
         result = -1;
         goto skip_timeout;
 success:
@@ -164,9 +166,9 @@ ready:
 ## What is known independently of this body
 
 - Screened blocker-clean at carve time (round 26): no `gp_rel`, no forward `mflo`/`mfhi`-before-`mult`/`div`, no `jr $t2` trampoline, no `jtbl_`.
-- `D_8008B3E4`/`D_8008B3E8`/`D_8008B3EC` are a poll-deadline/counter/message-pointer trio shared with the unit's other two functions (`func_80029C40`, `func_80029F10`) -- all three run the identical timeout-and-print idiom against a different `D_8008B3EC` message.
-- `D_8006D8D8` is a 3-byte driver-state array (bytes `[0]`, `[1]`, `[2]` each independently meaningful -- `func_80029C40` reads all three, this function only `[0]`/`[1]`).
-- `getintr`'s return value is a bitmask: bit `0x4` gates a call through `D_8006D600(state[1], D_8008B3D4)`, bit `0x2` gates a call through `D_8006D5FC(state[0], D_8008B3CC)`. `func_8002ADE8` (`code_179d8_g.c`, matched) independently documents `D_8006D600` being assigned `func_8002B4D4` as a callback, consistent with this reading.
+- `D_8008B3E4`/`D_8008B3E8`/`D_8008B3EC` are a poll-deadline/counter/message-pointer trio shared with the unit's other two functions (`CD_ready`, `CD_cw`) -- all three run the identical timeout-and-print idiom against a different `D_8008B3EC` message.
+- `D_8006D8D8` is a 3-byte driver-state array (bytes `[0]`, `[1]`, `[2]` each independently meaningful -- `CD_ready` reads all three, this function only `[0]`/`[1]`).
+- `getintr`'s return value is a bitmask: bit `0x4` gates a call through `D_8006D600(state[1], D_8008B3D4)`, bit `0x2` gates a call through `D_8006D5FC(state[0], D_8008B3CC)`. `CD_readm` (`code_179d8_g.c`, matched) independently documents `D_8006D600` being assigned `func_8002B4D4` as a callback, consistent with this reading.
 - The format string `D_80010994` is confirmed via `asm/data/FD8.rodata.s`: `"%s:(%s) Sync=%s, Ready=%s\n"` -- 4 `%s`, matching the 4 non-format arguments in the `func_80012C20` call.
 
 ### Proposed learning
@@ -178,7 +180,7 @@ ready:
 Per CLAUDE.md's "BUILD any inherited/preserved body ONCE before trusting its
 recorded score" and round 31's "a preserved body's `jal` targets can go STALE
 across an SDK-object round": the body above, as literally written, calls
-`func_80025900`/`func_80025AE4`/`func_8002A510`(unaffected)/`func_80024E64`/
+`func_80025900`/`func_80025AE4`/`CD_flush`(unaffected)/`func_80024E64`/
 `getintr`/`func_80012C20` by round-26's placeholder names. Four of
 those six are now stale -- SDK-object conversion rounds between 26 and 35
 renamed them to their real Sony symbols: `func_80025900` -> `VSync`,
@@ -245,7 +247,7 @@ declaring it earlier -- a different POSITION for the same
 `readyVal = 2;` placed immediately before the `if (st == readyVal)`
 check, matching the candidate's position exactly, and rebuilt.
 
-**Result: `build/lsdde.map` shows the next function (`func_80029C40`)
+**Result: `build/lsdde.map` shows the next function (`CD_ready`)
 landing at `0x80029c3c` -- this build is now 160/161 words, 1 word
 SHORT, where the round-35 baseline was 162/161, 1 word LONG.** The
 1-word gap did not close; it flipped sign. Raw word-match (now
@@ -263,7 +265,7 @@ this report's own three-round finding that this specific hoist is a
 GCC-side value-availability decision no C rewrite controls in the wanted
 direction.
 
-**Judgment call: NOT adopted.** Unlike `func_80029F10`'s sibling result
+**Judgment call: NOT adopted.** Unlike `CD_cw`'s sibling result
 this same round (where a length-exact state was adopted despite a raw-
 match tradeoff, because the structural gap count did not worsen), here
 the length gap did not close at all -- it merely changed sign, and the

@@ -93,7 +93,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `CheckDreamAuxTriggerCondition` 100/100. (a §"An arm that must JUMP")
 - **"A barrier had no effect" is positive evidence FOR block order**, as is a flat permuter plateau.
   But "a barrier does not transfer" has three causes — block order, intra-block scheduling, and DCE
-  (barrier-proof; `func_80029C40`) — and an `mflo`/`mfhi` is a NEGATIVE indicator. Once block order
+  (barrier-proof; `CD_ready`) — and an `mflo`/`mfhi` is a NEGATIVE indicator. Once block order
   is RIGHT, splitting into two C variables is actively harmful. (a §"\"A barrier had no effect\"")
 - **A shared `return` block lands where the FIRST `return` sits, and two early exits need an
   explicit `goto` to a hand-placed label** — even when both return the SAME value. Diagnostic:

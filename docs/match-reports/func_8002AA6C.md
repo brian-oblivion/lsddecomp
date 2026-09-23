@@ -32,7 +32,7 @@ worth resuming and one at 1/276 is not, and right now nobody knows which this
 is. The first thing the next attempt should do is get the LENGTH right — until
 then no per-function score from this shape means anything.
 
-Delta's own committed stall report for the sibling `func_8002A75C` (58/196,
+Delta's own committed stall report for the sibling `CD_init` (58/196,
 780/784 bytes) is the useful comparison: same unit, same session, and there
 the length was nearly right, which is what made its score readable.
 
@@ -81,11 +81,11 @@ s32 func_8002AA6C(void)
                             puts(D_80010A40);
                         }
                         counter++;
-                        func_80029F10(1, 0, 0, 0);
+                        CD_cw(1, 0, 0, 0);
                     }
 
-                    while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-                        func_80029F10(1, 0, 0, 0);
+                    while (CD_cw(0x16, D_8006D908, 0, 0)) {
+                        CD_cw(1, 0, 0, 0);
                         puts(D_80010A50);
                     }
 
@@ -93,10 +93,10 @@ s32 func_8002AA6C(void)
                     D_8006D904 = D_8006D614;
                 }
 
-                if (func_80029F10(9, 0, 0, 0) != 0) {
+                if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (func_80029F10(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -119,14 +119,14 @@ s32 func_8002AA6C(void)
 
             buf = (u8)p2[0];
             if (buf != D_8006D61C) {
-                if (func_80029F10(0xE, (s32)&buf, 0, 0) != 0) {
+                if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
                     goto tail;
                 }
             }
 
             D_8006D600 = (s32)func_8002B4D4;
             p2[-1] = p2[-2];
-            func_80029F10(6, 0, 0, 1);
+            CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
             p2[3] = VSync(-1) + 0x1E0;
             return p2[2];
@@ -141,7 +141,7 @@ s32 func_8002AA6C(void)
     return D_8006D8F4;
 }```
 
-Positioned between `func_8002A75C` and `func_8002ADE8` in ROM order.
+Positioned between `CD_init` and `CD_readm` in ROM order.
 
 ## What is known independently of this body
 
@@ -177,7 +177,7 @@ found for the identical global and an identical write-then-read shape.
 Before the fix, this build FOLDED the store's address (`sw
 v0,-0x2710(at)`); after routing it through a local pointer, it matches
 retail's unfolded `lui/addiu` + plain-offset store exactly. This is now
-a THIRD confirmed site (after `func_8002ADE8`'s `D_8006D8EC`/`D_8006D8F0`
+a THIRD confirmed site (after `CD_readm`'s `D_8006D8EC`/`D_8006D8F0`
 and `func_8002B4D4`'s own `D_8006D8F4` else-branch) where a global
 already declared `volatile` at file scope still needs a LOCAL pointer
 dereference to get unfolded addressing at one specific access -- see
@@ -198,7 +198,7 @@ class rarely yields to source-level levers, and given the function is
 now at a solid, well-understood baseline rather than an unknown one.
 
 **Not yet checked**: the `p2[-1] = p2[-2]; ... p2[2] = p2[-3]; p2[3] =
-...; return p2[2];` pointer-arithmetic block and the two `func_80029F10`
+...; return p2[2];` pointer-arithmetic block and the two `CD_cw`
 guard calls -- the diff shows these regions ALREADY MATCH retail
 byte-for-byte (confirmed via `asm-differ`, no markers in that range),
 so the salvaged body's derivation of these fields was already correct;
@@ -254,7 +254,7 @@ closed this exactly:
     s32 v0 = p2[0];
     buf = (u8)v0;
     if ((u8)v0 != D_8006D61C) {
-        if (func_80029F10(0xE, (s32)&buf, 0, 0) != 0) {
+        if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
             goto tail;
         }
     }
@@ -268,12 +268,12 @@ is independently correct per CLAUDE.md's guidance to fix incrementally
 and not revert a change with independent evidence behind it merely
 because the aggregate score doesn't immediately improve.
 
-### Fix 2: missing `__asm__("")` barrier before the reused func_8002A510 tail block (149 -> 171/223)
+### Fix 2: missing `__asm__("")` barrier before the reused CD_flush tail block (149 -> 171/223)
 
 The round-19/round-17 salvaged body's copy of the driver-reset tail
 (`D_8006D8DA = 0; q = &D_8006D8D9; D_8006D61C = 0; *q = D_8006D8DA;
 D_8006D8D8[0] = 2; ...`) was MISSING the `__asm__("");` barrier that the
-canonical `func_8002A510` version of this exact block carries between
+canonical `CD_flush` version of this exact block carries between
 `*q = D_8006D8DA;` and `D_8006D8D8[0] = 2;`. Adding it back (this
 report's earlier body simply never had it) fixed a real reordering in
 that block. This is the same idiom `func_8002B4D4.md` and this report's
@@ -385,11 +385,11 @@ s32 func_8002AA6C(void)
                             puts(D_80010A40);
                         }
                         counter++;
-                        func_80029F10(1, 0, 0, 0);
+                        CD_cw(1, 0, 0, 0);
                     }
 
-                    while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-                        func_80029F10(1, 0, 0, 0);
+                    while (CD_cw(0x16, D_8006D908, 0, 0)) {
+                        CD_cw(1, 0, 0, 0);
                         puts(D_80010A50);
                     }
 
@@ -397,10 +397,10 @@ s32 func_8002AA6C(void)
                     D_8006D904 = D_8006D614;
                 }
 
-                if (func_80029F10(9, 0, 0, 0) != 0) {
+                if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (func_80029F10(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -426,7 +426,7 @@ s32 func_8002AA6C(void)
                 s32 v0 = p2[0];
                 buf = (u8)v0;
                 if ((u8)v0 != D_8006D61C) {
-                    if (func_80029F10(0xE, (s32)&buf, 0, 0) != 0) {
+                    if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
                         goto tail;
                     }
                 }
@@ -434,7 +434,7 @@ s32 func_8002AA6C(void)
 
             D_8006D600 = (s32)func_8002B4D4;
             p2[-1] = p2[-2];
-            func_80029F10(6, 0, 0, 1);
+            CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
             p2[3] = VSync(-1) + 0x1E0;
             return p2[2];
@@ -470,7 +470,7 @@ trusted instead of tested.
 Also: **the "reused tail block needs a barrier at the same position every
 time it's copied" idiom (originally found for `D_8006D8F4` in
 `func_8002B4D4.md`) generalizes to the WHOLE shared 8-statement
-`func_8002A510`-style tail, not just to single-scalar volatile writes** --
+`CD_flush`-style tail, not just to single-scalar volatile writes** --
 this function's copy was missing it purely because the salvaged snapshot
 predated the discovery. Any future function that reuses this block
 should carry the barrier from the start.
@@ -574,7 +574,7 @@ that lever only helps while the C's block order is WRONG.
 
 ### The hypothesis does not explain the confirmed-PURE-scheduling residues either, and this is a genuine boundary, not a gap in testing
 
-`func_8002A75C`'s round-20 permuter run measured its residue's `--debug`
+`CD_init`'s round-20 permuter run measured its residue's `--debug`
 breakdown directly: **`Reorderings: 3` with `Register Differences: 0`,
 `Insertions: 0`, `Deletions: 0`** -- the permuter's own scorer, which can
 see block/CFG-shape mismatches as insertions or deletions, reports NONE.
@@ -635,7 +635,7 @@ block-order hypothesis correctly identifies exactly one of them:**
    internal heuristics (register-pressure estimates, pass ordering) that
    are not expressible from source at all in the forms tried. A barrier
    CAN in principle fix an ordering problem, and does, elsewhere in this
-   project (e.g. `func_8002ADE8`'s three-way case-store barrier) -- but
+   project (e.g. `CD_readm`'s three-way case-store barrier) -- but
    only when the barrier's position happens to coincide with where the
    scheduler's tie-break needs breaking. When it does not (this
    function's `a3`/`jal` split, this pass's `func_8002B640` constant-load
@@ -726,7 +726,7 @@ short of byte-exact stays in `src/`); build re-verified clean after revert
 3. Emission-order vs. source-order: not applicable here -- no new reorder
    attempted this round.
 4. Permuter negative is evidence about one search, not the function: not run
-   here this round (budget went to `func_8002A75C`'s extended search
+   here this round (budget went to `CD_init`'s extended search
    instead, which has a permuter-confirmed pure-scheduling residue --
    AA6C's is a confirmed register-identity one and is not a comparable
    target).
@@ -755,7 +755,7 @@ current" while their preserved code blocks still called the raw names).
 
 Rebuilt the round-20 202/223 body verbatim (names already correct per round
 33), **in isolation** (all five other stalled siblings in this unit reverted
-to `INCLUDE_ASM` -- see `func_8002A75C.md`'s round-36 entry: this unit's
+to `INCLUDE_ASM` -- see `CD_init.md`'s round-36 entry: this unit's
 known 1-word-short sibling, `func_8002B3F4`, shifts every later `.bss`
 address project-wide when left live alongside anything else, which pollutes
 a non-isolated `funcdiff.py` read even though the target function's own code
@@ -815,11 +815,11 @@ s32 func_8002AA6C(void)
                             puts(D_80010A40);
                         }
                         counter++;
-                        func_80029F10(1, 0, 0, 0);
+                        CD_cw(1, 0, 0, 0);
                     }
 
-                    while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-                        func_80029F10(1, 0, 0, 0);
+                    while (CD_cw(0x16, D_8006D908, 0, 0)) {
+                        CD_cw(1, 0, 0, 0);
                         puts(D_80010A50);
                     }
 
@@ -827,10 +827,10 @@ s32 func_8002AA6C(void)
                     D_8006D904 = D_8006D614;
                 }
 
-                if (func_80029F10(9, 0, 0, 0) != 0) {
+                if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (func_80029F10(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -856,7 +856,7 @@ s32 func_8002AA6C(void)
                 s32 v0 = p2[0];
                 buf = (u8)v0;
                 if ((u8)v0 != D_8006D61C) {
-                    if (func_80029F10(0xE, (s32)&buf, 0, 0) != 0) {
+                    if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
                         goto tail;
                     }
                 }
@@ -864,7 +864,7 @@ s32 func_8002AA6C(void)
 
             D_8006D600 = (s32)func_8002B4D4;
             p2[-1] = p2[-2];
-            func_80029F10(6, 0, 0, 1);
+            CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
             p2[3] = VSync(-1) + 0x1E0;
             return p2[2];
@@ -887,7 +887,7 @@ s32 func_8002AA6C(void)
 ```
 
 ### Proposed learning
-This unit's own `func_8002A75C.md` round-36 entry has the full mechanism,
+This unit's own `CD_init.md` round-36 entry has the full mechanism,
 but the short version worth repeating here: `funcdiff.py` scores for ANY
 stalled function in this unit are only trustworthy when EVERY OTHER stalled
 sibling is also reverted to `INCLUDE_ASM` -- the unit's confirmed
@@ -1017,7 +1017,7 @@ on the resulting object shows GCC materializes `D_80010AAC`'s address into
 (`asm/nonmatchings/code_179d8_g/func_8002AA6C.s`, `.L8002AAC8:`) recomputes
 the same `lui`/`addiu` pair FRESH INSIDE the loop, every iteration. Because
 `$a0` is caller-saved and every iteration of this loop makes several calls
-(`printf`, `func_80029F10` more than once) that clobber it, **the hoisted
+(`printf`, `CD_cw` more than once) that clobber it, **the hoisted
 form is a real correctness bug**: on any iteration after the first where
 the retry counter (`D_8006D8DC[0]`) is still `< 7` (a condition the loop
 itself is built to make happen -- that is the entire point of the retry
@@ -1046,8 +1046,8 @@ s32 v0 = p2[0];
 buf = (u8)v0;
 n = ((u8)v0 != D_8006D61C);      /* was: if ((u8)v0 != D_8006D61C) */
 if (n) {
-    saved = (s32)&buf;            /* was: func_80029F10(0xE, (s32)&buf, 0, 0) */
-    if (func_80029F10(0xE, saved, 0, 0) != 0) {
+    saved = (s32)&buf;            /* was: CD_cw(0xE, (s32)&buf, 0, 0) */
+    if (CD_cw(0xE, saved, 0, 0) != 0) {
         goto tail;
     }
 }
@@ -1084,7 +1084,7 @@ neighbourhood, both negative and both cheap to rule out:
   and shortens the function. Confirms this unit's established
   "`volatile` on the global alone is not enough; a local `volatile T *`
   pointer is what forces retail's unfolded addressing mode" idiom
-  (`func_8002ADE8.md`, `func_8002A510.md`) applies here too. Reverted.
+  (`CD_readm.md`, `CD_flush.md`) applies here too. Reverted.
 
 ### What's left at 215/223: two small, apparently unrelated register/scheduling clusters
 
@@ -1156,11 +1156,11 @@ s32 func_8002AA6C(void)
                             puts(D_80010A40);
                         }
                         counter++;
-                        func_80029F10(1, 0, 0, 0);
+                        CD_cw(1, 0, 0, 0);
                     }
 
-                    while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-                        func_80029F10(1, 0, 0, 0);
+                    while (CD_cw(0x16, D_8006D908, 0, 0)) {
+                        CD_cw(1, 0, 0, 0);
                         puts(D_80010A50);
                     }
 
@@ -1168,10 +1168,10 @@ s32 func_8002AA6C(void)
                     D_8006D904 = D_8006D614;
                 }
 
-                if (func_80029F10(9, 0, 0, 0) != 0) {
+                if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (func_80029F10(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -1199,7 +1199,7 @@ s32 func_8002AA6C(void)
                 n = ((u8)v0 != D_8006D61C);
                 if (n) {
                     saved = (s32)&buf;
-                    if (func_80029F10(0xE, saved, 0, 0) != 0) {
+                    if (CD_cw(0xE, saved, 0, 0) != 0) {
                         goto tail;
                     }
                 }
@@ -1207,7 +1207,7 @@ s32 func_8002AA6C(void)
 
             D_8006D600 = (s32)func_8002B4D4;
             p2[-1] = p2[-2];
-            func_80029F10(6, 0, 0, 1);
+            CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
             p2[3] = VSync(-1) + 0x1E0;
             return p2[2];
@@ -1374,7 +1374,7 @@ me, not on the round-17 label.
 
 **Hybrid, both halves reviewed:**
 - The overall control-flow/loop structure, the retry-counter decrement
-  idiom, the reused `func_8002A510`/link-wait blocks and the final
+  idiom, the reused `CD_flush`/link-wait blocks and the final
   `volatile s32 *pF4` unfolded-addressing idiom are hand-derived across
   rounds 17-39.
 - The `n`/`saved` throwaway-sink reuse inside the `{ s32 v0 = p2[0]; ... }`
@@ -1400,7 +1400,7 @@ me, not on the round-17 label.
 Residue at 215/223: two small isolated clusters (a loop-setup scheduling
 swap and a register-identity swap in the final block), both confirmed
 inert to every reorder/spelling axis tried across rounds 41 and 49.
-Compiles clean under `-DNON_MATCHING` (one pre-existing `func_80029F10`
+Compiles clean under `-DNON_MATCHING` (one pre-existing `CD_cw`
 int-from-pointer warning, no errors).
 
 NON_MATCHING body promoted, round 68.

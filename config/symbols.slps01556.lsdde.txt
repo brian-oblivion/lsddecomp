@@ -1373,3 +1373,33 @@ gSpriteShiftScratch = 0x80087880;
 // pinned CD_sync, bios.o's own order; libcd's CDROM/DiskError strings (report).
 // Matched as C in round 70. Renamed round 71 (bravo, track 2).
 getintr = 0x80029478; // type:func  (Psy-Q libcd/bios, shape match, no linked object)
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_ready by relocation), shape 1.00 vs libcd/bios CD_ready. Round 71 (bravo, track 2).
+CD_ready = 0x80029C40; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_cw by relocation), shape 0.99-1.00 vs libcd/bios CD_cw. Round 71 (bravo, track 2).
+CD_cw = 0x80029F10; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libcd/bios CD_vol (discs 3.3,3.5,3.6). Round 71 (bravo, track 2).
+CD_vol = 0x8002A378; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_shell by relocation), position in libcd/bios. Round 71 (bravo, track 2).
+CD_shell = 0x8002A400; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_flush by relocation), position in libcd/bios. Round 71 (bravo, track 2).
+CD_flush = 0x8002A510; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libcd/bios CD_initvol (discs 3.3,3.5,3.6). Round 71 (bravo, track 2).
+CD_initvol = 0x8002A5F8; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_initintr by relocation), position in libcd/bios. Round 71 (bravo, track 2).
+CD_initintr = 0x8002A6EC; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_init by relocation), position in libcd/bios. Round 71 (bravo, track 2).
+CD_init = 0x8002A75C; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libcd/bios CD_readm (disc 3.3). Round 71 (bravo, track 2).
+CD_readm = 0x8002ADE8; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_sync by relocation), shape 0.99-1.00 vs libcd/bios CD_sync. Round 71 (bravo, track 2).
+CD_sync = 0x800299BC; // type:func

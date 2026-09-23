@@ -94,7 +94,7 @@ re-run.
 writes `(&D_8006D8F8)[-1]`: negative indexing off a named global is only
 meaningful if the neighbouring word is part of the same object. The ten
 consecutive words `D_8006D8DC..D_8006D900` are therefore ONE ARRAY -- which
-`func_8002ADE8`'s zeroing walk (`p = &D_8006D8DC; for (i = 9; ...)`) had
+`CD_readm`'s zeroing walk (`p = &D_8006D8DC; for (i = 9; ...)`) had
 already implied in the same unit without anyone drawing the conclusion.
 
 They are now declared and indexed as one:
@@ -102,7 +102,7 @@ They are now declared and indexed as one:
 ```c
 extern s32 D_8006D8DC[10];
 ...
-    p   = D_8006D8DC;        /* was &D_8006D8DC, in func_8002ADE8 */
+    p   = D_8006D8DC;        /* was &D_8006D8DC, in CD_readm */
     pF8 = &D_8006D8DC[7];    /* was &D_8006D8F8                   */
 ```
 
@@ -201,7 +201,7 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
 - On timeout, prints `"CD timeout: "` then `"%s:(%s) Sync=%s, Ready=%s\n"`
   (`D_80010994`, confirmed 4-`%s` format via `asm/data/FD8.rodata.s`) with
   args `(D_8008B3EC, D_8006D620[D_6006D61D], D_8006D6A0[D_8006D8D8[0]],
-  D_8006D6A0[D_8006D8D8[1]])`, calls `func_8002A510()`, and returns -1.
+  D_8006D6A0[D_8006D8D8[1]])`, calls `CD_flush()`, and returns -1.
   **This means `D_8006D620`/`D_8006D6A0` are STRING-POINTER tables (each
   element is a `char *`, stored as `s32`), not raw values — worth carrying
   forward for whoever next touches `func_8002B198`, see the anomaly note
@@ -284,7 +284,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         __asm__("");
         func_80012C20(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
                       p6A0[idx0], p6A0[idx1]);
-        func_8002A510();
+        CD_flush();
         result = -1;
         goto after_diag;
 
@@ -355,7 +355,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
    documents in this unit, confirmed a second time here.
 3. **The copy loop needed the file's own established
    `for (i = N; i != -1; i--)` idiom** (already used by the matched
-   `func_8002A6EC`), not `n = 8; do {...} while (--n != 0);` — the two
+   `CD_initintr`), not `n = 8; do {...} while (--n != 0);` — the two
    compile to different instruction counts (retail's shape needs a
    dedicated `$a2 = -1` sentinel register and a `bne`, not a `bnez`) and
    only the sentinel form reproduces retail exactly, word-for-word,
@@ -480,7 +480,7 @@ stalls read for the question.
   worth checking BEFORE any byte-copy loop in this codebase, not just
   reaching for `do {} while(--n)`** — the two are not compile-equivalent
   under this pinned toolchain (different sentinel register usage), and
-  this project already has one confirmed instance (`func_8002A6EC`) plus
+  this project already has one confirmed instance (`CD_initintr`) plus
   this one.
 
 ## Round 33 (runner charlie): re-verified 153/174, one new negative, title already had all three figures
@@ -517,7 +517,7 @@ with no new mechanism would just re-spend budget confirming that.
 
 **Symbol-name note (same finding as `func_8002AA6C.md` this round)**: this
 report's preserved body already used the current names (`puts`, `printf`,
-`VSync`, `CheckCallback`) -- unlike `func_8002AA6C`/`func_8002A75C`'s
+`VSync`, `CheckCallback`) -- unlike `func_8002AA6C`/`CD_init`'s
 reports, whoever wrote this one had already picked up the rename. Worth
 flagging the inconsistency across this unit's reports rather than assuming
 any one of them reflects current symbol names.
@@ -547,7 +547,7 @@ any one of them reflects current symbol names.
    checked against the RAW `.s`'s actual instruction sequence (not a prose
    paraphrase) before being tried -- still negative.
 4. Permuter negative is one search, not a verdict on the function: not run
-   here this round (budget went to `func_8002A75C` instead, which has a
+   here this round (budget went to `CD_init` instead, which has a
    cleaner permuter debug signature -- pure reordering, no register/
    insertion/deletion component -- making it the stronger candidate for an
    extended search).
@@ -558,7 +558,7 @@ any one of them reflects current symbol names.
 ### Proposed learning
 A source-level evaluation-order swap of two independent scalar loads
 feeding into the SAME call's arguments is inert here, matching this unit's
-broader finding (`func_8002A75C.md`) that cc1 2.6.3's argument-evaluation
+broader finding (`CD_init.md`) that cc1 2.6.3's argument-evaluation
 order for a call is not steered by which local is assigned first in source.
 Worth treating as a low-probability lever generally in this codebase rather
 than re-trying it by default on the next redundant-load residue.
@@ -574,7 +574,7 @@ correction inserted above it. Translated all four.
 
 Rebuilt the 153/174 body with the fix, **in isolation** (all five other
 stalled siblings in this unit reverted to `INCLUDE_ASM` -- see
-`func_8002A75C.md`'s round-36 entry for why): `build exit=2`, no compile
+`CD_init.md`'s round-36 entry for why): `build exit=2`, no compile
 errors, `funcdiff.py` reports **153/174 words, no staleness warning,
 compiled length exact at 174/174** -- matches the round-25/33 recorded
 figure exactly once the names are actually current. No discrepancy between
@@ -697,7 +697,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         pEC = &D_8008B3EC;
         printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
                p6A0[idx0], p6A0[idx1]);
-        func_8002A510();
+        CD_flush();
         result = -1;
         goto after_diag;
 
@@ -842,7 +842,7 @@ the function outright: 173 -> 174/174, BYTE-EXACT.**
 
 Confirmed via the strongest available check, not just `funcdiff.py`'s
 in-range read: reverted every other stalled sibling in this unit
-(`func_8002AA6C`, `func_8002A75C`, `func_8002B198`, `func_8002B3F4`,
+(`func_8002AA6C`, `CD_init`, `func_8002B198`, `func_8002B3F4`,
 `func_8002B4D4`) to `INCLUDE_ASM`, rebuilt, and `./build-and-verify.sh`
 reports **`OK: build matches retail SLPS_015.56`, exit 0** -- the whole-image
 SHA1, not a per-function window.
@@ -920,7 +920,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
         pEC = &D_8008B3EC;
         printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
                p6A0[idx0], p6A0[idx1]);
-        func_8002A510();
+        CD_flush();
         result = -1;
         goto after_diag;
 

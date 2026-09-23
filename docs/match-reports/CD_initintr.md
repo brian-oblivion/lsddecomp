@@ -1,4 +1,6 @@
-# func_8002A6EC
+# CD_initintr
+
+> Renamed from `func_8002A6EC` on 2026-09-23 (tools/rename.py). Address 0x8002a6ec.
 
 **Unit:** code_179d8_g · **Size:** 28 words · **Status:** MATCHED (28/28 words)
 
@@ -13,7 +15,7 @@ ten consecutive words starting at `D_8006D8DC`, then calls
 ## The C
 
 ```c
-void func_8002A6EC(void)
+void CD_initintr(void)
 {
     s32 *p;
     s32 i;
@@ -32,13 +34,13 @@ void func_8002A6EC(void)
 }
 ```
 
-## The zeroing-loop shape -- important for the sibling func_8002A75C
+## The zeroing-loop shape -- important for the sibling CD_init
 
 The ten words zeroed here (`D_8006D8DC` through `D_8006D900`) are each
 ALREADY individually named symbols (confirmed against the true, undrifted
 link -- see below), not a real C array; splat named each one separately
 because each is also referenced individually elsewhere in this unit
-(`D_8006D8E0`/`D_8006D8E4` as plain scalars in `func_8002ADE8`, etc). Writing
+(`D_8006D8E0`/`D_8006D8E4` as plain scalars in `CD_readm`, etc). Writing
 this as `for (i = 0; i < 9; i++) D_8006D8DC[i] = 0;` over a declared
 `s32 D_8006D8DC[9]` compiles to a SHORTER, single-register pointer-compare
 loop -- 4 bytes short of retail, which uses a separate down-counting index
@@ -61,10 +63,10 @@ live in a later-linked `.data`/`.rodata` object -- even earlier-defined,
 already-matched functions in the SAME file appear to "break" with every word
 after the first `lui` looking wrong.** This is exactly
 `docs/MATCHING-GUIDE.md`'s documented address-drift class, but the
-presentation was confusing enough to write down concretely: `func_8002A378`
+presentation was confusing enough to write down concretely: `CD_vol`
 (the FIRST function in this file, matched and unchanged) started reporting
 27/34 with every `%lo` immediate off by 4, purely because a LATER function in
-the same file (`func_8002A6EC`) was compiling 4 bytes short. `funcdiff.py`'s
+the same file (`CD_initintr`) was compiling 4 bytes short. `funcdiff.py`'s
 "build differs OUTSIDE this range" warning is the tell -- trust it over the
 per-function word count when several unrelated-looking functions all show
 partial mismatches at once.

@@ -1,4 +1,6 @@
-# func_8002A400
+# CD_shell
+
+> Renamed from `func_8002A400` on 2026-09-23 (tools/rename.py). Address 0x8002a400.
 
 **Unit:** code_179d8_g · **Size:** 68 words · **Status:** MATCHED (68/68 words)
 
@@ -6,15 +8,15 @@
 
 If `D_8006D904 < D_8006D614` (a periodic-service counter is behind), saves
 and clears the `D_8006D5FC` callback, prints a one-shot "waiting" message
-while `D_8006D60C & 0x10` stays set (calling `func_80029F10(1,0,0,0)` each
-iteration), then retries `func_80029F10(0x16, D_8006D908, 0, 0)` printing a
+while `D_8006D60C & 0x10` stays set (calling `CD_cw(1,0,0,0)` each
+iteration), then retries `CD_cw(0x16, D_8006D908, 0, 0)` printing a
 "still waiting" message until it succeeds, restores `D_8006D5FC`, and
 catches `D_8006D904` up to `D_8006D614`.
 
 ## The C
 
 ```c
-void func_8002A400(void)
+void CD_shell(void)
 {
     s32 saved;
     s32 counter = 0;
@@ -28,11 +30,11 @@ void func_8002A400(void)
                 func_80025AE4(D_80010A40);
             }
             counter++;
-            func_80029F10(1, 0, 0, 0);
+            CD_cw(1, 0, 0, 0);
         }
 
-        while (func_80029F10(0x16, D_8006D908, 0, 0)) {
-            func_80029F10(1, 0, 0, 0);
+        while (CD_cw(0x16, D_8006D908, 0, 0)) {
+            CD_cw(1, 0, 0, 0);
             func_80025AE4(D_80010A50);
         }
 

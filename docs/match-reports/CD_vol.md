@@ -1,4 +1,6 @@
-# func_8002A378
+# CD_vol
+
+> Renamed from `func_8002A378` on 2026-09-23 (tools/rename.py). Address 0x8002a378.
 
 **Unit:** code_179d8_g · **Size:** 34 words · **Status:** MATCHED (34/34 words)
 
@@ -13,7 +15,7 @@ finishes with a fixed terminator byte `0x20`.
 ## The C
 
 ```c
-s32 func_8002A378(u8 *arg0)
+s32 CD_vol(u8 *arg0)
 {
     *D_8006D8C0 = 2;
     *D_8006D8C8 = arg0[0];
@@ -35,7 +37,7 @@ pointee matters for later functions that spin-poll through similarly-shaped
 pointers (see `func_8002B304`), so the whole family is typed consistently.
 
 Sibling `code_179d8_b.c` already carries its own extern for this function as
-`s32 func_8002A378(void *arg0)` (called from `func_800291C8`). This unit's own
+`s32 CD_vol(void *arg0)` (called from `func_800291C8`). This unit's own
 reading uses `u8 *` since the body indexes it byte-wise -- kept local per the
 project's multiple-independent-local-views convention, not promoted to a
 shared header.
@@ -43,4 +45,4 @@ shared header.
 ### Proposed learning
 
 None beyond what's already documented (address-drift bites unit-local extern
-declarations too, not just struct edits -- see func_8002A6EC's report).
+declarations too, not just struct edits -- see CD_initintr's report).

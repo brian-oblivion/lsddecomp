@@ -19,9 +19,9 @@
  *
  * Blocker census at carve time, four screens per function (gp_rel,
  * forward nop_mflo_mfhi, `jr $t2` trampoline, jtbl):
- *   func_800299BC (161w)  CLEAN
- *   func_80029C40 (180w)  CLEAN
- *   func_80029F10 (282w)  CLEAN
+ *   CD_sync (161w)  CLEAN
+ *   CD_ready (180w)  CLEAN
+ *   CD_cw (282w)  CLEAN
  * 3 of 3 clean, zero trivial `jr $ra` leaves.  These are BIG bodies, so this
  * unit is far larger in work than 3 suggests -- budget accordingly.
  *
@@ -42,8 +42,8 @@
  * project header with any other unit.
  *
  * Round 26 (echo): all three functions were worked to near-misses and
- * STALLED -- see docs/match-reports/func_800299BC.md (162/161, 1 word LONG),
- * func_80029C40.md (178/180, 2 words short) and func_80029F10.md (278/282,
+ * STALLED -- see docs/match-reports/CD_sync.md (162/161, 1 word LONG),
+ * CD_ready.md (178/180, 2 words short) and CD_cw.md (278/282,
  * 4 words short).  Every residue is an already-characterized GCC 2.6.3
  * quirk (a hoisted-constant register choice, dead-code-eliminated redundant
  * masks, and delay-slot/addressing-mode scheduling) documented in
@@ -62,24 +62,24 @@
  * same globals). Round 26's bodies, spliced verbatim, would not have LINKED
  * under today's tree -- the "a preserved body's `jal` targets can go STALE
  * across an SDK-object round" hazard from round 31 (DECOMPILATION_LEARNINGS.md).
- * `func_8002A510` and `getintr` were NOT renamed (still real game
+ * `CD_flush` and `getintr` were NOT renamed (still real game
  * code, still INCLUDE_ASM/matched under those names in sibling units).
  *
  * All three bodies were rebuilt this round with the four names corrected,
  * plus a couple of quick untried levers per rounds 31/33's newer findings
- * (routing the func_800299BC hoisted-constant "2" through a separate named
- * local; reading func_80029C40's two flag bytes through a `volatile u8 *`
+ * (routing the CD_sync hoisted-constant "2" through a separate named
+ * local; reading CD_ready's two flag bytes through a `volatile u8 *`
  * cast). All three REPRODUCED their round-26 recorded scores exactly
  * (162/161, 178/180, 278/282) and neither new lever moved anything --
  * consistent with round 33's finding that a GCSE/value-availability hoist
- * (func_800299BC's case) and a genuinely-redundant-mask DCE (func_80029C40's
+ * (CD_sync's case) and a genuinely-redundant-mask DCE (CD_ready's
  * case, independently re-confirmed here against the live `.s` rather than
  * inherited from a citation to the now-SDK-owned `func_8002B94C`) are both
  * immune to source-level rescue by construction, not by insufficient
  * effort. Re-filed as STALLS; see the three match reports for the updated
  * verdicts and the round-35 addenda.
  *
- * Round 37 (echo): re-confirmed func_80029C40's and func_80029F10's
+ * Round 37 (echo): re-confirmed CD_ready's and CD_cw's
  * round-35 bodies by rebuilding each live and checking funcdiff/lsdde.map
  * before trusting either score (both reproduce exactly), then preserved
  * both verbatim in `#if 0` blocks ahead of a permuter search -- neither had
@@ -88,12 +88,12 @@
  */
 #include "common.h"
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_n", func_800299BC);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_n", CD_sync);
 
 /* Round 37 (echo): re-splice of the round-35 rebuild, verbatim, to confirm
  * the recorded 178/180 score before a permuter search -- per CLAUDE.md's
  * "build the inherited body before you trust its score" discipline. See
- * docs/match-reports/func_80029C40.md for the full derivation; this is a
+ * docs/match-reports/CD_ready.md for the full derivation; this is a
  * STALL (2 words short, both instances of a redundant `andi` mask after an
  * already-zero-extending `lbu` that GCC's instruction selection elides by
  * choosing the load's destination register directly). Restored to
@@ -118,14 +118,14 @@ extern u8 D_8008B3DC[];                /* 8-byte record, this function's second 
 extern void (*D_8006D600)(s32 arg0, void *arg1);
 extern void (*D_8006D5FC)(s32 arg0, void *arg1);
 
-extern void func_8002A510(void);
+extern void CD_flush(void);
 extern s32 getintr(void);
 
 extern const char D_80010984[];
 extern const char D_80010994[];
 extern const char D_80010A14[];        /* "CD_ready" */
 
-s32 func_80029C40(s32 arg0, s32 arg1)
+s32 CD_ready(s32 arg0, s32 arg1)
 {
     const char **table;
     u8 *state;
@@ -162,7 +162,7 @@ timeout:
         puts(D_80010984);
         printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
                       table[state[0]], table[state[1]]);
-        func_8002A510();
+        CD_flush();
         result = -1;
         goto skip_timeout;
 success:
@@ -236,7 +236,7 @@ ret1:
     return 0;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_n", func_80029C40);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_n", CD_ready);
 
 /* Round 37 (echo): STALL, now 282/282 (LENGTH exact, no drift into
  * anything downstream) -- up from 278/282, via two stacked permuter-found
@@ -279,9 +279,9 @@ extern u8 D_8008B3D4[];
 extern void (*D_8006D600)(s32 arg0, void *arg1);
 extern void (*D_8006D5FC)(s32 arg0, void *arg1);
 
-extern void func_8002A510(void);
+extern void CD_flush(void);
 extern s32 getintr(void);
-extern s32 func_800299BC(s32 arg0, s32 arg1);          /* defined earlier in this unit, ROM order */
+extern s32 CD_sync(s32 arg0, s32 arg1);          /* defined earlier in this unit, ROM order */
 
 extern const char D_80010984[];
 extern const char D_80010994[];
@@ -289,7 +289,7 @@ extern const char D_80010A20[];        /* "%s...\n" */
 extern const char D_80010A28[];        /* "%s: no param\n" */
 extern const char D_80010A38[];        /* "CD_cw" */
 
-s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
+s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
 {
     const char **table;
     volatile u8 *state;
@@ -313,7 +313,7 @@ s32 func_80029F10(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
         return -2;
     }
 
-    func_800299BC(0, 0);
+    CD_sync(0, 0);
 
     if ((arg0 & 0xFF) == 2) {
         src = (const u8 *)arg1;
@@ -366,7 +366,7 @@ timeout3:
             src = table[state[1]];
             printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
                           table[state[0]], src);
-            func_8002A510();
+            CD_flush();
             result = -1;
             goto skip_timeout3;
 success3:
@@ -415,4 +415,4 @@ skip_timeout3:
     return (D_8006D8D8[0] == 5) ? -1 : 0;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_n", func_80029F10);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_n", CD_cw);

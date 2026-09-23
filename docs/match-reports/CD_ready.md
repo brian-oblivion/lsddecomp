@@ -1,18 +1,20 @@
-# func_80029C40 -- STALL (2 words SHORT: built 178/retail 180 words; 17/180 raw words match per funcdiff, unreliable due to length drift; first diff read off asm-differ at file offset 0x1A444 / vram 0x80029C40 -- an INHERITED-drift artifact from the sibling `func_800299BC` being 1 word long, not a defect in this function -- the first defect belonging to this function's own body is the missing `andi $a2, $v0, 0xFF` at retail file offset 0x1A640 / vram 0x80029E40)
+# CD_ready -- STALL (2 words SHORT: built 178/retail 180 words; 17/180 raw words match per funcdiff, unreliable due to length drift; first diff read off asm-differ at file offset 0x1A444 / vram 0x80029C40 -- an INHERITED-drift artifact from the sibling `CD_sync` being 1 word long, not a defect in this function -- the first defect belonging to this function's own body is the missing `andi $a2, $v0, 0xFF` at retail file offset 0x1A640 / vram 0x80029E40)
+
+> Renamed from `func_80029C40` on 2026-09-23 (tools/rename.py). Address 0x80029c40.
 
 Unit `code_179d8_n`. Runner echo, round 26. Carved this round; no prior report exists.
 
 ## Signature
 
 ```c
-s32 func_80029C40(s32 arg0, s32 arg1);
+s32 CD_ready(s32 arg0, s32 arg1);
 ```
 
-Confirmed by the already-matched call site `src/code_179d8_b.c:115` (`return func_80029C40(arg0, arg1);`).
+Confirmed by the already-matched call site `src/code_179d8_b.c:115` (`return CD_ready(arg0, arg1);`).
 
 ## What this function does
 
-Sibling of `func_800299BC` (see that report for the shared timeout/print/flush-loop idiom, reused verbatim here against `D_8008B3EC = D_80010A14` = `"CD_ready"` instead of `"CD_sync"`). The tail differs: instead of one state byte tested against two values, this function checks TWO INDEPENDENT flag bytes at `D_8006D8D8[2]` and `D_8006D8D8[1]`:
+Sibling of `CD_sync` (see that report for the shared timeout/print/flush-loop idiom, reused verbatim here against `D_8008B3EC = D_80010A14` = `"CD_ready"` instead of `"CD_sync"`). The tail differs: instead of one state byte tested against two values, this function checks TWO INDEPENDENT flag bytes at `D_8006D8D8[2]` and `D_8006D8D8[1]`:
 
 - If `D_8006D8D8[2] != 0`: clear it, optionally copy an 8-byte snapshot (`D_8008B3DC`) into `arg1`, return the ORIGINAL flag value.
 - Else if `D_8006D8D8[1] != 0`: clear it, optionally copy a DIFFERENT 8-byte snapshot (`D_8008B3D4`) into `arg1`, return the original flag value.
@@ -31,7 +33,7 @@ In both spots, retail loads the flag byte with `lbu $v0, N($s3)` and then REDUND
 
 Two real fixes ARE folded into the body below and are worth keeping on record:
 
-1. **Same timeout/success block-order fix as `func_800299BC`** (`goto timeout`/`goto success`/shared `result`, success placed as a trailing landing pad) -- this function shares that whole preamble verbatim.
+1. **Same timeout/success block-order fix as `CD_sync`** (`goto timeout`/`goto success`/shared `result`, success placed as a trailing landing pad) -- this function shares that whole preamble verbatim.
 2. **The store-then-copy sequence in each flag block needs a `__asm__("")` barrier directly after the flag-clearing store, or GCC sinks the store into the following branch's delay slot instead of leaving it where retail has it (immediately after the load+mask).** Without the barrier: `beqz $a2,skip [delay: move $a1,arg1] ... beqz $a1,ret [delay: STORE]` (store deferred into the SECOND branch's delay slot -- wrong). With the barrier: `beqz $a2,skip [delay:nop] ... STORE ... move $a1,arg1 ... beqz $a1,ret [delay: li $v1,7]` (store immediate, matches retail exactly). This closed a 2-word gap in the `flag1` block (`state2[-1]`) outright and fixed the `flag2` block's ordering too, though `flag2`'s own `beqz` tests `arg1` directly rather than the already-copied `dst`, so it did not need the barrier to reach the right SHAPE -- only to reach the right POSITION for the store; both blocks needed it once verified against the raw `.s`, since positions differ (see the two distinct `if` shapes in the body: `flag2` tests `arg1 == 0` raw, matching retail's `beqz $s4,...`; `flag1` tests the already-materialized `dst == 0`, matching retail's `beqz $a1,...` after `move $a1,$s4` as a real, non-delay-slot instruction). **This IS a genuine ordering residue a barrier fixes, unlike the `andi` mask above -- the two look similar (both "redundant instruction" residues) but are different causes per CLAUDE.md's four-ways-a-score-lies discipline applied at instruction granularity, and only one of the two responds to the same lever.**
 
 ## Body, as reached (178/180 words, near-miss)
@@ -59,7 +61,7 @@ extern void (*D_8006D5FC)(s32 arg0, void *arg1);
 extern s32 VSync(s32 arg0);
 extern void puts(const char *arg0);
 extern void printf(const char *fmt, ...);
-extern void func_8002A510(void);
+extern void CD_flush(void);
 extern s32 CheckCallback(void);
 extern s32 getintr(void);
 
@@ -67,7 +69,7 @@ extern const char D_80010984[];
 extern const char D_80010994[];
 extern const char D_80010A14[];        /* "CD_ready" */
 
-s32 func_80029C40(s32 arg0, s32 arg1)
+s32 CD_ready(s32 arg0, s32 arg1)
 {
     const char **table;
     u8 *state;
@@ -104,7 +106,7 @@ timeout:
         puts(D_80010984);
         printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
                       table[state[0]], table[state[1]]);
-        func_8002A510();
+        CD_flush();
         result = -1;
         goto skip_timeout;
 success:
@@ -183,7 +185,7 @@ ret1:
 
 - Screened blocker-clean at carve time (round 26).
 - `D_8008B3DC` is a NEW symbol this unit introduces (not referenced by `code_179d8_g.c` or `code_179d8_b.c`'s own local views) -- an 8-byte scratch buffer parallel to `D_8008B3CC`/`D_8008B3D4`, no dlabel in `asm/data/*.s` (uninitialized/BSS-style, same as those two).
-- The two flag bytes (`D_8006D8D8[1]`, `D_8006D8D8[2]`) are read/written ONLY by this function within the unit; `func_800299BC` and `func_80029F10` only ever touch `D_8006D8D8[0]`/`[1]`.
+- The two flag bytes (`D_8006D8D8[1]`, `D_8006D8D8[2]`) are read/written ONLY by this function within the unit; `CD_sync` and `CD_cw` only ever touch `D_8006D8D8[0]`/`[1]`.
 
 ### Proposed learning
 
@@ -209,7 +211,7 @@ ret1:
 > is real and complete -- go read the C in `src/code_179d8_g.c` rather than
 > the report's summary of it.
 
-Same stale-symbol-name hazard as `func_800299BC` (see that report's round-35
+Same stale-symbol-name hazard as `CD_sync` (see that report's round-35
 addendum): the body above calls `func_80025900`/`func_80025AE4`/
 `func_80024E64`/`func_80012C20` under round-26's placeholder names, all four
 since renamed (`VSync`/`puts`/`CheckCallback`/`printf`). Rebuilt this round
@@ -257,11 +259,11 @@ been tried against it and both are negative.
 Rebuilt the round-35 body live first (per this round's "build the
 inherited body before trusting its score" discipline): reproduces
 exactly, `build exit=2`, no compile errors, `build/lsdde.map` confirms
-`func_80029C40` links at the correct retail address `0x80029c40`.
+`CD_ready` links at the correct retail address `0x80029c40`.
 Preserved verbatim, then ran this function's **first-ever permuter
 search** -- it was one of the round's identified never-searched near-misses.
 
-`tools/setup-permuter.sh func_80029C40 <seed>` scaffolded cleanly.
+`tools/setup-permuter.sh CD_ready <seed>` scaffolded cleanly.
 `--debug --stack-diffs` sanity check: **base score = 1265** (13
 register-difference lines, 0 insertions/deletions at the top level --
 consistent with the two missing `andi` instructions rippling register
@@ -270,7 +272,7 @@ displacements, not a small isolated diff). Matches this report's own
 framing, so the scaffold is scoring the right residue.
 
 Ran the bounded search: `timeout 900 ... permuter.py -j 6 --stop-on-zero
---best-only --stack-diffs permuter-work/func_80029C40`, rc captured on
+--best-only --stack-diffs permuter-work/CD_ready`, rc captured on
 the very next command. **rc=124** (the 900-second bound fired; nothing
 external killed it). **67179 iterations, and the best score seen across
 the entire run never dropped below the starting 1265** -- every candidate
@@ -295,19 +297,19 @@ residue as very unlikely to pay off without a new lever first.
 
 **One more quick hand test, prompted by a cross-function finding, also
 negative:** this round's permuter search on this unit's OTHER sibling
-`func_80029F10` found that declaring the shared global `D_8006D8D8[3]`
+`CD_cw` found that declaring the shared global `D_8006D8D8[3]`
 (and the local pointers aliasing it) `volatile` closes 3 of that
-function's 4 missing words (see `func_80029F10.md`'s round-37 addendum).
+function's 4 missing words (see `CD_cw.md`'s round-37 addendum).
 Since this function also aliases the same global through `state`/
 `state1`/`state2`, tried the identical lever here: `extern volatile u8
 D_8006D8D8[3];` plus retyping all three local pointers to `volatile u8
 *`. **No change whatsoever** -- rebuilt, `build/lsdde.map` shows
-`func_80029F10` (the next function, still `INCLUDE_ASM`/byte-exact)
+`CD_cw` (the next function, still `INCLUDE_ASM`/byte-exact)
 landing at the same `0x80029f08`, 2 words short of retail, identical to
 the un-modified baseline. This function's residue is a byte-load
 DESTINATION-REGISTER choice on VALUE reads of two flag bytes (confirmed
 above), not a redundant-instruction-elision on address computation or
-staleness the way `func_80029F10`'s was -- the two residues only LOOKED
+staleness the way `CD_cw`'s was -- the two residues only LOOKED
 similar ("something about `D_8006D8D8` accesses"), and the lever that
 helped one function did nothing for the other. Reverted immediately;
 `src/code_179d8_n.c` confirmed back to its committed state
