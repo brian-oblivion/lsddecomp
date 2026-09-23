@@ -36,7 +36,7 @@ extern SByte3_d294 D_8008A8F8_b __asm__("D_8008A8F8");
 
 void Unk18Obj__InitDefaults(Unk18Obj *self) {
     self->unk90 = 0;
-    self->unk70 = 0;
+    self->otReady = 0;
     __asm__("");
     self->unk34.a = D_8008A8FC;
     self->unk34.b = D_8008A900;
@@ -47,10 +47,10 @@ void Unk18Obj__InitDefaults(Unk18Obj *self) {
     self->unk40 = 0x100;
     self->unk4C = 0xA;
     self->unk50 = 0x10000;
-    self->unk54 = 0;
-    self->unk60 = 0x4E20;
-    self->unk5B = D_8008A8F8;
-    self->unk58 = D_8008A8F8_b;
+    self->lightMode = 0;
+    self->fogNear = 0x4E20;
+    self->farColor = D_8008A8F8;
+    self->clearColor = D_8008A8F8_b;
     self->unkB4 = 0;
     self->unkB8 = 1;
 }
@@ -63,16 +63,16 @@ void Unk18Obj__SetUnk3C(Unk18Obj *self, s32 a1) {
     self->unk3C = a1;
 }
 
-/* Only writes unk44 the first time (guarded by the unk70 latch). */
+/* Only writes unk44 the first time (guarded by the otReady latch). */
 void Unk18Obj__SetUnk44(Unk18Obj *self, s32 a1) {
-    if (self->unk70 == 0) {
+    if (self->otReady == 0) {
         self->unk44 = a1;
     }
 }
 
 /* Same guard as Unk18Obj__SetUnk44, writes unk48 instead. */
 void Unk18Obj__SetUnk48(Unk18Obj *self, s32 a1) {
-    if (self->unk70 == 0) {
+    if (self->otReady == 0) {
         self->unk48 = a1;
     }
 }
@@ -88,19 +88,19 @@ void func_8003EA74(void) {
 }
 
 void Unk18Obj__SetUnk54(Unk18Obj *self, s32 a1) {
-    self->unk54 = a1;
+    self->lightMode = a1;
 }
 
 void Unk18Obj__SetUnk58(Unk18Obj *self, SByte3_d294 *src) {
-    self->unk58 = *src;
+    self->clearColor = *src;
 }
 
 void Unk18Obj__SetUnk5B(Unk18Obj *self, SByte3_d294 *src) {
-    self->unk5B = *src;
+    self->farColor = *src;
 }
 
 void Unk18Obj__SetUnk60(Unk18Obj *self, s32 a1) {
-    self->unk60 = a1;
+    self->fogNear = a1;
 }
 
 /* GsSetRefView2 is Sony's (`libgs/gs_131.o`, linked from the SDK object).
@@ -182,7 +182,7 @@ void Unk18Obj__InitOt(Unk18Obj *self) {
     s32 buf;
     s32 hdrSize = 0x14; /* sizeof(GsOT) */
 
-    if (self->unk70 != 0) {
+    if (self->otReady != 0) {
         return;
     }
 
@@ -210,8 +210,8 @@ void Unk18Obj__InitOt(Unk18Obj *self) {
     GsClearOt(0, 0, self->unk78);
     GsClearOt(0, 0, self->unk7C);
 
-    self->unk70 = 1;
-    self->unk74 = 0;
+    self->otReady = 1;
+    self->otIndex = 0;
 }
 
 /* Sony's `DrawSync` (libgpu/sys, fingerprint exact vs the disc corpus, not
@@ -224,10 +224,10 @@ extern void DrawSync(s32 mode);
 
 /* Teardown counterpart to Unk18Obj__InitOt's init. */
 void Unk18Obj__DeinitOt(Unk18Obj *self) {
-    if (self->unk70 != 0) {
+    if (self->otReady != 0) {
         DrawSync(0);
         func_80017CFC((void *)self->unk78);
-        self->unk70 = 0;
+        self->otReady = 0;
     }
 }
 
@@ -246,18 +246,18 @@ void Unk18Obj__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     }
 }
 
-/* Per-frame update, guarded by self->unk70 (only runs once Unk18Obj__InitOt's
+/* Per-frame update, guarded by self->otReady (only runs once Unk18Obj__InitOt's
  * init has succeeded). Notifies slotA0 if self->unk10->unkC is set,
- * updates three sub-objects (unk40/unk4C/unk54), conditionally re-notifies
- * a PsyQ helper when unk54 is 1 or 3, resets self->unk30's pointee,
+ * updates three sub-objects (unk40/unk4C/lightMode), conditionally re-notifies
+ * a PsyQ helper when lightMode is 1 or 3, resets self->unk30's pointee,
  * recomputes self->unk98 from the (unk50-unk4C)/(1<<unk3C) division,
- * forwards the current unk74-indexed slot to two more helpers, dispatches
+ * forwards the current otIndex-indexed slot to two more helpers, dispatches
  * slotA0 again with self->unkAC, and finally -- if self->unk10 is set --
  * walks it to its list tail and dispatches slotA0 a third time with that
  * tail. */
 /* Psy-Q's GTE far-colour register writer (libgte/reg03, linked from Sony's
  * own SDK object). LOCAL to this unit, not code_2cc8c.h -- see the note on
- * SetGeomScreen below. This call site reads self->unk5B's own three bytes
+ * SetGeomScreen below. This call site reads self->farColor's own three bytes
  * UNSIGNED (`lbu`, not `lb`) even though Unk18Obj__SetUnk5B writes them as signed
  * bytes; the disagreement is kept as a local cast rather than a retype of the
  * field. Sony's own argument type is `long` for each. */
@@ -284,7 +284,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
     s32 idx;
     Unk18Obj *tail;
 
-    if (self->unk70 == 0) {
+    if (self->otReady == 0) {
         return;
     }
 
@@ -294,12 +294,12 @@ void Unk18Obj__Update(Unk18Obj *self) {
 
     Unk18Obj__SetGeomScreen((Unk18Obj *)self->unk40);
     func_8003FB0C(self->unk4C);
-    GsSetLightMode(self->unk54);
+    GsSetLightMode(self->lightMode);
 
-    if (self->unk54 == 1 || self->unk54 == 3) {
-        u8 *rawBytes = (u8 *)&self->unk5B;
+    if (self->lightMode == 1 || self->lightMode == 3) {
+        u8 *rawBytes = (u8 *)&self->farColor;
         SetFarColor(rawBytes[0], rawBytes[1], rawBytes[2]);
-        SetFogNear(self->unk60, self->unk40);
+        SetFogNear(self->fogNear, self->unk40);
     }
 
     GsSetRefView2(&self->unk14);
@@ -307,10 +307,10 @@ void Unk18Obj__Update(Unk18Obj *self) {
 
     self->unk98 = (u32)(self->unk50 - self->unk4C) / (u32)(1 << self->unk3C) + 1;
 
-    idx = self->unk74;
+    idx = self->otIndex;
     func_8003FBE4(*(s32 *)((u8 *)self + 0x88 + idx * 4));
 
-    idx = self->unk74;
+    idx = self->otIndex;
     GsClearOt(0, 0, *(s32 *)((u8 *)self + 0x78 + idx * 4));
 
     ((void (*)(Unk18Obj *, void *))self->methods->slotA0)(self, self->unkAC);
@@ -324,7 +324,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
 /* Sony's `GsDrawOt` (libgs/gs_111, linked from the SDK object since round
  * 34; was func_8003FBF4, and was declared in include/code_2cc8c.h until this
  * round). Local for the same collision reason as the three above. Sony's own
- * argument is a `GsOT *`; this call site passes the same unk74-indexed slot
+ * argument is a `GsOT *`; this call site passes the same otIndex-indexed slot
  * it hands GsClearOt, as a plain word, and is left that way.
  * gs_111 and gs_112 are byte-identical objects defining GsDrawOt and
  * GsDrawOtIO at this one address -- gs_111/GsDrawOt is what the build links. */
@@ -333,26 +333,26 @@ extern void GsDrawOt(s32 a0);
 /* Sony's `GsSortClear` (libgs/gs_001, fingerprint exact vs the disc corpus,
  * not yet linked from an SDK object). Local for the same collision reason as
  * the three above: LIBGS.H's own prototype is `void GsSortClear(u_char r,
- * u_char g, u_char b, GsOT *ot);`. This call site reads self->unk58's own
+ * u_char g, u_char b, GsOT *ot);`. This call site reads self->clearColor's own
  * three bytes UNSIGNED (same "writer reads signed, this reader reads
- * unsigned" situation as unk5B/Unk18Obj__Update) and passes the fourth as a
+ * unsigned" situation as farColor/Unk18Obj__Update) and passes the fourth as a
  * plain word, same as GsClearOt/GsDrawOt above. */
 extern void GsSortClear(u8 a0, u8 a1, u8 a2, s32 a3);
 
-/* Recomputes self->unk74 from self->unkC->methods->slot54, optionally
+/* Recomputes self->otIndex from self->unkC->methods->slot54, optionally
  * resets the graphics context and re-notifies self->unkC->methods->slot50
- * (once, or twice more if unk74 is still 0), forwards the current
- * unk74-indexed slot to two rendering helpers, then finally collapses
- * self->unk74 to a plain boolean (1 if it was 0, else 0). */
+ * (once, or twice more if otIndex is still 0), forwards the current
+ * otIndex-indexed slot to two rendering helpers, then finally collapses
+ * self->otIndex to a plain boolean (1 if it was 0, else 0). */
 void Unk18Obj__Flip(Unk18Obj *self) {
     s32 idx;
     u8 *rawBytes;
 
-    if (self->unk70 == 0) {
+    if (self->otReady == 0) {
         return;
     }
 
-    self->unk74 = self->unkC->methods->slot54(self->unkC);
+    self->otIndex = self->unkC->methods->slot54(self->unkC);
     if (self->unkB8 == 0) {
         goto tail_check;
     }
@@ -361,25 +361,25 @@ void Unk18Obj__Flip(Unk18Obj *self) {
     self->unkC->methods->slot50(self->unkC);
 
     if (self->unkB4 != 0) {
-        if (self->unk74 == 0) {
+        if (self->otIndex == 0) {
             self->unkC->methods->slot50(self->unkC);
         }
     }
 
-    idx = self->unk74;
-    rawBytes = (u8 *)&self->unk58;
+    idx = self->otIndex;
+    rawBytes = (u8 *)&self->clearColor;
     GsSortClear(rawBytes[0], rawBytes[1], rawBytes[2],
                 *(s32 *)((u8 *)self + 0x78 + idx * 4));
 
-    idx = self->unk74;
+    idx = self->otIndex;
     GsDrawOt(*(s32 *)((u8 *)self + 0x78 + idx * 4));
 
-    if (self->unkB4 != 0 && self->unk74 == 0) {
+    if (self->unkB4 != 0 && self->otIndex == 0) {
         self->unkC->methods->slot50(self->unkC);
     }
 
 tail_check:
-    self->unk74 = (self->unk74 == 0);
+    self->otIndex = (self->otIndex == 0);
 }
 
 /* Only runs when self->unk10 is NULL: releases the current self->unkB0 (if

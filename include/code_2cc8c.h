@@ -653,38 +653,70 @@ struct Unk18Obj {
        before storing either, ruling out sequential per-field stores. */
     Pair32_d294 unk34;
     /* +0x03C..+0x048, round 13 (code_2cc8c_d): four plain field setters
-       (Unk18Obj__SetUnk3C/EA2C/EA48/EA64), all `sw $a1, N($a0)` or the same
-       guarded by `if (self->unk70 == 0)`. No further evidence of real
-       type/meaning beyond "a stored word", so kept `s32`. */
+       (Unk18Obj__SetUnk3C/SetUnk44/SetUnk48/SetUnk40), all `sw $a1, N($a0)`
+       or the same guarded by `if (self->otReady == 0)`. No further evidence
+       of real type/meaning beyond "a stored word", so kept `s32`. */
     s32 unk3C;                  /* +0x03C, OBSERVED: Unk18Obj__SetUnk3C (round 13) */
     s32 unk40;                  /* +0x040, OBSERVED: Unk18Obj__SetUnk40 (round 13) */
     s32 unk44;                  /* +0x044, OBSERVED: Unk18Obj__SetUnk44 (round 13),
-                                    only written when `self->unk70 == 0` */
+                                    only written when `self->otReady == 0` */
     s32 unk48;                  /* +0x048, OBSERVED: Unk18Obj__SetUnk48 (round 13),
-                                    only written when `self->unk70 == 0` */
+                                    only written when `self->otReady == 0` */
     s32 unk4C;                  /* +0x04C, OBSERVED: Unk18Obj__Update (round 14) */
     s32 unk50;                  /* +0x050, OBSERVED: Unk18Obj__Update (round 14) */
-    s32 unk54;                  /* +0x054, OBSERVED: Unk18Obj__SetUnk54 (round 13) */
+    s32 lightMode;              /* +0x054, OBSERVED: Unk18Obj__SetUnk54 (round 13).
+                                    RENAMED round 73 (charlie): the sole real
+                                    consumer is Unk18Obj__Update's own
+                                    `GsSetLightMode(self->lightMode)` call,
+                                    which also gates the far-color/fog-near
+                                    dispatch there (`if (lightMode == 1 ||
+                                    lightMode == 3)`). Exclusive to
+                                    code_2cc8c_d.c. */
     /* +0x058/+0x05B, round 13 (code_2cc8c_d): two 3-byte fields, each
        copied wholesale from a caller-supplied 3-byte source via a WHOLE
-       struct assignment (Unk18Obj__SetUnk58/EAA4 -- MEASURED: retail loads all
-       three source bytes before storing any of them, ruling out a
-       sequential per-field copy). Bytes are signed (`lb`, not `lbu`).
-       Real element type unknown, so named generically rather than guessed
-       as e.g. an RGB triple. */
-    SByte3_d294 unk58;          /* +0x058, OBSERVED: Unk18Obj__SetUnk58 (round 13) */
-    SByte3_d294 unk5B;          /* +0x05B, OBSERVED: Unk18Obj__SetUnk5B (round 13) */
+       struct assignment (Unk18Obj__SetUnk58/Unk18Obj__SetUnk5B -- MEASURED:
+       retail loads all three source bytes before storing any of them, ruling
+       out a sequential per-field copy). Bytes are signed (`lb`, not `lbu`),
+       though both are also READ unsigned (`lbu`) at their one real consumer
+       each. RENAMED round 73 (charlie): each field's own name comes from its
+       one identified consumer in Unk18Obj__Flip/Unk18Obj__Update
+       respectively (see each field's own comment) -- tier B, not tier A,
+       since the RGB-triple reading is inferred from the consuming Sony API's
+       own shape, not proven for the field's bit-level meaning. */
+    SByte3_d294 clearColor;     /* +0x058, OBSERVED: Unk18Obj__SetUnk58 (round
+                                   13). Sole real consumer: Unk18Obj__Flip's
+                                   `GsSortClear(rawBytes[0..2], ...)` --
+                                   Sony's own screen-clear-color argument. */
+    SByte3_d294 farColor;       /* +0x05B, OBSERVED: Unk18Obj__SetUnk5B (round
+                                   13). Sole real consumer: Unk18Obj__Update's
+                                   `SetFarColor(rawBytes[0..2])` -- Sony's own
+                                   GTE far-color register writer. */
     u8 pad05E[0x060 - 0x05E];
-    s32 unk60;                  /* +0x060, OBSERVED: Unk18Obj__SetUnk60 (round 13) */
+    s32 fogNear;                /* +0x060, OBSERVED: Unk18Obj__SetUnk60 (round
+                                   13). RENAMED round 73 (charlie): sole real
+                                   consumer is Unk18Obj__Update's own
+                                   `SetFogNear(self->fogNear, self->unk40)`
+                                   call -- Sony's own near-fog-distance
+                                   setter's first argument. Exclusive to
+                                   code_2cc8c_d.c. */
     u8 pad064[0x070 - 0x064];
-    /* +0x070, round 13 (code_2cc8c_d): a guard flag -- Unk18Obj__SetUnk44/EA48
-       (above) only write unk44/unk48 when this is zero/NULL, i.e. a
-       "already initialized" latch. RESOLVED round 14: Unk18Obj__InitOt is its
-       own set site -- a one-time allocator/init routine, guarded by this
-       same flag, that sets it to 1 (and zeroes unk74) once it succeeds. */
-    s32 unk70;
-    s32 unk74;                  /* +0x074, OBSERVED: Unk18Obj__InitOt (round 14),
-                                    zeroed alongside unk70 */
+    /* +0x070, round 13 (code_2cc8c_d): a guard flag -- Unk18Obj__SetUnk44/
+       Unk18Obj__SetUnk48 (above) only write unk44/unk48 when this is
+       zero/NULL, i.e. an "already initialized" latch. RESOLVED round 14:
+       Unk18Obj__InitOt is its own set site -- a one-time allocator/init
+       routine, guarded by this same flag, that sets it to 1 (and zeroes
+       otIndex) once it succeeds. RENAMED round 73 (charlie): the whole
+       field IS this latch (Unk18Obj__InitOt/Unk18Obj__DeinitOt are its only
+       set sites), so `otReady` names the mechanics directly rather than
+       guessing what it gates conceptually. Exclusive to code_2cc8c_d.c. */
+    s32 otReady;
+    s32 otIndex;                /* +0x074, OBSERVED: Unk18Obj__InitOt (round
+                                   14), zeroed alongside otReady. RENAMED
+                                   round 73 (charlie): Unk18Obj__Flip both
+                                   READS it (to pick which OT half to drain)
+                                   and TOGGLES it (0<->1) every call -- the
+                                   double-buffer index, named after that
+                                   mechanic. Exclusive to code_2cc8c_d.c. */
     /* +0x078..+0x08C, round 14 (Unk18Obj__InitOt): seven `s32`-typed
        addresses/sizes carved out of one `func_80017B34` allocation --
        MEASURED, not modeled as real pointer types since retail computes
