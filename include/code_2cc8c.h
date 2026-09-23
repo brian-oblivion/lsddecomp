@@ -437,7 +437,7 @@ struct SubHandleObj {
    warning at the assignment, not the compiled bytes. Verified with a full
    rebuild. */
 extern Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3);
-extern Unk18AcObj *func_8001CA94(void); /* local view of include/code_d294.h's
+extern Unk18AcObj *New_Class6B5CC(void); /* local view of include/code_d294.h's
                                     own `New_Class6B5CC` allocator, returning
                                     `Class6B5CCObj *` there -- this unit's
                                     own view retyped (round 13) once
@@ -454,7 +454,7 @@ extern u8 D_8008A8F4[]; /* round 14, code_2cc8c_d (asm/data/7B008.sdata.s,
 
 /*
  * `Unk18Obj->unkAC`'s pointee (round 13, Unk18Obj__Finalize) -- the return of
- * `func_8001CA94`, first stored opaquely by `Unk18Obj__Unk18Obj` and here
+ * `New_Class6B5CC`, first stored opaquely by `Unk18Obj__Unk18Obj` and here
  * dereferenced and released through the inherited BasicClass "release"
  * slot. Only that one slot is modelled.
  */
@@ -706,7 +706,7 @@ struct Unk18Obj {
                                     a running count incremented by 1 each call */
     u8 pad09C[0x0AC - 0x09C];
     Unk18AcObj *unkAC;          /* +0x0AC, OBSERVED: Unk18Obj__Unk18Obj (round 13,
-                                  set from `func_8001CA94()`, a
+                                  set from `New_Class6B5CC()`, a
                                   `New_Class6B5CC` allocator, `code_d294.c`)
                                   and Unk18Obj__Finalize (round 13, dereferenced
                                   and released -- see `Unk18AcObj`'s own

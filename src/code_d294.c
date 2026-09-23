@@ -1,7 +1,7 @@
 #include "common.h"
 #include "code_d294.h"
 
-Class6B5CCObj *func_8001CA94(void) {
+Class6B5CCObj *New_Class6B5CC(void) {
     Class6B5CCObj *obj;
 
     obj = func_80017B34(0x44);

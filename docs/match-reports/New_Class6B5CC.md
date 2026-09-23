@@ -1,4 +1,6 @@
-# func_8001CA94
+# New_Class6B5CC
+
+> Renamed from `func_8001CA94` on 2026-09-23 (tools/rename.py). Address 0x8001ca94.
 
 **Unit:** code_d294 · **Size:** 24 words · **Status:** MATCHED (24/24 words)
 
@@ -16,7 +18,7 @@ instance.
 ## The C
 
 ```c
-Class6B5CCObj *func_8001CA94(void) {
+Class6B5CCObj *New_Class6B5CC(void) {
     Class6B5CCObj *obj;
 
     obj = func_80017B34(0x44);

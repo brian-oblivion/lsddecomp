@@ -27,7 +27,7 @@
  * established convention for classes discovered by table address rather
  * than by a plausible role (see Class6D3C8, Class86AA0, Class65650).
  *
- * func_8001CA94 is NOT a table slot -- it is the `New_Class6B5CC` allocator
+ * New_Class6B5CC is NOT a table slot -- it is the `New_Class6B5CC` allocator
  * wrapper (allocates 0x44 bytes, calls the ctor via `GetClass6B5CCMethods()->ctor`,
  * frees and returns NULL on ctor failure). GetClass6B5CCMethods is a plain
  * no-argument getter, `lui/addiu %hi/%lo(D_8006B5CC); jr $ra` -- MEASURED,
@@ -36,7 +36,7 @@
  * follows: other units call the same GetClass6B5CCMethods symbol with a different
  * argument count and are equally byte-exact. Declared here with 0 arguments
  * and a Class6B5CCMethods* return type, matching only THIS unit's call site
- * (func_8001CA94).
+ * (New_Class6B5CC).
  */
 
 /* ================= PSY-Q IDENTIFICATION (round 50, charlie) =================
@@ -722,7 +722,7 @@ extern void ApplyMatrixLV(); /* arity-ok: deliberately unprototyped (round 19, s
  * applies to ApplyMatrixToSVArray's declaration above. */
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 
-extern Class6B5CCObj *func_8001CA94(void);
+extern Class6B5CCObj *New_Class6B5CC(void);
 void *func_8001CAF4(Class6B5CCObj *self);
 void func_8001CBA4(Class6B5CCObj *self);
 void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other);

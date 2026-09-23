@@ -7,7 +7,7 @@
 `Class6B5CC`'s own constructor — vtable slot `+0x008` of `D_8006B5CC`
 (confirmed directly: `tools/classtable.py D_8006B5CC` names `func_8001CAF4`
 as the occupant of that slot). Takes an already-allocated `self` (the
-allocation itself is `func_8001CA94`, a separate `New_X` wrapper, not this
+allocation itself is `New_Class6B5CC`, a separate `New_X` wrapper, not this
 function). Allocates two sub-blocks (`self->unk14`, 0x50 bytes, then
 `self->unk14->unk44`, 0x28 bytes), frees the first and bails out if the
 second allocation fails, otherwise calls the BasicClass base constructor
