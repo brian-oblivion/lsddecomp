@@ -1,4 +1,6 @@
-# func_80055A24 -- MATCHED, round 46 (2026-09-15)
+# DrawStyleTables -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `func_80055A24` on 2026-09-23 (tools/rename.py). Address 0x80055a24.
 
 Unit `class_3bb8c_n`. **25/25 words, byte-exact.** Second build (one lever).
 
@@ -53,7 +55,7 @@ extern s32 D_80087450[];
 extern s32 D_8008745C[];
 extern s32 D_80087468[];
 
-void func_80055A24(void) {
+void DrawStyleTables(void) {
     void *a0, *a2;
     s32 a1;
 

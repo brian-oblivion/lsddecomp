@@ -1,16 +1,18 @@
-# func_80055874 -- MATCHED (31/31 words), class_3bb8c_n
+# IsStyleCueNear -- MATCHED (31/31 words), class_3bb8c_n
+
+> Renamed from `func_80055874` on 2026-09-23 (tools/rename.py). Address 0x80055874.
 
 Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 
 ## Signature
 
 ```c
-s32 func_80055874(ObjN14 *arg0, void *arg1);
+s32 IsStyleCueNear(ObjN14 *arg0, void *arg1);
 ```
 
-Called from `func_8005582C` in this unit (already matched, forward-declared
+Called from `StopStyleCueIfNear` in this unit (already matched, forward-declared
 this signature). `arg0` is the same `ObjN14 *` local-view type this unit
-carries for `func_800557DC`/`func_8005582C`; this function is the first to
+carries for `FlushStyleCue`/`StopStyleCueIfNear`; this function is the first to
 touch its padding region, so the local struct grows three named fields.
 
 ## Struct: `ObjN14` grows three fields
@@ -40,7 +42,7 @@ confirmed with `grep -rl ObjN14 src/ include/` before editing.
 ```c
 extern s32 D_80087474[];
 
-s32 func_80055874(ObjN14 *arg0, void *arg1) {
+s32 IsStyleCueNear(ObjN14 *arg0, void *arg1) {
     s32 dx, dy, dist;
     s8 idx;
 

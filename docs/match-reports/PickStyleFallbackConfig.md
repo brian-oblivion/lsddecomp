@@ -1,22 +1,24 @@
-# func_80054758 -- MATCHED (62/62 words), class_3bb8c_n
+# PickStyleFallbackConfig -- MATCHED (62/62 words), class_3bb8c_n
+
+> Renamed from `func_80054758` on 2026-09-23 (tools/rename.py). Address 0x80054758.
 
 Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 
 ## Signature
 
 ```c
-void *func_80054758(void);
+void *PickStyleFallbackConfig(void);
 ```
 
 The first function in the unit (ROM order), so every extern it needs is a
-fresh copy (same reasoning as `func_80054C74`/`func_8005556C`/
-`func_80054B84`).
+fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
+`StyleBuildEffectSlots`).
 
 ## New externs
 
 ```c
 extern s32 D_8008AC74;         /* already s32 in class_3bb8c_m.c */
-extern s32 D_8008AC6C;         /* already s32 in class_3bb8c_m.c and this unit's own func_80055A24 */
+extern s32 D_8008AC6C;         /* already s32 in class_3bb8c_m.c and this unit's own DrawStyleTables */
 extern s8 D_800873DC[];        /* 16-entry table, indexed by (D_8008AC74+D_8008AC6C)&0xF */
 extern s32 D_8008AC80;
 extern s8 D_800873D8[];        /* divisor table, indexed by "kind" -- raw index, no scale */
@@ -33,7 +35,7 @@ extern s32 D_8008AB50;
 ## Body
 
 ```c
-void *func_80054758(void) {
+void *PickStyleFallbackConfig(void) {
     s32 sum;
     s32 kind;
     s32 divisor;

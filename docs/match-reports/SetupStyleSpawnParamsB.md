@@ -1,4 +1,6 @@
-# func_80055410 -- MATCHED round 64, 87/87 words, ins 0 / del 0, length exact (0x15C)
+# SetupStyleSpawnParamsB -- MATCHED round 64, 87/87 words, ins 0 / del 0, length exact (0x15C)
+
+> Renamed from `func_80055410` on 2026-09-23 (tools/rename.py). Address 0x80055410.
 
 ## Round 64 (charlie) -- REVISIT, closed by DELETING one named local
 
@@ -12,7 +14,7 @@ shape rounds 46-48 recovered was already correct.**
 The inherited body did not rebuild at its recorded 25/87, for a reason that
 has nothing to do with this function: earlier in the same session I retyped
 the shared global `D_8008E0A4` from `extern u8 D_8008E0A4[]` to
-`extern s32 D_8008E0A4` to close `func_80055258`, and this body writes that
+`extern s32 D_8008E0A4` to close `SetupStyleSpawnParamsA`, and this body writes that
 symbol too. So the first figure below is the inherited body under the
 already-changed declaration, and the second is the inherited body's own
 recorded state, which I recovered afterwards by experiment.
@@ -79,7 +81,7 @@ extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0B8;
 
-void func_80055410(void *arg0, void *arg1) {
+void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     s32 mod3;
 
     rand();
@@ -97,7 +99,7 @@ void func_80055410(void *arg0, void *arg1) {
 }
 ```
 
-**This is the idiom the matched sibling `func_80055258`, two functions
+**This is the idiom the matched sibling `SetupStyleSpawnParamsA`, two functions
 earlier in the same unit, already used** -- inline `rand()` in every
 expression, no carrier local. Round 63's "check whether a sibling in the SAME
 function already uses the correct idiom" generalises to a sibling in the same
@@ -129,11 +131,11 @@ The `D_8008E0A4` retype moved this function **25/87 -> 10/87** and 2 words
 long -> 3 words long. Read at face value that is a regression, and the
 standing rule (`DECOMPILATION_LEARNINGS` 3d, "Levers do not commute: if a
 residue MOVES rather than SHRINKS, revert before the next") says revert it.
-I could not, because `func_80055258` requires the scalar declaration. Then
+I could not, because `SetupStyleSpawnParamsA` requires the scalar declaration. Then
 deleting the local closed the function *with the retype still in place*,
 which makes it look as though the two levers combined.
 
-**They did not.** One build settles it: I parked `func_80055258` back on
+**They did not.** One build settles it: I parked `SetupStyleSpawnParamsA` back on
 `INCLUDE_ASM` (so it contributes retail's own bytes at exact length and
 introduces no drift into this function's window), restored the array
 declaration and the `*(s32 *)` casts, and kept the no-local body. Result:
@@ -191,8 +193,8 @@ use.
   that stands -- and the search was on the one axis that could not reach the
   fix.
 - **Round 47 (bravo):** widened the signature to two dead `void *` params
-  (`func_80054DA4` dispatches this through a function pointer shared with
-  `func_80055258`, so the ABI slot is call-site-determined). Reproduced 25/87
+  (`StyleFillEffectKind0` dispatches this through a function pointer shared with
+  `SetupStyleSpawnParamsA`, so the ABI slot is call-site-determined). Reproduced 25/87
   under the wider signature, confirming dead params cost nothing in the
   callee. **Correct and kept in the matched body.**
 - **Round 46 (alpha):** recovered the structure and every value. The four

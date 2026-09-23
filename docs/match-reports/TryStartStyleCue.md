@@ -1,19 +1,21 @@
-# func_8005556C -- MATCHED (45/45 words), class_3bb8c_n
+# TryStartStyleCue -- MATCHED (45/45 words), class_3bb8c_n
+
+> Renamed from `func_8005556C` on 2026-09-23 (tools/rename.py). Address 0x8005556c.
 
 Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 
 ## Round 47 (bravo) addendum: signature widened again, this time NOT a dead param
 
-While deriving `func_80055620` (this unit, cold-fresh this round -- see its
+While deriving `FindNearestStyleCueEntry` (this unit, cold-fresh this round -- see its
 own report), found that its first real instruction reads and branches on
 `$a2`, and objdump of THIS function's already-matched object shows nothing
-sets `$a2` before that call -- `$a2` still holds `func_8005556C`'s own third
-parameter (`ctx`, called "dead" in `func_800558F0`'s round-46 report,
-correctly, from `func_8005556C`'s OWN body's point of view) forwarded
+sets `$a2` before that call -- `$a2` still holds `TryStartStyleCue`'s own third
+parameter (`ctx`, called "dead" in `TickStyle`'s round-46 report,
+correctly, from `TryStartStyleCue`'s OWN body's point of view) forwarded
 silently because no other value needed that register in between. Widened
-the call site from `func_80055620(&arg0->unk4, &arg0->unk10)` to
-`func_80055620(&arg0->unk4, &arg0->unk10, arg2)`, and widened the forward
-declaration accordingly. Rebuilt: **`func_8005556C` still scores 45/45**,
+the call site from `FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10)` to
+`FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2)`, and widened the forward
+declaration accordingly. Rebuilt: **`TryStartStyleCue` still scores 45/45**,
 whole-image SHA1 still verifies -- the added argument costs nothing because
 the register already held the right value. This is the argument-side
 counterpart to round 46's own "already-matched signature can be too narrow"
@@ -23,10 +25,10 @@ site under-declaring what it silently forwards.
 ## Signature
 
 ```c
-ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3);
+ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3);
 ```
 
-(`arg2`/`arg3` were already added as dead params by `func_800558F0`'s
+(`arg2`/`arg3` were already added as dead params by `TickStyle`'s
 round-46 report; `arg2` turned out to be genuinely forwarded, per above --
 "dead" was correct for THIS function's own body, not for what it passes on.)
 
@@ -39,9 +41,9 @@ the epilogue: the null path sets `v0 = 0`, the success path sets
 
 ```c
 extern s32 D_8008AC7C;                                 /* fresh copy -- see below */
-extern void *func_80055620(void *arg0, s32 *arg1, void *arg2);  /* forward decl, own unit,
+extern void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);  /* forward decl, own unit,
                                                           111w, STALL -- widened round 47,
-                                                          see func_80055620.md */
+                                                          see FindNearestStyleCueEntry.md */
 extern s32 D_800874B0[];                                /* 14-slot table, class_3bb8c_r.c's D_800874B0 */
 extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 ```
@@ -52,8 +54,8 @@ arg4)`); this call site only needs `void *`/`s32` at the ABI level (matches
 the looser local signatures `Entity.c` and `DreamSys.c` already use for the
 same cross-unit call, per the multiple-independent-local-views convention).
 `D_8008AC7C` is redeclared fresh here (not reusing the copy later in this
-file for `func_800557DC`/`func_8005582C`) because this function's ROM
-address is earlier -- same pattern as `func_80054C74`'s fresh `D_8008AC80`
+file for `FlushStyleCue`/`StopStyleCueIfNear`) because this function's ROM
+address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `D_8008AC80`
 copy. `D_800874B0` is `class_3bb8c_r.c`'s already-identified 14-function
 table (its own `ParamMethods` slot list); here it is read as a raw `s32`
 bit pattern (a function pointer forwarded opaquely as `InitSoundCueSet`'s 5th
@@ -64,10 +66,10 @@ nothing here calls through it.
 ## Body
 
 ```c
-ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
+ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     ObjN14Sub *sub;
 
-    sub = (ObjN14Sub *) func_80055620(&arg0->unk4, &arg0->unk10, arg2);
+    sub = (ObjN14Sub *) FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2);
     if (sub != 0) {
         arg0->unk0 = sub;
         InitSoundCueSet(*(s32 *) D_8008AC7C, &arg0->unk14, sub->unk6, arg0, D_800874B0[sub->unk6]);

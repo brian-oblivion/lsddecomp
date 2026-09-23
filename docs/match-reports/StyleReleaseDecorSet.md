@@ -1,4 +1,6 @@
-# func_80054B50 -- MATCHED, round 46 (2026-09-15)
+# StyleReleaseDecorSet -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `func_80054B50` on 2026-09-23 (tools/rename.py). Address 0x80054b50.
 
 Unit `class_3bb8c_n`. **13/13 words, byte-exact.** First build.
 
@@ -21,7 +23,7 @@ Fresh ground, carved round 45, never attempted. No blockers.
 jr $ra
 ```
 
-Same one-shot-flag shape as `func_80054714`: test `D_8008AB50`, act, then
+Same one-shot-flag shape as `StyleFlushDecoration`: test `D_8008AB50`, act, then
 clear the flag. `ReleaseBasicClassArray` is already established across the codebase
 (`src/code_8220_b.c`, `src/class_3bb8c_o.c`, `src/class_3bb8c_s.c`) as
 `void ReleaseBasicClassArray(void **array, s32 count)`. `D_8008E10C` is plain `.bss`
@@ -37,7 +39,7 @@ extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 D_8008AB50;
 extern void *D_8008E10C[];
 
-void func_80054B50(void) {
+void StyleReleaseDecorSet(void) {
     if (D_8008AB50 != 0) {
         ReleaseBasicClassArray(D_8008E10C, 0x12);
         D_8008AB50 = 0;

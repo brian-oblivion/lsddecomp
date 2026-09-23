@@ -1,4 +1,6 @@
-# func_80054B1C -- MATCHED, round 46 (2026-09-15)
+# AdjustRgbByDelta -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `func_80054B1C` on 2026-09-23 (tools/rename.py). Address 0x80054b1c.
 
 Unit `class_3bb8c_n`. **13/13 words, byte-exact.** First build.
 
@@ -28,7 +30,7 @@ before this one) reads a 3-byte-stride colour table (`D_800872C4`) into the
 same region of globals this unit's other functions touch.
 
 ```c
-void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
+void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
     dst[0] = src[0] - delta;
     dst[1] = src[1] - delta;
     dst[2] = src[2] + delta;

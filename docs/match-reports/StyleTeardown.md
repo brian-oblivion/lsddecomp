@@ -1,4 +1,6 @@
-# func_80054D30 -- MATCHED, round 46 (2026-09-15)
+# StyleTeardown -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `func_80054D30` on 2026-09-23 (tools/rename.py). Address 0x80054d30.
 
 Unit `class_3bb8c_n`. **29/29 words, byte-exact.** First build.
 
@@ -6,7 +8,7 @@ Unit `class_3bb8c_n`. **29/29 words, byte-exact.** First build.
 
 Fresh ground, carved round 45, never attempted. Already declared in the
 shared header (`include/class_3bb8c.h:2557`, `extern void
-func_80054D30(void);`) and called with no arguments from
+StyleTeardown(void);`) and called with no arguments from
 `src/class_3bb8c_l.c:173`, which fixed its signature before any decompiling
 started here.
 
@@ -16,24 +18,24 @@ started here.
 addiu $sp, $sp, -0x20
 sw    $ra, 0x18($sp)
 sw    $s1, 0x14($sp)
-jal   func_80054714
+jal   StyleFlushDecoration
  sw   $s0, 0x10($sp)
-jal   func_80054B50
+jal   StyleReleaseDecorSet
  addu $s1, $zero, $zero
-jal   func_80054CFC
+jal   StyleReleaseEffectSlots
 lui   $s0, %hi(D_8008AC9C)
 addiu $s0, $s0, %lo(D_8008AC9C)
 .L80054D5C:
 lw    $a0, 0x0($s0)
-jal   func_800557DC
+jal   FlushStyleCue
  addiu $s1, $s1, 0x1
 sw    $v0, 0x0($s0)
 slti  $v0, $s1, 0x2
 bnez  $v0, .L80054D5C
  addiu $s0, $s0, 0x4
-lw    $v0, %gp_rel(D_8008AB4C)($gp)
+lw    $v0, %gp_rel(gStyleCueSelf)($gp)
 beqz  $v0, .L80054D8C
-sw    $zero, %gp_rel(D_8008AB4C)($gp)
+sw    $zero, %gp_rel(gStyleCueSelf)($gp)
 .L80054D8C:
 ...
 jr $ra
@@ -41,16 +43,16 @@ jr $ra
 
 Calls the three just-matched one-shot-flag helpers unconditionally, then
 loops twice over `D_8008AC9C[i]`, replacing each element with
-`func_800557DC`'s return (`func_800557DC` always returns 0, so this clears
-the two-slot array), then clears the `D_8008AB4C` flag if set. Since
-`func_800557DC` is defined later in this unit (higher ROM address) but
+`FlushStyleCue`'s return (`FlushStyleCue` always returns 0, so this clears
+the two-slot array), then clears the `gStyleCueSelf` flag if set. Since
+`FlushStyleCue` is defined later in this unit (higher ROM address) but
 called here, it needs a forward declaration -- matching the pattern already
 used for `ObjM__ForwardToSubChild` in `src/class_3bb8c_m.c`.
 
 `D_8008AC9C` holds two elements of a local per-unit type introduced here,
 `ObjN14` (named for its two accessed fields: `unk0`, address-taken then
 chased for a byte at `+0x6`; `unk14`, only ever address-taken and handed to
-`FlushSoundCueSet`/`func_8002CD08` by `func_800557DC` and `func_8005582C`
+`FlushSoundCueSet`/`func_8002CD08` by `FlushStyleCue` and `StopStyleCueIfNear`
 respectively -- see their own reports). `D_8008AC9C` is `.sbss`
 (`asm/data/7B46C.sbss.s`), adjacent to the other `D_8008ACxx` globals this
 class family already uses.
@@ -69,22 +71,22 @@ struct ObjN14 {
     s32 unk14; /* +0x014 */
 };
 
-extern s32 func_800557DC(ObjN14 *arg0);
+extern s32 FlushStyleCue(ObjN14 *arg0);
 
-extern s32 D_8008AB4C;
+extern s32 gStyleCueSelf;
 extern ObjN14 *D_8008AC9C[2];
 
-void func_80054D30(void) {
+void StyleTeardown(void) {
     s32 i;
 
-    func_80054714();
-    func_80054B50();
-    func_80054CFC();
+    StyleFlushDecoration();
+    StyleReleaseDecorSet();
+    StyleReleaseEffectSlots();
     for (i = 0; i < 2; i++) {
-        D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
+        D_8008AC9C[i] = (ObjN14 *) FlushStyleCue(D_8008AC9C[i]);
     }
-    if (D_8008AB4C != 0) {
-        D_8008AB4C = 0;
+    if (gStyleCueSelf != 0) {
+        gStyleCueSelf = 0;
     }
 }
 ```

@@ -7,7 +7,7 @@ before this round.
 
 ## What it does
 
-Register-once initializer: if `D_8008AB4C` (a `.sdata` flag word, zero at
+Register-once initializer: if `gStyleCueSelf` (a `.sdata` flag word, zero at
 boot) is already set, return 0. Otherwise stash the 5 arguments (4 in
 registers, 1 on the stack at `0x28($sp)`) into a scatter of `.sbss` globals,
 zero two adjacent words (`D_8008ACA0`, and `D_8008AC9C` immediately below it
@@ -15,7 +15,7 @@ by pointer decrement), then tail-call `ApplyStyleConfig()` and return its
 result.
 
 ```c
-extern s32 D_8008AB4C;
+extern s32 gStyleCueSelf;
 extern s32 D_8008AC6C;
 extern s32 D_8008AC70;
 extern s32 D_8008AC74;
@@ -30,10 +30,10 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
     s32 i;
 
-    if (D_8008AB4C == 0) {
+    if (gStyleCueSelf == 0) {
         i = 1;
         p = &D_8008ACA0;
-        D_8008AB4C = a0;
+        gStyleCueSelf = a0;
         D_8008AC6C = a1;
         D_8008AC7C = a2;
         D_8008AC80 = -1;
@@ -84,4 +84,4 @@ produce, and the difference changes the instruction count.
 
 ## Naming
 
-**RegisterStyleConfig** -- tier B. Free function (VerbNoun, unrelated to the `ObjM`/`DreamSys` cluster above): a register-once guard over a `.sdata` flag word (`D_8008AB4C`), stashing five style-config arguments into `.sbss` globals and zeroing two more before tail-calling `ApplyStyleConfig`. Mechanically well understood from the disassembly; "style" describes the data it touches (color/config table consumed by `FillStyleFromConfig`/`StyleM`), not a confirmed game concept.
+**RegisterStyleConfig** -- tier B. Free function (VerbNoun, unrelated to the `ObjM`/`DreamSys` cluster above): a register-once guard over a `.sdata` flag word (`gStyleCueSelf`), stashing five style-config arguments into `.sbss` globals and zeroing two more before tail-calling `ApplyStyleConfig`. Mechanically well understood from the disassembly; "style" describes the data it touches (color/config table consumed by `FillStyleFromConfig`/`StyleM`), not a confirmed game concept.

@@ -1,4 +1,6 @@
-# func_80054B84 -- MATCHED (60/60 words), class_3bb8c_n
+# StyleBuildEffectSlots -- MATCHED (60/60 words), class_3bb8c_n
+
+> Renamed from `func_80054B84` on 2026-09-23 (tools/rename.py). Address 0x80054b84.
 
 Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 Matched on the first build.
@@ -6,7 +8,7 @@ Matched on the first build.
 ## Signature
 
 ```c
-void func_80054B84(void *arg0);
+void StyleBuildEffectSlots(void *arg0);
 ```
 
 ## New externs
@@ -15,10 +17,10 @@ void func_80054B84(void *arg0);
 extern void BaseObjO__func_56f5c(s32 arg0, void *arg1, s32 arg2, s32 arg3); /* class_3bb8c_o.c, ALREADY MATCHED */
 extern s32 rand(void);                                               /* libc, shared local view used project-wide */
 extern s8 D_80087324[];                                              /* 4-entry table, forward-indexed by rand()&3 */
-extern void *func_80054DA4(void *arg0, s32 arg1, void *arg2);        /* forward decl, own unit, cold */
-extern void **func_80054F30(void **arg0, s32 arg1, void *arg2);      /* forward decl, own unit, ALREADY MATCHED this round */
-extern void func_80054FD8(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
-extern void func_8005511C(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
+extern void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);        /* forward decl, own unit, cold */
+extern void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);      /* forward decl, own unit, ALREADY MATCHED this round */
+extern void StyleFillEffectKind3(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
+extern void StyleFillEffectKind2(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
 ```
 
 `BaseObjO__func_56f5c` is `class_3bb8c_o.c`'s already-matched
@@ -27,12 +29,12 @@ call site only needs the ABI shape (`s32,void*,s32,s32`), matching the
 project's convention of a looser cross-unit local signature. `D_8008AC80`,
 `D_8008AC7C`, `D_8008AC88` and `D_8008E0C8` are fresh copies of externs
 already declared later in this file, needed here because this function's
-ROM address is earlier (same reasoning as `func_80054C74`/`func_8005556C`).
+ROM address is earlier (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`).
 
 ## Body
 
 ```c
-void func_80054B84(void *arg0) {
+void StyleBuildEffectSlots(void *arg0) {
     s32 base;
     s32 val;
     s32 count;
@@ -46,12 +48,12 @@ void func_80054B84(void *arg0) {
     val = D_80087324[rand() & 3];
     count = (D_8008AC80 == 2) ? 0x10 - val : 0;
     D_8008AC88 = val + count;
-    filled = (void **) func_80054DA4(D_8008E0C8, val, arg0);
-    filled = func_80054F30(filled, count, arg0);
+    filled = (void **) StyleFillEffectKind0(D_8008E0C8, val, arg0);
+    filled = StyleFillEffectKind1(filled, count, arg0);
     if (D_8008AC80 == 0) {
-        func_80054FD8(filled, arg0);
+        StyleFillEffectKind3(filled, arg0);
     } else if (D_8008AC80 == 2) {
-        func_8005511C(filled, arg0);
+        StyleFillEffectKind2(filled, arg0);
     } else {
         return;
     }

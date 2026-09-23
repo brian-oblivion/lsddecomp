@@ -2588,13 +2588,13 @@ extern void func_80049098(void *arg0, s32 arg1, s32 arg2);
 
 /* func_8005393C's own helper -- still-uncarved ground (asm/class_3bb8c_n.s).
  * Typed purely from this call site's own register usage. */
-extern void func_800558F0(void *arg0, void *arg1, s32 arg2);
+extern void TickStyle(void *arg0, void *arg1, s32 arg2);
 
 /* func_80053134's own helpers -- still-uncarved ground
  * (asm/class_3bb8c_n.s), called with no arguments and their return values
  * unused. */
 extern void TickDreamAuxSlots2(void);
-extern void func_80054D30(void);
+extern void StyleTeardown(void);
 
 
 /* -------------------------------------------------------------------

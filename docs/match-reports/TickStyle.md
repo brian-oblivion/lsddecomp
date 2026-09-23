@@ -1,4 +1,6 @@
-# func_800558F0 -- MATCHED (77/77 words), class_3bb8c_n
+# TickStyle -- MATCHED (77/77 words), class_3bb8c_n
+
+> Renamed from `func_800558F0` on 2026-09-23 (tools/rename.py). Address 0x800558f0.
 
 Round 47 (bravo). Closed round 46's register-colour-swap stall (below) with
 a permuter search rather than further hand rephrasing.
@@ -26,7 +28,7 @@ stale.
   what check (c) is actually gating.
 
 **Search**: `-j 6 --stop-on-zero --best-only`, bounded `timeout 600`.
-Found a **zero-scoring candidate at iteration 4** (`permuter-work/func_800558F0/output-0-1`,
+Found a **zero-scoring candidate at iteration 4** (`permuter-work/TickStyle/output-0-1`,
 rc=0 from `--stop-on-zero` firing). Read every `output-*/score.txt` produced
 (only `output-0-1` and an earlier `output-30-1`; the zero is the only one
 worth translating).
@@ -34,7 +36,7 @@ worth translating).
 **The lever, translated and verified against the REAL build (not just the
 scaffold):** a dead `i++; i--;` pair, placed as the LAST two statements
 inside the `if (D_8008AC9C[i] != 0) { ... }` arm (after the
-`func_8005582C`/`func_800557DC` handling, before that arm's closing brace),
+`StopStyleCueIfNear`/`FlushStyleCue` handling, before that arm's closing brace),
 perturbs GCC 2.6.3's register allocator enough to swap `ctx`/`i` back into
 retail's colours -- with zero net effect on either variable's value at any
 point downstream (`i` is immediately re-read by the `for`'s own increment
@@ -61,7 +63,7 @@ rewrite, a named intermediate pointer) and found nothing; the permuter
 closed it in 4 iterations with a dead `i++; i--;` pair that no hand
 rephrasing attempt had reason to try, because it looks like dead code. Check
 whether OTHER `ctx`/`i`-shaped register-swap stalls in this unit
-(`func_80054DA4`'s arg0/arg1/arg2 swap, `func_80054FD8`'s arg0/arg1 swap)
+(`StyleFillEffectKind0`'s arg0/arg1/arg2 swap, `StyleFillEffectKind3`'s arg0/arg1 swap)
 respond to the same "dead increment/decrement pair placed inside the
 relevant branch" idiom before spending further hand-rephrasing budget on
 them.
@@ -78,10 +80,10 @@ real diff off `asm-differ`: word 4 (`0x046100`/vram `0x80055900`),
 ## Signature (recovered with confidence -- verified via calling convention)
 
 ```c
-s32 func_800558F0(void *arg0, void *arg1, s32 arg2);
+s32 TickStyle(void *arg0, void *arg1, s32 arg2);
 ```
 
-`arg2`'s address is taken later (passed as `func_8005556C`'s second
+`arg2`'s address is taken later (passed as `TryStartStyleCue`'s second
 argument) and the function returns whatever `arg2` holds at that point --
 confirmed from the epilogue, which reloads `arg2`'s natural ABI spill slot
 (`sp+0x40`, exactly `framesize(0x38) + 8`, the standard o32 home for an
@@ -92,18 +94,18 @@ stack slot by hand -- GCC picks that slot on its own once `&arg2` is taken.
 ## Two already-matched sibling functions turned out to take EXTRA dead
 parameters -- both signatures corrected in this file (safe, verified)
 
-Both `func_8005582C` and `func_8005556C` (already matched earlier this
+Both `StopStyleCueIfNear` and `TryStartStyleCue` (already matched earlier this
 round/sitting) are called here with MORE live argument registers than their
 recorded signatures declare:
 
-- `func_8005582C(ObjN14 *arg0, void *arg1)` is called here with `$a2` also
+- `StopStyleCueIfNear(ObjN14 *arg0, void *arg1)` is called here with `$a2` also
   set (to this function's own `ctx` local). Confirmed by objdump on the
   already-matched body: `$a2` is never referenced inside it. Added a third,
   genuinely-unused `void *arg2` parameter to its definition -- a dead
   parameter costs zero instructions in the callee, so this does not disturb
   its already-verified bytes (confirmed: whole-image SHA1 still passes with
   the wider signature in place).
-- `func_8005556C(ObjN14 *arg0, s32 *arg1)` similarly gets two more dead
+- `TryStartStyleCue(ObjN14 *arg0, s32 *arg1)` similarly gets two more dead
   register arguments here (`$a2`, `$a3`, this function's `ctx` and `arg1`).
   Same fix, same verification.
 
@@ -129,7 +131,7 @@ struct ObjAB4C {
 };
 ```
 
-`D_8008AB4C`'s value is another "pointer stored as a plain `s32`" global
+`gStyleCueSelf`'s value is another "pointer stored as a plain `s32`" global
 (same idiom as `D_8008AC7C`), dispatched here as a self object through
 method slot `+0xE8` -- the third such `ObjXXXX`/`ObjXXXXMethods` local view
 in this unit (`ObjAB54`, `ObjE0C8`, now `ObjAB4C`).
@@ -172,7 +174,7 @@ rule.
 
 ```c
 #if 0
-s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
+s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     void *ctx;
     u8 buf[0x10];
     s32 i;
@@ -180,24 +182,24 @@ s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
     ctx = 0;
     if (arg0 != 0) {
         ctx = buf;
-        ((ObjAB4C *) D_8008AB4C)->methods->slotE8((ObjAB4C *) D_8008AB4C, ctx, arg0);
+        ((ObjAB4C *) gStyleCueSelf)->methods->slotE8((ObjAB4C *) gStyleCueSelf, ctx, arg0);
     }
     if (D_8008AC70++ == 0) {
         ApplyStyleDecorationIfSet();
-        func_80054850();
-        func_80054B84(ctx);
+        StyleBuildDecorSet();
+        StyleBuildEffectSlots(ctx);
     }
-    func_800549A8();
-    func_80054C74(ctx);
-    func_80055A24();
+    StyleUpdateDecorSet();
+    StyleUpdateEffectSlots(ctx);
+    DrawStyleTables();
     D_8008AC98 = 0;
     for (i = 0; i < 2; i++) {
         if (D_8008AC9C[i] != 0) {
-            if (func_8005582C(D_8008AC9C[i], ctx, arg1) == 0) {
-                D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
+            if (StopStyleCueIfNear(D_8008AC9C[i], ctx, arg1) == 0) {
+                D_8008AC9C[i] = (ObjN14 *) FlushStyleCue(D_8008AC9C[i]);
             }
         } else {
-            D_8008AC9C[i] = func_8005556C((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
+            D_8008AC9C[i] = TryStartStyleCue((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;
@@ -207,15 +209,15 @@ s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
 
 Needs (already present earlier in the unit, in strict ROM order, at the
 point this body would compile): the `ObjAB4C`/`ObjAB4CMethods` local view
-above; `extern s32 D_8008AB4C;`, `extern s32 D_8008AC70;`,
+above; `extern s32 gStyleCueSelf;`, `extern s32 D_8008AC70;`,
 `extern void ApplyStyleDecorationIfSet(void);` (matched, `class_3bb8c_m.c`),
-`extern void func_80054850(void);`/`extern void func_800549A8(void);`
-(forward, own unit, still cold), `void func_80054B84(void *arg0);` (matched
-earlier this unit, this round), `void func_80054C74(void *arg0);` (matched,
-this unit), `extern void func_80055A24(void);` (forward, matched, this
+`extern void StyleBuildDecorSet(void);`/`extern void StyleUpdateDecorSet(void);`
+(forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
+earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matched,
+this unit), `extern void DrawStyleTables(void);` (forward, matched, this
 unit, defined later), `extern s32 D_8008AC98;`, `extern u8 D_8008E154[];`,
-`extern ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void
-*arg3);`, `extern s32 func_8005582C(ObjN14 *arg0, void *arg1, void
+`extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void
+*arg3);`, `extern s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void
 *arg2);`.
 
 ### Proposed learning

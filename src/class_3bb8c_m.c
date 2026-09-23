@@ -206,7 +206,7 @@ void *GetObjMMethods(void) {
 
 struct StyleM;
 
-extern s32 D_8008AB4C;
+extern s32 gStyleCueSelf;
 extern s32 D_8008AC6C;
 extern s32 D_8008AC70;
 extern s32 D_8008AC74;
@@ -221,10 +221,10 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
     s32 i;
 
-    if (D_8008AB4C == 0) {
+    if (gStyleCueSelf == 0) {
         i = 1;
         p = &D_8008ACA0;
-        D_8008AB4C = a0;
+        gStyleCueSelf = a0;
         D_8008AC6C = a1;
         D_8008AC7C = a2;
         D_8008AC80 = -1;
@@ -243,7 +243,7 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
 
 extern s32 D_80087424;
 extern s8 *D_800873EC[];
-extern s8 *func_80054758(void);
+extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
 extern u8 D_800872C4[][3];
 extern const u8 *D_8008AB54;
@@ -252,7 +252,7 @@ void *ApplyStyleConfig(void) {
     s8 *cfg = D_800873EC[D_8008AC6C];
 
     if (cfg == 0) {
-        cfg = func_80054758();
+        cfg = PickStyleFallbackConfig();
     }
     FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
     if (cfg[1] >= 4) {

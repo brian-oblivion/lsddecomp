@@ -1,4 +1,6 @@
-# func_80054DA4 -- STALL, 93/99 words (length matches, 0x18C), whole-function arg0/arg1/arg2 register-colour rotation
+# StyleFillEffectKind0 -- STALL, 93/99 words (length matches, 0x18C), whole-function arg0/arg1/arg2 register-colour rotation
+
+> Renamed from `func_80054DA4` on 2026-09-23 (tools/rename.py). Address 0x80054da4.
 
 ## Round 48 (alpha): re-measured, Check 3 AGREE, permuter searched (900s, no zero)
 
@@ -31,7 +33,7 @@ either way 93/99 is what this round's pinned pipeline reproduces.
 **Result: not closed.** 90,031 iterations completed within the wall-clock
 bound; best score plateaued at 45 (down from the base-line 69) and never
 reached 0 -- candidates at score 45 and 30 were written
-(`permuter-work/func_80054DA4/output-{30,45}-*`) but none is a zero. The
+(`permuter-work/StyleFillEffectKind0/output-{30,45}-*`) but none is a zero. The
 wrapping shell that was to append `permuter rc=$?` was reaped before that
 line was written (a harness artifact, not a search anomaly); the log's
 growth stopped at iteration 90031 in step with the 900s wall-clock and the
@@ -41,7 +43,7 @@ exit -- treating this as **rc=124-equivalent (bound fired), not exhausted.**
 
 A 3-way register ROTATION (not a 2-variable swap) may simply be a larger
 perturbation than decomp-permuter's default move set reaches efficiently in
-under 90k iterations -- contrast with `func_800558F0` (this unit, round 47),
+under 90k iterations -- contrast with `TickStyle` (this unit, round 47),
 a 2-variable-class residue closed in 4 iterations. Worth a longer bound or a
 hinted search in a future round if this function is revisited; not
 re-attempted here (machine discipline: one search per function this round,
@@ -49,22 +51,22 @@ budget spent).
 
 ## Round 47 (bravo). Cold fresh, never worked before. Length matches retail
 exactly (0x18C bytes / 99 words both sides, confirmed via `build/lsdde.map`:
-`func_80054DA4` to `func_80054F30` is exactly `0x18C`). First real diff off
+`StyleFillEffectKind0` to `StyleFillEffectKind1` is exactly `0x18C`). First real diff off
 `asm-differ`: word 2 (`0x0455A8`/vram `0x80054DA8`), retail `sw $s2,0x20($sp)`
 vs built `sw $s5,0x2c($sp)`.
 
 ## Signature (recovered with confidence)
 
 ```c
-void *func_80054DA4(void *arg0, s32 arg1, void *arg2);
+void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);
 ```
 
-Already forward-declared this way at the call site in `func_80054B84`
+Already forward-declared this way at the call site in `StyleBuildEffectSlots`
 (matched, this unit, earlier round): `filled = (void **)
-func_80054DA4(D_8008E0C8, val, arg0);`. `arg1` is the loop bound, `arg0` is
+StyleFillEffectKind0(D_8008E0C8, val, arg0);`. `arg1` is the loop bound, `arg0` is
 the output array walked and returned one slot advanced (the same
-"array-fill, return next slot" idiom as `func_80054F30`/`func_80054FD8`/
-`func_8005511C`), `arg2` is passed through unchanged to every callee.
+"array-fill, return next slot" idiom as `StyleFillEffectKind1`/`StyleFillEffectKind3`/
+`StyleFillEffectKind2`), `arg2` is passed through unchanged to every callee.
 
 ## What the function does (recovered from the raw disassembly)
 
@@ -74,12 +76,12 @@ extern s32 D_80087328[];
 extern u8 *D_8008E0B4;
 extern s32 D_8008E0BC;
 extern u8 D_8008E0A4[];
-extern void func_80055258(void *arg0, void *arg1);   /* this unit, cold */
-extern void func_80055410(void *arg0, void *arg1);   /* this unit, cold,
+extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* this unit, cold */
+extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);   /* this unit, cold,
                                                          signature widened */
 extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
 
-void *func_80054DA4(void *arg0, s32 arg1, void *arg2) {
+void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     void **arr;
     s32 i;
     s32 t3;
@@ -92,13 +94,13 @@ void *func_80054DA4(void *arg0, s32 arg1, void *arg2) {
     if (t3 != 0) {
         t3 = D_80087328[t3];
     }
-    fp = func_80055410;
+    fp = SetupStyleSpawnParamsB;
     if (D_8008AC74 % 7 != 0) {
-        fp = func_80055258;
+        fp = SetupStyleSpawnParamsA;
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = func_80056320((void *) 0, D_8008E0A4, (void *) D_8008AB4C, arg2);
+        *arr = func_80056320((void *) 0, D_8008E0A4, (void *) gStyleCueSelf, arg2);
         arr++;
     }
     return (void *) arr;
@@ -116,21 +118,21 @@ Every value confirmed directly off the raw bytes:
   reassignment shape.
 - **A function pointer, not a branch, dispatches the per-iteration call.**
   `s3` is reused: first as the `%7` magic constant, then unconditionally
-  loaded with `&func_80055410` (filling the `mult`'s latency slot for free),
-  then conditionally overwritten to `&func_80055258` if
+  loaded with `&SetupStyleSpawnParamsB` (filling the `mult`'s latency slot for free),
+  then conditionally overwritten to `&SetupStyleSpawnParamsA` if
   `D_8008AC74 % 7 != 0`. This is the **same shared-dispatch idiom
-  `func_800558F0` uses via `ObjAB4C::slotE8`**, except here the two
+  `TickStyle` uses via `ObjAB4C::slotE8`**, except here the two
   candidates are plain functions (not vtable slots), selected by a modulo
   test rather than a self-object's own state.
-- `func_80055410` is called through this pointer with **two live argument
+- `SetupStyleSpawnParamsB` is called through this pointer with **two live argument
   registers** (`a0=arg2`, `a1=t3`) even though its OWN body (round 46's
   derivation, unrelated to this call) never references either -- the
   standard "already-matched/derived signature can be too narrow" situation.
-  Widened its signature from `void func_80055410(void)` to
-  `void func_80055410(void *arg0, void *arg1)` (dead params, zero cost in
-  the callee, confirmed: rebuilding `func_80055410`'s own preserved body
+  Widened its signature from `void SetupStyleSpawnParamsB(void)` to
+  `void SetupStyleSpawnParamsB(void *arg0, void *arg1)` (dead params, zero cost in
+  the callee, confirmed: rebuilding `SetupStyleSpawnParamsB`'s own preserved body
   under the wider signature still reproduces its recorded 25/87 score
-  exactly -- see `docs/match-reports/func_80055410.md`).
+  exactly -- see `docs/match-reports/SetupStyleSpawnParamsB.md`).
 
 ## The stall: `arg0`/`arg1`/`arg2` land in swapped saved registers
 
@@ -151,7 +153,7 @@ loop) is byte-identical modulo this one rotation.
    reverted.
 
 No `register T v asm("$N")` or operand constraint was tried or used, per
-HARD RULE 6. Given `func_800558F0`'s sibling register-colour-swap stall in
+HARD RULE 6. Given `TickStyle`'s sibling register-colour-swap stall in
 this same unit closed via a dead `i++; i--;` pair found by the permuter
 (round 47, see that report), this function is a permuter candidate too,
 untried here for lack of remaining round budget.
@@ -169,6 +171,6 @@ is preserved in `#if 0`.
 parameters is the same HARD-RULE-6 class as a 2-variable colour swap, and
 the same permuter approach (a dead statement pair perturbing the
 allocator) is worth trying before declaring it unfixable by hand** -- see
-`func_800558F0` in this unit for a confirmed instance of the technique
+`TickStyle` in this unit for a confirmed instance of the technique
 working. Not yet tried here for lack of round budget; flagging for the next
 runner/round rather than re-deriving the structure.

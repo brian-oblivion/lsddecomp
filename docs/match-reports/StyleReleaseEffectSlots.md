@@ -1,4 +1,6 @@
-# func_80054CFC -- MATCHED, round 46 (2026-09-15)
+# StyleReleaseEffectSlots -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `func_80054CFC` on 2026-09-23 (tools/rename.py). Address 0x80054cfc.
 
 Unit `class_3bb8c_n`. **13/13 words, byte-exact.** First build.
 
@@ -20,7 +22,7 @@ Fresh ground, carved round 45, never attempted. No blockers.
 jr $ra
 ```
 
-Same family as `func_80054B50` (also calls `ReleaseBasicClassArray`), but gated by
+Same family as `StyleReleaseDecorSet` (also calls `ReleaseBasicClassArray`), but gated by
 `D_8008AC80 >= 0` rather than a nonzero flag, with no flag-clear afterward
 and a variable count (`D_8008AC88`) instead of a literal. `D_8008E0C8` is
 the same kind of far `.bss` symbol as `D_8008E10C` (no dlabel in any
@@ -32,7 +34,7 @@ extern s32 D_8008AC80;
 extern s32 D_8008AC88;
 extern void *D_8008E0C8[];
 
-void func_80054CFC(void) {
+void StyleReleaseEffectSlots(void) {
     if (D_8008AC80 >= 0) {
         ReleaseBasicClassArray(D_8008E0C8, D_8008AC88);
     }
@@ -44,5 +46,5 @@ void func_80054CFC(void) {
 
 ### Proposed learning
 
-None new -- confirms the `func_80054B50` pattern generalises (flag test,
+None new -- confirms the `StyleReleaseDecorSet` pattern generalises (flag test,
 optional clear, `ReleaseBasicClassArray` call) rather than needing its own lever.

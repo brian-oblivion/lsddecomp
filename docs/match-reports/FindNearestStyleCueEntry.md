@@ -1,4 +1,6 @@
-# func_80055620 -- MATCHED round 48 (alpha), 111/111 words
+# FindNearestStyleCueEntry -- MATCHED round 48 (alpha), 111/111 words
+
+> Renamed from `func_80055620` on 2026-09-23 (tools/rename.py). Address 0x80055620.
 
 ## Round 48 (alpha): Check 3 AGREE, permuter search led to a hand-applied fix, closed byte-exact
 
@@ -26,14 +28,14 @@ that line landed; log growth stopped at iteration 96740 in step with the
 `resource_tracker` warning, which is `timeout`'s SIGTERM signature --
 treating the raw search as rc=124-equivalent (bound fired).
 
-**But the score-10 candidate (`permuter-work/func_80055620/output-10-1`) was
+**But the score-10 candidate (`permuter-work/FindNearestStyleCueEntry/output-10-1`) was
 a genuine, correct lead, and applying it by hand closed the function.** Two
 changes, read straight off that candidate's mutated source:
 
 1. **`if (n <= 0) goto fail;` is REDUNDANT and can simply be dropped.** The
    candidate's mutation turned it into an empty `if (n <= 0) { }` (plus an
    inert duplicate `goto fail; goto fail;` elsewhere, a pure scheduling
-   nudge in the same spirit as `func_800558F0`'s dead `i++; i--;`). Tracing
+   nudge in the same spirit as `TickStyle`'s dead `i++; i--;`). Tracing
    it through: when `n <= 0`, the very next statement is
    `for (j = 0; j < n; ...)`, whose own condition `j < n` is `0 < n`, false
    immediately -- so the loop body never runs and execution falls straight
@@ -58,7 +60,7 @@ changes, read straight off that candidate's mutated source:
 **Final body (matched):**
 
 ```c
-void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
+void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     s32 j, n;
     u8 *base;
     EntrySlot *entry;
@@ -77,7 +79,7 @@ void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
-            self = (void *) D_8008AB4C;
+            self = (void *) gStyleCueSelf;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -102,7 +104,7 @@ fail:
 
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
-`extern s32 D_8008AC6C, D_8008AC98, D_8008AB4C, D_80087474[];`,
+`extern s32 D_8008AC6C, D_8008AC98, gStyleCueSelf, D_80087474[];`,
 `extern u8 *D_800876B4[], D_800876EC[], D_800874EC[];` (all already
 declared in `src/class_3bb8c_n.c` ahead of this function).
 
@@ -142,25 +144,25 @@ several instructions later).
 ## Signature (recovered with confidence) -- widened from the existing 2-arg forward declaration
 
 ```c
-void *func_80055620(void *arg0, s32 *arg1, void *arg2);
+void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);
 ```
 
-The pre-existing forward declaration in this unit (`func_8005556C`'s block,
+The pre-existing forward declaration in this unit (`TryStartStyleCue`'s block,
 itself already MATCHED) declared only `(s32 *arg0, s32 *arg1)` -- but the
 raw disassembly plainly reads and branches on `$a2` (`beqz $s4,...` as the
 very first real instruction), and objdump of the ALREADY-MATCHED
-`func_8005556C.o` shows **nothing sets `$a2` before that call** -- `$a2`
-still holds whatever `func_8005556C` itself received as ITS OWN third
+`TryStartStyleCue.o` shows **nothing sets `$a2` before that call** -- `$a2`
+still holds whatever `TryStartStyleCue` itself received as ITS OWN third
 argument (`ctx`, a genuinely dead-looking parameter per
-`func_800558F0`'s report) when `func_8005556C` was entered. So `ctx` is
-silently forwarded as `func_80055620`'s third argument, at zero cost (no
+`TickStyle`'s report) when `TryStartStyleCue` was entered. So `ctx` is
+silently forwarded as `FindNearestStyleCueEntry`'s third argument, at zero cost (no
 instruction sets `$a2`, since it already holds the right value from
 function entry).
 
-**Updated `func_8005556C`'s call site to make this explicit**
-(`func_80055620(&arg0->unk4, &arg0->unk10, arg2)`), and confirmed this does
-NOT disturb `func_8005556C`'s own already-matched bytes: rebuilt the whole
-image with the change and `func_8005556C` still scores 45/45 with a clean
+**Updated `TryStartStyleCue`'s call site to make this explicit**
+(`FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2)`), and confirmed this does
+NOT disturb `TryStartStyleCue`'s own already-matched bytes: rebuilt the whole
+image with the change and `TryStartStyleCue` still scores 45/45 with a clean
 `OK: build matches retail SLPS_015.56`. This is the "a call argument that's
 already resident needs no source-level move" case, not a widening that
 costs the caller anything.
@@ -187,7 +189,7 @@ typedef struct EntrySlot {                              /* 8B stride */
 } EntrySlot;
 typedef struct LocalBuf { Pos4 pos; TabEntry tab; } LocalBuf;   /* 10B */
 
-void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
+void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     s32 j, n;
     u8 *base;
     EntrySlot *entry;
@@ -209,7 +211,7 @@ void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
-            self = (void *) D_8008AB4C;
+            self = (void *) gStyleCueSelf;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -241,15 +243,15 @@ Notes on the recovery:
   aligned `lw`/`sw` pair -- confirmed byte-for-byte against retail's
   `lwl 3(s1)/lwr 0(s1)` + `swl 0x13(sp)/swr 0x10(sp)` sequences.
 - **The `ObjAB4C`/`ObjAB4CMethods` local view (self-dispatch through method
-  slot `+0xE8`) is the SAME idiom `func_800558F0` establishes** for
-  `D_8008AB4C` -- moved that typedef earlier in the unit (it originally sat
-  just before `func_800558F0`, which is ROM-later) since this function,
+  slot `+0xE8`) is the SAME idiom `TickStyle` establishes** for
+  `gStyleCueSelf` -- moved that typedef earlier in the unit (it originally sat
+  just before `TickStyle`, which is ROM-later) since this function,
   ROM-earlier, also needs it. No behavioural change, pure reordering of a
   type declaration.
 - **The `~x + 1` / `if (d2 >= 0) dist = d1+d2; else dist = d1-d2;` distance
   computation reuses two already-established levers from this unit's round
   46 report** (`~x+1` instead of `-x` for the delay-slot-friendly negate;
-  the explicit if/else "combine" shape `func_80055874` already uses for an
+  the explicit if/else "combine" shape `IsStyleCueNear` already uses for an
   identical Manhattan-distance pattern in this same unit).
 - `entry->count` is read from memory **twice** by retail (once for the
   `> 0` guard, again for the `D_80087474[entry->count]` index) rather than

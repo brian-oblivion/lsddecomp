@@ -1,4 +1,6 @@
-# func_80054FD8 -- STALL, 79/81 words, length EXACT, insertions 0 / deletions 0, first real diff at word 60 (0x458C8 / vram 0x800550C8)
+# StyleFillEffectKind3 -- STALL, 79/81 words, length EXACT, insertions 0 / deletions 0, first real diff at word 60 (0x458C8 / vram 0x800550C8)
+
+> Renamed from `func_80054FD8` on 2026-09-23 (tools/rename.py). Address 0x80054fd8.
 
 REVISITED, round 61: 38/81 -> 79/81, and the round-47 verdict is retracted as
 wrong in both of its two claims; names/types not relevant (unit has not passed
@@ -36,8 +38,8 @@ build (`./build-and-verify.sh`, then `tools/funcdiff.py`).
 | 2 | `s32 *p = &D_8008E0AC;` for the clamp block | 38, length 79 (2 short), drift |
 | 3 | **+ inline the `rand() % 3` instead of an `idx` local** | **66/81** |
 | 4 | + `u8 **q = &D_8008E0B0;` for the tail store/arg pair | **71/81** |
-| 5 | + signature `void **func_80054FD8(void **arg0, void *arg1)` with `*arg0 = ...; arg0++; return arg0;` | **78/81** |
-| 6 | + ONE shared local `t` holding the else branch's computed value AND the hoisted `D_8008AB4C` read (found by the permuter) | **79/81, ins 0 / del 0** |
+| 5 | + signature `void **StyleFillEffectKind3(void **arg0, void *arg1)` with `*arg0 = ...; arg0++; return arg0;` | **78/81** |
+| 6 | + ONE shared local `t` holding the else branch's computed value AND the hoisted `gStyleCueSelf` read (found by the permuter) | **79/81, ins 0 / del 0** |
 
 Note step 2 on its own is the change round 47 recorded as a FAILURE ("16/81
 with 106238 bytes of drift -- reverted"). It is not a failure; it is
@@ -67,11 +69,11 @@ word").
 ### Why step 5 is load-bearing
 
 `$s0`/`$s1` really were swapped (retail `$s0 = arg0`, `$s1 = arg1`), and the
-fix is the idiom the already-MATCHED sibling `func_80054F30` in this same unit
+fix is the idiom the already-MATCHED sibling `StyleFillEffectKind1` in this same unit
 already uses: `void **arg0`, `*arg0 = ...; arg0++; return arg0;`. Writing the
 pointer walk gives `arg0` two more references, which lifts its allocno
 priority above `arg1`'s and restores retail's colouring. Round 47 declined to
-retry this residue at all, citing `func_800558F0` having spent five
+retry this residue at all, citing `TickStyle` having spent five
 rephrasings on "the equivalent problem" -- but those five rephrasings were on
 a different function with a different parameter shape, and the sibling with
 the answer was forty lines up in the same file.
@@ -84,7 +86,7 @@ the answer was forty lines up in the same file.
 ```
 
 Nothing else differs. `t`'s pseudo has two disjoint live ranges (the else
-branch's value, then `D_8008AB4C`), gcc 2.6.3 does no live-range splitting, so
+branch's value, then `gStyleCueSelf`), gcc 2.6.3 does no live-range splitting, so
 one hard register serves both -- and it picks `$a2`, the third-argument
 register the second use needs, where retail uses `$v1` and loads `$a2`
 directly at the second use. Both spellings are the same instruction COUNT;
@@ -94,7 +96,7 @@ by project rule.**
 Five further spellings were tried against it, all 79/81 and all
 byte-identical, so the colour is invariant rather than merely unimproved:
 `t` typed `s32` vs `void *`; the else value written as
-`(s32) &D_8008721C[n*3]` vs `(s32) (D_8008721C + n*3)`; `t = D_8008AB4C`
+`(s32) &D_8008721C[n*3]` vs `(s32) (D_8008721C + n*3)`; `t = gStyleCueSelf`
 before vs after `q = &D_8008E0B0`; `t` declared first vs last. Reusing the
 `s32 *p` pointer for all three roles instead of adding `t` regresses to
 73/81.
@@ -106,8 +108,8 @@ Three words differ, and they are one instruction moved:
 ```
 retail                              built
 458e8  addiu v0,v0,%lo(D_80087174)  458e8  addiu v0,v0,%lo(D_80087174)
-458ec  lw    a2,%gp_rel(D_8008AB4C) 458ec  sw    v0,0(v1)          <-- here
-458f0  move  a3,s1                  458f0  lw    a2,%gp_rel(D_8008AB4C)
+458ec  lw    a2,%gp_rel(gStyleCueSelf) 458ec  sw    v0,0(v1)          <-- here
+458f0  move  a3,s1                  458f0  lw    a2,%gp_rel(gStyleCueSelf)
 458f4  jal   func_80056320          458f4  jal   func_80056320
 458f8   sw   v0,0(v1)   (delay)     458f8   move a3,s1   (delay)
 ```
@@ -119,7 +121,7 @@ delay slot.
 **The mechanism is a scheduler memory dependence, and it is MEASURED, not
 reasoned.** A store through a pointer variable is `(mem (reg))` -- an opaque
 address gcc 2.6.3's `sched_analyze` will not disambiguate -- so the
-gp-relative load of `D_8008AB4C` cannot hoist across it and the store cannot
+gp-relative load of `gStyleCueSelf` cannot hoist across it and the store cannot
 sink below it. Two independent experiments prove it is this and nothing else:
 
 - Write the store as a plain global (`D_8008E0B0 = D_80087174;`, a
@@ -127,7 +129,7 @@ sink below it. Two independent experiments prove it is this and nothing else:
   immediately** -- but the `q` pointer then folds away and the address
   argument regresses to `lui a1; addiu a1,%lo(D_8008E0A4)` (73/81).
 - Keep the pointer store and hoist the load by hand instead
-  (`t = D_8008AB4C;` as a local placed BEFORE the store): the ordering becomes
+  (`t = gStyleCueSelf;` as a local placed BEFORE the store): the ordering becomes
   **byte-for-byte retail's**, delay slot included, with *zero* structural
   difference -- see the variant below.
 
@@ -142,7 +144,7 @@ as a limit.
 
 ```c
     q = &D_8008E0B0;
-    t = D_8008AB4C;                                    /* s32 t; */
+    t = gStyleCueSelf;                                    /* s32 t; */
     *q = D_80087174;
     *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
 ```
@@ -169,7 +171,7 @@ it forward as the residue.
 Axes varied against it, all 75/81, all identical output (so the colour is
 invariant to every one of them, not merely unimproved):
 
-- statement order over `{q = &D_8008E0B0, t = D_8008AB4C, val = D_80087174}` --
+- statement order over `{q = &D_8008E0B0, t = gStyleCueSelf, val = D_80087174}` --
   every order that keeps the load before the store;
 - declaration order of `q`, `t`, `val`;
 - naming the stored value in a local vs leaving it anonymous;
@@ -189,11 +191,11 @@ computation moves above the branch).
 ## Signature (corrected this round)
 
 ```c
-void **func_80054FD8(void **arg0, void *arg1);
+void **StyleFillEffectKind3(void **arg0, void *arg1);
 ```
 
-Widened from round 46's `void *func_80054FD8(void *arg0, void *arg1)`. The
-forward declaration in `func_80054B84`'s block was widened to match; the call
+Widened from round 46's `void *StyleFillEffectKind3(void *arg0, void *arg1)`. The
+forward declaration in `StyleBuildEffectSlots`'s block was widened to match; the call
 site already passed a `void **`. This is not cosmetic -- it is what fixes the
 `$s0`/`$s1` colouring (step 5 above).
 
@@ -237,7 +239,7 @@ reorderings and left only register-field differences.
 
 **Translated in-tree and it is a real improvement: 78/81 -> 79/81, and
 `insertions 2 / deletions 2` -> `insertions 0 / deletions 0`.** The candidate
-was my own `t`-hoist (a local holding `D_8008AB4C`, placed before the store,
+was my own `t`-hoist (a local holding `gStyleCueSelf`, placed before the store,
 which is what lets the load hoist past the opaque pointer store) plus **one
 twist I had not tried: the SAME local also holds the else branch's computed
 value.** That single shared pseudo is worth 4 words -- splitting it into two
@@ -260,9 +262,9 @@ extern s32 D_8008AB50;
 extern s32 D_8008AC8C;
 extern u8 D_8008726C[];
 extern u8 D_8008E0A4[];
-extern s32 D_8008AB4C;
+extern s32 gStyleCueSelf;
 extern s32 D_80087330;
-extern void func_80055258(void *arg0, void *arg1);
+extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
@@ -272,12 +274,12 @@ extern u8 D_8008721C[];
 extern s32 rand(void);
 extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
 
-void **func_80054FD8(void **arg0, void *arg1) {
+void **StyleFillEffectKind3(void **arg0, void *arg1) {
     s32 t;
     s32 *p;
     u8 **q;
 
-    func_80055258(arg1, (void *) D_80087330);
+    SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     if (D_8008AB50 != 0 && D_8008AC8C == (s32) D_8008726C) {
         *(s32 *) D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
@@ -294,7 +296,7 @@ void **func_80054FD8(void **arg0, void *arg1) {
         t = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
         D_8008E0C0[0] = t;
     }
-    t = D_8008AB4C;
+    t = gStyleCueSelf;
     q = &D_8008E0B0;
     *q = D_80087174;
     *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
@@ -327,7 +329,7 @@ RETRACTED.** That learning was derived from exactly this function, from step 2
 above, and it was derived from a drift number rather than from a diff. There
 is no call between the three `D_8008E0AC` accesses and the pointer cache is
 nevertheless correct -- it is precisely what retail does. The rule it was
-generalising from (`func_80054F30`'s and `func_8005511C`'s wins) may still
+generalising from (`StyleFillEffectKind1`'s and `StyleFillEffectKind2`'s wins) may still
 hold on its own evidence, but this function is not an instance of it and must
 not be cited as the negative half. **A source change that makes the score go
 down while the LENGTH moves toward a known-missing construct is a partial fix,
@@ -335,7 +337,7 @@ not a refutation** -- read the diff before reverting.
 
 **3. Reusing ONE local across two disjoint live ranges can be the source
 shape.** Here a single `s32 t` holds the else branch's computed value and then
-the `D_8008AB4C` read; two separate variables cost 4 words. gcc 2.6.3 does no
+the `gStyleCueSelf` read; two separate variables cost 4 words. gcc 2.6.3 does no
 live-range splitting, so a shared variable is a shared hard register, and that
 is an allocation decision the source controls directly. This is the axis my
 own hand sweep did not have -- I varied statement order, declaration order,

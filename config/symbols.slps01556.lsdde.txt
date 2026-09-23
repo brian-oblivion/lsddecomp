@@ -1647,3 +1647,27 @@ ReadDeltaValue = 0x80035E80; // type:func
 // identified: config/psyq-objects.ld pin (linked Sony object calls this
 // address Snd_crescendo by relocation). Round 71 (bravo, track 2).
 Snd_crescendo = 0x80036528; // type:func
+StyleFlushDecoration = 0x80054714; // type:func
+PickStyleFallbackConfig = 0x80054758; // type:func
+StyleBuildDecorSet = 0x80054850; // type:func
+StyleUpdateDecorSet = 0x800549A8; // type:func
+AdjustRgbByDelta = 0x80054B1C; // type:func
+StyleReleaseDecorSet = 0x80054B50; // type:func
+StyleBuildEffectSlots = 0x80054B84; // type:func
+StyleUpdateEffectSlots = 0x80054C74; // type:func
+StyleReleaseEffectSlots = 0x80054CFC; // type:func
+StyleTeardown = 0x80054D30; // type:func
+StyleFillEffectKind0 = 0x80054DA4; // type:func
+StyleFillEffectKind1 = 0x80054F30; // type:func
+StyleFillEffectKind3 = 0x80054FD8; // type:func
+StyleFillEffectKind2 = 0x8005511C; // type:func
+SetupStyleSpawnParamsA = 0x80055258; // type:func
+SetupStyleSpawnParamsB = 0x80055410; // type:func
+TryStartStyleCue = 0x8005556C; // type:func
+FindNearestStyleCueEntry = 0x80055620; // type:func
+FlushStyleCue = 0x800557DC; // type:func
+StopStyleCueIfNear = 0x8005582C; // type:func
+IsStyleCueNear = 0x80055874; // type:func
+TickStyle = 0x800558F0; // type:func
+DrawStyleTables = 0x80055A24; // type:func
+gStyleCueSelf = 0x8008AB4C;

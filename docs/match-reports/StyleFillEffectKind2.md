@@ -1,4 +1,6 @@
-# func_8005511C -- STALL, length EXACT (0x13C / 79 words), 49/79 words, first real diff at word 11 (file 0x45948 / vram 0x80055148)
+# StyleFillEffectKind2 -- STALL, length EXACT (0x13C / 79 words), 49/79 words, first real diff at word 11 (file 0x45948 / vram 0x80055148)
+
+> Renamed from `func_8005511C` on 2026-09-23 (tools/rename.py). Address 0x8005511c.
 
 ## Round 64 (charlie) -- REVISIT: 16/79 and 1 word short -> 49/79 and length EXACT
 
@@ -10,7 +12,7 @@ names/types USED -- one of the two levers was the parameter type.**
 
 Rebuilt the inherited body verbatim: `build exit=2`, no compile-error grep
 hits, **16/79 reproduced exactly**, and `build/lsdde.map` puts the next
-function `func_80055258` at `0x80055254` against retail's `0x80055258`,
+function `SetupStyleSpawnParamsA` at `0x80055254` against retail's `0x80055258`,
 confirming the recorded "1 word short" precisely.
 
 **`insertions 10 / deletions 10`, positional skeleton diffs 59.** Round 48
@@ -50,7 +52,7 @@ address, `$s1`/`$s2` for the parameters) and the build used two, so one
 `sw`/`lw` pair was missing. `+1 - 2 = -1` -- the whole recorded "1 word short"
 accounted for, with no scheduling hypothesis needed.
 
-The fix is the idiom the sibling `func_80054FD8` in this same unit already
+The fix is the idiom the sibling `StyleFillEffectKind3` in this same unit already
 carries in its own preserved body:
 
 ```c
@@ -59,7 +61,7 @@ u8 **q;
 q = &D_8008E0B0;
 *q = D_80087174;
 ...
-func_80056320((void *) 2, (u8 *) q - 0xC, (void *) D_8008AB4C, arg1);
+func_80056320((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
 ```
 
 **16/79 and 1 short -> 42/79 and LENGTH EXACT**, skeleton diffs 59 -> 35.
@@ -74,7 +76,7 @@ later round: the correct lever was on file, marked as tried and failed.
 ### Lever 2 (+7 words, and the entire prologue): the sibling's arg0 shape
 
 Retail's parameter colours were still swapped -- retail `$s1 = arg0`,
-`$s2 = arg1`; built the reverse. The matched sibling `func_80054F30` takes
+`$s2 = arg1`; built the reverse. The matched sibling `StyleFillEffectKind1` takes
 `void **arg0` and ends `*arg0 = ...; arg0++; return arg0;`, where this body
 had the narrower `void *arg0` with `*(void **) arg0 = ...` and
 `return (u8 *) arg0 + 4;`.
@@ -82,9 +84,9 @@ had the narrower `void *arg0` with `*(void **) arg0 = ...` and
 Retyping to the sibling's shape:
 
 ```c
-void **func_8005511C(void **arg0, void *arg1) {
+void **StyleFillEffectKind2(void **arg0, void *arg1) {
     ...
-    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) D_8008AB4C, arg1);
+    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
@@ -100,7 +102,7 @@ enough to reorder the allocno priority that decides `$s1` vs `$s2`. Consistent
 with section 3d's "any change to the set of named locals is a new allocno" --
 a parameter's mention count is on the same axis.
 
-The caller `func_80054B84` is live and already matched, passes a `void **`,
+The caller `StyleBuildEffectSlots` is live and already matched, passes a `void **`,
 and discards the return, so widening the forward declaration is free; whole
 image verified green with it in place.
 
@@ -140,7 +142,7 @@ slot and forcing the two-block form.
 **Negative 2: deleting the single-use `idx` local is exactly INERT.**
 `idx = (u32) rand() % 3;` used once, inlined into the store expression:
 42/79 -> 42/79, ins 8/8, 35 skeleton diffs -- byte-identical, not merely
-similar. This is a useful boundary on the lever that closed `func_80055410`
+similar. This is a useful boundary on the lever that closed `SetupStyleSpawnParamsB`
 in this same session and same unit: **that lever needs a local whose LIVE
 RANGE CROSSES A CALL** (`r` there carried three `rand()` results across
 intervening calls, costing one `move` per call). `idx`'s live range is
@@ -182,7 +184,7 @@ local to move it earlier" reshape is structurally excluded before building it
 
 **Search:** one bounded search on this body (`-j 6 --stop-on-zero
 --best-only`, `timeout 900`, exit status to
-`permuter-work/func_8005511C/rc.txt`). Outcome in "Search outcome" below.
+`permuter-work/StyleFillEffectKind2/rc.txt`). Outcome in "Search outcome" below.
 The residue is now purely statement order, expression form and register
 colour -- `Insertions 8 / Deletions 8` with zero stack and branch penalty --
 which is inside the permuter's search space, unlike the local-COUNT axis that
@@ -227,7 +229,7 @@ local COUNT (this session's other two matches) or a declaration.
 
 - **(a)** an explicit alias for the first store:
   `new_var = slot; *new_var = (s32) (D_80087228 + idx * 3);`
-- **(b)** a named local for the `D_8008AB4C` load, passed as
+- **(b)** a named local for the `gStyleCueSelf` load, passed as
   `func_80056320`'s third argument.
 
 Screened for UB first (no use-before-init, no staleness across a back-edge,
@@ -272,7 +274,7 @@ window.
 
 ```c
 extern s32 D_8008AC74;
-extern s32 D_8008AB4C;
+extern s32 gStyleCueSelf;
 extern s32 D_80087430;
 extern s32 D_80087330;
 extern u8 D_80087228[];
@@ -280,10 +282,10 @@ extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0BC;
-extern void func_80055258(void *arg0, void *arg1);
+extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
 
-void **func_8005511C(void **arg0, void *arg1) {
+void **StyleFillEffectKind2(void **arg0, void *arg1) {
     s32 idx;
     s32 randval;
     s32 v0;
@@ -300,19 +302,19 @@ void **func_8005511C(void **arg0, void *arg1) {
         v0 = D_80087430;
     }
     *slot = v0;
-    func_80055258(arg1, (void *) D_80087330);
+    SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     q = &D_8008E0B0;
     *q = D_80087174;
     randval = rand();
     D_8008E0BC = randval - (randval / 3) * 6;
-    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) D_8008AB4C, arg1);
+    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
 ```
 
-The forward declaration in `func_80054B84`'s block is widened to match:
-`extern void **func_8005511C(void **arg0, void *arg1);`. That widening ships
+The forward declaration in `StyleBuildEffectSlots`'s block is widened to match:
+`extern void **StyleFillEffectKind2(void **arg0, void *arg1);`. That widening ships
 (the whole image is green with it and `INCLUDE_ASM` restored) because it is
 the correct signature regardless of whether the body is live.
 
@@ -321,9 +323,9 @@ the correct signature regardless of whether the body is live.
 **1. "Retail caches an address in a callee-saved register" and "retail
 re-materialises it per access" are BOTH real shapes, they occur in adjacent
 functions in one unit, and the source spellings are different.** This session
-matched `func_80055258` by STOPPING an address from being cached (an
+matched `SetupStyleSpawnParamsA` by STOPPING an address from being cached (an
 incomplete-array declaration was producing the cache) and improved
-`func_8005511C` by FORCING one (a `u8 **q` local). Same unit, same symbol
+`StyleFillEffectKind2` by FORCING one (a `u8 **q` local). Same unit, same symbol
 group, opposite directions. So neither is a rule about the codebase; read
 which one retail's own words show, then pick the spelling:
 
@@ -363,7 +365,7 @@ record of what someone did, not a proof of what does not work.
   (1)`, `Register 39 (5)`, `Reorderings 3 (60)`, `Insertions 12 (100)`,
   `Deletions 13 (100)`, base 2899; in-tree rebuild 16/79). Permuter searched
   900s / 131,794 iterations, best 830, no zero; candidate at
-  `permuter-work/func_8005511C/output-830-1` left uninspected, and correctly
+  `permuter-work/StyleFillEffectKind2/output-830-1` left uninspected, and correctly
   so -- 830/2899 was a weak signal. That negative is superseded: it was
   measured on the 1-word-short body whose scaffold base was 2899, and this
   round's body bases at 1900 with zero stack and branch penalty.

@@ -1,11 +1,13 @@
-# func_800557DC -- MATCHED, round 46 (2026-09-15)
+# FlushStyleCue -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `func_800557DC` on 2026-09-23 (tools/rename.py). Address 0x800557dc.
 
 Unit `class_3bb8c_n`. **20/20 words, byte-exact.** First build.
 
 ## What it was
 
 Fresh ground, carved round 45, never attempted. Already forward-declared
-by `func_80054D30` earlier in this unit (`extern s32 func_800557DC(ObjN14
+by `StyleTeardown` earlier in this unit (`extern s32 FlushStyleCue(ObjN14
 *arg0);`), which fixed the parameter type before this function's own
 derivation started.
 
@@ -39,7 +41,7 @@ arg0, void *arg1);`) -- each caller already carries its own local reading of
 `self`'s real type, so this unit does the same rather than pulling in
 `ObjDA34`.
 
-`arg0` (this unit's own `ObjN14`, introduced by `func_80054D30`) supplies
+`arg0` (this unit's own `ObjN14`, introduced by `StyleTeardown`) supplies
 both the embedded sub-object handed to `FlushSoundCueSet` (`&arg0->unk14`) and
 the byte toggled after the call (`arg0->unk0->unk6`, negated in place).
 
@@ -47,7 +49,7 @@ the byte toggled after the call (`arg0->unk0->unk6`, negated in place).
 extern s32 D_8008AC7C;
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
-s32 func_800557DC(ObjN14 *arg0) {
+s32 FlushStyleCue(ObjN14 *arg0) {
     FlushSoundCueSet(*(s32 *) D_8008AC7C, &arg0->unk14);
     arg0->unk0->unk6 = -arg0->unk0->unk6;
     return 0;

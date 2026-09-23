@@ -1,18 +1,20 @@
-# func_80054F30 -- MATCHED (42/42 words), class_3bb8c_n
+# StyleFillEffectKind1 -- MATCHED (42/42 words), class_3bb8c_n
+
+> Renamed from `func_80054F30` on 2026-09-23 (tools/rename.py). Address 0x80054f30.
 
 Round 46 (second sitting, alpha). Byte-exact, whole-image SHA1 verified.
 
 ## Signature
 
 ```c
-void **func_80054F30(void **arg0, s32 arg1, void *arg2);
+void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);
 ```
 
 Fills `arg1` slots of the array at `arg0` (advancing it by one pointer each
 time) with `func_80056320(...)` results, and returns the pointer one past
 the last slot written -- the classic "array fill, return next free slot"
 idiom (matches this unit's already-established preference for that shape;
-see `func_80054D30`'s per-index rewrite of `D_8008AC9C`).
+see `StyleTeardown`'s per-index rewrite of `D_8008AC9C`).
 
 ## New externs
 
@@ -21,7 +23,7 @@ extern s32 D_80087330;             /* only element [0] read here */
 extern u8 D_80087204[];            /* address only taken, never indexed */
 extern u8 D_8008E0A4[];            /* address only taken, passed to New_X */
 extern u8 *D_8008E0B4;             /* set to &D_80087204 unconditionally */
-extern void *func_80055258(void *arg0, void *arg1);   /* forward decl, own unit, cold */
+extern void *SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* forward decl, own unit, cold */
 extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3); /* class_3bb8c_r.c, ALREADY MATCHED */
 ```
 
@@ -31,7 +33,7 @@ an array -- if a sibling function later indexes `[1]`, retype there, not
 here (no other unit references any of these four symbols currently).
 `func_80056320` is `class_3bb8c_r.c`'s already-matched `New_X`-style
 allocator (`void *(void*,void*,void*,void*)`), called cross-unit by
-prototype only. `func_80055258` is one of this unit's own still-cold
+prototype only. `SetupStyleSpawnParamsA` is one of this unit's own still-cold
 functions (110w, queued later); its return value is discarded here (`jal`
 result overwritten before use), so the forward declaration's return type is
 unconstrained by this call site -- reconcile if its own definition needs a
@@ -40,15 +42,15 @@ narrower type.
 ## Body
 
 ```c
-void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
+void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     s32 i;
     s32 val;
 
     val = D_80087330;
     D_8008E0B4 = D_80087204;
     for (i = 0; i < arg1; i++) {
-        func_80055258(arg2, (void *) val);
-        *arg0 = func_80056320((void *) 1, D_8008E0A4, (void *) D_8008AB4C, arg2);
+        SetupStyleSpawnParamsA(arg2, (void *) val);
+        *arg0 = func_80056320((void *) 1, D_8008E0A4, (void *) gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
@@ -59,8 +61,8 @@ void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
 even when the call's return value is discarded
 
 First attempt read `D_80087330` directly inside the loop body
-(`func_80055258(arg2, (void *) D_80087330)`), which is semantically identical
--- but GCC 2.6.3 can't prove `func_80055258` doesn't write back to
+(`SetupStyleSpawnParamsA(arg2, (void *) D_80087330)`), which is semantically identical
+-- but GCC 2.6.3 can't prove `SetupStyleSpawnParamsA` doesn't write back to
 `D_80087330`, so it reloads the global from memory on every iteration
 (`lui`/`lw` inside the loop, one fewer callee-saved register overall: 39
 words instead of retail's 42). Retail hoists the read to a local

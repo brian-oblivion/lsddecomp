@@ -1,4 +1,6 @@
-# func_80054714 -- MATCHED, round 46 (2026-09-15)
+# StyleFlushDecoration -- MATCHED, round 46 (2026-09-15)
+
+> Renamed from `func_80054714` on 2026-09-23 (tools/rename.py). Address 0x80054714.
 
 Unit `class_3bb8c_n`. **17/17 words, byte-exact.** Second build (one-word
 struct-offset miss on the first).
@@ -50,7 +52,7 @@ struct ObjAB54 {
 extern const u8 *D_8008AB54;
 extern s32 D_8008AC94;
 
-void func_80054714(void) {
+void StyleFlushDecoration(void) {
     if (D_8008AB54 != 0) {
         ((ObjAB54 *) D_8008AC94)->methods->slot4((ObjAB54 *) D_8008AC94);
         D_8008AB54 = 0;

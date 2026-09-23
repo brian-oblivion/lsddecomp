@@ -68,7 +68,7 @@ struct ObjAB54 {
 extern const u8 *D_8008AB54;
 extern s32 D_8008AC94;
 
-void func_80054714(void) {
+void StyleFlushDecoration(void) {
     if (D_8008AB54 != 0) {
         ((ObjAB54 *) D_8008AC94)->methods->slot4((ObjAB54 *) D_8008AC94);
         D_8008AB54 = 0;
@@ -89,7 +89,7 @@ extern s32 D_8008AC8C;
 extern u8 D_80087234[];
 extern s32 D_8008AB50;
 
-void *func_80054758(void) {
+void *PickStyleFallbackConfig(void) {
     s32 sum;
     s32 kind;
     s32 divisor;
@@ -160,7 +160,7 @@ struct ObjSlotAC {
  * produces retail's otherwise inexplicable reload of D_8008AB50 for the
  * `== 2` test and its reload of the pair's second word right after writing
  * it.  Written as two scalar stores, neither reload appears and the body is
- * several words short.  Round 61; see docs/match-reports/func_80054850.md. */
+ * several words short.  Round 61; see docs/match-reports/StyleBuildDecorSet.md. */
 typedef struct PairXY PairXY;
 struct PairXY {
     s32 x; /* +0x000 */
@@ -169,11 +169,11 @@ struct PairXY {
 
 /* STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first
  * real diff at word 15 (0x4508C / vram 0x8005488C) -- see
- * docs/match-reports/func_80054850.md.  Round 61 REVISIT: 12/86 and 6 short
+ * docs/match-reports/StyleBuildDecorSet.md.  Round 61 REVISIT: 12/86 and 6 short
  * -> 17/86 and 1 short.  Residue is one redundant `move` retail emits and
  * two scheduling reorderings.  Preserved near-miss body: */
 #if 0
-void func_80054850(void) {
+void StyleBuildDecorSet(void) {
     PairXY paramA;
     PairXY paramB;
     s32 i;
@@ -215,7 +215,7 @@ void func_80054850(void) {
     ((ObjSlot4C *) D_8008E10C[0])->methods->slot4C(D_8008E10C[0], result, &paramA);
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054850);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleBuildDecorSet);
 
 typedef struct ObjAC7CSub ObjAC7CSub;
 typedef struct ObjAC7CSubMethods ObjAC7CSubMethods;
@@ -243,11 +243,11 @@ struct ObjSlotB8B8 {
 };
 
 /* MATCHED round 61 (bravo), first attempt, after the BLKmode-struct-copy
- * lever found on func_80054850 -- see docs/match-reports/func_800549A8.md.
- * `rgb` is written only at [0..2] (by func_80054B1C); its declared size of 8
+ * lever found on StyleBuildDecorSet -- see docs/match-reports/StyleUpdateDecorSet.md.
+ * `rgb` is written only at [0..2] (by AdjustRgbByDelta); its declared size of 8
  * is inferred from the STACK LAYOUT (it occupies sp+0x10..0x17, with `pos`
  * at sp+0x18), not from any access. */
-void func_800549A8(void) {
+void StyleUpdateDecorSet(void) {
     ObjAC7CSub *self;
     s32 delta;
     s32 shift;
@@ -276,7 +276,7 @@ void func_800549A8(void) {
     srcOfs = 0;
     pos.y += shift * 3;
     do {
-        func_80054B1C(rgb, (u8 *) (srcOfs + D_8008AC8C), shift);
+        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + D_8008AC8C), shift);
         obj = (ObjSlotB8B8 *) *wp;
         obj->methods->slotB8(obj, 1, rgb);
         obj = (ObjSlotB8B8 *) *wp;
@@ -286,11 +286,11 @@ void func_800549A8(void) {
         pos.y += 3;
         wp++;
     } while (i < 0x12);
-    func_80054B1C(rgb, (u8 *) D_8008AC90, shift);
+    AdjustRgbByDelta(rgb, (u8 *) D_8008AC90, shift);
     self->methods->slot64(self, rgb);
 }
 
-void func_80054B1C(u8 *dst, u8 *src, s32 delta) {
+void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
     dst[0] = src[0] - delta;
     dst[1] = src[1] - delta;
     dst[2] = src[2] + delta;
@@ -300,7 +300,7 @@ extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 D_8008AB50;
 extern void *D_8008E10C[];
 
-void func_80054B50(void) {
+void StyleReleaseDecorSet(void) {
     if (D_8008AB50 != 0) {
         ReleaseBasicClassArray(D_8008E10C, 0x12);
         D_8008AB50 = 0;
@@ -314,12 +314,12 @@ extern s32 rand(void);
 extern s8 D_80087324[];
 extern s32 D_8008AC88;
 extern void *D_8008E0C8[];
-extern void *func_80054DA4(void *arg0, s32 arg1, void *arg2);
-extern void **func_80054F30(void **arg0, s32 arg1, void *arg2);
-extern void **func_80054FD8(void **arg0, void *arg1);
-extern void **func_8005511C(void **arg0, void *arg1);
+extern void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);
+extern void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);
+extern void **StyleFillEffectKind3(void **arg0, void *arg1);
+extern void **StyleFillEffectKind2(void **arg0, void *arg1);
 
-void func_80054B84(void *arg0) {
+void StyleBuildEffectSlots(void *arg0) {
     s32 base;
     s32 val;
     s32 count;
@@ -333,12 +333,12 @@ void func_80054B84(void *arg0) {
     val = D_80087324[rand() & 3];
     count = (D_8008AC80 == 2) ? 0x10 - val : 0;
     D_8008AC88 = val + count;
-    filled = (void **) func_80054DA4(D_8008E0C8, val, arg0);
-    filled = func_80054F30(filled, count, arg0);
+    filled = (void **) StyleFillEffectKind0(D_8008E0C8, val, arg0);
+    filled = StyleFillEffectKind1(filled, count, arg0);
     if (D_8008AC80 == 0) {
-        func_80054FD8(filled, arg0);
+        StyleFillEffectKind3(filled, arg0);
     } else if (D_8008AC80 == 2) {
-        func_8005511C(filled, arg0);
+        StyleFillEffectKind2(filled, arg0);
     } else {
         return;
     }
@@ -362,7 +362,7 @@ extern s32 D_8008AC80;
 extern s32 D_8008AC88;
 extern void *D_8008E0C8[];
 
-void func_80054C74(void *arg0) {
+void StyleUpdateEffectSlots(void *arg0) {
     s32 i;
     ObjE0C8 *obj;
 
@@ -379,13 +379,13 @@ extern s32 D_8008AC80;
 extern s32 D_8008AC88;
 extern void *D_8008E0C8[];
 
-void func_80054CFC(void) {
+void StyleReleaseEffectSlots(void) {
     if (D_8008AC80 >= 0) {
         ReleaseBasicClassArray(D_8008E0C8, D_8008AC88);
     }
 }
 
-/* Local view only: `func_800557DC` (defined later in this unit, in strict
+/* Local view only: `FlushStyleCue` (defined later in this unit, in strict
  * ROM order) takes one of these two per-slot objects. `unk0` is address-
  * taken then chased for a single byte at +0x6 (toggled there); `unk14` is
  * only ever address-taken, as an embedded sub-object handed to
@@ -408,22 +408,22 @@ struct ObjN14 {
     s32 unk14; /* +0x014 */
 };
 
-extern s32 func_800557DC(ObjN14 *arg0);
+extern s32 FlushStyleCue(ObjN14 *arg0);
 
-extern s32 D_8008AB4C;
+extern s32 gStyleCueSelf;
 extern ObjN14 *D_8008AC9C[2];
 
-void func_80054D30(void) {
+void StyleTeardown(void) {
     s32 i;
 
-    func_80054714();
-    func_80054B50();
-    func_80054CFC();
+    StyleFlushDecoration();
+    StyleReleaseDecorSet();
+    StyleReleaseEffectSlots();
     for (i = 0; i < 2; i++) {
-        D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
+        D_8008AC9C[i] = (ObjN14 *) FlushStyleCue(D_8008AC9C[i]);
     }
-    if (D_8008AB4C != 0) {
-        D_8008AB4C = 0;
+    if (gStyleCueSelf != 0) {
+        gStyleCueSelf = 0;
     }
 }
 
@@ -432,19 +432,19 @@ extern s32 D_80087328[];
 extern u8 *D_8008E0B4;
 extern s32 D_8008E0BC;
 extern s32 D_8008E0A4;
-extern void func_80055258(void *arg0, void *arg1);
-extern void func_80055410(void *arg0, void *arg1);
+extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
+extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);
 extern void *func_80056320(void *arg0, void *arg1, void *arg2, void *arg3);
 
 /* STALL, 93/99 words (length matches, 0x18C, re-measured round 48; earlier
  * round 47 report recorded 87/99), whole-function arg0/arg1/arg2
  * register-colour rotation (s2/s5/s4) -- see
- * docs/match-reports/func_80054DA4.md. Round 48: check 3 confirms AGREE
+ * docs/match-reports/StyleFillEffectKind0.md. Round 48: check 3 confirms AGREE
  * (permuter scaffold: Insertions 0, Deletions 0, Reorderings 0, pure
  * Stack/Register-field residue -- matches the in-tree rebuild's pure
  * word-level register-field diffs). Preserved near-miss body: */
 #if 0
-void *func_80054DA4(void *arg0, s32 arg1, void *arg2) {
+void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     void **arr;
     s32 i;
     s32 t3;
@@ -457,39 +457,39 @@ void *func_80054DA4(void *arg0, s32 arg1, void *arg2) {
     if (t3 != 0) {
         t3 = D_80087328[t3];
     }
-    fp = func_80055410;
+    fp = SetupStyleSpawnParamsB;
     if (D_8008AC74 % 7 != 0) {
-        fp = func_80055258;
+        fp = SetupStyleSpawnParamsA;
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = func_80056320((void *) 0, &D_8008E0A4, (void *) D_8008AB4C, arg2);
+        *arr = func_80056320((void *) 0, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
         arr++;
     }
     return (void *) arr;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054DA4);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleFillEffectKind0);
 
 extern s32 D_80087330;
 extern u8 D_80087204[];
 
-void **func_80054F30(void **arg0, s32 arg1, void *arg2) {
+void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     s32 i;
     s32 val;
 
     val = D_80087330;
     D_8008E0B4 = D_80087204;
     for (i = 0; i < arg1; i++) {
-        func_80055258(arg2, (void *) val);
-        *arg0 = func_80056320((void *) 1, &D_8008E0A4, (void *) D_8008AB4C, arg2);
+        SetupStyleSpawnParamsA(arg2, (void *) val);
+        *arg0 = func_80056320((void *) 1, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
         arg0++;
     }
     return arg0;
 }
 
 extern s32 D_80087330;
-extern void func_80055258(void *arg0, void *arg1);
+extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern s32 D_8008E0C0[];
 extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
@@ -498,7 +498,7 @@ extern s32 D_8008E0AC;
 extern u8 D_8008721C[];
 
 /* STALL, 78/81 words, length EXACT (no drift), first real diff at word 69
- * (0x458EC / vram 0x800550EC) -- see docs/match-reports/func_80054FD8.md.
+ * (0x458EC / vram 0x800550EC) -- see docs/match-reports/StyleFillEffectKind3.md.
  * Round 61 REVISIT: 38/81 -> 78/81. Round 47's "pure arg0/arg1 register-
  * colour swap, ZERO drift" verdict was wrong on both counts; the equal
  * length was two defects cancelling. Residue is now ONE instruction's
@@ -508,7 +508,7 @@ extern u8 D_8008721C[];
  * gp-relative load hoist across. Preserved near-miss body: */
 /* STALL, 79/81 words, length EXACT, insertions 0 / deletions 0, first real
  * diff at word 60 (0x458C8 / vram 0x800550C8) -- see
- * docs/match-reports/func_80054FD8.md.  Round 61 REVISIT: 38/81 -> 79/81.
+ * docs/match-reports/StyleFillEffectKind3.md.  Round 61 REVISIT: 38/81 -> 79/81.
  * Round 47's "pure arg0/arg1 register-colour swap, ZERO drift" verdict was
  * wrong on both counts; the equal length was two defects cancelling.  What
  * is left is 2 words of genuine register identity: the else branch's
@@ -517,12 +517,12 @@ extern u8 D_8008721C[];
  * words) coalesces with the third-argument register.  Preserved near-miss
  * body: */
 #if 0
-void **func_80054FD8(void **arg0, void *arg1) {
+void **StyleFillEffectKind3(void **arg0, void *arg1) {
     s32 t;
     s32 *p;
     u8 **q;
 
-    func_80055258(arg1, (void *) D_80087330);
+    SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     if (D_8008AB50 != 0 && D_8008AC8C == (s32) D_8008726C) {
         D_8008E0A4 = 0xFFFF5000;
         D_8008E0A8 = -0x2000;
@@ -539,7 +539,7 @@ void **func_80054FD8(void **arg0, void *arg1) {
         t = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
         D_8008E0C0[0] = t;
     }
-    t = D_8008AB4C;
+    t = gStyleCueSelf;
     q = &D_8008E0B0;
     *q = D_80087174;
     *arg0 = func_80056320((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
@@ -547,7 +547,7 @@ void **func_80054FD8(void **arg0, void *arg1) {
     return arg0;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_80054FD8);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleFillEffectKind3);
 
 extern s32 D_80087430;
 extern u8 D_80087228[];
@@ -560,9 +560,9 @@ extern s32 D_8008E0BC;
  * short).  Two levers closed the length gap and the whole prologue:
  *   (1) `u8 **q = &D_8008E0B0;` -- retail CACHES that address in a
  *       callee-saved register and derives D_8008E0A4's address from it as
- *       `q - 0xC`, which is the idiom func_80054FD8 below already uses.
+ *       `q - 0xC`, which is the idiom StyleFillEffectKind3 below already uses.
  *       16/79 (1 short) -> 42/79 (exact).
- *   (2) the arg0 shape of the matched sibling func_80054F30 -- `void **`
+ *   (2) the arg0 shape of the matched sibling StyleFillEffectKind1 -- `void **`
  *       parameter, `*arg0 = ...; arg0++; return arg0;` rather than a cast
  *       and `+ 4`.  42/79 -> 49/79, and the $s1/$s2 parameter colours and
  *       the entire prologue then matched exactly.
@@ -575,7 +575,7 @@ extern s32 D_8008E0BC;
  * loses retail's `addiu a2,a2,4` there.  Do not re-derive that.
  * Preserved near-miss body: */
 #if 0
-void **func_8005511C(void **arg0, void *arg1) {
+void **StyleFillEffectKind2(void **arg0, void *arg1) {
     s32 idx;
     s32 randval;
     s32 v0;
@@ -592,17 +592,17 @@ void **func_8005511C(void **arg0, void *arg1) {
         v0 = D_80087430;
     }
     *slot = v0;
-    func_80055258(arg1, (void *) D_80087330);
+    SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     q = &D_8008E0B0;
     *q = D_80087174;
     randval = rand();
     D_8008E0BC = randval - (randval / 3) * 6;
-    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) D_8008AB4C, arg1);
+    *arg0 = func_80056320((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", func_8005511C);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleFillEffectKind2);
 
 extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
@@ -622,8 +622,8 @@ extern s32 D_8008E0B8;
  * element type (`u8[]` vs `s32[]`) and the cast spelling (`*(s32 *) &D_X`
  * vs `D_X`) are both measurably INERT.  Do not restate this as "the
  * declared type" -- that was the first, wrong, reading.
- * See docs/match-reports/func_80055258.md. */
-void func_80055258(void *arg0, void *arg1) {
+ * See docs/match-reports/SetupStyleSpawnParamsA.md. */
+void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
     if (arg1 == 0) {
         arg1 = (void *) D_80087328[rand() & 3];
     }
@@ -651,16 +651,16 @@ extern s32 D_8008E0B8;
  * `rand`'s `$v0` into it and emitted `move $a1,$v0` after each `jal rand`
  * (two visible, a third word from the knock-on).  Deleting `r` and calling
  * `rand()` inline in each expression -- exactly the idiom the matched
- * sibling func_80055258 above already uses -- keeps the value in `$v0` and
+ * sibling SetupStyleSpawnParamsA above already uses -- keeps the value in `$v0` and
  * recolours the whole body to retail's.  `mod3` stays a local: it has two
  * genuine use points.  A permuter mutates a body but never deletes its
  * locals, which is why the 136367-iteration negative bounded the search and
  * not the function (round 63's LOCAL COUNT corollary).
- * The signature keeps round 47's two dead void* params: func_80054DA4
- * dispatches this through a function pointer shared with func_80055258, so
+ * The signature keeps round 47's two dead void* params: StyleFillEffectKind0
+ * dispatches this through a function pointer shared with SetupStyleSpawnParamsA, so
  * the ABI slot is call-site-determined.  Dead params cost nothing here.
- * See docs/match-reports/func_80055410.md. */
-void func_80055410(void *arg0, void *arg1) {
+ * See docs/match-reports/SetupStyleSpawnParamsB.md. */
+void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
     s32 mod3;
 
     rand();
@@ -678,14 +678,14 @@ void func_80055410(void *arg0, void *arg1) {
 }
 
 extern s32 D_8008AC7C;
-extern void *func_80055620(void *arg0, s32 *arg1, void *arg2);
+extern void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2);
 extern s32 D_800874B0[];
 extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 
-ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
+ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     ObjN14Sub *sub;
 
-    sub = (ObjN14Sub *) func_80055620(&arg0->unk4, &arg0->unk10, arg2);
+    sub = (ObjN14Sub *) FindNearestStyleCueEntry(&arg0->unk4, &arg0->unk10, arg2);
     if (sub != 0) {
         arg0->unk0 = sub;
         InitSoundCueSet(*(s32 *) D_8008AC7C, &arg0->unk14, sub->unk6, arg0, D_800874B0[sub->unk6]);
@@ -705,11 +705,11 @@ extern u8 D_800876EC[];
 extern u8 D_800874EC[];
 extern s32 D_80087474[];
 
-/* Local view only: `D_8008AB4C`'s value is another "pointer stored as a
+/* Local view only: `gStyleCueSelf`'s value is another "pointer stored as a
  * plain s32" (same idiom as `D_8008AC7C`), here treated as a "self" object
  * with a method table at offset 0, dispatched through slot +0x0E8. Moved
- * ahead of its original spot (just before func_800558F0) because
- * func_80055620, ROM-earlier, also dispatches through it. */
+ * ahead of its original spot (just before TickStyle) because
+ * FindNearestStyleCueEntry, ROM-earlier, also dispatches through it. */
 typedef struct ObjAB4C ObjAB4C;
 typedef struct ObjAB4CMethods ObjAB4CMethods;
 struct ObjAB4CMethods {
@@ -747,7 +747,7 @@ struct LocalBuf {
     TabEntry tab;
 };
 
-/* MATCHED round 48 (alpha), 111/111 -- see docs/match-reports/func_80055620.md
+/* MATCHED round 48 (alpha), 111/111 -- see docs/match-reports/FindNearestStyleCueEntry.md
  * for the round 47 (bravo) recovery and the round 48 permuter lead that
  * closed it: the `if (n <= 0) goto fail;` early exit is redundant (the
  * `for (j = 0; j < n; ...)` loop already falls through to the same
@@ -755,7 +755,7 @@ struct LocalBuf {
  * `entry` pointer's address computation as `offset + (s32) base` instead
  * of `base + offset`, closed the last word (a pure commutative-operand
  * encoding-order residue in the `addu`). */
-void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
+void *FindNearestStyleCueEntry(void *arg0, s32 *arg1, void *arg2) {
     s32 j, n;
     u8 *base;
     EntrySlot *entry;
@@ -774,7 +774,7 @@ void *func_80055620(void *arg0, s32 *arg1, void *arg2) {
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (D_800874EC + entry->idx * 6);
-            self = (void *) D_8008AB4C;
+            self = (void *) gStyleCueSelf;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -799,17 +799,17 @@ fail:
 extern s32 D_8008AC7C;
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
-s32 func_800557DC(ObjN14 *arg0) {
+s32 FlushStyleCue(ObjN14 *arg0) {
     FlushSoundCueSet(*(s32 *) D_8008AC7C, &arg0->unk14);
     arg0->unk0->unk6 = -arg0->unk0->unk6;
     return 0;
 }
 
-extern s32 func_80055874(ObjN14 *arg0, void *arg1);
+extern s32 IsStyleCueNear(ObjN14 *arg0, void *arg1);
 extern void func_8002CD08(s32 arg0, void *arg1);
 
-s32 func_8005582C(ObjN14 *arg0, void *arg1, void *arg2) {
-    if (func_80055874(arg0, arg1) != 0) {
+s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void *arg2) {
+    if (IsStyleCueNear(arg0, arg1) != 0) {
         func_8002CD08(*(s32 *) D_8008AC7C, &arg0->unk14);
         return 1;
     }
@@ -818,7 +818,7 @@ s32 func_8005582C(ObjN14 *arg0, void *arg1, void *arg2) {
 
 extern s32 D_80087474[];
 
-s32 func_80055874(ObjN14 *arg0, void *arg1) {
+s32 IsStyleCueNear(ObjN14 *arg0, void *arg1) {
     s32 dx, dy, dist;
     s8 idx;
 
@@ -844,16 +844,16 @@ s32 func_80055874(ObjN14 *arg0, void *arg1) {
     return 0;
 }
 
-extern void func_80054850(void);
-extern void func_800549A8(void);
-extern void func_80055A24(void);
+extern void StyleBuildDecorSet(void);
+extern void StyleUpdateDecorSet(void);
+extern void DrawStyleTables(void);
 extern s32 D_8008AC70;
 extern s32 D_8008AC98;
 extern u8 D_8008E154[];
-extern ObjN14 *func_8005556C(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3);
-extern s32 func_8005582C(ObjN14 *arg0, void *arg1, void *arg2);
+extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3);
+extern s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void *arg2);
 
-s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
+s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     void *ctx;
     u8 buf[0x10];
     s32 i;
@@ -861,21 +861,21 @@ s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
     ctx = 0;
     if (arg0 != 0) {
         ctx = buf;
-        ((ObjAB4C *) D_8008AB4C)->methods->slotE8((ObjAB4C *) D_8008AB4C, ctx, arg0);
+        ((ObjAB4C *) gStyleCueSelf)->methods->slotE8((ObjAB4C *) gStyleCueSelf, ctx, arg0);
     }
     if (D_8008AC70++ == 0) {
         ApplyStyleDecorationIfSet();
-        func_80054850();
-        func_80054B84(ctx);
+        StyleBuildDecorSet();
+        StyleBuildEffectSlots(ctx);
     }
-    func_800549A8();
-    func_80054C74(ctx);
-    func_80055A24();
+    StyleUpdateDecorSet();
+    StyleUpdateEffectSlots(ctx);
+    DrawStyleTables();
     D_8008AC98 = 0;
     for (i = 0; i < 2; i++) {
         if (D_8008AC9C[i] != 0) {
-            if (func_8005582C(D_8008AC9C[i], ctx, arg1) == 0) {
-                D_8008AC9C[i] = (ObjN14 *) func_800557DC(D_8008AC9C[i]);
+            if (StopStyleCueIfNear(D_8008AC9C[i], ctx, arg1) == 0) {
+                D_8008AC9C[i] = (ObjN14 *) FlushStyleCue(D_8008AC9C[i]);
             }
             /* INERT ON PURPOSE -- DO NOT DELETE. This pair is a semantic
              * no-op (`i` is the initialized loop counter, so nothing here is
@@ -885,11 +885,11 @@ s32 func_800558F0(void *arg0, void *arg1, s32 arg2) {
              * and kept because the WHOLE-IMAGE SHA1 verifies with it, not
              * because the permuter's own scorer liked it (round 41: a
              * scorer zero is a lead, an `OK: build matches retail` is an
-             * answer). Removing these two lines re-breaks func_800558F0. */
+             * answer). Removing these two lines re-breaks TickStyle. */
             i++;
             i--;
         } else {
-            D_8008AC9C[i] = func_8005556C((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
+            D_8008AC9C[i] = TryStartStyleCue((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;
@@ -902,7 +902,7 @@ extern s32 D_80087450[];
 extern s32 D_8008745C[];
 extern s32 D_80087468[];
 
-void func_80055A24(void) {
+void DrawStyleTables(void) {
     void *a0, *a2;
     s32 a1;
 

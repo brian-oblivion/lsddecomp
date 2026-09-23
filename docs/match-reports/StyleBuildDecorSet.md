@@ -1,4 +1,6 @@
-# func_80054850 -- STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first real diff at word 15 (0x4508C / vram 0x8005488C)
+# StyleBuildDecorSet -- STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first real diff at word 15 (0x4508C / vram 0x8005488C)
+
+> Renamed from `func_80054850` on 2026-09-23 (tools/rename.py). Address 0x80054850.
 
 REVISITED, round 61: 12/86 and 6 words short -> 17/86 and 1 word short; the
 two residues rounds 46/47 classified as uncontrollable register pressure were
@@ -146,7 +148,7 @@ struct PairXY {
     s32 y; /* +0x004 */
 };
 
-void func_80054850(void) {
+void StyleBuildDecorSet(void) {
     PairXY paramA;
     PairXY paramB;
     s32 i;
@@ -192,7 +194,7 @@ void func_80054850(void) {
 ## Gate 3 / permuter
 
 **Not run this round, and deliberately.** One bounded search was spent on
-`func_80054FD8` (this session's first assignment, one search at a time), and
+`StyleFillEffectKind3` (this session's first assignment, one search at a time), and
 by the time this body reached 1 word short that search was still live. This
 function is now a much better search candidate than it was when rounds 46 and
 47 recommended one: the base has gone from 6 words short with a mis-derived
