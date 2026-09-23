@@ -132,52 +132,39 @@ void Class6E99C__SetStep(Class6E99CObj *self, s32 a1) {
     self->step = a1;
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 29/35 words, length exact. Residue: instruction
- * scheduling (retail materializes `li $a1,1` immediately after the
- * configure dispatch, before computing idx*3; this body defers it to just
- * before the slotB8 call) (docs/match-reports/Class6E99C__StartFadeToIndex.md).
- * Hand-derived. */
-void Class6E99C__StartFadeToIndex(Class6E99CObj *self) {
+/* `configure`'s occupant, Class6E99C__Configure, reads all four argument
+ * registers, and both StartFade* functions forward their own a1..a3 to it
+ * untouched (no argument register is set before that jalr). The shared
+ * Class6E99CMethods slot is declared `(self)` only, so the call goes through
+ * this file-local view instead of retyping the shared header. Spelling the
+ * forward is load-bearing: the `(self)`-only call compiles to the same
+ * instructions in a different order (29/35; round 73). */
+typedef s32 (*Configure6E99CFn)(Class6E99CObj *self, s32 a1, s32 a2, s32 a3);
+
+void Class6E99C__StartFadeToIndex(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     s32 idx;
 
     if (self->state != 0) {
         return;
     }
-    idx = self->methods->configure(self);
+    idx = ((Configure6E99CFn)self->methods->configure)(self, a1, a2, a3);
     self->methods->slotB8(self, 1, &D_8006EA90[idx * 3]);
     self->state = 1;
     self->step = -self->step;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeToIndex);
-#endif
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 40/41 words, 1 word short. Residue: two residues --
- * the shared `li $a1,1`-scheduling class with Class6E99C__StartFadeToIndex, plus a
- * genuinely missing register-only dead-store delay-slot filler
- * (retail copies its unread 3rd argument into $t0 in a branch delay
- * slot; GCC 2.6.3 eliminates the equivalent C statement as dead code
- * before scheduling ever sees it) (docs/match-reports/Class6E99C__StartFadeDefault.md).
- * Hand-derived. */
-void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2) {
-    s32 idx;
-
+void Class6E99C__StartFadeDefault(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     if (self->state != 0) {
         return;
     }
-    idx = self->methods->configure(self);
+    a2 = ((Configure6E99CFn)self->methods->configure)(self, a1, a2, a3);
     if (self->altMode != 0) {
         self->unk80--;
     } else {
-        self->methods->slotB8(self, 1, &D_8006EAA8[idx * 3]);
+        self->methods->slotB8(self, 1, &D_8006EAA8[a2 * 3]);
     }
     self->state = 2;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__StartFadeDefault);
-#endif
 
 s32 Class6E99C__Configure(Class6E99CObj *self, s32 a1, s32 a2, s32 a3) {
     Class6E99CMethods *methods;
@@ -256,31 +243,20 @@ void *Class6E99C__GetColor(Class6E99CObj *self) {
     return &D_8006EA90[self->unk78 * 3];
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 22/25 words, length exact. Residue: redundant-move
- * register residue -- retail additionally does `move $t0,$a1`
- * unconditionally in a branch delay slot and uses $t0 for both a1->x/
- * a1->y loads; nothing in the C forces an early copy of a1, so no
- * source shape tried reproduces the extra move. Permuter-exhausted
- * (~76k combined iterations, two independent runs)
- * (docs/match-reports/Class6E99C__PushPosition.md). Hand-derived. */
+/* Both s32 pairs are copied as whole structs. GCC 2.6.3's MIPS
+ * `movstrsi_internal` clobbers $v0/$v1/$a0/$a1, so `self` and `a1`, live
+ * across the first copy, cannot stay in their incoming registers: that is
+ * retail's entry `move $a3,$a0` / delay-slot `move $t0,$a1` (round 73). */
 void Class6E99C__PushPosition(Class6E99CObj *self, SkipShort2 *a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
-        __asm__("" ::: "memory");
-        self->unk90 = self->unk50;
-        self->unk94 = self->unk54;
-        __asm__("" ::: "memory");
+        *(Pair32E99C *)&self->unk90 = *(Pair32E99C *)&self->unk50;
         self->unk60 = a1->x;
         self->unk62 = a1->y;
-        __asm__("" ::: "memory");
         *(Pair32E99C *)&self->unk50 = *a2;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", Class6E99C__PushPosition);
-#endif
 
 void Class6E99C__PopPosition(Class6E99CObj *self) {
     s32 t0, t1;

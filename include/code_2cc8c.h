@@ -1983,6 +1983,12 @@ struct Class6E99CMethods {
     /* +0x0DC, IS ClassEAC0Methods's own +0x0DC too -- Class6E99C__Configure (this
        unit) is the shared occupant either way. RENAMED round 61 (was slotDC). */
     s32 (*configure)(Class6E99CObj *self);              /* +0x0DC, Class6E99C__Configure */
+    /* Round 73 note: the slot is declared `(self)` only, but its occupant
+       reads all four argument registers and both StartFade* callers forward
+       their own a1..a3 to it; code_2cc8c_e.c calls it through a file-local
+       4-argument view (Configure6E99CFn) rather than retyping this shared
+       slot. The same holds for startFadeToIndex/startFadeDefault, whose
+       definitions take (self, a1, a2, a3). */
     void (*stop)(Class6E99CObj *self, void *a1);   /* +0x0E0, Class6E99C__Stop.
                                 RENAMED round 61 (was slotE0). */
     void *(*getColor)(Class6E99CObj *self);            /* +0x0E4, Class6E99C__GetColor.
