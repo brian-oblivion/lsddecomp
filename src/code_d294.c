@@ -177,7 +177,7 @@ Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self) {
     return self;
 }
 
-void func_8001D204(Class6B5CCObj *self) {
+void Class6B5CC__DetachAttachedChildren(Class6B5CCObj *self) {
     GenericObj_d294 *entry = NULL;
     s32 cont;
 

@@ -11,7 +11,7 @@
  * +0x018 Class6B5CC__RemoveAllChildren, [+0x01C..+0x038 seven slots inherited verbatim from
  * BasicClass, D_8006B58C], +0x038 Class6B5CC__OnNotify (override), +0x03C null,
  * +0x040 Class6B5CC__Reset, +0x044 Class6B5CC__UpdateRotation, +0x048 Class6B5CC__UpdateScale,
- * +0x04C Class6B5CC__AttachToParent, +0x050 Class6B5CC__DetachFromParent, +0x054 func_8001D204,
+ * +0x04C Class6B5CC__AttachToParent, +0x050 Class6B5CC__DetachFromParent, +0x054 Class6B5CC__DetachAttachedChildren,
  * +0x058 func_8001D280, +0x05C func_8001D33C (already-matched no-op stub),
  * +0x060 func_8001D344, +0x064 func_8001D374, +0x068 func_8001D3A0,
  * +0x06C func_8001D3CC, +0x070 func_8001D3F8, and continuing past this
@@ -377,7 +377,7 @@ struct GenericMethods_d294 {
      * real meaning of the literal unknown. */
     void (*slot38)(GenericObj_d294 *self, Class6B5CCObj *arg1, s32 arg2); /* +0x038 */
     u8 pad03C[0x050 - 0x03C];
-    void (*slot50)(GenericObj_d294 *self); /* +0x050, func_8001D204's call target */
+    void (*slot50)(GenericObj_d294 *self); /* +0x050, Class6B5CC__DetachAttachedChildren's call target */
 };
 struct GenericObj_d294 {
     GenericMethods_d294 *methods; /* +0x000 */
@@ -438,8 +438,8 @@ struct Class6B5CCMethods {
     void (*updateScale)(Class6B5CCObj *self, s32 flag, void *data); /* +0x048, Class6B5CC__UpdateScale */
     u8 pad04C[0x050 - 0x04C];
     void (*slot50)(Class6B5CCObj *self);      /* +0x050, Class6B5CC__DetachFromParent (this unit) */
-    void (*slot54)(Class6B5CCObj *self);      /* +0x054, func_8001D204 (this unit) */
-    /* +0x058, func_8001D280 (still queued). func_8001D204's own call site
+    void (*slot54)(Class6B5CCObj *self);      /* +0x054, Class6B5CC__DetachAttachedChildren (this unit) */
+    /* +0x058, func_8001D280 (still queued). Class6B5CC__DetachAttachedChildren's own call site
      * establishes its signature: writes an output entry pointer and an
      * output "more remain" flag through its 2nd/3rd arguments. */
     void (*slot58)(Class6B5CCObj *self, GenericObj_d294 **outEntry, s32 *outCont); /* +0x058 */
@@ -731,7 +731,7 @@ void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self);
 void Class6B5CC__Reset(Class6B5CCObj *self);
 Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec);
 Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self);
-void func_8001D204(Class6B5CCObj *self);
+void Class6B5CC__DetachAttachedChildren(Class6B5CCObj *self);
 void func_8001D280(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor);
 
 /* GetSetBitField (round 54 correction: this banner was STALE -- it is

@@ -1,4 +1,6 @@
-# func_8001D204
+# Class6B5CC__DetachAttachedChildren
+
+> Renamed from `func_8001D204` on 2026-09-23 (tools/rename.py). Address 0x8001d204.
 
 **Unit:** code_d294 · **Size:** 31 words · **Status:** MATCHED (31/31 words)
 
@@ -15,7 +17,7 @@ the loop's own continue flag) goes to zero.
 ## The C
 
 ```c
-void func_8001D204(Class6B5CCObj *self) {
+void Class6B5CC__DetachAttachedChildren(Class6B5CCObj *self) {
     GenericObj_d294 *entry = NULL;
     s32 cont;
 

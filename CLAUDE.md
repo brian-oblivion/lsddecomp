@@ -566,7 +566,7 @@ backstop, not a substitute for reading `build exit=`.
 adding one.** Round 13's delta inserted a new field into a shared vtable
 struct and forgot its leading `u8 padNN[...]`. Everything after it shifted,
 which broke an ALREADY-MATCHED function in a DIFFERENT unit
-(`func_8001D204`, `code_d294.c`) by exactly one byte. It compiled clean, and
+(`Class6B5CC__DetachAttachedChildren`, `code_d294.c`) by exactly one byte. It compiled clean, and
 nothing in delta's own function's output showed anything wrong. Delta
 proposed it as a fifth way a score lies.
 
