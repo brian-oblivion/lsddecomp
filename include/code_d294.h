@@ -8,7 +8,7 @@
  * shows this unit's own method table starts at D_8006B5CC and its slots,
  * in order, ARE this unit's functions: +0x008 Class6B5CC__Class6B5CC (ctor),
  * +0x00C Class6B5CC__Finalize (dtor), +0x010 Class6B5CC__AddChild, +0x014 Class6B5CC__RemoveChild,
- * +0x018 func_8001CD20, [+0x01C..+0x038 seven slots inherited verbatim from
+ * +0x018 Class6B5CC__RemoveAllChildren, [+0x01C..+0x038 seven slots inherited verbatim from
  * BasicClass, D_8006B58C], +0x038 func_8001CD60 (override), +0x03C null,
  * +0x040 func_8001CE30, +0x044 func_8001CEB4, +0x048 func_8001D008,
  * +0x04C func_8001D0EC, +0x050 func_8001D1A4, +0x054 func_8001D204,
@@ -288,7 +288,7 @@ struct BasicClassMethodsD294 {
      * this unit alone. */
     void (*slot10)(void *self, void *other); /* +0x010 */
     void (*slot14)(void *self, void *other); /* +0x014 */
-    void (*slot18)(void *self);              /* +0x018, func_8001CD20's forward target */
+    void (*slot18)(void *self);              /* +0x018, Class6B5CC__RemoveAllChildren's forward target */
     u8 pad01C[0x038 - 0x01C];
     /* +0x038, func_8001CD60's (this unit) own forward target -- called
      * unconditionally as its very first action, `(self, other, arg2)`,
@@ -727,7 +727,7 @@ void *Class6B5CC__Class6B5CC(Class6B5CCObj *self);
 void Class6B5CC__Finalize(Class6B5CCObj *self);
 void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other);
 void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other);
-void func_8001CD20(Class6B5CCObj *self);
+void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self);
 void func_8001CE30(Class6B5CCObj *self);
 Class6B5CCObj *func_8001D0EC(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec);
 Class6B5CCObj *func_8001D1A4(Class6B5CCObj *self);

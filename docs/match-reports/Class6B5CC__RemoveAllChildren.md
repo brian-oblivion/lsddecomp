@@ -1,4 +1,6 @@
-# func_8001CD20
+# Class6B5CC__RemoveAllChildren
+
+> Renamed from `func_8001CD20` on 2026-09-23 (tools/rename.py). Address 0x8001cd20.
 
 **Unit:** code_d294 · **Size:** 16 words · **Status:** MATCHED (16/16 words)
 
@@ -11,7 +13,7 @@ then unconditionally forwards to the base class's own `+0x018` slot.
 ## The C
 
 ```c
-void func_8001CD20(Class6B5CCObj *self) {
+void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self) {
     Class6B5CC__UnlinkModel(self);
     Get_vtable_BasicClass()->slot18(self);
 }

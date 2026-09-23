@@ -1934,7 +1934,7 @@ struct Class6E99CMethods {
                                 whose OWN `a2` really is a pointer). */
     void (*dtor)(Class6E99CObj *self);               /* +0x00C, Class6B5CC__Finalize, shared */
     /* +0x010/+0x014/+0x018, IS Class6B5CCMethods's own +0x010/+0x014/+0x018
-       (Class6B5CC__AddChild/Class6B5CC__RemoveChild/func_8001CD20) -- identical addresses in
+       (Class6B5CC__AddChild/Class6B5CC__RemoveChild/Class6B5CC__RemoveAllChildren) -- identical addresses in
        both tables per the file banner's classtable.py census. */
     void (*slot10)(Class6E99CObj *self); /* +0x010, OBSERVED: Class6E99C__Configure */
     void (*slot14)(Class6E99CObj *self, s32 a1); /* +0x014, OBSERVED: Class6E99C__Stop */

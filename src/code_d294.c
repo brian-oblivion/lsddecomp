@@ -64,7 +64,7 @@ void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     Get_vtable_BasicClass()->slot14(self, other);
 }
 
-void func_8001CD20(Class6B5CCObj *self) {
+void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self) {
     Class6B5CC__UnlinkModel(self);
     Get_vtable_BasicClass()->slot18(self);
 }
