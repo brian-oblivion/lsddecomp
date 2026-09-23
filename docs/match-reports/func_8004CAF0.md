@@ -1,4 +1,136 @@
-# func_8004CAF0 — STALL, 97 words (exact length, zero drift), 62/97 raw word-match (round 58, up from 55/97), first diff at the prologue register saves (0x3D2F4, `self`/`slot`/temp 3-cycle among `$s0`/`$s1`/`$s3`) — but round 58 argues that rotation is DOWNSTREAM of the one remaining structural diff, an arithmetic reassociation at 0x3D3E0, and so this is not yet established as a HARD RULE 6 register-identity stall
+# func_8004CAF0 — MATCHED 97/97 (round 71, delta; revisit). Previously: STALL, 97 words exact length, 62/97, first diff at the prologue register saves
+
+
+> **REVISITED, round 71: MATCHED 97/97, byte-exact, whole-image SHA1 green; names/types used (parameters renamed col/row/width/height, locals overflow/span/elemArg/widthLeft; no struct change).** The sections below this one are the history and are superseded by it.
+
+## Round 71 (delta) — MATCHED
+
+**Rebuilt as given first.** The round-58/60 `#ifdef NON_MATCHING` body, made
+live unchanged: **62/97, exact length, zero drift; funcdiff `insertions 0 /
+deletions 0`, positional skeleton diffs 34.** (Round 58's "3 ins / 3 del" was
+the permuter's figure on the 55/97 body; on the 62/97 body the real-build
+opcode diff is 0/0 — diff B is two replacements plus a delay-slot fill, not an
+ins/del.)
+
+**Round 58's CAUSE was right in location (diff B) and wrong in mechanism.**
+It called the reassociation "below the level a named temporary can reach". It
+is not: it is a TREE-level `fold` rewrite, `(A + C) - B -> A - (B - C)`, after
+which CSE shares `B - C` (`span - 20`) with the later `slot->h8 = span - 20`
+and carries that across the call instead of `span`. Splitting the expression
+into two statements (`widthLeft = width + 20; widthLeft = widthLeft - span;`)
+defeats `fold`. Round 58 recorded the split as "drift" and the named local as
+"inert"; both are true on the body they were measured on, because that body
+had other compensating shapes (below) that the split disturbs.
+
+Progression, every step through the full oracle, every one exact length
+unless stated:
+
+| step | shape | score | funcdiff ins/del |
+| --- | --- | --- | --- |
+| 0 | round-58 body as given | 62/97 | 0/0 |
+| 1 | + split `(p7 + 20) - sum` into two statements | 45/97, **length change** | 1/1 — but asm-differ shows diff B CLOSED; the new residue is an extra `move v0,count` in the tail's delay slot and a jump to past the epilogue's copy |
+| 2 | + one shared `return count;` at the end (if/else arms instead of three early returns) | **76/97** | 0/0 — residue now a 3-cycle count/nextArg/sum among `$s2`/`$s3`/`$s4` |
+| 3 | + `slot->h4 = p5 ± 10` stored inside each arm, the two `__asm__("")` barriers dropped | 76/97 | 0/0 (identical; the barriers were no longer doing anything) |
+| 4 | + drop the `do { } while (0)` | 46/97 | 1/1 — count's register now RIGHT (`$s2`); residue nextArg/sum swap + diff A (the `sh hA` became the `lh h4` load-delay filler again) |
+| 5 | + bare `__asm__("")` after `slot->hA = hSpan2` (diagnostic only) | **86/97** | 0/0 — diff A closed, residue a pure 2-register swap nextArg/sum |
+| 6 | instead of 5: `slot->hA = span;` written at the END OF EACH ARM of the `col < 10` if/else, not once after the join | **97/97, `OK: build matches retail`** | 0/0 |
+
+So the `do { } while (0)` that round 58 found was compensating for the missing
+join-point barrier (loop notes act as a scheduling barrier in 2.6.3's sched),
+at the price of perturbing `count`'s allocation priority, and the "3-register
+rotation" was downstream of that, not of diff B alone. The real source has the
+`hA` store duplicated in both arms: cross-jumping merges the two identical
+`sh s3,0xa(s0)` into the join block, so retail shows ONE store — and the join
+label, which exists because of that merge, keeps the following `lh h4` from
+being scheduled above it. That is why no single-store spelling reached it.
+
+Negatives measured this round on the way (each through the full oracle):
+`20 - (hSpan2 - p7)` 37/97 drift; `20 - hSpan2 + p7` 45/97 drift;
+`p7 + (20 - hSpan2)` 45/97 drift; `20 - slot->h4` 36/97 drift;
+`hSpan2 + -20` inert; `hSpan2 -= 20; slot->h8 = hSpan2;` inert; reusing
+`baseIdx` (`baseIdx += 2`) instead of `nextArg` 11/97 drift; separate `sum`
+local instead of reusing `hSpan2` 40/97 (without barrier) / 82/97 3-3 (with);
+reusing `p8` as the copy 4/97; moving the `hSpan2 = hSpan` copy 7/97 or inert;
+declaration order inert. The single-expression form of the h8 store on the
+final body: 38/97, 1/1 — the split is load-bearing. No permuter search was
+spent (Gate 3 not run; not needed).
+
+### Matched body
+
+```c
+#if 0
+/* needs: common.h, class_3bb8c.h (Obj866E8, GridSlot866E8, slots8C, methods->slot120) */
+s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
+    s32 overflow;
+    s32 span;
+    s32 elemArg;
+    s32 widthLeft;
+
+    if (row + height >= 21) {
+        /* The rectangle runs past the bottom edge (row 20): clip this slot
+         * and open a new one for the part below. */
+        overflow = (row + height) - 20;
+        span = overflow;
+        slot->hA = height - overflow;
+        count = count + 1;
+        slot = &self->slots8C[count];
+
+        if (col < 10) {
+            elemArg = baseIdx + 2;
+            slot->elemIdx = self->methods->slot120(self, elemArg);
+            slot->h4 = col + 10;
+            slot->hA = span;
+        } else {
+            elemArg = baseIdx + 3;
+            slot->elemIdx = self->methods->slot120(self, elemArg);
+            slot->h4 = col - 10;
+            slot->hA = span;
+        }
+
+        span = slot->h4 + width;
+        slot->h6 = 0;
+        if (span >= 21) {
+            /* ...and past the right edge (column 20) too. */
+            count = count + 1;
+            widthLeft = width + 20;
+            widthLeft = widthLeft - span;
+            slot->h8 = widthLeft;
+            slot = &self->slots8C[count];
+            slot->elemIdx = self->methods->slot120(self, elemArg + 1);
+            slot->h4 = 0;
+            slot->h6 = 0;
+            slot->h8 = span - 20;
+            slot->hA = overflow;
+        } else {
+            slot->h8 = width;
+        }
+    } else {
+        slot->hA = height;
+    }
+    return count;
+}
+#endif
+```
+
+### Proposed learning
+
+1. **A duplicated store in both arms of an if/else is a real source shape
+   even when retail shows ONE copy at the join.** Cross-jumping merges the
+   identical tails; the join label that results is a basic-block boundary the
+   scheduler will not move a later load across. Symptom: retail keeps a store
+   BEFORE a following independent load and leaves the load-delay `nop`, where
+   every one-store spelling lets GCC fill the delay slot with the store. A
+   `do { } while (0)` or `__asm__("")` reproduces the ordering but perturbs
+   allocation priorities elsewhere (here a callee-saved 3-cycle).
+2. **`(a + K) - b` is rewritten by `fold` to `a - (b - K)` at the TREE level**,
+   and CSE will then share `b - K` with any later `b - K`, carrying it across
+   calls. Retail showing `addiu t,a,K; subu t,t,b` and a separate later
+   `addiu u,b,-K` means the source split the expression into two statements.
+   Test the split on a body WITHOUT compensating shapes: here it read as
+   "drift" / "inert" for two rounds because it was measured on one.
+
+---
+
 
 > **ROUND 19 (bravo) UPDATE: the round-9 "reconstruction problem, frame off
 > by 8 bytes" diagnosis is SUPERSEDED.** Acting directly on the round-9 head

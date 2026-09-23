@@ -261,74 +261,60 @@ void func_8004C93C(Obj866E8 *self) {
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
 #endif
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 62/97 words, length exact, zero drift (round 58, up from
- * 55/97). Residue: an arithmetic reassociation plus a 3-register rotation
- * (self/slot/temp among $s0/$s1/$s3) that round 58 argues is DOWNSTREAM of
- * it -- not yet established as a HARD RULE 6 register-identity stall
- * (docs/match-reports/func_8004CAF0.md). Frame size, callee-saved register
- * SET and CFG shape match retail exactly. Round 58 retired the "permuter
- * scaffold is untrustworthy" blocker that rounds 19 and 33 had recorded
- * (it was a unit error: funcdiff reports no insertion/deletion counts at
- * all, so the "0 ins / 0 del" those rounds weighed against the permuter
- * was never measured), ran this function's first search, and closed two
- * of its three structural diffs with the pair of levers in the body below
- * -- the do-while(0) around the first half AND the named h8Val temp,
- * which only work JOINTLY (either alone changes the function's length).
- * Hand-derived. */
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
-    s32 hSpan;
-    s32 hSpan2;
-    s32 h4;
-    s32 nextArg;
-    s32 h8Val;
+s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
+    s32 overflow;
+    s32 span;
+    s32 elemArg;
+    s32 widthLeft;
 
-    if (p6 + p8 >= 21) {
-        do {
-            hSpan = (p6 + p8) - 20;
-            hSpan2 = hSpan;
-            slot->hA = p8 - hSpan;
-            count = count + 1;
-            slot = &self->slots8C[count];
+    if (row + height >= 21) {
+        /* The rectangle runs past the bottom edge (row 20): clip this slot
+         * and open a new one for the part below. */
+        overflow = (row + height) - 20;
+        span = overflow;
+        slot->hA = height - overflow;
+        count = count + 1;
+        slot = &self->slots8C[count];
 
-            if (p5 < 10) {
-                nextArg = baseIdx + 2;
-                slot->elemIdx = self->methods->slot120(self, nextArg);
-                __asm__("");
-                h4 = p5 + 10;
-            } else {
-                nextArg = baseIdx + 3;
-                slot->elemIdx = self->methods->slot120(self, nextArg);
-                __asm__("");
-                h4 = p5 - 10;
-            }
-            slot->h4 = h4;
-            slot->hA = hSpan2;
-        } while (0);
+        if (col < 10) {
+            elemArg = baseIdx + 2;
+            slot->elemIdx = self->methods->slot120(self, elemArg);
+            slot->h4 = col + 10;
+            /* Stored in BOTH arms: cross-jumping merges the copies, and
+             * the join label keeps the h4 reload below after it. */
+            slot->hA = span;
+        } else {
+            elemArg = baseIdx + 3;
+            slot->elemIdx = self->methods->slot120(self, elemArg);
+            slot->h4 = col - 10;
+            slot->hA = span;
+        }
 
-        hSpan2 = slot->h4 + p7;
+        span = slot->h4 + width;
         slot->h6 = 0;
-        if (hSpan2 >= 21) {
+        if (span >= 21) {
+            /* ...and past the right edge (column 20) too. */
             count = count + 1;
-            h8Val = (p7 + 20) - hSpan2;
-            slot->h8 = h8Val;
+            /* Two statements, not `(width + 20) - span`: fold rewrites
+             * that tree as `width - (span - 20)` and CSE then shares
+             * `span - 20` with the store below (round 71). */
+            widthLeft = width + 20;
+            widthLeft = widthLeft - span;
+            slot->h8 = widthLeft;
             slot = &self->slots8C[count];
-            slot->elemIdx = self->methods->slot120(self, nextArg + 1);
+            slot->elemIdx = self->methods->slot120(self, elemArg + 1);
             slot->h4 = 0;
             slot->h6 = 0;
-            slot->h8 = hSpan2 - 20;
-            slot->hA = hSpan;
-            return count;
+            slot->h8 = span - 20;
+            slot->hA = overflow;
+        } else {
+            slot->h8 = width;
         }
-        slot->h8 = p7;
-        return count;
+    } else {
+        slot->hA = height;
     }
-    slot->hA = p8;
     return count;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CAF0);
-#endif
 
 /* Forward declaration: defined later in this file (in ROM order, after
  * func_8004CC74), and EXCLUDED from this round's targets (documented
