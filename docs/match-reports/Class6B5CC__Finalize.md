@@ -1,4 +1,6 @@
-# func_8001CBA4
+# Class6B5CC__Finalize
+
+> Renamed from `func_8001CBA4` on 2026-09-23 (tools/rename.py). Address 0x8001cba4.
 
 **Unit:** code_d294 · **Size:** 41 words · **Status:** MATCHED (41/41 words)
 
@@ -16,7 +18,7 @@ sub-blocks the constructor allocated (`self->unk14->unk44`, then
 ## The C
 
 ```c
-void func_8001CBA4(Class6B5CCObj *self) {
+void Class6B5CC__Finalize(Class6B5CCObj *self) {
     self->methods->slot50(self);
     self->methods->slot54(self);
     self->methods->slot5C(self, 0);

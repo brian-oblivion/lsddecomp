@@ -1375,3 +1375,4 @@ gSpriteScaleSmall = 0x80087874;
 gSpriteShiftScratch = 0x80087880;
 New_Class6B5CC = 0x8001CA94; // type:func
 Class6B5CC__Class6B5CC = 0x8001CAF4; // type:func
+Class6B5CC__Finalize = 0x8001CBA4; // type:func

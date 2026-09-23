@@ -7,7 +7,7 @@
  * 55-function segment never carved before. `tools/classtable.py D_8006B5CC`
  * shows this unit's own method table starts at D_8006B5CC and its slots,
  * in order, ARE this unit's functions: +0x008 Class6B5CC__Class6B5CC (ctor),
- * +0x00C func_8001CBA4 (dtor), +0x010 func_8001CC48, +0x014 func_8001CCB4,
+ * +0x00C Class6B5CC__Finalize (dtor), +0x010 func_8001CC48, +0x014 func_8001CCB4,
  * +0x018 func_8001CD20, [+0x01C..+0x038 seven slots inherited verbatim from
  * BasicClass, D_8006B58C], +0x038 func_8001CD60 (override), +0x03C null,
  * +0x040 func_8001CE30, +0x044 func_8001CEB4, +0x048 func_8001D008,
@@ -420,7 +420,7 @@ struct Class6B5CCMethods {
     s32 header;                              /* +0x000 */
     void *unk04;                              /* +0x004, BasicClass__func_17eb0, inherited, unused here */
     void *(*ctor)(void *self);                /* +0x008, Class6B5CC__Class6B5CC (this unit) */
-    void  (*dtor)(void *self);                /* +0x00C, func_8001CBA4 (this unit) */
+    void  (*dtor)(void *self);                /* +0x00C, Class6B5CC__Finalize (this unit) */
     u8 pad010[0x030 - 0x010];
     /* +0x030, BasicClass__NotifyParents, inherited verbatim (per the file
      * banner's `--vs D_8006B58C` census) -- NOT decompiled here, BasicClass
@@ -444,7 +444,7 @@ struct Class6B5CCMethods {
      * output "more remain" flag through its 2nd/3rd arguments. */
     void (*slot58)(Class6B5CCObj *self, GenericObj_d294 **outEntry, s32 *outCont); /* +0x058 */
     /* +0x05C, func_8001D33C -- already matched as a no-op `void(void)`
-     * body, but THIS call site (func_8001CBA4's dtor) passes it 2 args
+     * body, but THIS call site (Class6B5CC__Finalize's dtor) passes it 2 args
      * (self, 0). Both are right about their own codegen: the callee body
      * ignores every argument, so the caller's arity is unconstrained. Same
      * "per-call-site signature" precedent as GetClass6B5CCMethods above. */
@@ -724,7 +724,7 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 
 extern Class6B5CCObj *New_Class6B5CC(void);
 void *Class6B5CC__Class6B5CC(Class6B5CCObj *self);
-void func_8001CBA4(Class6B5CCObj *self);
+void Class6B5CC__Finalize(Class6B5CCObj *self);
 void func_8001CC48(Class6B5CCObj *self, GenericObj_d294 *other);
 void func_8001CCB4(Class6B5CCObj *self, GenericObj_d294 *other);
 void func_8001CD20(Class6B5CCObj *self);

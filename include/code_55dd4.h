@@ -36,7 +36,7 @@ typedef struct D800878D4Methods {
     s32 header;                                    /* +0x000 */
     void *unk04;                                    /* +0x004 BasicClass__func_17eb0, inherited */
     Class65650 *(*ctor)(Class65650 *self);            /* +0x008 BaseObjO__BaseObjO */
-    void (*dtor)(Class65650 *self);                    /* +0x00C func_8001CBA4 */
+    void (*dtor)(Class65650 *self);                    /* +0x00C Class6B5CC__Finalize */
     void (*slot10)(void *self, void *arg);             /* +0x010 BaseObjO__LinkCompanion */
     void *unk14;                                        /* +0x014 BaseObjO__UnlinkCompanion */
     void *unk18;                                         /* +0x018 BaseObjO__ClearCompanions */

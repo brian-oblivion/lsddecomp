@@ -1864,7 +1864,7 @@ struct ClassEAC0Methods {
                                 none of which know about `SkipShort2`); the
                                 occupant's own definition is free to use a
                                 more specific parameter type internally. */
-    void (*dtor)(ClassEAC0Obj *self);                   /* +0x00C, func_8001CBA4, shared with Class6B5CCMethods */
+    void (*dtor)(ClassEAC0Obj *self);                   /* +0x00C, Class6B5CC__Finalize, shared with Class6B5CCMethods */
     u8 pad010[0x040 - 0x010];
     void (*finishConstruct)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, ClassEAC0__FinishConstruct (this unit).
                                 RENAMED round 61 (was slot40). */
@@ -1932,7 +1932,7 @@ struct Class6E99CMethods {
                                 internally before forwarding to the next
                                 ctor down the chain (ClassEAC0Methods::ctor,
                                 whose OWN `a2` really is a pointer). */
-    void (*dtor)(Class6E99CObj *self);               /* +0x00C, func_8001CBA4, shared */
+    void (*dtor)(Class6E99CObj *self);               /* +0x00C, Class6B5CC__Finalize, shared */
     /* +0x010/+0x014/+0x018, IS Class6B5CCMethods's own +0x010/+0x014/+0x018
        (func_8001CC48/func_8001CCB4/func_8001CD20) -- identical addresses in
        both tables per the file banner's classtable.py census. */

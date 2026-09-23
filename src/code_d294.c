@@ -38,7 +38,7 @@ void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     return self;
 }
 
-void func_8001CBA4(Class6B5CCObj *self) {
+void Class6B5CC__Finalize(Class6B5CCObj *self) {
     Class6B5CCSub14 *sub;
 
     self->methods->slot50(self);
