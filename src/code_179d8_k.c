@@ -159,15 +159,14 @@ extern s32 func_80035E80(s16 channel, s16 slot);
  * characterised since it has not been matched. */
 extern void func_8003424C(s16 channel, s16 slot);
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 66/69 words, length exact. Residue: two pure scheduling
- * residues in the prologue (a load-pair order swap and one delay-slot
- * filler choice), not a logic or CFG difference
- * (docs/match-reports/func_80034138.md). Hand-derived. */
+/* Catch-up scheduler tick.  When the re-armed counter is still reloading
+ * its threshold (remain == 0) it copies the threshold rec->unk70 into the
+ * counter.  The third parameter is unused; retail reuses its dead register
+ * ($a2) to hold rec->unk70 for that store (round 69,
+ * docs/match-reports/func_80034138.md). */
 void func_80034138(s16 a0, s16 a1, s16 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
-    s32 dead[2];
     s16 last = rec->unk70;
     s32 elapsed = rec->unk88;
     s32 delta = elapsed - last;
@@ -176,10 +175,6 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
     s32 step;
     s16 last2;
 
-    if (0) {
-        dead[0] = 0;
-        dead[1] = 0;
-    }
     if (delta > 0) {
         remain = rec->unk6E;
         if (remain > 0) {
@@ -187,7 +182,7 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
             return;
         }
         if (remain == 0) {
-            rec->unk6E = a2;
+            rec->unk6E = last;
             rec->unk88 = rec->unk88 - 1;
             return;
         }
@@ -212,9 +207,6 @@ void func_80034138(s16 a0, s16 a1, s16 a2)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", func_80034138);
-#endif
 
 /* Forward declarations for sibling functions defined later in THIS unit,
  * needed because func_8003424C dispatches to them by MIDI-style status
