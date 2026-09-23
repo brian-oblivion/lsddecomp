@@ -350,7 +350,66 @@ extern u8 D_8008E9D0;
  * (309/311 built words, 2 words SHORT) preserved there in #if 0. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D8E0);
 
+#ifdef NON_MATCHING
+/* NON_MATCHING: 107/112 words, 5 words short. Residue: the a0/a3 role-swap
+ * register-identity class (this unit's documented class) plus an 8-byte
+ * frame retail allocates that this shape doesn't reach
+ * (docs/match-reports/func_8002DDBC.md). Hand-derived. */
+extern u8 D_8008D98A[];
+
+void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
+    s32 a3;
+    s32 off16;
+    s32 v1;
+    s32 lowBit;
+    s32 highBit;
+    s32 idx52;
+    s32 li;
+    s32 i;
+    s32 n;
+
+    a3 = a0;
+    a0 = (u8)a0;
+    off16 = a0 << 4;
+    *(u16 *)(D_8008D7F2 + off16) = a2;
+    __asm__("");
+    v1 = D_8008D970[a0];
+    *(u16 *)(D_8008D7F0 + off16) = a1;
+    v1 |= 3;
+    D_8008D970[a0] = v1;
+    if ((u32)a0 < 16) {
+        lowBit = 1 << a0;
+        highBit = 0;
+    } else {
+        lowBit = 0;
+        highBit = 1 << (a0 - 16);
+    }
+
+    idx52 = (u8)a3 * 52;
+    n = D_8008E9D0;
+    *(u16 *)(D_8008D98C + idx52) = 10;
+    if (n != 0) {
+        i = 0;
+        do {
+            li = (u16)i * 52;
+            *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
+            i++;
+        } while ((u16)i < D_8008E9D0);
+    }
+    idx52 = (u8)a3 * 52;
+    *(u8 *)(D_8008D9A3 + idx52) = 2;
+
+    *(u16 *)(D_8008D98A + idx52) = 0;
+    D_8008E228 = lowBit | D_8008E228;
+    D_8008E22C = highBit | D_8008E22C;
+    D_80090C60 = D_80090C60 & ~D_8008E228;
+    D_80090C64 = D_80090C64 & ~D_8008E22C;
+    D_8006DAD4[0xCA] = lowBit;
+    D_8006DAD4[0xCB] = highBit;
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002DDBC);
+#endif
 
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
