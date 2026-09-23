@@ -236,16 +236,11 @@ extern u8 D_8008D7F0[];
 extern u8 D_8008D970[];
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 315/324 words, 9 words short as of round 62 (re-measured
- * round 70, unchanged -- this residue is a GCC 2.6.3 CSE decision on the
- * `D_8008E978[D_8008D99C[i].unk0]` address, not the load-delay-nop
- * construct round 63's `--nop-at-expansion` flag resolved, so that flag
- * does not touch this function). Raw word-match 10/324, insertions 76 /
- * deletions 76. Round 50's earlier 324/324 "length-exact" body is
- * FALSIFIED at ins101/del101 -- more structurally wrong despite the
- * matching word count -- and is not used here; this is round 62's
- * better-characterized body. See docs/match-reports/func_80030980.md.
- * Hand-derived. */
+/* NON_MATCHING: 315/324 words, 9 words short; raw word-match 10/324,
+ * insertions 76 / deletions 76 (re-measured round 70, unchanged since
+ * round 62). Residue: one GCC CSE decision on the
+ * `D_8008E978[D_8008D99C[i].unk0]` address plus two loop-invariant
+ * hoists (docs/match-reports/func_80030980.md). Hand-derived. */
 s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     D800902E8Entry *e;
     u8 i;
@@ -344,18 +339,11 @@ s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
 #endif
 #ifdef NON_MATCHING
-/* NON_MATCHING: 252/252 words, LENGTH-EXACT as of round 70 -- the
- * round-63 `--nop-at-expansion` maspsx flag closed the 9/11-word
- * load-delay-nop gap this report's round-62 section attributed to a
- * below-cc1 blocker (see docs/match-reports/func_80030E90.md); that
- * blocker is RESOLVED and this title is no longer "TOOLCHAIN-BLOCKED".
- * Re-measured round 70: raw word-match 65/252, insertions 11 / deletions
- * 11 (was 241/252 11-short, raw 36/252, ins22/del22 before the flag).
- * Residue: the busy-lock guard polarity (retail `bne` NEAR, ours `beq`
- * FAR) plus whatever the flag's extra nops reshuffled elsewhere in the
- * function -- not yet re-characterized past the raw figures. See
- * docs/match-reports/func_80030E90.md's "Round 70 re-measure" section.
- * Hand-derived. */
+/* NON_MATCHING: 252/252 words, length exact; raw word-match 65/252,
+ * insertions 11 / deletions 11 (re-measured round 70). Residue: the
+ * busy-lock guard's branch polarity, with the rest not re-characterised
+ * since `--nop-at-expansion` closed the old length gap
+ * (docs/match-reports/func_80030E90.md). Hand-derived. */
 s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
     SlotE968 *slot;
@@ -502,18 +490,11 @@ fail_nolock:
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 248/253 words, 5 words short as of round 70 -- the
- * round-63 `--nop-at-expansion` maspsx flag narrowed this from 16 words
- * short (11 of its 16 missing words were the same below-cc1 load-delay
- * nop func_80030E90's report documents, 11 sites here vs that function's
- * 9); that blocker is RESOLVED and this title is no longer
- * "TOOLCHAIN-BLOCKED". Re-measured round 70 via build/lsdde.map (raw
- * word-match and ins/del are drift-contaminated while the length gap is
- * nonzero, per CLAUDE.md's "address drift" guard -- see
- * docs/match-reports/func_8003149C.md's "Round 70 re-measure" section for
- * the upper-bound figures). Residue: the remaining 5-word gap plus the
- * two guard-polarity residues this report already documents, not yet
- * re-characterized past the length figure. Hand-derived. */
+/* NON_MATCHING: 248/253 words, 5 words short (re-measured round 70).
+ * Residue: the busy-lock guard's branch polarity and a second guard
+ * flip; the 5-word gap is not re-characterised since
+ * `--nop-at-expansion` closed 11 of the old 16
+ * (docs/match-reports/func_8003149C.md). Hand-derived. */
 s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
