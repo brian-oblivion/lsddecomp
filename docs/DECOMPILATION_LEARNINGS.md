@@ -179,7 +179,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   SCOPE: needs at least THREE explicit case values; at two-plus-default, `switch` and `if`-chain are
   byte-identical. (a §"A `switch`'s CASE ORDER is recoverable from the binary")
 - **A genuine `switch` and a logically identical if/else chain are not interchangeable, and neither
-  is "the" answer** — a real `switch` moved `func_80032708` 24 -> 65/164 and closed `func_8004A070`
+  is "the" answer** — a real `switch` moved `SeqTimerControl` 24 -> 65/164 and closed `func_8004A070`
   48/48, while elsewhere a sparse switch beat a chain that would not converge; `if`/`else-if` and a
   `return`-terminated sequential-`if` compile IDENTICALLY. Never size a residue with the whole-image
   byte count when a `switch` is present — compiling it relocates rodata. (a §"Round 16", §"Round

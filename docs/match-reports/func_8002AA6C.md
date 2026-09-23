@@ -191,7 +191,7 @@ allocates `pRetry`'s address into a fresh register (`$a0`) at the very
 last use, where retail keeps it in the SAME persistent register (`$s3`)
 it was allocated to earlier in the function. This is the same
 parameter/local-persists-in-one-register-vs-gets-reloaded-fresh
-register-identity question this round's other reports (`func_80032BB8`,
+register-identity question this round's other reports (`GetRCnt`,
 `func_8002C278`) already document as resistant to reshaping -- not
 re-attempted here given the round's broader finding that this specific
 class rarely yields to source-level levers, and given the function is

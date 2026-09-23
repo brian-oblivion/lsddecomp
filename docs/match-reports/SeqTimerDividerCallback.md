@@ -1,4 +1,6 @@
-# func_80032AD0
+# SeqTimerDividerCallback
+
+> Renamed from `func_80032AD0` on 2026-09-23 (tools/rename.py). Address 0x80032ad0.
 
 **Unit:** code_179d8_c · **Size:** 18 instructions · **Status:** MATCHED (18/18 words)
 
@@ -6,7 +8,7 @@
 
 A toggle: flips the global flag `D_8006DCA0` between `0` and `1`, and
 whenever it transitions back to `0` also calls `func_80033738` (the same
-external cleanup/teardown routine `func_80032A9C` calls unconditionally
+external cleanup/teardown routine `SeqTimerCallback` calls unconditionally
 -- see that report). Reads naturally as a pause/mute-style toggle: "turn
 on" just sets the flag, "turn off" clears it and runs the teardown.
 
@@ -15,7 +17,7 @@ on" just sets the flag, "turn off" clears it and runs the teardown.
 ```c
 extern s32 D_8006DCA0;
 
-void func_80032AD0(void)
+void SeqTimerDividerCallback(void)
 {
     if (D_8006DCA0 == 0) {
         D_8006DCA0 = 1;

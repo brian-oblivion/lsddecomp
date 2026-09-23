@@ -15,15 +15,15 @@
  * middle of it. File 0x22D88..0x23500, vram 0x80032588..0x80032D00.
  *
  * WHY THE SPLIT EXISTS. `func_800323A8` (120w) sat between func_80032388 and
- * func_80032588 and is Sony's `SsSetTableSize`; the object covers exactly
+ * SetSeqTimerMode and is Sony's `SsSetTableSize`; the object covers exactly
  * those 120 words. A placed object cannot live inside a `c` segment, so the
  * slice had to become [c][o][c] and the second `c` needed its own name. The
  * first half kept `code_179d8_c`.
  *
  * THE RODATA ATTACH CAME WITH THIS HALF, AND THAT IS THE WHOLE REASON THIS
- * COMMENT EXISTS. `func_80032588` owns `jtbl_80010CD8`, whose sub-slot of the
+ * COMMENT EXISTS. `SetSeqTimerMode` owns `jtbl_80010CD8`, whose sub-slot of the
  * 0xFD8 rodata region is attached in the splat yaml. That attach pointed at
- * `code_179d8_c`; func_80032588 is now HERE, so the attach was moved to
+ * `code_179d8_c`; SetSeqTimerMode is now HERE, so the attach was moved to
  * `code_179d8_c_b`. Left behind it would have produced
  * `undefined reference to '.L800325xx'` -- the routine carve failure Gate 2
  * in docs/PARALLEL-RUNS.md documents. Leave it alone.
@@ -48,7 +48,7 @@ extern s32 D_8006DCA4;
 extern s32 D_8006DC98;
 extern u32 D_8009024C;
 
-void func_80032588(s32 a0)
+void SetSeqTimerMode(s32 a0)
 {
     s32 cmd;
 
@@ -114,18 +114,18 @@ void func_80032588(s32 a0)
     D_8009024C = cmd;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", func_80032708);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", SeqTimerControl);
 
-extern void func_80032708(s32 arg0);
+extern void SeqTimerControl(s32 arg0);
 
-void func_80032998(void)
+void StartSeqTimer(void)
 {
-    func_80032708(1);
+    SeqTimerControl(1);
 }
 
-void func_800329B8(void)
+void StopSeqTimer(void)
 {
-    func_80032708(0);
+    SeqTimerControl(0);
 }
 
 extern void EnterCriticalSection(void);
@@ -138,7 +138,7 @@ extern s32 D_8006DC8C;
 extern s32 D_8006DC90;
 extern void (*D_8006DC9C)(void);
 
-void func_800329D8(void)
+void CancelSeqTimer(void)
 {
     s32 v;
 
@@ -169,7 +169,7 @@ void func_800329D8(void)
 
 extern void SpuQuit(void);
 
-void func_80032A7C(void)
+void ClearSpuMute(void)
 {
     SpuQuit();
 }
@@ -179,7 +179,7 @@ void func_80032A7C(void)
 extern void SsSeqCalledTbyT(void);
 extern void (*D_8006DC9C)(void);
 
-void func_80032A9C(void)
+void SeqTimerCallback(void)
 {
     if (D_8006DC9C != NULL) {
         D_8006DC9C();
@@ -189,7 +189,7 @@ void func_80032A9C(void)
 
 extern s32 D_8006DCA0;
 
-void func_80032AD0(void)
+void SeqTimerDividerCallback(void)
 {
     if (D_8006DCA0 == 0) {
         D_8006DCA0 = 1;
@@ -208,11 +208,11 @@ void func_80032AD0(void)
  * registers, and that is load-bearing for matching as well as correct:
  * without it GCC reorders the table load against the index arithmetic and
  * hoists stores into unconditional-jump delay slots retail leaves as `nop`.
- * It closed func_80032BB8 and func_80032C60 in round 32 -- the first of
+ * It closed GetRCnt and ResetRCnt in round 32 -- the first of
  * which had been filed for three rounds as an unfixable register-identity
  * residue -- and it SUBSUMES the `__asm__("")` barrier SetRCnt used to
  * carry (removed in the same round; SetRCnt still verifies 40/40).
- * See docs/match-reports/func_80032C60.md for the mechanism. */
+ * See docs/match-reports/ResetRCnt.md for the mechanism. */
 typedef struct {
     volatile u16 count;              /* 0x0 */
     u8  pad2[0x4 - 0x2];
@@ -259,7 +259,7 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
     return 1;
 }
 
-s32 func_80032BB8(s32 n)
+s32 GetRCnt(s32 n)
 {
     s32 idx = (u16)n;
     RCntEntry *base;
@@ -285,7 +285,7 @@ typedef struct {
 extern IrqRegs *D_8006DCAC;
 extern u32 D_8006DCB4[4];
 
-s32 func_80032BF0(u16 which)
+s32 SetIrqMask(u16 which)
 {
     s32 idx = which;
     IrqRegs *reg = D_8006DCAC;
@@ -294,7 +294,7 @@ s32 func_80032BF0(u16 which)
     return idx < 3;
 }
 
-s32 func_80032C28(u16 which)
+s32 ClearIrqMask(u16 which)
 {
     s32 idx = which;
     IrqRegs *reg = D_8006DCAC;
@@ -303,7 +303,7 @@ s32 func_80032C28(u16 which)
     return 1;
 }
 
-s32 func_80032C60(s32 n)
+s32 ResetRCnt(s32 n)
 {
     s32 idx = (u16)n;
     RCntEntry *base;

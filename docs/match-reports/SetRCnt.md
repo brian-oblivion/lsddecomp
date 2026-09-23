@@ -3,7 +3,7 @@
 **Unit:** code_179d8_c · **Size:** 40 instructions · **Status:** MATCHED (40/40 words)
 
 Not a `psyq_*` segment function -- this and its neighbours
-(`func_80032BB8`, `func_80032C60`, `func_80032AD0`) look like Psy-Q
+(`GetRCnt`, `ResetRCnt`, `SeqTimerDividerCallback`) look like Psy-Q
 root-counter (hardware timer) routines linked directly into game text
 rather than into a separate SDK segment. Per the assignment note: this is
 ordinary work, but do not generalise anything found here to the game's
@@ -11,7 +11,7 @@ own code -- the real Psy-Q `SETRCNT.H`/prototype is not present anywhere
 in `include/psyq/` in this tree (checked: no `RCnt` hits in `LIBETC.H`,
 `KERNEL.H`, or anywhere else under `include/`), so there is no SDK
 prototype to match against; the signature below is derived purely from
-the call site in `func_80032708` and from this function's own body.
+the call site in `SeqTimerControl` and from this function's own body.
 
 ## What it does
 

@@ -205,8 +205,8 @@ round -- time spent entirely on the C.**
 
 **Lever transferability (the coordinator's cross-unit question):** this
 function's `entry = (u8 *)self + offset` recompute is the closest
-analogue in this unit to `func_80032BB8`'s `base`/`entry` split, but the
-lever does not map onto it the way it did there. `func_80032BB8`'s
+analogue in this unit to `GetRCnt`'s `base`/`entry` split, but the
+lever does not map onto it the way it did there. `GetRCnt`'s
 starting shape was a single expression built from a GLOBAL table
 (`D_8006DCB0[idx]`) that had never been given its own name; splitting the
 global reference out into its own `base` local is what created slack.

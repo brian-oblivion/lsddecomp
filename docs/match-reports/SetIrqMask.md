@@ -1,4 +1,6 @@
-# func_80032BF0 -- MATCHED (14/14 words)
+# SetIrqMask -- MATCHED (14/14 words)
+
+> Renamed from `func_80032BF0` on 2026-09-23 (tools/rename.py). Address 0x80032bf0.
 
 Unit: `code_179d8_c`. Round 23, runner bravo.
 
@@ -28,7 +30,7 @@ typedef struct {
 extern IrqRegs *D_8006DCAC;
 extern u32 D_8006DCB4[4];
 
-s32 func_80032BF0(u16 which)
+s32 SetIrqMask(u16 which)
 {
     s32 idx = which;
     IrqRegs *reg = D_8006DCAC;
@@ -47,7 +49,7 @@ GCC's delay-slot filler had hoisted the independent `sw $v1, 0x4($a1)` store
 into the `jr $ra` delay slot, dropping the explicit trailing `nop` retail has.
 That makes the compiled function 13 instructions (0x34 bytes) instead of
 retail's 14 (0x38) -- one word of address drift, which shifted every
-following byte in the image and made the following function (`func_80032C28`)
+following byte in the image and made the following function (`ClearIrqMask`)
 compare against nothing meaningful.
 
 Retail does NOT hoist that store. The fix: mark the hardware-register struct

@@ -1,4 +1,6 @@
-# func_80032BB8 -- MATCHED (byte-exact, 14/14 words). Round 32, head.
+# GetRCnt -- MATCHED (byte-exact, 14/14 words). Round 32, head.
+
+> Renamed from `func_80032BB8` on 2026-09-23 (tools/rename.py). Address 0x80032bb8.
 
 > **ROUND 32 (2026-09-12), head. CLOSED — and the prior verdict's CAUSE was
 > wrong in the most expensive direction available.**
@@ -18,7 +20,7 @@ table if `idx >= 3`.
 ## The match
 
 ```c
-s32 func_80032BB8(s32 n)
+s32 GetRCnt(s32 n)
 {
     s32 idx = (u16)n;
     RCntEntry *base;
@@ -33,7 +35,7 @@ s32 func_80032BB8(s32 n)
 
 That is byte-for-byte the shape earlier rounds had already reached and
 rejected. **The only thing that changed is that `RCntEntry`'s three
-hardware fields are now declared `volatile`** (see `func_80032C60.md` for
+hardware fields are now declared `volatile`** (see `ResetRCnt.md` for
 how that was found). With the plain `u16` typing this body produces the
 documented register scramble; with the volatile typing it is exact, first
 attempt, no barrier, no reshaping.
@@ -66,7 +68,7 @@ source). The discriminator is whether anything in the C constrains the
 ORDER. Before filing register-identity, ask what forces the order in
 retail's build that does not force it in yours — and if the answer is "an
 access the hardware makes observable", the fix is `volatile` and the
-verdict is wrong. See `func_80032C60.md` for the full mechanism and for
+verdict is wrong. See `ResetRCnt.md` for the full mechanism and for
 the barrier-vs-volatile comparison.
 
 ## Provenance

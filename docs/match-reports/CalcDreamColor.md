@@ -345,7 +345,7 @@ advance -- this report's own residue description ("both addus end up
 register-swapped relative to retail... reshapes... all four producing
 the identical result") already matches the class's signature exactly; it
 just wasn't cross-referenced against the class until this round. The
-one nuance worth recording: unlike `func_80032BB8`'s instance (a single
+one nuance worth recording: unlike `GetRCnt`'s instance (a single
 `addu` with a genuine destination-register choice), here the swap
 presents across TWO separate `addu`s and is entangled with an
 independent load (`upper`) being scheduled early -- but the decisive

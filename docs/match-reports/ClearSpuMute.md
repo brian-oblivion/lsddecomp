@@ -1,4 +1,6 @@
-# func_80032A7C
+# ClearSpuMute
+
+> Renamed from `func_80032A7C` on 2026-09-23 (tools/rename.py). Address 0x80032a7c.
 
 **Unit:** code_179d8_c · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
@@ -17,7 +19,7 @@ everywhere it's invoked) and never sets `$v0`, so it is `void(void)`.
 ```c
 extern void func_80038FB0(void);
 
-void func_80032A7C(void)
+void ClearSpuMute(void)
 {
     func_80038FB0();
 }

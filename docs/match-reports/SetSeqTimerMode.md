@@ -1,4 +1,6 @@
-# func_80032588 -- MATCH (96/96 words, byte-exact)
+# SetSeqTimerMode -- MATCH (96/96 words, byte-exact)
+
+> Renamed from `func_80032588` on 2026-09-23 (tools/rename.py). Address 0x80032588.
 
 Unit: `code_179d8_c_b`. Round 41, runner delta. Owns `jtbl_80010CD8`
 (attached rodata, not touched by this round).
@@ -12,7 +14,7 @@ recorded below for completeness (it was superseded mid-run, not exhausted).
 
 ## What it does
 
-`void func_80032588(s32 a0)`. Two parts, unchanged from the round-23
+`void SetSeqTimerMode(s32 a0)`. Two parts, unchanged from the round-23
 description:
 
 1. Splits `a0` into a "cmd" value stored in `D_8006DCA4` and a flag in
@@ -144,7 +146,7 @@ Set up per `tools/setup-permuter.sh` against the round-23 90/96 preserved
 body (i.e. before the fix above was found):
 
 ```
-tools/setup-permuter.sh func_80032588 <seed with round-23 body>
+tools/setup-permuter.sh SetSeqTimerMode <seed with round-23 body>
 ```
 
 `--debug --stack-diffs` validation against the scaffold matched the
@@ -154,7 +156,7 @@ polarity, matching the round-23 prose). The scaffold was trustworthy.
 
 Launched: `PATH=.../permuter-work/bin:$PATH .venv/bin/python3
 tools/decomp-permuter/permuter.py -j 4 --stop-on-zero --best-only
-permuter-work/func_80032588`, bounded at 900s. **Killed by PID (not
+permuter-work/SetSeqTimerMode`, bounded at 900s. **Killed by PID (not
 `pkill -f`) partway through, once the manual structural fix above reached
 96/96 independently** -- the search was still running against the OLD
 (pre-fix) scaffold and could not have found the outer-bound-check
@@ -167,7 +169,7 @@ negative permuter result.
 
 ```
 ./build-and-verify.sh   ->  build exit=0, "OK: build matches retail SLPS_015.56"
-tools/funcdiff.py func_80032588  ->  96/96 words match (file 0x22D88-0x22F08)
+tools/funcdiff.py SetSeqTimerMode  ->  96/96 words match (file 0x22D88-0x22F08)
 ```
 
 Whole-image SHA1 passes. This is a genuine match, not a per-function read

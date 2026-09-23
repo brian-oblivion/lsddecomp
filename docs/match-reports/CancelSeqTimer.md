@@ -1,4 +1,6 @@
-# func_800329D8
+# CancelSeqTimer
+
+> Renamed from `func_800329D8` on 2026-09-23 (tools/rename.py). Address 0x800329d8.
 
 **Unit:** code_179d8_c · **Size:** 41 instructions · **Status:** MATCHED (41/41 words)
 
@@ -31,7 +33,7 @@ extern s32 D_8006DC8C;
 extern s32 D_8006DC90;
 extern void (*D_8006DC9C)(void);
 
-void func_800329D8(void)
+void CancelSeqTimer(void)
 {
     s32 v;
 
@@ -61,7 +63,7 @@ void func_800329D8(void)
 }
 ```
 
-## Residue note: another instance of the `func_80032AD0` block-order lever
+## Residue note: another instance of the `SeqTimerDividerCallback` block-order lever
 
 First attempt wrote the if/else in "natural" order (`if (D_8006DC8C ==
 0) { the D_8006DC90 logic } else { the func_80024DA0 teardown }`), which
@@ -71,29 +73,29 @@ does the opposite (the `!=0`/teardown branch is the fallthrough, the
 `==0`/re-arm branch is reached by a taken `beqz`). Swapping the C to test
 `D_8006DC8C != 0` first (matching which block retail places first)
 reproduced the exact instruction sequence with no other change --
-consistent with the `func_80032AD0` finding, though note this is a
+consistent with the `SeqTimerDividerCallback` finding, though note this is a
 *different* shape than that one: this is a full `if/else` where BOTH
 arms do real work and rejoin at a shared tail (not a guard-clause-with-
-early-return), so the "boundary" written up in `func_80032BB8.md` /
-`func_80032C60.md` (block-order flip doesn't help guard-clauses) does
+early-return), so the "boundary" written up in `GetRCnt.md` /
+`ResetRCnt.md` (block-order flip doesn't help guard-clauses) does
 not contradict this -- this residue confirms the lever DOES apply to
 plain two-sided `if/else` compiled from a raw loaded value, just not to
 "if (range check fails) return fail;" guards.
 
 ### Proposed learning
 
-`func_80032AD0`'s block-order lever generalises to any two-sided `if
+`SeqTimerDividerCallback`'s block-order lever generalises to any two-sided `if
 (rawValue) {A} else {B}` where GCC needs to decide which arm is
 fallthrough vs. out-of-line -- not just single-sided toggles. The
 distinguishing factor found so far across four instances this round: it
-applies to raw-value/full-if-else shapes (`func_80032AD0`,
-`func_800329D8`), NOT to guard-clause range-check-then-bail shapes
-(`func_80032BB8`, `func_80032C60`, `SetRCnt`), where negative-first is
+applies to raw-value/full-if-else shapes (`SeqTimerDividerCallback`,
+`CancelSeqTimer`), NOT to guard-clause range-check-then-bail shapes
+(`GetRCnt`, `ResetRCnt`, `SetRCnt`), where negative-first is
 already what retail compiles to and flipping regresses.
 
 ## Provenance
 
 round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve,
 second pass, head-directed follow-up). Matched second attempt (one
-if/else block-order flip after the head's `func_80032AD0` lever
+if/else block-order flip after the head's `SeqTimerDividerCallback` lever
 generalisation request surfaced the same axis here).

@@ -65,7 +65,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     }
     if (gVabStreamInited == 0) {
         D_8008A8CC = 0x3C;
-        func_80032588(1);
+        SetSeqTimerMode(1);
         gVabStreamInited = 1;
     }
     gOpenVabCount++;
