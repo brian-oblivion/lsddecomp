@@ -1,33 +1,59 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
- *
  * class_3bb8c_m -- seventh carved slice of the class_3bb8c block
- * (0x44518..0x44F14, vram 0x80053D18..0x80054714), 20 functions.
- * Carved round 15.
+ * (0x44518..0x44F14, vram 0x80053D18..0x80054714), 20 functions, ALL 20
+ * MATCHED (0 INCLUDE_ASM, 0 NON_MATCHING). Carved round 15; all four former
+ * toolchain-blocker functions matched round 23/44, once `addiu_at` and
+ * `gp_rel` were resolved project-wide (CLAUDE.md, "Open toolchain
+ * blockers"). This unit owns no switch jump table.
  *
- * Blocker profile -- RE-SCREENED round 23 (2026-09-07). The carve-time screen
- * was a THREE-grep screen; `addiu_at` was resolved in round 21 (maspsx
- * `--addiu-at`; docs/research/addiu-at-blocker.md) and screening for it now
- * INVENTS blockers, so the live screen is TWO greps -- `gp_rel` and
- * `nop_mflo_mfhi`. Current state:
- *   RegisterStyleConfig  was gp_rel            -- MATCHED round 44, 29/29.
- *   ApplyStyleConfig  was gp_rel (+ addiu-$at) -- MATCHED round 44, 41/41.
- *   FillStyleFromConfig  was addiu-$at ONLY    -- NOT BLOCKED. MATCHED round 23, 25/25.
- *   ApplyStyleDecorationIfSet  was gp_rel            -- MATCHED round 44, 45/45.
- * The old profile said "all four have stub reports; do not attempt them",
- * which was true when written and became a false blocker on one of the four
- * the moment `addiu_at` was fixed. Screen with `python3 tools/nearmiss.py`
- * rather than trusting any transcribed profile, this one included.
- * This unit owns NO switch jump table.
+ * NAMING PASS, round 69 (runner alpha). Two class identifications drive
+ * every name below, both confirmed with `tools/classtable.py`, never by
+ * guessing from a slot number:
+ *
+ *   - This unit's `self` (`ObjM`) is a subclass whose OWN vtable is
+ *     `D_80087034` (`tools/classtable.py 0x80087034`, 53 slots) -- the same
+ *     class as class_3bb8c_l's `Obj87034_3bb8c_l` (see that HEAD NOTE in
+ *     include/class_3bb8c.h; NOT unified with it here, a struct-merge is its
+ *     own change per that note). This unit's own 14 functions occupy that
+ *     table's tail, offsets +0xA0..+0xD4, i.e. this class's own new virtual
+ *     methods (the base Class86668/Obj865C8 table --
+ *     docs/match-reports/func_80052CD8.md -- only goes up to about +0x88).
+ *     `ObjMMethods::notifyParents`/`checkAuxTrigger`/`teardownPauseOverlay`
+ *     (+0x030/+0x0B8/+0x0D4) are confirmed the same way: +0x030 is
+ *     `BasicClass__NotifyParents`, and +0x0B8/+0x0D4 are this unit's own
+ *     `ObjM__CheckAuxTrigger`/`ObjM__TeardownPauseOverlay`.
+ *   - `self->dreamSys` (formerly `unk3C`) is `DreamSys*`
+ *     (`tools/classtable.py 0x80087BDC`, DreamSys's real vtable,
+ *     include/DreamSys.h): the six offsets this unit dispatches
+ *     (0xF0/0xF4/0xFC/0x13C/0x17C/0x1A0) land EXACTLY on
+ *     DreamSys__GetSetFlashbackSession/SetMoveOverride/BlockMovement/
+ *     SelectCallback98/StopDrift/GetCurrentDayAndYear, both offset and
+ *     argument count. Kept as this unit's own minimal local view
+ *     (`DreamSysObj_3bb8c_m`/`DreamSysMethods_3bb8c_m` in
+ *     include/class_3bb8c.h) rather than `#include "DreamSys.h"`, per the
+ *     project's multiple-independent-local-views convention -- the same
+ *     choice class_3bb8c_l already made for a different six DreamSys
+ *     offsets of its own.
+ *
+ * What the class itself IS remains TIER B, not asserted further:
+ * `ObjM__AdvancePauseSetup`/`ObjM__TeardownPauseOverlay` build and tear down
+ * an object literally constructed with the name "Pause"
+ * (`D_8008AB44`, "Pause", asm/data/7B008.sdata.s), gated by a 5-step
+ * counter and a `mode` field (`ObjM::mode`, ex-`unk20`) that other
+ * functions here set to fixed small codes (0,4,5,6,7,8,0xA,0xB,0xC,0xD) and
+ * forward to `ObjMMethods::notifyParents` -- consistent with a pause/dialog
+ * overlay controller driving a small state machine and notifying its
+ * parent object of transitions, but nothing here pins down the exact
+ * gameplay meaning of any one mode code. `func_800541CC` (vtable slot
+ * +0x0BC) is an empty `{}` body with no further evidence and is left
+ * unnamed.
+ *
+ * A separate, unrelated cluster of free functions (RegisterStyleConfig /
+ * ApplyStyleConfig / FillStyleFromConfig / ApplyStyleDecorationIfSet) reads
+ * and writes a small set of `.sdata`/`.sbss` globals to configure a
+ * `StyleM` colour/config descriptor (struct defined below, own comment) --
+ * unrelated to the ObjM/DreamSys machinery above beyond living in the same
+ * carved address range.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
