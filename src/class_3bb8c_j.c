@@ -188,10 +188,9 @@ typedef struct Class86ED0 Class86ED0;
 
 /*
  * Class86ED0's own opaque "handle" object (self->unk50's pointee, built by
- * func_80051F24 via BuildFileName/func_8003B39C/func_80041C9C -- none of
- * which are this round's functions, so `local`'s own real structure and
- * these three helpers' precise semantics are unestablished beyond their
- * register-level call shape). Only the three slots this unit's own
+ * func_80051F24 via BuildFileName/func_8003B39C/func_80041C9C: a
+ * "CARD\\<name>.TIM" path is built and loaded, as in class_3bb8c_i's
+ * func_80050F98). Only the three slots this unit's own
  * functions dispatch through are named.
  */
 typedef struct Class86ED0Handle Class86ED0Handle;
@@ -308,74 +307,57 @@ fail:
  * (0 or 1) also stashed into self->unkC. First pass counts entries; then
  * allocates two parallel self->unk10-length arrays (self->unk18: one
  * individually-allocated buffer per entry; self->unk1C: one s32 length
- * per entry, computed by strlen -- halved when arg2==1, via the
- * standard truncating-division-by-2 idiom). Each buffer is filled either
- * via DecodeFullWidthSjis (arg2==1) or strcpy (otherwise), and self->unk14
- * tracks the running max of the computed lengths.
+ * per entry, computed by strlen -- halved when arg2==1). Each buffer is
+ * filled either via DecodeFullWidthSjis (arg2==1) or strcpy (otherwise),
+ * and self->unk14 tracks the running max of the computed lengths. The max
+ * is a ternary, not an `if`: retail stores the old value back
+ * unconditionally before the conditional store of len.
  */
 extern s32 strlen(void *arg0);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 extern char *strcpy(char *dest, char *src);
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 6/107 words (length exact, 107/107 -- objdump confirms).
- * Residue: register identity, not instruction count -- retail keeps arg1
- * live in one register for the whole function and uses a separate cursor
- * register for both the counting and filling loops, while this body's
- * allocation rotates self/arg1/count/cursor/index differently, cascading
- * from partway through the body onward (docs/match-reports/func_80051AC8.md).
- * Hand-derived; reviewed rounds 9, 13, 19 -- round 19 additionally fixed a
- * real sign/unsigned-promotion bug in the halving idiom (`sra` vs `srl`)
- * and matched two more of retail's scheduling choices, neither of which
- * moved the word count since it is dominated by the register rotation. */
 void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
 {
     void **p;
-    s32 count;
-    s32 index;
+    s32 i;
     s32 len;
 
+    i = 0;
+    p = arg1;
     Get_vtable_BasicClass()->ctor(self);
     self->methods = func_80052B60();
 
-    count = 0;
-    for (p = arg1; *p != NULL; p++) {
-        count++;
+    while (*p++ != NULL) {
+        i++;
     }
 
-    self->unk10 = count;
-    self->unk18 = func_80017B34(count * 4);
+    self->unk10 = i;
+    self->unk18 = func_80017B34(i * 4);
     p = arg1;
     self->unk1C = func_80017B34(self->unk10 * 4);
+    self->unk14 = 0;
 
-    if (count > 0) {
-        self->unk14 = 0;
-        for (index = 0; index < self->unk10; index++) {
-            len = strlen(*p);
-            if (arg2 == 1) {
-                len = (s32)(len + ((u32)len >> 31)) >> 1;
-            }
-            self->unk1C[index] = len;
-            self->unk18[index] = func_80017B34(len + 4);
-            if (arg2 == 1) {
-                DecodeFullWidthSjis(self->unk18[index], *p);
-            } else {
-                strcpy(self->unk18[index], *p);
-            }
-            if (self->unk14 < len) {
-                self->unk14 = len;
-            }
-            p++;
+    for (i = 0; i < self->unk10; i++) {
+        len = strlen(*p);
+        if (arg2 == 1) {
+            len /= 2;
         }
+        self->unk1C[i] = len;
+        self->unk18[i] = func_80017B34(len + 4);
+        if (arg2 == 1) {
+            DecodeFullWidthSjis(self->unk18[i], *p);
+        } else {
+            strcpy(self->unk18[i], *p);
+        }
+        self->unk14 = (self->unk14 < len) ? len : self->unk14;
+        p++;
     }
 
     self->unkC = arg2;
     func_80051C74(self);
     self->methods->slot40(self);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051AC8);
-#endif
 
 void func_80051C74(Class86ED0 *self)
 {
@@ -454,53 +436,51 @@ void func_80051F14(Class86ED0 *self)
     self->unk28 = 0;
 }
 
-extern void *BuildFileName(void *out, void *a1, void *a2, void *a3);
-extern Class86ED0Handle *func_8003B39C(void *arg0);
+extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
+extern Class86ED0Handle *func_8003B39C(char *path);
 extern Class86ED0Handle *func_80041C9C(Class86ED0Handle *arg0, void *arg1, s32 arg2);
-extern s32 D_8008AB14;
-extern s32 D_8008AB1C;
-extern s32 D_8008AB24;
+extern const char D_8008AB14[]; /* "SELECT" */
+extern const char D_8008AB1C[]; /* "CARD\\" */
+extern const char D_8008AB24[]; /* ".TIM" */
 extern s32 D_80087028;
 extern s32 D_8008AAF8;
-extern s32 D_800116E4;
+extern const char D_800116E4[]; /* "FONTICON" */
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 75/95 words. Residue: pure register-identity rotation, not
- * a size/instruction defect -- compiled length is exactly 95 words on the
- * first attempt (funcdiff reports no drift), and a permuter --debug run
- * confirms 0 reorderings/insertions/deletions, only 28 register diffs: a
- * clean three-way rotation of the same three long-lived values (the two
- * repeated global addresses feeding BuildFileName, plus the handle) across
- * the same three registers, while self/arg1 already match retail exactly
- * (docs/match-reports/func_80051F24.md). Hand-derived; reviewed rounds 18,
- * 19 -- ten attempts across four functions now confirm declaration/
- * introduction-order reshaping is inert for this residue class. */
+/*
+ * Two handle variables, not one: handle1 and handle2 are disjoint live
+ * ranges, and merging them into one `h` gives the rotation filed as the
+ * round-18/19 stall (75/95, both addresses and the handle swapped among
+ * $s0-$s2). Same shape as class_3bb8c_i's func_80050F98.
+ */
 void func_80051F24(Class86ED0 *self, void *arg1)
 {
-    s32 local[8];
-    Class86ED0Handle *h;
+    char path[0x20];
+    const char *dir;
+    const char *ext;
+    Class86ED0Handle *handle1;
+    Class86ED0Handle *handle2;
 
-    if (!arg1) {
+    if (arg1 == NULL) {
         return;
     }
-    if (self->unk50) {
+    if (self->unk50 != NULL) {
         return;
     }
 
-    h = func_8003B39C(BuildFileName(local, &D_8008AB14, &D_8008AB1C, &D_8008AB24));
-    h->methods->slot78(h);
-    self->unk50 = func_80041C9C(h, &D_80087028, 0);
-    h->methods->slot4(h);
+    dir = D_8008AB1C;
+    ext = D_8008AB24;
+
+    handle1 = func_8003B39C(BuildFileName(path, D_8008AB14, dir, ext));
+    handle1->methods->slot78(handle1);
+    self->unk50 = func_80041C9C(handle1, &D_80087028, 0);
+    handle1->methods->slot4(handle1);
     self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
 
-    h = func_8003B39C(BuildFileName(local, &D_800116E4, &D_8008AB1C, &D_8008AB24));
-    h->methods->slot78(h);
-    self->methods->slot8C(self, arg1, h, self->unk20, self->unk24, self->unk28);
-    h->methods->slot4(h);
+    handle2 = func_8003B39C(BuildFileName(path, D_800116E4, dir, ext));
+    handle2->methods->slot78(handle2);
+    self->methods->slot8C(self, arg1, handle2, self->unk20, self->unk24, self->unk28);
+    handle2->methods->slot4(handle2);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_j", func_80051F24);
-#endif
 
 void func_800520A0(Class86ED0 *self)
 {
