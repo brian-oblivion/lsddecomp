@@ -1,4 +1,6 @@
-# func_8002DF7C — MATCHED (47/47 words)
+# note2pitch — MATCHED (47/47 words)
+
+> Renamed from `func_8002DF7C` on 2026-09-23 (tools/rename.py). Address 0x8002df7c.
 
 `code_179d8_l`, vram `0x8002DF7C`, file offset `0x1E77C`. Frameless, 47 words
 (0xBC bytes). Takes no arguments; return value is used by its only caller
@@ -19,7 +21,7 @@ extern u8 D_8008EA1C;
 extern u8 D_8008EA1D;
 extern u16 D_8006DAD8[];
 
-s32 func_8002DF7C(void) {
+s32 note2pitch(void) {
     s32 a0;
     s32 q12;
     s16 rem12;
@@ -105,7 +107,7 @@ narrowing-cost difference.
 ## Result
 
 `build-and-verify.sh` exits 0 (whole-image SHA1 verifies).
-`tools/funcdiff.py func_8002DF7C` reports 47/47 words match.
+`tools/funcdiff.py note2pitch` reports 47/47 words match.
 
 ### Proposed learning
 

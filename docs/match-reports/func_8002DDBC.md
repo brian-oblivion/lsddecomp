@@ -147,7 +147,7 @@ void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
    while(...)` loop in the body above gets **loop-strength-reduced** by
    GCC into a running accumulator (`+= 52` per iteration) — fewer
    instructions than retail. This is the same "compiler proves a cheaper
-   equivalent" family as the `func_8002E038` `sra`→`srl` lever (round 24),
+   equivalent" family as the `note2pitch2` `sra`→`srl` lever (round 24),
    but on loop induction rather than a division; it was not chased further
    here for lack of budget. A LIKELY lever, untried: some property of the
    loop that defeats strength-reduction in retail's original — e.g. the
@@ -186,7 +186,7 @@ may stay in `src/`.
   will keep running into on any `for`/`while` loop over a stride-N array
   with a small N; when retail does NOT show the reduced form, that is a
   structural tell worth naming (parallel to the sra/srl and copy-elision
-  levers already documented for `func_8002E038`), not yet reduced to a
+  levers already documented for `note2pitch2`), not yet reduced to a
   known trigger.
 
 ## Round 33 update (runner alpha): the loop-strength-reduction lever WAS known — this unit's own `func_8002CF18` report already named the exact fix

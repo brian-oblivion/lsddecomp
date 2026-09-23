@@ -1,12 +1,14 @@
-# func_8002B4D4 -- MATCHED round 49 (echo), 91/91 words
+# cb_read -- MATCHED round 49 (echo), 91/91 words
+
+> Renamed from `func_8002B4D4` on 2026-09-23 (tools/rename.py). Address 0x8002b4d4.
 
 **Unit:** code_179d8_g · **Size:** 91 words · **Status:** MATCHED (byte-exact, round 49) -- history below is from when it was a STALL (length EXACT 91/91, 84/91 words match, first real diff at vram 0x8002B508)
 
 ## What it does
 
-Registered as a callback (`D_8006D600 = func_8002B4D4` in `func_8002AA6C`,
+Registered as a callback (`D_8006D600 = cb_read` in `func_8002AA6C`,
 still `INCLUDE_ASM`). If `arg0 == 1` and the retry counter `D_8006D8F4` is
-still positive, calls `func_8002B304(D_8006D8E8, D_8006D8F0)`, advances
+still positive, calls `CD_getsector(D_8006D8E8, D_8006D8F0)`, advances
 `D_8006D8E8` by `D_8006D8F0 * 4`, and decrements `D_8006D8F4`; otherwise
 sets `D_8006D8F4 = -1`. Records `D_8006D8F8 = func_80025900(-1)`. If
 `D_8006D8F4 < 0` and `D_8006D8DC > 0`, calls `func_8002AA6C()`. If
@@ -17,7 +19,7 @@ sets `D_8006D8F4 = -1`. Records `D_8006D8F8 = func_80025900(-1)`. If
 
 ```c
 #if 0
-void func_8002B4D4(s32 arg0, s32 arg1)
+void cb_read(s32 arg0, s32 arg1)
 {
     volatile s32 *p;
     s32 code;
@@ -25,7 +27,7 @@ void func_8002B4D4(s32 arg0, s32 arg1)
     if (arg0 == 1) {
         p = &D_8006D8F4;
         if (*p > 0) {
-            func_8002B304(D_8006D8E8, D_8006D8F0);
+            CD_getsector(D_8006D8E8, D_8006D8F0);
             D_8006D8E8 = D_8006D8E8 + D_8006D8F0 * 4;
             *p = *p - 1;
         }
@@ -73,7 +75,7 @@ parts of them** -- the same class of residue worked around in
 before time ran out on this function. That is the next lever to try, not
 a new one.
 
-**Argument order at the `func_8002B304` call site also looked suspicious
+**Argument order at the `CD_getsector` call site also looked suspicious
 in the diff** (retail loads `$a0` from what should be `D_8006D8E8` and
 `$a1` from `D_8006D8F0`, in that order; this build's registers didn't
 line up cleanly) but this could not be confirmed independent of the
@@ -97,7 +99,7 @@ before time ran out. Did that.
 
 ```c
 #if 0
-void func_8002B4D4(s32 arg0, s32 arg1)
+void cb_read(s32 arg0, s32 arg1)
 {
     volatile s32 *p;
     s32 code;
@@ -110,7 +112,7 @@ void func_8002B4D4(s32 arg0, s32 arg1)
     if (*p <= 0) {
         goto shared;
     }
-    func_8002B304(D_8006D8E8, D_8006D8F0);
+    CD_getsector(D_8006D8E8, D_8006D8F0);
     D_8006D8E8 = D_8006D8E8 + D_8006D8F0 * 4;
     *p = *p - 1;
     dummy = *p;       /* retail re-reads D_8006D8F4 here for no dataflow
@@ -303,14 +305,14 @@ register allocation.
 
 ### What's left, confined to two register/order residues -- both re-tested this round, both confirmed load-bearing as-is
 
-1. **`func_8002B304`'s two arguments (`D_8006D8E8`, `D_8006D8F0`) are
+1. **`CD_getsector`'s two arguments (`D_8006D8E8`, `D_8006D8F0`) are
    computed in the OPPOSITE order** -- retail materializes `a0` (first
    param) before `a1` (second param); this build materializes `a1`
    before `a0`. Both end up in the semantically correct registers before
    the call (this is NOT a value/identity bug), purely an evaluation-
    order difference. **Tried forcing left-to-right evaluation via
    explicit named temporaries** (`s32 e8 = D_8006D8E8; s32 f0 =
-   D_8006D8F0; func_8002B304(e8, f0);`) -- **no change at all**, byte-
+   D_8006D8F0; CD_getsector(e8, f0);`) -- **no change at all**, byte-
    identical output to the plain inline call. cc1's argument-evaluation
    order for this call appears fixed regardless of source-level
    sequencing hints tried so far.
@@ -319,7 +321,7 @@ register allocation.
    callee-saved) instead of retail's `$v1` (a caller-saved temp)** --
    this is because the current C reuses the SAME `p` variable across
    both the `if`-branch (where it genuinely needs to persist across the
-   `func_8002B304` call, hence `$s0`) and the `elseBranch` (where retail
+   `CD_getsector` call, hence `$s0`) and the `elseBranch` (where retail
    does NOT persist it, since nothing intervenes before the store).
    **Re-tried round 19's already-rejected fix -- giving `elseBranch` its
    own fresh `volatile s32 *p2`** now that fixes 1 and 2 have changed the
@@ -340,7 +342,7 @@ instruction order -- both of these are exactly that). Restored to
 
 ```c
 #if 0
-void func_8002B4D4(s32 arg0, s32 arg1)
+void cb_read(s32 arg0, s32 arg1)
 {
     volatile s32 *p;
     s32 code;
@@ -353,7 +355,7 @@ void func_8002B4D4(s32 arg0, s32 arg1)
     if (*p <= 0) {
         goto shared;
     }
-    func_8002B304(D_8006D8E8, D_8006D8F0);
+    CD_getsector(D_8006D8E8, D_8006D8F0);
     D_8006D8E8 = D_8006D8E8 + D_8006D8F0 * 4;
     *p = *p - 1;
     dummy = *p;
@@ -419,15 +421,15 @@ below) and confirmed independently: `build exit=2`, no compile errors,
 `funcdiff.py` reports **60/91 words, no staleness warning, compiled length
 exact at 91/91**. Matches the round-20 report's own claim exactly.
 
-**First real diff, read off `tools/asm-differ/diff.py func_8002B4D4` on an
+**First real diff, read off `tools/asm-differ/diff.py cb_read` on an
 isolated build (only this function live, its siblings reverted to
 `INCLUDE_ASM`): file offset `0x1BD08`, vram `0x8002B508`** -- the
-`func_8002B304` call's two argument address computations (`D_8006D8E8`/
+`CD_getsector` call's two argument address computations (`D_8006D8E8`/
 `D_8006D8F0`), swapped `$a0`/`$a1` between retail and this build. This is
 residue 1 from round 20's "what's left", not a new finding; the title above
 had no location figure before this round.
 
-**No new attempt.** Both open residues (the `func_8002B304` argument
+**No new attempt.** Both open residues (the `CD_getsector` argument
 evaluation order, and the `elseBranch` pointer landing in `$s0` instead of
 `$v1`) have each been tried and rejected TWICE across rounds 19-20 with the
 second attempt in each case explicitly re-testing after an unrelated
@@ -460,7 +462,7 @@ build re-verified clean.
    `addiu`/`ori` rendering coincidence.
 
 ### Symbol-name note
-Same finding as `func_8002AA6C.md`/`func_8002AEE0.md` this round: this
+Same finding as `func_8002AA6C.md`/`CD_readsync.md` this round: this
 report's preserved body already calls `VSync`/`func_8002AA6C` by their
 current names, so no translation was needed here (unlike `func_8002AA6C`'s
 and `CD_init`'s reports, which still carry the pre-rename raw names).
@@ -469,7 +471,7 @@ and `CD_init`'s reports, which still carry the pre-rename raw names).
 > instance of this round's assigned trap.** The preserved body in this exact
 > report (see the `#if 0` block just above, `*pF8 = func_80025900(-1);`)
 > still calls `func_80025900`, the RAW pre-rename name -- not `VSync`.
-> `tools/stalesyms.py` confirms: `func_8002B4D4.md: func_80025900 -> VSync`.
+> `tools/stalesyms.py` confirms: `cb_read.md: func_80025900 -> VSync`.
 > Round 33 apparently checked this report's PROSE (which does say "VSync" in
 > a few narrative sentences describing what the function does) without
 > checking the preserved CODE BLOCK itself, exactly the gap
@@ -525,18 +527,18 @@ the way it would inside pure game code -- it has to be checked with
 `objdump`'s own instruction count, not just `build/lsdde.map`.
 
 **Reverted immediately.** This is the SAME class of trap
-`func_8002B3F4.md`'s round-19 entry already documents for this unit (a
+`callback.md`'s round-19 entry already documents for this unit (a
 permuter-found lower score that is unsafe/wrong against the real oracle, not
 merely untested) -- except there the danger was a cross-translation-unit bss
 shift from a retyped GLOBAL, and here it is a plain LENGTH regression from a
 scorer whose alignment-based penalty metric does not track raw per-word
 byte identity or total instruction count reliably. Consistent with this
-same round's `func_8002B198` entry finding the OPPOSITE (a lower permuter
+same round's `CD_datasync` entry finding the OPPOSITE (a lower permuter
 score there DID hold up) -- neither direction can be trusted without a real
 rebuild-and-diff.
 
 **No further manual attempt** on this function's two already-characterized
-open residues (the `func_8002B304` argument evaluation order, and the
+open residues (the `CD_getsector` argument evaluation order, and the
 `elseBranch` pointer's `$s0`-vs-`$v1` register split) -- both are
 twice-independently-confirmed register-identity/allocation questions per
 rounds 19-20's own testing, and this round's permuter search (the
@@ -547,7 +549,7 @@ negative. Restored to `INCLUDE_ASM`; build re-verified clean.
 
 ```c
 #if 0
-void func_8002B4D4(s32 arg0, s32 arg1)
+void cb_read(s32 arg0, s32 arg1)
 {
     volatile s32 *p;
     s32 code;
@@ -560,7 +562,7 @@ void func_8002B4D4(s32 arg0, s32 arg1)
     if (*p <= 0) {
         goto shared;
     }
-    func_8002B304(D_8006D8E8, D_8006D8F0);
+    CD_getsector(D_8006D8E8, D_8006D8F0);
     D_8006D8E8 = D_8006D8E8 + D_8006D8F0 * 4;
     *p = *p - 1;
     dummy = *p;
@@ -610,7 +612,7 @@ line, which already does this correctly) rather than reading prose.
 Also: **a permuter score improvement needs the same real-oracle
 verification as a permuter score of exactly zero, and this project now has
 one confirmed example in each direction within the same unit, same
-round** -- `func_8002B198` (this unit, this round) found a lower-metric
+round** -- `CD_datasync` (this unit, this round) found a lower-metric
 candidate that held up; this function found one that didn't (a genuine
 1-instruction-short regression). The permuter's alignment-penalty score and
 this project's raw word-match/byte-length are different measurements that
@@ -623,7 +625,7 @@ recording any permuter result as fact.
 
 Rebuilt the round-20/33/36 60/91 body verbatim (already current names) **in
 isolation** (all other stalled siblings in this unit reverted to
-`INCLUDE_ASM`, `func_8002AEE0` now genuinely MATCHED rather than reverted):
+`INCLUDE_ASM`, `CD_readsync` now genuinely MATCHED rather than reverted):
 `build exit=2`, no compile errors, `funcdiff.py` reports **60/91 words, no
 staleness warning, compiled length exact at 91/91** -- matches every prior
 round's recorded figure exactly.
@@ -632,11 +634,11 @@ Checked both open residues against this round's two new levers
 (hoist-both-before-either, and the combination corollary) before declining to
 spend further attempts:
 
-- **Residue 1 (`func_8002B304`'s two arguments materialize in the opposite
+- **Residue 1 (`CD_getsector`'s two arguments materialize in the opposite
   order)**: this IS the hoist-both shape on its face (two independently
   producible values, `D_8006D8E8`/`D_8006D8F0`, consumed by one call), but
   the exact hoist (`s32 e8 = D_8006D8E8; s32 f0 = D_8006D8F0;
-  func_8002B304(e8, f0);`) was already tried in round 20 and produced
+  CD_getsector(e8, f0);`) was already tried in round 20 and produced
   byte-identical output to the plain inline call -- this precondition was
   already tested and found inert, not merely untried. Re-running it here
   would not add information.
@@ -649,15 +651,15 @@ spend further attempts:
   combined fix could exploit (they are in disjoint branches of the
   function).
 
-This round's `func_8002AEE0` (same unit) found that a permuter-discovered
+This round's `CD_readsync` (same unit) found that a permuter-discovered
 "always-true either-branch, duplicated body, referencing the contested
 variable" trick closed a register-numbering residue there after manual
 reorders had failed. **Tried the same shape here**, forcing `p`'s liveness at
 different points with `if (D_8006D8E8 || D_8006D8F0) { ... } else { ... }`
-wrapped around the `func_8002B304` call and around the final dispatch -- no
+wrapped around the `CD_getsector` call and around the final dispatch -- no
 placement tried reproduced any improvement (all either no-op or regressed);
 not written up instruction-by-instruction since none of them moved the score
-at all, unlike `func_8002B198`'s and `func_8002AEE0`'s cases this round where
+at all, unlike `CD_datasync`'s and `CD_readsync`'s cases this round where
 at least a partial or full effect was observed.
 
 **No new attempt beyond that.** Restored to `INCLUDE_ASM`; body unchanged
@@ -665,8 +667,8 @@ from round 36's preserved best (reproduced there, not repeated here).
 
 ### Proposed learning
 
-The permuter's "always-true either-branch" trick (this round's `func_8002AEE0`
-and `func_8002B198` findings) is not universally applicable within a unit even
+The permuter's "always-true either-branch" trick (this round's `CD_readsync`
+and `CD_datasync` findings) is not universally applicable within a unit even
 when the residue LOOKS superficially similar (a register-numbering/identity
 question) -- it worked twice in this unit's OTHER two stalls this round and
 zero times here across several placements. Worth trying cheaply when a
@@ -683,7 +685,7 @@ body VERBATIM into `src/` in isolation. **It did NOT reproduce 60/91** --
 `funcdiff.py` reported 37/91 with a 294237-byte outside-range drift warning.
 The cause: this body's `if (D_8006D8F4 < 0 && D_8006D8DC > 0)` uses bare
 `D_8006D8DC`, which was a plain scalar when this line was first written
-(round 19), but round 40 (this same unit, `func_8002AEE0.md`) retyped the
+(round 19), but round 40 (this same unit, `CD_readsync.md`) retyped the
 ten consecutive globals `D_8006D8DC`/`D_8006D8E0`/.../`D_8006D900` into one
 `s32 D_8006D8DC[10]` array. A bare array name in an arithmetic comparison
 DECAYS to a pointer, so `D_8006D8DC > 0` silently stopped being "is the
@@ -703,7 +705,7 @@ claimed to "rebuild verbatim, in isolation" and reported 60/91 -- meaning
 either they were quietly building against the OLD, pre-retype declaration
 some other way, or this specific line was never actually re-verified
 letter-for-letter against the CURRENT unit header after the round-40 edit
-landed. Given round 40's own `func_8002AEE0.md` explicitly discusses this
+landed. Given round 40's own `CD_readsync.md` explicitly discusses this
 exact array retype in detail without cross-checking this sibling function's
 use of the SAME symbol, the likely explanation is simply that nobody
 grepped this report's preserved body for `D_8006D8DC` after that retype.
@@ -719,8 +721,8 @@ trusting its recorded score.
 
 ### Scaffold validated, then searched: 900s bound, ~123,000 iterations, rc=0 (ran to its own timeout)
 
-Set up `tools/setup-permuter.sh func_8002B4D4 <seed>` from the CORRECTED
-60/91 body (`permuter-seeds/func_8002B4D4.c` in this worktree). `--debug
+Set up `tools/setup-permuter.sh cb_read <seed>` from the CORRECTED
+60/91 body (`permuter-seeds/cb_read.c` in this worktree). `--debug
 --stack-diffs`: base score **295** (`Register Differences: 19,
 Reorderings: 0, Insertions: 1, Deletions: 1`) -- a cleaner residue profile
 than round 36's own base-620 read against the (also-buggy, at the time)
@@ -773,8 +775,8 @@ unlike this same round's `func_8002AA6C` finding where an equivalent-
 looking hoist broke across a LOOP boundary.
 
 **This is exactly the "same failure mode can be conditioned on the
-register/data-model state it was tested under" lesson `func_8002B4D4.md`'s
-own round-20 entry and `func_8002AEE0.md`'s round-40 entry already
+register/data-model state it was tested under" lesson `cb_read.md`'s
+own round-20 entry and `CD_readsync.md`'s round-40 entry already
 independently drew** -- a THIRD instance of it, and the first one caused
 by a data-model bug in the seed rather than a later fix changing register
 pressure. A "negative, confirmed unsafe" verdict on a permuter candidate is
@@ -786,12 +788,12 @@ a change that is expected to help.
 
 Remaining residue, read off `funcdiff.py`'s DIFF lines (isolated build):
 
-1. **`vram=0x8002B508`-`0x8002B514` (4 words)**: `func_8002B304`'s two
+1. **`vram=0x8002B508`-`0x8002B514` (4 words)**: `CD_getsector`'s two
    arguments (`D_8006D8E8`, `D_8006D8F0`) materialize into `$a0`/`$a1` in
    the OPPOSITE order from retail (retail: a0 from D_8006D8E8 first, a1
    from D_8006D8F0 second; this build evaluates them right-to-left).
    Tried the hoist-both-into-locals fix (`s32 e8 = D_8006D8E8; s32 f0 =
-   D_8006D8F0; func_8002B304(e8, f0); D_8006D8E8 = e8 + f0 * 4;`), both as
+   D_8006D8F0; CD_getsector(e8, f0); D_8006D8E8 = e8 + f0 * 4;`), both as
    a block-scoped and as a function-top-level declaration -- **both
    catastrophically regressed to 2/91 with 294261 bytes of drift** (the
    compiled length grew substantially). Round 39/round-20's own claim that
@@ -820,7 +822,7 @@ exit 0, after reverting).
 
 ```c
 #if 0
-void func_8002B4D4(s32 arg0, s32 arg1)
+void cb_read(s32 arg0, s32 arg1)
 {
     volatile s32 *p;
     s32 code;
@@ -834,7 +836,7 @@ void func_8002B4D4(s32 arg0, s32 arg1)
     if (*p <= 0) {
         goto shared;
     }
-    func_8002B304(D_8006D8E8, D_8006D8F0);
+    CD_getsector(D_8006D8E8, D_8006D8F0);
     D_8006D8E8 = D_8006D8E8 + D_8006D8F0 * 4;
     *p = *p - 1;
     dummy = *p;
@@ -881,7 +883,7 @@ shared:
   another round a rebuild-and-rediscover cycle.
 - A permuter candidate's rejection is conditioned on the SEED (not just
   the register-pressure context) it was tested against -- this is
-  `func_8002AEE0.md`'s round-40 lesson again, but from a data-correctness
+  `CD_readsync.md`'s round-40 lesson again, but from a data-correctness
   angle rather than a register-pressure one: fix a latent bug in a
   near-miss's preserved body before trusting ANY of its recorded permuter
   verdicts, not just its word-match score.
@@ -895,7 +897,7 @@ siblings in this unit still `INCLUDE_ASM`): `build exit=2`, no compile errors,
 
 ### Permuter search: base score 70 matches the report, check 3 passes (AGREE)
 
-`tools/setup-permuter.sh func_8002B4D4 permuter-seeds/func_8002B4D4.c`
+`tools/setup-permuter.sh cb_read permuter-seeds/cb_read.c`
 (seed = round 41's corrected 84/91 body). `--debug --stack-diffs`: base score
 **70** (`Register Differences: 14, Reorderings: 0, Insertions: 0,
 Deletions: 0`) -- matches round 41's own recorded 70 exactly, and the
@@ -918,7 +920,7 @@ int`; applied as `volatile s32` for idiom consistency -- same width, same
 signedness in practice, no semantic change). No source-level change to the
 function body itself was needed.
 
-**This is the exact class of fix `func_8002B3F4.md`'s round-19 entry found
+**This is the exact class of fix `callback.md`'s round-19 entry found
 unsafe** (a permuter-discovered global `volatile` retype that scores well
 locally but shifts a neighboring symbol's linked address, corrupting a
 sibling). Checked for that specifically before trusting it:
@@ -928,7 +930,7 @@ grep 'D_8006D8C0\b\|D_8006D8E8\b\|D_8006D8EC\b\|D_8006D8F0\b' build/lsdde.map
 # before AND after the retype: identical addresses, no shift
 ```
 
-**No shift.** Unlike `func_8002B3F4`'s case (a `u8[2]` array where `volatile`
+**No shift.** Unlike `callback`'s case (a `u8[2]` array where `volatile`
 forced 4-byte alignment, pushing later globals forward by padding),
 `D_8006D8E8` is already a plain 4-byte `s32` at its natural alignment --
 `volatile` has nothing to round up here, so the counter-lever's failure mode
@@ -937,7 +939,7 @@ unit (confirmed via `grep -rn D_8006D8E8 src/ include/`), so there is no
 header-contention or other-unit exposure either.
 
 Rebuilt with the retype applied: `funcdiff.py` reports **88/91 words, length
-still exact, no drift** -- the entire `func_8002B304` argument-order residue
+still exact, no drift** -- the entire `CD_getsector` argument-order residue
 (vram `0x8002B508`-`0x8002B514`, the two args materializing in the opposite
 order from retail) is now GONE. `volatile` on `D_8006D8E8` evidently forces a
 genuine fresh reload at each use, which happens to also fix the argument
@@ -985,7 +987,7 @@ closing the function rather than just explaining a partial score.
   The two searches explored different parts of the space from different
   seeds; a stale negative from an earlier seed does not predict a fresh
   seed's search.
-- **The `func_8002B3F4`-taught counter-lever ("verify a volatile-retype
+- **The `callback`-taught counter-lever ("verify a volatile-retype
   candidate against `build/lsdde.map` before trusting it") is cheap and
   should be applied to EVERY permuter-found global retype, not just ones
   that look suspicious** -- here it cost one `grep` and confirmed safety in
@@ -998,5 +1000,5 @@ closing the function rather than just explaining a partial score.
   become correct once a DIFFERENT, unrelated residue in the same function is
   fixed first** -- the third confirmed instance of this unit's own
   "negative result is scoped to the state it was tested under" lesson
-  (`func_8002B4D4.md` round 20, `func_8002AEE0.md` round 40), and the first
+  (`cb_read.md` round 20, `CD_readsync.md` round 40), and the first
   one to go all the way to a full match rather than a partial improvement.

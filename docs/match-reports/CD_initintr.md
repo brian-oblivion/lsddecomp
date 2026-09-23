@@ -10,7 +10,7 @@ Minimal driver-thread starter: clears four scalar state words
 (`D_8006D600`, `D_8006D5FC`, `D_8006D610`, `D_8006D60C`), zeroes a run of
 ten consecutive words starting at `D_8006D8DC`, then calls
 `func_80024D10` (Psy-Q, `asm/psyq_GsLinkObject4.s`) and registers
-`func_8002B3F4` as a thread entry via `func_80024D40(2, func_8002B3F4)`.
+`callback` as a thread entry via `func_80024D40(2, callback)`.
 
 ## The C
 
@@ -30,7 +30,7 @@ void CD_initintr(void)
         p++;
     }
     func_80024D10();
-    func_80024D40(2, func_8002B3F4);
+    func_80024D40(2, callback);
 }
 ```
 

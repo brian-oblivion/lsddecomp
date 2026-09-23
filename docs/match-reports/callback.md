@@ -1,11 +1,11 @@
-# func_8002B3F4 -- STALL: length 1 word SHORT (220/224 bytes); 30/56 raw word-match; first real diff at vram 0x8002B484
+# callback -- STALL: length 1 word SHORT (220/224 bytes); 30/56 raw word-match; first real diff at vram 0x8002B484
 
 **Unit:** code_179d8_g · **Size:** 56 words · **Status:** STALL (1 word short: 220/224 bytes, 30/56 words match, first real diff at vram 0x8002B484)
 
 ## What it does
 
 Thread entry point registered by `CD_initintr`/`CD_init` via
-`func_80024D40(2, func_8002B3F4)`. Loops on `getintr()` (still
+`func_80024D40(2, callback)`. Loops on `getintr()` (still
 `INCLUDE_ASM`/BLOCKED in `code_179d8_b`) dispatching two optional callbacks
 (`D_8006D600` and `D_8006D5FC`, both function pointers) based on flag bits,
 until `getintr()` returns 0, then restores the driver's saved status
@@ -15,7 +15,7 @@ byte into `*D_8006D8C0`.
 
 ```c
 #if 0
-void func_8002B3F4(void)
+void callback(void)
 {
     u8 status;
     s32 flags;
@@ -116,7 +116,7 @@ divergence (extra saved register) rather than the intended one.
 
 ## Round: hand analysis (runner delta), permuter queued but not yet run
 
-Re-read `asm/nonmatchings/code_179d8_g/func_8002B3F4.s` directly to
+Re-read `asm/nonmatchings/code_179d8_g/callback.s` directly to
 confirm the report's residue reading byte-for-byte (not just trust the
 prose). Confirmed exactly as described:
 
@@ -151,7 +151,7 @@ forward since it is the semantically-correct spelling of what retail's
 `lbu` actually loads, and the bare-array form only reads correctly by an
 implicit-conversion coincidence that a stricter compiler would flag.
 
-**Permuter scaffold prepared and validated** (`permuter-work/func_8002B3F4`,
+**Permuter scaffold prepared and validated** (`permuter-work/callback`,
 seed uses the corrected `D_8006D8D8[0]` form) -- `--debug` base score
 140, matching the report's characterization (a single-value residue, not
 a control-flow one). Not yet searched under `-j 6`: only one search runs
@@ -206,13 +206,13 @@ residue already documented, not a type mismatch. No source changes.
 
 The permuter scaffold this report describes as "prepared but not yet
 searched" was finally run this round. Rebuilt the scaffold fresh
-(`tools/setup-permuter.sh func_8002B3F4 <seed>`, seed = this report's
+(`tools/setup-permuter.sh callback <seed>`, seed = this report's
 corrected `D_8006D8D8[0]` body), confirmed base score 140 via `--debug
 --stack-diffs` (matches this report's earlier characterization exactly:
 `Register Differences: 8, Deletions: 1`), then searched with
 `timeout 300 ... permuter.py -j 6 --stop-on-zero --best-only` in the
 background per the round's process rules. **It found a genuine zero at
-iteration 2095** (`permuter-work/func_8002B3F4/output-0-1`), well within
+iteration 2095** (`permuter-work/callback/output-0-1`), well within
 the 300s bound.
 
 The winning source makes two substantive changes beyond this report's
@@ -248,11 +248,11 @@ symbol in the same `D_8006D8xx` block.** Verified directly, twice, with
 $ grep 'D_8006D8C0\b' build/lsdde.map      # plain `u8 D_8006D8D8[2]` (baseline)
                 0x8006d8c0                D_8006D8C0
 
-$ grep 'D_8006D8C0\b' build/lsdde.map      # `volatile u8 D_8006D8D8[2]`, func_8002B3F4
+$ grep 'D_8006D8C0\b' build/lsdde.map      # `volatile u8 D_8006D8D8[2]`, callback
                 0x8006d8c4                D_8006D8C0        # <- shifted +4
 ```
 
-With `func_8002B3F4` left safely as `INCLUDE_ASM` (contributing zero
+With `callback` left safely as `INCLUDE_ASM` (contributing zero
 drift of its own) and ONLY the `volatile` qualifier changed,
 `CD_flush` -- fully matched (58/58) on `main` -- regresses to
 34/59 words, and `asm-differ` confirms it is a REAL codegen change, not
@@ -362,7 +362,7 @@ scratch**, because that same round's write-up diagnosed a `make clean` +
 open the possibility the shift was itself a symptom of that desync rather
 than a genuine C-level effect. Reproduced independently this round: changed
 ONLY `extern u8 D_8006D8D8[2];` to `extern volatile u8 D_8006D8D8[2];` in this
-file (no other change, `func_8002B3F4` still plain `INCLUDE_ASM`), rebuilt
+file (no other change, `callback` still plain `INCLUDE_ASM`), rebuilt
 clean, and got the identical result reported in round 19 -- `D_8006D8C0` moves
 from `0x8006d8c0` to `0x8006d8c4` in `build/lsdde.map`, and `CD_flush`
 (otherwise 58/58-matched) regresses to `34/59`, `asm-differ`-confirmed as a
@@ -416,7 +416,7 @@ staleness warning, 220/224 bytes (1 instruction short of retail's 56)**.
 Matches this report's own claim exactly.
 
 **First real diff.** With this function's siblings (`CD_init`,
-`func_8002AA6C`, `func_8002AEE0`) also mid-experiment in the same session,
+`func_8002AA6C`, `CD_readsync`) also mid-experiment in the same session,
 `asm-differ`'s naive read was polluted by their own still-open residues
 upstream (a genuine instance of CLAUDE.md's "drift need not come from the
 function you're editing" attribution hazard -- checked `build/lsdde.map` and
@@ -424,7 +424,7 @@ confirmed the apparent first diff at file offset 0x1BBF8 was a 4-byte
 immediate shift caused by upstream drift, not this function's own residue).
 Read the true site directly off retail's own `.s` instead, which this
 report's prose already pinpoints precisely: `asm/nonmatchings/code_179d8_g/
-func_8002B3F4.s` line 46, **file offset `0x1BC84`, vram `0x8002B484`** --
+callback.s` line 46, **file offset `0x1BC84`, vram `0x8002B484`** --
 the `lui $v0,%hi(D_8006D8D8) / addiu $v0,$v0,%lo(D_8006D8D8) / lbu $a0,0x0
 ($v0)` unfolded 3-instruction sequence this build's plain `D_8006D8D8[0]`
 reference folds to 2. The title above had a byte-count but no location
@@ -435,7 +435,7 @@ local hoisting, which regresses via LICM since the target is loop-invariant;
 and a global `volatile` retype, which scores 0 locally but corrupts a
 sibling function's linked address, confirmed twice across rounds 19-20) are
 dead ends for reasons independent of each other, and this round's own
-`func_8002AEE0` investigation (see that report) found the SAME class of
+`CD_readsync` investigation (see that report) found the SAME class of
 "redundant reload vs. register-pressure choice" resistant to reordering too
 -- consistent with this being a genuine instruction-SELECTION residue
 (explicitly not a scheduling one: a bare `__asm__("")` barrier was already
@@ -499,9 +499,9 @@ different, well-characterized reasons, and a bare `__asm__("")` barrier
 (the remaining lever HARD RULE 6 would permit) was already tried and does
 nothing (this is a selection residue -- folded vs. unfolded addressing --
 not an ordering one). Given this round's budget went to running fresh
-permuter searches on the two SMALLEST siblings (`func_8002B198`,
-`func_8002B4D4`, per this round's own instructions to prefer the smallest
-measured gap) plus `func_8002AEE0` (which had never seen ANY permuter run
+permuter searches on the two SMALLEST siblings (`CD_datasync`,
+`cb_read`, per this round's own instructions to prefer the smallest
+measured gap) plus `CD_readsync` (which had never seen ANY permuter run
 at all), and this function already HAS a permuter-confirmed result that is
 unsafe rather than merely untested, there was no new lever to spend an
 attempt on here. Restored to `INCLUDE_ASM` (unchanged, was already there).
@@ -525,7 +525,7 @@ spend an attempt:
   body already reproduces exactly except for the one addressing-mode word;
   no missing `addiu $sp,$sp,-N` is involved.
 - **The permuter's "always-true either-branch" trick** (this round's
-  `func_8002AEE0`/`func_8002B198` findings, same unit): this function's
+  `CD_readsync`/`CD_datasync` findings, same unit): this function's
   own history already has the analogous case tried and REJECTED for a
   different reason -- round 19's permuter search found a genuine zero via
   RETYPING the global `D_8006D8D8` `volatile`, which is a stronger move
@@ -612,7 +612,7 @@ instruction short)** -- matches every prior round's recorded figure exactly.
 
 ### Permuter scaffold validated (check 3: AGREE)
 
-`tools/setup-permuter.sh func_8002B3F4 permuter-seeds/func_8002B3F4.c`
+`tools/setup-permuter.sh callback permuter-seeds/callback.c`
 (seed = the corrected `D_8006D8D8[0]` body already established by this
 report's earlier rounds). `--debug --stack-diffs`: base score **140**
 (`Register Differences: 8, Deletions: 1`, no reorderings/insertions) --
@@ -627,7 +627,7 @@ one either).
 ### Search: ~28,927 iterations, process exited at its own 600s bound
 
 ```
-timeout 600 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/func_8002B3F4
+timeout 600 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/callback
 ```
 
 **Process-compliance gap, noted rather than hidden**: this run's `rc` was not
@@ -658,7 +658,7 @@ if (flags & 2) {
 ```
 
 This LOOKS like the unit's established "reuse an already-hot register as a
-throwaway sink" idiom (`func_8002AA6C`, `func_8002B198`, `func_8002AEE0` all
+throwaway sink" idiom (`func_8002AA6C`, `CD_datasync`, `CD_readsync` all
 confirmed instances), but tracing `pd9` FORWARD to its next use (per this
 round's broadcast lever 3, from delta's round-48 finding) shows it is NOT a
 dead sink: `pd9` is set ONCE before the loop and read on EVERY iteration's
@@ -713,7 +713,7 @@ reverting all of this session's siblings.
   variable's OLD value must be dead at every point reachable from the reuse
   site, not merely "not read immediately after."** `pd9` fails this (read
   again on a LATER loop iteration under its old meaning); `func_8002AA6C`'s
-  `n`/`saved` and `func_8002B198`'s `ok` all pass it (each is either about
+  `n`/`saved` and `CD_datasync`'s `ok` all pass it (each is either about
   to `return` or is unconditionally overwritten before the next read, with
   no loop-carried path back to a stale read). Before adopting ANY
   permuter-found reuse-as-sink candidate, trace the reused variable forward

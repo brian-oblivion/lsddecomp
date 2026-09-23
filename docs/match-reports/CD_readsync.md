@@ -1,4 +1,6 @@
-# func_8002AEE0 -- MATCHED 174/174 (round 39, runner delta), BUT ONE CONSTRUCT IS KNOWN-BAD AND IS FLAGGED BELOW
+# CD_readsync -- MATCHED 174/174 (round 39, runner delta), BUT ONE CONSTRUCT IS KNOWN-BAD AND IS FLAGGED BELOW
+
+> Renamed from `func_8002AEE0` on 2026-09-23 (tools/rename.py). Address 0x8002aee0.
 
 ## ROUND 39 (head): the match is real and verified; the duplicate-arm construct is not idiomatic, and eleven attempts to replace it failed
 
@@ -82,7 +84,7 @@ needed to establish it:
 | operand | what the data says | where |
 | --- | --- | --- |
 | `D_8006D6A0` | a fixed **8-element table of rodata string addresses** (`0x8001097C`, `0x80010970`, ...) -- an array, so the decay is tautologically non-null | `asm/data/5DDFC.data.s:121-130` |
-| `D_8006D8F8` | **one zero word** that the sibling `func_8002B4D4` stores `VSync(-1)`'s return into (`lui`/`addiu`/`sw $v0`) -- an `s32` timestamp | `asm/nonmatchings/code_179d8_g/func_8002B4D4.s:49-51` |
+| `D_8006D8F8` | **one zero word** that the sibling `cb_read` stores `VSync(-1)`'s return into (`lui`/`addiu`/`sw $v0`) -- an `s32` timestamp | `asm/nonmatchings/code_179d8_g/cb_read.s:49-51` |
 
 A pointer global would be a word holding an address; this one holds a frame
 count written by `VSync`. That half of the lead is closed and should not be
@@ -174,7 +176,7 @@ at the data model rather than at the code shape.
 
 ---
 
-## (original report follows) func_8002AEE0 — MATCHED (174/174, 174/174 words -- round 39, up from 165/174 in round 36)
+## (original report follows) CD_readsync — MATCHED (174/174, 174/174 words -- round 39, up from 165/174 in round 36)
 
 `code_179d8_g`, vram `0x8002AEE0`, file offset `0x1B6E0`, 174 instructions
 (0x2B8 bytes). No `nop_mflo_mfhi` or `gp_rel` hits — clean per the carve
@@ -189,14 +191,14 @@ actually load-bearing here, just mis-filed as a group with its two siblings.
 A CD-subsystem poll/dispatch driver, structurally the same "poll with
 timeout, print a 4-string diagnostic on timeout, close the port, run a
 button/callback dispatch loop, copy 8 bytes, then conditionally chain to
-`func_8002AA6C`/`func_8002B198`" shape as the sibling `func_8002B198`
+`func_8002AA6C`/`CD_datasync`" shape as the sibling `CD_datasync`
 (itself a stall in this same unit), wrapped in an OUTER retry loop keyed off
 `arg0` and `D_8006D8F4`.
 
 - Sets a deadline (`D_8008B3E4 = now + 0x1E0`), a retry counter cap
   (`D_8008B3E8`, capped at `0x1E0000`), and a driver-name string pointer
   (`D_8008B3EC = "CD_read"`, confirmed via `asm/data/120C.rodata.s`
-  `D_80010AD8`), matching `func_8002B198`'s identical setup with a
+  `D_80010AD8`), matching `CD_datasync`'s identical setup with a
   different string (`"CD_datasync"`, `D_80010AE0`).
 - On timeout, prints `"CD timeout: "` then `"%s:(%s) Sync=%s, Ready=%s\n"`
   (`D_80010994`, confirmed 4-`%s` format via `asm/data/FD8.rodata.s`) with
@@ -204,13 +206,13 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
   D_8006D6A0[D_8006D8D8[1]])`, calls `CD_flush()`, and returns -1.
   **This means `D_8006D620`/`D_8006D6A0` are STRING-POINTER tables (each
   element is a `char *`, stored as `s32`), not raw values — worth carrying
-  forward for whoever next touches `func_8002B198`, see the anomaly note
+  forward for whoever next touches `CD_datasync`, see the anomaly note
   below.**
 - On success, calls `func_80024E64()` (a trivial Psy-Q getter,
   `(s32)(u16)D_8006C272`, still `INCLUDE_ASM` in `asm/psyq_GsLinkObject4.s`
   — declared here as `extern s32 func_80024E64(void);`); if nonzero, saves
   `*D_8006D8C0 & 3`, runs the same button-dispatch loop as
-  `func_8002B3F4`/`func_8002B198` (bit 4 → `D_8006D600(D_8006D8D8[1],
+  `callback`/`CD_datasync` (bit 4 → `D_8006D600(D_8006D8D8[1],
   D_8008B3D4)`, bit 2 → `D_8006D5FC(D_8006D8D8[0], D_8008B3CC)`, until
   `getintr()` returns 0), then restores the saved status byte.
 - Copies 8 bytes from `D_8008B3D4` into `*(u8 *)arg1` — but ONLY if `arg1 !=
@@ -218,15 +220,15 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
   raw disassembly out of order).
 - If `func_80025900(-1) > D_8006D8F8 + 0x3C`, calls `func_8002AA6C()`
   (itself a stall in this unit, `docs/match-reports/func_8002AA6C.md`).
-- If `D_8006D8F4 == 0`, calls `func_8002B198(0)` (also a stall).
+- If `D_8006D8F4 == 0`, calls `CD_datasync(0)` (also a stall).
 - Loops back to the very top of the poll (NOT re-initializing the deadline
   the way this comment described, but jumping back to the SAME `for(;;)`
   head that both timeout branches and initial entry share, so subsequent
   iterations poll against the ORIGINAL deadline) while `arg0 == 0 &&
   D_8006D8F4 > 0`; otherwise returns `D_8006D8F4`.
 
-`func_8002B198` and `func_80024E64` both needed forward `extern` prototypes
-added to this unit (`func_8002B198` is still `INCLUDE_ASM` later in this
+`CD_datasync` and `func_80024E64` both needed forward `extern` prototypes
+added to this unit (`CD_datasync` is still `INCLUDE_ASM` later in this
 same file; `func_80024E64` is `INCLUDE_ASM` in a different segment
 entirely) — both added near this file's existing `func_8002AA6C` forward
 declaration.
@@ -236,10 +238,10 @@ declaration.
 ```c
 #if 0
 extern s32 func_80024E64(void);           /* trivial Psy-Q getter, still INCLUDE_ASM elsewhere */
-extern s32 func_8002B198(s32 arg0);       /* forward decl -- still INCLUDE_ASM later in this file */
+extern s32 CD_datasync(s32 arg0);       /* forward decl -- still INCLUDE_ASM later in this file */
 extern u8 D_80010AD8[];                   /* "CD_read", asm/data/120C.rodata.s */
 
-s32 func_8002AEE0(s32 arg0, s32 arg1)
+s32 CD_readsync(s32 arg0, s32 arg1)
 {
     s32 now;
     s32 old;
@@ -326,7 +328,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
             func_8002AA6C();
         }
         if (pF8[-1] == 0) {
-            func_8002B198(0);
+            CD_datasync(0);
         }
         if (arg0 != 0 || pF8[-1] <= 0) {
             break;
@@ -351,7 +353,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
    materialized boolean flag.** An initial `timedOut = (cond1); if
    (!timedOut) {...}` shape compiled an extra `li $a0,0x1` / `beqz $a0,...`
    pair that retail's direct two-branch-to-one-target shape doesn't have —
-   same "ok-flag vs direct branch" class `func_8002B198.md` already
+   same "ok-flag vs direct branch" class `CD_datasync.md` already
    documents in this unit, confirmed a second time here.
 3. **The copy loop needed the file's own established
    `for (i = N; i != -1; i--)` idiom** (already used by the matched
@@ -401,7 +403,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
      before `idx0 = p8D8[0];`) — no change.
    - Spelling `p8D9` via `&D_8006D8D8[1]` instead of `p8D8 + 1` — no
      change (both forms are compile-time-identical addresses to cc1).
-   This is the SAME class `func_8002B198.md` already names ("what's left
+   This is the SAME class `CD_datasync.md` already names ("what's left
    is register NUMBERING, not hoisting-or-not") and CLAUDE.md's own
    register-identity guidance: none of the four levers changed WHICH
    VALUE ended up in which register, only reordering/renaming attempts
@@ -430,9 +432,9 @@ the next attempt, which should start from residue 2 (register numbering) —
 residue 1 already has a confirmed-inert set of four levers, so a fifth
 reshape without a new idea is not worth budget.
 
-## Anomaly spotted in passing: `func_8002B198.md`'s preserved "best C" body mis-transcribes its own diagnostic call
+## Anomaly spotted in passing: `CD_datasync.md`'s preserved "best C" body mis-transcribes its own diagnostic call
 
-Not fixed here (out of this function's scope, and `func_8002B198` was not
+Not fixed here (out of this function's scope, and `CD_datasync` was not
 one of this pass's assigned targets) but worth flagging since it could
 mislead whoever picks that stall back up: the report's preserved body has
 
@@ -440,7 +442,7 @@ mislead whoever picks that stall back up: the report's preserved body has
 func_80012C20(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], p6A0[p8D8[0]]);
 ```
 
-but `asm/nonmatchings/code_179d8_g/func_8002B198.s` (lines ~50-70) shows the
+but `asm/nonmatchings/code_179d8_g/CD_datasync.s` (lines ~50-70) shows the
 EXACT same instruction shape as this function's own diagnostic block: `a1 =
 D_8008B3EC` (not `p8D8[0]`), `a2 = D_6006D620[D_8006D61D]`, `a3 =
 D_8006D6A0[D_8006D8D8[0]]`, stack-arg = `D_8006D6A0[D_8006D8D8[1]]` —
@@ -470,7 +472,7 @@ stalls read for the question.
   the early return is logically equivalent and shorter, retail's compiler
   did not have that shape in its source; the extra "redundant-looking"
   instructions have to be sourced with an actual flag variable and a
-  single join-point check. This generalizes `func_8002B198.md`'s
+  single join-point check. This generalizes `CD_datasync.md`'s
   "ok-flag vs direct branch" finding: the direction that seems more
   natural (early return) is not just occasionally worse, it can be a
   categorical mismatch when retail's OWN code shows the flag-join
@@ -527,7 +529,7 @@ any one of them reflects current symbol names.
 > `func_80025AE4`, `func_80012C20`, `func_80024E64` throughout -- all four
 > raw, pre-rename names, not the current ones. `tools/stalesyms.py` confirms
 > all four for this report. This is the SAME trap as `func_8002AA6C.md`'s and
-> `func_8002B4D4.md`'s own round-36 corrections: round 33 apparently
+> `cb_read.md`'s own round-36 corrections: round 33 apparently
 > confirmed the rename by reading prose/a nearby paraphrase rather than
 > grepping the actual preserved code block. See the round-36 entry below for
 > the corrected, verified-linkable body -- and the substantial improvement
@@ -593,7 +595,7 @@ no zero, but four successive improvements, the last two substantial: 920 ->
 890 -> 750 -> 105 -> **75**.
 
 **Verified the winning (75) candidate against the real oracle before
-trusting it** (this round's `func_8002B4D4` entry found a permuter-metric
+trusting it** (this round's `cb_read` entry found a permuter-metric
 improvement that was actually a regression, so every candidate gets checked
 regardless of which direction its own score moved). Two changes, both
 narrow:
@@ -609,7 +611,7 @@ narrow:
 
 Built into `src/` in isolation: **165/174 words match, compiled length
 still EXACT at 174/174, no drift warning** -- confirmed via
-`build/lsdde.map` (`func_8002B198`, the next function in this unit, lands at
+`build/lsdde.map` (`CD_datasync`, the next function in this unit, lands at
 its correct retail address `0x8002b198`). A genuine 12-word improvement,
 the largest single gain on this unit's assignment this round.
 
@@ -618,14 +620,14 @@ with `result = -1;` restored to its plain form (dropping `new_var` and the
 fold entirely, keeping only change 1) and re-measured: **still 165/174,
 byte-identical diff set** (the same 9 file offsets, confirmed via a full
 `funcdiff.py` listing, not just the tail). Change 2 was permuter noise after
-all, unlike `func_8002B4D4`'s rejected candidate this round which looked
+all, unlike `cb_read`'s rejected candidate this round which looked
 similar but was NOT inert. The corrected body below drops `new_var`
 entirely; the ONLY substantive fix is routing `D_8008B3EC` through a local
 pointer at the diagnostic `printf` call site (the same "force unfolded
 addressing" idiom this unit's other functions already document, applied to
 a call ARGUMENT here rather than an assignment target).
 
-**What's left, read off `tools/asm-differ/diff.py func_8002AEE0`: 9 words
+**What's left, read off `tools/asm-differ/diff.py CD_readsync`: 9 words
 across 9 scattered instruction positions** (file offsets 0x1B718, 0x1B71C,
 0x1B728, 0x1B74C, 0x1B754, 0x1B7B4, 0x1B7C4, 0x1B7D8, 0x1B87C -- vram
 0x8002AF18 through 0x8002B07C). The first two and the pair at 0x1B74C/
@@ -636,7 +638,7 @@ prior reorder attempts. The remaining scattered single-word diffs (0x1B728,
 0x1B7B4, 0x1B7C4, 0x1B7D8, 0x1B87C) are new positions to characterize, not
 yet individually attributed -- **not investigated further this round**
 (time budget went to confirming and writing up the improvement itself, and
-to the sibling permuter runs on `func_8002B198`/`func_8002B4D4`). The next
+to the sibling permuter runs on `CD_datasync`/`cb_read`). The next
 attempt on this function should start there.
 
 Restored to `INCLUDE_ASM` (165/174 is still short of byte-exact); corrected
@@ -646,7 +648,7 @@ body below.
 
 ```c
 #if 0
-s32 func_8002AEE0(s32 arg0, s32 arg1)
+s32 CD_readsync(s32 arg0, s32 arg1)
 {
     s32 now;
     s32 old;
@@ -739,7 +741,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
             func_8002AA6C();
         }
         if (pF8[-1] == 0) {
-            func_8002B198(0);
+            CD_datasync(0);
         }
         if (arg0 != 0 || pF8[-1] <= 0) {
             break;
@@ -755,12 +757,12 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
 
 **Permuter "noise" that folds an assignment to an unused local into an
 otherwise-plain constant expression is not always safely discardable** --
-`func_8002B4D4`'s round-36 entry (this same session) found a permuter
+`cb_read`'s round-36 entry (this same session) found a permuter
 candidate that regressed the real oracle; this function's winning candidate
 also contains a seemingly-pointless `new_var` assignment
 (`-(new_var = 1)`), and REMOVING it (writing plain `result = -1;`) was not
 separately re-tested here due to time, but should be before assuming it is
-inert -- the general lesson from this unit's `func_8002B198`/`func_8002B4D4`
+inert -- the general lesson from this unit's `CD_datasync`/`cb_read`
 entries this round is that neither "the permuter's score went down" nor "the
 candidate contains obvious noise" predicts whether a specific line is
 load-bearing; only a rebuild-and-diff does.
@@ -776,7 +778,7 @@ offsets 0x1B718/0x1B71C/0x1B728 (the `p6A0`/`p8D9` `$s4`/`$s5` swap),
 
 Retail's own instruction stream stores `D_8008B3E8 = 0` BEFORE
 `D_8008B3EC = (s32)D_80010AD8` (confirmed directly off
-`asm/nonmatchings/code_179d8_g/func_8002AEE0.s`, offsets 0x1B748-0x1B754);
+`asm/nonmatchings/code_179d8_g/CD_readsync.s`, offsets 0x1B748-0x1B754);
 the round-36 body assigned them in the opposite order
 (`D_8008B3EC` then `D_8008B3E8`). Swapping the two assignment statements to
 match retail's order closed exactly the 0x1B74C/0x1B754 pair with no other
@@ -792,7 +794,7 @@ assignment-order swap `p8D8;p8D9;p6A0`: 167->165) -- consistent with round
 36's four already-documented inert reorder axes for this exact residue
 class.
 
-Ran the permuter instead (`tools/setup-permuter.sh func_8002AEE0 <seed>`
+Ran the permuter instead (`tools/setup-permuter.sh CD_readsync <seed>`
 from the fix-1 167/174 body; base score 45, `Register Differences: 9` per
 `--debug`, confirming this is purely the register-numbering residue with
 nothing else hiding under it). Searched `timeout 600 ... -j 6 --stack-diffs
@@ -818,7 +820,7 @@ the ENTIRE `p6A0`/`p8D9` `$s4`/`$s5` swap: 167 -> 173/174, closing 6 of the
 7 words this residue class accounted for (0x1B718, 0x1B71C, 0x1B728,
 0x1B7C4, 0x1B7D8, 0x1B87C all closed at once; only 0x1B7B4 remained).
 
-This is the same phenomenon `func_8002B198.md`'s round-36 entry documents
+This is the same phenomenon `CD_datasync.md`'s round-36 entry documents
 (a permuter candidate reusing an already-hot register/variable as a
 throwaway sink), but the FORM here is different and worth recording
 separately: not a reused-variable write, but a duplicated-arm branch on an
@@ -842,8 +844,8 @@ the function outright: 173 -> 174/174, BYTE-EXACT.**
 
 Confirmed via the strongest available check, not just `funcdiff.py`'s
 in-range read: reverted every other stalled sibling in this unit
-(`func_8002AA6C`, `CD_init`, `func_8002B198`, `func_8002B3F4`,
-`func_8002B4D4`) to `INCLUDE_ASM`, rebuilt, and `./build-and-verify.sh`
+(`func_8002AA6C`, `CD_init`, `CD_datasync`, `callback`,
+`cb_read`) to `INCLUDE_ASM`, rebuilt, and `./build-and-verify.sh`
 reports **`OK: build matches retail SLPS_015.56`, exit 0** -- the whole-image
 SHA1, not a per-function window.
 
@@ -851,7 +853,7 @@ SHA1, not a per-function window.
 
 - **A negative result for a specific reshape is conditioned on the register
   state it was tested under, not permanent** -- this is the SAME lesson
-  `func_8002B4D4.md`'s round-20 entry already drew for a guard-polarity flip,
+  `cb_read.md`'s round-20 entry already drew for a guard-polarity flip,
   now confirmed a second time in this same unit for a completely different
   lever (redirecting a load's source pointer). When an earlier, unrelated
   fix changes a function's register allocation, re-check a previously-inert
@@ -859,18 +861,18 @@ SHA1, not a per-function window.
 - **The permuter's random mutator can find a "duplicate both arms of an
   always-true branch, referencing the contested variables" shape that no
   reasonable manual reorder attempt would try, and it can be genuinely
-  load-bearing** -- add this to `func_8002B198.md`'s "reuse an already-hot
+  load-bearing** -- add this to `CD_datasync.md`'s "reuse an already-hot
   register as a sink" finding as a second, structurally different form of
   the same underlying phenomenon (force a value's liveness at a specific
   program point by making the source visibly reference it there). Both
   require real-oracle verification regardless of which direction the
-  permuter's own score moved; this one held up, `func_8002B4D4`'s round-36
+  permuter's own score moved; this one held up, `cb_read`'s round-36
   candidate did not.
 
 ### Final body (174/174, MATCHED)
 
 ```c
-s32 func_8002AEE0(s32 arg0, s32 arg1)
+s32 CD_readsync(s32 arg0, s32 arg1)
 {
     s32 now;
     s32 old;
@@ -970,7 +972,7 @@ s32 func_8002AEE0(s32 arg0, s32 arg1)
             func_8002AA6C();
         }
         if (pF8[-1] == 0) {
-            func_8002B198(0);
+            CD_datasync(0);
         }
         if (arg0 != 0 || pF8[-1] <= 0) {
             break;

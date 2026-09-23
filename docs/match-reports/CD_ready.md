@@ -189,7 +189,7 @@ ret1:
 
 ### Proposed learning
 
-- **Two GCC 2.6.3 residues that both look like "a redundant instruction retail keeps that mine elides" are NOT always the same mechanism, and only one of the two responds to a scheduling barrier.** Here, an `andi` mask after an already-zero-extending `lbu` is dead-code-eliminated (barrier-proof, matches the documented `func_8002B94C` cause) in the SAME function where a store's POSITION relative to a following branch's delay slot IS a genuine order residue a barrier fixes (matches the documented `func_8002AEE0`/`DreamSys__StepLookOffset` cause). Diagnose each instance against the raw `.s`'s exact instruction sequence rather than assuming a match report's fix for one instance transfers to a superficially similar one three lines later.
+- **Two GCC 2.6.3 residues that both look like "a redundant instruction retail keeps that mine elides" are NOT always the same mechanism, and only one of the two responds to a scheduling barrier.** Here, an `andi` mask after an already-zero-extending `lbu` is dead-code-eliminated (barrier-proof, matches the documented `func_8002B94C` cause) in the SAME function where a store's POSITION relative to a following branch's delay slot IS a genuine order residue a barrier fixes (matches the documented `CD_readsync`/`DreamSys__StepLookOffset` cause). Diagnose each instance against the raw `.s`'s exact instruction sequence rather than assuming a match report's fix for one instance transfers to a superficially similar one three lines later.
 
 ## Round 35 addendum (echo) -- rebuilt, STILL a stall, same residue; the cited `func_8002B94C` cause is now suspect but the mechanism re-confirms independently
 
@@ -206,7 +206,7 @@ ret1:
 > is only the appeal to `func_8002B94C` as the worked precedent for it, in
 > this heading and in the proposed-learning bullet above it.
 >
-> Note the `func_8002AEE0` half of that same bullet is the OTHER exit and is
+> Note the `CD_readsync` half of that same bullet is the OTHER exit and is
 > fine: that one was matched as game C (174/174, round 39), so its precedent
 > is real and complete -- go read the C in `src/code_179d8_g.c` rather than
 > the report's summary of it.

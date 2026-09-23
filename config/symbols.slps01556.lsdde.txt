@@ -1403,3 +1403,31 @@ CD_readm = 0x8002ADE8; // type:func
 // identified: config/psyq-objects.ld pin (linked Sony object calls this
 // address CD_sync by relocation), shape 0.99-1.00 vs libcd/bios CD_sync. Round 71 (bravo, track 2).
 CD_sync = 0x800299BC; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libcd/bios cb_read (disc 3.3).
+// Round 71 (bravo, track 2).
+cb_read = 0x8002B4D4; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_readsync by relocation), shape 0.99 vs libcd/bios CD_readsync.
+// Round 71 (bravo, track 2).
+CD_readsync = 0x8002AEE0; // type:func
+// identified: config/psyq-objects.ld pin (linked Sony object calls this
+// address CD_datasync by relocation), fingerprint masked 0.98 vs libcd/bios
+// CD_datasync (discs 3.5,3.6). Round 71 (bravo, track 2).
+CD_datasync = 0x8002B198; // type:func
+// identified: config/psyq-objects.ld pin, fingerprint EXACT masked 1.00 vs
+// libcd/bios CD_getsector (disc 3.3). Round 71 (bravo, track 2).
+CD_getsector = 0x8002B304; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager note2pitch
+// (disc 3.3); position between libc2/strncmp and libsnd/vm_prog agrees.
+// Round 71 (bravo, track 2).
+note2pitch = 0x8002DF7C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager note2pitch2
+// (disc 3.3); position between libc2/strncmp and libsnd/vm_prog agrees.
+// Round 71 (bravo, track 2).
+note2pitch2 = 0x8002E038; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libcd/bios callback (discs
+// 3.3,3.5,3.6). Renamed by hand (rename.py refuses: "callback" is a
+// pervasive local-variable/field name elsewhere in src/, a false-positive
+// collision -- those are a different C namespace and shadow harmlessly).
+// Round 71 (bravo, track 2). Still NON_MATCHING (30/56 words); unaffected.
+callback = 0x8002B3F4; // type:func

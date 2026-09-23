@@ -1,4 +1,6 @@
-# func_8002B198 -- STALL (length EXACT 91/91, 49/91 words match, first real diff at vram 0x8002B1C8)
+# CD_datasync -- STALL (length EXACT 91/91, 49/91 words match, first real diff at vram 0x8002B1C8)
+
+> Renamed from `func_8002B198` on 2026-09-23 (tools/rename.py). Address 0x8002b198.
 
 **Unit:** code_179d8_g · **Size:** 91 words · **Status:** STALL (length EXACT 364/364 bytes; best 49/91 words match, up from 45/91 in round 36; first real diff at vram 0x8002B1C8 -- see below)
 
@@ -17,7 +19,7 @@ returns 0, if set and `arg0 == 0` it loops again, otherwise returns 1.
 ```c
 #if 0
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_8002B198(s32 arg0)
+s32 CD_datasync(s32 arg0)
 {
     s32 now;
     s32 ok;
@@ -66,10 +68,10 @@ s32 func_8002B198(s32 arg0)
 ## Residue and what was learned
 
 **This is the SAME "loop-invariant address hoisting" class as
-`func_8002B3F4`, but bigger: retail hoists THREE addresses
+`callback`, but bigger: retail hoists THREE addresses
 (`&D_8006D620`, `&D_8006D8D8`, `&D_8006D6A0`) into `$s3`/`$s1`/`$s0`
 respectively, computed once before the retry loop.** Unlike
-`func_8002B3F4`'s single stubborn case, a genuine `for (;;)` loop
+`callback`'s single stubborn case, a genuine `for (;;)` loop
 (replacing an earlier `goto`-based attempt that scored much worse -- see
 axis note below) DOES let GCC hoist these correctly when the addresses are
 assigned to local pointer variables (`s32 *p620 = D_8006D620;` etc.)
@@ -282,29 +284,29 @@ exact at 364/364 bytes** -- matches round 20's recorded figure exactly, no
 discrepancy between claimed and measured.
 
 **Isolation matters in this unit specifically.** With this unit's known
-1-word-short sibling (`func_8002B3F4`) ALSO live at the same time, this same
+1-word-short sibling (`callback`) ALSO live at the same time, this same
 body reads as only 44/91 with a whole-image drift warning -- not because
-anything about this function changed, but because `func_8002B3F4`'s 4-byte
+anything about this function changed, but because `callback`'s 4-byte
 shortfall shifts this project's single contiguous `.main`-section `.bss`
 placement project-wide (see `CD_init.md`'s round-36 entry for the full
 mechanism). Every score in this report from here on was read with all other
 unit siblings reverted.
 
-### Permuter run: found a real, oracle-confirmed improvement (45/91 -> 49/91), from an anomaly this unit's `func_8002AEE0.md` had already flagged but never tested here
+### Permuter run: found a real, oracle-confirmed improvement (45/91 -> 49/91), from an anomaly this unit's `CD_readsync.md` had already flagged but never tested here
 
-`func_8002AEE0.md` (this same unit) recorded an "anomaly spotted in passing":
+`CD_readsync.md` (this same unit) recorded an "anomaly spotted in passing":
 this report's diagnostic call, `func_80012C20(D_80010994, p8D8[0],
 p6A0[p8D8[1]], p620[D_8006D61D], p6A0[p8D8[0]])`, looked structurally wrong
-compared to `func_8002AEE0`'s own byte-verified analog of the same block
+compared to `CD_readsync`'s own byte-verified analog of the same block
 (which uses `D_8008B3EC` -- not `p8D8[0]` -- as the first `%s` argument).
 **Tried the direct fix first** (swap the first argument to `D_8008B3EC`,
-matching `func_8002AEE0`'s shape exactly) -- this REGRESSED: the function
+matching `CD_readsync`'s shape exactly) -- this REGRESSED: the function
 compiled 2 instructions LONGER than retail (93 vs 91, confirmed via
-`build/lsdde.map`: `func_8002B304` landed at `0x8002b30c`, 8 bytes past its
+`build/lsdde.map`: `CD_getsector` landed at `0x8002b30c`, 8 bytes past its
 correct `0x8002b304`). Reverted immediately. **The anomaly note describes
 what the call SHOULD semantically pass, per the diagnostic string's `%s`
 formatting, but retail's actual compiled bytes for THIS function are not
-simply `func_8002AEE0`'s block transplanted -- the two diagnostic blocks are
+simply `CD_readsync`'s block transplanted -- the two diagnostic blocks are
 independently scheduled, and copying one function's argument list onto the
 other's call site does not reproduce retail here.** Left as a caution for
 whoever next reads that anomaly note: it is real (the string/argument
@@ -315,14 +317,14 @@ not this function's residue.
 previously searched -- round 19/20's restructuring experiments were manual,
 not permuter-driven). Base score confirmed via `--debug`: 1930 (`Register
 Differences: 22, Reorderings: 7, Insertions: 7, Deletions: 7` -- a much
-messier residue class than `func_8002B4D4`'s, consistent with this being the
+messier residue class than `cb_read`'s, consistent with this being the
 "ok-flag vs direct branch" structural class rather than a pure scheduling
 one). Searched `timeout 300 ... -j 4 --stop-on-zero --best-only`, ~28,873
 iterations, best found **1605** (five successive improvements: 1895, 1770,
 1710, 1650, 1605) -- no zero.
 
 **Verified the winning candidate against the REAL oracle** (learned from
-this same round's `func_8002B4D4` experience that a lower permuter score is a
+this same round's `cb_read` experience that a lower permuter score is a
 LEAD, not a result). The winning mutation is a single, narrow change: the
 diagnostic `printf` call's last argument becomes an assignment expression,
 `printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], ok =
@@ -347,7 +349,7 @@ scope, not a semantically-cleaner fresh one. Kept the `ok =` form as the new
 best despite its slightly odd reading; a comment was added at the call site
 explaining why.
 
-**First real diff, read off `tools/asm-differ/diff.py func_8002B198`
+**First real diff, read off `tools/asm-differ/diff.py CD_datasync`
 (isolated build): file offset `0x1B9C8`, vram `0x8002B1C8`** -- the
 `p620`/`p6A0` hoisted-pointer register-numbering swap this report's round-19
 entry already documents (`$s3`/`$s0` this time, not the earlier `$s1`
@@ -368,7 +370,7 @@ linkable 49/91 body is preserved below for the next attempt.
 
 ```c
 #if 0
-s32 func_8002B198(s32 arg0)
+s32 CD_datasync(s32 arg0)
 {
     s32 now;
     s32 ok;
@@ -421,7 +423,7 @@ s32 func_8002B198(s32 arg0)
 
 **A permuter-found "improvement" needs the same real-oracle re-verification
 in BOTH directions this project already applies to a permuter ZERO** --
-this round's `func_8002B4D4` entry found a lower permuter-metric score that
+this round's `cb_read` entry found a lower permuter-metric score that
 turned out to be a genuine regression (shorter compiled length) against the
 real oracle; this function's own permuter result is the mirror case, a
 lower-metric-score candidate that DID hold up. The permuter's own penalty
@@ -436,7 +438,7 @@ Also: **an anomaly flagged in one function's report, describing what a
 SIBLING function's analogous call site "should" look like by structural
 comparison, is a lead worth testing directly and quickly rejecting if it
 regresses the LENGTH -- it does not automatically transfer even when the
-two blocks are otherwise near-identical.** `func_8002AEE0.md`'s anomaly note
+two blocks are otherwise near-identical.** `CD_readsync.md`'s anomaly note
 about this exact call was correct as an observation (the argument list does
 look semantically mismatched against the format string) but wrong as a
 prescription for this function's specific compiled residue.
@@ -489,14 +491,14 @@ lead in EITHER direction). Two forms tested at the 995 level:
    (38/91 and 39/91 respectively, both flagged by the outside-range
    warning). All three reverted.
 
-**Unlike `func_8002AEE0`'s and this same function's own round-36 result**,
+**Unlike `CD_readsync`'s and this same function's own round-36 result**,
 none of this round's permuter-found candidates held up against the real
 oracle. Score unchanged at 49/91.
 
 ### Proposed learning
 
 A third data point for "verify every permuter candidate regardless of which
-direction the metric moved": this round's `func_8002AEE0` had a permuter
+direction the metric moved": this round's `CD_readsync` had a permuter
 candidate (also an always-true-branch trick) that held up and closed 6
 words; this same function's OWN three candidates from an equally deep
 search, using the identical trick shape, all failed against the real
@@ -511,7 +513,7 @@ Body unchanged from round 36's preserved best; not re-pasted here since
 nothing in it changed this round. Full whole-image `./build-and-verify.sh`
 re-confirmed `OK: build matches retail SLPS_015.56` (exit 0) with this
 function and every other unit stall reverted to `INCLUDE_ASM` and only
-`func_8002AEE0` live as matched C -- see that report's round-39 entry for
+`CD_readsync` live as matched C -- see that report's round-39 entry for
 the corresponding confirmation.
 
 ## Round 41 (runner charlie): title rebuilt with the required figures; manual reorder axes reconfirmed inert; a second fresh permuter search, still negative -- unchanged at 49/91
@@ -576,8 +578,8 @@ are uncorrelated when the search is this deep into a hard residue class**:
 every surviving candidate from ~211,000 combined iterations across two
 separate searches (round 39 and this round) that the permuter itself
 ranks as an improvement is a real regression, several with genuine
-length drift. `func_8002B198.md`'s own round-36 entry already drew this
-lesson once (for `func_8002B4D4`'s candidate); this round supplies four
+length drift. `CD_datasync.md`'s own round-36 entry already drew this
+lesson once (for `cb_read`'s candidate); this round supplies four
 more data points in the SAME direction for THIS function specifically,
 which round 39's three data points had already suggested but not yet
 this strongly.

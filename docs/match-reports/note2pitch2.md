@@ -1,7 +1,9 @@
-# func_8002E038 — MATCHED (64/64 words)
+# note2pitch2 — MATCHED (64/64 words)
+
+> Renamed from `func_8002E038` on 2026-09-23 (tools/rename.py). Address 0x8002e038.
 
 `code_179d8_l`, vram `0x8002E038`, file offset `0x1E838`. Frameless, 64 words
-(0x100 bytes). Sibling in shape to `func_8002DF7C` (same unit, same tail:
+(0x100 bytes). Sibling in shape to `note2pitch` (same unit, same tail:
 div-by-12 magic multiply + `D_8006DAD8[]` table lookup + magnitude-based
 shift), but with more front-matter: a struct-array lookup and a div-by-8
 half/remainder split feeding the same tail idiom.
@@ -21,7 +23,7 @@ typedef struct {
 
 extern D8008E978Entry *D_8008E978;
 
-s32 func_8002E038(s32 a0, s32 a1) {
+s32 note2pitch2(s32 a0, s32 a1) {
     s32 origA0;
     s32 idx;
     s32 tblIdx;
@@ -69,7 +71,7 @@ placed in a shared header.
 
 ## Derivation notes (each confirmed against the pinned reproducer pipeline)
 
-This took far more iterations than `func_8002DF7C` because four independent,
+This took far more iterations than `note2pitch` because four independent,
 non-obvious codegen levers stack on top of each other. All four were found
 by bisecting reduced C snippets through
 `tools/gcc263/cpp | cc1 | maspsx --expand-div --addiu-at | as`
@@ -104,7 +106,7 @@ in `docs/DECOMPILATION_LEARNINGS.md` yet.
    `a2 = 1; a3 = div8 - 16;` (a2 first) matches retail's instruction order
    there; the type of `a3` at that point didn't matter for whether the
    copy survives, only the statement order did.
-3. **The `u8`-narrows-a-commutative-add lever from `func_8002DF7C` recurred,
+3. **The `u8`-narrows-a-commutative-add lever from `note2pitch` recurred,
    but this time on `a3`'s WIDTH gating whether the copy-elision above
    happens at all**, not just on operand order. `s32 a3` still collapsed
    into `a1` regardless of statement order; only narrowing `a3` to `s16`
@@ -143,7 +145,7 @@ hazard, but cheap to avoid.
 ## Result
 
 `build-and-verify.sh` exits 0 (whole-image SHA1 verifies).
-`tools/funcdiff.py func_8002E038` reports 64/64 words match.
+`tools/funcdiff.py note2pitch2` reports 64/64 words match.
 
 ### Proposed learnings
 

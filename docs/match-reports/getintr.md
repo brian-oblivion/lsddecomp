@@ -109,8 +109,8 @@ missed condition or wrong constant anywhere):
    `0x2` and `0x4`, consistent with a flag word.
 
 `s32 getintr(void)` -- confirmed against three call sites
-(`asm/code_179d8_mid.s`, `asm/nonmatchings/code_179d8_g/func_8002B3F4.s`,
-`asm/nonmatchings/code_179d8_g/func_8002AEE0.s`), all `jal` with a `nop`
+(`asm/code_179d8_mid.s`, `asm/nonmatchings/code_179d8_g/callback.s`,
+`asm/nonmatchings/code_179d8_g/CD_readsync.s`), all `jal` with a `nop`
 delay slot and no argument setup, and against `code_179d8_g.c`'s own
 existing forward declaration (`extern s32 getintr(void);`).
 

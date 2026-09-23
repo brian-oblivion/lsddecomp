@@ -70,7 +70,7 @@ s32 CD_init(void)
         p++;
     }
     ResetCallback();
-    InterruptCallback(2, func_8002B3F4);
+    InterruptCallback(2, callback);
 
     *D_8006D8C0 = 1;
     while (*D_8006D8CC & 7) {
@@ -454,8 +454,8 @@ already-correct statements and dilute the search.
 `func_80025AE4`->`puts`) alongside its five siblings in this unit. Round 33
 already translated the names for its own build, so this report was NOT an
 instance of this round's assigned trap (the prose-says-renamed-but-body-
-still-raw-names pattern found in `func_8002AA6C.md`/`func_8002AEE0.md`/
-`func_8002B4D4.md` this same round -- see those reports).
+still-raw-names pattern found in `func_8002AA6C.md`/`CD_readsync.md`/
+`cb_read.md` this same round -- see those reports).
 
 Rebuilt the round-19 fix-1+fix-2 body verbatim, **with all five other
 INCLUDE_ASM siblings in this unit reverted (isolation is load-bearing here --
@@ -467,16 +467,16 @@ reports **171/196 words, no staleness warning, compiled length exact at
 
 **Why isolation was necessary, worth recording as a process note for this
 unit specifically:** this unit has SIX stalled functions in a row, one of
-which (`func_8002B3F4`) is a CONFIRMED, permanent 1-word-short near-miss (its
+which (`callback`) is a CONFIRMED, permanent 1-word-short near-miss (its
 own report documents two independently-dead-end routes to closing it). With
-`func_8002B3F4`'s near-miss body live in `src/` AT THE SAME TIME as this
+`callback`'s near-miss body live in `src/` AT THE SAME TIME as this
 function's, `funcdiff.py` on this function read **146/196**, a full 25 words
 worse than the true, isolated 171/196 -- not because this function's own
-code changed at all, but because `func_8002B3F4`'s 4-byte shortfall shifts
+code changed at all, but because `callback`'s 4-byte shortfall shifts
 this project's `.bss` placement (the whole game links as one contiguous
 `.main` section in `lsdde.ld`, so ANY length mismatch anywhere earlier in
 the image moves every later `.bss` symbol, not just later `.text`) --
-confirmed directly: with `func_8002B3F4` reverted to `INCLUDE_ASM` and every
+confirmed directly: with `callback` reverted to `INCLUDE_ASM` and every
 OTHER already-matched sibling in this exact unit (`CD_shell`, untouched
 this round) suddenly regressed from 68/68 to 58/68 the moment all six
 functions were live together. This is CLAUDE.md's "address drift need not
@@ -499,7 +499,7 @@ debug breakdown isolates the residue to pure reordering with zero register/
 insertion/deletion component, and found nothing better than the base score.
 **SKIPPING this function as exhausted for this round**: budget went instead
 to the two smaller (91-word) siblings this unit's assignment specifically
-flagged as the priority (`func_8002B198`, `func_8002B4D4`), which had never
+flagged as the priority (`CD_datasync`, `cb_read`), which had never
 seen a permuter run against their CURRENT best bodies (only against earlier,
 now-superseded seeds).
 
@@ -530,7 +530,7 @@ s32 CD_init(void)
         p++;
     }
     ResetCallback();
-    InterruptCallback(2, func_8002B3F4);
+    InterruptCallback(2, callback);
 
     *D_8006D8C0 = 1;
     while (*D_8006D8CC & 7) {
@@ -634,7 +634,7 @@ after its own arguments materialize) before declining to spend an attempt:
 genuine intra-block list-scheduling tie-break, not reachable by a
 barrier at any position tried) remains the most heavily searched stall in
 this unit and this round's budget went to the two closer/newly-productive
-siblings (`func_8002AEE0`, matched; `func_8002B198`, improved). Restored to
+siblings (`CD_readsync`, matched; `CD_datasync`, improved). Restored to
 `INCLUDE_ASM`; body unchanged from round 36's preserved best.
 
 ### Proposed learning

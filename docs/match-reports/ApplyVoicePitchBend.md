@@ -122,9 +122,9 @@ own score (77/138 before and after), so it is recorded as a correction to
 - `D_8008D970[]`: plain byte-stride flags array (no per-record multiply in
   its own addressing, unlike every 0x34/0x10-stride array above).
 - `D_8008EA13`, `D_8008EA18`: plain byte globals.
-- `func_8002E038` (defined in `code_179d8_l`, still `INCLUDE_ASM` there):
-  called as `func_8002E038(outA2 & 0xFFFF, outA1 & 0xFFFF)`, guessed
-  `extern s16 func_8002E038(u16 a0, u16 a1);` from the call-site register
+- `note2pitch2` (defined in `code_179d8_l`, still `INCLUDE_ASM` there):
+  called as `note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF)`, guessed
+  `extern s16 note2pitch2(u16 a0, u16 a1);` from the call-site register
   widths and the fact its return value gets stored into a `s16`-shaped
   record field.
 
@@ -145,7 +145,7 @@ negative, each producing a quotient/remainder pair fed into `outA2`/`outA1`
 -- see below); `threshold == 0` just leaves `outA2 = baseValue`, `outA1 =
 0`. Finally: read `D_8008D99C[a0]`'s low BYTE, stash `a0` into the
 "currently selected channel" scratch `D_8008EA26`, store the byte into
-`D_8008EA18`, call `func_8002E038(outA2 & 0xFFFF, outA1 & 0xFFFF)` and store
+`D_8008EA18`, call `note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF)` and store
 its return into `D_8008D7F4[a0]`, OR a flag bit into `D_8008D970[a0]`, and
 return `1`.
 
@@ -201,7 +201,7 @@ return `1`.
     ordering tried -- consistent with this project's standing finding that
     declaration order alone does not move register allocation.
 11. **A bare `__asm__("")` scheduling barrier** immediately before the
-    `func_8002E038` call statement: **80/138 in-range, but reintroduced
+    `note2pitch2` call statement: **80/138 in-range, but reintroduced
     280490 bytes of drift** -- the barrier's ordering constraint forced the
     compiler to emit at least one genuinely different (extra) instruction
     elsewhere, which is disqualifying (a barrier that changes code SIZE is
@@ -289,7 +289,7 @@ extern u8 D_8008D970[];
 /* Selected-channel debug byte, write-only here. */
 extern u8 D_8008EA18;
 
-extern s16 func_8002E038(u16 a0, u16 a1);
+extern s16 note2pitch2(u16 a0, u16 a1);
 
 s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     s16 threshold;
@@ -341,7 +341,7 @@ s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     byteVal = *(u8 *) &D_8008D99C[a0].unk0;
     D_8008EA26 = a0;
     D_8008EA18 = byteVal;
-    D_8008D7F4[a0].unk0 = func_8002E038(outA2 & 0xFFFF, outA1 & 0xFFFF);
+    D_8008D7F4[a0].unk0 = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
     D_8008D970[a0] |= 4;
     return 1;
 }
@@ -449,7 +449,7 @@ bound. The best score reached was **485** (from base 770), saved at
 `permuter-work/ApplyVoicePitchBend/output-485-1/`; no candidate ever reached
 zero across the whole run. Diffing that candidate against `base.c` shows
 the improvement came from dropping the `& 0xFFFF` mask on the SECOND
-`func_8002E038` call argument (relying on the value's already-narrow
+`note2pitch2` call argument (relying on the value's already-narrow
 range) plus some statement-grouping changes (a `do {...} while(0)` around
 part of the positive-`threshold` branch, a merged
 `byteVal = (D_8008EA18 = ...)` assignment-chain) -- none of which, on
@@ -509,7 +509,7 @@ evident (preserved below, exact length): matches a voice by its
 bend from a 0-127 depth value centered at `0x40` (`threshold = a4 - 0x40`,
 looked up in `D_8008E978`'s `bendCurveUp`/`bendCurveDown` fields depending
 on sign) applied to a base value, writes the result through
-`func_8002E038`, and returns `1` on match / `0` otherwise -- the return
+`note2pitch2`, and returns `1` on match / `0` otherwise -- the return
 value is what `ApplyPitchBendToAllVoices` sums into its own return.
 "PitchBend" rather than a vaguer name because the `a4-0x40`-centered,
 signed-threshold, curve-table shape is the textbook MIDI pitch-bend-depth
@@ -521,7 +521,7 @@ The naming pass rested "PitchBend" on this function's own shape (a 0-127
 depth centred at `0x40`, signed into `bendCurveUp`/`bendCurveDown`). That
 reading is right, and there is a second, independent line of evidence the
 pass did not cite: the callee it writes its result through,
-`func_8002E038` (`src/code_179d8_l.c:183`), is a note-to-pitch converter on
+`note2pitch2` (`src/code_179d8_l.c:183`), is a note-to-pitch converter on
 its face. It computes `origA0 + 0x3C - e->unk4`, divides the result by 12,
 indexes a table 16 entries per semitone, and finishes with a shift by
 `q12 - 5`. `0x3C` is 60, MIDI middle C; 12 is semitones per octave; the
@@ -529,7 +529,7 @@ trailing shift is octave scaling of an SPU sample-rate value. So the value
 this function bends is a PITCH, established by the arithmetic of the
 function that produces it, not only by the MIDI-shaped depth encoding here.
 
-Two independent kinds of evidence, so tier A stands. `func_8002E038` is
+Two independent kinds of evidence, so tier A stands. `note2pitch2` is
 itself a naming candidate (a note-to-SPU-pitch converter) for whoever takes
 `code_179d8_l`; it was correctly left alone this round as out of unit.
 

@@ -34,7 +34,7 @@ s32 CD_vol(u8 *arg0)
 holds an address, loaded fresh via `lw` before every dereference) -- not
 arrays. Declared `volatile u8 *` locally in this unit; the `volatile` on the
 pointee matters for later functions that spin-poll through similarly-shaped
-pointers (see `func_8002B304`), so the whole family is typed consistently.
+pointers (see `CD_getsector`), so the whole family is typed consistently.
 
 Sibling `code_179d8_b.c` already carries its own extern for this function as
 `s32 CD_vol(void *arg0)` (called from `func_800291C8`). This unit's own

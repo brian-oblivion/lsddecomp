@@ -46,7 +46,7 @@ s32 CD_initvol(void)
 
 Matched on the first attempt -- straightforward translation once
 `D_8006D8D4` was already established as `volatile u16 *` in this unit's
-header (declared while matching `CD_vol`/`func_8002B304`'s neighbours;
+header (declared while matching `CD_vol`/`CD_getsector`'s neighbours;
 see `code_179d8_g.c`'s extern block). Indices are the halfword offsets
 divided by 2 (`0x180/2 = 0xC0`, etc), matching retail's byte-offset
 immediates exactly through ordinary `u16 *` pointer arithmetic -- no cast

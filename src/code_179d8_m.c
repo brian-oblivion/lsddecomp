@@ -52,7 +52,7 @@
  *   - ApplyVoicePitchBend / ApplyPitchBendToAllVoices: match a voice by
  *     identity and apply a curve-table-driven pitch bend from a 0-127
  *     depth value centered at 0x40, writing the result through
- *     func_8002E038; the "AllVoices" wrapper calls Sony's SpuVmVSetUp once
+ *     note2pitch2; the "AllVoices" wrapper calls Sony's SpuVmVSetUp once
  *     and then runs this over every voice, returning the count affected.
  *   - InitSpuDriver: the SPU driver's init call -- _spu_setInTransfer,
  *     SpuInitMalloc, zeroes every per-voice table and the two master
@@ -744,12 +744,12 @@ extern u8 D_8008D970[];
 /* Selected-channel debug byte, write-only here. */
 extern u8 D_8008EA18;
 
-extern s16 func_8002E038(u16 a0, u16 a1);
+extern s16 note2pitch2(u16 a0, u16 a1);
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 77/138 words, length exact. Residue: register-class
  * renumbering plus one deferred `& 0xFFFF` mask on the second
- * func_8002E038 argument -- a banned-to-fix register-identity case, per
+ * note2pitch2 argument -- a banned-to-fix register-identity case, per
  * a permuter search that plateaued at 485/770 with no candidate reaching
  * zero (docs/match-reports/ApplyVoicePitchBend.md). Hand-derived. */
 s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
@@ -803,7 +803,7 @@ s16 ApplyVoicePitchBend(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
     byteVal = *(u8 *) &D_8008D99C[a0].unk0;
     D_8008EA26 = a0;
     D_8008EA18 = byteVal;
-    D_8008D7F4[a0].unk0 = func_8002E038(outA2 & 0xFFFF, outA1 & 0xFFFF);
+    D_8008D7F4[a0].unk0 = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
     D_8008D970[a0] |= 4;
     return 1;
 }
@@ -1050,7 +1050,7 @@ extern Rec34Half D_8008D9A0[];
 
 extern void func_8002D6A4(void);
 extern void func_8002D8E0(s32 a0);
-extern s32 func_8002DF7C(void);
+extern s32 note2pitch(void);
 extern void func_8002D1B4(s32 a0, u16 a1);
 extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
 
@@ -1159,7 +1159,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                     if (D_8008EA24 == 0xFF) {
                         func_8002D8E0(*(u8 *) &D_8008EA26);
                     } else {
-                        func_8002D1B4(matchCount, func_8002DF7C());
+                        func_8002D1B4(matchCount, note2pitch());
                     }
                     s3 = (s3 << 4) | D_8008EA26;
                 }

@@ -124,7 +124,7 @@ s32 func_8002AA6C(void)
                 }
             }
 
-            D_8006D600 = (s32)func_8002B4D4;
+            D_8006D600 = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -172,16 +172,16 @@ characterized rather than unknown).
 **One structural fix applied and confirmed real, though it didn't
 change the final word count:** the function's tail (`D_8006D8F4 = -1;
 return D_8006D8F4;`) needed the same unfolded-address `volatile s32 *`
-local-pointer idiom this round's `func_8002B4D4` report independently
+local-pointer idiom this round's `cb_read` report independently
 found for the identical global and an identical write-then-read shape.
 Before the fix, this build FOLDED the store's address (`sw
 v0,-0x2710(at)`); after routing it through a local pointer, it matches
 retail's unfolded `lui/addiu` + plain-offset store exactly. This is now
 a THIRD confirmed site (after `CD_readm`'s `D_8006D8EC`/`D_8006D8F0`
-and `func_8002B4D4`'s own `D_8006D8F4` else-branch) where a global
+and `cb_read`'s own `D_8006D8F4` else-branch) where a global
 already declared `volatile` at file scope still needs a LOCAL pointer
 dereference to get unfolded addressing at one specific access -- see
-`func_8002B4D4.md`'s proposed learning, now confirmed a fourth time
+`cb_read.md`'s proposed learning, now confirmed a fourth time
 across two different functions touching the SAME global.
 
 **What's left, confined to a narrow, well-characterized area:** the
@@ -220,7 +220,7 @@ trustworthy score. Before spending attempts reshaping a body flagged
 measure cleanly with zero changes first -- that alone may resolve the
 open question the flag exists to raise.
 
-Also reinforces `func_8002B4D4.md`'s finding from this same round:
+Also reinforces `cb_read.md`'s finding from this same round:
 `D_8006D8F4` specifically (and by extension, this driver's other
 `volatile`-qualified scalars) needs the local-pointer-dereference idiom
 at EVERY write-then-immediate-read site, not just once per function --
@@ -276,7 +276,7 @@ D_8006D8D8[0] = 2; ...`) was MISSING the `__asm__("");` barrier that the
 canonical `CD_flush` version of this exact block carries between
 `*q = D_8006D8DA;` and `D_8006D8D8[0] = 2;`. Adding it back (this
 report's earlier body simply never had it) fixed a real reordering in
-that block. This is the same idiom `func_8002B4D4.md` and this report's
+that block. This is the same idiom `cb_read.md` and this report's
 own round-19 entry already document for `D_8006D8F4`; it turns out to
 also apply to this shared eight-statement tail block, at the SAME
 barrier position, every time that block is reused -- worth checking
@@ -310,7 +310,7 @@ without it, GCC folds the `sw` into the `bgtz`'s delay slot, one
 instruction shorter than retail, which keeps a plain `nop` there instead)
 closed this precisely: compiled length went from 220/222 (short) to
 **223/223, exact**, and word-match jumped 149 -> 202. This also confirms
-the general shape of `func_8002B3F4.md`'s residue-reading is right even
+the general shape of `callback.md`'s residue-reading is right even
 though its own specific case stayed unresolved: retail sometimes visibly
 prefers NOT hoisting/persisting a value across a large span even when it
 would be cheaper to, and that preference has to be reproduced by making
@@ -432,7 +432,7 @@ s32 func_8002AA6C(void)
                 }
             }
 
-            D_8006D600 = (s32)func_8002B4D4;
+            D_8006D600 = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -469,7 +469,7 @@ trusted instead of tested.
 
 Also: **the "reused tail block needs a barrier at the same position every
 time it's copied" idiom (originally found for `D_8006D8F4` in
-`func_8002B4D4.md`) generalizes to the WHOLE shared 8-statement
+`cb_read.md`) generalizes to the WHOLE shared 8-statement
 `CD_flush`-style tail, not just to single-scalar volatile writes** --
 this function's copy was missing it purely because the salvaged snapshot
 predated the discovery. Any future function that reuses this block
@@ -498,8 +498,8 @@ retail's success/timeout join is not two early `return`s, it is a
 FLAG-and-single-join with the failure arm placed textually FIRST (falling
 through into it from both upstream checks) and the success arm placed
 SECOND, reached by an explicit branch and left to fall through into the
-shared check. This round applied the identical shape to `func_8002AEE0`
-(this pass's own fresh function, `docs/match-reports/func_8002AEE0.md`):
+shared check. This round applied the identical shape to `CD_readsync`
+(this pass's own fresh function, `docs/match-reports/CD_readsync.md`):
 an early `return -1;` written directly inside the timeout arm compiled
 SHORTER than retail (missing the "redundant" `move v0,zero`/`bnez
 v0,<epilogue>` pair retail keeps at the join) -- restructuring to
@@ -510,9 +510,9 @@ confirmation of the head's mechanism**, and it predates the broadcast that
 named it -- the same shape, found twice independently in two different
 functions in this unit, is stronger evidence than either instance alone.
 
-### The hypothesis is CONFIRMED as the correct explanation for `func_8002B4D4`'s ALREADY-CLOSED delay-slot-sharing residue, and its remaining OPEN residue shows the naive fix does not always transfer
+### The hypothesis is CONFIRMED as the correct explanation for `cb_read`'s ALREADY-CLOSED delay-slot-sharing residue, and its remaining OPEN residue shows the naive fix does not always transfer
 
-`func_8002B4D4`'s round-20 fix (57->60/91, the `code=2`/`code=5` dispatch)
+`cb_read`'s round-20 fix (57->60/91, the `code=2`/`code=5` dispatch)
 is the SAME family: retail shares one `li $a0,0x5` via a delay slot across
 both branches, with the fallthrough path overwriting it -- a compiler
 choice about which value's write is shared vs duplicated, not a scheduling
@@ -520,15 +520,15 @@ question a barrier could touch (round 19 confirmed a bare `__asm__("")`
 does nothing here; round 20 closed it by flipping the guard polarity
 instead, changing which arm falls through).
 
-Re-reading `func_8002B4D4`'s STILL-OPEN residue (the `elseBranch` pointer
+Re-reading `cb_read`'s STILL-OPEN residue (the `elseBranch` pointer
 landing in `$s0` instead of `$v1`) against the raw `.s`
-(`asm/nonmatchings/code_179d8_g/func_8002B4D4.s`, lines 34-45) confirms the
+(`asm/nonmatchings/code_179d8_g/cb_read.s`, lines 34-45) confirms the
 block-order PART of the mechanism is already satisfied here: the
 if-branch's own tail ends with an explicit `j .L8002B56C` (line 39, jumping
 OVER the elseBranch to the shared label), and `elseBranch` itself (line
 41-45) has NO trailing jump at all -- it simply falls through into the
 shared label. `elseBranch` is textually LAST in the current preserved C
-(`docs/match-reports/func_8002B4D4.md`'s round-20 body) and correctly gets
+(`docs/match-reports/cb_read.md`'s round-20 body) and correctly gets
 the fallthrough; the if-branch is textually first and correctly carries the
 explicit jump. **The block order matches the rule exactly already.**
 
@@ -546,7 +546,7 @@ named pointer variable changes register allocation for the WHOLE function,
 not just the one store, because the allocator's overall pressure budget
 is shared across the entire body. **This is a clean, twice-reproduced
 counter-example to the naive form of the head's fix**, not a failure to
-try hard enough -- worth keeping next to the positive `func_8002AEE0`
+try hard enough -- worth keeping next to the positive `CD_readsync`
 result, because both are true at once: the MECHANISM (retail keeps two
 independent materializations, block order decides which one earns the
 fallthrough) is real and worth checking first, but "split it into two C
@@ -563,9 +563,9 @@ that lever only helps while the C's block order is WRONG.
   order, statement order) were tried and regressed, independent of this
   round's investigation. The block-order hypothesis has nothing to say
   about a residue with no candidate blocks to order.
-- **`func_8002B198`'s remaining residue** ("what's left is register
+- **`CD_datasync`'s remaining residue** ("what's left is register
   NUMBERING, not hoisting-or-not") and **this pass's own new instances in
-  `func_8002AEE0`** (the `p6A0`/`p8D9` register swap, four independent
+  `CD_readsync`** (the `p6A0`/`p8D9` register swap, four independent
   reorder/rename attempts inert) **and `func_8002B640`** (the
   `copySrc`/`rec`/`off` register-numbering swap in its table-search loop)
   are all the SAME class: a straight-line or single-loop-body register
@@ -593,7 +593,7 @@ a tie-break among orderings that a scheduling barrier, which only fixes
 relative order across itself, cannot force from any source-level
 phrasing tried (call/goto restructuring, named locals, `volatile`).
 
-`func_8002B3F4`'s open residue is a different boundary again: it is an
+`callback`'s open residue is a different boundary again: it is an
 address-FOLDING (selection) difference, not an ordering one, and its own
 report already states this explicitly ("a barrier does not affect
 instruction SELECTION... only ORDERING, and this residue is a selection
@@ -623,8 +623,8 @@ block-order hypothesis correctly identifies exactly one of them:**
    often has the SAME two candidates but embedded in a body with more
    surrounding live values and control flow, where simply "put it last"
    is not obviously available without restructuring the whole
-   surrounding shape (which is exactly what closed `func_8002AEE0`, and
-   exactly what does NOT further help `func_8002B4D4` once already
+   surrounding shape (which is exactly what closed `CD_readsync`, and
+   exactly what does NOT further help `cb_read` once already
    correct). A barrier cannot fix this because there is nothing to
    reorder WITHIN a block -- the missing/extra instructions are a
    consequence of which block executes at all along a given path.
@@ -749,14 +749,14 @@ unit-wide and no single report flagged it.
 Round 33's own entry above already correctly documented the rename
 (`func_80025AE4`->`puts`, `func_80012C20`->`printf`, `func_80025900`->`VSync`)
 in PROSE and translated its own build -- this report was NOT an instance of
-this round's assigned trap (contrast `func_8002AEE0.md` and
-`func_8002B4D4.md` in this same unit, both of which claimed "already
+this round's assigned trap (contrast `CD_readsync.md` and
+`cb_read.md` in this same unit, both of which claimed "already
 current" while their preserved code blocks still called the raw names).
 
 Rebuilt the round-20 202/223 body verbatim (names already correct per round
 33), **in isolation** (all five other stalled siblings in this unit reverted
 to `INCLUDE_ASM` -- see `CD_init.md`'s round-36 entry: this unit's
-known 1-word-short sibling, `func_8002B3F4`, shifts every later `.bss`
+known 1-word-short sibling, `callback`, shifts every later `.bss`
 address project-wide when left live alongside anything else, which pollutes
 a non-isolated `funcdiff.py` read even though the target function's own code
 is unaffected). Confirmed: `build exit=2`, no compile errors, `funcdiff.py`
@@ -771,7 +771,7 @@ swap, no change; statement-order swap, catastrophic regression to 9/223) and
 is a confirmed register-IDENTITY question per HARD RULE 6's own test (WHICH
 register holds a value, not merely instruction order). **SKIPPING as
 exhausted for manual attempts**; this round's remaining permuter budget went
-to `func_8002AEE0` (also in this unit, a much cleaner permuter debug
+to `CD_readsync` (also in this unit, a much cleaner permuter debug
 signature -- see that report) instead, per the same reasoning round 33 gave
 for making the same choice.
 
@@ -862,7 +862,7 @@ s32 func_8002AA6C(void)
                 }
             }
 
-            D_8006D600 = (s32)func_8002B4D4;
+            D_8006D600 = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -891,7 +891,7 @@ This unit's own `CD_init.md` round-36 entry has the full mechanism,
 but the short version worth repeating here: `funcdiff.py` scores for ANY
 stalled function in this unit are only trustworthy when EVERY OTHER stalled
 sibling is also reverted to `INCLUDE_ASM` -- the unit's confirmed
-1-word-short function (`func_8002B3F4`) shifts `.bss` addresses project-wide
+1-word-short function (`callback`) shifts `.bss` addresses project-wide
 whenever it is left live, and this shows up as spurious word-mismatch noise
 in an unrelated function's own diff with no hint that the cause lies
 elsewhere in the same file.
@@ -903,9 +903,9 @@ Rebuilt the round-20/33/36 202/223 body verbatim (names already current):
 staleness warning, compiled length exact at 223/223** -- matches every prior
 round's recorded figure exactly.
 
-**Tried this round's `func_8002AEE0`-style "always-true either-branch"
+**Tried this round's `CD_readsync`-style "always-true either-branch"
 trick** (which closed a register-numbering residue in this same unit's
-`func_8002AEE0` after manual reorders had failed) against the one open
+`CD_readsync` after manual reorders had failed) against the one open
 residue here (the `tmp`/`n` address-vs-value swap at the function's first
 computed temporary). Wrapped the `D_8006D600 = 0;` statement immediately
 after the load in a duplicated `if (tmp || n) {...} else {...}` referencing
@@ -926,7 +926,7 @@ __asm__("");
 
 **Regressed catastrophically: 202/223 -> 17/223, with 296037 bytes of
 outside-range drift** (the compiled length grew substantially). Reverted
-immediately. Unlike `func_8002AEE0`'s case, this residue sits in the
+immediately. Unlike `CD_readsync`'s case, this residue sits in the
 function's very FIRST two instructions, before any other value has been
 computed and before any register pressure has built up -- there is no
 "downstream pressure" for a duplicated branch to influence, so forcing an
@@ -939,13 +939,13 @@ round's forced-liveness trick) has been anything but inert-or-worse.
 
 **No further attempt.** This function's remaining budget this round went to
 the two closer siblings this unit's assignment specifically flagged
-(`func_8002AEE0`, matched; `func_8002B198`, improved). Restored to
+(`CD_readsync`, matched; `CD_datasync`, improved). Restored to
 `INCLUDE_ASM`; body unchanged from round 36's preserved best.
 
 ### Proposed learning
 
 The permuter-found "always-true either-branch" trick that closed two
-residues elsewhere in this unit this round (`func_8002AEE0`, `func_8002B198`)
+residues elsewhere in this unit this round (`CD_readsync`, `CD_datasync`)
 needs EXISTING register pressure/pipeline depth to redirect -- it works by
 nudging an allocator's decision among several live candidates, not by
 creating pressure from nothing. Applied to a residue at a function's very
@@ -1038,8 +1038,8 @@ iteration, because that is a runtime property, not a static one.
 **`output-235-1` (permuter score 235) IS sound and is this round's adopted
 fix.** Its mutation reuses two variables that are provably dead at that
 exact program point for a completely different purpose, in the same
-"already-hot register as sink" idiom this unit's `func_8002B198.md`
-(round 36) and `func_8002AEE0.md` (round 39/40) already established:
+"already-hot register as sink" idiom this unit's `CD_datasync.md`
+(round 36) and `CD_readsync.md` (round 39/40) already established:
 
 ```c
 s32 v0 = p2[0];
@@ -1067,7 +1067,7 @@ problem.
 
 **Combining both candidates does not stack -- it REGRESSES to 208/223,
 i.e. to the unsound candidate's own score.** Tried once, out of curiosity
-given `func_8002AEE0`'s history of stacking independent fixes; reverted
+given `CD_readsync`'s history of stacking independent fixes; reverted
 immediately once the real-oracle score came back lower than the `n`/`saved`
 fix alone. Two additional manual variations on the surviving fix's
 neighbourhood, both negative and both cheap to rule out:
@@ -1205,7 +1205,7 @@ s32 func_8002AA6C(void)
                 }
             }
 
-            D_8006D600 = (s32)func_8002B4D4;
+            D_8006D600 = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -1249,7 +1249,7 @@ s32 func_8002AA6C(void)
   on something better than either. Check every combination against the
   real oracle before assuming "two good candidates together must be at
   least as good as the better one alone."
-- This function joins `func_8002B198`/`func_8002AEE0` in confirming the
+- This function joins `CD_datasync`/`CD_readsync` in confirming the
   "reuse an already-dead variable's slot as a throwaway sink for an
   unrelated value at the same program point" idiom as a real, repeatable
   register-allocation lever in this unit -- three independent instances
@@ -1270,9 +1270,9 @@ exactly, no discrepancy.
 1. Declared `pF4` (the `volatile s32 *` for the final `D_8006D8F4 = -1;
    return *pF4;` block) at function scope instead of block scope, and also
    tried folding the assignment into the condition-style idiom that closed
-   `func_8002B4D4`'s analogous residue this round (`*(pF4 = &D_8006D8F4) =
+   `cb_read`'s analogous residue this round (`*(pF4 = &D_8006D8F4) =
    -1; return *pF4;`) -- **both inert, identical 215/223 and identical
-   byte diff** at `0x8002ADAC`-`0x8002ADBC`. Unlike `func_8002B4D4`'s case,
+   byte diff** at `0x8002ADAC`-`0x8002ADBC`. Unlike `cb_read`'s case,
    this residue is not sensitive to `pF4`'s declaration placement or
    expression form.
 2. Re-tried `p2 = &tmp[4];` (array-index spelling instead of `pRetry + 4`)
@@ -1302,7 +1302,7 @@ timeout 900 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/func_8
 
 First run: ~76,160 iterations (background job, rc not captured to its own
 file -- a process-compliance gap, noted rather than hidden, same as this
-round's `func_8002B3F4` entry). Second run against the identical seed:
+round's `callback` entry). Second run against the identical seed:
 ~82,965 iterations, also no rc file captured (both were launched as plain
 backgrounded `&` jobs rather than the `timeout ...; rc=$?; printf ...`
 form this round's broadcast specifies -- corrected for any further searches
@@ -1348,7 +1348,7 @@ reverting.
 
 ### Proposed learning
 
-Extends this round's `func_8002B3F4` finding (a reused-but-still-live
+Extends this round's `callback` finding (a reused-but-still-live
 variable) with a second, distinct shape of the same underlying hazard: a
 **reordered-but-uninitialized** variable. Both are invisible to the
 permuter's byte-only scorer and both are cheap to catch by inspection
@@ -1385,7 +1385,7 @@ me, not on the round-17 label.
   consumed earlier on this same path before being reused as `(s32)&buf` --
   both are freshly written on every pass through this code before their
   next read, with no loop-carried path back to a stale value. This is the
-  SAME idiom already reviewed and promoted in `func_8002B198.md`.
+  SAME idiom already reviewed and promoted in `CD_datasync.md`.
 - A second, lower-scoring permuter candidate from the same round
   (`output-215-1`, which hoists a `D_80010AAC` address load out of the
   retry loop) was reviewed and rejected as UNSOUND: `$a0` is caller-saved

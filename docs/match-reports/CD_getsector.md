@@ -1,4 +1,6 @@
-# func_8002B304
+# CD_getsector
+
+> Renamed from `func_8002B304` on 2026-09-23 (tools/rename.py). Address 0x8002b304.
 
 **Unit:** code_179d8_g · **Size:** 56 words · **Status:** MATCHED (56/56 words)
 
@@ -13,7 +15,7 @@ before finishing.
 ## The C
 
 ```c
-s32 func_8002B304(s32 arg0, s32 arg1)
+s32 CD_getsector(s32 arg0, s32 arg1)
 {
     *D_8006D8C0 = 0;
     *D_8006D8CC = 0x80;
@@ -41,6 +43,6 @@ while (cond); }` duplication was needed in source. `D_8006D934`'s pointee is
 declared `volatile s32` specifically so the loop keeps re-reading memory each
 iteration instead of being folded to an infinite loop with a single load.
 
-Sibling `code_179d8_b.c` already declares `func_8002B304(s32 arg0, s32
+Sibling `code_179d8_b.c` already declares `CD_getsector(s32 arg0, s32
 arg1)` as extern (called from `func_800291EC`); this unit is the one that
 carves and defines it.
