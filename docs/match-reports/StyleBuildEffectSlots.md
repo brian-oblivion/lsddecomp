@@ -27,7 +27,7 @@ extern void StyleFillEffectKind2(void *arg0, void *arg1);                   /* f
 `void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3)`; this
 call site only needs the ABI shape (`s32,void*,s32,s32`), matching the
 project's convention of a looser cross-unit local signature. `gStyleVariant`,
-`gStyleTargetObj`, `gStyleEffectSlotCount` and `D_8008E0C8` are fresh copies of externs
+`gStyleTargetObj`, `gStyleEffectSlotCount` and `gStyleEffectSlots` are fresh copies of externs
 already declared later in this file, needed here because this function's
 ROM address is earlier (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`).
 
@@ -48,7 +48,7 @@ void StyleBuildEffectSlots(void *arg0) {
     val = D_80087324[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     gStyleEffectSlotCount = val + count;
-    filled = (void **) StyleFillEffectKind0(D_8008E0C8, val, arg0);
+    filled = (void **) StyleFillEffectKind0(gStyleEffectSlots, val, arg0);
     filled = StyleFillEffectKind1(filled, count, arg0);
     if (gStyleVariant == 0) {
         StyleFillEffectKind3(filled, arg0);

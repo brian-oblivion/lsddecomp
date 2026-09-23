@@ -141,7 +141,7 @@ in this unit (`ObjAB54`, `ObjE0C8`, now `ObjAB4C`).
 Retail assigns `ctx` (the local scratch-buffer pointer, defaulting to
 `NULL`, conditionally set to `&buf` before the first call) to `$s3`, and the
 loop counter `i` to `$s2`. My best body -- which independently confirmed
-GCC 2.6.3 DOES auto-strength-reduce `D_8008E154 + i * 0x68` into a proper
+GCC 2.6.3 DOES auto-strength-reduce `gStyleCueSlotPool + i * 0x68` into a proper
 `$s1`-style per-iteration accumulator, matching retail's use of a genuine
 fifth saved register for exactly that purpose -- lands `ctx` in `$s2` and
 `i` in `$s3`: the two are swapped, and every other saved register (`$s0`
@@ -154,7 +154,7 @@ before ctx, ctx before i -- no effect, confirming charlie's finding that
 declaration order plays no role); an explicit named `ObjAB4C *self` local
 for the `slotE8` dispatch chain (to perturb pseudo-numbering before ctx's
 own pseudo is created) -- no effect, byte-identical residue. A genuine
-accumulator-pointer rewrite of the `D_8008E154` walk (an explicit
+accumulator-pointer rewrite of the `gStyleCueSlotPool` walk (an explicit
 `u8 *entry` incremented by `0x68` each iteration, matching retail's
 literal shape more closely than the multiply) was tried twice (plain
 increment, and combined into the `for`'s own increment clause) and both
@@ -199,7 +199,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
                 gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
             }
         } else {
-            gStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
+            gStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (gStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;
@@ -215,7 +215,7 @@ above; `extern s32 gStyleCueSelf;`, `extern s32 gStyleTickCount;`,
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
 earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matched,
 this unit), `extern void DrawStyleTables(void);` (forward, matched, this
-unit, defined later), `extern s32 gStyleCueRecordIndex;`, `extern u8 D_8008E154[];`,
+unit, defined later), `extern s32 gStyleCueRecordIndex;`, `extern u8 gStyleCueSlotPool[];`,
 `extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void
 *arg3);`, `extern s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void
 *arg2);`.

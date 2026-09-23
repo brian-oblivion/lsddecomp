@@ -118,10 +118,6 @@ D_8008AB40
 D_8008AB44
 D_8008AB58
 D_8008AB60
-D_8008AB68
-D_8008AB6C
-D_8008AB70
-D_8008AB74
 D_8008AB78
 D_8008AB7C
 D_8008AB80
@@ -200,6 +196,10 @@ gStyleCueSelf
 gStyleCueSlots
 gStyleDecorColor
 gStyleDecorObj
+gStyleDecorPosAX
+gStyleDecorPosAY
+gStyleDecorPosBX
+gStyleDecorPosBY
 gStyleDecorVariant
 gStyleEffectSlotCount
 gStyleFlushColor

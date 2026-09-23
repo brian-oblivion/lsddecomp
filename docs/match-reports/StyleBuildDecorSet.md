@@ -27,11 +27,11 @@ typedef struct PairXY { s32 x; s32 y; } PairXY;
 
 PairXY paramA, paramB;
 
-paramA = *(PairXY *) &D_8008AB68;      /* NOT paramA[0] = ..; paramA[1] = ..; */
+paramA = *(PairXY *) &gStyleDecorPosAX;      /* NOT paramA[0] = ..; paramA[1] = ..; */
 if (gStyleDecorVariant == 2) {
     paramA.y += 0x1E;
 }
-paramB = *(PairXY *) &D_8008AB70;
+paramB = *(PairXY *) &gStyleDecorPosBX;
 ```
 
 **Mechanism.** A struct assignment is a BLKmode `set`. gcc 2.6.3's `cse.c`
@@ -48,8 +48,8 @@ With that one change, retail's whole setup block matches byte for byte,
 reloads, load-delay `nop` and all:
 
 ```
-45070  lw    v0,%gp_rel(D_8008AB68)     45078  sw  v0,0x10(sp)
-45074  lw    v1,%gp_rel(D_8008AB6C)     4507c  sw  v1,0x14(sp)
+45070  lw    v0,%gp_rel(gStyleDecorPosAX)     45078  sw  v0,0x10(sp)
+45074  lw    v1,%gp_rel(gStyleDecorPosAY)     4507c  sw  v1,0x14(sp)
 45080  lw    v1,%gp_rel(gStyleDecorVariant)   <-- reload 2
 45084  li    v0,0x2
 45088  bne   v1,v0,450a0
@@ -68,7 +68,7 @@ read straight off the raw `.s`:
 | # | correction | evidence in retail |
 | --- | --- | --- |
 | 1 | the pair copies are struct assignments (above) | the two reloads |
-| 2 | the trailing double dispatch reads the GLOBAL `D_8008E10C[0]` twice, not the cached `arr[0]` | `lui v1/lw %lo(D_8008E10C)` at 45160 **and again** `lui a0/lw %lo` at 45170, where the loop body uses `lw a1,0(s3)` |
+| 2 | the trailing double dispatch reads the GLOBAL `gStyleDecorSlots[0]` twice, not the cached `arr[0]` | `lui v1/lw %lo(gStyleDecorSlots)` at 45160 **and again** `lui a0/lw %lo` at 45170, where the loop body uses `lw a1,0(s3)` |
 | 3 | the array is walked with a separate pointer starting at `arr + 1`, not indexed by the loop counter | `addiu s0,s3,4` before the loop; `sw a0,0(s0); addiu s0,s0,4` inside |
 | 4 | `arr` is assigned AFTER the first call, not before | `lui v1/addiu v1` sit at 450c4, past the `jal` at 450bc |
 
@@ -102,10 +102,10 @@ register, same value, branch targets agreeing"), and it is the whole of the
 byte-identical output, i.e. the residue is invariant to all of them rather
 than merely unimproved:
 
-- `arr = D_8008E10C; wp = arr + 1;`
-- `wp = D_8008E10C; arr = wp; wp = arr + 1;`
-- an extra `void **base;` temp: `base = D_8008E10C; arr = base;`
-- `wp = D_8008E10C + 1;` (derive the walker from the global, not from `arr`)
+- `arr = gStyleDecorSlots; wp = arr + 1;`
+- `wp = gStyleDecorSlots; arr = wp; wp = arr + 1;`
+- an extra `void **base;` temp: `base = gStyleDecorSlots; arr = base;`
+- `wp = gStyleDecorSlots + 1;` (derive the walker from the global, not from `arr`)
 - `wp[0] = obj; wp = wp + 1;` instead of `*wp = obj; wp++;`
 - `obj` typed `ObjSlot4C *` instead of `void *`, dropping the cast at the
   dispatch
@@ -135,8 +135,8 @@ side effect of the image moving. The honest figures are the two in the title:
 ## Preserved near-miss body (1 word short, `#if 0` in `src/class_3bb8c_n.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
-`extern s32 gStyleDecorVariant, D_8008AB68, D_8008AB6C, D_8008AB70, D_8008AB74,
-gStyleTargetObj, gStyleColorTable;`, `extern void *D_8008E10C[];`,
+`extern s32 gStyleDecorVariant, gStyleDecorPosAX, gStyleDecorPosAY, gStyleDecorPosBX, gStyleDecorPosBY,
+gStyleTargetObj, gStyleColorTable;`, `extern void *gStyleDecorSlots[];`,
 `extern void *New_ClassEAC0(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
 the function in the unit.
@@ -162,16 +162,16 @@ void StyleBuildDecorSet(void) {
     if (gStyleDecorVariant == 0) {
         return;
     }
-    paramA = *(PairXY *) &D_8008AB68;
+    paramA = *(PairXY *) &gStyleDecorPosAX;
     if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &D_8008AB70;
+    paramB = *(PairXY *) &gStyleDecorPosBX;
     i = 1;
     s1 = 3;
     obj = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
     __asm__("");
-    arr = D_8008E10C;
+    arr = gStyleDecorSlots;
     wp = arr + 1;
     *arr = obj;
     do {
@@ -187,7 +187,7 @@ void StyleBuildDecorSet(void) {
 
     self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) D_8008E10C[0])->methods->slot4C(D_8008E10C[0], result, &paramA);
+    ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
 }
 ```
 

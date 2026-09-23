@@ -63,7 +63,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);
 
 Already forward-declared this way at the call site in `StyleBuildEffectSlots`
 (matched, this unit, earlier round): `filled = (void **)
-StyleFillEffectKind0(D_8008E0C8, val, arg0);`. `arg1` is the loop bound, `arg0` is
+StyleFillEffectKind0(gStyleEffectSlots, val, arg0);`. `arg1` is the loop bound, `arg0` is
 the output array walked and returned one slot advanced (the same
 "array-fill, return next slot" idiom as `StyleFillEffectKind1`/`StyleFillEffectKind3`/
 `StyleFillEffectKind2`), `arg2` is passed through unchanged to every callee.

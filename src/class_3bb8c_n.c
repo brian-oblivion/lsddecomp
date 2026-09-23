@@ -124,12 +124,12 @@ void *PickStyleFallbackConfig(void) {
     return result;
 }
 
-extern s32 D_8008AB68;
-extern s32 D_8008AB6C;
-extern s32 D_8008AB70;
-extern s32 D_8008AB74;
+extern s32 gStyleDecorPosAX;
+extern s32 gStyleDecorPosAY;
+extern s32 gStyleDecorPosBX;
+extern s32 gStyleDecorPosBY;
 extern void *New_ClassEAC0(void *a0, void *a1, s32 a2);
-extern void *D_8008E10C[];
+extern void *gStyleDecorSlots[];
 extern s32 gStyleTargetObj;
 
 typedef struct ObjSlot4C ObjSlot4C;
@@ -152,7 +152,7 @@ struct ObjSlotAC {
     ObjSlotACMethods *methods; /* +0x000 */
 };
 
-/* Local view: D_8008AB68/D_8008AB6C and D_8008AB70/D_8008AB74 are two
+/* Local view: gStyleDecorPosAX/gStyleDecorPosAY and gStyleDecorPosBX/gStyleDecorPosBY are two
  * adjacent 8-byte pairs, and this unit copies each into a local pair as a
  * WHOLE-STRUCT assignment rather than field by field.  That is not a style
  * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call
@@ -187,16 +187,16 @@ void StyleBuildDecorSet(void) {
     if (gStyleDecorVariant == 0) {
         return;
     }
-    paramA = *(PairXY *) &D_8008AB68;
+    paramA = *(PairXY *) &gStyleDecorPosAX;
     if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &D_8008AB70;
+    paramB = *(PairXY *) &gStyleDecorPosBX;
     i = 1;
     s1 = 3;
     obj = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
     __asm__("");
-    arr = D_8008E10C;
+    arr = gStyleDecorSlots;
     wp = arr + 1;
     *arr = obj;
     do {
@@ -212,7 +212,7 @@ void StyleBuildDecorSet(void) {
 
     self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) D_8008E10C[0])->methods->slot4C(D_8008E10C[0], result, &paramA);
+    ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
 }
 #endif
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleBuildDecorSet);
@@ -267,12 +267,12 @@ void StyleUpdateDecorSet(void) {
     if (shift <= 0) {
         return;
     }
-    pos = *(PairXY *) &D_8008AB68;
+    pos = *(PairXY *) &gStyleDecorPosAX;
     i = 0;
     if (gStyleDecorVariant == 2) {
         pos.y += 0x1E;
     }
-    wp = D_8008E10C;
+    wp = gStyleDecorSlots;
     srcOfs = 0;
     pos.y += shift * 3;
     do {
@@ -298,11 +298,11 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gStyleDecorVariant;
-extern void *D_8008E10C[];
+extern void *gStyleDecorSlots[];
 
 void StyleReleaseDecorSet(void) {
     if (gStyleDecorVariant != 0) {
-        ReleaseBasicClassArray(D_8008E10C, 0x12);
+        ReleaseBasicClassArray(gStyleDecorSlots, 0x12);
         gStyleDecorVariant = 0;
     }
 }
@@ -313,7 +313,7 @@ extern void BaseObjO__func_56f5c(s32 arg0, void *arg1, s32 arg2, s32 arg3);
 extern s32 rand(void);
 extern s8 D_80087324[];
 extern s32 gStyleEffectSlotCount;
-extern void *D_8008E0C8[];
+extern void *gStyleEffectSlots[];
 extern void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);
 extern void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);
 extern void **StyleFillEffectKind3(void **arg0, void *arg1);
@@ -333,7 +333,7 @@ void StyleBuildEffectSlots(void *arg0) {
     val = D_80087324[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     gStyleEffectSlotCount = val + count;
-    filled = (void **) StyleFillEffectKind0(D_8008E0C8, val, arg0);
+    filled = (void **) StyleFillEffectKind0(gStyleEffectSlots, val, arg0);
     filled = StyleFillEffectKind1(filled, count, arg0);
     if (gStyleVariant == 0) {
         StyleFillEffectKind3(filled, arg0);
@@ -345,7 +345,7 @@ void StyleBuildEffectSlots(void *arg0) {
     gStyleEffectSlotCount = gStyleEffectSlotCount + 1;
 }
 
-/* Local view: array elements at D_8008E0C8 are objects with a method table
+/* Local view: array elements at gStyleEffectSlots are objects with a method table
  * pointer at offset 0, dispatched here through slot +0xEC as
  * slotEC(self, arg1) -- mirrors the ObjAB54 pattern above. */
 typedef struct ObjE0C8 ObjE0C8;
@@ -360,7 +360,7 @@ struct ObjE0C8 {
 
 extern s32 gStyleVariant;
 extern s32 gStyleEffectSlotCount;
-extern void *D_8008E0C8[];
+extern void *gStyleEffectSlots[];
 
 void StyleUpdateEffectSlots(void *arg0) {
     s32 i;
@@ -370,18 +370,18 @@ void StyleUpdateEffectSlots(void *arg0) {
         return;
     }
     for (i = 0; i < gStyleEffectSlotCount; i++) {
-        obj = (ObjE0C8 *) D_8008E0C8[i];
+        obj = (ObjE0C8 *) gStyleEffectSlots[i];
         obj->methods->slotEC(obj, arg0);
     }
 }
 
 extern s32 gStyleVariant;
 extern s32 gStyleEffectSlotCount;
-extern void *D_8008E0C8[];
+extern void *gStyleEffectSlots[];
 
 void StyleReleaseEffectSlots(void) {
     if (gStyleVariant >= 0) {
-        ReleaseBasicClassArray(D_8008E0C8, gStyleEffectSlotCount);
+        ReleaseBasicClassArray(gStyleEffectSlots, gStyleEffectSlotCount);
     }
 }
 
@@ -849,7 +849,7 @@ extern void StyleUpdateDecorSet(void);
 extern void DrawStyleTables(void);
 extern s32 gStyleTickCount;
 extern s32 gStyleCueRecordIndex;
-extern u8 D_8008E154[];
+extern u8 gStyleCueSlotPool[];
 extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3);
 extern s32 StopStyleCueIfNear(ObjN14 *arg0, void *arg1, void *arg2);
 
@@ -889,7 +889,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
             i++;
             i--;
         } else {
-            gStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (D_8008E154 + i * 0x68), &arg2, ctx, arg1);
+            gStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (gStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;
