@@ -12,7 +12,7 @@ value was 0 (i.e. it returns the logical negation of the old bit).
 
 See `include/code_d294.h` for `GetSetBitField`, the generic packed-bitfield
 accessor all five sibling functions in this file (`Class6B5CC__SetDisplay`,
-`func_8001D374`, `func_8001D3A0`, `func_8001D3CC`, `func_8001D3F8`) wrap.
+`Class6B5CC__SetSemiTrans`, `func_8001D3A0`, `func_8001D3CC`, `func_8001D3F8`) wrap.
 It lives in the next, still-uncarved slice (`asm/code_d294_b.s`) and was
 read directly off its own disassembly rather than decompiled here.
 

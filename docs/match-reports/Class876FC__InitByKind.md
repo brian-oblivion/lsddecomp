@@ -179,7 +179,7 @@ method signatures; zero bytes changed.
 | slot +0x048 | slot48 | updateScale | B | Class6B5CC__UpdateScale (set/add .scale); sprite override func_80057DF4 also a scale |
 | slot +0x04C | slot4C | attachToParent | B | Class6B5CC__AttachToParent (parent link, coord2 super, coord.t) |
 | slot +0x060 | slot60 | setDisplay | B | Class6B5CC__SetDisplay / func_8004220C: attribute bit 31 = !on (GsDOFF) |
-| slot +0x064 | slot64 | setSemiTrans | B | func_8001D374 / func_8004223C: bit 30 (GsALON) |
+| slot +0x064 | slot64 | setSemiTrans | B | Class6B5CC__SetSemiTrans / func_8004223C: bit 30 (GsALON) |
 | slot +0x068 | slot68 | setSemiTransRate | B | func_8001D3A0 / func_80042268: bits 28-29 (GsAZERO..GsATHREE) |
 | slot +0x0B8 | slotB8 | kept | C | class-dependent: BaseObjO__SetVec14 (translation) on the owner and model children, RGB on sprites |
 | slot +0x0BC | slotBC | addTranslation | B | BaseObjO__AddVec14; only called on model children (sprite override is a no-op) |

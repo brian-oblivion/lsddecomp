@@ -216,7 +216,7 @@ s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;
 }
 
-u32 func_8001D374(Class6B5CCObj *self, s32 a1) {
+u32 Class6B5CC__SetSemiTrans(Class6B5CCObj *self, s32 a1) {
     return GetSetBitField(&self->unk10, 0x1E, 1, a1 != 0);
 }
 

@@ -10,7 +10,7 @@ Sibling of the five `self->unk10` bitfield accessors already matched in
 `code_d294.c` (`Class6B5CC__SetDisplay`/`D374`/`D3A0`/`D3CC`/`D3F8`). Thin wrapper
 around `GetSetBitField(&self->unk10, shift, width, value)`, shift 0, width 3,
 value and result both pass straight through (no `== 0` boolean conversion on
-either side -- same shape as `func_8001D374`/`D3A0`/`D3F8`).
+either side -- same shape as `Class6B5CC__SetSemiTrans`/`D3A0`/`D3F8`).
 
 ```c
 u32 Class6B5CC__GetSetUnk10Field0(Class6B5CCObj *self, u32 a1) {

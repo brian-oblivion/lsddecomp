@@ -13,7 +13,7 @@
  * +0x040 Class6B5CC__Reset, +0x044 Class6B5CC__UpdateRotation, +0x048 Class6B5CC__UpdateScale,
  * +0x04C Class6B5CC__AttachToParent, +0x050 Class6B5CC__DetachFromParent, +0x054 Class6B5CC__DetachAttachedChildren,
  * +0x058 Class6B5CC__GetNextAttachedChild, +0x05C Class6B5CC__func_1d33c (already-matched no-op stub),
- * +0x060 Class6B5CC__SetDisplay, +0x064 func_8001D374, +0x068 func_8001D3A0,
+ * +0x060 Class6B5CC__SetDisplay, +0x064 Class6B5CC__SetSemiTrans, +0x068 func_8001D3A0,
  * +0x06C func_8001D3CC, +0x070 func_8001D3F8, and continuing past this
  * unit's slice into the next carve (code_d294_b) up to +0x0B4
  * Class6B5CC__NotifyTaggedParents (45 slots total). This is proof, not a guess -- `--vs
@@ -753,7 +753,7 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **ent
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1);
-u32 func_8001D374(Class6B5CCObj *self, s32 a1);
+u32 Class6B5CC__SetSemiTrans(Class6B5CCObj *self, s32 a1);
 u32 func_8001D3A0(Class6B5CCObj *self, u32 a1);
 u32 func_8001D3CC(Class6B5CCObj *self, s32 a1);
 u32 func_8001D3F8(Class6B5CCObj *self, u32 a1);
