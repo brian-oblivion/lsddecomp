@@ -58,12 +58,27 @@
  * jump table -- all seven jtbl blocks in the 0xFD8 rodata slot fall outside
  * 0x8002BC40..0x8002C408 -- so no rodata sub-slot is attached to it.
  *
- * Sibling-slice finding worth having up front (established in code_179d8_b,
- * round 16): this region is NOT class-framework code. tools/classtable.py
- * --scan has no hit anywhere near these globals, and the neighbouring
- * functions read as a low-level serial/link driver poking raw control words
- * into a block of globals that look like hardware/SIO register staging. Do
- * not expect vtables here; do not go looking for a `this` pointer.
+ * ROUND 77 CORRECTION (naming pass, charlie): the paragraph below (round 16,
+ * code_179d8_b's sibling-slice finding) is WRONG for this unit and must not
+ * be trusted for it again. `python3 tools/classtable.py --scan` DOES hit
+ * this unit's own globals: `D_8006D940` is a real 30-slot Class6D430-derived
+ * vtable (header word 0x00000E03), confirmed by `tools/classtable.py
+ * 0x8006D940` -- slots +0x004/+0x05C/+0x060 are the SAME
+ * `DestroyChained`/`Class6D430__FreeBuffer`/`NoOp` symbols the base class and
+ * its CD-driver sibling (`D_8006D4E8`, code_179d8_q.c) share verbatim, +0x008
+ * is a genuine ctor (`Class6D940__Class6D940`), +0x00C a genuine dtor
+ * (`Class6D940__Destroy`), and `D_8006D940`'s own getter (`GetClass6D940Methods`,
+ * ex-`func_8002C3A8`) is registered in `D_8006D4AC` (code_171e0.c) -- the
+ * NULL-terminated array of "class-method-table getters of every
+ * Class6D430-derived client" -- as that array's FIRST entry
+ * (`asm/data/5DB70.data.s`). So this unit's own class (kept address-named
+ * `Class6D940`, no game-purpose evidence yet) is a real, registered
+ * `SetActiveDataSource`-client sibling of `VabStreamObj`
+ * (code_179d8_e.c) and the CD-read driver (code_179d8_q.c) -- do go looking
+ * for `this->methods->slotN(this, ...)` dispatch here; it is real. This does
+ * NOT extend to the REST of the unit's globals: no other classtable.py hit
+ * exists in this window, so the "low-level control-word staging" read below
+ * may still hold for whatever is not `D_8006D940`/`Class6D940Methods`-shaped.
  *
  * Declarations: keep anything that encodes THIS unit's reading of the region
  * next to the code, in this file. Do NOT create a shared code_179d8*.h --
@@ -73,16 +88,22 @@
 #include "common.h"
 
 /*
- * D_8006D940: a function-pointer table this unit's own `New_Class6D940`/
- * `Class6D940__Class6D940` dispatch through. Named/typed as a plain local struct,
- * NOT claimed to be a class-framework vtable -- per this unit's header
- * comment (sibling-slice finding: no classtable.py hit anywhere near this
- * region). Only the two slots this unit's own functions reach are typed;
- * the rest stays opaque padding. Kept LOCAL to this file, not a shared
- * header, per this round's rule for code_179d8 slices.
+ * D_8006D940: a REAL 30-slot Class6D430-derived class-framework vtable
+ * (see the round-77 correction in the unit header comment above --
+ * `tools/classtable.py 0x8006D940` confirms it, contradicting the earlier
+ * round-16 "no classtable.py hit" finding). `Class6D940Methods`/`Class6D940`
+ * are this unit's own local names (kept address-based: no game-purpose
+ * evidence yet for what the class represents). Only the slots this unit's
+ * own functions define or dispatch through are typed here; the inherited
+ * BasicClass/Class6D430 slots (+0x010..+0x038, +0x05C, +0x060) are left as
+ * opaque padding since nothing in this unit calls them directly -- see
+ * `include/code_171e0.h`/`class_16334.h` for their own typed views of the
+ * same physical layout. Kept LOCAL to this file, not a shared header, per
+ * this round's rule for code_179d8 slices (independent local views are
+ * this project's convention; unifying is track 4's job).
  */
-typedef struct Table6D940 Table6D940;
-struct Table6D940 {
+typedef struct Class6D940Methods Class6D940Methods;
+struct Class6D940Methods {
     u8 pad000[0x008];
     /* +0x008, New_Class6D940's own dispatch -- this IS Class6D940__Class6D940
      * itself (same 2-arg (self, arg1) shape). */
@@ -91,19 +112,19 @@ struct Table6D940 {
     /* +0x06C, Class6D940__Class6D940's own conditional dispatch. */
     void (*slot6C)(void *self, s32 arg1);
 };
-extern Table6D940 D_8006D940;
+extern Class6D940Methods D_8006D940;
 
 /* Forward-declared: defined below at its own ROM address (GetClass6D940Methods),
  * but called here (New_Class6D940, Class6D940__Class6D940) before that point in the
  * file. Without this, cc1 implicitly declares it `int`, which happens to be
  * byte-identical on this ABI but is a lie about the real signature. */
-Table6D940 *GetClass6D940Methods(void);
+Class6D940Methods *GetClass6D940Methods(void);
 
 /* The 0x34-byte object New_Class6D940 allocates. Only the fields
  * Class6D940__Class6D940 itself touches are named. */
-typedef struct Obj6D940 Obj6D940;
-struct Obj6D940 {
-    Table6D940 *methods; /* +0x000, Class6D940__Class6D940 */
+typedef struct Class6D940 Class6D940;
+struct Class6D940 {
+    Class6D940Methods *methods; /* +0x000, Class6D940__Class6D940 */
     u8 pad004[0x02C - 0x004];
     s32 unk2C;            /* +0x02C, Class6D940__Class6D940: zeroed */
     s32 unk30;             /* +0x030, Class6D940__Class6D940: zeroed */
@@ -140,7 +161,7 @@ extern void *BMemPMgrAlloc(s32 size);
 void *New_Class6D940(s32 arg1)
 {
     void *self;
-    Table6D940 *table;
+    Class6D940Methods *table;
 
     self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
@@ -151,7 +172,7 @@ void *New_Class6D940(s32 arg1)
     return NULL;
 }
 
-void Class6D940__Class6D940(Obj6D940 *self, s32 arg1)
+void Class6D940__Class6D940(Class6D940 *self, s32 arg1)
 {
     GetActiveDataSourceMethods()->slot08(self);
     self->methods = GetClass6D940Methods();
@@ -264,7 +285,7 @@ s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 }
 
 
-Table6D940 *GetClass6D940Methods(void)
+Class6D940Methods *GetClass6D940Methods(void)
 {
     return &D_8006D940;
 }
