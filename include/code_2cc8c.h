@@ -194,10 +194,14 @@ struct Unk4CObj {
  * retrofitted onto this type, per this project's convention of not
  * editing matched functions to adopt a later, more specific type.
  */
-typedef struct Unk24Elem Unk24Elem;
-struct Unk24Elem {
+/* Renamed from Unk24Elem, round 78 -- tier B, exclusive to this unit (only
+ * code_2cc8c_b.c casts to this type; see this struct's own comment above
+ * for the cross-unit `target->unk24[idx]` reads that stay untyped). */
+typedef struct SlotEntry SlotEntry;
+struct SlotEntry {
     u8 pad000[0x004];
-    s32 unk4;    /* +0x004, a per-slot counter/index: SET here by
+    s32 savedCursor; /* +0x004, renamed from unk4, round 78 -- the
+                    slot's own persisted ring-cursor value: SET here by
                     Obj86B60__CommitElementScroll, READ back as `newVal` by the
                     already-matched Obj86B60__CancelElementScroll */
     u8 pad008[0x010 - 0x008];

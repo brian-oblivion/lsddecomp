@@ -1,7 +1,7 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-/* Unk24Elem's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
+/* SlotEntry's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
  * copies it with a whole-struct assignment (lw/lw into two fresh
  * temporaries, sw/sw, then a RELOAD of .y before adjusting it) -- see
  * docs/match-reports/Obj86B60__CommitElementScroll.md, round 75. Local view: the shared
@@ -309,10 +309,10 @@ void Obj86B60__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
     idx = self->activeSlot;
     arr = (Unk64Elem **)self->itemLists[idx];
     {
-        Unk24Elem *target = (Unk24Elem *)self->unk4C->unk24[idx];
+        SlotEntry *target = (SlotEntry *)self->unk4C->unk24[idx];
 
         count = self->itemCounts[idx];
-        counter = target->unk4;
+        counter = target->savedCursor;
     }
 
     for (i = 0; i < count; i++) {
@@ -320,7 +320,7 @@ void Obj86B60__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
         arr++;
     }
 
-    pos = SLOT_POS((Unk24Elem *)self->unk4C->unk24[idx]);
+    pos = SLOT_POS((SlotEntry *)self->unk4C->unk24[idx]);
     pos.y -= counter * 10;
 
     if (a2 != 0) {
@@ -392,7 +392,7 @@ void Obj86B60__CommitElementScroll(Obj86B60 *self)
     }
     idx = self->activeSlot;
     counter = self->slotCounts[idx];
-    pos = SLOT_POS((Unk24Elem *)self->unk4C->unk24[idx]);
+    pos = SLOT_POS((SlotEntry *)self->unk4C->unk24[idx]);
     pos.y -= counter * 10;
 
     arr = (Unk64Elem **)self->itemLists[idx];
@@ -411,7 +411,7 @@ void Obj86B60__CommitElementScroll(Obj86B60 *self)
         elem->methods->slotB8(elem, self->unk4C->unk10);
     }
 
-    ((Unk24Elem *)self->unk4C->unk24[idx])->unk4 = counter;
+    ((SlotEntry *)self->unk4C->unk24[idx])->savedCursor = counter;
 
     self->listView->methods->slot50(self->listView);
 
