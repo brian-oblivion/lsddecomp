@@ -85,3 +85,7 @@ residue (the switch's own comparison register) resolving simultaneously
 once the constant-reuse reading replaced it -- a useful pattern to watch
 for when two residues in one function both vanish from a single source
 change: it usually means they shared one cause, not two.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004D9D4` -> `Class86B60__Tick`. **Tier B**: Unconditionally calls the base class's own `slot90`, then dispatches on the state field `unk58` among three of this class's own handler slots. Named for the "unconditional base call, then per-state sub-dispatch" shape; the individual state meanings are not established.

@@ -82,3 +82,7 @@ case; the value-of case surfaces when the "address" being forwarded was
 itself precomputed into a `.sdata` pointer variable by someone else's static
 initializer, and the pointee (here, an offset into an unowned rodata blob
 with no `dlabel` of its own) may not even be nameable.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004E1C4` -> `Class86B60__UpdateMemcardSaveStatus`. **Tier B, lower confidence**: Calls `slot128` then forwards `self->unkBC`/`unkC0` (no icon handle, no literal flags) through `unkAC`'s `slot74` -- the simpler sibling of `Class86B60__UpdateMemcardSaveWithIcon` and the dispatch target for `Class86B60__Tick`'s case-3. Purpose beyond "the icon-less variant of the two unkAC dispatch calls" is not established.

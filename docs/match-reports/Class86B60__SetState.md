@@ -55,3 +55,7 @@ constant after the call in either reading.
 None new -- the "delay-slot instruction belongs to the taken path" and
 "redundant constant re-materialization across branches" families already
 cover this; filing as a confirming instance rather than a new bullet.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004D90C` -> `Class86B60__SetState`. **Tier B**: Forwards `arg1` to the base class's own state-setter (`Get_vtable_TaskCore()->slot60(self, arg1)`) and does extra dispatch for two literal values (5, 0xA) -- the same "forward-then-special-case" shape already named `SetState` for `TaskObjF` (`class_3bb8c_g.c`). Purpose of the two particular state values not established.

@@ -10,7 +10,7 @@ SHA1 matches retail. `funcdiff.py Class86B60__EndMemcardSave`: 36/36 words match
 ```c
 void Class86B60__EndMemcardSave(Class86B60 *self)
 {
-    self->methods->slot10(self, self->unkC->unk4);
+    self->methods->slot10(self, self->handlerTable->unk4);
     self->methods->slot10(self, self->unk10);
     self->methods->slot14(self, self->unkAC);
     self->unkAC->methods->slot70(self->unkAC);
@@ -25,7 +25,7 @@ cache in a named local" idiom).
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 - `Class86B60Methods::slot10` -- new slot, called TWICE in this function
-  with two different opaque arguments (`self->unkC->unk4`, then
+  with two different opaque arguments (`self->handlerTable->unk4`, then
   `self->unk10`).
 - `Class86B60Methods::slot14` -- new slot, `(self, void *arg1)`, called
   with `self->unkAC` forwarded opaquely (not dereferenced by this caller).
@@ -36,9 +36,13 @@ cache in a named local" idiom).
   dedicated `Class86B60UnkACObj_3bb8c_d *` carrying both the shared
   `release` slot at `+0x004` and this function's own `+0x070` slot. Same
   size, no layout change; same shape of retype already done once for
-  `unkB0` in `Class86B60__ForwardToNameField`'s report, for the identical reason (one
+  `nameField` in `Class86B60__ForwardToNameField`'s report, for the identical reason (one
   instance needs a second slot the others never reach).
 
 ### Proposed learning
 
 None new.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004E054` -> `Class86B60__EndMemcardSave`. **Tier B**: Mirror-image teardown of `Class86B60__BeginMemcardSave` -- forwards `self->handlerTable->unk4` and `self->unk10` through `self->methods->slot10`/`slot14`, then `unkAC->methods->slot70(unkAC)`. Named as the paired counterpart by symmetry of the two functions' argument sets, not from independent purpose evidence.

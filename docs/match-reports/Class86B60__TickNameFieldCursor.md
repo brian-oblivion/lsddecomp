@@ -67,7 +67,7 @@ void Class86B60__TickNameFieldCursor(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
     if (D_8008AA2C >= 0x101) {
         D_8008AA2C = 0;
     }
-    self->unkB0->methods->slotB8(self->unkB0, &buf);
+    self->nameField->methods->slotB8(self->nameField, &buf);
 }
 ```
 
@@ -174,7 +174,7 @@ skip:
     if (D_8008AA2C >= 0x101) {
         D_8008AA2C = 0;
     }
-    self->unkB0->methods->slotB8(self->unkB0, buf);
+    self->nameField->methods->slotB8(self->nameField, buf);
 }
 ```
 
@@ -211,7 +211,7 @@ This is preserved verbatim, `#if 0`-wrapped, immediately above the
   including the `andi v0,v0,0xff` re-mask retail emits after storing
   `D_8008AA28` back (the ordinary compiled shape of an unsigned-char
   increment-and-wrap).
-- `self->unkB0->methods->slotB8(self->unkB0, buf)` -- reuses this round's
+- `self->nameField->methods->slotB8(self->nameField, buf)` -- reuses this round's
   `Class86B60__TickNameFieldCursor`... (no -- reuses the slot round 43 ALSO establishes
   in this same function; see header changes). **Confirmed correct.**
 
@@ -290,3 +290,7 @@ in-range words, suspect the generated `compile.sh`, not the candidate.
 This is a fix to `tools/setup-permuter.sh` itself (out of this unit's
 scope to make) -- flagging for the head/operator rather than patching it
 project-wide from a runner worktree.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004DCD0` -> `Class86B60__TickNameFieldCursor`. **Tier B**: Guarded by `self->unk3C`, cycles a 3-byte colour-like buffer through a rolling index (`D_8008AA28`, 0-2) and a counter (`D_8008AA2C`, wraps at 0x101), then forwards the buffer to `self->nameField`'s `slotB8`. Read as a counter-driven colour/blink update on the name field's cursor; the exact visual effect is not established.

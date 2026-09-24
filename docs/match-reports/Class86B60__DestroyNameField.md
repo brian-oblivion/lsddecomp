@@ -10,7 +10,7 @@ SHA1 matches retail. `funcdiff.py Class86B60__DestroyNameField`: 23/23 words mat
 ```c
 void Class86B60__DestroyNameField(Class86B60 *self)
 {
-    self->unkB0->methods->release(self->unkB0);
+    self->nameField->methods->release(self->nameField);
     Get_vtable_TaskCore()->slotDC(self);
 }
 ```
@@ -23,7 +23,7 @@ sub-object.
 
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
-- `Class86B60::unkB0` -- new field, `GenericReleaseObj_3bb8c_d *`,
+- `Class86B60::nameField` -- new field, `GenericReleaseObj_3bb8c_d *`,
   reusing the same release-only view established by `Class86B60__Dtor`.
   Carved from the `pad0B0` gap (now `pad0B4`).
 - `BaseTaskCtorTable_3bb8c_c::slotDC` -- new slot, `void (*)(void *self)`.
@@ -31,3 +31,7 @@ sub-object.
 ### Proposed learning
 
 None new.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004DC08` -> `Class86B60__DestroyNameField`. **Tier B**: Unconditionally releases `self->nameField` (the sub-object `Class86B60__CreateNameField` constructs) then forwards to the base class's own `slotDC`. Mirror-image counterpart to `CreateNameField`; not the class's own destructor (that is `Class86B60__Dtor`, a different base slot).

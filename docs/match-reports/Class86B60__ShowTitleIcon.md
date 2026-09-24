@@ -50,3 +50,7 @@ reshaping needed.
 ### Proposed learning
 
 None new.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004D814` -> `Class86B60__ShowTitleIcon`. **Tier B**: Passes `&D_800114E8` (a real dlabel string, "ETC\\TITLE.TIM" -- `asm/data/1C34.rodata.s`) to `slotD4`, sets `slot6C(self, 0xA)`, and resets `unk34`/`unk2C`. Named from the one concrete piece of evidence available (the TIM filename); the rest of the sequence's purpose is not established.

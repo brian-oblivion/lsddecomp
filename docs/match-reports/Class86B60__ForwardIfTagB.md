@@ -50,3 +50,7 @@ whoever next resolves a caller of this function.
 None new. This is a clean instance of the already-documented
 "`arg->methods->header & 0xF` is a runtime type ID" shape (round 13), just
 the first time this unit's own `slot38`/`slot138` pair exercises it.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004D788` -> `Class86B60__ForwardIfTagB`. **Tier B**: Forwards to the base class's `slot38` unconditionally, then to its own `slot138` only when `arg1`'s vtable header low nibble == 0xB -- the same runtime-type-id-gated forward shape already named `Class86AA0__ForwardIfTag34` in `class_3bb8c_c.c`. Purpose of tag 0xB itself not established.

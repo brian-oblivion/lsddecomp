@@ -39,3 +39,7 @@ stack-local buffer whose address is forwarded to `self->unkA4`
 ### Proposed learning
 
 None new.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004DABC` -> `Class86B60__RefreshViewValue`. **Tier B**: Calls the base class's `slot94`, copies `self->unk60->unk14` into a stack buffer, and forwards its address to `DreamSysView::slot19C` -- the same "read a value, push it through the view's slot19C out-parameter call" idiom that recurs in `Class86B60__UpdateMemcardSaveWithIcon` and `Class86B60__CommitNameEntry` in this same unit. Also the dispatch target for `Class86B60__Tick`'s case 1/case 4. Purpose of the value itself not established.

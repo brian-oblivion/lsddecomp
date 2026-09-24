@@ -65,3 +65,7 @@ its own data point rather than merged into that list, since the direction
 of the effect is reversed. The reliable move once a `&&`/`||` residue
 shows outside-range drift (not just a few different words) is to try the
 nested-`if` spelling before anything else.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004E230` -> `Class86B60__OnTagBValue`. **Tier B**: The exclusive dispatch target of `Class86B60__ForwardIfTagB`'s `slot138` forward (called only when `arg1`'s header nibble == 0xB), gating further work on ranges of its own `value` parameter (>= 0x16, < 0x18, == 0x16). Named for its role as the tag-0xB handler; the value ranges' meaning is not established.

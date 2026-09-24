@@ -18,11 +18,11 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     void *buf1;
     s32 buf2;
 
-    size = self->unkB0->unkA9;
+    size = self->nameField->unkA9;
     origUnk58 = self->unk58;
     buf1 = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf1, D_8008AA18);
-    self->unkB0->methods->slotCC(self->unkB0, buf1);
+    self->nameField->methods->slotCC(self->nameField, buf1);
     BMemPMgrFree(buf1);
     CheckObj866E8CountFlag(self, self->unk4C, self->unkA4);
     self->methods->slotE0(self, self->unk14);
@@ -46,7 +46,7 @@ the whole image after any further edit there.)
 
 ## Derivation
 
-- `size = self->unkB0->unkA9;` -- a NEW `u8` field at `Class86B60UnkB0Obj_
+- `size = self->nameField->unkA9;` -- a NEW `u8` field at `Class86B60UnkB0Obj_
   3bb8c_d`'s +0x0A9 (immediately before this round's `Class86B60__CreateNameField`-
   established `unkAA`/`unkAB`/`unkAC`), read unsigned and used directly as
   an allocation size.
@@ -56,7 +56,7 @@ the whole image after any further edit there.)
   which is why the C statement is placed there too rather than immediately
   before its one use at the very end.
 - `buf1 = BMemPMgrAlloc(size); DecodeFullWidthSjis(buf1, D_8008AA18); self->
-  unkB0->methods->slotCC(self->unkB0, buf1); BMemPMgrFree(buf1);` -- the
+  nameField->methods->slotCC(self->nameField, buf1); BMemPMgrFree(buf1);` -- the
   identical allocate/fill/consume/free idiom already matched in this unit's
   own `Class86B60__CreateNameField` (this round), just simpler (no `strcpy`/`strlen`
   sizing step here -- the size comes straight from `unkA9`).
@@ -140,3 +140,7 @@ one under the cursor has a real residue -- this is the same
 attribution hazard CLAUDE.md's "Address drift" section documents for
 round 20, just triggered by a same-unit sibling instead of a forgotten
 `#if 0` wrapper.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004DE08` -> `Class86B60__CommitNameEntry`. **Tier B**: Allocates/fills/frees a temp buffer via `BMemPMgrAlloc`/`DecodeFullWidthSjis`/`BMemPMgrFree` and pushes it through `self->nameField->methods->slotCC`, then calls `CheckObj866E8CountFlag`, sets `unk58 = 5`, and runs two `Class86B60__SetState` calls (0xB then 0xF) bracketing a refresh of the DreamSysView. Read as committing the entered name-field text and advancing state; the two literal state values are not otherwise established.

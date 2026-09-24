@@ -105,3 +105,7 @@ explains why the function's first act is often `self->methods =
 <table-getter>()` (the same-table self-assignment idiom already seen for
 `Class86B60`/`Class86B60__Class86B60`) rather than reading `self->methods` from
 somewhere else.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004E34C` -> `TaskObjF__TaskObjF`. **Tier A**: `tools/classtable.py 0x80086DC4` places this function exactly at `gTaskObjFMethods`'s own +0x008 ctor slot -- the constructor for the class `class_3bb8c_f.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Follows the `New_Class`/`Class__Class` constructor convention.

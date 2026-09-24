@@ -20,7 +20,7 @@ void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
         *(u8 *)D_8008AA10 = 0;
     }
     self->unkAC->methods->slot78(self->unkAC, D_8008AA10, D_8008AA18, 0xD, 3,
-                                  self->unkA8, self->unkBC, self->unkC0);
+                                  self->iconHandle, self->unkBC, self->unkC0);
 }
 ```
 
@@ -51,10 +51,10 @@ SLPS_015.56`.
 - The final call, `self->unkAC->methods->slot78(...)`, is an 8-argument
   dispatch (four in registers, four on the stack at `0x10`-`0x1C($sp)`):
   `self->unkAC`, `D_8008AA10`, `D_8008AA18`, the literal `0xD`, the
-  literal `3`, `self->unkA8`, `self->unkBC`, `self->unkC0`. The offset
+  literal `3`, `self->iconHandle`, `self->unkBC`, `self->unkC0`. The offset
   (+0x078) falls immediately after this round's `Class86B60__UpdateMemcardSaveStatus`-derived
   `slot74` (+0x074, 4 bytes) with no gap, so it was appended there.
-  `self->unkA8` is forwarded opaquely (this slot never dereferences it),
+  `self->iconHandle` is forwarded opaquely (this slot never dereferences it),
   so its parameter stays `void *` rather than the fuller
   `GenericReleaseObj_3bb8c_d *` the header already has for that field.
 
@@ -77,3 +77,7 @@ None beyond what round 43's earlier two reports (`Class86B60__UpdateMemcardSaveS
 derivation was routine once those two slots (`slot128`, `D_8008AA10`)
 were on file, and it re-confirmed `slot74`'s exact byte offset by landing
 its own new slot immediately after it.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004E0E4` -> `Class86B60__UpdateMemcardSaveWithIcon`. **Tier B, lower confidence**: Refreshes the view (same idiom as `Class86B60__RefreshViewValue`), calls `slot128`, conditionally clears `D_8008AA10` behind the same `self->unkA4->methods->slot1AC()` gate `Class86B60__CreateNameField` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `Class86B60__Tick`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
