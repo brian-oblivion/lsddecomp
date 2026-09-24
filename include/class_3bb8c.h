@@ -2920,7 +2920,7 @@ struct Class86F88ElemMethods {
     /* +0x04C, round 45's Class86F88__CreateRows -- called once per freshly-created
      * element right after `New_Obj6EAC0` returns it, before the same
      * element's own `slotB8` call. `arg2` points at a 2-word stack-local
-     * (`D_8008AB00`'s value, then a running `D_8008AB04`-seeded
+     * (`gClass86F88RowOriginX`'s value, then a running `D_8008AB04`-seeded
      * accumulator incremented by 0xA per loop iteration) -- kept opaque
      * `void *` here since only that one call site gives it any shape;
      * see `Elem4CArg_3bb8c_k` in src/class_3bb8c_k.c for the concrete

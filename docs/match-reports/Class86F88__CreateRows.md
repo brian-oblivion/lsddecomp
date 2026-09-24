@@ -17,7 +17,7 @@ of the same file; this function is ordinary matching work.
 extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
 extern void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
 
-extern s32 D_8008AB00;
+extern s32 gClass86F88RowOriginX;
 extern s32 D_8008AB04;
 
 typedef struct {
@@ -37,7 +37,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
         return;
     }
 
-    local.a = D_8008AB00;
+    local.a = gClass86F88RowOriginX;
     local.b = D_8008AB04;
     count = self->unk10;
     p = &self->unk40[0];
@@ -63,7 +63,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
 count = 4;` clamp, same `Class86F88__FormatRowText` text-formatting call inside the
 loop): the two differ in that this function ALSO calls each freshly-created
 element's own `slot4C` (with a 2-word stack-local argument seeded from
-`D_8008AB00`/`D_8008AB04`, the second word accumulating by `0xA` per
+`gClass86F88RowOriginX`/`D_8008AB04`, the second word accumulating by `0xA` per
 iteration) and `slotB8` before `Class86F88__RefreshRows`'s sibling code reaches its
 own `slotCC`, and this one always passes `1` (not a caller flag) as the
 final `Class86F88__SetView` argument. `Class86F88ElemMethods::slot4C` (offset
