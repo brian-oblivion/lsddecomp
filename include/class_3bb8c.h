@@ -2358,23 +2358,23 @@ struct ObjM {
 typedef struct Obj87034_3bb8c_l Obj87034_3bb8c_l;
 
 /* self->unk50's pointee: a plain (non-vtable) record, read directly by
- * func_800531CC via ordinary field offsets, never through a methods
+ * ObjM__TransferToOther via ordinary field offsets, never through a methods
  * pointer -- so it is NOT another Obj87034_3bb8c_l, just an opaque
  * 3-field descriptor. */
 typedef struct Unk50Struct_3bb8c_l {
     s32 unk0;      /* +0x000, round 45's func_800534C8: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg2 */
     s32 unk4;      /* +0x004, round 45's func_800534C8: forwarded opaquely to Obj14Methods_3bb8c_l::slotC4's arg3 */
     s32 unk8;      /* +0x008, round 45's func_800534C8: forwarded opaquely to Obj14Methods_3bb8c_l::slotBC's arg1 */
-    void *unkC;   /* +0x00C, func_800531CC (address taken, forwarded opaquely) */
+    void *unkC;   /* +0x00C, ObjM__TransferToOther (address taken, forwarded opaquely) */
     u8 pad10[0x014 - 0x010];
-    s32 unk14;    /* +0x014, func_800531CC: discriminant compared against 2; also func_80053764: discriminant compared against 1 */
-    void *unk18;  /* +0x018, func_800531CC (address taken, forwarded opaquely) */
+    s32 unk14;    /* +0x014, ObjM__TransferToOther: discriminant compared against 2; also func_80053764: discriminant compared against 1 */
+    void *unk18;  /* +0x018, ObjM__TransferToOther (address taken, forwarded opaquely) */
     void *unk1C;  /* +0x01C, func_80053764 (address taken, forwarded opaquely) */
 } Unk50Struct_3bb8c_l;
 
 /* Whatever self->unk14 points to: an object of some OTHER, unidentified
  * class -- it has its own methods pointer at +0x000 (func_8005393C
- * dispatches +0x10C on it) AND a plain u16 field at +0x1B4 (func_800531CC
+ * dispatches +0x10C on it) AND a plain u16 field at +0x1B4 (ObjM__TransferToOther
  * reads it directly). Offset +0x10C happens to coincide with a DreamSys
  * vtable offset, but DreamSys's own occupant there (DreamSys__SetSoundObj) takes
  * one s32 argument while this call site passes two -- different arities,
@@ -2407,7 +2407,7 @@ typedef struct Obj14Methods_3bb8c_l {
 typedef struct Obj14_3bb8c_l {
     Obj14Methods_3bb8c_l *methods; /* +0x000 */
     u8 pad04[0x1B4 - 0x004];
-    u16 unk1B4;                     /* +0x1B4, func_800531CC */
+    u16 unk1B4;                     /* +0x1B4, ObjM__TransferToOther */
 } Obj14_3bb8c_l;
 
 /* Whatever self->unk3C/self->unk18 point to. Resolved by cross-checking
@@ -2464,8 +2464,8 @@ typedef struct DreamSysMethods_3bb8c_l {
     void (*slotF8)(void *self, s32 arg1, s32 arg2); /* +0x0F8, func_80053764 */
     void (*slotFC)(void *self);          /* +0x0FC, func_800536B0/func_80053C94 */
     u8 pad100[0x104 - 0x100];
-    s32 (*slot104)(void *self, s32 arg1); /* +0x104, func_800531CC */
-    s32 (*slot108)(void *self);           /* +0x108, func_800531CC */
+    s32 (*slot104)(void *self, s32 arg1); /* +0x104, ObjM__TransferToOther */
+    s32 (*slot108)(void *self);           /* +0x108, ObjM__TransferToOther */
     u8 pad10C[0x1A0 - 0x10C];
     s32 (*slot1A0)(void *self, s32 arg1); /* +0x1A0, ObjM__InitStyleAndWorld (return value forwarded opaquely to two other calls) */
     u8 pad1A4[0x200 - 0x1A4];
@@ -2493,7 +2493,7 @@ typedef struct RegistrantObj_3bb8c_l {
 
 typedef struct Obj87034Methods_3bb8c_l {
     s32 header;                                                    /* +0x000 */
-    void (*slot04)(Obj87034_3bb8c_l *self);                        /* +0x004, BasicClass generic (func_80017EB0); dispatched directly by func_800531CC on its `other` argument */
+    void (*slot04)(Obj87034_3bb8c_l *self);                        /* +0x004, BasicClass generic (func_80017EB0); dispatched directly by ObjM__TransferToOther on its `other` argument */
     u8 pad08[0x010 - 0x008];
     void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, ObjM__AttachTarget */
     void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, ObjM__DetachTarget/func_800536B0 */
@@ -2506,10 +2506,10 @@ typedef struct Obj87034Methods_3bb8c_l {
     u8 pad60[0x074 - 0x060];
     void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, func_80053358 (event 0x21) */
     u8 pad78[0x07C - 0x078];
-    void (*slot7C)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x07C, func_800531CC */
-    void (*slot80)(Obj87034_3bb8c_l *self);                        /* +0x080, func_800531CC */
+    void (*slot7C)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x07C, ObjM__TransferToOther */
+    void (*slot80)(Obj87034_3bb8c_l *self);                        /* +0x080, ObjM__TransferToOther */
     void (*slot84)(Obj87034_3bb8c_l *self);                        /* +0x084, ObjM__TeardownStyle */
-    void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, func_800531CC */
+    void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, ObjM__TransferToOther */
     void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, func_800533F0 */
     u8 pad90[0x094 - 0x090];
     void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, func_80053984 (event/code 0xA, dense switch) */
@@ -2533,7 +2533,7 @@ struct Obj87034_3bb8c_l {
     u8 pad04[0x00C - 0x004];
     RegistrantObj_3bb8c_l *unkC;      /* +0x00C, ObjM__AttachTarget's `arg1->unkC` */
     s32 unk10;                        /* +0x010, func_80053764 */
-    Obj14_3bb8c_l *unk14;              /* +0x014, func_800531CC/func_8005393C/func_800536B0 */
+    Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/func_8005393C/func_800536B0 */
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, func_800536B0 */
     s32 unk1C;                           /* +0x01C, func_800533F0: incremented once per call */
     s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
@@ -2545,18 +2545,18 @@ struct Obj87034_3bb8c_l {
     s32 unk44;                              /* +0x044, func_80053764 */
     s32 unk48;                               /* +0x048, ObjM__InitStyleAndWorld: set from arg1, or 0xA000 if arg1==0 */
     s32 unk4C;                                /* +0x04C, ObjM__InitStyleAndWorld: set from arg3 (only when self->unk38 != 0) */
-    Unk50Struct_3bb8c_l *unk50;             /* +0x050, func_800531CC */
+    Unk50Struct_3bb8c_l *unk50;             /* +0x050, ObjM__TransferToOther */
     Obj87034_3bb8c_l *unk54;                 /* +0x054, ObjM__TeardownStyle */
-    Obj87034_3bb8c_l *unk58;                  /* +0x058, func_800531A0: forwarded as func_800531CC's `other` */
+    Obj87034_3bb8c_l *unk58;                  /* +0x058, ObjM__OnSelectTransfer: forwarded as ObjM__TransferToOther's `other` */
     u8 pad5C[0x060 - 0x05C];
-    s32 unk60;                                 /* +0x060, func_800531CC: has-a-target gate, cleared after detaching */
-    s32 unk64;                                  /* +0x064, func_800531CC: set to 1 */
-    s32 unk68;                                   /* +0x068, func_800531CC/func_80053358/func_800533F0: zero-checked gate */
+    s32 unk60;                                 /* +0x060, ObjM__TransferToOther: has-a-target gate, cleared after detaching */
+    s32 unk64;                                  /* +0x064, ObjM__TransferToOther: set to 1 */
+    s32 unk68;                                   /* +0x068, ObjM__TransferToOther/func_80053358/func_800533F0: zero-checked gate */
     s32 unk6C;                                    /* +0x06C, ObjM__InitStyleAndWorld: out-parameter address passed to RegisterStyleConfig, own type unknown */
     u8 pad70[0x078 - 0x070];
     DreamSysObj_3bb8c_l *unk78;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->unk18 */
     u8 pad7C[0x080 - 0x07C];
-    s32 unk80;                                    /* +0x080, func_800531CC (on `other`)/func_800533F0/func_80053458: zero-checked gate */
+    s32 unk80;                                    /* +0x080, ObjM__TransferToOther (on `other`)/func_800533F0/func_80053458: zero-checked gate */
 };
 
 /* Global BasicClass-family accessor shared across many classes (see
@@ -2587,9 +2587,9 @@ struct Obj87034_3bb8c_l {
  * definition (ROM order later) is reached. */
 extern void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3);
 
-/* func_800531A0's tail call -- forward-declared for the same ROM-order
- * reason as ObjM__OnRegistrantEvent above (func_800531CC is defined later). */
-extern void func_800531CC(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
+/* ObjM__OnSelectTransfer's tail call -- forward-declared for the same ROM-order
+ * reason as ObjM__OnRegistrantEvent above (ObjM__TransferToOther is defined later). */
+extern void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
 
 /* ObjM__OnRegistrantEvent's own two helpers -- still-uncarved ground
  * (asm/psyq_memset.s). func_80049060 is genuinely called at two different

@@ -45,7 +45,7 @@ void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg
 ### Proposed learning
 
 Confirms (third instance, after `ObjM__OnRegistrantEvent`'s own sibling case in
-`func_800531CC` and one more below) that GCC 2.6.3's `if`/`else` codegen
+`ObjM__TransferToOther` and one more below) that GCC 2.6.3's `if`/`else` codegen
 convention is completely mechanical: `NOT(written condition)` is always the
 compiled test, and the `if`-body always lands at the fallthrough. When a
 residue is "right content, wrong branch instruction and swapped

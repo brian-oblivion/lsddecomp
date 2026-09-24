@@ -2332,3 +2332,5 @@ ObjM__OnRegistrantEvent = 0x80052E7C; // type:func
 ObjM__DetachTarget = 0x80052EBC; // type:func
 ObjM__InitStyleAndWorld = 0x80052F10; // type:func
 ObjM__TeardownStyle = 0x80053134; // type:func
+ObjM__TransferToOther = 0x800531CC; // type:func
+ObjM__OnSelectTransfer = 0x800531A0; // type:func

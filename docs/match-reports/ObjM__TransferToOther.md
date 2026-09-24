@@ -1,4 +1,6 @@
-# func_800531CC
+# ObjM__TransferToOther
+
+> Renamed from `func_800531CC` on 2026-09-24 (tools/rename.py). Address 0x800531cc.
 
 **Unit:** class_3bb8c_l · **Size:** 99 words (0x18C bytes) ·
 **Status: MATCHED 99/99**, whole-image SHA1 green. One of the two "large"
@@ -12,7 +14,7 @@ by the identical field offsets `self` and `other` are both read through:
 `0x0`, `0x3C`, `0x50`, `0x60`, `0x68`, `0x80`).
 
 ```c
-void func_800531CC(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
+void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     s32 ret;
     s32 sel;
     void *a1;

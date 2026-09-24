@@ -174,13 +174,13 @@ void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
     self->unk54->methods->slot48(self->unk54);
 }
 
-void func_800531A0(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
+void ObjM__OnSelectTransfer(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
     if (sel == 2) {
-        func_800531CC(self, self->unk58);
+        ObjM__TransferToOther(self, self->unk58);
     }
 }
 
-void func_800531CC(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
+void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     s32 ret;
     s32 sel;
     void *a1;
