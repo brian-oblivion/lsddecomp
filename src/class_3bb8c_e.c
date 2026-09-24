@@ -1,36 +1,57 @@
 #include "common.h"
 
 /*
- * class_3bb8c_e (round 14): 19 functions carved from the same 305-function
- * class_3bb8c remainder segment as class_3bb8c_b/_c/_d/_f, but they operate
- * on a class UNRELATED to Obj866E8/D_800866E8 (include/class_3bb8c.h) --
- * none of these 19 functions read or write anything typed there, and no
- * function in _b/_c/_d/_f calls into this unit (checked: the only cross-unit
- * calls are FROM this unit INTO class_3bb8c_f's BuildMemcardPath /
- * TaskObjF__EnableEvents / TaskObjF__DisableEvents / TaskObjF__TestEvents /
- * TaskObjF__ForEachEvent / TaskObjF__WaitForReadyEvent, never the reverse).
- * These declarations are kept local to this .c rather than moved into
- * include/class_3bb8c.h, per the project's cross-unit-prototype rule.
+ * class_3bb8c_e (round 14; named round 78, track 3): 19 functions carved
+ * from the same 305-function class_3bb8c remainder segment as
+ * class_3bb8c_b/_c/_d/_f. These declarations are kept local to this .c
+ * rather than moved into include/class_3bb8c.h, per the project's
+ * cross-unit-prototype rule.
  *
- * ROUND 60 CORRECTIONS to this comment. (1) Those six callees were described
- * here as "still-INCLUDE_ASM"; they are MATCHED C and have been for several
- * rounds -- the round-14 wording outlived the fact. (2) The original reason
- * given for keeping them local was "zero collision risk with the other two
- * runners editing that shared header this round", which froze one round's
- * staffing into a source comment; the durable reason is the rule, not who
- * happened to be running. (3) The "UNRELATED class" claim above concerns
- * Obj866E8 and still stands, but round 60 found concrete evidence that this
- * unit's Node3bb8cE and class_3bb8c_f's TaskObjF may be ONE class seen
- * through two independent local views: TaskObjF__OpenEvents fills Node3bb8cE's
- * events[4] at +0x014 and hands the same pointer to TaskObjF__EnableEvents.
- * A track-4 lead; see docs/match-reports/TaskObjF__EnableEvents.md.
+ * ROUND 78: `Node3bb8cE` IS `TaskObjF` (include/class_3bb8c.h,
+ * class_3bb8c_d.c/_f.c/_g.c) -- CONFIRMED, not just suspected. Round 60
+ * found `TaskObjF__OpenEvents` (this unit) filling the identical `events[4]`
+ * offset `TaskObjF::events` occupies and handing the same pointer straight
+ * to class_3bb8c_f.c's `TaskObjF__EnableEvents`, and flagged it as a
+ * track-4 lead (docs/match-reports/TaskObjF__EnableEvents.md). Round 78
+ * cross-checked it against `gTaskObjFMethods` itself
+ * (asm/data/76DC8.data.s): 9 of this unit's 19 functions are LITERAL
+ * entries of that table, at the exact offsets this unit had already
+ * derived independently for its own `BaseMethods3bb8cE`/`SelfMethods3bb8cE`
+ * views --
+ *   +0x00C finalize          = TaskObjF__Finalize
+ *   +0x010 addChild          = TaskObjF__AddChild
+ *   +0x014 removeChild       = TaskObjF__RemoveChild
+ *   +0x018 removeAllChildren = TaskObjF__RemoveAllChildren
+ *   +0x040..+0x060 (9 contiguous slots) = TaskObjF__SetCardSlot,
+ *     TaskObjF__OpenEvents, TaskObjF__CloseEvents, TaskObjF__CheckCardStatus,
+ *     TaskObjF__FormatCard, TaskObjF__ProbeMemcardFile,
+ *     TaskObjF__FindUnusedMemcardName, TaskObjF__CollectExistingMemcardFiles,
+ *     TaskObjF__CheckCardSpace
+ * and `TaskObjF__SetCardSlot` (+0x040) is the exact function
+ * `TaskObjF__TaskObjF`'s ctor calls directly as `self->methods->slot40(self,
+ * arg2)` (class_3bb8c_d.c) -- the same real object, same real vtable, two
+ * independent local views. `include/class_3bb8c.h`'s own `TaskObjFMethods`
+ * struct mis-marks +0x040 as padding (`pad3C[0x044-0x03C]`); it is a real
+ * slot -- proposed for track 4, see this round's match reports and the
+ * broadcast. The type stays `Node3bb8cE` here regardless: unifying it with
+ * `TaskObjF` is track 4's job, not track 3's, and the project's
+ * multiple-independent-local-views convention
+ * (docs/DECOMPILATION_LEARNINGS.md) is what makes keeping two names
+ * legitimate until then.
+ *
+ * The other five functions (`TaskObjF__ClearResourceSlots`,
+ * `TaskObjF__CardInfoAndLoadStatus`, `TaskObjF__CardInfoStatus`,
+ * `TaskObjF__CardLoadStatus`, `TaskObjF__OpenAndReadMemcardFile`,
+ * `TaskObjF__ProbeCardFreeSpace`) are NOT vtable entries (checked against
+ * the full `gTaskObjFMethods` table) -- private helpers the slotted
+ * functions above call, mostly wrapping the PS-X memory-card BIOS calls
+ * (`_card_info`/`_card_load`/`_card_clear`, `open`/`read`/`close`/`delete`,
+ * `format`) behind this class's own retry idiom.
  *
  * The object derives from the same BasicClass framework documented in
  * include/code_8220.h (base vtable fetched via a no-argument getter,
- * Get_vtable_BasicClass(), with finalize/addChild/removeChild/removeAllChildren at
- * +0x00C/+0x010/+0x014/+0x018) -- this unit's own independent local view of
- * that same getter, per the project's established
- * multiple-independent-local-views convention (docs/DECOMPILATION_LEARNINGS.md).
+ * Get_vtable_BasicClass()) -- this unit's own independent local view of
+ * that same getter.
  */
 typedef struct BaseMethods3bb8cE BaseMethods3bb8cE;
 struct BaseMethods3bb8cE {
@@ -113,12 +134,16 @@ extern s32 TaskObjF__WaitForReadyEvent(void *self);
 extern s32 D_80086E78[4];
 extern s32 OpenEvent(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
-/* Two format-string-like globals selected by TaskObjF__FormatCard on self->cardSlot's
- * truth value; passed opaquely (never dereferenced in this unit). */
+/* PS-X BIOS memcard device-name templates (asm/data/7B12C.sdata.s: literal
+ * "bu10:"/"bu00:", include/class_3bb8c.h's DeviceName866E8), selected by
+ * TaskObjF__FormatCard on self->cardSlot's truth value and passed opaquely
+ * to `format()` -- never dereferenced in THIS unit, so declared `s32` here
+ * rather than pulling in the shared struct type for an address-only use. */
 extern s32 gMcDevicePath1;
 extern s32 gMcDevicePath0;
-/* Third such constant, passed as BuildMemcardPath's 3rd argument by
- * TaskObjF__ProbeCardFreeSpace only. */
+/* Literal "TEMP" (asm/data/7B12C.sdata.s) -- the throwaway suffix
+ * TaskObjF__ProbeCardFreeSpace passes as BuildMemcardPath's 3rd argument to
+ * build a placeholder file name when probing free space. */
 extern s32 gMcTempFileSuffix;
 
 extern void *BMemPMgrAlloc(s32 size);
