@@ -61,7 +61,12 @@
  * are themselves addiu-$at blocked in their own units"; that is stale as of
  * round 21 and was removed rather than left to be believed.)  See CLAUDE.md's note on this.
  * ------------------------------------------------------------------------ */
-extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
+/* SpuVmKeyOn (round 76, was StartNote) is Sony libsnd/vmanager INTERNAL --
+ * unlike SsUtKeyOn (code_179d8_e.c), it has no public prototype in
+ * LIBSND.H (grep confirms no `Vm`-prefixed extern anywhere in that
+ * header), so this stays the byte-exact local-guess signature rather
+ * than a header copy. */
+extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3);
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 extern s16 SpuVmPBVoice(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);

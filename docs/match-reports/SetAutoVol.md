@@ -395,12 +395,12 @@ frame did not reveal anything beyond what was already on file.
 
 **This unit is now 4-for-4 this round: charlie's `dead[N]`/`if(0)`
 padding idiom recovers frame byte-alignment exactly every time (four
-measured cases: `SpuVmFlush`, `SetAutoPan`, `StartNote`, and
+measured cases: `SpuVmFlush`, `SetAutoPan`, `SpuVmKeyOn`, and
 this function), and has closed a missing-WORD-COUNT gap on none of them.**
 Every one of `code_179d8_m`'s frame gaps is pure unaddressed
 register-save-area padding — confirmed directly by grep in three of the
 four cases (`SetAutoVol`, `SpuVmFlush` here; `SetAutoPan` and
-`StartNote`'s own permuter `--stack-diffs` runs independently
+`SpuVmKeyOn`'s own permuter `--stack-diffs` runs independently
 confirmed zero stack differences) — with each function's real content
 residue (a redundant mask, a persisted early value, an addressing-cost
 difference, an early-materialization placement) living entirely
@@ -655,7 +655,7 @@ REVISITED, round 73: STALL improved to length-exact 223/231 (ins 1 / del 1), res
 `sdkname.py SetAutoVol`: **masked 0.00, shape 0.99** against libsnd
 `SetAutoVol` (3.3 `vmanager`, 227w). This is Sony's `SetAutoVol` in a build
 no disc carries (the `seqread` situation; matching as C is the project's
-practice for those, counted as library by address). See `StartNote.md`,
+practice for those, counted as library by address). See `SpuVmKeyOn.md`,
 round 73, for the rest of the unit.
 
 ### Preserved body rebuilt first

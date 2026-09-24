@@ -56,7 +56,7 @@ gap (see below).
    {...}` reproduces the extra `andi` on its own, nothing to do with
    surrounding context). Retail has no such mask; declaring the SAME
    local `u32 c2` instead (still assigned from `*src`, a `u8*`) drops it,
-   matching the sibling class already documented (`StartNote`'s
+   matching the sibling class already documented (`SpuVmKeyOn`'s
    `chan = call() & 0xFF` staying `s32` to get `slt` not `sltu` — same
    family: a byte-sized VALUE reused across multiple comparisons needs a
    wider LOCAL type even though the underlying quantity never exceeds a
@@ -150,7 +150,7 @@ next, but not assumed to help.
 operations needs a WIDER local type (`u32`, not `u8`) to avoid a
 spurious re-mask, even when every value in play fits in a byte — a
 fourth confirmed instance of the "declared width is a codegen decision"
-family, and specifically the same lever as `StartNote`'s
+family, and specifically the same lever as `SpuVmKeyOn`'s
 `chan`/`slt`-vs-`sltu` finding from round 27's other unit.** Isolated
 in under a second through the pinned pipeline; always test single-use
 vs. multi-use locals separately when a `u8`/`u16` variable's declared
@@ -483,7 +483,7 @@ reading a reused byte value through a SECOND local, rather than the
 SAME variable already holding the first byte's value, was enough to flip
 all three simultaneously. This is a variant of the project's existing
 "declared width/reuse affects codegen" family (see this report's own
-`u8`-vs-`u32` finding above and `StartNote`'s `chan` finding), but the
+`u8`-vs-`u32` finding above and `SpuVmKeyOn`'s `chan` finding), but the
 lever here is introducing a SEPARATE variable for a second, unrelated use
 of what is conceptually the same kind of value (a decoded byte), not
 widening one variable's type. Worth trying on any register-identity stall

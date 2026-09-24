@@ -64,7 +64,9 @@
  * for a function ANOTHER unit defines stays in this .c, not in a shared
  * header. */
 extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
-extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
+/* SpuVmKeyOn (round 76, was StartNote): Sony libsnd/vmanager INTERNAL,
+ * no public LIBSND.H prototype (unlike SsUtKeyOn) -- kept byte-exact. */
+extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
 extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
 /* Psy-Q libsnd, linked from the SDK objects (round 34): `ut_rev` and
  * `vm_doff`. Both were carried as matched C in code_179d8_f.c until that
@@ -348,7 +350,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
         u8 vol = ptr[0x2C];
-        StartNote(packed, note, vol, (u8)a3, (u16)divided, status);
+        SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status);
         rec->unkA8 = (u8)speed;
     } else {
         s16 packed = (a1 << 8) | a0;

@@ -1,5 +1,23 @@
 # StartNote -- STALL, SDK-OWNED (libsnd SpuVmKeyOn, round 73): 27 words LONG (414/387 rebuilt round 73; previously recorded 402), 14/387 raw word-match, first diff at vram 0x8002FAC4 (function entry, register-save set / frame size)
 
+> Round 76 (bravo, track 2): renamed `StartNote` -> `SpuVmKeyOn` on 2026-09-24
+> (tools/rename.py). Evidence re-confirmed: `sdkname.py` still gives shape
+> 0.76/0.75 vs libsnd/vmanager SpuVmKeyOn on discs 3.3/3.6 (no disc carries
+> this exact build) with position bracketed by the already-identified
+> pinned neighbors `SpuVmFlush` before and `SpuVmKeyOff` after -- two
+> independent evidence kinds per the track 2 rule (fingerprint + position),
+> satisfying the bar without a header prototype (see below). This stays an
+> `INCLUDE_ASM` STALL: it is Sony's code and leaves every matching queue,
+> it is only being named here. The three call sites
+> (`src/code_179d8_j.c`, `src/code_179d8_k.c`, `src/code_179d8_j_c.c`) keep
+> their existing byte-exact local `extern` signatures rather than a
+> LIBSND.H copy: unlike `SsUtKeyOn`, `SpuVmKeyOn` is libsnd/vmanager
+> INTERNAL and has no public prototype in `include/psyq/LIBSND.H` (grep
+> confirms no `Vm`-prefixed extern anywhere in that header) -- a finding,
+> not something to paper over.
+
+> Renamed from `StartNote` on 2026-09-24 (tools/rename.py). Address 0x8002fac4.
+
 > Renamed from `func_8002FAC4` on 2026-09-20 (tools/rename.py). Address 0x8002fac4.
 
 Unit: `src/code_179d8_m.c`. Round 27, runner bravo. This is the ordered
@@ -9,8 +27,8 @@ function.
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/StartNote.s            -> no hits
-grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_m/StartNote.s \
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SpuVmKeyOn.s            -> no hits
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_m/SpuVmKeyOn.s \
   | grep -E '\b(mult|multu|div|divu)\b'                                   -> no hits
 ```
 
@@ -34,7 +52,7 @@ function showed a genuine content/order mismatch in this round's reading.
 
 Re-spliced this exact preserved body and rebuilt from scratch. **All title
 figures reconfirmed:** `objdump -t build/src/code_179d8_m.c.o` shows
-`StartNote` at `0x648` bytes = **402 words**, retail 387 (15 long,
+`SpuVmKeyOn` at `0x648` bytes = **402 words**, retail 387 (15 long,
 exactly as titled), and `funcdiff.py`'s in-range figure is **6/387** with
 its drift warning firing, matching this report's own caution. No new axis
 attempted this round: this is fresh ground from the immediately preceding
@@ -46,21 +64,21 @@ correctly triaged as such by the work order.
 ## Signature -- corroborated independently by three sibling units, not just derived here
 
 ```c
-s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
+s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 ```
 
-Before writing any C, `grep -rn StartNote src/*.c docs/match-reports/*.md`
+Before writing any C, `grep -rn SpuVmKeyOn src/*.c docs/match-reports/*.md`
 turned up this **exact** signature already guessed independently by
 `code_179d8_i.c`, `code_179d8_j.c` and `code_179d8_k.c` (each calls this
 function and typed it from its own call site), plus two live call sites
 with concrete argument roles:
 
 - `code_179d8_j.c`'s `SpuVmSeKeyOn` (matched): `return
-  StartNote(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
+  SpuVmKeyOn(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
   0x21` is a real sentinel value this function itself branches on (see
   below).
 - `code_179d8_k.c`'s `NoteOn` (its own report, STALL):
-  `StartNote(packed, note, vol, (u8)a3, (u16)divided, status)` where
+  `SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status)` where
   `packed = (a1<<8)|a0` is a `[screen | slot<<8]` pair into the SAME
   `D_800902E8[][]` array this function itself indexes with `a0`. This
   confirms `a0`'s low byte is a `D_800902E8` row index and its next byte an
@@ -112,7 +130,7 @@ until you diff registers, not just word counts.
 
 ## Where this came from: a sibling unit had already typed almost everything
 
-Before deriving anything by hand, `grep -rn StartNote src/*.c` found
+Before deriving anything by hand, `grep -rn SpuVmKeyOn src/*.c` found
 this function's signature independently triple-corroborated (above), and
 `code_179d8_j.c`'s header comment for its OWN (still-`INCLUDE_ASM`)
 `SsUtKeyOn` already named the exact same globals this function
@@ -269,12 +287,12 @@ content, control flow and field accesses are unaffected -- both are
 symbol-naming bugs that could only be caught by actually linking the
 body**, which is precisely round 33's lesson this round's brief called out
 by name. With both fixed, **the title's length figure reconfirms exactly**:
-`objdump -t build/src/code_179d8_m.c.o` shows `StartNote` at `0x648`
+`objdump -t build/src/code_179d8_m.c.o` shows `SpuVmKeyOn` at `0x648`
 bytes = **402 words** (retail 387, 15 words LONG, exactly as titled).
 
 ### Permuter search
 
-`tools/setup-permuter.sh StartNote <seed>` -- seed built from this
+`tools/setup-permuter.sh SpuVmKeyOn <seed>` -- seed built from this
 report's preserved body with both fixes above applied. See the Permuter
 result subsection for the base `--debug --stack-diffs` score and the real
 search's outcome (iteration count and `rc`). Lowest priority of the five
@@ -300,7 +318,7 @@ with a **reduced `timeout 600`** (10 minutes) rather than the full 900,
 per this report's own note that a shorter bound is acceptable here if the
 round's budget is tight. **Completed cleanly, `rc=124`** (own bound) after
 **51,596 iterations**. Best score: **12471** (from base 15053), saved at
-`permuter-work/StartNote/output-12471-1/`; no zero reached. Given the
+`permuter-work/SpuVmKeyOn/output-12471-1/`; no zero reached. Given the
 base score's scale (15053, an order of magnitude above the other four
 functions' bases) and the modest fractional improvement in 51k iterations,
 this reads as consistent with the report's own "two residues, ~10-12 words
@@ -369,7 +387,7 @@ SHA1 reconfirmed green.
 frame-padding idiom recovers frame byte-alignment exactly every time it is
 applied to a measured frame-size gap, and it has closed a missing-WORD-COUNT
 gap ZERO of three times on this unit** (`SpuVmFlush`, `SetAutoPan`,
-`StartNote`) -- including on a function that is overall LONG (this one,
+`SpuVmKeyOn`) -- including on a function that is overall LONG (this one,
 15 words over) as readily as on the two that are SHORT. The common thread
 across the unit's three tests: every one of this unit's frame gaps is pure
 unaddressed register-save-area padding, with whatever content residue the
@@ -451,9 +469,9 @@ extern s32 note2pitch(void);
 extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 
-/* Called as `StartNote(0x21, p0, p1, p2, outA, outB)` from
+/* Called as `SpuVmKeyOn(0x21, p0, p1, p2, outA, outB)` from
  * code_179d8_j.c's SpuVmSeKeyOn and as
- * `StartNote(packed, note, vol, (u8)a3, (u16)divided, status)` from
+ * `SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status)` from
  * code_179d8_k.c's NoteOn -- signature confirmed independently
  * by three sibling units' own extern guesses (code_179d8_i/_j/_k all
  * agree on this exact shape). `a0` is a packed [screen | slot<<8]
@@ -462,7 +480,7 @@ extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
  * 7-bit-percentage volume/pan bytes staged into the same
  * D_8008EA10/D_8008EA11 scratch globals the interpolation-setup
  * functions elsewhere in this unit use. */
-s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
+s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
 {
     Entry90902E8M *s6;
     SlotE968M *slot;
@@ -591,7 +609,7 @@ it again.
 
 ## Naming
 
-**StartNote** (was `func_8002FAC4`) -- Tier A. Signature and role
+**SpuVmKeyOn** (was `func_8002FAC4`) -- Tier A. Signature and role
 corroborated independently by three sibling units (`code_179d8_i.c`,
 `code_179d8_j.c`, `code_179d8_k.c`, per this report's own "Signature"
 section) before any body-level derivation: `code_179d8_k.c`'s
@@ -657,7 +675,7 @@ reverted: `build exit=2`, no compile-error grep hits.
   the 402 figure was measured on (two stale-symbol fixes landed in round
   37 and the body was promoted in round 67); the figure above is this
   round's measurement.
-- `funcdiff.py StartNote`: `14/387`, `insertions 123 / deletions 123`,
+- `funcdiff.py SpuVmKeyOn`: `14/387`, `insertions 123 / deletions 123`,
   positional skeleton diffs 371 -- untrustworthy by construction with a
   27-word length gap (funcdiff's own out-of-range warning fired).
 
@@ -667,7 +685,7 @@ The assignment's ownership note gave `sdkname.py` shape 0.76 against
 `SpuVmKeyOn` (libsnd/vmanager, 3.3) and asked for a reading. The reading
 says it IS that function, a different build of it:
 
-1. **Signature.** `StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)`
+1. **Signature.** `SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)`
    is libsnd's `SpuVmKeyOn(seq_sep_no, vabId, prog, note, voll, pan)`
    argument-for-argument: `a0` packs `[sep|seq]` and indexes
    `D_800902E8[seq][sep]` (`_ss_score`, 0xAC-byte score records), `a1`/`a2`
@@ -675,18 +693,18 @@ says it IS that function, a different build of it:
    tone's min/max note, `a4 == 0` routes to key-off, `a5` is the pan.
 2. **Call sequence.** Sony's 3.3 `vmanager.o` `SpuVmKeyOn` calls, in
    order, `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`, `SpuVmDoAllocate`.
-   StartNote calls `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`,
+   SpuVmKeyOn calls `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`,
    `SpuVmDoAllocate`, then `vmNoiseOn`/`note2pitch`+`SpuVmKeyOnNow`. The
    callee names this project already carries for the first and last
    (`SpuVmVSetUp`, `note2pitch`) are Sony's own.
 3. **Tone-scan loop.** Sony's 3.3 body has the six-`andi 0xff` run
    (`andi v1,a1,0xff; andi v0,a2,0xff; andi v1,v1,0xff; andi v0,a1,0xff;
    andi v0,a2,0xff; andi v1,s1,0xff`) followed by `sll v0,v0,4` tone
-   indexing; retail StartNote has the identical six-`andi` run at 0x2044C..
+   indexing; retail SpuVmKeyOn has the identical six-`andi` run at 0x2044C..
    0x204F4 with the same registers.
 4. **The `0x21` test.** Sony's 3.6 `vm_key.o` `SpuVmKeyOn` has
    `li v0,0x21` -- libsnd's "seq_sep_no 33 = not a sequence" marker;
-   StartNote's `if ((s16) a0 != 0x21)` at 0x206CC is the same test.
+   SpuVmKeyOn's `if ((s16) a0 != 0x21)` at 0x206CC is the same test.
 
 `masked 0.00` against every disc only says no disc carries THIS build;
 the game's libsnd matches neither 3.3 nor 3.6 here, the same situation as
