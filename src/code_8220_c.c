@@ -47,32 +47,21 @@ typedef struct {
     s16 x, y;
 } Vec2s16_98;
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 76/84 words, length exact. Residue: family-shared register
- * identity ($a2 vs $a1, duplicated OT mask) plus a missing delay-slot
- * filler `addiu $v0,$s1,0x1c` (docs/match-reports/func_8001989C.md).
- * This function's own self/prim register-swap sub-residue is closed by a
- * permuter-found lead (do/while(0) wrap + partial vtx0 caching), reviewed
- * and confirmed semantically equivalent to the disassembly, not scorer-
- * exploiting UB. Hand-derived (with a reviewed permuter-found lever). */
-void func_8001989C(void *arg0, void *arg1) {
+/* Returns the next packet pointer: arg0 + sizeof(POLY_G3) = 0x1C when the
+ * primitive is spliced into the OT directly, else RCpolyG3's own return
+ * (cast: RCpolyG3 is declared void in code_8220.h). Same shape as
+ * func_800197C4. */
+void *func_8001989C(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
-    u8 *vtx0;
 
-    if (*(s32 *)(prim + 0x78) == 0) {
-        do {
-            ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
-            (*(OtTag **)(prim + 0x30))->addr = (u32)self;
-        } while (0);
-    } else {
+    if (*(s32 *)(prim + 0x78) != 0) {
         func_8001A380(D_8008ACD0, prim, self + 0x4, 0, 0, 0);
         func_8001A3EC((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
 
-        vtx0 = *(u8 **)(prim + 0x88);
-        *(u16 *)(vtx0 + 0xA) = *(u8 *)(self + 0xF);
+        *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0xA) = *(u8 *)(self + 0xF);
         *(u16 *)(*(u8 **)(prim + 0x90) + 0xA) = *(u8 *)(self + 0x17);
 
@@ -80,12 +69,12 @@ void func_8001989C(void *arg0, void *arg1) {
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
 
-        RCpolyG3(self, D_8008ACD0);
+        return ((void *(*)(void *, void *))RCpolyG3)(self, D_8008ACD0);
     }
+    ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+    (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+    return self + 0x1C;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001989C);
-#endif
 
 /* Returns the next packet pointer: arg0 + sizeof(POLY_FT3) = 0x20 when the
  * primitive is spliced into the OT directly, else RCpolyFT3's own return
