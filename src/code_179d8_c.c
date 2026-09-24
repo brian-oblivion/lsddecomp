@@ -59,6 +59,31 @@
  * next to the code, in this file. Do not create a shared code_179d8*.h --
  * the sibling slices are staffed independently and a shared header is what
  * makes their merges collide.
+ *
+ * ROUND 78 (track 3 naming pass): this unit has no class (not in
+ * `classtable.py --scan`) -- it is Sony's sound-system init, reconstructed
+ * as C rather than linked as an object, matching the `libsnd/vm_vsu` and
+ * `libsnd/sstable` objects placed immediately before and after it.
+ * `_SsInit` is already Sony-identified and MATCHED (round 63); leave it.
+ * `func_80032368`/`func_80032388` (its arg=0/arg=1 wrappers) each score an
+ * EXACT(1.00) `sdkname.py` fingerprint, position-decided to the same
+ * libsnd/libspu window as the two placed objects flanking this slice --
+ * the same shape as this round's `GsSetNearClip`/`GsSetWorkBase` finding
+ * (CLAUDE.md, "never write C for a function a Sony object owns"). NOT
+ * given game names; left `func_`. Do not rename `func_80036AA8` (called
+ * from `_SsInit`, arg=1 path) -- its Sony ownership is an open question
+ * with the head/operator, per this round's brief.
+ *
+ * `_SsInit`'s data: `D_8008EA00`/`D_8008E934` are Sony-pinned in
+ * `config/psyq-objects.ld` (`_snd_openflag`/`_snd_ev_flag`, same
+ * addresses) but still carry placeholder names here -- proposed to the
+ * head for `rename.py` rather than applied directly, since `_snd_ev_flag`
+ * also appears in `src/code_179d8_j_b.c`, outside this unit. The two SPU
+ * register-init templates `D_8006DC5C`/`D_8006DC6C` and the per-voice
+ * state array `D_80090368` are read only by `_SsInit` itself (a Sony
+ * function), so per the "field only Sony functions read" rule they are
+ * left unnamed rather than given game names, even though the two
+ * templates are textually unique to this unit.
  */
 #include "common.h"
 
