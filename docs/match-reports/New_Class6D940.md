@@ -1,4 +1,6 @@
-# new_class_6d940
+# New_Class6D940
+
+> Renamed from `new_class_6d940` on 2026-09-24 (tools/rename.py). Address 0x8002c12c.
 
 **Unit:** code_179d8_d · **Size:** 24 instructions (0x60 bytes) ·
 **Status: MATCHED 24/24**, whole-image SHA1 green. Matched on the first
@@ -7,19 +9,19 @@ attempt.
 ## Role
 
 Allocator: `BMemPMgrAlloc(0x34)`, and on success dispatches
-`func_8002C3A8()->slot08(self, arg1)` (that slot IS `func_8002C18C`, this
+`GetClass6D940Methods()->slot08(self, arg1)` (that slot IS `Class6D940__Class6D940`, this
 unit, matched this round -- see its own report), returning the new
 instance; returns `NULL` on allocation failure.
 
 ```c
-void *new_class_6d940(s32 arg1)
+void *New_Class6D940(s32 arg1)
 {
     void *self;
     Table6D940 *table;
 
     self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
-        table = func_8002C3A8();
+        table = GetClass6D940Methods();
         table->slot08(self, arg1);
         return self;
     }
@@ -48,3 +50,13 @@ class-framework instance.
 `BMemPMgrAlloc` (the pool allocator, already established in
 `include/class_16334.h`/`include/code_8220.h`) declared LOCAL to this file
 since neither shared header is included here.
+
+## Naming (round 77, charlie -- track 3)
+
+Renamed `new_class_6d940 -> New_Class6D940`, tier A. Matches the project's
+`New_Class` allocator convention exactly. This function's own class,
+`D_8006D940`/`Class6D940Methods`, IS real class-framework data
+(`tools/classtable.py 0x8006D940`, 30 slots) -- the "NOT class-framework
+code" language in the `## Role` section above predates the round-77
+correction recorded in the unit header comment and is left as written
+history.

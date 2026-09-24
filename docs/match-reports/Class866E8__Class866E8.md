@@ -20,7 +20,7 @@ struct BaseCtorTable_3ac78 {
 
 extern BaseCtorTable_3ac78 *func_800428E4(void);
 extern UnkSlotChildObj_3ac78 *func_80048894(void);
-extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
+extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
 extern s32 func_80020C5C(void);
 extern Vec3_3ac78 gDefaultOrigin;
@@ -65,7 +65,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         entry->unk2 = i;
         entry->unk0 = 0;
 
-        entry->unk8 = new_class_6d940(0);
+        entry->unk8 = New_Class6D940(0);
         entry->unkC = New_Class86AA0();
         entry->unkC->methods->slot4C(entry->unkC, self, &self->unk54);
 
@@ -113,7 +113,7 @@ established elsewhere in this project), sets `self->methods`, copies a
 3-word block into `self->unk54` (from `arg1` if given, else a default
 global), zeroes several scalar fields, then fills `self->unkEC[0..6]`
 (7 slot entries): each gets a child object (`func_80048894`), a list object
-(`new_class_6d940`), a generic object (`New_Class86AA0`) dispatched with the
+(`New_Class6D940`), a generic object (`New_Class86AA0`) dispatched with the
 just-copied `self->unk54` block, and a freshly-allocated 0x668-byte buffer
 of pointers -- each pointer itself a `New_Class86AA0()`-created object,
 initialized via a rect-packing-style budget (`buf[0]`/`buf[2]`, wrapping
@@ -153,12 +153,12 @@ here since this function only DISPATCHES to it, never inlines its body).
    `self->unk54 = *arg1;` / `self->unk54 = gDefaultOrigin;` instead of
    field-by-field fixed a register-swap-and-shift residue immediately
    (23/163 -> 70/163 in one change).
-2. **`new_class_6d940` takes an argument, not zero.** Retail sets
+2. **`New_Class6D940` takes an argument, not zero.** Retail sets
    `$a0 = 0` right after the `slot88` dispatch and never touches it again
    before the `jal` -- the "leftover register is a forwarded/explicit
    argument" tell, same family as this round's `class_3bb8c_i` slot-arity
    fixes, except here the argument is a plain literal `0` rather than
-   forwarded. Declaring it `(s32 arg1)` and calling `new_class_6d940(0)`,
+   forwarded. Declaring it `(s32 arg1)` and calling `New_Class6D940(0)`,
    plus reordering the four field-zeroing statements to match retail's
    actual order (`unk14, unk18, unk2, unk0`, not declaration order),
    fixed a second residue (70/163 -> 86/163).
@@ -224,7 +224,7 @@ no accessor outside `src/class_3ac78.c`):
 | `UnkSlotEntry+0x000` | `flag` | B | Zeroed here and in `Class866E8__ResetAllElements`; `class_3bb8c`'s independent view names the same halfword `Elem::flag`. |
 | `UnkSlotEntry+0x002` | `key` | B | Set to the loop index here and copied on into `target->key`; `class_3bb8c`'s `func_8004B700` copies a caller-supplied key byte into the same field. |
 | `UnkSlotEntry+0x004` | `target` | B | `class_3bb8c` types the same pointer `ElemTarget *` from six functions. |
-| `UnkSlotEntry+0x008` | `list` | C-ish/B | Built here by `new_class_6d940(0)`; the name records only that it is the list object the entry owns. |
+| `UnkSlotEntry+0x008` | `list` | C-ish/B | Built here by `New_Class6D940(0)`; the name records only that it is the list object the entry owns. |
 | `UnkSlotEntry+0x00C` | `cellParent` | B | Initialized here with `slot4C(cellParent, self, &self->origin)` and then passed as the PARENT argument of every grid cell's own `slot4C(cell, cellParent, buf)`. Its role in this function is exactly "the node the cells hang off". |
 | `UnkSlotEntry+0x010` | `cells` | A | 0x668 raw bytes allocated here and filled with freshly built cell objects, one per 4 bytes; `Class866E8__Finalize` walks the same span tearing them down; `class_3bb8c`'s byte-matched `Class866E8__SetFootprintCellFlag` indexes the same block as a 2D grid. |
 

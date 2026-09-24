@@ -21,7 +21,7 @@
  * `libc2/strncmp.o`. Five had been matched as C -- they were Sony's the whole
  * time, and reclassifying them out of the game count is the correction
  * CLAUDE.md asks for, not a regression. The unit is now 0x1C92C..0x1CC08
- * (vram 0x8002C12C..), new_class_6d940 onward, 14 functions. The ISO9660
+ * (vram 0x8002C12C..), New_Class6D940 onward, 14 functions. The ISO9660
  * directory-record views and diagnostic-string externs that lived here went
  * with the functions; the stall's preserved body is in its report.
  *
@@ -29,7 +29,7 @@
  * Screened 17/20 clean on the three-grep blocker census -- the highest of
  * any window in this monolith -- but that number overstates its value: 9 of
  * the 20 are 4-6 word leaves, and splat matched five of those itself as
- * empty `jr $ra; nop` bodies (func_8002C3C0/C3C8/C3F0/C3F8/C400 below).
+ * empty `jr $ra; nop` bodies (VabDriver__VabDriver/C3C8/C3F0/C3F8/C400 below).
  * Those five count as `matched` in tools/progress.py without having been
  * work, which is exactly the caveat CLAUDE.md attaches to that column.
  *
@@ -48,7 +48,7 @@
  * Their stub reports are gone.  The previous version of this comment listed
  * both as "blocked, have stub reports", which by round 24 was a stale
  * DIRECTIVE over free ground -- the fourth unit in two rounds to carry one.
- * func_8002C278 was originally screened as a third (nop_mflo_mfhi) but
+ * Class6D940__ResolveEntry was originally screened as a third (nop_mflo_mfhi) but
  * that screen was inverted (checked mult/div BEFORE mflo/mfhi instead of
  * after) -- the head corrected it mid-round and deleted the stub report.
  * It is fresh ground; the mult/mfhi pair in its body is retail's signed-
@@ -58,12 +58,27 @@
  * jump table -- all seven jtbl blocks in the 0xFD8 rodata slot fall outside
  * 0x8002BC40..0x8002C408 -- so no rodata sub-slot is attached to it.
  *
- * Sibling-slice finding worth having up front (established in code_179d8_b,
- * round 16): this region is NOT class-framework code. tools/classtable.py
- * --scan has no hit anywhere near these globals, and the neighbouring
- * functions read as a low-level serial/link driver poking raw control words
- * into a block of globals that look like hardware/SIO register staging. Do
- * not expect vtables here; do not go looking for a `this` pointer.
+ * ROUND 77 CORRECTION (naming pass, charlie): the paragraph below (round 16,
+ * code_179d8_b's sibling-slice finding) is WRONG for this unit and must not
+ * be trusted for it again. `python3 tools/classtable.py --scan` DOES hit
+ * this unit's own globals: `D_8006D940` is a real 30-slot Class6D430-derived
+ * vtable (header word 0x00000E03), confirmed by `tools/classtable.py
+ * 0x8006D940` -- slots +0x004/+0x05C/+0x060 are the SAME
+ * `DestroyChained`/`Class6D430__FreeBuffer`/`NoOp` symbols the base class and
+ * its CD-driver sibling (`D_8006D4E8`, code_179d8_q.c) share verbatim, +0x008
+ * is a genuine ctor (`Class6D940__Class6D940`), +0x00C a genuine dtor
+ * (`Class6D940__Destroy`), and `D_8006D940`'s own getter (`GetClass6D940Methods`,
+ * ex-`func_8002C3A8`) is registered in `D_8006D4AC` (code_171e0.c) -- the
+ * NULL-terminated array of "class-method-table getters of every
+ * Class6D430-derived client" -- as that array's FIRST entry
+ * (`asm/data/5DB70.data.s`). So this unit's own class (kept address-named
+ * `Class6D940`, no game-purpose evidence yet) is a real, registered
+ * `SetActiveDataSource`-client sibling of `VabStreamObj`
+ * (code_179d8_e.c) and the CD-read driver (code_179d8_q.c) -- do go looking
+ * for `this->methods->slotN(this, ...)` dispatch here; it is real. This does
+ * NOT extend to the REST of the unit's globals: no other classtable.py hit
+ * exists in this window, so the "low-level control-word staging" read below
+ * may still hold for whatever is not `D_8006D940`/`Class6D940Methods`-shaped.
  *
  * Declarations: keep anything that encodes THIS unit's reading of the region
  * next to the code, in this file. Do NOT create a shared code_179d8*.h --
@@ -73,40 +88,46 @@
 #include "common.h"
 
 /*
- * D_8006D940: a function-pointer table this unit's own `new_class_6d940`/
- * `func_8002C18C` dispatch through. Named/typed as a plain local struct,
- * NOT claimed to be a class-framework vtable -- per this unit's header
- * comment (sibling-slice finding: no classtable.py hit anywhere near this
- * region). Only the two slots this unit's own functions reach are typed;
- * the rest stays opaque padding. Kept LOCAL to this file, not a shared
- * header, per this round's rule for code_179d8 slices.
+ * D_8006D940: a REAL 30-slot Class6D430-derived class-framework vtable
+ * (see the round-77 correction in the unit header comment above --
+ * `tools/classtable.py 0x8006D940` confirms it, contradicting the earlier
+ * round-16 "no classtable.py hit" finding). `Class6D940Methods`/`Class6D940`
+ * are this unit's own local names (kept address-based: no game-purpose
+ * evidence yet for what the class represents). Only the slots this unit's
+ * own functions define or dispatch through are typed here; the inherited
+ * BasicClass/Class6D430 slots (+0x010..+0x038, +0x05C, +0x060) are left as
+ * opaque padding since nothing in this unit calls them directly -- see
+ * `include/code_171e0.h`/`class_16334.h` for their own typed views of the
+ * same physical layout. Kept LOCAL to this file, not a shared header, per
+ * this round's rule for code_179d8 slices (independent local views are
+ * this project's convention; unifying is track 4's job).
  */
-typedef struct Table6D940 Table6D940;
-struct Table6D940 {
+typedef struct Class6D940Methods Class6D940Methods;
+struct Class6D940Methods {
     u8 pad000[0x008];
-    /* +0x008, new_class_6d940's own dispatch -- this IS func_8002C18C
+    /* +0x008, New_Class6D940's own dispatch -- this IS Class6D940__Class6D940
      * itself (same 2-arg (self, arg1) shape). */
     void (*slot08)(void *self, s32 arg1);
     u8 pad00C[0x06C - 0x00C];
-    /* +0x06C, func_8002C18C's own conditional dispatch. */
+    /* +0x06C, Class6D940__Class6D940's own conditional dispatch. */
     void (*slot6C)(void *self, s32 arg1);
 };
-extern Table6D940 D_8006D940;
+extern Class6D940Methods D_8006D940;
 
-/* Forward-declared: defined below at its own ROM address (func_8002C3A8),
- * but called here (new_class_6d940, func_8002C18C) before that point in the
+/* Forward-declared: defined below at its own ROM address (GetClass6D940Methods),
+ * but called here (New_Class6D940, Class6D940__Class6D940) before that point in the
  * file. Without this, cc1 implicitly declares it `int`, which happens to be
  * byte-identical on this ABI but is a lie about the real signature. */
-Table6D940 *func_8002C3A8(void);
+Class6D940Methods *GetClass6D940Methods(void);
 
-/* The 0x34-byte object new_class_6d940 allocates. Only the fields
- * func_8002C18C itself touches are named. */
-typedef struct Obj6D940 Obj6D940;
-struct Obj6D940 {
-    Table6D940 *methods; /* +0x000, func_8002C18C */
+/* The 0x34-byte object New_Class6D940 allocates. Only the fields
+ * Class6D940__Class6D940 itself touches are named. */
+typedef struct Class6D940 Class6D940;
+struct Class6D940 {
+    Class6D940Methods *methods; /* +0x000, Class6D940__Class6D940 */
     u8 pad004[0x02C - 0x004];
-    s32 unk2C;            /* +0x02C, func_8002C18C: zeroed */
-    s32 unk30;             /* +0x030, func_8002C18C: zeroed */
+    s32 unk2C;            /* +0x02C, Class6D940__Class6D940: zeroed */
+    s32 unk30;             /* +0x030, Class6D940__Class6D940: zeroed */
 };
 
 /*
@@ -118,15 +139,15 @@ struct Obj6D940 {
 typedef struct BaseTable6D940 BaseTable6D940;
 struct BaseTable6D940 {
     u8 pad000[0x008];
-    void (*slot08)(void *self); /* +0x008, func_8002C18C's own base-chain call */
-    /* +0x00C, func_8002C200's own dispatch -- that function's whole body
+    void (*slot08)(void *self); /* +0x008, Class6D940__Class6D940's own base-chain call */
+    /* +0x00C, Class6D940__Destroy's own dispatch -- that function's whole body
      * is this one call with nothing after it, so its own return type is
      * genuinely ambiguous (a void wrapper around an s32 tail call is
      * byte-identical); typed s32 here per CLAUDE.md's rule to default to
      * `return callee(...)` absent positive void evidence. */
     s32 (*slot0C)(void *self);
     u8 pad010[0x064 - 0x010];
-    /* +0x064, func_8002C238's own dispatch -- same tail-call ambiguity as
+    /* +0x064, Class6D940__SetFlag's own dispatch -- same tail-call ambiguity as
      * slot0C above. */
     s32 (*slot64)(void *self);
 };
@@ -137,24 +158,24 @@ extern BaseTable6D940 *GetActiveDataSourceMethods(void);
  * this unit does not include either header. */
 extern void *BMemPMgrAlloc(s32 size);
 
-void *new_class_6d940(s32 arg1)
+void *New_Class6D940(s32 arg1)
 {
     void *self;
-    Table6D940 *table;
+    Class6D940Methods *table;
 
     self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
-        table = func_8002C3A8();
+        table = GetClass6D940Methods();
         table->slot08(self, arg1);
         return self;
     }
     return NULL;
 }
 
-void func_8002C18C(Obj6D940 *self, s32 arg1)
+void Class6D940__Class6D940(Class6D940 *self, s32 arg1)
 {
     GetActiveDataSourceMethods()->slot08(self);
-    self->methods = func_8002C3A8();
+    self->methods = GetClass6D940Methods();
     self->unk2C = 0;
     self->unk30 = 0;
     if (arg1 != 0) {
@@ -162,19 +183,19 @@ void func_8002C18C(Obj6D940 *self, s32 arg1)
     }
 }
 
-s32 func_8002C200(void *self)
+s32 Class6D940__Destroy(void *self)
 {
     return GetActiveDataSourceMethods()->slot0C(self);
 }
 
-s32 func_8002C238(s32 *self)
+s32 Class6D940__SetFlag(s32 *self)
 {
     self[0xC] = 1;
     return GetActiveDataSourceMethods()->slot64(self);
 }
 
 /*
- * func_8002C278's own "descriptor" pointer, resolved either from a cached
+ * Class6D940__ResolveEntry's own "descriptor" pointer, resolved either from a cached
  * byte offset (Obj278::unk34) or freshly from `index*12+8` into
  * Ctx278::unk10's byte array. Field meaning unestablished beyond
  * offset/width -- this region reads as raw hardware/SIO register staging
@@ -190,7 +211,7 @@ typedef struct Entry278 {
     s32 unk8;  /* +0x8 */
 } Entry278;
 
-/* func_8002C278's own object (its own `arg1`). Only the fields this
+/* Class6D940__ResolveEntry's own object (its own `arg1`). Only the fields this
  * function itself touches are named. */
 typedef struct Obj278 {
     u8 pad0[0xC];
@@ -213,14 +234,14 @@ typedef struct Ctx278Sub Ctx278Sub;
 struct Ctx278SubMethods {
     u8 pad000[0x080];
     /* (self, desc->unk2, index, obj): the last two are forwarded from
-     * func_8002C278's own parameters, so they emit no set-up code. */
+     * Class6D940__ResolveEntry's own parameters, so they emit no set-up code. */
     s32 (*slot80)(Ctx278Sub *self, s32 unk2, s32 index, Obj278 *obj);
 };
 struct Ctx278Sub {
     Ctx278SubMethods *methods;
 };
 
-/* func_8002C278's own `arg0`. Only the fields this function itself
+/* Class6D940__ResolveEntry's own `arg0`. Only the fields this function itself
  * touches are named. */
 typedef struct Ctx278 {
     u8 pad0[0x10];
@@ -229,7 +250,7 @@ typedef struct Ctx278 {
     Ctx278Sub *unk2C; /* +0x2C */
 } Ctx278;
 
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 whole;
@@ -264,7 +285,7 @@ s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
 }
 
 
-Table6D940 *func_8002C3A8(void)
+Class6D940Methods *GetClass6D940Methods(void)
 {
     return &D_8006D940;
 }
@@ -274,10 +295,10 @@ s32 func_8002C3B8(void)
     return 0;
 }
 
-void func_8002C3C0(void) {
+void VabDriver__VabDriver(void) {
 }
 
-void func_8002C3C8(void) {
+void VabDriver__Destroy(void) {
 }
 
 void func_8002C3D0(void)

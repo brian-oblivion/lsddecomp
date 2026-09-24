@@ -1,4 +1,6 @@
-# func_8002C278 -- MATCHED (round 76, REVISIT-2; 76/76, length exact, 0 insertions / 0 deletions)
+# Class6D940__ResolveEntry -- MATCHED (round 76, REVISIT-2; 76/76, length exact, 0 insertions / 0 deletions)
+
+> Renamed from `func_8002C278` on 2026-09-24 (tools/rename.py). Address 0x8002c278.
 
 REVISITED, round 76: MATCHED 76/76 byte-exact (from 54/76) by the argument-count lever -- slot80 takes four arguments; names/types used (the unit's own Ctx278/Obj278/Entry278, slot80 retyped)
 
@@ -71,7 +73,7 @@ No permuter search this round (not needed: 12 builds to the match). No
 /* in Ctx278SubMethods */
     s32 (*slot80)(Ctx278Sub *self, s32 unk2, s32 index, Obj278 *obj);
 
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 whole;
@@ -131,7 +133,7 @@ arity that mattered was the callee's, not the function's own.
 
 ## History: the stall as filed through round 60 (superseded)
 
-Original title: func_8002C278 -- STALL (length EXACT; 54/76 words; 0 insertions / 0 deletions -- every instruction is retail's, only register identity differs; first real diff 0x1CA88 `move a3,a1` vs `move t0,a1`)
+Original title: Class6D940__ResolveEntry -- STALL (length EXACT; 54/76 words; 0 insertions / 0 deletions -- every instruction is retail's, only register identity differs; first real diff 0x1CA88 `move a3,a1` vs `move t0,a1`)
 
 NON_MATCHING body promoted, round 73.
 
@@ -155,7 +157,7 @@ correction.
 ```c
 #if 0
 /*
- * func_8002C278's own "descriptor" pointer, resolved either from a cached
+ * Class6D940__ResolveEntry's own "descriptor" pointer, resolved either from a cached
  * byte offset (Obj278::unk34) or freshly from `index*12+8` into
  * Ctx278::unk10's byte array. Field meaning unestablished beyond
  * offset/width -- this region reads as raw hardware/SIO register staging
@@ -171,7 +173,7 @@ typedef struct Entry278 {
     s32 unk8;  /* +0x8 */
 } Entry278;
 
-/* func_8002C278's own object (its own `arg1`). Only the fields this
+/* Class6D940__ResolveEntry's own object (its own `arg1`). Only the fields this
  * function itself touches are named. */
 typedef struct Obj278 {
     u8 pad0[0xC];
@@ -199,7 +201,7 @@ struct Ctx278Sub {
     Ctx278SubMethods *methods;
 };
 
-/* func_8002C278's own `arg0`. Only the fields this function itself
+/* Class6D940__ResolveEntry's own `arg0`. Only the fields this function itself
  * touches are named. */
 typedef struct Ctx278 {
     u8 pad0[0x10];
@@ -208,7 +210,7 @@ typedef struct Ctx278 {
     Ctx278Sub *unk2C; /* +0x2C */
 } Ctx278;
 
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 cached;
@@ -465,8 +467,8 @@ On the revisit hypothesis specifically: this unit's own types and names
 (`Entry278`, `Obj278`, `Ctx278`, `Ctx278Sub`) were authored BY this
 function's own earlier attempts and were already live in
 `src/code_179d8_d.c`, so there was nothing newer to import; the unit's
-other matched functions (`new_class_6d940`, `func_8002C18C`,
-`func_8002C200`, `func_8002C238`) touch a different object family
+other matched functions (`New_Class6D940`, `Class6D940__Class6D940`,
+`Class6D940__Destroy`, `Class6D940__SetFlag`) touch a different object family
 (`Obj6D940`/`Table6D940`) and share no field with this one. **Nothing in
 the four rounds of names and types since the stall was filed changed
 anything here.** What moved the score was re-reading the diff instead of
@@ -668,7 +670,7 @@ needs is in `src/code_179d8_d.c` already (`Entry278`, `Obj278`, `Ctx278`,
 
 ```c
 #if 0
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     Obj278 *p;
@@ -724,7 +726,7 @@ both green.
 
 ```c
 #if 0
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 cached;
@@ -798,3 +800,23 @@ Two sub-lessons, both independently reusable:
   out the reverse of the source order. If a `nop` sits after a load that
   retail fills, try moving that load's statement earlier in the source,
   not later.
+
+## Naming (round 77, charlie -- track 3)
+
+Renamed `func_8002C278 -> Class6D940__ResolveEntry`, tier B (mechanics
+established, purpose not). This is `D_8006D940`'s own `+0x078` slot -- a
+unique extension beyond Class6D430's base layout, confirmed by
+`tools/classtable.py 0x8006D940`. Resolves an `Entry278` descriptor for a
+grid-cell-shaped index (cached byte offset, or fresh `index*12+8` lookup),
+and when present computes position-like fields on a 0x800/0x400 lattice
+with row stride 20 before forwarding to `ctx->unk2C->methods->slot80`.
+That lattice/stride matches `class_3ac78.c`'s own header comment for
+`Class866E8`'s 20-column grid verbatim ("seeds every cell with a world
+position on a 0x800 lattice") -- a real lead for a future round, not
+claimed as proof here, since nothing in this unit confirms `ctx`/`self`
+are actually reached from that class. The pre-round-77-correction "no
+classtable.py hit nearby ... not class-framework data" language inside the
+preserved `#if 0` bodies above (Entry278's own comment) predates the
+correction and is left as written history, not edited (rewriting text
+inside a preserved stall body risks silently changing what was actually
+built and scored).

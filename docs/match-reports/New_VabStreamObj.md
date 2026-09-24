@@ -32,7 +32,7 @@ The `new_class_*`-style constructor for the `gVabStreamObjMethods` class: alloca
 (`VabStreamObj__VabStreamObj`, BLOCKED gp_rel -- not this unit's to write, only its
 prototype's shape matters here) as the actual constructor, which is where
 `self->methods` gets assigned (inside `VabStreamObj__VabStreamObj`'s own body, not here).
-Same idiom as `new_class_6d940` in the sibling `code_179d8_d.c`.
+Same idiom as `New_Class6D940` in the sibling `code_179d8_d.c`.
 
 `slot08`'s return value is discarded -- retail overwrites `$v0` with `self`
 unconditionally right after the `jalr`, regardless of what the constructor
@@ -50,5 +50,5 @@ Renamed `func_8002C480` -> `New_VabStreamObj`, tier A. Matches
 FINISHING-PLAN track 3's own constructor convention (`New_Class` for the
 allocate-and-dispatch entry point, `Class__Class` for the real per-object
 init) -- this function's whole body IS "malloc the object, dispatch to the
-real constructor," the same idiom already named `new_class_6d940` in the
+real constructor," the same idiom already named `New_Class6D940` in the
 sibling `code_179d8_d.c`.
