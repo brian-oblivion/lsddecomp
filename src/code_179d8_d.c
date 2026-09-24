@@ -119,7 +119,7 @@ typedef struct BaseTable6D940 BaseTable6D940;
 struct BaseTable6D940 {
     u8 pad000[0x008];
     void (*slot08)(void *self); /* +0x008, Class6D940__Class6D940's own base-chain call */
-    /* +0x00C, func_8002C200's own dispatch -- that function's whole body
+    /* +0x00C, Class6D940__Destroy's own dispatch -- that function's whole body
      * is this one call with nothing after it, so its own return type is
      * genuinely ambiguous (a void wrapper around an s32 tail call is
      * byte-identical); typed s32 here per CLAUDE.md's rule to default to
@@ -162,7 +162,7 @@ void Class6D940__Class6D940(Obj6D940 *self, s32 arg1)
     }
 }
 
-s32 func_8002C200(void *self)
+s32 Class6D940__Destroy(void *self)
 {
     return GetActiveDataSourceMethods()->slot0C(self);
 }
