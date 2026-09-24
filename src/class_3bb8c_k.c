@@ -72,8 +72,8 @@ struct ObjM_3bb8c_k {
     s32 unk70;                          /* +0x070, ObjM__ObjM: arg4 */
     s32 unk74;                          /* +0x074, ObjM__ObjM: arg3 (shared ObjM view: New_Obj6EAC0's ctx) */
     u8 pad78[0x080 - 0x078];
-    s32 unk80;                          /* +0x080, ObjM__ObjM: zeroed */
-    s32 unk84;                          /* +0x084, ObjM__ObjM: zeroed */
+    s32 pauseSetupStep;                 /* +0x080, ObjM__ObjM: zeroed; ObjM__AdvancePauseSetup's step counter (class_3bb8c_m, shared view unk80) */
+    s32 closeReady;                     /* +0x084, ObjM__ObjM: zeroed; set by ObjM__UpdateCloseReadyFlag, cleared by ObjM__ClearCloseReadyFlag, tested by ObjM__CloseAndNotifyC/D (shared view unk84) */
 };
 
 void Class86F88__SetState(Class86F88 *self, s32 state)
@@ -453,8 +453,8 @@ void ObjM__ObjM(ObjM_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4,
     self->unk6C = arg1;
     self->unk74 = arg3;
     self->unk70 = arg4;
-    self->unk80 = 0;
-    self->unk84 = 0;
+    self->pauseSetupStep = 0;
+    self->closeReady = 0;
     self->methods->slot40(self);
 }
 

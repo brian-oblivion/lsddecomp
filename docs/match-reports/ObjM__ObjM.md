@@ -88,3 +88,20 @@ register reuse.
 Round 75 (bravo, track 3). `func_80052C10` -> `ObjM__ObjM`, **tier A**.
 
 Slot +0x008 of D_80087034 (`tools/classtable.py 0x80087034`), the ctor New_ObjM calls. Runs the base Class86668 ctor, sets methods = GetObjMMethods(), stores its arguments and clears fields, then calls +0x040.
+
+Local view fields named round 75 (class_3bb8c_k's `ObjM_3bb8c_k` only):
+`pauseSetupStep` (+0x080) and `closeReady` (+0x084), tier B, from the
+named class_3bb8c_m methods that read them (ObjM__AdvancePauseSetup counts
++0x080; ObjM__UpdateCloseReadyFlag/ObjM__ClearCloseReadyFlag/
+ObjM__CloseAndNotifyC/D set, clear and test +0x084). The other eight
+fields stay `unkNN`: this ctor only stores arguments or constants into them.
+
+## Proposed field names
+
+For the SHARED `ObjM` struct in include/class_3bb8c.h (accessors in
+class_3bb8c_m, not this unit, so not applied here):
+
+| field | proposed | tier | evidence |
+| --- | --- | --- | --- |
+| `ObjM::unk80` | `pauseSetupStep` | B | ObjM__AdvancePauseSetup's step counter; ObjM__UpdateCloseReadyFlag requires it non-zero; ObjM__ObjM zeroes it |
+| `ObjM::unk84` | `closeReady` | B | set by ObjM__UpdateCloseReadyFlag, cleared by ObjM__ClearCloseReadyFlag, gates ObjM__CloseAndNotifyC/D |
