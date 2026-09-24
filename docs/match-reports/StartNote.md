@@ -97,7 +97,7 @@ until you diff registers, not just word counts.
   per-channel byte-field block used in bulk) alongside the existing
   `unkC`/`unkD`, none of which overlap.
 - `ObjE970` (already declared with a `+0x18` byte field for the stalled
-  `StepVoiceEnvelope`/`StepVoiceFade` bodies) needed a NEW `u16` field at
+  `SetAutoVol`/`SetAutoPan` bodies) needed a NEW `u16` field at
   `+0x12` -- a "channel-count difficulty threshold" compared unsigned
   against `D_8008EA13`. Since neither prior user of `ObjE970` is currently
   compiled (both are `INCLUDE_ASM`), extending the struct in place was
@@ -107,7 +107,7 @@ until you diff registers, not just word counts.
   `D_8008EA0D`, `D_8008EA0E`, `D_8008EA0F`, `D_8008EA1C`..`D_8008EA20`,
   `D_8008EA24`. All plain `u8`/`u16` scratch, all already declared with
   identical types in `code_179d8_j.c`'s own header block for the sibling
-  `func_80030E90` -- this was the single biggest time-saver this round
+  `SsUtKeyOn` -- this was the single biggest time-saver this round
   (see "Where this came from" below).
 
 ## Where this came from: a sibling unit had already typed almost everything
@@ -115,7 +115,7 @@ until you diff registers, not just word counts.
 Before deriving anything by hand, `grep -rn StartNote src/*.c` found
 this function's signature independently triple-corroborated (above), and
 `code_179d8_j.c`'s header comment for its OWN (still-`INCLUDE_ASM`)
-`func_80030E90` already named the exact same globals this function
+`SsUtKeyOn` already named the exact same globals this function
 touches (`D_8008EA0C` through `D_8008EA20`, `D_8008EA24`) as "a `start
 channel` setup routine that stages its parameters and a couple of table
 lookups into a block of one/two-byte globals before registering a new
@@ -134,7 +134,7 @@ someone touching an adjacent unit has usually already typed half of it.
 Retail's `a0` (this function's packed screen/slot id) needs THREE
 different views: its low byte (`a0 & 0xFF`, for the `D_800902E8` row
 index), a sign-extended 16-bit copy (`s1` in retail, used later as
-`StopNote`'s first argument), and a second byte (`(u8)((u16)s1 >>
+`SpuVmKeyOff`'s first argument), and a second byte (`(u8)((u16)s1 >>
 8)`, the row's slot index) -- and retail computes the LAST TWO from a
 SHARED intermediate (`v1 = a0 << 16`, materialized ONCE, then `sra v1,16`
 for the sign-extend and, SEPARATELY, `srl v1,24` reusing that SAME shifted
@@ -368,7 +368,7 @@ SHA1 reconfirmed green.
 **Three for three on `code_179d8_m` this round: charlie's `dead[N]`/`if(0)`
 frame-padding idiom recovers frame byte-alignment exactly every time it is
 applied to a measured frame-size gap, and it has closed a missing-WORD-COUNT
-gap ZERO of three times on this unit** (`SpuVmFlush`, `StepVoiceFade`,
+gap ZERO of three times on this unit** (`SpuVmFlush`, `SetAutoPan`,
 `StartNote`) -- including on a function that is overall LONG (this one,
 15 words over) as readily as on the two that are SHORT. The common thread
 across the unit's three tests: every one of this unit's frame gaps is pure
@@ -445,11 +445,11 @@ extern Rec34Byte D_8008D992[];
 extern Rec34S16 D_8008D998[];
 extern Rec34Half D_8008D9A0[];
 
-extern void func_8002D6A4(void);
-extern void func_8002D8E0(s32 a0);
+extern void SpuVmDoAllocate(void);
+extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch(void);
-extern void func_8002D1B4(s32 a0, u16 a1);
-extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
+extern void SpuVmKeyOnNow(s32 a0, u16 a1);
+extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 
 /* Called as `StartNote(0x21, p0, p1, p2, outA, outB)` from
  * code_179d8_j.c's SpuVmSeKeyOn and as
@@ -458,7 +458,7 @@ extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
  * by three sibling units' own extern guesses (code_179d8_i/_j/_k all
  * agree on this exact shape). `a0` is a packed [screen | slot<<8]
  * dispatch id into `D_800902E8`; `a1`/`a2` are the "key" values
- * `StopNote`'s own three-field match loop checks; `a4`/`a5` are
+ * `SpuVmKeyOff`'s own three-field match loop checks; `a4`/`a5` are
  * 7-bit-percentage volume/pan bytes staged into the same
  * D_8008EA10/D_8008EA11 scratch globals the interpolation-setup
  * functions elsewhere in this unit use. */
@@ -541,7 +541,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                 D_8008EA1E = entry2->unk6;
                 D_8008EA1F = entry2->unk7;
 
-                chan = func_8002CF18(0) & 0xFF;
+                chan = SpuVmAlloc(0) & 0xFF;
                 D_8008EA26 = chan;
                 if (chan < D_8008E9D0) {
                     D_8008D9A3[chan].unk0 = 1;
@@ -563,18 +563,18 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                     D_8008D9A0[D_8008EA26].unk0 = D_8008EA1B;
                     D_8008D988[D_8008EA26].unk0 = D_8008EA24;
 
-                    func_8002D6A4();
+                    SpuVmDoAllocate();
                     if (D_8008EA24 == 0xFF) {
-                        func_8002D8E0(*(u8 *) &D_8008EA26);
+                        vmNoiseOn(*(u8 *) &D_8008EA26);
                     } else {
-                        func_8002D1B4(matchCount, note2pitch());
+                        SpuVmKeyOnNow(matchCount, note2pitch());
                     }
                     s3 = (s3 << 4) | D_8008EA26;
                 }
             }
         }
     } else {
-        StopNote(a0s16, a1, a2, a3);
+        SpuVmKeyOff(a0s16, a1, a2, a3);
     }
 
     return s3;
@@ -586,7 +586,7 @@ Note: `ObjE970` gained a `+0x12` `u16` field for this attempt (see
 "Struct/global knowledge" above) -- that extension is left in place in
 `src/` (outside the `#if 0`) since it does not affect any currently
 compiled function and the next attempt at this function, or at
-`StepVoiceEnvelope`/`StepVoiceFade` (which also use `D_8008E970`), will need
+`SetAutoVol`/`SetAutoPan` (which also use `D_8008E970`), will need
 it again.
 
 ## Naming
@@ -595,7 +595,7 @@ it again.
 corroborated independently by three sibling units (`code_179d8_i.c`,
 `code_179d8_j.c`, `code_179d8_k.c`, per this report's own "Signature"
 section) before any body-level derivation: `code_179d8_k.c`'s
-`NoteOn` calls this in its nonzero-velocity branch and StopNote in
+`NoteOn` calls this in its nonzero-velocity branch and SpuVmKeyOff in
 its zero-velocity branch of the SAME MIDI-status-byte switch, and
 `code_179d8_j.c` wraps both with the same fixed leading identity constant
 (`0x21`) -- a clean NoteOn/NoteOff symmetry, which is the primary evidence
@@ -610,7 +610,7 @@ velocity, pan-split pair, status).
 `masterVolume` field names this round) and `D_8008E978`/`Tbl32E978`
 (`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
 declared in this unit but only used by functions still `INCLUDE_ASM`
-(StepVoiceEnvelope, StepVoiceFade, SpuVmPBVoice, and this
+(SetAutoVol, SetAutoPan, SpuVmPBVoice, and this
 function) -- the field renames are live in `src/code_179d8_m.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
 themselves (`D_8008E970`, `D_8008E978`) were not renamed since
@@ -675,8 +675,8 @@ says it IS that function, a different build of it:
    tone's min/max note, `a4 == 0` routes to key-off, `a5` is the pan.
 2. **Call sequence.** Sony's 3.3 `vmanager.o` `SpuVmKeyOn` calls, in
    order, `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`, `SpuVmDoAllocate`.
-   StartNote calls `SpuVmVSetUp`, `StopNote`, `func_8002CF18`,
-   `func_8002D6A4`, then `func_8002D8E0`/`note2pitch`+`func_8002D1B4`. The
+   StartNote calls `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`,
+   `SpuVmDoAllocate`, then `vmNoiseOn`/`note2pitch`+`SpuVmKeyOnNow`. The
    callee names this project already carries for the first and last
    (`SpuVmVSetUp`, `note2pitch`) are Sony's own.
 3. **Tone-scan loop.** Sony's 3.3 body has the six-`andi 0xff` run
@@ -698,10 +698,10 @@ matching") no matching was attempted.
 
 - By the same call-slot correspondence: `StopNote` = `SpuVmKeyOff`,
   `func_8002CF18` = `SpuVmAlloc`, `func_8002D6A4` = `SpuVmDoAllocate`.
-- `sdkname.py` also gives `StepVoiceEnvelope` **shape 0.99** against
+- `sdkname.py` also gives `SetAutoVol` **shape 0.99** against
   libsnd `SetAutoVol` (3.3 vmanager, 227w vs 231w). Its sibling
   `StepVoiceFade` is `SetAutoPan` (3.3: 224w, same opening skeleton), and
-  `BeginVoiceFade`/`func_8002E308` are then `SsUtAutoPan`/`SsUtAutoVol`.
+  `SeAutoPan`/`SeAutoVol` are then `SsUtAutoPan`/`SsUtAutoVol`.
   This whole unit is libsnd's voice manager. `progress.py` should count it
   as library by address (`config/sdk-in-game.txt` / `identified` symbols),
   which is a head decision.

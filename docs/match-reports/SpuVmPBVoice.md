@@ -39,8 +39,8 @@ and `asm-differ` confirms the first real divergence is still the function's
 second instruction, `move t2,a0` (retail) vs `move t1,a0` (built).
 
 **New axis 12: applied this unit's own `idxCopy = a0;`-at-the-top idiom**
-(the pattern already established and proven in `StepVoiceEnvelope`/
-`StepVoiceFade`, sibling functions in this same unit) — declare `s16
+(the pattern already established and proven in `SetAutoVol`/
+`SetAutoPan`, sibling functions in this same unit) — declare `s16
 idxCopy;`, assign it from `a0` as the function's first statement, and use
 `idxCopy` in place of `a0` for every one of the record-index accesses
 (`D_8008D996[idxCopy]`, `D_8008D99E[idxCopy]`, etc., through to the final
@@ -102,7 +102,7 @@ own score (77/138 before and after), so it is recorded as a correction to
 - `Rec34U16` / `D_8008D99C[]`: the SAME 0x34-stride record family as
   `Rec34S16` (already declared above for `D_8008D994`/`D_8008D996`/
   `D_8008D99A`/`D_8008D99E`/`D_8008D988`), but this function reads
-  `D_8008D99C` UNSIGNED (`lhu`) where `StopNote` (same unit, already
+  `D_8008D99C` UNSIGNED (`lhu`) where `SpuVmKeyOff` (same unit, already
   matched) reads it -- and `D_8008D994` -- SIGNED (`lh`). Since one extern
   symbol cannot carry two conflicting C types in one translation unit, the
   unsigned view is reached with a pointer-cast reinterpretation:
@@ -135,7 +135,7 @@ own score (77/138 before and after), so it is recorded as a correction to
 Given a record index `a0` and three `s16` key values (`a1`, `a2`, `a3`),
 verify they match `D_8008D996[a0]`/`D_8008D99E[a0]`/`D_8008D99A[a0]`
 respectively (three early-return guard clauses, same idiom as
-`StopNote`'s key-match loop). `threshold = a4 - 0x40` is computed
+`SpuVmKeyOff`'s key-match loop). `threshold = a4 - 0x40` is computed
 BEFORE these checks (an early, unconditional local -- moving it there from
 an initial after-the-checks placement was itself a real fix, see below). If
 all three match: combine a debug byte into an index (`someTotal =
@@ -254,7 +254,7 @@ plateau:
  * width (`lbu`, same offset) elsewhere in this same function; the byte
  * view is reached via a plain pointer cast, same idiom as D_8008EA26's
  * mixed sh/lbu access.  D_8008D994 needs the same unsigned re-reading
- * here even though StopNote (above) reads the SAME symbol signed
+ * here even though SpuVmKeyOff (above) reads the SAME symbol signed
  * (`lh`) -- reinterpreted through a cast rather than redeclared, since
  * one extern symbol cannot carry two conflicting C types in one file. */
 typedef struct {
@@ -357,7 +357,7 @@ duplicate-declaration conflicts by reusing the ALREADY-declared `Rec34U16`/
 `Tbl32E978`/etc. types this unit's later functions define, rather than
 redeclaring — this unit's own functions appear in ROM order after this one's
 declaration site, so the existing types were directly reusable this time,
-unlike `StepVoiceEnvelope`, which sits FIRST in the file and needs its own local
+unlike `SetAutoVol`, which sits FIRST in the file and needs its own local
 copies). **All three title figures reconfirmed exactly:** `funcdiff.py`
 reports **77/138 words match, file 0x1FBE8-0x1FE10** (zero out-of-range
 drift, genuinely exact length), first real diff still the function's second
@@ -365,13 +365,13 @@ instruction (`move t2,a0` retail vs `move t1,a0` built).
 
 Read the raw disassembly directly this round (rather than re-deriving from
 the report's prose) to check whether the persisted-register class this
-unit's OTHER two large stalls (`StepVoiceFade`, `StepVoiceEnvelope`) show is the
+unit's OTHER two large stalls (`SetAutoPan`, `SetAutoVol`) show is the
 same mechanism here. It is not quite the same shape: this function's
 register renumbering starts at instruction 2 and is a near-total CLASS
 shift (both `$t`-temporaries and `$a`-arguments renumbered together) rather
 than one dedicated persisted value computed early and consumed once late.
 No new lever identified this round; not spending further attempts here
-given `StepVoiceFade` and `StepVoiceEnvelope` (this unit's two other open
+given `SetAutoPan` and `SetAutoVol` (this unit's two other open
 stalls) each had a specific, named, untried lever this round, and both of
 those also failed to move when tried (see their own round-32 updates) —
 consistent with all three of this unit's remaining stalls being the same

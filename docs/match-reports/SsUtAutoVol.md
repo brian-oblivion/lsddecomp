@@ -7,19 +7,19 @@ plain function, no vtable dereference). Sibling of `SsUtAutoPan`
 (identical shape, different callee).
 
 ```c
-extern void func_8002E308(s16 a0, s16 a1, s16 a2, s16 a3);
+extern void SeAutoVol(s16 a0, s16 a1, s16 a2, s16 a3);
 
 s32 SsUtAutoVol(s16 p0, s16 p1, s16 p2, s16 p3)
 {
     if ((u16) p0 < 0x18) {
-        func_8002E308(p0, p1, p2, p3);
+        SeAutoVol(p0, p1, p2, p3);
         return 0;
     }
     return -1;
 }
 ```
 
-`func_8002E308` is still `INCLUDE_ASM` in whatever unit owns it (not
+`SeAutoVol` is still `INCLUDE_ASM` in whatever unit owns it (not
 found in any `src/*.c` at time of writing), so this is a per-call-site
 guess: all four arguments are `s16`-sign-extended before the `jal`, and
 its return value is explicitly discarded (an unconditional `addu

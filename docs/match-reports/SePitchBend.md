@@ -1,4 +1,6 @@
-# func_8002E138 -- MATCHED (round 73, 112/112, whole-image SHA1 green)
+# SePitchBend -- MATCHED (round 73, 112/112, whole-image SHA1 green)
+
+> Renamed from `func_8002E138` on 2026-09-24 (tools/rename.py). Address 0x8002e138.
 
 REVISITED, round 73: MATCHED 112/112, fresh transcription, no permuter; names/types used (params `chan`/`bend`, local 0x34-stride record views, `D_8008D7F4` written as `((u16 *)D_8008D7F0)[off + 2]`)
 
@@ -47,7 +49,7 @@ one item and nothing else:
    `(const (plus D_8008D7F0 4))`, the test can no longer separate them, and
    the order holds (111 -> 112/112). This also explains `off = chan * 8`:
    it is a u16-element index into the 16-byte per-voice record at
-   `D_8008D7F0`, the same record `func_8002DDBC` writes through
+   `D_8008D7F0`, the same record `vmNoiseOn2` writes through
    `D_8008D7F0`/`D_8008D7F2`. It is not a byte offset.
 
 Build figures (words / raw): a (clean transcription) 119; b (+idx hoist)
@@ -83,7 +85,7 @@ extern Rec34H_E138 D_8008D994[];
 extern s16 D_8008EA26[];
 extern u8 D_8008D970[];
 
-void func_8002E138(s32 chan, s32 bend) {
+void SePitchBend(s32 chan, s32 bend) {
     s32 off;
     s32 prod;
     s32 q;
@@ -146,7 +148,7 @@ Raw word-match is not meaningful under that drift. **First real diff is the
 second instruction**, vram `0x8002E140`/file `0x1E940` is the last matching
 one (`move $s0,$a0`); retail's very next instruction, `andi $v1,$s0,0xFF`,
 has an extra `move $a0,$s0` inserted before it in every derivation tried —
-confirmed with `tools/asm-differ/diff.py func_8002E138`, not inferred.
+confirmed with `tools/asm-differ/diff.py SePitchBend`, not inferred.
 
 `code_179d8_l`, vram `0x8002E138`, file offset `0x1E938`, 112 words
 (0x1C0 bytes), real frame (`-0x20`, saves `$s0`,`$s1`,`$ra`). No
@@ -210,20 +212,20 @@ compiles to `lui 0x8102 / ori 0x409` with `mult, mfhi, addu $v0,$v0,$a0,
 sra $v0,$v0,0x6, sra $a0,$a0,0x1f, subu $v0,$v0,$a0` — an exact instruction-
 for-instruction match against both of retail's division sites here.
 
-## Residues (both classes already seen this round, in `func_8002DDBC`)
+## Residues (both classes already seen this round, in `vmNoiseOn2`)
 
 1. **A spurious extra register copy before the first read of a saved
-   register**, same class as `func_8002DDBC`'s residue 1. Retail reads
+   register**, same class as `vmNoiseOn2`'s residue 1. Retail reads
    `$s0` directly for `andi $v1,$s0,0xFF` with no preceding copy; every
    phrasing tried here (a separate `u8 chan` local, inlining `(u8)s0`
    everywhere instead, computing the mask before vs. after the shift)
    produces an extra `move $a0,$s0` (or `$a3,$s0`) first. Not resolved —
-   consistent with the `func_8002DDBC` finding that **C variable identity
+   consistent with the `vmNoiseOn2` finding that **C variable identity
    does not control physical register assignment** in this compiler; this
    is the second function in the round to hit the same wall, which
    promotes it from anecdote to a pattern worth flagging for the next
    runner (see proposed learning).
-2. **A hoisted/reordered store**, same class as `func_8002DDBC`'s residue
+2. **A hoisted/reordered store**, same class as `vmNoiseOn2`'s residue
    2. `D_8008EA26 = (u8)s0;` (no dependency on the surrounding
    `D_8008EA13`/`D_8008EA18` stores) moves relative to them without a
    scheduling barrier. A bare `__asm__("")` placed right after the
@@ -241,7 +243,7 @@ extern u8 D_8008D7F4[];
 extern u16 D_8008EA26;
 extern u8 D_8008D970[];
 
-void func_8002E138(s32 a0, s32 a1) {
+void SePitchBend(s32 a0, s32 a1) {
     s32 s0;
     s32 off16;
     s32 idx52;
@@ -308,7 +310,7 @@ reuse for the reload later in the function), and the scheduling barrier for
 
 ### Proposed learning
 
-**Two functions in one round (`func_8002DDBC`, this one) both open with a
+**Two functions in one round (`vmNoiseOn2`, this one) both open with a
 spurious extra register-to-register copy before the first use of a value
 that must survive a function call (hence lives in a callee-saved
 register), and no C-level reshaping removed it in either case.** This is
@@ -337,8 +339,8 @@ recomputes the table's base address FRESH inside each arm** (a distinct
 inside the `else` arm, with no counterpart in the shared-pointer
 compilation). This is the identical "must be textually duplicated in BOTH
 arms, not shared after/before the `if`" idiom already validated for
-`func_8002D6A4` (fix #3 in that report) and referenced generically in
-`func_8002CF18`'s report — moving the single
+`SpuVmDoAllocate` (fix #3 in that report) and referenced generically in
+`SpuVmAlloc`'s report — moving the single
 `e = &D_8008E978[idxStruct];` statement to inside EACH branch (so it's
 computed twice, once per arm) reproduced retail's double materialization
 exactly and moved the function from **108/112 (4 short) to 113/112 (1
@@ -386,7 +388,7 @@ extern u8 D_8008D7F4[];
 extern u16 D_8008EA26;
 extern u8 D_8008D970[];
 
-void func_8002E138(s32 a0, s32 a1) {
+void SePitchBend(s32 a0, s32 a1) {
     s32 s0;
     s32 off16;
     s32 idx52;
@@ -443,7 +445,7 @@ void func_8002E138(s32 a0, s32 a1) {
 ### Proposed learning (round 33)
 
 **The "duplicate the shared computation in both `if`/`else` arms instead
-of sharing it before the branch" idiom (already named for `func_8002D6A4`)
+of sharing it before the branch" idiom (already named for `SpuVmDoAllocate`)
 generalizes beyond an explicit shared STATEMENT to a shared POINTER/ADDRESS
 computation feeding field accesses in both arms.** It is now confirmed on
 two independent functions in this unit and is worth checking as a matter
@@ -457,7 +459,7 @@ the observed range so far).
 
 Re-verified the inherited 113/112 body first (per the "compile every inherited
 body before trusting it" instruction): it reproduces exactly — `objdump -t`
-on `build/src/code_179d8_l.c.o` shows `func_8002E138` at `0x1c4` bytes = 113
+on `build/src/code_179d8_l.c.o` shows `SePitchBend` at `0x1c4` bytes = 113
 words, matching round 33's claim exactly. Confirmed via `asm-differ`'s
 realigned diff that the residues are exactly as round 33 described: the
 extra `move a0,s0` (later reappearing in a different register depending on
@@ -505,8 +507,8 @@ source statements, retiming address materialization, and scheduling
 barriers all either do nothing or regress. The leading residue continues
 to look like straightforward HARD RULE 6 register-identity territory (not
 fixable from C, and not a case for `register asm("$N")`); the tail
-reorder's resistance to a barrier is consistent with `func_8002E308` and
-`func_8002CF18`'s independent round-33 finding that a barrier cannot
+reorder's resistance to a barrier is consistent with `SeAutoVol` and
+`SpuVmAlloc`'s independent round-33 finding that a barrier cannot
 prevent a side-effect-free value/address computation from being reordered
 across it when there is nothing for the barrier to protect.
 
@@ -516,7 +518,7 @@ independent statement groups into a single expression that forces GCC to
 serialize them in source order (e.g. via a sequence point inside one
 combined expression, or a dummy volatile read) — untried because it starts
 to resemble exactly the "not simply order, but value-numbering" class
-`func_8002CF18`'s report already showed a barrier cannot reach, and no new
+`SpuVmAlloc`'s report already showed a barrier cannot reach, and no new
 mechanism was identified this round that would behave differently.
 
 ### Proposed learning (round 35)
@@ -528,7 +530,7 @@ pointer-address materialization to before vs. after the value it stores
 changed WHICH instruction was spurious (an `addiu` became a `move`) without
 changing the total count. This is worth stating alongside the existing
 "variable identifier choice has no influence on register assignment"
-learning (`func_8002DDBC`'s report) as a corollary: **statement REORDER,
+learning (`vmNoiseOn2`'s report) as a corollary: **statement REORDER,
 not just naming, is also not a lever for this class** — both are surface
 changes the allocator sees through.
 
@@ -537,7 +539,7 @@ changes the allocator sees through.
 Per this round's thesis (permuter is the primary lever for the four
 never-searched functions in this unit), re-verified the inherited 113/112
 body first: `objdump -t` on `build/src/code_179d8_l.c.o` confirms
-`func_8002E138` compiles to `0x1c4` bytes = 113 words, matching round 33's
+`SePitchBend` compiles to `0x1c4` bytes = 113 words, matching round 33's
 figure exactly.
 
 **`--debug --stack-diffs` sanity check:** base score = **2020** (not the
@@ -563,7 +565,7 @@ for the next runner: launch as
 status regardless of which shell later reads it.
 
 **Result: 74597 iterations, ZERO hits at `score = 0`.** Best score reached
-was **795** (`permuter-work/func_8002E138/output-795-1`), down from the
+was **795** (`permuter-work/SePitchBend/output-795-1`), down from the
 2020 baseline, found within the first ~4 minutes; no further improvement in
 the remaining ~11 minutes of search.
 
@@ -602,8 +604,8 @@ grouping idiom is a validated-negative lever for THIS function specifically
 **A `do { ... } while (0);` block wrapping a statement group is a
 genuinely different C-level construct from a bare `__asm__("")` barrier —
 worth testing generally as a potential fence against GCC 2.6.3's
-cross-branch/value-hoisting immunity to `asm("")` (the class `func_8002E308`
-and `func_8002CF18` document as resistant to plain barriers) — but on this
+cross-branch/value-hoisting immunity to `asm("")` (the class `SeAutoVol`
+and `SpuVmAlloc` document as resistant to plain barriers) — but on this
 function specifically it relocated the residue rather than removing it, so
 record the outcome as function-specific, not yet a validated project-wide
 idiom.** Also worth a general caution for future permuter rounds on this
@@ -618,7 +620,7 @@ scramble rather than a simple candidate rewrite).
 ## Round 44 update (runner delta): inherited body re-verified real, not re-attempted further
 
 Re-verified the inherited 113/112 body: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002E138` compiles to `0x1c4`
+`build/src/code_179d8_l.c.o` confirms `SePitchBend` compiles to `0x1c4`
 bytes = 113 words, matching rounds 33/35/37's figure exactly -- this is a
 genuine, reproducible near-miss, not a stale claim. Given three prior
 rounds' worth of levers already tried and confirmed negative (declaration

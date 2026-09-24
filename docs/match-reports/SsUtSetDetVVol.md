@@ -87,7 +87,7 @@ the array form's exact byte count) nor is needed by an array.
 **"GCC 2.6.3 dead-code-eliminates an unused local" is true of SCALARS and
 false of ARRAYS, and the difference is the lever for the unused-frame residue
 class.** That sentence is currently written down without the qualifier —
-`docs/match-reports/func_8002DDBC.md`'s round 35 update reaches it from a
+`docs/match-reports/vmNoiseOn2.md`'s round 35 update reaches it from a
 scalar experiment and states it unconditionally. Measured here both ways: a
 scalar (or two) leaves no frame, an array of the right size leaves exactly
 that frame.

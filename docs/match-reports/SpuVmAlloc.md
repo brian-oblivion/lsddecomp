@@ -1,4 +1,6 @@
-# func_8002CF18 -- STALL (round 65 revisit: length still EXACT 167/167, but round 37's exact length is RETRACTED as arithmetic rather than structure -- it was two one-word padding artifacts over a body two words short; raw word-match 47/167 -> **74/167** (79/167 on the `u32 bestSec` variant -- see the instrument-disagreement note), funcdiff insertions/deletions 29/29 -> **16/16** and positional skeleton diffs 118 -> 89, asm-differ 3255 -> 1250; first real diff still at vram 0x8002CF24, retail's `li t3,0xffff` against a register-rotated `li t0,0xffff`, per tools/asm-differ/diff.py -- the residue is now almost purely that rotation)
+# SpuVmAlloc -- STALL (round 65 revisit: length still EXACT 167/167, but round 37's exact length is RETRACTED as arithmetic rather than structure -- it was two one-word padding artifacts over a body two words short; raw word-match 47/167 -> **74/167** (79/167 on the `u32 bestSec` variant -- see the instrument-disagreement note), funcdiff insertions/deletions 29/29 -> **16/16** and positional skeleton diffs 118 -> 89, asm-differ 3255 -> 1250; first real diff still at vram 0x8002CF24, retail's `li t3,0xffff` against a register-rotated `li t0,0xffff`, per tools/asm-differ/diff.py -- the residue is now almost purely that rotation)
+
+> Renamed from `func_8002CF18` on 2026-09-24 (tools/rename.py). Address 0x8002cf18.
 
 Unit `src/code_179d8_l.c` (carved round 24). Size: 167 words (0x29C bytes).
 Round 26, runner delta.
@@ -59,7 +61,7 @@ extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
 `D_8008D9A3` / `D_8008D98E` / `D_8008D98A` / `D_8008D9A0` / `D_8008D988` are
 all 0x34-byte-stride, all with the SAME index (channel number), which is
-the same table family this unit's `func_8002D6A4` also touches
+the same table family this unit's `SpuVmDoAllocate` also touches
 (`D_8008D98E`). `func_800375E8` has no established prototype anywhere in
 the project yet; declared locally here per CLAUDE.md's rule on prototypes
 for another unit's function.
@@ -68,7 +70,7 @@ for another unit's function.
 
 ```c
 /* stalesyms --fix 2026-09-22: func_800375E8 -> SpuSetNoiseVoice -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     s32 bestSec;
@@ -146,7 +148,7 @@ s32 func_8002CF18(void)
 }
 ```
 
-Restored to `INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);` in
+Restored to `INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);` in
 `src/code_179d8_l.c` -- the struct/extern declarations above were removed
 along with it (none are shared with any other function in this unit).
 
@@ -182,7 +184,7 @@ Starting point was a naive transcription using a signed `s32 idx` and plain
    the multiply-every-iteration shape.
 4. **Duplicating the divide/lookup in each `if`/`else` arm was NOT needed
    here** (that fix mattered for the sibling function, see
-   `func_8002D6A4.md`) — `func_8002CF18` has no such division split.
+   `SpuVmDoAllocate.md`) — `SpuVmAlloc` has no such division split.
 
 ## What is still wrong (the residue)
 
@@ -295,7 +297,7 @@ report speculated.
 "cross-branch redundant-recompute elision" framing suggested it might be
 fixable with — it is a genuine GCC value-availability/CSE decision, and
 TWO independent levers were tried against it this round, both negative,
-both consistent with what `func_8002E308`'s report (same round) found
+both consistent with what `SeAutoVol`'s report (same round) found
 independently against an unrelated instance of the same class:**
 
 1. **Bare `__asm__("")` immediately before each `goto evalPriority;`** (at
@@ -321,7 +323,7 @@ multiply with no memory access.** An empty `__asm__("")` is a barrier
 against instruction motion of operations with side effects or unknown
 memory interactions — it gives GCC nothing to protect a side-effect-free
 arithmetic value from, so the compiler is free to prove the value is still
-available across it and reuse it. This matches `func_8002E308`'s
+available across it and reuse it. This matches `SeAutoVol`'s
 independent finding in the same round (a different function, same
 project, same class of residue: a GCSE-style hoist of a redundant
 subtraction survived a barrier at every position tried). **Promote this
@@ -371,7 +373,7 @@ extern void SpuSetNoiseVoice(s32 a0, s32 a1); /* Psy-Q libspu/s_snv, linked obje
                                                 * wrongly named func_800375E8 in the
                                                 * round-26 body, which never linked */
 
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     u32 bestSec;
@@ -463,7 +465,7 @@ s32 func_8002CF18(void)
   immune to a bare `__asm__("")` scheduling barrier, at any of the
   placements tried (both predecessors, and the merge label itself).**
   Confirmed independently in two functions this round
-  (`func_8002E308`, this one). Worth promoting in
+  (`SeAutoVol`, this one). Worth promoting in
   `DECOMPILATION_LEARNINGS.md` from "try a barrier" to "a barrier cannot
   reach this class; the next lever must change which value the front end
   computes, not when."
@@ -472,7 +474,7 @@ s32 func_8002CF18(void)
 
 Re-verified the inherited round-33 body first, including the
 `SpuSetNoiseVoice` link fix: `objdump -t` on `build/src/code_179d8_l.c.o`
-confirms `func_8002CF18` compiles and LINKS to `0x28c` bytes = 163 words,
+confirms `SpuVmAlloc` compiles and LINKS to `0x28c` bytes = 163 words,
 matching round 33's corrected figure exactly (not the never-linking round-26
 number).
 
@@ -500,7 +502,7 @@ would need to make the two array-index computations ACTUALLY different at
 the value level — e.g., have one of the two predecessor checks index
 through a different but provably-equal expression (a pointer walked by a
 running total rather than `idx*0x34`, matching this unit's own
-`func_8002DDBC` residue-3 "narrow-cast defeats strength reduction" family,
+`vmNoiseOn2` residue-3 "narrow-cast defeats strength reduction" family,
 though that lever targets loop induction, not a single recompute, so it is
 not a direct transplant) — untried this round for lack of a concrete
 mechanism, not for lack of budget.
@@ -514,7 +516,7 @@ suspected hoist is NOT a working technique to present the compiler with a
 "different" value; it collapses the alias back to the original before the
 relevant optimization pass sees it. This closes off the last of the
 "rename or alias to dodge CSE" family of ideas for this residue class —
-combined with `func_8002E308`'s round-35 finding that an algebraic-identity
+combined with `SeAutoVol`'s round-35 finding that an algebraic-identity
 rewrite (`-(b-a)` for `a-b`) is equally transparent to it, the working
 conclusion for this project's "value-hoist immune to barriers" class is
 that NO surface-syntax rephrasing of an equivalent expression defeats it;
@@ -536,7 +538,7 @@ value-availability CSE decision, not a local instruction gap.
 
 **Search: `-j 6 --stop-on-zero --best-only --stack-diffs`, bounded to
 900s.** Zero `score = 0` hits. Best candidate: **3025** (down from 4620),
-`permuter-work/func_8002CF18/output-3025-1`.
+`permuter-work/SpuVmAlloc/output-3025-1`.
 
 **Unlike the other three functions searched this round, this candidate
 translated into REAL, VERIFIED progress — the first of this round's four
@@ -624,7 +626,7 @@ extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     u32 bestSec;
@@ -714,7 +716,7 @@ genuinely different, non-asm, C-level lever from a bare `__asm__("")`
 barrier, and here it closed a 4-word LENGTH gap that three prior rounds of
 barriers, aliasing, and algebraic rewrites could not touch** — the first
 positive (if partial) result on this function across four rounds. This
-generalizes the round-37 `func_8002E138` finding (where the same construct
+generalizes the round-37 `SePitchBend` finding (where the same construct
 was tried and did NOT help) in the opposite direction: the construct is a
 real, distinct lever, and whether it helps is function-specific, not
 predictable in advance. Worth trying as a standard move on any
@@ -735,7 +737,7 @@ FULL diff is not the same as its MINIMAL fix.
 
 Re-verified the inherited 167/167-length body (with the round-37
 `do-while(0)`/`newVar` fix intact): `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002CF18` compiles to `0x29c`
+`build/src/code_179d8_l.c.o` confirms `SpuVmAlloc` compiles to `0x29c`
 bytes = 167 words, matching retail's length exactly, and `funcdiff.py`
 confirms 47/167 raw match with NO outside-range drift, exactly as round 37
 left it. Given three prior rounds' worth of levers already tried against
@@ -751,7 +753,7 @@ unchanged.
 **Verdict: arity-ok idiom.** Both declarations stay; each is right about its own
 file.
 
-**Callee evidence.** `func_8002CF18` is still `INCLUDE_ASM`
+**Callee evidence.** `SpuVmAlloc` is still `INCLUDE_ASM`
 (`src/code_179d8_l.c`), so the disassembly is the only evidence. It reads NONE
 of `$a0`-`$a3`: the prologue writes every register it uses from constants and
 `%hi`/`%lo` globals before any read.
@@ -770,10 +772,10 @@ of `$a0`-`$a3`: the prologue writes every register it uses from constants and
 So the function takes zero arguments in the sense of what it consumes.
 
 **Why `src/code_179d8_m.c`'s one-parameter declaration stays.** Its two call
-sites write `func_8002CF18(0xFF)`, and that argument is byte-load-bearing:
+sites write `SpuVmAlloc(0xFF)`, and that argument is byte-load-bearing:
 
 ```
-8002f240:  jal   8002cf18 <func_8002CF18>
+8002f240:  jal   8002cf18 <SpuVmAlloc>
 8002f244:  li    a0,0xff          <- in retail, from matched SpuVmNoiseOnWithAdsr
 ```
 
@@ -787,9 +789,9 @@ about what the body reads.
 
 ### Call-site / declaration disagreement, reported not fixed
 
-`src/code_179d8_j_b.c:155`'s `extern s32 func_8002CF18(void);` has **no live
-call site in that file** — the only other mention is prose in `func_80030E90`'s
-banner, and `func_80030E90` is itself still `INCLUDE_ASM`. It is a declaration
+`src/code_179d8_j_b.c:155`'s `extern s32 SpuVmAlloc(void);` has **no live
+call site in that file** — the only other mention is prose in `SsUtKeyOn`'s
+banner, and `SsUtKeyOn` is itself still `INCLUDE_ASM`. It is a declaration
 kept for a call that exists only in assembly. It is harmless (it agrees with
 what the body reads) and it is not mine to delete under a round-59 extern
 review, but a later reader should know the two declarations were never in
@@ -822,7 +824,7 @@ oracle:
 
 *(Incidental, worth knowing for anyone else splicing this body back: the
 unit's own later `extern u8 D_8008D9A3[];` and `extern u8 D_8008E9D0;` —
-which exist for `func_8002D1B4`'s and `func_8002DDBC`'s preserved bodies —
+which exist for `SpuVmKeyOnNow`'s and `vmNoiseOn2`'s preserved bodies —
 CONFLICT with this function's `Rec34Flag`-typed view and must be commented
 out while it is live. The first build attempt failed on exactly that, and
 `funcdiff.py` refused the number with `WARNING: STALE BUILD` rather than
@@ -920,7 +922,7 @@ throughout:
   (`move $a1,$a2` at `1d7d8`, `move $v1,$v0` at `1d868`): retail loads into
   one register and copies to another before using it, i.e. one more pseudo
   than the built body has. Given how the local-count lever paid on
-  `func_8002DDBC` and `func_8002D1B4` this same round, **this is the first
+  `vmNoiseOn2` and `SpuVmKeyOnNow` this same round, **this is the first
   thing to try next: a named temp for the loaded priority/tertiary value.**
 - **`idx++` placement in the counter loop** (retail after the stride
   computation, built at the loop head) and the `D_8008EA1B` load position in
@@ -930,7 +932,7 @@ throughout:
 
 ~18 build/oracle iterations. Inside the 30-attempt cap; the last improvement
 was three iterations before the stop. No permuter search was spent here: the
-session's one search went to `func_8002D1B4`, and round 37's search on THIS
+session's one search went to `SpuVmKeyOnNow`, and round 37's search on THIS
 function is still citable for what it found, though note that what it found
 is now understood as padding rather than a fix.
 
@@ -941,7 +943,7 @@ conflicting later declarations in the unit must be commented out while this
 is live (see the bookkeeping note).
 
 #if 0
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     u16 bestSec;
@@ -1083,13 +1085,13 @@ preserving:
   original `goto` pair, and the free-channel case is now the explicit `else`.
 - **The `Rec34*`-typed struct declarations were replaced with plain pointer
   arithmetic on `u8[]`.** `src/code_179d8_l.c` already declares
-  `D_8008D9A3` and `D_8008E9D0` (plain `u8[]`/`u8`) for `func_8002DDBC`'s and
-  `func_8002D1B4`'s own preserved bodies, later in the SAME file; a
+  `D_8008D9A3` and `D_8008E9D0` (plain `u8[]`/`u8`) for `vmNoiseOn2`'s and
+  `SpuVmKeyOnNow`'s own preserved bodies, later in the SAME file; a
   struct-typed re-declaration of `D_8008D9A3` here would be a `conflicting
   types` error under `-DNON_MATCHING`, which compiles the whole unit at
   once. Declared `D_8008D9A3`/`D_8008D98E`/`D_8008D98A`/`D_8008D9A0`/
   `D_8008D988` as `u8[]` instead and indexed with explicit `idx * 0x34` (and
   `+2` for `D_8008D988`'s halfword field) — the same idiom this unit's other
   two promoted bodies already use for the identical stride. `D_8008D98A` in
-  particular is shared with `func_8002DDBC`'s promoted body and must keep
+  particular is shared with `vmNoiseOn2`'s promoted body and must keep
   the same type in both for the file to compile.

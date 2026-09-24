@@ -1,4 +1,6 @@
-# func_8002D6A4 -- STALL (1 word short: 142/143 compiled length; 10/143 raw word-match, badly degraded by the 1-word shift -- see caveat; first real diff at word 0, off=0x01DEA4, vram=0x8002D6A4, asm-differ realigned)
+# SpuVmDoAllocate -- STALL (1 word short: 142/143 compiled length; 10/143 raw word-match, badly degraded by the 1-word shift -- see caveat; first real diff at word 0, off=0x01DEA4, vram=0x8002D6A4, asm-differ realigned)
+
+> Renamed from `func_8002D6A4` on 2026-09-24 (tools/rename.py). Address 0x8002d6a4.
 
 Unit `src/code_179d8_l.c` (carved round 24). Size: 143 words (0x23C bytes).
 Round 26, runner delta.
@@ -24,10 +26,10 @@ No arguments, no return value. It:
 2. Reads `D_8008EA26` once (`chan`), stores `chan << 3` into `D_8008EA28`
    through the pointer from step 1, computes
    `D_8008EA18 + (D_8008EA13 << 4)` (the same channel-index idiom this
-   unit's `note2pitch2`/`func_8002D6A4`'s sibling functions use) and
+   unit's `note2pitch2`/`SpuVmDoAllocate`'s sibling functions use) and
    stashes it in the scalar `D_8008EA2A`, then resets
    `D_8008D98E[chan].unk0` to `0x7FFF` (priority-table reset, same 0x34
-   -stride family `func_8002CF18` uses).
+   -stride family `SpuVmAlloc` uses).
 3. Clears one bit (`1 << D_8008EA26`, read through the pointer from step 1)
    across all 16 words of the `gVoiceActivityRing` array — a "clear this channel's
    bit everywhere" sweep.
@@ -121,7 +123,7 @@ prove redundant and elide).
 ## Best body reached (142/143 compiled words, 1 short)
 
 ```c
-void func_8002D6A4(void)
+void SpuVmDoAllocate(void)
 {
     volatile s16 *p28;
     volatile s16 *maskPtr;
@@ -171,7 +173,7 @@ void func_8002D6A4(void)
 }
 ```
 
-Restored to `INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D6A4);`.
+Restored to `INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);`.
 The `D8008E978Entry` typedef was reverted to its ORIGINAL (pre-this-attempt)
 shape ahead of `note2pitch2`, which still needs it and is otherwise
 unaffected.
@@ -361,7 +363,7 @@ next move, not another cast variant.
 ## Round 35 update (runner bravo): inherited body re-verified real; one genuine byte-level fix found (still 142/143, unchanged total)
 
 Re-verified the inherited 142/143 body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002D6A4` compiles to `0x238`
+`build/src/code_179d8_l.c.o` confirms `SpuVmDoAllocate` compiles to `0x238`
 bytes = 142 words, matching the report's figure exactly.
 
 **Found and fixed one previously-undocumented byte-level mismatch while
@@ -451,7 +453,7 @@ extern s16 D_8008D7F8[];
 extern s16 D_8008D7FA[];
 extern s16 D_8008E84C;
 
-void func_8002D6A4(void)
+void SpuVmDoAllocate(void)
 {
     volatile s16 *p28;
     volatile s16 *maskPtr;
@@ -525,7 +527,7 @@ earlier in the file (this function precedes `note2pitch2` in ROM order,
 and the extended shape — trailing `unk14[18]` split into
 `pad14[2]/unk16/unk18/pad20[12]` — is layout-compatible with
 `note2pitch2`'s use of only offsets 4/5). Confirmed via `objdump -t`:
-`func_8002D6A4` compiles to `0x238` bytes = 142 words, matching the report
+`SpuVmDoAllocate` compiles to `0x238` bytes = 142 words, matching the report
 exactly. Reverted the relocation immediately afterward since it isn't
 needed for anything short of closing the function.
 
@@ -549,7 +551,7 @@ this needs the `echo` to happen in a script that `wait`s on the actual
 permuter PID specifically, not just relies on `bash -c`'s own sequencing.
 Inferred (not captured) as `rc=124` (bound fired) from wall-clock timing:
 the process ended almost exactly at the 900s mark, matching
-`func_8002E138`'s same-shaped exit earlier this round.
+`SePitchBend`'s same-shaped exit earlier this round.
 
 **Result: 76056 iterations, ZERO hits at `score = 0`.** Best score reached
 was **4245**, down from the 5710 baseline.
@@ -571,7 +573,7 @@ iterations under shared-machine load (concurrent permuter searches were
 running in sibling worktrees this round). The permuter's own scorer
 improved (5710 -> 4245) via a change that is a confirmed regression against
 the real project oracle — a second instance this round (after
-`func_8002E138`) of the isolated-scaffold-score / real-build-score
+`SePitchBend`) of the isolated-scaffold-score / real-build-score
 divergence CLAUDE.md warns about. Not promoting to "permuter-exhausted";
 recording as "not closed in ~76k iterations under load, and the only
 lower-scoring candidate found reintroduces an already-rejected sharing
@@ -585,7 +587,7 @@ round's derivation already tried and rejected for THIS function** — worth
 checking any permuter candidate's structural change against the function's
 own report history before assuming a lower isolated-scaffold score means
 anything, not just checking the final word count. This is the same
-underlying caution as `func_8002E138`'s round-37 finding (permuter score
+underlying caution as `SePitchBend`'s round-37 finding (permuter score
 improvement does not imply real-build improvement) from a different angle:
 here the specific mechanism (re-sharing a deliberately-duplicated
 computation) was independently already known-bad from this same function's
@@ -596,7 +598,7 @@ skippable.
 
 Re-verified the inherited 142/143 body (with the round-35 `blez` fix and
 the round-37 struct-sharing note both intact): `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002D6A4` compiles to `0x238`
+`build/src/code_179d8_l.c.o` confirms `SpuVmDoAllocate` compiles to `0x238`
 bytes = 142 words, matching the report exactly, and `note2pitch2`
 (already matched, sharing the same `D8008E978Entry` typedef) is
 unaffected at `0x100` bytes = 64 words.
@@ -604,7 +606,7 @@ unaffected at `0x100` bytes = 64 words.
 **The shared `D8008E978Entry` typedef this report's round-37 section noted
 as "requires moving the struct's declaration point earlier in the file" is
 now PERMANENTLY relocated in `src/code_179d8_l.c`**, ahead of
-`func_8002D6A4`'s own (still-`INCLUDE_ASM`) slot, with the extended
+`SpuVmDoAllocate`'s own (still-`INCLUDE_ASM`) slot, with the extended
 `unk16`/`unk18` fields this function's derivation needs -- committed
 separately this round as a byte-exact, zero-functional-change struct move
 so the next attempt at this function does not need to redo that relocation

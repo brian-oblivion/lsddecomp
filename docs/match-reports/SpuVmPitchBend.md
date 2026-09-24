@@ -93,7 +93,7 @@ Retail re-derives THREE of this function's four parameters from scratch on
 every iteration, each via its own `sll #16`/`sra #16` pair even though none
 of them change inside the loop:
 
-- The loop counter `i` (naturally `s16`, matching `ClearNoiseVoices`'s
+- The loop counter `i` (naturally `s16`, matching `SpuVmNoiseOff`'s
   already-documented idiom of a local needing re-sign-extension at every
   use).
 - `a0` (this function's own first parameter) -- re-narrowed EVERY

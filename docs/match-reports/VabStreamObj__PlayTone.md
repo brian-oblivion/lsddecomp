@@ -21,7 +21,7 @@ if (index >= 0) {
     hi = index >> 4;                      /* array-of-pointers index */
     lo = index - hi * 16;                 /* sub-index within that chunk */
     entry = &self->progVagTable[hi][lo];  /* VagAtrView *, 0x20-byte stride */
-    result = func_80030E90(self->vabId, (s16)hi, (s16)lo,
+    result = SsUtKeyOn(self->vabId, (s16)hi, (s16)lo,
                             (s16)(entry->center + self->pitchOffset), entry->shift,
                             (s16)arg2, (s16)arg2);   /* NOTE: arg2 passed TWICE */
     if (result >= 0) {
@@ -37,7 +37,7 @@ the preserved body below -- `unk50/unk54/unk60/unk4/unk5` were the field
 names m2c/the original derivation actually saw.)
 
 This structure (control flow, argument counts -- including the double-`arg2`
-7th argument to `func_80030E90`, which m2c independently confirmed -- field
+7th argument to `SsUtKeyOn`, which m2c independently confirmed -- field
 offsets, and the `self->unk50[hi][lo]` addressing) is corroborated by
 `.venv/bin/python3 tools/m2ctx.py code_179d8_e --sig 's32
 VabStreamObj__PlayTone(ObjDA34 *self, s32 index, s32 arg2, s32 arg3)' --run`, which
@@ -169,7 +169,7 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
         hi = index / 16;
         lo = index - hi * 16;
         entry = &self->progVagTable[hi][lo];
-        result = func_80030E90(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
+        result = SsUtKeyOn(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
                                 entry->shift, (s16)arg2, (s16)arg2);
         if (result >= 0) {
             SsUtAutoVol(result, (s16)arg2, (s16)arg3, 2);
@@ -189,7 +189,7 @@ in `include/psyq/LIBSND.H`, where they land on the struct's own
 same-named bytes. Bytes/derivation unchanged.)
 
 Needs, from this unit's top-of-file scaffolding: `VabStreamObj`,
-`VagAtrView`, `extern s16 func_80030E90(s16, s16, s16, s16, s32, s32,
+`VagAtrView`, `extern s16 SsUtKeyOn(s16, s16, s16, s16, s32, s32,
 s32);`, `extern void SsUtAutoVol(s16, s16, s16, s32);` -- all already
 present in `src/code_179d8_e.c`.
 
@@ -309,7 +309,7 @@ Everything echo established about the FUNCTION stands unchanged and was not
 re-derived here: the signature, the `self->progVagTable[hi][lo]` addressing
 (named `unk50` at the time) with 0x20-byte stride, the `s16 vabId` /
 `s32 pitchOffset` field widths (named `unk54`/`unk60` at the time), and the
-double-`arg2` seventh argument to `func_80030E90` (visible in retail as
+double-`arg2` seventh argument to `SsUtKeyOn` (visible in retail as
 `sw $s1, 0x14($sp)` and `sw $s1, 0x18($sp)` from one sign-extension).
 
 ## Naming
@@ -321,7 +321,7 @@ instructed): the function resolves a packed `index` into a program/tone
 pair (`hi`/`lo`, exactly the `(vabId, prog, tone)` triple `SsUtGetVagAtr`
 uses elsewhere in this unit), looks up the matching `VagAtrView` entry,
 adds `self->pitchOffset` to its `center` note, and dispatches
-`func_80030E90(vabId, hi, lo, pitch, shift, arg2, arg2)` -- a "start
+`SsUtKeyOn(vabId, hi, lo, pitch, shift, arg2, arg2)` -- a "start
 playing this program/tone" call whose result (a voice/handle number) is
 then registered via `SsUtAutoVol`. `VabStreamObj__StopVoice`'s own
 "index < 0x18" guard (0x18 == 24, the PS1 SPU's own voice count) is the

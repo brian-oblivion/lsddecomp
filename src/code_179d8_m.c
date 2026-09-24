@@ -4,7 +4,7 @@
  * pair for a 24-voice (0..0x17) PS1 SPU wavetable player driven by MIDI-
  * shaped events (confirmed: code_179d8_k.c's caller switches on a status
  * byte with the MIDI 0x90/0xB0/0xC0/0xE0/0xFF nibbles; D_8006DAD4 is the
- * PS1 SPU's real hardware base, 0x1F801C00, per func_8002DDBC's report in
+ * PS1 SPU's real hardware base, 0x1F801C00, per vmNoiseOn2's report in
  * code_179d8_l). Plain free functions, no vtable -- `tools/classtable.py`
  * lists no method table at these addresses.
  *
@@ -18,49 +18,49 @@
  *
  * WHAT EACH FUNCTION DOES (see docs/match-reports/<name>.md for the full
  * derivation and evidence):
- *   - StartNote / StopNote: a matched NoteOn/NoteOff pair. Given a packed
+ *   - StartNote / SpuVmKeyOff: a matched NoteOn/NoteOff pair. Given a packed
  *     [screen|slot] identity, note, volume/program and (for StartNote) a
  *     velocity and a computed stereo pan split, StartNote registers a new
- *     active-voice record; StopNote scans every voice for one whose
+ *     active-voice record; SpuVmKeyOff scans every voice for one whose
  *     identity fields match and releases it, returning the count released.
- *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (func_8002CF18, in
- *     code_179d8_l) and, if one exists, key it on (func_8002DDBC, also
+ *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (SpuVmAlloc, in
+ *     code_179d8_l) and, if one exists, key it on (vmNoiseOn2, also
  *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
  *     two hardcoded constants.
- *   - BeginVoiceFade / StepVoiceFade: a linear-ramp pair over the
+ *   - SeAutoPan / SetAutoPan: a linear-ramp pair over the
  *     gVoiceFade* per-voice arrays -- Begin sets a start/target/step-rate;
  *     Step advances the accumulator (throttled by an interval/countdown
  *     pair), clamps at the target, and writes the resulting stereo output
  *     level.
- *   - StepVoiceEnvelope: the same accumulate-until-limit shape over its
+ *   - SetAutoVol: the same accumulate-until-limit shape over its
  *     own gVoiceEnv* family, but with no "Begin" counterpart in this
  *     unit -- whatever sets gVoiceEnvActive/gVoiceEnvStep/gVoiceEnvLimit
- *     is still undecompiled elsewhere. func_8002E308 in code_179d8_l opens
+ *     is still undecompiled elsewhere. SeAutoVol in code_179d8_l opens
  *     with the identical prologue/argument-narrowing shape and is worth
  *     checking as that counterpart.
  *   - SpuVmFlush: the per-tick dispatcher. Maintains a 16-slot
  *     ring buffer of per-tick voice-activity bitmasks; when a voice has
  *     shown no activity for 16 consecutive ticks it force-releases it
  *     (disabling the SPU noise generator if that voice was in noise
- *     state); then calls StepVoiceEnvelope/StepVoiceFade for every voice
+ *     state); then calls SetAutoVol/SetAutoPan for every voice
  *     whose respective flag is set. Called once at the end of
- *     InitSpuDriver and, going by its own ring-buffer/mask-clearing logic,
+ *     SpuVmInit and, going by its own ring-buffer/mask-clearing logic,
  *     meant to run every frame thereafter.
- *   - ClearNoiseVoices: releases every voice whose state byte reads
- *     exactly 2 (the same value StopNote/SpuVmFlush/func_8002CF18
+ *   - SpuVmNoiseOff: releases every voice whose state byte reads
+ *     exactly 2 (the same value SpuVmKeyOff/SpuVmFlush/SpuVmAlloc
  *     treat as "noise voice needing SpuSetNoiseVoice/func_800375E8 cleanup").
  *   - SpuVmPBVoice / SpuVmPitchBend: match a voice by
  *     identity and apply a curve-table-driven pitch bend from a 0-127
  *     depth value centered at 0x40, writing the result through
  *     note2pitch2; the "AllVoices" wrapper calls Sony's SpuVmVSetUp once
  *     and then runs this over every voice, returning the count affected.
- *   - InitSpuDriver: the SPU driver's init call -- _spu_setInTransfer,
+ *   - SpuVmInit: the SPU driver's init call -- _spu_setInTransfer,
  *     SpuInitMalloc, zeroes every per-voice table and the two master
  *     volume globals (reset to 0x3FFF, the SPU's real max), then calls
  *     SpuVmFlush once.
  *
  * STALLS: SpuVmPBVoice, StartNote, SpuVmFlush,
- * StepVoiceEnvelope, StepVoiceFade -- all five are the same "whole-function
+ * SetAutoVol, SetAutoPan -- all five are the same "whole-function
  * register-count decision predates any of the function's own locals"
  * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
  */
@@ -70,14 +70,14 @@
  * this function's frame gap (0x10 built vs retail's 0x18, 8 bytes; retail
  * saves ZERO callee-saved registers and addresses NOTHING via $sp beyond
  * the prologue/epilogue immediate itself, confirmed via grep -- textbook
- * pure-padding shape). See docs/match-reports/StepVoiceEnvelope.md for the
+ * pure-padding shape). See docs/match-reports/SetAutoVol.md for the
  * full derivation this body is otherwise unchanged from.
  *
  * This function sits FIRST in ROM order in this unit, so the shared
  * record-family types its sibling stalls also use (Rec34Half, Rec34HalfU,
  * Rec16D7F0, ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
  * defined HERE instead of duplicated -- their old definitions further
- * down this file (originally written for StepVoiceFade's isolated splice)
+ * down this file (originally written for SetAutoPan's isolated splice)
  * are removed; the plain externs that used to accompany them there are
  * left in place and now just reference these same, earlier-defined types
  * (a harmless duplicate extern declaration, not a redefinition). Same
@@ -87,7 +87,7 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half gVoiceEnvActive[]; /* nonzero while this voice's envelope is still ramping; cleared by StepVoiceEnvelope when it reaches gVoiceEnvLimit */
+extern Rec34Half gVoiceEnvActive[]; /* nonzero while this voice's envelope is still ramping; cleared by SetAutoVol when it reaches gVoiceEnvLimit */
 extern Rec34Half gVoiceEnvStep[]; /* per-tick increment/decrement applied to gVoiceEnvAccum */
 extern Rec34Half gVoiceEnvInterval[]; /* ticks between steps (0 = every tick), same throttle idiom as gVoiceFadeInterval below */
 extern Rec34Half gVoiceEnvCountdown[]; /* countdown to the next step, reloaded from gVoiceEnvInterval */
@@ -112,7 +112,7 @@ typedef struct {
     u8 pad[0x12];
     u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per StartNote's report */
     u8 pad14[0x18 - 0x14];
-    u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in StepVoiceEnvelope/StepVoiceFade */
+    u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in SetAutoVol/SetAutoPan */
 } ObjE970;
 extern ObjE970 *D_8008E970;
 
@@ -131,9 +131,9 @@ extern s16 D_8008E8C0;
  * (sdkname shape 0.99). Residue: in the pan split's `else` arm retail
  * copies the volume into $a1 first and multiplies THAT register (no
  * andi); this body multiplies the volume register directly and masks
- * val1 -- same residue as StepVoiceFade below
- * (docs/match-reports/StepVoiceEnvelope.md). */
-void StepVoiceEnvelope(s16 voice)
+ * val1 -- same residue as SetAutoPan below
+ * (docs/match-reports/SetAutoVol.md). */
+void SetAutoVol(s16 voice)
 {
     s16 v;
     s16 off;
@@ -211,7 +211,7 @@ void StepVoiceEnvelope(s16 voice)
     D_8008D970[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceEnvelope);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoVol);
 #endif
 
 /* Same 0x34-stride channel-configuration record family documented in
@@ -219,14 +219,14 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceEnvelope);
  * own local view rather than sharing that file's header-less types.
  * Six independent 2-bytes-apart symbols share this one shape, same
  * idiom as code_179d8_j.c's own D_8008D994/D_8008D996/... family. */
-extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by BeginVoiceFade, cleared by StepVoiceFade when gVoiceFadeAccum reaches gVoiceFadeLimit */
+extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by SeAutoPan, cleared by SetAutoPan when gVoiceFadeAccum reaches gVoiceFadeLimit */
 extern Rec34Half gVoiceFadeStep[]; /* per-tick increment/decrement applied to gVoiceFadeAccum */
 extern Rec34Half gVoiceFadeInterval[]; /* ticks between steps (0 = every tick); same throttle idiom as gVoiceEnvInterval above */
 extern Rec34Half gVoiceFadeCountdown[]; /* countdown to the next step, reloaded from gVoiceFadeInterval */
-extern Rec34Half gVoiceFadeAccum[]; /* running interpolated value, initialized to BeginVoiceFade's "from" argument */
-extern Rec34Half gVoiceFadeLimit[]; /* target value the fade is moving toward, BeginVoiceFade's "to" argument */
+extern Rec34Half gVoiceFadeAccum[]; /* running interpolated value, initialized to SeAutoPan's "from" argument */
+extern Rec34Half gVoiceFadeLimit[]; /* target value the fade is moving toward, SeAutoPan's "to" argument */
 
-void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
+void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
 
     if (a1 == a2) {
@@ -253,8 +253,8 @@ void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
  * insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoPan.
  * Residue: the pan split's `else` arm -- retail copies the volume into
  * $a1 and multiplies that copy unmasked; this body masks val1 instead
- * (docs/match-reports/StepVoiceFade.md). */
-void StepVoiceFade(s16 voice)
+ * (docs/match-reports/SetAutoPan.md). */
+void SetAutoPan(s16 voice)
 {
     s16 v;
     s16 off;
@@ -332,7 +332,7 @@ void StepVoiceFade(s16 voice)
     D_8008D970[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceFade);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoPan);
 #endif
 
 extern void _spu_setInTransfer(s32 a0);
@@ -410,10 +410,10 @@ extern ObjDAD4Edd4 *D_8006DAD4Edd4 __asm__("D_8006DAD4");
  * two separately-named locals (the natural, more readable choice) gives a
  * WORSE result than either leaving `a0` alone or this single-variable
  * reuse; the reuse itself is load-bearing, not cosmetic.  See
- * docs/match-reports/InitSpuDriver.md for the full derivation, the
+ * docs/match-reports/SpuVmInit.md for the full derivation, the
  * permuter trace, and why the naive two-variable translation regresses
  * sharply (47/270) despite being semantically identical. */
-void InitSpuDriver(s32 a0) {
+void SpuVmInit(s32 a0) {
     s16 i;
     s32 scratch;
 
@@ -539,24 +539,24 @@ extern u8 D_8008E9D0;
 /* Flag byte forced on unconditionally at entry. */
 extern u8 D_8008EA1B;
 
-extern s32 func_8002CF18(s32 a0); /* arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244 */
-extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
+extern s32 SpuVmAlloc(s32 a0); /* arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244 */
+extern void vmNoiseOn2(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
-    v0 = func_8002CF18(0xFF) & 0xFF;
+    v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
     if (v0 < D_8008E9D0) {
-        func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, a2 & 0xFFFF, a3 & 0xFFFF);
+        vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, a2 & 0xFFFF, a3 & 0xFFFF);
     }
 }
 
 /* Same 0x34-stride channel-configuration record family documented in
  * code_179d8_j.c (Rec34D994/Rec34Byte); this unit keeps its own local
  * view rather than sharing that file's header-less types. Rec34Half
- * itself is declared above, before its first user BeginVoiceFade. */
+ * itself is declared above, before its first user SeAutoPan. */
 typedef struct {
     u8 unk0; /* +0x0 */
     u8 pad1[0x34 - 0x1];
@@ -577,7 +577,7 @@ typedef struct {
 } ObjDAD4;
 extern ObjDAD4 *D_8006DAD4;
 
-void ClearNoiseVoices(void) {
+void SpuVmNoiseOff(void) {
     s16 i;
 
     for (i = 0; i < D_8008E9D0; i++) {
@@ -594,10 +594,10 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
-    v0 = func_8002CF18(0xFF) & 0xFF;
+    v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
     if (v0 < D_8008E9D0) {
-        func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
+        vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
     }
 }
 
@@ -622,7 +622,7 @@ extern Rec34S16 D_8008D988[];
  * width (`lbu`, same offset) elsewhere in this same function; the byte
  * view is reached via a plain pointer cast, same idiom as D_8008EA26's
  * mixed sh/lbu access.  D_8008D994 needs the same unsigned re-reading
- * here even though StopNote (above) reads the SAME symbol signed
+ * here even though SpuVmKeyOff (above) reads the SAME symbol signed
  * (`lh`) -- reinterpreted through a cast rather than redeclared, since
  * one extern symbol cannot carry two conflicting C types in one file. */
 typedef struct {
@@ -789,8 +789,8 @@ typedef struct {
 } Rec34HalfU2;
 
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
-extern void StepVoiceEnvelope(s16 a0);
-extern void StepVoiceFade(s16 a0);
+extern void SetAutoVol(s16 a0);
+extern void SetAutoPan(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
 /* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
@@ -880,10 +880,10 @@ void SpuVmFlush(void) {
 
     for (i = 0; i < 0x18; i++) {
         if (gVoiceEnvActive[i].unk0 != 0) {
-            StepVoiceEnvelope(i);
+            SetAutoVol(i);
         }
         if (gVoiceFadeActive[i].unk0 != 0) {
-            StepVoiceFade(i);
+            SetAutoPan(i);
         }
     }
 
@@ -977,11 +977,11 @@ extern u16 D_8008EA24;
 
 extern Rec34Half D_8008D9A0[];
 
-extern void func_8002D6A4(void);
-extern void func_8002D8E0(s32 a0);
+extern void SpuVmDoAllocate(void);
+extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch(void);
-extern void func_8002D1B4(s32 a0, u16 a1);
-extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
+extern void SpuVmKeyOnNow(s32 a0, u16 a1);
+extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 
 s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
 {
@@ -1062,7 +1062,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                 D_8008EA1E = entry2->unk6;
                 D_8008EA1F = entry2->unk7;
 
-                chan = func_8002CF18(0) & 0xFF;
+                chan = SpuVmAlloc(0) & 0xFF;
                 D_8008EA26 = chan;
                 if (chan < D_8008E9D0) {
                     D_8008D9A3[chan].unk0 = 1;
@@ -1084,18 +1084,18 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                     D_8008D9A0[D_8008EA26].unk0 = D_8008EA1B;
                     D_8008D988[D_8008EA26].unk0 = D_8008EA24;
 
-                    func_8002D6A4();
+                    SpuVmDoAllocate();
                     if (D_8008EA24 == 0xFF) {
-                        func_8002D8E0(*(u8 *) &D_8008EA26);
+                        vmNoiseOn(*(u8 *) &D_8008EA26);
                     } else {
-                        func_8002D1B4(matchCount, note2pitch());
+                        SpuVmKeyOnNow(matchCount, note2pitch());
                     }
                     s3 = (s3 << 4) | D_8008EA26;
                 }
             }
         }
     } else {
-        StopNote(a0s16, a1, a2, a3);
+        SpuVmKeyOff(a0s16, a1, a2, a3);
     }
 
     return s3;
@@ -1113,7 +1113,7 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3) {
+u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
     u8 count;
 

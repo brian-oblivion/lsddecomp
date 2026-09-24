@@ -1,7 +1,9 @@
-# func_8003149C -- STALL (round 70 re-measure: 5 words SHORT, 248/253 built; raw word-match 47/253 and insertions 18 / deletions 18 are drift-contaminated upper bounds while short; first real diff at word 23, the busy-lock guard's branch polarity, per round 36. The round-62 "BLOCKED below cc1" verdict is RETRACTED: 11 of the 16 missing words were the load-delay nop `--nop-at-expansion` emits since round 63)
+# SsUtKeyOnV -- STALL (round 70 re-measure: 5 words SHORT, 248/253 built; raw word-match 47/253 and insertions 18 / deletions 18 are drift-contaminated upper bounds while short; first real diff at word 23, the busy-lock guard's branch polarity, per round 36. The round-62 "BLOCKED below cc1" verdict is RETRACTED: 11 of the 16 missing words were the load-delay nop `--nop-at-expansion` emits since round 63)
+
+> Renamed from `func_8003149C` on 2026-09-24 (tools/rename.py). Address 0x8003149c.
 
 > **[RETRACTED round 70: the blocker below is resolved; see the title.]** **TOOLCHAIN-BLOCKED -- note added round 62 by bravo, who did not work this
-> function.** While revisiting its near twin `func_80030E90` (same unit,
+> function.** While revisiting its near twin `SsUtKeyOn` (same unit,
 > `src/code_179d8_j_b.c`), a below-cc1 blocker was found and escalated: a
 > load-delay `nop` that ASPSX 2.34 emits after an indexed load whose next
 > unexpanded instruction is a store-to-symbol macro of the loaded register,
@@ -10,17 +12,17 @@
 > function written as C. **This function has 11 of those 40 sites -- more than
 > any other function in the executable** -- so at least 11 of its 16 missing
 > words cannot be emitted by this pipeline for ANY C input. Its recorded
-> residues (and `func_80030E90`'s, which they were grouped with) predate this
+> residues (and `SsUtKeyOn`'s, which they were grouped with) predate this
 > finding and are not the reason it is short. **Do not staff another source
 > attempt until the blocker is resolved.** Reproducer, census method and the
-> per-function site counts are in `docs/match-reports/func_80030E90.md`'s
+> per-function site counts are in `docs/match-reports/SsUtKeyOn.md`'s
 > round-62 section. Nothing else in this report has been changed.
 
 
 Unit `code_179d8_j_b` (re-carved round 34; the round-26 text below says `code_179d8_j`, its name before the split). Round 26 (2026-09-09). Not a class method. **Read
-`func_80030E90`'s report first** -- this is that function's near-twin, with
+`SsUtKeyOn`'s report first** -- this is that function's near-twin, with
 one structural difference: instead of allocating a fresh channel slot via
-`func_8002CF18`, the caller supplies the slot index directly (`idx`,
+`SpuVmAlloc`, the caller supplies the slot index directly (`idx`,
 bounds-checked `< 0x18`), and `idx` itself (not an allocated "result") is
 the registration index and the success return value. Every other block
 (volume-pan, `SlotE968`/`RecordE978` field copies, the nine-table
@@ -31,7 +33,7 @@ the SAME fixes.
 
 ```c
 #if 0
-s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u16 note;
@@ -92,12 +94,12 @@ s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p
     D_8008D9A3[idx].unk0 = 1;
     D_8008D98A[idx].unk0 = 0;
     D_8008D99C[idx].unk0 = pending18;
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0((u8) idx);
+        vmNoiseOn((u8) idx);
     } else {
         s32 ret = note2pitch2(p3, p4);
-        func_8002D1B4(1, (u16) ret);
+        SpuVmKeyOnNow(1, (u16) ret);
     }
     D_8008E934 = 0;
     return idx;
@@ -109,17 +111,17 @@ fail:
 #endif
 ```
 
-As with `func_80030E90`, the actual attempted source had a bare
+As with `SsUtKeyOn`, the actual attempted source had a bare
 `__asm__("");` between almost every statement in the `RecordE978` field-copy
 block and the nine-table registration block (the exact same placement that
-closed `func_80030E90`'s registration-block ordering, reused verbatim here
+closed `SsUtKeyOn`'s registration-block ordering, reused verbatim here
 and confirmed to work identically -- see finding 2).
 
-## What's identical to `func_80030E90`, confirmed rather than assumed
+## What's identical to `SsUtKeyOn`, confirmed rather than assumed
 
 - The busy-lock guard's shape (`bne v0,v1,NEAR; ...; j FAR; li v0,-1;
   NEAR: ...`) is byte-for-byte the same construct, and a plain `if
-  (D_8008E934 == 1) return -1;` reproduces `func_80030E90`'s WRONG ("far
+  (D_8008E934 == 1) return -1;` reproduces `SsUtKeyOn`'s WRONG ("far
   jump") polarity here too -- same residue, same non-result from every
   guard-clause reshape tried previously (see that report's finding 4 for
   the full experiment log; not repeated here since the outcome is
@@ -127,7 +129,7 @@ and confirmed to work identically -- see finding 2).
 - `RecordE978`, `SlotE968`, and every scratch global in the
   `D_8008EA0C`-`D_8008EA24` range are the SAME symbols this unit's other
   function already declared; no new struct knowledge here beyond what
-  `func_80030E90`'s report already recorded.
+  `SsUtKeyOn`'s report already recorded.
 - `D_8008EA18` volatile / `D_8008EA24` plain-with-cast (finding 2 of the
   sibling report) reproduced correctly on the first attempt by reusing the
   same declarations -- no rediscovery needed.
@@ -141,18 +143,18 @@ and confirmed to work identically -- see finding 2).
   for-byte, INCLUDING the single-instruction (`li v1,0x1`) placement that
   needed that specific gap barrier-free.
 
-## What's NEW here (not present in `func_80030E90`)
+## What's NEW here (not present in `SsUtKeyOn`)
 
 ### A second, independent guard-polarity residue: the "note == 0" check
 
-`func_80030E90`'s equivalent check (`if ((s16) note == 0) goto fail;`,
+`SsUtKeyOn`'s equivalent check (`if ((s16) note == 0) goto fail;`,
 sharing a tail with the bounds/`func_80032148` failures) compiled with the
 SAME polarity as retail (`beqz a0,FAIL_TAIL`). Here, the identical C
 construct compiles to `beqz a0,FAIL_TAIL` in my build but retail uses
 **`bnez a0,SUCCESS`** (jump-to-continue on the true/non-fail case, with the
 fail path reached by FALLING THROUGH into the shared tail when false) --
-the reverse of `func_80030E90`'s own polarity choice for the textually
-identical construct. Given `func_80030E90` already proved this class of
+the reverse of `SsUtKeyOn`'s own polarity choice for the textually
+identical construct. Given `SsUtKeyOn` already proved this class of
 residue is insensitive to source reshaping (three different guard shapes,
 byte-identical output), this was not re-attempted here; it is recorded as
 a SECOND, independently-occurring instance of the same "GCC's branch
@@ -161,30 +163,30 @@ project's source-level view" phenomenon, not a new finding.
 
 ### A minor re-emergence of the fresh-read ordering issue, at a DIFFERENT statement pair
 
-`func_80030E90`'s barrier configuration placed `D_8008EA13`'s fresh read
+`SsUtKeyOn`'s barrier configuration placed `D_8008EA13`'s fresh read
 immediately before its own store (`D_8008D998[idx].unk0 = D_8008EA13;`),
 matching retail exactly there. Reusing the identical C and identical
 barriers here, retail's read positions ONE STATEMENT EARLIER than my build
 (retail: read `D_8008EA13` right after the `D_8008D99A` store, i.e. one
 step before my build performs it) -- the same class of "GCC batches an
 independent load differently depending on function-wide register
-pressure" issue documented in `func_80030E90`'s finding 3, but the exact
+pressure" issue documented in `SsUtKeyOn`'s finding 3, but the exact
 barrier arrangement that solved it there does not fully solve it here.
 This accounts for a small (2-4 word) fraction of the remaining gap; the
 much larger contributor is the missing load-delay-slot nops in the
 `SlotE968`/`RecordE978` field-copy blocks, inherited unchanged from
-`func_80030E90` (same confirmed-not-a-barrier-problem diagnosis; not
-re-investigated here since `func_80030E90`'s report already exhausted the
+`SsUtKeyOn` (same confirmed-not-a-barrier-problem diagnosis; not
+re-investigated here since `SsUtKeyOn`'s report already exhausted the
 axes available, and this function's copy of the same blocks showed
 IDENTICAL missing-nop positions).
 
 ## Attempts
 
-4 build-and-verify cycles (far fewer than `func_80030E90`, since almost
+4 build-and-verify cycles (far fewer than `SsUtKeyOn`, since almost
 every fix transferred directly): (1) fresh implementation reusing every
-`func_80030E90` fix proactively, which alone reached 35/253 raw / 236
+`SsUtKeyOn` fix proactively, which alone reached 35/253 raw / 236
 compiled words with the exact three residue classes predicted going in.
-No further reshaping attempted this round given `func_80030E90`'s report
+No further reshaping attempted this round given `SsUtKeyOn`'s report
 already demonstrates these residues resist source-level correction, and
 this function's remaining time budget was better spent confirming the
 transfer (which itself is the useful finding) than re-deriving the same
@@ -201,7 +203,7 @@ so here turned what would likely have been another 15+-attempt investigation
 into a 4-attempt confirmation, and the two residues that DID differ between
 siblings (a second, independently-oriented branch-polarity flip; a
 fresh-read position that shifted by one statement) were both instances of
-mechanisms `func_80030E90`'s report had already characterized as
+mechanisms `SsUtKeyOn`'s report had already characterized as
 non-source-derivable, not new problems requiring new investigation.
 
 **A residue confirmed non-source-derivable in one function should be
@@ -216,43 +218,43 @@ census rather than a per-function surprise each time it's hit.
 ## ROUND 31 (runner delta): rebuild confirms both title figures exactly
 
 Rebuilt the preserved body verbatim (same barrier placement as
-`func_80030E90`'s finding 3, reused here as that report recommends)
+`SsUtKeyOn`'s finding 3, reused here as that report recommends)
 through the current pinned pipeline. `build/lsdde.map` puts the next
-function, `func_80031890`, at built address `0x8003184c` against its own
+function, `SsUtKeyOffV`, at built address `0x8003184c` against its own
 retail address `0x80031890` -- a 68-byte (17-word) deficit, confirming
 **236/253 words, 17 SHORT**, exactly as the title states. `funcdiff.py`'s
 raw count reproduces **35/253** exactly as well. No new reshape attempted
 this round: this function's own report already treats its two
-differences from `func_80030E90` (the reversed `note==0` polarity, the
+differences from `SsUtKeyOn` (the reversed `note==0` polarity, the
 shifted `D_8008EA13` fresh-read position) as instances of mechanisms the
 sibling report characterizes as non-source-derivable, not new problems,
-and this round's time was spent instead on `func_80030E90` (where the
+and this round's time was spent instead on `SsUtKeyOn` (where the
 report's one specifically-flagged untested lever, `result` typed `s32`,
 gained one word -- see that report's round-31 addendum) and on
-`func_80031A44` (where a permuter search found a genuine improvement --
+`SsUtChangePitch` (where a permuter search found a genuine improvement --
 see that report). Restored to `INCLUDE_ASM`; still a STALL.
 
-## ROUND 36 (runner delta): stale-symbol rebuild -- 237/253 measured, same declaration gaps as func_80030E90
+## ROUND 36 (runner delta): stale-symbol rebuild -- 237/253 measured, same declaration gaps as SsUtKeyOn
 
-Same rename as `func_80030E90` (`func_80032148` -> `SpuVmVSetUp`, round
+Same rename as `SsUtKeyOn` (`func_80032148` -> `SpuVmVSetUp`, round
 34's `libsnd/vm_vsu.o` conversion) and the same three declaration gaps
 round 34's carve left in `src/code_179d8_j_b.c` (`SpuVmVSetUp` itself,
-`D_8008EA22`, the `SlotE968`/`D_8008E968` pair) -- see `func_80030E90.md`'s
+`D_8008EA22`, the `SlotE968`/`D_8008E968` pair) -- see `SsUtKeyOn.md`'s
 round-36 addendum for the full derivation; adding them once in this shared
 file fixed both functions' preserved bodies.
 
 Rebuilt the body shown above verbatim, with the SAME barrier placement
-`func_80030E90`'s round-36 rebuild used (the report above says this
+`SsUtKeyOn`'s round-36 rebuild used (the report above says this
 function reuses that exact configuration). Clean compile. **Measured:
 237/253 words, 16 short** (`build/lsdde.map`: retail's next function
-`func_80031890` at `0x80031890`, this build's at `0x80031850`, a
+`SsUtKeyOffV` at `0x80031890`, this build's at `0x80031850`, a
 0x40/16-word deficit). Raw word-match 33/253. Close to but not an exact
 reproduction of the title's inherited 236/253 -- one word different, same
-caveat as `func_80030E90`'s round-36 note (barrier placement recovered
+caveat as `SsUtKeyOn`'s round-36 note (barrier placement recovered
 from prose, not guaranteed bit-exact).
 
 **Not reattempted beyond the rebuild**, for the same reason as
-`func_80030E90`: this function's own report treats every one of its
+`SsUtKeyOn`: this function's own report treats every one of its
 residues (three inherited, two more of its own) as instances of mechanisms
 the sibling report already investigated exhaustively and confirmed
 non-source-derivable, and this round's remaining time went to the two
@@ -262,13 +264,13 @@ STALL.
 ### The corrected, linkable body (237/253 words, this round's measurement)
 
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
-`func_8003149C` in `src/code_179d8_j_b.c`, between `func_80031280` and
-`func_80031890`. Needs the same `SlotE968`/`D_8008E968`/`D_8008EA22`
-declarations as `func_80030E90`'s corrected body (see that report), all
+`SsUtKeyOnV` in `src/code_179d8_j_b.c`, between `SsUtKeyOff` and
+`SsUtKeyOffV`. Needs the same `SlotE968`/`D_8008E968`/`D_8008EA22`
+declarations as `SsUtKeyOn`'s corrected body (see that report), all
 now present in the shared file.
 
 ```c
-s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u16 note;
@@ -338,12 +340,12 @@ s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p
     D_8008D98A[idx].unk0 = 0;
     __asm__("");
     D_8008D99C[idx].unk0 = pending18;
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0((u8) idx);
+        vmNoiseOn((u8) idx);
     } else {
         s32 ret = note2pitch2(p3, p4);
-        func_8002D1B4(1, (u16) ret);
+        SpuVmKeyOnNow(1, (u16) ret);
     }
     D_8008E934 = 0;
     return idx;
@@ -362,7 +364,7 @@ waiting on a notification that was never coming (nothing runs on a runner's
 behalf). The head recovered the worktree by hand before teardown: measured the
 body, preserved it below, restored the `INCLUDE_ASM`, and wrote this entry. The
 MEASUREMENTS here are the head's own and were taken with the sibling
-`func_80030E90` restored to
+`SsUtKeyOn` restored to
 `INCLUDE_ASM`, so this figure is free of that sibling's drift. The
 INTERPRETATION is reconstructed from the runner's artifacts, not from its
 reasoning, and is flagged where it is inference.
@@ -410,7 +412,7 @@ will mislead; find the missing instructions first.
 
 ```c
 #if 0
-s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u16 note;
@@ -480,12 +482,12 @@ s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p
     D_8008D98A[idx].unk0 = 0;
     __asm__("");
     D_8008D99C[idx].unk0 = pending18;
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0((u8) idx);
+        vmNoiseOn((u8) idx);
     } else {
         s32 ret = note2pitch2(p3, p4);
-        func_8002D1B4(1, (u16) ret);
+        SpuVmKeyOnNow(1, (u16) ret);
     }
     D_8008E934 = 0;
     return idx;
@@ -505,12 +507,12 @@ attempt" and explicitly NOT yet translated at the time of recovery. This
 session resumed (both this round's background permuter searches completed
 and their notifications were processed normally) and closed that open
 item -- for three candidates, not just the flagged one, since the saved
-`permuter-work/func_8003149C/output-*` directory held two more below the
+`permuter-work/SsUtKeyOnV/output-*` directory held two more below the
 4035 base worth checking at the same time:
 
 - **Score 3265**: a pointer-indirection idiom for the `note` read
   (`u16 *new_var = &rec->unk16; note = *new_var;`). Translated as
-  `pnote`/`*pnote` and rebuilt (isolated: sibling `func_80030E90` held at
+  `pnote`/`*pnote` and rebuilt (isolated: sibling `SsUtKeyOn` held at
   `INCLUDE_ASM` so its own shortfall does not contaminate this function's
   window, per CLAUDE.md's attribution-hazard note): **byte-identical to
   baseline, 33/253 raw match, no change.**
@@ -526,7 +528,7 @@ item -- for three candidates, not just the flagged one, since the saved
   isolation: **byte-identical to baseline, 33/253, no change.**
 
 All three are the same scaffold-vs-real-oracle disagreement
-`func_80031890`'s and `func_80030E90`'s round-40 entries document: the
+`SsUtKeyOffV`'s and `SsUtKeyOn`'s round-40 entries document: the
 permuter's isolated translation unit does not reproduce this project's real
 register-allocation pressure, so a scaffold-local score improvement
 (4035 -> 2575, ~36%) is not evidence about the real function on its own.
@@ -537,7 +539,7 @@ confirmed exhausted under a real permuter search of 63315 iterations as
 well as hand reshaping and direct transfer from the sibling function.
 
 Also added the `SpuVmVSetUp` extern to `src/code_179d8_j_b.c` (shared fix,
-same gap `func_80030E90.md`'s continuation describes -- this function's
+same gap `SsUtKeyOn.md`'s continuation describes -- this function's
 preserved body needs the same declaration and it was likewise missing).
 
 ### Proposed learning
@@ -546,8 +548,8 @@ preserved body needs the same declaration and it was likewise missing).
 the second one still surfaces DIFFERENT sub-base leads than the first,
 even against the same declarations -- but "different leads" is not the
 same as "different outcome."** This function's search found three distinct
-candidates that `func_80030E90`'s search did not surface at all, yet all
-three failed to transfer for the identical reason `func_80030E90`'s single
+candidates that `SsUtKeyOn`'s search did not surface at all, yet all
+three failed to transfer for the identical reason `SsUtKeyOn`'s single
 lead did (scaffold-local register pressure, not a real source-level fix).
 The negative result generalizes across the sibling pair even though the
 specific leads found do not -- worth recording because it means a second
@@ -560,17 +562,17 @@ length gap from 16 to 5 words; NON_MATCHING promoted, comment updated
 
 Promotion job (`docs/FINISHING-PLAN.md` track 1b), not a matching session:
 measure once, do not iterate. The round-40 body above was put LIVE
-(replacing `INCLUDE_ASM`, no `#ifdef`, sibling `func_80030E90` left at
+(replacing `INCLUDE_ASM`, no `#ifdef`, sibling `SsUtKeyOn` left at
 `INCLUDE_ASM` so its own bytes do not contaminate this window) and rebuilt.
 
 **Length: 248/253 built, 5 words short** (`build/lsdde.map`:
-`func_80031890` now at `0x8003187c` against retail's own `0x80031890`, a
+`SsUtKeyOffV` now at `0x8003187c` against retail's own `0x80031890`, a
 0x14/5-word deficit -- was `0x8003184c`/17-then-16 words short at every
 prior measurement). This matches the round-62 accounting's prediction
 closely: this function has 11 load-delay-nop sites (vs the sibling's 9),
 and `--nop-at-expansion` (CLAUDE.md, "Open toolchain blockers", resolved
 round 63) is exactly that fix, though it does not close this function's
-gap to zero the way it did for `func_80030E90` -- 5 words of some other
+gap to zero the way it did for `SsUtKeyOn` -- 5 words of some other
 residue (the two guard-polarity flips this report already documents, most
 likely) remain.
 

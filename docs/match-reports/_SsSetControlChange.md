@@ -1,4 +1,6 @@
-# func_80034690 -- MATCHED (round 69, runner bravo): 200/200, byte-exact, whole-image SHA1 green
+# _SsSetControlChange -- MATCHED (round 69, runner bravo): 200/200, byte-exact, whole-image SHA1 green
+
+> Renamed from `func_80034690` on 2026-09-24 (tools/rename.py). Address 0x80034690.
 
 **REVISITED, round 69: MATCHED; names/types used** (a callee parameter
 type and a case-local's width -- no field or function renamed).
@@ -69,7 +71,7 @@ retail's `lbu $t0` + per-arm `move` shape.
 
 ## History (superseded -- the stall verdict below is retired by the match above)
 
-Old title: func_80034690 -- STALL: length 5 words SHORT (compiled 195/200); raw word-match DELIBERATELY NOT QUOTED (see below -- a length gap voids it); first real diff is the length gap itself
+Old title: _SsSetControlChange -- STALL: length 5 words SHORT (compiled 195/200); raw word-match DELIBERATELY NOT QUOTED (see below -- a length gap voids it); first real diff is the length gap itself
 
 **5 words SHORT: compiled length 195/200 words.** Measured directly from
 `build/src/code_179d8_k.c.o` (`objdump -d`, symbol-to-symbol distance),
@@ -234,7 +236,7 @@ extern void ContRpn1(s16 a0, s16 a1, u8 a2);
 extern void ContRpn2(s16 a0, s16 a1, u8 a2);
 extern void ContResetAll(s16 a0, s16 a1);
 
-void func_80034690(s16 a0, s16 a1, u8 a2)
+void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = rec->unk4;
@@ -467,7 +469,7 @@ stronger signal than either alone.
 ## Round 39 update (runner alpha): re-verified; hoist-both-before-either checked, not applicable
 
 Rebuilt the preserved near-miss body and cross-checked compiled length
-directly via `objdump` symbol-to-symbol distance: `func_80034690` is
+directly via `objdump` symbol-to-symbol distance: `_SsSetControlChange` is
 `0x30c` bytes (195 words), reproducing the title's "5 words SHORT
 (195/200)" exactly. Confirmed clean against both blocker screens
 (`gp_rel`, `nop_mflo_mfhi`) -- no hits, as the unit header already states.

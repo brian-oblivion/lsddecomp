@@ -13,7 +13,7 @@
  * code_179d8_j_c -- the TAIL of the old code_179d8_j slice, split off in round
  * 34 (2026-09-12) when Sony's `libsnd/ut_pb.o` was linked into the middle of
  * `code_179d8_j_b`.  Now 0x22244..0x2273C (vram 0x80031A44..0x80031F3C), eight
- * functions (func_80031A44 .. SsUtAutoPan).
+ * functions (SsUtChangePitch .. SsUtAutoPan).
  *
  * WHY THE SPLIT EXISTS.  `func_800319B4` is Sony's `SsUtPitchBend`
  * (`libsnd/ut_pb`, Psy-Q 3.6 -- the only disc carrying the module; 0x90 text
@@ -43,7 +43,7 @@
  *
  * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
  * re-implementing the greps and never for `addiu_at` (resolved round 21).
- * `nearmiss.py` runs `tools/sdkstalls.py` for you.  func_80031A44 carries a
+ * `nearmiss.py` runs `tools/sdkstalls.py` for you.  SsUtChangePitch carries a
  * HEAD SALVAGE body in its report (84/88 words, round 31) -- read the report
  * before starting, it is not cold ground.
  *
@@ -62,11 +62,11 @@
  * round 21 and was removed rather than left to be believed.)  See CLAUDE.md's note on this.
  * ------------------------------------------------------------------------ */
 extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
-extern s32 StopNote(s32 a0, s16 a1, s16 a2, u16 a3);
+extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3);
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 extern s16 SpuVmPBVoice(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
-extern void func_8002E308(s16 a0, s16 a1, s16 a2, s16 a3);
-extern void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3);
+extern void SeAutoVol(s16 a0, s16 a1, s16 a2, s16 a3);
+extern void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3);
 
 /* Base pointer for a table of 0x10-byte entries, indexed by a 0..0x17
  * id.  Only the two leading s16 fields this unit's own accessors touch
@@ -74,8 +74,8 @@ extern void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3);
 typedef struct EntryDAD4 {
     s16 unk0; /* +0x0 */
     s16 unk2; /* +0x2 */
-    s16 unk4; /* +0x4 -- read by func_80031280, entry index 25 only */
-    s16 unk6; /* +0x6 -- read by func_80031280, entry index 25 only */
+    s16 unk4; /* +0x4 -- read by SsUtKeyOff, entry index 25 only */
+    s16 unk6; /* +0x6 -- read by SsUtKeyOff, entry index 25 only */
     u8 pad8[0x10 - 0x8];
 } EntryDAD4;
 extern EntryDAD4 *D_8006DAD4;
@@ -114,7 +114,7 @@ extern Rec16D7F0 D_8008D7F4[]; /* independent array, same shape */
 /* Per-slot flag byte, same 0..0x17 id as several of the tables above. */
 extern u8 D_8008D970[];
 
-/* STALL -- see docs/match-reports/func_80031A44.md.  HEAD SALVAGE, round 31,
+/* STALL -- see docs/match-reports/SsUtChangePitch.md.  HEAD SALVAGE, round 31,
  * confirmed round 32 (permuter, ~54k iterations, not closed). Round 36:
  * rebuilt with SpuVmVSetUp's real name (was func_80032148 in the report's
  * preserved body -- round 34's SDK conversion renamed the callee, and the
@@ -123,7 +123,7 @@ extern u8 D_8008D970[];
  * D_8008EA22 stores (the one untested lever the report flagged) blows the
  * function up drastically instead of fixing the swap -- see this round's
  * report update. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", func_80031A44);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", SsUtChangePitch);
 
 /* Rec34D994 (D_8008D994/99A/99E) and Rec16D7F0 (D_8008D7F8/D_8008D7FA
  * below) are declared once, near the top of this file, and shared by
@@ -139,7 +139,7 @@ extern Rec16D7F0 D_8008D7FA[];
  * stack-passed arguments at 0x18/0x1C($sp) instead of 0x10/0x14.  See this
  * function's match report -- the frame is the ONLY thing the idiom is for,
  * and adding anything else on top of it breaks the scheduling. */
-s32 func_80031BA4(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
+s32 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
     s32 dead[2];
 
     if ((u16)idx < 0x18) {
@@ -228,7 +228,7 @@ s32 SsUtSetVVol(s16 idx, s16 p1, s16 p2)
 s32 SsUtAutoVol(s16 p0, s16 p1, s16 p2, s16 p3)
 {
     if ((u16) p0 < 0x18) {
-        func_8002E308(p0, p1, p2, p3);
+        SeAutoVol(p0, p1, p2, p3);
         return 0;
     }
     return -1;
@@ -237,7 +237,7 @@ s32 SsUtAutoVol(s16 p0, s16 p1, s16 p2, s16 p3)
 s32 SsUtAutoPan(s16 p0, s16 p1, s16 p2, s16 p3)
 {
     if ((u16) p0 < 0x18) {
-        BeginVoiceFade(p0, p1, p2, p3);
+        SeAutoPan(p0, p1, p2, p3);
         return 0;
     }
     return -1;

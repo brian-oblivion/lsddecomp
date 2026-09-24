@@ -13,7 +13,7 @@
  * code_179d8_j_b -- the MIDDLE third of the old code_179d8_j slice, after
  * round 34 (2026-09-12) linked TWO Sony objects into what used to be one unit.
  * Now 0x21180..0x221B4 (vram 0x80030980..0x800319B4), five functions
- * (func_80030980 .. func_80031890).
+ * (func_80030980 .. SsUtKeyOffV).
  *
  * WHY THIS UNIT EXISTS, IN TWO STEPS, BOTH IN ROUND 34.
  *   1. `libsnd/vm_prog.o` (Psy-Q 3.6 -- the only disc carrying the module)
@@ -23,7 +23,7 @@
  *   2. `libsnd/ut_pb.o` (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244:
  *      `SsUtPitchBend`, which was `func_800319B4`, also previously MATCHED.
  *      That split THIS file again into [c][o][c], and everything from
- *      func_80031A44 on moved to `src/code_179d8_j_c.c`.
+ *      SsUtChangePitch on moved to `src/code_179d8_j_c.c`.
  * Reclassifying five matched functions out of the game count across the two
  * steps is the correction CLAUDE.md asks for, not a regression; their C is
  * DELETED, not commented out.
@@ -31,8 +31,8 @@
  * `D_8008EA22`'S OWN COMMENT WAS WRONG AND IS CORRECTED HERE (round 36): it
  * used to claim `SsUtPitchBend` and the deleted `SpuVmGetSeqRVol` were its
  * only readers in this family, and dropped the extern on that basis. That
- * was never true of this file's own two remaining stalls -- func_80030E90
- * and func_8003149C both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
+ * was never true of this file's own two remaining stalls -- SsUtKeyOn
+ * and SsUtKeyOnV both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
  * unnoticed because both were still INCLUDE_ASM and nothing failed to
  * link. Declared again below.
  *
@@ -48,7 +48,7 @@
  * shared code_179d8*.h.  The sibling slices are staffed independently and a
  * shared header is what makes their merges collide; see
  * `python3 tools/headercontention.py`.  Several externs below are read only by
- * functions still carried as INCLUDE_ASM (the `func_80030E90` scratch globals
+ * functions still carried as INCLUDE_ASM (the `SsUtKeyOn` scratch globals
  * in particular); they are knowledge about those functions, not dead code, and
  * were re-homed here deliberately rather than dropped.
  *
@@ -67,9 +67,9 @@
 #include "common.h"
 
 /* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
- * (func_80030E90's own computed index, not a channel id). Every field
+ * (SsUtKeyOn's own computed index, not a channel id). Every field
  * this unit's own accessor touches is named; offsets are exact (read
- * from func_80030E90's own lbu/lhu immediates), field names are not. */
+ * from SsUtKeyOn's own lbu/lhu immediates), field names are not. */
 typedef struct {
     u8 unk0;  /* +0x0 */
     u8 unk1;  /* +0x1 */
@@ -91,8 +91,8 @@ extern RecordE978 *D_8008E978;
 typedef struct EntryDAD4 {
     s16 unk0; /* +0x0 */
     s16 unk2; /* +0x2 */
-    s16 unk4; /* +0x4 -- read by func_80031280, entry index 25 only */
-    s16 unk6; /* +0x6 -- read by func_80031280, entry index 25 only */
+    s16 unk4; /* +0x4 -- read by SsUtKeyOff, entry index 25 only */
+    s16 unk6; /* +0x6 -- read by SsUtKeyOff, entry index 25 only */
     u8 pad8[0x10 - 0x8];
 } EntryDAD4;
 extern EntryDAD4 *D_8006DAD4;
@@ -112,11 +112,11 @@ extern volatile u8 D_8008EA18;
 extern u16 D_8008EA22;
 
 /* Base pointer for a table of 0x10-byte slots, indexed by the same <0x18
- * channel space func_80030E90 validates via SpuVmVSetUp. This unit's own
- * reduced view: only the fields func_80030E90 itself touches are named.
+ * channel space SsUtKeyOn validates via SpuVmVSetUp. This unit's own
+ * reduced view: only the fields SsUtKeyOn itself touches are named.
  * The sibling accessors that used to share this typedef (SpuVmSetProgVol
  * and friends, code_179d8_j.c's old `SlotE968`) are Sony's own object as
- * of round 34's split and never touched offset 0; func_80030E90 does, so
+ * of round 34's split and never touched offset 0; SsUtKeyOn does, so
  * this unit's own copy of the type names it (see func_80030864.md, the
  * matched sibling's report, for the +0x1/+0x4 fields' provenance). */
 typedef struct SlotE968 {
@@ -128,7 +128,7 @@ typedef struct SlotE968 {
 } SlotE968;
 extern SlotE968 *D_8008E968;
 
-/* func_80030E90's own scratch globals -- a "start channel" setup
+/* SsUtKeyOn's own scratch globals -- a "start channel" setup
  * routine that stages its parameters and a couple of table lookups
  * into a block of one/two-byte globals before registering a new
  * active-channel record.  Offsets are exact (this unit's own field
@@ -152,11 +152,11 @@ extern u8 D_8008EA1F;
 extern u8 D_8008EA20;
 extern u16 D_8008EA24;
 
-extern s32 func_8002CF18(void);
-extern void func_8002D6A4(void);
-extern void func_8002D8E0(s32 a0);
+extern s32 SpuVmAlloc(void);
+extern void SpuVmDoAllocate(void);
+extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch2(u16 a0, u16 a1);
-extern void func_8002D1B4(s32 a0, u16 a1);
+extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 
 /* Loop bound for a small table of active "objects" (screen/slot
@@ -204,7 +204,7 @@ extern Rec34Byte D_8008D9A3[];
  * D_8008D98A and D_8008D98C, each 2 bytes apart in the data section --
  * same "several unrelated top-level symbols" convention as the
  * Rec34D994 group above). D_8008D988's field is read signed
- * (func_80031280 compares it against 0xFF with `lh`, not `lhu`). */
+ * (SsUtKeyOff compares it against 0xFF with `lh`, not `lhu`). */
 typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
@@ -213,7 +213,7 @@ extern Rec34Half D_8008D988[];
 extern Rec34Half D_8008D98A[];
 extern Rec34Half D_8008D98C[];
 
-/* Shared with func_8002D8E0/func_8002D1B4 in code_179d8_l.c (same
+/* Shared with vmNoiseOn/SpuVmKeyOnNow in code_179d8_l.c (same
  * two-level entry table, same blend-cascade shape); this unit's own
  * reduced view, per the project's per-unit-local-view convention --
  * only the two fields func_80030980 itself touches are named. */
@@ -343,8 +343,8 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
  * insertions 11 / deletions 11 (re-measured round 70). Residue: the
  * busy-lock guard's branch polarity, with the rest not re-characterised
  * since `--nop-at-expansion` closed the old length gap
- * (docs/match-reports/func_80030E90.md). Hand-derived. */
-s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
+ * (docs/match-reports/SsUtKeyOn.md). Hand-derived. */
+s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
     SlotE968 *slot;
     RecordE978 *rec;
@@ -394,7 +394,7 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     if ((s16) note == 0) {
         goto fail;
     }
-    result = (s32)(u8) func_8002CF18();
+    result = (s32)(u8) SpuVmAlloc();
     if ((u8) result == D_8008E9D0) {
         goto fail;
     }
@@ -419,12 +419,12 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     __asm__("");
     D_8008D99C[(u8) result].unk0 = pending18;
 
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0((u8) result);
+        vmNoiseOn((u8) result);
     } else {
         s32 ret = note2pitch2((u16) p3, p4);
-        func_8002D1B4(1, (u16) ret);
+        SpuVmKeyOnNow(1, (u16) ret);
     }
     D_8008E934 = 0;
     return (u8) result;
@@ -435,10 +435,10 @@ fail_nolock:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030E90);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOn);
 #endif
 
-s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
+s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
 {
     u16 chan;
     u32 mask0;
@@ -494,8 +494,8 @@ fail_nolock:
  * Residue: the busy-lock guard's branch polarity and a second guard
  * flip; the 5-word gap is not re-characterised since
  * `--nop-at-expansion` closed 11 of the old 16
- * (docs/match-reports/func_8003149C.md). Hand-derived. */
-s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
+ * (docs/match-reports/SsUtKeyOnV.md). Hand-derived. */
+s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u16 note;
@@ -565,12 +565,12 @@ s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p
     D_8008D98A[idx].unk0 = 0;
     __asm__("");
     D_8008D99C[idx].unk0 = pending18;
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0((u8) idx);
+        vmNoiseOn((u8) idx);
     } else {
         s32 ret = note2pitch2(p3, p4);
-        func_8002D1B4(1, (u16) ret);
+        SpuVmKeyOnNow(1, (u16) ret);
     }
     D_8008E934 = 0;
     return idx;
@@ -580,10 +580,10 @@ fail:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
 #endif
 
-/* The "release channel" twin of func_80031280's else-branch above: same
+/* The "release channel" twin of SsUtKeyOff's else-branch above: same
  * D_8008E934 lock, same (mask0, mask1) split of a 0..0x17 channel across two
  * 16-bit mask words, same three per-channel field clears, same mask update.
  * MATCHED round 62 by writing it in exactly that sibling's idiom -- direct
@@ -593,8 +593,8 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
  * The only structural difference from the sibling is that the lock is
  * released BEFORE the mask block rather than after it (retail's
  * `sw zero, D_8008E934` sits at 0x80031950, between the D_8008E228 load and
- * the first `or`). See docs/match-reports/func_80031890.md. */
-s32 func_80031890(s16 idx)
+ * the first `or`). See docs/match-reports/SsUtKeyOffV.md. */
+s32 SsUtKeyOffV(s16 idx)
 {
     u16 chan;
     u32 mask0;

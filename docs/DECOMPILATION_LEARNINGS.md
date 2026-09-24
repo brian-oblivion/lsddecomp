@@ -142,7 +142,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   the fallthrough rule absent. 77/217 -> 208/217. (a docs/match-reports/func_80063144.md, round 59)
 - **A bare `__asm__("")` at a basic-block JOIN blocks GCC's eager delay-slot fill and can COST
   instructions.** It is legal under HARD RULE 6 (it moves no value between registers) and still made
-  `func_8002CF18` worse for four rounds. The discriminator is WHERE it sits: inside a block a barrier
+  `SpuVmAlloc` worse for four rounds. The discriminator is WHERE it sits: inside a block a barrier
   orders that block's statements, but at a join it denies the scheduler the instruction it would have
   hoisted into the branch's delay slot, costing a nop per join. A barrier that makes the body LONGER
   is this, not a block-order result. (a round 65)
@@ -322,10 +322,10 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   in the same unit. (a docs/match-reports/func_80062C58.md, round 59; a round 64, charlie)
 - **Local COUNT is the lever on a register-identity residue in all THREE directions — delete, merge
   and add — not only delete.** Round 65 worked one unit's three stalls at once: deleting four cached
-  tail temps made `func_8002DDBC`'s whole 25-instruction tail byte-exact and fixed two registers four
-  blocks UPSTREAM of the deletion; reusing an already-dead local in `func_8002D1B4` was worth 1700
+  tail temps made `vmNoiseOn2`'s whole 25-instruction tail byte-exact and fixed two registers four
+  blocks UPSTREAM of the deletion; reusing an already-dead local in `SpuVmKeyOnNow` was worth 1700
   asm-differ points where a fresh one was worth 500; ADDING a hoisted base pointer moved
-  `func_8002CF18`. The delete direction needs a CALL-crossing live range, so it does not apply to
+  `SpuVmAlloc`. The delete direction needs a CALL-crossing live range, so it does not apply to
   leaves. A permuter never merges or deletes locals, so local count is a PARAMETER of its search
   space: `func_8004BA40` (four locals into two) and `func_8004B700` (one deleted) closed after ~330k
   iterations missed both. (a round 65; round 63)
@@ -363,7 +363,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   110/132. (PROGRESS round 73)
 - **`(u8)x` creates an 8-bit temporary that stays live in a saved register; `x & 0xFF` does not.**
   The tell is an entry `move aN,sM` nothing explains; a bound test may then need `(u32)`. Closed
-  `func_8002E138` after four rounds. (PROGRESS round 73)
+  `SePitchBend` after four rounds. (PROGRESS round 73)
 - **Commutative `+` operand order is fixed at RTL generation: a FIELD-LOAD operand goes second
   whatever the source order; a NAMED local keeps its source position** (`cc1 -dr`). So flipping
   textual order is inert, and a field load FIRST in retail means the source had it in a local;
@@ -440,7 +440,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   tail-merge or register-identity stall.** Beyond the sign-extend pair, the narrowed argument is not
   CSE'd with the widened value later calls reuse, so the build comes out N words short with one
   fewer callee-saved register. Discriminator: the callee masks the parameter wider than its declared
-  type (`0xFF00` on an `s16`). `func_80034690` went 195 -> 190 -> 200/200 on `s16`->`s32`; pair it
+  type (`0xFF00` on an `s16`). `_SsSetControlChange` went 195 -> 190 -> 200/200 on `s16`->`s32`; pair it
   with the return-type listing. (round 69)
 - **The DEFINITION's own parameters narrow too: a parameter that hops `$a0` -> `$a3` -> `$s5`
   with every use re-sign-extending it is an `s16` parameter, not an allocation residue.** Declaring
@@ -687,13 +687,13 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   and remember an unpromoted learning does not exist. (a §"\"Unscoreable\" describes a SESSION's
   state", §"Gate 1b's sixth screen is neither SOUND nor COMPLETE")
 - **A recorded LENGTH figure is only comparable within one toolchain generation.** Round 45 filed
-  `func_8002D1B4` at 332 built words; the same preserved body rebuilt in round 65 gives 334, because
+  `SpuVmKeyOnNow` at 332 built words; the same preserved body rebuilt in round 65 gives 334, because
   round 63 adopted `--nop-at-expansion`. Word-match was unaffected, so the two instruments decayed
   differently: a maspsx flag that adds or drops an expansion nop changes every LENGTH figure recorded
   before it and no MATCH figure. A title's "N words short/long" from before a flag landed is not
   comparable with one after; rebuild the body and re-measure before ranking on it. (a round 65)
 - **"Exact length" can be arithmetic rather than structure, and only the positional-skeleton figure
-  notices.** `func_8002CF18` carried "EXACT LENGTH MATCH 167/167" from round 37 for 28 rounds; round
+  notices.** `SpuVmAlloc` carried "EXACT LENGTH MATCH 167/167" from round 37 for 28 rounds; round
   65 found two one-word padding artifacts sitting on a body two words SHORT, summing to the right
   total. Length is a SUM and cancels; the skeleton figure was 118 at that "exact length". Read the
   skeleton figure before believing a length claim, exactly as for ins/del. (a round 65)

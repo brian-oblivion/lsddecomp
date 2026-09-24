@@ -130,7 +130,7 @@ after every one of these):**
 3. Dropping the separate `cursor` local for the first byte-read and
    folding it into the same `p`-based idiom the case bodies use.
 4. Introducing a single shared `note` variable used as the argument to
-   `func_80034690`/`SetProgramChange`/`GetMetaEvent` in the 0xB0/0xC0/0xF0
+   `_SsSetControlChange`/`SetProgramChange`/`GetMetaEvent` in the 0xB0/0xC0/0xF0
    cases (instead of passing `*p` inline), to raise that pseudo's
    reference count closer to "channel"'s.
 5. Declaring `note`/`vel` as `s32` (matching the callee parameter types
@@ -160,7 +160,7 @@ this is ordinary C control flow, not an unrepresentable GTE/COP2 access.
  * defined later in the same unit's ROM-address order:
  *   extern void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3);
  *   extern void SetProgramChange(s16 a0, s16 a1, u8 a2);
- *   extern void func_80034690(s16 a0, s16 a1, u8 a2);
+ *   extern void _SsSetControlChange(s16 a0, s16 a1, u8 a2);
  *   extern void SetPitchBend(s16 a0, s16 a1);
  *   extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
  */
@@ -192,7 +192,7 @@ void GetSeqData(s16 a0, s16 a1)
             rec->unk11 = 0xB0;
             rec->unk4 = p + 1;
             note = *p;
-            func_80034690(a0, a1, note);
+            _SsSetControlChange(a0, a1, note);
             return;
         case 0xC0:
             p = rec->unk4;
@@ -226,7 +226,7 @@ void GetSeqData(s16 a0, s16 a1)
             NoteOn(a0, a1, raw, vel);
             return;
         case 0xB0:
-            func_80034690(a0, a1, raw);
+            _SsSetControlChange(a0, a1, raw);
             return;
         case 0xC0:
             SetProgramChange(a0, a1, raw);

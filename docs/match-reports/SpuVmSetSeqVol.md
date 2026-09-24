@@ -154,7 +154,7 @@ the baseline above):
   source.
 
 Both of these are the SAME class of finding as `SpuVmSetSeqVol`'s siblings
-in this unit (`func_80031890`, `SpuVmSeqKeyOff`): a value provably
+in this unit (`SsUtKeyOffV`, `SpuVmSeqKeyOff`): a value provably
 derivable from an already-live register gets recomputed via a fresh
 extraction/copy instead of reusing the exact bit-manipulation sequence
 retail's compiler happened to choose, and no legal source reshaping tried
@@ -257,8 +257,8 @@ else live across the barrier), this function has FIVE more live locals
 (`entry`, `recIdx`, `key`, plus the two `t1v`/`t0v` products computed later)
 whose liveness the barrier's scheduling boundary interacts with -- the
 sibling idiom does not transfer to a function with substantially higher
-register pressure at that point, the same lesson `func_80031890`'s round-32
-addendum draws about `func_80031280`'s type-asymmetry idiom not
+register pressure at that point, the same lesson `SsUtKeyOffV`'s round-32
+addendum draws about `SsUtKeyOff`'s type-asymmetry idiom not
 transferring either.
 
 Restored to the preserved body (no barrier) exactly as documented;
@@ -277,7 +277,7 @@ sibling with HIGHER register pressure at the analogous point, even when
 the store being guarded is textually identical (`D_8008EA22 = p0;`).**
 This is the third round-32 instance of "a fix that works on one function in
 this unit does not transfer to a structurally similar one" (see
-`func_80031890`'s and this same addendum's own sibling-derived-axis
+`SsUtKeyOffV`'s and this same addendum's own sibling-derived-axis
 findings) -- worth treating as a standing caution for this unit
 specifically: shared idioms need re-verification per function, not
 adoption by analogy, and checking the DONOR function's register pressure

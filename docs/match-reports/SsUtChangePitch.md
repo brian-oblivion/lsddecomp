@@ -1,4 +1,6 @@
-# func_80031A44 -- STALL: length EXACT at 88/88 (no drift); 84/88 raw word-match; first real diff at in-range word 49 (vram 0x80031B08) -- HEAD SALVAGE round 31, reconfirmed rounds 32 and 36
+# SsUtChangePitch -- STALL: length EXACT at 88/88 (no drift); 84/88 raw word-match; first real diff at in-range word 49 (vram 0x80031B08) -- HEAD SALVAGE round 31, reconfirmed rounds 32 and 36
+
+> Renamed from `func_80031A44` on 2026-09-24 (tools/rename.py). Address 0x80031a44.
 
 **CONTRADICTS THE TITLE -- REBUILD BEFORE USING EITHER FIGURE (flagged by
 the head, round 57, not resolved).** The note below is undated and states
@@ -35,8 +37,8 @@ the same breath without saying how they relate) left ambiguous.
 
 Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `idx`, validates it against three parallel 52-byte-stride records
-(`D_8008D99E`/`D_8008D99A`/`D_8008D994`, same family as `func_80031BA4`/
-`func_80031280`), then on a full match calls `func_80032148`, sets the
+(`D_8008D99E`/`D_8008D99A`/`D_8008D994`, same family as `SsUtChangeADSR`/
+`SsUtKeyOff`), then on a full match calls `func_80032148`, sets the
 "current channel" mode globals, copies a per-channel byte into
 `D_8008EA18`, stores `note2pitch2`'s return into a 16-byte-stride table,
 and ORs a flag bit into `D_8008D970`.
@@ -88,7 +90,7 @@ extern u16 D_8008EA22;
 
 extern s16 note2pitch2(u16 a0, u16 a1);
 
-s32 func_80031A44(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5)
+s32 SsUtChangePitch(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5)
 {
     s16 v1, v2, v3;
 
@@ -150,7 +152,7 @@ without it.
 Before finding the unused-parameter explanation, a scalar `s32 dead;` and
 a one-element `s32 dead[1];`, both guarded by an unreachable `if (0) { ... }`
 statement (this unit's established idiom for forcing a frame on an
-otherwise-frameless leaf, see `func_80031BA4`'s report), were tried here and
+otherwise-frameless leaf, see `SsUtChangeADSR`'s report), were tried here and
 had **zero effect** on the stack-argument offsets -- this function already
 has a real, non-zero frame from five callee-saved registers plus `$ra`, and
 the dead-local trick appears to only matter for sizing a frame that
@@ -195,7 +197,7 @@ zero -- one fewer instruction, not a different one). Tried and rejected:
   output; both spellings compile the same way.
 - Passing `func_80032148`'s two arguments as the raw parameters (`p1`, `p2`)
   instead of the just-validated record fields (`v1`, `v2`) -- **no effect**,
-  confirming (a second time, after `func_80031BA4`'s report) that GCC 2.6.3's
+  confirming (a second time, after `SsUtChangeADSR`'s report) that GCC 2.6.3's
   cse pass treats a value proven equal by an `if (x != y) return;` guard as
   fully interchangeable for a later call, regardless of which name the
   source uses.
@@ -332,7 +334,7 @@ extern u16 D_8008EA22;
 extern s16  note2pitch2(u16 p4, u16 p5);
 
 /* The salvaged body -- scored 84/88, exact length: */
-s32 func_80031A44(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5)
+s32 SsUtChangePitch(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5)
 {
     s16 v1, v2, v3;
 
@@ -411,7 +413,7 @@ reversed relative to retail's own literal source order** (retail:
 first) **yet the reversed order is what scores better overall** -- a
 direct instance of this unit's already-documented "independent global
 stores get freely reordered/batched by GCC unless barred" finding
-(`func_80030E90`'s finding 3), here cutting the OTHER way: matching
+(`SsUtKeyOn`'s finding 3), here cutting the OTHER way: matching
 retail's own writing order for these two statements, verified as the
 FIRST body ever tried on this function (41/88, with drift), scored worse
 than reversing it. A `__asm__("")` barrier between the two statements
@@ -448,7 +450,7 @@ omitted the way round 31's first, discarded attempt did):
 ```
 timeout 600 env PATH=.../permuter-work/bin:$PATH \
   .venv/bin/python3 tools/decomp-permuter/permuter.py -j 4 --stack-diffs \
-  --stop-on-zero --best-only permuter-work/func_80031A44
+  --stop-on-zero --best-only permuter-work/SsUtChangePitch
 ```
 
 **Reached iteration 54507 before the wall-clock bound ended the run** --
@@ -554,7 +556,7 @@ D_8008EA22 = 0x21;
 function's own range** -- a massive length increase, not the targeted
 2-word reorder. Removing the barrier (reverting to the plain, unbarred
 84/88 body) restored the exact prior state (`build/lsdde.map` confirms
-`func_80031A44` and its own length are back to the 84/88 baseline). So the
+`SsUtChangePitch` and its own length are back to the 84/88 baseline). So the
 barrier does not "block a reorder here", it forces the compiler into an
 entirely different, much larger code shape for this specific function --
 a bare scheduling barrier is not free of side effects on every function,

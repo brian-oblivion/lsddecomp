@@ -16,7 +16,7 @@ raw count.)
 Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Scans
 `D_8008D996[0..D_8008E9D0)` for an entry equal to `(s16) p0`; on a match,
 runs this unit's "clear channel bits" tail (the same block as
-`func_80031890`, see that function's report) keyed by the loop index. Called
+`SsUtKeyOffV`, see that function's report) keyed by the loop index. Called
 from `code_179d8_i.c`'s `func_800339AC` as
 `SpuVmSeqKeyOff((sa1 << 8) | sa0)`.
 
@@ -122,7 +122,7 @@ this same unit.
   `t2 = &D_8008EA26` (a `lui`/`addiu` pair) ONCE, before the loop even
   starts, and every in-loop `sh ..., 0(t2)` reuses it. This build recomputes
   `lui`/`addiu` fresh inside the `if` block on every iteration that takes it
-  (the same "materialize %hi/%lo every access" shape `func_80031890`'s
+  (the same "materialize %hi/%lo every access" shape `SsUtKeyOffV`'s
   report already covers for a straight-line function -- here it additionally
   fails to hoist out of a LOOP). Tried: caching the address explicitly in a
   `volatile u16 *chanPtr = &D_8008EA26;` local declared before the loop --
@@ -131,13 +131,13 @@ this same unit.
   `SsUtSetDetVVol`'s report, apparently triggered here by the combination of
   a loop-carried pointer local plus the `volatile` qualifier. Reverted.
 - **`loBit`/`hiBit` land in the wrong scratch registers**, same class,
-  same unresolved status, as `func_80031890`'s report already documents
+  same unresolved status, as `SsUtKeyOffV`'s report already documents
   in detail (same source shape, same residue). Not re-investigated
   separately this round since that function's axes (declaration order,
   statement order within each arm) were already shown not to move it.
 - A handful of interior words (address 0x20F60, 0x20F88-0x20FC0) are the
   same "which channel-mask half gets which scratch register" residue as
-  `func_80031890`'s second cluster.
+  `SsUtKeyOffV`'s second cluster.
 
 ## Axes tried (for the next attempt)
 
@@ -324,7 +324,7 @@ GCC 2.6.3's loop-invariant motion then hoists the `(set (reg) (symbol_ref))`
 into the preheader and the build emits retail's `lui t2,%hi(D_8008EA26)` /
 `addiu t2,t2,%lo(D_8008EA26)` / `sh ...,0(t2)` **byte-for-byte**. The global
 is still declared `extern volatile u16 D_8008EA26;` (as its matched sibling
-`func_80031280` in `code_179d8_j_b.c` declares it), so the read-back
+`SsUtKeyOff` in `code_179d8_j_b.c` declares it), so the read-back
 `bankIdx = D_8008EA26;` still compiles to a fresh `lui`/`lhu %lo` -- which is
 exactly retail's own asymmetry between the store and the reload, and the
 thing that made the residue look unexplainable.
@@ -472,7 +472,7 @@ void SpuVmSeqKeyOff(s32 p0)
   (`old60 | loBit` vs `loBit | old60`); `u32` masks. GCC's scheduler picks
   the same order regardless. **The tail residue is not expression-order
   steerable.**
-- **`func_80031280`'s matched tail idiom does NOT transfer here.** Writing
+- **`SsUtKeyOff`'s matched tail idiom does NOT transfer here.** Writing
   the tail exactly as that already-matched sibling does
   (`D_80090C60 = loBit | D_80090C60; D_8008E228 &= ~D_80090C60; ...`, with
   its documented `u32`/`u16` mask type asymmetry) REGRESSES to 47/85. The
@@ -763,7 +763,7 @@ to retail; before this lever the loop head carried five register diffs.
 
 This CLOSES this report's oldest-but-one open residue, "`loBit`/`hiBit` land
 in the wrong scratch registers", which had been carried since round 23 and
-cross-referenced from `func_80031890`'s report as the same unresolved class.
+cross-referenced from `SsUtKeyOffV`'s report as the same unresolved class.
 
 ### CLOSED lever 4 -- materialise the `nor` into a local, and write the `or` as a direct global RMW
 
@@ -804,7 +804,7 @@ What moves the tail is not ORDER, it is which sub-expression gets a name:
             D_8008E22C = D_8008E22C & old64;
 ```
 
-Note this is NOT `func_80031280`'s tail idiom, which round 56 measured at
+Note this is NOT `SsUtKeyOff`'s tail idiom, which round 56 measured at
 47/85 and which folds the complement back into the `&=`; the complement's own
 local is what distinguishes them, and it is load-bearing.
 

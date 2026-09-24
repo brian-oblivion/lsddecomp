@@ -34,10 +34,10 @@
  *   SeqPlay  69w   NoteOn  70w   ContNrpn1  77w
  *   ContModulation  79w   ContPortaTime  79w   ContNrpn2  82w
  *   ContPortamento  90w   GetSeqData 172w   Snd_setVabAttr 179w
- *   func_80034690 200w   GetMetaEvent 213w   ContDataEntry 376w
+ *   _SsSetControlChange 200w   GetMetaEvent 213w   ContDataEntry 376w
  *
  * THIS UNIT OWNS THREE SWITCH JUMP TABLES, not the two the old remainder
- * comment claimed: func_80034690 -> jtbl_80010CF0, and Snd_setVabAttr ->
+ * comment claimed: _SsSetControlChange -> jtbl_80010CF0, and Snd_setVabAttr ->
  * jtbl_80010ED8 AND jtbl_80010F38 (a double switch).  The 0x14F0 rodata
  * slot holds exactly those three tables and nothing else, is referenced
  * from nowhere outside this unit, and is attached whole in the splat yaml.
@@ -65,7 +65,7 @@
  * header. */
 extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
 extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
-extern s32 StopNote(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
+extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
 /* Psy-Q libsnd, linked from the SDK objects (round 34): `ut_rev` and
  * `vm_doff`. Both were carried as matched C in code_179d8_f.c until that
  * unit's prefix was given back to Sony; these are local views, as a Psy-Q
@@ -212,11 +212,11 @@ void SeqPlay(s16 a0, s16 a1, s16 a2)
  * needed because GetSeqData dispatches to them by MIDI-style status
  * byte before they appear in ROM-address order below.  NoteOn's
  * signature is the one already established in its own (still-stalled) STALL
- * comment above; func_80034690's and GetMetaEvent's are this function's own
+ * comment above; _SsSetControlChange's and GetMetaEvent's are this function's own
  * reading, derived from the registers loaded before each call below. */
 extern void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3);
 extern void SetProgramChange(s16 a0, s16 a1, u8 a2);
-extern void func_80034690(s16 a0, s16 a1, u8 a2);
+extern void _SsSetControlChange(s16 a0, s16 a1, u8 a2);
 extern void SetPitchBend(s16 a0, s16 a1);
 extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
 
@@ -268,7 +268,7 @@ void GetSeqData(s16 a0, s16 a1)
             rec->unk11 = 0xB0;
             rec->unk4 = p + 1;
             note = *p;
-            func_80034690(a0, a1, note);
+            _SsSetControlChange(a0, a1, note);
             return;
         case 0xC0:
             p = rec->unk4;
@@ -302,7 +302,7 @@ void GetSeqData(s16 a0, s16 a1)
             NoteOn(a0, a1, raw, vel);
             return;
         case 0xB0:
-            func_80034690(a0, a1, raw);
+            _SsSetControlChange(a0, a1, raw);
             return;
         case 0xC0:
             SetProgramChange(a0, a1, raw);
@@ -354,7 +354,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
         u8 vol = ptr[0x2C];
-        StopNote(packed, note, vol, (u8)a3);
+        SpuVmKeyOff(packed, note, vol, (u8)a3);
     }
 }
 #else
@@ -417,7 +417,7 @@ extern void ContResetAll(s16 a0, s16 a1);
  * case-local `u16`, which keeps the switch-wide byte in a caller-saved
  * register and gives each case its own callee-saved copy.
  */
-void func_80034690(s16 a0, s16 a1, u8 a2)
+void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = rec->unk4;
@@ -632,7 +632,7 @@ void ContResetAll(s16 a0, s16 a1)
 
 /* A per-(channel,slot) dispatch table of function pointers, row-major with
  * a 0x40 (64)-byte stride (16 pointers per row) -- also referenced from
- * code_179d8_c's func_8003221C. Not yet given a real element count; the
+ * code_179d8_c's _SsInit. Not yet given a real element count; the
  * outer dimension is left open. */
 typedef void (*Fn80090368)(s32 channel, u8 arg1);
 extern Fn80090368 D_80090368[][16];

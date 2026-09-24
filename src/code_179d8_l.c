@@ -32,7 +32,7 @@
  *
  * ROUND 44: THE THREE BELOW ARE ASSIGNABLE AND ARE THIS UNIT'S FRESH GROUND.
  * ~~BLOCKED on nop_mflo_mfhi, which is STILL OPEN -- do NOT spend attempts:~~
- *   func_8002CD08 (132w), func_8002D1B4 (316w), func_8002D8E0 (311w)
+ *   func_8002CD08 (132w), SpuVmKeyOnNow (316w), vmNoiseOn (311w)
  * nop_mflo_mfhi was RESOLVED in round 42 (`--no-nop-mflo-mfhi`), so the
  * "do NOT spend attempts" directive above is WITHDRAWN.  All three are
  * never-attempted cold ground whose reports were marked REOPENED in round 44.
@@ -43,16 +43,16 @@
  * 9 CLEAN of 12, cheapest first:
  *   func_8002E2F8    2w  <- already matched: splat emitted the empty C body
  *   func_8002E300    2w  <- itself.  Not work, and not yours to redo.
- *   note2pitch   47w   note2pitch2   64w   func_8002DDBC  112w
- *   func_8002E138  112w   func_8002E308  116w   func_8002D6A4  143w
- *   func_8002CF18  167w
+ *   note2pitch   47w   note2pitch2   64w   vmNoiseOn2  112w
+ *   SePitchBend  112w   SeAutoVol  116w   SpuVmDoAllocate  143w
+ *   SpuVmAlloc  167w
  *
- * func_8002E308's opening `addu $t3, $a0, $zero` is REGISTER PRESSURE with
+ * SeAutoVol's opening `addu $t3, $a0, $zero` is REGISTER PRESSURE with
  * s16 argument narrowing, NOT a BIOS trampoline -- checked by hand at carve
  * time, because the `jr $t2` trampoline screen is blind to variants and a
  * trampoline-dense segment reads as the cleanest ground in the file while
  * being the least matchable (round 17, class_3bb8c_h).  It is also a
- * near-identical sibling of BeginVoiceFade in code_179d8_m: same prologue,
+ * near-identical sibling of SeAutoPan in code_179d8_m: same prologue,
  * same narrowing shape, same early-out branch.  If you match one, say so in
  * the report -- the other unit's runner is deriving the same shape.
  *
@@ -157,7 +157,7 @@ void func_8002CD08(Obj179D8CD08 *a0, S179D8CD08 *a1) {
 /* NON_MATCHING: 167/167 words, length exact (74/167 raw word-match; funcdiff
  * insertions/deletions 16/16). Residue: a systematic register rotation
  * (t3/t0/a2/a3 family) running through nearly the whole function, visible
- * from the very first instruction (docs/match-reports/func_8002CF18.md).
+ * from the very first instruction (docs/match-reports/SpuVmAlloc.md).
  * Hand-derived. */
 extern u8 D_8008D9A3[];
 extern u8 D_8008D98E[];
@@ -168,7 +168,7 @@ extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     u16 bestSec;
@@ -244,11 +244,11 @@ s32 func_8002CF18(void)
     return (u8) chosen;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);
 #endif
 
-/* Shared with func_8002D8E0 below (same two-level entry table, same
- * blend-cascade shape); declared once here since func_8002D1B4 is
+/* Shared with vmNoiseOn below (same two-level entry table, same
+ * blend-cascade shape); declared once here since SpuVmKeyOnNow is
  * ROM-earlier, reused there rather than redeclared. */
 typedef struct {
     u8 pad0[0x74];
@@ -276,14 +276,14 @@ extern u16 D_80090C64;
 extern u16 D_8008E230;
 extern u16 D_8008E234;
 
-/* STALL -- see docs/match-reports/func_8002D1B4.md. Best body reached
+/* STALL -- see docs/match-reports/SpuVmKeyOnNow.md. Best body reached
  * (332/316 built words, 16 words LONG; 33/316 raw word-match, drift-
  * affected) preserved there in #if 0. */
 #ifdef NON_MATCHING
 /* NON_MATCHING: 316/316 words, length exact (201/316 raw word-match; funcdiff
  * insertions/deletions 46/46). Residue: frame SIZE only -- addiu sp,sp,-8
  * against retail's -0x10 -- plus this unit's documented register-identity
- * class (docs/match-reports/func_8002D1B4.md). Hand-derived, plus one
+ * class (docs/match-reports/SpuVmKeyOnNow.md). Hand-derived, plus one
  * permuter hoist (round 65: pan1sq/16383 computed before pan2sq), reviewed
  * as a pure reordering and kept. */
 /* Object holding a per-note "priority"-ish scale byte at +0x18; only field
@@ -304,7 +304,7 @@ extern s16 D_8008EA26[];
 /* Independent 0x10-byte-stride s16 array. */
 extern s16 D_8008D7F4[];
 
-void func_8002D1B4(s32 a0, s32 a1) {
+void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D800902E8Entry *e;
     s32 prio;
     s32 lvl0;
@@ -391,7 +391,7 @@ void func_8002D1B4(s32 a0, s32 a1) {
     D_80090C64 = D_80090C64 & ~D_8008E22C;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D1B4);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmKeyOnNow);
 #endif
 
 extern u8 D_8008EA13;
@@ -399,8 +399,8 @@ extern u8 D_8008EA18;
 
 /* Shared with note2pitch2 below (same base pointer, same table); this
  * function needs the +0x10/+0x12 halfwords too, so the struct is declared
- * once here (ROM-address order: func_8002D6A4 precedes note2pitch2) and
- * reused there rather than redeclared -- see docs/match-reports/func_8002D6A4.md. */
+ * once here (ROM-address order: SpuVmDoAllocate precedes note2pitch2) and
+ * reused there rather than redeclared -- see docs/match-reports/SpuVmDoAllocate.md. */
 typedef struct {
     u8 unk0[4];
     u8 unk4;
@@ -415,12 +415,12 @@ typedef struct {
 } D8008E978Entry;
 extern D8008E978Entry *D_8008E978;
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D6A4);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
 /* D800902E8Entry, D_800902E8 and the blend-cascade globals
  * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, D_80090C60/64,
  * D_8008E230/234, D_8008D970/98C/9A3) are already declared above, before
- * func_8002D1B4 (ROM-earlier, same shapes) -- reused here, not redeclared. */
+ * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
 extern u16 *D_8006DAD4;
@@ -428,19 +428,19 @@ extern u8 D_8008D7F0[];
 extern u8 D_8008D7F2[];
 extern u8 D_8008E9D0;
 
-/* STALL -- see docs/match-reports/func_8002D8E0.md. Best body reached
+/* STALL -- see docs/match-reports/vmNoiseOn.md. Best body reached
  * (309/311 built words, 2 words SHORT) preserved there in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D8E0);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn);
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 107/112 words, 5 words short. Residue: the a0/a3 role-swap
  * register-identity class (this unit's documented class) plus an 8-byte
  * frame retail allocates that this shape doesn't reach
- * (docs/match-reports/func_8002DDBC.md). Hand-derived. The byte-shaped
+ * (docs/match-reports/vmNoiseOn2.md). Hand-derived. The byte-shaped
  * body's order-only __asm__("") barrier is omitted here; it is in the report. */
 extern u8 D_8008D98A[];
 
-void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
+void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
     s32 off16;
     s32 v1;
@@ -490,7 +490,7 @@ void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
     D_8006DAD4[0xCB] = highBit;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002DDBC);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn2);
 #endif
 
 extern u8 D_8008EA0E;
@@ -563,7 +563,7 @@ s32 note2pitch2(s32 a0, s32 a1) {
     return v1;
 }
 
-/* Matched round 73 -- docs/match-reports/func_8002E138.md. */
+/* Matched round 73 -- docs/match-reports/SePitchBend.md. */
 typedef struct {
     u8 unk0;
     u8 pad1[0x34 - 0x1];
@@ -578,7 +578,7 @@ extern Rec34H_E138 D_8008D994[];
 extern s16 D_8008EA26[];
 extern u8 D_8008D970[];
 
-void func_8002E138(s32 chan, s32 bend) {
+void SePitchBend(s32 chan, s32 bend) {
     s32 off;
     s32 prod;
     s32 q;
@@ -617,8 +617,8 @@ void func_8002E2F8(void) {
 void func_8002E300(void) {
 }
 
-/* Matched round 73 -- docs/match-reports/func_8002E308.md. Same body as
- * BeginVoiceFade (code_179d8_m) over the gVoiceEnv* family. */
+/* Matched round 73 -- docs/match-reports/SeAutoVol.md. Same body as
+ * SeAutoPan (code_179d8_m) over the gVoiceEnv* family. */
 typedef struct {
     s16 unk0;
     u8 pad2[0x34 - 0x2];
@@ -630,7 +630,7 @@ extern Rec34Half_E308 gVoiceEnvCountdown[];
 extern Rec34Half_E308 gVoiceEnvAccum[];
 extern Rec34Half_E308 gVoiceEnvLimit[];
 
-void func_8002E308(s16 voice, s16 from, s16 to, s16 duration) {
+void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
 
     if (from == to) {

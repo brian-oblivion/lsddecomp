@@ -1,4 +1,6 @@
-# BeginVoiceFade -- MATCHED (116/116 words)
+# SeAutoPan -- MATCHED (116/116 words)
+
+> Renamed from `BeginVoiceFade` on 2026-09-24 (tools/rename.py). Address 0x8002e874.
 
 > Renamed from `func_8002E874` on 2026-09-20 (tools/rename.py). Address 0x8002e874.
 
@@ -24,7 +26,7 @@ extern Rec34Half gVoiceFadeCountdown[]; /* step/quotient (companion pair) */
 extern Rec34Half gVoiceFadeAccum[]; /* saved start value */
 extern Rec34Half gVoiceFadeLimit[]; /* saved end value */
 
-void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
+void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
 
     if (a1 == a2) {
@@ -48,7 +50,7 @@ void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
 
 ## Sibling note (see the unit header and the round prompt)
 
-This function IS the "near-identical sibling of `func_8002E308` in
+This function IS the "near-identical sibling of `SeAutoVol` in
 `code_179d8_l`" the unit header calls out: same prologue shape (`addu
 t3,a0,zero` / `addu t0,a1,zero` / `addu t1,a2,zero`), same `s16`
 argument-narrowing (`sll #16`/`sra #16` on `a1`, `a2` before the compare),
@@ -64,7 +66,7 @@ the same opening shape from the sibling side; this confirms it.
 `gVoiceFadeActive`..`gVoiceFadeLimit` are six 2-bytes-apart symbols in the SAME
 0x34-byte-stride channel-configuration record family `code_179d8_j.c`
 documents (`Rec34D994`, `Rec34Byte`) -- this unit's own local
-`Rec34Half` type (already declared for `ClearNoiseVoices`'s `D_8008D98C`,
+`Rec34Half` type (already declared for `SpuVmNoiseOff`'s `D_8008D98C`,
 hoisted above this function since it is the earlier ROM-order user).
 
 ## Shape
@@ -152,14 +154,14 @@ empty, the block runs on every path through that point.
 
 ## Naming
 
-**BeginVoiceFade** (was `func_8002E874`) -- Tier B. Mechanics fully evident
+**SeAutoPan** (was `func_8002E874`) -- Tier B. Mechanics fully evident
 from the body: given a voice index and a from/to/rate triple, it
 unconditionally records the from/to pair and the "fading" flag into the
 `gVoiceFade*` arrays, then computes a per-tick step (and, in the
-"close" branch, a throttle interval) so that `StepVoiceFade` can advance
+"close" branch, a throttle interval) so that `SetAutoPan` can advance
 the value later. What in the game actually gets faded this way (a MIDI
 CC-driven volume slide? an automatic release curve?) is not established --
 only that the destination of the ramp feeds into a stereo-volume
-computation (see StepVoiceFade's own report), which is why "Fade" rather
+computation (see SetAutoPan's own report), which is why "Fade" rather
 than a more specific term. See the unit header comment in
 `src/code_179d8_m.c` for the cross-function picture.

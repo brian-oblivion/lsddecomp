@@ -1,4 +1,6 @@
-# func_8002DDBC — STALL (round 65 update: 108 -> 107 built words, now **5 words SHORT** of retail's 112; raw word-match NOT MEASURABLE — the body is length-inexact so funcdiff's fixed 112-word window is drift-contaminated and reports 1/112, which is ripple, not residue; **first real diff still at the very first instruction**, vram 0x8002DDBC / file 0x1E5BC, retail's `move $a3,$a0` having no counterpart — per tools/asm-differ/diff.py, not inferred. The whole 25-instruction tail and the lowBit/highBit registers are now byte-exact; see the round 65 section for the two residues that were NOT the register cascade)
+# vmNoiseOn2 — STALL (round 65 update: 108 -> 107 built words, now **5 words SHORT** of retail's 112; raw word-match NOT MEASURABLE — the body is length-inexact so funcdiff's fixed 112-word window is drift-contaminated and reports 1/112, which is ripple, not residue; **first real diff still at the very first instruction**, vram 0x8002DDBC / file 0x1E5BC, retail's `move $a3,$a0` having no counterpart — per tools/asm-differ/diff.py, not inferred. The whole 25-instruction tail and the lowBit/highBit registers are now byte-exact; see the round 65 section for the two residues that were NOT the register cascade)
+
+> Renamed from `func_8002DDBC` on 2026-09-24 (tools/rename.py). Address 0x8002ddbc.
 
 **14 words short** (best derivation compiled to 98 words against retail's
 112); raw word-match is not meaningful under that drift (funcdiff reports
@@ -8,7 +10,7 @@ it shifted" class, except here the gap is larger and has more than one
 cause). **First real diff is at the very first instruction**, vram
 `0x8002DDBC` / file `0x1E5BC`: retail's `move $a3,$a0` has no counterpart at
 all in the derived body — confirmed with `tools/asm-differ/diff.py
-func_8002DDBC`, not inferred.
+vmNoiseOn2`, not inferred.
 
 `code_179d8_l`, vram `0x8002DDBC`, file offset `0x1E5BC`, 112 words
 (0x1C0 bytes). No `nop_mflo_mfhi` or `gp_rel` hits — this is a "clean"
@@ -52,7 +54,7 @@ extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 *D_8006DAD4;
 
-void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
+void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
     s32 off16;
     s32 v1;
@@ -189,14 +191,14 @@ may stay in `src/`.
   levers already documented for `note2pitch2`), not yet reduced to a
   known trigger.
 
-## Round 33 update (runner alpha): the loop-strength-reduction lever WAS known — this unit's own `func_8002CF18` report already named the exact fix
+## Round 33 update (runner alpha): the loop-strength-reduction lever WAS known — this unit's own `SpuVmAlloc` report already named the exact fix
 
 Re-verified the inherited 98/112 body first — reproduces exactly (compiled
 length 0x188 = 98 words), residues 1 and 2 confirmed at the exact positions
 this report already names.
 
 **The "not yet reduced to a known trigger" note above undersold it: this
-same unit's `func_8002CF18` report (also round 26) had already identified
+same unit's `SpuVmAlloc` report (also round 26) had already identified
 the discriminator — a `(u8)`/narrow cast on an array index defeats GCC
 2.6.3's strength reduction of `idx*stride` into `idx+=stride`.** The
 `do`/`while` loop's index `i` was declared and used as a plain `s32` with
@@ -260,7 +262,7 @@ extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 *D_8006DAD4;
 
-void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
+void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
     s32 off16;
     s32 v1;
@@ -325,7 +327,7 @@ void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
 ### Proposed learning (round 33)
 
 **The "narrow-cast defeats loop strength reduction" idiom
-(`func_8002CF18`'s report) is unit-wide, not local to the function that
+(`SpuVmAlloc`'s report) is unit-wide, not local to the function that
 found it** — it closed 10 of 14 missing words here, in a different
 function, the very next round. Any function in `code_179d8_l`/`_m` with a
 "my loop is N words short and retail recomputes a multiply I don't" shape
@@ -336,7 +338,7 @@ the same variable rather than picking the narrowest type that compiles.
 ## Round 35 update (runner bravo): inherited body re-verified real; frame-allocation lever tried, negative; confirmed the remaining gap is entirely the register-identity residue
 
 Re-verified the inherited 108/112 body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002DDBC` compiles to `0x1b0`
+`build/src/code_179d8_l.c.o` confirms `vmNoiseOn2` compiles to `0x1b0`
 bytes = 108 words, matching round 33's figure exactly. Realigned
 `asm-differ` diff confirms residues 1 (the `a3`/`a0` register swap) and 4
 (the missing `addiu sp,sp,-8`/`+8` frame) at the exact positions this
@@ -394,7 +396,7 @@ that works on this compiler's allocator.
 ## Round 44 update (runner delta): inherited body re-verified real; first permuter search, negative
 
 Re-verified the inherited 108/112 body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002DDBC` compiles to `0x1b0`
+`build/src/code_179d8_l.c.o` confirms `vmNoiseOn2` compiles to `0x1b0`
 bytes = 108 words, matching rounds 26/33/35's figure exactly. Realigned
 `asm-differ` confirms the same residues (the `a3`/`a0` register swap, the
 missing `addiu sp,sp,-8`/`+8` frame) at the exact positions already named.
@@ -413,7 +415,7 @@ only structural change from the seed: wrapping the tail's
 **still 108/112 (0x1b0), no length change** -- the isolated scaffold's
 score improvement (3100 -> 1800) did not translate, consistent with this
 unit's other three same-round instances of this exact divergence
-(`func_8002CF18`, `func_8002E138`, `func_8002D6A4`, all round 37) EXCEPT
+(`SpuVmAlloc`, `SePitchBend`, `SpuVmDoAllocate`, all round 37) EXCEPT
 for `func_8002CD08` this round, where the identical construct DID
 translate -- confirming again that a `do-while(0)` candidate must be
 verified by direct rebuild every time, in both directions, never assumed
@@ -448,7 +450,7 @@ real oracle:
 
 - `objdump -t build/src/code_179d8_l.c.o` -> `0x1b0` = **108 words**,
   reproducing rounds 33/35/44 exactly. 4 words short of retail's 112.
-- `tools/funcdiff.py func_8002DDBC`:
+- `tools/funcdiff.py vmNoiseOn2`:
   `insertions 18 / deletions 18 (opcode-level ...; positional skeleton
   diffs 109)`, `1/112`..`3/112` words match, and a
   `WARNING: the build differs OUTSIDE this range too (241074 bytes)`.
@@ -585,14 +587,14 @@ spending the session's one search where it can bite.
 ### Preserved body (107/112 words, 5 short — rebuild this FIRST next time)
 
 Needs, in addition to the unit's existing declarations before
-`func_8002D1B4` and `func_8002D8E0` (`D_8008D7F0`, `D_8008D7F2`,
+`SpuVmKeyOnNow` and `vmNoiseOn` (`D_8008D7F0`, `D_8008D7F2`,
 `D_8008D970`, `D_8008D98C`, `D_8008D9A3`, `D_8008E228`, `D_8008E22C`,
 `D_80090C60`, `D_80090C64`, `D_8008E9D0`, `D_8006DAD4`), one extra:
 
 #if 0
 extern u8 D_8008D98A[];
 
-void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
+void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
     s32 off16;
     s32 v1;

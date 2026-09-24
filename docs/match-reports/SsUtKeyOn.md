@@ -1,4 +1,6 @@
-# func_80030E90 -- STALL (round 70 re-measure: LENGTH-EXACT, 252/252 built; raw word-match 65/252; insertions 11 / deletions 11; first real diff not re-located since round 62, which put it at the busy-lock guard polarity. The round-62 "BLOCKED below cc1" verdict is RETRACTED: that load-delay nop is emitted by `--nop-at-expansion` since round 63)
+# SsUtKeyOn -- STALL (round 70 re-measure: LENGTH-EXACT, 252/252 built; raw word-match 65/252; insertions 11 / deletions 11; first real diff not re-located since round 62, which put it at the busy-lock guard polarity. The round-62 "BLOCKED below cc1" verdict is RETRACTED: that load-delay nop is emitted by `--nop-at-expansion` since round 63)
+
+> Renamed from `func_80030E90` on 2026-09-24 (tools/rename.py). Address 0x80030e90.
 
 **REVISITED, round 62: STALL, unchanged in score but RE-CLASSIFIED from
 "three exhausted source residues" to "toolchain-blocked, with a complete
@@ -8,7 +10,7 @@ below cc1 and no source shape reaches it).**
 > **Unit corrected:** this report's original header said `code_179d8_j`.
 > That unit was re-carved in round 34 and this function now lives in
 > **`src/code_179d8_j_b.c`**. The `asm/nonmatchings/` path is
-> `code_179d8_j_b/func_80030E90.s`.
+> `code_179d8_j_b/SsUtKeyOn.s`.
 
 Size: 252 words (0x3F0 bytes), file offset `0x21690`, vram `0x80030E90`.
 
@@ -24,7 +26,7 @@ one below, taken from the object rather than the linked image.
 
 The title is **not** falsified: it claims a length gap and names three
 residues, and a length gap is exactly what ins/del non-zero means. (Contrast
-`func_80030980` and `func_80031890` this round, where the recorded verdicts
+`func_80030980` and `SsUtKeyOffV` this round, where the recorded verdicts
 *were* falsified by their ins/del.) What IS wrong is residue 2's **cause**,
 below.
 
@@ -34,8 +36,8 @@ below.
 reachable from C.**
 
 ```
-retail func_80030E90 : 252 words, 19 nops
-built  func_80030E90 : 241 words, 10 nops      (241 + 9 = 250)
+retail SsUtKeyOn : 252 words, 19 nops
+built  SsUtKeyOn : 241 words, 10 nops      (241 + 9 = 250)
 252 - 250 = 2 words  ->  the busy-lock guard polarity, and nothing else
 ```
 
@@ -116,10 +118,10 @@ whose retail bytes are used verbatim.
 
 | function | sites |
 | --- | --- |
-| `func_8003149C` (this unit, this function's near twin) | 11 |
-| **`func_80030E90`** | **9** |
+| `SsUtKeyOnV` (this unit, this function's near twin) | 11 |
+| **`SsUtKeyOn`** | **9** |
 | `func_8002FAC4` (`code_179d8_m`) | 2 |
-| `CD_cw`, `func_80031A44`, `SetupStyleSpawnParamsA`, `SetupStyleSpawnParamsB` | 1 each |
+| `CD_cw`, `SsUtChangePitch`, `SetupStyleSpawnParamsA`, `SetupStyleSpawnParamsB` | 1 each |
 
 No maspsx option covers it (`--help` on maspsx `e3d5916`; the two closest
 analogues, `--no-nop-mflo-mfhi` and `--addiu-at`, are precisely this shape of
@@ -149,7 +151,7 @@ and this body has control flow and still compiles `beq` FAR. That stands.
 What is new is that it is now **bounded**: it is worth exactly 2 words and
 nothing else. Every other word of the gap is the `nop` blocker. Two matched
 siblings in this same unit now carry the identical guard construct --
-`func_80031280` and, as of this round, `func_80031890` -- and **both compile
+`SsUtKeyOff` and, as of this round, `SsUtKeyOffV` -- and **both compile
 to `beq` FAR and both are byte-exact**, i.e. for those two functions retail
 itself has the FAR shape. So the construct is not miscompiled; this function's
 context selects the other layout, and two byte-exact controls in the same file
@@ -165,7 +167,7 @@ missing words cannot be emitted by this pipeline for any C input, so the best
 reachable score is 250/252 and byte-exactness is unreachable. That is a
 different statement from "exhausted", which is what rounds 26/31/36/40 had to
 say without this measurement, and it is checkable in one command rather than
-re-derived. The same applies with more force to `func_8003149C`, which has 11
+re-derived. The same applies with more force to `SsUtKeyOnV`, which has 11
 sites and whose report carries the same inherited attribution.
 
 When the blocker is resolved, this function is a good early target: the body
@@ -195,14 +197,14 @@ would have sunk a correct escalation.
 
 ---
 
-# func_80030E90 -- STALL (11 words short as of round 36: 241 built / 252 retail, a best-effort reproduction of round 31's 240/252; raw word-match 36/252; the three round-26 residues -- busy-lock branch polarity, missing field-copy nops, `result`'s register handling -- persist, and are treated as exhausted this round -- see round-36 addendum)
+# SsUtKeyOn -- STALL (11 words short as of round 36: 241 built / 252 retail, a best-effort reproduction of round 31's 240/252; raw word-match 36/252; the three round-26 residues -- busy-lock branch polarity, missing field-copy nops, `result`'s register handling -- persist, and are treated as exhausted this round -- see round-36 addendum)
 
 Unit `src/code_179d8_j_b.c` (CORRECTED round 62 -- this line said
 `code_179d8_j`, the pre-round-34 unit name), round 26 (2026-09-09). Not a class method. A "start
 channel" setup routine: validates `(p0,p1)` via `func_80032148`, computes a
 volume pan pair (same formula as this unit's already-matched
 `SpuVmSeKeyOn`), copies two small lookup-table records into a block of
-scratch globals, allocates a free channel slot via `func_8002CF18`,
+scratch globals, allocates a free channel slot via `SpuVmAlloc`,
 registers the new channel's config into nine parallel 0x34-stride tables,
 and dispatches one of two follow-up calls depending on the looked-up
 record's "note" field.
@@ -212,9 +214,9 @@ record's "note" field.
 ```c
 #if 0
 /* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
- * (func_80030E90's own computed index, not a channel id). Every field
+ * (SsUtKeyOn's own computed index, not a channel id). Every field
  * this unit's own accessor touches is named; offsets are exact (read
- * from func_80030E90's own lbu/lhu immediates), field names are not. */
+ * from SsUtKeyOn's own lbu/lhu immediates), field names are not. */
 typedef struct {
     u8 unk0;  /* +0x0 */
     u8 unk1;  /* +0x1 */
@@ -230,7 +232,7 @@ typedef struct {
 } RecordE978;
 extern RecordE978 *D_8008E978;
 
-/* func_80030E90's own scratch globals -- offsets are exact (this unit's
+/* SsUtKeyOn's own scratch globals -- offsets are exact (this unit's
  * own field accesses); names are opaque placeholders. */
 extern u8 D_8008EA0C;
 extern u8 D_8008EA0E;
@@ -251,13 +253,13 @@ extern u8 D_8008EA20;
 extern u16 D_8008EA24;
 extern volatile u8 D_8008EA18;  /* MUST be volatile -- see finding 2 */
 
-extern s32 func_8002CF18(void);
-extern void func_8002D6A4(void);
-extern void func_8002D8E0(s32 a0);
+extern s32 SpuVmAlloc(void);
+extern void SpuVmDoAllocate(void);
+extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch2(u16 a0, u16 a1);
-extern void func_8002D1B4(s32 a0, u16 a1);
+extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 
-s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u8 result;
@@ -305,7 +307,7 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     if ((s16) note == 0) {
         goto fail;
     }
-    result = (u8) func_8002CF18();
+    result = (u8) SpuVmAlloc();
     if (result == D_8008E9D0) {
         goto fail;
     }
@@ -320,12 +322,12 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     D_8008D9A3[result].unk0 = 1;
     D_8008D98A[result].unk0 = 0;
     D_8008D99C[result].unk0 = pending18;
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0(result);
+        vmNoiseOn(result);
     } else {
         s32 ret = note2pitch2((u16) p3, p4);
-        func_8002D1B4(1, (u16) ret);
+        SpuVmKeyOnNow(1, (u16) ret);
     }
     D_8008E934 = 0;
     return result;
@@ -391,7 +393,7 @@ non-volatile global would otherwise let GCC skip the reload. Declaring it
 - The immediate post-field-copy check (`if ((s16) note == 0)`) reuses the
   REGISTER the field copy already loaded (`a0`), with NO reload -- so this
   site wants a plain LOCAL (`note`), not the volatile global.
-- The `==0xFF` check (after the `func_8002D6A4()` call) needs a fresh `lh`
+- The `==0xFF` check (after the `SpuVmDoAllocate()` call) needs a fresh `lh`
   (SIGNED) read from memory, and the plain copy into `D_8008D988[result]`
   a few statements earlier needs a fresh `lhu` (UNSIGNED) read -- confirmed
   from the raw opcode bits (`0x25`=LHU at one site, `0x21`=LH at the other,
@@ -403,7 +405,7 @@ non-volatile global would otherwise let GCC skip the reload. Declaring it
   cast at the point of use compiles the cast straight into the load
   instruction (`lh`)** -- this is the version that matches. The
   non-volatile declaration still produced the needed fresh reload at both
-  later sites (apparently because of the intervening `func_8002D6A4()`
+  later sites (apparently because of the intervening `SpuVmDoAllocate()`
   call, which is enough of a barrier on its own without `volatile`).
 
 **Net: `D_8008EA18` is `volatile`, `D_8008EA24` is plain `u16`, and the very
@@ -451,7 +453,7 @@ neighbors. This was reached by direct experimentation, not derived.
   the locked-case `return -1` inlined immediately after the test, reached
   by falling straight through when locked. The identical `if (locked)
   return -1;` construct produces the "near/inline" shape for
-  `func_80031280` in THIS SAME unit (confirmed: this round's other match)
+  `SsUtKeyOff` in THIS SAME unit (confirmed: this round's other match)
   but the "far" shape here. Tried: plain guard, `goto`-based guard to a
   dedicated `fail_nolock:` label, and a full inversion (`if (!locked) {
   ...entire 200-line body... } return -1;`, moving the busy-check's own
@@ -485,7 +487,7 @@ neighbors. This was reached by direct experimentation, not derived.
   build genuinely emits a wasted cycle here that a matching, differently-
   shaped C source would also produce, the trigger has not been found.
 
-- **`result`'s register-identity ordering after the `func_8002CF18()`
+- **`result`'s register-identity ordering after the `SpuVmAlloc()`
   call.** Retail masks the call's return value to a byte IMMEDIATELY
   (`andi s0,v0,0xff`) into its long-lived (callee-saved) home, then makes
   a disposable WIDENED copy (`move v1,s0`) purely for the immediate
@@ -601,7 +603,7 @@ refuted**: F/G/H/I flip it with an ordinary source-level change.
 
 The simple rule the table suggests — *straight-line fallthrough sinks the
 early return and branches far; any further control flow inlines it and
-branches near* — **cannot be what is happening here.** `func_80030E90`'s
+branches near* — **cannot be what is happening here.** `SsUtKeyOn`'s
 fallthrough demonstrably DOES contain further control flow (this report's
 own description: it "dispatches one of two follow-up calls depending on the
 looked-up record's note field"), yet it still compiles to the `beq` FAR
@@ -627,7 +629,7 @@ the effect the probes isolate, and the probes do not capture it.
   straight-line, one change could plausibly move the polarity AND the
   scheduling AND part of the 13-word gap at once. That is the lever to try
   before any further guard-shape reshaping.
-- **The already-matched sibling `func_80031280` is the control.** It is in
+- **The already-matched sibling `SsUtKeyOff` is the control.** It is in
   this same unit, uses the identical guard construct, and gets the NEAR
   shape. Diffing what structurally differs between its fallthrough and this
   one is a cheaper experiment than any probe, and it is the one this
@@ -652,7 +654,7 @@ describes: a bare `__asm__("")` between all nine registration statements
 except between the `p3` store and the `1`-store, and between the
 `RecordE978`/`SlotE968` field-copy statements too) through the current
 pinned pipeline. This reached **240 words built (`build/lsdde.map` puts
-the next function, `func_80031280`, at `0x8003124c`/`0x80031250`
+the next function, `SsUtKeyOff`, at `0x8003124c`/`0x80031250`
 depending on the exact variant -- see below -- against retail's own
 `0x80031280`)** and a raw word-match in the low-to-mid 30s out of 252,
 in the same range as the round-26 figure but not an exact reproduction of
@@ -665,14 +667,14 @@ a correction to the title's raw figure.
 **The report's one specifically-flagged untested lever -- declaring
 `result` as `s32` (untruncated) with `(u8)` casts only at the
 comparison/store/return sites, rather than `u8 result = (u8)
-func_8002CF18();` -- was tried this round.** It moved the length from
+SpuVmAlloc();` -- was tried this round.** It moved the length from
 239/252 (13 short, the pre-existing figure) to **240/252 (12 short)**,
 a genuine one-word improvement, confirmed via `build/lsdde.map` (the
 following function's built address moved from `0x8003124c` to
 `0x80031250`). It is not free, though: `tools/asm-differ/diff.py` shows
 it trades one problem for a different one at the same spot -- retail's
 shape is a single `andi s0,v0,0xff` immediately after the
-`func_8002CF18()` call (masking the call's raw `v0` return straight into
+`SpuVmAlloc()` call (masking the call's raw `v0` return straight into
 its long-lived home), but declaring `result` as `s32` makes GCC keep
 BOTH a full-width copy (`move s1,v0`) AND a masked copy (`andi
 s0,v1,0xff`) alive simultaneously, because the C type says the full
@@ -680,7 +682,7 @@ s0,v1,0xff`) alive simultaneously, because the C type says the full
 function casts it to `(u8)`. That extra `move` is a new one-word cost at
 this exact site, offset by whatever the wider type fixed one word
 elsewhere in the function -- net one word better, not a clean win, and
-the underlying register-identity residue at the `func_8002CF18()` return
+the underlying register-identity residue at the `SpuVmAlloc()` return
 site is still present, just reshaped.
 
 **This does not close the function and no further reshape was attempted
@@ -732,7 +734,7 @@ typedef, extended with the `unk0` field this report's own "Struct/global
 additions" section says this function added).
 
 **Measured: 241/252 words, 11 short (`build/lsdde.map`: retail's next
-function `func_80031280` sits at `0x80031280`, this build's sits at
+function `SsUtKeyOff` sits at `0x80031280`, this build's sits at
 `0x80031254`, a 0x2C/11-word deficit).** Raw word-match 36/252. This is
 close to but not an exact reproduction of round 31's 240/252 -- one word
 different, consistent with round 31's own caveat that its exact barrier
@@ -750,14 +752,14 @@ and confirmed the guard-polarity residue is context-sensitive in a way
 this project's source-level view cannot reach, and a round-31 addendum
 that gained exactly one word from the one lever it had left -- reads as
 exhausted for hand reshaping. Time this round went to the two tighter
-gaps (`Unk18Obj__InitOt`, `func_80031A44`) instead, per this round's own
+gaps (`Unk18Obj__InitOt`, `SsUtChangePitch`) instead, per this round's own
 stated priority. Restored to `INCLUDE_ASM`. Classification unchanged:
 STALL.
 
 ### The corrected, linkable body (241/252 words, this round's measurement)
 
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
-`func_80030E90` in `src/code_179d8_j_b.c`, after `func_80030980`'s own
+`SsUtKeyOn` in `src/code_179d8_j_b.c`, after `func_80030980`'s own
 `INCLUDE_ASM` line. Requires (all now present in that file, added this
 round): `extern u16 D_8008EA22;` and the `SlotE968`/`D_8008E968`
 declarations shown below, alongside the file's existing `RecordE978`,
@@ -773,7 +775,7 @@ typedef struct SlotE968 {
 } SlotE968;
 extern SlotE968 *D_8008E968;
 
-s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
     SlotE968 *slot;
     RecordE978 *rec;
@@ -823,7 +825,7 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     if ((s16) note == 0) {
         goto fail;
     }
-    result = (s32)(u8) func_8002CF18();
+    result = (s32)(u8) SpuVmAlloc();
     if ((u8) result == D_8008E9D0) {
         goto fail;
     }
@@ -848,12 +850,12 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     __asm__("");
     D_8008D99C[(u8) result].unk0 = pending18;
 
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0((u8) result);
+        vmNoiseOn((u8) result);
     } else {
         s32 ret = note2pitch2((u16) p3, p4);
-        func_8002D1B4(1, (u16) ret);
+        SpuVmKeyOnNow(1, (u16) ret);
     }
     D_8008E934 = 0;
     return (u8) result;
@@ -889,7 +891,7 @@ waiting on a notification that was never coming (nothing runs on a runner's
 behalf). The head recovered the worktree by hand before teardown: measured the
 body, preserved it below, restored the `INCLUDE_ASM`, and wrote this entry. The
 MEASUREMENTS here are the head's own and were taken with the sibling
-`func_8003149C` restored to
+`SsUtKeyOnV` restored to
 `INCLUDE_ASM`, so this figure is free of that sibling's drift. The
 INTERPRETATION is reconstructed from the runner's artifacts, not from its
 reasoning, and is flagged where it is inference.
@@ -937,7 +939,7 @@ will mislead; find the missing instructions first.
 
 ```c
 #if 0
-s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
     SlotE968 *slot;
     RecordE978 *rec;
@@ -987,7 +989,7 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     if ((s16) note == 0) {
         goto fail;
     }
-    result = (s32)(u8) func_8002CF18();
+    result = (s32)(u8) SpuVmAlloc();
     if ((u8) result == D_8008E9D0) {
         goto fail;
     }
@@ -1012,12 +1014,12 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     __asm__("");
     D_8008D99C[(u8) result].unk0 = pending18;
 
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0((u8) result);
+        vmNoiseOn((u8) result);
     } else {
         s32 ret = note2pitch2((u16) p3, p4);
-        func_8002D1B4(1, (u16) ret);
+        SpuVmKeyOnNow(1, (u16) ret);
     }
     D_8008E934 = 0;
     return (u8) result;
@@ -1043,15 +1045,15 @@ that open item.
 `__asm__("")` from between the `D_8008D99A[result]`/`D_8008D998[result]`
 store pair to between `D_8008EA1B = rec->unk0;` and `note = rec->unk16;`
 instead. Applied literally to the real source (isolating this function
-alone, sibling `func_8003149C` held at `INCLUDE_ASM` so its own shortfall
+alone, sibling `SsUtKeyOnV` held at `INCLUDE_ASM` so its own shortfall
 does not contaminate this function's window, per the attribution-hazard
 note in CLAUDE.md) and rebuilt through `./build-and-verify.sh` +
 `tools/funcdiff.py`: **byte-identical to baseline -- still 36/252 raw
-word-match, still 11 words short (`build/lsdde.map`: `func_80031280` still
+word-match, still 11 words short (`build/lsdde.map`: `SsUtKeyOff` still
 lands at `0x80031254`, unchanged).** Reverted; no net effect.
 
-This is the same scaffold-vs-real-oracle disagreement `func_80031890`'s
-and `func_8003149C`'s round-40 entries document: the permuter's isolated
+This is the same scaffold-vs-real-oracle disagreement `SsUtKeyOffV`'s
+and `SsUtKeyOnV`'s round-40 entries document: the permuter's isolated
 translation unit does not reproduce this project's real
 register-allocation pressure, so a scaffold-local score drop (4050 -> 2965,
 ~27%) is not evidence about the real function on its own. No new axis
@@ -1068,7 +1070,7 @@ restored, but it was not actually present in the committed file -- this
 function's preserved body cannot compile without it, and the round-36
 gap-check apparently checked the OTHER two declarations (`D_8008EA22`,
 `SlotE968`/`D_8008E968`) but not this one. Fixed once, shared with
-`func_8003149C`'s identical dependency.
+`SsUtKeyOnV`'s identical dependency.
 
 ### Proposed learning
 
@@ -1086,12 +1088,12 @@ flag closed the length gap, and the title's "TOOLCHAIN-BLOCKED" is retired
 This round is a promotion job (`docs/FINISHING-PLAN.md` track 1b), not a
 matching session: measure once under the current toolchain, do not iterate.
 The round-40 body above was put LIVE (replacing `INCLUDE_ASM`, no `#ifdef`,
-sibling `func_8003149C` left at `INCLUDE_ASM` so its own drift does not
+sibling `SsUtKeyOnV` left at `INCLUDE_ASM` so its own drift does not
 contaminate this window) and rebuilt through `./build-and-verify.sh` +
 `tools/funcdiff.py`.
 
 **Length is now EXACT.** `build/lsdde.map` puts the next function,
-`func_80031280`, at `0x80031280` -- retail's own address, zero deficit
+`SsUtKeyOff`, at `0x80031280` -- retail's own address, zero deficit
 (was `0x80031254`, 11 words short, at every prior measurement back to
 round 36). This is exactly what the round-62 accounting predicted: 9 of
 the 11 missing words were the below-cc1 load-delay `nop` maspsx did not

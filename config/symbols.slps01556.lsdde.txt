@@ -783,6 +783,16 @@ GsSortClear = 0x80023DA0; // type:func  (Psy-Q libgs/gs_001, fingerprint)
 // libgte/reg, unidentified: 5-way tie masked 0.67 (SetRGBcd/SetIR0/SetData32/
 // SetGeomScreen/SetDQA), 3w. Position confirms libgte (after libgte/ratan).
 func_8001F3A4 = 0x8001F3A4; // type:func
+// libcomb, unidentified: masked 0.80 shape 0.80 AddCOMB (libcomb/comb,
+// 10w), also masked 0.70 StartPAD (libapi/pad)/def_cbsync/def_cbready/
+// def_cbread (libcd/event); none reaches the shape bar and position (after
+// libgte/ratan, before libgs/gs_105) matches none of them. Round 74 (bravo,
+// track 2).
+func_8001F4E4 = 0x8001F4E4; // type:func
+// unidentified: TINY (4w), EXACT tie PadVersion (_obj/mouse) / CdLastPos
+// (libcd/sys); position (after libgte/ratan, before libgs/gs_105) matches
+// neither candidate's library, unresolved. Round 74 (bravo, track 2).
+func_8001F50C = 0x8001F50C; // type:func
 // unidentified: masked 0.10 strtoul (libc2), too weak; no position/header support.
 func_8001F51C = 0x8001F51C; // type:func
 // unidentified: masked 0.00, no viable candidate.
@@ -1058,15 +1068,37 @@ GetClass6E99CMethods = 0x800404C0; // type:func
 New_ClassEAC0 = 0x800404D0; // type:func
 ClassEAC0__ClassEAC0 = 0x8004054C; // type:func
 ClassEAC0__FinishConstruct = 0x800405D0; // type:func
-BeginVoiceFade = 0x8002E874; // type:func
-StepVoiceFade = 0x8002EA44; // type:func
-StepVoiceEnvelope = 0x8002E4D8; // type:func
-InitSpuDriver = 0x8002EDD4; // type:func
+// identified: shape 0.97 vs libsnd/vmanager SeAutoVol (110w vs our 116w,
+// disc 3.3) -- the same tied candidate as SeAutoVol (0x8002E308);
+// disambiguated by family: this function operates on the gVoiceFade*
+// globals, the family StepVoiceFade (-> SetAutoPan) uses, mirroring Sony's
+// public SsUtAutoVol/SsUtAutoPan pair (LIBSND.H) onto internal
+// SeAutoVol/SeAutoPan. Superseded game-style name BeginVoiceFade.
+// Round 74 (bravo, track 2).
+SeAutoPan = 0x8002E874; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SetAutoPan (224w vs our 228w,
+// disc 3.3), position within the libsnd neighborhood, directly after
+// SeAutoPan (Se/Set pair). Superseded game-style name StepVoiceFade.
+// Round 74 (bravo, track 2).
+SetAutoPan = 0x8002EA44; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SetAutoVol (227w vs our 231w,
+// disc 3.3), position within the libsnd neighborhood, directly after
+// SeAutoVol (Se/Set pair). Superseded game-style name StepVoiceEnvelope.
+// Round 74 (bravo, track 2).
+SetAutoVol = 0x8002E4D8; // type:func
+// identified: shape 0.95 vs libsnd/vmanager SpuVmInit (244w vs our 270w,
+// disc 3.5), position within the libsnd neighborhood. Superseded
+// game-style name InitSpuDriver. Round 74 (bravo, track 2).
+SpuVmInit = 0x8002EDD4; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
 // SpuVmNoiseOnWithAdsr (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded
 // game-style name PlaySound. Round 71 (bravo, track 2).
 SpuVmNoiseOnWithAdsr = 0x8002F20C; // type:func
-ClearNoiseVoices = 0x8002F2A4; // type:func
+// identified: shape 0.97 vs libsnd/vmanager SpuVmNoiseOff (46w vs our 49w,
+// disc 3.5), position within the libsnd neighborhood, right after
+// SpuVmNoiseOnWithAdsr. Superseded game-style name ClearNoiseVoices.
+// Round 74 (bravo, track 2).
+SpuVmNoiseOff = 0x8002F2A4; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmNoiseOn
 // (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded game-style name
 // PlayFixedSound. Round 71 (bravo, track 2).
@@ -1086,7 +1118,10 @@ SpuVmPitchBend = 0x8002F610; // type:func
 // UpdateVoiceEnvelopes. Round 71 (bravo, track 2).
 SpuVmFlush = 0x8002F700; // type:func
 StartNote = 0x8002FAC4; // type:func
-StopNote = 0x800300D0; // type:func
+// identified: shape 0.93 vs libsnd/vmanager SpuVmKeyOff (124w vs our
+// 131w, disc 3.5), position within the libsnd neighborhood. Superseded
+// game-style name StopNote. Round 74 (bravo, track 2).
+SpuVmKeyOff = 0x800300D0; // type:func
 gVoiceEnvActive = 0x8008D9A4;
 gVoiceEnvStep = 0x8008D9A6;
 gVoiceEnvInterval = 0x8008D9A8;
@@ -1829,3 +1864,112 @@ BMemPMgrFree = 0x80017CFC; // type:func
 PushBasicClassListNode = 0x800181AC; // type:func
 RemoveBasicClassListNode = 0x80018208; // type:func
 gDefaultBMemPMgr = 0x8008A818;
+// identified: shape 0.98 vs libsnd/vmanager SpuVmAlloc (159w vs our 167w,
+// disc 3.3), position between libc2/strncmp and libsnd/vm_prog (libsnd
+// neighborhood). Superseded game-style func_8002CF18. Round 74 (bravo, track 2).
+SpuVmAlloc = 0x8002CF18; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SpuVmKeyOnNow (312w vs our
+// 316w, disc 3.3), position within the libsnd neighborhood. Superseded
+// game-style func_8002D1B4. Round 74 (bravo, track 2).
+SpuVmKeyOnNow = 0x8002D1B4; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SpuVmDoAllocate (141w vs our
+// 143w, disc 3.3), position within the libsnd neighborhood. Superseded
+// game-style func_8002D6A4. Round 74 (bravo, track 2).
+SpuVmDoAllocate = 0x8002D6A4; // type:func
+// identified: shape 0.98 vs libsnd/vmanager vmNoiseOn (308w vs our 311w,
+// disc 3.5, also libsnd/vm_no1 disc 3.6), position within the libsnd
+// neighborhood. Internal lowercase helper, distinct from the already-named
+// public SpuVmNoiseOn (0x8002F368). Superseded game-style func_8002D8E0.
+// Round 74 (bravo, track 2).
+vmNoiseOn = 0x8002D8E0; // type:func
+// identified: shape 0.96 vs libsnd/vmanager vmNoiseOn2 (103w vs our
+// 112w, disc 3.5, also libsnd/vm_no2 disc 3.6), position within the
+// libsnd neighborhood, right after vmNoiseOn (paired helper). Superseded
+// game-style func_8002DDBC. Round 74 (bravo, track 2).
+vmNoiseOn2 = 0x8002DDBC; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SePitchBend (110w vs our
+// 112w, disc 3.3), position within the libsnd neighborhood. Superseded
+// game-style func_8002E138. Round 74 (bravo, track 2).
+SePitchBend = 0x8002E138; // type:func
+// identified: shape 0.97 vs libsnd/vmanager SeAutoVol (110w vs our 116w,
+// disc 3.3), position within the libsnd neighborhood. sdkname.py ties this
+// same shape candidate against BeginVoiceFade (0x8002E874); disambiguated by
+// family: this function operates on the gVoiceEnv* globals, the same family
+// StepVoiceEnvelope (-> SetAutoVol) uses, while BeginVoiceFade operates on
+// gVoiceFade* (the family StepVoiceFade -> SetAutoPan uses) -- matching
+// Sony's public SsUtAutoVol/SsUtAutoPan pair (LIBSND.H) onto its internal
+// SeAutoVol/SeAutoPan pair. Superseded game-style func_8002E308.
+// Round 74 (bravo, track 2).
+SeAutoVol = 0x8002E308; // type:func
+// identified: shape 1.00 vs libsnd/vmanager SsUtKeyOn (250w vs our 252w,
+// disc 3.3), position within the libsnd neighborhood, header LIBSND.H
+// (`extern short SsUtKeyOn(short,short,short,short,short,short,short);`,
+// 7 params -- this function's own 7-param shape agrees on count).
+// Superseded game-style func_80030E90. Round 74 (bravo, track 2).
+SsUtKeyOn = 0x80030E90; // type:func
+// identified: shape 0.96 vs libsnd/vmanager SsUtKeyOff (125w vs our 135w,
+// disc 3.5), position right after SsUtKeyOn, header LIBSND.H
+// (`extern short SsUtKeyOff(short,short,short,short,short);`, 5 params --
+// this function's own 5-param shape agrees on count). Superseded
+// game-style func_80031280. Round 74 (bravo, track 2).
+SsUtKeyOff = 0x80031280; // type:func
+// identified: shape 0.95 vs libsnd/vmanager SsUtKeyOnV (231w vs our
+// 253w, disc 3.5), position within the libsnd neighborhood, header
+// LIBSND.H (`extern short SsUtKeyOnV(short voice, short vabId, short prog,
+// short tone, short note, short fine, short voll, short volr);`, 8 params
+// -- this function's own 8-param shape agrees on count). Superseded
+// game-style func_8003149C. Round 74 (bravo, track 2).
+SsUtKeyOnV = 0x8003149C; // type:func
+// identified: shape 0.98 vs libsnd/vmanager SsUtKeyOffV (70w vs our 73w,
+// disc 3.3), position right after SsUtKeyOnV, header LIBSND.H
+// (`extern short SsUtKeyOffV(short voice);`, 1 param -- this function's
+// own 1-param shape agrees exactly). Superseded game-style func_80031890.
+// Round 74 (bravo, track 2).
+SsUtKeyOffV = 0x80031890; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SsUtChangePitch (86w vs our
+// 88w, disc 3.3), position within the libsnd neighborhood, header
+// LIBSND.H (`extern short SsUtChangePitch(short,short,short,short,short,
+// short,short);`, 7 params -- this function's own 7-param shape
+// (idx,p1,p2,p3,unusedP,p4,p5, docs/match-reports/SsUtChangePitch.md)
+// agrees on count). Superseded game-style func_80031A44. Still a STALL --
+// this rename does not change that. Round 74 (bravo, track 2).
+SsUtChangePitch = 0x80031A44; // type:func
+// identified: shape 0.98 vs libsnd/vmanager SsUtChangeADSR (59w vs our
+// 61w, disc 3.3), position right after SsUtChangePitch, header LIBSND.H
+// (`extern short SsUtChangeADSR(short,short,short,short,unsigned short,
+// unsigned short);`, 6 params -- this function's own 6-param shape
+// (idx,p1,p2,p3,u16 p4,u16 p5) agrees on both count and the ushort tail).
+// Superseded game-style func_80031BA4. Round 74 (bravo, track 2).
+SsUtChangeADSR = 0x80031BA4; // type:func
+// identified: shape 0.95 vs libsnd/vmanager SsUtAllKeyOff (119w vs our
+// 131w, disc 3.5), position within the libsnd neighborhood, semantics
+// ("key off every voice", unconditional loop over every channel) match
+// the header LIBSND.H prototype's name and its 1-param count
+// (`extern void SsUtAllKeyOff(short);`, call site src/code_179d8_e.c:191
+// declares 1 param). The preserved stalled body in code_179d8_p.c is
+// currently modeled void(void), not yet reading that argument -- a
+// derivation gap to close, not a naming disagreement. Superseded
+// game-style func_80031F3C. Still a STALL. Round 74 (bravo, track 2).
+SsUtAllKeyOff = 0x80031F3C; // type:func
+// identified: shape 0.99 vs libsnd/ssinit _SsInit (85w vs our 83w, disc
+// 3.3), position within the libsnd neighborhood (after libsnd/vm_vsu,
+// before libsnd/sstable), same underscore-prefixed internal-helper
+// convention already used for _SsStart (docs/match-reports/_SsStart.md)
+// in this project. Superseded game-style func_8003221C.
+// Round 74 (bravo, track 2).
+_SsInit = 0x8003221C; // type:func
+// identified: shape 0.99 vs libsnd/seqread _SsSetControlChange (198w vs
+// our 200w, disc 3.5), position within the libsnd neighborhood (after
+// libsnd/vs_vab, before libsnd/adsr), same underscore-prefixed
+// internal-helper convention as _SsInit/_SsStart. Superseded game-style
+// func_80034690. Round 74 (bravo, track 2).
+_SsSetControlChange = 0x80034690; // type:func
+// identified: shape 1.00 vs libcard/card _card_clear (12w, exact length,
+// disc 3.3), position CONTIGUOUS on both sides with zero gap between
+// placed libcard objects (c171 _card_info ends exactly where this starts;
+// a78 _card_write starts exactly where this ends) -- confirmed
+// independently in round 39's own three-line analysis (banner comment,
+// src/class_3bb8c_v.c) that this is Sony libcard code whose object is not
+// on any disc in sdk/. Superseded game-style func_80050B28. Still a
+// STALL. Round 74 (bravo, track 2).
+_card_clear = 0x80050B28; // type:func

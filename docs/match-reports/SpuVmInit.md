@@ -1,4 +1,6 @@
-# InitSpuDriver -- MATCHED round 32 (bravo): 270/270, whole-image SHA1 verified
+# SpuVmInit -- MATCHED round 32 (bravo): 270/270, whole-image SHA1 verified
+
+> Renamed from `InitSpuDriver` on 2026-09-24 (tools/rename.py). Address 0x8002edd4.
 
 > Renamed from `func_8002EDD4` on 2026-09-20 (tools/rename.py). Address 0x8002edd4.
 
@@ -21,7 +23,7 @@ HEAD's diagnosis of the "split scaled index" residue (see below).
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/InitSpuDriver.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SpuVmInit.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -56,7 +58,7 @@ same block) with `s0` in place of retail's `a0` and nothing else differing
 the score): the preserved body's two `SPU` calls used STALE placeholder
 names.** `func_80039228(0)` and `func_80039104(0x20, gSpuMallocArea)` were
 written when these two library calls had no symbol yet; `asm/nonmatchings/
-code_179d8_m/InitSpuDriver.s` itself now names them `_spu_setInTransfer`
+code_179d8_m/SpuVmInit.s` itself now names them `_spu_setInTransfer`
 and `SpuInitMalloc` (`config/symbols.slps01556.lsdde.txt` lines 287/291,
 Psy-Q `libspu`, from the SDK-object-linking work in later rounds). The
 preserved body below has been updated to the current names; nothing about
@@ -64,7 +66,7 @@ the residue or the score changes.
 
 **Permuter search launched per this round's assignment** (this is the
 round's designated permuter target, the closest large near-miss in the
-corpus): `tools/setup-permuter.sh InitSpuDriver <seed>` with the corrected
+corpus): `tools/setup-permuter.sh SpuVmInit <seed>` with the corrected
 seed (SDK symbol names fixed, all needed struct/extern declarations
 inlined), sanity-checked with `--debug --stack-diffs` first — base score
 **15** (3 register differences × 5, zero insertions/deletions/reorderings/
@@ -106,7 +108,7 @@ downstream register-identity residue noted below). This is the single
 biggest structural fix of the round and should be treated as the
 established idiom for this record family's D_8006DAD4-array writes
 whenever they occur inside a LOOP (see the caveat under
-`StepVoiceEnvelope`'s report on the non-loop case, which behaves differently).
+`SetAutoVol`'s report on the non-loop case, which behaves differently).
 
 **One sub-finding not in the head's message:** the `+0x8` field
 (`0x80FF`) needed a `u16 *` cast rather than `s16 *` at its specific store
@@ -256,12 +258,12 @@ and stored identically to retail.
 4. **The `woff`-halfword-index idiom for a small-struct array proven inside
    a loop (this function's D_8006DAD4 fix, confirmed byte-exact) does NOT
    transfer cleanly to the equivalent access OUTSIDE a loop** — see
-   `StepVoiceEnvelope`'s report, attempted this same round with the identical
+   `SetAutoVol`'s report, attempted this same round with the identical
    idiom against a single (non-looping) call site, which reduced but did
    not eliminate its residue and surfaced different register-pressure
    side effects. Loop vs. non-loop context is a real discriminator for
    this idiom, not a detail. **Round 30 adds a THIRD variant**:
-   `StepVoiceFade.md`'s round-30 update found the idiom REGRESSES a third
+   `SetAutoPan.md`'s round-30 update found the idiom REGRESSES a third
    sibling because retail derives the shift from an ALREADY-sign-extended
    working value shared with a neighbouring computation, not from a fresh
    copy of the raw parameter — so "top of function, `s16`, mask deferred to
@@ -354,7 +356,7 @@ typedef struct {
 } ObjDAD4;
 extern ObjDAD4 *D_8006DAD4;
 
-void InitSpuDriver(s32 a0) {
+void SpuVmInit(s32 a0) {
     s16 i;
 
     _spu_setInTransfer(0);
@@ -399,7 +401,7 @@ void InitSpuDriver(s32 a0) {
          * disassembly shows on the PRODUCT and the LATE base-pointer
          * load. This idiom, confirmed byte-exact for this loop, does
          * NOT transfer cleanly to the equivalent non-loop access in
-         * StepVoiceEnvelope -- see that function's report. */
+         * SetAutoVol -- see that function's report. */
         woff = (u16) i * 8;
 
         D_8008D98A[(u16) i].unk0 = 0x18;
@@ -577,12 +579,12 @@ figure exactly, no drift), then ran a fresh, cleanly-bounded permuter search.
 ### Permuter run: clean exit, own bound never reached -- found zero instead
 
 ```sh
-tools/setup-permuter.sh InitSpuDriver <seed from this report's own preserved body>
+tools/setup-permuter.sh SpuVmInit <seed from this report's own preserved body>
 PATH=$PWD/permuter-work/bin:$PATH .venv/bin/python3 tools/decomp-permuter/permuter.py \
-  --debug --stack-diffs permuter-work/InitSpuDriver        # sanity check: base score 15
+  --debug --stack-diffs permuter-work/SpuVmInit        # sanity check: base score 15
 PATH=$PWD/permuter-work/bin:$PATH nohup timeout 900 .venv/bin/python3 \
   tools/decomp-permuter/permuter.py -j 6 --stack-diffs --stop-on-zero --best-only \
-  permuter-work/InitSpuDriver > /tmp/bravo_permuter_8002EDD4.log 2>&1 &
+  permuter-work/SpuVmInit > /tmp/bravo_permuter_8002EDD4.log 2>&1 &
 ```
 
 Base score sanity-checked at **15** (3 register differences x 5, zero
@@ -597,8 +599,8 @@ bound -- confirmed by `ps -o etime` immediately before the exit, and the log
 line itself), the permuter printed:
 
 ```
-[InitSpuDriver] found new best score! (0 vs 15)
-wrote to permuter-work/InitSpuDriver/output-0-1
+[SpuVmInit] found new best score! (0 vs 15)
+wrote to permuter-work/SpuVmInit/output-0-1
 iteration 66199, 0 errors, score = 0
 Found zero score! Exiting.
 ```
@@ -614,7 +616,7 @@ entirely and should not be graded on the same rubric.
 
 ### The candidate, and why it is NOT a false lead this time
 
-`permuter-work/InitSpuDriver/output-0-1/diff.txt` shows three related
+`permuter-work/SpuVmInit/output-0-1/diff.txt` shows three related
 substitutions, all using ONE permuter-inserted `int new_var;`:
 
 1. `a0 = (u8) a0; new_var = a0; ... D_8008E9D0 = new_var;` in place of
@@ -706,7 +708,7 @@ pointless assignment) by ordinary C style standards.
 
 ## Naming
 
-**InitSpuDriver** (was `func_8002EDD4`) -- Tier A. Two Sony `libspu` calls
+**SpuVmInit** (was `func_8002EDD4`) -- Tier A. Two Sony `libspu` calls
 (`_spu_setInTransfer`, `SpuInitMalloc`), zeroes every per-voice table this
 unit owns plus `gMasterVolL`/`gMasterVolR` (reset to `0x3FFF`, the PS1
 SPU's actual 14-bit max volume register value -- strong corroborating
@@ -719,7 +721,7 @@ sound driver"; nothing about it is guessed beyond what the body does.
 Not this function's own struct, but noting here since this report already
 lists most of the cluster: `D_8006DAD4Edd4`/`D_8006DAD4` (this unit's two
 independent local views of the same base pointer) is the PS1 SPU hardware
-base address `0x1F801C00`, per `func_8002DDBC`'s own report in
+base address `0x1F801C00`, per `vmNoiseOn2`'s own report in
 `code_179d8_l`. Proposing (not applying -- shared with bravo's live
 `code_179d8_j_b.c` this round, see broadcast) a base-pointer rename to
 `gSpuRegs` once no live runner touches `code_179d8_j_b`/`_l`/`_j`/`_j_c`/

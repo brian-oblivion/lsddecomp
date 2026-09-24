@@ -1,5 +1,7 @@
 # StepVoiceFade -- STALL: length exact (228/228, round 73), 220/228 raw word-match, first diff at vram 0x8002EC6C (the pan split: retail copies the volume into $a1 and multiplies the copy; this body masks val1). libsnd SetAutoPan.
 
+> Renamed from `StepVoiceFade` on 2026-09-24 (tools/rename.py). Address 0x8002ea44.
+
 > Renamed from `func_8002EA44` on 2026-09-20 (tools/rename.py). Address 0x8002ea44.
 
 Unit: `src/code_179d8_m.c`. Round 24 (second pass), runner bravo.
@@ -7,7 +9,7 @@ Unit: `src/code_179d8_m.c`. Round 24 (second pass), runner bravo.
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/StepVoiceFade.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SetAutoPan.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -27,12 +29,12 @@ the next attempt.
 
 Re-spliced this exact preserved body and rebuilt from scratch. **All title
 figures reconfirmed:** built length **223 words** (`objdump -t
-build/src/code_179d8_m.c.o` confirms `StepVoiceFade` at `0x37c` bytes = 223
+build/src/code_179d8_m.c.o` confirms `SetAutoPan` at `0x37c` bytes = 223
 words, retail 228, so 5 short), `funcdiff.py`'s in-range figure **13/228**
 with drift (238724 bytes this run, matching the report's own figure to
 within measurement noise).
 
-**New axis: applied `StepVoiceEnvelope`'s "woff" idiom** (declare `s16 woff;`,
+**New axis: applied `SetAutoVol`'s "woff" idiom** (declare `s16 woff;`,
 set `woff = idxCopy << 3;` as one of the function's FIRST statements,
 before any of the 0x34-stride record accesses, then store the two final
 results through flat `((s16 *) D_8008D7F2)[(u16) woff]` / `((s16 *)
@@ -40,7 +42,7 @@ D_8008D7F0)[(u16) woff]` casts instead of the `Rec16D7F0`-typed
 `array[idxCopy].unk0` form) — this is exactly the SAME "persisted `idx*8`,
 consumed once near the end for these same two arrays" shape this report's
 own "What's missing" section already named as the open mystery, and it is
-the identical fix `StepVoiceEnvelope` (this unit's own sibling, same round)
+the identical fix `SetAutoVol` (this unit's own sibling, same round)
 used to close its analogous early-`sll`/mid-block-mask gap. **This
 REGRESSED the score**: still 223/228 built length (unchanged), but the
 in-range match dropped from 13/228 to 7/228 and out-of-range drift grew
@@ -48,13 +50,13 @@ in-range match dropped from 13/228 to 7/228 and out-of-range drift grew
 the better of the two and is what is preserved.
 
 **Why it regressed, read off `asm-differ` directly — a THIRD placement
-variant beyond `StepVoiceEnvelope`'s own loop-vs-non-loop distinction.**
+variant beyond `SetAutoVol`'s own loop-vs-non-loop distinction.**
 Retail's actual dependency chain here is: sign-extend `a0` ONCE into a
 temp (`v1 = (s16) a0`), THEN derive `t1 = v1 << 3` (the woff-equivalent)
 FROM that already-sign-extended value, and separately reuse the SAME `v1`
 to start the 0x34-stride multiply chain — i.e. retail computes the
 sign-extension exactly once and shares it between both consumers. Placing
-`woff = idxCopy << 3;` at the very top (mirroring `StepVoiceEnvelope`'s
+`woff = idxCopy << 3;` at the very top (mirroring `SetAutoVol`'s
 winning placement verbatim) instead computes it from the RAW,
 not-yet-sign-extended parameter as a standalone early instruction, which
 `asm-differ` shows landing as `sll t1,a0,0x3` / `move t0,a0` / `sll
@@ -67,7 +69,7 @@ original (non-woff) attempt, which never introduced the extra early
 
 **So the idiom's correct placement is a THIRD, function-specific variant,
 not just "top of function, `s16`, mask deferred to use" as
-`StepVoiceEnvelope`'s report generalised it.** Here the shift must be derived
+`SetAutoVol`'s report generalised it.** Here the shift must be derived
 from the ALREADY-sign-extended working value the 0x34-stride chain also
 uses (i.e. computed AFTER whatever sign-extends the parameter for its
 first record-index use, not before it) — untried this round given the
@@ -195,7 +197,7 @@ positive, else reset from `gVoiceFadeInterval`" shape as the OTHER interpolation
 functions in this unit), then an accumulator update against a clamped limit
 (`gVoiceFadeStep`/`gVoiceFadeAccum`/`gVoiceFadeLimit`, the SAME "increment, clamp against
 a limit whose comparison direction depends on the increment's sign" shape
-already documented for `BeginVoiceFade`'s and `StopNote`'s siblings in
+already documented for `SeAutoPan`'s and `SpuVmKeyOff`'s siblings in
 this record family). Then a four-stage 7-bit-percentage blend chain:
 combine two byte-scratch globals through the identified 16129 divisor
 (twice, once signed once unsigned) to get a base level `q2`, then apply
@@ -321,7 +323,7 @@ its recorded score.
 
 **The rebuild reproduces the exact same C, but the true built length is
 222 words, not 223.** `objdump -t build/src/code_179d8_m.c.o` gives
-`StepVoiceFade` at `0x378` bytes = 222 words (confirmed independently by
+`SetAutoPan` at `0x378` bytes = 222 words (confirmed independently by
 counting disassembled instructions from the function's `addiu sp,sp,-0x18`
 line to its final `nop`, inclusive: 222 lines). Retail is 228, so this is
 **6 words short, not 5** as every prior round (26, 30, 32) recorded. The
@@ -340,7 +342,7 @@ was.
 
 ### Permuter search
 
-`tools/setup-permuter.sh StepVoiceFade <seed>` (seed: the preserved body
+`tools/setup-permuter.sh SetAutoPan <seed>` (seed: the preserved body
 below, `Rec34HalfU`'s three unsigned-view symbols routed through
 `__asm__`-aliased C names to avoid clashing with the plain signed
 declarations the same file needs elsewhere -- a scaffold-only device, not
@@ -365,7 +367,7 @@ Real search: `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
 --stack-diffs` via the harness's `run_in_background`. **Completed cleanly,
 `rc=124`** (own bound) after **63,989 iterations**. Best score: **2430**
 (from base 4125), saved at
-`permuter-work/StepVoiceFade/output-2430-1/`; no zero reached.
+`permuter-work/SetAutoPan/output-2430-1/`; no zero reached.
 
 The 2430 candidate's only content change from the scaffold is dropping the
 intermediate `limit = gVoiceFadeLimit[a0].unk0;` assignment in the
@@ -403,7 +405,7 @@ regardless of the immediate value -- it cannot by itself manufacture
 missing content words. It only recovers frame BYTE-ALIGNMENT, which makes
 the rest of the disassembly comparison meaningful again.
 
-With the frame realigned, `tools/asm-differ/diff.py StepVoiceFade` shows
+With the frame realigned, `tools/asm-differ/diff.py SetAutoPan` shows
 retail computing `t1 = v1 << 3` (the sign-extended `a0`, shifted) as its
 THIRD instruction and holding it live, exactly as this report's own "What's
 missing" section already diagnosed from the un-realigned disassembly —
@@ -421,7 +423,7 @@ Reverted to `INCLUDE_ASM`; whole-image SHA1 reconfirmed green.
 
 **Two-for-two this round: charlie's `dead[N]`/`if(0)` frame-padding idiom
 recovered frame byte-alignment exactly on both `SpuVmFlush` and
-`StepVoiceFade`, and closed the missing-WORD-count gap on NEITHER.** Both
+`SetAutoPan`, and closed the missing-WORD-count gap on NEITHER.** Both
 functions' extra retail frame bytes are pure unaddressed register-save-area
 padding with no companion missing-instruction elsewhere in THIS unit,
 unlike `ContDataEntry` (a different unit), whose length recovery came from
@@ -486,7 +488,7 @@ extern u8 D_8008EA1A;
  * when set to 1. */
 extern s16 D_8008E8C0;
 
-void StepVoiceFade(s16 a0) {
+void SetAutoPan(s16 a0) {
     s16 idxCopy;
     s16 step;
     u16 increment;
@@ -594,14 +596,14 @@ void StepVoiceFade(s16 a0) {
 
 ## Naming
 
-**StepVoiceFade** (was `func_8002EA44`) -- Tier B. Companion to
-BeginVoiceFade: advances `gVoiceFadeAccum` toward `gVoiceFadeLimit` by
+**SetAutoPan** (was `func_8002EA44`) -- Tier B. Companion to
+SeAutoPan: advances `gVoiceFadeAccum` toward `gVoiceFadeLimit` by
 `gVoiceFadeStep`, throttled by `gVoiceFadeInterval`/`gVoiceFadeCountdown`,
 clears `gVoiceFadeActive` on reaching the limit, then computes and writes
 this voice's stereo output level from the resulting percentage (same
-final block as StepVoiceEnvelope, confirmed near-identical between the
+final block as SetAutoVol, confirmed near-identical between the
 two reports). "Fade" rather than a more specific name for the same reason
-as BeginVoiceFade: what value is actually being interpolated in-game is
+as SeAutoPan: what value is actually being interpolated in-game is
 not established from this function's body alone.
 
 ## NON_MATCHING body promoted, round 67
@@ -609,7 +611,7 @@ not established from this function's body alone.
 Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. All of the preserved body's own local `Rec34HalfU`/
 `Rec16D7F0`/plain-byte-global declarations were already present in the
-unit's shared prelude (moved up for `StepVoiceEnvelope`, first in ROM
+unit's shared prelude (moved up for `SetAutoVol`, first in ROM
 order) and were dropped here rather than re-typedef'd. One real field-name
 update: the body's own local `ObjE970` (`unk18`) collided with the shared
 `ObjE970` the prelude already declares with the same offset under the name
@@ -623,7 +625,7 @@ REVISITED, round 73: STALL improved to length-exact 220/228 (ins 1 / del 1), res
 
 ### Ownership, read before spending more on this
 
-`sdkname.py` puts its sibling `StepVoiceEnvelope` at **shape 0.99** against
+`sdkname.py` puts its sibling `SetAutoVol` at **shape 0.99** against
 libsnd `SetAutoVol` (3.3 `vmanager`), and Sony's 3.3 `SetAutoPan` has this
 function's opening skeleton (224w; the 0x30 voice stride there vs 0x34 here
 accounts for the length). This is libsnd's `SetAutoPan` in a build no disc
@@ -748,7 +750,7 @@ semantics, rejected).
   at every access, where yours hoists one `addu aN,aK,vX` and then uses
   `0(aN)`, means your C cached a VALUE in a local and CSE then shared the
   ADDRESS.** Write the field access each time (`x[i].f--`, `x[i].f += ...`).
-  Closed 6 words here and 6 in `StepVoiceEnvelope`.
+  Closed 6 words here and 6 in `SetAutoVol`.
 - **A leaf function's dead frame (no `$sp` access, frame > 0) counts the
   sign-extension pseudos that combine folded into loads/compares.** Each
   keeps its register-allocation record and gets a stack slot. A frame
@@ -786,7 +788,7 @@ extern Rec34Half gVoiceFadeCountdown[];
 extern Rec34Half gVoiceFadeAccum[];
 extern Rec34Half gVoiceFadeLimit[];
 
-void StepVoiceFade(s16 voice)
+void SetAutoPan(s16 voice)
 {
     s16 v;
     s16 off;

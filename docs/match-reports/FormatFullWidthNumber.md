@@ -183,7 +183,7 @@ tells you how the line was written.
 Head's round-27 broadcast asked for the one-command discriminator on this
 function specifically: does retail save the SAME callee-saved set as the
 build, fewer, or none-on-both-sides (per the third outcome found on
-`StepVoiceEnvelope` in a different unit this round). Checked directly rather
+`SetAutoVol` in a different unit this round). Checked directly rather
 than re-reasoning from the existing table:
 
 ```sh
@@ -202,7 +202,7 @@ sw s4,32(sp)   sw s3,28(sp)   sw s2,24(sp)   sw s0,16(sp)
 **Same 7-register set on both sides: `{$s0,$s1,$s2,$s3,$s4,$s5,$fp}`.**
 This is the SECOND of the three possible outcomes the discriminator
 distinguishes (same set, values permuted among them) — not the third
-outcome (`StepVoiceEnvelope`, neither side saves anything) and not a case
+outcome (`SetAutoVol`, neither side saves anything) and not a case
 where the sets differ in membership. **The existing verdict stands
 exactly as filed**: this is genuine register identity per CLAUDE.md's own
 test (same instructions, only WHICH physical register differs), correctly

@@ -1,4 +1,6 @@
-# func_80050B28 -- NOT GAME CODE. Psy-Q **libcard**, no object on the user's SDK discs. UNMATCHABLE BY CONSTRUCTION -- do not staff, do not permuter, do not attempt.
+# _card_clear -- NOT GAME CODE. Psy-Q **libcard**, no object on the user's SDK discs. UNMATCHABLE BY CONSTRUCTION -- do not staff, do not permuter, do not attempt.
+
+> Renamed from `func_80050B28` on 2026-09-24 (tools/rename.py). Address 0x80050b28.
 
 > **ROUND 39 (head): VERDICT REPLACED.** Everything below this box is a real
 > and careful derivation of a function that no C was ever compiled to. The
@@ -62,7 +64,7 @@ And this function is inside libcard's own run. From the splat yaml and
 ```
 0x41308  libcard/c172   _card_load    (placed object)
 0x41318  libcard/c171   _card_info    (placed object)
-0x41328  func_80050B28  12w, 0x30 bytes   <-- THIS FUNCTION, unclaimed
+0x41328  _card_clear  12w, 0x30 bytes   <-- THIS FUNCTION, unclaimed
 0x41358  libcard/a78    _card_write   (placed object)
 0x41368  libcard/a74    InitCARD      (placed object)
 0x41378  libcard/a75    StartCARD     (placed object)
@@ -74,7 +76,7 @@ It is bracketed on both sides by placed libcard objects, it calls **only**
 `_new_card` and `_card_write` (both libcard), and it carries libcard's
 assembler fingerprint in the one place the whole game disassembly carries it.
 
-**Conclusion: `func_80050B28` is Psy-Q libcard code. Its object is simply not
+**Conclusion: `_card_clear` is Psy-Q libcard code. Its object is simply not
 on the discs in `sdk/`** -- it is one of the SDK functions `progress.py`
 counts under "have no object on any disc in sdk/". No source shape reaches
 those bytes, and every attempt on it is spent for certain.
@@ -116,7 +118,7 @@ report recommending a permuter budget on Sony's code.
 
 ---
 
-## (SUPERSEDED BELOW -- retained as evidence) func_80050B28 -- STALL: length EXACT (12/12 words, no drift); 9/12 raw word-match (round 32, up from 5/12); first real diff at word 1 (`sw ra,0x18(sp)` vs retail's `0x1c(sp)`)
+## (SUPERSEDED BELOW -- retained as evidence) _card_clear -- STALL: length EXACT (12/12 words, no drift); 9/12 raw word-match (round 32, up from 5/12); first real diff at word 1 (`sw ra,0x18(sp)` vs retail's `0x1c(sp)`)
 
 > **ROUND 36 (2026-09-12), runner charlie -- MEASURED, not just re-named.**
 > Round 34 renamed the two callees in prose but never rebuilt this body under
@@ -128,7 +130,7 @@ report recommending a permuter budget on Sony's code.
 > `lib/libcard/a78.o`), spliced the exact round-32 body into
 > `src/class_3bb8c_v.c` in place of the `INCLUDE_ASM`, and ran the real
 > oracle: **`build exit=0`, whole-image SHA1 matches**, and
-> `funcdiff.py func_80050B28` reports **9/12 words, exact length, no
+> `funcdiff.py _card_clear` reports **9/12 words, exact length, no
 > drift** -- IDENTICAL to round 32's recorded diff (same three words: the
 > `ra` slot at word 1, the `li a1,0x3f` encoding at word 5, the `ra` reload
 > at word 8). The unverified figure is now a measured one, and it did not
@@ -237,7 +239,7 @@ Size: 12 words (0x30 bytes), vram `0x80050B28`, file `0x41328`.
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/class_3bb8c_v/func_80050B28.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/class_3bb8c_v/_card_clear.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'   -> no hits
 ```
 
@@ -262,7 +264,7 @@ identifies it. Its declaration there is otherwise correct and is the one to
 match:
 
 ```c
-extern s32 func_80050B28(s32 arg0);        /* class_3bb8c_e.c:276 */
+extern s32 _card_clear(s32 arg0);        /* class_3bb8c_e.c:276 */
 ```
 
 The remaining trampolines in the two sibling segments decode as `0x4A`
@@ -300,7 +302,7 @@ it moves the function from 0/12-with-drift to 5/12 at 12/12 words:
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80050B58 -> _card_write, func_80050B98 -> _new_card -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_80050B28(s32 chan) {
+s32 _card_clear(s32 chan) {
     s32 *p = &chan;
     _new_card();
     return _card_write(*p, 0x3F, 0);
@@ -319,7 +321,7 @@ Complete and compilable as written -- splice it in place of the
 extern void _new_card(void);                           /* B(0x50) _new_card   */
 extern s32 _card_write(s32 chan, s32 sector, void *src); /* B(0x4E) _card_write */
 
-s32 func_80050B28(s32 chan) {
+s32 _card_clear(s32 chan) {
     s32 *p = &chan;
     _new_card();
     return _card_write(*p, 0x3F, 0);
@@ -443,17 +445,17 @@ second instance turns up.
 **With `--stack-diffs`, one dead end (score 0 is unreachable via
 stack-diff normalization tricks) but real, substantial progress on the
 frame mechanism itself.** The corrected search's best-found candidate
-(`permuter-work/func_80050B28/output-8-1`, score 8, ~80k iterations, no
+(`permuter-work/_card_clear/output-8-1`, score 8, ~80k iterations, no
 zero found in a 600s/`-j 6` run) reproduces retail's frame size AND the
 `lw a0` / `li a1` instruction ORDER exactly — the only remaining
 difference is `ra`'s own slot: `0x18(sp)` vs retail's `0x1c(sp)`, a single
 4-byte gap. Distilled and verified by hand (`tools/binutils/.../objdump`
-against `permuter-work/func_80050B28/compile.sh`, the REAL Makefile
+against `permuter-work/_card_clear/compile.sh`, the REAL Makefile
 pipeline, not an isolated reproducer):
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80050B58 -> _card_write, func_80050B98 -> _new_card -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_80050B28(s32 chan) {
+s32 _card_clear(s32 chan) {
     s32 *p = &chan;
     volatile long long pad;   /* forces the frame to grow to 0x20 at all */
     int *new_var;              /* unused -- but REQUIRED: without it, the
@@ -533,7 +535,7 @@ reading the permuter's score:
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80050B58 -> _card_write, func_80050B98 -> _new_card -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_80050B28(s32 chan) {
+s32 _card_clear(s32 chan) {
     s32 *p = &chan;
     volatile long long pad;
     int *new_var;
@@ -577,7 +579,7 @@ ONE OTHER instruction should remain. Spliced this exact body into
 
 ```
 build exit=2
-func_80050B28: 9/12 words match (file 0x41328-0x41358)
+_card_clear: 9/12 words match (file 0x41328-0x41358)
   1 off=0x04132C DIFF retail=1c00bfaf built=1800bfaf   (sw ra: 0x1c vs 0x18)
   5 off=0x04133C DIFF retail=3f000524 built=3f000534   (the li a1,0x3f encoding itself)
   8 off=0x041348 DIFF retail=1c00bf8f built=1800bf8f   (lw ra: 0x1c vs 0x18)
@@ -744,7 +746,7 @@ the CURRENT tree:
 extern void _new_card(void);                            /* B(0x50) */
 extern s32 _card_write(s32 chan, s32 sector, void *src); /* B(0x4E) */
 
-s32 func_80050B28(s32 chan) {
+s32 _card_clear(s32 chan) {
     s32 *p = &chan;
     volatile long long pad;
     int *new_var;

@@ -1,4 +1,6 @@
-# func_8002E308 -- MATCHED (round 73, 116/116, whole-image SHA1 green)
+# SeAutoVol -- MATCHED (round 73, 116/116, whole-image SHA1 green)
+
+> Renamed from `func_8002E308` on 2026-09-24 (tools/rename.py). Address 0x8002e308.
 
 REVISITED, round 73: MATCHED 116/116 on the first build of a fresh body; names/types used (s16 parameters `voice`/`from`/`to`/`duration`, `Rec34Half`-shaped record view)
 
@@ -9,7 +11,7 @@ file), funcdiff raw 1/116 (drift), `insertions 55 / deletions 55`,
 positional skeleton diffs 114.
 
 **Lever: sibling body.** This report and the unit's carve note both said
-this function is a near-identical sibling of `BeginVoiceFade` in
+this function is a near-identical sibling of `SeAutoPan` in
 `code_179d8_m`, which is matched. That body was copied with the
 `gVoiceFade*` arrays renamed to the `gVoiceEnv*` family, and it matched on
 the first build. The whole five-round residue came from the preserved body
@@ -23,7 +25,7 @@ needed to change: `(from - to < 0 ? to - from : from - to) < duration` is
 retail's two-branch abs compare as written.
 
 This is the counterpart `code_179d8_m`'s header asks about: the "Begin"
-for `StepVoiceEnvelope`. It sets `gVoiceEnvActive`, `gVoiceEnvAccum`,
+for `SetAutoVol`. It sets `gVoiceEnvActive`, `gVoiceEnvAccum`,
 `gVoiceEnvLimit` and then either `Step=1, Interval=Countdown=q` or
 `Interval=0, Step=q`. Naming it (for example `BeginVoiceEnvelope`) is
 track-3 work and was not done here: this round's orders are no renames.
@@ -42,7 +44,7 @@ extern Rec34Half_E308 gVoiceEnvCountdown[];
 extern Rec34Half_E308 gVoiceEnvAccum[];
 extern Rec34Half_E308 gVoiceEnvLimit[];
 
-void func_8002E308(s16 voice, s16 from, s16 to, s16 duration) {
+void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
 
     if (from == to) {
@@ -83,7 +85,7 @@ this function for five rounds.
 instruction already diverges. **First real diff is at vram `0x8002E30C` /
 file `0x1EB0C`**: retail's `move $t0,$a1` (preserving the raw, un-narrowed
 parameter) has no counterpart at all in the derived body — confirmed with
-`tools/asm-differ/diff.py func_8002E308`, not inferred. Register shuffling
+`tools/asm-differ/diff.py SeAutoVol`, not inferred. Register shuffling
 cascades through essentially the entire function from that point on.
 
 `code_179d8_l`, vram `0x8002E308`, file offset `0x1EB08`, 116 words
@@ -99,7 +101,7 @@ the unit's carve-time header comment**, not a BIOS trampoline: the opening
 `addu $t3,$a0,$zero` / `addu $t0,$a1,$zero` / `addu $t1,$a2,$zero` preserves
 each of three incoming parameters in a raw (un-narrowed) register BEFORE the
 same three registers get narrowed to `s16` in place (`sll..16`/`sra..16`).
-Confirmed by hand, matching the header's note that `BeginVoiceFade` in
+Confirmed by hand, matching the header's note that `SeAutoPan` in
 `code_179d8_m` (this round's runner bravo) opens with the identical
 three-register preserve-then-narrow prologue and the same early-out branch
 comparing two of the narrowed arguments — **this is the same shape as that
@@ -111,7 +113,7 @@ Semantically: 4 params (call them `start`, `a1`, `a2`, `duration`, matching
 to interpolate). Otherwise this looks like ramp/tween setup: it writes
 `1` / `a1` / `a2` into three per-channel 52-byte-stride tables
 (`gVoiceEnvActive`/`gVoiceEnvAccum`/`gVoiceEnvLimit`, same stride-52 "channel record"
-convention seen in `func_8002DDBC` and `func_8002E138` this round — index
+convention seen in `vmNoiseOn2` and `SePitchBend` this round — index
 `chan*52` where `chan` is the narrowed `start` param) marking the channel
 "active" with its start/end values, then picks a numerator/denominator pair
 depending on whether `a1-a2` (or its negation) is closer to zero than
@@ -123,7 +125,7 @@ final formula — transcribed faithfully from the `.s`, not simplified, since
 the byte-match depends on which exact subtraction/division retail performs
 in each arm.
 
-## The residue: same pattern as `func_8002DDBC` and `func_8002E138`, worse
+## The residue: same pattern as `vmNoiseOn2` and `SePitchBend`, worse
 
 **All three stall reports filed in this unit this round hit some variant of
 "GCC 2.6.3 proves a preserved raw copy is bit-identical to a value already
@@ -162,7 +164,7 @@ extern u8 gVoiceEnvCountdown[];
 extern u8 gVoiceEnvAccum[];
 extern u8 gVoiceEnvLimit[];
 
-void func_8002E308(s32 a0in, s32 a1, s32 a2, s32 a3) {
+void SeAutoVol(s32 a0in, s32 a1, s32 a2, s32 a3) {
     s32 t3;
     s32 t0;
     s32 t1;
@@ -228,7 +230,7 @@ end:
 the scheduling-barrier technique works on a reduced version of this exact
 shape but not on the real function. Restored to `INCLUDE_ASM` per the hard
 rule. Given the same residue CLASS already produced two other stalls this
-round in this unit (`func_8002DDBC`, `func_8002E138`), and this is a third,
+round in this unit (`vmNoiseOn2`, `SePitchBend`), and this is a third,
 worse instance, further budget here should wait for whatever the head/next
 runner learns chasing the class generally rather than this instance
 specifically.
@@ -273,7 +275,7 @@ table store, before any of the `bltz`/`slt`/`bnez` sequence that decides
 which arm to take at all. This is despite the C writing the two
 computations as textually separate statements in textually separate
 branches (goto-target `common:` vs. the straight-through "far" code) — the
-per-branch-duplication idiom documented for `func_8002D6A4` (share nothing
+per-branch-duplication idiom documented for `SpuVmDoAllocate` (share nothing
 after the `if`) does NOT defeat this, because the mechanism here is a true
 cross-branch redundancy/availability analysis, not a same-block CSE of a
 shared tail statement.
@@ -326,7 +328,7 @@ four queued functions.
 ## Round 35 update (runner bravo): the algebraic value-numbering lever, tried and negative
 
 Re-verified the inherited 118/116-word body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002E308` compiles to `0x1d8`
+`build/src/code_179d8_l.c.o` confirms `SeAutoVol` compiles to `0x1d8`
 bytes = 118 words, matching round 33's figure exactly.
 
 **Tried round 33's own proposed next lever — rewriting the "far" arm's
@@ -369,7 +371,7 @@ not the surface `goto` structure.
 though they are different C token sequences** — an algebraic-identity
 rewrite is not a working lever against this project's "immune to
 scheduling barriers" CSE/value-hoisting residue class (already named in
-`func_8002CF18`'s and this function's own round-33 sections). Combined
+`SpuVmAlloc`'s and this function's own round-33 sections). Combined
 with the `volatile`-regresses-further finding (now confirmed twice, in two
 different functions), the working hypothesis for this residue class should
 move from "try qualifiers and rewrites" to "look for a source restructuring
@@ -381,7 +383,7 @@ what's now confirmed twice each.
 ## Round 37 update (runner alpha): first permuter search on this function, negative
 
 Re-verified the inherited 118/116 body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002E308` compiles to `0x1d8`
+`build/src/code_179d8_l.c.o` confirms `SeAutoVol` compiles to `0x1d8`
 bytes = 118 words, matching rounds 33/35's figure exactly.
 
 **`--debug --stack-diffs` sanity check:** base score = **6315** — far from
@@ -394,12 +396,12 @@ real filled measurement.
 900s, `rc` still not captured in the log** (same `bash -c '...; echo
 rc=$? >> log'` wrapper as the previous two searches this round — the
 `echo` again did not appear even though the wait loop confirmed the process
-had exited; see `func_8002D6A4`'s round-37 note on the likely cause).
+had exited; see `SpuVmDoAllocate`'s round-37 note on the likely cause).
 Inferred `rc=124` (bound fired) from wall-clock timing matching the other
 two searches this round.
 
 **Result: ZERO hits at `score = 0`.** Best score reached was **2175**, down
-from the 6315 baseline (`permuter-work/func_8002E308/output-2175-1`).
+from the 6315 baseline (`permuter-work/SeAutoVol/output-2175-1`).
 
 **The 2175 candidate is a genuinely NEW structural idea — not a rehash of
 the "algebraic rewrite" or "volatile" levers rounds 33/35 already tried and
@@ -433,8 +435,8 @@ plausible-looking near-miss. Not promoting to "permuter-exhausted".
 **A large permuter score improvement (6315 -> 2175, nearly 3x) can still be
 a real-build regression, and the size of the improvement is not a
 reliability signal** — the two smaller-magnitude false leads found
-elsewhere in this unit this round (`func_8002E138`'s 2020->795,
-`func_8002D6A4`'s 5710->4245) at least preserved the retail-matching parts
+elsewhere in this unit this round (`SePitchBend`'s 2020->795,
+`SpuVmDoAllocate`'s 5710->4245) at least preserved the retail-matching parts
 of the function; this one caused the allocator to abandon the whole
 register scheme. Worth stating alongside the existing warning: do not use
 the MAGNITUDE of a permuter score drop as a proxy for how promising a
@@ -444,7 +446,7 @@ oracle — a bigger drop is not more trustworthy.
 ## Round 44 update (runner delta): inherited body re-verified real, not re-attempted further
 
 Re-verified the inherited 118/116 body: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002E308` compiles to `0x1d8`
+`build/src/code_179d8_l.c.o` confirms `SeAutoVol` compiles to `0x1d8`
 bytes = 118 words, matching rounds 33/35/37's figure exactly. Given three
 prior rounds' worth of levers already tried and confirmed negative
 (algebraic-identity rewrite, `volatile` at two different sites both

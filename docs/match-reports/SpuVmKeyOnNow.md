@@ -1,13 +1,15 @@
-# func_8002D1B4 -- STALL (round 65 revisit: **EXACT LENGTH 316/316** built words, up from round 45's 332-recorded / 334-rebuilt 18-words-LONG; raw word-match **201/316** after the round's one permuter search (195/316 before it) up from 33/316, measured with NO out-of-range drift; first real diff at file 0x1DA2C / vram 0x8002D22C -- unchanged in POSITION but no longer the same thing: it is now only the frame SIZE, `addiu sp,sp,-8` against retail's `-0x10`, per tools/asm-differ/diff.py. Round 45's `volatile s16 D_8008EA26` model is RETRACTED below -- the global is an ordinary non-volatile `s16` declared as an incomplete array)
+# SpuVmKeyOnNow -- STALL (round 65 revisit: **EXACT LENGTH 316/316** built words, up from round 45's 332-recorded / 334-rebuilt 18-words-LONG; raw word-match **201/316** after the round's one permuter search (195/316 before it) up from 33/316, measured with NO out-of-range drift; first real diff at file 0x1DA2C / vram 0x8002D22C -- unchanged in POSITION but no longer the same thing: it is now only the frame SIZE, `addiu sp,sp,-8` against retail's `-0x10`, per tools/asm-differ/diff.py. Round 45's `volatile s16 D_8008EA26` model is RETRACTED below -- the global is an ordinary non-volatile `s16` declared as an incomplete array)
+
+> Renamed from `func_8002D1B4` on 2026-09-24 (tools/rename.py). Address 0x8002d1b4.
 
 > Round 44's stub report (kept below the divider) predicted this would be
 > "promising rather than hard" by analogy with its unit-siblings
-> `func_8002CD08` and `func_8002D8E0`. That held for roughly the first 30
+> `func_8002CD08` and `vmNoiseOn`. That held for roughly the first 30
 > instructions (full byte-for-byte match, see below) and then did not: this
 > function needed real derivation work (a second, independent divisor
 > family -- 16129 = 127² used DIRECTLY rather than via two chained /127
 > divisions, a THIRD data table, and a per-note lookup with an early-out
-> branch `func_8002D8E0` doesn't have), and closes with a genuine,
+> branch `vmNoiseOn` doesn't have), and closes with a genuine,
 > not-yet-solved frame-allocation-POSITION residue on top of this unit's
 > already-documented register-identity class. Round 45 is this function's
 > first-ever attempt.
@@ -17,7 +19,7 @@ Unit: `src/code_179d8_l.c` (carved round 24, 2026-09-08) · Size: 316 words
 
 ## What it computes
 
-Sibling of `func_8002D8E0` in the same unit (same two-level `D_800902E8`
+Sibling of `vmNoiseOn` in the same unit (same two-level `D_800902E8`
 entry table, same three-stage `D_8008EA1A`/`17`/`11` blend cascade, same
 `D_8008E8C0`-gated clamp, same low/high enable-bit split) but a DIFFERENT
 source object and a DIFFERENT tail:
@@ -26,7 +28,7 @@ source object and a DIFFERENT tail:
   byte, NOT the per-note `D_800902E8` entry) and combines it with
   `D_8008EA10` through a SIGNED division by `16129` (`=127²`, confirmed
   against the SAME magic constant `0x82061029`/shift-13 the sibling unit's
-  own report `StepVoiceFade.md` -- `code_179d8_m.c`, read for reference
+  own report `SetAutoPan.md` -- `code_179d8_m.c`, read for reference
   only, not edited -- already brute-force-identified as divisor 16129 via a
   batch-compiled `int f(int){return a/N;}` sweep through the pinned
   pipeline). The result is then multiplied by `D_8008EA16` and `D_8008EA19`
@@ -36,7 +38,7 @@ source object and a DIFFERENT tail:
   same divisor). **Both divisions are literal single `/16129`, not two
   chained `/127`s** -- m2c's own pattern-matcher recognized the first
   (signed) division automatically as `/16129`.
-- **Per-note lookup with an early-out** `func_8002D8E0` does not have: reads
+- **Per-note lookup with an early-out** `vmNoiseOn` does not have: reads
   `D_8008EA22` (same two-level `D_800902E8[lowbyte][highbyte]` indexing as
   D8E0) and compares the FULL SIGNED 16-bit value against `0x21` (33) --
   when equal, both channel levels stay at the raw `lvl1` (no per-note
@@ -44,14 +46,14 @@ source object and a DIFFERENT tail:
   `unk76` (`lvl1 * entry->field / 127`, single division, matching D8E0's own
   established `x/127` idiom).
 - **The three-stage `D_8008EA1A`/`17`/`11` blend cascade is IDENTICAL in
-  shape to `func_8002D8E0`'s** (each stage: `byte<0x40` picks which of the
+  shape to `vmNoiseOn`'s** (each stage: `byte<0x40` picks which of the
   pair gets scaled by `byte` vs `127-byte`, divided by 63) -- reused
   verbatim from that function's already-proven-correct C shape.
 - **A genuinely different tail**: after the clamp, BOTH pan values are
   SQUARED and divided by a THIRD divisor, `16383` (`=0x3FFF`, confirmed via
   the pinned-pipeline reproducer -- see below), then written together with
   the RAW `a1` parameter into a THIRD 16-byte-stride table, `D_8008D7F4`
-  (distinct from `func_8002D8E0`'s `D_8008D7F0`/`D_8008D7F2`), at constant
+  (distinct from `vmNoiseOn`'s `D_8008D7F0`/`D_8008D7F2`), at constant
   BYTE offsets `-4`/`-2`/`0` from one base-index computation
   (`D_8008EA26 * 8`, i.e. an s16-ELEMENT index of `D_8008D7F4[idx-2]`,
   `[idx-1]`, `[idx]`) -- retail computes ONE `lui`/`addiu` for `D_8008D7F4`
@@ -71,7 +73,7 @@ source object and a DIFFERENT tail:
   per-unit divergence from other units' `u16` view, per CLAUDE.md's
   multiple-independent-local-views convention) rather than reusing another
   unit's header.
-- **The write order in the enable-bit tail is REVERSED from `func_8002D8E0`**:
+- **The write order in the enable-bit tail is REVERSED from `vmNoiseOn`**:
   this function updates the `D_8008EA20`-gated `D_8008E230`/`234` pair
   FIRST, then `D_8008E228`/`22C`/`80090C60`/`64` SECOND -- the opposite
   order from D8E0. Confirmed structurally correct by m2c's own independent
@@ -98,7 +100,7 @@ Plain `u32 x / 16383` is the correct spelling.
 ## Struct/global model (all local to this unit)
 
 ```c
-/* Shared with func_8002D8E0 (declared once, before this function since it
+/* Shared with vmNoiseOn (declared once, before this function since it
  * is ROM-earlier). */
 typedef struct {
     u8 pad0[0x74];
@@ -144,7 +146,7 @@ extern s16 D_8008D7F4[];
 ## Best-derived body (332/316 words, 16 words LONG, preserved for the next attempt)
 
 ```c
-void func_8002D1B4(s32 a0, s32 a1) {
+void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D800902E8Entry *e;
     s32 prio;
     s32 lvl0;
@@ -231,7 +233,7 @@ void func_8002D1B4(s32 a0, s32 a1) {
 ```
 
 **The opening ~30 instructions match retail BYTE-FOR-BYTE** (confirmed with
-`tools/asm-differ/diff.py func_8002D1B4`) once the multiply order was fixed
+`tools/asm-differ/diff.py SpuVmKeyOnNow`) once the multiply order was fixed
 to an explicit `prio` intermediate (see Attempts) -- including both
 magic-multiply divisions, the two-level `D_800902E8` entry lookup, and the
 `id != 0x21` early-out branch with its per-note scaling. The gap starts at
@@ -244,7 +246,7 @@ the STACK FRAME ALLOCATION.
    second (`/16129` unsigned) division, BEFORE the first read of
    `D_8008EA26`. This derivation's frame allocation lands several
    instructions LATER, after the raw `a1`-preserve and the `D_8008EA26`
-   read/shift. This is a DIFFERENT shape of residue from `func_8002D8E0`'s
+   read/shift. This is a DIFFERENT shape of residue from `vmNoiseOn`'s
    (which has the right program POSITION but wrong SIZE, -0x10 vs retail's
    -8) -- here the eventual SIZE was not even reached before the position
    diverged, so D8E0's "mark the chained-division intermediates volatile"
@@ -252,21 +254,21 @@ the STACK FRAME ALLOCATION.
    not better, confirming the two functions' frame gaps are not the same
    lever despite superficially similar division chains.
 2. **A register-identity swap at the `id != 0x21` join**, same unfixable
-   class as this unit's other three stalls (`func_8002DDBC`,
-   `func_8002E138`, `func_8002D8E0`): retail's unconditional delay-slot copy
+   class as this unit's other three stalls (`vmNoiseOn2`,
+   `SePitchBend`, `vmNoiseOn`): retail's unconditional delay-slot copy
    is `move $a2,$a3` (i.e. `pan1`'s fallback gets a fresh register, `pan2`'s
    fallback quietly reuses whichever register already held `lvl1`); every
    derivation tried here either omits the copy entirely (when `pan1`/`pan2`
    are assigned in-place, in which case retail's explicit copy has no C
    counterpart) or emits `move $a3,$a2` -- the mirror-image swap -- when
    `pan1`/`pan2` are split into distinct `_pre` intermediates matching
-   `func_8002D8E0`'s exact proven shape (see Attempts #3). Per HARD RULE 6
+   `vmNoiseOn`'s exact proven shape (see Attempts #3). Per HARD RULE 6
    and this unit's own established finding, not pursued further as an
    independent lever.
 3. **`D_8008EA26`'s per-read signedness may not be uniform across the
    function** -- the very first read (feeding `chanIdx`) is confirmed `lh`,
    but a full per-call-site audit of the ~5 raw `D_8008EA26` references in
-   `asm/nonmatchings/code_179d8_l/func_8002D1B4.s` (rather than trusting one
+   `asm/nonmatchings/code_179d8_l/SpuVmKeyOnNow.s` (rather than trusting one
    blanket `volatile s16` declaration to cover all of them) was not
    completed this round -- next concrete step.
 
@@ -274,7 +276,7 @@ the STACK FRAME ALLOCATION.
 
 Within the 30-attempt cap (9 real builds used):
 1. m2c-seeded skeleton (`tools/m2ctx.py code_179d8_l --sig 'void
-   func_8002D1B4(s32 a0, s32 a1)' --run`) transcribed directly, entry-field-
+   SpuVmKeyOnNow(s32 a0, s32 a1)' --run`) transcribed directly, entry-field-
    first multiply order (`D_8008E970->unk18 * 0x3FFF * D_8008EA10 / 16129`):
    compiled, but the very FIRST instruction loaded `D_8008EA10` before
    `D_8008E970`/`unk18` -- opposite of retail. **Root cause confirmed via
@@ -291,18 +293,18 @@ Within the 30-attempt cap (9 real builds used):
    prevents GCC's re-association from reaching across it. This is the
    version kept.
 3. Split `pan1`/`pan2`'s first assignment into `pan1pre`/`pan2pre`
-   intermediates, mirroring `func_8002D8E0`'s exact proven three-stage-blend
+   intermediates, mirroring `vmNoiseOn`'s exact proven three-stage-blend
    shape (`pan1 = pan1pre; pan2 = (pan2pre*byte)/63;` in each arm): compiled
    to 337/316 (WORSE than the 332 kept version) and swapped which register
    got the explicit `move` (retail: `a2,a3`; this attempt: `a3,a2`) rather
    than fixing it. **Reverted** -- residue 2 above is the same unfixable
    class already documented three times in this unit, not something this
    restructuring resolves, and it cost 5 extra words while not doing so.
-4. `volatile` on `lvl0`/`lvl1` (the direct `func_8002D8E0` lever, which
+4. `volatile` on `lvl0`/`lvl1` (the direct `vmNoiseOn` lever, which
    fixed THAT function's frame-size gap from 295 to 309/311): compiled to
    342/316, WORSE than both the non-volatile version and attempt #3.
    **Reverted.** This is worth recording plainly: **the same lever that
-   closed `func_8002D8E0`'s frame gap makes this structurally-similar
+   closed `vmNoiseOn`'s frame gap makes this structurally-similar
    sibling function's gap WORSE**, confirming (as the two functions'
    residue-1 descriptions already show) that the frame issues are NOT the
    same underlying mechanism despite both functions chaining
@@ -320,7 +322,7 @@ Within the 30-attempt cap (9 real builds used):
 **A lever that fixes one function's frame-allocation gap can make a
 structurally-near-identical sibling's gap WORSE, even within the same unit
 and even when both chain the same family of magic-multiply divisions.**
-`func_8002D8E0` and `func_8002D1B4` share the two-level `D_800902E8`
+`vmNoiseOn` and `SpuVmKeyOnNow` share the two-level `D_800902E8`
 lookup, the exact same three-stage blend cascade, and the same
 `D_8008E8C0` clamp shape, and both have unresolved frame-size/position
 gaps -- but marking the chained-division intermediates `volatile` (which
@@ -342,7 +344,7 @@ of parens, is what stops the re-association.
 `src/`). First-ever attempt on this function reached a genuine, verified
 structural derivation: the opening ~30 instructions (both magic-multiply
 divisions, the two-level entry lookup, the `id != 0x21` early-out, and the
-full three-stage blend cascade reused verbatim from `func_8002D8E0`'s
+full three-stage blend cascade reused verbatim from `vmNoiseOn`'s
 already-proven shape) match retail byte-for-byte. The gap is a
 frame-allocation-position residue (not yet closed by either of the two
 levers tried) plus this unit's already-documented register-identity class.
@@ -355,7 +357,7 @@ restructuring reached it this round.
 
 ---
 
-# (round 44, superseded) func_8002D1B4 -- ASSIGNABLE, NEVER ATTEMPTED (316w, no figures existed before round 45)
+# (round 44, superseded) SpuVmKeyOnNow -- ASSIGNABLE, NEVER ATTEMPTED (316w, no figures existed before round 45)
 
 > **Round 44, head.** No length, word-match or first-diff figure is quoted here
 > because NONE HAS EVER BEEN MEASURED -- this function has never been compiled.
@@ -365,7 +367,7 @@ restructuring reached it this round.
 >
 > Its two unit-siblings were reopened on the same evidence and both moved a
 > long way on FIRST contact in round 44 -- `func_8002CD08` 0 -> 110/132 and
-> `func_8002D8E0` 0 -> 309/311 -- so treat this as promising rather than hard.
+> `vmNoiseOn` 0 -> 309/311 -- so treat this as promising rather than hard.
 > Delta ran out of round budget before reaching it; nothing about it was tried
 > and found difficult.
 
@@ -378,7 +380,7 @@ FOLLOWING lines -- the direction is load-bearing and every reimplementation so
 far has inverted it):
 
 ```sh
-grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_l/func_8002D1B4.s \
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_l/SpuVmKeyOnNow.s \
   | grep -E '\b(mult|multu|div|divu)\b'
 ```
 
@@ -468,7 +470,7 @@ plainly not byte-inert in situ, and the mechanism is now named: it is an
 ADDRESS-MATERIALISATION axis, and it only pays where the same global is read
 several times in one function.
 
-### Third: two more levers, one of them transferred straight from `func_8002DDBC` this same round
+### Third: two more levers, one of them transferred straight from `vmNoiseOn2` this same round
 
 - **`pan1sq` belongs AFTER the `D_8008E8C0` clamp, not before-and-again-inside.**
   Round 45's body computed `pan1sq = pan1*pan1;` before the `if`, then again
@@ -479,7 +481,7 @@ several times in one function.
   **Two `mult`s and one `mflo` is a delay-slot duplication, not two source
   multiplies** — counting `mult`s to infer source statements is what produced
   the round-45 shape.
-- **The `func_8002DDBC` tail lever transfers verbatim** (see that report's
+- **The `vmNoiseOn2` tail lever transfers verbatim** (see that report's
   round-65 section): write `G = x | G;` not `G |= x;` (retail's `or $v1,$a2,$v1`
   puts the loaded value SECOND), and order the four global updates by retail's
   LOAD order `E228, E22C, C60, C64` rather than `E228, C60, E22C, C64`. The
@@ -552,7 +554,7 @@ extern s16 D_8008EA26[];
 /* Independent 0x10-byte-stride s16 array. */
 extern s16 D_8008D7F4[];
 
-void func_8002D1B4(s32 a0, s32 a1) {
+void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D800902E8Entry *e;
     s32 prio;
     s32 lvl0;
@@ -678,7 +680,7 @@ source multiplies is what produced round 45's duplicated `pan1sq`.
 ### Gate 3, all three checks, run BEFORE the search (PARALLEL-RUNS.md §3.5)
 
 - **Check 1 (correctness):** the scaffold compiles and scores.
-  `tools/setup-permuter.sh func_8002D1B4 <seed>` built cleanly; base score
+  `tools/setup-permuter.sh SpuVmKeyOnNow <seed>` built cleanly; base score
   **4470**, `Stack Differences: 0 (1)`, `Branch Differences: 0 (1)`,
   `Register Differences: 42 (5)`, `Reorderings: 1 (60)`.
 - **Check 2 (cost):** the scaffold's `--debug --stack-diffs`
@@ -705,7 +707,7 @@ basis, and the outcome (below) supports it — the search found a real lever.**
 
 `-j 6 --stop-on-zero --best-only`, bounded to 1500s, which it hit
 (`timeout` exit 124). Zero `score = 0` hits. Best candidate **2065** from a
-base of 4470/4325, at `permuter-work/func_8002D1B4/output-2065-1`.
+base of 4470/4325, at `permuter-work/SpuVmKeyOnNow/output-2065-1`.
 
 ### The candidate, and what translating it took
 
@@ -737,7 +739,7 @@ unit's standing finding that identifier choice does not reach the allocator.
 
 That is the local-COUNT lever again, in the direction the round-65 brief
 names — and it is the third instance this session across two functions
-(`func_8002DDBC`'s four deleted tail temps, this). **The consistent shape:
+(`vmNoiseOn2`'s four deleted tail temps, this). **The consistent shape:
 when a residue is register identity, the number of simultaneously-live
 pseudos is the axis, and it is reachable from C by merging or deleting
 locals, not by renaming or reordering them.**
@@ -757,7 +759,7 @@ Same declarations as the previous preserved body (`D_8008EA26` an incomplete
 array, NOT volatile).
 
 #if 0
-void func_8002D1B4(s32 a0, s32 a1) {
+void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D800902E8Entry *e;
     s32 prio;
     s32 tmp;
