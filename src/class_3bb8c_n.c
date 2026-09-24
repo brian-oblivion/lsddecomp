@@ -37,9 +37,8 @@
  * Owns NO switch jump table (zero `jtbl_` references). All four blocker
  * constructs (`gp_rel`, `addiu_at`, `nop_mflo_mfhi`, `nop_at_expansion`) are
  * RESOLVED project-wide (CLAUDE.md, "Open toolchain blockers"); this unit's
- * four STALLs (`StyleBuildDecorSet`, `StyleFillEffectKind0`/`2`/`3`) are
- * ordinary register-identity residues, not toolchain blockers -- see their
- * own reports.
+ * remaining stalls are ordinary matching residues, not toolchain blockers --
+ * see their own reports (`StyleFillEffectKind0` matched round 75).
  *
  * This unit includes include/class_3bb8c.h, which eleven other units also
  * include. Whoever edits this unit's C should be the ONLY runner in the
@@ -314,7 +313,7 @@ extern s32 rand(void);
 extern s8 D_80087324[];
 extern s32 gStyleEffectSlotCount;
 extern void *gStyleEffectSlots[];
-extern void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);
+extern void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2);
 extern void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);
 extern void **StyleFillEffectKind3(void **arg0, void *arg1);
 extern void **StyleFillEffectKind2(void **arg0, void *arg1);
@@ -333,7 +332,7 @@ void StyleBuildEffectSlots(void *arg0) {
     val = D_80087324[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     gStyleEffectSlotCount = val + count;
-    filled = (void **) StyleFillEffectKind0(gStyleEffectSlots, val, arg0);
+    filled = StyleFillEffectKind0(gStyleEffectSlots, val, arg0);
     filled = StyleFillEffectKind1(filled, count, arg0);
     if (gStyleVariant == 0) {
         StyleFillEffectKind3(filled, arg0);
@@ -445,21 +444,16 @@ extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
 extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);
 extern void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3);
 
-/* STALL, 93/99 words (length matches, 0x18C, re-measured round 48; earlier
- * round 47 report recorded 87/99), whole-function arg0/arg1/arg2
- * register-colour rotation (s2/s5/s4) -- see
- * docs/match-reports/StyleFillEffectKind0.md. Round 48: check 3 confirms AGREE
- * (permuter scaffold: Insertions 0, Deletions 0, Reorderings 0, pure
- * Stack/Register-field residue -- matches the in-tree rebuild's pure
- * word-level register-field diffs). Preserved near-miss body: */
-#if 0
-void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
-    void **arr;
+/* Fills arg1 slots with New_Class876FC(kind 0, ...) objects, first setting
+ * up the random style parameters and choosing the per-slot setup function by
+ * gStyleCounter % 7; returns the next free slot. Matched round 75: arg0 is
+ * the walking pointer itself (a separate `arr = arg0` copy reordered the
+ * prologue's argument moves). */
+void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
     s32 i;
     s32 t3;
     void (*fp)(void *, void *);
 
-    arr = (void **) arg0;
     D_8008E0BC = rand() % 7;
     D_8008E0B4 = (u8 *) D_800871C8 + ((u32) rand() % 5) * 12;
     t3 = (u32) rand() % 5;
@@ -472,13 +466,11 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = New_Class876FC((void *) 0, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
-        arr++;
+        *arg0 = New_Class876FC((void *) 0, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        arg0++;
     }
-    return (void *) arr;
+    return arg0;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleFillEffectKind0);
 
 extern s32 D_80087330;
 extern u8 D_80087204[];
