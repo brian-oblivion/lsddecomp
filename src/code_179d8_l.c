@@ -69,55 +69,67 @@
  */
 #include "common.h"
 
-/* Matched round 73 -- docs/match-reports/ServiceSoundCueSet.md. */
-typedef struct Obj179D8CD08 Obj179D8CD08;
+/* Matched round 73 -- docs/match-reports/ServiceSoundCueSet.md.
+ * Round 75 (naming): `self`/`set` confirmed the same objects
+ * `code_179d8_e.c` already names `VabStreamObj`/`SoundCueSet` -- the +0x80/
+ * +0x84/+0x9C slots this function dispatches line up exactly with
+ * `tools/classtable.py gVabStreamObjMethods`' `VabStreamObj__PlayTone`/
+ * `VabStreamObj__StopVoice`/`VabStreamObj__SetPitchOffset`, and
+ * `SoundCueSlot.index`/`SoundCueSet.tag`/`.owner`/`.slots` match this
+ * function's own field usage (the `>= 0`-gated stop-voice call, the `> 0`
+ * tag guard, `callback`'s first argument). This is a second, independent
+ * LOCAL view of the same struct family `code_179d8_e.c` defines -- per the
+ * project's independent-local-view convention, declared again here rather
+ * than shared through a header (see FlushSoundCueSet.md / DreamSys__SetSoundObj.md
+ * for the cross-unit identification trail). */
+typedef struct VabStreamObj VabStreamObj;
 
 typedef struct {
     u8 pad0[0x80];
-    s32 (*slot80)(Obj179D8CD08 *self, s32 arg1, s32 arg2, s32 arg3);
-    void (*slot84)(Obj179D8CD08 *self, s32 handle);
+    s32 (*playTone)(VabStreamObj *self, s32 arg1, s32 arg2, s32 arg3);
+    s32 (*stopVoice)(VabStreamObj *self, s32 index);
     u8 pad88[0x9C - 0x88];
-    void (*slot9C)(Obj179D8CD08 *self, s32 arg1);
-} Obj179D8CD08Methods;
+    void (*setPitchOffset)(VabStreamObj *self, s32 arg1);
+} VabStreamObjMethods;
 
-struct Obj179D8CD08 {
-    Obj179D8CD08Methods *methods;
+struct VabStreamObj {
+    VabStreamObjMethods *methods;
 };
 
 typedef struct {
-    s32 result;
-    s32 word0;
-    s32 word1;
-    s32 word2;
-    s32 word3;
-} Entry179D8CD08;
+    s32 index;   /* matches code_179d8_e.c's SoundCueSlot.index: -1 sentinel, else a VabStreamObj__StopVoice-forwardable voice index */
+    s32 note;    /* packed as note*16 into VabStreamObj__PlayTone's `index` argument (hi=note, lo=0) */
+    s32 pitchOffset;  /* forwarded to VabStreamObj__SetPitchOffset unchanged */
+    s32 word2;   /* default 0x7F (127); feeds PlayTone's arg2 via a `/unk14*unk10` remainder -- proposed vol/pan, unconfirmed */
+    s32 word3;   /* default 0x40 (64); feeds PlayTone's arg3 the same way -- proposed vol/pan, unconfirmed */
+} SoundCueSlot;
 
-typedef struct S179D8CD08 S179D8CD08;
+typedef struct SoundCueSet SoundCueSet;
 
-struct S179D8CD08 {
-    s32 unk0;
-    s32 unk4;
-    s32 unk8;
-    void (*callback)(s32 arg0, S179D8CD08 *self);
-    s32 unk10;
-    s32 unk14;
-    Entry179D8CD08 entries[3];
+struct SoundCueSet {
+    s32 tag;     /* matches code_179d8_e.c's SoundCueSet.tag: guard, >0 required to service */
+    s32 unk4;    /* incremented once per service call here; code_179d8_e.c's own view never reads it */
+    s32 owner;   /* matches code_179d8_e.c's SoundCueSet.owner: passed as callback's first argument, unchanged */
+    void (*callback)(s32 arg0, SoundCueSet *self);
+    s32 unk10;   /* set 0 before the callback runs; callback may set it negative to skip servicing this tick -- purpose beyond that not established */
+    s32 unk14;   /* matches code_179d8_e.c's SoundCueSet.unk14 (set to 10 by InitSoundCueSet); used here as a divisor */
+    SoundCueSlot slots[3];
 };
 
-void ServiceSoundCueSet(Obj179D8CD08 *a0, S179D8CD08 *a1) {
+void ServiceSoundCueSet(VabStreamObj *a0, SoundCueSet *a1) {
     s32 i;
-    Entry179D8CD08 *e;
+    SoundCueSlot *e;
     s32 rem1;
     s32 rem2;
     s32 note;
 
-    if (a1->unk0 > 0) {
+    if (a1->tag > 0) {
         i = 0;
-        e = &a1->entries[0];
+        e = &a1->slots[0];
         do {
             i++;
-            e->word0 = -1;
-            e->word1 = 0;
+            e->note = -1;
+            e->pitchOffset = 0;
             e->word2 = 0x7F;
             e->word3 = 0x40;
             e++;
@@ -125,24 +137,24 @@ void ServiceSoundCueSet(Obj179D8CD08 *a0, S179D8CD08 *a1) {
 
         a1->unk10 = 0;
         if (a1->callback != NULL) {
-            a1->callback(a1->unk8, a1);
+            a1->callback(a1->owner, a1);
         }
 
         if (a1->unk10 >= 0) {
-            e = &a1->entries[0];
+            e = &a1->slots[0];
             i = 0;
             do {
-                if (e->word0 >= 0) {
-                    if (e->result >= 0) {
-                        a0->methods->slot84(a0, e->result);
+                if (e->note >= 0) {
+                    if (e->index >= 0) {
+                        a0->methods->stopVoice(a0, e->index);
                     }
-                    a0->methods->slot9C(a0, e->word1);
-                    note = e->word0 * 16;
+                    a0->methods->setPitchOffset(a0, e->pitchOffset);
+                    note = e->note * 16;
                     rem1 = e->word2 - (e->word2 / a1->unk14) * a1->unk10;
                     rem2 = e->word3 - (e->word3 / a1->unk14) * a1->unk10;
-                    e->result = a0->methods->slot80(a0, note, rem1, rem2);
-                } else if (e->word0 == -2 && e->result >= 0) {
-                    a0->methods->slot84(a0, e->result);
+                    e->index = a0->methods->playTone(a0, note, rem1, rem2);
+                } else if (e->note == -2 && e->index >= 0) {
+                    a0->methods->stopVoice(a0, e->index);
                 }
                 i++;
                 e++;
