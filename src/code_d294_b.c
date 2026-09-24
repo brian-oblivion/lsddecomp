@@ -20,9 +20,8 @@
  * 76) that hands off to a rotation compose-and-
  * apply step (`Class6B5CC__ComposeAndApplyRotation`), a corner-list AABB
  * overlap test (`Class6B5CC__CheckBoundsOverlap`, MATCHED round 73), and a
- * plane-classification test (`Class6B5CC__ClassifyAgainstPlanes`, STALL, proposed
- * `Class6B5CC__ClassifyAgainstPlanes` -- the RESOLVED former `gp_rel`
- * blocker, ordinary matching work now); a third no-op stub
+ * plane-classification test (`Class6B5CC__ClassifyAgainstPlanes`, MATCHED
+ * round 76); a third no-op stub
  * (`func_8001E49C`); a parent-list notify walk (`Class6B5CC__NotifyTaggedParents`, STALL,
  * proposed `Class6B5CC__NotifyTaggedParents` -- naming only, matching
  * this one is explicitly out of scope for this round); this unit's own
@@ -31,10 +30,10 @@
  * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
  * all) that `Class6B5CC__CheckBoundsOverlap` and `Class6B5CC__ClassifyAgainstPlanes` build on.
  *
- * Two functions remain INCLUDE_ASM: `Class6B5CC__ClassifyAgainstPlanes`,
- * `Class6B5CC__NotifyTaggedParents` -- documented stalls, see
- * docs/match-reports/. (`Class6B5CC__CheckBoundsOverlap` matched round 73,
- * `Class6B5CC__TryAttachNearby` round 76.)
+ * One function remains INCLUDE_ASM: `Class6B5CC__NotifyTaggedParents`, a
+ * documented stall, see docs/match-reports/. (`Class6B5CC__CheckBoundsOverlap`
+ * matched round 73; `Class6B5CC__TryAttachNearby` and
+ * `Class6B5CC__ClassifyAgainstPlanes` round 76.)
  */
 
 #include "common.h"
@@ -354,31 +353,30 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
 }
 
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 29/199 words, length exact. Residue: whole-function
- * register-pressure interaction, not a simple two-value swap -- Part 1's
- * own induction-variable decomposition (four raw read pointers plus two
- * write pointers in retail, against the indexed mid[row].x/y/z form here)
- * competes for callee-saved registers with everything else in the function
- * (docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md). Hand-derived. */
+/* Tests the corner list against every model plane. Part 1 averages two
+ * diagonal corner pairs into mid[0]/mid[1] and tests that segment against
+ * each plane, setting bit i of self->unk2C on a hit; any hit returns at once.
+ * Otherwise every 8-corner box k in `list` has its two vertical edges
+ * (corner m against corner m+4, m = 1, 2) tested against every plane, and a
+ * hit sets plane bit i in self->unk2C and box bit k in *outFlag. `hit` is
+ * written only as 0, but retail still tests it. Round 76. Byte levers:
+ * the D_8008A838 gate is two arms that each set the bit, so loop.c sees two
+ * equal constant-1 loads (savings 2) and hoists the 1 into $s1; Part 1 walks
+ * `p`, `v` and `hi` as pointers. */
 extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
-s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
+s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, AttachCornerList_d294b *list) {
     Vec3S16_d294 mid[2];
-    s16 *loPtr;
-    s16 *hiPtr;
-    s32 row;
+    Vec3S16_d294 *p;
+    Vec3S16_d294 *hi;
     s32 count1;
     s32 i;
     Sixteen6_d294 *plane;
-    s32 flag2;
+    s32 hit;
     s32 cnt2;
-    s32 j;
-    u8 *rowBase;
+    Vec3S16_d294 *v;
     s32 k;
-    s32 bitJ;
-    s32 bitK;
     s32 m;
     s32 bigConst;
     s32 outWord;
@@ -386,25 +384,27 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
 
     bigConst = 0x7FFFFFFF;
 
-    loPtr = (s16 *)((u8 *)list + 4);
-    hiPtr = (s16 *)((u8 *)list + 0x10);
-    for (row = 0; row < 2; row++) {
-        mid[row].x = (loPtr[0] + hiPtr[0]) >> 1;
-        mid[row].y = (loPtr[1] + hiPtr[1]) >> 1;
-        mid[row].z = (loPtr[2] + hiPtr[2]) >> 1;
-        loPtr = (s16 *)((u8 *)loPtr + 0x18);
-        hiPtr = (s16 *)((u8 *)hiPtr + 0x18);
+    v = list->v;
+    hi = list->v + 2;
+    for (p = mid; p < &mid[2]; p++) {
+        p->x = (v->x + hi->x) >> 1;
+        p->y = (v->y + hi->y) >> 1;
+        p->z = (v->z + hi->z) >> 1;
+        v += 4;
+        hi += 4;
     }
 
-    count1 = func_8001F3A4(self->unk20);
     self->unk2C = 0;
-    flag2 = 0;
+    count1 = func_8001F3A4(self->unk20);
+    hit = 0;
     for (i = 0; i < count1; i++) {
         plane = func_8001F50C(self->unk20, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
-                if (D_8008A838 == 0 || outWord >= 0x201) {
-                    self->unk2C |= (1 << i);
+                if (D_8008A838 == 0) {
+                    self->unk2C |= 1 << i;
+                } else if (outWord >= 0x201) {
+                    self->unk2C |= 1 << i;
                 }
             }
         }
@@ -412,44 +412,37 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
 
     if (self->unk2C != 0) {
         *outFlag = 1;
-        if (flag2 != 0) {
+        if (hit != 0) {
             return 2;
         }
         return 1;
     }
 
     *outFlag = 0;
-    cnt2 = *(s32 *)list;
-    for (j = 0; j < count1; j++) {
-        plane = func_8001F50C(self->unk20, j);
-        bitJ = 1 << j;
-        rowBase = (u8 *)list + 4;
+    cnt2 = list->count;
+    for (i = 0; i < count1; i++) {
+        plane = func_8001F50C(self->unk20, i);
+        v = list->v;
         for (k = 0; k < cnt2; k++) {
-            bitK = 1 << k;
             for (m = 0; m < 4; m++) {
                 if (m == 1 || m == 2) {
-                    u8 *rowM = rowBase;
-                    u8 *rowMplus1 = rowBase + 0x18;
-                    if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
-                        if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
-                            if (D_8008A838 == 0 || outWord >= 0x201) {
-                                self->unk2C |= bitJ;
-                                *outFlag |= bitK;
+                    if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, v, v + 4)) {
+                        if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, v, v + 4)) {
+                            if (outWord >= 0x201) {
+                                self->unk2C |= 1 << i;
+                                *outFlag |= 1 << k;
                             }
                         }
                     }
                 }
-                rowBase += 6;
+                v++;
             }
-            rowBase += 0x18;
+            v += 4;
         }
     }
 
     return (*outFlag != 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__ClassifyAgainstPlanes);
-#endif
 
 /* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
  * tail-merge/shared-block dispatch, see the git history for the full
