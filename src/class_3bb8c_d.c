@@ -133,7 +133,7 @@ void Class86B60__CreateNameField(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     BMemPMgrFree(buf);
 }
 
-void func_8004DC08(Class86B60 *self)
+void Class86B60__DestroyNameField(Class86B60 *self)
 {
     self->unkB0->methods->release(self->unkB0);
     Get_vtable_TaskCore()->slotDC(self);

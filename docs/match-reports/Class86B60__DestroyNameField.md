@@ -1,12 +1,14 @@
-# func_8004DC08 -- MATCH
+# Class86B60__DestroyNameField -- MATCH
+
+> Renamed from `func_8004DC08` on 2026-09-24 (tools/rename.py). Address 0x8004dc08.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004DC08`: 23/23 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__DestroyNameField`: 23/23 words match.
 
 ## Source
 
 ```c
-void func_8004DC08(Class86B60 *self)
+void Class86B60__DestroyNameField(Class86B60 *self)
 {
     self->unkB0->methods->release(self->unkB0);
     Get_vtable_TaskCore()->slotDC(self);

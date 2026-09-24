@@ -1081,7 +1081,7 @@ typedef struct Class86B60UnkB0Obj_3bb8c_d Class86B60UnkB0Obj_3bb8c_d;
 
 struct Class86B60UnkB0ObjMethods_3bb8c_d {
     u8 pad000[0x004];
-    void (*release)(Class86B60UnkB0Obj_3bb8c_d *self); /* +0x004, func_8004DC08 */
+    void (*release)(Class86B60UnkB0Obj_3bb8c_d *self); /* +0x004, Class86B60__DestroyNameField */
     u8 pad008[0x04C - 0x008];
     /* +0x04C, func_8004DC64's own 2nd call: `(self, arg1, &D_8008A9B4)`. */
     void (*slot4C)(Class86B60UnkB0Obj_3bb8c_d *self, s32 arg1, void *arg2);
@@ -1326,7 +1326,7 @@ struct Class86B60 {
      * dedicated `Class86B60UnkACObj_3bb8c_d *` -- func_8004E054 reaches a
      * second slot (`+0x070`) on it. Same size, no layout change. */
     Class86B60UnkACObj_3bb8c_d *unkAC;
-    /* +0x0B0, func_8004DC08: a third owned sub-object, released
+    /* +0x0B0, Class86B60__DestroyNameField: a third owned sub-object, released
      * unconditionally (no null check) through the same shared `release`
      * slot as `unkA8`/`unkAC`. Typed its own `Class86B60UnkB0Obj_3bb8c_d`
      * rather than reusing `GenericReleaseObj_3bb8c_d` -- func_8004DC64
@@ -1447,7 +1447,7 @@ struct BaseTaskCtorTable_3bb8c_c {
      * Class86B60__Tick's report) -- same offset number, unrelated table. */
     void (*slot94)(void *self);
     u8 pad098[0x0DC - 0x098];
-    /* +0x0DC, func_8004DC08's own last call, `self` only, right after
+    /* +0x0DC, Class86B60__DestroyNameField's own last call, `self` only, right after
      * releasing `Class86B60::unkB0`. */
     void (*slotDC)(void *self);
     /* +0x0E0, func_8004DC64's own first call: `(self, arg1)`, arg1 its
