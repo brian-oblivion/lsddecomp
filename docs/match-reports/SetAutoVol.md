@@ -18,7 +18,7 @@ grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no 
 
 `./build-and-verify.sh` GREEN with `INCLUDE_ASM` restored. **The
 halfword-index idiom the HEAD diagnosed (and this round confirmed
-byte-exact for `InitSpuDriver`'s loop) DOES reproduce the early `sll #3`
+byte-exact for `SpuVmInit`'s loop) DOES reproduce the early `sll #3`
 here too** — confirmed via `asm-differ`, the function's very first
 instruction now matches retail's `sll t0,v1,0x3` shape (register-renamed
 but structurally identical), closing the specific gap the HEAD's message
@@ -52,7 +52,7 @@ the HEAD predicted.
 
 ## Why this is NOT a loop, and why that matters
 
-`InitSpuDriver`'s version of this idiom lives inside a per-channel `for`
+`SpuVmInit`'s version of this idiom lives inside a per-channel `for`
 loop, where `i` changes every iteration and `woff` is naturally recomputed
 each time as the loop body's first statement — there is no "which value is
 `woff` derived from" ambiguity, because `i` IS the loop induction variable
@@ -217,7 +217,7 @@ revisiting either function's split-index code next.
 array write is CONFIRMED to generalize across this record family and
 across at least two different sibling functions, but its correct SOURCE
 FORM depends on whether the write site is inside a loop or not.** Inside a
-loop (`InitSpuDriver`), declaring `woff` fresh each iteration as the loop
+loop (`SpuVmInit`), declaring `woff` fresh each iteration as the loop
 body's first statement, computed from the loop induction variable directly,
 reproduces retail exactly. Outside a loop (`SetAutoVol`, this report),
 the SAME idiom needs the intermediate value kept at its NATURAL type (here
@@ -517,7 +517,7 @@ void SetAutoVol(s16 a0) {
      * the point of use (indexing an `s16 *`, which then scales by 2),
      * reaching idx*16 -- the real per-channel byte stride for these two
      * 0x10-stride, single-field arrays. Same base idiom as
-     * InitSpuDriver's D_8006DAD4 fix, but kept `s16` (not `u16`) until
+     * SpuVmInit's D_8006DAD4 fix, but kept `s16` (not `u16`) until
      * point of use -- see this report's "non-loop" analysis for why the
      * loop-context version of the idiom does not transfer directly. */
     idxCopy = a0;

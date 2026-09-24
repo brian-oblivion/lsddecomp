@@ -44,7 +44,7 @@
  *     (disabling the SPU noise generator if that voice was in noise
  *     state); then calls SetAutoVol/SetAutoPan for every voice
  *     whose respective flag is set. Called once at the end of
- *     InitSpuDriver and, going by its own ring-buffer/mask-clearing logic,
+ *     SpuVmInit and, going by its own ring-buffer/mask-clearing logic,
  *     meant to run every frame thereafter.
  *   - ClearNoiseVoices: releases every voice whose state byte reads
  *     exactly 2 (the same value StopNote/SpuVmFlush/SpuVmAlloc
@@ -54,7 +54,7 @@
  *     depth value centered at 0x40, writing the result through
  *     note2pitch2; the "AllVoices" wrapper calls Sony's SpuVmVSetUp once
  *     and then runs this over every voice, returning the count affected.
- *   - InitSpuDriver: the SPU driver's init call -- _spu_setInTransfer,
+ *   - SpuVmInit: the SPU driver's init call -- _spu_setInTransfer,
  *     SpuInitMalloc, zeroes every per-voice table and the two master
  *     volume globals (reset to 0x3FFF, the SPU's real max), then calls
  *     SpuVmFlush once.
@@ -410,10 +410,10 @@ extern ObjDAD4Edd4 *D_8006DAD4Edd4 __asm__("D_8006DAD4");
  * two separately-named locals (the natural, more readable choice) gives a
  * WORSE result than either leaving `a0` alone or this single-variable
  * reuse; the reuse itself is load-bearing, not cosmetic.  See
- * docs/match-reports/InitSpuDriver.md for the full derivation, the
+ * docs/match-reports/SpuVmInit.md for the full derivation, the
  * permuter trace, and why the naive two-variable translation regresses
  * sharply (47/270) despite being semantically identical. */
-void InitSpuDriver(s32 a0) {
+void SpuVmInit(s32 a0) {
     s16 i;
     s32 scratch;
 

@@ -66,7 +66,7 @@
 extern s32 ResetCallback(void);
 extern void SpuInit(void); /* Psy-Q LIBSPU.H: extern void SpuInit (void); -- track 2 identification, round 64 */
 extern void func_80036AA8(void);
-extern void InitSpuDriver(s32 arg0);
+extern void SpuVmInit(s32 arg0);
 extern s32 GetVideoMode(void);
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
@@ -140,7 +140,7 @@ void func_8003221C(s32 arg0)
         reg++;
     }
 
-    InitSpuDriver(0x18);
+    SpuVmInit(0x18);
 
     for (j = 0; j < 0x20; j++) {
         for (i = 15; i >= 0; i--) {

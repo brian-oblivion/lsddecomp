@@ -48,7 +48,7 @@ the score): the preserved body's `func_800375E8(0, 0xFFFFFF)` call used a
 STALE placeholder name.** `asm/nonmatchings/code_179d8_m/SpuVmFlush.s`
 now names this call `SpuSetNoiseVoice` (`config/symbols.slps01556.lsdde.txt`
 line 263, Psy-Q `libspu`, from the SDK-object-linking work in later
-rounds) — same staleness class found in `InitSpuDriver`'s two SPU calls
+rounds) — same staleness class found in `SpuVmInit`'s two SPU calls
 this round. The preserved body below has been updated to the current name;
 nothing about the residue or the score changes. No new structural axis was
 attempted this round given the time budget and the six-function work list;
@@ -56,7 +56,7 @@ the 2-word frame gap plus 2 unidentified words remain as described above.
 
 ## Signature and shape (believed fully correct in content, order and control flow)
 
-`void SpuVmFlush(void)` — no arguments (confirmed: `InitSpuDriver`'s own
+`void SpuVmFlush(void)` — no arguments (confirmed: `SpuVmInit`'s own
 report, and this function's own prologue, never touch `$a0` before first
 overwriting it). Five phases, each independently verified against the
 disassembly instruction-by-instruction within the true `0x1ff00`-`0x202c4`
@@ -117,7 +117,7 @@ window:
 - `D_8006DAD4` gains a THIRD independent local view in this function
   (`Rec16DAD4C`, 0x10-byte stride, fields at `+0`,`+2`,`+4`,`+6`,`+8`,`+0xA`,
   and now also `+0xC` [`u16`, read via `lhu`] beyond the six fields
-  `InitSpuDriver`'s stalled report already established) — on top of the
+  `SpuVmInit`'s stalled report already established) — on top of the
   existing single-struct view (`+0x194`/`+0x196`) and this function's own
   final-tail single-struct-again view (`+0x188` through `+0x19A`). Three
   independent readings of the SAME base pointer in different parts of ONE
@@ -793,7 +793,7 @@ clears the active-voice mask and calls SetAutoVol/SetAutoPan
 for every voice whose respective flag is set. Named for the dispatch
 role, which is unambiguous; the exact tick cadence (every video frame?
 every audio-driver callback?) is not established from this function's
-body alone -- it is simply called once at the end of InitSpuDriver in
+body alone -- it is simply called once at the end of SpuVmInit in
 this unit, with its own logic implying a recurring caller elsewhere.
 
 ## Proposed field names
@@ -825,7 +825,7 @@ here -- proposing for the head to apply once no runner is live on
   -> `gSpuRegs`: confirmed to be the PS1 SPU's own hardware base address
   `0x1F801C00` by `vmNoiseOn2`'s report in `code_179d8_l`.
 
-Posted to the broadcast this round; see also InitSpuDriver.md's own
+Posted to the broadcast this round; see also SpuVmInit.md's own
 `## Proposed field names`.
 
 ## NON_MATCHING body promoted, round 67

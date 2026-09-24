@@ -1076,7 +1076,10 @@ SetAutoPan = 0x8002EA44; // type:func
 // SeAutoVol (Se/Set pair). Superseded game-style name StepVoiceEnvelope.
 // Round 74 (bravo, track 2).
 SetAutoVol = 0x8002E4D8; // type:func
-InitSpuDriver = 0x8002EDD4; // type:func
+// identified: shape 0.95 vs libsnd/vmanager SpuVmInit (244w vs our 270w,
+// disc 3.5), position within the libsnd neighborhood. Superseded
+// game-style name InitSpuDriver. Round 74 (bravo, track 2).
+SpuVmInit = 0x8002EDD4; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
 // SpuVmNoiseOnWithAdsr (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded
 // game-style name PlaySound. Round 71 (bravo, track 2).
