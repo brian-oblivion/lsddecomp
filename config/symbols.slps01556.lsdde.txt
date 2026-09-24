@@ -2330,3 +2330,5 @@ ObjM__NoOpSlot7C = 0x800534C0; // type:func
 ObjM__AttachTarget = 0x80052DE8; // type:func
 ObjM__OnRegistrantEvent = 0x80052E7C; // type:func
 ObjM__DetachTarget = 0x80052EBC; // type:func
+ObjM__InitStyleAndWorld = 0x80052F10; // type:func
+ObjM__TeardownStyle = 0x80053134; // type:func

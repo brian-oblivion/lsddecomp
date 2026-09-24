@@ -91,7 +91,7 @@ this is the same class of residue before reshaping further:
 **TickDreamAuxSlots2** — tier A. Identical mechanics to `TickDreamAuxSlots`,
 over `gDreamAuxSlots2` instead of `gDreamAuxSlots` (see that report/entry for
 the shared derivation). Tier A for the same reason: the tick pass over the
-slot family IS the function's purpose. Called from `func_80053134`
+slot family IS the function's purpose. Called from `ObjM__TeardownStyle`
 (`class_3bb8c_l.c`) alongside other per-frame-looking calls, consistent with
 "tick", though nothing in this unit distinguishes what makes the "2" family
 different in KIND from the first (it is never populated by any function in

@@ -443,7 +443,7 @@ extern s32 D_8008A838;
  * established, so there is no noun to put in the name: its only known
  * reader is Class6B5CC__ClassifyAgainstPlanes (code_d294_b), where `D_8008A838 == 0 || outWord
  * >= 0x201` gates accepting a hit, and its only known writer is
- * class_3bb8c_l.c's func_80052F10, which passes a flag derived from a
+ * class_3bb8c_l.c's ObjM__InitStyleAndWorld, which passes a flag derived from a
  * stage/mode value of 3, 5 or 6. Two call sites, neither naming the thing.
  * D_8008A838 keeps its placeholder name for the same reason. */
 s32 func_8001EF60(s32 value) {

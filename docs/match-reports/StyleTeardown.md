@@ -109,7 +109,7 @@ before.
 Calls `StyleFlushDecoration`, `StyleReleaseDecorSet`, `StyleReleaseEffectSlots`
 unconditionally, then flushes both `gStyleCueSlots[2]` entries via
 `FlushStyleCue`, then clears `gStyleCueSelf`. Called from
-`src/class_3bb8c_l.c`'s `func_80053134` (itself calling `self->methods->slot84`
+`src/class_3bb8c_l.c`'s `ObjM__TeardownStyle` (itself calling `self->methods->slot84`
 and `TickDreamAuxSlots2()`, an end-of-scene-style teardown), which is the
 evidence for "Teardown" over a narrower "Reset" -- it releases every
 resource `TickStyle` builds, matching a scene-exit shape rather than a

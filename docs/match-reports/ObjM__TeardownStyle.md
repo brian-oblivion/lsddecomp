@@ -1,4 +1,6 @@
-# func_80053134
+# ObjM__TeardownStyle
+
+> Renamed from `func_80053134` on 2026-09-24 (tools/rename.py). Address 0x80053134.
 
 **Unit:** class_3bb8c_l · **Size:** 27 words (0x6C bytes) ·
 **Status: MATCHED 27/27**, whole-image SHA1 green.
@@ -6,7 +8,7 @@
 ## What it does
 
 ```c
-void func_80053134(Obj87034_3bb8c_l *self) {
+void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
     self->methods->slot84(self);
     TickDreamAuxSlots2();
     StyleTeardown();

@@ -1,4 +1,6 @@
-# func_80052F10 -- MATCHED (137/137 words)
+# ObjM__InitStyleAndWorld -- MATCHED (137/137 words)
+
+> Renamed from `func_80052F10` on 2026-09-24 (tools/rename.py). Address 0x80052f10.
 
 Unit `src/class_3bb8c_l.c`. Round 26, runner delta.
 
@@ -25,7 +27,7 @@ extern s32 D_80087168;
 extern s32 D_80087118[];
 extern s32 D_80087150;
 
-void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
+void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
     s32 ret1;
     s32 flag;

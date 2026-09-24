@@ -23,6 +23,6 @@ slot). No branches, matched on the first correctly-typed attempt.
 
 - `BaseMethods87034_3bb8c_l::slot48` (the base accessor's `+0x48`) is a
   DIFFERENT table from `Obj87034Methods_3bb8c_l::slot48` (self's own
-  `+0x48`, used by `func_80053134` on a sibling object) — same numeric
+  `+0x48`, used by `ObjM__TeardownStyle` on a sibling object) — same numeric
   offset, unrelated classes, no naming collision since they're separate
   struct types.

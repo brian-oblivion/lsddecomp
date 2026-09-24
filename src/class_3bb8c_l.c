@@ -21,7 +21,7 @@
  *   func_800534C8  gp_rel        -- MATCHED round 45 (122/122 words). The
  *                  `gp_rel` blocker itself was RESOLVED round 42; see the
  *                  file-top banner above.
- *   func_80052F10  was addiu-$at ONLY -- NOT BLOCKED. 137w.
+ *   ObjM__InitStyleAndWorld  was addiu-$at ONLY -- NOT BLOCKED. 137w.
  *                  ROUND 32: MATCHED, 137/137.
  *   func_80053984  was addiu-$at ONLY -- NOT BLOCKED. 82w.
  *                  ROUND 32: MATCHED, 82/82, first attempt.
@@ -99,7 +99,7 @@ extern s32 D_80087168;
 extern s32 D_80087118[];
 extern s32 D_80087150;
 
-void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
+void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
     s32 ret1;
     s32 flag;
@@ -167,7 +167,7 @@ void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, 
     self->unk20 = 5;
 }
 
-void func_80053134(Obj87034_3bb8c_l *self) {
+void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
     self->methods->slot84(self);
     TickDreamAuxSlots2();
     StyleTeardown();
