@@ -1404,3 +1404,54 @@ Compiles clean under `-DNON_MATCHING` (one pre-existing `CD_cw`
 int-from-pointer warning, no errors).
 
 NON_MATCHING body promoted, round 68.
+
+## Round 75 (runner delta): NOT GAME CODE -- this is libcd/bios.c's static `cd_read_retry`; not matched
+
+REVISITED, round 75: stopped at the pre-work provenance check, no build made;
+names/types not relevant.
+
+`progress.py` currently counts this function as GAME (it is not in
+`config/sdk-in-game.txt`, has no `config/psyq-objects.ld` pin and no
+`identified` comment in the symbols file). That is only because no fingerprint
+fires: retail's libcd is the December 1995 build that matches no disc in
+`sdk/`, so the exact-masked screen in `sdkname.py --game` cannot hit. The
+evidence that it is Sony's is otherwise conclusive:
+
+1. **Position.** It lies between `CD_init` (0x8002A75C) and `CD_readm`
+   (0x8002ADE8), both already identified as libcd/bios and pinned in
+   `config/psyq-objects.ld`. In libcd 3.3's `bios.o`
+   (`sdk/work/3.3/elf/libcd/bios.o`) the function in that exact slot, between
+   `CD_init` (0x1220) and `CD_readm` (0x1740), is the weak/static
+   `cd_read_retry` (0x1474).
+2. **Its own strings.** `D_80010AAC` = `"CD read retry:"` and `D_80010ABC` =
+   `"%d,pos=(%02x:%02x:%02x)\n"`. 3.3's bios.o carries
+   `"CD read retry %2d(%02x:%02x:%02x)"`, the same message in an older form.
+   The rodata block they sit in (`asm/data/120C.rodata.s`) also holds
+   `"$Id: bios.c,v 1.71 1995/12/01 08:36:19 makoto Exp $"`, `"CD_init:"` and
+   `"CD opening...\n"` / `"CD closing...\n"` (this function's `D_80010A40` /
+   `D_80010A50`).
+3. **Shape.** 3.3's `cd_read_retry` uses the same distinctive sequence as
+   this body: the `0x1325` register write, `CD_cw(2, ...)`, `CD_cw(0xE, ...)`,
+   `CD_cw(6, 0, 0, 1)`, `VSync(-1)` and a final `-1` return. Retail is 223 words
+   against 3.3's 179 because it is a later build: `CD_init` grew the same way
+   (196 words retail against 149 in 3.3).
+
+So the right place for this function is track 2 (name it `cd_read_retry`,
+libcd/bios, Dec-1995 build, identified by position and strings) and
+`progress.py`'s library count, not the matching queue. **Proposed for the head,
+not acted on** (the symbols file is off-limits to runners): add an
+`identified` entry `cd_read_retry = 0x8002AA6C; // type:func` citing the
+evidence above. After that, `progress.py` drops it from the game queue. The
+round-68 NON_MATCHING body stays as it is (readable, 215/223, length exact)
+until the head decides what to do with it.
+
+### Proposed learning
+
+**Where the build matches no SDK disc, the fingerprint screen goes quiet and
+position plus rodata strings become the evidence.** `sdkname.py --game` needs
+an exact masked match, and a libcd build that matches no disc produces none.
+But a function sandwiched between two identified functions of one module,
+whose string literals sit in that module's `$Id:` rodata block, is that
+module's code. Before revisiting any stall in a `code_179d8_*` unit, look at
+its neighbours in `config/psyq-objects.ld` and grep its `D_` strings'
+rodata block for a `$Id:` line.
