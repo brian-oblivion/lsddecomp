@@ -27,7 +27,7 @@ void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
     Class86B60Unk48Obj *obj;
 
     Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0);
-    self->methods = func_8004E2D0();
+    self->methods = GetClass86B60Methods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
     self->unkA4 = dreamSys;
@@ -50,7 +50,7 @@ presence anywhere in the project. Placed as one new block right before the
 - `Class86B60`/`Class86B60Methods`: `ctor` (+0x008, this function),
   `slot40` (+0x040, this function's own last call), `slotD8` (+0x0D8, this
   function's own second-to-last call). Vtable is `gClass86B60Methods`, resolved
-  via `func_8004E2D0` (still raw asm in the uncarved
+  via `GetClass86B60Methods` (still raw asm in the uncarved
   `asm/class_3bb8c_d.s`, called directly by `jal` -- same "vtable getter"
   shape as `GetClass869D8Methods`/`GetClass86AA0Methods`).
 - `Class86B60` struct fields: `unk48` (`Class86B60Unk48Obj *`, set up by
@@ -107,7 +107,7 @@ call-then-call sequencing word-for-word).
 > **A "base ctor sets self->methods directly rather than fetching it
 > through a getter" ctor can still dispatch through `self->methods`
 > immediately afterward in the SAME function** (here, `slotD8` and
-> `slot40` right after `self->methods = func_8004E2D0();`) -- write it as
+> `slot40` right after `self->methods = GetClass86B60Methods();`) -- write it as
 > a plain sequential assignment-then-dispatch; no getter re-fetch or
 > caching is needed for the match.
 

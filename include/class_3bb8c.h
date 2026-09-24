@@ -983,7 +983,7 @@ struct GenericTagInst_3bb8c_c {
 /*
  * A third small sibling class (New_X/ctor pair, same shape as Class869D8
  * and Class86AA0 above), named by its vtable's address `gClass86B60Methods`
- * (returned by `func_8004E2D0`, still raw asm in the uncarved
+ * (returned by `GetClass86B60Methods`, still raw asm in the uncarved
  * `asm/class_3bb8c_d.s` -- called directly, not through any vtable).
  * `New_Class86B60` is the New_X allocator (alloc size 0xC4); `Class86B60__Class86B60`
  * is the ctor itself, which SETS `self->methods` directly to this table's
@@ -1343,7 +1343,7 @@ struct Class86B60 {
 };
 
 extern Class86B60Methods gClass86B60Methods;
-extern Class86B60Methods *func_8004E2D0(void);   /* still raw asm, asm/class_3bb8c_d.s -- called
+extern Class86B60Methods *GetClass86B60Methods(void);   /* still raw asm, asm/class_3bb8c_d.s -- called
                                                        directly (jal), not through any vtable */
 
 /*

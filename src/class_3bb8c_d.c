@@ -285,7 +285,7 @@ void Class86B60__OnTagBValue(Class86B60 *self, s32 arg1, s32 value)
     }
 }
 
-Class86B60Methods *func_8004E2D0(void)
+Class86B60Methods *GetClass86B60Methods(void)
 {
     return &gClass86B60Methods;
 }

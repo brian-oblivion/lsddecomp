@@ -130,7 +130,7 @@ Class86B60 *New_Class86B60(void *dreamSys)
 
     self = BMemPMgrAlloc(0xC4);
     if (self != NULL) {
-        func_8004E2D0()->ctor(self, dreamSys);
+        GetClass86B60Methods()->ctor(self, dreamSys);
         return self;
     }
     return NULL;
@@ -142,7 +142,7 @@ void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
     Class86B60Unk48Obj *obj;
 
     Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0);
-    self->methods = func_8004E2D0();
+    self->methods = GetClass86B60Methods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
     self->unkA4 = dreamSys;
