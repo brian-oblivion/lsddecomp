@@ -234,10 +234,6 @@ void func_80065DEC(Class65650 *self)
     }
 }
 
-/* NON_MATCHING: 49/68 words, length exact (no drift). Residue: whole-function
- * self<->p register-identity swap ($s1/$s2), CLAUDE.md rule 6
- * (docs/match-reports/func_80065E1C.md). Hand-derived. */
-#ifdef NON_MATCHING
 s32 func_80065E1C(Class65650 *self)
 {
     s32 buf[4];
@@ -261,12 +257,10 @@ s32 func_80065E1C(Class65650 *self)
     self->unk6C = 0;
     if (count != 0) {
         do {
-            *p = New_BaseObjO();
-            if (*p == NULL) {
+            if ((*p++ = New_BaseObjO()) == NULL) {
                 goto fail;
             }
-            p++;
-            self->unk6C = self->unk6C + 1;
+            self->unk6C++;
             i++;
         } while (i < count);
     }
@@ -279,9 +273,6 @@ fail:
     func_80065F2C(self);
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065E1C);
-#endif
 
 void func_80065F2C(Class65650 *self)
 {
