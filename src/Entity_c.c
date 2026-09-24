@@ -182,35 +182,35 @@ void func_8005F708(Entity *this) {
             this->methods->updateScale(this, 1, D_80089E74);
             this->methods->slotCC(this, -0x7800, 0);
         }
-        this->unk44 = rand() % 5;
+        this->moodState = rand() % 5;
     }
-    if (this->unk44 == 0) {
+    if (this->moodState == 0) {
         this->methods->updateRotation(this, 0, D_80089D18);
     }
 }
 
 void func_8005F800(Entity *this) {
-    if (this->unk44 == 0) {
+    if (this->moodState == 0) {
         if (this->target->methods->slot200(this->target) == 1) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         } else {
-            this->unk44 = 0xC;
+            this->moodState = 0xC;
         }
     }
 
-    if (this->unk44 == 0xC) {
+    if (this->moodState == 0xC) {
         this->methods->updateScale(this, 1, SCALE_DOUBLE);
         this->methods->slotCC(this, -0x1E, 0);
     } else {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-        if (this->unk44 == 0xB) {
+        if (this->moodState == 0xB) {
             this->methods->slotC4(this, -0x64, 0);
             if ((u32)(this->moodTimer - 0x55) < 0x1E) {
                 this->methods->slotCC(this, 0x50, 0);
             } else if (this->moodTimer == 0x78) {
-                this->unk44 = 0xD;
+                this->moodState = 0xD;
             }
-        } else if (this->unk44 == 0xD) {
+        } else if (this->moodState == 0xD) {
             this->methods->setVec14(this, &this->target->unk14->x);
             this->methods->addVec14(this, D_80089DB4);
         }
@@ -316,14 +316,14 @@ void func_8005FDFC(Entity *this) {
     u8 *arg2;
     s32 roll;
 
-    if (this->unk44 == 0) {
+    if (this->moodState == 0) {
         roll = rand();
         arg2 = SCALE_SIX;
         if ((roll & 1) != 0) {
             arg2 = SCALE_DOUBLE;
         }
         this->methods->updateScale(this, 1, arg2);
-        this->unk44 = 0xB;
+        this->moodState = 0xB;
     }
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
     if (this->methods->slot144(this, this->target) < 0x7000) {

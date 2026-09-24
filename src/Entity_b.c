@@ -64,7 +64,7 @@ s32 Entity__UpdateSoundCueStart(Entity *this) {
     s32 *xptr;
     s32 dist;
 
-    if (this->active != 0 && this->soundCueActive == 0 && this->unk44 != 1) {
+    if (this->active != 0 && this->soundCueActive == 0 && this->moodState != 1) {
         row = &gEntityMoodTable[this->moodIndex];
         if (row->cueRange != 0) {
             xptr = &this->unk14->x;
@@ -143,11 +143,11 @@ EntityMethods *Get_vtable_Entity(void) {
 void Entity__MoodCue00(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 == 0) {
         if (this->target->methods->slot200(this->target) == 5) {
-            this->unk44 = 0x64;
+            this->moodState = 0x64;
         }
     }
     out->unk10 = this->methods->getProximityRatio(this);
-    if (this->unk44 == 0) {
+    if (this->moodState == 0) {
         if (out->unk4 % 10 == 0) {
             out->unk1C = 5;
             out->unk20 = -2;
@@ -261,7 +261,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0xA;
         out->unk20 = 1;
     }
-    if (this->unk44 == 0xB) {
+    if (this->moodState == 0xB) {
         if (this->moodTimer == 0xA8C) {
             row = ROTATION_YAW_MINUS90;
         }
@@ -274,14 +274,14 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         if ((u32)(this->moodTimer - 0xD5D) < 0x78) {
             if (this->target->methods->slot100(this->target) != 0) {
                 this->moodTimer = 0;
-                this->unk44 = 0xD;
+                this->moodState = 0xD;
             }
         }
-    } else if (this->unk44 == 0xC) {
+    } else if (this->moodState == 0xC) {
         if (this->moodTimer == 0x7BC) {
             row = ROTATION_YAW_MINUS90;
         }
-    } else if (this->unk44 == 0xD) {
+    } else if (this->moodState == 0xD) {
         this->unk48 = -0x78;
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         this->methods->updateScale(this, 1, SCALE_HALF);
@@ -292,17 +292,17 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0x618) {
         if ((rand() & 1) != 0) {
             row = ROTATION_YAW_PLUS90;
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         } else {
             row = ROTATION_YAW_MINUS90;
-            this->unk44 = 0xC;
+            this->moodState = 0xC;
         }
     }
     if (row != 0) {
         this->methods->updateRotation(this, 0, row);
     }
     this->methods->slotD0(this, this->unk48, 0);
-    if (this->unk44 != 0xC) {
+    if (this->moodState != 0xC) {
         if (this->unk28 != 0) {
             this->methods->slotCC(this, -0xC8, 0);
         }
@@ -316,21 +316,21 @@ void Entity__MoodCue12(Entity *this) {
 
     if (this->moodTimer == 0) {
         if ((rand() & 1) == 0) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
     }
     y = this->unk14->y;
     if (y < 0x7D0) {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
     }
-    if (this->unk44 == 0xB) {
+    if (this->moodState == 0xB) {
         result = this->methods->slot144(this, this->target);
         if (result < 0xA00) {
             this->unk4C->methods->slot138(this->unk4C, 1, 1);
             this->moodTimer = 1;
-            this->unk44 = 0xC;
+            this->moodState = 0xC;
         }
-    } else if (this->unk44 == 0xC) {
+    } else if (this->moodState == 0xC) {
         oldFC = this->moodTimer;
         this->moodTimer = oldFC + 1;
         if (oldFC == 0x12C) {
@@ -343,11 +343,11 @@ void Entity__MoodCue13(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 == 0) {
         out->unk1C = 0xC;
-        this->unk44++;
+        this->moodState++;
     } else if (out->unk4 >= this->unk80 - 1) {
         out->unk4 = -1;
     }
-    if (this->unk44 == 0x24) {
+    if (this->moodState == 0x24) {
         if (rand() % 3 == 0) {
             this->methods->notifyParents(this, 0xB);
         }
@@ -375,10 +375,10 @@ void Entity__MoodCue16(Entity *this) {
 
     if (this->moodTimer == 0) {
         if ((rand() & 1) != 0) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
     }
-    if (this->unk44 == 0) {
+    if (this->moodState == 0) {
         if (this->moodTimer < 0x40) {
             this->methods->slotC4(this, -0x5A, 0);
         } else if (this->moodTimer == 0x40) {
@@ -392,7 +392,7 @@ void Entity__MoodCue16(Entity *this) {
         } else {
             this->methods->slotD0(this, -0x176, rand() % 2);
         }
-    } else if (this->unk44 == 0xB) {
+    } else if (this->moodState == 0xB) {
         if (this->moodTimer % 5 == 0) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
         }

@@ -3,7 +3,7 @@
 
 void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0 && rand() % 10 == 0) {
-        this->unk44 = 0xC;
+        this->moodState = 0xC;
     }
     if (out->unk4 % 10 == 0) {
         out->unk10 = this->methods->getProximityRatio(this);
@@ -16,7 +16,7 @@ void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
     this->methods->slotC4(this, -0x80, 0);
-    if (this->unk44 == 0xC && this->moodTimer == 0x12C) {
+    if (this->moodState == 0xC && this->moodTimer == 0x12C) {
         this->unk4C->methods->slot138(this->unk4C, 1, 1);
     }
 }
@@ -44,7 +44,7 @@ void func_80061C2C(Entity *this, EntityMoodHandlerArg *out) {
     } else if (this->moodTimer == 0x1F4) {
         this->target->methods->slot134(this->target, 1, 1);
     }
-    if (this->unk44 == 0) {
+    if (this->moodState == 0) {
         if (this->methods->slot144(this, this->target) < 0x400) {
             if (rand() & 1) {
                 out->unk30 = 6;
@@ -54,13 +54,13 @@ void func_80061C2C(Entity *this, EntityMoodHandlerArg *out) {
                     this->unk4C->methods->slot138(this->unk4C, -1, 0);
                 }
                 this->moodTimer = 0;
-                this->unk44 = 0xA;
+                this->moodState = 0xA;
             } else {
-                this->unk44 = 0xB;
+                this->moodState = 0xB;
             }
         }
     }
-    if (this->unk44 == 0xA && this->moodTimer == 0x46) {
+    if (this->moodState == 0xA && this->moodTimer == 0x46) {
         this->methods->notifyParents(this, (rand() & 1) ? 0xC : 0xB);
     }
 }
@@ -88,10 +88,10 @@ void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
             this->methods->updateScale(this, 1, SCALE_HALF);
             this->methods->slotCC(this, -0x12C, 0);
             this->methods->updateRotation(this, 1, ROTATION_YAW_PLUS90);
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
     }
-    if (this->unk44 == 0xB) {
+    if (this->moodState == 0xB) {
         if (this->moodTimer == 0x7D0) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
         }
@@ -109,10 +109,10 @@ void func_8006204C(Entity *this, EntityMoodHandlerArg *out) {
 void func_800620C4(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
     }
-    if (this->unk44 == 0xB) {
+    if (this->moodState == 0xB) {
         if (this->moodTimer == 0x1F6) {
             this->methods->slotCC(this, 0x800, 0);
             Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
@@ -131,7 +131,7 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 == 0) {
         this->unk48 = (rand() & 1) ? -0x176 : -0xC0;
     }
-    if (this->unk44 == 0) {
+    if (this->moodState == 0) {
         if (out->unk4 % 10 == 0) {
             out->unk1C = 0x1C;
         }
@@ -147,13 +147,13 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
         if ((this->moodTimer & 1) == 0) {
             if (this->target->methods->slot100(this->target) != 0) {
                 this->moodTimer = -1;
-                this->unk44 = 0xA;
+                this->moodState = 0xA;
                 out->unk1C = 0x12;
             }
         }
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         this->methods->slotC4(this, this->unk48, 1);
-    } else if (this->unk44 == 0xA) {
+    } else if (this->moodState == 0xA) {
         if (this->moodTimer < 8) {
             this->methods->updateRotation(this, 0, D_80089CC4);
             this->methods->addVec14(this, D_80089D6C);
@@ -164,7 +164,7 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
             out->unk30 = 3;
             this->methods->stopSoundCue(this);
             r = rand() & 1;
-            this->unk44 = r < 1;
+            this->moodState = r < 1;
         }
     }
 }
@@ -193,14 +193,14 @@ extern u8 ROTATION_YAW_PLUS180[];
 void func_800624BC(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() & 1) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
     }
     if (this->moodTimer == 0x12C) {
         this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
     }
     if (this->moodTimer < 0x258) {
-        this->methods->slotC4(this, this->unk44 == 0 ? -0x100 : 0x100, 0);
+        this->methods->slotC4(this, this->moodState == 0 ? -0x100 : 0x100, 0);
     }
 }
 
@@ -242,12 +242,12 @@ extern u8 D_8008AC1C[];
 void func_80062730(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         this->target->unk5C->methods->slot64(this->target->unk5C, D_8008AC1C);
-        this->unk44 = rand() % 3;
+        this->moodState = rand() % 3;
         if (this->target->unk14->z < 0x262) {
-            this->unk44 = 0;
+            this->moodState = 0;
         }
     }
-    if (this->unk44 != 0) {
+    if (this->moodState != 0) {
         if (this->unk80 / 2 < this->moodTimer) {
             this->target->methods->slotC4(this->target, 0x80, 0);
         }
@@ -311,12 +311,12 @@ void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer == this->unk80) {
             this->methods->slot128(this, 1);
             if (rand() & 1) {
-                this->unk44 = 0xB;
+                this->moodState = 0xB;
             }
         }
         return;
     }
-    if (this->unk44 == 0) {
+    if (this->moodState == 0) {
         if (this->moodTimer == 0x3C || this->moodTimer == 0xD4 || this->moodTimer == 0x122 || this->moodTimer == 0x140) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
         }
@@ -334,7 +334,7 @@ void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->moodTimer == 0xAE) {
         this->methods->stopSoundCue(this);
-        this->unk44 = 1;
+        this->moodState = 1;
     }
 }
 
@@ -351,10 +351,10 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
         D_8008ACCC = 0;
         tmp = rand() % 3;
         if (tmp == 1) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
         if (tmp == 2) {
-            this->unk44 = 0xC;
+            this->moodState = 0xC;
         }
     }
 
@@ -382,24 +382,24 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
 
-    if (this->unk44 == 0xB && out->unk4 == 0x1FE) {
+    if (this->moodState == 0xB && out->unk4 == 0x1FE) {
         this->methods->slotCC(this, -0x17C, 0);
         this->methods->updateRotation(this, 0, D_80089D0C);
         this->methods->stopSoundCue(this);
-        this->unk44 = 1;
+        this->moodState = 1;
         D_8008ACCC = 1;
-    } else if (this->unk44 >= 0xC && out->unk4 >= 0x14A && (out->unk4 % 60) == 30) {
+    } else if (this->moodState >= 0xC && out->unk4 >= 0x14A && (out->unk4 % 60) == 30) {
         tmp = 0;
         if (rand() & 1) {
             table = SCALE_Y2;
-            tmp = (this->unk44 == 0xC) ? 0x190 : 0;
-            this->unk44 = 0xD;
+            tmp = (this->moodState == 0xC) ? 0x190 : 0;
+            this->moodState = 0xD;
         } else {
             table = D_80089E14;
-            if (this->unk44 == 0xD) {
+            if (this->moodState == 0xD) {
                 tmp = -0x190;
             }
-            this->unk44 = 0xC;
+            this->moodState = 0xC;
         }
         this->methods->updateScale(this, 1, table);
         this->methods->slotCC(this, tmp, 0);
@@ -407,7 +407,7 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
 
     if (out->unk4 == 0x208 && D_8008ACCC != 0) {
         this->methods->stopSoundCue(this);
-        this->unk44 = 1;
+        this->moodState = 1;
     }
 }
 
@@ -421,9 +421,9 @@ void func_80062FAC(Entity *this, EntityMoodHandlerArg *out) {
         out->unk20 = 2;
     }
     this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
-    if (this->unk44 == 0 && this->unkF4 != 0) {
+    if (this->moodState == 0 && this->unkF4 != 0) {
         this->methods->notifyParents(this, 0xB);
-        this->unk44 = 0xB;
+        this->moodState = 0xB;
     }
 }
 
@@ -451,9 +451,9 @@ void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
     s32 mood;
 
     if (this->moodTimer == 0 && (rand() & 1)) {
-        this->unk44 = rand() % 3;
+        this->moodState = rand() % 3;
     }
-    if (this->unk44 != 0 && this->unkF4 != 0) {
+    if (this->moodState != 0 && this->unkF4 != 0) {
         if (out->unk4 >= 0x3D) {
             out->unk4 = 0;
         }
@@ -470,20 +470,20 @@ void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
             out->unk44 = -2;
         }
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-        mood = this->unk44;
+        mood = this->moodState;
         if (mood == 1) {
             this->methods->updateScale(this, 0, D_80089E08);
             mod = -0x176;
             if (this->methods->slot144(this, this->target) < 0x200) {
                 this->methods->deactivate(this);
-                this->unk44 = mood;
+                this->moodState = mood;
             }
         } else {
             this->target->methods->slot130(this->target, 1);
             Class6B5CC__FaceTarget((Entity *)this->target, this, 1, 1, 0);
-            if (this->unk44 == 2) {
+            if (this->moodState == 2) {
                 if (this->methods->slot144(this, this->target) < 0x960) {
-                    this->unk44 = 0xB;
+                    this->moodState = 0xB;
                     this->methods->notifyParents(this, 0xC);
                 }
                 mod = -0x60;

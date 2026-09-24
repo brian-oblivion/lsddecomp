@@ -307,7 +307,7 @@ s32 Entity__UpdateActivationState(Entity *this) {
     EntityMoodRow *row;
     s32 doDetach;
 
-    if (this->active == 0 && this->unk44 != 1) {
+    if (this->active == 0 && this->moodState != 1) {
         row = &gEntityMoodTable[this->moodIndex];
         doDetach = 0;
         if (row->detachKind != 0) {

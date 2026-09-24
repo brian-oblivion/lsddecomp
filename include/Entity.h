@@ -299,7 +299,7 @@ struct Entity {
     /* +0x24 */ s32 unk24;             /* cleared by Entity__Activate; xored against a mood-row-derived value in Entity__UpdateDeactivationState */
     /* +0x28 */ s32 unk28;             /* read by Entity__MoodCue11, gates its final slotCC call */
     /* +0x2C */ u8 pad2C[0x44 - 0x2C];
-    /* +0x44 */ s32 unk44;              /* gates Entity__UpdateActivationState's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by Entity__MoodCue13 */
+    /* +0x44 */ s32 moodState;             /* gates Entity__UpdateActivationState's whole body when == 1; also a small state code compared against several other literals (0xB, 0xC, 0x24, ...) by this unit's mood-dispatch handlers, and incremented directly by Entity__MoodCue13 */
     /* +0x48 */ s16 unk48;               /* a HALFWORD field (sh/lh, not the full-word sw/lw every other field here uses) -- Entity__MoodCue11 both writes it (-0x14, -0x78) and reads it back (as slotD0's arg1) */
     /* +0x4A */ u8 pad4A[0x4C - 0x4A];
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by Entity__DetachUnk4C; dereferenced through its own vtable by Entity__MoodCue12 -- see Unk4CObj's own comment */

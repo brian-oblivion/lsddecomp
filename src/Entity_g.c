@@ -73,17 +73,17 @@ void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer < 0x7D0) {
             this->methods->slotC4(this, -0x40, 0);
         } else {
-            this->unk44 = 1;
+            this->moodState = 1;
         }
     } else {
         this->methods->slotC4(this, -0x100, 0);
     }
-    if (this->unkF4 != 0 && this->unk44 == 0) {
-        this->unk44 = 0xC;
+    if (this->unkF4 != 0 && this->moodState == 0) {
+        this->moodState = 0xC;
         this->target->methods->slot130(this->target, 1);
         this->methods->notifyParents(this, 0xA);
     }
-    if (this->unk44 == 0xC) {
+    if (this->moodState == 0xC) {
         this->target->methods->slotC4(this->target, 0x100, 0);
     }
 }
@@ -91,10 +91,10 @@ void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
 void func_80064928(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0x2BC) {
         if (rand() % 3 == 0) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
     }
-    if (this->unk44 == 0xB) {
+    if (this->moodState == 0xB) {
         if (this->moodTimer < 0x3FC) {
             this->methods->updateRotation(this, 0, D_80089CB8);
             this->methods->slotCC(this, 0x1E, 0);
@@ -124,10 +124,10 @@ void func_80064B14(Entity *this, EntityMoodHandlerArg *out) {
 void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if ((rand() & 1) == 0) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
     }
-    if (this->unk44 == 0xB) {
+    if (this->moodState == 0xB) {
         void *fn;
 
         if (this->moodTimer == 0) {
@@ -156,18 +156,18 @@ void func_80064CEC(Entity *this, EntityMoodHandlerArg *out) {
 void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateScale(this, 1, D_80089E44);
     this->methods->slot130(this);
-    if (this->unk44 == 0) {
+    if (this->moodState == 0) {
         if (this->methods->slot144(this, this->target) < 0x800) {
-            this->unk44 = 0xA;
+            this->moodState = 0xA;
             this->moodTimer = 0;
         }
     }
-    if (this->unk44 == 0xA) {
+    if (this->moodState == 0xA) {
         if (this->moodTimer < 0x2D) {
             this->methods->updateRotation(this, 0, D_80089D00);
         }
         if (this->moodTimer >= 0x1F5) {
-            this->unk44 = 0;
+            this->moodState = 0;
         }
     }
 }
@@ -175,10 +175,10 @@ void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
 void func_80064E34(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (this->target->methods->slot200(this->target) == 5) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
     }
-    if (this->unk44 != 0 && this->moodTimer >= 0x870) {
+    if (this->moodState != 0 && this->moodTimer >= 0x870) {
         if ((u32)(this->moodTimer - 0x870) < 0x191) {
             if (this->moodTimer == 0x870) {
                 this->methods->slot130(this);
@@ -247,7 +247,7 @@ L74:
     this->methods->slotC4(this, arg4, 0);
     if (this->moodTimer == arg3) {
         this->methods->deactivate(this);
-        this->unk44 = 1;
+        this->moodState = 1;
     }
 }
 
@@ -284,16 +284,16 @@ void func_80065204(Entity *this, EntityMoodHandlerArg *out) {
 void func_80065238(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() % 5 == 0) {
-            this->unk44 = 0xB;
+            this->moodState = 0xB;
         }
     }
     this->methods->slot130(this);
     this->methods->slotC4(this, 0x64, 0);
     if (this->moodTimer == 0x3E8) {
         this->methods->stopSoundCue(this);
-        this->unk44 = 1;
+        this->moodState = 1;
     }
-    if (this->unk44 == 0xB) {
+    if (this->moodState == 0xB) {
         if (this->moodTimer >= 0x12D) {
             this->target->methods->slot94(this->target, 0, 2);
             this->target->methods->slot94(this->target, 0, 7);
@@ -312,7 +312,7 @@ void func_8006536C(Entity *this, EntityMoodHandlerArg *out) {
     }
 trigger:
     this->methods->deactivate(this);
-    this->unk44 = 1;
+    this->moodState = 1;
 merge:
     this->methods->updateScale(this, 1, D_80089E44);
     out->unk10 = this->methods->getProximityRatio(this);
@@ -331,12 +331,12 @@ void func_800654A0(Entity *this, EntityMoodHandlerArg *out) {
 
 void func_80065514(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
-        this->unk44 = rand() % 2 + 0xA;
+        this->moodState = rand() % 2 + 0xA;
     }
     this->methods->slot130(this);
     if (this->moodTimer >= 0xC9) {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-        if (this->unk44 == 0xA) {
+        if (this->moodState == 0xA) {
             this->methods->slotD0(this, -0x200, 0);
         }
     }
