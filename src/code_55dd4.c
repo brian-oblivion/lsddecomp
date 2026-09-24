@@ -1,6 +1,19 @@
-/* 34 queued, all fresh. Offered to runners in round 2026-08-30-a; no longer
- * banked. No function in this unit touches a %gp_rel global, so none of it is
- * exposed to the gp-relative blocker (docs/research/gp-relative-blocker.md).
+/*
+ * Class65650 (include/code_55dd4.h): a BaseObjO subclass that owns one
+ * BaseObjO "part" per object of a TOD animation and plays TODs over them.
+ * Method table gClass65650Methods; Entity derives from it.
+ *
+ * - construction: modelData (+0x5C) is borrowed from the ctor's arg1 or made
+ *   by func_8004468C; CreateParts allocates partCount parts and their TOD
+ *   object ids from it; Destructor/ReleaseModelData undo both.
+ * - base-slot overrides: OnNotify, InitDefaults, AttachToParent,
+ *   DetachFromParent, SetDisplay/SetLightMode (forwarded to every part), and
+ *   OnClass6EF50Notify (+0x098: code 2 -> Tick, 4 -> Release).
+ * - Tick: once per call, runs the selected tick callback (A/B/C) and, while
+ *   a TOD is playing, applies its next frame and wraps at the frame count.
+ * - ApplyTodFrame/ApplyTodPacket: walk a TOD frame's packets and apply the
+ *   attribute, coordinate (GsCOORD2PARAM rotate/scale/trans), model-id and
+ *   parent packets to the part the packet's object id names.
  */
 #include "common.h"
 #include "code_55dd4.h"
@@ -58,7 +71,7 @@ void Class65650__OnNotify(Class65650 *self, TagCheckArg *arg1, s32 arg2)
 
     base = DreamSys__GetBaseMethods();
     base->onNotify(self, arg1, arg2);
-    if (arg1->methods->header == 0x5F03 && arg2 == 1 && self->ownsModelData == 0) {
+    if (arg1->methods->header == MODEL_DATA_CLASS_HEADER && arg2 == 1 && self->ownsModelData == 0) {
         self->methods->release(self);
     }
 }
@@ -72,7 +85,7 @@ void Class65650__InitDefaults(Class65650 *self)
     self->methods->setUnk64(self, 1);
     self->methods->setLastOffsetValue(self, 0x12C);
     self->methods->disableTickCallback(self);
-    self->methods->selectTickCallback(self, 0x41);
+    self->methods->selectTickCallback(self, TICK_CALLBACK_A);
     self->methods->stopTod(self);
     self->methods->setTod(self, 0);
     if (self->mainPart != NULL) {
@@ -310,13 +323,13 @@ void Class65650__Tick(Class65650 *self)
 void Class65650__SelectTickCallback(Class65650 *self, s32 value)
 {
     switch ((u8)value) {
-    case 0x41:
+    case TICK_CALLBACK_A:
         self->tickCallback = self->methods->tickCallbackA;
         break;
-    case 0x42:
+    case TICK_CALLBACK_B:
         self->tickCallback = self->methods->tickCallbackB;
         break;
-    case 0x43:
+    case TICK_CALLBACK_C:
         self->tickCallback = self->methods->tickCallbackC;
         break;
     }
@@ -392,106 +405,106 @@ void *Class65650__ApplyTodFrame(Class65650 *self, void *hdr, void *extra)
 void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
 {
     u8 outbuf[4];
-    void *s0;
+    void *data;
     s32 idx;
     Unk70ElemObj *elem;
-    Elem14Obj *e14;
-    TimeTargetObj *t0;
+    Elem14Obj *coord;
+    TimeTargetObj *param;
     s32 i;
 
-    s0 = self->modelData->methods->decodeTodPacket(self->modelData, acc, &outbuf[0], &outbuf[1], &outbuf[2], &outbuf[3]);
+    data = self->modelData->methods->decodeTodPacket(self->modelData, acc, &outbuf[0], &outbuf[1], &outbuf[2], &outbuf[3]);
     idx = Class65650__FindPartIndex(self, outbuf[0]);
     if (idx < 0) {
         goto end;
     }
     elem = self->parts[idx];
-    e14 = elem->coord2;
-    e14->flg = 0;
-    t0 = e14->param;
+    coord = elem->coord2;
+    coord->flg = 0;
+    param = coord->param;
 
     switch (outbuf[1]) {
-    case 0:
-        elem->attribute = (elem->attribute & ((s32 *)s0)[0]) | ((s32 *)s0)[1];
+    case TOD_PACKET_ATTRIBUTE:
+        elem->attribute = (elem->attribute & ((s32 *)data)[0]) | ((s32 *)data)[1];
         break;
-    case 1: {
-        if (outbuf[2] & 1) {
-            if (outbuf[2] & 2) {
-                s16 *p16 = t0->rotate;
+    case TOD_PACKET_COORDINATE: {
+        if (outbuf[2] & TOD_COORD_DIFFERENTIAL) {
+            if (outbuf[2] & TOD_COORD_ROTATE) {
+                s16 *p16 = param->rotate;
 
                 for (i = 0; i < 3; i++, p16++) {
                     s16 tmp;
 
-                    tmp = *p16 + ((s32 *)s0)[i] / 360;
+                    tmp = *p16 + ((s32 *)data)[i] / 360;
                     *p16 = tmp;
                     *p16 = tmp % 4096;
                 }
-                s0 = (u8 *)s0 + 0xC;
+                data = (u8 *)data + 0xC;
             }
-            if (outbuf[2] & 4) {
-                s32 *p32 = t0->scale;
+            if (outbuf[2] & TOD_COORD_SCALE) {
+                s32 *p32 = param->scale;
 
                 for (i = 0; i < 3; i++, p32++) {
-                    *p32 = (((s16 *)s0)[i] * *p32) / 4096;
+                    *p32 = (((s16 *)data)[i] * *p32) / 4096;
                 }
-                s0 = (u8 *)s0 + 8;
+                data = (u8 *)data + 8;
             }
-            if (!(outbuf[2] & 8)) {
+            if (!(outbuf[2] & TOD_COORD_TRANSLATE)) {
                 goto end;
             }
             {
-                s32 *p32 = t0->trans;
+                s32 *p32 = param->trans;
 
                 for (i = 0; i < 3; i++, p32++) {
-                    *p32 += ((s32 *)s0)[i];
+                    *p32 += ((s32 *)data)[i];
                 }
             }
         } else {
-            if (outbuf[2] & 2) {
-                s16 *p16 = t0->rotate;
+            if (outbuf[2] & TOD_COORD_ROTATE) {
+                s16 *p16 = param->rotate;
 
                 for (i = 0; i < 3; i++, p16++) {
-                    *p16 = ((s32 *)s0)[i] / 360;
+                    *p16 = ((s32 *)data)[i] / 360;
                 }
-                s0 = (u8 *)s0 + 0xC;
+                data = (u8 *)data + 0xC;
             }
-            if (outbuf[2] & 4) {
-                s32 *p32 = t0->scale;
+            if (outbuf[2] & TOD_COORD_SCALE) {
+                s32 *p32 = param->scale;
 
                 for (i = 0; i < 3; i++, p32++) {
-                    *p32 = ((s16 *)s0)[i];
+                    *p32 = ((s16 *)data)[i];
                 }
-                s0 = (u8 *)s0 + 8;
+                data = (u8 *)data + 8;
             }
-            if (!(outbuf[2] & 8)) {
+            if (!(outbuf[2] & TOD_COORD_TRANSLATE)) {
                 goto end;
             }
             {
-                s32 *p32 = t0->trans;
+                s32 *p32 = param->trans;
 
                 for (i = 0; i < 3; i++, p32++) {
-                    *p32 = ((s32 *)s0)[i];
+                    *p32 = ((s32 *)data)[i];
                 }
             }
         }
         {
-            Elem14Obj *e14b;
+            Elem14Obj *coordB;
             s32 v1, v2, v3;
 
-            e14b = elem->coord2;
-            v1 = t0->trans[0];
-            v2 = t0->trans[1];
-            v3 = t0->trans[2];
-            e14b->tx = v1;
-            e14b->ty = v2;
-            e14b->tz = v3;
+            coordB = elem->coord2;
+            v1 = param->trans[0];
+            v2 = param->trans[1];
+            v3 = param->trans[2];
+            coordB->tx = v1;
+            coordB->ty = v2;
+            coordB->tz = v3;
             __asm__("");
         }
         break;
     }
-    case 2: {
+    case TOD_PACKET_MODEL_ID: {
         u16 count;
 
-        count = *(u16 *)s0;
+        count = *(u16 *)data;
         if (count != 0 && elem->unk20 == 0) {
             s32 v;
 
@@ -500,16 +513,16 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
         }
         break;
     }
-    case 3: {
+    case TOD_PACKET_PARENT: {
         s32 v1;
 
-        v1 = *(s32 *)s0;
+        v1 = *(s32 *)data;
         if (v1 == 0 || v1 == 0xFFFF) {
             elem->methods->attachToParent(elem, self, 0);
         } else {
             s32 idx2;
 
-            idx2 = Class65650__FindPartIndex(self, *(u8 *)s0);
+            idx2 = Class65650__FindPartIndex(self, *(u8 *)data);
             elem->methods->attachToParent(elem, self->parts[idx2], 0);
         }
         break;
