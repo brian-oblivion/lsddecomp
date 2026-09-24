@@ -14,20 +14,20 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-s32 func_8004B38C(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
+s32 Class866E8__SetTargetAndBuildRates(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
     s32 ret;
 
     self->unk6C = arg2;
     self->unkBC = *arg3;
-    ret = func_8004B44C(arg1, stackBuf, self->unk68, &self->unk54, arg3);
+    ret = ComputeCellWorldOffsets(arg1, stackBuf, self->unk68, &self->unk54, arg3);
     return self->methods->slotF8(self, ret, stackBuf, &D_80086904);
 }
 
-s32 func_8004B418(Obj866E8 *self, void *arg1, void *arg2) {
+s32 Class866E8__ComputeCellOffsets(Obj866E8 *self, void *arg1, void *arg2) {
     s32 outBuf[3];
 
-    return func_8004B44C(arg1, outBuf, self->unk68, &self->unk54, arg2);
+    return ComputeCellWorldOffsets(arg1, outBuf, self->unk68, &self->unk54, arg2);
 }
 
 /* MATCH, round 40 (bravo): permuter-found zero, first-ever search on this
@@ -38,8 +38,8 @@ s32 func_8004B418(Obj866E8 *self, void *arg1, void *arg2) {
  * confirmed by the score dropping straight to 0. Every prior round's
  * attempts targeted the outBuf[0]/outBuf[2] STORE-vs-LOAD scheduling
  * directly and never touched this constant; the permuter found a
- * completely different axis. See docs/match-reports/func_8004B44C.md. */
-s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
+ * completely different axis. See docs/match-reports/ComputeCellWorldOffsets.md. */
+s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
     s32 sum;
@@ -73,13 +73,13 @@ s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, 
     return sum;
 }
 
-void func_8004B570(Obj866E8 *self) {
-    self->unk70 = 1;
+void Class866E8__Enable(Obj866E8 *self) {
+    self->enabled = 1;
 }
 
-void func_8004B57C(Obj866E8 *self) {
+void Class866E8__Disable(Obj866E8 *self) {
     self->methods->slotC0(self);
-    self->unk70 = 0;
+    self->enabled = 0;
 }
 
 /* func_8004B5BC -- see docs/match-reports/func_8004B5BC.md. */

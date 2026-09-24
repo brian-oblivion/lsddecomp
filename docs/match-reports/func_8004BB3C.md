@@ -234,7 +234,7 @@ allocation wrong.
 > check, aggregate-assignment check, a permuter run whose scaffold was
 > proven to score a different residue) with nothing left un-checked; not
 > re-attempted further this round. Time went to the higher-yield queue
-> entries instead (`func_8004C470`, `func_8004B44C`, and the two large
+> entries instead (`func_8004C470`, `ComputeCellWorldOffsets`, and the two large
 > multi-load functions with higher pre-screen hit counts).
 
 > **ROUND 32 (bravo2): re-verified, no new attempt.** Rebuilt the exact

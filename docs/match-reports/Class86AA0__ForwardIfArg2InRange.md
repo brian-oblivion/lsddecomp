@@ -141,7 +141,7 @@ registers' identities are swapped throughout.
 Kept even though the function itself stalls -- these are genuine,
 evidence-based struct/table facts established from reading this function's
 own disassembly, independent of the register-identity residue (same
-policy as `func_8004B44C`'s report, which kept its prototype after a
+policy as `ComputeCellWorldOffsets`'s report, which kept its prototype after a
 near-miss):
 
 - **`Class86AA0Methods`**: added `slotA0`

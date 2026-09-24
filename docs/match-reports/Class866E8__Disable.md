@@ -1,4 +1,8 @@
-# func_8004B57C — MATCHED (16/16 words)
+# Class866E8__Disable — MATCHED (16/16 words)
+
+> Renamed from `Class866E8__func_8004B57C` on 2026-09-24 (tools/rename.py). Address 0x8004b57c.
+
+> Renamed from `func_8004B57C` on 2026-09-24 (tools/rename.py). Address 0x8004b57c.
 
 `Obj866E8`'s vtable slot +0x0F0.
 
@@ -22,7 +26,7 @@ jr $ra
 ## Final C
 
 ```c
-void func_8004B57C(Obj866E8 *self) {
+void Class866E8__Disable(Obj866E8 *self) {
     self->methods->slotC0(self);
     self->unk70 = 0;
 }

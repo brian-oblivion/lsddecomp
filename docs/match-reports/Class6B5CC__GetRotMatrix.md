@@ -54,7 +54,7 @@ void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2) {
   alignment 2, which is exactly what makes retail's whole-struct copy
   (`buf = *src;` on the `a2 == 0` path) compile to unaligned `lwl`/`lwr` +
   `swl`/`swr` instead of a plain `lw`/`sw` — the same idiom already recorded
-  in DECOMPILATION_LEARNINGS for `func_8004B38C`/`FlashbackRotation`. This is
+  in DECOMPILATION_LEARNINGS for `Class866E8__SetTargetAndBuildRates`/`FlashbackRotation`. This is
   what made the byte match land on the first attempt: I wrote the copy as a
   single struct assignment specifically to trigger that codegen, rather than
   as three/four scalar copies.

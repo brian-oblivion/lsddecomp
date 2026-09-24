@@ -1,17 +1,19 @@
-# func_8004B38C
+# Class866E8__SetTargetAndBuildRates
+
+> Renamed from `func_8004B38C` on 2026-09-24 (tools/rename.py). Address 0x8004b38c.
 
 **Unit:** class_3bb8c · **Size:** 35 words · **Status:** MATCHED.
 
 ## Result
 
 ```c
-s32 func_8004B38C(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
+s32 Class866E8__SetTargetAndBuildRates(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
     s32 ret;
 
     self->unk6C = arg2;
     self->unkBC = *arg3;
-    ret = func_8004B44C(arg1, stackBuf, self->unk68, &self->unk54, arg3);
+    ret = ComputeCellWorldOffsets(arg1, stackBuf, self->unk68, &self->unk54, arg3);
     return self->methods->slotF8(self, ret, stackBuf, &D_80086904);
 }
 ```
@@ -19,8 +21,8 @@ s32 func_8004B38C(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3
 ## Derivation
 
 First-pass reading of the raw asm badly mis-transcribed this function -- it
-looked like a single call to `func_8004B44C` whose result was the return
-value. It is actually **two calls**: `func_8004B44C` first, whose `s32`
+looked like a single call to `ComputeCellWorldOffsets` whose result was the return
+value. It is actually **two calls**: `ComputeCellWorldOffsets` first, whose `s32`
 result is immediately forwarded (via `$a1`) as the **second argument** to a
 *second* dispatch, `self->methods->slotF8(self, ret, &stackBuf, &D_80086904)`
 -- and it's `slotF8`'s return that the function actually returns. Caught only
@@ -33,7 +35,7 @@ plain `sh` for the trailing halfword -- not the aligned `lw`/`sw` a naive
 struct-of-{2 words, 1 half} type would produce. This only reproduces if the
 struct's own natural alignment is **less than 4**, which needs every member
 to be `s8`/`s16` (no `s32`) -- confirmed by cross-referencing
-`func_8004B44C`'s OWN read of the same 10-byte pointee (individual signed
+`ComputeCellWorldOffsets`'s OWN read of the same 10-byte pointee (individual signed
 bytes at `+0x0..+0x3`, signed halfwords at `+0x4`,`+0x6`,`+0x8`), giving a
 mixed byte/short struct (`Descriptor10`) whose alignment is 2. This is the
 same "no s32 member forces the unaligned-block-copy shape" idiom already
@@ -45,7 +47,7 @@ combined with `func_8004C158`'s later dereference of the SAME field (`+0x014`,
 see that report) is what pinned `unk6C`'s type to `Unk6CObj *` rather than
 leaving it `void *`/`s32`.
 
-The 5th argument to `func_8004B44C` is the caller's OWN `arg3` pointer passed
+The 5th argument to `ComputeCellWorldOffsets` is the caller's OWN `arg3` pointer passed
 straight through (not `&self->unkBC`, even though `self->unkBC` was *just*
 populated from `*arg3` on the previous line) -- confirmed by the stack spill
 (`sw a3, 0x10(sp)`) using the original `$a3`, never reloaded from

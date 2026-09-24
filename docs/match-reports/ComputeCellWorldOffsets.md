@@ -1,4 +1,6 @@
-# func_8004B44C
+# ComputeCellWorldOffsets
+
+> Renamed from `func_8004B44C` on 2026-09-24 (tools/rename.py). Address 0x8004b44c.
 
 **Unit:** class_3bb8c · **Size:** 73 words · **Status:** MATCH (73/73), round 40.
 
@@ -15,7 +17,7 @@ which topped out at 58/73.
 drift, identical residue to what this report already documented. The
 recorded figure was honest.
 
-**Scaffold:** `tools/setup-permuter.sh func_8004B44C <seed>` built cleanly;
+**Scaffold:** `tools/setup-permuter.sh ComputeCellWorldOffsets <seed>` built cleanly;
 `--debug --stack-diffs` reported base score 415 (7 register differences, 3
 reorderings, 1 insertion, 1 deletion) -- matching the report's own
 description of the residue (a deferred store past independent loads), so
@@ -41,10 +43,10 @@ whole store-scheduling residue this report spent 5 rounds on.
 **Translated as found -- the permuter's candidate already was idiomatic C**,
 no UB, no duplicate-arm artifact to clean up. Re-verified through the full
 oracle: `./build-and-verify.sh` -- `OK: build matches retail SLPS_015.56`;
-`funcdiff.py func_8004B44C` -- `73/73 words match`. Byte-exact.
+`funcdiff.py ComputeCellWorldOffsets` -- `73/73 words match`. Byte-exact.
 
 ```c
-s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
+s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
     s32 sum;
@@ -166,7 +168,7 @@ despite ~15 manual attempts) is exactly what caught it.
 
 ```c
 #if 0
-s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
+s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
     s32 sum;
@@ -282,7 +284,7 @@ because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
-are honest** — `func_8004C470` 68/70, `func_8004B44C` 58/73,
+are honest** — `func_8004C470` 68/70, `ComputeCellWorldOffsets` 58/73,
 `func_8004B700` 125/140, `func_8004BE54` 130/150. No stale figure and no
 never-linked body in this unit.
 

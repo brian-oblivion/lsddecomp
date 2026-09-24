@@ -50,7 +50,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AB24` | `Class866E8__UpdateIfEnabled` | B | Occupant of vtable slot `+0x098`. The gate field is `+0x070`, and `class_3bb8c`'s two matched accessors pin its meaning exactly: `func_8004B570` sets it to 1 and `func_8004B57C` runs `slotC0` and then clears it to 0 -- an enable/disable pair. When enabled this function dispatches `slotF4` then `slot13C`; `slot13C` is `class_3bb8c_b`'s matched `Class866E8__AdvanceRateCountdown`, which decrements a per-object countdown and sweeps every element's cells, i.e. periodic work. Tier B: "update" describes what the two dispatched slots do, not a purpose anyone has established. |
+| `func_8004AB24` | `Class866E8__UpdateIfEnabled` | B | Occupant of vtable slot `+0x098`. The gate field is `+0x070`, and `class_3bb8c`'s two matched accessors pin its meaning exactly: `Class866E8__Enable` sets it to 1 and `Class866E8__Disable` runs `slotC0` and then clears it to 0 -- an enable/disable pair. When enabled this function dispatches `slotF4` then `slot13C`; `slot13C` is `class_3bb8c_b`'s matched `Class866E8__AdvanceRateCountdown`, which decrements a per-object countdown and sweeps every element's cells, i.e. periodic work. Tier B: "update" describes what the two dispatched slots do, not a purpose anyone has established. |
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |

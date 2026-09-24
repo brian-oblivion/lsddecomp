@@ -348,7 +348,7 @@ not to the shipped bytes.
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004ABD0` | `Class866E8__ResetAllElements` | B | Occupant of vtable slot `+0x0C0`, and `class_3bb8c`'s matched `func_8004B57C` calls exactly that slot immediately before clearing `enabled` -- so this is the shutdown/clear path. The body walks all seven `elems[]` entries and for each: dispatches the target's `slot74`, zeroes the entry's `flag`, dispatches `slot108`, releases the list's held object, raises `onElementEvent(self, 6, entry, i)`, dispatches the target's `slot84`. Then zeroes `unk1B4`/`unk1B8` and dispatches `slot140`. Tier B: "reset all elements" is what the loop does; why the object is reset is not established. |
+| `func_8004ABD0` | `Class866E8__ResetAllElements` | B | Occupant of vtable slot `+0x0C0`, and `class_3bb8c`'s matched `Class866E8__Disable` calls exactly that slot immediately before clearing `enabled` -- so this is the shutdown/clear path. The body walks all seven `elems[]` entries and for each: dispatches the target's `slot74`, zeroes the entry's `flag`, dispatches `slot108`, releases the list's held object, raises `onElementEvent(self, 6, entry, i)`, dispatches the target's `slot84`. Then zeroes `unk1B4`/`unk1B8` and dispatches `slot140`. Tier B: "reset all elements" is what the loop does; why the object is reset is not established. |
 
 The preserved `#if 0` body in `src/class_3ac78.c` was updated to the current
 field names in the same round (`entry->unk0` -> `flag`, `entry->unk4` ->

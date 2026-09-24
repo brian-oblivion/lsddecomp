@@ -375,7 +375,7 @@ the report and to the preserved body's identifiers, not to the shipped bytes.
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `Class866E8+0x0BC` | `cellTag` | C-ish/B | Copied verbatim into `curCellTag` before every cell visit and never otherwise touched here. `class_3bb8c` reads the same offset as the first halfword of a 10-byte `Descriptor10` that `func_8004B38C` block-copies in. The name records only "the tag stamped onto each visited cell". |
+| `Class866E8+0x0BC` | `cellTag` | C-ish/B | Copied verbatim into `curCellTag` before every cell visit and never otherwise touched here. `class_3bb8c` reads the same offset as the first halfword of a 10-byte `Descriptor10` that `Class866E8__SetTargetAndBuildRates` block-copies in. The name records only "the tag stamped onto each visited cell". |
 | `Class866E8+0x1C0` | `curCellTag` | B | Written per cell visit; `Class866E8__GetCurrentCellKey` returns its address. |
 | `Class866E8+0x1C2` | `curCellCol` | A | Written per cell visit with the rectangle's start column plus the inner loop offset. |
 | `Class866E8+0x1C3` | `curCellRow` | A | Same, row. |

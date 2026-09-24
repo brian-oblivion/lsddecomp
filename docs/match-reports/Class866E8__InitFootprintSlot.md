@@ -30,7 +30,7 @@ function itself discards it).
   slot.
 - New extern `D_80086990` (`Unk54Struct`, whole-struct copy source) —
   reuses the existing `Unk54Struct` type (already established from
-  `self->unk54` and `func_8004B44C`'s `arg3`).
+  `self->unk54` and `ComputeCellWorldOffsets`'s `arg3`).
 
 ## Final C
 

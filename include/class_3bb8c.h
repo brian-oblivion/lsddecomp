@@ -38,7 +38,7 @@ typedef struct ResInfo866E8 ResInfo866E8;
 typedef struct EntryGpu EntryGpu;
 
 /* self+0x54: an inline (not pointer) 3-word sub-struct, dereferenced by
- * func_8004B44C (arg3) and also matches func_8004C470's `arg1` descriptor
+ * ComputeCellWorldOffsets (arg3) and also matches func_8004C470's `arg1` descriptor
  * (unk0/unk4/unk8, all s32) -- reused for both since the shapes agree and
  * nothing distinguishes them. Field meaning unknown beyond "3 words,
  * read/written as a group". */
@@ -55,8 +55,8 @@ typedef struct Unk54Struct {
  *  - func_8004B930 reads +0x000 (same divisor) and +0x002 (s16 count,
  *    used as a loop trip count) and +0x004 (s32, gates the whole
  *    function between two totally different code paths).
- *  - func_8004B44C's own `arg2` parameter is fed this exact pointer at
- *    its one call site (func_8004B418) and reads all three fields
+ *  - ComputeCellWorldOffsets's own `arg2` parameter is fed this exact pointer at
+ *    its one call site (Class866E8__ComputeCellOffsets) and reads all three fields
  *    (+0x000 s16, +0x002 s16, +0x004 s32) the same way.
  *  - func_8004C470 reads +0x004 alone (a boolean-ish gate).
  */
@@ -69,10 +69,10 @@ typedef struct Unk68Struct {
 /*
  * A 10-byte "descriptor" struct, passed by pointer. Established from TWO
  * independent functions:
- *  - func_8004B44C's `arg4` (5th/stack argument) reads it as four signed
+ *  - ComputeCellWorldOffsets's `arg4` (5th/stack argument) reads it as four signed
  *    bytes (+0x0..+0x3) followed by three signed halfwords (+0x4, +0x6,
  *    +0x8).
- *  - func_8004B38C block-copies a whole one of these (its own `arg3`)
+ *  - Class866E8__SetTargetAndBuildRates block-copies a whole one of these (its own `arg3`)
  *    into `self->unkBC` in ONE retail load-all-then-store-all sequence:
  *    two unaligned lwl/lwr loads (8 bytes) followed by a plain unaligned
  *    swl/swr pair, then a final aligned `sh` for the trailing halfword.
@@ -197,9 +197,9 @@ typedef struct SetupSub866E8 {
 } SetupSub866E8;
 
 /* Uncarved helper in this same unit (asm/class_3bb8c.s past this slice),
- * called by func_8004B418 and func_8004B38C (both already matched) and
+ * called by Class866E8__ComputeCellOffsets and Class866E8__SetTargetAndBuildRates (both already matched) and
  * itself attempted-but-stalled this round (58/73, see
- * docs/match-reports/func_8004B44C.md) -- not a byte-exact match, so its
+ * docs/match-reports/ComputeCellWorldOffsets.md) -- not a byte-exact match, so its
  * body stays raw asm, but the prototype below reflects what the attempt
  * established.
  *
@@ -211,9 +211,9 @@ typedef struct SetupSub866E8 {
  * `arg4` is the 5th/stack argument (Descriptor10 *, see above); `outBuf`
  * is fed a 3-word local array by both call sites, so it is typed `s32 *`
  * rather than opaque `void *`. */
-extern s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4);
+extern s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4);
 
-/* Unidentified global, address-only use (func_8004B38C passes `&D_80086904`
+/* Unidentified global, address-only use (Class866E8__SetTargetAndBuildRates passes `&D_80086904`
  * as an argument, never reads it directly here). Typed `s32` purely as a
  * placeholder since only its address is taken. */
 extern s32 D_80086904;
@@ -285,7 +285,7 @@ extern const s8 D_800868FC[8];
  * words at `D_80086974` (one NULL, six pointers into the 4-word tables
  * `D_80086914`..`D_80086964`) before the next symbol starts. Element type
  * `s32 *` matches `Obj866E8Methods::slotF8`'s own `arg3` (already `s32 *`
- * from `func_8004B38C`'s call site) -- func_8004B5BC forwards a
+ * from `Class866E8__SetTargetAndBuildRates`'s call site) -- func_8004B5BC forwards a
  * `D_80086974` entry there unchanged. */
 extern s32 *D_80086974[7];
 
@@ -325,11 +325,11 @@ typedef struct Obj866E8Methods {
      * all three pass exactly 3 args beyond self; return unused. */
     void (*slotA8)(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0A8, Obj86ED0__AdvanceCountdown/Obj86ED0__ResetCountdown/Obj86ED0__ResetAllAndFinish */
     u8 pad0AC[0xC0 - 0xAC];
-    /* Called by func_8004B57C right before it zeroes self->unk70. */
+    /* Called by Class866E8__Disable right before it clears self->enabled. */
     void (*slotC0)(Obj866E8 *self);            /* +0x0C0 */
     u8 pad0C4[0xF8 - 0xC4];
-    /* Called by func_8004B38C with func_8004B44C's own return value, the
-     * SAME stack buffer that was func_8004B44C's `outBuf` argument, and
+    /* Called by Class866E8__SetTargetAndBuildRates with ComputeCellWorldOffsets's own return value, the
+     * SAME stack buffer that was ComputeCellWorldOffsets's `outBuf` argument, and
      * the address of an unidentified global (`D_80086904`). */
     s32 (*slotF8)(Obj866E8 *self, s32 arg1, s32 *arg2, s32 *arg3);   /* +0x0F8 */
     /* = func_8004BB3C. This IS func_8004BB3C's own identity slot (verified
@@ -578,7 +578,7 @@ struct Unk6C14SubObj {
 };
 
 /*
- * self+0x6C's pointee. func_8004B38C only ever STORES its own arg2 here
+ * self+0x6C's pointee. Class866E8__SetTargetAndBuildRates only ever STORES its own arg2 here
  * raw (never dereferences it); func_8004C158 dereferences it and reads
  * +0x014, itself a pointer used only for address-of-plus-offset
  * arithmetic (`+0x018`), never further dereferenced. Retyped this round
@@ -731,7 +731,7 @@ struct Obj866E8 {
     void *unk44;                   /* +0x044 */
     s32 unk48;                     /* +0x048, Obj86ED0__AdvanceCountdown/Obj86ED0__ToggleFlag20/Obj86ED0__ResetCountdown/Obj86ED0__ResetAllAndFinish */
     u8 pad4C[0x54 - 0x4C];
-    Unk54Struct unk54;             /* +0x054, func_8004B418 (address taken, forwarded opaquely) */
+    Unk54Struct unk54;             /* +0x054, Class866E8__ComputeCellOffsets (address taken, forwarded opaquely) */
     /* +0x060/+0x064, func_8004BA40 (this round): a callback invoked as
      * `unk60(unk64, value, 0, 0)`, whose result is stored into the
      * SetupEntry866E8 slot being filled. `unk64` is never dereferenced in
@@ -740,9 +740,13 @@ struct Obj866E8 {
      * additive (same total size, same offsets), not a removal. */
     void *(*unk60)(void *arg0, s32 arg1, s32 arg2, s32 arg3); /* +0x060 */
     void *unk64;                                              /* +0x064 */
-    Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
-    Unk6CObj *unk6C;               /* +0x06C, func_8004B38C stores it raw; func_8004C158 dereferences it */
-    s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
+    Unk68Struct *unk68;            /* +0x068, Class866E8__ComputeCellOffsets/Class866E8__SetTargetAndBuildRates/func_8004B930/func_8004C470 */
+    Unk6CObj *unk6C;               /* +0x06C, Class866E8__SetTargetAndBuildRates stores it raw; func_8004C158 dereferences it */
+    s32 enabled;                   /* +0x070, Class866E8__Enable/Class866E8__Disable. TIER A: class_3ac78's
+                                     * independent local view of this SAME field already reached "enabled"
+                                     * from the identical evidence (its own Class866E8__UpdateIfEnabled report,
+                                     * round 67) -- set 1 by Class866E8__Enable, cleared 0 by Class866E8__Disable
+                                     * after a teardown dispatch, matching a plain enable/disable pair. */
     s32 gridSpan;                  /* +0x074, world span of the grid; gDefaultGridSpan = 0xA000. Class866E8__ComputeFootprintFromRotation copies it into its stack-local QueryTemplate866E8's unk1C before calling RotMatrix */
     s16 gridHalfCells;             /* +0x078, gridSpan >> 12 = 10; Class866E8__RefreshFootprint doubles it into an index (giving gridCells) */
     s16 gridCells;                 /* +0x07A, gridSpan >> 11 = 20, the row stride byte-matched Class866E8__SetFootprintCellFlag uses; Class866E8__RefreshFootprint passes it on as an arg */
@@ -752,7 +756,7 @@ struct Obj866E8 {
     s32 footprintHeight;                     /* +0x084, Class866E8__ComputeFootprintFromRotation (writes the other of arg1/arg2), then read/forwarded by Class866E8__BuildFootprintSlots to Class866E8__SplitFootprintSlot's p8 */
     s32 gridSlotCount;                     /* +0x088, Class866E8__SetFootprintCellFlag: loop count over gridSlots[] (bounded by gridSlots's own 4-element capacity) */
     GridSlot866E8 gridSlots[4];      /* +0x08C, Class866E8__SetFootprintCellFlag (reads); Class866E8__InitFootprintSlot (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
-    Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
+    Descriptor10 unkBC;            /* +0x0BC, Class866E8__SetTargetAndBuildRates: whole-struct copy from its arg3 */
     u8 padC6[0xEC - 0xC6];
     Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/Class866E8__FindElemIndexByUnk32/Class866E8__FindElemIndexByUnk30/func_8004BD14/Class866E8__ForEachEntryChild */
     s32 unk1B0;                    /* +0x1B0, func_8004BD14 */

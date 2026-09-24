@@ -246,7 +246,7 @@ submission.
  * struct copy retail uses for prim->0x60 -> prim->0x74 -> prim->0x70 even
  * though those particular offsets are accidentally 4-aligned; the compiler
  * only knows the DECLARED alignment of the type, not the runtime address.
- * Same idiom as FlashbackRotation (include/DreamSys.h) and func_8004B38C. */
+ * Same idiom as FlashbackRotation (include/DreamSys.h) and Class866E8__SetTargetAndBuildRates. */
 typedef struct {
     s16 x, y;
 } Vec2s16;
