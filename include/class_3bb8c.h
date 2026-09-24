@@ -756,7 +756,7 @@ struct Obj866E8 {
     void *(*unk60)(void *arg0, s32 arg1, s32 arg2, s32 arg3); /* +0x060 */
     void *unk64;                                              /* +0x064 */
     Unk68Struct *unk68;            /* +0x068, Class866E8__ComputeCellOffsets/Class866E8__SetTargetAndBuildRates/Class866E8__ComputeRateFlags/Class866E8__FindElementForPosition */
-    Unk6CObj *unk6C;               /* +0x06C, Class866E8__SetTargetAndBuildRates stores it raw; Class866E8__GetTargetDescriptor dereferences it */
+    Unk6CObj *target;              /* +0x06C, Class866E8__SetTargetAndBuildRates stores it raw; Class866E8__GetTargetDescriptor dereferences it; round 78 head: renamed from unk6C by type scope (bravo proposed posSource; `target` matches the two functions that set and read it) */
     s32 enabled;                   /* +0x070, Class866E8__Enable/Class866E8__Disable. TIER A: class_3ac78's
                                      * independent local view of this SAME field already reached "enabled"
                                      * from the identical evidence (its own Class866E8__UpdateIfEnabled report,

@@ -40,7 +40,7 @@ s32 Class866E8__SetTargetAndBuildRates(Obj866E8 *self, void *arg1, Unk6CObj *arg
     s32 stackBuf[3];
     s32 ret;
 
-    self->unk6C = arg2;
+    self->target = arg2;
     self->unkBC = *arg3;
     ret = ComputeCellWorldOffsets(arg1, stackBuf, self->unk68, &self->unk54, arg3);
     return self->methods->slotF8(self, ret, stackBuf, sDefaultTargetSpecs);
@@ -574,7 +574,7 @@ void Class866E8__ResetElementCells(Obj866E8 *self, Elem *entry) {
 Descriptor10 *Class866E8__GetTargetDescriptor(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
     void *v1;
 
-    v1 = (u8 *)self->unk6C->unk14 + 0x18;
+    v1 = (u8 *)self->target->unk14 + 0x18;
     if (out != 0) {
         *out = v1;
     }

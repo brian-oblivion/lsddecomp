@@ -84,3 +84,9 @@ to apply by type scope.
 | --- | --- | --- | --- |
 | `Obj866E8::unk6C` | `posSource` | B | Stored raw by `Class866E8__SetTargetAndBuildRates` (`self->unk6C = arg2`, never dereferenced there); dereferenced by `Class866E8__GetTargetDescriptor` as `self->unk6C->unk14 + 0x18` to obtain the `QueryPos866E8` (world-position triple) fed to `Class866E8__ComputeFootprintDescriptor`; `class_3bb8c_b.c`'s `Class866E8__ComputeFootprintFromRotation` independently reaches the SAME `->unk14->unk44` chain. "posSource" names the mechanic (an object whose `unk14` substruct supplies positions), not an asserted game identity. |
 | `Obj866E8::unkBC` | `descriptor` | B | Whole-struct-copied from a caller `Descriptor10*` in `Class866E8__SetTargetAndBuildRates`; overwritten wholesale (44 bytes, past the declared field into trailing padding -- see `Class866E8__UpdateFootprintTracking.md`'s own derivation) and read back (`Class866E8__GetTargetDescriptor` returns `&self->unkBC` directly) as "the object's current footprint descriptor". Not tested for cross-unit accessors this round (only `unk6C` was); the head should re-run the same compiler check before applying. |
+
+**Head disposition, round 78.** `unk6C` applied by type scope as `target`
+(3 accessors: class_3bb8c.c x2, class_3bb8c_b.c x1), not `posSource`: this
+function (`SetTarget...`) stores it and `GetTargetDescriptor` reads it, so the
+unit's own function names already call it the target. `unkBC` -> `descriptor`
+DECLINED: it restates the field's type (`Descriptor10`), round 77's precedent.

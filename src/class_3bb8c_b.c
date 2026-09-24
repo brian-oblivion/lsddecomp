@@ -95,7 +95,7 @@ void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2
     s32 half;
     void *rot;
 
-    sub = self->unk6C->unk14->unk44;
+    sub = self->target->unk14->unk44;
     rot = (u8 *)sub + 0x10;
     self->methods->slot10C(self, &buf, 0);
     point0 = buf.point[0];
