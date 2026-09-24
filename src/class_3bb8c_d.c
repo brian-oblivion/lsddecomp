@@ -1,7 +1,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-void func_8004D704(Class86B60 *self)
+void Class86B60__Dtor(Class86B60 *self)
 {
     if (self->unkAC != NULL) {
         self->unkAC->methods->release(self->unkAC);

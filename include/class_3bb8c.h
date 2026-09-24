@@ -1055,7 +1055,7 @@ struct Class86B60Unk60Obj_3bb8c_d {
  * on an object whose concrete class this unit does not otherwise need to
  * know. Local, independent view per this project's established
  * multiple-independent-views convention (see e.g. GenericTagInst_3bb8c_c
- * above). func_8004D704 calls this on both `Class86B60::unkA8` and
+ * above). Class86B60__Dtor calls this on both `Class86B60::unkA8` and
  * `Class86B60::unkAC`.
  */
 typedef struct GenericReleaseMethods_3bb8c_d GenericReleaseMethods_3bb8c_d;
@@ -1121,7 +1121,7 @@ struct Class86B60UnkB0Obj_3bb8c_d {
 
 /*
  * Class86B60::unkAC's fuller shape -- shares the same `release` slot at
- * `+0x004` as the generic view (established by func_8004D704), but
+ * `+0x004` as the generic view (established by Class86B60__Dtor), but
  * func_8004E054 also reaches `+0x070`. Same reasoning as
  * `Class86B60UnkB0Obj_3bb8c_d` above: kept a dedicated type rather than
  * assuming `unkA8` shares this fuller interface too, since nothing in
@@ -1132,7 +1132,7 @@ typedef struct Class86B60UnkACObj_3bb8c_d Class86B60UnkACObj_3bb8c_d;
 
 struct Class86B60UnkACObjMethods_3bb8c_d {
     u8 pad000[0x004];
-    void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, func_8004D704 */
+    void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, Class86B60__Dtor */
     u8 pad008[0x06C - 0x008];
     /* +0x06C, func_8004DF64's own call: `(self, D_8008A9D0, &D_80086D6C,
      * self->unkC->unk4, self->unk10, self->unk14, self->unk48)` -- 7
@@ -1310,18 +1310,18 @@ struct Class86B60 {
      * parameter) still compiles under ordinary C pointer conversion
      * rules. */
     DreamSysView_3bb8c_c *unkA4;
-    /* +0x0A8/+0x0AC, func_8004D704 (this unit's destructor): two owned
+    /* +0x0A8/+0x0AC, Class86B60__Dtor (this unit's destructor): two owned
      * sub-objects, each released through their own shared `release` slot.
      * BOTH releases sit inside the SAME `unkAC != NULL` guard -- retail's
      * single branch skips over both calls together, not just the first;
      * there is no separate null check on `unkA8`. `unkAC` was previously
      * typed a bare `s32` from Class86B60__Class86B60's `zeroed` write alone, which
      * is consistent with either a scalar 0 or a null pointer -- this
-     * round's func_8004D704 is what proves it is dereferenced through a
+     * round's Class86B60__Dtor is what proves it is dereferenced through a
      * vtable, so it is retyped a pointer here (same size, no layout
      * change). */
-    GenericReleaseObj_3bb8c_d *unkA8; /* +0x0A8, func_8004D704: released iff unkAC != NULL */
-    /* +0x0AC, Class86B60__Class86B60: zeroed; func_8004D704: guards both releases.
+    GenericReleaseObj_3bb8c_d *unkA8; /* +0x0A8, Class86B60__Dtor: released iff unkAC != NULL */
+    /* +0x0AC, Class86B60__Class86B60: zeroed; Class86B60__Dtor: guards both releases.
      * RETYPED from the minimal `GenericReleaseObj_3bb8c_d *` to the
      * dedicated `Class86B60UnkACObj_3bb8c_d *` -- func_8004E054 reaches a
      * second slot (`+0x070`) on it. Same size, no layout change. */
@@ -1423,7 +1423,7 @@ struct BaseTaskCtorTable_3bb8c_c {
     /* Class86B60__Class86B60's own unconditional first statement:
      * Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0). */
     void (*slot08)(void *self, void *arg1, void *arg2, s32 arg3); /* +0x008 */
-    /* +0x00C, func_8004D704's own unconditional last call, `self` only.
+    /* +0x00C, Class86B60__Dtor's own unconditional last call, `self` only.
      * Same offset AND arity as `TaskCoreMethods::slot0C` in
      * include/code_2c054.h (also derived from `gTaskCoreMethods`, the same real
      * global this getter returns) -- independent confirmation, not a

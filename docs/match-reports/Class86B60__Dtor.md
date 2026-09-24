@@ -1,12 +1,14 @@
-# func_8004D704 -- MATCH
+# Class86B60__Dtor -- MATCH
+
+> Renamed from `func_8004D704` on 2026-09-24 (tools/rename.py). Address 0x8004d704.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004D704`: 33/33 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__Dtor`: 33/33 words match.
 
 ## Source
 
 ```c
-void func_8004D704(Class86B60 *self)
+void Class86B60__Dtor(Class86B60 *self)
 {
     if (self->unkAC != NULL) {
         self->unkAC->methods->release(self->unkAC);
