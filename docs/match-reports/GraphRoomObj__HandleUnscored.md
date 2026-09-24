@@ -31,3 +31,13 @@ Names `D_80087AACMethods::slot70`/`slot94` and `D_80087AACObj::unk_0x238`
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py GraphRoomObj__HandleUnscored   # 25/25
 ```
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__HandleUnscored`** -- tier B. Own vtable slot +0x078. Its
+one guard is `self->scored == 0`, exactly the failure value
+`GraphRoomObj__ScoreDayLog`'s return produces -- so this function's whole
+purpose is "when scoring hasn't succeeded, do X" (two further calls,
+`slot70(self, 0x10)`/`slot94(self)`, whose own purpose is not established
+past that gate). Named for the guard condition rather than guessing what
+the two calls display.

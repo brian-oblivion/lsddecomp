@@ -42,3 +42,13 @@ Matched on the first attempt with no residues.
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py GraphRoomObj__UpdateFromLog   # 57/57
 ```
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__UpdateFromLog`** -- tier B. Own vtable slot +0x05C.
+Fetches the day-log's current data (`dayLog->methods->getData`),
+conditionally toggles the first graph point, then always calls the
+class's own `tick` slot (`GraphRoomObj__TickHighlight`). Named for what it
+does (pulls from the log, then drives the tick), not a confirmed in-game
+trigger point (e.g. "on room enter" is plausible but not proven from the
+body alone).

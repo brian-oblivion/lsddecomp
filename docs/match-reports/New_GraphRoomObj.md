@@ -44,3 +44,11 @@ matched.
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py New_GraphRoomObj   # 24/24
 ```
+
+## Naming (round 75, track 3)
+
+**`New_GraphRoomObj`** -- tier B. `New_X`-shaped allocator (allocate
+`0x244` bytes, null-check, dispatch the ctor slot) for the class named
+`GraphRoomObj` this round -- see `src/class_3bb8c_t.c`'s own header
+comment for the class-identity evidence (loads "ETC\HGRAPH.TIM", builds
+100 coloured points from a day-type ring).

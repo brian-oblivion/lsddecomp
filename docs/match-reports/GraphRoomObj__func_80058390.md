@@ -51,3 +51,12 @@ Names `D_80087AACObj::unk_0x38` (additive split of the class struct's pad).
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py GraphRoomObj__func_80058390   # 29/29
 ```
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__func_80058390`** -- tier C. Own vtable slot +0x044
+(`tools/classtable.py gGraphRoomMethods`), so the `Class__func_xxxxx` form
+applies now that the class is named. Body: chains through the base
+class's own +0x044 slot, then returns `unk_0x38` if `scored == 0`, else
+the literal `2`. No caller in this unit and no field/return semantics
+strong enough to name past that -- kept `func_`.

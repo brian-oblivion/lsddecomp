@@ -195,3 +195,12 @@ verdict to correct):
 Round 19 fourth pass, runner delta. Cold ground, no prior attempt.
 MATCHED 108/108 on the first full derivation, after the three levers
 above closed the residues found while verifying against the real oracle.
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__PopulateGraphPoints`** -- tier B. Own vtable slot +0x0E0.
+Fetches the day-log, scores it (`GraphRoomObj__ScoreDayLog`), then walks
+the day ring backwards computing each `{x, y}` point and dispatching it to
+the matching `points[i]`'s `setPosition` slot -- the function that
+actually lays the graph's dots out on screen, matching the class's own
+identity evidence.

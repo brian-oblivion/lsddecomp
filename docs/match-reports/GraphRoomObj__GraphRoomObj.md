@@ -60,3 +60,10 @@ directly at both use sites matched exactly.
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py GraphRoomObj__GraphRoomObj   # 44/44
 ```
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__GraphRoomObj`** -- tier B. `Class__Class` ctor
+convention; this IS `GraphRoomObj`'s own vtable slot +0x008
+(`tools/classtable.py gGraphRoomMethods`). Class identity: see
+`src/class_3bb8c_t.c`'s header comment.

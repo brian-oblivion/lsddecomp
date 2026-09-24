@@ -61,3 +61,13 @@ constant N` learning.
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py GraphRoomObj__TickHighlight   # 52/52
 ```
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__TickHighlight`** -- tier B. Own vtable slot +0x124
+(`tools/classtable.py gGraphRoomMethods` -- the class's own highest slot,
+past the inherited range). Four nested guards gate a single call through
+`points[idx]->methods->highlight`, advancing `highlightCount` (0..3) once
+per `elapsedHours % 24 == 0` tick once `elapsedHours >= 0x1F` -- reads as
+"once a day, once the room has been open long enough, highlight the next
+ScoreDayLog match" (in-game trigger cadence not independently confirmed).

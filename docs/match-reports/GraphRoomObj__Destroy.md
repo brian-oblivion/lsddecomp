@@ -38,3 +38,11 @@ chains to the shared base class's own dtor (`+0x0DC`).
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py GraphRoomObj__Destroy   # 34/34
 ```
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__Destroy`** -- tier A. Own vtable slot +0x0DC, confirmed
+via `tools/classtable.py gGraphRoomMethods` as the class's dtor slot, and
+its body's final act is chaining to the base class's own dtor
+(`Get_vtable_TaskCore()->slotDC(self)`) after tearing down every `points`
+entry -- the standard dtor shape.

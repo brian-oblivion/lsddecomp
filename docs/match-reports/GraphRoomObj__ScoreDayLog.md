@@ -222,3 +222,12 @@ re-verify with the whole-image oracle before believing a per-function
 score, since two of the four confirmed regressions here only showed up
 as `build exit=2` plus a length/drift warning, not as a wrong per-function
 byte count.
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__ScoreDayLog`** -- tier B (name carried over verbatim from
+its round-41 provenance, `func_800585B4` -> `GraphRoomObj__ScoreDayLog` via
+`tools/rename.py` this round). Scans the day-log's 365-entry ring for four
+fixed day-type targets (`D_80087BD4`) and records, per target, the most
+recent matching day index into `matchedDayIndices` -- exactly "scoring"
+the log against those four targets, feeding `GraphRoomObj__TickHighlight`.

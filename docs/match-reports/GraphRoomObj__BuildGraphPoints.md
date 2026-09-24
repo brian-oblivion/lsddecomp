@@ -187,3 +187,11 @@ void GraphRoomObj__BuildGraphPoints(D_80087AACObj *self) {
 Round 17, runner alpha (killed mid-attempt, recovered by the head per
 PARALLEL-RUNS §4c). Round 19 fourth pass, runner delta: corrected the
 staffing mislabeling, fixed the decrement-order bug, MATCHED 56/56.
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__BuildGraphPoints`** -- tier B. Own vtable slot +0x0D8.
+Builds the 100-entry `points` array of small coloured `New_ClassEAC0`
+objects that the graph plots dream-history onto (see class header
+comment); also allocates the 4-byte `matchedDayIndices` scratch buffer
+`GraphRoomObj__ScoreDayLog` later fills in.
