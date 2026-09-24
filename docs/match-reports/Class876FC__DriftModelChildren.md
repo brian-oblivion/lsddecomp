@@ -323,3 +323,13 @@ of `INCLUDE_ASM`: 117/121 words match, no address drift (positional skeleton
 diffs 4, all four inside the function's own window), confirming the figures
 above are current. `./build-and-verify.sh` and `tools/check-nonmatching.sh`
 both green with the body in its NON_MATCHING branch.
+
+## Extern arity (head, round 75)
+
+`tools/externcheck.py` flagged this function once it matched: the definition
+takes one parameter and the file's forward `extern` is unprototyped, because
+`Class876FC__UpdateByKind` calls it as `(self, pos)`. Measured: the body writes
+`$a1` (`move a1,zero`) before any read, and retail's caller emits `move a1,s1`
+in the `jal` delay slot at 0x800566D8, so the dead second argument is
+byte-load-bearing. Same idiom as the three sibling externs above it; annotated
+`/* arity-ok */` rather than changed.

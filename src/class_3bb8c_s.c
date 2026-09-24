@@ -113,7 +113,7 @@ extern void NoOpIgnoreArgs();
 extern void LinkOwnerObj__func_56e1c(); /* arity-ok: definition is 1-parameter and the body WRITES $a1/$a2/$a3 to zero before any read, but Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056624 */
 extern void LinkOwnerObj__RandomizeLinks(); /* arity-ok: definition is 1-parameter and the body reads only $a0 (`addiu s0,a0,136`), but Class876FC__UpdateByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` at 0x800566FC */
 extern void Class876FC__BuildRandomSprites(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body reading only $a0 (`move s1,a0`); Class876FC__InitByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,zero` at 0x80056614 */
-extern void Class876FC__DriftModelChildren();
+extern void Class876FC__DriftModelChildren(); /* arity-ok: the definition is 1-parameter and LIVES IN THIS FILE (below, ROM-later), the body writing $a1 (`move a1,zero`) before any read; Class876FC__UpdateByKind's dead 2nd argument is byte-load-bearing -- retail emits `move a1,s1` in the jal delay slot at 0x800566D8 (round 75) */
 
 /* class_3bb8c_p.c; fully prototyped since every call site here uses all
  * three arguments for real. */
