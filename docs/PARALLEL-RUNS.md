@@ -119,6 +119,8 @@ tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alp
    - Never `pkill -f <tool name>`; it kills every runner's search. Kill by a
      PID you captured, or scope to your own worktree path.
    - Log paths carry the runner name: `/tmp/<name>_b.log`, never `/tmp/b.log`.
+     The session scratchpad is shared too (subagents inherit it): helpers
+     and outputs go under `<scratchpad>/<name>/` (round 73).
    - Bound every long search with `timeout`, and write its exit status to its
      OWN file, because a multiprocessing search's shutdown noise races an
      `echo` on a shared descriptor (archive §2b, round 48):
@@ -369,6 +371,9 @@ carries the old names; the link then fails on `undefined reference to
 func_OLD` from whichever unit has an `INCLUDE_ASM` calling the renamed
 function. Gate 0 covers this at the START of a round, not at merge (round 50,
 merging `runner/charlie`: `src/code_55dd4.c` against `func_8001E770`).
+`make extract` also regenerates `config/gp-symbols.txt`, and every object
+depends on it, so a changed file recompiles what it must; commit it if
+`git status` shows it (round 73's red merge was that file stale by hand).
 
 **Do not pipe `build-and-verify.sh` into `tail`/`head` to read its tail.**
 `$?` is then the PIPE's last command and is always 0, which is the "necessary
@@ -388,16 +393,10 @@ worktree with an unmerged commit by chaining the command onto a push):
 
 ```sh
 tools/teardown-worktree.sh <name>            # refuses unless merged, clean, idle
-python3 tools/externcheck.py                 # after any round that MATCHED: externs vs new signatures
+python3 tools/externcheck.py                 # after any round that MATCHED (archive §3.9: arity is invisible to bytes)
 python3 tools/stalesyms.py --fix             # after any round that RENAMED: outstanding preserved bodies link again
 git status --porcelain && ./build-and-verify.sh && git push origin main
 ```
-
-`externcheck.py` exists because a wrong `extern` arity is invisible to the
-byte oracle: the callee reads registers the caller already left loaded
-(round 57, `func_8001E7BC` declared `(void)` and called with none while
-taking three). A match is the first moment a real signature exists to check
-against.
 
 Escalate to the operator, never act yourself, on: any toolchain or flag
 change; a branch that fails to verify after claimed matches; a runner that
@@ -451,7 +450,7 @@ with the largest queue.
 > no hit is a fresh build that does not match yet. The `*** [….o]` pattern is
 > load-bearing: GCC 2.6.3 prints most fatal errors without the word `error`.
 > funcdiff exits 2 when it cannot trust its own number; read its warnings.
-> Your log path carries YOUR name; `/tmp` is shared.
+> Your log path carries YOUR name; `/tmp` and the scratchpad are shared.
 >
 > **Revisit?** If your brief says REVISIT, first rebuild the preserved body
 > exactly as the report gives it and record `funcdiff.py`'s `insertions /

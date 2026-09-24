@@ -19,10 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 13 (2026-09-23, after rounds 69 and 70: Sony code inside
-game segments is library at function grain, measured by tools, and belongs
-to track 2, not to tracks 1, 1b or 3).
-Changing the plan is a Fable head task; record the change in
+Plan revision: 14 (2026-09-24, after rounds 71 to 73: shape leads join the
+function-grain library set, a second revisit once the first ones run out,
+the premium role replaces "Fable", the default runner cap is five).
+Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
 ## 1. What done means
@@ -52,17 +52,24 @@ the SDK" is a goal. Done is all five of:
 
 | role | default | switch, and to what |
 | --- | --- | --- |
-| **head** | Opus | **Fable** only when the round itself will WRITE a new procedure or tool or change a RULE in a doc, or must adjudicate a HARD RULE tension or a toolchain lead. Escalated gaps are NOT a reason for the next round's head to be Fable: the operator hands them to a Fable session BETWEEN rounds, which revises this plan and the tools, and the next round runs on Opus again. An Opus head executes what is written and escalates every gap in its report instead of writing procedure (round 50 onward). MAINTAINING a doc within its existing rules (distilling entries to the archive to meet a budget, fixing a stale figure) is not a plan change: the head does it, or spawns a Sonnet for it, when `plan.py` warns. |
+| **head** | Opus | **premium** only when the round itself will WRITE a new procedure or tool or change a RULE in a doc, or must adjudicate a HARD RULE tension or a toolchain lead. Escalated gaps are NOT a reason for the next round's head to be premium: the operator hands them to a premium session BETWEEN rounds, which revises this plan and the tools, and the next round runs on Opus again. An Opus head executes what is written and escalates every gap in its report instead of writing procedure (round 50 onward). MAINTAINING a doc within its existing rules (distilling entries to the archive to meet a budget, fixing a stale figure) is not a plan change: the head does it, or spawns a Sonnet for it, when `plan.py` warns. |
 | **matching runner** (tracks 1, revisit) | decided by calibration: `plan.py` says which | round A Sonnet, round B Opus, on comparably ranked stalls; thereafter whichever produced more matches per runner-session. The head may override with `plan.py set-model`, with a reason in PROGRESS.md. |
 | **naming runner** (track 3) | Opus | **Sonnet** once the head has reviewed two Opus-named units and found no wrong tier-A name. Back to Opus if a Sonnet unit fails review. |
 | **mechanical runner** (track 2 identification, track 1b promotion, report hygiene) | Sonnet | never higher |
-| **types runner** (track 4) | Opus | head (Fable) does the first class itself |
+| **types runner** (track 4) | Opus | a premium head does the first class itself |
 
-Fable never runs as a runner. The head spawns runners with the Agent tool's
-`model` parameter. **The head states its own model in its first message; if
-this table says the round needs Fable and it is running as Opus, it says so
-and stops before spawning anything.** The operator's runner cap in the pasted
-prompt is binding; with none stated, use three.
+**Premium is a role, not a model name: head agent (Opus 5.5)** today, the
+strongest model the operator has (it replaced Fable 5.1 in revision 14; the
+next swap edits this line and `plan.py`'s `PREMIUM`). A session is premium
+because the operator started it as one, with the plan-change mandate, not
+because of its model string, so it stays distinct from an ordinary Opus head
+even on the same model. A premium session never runs as a runner. The head
+spawns runners with the Agent tool's `model` parameter. **The head states its
+own model and role in its first message; if this table says the round needs a
+premium head and the operator did not start it as one, it says so and stops
+before spawning anything.** The operator's runner cap in the pasted prompt is
+binding; with none stated, use five (PARALLEL-RUNS §4 still says stay at three
+when the head takes a substantial task itself).
 
 ## 3. Tracks
 
@@ -124,7 +131,10 @@ MATCHED), in the same commit as the attempt. The head checks it at merge:
 every attempted function's report must no longer carry a marker. Rounds 49
 to 52 re-ranked the queue on markers nobody had retired.
 
-**Revisit rule.** Every stall gets exactly ONE revisit: a fresh Opus re-read
+**Revisit rule.** Every stall gets ONE revisit, and a second once every stall
+has had its first (revision 14: revisits paid 40/60 against the band's 1/13,
+so the re-read, not the band, is what track 1 now is; `plan.py` labels those
+jobs `REVISIT-2`). A revisit is a fresh Opus re-read
 in cost order, with the preserved body rebuilt first so `funcdiff.py`'s
 `insertions / deletions` line is recorded before anything else. Read it as
 a pointer, not a verdict: a title claiming register identity with a nonzero
@@ -134,8 +144,8 @@ alignment on a loop nest's repeating instruction skeleton (round 63 measured
 diffs and reports 0/0 when those are zero. `plan.py` lists every stall whose report has no
 `REVISITED` line; the runner writes `REVISITED, round N: <outcome>;
 names/types <used | not relevant>` and that retires it. This is what remains
-of track 1 after the stop rule parks the band: one revisit runner per round
-until every stall has had its one. The rule was first written to test whether
+of track 1 after the stop rule parks the band: revisit jobs in the
+round-robin until every stall has had its two. The rule was first written to test whether
 a unit's new names unlock old stalls, then gated on stale titles; three
 consecutive revisits recorded names as not relevant while the revisits paid
 3 matches in 7 attempts against the band's 1 in 13, so the trigger is gone and
@@ -211,8 +221,14 @@ fingerprint in `config/sdk-in-game.txt` (generated: `sdkname.py --game
 name), or an `identified` comment on its symbols entry (position plus header
 or strings, recorded by the evidence rule below). Such a function leaves the
 game counts and every track 1, 1b and 3 queue, and a game-style name on one
-(`SetSeqTimerMode` for `SsSetTickMode`) counts as unnamed here. Renaming onto
+(a game-worded name for Sony's) counts as unnamed here. Renaming onto
 a pinned name is byte-identical and keeps the ld fragment current (measured).
+The generated file also carries LEAD lines: no exact fingerprint, but shape
+>= 0.90 at >= 40 words, the cliff below which only unrelated stubs score
+(revision 14; every lead above it was libsnd). A lead counts as library until
+the runner either identifies it (comment line with `identified`, rename; any
+Sony name the evidence settles on closes it) or rejects it with a
+`// not SDK: <reason>` comment line above its symbols entry.
 
 **The tool:** `.venv/bin/python3 tools/sdkname.py <func>...` (or `--all`)
 scores each unnamed SDK function against every function in every object on
@@ -342,8 +358,10 @@ those, oracle), then `make extract` (the symbols file changed) and the
 oracle.
 
 **Head review before `mark-unit`.** Sample five names per unit against their
-evidence. A tier-A name without evidence, or a name that asserts purpose
-from a single call, sends the unit back. Two clean Opus units in a row and
+evidence. A tier-A name without evidence, a name that asserts purpose
+from a single call, or a class prefix `classtable.py` contradicts (round
+73: methods named for an address inside another class's table) sends the
+unit back. Two clean Opus units in a row and
 the naming runner becomes Sonnet (`plan.py set-model --role naming_runner
 --model sonnet`); one Sonnet unit sent back and it goes back to Opus. Then:
 
@@ -371,7 +389,7 @@ header's related declarations, delete the local views, build. This edit is
 non-local by construction: the oracle is the only check, so one class per
 commit and the whole oracle after each.
 
-**Staffing.** The head does the first class itself (Fable, new procedure)
+**Staffing.** The head does the first class itself (premium, new procedure)
 and writes the recipe here. Then Opus runners, one class each, but a class
 merge touches several units, so classes are merged SEQUENTIALLY, never two
 runners at once. **Park rule:** two views that disagree on a field's type at
@@ -398,7 +416,7 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 > Say which model you are running as. Read `docs/FINISHING-PLAN.md`, then
 > `docs/PARALLEL-RUNS.md`, then CLAUDE.md. Run Gate 0 (PARALLEL-RUNS §3.2) and
 > `python3 tools/plan.py`. If the top jobs need a model this table says you are
-> not, stop and tell me. Otherwise fill at most `<K, or 3 if I did not say>`
+> not, stop and tell me. Otherwise fill at most `<K, or 5 if I did not say>`
 > runner slots from the top of the ready-jobs list, one unit per runner,
 > checking header contention, and spawn each with its track's prompt from
 > FINISHING-PLAN §4 (matching: PARALLEL-RUNS §5) on the model the list names.
@@ -530,7 +548,7 @@ this repo from following:
 
 ## 6. When to reconsider the plan
 
-Reconsider, as a Fable head task recorded in PROGRESS.md with the revision
+Reconsider, as a premium head task recorded in PROGRESS.md with the revision
 line above bumped, when any of these happens:
 
 - a stop rule fires and the operator wants the track reopened anyway;

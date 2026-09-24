@@ -38,8 +38,15 @@ def main():
             sys.exit(f'{OUT} is stale -- run python3 tools/gpsyms.py')
         print(f'OK: {OUT} current ({len(syms)} symbols)')
         return
-    open(OUT, 'w').write(body)
-    print(f'wrote {OUT}: {len(syms)} symbols')
+    try:
+        cur = open(OUT).read()
+    except FileNotFoundError:
+        cur = ''
+    if cur != body:   # untouched when current: every object depends on its mtime
+        open(OUT, 'w').write(body)
+        print(f'wrote {OUT}: {len(syms)} symbols')
+    else:
+        print(f'{OUT} current ({len(syms)} symbols)')
     # every gp_rel target retail uses must be in the list
     targets = set()
     for f in glob.glob('asm/**/*.s', recursive=True):

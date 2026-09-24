@@ -3130,6 +3130,54 @@ screen flags `psyq_33808` (76 of 113 in tables), `psyq_10ee0`,
 re-segmentation is made on this evidence. It needs a per-function audit,
 whose `jal` half is now clean.
 
+**Revision 14 (2026-09-24, after rounds 71 to 73).** Two operator decisions
+and seven head escalations. The operator's decisions: "Fable" becomes the
+PREMIUM role, head agent (Opus 5.5) today. It is defined once in FINISHING-PLAN
+§2 as a mandate the operator grants, so it stays distinct from an ordinary
+Opus head on the same model, and `plan.py`'s `PREMIUM` is the one line a
+future swap edits. The default runner cap is now five in §2, §4.1 and
+`plan.py`. The escalations, each measured before acting:
+- Round 71's first held and was worse than reported. A function renamed onto
+  its ld pin links as `A`, and label aliases at the same address
+  (`CD_sync.NON_MATCHING`) hid it even from an `A`-aware reader.
+  `text_symbols()` now takes `A` symbols inside the text range at addresses
+  no real function names, so library goes 483 -> 504 and the game queue
+  66 -> 56.
+- Round 73's K&R finding held too. `progress.DEF_RE` accepts indented
+  parameter-declaration lines and is shared by plan.py, headercontention and
+  externcheck, so matched reads 1127 -> 1129.
+- Round 71's second and round 73's third are one gap. Leads, measured over
+  every game-segment function, show a cliff at shape 0.90 and 40 words:
+  above it all 23 are libsnd (vmanager, seqread, ssinit), below it only stubs
+  of 18 words or fewer, against unrelated libraries. So `sdkname.py --game`
+  writes those as LEAD lines, and `progress.py` counts them as library until
+  track 2 identifies or rejects each (`// not SDK:`). Game code goes 1195 ->
+  1162, and track 2 reopens with 25 functions. Two of round 73's sixteen
+  revisit matches are among them (`func_8002E138` is SePitchBend,
+  `func_8002E308` is SeAutoVol), and so is plan.py's top revisit job
+  `func_8002D8E0` (vmNoiseOn), which the head was about to staff.
+  `func_80030E90` (round 70/71's "strongest match lead") scores 1.00 against
+  SsUtKeyOn and leaves the matching question for good.
+- `sdkname.py`'s ranking now always carries and flags the best-SHAPE row,
+  which is what round 73's head missed by reading the top line.
+  `sdk-in-game.txt` skips pinned addresses, so a rename onto a pin no longer
+  makes it stale.
+- `rename.py`: a symbols-file comment no longer blocks a name, since only an
+  entry counts. A local of the same name in a file that never mentions OLD
+  gets a note rather than a refusal. A prose line that already names NEW is
+  left alone and listed (round 71's "getintr, libcd `getintr`").
+- `make extract` regenerates `gp-symbols.txt` (written only on change),
+  and every object depends on it. PARALLEL-RUNS §2.7 names the shared
+  scratchpad.
+- Track 1's stop rule: the band stays parked, but a stall whose one revisit
+  failed gets a second once the first-revisit queue is empty (`REVISIT-2`
+  in `plan.py`). 33 first revisits remain.
+- Naming model: a class prefix that `classtable.py` contradicts is now a
+  send-back, going forward only, so the naming runner stays Sonnet.
+Taken with the salt the operator asked for: every escalation above held when
+measured; none was noise. Round 71's cap mismatch is moot under the new
+default.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

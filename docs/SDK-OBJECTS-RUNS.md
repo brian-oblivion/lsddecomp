@@ -22,7 +22,7 @@ still say the image matches retail after every step.
 
 ## Who does what
 
-| | head — **Fable** | runner — **Opus** |
+| | head — **premium** (FINISHING-PLAN §2) | runner — **Opus** |
 | --- | --- | --- |
 | queue | derives it (`psyq_sdk.py runs`), decides order, assigns segments | works the assigned segment's runs in address order |
 | pure `psyq_*` runs | — | **all of them**: text-only and data-bearing alike, per the guide |
@@ -87,7 +87,7 @@ figure:
 | phase | what | who | rounds |
 | --- | --- | --- | --- |
 | 1 | the pure `psyq_*` segments — **DONE 2026-09-11 (rounds 29–30)** except `libgs/gs_001 gs_002 gs_003`, held for the operator | four Opus runners, one at a time | 2 |
-| 2 | the 60-odd objects inside game units | head (Fable) carving, or a runner who is assigned that unit for the round | 3–4, interleaved with matching rounds |
+| 2 | the 60-odd objects inside game units | premium head carving, or a runner who is assigned that unit for the round | 3–4, interleaved with matching rounds |
 | 3 | naming pass for the 426 functions no disc places (name from the shape-matched module, bytes stay asm) | one cheap runner with `psyq_sdk.py symbols` | 1 |
 
 **Phase 2 status, round 34 (2026-09-12): DONE except two items.** The head
@@ -223,7 +223,7 @@ attached slots it has not pre-measured, `localize=`, shadows, anything
 > as it stands at the end. Leave your worktree with `git status --porcelain`
 > empty.
 
-## Head prompt (operator pastes this to Fable)
+## Head prompt (operator pastes this to a premium session, FINISHING-PLAN §2)
 
 > Act as the head for an SDK-object conversion round per
 > docs/SDK-OBJECTS-RUNS.md. First measure: `python3 tools/progress.py`,

@@ -68,7 +68,7 @@ def build_map():
     return {u: unit_headers(u) for u in srcpath.units()}
 
 
-DEF_RE = re.compile(r"^\w[^;=]*?\b(\w+)\s*\([^;{]*\)\s*\{", re.M)
+from progress import DEF_RE  # noqa: E402  (K&R-aware, round 73)
 
 
 def call_contention(units):

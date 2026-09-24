@@ -48,3 +48,34 @@
 0x80035A7C     44  libsnd/seqread:SetPitchBend@3.3
 0x80035B2C    213  libsnd/seqread:GetMetaEvent@3.3 libsnd/seqread:_SsGetMetaEvent@3.5
 0x80035E80     47  libsnd/seqread:ReadDeltaValue@3.3
+#
+# LEADS: no exact fingerprint, but shape >= 0.9 against one SDK function at
+# >= 40 words (or bracketed by placed objects of its library). Counted as
+# library, and so out of every matching and naming queue, until track 2
+# confirms one (`identified` symbols comment, rename) or rejects it with a
+# `// not SDK: <reason>` comment line above its symbols entry.
+# LEAD vram   words  shape  best candidate (module:function)
+LEAD 0x80029478    337  0.92  libcd/bios:getintr
+LEAD 0x8002CF18    167  0.98  libsnd/vmanager:SpuVmAlloc
+LEAD 0x8002D1B4    316  0.99  libsnd/vmanager:SpuVmKeyOnNow
+LEAD 0x8002D6A4    143  0.99  libsnd/vmanager:SpuVmDoAllocate
+LEAD 0x8002D8E0    311  0.98  libsnd/vmanager:vmNoiseOn
+LEAD 0x8002DDBC    112  0.96  libsnd/vmanager:vmNoiseOn2
+LEAD 0x8002E138    112  0.99  libsnd/vmanager:SePitchBend
+LEAD 0x8002E308    116  0.97  libsnd/vmanager:SeAutoVol
+LEAD 0x8002E4D8    231  0.99  libsnd/vmanager:SetAutoVol
+LEAD 0x8002E874    116  0.97  libsnd/vmanager:SeAutoVol
+LEAD 0x8002EA44    228  0.99  libsnd/vmanager:SetAutoPan
+LEAD 0x8002EDD4    270  0.95  libsnd/vmanager:SpuVmInit
+LEAD 0x8002F2A4     49  0.97  libsnd/vmanager:SpuVmNoiseOff
+LEAD 0x800300D0    131  0.93  libsnd/vmanager:SpuVmKeyOff
+LEAD 0x80030E90    252  1.00  libsnd/vmanager:SsUtKeyOn
+LEAD 0x80031280    135  0.96  libsnd/vmanager:SsUtKeyOff
+LEAD 0x8003149C    253  0.95  libsnd/vmanager:SsUtKeyOnV
+LEAD 0x80031890     73  0.98  libsnd/vmanager:SsUtKeyOffV
+LEAD 0x80031A44     88  0.99  libsnd/vmanager:SsUtChangePitch
+LEAD 0x80031BA4     61  0.98  libsnd/vmanager:SsUtChangeADSR
+LEAD 0x80031F3C    131  0.95  libsnd/vmanager:SsUtAllKeyOff
+LEAD 0x8003221C     83  0.99  libsnd/ssinit:_SsInit
+LEAD 0x80034690    200  0.99  libsnd/seqread:_SsSetControlChange
+LEAD 0x80050B28     12  1.00  libcard/card:_card_clear

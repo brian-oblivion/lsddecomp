@@ -2956,3 +2956,12 @@ invalid.
 > lever, warning or brief correction the moment you have it, and `read` it at
 > every triage for the runners' own posts and questions. Runners are told to
 > read it before each function and to post levers and negatives immediately.
+
+
+## §3.9 addendum (distilled 2026-09-24, plan revision 14)
+
+`externcheck.py` exists because a wrong `extern` arity is invisible to the
+byte oracle: the callee reads registers the caller already left loaded
+(round 57, `func_8001E7BC` declared `(void)` and called with none while
+taking three). A match is the first moment a real signature exists to check
+against.

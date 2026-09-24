@@ -34,7 +34,8 @@ import srcpath   # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 EXTERN_RE = re.compile(r"^\s*extern\s+[^;=(]*?\b(\w+)\s*\(([^;]*?)\)\s*;", re.M)
-DEF_RE = re.compile(r"^\w[^;=]*?\b(\w+)\s*\(([^;{]*)\)\s*\{", re.M)
+# K&R declaration lines between `)` and `{` (func_80017B34, round 73).
+DEF_RE = re.compile(r"^\w[^;=]*?\b(\w+)\s*\(([^;{]*)\)(?:[ \t]*\n[ \t]+[A-Za-z_][^;{}()\n]*;)*\s*\{", re.M)
 NOT_DEF = {"if", "while", "for", "switch", "do", "return", "sizeof"}
 
 

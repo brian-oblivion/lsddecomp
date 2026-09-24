@@ -17,7 +17,8 @@ PLAN.md, track 3) is hundreds of renames, so this has to be one command.
 WHAT IT DOES, in order:
   1. resolves OLD's address: from the name if it is a splat placeholder
      (`func_800XXXXX`, `D_800XXXXX`), else from the symbols file;
-  2. refuses if NEW is not a C identifier, is already used anywhere, or is a
+  2. refuses if NEW is not a C identifier, is already a symbol or visible where
+     OLD is used (an unrelated local elsewhere is only noted), or is a
      splat placeholder spelling;
   3. rewrites the symbols file (replaces OLD's line, or appends a line for a
      placeholder that had none) and every whole-word OLD in src/, include/,
@@ -106,7 +107,9 @@ def name_in_use(name):
                 prose.append(rel)
         elif pat.search(text):
             prose.append(rel)
-    if pat.search(SYMBOLS.read_text()):
+    # An ENTRY, not a mention: a comment naming NEW as the identification
+    # being applied blocked round 71's track-2 renames again and again.
+    if re.search(rf"^\s*{re.escape(name)}\s*=", SYMBOLS.read_text(), re.M):
         code.append(str(SYMBOLS.relative_to(ROOT)))
     for p in ROOT.glob("asm/**/*.s"):
         if re.search(rf"^glabel {re.escape(name)}$|^dlabel {re.escape(name)}$",
@@ -175,8 +178,25 @@ def main():
         sys.exit(f"FATAL: {old!r} resolves to {addr:#x}, outside the image")
 
     code_hits, prose_hits = name_in_use(new)
-    if code_hits:
-        sys.exit(f"FATAL: {new!r} already exists in code: " + ", ".join(code_hits[:6]))
+    # A code hit is a COLLISION only if NEW is a symbol (symbols entry, asm
+    # label, a definition or file-scope declaration) or shares a file with OLD,
+    # where a local named NEW would shadow the renamed function. Otherwise it
+    # is an unrelated local (`callback`, round 71) and the link decides.
+    oldpat = re.compile(rf"\b{re.escape(old)}\b")
+    scope = re.compile(rf"^\w[^;=(]*\b{re.escape(new)}\b\s*(\(|;|\[|=)", re.M)
+    hard, soft = [], []
+    for rel in code_hits:
+        p = ROOT / rel
+        if not rel.startswith(("src/", "include/")):
+            hard.append(rel)
+            continue
+        t = re.sub(r"/\*.*?\*/", "", p.read_text(errors="replace"), flags=re.S)
+        (hard if scope.search(t) or oldpat.search(t) else soft).append(rel)
+    if hard:
+        sys.exit(f"FATAL: {new!r} already exists in code: " + ", ".join(hard[:6]))
+    if soft:
+        print(f"note: {new!r} is a local identifier in {len(soft)} file(s) that never reference "
+              f"{old!r} ({', '.join(soft[:3])}); not a collision, the build decides.")
     if prose_hits:
         print(f"note: {new!r} already appears in prose ({len(prose_hits)} file(s): "
               + ", ".join(prose_hits[:3]) + "); those mentions are left as they are.")
@@ -217,9 +237,24 @@ def main():
 
     # 3. every other file
     vacuous = re.compile(rf"\b{re.escape(new)}\b\s*(->|→|=>)\s*\b{re.escape(new)}\b")
+    newpat = re.compile(rf"\b{re.escape(new)}\b")
     for p in touched:
         text = p.read_text(errors="replace")
-        text = pat.sub(new, text)
+        rel = str(p.relative_to(ROOT))
+        if rel.startswith(("src/", "include/", "config/")):
+            text = pat.sub(new, text)
+        else:
+            # Prose: a line that already names NEW is ABOUT the rename ("X is
+            # libcd's getintr"), and rewriting it reads "getintr, libcd's
+            # getintr" (round 71, twice). Leave it and say where.
+            out = []
+            for i, line in enumerate(text.split("\n"), 1):
+                if pat.search(line) and newpat.search(line):
+                    print(f"  note: {rel}:{i} names both {old} and {new}; left as written, edit by hand if needed")
+                    out.append(line)
+                else:
+                    out.append(pat.sub(new, line))
+            text = "\n".join(out)
         p.write_text(text)
         # A "PROPOSED RENAME: old -> new" note whose proposal this rename just
         # applied now reads "new -> new" (round 67, code_8220.h). The rewrite

@@ -51,9 +51,13 @@ STATE = ROOT / "config/plan-state.json"
 REPORTS = ROOT / "docs/match-reports"
 
 # --- the model table (mirrors FINISHING-PLAN.md; the doc is the authority) ---
+# "premium" is a ROLE, not a model: the strongest model available, for a head
+# that writes procedure and for the between-round plan session. Revision 14
+# (2026-09-24): Opus 5.5, replacing Fable 5.1. A later swap edits this line.
+PREMIUM = "opus-5.5"
 MODELS = {
     "head": "opus",
-    "head_when_new_procedure": "fable",
+    "head_when_new_procedure": f"premium ({PREMIUM})",
     "match_runner_default": "sonnet",
     "naming_runner_default": "opus",
     "mechanical_runner": "sonnet",
@@ -100,7 +104,7 @@ DEFAULT_STATE = {
 # A splat placeholder, or the tier-C method form `Class__func_xxxxx` that keeps
 # the address in the name: both count as NOT YET NAMED (FINISHING-PLAN track 3).
 FUNC_PH = re.compile(r"^(?:\w+__)?func_(?:800)?[0-9A-Fa-f]{5}$")
-DEF_RE = re.compile(r"^\w[^;=]*?\b(\w+)\s*\([^;{]*\)\s*\{", re.M)
+DEF_RE = progress.DEF_RE
 NOT_DEF = {"if", "while", "for", "switch", "do", "return", "sizeof"}
 
 
@@ -259,11 +263,14 @@ def sdk_surface(info, units):
     # carries one of its candidates' Sony names, however readable the game-style
     # name it has now (SetSeqTimerMode is libsnd's SsSetTickMode).
     by_addr = {a: n for n, (a, _) in progress.text_symbols().items()}
+    cmts = progress.symbol_comments()
     for a, cands in sorted(sony.items()):
         name = by_addr.get(a)
-        if name is None:
-            continue
-        if name in cands:
+        if name is None or a not in progress.SONY_IN_GAME:
+            continue            # a lead rejected with `// not SDK:`
+        # A lead is closed by its `identified` comment, whatever Sony name the
+        # evidence settled on (StartNote is SpuVmKeyOn, not the shape's pick).
+        if name in cands or (not FUNC_PH.match(name) and progress.IDENTIFIED_RE.search(cmts.get(a, ""))):
             if name not in named:
                 named.append(name)
         elif name not in closed and name not in unnamed:
@@ -277,11 +284,25 @@ def sdk_in_game_names():
     out = {a: {n} for a, n in progress.ld_pinned_externals().items()}
     if progress.SDK_IN_GAME.exists():
         for line in progress.SDK_IN_GAME.read_text().splitlines():
-            m = re.match(r"^(0x[0-9A-Fa-f]{8})\s+\d+\s+(.*)$", line)
+            m = re.match(r"^(?:LEAD )?(0x[0-9A-Fa-f]{8})\s+\d+\s+(?:[01]\.\d\d\s+)?(.*)$", line)
             if m:
                 out.setdefault(int(m.group(1), 16), set()).update(
                     c.split(":", 1)[1].split("@")[0] for c in m.group(2).split())
     return out
+
+
+REVISITED_RE = re.compile(r"REVISITED[,:]?\s*\(?round (\d+)")
+
+
+def revisits_done(func):
+    """How many revisits a stall has had: distinct rounds on its REVISITED
+    lines (the line format varies; a round mentioned twice is one revisit)."""
+    p = REPORTS / f"{func}.md"
+    if not p.exists():
+        return 0
+    t = p.read_text(errors="replace")
+    n = len(set(REVISITED_RE.findall(t)))
+    return n if n else (1 if "REVISITED" in t else 0)
 
 
 def report_state(func):
@@ -427,9 +448,15 @@ def collect(st):
     # re-read was. The runner's REVISITED line retires a function.
     revisit = []
     for words, unit, func, title in stall_rows:
-        rp = REPORTS / f"{func}.md"
-        if rp.exists() and "REVISITED" not in rp.read_text(errors="replace"):
+        if revisits_done(func) == 0:
             revisit.append((words, unit, func, title))
+    # Revision 14: revisits paid 40/60 against the band's 1/13, so a stall
+    # whose one revisit did not close it gets ONE more, once every stall has
+    # had its first. Same cost order; a second REVISITED line retires it.
+    revisit_label = "REVISIT"
+    if not revisit:
+        revisit = [r for r in stall_rows if revisits_done(r[2]) == 1]
+        revisit_label = "REVISIT-2"
     # A function eligible for a revisit is offered ONLY there, so the two
     # track-1 queues never hand the same function to two runners.
     rv = {f for _, _, f, _ in revisit}
@@ -491,7 +518,7 @@ def collect(st):
         "docs": docs,
         "units": units,
         "_fresh": fresh_funcs, "_stalls": stall_rows, "_promotable": promotable,
-        "_todo3": todo3, "_revisit": revisit,
+        "_todo3": todo3, "_revisit": revisit, "_revisit_label": revisit_label,
     }
 
 
@@ -565,7 +592,7 @@ def jobs(d, n):
             q_sdk.append(("2", f"identify and name {t['2']['unnamed']} SDK functions game code calls "
                                f"(one runner, batch; list: plan.py --json .tracks.2.unnamed_list)",
                           MODELS["mechanical_runner"]))
-    q_revisit = stall_runner_jobs(d["_revisit"], t["1"]["next_match_model"], "REVISIT")
+    q_revisit = stall_runner_jobs(d["_revisit"], t["1"]["next_match_model"], d["_revisit_label"])
     # One job per UNIT (a runner owns one unit; round 62's slot drew one 32w
     # function while its unit had nine promotable bodies).
     q_promote = []
@@ -611,7 +638,7 @@ def print_status(d, n, st):
     if t1["reason"]:
         print(f"                    {t1['reason']}")
     if t1["revisit"]:
-        print(f"                    {t1['revisit']} stall(s) awaiting their one REVISIT; revisit yield so far "
+        print(f"                    {t1['revisit']} stall(s) awaiting a {d['_revisit_label']}; revisit yield so far "
               f"{rv_m}/{rv_a} (matches/attempts, from rounds recorded with REVISIT in the note)")
     print(f"  1b     {t['1b']['status']:<10} NON_MATCHING bodies: {t['1b']['nm_bodies']} in src, "
           f"{t['1b']['promotable']} stall(s) with a preserved body and none yet")
@@ -631,7 +658,7 @@ def print_status(d, n, st):
         for k, v in over:
             print(f"    {k}: {v['words']} words, budget {v['budget']} (distil to docs/archive/; a reflow changes nothing here)")
         print()
-    print(f"  READY JOBS (top {n}; head fills the operator's runner cap from the top, 3 if none is stated,"
+    print(f"  READY JOBS (top {n}; head fills the operator's runner cap from the top, 5 if none is stated,"
           f" never more than 5; one unit per runner):")
     for track, desc, model in jobs(d, n):
         print(f"    [{track:<2}] {model:<7} {desc}")
@@ -665,7 +692,7 @@ def main():
     r = sub.add_parser("record-round")
     r.add_argument("--track", required=True)
     r.add_argument("--round", type=int, required=True)
-    r.add_argument("--model", required=True, choices=["sonnet", "opus", "fable"])
+    r.add_argument("--model", required=True, choices=["sonnet", "opus", "premium", "fable"])
     r.add_argument("--runners", type=int, required=True)
     r.add_argument("--attempts", type=int, required=True)
     r.add_argument("--matches", type=int, required=True)
