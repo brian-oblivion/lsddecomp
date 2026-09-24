@@ -2007,3 +2007,4 @@ Class86F88__LoadResources = 0x80051F24; // type:func
 Class86F88__ReleaseResources = 0x800520A0; // type:func
 Class86F88__AddChildAndSetState = 0x80052110; // type:func
 Class86F88__RemoveCachedChildren = 0x8005217C; // type:func
+Class86F88__SetState = 0x800521D4; // type:func

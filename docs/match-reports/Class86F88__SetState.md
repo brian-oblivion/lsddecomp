@@ -1,8 +1,10 @@
-# func_800521D4 -- MATCH
+# Class86F88__SetState -- MATCH
+
+> Renamed from `func_800521D4` on 2026-09-24 (tools/rename.py). Address 0x800521d4.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0 (checked once
 the whole unit's batch of matches was in place); whole-image SHA1 matches
-retail. `funcdiff.py func_800521D4`: 42/42 words match.
+retail. `funcdiff.py Class86F88__SetState`: 42/42 words match.
 
 This is vtable slot `+0x054` of `D_80086F88` (`Class86F88Methods::slot54`),
 dispatched by `func_8005227C` (this unit) as `self->methods->slot54(self, 4)`.
@@ -10,7 +12,7 @@ dispatched by `func_8005227C` (this unit) as `self->methods->slot54(self, 4)`.
 ## Source
 
 ```c
-void func_800521D4(Class86F88 *self, s32 state)
+void Class86F88__SetState(Class86F88 *self, s32 state)
 {
     self->unk30 = 0;
     if (state < 2) {

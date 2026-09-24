@@ -2869,17 +2869,17 @@ typedef struct Class86F88Elem Class86F88Elem;
 
 struct Class86F88Methods {
     u8 pad000[0x014];
-    /* +0x014, func_800521D4's own first dispatch:
+    /* +0x014, Class86F88__SetState's own first dispatch:
      * `self->methods->slot14(self, self->unk34)`. */
     void (*slot14)(Class86F88 *self, s32 arg1);
     u8 pad018[0x030 - 0x018];
-    /* +0x030, func_800521D4's `state == 4` path:
+    /* +0x030, Class86F88__SetState's `state == 4` path:
      * `self->methods->slot30(self, self->unk2C)`. */
     void (*slot30)(Class86F88 *self, s32 arg1);
     u8 pad034[0x048 - 0x034];
-    void (*slot48)(Class86F88 *self); /* +0x048, func_800521D4's own 2nd dispatch, self only */
+    void (*slot48)(Class86F88 *self); /* +0x048, Class86F88__SetState's own 2nd dispatch, self only */
     u8 pad04C[0x054 - 0x04C];
-    /* +0x054 = func_800521D4 itself (this unit, matched). Dispatched by
+    /* +0x054 = Class86F88__SetState itself (this unit, matched). Dispatched by
      * func_8005227C as `self->methods->slot54(self, 4)`. */
     void (*slot54)(Class86F88 *self, s32 state);
     u8 pad058[0x060 - 0x058];
@@ -2954,9 +2954,9 @@ struct Class86F88 {
     s32 unk20;                     /* +0x020, func_800523F0(fwd)/func_80052430/func_80052498/func_800524F8/func_80052598/func_800529FC */
     s32 unk24;                     /* +0x024, ditto */
     s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
-    s32 unk2C;                     /* +0x02C, func_8005227C/func_800521D4 */
-    s32 unk30;                     /* +0x030, func_8005227C/func_800521D4 */
-    s32 unk34;                     /* +0x034, func_800521D4's slot14 argument */
+    s32 unk2C;                     /* +0x02C, func_8005227C/Class86F88__SetState */
+    s32 unk30;                     /* +0x030, func_8005227C/Class86F88__SetState */
+    s32 unk34;                     /* +0x034, Class86F88__SetState's slot14 argument */
     u8 pad038[0x03C - 0x038];
     Class86F88 *unk3C;              /* +0x03C, func_800523F0: another instance of this same class */
     Class86F88Elem *unk40[4];       /* +0x040, func_8005278C/func_8005281C/func_800529FC */

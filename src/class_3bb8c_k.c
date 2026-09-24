@@ -115,7 +115,7 @@ struct Obj87034_3bb8c_k {
     s32 unk84;                          /* +0x084, func_80052C10: zeroed */
 };
 
-void func_800521D4(Class86F88 *self, s32 state)
+void Class86F88__SetState(Class86F88 *self, s32 state)
 {
     self->unk30 = 0;
     if (state < 2) {
