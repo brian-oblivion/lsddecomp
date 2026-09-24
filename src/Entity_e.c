@@ -313,7 +313,7 @@ void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out) {
     void (*fn)(Entity *self, s32 arg1, void *arg2);
     void *table;
 
-    if (this->unkF4 != 0) {
+    if (this->targetReached != 0) {
         this->methods->slot12C(this);
         if (this->unk84 == this->moodDuration - 1) {
             this->methods->slot130(this);
@@ -449,7 +449,7 @@ void Entity__MoodCue79(Entity *this, EntityMoodHandlerArg *out) {
         out->unk20 = 2;
     }
     this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
-    if (this->moodState == 0 && this->unkF4 != 0) {
+    if (this->moodState == 0 && this->targetReached != 0) {
         this->methods->notifyParents(this, 0xB);
         this->moodState = 0xB;
     }
@@ -481,7 +481,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0 && (rand() & 1)) {
         this->moodState = rand() % 3;
     }
-    if (this->moodState != 0 && this->unkF4 != 0) {
+    if (this->moodState != 0 && this->targetReached != 0) {
         if (out->unk4 >= 0x3D) {
             out->unk4 = 0;
         }

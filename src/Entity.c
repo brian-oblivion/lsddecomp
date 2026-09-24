@@ -276,7 +276,7 @@ void Entity__SetUnkF4(Entity *this, s32 arg1) {
     if (arg1 != 0) {
         this->methods->notifyParents(this, 9);
     }
-    this->unkF4 = arg1;
+    this->targetReached = arg1;
 }
 
 typedef struct EntityMoodHandlerRow EntityMoodHandlerRow;

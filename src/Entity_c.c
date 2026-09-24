@@ -91,7 +91,7 @@ void Entity__MoodCue23(Entity *this) {
 
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
 
-    if (this->unkF4 != 0) {
+    if (this->targetReached != 0) {
         if (this->moodTimer >= 0x41) {
             this->moodTimer = 0;
         }
@@ -259,7 +259,7 @@ void Entity__MoodCue32(Entity *this) {
 }
 
 void Entity__MoodCue33(Entity *this, EntityMoodHandlerArg *out) {
-    if (this->unkF4 != 0) {
+    if (this->targetReached != 0) {
         this->methods->updateScale(this, 1, SCALE_QUARTER);
     } else if (out->unk4 % 30 == 0) {
         out->unk10 = 0;

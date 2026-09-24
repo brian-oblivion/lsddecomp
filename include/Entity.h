@@ -322,7 +322,7 @@ struct Entity {
     /* +0xB0 */ s32 proximityDivisor;             /* divisor in Entity__GetProximityRatio's (getProximityRatio) computation, this unit */
     /* +0xB4 */ u8 padB4[0xF0 - 0xB4];
     /* +0xF0 */ s32 active;             /* set to 1 by Entity__Activate; gate flag for Entity__UpdateActivationState/Entity__UpdateDeactivationState */
-    /* +0xF4 */ s32 unkF4;             /* set from Entity__SetUnkF4's arg1 */
+    /* +0xF4 */ s32 targetReached;           /* set from Entity__SetUnkF4's arg1; latched 1 by Entity__UpdateTargetProximity once the target is within proximityRange, cleared by Entity__Deactivate; round 78 head: renamed from unkF4 by type scope */
     /* +0xF8 */ s32 soundCueActive;             /* cleared by Entity__StopSoundCue */
     /* +0xFC */ s32 moodTimer;             /* incremented by Entity__TickSoundCue */
     /* +0x100 */ Unk100Obj *unk100;      /* lazily created/cached by Entity__GetOrCreateUnk100; torn down by Entity__Destructor */

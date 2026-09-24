@@ -42,7 +42,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
 
     row = &gEntityMoodTable[this->moodIndex];
     if (this->active != 0) {
-        if (this->unkF4 == 0) {
+        if (this->targetReached == 0) {
             xptr = &this->unk14->x;
             dist = row->proximityRange;
             if (dist < 0) {
@@ -56,7 +56,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
             Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         }
     }
-    return this->unkF4;
+    return this->targetReached;
 }
 
 s32 Entity__UpdateSoundCueStart(Entity *this) {

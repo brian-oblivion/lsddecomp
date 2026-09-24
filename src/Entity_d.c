@@ -246,7 +246,7 @@ skip48:
 }
 
 void Entity__MoodCue47(Entity *this) {
-    if (this->unkF4 == 0) {
+    if (this->targetReached == 0) {
         return;
     }
     if (this->moodState == 0) {
@@ -299,7 +299,7 @@ void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
         out->unk30 = 4;
         out->unk44 = 4;
     }
-    if (this->unkF4 != 0) {
+    if (this->targetReached != 0) {
         if (this->moodState == 0) {
             this->moodState = 0xA;
             this->moodTimer = 0;

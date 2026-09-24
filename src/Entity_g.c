@@ -73,7 +73,7 @@ extern u8 SCALE_THIRTY_SECOND[];
 extern void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
 
 void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
-    if (this->unkF4 != 0) {
+    if (this->targetReached != 0) {
         if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
             this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
             this->methods->deactivate(this);
@@ -121,7 +121,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
     } else {
         this->methods->slotC4(this, -0x100, 0);
     }
-    if (this->unkF4 != 0 && this->moodState == 0) {
+    if (this->targetReached != 0 && this->moodState == 0) {
         this->moodState = 0xC;
         this->target->methods->slot130(this->target, 1);
         this->methods->notifyParents(this, 0xA);

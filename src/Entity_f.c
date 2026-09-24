@@ -264,7 +264,7 @@ void func_80063ED4(Entity *this, EntityMoodHandlerArg *out) {
 
 void func_80064078(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk7C == 0) {
-        if (this->unkF4 != 0) {
+        if (this->targetReached != 0) {
             Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
             this->methods->slot128(this, 1);
             this->target->methods->slot130(this->target, 1);
