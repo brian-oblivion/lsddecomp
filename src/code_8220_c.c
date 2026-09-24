@@ -224,19 +224,15 @@ typedef struct {
     s16 x, y;
 } Vec2s16_A64;
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 104/112 words, length exact. Residue: register identity
- * ($a2 vs $a1 for the OT mask) plus a missing load-delay-slot filler
- * `addiu $v0,$s1,0x34` = align_up_4(last touched self field + width)
- * (docs/match-reports/func_8001A064.md). Hand-derived. */
-void func_8001A064(void *arg0, void *arg1) {
+/* Returns the next packet pointer: arg0 + sizeof(POLY_GT4) = 0x34 when the
+ * primitive is spliced into the OT directly, else RCpolyGT4's own return
+ * (cast: RCpolyGT4 is declared void in code_8220.h). Same shape as
+ * func_800197C4. */
+void *func_8001A064(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
 
-    if (*(s32 *)(prim + 0x78) == 0) {
-        ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
-        (*(OtTag **)(prim + 0x30))->addr = (u32)self;
-    } else {
+    if (*(s32 *)(prim + 0x78) != 0) {
         func_8001A380(D_8008AEE8, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         func_8001A4C0(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
                       self + 0x20, self + 0x2C);
@@ -256,12 +252,12 @@ void func_8001A064(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)(prim + 0x9C) + 0x8) = *(u16 *)(self + 0x24);
         *(u16 *)(*(u8 **)(prim + 0xA0) + 0x8) = *(u16 *)(self + 0x30);
 
-        RCpolyGT4(self, D_8008AEE8);
+        return ((void *(*)(void *, void *))RCpolyGT4)(arg0, D_8008AEE8);
     }
+    ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+    (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+    return (u8 *)arg0 + 0x34;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A064);
-#endif
 
 void func_8001A224(void *arg0, void *arg1, s32 kind)
 {
