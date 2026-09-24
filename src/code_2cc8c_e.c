@@ -7,7 +7,7 @@
  *
  *   [c code_2cc8c_e0]  func_8003FB0C          game code, own file
  *   [o libgs/gs_123]   Gssub_make_matrix      was func_8003FB1C, matched C
- *   [c code_2cc8c_e1]  func_8003FBE4          game code, own file
+ *   [c code_2cc8c_e1]  SetPacketBufCursor          game code, own file
  *   [o libgs/gs_111]   GsDrawOt               was func_8003FBF4, matched C
  *   [o libgs/gs_113]   GsClearOt              was func_8003FC18, matched C
  *   [o libgs/gs_108]   GsSetLightMode         was func_8003FC70, matched C

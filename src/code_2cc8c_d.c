@@ -330,7 +330,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
     self->unk98 = (u32)(self->unk50 - self->unk4C) / (u32)(1 << self->unk3C) + 1;
 
     idx = self->otIndex;
-    func_8003FBE4(*(s32 *)((u8 *)self + 0x88 + idx * 4));
+    SetPacketBufCursor(*(s32 *)((u8 *)self + 0x88 + idx * 4));
 
     idx = self->otIndex;
     GsClearOt(0, 0, *(s32 *)((u8 *)self + 0x78 + idx * 4));
