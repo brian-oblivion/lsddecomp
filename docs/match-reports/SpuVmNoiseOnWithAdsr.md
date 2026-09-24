@@ -19,14 +19,14 @@ extern u16 D_8008EA26;
 extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 
-extern s32 func_8002CF18(s32 a0);
+extern s32 SpuVmAlloc(s32 a0);
 extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
-    v0 = func_8002CF18(0xFF) & 0xFF;
+    v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
     if (v0 < D_8008E9D0) {
         func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, a2 & 0xFFFF, a3 & 0xFFFF);
@@ -39,7 +39,7 @@ void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
 The 4-argument sibling of `SpuVmNoiseOn` (same report has the full
 derivation of the mixed-width `D_8008EA26` access and the two wrong turns
 that preceded the working form -- read that first). Same gate: force
-`D_8008EA1B`, call `func_8002CF18(0xFF)`, mask, stash into `D_8008EA26`,
+`D_8008EA1B`, call `SpuVmAlloc(0xFF)`, mask, stash into `D_8008EA26`,
 compare to `D_8008E9D0`, and conditionally forward into `func_8002DDBC`.
 
 The only structural difference from `SpuVmNoiseOn` is the callee's
@@ -51,7 +51,7 @@ passes all four of ITS OWN arguments, each independently narrowed to
 positions). Confirms `func_8002DDBC`'s signature derived from the sibling:
 `(channel_byte, s32, s32, s32, s32)`.
 
-Reused the `D_8008EA26`/`D_8008E9D0`/`D_8008EA1B`/`func_8002CF18`/
+Reused the `D_8008EA26`/`D_8008E9D0`/`D_8008EA1B`/`SpuVmAlloc`/
 `func_8002DDBC` declarations verbatim from `SpuVmNoiseOn` (moved up to
 before `SpuVmNoiseOnWithAdsr`, the first user in ROM order -- these two functions
 are adjacent modulo the frameless `ClearNoiseVoices` between them). One build
@@ -74,7 +74,7 @@ libsnd/vmanager `SpuVmNoiseOnWithAdsr` (discs 3.3/3.5; `libsnd/vm_noise` on
 those functions and moves them out of tracks 1/1b/3.
 
 **SpuVmNoiseOnWithAdsr** (was `func_8002F20C`) -- Tier B. Allocates a free voice via
-`func_8002CF18` (code_179d8_l, "voice-steal candidate scan") and, if one
+`SpuVmAlloc` (code_179d8_l, "voice-steal candidate scan") and, if one
 is available (`v0 < D_8008E9D0`, the voice count), keys it on via
 `func_8002DDBC` (code_179d8_l, confirmed to write the PS1 SPU's key-on
 registers) forwarding all four caller-supplied parameters unchanged. The

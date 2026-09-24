@@ -152,7 +152,7 @@ extern u8 D_8008EA1F;
 extern u8 D_8008EA20;
 extern u16 D_8008EA24;
 
-extern s32 func_8002CF18(void);
+extern s32 SpuVmAlloc(void);
 extern void func_8002D6A4(void);
 extern void func_8002D8E0(s32 a0);
 extern s32 note2pitch2(u16 a0, u16 a1);
@@ -394,7 +394,7 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     if ((s16) note == 0) {
         goto fail;
     }
-    result = (s32)(u8) func_8002CF18();
+    result = (s32)(u8) SpuVmAlloc();
     if ((u8) result == D_8008E9D0) {
         goto fail;
     }

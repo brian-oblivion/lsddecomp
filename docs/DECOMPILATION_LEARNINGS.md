@@ -142,7 +142,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   the fallthrough rule absent. 77/217 -> 208/217. (a docs/match-reports/func_80063144.md, round 59)
 - **A bare `__asm__("")` at a basic-block JOIN blocks GCC's eager delay-slot fill and can COST
   instructions.** It is legal under HARD RULE 6 (it moves no value between registers) and still made
-  `func_8002CF18` worse for four rounds. The discriminator is WHERE it sits: inside a block a barrier
+  `SpuVmAlloc` worse for four rounds. The discriminator is WHERE it sits: inside a block a barrier
   orders that block's statements, but at a join it denies the scheduler the instruction it would have
   hoisted into the branch's delay slot, costing a nop per join. A barrier that makes the body LONGER
   is this, not a block-order result. (a round 65)
@@ -325,7 +325,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   tail temps made `func_8002DDBC`'s whole 25-instruction tail byte-exact and fixed two registers four
   blocks UPSTREAM of the deletion; reusing an already-dead local in `func_8002D1B4` was worth 1700
   asm-differ points where a fresh one was worth 500; ADDING a hoisted base pointer moved
-  `func_8002CF18`. The delete direction needs a CALL-crossing live range, so it does not apply to
+  `SpuVmAlloc`. The delete direction needs a CALL-crossing live range, so it does not apply to
   leaves. A permuter never merges or deletes locals, so local count is a PARAMETER of its search
   space: `func_8004BA40` (four locals into two) and `func_8004B700` (one deleted) closed after ~330k
   iterations missed both. (a round 65; round 63)
@@ -693,7 +693,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   before it and no MATCH figure. A title's "N words short/long" from before a flag landed is not
   comparable with one after; rebuild the body and re-measure before ranking on it. (a round 65)
 - **"Exact length" can be arithmetic rather than structure, and only the positional-skeleton figure
-  notices.** `func_8002CF18` carried "EXACT LENGTH MATCH 167/167" from round 37 for 28 rounds; round
+  notices.** `SpuVmAlloc` carried "EXACT LENGTH MATCH 167/167" from round 37 for 28 rounds; round
   65 found two one-word padding artifacts sitting on a body two words SHORT, summing to the right
   total. Length is a SUM and cancels; the skeleton figure was 118 at that "exact length". Read the
   skeleton figure before believing a length claim, exactly as for ins/del. (a round 65)

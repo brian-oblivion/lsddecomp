@@ -541,7 +541,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                 D_8008EA1E = entry2->unk6;
                 D_8008EA1F = entry2->unk7;
 
-                chan = func_8002CF18(0) & 0xFF;
+                chan = SpuVmAlloc(0) & 0xFF;
                 D_8008EA26 = chan;
                 if (chan < D_8008E9D0) {
                     D_8008D9A3[chan].unk0 = 1;
@@ -675,7 +675,7 @@ says it IS that function, a different build of it:
    tone's min/max note, `a4 == 0` routes to key-off, `a5` is the pan.
 2. **Call sequence.** Sony's 3.3 `vmanager.o` `SpuVmKeyOn` calls, in
    order, `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`, `SpuVmDoAllocate`.
-   StartNote calls `SpuVmVSetUp`, `StopNote`, `func_8002CF18`,
+   StartNote calls `SpuVmVSetUp`, `StopNote`, `SpuVmAlloc`,
    `func_8002D6A4`, then `func_8002D8E0`/`note2pitch`+`func_8002D1B4`. The
    callee names this project already carries for the first and last
    (`SpuVmVSetUp`, `note2pitch`) are Sony's own.

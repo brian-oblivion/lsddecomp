@@ -189,14 +189,14 @@ may stay in `src/`.
   levers already documented for `note2pitch2`), not yet reduced to a
   known trigger.
 
-## Round 33 update (runner alpha): the loop-strength-reduction lever WAS known — this unit's own `func_8002CF18` report already named the exact fix
+## Round 33 update (runner alpha): the loop-strength-reduction lever WAS known — this unit's own `SpuVmAlloc` report already named the exact fix
 
 Re-verified the inherited 98/112 body first — reproduces exactly (compiled
 length 0x188 = 98 words), residues 1 and 2 confirmed at the exact positions
 this report already names.
 
 **The "not yet reduced to a known trigger" note above undersold it: this
-same unit's `func_8002CF18` report (also round 26) had already identified
+same unit's `SpuVmAlloc` report (also round 26) had already identified
 the discriminator — a `(u8)`/narrow cast on an array index defeats GCC
 2.6.3's strength reduction of `idx*stride` into `idx+=stride`.** The
 `do`/`while` loop's index `i` was declared and used as a plain `s32` with
@@ -325,7 +325,7 @@ void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
 ### Proposed learning (round 33)
 
 **The "narrow-cast defeats loop strength reduction" idiom
-(`func_8002CF18`'s report) is unit-wide, not local to the function that
+(`SpuVmAlloc`'s report) is unit-wide, not local to the function that
 found it** — it closed 10 of 14 missing words here, in a different
 function, the very next round. Any function in `code_179d8_l`/`_m` with a
 "my loop is N words short and retail recomputes a multiply I don't" shape
@@ -413,7 +413,7 @@ only structural change from the seed: wrapping the tail's
 **still 108/112 (0x1b0), no length change** -- the isolated scaffold's
 score improvement (3100 -> 1800) did not translate, consistent with this
 unit's other three same-round instances of this exact divergence
-(`func_8002CF18`, `func_8002E138`, `func_8002D6A4`, all round 37) EXCEPT
+(`SpuVmAlloc`, `func_8002E138`, `func_8002D6A4`, all round 37) EXCEPT
 for `func_8002CD08` this round, where the identical construct DID
 translate -- confirming again that a `do-while(0)` candidate must be
 verified by direct rebuild every time, in both directions, never assumed

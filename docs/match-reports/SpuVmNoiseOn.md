@@ -19,14 +19,14 @@ extern u16 D_8008EA26;
 extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 
-extern s32 func_8002CF18(s32 a0);
+extern s32 SpuVmAlloc(s32 a0);
 extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 void SpuVmNoiseOn(s32 a0, s32 a1) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
-    v0 = func_8002CF18(0xFF) & 0xFF;
+    v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
     if (v0 < D_8008E9D0) {
         func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
@@ -39,7 +39,7 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
 Straight-line leaf, one conditional call:
 
 1. Force flag byte `D_8008EA1B = 0x7F` unconditionally.
-2. Call `func_8002CF18(0xFF)` (a `code_179d8_l`/charlie function, still
+2. Call `SpuVmAlloc(0xFF)` (a `code_179d8_l`/charlie function, still
    `INCLUDE_ASM` there), mask the result to a byte, store it into
    `D_8008EA26` (a 16-bit store -- the value is always 0..0xFF here, so the
    upper byte written is always 0).
@@ -51,7 +51,7 @@ Straight-line leaf, one conditional call:
    (`$a3`), and the constant `0x5FC8` passed on the stack (5th argument,
    `0x10($sp)`).
 
-`func_8002CF18` and `func_8002DDBC` are declared here as unit-local `extern`
+`SpuVmAlloc` and `func_8002DDBC` are declared here as unit-local `extern`
 prototypes only (per CLAUDE.md's rule on prototypes for functions another
 unit defines) -- they are not added to any shared header.
 

@@ -1,4 +1,6 @@
-# func_8002CF18 -- STALL (round 65 revisit: length still EXACT 167/167, but round 37's exact length is RETRACTED as arithmetic rather than structure -- it was two one-word padding artifacts over a body two words short; raw word-match 47/167 -> **74/167** (79/167 on the `u32 bestSec` variant -- see the instrument-disagreement note), funcdiff insertions/deletions 29/29 -> **16/16** and positional skeleton diffs 118 -> 89, asm-differ 3255 -> 1250; first real diff still at vram 0x8002CF24, retail's `li t3,0xffff` against a register-rotated `li t0,0xffff`, per tools/asm-differ/diff.py -- the residue is now almost purely that rotation)
+# SpuVmAlloc -- STALL (round 65 revisit: length still EXACT 167/167, but round 37's exact length is RETRACTED as arithmetic rather than structure -- it was two one-word padding artifacts over a body two words short; raw word-match 47/167 -> **74/167** (79/167 on the `u32 bestSec` variant -- see the instrument-disagreement note), funcdiff insertions/deletions 29/29 -> **16/16** and positional skeleton diffs 118 -> 89, asm-differ 3255 -> 1250; first real diff still at vram 0x8002CF24, retail's `li t3,0xffff` against a register-rotated `li t0,0xffff`, per tools/asm-differ/diff.py -- the residue is now almost purely that rotation)
+
+> Renamed from `func_8002CF18` on 2026-09-24 (tools/rename.py). Address 0x8002cf18.
 
 Unit `src/code_179d8_l.c` (carved round 24). Size: 167 words (0x29C bytes).
 Round 26, runner delta.
@@ -68,7 +70,7 @@ for another unit's function.
 
 ```c
 /* stalesyms --fix 2026-09-22: func_800375E8 -> SpuSetNoiseVoice -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     s32 bestSec;
@@ -146,7 +148,7 @@ s32 func_8002CF18(void)
 }
 ```
 
-Restored to `INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);` in
+Restored to `INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);` in
 `src/code_179d8_l.c` -- the struct/extern declarations above were removed
 along with it (none are shared with any other function in this unit).
 
@@ -182,7 +184,7 @@ Starting point was a naive transcription using a signed `s32 idx` and plain
    the multiply-every-iteration shape.
 4. **Duplicating the divide/lookup in each `if`/`else` arm was NOT needed
    here** (that fix mattered for the sibling function, see
-   `func_8002D6A4.md`) — `func_8002CF18` has no such division split.
+   `func_8002D6A4.md`) — `SpuVmAlloc` has no such division split.
 
 ## What is still wrong (the residue)
 
@@ -371,7 +373,7 @@ extern void SpuSetNoiseVoice(s32 a0, s32 a1); /* Psy-Q libspu/s_snv, linked obje
                                                 * wrongly named func_800375E8 in the
                                                 * round-26 body, which never linked */
 
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     u32 bestSec;
@@ -472,7 +474,7 @@ s32 func_8002CF18(void)
 
 Re-verified the inherited round-33 body first, including the
 `SpuSetNoiseVoice` link fix: `objdump -t` on `build/src/code_179d8_l.c.o`
-confirms `func_8002CF18` compiles and LINKS to `0x28c` bytes = 163 words,
+confirms `SpuVmAlloc` compiles and LINKS to `0x28c` bytes = 163 words,
 matching round 33's corrected figure exactly (not the never-linking round-26
 number).
 
@@ -536,7 +538,7 @@ value-availability CSE decision, not a local instruction gap.
 
 **Search: `-j 6 --stop-on-zero --best-only --stack-diffs`, bounded to
 900s.** Zero `score = 0` hits. Best candidate: **3025** (down from 4620),
-`permuter-work/func_8002CF18/output-3025-1`.
+`permuter-work/SpuVmAlloc/output-3025-1`.
 
 **Unlike the other three functions searched this round, this candidate
 translated into REAL, VERIFIED progress — the first of this round's four
@@ -624,7 +626,7 @@ extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     u32 bestSec;
@@ -735,7 +737,7 @@ FULL diff is not the same as its MINIMAL fix.
 
 Re-verified the inherited 167/167-length body (with the round-37
 `do-while(0)`/`newVar` fix intact): `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002CF18` compiles to `0x29c`
+`build/src/code_179d8_l.c.o` confirms `SpuVmAlloc` compiles to `0x29c`
 bytes = 167 words, matching retail's length exactly, and `funcdiff.py`
 confirms 47/167 raw match with NO outside-range drift, exactly as round 37
 left it. Given three prior rounds' worth of levers already tried against
@@ -751,7 +753,7 @@ unchanged.
 **Verdict: arity-ok idiom.** Both declarations stay; each is right about its own
 file.
 
-**Callee evidence.** `func_8002CF18` is still `INCLUDE_ASM`
+**Callee evidence.** `SpuVmAlloc` is still `INCLUDE_ASM`
 (`src/code_179d8_l.c`), so the disassembly is the only evidence. It reads NONE
 of `$a0`-`$a3`: the prologue writes every register it uses from constants and
 `%hi`/`%lo` globals before any read.
@@ -770,10 +772,10 @@ of `$a0`-`$a3`: the prologue writes every register it uses from constants and
 So the function takes zero arguments in the sense of what it consumes.
 
 **Why `src/code_179d8_m.c`'s one-parameter declaration stays.** Its two call
-sites write `func_8002CF18(0xFF)`, and that argument is byte-load-bearing:
+sites write `SpuVmAlloc(0xFF)`, and that argument is byte-load-bearing:
 
 ```
-8002f240:  jal   8002cf18 <func_8002CF18>
+8002f240:  jal   8002cf18 <SpuVmAlloc>
 8002f244:  li    a0,0xff          <- in retail, from matched SpuVmNoiseOnWithAdsr
 ```
 
@@ -787,7 +789,7 @@ about what the body reads.
 
 ### Call-site / declaration disagreement, reported not fixed
 
-`src/code_179d8_j_b.c:155`'s `extern s32 func_8002CF18(void);` has **no live
+`src/code_179d8_j_b.c:155`'s `extern s32 SpuVmAlloc(void);` has **no live
 call site in that file** — the only other mention is prose in `func_80030E90`'s
 banner, and `func_80030E90` is itself still `INCLUDE_ASM`. It is a declaration
 kept for a call that exists only in assembly. It is harmless (it agrees with
@@ -941,7 +943,7 @@ conflicting later declarations in the unit must be commented out while this
 is live (see the bookkeeping note).
 
 #if 0
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     u16 bestSec;

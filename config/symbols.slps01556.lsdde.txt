@@ -1821,3 +1821,7 @@ Class876FC__SetParams = 0x800564A4; // type:func
 Class876FC__Update = 0x800564F4; // type:func
 gClass876FCMethods = 0x800876FC;
 GetClass876FCMethods = 0x80056F4C; // type:func
+// identified: shape 0.98 vs libsnd/vmanager SpuVmAlloc (159w vs our 167w,
+// disc 3.3), position between libc2/strncmp and libsnd/vm_prog (libsnd
+// neighborhood). Superseded game-style func_8002CF18. Round 74 (bravo, track 2).
+SpuVmAlloc = 0x8002CF18; // type:func

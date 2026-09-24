@@ -107,7 +107,7 @@ occurrence's own narrower codegen.
 
 **ClearNoiseVoices** (was `func_8002F2A4`) -- Tier B. Releases every
 voice whose state byte (`D_8008D9A3`) reads exactly `2`. The value `2` is
-the same one `func_8002CF18` (code_179d8_l) and SpuVmFlush both
+the same one `SpuVmAlloc` (code_179d8_l) and SpuVmFlush both
 react to by calling their respective "silence the SPU noise generator"
 Sony/library function (`func_800375E8` / `SpuSetNoiseVoice`) before
 clearing state -- three independent sites agreeing on what state `2`

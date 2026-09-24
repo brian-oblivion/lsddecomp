@@ -45,7 +45,7 @@
  *   func_8002E300    2w  <- itself.  Not work, and not yours to redo.
  *   note2pitch   47w   note2pitch2   64w   func_8002DDBC  112w
  *   func_8002E138  112w   func_8002E308  116w   func_8002D6A4  143w
- *   func_8002CF18  167w
+ *   SpuVmAlloc  167w
  *
  * func_8002E308's opening `addu $t3, $a0, $zero` is REGISTER PRESSURE with
  * s16 argument narrowing, NOT a BIOS trampoline -- checked by hand at carve
@@ -157,7 +157,7 @@ void func_8002CD08(Obj179D8CD08 *a0, S179D8CD08 *a1) {
 /* NON_MATCHING: 167/167 words, length exact (74/167 raw word-match; funcdiff
  * insertions/deletions 16/16). Residue: a systematic register rotation
  * (t3/t0/a2/a3 family) running through nearly the whole function, visible
- * from the very first instruction (docs/match-reports/func_8002CF18.md).
+ * from the very first instruction (docs/match-reports/SpuVmAlloc.md).
  * Hand-derived. */
 extern u8 D_8008D9A3[];
 extern u8 D_8008D98E[];
@@ -168,7 +168,7 @@ extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
-s32 func_8002CF18(void)
+s32 SpuVmAlloc(void)
 {
     s32 chosen;
     u16 bestSec;
@@ -244,7 +244,7 @@ s32 func_8002CF18(void)
     return (u8) chosen;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002CF18);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);
 #endif
 
 /* Shared with func_8002D8E0 below (same two-level entry table, same

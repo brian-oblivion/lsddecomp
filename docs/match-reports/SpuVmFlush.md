@@ -820,7 +820,7 @@ here -- proposing for the head to apply once no runner is live on
 - `D_8008D970` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by
   several functions in this cluster; never fully decoded here).
 - `D_8008D9A3` -> `gVoiceState` (the byte StopNote/ClearNoiseVoices/
-  `func_8002CF18` all compare against `2` for "noise voice").
+  `SpuVmAlloc` all compare against `2` for "noise voice").
 - `D_8006DAD4` (and this unit's two local views `ObjDAD4`/`ObjDAD4Edd4`)
   -> `gSpuRegs`: confirmed to be the PS1 SPU's own hardware base address
   `0x1F801C00` by `func_8002DDBC`'s report in `code_179d8_l`.

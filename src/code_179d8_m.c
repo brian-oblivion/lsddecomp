@@ -23,7 +23,7 @@
  *     velocity and a computed stereo pan split, StartNote registers a new
  *     active-voice record; StopNote scans every voice for one whose
  *     identity fields match and releases it, returning the count released.
- *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (func_8002CF18, in
+ *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (SpuVmAlloc, in
  *     code_179d8_l) and, if one exists, key it on (func_8002DDBC, also
  *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
  *     two hardcoded constants.
@@ -47,7 +47,7 @@
  *     InitSpuDriver and, going by its own ring-buffer/mask-clearing logic,
  *     meant to run every frame thereafter.
  *   - ClearNoiseVoices: releases every voice whose state byte reads
- *     exactly 2 (the same value StopNote/SpuVmFlush/func_8002CF18
+ *     exactly 2 (the same value StopNote/SpuVmFlush/SpuVmAlloc
  *     treat as "noise voice needing SpuSetNoiseVoice/func_800375E8 cleanup").
  *   - SpuVmPBVoice / SpuVmPitchBend: match a voice by
  *     identity and apply a curve-table-driven pitch bend from a 0-127
@@ -539,14 +539,14 @@ extern u8 D_8008E9D0;
 /* Flag byte forced on unconditionally at entry. */
 extern u8 D_8008EA1B;
 
-extern s32 func_8002CF18(s32 a0); /* arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244 */
+extern s32 SpuVmAlloc(s32 a0); /* arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244 */
 extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
-    v0 = func_8002CF18(0xFF) & 0xFF;
+    v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
     if (v0 < D_8008E9D0) {
         func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, a2 & 0xFFFF, a3 & 0xFFFF);
@@ -594,7 +594,7 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
     s32 v0;
 
     D_8008EA1B = 0x7F;
-    v0 = func_8002CF18(0xFF) & 0xFF;
+    v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
     if (v0 < D_8008E9D0) {
         func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
@@ -1062,7 +1062,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                 D_8008EA1E = entry2->unk6;
                 D_8008EA1F = entry2->unk7;
 
-                chan = func_8002CF18(0) & 0xFF;
+                chan = SpuVmAlloc(0) & 0xFF;
                 D_8008EA26 = chan;
                 if (chan < D_8008E9D0) {
                     D_8008D9A3[chan].unk0 = 1;
