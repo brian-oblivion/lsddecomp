@@ -166,19 +166,17 @@ struct PairXY {
     s32 y; /* +0x004 */
 };
 
-/* STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first
- * real diff at word 15 (0x4508C / vram 0x8005488C) -- see
- * docs/match-reports/StyleBuildDecorSet.md.  Round 61 REVISIT: 12/86 and 6 short
- * -> 17/86 and 1 short.  Residue is one redundant `move` retail emits and
- * two scheduling reorderings.  Preserved near-miss body: */
-#if 0
+/* Allocates the 18 decor objects into gStyleDecorSlots, each attached
+ * (slot4C) to slot 0, then attaches slot 0 to the target object's slotAC
+ * result.  MATCHED round 76 (charlie): an indexed for loop -- loop.c's
+ * strength reduction produces both the slot walker and the colour-table
+ * stride (`gStyleColorTable + i * 3`), which earlier rounds had written as
+ * hand-rolled pointer/counter variables.  See
+ * docs/match-reports/StyleBuildDecorSet.md. */
 void StyleBuildDecorSet(void) {
     PairXY paramA;
     PairXY paramB;
     s32 i;
-    s32 s1;
-    void **arr;
-    void **wp;
     void *obj;
     ObjSlotAC *self2;
     void *result;
@@ -191,30 +189,20 @@ void StyleBuildDecorSet(void) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *) &gStyleDecorPosBX;
-    i = 1;
-    s1 = 3;
-    obj = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
-    __asm__("");
-    arr = gStyleDecorSlots;
-    wp = arr + 1;
-    *arr = obj;
-    do {
-        obj = New_ClassEAC0(&paramB, (void *) (s1 + gStyleColorTable), 0x1FFF);
-        *wp = obj;
-        wp++;
-        ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], &paramA);
-        s1 += 3;
+    gStyleDecorSlots[0] = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
+    for (i = 1; i < 0x12; i++) {
+        obj = New_ClassEAC0(&paramB, (void *) (gStyleColorTable + i * 3), 0x1FFF);
+        gStyleDecorSlots[i] = obj;
+        ((ObjSlot4C *) obj)->methods->slot4C(obj, gStyleDecorSlots[0], &paramA);
         paramA.y += 3;
         paramB.y -= 7;
-        i++;
-    } while (i < 0x12);
+    }
 
     self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
     result = self2->methods->slotAC(self2);
     ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleBuildDecorSet);
+
 
 typedef struct ObjAC7CSub ObjAC7CSub;
 typedef struct ObjAC7CSubMethods ObjAC7CSubMethods;
