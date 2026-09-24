@@ -21,7 +21,7 @@
  * TRANSLATE_Y_PLUS256/SCALE_HALF tables (rotation/scale: four s16 {num,den}
  * pairs for X/Y(yaw)/Z/W; translate: three consecutive s32 for X/Y/Z):
  * ROTATION_ZPLUS9, ROTATION_XPLUS90, TRANSLATE_Y_PLUS8, TRANSLATE_Y_MINUS512.
- * `gMoodCue78TransitionDone` (formerly D_8008ACCC) is a one-shot s32 flag
+ * `sMoodCue78TransitionDone` (formerly D_8008ACCC) is a one-shot s32 flag
  * local to Entity__MoodCue78's own state machine, referenced nowhere else in
  * `src/`. See each function's match report's `## Naming` section for the
  * per-constant evidence.
@@ -369,14 +369,14 @@ void Entity__MoodCue77(Entity *this, EntityMoodHandlerArg *out) {
 extern u8 ROTATION_XPLUS90[];
 extern u8 SCALE_Y2[];
 extern u8 D_80089E14[];
-extern s32 gMoodCue78TransitionDone;
+extern s32 sMoodCue78TransitionDone;
 
 void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
     s32 tmp;
     void *table;
 
     if (out->unk4 == 0) {
-        gMoodCue78TransitionDone = 0;
+        sMoodCue78TransitionDone = 0;
         tmp = rand() % 3;
         if (tmp == 1) {
             this->moodState = 0xB;
@@ -415,7 +415,7 @@ void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->updateRotation(this, 0, ROTATION_XPLUS90);
         this->methods->stopSoundCue(this);
         this->moodState = 1;
-        gMoodCue78TransitionDone = 1;
+        sMoodCue78TransitionDone = 1;
     } else if (this->moodState >= 0xC && out->unk4 >= 0x14A && (out->unk4 % 60) == 30) {
         tmp = 0;
         if (rand() & 1) {
@@ -433,7 +433,7 @@ void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotCC(this, tmp, 0);
     }
 
-    if (out->unk4 == 0x208 && gMoodCue78TransitionDone != 0) {
+    if (out->unk4 == 0x208 && sMoodCue78TransitionDone != 0) {
         this->methods->stopSoundCue(this);
         this->moodState = 1;
     }

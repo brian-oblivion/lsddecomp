@@ -186,7 +186,6 @@ gLinkSpawnIndex
 gLinkSrcStage
 gLinkTriggerIndex
 gMemcardIconTemplate
-gMoodCue78TransitionDone
 gOpenVabCount
 gPendingVabBuffer
 gStyleColorTable
@@ -218,3 +217,4 @@ gVabVolumeInited
 gpDinamicLinkPenalty
 gpNavChallengesComplete
 sCdDriveInited
+sMoodCue78TransitionDone
