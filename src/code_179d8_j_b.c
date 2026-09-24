@@ -13,7 +13,7 @@
  * code_179d8_j_b -- the MIDDLE third of the old code_179d8_j slice, after
  * round 34 (2026-09-12) linked TWO Sony objects into what used to be one unit.
  * Now 0x21180..0x221B4 (vram 0x80030980..0x800319B4), five functions
- * (func_80030980 .. func_80031890).
+ * (func_80030980 .. SsUtKeyOffV).
  *
  * WHY THIS UNIT EXISTS, IN TWO STEPS, BOTH IN ROUND 34.
  *   1. `libsnd/vm_prog.o` (Psy-Q 3.6 -- the only disc carrying the module)
@@ -593,8 +593,8 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
  * The only structural difference from the sibling is that the lock is
  * released BEFORE the mask block rather than after it (retail's
  * `sw zero, D_8008E934` sits at 0x80031950, between the D_8008E228 load and
- * the first `or`). See docs/match-reports/func_80031890.md. */
-s32 func_80031890(s16 idx)
+ * the first `or`). See docs/match-reports/SsUtKeyOffV.md. */
+s32 SsUtKeyOffV(s16 idx)
 {
     u16 chan;
     u32 mask0;

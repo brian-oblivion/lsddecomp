@@ -4,7 +4,7 @@
 
 Unit `code_179d8_j`, round 26 (2026-09-09). Not a class method. Sibling of
 `SsUtGetDetVVol`/`SsUtSetDetVVol`/`SsUtSetVVol` (same 0x18-entry bounds check
-idiom, same busy-lock reentrancy guard as `SsUtKeyOn`/`func_80031890`'s
+idiom, same busy-lock reentrancy guard as `SsUtKeyOn`/`SsUtKeyOffV`'s
 class) -- this one is a "stop a channel" operation: it validates the
 caller's (p1,p2,p3,p4) against the four cached config records for `idx`,
 then either clears the channel's active-mask bits or (if it was already in

@@ -220,7 +220,7 @@ census rather than a per-function surprise each time it's hit.
 Rebuilt the preserved body verbatim (same barrier placement as
 `SsUtKeyOn`'s finding 3, reused here as that report recommends)
 through the current pinned pipeline. `build/lsdde.map` puts the next
-function, `func_80031890`, at built address `0x8003184c` against its own
+function, `SsUtKeyOffV`, at built address `0x8003184c` against its own
 retail address `0x80031890` -- a 68-byte (17-word) deficit, confirming
 **236/253 words, 17 SHORT**, exactly as the title states. `funcdiff.py`'s
 raw count reproduces **35/253** exactly as well. No new reshape attempted
@@ -247,7 +247,7 @@ Rebuilt the body shown above verbatim, with the SAME barrier placement
 `SsUtKeyOn`'s round-36 rebuild used (the report above says this
 function reuses that exact configuration). Clean compile. **Measured:
 237/253 words, 16 short** (`build/lsdde.map`: retail's next function
-`func_80031890` at `0x80031890`, this build's at `0x80031850`, a
+`SsUtKeyOffV` at `0x80031890`, this build's at `0x80031850`, a
 0x40/16-word deficit). Raw word-match 33/253. Close to but not an exact
 reproduction of the title's inherited 236/253 -- one word different, same
 caveat as `SsUtKeyOn`'s round-36 note (barrier placement recovered
@@ -265,7 +265,7 @@ STALL.
 
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
 `SsUtKeyOnV` in `src/code_179d8_j_b.c`, between `SsUtKeyOff` and
-`func_80031890`. Needs the same `SlotE968`/`D_8008E968`/`D_8008EA22`
+`SsUtKeyOffV`. Needs the same `SlotE968`/`D_8008E968`/`D_8008EA22`
 declarations as `SsUtKeyOn`'s corrected body (see that report), all
 now present in the shared file.
 
@@ -528,7 +528,7 @@ item -- for three candidates, not just the flagged one, since the saved
   isolation: **byte-identical to baseline, 33/253, no change.**
 
 All three are the same scaffold-vs-real-oracle disagreement
-`func_80031890`'s and `SsUtKeyOn`'s round-40 entries document: the
+`SsUtKeyOffV`'s and `SsUtKeyOn`'s round-40 entries document: the
 permuter's isolated translation unit does not reproduce this project's real
 register-allocation pressure, so a scaffold-local score improvement
 (4035 -> 2575, ~36%) is not evidence about the real function on its own.
@@ -566,7 +566,7 @@ measure once, do not iterate. The round-40 body above was put LIVE
 `INCLUDE_ASM` so its own bytes do not contaminate this window) and rebuilt.
 
 **Length: 248/253 built, 5 words short** (`build/lsdde.map`:
-`func_80031890` now at `0x8003187c` against retail's own `0x80031890`, a
+`SsUtKeyOffV` now at `0x8003187c` against retail's own `0x80031890`, a
 0x14/5-word deficit -- was `0x8003184c`/17-then-16 words short at every
 prior measurement). This matches the round-62 accounting's prediction
 closely: this function has 11 load-delay-nop sites (vs the sibling's 9),

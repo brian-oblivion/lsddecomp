@@ -26,7 +26,7 @@ one below, taken from the object rather than the linked image.
 
 The title is **not** falsified: it claims a length gap and names three
 residues, and a length gap is exactly what ins/del non-zero means. (Contrast
-`func_80030980` and `func_80031890` this round, where the recorded verdicts
+`func_80030980` and `SsUtKeyOffV` this round, where the recorded verdicts
 *were* falsified by their ins/del.) What IS wrong is residue 2's **cause**,
 below.
 
@@ -151,7 +151,7 @@ and this body has control flow and still compiles `beq` FAR. That stands.
 What is new is that it is now **bounded**: it is worth exactly 2 words and
 nothing else. Every other word of the gap is the `nop` blocker. Two matched
 siblings in this same unit now carry the identical guard construct --
-`SsUtKeyOff` and, as of this round, `func_80031890` -- and **both compile
+`SsUtKeyOff` and, as of this round, `SsUtKeyOffV` -- and **both compile
 to `beq` FAR and both are byte-exact**, i.e. for those two functions retail
 itself has the FAR shape. So the construct is not miscompiled; this function's
 context selects the other layout, and two byte-exact controls in the same file
@@ -1052,7 +1052,7 @@ note in CLAUDE.md) and rebuilt through `./build-and-verify.sh` +
 word-match, still 11 words short (`build/lsdde.map`: `SsUtKeyOff` still
 lands at `0x80031254`, unchanged).** Reverted; no net effect.
 
-This is the same scaffold-vs-real-oracle disagreement `func_80031890`'s
+This is the same scaffold-vs-real-oracle disagreement `SsUtKeyOffV`'s
 and `SsUtKeyOnV`'s round-40 entries document: the permuter's isolated
 translation unit does not reproduce this project's real
 register-allocation pressure, so a scaffold-local score drop (4050 -> 2965,

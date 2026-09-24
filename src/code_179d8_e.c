@@ -187,7 +187,7 @@ struct VabStreamObj {
 extern void *func_80017B34(s32 size);
 extern s16 SsUtKeyOn(s16 a0, s16 hi, s16 lo, s16 a3, s32 b5, s32 argA, s32 argB);
 extern void SsUtAutoVol(s16 a0, s16 a1, s16 a2, s32 a3);
-extern void func_80031890(s16 index);
+extern void SsUtKeyOffV(s16 index);
 extern void func_80031F3C(s32 arg0);
 /* Sony's `SsVabTransCompleted` (`libsnd/vs_vtc`) and `SsSetMute`
  * (`libsnd/scsmute`), linked from the SDK objects since round 34.  The two
@@ -533,7 +533,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_e", VabStreamObj__PlayTone);
 
 s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 index) {
     if (index < SPU_VOICE_COUNT) {
-        func_80031890(index);
+        SsUtKeyOffV(index);
     } else {
         func_80031F3C(0);
     }

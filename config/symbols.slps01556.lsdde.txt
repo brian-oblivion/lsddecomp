@@ -1902,3 +1902,9 @@ SsUtKeyOff = 0x80031280; // type:func
 // -- this function's own 8-param shape agrees on count). Superseded
 // game-style func_8003149C. Round 74 (bravo, track 2).
 SsUtKeyOnV = 0x8003149C; // type:func
+// identified: shape 0.98 vs libsnd/vmanager SsUtKeyOffV (70w vs our 73w,
+// disc 3.3), position right after SsUtKeyOnV, header LIBSND.H
+// (`extern short SsUtKeyOffV(short voice);`, 1 param -- this function's
+// own 1-param shape agrees exactly). Superseded game-style func_80031890.
+// Round 74 (bravo, track 2).
+SsUtKeyOffV = 0x80031890; // type:func

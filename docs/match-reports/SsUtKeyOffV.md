@@ -1,4 +1,6 @@
-# func_80031890 -- MATCHED (round 62 REVISIT: 73/73 words, insertions 0 / deletions 0, whole-image oracle green)
+# SsUtKeyOffV -- MATCHED (round 62 REVISIT: 73/73 words, insertions 0 / deletions 0, whole-image oracle green)
+
+> Renamed from `func_80031890` on 2026-09-24 (tools/rename.py). Address 0x80031890.
 
 **REVISITED, round 62: MATCHED; names/types used -- the closing lever came
 from the MATCHED sibling `SsUtKeyOff`'s idiom, and the local names
@@ -11,7 +13,7 @@ vram `0x80031890`.
 ## The closing body
 
 ```c
-s32 func_80031890(s16 idx)
+s32 SsUtKeyOffV(s16 idx)
 {
     u16 chan;
     u32 mask0;
@@ -85,11 +87,11 @@ or / sh D_80090C64 / nor / and / sh D_8008E22C
 sw   zero, D_8008E934
 ```
 
-That is **instruction for instruction** retail's `func_80031890` from word 33
+That is **instruction for instruction** retail's `SsUtKeyOffV` from word 33
 to word 65 -- same four-global load order (C60, C64, E228, E22C), same
 or/store/nor/and/store pairing per channel, same `or` operand order (the mask
 first). The one difference is *where the `D_8008E934 = 0;` store lands*: the
-sibling releases the lock after the mask block, retail's `func_80031890`
+sibling releases the lock after the mask block, retail's `SsUtKeyOffV`
 releases it before (`sw zero, %lo(D_8008E934)` at 0x80031950, between the
 `D_8008E228` load and the first `or`). Moving that one statement is the entire
 delta. First build of that shape: **73/73, ins 0 / del 0, whole-image SHA1
@@ -169,7 +171,7 @@ No permuter search was spent; the match came on the sixth build.
 **When a stall has a byte-exact sibling, diff the sibling's COMPILED OBJECT
 against your target's retail `.s` -- comparing the two functions' C is a
 different and much weaker check, and it is the one that fails.**
-`func_80031890` stood for four rounds beside a matched twin 1500 bytes up its
+`SsUtKeyOffV` stood for four rounds beside a matched twin 1500 bytes up its
 own file. Round 32 did compare them, in C, and came away with the one
 difference that was cosmetic (the `u32`/`u16` mask types) while missing the one
 that was structural (the sibling caches no globals). The object-level diff
@@ -209,7 +211,7 @@ matching body and are unchanged.
 
 ---
 
-# func_80031890 -- STALL (length EXACT at 73/73 words; 51/73 raw word-match; first real diff at word 37 / retail 0x80031924 -- genuine scattered residue, not a shift)
+# SsUtKeyOffV -- STALL (length EXACT at 73/73 words; 51/73 raw word-match; first real diff at word 37 / retail 0x80031924 -- genuine scattered residue, not a shift)
 
 **Measurement note (both numbers, not conflated):** compiled LENGTH is
 exactly retail's 73 words (funcdiff reports no out-of-range drift). The
@@ -236,7 +238,7 @@ corresponding bits out of two "active" masks (`D_8008E228`/`D_8008E22C`).
 #if 0
 extern volatile u16 D_8008EA26;
 
-s32 func_80031890(s16 idx)
+s32 SsUtKeyOffV(s16 idx)
 {
     u16 bankIdx;
     u16 hiBit, loBit;
@@ -516,7 +518,7 @@ unit, this function's own declarations were untouched by round 34's split).
 **This function had never been permuter-searched before this round** (per
 this round's assignment, corrected from an earlier over-count of which
 functions in this unit had already had the lever pulled). Set up via
-`tools/setup-permuter.sh func_80031890 permuter-work/seed_func_80031890.c`;
+`tools/setup-permuter.sh SsUtKeyOffV permuter-work/seed_func_80031890.c`;
 scaffold built clean, `--debug --stack-diffs` base score **550**, consistent
 with this report's two residue clusters (no stack or branch-target
 penalty, all cost in register/reorder/insertion/deletion buckets).
