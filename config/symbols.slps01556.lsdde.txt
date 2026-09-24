@@ -2143,3 +2143,4 @@ Class86B60__UpdateMemcardSaveStatus = 0x8004E1C4; // type:func
 Class86B60__OnTagBValue = 0x8004E230; // type:func
 GetClass86B60Methods = 0x8004E2D0; // type:func
 New_TaskObjF = 0x8004E2E0; // type:func
+TaskObjF__TaskObjF = 0x8004E34C; // type:func

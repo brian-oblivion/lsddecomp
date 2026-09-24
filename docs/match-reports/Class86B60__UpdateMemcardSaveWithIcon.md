@@ -73,7 +73,7 @@ No existing declaration was retyped or resized.
 ### Proposed learning
 
 None beyond what round 43's earlier two reports (`Class86B60__UpdateMemcardSaveStatus`,
-`func_8004E34C`) already recorded for this unit -- this function's own
+`TaskObjF__TaskObjF`) already recorded for this unit -- this function's own
 derivation was routine once those two slots (`slot128`, `D_8008AA10`)
 were on file, and it re-confirmed `slot74`'s exact byte offset by landing
 its own new slot immediately after it.

@@ -1,4 +1,6 @@
-# func_8004E34C -- MATCHED 42/42, round 43
+# TaskObjF__TaskObjF -- MATCHED 42/42, round 43
+
+> Renamed from `func_8004E34C` on 2026-09-24 (tools/rename.py). Address 0x8004e34c.
 
 Unit `class_3bb8c_d`. **REOPENED -- ASSIGNABLE** from round 42's `gp_rel`
 resolution. The round-14 stub recorded 2 `gp_rel` hits and no derivation;
@@ -6,7 +8,7 @@ this round wrote and matched the function from scratch.
 
 ## What this function IS
 
-`func_8004E34C` is the constructor for the class whose vtable is
+`TaskObjF__TaskObjF` is the constructor for the class whose vtable is
 `gTaskObjFMethods` -- `tools/classtable.py 0x80086DC4` places it exactly at that
 table's own **+0x008 ctor slot**. This is the same real class
 `GetClass86B60Methods`/`New_TaskObjF` (already matched, earlier in this unit)
@@ -18,7 +20,7 @@ and the SAME real object `class_3bb8c_e.c` independently names `Node3bb8cE`
 ## Body
 
 ```c
-void func_8004E34C(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
+void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
 {
     s32 count;
 
@@ -36,7 +38,7 @@ void func_8004E34C(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py func_8004E34C` -> `42/42 words
+Byte-exact on the first build: `funcdiff.py TaskObjF__TaskObjF` -> `42/42 words
 match (file 0x3EB4C-0x3EBF4)`; whole-image `OK: build matches retail
 SLPS_015.56`.
 
@@ -85,7 +87,7 @@ view rather than `class_3bb8c_e`'s `Node3bb8cE *`) and for `InitCARD`/
 same way `malloc`/`free`/`printf` are per-unit rather than in a shared
 header -- CLAUDE.md's "To `include/` has one exception").
 
-`func_8004E34C`'s own parameter types (`GenericCtorObj_3bb8c_d *`, `s32`,
+`TaskObjF__TaskObjF`'s own parameter types (`GenericCtorObj_3bb8c_d *`, `s32`,
 `s32`) intentionally do NOT match the existing `GenericCtorTable_3bb8c_d
 ::ctor` field's declared type (`void *`, `void *`, `void *`) -- nothing in
 this codebase type-checks the two against each other (the vtable's own

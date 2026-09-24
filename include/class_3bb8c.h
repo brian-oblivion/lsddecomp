@@ -1548,7 +1548,7 @@ extern u8 D_8008AA28;
 /* Class86B60__TickNameFieldCursor's own rolling word counter (wraps to 0 at 0x101). */
 extern s32 D_8008AA2C;
 
-/* func_8004E34C's own one-shot init guard: read, then unconditionally
+/* TaskObjF__TaskObjF's own one-shot init guard: read, then unconditionally
  * incremented, before its own body's InitCARD/StartCARD/_bu_init calls
  * run only when the PRE-increment value was 0 (i.e. only on the very
  * first construction of this class). */
@@ -1594,9 +1594,9 @@ typedef struct Result678_3bb8c_c {
 typedef struct GenericCtorTable_3bb8c_d GenericCtorTable_3bb8c_d;
 struct GenericCtorTable_3bb8c_d {
     u8 pad000[0x008];
-    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, New_TaskObjF's own call; IS func_8004E34C -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention (BaseTaskCtorTable_3bb8c_c/Get_vtable_TaskCore) since nothing here type-checks the two against each other */
+    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, New_TaskObjF's own call; IS TaskObjF__TaskObjF -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention (BaseTaskCtorTable_3bb8c_c/Get_vtable_TaskCore) since nothing here type-checks the two against each other */
     u8 pad00C[0x040 - 0x00C];
-    /* +0x040, func_8004E34C's own last call, forwarding its own 3rd
+    /* +0x040, TaskObjF__TaskObjF's own last call, forwarding its own 3rd
      * parameter verbatim; class_3bb8c_e's independent view (round 14,
      * this same real object) names the concrete function `func_8004E5D4`,
      * still uncarved there. */
@@ -1607,7 +1607,7 @@ extern GenericCtorTable_3bb8c_d gTaskObjFMethods;
 extern GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods; matched in class_3bb8c_g */
 
 /*
- * The object instance itself -- established this round by func_8004E34C,
+ * The object instance itself -- established this round by TaskObjF__TaskObjF,
  * which IS this class's own constructor (verified: `tools/classtable.py
  * 0x80086DC4` places it at the table's own +0x008 ctor slot). Kept
  * minimal (only the one field this unit's ctor writes) since nothing else
@@ -1618,7 +1618,7 @@ extern GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void); /* returns &gTaskObjF
  */
 typedef struct GenericCtorObj_3bb8c_d GenericCtorObj_3bb8c_d;
 struct GenericCtorObj_3bb8c_d {
-    GenericCtorTable_3bb8c_d *methods; /* +0x000, func_8004E34C: self->methods = GetTaskObjFMethods() -- the base-ctor-chain "sets self->methods directly to this table's own pointer" pattern already seen for Class86B60/Class86B60__Class86B60 */
+    GenericCtorTable_3bb8c_d *methods; /* +0x000, TaskObjF__TaskObjF: self->methods = GetTaskObjFMethods() -- the base-ctor-chain "sets self->methods directly to this table's own pointer" pattern already seen for Class86B60/Class86B60__Class86B60 */
 };
 
 /*

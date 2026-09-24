@@ -311,14 +311,14 @@ fail:
 extern void func_8004E3F4(void *self);
 
 /* libcard, linked SDK objects (config/psyq-objects.txt: libcard/a74,
- * libcard/a75, libcard/c112 -- see docs/match-reports/func_8004E34C.md).
+ * libcard/a75, libcard/c112 -- see docs/match-reports/TaskObjF__TaskObjF.md).
  * Declared locally rather than in the shared header, same policy as
  * malloc/free/printf (CLAUDE.md, "To include/ has one exception"). */
 extern void InitCARD(s32 padEnable);
 extern void StartCARD(void);
 extern void _bu_init(void);
 
-void func_8004E34C(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
+void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
 {
     s32 count;
 
