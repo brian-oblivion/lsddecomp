@@ -445,3 +445,25 @@ REVISITED, round 63: MATCHED 83/83 (ins 0 / del 0), whole-image SHA1 green;
 names/types not relevant (the two stale names had to be corrected to link, but
 no naming or retyping work closed it -- two statement-level source-order
 changes did).
+
+## Naming (round 78, runner alpha)
+
+`_SsInit` is already Sony's own identified name (matched round 63) --
+untouched this round. Confirmed the unit as a whole has no class
+(`tools/classtable.py --scan` has no `code_179d8_c` entry): it is plain
+Sony sound-init C sandwiched between the placed `libsnd/vm_vsu` and
+`libsnd/sstable` objects.
+
+Data this function touches: `D_8008EA00`/`D_8008E934` are Sony-pinned in
+`config/psyq-objects.ld` as `_snd_openflag`/`_snd_ev_flag` (same
+addresses) -- proposed to the head for `rename.py` rather than applied
+directly, since `_snd_ev_flag` also appears in `src/code_179d8_j_b.c`,
+outside this unit (collision rules, PARALLEL-RUNS §2.1/§2.3). Tier: not
+applicable (identification, not a game name).
+
+`D_8006DC5C`/`D_8006DC6C` (SPU voice/control register init templates) and
+`D_80090368` (per-voice state array, already typed `VoiceState80090368`)
+are read only by `_SsInit`, a Sony function -- left unnamed per CLAUDE.md's
+"never write C for a function a Sony object owns" / "a field of a struct
+only Sony functions read" rule (FINISHING-PLAN track 3, round 75
+precedent: 24 libsnd variables). Not proposing game names for these.
