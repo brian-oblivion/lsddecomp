@@ -1,12 +1,14 @@
-# func_8004D814 -- MATCH
+# Class86B60__ShowTitleIcon -- MATCH
+
+> Renamed from `func_8004D814` on 2026-09-24 (tools/rename.py). Address 0x8004d814.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004D814`: 33/33 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__ShowTitleIcon`: 33/33 words match.
 
 ## Source
 
 ```c
-void func_8004D814(Class86B60 *self)
+void Class86B60__ShowTitleIcon(Class86B60 *self)
 {
     self->unk34 = 0;
     self->unk2C = 0x190;

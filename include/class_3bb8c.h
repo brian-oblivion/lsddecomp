@@ -1212,7 +1212,7 @@ struct Class86B60Methods {
      * later in the same function. */
     void (*slot60)(Class86B60 *self, s32 arg1);
     u8 pad064[0x06C - 0x064];
-    void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, func_8004D814's own 2nd call, arg1 = 0xA */
+    void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, Class86B60__ShowTitleIcon's own 2nd call, arg1 = 0xA */
     u8 pad070[0x078 - 0x070];
     void (*slot78)(Class86B60 *self); /* +0x078, func_8004D90C's own last call, `self` only */
     void (*slot7C)(Class86B60 *self); /* +0x07C, func_8004D90C's own 2nd call, `self` only */
@@ -1224,7 +1224,7 @@ struct Class86B60Methods {
      * SAME call site with the same signature. */
     void (*slot94)(Class86B60 *self);
     u8 pad098[0x0D4 - 0x098];
-    /* +0x0D4, func_8004D814's own first call, arg1 = &D_800114E8, arg2 = 0. */
+    /* +0x0D4, Class86B60__ShowTitleIcon's own first call, arg1 = &D_800114E8, arg2 = 0. */
     void (*slotD4)(Class86B60 *self, void *arg1, s32 arg2);
     void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, Class86B60__Class86B60's own call, arg1 = &D_80086D44 */
     u8 pad0DC[0x0E0 - 0x0DC];
@@ -1234,7 +1234,7 @@ struct Class86B60Methods {
     u8 pad0E4[0x0F0 - 0x0E4];
     /* +0x0F0, func_8004D90C's own 3rd call: `(self, self->unk4C->unk8,
      * 1)`. Distinct from `DreamSysViewMethods_3bb8c_c::slotF0` (see
-     * func_8004D814's report) -- same offset number, unrelated table.
+     * Class86B60__ShowTitleIcon's report) -- same offset number, unrelated table.
      * func_8004DE08 (this round) also reaches this slot, forwarding an
      * `s32` (its own saved pre-overwrite copy of `self->unk58`) through
      * the SAME `void *arg1` parameter, cast at that call site rather than
@@ -1266,9 +1266,9 @@ struct Class86B60 {
     void *unk10;                     /* +0x010, func_8004E054: opaque, forwarded verbatim */
     void *unk14;                     /* +0x014, func_8004DF64: opaque, forwarded verbatim to unkAC->methods->slot6C */
     u8 pad018[0x02C - 0x018];
-    s32 unk2C;                      /* +0x02C, func_8004D814: set to 0x190 */
+    s32 unk2C;                      /* +0x02C, Class86B60__ShowTitleIcon: set to 0x190 */
     u8 pad030[0x034 - 0x030];
-    s32 unk34;                      /* +0x034, func_8004D814: zeroed */
+    s32 unk34;                      /* +0x034, Class86B60__ShowTitleIcon: zeroed */
     /* +0x038, func_8004D9D4: set to 0 on the `unk58==1` path and to the
      * literal 2 on the `unk58==4` path -- read by nothing else in this
      * unit. The literal 2 is the SAME constant `func_8004D9D4` compares
@@ -1303,7 +1303,7 @@ struct Class86B60 {
     u8 pad094[0x0A4 - 0x094];
     /* +0x0A4, Class86B60__Class86B60: stores its own dreamSys arg raw. RETYPED this
      * round from a bare `void *` to `DreamSysView_3bb8c_c *` --
-     * func_8004D814 (this unit) is the first function to dereference it
+     * Class86B60__ShowTitleIcon (this unit) is the first function to dereference it
      * through its own vtable (`slotF0`) rather than only forwarding it
      * opaquely. Same size (4 bytes), so no layout change; the assignment
      * in Class86B60__Class86B60 (`self->unkA4 = dreamSys;`, `dreamSys` a `void *`
@@ -1378,7 +1378,7 @@ typedef struct DreamSysViewMethods_3bb8c_c DreamSysViewMethods_3bb8c_c;
 
 struct DreamSysViewMethods_3bb8c_c {
     u8 pad000[0x0F0];
-    /* +0x0F0, func_8004D814's own last call: `(dreamSys, 0, 0)`, both
+    /* +0x0F0, Class86B60__ShowTitleIcon's own last call: `(dreamSys, 0, 0)`, both
      * trailing arguments literal zero. */
     void (*slotF0)(DreamSysView_3bb8c_c *self, s32 arg1, s32 arg2);
     u8 pad0F4[0x19C - 0x0F4];
@@ -1470,7 +1470,7 @@ extern s32 D_80086D44;
  * here. */
 extern s32 D_800114DC;
 
-/* Address-of only in this unit (func_8004D814 passes &D_800114E8 to
+/* Address-of only in this unit (Class86B60__ShowTitleIcon passes &D_800114E8 to
  * `Class86B60Methods::slotD4`). Placeholder s32 type since only the
  * address is taken here. */
 extern s32 D_800114E8;

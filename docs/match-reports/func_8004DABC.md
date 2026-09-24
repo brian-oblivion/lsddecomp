@@ -31,7 +31,7 @@ stack-local buffer whose address is forwarded to `self->unkA4`
   `unk14` reached, a plain `s32`).
 - `Class86B60::unk60` -- new field, carved from the `pad05C` gap.
 - `DreamSysViewMethods_3bb8c_c::slot19C` -- new slot (already added ahead
-  of this function while deriving `func_8004D814`'s neighbourhood; this
+  of this function while deriving `Class86B60__ShowTitleIcon`'s neighbourhood; this
   is the function that actually exercises it).
 
 ### Proposed learning

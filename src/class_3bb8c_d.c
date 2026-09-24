@@ -18,7 +18,7 @@ void Class86B60__ForwardIfTagB(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1,
     }
 }
 
-void func_8004D814(Class86B60 *self)
+void Class86B60__ShowTitleIcon(Class86B60 *self)
 {
     self->unk34 = 0;
     self->unk2C = 0x190;
