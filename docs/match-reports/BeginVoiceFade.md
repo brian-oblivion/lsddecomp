@@ -48,7 +48,7 @@ void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
 
 ## Sibling note (see the unit header and the round prompt)
 
-This function IS the "near-identical sibling of `func_8002E308` in
+This function IS the "near-identical sibling of `SeAutoVol` in
 `code_179d8_l`" the unit header calls out: same prologue shape (`addu
 t3,a0,zero` / `addu t0,a1,zero` / `addu t1,a2,zero`), same `s16`
 argument-narrowing (`sll #16`/`sra #16` on `a1`, `a2` before the compare),

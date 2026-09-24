@@ -297,7 +297,7 @@ report speculated.
 "cross-branch redundant-recompute elision" framing suggested it might be
 fixable with — it is a genuine GCC value-availability/CSE decision, and
 TWO independent levers were tried against it this round, both negative,
-both consistent with what `func_8002E308`'s report (same round) found
+both consistent with what `SeAutoVol`'s report (same round) found
 independently against an unrelated instance of the same class:**
 
 1. **Bare `__asm__("")` immediately before each `goto evalPriority;`** (at
@@ -323,7 +323,7 @@ multiply with no memory access.** An empty `__asm__("")` is a barrier
 against instruction motion of operations with side effects or unknown
 memory interactions — it gives GCC nothing to protect a side-effect-free
 arithmetic value from, so the compiler is free to prove the value is still
-available across it and reuse it. This matches `func_8002E308`'s
+available across it and reuse it. This matches `SeAutoVol`'s
 independent finding in the same round (a different function, same
 project, same class of residue: a GCSE-style hoist of a redundant
 subtraction survived a barrier at every position tried). **Promote this
@@ -465,7 +465,7 @@ s32 SpuVmAlloc(void)
   immune to a bare `__asm__("")` scheduling barrier, at any of the
   placements tried (both predecessors, and the merge label itself).**
   Confirmed independently in two functions this round
-  (`func_8002E308`, this one). Worth promoting in
+  (`SeAutoVol`, this one). Worth promoting in
   `DECOMPILATION_LEARNINGS.md` from "try a barrier" to "a barrier cannot
   reach this class; the next lever must change which value the front end
   computes, not when."
@@ -516,7 +516,7 @@ suspected hoist is NOT a working technique to present the compiler with a
 "different" value; it collapses the alias back to the original before the
 relevant optimization pass sees it. This closes off the last of the
 "rename or alias to dodge CSE" family of ideas for this residue class —
-combined with `func_8002E308`'s round-35 finding that an algebraic-identity
+combined with `SeAutoVol`'s round-35 finding that an algebraic-identity
 rewrite (`-(b-a)` for `a-b`) is equally transparent to it, the working
 conclusion for this project's "value-hoist immune to barriers" class is
 that NO surface-syntax rephrasing of an equivalent expression defeats it;

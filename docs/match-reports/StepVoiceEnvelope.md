@@ -619,7 +619,7 @@ pair, clear an active flag on reaching the limit, then compute and write
 a stereo output level from the result) but over its own `gVoiceEnv*`
 family, and with no "Begin"-style setup function in this unit -- nothing
 here writes `gVoiceEnvActive`, `gVoiceEnvStep` or `gVoiceEnvLimit`.
-`func_8002E308` in `code_179d8_l` opens with the identical prologue and
+`SeAutoVol` in `code_179d8_l` opens with the identical prologue and
 argument-narrowing shape this unit's header already calls out as a
 register-pressure sibling, not a coincidence worth re-deriving; worth
 checking directly whether it is the missing "BeginVoiceEnvelope".

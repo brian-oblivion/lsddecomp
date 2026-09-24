@@ -1,4 +1,6 @@
-# func_8002E308 -- MATCHED (round 73, 116/116, whole-image SHA1 green)
+# SeAutoVol -- MATCHED (round 73, 116/116, whole-image SHA1 green)
+
+> Renamed from `func_8002E308` on 2026-09-24 (tools/rename.py). Address 0x8002e308.
 
 REVISITED, round 73: MATCHED 116/116 on the first build of a fresh body; names/types used (s16 parameters `voice`/`from`/`to`/`duration`, `Rec34Half`-shaped record view)
 
@@ -42,7 +44,7 @@ extern Rec34Half_E308 gVoiceEnvCountdown[];
 extern Rec34Half_E308 gVoiceEnvAccum[];
 extern Rec34Half_E308 gVoiceEnvLimit[];
 
-void func_8002E308(s16 voice, s16 from, s16 to, s16 duration) {
+void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
 
     if (from == to) {
@@ -83,7 +85,7 @@ this function for five rounds.
 instruction already diverges. **First real diff is at vram `0x8002E30C` /
 file `0x1EB0C`**: retail's `move $t0,$a1` (preserving the raw, un-narrowed
 parameter) has no counterpart at all in the derived body — confirmed with
-`tools/asm-differ/diff.py func_8002E308`, not inferred. Register shuffling
+`tools/asm-differ/diff.py SeAutoVol`, not inferred. Register shuffling
 cascades through essentially the entire function from that point on.
 
 `code_179d8_l`, vram `0x8002E308`, file offset `0x1EB08`, 116 words
@@ -162,7 +164,7 @@ extern u8 gVoiceEnvCountdown[];
 extern u8 gVoiceEnvAccum[];
 extern u8 gVoiceEnvLimit[];
 
-void func_8002E308(s32 a0in, s32 a1, s32 a2, s32 a3) {
+void SeAutoVol(s32 a0in, s32 a1, s32 a2, s32 a3) {
     s32 t3;
     s32 t0;
     s32 t1;
@@ -326,7 +328,7 @@ four queued functions.
 ## Round 35 update (runner bravo): the algebraic value-numbering lever, tried and negative
 
 Re-verified the inherited 118/116-word body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002E308` compiles to `0x1d8`
+`build/src/code_179d8_l.c.o` confirms `SeAutoVol` compiles to `0x1d8`
 bytes = 118 words, matching round 33's figure exactly.
 
 **Tried round 33's own proposed next lever — rewriting the "far" arm's
@@ -381,7 +383,7 @@ what's now confirmed twice each.
 ## Round 37 update (runner alpha): first permuter search on this function, negative
 
 Re-verified the inherited 118/116 body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002E308` compiles to `0x1d8`
+`build/src/code_179d8_l.c.o` confirms `SeAutoVol` compiles to `0x1d8`
 bytes = 118 words, matching rounds 33/35's figure exactly.
 
 **`--debug --stack-diffs` sanity check:** base score = **6315** — far from
@@ -399,7 +401,7 @@ Inferred `rc=124` (bound fired) from wall-clock timing matching the other
 two searches this round.
 
 **Result: ZERO hits at `score = 0`.** Best score reached was **2175**, down
-from the 6315 baseline (`permuter-work/func_8002E308/output-2175-1`).
+from the 6315 baseline (`permuter-work/SeAutoVol/output-2175-1`).
 
 **The 2175 candidate is a genuinely NEW structural idea — not a rehash of
 the "algebraic rewrite" or "volatile" levers rounds 33/35 already tried and
@@ -444,7 +446,7 @@ oracle — a bigger drop is not more trustworthy.
 ## Round 44 update (runner delta): inherited body re-verified real, not re-attempted further
 
 Re-verified the inherited 118/116 body: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002E308` compiles to `0x1d8`
+`build/src/code_179d8_l.c.o` confirms `SeAutoVol` compiles to `0x1d8`
 bytes = 118 words, matching rounds 33/35/37's figure exactly. Given three
 prior rounds' worth of levers already tried and confirmed negative
 (algebraic-identity rewrite, `volatile` at two different sites both

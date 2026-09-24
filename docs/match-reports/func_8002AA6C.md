@@ -479,7 +479,7 @@ should carry the barrier from the start.
 
 Assigned question: **what distinguishes the isolated reduction where a bare
 `__asm__("")` barrier fixes the "redundant-raw-copy elision" class (round
-24, `code_179d8_l`: `vmNoiseOn2`/`SePitchBend`/`func_8002E308`) from
+24, `code_179d8_l`: `vmNoiseOn2`/`SePitchBend`/`SeAutoVol`) from
 the real function, where it transfers to none of them?** Mid-investigation
 the head sent two broadcasts proposing a BLOCK-ORDER / tail-merge mechanism
 (measured on `CheckDreamAuxTriggerCondition` and `Entity__UpdateActivationState` in other units this same
@@ -651,7 +651,7 @@ block-order hypothesis correctly identifies exactly one of them:**
    which is not a scheduling outcome a barrier operates on at all.
 
 **None of the three explains why an isolated 2-4 value reduction of the
-"preserve raw copy, narrow in place" shape (round 24's `func_8002E308`)
+"preserve raw copy, narrow in place" shape (round 24's `SeAutoVol`)
 closes with a barrier while the real function does not** -- that specific
 class was not reproduced inside THIS unit's five assigned stalls (none of
 them is a preserve-then-narrow parameter shape), so this investigation

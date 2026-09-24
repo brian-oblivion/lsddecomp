@@ -507,7 +507,7 @@ source statements, retiming address materialization, and scheduling
 barriers all either do nothing or regress. The leading residue continues
 to look like straightforward HARD RULE 6 register-identity territory (not
 fixable from C, and not a case for `register asm("$N")`); the tail
-reorder's resistance to a barrier is consistent with `func_8002E308` and
+reorder's resistance to a barrier is consistent with `SeAutoVol` and
 `SpuVmAlloc`'s independent round-33 finding that a barrier cannot
 prevent a side-effect-free value/address computation from being reordered
 across it when there is nothing for the barrier to protect.
@@ -604,7 +604,7 @@ grouping idiom is a validated-negative lever for THIS function specifically
 **A `do { ... } while (0);` block wrapping a statement group is a
 genuinely different C-level construct from a bare `__asm__("")` barrier —
 worth testing generally as a potential fence against GCC 2.6.3's
-cross-branch/value-hoisting immunity to `asm("")` (the class `func_8002E308`
+cross-branch/value-hoisting immunity to `asm("")` (the class `SeAutoVol`
 and `SpuVmAlloc` document as resistant to plain barriers) — but on this
 function specifically it relocated the residue rather than removing it, so
 record the outcome as function-specific, not yet a validated project-wide

@@ -701,7 +701,7 @@ matching") no matching was attempted.
 - `sdkname.py` also gives `StepVoiceEnvelope` **shape 0.99** against
   libsnd `SetAutoVol` (3.3 vmanager, 227w vs 231w). Its sibling
   `StepVoiceFade` is `SetAutoPan` (3.3: 224w, same opening skeleton), and
-  `BeginVoiceFade`/`func_8002E308` are then `SsUtAutoPan`/`SsUtAutoVol`.
+  `BeginVoiceFade`/`SeAutoVol` are then `SsUtAutoPan`/`SsUtAutoVol`.
   This whole unit is libsnd's voice manager. `progress.py` should count it
   as library by address (`config/sdk-in-game.txt` / `identified` symbols),
   which is a head decision.

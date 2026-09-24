@@ -35,7 +35,7 @@
  *   - StepVoiceEnvelope: the same accumulate-until-limit shape over its
  *     own gVoiceEnv* family, but with no "Begin" counterpart in this
  *     unit -- whatever sets gVoiceEnvActive/gVoiceEnvStep/gVoiceEnvLimit
- *     is still undecompiled elsewhere. func_8002E308 in code_179d8_l opens
+ *     is still undecompiled elsewhere. SeAutoVol in code_179d8_l opens
  *     with the identical prologue/argument-narrowing shape and is worth
  *     checking as that counterpart.
  *   - SpuVmFlush: the per-tick dispatcher. Maintains a 16-slot

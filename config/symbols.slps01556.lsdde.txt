@@ -1848,3 +1848,13 @@ vmNoiseOn2 = 0x8002DDBC; // type:func
 // 112w, disc 3.3), position within the libsnd neighborhood. Superseded
 // game-style func_8002E138. Round 74 (bravo, track 2).
 SePitchBend = 0x8002E138; // type:func
+// identified: shape 0.97 vs libsnd/vmanager SeAutoVol (110w vs our 116w,
+// disc 3.3), position within the libsnd neighborhood. sdkname.py ties this
+// same shape candidate against BeginVoiceFade (0x8002E874); disambiguated by
+// family: this function operates on the gVoiceEnv* globals, the same family
+// StepVoiceEnvelope (-> SetAutoVol) uses, while BeginVoiceFade operates on
+// gVoiceFade* (the family StepVoiceFade -> SetAutoPan uses) -- matching
+// Sony's public SsUtAutoVol/SsUtAutoPan pair (LIBSND.H) onto its internal
+// SeAutoVol/SeAutoPan pair. Superseded game-style func_8002E308.
+// Round 74 (bravo, track 2).
+SeAutoVol = 0x8002E308; // type:func

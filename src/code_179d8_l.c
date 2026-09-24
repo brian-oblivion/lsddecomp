@@ -44,10 +44,10 @@
  *   func_8002E2F8    2w  <- already matched: splat emitted the empty C body
  *   func_8002E300    2w  <- itself.  Not work, and not yours to redo.
  *   note2pitch   47w   note2pitch2   64w   vmNoiseOn2  112w
- *   SePitchBend  112w   func_8002E308  116w   SpuVmDoAllocate  143w
+ *   SePitchBend  112w   SeAutoVol  116w   SpuVmDoAllocate  143w
  *   SpuVmAlloc  167w
  *
- * func_8002E308's opening `addu $t3, $a0, $zero` is REGISTER PRESSURE with
+ * SeAutoVol's opening `addu $t3, $a0, $zero` is REGISTER PRESSURE with
  * s16 argument narrowing, NOT a BIOS trampoline -- checked by hand at carve
  * time, because the `jr $t2` trampoline screen is blind to variants and a
  * trampoline-dense segment reads as the cleanest ground in the file while
@@ -617,7 +617,7 @@ void func_8002E2F8(void) {
 void func_8002E300(void) {
 }
 
-/* Matched round 73 -- docs/match-reports/func_8002E308.md. Same body as
+/* Matched round 73 -- docs/match-reports/SeAutoVol.md. Same body as
  * BeginVoiceFade (code_179d8_m) over the gVoiceEnv* family. */
 typedef struct {
     s16 unk0;
@@ -630,7 +630,7 @@ extern Rec34Half_E308 gVoiceEnvCountdown[];
 extern Rec34Half_E308 gVoiceEnvAccum[];
 extern Rec34Half_E308 gVoiceEnvLimit[];
 
-void func_8002E308(s16 voice, s16 from, s16 to, s16 duration) {
+void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
 
     if (from == to) {

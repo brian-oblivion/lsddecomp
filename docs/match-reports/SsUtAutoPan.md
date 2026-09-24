@@ -4,7 +4,7 @@
 
 Unit `code_179d8_j`, round 21 (2026-09-06). Sibling of `SsUtAutoVol`
 (see that report) -- identical shape, calls `BeginVoiceFade` instead of
-`func_8002E308`.
+`SeAutoVol`.
 
 ```c
 extern void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3);
