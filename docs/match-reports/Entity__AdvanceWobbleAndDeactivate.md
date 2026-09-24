@@ -16,7 +16,7 @@ cross-unit from `Entity_d.c`'s own extern
 arg2, s32 arg3, s32 arg4);`). Sets four `out->` fields when `out->unk4 ==
 6`. Tests `this->unkFC` against a cascade of six `arg2`-relative
 thresholds (`arg2`, `arg2+0x5B`, `arg2+0x155`, `arg2+0x1B1`, `arg2+0x2BA`,
-`arg2+0x317`) that collapse to a single `slot44(this, 0, D_80089D18)` call
+`arg2+0x317`) that collapse to a single `slot44(this, 0, ROTATION_YAW_PLUS1)` call
 when `unkFC` lands in one of three disjoint windows relative to `arg2`
 (`[0,0x5B]`, `[0x155,0x1B1]`, `[0x2BA,0x317]`, all offsets from `arg2`);
 either way, falls through to `slotC4(this, arg4, 0)`, then `slot160`/
@@ -57,7 +57,7 @@ L34:
         goto L74;
     }
 L50:
-    this->methods->slot44(this, 0, D_80089D18);
+    this->methods->slot44(this, 0, ROTATION_YAW_PLUS1);
 L74:
     this->methods->slotC4(this, arg4, 0);
     if (this->unkFC == arg3) {
@@ -185,7 +185,7 @@ L34:
         goto L74;
     }
 L50:
-    this->methods->slot44(this, 0, D_80089D18);
+    this->methods->slot44(this, 0, ROTATION_YAW_PLUS1);
 L74:
     this->methods->slotC4(this, arg4, 0);
     if (this->unkFC == arg3) {

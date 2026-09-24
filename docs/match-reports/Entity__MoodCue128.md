@@ -11,14 +11,14 @@ No hits.
 ## What it does
 
 `gEntityMoodHandlerTable` handler row; `out` unused. `Class6B5CC__FaceTarget(this, this->unk94,
-1, 0, 0)`, `slot48(this, 1, D_80089E80)`, `slotC4(this, -0x1E, 1)`.
+1, 0, 0)`, `slot48(this, 1, SCALE_THIRTY_SECOND)`, `slotC4(this, -0x1E, 1)`.
 
 ## The C
 
 ```c
 void Entity__MoodCue128(Entity *this, EntityMoodHandlerArg *out) {
     Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
-    this->methods->slot48(this, 1, D_80089E80);
+    this->methods->slot48(this, 1, SCALE_THIRTY_SECOND);
     this->methods->slotC4(this, -0x1E, 1);
 }
 ```

@@ -10,17 +10,17 @@ extern u8 D_80089CAC[];
 extern u8 D_80089E14[];
 extern u8 D_80089DE4[];
 extern u8 SCALE_HALF[];
-extern u8 D_80089E20[];
-extern u8 D_80089DCC[];
+extern u8 SCALE_EIGHTH[];
+extern u8 SCALE_QUARTER[];
 extern u8 D_80089CB8[];
 extern u8 D_80089E2C[];
 extern u8 SCALE_SIX[];
 extern u8 D_80089E44[];
-extern u8 D_80089D00[];
-extern u8 D_80089D18[];
+extern u8 ROTATION_ZPLUS4[];
+extern u8 ROTATION_YAW_PLUS1[];
 extern u8 ROTATION_YAW_MINUS9[];
 extern u8 ROTATION_YAW_PLUS9[];
-extern u8 D_80089E80[];
+extern u8 SCALE_THIRTY_SECOND[];
 
 /* Entity__AdvanceWobbleAndDeactivate, this unit's own function, is called by Entity__MoodCue111
  * (earlier in ROM order) before its own definition below -- forward
@@ -65,9 +65,9 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         } else if (this->moodTimer >= 0x786) {
             a2 = SCALE_HALF;
         } else if (this->moodTimer >= 0x781) {
-            a2 = D_80089DCC;
+            a2 = SCALE_QUARTER;
         } else {
-            a2 = D_80089E20;
+            a2 = SCALE_EIGHTH;
         }
         this->methods->updateScale(this, 1, a2);
         if (this->moodTimer < 0x7D0) {
@@ -111,7 +111,7 @@ void Entity__MoodCue103(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue104(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->updateScale(this, 1, D_80089DCC);
+    this->methods->updateScale(this, 1, SCALE_QUARTER);
     if ((u32)(this->moodTimer - 0xC9) < 0x63) {
         this->methods->slotCC(this, -0x20, 0);
     }
@@ -164,7 +164,7 @@ void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->moodState == 0xA) {
         if (this->moodTimer < 0x2D) {
-            this->methods->updateRotation(this, 0, D_80089D00);
+            this->methods->updateRotation(this, 0, ROTATION_ZPLUS4);
         }
         if (this->moodTimer >= 0x1F5) {
             this->moodState = 0;
@@ -242,7 +242,7 @@ L34:
         goto L74;
     }
 L50:
-    this->methods->updateRotation(this, 0, D_80089D18);
+    this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
 L74:
     this->methods->slotC4(this, arg4, 0);
     if (this->moodTimer == arg3) {
@@ -278,7 +278,7 @@ void Entity__MoodCue118(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue121(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->updateScale(this, 1, D_80089DCC);
+    this->methods->updateScale(this, 1, SCALE_QUARTER);
 }
 
 void Entity__MoodCue123(Entity *this, EntityMoodHandlerArg *out) {
@@ -325,7 +325,7 @@ merge:
 
 void Entity__MoodCue128(Entity *this, EntityMoodHandlerArg *out) {
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-    this->methods->updateScale(this, 1, D_80089E80);
+    this->methods->updateScale(this, 1, SCALE_THIRTY_SECOND);
     this->methods->slotC4(this, -0x1E, 1);
 }
 

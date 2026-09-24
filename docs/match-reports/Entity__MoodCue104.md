@@ -11,7 +11,7 @@ No hits.
 ## What it does
 
 `gEntityMoodHandlerTable` handler row; `out` unused. `this->methods->slot48(this, 1,
-D_80089DCC)` unconditionally, then `this->methods->slotCC(this, -0x20, 0)`
+SCALE_QUARTER)` unconditionally, then `this->methods->slotCC(this, -0x20, 0)`
 when `this->unkFC` falls in `[0xC9, 0x12C)` (an unsigned-subtract range
 check, `(u32)(this->unkFC - 0xC9) < 0x63`).
 
@@ -19,7 +19,7 @@ check, `(u32)(this->unkFC - 0xC9) < 0x63`).
 
 ```c
 void Entity__MoodCue104(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089DCC);
+    this->methods->slot48(this, 1, SCALE_QUARTER);
     if ((u32)(this->unkFC - 0xC9) < 0x63) {
         this->methods->slotCC(this, -0x20, 0);
     }

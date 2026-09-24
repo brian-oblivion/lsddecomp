@@ -49,9 +49,9 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         } else if (this->unkFC >= 0x786) {
             a2 = SCALE_HALF;
         } else if (this->unkFC >= 0x781) {
-            a2 = D_80089DCC;
+            a2 = SCALE_QUARTER;
         } else {
-            a2 = D_80089E20;
+            a2 = SCALE_EIGHTH;
         }
         this->methods->slot48(this, 1, a2);
         if (this->unkFC < 0x7D0) {
@@ -76,11 +76,11 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
 ## Residue chased: two swapped row pointers in the cascading chain
 
 First attempt built and scored 146/148, differing only at the LAST two
-`addiu %lo(...)` immediates -- `D_80089E20` and `D_80089DCC` swapped. Tracing
+`addiu %lo(...)` immediates -- `SCALE_EIGHTH` and `SCALE_QUARTER` swapped. Tracing
 the `bnez`/delay-slot-recompute chain by hand for the last two arms (each
 delay slot recomputes `$v0` for the NEXT comparison down the chain, and the
-final arm sets `a2 = D_80089E20` BEFORE testing whether to overwrite it with
-`D_80089DCC`, i.e. the "set first, conditionally overwrite" idiom applied to
+final arm sets `a2 = SCALE_EIGHTH` BEFORE testing whether to overwrite it with
+`SCALE_QUARTER`, i.e. the "set first, conditionally overwrite" idiom applied to
 which POINTER a2 ends up holding, not a value) showed the two low-end arms
 were reversed from my first reading. Fixed by swapping which arm gets which
 row pointer; closed to 148/148 on the second build.

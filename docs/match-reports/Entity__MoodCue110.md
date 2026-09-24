@@ -29,7 +29,7 @@ void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xA) {
         if (this->unkFC < 0x2D) {
-            this->methods->slot44(this, 0, D_80089D00);
+            this->methods->slot44(this, 0, ROTATION_ZPLUS4);
         }
         if (this->unkFC >= 0x1F5) {
             this->unk44 = 0;

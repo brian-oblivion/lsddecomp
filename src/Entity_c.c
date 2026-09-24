@@ -13,13 +13,13 @@
 extern u8 SCALE_SIX[];
 extern u8 SCALE_Y2[];
 extern u8 SCALE_DOUBLE[];
-extern u8 D_80089DCC[];
+extern u8 SCALE_QUARTER[];
 extern u8 ROTATION_YAW_PLUS2[];
 extern u8 ROTATION_YAW_PLUS9[];
 extern u8 ROTATION_YAW_MINUS9[];
 extern u8 D_80089C58[];
 extern u8 D_80089E74[];
-extern u8 D_80089D18[];
+extern u8 ROTATION_YAW_PLUS1[];
 extern u8 D_80089DB4[];
 extern u8 TRANSLATE_Y_MINUS64[];
 extern u8 D_80089D9C[];
@@ -185,7 +185,7 @@ void func_8005F708(Entity *this) {
         this->moodState = rand() % 5;
     }
     if (this->moodState == 0) {
-        this->methods->updateRotation(this, 0, D_80089D18);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
     }
 }
 
@@ -238,7 +238,7 @@ void func_8005FA64(Entity *this) {
 
 void func_8005FA94(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
-        this->methods->updateScale(this, 1, D_80089DCC);
+        this->methods->updateScale(this, 1, SCALE_QUARTER);
     } else if (out->unk4 % 30 == 0) {
         out->unk10 = 0;
         out->unk1C = 3;

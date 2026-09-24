@@ -10,13 +10,13 @@ No hits.
 
 ## What it does
 
-`gEntityMoodHandlerTable` handler row; `out` unused. `slot48(this, 1, D_80089DCC)`.
+`gEntityMoodHandlerTable` handler row; `out` unused. `slot48(this, 1, SCALE_QUARTER)`.
 
 ## The C
 
 ```c
 void Entity__MoodCue121(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, D_80089DCC);
+    this->methods->slot48(this, 1, SCALE_QUARTER);
 }
 ```
 
