@@ -367,18 +367,15 @@ typedef struct DreamSysUnk4CMethods {
 	   pass). */
 	s32 (*queryLinkAtPos)(void *self, void *out, void *pos);
 	u8 pad_0x114[0x118 - 0x114];
-	/* This unit's own DreamSys__BuildLinkQueries dispatches to it twice, with a
-	   different argument count each time (per-call-site signature, see
-	   DreamSys__AcceptGridElem's report): `(this->unk_0x4C, arg1, arg2, arg3)` and
-	   `(this->unk_0x4C, arg1)` -- typed here with the fuller shape; the
-	   shorter call simply leaves the trailing two as whatever the
-	   registers already held. Return value is stored into a
-	   `GridArrElem *` array slot (round 2026-09-04). Named
-	   `getGridArrElemAt`: both calls pass an adjacent grid index
-	   (`pos = s3 +/- 1` in DreamSys__BuildLinkQueries's own preserved
-	   derivation) and get back the `GridArrElem *` for that index --
-	   accessed only from `class_3bb8c_p.c` (round 57 naming pass). */
-	void *(*getGridArrElemAt)(void *self, s32 arg1, s32 arg2, void *arg3);
+	/* DreamSys__BuildLinkQueries (class_3bb8c_p.c) dispatches to it twice,
+	   both times as (this->unk_0x4C, pos) with pos an adjacent grid index
+	   (s3 +/- 1), and stores the result into a `GridArrElem *` array slot.
+	   Round 75 corrected the arity: retail sets only a0/a1 at the second
+	   call, and the a2/a3 values visible at the first are the caller's own
+	   leftovers; a 4-argument type kept two extra callee-saved registers
+	   live (DreamSys__BuildLinkQueries's report). Named `getGridArrElemAt`
+	   in the round 57 naming pass; accessed only from class_3bb8c_p.c. */
+	void *(*getGridArrElemAt)(void *self, s32 pos);
 	/* Called by DreamSys__NotifyLinkAttempt's `arg1 == -2` path as (this->unk_0x4C,
 	   (u8 *)this->unk_0x14 + 0x18); the result's `unk_0x4` is chased and its
 	   `unk_0x2C` compared against the literal 2 (round 2026-09-02). */

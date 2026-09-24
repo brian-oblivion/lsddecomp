@@ -197,13 +197,6 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
     return 0;
 }
 
-/* Both getGridArrElemAt calls pass only (this, pos): retail sets a0/a1
- * and nothing else at the second call, and the a2/a3 values visible at
- * the first are leftovers of this function's own register use. Calling it
- * through the header's 4-argument shape kept row/source live across both
- * calls in two extra callee-saved registers (round 75, see the report). */
-typedef GridArrElem *(*GetGridArrElemAt2Fn)(void *self, s32 pos);
-
 s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4) {
     s32 f2 = arg3->queryCol;
     s32 f3 = arg3->queryRow;
@@ -239,13 +232,13 @@ s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **ar
         s3 = src->info->unk32;
         pos = s3 + 1;
         if (pos < unk68->unk_0x2) {
-            arr2[1] = ((GetGridArrElemAt2Fn) unk4C->methods->getGridArrElemAt)(unk4C, pos);
+            arr2[1] = unk4C->methods->getGridArrElemAt(unk4C, pos);
             idx = 2;
             arr1[1] = arr1[0];
         }
         pos = s3 - 1;
         if (pos >= 0) {
-            arr2[idx] = ((GetGridArrElemAt2Fn) unk4C->methods->getGridArrElemAt)(unk4C, pos);
+            arr2[idx] = unk4C->methods->getGridArrElemAt(unk4C, pos);
             arr1[idx] = arr1[0];
             idx++;
         }
