@@ -50,3 +50,24 @@ Matched on the first build.
 
 round 13 (2026-09-03), runner alpha, unit Entity_g. Matched on the first
 build.
+
+
+## Naming
+
+Why `MoodCue123`: the function's address sits in `gEntityMoodHandlerTable`
+row 123 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
+confirmed by reading `disk/SLPS_015.56` directly rather than trusting
+address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+order does not track code address). Tier B: the row-to-function mapping is
+a compiler fact, not a guess, but which dream state or object each row
+represents is not established -- the row number is kept decimal, matching
+the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+names sort in table order.
+
+**This handler also occupies row 126** of `gEntityMoodHandlerTable` (same
+`handler` word at both `0x80089EB0+0x10*123` and `0x80089EB0+0x10*126`;
+the row's other three words -- data0/data1/data2 -- differ between the two
+rows, so it is one function shared by two distinct mood-row
+configurations, not a naming collision). Named for its lower/first row per
+the existing convention (Entity__MoodCue81, Entity_e round 59/77); not a
+second name.

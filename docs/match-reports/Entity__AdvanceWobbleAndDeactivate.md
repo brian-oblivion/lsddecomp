@@ -227,3 +227,35 @@ confirmed correct. When several C-level reshapes of a small block all
 converge on the identical residue, that convergence is evidence the levers
 tried are the wrong axis -- not evidence the axis (conditional grouping,
 statement scope) has been exhausted.
+
+## Naming
+
+Not a `gEntityMoodHandlerTable` row (no row's `handler` word is
+0x80064FBC; confirmed by scanning the whole table against every row, same
+method used for the row functions in this unit). It is a shared per-tick
+helper called directly (`jal`, not through any vtable) by two different
+row handlers: `Entity__MoodCue111` (this unit, twice, with different
+`arg2`/`arg3`/`arg4`) and `Entity__MoodCue40` (`Entity_d.c`, cross-unit,
+one call site). Tier B: the mechanics are fully established from the body
+-- up to three periodic "wobble" windows relative to `arg2`
+(`[arg2,arg2+0x5B]`, `[arg2+0x155,arg2+0x1B1]`, `[arg2+0x2BA,arg2+0x317]`)
+trigger a single `updateRotation(this, 0, ROTATION_YAW_PLUS1)` pulse, then
+every call unconditionally applies `slotC4(this, arg4, 0)` (a continuous
+decay/approach call used identically by many of this unit's own row
+handlers) and deactivates + sets `moodState = 1` once `moodTimer == arg3`
+-- but why two unrelated mood cues (row 40 and row 111) share exactly this
+timed-wobble-then-deactivate shape, or what the wobble represents in the
+game, is not established. Named `AdvanceWobbleAndDeactivate` (free-function
+`VerbNoun`-adjacent form, `Entity__` prefix kept because it operates
+directly on `Entity::moodTimer`/`Entity::moodState` the same way
+`Entity__GetOrCreateUnk100`/`Entity__IsTargetInRange` do) rather than the
+tier-C `Entity__func_80064FBC` form, because the mechanics description
+above is concrete, not a placeholder.
+
+## Data constant decoded this round
+
+`ROTATION_YAW_PLUS1` (0x80089D18), the wobble-pulse `updateRotation`
+argument, decoded from `disk/SLPS_015.56` as four s16 `{num,den}` pairs:
+`(0,1, 1,1, 0,1, 0,1)` -- only Y (yaw) nonzero, a whole 1/1 = 1 degree,
+matching the existing `ROTATION_YAW_PLUS2` precedent for small whole-degree
+per-tick amounts.

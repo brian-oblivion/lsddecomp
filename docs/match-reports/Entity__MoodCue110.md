@@ -43,3 +43,37 @@ Matched on the first build.
 ## Provenance
 
 round 13 (2026-09-03), runner alpha, unit Entity_g.
+
+
+## Naming
+
+Why `MoodCue110`: the function's address sits in `gEntityMoodHandlerTable`
+row 110 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
+confirmed by reading `disk/SLPS_015.56` directly rather than trusting
+address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+order does not track code address). Tier B: the row-to-function mapping is
+a compiler fact, not a guess, but which dream state or object each row
+represents is not established -- the row number is kept decimal, matching
+the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+names sort in table order.
+
+## Data constant decoded this round
+
+`ROTATION_ZPLUS4` (0x80089D00), this function's `updateRotation` argument
+inside its `moodState == 0xA` branch, decoded from `disk/SLPS_015.56` as
+four s16 `{num,den}` pairs: `(0,1, 4,1, 0,1, 90,1)` -- only Z is a whole
+degree (4/1), X=Y=0; W=90/1 is ignored per the established precedent that
+the 4th pair is never reflected in the name (`ROTATION_YAW_MINUS120` at
+0x80089CE8 has an equally nonzero, equally unnamed W=50/1). Matches the
+existing `ROTATION_ZPLUS9` naming shape exactly, just a different Z
+amount.
+
+## Data constant left unnamed this round
+
+`D_80089E44` (`updateScale` arg, unconditional at function entry; also
+used by `Entity__MoodCue125`): s16-pair decoded `(2,5, 2,5, 2,5, 1,1)` --
+uniform X=Y=Z=2/5. A non-unit fraction, unlike every currently-named
+`SCALE_*` (`HALF`=1/2, `EIGHTH`=1/8, `QUARTER`=1/4, all unit fractions, or
+`SIX`/`X3`/`Y2`/`Y4`/`DOUBLE`, all whole multiples) -- no precedent covers
+a fraction like 2/5, so left as `D_` rather than inventing a new word
+(`SCALE_TWO_FIFTHS`) with no anchor in the existing convention.

@@ -113,3 +113,52 @@ and vtable dispatch.
 
 round 13 (2026-09-03), runner alpha, unit Entity_g. 2 attempts (one residue,
 two swapped row-pointer arms in a cascading range chain).
+
+
+## Naming
+
+Why `MoodCue102`: the function's address sits in `gEntityMoodHandlerTable`
+row 102 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
+confirmed by reading `disk/SLPS_015.56` directly rather than trusting
+address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+order does not track code address). Tier B: the row-to-function mapping is
+a compiler fact, not a guess, but which dream state or object each row
+represents is not established -- the row number is kept decimal, matching
+the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+names sort in table order.
+
+## Data constants decoded this round
+
+`SCALE_EIGHTH` (0x80089E20) and `SCALE_QUARTER` (0x80089DCC), both cascade
+arms in this function's `moodTimer`-threshold chain, decoded directly from
+`disk/SLPS_015.56` as four s16 `{num,den}` pairs (X/Y(yaw)/Z/W, matching
+`SCALE_HALF`/`SCALE_SIX`'s own layout):
+
+- `SCALE_EIGHTH`: `(1,8, 1,8, 1,8, 1,8)` -- uniform X=Y=Z=1/8, the same
+  unit-fraction-word convention as `SCALE_HALF` (1/2).
+- `SCALE_QUARTER`: `(1,4, 1,4, 1,4, 1,2)` -- uniform X=Y=Z=1/4, W=1/2
+  (ignored per the established `SCALE_HALF`/`SCALE_SIX`/
+  `ROTATION_YAW_MINUS120` precedent that the 4th pair is never reflected
+  in the name).
+
+Also used by `Entity__MoodCue104`/`Entity__MoodCue121` (`SCALE_QUARTER`)
+elsewhere in this unit -- same symbol, not redecoded per call site.
+
+## Three constants left unnamed this round
+
+- `D_80089CAC` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
+  decoded `(0,1, -1,3, 0,1, 0,1)` -- only Y nonzero, but -1/3 degree is not
+  a whole number, so it does not fit the established `ROTATION_YAW_PLUS2`/
+  `ROTATION_YAW_PLUS9`/`ROTATION_YAW_PLUS1` whole-degree convention. No
+  fractional-degree rotation constant has a name anywhere in the project
+  yet, so inventing one here (`ROTATION_YAW_MINUS_THIRD`-style) would be a
+  new naming style, not an application of an existing one.
+- `D_80089E14` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
+  `(1,1, 1,1, 1,1, 1,8)` -- uniform X=Y=Z=1/1, i.e. the same VALUE as the
+  existing (structurally distinct, different address, 0xC-byte/3-entry)
+  `SCALE_ONE` used by `Class6B5CC__UpdateScale`. Not renamed to `SCALE_ONE`
+  or a variant: two differently-addressed, differently-shaped symbols
+  sharing one implied meaning is confusing, not clarifying.
+- `D_80089DE4` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded
+  `(4,5, 6,5, 5,5, 2,1)` -- X=4/5, Y=6/5, Z=1, not uniform, so it is not
+  one of this project's single-ratio `SCALE_*` names.

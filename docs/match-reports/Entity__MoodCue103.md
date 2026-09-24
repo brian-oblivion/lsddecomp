@@ -49,3 +49,25 @@ Matched on the first build.
 
 round 13 (2026-09-03), runner alpha, unit Entity_g. Matched on the first
 build. Adds `D_80089CB8` to this unit's local externs.
+
+
+## Naming
+
+Why `MoodCue103`: the function's address sits in `gEntityMoodHandlerTable`
+row 103 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
+confirmed by reading `disk/SLPS_015.56` directly rather than trusting
+address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+order does not track code address). Tier B: the row-to-function mapping is
+a compiler fact, not a guess, but which dream state or object each row
+represents is not established -- the row number is kept decimal, matching
+the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+names sort in table order.
+
+## Data constant left unnamed this round
+
+`D_80089CB8` (`updateRotation` arg, `moodState == 0xB` branch): s16-pair
+decoded `(0,1, -1,2, 0,1, 0,1)` -- only Y nonzero, -1/2 degree. Same
+reasoning as `D_80089CAC` (Entity__MoodCue102's report): no fractional-degree
+rotation constant is named anywhere in the project, so a half-degree
+per-tick wobble rate does not fit the established whole-degree
+`ROTATION_YAW_*` convention.
