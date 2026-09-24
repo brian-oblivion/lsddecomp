@@ -406,22 +406,13 @@ void TaskObjF__FreeBuffers(TaskObjF *self) {
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 63/77 words, 0x140/0x134 (3 words / 12 bytes too long).
- * Residue: early-exit tail re-materialization -- retail reuses
- * `TaskObjF__Validate`'s own false(0) return value directly as the
- * function's return with zero extra instructions, but this build always
- * re-materializes an explicit `v0=0` plus a skip-jump around it, whether
- * the C returns a literal `0` or a captured variable holding the same
- * value (docs/match-reports/TaskObjF__func_8004F8A4.md). Hand-derived:
- * caching `self->methods` into a local `TaskObjFMethods *m` right where
- * retail does (in the `slot60`-returned-nonzero tail, before its own
- * 2-way `statusCode` check) reproduces retail's whole dispatch structure
- * byte-for-byte up through the final shared `jalr`; only the early-exit
- * tail remains unmatched. */
-s32 TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+/* MATCHED round 75 (docs/match-reports/TaskObjF__func_8004F8A4.md): the
+ * function returns nothing -- the early exit falls straight into the
+ * epilogue with Validate's own $v0 -- and each of the three leaves makes its
+ * own slot7C call, which GCC cross-jumps down to one shared `jalr`. */
+void TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
     s32 code;
-    s32 (*dispatch)(TaskObjF *, s32);
+    TaskObjFMethods *m;
 
     self->unk40 = a1;
     self->unk44 = a2;
@@ -432,43 +423,26 @@ s32 TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a
     self->unk54 = a7;
     self->unk58 = a8;
     if (TaskObjF__Validate(self)) {
-        if (self->methods->slot54(self, 0, a1) == 0) {
-            goto slot60_path;
-        }
-        code = 0xA;
-        if (self->statusCode == code) {
-            code = 0x11;
-        } else if (self->statusCode == 0x11) {
-            code = 0xB;
-        }
-
-    top_dispatch:
-        dispatch = self->methods->slot7C;
-        goto call_it;
-
-    slot60_path:
-        if (!self->methods->slot60(self, a5, a8)) {
-            code = 9;
-            dispatch = self->methods->slot7C;
-            goto call_it;
-        }
-        {
-            TaskObjFMethods *m = self->methods;
+        if (self->methods->slot54(self, 0, a1) != 0) {
+            code = 0xA;
+            if (self->statusCode == code) {
+                code = 0x11;
+            } else if (self->statusCode == 0x11) {
+                code = 0xB;
+            }
+            self->methods->slot7C(self, code);
+        } else if (!self->methods->slot60(self, a5, a8)) {
+            self->methods->slot7C(self, 9);
+        } else {
+            m = self->methods;
             code = 0x11;
             if (self->statusCode == code) {
                 code = 0xB;
             }
-            dispatch = m->slot7C;
+            m->slot7C(self, code);
         }
-
-    call_it:
-        return dispatch(self, code);
     }
-    return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", TaskObjF__func_8004F8A4);
-#endif
 
 
 s32 TaskObjF__Validate(TaskObjF *self) {
