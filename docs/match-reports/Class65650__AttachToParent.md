@@ -1,4 +1,6 @@
-# func_80065918
+# Class65650__AttachToParent
+
+> Renamed from `func_80065918` on 2026-09-24 (tools/rename.py). Address 0x80065918.
 
 **Unit:** code_55dd4 · **Size:** 46 words (0xB8 bytes) · **Status:** MATCHED
 (46/46 words, whole-image `./build-and-verify.sh` green)
@@ -13,7 +15,7 @@ intermediate base's `+0x04C` slot, conditionally links via
 `self->methods->slot13C`:
 
 ```c
-void func_80065918(Class65650 *self, Class65650 *other, void *arg2, void *arg3, void *arg4)
+void Class65650__AttachToParent(Class65650 *self, Class65650 *other, void *arg2, void *arg3, void *arg4)
 {
     D800878D4Methods *base;
 

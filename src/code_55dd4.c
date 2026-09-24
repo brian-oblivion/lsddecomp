@@ -93,7 +93,7 @@ void Class65650__InitDefaults(Class65650 *self)
     }
 }
 
-void func_80065918(Class65650 *self, Class65650 *other, void *arg2, void *arg3, void *arg4)
+void Class65650__AttachToParent(Class65650 *self, Class65650 *other, void *arg2, void *arg3, void *arg4)
 {
     D800878D4Methods *base;
 
