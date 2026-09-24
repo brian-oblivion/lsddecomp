@@ -185,7 +185,7 @@ struct Vec3_3ac78 {
  */
 struct Class866E8Methods {
     /* +0x000 */ s32 header;
-    /* +0x004 */ void *release;                                                   /* BasicClass__func_17eb0 */
+    /* +0x004 */ void *release;                                                   /* BasicClass__Release */
     /* +0x008 */ void (*ctor)(Class866E8 *self, s32 arg1, s32 arg2);            /* Class866E8__Class866E8; called by New_Class866E8 */
     /* +0x00C */ void *finalize;                                                    /* Class866E8__Finalize (MATCHED); not dispatched by any of this project's decompiled callers yet */
     /* +0x010 */ void (*addChild)(Class866E8 *self, s32 arg1);                    /* Class866E8__Class866E8 (ctor); called with func_80020C5C()'s return, after the 7-entry elems[] init loop */
@@ -330,7 +330,7 @@ struct UnkArgObj_3ac78 {
  * unconfirmed; only the one byte this function reads is modeled here.
  *
  * release is the shared "BasicClass" base-method slot at +0x004 -- the same
- * slot Class866E8Methods documents as `BasicClass__func_17eb0`. Its exact
+ * slot Class866E8Methods documents as `BasicClass__Release`. Its exact
  * semantics are unknown; Class866E8__OnElementEvent calls it on a GenericObject and
  * stores the (pointer) return value back where the object came from,
  * suggesting a release-and-replace pattern, but that is not confirmed.

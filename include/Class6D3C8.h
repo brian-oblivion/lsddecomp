@@ -63,7 +63,7 @@ typedef struct Class6D3C8 Class6D3C8;
 
 typedef struct Class6D3C8Methods {
     s32 header;                                            /* +0x000 */
-    void *unk04;                                            /* +0x004 BasicClass__func_17eb0 */
+    void *unk04;                                            /* +0x004 BasicClass__Release */
     void (*ctor)(Class6D3C8 *self, Class6D3C8CtorArgs *arg); /* +0x008 func_80025FDC */
     void *unk0C;                                            /* +0x00C func_8003B024 (dtor override) */
     void *unk10;                                            /* +0x010 BasicClass__func_17f98 */

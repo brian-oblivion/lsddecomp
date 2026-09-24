@@ -1,4 +1,6 @@
-# BasicClass__func_17eb0
+# BasicClass__Release
+
+> Renamed from `BasicClass__func_17eb0` on 2026-09-24 (tools/rename.py). Address 0x80017eb0.
 
 **Unit:** code_8220 · **Size:** 18 instructions · **Status:** MATCHED (18/18 words)
 
@@ -17,7 +19,7 @@ function's own stub report for why), and always returns `NULL`.
 ## The C
 
 ```c
-void *BasicClass__func_17eb0(BasicClass *self)
+void *BasicClass__Release(BasicClass *self)
 {
     self->methods->finalize(self);
     BMemPMgrFree(self);

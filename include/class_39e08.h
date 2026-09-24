@@ -73,7 +73,7 @@ typedef struct EventArg {
  * left untyped. */
 typedef struct Class865C8Methods {
     s32 header;                                   /* +0x000 */
-    void *unk04;                                   /* +0x004 BasicClass__func_17eb0 */
+    void *unk04;                                   /* +0x004 BasicClass__Release */
     /* Typed because New_Obj865C8 (this unit) dispatches it as
      * GetObj865C8Methods()->ctor(self, arg1, arg2, arg3); the signature is
      * Obj865C8__Obj865C8's own, defined just below. */

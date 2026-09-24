@@ -2958,7 +2958,7 @@ extern s32 D_8008AB10;
 /* GetObjMMethods: a plain class-vtable getter (`lui`/`addiu`, no
  * `lw`/`sw`), returns `&D_80087034` verbatim. Confirmed a BasicClass-
  * derived vtable with `tools/classtable.py 0x80087034` (header word then
- * `BasicClass__func_17eb0` at +4, the class-framework fingerprint) --
+ * `BasicClass__Release` at +4, the class-framework fingerprint) --
  * nothing in this unit dereferences it, so it stays untyped beyond the
  * address itself, same convention as `D_80086904` above. */
 extern s32 D_80087034;

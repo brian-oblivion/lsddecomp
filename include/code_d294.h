@@ -419,7 +419,7 @@ struct GenericCountList_d294 {
  * for the full slot census from classtable.py. */
 struct Class6B5CCMethods {
     s32 header;                              /* +0x000 */
-    void *unk04;                              /* +0x004, BasicClass__func_17eb0, inherited, unused here */
+    void *unk04;                              /* +0x004, BasicClass__Release, inherited, unused here */
     void *(*ctor)(void *self);                /* +0x008, Class6B5CC__Class6B5CC (this unit) */
     void  (*finalize)(void *self);                /* +0x00C, Class6B5CC__Finalize (this unit) */
     u8 pad010[0x030 - 0x010];

@@ -7,7 +7,7 @@ class's overall design.
 
 ## What it does
 
-The base "finalize" hook, called by `BasicClass__func_17eb0` (`release`,
+The base "finalize" hook, called by `BasicClass__Release` (`release`,
 slot `+0x004`) before it frees `self`. Dispatches three further virtual
 calls through `self->methods`, all THIS class's own slots, in address
 order:

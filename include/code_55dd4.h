@@ -34,7 +34,7 @@ typedef struct Class65650 Class65650;
  * lui/addiu address-of, not a gp_rel load). */
 typedef struct D800878D4Methods {
     s32 header;                                    /* +0x000 */
-    void *unk04;                                    /* +0x004 BasicClass__func_17eb0, inherited */
+    void *unk04;                                    /* +0x004 BasicClass__Release, inherited */
     Class65650 *(*ctor)(Class65650 *self);            /* +0x008 BaseObjO__BaseObjO */
     void (*dtor)(Class65650 *self);                    /* +0x00C Class6B5CC__Finalize */
     void (*slot10)(void *self, void *arg);             /* +0x010 BaseObjO__LinkCompanion */
@@ -200,7 +200,7 @@ extern Unk5CObj *func_8004468C(UnkArg1Obj *arg);
 
 typedef struct Class65650Methods {
     s32 header;                                                    /* +0x000 */
-    void (*slot04)(Class65650 *self);                               /* +0x004 BasicClass__func_17eb0, inherited -- used by func_80065B80 when its `val` == 4 */
+    void (*slot04)(Class65650 *self);                               /* +0x004 BasicClass__Release, inherited -- used by func_80065B80 when its `val` == 4 */
     Class65650 *(*ctor)(Class65650 *self, void *arg1, void *arg2);   /* +0x008 class_65650__Constructor */
     void (*dtor)(Class65650 *self);                                   /* +0x00C func_8006573C */
     void (*slot10)(Class65650 *self, void *arg);                       /* +0x010 BaseObjO__LinkCompanion, inherited -- "link" companion of slot14, see func_80066748 */

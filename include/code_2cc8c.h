@@ -1886,7 +1886,7 @@ struct Pair32E99C {
 
 struct ClassEAC0Methods {
     s32 header;                                        /* +0x000 */
-    void *unk04;                                        /* +0x004, BasicClass__func_17eb0, inherited, unused here */
+    void *unk04;                                        /* +0x004, BasicClass__Release, inherited, unused here */
     void (*ctor)(ClassEAC0Obj *self, void *a1, void *a2, s32 a3); /* +0x008,
                                 ClassEAC0__ClassEAC0 (this unit). `a1`/`a2` kept as
                                 plain `void *` here (not `SkipShort2 *`) --
@@ -1955,7 +1955,7 @@ struct ClassEAC0Obj {
 
 struct Class6E99CMethods {
     s32 header;                                     /* +0x000 */
-    void *unk04;                                     /* +0x004, BasicClass__func_17eb0, inherited, unused here */
+    void *unk04;                                     /* +0x004, BasicClass__Release, inherited, unused here */
     void (*ctor)(Class6E99CObj *self, void *a1, s32 a2, s32 a3); /* +0x008,
                                 Class6E99C__Class6E99C (this unit). `a2` is a RAW
                                 index/mode (0 or a small positive count),

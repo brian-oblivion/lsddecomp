@@ -169,7 +169,7 @@ whether the function itself matched)
 - `BasicClass__func_1816c` (already matched, `src/code_8220.c`) is called
   directly here (not through a vtable) — same "verbatim inherited BasicClass
   method, called by symbol" pattern already established for
-  `BasicClass__func_17eb0` etc. Declared locally with this unit's own
+  `BasicClass__Release` etc. Declared locally with this unit's own
   opaque/pointer types rather than `#include "code_8220.h"`.
 
 ## Header changes kept

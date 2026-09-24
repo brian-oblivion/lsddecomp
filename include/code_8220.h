@@ -47,7 +47,7 @@ struct BasicClassListNode {
 
 struct BasicClassMethods {
     /* +0x000 */ s32 header;
-    /* +0x004 */ void *(*release)(BasicClass *self);                              /* BasicClass__func_17eb0: virtual finalize, then free self */
+    /* +0x004 */ void *(*release)(BasicClass *self);                              /* BasicClass__Release: virtual finalize, then free self */
     /* +0x008 */ void (*ctor)(BasicClass *self);                                  /* BasicClass__BasicClass */
     /* +0x00C */ void (*finalize)(BasicClass *self);                              /* BasicClass__func_17f2c: notifyParents(1), removeAllChildren(), clearParentRefs() */
     /* +0x010 */ void (*addChild)(BasicClass *self, BasicClass *child);           /* BasicClass__func_17f98 */
