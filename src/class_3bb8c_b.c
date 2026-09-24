@@ -275,10 +275,7 @@ s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 coun
 }
 
 /* Forward declaration: defined later in this file (in ROM order, after
- * Class866E8__SetFootprintFromQuery), and EXCLUDED from this round's targets (documented
- * STALL, see docs/match-reports/IsPointOutOfBounds.md) -- calling into it
- * while it is still INCLUDE_ASM is fine, per this unit's established
- * convention. Signature per that report. */
+ * Class866E8__SetFootprintFromQuery). */
 extern s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point);
 
 /* Forward declaration: defined later in this file (in ROM order, after
@@ -303,39 +300,19 @@ void Class866E8__SetFootprintFromQuery(Obj866E8 *self) {
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 2/27 words, length exact, zero drift (re-measured round 71;
- * round 71 traced every diff to one root: retail's block-local temps avoid
- * $v0; 376k more permuter iterations, no zero). Residue: register
- * identity (retail copies `bounds` into $a2 with an unconditional `move
- * a2,a0` before the null check, dedicates $v0 to the constant 1 for the
- * whole body, and re-extracts point[0] from the saved-but-unshifted $a3 in
- * a delay slot; every hand-derived C shape tried instead keeps everything
- * in $a0/$v0 and re-materializes `li v0,1` at three of the four exits).
- * Eleven independent source restatements (if-chains, `||`, `goto`, a
- * consistent-alias local, narrow `s8` locals, a nested ternary, and a
- * `result`/`do..while(0)` variable) all converge on this same shape or
- * worse; permuter search (round 18, 71363 iterations) also failed to
- * reach zero against the identical, since-confirmed-faithful scaffold
- * (round 58) (docs/match-reports/IsPointOutOfBounds.md). Hand-derived. */
+/* The in-range test is written as the NEGATION returning 0, with `return 1`
+ * as the else arm: that is jump.c's "if (...) x = a; else x = b;" shape with
+ * x = $v0 and b = 1, so the constant is preset into $v0 ahead of the first
+ * test and stays live across every check block (keeping the block temps out
+ * of $v0, and pushing `bounds` to $a2), and the final `>=` folds back into
+ * the store-flag `slt`. See docs/match-reports/IsPointOutOfBounds.md. */
 s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
-    if (bounds == NULL) {
-        return 1;
+    if (bounds != NULL && point[0] >= bounds->minX && bounds->maxX >= point[0]
+        && point[1] >= bounds->minY && bounds->maxY >= point[1]) {
+        return 0;
     }
-    if (point[0] < bounds->minX) {
-        return 1;
-    }
-    if (bounds->maxX < point[0]) {
-        return 1;
-    }
-    if (point[1] < bounds->minY) {
-        return 1;
-    }
-    return bounds->maxY < point[1];
+    return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", IsPointOutOfBounds);
-#endif
 
 s32 Class866E8__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
     Unk54Struct *slot;

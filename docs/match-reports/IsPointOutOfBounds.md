@@ -1,9 +1,93 @@
-# IsPointOutOfBounds — STALL, 27 words (exact length, zero drift), 2/27 raw word-match (round 71 re-measure), first diff at vram 0x8004CD38 (retail's `move a2,a0`, which every C shape omits)
+# IsPointOutOfBounds — MATCHED 27/27 (round 77, charlie; REVISIT-2)
 
 > Renamed from `func_8004CD38` on 2026-09-24 (tools/rename.py). Address 0x8004cd38.
 
+> **REVISITED, round 77: MATCHED 27/27, whole-image SHA1 green; the in-range test written as its negation returning 0, with `return 1` after it, so jump.c presets the constant into `$v0`; names/types not relevant (signature, struct and caller unchanged).**
 
 > **REVISITED, round 71: STALL, unchanged at 2/27; the recorded cause is refined to ONE root (block-local temps avoid `$v0` in retail), and a result-variable shape reaches 1/1 ins/del against the given body's 6/6; names/types not relevant (no type lever reached it; a narrower return type changes the caller).**
+
+## Round 77 (charlie) — REVISIT-2, MATCHED
+
+**Rebuilt as given first.** The `#ifdef NON_MATCHING` body made live:
+**2/27, exact length, zero drift, funcdiff `insertions 6 / deletions 6`,
+positional skeleton diffs 25** — the same as round 71.
+
+**The body that matches** (live in `src/class_3bb8c_b.c`, `INCLUDE_ASM` and
+the `NON_MATCHING` block removed):
+
+```c
+s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+    if (bounds != NULL && point[0] >= bounds->minX && bounds->maxX >= point[0]
+        && point[1] >= bounds->minY && bounds->maxY >= point[1]) {
+        return 0;
+    }
+    return 1;
+}
+```
+
+`./build-and-verify.sh`: exit 0, `OK: build matches retail`; funcdiff 27/27,
+`insertions 0 / deletions 0`; `tools/check-nonmatching.sh` green. The caller
+`Class866E8__SetFootprintFromQuery` is untouched (same signature).
+
+**Why it works (the mechanism round 71 named, and the construct that
+reaches it).** Round 71 established that the one root is that retail's
+block-local temps avoid `$v0`, which needs `$v0` live across the check blocks
+before local-alloc. The construct that makes the HARD return register live
+there is jump.c's "`if (...) x = a; else x = b;` -> `x = b; if (...) x = a;`"
+preset, applied with `x` = `$v0`:
+
+- the tests may be a multi-branch chain, provided every one jumps to the
+  else label (an `&&` chain does; an `||` chain jumps to the THEN label and
+  leaves a label between the tests and `x = a`, which blocks it);
+- `x = a` must be ONE insn directly before the `goto` over the else arm, so
+  `a` must be a constant or register — `return bounds->maxY < point[1]` is
+  several insns and never qualifies, which is why every earlier shape that
+  RETURNED the comparison missed;
+- `x = b` (`return 1`) is a constant.
+
+So the last comparison moves INTO the chain (`&& maxY >= point[1]`) and the
+then-arm becomes `return 0`. The preset puts `v0 = 1` ahead of the NULL test
+(it lands in the `beqz` delay slot), local-alloc's temps then take
+`$v1`/`$a0`, `bounds` is pushed off `$a0` into `$a2` (retail's entry
+`move a2,a0`), and the remaining `if (!(maxY >= p1)) v0 = 0` is folded back
+into the store-flag `slt v0,v1,v0` that falls into `jr ra`.
+
+**Measured shapes this session** (isolated compiles through the pinned
+pipeline, then the full oracle for the winner):
+
+| shape | result |
+| --- | --- |
+| as given (four `return 1;`, `return maxY < p1`) | `$v0` temps, three `li v0,1` |
+| `if (in range && ...) return maxY < p1; return 1;` (and with explicit `else`) | same as given |
+| `if (A \|\| ... \|\| maxY < p1) return 1; return 0;` | no preset; `move v0,zero` tail, 29 words |
+| five separate `if (...) return 1;` then `return 0;` | store-flag fold happens (26 words) but no preset, `$v0` temps |
+| **`if (!A && ... && maxY >= p1) return 0; return 1;`** | **27/27, byte-exact** |
+
+The prompt's parameter-list hypothesis (a structural cause for the entry
+`move`) was checked and is not the cause: the only caller passes
+`(self->bounds, buf.point)` and the signature is unchanged in the match.
+No permuter search was run (not needed); Gate 3 therefore not run.
+
+### Proposed learning
+
+**When retail presets a return constant in `$v0` before the first test and
+every block temp avoids `$v0` (often visible as an entry `move aN,a0` in a
+leaf), write the test as the NEGATED `&&` chain with `return 0` in the
+then-arm and `return <const>` after it.** jump.c's `x = b; if (...) x = a;`
+preset fires on the hard return register only when `x = a` is a single insn
+(a constant) and every test jumps to the else label; a trailing computed
+comparison goes into the chain, and store-flag folds it back into `slt`.
+Returning the comparison, `||` chains and `result` variables are all
+negative (`IsPointOutOfBounds`, 2/27 -> 27/27, round 77).
+
+---
+
+## Earlier history (the title below was the stall title before round 77)
+
+Former title: IsPointOutOfBounds — STALL, 27 words (exact length, zero drift), 2/27 raw word-match (round 71 re-measure), first diff at vram 0x8004CD38 (retail's `move a2,a0`, which every C shape omits)
+
+
+
 
 ## Round 71 (delta) — revisit
 
