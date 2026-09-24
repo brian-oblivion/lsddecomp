@@ -1427,9 +1427,21 @@ struct Obj86B60 {
                                      Obj86B60__AdvanceSlotCursor and decremented
                                      (wrapping to itemCounts[activeSlot]-1 below 0) by
                                      Obj86B60__RetreatSlotCursor -- a ring-buffer index */
-    void **unk64;                /* +0x064, Obj86B60__ReleaseSlotElements: array indexed by
-                                     activeSlot, giving ReleaseBasicClassArray's 1st arg
-                                     and BMemPMgrFree's arg */
+    void **itemLists;             /* +0x064, renamed from unk64, round 78 --
+                                     array indexed by activeSlot, one item
+                                     LIST per slot (itemCounts[idx] elements,
+                                     built by Obj86B60__CreateSlotElements,
+                                     walked as `Unk64Elem **` by
+                                     Obj86B60__RefreshSlotView/
+                                     Obj86B60__BroadcastToSlotElements/
+                                     Obj86B60__BeginElementScroll/
+                                     Obj86B60__CommitElementScroll/
+                                     Obj86B60__CancelElementScroll/
+                                     Obj86B60__SetSlotCursor). Also read
+                                     opaquely (not as `Unk64Elem **`) by
+                                     Obj86B60__ReleaseSlotElements: giving
+                                     ReleaseBasicClassArray's 1st arg and
+                                     BMemPMgrFree's arg */
     Unk68Obj *unk68;             /* +0x068, OBSERVED: Obj86B60__ReleaseTarget,
                                      Obj86B60__CommitElementScroll, Obj86B60__RefreshSlotView (round 12)
                                      -- built once by Obj86B60__SetTarget via
