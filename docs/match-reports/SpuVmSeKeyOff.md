@@ -5,11 +5,11 @@
 Unit `code_179d8_j`, round 21 (2026-09-06). One-line tail-call wrapper.
 
 ```c
-extern s32 StopNote(s32 a0, s16 a1, s16 a2, u16 a3);
+extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3);
 
 s32 SpuVmSeKeyOff(s16 p0, s16 p1, u16 p2)
 {
-    return StopNote(0x21, p0, p1, p2);
+    return SpuVmKeyOff(0x21, p0, p1, p2);
 }
 ```
 

@@ -807,7 +807,7 @@ here -- proposing for the head to apply once no runner is live on
 
 - `D_8008EA26` -> `gSelectedVoice` ("currently selected channel" scratch,
   already documented `volatile`, read back via a plain `u8 *` cast --
-  see StopNote's own report for why that specific cast matters).
+  see SpuVmKeyOff's own report for why that specific cast matters).
 - `D_8008E9D0` -> `gVoiceCount` ("loop bound for a small table of active
   objects", consistently the upper bound of every per-voice loop in this
   unit and its siblings).
@@ -819,7 +819,7 @@ here -- proposing for the head to apply once no runner is live on
   pair, per `vmNoiseOn2`'s report).
 - `D_8008D970` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by
   several functions in this cluster; never fully decoded here).
-- `D_8008D9A3` -> `gVoiceState` (the byte StopNote/SpuVmNoiseOff/
+- `D_8008D9A3` -> `gVoiceState` (the byte SpuVmKeyOff/SpuVmNoiseOff/
   `SpuVmAlloc` all compare against `2` for "noise voice").
 - `D_8006DAD4` (and this unit's two local views `ObjDAD4`/`ObjDAD4Edd4`)
   -> `gSpuRegs`: confirmed to be the PS1 SPU's own hardware base address

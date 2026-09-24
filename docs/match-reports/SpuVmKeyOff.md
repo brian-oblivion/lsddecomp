@@ -1,4 +1,6 @@
-# StopNote -- MATCHED (131/131 words)
+# SpuVmKeyOff -- MATCHED (131/131 words)
+
+> Renamed from `StopNote` on 2026-09-24 (tools/rename.py). Address 0x800300d0.
 
 > Renamed from `func_800300D0` on 2026-09-20 (tools/rename.py). Address 0x800300d0.
 
@@ -28,7 +30,7 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3) {
+u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
     u8 count;
 
@@ -88,7 +90,7 @@ same 0x34-stride record family `code_179d8_j.c` documents as
 `(a3, a2, a0, a1)`. For every match, do one of two cleanups depending on
 `D_8008D988[i]`:
 
-- **`== 0xFF`:** the same "type A" reset `StopNote`'s neighbours use
+- **`== 0xFF`:** the same "type A" reset `SpuVmKeyOff`'s neighbours use
   -- clear `D_8008D9A3[i]`, `D_8008D98C[i]`, and the current object's
   `unk194`/`unk196` fields (`D_8006DAD4`, both already declared for
   `SpuVmNoiseOff`).
@@ -200,7 +202,7 @@ symbol or one like it.
 
 ## Naming
 
-**StopNote** (was `func_800300D0`) -- Tier A. Same evidence as StartNote:
+**SpuVmKeyOff** (was `func_800300D0`) -- Tier A. Same evidence as StartNote:
 `code_179d8_k.c`'s `NoteOn` calls this in its zero-velocity branch
 (the MIDI note-off convention) and StartNote in the nonzero-velocity
 branch of the same switch; `code_179d8_j.c`'s `SpuVmSeKeyOff` wraps this

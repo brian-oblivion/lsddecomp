@@ -65,7 +65,7 @@
  * header. */
 extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3);   /* code_179d8_m, not yet matched: local guess */
 extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);  /* code_179d8_m, not yet matched: local guess, matches code_179d8_j's independent reading of the same call shape */
-extern s32 StopNote(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
+extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3);   /* code_179d8_m, not yet matched: local guess, ditto */
 /* Psy-Q libsnd, linked from the SDK objects (round 34): `ut_rev` and
  * `vm_doff`. Both were carried as matched C in code_179d8_f.c until that
  * unit's prefix was given back to Sony; these are local views, as a Psy-Q
@@ -354,7 +354,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
         u8 vol = ptr[0x2C];
-        StopNote(packed, note, vol, (u8)a3);
+        SpuVmKeyOff(packed, note, vol, (u8)a3);
     }
 }
 #else

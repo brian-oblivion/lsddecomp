@@ -134,7 +134,7 @@ someone touching an adjacent unit has usually already typed half of it.
 Retail's `a0` (this function's packed screen/slot id) needs THREE
 different views: its low byte (`a0 & 0xFF`, for the `D_800902E8` row
 index), a sign-extended 16-bit copy (`s1` in retail, used later as
-`StopNote`'s first argument), and a second byte (`(u8)((u16)s1 >>
+`SpuVmKeyOff`'s first argument), and a second byte (`(u8)((u16)s1 >>
 8)`, the row's slot index) -- and retail computes the LAST TWO from a
 SHARED intermediate (`v1 = a0 << 16`, materialized ONCE, then `sra v1,16`
 for the sign-extend and, SEPARATELY, `srl v1,24` reusing that SAME shifted
@@ -449,7 +449,7 @@ extern void SpuVmDoAllocate(void);
 extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch(void);
 extern void SpuVmKeyOnNow(s32 a0, u16 a1);
-extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
+extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 
 /* Called as `StartNote(0x21, p0, p1, p2, outA, outB)` from
  * code_179d8_j.c's SpuVmSeKeyOn and as
@@ -458,7 +458,7 @@ extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
  * by three sibling units' own extern guesses (code_179d8_i/_j/_k all
  * agree on this exact shape). `a0` is a packed [screen | slot<<8]
  * dispatch id into `D_800902E8`; `a1`/`a2` are the "key" values
- * `StopNote`'s own three-field match loop checks; `a4`/`a5` are
+ * `SpuVmKeyOff`'s own three-field match loop checks; `a4`/`a5` are
  * 7-bit-percentage volume/pan bytes staged into the same
  * D_8008EA10/D_8008EA11 scratch globals the interpolation-setup
  * functions elsewhere in this unit use. */
@@ -574,7 +574,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
             }
         }
     } else {
-        StopNote(a0s16, a1, a2, a3);
+        SpuVmKeyOff(a0s16, a1, a2, a3);
     }
 
     return s3;
@@ -595,7 +595,7 @@ it again.
 corroborated independently by three sibling units (`code_179d8_i.c`,
 `code_179d8_j.c`, `code_179d8_k.c`, per this report's own "Signature"
 section) before any body-level derivation: `code_179d8_k.c`'s
-`NoteOn` calls this in its nonzero-velocity branch and StopNote in
+`NoteOn` calls this in its nonzero-velocity branch and SpuVmKeyOff in
 its zero-velocity branch of the SAME MIDI-status-byte switch, and
 `code_179d8_j.c` wraps both with the same fixed leading identity constant
 (`0x21`) -- a clean NoteOn/NoteOff symmetry, which is the primary evidence
@@ -675,7 +675,7 @@ says it IS that function, a different build of it:
    tone's min/max note, `a4 == 0` routes to key-off, `a5` is the pan.
 2. **Call sequence.** Sony's 3.3 `vmanager.o` `SpuVmKeyOn` calls, in
    order, `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`, `SpuVmDoAllocate`.
-   StartNote calls `SpuVmVSetUp`, `StopNote`, `SpuVmAlloc`,
+   StartNote calls `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`,
    `SpuVmDoAllocate`, then `vmNoiseOn`/`note2pitch`+`SpuVmKeyOnNow`. The
    callee names this project already carries for the first and last
    (`SpuVmVSetUp`, `note2pitch`) are Sony's own.

@@ -197,7 +197,7 @@ positive, else reset from `gVoiceFadeInterval`" shape as the OTHER interpolation
 functions in this unit), then an accumulator update against a clamped limit
 (`gVoiceFadeStep`/`gVoiceFadeAccum`/`gVoiceFadeLimit`, the SAME "increment, clamp against
 a limit whose comparison direction depends on the increment's sign" shape
-already documented for `SeAutoPan`'s and `StopNote`'s siblings in
+already documented for `SeAutoPan`'s and `SpuVmKeyOff`'s siblings in
 this record family). Then a four-stage 7-bit-percentage blend chain:
 combine two byte-scratch globals through the identified 16129 divisor
 (twice, once signed once unsigned) to get a base level `q2`, then apply

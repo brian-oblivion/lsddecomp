@@ -102,7 +102,7 @@ own score (77/138 before and after), so it is recorded as a correction to
 - `Rec34U16` / `D_8008D99C[]`: the SAME 0x34-stride record family as
   `Rec34S16` (already declared above for `D_8008D994`/`D_8008D996`/
   `D_8008D99A`/`D_8008D99E`/`D_8008D988`), but this function reads
-  `D_8008D99C` UNSIGNED (`lhu`) where `StopNote` (same unit, already
+  `D_8008D99C` UNSIGNED (`lhu`) where `SpuVmKeyOff` (same unit, already
   matched) reads it -- and `D_8008D994` -- SIGNED (`lh`). Since one extern
   symbol cannot carry two conflicting C types in one translation unit, the
   unsigned view is reached with a pointer-cast reinterpretation:
@@ -135,7 +135,7 @@ own score (77/138 before and after), so it is recorded as a correction to
 Given a record index `a0` and three `s16` key values (`a1`, `a2`, `a3`),
 verify they match `D_8008D996[a0]`/`D_8008D99E[a0]`/`D_8008D99A[a0]`
 respectively (three early-return guard clauses, same idiom as
-`StopNote`'s key-match loop). `threshold = a4 - 0x40` is computed
+`SpuVmKeyOff`'s key-match loop). `threshold = a4 - 0x40` is computed
 BEFORE these checks (an early, unconditional local -- moving it there from
 an initial after-the-checks placement was itself a real fix, see below). If
 all three match: combine a debug byte into an index (`someTotal =
@@ -254,7 +254,7 @@ plateau:
  * width (`lbu`, same offset) elsewhere in this same function; the byte
  * view is reached via a plain pointer cast, same idiom as D_8008EA26's
  * mixed sh/lbu access.  D_8008D994 needs the same unsigned re-reading
- * here even though StopNote (above) reads the SAME symbol signed
+ * here even though SpuVmKeyOff (above) reads the SAME symbol signed
  * (`lh`) -- reinterpreted through a cast rather than redeclared, since
  * one extern symbol cannot carry two conflicting C types in one file. */
 typedef struct {

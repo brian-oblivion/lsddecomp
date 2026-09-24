@@ -18,10 +18,10 @@
  *
  * WHAT EACH FUNCTION DOES (see docs/match-reports/<name>.md for the full
  * derivation and evidence):
- *   - StartNote / StopNote: a matched NoteOn/NoteOff pair. Given a packed
+ *   - StartNote / SpuVmKeyOff: a matched NoteOn/NoteOff pair. Given a packed
  *     [screen|slot] identity, note, volume/program and (for StartNote) a
  *     velocity and a computed stereo pan split, StartNote registers a new
- *     active-voice record; StopNote scans every voice for one whose
+ *     active-voice record; SpuVmKeyOff scans every voice for one whose
  *     identity fields match and releases it, returning the count released.
  *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (SpuVmAlloc, in
  *     code_179d8_l) and, if one exists, key it on (vmNoiseOn2, also
@@ -47,7 +47,7 @@
  *     SpuVmInit and, going by its own ring-buffer/mask-clearing logic,
  *     meant to run every frame thereafter.
  *   - SpuVmNoiseOff: releases every voice whose state byte reads
- *     exactly 2 (the same value StopNote/SpuVmFlush/SpuVmAlloc
+ *     exactly 2 (the same value SpuVmKeyOff/SpuVmFlush/SpuVmAlloc
  *     treat as "noise voice needing SpuSetNoiseVoice/func_800375E8 cleanup").
  *   - SpuVmPBVoice / SpuVmPitchBend: match a voice by
  *     identity and apply a curve-table-driven pitch bend from a 0-127
@@ -622,7 +622,7 @@ extern Rec34S16 D_8008D988[];
  * width (`lbu`, same offset) elsewhere in this same function; the byte
  * view is reached via a plain pointer cast, same idiom as D_8008EA26's
  * mixed sh/lbu access.  D_8008D994 needs the same unsigned re-reading
- * here even though StopNote (above) reads the SAME symbol signed
+ * here even though SpuVmKeyOff (above) reads the SAME symbol signed
  * (`lh`) -- reinterpreted through a cast rather than redeclared, since
  * one extern symbol cannot carry two conflicting C types in one file. */
 typedef struct {
@@ -981,7 +981,7 @@ extern void SpuVmDoAllocate(void);
 extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch(void);
 extern void SpuVmKeyOnNow(s32 a0, u16 a1);
-extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
+extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 
 s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
 {
@@ -1095,7 +1095,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
             }
         }
     } else {
-        StopNote(a0s16, a1, a2, a3);
+        SpuVmKeyOff(a0s16, a1, a2, a3);
     }
 
     return s3;
@@ -1113,7 +1113,7 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3) {
+u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
     u8 count;
 

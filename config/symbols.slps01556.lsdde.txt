@@ -1108,7 +1108,10 @@ SpuVmPitchBend = 0x8002F610; // type:func
 // UpdateVoiceEnvelopes. Round 71 (bravo, track 2).
 SpuVmFlush = 0x8002F700; // type:func
 StartNote = 0x8002FAC4; // type:func
-StopNote = 0x800300D0; // type:func
+// identified: shape 0.93 vs libsnd/vmanager SpuVmKeyOff (124w vs our
+// 131w, disc 3.5), position within the libsnd neighborhood. Superseded
+// game-style name StopNote. Round 74 (bravo, track 2).
+SpuVmKeyOff = 0x800300D0; // type:func
 gVoiceEnvActive = 0x8008D9A4;
 gVoiceEnvStep = 0x8008D9A6;
 gVoiceEnvInterval = 0x8008D9A8;
