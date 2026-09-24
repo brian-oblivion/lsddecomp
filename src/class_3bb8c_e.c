@@ -22,7 +22,7 @@
  * Obj866E8 and still stands, but round 60 found concrete evidence that this
  * unit's Node3bb8cE and class_3bb8c_f's TaskObjF may be ONE class seen
  * through two independent local views: TaskObjF__OpenEvents fills Node3bb8cE's
- * threads[4] at +0x014 and hands the same pointer to TaskObjF__EnableEvents.
+ * events[4] at +0x014 and hands the same pointer to TaskObjF__EnableEvents.
  * A track-4 lead; see docs/match-reports/TaskObjF__EnableEvents.md.
  *
  * The object derives from the same BasicClass framework documented in
@@ -59,7 +59,7 @@ struct Res3bb8cE {
 
 /*
  * The class itself. Offsets established purely from this unit's own 19
- * functions (see each field's comment). unk60/unk64/unk78/unk7C are four
+ * functions (see each field's comment). res02/res05/res10/res20 are four
  * typed resource slots, one per tag value TaskObjF__AddChild/TaskObjF__RemoveChild
  * dispatch on; unk68 is zeroed alongside them by TaskObjF__ClearResourceSlots/TaskObjF__RemoveAllChildren
  * but has no setter anywhere in this unit, so its pointee type is unproven.
@@ -80,16 +80,16 @@ struct SelfMethods3bb8cE {
 struct Node3bb8cE {
     SelfMethods3bb8cE *methods;   /* +0x000, TaskObjF__FindUnusedMemcardName */
     u8 pad04[0x00C - 0x004];
-    s32 unkC;              /* +0x00C, TaskObjF__SetCardSlot sets it (caller value); TaskObjF__FormatCard nonzero-tests it; TaskObjF__OpenAndReadMemcardFile/TaskObjF__ProbeCardFreeSpace forward it as BuildMemcardPath's arg1 */
-    s32 unk10;             /* +0x010, TaskObjF__SetCardSlot: unkC << 4; TaskObjF__CardInfoStatus/TaskObjF__CardLoadStatus: a resource handle passed to _card_info/_card_load/_card_clear */
-    s32 threads[4];        /* +0x014..+0x020, TaskObjF__OpenEvents: 4 OpenTh-style thread handles, one per D_80086E78[] entry */
+    s32 cardSlot;              /* +0x00C, TaskObjF__SetCardSlot sets it (caller value); TaskObjF__FormatCard nonzero-tests it; TaskObjF__OpenAndReadMemcardFile/TaskObjF__ProbeCardFreeSpace forward it as BuildMemcardPath's arg1 */
+    s32 cardHandle;             /* +0x010, TaskObjF__SetCardSlot: cardSlot << 4; TaskObjF__CardInfoStatus/TaskObjF__CardLoadStatus: a resource handle passed to _card_info/_card_load/_card_clear */
+    s32 events[4];        /* +0x014..+0x020, TaskObjF__OpenEvents: 4 OpenTh-style thread handles, one per D_80086E78[] entry */
     u8 pad24[0x060 - 0x024];
-    Res3bb8cE *unk60;      /* +0x060, tag 2 */
-    Res3bb8cE *unk64;      /* +0x064, tag 5 */
+    Res3bb8cE *res02;      /* +0x060, tag 2 */
+    Res3bb8cE *res05;      /* +0x064, tag 5 */
     Res3bb8cE *unk68;      /* +0x068, zeroed only -- no setter in this unit */
     u8 pad6C[0x078 - 0x06C];
-    Res3bb8cE *unk78;      /* +0x078, tag 0x10 */
-    Res3bb8cE *unk7C;      /* +0x07C, tag 0x20 */
+    Res3bb8cE *res10;      /* +0x078, tag 0x10 */
+    Res3bb8cE *res20;      /* +0x07C, tag 0x20 */
 };
 
 /* Helpers this unit calls into, defined in class_3bb8c_f.c (extern for a
@@ -113,7 +113,7 @@ extern s32 TaskObjF__WaitForReadyEvent(void *self);
 extern s32 D_80086E78[4];
 extern s32 OpenEvent(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
-/* Two format-string-like globals selected by TaskObjF__FormatCard on self->unkC's
+/* Two format-string-like globals selected by TaskObjF__FormatCard on self->cardSlot's
  * truth value; passed opaquely (never dereferenced in this unit). */
 extern s32 D_8008AA9C;
 extern s32 D_8008AAA4;
@@ -128,11 +128,11 @@ extern char *strcat(char *dest, char *src);
 
 void TaskObjF__ClearResourceSlots(Node3bb8cE *self)
 {
-    self->unk60 = NULL;
-    self->unk64 = NULL;
+    self->res02 = NULL;
+    self->res05 = NULL;
     self->unk68 = NULL;
-    self->unk78 = NULL;
-    self->unk7C = NULL;
+    self->res10 = NULL;
+    self->res20 = NULL;
 }
 
 void TaskObjF__Finalize(Node3bb8cE *self)
@@ -150,19 +150,19 @@ void TaskObjF__AddChild(Node3bb8cE *self, Res3bb8cE *res)
     Get_vtable_BasicClass()->addChild(self, res);
     tag = res->methods->header;
     if ((tag & 0xF) == 2) {
-        self->unk60 = res;
+        self->res02 = res;
         return;
     }
     if ((tag & 0xF) == 5) {
-        self->unk64 = res;
+        self->res05 = res;
         return;
     }
     if ((tag & 0xFF) == 0x10) {
-        self->unk78 = res;
+        self->res10 = res;
         return;
     }
     if ((tag & 0xFF) == 0x20) {
-        self->unk7C = res;
+        self->res20 = res;
     }
 }
 
@@ -175,31 +175,31 @@ void TaskObjF__RemoveChild(Node3bb8cE *self, Res3bb8cE *res)
     }
     tag = res->methods->header;
     if ((tag & 0xF) == 2) {
-        self->unk60 = NULL;
+        self->res02 = NULL;
     } else if ((tag & 0xF) == 5) {
-        self->unk64 = NULL;
+        self->res05 = NULL;
     } else if ((tag & 0xFF) == 0x10) {
-        self->unk78 = NULL;
+        self->res10 = NULL;
     } else if ((tag & 0xFF) == 0x20) {
-        self->unk7C = NULL;
+        self->res20 = NULL;
     }
     Get_vtable_BasicClass()->removeChild(self, res);
 }
 
 void TaskObjF__RemoveAllChildren(Node3bb8cE *self)
 {
-    self->unk60 = NULL;
-    self->unk64 = NULL;
+    self->res02 = NULL;
+    self->res05 = NULL;
     self->unk68 = NULL;
-    self->unk78 = NULL;
-    self->unk7C = NULL;
+    self->res10 = NULL;
+    self->res20 = NULL;
     Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
 void TaskObjF__SetCardSlot(Node3bb8cE *self, s32 val)
 {
-    self->unkC = val;
-    self->unk10 = val << 4;
+    self->cardSlot = val;
+    self->cardHandle = val << 4;
 }
 
 extern void EnterCriticalSection(void);
@@ -214,7 +214,7 @@ s32 TaskObjF__OpenEvents(Node3bb8cE *self)
     i = 0;
     cur = self;
     do {
-        cur->threads[0] = OpenEvent(0xF4000001, D_80086E78[i], 0x2000, 0);
+        cur->events[0] = OpenEvent(0xF4000001, D_80086E78[i], 0x2000, 0);
         i++;
         cur = (Node3bb8cE *)((u8 *)cur + 4);
     } while (i < 4);
@@ -274,7 +274,7 @@ s32 TaskObjF__CardInfoStatus(Node3bb8cE *self, s32 *p1, s32 *p2)
     status = 1;
     *p2 = *p1 = 0;
     TaskObjF__TestEvents(self);
-    while (_card_info(self->unk10) == 0)
+    while (_card_info(self->cardHandle) == 0)
         ;
     code = TaskObjF__WaitForReadyEvent(self);
     if (code == 0x100) {
@@ -284,7 +284,7 @@ s32 TaskObjF__CardInfoStatus(Node3bb8cE *self, s32 *p1, s32 *p2)
         *p1 = 1;
     } else if (code == 0x2000) {
         *p2 = 1;
-        _card_clear(self->unk10);
+        _card_clear(self->cardHandle);
     }
     return status;
 }
@@ -299,7 +299,7 @@ s32 TaskObjF__CardLoadStatus(Node3bb8cE *self, s32 *p1, s32 *p2)
     status = 1;
     *p2 = (*p1 = 0, status);
     TaskObjF__TestEvents(self);
-    while (_card_load(self->unk10) == 0)
+    while (_card_load(self->cardHandle) == 0)
         ;
     code = TaskObjF__WaitForReadyEvent(self);
     if (code == 0x100) {
@@ -323,7 +323,7 @@ s32 TaskObjF__FormatCard(Node3bb8cE *self)
 
     retries = 10;
     do {
-        path = self->unkC != 0 ? &D_8008AA9C : &D_8008AAA4;
+        path = self->cardSlot != 0 ? &D_8008AA9C : &D_8008AAA4;
         result = format(path);
     } while (result == 0 && retries-- != 0);
     return result;
@@ -362,7 +362,7 @@ s32 TaskObjF__OpenAndReadMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
     s32 handle;
     void *buf;
 
-    path = BuildMemcardPath(pathBuf, self->unkC, suffix);
+    path = BuildMemcardPath(pathBuf, self->cardSlot, suffix);
     handle = open(path, 1);
     if (handle == -1) {
         return 0;
@@ -434,7 +434,7 @@ s32 TaskObjF__ProbeCardFreeSpace(Node3bb8cE *self, u8 id, s32 sizeArg)
     s32 sectors;
 
     sectors = (u32)(sizeArg + 0x21FF) >> 13;
-    path = BuildMemcardPath(pathBuf, self->unkC, &D_8008AAAC);
+    path = BuildMemcardPath(pathBuf, self->cardSlot, &D_8008AAAC);
     handle = open(path, (sectors << 16) | 0x200);
     if (handle == -1) {
         return 0;
