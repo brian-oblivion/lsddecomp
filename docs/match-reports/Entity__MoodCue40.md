@@ -99,7 +99,7 @@ describes the score, not the defect count").
 - **A `void*`/pointer local that must survive an intervening vtable call
   needs its INITIALIZER at the point of declaration, not a separate
   assignment statement positioned after the call** -- same "eager
-  initialization" family as `func_80061070`'s `mood` field-read, but for a
+  initialization" family as `Entity__MoodCue55`'s `mood` field-read, but for a
   local variable's default value rather than a struct field read. The tell
   is identical: a frame missing one callee-saved register pair versus
   retail, and a `funcdiff` "differs outside range" count in the tens- or

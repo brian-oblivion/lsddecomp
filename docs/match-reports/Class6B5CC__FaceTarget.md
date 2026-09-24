@@ -4,7 +4,7 @@
 
 Unit: `code_d294_c` (round 14). **The function two runners independently
 flagged for its argument-swap oddity** (see `docs/match-reports/
-func_80061778.md` and `func_80063144.md` from earlier rounds, and
+Entity__MoodCue115.md` and `func_80063144.md` from earlier rounds, and
 `docs/DECOMPILATION_LEARNINGS.md`). A "face target" orientation setter:
 computes yaw/pitch from `self` toward `target` via two `ratan2` calls,
 converts both to degrees, builds a 3-entry `WholeFrac_d294` table, and

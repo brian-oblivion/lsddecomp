@@ -438,7 +438,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   the call insn is where a shared suffix must BEGIN, so a return-type mismatch forecloses the WHOLE
   merge rather than costing one instruction — length comes out long by roughly 3 words per un-merged
   arm. Confirmed in BOTH directions on two slots: `void`→`s32` stopped a merge and cost
-  already-matched `Entity__MoodCue00` 4 words; `s32`→`void` restored one and closed `func_80061778`'s
+  already-matched `Entity__MoodCue00` 4 words; `s32`→`void` restored one and closed `Entity__MoodCue115`'s
   two-round stall at 198/198 with the derived body UNCHANGED. Two chains that appear to miss in
   OPPOSITE directions are the same uniform deficit twice, not two bugs — that misreading is what
   cost the stall its second round. (a round 68)

@@ -1,4 +1,6 @@
-# func_80061778
+# Entity__MoodCue115
+
+> Renamed from `func_80061778` on 2026-09-24 (tools/rename.py). Address 0x80061778.
 
 **Unit:** Entity_d · **Size:** 198 words · **Status:** MATCHED (round 68) — 198/198, whole-image oracle green
 
@@ -17,14 +19,14 @@ applied (`unk94`→`target`, `unkFC`→`moodTimer`, `slot15C`→`activate`,
 inherited score exactly:
 
 ```
-func_80061778: 115/198 words match (file 0x51F78-0x52290)
-func_80061778: insertions 8 / deletions 8 (opcode-level, built vs retail;
+Entity__MoodCue115: 115/198 words match (file 0x51F78-0x52290)
+Entity__MoodCue115: insertions 8 / deletions 8 (opcode-level, built vs retail;
                positional skeleton diffs 78)
 ```
 
 **and one figure the inherited report never recorded: the built function was
 0x330 bytes = 204 words against retail's 0x318 = 198, i.e. 6 words LONG**
-(`build/lsdde.map`: `func_80061778` at `0x80061778`, next symbol
+(`build/lsdde.map`: `Entity__MoodCue115` at `0x80061778`, next symbol
 `func_80061A90` at `0x80061aa8`). That number is what cracked it, because it
 is exactly +3 in each of the two dispatch chains, and "the same deficit twice"
 is the opposite of the inherited report's "opposite-direction misses" reading.
@@ -131,7 +133,7 @@ As committed in `src/Entity_d.c` — the inherited near-miss body unchanged
 apart from the renames. The fix was entirely in the header.
 
 ```c
-void func_80061778(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0) {
         if (Entity__IsTargetInRange(this, 0x800) != 0) {
             this->unk44 = 0xB;
@@ -259,7 +261,7 @@ emitted.
 
 ## HEAD FINDING, round 13: the reversed `Class6B5CC__FaceTarget` arguments are a DIRECTION FLAG
 
-Runner echo (`func_80061778`, `Entity_d`) and runner bravo (`func_80063144`,
+Runner echo (`Entity__MoodCue115`, `Entity_d`) and runner bravo (`func_80063144`,
 `Entity_e`) each independently flagged a `Class6B5CC__FaceTarget` call site
 whose first two arguments are swapped relative to every other known site. Both
 verified it against raw disassembly. The head then surveyed **every** call site

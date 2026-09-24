@@ -1,13 +1,15 @@
-# func_80061158 -- MATCHED (16/16 words)
+# Entity__MoodCue56 -- MATCHED (16/16 words)
+
+> Renamed from `func_80061158` on 2026-09-24 (tools/rename.py). Address 0x80061158.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Smallest function in the
 unit's queue -- a one-line gated vtable dispatch, no `out` parameter.
-`void func_80061158(Entity *this)`.
+`void Entity__MoodCue56(Entity *this)`.
 
 ## Final source
 
 ```c
-void func_80061158(Entity *this) {
+void Entity__MoodCue56(Entity *this) {
     if (this->unkFC == 0) {
         this->methods->slotCC(this, -0xC8, 0);
     }

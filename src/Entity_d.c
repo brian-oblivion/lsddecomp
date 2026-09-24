@@ -366,7 +366,7 @@ void Entity__MoodCue52(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotD0(this, -0x200, 0);
 }
 
-void func_80061070(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue55(Entity *this, EntityMoodHandlerArg *out) {
     s32 mood = this->unk84;
 
     if (this->moodTimer == 0) {
@@ -386,13 +386,13 @@ void func_80061070(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061158(Entity *this) {
+void Entity__MoodCue56(Entity *this) {
     if (this->moodTimer == 0) {
         this->methods->slotCC(this, -0xC8, 0);
     }
 }
 
-void func_80061198(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue57(Entity *this, EntityMoodHandlerArg *out) {
     s32 mood;
 
     if (this->moodTimer == 0) {
@@ -439,7 +439,7 @@ void func_80061198(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue58(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         out->unk10 = 0;
         out->unk1C = 0xC;
@@ -494,7 +494,7 @@ void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061778(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0) {
         if (Entity__IsTargetInRange(this, 0x800) != 0) {
             this->unk44 = 0xB;

@@ -46,7 +46,7 @@ void Entity__func_80060710(Entity *this) {
   simultaneously.** Before fixing it, `funcdiff.py` reported "differs
   OUTSIDE this range" counts around 116,000 bytes for every other function
   in the file, and functions physically after this one in ROM order (e.g.
-  `Entity__MoodCue48`, `Entity__MoodCue50`, `func_80061158`) scored 0/N despite
+  `Entity__MoodCue48`, `Entity__MoodCue50`, `Entity__MoodCue56`) scored 0/N despite
   being logically correct, because their comparison window was reading from
   the wrong address entirely. Fixing this function's word count collapsed
   the drift to under 200 bytes project-wide and every other function's score
