@@ -1,15 +1,17 @@
-# func_8004E444 — MATCH (41/41 words)
+# TaskObjF__AddChild — MATCH (41/41 words)
+
+> Renamed from `func_8004E444` on 2026-09-24 (tools/rename.py). Address 0x8004e444.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
 
 ## What it does
 
-`void func_8004E444(Node3bb8cE *self, Res3bb8cE *res)`. If `res` is
+`void TaskObjF__AddChild(Node3bb8cE *self, Res3bb8cE *res)`. If `res` is
 non-NULL: chains to the base class's `addChild` (`Get_vtable_BasicClass()`'s
 +0x010 slot), then reads `res->methods->header` (a type-tag word) and
 stores `res` itself into one of self's four typed resource slots
 (`unk60`/`unk64`/`unk78`/`unk7C`) depending on whether the tag is
-2, 5, 0x10 or 0x20 respectively. `func_8004E4E8` is the mirror
+2, 5, 0x10 or 0x20 respectively. `TaskObjF__RemoveChild` is the mirror
 (remove/zero) of this function.
 
 ## Where it stood, and the fix
@@ -33,7 +35,7 @@ first two comparisons and widening only where required. Writing the
 source with that same narrow-then-wide split matched immediately:
 
 ```c
-void func_8004E444(Node3bb8cE *self, Res3bb8cE *res)
+void TaskObjF__AddChild(Node3bb8cE *self, Res3bb8cE *res)
 {
     s32 tag;
 
@@ -92,4 +94,8 @@ case-value SET" family, but manifesting as an if-chain rather than an
 actual `switch` — the superficially switch-shaped `andi`/`bne` sequence
 here is NOT reproducible by a real `switch` statement (tried, regressed
 badly); it wants the narrow-then-wide literal if-chain instead. See
-`func_8004E4E8`, which needed the identical narrow-then-wide split.
+`TaskObjF__RemoveChild`, which needed the identical narrow-then-wide split.
+
+## Naming (round 78, track 3)
+
+`func_8004E444` -> `TaskObjF__AddChild`. **Tier A.** Sits at `gTaskObjFMethods` +0x010 (asm/data/76DC8.data.s), the exact offset this unit's own `BaseMethods3bb8cE` view had already named `addChild`. Classifies the incoming `Res3bb8cE`'s tag word into one of the four typed resource slots (`res02`/`res05`/`res10`/`res20`) after forwarding to the base class's own `addChild` -- a textbook override-then-chain-to-base shape. `TaskObjF__` prefix: see the unit header comment.

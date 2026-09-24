@@ -222,7 +222,7 @@ was read directly rather than re-guessing the idiom from scratch:
    drift)** to **85/113 (with drift)**, closing exactly the "retail has a
    redundant `self->unk10`-materializing move that a direct assignment
    doesn't reproduce" gap -- the SAME shape of residue documented
-   elsewhere in this round for `func_8004EA38` (a MISSING redundant move
+   elsewhere in this round for `TaskObjF__OpenAndReadMemcardFile` (a MISSING redundant move
    there too), except here the sibling ctor happened to already show the
    fix.
 3. **The remaining 1-word gap** (85/113, still drifted by exactly one

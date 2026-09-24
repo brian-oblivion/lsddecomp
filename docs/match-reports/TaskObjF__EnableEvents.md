@@ -25,7 +25,7 @@ concrete evidence worth cross-checking before track 4 unifies types.**
 `class_3bb8c_e.c`'s `Node3bb8cE` (a distinct local view, its own header
 comment) and this unit's `TaskObjF` were derived independently and never
 declared the same type -- but `Node3bb8cE::threads[4]` at +0x014 is
-filled by `func_8004E5E4` via `OpenEvent(0xF4000001, D_80086E78[i], 0x2000, 0)`,
+filled by `TaskObjF__OpenEvents` via `OpenEvent(0xF4000001, D_80086E78[i], 0x2000, 0)`,
 and that same function's LAST statement is `TaskObjF__EnableEvents(self)`
 with `self` still typed `Node3bb8cE *`, i.e. the same object pointer is
 handed straight into this unit's own event-enable wrapper. That is

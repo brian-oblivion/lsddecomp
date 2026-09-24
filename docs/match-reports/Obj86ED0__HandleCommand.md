@@ -78,7 +78,7 @@ This is documented (`docs/DECOMPILATION_LEARNINGS.md`, "Splitting a fused
 boolean condition... / a crossjump-mergeable tail needs the full call
 statement written out in each branch rather than deferred through a
 function-pointer local, when the branches share one slot with different
-arguments" -- `func_8004E6B8`/`TaskObjF__TickStateDelay`) from the OPPOSITE direction
+arguments" -- `TaskObjF__CheckCardStatus`/`TaskObjF__TickStateDelay`) from the OPPOSITE direction
 (wanting a merge that wasn't happening); this function needed the same lever
 applied to PREVENT an unwanted one. **Fix: drop the `fn` variable entirely
 and write the full call inline in each case** (`self->methods->slot88(self);

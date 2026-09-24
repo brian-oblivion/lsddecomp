@@ -1,4 +1,6 @@
-# func_8004EA38 — MATCHED round 75 (echo): 41/41, whole image OK. Lever: MISSING ARGUMENT -- the call is `BuildMemcardPath(pathBuf, self->unkC, suffix)`, forwarding this function's own 3rd parameter, not a 2-argument call.
+# TaskObjF__OpenAndReadMemcardFile — MATCHED round 75 (echo): 41/41, whole image OK. Lever: MISSING ARGUMENT -- the call is `BuildMemcardPath(pathBuf, self->unkC, suffix)`, forwarding this function's own 3rd parameter, not a 2-argument call.
+
+> Renamed from `func_8004EA38` on 2026-09-24 (tools/rename.py). Address 0x8004ea38.
 
 REVISITED, round 75: MATCHED on the fifth build (first build of the lever); names/types used (the K&R `BuildMemcardPath()` declaration is now a 3-parameter prototype; the 3rd parameter renamed `filterName` -> `suffix`).
 
@@ -31,12 +33,12 @@ there is nothing forcing the order and `self` stays in `$a0`.
 Also dropped: the `arity-ok` K&R declaration. Both call sites in this unit
 now pass three arguments, so `extern void *BuildMemcardPath(void *dest,
 s32 selector, void *suffix);` is a real prototype and the whole image
-stays byte-exact (func_8004ECCC 29/29). `docs/match-reports/BuildMemcardPath.md`
+stays byte-exact (TaskObjF__ProbeCardFreeSpace 29/29). `docs/match-reports/BuildMemcardPath.md`
 ("Why src/class_3bb8c_e.c must declare it unprototyped") is superseded by
 this -- flagged for the head, not edited.
 
 ```c
-s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
+s32 TaskObjF__OpenAndReadMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
 {
     s32 pathBuf[8];
     void *path;
@@ -72,7 +74,7 @@ an argument deserve this check.
 
 ---
 
-Previous title: func_8004EA38 — NON_MATCHING body promoted, round 71. Length: 1 word SHORT (40/41, 0xA0/0xA4). Word-match: 1/41 in-range (live-measured round 71, matches rounds 14/19/37 -- the body is structurally right, see below). First real diff: file 0x3F238 / vram 0x8004EA3C.
+Previous title: TaskObjF__OpenAndReadMemcardFile — NON_MATCHING body promoted, round 71. Length: 1 word SHORT (40/41, 0xA0/0xA4). Word-match: 1/41 in-range (live-measured round 71, matches rounds 14/19/37 -- the body is structurally right, see below). First real diff: file 0x3F238 / vram 0x8004EA3C.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class). Restored to
 `INCLUDE_ASM` — see "Why restored" below; this is a correct-LENGTH
@@ -87,21 +89,21 @@ placeholder, not a correct-BYTES one.
 > no zero, which this round's own thesis (prioritize the NEVER-searched
 > 38-function queue) explicitly weighs against a third run. Not
 > re-searched this round; time spent instead on TaskObjF__TryWriteMemcardSaveFile,
-> TaskObjF__func_8004F8A4 and func_8004E6B8, all higher priority on this round's
+> TaskObjF__func_8004F8A4 and TaskObjF__CheckCardStatus, all higher priority on this round's
 > own list. Restored to `INCLUDE_ASM`, unchanged.
 
 ## What it does
 
-`s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)`. Opens
+`s32 TaskObjF__OpenAndReadMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *filterName)`. Opens
 a path built from `self->unkC` via `BuildMemcardPath`/`func_80050938`; on
 success, if `destBuf` is non-NULL, allocates an 0x80-byte scratch buffer,
 reads into it via `func_80050928`, copies the string at `buf+4` into
 `destBuf` via `strcpy`, and frees the scratch buffer; either way closes
 the handle and returns 1 (0 if the open failed). `filterName` (3rd
 parameter) is genuinely forwarded by this function's own caller
-(`func_8004E9AC`) but never read anywhere in this function's body — the
+(`TaskObjF__ProbeMemcardFile`) but never read anywhere in this function's body — the
 already-established "unused parameter invisible from the callee's own
-disassembly" shape (see `func_8004E9AC`'s report and
+disassembly" shape (see `TaskObjF__ProbeMemcardFile`'s report and
 DECOMPILATION_LEARNINGS).
 
 ## Where it stands
@@ -120,7 +122,7 @@ copy entirely) since `$a0` hasn't been clobbered yet at that point.
 This is the project's well-documented "redundant `move` retail emits and
 you do not, same register, same value" residue class
 (docs/MATCHING-GUIDE.md), now with a fifth confirmed instance —
-`func_8004ECCC` (matched this round, see its report) has the IDENTICAL
+`TaskObjF__ProbeCardFreeSpace` (matched this round, see its report) has the IDENTICAL
 call shape (`BuildMemcardPath(localBuf, self->field, ...)`) and needed the
 SAME redundant copy, but it resolved itself once an unrelated arithmetic
 computation was reshaped elsewhere in that function, giving GCC a reason
@@ -143,7 +145,7 @@ whole body other than the two calls IS the `BuildMemcardPath`/
 5. Swapping the two call arguments' evaluation order in source (not
    meaningfully expressible in C for a 2-argument call with no
    dependency between them; both orderings compile identically here).
-6. Ran the permuter (`tools/setup-permuter.sh func_8004EA38 <seed>`) for
+6. Ran the permuter (`tools/setup-permuter.sh TaskObjF__OpenAndReadMemcardFile <seed>`) for
    ~280 seconds across ~4600+ iterations with `-j 6 --stop-on-zero`: best
    score reached was 5 (not 0), via `void *new_var; new_var = path; ...
    func_80050938(new_var, 1);` — a read of an UNINITIALIZED local (`path`
@@ -159,11 +161,11 @@ whole body other than the two calls IS the `BuildMemcardPath`/
 ## Why restored to `INCLUDE_ASM`
 
 The 40-vs-41-word mismatch means every function AFTER this one in ROM
-order (`func_8004EADC`, `func_8004EB88`, `func_8004EC5C`,
-`func_8004ECCC`) would drift by 4 bytes if this function's near-miss C
+order (`TaskObjF__FindUnusedMemcardName`, `TaskObjF__CollectExistingMemcardFiles`, `TaskObjF__CheckCardSpace`,
+`TaskObjF__ProbeCardFreeSpace`) would drift by 4 bytes if this function's near-miss C
 were left in `src/`. Restoring `INCLUDE_ASM` reproduces retail's own
-bytes verbatim (correct length), which is what let `func_8004EC5C` and
-`func_8004ECCC` (both after this one) be verified and matched cleanly
+bytes verbatim (correct length), which is what let `TaskObjF__CheckCardSpace` and
+`TaskObjF__ProbeCardFreeSpace` (both after this one) be verified and matched cleanly
 this round. Per CLAUDE.md: no score short of byte-exact justifies leaving
 C in `src/`.
 
@@ -176,7 +178,7 @@ believed correct.
 ```c
 #if 0
 /* stalesyms --fix 2026-09-22: func_800508F8 -> close, func_80050928 -> read, func_80050938 -> open -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
+s32 TaskObjF__OpenAndReadMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
 {
     s32 pathBuf[8];
     void *path;
@@ -218,10 +220,10 @@ a barrier or operand-order change cannot do.
 
 **The redundant-`move`-of-`self` shape recurs specifically around calls
 of the form `helper(localStackBuffer, self->field, ...)`** — both this
-function and `func_8004ECCC` hit it on the identical call
-(`BuildMemcardPath`). It resolved for `func_8004ECCC` once other arithmetic
+function and `TaskObjF__ProbeCardFreeSpace` hit it on the identical call
+(`BuildMemcardPath`). It resolved for `TaskObjF__ProbeCardFreeSpace` once other arithmetic
 in that function gave the register allocator a reason to move `self`
-out of `$a0` early; `func_8004EA38` has no such arithmetic to lean on,
+out of `$a0` early; `TaskObjF__OpenAndReadMemcardFile` has no such arithmetic to lean on,
 which may be exactly why it stayed a genuine stall while its sibling
 matched. Worth trying on a future instance: if the function has ANY
 unrelated computation that can be legitimately reordered to sit between
@@ -241,7 +243,7 @@ BOTH `pathBuf`'s address and `self->unkC` through named locals assigned
 as separate statements before the call (`pbuf = pathBuf; id = self->unkC;
 path = BuildMemcardPath(pbuf, id);`), on the theory that forcing two
 explicit materializations right after entry might give the allocator a
-reason to evacuate `self` into a scratch register the way `func_8004ECCC`
+reason to evacuate `self` into a scratch register the way `TaskObjF__ProbeCardFreeSpace`
 found. Result: **worse and drifted** (39 words, now 2 short instead of
 1, with the redundant move still missing) -- reverted immediately.
 
@@ -297,7 +299,7 @@ body live C (not `#ifdef`), ran `./build-and-verify.sh` (clean compile,
 whole-image SHA1 mismatch as expected -- the 1-word-short length shifts
 everything after it in ROM order, which is the ~175KB out-of-range drift
 `funcdiff.py` reports and is expected, not a new residue) and
-`tools/funcdiff.py func_8004EA38`. Result: **1/41 words match in-range,
+`tools/funcdiff.py TaskObjF__OpenAndReadMemcardFile`. Result: **1/41 words match in-range,
 40/41 total length (1 word short)**, objdump confirms 40 instructions in
 the compiled body -- identical to the figures already on file since round
 14/19/37. No stale-length correction needed; the title line above is
@@ -305,3 +307,7 @@ otherwise unchanged in substance. Restored the `#ifdef
 NON_MATCHING`/`#else INCLUDE_ASM`/`#endif` wrapper after measuring;
 `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green with
 the wrapped form in place.
+
+## Naming (round 78, track 3)
+
+`func_8004EA38` -> `TaskObjF__OpenAndReadMemcardFile`. **Tier B.** Private helper called only by `TaskObjF__ProbeMemcardFile`. Builds a memcard path (`BuildMemcardPath(pathBuf, self->cardSlot, suffix)`), opens it, and if `destBuf` is non-NULL reads the first 0x80 bytes and `strcpy`s from offset +4 into `destBuf` (skipping what looks like a 4-byte header field). Mechanics only; what the copied bytes represent to the game (a save's title/comment field, by position) is not confirmed here.

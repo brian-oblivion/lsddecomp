@@ -86,9 +86,6 @@ D_8008AA7C
 D_8008AA84
 D_8008AA8C
 D_8008AA94
-D_8008AA9C
-D_8008AAA4
-D_8008AAAC
 D_8008AAC8
 D_8008AACC
 D_8008AAD4
@@ -177,6 +174,9 @@ gLinkDstStage
 gLinkSpawnIndex
 gLinkSrcStage
 gLinkTriggerIndex
+gMcDevicePath0
+gMcDevicePath1
+gMcTempFileSuffix
 gMemcardIconTemplate
 gNameCharTable
 gOpenVabCount

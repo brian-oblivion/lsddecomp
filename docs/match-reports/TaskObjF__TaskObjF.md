@@ -15,7 +15,7 @@ table's own **+0x008 ctor slot**. This is the same real class
 allocate and construct through `GetTaskObjFMethods()->ctor(self, arg0, arg1)`,
 and the SAME real object `class_3bb8c_e.c` independently names `Node3bb8cE`
 (its own local view, established there round 14 from ITS 19 functions --
-`func_8004E3F4`/`func_8004E40C`/etc. all operate on this same table).
+`TaskObjF__ClearResourceSlots`/`TaskObjF__Finalize`/etc. all operate on this same table).
 
 ## Body
 
@@ -33,7 +33,7 @@ void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
         StartCARD();
         _bu_init();
     }
-    func_8004E3F4(self);
+    TaskObjF__ClearResourceSlots(self);
     self->methods->slot40(self, arg2);
 }
 ```
@@ -59,13 +59,13 @@ SLPS_015.56`.
    `libcard/a74`, `libcard/a75`, `libcard/c112`) -- **only on the very
    first construction** of this class (a classic "init memory cards once"
    singleton-style guard).
-4. `func_8004E3F4(self)` -- already matched, `class_3bb8c_e.c`, under that
+4. `TaskObjF__ClearResourceSlots(self)` -- already matched, `class_3bb8c_e.c`, under that
    unit's own `Node3bb8cE *` view; zeroes four resource-slot fields.
 5. `self->methods->slot40(self, arg2)` -- forwards this function's own 3rd
    parameter verbatim to a new table slot at +0x040 (immediately after the
    existing `ctor` field's implicit end, with a `pad00C[0x040-0x00C]` gap
    filled in). `class_3bb8c_e.c`'s own independent view already names the
-   concrete function at this address `func_8004E5D4` (still uncarved
+   concrete function at this address `TaskObjF__SetCardSlot` (still uncarved
    there).
 
 ## Header changes
@@ -81,7 +81,7 @@ SLPS_015.56`.
 - New extern `D_8008AA30` (`s32`, the one-shot init counter).
 
 `src/class_3bb8c_d.c`: local (not shared-header) externs for
-`func_8004E3F4` (already matched elsewhere, under this unit's own `void *`
+`TaskObjF__ClearResourceSlots` (already matched elsewhere, under this unit's own `void *`
 view rather than `class_3bb8c_e`'s `Node3bb8cE *`) and for `InitCARD`/
 `StartCARD`/`_bu_init` (Sony's, linked from `lib/libcard`, declared the
 same way `malloc`/`free`/`printf` are per-unit rather than in a shared
