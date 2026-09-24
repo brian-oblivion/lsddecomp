@@ -1,4 +1,88 @@
-# VabStreamObj__PlayTone -- STALL (best: 5/55 words match, but see caveat below)
+# VabStreamObj__PlayTone -- MATCHED (round 75: load the program pointer before computing `lo`, so `hi`'s first use is not the multiply)
+
+REVISITED, round 75: MATCHED (55/55, byte-exact, whole-image oracle `OK: build matches retail`); names/types not relevant (the round-52 names and the unit's existing `SsUtKeyOn` extern were used unchanged).
+
+## Round 75 (runner bravo)
+
+**First measurement, before changing anything.** The round-73 NON_MATCHING
+body (`hi = index / 16; lo = index - hi * 16;`) compiled live in place of the
+`INCLUDE_ASM`: `5/55 words match`, `insertions 6 / deletions 6 (opcode-level;
+positional skeleton diffs 44)`, three words short, frame 0x38 vs 0x30, and
+297063 bytes of drift outside the range. So the old figure was misalignment
+from a length difference, as suspected, not a register residue.
+
+**Steps, one build each:**
+
+| body | score | ins/del | note |
+| --- | --- | --- | --- |
+| round-73 body (`/16`, `lo = index - hi*16`) | 5/55 | 6/6 | `andi` fold, 3 words short |
+| head's round-17 narrowing `lo = index - (s16)hi * 16` | 46/55 | 1/1 | length exact; `sll 4` fed from the truncated `hi`, v0/v1 swapped |
+| `hi = index; hi >>= 4;` / `lo = index; lo -= hi<<4;` / `lo = index - (hi = index>>4)*16` / `lo = index; lo -= hi*16` / `index + hi * -16` | 5/55 | 6/6 | all fold |
+| `lo = index - (s16)(hi * 16)` | 10/55 | 2/2 | extra sext |
+| `__asm__("")` (and `__volatile__`) between `hi` and `lo` | 5/55 | 6/6 | barrier does NOT block the fold |
+| `hi = index >> 4;` hoisted ABOVE the guard | 44/55 | 1/1 | fold blocked, untruncated `sll 4` exactly as retail, but `sra` lands before `bltz` |
+| redundant inner `if (hi >= 0)` | 10/55 | 1/1 | retail's hi/lo sequence exactly, plus one extra `bltz` |
+| `entry = &tab[hi][index - hi*16]; lo = index - hi*16;` | 49/55 | 0/0 | 6 register-identity diffs |
+| **`prog = self->progVagTable[hi]; lo = index - hi*16; entry = &prog[lo];`** | **55/55** | 0/0 | **MATCH** |
+
+**The mechanism (why the lever works).** The fold `index - (index>>4)*16 ->
+index & 0xF` is done by COMBINE (three-insn: `sra` -> `sll 4` -> `subu`), and
+combine can only find the `sra` through the `LOG_LINKS` of the insn that uses
+it. GCC 2.6.3's `flow.c` builds a `LOG_LINK` (a) only within one basic block
+and (b) only from the NEXT use of a register after its set. Two measured
+consequences:
+
+- Put `hi`'s set in a different block from the multiply (hoist it above the
+  guard, or add a redundant branch between them) and the fold disappears, with
+  the `sll 4` still fed from the untruncated `hi`, which is retail's exact
+  sequence.
+- Keep everything in one block but make `hi`'s FIRST use something else (here
+  the `hi * 4` of the program-pointer load) and the multiply gets no link to
+  the `sra`. The fold disappears with no extra code, and this is retail.
+
+The head's round-17 `(s16)hi * 16` worked for the same reason: the first use
+of `hi` became the sign extension. It also changed the operand, which is why
+it left one word. Round 17's "seven probes" all put the multiply first, which
+is why every one of them folded. The `__asm__("")` barrier does not block the
+fold, so it is not a volatile-insn check that stops combine here.
+
+**SsUtKeyOn extern: observed, NOT changed, because this function did not need
+it.** The unit declares `extern s16 SsUtKeyOn(s16, s16, s16, s16, s32, s32,
+s32);`. `include/psyq/LIBSND.H` has `short SsUtKeyOn(short x7)`, and the
+`#ifdef NON_MATCHING` definition in `src/code_179d8_j_b.c` reads it as `s32
+SsUtKeyOn(s16, s16, s16, s16, u16, s16, s16)`. That definition is a stall
+(65/252), not a byte-exact one. Callers checked: `grep -rln "jal *SsUtKeyOn$"
+asm/` finds exactly one, this function, and `grep` in `src/` finds no other C
+call. At this call site the disagreement is byte-invisible: the 5th argument
+is a `u8` (`lbu`, stored straight to `0x10($sp)` under either `s32` or
+`short`); the 6th and 7th are already `(s16)` casts; and the `s16` return
+type is what produces retail's `sll`/`sra` on `$v0` after the `jal`. The unit
+matched with the extern as it stands, so I left it alone.
+
+**Budget:** 18 builds in all, no permuter search. The match came before any
+Gate 3 decision was needed.
+
+### Proposed learning
+
+**The `x - (x >> k) * 2^k -> x & (2^k-1)` fold is a combine fold, and it
+depends on where the shifted value is FIRST used.** flow.c links a register's
+set only to its next use in the same basic block. If the multiply is the first
+use of `hi = x >> k`, combine folds it to `andi` and the function comes out
+3 instructions short. If anything else uses `hi` first (an array index
+`tab[hi]`, a cast `(s16)hi`), or the set is in another block, the retail-style
+`sll`+`subu` survives, fed from the untruncated `hi`. **The tell:** retail has
+`sra; ...; sll k; subu` where your build has `andi 0xf` straight off the
+original register. **The lever:** reorder the statements so that some other
+use of `hi` comes before `lo = x - hi * 2^k`. A bare `__asm__("")` between the
+two does NOT block it. This generalises the round-74 goto-loop lesson:
+several "compiler residues" turn out to be pass-scope effects (loop notes,
+basic blocks, first-use links) that source order controls.
+
+---
+
+## History (round 17 - round 73), kept for the derivation
+
+Original title: VabStreamObj__PlayTone -- STALL (best: 5/55 words match, but see caveat below)
 
 > Renamed from `func_8002CA3C` on 2026-09-18 (tools/rename.py). Address 0x8002ca3c.
 
