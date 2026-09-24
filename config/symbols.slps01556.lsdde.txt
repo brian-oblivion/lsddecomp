@@ -783,6 +783,16 @@ GsSortClear = 0x80023DA0; // type:func  (Psy-Q libgs/gs_001, fingerprint)
 // libgte/reg, unidentified: 5-way tie masked 0.67 (SetRGBcd/SetIR0/SetData32/
 // SetGeomScreen/SetDQA), 3w. Position confirms libgte (after libgte/ratan).
 func_8001F3A4 = 0x8001F3A4; // type:func
+// libcomb, unidentified: masked 0.80 shape 0.80 AddCOMB (libcomb/comb,
+// 10w), also masked 0.70 StartPAD (libapi/pad)/def_cbsync/def_cbready/
+// def_cbread (libcd/event); none reaches the shape bar and position (after
+// libgte/ratan, before libgs/gs_105) matches none of them. Round 74 (bravo,
+// track 2).
+func_8001F4E4 = 0x8001F4E4; // type:func
+// unidentified: TINY (4w), EXACT tie PadVersion (_obj/mouse) / CdLastPos
+// (libcd/sys); position (after libgte/ratan, before libgs/gs_105) matches
+// neither candidate's library, unresolved. Round 74 (bravo, track 2).
+func_8001F50C = 0x8001F50C; // type:func
 // unidentified: masked 0.10 strtoul (libc2), too weak; no position/header support.
 func_8001F51C = 0x8001F51C; // type:func
 // unidentified: masked 0.00, no viable candidate.
