@@ -95,19 +95,19 @@ void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2
 
     if ((u16)(angle - 0x200) < 0x400 || (u16)(angle - 0xA00) < 0x400) {
         offset = mat.unk1C;
-        self->unk80 = arg2;
-        self->unk84 = arg1;
-        self->unk7C = (mat.unk14 > 0) ? point0 : point0 - arg1 + 1;
-        self->unk7E = (mat.unk1C > 0) ? point1 - (u16)self->gridHalfCells - 1
+        self->footprintWidth = arg2;
+        self->footprintHeight = arg1;
+        self->footprintCol = (mat.unk14 > 0) ? point0 : point0 - arg1 + 1;
+        self->footprintRow = (mat.unk1C > 0) ? point1 - (u16)self->gridHalfCells - 1
                                       : point1 - (u16)self->gridHalfCells + 1;
         flag = 0;
     } else if ((u16)(angle - 0x600) < 0x400 || (u16)(angle - 0x200) >= 0xC00) {
         offset = mat.unk14;
-        self->unk80 = arg1;
-        self->unk84 = arg2;
-        self->unk7C = (mat.unk14 > 0) ? point0 - (u16)self->gridHalfCells - 1
+        self->footprintWidth = arg1;
+        self->footprintHeight = arg2;
+        self->footprintCol = (mat.unk14 > 0) ? point0 - (u16)self->gridHalfCells - 1
                                       : point0 - (u16)self->gridHalfCells + 1;
-        self->unk7E = (mat.unk1C > 0) ? point1 : point1 - arg2 + 1;
+        self->footprintRow = (mat.unk1C > 0) ? point1 : point1 - arg2 + 1;
         flag = 1;
     }
 
@@ -121,9 +121,9 @@ void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2
         offset = half + 1;
     }
     if (flag) {
-        self->unk7C = (u16)self->unk7C + offset;
+        self->footprintCol = (u16)self->footprintCol + offset;
     } else {
-        self->unk7E = (u16)self->unk7E + offset;
+        self->footprintRow = (u16)self->footprintRow + offset;
     }
     Class866E8__BuildFootprintSlots(self);
 }
@@ -136,68 +136,68 @@ extern s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s
  * round 19 as a whole-function register rotation
  * (docs/match-reports/Class866E8__BuildFootprintSlots.md): ONE slot pointer reused for the
  * second slot (no separate slot1), assigned once at the join after the
- * h6<0 test (reorg fills the bgez delay slot from it and deletes the
+ * row<0 test (reorg fills the bgez delay slot from it and deletes the
  * redundant copy on the other path -- no barrier, no duplicate); the
  * clipped remainder in its own local `over` rather than `span -= 0x14`;
  * and `count += 1` as a statement in each arm plus at the join. */
 void Class866E8__BuildFootprintSlots(Obj866E8 *self) {
     s32 flag;
-    s32 h4;
+    s32 col;
     s32 width;
     s32 height;
     s32 quadrant;
-    s32 h6;
+    s32 row;
     GridSlot866E8 *slot;
     s32 span;
     s32 count;
     s32 over;
 
     flag = 0;
-    h4 = self->unk7C;
-    width = self->unk80;
-    height = self->unk84;
+    col = self->footprintCol;
+    width = self->footprintWidth;
+    height = self->footprintHeight;
     quadrant = 3;
-    if (h4 < 0) {
-        h4 += 0x14;
+    if (col < 0) {
+        col += 0x14;
         flag = 1;
         quadrant = 2;
     }
-    h6 = self->unk7E;
-    if (h6 < 0) {
-        h6 += 0x14;
+    row = self->footprintRow;
+    if (row < 0) {
+        row += 0x14;
         if (flag != 0) {
-            h4 -= 0xA;
+            col -= 0xA;
             quadrant = 0;
-        } else if (h4 < 0xA) {
-            h4 += 0xA;
+        } else if (col < 0xA) {
+            col += 0xA;
             quadrant = 0;
         } else {
-            h4 -= 0xA;
+            col -= 0xA;
             quadrant = 1;
         }
     }
-    slot = &self->slots8C[0];
+    slot = &self->gridSlots[0];
     slot->elemIdx = self->methods->slot120(self, quadrant);
-    slot->h4 = (h4 >= 0) ? h4 : 0;
-    slot->h6 = h6;
-    span = h4 + width;
+    slot->col = (col >= 0) ? col : 0;
+    slot->row = row;
+    span = col + width;
     if (span >= 0x15) {
         over = span - 0x14;
-        slot->h8 = width - over;
-        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, h4, h6, width, height);
+        slot->width = width - over;
+        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
         count += 1;
-        slot = &self->slots8C[count];
+        slot = &self->gridSlots[count];
         slot->elemIdx = self->methods->slot120(self, quadrant + 1);
-        slot->h4 = 0;
-        slot->h6 = self->slots8C[0].h6;
-        slot->h8 = over;
-        slot->hA = self->slots8C[0].hA;
+        slot->col = 0;
+        slot->row = self->gridSlots[0].row;
+        slot->width = over;
+        slot->height = self->gridSlots[0].height;
     } else {
-        slot->h8 = width;
-        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, h4, h6, width, height);
+        slot->width = width;
+        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
     }
     count += 1;
-    self->unk88 = count;
+    self->gridSlotCount = count;
 }
 
 s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
@@ -211,26 +211,26 @@ s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 coun
          * and open a new one for the part below. */
         overflow = (row + height) - 20;
         span = overflow;
-        slot->hA = height - overflow;
+        slot->height = height - overflow;
         count = count + 1;
-        slot = &self->slots8C[count];
+        slot = &self->gridSlots[count];
 
         if (col < 10) {
             elemArg = baseIdx + 2;
             slot->elemIdx = self->methods->slot120(self, elemArg);
-            slot->h4 = col + 10;
+            slot->col = col + 10;
             /* Stored in BOTH arms: cross-jumping merges the copies, and
-             * the join label keeps the h4 reload below after it. */
-            slot->hA = span;
+             * the join label keeps the col reload below after it. */
+            slot->height = span;
         } else {
             elemArg = baseIdx + 3;
             slot->elemIdx = self->methods->slot120(self, elemArg);
-            slot->h4 = col - 10;
-            slot->hA = span;
+            slot->col = col - 10;
+            slot->height = span;
         }
 
-        span = slot->h4 + width;
-        slot->h6 = 0;
+        span = slot->col + width;
+        slot->row = 0;
         if (span >= 21) {
             /* ...and past the right edge (column 20) too. */
             count = count + 1;
@@ -239,18 +239,18 @@ s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 coun
              * `span - 20` with the store below (round 71). */
             widthLeft = width + 20;
             widthLeft = widthLeft - span;
-            slot->h8 = widthLeft;
-            slot = &self->slots8C[count];
+            slot->width = widthLeft;
+            slot = &self->gridSlots[count];
             slot->elemIdx = self->methods->slot120(self, elemArg + 1);
-            slot->h4 = 0;
-            slot->h6 = 0;
-            slot->h8 = span - 20;
-            slot->hA = overflow;
+            slot->col = 0;
+            slot->row = 0;
+            slot->width = span - 20;
+            slot->height = overflow;
         } else {
-            slot->h8 = width;
+            slot->width = width;
         }
     } else {
-        slot->hA = height;
+        slot->height = height;
     }
     return count;
 }
@@ -272,15 +272,15 @@ void Class866E8__SetFootprintFromQuery(Obj866E8 *self) {
     CC74QueryBuf buf;
 
     self->methods->slot10C(self, &buf, 0);
-    self->unk88 = 0;
-    self->unk88 = Class866E8__InitFootprintSlot(self, junk, 0, buf.count);
-    if (IsPointOutOfBounds(self->unk1DC, buf.point) != 0) {
+    self->gridSlotCount = 0;
+    self->gridSlotCount = Class866E8__InitFootprintSlot(self, junk, 0, buf.count);
+    if (IsPointOutOfBounds(self->bounds, buf.point) != 0) {
         if (buf.count + 1 < self->unk68->count) {
-            self->unk88 = Class866E8__InitFootprintSlot(self, junk, self->unk88, buf.count + 1);
+            self->gridSlotCount = Class866E8__InitFootprintSlot(self, junk, self->gridSlotCount, buf.count + 1);
         }
     }
     if (buf.count - 1 >= 0) {
-        self->unk88 = Class866E8__InitFootprintSlot(self, junk, self->unk88, buf.count - 1);
+        self->gridSlotCount = Class866E8__InitFootprintSlot(self, junk, self->gridSlotCount, buf.count - 1);
     }
 }
 
@@ -303,16 +303,16 @@ s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
     if (bounds == NULL) {
         return 1;
     }
-    if (point[0] < bounds->unk0) {
+    if (point[0] < bounds->minX) {
         return 1;
     }
-    if (bounds->unk4 < point[0]) {
+    if (bounds->maxX < point[0]) {
         return 1;
     }
-    if (point[1] < bounds->unk2) {
+    if (point[1] < bounds->minY) {
         return 1;
     }
-    return bounds->unk8 < point[1];
+    return bounds->maxY < point[1];
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", IsPointOutOfBounds);
@@ -336,15 +336,15 @@ void Class866E8__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
     EntryChildObj **cell;
     EntryChildObj *next;
 
-    slot = self->slots8C;
-    for (i = 0; i < self->unk88; slot++, i++) {
+    slot = self->gridSlots;
+    for (i = 0; i < self->gridSlotCount; slot++, i++) {
         e = &self->arr[slot->elemIdx];
         if (e->unk4->unk2C == 0) {
             continue;
         }
-        cell = e->unk10 + slot->h4 + slot->h6 * 20;
-        for (j = 0; j < slot->hA; j++) {
-            for (k = 0; k < slot->h8; k++) {
+        cell = e->unk10 + slot->col + slot->row * 20;
+        for (j = 0; j < slot->height; j++) {
+            for (k = 0; k < slot->width; k++) {
                 if (setBit != 0) {
                     (*cell)->unk10 &= 0x7FFFFFFF;
                 } else {
@@ -361,7 +361,7 @@ void Class866E8__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
                 }
                 cell++;
             }
-            cell += 20 - slot->h8;
+            cell += 20 - slot->width;
         }
     }
 }
@@ -371,26 +371,26 @@ void *Class866E8__GetUnk1CC(Obj866E8 *self) {
 }
 
 void Class866E8__SetBounds(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
-    self->unk1DC = arg1;
+    self->bounds = arg1;
 }
 
 /* Picks one of the four static 0xC-byte EntryDesc866E8 entries by the sign of
- * `rate` and by `flag`, then sets unk1E0 to |rate| scaled by the chosen
- * entry's unk6.
+ * `rate` and by `flag`, then sets rateCountdown to |rate| scaled by the chosen
+ * entry's scale field.
  *
  * Two source shapes here are load-bearing and neither is cosmetic:
  *
  *  - The `goto` ladder, and its asymmetry. Retail emits TWO stores to
- *    unk1E4: the rate>0/flag!=0 path has its own (in a `j`'s delay slot at
+ *    rateEntry: the rate>0/flag!=0 path has its own (in a `j`'s delay slot at
  *    0x8004CFDC) and the other three SHARE one (0x8004CFF8). Writing the
  *    field directly on that one path and going through `table` on the other
  *    three is what reproduces that split. Byte-exact since round 9.
- *  - `scale` and `val`. Retail loads the entry's unk6 ONCE (`lh $v1,6($v0)`)
+ *  - `scale` and `val`. Retail loads the entry's scale field ONCE (`lh $v1,6($v0)`)
  *    before the sign branch and keeps a single `mflo` after the join, with a
  *    `mult` in each arm. Caching the load in `scale` and letting an explicit
  *    if/else assign a local `val` is what defers that `mflo`; the
  *    default-then-overwrite spelling makes cc1 extract it eagerly, and
- *    storing to self->unk1E0 directly instead of through `val` perturbs the
+ *    storing to self->rateCountdown directly instead of through `val` perturbs the
  *    table-selection half as well. Both were measured -- round 58 and
  *    docs/match-reports/Class866E8__ConfigureRateEntry.md.
  *
@@ -407,7 +407,7 @@ void Class866E8__ConfigureRateEntry(Obj866E8 *self, s32 rate, s32 flag) {
     if (flag == 0) {
         goto store;
     }
-    self->unk1E4 = &D_800869A8;
+    self->rateEntry = &D_800869A8;
     goto merge;
 rate_le:
     table = &D_800869B4;
@@ -416,15 +416,15 @@ rate_le:
     }
     table = &D_800869C0;
 store:
-    self->unk1E4 = table;
+    self->rateEntry = table;
 merge:
-    scale = self->unk1E4->unk6;
+    scale = self->rateEntry->scale;
     if (rate >= 0) {
         val = scale * rate;
     } else {
         val = scale * (~rate + 1);
     }
-    self->unk1E0 = val;
+    self->rateCountdown = val;
 }
 
 /* Forward declaration: defined later in this file (after Class866E8__AdvanceRateCountdown in
@@ -433,11 +433,11 @@ merge:
 void Class866E8__ApplyRateToChild(Obj866E8 *self, EntryChildObj *item);
 
 void Class866E8__AdvanceRateCountdown(Obj866E8 *self) {
-    if (self->unk1E0 > 0) {
+    if (self->rateCountdown > 0) {
         Class866E8__ForEachElem(self, Class866E8__ApplyRateToChild, 0);
-        self->unk1E0 -= 1;
-        if (self->unk1E0 == 0) {
-            self->unk1E0 = -1;
+        self->rateCountdown -= 1;
+        if (self->rateCountdown == 0) {
+            self->rateCountdown = -1;
         }
     }
 }
@@ -448,14 +448,14 @@ void Class866E8__AdvanceRateCountdown(Obj866E8 *self) {
 void Class866E8__ResetChildRate(Obj866E8 *self, EntryChildObj *item);
 
 void Class866E8__FlushRateLatch(Obj866E8 *self) {
-    if (self->unk1E0 != 0) {
+    if (self->rateCountdown != 0) {
         Class866E8__ForEachElem(self, Class866E8__ResetChildRate, 0);
-        self->unk1E0 = 0;
+        self->rateCountdown = 0;
     }
 }
 
 void Class866E8__ApplyRateToChild(Obj866E8 *self, EntryChildObj *item) {
-    item->methods->slot48(item, 0, self->unk1E4);
+    item->methods->slot48(item, 0, self->rateEntry);
 }
 
 void Class866E8__ResetChildRate(Obj866E8 *self, EntryChildObj *item) {
