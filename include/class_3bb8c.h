@@ -1168,7 +1168,7 @@ struct Class86B60UnkACObj_3bb8c_d {
  * vtable header WORD (the full `s32` at the vtable's own `+0x000`), the
  * same "arg->methods->header" runtime-type-id shape already documented
  * project-wide. Distinct from `GenericTagInst_3bb8c_c` above, which reads
- * only the LOW BYTE of the same word (a `lbu`) -- func_8004D788 loads and
+ * only the LOW BYTE of the same word (a `lbu`) -- Class86B60__ForwardIfTagB loads and
  * masks the FULL WORD (`lw` then `andi ..,0xF`), so reusing that byte-typed
  * struct here would emit the wrong load width.
  */
@@ -1253,9 +1253,9 @@ struct Class86B60Methods {
     void (*slot12C)(Class86B60 *self); /* +0x12C, func_8004E230's own first call, `self` only */
     void (*slot130)(Class86B60 *self); /* +0x130, func_8004D9D4's `unk58==2` tail target */
     void (*slot134)(Class86B60 *self); /* +0x134, func_8004D9D4's `unk58==3` tail target */
-    /* +0x138, func_8004D788's forward target, only reached when its own
+    /* +0x138, Class86B60__ForwardIfTagB's forward target, only reached when its own
      * arg1's header-word low nibble == 0xB (a runtime-type-id gate) --
-     * called with all three of func_8004D788's own parameters verbatim. */
+     * called with all three of Class86B60__ForwardIfTagB's own parameters verbatim. */
     void (*slot138)(Class86B60 *self, void *arg1, s32 arg2);
 };
 
@@ -1432,7 +1432,7 @@ struct BaseTaskCtorTable_3bb8c_c {
      * are released. */
     void (*slot0C)(void *self);
     u8 pad010[0x038 - 0x010];
-    /* +0x038, func_8004D788's own unconditional first call, forwarding
+    /* +0x038, Class86B60__ForwardIfTagB's own unconditional first call, forwarding
      * all three of its own parameters verbatim. */
     void (*slot38)(void *self, void *arg1, s32 arg2);
     u8 pad03C[0x060 - 0x03C];

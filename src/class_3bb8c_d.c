@@ -10,7 +10,7 @@ void Class86B60__Dtor(Class86B60 *self)
     Get_vtable_TaskCore()->slot0C(self);
 }
 
-void func_8004D788(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
+void Class86B60__ForwardIfTagB(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
 {
     Get_vtable_TaskCore()->slot38(self, arg1, arg2);
     if ((arg1->methods->header & 0xF) == 0xB) {

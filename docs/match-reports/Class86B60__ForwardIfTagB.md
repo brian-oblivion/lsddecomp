@@ -1,12 +1,14 @@
-# func_8004D788 -- MATCH
+# Class86B60__ForwardIfTagB -- MATCH
+
+> Renamed from `func_8004D788` on 2026-09-24 (tools/rename.py). Address 0x8004d788.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004D788`: 35/35 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__ForwardIfTagB`: 35/35 words match.
 
 ## Source
 
 ```c
-void func_8004D788(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
+void Class86B60__ForwardIfTagB(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
 {
     Get_vtable_TaskCore()->slot38(self, arg1, arg2);
     if ((arg1->methods->header & 0xF) == 0xB) {
