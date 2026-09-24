@@ -307,7 +307,7 @@ that point. A pointer-indirection idiom (`u16 *cur = &D_8008EA26; *cur =
 idx; bankIdx = *cur;`) that works for this unit's `D_8008EA22` in
 `SpuVmGetSeqVol` does **not** reproduce it here -- GCC still traces the
 pointer back to the known constant address and folds it exactly like the
-non-pointer form. Since `SpuVmSeqKeyOff` and `func_80031A44` (this same
+non-pointer form. Since `SpuVmSeqKeyOff` and `SsUtChangePitch` (this same
 round, this same unit) write-then-immediately-reread this identical global,
 this fix generalises to all three; the type is declared once, shared, in
 this unit's top block.

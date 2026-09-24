@@ -173,7 +173,7 @@ markedly WORSE than the 21/32 baseline**, despite scoring better on the
 permuter's own heuristic. The extra alias apparently gives cc1 enough
 freedom to allocate a genuinely different (larger) frame. This is the
 same class of permuter false-lead this project's other reports already
-document (`Unk18Obj__InitOt.md` round 36, `func_80031A44.md`): a heuristic
+document (`Unk18Obj__InitOt.md` round 36, `SsUtChangePitch.md`): a heuristic
 score below baseline is a LEAD to verify, never a result to adopt
 un-translated.
 

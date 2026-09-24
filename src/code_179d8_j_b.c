@@ -23,7 +23,7 @@
  *   2. `libsnd/ut_pb.o` (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244:
  *      `SsUtPitchBend`, which was `func_800319B4`, also previously MATCHED.
  *      That split THIS file again into [c][o][c], and everything from
- *      func_80031A44 on moved to `src/code_179d8_j_c.c`.
+ *      SsUtChangePitch on moved to `src/code_179d8_j_c.c`.
  * Reclassifying five matched functions out of the game count across the two
  * steps is the correction CLAUDE.md asks for, not a regression; their C is
  * DELETED, not commented out.

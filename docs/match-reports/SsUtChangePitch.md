@@ -1,4 +1,6 @@
-# func_80031A44 -- STALL: length EXACT at 88/88 (no drift); 84/88 raw word-match; first real diff at in-range word 49 (vram 0x80031B08) -- HEAD SALVAGE round 31, reconfirmed rounds 32 and 36
+# SsUtChangePitch -- STALL: length EXACT at 88/88 (no drift); 84/88 raw word-match; first real diff at in-range word 49 (vram 0x80031B08) -- HEAD SALVAGE round 31, reconfirmed rounds 32 and 36
+
+> Renamed from `func_80031A44` on 2026-09-24 (tools/rename.py). Address 0x80031a44.
 
 **CONTRADICTS THE TITLE -- REBUILD BEFORE USING EITHER FIGURE (flagged by
 the head, round 57, not resolved).** The note below is undated and states
@@ -88,7 +90,7 @@ extern u16 D_8008EA22;
 
 extern s16 note2pitch2(u16 a0, u16 a1);
 
-s32 func_80031A44(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5)
+s32 SsUtChangePitch(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5)
 {
     s16 v1, v2, v3;
 
@@ -332,7 +334,7 @@ extern u16 D_8008EA22;
 extern s16  note2pitch2(u16 p4, u16 p5);
 
 /* The salvaged body -- scored 84/88, exact length: */
-s32 func_80031A44(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5)
+s32 SsUtChangePitch(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5)
 {
     s16 v1, v2, v3;
 
@@ -448,7 +450,7 @@ omitted the way round 31's first, discarded attempt did):
 ```
 timeout 600 env PATH=.../permuter-work/bin:$PATH \
   .venv/bin/python3 tools/decomp-permuter/permuter.py -j 4 --stack-diffs \
-  --stop-on-zero --best-only permuter-work/func_80031A44
+  --stop-on-zero --best-only permuter-work/SsUtChangePitch
 ```
 
 **Reached iteration 54507 before the wall-clock bound ended the run** --
@@ -554,7 +556,7 @@ D_8008EA22 = 0x21;
 function's own range** -- a massive length increase, not the targeted
 2-word reorder. Removing the barrier (reverting to the plain, unbarred
 84/88 body) restored the exact prior state (`build/lsdde.map` confirms
-`func_80031A44` and its own length are back to the 84/88 baseline). So the
+`SsUtChangePitch` and its own length are back to the 84/88 baseline). So the
 barrier does not "block a reorder here", it forces the compiler into an
 entirely different, much larger code shape for this specific function --
 a bare scheduling barrier is not free of side effects on every function,

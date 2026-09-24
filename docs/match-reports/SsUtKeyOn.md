@@ -121,7 +121,7 @@ whose retail bytes are used verbatim.
 | `SsUtKeyOnV` (this unit, this function's near twin) | 11 |
 | **`SsUtKeyOn`** | **9** |
 | `func_8002FAC4` (`code_179d8_m`) | 2 |
-| `CD_cw`, `func_80031A44`, `SetupStyleSpawnParamsA`, `SetupStyleSpawnParamsB` | 1 each |
+| `CD_cw`, `SsUtChangePitch`, `SetupStyleSpawnParamsA`, `SetupStyleSpawnParamsB` | 1 each |
 
 No maspsx option covers it (`--help` on maspsx `e3d5916`; the two closest
 analogues, `--no-nop-mflo-mfhi` and `--addiu-at`, are precisely this shape of
@@ -752,7 +752,7 @@ and confirmed the guard-polarity residue is context-sensitive in a way
 this project's source-level view cannot reach, and a round-31 addendum
 that gained exactly one word from the one lever it had left -- reads as
 exhausted for hand reshaping. Time this round went to the two tighter
-gaps (`Unk18Obj__InitOt`, `func_80031A44`) instead, per this round's own
+gaps (`Unk18Obj__InitOt`, `SsUtChangePitch`) instead, per this round's own
 stated priority. Restored to `INCLUDE_ASM`. Classification unchanged:
 STALL.
 

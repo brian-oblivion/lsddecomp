@@ -231,7 +231,7 @@ sibling report characterizes as non-source-derivable, not new problems,
 and this round's time was spent instead on `SsUtKeyOn` (where the
 report's one specifically-flagged untested lever, `result` typed `s32`,
 gained one word -- see that report's round-31 addendum) and on
-`func_80031A44` (where a permuter search found a genuine improvement --
+`SsUtChangePitch` (where a permuter search found a genuine improvement --
 see that report). Restored to `INCLUDE_ASM`; still a STALL.
 
 ## ROUND 36 (runner delta): stale-symbol rebuild -- 237/253 measured, same declaration gaps as SsUtKeyOn

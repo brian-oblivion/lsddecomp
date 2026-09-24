@@ -1908,3 +1908,11 @@ SsUtKeyOnV = 0x8003149C; // type:func
 // own 1-param shape agrees exactly). Superseded game-style func_80031890.
 // Round 74 (bravo, track 2).
 SsUtKeyOffV = 0x80031890; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SsUtChangePitch (86w vs our
+// 88w, disc 3.3), position within the libsnd neighborhood, header
+// LIBSND.H (`extern short SsUtChangePitch(short,short,short,short,short,
+// short,short);`, 7 params -- this function's own 7-param shape
+// (idx,p1,p2,p3,unusedP,p4,p5, docs/match-reports/SsUtChangePitch.md)
+// agrees on count). Superseded game-style func_80031A44. Still a STALL --
+// this rename does not change that. Round 74 (bravo, track 2).
+SsUtChangePitch = 0x80031A44; // type:func

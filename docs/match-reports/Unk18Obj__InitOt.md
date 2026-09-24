@@ -587,7 +587,7 @@ each `source.c` against the seed:
   >255 in general (this specific call site's actual runtime values are
   unknown, so nothing here proves it safe). Same class of permuter
   artifact as the fingerprinted 130-scored candidate in
-  `func_80031A44.md`'s round 31/32 addenda: a mutation that scores better
+  `SsUtChangePitch.md`'s round 31/32 addenda: a mutation that scores better
   on the tool's own heuristic without being a real candidate.
 
 **Verdict: unchanged.** 71/73 remains the best HONEST score; the residue
@@ -604,7 +604,7 @@ itself -- diff the candidate's source against the seed before trusting the
 number.** Both sub-baseline candidates found here were real bugs (a value
 computed differently, silently, in a way the assembled bytes partially
 disguise) rather than closer matches, mirroring the pattern
-`func_80031A44`'s reports already document for a different function. A
+`SsUtChangePitch`'s reports already document for a different function. A
 scoring heuristic built on instruction/textual distance to the target has
 no way to know the source changed what the function COMPUTES, only that
 the resulting bytes moved closer on some weighted metric; that gap is
