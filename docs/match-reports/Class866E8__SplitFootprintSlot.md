@@ -1,4 +1,6 @@
-# func_8004CAF0 — MATCHED 97/97 (round 71, delta; revisit). Previously: STALL, 97 words exact length, 62/97, first diff at the prologue register saves
+# Class866E8__SplitFootprintSlot — MATCHED 97/97 (round 71, delta; revisit). Previously: STALL, 97 words exact length, 62/97, first diff at the prologue register saves
+
+> Renamed from `func_8004CAF0` on 2026-09-24 (tools/rename.py). Address 0x8004caf0.
 
 
 > **REVISITED, round 71: MATCHED 97/97, byte-exact, whole-image SHA1 green; names/types used (parameters renamed col/row/width/height, locals overflow/span/elemArg/widthLeft; no struct change).** The sections below this one are the history and are superseded by it.
@@ -60,7 +62,7 @@ spent (Gate 3 not run; not needed).
 ```c
 #if 0
 /* needs: common.h, class_3bb8c.h (Obj866E8, GridSlot866E8, slots8C, methods->slot120) */
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;
     s32 elemArg;
@@ -188,7 +190,7 @@ s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s
 > its `--debug` base score (869: 24 stack differences, 3 insertions/3
 > deletions, 37 register diffs) does **not** match the real build's
 > structural state (55/97, 0 insertions/deletions, pure rotation) — the
-> same scaffold-vs-real-build mismatch `func_8004CD38`'s report already
+> same scaffold-vs-real-build mismatch `IsPointOutOfBounds`'s report already
 > documented for this project (the standalone compile schedules
 > differently than the in-context one). Running a search against that
 > scaffold would target the wrong residue, so none was run; this is a
@@ -236,13 +238,13 @@ STALL (best 8/92 words; frame size off by 8 bytes)
 The biggest attempted this round (97 words) and the one that resisted
 byte-exactness. An 8-parameter function that populates one or two
 `GridSlot866E8` entries (the same type established this round from
-`func_8004CE24`/`func_8004CDA4`), advancing and returning `self->unk88`
+`Class866E8__SetFootprintCellFlag`/`Class866E8__InitFootprintSlot`), advancing and returning `self->unk88`
 (the slot count) as it goes.
 
 ## What the function does (control flow and semantics, not in doubt)
 
 ```c
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 v;
     s32 hSpan;
     s32 h4sum;
@@ -310,7 +312,7 @@ own `-0x38` frame, i.e. the 5th-8th arguments):
 
 Confirmed against the raw asm line-by-line: every branch target, every
 field write (`elemIdx`@0, `h4`@4, `h6`@6, `h8`@8, `hA`@0xA — the SAME
-`GridSlot866E8` layout `func_8004CE24` established), and every arithmetic
+`GridSlot866E8` layout `Class866E8__SetFootprintCellFlag` established), and every arithmetic
 op matches retail's OPERATIONS. The residue is a REGISTER ALLOCATION /
 frame-size difference, not a logic difference.
 
@@ -331,7 +333,7 @@ uses onto one register/lifetime.
 Attempts:
 
 1. Reassigning `slot` in place (shown above) — 8/92 in the fixed window,
-   frame `-0x30`, `func_8004CC74` (the next function) shifts by -0x14
+   frame `-0x30`, `Class866E8__SetFootprintFromQuery` (the next function) shifts by -0x14
    (20 bytes) low, meaning this function compiles noticeably SHORTER
    than retail overall (missing register save/restore pairs, not just a
    handful of instructions).
@@ -359,7 +361,7 @@ a pure scheduling residue).
 
 ```c
 #if 0
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 v;
     s32 hSpan;
     s32 h4sum;
@@ -446,7 +448,7 @@ genuinely separate value neither attempt captured), not just the naming.
 
 ```c
 #if 0
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 hSpan;
     s32 hSpan2;
     s32 h4;
@@ -525,7 +527,7 @@ successfully** (this scaffold: 869/24 stack diffs/3 ins/3 del vs the real
 build's 55/97/0 ins/0 del). Sanity-checking the base score against the
 CURRENT known-best structural state (not just against an old report's
 stale number) before running a search is the same discipline
-`func_8004CD38`'s report already flags, now confirmed on a second,
+`IsPointOutOfBounds`'s report already flags, now confirmed on a second,
 independently-carved function.
 
 **Checked against the head's second mid-round broadcast (aggregate/whole-
@@ -539,10 +541,10 @@ from one existing struct instance into another. The shape does not occur.
 
 ## Round 33 (charlie) — re-derived from the raw asm by hand, register rotation confirmed genuine; permuter scaffold mismatch re-checked, still unusable
 
-Traced every instruction in `asm/nonmatchings/class_3bb8c_b/func_8004CAF0.s`
+Traced every instruction in `asm/nonmatchings/class_3bb8c_b/Class866E8__SplitFootprintSlot.s`
 fresh against the round-19 preserved body, line by line, specifically hunting
 for anything the earlier rounds might have missed (in the spirit of this
-round's other stall on this unit, `func_8004C6A8`, where the same exercise
+round's other stall on this unit, `Class866E8__ComputeFootprintFromRotation`, where the same exercise
 found two real fixes). Found none here: every field write, every branch
 target, every delay-slot placement, and every value's SOURCE POSITION
 (including the `hSpan2 = hSpan;` copy sitting in the `p5<10` guard's own
@@ -574,8 +576,8 @@ mismatch itself is root-caused.
 ## Round 53 (bravo) — CALIBRATION attempt, two fresh levers, both inert, negative
 
 Assigned as one of three functions in a round-53 Sonnet calibration slot for
-the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `func_8004CD38`
-and `func_8004CFB8`. Round 33's disposition ("still a pure register-identity
+the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `IsPointOutOfBounds`
+and `Class866E8__ConfigureRateEntry`. Round 33's disposition ("still a pure register-identity
 rotation with no new lever found") is the reason this unit was picked over
 the plan's higher-ranked but levers-measurably-spent `code_2cc8c_e` job.
 
@@ -737,11 +739,11 @@ body agree with that body rebuilt in the real tree? — was never actually run;
 what was compared was two tools' *summary numbers*. Run properly this round:
 
 ```sh
-tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/func_8004CAF0/base.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/Class866E8__SplitFootprintSlot/base.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/class_3bb8c_b.c.o
 ```
 
-`func_8004CAF0` is **byte-identical** between the two, instruction for
+`Class866E8__SplitFootprintSlot` is **byte-identical** between the two, instruction for
 instruction, with the only textual differences being the absolute targets of
 `j`/`bnez` (`j 4cbbc` vs `j cc`) — which is what a standalone object always
 shows, because those are section-relative until link time. 98 vs 99 lines,
@@ -920,3 +922,10 @@ No source change beyond the wrapper and comment; both oracles green:
 (still `INCLUDE_ASM` in the verified build; the remaining residue is not
 yet established as a HARD RULE 6 register-identity stall per round 58).
 
+
+## Naming
+
+**Tier B.** Not a vtable slot. Clips a footprint slot against the grid's
+row-20/column-20 wrap and opens the extra slot(s) needed for the
+overflow. Named for what it does to the slot (splits/clips it at a grid
+edge), not for a guessed game purpose.

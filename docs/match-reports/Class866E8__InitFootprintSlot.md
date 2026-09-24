@@ -1,4 +1,6 @@
-# func_8004CDA4 — MATCHED (32/32 words)
+# Class866E8__InitFootprintSlot — MATCHED (32/32 words)
+
+> Renamed from `func_8004CDA4` on 2026-09-24 (tools/rename.py). Address 0x8004cda4.
 
 Writes a fresh copy of a constant 3-word struct (`D_80086990`) into
 `self+0x8C+key*0xC`, then overwrites just the first word of that copy
@@ -7,7 +9,7 @@ arg3)`), and returns `key + 1`.
 
 `self`'s `+0x8C` region is a currently-uncharted array of 0xC-byte
 (`Unk54Struct`-shaped) slots indexed by `key`; only ONE index is exercised
-here and its true element count is not established (only `func_8004CC74`
+here and its true element count is not established (only `Class866E8__SetFootprintFromQuery`
 calls this, with `key` values that would need that function fully
 derived to bound), so this stays explicit pointer arithmetic rather than
 a sized array field in `struct Obj866E8` — same policy already used for
@@ -17,7 +19,7 @@ The 4-arg register layout is notable: the second parameter (`$a1`) is
 loaded fresh from `D_80086990`'s own third word (`lw $a1, 0x8($a2)`)
 partway through the function and is NEVER READ as an incoming argument —
 it is a dead/unused parameter from this function's own perspective
-(its callers, in `func_8004CC74`, do pass a real value there, but this
+(its callers, in `Class866E8__SetFootprintFromQuery`, do pass a real value there, but this
 function itself discards it).
 
 ## New struct knowledge (`include/class_3bb8c.h`)
@@ -33,7 +35,7 @@ function itself discards it).
 ## Final C
 
 ```c
-s32 func_8004CDA4(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
+s32 Class866E8__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
     Unk54Struct *slot;
 
     slot = (Unk54Struct *) ((u8 *) self + 0x8C + key * sizeof(Unk54Struct));
@@ -58,3 +60,12 @@ register trace was right.
 None new — confirms two existing idioms (constant-multiply-to-shift/add,
 whole-struct assignment for a block copy) compose cleanly when used
 together in the same statement.
+
+## Naming
+
+**Tier B.** Not a vtable slot. Writes the constant `Unk54Struct` template
+`D_80086990` into a `self->gridSlots[]`-shaped entry, then overwrites its
+`elemIdx` word via `slot124`. Called by both
+`Class866E8__BuildFootprintSlots`'s sibling paths and
+`Class866E8__SetFootprintFromQuery`, always to seed a fresh slot -- hence
+"init", not "set" (it does not preserve any prior content of the slot).

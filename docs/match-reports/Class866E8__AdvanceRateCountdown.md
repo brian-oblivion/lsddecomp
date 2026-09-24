@@ -1,6 +1,8 @@
-# func_8004D028 — MATCHED (24/24 words)
+# Class866E8__AdvanceRateCountdown — MATCHED (24/24 words)
 
-Sibling of `func_8004D088` (own report) — same shape, one instruction
+> Renamed from `func_8004D028` on 2026-09-24 (tools/rename.py). Address 0x8004d028.
+
+Sibling of `Class866E8__FlushRateLatch` (own report) — same shape, one instruction
 longer because the gate here is a genuine countdown rather than a
 one-shot latch.
 
@@ -14,9 +16,9 @@ sw    $ra, 0x14($sp)
 lw    $v0, 0x1E0($s0)        ; v0 = self->unk1E0
 blez  $v0, .skip
  nop
-lui   $a1, %hi(func_8004D0D0)
-addiu $a1, $a1, %lo(func_8004D0D0)
-jal   func_8004D140
+lui   $a1, %hi(Class866E8__ApplyRateToChild)
+addiu $a1, $a1, %lo(Class866E8__ApplyRateToChild)
+jal   Class866E8__ForEachElem
  move $a2, $zero
 lw    $v0, 0x1E0($s0)         ; reload
 addiu $v0, $v0, -1
@@ -37,9 +39,9 @@ new value unconditionally, and the branch-not-taken path (decrement hit
 ## Final C
 
 ```c
-void func_8004D028(Obj866E8 *self) {
+void Class866E8__AdvanceRateCountdown(Obj866E8 *self) {
     if (self->unk1E0 > 0) {
-        func_8004D140(self, func_8004D0D0, 0);
+        Class866E8__ForEachElem(self, Class866E8__ApplyRateToChild, 0);
         self->unk1E0 -= 1;
         if (self->unk1E0 == 0) {
             self->unk1E0 = -1;
@@ -48,13 +50,13 @@ void func_8004D028(Obj866E8 *self) {
 }
 ```
 
-`func_8004D0D0` is defined later in this file (ROM order), so it needs a
+`Class866E8__ApplyRateToChild` is defined later in this file (ROM order), so it needs a
 forward declaration here — same pattern already used for
-`func_8004D108` in `func_8004D088`.
+`Class866E8__ResetChildRate` in `Class866E8__FlushRateLatch`.
 
 ## New struct knowledge
 
-None new (reuses `Obj866E8::unk1E0`, established by `func_8004D088`).
+None new (reuses `Obj866E8::unk1E0`, established by `Class866E8__FlushRateLatch`).
 
 ## Attempts
 
@@ -65,3 +67,13 @@ recognizable immediately).
 ### Proposed learning
 
 None new — confirms the existing idiom, does not extend it.
+
+## Naming
+
+**Tier B.** Not a vtable slot. While `self->rateCountdown > 0`: applies
+the configured rate entry to every child via
+`ForEachElem(self, ApplyRateToChild, 0)`, then decrements the countdown,
+clamping to -1 once it reaches 0 (a "done" sentinel, distinct from the
+0 the sibling `Class866E8__FlushRateLatch` uses for "off"). Named for the
+mechanics: it is the per-tick advance of the rate/countdown pair
+established by `Class866E8__ConfigureRateEntry`.

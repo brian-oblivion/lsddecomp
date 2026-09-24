@@ -85,7 +85,7 @@ Field names established here:
 | --- | --- | --- | --- |
 | `Class866E8+0x068` | `config` | B | Cleared here, set by `Class866E8__SetConfig`, read by `Class866E8__ApplyToSenderFootprint` as `config->unk4`; `class_3bb8c` reads the same pointee as `{s16 divisor, s16 count, s32 unk4}` from four functions -- a small parameter block, not an object. |
 | `Class866E8+0x0E8` | `acceptedTags` | A | See `Class866E8__ForwardAcceptedCommand.md`: its only reader walks it as a NUL-terminated list of vtable header words and uses it to accept or reject a sender. |
-| `Class866E8+0x088` | `rectCount` | A | Its only writers set it to 1 (`Class866E8__SetFootprintRect`) or save/restore it around a walk (`Class866E8__ApplyToSenderFootprint`), and its only readers bound a loop over `rects[]` (here, and `class_3bb8c_b`'s matched `func_8004CE24`). |
+| `Class866E8+0x088` | `rectCount` | A | Its only writers set it to 1 (`Class866E8__SetFootprintRect`) or save/restore it around a walk (`Class866E8__ApplyToSenderFootprint`), and its only readers bound a loop over `rects[]` (here, and `class_3bb8c_b`'s matched `Class866E8__SetFootprintCellFlag`). |
 
 `unk1CC`/`unk1D0`/`unk1D4`/`unk1D8` deliberately keep placeholder names: all
 that is known is that they are four consecutive words set to `-1` here and

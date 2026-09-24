@@ -54,7 +54,7 @@ struct UnkSlotEntry_3ac78 {
      * derived view calls the same block `EntryChildObj **`, and its evidence
      * is stronger -- the ctor here ORs 0x80000000 into each freshly-built
      * cell's +0x010, which is EntryChildObj::unk10 exactly (func_8004C0AC
-     * does the same OR, func_8004CE24 clears the same bit), and the
+     * does the same OR, Class866E8__SetFootprintCellFlag clears the same bit), and the
      * `flags36`/`nextInCell` fields NotifyGridCell walks line up with
      * EntryChildObj::unk36/unk38. Unifying the two views is a track-4 job,
      * not a naming one, so the declared type is left alone; read it as
@@ -71,7 +71,7 @@ struct UnkSlotEntry_3ac78 {
  * independent pieces of evidence now agree:
  *  - Class866E8__SetFootprintRect (matched round 71) writes `self->rects.e[0].elemIdx = self->methods->
  *    slot124(...)` into element [0]'s first field; `slot124`'s real
- *    occupant (func_8004C5D0) was independently retyped, round 8, to
+ *    occupant (Class866E8__FindElemIndexByUnk30) was independently retyped, round 8, to
  *    return an s32 LOOP INDEX, never a pointer (see Class866E8Methods::
  *    slot124's own comment) -- so this field is an index, not a pointer.
  *  - Class866E8__DispatchToRectCells reads that same first field back and uses it as
@@ -154,7 +154,7 @@ struct Vec3_3ac78 {
 
 /*
  * Class866E8 -- constructed by New_Class866E8 (New_Class866E8: allocates
- * 0x1E8 bytes, gets the vtable via func_8004D244, calls ctor slot +0x008).
+ * 0x1E8 bytes, gets the vtable via GetClass866E8Methods, calls ctor slot +0x008).
  * Vtable is D_800866E8 (80 slots, header 0x114), resolved with
  * tools/classtable.py D_800866E8. Ctor is Class866E8__Class866E8 (177 words,
  * MATCHED) and the finalize slot (+0x00C) is Class866E8__Finalize (113 words, MATCHED round 19 --
@@ -171,7 +171,7 @@ struct Vec3_3ac78 {
  * 0xA000; Class866E8__SetGridSpan stores it at +0x74 and derives
  * gridCells = span >> 11 = 20 and gridHalfCells = span >> 12 = 10. The
  * ctor spaces cells 0x800 apart (0xA000 / 0x800 == 20), and 20 is also the
- * row stride class_3bb8c_b's BYTE-MATCHED func_8004CE24 uses over the same
+ * row stride class_3bb8c_b's BYTE-MATCHED Class866E8__SetFootprintCellFlag uses over the same
  * cell block. Three independent facts, one number.
  *
  * One thing that does NOT reconcile, recorded rather than resolved: the
@@ -180,7 +180,7 @@ struct Vec3_3ac78 {
  * pointers, which is neither 20 * 20 nor a whole number of 21-cell rows.
  * The ctor is byte-exact, so the constants are certainly right; what the
  * extra column and the 10 spare pointers are for is unknown. Do not "fix"
- * the stride to 21 on the strength of the ctor alone -- func_8004CE24's
+ * the stride to 21 on the strength of the ctor alone -- Class866E8__SetFootprintCellFlag's
  * 20 is the byte-verified one.
  */
 struct Class866E8Methods {
@@ -215,10 +215,10 @@ struct Class866E8Methods {
     /* +0x10C */ u8 pad10C[0x110 - 0x10C];
     /* +0x110 */ s32 (*slot110)(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2); /* func_8004C1C0; called by Class866E8__ApplyToSenderFootprint */
     /* +0x114 */ u8 pad114[0x124 - 0x114];
-    /* +0x124 */ s32 (*slot124)(Class866E8 *self, s32 key);                     /* func_8004C5D0; called by Class866E8__SetFootprintRect.
+    /* +0x124 */ s32 (*slot124)(Class866E8 *self, s32 key);                     /* Class866E8__FindElemIndexByUnk30; called by Class866E8__SetFootprintRect.
                   * RETYPED round 8 from `void *(*)(Class866E8 *, void *)` on the strength of the
                   * occupant's own BYTE-EXACT body, matched that round in class_3bb8c_b as
-                  * `s32 func_8004C5D0(Obj866E8 *self, s32 key)`: it returns a loop INDEX
+                  * `s32 Class866E8__FindElemIndexByUnk30(Obj866E8 *self, s32 key)`: it returns a loop INDEX
                   * (`move v0,a2`) or -1, never a pointer, and `key` is compared against a
                   * s16 field so it is a scalar. Safe to change because slot124 has no C call
                   * site yet, and the whole-image SHA1 was re-verified after the change.
@@ -227,8 +227,8 @@ struct Class866E8Methods {
     /* +0x128 */ u8 pad128[0x12C - 0x128];
     /* +0x12C */ void (*applyToSenderFootprint)(Class866E8 *self, void *sender, s32 command);       /* Class866E8__ApplyToSenderFootprint; called by Class866E8__ForwardAcceptedCommand */
     /* +0x130 */ u8 pad130[0x13C - 0x130];
-    /* +0x13C */ void (*slot13C)(Class866E8 *self);                             /* func_8004D028; called by Class866E8__UpdateIfEnabled */
-    /* +0x140 */ void (*slot140)(Class866E8 *self);                             /* func_8004D088; called by Class866E8__ResetAllElements */
+    /* +0x13C */ void (*slot13C)(Class866E8 *self);                             /* Class866E8__AdvanceRateCountdown; called by Class866E8__UpdateIfEnabled */
+    /* +0x140 */ void (*slot140)(Class866E8 *self);                             /* Class866E8__FlushRateLatch; called by Class866E8__ResetAllElements */
 };
 
 /* Object size is 0x1E8, from New_Class866E8's allocator call. Field offsets
@@ -278,7 +278,7 @@ struct Class866E8 {
 
 /* Get-vtable helper for Class866E8. Still raw asm: it lives in class_3bb8c,
  * an uncarved monolithic segment, not yet a carved src/ unit anywhere. */
-extern Class866E8Methods *func_8004D244(void);
+extern Class866E8Methods *GetClass866E8Methods(void);
 
 /* The generic allocator, established already in DreamSys.h/Entity.h/etc. */
 extern void *BMemPMgrAlloc(s32 size);

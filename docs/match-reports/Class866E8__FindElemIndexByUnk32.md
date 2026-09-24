@@ -1,4 +1,6 @@
-# func_8004C588 — MATCHED (18/18 words)
+# Class866E8__FindElemIndexByUnk32 — MATCHED (18/18 words)
+
+> Renamed from `func_8004C588` on 2026-09-24 (tools/rename.py). Address 0x8004c588.
 
 Not a vtable slot by call-site inspection needed — it IS one, per
 `tools/classtable.py D_800866E8` (`+0x120`), though nothing in this unit
@@ -34,7 +36,7 @@ Second attempt (with `e`) matched immediately.
 ## Final C
 
 ```c
-s32 func_8004C588(Obj866E8 *self, s32 key) {
+s32 Class866E8__FindElemIndexByUnk32(Obj866E8 *self, s32 key) {
     s32 result;
     s32 i;
     Elem *e;
@@ -75,5 +77,25 @@ guidance in `docs/DECOMPILATION_LEARNINGS.md`: that entry showed
 opposite-looking fix (adding an explicit per-iteration element pointer)
 serves the same underlying purpose — controlling which value GCC treats
 as the loop's own induction variable. Confirmed again on the very next
-function, `func_8004C5D0` (own report), so this is now a two-instance
+function, `Class866E8__FindElemIndexByUnk30` (own report), so this is now a two-instance
 pattern for this project, not a one-off.
+
+## Naming
+
+**Tier A.** Vtable slot +0x120 of `D_800866E8` (`tools/classtable.py`),
+class prefix `Class866E8` confirmed against that same table's other
+already-named slots (e.g. `Class866E8__ApplyToSenderFootprint` at +0x12C).
+Pure linear-search leaf: the body IS the evidence -- walk `self->arr`,
+compare `e->unk4->unk32` to `key`, return the matching index (default 0).
+Named by the field it searches on (`unk32`, still unrenamed -- it is a
+cross-unit `ElemTarget` field, also read by `func_8004C434` in
+class_3bb8c.c, so this unit does not own it) rather than by a guessed
+purpose, per this project's "name what the code does" rule.
+
+## Proposed field names
+
+`ElemTarget::unk32` (also read by class_3bb8c.c's `func_8004C434`, so
+cross-unit -- not renamed here). Proposed: `key` -- it is exactly what
+both `FindElemIndexByUnk32` and its caller-side context treat it as, a
+value compared for equality to select an element. Evidence: this
+function's entire body is `e->unk4->unk32 == key`.

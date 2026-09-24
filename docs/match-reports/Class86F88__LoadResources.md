@@ -136,7 +136,7 @@ covers the base case but not this one.
 ## Round 18 (echo) — two more declaration-order variants, both fully inert
 
 Confirmed this is the SAME class CLAUDE.md/`docs/DECOMPILATION_LEARNINGS.md`
-document via `func_8004C93C` (7 variants, zero movement) and
+document via `Class866E8__BuildFootprintSlots` (7 variants, zero movement) and
 `TaskObjF__WriteMemcardSaveFile` (this same round, also stalled): "full register-identity
 PERMUTATION with zero address drift." Two more attempts, both real-oracle
 verified (`build-and-verify.sh`), both **byte-for-byte identical** to the
@@ -166,7 +166,7 @@ Restored to `INCLUDE_ASM`, unchanged from the prior state. No further
 hand-reshaping attempts budgeted for this function without a genuinely new
 lever (not a reordering) to test -- the "collapse into one call
 expression" lever CLAUDE.md notes moved a SIBLING function
-(`func_8004C6A8`) by one word, not by a register, so even known lever
+(`Class866E8__ComputeFootprintFromRotation`) by one word, not by a register, so even known lever
 outside "ordering" have a track record of not helping this class.
 
 ---
@@ -206,7 +206,7 @@ reshaping).
 ### Proposed learning (reinforces existing entry, does not add a new class)
 
 **Three independent functions across two different header families
-(`class_3bb8c_b`'s `func_8004C93C`, `class_3bb8c_f`'s `TaskObjF__WriteMemcardSaveFile`,
+(`class_3bb8c_b`'s `Class866E8__BuildFootprintSlots`, `class_3bb8c_f`'s `TaskObjF__WriteMemcardSaveFile`,
 `class_3bb8c_j`'s `Class86F88__LoadResources`) now confirm the same negative result
 for the SAME lever (declaration/introduction order of the contested
 locals).** This is strong enough evidence to stop treating "try a

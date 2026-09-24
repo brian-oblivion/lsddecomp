@@ -437,7 +437,7 @@ This is the SAME class `TaskObjF__TryWriteMemcardSaveFile`'s own caller, `TaskOb
 already hit and documented (per that function's own report, referenced
 in this function's prior round's write-up) as "a full 9-value bijection
 permuted relative to retail's own... reshaping does not resolve it" --
-and per `func_8004C93C`'s precedent (7 reshaping variants, zero
+and per `Class866E8__BuildFootprintSlots`'s precedent (7 reshaping variants, zero
 movement), this project's own experience is that this class does not
 respond to further manual source reshaping. Not pursued further this
 round; `TaskObjF__WriteMemcardSaveFile`'s residue is register PERMUTATION with zero

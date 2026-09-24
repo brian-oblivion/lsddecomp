@@ -1,4 +1,6 @@
-# func_8004D244 — MATCHED (4/4 words)
+# GetClass866E8Methods — MATCHED (4/4 words)
+
+> Renamed from `func_8004D244` on 2026-09-24 (tools/rename.py). Address 0x8004d244.
 
 Get-vtable helper for the class whose method table is `D_800866E8`
 (`Obj866E8` in this unit's header, `Class866E8` in `class_3ac78.h`'s
@@ -21,12 +23,12 @@ zero-argument call from its only external caller, `class_3ac78.c`'s
 `Class866E8__Class866E8` (the `New_Class866E8` constructor): the `jal` there has a
 `nop` in its own delay slot (no argument setup) and the very next
 instruction stores `$v0` straight into `self->methods` (offset 0), i.e.
-`self->methods = func_8004D244();`.
+`self->methods = GetClass866E8Methods();`.
 
 ## Final C
 
 ```c
-Obj866E8Methods *func_8004D244(void) {
+Obj866E8Methods *GetClass866E8Methods(void) {
     return &D_800866E8;
 }
 ```
@@ -48,3 +50,13 @@ None new — confirms the already-established "extern Methods D_xxx; return
 &D_xxx;" getter idiom used throughout the project (`class_16334.c`,
 `Entity_b.c`, `class_39e08.c`, `class_3ac78.c`, `code_2c054.c`,
 `code_55dd4.c`).
+
+## Naming
+
+**Tier A.** `lui`/`addiu` of `&D_800866E8`, no dereference -- the class's
+get-vtable helper. Matches this project's established
+`GetClass<addr>Methods` convention for these helpers exactly (e.g.
+`GetClass86668Methods`, `GetClass86F88Methods`, `GetClass869D8Methods`),
+which class_3ac78.h's own extern for this SAME real function already
+anticipated under this exact name pattern (previously documented there as
+an unnamed extern for "the get-vtable helper... lives in class_3bb8c").

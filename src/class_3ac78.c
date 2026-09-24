@@ -11,7 +11,7 @@
  * cell with a world position on a 0x800 lattice. Indexing the grid uses a row
  * stride of 20 cells -- the same 20 that gDefaultGridSpan >> 11 produces
  * (0xA000 / 0x800, see Class866E8__SetGridSpan) and the same stride
- * class_3bb8c_b's byte-matched func_8004CE24 walks.
+ * class_3bb8c_b's byte-matched Class866E8__SetFootprintCellFlag walks.
  *
  * Work reaches the cells through a rectangle list (rects[4]/rectCount): a
  * notification arrives at Class866E8__OnNotify or Class866E8__OnCommand,
@@ -52,7 +52,7 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
 
     self = BMemPMgrAlloc(0x1E8);
     if (self != NULL) {
-        func_8004D244()->ctor(self, arg1, arg2);
+        GetClass866E8Methods()->ctor(self, arg1, arg2);
         return self;
     }
     return NULL;
@@ -88,7 +88,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     s32 buf[3];
 
     func_800428E4()->ctor(self);
-    self->methods = func_8004D244();
+    self->methods = GetClass866E8Methods();
 
     if (arg1 != NULL) {
         self->origin = *arg1;
@@ -409,7 +409,7 @@ void Class866E8__ApplyToSenderFootprint(Class866E8 *self, UnkListObj_3ac78 *send
     self->rects = saved;
 }
 
-extern void func_8004C93C(Class866E8 *self);
+extern void Class866E8__BuildFootprintSlots(Class866E8 *self);
 
 void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 span)
 {
@@ -420,7 +420,7 @@ void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *desc, s
     self->footprintW = span;
     self->footprintH = span;
     self->footprintRow = t;
-    func_8004C93C(self);
+    Class866E8__BuildFootprintSlots(self);
 }
 
 /* Clamp a span x span footprint centred on desc's cell to the 20 x 20 grid:

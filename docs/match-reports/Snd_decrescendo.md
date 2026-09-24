@@ -241,8 +241,8 @@ Gate 3, all three checks run 2026-09-19, on body A:
    "the signatures agree" (scaffold net `-2` vs the real build's 2-short). It
    happened to reach the same verdict, but it could not have detected a
    scaffold artifact, which is the only thing check 3 exists to detect. Bravo
-   root-caused the same substitution in the reports for `func_8004CAF0` and
-   `func_8004CD38`, where it had blocked searches for 39 rounds. Confirmed
+   root-caused the same substitution in the reports for `Class866E8__SplitFootprintSlot` and
+   `IsPointOutOfBounds`, where it had blocked searches for 39 rounds. Confirmed
    here on a third function: do the bytes.
 
 **Search: ONE bounded run, NEGATIVE.** `-j 6 --stop-on-zero --best-only`,
@@ -487,7 +487,7 @@ edits in one build.
 scheduling one.** Runner bravo found in this same round that a
 `do { } while (0)` around a statement group is a real loop construct to cc1
 2.6.3 while a plain `{ }` is not, and used it to close delay-slot residues on
-`func_8004CAF0`. Confirmed here on a second function AND on a different kind
+`Class866E8__SplitFootprintSlot`. Confirmed here on a second function AND on a different kind
 of residue: it re-ranked GLOBAL REGISTER ALLOCATION, moving `172*slot` into
 `$s1` — retail's own register. **Run the brace-block control**: the same wrap
 written `{ ... }` produced byte-identical output, which is what turns the

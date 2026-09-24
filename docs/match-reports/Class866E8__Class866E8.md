@@ -36,7 +36,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     s32 buf[3];
 
     func_800428E4()->ctor(self);
-    self->methods = func_8004D244();
+    self->methods = GetClass866E8Methods();
 
     if (arg1 != NULL) {
         self->unk54 = *arg1;
@@ -226,13 +226,13 @@ no accessor outside `src/class_3ac78.c`):
 | `UnkSlotEntry+0x004` | `target` | B | `class_3bb8c` types the same pointer `ElemTarget *` from six functions. |
 | `UnkSlotEntry+0x008` | `list` | C-ish/B | Built here by `new_class_6d940(0)`; the name records only that it is the list object the entry owns. |
 | `UnkSlotEntry+0x00C` | `cellParent` | B | Initialized here with `slot4C(cellParent, self, &self->origin)` and then passed as the PARENT argument of every grid cell's own `slot4C(cell, cellParent, buf)`. Its role in this function is exactly "the node the cells hang off". |
-| `UnkSlotEntry+0x010` | `cells` | A | 0x668 raw bytes allocated here and filled with freshly built cell objects, one per 4 bytes; `Class866E8__Finalize` walks the same span tearing them down; `class_3bb8c`'s byte-matched `func_8004CE24` indexes the same block as a 2D grid. |
+| `UnkSlotEntry+0x010` | `cells` | A | 0x668 raw bytes allocated here and filled with freshly built cell objects, one per 4 bytes; `Class866E8__Finalize` walks the same span tearing them down; `class_3bb8c`'s byte-matched `Class866E8__SetFootprintCellFlag` indexes the same block as a 2D grid. |
 
 **The 21-vs-20 discrepancy, recorded not resolved.** This ctor's placement
 loop wraps X after 21 columns (`x = 0x400 + k * 0x800`, reset when
 `x > 0xA400`), and 0x668 bytes is 410 cell pointers -- neither `20 * 20` nor a
 whole number of 21-cell rows. The grid's INDEX stride is 20, byte-verified
-twice over (`class_3bb8c_b`'s matched `func_8004CE24`, and
+twice over (`class_3bb8c_b`'s matched `Class866E8__SetFootprintCellFlag`, and
 `gDefaultGridSpan >> 11`). This function is byte-exact, so both constants are
 certainly right; what the extra column and the 10 spare pointers are for is
 unknown. Do not "correct" the stride to 21 on this function's evidence alone.

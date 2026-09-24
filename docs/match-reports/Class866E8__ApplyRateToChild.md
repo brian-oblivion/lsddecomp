@@ -1,20 +1,22 @@
-# func_8004D0D0 — MATCHED (14/14 words)
+# Class866E8__ApplyRateToChild — MATCHED (14/14 words)
+
+> Renamed from `func_8004D0D0` on 2026-09-24 (tools/rename.py). Address 0x8004d0d0.
 
 ## How the arguments were resolved (worth recording — this one was not
 obvious from the function's own body alone)
 
-`func_8004D0D0`'s only two references anywhere in the executable are as a
+`Class866E8__ApplyRateToChild`'s only two references anywhere in the executable are as a
 function-pointer VALUE (`lui`/`addiu` of its address, never a direct
-`jal`) inside `func_8004D028` (this unit), passed as the second argument
-to `func_8004D140`. Reading `func_8004D140` in isolation makes it look
-like `func_8004D0D0` is invoked there directly as `callback(self, &arr[i])`
-— but `func_8004D140` (own body: `s5 = a1`, forwarded unchanged to
-`func_8004D1D0`'s own second argument) actually treats its OWN second
+`jal`) inside `Class866E8__AdvanceRateCountdown` (this unit), passed as the second argument
+to `Class866E8__ForEachElem`. Reading `Class866E8__ForEachElem` in isolation makes it look
+like `Class866E8__ApplyRateToChild` is invoked there directly as `callback(self, &arr[i])`
+— but `Class866E8__ForEachElem` (own body: `s5 = a1`, forwarded unchanged to
+`Class866E8__ForEachEntryChild`'s own second argument) actually treats its OWN second
 argument as a pass-through value, not a callback it calls itself. The
-real call site is one level further down, inside `func_8004D1D0`, which
+real call site is one level further down, inside `Class866E8__ForEachEntryChild`, which
 walks `item->unk10[]` (an array of `Unk10ChildObj_3bb8c_b*`, up to
 `+0x668` bytes from the base) and calls `callback(self, element)` for
-each entry. So `func_8004D0D0`'s true "item" parameter is one of THOSE
+each entry. So `Class866E8__ApplyRateToChild`'s true "item" parameter is one of THOSE
 array elements, not `&self->arr[i]` directly — reading only the
 one-hop-removed caller would have produced the wrong type for `arg1`.
 
@@ -33,14 +35,14 @@ jalr  $v0
 ...epilogue
 ```
 
-`m2c` (seeded with `void func_8004D0D0(void *arg0, void *arg1)`) already
+`m2c` (seeded with `void Class866E8__ApplyRateToChild(void *arg0, void *arg1)`) already
 called this shape correctly: `(*arg1)->unk48(arg1, 0, arg0->unk1E4);` —
 confirming the vtable-slot read before any header work was done.
 
 ## Final C
 
 ```c
-void func_8004D0D0(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
+void Class866E8__ApplyRateToChild(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
     item->methods->slot48(item, 0, self->unk1E4);
 }
 ```
@@ -50,14 +52,14 @@ void func_8004D0D0(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
 - New type `Unk10ChildObj_3bb8c_b` / `Unk10ChildMethods_3bb8c_b` — the
   object type held in `Elem::unk10[]`. Only `slot48` is typed
   (`void (*slot48)(Unk10ChildObj_3bb8c_b *self, s32 arg1, void *arg2)`),
-  resolved from this function and its sibling `func_8004D108`.
+  resolved from this function and its sibling `Class866E8__ResetChildRate`.
 - `Elem::unk10` (`Unk10ChildObj_3bb8c_b **`, +0x010) — same real field
   `class_3ac78.h`'s independent view already names `unk10`
   (`GenericObject **`) on its own `UnkSlotEntry_3ac78` type; both
   descriptions agree on offset and "array of pointers, walked to +0x668".
 - `Obj866E8::unk1E4` (`void *`, +0x1E4) — forwarded opaquely as `slot48`'s
   third argument; never dereferenced in this unit.
-- `extern void func_8004D140(...)` / `extern void func_8004D1D0(...)` —
+- `extern void Class866E8__ForEachElem(...)` / `extern void Class866E8__ForEachEntryChild(...)` —
   both still `INCLUDE_ASM` in this same unit; forward-declared per the
   established "calling into a still-`INCLUDE_ASM` function is fine"
   convention, typed from their own call sites (see those functions' future
@@ -66,14 +68,23 @@ void func_8004D0D0(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
 ## Attempts
 
 1 (matched on first attempt, once the true call chain — two hops through
-`func_8004D140`/`func_8004D1D0`, not one — was traced).
+`Class866E8__ForEachElem`/`Class866E8__ForEachEntryChild`, not one — was traced).
 
 ### Proposed learning
 
 **A function passed by address is not necessarily called by its immediate
-receiver.** `func_8004D140` receives `func_8004D0D0`'s address only to
-forward it, unclobbered, to a second function (`func_8004D1D0`) that does
+receiver.** `Class866E8__ForEachElem` receives `Class866E8__ApplyRateToChild`'s address only to
+forward it, unclobbered, to a second function (`Class866E8__ForEachEntryChild`) that does
 the actual `jalr`. Reading the receiver's own body (which never does
 `jalr` on that register) is itself the signal to keep tracing one hop
 further before typing the passed function's parameters from the wrong
 call site.
+
+## Naming
+
+**Tier B.** Not a vtable slot -- a callback, passed as a function pointer
+to `Class866E8__ForEachElem`/`Class866E8__ForEachEntryChild` by
+`Class866E8__AdvanceRateCountdown`. Body: `item->methods->slot48(item, 0,
+self->rateEntry)`. Named for what it does to each child entry (forwards
+the parent's current rate entry to it), mirrored by
+`Class866E8__ResetChildRate`'s sibling shape.

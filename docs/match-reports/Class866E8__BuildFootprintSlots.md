@@ -1,8 +1,10 @@
-# func_8004C93C -- MATCHED 109/109, round 75 (echo)
+# Class866E8__BuildFootprintSlots -- MATCHED 109/109, round 75 (echo)
+
+> Renamed from `func_8004C93C` on 2026-09-24 (tools/rename.py). Address 0x8004c93c.
 
 REVISITED, round 75: MATCHED 109/109, whole image `OK: build matches retail`,
 `tools/check-nonmatching.sh` green; names/types not relevant (no struct or
-header change; one unit-local prototype for `func_8004CAF0`).
+header change; one unit-local prototype for `Class866E8__SplitFootprintSlot`).
 
 **Lever: source shape, three parts -- one reused slot pointer, a separate
 `over` local, and the `h6 += 0x14` placement retail actually executes.** Filed
@@ -18,7 +20,7 @@ length, zero drift -- identical to the recorded figure.
 
 Retail stores slot 0's fields through `self` (`sw v0,0x8C($s2)`,
 `sh v1,0x90($s2)`, ...), keeps `&self->slots8C[0]` in `$s3` only to pass it
-to `func_8004CAF0`, and then REUSES `$s3` for `&self->slots8C[count]`. The two
+to `Class866E8__SplitFootprintSlot`, and then REUSES `$s3` for `&self->slots8C[count]`. The two
 `addiu $s3,$s2,0x8C` copies are not two source statements: there is one at
 the join after the `h6 < 0` test; reorg filled the `bgez $s5` delay slot from
 that target (redirecting to the next label) and then deleted the copy on the
@@ -48,7 +50,7 @@ Six builds total. No permuter.
 ## Matched body
 
 ```c
-void func_8004C93C(Obj866E8 *self) {
+void Class866E8__BuildFootprintSlots(Obj866E8 *self) {
     s32 flag;
     s32 h4;
     s32 width;
@@ -92,7 +94,7 @@ void func_8004C93C(Obj866E8 *self) {
     if (span >= 0x15) {
         over = span - 0x14;
         slot->h8 = width - over;
-        count = func_8004CAF0(self, slot, 0, quadrant, h4, h6, width, height);
+        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, h4, h6, width, height);
         count += 1;
         slot = &self->slots8C[count];
         slot->elemIdx = self->methods->slot120(self, quadrant + 1);
@@ -102,14 +104,14 @@ void func_8004C93C(Obj866E8 *self) {
         slot->hA = self->slots8C[0].hA;
     } else {
         slot->h8 = width;
-        count = func_8004CAF0(self, slot, 0, quadrant, h4, h6, width, height);
+        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, h4, h6, width, height);
     }
     count += 1;
     self->unk88 = count;
 }
 ```
 
-It calls `func_8004CAF0` (defined next in ROM order) through a unit-local
+It calls `Class866E8__SplitFootprintSlot` (defined next in ROM order) through a unit-local
 prototype identical to that function's definition.
 
 ### Proposed learning
@@ -171,9 +173,9 @@ prototype identical to that function's definition.
 > `TaskObjF__WriteMemcardSaveFile`.
 >
 > **Permuter scaffold rebuilt from scratch** (`tools/setup-permuter.sh
-> func_8004C93C <seed>`, seed = this report's own 45/109 body verbatim,
+> Class866E8__BuildFootprintSlots <seed>`, seed = this report's own 45/109 body verbatim,
 > plus a forward declaration for the not-yet-matched sibling
-> `func_8004CAF0`). `--debug --stack-diffs`: **base score 2153 -- 8
+> `Class866E8__SplitFootprintSlot`). `--debug --stack-diffs`: **base score 2153 -- 8
 > insertions, 8 deletions, 4 reorderings, 61 register differences.** The
 > real in-context build's own residue (confirmed immediately above, same
 > build) is a **pure zero-drift, zero-insertion, zero-deletion register
@@ -186,7 +188,7 @@ prototype identical to that function's definition.
 > scaffold: 11 insertions/11 deletions) on a freshly-built scaffold four
 > rounds later, with a different absolute count but the same qualitative
 > mismatch. **Per Gate 3, a disagreement means STOP -- no search launched.**
-> This function now belongs in the same class as `func_8004CAF0`,
+> This function now belongs in the same class as `Class866E8__SplitFootprintSlot`,
 > `func_8004C1C0` and `func_8004BB3C`: real residue is a clean register
 > rotation, but no runner-buildable isolated scaffold reproduces it, so the
 > permuter route needs more surrounding-file context than
@@ -207,7 +209,7 @@ prototype identical to that function's definition.
 > three additions (`quadrant`, `flag`, `span`) complete the set of locals
 > with a provable value range in this function. All five are now
 > individually tested and negative; nothing narrower remains to try here.
-> **A fourth function (`func_8004C93C`, joining `func_8004CAF0`,
+> **A fourth function (`Class866E8__BuildFootprintSlots`, joining `Class866E8__SplitFootprintSlot`,
 > `func_8004C1C0`, `func_8004BB3C`) now confirms the same scaffold-mismatch
 > class in this one unit** -- worth flagging as a property of this specific
 > header/class's functions (heavy `Obj866E8` self-pointer traffic, deep
@@ -225,7 +227,7 @@ prototype identical to that function's definition.
 > **delay slot**, so the increment executes on BOTH paths whenever `h6 < 0`.
 >
 > **The delay-slot reading is confirmed** — `asm/nonmatchings/class_3bb8c_b/
-> func_8004C93C.s` lines 32-33, verified by the head. The source inference
+> Class866E8__BuildFootprintSlots.s` lines 32-33, verified by the head. The source inference
 > does not follow, and both spellings of it measure WORSE than the 45/109
 > baseline:
 >
@@ -257,7 +259,7 @@ prototype identical to that function's definition.
 > **ROUND 33, head — ONE MORE LEVER TRIED HERE AND INERT.** A runner left an
 > uncommitted experiment in the worktree at teardown: the preserved body with
 > `(u16)` narrow casts added on the two `self->slots8C[0]` halfword reads
-> (`h6`, `hA`), plus a forward declaration of `func_8004CAF0`. That is
+> (`h6`, `hA`), plus a forward declaration of `Class866E8__SplitFootprintSlot`. That is
 > round 33's `narrow-cast-defeats-strength-reduction` idiom, which was worth
 > 10 words on `vmNoiseOn2` in a different unit the same round.
 >
@@ -345,7 +347,7 @@ prototype identical to that function's definition.
 > real in-context build does not have** (real build: 0 drift, exactly
 > 109 words). This is the THIRD confirmed instance in this exact
 > unit/header of the scaffold-vs-real-build mismatch already documented
-> in `func_8004CD38`'s and `func_8004CAF0`'s reports -- no search was run
+> in `IsPointOutOfBounds`'s and `Class866E8__SplitFootprintSlot`'s reports -- no search was run
 > against it. **This mismatch is now common enough in this one header
 > (`class_3bb8c.h`, three functions) that it looks systemic to something
 > about this class's real in-context register pressure, not
@@ -377,15 +379,15 @@ prototype identical to that function's definition.
 
 ## What it does
 
-`void func_8004C93C(Obj866E8 *self)`. Computes a "quadrant" index and a
+`void Class866E8__BuildFootprintSlots(Obj866E8 *self)`. Computes a "quadrant" index and a
 clamped `(h4, h6)` sub-cell offset from `self->unk7C`/`self->unk7E`
 (each signed, clamped into `[0, 0x14)` with a `-0xA`/`+0xA` secondary split
 when both axes are negative), fills `self->slots8C[0]` via
 `self->methods->slot120(self, quadrant)`, then decides whether the
 horizontal footprint (`h4 + self->unk80`) fits in one 20-unit grid cell or
 needs a second `GridSlot866E8` — filling that second slot directly when it
-does — before calling the documented-STALL `func_8004CAF0` (signature per
-its own report, `docs/match-reports/func_8004CAF0.md`) to (possibly) append
+does — before calling the documented-STALL `Class866E8__SplitFootprintSlot` (signature per
+its own report, `docs/match-reports/Class866E8__SplitFootprintSlot.md`) to (possibly) append
 further slots on the OTHER axis, and finally writing the total slot count to
 `self->unk88`.
 
@@ -457,16 +459,16 @@ order, boolean-vs-requery, read order, pointer-assignment timing).
 
 ## Preserved near-miss body (`#if 0`) -- round 19, 45/109, zero address drift
 
-Requires `func_8004CAF0`'s forward extern (already declared with this
+Requires `Class866E8__SplitFootprintSlot`'s forward extern (already declared with this
 exact signature elsewhere in this unit, see
-`docs/match-reports/func_8004CAF0.md`) if spliced back in — add
-`extern s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8);`
-before it (this function is defined AFTER `func_8004C93C` in ROM order in
+`docs/match-reports/Class866E8__SplitFootprintSlot.md`) if spliced back in — add
+`extern s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8);`
+before it (this function is defined AFTER `Class866E8__BuildFootprintSlots` in ROM order in
 `src/class_3bb8c_b.c`).
 
 ```c
 #if 0
-void func_8004C93C(Obj866E8 *self) {
+void Class866E8__BuildFootprintSlots(Obj866E8 *self) {
     s32 flag;
     s32 h4;
     s32 width;
@@ -515,7 +517,7 @@ void func_8004C93C(Obj866E8 *self) {
     if (span >= 0x15) {
         span -= 0x14;
         slot0->h8 = width - span;
-        count = func_8004CAF0(self, slot0, 0, quadrant, h4, h6, width, height);
+        count = Class866E8__SplitFootprintSlot(self, slot0, 0, quadrant, h4, h6, width, height);
         count += 1;
         slot1 = &self->slots8C[count];
         slot1->elemIdx = self->methods->slot120(self, quadrant + 1);
@@ -525,7 +527,7 @@ void func_8004C93C(Obj866E8 *self) {
         slot1->hA = self->slots8C[0].hA;
     } else {
         slot0->h8 = width;
-        count = func_8004CAF0(self, slot0, 0, quadrant, h4, h6, width, height);
+        count = Class866E8__SplitFootprintSlot(self, slot0, 0, quadrant, h4, h6, width, height);
     }
     count += 1;
     self->unk88 = count;
@@ -547,8 +549,8 @@ retype of anything already named:
 - `s16 Obj866E8::unk7C` (+0x7C) — signed sub-cell horizontal offset.
 - `s16 Obj866E8::unk7E` (+0x7E) — same convention, vertical.
 - `s32 Obj866E8::unk80` (+0x80) — horizontal span, forwarded to
-  `func_8004CAF0`'s `p7`.
-- `s32 Obj866E8::unk84` (+0x84) — forwarded to `func_8004CAF0`'s `p8`.
+  `Class866E8__SplitFootprintSlot`'s `p7`.
+- `s32 Obj866E8::unk84` (+0x84) — forwarded to `Class866E8__SplitFootprintSlot`'s `p8`.
 
 These four exactly fill `0x7C..0x88` (`0xC` bytes: `2+2+4+4`), matching the
 existing gap's size, so no other offset in the struct moves.
@@ -563,18 +565,18 @@ existing gap's size, so no other offset in the struct moves.
   even when it doesn't explain WHY — it lets 5+ variants be checked in
   under a second each rather than paying a full project rebuild, which is
   what made 7 real attempts affordable inside one budget.** Consider this
-  exactly the "biggest lever untried" caution from `func_8004CAF0`'s own
+  exactly the "biggest lever untried" caution from `Class866E8__SplitFootprintSlot`'s own
   report (also in this header/unit): that stall's fix (per its head note)
   is "give each distinct value its own named local" to let the frame grow
   — already the case here (10 named locals, matching retail's implied live
   set) — so the SAME lever does not obviously generalize to a permutation
   residue with no length/frame difference. This looks like a genuinely
-  distinct residue class from `func_8004CAF0`'s missing-variable one, and
+  distinct residue class from `Class866E8__SplitFootprintSlot`'s missing-variable one, and
   from every register-identity case documented so far in this project's
   `%N`/receiver-timing lore (all of which involved 1-2 registers, not a
   whole-function permutation) — worth flagging for whoever revisits this
-  unit's remaining stalls, since `func_8004C6A8` (this round's other
-  target) and `func_8004CD38`/`func_8004CFB8` (already-documented stalls)
+  unit's remaining stalls, since `Class866E8__ComputeFootprintFromRotation` (this round's other
+  target) and `IsPointOutOfBounds`/`Class866E8__ConfigureRateEntry` (already-documented stalls)
   are all in the same header/class and may share whatever is driving it.
 
 ---
@@ -612,7 +614,7 @@ OTHER single value in the function (e.g. `flag`, `quadrant`, or `span`
 individually) the way `TaskObjF__WriteMemcardSaveFile` narrowed exactly one parameter and
 nothing else.
 
-**Permuter scaffold prepared (`permuter-work/func_8004C93C`, plain seed,
+**Permuter scaffold prepared (`permuter-work/Class866E8__BuildFootprintSlots`, plain seed,
 no PERM macros -- default randomization already covers type mutations,
 which is what actually found `TaskObjF__WriteMemcardSaveFile`'s fix) but the bounded search
 was NEVER LAUNCHED this round** -- wind-down landed first. `--debug` base
@@ -632,7 +634,7 @@ number.**
 for the next round on this unit: launch
 `PATH=$PWD/permuter-work/bin:$PATH timeout 600 .venv/bin/python3
 tools/decomp-permuter/permuter.py -j 6 --stop-on-zero --best-only
-permuter-work/func_8004C93C` (scaffold already provisioned, no setup
+permuter-work/Class866E8__BuildFootprintSlots` (scaffold already provisioned, no setup
 needed) and, independently, try narrowing `flag` and `quadrant` (both
 provably 2-3 valued) one at a time rather than `h4`/`h6` wholesale.
 
@@ -663,3 +665,11 @@ both oracles green: `./build-and-verify.sh` (exit 0, `OK: build matches
 retail`) and `tools/check-nonmatching.sh` (exit 0). Disposition otherwise
 unchanged (still `INCLUDE_ASM` in the verified build, still a HARD RULE 6
 register-identity stall).
+
+## Naming
+
+**Tier B.** Turns the column/row/width/height computed by
+`Class866E8__ComputeFootprintFromRotation` into one or two
+`self->gridSlots[]` entries, splitting via `Class866E8__SplitFootprintSlot`
+when the footprint would run past the grid's 20-unit edge. Mechanics
+evidenced; game-level purpose not.

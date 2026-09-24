@@ -1,4 +1,6 @@
-# func_8004C5D0 — MATCHED (20/20 words)
+# Class866E8__FindElemIndexByUnk30 — MATCHED (20/20 words)
+
+> Renamed from `func_8004C5D0` on 2026-09-24 (tools/rename.py). Address 0x8004c5d0.
 
 A vtable slot in `D_800866E8` (`+0x124`, per `tools/classtable.py`), and
 already independently visible from `class_3ac78.h`'s own view of the same
@@ -41,7 +43,7 @@ falling through to `return -1;` if the loop exhausts.
 
 ## Residue and how it closed (1 residue, 2 attempts)
 
-Same class as `func_8004C588`'s (own report, matched immediately before
+Same class as `Class866E8__FindElemIndexByUnk32`'s (own report, matched immediately before
 this one in the queue): the plain indexed form
 (`self->arr[i].unk4->unk30`/`unk2C`) let GCC repurpose `self` as its own
 moving pointer, dropping the separate running-offset register retail
@@ -51,7 +53,7 @@ reads, closed it on the second attempt.
 ## Final C
 
 ```c
-s32 func_8004C5D0(Obj866E8 *self, s32 key) {
+s32 Class866E8__FindElemIndexByUnk30(Obj866E8 *self, s32 key) {
     s32 i;
     Elem *e;
 
@@ -89,3 +91,25 @@ caller side, never checked against the occupant's own disassembly. Since
 `class_3ac78.h` belongs to a different unit under this round's parallel
 rules, this is left for the head to reconcile rather than edited directly
 — flagged explicitly per the runner brief's shared-vtable-slot caution.
+
+## Naming
+
+**Tier A.** Vtable slot +0x124. Sibling search leaf to
+`Class866E8__FindElemIndexByUnk32`: same loop shape, different field
+(`unk4->unk30`) and an extra `unk4->unk2C != 0` gate, returns -1 (not 0)
+on a miss. Named the same way and for the same reason -- by the field it
+searches, since `unk30`/`unk2C` are cross-unit `ElemTarget` fields this
+unit does not own (also read by `func_8004BD14`/`func_8004C0AC` in
+class_3bb8c.c).
+
+## Proposed field names
+
+`ElemTarget::unk30` and `ElemTarget::unk2C` (also read by class_3bb8c.c's
+`func_8004BD14`/`func_8004C0AC` -- cross-unit, not renamed here).
+Proposed: `unk30` -> `key` (same reasoning as `unk32` above -- compared
+for equality against this function's own `key` argument);
+`unk2C` -> `enabled` (gates this function's match with a nonzero test,
+and class_3bb8c.c's `func_8004BD14` gates its own dispatch on the same
+field the same way -- a plain "is this target live" flag is the simplest
+reading that fits both call sites, though neither establishes it beyond
+"nonzero enables").

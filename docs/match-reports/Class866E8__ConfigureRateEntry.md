@@ -1,4 +1,6 @@
-# func_8004CFB8 — MATCHED (round 58), 28/28, whole-image SHA1 green
+# Class866E8__ConfigureRateEntry — MATCHED (round 58), 28/28, whole-image SHA1 green
+
+> Renamed from `func_8004CFB8` on 2026-09-24 (tools/rename.py). Address 0x8004cfb8.
 
 > **HEAD VERIFICATION, round 9. Classification CONFIRMED as a stall, but
 > RECLASSIFIED as to kind: this is a SOURCE-SHAPE stall and a permuter
@@ -124,7 +126,7 @@ tool artifact.
 
 ```c
 #if 0
-void func_8004CFB8(Obj866E8 *self, s32 rate, s32 flag) {
+void Class866E8__ConfigureRateEntry(Obj866E8 *self, s32 rate, s32 flag) {
     EntryDesc866E8 *table;
     s32 val;
 
@@ -167,11 +169,11 @@ byte-exact first half, and useful for whoever picks this back up.
 - `D_8008699C`, `D_800869A8`, `D_800869B4`, `D_800869C0` — four static
   instances of `EntryDesc866E8`, addresses confirmed 0xC apart. The
   existing `D_800869CC` (`extern s32 D_800869CC[3]`, declared by an
-  earlier round from `func_8004D108`) is a plausible fifth entry of the
+  earlier round from `Class866E8__ResetChildRate`) is a plausible fifth entry of the
   same table by the same stride, but is left independently declared —
   nothing in this unit reaches it through the `EntryDesc866E8` type.
 - **`Obj866E8::unk1E4` retyped** from `void *` to `EntryDesc866E8 *`.
-  Only reference elsewhere in this unit is `func_8004D0D0`, which
+  Only reference elsewhere in this unit is `Class866E8__ApplyRateToChild`, which
   forwards it opaquely to a `void *` parameter (`EntryChildObjMethods::
   slot48`'s `arg2`) — implicit pointer-to-`void *` conversion, so this
   does not disturb that already-matched function's bytes. Flagging per
@@ -211,7 +213,7 @@ well-characterized.
 
 Seed: the "Best-attempt body" above (25/28-equivalent shape after the
 first, byte-exact half). `--debug` base score: **360** (1 reordering + 3
-insertions, `func_8004CFB8` header), consistent with the report's own
+insertions, `Class866E8__ConfigureRateEntry` header), consistent with the report's own
 "3 extra words" reading of the second half's residue (the eager `mflo`
 plus its knock-on reordering).
 
@@ -324,8 +326,8 @@ neutral one.
 ## Round 53 (bravo) — CALIBRATION attempt, one fresh shape, regressed the already-solved half, negative
 
 Assigned as one of three functions in a round-53 Sonnet calibration slot for
-the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `func_8004CD38`
-and `func_8004CAF0`. This report's disposition (round 18: "bounded search
+the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `IsPointOutOfBounds`
+and `Class866E8__SplitFootprintSlot`. This report's disposition (round 18: "bounded search
 exhausted its time budget with no improvement, NOT permuter-exhausted") is
 the reason it was picked over the plan's higher-ranked but
 levers-measurably-spent `code_2cc8c_e` job.
@@ -450,7 +452,7 @@ The first half (the `goto` ladder selecting one of the four
 | # | second-half shape | result |
 | --- | --- | --- |
 | s0 | the report's recorded best body: default-then-overwrite, field access in both places | **17/28, length changes (drift)** |
-| s1 | s0 with a `do { … break; … } while (0)` around it (round 58's new lever from `func_8004CAF0`) | **17/28, drift** — byte-identical to s0 |
+| s1 | s0 with a `do { … break; … } while (0)` around it (round 58's new lever from `Class866E8__SplitFootprintSlot`) | **17/28, drift** — byte-identical to s0 |
 | s2 | explicit `if`/`else` with `val`, but the field access still written in both arms | **10/28, drift** — worse than s0 |
 | s3 | explicit `if`/`else` **plus** the cached `scale` local | **28/28, exact, whole image green** |
 
@@ -505,7 +507,16 @@ additive.** Each alone measured as a regression (17/28 and 10/28 against a
 17/28 baseline); together they were byte-exact on the first build. When two
 axes are both suspected, try the product before concluding either is inert.
 
-`do { } while (0)`, round 58's new lever from `func_8004CAF0`, was tried
+`do { } while (0)`, round 58's new lever from `Class866E8__SplitFootprintSlot`, was tried
 here (s1) and is **byte-identical to s0** — a clean negative that helps
 scope it: it moves scheduling and delay-slot placement, and does not touch
 how cc1 expands a statement into `mult` + `mflo`.
+
+## Naming
+
+**Tier B.** Not a vtable slot. Picks one of four static `EntryDesc866E8`
+table entries by the sign of `rate` and by `flag`, stores it in
+`self->rateEntry`, then sets `self->rateCountdown` to `abs(rate)` scaled
+by the entry's own `scale` field. Mechanics fully evidenced (see the
+existing source-shape comment on the function); what "rate" represents
+in-game is not.
