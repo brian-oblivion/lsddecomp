@@ -282,15 +282,15 @@ extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s
 extern void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
 
 /* VALUE-of `%gp_rel`, round 45's own local view -- two plain s32
- * constants (`gClass86F88RowOriginX`=-0x5C, `D_8008AB04`=-0xF in the ROM image,
+ * constants (`gClass86F88RowOriginX`=-0x5C, `gClass86F88RowOriginY`=-0xF in the ROM image,
  * `asm/data/7B12C.sdata.s`) seeding a 2-word stack-local this function
  * builds and passes to each freshly-created element's own `slot4C`. */
 extern s32 gClass86F88RowOriginX;
-extern s32 D_8008AB04;
+extern s32 gClass86F88RowOriginY;
 
 /* Class86F88__CreateRows's own stack-local argument to Class86F88ElemMethods::
  * slot4C -- `a` is gClass86F88RowOriginX's value, set once; `b` starts at
- * D_8008AB04's value and accumulates by 0xA per loop iteration. Kept
+ * gClass86F88RowOriginY's value and accumulates by 0xA per loop iteration. Kept
  * local to this unit (see the shared header's own `void *arg2` for that
  * slot) since nothing else gives this argument any shape. */
 typedef struct {
@@ -311,7 +311,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
     }
 
     local.a = gClass86F88RowOriginX;
-    local.b = D_8008AB04;
+    local.b = gClass86F88RowOriginY;
     count = self->unk10;
     p = &self->unk40[0];
     if (count >= 5) {
