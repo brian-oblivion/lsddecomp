@@ -282,7 +282,7 @@ cd_read = 0x8002BFA8; // type:func  (Psy-Q libcd/iso9660, from the SDK object)
 // config/psyq-objects.txt), so it keeps no entry.
 strcmp = 0x8002C048; // type:func  (Psy-Q libc2/strcmp, from the SDK object)
 strncmp = 0x8002C0AC; // type:func  (Psy-Q libc2/strncmp, from the SDK object)
-new_class_6d940 = 0x8002C12C;
+New_Class6D940 = 0x8002C12C;
 
 // ROUND 34 -- code_179d8_j middle (0x20FF0..0x21180): libsnd/vm_prog, the four
 // SPU-voice-manager program volume/pan accessors. Psy-Q 3.6 is the only disc

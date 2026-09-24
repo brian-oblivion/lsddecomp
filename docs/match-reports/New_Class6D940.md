@@ -1,4 +1,6 @@
-# new_class_6d940
+# New_Class6D940
+
+> Renamed from `new_class_6d940` on 2026-09-24 (tools/rename.py). Address 0x8002c12c.
 
 **Unit:** code_179d8_d · **Size:** 24 instructions (0x60 bytes) ·
 **Status: MATCHED 24/24**, whole-image SHA1 green. Matched on the first
@@ -12,7 +14,7 @@ unit, matched this round -- see its own report), returning the new
 instance; returns `NULL` on allocation failure.
 
 ```c
-void *new_class_6d940(s32 arg1)
+void *New_Class6D940(s32 arg1)
 {
     void *self;
     Table6D940 *table;

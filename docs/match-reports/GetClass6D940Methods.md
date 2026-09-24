@@ -13,7 +13,7 @@ project (`docs/research/class-framework.md`), but this unit is NOT
 class-framework code (per the unit's own header comment / charlie's
 sibling-slice finding) -- so this is written as a plain local
 function-pointer-table getter, not claimed to be a real vtable accessor.
-`new_class_6d940` and `func_8002C18C` (both this unit, this round) dispatch
+`New_Class6D940` and `func_8002C18C` (both this unit, this round) dispatch
 through the returned table.
 
 ```c
@@ -27,7 +27,7 @@ Table6D940 *GetClass6D940Methods(void)
 
 `Table6D940` (this file only) -- a function-pointer table with two known
 slots: `+0x008` (`slot08`, 2-arg `(self, s32)` -- this IS `func_8002C18C`
-itself, confirmed by `new_class_6d940`'s own dispatch through this exact
+itself, confirmed by `New_Class6D940`'s own dispatch through this exact
 slot) and `+0x06C` (`slot6C`, same 2-arg shape, dispatched conditionally
 from inside `func_8002C18C`'s own body). `D_8006D940` declared `extern
 Table6D940 D_8006D940;`.

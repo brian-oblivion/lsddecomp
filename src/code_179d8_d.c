@@ -21,7 +21,7 @@
  * `libc2/strncmp.o`. Five had been matched as C -- they were Sony's the whole
  * time, and reclassifying them out of the game count is the correction
  * CLAUDE.md asks for, not a regression. The unit is now 0x1C92C..0x1CC08
- * (vram 0x8002C12C..), new_class_6d940 onward, 14 functions. The ISO9660
+ * (vram 0x8002C12C..), New_Class6D940 onward, 14 functions. The ISO9660
  * directory-record views and diagnostic-string externs that lived here went
  * with the functions; the stall's preserved body is in its report.
  *
@@ -73,7 +73,7 @@
 #include "common.h"
 
 /*
- * D_8006D940: a function-pointer table this unit's own `new_class_6d940`/
+ * D_8006D940: a function-pointer table this unit's own `New_Class6D940`/
  * `func_8002C18C` dispatch through. Named/typed as a plain local struct,
  * NOT claimed to be a class-framework vtable -- per this unit's header
  * comment (sibling-slice finding: no classtable.py hit anywhere near this
@@ -84,7 +84,7 @@
 typedef struct Table6D940 Table6D940;
 struct Table6D940 {
     u8 pad000[0x008];
-    /* +0x008, new_class_6d940's own dispatch -- this IS func_8002C18C
+    /* +0x008, New_Class6D940's own dispatch -- this IS func_8002C18C
      * itself (same 2-arg (self, arg1) shape). */
     void (*slot08)(void *self, s32 arg1);
     u8 pad00C[0x06C - 0x00C];
@@ -94,12 +94,12 @@ struct Table6D940 {
 extern Table6D940 D_8006D940;
 
 /* Forward-declared: defined below at its own ROM address (GetClass6D940Methods),
- * but called here (new_class_6d940, func_8002C18C) before that point in the
+ * but called here (New_Class6D940, func_8002C18C) before that point in the
  * file. Without this, cc1 implicitly declares it `int`, which happens to be
  * byte-identical on this ABI but is a lie about the real signature. */
 Table6D940 *GetClass6D940Methods(void);
 
-/* The 0x34-byte object new_class_6d940 allocates. Only the fields
+/* The 0x34-byte object New_Class6D940 allocates. Only the fields
  * func_8002C18C itself touches are named. */
 typedef struct Obj6D940 Obj6D940;
 struct Obj6D940 {
@@ -137,7 +137,7 @@ extern BaseTable6D940 *GetActiveDataSourceMethods(void);
  * this unit does not include either header. */
 extern void *BMemPMgrAlloc(s32 size);
 
-void *new_class_6d940(s32 arg1)
+void *New_Class6D940(s32 arg1)
 {
     void *self;
     Table6D940 *table;
