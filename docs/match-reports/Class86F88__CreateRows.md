@@ -14,7 +14,7 @@ of the same file; this function is ordinary matching work.
 ## Derivation
 
 ```c
-extern char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
+extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
 extern void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
 
 extern s32 D_8008AB00;
@@ -46,7 +46,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
     }
 
     for (i = 0; i < count; i++) {
-        func_8005292C(self, buf, i, arg3, (char *)arg4);
+        Class86F88__FormatRowText(self, buf, i, arg3, (char *)arg4);
         *p = (Class86F88Elem *)New_Obj6EAC0((void *)arg2, 0x1A, buf);
         (*p)->methods->slot4C(*p, arg1, &local);
         (*p)->methods->slotB8(*p, &D_8008AB0C);
@@ -60,7 +60,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
 
 **A close sibling of the already-matched `Class86F88__RefreshRows`** (same unit, same
 `self->unk40[]` element array, same `count = self->unk10; if (count >= 5)
-count = 4;` clamp, same `func_8005292C` text-formatting call inside the
+count = 4;` clamp, same `Class86F88__FormatRowText` text-formatting call inside the
 loop): the two differ in that this function ALSO calls each freshly-created
 element's own `slot4C` (with a 2-word stack-local argument seeded from
 `D_8008AB00`/`D_8008AB04`, the second word accumulating by `0xA` per
@@ -83,7 +83,7 @@ different local name for what the header comment already notes might be
 the same real object, so the return value is cast explicitly rather than
 adding a second, conflicting declaration.
 
-`func_8005292C` and `func_800529FC` are defined LATER in this same file
+`Class86F88__FormatRowText` and `func_800529FC` are defined LATER in this same file
 (ROM order), so both needed forward `extern` declarations above
 `Class86F88__CreateRows`, matching their real definitions exactly — same convention
 already used for `Obj865C8__EnterState2`/`func_80050CD8` elsewhere this round.
@@ -91,7 +91,7 @@ already used for `Obj865C8__EnterState2`/`func_80050CD8` elsewhere this round.
 **One register-identity trap, closed by reordering two local
 declarations — no logic change.** With `Elem4CArg_3bb8c_k local;` declared
 before `char buf[0x20];`, GCC decided `buf`'s address (used at two call
-sites, `func_8005292C` and `New_Obj6EAC0`) was worth caching in a
+sites, `Class86F88__FormatRowText` and `New_Obj6EAC0`) was worth caching in a
 callee-saved register across both uses, rather than recomputing the cheap
 `sp`-relative address each time — retail does NOT cache it (two separate
 `addiu $a1/$a2, $sp, 0x18` computations). That one cached register pushed

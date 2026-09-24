@@ -2930,7 +2930,7 @@ struct Class86F88ElemMethods {
     void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, func_800529FC */
     u8 pad0BC[0x0CC - 0x0BC];
     /* +0x0CC, Class86F88__RefreshRows: called once per active window element with a
-     * freshly-formatted (func_8005292C) fixed-width text buffer. */
+     * freshly-formatted (Class86F88__FormatRowText) fixed-width text buffer. */
     void (*slotCC)(Class86F88Elem *self, char *arg1);
 };
 
@@ -2943,13 +2943,13 @@ struct Class86F88 {
     u8 pad004[0x010 - 0x004];
     s32 unk10;                     /* +0x010, Class86F88__ReleaseRows/Class86F88__RefreshRows: element count, clamped to a max of 4 */
     s32 unk14;                     /* +0x014, Class86F88__ScrollRight: upper bound compared against unk24+0x1A */
-    /* +0x018, func_8005292C: a table of BYTE OFFSETS (s32 each), added to
+    /* +0x018, Class86F88__FormatRowText: a table of BYTE OFFSETS (s32 each), added to
      * that function's own `base` (char *) argument to form a source
      * pointer -- `self->unk18[idx]` is never scaled by anything other than
      * its own natural s32 stride, and the resulting sum is used as a plain
      * byte address (strlen/strncpy-style calls), so `base` is a byte
      * pointer and this is an OFFSET table, not a pointer table. */
-    s32 *unk18;                    /* +0x018, func_8005292C */
+    s32 *unk18;                    /* +0x018, Class86F88__FormatRowText */
     u8 pad01C[0x020 - 0x01C];
     s32 unk20;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/Class86F88__ScrollRight/Class86F88__ScrollLeft/Class86F88__CursorUp/Class86F88__CursorDown/func_800529FC */
     s32 unk24;                     /* +0x024, ditto */

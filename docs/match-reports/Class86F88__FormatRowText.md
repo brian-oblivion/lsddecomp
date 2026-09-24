@@ -1,4 +1,6 @@
-# func_8005292C
+# Class86F88__FormatRowText
+
+> Renamed from `func_8005292C` on 2026-09-24 (tools/rename.py). Address 0x8005292c.
 
 **Unit:** class_3bb8c_k · **Size:** 52 instructions (0xD0 bytes) ·
 **Status: MATCHED 52/52**, whole-image SHA1 green.
@@ -39,7 +41,7 @@ function, same convention documented for `DecodeFullWidthSjis` in
 ## Final source
 
 ```c
-char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base)
+char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base)
 {
     s32 idx = arg4 + arg3;
     s32 len;

@@ -278,7 +278,7 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
  * Class86F88__CreateRows calls both, same convention as Obj865C8__EnterState2 in
  * src/class_39e08.c. Signatures must match their real definitions below
  * exactly. */
-extern char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
+extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
 extern void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
 
 /* VALUE-of `%gp_rel`, round 45's own local view -- two plain s32
@@ -319,7 +319,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
     }
 
     for (i = 0; i < count; i++) {
-        func_8005292C(self, buf, i, arg3, (char *)arg4);
+        Class86F88__FormatRowText(self, buf, i, arg3, (char *)arg4);
         *p = (Class86F88Elem *)New_Obj6EAC0((void *)arg2, 0x1A, buf);
         (*p)->methods->slot4C(*p, arg1, &local);
         (*p)->methods->slotB8(*p, &D_8008AB0C);
@@ -388,7 +388,7 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32
         count = 4;
     }
     for (i = 0; i < count; i++) {
-        func_8005292C(self, buf, i, arg1, (char *)arg2);
+        Class86F88__FormatRowText(self, buf, i, arg1, (char *)arg2);
         (*p)->methods->slotCC(*p, buf);
         p++;
     }
@@ -398,7 +398,7 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32
     }
 }
 
-char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base)
+char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base)
 {
     s32 idx = arg4 + arg3;
     s32 len;
