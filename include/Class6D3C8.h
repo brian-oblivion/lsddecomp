@@ -27,6 +27,24 @@
  * concrete field types; the rest stay opaque `void *` so the struct keeps
  * the right size/offsets without requiring every method to be typed up
  * front.
+ *
+ * What the unit IS (round 77 naming pass): a startup/title-sequence
+ * controller. The ctor (`Class6D3C8__Class6D3C8`) loads one 3D model
+ * ("ETC\DREAME5.TMD") and builds this object's owned `DreamSys` from it;
+ * every other vtable slot is a `Class6D3C8CtorArgs`-gated block that either
+ * loads a named boot-time asset (the ASMK/OSD logo `LoaderTask`s and their
+ * bracketing stream, `Class6D3C8__LoadIntroLogoSequence`), starts a
+ * StreamTask keyed to a day/week or "GraphRoom"-poll-derived index
+ * (`Class6D3C8__StartWeeklyStreamTask`, `Class6D3C8__StartGraphRoomStreamTask`,
+ * `Class6D3C8__StartStreamTaskWithInit`), polls a "GraphRoom"-named PollTask
+ * pair against the owned `DreamSys`'s status (`Class6D3C8__PollGraphRoomStatus`),
+ * or resolves and streams the current cinematic
+ * (`Class6D3C8__StartCinematicStream`, reached via
+ * `Class6D3C8__PollStatusObj`'s status-code dispatch). All 13 of this
+ * unit's own functions are named (tier A/B, see each one's match report's
+ * `## Naming` section); no game-purpose name for the CLASS itself is
+ * established yet (that is track 4's job, once a caller elsewhere names an
+ * instance's role) -- `Class6D3C8` is kept as the table-address identity.
  */
 
 /* The intermediate base class at D_8006E4F0. Same policy: only slots this
