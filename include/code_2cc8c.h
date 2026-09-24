@@ -1123,7 +1123,7 @@ struct Obj86B60Methods {
     void (*slot84)(Obj86B60 *self, s32 a1);       /* +0x084, IS func_8003C858 */
     u8 pad088[0x090 - 0x088];
     void (*slot90)(Obj86B60 *self);               /* +0x090, external
-                                                      (func_8004D9D4);
+                                                      (Class86B60__Tick);
                                                       OBSERVED: func_8003C63C
                                                       (STALL, not attempted --
                                                       read off the

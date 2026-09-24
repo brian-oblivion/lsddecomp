@@ -53,7 +53,7 @@ void Class86B60__SetState(Class86B60 *self, s32 arg1)
     }
 }
 
-void func_8004D9D4(Class86B60 *self)
+void Class86B60__Tick(Class86B60 *self)
 {
     void (*fn)(Class86B60 *);
 

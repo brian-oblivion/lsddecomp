@@ -1217,7 +1217,7 @@ struct Class86B60Methods {
     void (*slot78)(Class86B60 *self); /* +0x078, Class86B60__SetState's own last call, `self` only */
     void (*slot7C)(Class86B60 *self); /* +0x07C, Class86B60__SetState's own 2nd call, `self` only */
     u8 pad080[0x094 - 0x080];
-    /* +0x094, func_8004D9D4's shared tail call target for its `unk58==1`
+    /* +0x094, Class86B60__Tick's shared tail call target for its `unk58==1`
      * and `unk58==4` cases -- a crossjump-merge-safe local function
      * pointer (see round 12's "local function pointer variable" lever)
      * rather than a retyped slot, since `slot130`/`slot134` reach the
@@ -1251,8 +1251,8 @@ struct Class86B60Methods {
     /* +0x128, func_8004E1C4's own first call, `self` only. Return unused. */
     void (*slot128)(Class86B60 *self);
     void (*slot12C)(Class86B60 *self); /* +0x12C, func_8004E230's own first call, `self` only */
-    void (*slot130)(Class86B60 *self); /* +0x130, func_8004D9D4's `unk58==2` tail target */
-    void (*slot134)(Class86B60 *self); /* +0x134, func_8004D9D4's `unk58==3` tail target */
+    void (*slot130)(Class86B60 *self); /* +0x130, Class86B60__Tick's `unk58==2` tail target */
+    void (*slot134)(Class86B60 *self); /* +0x134, Class86B60__Tick's `unk58==3` tail target */
     /* +0x138, Class86B60__ForwardIfTagB's forward target, only reached when its own
      * arg1's header-word low nibble == 0xB (a runtime-type-id gate) --
      * called with all three of Class86B60__ForwardIfTagB's own parameters verbatim. */
@@ -1269,9 +1269,9 @@ struct Class86B60 {
     s32 unk2C;                      /* +0x02C, Class86B60__ShowTitleIcon: set to 0x190 */
     u8 pad030[0x034 - 0x030];
     s32 unk34;                      /* +0x034, Class86B60__ShowTitleIcon: zeroed */
-    /* +0x038, func_8004D9D4: set to 0 on the `unk58==1` path and to the
+    /* +0x038, Class86B60__Tick: set to 0 on the `unk58==1` path and to the
      * literal 2 on the `unk58==4` path -- read by nothing else in this
-     * unit. The literal 2 is the SAME constant `func_8004D9D4` compares
+     * unit. The literal 2 is the SAME constant `Class86B60__Tick` compares
      * `self->unk58` against for its `case 2`, and retail keeps it
      * resident in one register across the whole function rather than
      * re-materializing it, which is what proves this is a literal `2`
@@ -1292,7 +1292,7 @@ struct Class86B60 {
     struct Class86B60Unk48Obj *unk48;  /* +0x048, Class86B60__Class86B60 */
     Class86B60Unk4CObj_3bb8c_d *unk4C; /* +0x04C, Class86B60__SetState */
     u8 pad050[0x058 - 0x050];
-    s32 unk58;                       /* +0x058, func_8004D9D4: 5-valued dispatch (0-4) */
+    s32 unk58;                       /* +0x058, Class86B60__Tick: 5-valued dispatch (0-4) */
     u8 pad05C[0x060 - 0x05C];
     Class86B60Unk60Obj_3bb8c_d *unk60; /* +0x060, func_8004DABC */
     u8 pad064[0x093 - 0x064];
@@ -1440,11 +1440,11 @@ struct BaseTaskCtorTable_3bb8c_c {
      * that function's own forwarded 2nd parameter. */
     void (*slot60)(void *self, s32 arg1);
     u8 pad064[0x090 - 0x064];
-    /* +0x090, func_8004D9D4's own first, unconditional call, `self` only. */
+    /* +0x090, Class86B60__Tick's own first, unconditional call, `self` only. */
     void (*slot90)(void *self);
     /* +0x094, func_8004DABC's own first, unconditional call, `self`
      * only. Distinct from `Class86B60Methods::slot94` (see
-     * func_8004D9D4's report) -- same offset number, unrelated table. */
+     * Class86B60__Tick's report) -- same offset number, unrelated table. */
     void (*slot94)(void *self);
     u8 pad098[0x0DC - 0x098];
     /* +0x0DC, func_8004DC08's own last call, `self` only, right after

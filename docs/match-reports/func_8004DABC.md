@@ -25,7 +25,7 @@ stack-local buffer whose address is forwarded to `self->unkA4`
 
 - `BaseTaskCtorTable_3bb8c_c::slot94` -- new slot, `void (*)(void *self)`.
   Distinct from `Class86B60Methods::slot94` (established by
-  `func_8004D9D4`'s report) -- same offset number, unrelated table, no
+  `Class86B60__Tick`'s report) -- same offset number, unrelated table, no
   conflict.
 - New type `Class86B60Unk60Obj_3bb8c_d` (self->unk60's pointee, only
   `unk14` reached, a plain `s32`).
