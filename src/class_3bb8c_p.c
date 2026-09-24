@@ -202,8 +202,9 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 13/116 words. Residue: register-allocation/scheduling only
- * (two extra callee-saved registers survive throughout, and the
+/* NON_MATCHING: 13/116 words, length NOT exact (live build drifts the image).
+ * Residue: frame and register allocation (two extra callee-saved registers
+ * survive throughout, which is a frame difference, not scheduling), and the
  * `oddCount` ternary and the second `getGridArrElemAt` call site each
  * codegen differently from retail in ways not yet reproduced). Control
  * and data flow are independently confirmed against m2ctx.py.
