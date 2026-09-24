@@ -324,7 +324,7 @@ GCC 2.6.3's loop-invariant motion then hoists the `(set (reg) (symbol_ref))`
 into the preheader and the build emits retail's `lui t2,%hi(D_8008EA26)` /
 `addiu t2,t2,%lo(D_8008EA26)` / `sh ...,0(t2)` **byte-for-byte**. The global
 is still declared `extern volatile u16 D_8008EA26;` (as its matched sibling
-`func_80031280` in `code_179d8_j_b.c` declares it), so the read-back
+`SsUtKeyOff` in `code_179d8_j_b.c` declares it), so the read-back
 `bankIdx = D_8008EA26;` still compiles to a fresh `lui`/`lhu %lo` -- which is
 exactly retail's own asymmetry between the store and the reload, and the
 thing that made the residue look unexplainable.
@@ -472,7 +472,7 @@ void SpuVmSeqKeyOff(s32 p0)
   (`old60 | loBit` vs `loBit | old60`); `u32` masks. GCC's scheduler picks
   the same order regardless. **The tail residue is not expression-order
   steerable.**
-- **`func_80031280`'s matched tail idiom does NOT transfer here.** Writing
+- **`SsUtKeyOff`'s matched tail idiom does NOT transfer here.** Writing
   the tail exactly as that already-matched sibling does
   (`D_80090C60 = loBit | D_80090C60; D_8008E228 &= ~D_80090C60; ...`, with
   its documented `u32`/`u16` mask type asymmetry) REGRESSES to 47/85. The
@@ -804,7 +804,7 @@ What moves the tail is not ORDER, it is which sub-expression gets a name:
             D_8008E22C = D_8008E22C & old64;
 ```
 
-Note this is NOT `func_80031280`'s tail idiom, which round 56 measured at
+Note this is NOT `SsUtKeyOff`'s tail idiom, which round 56 measured at
 47/85 and which folds the complement back into the `&=`; the complement's own
 local is what distinguishes them, and it is load-bearing.
 

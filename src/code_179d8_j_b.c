@@ -91,8 +91,8 @@ extern RecordE978 *D_8008E978;
 typedef struct EntryDAD4 {
     s16 unk0; /* +0x0 */
     s16 unk2; /* +0x2 */
-    s16 unk4; /* +0x4 -- read by func_80031280, entry index 25 only */
-    s16 unk6; /* +0x6 -- read by func_80031280, entry index 25 only */
+    s16 unk4; /* +0x4 -- read by SsUtKeyOff, entry index 25 only */
+    s16 unk6; /* +0x6 -- read by SsUtKeyOff, entry index 25 only */
     u8 pad8[0x10 - 0x8];
 } EntryDAD4;
 extern EntryDAD4 *D_8006DAD4;
@@ -204,7 +204,7 @@ extern Rec34Byte D_8008D9A3[];
  * D_8008D98A and D_8008D98C, each 2 bytes apart in the data section --
  * same "several unrelated top-level symbols" convention as the
  * Rec34D994 group above). D_8008D988's field is read signed
- * (func_80031280 compares it against 0xFF with `lh`, not `lhu`). */
+ * (SsUtKeyOff compares it against 0xFF with `lh`, not `lhu`). */
 typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
@@ -438,7 +438,7 @@ fail_nolock:
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOn);
 #endif
 
-s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
+s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
 {
     u16 chan;
     u32 mask0;
@@ -583,7 +583,7 @@ fail:
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
 #endif
 
-/* The "release channel" twin of func_80031280's else-branch above: same
+/* The "release channel" twin of SsUtKeyOff's else-branch above: same
  * D_8008E934 lock, same (mask0, mask1) split of a 0..0x17 channel across two
  * 16-bit mask words, same three per-channel field clears, same mask update.
  * MATCHED round 62 by writing it in exactly that sibling's idiom -- direct

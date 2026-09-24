@@ -258,7 +258,7 @@ else live across the barrier), this function has FIVE more live locals
 whose liveness the barrier's scheduling boundary interacts with -- the
 sibling idiom does not transfer to a function with substantially higher
 register pressure at that point, the same lesson `func_80031890`'s round-32
-addendum draws about `func_80031280`'s type-asymmetry idiom not
+addendum draws about `SsUtKeyOff`'s type-asymmetry idiom not
 transferring either.
 
 Restored to the preserved body (no barrier) exactly as documented;

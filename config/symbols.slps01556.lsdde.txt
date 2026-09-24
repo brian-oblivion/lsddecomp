@@ -1889,3 +1889,9 @@ SeAutoVol = 0x8002E308; // type:func
 // 7 params -- this function's own 7-param shape agrees on count).
 // Superseded game-style func_80030E90. Round 74 (bravo, track 2).
 SsUtKeyOn = 0x80030E90; // type:func
+// identified: shape 0.96 vs libsnd/vmanager SsUtKeyOff (125w vs our 135w,
+// disc 3.5), position right after SsUtKeyOn, header LIBSND.H
+// (`extern short SsUtKeyOff(short,short,short,short,short);`, 5 params --
+// this function's own 5-param shape agrees on count). Superseded
+// game-style func_80031280. Round 74 (bravo, track 2).
+SsUtKeyOff = 0x80031280; // type:func

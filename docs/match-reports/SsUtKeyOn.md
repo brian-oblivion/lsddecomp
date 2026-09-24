@@ -151,7 +151,7 @@ and this body has control flow and still compiles `beq` FAR. That stands.
 What is new is that it is now **bounded**: it is worth exactly 2 words and
 nothing else. Every other word of the gap is the `nop` blocker. Two matched
 siblings in this same unit now carry the identical guard construct --
-`func_80031280` and, as of this round, `func_80031890` -- and **both compile
+`SsUtKeyOff` and, as of this round, `func_80031890` -- and **both compile
 to `beq` FAR and both are byte-exact**, i.e. for those two functions retail
 itself has the FAR shape. So the construct is not miscompiled; this function's
 context selects the other layout, and two byte-exact controls in the same file
@@ -453,7 +453,7 @@ neighbors. This was reached by direct experimentation, not derived.
   the locked-case `return -1` inlined immediately after the test, reached
   by falling straight through when locked. The identical `if (locked)
   return -1;` construct produces the "near/inline" shape for
-  `func_80031280` in THIS SAME unit (confirmed: this round's other match)
+  `SsUtKeyOff` in THIS SAME unit (confirmed: this round's other match)
   but the "far" shape here. Tried: plain guard, `goto`-based guard to a
   dedicated `fail_nolock:` label, and a full inversion (`if (!locked) {
   ...entire 200-line body... } return -1;`, moving the busy-check's own
@@ -629,7 +629,7 @@ the effect the probes isolate, and the probes do not capture it.
   straight-line, one change could plausibly move the polarity AND the
   scheduling AND part of the 13-word gap at once. That is the lever to try
   before any further guard-shape reshaping.
-- **The already-matched sibling `func_80031280` is the control.** It is in
+- **The already-matched sibling `SsUtKeyOff` is the control.** It is in
   this same unit, uses the identical guard construct, and gets the NEAR
   shape. Diffing what structurally differs between its fallthrough and this
   one is a cheaper experiment than any probe, and it is the one this
@@ -654,7 +654,7 @@ describes: a bare `__asm__("")` between all nine registration statements
 except between the `p3` store and the `1`-store, and between the
 `RecordE978`/`SlotE968` field-copy statements too) through the current
 pinned pipeline. This reached **240 words built (`build/lsdde.map` puts
-the next function, `func_80031280`, at `0x8003124c`/`0x80031250`
+the next function, `SsUtKeyOff`, at `0x8003124c`/`0x80031250`
 depending on the exact variant -- see below -- against retail's own
 `0x80031280`)** and a raw word-match in the low-to-mid 30s out of 252,
 in the same range as the round-26 figure but not an exact reproduction of
@@ -734,7 +734,7 @@ typedef, extended with the `unk0` field this report's own "Struct/global
 additions" section says this function added).
 
 **Measured: 241/252 words, 11 short (`build/lsdde.map`: retail's next
-function `func_80031280` sits at `0x80031280`, this build's sits at
+function `SsUtKeyOff` sits at `0x80031280`, this build's sits at
 `0x80031254`, a 0x2C/11-word deficit).** Raw word-match 36/252. This is
 close to but not an exact reproduction of round 31's 240/252 -- one word
 different, consistent with round 31's own caveat that its exact barrier
@@ -1049,7 +1049,7 @@ alone, sibling `func_8003149C` held at `INCLUDE_ASM` so its own shortfall
 does not contaminate this function's window, per the attribution-hazard
 note in CLAUDE.md) and rebuilt through `./build-and-verify.sh` +
 `tools/funcdiff.py`: **byte-identical to baseline -- still 36/252 raw
-word-match, still 11 words short (`build/lsdde.map`: `func_80031280` still
+word-match, still 11 words short (`build/lsdde.map`: `SsUtKeyOff` still
 lands at `0x80031254`, unchanged).** Reverted; no net effect.
 
 This is the same scaffold-vs-real-oracle disagreement `func_80031890`'s
@@ -1093,7 +1093,7 @@ contaminate this window) and rebuilt through `./build-and-verify.sh` +
 `tools/funcdiff.py`.
 
 **Length is now EXACT.** `build/lsdde.map` puts the next function,
-`func_80031280`, at `0x80031280` -- retail's own address, zero deficit
+`SsUtKeyOff`, at `0x80031280` -- retail's own address, zero deficit
 (was `0x80031254`, 11 words short, at every prior measurement back to
 round 36). This is exactly what the round-62 accounting predicted: 9 of
 the 11 missing words were the below-cc1 load-delay `nop` maspsx did not

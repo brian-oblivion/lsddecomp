@@ -74,8 +74,8 @@ extern void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3);
 typedef struct EntryDAD4 {
     s16 unk0; /* +0x0 */
     s16 unk2; /* +0x2 */
-    s16 unk4; /* +0x4 -- read by func_80031280, entry index 25 only */
-    s16 unk6; /* +0x6 -- read by func_80031280, entry index 25 only */
+    s16 unk4; /* +0x4 -- read by SsUtKeyOff, entry index 25 only */
+    s16 unk6; /* +0x6 -- read by SsUtKeyOff, entry index 25 only */
     u8 pad8[0x10 - 0x8];
 } EntryDAD4;
 extern EntryDAD4 *D_8006DAD4;

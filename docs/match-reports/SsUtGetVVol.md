@@ -11,8 +11,8 @@ out-of-range bytes.
 
 This was filed as a STALL since round 21 (2026-09-06), corrected for length in
 round 31, and reassigned this round with a stale cross-reference in its own
-line 5/9 ("`SsUtGetDetVVol`/`func_80031280` (blocked, elsewhere)") -- both are
-now MATCHED (`SsUtGetDetVVol` in this same unit, `func_80031280` in
+line 5/9 ("`SsUtGetDetVVol`/`SsUtKeyOff` (blocked, elsewhere)") -- both are
+now MATCHED (`SsUtGetDetVVol` in this same unit, `SsUtKeyOff` in
 `code_179d8_j_b`), which is corrected below.
 
 ## The C

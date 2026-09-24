@@ -1,4 +1,6 @@
-# func_80031280 -- MATCHED (135/135 words)
+# SsUtKeyOff -- MATCHED (135/135 words)
+
+> Renamed from `func_80031280` on 2026-09-24 (tools/rename.py). Address 0x80031280.
 
 Unit `code_179d8_j`, round 26 (2026-09-09). Not a class method. Sibling of
 `SsUtGetDetVVol`/`SsUtSetDetVVol`/`SsUtSetVVol` (same 0x18-entry bounds check
@@ -12,7 +14,7 @@ the "0xFF" idle state) clears a fixed slot-25 pair of fields on the shared
 ## What it is
 
 ```c
-s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
+s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
 {
     u16 chan;
     u32 mask0;
@@ -77,7 +79,7 @@ fail_nolock:
   `s16 unk0` -- neither array was read by any already-matched function in
   this unit yet (only written, via `sh`, which doesn't care about
   signedness), so this was a free retype. It matters here because
-  `func_80031280` compares `D_8008D988[idx].unk0` against `0xFF` with a
+  `SsUtKeyOff` compares `D_8008D988[idx].unk0` against `0xFF` with a
   genuinely *signed* `lh`, not `lhu` -- confirmed from the `.s` opcode
   encoding (top 6 bits `100001` = `LH`), not inferred.
 - New sibling array `D_8008D98A[]`, same `Rec34Half` shape, 2 bytes after
@@ -143,7 +145,7 @@ that held the just-written-then-reread `D_8008EA26` (`chan` in this C).
 This is the same "written as a side effect and then re-read from the
 global, not from the parameter" idiom this file's own header comment
 already documents for `D_8008EA22`/`D_8008EA26` -- it applies to
-`func_80031280`'s array-index use too, not just to the scratch value
+`SsUtKeyOff`'s array-index use too, not just to the scratch value
 itself.
 
 ### 5. `mask1` needed to be `u16`, not `u32` -- found by the permuter, not by reasoning
