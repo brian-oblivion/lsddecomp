@@ -41,7 +41,7 @@ class's base method table gClass86B60Methods).
 ## Naming (round 78, delta)
 
 **Tier A** (pure setter -- "a getter, a clamp, a list push" per
-FINISHING-PLAN's tier-A-by-definition rule for a pure leaf). `func_8003C794`
+FINISHING-PLAN's tier-A-by-definition rule for a pure leaf). `Obj86B60__SetFrameBound`
 -> `Obj86B60__SetFrameBound`. Body: `self->unk40 = a1;` then, when `a1 >= 0`,
 `self->unk40 = a1 * 20`. Occupies slot6C (round 78: this slot was previously
 padded over in the header as unoccupied -- corrected against the raw table

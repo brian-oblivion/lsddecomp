@@ -75,8 +75,8 @@ Renamed `func_` -> `Obj86B60__BeginElementScroll`. **Tier B**: Gated on `self->u
 ## Proposed field names
 
 Not renamed here -- `self->unk3C` is CROSS-UNIT (`code_2cc8c.c`'s
-`func_8003C858`/`func_8003C8D0`/`func_8003C944`/`func_8003C9B0` all gate on
-it too, plus the STALL `func_8003C48C`/`func_8003C63C`), not attempted as a
+`Obj86B60__func_8003C858`/`Obj86B60__func_8003C8D0`/`Obj86B60__func_8003C944`/`Obj86B60__func_8003C9B0` all gate on
+it too, plus the STALL `Obj86B60__OnTag2Notify`/`Obj86B60__SetState`), not attempted as a
 compiler-verified rename this round. Proposing for the head to apply at
 merge:
 
@@ -84,7 +84,7 @@ merge:
   the 1<->2 state this function/`Obj86B60__CommitElementScroll`/
   `Obj86B60__CancelElementScroll` open and close (BeginElementScroll:
   1->2; the other two: 2->1). Whether the sibling unit's own
-  `func_8003C858` etc. use the same two values for the same meaning, or a
+  `Obj86B60__func_8003C858` etc. use the same two values for the same meaning, or a
   wider range of states unrelated to scrolling, is NOT established from
   this unit alone -- the head or whoever names that unit should confirm
   `unk3C`'s full value range before applying this name tree-wide.

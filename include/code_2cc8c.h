@@ -1156,7 +1156,7 @@ struct Obj86B60Methods {
      * 0x13 -> slot84, 0x17 -> slot7C, 0x19 -> slot78, 0x21 -> slot74.
      *
      * CORRECTED round 78 (delta): the occupants below were previously listed
-     * REVERSED (slot74 said "IS func_8003C9B0", slot84 said "IS func_8003C858",
+     * REVERSED (slot74 said "IS Obj86B60__func_8003C9B0", slot84 said "IS Obj86B60__func_8003C858",
      * etc -- a mirror image of the truth). Read the raw table bytes directly
      * (asm/data/76DC8.data.s lines for gClass86B60Methods+0x074..+0x084, and
      * the same offsets in gTaskCoreMethods, asm/data/5E140.data.s): the five

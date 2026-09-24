@@ -150,8 +150,8 @@ Renamed `func_` -> `Obj86B60__SetTarget`. **Tier B**: Stores `a1` into `self->un
 
 ## Proposed field names
 
-Not renamed here -- both fields are CROSS-UNIT (read by `func_8003C63C`/
-`func_8003CA1C` in `src/code_2cc8c.c`, verified by attempting the rename and
+Not renamed here -- both fields are CROSS-UNIT (read by `Obj86B60__SetState`/
+`Obj86B60__Tick` in `src/code_2cc8c.c`, verified by attempting the rename and
 reading the compiler's own error list: both moved from "0 errors" to errors
 in `code_2cc8c.c` specifically, none elsewhere). Proposing for the head to
 apply at merge (type scope: rename the definition, rebuild, fix exactly the
@@ -163,7 +163,7 @@ accessors the compiler lists, in both units):
 - `Unk4CObj::unk24` -> `slotEntries`, type `SlotEntry **` (tier B, retype +
   rename). Every dereference in `code_2cc8c_b.c` (`Obj86B60__CommitElementScroll`,
   `Obj86B60__RefreshSlotView`, `Obj86B60__CancelElementScroll`, `Obj86B60__SetSlotCursor`)
-  already casts it to `SlotEntry *`/`(SlotEntry *)...` locally; `func_8003CA1C`
+  already casts it to `SlotEntry *`/`(SlotEntry *)...` locally; `Obj86B60__Tick`
   (code_2cc8c.c, not attempted) reads it as a generic word-pointer array and
   would need `(void **)self->unk4C->slotEntries` or an equivalent cast, a
   one-line fix at that one call site.
@@ -172,5 +172,5 @@ accessors the compiler lists, in both units):
   element's `slotB8` right before (or without) a `slot60(elem,1)`
   highlight-on call on the NEW one -- the colour an item reverts to when it
   stops being the current selection, not the selection's own colour.
-  `func_8003C63C` (code_2cc8c.c, not attempted) only takes its address, so a
+  `Obj86B60__SetState` (code_2cc8c.c, not attempted) only takes its address, so a
   rename there is a pure rename, no cast needed.

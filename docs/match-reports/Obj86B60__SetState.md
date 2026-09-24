@@ -159,8 +159,8 @@ the shared header -- only the compiler (a definition-only rename + rebuild)
 can settle which of those are the SAME struct. Evidence for the name from
 this unit alone: `Obj86B60__SetState` sets it to 0 or 1 (cases 4/7 and 5);
 `Obj86B60__OnTag2Notify` gates its whole body on `!= 0`;
-`Obj86B60__func_8003C858`/`func_8003C8D0` compare it `==1`/`!=1`;
-`func_8003C944`/`func_8003C9B0` branch `==1` vs `==2`. Reads as a small mode
+`Obj86B60__func_8003C858`/`Obj86B60__func_8003C8D0` compare it `==1`/`!=1`;
+`Obj86B60__func_8003C944`/`Obj86B60__func_8003C9B0` branch `==1` vs `==2`. Reads as a small mode
 enum selecting which of two/three notify-handling paths applies; "notifyMode"
 describes that mechanic without asserting which in-game states 1/2 are.
 

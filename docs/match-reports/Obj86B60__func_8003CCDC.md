@@ -186,6 +186,6 @@ changed.
 **Tier C.** `func_8003CCDC` -> `Obj86B60__func_8003CCDC`. Same
 "invoke-optional-callback, transition on nonzero" shape as
 `Obj86B60__TickFadeCallback` above, but for the `unk8C`/`slotC4` pair
-(`func_8003CD48`, external, unread here -- see `Obj86B60__func_8003CB30`), so
+(`Obj86B60__TickFadeColor`, external, unread here -- see `Obj86B60__func_8003CB30`), so
 it is not established as a "fade" tick either; transitions to state 8
-instead of 5 on completion. Kept tier C for the same reason as `func_8003CB30`.
+instead of 5 on completion. Kept tier C for the same reason as `Obj86B60__func_8003CB30`.
