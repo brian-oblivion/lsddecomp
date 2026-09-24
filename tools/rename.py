@@ -23,7 +23,8 @@ WHAT IT DOES, in order:
   3. rewrites the symbols file (replaces OLD's line, or appends a line for a
      placeholder that had none) and every whole-word OLD in src/, include/,
      the report files and the live docs -- NOT docs/PROGRESS.md and NOT
-     docs/archive/, which are narrative frozen at the time of writing;
+     docs/archive/, which are narrative frozen at the time of writing, and NOT
+     the rule docs (RULE_DOCS), whose mentions are listed instead;
   4. renames docs/match-reports/OLD.md to NEW.md and prepends a note so the
      old name stays greppable;
   5. `make extract` (asm/ is generated from the symbols file), then
@@ -70,7 +71,15 @@ def text_files():
     # (found by runner charlie, round 50). docs/archive/ is frozen for the
     # same reason and is not in the globs above.
     out = [p for p in out if p.name != "PROGRESS.md"]
+    # RULE docs are not rewritten either (rounds 74, 75): their examples show a
+    # FORM, and a rename turned the tier-C placeholder example into a tier-A
+    # name. main() lists their mentions of OLD for the head to judge.
+    out = [p for p in out if p.relative_to(ROOT).as_posix() not in RULE_DOCS]
     return sorted(set(out))
+
+
+RULE_DOCS = {"CLAUDE.md", "docs/FINISHING-PLAN.md", "docs/PARALLEL-RUNS.md",
+             "docs/MATCHING-GUIDE.md", "docs/SDK-OBJECTS-GUIDE.md", "docs/SDK-OBJECTS-RUNS.md"}
 
 
 def symbol_address(name):
@@ -153,6 +162,39 @@ def is_text_symbol(name, addr):
     return None
 
 
+def sony_data_owner(addr):
+    """(pin_name, pin_addr, size) when `addr` is a Sony variable that
+    config/psyq-objects.ld pins, or lies inside one; else None. Sizes come from
+    the defining objects on the SDK discs (sdk/work/*/elf); a pin whose size no
+    object gives covers its own address only. Round 75 named 24 libsnd
+    variables in game words, five of them offsets inside `_svm_cur`."""
+    ld = ROOT / "config/psyq-objects.ld"
+    if not ld.exists():
+        return None
+    pins = {}
+    for m in re.finditer(r"^(\w+) = (0x[0-9A-Fa-f]{8});", ld.read_text(), re.M):
+        pins.setdefault(int(m.group(2), 16), m.group(1))
+    if addr in pins:
+        return pins[addr], addr, 0
+    near = [(a, n) for a, n in pins.items() if a < addr <= a + 0x2000]
+    if not near:
+        return None
+    nm = ROOT / "tools/binutils/bin/mipsel-linux-gnu-nm"
+    names = {n for _, n in near}
+    sizes = {}
+    for o in (ROOT / "sdk/work").glob("*/elf/**/*.o"):
+        out = subprocess.run([str(nm), "-S", "--defined-only", str(o)],
+                             capture_output=True, text=True).stdout
+        for line in out.splitlines():
+            parts = line.split()
+            if len(parts) == 4 and parts[3] in names:
+                sizes[parts[3]] = max(sizes.get(parts[3], 0), int(parts[1], 16))
+    for a, n in sorted(near, reverse=True):
+        if addr < a + sizes.get(n, 0):
+            return n, a, sizes[n]
+    return None
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("old")
@@ -176,6 +218,13 @@ def main():
         sys.exit(f"FATAL: {old!r} is neither a placeholder nor in {SYMBOLS.name}")
     if not (VRAM_LO <= addr < VRAM_HI):
         sys.exit(f"FATAL: {old!r} resolves to {addr:#x}, outside the image")
+    owner = sony_data_owner(addr)
+    if owner and not (owner[1] == addr and new == owner[0]):
+        pin, pa, size = owner
+        where = "is" if pa == addr else f"lies at +{addr - pa:#x} inside"
+        sys.exit(f"FATAL: {addr:#x} {where} Sony's `{pin}` ({pa:#x}, {size:#x} bytes, pinned in "
+                 f"config/psyq-objects.ld). Sony data keeps Sony's name (FINISHING-PLAN track 3); "
+                 f"the only rename allowed here is to `{pin}` itself.")
 
     code_hits, prose_hits = name_in_use(new)
     # A code hit is a COLLISION only if NEW is a symbol (symbols entry, asm
@@ -221,6 +270,12 @@ def main():
         print(f"  report: {report_old.relative_to(ROOT)} -> {report_new.name}")
     if not touched and symline is None and not report_old.exists():
         sys.exit("FATAL: nothing references the old name; is it spelled right?")
+    for rel in sorted(RULE_DOCS):
+        rp = ROOT / rel
+        if rp.exists():
+            for i, line in enumerate(rp.read_text(errors="replace").split("\n"), 1):
+                if pat.search(line):
+                    print(f"  rule doc, NOT rewritten: {rel}:{i} mentions {old}; update by hand only if it is a reference, never an example")
     if a.dry_run:
         return
 

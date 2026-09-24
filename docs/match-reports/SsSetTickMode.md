@@ -23,15 +23,15 @@ description:
    `gSeqTimerModeFlag`: if `a0 & 0x1000`, `gSeqTimerModeFlag = 1` and `gSeqTimerRateMode = a0 &
    0xFFF`; else `gSeqTimerModeFlag = 0` and `gSeqTimerRateMode = a0` (the raw value).
 2. Reloads `cmd = gSeqTimerRateMode` and dispatches:
-   - `cmd >= 6` (signed): `gSeqTickRate = cmd` (raw passthrough).
-   - `cmd < 0` (falls out of the unsigned `cmd < 6` recheck): `gSeqTickRate
+   - `cmd >= 6` (signed): `VBLANK_MINUS = cmd` (raw passthrough).
+   - `cmd < 0` (falls out of the unsigned `cmd < 6` recheck): `VBLANK_MINUS
      = 0x3c`.
    - `0 <= cmd < 6`: a genuine `switch` over `jtbl_80010CD8` (6 dense
-     cases), each setting `gSeqTickRate` to a per-case tempo/rate constant,
+     cases), each setting `VBLANK_MINUS` to a per-case tempo/rate constant,
      and cases 1 and 4 additionally rewriting `gSeqTimerRateMode` based on
      `gVideoMode` (a play-state flag: 0/1/other).
 
-| case | gSeqTickRate | gSeqTimerRateMode side effect |
+| case | VBLANK_MINUS | gSeqTimerRateMode side effect |
 | --- | --- | --- |
 | 0 | `(gVideoMode==1) ? 0x32 : 0x3c` | none |
 | 1 | `0x3c` (always) | `(gVideoMode==0) ? 5 : 0x3c` |
@@ -73,11 +73,11 @@ was **half right and half wrong**:
 
   ```c
   if (cmd >= 6) {
-      gSeqTickRate = cmd;
+      VBLANK_MINUS = cmd;
       return;
   }
   if ((u32)cmd >= 6) {
-      gSeqTickRate = 0x3c;
+      VBLANK_MINUS = 0x3c;
       return;
   }
   switch (cmd) { ... }
@@ -88,7 +88,7 @@ was **half right and half wrong**:
   (fallthrough) immediately after the test, and reaches `rest` via a
   branch-away when the test is false. Retail's actual layout is the
   **opposite polarity**: the test's fallthrough (not-taken) case continues
-  inline into the next check, and the `gSeqTickRate = cmd; ` passthrough
+  inline into the next check, and the `VBLANK_MINUS = cmd; ` passthrough
   store is placed at the very END of the function (`.L800326F8`,
   immediately before the shared epilogue), reached only via a
   branch-when-true. Reading `asm-differ`'s realigned output made this
@@ -106,15 +106,15 @@ if (cmd < 6) {
         /* ... six cases, unchanged from round 23 ... */
         }
     } else {
-        gSeqTickRate = 0x3c;
+        VBLANK_MINUS = 0x3c;
         return;
     }
 }
-gSeqTickRate = cmd;
+VBLANK_MINUS = cmd;
 ```
 
 This reproduces retail's layout exactly: the passthrough store
-(`gSeqTickRate = cmd;`) is now the code that FOLLOWS the whole `if` block in
+(`VBLANK_MINUS = cmd;`) is now the code that FOLLOWS the whole `if` block in
 source order, so GCC places it physically at the end of the function
 (reached by branch-when-`cmd>=6`, i.e. exactly `.L800326F8`) instead of
 inline. The `(u32)cmd >= 6` case's `0x3c` store also moved from an early
@@ -226,7 +226,7 @@ Round 69 (delta), track 3 pass on `code_179d8_c_b`.
 | `gSeqTimerRateMode` (was `D_8006DCA4`) | B | the "cmd" this function derives from its argument and `_SsStart` (the timer-arming stall) dispatches on for its own device-tag/rate selection -- see that report. |
 | `gSeqTimerModeFlag` (was `D_8006DCA8`) | B | the flag bit (`a0 & 0x1000`) extracted alongside the rate mode; `_SsStart`'s `default:` arm returns immediately without touching the timer when this is set, so it gates whether the computed-rate path runs at all. |
 | `gVideoMode` (was `D_8006DC98`) | A | assigned directly from Psy-Q's `GetVideoMode()` in `_SsInit` (sibling unit `code_179d8_c.c`, its own match report). This function only reads it, to choose between the two named tick rates. |
-| `gSeqTickRate` (was `D_8009024C`) | B | `src/code_179d8_k.c` (a different, uninvolved unit) independently reads this same global and comments it as "a tick-rate/PPQN-style constant" used in a MIDI Set-Tempo scheduling formula (`GetMetaEvent`/`SetTempo`-style handler) -- two unrelated units converging on the same reading. This function is the one that WRITES it, from the 6-way rate table below. |
+| `VBLANK_MINUS` (was `D_8009024C`) | B | `src/code_179d8_k.c` (a different, uninvolved unit) independently reads this same global and comments it as "a tick-rate/PPQN-style constant" used in a MIDI Set-Tempo scheduling formula (`GetMetaEvent`/`SetTempo`-style handler) -- two unrelated units converging on the same reading. This function is the one that WRITES it, from the 6-way rate table below. |
 | `SEQ_TICKRATE_50`/`_60`/`_120`/`_240` (magic constants `0x32`/`0x3c`/`0x78`/`0xf0`) | B | named by value only (the numbers themselves), not by an NTSC/PAL region claim -- `gVideoMode` (0/1) does select between the 50 and 60 values in three of the six cases, which is suggestive, but this file has no direct evidence pinning which region is which value. |
 
 See `_SsStart.md` for the globals `gSeqTimerId`/`gSeqTimerRateFlag`/

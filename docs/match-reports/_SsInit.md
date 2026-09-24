@@ -29,7 +29,7 @@ into (see those reports). Calls `func_80024D10(arg0)`, then
 4. Zeroes the first `0x40` bytes of each of 32 `D_80090368` entries
    (stride `0x40`, confirmed by the pointer increment).
 5. Initializes the whole sound-system global block this unit has been
-   working all round: `gSeqTickRate=0x3C`, `D_8008EA00=0`, `gSeqTimerStopPending=0`,
+   working all round: `VBLANK_MINUS=0x3C`, `D_8008EA00=0`, `gSeqTimerStopPending=0`,
    `gSeqTimerId=-1`, `gSeqTimerRateFlag=0`, `gSeqTimerChainedCallback=NULL`,
    `gVideoMode=func_8002551C()`, `D_8008E934=0`. Every one of these
    globals is already established from `_SsSeqCalledTbyT_1per2`, `_SsTrapIntrVSync`
@@ -47,7 +47,7 @@ extern void SpuVmInit(s32 arg0);
 extern s32 func_8002551C(void);
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
-extern s32 gSeqTickRate;
+extern s32 VBLANK_MINUS;
 extern s32 D_8008EA00;
 extern s32 gSeqTimerStopPending;
 extern s32 gSeqTimerId;
@@ -106,7 +106,7 @@ void _SsInit(s32 arg0)
         }
     }
 
-    gSeqTickRate = 0x3C;
+    VBLANK_MINUS = 0x3C;
     D_8008EA00 = 0;
     gSeqTimerStopPending = 0;
     gSeqTimerId = -1;

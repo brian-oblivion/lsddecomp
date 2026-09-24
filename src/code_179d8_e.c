@@ -185,10 +185,12 @@ struct VabStreamObj {
  * declared LOCAL to this unit, per-call-site typed, since none of them have
  * an established prototype anywhere yet. */
 extern void *BMemPMgrAlloc(s32 size);
-extern s16 SsUtKeyOn(s16 a0, s16 hi, s16 lo, s16 a3, s32 b5, s32 argA, s32 argB);
-extern void SsUtAutoVol(s16 a0, s16 a1, s16 a2, s32 a3);
-extern void SsUtKeyOffV(s16 index);
-extern void SsUtAllKeyOff(s32 arg0);
+/* Sony libsnd, prototypes copied from LIBSND.H (plan revision 15; round 74
+ * found the SsUtKeyOn and SsUtAllKeyOff lines disagreeing with it). */
+extern s16 SsUtKeyOn(s16 vabId, s16 prog, s16 tone, s16 note, s16 fine, s16 voll, s16 volr);
+extern s16 SsUtAutoVol(s16 vc, s16 start_vol, s16 end_vol, s16 delta_time);
+extern s16 SsUtKeyOffV(s16 voice);
+extern void SsUtAllKeyOff(s16 mode);
 /* Sony's `SsVabTransCompleted` (`libsnd/vs_vtc`) and `SsSetMute`
  * (`libsnd/scsmute`), linked from the SDK objects since round 34.  The two
  * signatures are this call site's own reading and disagree with the sibling

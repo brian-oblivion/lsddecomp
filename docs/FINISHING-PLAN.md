@@ -19,9 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 14 (2026-09-24, after rounds 71 to 73: shape leads join the
-function-grain library set, a second revisit once the first ones run out,
-the premium role replaces "Fable", the default runner cap is five).
+Plan revision: 15 (2026-09-24, after rounds 74 and 75: `plan.py` defers
+jobs that would rename each other's files, rule docs are out of
+`rename.py`'s reach, Sony data keeps Sony's names, REVISIT-2 is track 1's
+last pass).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -78,7 +79,9 @@ that takes turns across every open track (fresh matches, naming, a stall
 runner, the SDK batch, revisits, promotions, types, close-out), and the head
 fills its runner slots from the top, one unit per runner. A round with two
 slots therefore always carries one naming pass and one stall runner; a
-priority-sorted list starved every track but naming for two rounds. Every
+priority-sorted list starved every track but naming for two rounds. A job a
+renaming job above it would rewrite (call-graph contention) is listed as
+DEFERRED instead, with the reason; staff it once that job merges. Every
 track has a stop or park rule so that "hard" becomes "parked with a written
 reason" rather than another round.
 
@@ -134,7 +137,8 @@ to 52 re-ranked the queue on markers nobody had retired.
 **Revisit rule.** Every stall gets ONE revisit, and a second once every stall
 has had its first (revision 14: revisits paid 40/60 against the band's 1/13,
 so the re-read, not the band, is what track 1 now is; `plan.py` labels those
-jobs `REVISIT-2`). A revisit is a fresh Opus re-read
+jobs `REVISIT-2`). REVISIT-2 is the LAST pass: with neither pass left and no
+fresh ground, `plan.py` marks track 1 done (revision 15). A revisit is a fresh Opus re-read
 in cost order, with the preserved body rebuilt first so `funcdiff.py`'s
 `insertions / deletions` line is recorded before anything else. Read it as
 a pointer, not a verdict: a title claiming register identity with a nonzero
@@ -170,13 +174,13 @@ matching projects do; the default build never sees the body.
 ```c
 #ifdef NON_MATCHING
 /* NON_MATCHING: 252/258 words, length exact. Residue: register identity in
- * the second loop (docs/match-reports/Class65650__ApplyTodPacket.md). Hand-derived. */
-void Class65650__ApplyTodPacket(Foo *this, s32 arg1)
+ * the second loop (docs/match-reports/Foo__Example.md). Hand-derived. */
+void Foo__Example(Foo *this, s32 arg1)
 {
     ...
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", Class65650__ApplyTodPacket);
+INCLUDE_ASM("asm/nonmatchings/<unit>", Foo__Example);
 #endif
 ```
 
@@ -227,7 +231,8 @@ The generated file also carries LEAD lines: no exact fingerprint, but shape
 >= 0.90 at >= 40 words, the cliff below which only unrelated stubs score
 (revision 14; every lead above it was libsnd). A lead counts as library until
 the runner either identifies it (comment line with `identified`, rename; any
-Sony name the evidence settles on closes it) or rejects it with a
+Sony name the evidence settles on closes it; `Rename pending` in that comment
+lists it for track 2 until the rename drops the words) or rejects it with a
 `// not SDK: <reason>` comment line above its symbols entry.
 
 **The tool:** `.venv/bin/python3 tools/sdkname.py <func>...` (or `--all`)
@@ -336,8 +341,9 @@ propagates everywhere.
   mechanics ARE its purpose (a getter, a clamp, a list push) is tier A by
   definition; B, mechanics described but purpose in the game not established;
   C, placeholder kept, with what IS known written down. The tier-C form for a
-  method whose CLASS is known is `Class__func_xxxxx` (the existing
-  `BasicClass__func_18350` convention), and bare `func_800xxxxx` otherwise;
+  method whose CLASS is known is `Class__func_xxxxx` (e.g. `Foo__func_12345`;
+  examples here are synthetic so `rename.py` can never rewrite them), and bare
+  `func_800xxxxx` otherwise;
   `plan.py` counts both as unnamed. A wrong tier-A name is worse than a
   placeholder. A tier-B name is expected to be sharpened later; renames are
   cheap now.
@@ -349,8 +355,11 @@ propagates everywhere.
   the method they dispatch to. Do not invent a new style.
 - **Every inherited name (FirecatFG's, `CREDITS.md`) is a tier-B hypothesis.**
   Confirm it with evidence or rename it; either way, record it.
-- **Do not rename a Sony symbol**, and give no game name to a function
-  `progress.py` counts as library: both are track 2's.
+- **Do not rename a Sony symbol, and give no game name to anything Sony
+  owns**: a function `progress.py` counts as library, a variable
+  `psyq-objects.ld` pins or an address inside one (`rename.py` refuses both),
+  or a field of a struct only Sony functions read (round 75: 24 libsnd
+  variables). All are track 2's.
 
 **Head at merge.** Apply the runner's proposed cross-unit field names one at
 a time by type scope (definition first, compiler lists the accessors, fix

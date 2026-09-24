@@ -47,9 +47,9 @@
 extern s32 gSeqTimerModeFlag;
 extern s32 gSeqTimerRateMode;
 extern s32 gVideoMode;
-extern u32 gSeqTickRate;
+extern u32 VBLANK_MINUS;
 
-/* gSeqTickRate values SsSetTickMode's rate table selects between.
+/* VBLANK_MINUS values SsSetTickMode's rate table selects between.
  * gVideoMode (Psy-Q `GetVideoMode`) is 0/1, and cases 0/4/5 pick between
  * SEQ_TICKRATE_50/SEQ_TICKRATE_60 by it -- named by value only, not by an
  * NTSC/PAL claim this file has no direct evidence for. */
@@ -76,7 +76,7 @@ void SsSetTickMode(s32 a0)
         if ((u32)cmd < 6) {
             switch (cmd) {
             case 4:
-                gSeqTickRate = SEQ_TICKRATE_50;
+                VBLANK_MINUS = SEQ_TICKRATE_50;
                 if (gVideoMode == 1) {
                     gSeqTimerRateMode = 5;
                 } else {
@@ -84,7 +84,7 @@ void SsSetTickMode(s32 a0)
                 }
                 return;
             case 1:
-                gSeqTickRate = SEQ_TICKRATE_60;
+                VBLANK_MINUS = SEQ_TICKRATE_60;
                 if (gVideoMode == 0) {
                     gSeqTimerRateMode = 5;
                 } else {
@@ -92,36 +92,36 @@ void SsSetTickMode(s32 a0)
                 }
                 return;
             case 3:
-                gSeqTickRate = SEQ_TICKRATE_120;
+                VBLANK_MINUS = SEQ_TICKRATE_120;
                 return;
             case 2:
-                gSeqTickRate = SEQ_TICKRATE_240;
+                VBLANK_MINUS = SEQ_TICKRATE_240;
                 return;
             case 5:
                 if (gVideoMode == 0) {
-                    gSeqTickRate = SEQ_TICKRATE_60;
+                    VBLANK_MINUS = SEQ_TICKRATE_60;
                 } else if (gVideoMode == 1) {
-                    gSeqTickRate = SEQ_TICKRATE_50;
+                    VBLANK_MINUS = SEQ_TICKRATE_50;
                 } else {
-                    gSeqTickRate = SEQ_TICKRATE_60;
+                    VBLANK_MINUS = SEQ_TICKRATE_60;
                 }
                 return;
             case 0:
                 if (gVideoMode == 0) {
-                    gSeqTickRate = SEQ_TICKRATE_60;
+                    VBLANK_MINUS = SEQ_TICKRATE_60;
                 } else if (gVideoMode == 1) {
-                    gSeqTickRate = SEQ_TICKRATE_50;
+                    VBLANK_MINUS = SEQ_TICKRATE_50;
                 } else {
-                    gSeqTickRate = SEQ_TICKRATE_60;
+                    VBLANK_MINUS = SEQ_TICKRATE_60;
                 }
                 return;
             }
         } else {
-            gSeqTickRate = SEQ_TICKRATE_60;
+            VBLANK_MINUS = SEQ_TICKRATE_60;
             return;
         }
     }
-    gSeqTickRate = cmd;
+    VBLANK_MINUS = cmd;
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_c_b", _SsStart);

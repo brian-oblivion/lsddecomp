@@ -535,5 +535,5 @@ Round 69 (delta), track 3 pass on `code_179d8_c_b`.
 | `gSeqTimerStopPending` (was `D_8006DC8C`) | B | when set, this function's shared tail skips arming entirely and instead tears down via `VSyncCallback(SsSeqCalledTbyT)`; `SsEnd` is the other place that reads/clears it, calling `VSyncCallback(0)` first. Named for what it gates (a pending stop/teardown), not for a specific caller's intent. |
 | `gSeqTimerChainedCallback` (was `D_8006DC9C`) | B | captured from `InterruptCallback(0, NULL)`'s return value (the previously-installed handler) right before this function installs `_SsTrapIntrVSync` as the new one; `_SsTrapIntrVSync` calls it first, then always calls `SsSeqCalledTbyT` -- the classic "save old handler, chain to it" ISR-hook idiom. |
 
-`gSeqTimerRateMode`/`gSeqTimerModeFlag`/`gVideoMode`/`gSeqTickRate` are
+`gSeqTimerRateMode`/`gSeqTimerModeFlag`/`gVideoMode`/`VBLANK_MINUS` are
 established in `SsSetTickMode.md`; this function only reads the first two.

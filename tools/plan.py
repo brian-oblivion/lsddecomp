@@ -275,6 +275,16 @@ def sdk_surface(info, units):
                 named.append(name)
         elif name not in closed and name not in unnamed:
             unnamed.append(name)
+    # An `identified` entry whose comment still says the rename is PENDING
+    # (StartNote is SpuVmKeyOn, recorded by the plan session in revision 15):
+    # the name the evidence settled on is in the comment, not in a table.
+    for a, c in sorted(cmts.items()):
+        if progress.IDENTIFIED_RE.search(c) and re.search(r"(?i)\b(rename|name) pending\b", c):
+            name = by_addr.get(a)
+            if name and name not in unnamed:
+                unnamed.append(name)
+                if name in named:
+                    named.remove(name)
     return named, unnamed, parked
 
 
@@ -457,6 +467,11 @@ def collect(st):
     if not revisit:
         revisit = [r for r in stall_rows if revisits_done(r[2]) == 1]
         revisit_label = "REVISIT-2"
+    # Revision 15: REVISIT-2 is the LAST pass. With neither pass left and no
+    # fresh ground, track 1 is done; what remains is track 1b's.
+    if not revisit and not fresh_funcs and t1_status == "parked":
+        t1_status, t1_reason = "done", ("every stall has had its two revisits; the rest get "
+                                        "NON_MATCHING bodies or a written reason (track 1b)")
     # A function eligible for a revisit is offered ONLY there, so the two
     # track-1 queues never hand the same function to two runners.
     rv = {f for _, _, f, _ in revisit}
@@ -609,12 +624,75 @@ def jobs(d, n):
     q_close = [("5", f"{k}: {TRACK5_ITEMS[k]}", "opus")
                for k, done in t["5"]["checklist"].items() if not done] if t["5"]["status"] == "open" else []
     queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close]
-    out = []
-    while len(out) < n and any(queues):
+    order = []
+    while any(queues):
         for q in queues:
-            if q and len(out) < n:
-                out.append(q.pop(0))
-    return out
+            if q:
+                order.append(q.pop(0))
+    return select_jobs(d, order, n)
+
+
+RENAMES = ("naming pass on", "identify and name", "extern review")
+JOB_UNIT_RES = (r"naming pass on (\w+)", r"runner on (\w+):", r"in (\w+) to #ifdef", r"match \w+ \((\w+),")
+
+
+def job_units(d, desc):
+    """The units a job's runner edits: its one unit, or for the track-2 batch
+    every unit holding one of the listed functions."""
+    for rx in JOB_UNIT_RES:
+        m = re.search(rx, desc)
+        if m:
+            return {m.group(1)}
+    if desc.startswith("identify and name"):
+        want = set(d["tracks"]["2"]["unnamed_list"])
+        us = set()
+        for c in srcpath.src_files():
+            t = c.read_text(errors="replace")
+            if any(re.search(rf"\b{re.escape(f)}\b", t) for f in want):
+                us.add(c.stem)
+        return us
+    return set()
+
+
+def select_jobs(d, order, n):
+    """Take jobs in round-robin order, DEFERRING one whose units a renaming job
+    already taken would rewrite (or that would rewrite a taken job's units):
+    call-graph contention, headercontention.py's test. Rounds 73 to 75 each
+    skipped two or three top jobs by hand for exactly this (plan revision 15).
+    Returns the first n kept; d["_deferred"] gets (job, reason) for the rest
+    that collided before n were kept."""
+    import headercontention
+    taken, deferred = [], []
+    pair_cache = {}
+
+    def rewrites(ua, ub):
+        """Does a RENAME in units ua rewrite a file in units ub?"""
+        key = (frozenset(ua), frozenset(ub))
+        if key not in pair_cache:
+            us = sorted(ua | ub)
+            hits = headercontention.call_contention(us) if len(us) > 1 else []
+            pair_cache[key] = any(a in ua and b in ub for a, b, _ in hits)
+        return pair_cache[key]
+
+    for job in order:
+        if len(taken) >= n:
+            break
+        units = job_units(d, job[1])
+        reason = None
+        for i, (tj, tu) in enumerate(taken, 1):
+            if units & tu:
+                reason = f"same unit as #{i}"
+            elif units and tu and ((job[1].startswith(RENAMES) and rewrites(units, tu))
+                                   or (tj[1].startswith(RENAMES) and rewrites(tu, units))):
+                reason = f"call-graph contention with #{i} (a rename in one rewrites the other)"
+            if reason:
+                break
+        if reason:
+            deferred.append((job, reason))
+        else:
+            taken.append((job, units))
+    d["_deferred"] = deferred
+    return [j for j, _ in taken]
 
 
 def print_status(d, n, st):
@@ -660,8 +738,12 @@ def print_status(d, n, st):
         print()
     print(f"  READY JOBS (top {n}; head fills the operator's runner cap from the top, 5 if none is stated,"
           f" never more than 5; one unit per runner):")
-    for track, desc, model in jobs(d, n):
-        print(f"    [{track:<2}] {model:<7} {desc}")
+    for i, (track, desc, model) in enumerate(jobs(d, n), 1):
+        print(f"    {i:>2}. [{track:<2}] {model:<7} {desc}")
+    if d.get("_deferred"):
+        print("  DEFERRED (would collide with a job above; staff after that one merges, or in a later slot):")
+        for (track, desc, model), why in d["_deferred"]:
+            print(f"        [{track:<2}] {model:<7} {desc[:90]}{'...' if len(desc) > 90 else ''}  <- {why}")
     review = [u for u in d["_todo3"] if not any(d["units"][u][k] for k in
               ("func_named", "unk_refs", "slot_refs", "d_refs"))]
     if review:

@@ -3408,6 +3408,43 @@ Taken with the salt the operator asked for: every escalation above held when
 measured; none was noise. Round 71's cap mismatch is moot under the new
 default.
 
+**Revision 15 (2026-09-24, after rounds 74 and 75).** Nine escalations
+across the two reports. All held when measured.
+- `rename.py` still rewrote rule text. Revision 14 only protected lines that
+  already named NEW, so `BasicClass__func_17eb0 -> BasicClass__Release` turned
+  the tier-C example into a tier-A name, and round 75 renamed the 1b shape
+  example. Now the rule docs (CLAUDE.md, FINISHING-PLAN, PARALLEL-RUNS,
+  MATCHING-GUIDE, both SDK docs) are not rewritten at all. `rename.py` lists
+  their mentions for the head, and both examples are synthetic (`Foo__Example`,
+  `Foo__func_12345`), so no rename can reach them.
+- Sony data. `rename.py` refuses an address that `psyq-objects.ld` pins unless
+  the new name is the pin's, and it refuses an address inside a pinned
+  variable. Sizes come from the defining objects on the discs, so
+  `_svm_cur+4` is refused. Track 3's rule sentence now covers pinned
+  variables and fields only Sony reads. One outstanding case was found and
+  fixed: `gSeqTickRate` (round 69) is libsnd's `VBLANK_MINUS`, renamed back,
+  image byte-identical.
+- Job collisions. `plan.py` walks its round-robin order and DEFERS a job when
+  a renaming job already taken (naming, track 2, extern review) would rewrite
+  its unit, or when it would rewrite a taken job's. That is the directional
+  `call_contention` test, and the deferral is printed with its reason. A first
+  symmetric version deferred five naming jobs behind a revisit in
+  `code_8220_b`, whose functions they merely call; the directional one does
+  not.
+- `StartNote` is recorded as `identified` (SpuVmKeyOn: shape 0.76/0.75 on two
+  discs, vmanager position, round 73's call order), so it left the REVISIT-2
+  queue. A `Rename pending` phrase in an `identified` comment now lists a
+  game-named Sony function for track 2.
+- The SDK prototypes. `code_179d8_e.c`'s `SsUtKeyOn`, `SsUtAutoVol`,
+  `SsUtKeyOffV` and `SsUtAllKeyOff` externs now copy LIBSND.H, image
+  byte-exact. `SsUtAllKeyOff`'s header parameter is dead in retail, since the
+  body overwrites `$a0` first, so the call site passing one is right and its
+  preserved `(void)` body is left alone.
+- Track 1: REVISIT-2 is the last pass. With neither pass left and no fresh
+  ground, `plan.py` marks the track done, and the remaining stalls are 1b's.
+- Round 75's point that the `SsUtKeyOn` extern is byte-invisible is right;
+  it changed no bytes here either.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).
