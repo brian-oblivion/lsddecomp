@@ -22,7 +22,7 @@ own logic is independent).
 void Unk18Obj__DeinitOt(Unk18Obj *self) {
     if (self->unk70 != 0) {
         DrawSync(0);
-        func_80017CFC((void *)self->unk78);
+        BMemPMgrFree((void *)self->unk78);
         self->unk70 = 0;
     }
 }

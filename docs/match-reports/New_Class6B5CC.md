@@ -21,14 +21,14 @@ instance.
 Class6B5CCObj *New_Class6B5CC(void) {
     Class6B5CCObj *obj;
 
-    obj = func_80017B34(0x44);
+    obj = BMemPMgrAlloc(0x44);
     if (obj == NULL) {
         return NULL;
     }
     if (GetClass6B5CCMethods()->ctor(obj) != NULL) {
         return obj;
     }
-    func_80017CFC(obj);
+    BMemPMgrFree(obj);
     return NULL;
 }
 ```

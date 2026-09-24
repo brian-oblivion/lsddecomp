@@ -6,7 +6,7 @@
 
 ## What it does
 
-Allocates a 0x24-byte doubly-linked-list node (`func_80017B34(0x24)`) and
+Allocates a 0x24-byte doubly-linked-list node (`BMemPMgrAlloc(0x24)`) and
 appends it to the tail of the list rooted at `gCdRequestQueue`. New-node fields
 at offset 0x0 and 0x4 are zeroed; 0x1C/0x20 are the prev/next links. If the
 list is empty, the new node simply becomes the head; otherwise the function
@@ -33,7 +33,7 @@ Node8008A894 *AllocCdRequestNode(void)
     Node8008A894 *cur;
 
     LockCd();
-    node = func_80017B34(0x24);
+    node = BMemPMgrAlloc(0x24);
     if (node != NULL) {
         head = gCdRequestQueue;
         node->prev = NULL;
@@ -74,7 +74,7 @@ UnlockCd(void);` rather than sharing a header with the adjacent unit.
 
 ## Naming
 
-**Tier A.** Allocates a 0x24-byte queue node (`func_80017B34(0x24)`) and
+**Tier A.** Allocates a 0x24-byte queue node (`BMemPMgrAlloc(0x24)`) and
 appends it to the tail of `gCdRequestQueue`, clearing `active` (offset 0x00)
 and `unk4` (offset 0x04). Named for exactly this mechanics -- a pure
 alloc+link leaf, tier A by the "mechanics ARE its purpose" rule. Corroborated

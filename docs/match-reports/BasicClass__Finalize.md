@@ -1,4 +1,6 @@
-# BasicClass__func_17f2c
+# BasicClass__Finalize
+
+> Renamed from `BasicClass__func_17f2c` on 2026-09-24 (tools/rename.py). Address 0x80017f2c.
 
 **Unit:** code_8220 · **Size:** 27 instructions · **Status:** MATCHED (27/27 words)
 
@@ -7,7 +9,7 @@ class's overall design.
 
 ## What it does
 
-The base "finalize" hook, called by `BasicClass__func_17eb0` (`release`,
+The base "finalize" hook, called by `BasicClass__Release` (`release`,
 slot `+0x004`) before it frees `self`. Dispatches three further virtual
 calls through `self->methods`, all THIS class's own slots, in address
 order:
@@ -17,17 +19,17 @@ order:
   (`code_8220_b`), so its own behaviour is unconfirmed here; only that this
   function calls it with a literal `1` second argument.
 - `+0x018` (`removeAllChildren`, `self`) — this unit's own
-  `BasicClass__func_18040` (own report): walks and detaches every entry in
+  `BasicClass__RemoveAllChildren` (own report): walks and detaches every entry in
   `children`.
 - `+0x028` (`clearParentRefs`, `self`) — this unit's own
-  `BasicClass__func_1813c` (still `INCLUDE_ASM` this round, but its
+  `BasicClass__ClearParentRefs` (still `INCLUDE_ASM` this round, but its
   extern prototype and behaviour are already established from its own
   disassembly): frees every node in `parentRefs` and nulls the list head.
 
 ## The C
 
 ```c
-void BasicClass__func_17f2c(BasicClass *self)
+void BasicClass__Finalize(BasicClass *self)
 {
     self->methods->notifyParents(self, 1);
     self->methods->removeAllChildren(self);
@@ -55,3 +57,9 @@ caching `self->methods` first and then have to undo it.
 ## Provenance
 
 round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve).
+
+## Naming (round 74)
+
+`BasicClass__Finalize`, **tier A**: matches vtable slot `+0x00C`
+(`finalize`), already documented in `code_8220.h`'s `BasicClassMethods`
+comment. Called by `BasicClass__Release` before freeing `self`.

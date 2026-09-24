@@ -1,4 +1,6 @@
-# BasicClass__func_18040
+# BasicClass__RemoveAllChildren
+
+> Renamed from `BasicClass__func_18040` on 2026-09-24 (tools/rename.py). Address 0x80018040.
 
 **Unit:** code_8220 · **Size:** 31 instructions · **Status:** MATCHED (31/31 words)
 
@@ -11,7 +13,7 @@ winning shape is non-obvious and generalizes.
 
 Iterates `self->children` via `GetNextBasicClass` (still `asm/code_8220_b.s`,
 not yet carved to C — see signature below), calling `removeChild` (slot
-`+0x014`, this unit's `BasicClass__func_17ff0`) on each extracted child
+`+0x014`, this unit's `BasicClass__RemoveChild`) on each extracted child
 until the list is exhausted.
 
 ## `GetNextBasicClass`'s signature, established here
@@ -19,17 +21,17 @@ until the list is exhausted.
 `GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor)`,
 `void`. Pop-and-advance: reads `node = *cursor`; if null, `*outValue = 0`;
 else `*outValue = node->value`, `*cursor = node->next`. Does NOT free the
-popped node (that's `removeChild`'s/`func_80018208`'s job, which is called
+popped node (that's `removeChild`'s/`RemoveBasicClassListNode`'s job, which is called
 separately on each extracted value by THIS function's caller-facing use of
 it — `GetNextBasicClass` only walks, it never frees). Also used, identically,
-by the still-`INCLUDE_ASM` `BasicClass__func_180bc`/`BasicClass__func_1816c`
+by the still-`INCLUDE_ASM` `BasicClass__GetNextChild`/`BasicClass__GetNextParentRef`
 ("get next child"/"get next parent ref" iterators) — not derived
 independently here, just cross-checked for a consistent call shape.
 
 ## The final C
 
 ```c
-void BasicClass__func_18040(BasicClass *self)
+void BasicClass__RemoveAllChildren(BasicClass *self)
 {
     BasicClass *child;
     BasicClass **childPtr;
@@ -147,3 +149,10 @@ concrete lever that exposes the merge to the compiler.
 round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). ~14
 build/measure iterations before landing on the final shape; well inside the
 30-attempt budget.
+
+## Naming (round 74)
+
+`BasicClass__RemoveAllChildren`, **tier A**: matches vtable slot `+0x018`
+(`removeAllChildren`), already documented in `code_8220.h`. Iterates
+`self->children` via `GetNextBasicClass`, dispatching `removeChild` on
+each until exhausted.

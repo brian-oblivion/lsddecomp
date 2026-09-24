@@ -4,7 +4,7 @@
 Pad *func_80025B34(void *arg1, s32 port) {
     Pad *self;
 
-    self = func_80017B34(0x20);
+    self = BMemPMgrAlloc(0x20);
     if (self == NULL) {
         goto fail;
     }

@@ -70,7 +70,7 @@ source elsewhere resolved it to 25/25.
 
 ## Proposed learning
 
-See `Class6D430__AllocBuffer.md` for the real finding from this round: `func_80017B34`
+See `Class6D430__AllocBuffer.md` for the real finding from this round: `BMemPMgrAlloc`
 (the allocator) takes **one** argument (`size`), not two. This function's own
 "one word off, call-target only" symptom while a sibling function in the same
 unit had a genuine size bug is a useful diagnostic pattern worth naming: a

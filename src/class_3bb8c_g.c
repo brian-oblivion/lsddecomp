@@ -69,11 +69,11 @@ void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
 
     if ((u32)(arg1 - 0x16) < 2) {
         if (self->secondaryMode == 1 && self->unk38 != NULL) {
-            func_80017CFC(self->unk3C);
+            BMemPMgrFree(self->unk3C);
             for (i = 0; i < self->unk2C; i++) {
-                func_80017CFC(((void **)self->unk38)[i]);
+                BMemPMgrFree(((void **)self->unk38)[i]);
             }
-            func_80017CFC(self->unk38);
+            BMemPMgrFree(self->unk38);
             self->unk38 = NULL;
         }
         self->state = 0;

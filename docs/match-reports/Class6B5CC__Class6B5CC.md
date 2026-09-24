@@ -25,14 +25,14 @@ freshly-added fields, and finally calls its own virtual init hook
 void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     void *blockB;
 
-    self->unk14 = func_80017B34(0x50);
+    self->unk14 = BMemPMgrAlloc(0x50);
     if (self->unk14 == NULL) {
         return NULL;
     }
-    blockB = func_80017B34(0x28);
+    blockB = BMemPMgrAlloc(0x28);
     self->unk14->unk44 = blockB;
     if (blockB == NULL) {
-        func_80017CFC(self->unk14);
+        BMemPMgrFree(self->unk14);
         return NULL;
     }
     Get_vtable_BasicClass()->ctor(self);
@@ -65,12 +65,12 @@ void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
   DECOMPILATION_LEARNINGS.md if a second instance turns up.
 - **Instruction ORDER (store vs. call-argument setup) around a `jal`'s
   delay slot is source-order-sensitive in a way that isn't just "which
-  statement is textually first".** `self->unk14 = func_80017B34(0x50);`
+  statement is textually first".** `self->unk14 = BMemPMgrAlloc(0x50);`
   compiled with the STORE and the FOLLOWING call's `li $a0` juggled by the
   scheduler; the version that matched byte-for-byte was writing the
   allocation call directly into the assignment
-  (`self->unk14 = func_80017B34(0x50);`) rather than staging it through an
-  intermediate local (`blockA = func_80017B34(0x50); ...; self->unk14 =
+  (`self->unk14 = BMemPMgrAlloc(0x50);`) rather than staging it through an
+  intermediate local (`blockA = BMemPMgrAlloc(0x50); ...; self->unk14 =
   blockA;`), even though both are logically identical. Prefer assigning a
   struct-field/global destination directly from the call expression over
   round-tripping it through a temporary, when a residue looks like two

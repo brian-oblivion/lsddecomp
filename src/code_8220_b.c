@@ -34,13 +34,13 @@ void FreeBasicClassList(BasicClassListNode **head)
     while (node != NULL) {
         BasicClassListNode *cur = node;
         node = node->next;
-        func_80017CFC(cur);
+        BMemPMgrFree(cur);
     }
 }
 
 /* BasicClassMethods slot +0x030. Tell every object holding a reference to
  * `self` that `event` happened, by calling each one's own +0x038 slot with
- * `self` as the sender. BasicClass__func_17f2c (finalize, code_8220.c) is
+ * `self` as the sender. BasicClass__Finalize (finalize, code_8220.c) is
  * the only caller in carved C and passes 1. */
 void BasicClass__NotifyParents(BasicClass *self, s32 event)
 {

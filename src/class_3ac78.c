@@ -50,7 +50,7 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
 {
     Class866E8 *self;
 
-    self = func_80017B34(0x1E8);
+    self = BMemPMgrAlloc(0x1E8);
     if (self != NULL) {
         func_8004D244()->ctor(self, arg1, arg2);
         return self;
@@ -74,7 +74,7 @@ extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
 extern s32 func_80020C5C(void);
-extern void func_80017CFC(void *arg1);
+extern void BMemPMgrFree(void *arg1);
 extern Vec3_3ac78 gDefaultOrigin;
 
 void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
@@ -121,7 +121,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         entry->cellParent = New_Class86AA0();
         entry->cellParent->methods->slot4C(entry->cellParent, self, &self->origin);
 
-        entry->cells = (Class866E8 **)func_80017B34(0x668);
+        entry->cells = (Class866E8 **)BMemPMgrAlloc(0x668);
         if (entry->cells == NULL) {
             return;
         }
@@ -197,7 +197,7 @@ void Class866E8__Finalize(Class866E8 *self)
             p += 4;
         }
 
-        func_80017CFC(entry->cells);
+        BMemPMgrFree(entry->cells);
     }
 
     func_800428E4()->dtor(self);

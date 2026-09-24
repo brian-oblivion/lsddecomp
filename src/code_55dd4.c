@@ -10,7 +10,7 @@ void *New_class_65650(void *arg1, void *arg2)
     Class65650 *self;
     Class65650Methods *vt;
 
-    self = (Class65650 *)func_80017B34(0x98);
+    self = (Class65650 *)BMemPMgrAlloc(0x98);
     if (self == NULL) {
         return NULL;
     }
@@ -18,7 +18,7 @@ void *New_class_65650(void *arg1, void *arg2)
     if (vt->ctor(self, arg1, arg2) != NULL) {
         return self;
     }
-    func_80017CFC(self);
+    BMemPMgrFree(self);
     return NULL;
 }
 
@@ -276,11 +276,11 @@ s32 func_80065E1C(Class65650 *self)
     Unk70ElemObj **p;
 
     count = self->unk5C->methods->slot80(self->unk5C, NULL, buf) & 0xFF;
-    self->unk70 = func_80017B34(count * 4);
+    self->unk70 = BMemPMgrAlloc(count * 4);
     if (self->unk70 == NULL) {
         goto alloc_fail;
     }
-    self->unk74 = func_80017B34(count);
+    self->unk74 = BMemPMgrAlloc(count);
     if (self->unk74 == NULL) {
         goto alloc_fail;
     }
@@ -325,8 +325,8 @@ void func_80065F2C(Class65650 *self)
         }
         self->unk68 = 0;
     }
-    self->unk74 = func_80017CFC(self->unk74);
-    self->unk70 = func_80017CFC(self->unk70);
+    self->unk74 = BMemPMgrFree(self->unk74);
+    self->unk70 = BMemPMgrFree(self->unk70);
 }
 
 void func_80065FD8(Class65650 *self)

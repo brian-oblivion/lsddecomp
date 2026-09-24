@@ -1,4 +1,6 @@
-# func_80017AC8 — MATCHED (round 45)
+# SetupBMemPMgrFreeList — MATCHED (round 45)
+
+> Renamed from `func_80017AC8` on 2026-09-24 (tools/rename.py). Address 0x80017ac8.
 
 **Unit:** `code_8220` · **Size:** 27 words · **Status:** MATCHED, 27/27 words, byte-exact.
 
@@ -9,7 +11,7 @@ Filed as `gp_rel`-blocked before round 42; reopened round 42
 
 **One part of the old stub's structural read was wrong, not just its
 verdict**, and it's worth flagging since the same misreading could have
-propagated into `func_80017B34`/`func_80017CFC`'s still-open reports: it
+propagated into `BMemPMgrAlloc`/`BMemPMgrFree`'s still-open reports: it
 said this function "stores `pool` itself (self-pointer) into two places
 at `pool+0x1C+4` and `pool+0x1C+8`". The actual writes to those two words
 are `header->prev = NULL` and `header->next = NULL` (zero, not a
@@ -25,13 +27,13 @@ right shape, wrong two locations.
 ## The function
 
 ```c
-void func_80017AC8(BMemPMgr *pool)
+void SetupBMemPMgrFreeList(BMemPMgr *pool)
 {
     BMemPMgr *mgr;
     BMemBlockHdr *header;
     u8 *end;
 
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -75,7 +77,7 @@ already-matched `BMemPMgrInit`'s `pool->freeListHead = (u8 *)pool + 0x1C;`
 assignment; `void *` still converts implicitly into the local `header`
 variable with no cast needed.
 
-The `pool` argument is genuinely used only as the `D_8008A818 == NULL`
+The `pool` argument is genuinely used only as the `gDefaultBMemPMgr == NULL`
 fallback, confirmed byte-exact — the old report's read of the calling
 convention (one real argument; `$a1`'s "fallback pool" role) was correct
 and needed no revision.
@@ -83,7 +85,7 @@ and needed no revision.
 ## Provenance
 
 round 45 (2026-09-15), runner alpha. `./build-and-verify.sh` green,
-`tools/funcdiff.py func_80017AC8` reports 27/27 words match, one attempt.
+`tools/funcdiff.py SetupBMemPMgrFreeList` reports 27/27 words match, one attempt.
 
 ### Proposed learning
 
@@ -97,3 +99,12 @@ about being "gp_rel-blocked" made that paragraph any less checkable at
 the time it was written — the disassembly was already sitting right
 there. Read the actual instruction operands, not just the report's prose,
 even when a report is otherwise well-sourced.
+
+## Naming (round 74)
+
+`SetupBMemPMgrFreeList`, **tier A**: every write in the body is fully
+derived (round 45 above) -- it seeds `freeListStart`/`freeListEnd` from
+`freeListHead`, marks the whole pool area as one free block, and plants
+the two boundary sentinels used for coalescing. Called only by
+`BMemPMgrInit` (this unit), which is exactly what the name says: the
+free-list half of pool setup.

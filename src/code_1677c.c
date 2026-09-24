@@ -7,7 +7,7 @@
  *
  * The null path deliberately falls off the end rather than returning a
  * value. That is not an oversight in the transcription -- it is what
- * retail does, and it is the ONLY form that matches. `func_80017B34`
+ * retail does, and it is the ONLY form that matches. `BMemPMgrAlloc`
  * already left the null in $v0, so the original source never had to
  * restate it; every spelling that returns explicitly on that path
  * (`return 0`, `return self`, an early return, a goto to a shared exit)
@@ -16,7 +16,7 @@
  * correct about the C -- the bytes are what say the original had it too.
  * See docs/match-reports/new_class_6d3c8.md for the full derivation. */
 Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
-    Class6D3C8 *self = func_80017B34(0x2C);
+    Class6D3C8 *self = BMemPMgrAlloc(0x2C);
 
     if (self != 0) {
         ((Class6D3C8Methods *)GetClass6D3C8Methods())->ctor(self, arg);

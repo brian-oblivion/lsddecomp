@@ -28,7 +28,7 @@ Unk18Obj *New_Unk18Obj(void)
 {
     Unk18Obj *self;
 
-    self = func_80017B34(0xBC);
+    self = BMemPMgrAlloc(0xBC);
     if (self != NULL) {
         GetUnk18ObjMethods()->ctor(self);
         return self;
@@ -54,6 +54,6 @@ first build.
 
 **New_Unk18Obj** (renamed from `func_8003E5D8`, round 55, runner alpha).
 Tier A: standard `New_Class` allocator idiom already established in this
-project (allocate `0xBC` bytes via `func_80017B34`, then invoke the class's
+project (allocate `0xBC` bytes via `BMemPMgrAlloc`, then invoke the class's
 own ctor through its vtable getter) -- matches this unit's own class
 placeholder name `Unk18Obj`.

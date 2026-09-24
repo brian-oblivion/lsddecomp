@@ -13,7 +13,7 @@ call — `$a2` is left live/unset). Then:
 
 - if `arg1 == 6`: possibly refresh `arg2->unk14` through its own base-class
   slot `unk04` (`GenericMethodsHeader::unk04`, the same `BasicClass` slot
-  Class866E8Methods documents as `+0x004`/`BasicClass__func_17eb0`), then
+  Class866E8Methods documents as `+0x004`/`BasicClass__Release`), then
   fall into the shared tail;
 - if `arg1 == 7`: skip straight to the shared tail;
 - any other `arg1`: return immediately, skipping the tail entirely.

@@ -1,10 +1,12 @@
-# func_80018208
+# RemoveBasicClassListNode
+
+> Renamed from `func_80018208` on 2026-09-24 (tools/rename.py). Address 0x80018208.
 
 **Unit:** code_8220 · **Size:** 32 instructions · **Status:** MATCHED (32/32 words)
 
 The `BasicClassListNode` list find-unlink-free primitive, used by both of
-BasicClass's lists (`children` via `BasicClass__func_17ff0`, `parentRefs`
-via `BasicClass__func_1811c`) — see `BasicClass__BasicClass.md` for the
+BasicClass's lists (`children` via `BasicClass__RemoveChild`, `parentRefs`
+via `BasicClass__RemoveParentRef`) — see `BasicClass__BasicClass.md` for the
 class's overall design. Both call sites and this function's `void`
 signature were provisionally established last round while matching those
 two callers (still `INCLUDE_ASM` at the time); this round derives the
@@ -14,13 +16,13 @@ body itself.
 
 Walks `*head` looking for the first node whose `value == value`; if
 found, unlinks it (updating `*head` if it was the list head, or the
-previous node's `next` otherwise) and frees it via `func_80017CFC`. Does
+previous node's `next` otherwise) and frees it via `BMemPMgrFree`. Does
 nothing if no match is found.
 
 ## The C
 
 ```c
-void func_80018208(BasicClassListNode **head, BasicClass *value)
+void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value)
 {
     BasicClassListNode *prev;
     BasicClassListNode *node;
@@ -34,7 +36,7 @@ void func_80018208(BasicClassListNode **head, BasicClass *value)
             } else {
                 *head = node->next;
             }
-            func_80017CFC(node);
+            BMemPMgrFree(node);
             return;
         }
         prev = node;
@@ -43,7 +45,7 @@ void func_80018208(BasicClassListNode **head, BasicClass *value)
 }
 ```
 
-## One branch-polarity flip needed, same family as func_800181AC's
+## One branch-polarity flip needed, same family as PushBasicClassListNode's
 
 First attempt wrote the intuitively-ordered `if (prev == NULL) { *head =
 ...; } else { prev->next = ...; }` — reads naturally as "handle the head
@@ -61,3 +63,12 @@ diff was two SWAPPED words, not two wrong ones).
 
 round 11 (2026-09-03), runner delta, unit code_8220, second pass. 2
 attempts.
+
+## Naming (round 74)
+
+`RemoveBasicClassListNode`, **tier A**: finds the node in `*head` whose
+`value == value`, unlinks it, and releases it via `BMemPMgrFree`; used
+identically for both of `BasicClass`'s lists (`children` via
+`BasicClass__RemoveChild`/RemoveChild, `parentRefs` via
+`BasicClass__RemoveParentRef`/RemoveParentRef), the release-side mirror of
+`PushBasicClassListNode`.

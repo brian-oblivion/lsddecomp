@@ -124,13 +124,13 @@ void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     }
     size = strlen((char *)D_8008AA18);
     size = (size >> 1) + 4;
-    buf = func_80017B34(size);
+    buf = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf, D_8008AA18);
     self->unkB0 = (Class86B60UnkB0Obj_3bb8c_d *)New_Obj6EAC0(arg1->unk4, size, buf);
     self->unkB0->unkAB = 8;
     self->unkB0->unkAC = 4;
     self->unkB0->unkAA = 9;
-    func_80017CFC(buf);
+    BMemPMgrFree(buf);
 }
 
 void func_8004DC08(Class86B60 *self)
@@ -227,10 +227,10 @@ void func_8004DE08(Class86B60 *self)
 
     size = self->unkB0->unkA9;
     origUnk58 = self->unk58;
-    buf1 = func_80017B34(size);
+    buf1 = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf1, D_8008AA18);
     self->unkB0->methods->slotCC(self->unkB0, buf1);
-    func_80017CFC(buf1);
+    BMemPMgrFree(buf1);
     CheckObj866E8CountFlag(self, self->unk4C, self->unkA4);
     self->methods->slotE0(self, self->unk14);
     self->unkA4->methods->slot19C(self->unkA4, &buf2);
@@ -313,7 +313,7 @@ void *func_8004E2E0(void *arg0, void *arg1)
 {
     void *self;
 
-    self = func_80017B34(0x84);
+    self = BMemPMgrAlloc(0x84);
     if (self == NULL) {
         goto fail;
     }

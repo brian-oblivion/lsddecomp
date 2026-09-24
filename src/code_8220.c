@@ -1,6 +1,29 @@
 #include "common.h"
 #include "code_8220.h"
 
+/* This unit holds two unrelated things, decomp-adjacent by ROM address
+ * only:
+ *
+ *  - The `BMemPMgr` pool allocator: `BMemPMgrInit` carves a block out of
+ *    the Psy-Q heap (`malloc`) and hands it to `SetupBMemPMgrFreeList`,
+ *    which threads it onto a single doubly-linked free list of
+ *    `BMemBlockHdr` nodes. `BMemPMgrAlloc`/`BMemPMgrFree` split and
+ *    coalesce blocks off that list; both resolve their target pool
+ *    through the global `gDefaultBMemPMgr` (set by `SetDefaultBMemPMgr`)
+ *    when the caller doesn't name one directly. It is the game's
+ *    general-purpose small-object allocator -- called from a wide
+ *    cross-section of units, not just this one.
+ *  - `BasicClass`, the game's hand-rolled root class
+ *    (`docs/research/class-framework.md`; full design in the
+ *    `BasicClass`/`BasicClassMethods` comment in `code_8220.h`). Its
+ *    fourteen virtual methods live here; `PushBasicClassListNode`/
+ *    `RemoveBasicClassListNode` are the pool-backed list primitives both
+ *    of its linked lists (`children`, `parentRefs`) share.
+ *
+ * See `code_8220_b`/`code_8220_c` for this unit's siblings (GTE/GPU
+ * primitive code, unrelated to either of the above).
+ */
+
 /* Psy-Q heap, linked from Sony's own object (`_obj/malloc`) rather than
  * decompiled, so these carry Sony's exported names. The real prototypes are
  * in <malloc.h>; they are restated here rather than included because no unit
@@ -27,30 +50,30 @@ void *BMemPMgrInit(s32 poolSize)
     if (pool != NULL) {
         pool->freeListHead = (u8 *)pool + 0x1C;
         pool->poolSize = poolSize;
-        func_80017AC8(pool);
+        SetupBMemPMgrFreeList(pool);
     } else {
         printf(D_8001028C, NULL, poolSize);
     }
     return pool;
 }
 
-void func_80017A9C(BMemPMgr *pool)
+void SetDefaultBMemPMgr(BMemPMgr *pool)
 {
-    D_8008A818 = pool;
+    gDefaultBMemPMgr = pool;
 }
 
-void func_80017AA8(void *ptr)
+void FreeMem(void *ptr)
 {
     free(ptr);
 }
 
-void func_80017AC8(BMemPMgr *pool)
+void SetupBMemPMgrFreeList(BMemPMgr *pool)
 {
     BMemPMgr *mgr;
     BMemBlockHdr *header;
     u8 *end;
 
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -66,7 +89,7 @@ void func_80017AC8(BMemPMgr *pool)
     *(u32 *)end = 0x80000000;
 }
 
-void *func_80017B34(size, pool)
+void *BMemPMgrAlloc(size, pool)
     s32 size;
     void *pool;
 {
@@ -80,7 +103,7 @@ void *func_80017B34(size, pool)
 
     SetBMemPMgrBusy(1);
     result = NULL;
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -158,7 +181,7 @@ void *func_80017B34(size, pool)
     return result;
 }
 
-void *func_80017CFC(ptr, pool)
+void *BMemPMgrFree(ptr, pool)
     void *ptr;
     void *pool;
 {
@@ -168,7 +191,7 @@ void *func_80017CFC(ptr, pool)
     u32 nextFree;
 
     SetBMemPMgrBusy(1);
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -254,10 +277,10 @@ void *func_80017CFC(ptr, pool)
 void func_80017EA8(void) {
 }
 
-void *BasicClass__func_17eb0(BasicClass *self)
+void *BasicClass__Release(BasicClass *self)
 {
     self->methods->finalize(self);
-    func_80017CFC(self);
+    BMemPMgrFree(self);
     return NULL;
 }
 
@@ -268,27 +291,27 @@ void BasicClass__BasicClass(BasicClass *self)
     self->children = NULL;
 }
 
-void BasicClass__func_17f2c(BasicClass *self)
+void BasicClass__Finalize(BasicClass *self)
 {
     self->methods->notifyParents(self, 1);
     self->methods->removeAllChildren(self);
     self->methods->clearParentRefs(self);
 }
 
-void BasicClass__func_17f98(BasicClass *self, BasicClass *child)
+void BasicClass__AddChild(BasicClass *self, BasicClass *child)
 {
-    if (func_800181AC(&self->children, child)) {
+    if (PushBasicClassListNode(&self->children, child)) {
         child->methods->addParentRef(child, self);
     }
 }
 
-void BasicClass__func_17ff0(BasicClass *self, BasicClass *child)
+void BasicClass__RemoveChild(BasicClass *self, BasicClass *child)
 {
-    func_80018208(&self->children, child);
+    RemoveBasicClassListNode(&self->children, child);
     child->methods->removeParentRef(child, self);
 }
 
-void BasicClass__func_18040(BasicClass *self)
+void BasicClass__RemoveAllChildren(BasicClass *self)
 {
     BasicClass *child;
     BasicClass **childPtr;
@@ -303,7 +326,7 @@ void BasicClass__func_18040(BasicClass *self)
     }
 }
 
-void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor)
+void BasicClass__GetNextChild(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor)
 {
     if (*outChild == NULL) {
         *cursor = self->children;
@@ -311,23 +334,23 @@ void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassL
     GetNextBasicClass(outChild, cursor);
 }
 
-s32 BasicClass__func_180fc(BasicClass *self, BasicClass *parent)
+s32 BasicClass__AddParentRef(BasicClass *self, BasicClass *parent)
 {
-    return func_800181AC(&self->parentRefs, parent);
+    return PushBasicClassListNode(&self->parentRefs, parent);
 }
 
-void BasicClass__func_1811c(BasicClass *self, BasicClass *parent)
+void BasicClass__RemoveParentRef(BasicClass *self, BasicClass *parent)
 {
-    func_80018208(&self->parentRefs, parent);
+    RemoveBasicClassListNode(&self->parentRefs, parent);
 }
 
-void BasicClass__func_1813c(BasicClass *self)
+void BasicClass__ClearParentRefs(BasicClass *self)
 {
     FreeBasicClassList(&self->parentRefs);
     self->parentRefs = NULL;
 }
 
-void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor)
+void BasicClass__GetNextParentRef(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor)
 {
     if (*outParent == NULL) {
         *cursor = self->parentRefs;
@@ -335,12 +358,12 @@ void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClass
     GetNextBasicClass(outParent, cursor);
 }
 
-s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
+s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value)
 {
     BasicClassListNode *node;
     BasicClassListNode *oldHead;
 
-    node = func_80017B34(0x8);
+    node = BMemPMgrAlloc(0x8);
     if (node != NULL) {
         oldHead = *head;
         node->value = value;
@@ -351,7 +374,7 @@ s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
     return 0;
 }
 
-void func_80018208(BasicClassListNode **head, BasicClass *value)
+void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value)
 {
     BasicClassListNode *prev;
     BasicClassListNode *node;
@@ -365,7 +388,7 @@ void func_80018208(BasicClassListNode **head, BasicClass *value)
             } else {
                 *head = node->next;
             }
-            func_80017CFC(node);
+            BMemPMgrFree(node);
             return;
         }
         prev = node;

@@ -22,7 +22,7 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
 {
     Class866E8 *self;
 
-    self = func_80017B34(0x1E8);
+    self = BMemPMgrAlloc(0x1E8);
     if (self != NULL) {
         func_8004D244()->ctor(self, arg1, arg2);
         return self;
@@ -125,7 +125,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004A4C8` | `New_Class866E8` | A | Body is the project's established `New_X` shape: allocate `0x1E8` via `func_80017B34`, and on success dispatch the class's ctor slot `+0x008` with the caller's two arguments, else return NULL. `New_Class` is the convention named in FINISHING-PLAN.md track 3, and this report already used the phrase before the rename. |
+| `func_8004A4C8` | `New_Class866E8` | A | Body is the project's established `New_X` shape: allocate `0x1E8` via `BMemPMgrAlloc`, and on success dispatch the class's ctor slot `+0x008` with the caller's two arguments, else return NULL. `New_Class` is the convention named in FINISHING-PLAN.md track 3, and this report already used the phrase before the rename. |
 
 The one call site is `src/class_39e08.c`'s `Obj865C8__Obj865C8`, the boot path:
 `arg1->unkC = (SubObjG *)New_Class866E8(0, 1);`. So exactly one instance of

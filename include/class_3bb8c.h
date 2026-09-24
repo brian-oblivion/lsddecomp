@@ -852,7 +852,7 @@ typedef struct BaseCtorTable_3bb8c_c {
 
 extern BaseCtorTable_3bb8c_c *GetUnk18ObjMethods(void);
 
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 typedef struct Class86AA0 Class86AA0;
 typedef struct Class86AA0Methods Class86AA0Methods;
@@ -1105,7 +1105,7 @@ struct Class86B60UnkB0Obj_3bb8c_d {
     Class86B60UnkB0ObjMethods_3bb8c_d *methods; /* +0x000 */
     u8 pad004[0x0A9 - 0x004];
     /* +0x0A9, func_8004DE08: read as an unsigned byte and used directly as
-     * an allocation SIZE (`func_80017B34`'s own argument). */
+     * an allocation SIZE (`BMemPMgrAlloc`'s own argument). */
     u8 unkA9;
     /* +0x0AA/+0x0AB/+0x0AC, func_8004DB18: three literal byte fields
      * (9/8/4) set right after allocation via `New_Obj6EAC0` -- this is
@@ -1871,7 +1871,7 @@ struct Class86E00_3bb8c_g {
  * `self->unk38` and the literal `1` to this external helper; return
  * value stored into `self->childB`. Not this round's function here -- it
  * is class_3bb8c_j's New_Class86ED0 (matched round 15, src/class_3bb8c_j.c):
- * `func_80017B34(0x54)` then, on success, its own ctor-table getter's
+ * `BMemPMgrAlloc(0x54)` then, on success, its own ctor-table getter's
  * `+0x008` slot called `(self, arg0, arg1)`. This call site's own
  * evidence (arg1 a literal `1`) is what fixed the 2nd parameter as `s32`
  * rather than a pointer. */
@@ -1986,11 +1986,11 @@ extern s32 D_80086E78[];
 extern s32 WaitForReadyEvent(s32 *arr, s32 count);
 
 /* The generic pool allocator/free pair, already established the same way
- * by include/code_8220.h, include/code_55dd4.h etc -- `func_80017CFC`
+ * by include/code_8220.h, include/code_55dd4.h etc -- `BMemPMgrFree`
  * returning `void *` (not `void`) matches TaskObjF__FreeUnusedBuffers's own use here,
  * which stores its return value back into the freed slot. */
-/* func_80017B34/func_80017CFC already declared above in this header. */
-extern void *func_80017CFC(void *ptr);
+/* BMemPMgrAlloc/BMemPMgrFree already declared above in this header. */
+extern void *BMemPMgrFree(void *ptr);
 
 /* A fixed 6-byte memory-card device-name template ("bu00:"/"bu10:", PS-X
  * BIOS device names -- asm/data/7B008.sdata.s). An all-`s8` struct
@@ -2615,7 +2615,7 @@ extern void StyleTeardown(void);
  * settles it. bravo reported this class as "alloc size 0x54, vtable
  * D_80086ED0"; alpha reported 0x4C. Measured:
  *
- *   func_80050BA8  li a0,0x4c -> func_80017B34, then ctors through
+ *   func_80050BA8  li a0,0x4c -> BMemPMgrAlloc, then ctors through
  *                  func_80051A4C(), which returns &D_80086ED0.
  *   func_80051A5C  allocates 0x54 and ctors through func_80052B60(),
  *                  a DIFFERENT table getter living in class_3bb8c_k.
@@ -2958,7 +2958,7 @@ extern s32 D_8008AB10;
 /* GetObjMMethods: a plain class-vtable getter (`lui`/`addiu`, no
  * `lw`/`sw`), returns `&D_80087034` verbatim. Confirmed a BasicClass-
  * derived vtable with `tools/classtable.py 0x80087034` (header word then
- * `BasicClass__func_17eb0` at +4, the class-framework fingerprint) --
+ * `BasicClass__Release` at +4, the class-framework fingerprint) --
  * nothing in this unit dereferences it, so it stays untyped beyond the
  * address itself, same convention as `D_80086904` above. */
 extern s32 D_80087034;

@@ -475,7 +475,7 @@ Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
     Obj4C *self;
     Class87034Methods_3bb8c_k *methods;
 
-    self = func_80017B34(0x88);
+    self = BMemPMgrAlloc(0x88);
     if (self != NULL) {
         methods = GetObjMMethods();
         methods->ctor(self, a0, a1, a2, a3, a4);

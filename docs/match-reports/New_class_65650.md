@@ -8,13 +8,13 @@
 The `New_X` allocator for the class whose method table is `D_8008A6C4`
 (resolved with `tools/classtable.py D_8008A6C4 --vs 0x800878D4`; see
 `include/code_55dd4.h` for the full inheritance chain). Allocates a 0x98-byte
-instance through the game allocator `func_80017B34`, fetches the class's own
+instance through the game allocator `BMemPMgrAlloc`, fetches the class's own
 vtable via `func_80066818()` (a `Get_vtable`-style accessor, matched
 separately, see its own report), and calls the constructor slot (`+0x008`)
 with `(self, arg1, arg2)`. Unlike the simpler `New_X` shapes documented
 elsewhere in this project (`func_80025B34`, `new_class_6d3c8`), **this one
 also checks the constructor's own return value**: on constructor failure it
-frees the object (`func_80017CFC`) and returns `NULL` instead of leaving it
+frees the object (`BMemPMgrFree`) and returns `NULL` instead of leaving it
 allocated.
 
 ```c
@@ -23,7 +23,7 @@ void *New_class_65650(void *arg1, void *arg2)
     Class65650 *self;
     Class65650Methods *vt;
 
-    self = (Class65650 *)func_80017B34(0x98);
+    self = (Class65650 *)BMemPMgrAlloc(0x98);
     if (self == NULL) {
         return NULL;
     }
@@ -31,7 +31,7 @@ void *New_class_65650(void *arg1, void *arg2)
     if (vt->ctor(self, arg1, arg2) != NULL) {
         return self;
     }
-    func_80017CFC(self);
+    BMemPMgrFree(self);
     return NULL;
 }
 ```
@@ -64,9 +64,9 @@ rewrite to every `New_X` residue.
 
 ## Notes on the header
 
-`include/code_55dd4.h` types `func_80017B34` as taking a single `s32 size`
+`include/code_55dd4.h` types `BMemPMgrAlloc` as taking a single `s32 size`
 parameter (matching the correction the head made to `class_16334.h`'s
-`func_80017B34` prototype in the same round) — the call site here sets only
+`BMemPMgrAlloc` prototype in the same round) — the call site here sets only
 `$a0` before `jal`.
 
 ### Proposed learning

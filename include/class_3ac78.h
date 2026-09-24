@@ -59,7 +59,7 @@ struct UnkSlotEntry_3ac78 {
      * EntryChildObj::unk36/unk38. Unifying the two views is a track-4 job,
      * not a naming one, so the declared type is left alone; read it as
      * "a cell object", not as "another Class866E8". */
-    Class866E8 **cells;              /* Class866E8__DispatchToRectCells: 2D grid, row stride 20 cells. Class866E8__Class866E8 (ctor): allocates 0x668 raw bytes (func_80017B34) and fills it with pointers built in an inner loop. Class866E8__Finalize (dtor, MATCHED): walks the same 0x668-byte span tearing down each non-NULL cell, then frees it. */
+    Class866E8 **cells;              /* Class866E8__DispatchToRectCells: 2D grid, row stride 20 cells. Class866E8__Class866E8 (ctor): allocates 0x668 raw bytes (BMemPMgrAlloc) and fills it with pointers built in an inner loop. Class866E8__Finalize (dtor, MATCHED): walks the same 0x668-byte span tearing down each non-NULL cell, then frees it. */
     GenericObject *heldObj;          /* Class866E8__Class866E8 (ctor): zeroed. Class866E8__OnElementEvent releases it through the shared BasicClass `release` slot on event 6 and stores the result back, the project's standard release-and-clear shape. RETYPED from `s32` this round: the only code that touches it dereferences it as an object with a vtable at +0x000. */
     s32 unk18;                       /* Class866E8__Class866E8 (ctor): zeroed */
 };
@@ -185,7 +185,7 @@ struct Vec3_3ac78 {
  */
 struct Class866E8Methods {
     /* +0x000 */ s32 header;
-    /* +0x004 */ void *release;                                                   /* BasicClass__func_17eb0 */
+    /* +0x004 */ void *release;                                                   /* BasicClass__Release */
     /* +0x008 */ void (*ctor)(Class866E8 *self, s32 arg1, s32 arg2);            /* Class866E8__Class866E8; called by New_Class866E8 */
     /* +0x00C */ void *finalize;                                                    /* Class866E8__Finalize (MATCHED); not dispatched by any of this project's decompiled callers yet */
     /* +0x010 */ void (*addChild)(Class866E8 *self, s32 arg1);                    /* Class866E8__Class866E8 (ctor); called with func_80020C5C()'s return, after the 7-entry elems[] init loop */
@@ -281,7 +281,7 @@ struct Class866E8 {
 extern Class866E8Methods *func_8004D244(void);
 
 /* The generic allocator, established already in DreamSys.h/Entity.h/etc. */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 /*
  * Class86668 -- vtable gClass86668Methods (28 slots, header 0x230), resolved with
@@ -330,7 +330,7 @@ struct UnkArgObj_3ac78 {
  * unconfirmed; only the one byte this function reads is modeled here.
  *
  * release is the shared "BasicClass" base-method slot at +0x004 -- the same
- * slot Class866E8Methods documents as `BasicClass__func_17eb0`. Its exact
+ * slot Class866E8Methods documents as `BasicClass__Release`. Its exact
  * semantics are unknown; Class866E8__OnElementEvent calls it on a GenericObject and
  * stores the (pointer) return value back where the object came from,
  * suggesting a release-and-replace pattern, but that is not confirmed.

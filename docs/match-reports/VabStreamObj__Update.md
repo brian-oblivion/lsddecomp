@@ -27,7 +27,7 @@ void VabStreamObj__Update(VabStreamObj *self) {
             self->streamBuffer = NULL;
             self->methods->slot58(self, path);
             if (self->baseFilename != NULL) {
-                func_80017CFC(self->baseFilename);
+                BMemPMgrFree(self->baseFilename);
                 self->baseFilename = NULL;
             }
         }

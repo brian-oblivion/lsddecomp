@@ -8,7 +8,7 @@
 
 `D_8006D430`'s vtable slot `+0x05C` (also reachable indirectly through
 `Class6D430__Destroy`, the class's own dtor). Frees `this->unk10` via
-`func_80017CFC` and clears it, but only when three conditions all hold:
+`BMemPMgrFree` and clears it, but only when three conditions all hold:
 the pointer is non-NULL, `this->unk14` (its recorded size) is non-zero, and
 `this->unk20` (a flag cleared in the constructor) is zero.
 
@@ -21,7 +21,7 @@ lw    $v0, 0x14($s0)
 beqz  $v0, END                  ; if (this->unk14 == 0) return;
 lhu   $v0, 0x20($s0)
 bnez  $v0, END                  ; if (this->unk20 != 0) return;
-jal   func_80017CFC             ; func_80017CFC(this->unk10) -- a0 unchanged since first load
+jal   BMemPMgrFree             ; BMemPMgrFree(this->unk10) -- a0 unchanged since first load
 sw    $zero, 0x10($s0)          ; this->unk10 = NULL
 END: epilogue
 ```
@@ -44,7 +44,7 @@ void Class6D430__FreeBuffer(Class6D430 *this) {
     if (this->unk20 != 0) {
         return;
     }
-    func_80017CFC(this->unk10);
+    BMemPMgrFree(this->unk10);
     this->unk10 = NULL;
 }
 ```
@@ -84,7 +84,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80026C20` | `Class6D430__FreeBuffer` | B |
 
-**Evidence.** `+0x05C` slot: frees `this->unk10` via `func_80017CFC` and
+**Evidence.** `+0x05C` slot: frees `this->unk10` via `BMemPMgrFree` and
 clears it, guarded by three conditions (non-NULL, sized, not busy per
 `unk20`). Also reachable indirectly through `Class6D430__Destroy`. Mirrors
 `Class6D430__AllocBuffer`'s naming; mechanics known, why the buffer needs

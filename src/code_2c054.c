@@ -5,7 +5,7 @@ StreamTaskObj *New_StreamTaskObj(s32 a1, s32 a2, s32 a3, s32 a4)
 {
     StreamTaskObj *self;
 
-    self = func_80017B34(0xDC);
+    self = BMemPMgrAlloc(0xDC);
     if (self != NULL) {
         Get_vtable_StreamTaskObj()->slot08(self, a1, a2, a3, a4);
         return self;
@@ -158,7 +158,7 @@ TaskCoreObj *New_TaskCoreObj(s32 a1, s32 a2, s32 a3)
 {
     TaskCoreObj *self;
 
-    self = func_80017B34(0xA4);
+    self = BMemPMgrAlloc(0xA4);
     if (self != NULL) {
         Get_vtable_TaskCore()->slot08((StreamTaskObj *)self, a1, a2, a3);
         return self;

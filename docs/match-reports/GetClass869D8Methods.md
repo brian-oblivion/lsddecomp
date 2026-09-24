@@ -24,7 +24,7 @@ Class869D8Methods *GetClass869D8Methods(void)
 
 `gClass869D8Methods` (asm/data/76DC8.data.s) is a plain-C vtable in the same shape
 as every other one in this codebase: header word (0x17), then a
-`BasicClass__func_17eb0` slot at +0x004, then a ctor at +0x008. Resolved by
+`BasicClass__Release` slot at +0x004, then a ctor at +0x008. Resolved by
 reading the table directly (it isn't registered with `tools/classtable.py`,
 since it isn't `D_800866E8`'s own table -- this is a distinct, smaller
 class). Only the slots this unit's own functions reach are typed:
@@ -38,7 +38,7 @@ Not every vtable in this executable is one of the ones `tools/classtable.py
 --scan` already knows about -- a table can be found by tracing a
 `func_8004Dxxx()->slotN(...)` call backward to the `lui`/`addiu` pair that
 computes the getter's return value, then reading the table directly out of
-`asm/data/*.s`. The "count header word, +0x004 BasicClass__func_17eb0"
+`asm/data/*.s`. The "count header word, +0x004 BasicClass__Release"
 opening two words are a strong fingerprint that a `.word` block found this
 way really is a vtable and not incidental data.
 

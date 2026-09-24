@@ -259,12 +259,12 @@ extern Unk74Obj *func_8003B39C(const char *path); /* already matched in
                                                        view retyped to this
                                                        unit's own Unk74Obj */
 
-extern void *func_80017B34(s32 size);   /* allocator, confirmed across many
+extern void *BMemPMgrAlloc(s32 size);   /* allocator, confirmed across many
                                             units */
-extern void *func_80017CFC(void *ptr);  /* matching free/release. Its own
+extern void *BMemPMgrFree(void *ptr);  /* matching free/release. Its own
                                             disassembly (still INCLUDE_ASM,
                                             asm/nonmatchings/code_8220/
-                                            func_80017CFC.s) ends with an
+                                            BMemPMgrFree.s) ends with an
                                             explicit `addu $v0,$zero,$zero`
                                             -- it genuinely returns NULL,
                                             not void. code_171e0.h/Entity.h
@@ -390,7 +390,7 @@ struct Unk68Obj {
 
 /* Retyped round 14 once code_2cc8c_e's own body was matched: this is the
    New_X allocator for `ClassEAC0Obj` (see the Class6E99CObj/ClassEAC0Obj
-   section far below) -- `func_80017B34(0x6C)` then
+   section far below) -- `BMemPMgrAlloc(0x6C)` then
    `Obj6EAC0__GetBaseMethods()->ctor(self, a0, a1, a2)`. Parameter types are UNCHANGED
    from the existing declaration (both already pointer/pointer/s32, matching
    this call site's own real arguments exactly); only the RETURN type
@@ -423,7 +423,7 @@ struct SubHandleObj {
 
 /* Retyped round 14 once code_2cc8c_e's own body was matched: this is the
    New_X allocator for `Class6E99CObj` (this unit's own view, see the
-   Class6E99CObj/ClassEAC0Obj section far below) -- `func_80017B34(0xA0)`
+   Class6E99CObj/ClassEAC0Obj section far below) -- `BMemPMgrAlloc(0xA0)`
    then `GetClass6E99CMethods()->ctor(self, a1, a2, a3)`. `a1`/`a2`/`a3` forward
    straight through to that ctor unmodified; `a1` is a pointer (confirmed
    by THIS unit's own two real callers, `code_2cc8c_c.c` passing
@@ -718,7 +718,7 @@ struct Unk18Obj {
                                    double-buffer index, named after that
                                    mechanic. Exclusive to code_2cc8c_d.c. */
     /* +0x078..+0x08C, round 14 (Unk18Obj__InitOt): seven `s32`-typed
-       addresses/sizes carved out of one `func_80017B34` allocation --
+       addresses/sizes carved out of one `BMemPMgrAlloc` allocation --
        MEASURED, not modeled as real pointer types since retail computes
        every one of them via plain word arithmetic (not pointer-typed
        addition), and unk78/unk7C are ALSO dereferenced directly as raw
@@ -1030,7 +1030,7 @@ struct Obj86B60Methods {
     u8 pad000[0x010];
     void (*addChild)(Obj86B60 *self, void *a1);     /* +0x010, inherited
                                                       BasicClass addChild
-                                                      (BasicClass__func_17f98);
+                                                      (BasicClass__AddChild);
                                                       OBSERVED: Obj86B60__Init.
                                                       Renamed from slot10,
                                                       round 55 -- exclusive to
@@ -1041,7 +1041,7 @@ struct Obj86B60Methods {
                                                       offset). */
     void (*removeChild)(Obj86B60 *self, void *a1);     /* +0x014, inherited
                                                       BasicClass removeChild
-                                                      (BasicClass__func_17ff0);
+                                                      (BasicClass__RemoveChild);
                                                       OBSERVED: Obj86B60__Deinit
                                                       (round 13). Renamed from
                                                       slot14, round 55, same
@@ -1416,7 +1416,7 @@ struct Obj86B60 {
                                      func_8003DE30 -- a ring-buffer index */
     void **unk64;                /* +0x064, func_8003D6D4: array indexed by
                                      unk58, giving ReleaseBasicClassArray's 1st arg
-                                     and func_80017CFC's arg */
+                                     and BMemPMgrFree's arg */
     Unk68Obj *unk68;             /* +0x068, OBSERVED: func_8003D050,
                                      func_8003DAD4, func_8003D73C (round 12)
                                      -- built once by func_8003CE98 via
@@ -1495,7 +1495,7 @@ struct BasicClassMethodsCC8C {
     u8 pad000[0x008];
     void (*ctor)(void *self); /* +0x008, IS BasicClass__BasicClass
                                   (code_8220.c); OBSERVED: IntermediateBase__IntermediateBase */
-    void (*finalize)(void *self); /* +0x00C, IS BasicClass__func_17f2c
+    void (*finalize)(void *self); /* +0x00C, IS BasicClass__Finalize
                                   (code_8220.c, "finalize"); OBSERVED:
                                   Unk18Obj__Finalize (round 13). Renamed from
                                   slot0C, round 55 -- exclusive to this unit
@@ -1503,12 +1503,12 @@ struct BasicClassMethodsCC8C {
                                   Get_vtable_BasicClass() in the code_2cc8c
                                   family). */
     void (*addChild)(void *self, void *child); /* +0x010, IS
-                                  BasicClass__func_17f98 (code_8220.c,
+                                  BasicClass__AddChild (code_8220.c,
                                   "addChild"); OBSERVED: Unk18Obj__AddChild
                                   (round 13). Renamed from slot10, round 55,
                                   same exclusivity as finalize above. */
     void (*removeChild)(void *self, void *child); /* +0x014, IS
-                                  BasicClass__func_17ff0 (code_8220.c,
+                                  BasicClass__RemoveChild (code_8220.c,
                                   "removeChild"); OBSERVED: Unk18Obj__RemoveChild
                                   (round 13). Renamed from slot14, round 55,
                                   same exclusivity as finalize above. */
@@ -1886,7 +1886,7 @@ struct Pair32E99C {
 
 struct ClassEAC0Methods {
     s32 header;                                        /* +0x000 */
-    void *unk04;                                        /* +0x004, BasicClass__func_17eb0, inherited, unused here */
+    void *unk04;                                        /* +0x004, BasicClass__Release, inherited, unused here */
     void (*ctor)(ClassEAC0Obj *self, void *a1, void *a2, s32 a3); /* +0x008,
                                 ClassEAC0__ClassEAC0 (this unit). `a1`/`a2` kept as
                                 plain `void *` here (not `SkipShort2 *`) --
@@ -1955,7 +1955,7 @@ struct ClassEAC0Obj {
 
 struct Class6E99CMethods {
     s32 header;                                     /* +0x000 */
-    void *unk04;                                     /* +0x004, BasicClass__func_17eb0, inherited, unused here */
+    void *unk04;                                     /* +0x004, BasicClass__Release, inherited, unused here */
     void (*ctor)(Class6E99CObj *self, void *a1, s32 a2, s32 a3); /* +0x008,
                                 Class6E99C__Class6E99C (this unit). `a2` is a RAW
                                 index/mode (0 or a small positive count),

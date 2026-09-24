@@ -14,10 +14,10 @@ land in `code_8220_b`, next round's carve).
 
 It maintains two singly-linked lists of pool-allocated 8-byte nodes
 (`BasicClassListNode { next; BasicClass *value; }`, size confirmed by
-`func_800181AC`'s `func_80017B34(0x8)` allocation):
+`PushBasicClassListNode`'s `BMemPMgrAlloc(0x8)` allocation):
 
 - `children` (`+0x004`): objects added via `addChild`/`removeChild`
-  (`BasicClass__func_17f98`/`BasicClass__func_17ff0`, own reports). Adding
+  (`BasicClass__AddChild`/`BasicClass__RemoveChild`, own reports). Adding
   one ALSO registers `self` in the child's own `parentRefs` list, by
   dispatching through the CHILD's own vtable slots `+0x020`/`+0x024` — the
   same slots this class's own `addParentRef`/`removeParentRef` occupy — so
@@ -53,9 +53,9 @@ TARGET immediate for `Get_vtable_BasicClass` (a call, not a branch — the encod
 absolute address itself differed). This is not a scheduling or codegen
 issue in this function at all: `Get_vtable_BasicClass` lives in the still-uncarved
 `code_8220_b.s` tail, so its real link address depends on the total size of
-everything before it, including `BasicClass__func_18040` (this unit's
+everything before it, including `BasicClass__RemoveAllChildren` (this unit's
 hardest function, worked on afterward — see its own report). Once
-`BasicClass__func_18040` reached its correct byte-exact size, this
+`BasicClass__RemoveAllChildren` reached its correct byte-exact size, this
 function's `jal` target resolved correctly with no changes here at all —
 confirms DECOMPILATION_LEARNINGS' point that "differs OUTSIDE this range"
 warnings mean the CALLING function isn't necessarily the one at fault.

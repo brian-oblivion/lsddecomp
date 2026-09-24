@@ -26,7 +26,7 @@ typedef struct PadMethods PadMethods;
 
 struct PadMethods {
     /* +0x00 */ s32 header;   /* class-id/flags word; meaning open project-wide (see DECOMPILATION_LEARNINGS.md) */
-    /* +0x04 */ void *unk04;  /* == BasicClass__func_17eb0, inherited, unused by this unit */
+    /* +0x04 */ void *unk04;  /* == BasicClass__Release, inherited, unused by this unit */
     /* +0x08 */ void (*ctor)(Pad *self, void *arg1, s32 port);
     /* +0x0C */ void *(*dtor)(Pad *self);
     /* +0x10 */ void *unk10;
@@ -71,7 +71,7 @@ typedef struct BasicClassMethods {
 } BasicClassMethods;
 
 extern BasicClassMethods *Get_vtable_BasicClass(void);
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 /* Psy-Q Pad library helpers (asm/psyq_PadInit.s, uncarved). */
 extern void PadInit(void *arg1);

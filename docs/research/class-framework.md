@@ -27,7 +27,7 @@ Everything below is from the bytes.
 
 ```
 ori   $a0, $zero, 0x928        ; size
-jal   func_80017B34            ; allocator
+jal   BMemPMgrAlloc            ; allocator
 addu  $s0, $v0, $zero
 beqz  $s0, .L800587D0          ; NULL CHECK
 jal   Get_vtable_DreamSys      ; -> &DREAMSYS_METHODS

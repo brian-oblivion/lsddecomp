@@ -27,10 +27,10 @@
  *    plain push/remove/clear with no notification callback (unlike
  *    `children`, which fires the child's own vtable slot).
  *
- * List nodes come from the pool allocator (BMemPMgrInit/func_80017B34/
- * func_80017CFC family; func_80017B34 and func_80017CFC's second
+ * List nodes come from the pool allocator (BMemPMgrInit/BMemPMgrAlloc/
+ * BMemPMgrFree family; BMemPMgrAlloc and BMemPMgrFree's second
  * "pool" parameter is a fallback used only when a global default pool
- * pointer, D_8008A818, is unset -- established already by
+ * pointer, gDefaultBMemPMgr, is unset -- established already by
  * include/class_3ac78.h, include/DreamSys.h etc., which all declare
  * both as single-argument).
  */
@@ -39,7 +39,7 @@ typedef struct BasicClassMethods BasicClassMethods;
 typedef struct BasicClassListNode BasicClassListNode;
 
 /* One node of either of BasicClass's two lists. 8 bytes -- the literal
- * allocation size func_800181AC passes to the pool allocator. */
+ * allocation size PushBasicClassListNode passes to the pool allocator. */
 struct BasicClassListNode {
     BasicClassListNode *next;  /* +0x000 */
     BasicClass *value;          /* +0x004 */
@@ -47,17 +47,17 @@ struct BasicClassListNode {
 
 struct BasicClassMethods {
     /* +0x000 */ s32 header;
-    /* +0x004 */ void *(*release)(BasicClass *self);                              /* BasicClass__func_17eb0: virtual finalize, then free self */
+    /* +0x004 */ void *(*release)(BasicClass *self);                              /* BasicClass__Release: virtual finalize, then free self */
     /* +0x008 */ void (*ctor)(BasicClass *self);                                  /* BasicClass__BasicClass */
-    /* +0x00C */ void (*finalize)(BasicClass *self);                              /* BasicClass__func_17f2c: notifyParents(1), removeAllChildren(), clearParentRefs() */
-    /* +0x010 */ void (*addChild)(BasicClass *self, BasicClass *child);           /* BasicClass__func_17f98 */
-    /* +0x014 */ void (*removeChild)(BasicClass *self, BasicClass *child);        /* BasicClass__func_17ff0 */
-    /* +0x018 */ void (*removeAllChildren)(BasicClass *self);                     /* BasicClass__func_18040 */
-    /* +0x01C */ void (*getNextChild)(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor); /* BasicClass__func_180bc */
-    /* +0x020 */ s32 (*addParentRef)(BasicClass *self, BasicClass *parent);       /* BasicClass__func_180fc; tail-calls func_800181AC, so typed non-void per the one-line-wrapper rule */
-    /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__func_1811c; tail-calls func_80018208, which is void (see below) */
-    /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__func_1813c */
-    /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__func_1816c */
+    /* +0x00C */ void (*finalize)(BasicClass *self);                              /* BasicClass__Finalize: notifyParents(1), removeAllChildren(), clearParentRefs() */
+    /* +0x010 */ void (*addChild)(BasicClass *self, BasicClass *child);           /* BasicClass__AddChild */
+    /* +0x014 */ void (*removeChild)(BasicClass *self, BasicClass *child);        /* BasicClass__RemoveChild */
+    /* +0x018 */ void (*removeAllChildren)(BasicClass *self);                     /* BasicClass__RemoveAllChildren */
+    /* +0x01C */ void (*getNextChild)(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor); /* BasicClass__GetNextChild */
+    /* +0x020 */ s32 (*addParentRef)(BasicClass *self, BasicClass *parent);       /* BasicClass__AddParentRef; tail-calls PushBasicClassListNode, so typed non-void per the one-line-wrapper rule */
+    /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__RemoveParentRef; tail-calls RemoveBasicClassListNode, which is void (see below) */
+    /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__ClearParentRefs */
+    /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__GetNextParentRef */
     /* +0x030 */ void (*notifyParents)(BasicClass *self, s32 arg1);                  /* BasicClass__NotifyParents; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, event). Named round 51, tier A: the EMITTER, not a handler, and not finalize-specific -- `arg1` is a general event code the base only ever sees as 1. */
     /* +0x034 */ void (*slot34)(void);                                            /* BasicClass__func_18350; empty (`jr $ra; nop`) for the base class, code_8220_b. No name: measured round 51 across all 60 method tables, 58 carry this exact address here and the 2 that differ are not BasicClass-derived, so nothing in the game overrides it and nothing establishes its purpose OR its real signature -- `void (*)(void)` is what the empty base body permits, not what a caller was seen to pass. No accessor anywhere in src/. */
     /* +0x038 */ void (*slot38)(BasicClass *self, void *arg1, s32 arg2);          /* BasicClass__OnNotify; code_8220_b. Receiving half of +0x030: arg1 is the SENDER, arg2 an event code (base acts only on 1; Class6B5CC__OnNotify/code_d294 and func_80065790/code_55dd4 forward to the base then branch on the sender's class tag). PROPOSED RENAME (round 51, tier B): slot38 -> onNotify, arg1 -> sender, arg2 -> event. Cross-unit field, 13 units access it, so the head applies it. */
@@ -73,8 +73,8 @@ struct BasicClass {
  * BMemBlockHdr -- a single free-list node inside a BMemPMgr's pool area.
  * `sizeAndFlags` packs the block's byte size into the low 28 bits and
  * flag bits into the high 4 (0x40000000 = free); `prev`/`next` link the
- * pool's doubly-linked free list. Derived from func_80017AC8 (round 45)
- * and reused by func_80017B34/func_80017CFC's still-undecoded bodies,
+ * pool's doubly-linked free list. Derived from SetupBMemPMgrFreeList (round 45)
+ * and reused by BMemPMgrAlloc/BMemPMgrFree's still-undecoded bodies,
  * which walk this same list via BMemPMgr's freeListStart/freeListEnd.
  */
 typedef struct BMemBlockHdr BMemBlockHdr;
@@ -87,7 +87,7 @@ struct BMemBlockHdr {
 /*
  * bMemPMgr -- BMemPMgrInit's own pool-header object. `freeListHead`/
  * `poolSize` are the two fields BMemPMgrInit itself writes; the three
- * below them (round 45, func_80017AC8) round out the pool's free-list
+ * below them (round 45, SetupBMemPMgrFreeList) round out the pool's free-list
  * bookkeeping. What remains opaque is the pool AREA itself (poolSize +
  * 0x20 bytes total, starting at `freeListHead`), walked as a chain of
  * BMemBlockHdr nodes rather than through any field of this struct.
@@ -96,9 +96,9 @@ typedef struct BMemPMgr BMemPMgr;
 struct BMemPMgr {
     /* +0x000 */ void *freeListHead;   /* set to `self + 0x1C` by BMemPMgrInit; the pool's first free-list node */
     /* +0x004 */ s32 poolSize;
-    /* +0x008 */ BMemBlockHdr *freeListStart; /* free list head, func_80017AC8/B34/CFC */
+    /* +0x008 */ BMemBlockHdr *freeListStart; /* free list head, SetupBMemPMgrFreeList/B34/CFC */
     /* +0x00C */ BMemBlockHdr *freeListEnd;   /* free list tail, same trio */
-    /* +0x010 */ s32 unk10;            /* set to 1 by func_80017AC8; not yet read by any decoded function */
+    /* +0x010 */ s32 unk10;            /* set to 1 by SetupBMemPMgrFreeList; not yet read by any decoded function */
 };
 
 /* The generic pool allocator/free pair, established already by
@@ -109,42 +109,42 @@ struct BMemPMgr {
  * declaration from this header.
  *
  * THIS header, uniquely, declares both with UNSPECIFIED parameters
- * (empty parens). Round 45 (func_80017B34/func_80017CFC, matched): each
+ * (empty parens). Round 45 (BMemPMgrAlloc/BMemPMgrFree, matched): each
  * function's own BODY genuinely reads a second argument ($a1, a fallback
- * pool pointer used only when the global default pool D_8008A818 is
+ * pool pointer used only when the global default pool gDefaultBMemPMgr is
  * unset -- dead in practice at every decoded call site, confirmed by
- * func_80017AC8/A9C setting that global before either is ever called).
+ * SetupBMemPMgrFreeList/A9C setting that global before either is ever called).
  * Both are therefore DEFINED in code_8220.c with an old-style
  * (K&R identifier-list) parameter list, which is the only way to expose
  * that second parameter to their own bodies without contradicting the
  * ~15 external single-argument prototypes OR this same unit's own
- * single-argument call sites (func_800181AC's `func_80017B34(0x8)`,
- * func_80018208's `func_80017CFC(node)`) that appear LATER in
+ * single-argument call sites (PushBasicClassListNode's `BMemPMgrAlloc(0x8)`,
+ * RemoveBasicClassListNode's `BMemPMgrFree(node)`) that appear LATER in
  * code_8220.c. A K&R-style definition does not install a prototype, so
  * those later 1-argument calls stay uncheck-and-compile clean; an
  * unspecified-parameter declaration here does the same for everything
  * before the definition. Do not "fix" this back to a full prototype --
  * that reintroduces the conflict this was written to route around. */
-extern void *func_80017B34(); /* arity-ok: re-measured round 59 -- the body really does read $a1 -- `move s1,a1` at 0x80017B40, consumed as `move t0,s1` at 0x80017B68 only when the gp default pool is unset. The ~22 one-parameter declarations elsewhere are right about THEIR call sites (retail emits $a0 only, e.g. `move a0,s2` at 0x80026B74); this unprototyped pair is required by the K&R definitions in code_8220.c. */
-extern void *func_80017CFC(); /* arity-ok: re-measured round 59, same -- `move s1,a1` at 0x80017D0C, consumed as `move t0,s1` at 0x80017D2C on the unset-default-pool path. */
+extern void *BMemPMgrAlloc(); /* arity-ok: re-measured round 59 -- the body really does read $a1 -- `move s1,a1` at 0x80017B40, consumed as `move t0,s1` at 0x80017B68 only when the gp default pool is unset. The ~22 one-parameter declarations elsewhere are right about THEIR call sites (retail emits $a0 only, e.g. `move a0,s2` at 0x80026B74); this unprototyped pair is required by the K&R definitions in code_8220.c. */
+extern void *BMemPMgrFree(); /* arity-ok: re-measured round 59, same -- `move s1,a1` at 0x80017D0C, consumed as `move t0,s1` at 0x80017D2C on the unset-default-pool path. */
 
 /* BMemPMgr setup, gp_rel-blocked (docs/research/gp-relative-blocker.md).
  * Called only by BMemPMgrInit in this unit. Genuinely ONE argument: its
  * own body's $a1 is a fallback pool pointer (defaulting to $a0/self) used
- * only when the global default pool D_8008A818 is unset, and
+ * only when the global default pool gDefaultBMemPMgr is unset, and
  * BMemPMgrInit's call site never sets $a1 before the `jal` -- confirmed
  * by objdump: declaring a second parameter here forces the caller to
  * materialise a spurious `move a1,s1`, one word too many. */
-extern void func_80017AC8(BMemPMgr *pool);
+extern void SetupBMemPMgrFreeList(BMemPMgr *pool);
 
 /* The default-pool global itself (see the comment above). Setter is
- * func_80017A9C(BMemPMgr *pool), a one-line `D_8008A818 = pool;`. Not yet
+ * SetDefaultBMemPMgr(BMemPMgr *pool), a one-line `gDefaultBMemPMgr = pool;`. Not yet
  * called from any carved C -- BMemPMgrInit never calls it, so whoever
  * establishes the game's one default pool is still asm. */
-extern BMemPMgr *D_8008A818;
+extern BMemPMgr *gDefaultBMemPMgr;
 
 /* Pool allocator/free critical-section flag, code_8220_b (setter
- * SetBMemPMgrBusy, getter GetBMemPMgrBusy). func_80017B34/func_80017CFC in
+ * SetBMemPMgrBusy, getter GetBMemPMgrBusy). BMemPMgrAlloc/BMemPMgrFree in
  * THIS unit bracket their free-list walk with SetBMemPMgrBusy(1) on entry
  * and SetBMemPMgrBusy(0) on exit -- an enter/exit pair, not a real lock
  * (no busy-wait or check on entry visible in either caller). */
@@ -161,11 +161,11 @@ extern s32 GetBMemPMgrBusy(void);
  * unit includes the SDK header first. See CLAUDE.md, "To include/ has one
  * exception". */
 
-/* BasicClass list primitives, this unit. func_800181AC/func_80018208
+/* BasicClass list primitives, this unit. PushBasicClassListNode/RemoveBasicClassListNode
  * stay INCLUDE_ASM this round; calling into a still-INCLUDE_ASM function
  * in the same or another unit is fine (docs/DECOMPILATION_LEARNINGS.md). */
-extern s32 func_800181AC(BasicClassListNode **head, BasicClass *value);  /* push: allocate a node, prepend to *head */
-extern void func_80018208(BasicClassListNode **head, BasicClass *value); /* find node by ->value == value, unlink, free; void -- see .md */
+extern s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value);  /* push: allocate a node, prepend to *head */
+extern void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value); /* find node by ->value == value, unlink, free; void -- see .md */
 
 /* Matched in code_8220_b, round 13. */
 extern void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor); /* pop *cursor into *outValue (or NULL), advance *cursor */

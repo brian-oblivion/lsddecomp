@@ -8,18 +8,18 @@ bytes, constructs, frees and returns `NULL` on construction failure.
 ## Final source
 
 ```c
-extern void *func_80017B34(s32 size);
-extern void *func_80017CFC(void *ptr);
+extern void *BMemPMgrAlloc(s32 size);
+extern void *BMemPMgrFree(void *ptr);
 extern BaseObjOMethods *DreamSys__GetBaseMethods(void);
 
 void *New_BaseObjO(void) {
-    BaseObjO *self = func_80017B34(0x58);
+    BaseObjO *self = BMemPMgrAlloc(0x58);
 
     if (self != NULL) {
         if (DreamSys__GetBaseMethods()->ctor(self) != NULL) {
             return self;
         }
-        func_80017CFC(self);
+        BMemPMgrFree(self);
         return NULL;
     }
     return NULL;
@@ -34,10 +34,10 @@ constructor failure -- plain `if`/`return`"), confirmed by disassembly: a
 literal `ori $a0,$zero,0x58` allocation, an unconditional test of the
 result, then `DreamSys__GetBaseMethods()->ctor(self)`'s OWN return checked against
 NULL -- nonzero means success (return `self`), zero means failure
-(`func_80017CFC(self)` then return `NULL`). `DreamSys__GetBaseMethods` is already
+(`BMemPMgrFree(self)` then return `NULL`). `DreamSys__GetBaseMethods` is already
 declared elsewhere (`code_55dd4.h`) returning `D800878D4Methods *`; this
 unit uses its own local `BaseObjOMethods *` reading of the same table (see
-`BaseObjO__BaseObjO`'s report). `func_80017B34`/`func_80017CFC` are the
+`BaseObjO__BaseObjO`'s report). `BMemPMgrAlloc`/`BMemPMgrFree` are the
 project's established single-argument pool allocator pair.
 
 `0x58` is a literal allocation size, not `sizeof(BaseObjO)`, per the

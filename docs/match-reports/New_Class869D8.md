@@ -20,7 +20,7 @@ Class869D8 *New_Class869D8(void)
 {
     Class869D8 *self;
 
-    self = func_80017B34(0xDC);
+    self = BMemPMgrAlloc(0xDC);
     if (self != NULL) {
         GetClass869D8Methods()->ctor(self);
         return self;

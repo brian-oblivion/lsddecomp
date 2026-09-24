@@ -17,7 +17,7 @@ Class86AA0 *New_Class86AA0(void)
 {
     Class86AA0 *self;
 
-    self = func_80017B34(0x3C);
+    self = BMemPMgrAlloc(0x3C);
     if (self != NULL) {
         GetClass86AA0Methods()->ctor(self);
         return self;

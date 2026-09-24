@@ -12,13 +12,13 @@ bytes) for the `gClass876FCMethods` class, dispatching through
 
 ```c
 void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
-    Class876FC *self = func_80017B34(0x98);
+    Class876FC *self = BMemPMgrAlloc(0x98);
 
     if (self != NULL) {
         if (GetClass876FCMethods()->ctor(self, arg0, arg1, arg2, arg3) != NULL) {
             return self;
         }
-        func_80017CFC(self);
+        BMemPMgrFree(self);
         return NULL;
     }
     return NULL;

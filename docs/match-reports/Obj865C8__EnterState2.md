@@ -72,7 +72,7 @@ committed source.)
   typed `Obj4C *` (the object `func_80052B70` returns) from the start,
   unaffected.
 - `Class865C8Methods::slot10` typed `void (*)(Obj865C8 *self, Obj4C *arg1)`
-  — a BasicClass-inherited slot (`BasicClass__func_17f98`, same address
+  — a BasicClass-inherited slot (`BasicClass__AddChild`, same address
   `Class6D3C8.h` already lists at its own local `+0x010` as an untyped
   `unk10`; not reconciled there per this project's per-unit local-view
   convention).
@@ -84,7 +84,7 @@ committed source.)
 - `func_80052B70` (uncarved, unit `class_3bb8c`) declared locally:
   `Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);` — its
   own disassembly is a `New_X`-shaped allocator (0x88-byte alloc via
-  `func_80017B34`, ctor via `GetObjMMethods`, then dispatches its new
+  `BMemPMgrAlloc`, ctor via `GetObjMMethods`, then dispatches its new
   object's own +0x008 slot with all 5 forwarded args, or returns 0 if the
   allocation failed).
 

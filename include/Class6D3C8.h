@@ -63,17 +63,17 @@ typedef struct Class6D3C8 Class6D3C8;
 
 typedef struct Class6D3C8Methods {
     s32 header;                                            /* +0x000 */
-    void *unk04;                                            /* +0x004 BasicClass__func_17eb0 */
+    void *unk04;                                            /* +0x004 BasicClass__Release */
     void (*ctor)(Class6D3C8 *self, Class6D3C8CtorArgs *arg); /* +0x008 func_80025FDC */
     void *unk0C;                                            /* +0x00C func_8003B024 (dtor override) */
-    void *unk10;                                            /* +0x010 BasicClass__func_17f98 */
-    void *unk14;                                            /* +0x014 BasicClass__func_17ff0 */
-    void *unk18;                                            /* +0x018 BasicClass__func_18040 */
-    void *unk1C;                                            /* +0x01C BasicClass__func_180bc */
-    void *unk20;                                            /* +0x020 BasicClass__func_180fc */
-    void *unk24;                                            /* +0x024 BasicClass__func_1811c */
-    void *unk28;                                            /* +0x028 BasicClass__func_1813c */
-    void *unk2C;                                            /* +0x02C BasicClass__func_1816c */
+    void *unk10;                                            /* +0x010 BasicClass__AddChild */
+    void *unk14;                                            /* +0x014 BasicClass__RemoveChild */
+    void *unk18;                                            /* +0x018 BasicClass__RemoveAllChildren */
+    void *unk1C;                                            /* +0x01C BasicClass__GetNextChild */
+    void *unk20;                                            /* +0x020 BasicClass__AddParentRef */
+    void *unk24;                                            /* +0x024 BasicClass__RemoveParentRef */
+    void *unk28;                                            /* +0x028 BasicClass__ClearParentRefs */
+    void *unk2C;                                            /* +0x02C BasicClass__GetNextParentRef */
     void *unk30;                                            /* +0x030 BasicClass__NotifyParents */
     void *unk34;                                            /* +0x034 BasicClass__func_18350 */
     void *unk38;                                            /* +0x038 BasicClass__OnNotify */
@@ -111,7 +111,7 @@ extern void *GetClass6D3C8Methods(void);
 
 /* The game's allocator, in the uncarved code_8220 block. Returns void *
  * rather than a typed pointer because every New_X in the game calls it. */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 /* Model-file-load request block used by func_80025FDC: {type; path}. Only
  * one call site is known so far (func_80025FDC, loading "ETC\DREAME5.TMD"

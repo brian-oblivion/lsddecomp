@@ -6,7 +6,7 @@ attempt.
 
 ## Role
 
-Allocator: `func_80017B34(0x34)`, and on success dispatches
+Allocator: `BMemPMgrAlloc(0x34)`, and on success dispatches
 `func_8002C3A8()->slot08(self, arg1)` (that slot IS `func_8002C18C`, this
 unit, matched this round -- see its own report), returning the new
 instance; returns `NULL` on allocation failure.
@@ -17,7 +17,7 @@ void *new_class_6d940(s32 arg1)
     void *self;
     Table6D940 *table;
 
-    self = func_80017B34(0x34);
+    self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
         table = func_8002C3A8();
         table->slot08(self, arg1);
@@ -45,6 +45,6 @@ function-pointer slot, return the pointer or NULL" is a common C idiom in
 this codebase generally, independent of whether the object is a
 class-framework instance.
 
-`func_80017B34` (the pool allocator, already established in
+`BMemPMgrAlloc` (the pool allocator, already established in
 `include/class_16334.h`/`include/code_8220.h`) declared LOCAL to this file
 since neither shared header is included here.

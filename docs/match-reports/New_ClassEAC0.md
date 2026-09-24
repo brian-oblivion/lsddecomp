@@ -14,7 +14,7 @@ Unit `code_2cc8c_e`, carved round 14.
 > ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
 >     ClassEAC0Obj *self;
 >
->     self = func_80017B34(0x6C);
+>     self = BMemPMgrAlloc(0x6C);
 >     if (self != NULL) {
 >         ((ClassEAC0Methods *)Obj6EAC0__GetBaseMethods())->ctor(self, a0, a1, a2);
 >         return self;

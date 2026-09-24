@@ -425,7 +425,7 @@ struct TaskUtilMethods {
     void (*slot08)(StreamTaskObj *self); /* +0x008, TaskCoreObj__TaskCoreObj's forward target
                                               (gIntermediateBaseMethods+0x008 = IntermediateBase__IntermediateBase) */
     void (*slot0C)(StreamTaskObj *self); /* +0x00C, TaskCoreObj__Destroy's forward target
-                                              (gIntermediateBaseMethods+0x00C = BasicClass__func_17f2c) */
+                                              (gIntermediateBaseMethods+0x00C = BasicClass__Finalize) */
     u8 pad10[0x044 - 0x010];
     void (*slot44)(StreamTaskObj *self, s32 a1, s32 a2); /* +0x044 */
 };

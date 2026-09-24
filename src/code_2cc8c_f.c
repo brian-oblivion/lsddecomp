@@ -109,7 +109,7 @@ Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void) {
 Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void);
 
 Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name) {
-    Obj6EAC0 *self = func_80017B34(0xB8);
+    Obj6EAC0 *self = BMemPMgrAlloc(0xB8);
     if (self != NULL) {
         Obj6EAC0__GetDerivedMethods()->slot08(self, (s32)ctx, len, (s32)name);
         return (Unk64Elem *)self;
@@ -127,7 +127,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     self->childCount = a2;
     self->childStart = 0;
     self->gapIndex = 0;
-    cursor = func_80017B34(a2 * 4);
+    cursor = BMemPMgrAlloc(a2 * 4);
     if (cursor != NULL) {
         self->children = cursor;
         i = 0;
@@ -144,7 +144,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 
 void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->children, self->totalChildCount);
-    self->children = func_80017CFC(self->children);
+    self->children = BMemPMgrFree(self->children);
     func_80041C3C()->slot0C(self);
 }
 

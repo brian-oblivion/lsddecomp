@@ -222,7 +222,7 @@ Unk18Obj *New_Unk18Obj(void)
 {
     Unk18Obj *self;
 
-    self = func_80017B34(0xBC);
+    self = BMemPMgrAlloc(0xBC);
     if (self != NULL) {
         GetUnk18ObjMethods()->ctor(self);
         return self;

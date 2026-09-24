@@ -75,7 +75,7 @@ Beyond the correction:
   function: `gStreamTaskObjMethods+0x0DC = func_8003D050`, extern, void, confirmed to
   exist via `classtable.py gStreamTaskObjMethods`.
 - New `TaskUtilMethods` slot `+0x00C` (`gIntermediateBaseMethods+0x00C =
-  BasicClass__func_17f2c`, extern, void — the generic base-class slot name
+  BasicClass__Finalize`, extern, void — the generic base-class slot name
   already seen elsewhere in this game).
 
 ## Third-learning check (per head's request)

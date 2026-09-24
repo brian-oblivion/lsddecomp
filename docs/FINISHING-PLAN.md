@@ -337,7 +337,7 @@ propagates everywhere.
   definition; B, mechanics described but purpose in the game not established;
   C, placeholder kept, with what IS known written down. The tier-C form for a
   method whose CLASS is known is `Class__func_xxxxx` (the existing
-  `BasicClass__func_17eb0` convention), and bare `func_800xxxxx` otherwise;
+  `BasicClass__Release` convention), and bare `func_800xxxxx` otherwise;
   `plan.py` counts both as unnamed. A wrong tier-A name is worse than a
   placeholder. A tier-B name is expected to be sharpened later; renames are
   cheap now.

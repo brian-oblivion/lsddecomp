@@ -34,7 +34,7 @@ registers) — matched, needing two levers.
 2. **The seek-offset arithmetic must be ONE fully-resolved expression
    BEFORE the intervening `free()` call, not split across it.** The raw
    disassembly interleaves the shift and the `-0x780` subtract around the
-   `func_80017CFC(hdr)` free call (the shift lands before the call, the
+   `BMemPMgrFree(hdr)` free call (the shift lands before the call, the
    subtract in the call's own delay slot) — reproducing that exact
    interleaving from C proved unnecessary and actively wrong: writing
    `seekPos = raw << 7; free(hdr); seekPos -= 0x780;` (matching the

@@ -73,13 +73,13 @@ typedef struct EventArg {
  * left untyped. */
 typedef struct Class865C8Methods {
     s32 header;                                   /* +0x000 */
-    void *unk04;                                   /* +0x004 BasicClass__func_17eb0 */
+    void *unk04;                                   /* +0x004 BasicClass__Release */
     /* Typed because New_Obj865C8 (this unit) dispatches it as
      * GetObj865C8Methods()->ctor(self, arg1, arg2, arg3); the signature is
      * Obj865C8__Obj865C8's own, defined just below. */
     void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, SubObjD *arg2, s32 arg3); /* +0x008 Obj865C8__Obj865C8 */
     void (*dtor)(Obj865C8 *self);                  /* +0x00C Obj865C8__Dtor */
-    /* BasicClass-inherited (BasicClass__func_17f98 -- same address as
+    /* BasicClass-inherited (BasicClass__AddChild -- same address as
      * Class6D3C8.h's own local unk10 view of this same shared slot).
      * Called by Obj865C8__EnterState2 as self->methods->slot10(self, newObj). */
     void (*slot10)(Obj865C8 *self, Obj4C *arg1);   /* +0x010 */
@@ -434,7 +434,7 @@ extern Class86668Methods *GetClass86668Methods(void);
 
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
  * class_16334.h for the other units that also declare it locally. */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 /* Allocator in the still-uncarved unit code_179d8 (asm/code_179d8.s):
  * allocates a 0x64-byte instance and, on success, ctors it with the single
@@ -507,7 +507,7 @@ typedef struct LoadRequest {
 extern SubObjG *func_80043840(LoadRequest *req);
 
 /* Uncarved, asm/psyq_memset.s: a magic-multiply division idiom over its one
- * argument (not an allocator -- no `func_80017B34` call in its own body).
+ * argument (not an allocator -- no `BMemPMgrAlloc` call in its own body).
  * Its return value is forwarded as `func_800398E0`'s own 1st argument. */
 extern s32 func_80048D74(s32 arg1);
 

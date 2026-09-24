@@ -414,7 +414,7 @@ DreamSysBaseMethods *DreamSys__GetBaseMethods(void) {
     return &D_800878D4;
 }
 
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 /* The class allocated below, table D_800879C4 (49 slots, uncarved --
  * lives in the still-monolithic asm/class_3bb8c_q.s, this unit's
@@ -454,7 +454,7 @@ struct D800879C4Obj {
 };
 
 void *New_D800879C4(void *arg1, void *arg2, void *arg3) {
-    void *obj = func_80017B34(0xA8);
+    void *obj = BMemPMgrAlloc(0xA8);
     if (obj != NULL) {
         func_80057F58()->ctor(obj, arg1, arg2, arg3);
         return obj;

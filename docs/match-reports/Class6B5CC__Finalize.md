@@ -22,8 +22,8 @@ void Class6B5CC__Finalize(Class6B5CCObj *self) {
     self->methods->slot50(self);
     self->methods->slot54(self);
     self->methods->slot5C(self, 0);
-    func_80017CFC(self->unk14->unk44);
-    func_80017CFC(self->unk14);
+    BMemPMgrFree(self->unk14->unk44);
+    BMemPMgrFree(self->unk14);
     Get_vtable_BasicClass()->dtor(self);
 }
 ```

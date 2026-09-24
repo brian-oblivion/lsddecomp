@@ -21,7 +21,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     self->unkAB = a2;
     self->unkAC = 0;
     self->unkAA = 0;
-    cursor = func_80017B34(a2 * 4);
+    cursor = BMemPMgrAlloc(a2 * 4);
     if (cursor != NULL) {
         self->unkB4 = cursor;
         i = 0;
@@ -44,7 +44,7 @@ sibling table's own `slot08` (a base-class-style constructor call
 through `func_80041C3C()`, same shape as `New_Obj6EAC0` calling
 `Obj6EAC0__GetDerivedMethods()->slot08`), then sets up `self->methods` to the
 DERIVED table, zeroes/initialises the slice-index fields, allocates an
-`a2`-element child array via `func_80017B34`, fills each slot by
+`a2`-element child array via `BMemPMgrAlloc`, fills each slot by
 calling the external New_X-shaped allocator `func_80041AB4(a1, 0x20)`
 (itself a "return-regardless" New_X variant, not this unit's function
 to attempt), and — only if the array allocation succeeded — dispatches

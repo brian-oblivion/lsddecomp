@@ -12,9 +12,9 @@ this class's own slots (`+0x044`, `+0x04C` twice, `+0x054`) — all four are
 null at `D_8006D430`'s own level (verified by reading the table's raw words
 directly out of `disk/SLPS_015.56`; see `include/code_171e0.h`), so they only
 resolve to real code for whichever subclass overrides them — sizes a new
-allocation via `func_80017B34`, and on success installs the new pointer/size
+allocation via `BMemPMgrAlloc`, and on success installs the new pointer/size
 into `this->unk10`/`this->unk14` and restores a temporarily-zeroed field
-(`this->unk0C`); on failure it releases a null pointer via `func_80017CFC`
+(`this->unk0C`); on failure it releases a null pointer via `BMemPMgrFree`
 and still calls slot `+0x048`.
 
 ## Derivation
@@ -34,7 +34,7 @@ lw    $v0, 0x4C($v0)
 jalr  $v0                       ; size = this->methods->slot4C(this, 0, 2)
  li   $a2, 2
 move  $s2, $v0                  ; s2 = size
-jal   func_80017B34             ; func_80017B34(size)  -- ONE ARGUMENT (see below)
+jal   BMemPMgrAlloc             ; BMemPMgrAlloc(size)  -- ONE ARGUMENT (see below)
  move $a0, $s2
 move  $s1, $v0                  ; s1 = newRes
 beqz  $s1, FAIL
@@ -45,7 +45,7 @@ sw    $s2, 0x14($s0)            ; this->unk14 = size
 j     END
  sw   $s3, 0xC($s0)             ; this->unk0C = saved value
 FAIL:
-jal   func_80017CFC              ; func_80017CFC(0)  -- literal NULL, not `this`
+jal   BMemPMgrFree              ; BMemPMgrFree(0)  -- literal NULL, not `this`
  move $a0, $zero
 ...slot48(this)
 END: epilogue
@@ -66,7 +66,7 @@ void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
     this->unk0C = 0;
     this->methods->slot44(this, arg1, 1, 0);
     size = this->methods->slot4C(this, 0, 2);
-    newRes = func_80017B34(size);
+    newRes = BMemPMgrAlloc(size);
     if (newRes != NULL) {
         this->methods->slot4C(this, 0, 0);
         this->methods->slot54(this, newRes, size);
@@ -75,7 +75,7 @@ void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
         this->unk14 = size;
         this->unk0C = savedUnk0C;
     } else {
-        func_80017CFC(NULL);
+        BMemPMgrFree(NULL);
         this->methods->slot48(this);
     }
 }
@@ -83,16 +83,16 @@ void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
 
 ## Attempt log — the real find
 
-First attempt (`func_80017B34(size, 0)`, matching the 2-argument signature
+First attempt (`BMemPMgrAlloc(size, 0)`, matching the 2-argument signature
 already on file in `include/class_16334.h`) compiled and linked, but produced
 a single-instruction shape mismatch right at the allocator call: retail's
-delay slot for `jal func_80017B34` is just `move a0,s2`; mine additionally
+delay slot for `jal BMemPMgrAlloc` is just `move a0,s2`; mine additionally
 emitted a **separate, non-delay-slot** `move a0,s2` plus a redundant
 `move a1,zero` in the delay slot — i.e. two wrong instructions from supplying
 an argument retail's call site never sets up at all.
 
 Cross-checked against `docs/match-reports/new_class_6d3c8.md` (a different
-unit, `code_1677c`), which independently derived `func_80017B34(0x2C)` — one
+unit, `code_1677c`), which independently derived `BMemPMgrAlloc(0x2C)` — one
 argument — for the same function. **The two-argument signature in
 `include/class_16334.h` (`s32 size, s32 zone`) is wrong**; it was never
 exercised against a call site where the phantom second argument's register
@@ -117,7 +117,7 @@ worst-drifted function in the build before the fix — `70/70` after).
 ## Proposed learning
 
 **FALSIFIED, round 59 (head, extern review).** The claim below is wrong
-about the callee. `func_80017B34` genuinely reads TWO argument registers:
+about the callee. `BMemPMgrAlloc` genuinely reads TWO argument registers:
 `addu $s1, $a1, $zero` at `0x80017B44` saves the incoming `$a1` before
 anything writes it, and it is consumed as `addu $t0, $s1, $zero` at
 `0x80017B68` on the path taken when the `$gp` default pool is unset. What
@@ -125,11 +125,11 @@ the two units below measured is that THEIR OWN call sites pass one argument
 and retail emits nothing for a second -- true, and the reason
 `include/class_16334.h:74`'s one-parameter declaration is byte-correct for
 them. It is a fact about those call sites, not about the callee's arity.
-See `docs/match-reports/func_80017B34.md`, `## Extern arity (round 59)`.
+See `docs/match-reports/BMemPMgrAlloc.md`, `## Extern arity (round 59)`.
 
-**`func_80017B34` takes one argument (`size`), not two.**
-`include/class_16334.h:74`'s `extern void *func_80017B34(s32 size, s32 zone);`
-should be corrected to `extern void *func_80017B34(s32 size);` — confirmed
+**`BMemPMgrAlloc` takes one argument (`size`), not two.**
+`include/class_16334.h:74`'s `extern void *BMemPMgrAlloc(s32 size, s32 zone);`
+should be corrected to `extern void *BMemPMgrAlloc(s32 size);` — confirmed
 independently in two units (`new_class_6d3c8` in `code_1677c`, and this
 function). Left unfixed for now since `class_16334.h` is outside this unit's
 scope; flagged for a spawned follow-up.
@@ -145,7 +145,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 **Evidence.** `+0x058` slot: a lazy (re)allocation routine. No-ops if
 `this->unk10` is already set; otherwise sizes and commits a new buffer
 through `slot44`/`slot4C`/`slot54`/`slot48` (all null at this class's own
-level -- subclass hooks) and `func_80017B34`, installing the result into
+level -- subclass hooks) and `BMemPMgrAlloc`, installing the result into
 `unk10`/`unk14` on success. Mechanics fully derived; what the buffer holds
 at the base-class level is not (the subclass provides that via the hooks).
 
@@ -169,8 +169,8 @@ PROPOSED, not renamed:
 | field | proposed name | tier | evidence |
 | --- | --- | --- | --- |
 | `unk0C` | `pendingGeneration` | C | Saved before being zeroed for the duration of the `slot44`/`slot4C` alloc dance, restored on success, left at `0` on failure. Read/write shape of a counter or sequence id, but no read site outside this dance was found to confirm what it counts -- kept speculative (tier C) rather than asserted. |
-| `unk10` | `buffer` | B | The lazily-(re)allocated resource itself: obtained from `func_80017B34`, released via `func_80017CFC`. Mechanics fully known; what the buffer actually holds at this base-class level is not (subclass-specific, via the null hooks). |
-| `unk14` | `bufferSize` | B | `unk10`'s allocation size, threaded through the same `slot4C`/`func_80017B34` calls. |
+| `unk10` | `buffer` | B | The lazily-(re)allocated resource itself: obtained from `BMemPMgrAlloc`, released via `BMemPMgrFree`. Mechanics fully known; what the buffer actually holds at this base-class level is not (subclass-specific, via the null hooks). |
+| `unk14` | `bufferSize` | B | `unk10`'s allocation size, threaded through the same `slot4C`/`BMemPMgrAlloc` calls. |
 
 Posted to the broadcast for the head to apply (whole-tree replace + oracle,
 per FINISHING-PLAN track 3's merge procedure).

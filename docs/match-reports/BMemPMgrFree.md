@@ -1,4 +1,6 @@
-# func_80017CFC — MATCHED (round 46): 107/107 words, byte-exact
+# BMemPMgrFree — MATCHED (round 46): 107/107 words, byte-exact
+
+> Renamed from `func_80017CFC` on 2026-09-24 (tools/rename.py). Address 0x80017cfc.
 
 ## ROUND 46 (bravo, second sitting): first-ever permuter search, MATCHED 99 -> 107/107
 
@@ -7,7 +9,7 @@ Picked up per this round's assignment as "never permuter-searched" despite
 all three of this round's mandated Gate-3 checks before searching, all
 recorded:
 
-1. **Correctness.** `tools/setup-permuter.sh func_80017CFC
+1. **Correctness.** `tools/setup-permuter.sh BMemPMgrFree
    permuter-work/func_80017CFC_seed.c` (seed checked byte-for-byte identical
    to the current in-tree preserved body first) built a scaffold cleanly:
    "base compiles, target assembled."
@@ -25,9 +27,9 @@ recorded:
    unlinked scaffold vs. linked build). No disagreement — safe to search.
 
 **Search: blind, no PERM macros, `-j 6`, bounded `timeout 1500` (backgrounded
-while `func_80017B34`'s recovered-candidate work above was written up and
+while `BMemPMgrAlloc`'s recovered-candidate work above was written up and
 committed).** Found a **zero score at iteration 373** —
-`permuter-work/func_80017CFC/output-0-1/`.
+`permuter-work/BMemPMgrFree/output-0-1/`.
 
 **The permuter's own diff carried two changes; only one was legitimate, and
 they were tested separately before either was trusted:**
@@ -51,7 +53,7 @@ they were tested separately before either was trusted:**
 - Applied ONLY change 2 (the `nextSize` reuse) on top of the committed
   99/107 body, leaving `SetBMemPMgrBusy`'s real single declaration untouched.
   `./build-and-verify.sh`: **`build exit=0`, `OK: build matches retail
-  SLPS_015.56`.** `tools/funcdiff.py func_80017CFC`: **107/107 words,
+  SLPS_015.56`.** `tools/funcdiff.py BMemPMgrFree`: **107/107 words,
   byte-exact.** The fabricated-prototype mutation was pure permuter noise
   that happened to ride along in the diff without being load-bearing — the
   real fix is entirely the dead-variable reuse.
@@ -61,14 +63,14 @@ they were tested separately before either was trusted:**
   fabrication against a real, differently-typed definition elsewhere in the
   project is not a legitimate translation, whatever the scorer says.)
 
-**Adopted. `func_80017CFC` is MATCHED, 107/107 words, byte-exact against
+**Adopted. `BMemPMgrFree` is MATCHED, 107/107 words, byte-exact against
 retail.** A short comment was added at the `nextSize` reuse site explaining
 why the dead variable is repurposed, since the idiom is unusual on its own
 and was found by search rather than derivation. Whole-image oracle re-run
 after the comment addition: still `OK: build matches retail`.
 
 **Unit:** `code_8220` — with this function's match, `code_8220` has exactly
-one remaining `INCLUDE_ASM` (`func_80017B34`, see its own report).
+one remaining `INCLUDE_ASM` (`BMemPMgrAlloc`, see its own report).
 
 ### Proposed learning
 
@@ -77,7 +79,7 @@ one remaining `INCLUDE_ASM` (`func_80017B34`, see its own report).
 an unrelated boolean/temporary a few lines later, and doing so can be
 exactly what nudges GCC 2.6.3 -O2 into retail's register choice for that
 temporary.** This is the read/no-branch-on-garbage-safe cousin of this
-round's `func_80017B34` finding (`p = unused = expr;`, a local declared
+round's `BMemPMgrAlloc` finding (`p = unused = expr;`, a local declared
 *only* to receive a dead store): here the local already existed for a real
 purpose, and the trick is reusing it a second time after its first job is
 done, rather than declaring a fresh anonymous one. Both are ordinary C, both
@@ -92,33 +94,33 @@ timing right and only the register is wrong.
 
 **Unit:** `code_8220` · **Size:** 107 words, EXACT. **Status:** STALL after
 ~10 attempts, restored to `INCLUDE_ASM`. Best raw score 99/107 words (92.5%);
-`tools/asm-differ/diff.py func_80017CFC` (realigned) confirms zero drift and
+`tools/asm-differ/diff.py BMemPMgrFree` (realigned) confirms zero drift and
 the first real difference at file offset `0x85BC` / vram `0x80017DBC`.
 
 ## Verdict correction on the predecessor report
 
 Filed as `gp_rel`-blocked, reopened round 42. This round attempted it for the
 first time. The prior report's functional read (pool `free`, mirror of
-`func_80017B34`, same critical-section lock, coalesce-with-adjacent-free-block
+`BMemPMgrAlloc`, same critical-section lock, coalesce-with-adjacent-free-block
 logic, same packed size+flags header) was correct and is confirmed exactly by
 the derivation below — including the ONE detail it left open ("depending on
 the header's high bit... either coalesces... or inserts... as a new
 standalone entry", which undersells it: it can do BOTH coalesces, with the
 previous block and the next block, not an either/or).
 
-## The three func_80017B34 levers all transferred directly
+## The three BMemPMgrAlloc levers all transferred directly
 
 This function needed exactly the same three structural levers as its sibling
-`func_80017B34` (`docs/match-reports/func_80017B34.md`), confirming they are
+`BMemPMgrAlloc` (`docs/match-reports/BMemPMgrAlloc.md`), confirming they are
 reusable project-wide, not one-off:
 
 1. **K&R old-style definition** for the dead second `pool` parameter,
    against the same unspecified-parameter declaration in `code_8220.h`
-   (`extern void *func_80017CFC();`, already in place from `func_80017B34`'s
+   (`extern void *BMemPMgrFree();`, already in place from `BMemPMgrAlloc`'s
    round).
 2. **Reuse an existing pointer's register instead of a fresh local** where
    retail does. Here it's not a `+=` on the parameter (unlike
-   `func_80017B34`'s `size`) but the SAME idea applied to `header`: on the
+   `BMemPMgrAlloc`'s `size`) but the SAME idea applied to `header`: on the
    coalesce-with-previous path, retail reloads directly into the SAME
    register that held `header` (`lw a2,-8(s0)`, reusing `a2`) rather than
    loading into a new register and moving it. The equivalent C is a plain
@@ -129,11 +131,11 @@ reusable project-wide, not one-off:
    through the soon-dead `header` variable cost an extra `move`).
 3. **Per-`if` scoped hoist of the twice-used free-list `prev`/`next` pair**,
    applied to BOTH unlink sites (one for the coalesce-with-previous case,
-   one for the coalesce-with-next case) — same shape as `func_80017B34`'s
+   one for the coalesce-with-next case) — same shape as `BMemPMgrAlloc`'s
    lever 3, confirmed to generalize to a second, independently-written pair
    of unlink sites in a sibling function.
 
-**New wrinkle found here, not present in `func_80017B34`:** the SIZE value
+**New wrinkle found here, not present in `BMemPMgrAlloc`:** the SIZE value
 being folded into the coalesced header must be captured into a local BEFORE
 reassigning the pointer that owned it, since the pointer swap destroys access
 to the original field:
@@ -151,7 +153,7 @@ if ((s32)header->sizeAndFlags < 0) {
 
 ## The per-if hoist direction is NOT a fixed rule across blocks — measured, not guessed
 
-`func_80017B34`'s report already flagged that which of `{n, p}` should be
+`BMemPMgrAlloc`'s report already flagged that which of `{n, p}` should be
 declared first to land the CONDITION variable in `v1` differs between two
 structurally-identical-looking `if` pairs, with no visible source-level
 explanation. This function reproduces the same fact a second time,
@@ -199,19 +201,19 @@ regresses hard (tested 4 times, same failure mode every time), while
 restructuring that keeps the outer shape and only changes WHEN a sub-value
 gets read (via an extra local) is safe and can still help. This looks like
 the same class of GCC 2.6.3 scheduler/allocator behavior documented as
-unresolved in `func_80017B34`'s report — not obviously fixable from the C
+unresolved in `BMemPMgrAlloc`'s report — not obviously fixable from the C
 side, a permuter candidate.
 
 ## Struct layout
 
-Same `BMemBlockHdr`/`BMemPMgr` as `func_80017B34` — no new fields discovered
+Same `BMemBlockHdr`/`BMemPMgr` as `BMemPMgrAlloc` — no new fields discovered
 here; every offset this function touches was already established.
 
 ## Preserved near-miss body (99/107, length-exact)
 
 ```c
 #if 0
-void *func_80017CFC(ptr, pool)
+void *BMemPMgrFree(ptr, pool)
     void *ptr;
     void *pool;
 {
@@ -221,7 +223,7 @@ void *func_80017CFC(ptr, pool)
     u32 nextFree;
 
     SetBMemPMgrBusy(1);
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -309,7 +311,7 @@ void *func_80017CFC(ptr, pool)
 
 ### Proposed learning (round 45)
 
-- **`func_80017B34`'s three levers generalize.** All three transferred to
+- **`BMemPMgrAlloc`'s three levers generalize.** All three transferred to
   this sibling function with no modification needed beyond the obvious
   per-function field/variable renaming. Worth treating as the default
   starting shape for any further `code_8220`/`code_8220_b` pool-management
@@ -337,7 +339,7 @@ odd-one-out declaration is the load-bearing one.
 before writing it:
 
 ```
-80017b34 <func_80017B34>:        80017cfc <func_80017CFC>:
+80017b34 <BMemPMgrAlloc>:        80017cfc <BMemPMgrFree>:
 80017b3c:  move  s0,a0           80017d04:  move  s0,a0
 80017b40:  move  s1,a1   <-      80017d0c:  move  s1,a1   <-
 ...                              ...
@@ -345,9 +347,9 @@ before writing it:
 ```
 
 `$a1` is a fallback pool pointer, consumed only on the path where the
-`$gp`-relative default pool `D_8008A818` is unset (`lw t0,16(gp)` /
+`$gp`-relative default pool `gDefaultBMemPMgr` is unset (`lw t0,16(gp)` /
 `bnez t0,...` immediately before). It is dead in practice at every decoded call
-site, because `func_80017AC8`/`func_80017A9C` set that global first — but it is
+site, because `SetupBMemPMgrFreeList`/`SetDefaultBMemPMgr` set that global first — but it is
 read, so these are two-argument functions.
 
 **Why the 22 one-parameter declarations are right anyway.** Every carved call
@@ -355,7 +357,7 @@ site passes one argument, and retail emits only `$a0` for it — e.g.
 `Class6D430__AllocBuffer`'s call:
 
 ```
-80026b70:  jal   80017b34 <func_80017B34>
+80026b70:  jal   80017b34 <BMemPMgrAlloc>
 80026b74:  move  a0,s2            <- $a0 only; $a1 is left as the caller had it
 ```
 
@@ -367,8 +369,8 @@ register the caller happens to leave loaded.
 `src/code_8220.c` with old-style (K&R identifier-list) parameter lists, which is
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
-unit's own later one-argument call sites (`func_800181AC`'s
-`func_80017B34(0x8)`, `func_80018208`'s `func_80017CFC(node)`). A K&R definition
+unit's own later one-argument call sites (`PushBasicClassListNode`'s
+`BMemPMgrAlloc(0x8)`, `RemoveBasicClassListNode`'s `BMemPMgrFree(node)`). A K&R definition
 installs no prototype, so those later calls stay clean; an unspecified-parameter
 declaration does the same for everything before the definition. A full prototype
 here reintroduces exactly that conflict.
@@ -380,3 +382,12 @@ unit correctly. Converging them would break one side or the other.
 **Declaration sites changed:** none (no arity anywhere changed).
 `/* arity-ok: ... */` added to the two lines in `include/code_8220.h`. Oracle
 green.
+
+## Naming (round 74)
+
+`BMemPMgrFree`, **tier A**: fully derived free-list release (round 46,
+99->107/107 permuter match) -- coalesces with the previous and following
+blocks and re-links the free list, the mirror of `BMemPMgrAlloc`. Called
+across the same wide set of units as `BMemPMgrAlloc` (`code_2cc8c_f`,
+`code_55dd4`, `code_d294`, `code_8220_b`, `main`, plus this unit's own
+`RemoveBasicClassListNode`), confirming the general-purpose pool pairing.

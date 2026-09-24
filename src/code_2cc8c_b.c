@@ -49,11 +49,11 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
         count++;
     }
     size = count * 4;
-    arr = func_80017B34(size);
+    arr = BMemPMgrAlloc(size);
     self->unk54 = arr;
-    self->unk5C = func_80017B34(size);
-    self->slotCounts = func_80017B34(size);
-    self->unk64 = func_80017B34(size);
+    self->unk5C = BMemPMgrAlloc(size);
+    self->slotCounts = BMemPMgrAlloc(size);
+    self->unk64 = BMemPMgrAlloc(size);
     self->unk50 = count;
 
     if (a1->unk0 != NULL) {
@@ -111,10 +111,10 @@ void func_8003D050(Obj86B60 *self)
         elem->methods->slot4(elem);
         i++;
     }
-    func_80017CFC(self->unk64);
-    func_80017CFC(self->slotCounts);
-    func_80017CFC(self->unk5C);
-    func_80017CFC(self->unk54);
+    BMemPMgrFree(self->unk64);
+    BMemPMgrFree(self->slotCounts);
+    BMemPMgrFree(self->unk5C);
+    BMemPMgrFree(self->unk54);
 }
 
 void func_8003D194(Obj86B60 *self, void *a1)
@@ -262,7 +262,7 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
     while (*list++ != NULL) {
         count++;
     }
-    buf = func_80017B34(count * 4);
+    buf = BMemPMgrAlloc(count * 4);
     self->unk64[idx] = (void *)buf;
     self->slotCounts[idx] = a1->unk4;
     self->unk5C[idx] = count;
@@ -282,7 +282,7 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
 void func_8003D6D4(Obj86B60 *self)
 {
     ReleaseBasicClassArray(self->unk64[self->activeSlot], self->unk5C[self->activeSlot]);
-    func_80017CFC(self->unk64[self->activeSlot]);
+    BMemPMgrFree(self->unk64[self->activeSlot]);
 }
 
 /* STALL -- see docs/match-reports/func_8003D73C.md. Round 49 (delta):

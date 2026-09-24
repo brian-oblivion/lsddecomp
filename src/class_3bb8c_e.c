@@ -120,8 +120,8 @@ extern s32 D_8008AAA4;
  * func_8004ECCC only. */
 extern s32 D_8008AAAC;
 
-extern void *func_80017B34(s32 size);
-extern void *func_80017CFC(void *ptr);
+extern void *BMemPMgrAlloc(s32 size);
+extern void *BMemPMgrFree(void *ptr);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 
@@ -397,10 +397,10 @@ s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
         return 0;
     }
     if (destBuf != NULL) {
-        buf = func_80017B34(0x80);
+        buf = BMemPMgrAlloc(0x80);
         read(handle, buf, 0x80);
         strcpy((char *)destBuf, (char *)buf + 4);
-        func_80017CFC(buf);
+        BMemPMgrFree(buf);
     }
     close(handle);
     return 1;

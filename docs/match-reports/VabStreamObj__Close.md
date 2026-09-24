@@ -23,9 +23,9 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
         SsEnd();
         QuitSpu();
     }
-    func_80017CFC(self->vagAttrPool);
-    func_80017CFC(self->progVagTable);
-    func_80017CFC(self->baseFilename);
+    BMemPMgrFree(self->vagAttrPool);
+    BMemPMgrFree(self->progVagTable);
+    BMemPMgrFree(self->baseFilename);
     return func_80026CAC()->slot0C(self);
 }
 ```

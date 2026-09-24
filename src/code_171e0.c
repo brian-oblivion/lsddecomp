@@ -41,7 +41,7 @@ void *DestroyChained(Class6D430 *this) {
     this->freeGuard = 0;
     this->methods->dtor(this);
     Get_vtable_BasicClass()->dtor(this);
-    func_80017CFC(this);
+    BMemPMgrFree(this);
     return NULL;
 }
 
@@ -75,7 +75,7 @@ void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
     this->pendingGeneration = 0;
     this->methods->configureBuffer(this, arg1, 1, 0);
     size = this->methods->bufferControl(this, 0, 2);
-    newRes = func_80017B34(size);
+    newRes = BMemPMgrAlloc(size);
     if (newRes != NULL) {
         this->methods->bufferControl(this, 0, 0);
         this->methods->installBuffer(this, newRes, size);
@@ -84,7 +84,7 @@ void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
         this->bufferSize = size;
         this->pendingGeneration = savedPendingGeneration;
     } else {
-        func_80017CFC(NULL);
+        BMemPMgrFree(NULL);
         this->methods->onBufferChanged(this);
     }
 }
@@ -99,7 +99,7 @@ void Class6D430__FreeBuffer(Class6D430 *this) {
     if (this->freeGuard != 0) {
         return;
     }
-    func_80017CFC(this->buffer);
+    BMemPMgrFree(this->buffer);
     this->buffer = NULL;
 }
 

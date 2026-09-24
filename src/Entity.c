@@ -28,12 +28,12 @@
 Entity *New_Entity(void *arg0, void *arg1, void *arg2) {
     Entity *obj;
 
-    obj = func_80017B34(0x108);
+    obj = BMemPMgrAlloc(0x108);
     if (obj == NULL) {
         return NULL;
     }
     if (Get_vtable_Entity()->ctor(obj, arg0, arg1, arg2) == NULL) {
-        func_80017CFC(obj);
+        BMemPMgrFree(obj);
         return NULL;
     }
     return obj;

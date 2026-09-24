@@ -5,7 +5,7 @@
 **Unit:** class_3bb8c_f · **Size:** 32 words (0x80) · **Status:** MATCH
 
 `void TaskObjF__AllocBuffers(TaskObjF *self)`. If `self->unk38` (a `void **`, a
-16-entry pointer array) is unallocated, allocates it (`func_80017B34
+16-entry pointer array) is unallocated, allocates it (`BMemPMgrAlloc
 (0x40)`, 16 words), fills the first 15 entries with individually-allocated
 0x41-byte buffers, then allocates `self->unk3C` (a single 0x40-byte
 buffer). Entry 15 of `unk38` is deliberately left uninitialized here — it

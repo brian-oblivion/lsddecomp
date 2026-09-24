@@ -1,10 +1,12 @@
-# func_800181AC
+# PushBasicClassListNode
+
+> Renamed from `func_800181AC` on 2026-09-24 (tools/rename.py). Address 0x800181ac.
 
 **Unit:** code_8220 · **Size:** 23 instructions · **Status:** MATCHED (23/23 words)
 
 The `BasicClassListNode` list-push primitive, used by both of BasicClass's
-lists (`children` via `BasicClass__func_17f98`, `parentRefs` via
-`BasicClass__func_180fc`) — see `BasicClass__BasicClass.md` for the
+lists (`children` via `BasicClass__AddChild`, `parentRefs` via
+`BasicClass__AddParentRef`) — see `BasicClass__BasicClass.md` for the
 class's overall design. Both call sites and this function's own
 signature were provisionally established last round while matching those
 two callers (still `INCLUDE_ASM` at the time); this round derives the
@@ -13,19 +15,19 @@ body itself.
 ## What it does
 
 Allocates an 8-byte `BasicClassListNode` from the pool
-(`func_80017B34(0x8)`); on success, sets `node->value = value`,
+(`BMemPMgrAlloc(0x8)`); on success, sets `node->value = value`,
 `node->next = *head` (the previous head), `*head = node` (prepend), and
 returns `1`. On allocation failure, returns `0` without touching `*head`.
 
 ## The C
 
 ```c
-s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
+s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value)
 {
     BasicClassListNode *node;
     BasicClassListNode *oldHead;
 
-    node = func_80017B34(0x8);
+    node = BMemPMgrAlloc(0x8);
     if (node != NULL) {
         oldHead = *head;
         node->value = value;
@@ -60,3 +62,11 @@ attempt.
 
 round 11 (2026-09-03), runner delta, unit code_8220, second pass. 2
 attempts.
+
+## Naming (round 74)
+
+`PushBasicClassListNode`, **tier A**: allocates an 8-byte `BasicClassListNode`
+from `BMemPMgrAlloc` and prepends it to `*head`; used identically for both
+of `BasicClass`'s lists (`children` via `BasicClass__AddChild`/AddChild,
+`parentRefs` via `BasicClass__AddParentRef`/AddParentRef), confirming it is
+the shared list-push primitive rather than something list-specific.

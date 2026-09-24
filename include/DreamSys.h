@@ -602,7 +602,7 @@ extern const s8 VOICE_PITCH_BY_SELECT[0x18];
 
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
    class_16334.h for the other units that also declare it locally. */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 /* Also declared in Entity.h for a different (Entity) struct's fields; here
    called by DreamSys__StopDrift as (this->soundObj, this->soundCueSet)

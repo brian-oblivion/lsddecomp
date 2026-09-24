@@ -1,4 +1,6 @@
-# BasicClass__func_180bc
+# BasicClass__GetNextChild
+
+> Renamed from `BasicClass__func_180bc` on 2026-09-24 (tools/rename.py). Address 0x800180bc.
 
 **Unit:** code_8220 · **Size:** 16 instructions · **Status:** MATCHED (16/16 words)
 
@@ -8,7 +10,7 @@ BasicClass vtable slot `+0x01C` (`getNextChild`) — see
 ## What it does
 
 The `children`-list iterator: `GetNextBasicClass` pop-and-advances a cursor
-(see `BasicClass__func_18040.md` for that function's established
+(see `BasicClass__RemoveAllChildren.md` for that function's established
 signature), and this wraps it with a "first call" seed — if `*outChild`
 is still `NULL` (the caller's sentinel for "haven't started yet"),
 `*cursor` is (re)seeded from `self->children` before popping. Lets a
@@ -27,7 +29,7 @@ do {
 ## The C
 
 ```c
-void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor)
+void BasicClass__GetNextChild(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor)
 {
     if (*outChild == NULL) {
         *cursor = self->children;
@@ -38,9 +40,16 @@ void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassL
 
 Matched first attempt, straight transliteration of the disassembly — the
 generic-object-iterator pattern was already fully derived while matching
-`BasicClass__func_18040` last round, so this one and its `parentRefs`
-sibling (`BasicClass__func_1816c`) needed no reshaping at all.
+`BasicClass__RemoveAllChildren` last round, so this one and its `parentRefs`
+sibling (`BasicClass__GetNextParentRef`) needed no reshaping at all.
 
 ## Provenance
 
 round 11 (2026-09-03), runner delta, unit code_8220, second pass.
+
+## Naming (round 74)
+
+`BasicClass__GetNextChild`, **tier A**: matches vtable slot `+0x01C`
+(`getNextChild`), already documented in `code_8220.h`. Seeds `*cursor`
+from `self->children` on the caller's first call, then pop-advances via
+`GetNextBasicClass`.

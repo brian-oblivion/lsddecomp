@@ -8,7 +8,7 @@ Creates a `BMemPMgr` memory pool: clamps `poolSize` up to a minimum of
 `0x400`, allocates `poolSize + 0x20` bytes from the game's generic heap
 (`func_80011D34`, Psy-Q SDK, `the 0x2258..0x8220 Psy-Q block (now linked from lib/, formerly asm/psyq_2258.s)`), and if that succeeds,
 initializes the pool header (`freeListHead = pool + 0x1C`, `poolSize`) and
-hands off to `func_80017AC8` (gp_rel-blocked, see its own report) to build
+hands off to `SetupBMemPMgrFreeList` (gp_rel-blocked, see its own report) to build
 the initial single free block covering the rest of the allocation. On
 allocation failure, logs an error via the Psy-Q printf wrapper
 (`func_80012C20`) using the rodata format string at `D_8001028C`
@@ -32,7 +32,7 @@ void *BMemPMgrInit(s32 poolSize)
     if (pool != NULL) {
         pool->freeListHead = (u8 *)pool + 0x1C;
         pool->poolSize = poolSize;
-        func_80017AC8(pool);
+        SetupBMemPMgrFreeList(pool);
     } else {
         func_80012C20(D_8001028C, NULL, poolSize);
     }
@@ -49,20 +49,20 @@ void *BMemPMgrInit(s32 poolSize)
    later reads it back with `%ld` (a *different*, signed, view of the same
    bit pattern for display purposes only).
 
-2. **`func_80017AC8` is genuinely one argument, not two.** The natural
+2. **`SetupBMemPMgrFreeList` is genuinely one argument, not two.** The natural
    first draft passed `poolSize` as a second argument (a plausible guess —
-   `BMemPMgrInit` clearly wants `func_80017AC8` to know the pool size).
+   `BMemPMgrInit` clearly wants `SetupBMemPMgrFreeList` to know the pool size).
    That compiled to a real function, one word too long, with a spurious
-   `move $a1,$s1` immediately before the `jal`. Checking `func_80017AC8`'s
-   own disassembly (`asm/nonmatchings/code_8220/func_80017AC8.s`) shows why:
+   `move $a1,$s1` immediately before the `jal`. Checking `SetupBMemPMgrFreeList`'s
+   own disassembly (`asm/nonmatchings/code_8220/SetupBMemPMgrFreeList.s`) shows why:
    its own `$a1` is read as a *fallback* pool pointer (`bnez $a1,
    .L80017ADC; ori $v0,$zero,0x1; addu $a1,$a0,$zero` — defaults to `$a0`,
-   i.e. self, when the global default pool `D_8008A818` is unset), and
+   i.e. self, when the global default pool `gDefaultBMemPMgr` is unset), and
    `BMemPMgrInit`'s call site never sets `$a1` before the `jal` — it is a
    genuinely-uninitialized, forwarded register, the same shape
    DECOMPILATION_LEARNINGS documents as "an unused parameter in the callee
    shows up in the caller as a genuinely uninitialised local." Declaring
-   `func_80017AC8` as `void func_80017AC8(BMemPMgr *pool)` (one argument)
+   `SetupBMemPMgrFreeList` as `void SetupBMemPMgrFreeList(BMemPMgr *pool)` (one argument)
    and calling it that way removed the extra `move` and closed this to the
    word.
 
@@ -135,7 +135,7 @@ Replacing `extern void *BMemPMgrInit();` with the real one-parameter prototype
 would make that call a `too many arguments` compile error, and dropping the
 argument from the call site would delete `move a1,zero` and break the match.
 The unprototyped form is the only spelling that reproduces retail, and it is
-the same idiom `include/code_8220.h` uses for `func_80017B34`/`func_80017CFC`.
+the same idiom `include/code_8220.h` uses for `BMemPMgrAlloc`/`BMemPMgrFree`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/main.c:24`. Oracle green after the edit.

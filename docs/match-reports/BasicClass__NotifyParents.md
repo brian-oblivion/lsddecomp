@@ -8,7 +8,7 @@ Unit: `src/code_8220_b.c`. This is `BasicClassMethods` vtable slot `+0x030`,
 each parent, calls that parent's own `slot38` (`BasicClass__OnNotify`,
 already matched in this unit) with `self` as its `arg1` and `flag` passed
 through as `arg2`. Since `slot38` only acts `if (arg2 == 1)`, calling
-`notifyParents(self, 1)` (as `BasicClass__func_17f2c`'s finalize path does)
+`notifyParents(self, 1)` (as `BasicClass__Finalize`'s finalize path does)
 tells every parent holding a reference to `self` to remove `self` as its
 own child.
 
@@ -72,7 +72,7 @@ boolean.
 **Tier A**, by the vtable-slot convention (name the slot after the method
 it dispatches to). The inherited `notifyParents` is wrong twice: this is the
 EMITTER, not an `on*` handler, and it is not finalize-specific --
-`BasicClass__func_17f2c` (finalize) happens to be the only caller in carved
+`BasicClass__Finalize` (finalize) happens to be the only caller in carved
 C, which is a fact about how much is carved, not about the slot.
 Cross-unit: accessed from `src/class_3bb8c_i.c` and `src/code_8220.c`, so
 not mine to rename.

@@ -9,7 +9,7 @@
 The remove/free counterpart to `AllocCdRequestNode`: unlinks a node from the
 doubly-linked list rooted at `gCdRequestQueue` (fixing up `prev->next`,
 `next->prev`, or the list head as appropriate) and frees it via
-`func_80017CFC`. Void return. Never-attempted cold ground.
+`BMemPMgrFree`. Void return. Never-attempted cold ground.
 
 ## The C
 
@@ -31,7 +31,7 @@ void FreeCdRequestNode(Node8008A894 *node)
         if (next != NULL) {
             next->prev = node->prev;
         }
-        func_80017CFC(node);
+        BMemPMgrFree(node);
     }
     UnlockCd();
 }
@@ -43,6 +43,6 @@ Closed on the first attempt (uses the `Node8008A894` struct from
 ## Naming
 
 **Tier A.** The remove/free counterpart to `AllocCdRequestNode`: unlinks a
-node from `gCdRequestQueue` and frees it via `func_80017CFC`. Corroborated
+node from `gCdRequestQueue` and frees it via `BMemPMgrFree`. Corroborated
 by code_179d8_q.c's own comment (pre-rename): "func_800283C4 unlinks and
 frees".

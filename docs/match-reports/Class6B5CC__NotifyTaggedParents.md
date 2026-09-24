@@ -19,12 +19,12 @@ void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node);
 Confirmed from the disassembly's own register roles, not guessed: `a0`
 (Class6B5CC__NotifyTaggedParents's 1st param) is forwarded, unmodified, as the 2nd argument to
 the final dispatch call (`entry->methods->slot10(entry, self)`) — a "self"
-role. `a1` (2nd param) is what gets walked via `BasicClass__func_1816c` —
+role. `a1` (2nd param) is what gets walked via `BasicClass__GetNextParentRef` —
 the "node" being scanned for tag-4 parents.
 
 ## What it does
 
-Walks `node`'s parent-ref list (via `BasicClass__func_1816c`, already
+Walks `node`'s parent-ref list (via `BasicClass__GetNextParentRef`, already
 matched in `code_8220`) looking for entries whose header's low nibble is 4.
 For each such entry whose header's FULL low byte is also `0x34`, dispatches
 the entry's own `+0x010` vtable slot as `(entry, self)`. Keeps scanning the
@@ -44,7 +44,7 @@ void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
     tag = 4;
     entry = NULL;
 loop:
-    BasicClass__func_1816c(n, &entry, &cursor);
+    BasicClass__GetNextParentRef(n, &entry, &cursor);
     if (entry == NULL) {
         goto check_cursor;
     }
@@ -109,7 +109,7 @@ kept in a register across the loop at all.
 2. **Copying `self` into a local `Class6B5CCObj *s;` before the loop, and
    using `s` (not `self`) at the one dispatch call site**: 42/54 → 45/54.
 3. **Also copying `node` into a local `void *n;` before the loop, and using
-   `n` (not `node`) in the `BasicClass__func_1816c` call**: 45/54 → 47/54,
+   `n` (not `node`) in the `BasicClass__GetNextParentRef` call**: 45/54 → 47/54,
    and this is what fixed `node`'s OWN register to `$s0`, matching retail.
 
 So indirecting every one of the three "needs a callee-saved register"
@@ -166,10 +166,10 @@ whether the function itself matched)
   a retype, just an ordinary new-field insertion with a forgotten pad, and
   it still broke a sibling unit silently until the full-image oracle was
   re-run. See Proposed learning below.
-- `BasicClass__func_1816c` (already matched, `src/code_8220.c`) is called
+- `BasicClass__GetNextParentRef` (already matched, `src/code_8220.c`) is called
   directly here (not through a vtable) — same "verbatim inherited BasicClass
   method, called by symbol" pattern already established for
-  `BasicClass__func_17eb0` etc. Declared locally with this unit's own
+  `BasicClass__Release` etc. Declared locally with this unit's own
   opaque/pointer types rather than `#include "code_8220.h"`.
 
 ## Header changes kept
@@ -177,7 +177,7 @@ whether the function itself matched)
 `include/code_d294.h`:
 - `GenericMethods_d294`: added `pad004[0x010-0x004]` + `slot10` (see above;
   the padding fix is the load-bearing part).
-- New extern `BasicClass__func_1816c(void *self, GenericObj_d294 **outParent,
+- New extern `BasicClass__GetNextParentRef(void *self, GenericObj_d294 **outParent,
   void **cursor)`.
 - Prototype `void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node);` left in
   place even though the function is back to `INCLUDE_ASM` — harmless (no
@@ -343,7 +343,7 @@ void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
     tag = 4;
     entry = NULL;
 loop:
-    BasicClass__func_1816c(n, &entry, &cursor);
+    BasicClass__GetNextParentRef(n, &entry, &cursor);
     if (entry == NULL) {
         goto check_cursor;
     }
@@ -454,7 +454,7 @@ matches this report's own figures with no contamination.
 - Every one of the four locals that gets its own callee-saved register
   (`s`, `n`, `tag`, plus `entry`/`cursor` on the stack) is assigned
   EXACTLY ONCE and read at exactly one call site each (`s` at the
-  dispatch call, `n` at the `BasicClass__func_1816c` call, `tag` in the
+  dispatch call, `n` at the `BasicClass__GetNextParentRef` call, `tag` in the
   loop's comparison). None of them is a pointer-chain value that gets
   reloaded through a DIFFERENT expression later after already being
   captured in a local -- the dead-reload shape requires exactly that
@@ -478,7 +478,7 @@ matches this report's own figures with no contamination.
 - The four `lw`/`lbu` reloads of `entry` itself (from its stack slot,
   `0x10($sp)`) at `0x8001E4D8`, `0x8001E504`, `0x8001E518`, `0x8001E550`
   are NOT a source-level redundancy either -- they are the necessary
-  re-reads of an out-parameter written by `BasicClass__func_1816c(n,
+  re-reads of an out-parameter written by `BasicClass__GetNextParentRef(n,
   &entry, &cursor)` on each loop iteration, and retail performs the
   identical four reloads at the identical addresses (confirmed by
   reading the `.s` directly, not inferred). Removing or caching any of
@@ -521,7 +521,7 @@ round** (this unit's assignment explicitly excludes matching this
 function -- it is a live `INCLUDE_ASM` stall handled by a different
 track; naming only). Proposed name: `Class6B5CC__NotifyTaggedParents`
 (tier B). Walks `node`'s parent-ref list (via the already-matched
-`BasicClass__func_1816c`, `code_8220`) looking for entries whose
+`BasicClass__GetNextParentRef`, `code_8220`) looking for entries whose
 header's low nibble is `4`; for each such entry whose header's FULL low
 byte is also `0x34`, dispatches the entry's own `+0x010` vtable slot as
 `(entry, self)`, continuing to scan the WHOLE list rather than stopping
@@ -554,7 +554,7 @@ round-13/19/20/37/41 sections already describe.
 
 **Explicit answer to the revisit's own question: the round-54 renaming gave
 NO new shape here.** This function's own body references `GenericObj_d294`,
-`GenericMethods_d294::slot10`, `Class6B5CCObj`, `BasicClass__func_1816c` --
+`GenericMethods_d294::slot10`, `Class6B5CCObj`, `BasicClass__GetNextParentRef` --
 none of those symbols were touched by round 54's naming pass (which renamed
 only seven `Class6B5CCMethods` vtable slots -- `getRotMatrix`,
 `readUnk20Data`, `transformAndNotifyParents`, `tryAttachNearby`,

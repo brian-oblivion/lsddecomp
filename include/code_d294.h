@@ -300,8 +300,8 @@ struct BasicClassMethodsD294 {
 };
 
 extern BasicClassMethodsD294 *Get_vtable_BasicClass(void);
-extern void *func_80017B34(s32 size);
-extern void func_80017CFC(void *arg);
+extern void *BMemPMgrAlloc(s32 size);
+extern void BMemPMgrFree(void *arg);
 
 /* The PARENT object, seen through self->unkC (see Class6B5CCObj below) and
  * as Class6B5CC__AttachToParent's 2nd argument. Its +0x010/+0x014 slots are
@@ -419,7 +419,7 @@ struct GenericCountList_d294 {
  * for the full slot census from classtable.py. */
 struct Class6B5CCMethods {
     s32 header;                              /* +0x000 */
-    void *unk04;                              /* +0x004, BasicClass__func_17eb0, inherited, unused here */
+    void *unk04;                              /* +0x004, BasicClass__Release, inherited, unused here */
     void *(*ctor)(void *self);                /* +0x008, Class6B5CC__Class6B5CC (this unit) */
     void  (*finalize)(void *self);                /* +0x00C, Class6B5CC__Finalize (this unit) */
     u8 pad010[0x030 - 0x010];
@@ -783,8 +783,8 @@ extern void RotMatrix(S16Quad_d294 *vec, s32 a1);
  * local buffers; declared only with that shape. */
 extern void MulMatrix2(void *arg0, void *arg1);
 
-/* BasicClass__func_1816c (src/code_8220.c, code_8220 unit, already matched
- * there as `void BasicClass__func_1816c(BasicClass *self, BasicClass
+/* BasicClass__GetNextParentRef (src/code_8220.c, code_8220 unit, already matched
+ * there as `void BasicClass__GetNextParentRef(BasicClass *self, BasicClass
  * **outParent, BasicClassListNode **cursor)` -- "getNextParentRef": on the
  * first call for a given walk (`*outParent == NULL`), seeds `*cursor` from
  * `self->parentRefs`; every call pops one entry via `GetNextBasicClass`.
@@ -792,7 +792,7 @@ extern void MulMatrix2(void *arg0, void *arg1);
  * `#include "code_8220.h"`, per this project's per-unit-local-view
  * convention (same precedent as BasicClassMethodsD294 above) -- pointer
  * shapes are ABI-identical across translation units, so this is safe. */
-extern void BasicClass__func_1816c(void *self, GenericObj_d294 **outParent, void **cursor);
+extern void BasicClass__GetNextParentRef(void *self, GenericObj_d294 **outParent, void **cursor);
 
 void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2);
 void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1);

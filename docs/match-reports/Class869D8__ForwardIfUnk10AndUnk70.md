@@ -25,7 +25,7 @@ void Class869D8__ForwardIfUnk10AndUnk70(Class869D8 *self)
 
 - `Class869D8` struct: added `unk10` (s32, +0x010) and `unk70` (s32,
   +0x070), both gate fields read here. Padding added to keep the struct at
-  its allocation size, 0xDC (from `New_Class869D8`'s `func_80017B34(0xDC)`
+  its allocation size, 0xDC (from `New_Class869D8`'s `BMemPMgrAlloc(0xDC)`
   call) -- purely additive, the existing `methods` field at +0x000 is
   untouched.
 - `BaseCtorTable_3bb8c_c` (GetUnk18ObjMethods's return type): added `slot9C`
