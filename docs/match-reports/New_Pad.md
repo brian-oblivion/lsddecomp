@@ -1,4 +1,6 @@
-# func_80025B34
+# New_Pad
+
+> Renamed from `func_80025B34` on 2026-09-24 (tools/rename.py). Address 0x80025b34.
 
 **Unit:** class_16334 · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED
 (byte-exact, whole-image `./build-and-verify.sh` green) · Worked by the head in
@@ -10,18 +12,18 @@ The `New_X` allocator for the Pad class (`D_8006D370`, resolved with
 `tools/classtable.py 0x8006D370 --vs 0x8006B58C`). Allocates a 0x20-byte
 instance through the game allocator `BMemPMgrAlloc`, and on success calls the
 class's own constructor — slot `+0x08` of the table returned by
-`func_80025E9C()` — with `(self, arg1, port)`. Returns the instance, or NULL if
+`Get_vtable_Pad()` — with `(self, arg1, port)`. Returns the instance, or NULL if
 the allocation failed.
 
 ```c
-Pad *func_80025B34(void *arg1, s32 port) {
+Pad *New_Pad(void *arg1, s32 port) {
     Pad *self;
 
     self = BMemPMgrAlloc(0x20);
     if (self == NULL) {
         goto fail;
     }
-    func_80025E9C()->ctor(self, arg1, port);
+    Get_vtable_Pad()->ctor(self, arg1, port);
     return self;
 fail:
     return NULL;
@@ -39,7 +41,7 @@ result sunk into the branch's own delay slot:
 ```
 beqz  $s0, .L80025B84
  addu $v0, $zero, $zero      ; delay slot: result = NULL
-jal   func_80025E9C
+jal   Get_vtable_Pad
  nop
 addu  $a0, $s0, $zero
 lw    $v0, 0x8($v0)

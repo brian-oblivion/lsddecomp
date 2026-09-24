@@ -99,7 +99,7 @@ The durable generalisation, promoted to DECOMPILATION_LEARNINGS.md:
 ## Round-3 follow-up (head-directed, 5-attempt budget, all negative)
 
 The head asked for a targeted follow-up after two other round-3 stalls
-turned out to be the SAME one-instruction class (`func_80025D10`'s
+turned out to be the SAME one-instruction class (`Pad__DispatchEvents`'s
 broadcast #1/#2, and the second instance broadcast #3 adjudicated), with an
 explicit instruction to check branch targets FIRST (broadcast #3) before
 spending any attempts, since a differing branch TARGET (not just a delay
@@ -150,7 +150,7 @@ of `if`/`goto`/temp-variable reshaping (already exhausted before this
 round), the goto-with-different-return-value spelling (new this round),
 and the pre-malloc `__asm__("")` position (new this round) fail to move
 this residue, and the branch target agrees with retail throughout. This is
-the SAME one-delay-slot class as `func_80025D10`'s two now-adjudicated
+the SAME one-delay-slot class as `Pad__DispatchEvents`'s two now-adjudicated
 instances, just with retail choosing `nop` where those chose a
 value-restating `move` — a THIRD confirmed instance of the class, and if
 anything a stronger permuter case for it (three independent occurrences

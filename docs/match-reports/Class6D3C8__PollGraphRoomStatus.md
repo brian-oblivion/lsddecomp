@@ -59,7 +59,7 @@ you hit a similar shape)
 produced a completely different top: `bnez` (inverted condition) skipping an
 inline `j <epilogue>; li v0,2` pair, instead of retail's forward `beqz`
 straight to a `li v0,2` that falls into the shared epilogue. **The
-HEAD-BROADCAST goto/return lever (from `func_80025B34`) does NOT transfer
+HEAD-BROADCAST goto/return lever (from `New_Pad`) does NOT transfer
 here unmodified** — swapping `return 2;` for `goto fail; ... fail: return
 2;` (tried next, still 5/66, byte-identical output) changed *nothing*, because
 that lever is about a *simple* function with one early check and one normal
@@ -111,14 +111,14 @@ sitting in a live register at that program point, regardless of whether the
 two comparisons are semantically related — the fix is to narrow the
 variable's C-level live range to start only where its *own* control flow
 (the loop) begins, not extend it to cover every comparison against the same
-number. This is a companion finding to `func_80025D10`'s "prologue store
+number. This is a companion finding to `Pad__DispatchEvents`'s "prologue store
 order is unreachable from C": here, by contrast, the register-allocation
 CHOICE (not just instruction order) *is* reachable from C — through where a
 variable's assignment sits in program order — just not the reachable lever
 you'd first reach for (writing the comparisons to literally match retail's
 instruction-level register reuse).
 
-**The goto/return early-exit lever from `func_80025B34` is shape-specific,
+**The goto/return early-exit lever from `New_Pad` is shape-specific,
 not universal.** It fixed a function with one early check and a single
 normal-path return. Here, with a loop on the normal path, the fix was the
 opposite shape at the source level: wrap the *entire* normal path in the

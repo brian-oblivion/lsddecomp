@@ -139,7 +139,7 @@ out to be wrong for this specific case. Placement mattered enormously:
 
 1. **`__asm__("")` as the function's very first statement** (the
    canonical placement per `DECOMPILATION_LEARNINGS.md`'s existing
-   `func_80025D10` precedent): made it MUCH worse — 3/62, plus whole-file
+   `Pad__DispatchEvents` precedent): made it MUCH worse — 3/62, plus whole-file
    address drift (an extra instruction). Reverted immediately.
 2. **Right before `if (this->isFlashbackSession)`** (i.e. right after the
    `goto tick_only;` early-exit, at the top of the block containing the

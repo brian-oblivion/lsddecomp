@@ -105,7 +105,7 @@ Roughly 25 build-and-diff attempts across five functions and four units:
 
 - `New_Class6D3C8` (code_1677c, 23/24) — 14+ attempts. `if`/`goto` reshaping
   both directions, `__asm__("")` in every position, `volatile`.
-- `func_80025D10` (two broadcast instances).
+- `Pad__DispatchEvents` (two broadcast instances).
 - `New_Class86668` (class_39e08, 26/27) — runner: `__asm__("")` after the malloc;
   early return. Head: result variable (0/27); comma-ternary (16/27).
 - `New_Class866E8` (class_3ac78, 26/27) — 5 reshapes, two with size regressions.

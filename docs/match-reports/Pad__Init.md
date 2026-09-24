@@ -1,4 +1,6 @@
-# func_80025C84
+# Pad__Init
+
+> Renamed from `func_80025C84` on 2026-09-24 (tools/rename.py). Address 0x80025c84.
 
 **Unit:** `src/class_16334.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (16/16 words, full build verified byte-exact)
@@ -6,15 +8,15 @@
 
 ## Context
 
-Called from the constructor (`func_80025BA0`) as the last step. Boolifies
+Called from the constructor (`Pad__Pad`) as the last step. Boolifies
 the incoming port argument into `self->port`, zeroes the three mask fields,
 then tail-calls `self->methods->loadButtonTable()` (slot `+0x50`,
-`func_80025E1C`) through the vtable.
+`Pad__LoadButtonTable`) through the vtable.
 
 ## Final C
 
 ```c
-void func_80025C84(Pad *self, s32 port) {
+void Pad__Init(Pad *self, s32 port) {
     self->port = (port != 0);
     self->heldMask = 0;
     self->releasedMask = 0;
@@ -30,17 +32,17 @@ void func_80025C84(Pad *self, s32 port) {
   matches directly.
 - The trailing call is a true tail call (`jalr`, then straight to the
   epilogue with no move into `$v0`): retail's own `$v0` at return is
-  whatever `func_80025E1C` (`loadButtonTable`) left there, which is itself a
+  whatever `Pad__LoadButtonTable` (`loadButtonTable`) left there, which is itself a
   loop-condition artifact, not an authored return value (see
-  `func_80025E1C`'s report). Declared `init` and `loadButtonTable` both
+  `Pad__LoadButtonTable`'s report). Declared `init` and `loadButtonTable` both
   `void` in `PadMethods` -- consistent with the two already-matched no-op
-  slots in this same table (`func_80025E14`/`func_80025E94`, `+0x4C`/`+0x54`,
+  slots in this same table (`Pad__func_80025E14`/`Pad__func_80025E94`, `+0x4C`/`+0x54`,
   both `void`). First-try full match with this typing; no register or
   reshaping fight needed.
 - Confirms field zeroing order (`heldMask`, `releasedMask`, `pressedMask` --
   offsets 0x10, 0x14, 0x18 in that order) matches the struct layout derived
-  from `func_80025CC4`.
+  from `Pad__UpdateMasks`.
 
 ### Proposed learning
 
-None beyond what's already recorded for `func_80025E1C`/`func_80025CC4`.
+None beyond what's already recorded for `Pad__LoadButtonTable`/`Pad__UpdateMasks`.

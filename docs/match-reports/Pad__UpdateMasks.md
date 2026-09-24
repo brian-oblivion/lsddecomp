@@ -1,4 +1,6 @@
-# func_80025CC4
+# Pad__UpdateMasks
+
+> Renamed from `func_80025CC4` on 2026-09-24 (tools/rename.py). Address 0x80025cc4.
 
 **Unit:** `src/class_16334.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (19/19 words, full build verified byte-exact)
@@ -15,7 +17,7 @@ held/pressed/released edge masks against the previous held mask.
 ## Final C
 
 ```c
-u32 func_80025CC4(Pad *self) {
+u32 Pad__UpdateMasks(Pad *self) {
     u32 newMask;
     u32 oldMask;
     u32 changed;
@@ -34,7 +36,7 @@ u32 func_80025CC4(Pad *self) {
 
 - `self->port` (`Pad.port`, offset 0xC, `u16`) is read with `lhu` in retail
   and passed as the port/pad-index argument -- confirms the ctor's boolified
-  field (see `func_80025BA0`'s report) really is used as a small integer
+  field (see `Pad__Pad`'s report) really is used as a small integer
   selector downstream, not just a flag.
 - The retail body never re-derefs `self->heldMask` after the assignment; the
   return value is the same register the new mask was computed into
@@ -43,8 +45,8 @@ u32 func_80025CC4(Pad *self) {
   `self->heldMask` for the return) reproduced that directly -- first-try
   full match, no register-identity fighting needed.
 - Confirms the `Pad.heldMask/releasedMask/pressedMask` (0x10/0x14/0x18)
-  layout guessed from `func_80025C84`.
+  layout guessed from `Pad__Init`.
 
 ### Proposed learning
 
-None beyond what's already in `func_80025E1C`'s report.
+None beyond what's already in `Pad__LoadButtonTable`'s report.

@@ -62,7 +62,7 @@ it matches `DREAMSYS_METHODS`, the one method table in the tree that is
 already named. **`tools/rename.py` refuses it** and I did not work around
 it: its "NEW already appears" guard fires because six files
 (`docs/match-reports/BasicClass__BasicClass.md`, this report,
-`func_80025E1C.md`, `func_80025E9C.md`, `include/class_16334.h`,
+`Pad__LoadButtonTable.md`, `Get_vtable_Pad.md`, `include/class_16334.h`,
 `include/class_3bb8c.h`) already contain the string `BASICCLASS_METHODS` as
 PROSE describing this very symbol. The guard is correct in general and
 wrong in this instance; see `### Proposed learning` below.

@@ -1,4 +1,6 @@
-# func_80025E1C
+# Pad__LoadButtonTable
+
+> Renamed from `func_80025E1C` on 2026-09-24 (tools/rename.py). Address 0x80025e1c.
 
 **Unit:** `src/class_16334.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (30/30 words, full build verified byte-exact)
@@ -9,7 +11,7 @@
 This class's method table (`D_8006D370`, 21 slots, see `tools/classtable.py
 D_8006D370`) inherits 14 slots verbatim from `BASICCLASS_METHODS`
 (`D_8006B58C`, returned by `Get_vtable_BasicClass`) and adds 7 of its own at
-`+0x38..+0x54`. `func_80025E1C` is the slot at `+0x50`.
+`+0x38..+0x54`. `Pad__LoadButtonTable` is the slot at `+0x50`.
 
 It copies a 0x40-byte (16-word) block from `D_80010764` into the runtime
 global `D_8008B388`. `D_80010764`'s vram falls inside the `psyq_15d04`
@@ -19,7 +21,7 @@ function copies a Psy-Q-owned constant table into game-owned bss. Given the
 surrounding class also drives `func_80025EAC`/`func_80025EFC`/`func_80025F2C`
 (which disassemble as part of `psyq_PadInit`, immediately adjacent in the
 yaml at file offset 0x166ac) and does edge-detected held/pressed/released
-button masking (see `func_80025CC4`), the working hypothesis for this whole
+button masking (see `Pad__UpdateMasks`), the working hypothesis for this whole
 unit is a Pad/controller wrapper class, and `D_80010764`/`D_8008B388` are the
 16 canonical digital-button bit masks. See `include/class_16334.h` for the
 full writeup and struct layout.
@@ -31,7 +33,7 @@ typedef struct { u32 w[16]; } Block64;
 extern Block64 D_80010764;
 extern u32 D_8008B388[16];
 
-void func_80025E1C(void) {
+void Pad__LoadButtonTable(void) {
     Block64 local;
     u32 *dst;
     u32 *src;

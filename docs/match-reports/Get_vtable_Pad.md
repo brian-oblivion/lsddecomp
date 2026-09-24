@@ -1,4 +1,6 @@
-# func_80025E9C
+# Get_vtable_Pad
+
+> Renamed from `func_80025E9C` on 2026-09-24 (tools/rename.py). Address 0x80025e9c.
 
 **Unit:** `src/class_16334.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (4/4 words, full build verified byte-exact)
@@ -8,14 +10,14 @@
 
 Trivial accessor: returns the address of this class's own 21-slot method
 table, `D_8006D370` (see `tools/classtable.py D_8006D370`). Called by
-`func_80025B34` (the `New_`-style allocator+constructor for this class) to
-fetch the constructor slot, and again internally by `func_80025BA0` (the
+`New_Pad` (the `New_`-style allocator+constructor for this class) to
+fetch the constructor slot, and again internally by `Pad__Pad` (the
 constructor itself) to install `self->methods`.
 
 ## Final C
 
 ```c
-PadMethods *func_80025E9C(void) {
+PadMethods *Get_vtable_Pad(void) {
     return &D_8006D370;
 }
 ```

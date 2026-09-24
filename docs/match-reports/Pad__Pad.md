@@ -1,4 +1,6 @@
-# func_80025BA0 -- MATCHED (36/36 words)
+# Pad__Pad -- MATCHED (36/36 words)
+
+> Renamed from `func_80025BA0` on 2026-09-24 (tools/rename.py). Address 0x80025ba0.
 
 **Unit:** class_16334 · **Round:** 44 (2026-09-15)
 
@@ -20,9 +22,9 @@ instance only — initializes the Psy-Q Pad library.
 ## C
 
 ```c
-void func_80025BA0(Pad *self, void *arg1, s32 port) {
+void Pad__Pad(Pad *self, void *arg1, s32 port) {
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_80025E9C();
+    self->methods = Get_vtable_Pad();
     if (D_8008A848++ == 0) {
         PadInit(arg1);
     }

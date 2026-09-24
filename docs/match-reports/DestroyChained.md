@@ -59,10 +59,10 @@ void *DestroyChained(Class6D430 *this) {
 
 ## Head broadcast levers — applicability
 
-- **goto-vs-return (func_80025B34 lever):** not applicable. No branch in this
+- **goto-vs-return (New_Pad lever):** not applicable. No branch in this
   function; it is straight-line code with one unconditional `return NULL;`.
-- **loop-invariant hoisting (func_80025D10 lever 2):** not applicable, no loop.
-- **prologue store-order barrier (func_80025D10 lever 1):** not applicable,
+- **loop-invariant hoisting (Pad__DispatchEvents lever 2):** not applicable, no loop.
+- **prologue store-order barrier (Pad__DispatchEvents lever 1):** not applicable,
   matched on the first correct attempt with no store-order residue.
 
 ## Proposed learning

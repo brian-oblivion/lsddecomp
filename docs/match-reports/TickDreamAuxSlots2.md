@@ -49,7 +49,7 @@ Retail interleaves per-variable (spill `s1`, init `s1`, spill `s0`, init
 `s0`), in the OPPOSITE variable order from `TickDreamAuxSlots`'s retail (which is
 slot/`s0` first, done/`s1` second) even though the two functions are
 otherwise structurally identical. Per the head's broadcast on
-`func_80025D10` (Lever 1: prologue callee-save store order is not reachable
+`Pad__DispatchEvents` (Lever 1: prologue callee-save store order is not reachable
 from C; use a bare `__asm__("")` as the first statement), I checked whether
 this is the same class of residue before reshaping further:
 
@@ -80,7 +80,7 @@ this is the same class of residue before reshaping further:
   whether the source used declarator initializers (`T x = expr;`) vs.
   separate assignment statements (`T x; ...; x = expr;`) before reaching for
   a scheduling barrier.** Here, declarator-initializer order was NOT
-  reachable from C (matches the `func_80025D10` broadcast) but converting to
+  reachable from C (matches the `Pad__DispatchEvents` broadcast) but converting to
   explicit assignment STATEMENTS, in the desired order, was -- and needed no
   barrier at all. This is a cheaper, more targeted lever than
   `__asm__("")` for this specific residue shape (adjacent prologue

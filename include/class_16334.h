@@ -12,11 +12,11 @@
  * class is a thin C wrapper around the Psy-Q Pad library. PadInit/
  * PadRead/PadStop -- called from this unit's ctor/dtor/updater --
  * disassemble as part of the `psyq_PadInit` segment (config/splat...yaml,
- * file offset 0x166ac), and func_80025E1C copies its default button-mask
+ * file offset 0x166ac), and Pad__LoadButtonTable copies its default button-mask
  * table from `D_80010764`, which itself sits inside the `psyq_15d04` rodata
  * blob -- i.e. this class copies a Psy-Q-owned constant. Held/released/
- * pressed edge-detection (func_80025CC4) and a priority-ordered per-bit
- * event dispatch (func_80025D10) are exactly the shape of a game-side Pad
+ * pressed edge-detection (Pad__UpdateMasks) and a priority-ordered per-bit
+ * event dispatch (Pad__DispatchEvents) are exactly the shape of a game-side Pad
  * wrapper. Names below are chosen on that hypothesis; not yet in
  * config/symbols (out of this unit's scope to rename).
  */
@@ -80,20 +80,20 @@ extern void PadStop(void);
 
 extern PadMethods D_8006D370;
 extern s32 D_8008A848;          /* live-instance counter; the first ctor registers the Pad ISR, the last dtor tears it down */
-extern u32 D_8008B388[16];      /* runtime copy of the button-mask table, filled by func_80025E1C */
+extern u32 D_8008B388[16];      /* runtime copy of the button-mask table, filled by Pad__LoadButtonTable */
 
 /* A 0x40-byte block, copied as a whole (GCC's inlined block-move codegen for
  * a struct assignment, not a word loop) rather than word-indexed. */
 typedef struct { u32 w[16]; } Block64;
 extern Block64 D_80010764;      /* Psy-Q's own default button-mask table (psyq_15d04 rodata) */
 
-PadMethods *func_80025E9C(void);
-Pad *func_80025B34(void *arg1, s32 port);
-void func_80025BA0(Pad *self, void *arg1, s32 port);
-void *func_80025C30(Pad *self);
-void func_80025C84(Pad *self, s32 port);
-u32 func_80025CC4(Pad *self);
-void func_80025D10(Pad *self);
-void func_80025E1C(void);
+PadMethods *Get_vtable_Pad(void);
+Pad *New_Pad(void *arg1, s32 port);
+void Pad__Pad(Pad *self, void *arg1, s32 port);
+void *Pad__Destroy(Pad *self);
+void Pad__Init(Pad *self, s32 port);
+u32 Pad__UpdateMasks(Pad *self);
+void Pad__DispatchEvents(Pad *self);
+void Pad__LoadButtonTable(void);
 
 #endif

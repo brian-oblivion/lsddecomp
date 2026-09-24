@@ -24,7 +24,7 @@ The `New_X` allocator wrapper for `DreamSys`: `malloc(sizeof(DreamSys))`
 regardless of the constructor's own return value. This is allocator
 sub-shape (1) from `DECOMPILATION_LEARNINGS.md`'s "at least three `New_X`
 sub-shapes" list -- ignores the constructor's return, one early exit -- but
-unlike `func_80025B34` (the shape's worked example, which needed `goto`
+unlike `New_Pad` (the shape's worked example, which needed `goto`
 because its early exit returns a DIFFERENT value), here BOTH paths return
 the same logical value (the allocation, or NULL). That similarity turned out
 to be exactly the trap; see the residue below.

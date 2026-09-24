@@ -1,11 +1,13 @@
-# func_80025C30 -- MATCHED (21/21 words)
+# Pad__Destroy -- MATCHED (21/21 words)
+
+> Renamed from `func_80025C30` on 2026-09-24 (tools/rename.py). Address 0x80025c30.
 
 **Unit:** class_16334 · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies (previously stub-stalled as
-`gp_rel`-blocked on the same `D_8008A848` global as `func_80025BA0`). The
+`gp_rel`-blocked on the same `D_8008A848` global as `Pad__Pad`). The
 preserved body from the earlier runner/alpha attempt named the guarded call
 as `func_80025F2C()`; re-reading the `.s` directly shows the call target is
 `PadStop` (already declared in `include/class_16334.h`,
@@ -21,7 +23,7 @@ base-class destructor through the method table.
 ## C
 
 ```c
-void *func_80025C30(Pad *self) {
+void *Pad__Destroy(Pad *self) {
     if (--D_8008A848 == 0) {
         PadStop();
     }

@@ -275,7 +275,7 @@ independent loops — strictly harder terrain for the same problem.
    own* register in place for the scan, and copies the original into a
    fresh temp — the opposite of what this attempt does).
 6. Bare `__asm__("");` as the very first statement of the function (per the
-   head's `func_80025D10` broadcast, Lever 1) — **worse (6/42)**. Confirms
+   head's `Pad__DispatchEvents` broadcast, Lever 1) — **worse (6/42)**. Confirms
    this residue is not the prologue-store-order class that lever addresses;
    it perturbed unrelated scheduling instead.
 7. Bare `__asm__("");` immediately before the overlap-check expression
@@ -328,7 +328,7 @@ The runner's original body differed from this only in the scan loop
 
 ## Head broadcast levers — applicability
 
-- **goto-vs-return (func_80025B34 lever):** **applied, and it is the reason
+- **goto-vs-return (New_Pad lever):** **applied, and it is the reason
   this function reached 16/42 rather than something much worse.** All three
   early exits return a value (`NULL`) different from the main path's
   (`origDest`) — exactly the shape the lever describes. Using `goto fail;`
@@ -338,7 +338,7 @@ The runner's original body differed from this only in the scan loop
   duplicate epilogues, no extra `j`. This part of the function is fully
   correct; the residue is entirely within the delay-slot-filler class above,
   unrelated to how the early exits are spelled.
-- **loop-invariant hoisting (func_80025D10 lever 2):** **checked, not
+- **loop-invariant hoisting (Pad__DispatchEvents lever 2):** **checked, not
   applicable in the form described.** Neither loop here walks a named array
   against a hoisted base/end pointer — both are simple forward pointer scans
   (`while (*d) d++;` and `while ((*d++ = *s++))`) with no bound/array

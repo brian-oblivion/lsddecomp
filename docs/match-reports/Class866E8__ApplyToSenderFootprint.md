@@ -79,7 +79,7 @@ fields that stalled attempt tentatively introduced. Both are now fixed in
    function copies the WHOLE 0x30-byte region (`self+0x8C` to `self+0xBC`)
    with a batched 4-word-per-iteration loop on both the save and the
    restore side — the classic "whole-struct assignment, not an indexed
-   loop" block-move signature already established by `func_80025E1C`
+   loop" block-move signature already established by `Pad__LoadButtonTable`
    (see that report for the precedent). `Class866E8__SetFootprintRect`'s single-pointer
    write is consistent with this as `unk8C.e[0].unk0` — the STALLED
    report's inline body is left as-is (it's preserved code, not doctrine)

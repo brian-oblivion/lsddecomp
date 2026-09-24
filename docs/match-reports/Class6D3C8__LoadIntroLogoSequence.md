@@ -104,7 +104,7 @@ control flow) is the only residue, try reordering their **C declarations**
 before reaching for anything else — this GCC's simple linear allocator
 appears to hand out `$s0`, `$s1`, ... in declaration order rather than
 first-use order, at least for this shape (mirrors, but is distinct from,
-`func_80025D10`'s head-broadcast finding that prologue *store* order is
+`Pad__DispatchEvents`'s head-broadcast finding that prologue *store* order is
 unreachable from C at all — this is about which variable gets which
 register, a different axis).
 

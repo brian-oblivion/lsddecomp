@@ -92,7 +92,7 @@ both compensations. Closed a 61-round stall on the second shape build.
 >   `$s1` both receive their values only AFTER the prologue. That is the
 >   specific decision to aim at.
 >
-> `Class65650__FindPartIndex` and `func_80025D10` are recorded as the same class and were
+> `Class65650__FindPartIndex` and `Pad__DispatchEvents` are recorded as the same class and were
 > CLOSED by a single barrier, so the class is not uniformly hard; this
 > instance is the residual tail of it.
 
@@ -162,12 +162,12 @@ consistently come out in the order `$ra, $s1, $s0` instead of retail's
 | --- | --- |
 | straightforward translation, no barrier, 4 locals (`p`, `i`, `element`, no filler) | 1/33 — also 2 words short (no stack frame at all) |
 | add a genuinely unused `u8 unused[8]` local to force the 8-byte frame retail has (confirmed by matching `.frame` output from `cc1` directly: `vars=8` reproduces retail's `$sp,0x30`) | still 2 words short — the `$s3`=`arg` copy was being deferred all the way into the `blez` delay slot instead of happening early like retail |
-| `__asm__("")` as the very first statement (closed a near-identical issue in `Class65650__FindPartIndex` and, per the head's broadcast, in `func_80025D10`) | **jumped straight to 30/33** — closed the `$s3` deferral, leaving only the three-store permutation above |
-| six declaration-order permutations of `p`/`i`/`unused` | 30/33 every time — declaration order does not reach this scheduler decision, matching the finding already recorded for `func_80025D10` and `Class65650__FindPartIndex` |
+| `__asm__("")` as the very first statement (closed a near-identical issue in `Class65650__FindPartIndex` and, per the head's broadcast, in `Pad__DispatchEvents`) | **jumped straight to 30/33** — closed the `$s3` deferral, leaving only the three-store permutation above |
+| six declaration-order permutations of `p`/`i`/`unused` | 30/33 every time — declaration order does not reach this scheduler decision, matching the finding already recorded for `Pad__DispatchEvents` and `Class65650__FindPartIndex` |
 | inlining the `element` temporary (`(*p)->methods->slot60(*p, arg)`) | 30/33, unchanged |
 | a second `__asm__("")` before `i = 0` (in addition to the first) | **worse** — 7/33, and the delay slot's `$s0 = 0` no longer got filled (extra `nop`), so a second barrier here costs more than it fixes |
 | moving `i = 0` before the first barrier, ahead of the null check | **much worse** — 5/33, changed which hard register holds `i` entirely, breaking downstream matches |
-| guard spelled as `if (count > 0) { ... whole loop ... }` instead of an early `return` | 30/33, unchanged (matches `func_80025D10`'s own finding that guard spelling doesn't move this class of residue) |
+| guard spelled as `if (count > 0) { ... whole loop ... }` instead of an early `return` | 30/33, unchanged (matches `Pad__DispatchEvents`'s own finding that guard spelling doesn't move this class of residue) |
 | `s32 unused[2];` instead of `u8 unused[8];` for the frame filler | 30/33, unchanged |
 
 Thirteen real attempts (not counting isolated `cc1` probes), the loop body

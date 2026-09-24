@@ -201,7 +201,7 @@ of which reproduce the same two residues:
    already document ("Prologue callee-save store ORDER is not reachable
    from C... a bare `__asm__("")` as the function's FIRST statement is the
    lever") — and the lever was tried (see below) but did not generalise
-   here the way it did for `func_80025D10`.
+   here the way it did for `Pad__DispatchEvents`.
 2. **`count`'s hardware register.** Retail keeps the incremented
    `this->unk_0xB4 + 1` value in `$a0` (freed up again right before the
    `DreamSys__StartVoice` call, which needs `$a0` for `this`); every rewrite tried

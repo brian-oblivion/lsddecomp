@@ -60,7 +60,7 @@ retargets straight to the shared epilogue, matching retail exactly.
 
 Another confirmed instance of the already-documented
 "goto vs return, different-value early exit" lever
-(`func_80025B34` in DECOMPILATION_LEARNINGS) -- worth noting it applies
+(`New_Pad` in DECOMPILATION_LEARNINGS) -- worth noting it applies
 here too even though the "different value" is a pointer (`self` vs
 `NULL`) rather than two integer constants, and the caller is a `New_X`
 allocator wrapper (sub-shape "ignores the constructor's return, one early

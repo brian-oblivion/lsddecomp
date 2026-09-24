@@ -99,7 +99,7 @@ would expose the forced truncation.
 
 **"Compute the pointer eagerly into its own local, in source order" is a
 distinct, repeatable lever from "compute the value eagerly."** This is the
-same family as `func_80025D10`'s hoisted-invariant lesson in
+same family as `Pad__DispatchEvents`'s hoisted-invariant lesson in
 `docs/DECOMPILATION_LEARNINGS.md`, but for an ADDRESS-of expression rather
 than a loop-hoisted value: writing `&this->unk14->x` inline at the call site
 let the compiler treat the add-immediate as free to schedule anywhere before
