@@ -400,34 +400,19 @@ void func_800662B4(Class65650 *self)
     self->unk90 = 0;
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 17/33 words, length exact. Residue: count's lhu load
- * routes through $v0 instead of directly into its long-lived register $s2
- * (docs/match-reports/func_800662BC.md). Hand-derived. */
 void *func_800662BC(Class65650 *self, void *hdr, void *extra)
 {
-    void *acc;
-    u16 count;
+    s32 count;
     u32 i;
-    u8 unused[8];
 
     count = *(u16 *)((u8 *)hdr + 2);
-    acc = (u8 *)hdr + 8;
-    if (count != 0) {
-        s32 cont;
-
-        i = 1;
-        do {
-            acc = self->methods->slot138(self, acc, extra);
-            cont = i < count;
-            i++;
-        } while (cont);
+    hdr = (u8 *)hdr + 8;
+    for (i = 0; i < count;) {
+        i++;
+        hdr = self->methods->slot138(self, hdr, extra);
     }
-    return acc;
+    return hdr;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
-#endif
 
 /* NON_MATCHING: 252/258 words, length exact (no drift). Residue: two
  * symmetric 3-word instruction-scheduling clusters around a compiler-
