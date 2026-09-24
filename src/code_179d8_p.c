@@ -10,7 +10,7 @@
  * comment still stands -- only the blocker verdicts are withdrawn.
  * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
  *
- * code_179d8_p -- func_80031F3C, 0x2273C..0x22948 (vram 0x80031F3C..
+ * code_179d8_p -- SsUtAllKeyOff, 0x2273C..0x22948 (vram 0x80031F3C..
  * 0x80032148).  A single 131-word function.  Carved round 26 (2026-09-09)
  * out of what had been the `code_179d8_mid_d` remainder; renamed on carve
  * because "mid_d" named a leftover and the leftover is now fully consumed.
@@ -28,7 +28,7 @@
  * string literal (splat has already emitted those bytes; a literal emits a
  * second copy and shifts the whole image).
  *
- * READ THIS BEFORE STARTING: func_80031F3C touches the same global family as
+ * READ THIS BEFORE STARTING: SsUtAllKeyOff touches the same global family as
  * `code_179d8_m` -- D_8008D988/98A/98C/98E/996/998/99A/99C/9A3 and
  * D_8006DAD4.  The "split scaled index" entry in
  * docs/DECOMPILATION_LEARNINGS.md (a mask on the PRODUCT means a halfword
@@ -108,7 +108,7 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-/* STALL -- see docs/match-reports/func_80031F3C.md.  Round 66 revisit:
+/* STALL -- see docs/match-reports/SsUtAllKeyOff.md.  Round 66 revisit:
  * best-derived body now compiles to EXACT LENGTH (was 9 words SHORT);
  * raw word-match 103/131 (was 42/131); first real diff at vram 0x80032064
  * (file 0x22864) -- `sllv a3,t2,a0` vs `sllv a2,t2,a0`, a register-identity
@@ -120,7 +120,7 @@ extern u16 D_8008E22C;
  * three stores off the reloaded index, not one.
  */
 #if 0
-void func_80031F3C(void)
+void SsUtAllKeyOff(void)
 {
     s16 i;
     s16 woff;
@@ -174,4 +174,4 @@ void func_80031F3C(void)
     }
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_p", func_80031F3C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_p", SsUtAllKeyOff);

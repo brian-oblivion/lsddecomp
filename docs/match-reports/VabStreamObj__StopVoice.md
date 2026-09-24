@@ -11,7 +11,7 @@ s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 index) {
     if (index < 0x18) {
         SsUtKeyOffV(index);
     } else {
-        func_80031F3C(0);
+        SsUtAllKeyOff(0);
     }
     return -1;
 }
@@ -30,7 +30,7 @@ which passes `(self, slots[i].index)` -- two args -- so the unused-`self`
 parameter has to stay in the C signature or `index` would land in `$a0`
 instead of `$a1` and every access would be wrong.
 
-Both call targets' (`SsUtKeyOffV`, `func_80031F3C`) return values are
+Both call targets' (`SsUtKeyOffV`, `SsUtAllKeyOff`) return values are
 discarded -- retail unconditionally sets `$v0 = -1` after either branch --
 so the function always returns `-1` regardless of which path is taken.
 
@@ -68,9 +68,9 @@ refers to." The `0x18` branch boundary is the concrete tell: 0x18 == 24,
 the PS1 SPU's own hardware voice count -- named `SPU_VOICE_COUNT` in
 `src/code_179d8_e.c` (FINISHING-PLAN track 3 step 4: replace an
 established magic constant with a named one) -- so `index < SPU_VOICE_COUNT`
-is "a real SPU voice number" and the `else` arm (`func_80031F3C(0)`,
+is "a real SPU voice number" and the `else` arm (`SsUtAllKeyOff(0)`,
 uncarved) is a
-fallback for anything else. Tier B, not A: `SsUtKeyOffV`/`func_80031F3C`
+fallback for anything else. Tier B, not A: `SsUtKeyOffV`/`SsUtAllKeyOff`
 are both still uncarved and unnamed, so the exact stop mechanism (per-voice
 key-off vs. something else) isn't independently confirmed from this unit
 alone.

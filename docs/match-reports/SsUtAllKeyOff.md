@@ -1,4 +1,6 @@
-# func_80031F3C — STALL (length EXACT; raw word-match 103/131; first real diff at vram 0x80032064 / file 0x22864)
+# SsUtAllKeyOff — STALL (length EXACT; raw word-match 103/131; first real diff at vram 0x80032064 / file 0x22864)
+
+> Renamed from `func_80031F3C` on 2026-09-24 (tools/rename.py). Address 0x80031f3c.
 
 `code_179d8_p`, vram `0x80031F3C`, file offset `0x2273C`, 131 instructions
 (0x20C bytes). Frameless. Only function in the unit.
@@ -214,7 +216,7 @@ extern u16 D_8008E22C;
 
 ```c
 #if 0
-void func_80031F3C(void)
+void SsUtAllKeyOff(void)
 {
     s16 i;
     s16 woff;
@@ -330,7 +332,7 @@ Gate 3 (`docs/PARALLEL-RUNS.md` §3.5), all three checks run:
 both objects with relocations masked:
 
 ```sh
-sh permuter-work/func_80031F3C/compile.sh permuter-work/func_80031F3C/base.c -o /tmp/scaf.o
+sh permuter-work/SsUtAllKeyOff/compile.sh permuter-work/SsUtAllKeyOff/base.c -o /tmp/scaf.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d /tmp/scaf.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/code_179d8_p.c.o
 ```
@@ -342,7 +344,7 @@ applies either (the scaffold is *cleaner* than the real build, and the real
 build is not zero-drift). So check 3 is satisfied in substance and a search
 would be meaningful.
 
-The scaffold is left in place at `permuter-work/func_80031F3C` (gitignored) for
+The scaffold is left in place at `permuter-work/SsUtAllKeyOff` (gitignored) for
 whoever picks this up. The search itself was not spent: the one remaining
 in-function residue that a permuter could plausibly move is residue 1, a
 register-identity swap between two adjacent temporaries, and residues 2 and 3

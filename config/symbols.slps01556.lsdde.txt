@@ -1923,3 +1923,13 @@ SsUtChangePitch = 0x80031A44; // type:func
 // (idx,p1,p2,p3,u16 p4,u16 p5) agrees on both count and the ushort tail).
 // Superseded game-style func_80031BA4. Round 74 (bravo, track 2).
 SsUtChangeADSR = 0x80031BA4; // type:func
+// identified: shape 0.95 vs libsnd/vmanager SsUtAllKeyOff (119w vs our
+// 131w, disc 3.5), position within the libsnd neighborhood, semantics
+// ("key off every voice", unconditional loop over every channel) match
+// the header LIBSND.H prototype's name and its 1-param count
+// (`extern void SsUtAllKeyOff(short);`, call site src/code_179d8_e.c:191
+// declares 1 param). The preserved stalled body in code_179d8_p.c is
+// currently modeled void(void), not yet reading that argument -- a
+// derivation gap to close, not a naming disagreement. Superseded
+// game-style func_80031F3C. Still a STALL. Round 74 (bravo, track 2).
+SsUtAllKeyOff = 0x80031F3C; // type:func

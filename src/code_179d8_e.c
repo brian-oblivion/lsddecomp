@@ -188,7 +188,7 @@ extern void *func_80017B34(s32 size);
 extern s16 SsUtKeyOn(s16 a0, s16 hi, s16 lo, s16 a3, s32 b5, s32 argA, s32 argB);
 extern void SsUtAutoVol(s16 a0, s16 a1, s16 a2, s32 a3);
 extern void SsUtKeyOffV(s16 index);
-extern void func_80031F3C(s32 arg0);
+extern void SsUtAllKeyOff(s32 arg0);
 /* Sony's `SsVabTransCompleted` (`libsnd/vs_vtc`) and `SsSetMute`
  * (`libsnd/scsmute`), linked from the SDK objects since round 34.  The two
  * signatures are this call site's own reading and disagree with the sibling
@@ -535,7 +535,7 @@ s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 index) {
     if (index < SPU_VOICE_COUNT) {
         SsUtKeyOffV(index);
     } else {
-        func_80031F3C(0);
+        SsUtAllKeyOff(0);
     }
     return -1;
 }
