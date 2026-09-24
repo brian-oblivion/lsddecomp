@@ -92,13 +92,14 @@ struct Node3bb8cE {
     Res3bb8cE *unk7C;      /* +0x07C, tag 0x20 */
 };
 
-/* Uncarved helpers this unit calls into, all still INCLUDE_ASM in
- * class_3bb8c_f.c (extern for a function OUTSIDE this unit). Declared with
- * unspecified argument lists (K&R style, no prototype) where this unit's own
- * call sites disagree on arity -- same idiom already established for
- * strcpy/strcat in include/psyq/STRINGS.H -- rather than forcing one
- * prototype to fit every call site. */
-extern void *BuildMemcardPath(); /* arity-ok: definition is 3-parameter and the callee reads $a2 (`suffix`), but this unit's two call sites disagree on arity and BOTH are byte-load-bearing -- func_8004EA38 emits no $a2 at all (0x8004EA58) while func_8004ECCC emits `lui a2`/`addiu a2` (0x8004ECE8) */
+/* Helpers this unit calls into, defined in class_3bb8c_f.c (extern for a
+ * function OUTSIDE this unit). */
+/* BuildMemcardPath(dest, selector, suffix): 3-parameter, and both of this
+ * unit's call sites pass all three. func_8004EA38 emits no $a2 set-up
+ * because its own 3rd parameter arrives in $a2 and is forwarded unchanged
+ * (round 75; this was an `arity-ok` K&R declaration until then, on the
+ * reading that func_8004EA38 made a 2-argument call). */
+extern void *BuildMemcardPath(void *dest, s32 selector, void *suffix);
 extern void TaskObjF__EnableEvents(void *self);
 extern void *TaskObjF__DisableEvents(void *self);
 extern void TaskObjF__TestEvents(void *self);
@@ -328,49 +329,40 @@ s32 func_8004E940(Node3bb8cE *self)
     return result;
 }
 
-/* func_8004EA38's 3rd parameter (`filterName` here) is forwarded verbatim
- * by func_8004E9AC but never read by func_8004EA38's own body -- the same
- * "unused parameter invisible from the callee's own disassembly" shape
- * already established elsewhere in this project (only the CALLER's setup
- * proves it's a real parameter). */
-extern s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName);
+/* func_8004EA38's 3rd parameter is the file-name suffix, forwarded verbatim
+ * by func_8004E9AC (after rejecting NULL/empty) and by func_8004EA38 as
+ * BuildMemcardPath's 3rd argument. Round 75 corrected the earlier reading
+ * that func_8004EA38 never used it: it never TOUCHES $a2, because the value
+ * is already where the call wants it. */
+extern s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *suffix);
 
-s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
+s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
 {
     s32 retries;
     s32 result;
 
     retries = 0;
-    if (filterName == NULL || *filterName == 0) {
+    if (suffix == NULL || *suffix == 0) {
         return 0;
     }
     do {
-        result = func_8004EA38(self, destBuf, filterName);
+        result = func_8004EA38(self, destBuf, suffix);
     } while (result == 0 && retries-- != 0);
     return result;
 }
 
-extern void *BuildMemcardPath(); /* arity-ok: second copy of the declaration above, same reason -- the 2-argument call at func_8004EA38 and the 3-argument call at func_8004ECCC cannot share one prototype */
 extern s32 open(void *arg0, s32 arg1);
 extern s32 read(s32 arg0, void *arg1, s32 arg2);
 extern s32 close(s32 arg0);
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 1/41 words in-range, length 1 short (40/41). Residue: a
- * single missing redundant register move -- retail copies `self` into
- * `$v0` (`addu $v0, $a0, $zero`) and reads `self->unkC` through that copy
- * before `$a0` is reused for the local buffer's address; this compiles to
- * reading it directly through `$a0` instead. Every value, branch and call
- * is otherwise correct (docs/match-reports/func_8004EA38.md). Hand-derived;
- * permuter-searched twice (rounds 14, 19) with no zero found. */
-s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
+s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
 {
     s32 pathBuf[8];
     void *path;
     s32 handle;
     void *buf;
 
-    path = BuildMemcardPath(pathBuf, self->unkC);
+    path = BuildMemcardPath(pathBuf, self->unkC, suffix);
     handle = open(path, 1);
     if (handle == -1) {
         return 0;
@@ -384,9 +376,6 @@ s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
     close(handle);
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004EA38);
-#endif
 
 char *func_8004EADC(Node3bb8cE *self, char *buf, char *middle, char **entries)
 {
