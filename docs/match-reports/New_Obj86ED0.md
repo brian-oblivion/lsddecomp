@@ -5,7 +5,7 @@
 Unit `class_3bb8c_i`, carved round 14.
 
 `New_X`-shaped factory for `Obj86ED0` (see `include/class_3bb8c.h`, vtable
-`D_80086ED0`, resolved with `tools/classtable.py D_80086ED0`): allocates the
+`gObj86ED0Methods`, resolved with `tools/classtable.py gObj86ED0Methods`): allocates the
 0x4C-byte instance and dispatches its own ctor (slot 0x008, `Obj86ED0__Obj86ED0`,
 itself a STALLED gp_rel-blocked function in this same unit -- see its own
 report). `Get_vtable_Obj86ED0` (`class_3bb8c_j`, still `INCLUDE_ASM`) is this

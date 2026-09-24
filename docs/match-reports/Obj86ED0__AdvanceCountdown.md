@@ -11,8 +11,8 @@ Unit: `src/class_3bb8c_j.c` (class_3bb8c_j, newly carved round 15).
 `D_800866E8`) and that the header additions below went onto that type.
 That was wrong, caught by `tools/classtable.py D_800866E8` (which does
 NOT contain this function's address at any of its 80 slots) versus
-`tools/classtable.py D_80086ED0` (which places this function, and all
-five siblings named below, at its +0x094..+0x0A8) -- `D_80086ED0` is
+`tools/classtable.py gObj86ED0Methods` (which places this function, and all
+five siblings named below, at its +0x094..+0x0A8) -- `gObj86ED0Methods` is
 `Obj86ED0`, a DIFFERENT, ALREADY shared and fully-typed class in
 `include/class_3bb8c.h`, established independently by class_3bb8c_i,
 whose own struct already carries unk10/unk14/unk18/unk1C/unk20/unk48 and
@@ -92,4 +92,4 @@ exact shape (early-exit-style reset vs. a call as the "main" path).
 
 ## Naming
 
-- `Obj86ED0__AdvanceCountdown` -- tier B. Decrements self->unk1C each call; while > 0 forwards (self->unk18, count, 1) to the same table's slotA8 (Obj86ED0__DispatchLookupValue); at 0, wraps back to self->unk14. Mechanics (a wrapping countdown that dispatches while running) are clear from the body; what it counts down IN THE GAME is not established. classtable.py D_80086ED0 +0x094.
+- `Obj86ED0__AdvanceCountdown` -- tier B. Decrements self->unk1C each call; while > 0 forwards (self->unk18, count, 1) to the same table's slotA8 (Obj86ED0__DispatchLookupValue); at 0, wraps back to self->unk14. Mechanics (a wrapping countdown that dispatches while running) are clear from the body; what it counts down IN THE GAME is not established. classtable.py gObj86ED0Methods +0x094.

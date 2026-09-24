@@ -12,7 +12,7 @@ attempt once rebuilt.
 
 ```c
 extern s32 strlen(char *s);
-extern u8 *D_8008AAE4;
+extern u8 *gNameCharTable;
 extern void Obj86ED0__ClearChildRefs(Obj86ED0 *self);
 
 void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
@@ -25,7 +25,7 @@ void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
     self->unk10 = strlen(arg1);
     self->unk28 = BMemPMgrAlloc(self->unk10 + 4);
 
-    p = D_8008AAE4;
+    p = gNameCharTable;
     count = 0;
     while (*p != 0) {
         p++;
@@ -52,11 +52,11 @@ value rather than reloading `self->unk10` from memory) — ordinary redundant-
 load elimination, not something the C needs to spell out by hand.
 
 **One thing worth flagging explicitly:** the byte-counting loop over
-`D_8008AAE4` is a HAND-WRITTEN `while (*p != 0) { p++; count++; }`, not a
+`gNameCharTable` is a HAND-WRITTEN `while (*p != 0) { p++; count++; }`, not a
 `strlen()` call — this project's `-fno-builtin` means GCC 2.6.3 never turns
 a `strlen` call into inline code, so retail's identical-looking inline loop
 means the SOURCE itself never called `strlen` for this count. Writing
-`count = strlen((char *)D_8008AAE4);` here would emit an actual `jal
+`count = strlen((char *)gNameCharTable);` here would emit an actual `jal
 strlen` instruction retail does not have.
 
 **Header changes** (`include/class_3bb8c.h`, additive):

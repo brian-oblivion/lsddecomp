@@ -88,7 +88,7 @@ call arity) cost one wasted, and materially WORSE, attempt.
 `TaskObjF__AttachChildA` (was `func_80050340`), tier B: lazily
 allocates `self->unk78` via `New_Obj86ED0` (an already-named `New_X`-shaped
 factory for the same real class the sibling `class_3bb8c_i`/`class_3bb8c_j`
-units call `Obj86ED0`/`Class86ED0`, vtable `D_80086ED0`) on first use, then
+units call `Obj86ED0`/`Class86ED0`, vtable `gObj86ED0Methods`) on first use, then
 attaches and configures it through this class's own vtable. Named "A" to
 distinguish it from the identically-shaped `AttachChildB`
 (`self->unk7C`, `New_Class86F88`) below -- nothing in either function's own

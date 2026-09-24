@@ -7,7 +7,7 @@
  * Two unrelated classes' methods live in this address range:
  *  - The first six functions (Obj86ED0__AdvanceCountdown ..
  *    Obj86ED0__DispatchLookupValue, +Get_vtable_Obj86ED0) are `Obj86ED0`
- *    methods -- D_80086ED0, a class ALREADY shared and fully typed in
+ *    methods -- gObj86ED0Methods, a class ALREADY shared and fully typed in
  *    include/class_3bb8c.h, established by class_3bb8c_i.
  *  - Everything else is `Class86F88_3bb8c_j` (gClass86F88Methods, a BasicClass
  *    subclass, alloc size 0x54, reached through `GetClass86F88Methods()` in
@@ -17,7 +17,7 @@
  *
  * Both attributions were WRONG before round 75 (this unit's own C
  * originally used a locally-defined, differently-tabled `Obj866E8` for
- * the first group, and named the second group after `D_80086ED0` by
+ * the first group, and named the second group after `gObj86ED0Methods` by
  * mistake). See `Class86F88__Class86F88.md` for the full
  * `tools/classtable.py` evidence trail -- this file's own git history has
  * the mechanical fix (functions renamed via `tools/rename.py`, types
@@ -119,16 +119,16 @@ void Obj86ED0__DispatchIndexValue(Obj86ED0 *self, s32 arg1, s32 arg2)
 
 /* VALUE-of `%gp_rel`, round 45's Obj86ED0__DispatchLookupValue only -- a byte lookup table
  * (ROM image initialises it to D_800115D0, still-uncarved rodata). */
-extern u8 *D_8008AAE4;
+extern u8 *gNameCharTable;
 
 void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     ChildObj86ED0 *obj;
 
     if (self->unk48) {
-        self->unk28[arg1] = D_8008AAE4[arg2];
+        self->unk28[arg1] = gNameCharTable[arg2];
         obj = self->unk44;
-        obj->methods->slotC4(obj, D_8008AAE4[arg2], arg1);
+        obj->methods->slotC4(obj, gNameCharTable[arg2], arg1);
         self->unk18 = arg1;
         self->unk1C = arg2;
         if (arg3) {
@@ -142,7 +142,7 @@ void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
  * unit (see the file header comment for why this is not added to the
  * shared class_3bb8c.h). Alloc size 0x54 (New_Class86F88). Its real
  * vtable is gClass86F88Methods, reached through GetClass86F88Methods() (class_3bb8c_k).
- * `Get_vtable_Obj86ED0`/D_80086ED0 immediately below are UNRELATED to this
+ * `Get_vtable_Obj86ED0`/gObj86ED0Methods immediately below are UNRELATED to this
  * class -- they are Obj86ED0's own table and getter (see the file header
  * comment), merely defined in this same file.
  *
@@ -227,14 +227,14 @@ struct Class86F88_3bb8c_j {
     Class86F88Handle_3bb8c_j *unk50;                  /* +0x050 */
 };
 
-/* D_80086ED0 is Obj86ED0's OWN table (Obj86ED0Methods, already shared in
+/* gObj86ED0Methods is Obj86ED0's OWN table (Obj86ED0Methods, already shared in
  * include/class_3bb8c.h, established by class_3bb8c_i) -- NOT this file's
  * local Class86F88Methods_3bb8c_j. See the file header comment. */
-extern Obj86ED0Methods D_80086ED0;
+extern Obj86ED0Methods gObj86ED0Methods;
 
 Obj86ED0Methods *Get_vtable_Obj86ED0(void)
 {
-    return &D_80086ED0;
+    return &gObj86ED0Methods;
 }
 
 /*

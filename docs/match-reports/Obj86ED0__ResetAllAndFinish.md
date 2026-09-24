@@ -2,7 +2,7 @@
 
 > Renamed from `func_80051858` on 2026-09-24 (tools/rename.py). Address 0x80051858.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Obj86ED0` (ROUND 75 CORRECTION: was misattributed to `Obj866E8`, actually `Obj86ED0` -- D_80086ED0, established by class_3bb8c_i; see Obj86ED0__AdvanceCountdown.md for
+Unit: `src/class_3bb8c_j.c`. `self` is `Obj86ED0` (ROUND 75 CORRECTION: was misattributed to `Obj866E8`, actually `Obj86ED0` -- gObj86ED0Methods, established by class_3bb8c_i; see Obj86ED0__AdvanceCountdown.md for
 the class-identity evidence shared across this group). This is the "flush
 all" sibling: fires `slotA8` once per remaining slot (counting down from
 `self->unk10 - 1` to 0), then always fires `slotA4` once at the end.
@@ -72,4 +72,4 @@ permuter on future instances of this residue class.
 
 ## Naming
 
-- `Obj86ED0__ResetAllAndFinish` -- tier B. Loops i from unk10-1 down to 0, setting unk18=i and calling slotA8(self, i, unk1C, 0) each iteration, then calls slotA4(self, unk18, 1) once after the loop. Reads as "re-initialise every index, then finalise/notify once" -- the in-game purpose of the loop is not established. classtable.py D_80086ED0 +0x0A0.
+- `Obj86ED0__ResetAllAndFinish` -- tier B. Loops i from unk10-1 down to 0, setting unk18=i and calling slotA8(self, i, unk1C, 0) each iteration, then calls slotA4(self, unk18, 1) once after the loop. Reads as "re-initialise every index, then finalise/notify once" -- the in-game purpose of the loop is not established. classtable.py gObj86ED0Methods +0x0A0.

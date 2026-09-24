@@ -19,12 +19,12 @@ extern char *DecodeFullWidthSjis(char *dest, char *src);
  * `Class86ED0Methods` local view, and two incompatible declarations of one
  * symbol in a shared header reach both translation units. See the HEAD NOTE
  * next to Obj86ED0Methods in that header. */
-extern Obj86ED0Methods D_80086ED0;
+extern Obj86ED0Methods gObj86ED0Methods;
 
 /* This class's own table getter -- New_Obj86ED0/Obj86ED0__Obj86ED0's shared
  * dispatch. DEFINED in src/class_3bb8c_j.c (matched round 15 by runner
  * bravo, which returns it as its own `Class86ED0Methods *` local view of
- * the same table). Returns `&D_80086ED0`; confirmed in the disassembly as
+ * the same table). Returns `&gObj86ED0Methods`; confirmed in the disassembly as
  * `lui/addiu` materialising that exact address then `jr $ra`, the same
  * no-argument-getter shape as `Get_vtable_BasicClass`. Declared here rather than
  * in the shared header because the two units' return types differ. */
@@ -47,11 +47,11 @@ void *New_Obj86ED0(s32 arg0, s32 arg1)
 extern s32 strlen(char *s);
 
 /* VALUE-of `%gp_rel`, round 45's own local view -- same global as
- * class_3bb8c_j's `D_8008AAE4` (a byte lookup table whose length this
+ * class_3bb8c_j's `gNameCharTable` (a byte lookup table whose length this
  * function counts by hand rather than via `strlen`, since GCC 2.6.3 with
  * `-fno-builtin` never turns a `strlen` CALL into inline code -- the
  * inline loop below has to be literal source, not a call). */
-extern u8 *D_8008AAE4;
+extern u8 *gNameCharTable;
 
 /* Defined later in this file (ROM order); forward-declared here since
  * Obj86ED0__Obj86ED0 calls it, same convention as Obj865C8__EnterState2 in
@@ -68,7 +68,7 @@ void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
     self->unk10 = strlen(arg1);
     self->unk28 = BMemPMgrAlloc(self->unk10 + 4);
 
-    p = D_8008AAE4;
+    p = gNameCharTable;
     count = 0;
     while (*p != 0) {
         p++;
@@ -179,10 +179,10 @@ extern ChildObj86ED0 *func_8003B39C(char *path);
 extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 extern ChildObj86ED0 *func_80041AB4(ChildObj86ED0 *arg0, s32 arg1);
 
-extern const char D_80011610[]; /* "COMINPUT" */
-extern const char D_8001161C[]; /* "FONTICON" */
-extern const char D_8008AAE8[]; /* "CARD\\" */
-extern const char D_8008AAF0[]; /* ".TIM" */
+extern const char sStrComInput[]; /* "COMINPUT" */
+extern const char sStrFontIcon[]; /* "FONTICON" */
+extern const char sCardPathPrefix[]; /* "CARD\\" */
+extern const char sTimExt[]; /* ".TIM" */
 extern s32 D_80086F7C; /* 3-word opaque block, func_80041C9C's arg1, address-only here */
 extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
@@ -204,16 +204,16 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
         return;
     }
 
-    dir = D_8008AAE8;
-    ext = D_8008AAF0;
+    dir = sCardPathPrefix;
+    ext = sTimExt;
 
-    handle1 = func_8003B39C(BuildFileName(path, D_80011610, dir, ext));
+    handle1 = func_8003B39C(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
     self->unk48 = func_80041C9C(handle1, (void *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
 
-    handle2 = func_8003B39C(BuildFileName(path, D_8001161C, dir, ext));
+    handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = New_Obj6EAC0(handle2, self->unk10, self->unk28);
     self->unk40 = func_80041AB4(handle2, 0x5F);

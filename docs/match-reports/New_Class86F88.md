@@ -7,7 +7,7 @@
 Unit: `src/class_3bb8c_j.c`. `New_Class86F88` -- the allocator for
 `Class86F88_3bb8c_j` (a small BasicClass-derived sibling class discovered this
 round, alloc size 0x54, vtable gClass86F88Methods reached through `GetClass86F88Methods()`
-(class_3bb8c_k) -- NOT `D_80086ED0`/`Get_vtable_Obj86ED0`, which is a
+(class_3bb8c_k) -- NOT `gObj86ED0Methods`/`Get_vtable_Obj86ED0`, which is a
 DIFFERENT, unrelated class (`Obj86ED0`, established by class_3bb8c_i) that
 this function's own body never touches; ROUND 75 CORRECTION, see
 `Get_vtable_Obj86ED0.md`).

@@ -5,7 +5,7 @@
 Unit `class_3bb8c_i`, carved round 14.
 
 `Obj86ED0`'s finalize override (vtable slot 0x00C, per
-`tools/classtable.py D_80086ED0`): frees the owned name buffer, then
+`tools/classtable.py gObj86ED0Methods`): frees the owned name buffer, then
 dispatches the BASE class's own finalize (`Get_vtable_BasicClass()->finalize`,
 NOT `self->methods->finalize`, since that would just call this same
 function again -- confirmed against `Get_vtable_BasicClass`'s local reduced view

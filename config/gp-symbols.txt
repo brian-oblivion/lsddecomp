@@ -95,9 +95,6 @@ D_8008AACC
 D_8008AAD4
 D_8008AADC
 D_8008AAE0
-D_8008AAE4
-D_8008AAE8
-D_8008AAF0
 D_8008AAF8
 D_8008AB14
 D_8008AB1C
@@ -182,6 +179,7 @@ gLinkSpawnIndex
 gLinkSrcStage
 gLinkTriggerIndex
 gMemcardIconTemplate
+gNameCharTable
 gOpenVabCount
 gPendingVabBuffer
 gPolySubmitTableQuad
@@ -214,7 +212,9 @@ gVabStreamInited
 gVabVolumeInited
 gpDinamicLinkPenalty
 gpNavChallengesComplete
+sCardPathPrefix
 sCdDriveInited
 sMoodCue78TransitionDone
 sPolyOtCodeOverride
 sPolyOtCodeOverrideSet
+sTimExt

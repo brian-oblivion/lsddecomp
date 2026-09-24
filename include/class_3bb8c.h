@@ -1872,7 +1872,7 @@ struct Class86E00_3bb8c_g {
  * value stored into `self->childB`. Not this round's function here -- it
  * is class_3bb8c_j's New_Class86F88 (matched round 15,
  * src/class_3bb8c_j.c; ROUND 75: its class is gClass86F88Methods/Class86F88_3bb8c_j,
- * not D_80086ED0 -- see that unit's file header comment):
+ * not gObj86ED0Methods -- see that unit's file header comment):
  * `BMemPMgrAlloc(0x54)` then, on success, its own ctor-table getter's
  * `+0x008` slot called `(self, arg0, arg1)`. This call site's own
  * evidence (arg1 a literal `1`) is what fixed the 2nd parameter as `s32`
@@ -2609,32 +2609,32 @@ extern void StyleTeardown(void);
 
 /* -------------------------------------------------------------------
  * HEAD NOTE, round 15 merge: `Obj86ED0` below and `Class86ED0` in
- * src/class_3bb8c_j.c are TWO NAMES for the table at D_80086ED0, given
+ * src/class_3bb8c_j.c are TWO NAMES for the table at gObj86ED0Methods, given
  * independently by runners alpha and bravo in the same round. Unify
  * deliberately, not inside a merge.
  *
  * Read alongside that, one of the two summaries was wrong and the binary
  * settles it. bravo reported this class as "alloc size 0x54, vtable
- * D_80086ED0"; alpha reported 0x4C. Measured:
+ * gObj86ED0Methods"; alpha reported 0x4C. Measured:
  *
  *   New_Obj86ED0  li a0,0x4c -> BMemPMgrAlloc, then ctors through
- *                  Get_vtable_Obj86ED0(), which returns &D_80086ED0.
+ *                  Get_vtable_Obj86ED0(), which returns &gObj86ED0Methods.
  *   New_Class86F88  allocates 0x54 and ctors through GetClass86F88Methods(),
  *                  a DIFFERENT table getter living in class_3bb8c_k.
  *
- * So D_80086ED0's class is 0x4C bytes (alpha is right), and bravo's
+ * So gObj86ED0Methods's class is 0x4C bytes (alpha is right), and bravo's
  * 0x54-byte New_X belongs to a different class whose table it had not yet
  * identified -- it typed that object `Class86ED0` after the getter it did
  * recognise. Neither unit's BYTES are affected; both are byte-exact, and
  * a type name is not codegen. What was at risk was the next reader
- * inheriting "D_80086ED0 == 0x54 bytes" as fact.
+ * inheriting "gObj86ED0Methods == 0x54 bytes" as fact.
  * ------------------------------------------------------------------- */
 /*
- * Obj86ED0 -- BasicClass-derived class, vtable D_80086ED0 (resolved with
- * `tools/classtable.py D_80086ED0`, 42 slots; the ONLY class this unit
+ * Obj86ED0 -- BasicClass-derived class, vtable gObj86ED0Methods (resolved with
+ * `tools/classtable.py gObj86ED0Methods`, 42 slots; the ONLY class this unit
  * (class_3bb8c_i) itself defines methods for). Get_vtable_Obj86ED0 (this class's
  * own table getter, `class_3bb8c_j`, still INCLUDE_ASM) returns
- * `&D_80086ED0`; New_Obj86ED0 is the `New_X`-shaped factory that
+ * `&gObj86ED0Methods`; New_Obj86ED0 is the `New_X`-shaped factory that
  * allocates the 0x4C-byte instance and dispatches its ctor (slot 0x008).
  * Slots 0x004-0x038 line up one-for-one with BasicClass's own 14-slot
  * layout (include/code_8220.h's BasicClassMethods) -- `classtable.py --vs
@@ -2688,7 +2688,7 @@ struct ChildObj86ED0 {
 };
 
 /* self->unk3C's pointee -- an unrelated class (own vtable, unconnected to
- * D_80086ED0), reached only through its own +0x080 slot by Obj86ED0__NotifyTarget.
+ * gObj86ED0Methods), reached only through its own +0x080 slot by Obj86ED0__NotifyTarget.
  * Field meaning beyond that slot is unestablished. */
 typedef struct TargetObj86ED0 TargetObj86ED0;
 typedef struct TargetMethods86ED0 TargetMethods86ED0;
@@ -2799,9 +2799,9 @@ struct Obj86ED0 {
  * cross-unit prototype for a function ANOTHER unit defines belongs in the
  * caller, not in the shared header, whenever the two units hold different
  * local views of the same class. */
-/* HEAD NOTE round 15: the `extern Obj86ED0Methods D_80086ED0;` that stood
+/* HEAD NOTE round 15: the `extern Obj86ED0Methods gObj86ED0Methods;` that stood
  * here was moved into src/class_3bb8c_i.c. src/class_3bb8c_j.c carries its
- * own `extern Class86ED0Methods D_80086ED0;` for the same object, and two
+ * own `extern Class86ED0Methods gObj86ED0Methods;` for the same object, and two
  * incompatible declarations of one symbol in a SHARED header reach both
  * translation units. Unit-local views belong in the unit -- which is what
  * runner bravo did with `Class86ED0` deliberately. The TYPES below stay
@@ -2828,13 +2828,13 @@ struct Obj86ED0 {
  * living in class_3bb8c_k" that bravo had not identified. charlie has now
  * MATCHED GetClass86F88Methods, and it returns &gClass86F88Methods. So the 0x54-byte
  * class's method table is gClass86F88Methods -- charlie's Class86F88 -- and NOT
- * D_80086ED0.
+ * gObj86ED0Methods.
  *
  * Consequence for the next reader: the type named `Class86ED0` in
  * src/class_3bb8c_j.c is MISNAMED. It is the object of the 0x54-byte
  * class (table gClass86F88Methods); the name came from Get_vtable_Obj86ED0, the only
  * getter bravo had resolved at the time, which actually returns
- * D_80086ED0 -- alpha's separate 0x4C-byte class in class_3bb8c_i.
+ * gObj86ED0Methods -- alpha's separate 0x4C-byte class in class_3bb8c_i.
  *
  * Nothing is wrong with the BYTES: class_3bb8c_j is byte-exact and a type
  * name is not codegen. Only the name misleads. Left in place rather than

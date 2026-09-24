@@ -14,10 +14,10 @@ extern ChildObj86ED0 *func_8003B39C(char *path);
 extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 extern ChildObj86ED0 *func_80041AB4(ChildObj86ED0 *arg0, s32 arg1);
 
-extern const char D_80011610[]; /* "COMINPUT" */
-extern const char D_8001161C[]; /* "FONTICON" */
-extern const char D_8008AAE8[]; /* "CARD\\" */
-extern const char D_8008AAF0[]; /* ".TIM" */
+extern const char sStrComInput[]; /* "COMINPUT" */
+extern const char sStrFontIcon[]; /* "FONTICON" */
+extern const char sCardPathPrefix[]; /* "CARD\\" */
+extern const char sTimExt[]; /* ".TIM" */
 extern s32 D_80086F7C; /* 3-word opaque block, func_80041C9C's arg1, address-only here */
 extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
@@ -39,16 +39,16 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
         return;
     }
 
-    dir = D_8008AAE8;
-    ext = D_8008AAF0;
+    dir = sCardPathPrefix;
+    ext = sTimExt;
 
-    handle1 = func_8003B39C(BuildFileName(path, D_80011610, dir, ext));
+    handle1 = func_8003B39C(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
     self->unk48 = func_80041C9C(handle1, (void *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
 
-    handle2 = func_8003B39C(BuildFileName(path, D_8001161C, dir, ext));
+    handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = New_Obj6EAC0(handle2, self->unk10, self->unk28);
     self->unk40 = func_80041AB4(handle2, 0x5F);
@@ -67,7 +67,7 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
 pass `(path, "COMINPUT", "CARD\\", ".TIM")` and
 `(path, "FONTICON", "CARD\\", ".TIM")`, i.e. building
 `CARD\COMINPUT.TIM` and `CARD\FONTICON.TIM` -- confirmed from the literal
-rodata bytes at `D_80011610`/`D_8001161C`/`D_8008AAE8`/`D_8008AAF0`
+rodata bytes at `sStrComInput`/`sStrFontIcon`/`sCardPathPrefix`/`sTimExt`
 (`asm/data/1DD0.rodata.s`, `asm/data/7B008.sdata.s`).
 
 `func_8003B39C` (a resource loader taking a path, returning a handle) is

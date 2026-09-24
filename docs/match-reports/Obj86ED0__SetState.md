@@ -10,7 +10,7 @@ Resets `unk30`, returns early for `arg1 < 2`, then dispatches on `arg1`:
 `{2,3}` detaches `unk34` and calls this class's own `slot48`
 (`Obj86ED0__ReleaseCardResources`) before stashing `arg1` into `unk2C`; `4` calls the
 UNMODIFIED base `notifyParents` (`BasicClass__NotifyParents`, confirmed not
-overridden via `tools/classtable.py D_80086ED0 --vs D_8006B58C`) with
+overridden via `tools/classtable.py gObj86ED0Methods --vs D_8006B58C`) with
 `unk2C` as its argument, reached through `self->methods` since that table
 slot is identical to the base's either way.
 

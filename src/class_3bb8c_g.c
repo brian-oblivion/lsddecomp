@@ -13,7 +13,7 @@
  * OnItemSelected forward an externally supplied 2/3 dispatch code the
  * same way. Two lazily-attached child sub-objects (childA/childB, the
  * same real class the sibling units call Obj86ED0/Class86ED0 via
- * D_80086ED0) are attached/detached in mirrored pairs. A third,
+ * gObj86ED0Methods) are attached/detached in mirrored pairs. A third,
  * independent child (cardIcon) is a memcard-icon TIM image, loaded once
  * by LoadCardIcon and stepped by TickCardIcon.
  *
