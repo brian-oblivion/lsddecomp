@@ -1,4 +1,74 @@
-# StyleFillEffectKind3 -- STALL, 79/81 words, length EXACT, insertions 0 / deletions 0, first real diff at word 60 (0x458C8 / vram 0x800550C8)
+# StyleFillEffectKind3 -- MATCHED 81/81 (round 76), lever: store the D_8008E0B0 slot through a pointer to a one-field STRUCT (scheduler alias rule), no shared `t`
+
+REVISITED, round 76: MATCHED 81/81 in 12 builds, no permuter, no barrier; names/types used (local struct view `PtrBoxK3` for the store; D_8008E0xx names kept).
+
+## Round 76 (charlie): MATCHED
+
+**Preserved body rebuilt first**, verbatim from the `#if 0` block: `build
+exit=2`, no compile-error grep hits, **79/81, `insertions 0 / deletions 0`
+(positional skeleton diffs 2)** -- reproduced exactly, residue the 2-word
+`$a2`/`$v1` colour of the else value (the shared `t`).
+
+**The shared `t` was a workaround for the real residue, and the real residue
+was aliasing, not registers.** Round 61 established (correctly) that the
+78/81 body's problem was one instruction: the `*q = D_80087174` store has to
+come AFTER the `lw a2, gStyleCueSelf` so it lands in the `jal` delay slot, and
+that a plain `u8 **q` store is an opaque `(mem (reg))` the scheduler will not
+move a global load across. Round 61 then forced the order by hoisting the
+load into a variable by hand, which cost a register colour somewhere else.
+
+The rule round 61 was one step from: gcc 2.6.3's `true_dependence` declares
+**no conflict** between a MEM that is `MEM_IN_STRUCT_P` with a varying
+address and a MEM that is a scalar at a fixed address. So store through the
+pointer as a STRUCT FIELD and the load is free to schedule above it:
+
+```c
+typedef struct PtrBoxK3 { u8 *p; } PtrBoxK3;
+PtrBoxK3 *q;
+...
+q = (PtrBoxK3 *) &D_8008E0B0;
+q->p = D_80087174;
+*arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
+```
+
+No `t` at all, and the else value goes back to being an anonymous
+expression, which is what puts it in `$v1`. Family: **CSE/parameter walking
+and first uses** is the nearest of round 75's five, but the lever itself is
+new -- a TYPE on the store's lvalue controlling scheduler motion.
+
+| build | body | score |
+| --- | --- | --- |
+| 1 | preserved (shared `t`) | 79/81, ins 0 / del 0 |
+| 2 | struct view over D_8008E0A4..B0, direct field store `SP->fC = ...` | 73/81 (store goes direct `lui at`, loses retail's `q` register) |
+| 3-5 | `p` reused as `q`, dedicated `t`, orders | 76/81, `li a0,3` falls out of the reorg-stolen join slot |
+| 6 | no `t` at all, plain `u8 **q` | 75/81 |
+| 7 | `q = &SP->fC` (struct view) + `&D_8008E0A4` arg | 78/81 -- CSE `related_value` reproduces `addiu a1,v1,-0xc` from `&base.fC`; residue back to the store placement |
+| 9-10 | store inside a comma expression in arg 2 / arg 4 | 78/81, 73/81 |
+| 11 | **`PtrBoxK3 *q`, `q->p = ...`, no `t`** | **81/81, `OK: build matches retail`** |
+| 12 | same, with `q = &SP->fC` (struct view whose +0xC is a `PtrBoxK3`) and `&D_8008E0A4` as the argument | 81/81 too |
+
+Build 11's form is the one committed (smaller local view, no struct laid
+over four separately-declared externs). Build 12 is recorded because it says
+the `- 0xC` was very probably `&struct` in the original: D_8008E0A4..C0
+look like one spawn-parameter struct whose +0xC member is itself a struct.
+Whole image green, `tools/check-nonmatching.sh` green.
+
+### Proposed learning
+
+**A store through a pointer that must SINK below a global load: make the
+store a struct-field store.** gcc 2.6.3's scheduler cannot disambiguate a
+`(mem (reg))` from anything, but `true_dependence` treats an in-struct MEM
+at a varying address and a scalar MEM at a fixed address as non-conflicting.
+Screen: "one store sits above a global load / argument load where retail has
+it below (often in a `jal` delay slot), everything else exact." Wrapping the
+pointee in a one-field struct (`q->p = x` instead of `*q = x`) is
+byte-neutral otherwise. The converse holds: a load that must NOT cross a
+store wants both sides scalar. This is what round 61's hand-hoisted `t`
+was approximating, and the approximation cost a colour.
+
+---
+
+(Previous title: StyleFillEffectKind3 -- STALL, 79/81 words, length EXACT, insertions 0 / deletions 0, first real diff at word 60 (0x458C8 / vram 0x800550C8))
 
 > Renamed from `func_80054FD8` on 2026-09-23 (tools/rename.py). Address 0x80054fd8.
 
