@@ -61,3 +61,26 @@ A call's result can be immediately handed to a SECOND call as an argument,
 with the second call's own result being what actually gets returned. Confirmed
 here after an initial mis-transcription assumed the first call's `$v0` value
 survived untouched to the epilogue.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B38C` | `Class866E8__SetTargetAndBuildRates` | B | Occupant of `D_800866E8` +0x0E4 (`tools/classtable.py 0x800866E8`), class prefix confirmed. Stores its own `arg2`/`arg3` into `self->unk6C`/`self->unkBC` (the tracked position source and current footprint descriptor), then computes offsets via `ComputeCellWorldOffsets` and forwards the result through its own vtable slot `slotF8`, which is `Class866E8__BuildRateEntries`'s identity slot. Mechanics only -- "sets the target/descriptor, then builds rates from it" describes what the body does, not why. |
+
+## Proposed field names
+
+Both below are read/written by `Obj866E8`-typed code OUTSIDE this unit
+(`src/class_3bb8c_b.c`), confirmed by actually attempting the rename: the
+field definition was changed, the whole-image oracle re-run, and
+`class_3bb8c_b.c`'s own `Class866E8__ComputeFootprintFromRotation`
+(`self->unk6C->unk14->unk44`) failed to compile with no matching member.
+Reverted per track 3 step 3's cross-unit rule; proposing here for the head
+to apply by type scope.
+
+| field | proposed name | tier | evidence |
+| --- | --- | --- | --- |
+| `Obj866E8::unk6C` | `posSource` | B | Stored raw by `Class866E8__SetTargetAndBuildRates` (`self->unk6C = arg2`, never dereferenced there); dereferenced by `Class866E8__GetTargetDescriptor` as `self->unk6C->unk14 + 0x18` to obtain the `QueryPos866E8` (world-position triple) fed to `Class866E8__ComputeFootprintDescriptor`; `class_3bb8c_b.c`'s `Class866E8__ComputeFootprintFromRotation` independently reaches the SAME `->unk14->unk44` chain. "posSource" names the mechanic (an object whose `unk14` substruct supplies positions), not an asserted game identity. |
+| `Obj866E8::unkBC` | `descriptor` | B | Whole-struct-copied from a caller `Descriptor10*` in `Class866E8__SetTargetAndBuildRates`; overwritten wholesale (44 bytes, past the declared field into trailing padding -- see `Class866E8__UpdateFootprintTracking.md`'s own derivation) and read back (`Class866E8__GetTargetDescriptor` returns `&self->unkBC` directly) as "the object's current footprint descriptor". Not tested for cross-unit accessors this round (only `unk6C` was); the head should re-run the same compiler check before applying. |

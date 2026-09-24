@@ -66,3 +66,11 @@ loop, rather than hand-rolling pointer arithmetic to mimic the observed
 `lhu 0xEC($a0)` / `addiu $a0,$a0,0x1C` register moves, reproduces retail
 exactly. The instinct to transcribe the moving-pointer shape literally
 would have been wrong and unnecessary.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004BCE0` | `Class866E8__CountFlaggedElements` | A | Pure leaf: loops `self->arr[7]`, counts entries with `flag != 0`, returns the count. A pure count is tier A by the naming rule's own "getter/clamp/list-push" clause -- the mechanics ARE the purpose. Called by `Class866E8__ApplyRateEntries` to refresh `self->unk1B4` after flagging/unflagging elements. |

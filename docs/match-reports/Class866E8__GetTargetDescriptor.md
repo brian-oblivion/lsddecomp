@@ -56,3 +56,11 @@ the call result's zero-ness". Traced correctly here by working out, for each
 of the two fall-through targets (`L8004C1A8` vs `L8004C1AC`), what value `$v0`
 actually holds *at the target*, not at the branch -- the same discipline
 broadcast #3 (delay-slot-belongs-to-the-target) states more generally.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C158` | `Class866E8__GetTargetDescriptor` | B | Occupant of `D_800866E8` +0x10C. Resolves `self->unk6C`'s own position substruct, optionally hands it to `slot110` (`Class866E8__ComputeFootprintDescriptor`) to fill a caller-supplied `Descriptor10Ext`, and always returns `&self->unkBC` -- this object's own current footprint descriptor. "Get...Descriptor" names the return value's role; "Target" reflects `self->unk6C`'s established role as the stored position source (`Class866E8__SetTargetAndBuildRates` sets it). |

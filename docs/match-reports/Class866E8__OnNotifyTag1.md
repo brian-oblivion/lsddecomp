@@ -70,3 +70,11 @@ INTERVENING operation here is a plain field STORE (`self->unk1B0 = 0;`), not
 a call -- worth generalizing that entry's discriminator ("what sits BETWEEN
 the reads") to include a direct sibling-field write, not just a call or an
 aliasing-suspect memory op.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004BD14` | `Class866E8__OnNotifyTag1` | B | Occupant of `D_800866E8` +0x100 (`slot100`). `class_3ac78`'s `Class866E8__OnNotify` (already matched) dispatches this slot, unconditionally, only when `(sender->methods->header & 0xF) == 1` -- i.e. only for one sender class tag. Follows the SAME "OnNotifyTagN" naming convention already established elsewhere in this codebase for identical per-tag dispatch targets (`Unk18Obj__OnNotifyTag5`/`Unk18Obj__OnNotifyTag1`, `src/code_2cc8c_d.c`). `mode` here is the caller's own `command`, but the body itself early-returns unless `mode == 2` -- narrower than "every tag-1 notification", which the name does not claim (only that this IS the tag-1 dispatch target). |

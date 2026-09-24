@@ -44,3 +44,11 @@ void Class866E8__Disable(Obj866E8 *self) {
 ### Proposed learning
 
 None new.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B57C` | `Class866E8__Disable` | A | Occupant of `D_800866E8` +0x0F0. Body: `self->methods->slotC0(self); self->enabled = 0;` -- dispatches a teardown slot, then clears the same field `Class866E8__Enable` sets. See `Class866E8__Enable.md` for the cross-unit confirmation of the `enabled` field name. |

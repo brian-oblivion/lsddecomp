@@ -1,6 +1,28 @@
 /* First slice of the 365-function class_3bb8c block -- 20 functions,
- * 0x3BB8C..0x3CD88. The remainder is `class_3bb8c_b` and is still a
- * monolithic asm segment.
+ * 0x3BB8C..0x3CD88, all matched C, occupants of `D_800866E8` +0x0E4..+0x11C
+ * (`tools/classtable.py 0x800866E8`). The remainder is `class_3bb8c_b` and
+ * is still a monolithic asm segment.
+ *
+ * This slice is Class866E8's FOOTPRINT/RATE engine: the position-to-grid-cell
+ * math and the per-element resource/GPU work that `class_3ac78`'s own unit
+ * header (src/class_3ac78.c) describes as living in "class_3bb8c*" --
+ * Class866E8__ComputeFootprintDescriptor converts a world position
+ * (QueryPos866E8) into a grid-cell descriptor (Descriptor10, byte row/column
+ * plus sub-cell halfword offsets); Class866E8__UpdateFootprintTracking runs
+ * every enabled tick (paired with class_3ac78's Class866E8__AdvanceRateCountdown)
+ * to refresh that descriptor and notify on change; Class866E8__BuildRateEntries
+ * / Class866E8__ComputeRateFlags / Class866E8__ComputeRateEntry /
+ * Class866E8__ApplyRateEntries build and apply a per-element rate table from
+ * a TargetSpec866E8 key/flag array (sDefaultTargetSpecs); and
+ * Class866E8__LoadElementResources / Class866E8__ResetElementCells own an
+ * element's resource-load and GPU-link cell array (the same 0x668-byte grid
+ * class_3ac78 calls out) and its teardown. Class866E8__Enable/Disable set
+ * the `enabled` flag class_3ac78 gates all of this on (cross-confirmed
+ * there independently, see docs/match-reports/Class866E8__Enable.md).
+ *
+ * Every function here keeps its own local struct view (`Obj866E8` etc.),
+ * distinct from class_3ac78's `Class866E8` -- see this unit's own header
+ * comment in include/class_3bb8c.h for why.
  *
  * Carve notes for whoever takes the NEXT slice: this block holds all 13 of
  * the game's PSX BIOS trampolines (`jr $t2` with the vector in $t2 and the

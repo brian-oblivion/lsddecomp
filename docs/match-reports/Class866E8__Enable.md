@@ -63,3 +63,15 @@ only about what the bytes prove.
 ### Proposed learning
 
 None new — a direct instance of an already-documented idiom.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B570` | `Class866E8__Enable` | A | Occupant of `D_800866E8` +0x0EC. Body is exactly `self->enabled = 1;`. Paired with `Class866E8__Disable` (+0x0F0, same struct, clears the same field) and cross-confirmed by `class_3ac78`'s own INDEPENDENT local view of the same field, already named `enabled` there (`docs/match-reports/Class866E8__UpdateIfEnabled.md`, round 67) from the identical set/clear evidence. A pure setter of a named boolean field is tier A by the naming rule's own "getter/clamp/list-push" clause. |
+
+| field | name | tier | evidence |
+| --- | --- | --- | --- |
+| `Obj866E8::unk70` | `enabled` | A | Set 1 here, cleared 0 (after a `slotC0` teardown dispatch) by `Class866E8__Disable`. Same field, same evidence, and the same conclusion `class_3ac78`'s independent view already reached for its own copy of this struct -- see `Class866E8__UpdateIfEnabled.md`. Renamed in `include/class_3bb8c.h`'s own `Obj866E8` definition; rebuild after the rename touched only `src/class_3bb8c.c` (`Class866E8__Enable`/`Class866E8__Disable`), confirming no other unit accesses this struct's `unk70`/`enabled` field. |

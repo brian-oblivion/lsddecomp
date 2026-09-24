@@ -819,3 +819,11 @@ typedefs), build, and measure. Try the reload elimination ALONE first -- on
 the sibling that single change carried the entire 12-word gain, and a combined
 result says nothing until each component is measured alone (round 39's
 head-side trap on `Unk18Obj__InitOt`).
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004BE54` | `Class866E8__LoadElementResources` | B | Occupant of `D_800866E8` +0x104 (`slot104`), and its own identity slot -- `Class866E8__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `func_80043840` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/class_3ac78.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |

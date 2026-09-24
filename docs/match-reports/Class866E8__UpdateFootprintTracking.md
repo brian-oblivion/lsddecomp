@@ -172,3 +172,11 @@ UNCHANGED (see derivation note above for why).
   overlapping-but-different-sized views of the same struct field and
   retyping the field would force one of them to change its own (already
   verified) source.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B5BC` | `Class866E8__UpdateFootprintTracking` | B | Occupant of `D_800866E8` +0x0F4 (`slotF4`). `class_3ac78`'s own `Class866E8__UpdateIfEnabled` (round 67 report) dispatches this slot then `slot13C` (`Class866E8__AdvanceRateCountdown`) back-to-back, guarded by `enabled` -- i.e. this runs every "enabled" tick alongside the rate countdown. Body reads the current footprint query (`slot10C`), resolves an element and its remap byte, conditionally forwards through `slotF8` (`Class866E8__BuildRateEntries`), calls `slot128` (`Class866E8__RefreshFootprint`), then updates `self->unkBC` (the current descriptor) and notifies (`slot30`) only if the descriptor's leading value changed. "Update...Tracking" names the mechanic (per-tick refresh-and-notify-on-change of the tracked footprint state), not an unproven in-game purpose. |

@@ -90,3 +90,11 @@ comparison against a plain `s32 key`, decoded as signed). 15/15.
 
 None new — same signed/unsigned halfword lesson already documented
 elsewhere this project (`Class86668__CheckTimeout`, `class_39e08`).
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C434` | `Class866E8__FindElemByUnk32` | A | Occupant of `D_800866E8` +0x118 (`slot118`). Pure linear search: loops `self->arr[7]`, returns the first `Elem *` whose `unk4->unk32 == key`. Named to parallel the already-matched sibling `Class866E8__FindElemIndexByUnk32` (+0x120), which searches the SAME field (`ElemTarget::unk32`) but returns an index rather than the element pointer -- consistent family naming for two functions doing the identical field comparison with a different return shape. A pure search-and-return is tier A by the "getter" clause. |

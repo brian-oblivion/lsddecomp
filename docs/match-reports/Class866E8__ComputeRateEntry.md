@@ -562,3 +562,11 @@ already existed.
   textually first in the source; whichever it reaches via an explicit
   forward branch belongs in the `else`/`goto`-target position, regardless
   of which condition "reads more naturally" as the `if`.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004BA40` | `Class866E8__ComputeRateEntry` | B | Fills one `SetupEntry866E8` slot (`arg1->ptr0`/`arg1->id`) from `sRateEntryTable[key]`/`sRateKeyMask[key]` and `self->unk60(self->unk64, ...)` (a stored resolver callback), called once per enabled `TargetSpec866E8` by `Class866E8__BuildRateEntries`. "Compute...Entry" matches that caller's own "Build...Entries" name (one call computes one entry of the array the caller builds). Return type corrected `void`->`s32` in an earlier round (see the header's own note); not revisited here. |

@@ -94,3 +94,11 @@ by more than one path.** If a residue is an unexplained `sll`/`sra`-by-16
 pair immediately preceding an arithmetic op on a value you cached from a
 signed-halfword field, widen the LOCAL's declared type to `s32` (leaving the
 struct field itself `s16`) before looking anywhere else.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B930` | `Class866E8__ComputeRateFlags` | B | Takes `self` as its first parameter (a method, not a free function). Computes a bitmask from `val`/`self->unk68->divisor`/`flag` (boundary tests against the divisor, remainder tests, complemented at every return) with no field write -- a pure computation, its result forwarded by `Class866E8__BuildRateEntries` to `Class866E8__ComputeRateEntry` as `savedResult`, tested there against `sRateKeyMask[key]`. "Compute...Flags" names the mechanic; the individual bit meanings (0x25/0x60/0x10/0x52/...) are not established. |

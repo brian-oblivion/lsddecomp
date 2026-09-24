@@ -601,3 +601,11 @@ length-preserving, let alone byte-exact -- the lever's "adjacent loads,
 later consumers" diagnostic from this round's brief is exactly the right
 test, and it says no here. Read the retail `.s` for that adjacency before
 spending an attempt on this lever, not after.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C470` | `Class866E8__FindElementForPosition` | B | Occupant of `D_800866E8` +0x11C (`slot11C`), called by `Class866E8__ComputeFootprintDescriptor` with its own `QueryPos866E8` world-position argument. Loops `self->arr[7]` via `slot118`, bounds-testing `arg1->unk0`/`arg1->unk8` against each candidate's `r->unk18`/`r->unk20` within a fixed `0xA000` tolerance (a spatial hit test), with a decreasing `threshold` and `self->unk68->unk4` gating an early-exit shortcut on ties. "Find...ForPosition" names the mechanic (locate the element whose bounds contain/are nearest a world position); the tie-break rule beyond "closer element wins" is not established. |

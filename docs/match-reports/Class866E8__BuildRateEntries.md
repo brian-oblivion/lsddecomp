@@ -719,3 +719,11 @@ void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Ta
 }
 #endif
 ```
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B700` | `Class866E8__BuildRateEntries` | B | Occupant of `D_800866E8` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `TargetSpec866E8[7]` (`sDefaultTargetSpecs` at its one known call site), calling `Class866E8__ComputeRateFlags` once and `Class866E8__ComputeRateEntry` per enabled entry to fill a 7-slot `SetupEntry866E8` stack buffer, then dispatches the filled count through `slotFC` (`Class866E8__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`Class866E8__ConfigureRateEntry`, `Class866E8__AdvanceRateCountdown`, `Class866E8__FlushRateLatch`). |

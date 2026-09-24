@@ -569,3 +569,11 @@ spending attempts reshaping the surrounding statements one at a time --
 it likely needs either the permuter or a specific understanding of what
 retail's original source held live at that point that this derivation didn't
 reconstruct.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C1C0` | `Class866E8__ComputeFootprintDescriptor` | B | Occupant of `D_800866E8` +0x110 (`slot110`). `class_3ac78`'s own `Class866E8__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `Class866E8__SetFootprintFromCell`/`Class866E8__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `QueryPos866E8` world position via `Class866E8__FindElementForPosition` and an `Unk14Obj` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |

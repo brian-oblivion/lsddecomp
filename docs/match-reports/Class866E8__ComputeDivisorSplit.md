@@ -39,3 +39,11 @@ several-instruction sequence with a zero/overflow check; write plain `%`/`/`"
 guidance in CLAUDE.md verbatim, including the double-reload-not-cached shape
 for a value read via two independent statements with no intervening
 assignment to a local.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C368` | `Class866E8__ComputeDivisorSplit` | A | Takes `self` first (a method). Pure two-line computation: `out[0] = val % self->unk68->divisor; out[1] = val / self->unk68->divisor;` -- a mod/div split against the object's own divisor, no other side effect. Mechanics-only name, tier A by the "getter/clamp" clause (a pure, unconditional computation whose mechanics fully describe it). |

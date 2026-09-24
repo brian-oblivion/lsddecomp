@@ -611,3 +611,11 @@ array" early (compare the FIRST diverging address's instruction to see if
 it's a lone extra `addiu $sN,$sN,<stride>` right at the loop-continue
 branch) -- it is cheap to misdiagnose as a big structural bug when 104 of
 105 instructions already agree.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004BB3C` | `Class866E8__ApplyRateEntries` | B | Occupant of `D_800866E8` +0x0FC (`slotFC`), verified via classtable as its own identity slot (already documented in `include/class_3bb8c.h`). Iterates the `SetupEntry866E8[count]` array `Class866E8__BuildRateEntries` just filled, resolving an `Elem` per entry (`slot118`) and either attaching (`ptr0 != 0`: `slot78`, sets `rate`, `flag = 1`) or detaching (`slot74`, `flag = 0`) it, then recomputes `self->unk1B4` via `Class866E8__CountFlaggedElements`. "Apply...Entries" mirrors the "Build...Entries" name of its own caller-side producer. |

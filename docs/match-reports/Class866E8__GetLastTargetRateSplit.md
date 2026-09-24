@@ -39,3 +39,11 @@ unit's own functions is a reliable way to spot repeated struct fields (here,
 `+0x030` on the target object, seen independently from two different call
 chains: `self->arr[i].unk4->unk30` in `Class866E8__ResetElementCells` and
 `self->unk1BC->unk4->unk30` here).
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C3F0` | `Class866E8__GetLastTargetRateSplit` | B | `func_8004C368(self, out, self->unk1BC->unk4->unk30); return self->unk1BC;` -- splits `self->unk1BC`'s own target rate (`unk4->unk30`, the same `ElemTarget::unk30` field `Class866E8__FindElemIndexByUnk30` and others already read as a rate) via `Class866E8__ComputeDivisorSplit`, and returns `self->unk1BC` itself. "GetLastTarget..." reflects `unk1BC`'s established role (set by `Class866E8__FindElementForPosition`'s callers elsewhere, read only here) as a stashed "most recently resolved" target pointer; "...RateSplit" names the mod/div computation performed on it. Tier B: the field's exact update site is outside this unit's matched functions, so "last" is inferred from usage pattern, not directly observed here. |
