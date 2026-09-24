@@ -37,7 +37,7 @@ void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
 ## Evidence
 
 - `Get_vtable_TaskCore()->slot60(self, a1)`: new `TaskCoreMethods` slot `+0x060`.
-  `classtable.py gTaskCoreMethods` confirms it's occupied (`func_8003C63C`, a
+  `classtable.py gTaskCoreMethods` confirms it's occupied (`Obj86B60__SetState`, a
   different unit) — result discarded, typed `void`.
 - `self->methods->slot94(self)`: new `StreamTaskObjMethods` slot `+0x094`.
   `classtable.py gStreamTaskObjMethods` shows it occupied by **this unit's own,

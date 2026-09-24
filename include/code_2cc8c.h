@@ -12,21 +12,40 @@ typedef struct ClassEAC0Obj ClassEAC0Obj;
 typedef struct Pair32E99C Pair32E99C;
 
 /*
- * The class whose method table is gClass86B60Methods (78 slots, base) with a
- * derived override table at gGraphRoomMethods (73 slots) -- resolved with
- * tools/classtable.py gClass86B60Methods / gClass86B60Methods --vs gGraphRoomMethods. No FirecatFG
- * name survives, so the struct is named `Obj86B60` after the base table's
- * address and fields are named by offset until real names are known. Per
- * this project's established multiple-independent-local-views convention
- * (see e.g. class_3bb8c.h's own header comment), this is THIS unit's own
- * view -- no other unit includes this header.
+ * The class whose method table is gClass86B60Methods (78 slots) -- resolved
+ * with tools/classtable.py gClass86B60Methods. No FirecatFG name survives,
+ * so the struct is named `Obj86B60` after that table's address and fields
+ * are named by offset until real names are known. Per this project's
+ * established multiple-independent-local-views convention (see e.g.
+ * class_3bb8c.h's own header comment), this is THIS unit's own view -- no
+ * other unit includes this header.
  *
- * Both tables agree on every slot this unit's 18 attempted functions
- * touch, so the base/derived split does not matter for this file; only
- * slots 0x090/0x094 (unused here) and a few 0x0D8+ slots differ between
- * them. See src/code_2cc8c.c's own header comment for the carve
- * provenance and the two functions (func_8003C48C, func_8003C63C) this
- * unit could not attempt (addiu_at-blocked dense switches).
+ * CORRECTED round 78 (delta): gClass86B60Methods is NOT the base table for
+ * this unit's 20 functions -- it is one of (at least) two INDEPENDENT
+ * DERIVED tables built on top of the real base, `gTaskCoreMethods`
+ * (72 slots, asm/data/5E140.data.s @ 0x8006E730, `Get_vtable_TaskCore()` --
+ * see code_2cc8c_c.c). Checked directly against the raw table bytes with
+ * `tools/classtable.py gTaskCoreMethods`: every one of this unit's 20
+ * functions occupies gTaskCoreMethods at the SAME offset it occupies in
+ * gClass86B60Methods, and 9 of them (Obj86B60__OnTag2Notify,
+ * Obj86B60__OnTag5Notify, Obj86B60__SetState, Obj86B60__Tick,
+ * Obj86B60__RefreshViewValue and the five func_8003Cxxx handlers at
+ * +0x074..+0x084) ALSO occupy the second derived table, `gGraphRoomMethods`
+ * (the `GraphRoomObj` class, src/class_3bb8c_t.c), unmodified. gClass86B60Methods
+ * (the `Class86B60` class, external to this unit) overrides three of them --
+ * slot60 with `Class86B60__SetState`, slot90 with `Class86B60__Tick`, slot94
+ * with `Class86B60__RefreshViewValue` -- which is exactly the evidence that
+ * settles those three names (this unit's own Obj86B60__SetState/Tick/
+ * RefreshViewValue are the DEFAULT implementations a sibling class
+ * overrides, not the override itself; do not rename them to a
+ * `Class86B60__`- or `GraphRoomObj__`-prefixed name -- see
+ * TaskCoreObj__TaskCoreObj/TaskCoreObj__Reset et al, already established in
+ * this same gTaskCoreMethods table, for why "Obj86B60" and not "TaskCoreObj"
+ * is still the right prefix for the non-identity-defining methods: this
+ * unit's own struct is typed `Obj86B60 *self` throughout, matching the
+ * project's `IntermediateBase__IntermediateBase(Obj86B60 *self)` precedent
+ * of naming by which table a function anchors rather than by its C
+ * parameter type).
  *
  * Only the slots/fields this unit's functions actually touch are given
  * concrete types; everything else stays opaque padding.
@@ -123,18 +142,16 @@ struct EventArg {
 /*
  * self->unk4C's pointee ("target"). Established from six independent
  * functions all agreeing:
- *  - func_8003C7F4/func_8003C858/func_8003C8D0/func_8003C944/func_8003C9B0
+ *  - Obj86B60__func_8003C7F4/Obj86B60__func_8003C858/Obj86B60__func_8003C8D0/Obj86B60__func_8003C944/Obj86B60__func_8003C9B0
  *    each use it ONLY as a null/non-null gate (never dereferenced), so it
  *    is at minimum a pointer.
- *  - func_8003CA1C dereferences +0x00C (s32, compared directly against
+ *  - Obj86B60__Tick dereferences +0x00C (s32, compared directly against
  *    self->unk58) and +0x024 (a pointer to a word-pointer array, indexed
  *    by self->unk58 and null-checked -- `target->unk24[self->unk58]`).
- *  - func_8003C63C (case a1==5, STALL -- see that function's report for
- *    why it was never attempted as a whole; this field use was read off
- *    the disassembly independently of attempting the function) reads
+ *  - Obj86B60__SetState (case a1==5) reads
  *    +0x008 (s32, forwarded as an argument) and takes the ADDRESS of
  *    +0x010 (passed as a 3-byte colour-ish buffer to self->methods->slotE4,
- *    the same slot func_8003CC2C feeds a locally-built 3-byte buffer to).
+ *    the same slot Obj86B60__TickColorFade feeds a locally-built 3-byte buffer to).
  */
 struct Unk4CObj {
     const char *path;   /* +0x000, renamed from unk0, round 78 -- exclusive
@@ -156,10 +173,10 @@ struct Unk4CObj {
                             back unchanged; same Unk74Obj slot4 interface
                             Obj86B60->unk74 uses) and Obj86B60__ReleaseTarget (slot4
                             called on it, gated by path's truthiness) */
-    s32 unk8;           /* +0x008, OBSERVED: func_8003C63C (not attempted) */
-    s32 unkC;            /* +0x00C, OBSERVED: func_8003CA1C */
+    s32 unk8;           /* +0x008, OBSERVED: Obj86B60__SetState */
+    s32 unkC;            /* +0x00C, OBSERVED: Obj86B60__Tick */
     u8 unk10[3];          /* +0x010, INFERRED 3-byte colour buffer read by
-                              address only (func_8003C63C, not attempted);
+                              address only (Obj86B60__SetState);
                               CONFIRMED as a 3-byte buffer read (not just
                               address-taken) by Obj86B60__CancelElementScroll/Obj86B60__SetSlotCursor,
                               both already matched, passing it directly to
@@ -189,7 +206,7 @@ struct Unk4CObj {
                                 records this unit never reads through
                                 directly, only forwards as Obj86B60__UpdateSlotElements's
                                 3rd arg to an Unk64Elem slot4C call) */
-    void **unk24;         /* +0x024, OBSERVED: func_8003CA1C, word-pointer
+    void **unk24;         /* +0x024, OBSERVED: Obj86B60__Tick, word-pointer
                               array indexed by self->unk58 */
 };
 
@@ -224,8 +241,8 @@ struct SlotEntry {
 
 /* self->unk48's pointee ("child"). A DIFFERENT class from Obj86B60 -- its
  * own vtable slot +0x080 takes FOUR args (self, a1, a2, a3), whereas
- * Obj86B60's OWN slot +0x080 (func_8003C944) takes none beyond self. Only
- * func_8003C7B4 touches it, so only that one slot is modelled. */
+ * Obj86B60's OWN slot +0x080 (Obj86B60__func_8003C944) takes none beyond self. Only
+ * Obj86B60__ForwardToChild touches it, so only that one slot is modelled. */
 struct Unk48ObjMethods {
     u8 pad000[0x080];
     void (*slot80)(Unk48Obj *self, s32 a1, s32 a2, s32 a3); /* +0x080 */
@@ -234,8 +251,8 @@ struct Unk48Obj {
     Unk48ObjMethods *methods; /* +0x000 */
 };
 
-/* self->unk78's pointee. Only func_8003CC2C touches it, calling one slot
- * with a literal 1 and the same 3-byte colour buffer func_8003CC2C builds
+/* self->unk78's pointee. Only Obj86B60__TickColorFade touches it, calling one slot
+ * with a literal 1 and the same 3-byte colour buffer Obj86B60__TickColorFade builds
  * for its own self->methods->slotE4 call just above. */
 struct Unk78ObjMethods {
     u8 pad000[0x0B8];
@@ -1032,16 +1049,16 @@ struct Obj86B60InitArgs {
  * unit never itself invokes.
  *
  * slotB0/slotC4 are read as DATA (a raw function-pointer VALUE stashed into
- * self->unk88/self->unk8C by func_8003CAF8/func_8003CB30), never called
+ * self->unk88/self->unk8C by Obj86B60__SetFadeCallbackEnabled/Obj86B60__func_8003CB30), never called
  * directly through the vtable in this unit -- their type is inferred from
- * how self->unk88/unk8C are later CALLED (func_8003CBC0/func_8003CCDC).
+ * how self->unk88/unk8C are later CALLED (Obj86B60__TickFadeCallback/Obj86B60__func_8003CCDC).
  *
- * slotAC/slotC0 ARE func_8003CBC0/func_8003CCDC respectively (OBSERVED from
- * classtable.py). func_8003C51C calls them with `self` only -- register
+ * slotAC/slotC0 ARE Obj86B60__TickFadeCallback/Obj86B60__func_8003CCDC respectively (OBSERVED from
+ * classtable.py). Obj86B60__OnTag5Notify calls them with `self` only -- register
  * `$a1` is genuinely live-but-unconsumed at those two call sites (leftover
  * from an earlier `self->methods->slot60(self, 6)` call a few instructions
  * before, on the branch that reaches them), not a real argument; neither
- * callee's own body reads it. See func_8003C51C's own report.
+ * callee's own body reads it. See Obj86B60__OnTag5Notify's own report.
  */
 struct Obj86B60Methods {
     u8 pad000[0x010];
@@ -1099,12 +1116,12 @@ struct Obj86B60Methods {
                                                       Renamed from slot54,
                                                       round 55 -- exclusive to
                                                       this unit. */
-    void (*slot58)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x058,
-                                                      external (func_8003C48C,
-                                                      STALL in code_2cc8c);
+    void (*slot58)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x058, IS
+                                                      Obj86B60__OnTag2Notify
+                                                      (already matched);
                                                       OBSERVED: Obj86B60__OnNotify */
     void (*slot5C)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x05C, IS
-                                                      func_8003C51C (already
+                                                      Obj86B60__OnTag5Notify (already
                                                       matched there with a1
                                                       typed s32 -- an
                                                       independent local view,
@@ -1121,64 +1138,95 @@ struct Obj86B60Methods {
                                                       Obj86B60__NotifyChildReset;
                                                       OBSERVED: Obj86B60__NotifyParents
                                                       (round 13) */
-    u8 pad06C[0x070 - 0x06C];
+    void (*slot6C)(Obj86B60 *self, s32 a1);       /* +0x06C, IS
+                                                      Obj86B60__SetFrameBound
+                                                      (round 78 -- previously
+                                                      padded over as unoccupied;
+                                                      it is a real slot,
+                                                      confirmed against the raw
+                                                      table bytes in both
+                                                      asm/data/76DC8.data.s
+                                                      (gClass86B60Methods+0x06C)
+                                                      and asm/data/5E140.data.s
+                                                      (gTaskCoreMethods+0x06C)) */
     void (*slot70)(Obj86B60 *self, s32 a1);       /* +0x070, IS
-                                                      func_8003C7B4 */
-    /* +0x074..+0x084: the five message handlers func_8003C48C dispatches to
+                                                      Obj86B60__ForwardToChild */
+    /* +0x074..+0x084: the five message handlers Obj86B60__OnTag2Notify dispatches to
      * (round 23). Read off jtbl_80011090: message code 0x12 -> slot80,
-     * 0x13 -> slot84, 0x17 -> slot7C, 0x19 -> slot78, 0x21 -> slot74; every
-     * other code in [0x12,0x21] is a no-op. In the base table gClass86B60Methods
-     * these are func_8003C7F4 / func_8003C858 / func_8003C8D0 /
-     * func_8003C944 / func_8003C9B0 respectively. Pad split is ADDITIVE and
-     * preserves the original 0x1C total (5 * 4 + 8). */
-    void (*slot74)(Obj86B60 *self, s32 a1);       /* +0x074, IS func_8003C9B0 */
-    void (*slot78)(Obj86B60 *self, s32 a1);       /* +0x078, IS func_8003C944 */
-    void (*slot7C)(Obj86B60 *self, s32 a1);       /* +0x07C, IS func_8003C8D0 */
-    void (*slot80)(Obj86B60 *self, s32 a1);       /* +0x080, IS func_8003C7F4 */
-    void (*slot84)(Obj86B60 *self, s32 a1);       /* +0x084, IS func_8003C858 */
+     * 0x13 -> slot84, 0x17 -> slot7C, 0x19 -> slot78, 0x21 -> slot74.
+     *
+     * CORRECTED round 78 (delta): the occupants below were previously listed
+     * REVERSED (slot74 said "IS func_8003C9B0", slot84 said "IS func_8003C858",
+     * etc -- a mirror image of the truth). Read the raw table bytes directly
+     * (asm/data/76DC8.data.s lines for gClass86B60Methods+0x074..+0x084, and
+     * the same offsets in gTaskCoreMethods, asm/data/5E140.data.s): the five
+     * `.word` entries are in ASCENDING function-address order, matching
+     * ASCENDING slot-offset order exactly, with no mirroring. That makes the
+     * message-code -> occupant mapping 0x21->Obj86B60__func_8003C7F4 (slot74),
+     * 0x19->Obj86B60__func_8003C858 (slot78), 0x17->Obj86B60__func_8003C8D0
+     * (slot7C, unaffected -- the middle slot of five is its own mirror),
+     * 0x12->Obj86B60__func_8003C944 (slot80), 0x13->Obj86B60__func_8003C9B0
+     * (slot84) -- every code_2cc8c.c source order (C7F4, C858, C8D0, C944,
+     * C9B0 -- see src/code_2cc8c.c's own function order) reads straight down
+     * the table starting at slot74, which is the tell that the OLD comment
+     * had it backwards. Pad split is ADDITIVE and preserves the original
+     * 0x1C total (5 * 4 + 8). */
+    void (*slot74)(Obj86B60 *self, s32 a1);       /* +0x074, IS Obj86B60__func_8003C7F4 */
+    void (*slot78)(Obj86B60 *self, s32 a1);       /* +0x078, IS Obj86B60__func_8003C858 */
+    void (*slot7C)(Obj86B60 *self, s32 a1);       /* +0x07C, IS Obj86B60__func_8003C8D0 */
+    void (*slot80)(Obj86B60 *self, s32 a1);       /* +0x080, IS Obj86B60__func_8003C944 */
+    void (*slot84)(Obj86B60 *self, s32 a1);       /* +0x084, IS Obj86B60__func_8003C9B0 */
     u8 pad088[0x090 - 0x088];
-    void (*slot90)(Obj86B60 *self);               /* +0x090, external
-                                                      (Class86B60__Tick);
-                                                      OBSERVED: func_8003C63C
-                                                      (STALL, not attempted --
-                                                      read off the
-                                                      disassembly only) */
-    void (*slot94)(Obj86B60 *self);                /* +0x094, external
-                                                       (Class86B60__RefreshViewValue);
-                                                       OBSERVED:
-                                                       func_8003CA1C and
-                                                       func_8003C63C (STALL) */
+    void (*slot90)(Obj86B60 *self);               /* +0x090, IS Obj86B60__Tick
+                                                      (already matched);
+                                                      gClass86B60Methods
+                                                      overrides this slot with
+                                                      the independently-named
+                                                      Class86B60__Tick, which
+                                                      is what settles the
+                                                      "Tick" name -- see
+                                                      Obj86B60__Tick's own
+                                                      report. OBSERVED:
+                                                      Obj86B60__SetState */
+    void (*slot94)(Obj86B60 *self);                /* +0x094, IS
+                                                       Obj86B60__RefreshViewValue
+                                                       (already matched);
+                                                       gClass86B60Methods
+                                                       overrides this slot with
+                                                       Class86B60__RefreshViewValue,
+                                                       same evidence shape as
+                                                       slot90 above. OBSERVED:
+                                                       Obj86B60__Tick and
+                                                       Obj86B60__SetState */
     u8 pad098[0x0AC - 0x098];
     s32 (*slotAC)(Obj86B60 *self);                 /* +0x0AC, OBSERVED:
-                                                       IS func_8003CBC0 */
+                                                       IS Obj86B60__TickFadeCallback */
     s32 (*slotB0)(Obj86B60 *self);                 /* +0x0B0, IS
-                                                       func_8003CC2C; read as
-                                                       DATA by func_8003CAF8 */
+                                                       Obj86B60__TickColorFade; read as
+                                                       DATA by Obj86B60__SetFadeCallbackEnabled */
     u8 pad0B4[0x0C0 - 0xB4];
     s32 (*slotC0)(Obj86B60 *self);                 /* +0x0C0, IS
-                                                       func_8003CCDC */
+                                                       Obj86B60__func_8003CCDC */
     s32 (*slotC4)(Obj86B60 *self);                  /* +0x0C4, external
                                                        (Obj86B60__TickFadeColor); read
                                                        as DATA by
-                                                       func_8003CB30 */
+                                                       Obj86B60__func_8003CB30 */
     u8 pad0C8[0x0E4 - 0xC8];
     void (*slotE4)(Obj86B60 *self, u8 *buf);        /* +0x0E4, external
                                                        (func_8003D9D4);
                                                        OBSERVED:
-                                                       func_8003CC2C and
-                                                       func_8003C63C (STALL,
-                                                       not attempted) */
+                                                       Obj86B60__TickColorFade and
+                                                       Obj86B60__SetState */
     void (*slotE8)(Obj86B60 *self);                 /* +0x0E8, external
                                                        (Obj86B60__FindNextFreeSlot);
-                                                       OBSERVED: func_8003C9B0 */
+                                                       OBSERVED: Obj86B60__func_8003C9B0 */
     void (*slotEC)(Obj86B60 *self);                 /* +0x0EC, external
                                                        (Obj86B60__FindPrevFreeSlot);
-                                                       OBSERVED: func_8003C944 */
+                                                       OBSERVED: Obj86B60__func_8003C944 */
     void (*slotF0)(Obj86B60 *self, s32 a1, s32 a2); /* +0x0F0, external
                                                        (Class86B60__RefreshViewValue);
                                                        OBSERVED:
-                                                       func_8003C63C (STALL,
-                                                       not attempted) */
+                                                       Obj86B60__SetState */
     u8 pad0F4[0x0F8 - 0xF4];
     void (*slotF8)(Obj86B60 *self, void *a1, Unk74Obj *a2); /* +0x0F8,
                                                        OBSERVED:
@@ -1195,22 +1243,22 @@ struct Obj86B60Methods {
                                                        Obj86B60__BroadcastToSlots */
     void (*slot108)(Obj86B60 *self);                /* +0x108, external
                                                        (Obj86B60__BeginElementScroll);
-                                                       OBSERVED: func_8003CA1C */
+                                                       OBSERVED: Obj86B60__Tick */
     void (*slot10C)(Obj86B60 *self);                /* +0x10C, external
                                                        (Obj86B60__CommitElementScroll).
                                                        RETYPED s32 -> void,
                                                        round 23: the s32 was
-                                                       read off func_8003C63C's
+                                                       read off Obj86B60__SetState's
                                                        disassembly while that
                                                        function was UNATTEMPTED,
                                                        and a discarded return
                                                        value is invisible in
                                                        the bytes. Matching
-                                                       func_8003C63C requires
+                                                       Obj86B60__SetState requires
                                                        void -- see that
                                                        report's tail-merge
                                                        finding. OBSERVED:
-                                                       func_8003C63C */
+                                                       Obj86B60__SetState */
     void (*slot110)(Obj86B60 *self);                /* +0x110, external
                                                        (Obj86B60__CancelElementScroll).
                                                        RETYPED s32 -> void,
@@ -1222,10 +1270,10 @@ struct Obj86B60Methods {
                                                        src/code_2cc8c_b.c as
                                                        `void Obj86B60__CancelElementScroll(
                                                        Obj86B60 *self)`.
-                                                       OBSERVED: func_8003C63C */
+                                                       OBSERVED: Obj86B60__SetState */
     void (*slot114)(Obj86B60 *self);                /* +0x114, external
                                                        (Obj86B60__AdvanceSlotCursor);
-                                                       OBSERVED: func_8003C9B0 */
+                                                       OBSERVED: Obj86B60__func_8003C9B0 */
     s32 (*slot118)(Obj86B60 *self);                 /* +0x118. CORRECTED
                                                        (round 12, runner
                                                        alpha): the occupant
@@ -1242,7 +1290,7 @@ struct Obj86B60Methods {
                                                        tools/classtable.py
                                                        gClass86B60Methods). The old
                                                        attribution came from
-                                                       func_8003C944.md's
+                                                       Obj86B60__func_8003C944.md's
                                                        "Struct knowledge
                                                        established" section,
                                                        which was itself
@@ -1256,7 +1304,7 @@ struct Obj86B60Methods {
                                                        discarding a return
                                                        value says nothing
                                                        about slot identity.
-                                                       OBSERVED: func_8003C944 */
+                                                       OBSERVED: Obj86B60__func_8003C944 */
     void (*slot11C)(Obj86B60 *self, s32 a1, s32 a2); /* +0x11C, external;
                                                        OBSERVED:
                                                        Obj86B60__AdvanceSlotCursor,
@@ -1370,17 +1418,12 @@ struct Obj86B60 {
                                     unit's own New_X allocator
                                     (New_Unk18Obj), then dispatched through
                                     (`self->viewport->methods->slot10(...)`) */
-    s32 frameCounter;                  /* +0x01C, func_8003CC2C (a running count/
+    s32 frameCounter;                  /* +0x01C, Obj86B60__TickColorFade (a running count/
                                     frame value multiplied against unk84);
-                                    func_8003C63C (STALL) zeroes it on
-                                    several message codes. PROPOSED (round 55,
-                                    tier B): unk1C -> frameCounter -- shared
-                                    with code_2cc8c.c (func_8003C63C,
-                                    func_8003CC2C, func_8003CBB8), so not
-                                    renamed here; see this unit's
-                                    "## Proposed field names". */
+                                    Obj86B60__SetState zeroes it on
+                                    several message codes. */
     u8 pad020[0x020 - 0x020];
-    s32 unk20;                  /* +0x020, func_8003C63C (STALL) sets it
+    s32 unk20;                  /* +0x020, Obj86B60__SetState sets it
                                     to a literal 5 */
     s32 initMode;               /* +0x024, renamed from unk24 round 55 --
                                     tier B, exclusive to this unit.
@@ -1393,18 +1436,18 @@ struct Obj86B60 {
                                     same ctor-shaped function as initArgs/unk10;
                                     real meaning unknown, generic word */
     u8 pad034[0x038 - 0x034];
-    s32 unk38;                  /* +0x038, func_8003C63C (STALL) sets it
+    s32 unk38;                  /* +0x038, Obj86B60__SetState sets it
                                     to 1 */
-    s32 unk3C;                  /* +0x03C, a mode/state value: func_8003C858
-                                    compares ==1, func_8003C8D0 !=1,
-                                    func_8003C944/func_8003C9B0 ==1/==2,
-                                    func_8003C48C (STALL) gates on !=0,
-                                    func_8003C63C (STALL) sets 0/1 */
-    s32 unk40;                  /* +0x040, func_8003C794 (setter: raw value
+    s32 unk3C;                  /* +0x03C, a mode/state value: Obj86B60__func_8003C858
+                                    compares ==1, Obj86B60__func_8003C8D0 !=1,
+                                    Obj86B60__func_8003C944/Obj86B60__func_8003C9B0 ==1/==2,
+                                    Obj86B60__OnTag2Notify gates on !=0,
+                                    Obj86B60__SetState sets 0/1 */
+    s32 unk40;                  /* +0x040, Obj86B60__SetFrameBound (setter: raw value
                                     if negative, value*20 if >= 0);
-                                    func_8003C51C compared against unk1C */
+                                    Obj86B60__OnTag5Notify compared against unk1C */
     u8 pad044[0x048 - 0x044];
-    Unk48Obj *unk48;            /* +0x048, func_8003C7B4 only */
+    Unk48Obj *unk48;            /* +0x048, Obj86B60__ForwardToChild only */
     Unk4CObj *unk4C;            /* +0x04C, see Unk4CObj's own comment */
     s32 slotCount;               /* +0x050, renamed from unk50, round 78 --
                                     Obj86B60__FindNextFreeSlot: capacity/wrap
@@ -1418,7 +1461,7 @@ struct Obj86B60 {
                                     one slot). Obj86B60__BroadcastToSlots:
                                     walked with an incrementing pointer,
                                     dereferenced directly for each element */
-    s32 activeSlot;                  /* +0x058, func_8003CA1C: index into
+    s32 activeSlot;                  /* +0x058, Obj86B60__Tick: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
     s32 *itemCounts;              /* +0x05C, renamed from unk5C, round 78 --
@@ -1472,28 +1515,28 @@ struct Obj86B60 {
                                     cache of the path last passed to
                                     func_8003B39C */
     Unk74Obj *unk74;            /* +0x074, Obj86B60__SetSubHandle only */
-    Unk78Obj *unk78;             /* +0x078, func_8003CC2C only */
+    Unk78Obj *unk78;             /* +0x078, Obj86B60__TickColorFade only */
     u8 pad07C[0x084 - 0x07C];
-    s32 unk84;                  /* +0x084, func_8003CC2C: multiplied
+    s32 unk84;                  /* +0x084, Obj86B60__TickColorFade: multiplied
                                     against unk1C */
     s32 (*unk88)(Obj86B60 *self); /* +0x088, a callback: set (to NULL or
-                                    self->methods->slotB0) by func_8003CAF8,
-                                    invoked by func_8003CBC0 */
+                                    self->methods->slotB0) by Obj86B60__SetFadeCallbackEnabled,
+                                    invoked by Obj86B60__TickFadeCallback */
     s32 (*unk8C)(Obj86B60 *self); /* +0x08C, same idiom via slotC4/
-                                    func_8003CB30/func_8003CCDC */
-    u8 unk90[3];                 /* +0x090, func_8003CB68 (setter, from
-                                    a1[0..2]); func_8003CC2C reads it as a
+                                    Obj86B60__func_8003CB30/Obj86B60__func_8003CCDC */
+    u8 unk90[3];                 /* +0x090, Obj86B60__SetColors (setter, from
+                                    a1[0..2]); Obj86B60__TickColorFade reads it as a
                                     colour base */
-    u8 unk93[3];                 /* +0x093, func_8003CB68 (setter, from
+    u8 unk93[3];                 /* +0x093, Obj86B60__SetColors (setter, from
                                     a2[0..2]) */
-    u8 unk96[3];                 /* +0x096, func_8003CB68 (setter, from
+    u8 unk96[3];                 /* +0x096, Obj86B60__SetColors (setter, from
                                     a3[0..2]) */
     u8 unk99[0x09C - 0x099];
-    void (*unk9C)(void *ctx);   /* +0x09C, a callback: set by func_8003CAEC,
+    void (*unk9C)(void *ctx);   /* +0x09C, a callback: set by Obj86B60__SetCallback,
                                     invoked (with unkA0 as its argument) by
-                                    func_8003CA94 */
-    void *unkA0;                 /* +0x0A0, set by func_8003CAEC, passed to
-                                    unk9C by func_8003CA94 */
+                                    Obj86B60__RefreshViewValue */
+    void *unkA0;                 /* +0x0A0, set by Obj86B60__SetCallback, passed to
+                                    unk9C by Obj86B60__RefreshViewValue */
 };
 
 /*
@@ -1505,7 +1548,7 @@ struct Obj86B60 {
  * src/code_2c054.c (TaskUtilMethods) and src/class_39e08.c
  * (IntermediateBaseMethods): each unit that reaches it keeps its own local
  * view, self typed `void *` since it is shared across unrelated classes.
- * Only the two slots this unit's func_8003C51C (and func_8003C63C, STALL)
+ * Only the two slots this unit's Obj86B60__OnTag5Notify (and Obj86B60__SetState)
  * actually reach are modelled.
  */
 typedef struct IntermediateBaseMethods IntermediateBaseMethods;

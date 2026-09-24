@@ -1,13 +1,15 @@
-# func_8003C51C — MATCH (72/72 words)
+# Obj86B60__OnTag5Notify — MATCH (72/72 words)
+
+> Renamed from `func_8003C51C` on 2026-09-24 (tools/rename.py). Address 0x8003c51c.
 
 **Unit:** code_2cc8c · **Size:** 72 instructions -- the second-largest function
 in the unit (after the two `addiu_at`-blocked switch dispatchers, see
-`func_8003C48C`/`func_8003C63C`'s reports).
+`Obj86B60__OnTag2Notify`/`Obj86B60__SetState`'s reports).
 
 ## What it does
 
 ```c
-void func_8003C51C(Obj86B60 *self, s32 a1, s32 a2)
+void Obj86B60__OnTag5Notify(Obj86B60 *self, s32 a1, s32 a2)
 {
     Obj86B60Methods *methods;
 
@@ -44,7 +46,7 @@ First forwards to the shared "IntermediateBase" utility class
 `unk40` is (unsigned) less than `unk1C`, calls `slot60` with reason `6`.
 Finally switches on `unk20` and forwards to one of four more vtable slots
 depending on its value -- two of which (`slotAC`/`slotC0`) ARE this unit's
-own `func_8003CBC0`/`func_8003CCDC`.
+own `Obj86B60__TickFadeCallback`/`Obj86B60__func_8003CCDC`.
 
 ## Residues found, and what closed each
 
@@ -66,15 +68,15 @@ is CALLER-saved and the intervening call (`slot60` itself) is free to
 clobber it, so whatever value reaches `slotAC`/`slotC0` is NOT a
 meaningful forwarded argument, just physically-whatever's-left-in-the-
 register. **Fix: call `slotAC(self)`/`slotC0(self)` with ONE argument**,
-and retype the shared vtable slots (and `func_8003CBC0`'s own definition,
+and retype the shared vtable slots (and `Obj86B60__TickFadeCallback`'s own definition,
 already matched earlier this round) down to `s32 (*)(Obj86B60*)` -- this
-does not change `func_8003CBC0`'s own compiled bytes (it never read the
+does not change `Obj86B60__TickFadeCallback`'s own compiled bytes (it never read the
 parameter either way) so the earlier match stays intact.
 
 **Residue 2: `self->methods` must be cached into a local BEFORE the
 `Get_vtable_IntermediateBase()` call, or every `self->methods->slotNN` after it reloads
 from memory instead of reusing retail's single early `lw $s3,0($s2)`.**
-Same lesson as `func_8003CAF8`'s report, but here the stakes are an entire
+Same lesson as `Obj86B60__SetFadeCallbackEnabled`'s report, but here the stakes are an entire
 missing callee-saved register (`s3`) and hence a wrong stack-frame size
 (`-0x20` instead of `-0x28`) rather than one extra word -- GCC cannot
 prove `self->methods` is unchanged across an opaque call, so without an
@@ -110,10 +112,10 @@ residues 1-2 were already fixed.
 - `Obj86B60Methods::slotAC`/`::slotC0` RETYPED from `(Obj86B60*, s32)` to
   `(Obj86B60*)` -- the `s32 a1` parameter in the original signature was
   never a real argument at this (their only) call site, just a leftover
-  caller-saved register value. `func_8003CBC0`'s own C definition updated
+  caller-saved register value. `Obj86B60__TickFadeCallback`'s own C definition updated
   to match (no effect on its already-matched bytes).
 - `Obj86B60::unk20` (s32, +0x020) -- confirmed as a real dispatch/state
-  value (previously only known as "set to 5" by `func_8003C63C`, STALL).
+  value (previously only known as "set to 5" by `Obj86B60__SetState`, STALL).
 
 ### Proposed learning
 
@@ -121,7 +123,7 @@ Two generalizable levers, both already present in the codebase but easy to
 under-apply on a function this size:
 1. **A shared "cache the vtable pointer" local is not optional once ANY
    call happens between two `self->methods->slotNN` uses** -- it is not
-   just a word-count nicety (as it looked in `func_8003CAF8`, a 14-insn
+   just a word-count nicety (as it looked in `Obj86B60__SetFadeCallbackEnabled`, a 14-insn
    function) but can cost an entire callee-saved register and a wrong
    frame size on a larger function, which then reads as "everything after
    word 6 differs" rather than a narrow diff. Screen for this FIRST on any
@@ -146,3 +148,12 @@ the unit after the rest were matched/stalled). Picked up and matched in a
 follow-up pass, ~6 attempts total (3 against the full build, plus the
 struct/slot-typing analysis carried over from the initial, pre-drafted
 design for this function).
+
+## Naming (round 78, delta)
+
+**Tier A.** `func_8003C51C` -> `Obj86B60__OnTag5Notify`. Occupies slot5C in
+`gTaskCoreMethods` and `gClass86B60Methods` identically (only `GraphRoomObj`
+overrides this slot, with its own `GraphRoomObj__UpdateFromLog`).
+`Obj86B60__OnNotify` dispatches `EventArg`s with `target->header & 0xF == 5`
+through `self->methods->slot5C`, same evidence shape as `OnTag2Notify` above.
+Tier A.

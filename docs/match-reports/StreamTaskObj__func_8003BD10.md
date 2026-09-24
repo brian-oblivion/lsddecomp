@@ -24,7 +24,7 @@ void StreamTaskObj__func_8003BD10(StreamTaskObj *self) {
 
 - `Get_vtable_TaskCore()` returns `&gTaskCoreMethods` (`TaskCoreMethods`, established
   elsewhere in `code_2c054.h`). `tools/classtable.py gTaskCoreMethods` shows slot
-  `+0x078 = func_8003C858` (a different unit, not touched here — only the
+  `+0x078 = Obj86B60__func_8003C858` (a different unit, not touched here — only the
   slot's existence and signature matter for this call site).
 - `self->methods` is `StreamTaskObjMethods*` (`gStreamTaskObjMethods`).
   `tools/classtable.py gStreamTaskObjMethods` shows slot `+0x060 = StreamTaskObj__func_8003BC14`, which

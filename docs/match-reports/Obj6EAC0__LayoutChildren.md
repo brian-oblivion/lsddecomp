@@ -48,7 +48,7 @@ retail's 50) with a `s32 buf[2]` stack array copied field-by-field
 (`buf[0]=a1[0]; buf[1]=a1[1];`). Two things closed the gap:
 
 1. **The whole-struct-assignment axis** (same lever as `Class6E99C__PushPosition`/
-   `Obj6EAC0__SetPosition`/`func_8003CB68`/`Obj6EAC0__ApplyColor` this round and last):
+   `Obj6EAC0__SetPosition`/`Obj86B60__SetColors`/`Obj6EAC0__ApplyColor` this round and last):
    replacing the two scalar array-element copies with one `buf = *a1;`
    struct assignment (after retyping the buffer from a raw `s32[2]` to
    the existing `Pair32E99C` type) closed the length gap outright,

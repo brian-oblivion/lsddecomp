@@ -7,7 +7,7 @@ Unit: `src/code_2cc8c_f.c`. Blocker screen clean (no `gp_rel`, no
 
 ## Round 19: closed with the whole-struct-assignment axis
 
-Same lever that closed `func_8003CB68` (this round) and `Class6E99C__PushPosition`/
+Same lever that closed `Obj86B60__SetColors` (this round) and `Class6E99C__PushPosition`/
 `Obj6EAC0__SetPosition` (round 18/19): the "copy arm" of this function was a
 3-byte scalar-by-scalar assignment (`d[0]=r; d[1]=g; d[2]=b;`), and
 rewriting it as one whole-struct assignment through a local 3-byte
@@ -53,19 +53,19 @@ either way.
 
 None of those 7 attempts touched the axis that closed it: replacing the
 scalar-by-scalar copy-arm assignment with one whole-struct assignment.
-This is the SAME shape as `func_8003CB68`'s stall (a `sX[0]=aY[0];
+This is the SAME shape as `Obj86B60__SetColors`'s stall (a `sX[0]=aY[0];
 sX[1]=aY[1]; sX[2]=aY[2];` byte triple) and the same fix applies.
 
 ### Proposed learning
 
 A fourth confirmation of the whole-struct-assignment lever (after
-`Class6E99C__PushPosition`, `Obj6EAC0__SetPosition`, `func_8003CB68`), and the first
+`Class6E99C__PushPosition`, `Obj6EAC0__SetPosition`, `Obj86B60__SetColors`), and the first
 instance paired with a "redundant move" framing rather than an
 insertion/deletion framing: **the "retail caches an argument into an
 extra unconditional register" residue and the "scalar-vs-aggregate
 field copy" residue are, empirically, very often the SAME defect wearing
 different funcdiff signatures** (missing instruction here, wrong
-register there, wrong opcode in `func_8003CB68`). Whenever a stalled
+register there, wrong opcode in `Obj86B60__SetColors`). Whenever a stalled
 function's body contains ANY multi-field/multi-byte copy written as
 consecutive scalar assignments, try folding it into one aggregate
 assignment before spending further attempts on the register/scheduling
