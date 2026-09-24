@@ -32,7 +32,7 @@
  *
  * ROUND 44: THE THREE BELOW ARE ASSIGNABLE AND ARE THIS UNIT'S FRESH GROUND.
  * ~~BLOCKED on nop_mflo_mfhi, which is STILL OPEN -- do NOT spend attempts:~~
- *   func_8002CD08 (132w), SpuVmKeyOnNow (316w), vmNoiseOn (311w)
+ *   ServiceSoundCueSet (132w), SpuVmKeyOnNow (316w), vmNoiseOn (311w)
  * nop_mflo_mfhi was RESOLVED in round 42 (`--no-nop-mflo-mfhi`), so the
  * "do NOT spend attempts" directive above is WITHDRAWN.  All three are
  * never-attempted cold ground whose reports were marked REOPENED in round 44.
@@ -69,7 +69,7 @@
  */
 #include "common.h"
 
-/* Matched round 73 -- docs/match-reports/func_8002CD08.md. */
+/* Matched round 73 -- docs/match-reports/ServiceSoundCueSet.md. */
 typedef struct Obj179D8CD08 Obj179D8CD08;
 
 typedef struct {
@@ -104,7 +104,7 @@ struct S179D8CD08 {
     Entry179D8CD08 entries[3];
 };
 
-void func_8002CD08(Obj179D8CD08 *a0, S179D8CD08 *a1) {
+void ServiceSoundCueSet(Obj179D8CD08 *a0, S179D8CD08 *a1) {
     s32 i;
     Entry179D8CD08 *e;
     s32 rem1;

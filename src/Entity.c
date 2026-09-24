@@ -172,7 +172,7 @@ void Entity__NotifyReset(Entity *this, s32 a1, s32 a2) {
 }
 
 void Entity__TickSoundCue(Entity *this) {
-    func_8002CD08(this->soundCueChannel, &this->soundCueSet);
+    ServiceSoundCueSet(this->soundCueChannel, &this->soundCueSet);
     this->moodTimer++;
 }
 

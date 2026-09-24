@@ -7,7 +7,7 @@
 ## What it does
 
 Calls a still-uncarved function, `FlushSoundCueSet(this->unk58, &this->unk9C)`
-(the same two-argument shape `Entity__TickSoundCue` uses with `func_8002CD08` — see
+(the same two-argument shape `Entity__TickSoundCue` uses with `ServiceSoundCueSet` — see
 that report), then calls this entity's own vtable slots `+0x130` and
 `+0x114` (both no-argument), and clears `this->unkF8`.
 
@@ -46,7 +46,7 @@ void Entity__StopSoundCue(Entity *this) {
 ```
 
 `FlushSoundCueSet` declared `extern void FlushSoundCueSet(s32 arg0, void *arg1);`
-in `Entity.h`, same rationale as `func_8002CD08` in `Entity__TickSoundCue.md`.
+in `Entity.h`, same rationale as `ServiceSoundCueSet` in `Entity__TickSoundCue.md`.
 `slot130`/`slot114` typed `void (*)(Entity *self)` in `EntityMethods`.
 
 ## Attempt log
@@ -56,7 +56,7 @@ Matched on the first attempt.
 ## Proposed learning
 
 None new beyond what's already in `Entity__TickSoundCue.md` about the
-`func_8002CD08`/`FlushSoundCueSet` pairing.
+`ServiceSoundCueSet`/`FlushSoundCueSet` pairing.
 
 ## Naming
 

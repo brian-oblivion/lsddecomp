@@ -27,7 +27,7 @@ permuter.
    after lock" body) compiled and scored under the harness.
 2. **Cost** -- base score 510 (`Register Differences: 10 (5)`,
    `Insertions: 2 (100)`, `Deletions: 2 (100)`) -- a real, non-zero,
-   non-register-identity-only residue (unlike round 45's `func_8002CD08`
+   non-register-identity-only residue (unlike round 45's `ServiceSoundCueSet`
    pure-register-identity dead end that never moved off its seed score).
 3. **Base-score agreement** -- rebuilt the identical seed body in-tree
    before searching: `9/19 words match (file 0x18D40-0x18D8C)`, length

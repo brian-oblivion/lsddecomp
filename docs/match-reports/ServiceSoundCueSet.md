@@ -1,4 +1,6 @@
-# func_8002CD08 -- MATCHED (round 73, 132/132, whole-image SHA1 green)
+# ServiceSoundCueSet -- MATCHED (round 73, 132/132, whole-image SHA1 green)
+
+> Renamed from `func_8002CD08` on 2026-09-24 (tools/rename.py). Address 0x8002cd08.
 
 REVISITED, round 73: MATCHED 132/132 in 13 builds, no permuter; names/types used (slot84's second parameter added; `divisor` local dropped)
 
@@ -84,7 +86,7 @@ struct S179D8CD08 {
     Entry179D8CD08 entries[3];
 };
 
-void func_8002CD08(Obj179D8CD08 *a0, S179D8CD08 *a1) {
+void ServiceSoundCueSet(Obj179D8CD08 *a0, S179D8CD08 *a1) {
     s32 i;
     Entry179D8CD08 *e;
     s32 rem1;
@@ -172,7 +174,7 @@ first real diff at the SECOND function-body instruction: retail's
 `andi $a0,$a3,0xff` (masking `$a3` into `$a0`) has no counterpart; the
 derived body computes the mask the other way around (masks `$a0` in place,
 keeping the original in `$a3`) -- a genuine register-identity swap.
-Confirmed with `tools/asm-differ/diff.py func_8002CD08`.
+Confirmed with `tools/asm-differ/diff.py ServiceSoundCueSet`.
 
 ## What it computes
 
@@ -302,7 +304,7 @@ struct S179D8CD08 {
     Entry179D8CD08 entries[3];
 };
 
-void func_8002CD08(Obj179D8CD08 *a0, S179D8CD08 *a1) {
+void ServiceSoundCueSet(Obj179D8CD08 *a0, S179D8CD08 *a1) {
     s32 i;
     s32 j;
     Entry179D8CD08 *e;

@@ -800,7 +800,7 @@ void DreamSys__TickDrift(DreamSys *this)
 		this->heightCurve->endValue -= 0x258;
 	}
 	if (this->cueServiceActive != 0)
-		func_8002CD08(this->soundObj, this->soundCueSet);
+		ServiceSoundCueSet(this->soundObj, this->soundCueSet);
 }
 
 void DreamSys__StopDrift(DreamSys *this, s32 arg1)

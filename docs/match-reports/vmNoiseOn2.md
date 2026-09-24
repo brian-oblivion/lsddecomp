@@ -416,12 +416,12 @@ only structural change from the seed: wrapping the tail's
 score improvement (3100 -> 1800) did not translate, consistent with this
 unit's other three same-round instances of this exact divergence
 (`SpuVmAlloc`, `SePitchBend`, `SpuVmDoAllocate`, all round 37) EXCEPT
-for `func_8002CD08` this round, where the identical construct DID
+for `ServiceSoundCueSet` this round, where the identical construct DID
 translate -- confirming again that a `do-while(0)` candidate must be
 verified by direct rebuild every time, in both directions, never assumed
 from the isolated score alone.
 
-**Process-hygiene note, for the record:** this search and `func_8002CD08`'s
+**Process-hygiene note, for the record:** this search and `ServiceSoundCueSet`'s
 were launched concurrently (both running for roughly 12 minutes) before
 the "one search at a time" rule was caught and corrected; flagged in the
 round's broadcast. Neither search's result is believed compromised by the

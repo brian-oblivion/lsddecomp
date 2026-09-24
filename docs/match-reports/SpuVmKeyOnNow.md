@@ -4,7 +4,7 @@
 
 > Round 44's stub report (kept below the divider) predicted this would be
 > "promising rather than hard" by analogy with its unit-siblings
-> `func_8002CD08` and `vmNoiseOn`. That held for roughly the first 30
+> `ServiceSoundCueSet` and `vmNoiseOn`. That held for roughly the first 30
 > instructions (full byte-for-byte match, see below) and then did not: this
 > function needed real derivation work (a second, independent divisor
 > family -- 16129 = 127² used DIRECTLY rather than via two chained /127
@@ -366,7 +366,7 @@ restructuring reached it this round.
 > withdrawn: that blocker was RESOLVED in round 42 by `--no-nop-mflo-mfhi`.
 >
 > Its two unit-siblings were reopened on the same evidence and both moved a
-> long way on FIRST contact in round 44 -- `func_8002CD08` 0 -> 110/132 and
+> long way on FIRST contact in round 44 -- `ServiceSoundCueSet` 0 -> 110/132 and
 > `vmNoiseOn` 0 -> 309/311 -- so treat this as promising rather than hard.
 > Delta ran out of round budget before reaching it; nothing about it was tried
 > and found difficult.

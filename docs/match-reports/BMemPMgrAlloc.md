@@ -109,7 +109,7 @@ before searching, all recorded:
    (1 insertion) + 100 (1 deletion) + 1x60 (1 reordering) + 25x5 (register
    differences). NOT 0/0 — there is a real insertion/deletion pair, meaning
    the residue is not pure register identity and is in principle reachable
-   by a source-mutation search, unlike round 45's `func_8002CD08`.
+   by a source-mutation search, unlike round 45's `ServiceSoundCueSet`.
 3. **Scaffold-vs-in-tree agreement (the new, load-bearing check).** Rebuilt
    the 92/114 seed body live in `src/code_8220.c` first and confirmed
    `funcdiff.py` reproduces round 45's exact 92/114 figure and diff. Then

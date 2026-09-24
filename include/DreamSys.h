@@ -612,7 +612,7 @@ extern void FlushSoundCueSet(s32 arg0, void *arg1);
 /* Also declared in Entity.h. Called by DreamSys__TickDrift as
    (this->soundObj, this->soundCueSet) -- same argument shape as
    FlushSoundCueSet above (round 2026-08-30-d). */
-extern void func_8002CD08(s32 arg0, void *arg1);
+extern void ServiceSoundCueSet(s32 arg0, void *arg1);
 
 typedef struct DreamSys {
 	struct vtable_DreamSys *vt;
