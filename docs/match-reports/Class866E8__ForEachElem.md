@@ -42,3 +42,12 @@ uses instead of re-deriving `&arr[i]` from scratch each iteration).
 None new — confirms the existing "intermediate element pointer" idiom
 generalizes to a loop whose body is entirely calls (no field reads other
 than the pointer itself).
+
+## Naming
+
+**Tier A.** Not a vtable slot -- a generic iteration helper: loops
+`self->arr[0..6]`, optionally invoking a per-`Elem` callback (`arg2`),
+then always forwarding to `Class866E8__ForEachEntryChild` for each
+element. Mechanics-is-purpose: it is exactly what its name says, a
+for-each over the object's `Elem` array, used by both the rate/countdown
+callers this round and (per the header's existing prototype) elsewhere.

@@ -67,3 +67,13 @@ recognizable immediately).
 ### Proposed learning
 
 None new — confirms the existing idiom, does not extend it.
+
+## Naming
+
+**Tier B.** Not a vtable slot. While `self->rateCountdown > 0`: applies
+the configured rate entry to every child via
+`ForEachElem(self, ApplyRateToChild, 0)`, then decrements the countdown,
+clamping to -1 once it reaches 0 (a "done" sentinel, distinct from the
+0 the sibling `Class866E8__FlushRateLatch` uses for "off"). Named for the
+mechanics: it is the per-tick advance of the rate/countdown pair
+established by `Class866E8__ConfigureRateEntry`.

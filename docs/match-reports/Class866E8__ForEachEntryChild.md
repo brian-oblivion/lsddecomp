@@ -119,3 +119,10 @@ sits immediately after a `lw` from a function ARGUMENT (`item->unk10`,
 `item` being `$a2`), which is a slightly different shape from prior
 instances (worth checking if the pattern is specific to loads off
 incoming arguments vs. `self`-relative loads).
+
+## Naming
+
+**Tier A.** Not a vtable slot -- walks one `Elem`'s `unk10[]`
+`EntryChildObj*` array (`0x668` bytes from the base) invoking a callback
+per entry. Same reasoning as `Class866E8__ForEachElem`: a generic iterator
+whose name is its mechanics.

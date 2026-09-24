@@ -78,3 +78,15 @@ swapped), try inverting the condition and swapping the arm bodies before
 looking for anything more exotic. Confirmed here: `if (!c) A else B`
 picked the opposite layout from `if (c) B else A` for a byte-identical
 body pair.
+
+## Naming
+
+**Tier B.** Vtable slot +0x128. Mechanics are solid (clear the grid-cell
+flag over the current footprint, recompute it via one of two strategies
+gated on `self->unk68->unk4`, set the flag again), but WHY the object's
+grid footprint needs refreshing (what game event triggers it) is not
+established from this unit alone. "Footprint" is not a guess -- it is
+class_3ac78's own already-established vocabulary for the identical
+mechanism on this same class (`Class866E8__ApplyToSenderFootprint`,
+`Class866E8__SetFootprintRect`), confirmed by that unit's independent view
+reaching the same `self->unk68->unk4` dispatch.

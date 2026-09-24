@@ -79,3 +79,12 @@ the actual `jalr`. Reading the receiver's own body (which never does
 `jalr` on that register) is itself the signal to keep tracing one hop
 further before typing the passed function's parameters from the wrong
 call site.
+
+## Naming
+
+**Tier B.** Not a vtable slot -- a callback, passed as a function pointer
+to `Class866E8__ForEachElem`/`Class866E8__ForEachEntryChild` by
+`Class866E8__AdvanceRateCountdown`. Body: `item->methods->slot48(item, 0,
+self->rateEntry)`. Named for what it does to each child entry (forwards
+the parent's current rate entry to it), mirrored by
+`Class866E8__ResetChildRate`'s sibling shape.

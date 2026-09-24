@@ -79,3 +79,23 @@ serves the same underlying purpose — controlling which value GCC treats
 as the loop's own induction variable. Confirmed again on the very next
 function, `Class866E8__FindElemIndexByUnk30` (own report), so this is now a two-instance
 pattern for this project, not a one-off.
+
+## Naming
+
+**Tier A.** Vtable slot +0x120 of `D_800866E8` (`tools/classtable.py`),
+class prefix `Class866E8` confirmed against that same table's other
+already-named slots (e.g. `Class866E8__ApplyToSenderFootprint` at +0x12C).
+Pure linear-search leaf: the body IS the evidence -- walk `self->arr`,
+compare `e->unk4->unk32` to `key`, return the matching index (default 0).
+Named by the field it searches on (`unk32`, still unrenamed -- it is a
+cross-unit `ElemTarget` field, also read by `func_8004C434` in
+class_3bb8c.c, so this unit does not own it) rather than by a guessed
+purpose, per this project's "name what the code does" rule.
+
+## Proposed field names
+
+`ElemTarget::unk32` (also read by class_3bb8c.c's `func_8004C434`, so
+cross-unit -- not renamed here). Proposed: `key` -- it is exactly what
+both `FindElemIndexByUnk32` and its caller-side context treat it as, a
+value compared for equality to select an element. Evidence: this
+function's entire body is `e->unk4->unk32 == key`.

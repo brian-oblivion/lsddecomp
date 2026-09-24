@@ -143,3 +143,13 @@ dependency between them).** `for (i = 0; i < N; i++, ptr++)` and `for (i
 reordering), even though nothing downstream depends on which happens
 first. Worth checking when a residue is confined to a loop's
 continue/back-edge and is a pure ordering difference.
+
+## Naming
+
+**Tier B.** Not a vtable slot. Walks every `self->gridSlots[]` entry's
+covered grid cells (and each cell's `unk38` overflow chain), setting or
+clearing bit 31 of `EntryChildObj::unk10` per the `setBit` argument (a
+name already established before this naming pass, not introduced by it).
+What bit 31 represents in-game is not established from this unit alone,
+so the name describes the mechanics (marks/clears a per-cell flag over
+the object's footprint) rather than asserting a meaning for the bit.

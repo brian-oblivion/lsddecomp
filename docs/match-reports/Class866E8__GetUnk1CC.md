@@ -37,3 +37,14 @@ void *Class866E8__GetUnk1CC(Obj866E8 *self) {
 ### Proposed learning
 
 None new.
+
+## Naming
+
+**Tier A**, pure getter -- `return &self->unk1CC;`, two instructions, no
+caller found anywhere in the executable. `unk1CC` itself is left
+unrenamed: `Class866E8__GetUnk1CC` only ever takes its address, never
+reads through it, so its real type (and therefore any real name) is not
+established from this unit -- class_3ac78's own independent view of the
+same offset (`Class866E8__Reset`: "set to -1") does not clarify it
+either. Following the "GetSetUnk10Field0"-style precedent for a field
+whose meaning is unknown but whose offset is fixed.

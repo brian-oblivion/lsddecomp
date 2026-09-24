@@ -665,3 +665,11 @@ both oracles green: `./build-and-verify.sh` (exit 0, `OK: build matches
 retail`) and `tools/check-nonmatching.sh` (exit 0). Disposition otherwise
 unchanged (still `INCLUDE_ASM` in the verified build, still a HARD RULE 6
 register-identity stall).
+
+## Naming
+
+**Tier B.** Turns the column/row/width/height computed by
+`Class866E8__ComputeFootprintFromRotation` into one or two
+`self->gridSlots[]` entries, splitting via `Class866E8__SplitFootprintSlot`
+when the footprint would run past the grid's 20-unit edge. Mechanics
+evidenced; game-level purpose not.

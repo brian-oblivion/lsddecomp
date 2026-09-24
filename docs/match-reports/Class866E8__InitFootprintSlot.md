@@ -60,3 +60,12 @@ register trace was right.
 None new — confirms two existing idioms (constant-multiply-to-shift/add,
 whole-struct assignment for a block copy) compose cleanly when used
 together in the same statement.
+
+## Naming
+
+**Tier B.** Not a vtable slot. Writes the constant `Unk54Struct` template
+`D_80086990` into a `self->gridSlots[]`-shaped entry, then overwrites its
+`elemIdx` word via `slot124`. Called by both
+`Class866E8__BuildFootprintSlots`'s sibling paths and
+`Class866E8__SetFootprintFromQuery`, always to seed a fresh slot -- hence
+"init", not "set" (it does not preserve any prior content of the slot).

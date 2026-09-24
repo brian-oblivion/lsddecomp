@@ -52,3 +52,10 @@ void Class866E8__ResetChildRate(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
 ### Proposed learning
 
 None new beyond `Class866E8__ApplyRateToChild`'s (same call-chain-tracing lesson).
+
+## Naming
+
+**Tier B.** Not a vtable slot -- the `Class866E8__FlushRateLatch` callback
+sibling of `Class866E8__ApplyRateToChild`. Body: `item->methods->slot48(
+item, 1, &D_800869CC)`, the constant "off" entry rather than the parent's
+own `rateEntry`. Named to read as the inverse of `ApplyRateToChild`.

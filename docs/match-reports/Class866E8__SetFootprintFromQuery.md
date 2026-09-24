@@ -90,3 +90,15 @@ mirror of `Class866E8__InitFootprintSlot`'s own "dead parameter" finding from ea
 this round — worth checking together whenever one function's parameter
 is proven dead: its callers may need an uninitialized local, not a
 real value, at that argument position.
+
+## Naming
+
+**Tier B.** Not a vtable slot. The `self->unk68->unk4 != 0` sibling of
+`Class866E8__ComputeFootprintFromRotation` under `RefreshFootprint`'s
+dispatch: fills a query buffer via `slot10C`, seeds `self->gridSlots[0]`
+via `Class866E8__InitFootprintSlot`, then conditionally adds up to two
+more slots gated by a bounding-box test (`IsPointOutOfBounds`) and a
+range check. Named to parallel class_3ac78's
+`Class866E8__SetFootprintFromCell`/`Class866E8__SetFootprintRect` pair for
+the same subsystem, which the query-buffer + bounding-box shape here most
+resembles.

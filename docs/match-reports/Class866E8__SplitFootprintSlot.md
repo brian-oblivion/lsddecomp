@@ -922,3 +922,10 @@ No source change beyond the wrapper and comment; both oracles green:
 (still `INCLUDE_ASM` in the verified build; the remaining residue is not
 yet established as a HARD RULE 6 register-identity stall per round 58).
 
+
+## Naming
+
+**Tier B.** Not a vtable slot. Clips a footprint slot against the grid's
+row-20/column-20 wrap and opens the extra slot(s) needed for the
+overflow. Named for what it does to the slot (splits/clips it at a grid
+edge), not for a guessed game purpose.

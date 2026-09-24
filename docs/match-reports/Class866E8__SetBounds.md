@@ -39,3 +39,11 @@ void Class866E8__SetBounds(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
 ### Proposed learning
 
 None new.
+
+## Naming
+
+**Tier A**, pure setter -- `self->unk1DC = arg1;`, two instructions.
+Renamed together with the field it writes (`unk1DC` -> `bounds`, this
+round): the field's role IS established, by its only other reader,
+`IsPointOutOfBounds`, which dereferences it as exactly a
+`Bounds866E8_3bb8c_b` bounding box.

@@ -511,3 +511,12 @@ axes are both suspected, try the product before concluding either is inert.
 here (s1) and is **byte-identical to s0** — a clean negative that helps
 scope it: it moves scheduling and delay-slot placement, and does not touch
 how cc1 expands a statement into `mult` + `mflo`.
+
+## Naming
+
+**Tier B.** Not a vtable slot. Picks one of four static `EntryDesc866E8`
+table entries by the sign of `rate` and by `flag`, stores it in
+`self->rateEntry`, then sets `self->rateCountdown` to `abs(rate)` scaled
+by the entry's own `scale` field. Mechanics fully evidenced (see the
+existing source-shape comment on the function); what "rate" represents
+in-game is not.

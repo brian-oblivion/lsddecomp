@@ -725,3 +725,13 @@ change beyond the wrapper and comment; both oracles green:
 `tools/check-nonmatching.sh` (exit 0). Disposition otherwise unchanged
 (still `INCLUDE_ASM` in the verified build, still a HARD RULE 6
 register-identity stall).
+
+## Naming
+
+**Tier B.** Not a vtable slot -- a plain helper called only from
+`Class866E8__RefreshFootprint`. Derives the object's grid bounding box
+(`self->footprintCol/Row/Width/Height`) from a rotation matrix
+(`RotMatrix`/`ApplyMatrixLV` over the object's own `Unk6C14SubObj`) and
+the query template `D_8008E98C`. Mechanics fully evidenced by the body;
+the broader purpose (what the rotated footprint represents in-game) is
+not.

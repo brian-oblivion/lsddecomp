@@ -59,3 +59,12 @@ body (still unmatched) rather than confirmed live.
 ### Proposed learning
 
 None new.
+
+## Naming
+
+**Tier B.** Not a vtable slot. One-shot sibling of
+`Class866E8__AdvanceRateCountdown`: if `self->rateCountdown != 0`, resets
+every child's rate (`ForEachElem(self, ResetChildRate, 0)`) and clears the
+latch to 0 in a single call, no per-tick decrement. "Latch" distinguishes
+it from the countdown sibling -- it fires once and clears, rather than
+ticking down.

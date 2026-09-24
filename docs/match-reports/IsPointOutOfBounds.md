@@ -697,3 +697,13 @@ build matches retail`) and `tools/check-nonmatching.sh` (exit 0). No bytes
 changed; disposition otherwise unchanged (still `INCLUDE_ASM` in the
 verified build, still a HARD RULE 6 register-identity stall, not
 re-attempted by hand this round).
+
+## Naming
+
+**Tier A.** Confirmed NOT a vtable slot (`tools/classtable.py D_800866E8`
+has no entry at this address) -- a plain, non-virtual helper, so it takes
+no `self` and gets no `Class866E8__` prefix. Still `INCLUDE_ASM` (a
+documented STALL), named per this round's brief since the evidence for
+its mechanics is solid: four comparisons of an `[x,y]` point against a
+`Bounds866E8_3bb8c_b`'s four edges, returning nonzero when the point is
+outside any of them. Mechanics-is-purpose leaf.
