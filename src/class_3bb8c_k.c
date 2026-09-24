@@ -501,7 +501,7 @@ void ObjM__ObjM(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 a
     self->methods->slot40(self);
 }
 
-void func_80052CD8(Obj865C8 *self)
+void ObjM__Dtor(Obj865C8 *self)
 {
     GetClass86668Methods()->dtor(self);
 }

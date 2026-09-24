@@ -1,7 +1,9 @@
-# func_80052CD8 -- MATCH
+# ObjM__Dtor -- MATCH
+
+> Renamed from `func_80052CD8` on 2026-09-24 (tools/rename.py). Address 0x80052cd8.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_80052CD8`: 14/14 words match.
+SHA1 matches retail. `funcdiff.py ObjM__Dtor`: 14/14 words match.
 
 This is vtable slot `+0x00C` (`dtor`) of `D_80087034` -- a SECOND class
 table this unit's tail overlaps (`tools/classtable.py D_80087034`, 53
@@ -12,7 +14,7 @@ this unit's earlier functions). `ObjM__ObjM` (this unit, still
 ## Source
 
 ```c
-void func_80052CD8(Obj865C8 *self)
+void ObjM__Dtor(Obj865C8 *self)
 {
     GetClass86668Methods()->dtor(self);
 }
