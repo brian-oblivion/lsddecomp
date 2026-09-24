@@ -1,6 +1,18 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
+/* Unk24Elem's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
+ * copies it with a whole-struct assignment (lw/lw into two fresh
+ * temporaries, sw/sw, then a RELOAD of .y before adjusting it) -- see
+ * docs/match-reports/func_8003DAD4.md, round 75. Local view: the shared
+ * header still spells the pair as two s32 fields. */
+typedef struct {
+    s32 x;
+    s32 y;
+} SlotPos;
+
+#define SLOT_POS(target) (*(SlotPos *)&(target)->unk10)
+
 s32 func_8003CD48(Obj86B60 *self)
 {
     s32 c = 0x80 - (self->frameCounter * self->unk84);
@@ -404,7 +416,46 @@ void func_8003DA10(Obj86B60 *self)
     self->methods->slot60(self, 14);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DAD4);
+void func_8003DAD4(Obj86B60 *self)
+{
+    s32 idx;
+    s32 counter;
+    SlotPos pos;
+    Unk64Elem **arr;
+    s32 count;
+    s32 i;
+
+    if (self->unk3C != 2) {
+        return;
+    }
+    idx = self->activeSlot;
+    counter = self->slotCounts[idx];
+    pos = SLOT_POS((Unk24Elem *)self->unk4C->unk24[idx]);
+    pos.y -= counter * 10;
+
+    arr = (Unk64Elem **)self->unk64[idx];
+    count = self->unk5C[idx];
+    for (i = 0; i < count; i++) {
+        (*arr)->methods->slot60(*arr, 0);
+        (*arr)->methods->slotBC(*arr, &pos);
+        pos.y += 10;
+        arr++;
+    }
+
+    {
+        Unk64Elem *elem = ((Unk64Elem **)self->unk64[idx])[counter];
+
+        elem->methods->slot60(elem, 1);
+        elem->methods->slotB8(elem, self->unk4C->unk10);
+    }
+
+    ((Unk24Elem *)self->unk4C->unk24[idx])->unk4 = counter;
+
+    self->unk68->methods->slot50(self->unk68);
+
+    self->unk3C = 1;
+    self->methods->slot60(self, 0x10);
+}
 
 void func_8003DCAC(Obj86B60 *self)
 {

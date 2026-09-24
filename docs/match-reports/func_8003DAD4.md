@@ -1,4 +1,71 @@
-# func_8003DAD4 -- STALL: length EXACT (118/118 words, no drift); 114/118 raw word-match; first real diff at in-range word 11 (file 0x2E304 / vram 0x8003DB04), the `bne $v1, $v0` delay slot
+# func_8003DAD4 -- MATCHED 118/118 (round 75): the `local[2]` pair was a WHOLE-STRUCT COPY
+
+REVISITED, round 75: MATCHED; names/types used (the +0x10/+0x14 pair is now a local `SlotPos` struct view, `pos`)
+
+## Round 75 (runner charlie): MATCHED -- struct assignment, no barrier, no temps
+
+**Baseline first.** The preserved body below (field names updated to the
+current header: `unk58` -> `activeSlot`, `unk60` -> `slotCounts`) was
+compiled live in place of the INCLUDE_ASM and rebuilt through the oracle:
+**114/118, `insertions 0 / deletions 0`, positional skeleton diffs 4** --
+the report's inherited figure, honest. The four differing words were the two
+residues rounds 19-49 describe (the `i = 0` delay-slot placement and the
+`target->unk14` temp in `$v0` instead of `$a1`).
+
+**The lever: the stack pair is a struct, and it is filled by struct
+assignment.**
+
+```c
+typedef struct { s32 x; s32 y; } SlotPos;
+#define SLOT_POS(target) (*(SlotPos *)&(target)->unk10)
+...
+    SlotPos pos;
+...
+    pos = SLOT_POS((Unk24Elem *)self->unk4C->unk24[idx]);
+    pos.y -= counter * 10;
+...
+        (*arr)->methods->slotBC(*arr, &pos);
+        pos.y += 10;
+```
+
+First build: **118/118, `build exit=0`, `OK: build matches retail`.** Both
+residues went at once, and so did the two compensations the old body needed:
+
+- GCC 2.6.3 expands an 8-byte, 4-aligned struct assignment through the MIPS
+  `movstrsi` pattern, whose output is `lw`/`lw` into two FRESH scratch
+  registers, then `sw`/`sw`. Those scratches are why retail's second word
+  lands in `$a1`: it was never the allocator choosing a register for a named
+  `t1`, it was a clobbered scratch of a block move. That was the whole
+  "register-identity" residue B.
+- A block move is opaque (BLKmode) to later passes, so `pos.y -= ...` must
+  RELOAD `.y` from the stack. The old body's `__asm__("" ::: "memory")` existed
+  only to force that reload (round 39 measured it as "a LENGTH lever"); the
+  struct copy produces it naturally.
+- With neither the barrier nor the named temps, reorg puts `i = 0` back into
+  the loop guard's `blez` slot and leaves the early-return `bne` slot a `nop`
+  -- residue A was a side effect of the barrier.
+
+Tell, for the next function: **two adjacent `lw` of consecutive words into
+distinct fresh registers, two `sw` to consecutive stack words, then an
+immediate reload of one of those stack words.** That is a struct copy, not
+two scalar assignments plus a barrier.
+
+The same lever transfers to the sibling `func_8003D73C` (see its report).
+
+### Proposed learning
+
+**An `__asm__("" ::: "memory")` that exists only to force a reload of a
+just-stored stack word is a symptom of a missing struct assignment.** Round
+39 correctly measured the barrier as load-bearing (removing it lost two
+words) and correctly classified it as a length lever, and that made it look
+like a finished part of the body. It was compensation: a whole-struct copy
+is BLKmode, so the following field access must go back to memory, and the
+block-move pattern's scratch registers set the register identity the
+allocator was blamed for. The shared header still spells `Unk24Elem`'s
++0x10/+0x14 as two scalars; retyping them as one struct member is a header
+change for the head (only `code_2cc8c_b.c` references `Unk24Elem`).
+
+## Earlier title: func_8003DAD4 -- STALL: length EXACT (118/118 words, no drift); 114/118 raw word-match; first real diff at in-range word 11 (file 0x2E304 / vram 0x8003DB04), the `bne $v1, $v0` delay slot
 
 ## ROUND 49 (runner delta): confirmed negative -- the named-temp+barrier lever that closed a scheduling swap in the sibling `func_8003D73C` does NOT transfer here
 
