@@ -212,7 +212,9 @@ typedef struct Ctx278SubMethods Ctx278SubMethods;
 typedef struct Ctx278Sub Ctx278Sub;
 struct Ctx278SubMethods {
     u8 pad000[0x080];
-    s32 (*slot80)(Ctx278Sub *self);
+    /* (self, desc->unk2, index, obj): the last two are forwarded from
+     * func_8002C278's own parameters, so they emit no set-up code. */
+    s32 (*slot80)(Ctx278Sub *self, s32 unk2, s32 index, Obj278 *obj);
 };
 struct Ctx278Sub {
     Ctx278SubMethods *methods;
@@ -227,26 +229,16 @@ typedef struct Ctx278 {
     Ctx278Sub *unk2C; /* +0x2C */
 } Ctx278;
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 75/76 words, one instruction short (retail's own
- * `move $a3,$a1` parameter eviction is missing). Residue: register
- * identity -- retail evicts `self` to a fresh register at entry and lets
- * `desc` inherit `self`'s native parameter register; every C form found
- * keeps `self` in its native register and gives `desc` the fresh one
- * instead. Both are valid allocations of the same two long-lived
- * pointers; no lever changes which one cc1 2.6.3 picks.
- * docs/match-reports/func_8002C278.md. Hand-derived. */
 s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
-    s32 cached;
     s32 whole;
     s32 frac;
+    s32 unk2;
 
     if (index < 0x190) {
-        cached = self->unk34;
-        if (cached != 0) {
-            desc = (Entry278 *)(ctx->unk10 + cached);
+        if (self->unk34 != 0) {
+            desc = (Entry278 *)(ctx->unk10 + self->unk34);
             self->unk30 = 1;
         } else {
             desc = (Entry278 *)(index * 12 + 8 + ctx->unk10);
@@ -262,16 +254,15 @@ s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
             self->unk1A = desc->unk5 << 10;
             self->unk2C = desc->unk1;
             self->unk2E = desc->unk4;
-            self->unk38 = desc->unk2;
-            return ctx->unk2C->methods->slot80(ctx->unk2C);
+            unk2 = desc->unk2;
+            self->unk38 = unk2;
+            return ctx->unk2C->methods->slot80(ctx->unk2C, unk2, index, self);
         }
         return -1;
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_d", func_8002C278);
-#endif
+
 
 Table6D940 *func_8002C3A8(void)
 {
