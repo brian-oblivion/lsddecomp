@@ -3,7 +3,7 @@
  * (vram 0x8003FBE4..0x8003FBF4).
  *
  * ROUND 34: this unit exists because the functions on BOTH SIDES of it are
- * Sony's. `code_2cc8c_e` used to hold a contiguous run from func_8003FB0C to
+ * Sony's. `code_2cc8c_e` used to hold a contiguous run from SetClipNear to
  * the end of the segment; seven of those functions turned out to be Psy-Q
  * library code, leaving this one wedged between `libgs/gs_123`
  * (Gssub_make_matrix, in front) and `libgs/gs_111` (GsDrawOt, behind). A

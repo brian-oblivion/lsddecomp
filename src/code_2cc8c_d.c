@@ -315,7 +315,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
     }
 
     Unk18Obj__SetGeomScreen((Unk18Obj *)self->unk40);
-    func_8003FB0C(self->unk4C);
+    SetClipNear(self->unk4C);
     GsSetLightMode(self->lightMode);
 
     if (self->lightMode == 1 || self->lightMode == 3) {
