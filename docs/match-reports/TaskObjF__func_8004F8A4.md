@@ -1,4 +1,92 @@
-# TaskObjF__func_8004F8A4 -- STALL. Length: 3 words TOO LONG (80/77, 0x140/0x134). Word-match: 63/77. First real diff: file 0x40158 / vram 0x8004F958 (delay-slot fill: retail `move $a0,$s0`, built `nop`).
+# TaskObjF__func_8004F8A4 -- MATCHED 77/77, round 75 (delta). Levers: return type `void` (no return value), and three ordinary leaf `slot7C` calls instead of the shared `dispatch` function-pointer local + `goto call_it`.
+
+REVISITED, round 75: MATCHED 77/77 in 3 builds, whole image `OK: build matches retail`; names/types used (the return TYPE was the first lever).
+
+## Round 75 (delta): revisit
+
+**Baseline first.** The round-73 `#ifdef NON_MATCHING` body, made live
+exactly as it stood, measured **63/77 at 0x140/0x134 (80 words, 3 too
+long), `insertions 3 / deletions 3`**, 12 positional skeleton diffs.
+
+**What retail says.** The recorded residue was "retail reuses Validate's
+0 as the return value; the build re-materialises `move $v0,zero` plus a
+skip-jump". Read the other way round, retail's `beqz $v0,<epilogue>`
+lands on `lw $ra` with nothing setting `$v0` and the `jalr` path also
+falls into the epilogue without touching `$v0` -- which is exactly what a
+`void` function compiles to. The function is reached only through a
+class table (`asm/data/76DC8.data.s`, `.word TaskObjF__func_8004F8A4`),
+so no caller constrains its return type.
+
+| build | change | score | ins/del |
+| --- | --- | --- | --- |
+| 1 | NON_MATCHING body as-is (`s32`, `return dispatch(...)` / `return 0`) | 63/77 (80 words) | 3 / 3 |
+| 2 | `void`, `dispatch(self, code);` with no returns | 73/77 (77 words, length exact) | 0 / 0; 4 words: `move $a0,$s0` in each leaf's delay slot in retail, once in the shared `jalr` slot in the build |
+| 3 | drop `dispatch`/labels: `if/else if/else` with a `slot7C(self, code)` call at each leaf (the `m = self->methods` cache kept in the third) | **77/77**, whole image OK | 0 / 0 |
+
+Build 2's residue told the rest: retail sets `$a0 = self` separately in
+each predecessor of the shared `jalr`, so the argument setup belongs to
+three separate calls that GCC cross-jumped down to their common tail
+(`nop; jalr`), not to one call reached through a function-pointer local.
+The round-20/-27 finding that "inlining every call is 4 words too long"
+was measured with the `s32` return, whose per-leaf `return` stopped the
+cross-jump; with `void` the three calls merge exactly as retail does.
+
+### Proposed learning
+
+- **A return value retail never sets is a `void` function.** If an early
+  exit branches straight to the epilogue with whatever `$v0` a call left,
+  and the main path falls from the last `jalr` into the epilogue too,
+  type the function `void` before reading the residue as "GCC re-
+  materialises a known-zero return". Check callers first (here: only a
+  class table).
+- **Per-predecessor `$a0` setup before a shared `jalr` = separate calls
+  cross-jumped**, not one call through a shared function-pointer local.
+  The shared-local shape puts the argument setup once, in the `jalr`
+  delay slot.
+
+## Final C (matched)
+
+```c
+void TaskObjF__func_8004F8A4(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s32 a7, s32 a8) {
+    s32 code;
+    TaskObjFMethods *m;
+
+    self->unk40 = a1;
+    self->unk44 = a2;
+    self->unk48 = a3;
+    self->opMode = 2;
+    self->unk4C = a5;
+    self->unk50 = a6;
+    self->unk54 = a7;
+    self->unk58 = a8;
+    if (TaskObjF__Validate(self)) {
+        if (self->methods->slot54(self, 0, a1) != 0) {
+            code = 0xA;
+            if (self->statusCode == code) {
+                code = 0x11;
+            } else if (self->statusCode == 0x11) {
+                code = 0xB;
+            }
+            self->methods->slot7C(self, code);
+        } else if (!self->methods->slot60(self, a5, a8)) {
+            self->methods->slot7C(self, 9);
+        } else {
+            m = self->methods;
+            code = 0x11;
+            if (self->statusCode == code) {
+                code = 0xB;
+            }
+            m->slot7C(self, code);
+        }
+    }
+}
+```
+
+(History below is the pre-round-75 stall record, kept unchanged.)
+
+## Previous title (superseded)
+
+TaskObjF__func_8004F8A4 -- STALL. Length: 3 words TOO LONG (80/77, 0x140/0x134). Word-match: 63/77. First real diff: file 0x40158 / vram 0x8004F958 (delay-slot fill: retail `move $a0,$s0`, built `nop`).
 
 NON_MATCHING body promoted, round 73
 
