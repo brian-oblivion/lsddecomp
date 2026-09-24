@@ -2,6 +2,16 @@
  * code_2cc8c_e1 -- ONE function, SetPacketBufCursor (4 words), 0x303E4..0x303F4
  * (vram 0x8003FBE4..0x8003FBF4).
  *
+ * Resets Sony's GsOUT_PACKET_P -- the GPU packet-buffer write cursor
+ * `func_80018464` (src/code_8220_b.c) reloads at the top of every render
+ * group and advances by each submit wrapper's return value -- to a given
+ * pointer. Its one caller, Unk18Obj__Update (code_2cc8c_d.c), passes the
+ * current OT slot's work-buffer base right before clearing that same slot
+ * with GsClearOt, i.e. this points the cursor at the start of the packet
+ * buffer for the frame about to render into it. See
+ * docs/match-reports/SetPacketBufCursor.md `## Naming` for the full
+ * derivation.
+ *
  * ROUND 34: this unit exists because the functions on BOTH SIDES of it are
  * Sony's. `code_2cc8c_e` used to hold a contiguous run from func_8003FB0C to
  * the end of the segment; seven of those functions turned out to be Psy-Q

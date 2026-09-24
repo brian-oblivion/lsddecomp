@@ -17,3 +17,37 @@ Unit `code_2cc8c_e`, carved round 14.
 
 Plain global-pointer setter, same shape as `func_8003FB0C`:
 `void SetPacketBufCursor(void *a0) { GsOUT_PACKET_P = a0; }`.
+
+## Naming
+
+**`SetPacketBufCursor`, tier A.** The whole body is the store
+`GsOUT_PACKET_P = a0`, and a setter's mechanics ARE its purpose (CLAUDE.md
+naming rule: "a pure leaf whose mechanics ARE its purpose ... is tier A by
+definition"). `GsOUT_PACKET_P` is the target -- Sony's own name, recovered by
+`tools/rename.py` when it refused a game name for it (pinned in
+`config/psyq-objects.ld`) -- and `func_80018464` (`src/code_8220_b.c`)
+confirms the mechanics from the reader side: its own comment calls this same
+global "the packet-buffer write cursor, reloaded ... at the top of every
+group and advanced by each submit wrapper's return value"
+(`prim = (u8 *)GsOUT_PACKET_P; ...; GsOUT_PACKET_P = prim;`). The one caller,
+`Unk18Obj__Update`, passes `self->unk88[idx]` (a per-OT-slot work-buffer base)
+right before calling `GsClearOt` on the same slot -- i.e. this resets the
+cursor to the start of that slot's packet buffer for the frame about to
+render into it, which is consistent with, and does not exceed, what the body
+shows.
+
+`GsOUT_PACKET_P` is Sony's global (pinned; not renamed -- CLAUDE.md/FINISHING-PLAN
+track 3, "do not rename a Sony symbol"). Referenced from two units
+(`code_2cc8c_e1.c` here, `code_8220_b.c`), so it is a genuine cross-unit
+global, not unit-static -- moot here since it already carries its Sony name.
+
+### Sibling note
+
+`func_8003FB0C` (`src/code_2cc8c_e0.c`, charlie's unit this round) is the
+identical shape one function earlier in the same original segment
+(`D_800902E4 = a0`), called from the same caller (`Unk18Obj__Update`) two
+lines above this one. `D_800902E4` is NOT referenced outside
+`code_2cc8c_e0.c` (checked: `grep -rn D_800902E4 src/ include/`), so unlike
+`GsOUT_PACKET_P` it does not carry a Sony pin as far as this unit can see --
+that's charlie's call to make with `rename.py`, which will say either way.
+Posted to the broadcast for parallel naming.
