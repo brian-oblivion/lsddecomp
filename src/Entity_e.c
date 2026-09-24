@@ -341,14 +341,14 @@ void Entity__MoodCue77(Entity *this, EntityMoodHandlerArg *out) {
 extern u8 ROTATION_XPLUS90[];
 extern u8 SCALE_Y2[];
 extern u8 D_80089E14[];
-extern s32 D_8008ACCC;
+extern s32 gMoodCue78TransitionDone;
 
 void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
     s32 tmp;
     void *table;
 
     if (out->unk4 == 0) {
-        D_8008ACCC = 0;
+        gMoodCue78TransitionDone = 0;
         tmp = rand() % 3;
         if (tmp == 1) {
             this->moodState = 0xB;
@@ -387,7 +387,7 @@ void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->updateRotation(this, 0, ROTATION_XPLUS90);
         this->methods->stopSoundCue(this);
         this->moodState = 1;
-        D_8008ACCC = 1;
+        gMoodCue78TransitionDone = 1;
     } else if (this->moodState >= 0xC && out->unk4 >= 0x14A && (out->unk4 % 60) == 30) {
         tmp = 0;
         if (rand() & 1) {
@@ -405,7 +405,7 @@ void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotCC(this, tmp, 0);
     }
 
-    if (out->unk4 == 0x208 && D_8008ACCC != 0) {
+    if (out->unk4 == 0x208 && gMoodCue78TransitionDone != 0) {
         this->methods->stopSoundCue(this);
         this->moodState = 1;
     }
