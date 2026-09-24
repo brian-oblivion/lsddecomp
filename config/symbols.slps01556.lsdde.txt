@@ -1833,3 +1833,9 @@ SpuVmKeyOnNow = 0x8002D1B4; // type:func
 // 143w, disc 3.3), position within the libsnd neighborhood. Superseded
 // game-style func_8002D6A4. Round 74 (bravo, track 2).
 SpuVmDoAllocate = 0x8002D6A4; // type:func
+// identified: shape 0.98 vs libsnd/vmanager vmNoiseOn (308w vs our 311w,
+// disc 3.5, also libsnd/vm_no1 disc 3.6), position within the libsnd
+// neighborhood. Internal lowercase helper, distinct from the already-named
+// public SpuVmNoiseOn (0x8002F368). Superseded game-style func_8002D8E0.
+// Round 74 (bravo, track 2).
+vmNoiseOn = 0x8002D8E0; // type:func

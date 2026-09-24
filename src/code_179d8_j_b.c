@@ -154,7 +154,7 @@ extern u16 D_8008EA24;
 
 extern s32 SpuVmAlloc(void);
 extern void SpuVmDoAllocate(void);
-extern void func_8002D8E0(s32 a0);
+extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch2(u16 a0, u16 a1);
 extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
@@ -213,7 +213,7 @@ extern Rec34Half D_8008D988[];
 extern Rec34Half D_8008D98A[];
 extern Rec34Half D_8008D98C[];
 
-/* Shared with func_8002D8E0/SpuVmKeyOnNow in code_179d8_l.c (same
+/* Shared with vmNoiseOn/SpuVmKeyOnNow in code_179d8_l.c (same
  * two-level entry table, same blend-cascade shape); this unit's own
  * reduced view, per the project's per-unit-local-view convention --
  * only the two fields func_80030980 itself touches are named. */
@@ -421,7 +421,7 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 
     SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0((u8) result);
+        vmNoiseOn((u8) result);
     } else {
         s32 ret = note2pitch2((u16) p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);
@@ -567,7 +567,7 @@ s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p
     D_8008D99C[idx].unk0 = pending18;
     SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
-        func_8002D8E0((u8) idx);
+        vmNoiseOn((u8) idx);
     } else {
         s32 ret = note2pitch2(p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);

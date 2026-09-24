@@ -446,7 +446,7 @@ extern Rec34S16 D_8008D998[];
 extern Rec34Half D_8008D9A0[];
 
 extern void SpuVmDoAllocate(void);
-extern void func_8002D8E0(s32 a0);
+extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch(void);
 extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 extern u8 StopNote(s16 a0, s16 a1, s16 a2, u16 a3);
@@ -565,7 +565,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
 
                     SpuVmDoAllocate();
                     if (D_8008EA24 == 0xFF) {
-                        func_8002D8E0(*(u8 *) &D_8008EA26);
+                        vmNoiseOn(*(u8 *) &D_8008EA26);
                     } else {
                         SpuVmKeyOnNow(matchCount, note2pitch());
                     }
@@ -676,7 +676,7 @@ says it IS that function, a different build of it:
 2. **Call sequence.** Sony's 3.3 `vmanager.o` `SpuVmKeyOn` calls, in
    order, `SpuVmVSetUp`, `SpuVmKeyOff`, `SpuVmAlloc`, `SpuVmDoAllocate`.
    StartNote calls `SpuVmVSetUp`, `StopNote`, `SpuVmAlloc`,
-   `SpuVmDoAllocate`, then `func_8002D8E0`/`note2pitch`+`SpuVmKeyOnNow`. The
+   `SpuVmDoAllocate`, then `vmNoiseOn`/`note2pitch`+`SpuVmKeyOnNow`. The
    callee names this project already carries for the first and last
    (`SpuVmVSetUp`, `note2pitch`) are Sony's own.
 3. **Tone-scan loop.** Sony's 3.3 body has the six-`andi 0xff` run

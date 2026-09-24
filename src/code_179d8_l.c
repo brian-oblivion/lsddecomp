@@ -32,7 +32,7 @@
  *
  * ROUND 44: THE THREE BELOW ARE ASSIGNABLE AND ARE THIS UNIT'S FRESH GROUND.
  * ~~BLOCKED on nop_mflo_mfhi, which is STILL OPEN -- do NOT spend attempts:~~
- *   func_8002CD08 (132w), SpuVmKeyOnNow (316w), func_8002D8E0 (311w)
+ *   func_8002CD08 (132w), SpuVmKeyOnNow (316w), vmNoiseOn (311w)
  * nop_mflo_mfhi was RESOLVED in round 42 (`--no-nop-mflo-mfhi`), so the
  * "do NOT spend attempts" directive above is WITHDRAWN.  All three are
  * never-attempted cold ground whose reports were marked REOPENED in round 44.
@@ -247,7 +247,7 @@ s32 SpuVmAlloc(void)
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);
 #endif
 
-/* Shared with func_8002D8E0 below (same two-level entry table, same
+/* Shared with vmNoiseOn below (same two-level entry table, same
  * blend-cascade shape); declared once here since SpuVmKeyOnNow is
  * ROM-earlier, reused there rather than redeclared. */
 typedef struct {
@@ -428,9 +428,9 @@ extern u8 D_8008D7F0[];
 extern u8 D_8008D7F2[];
 extern u8 D_8008E9D0;
 
-/* STALL -- see docs/match-reports/func_8002D8E0.md. Best body reached
+/* STALL -- see docs/match-reports/vmNoiseOn.md. Best body reached
  * (309/311 built words, 2 words SHORT) preserved there in #if 0. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D8E0);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn);
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 107/112 words, 5 words short. Residue: the a0/a3 role-swap

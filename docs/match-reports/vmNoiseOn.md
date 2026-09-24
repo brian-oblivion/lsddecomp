@@ -1,4 +1,6 @@
-# func_8002D8E0 -- STALL (round 45: permuter lever tried, NEGATIVE -- still 309/311, 2 words SHORT; scaffold confirmed not representative of the real build; first real diff still the opening instruction, vram 0x8002D8E0)
+# vmNoiseOn -- STALL (round 45: permuter lever tried, NEGATIVE -- still 309/311, 2 words SHORT; scaffold confirmed not representative of the real build; first real diff still the opening instruction, vram 0x8002D8E0)
+
+> Renamed from `func_8002D8E0` on 2026-09-24 (tools/rename.py). Address 0x8002d8e0.
 
 > **REOPENED by round 44, AND SINCE WORKED -- marker spent (head, round 45).**
 > This is now a DOCUMENTED STALL with a real, measured residue (309/311, 2 words
@@ -22,7 +24,7 @@ Unit: `src/code_179d8_l.c` (carved round 24, 2026-09-08) · Size: 311 words
 the very first instruction**, vram `0x8002D8E0`: the derived body inserts an
 extra `move $t2,$a0` (preserving the raw channel parameter) one instruction
 earlier than retail schedules it -- confirmed with
-`tools/asm-differ/diff.py func_8002D8E0`, not inferred. This is the SAME
+`tools/asm-differ/diff.py vmNoiseOn`, not inferred. This is the SAME
 "preserve raw copy before narrowing in place" register-identity residue
 already documented for `func_8002DDBC` and `func_8002E138` in this unit
 (both also stalled on it, across three prior rounds each) -- a fourth
@@ -175,7 +177,7 @@ extern u16 D_8008E230;
 extern u16 D_8008E234;
 extern u8 D_8008EA20;
 
-void func_8002D8E0(s32 a0) {
+void vmNoiseOn(s32 a0) {
     s32 chanRaw;
     D800902E8Entry *e;
     u32 pAttack;
@@ -401,9 +403,9 @@ spill-pair question as the next concrete lever. It was run this round;
 the result is a clean negative, plus a diagnostic finding about why:
 
 **Before searching, `--debug --stack-diffs` was checked per this round's own
-runner instructions** (`tools/setup-permuter.sh func_8002D8E0 <seed with the
+runner instructions** (`tools/setup-permuter.sh vmNoiseOn <seed with the
 309/311 body>`, then
-`PATH=permuter-work/bin:$PATH .venv/bin/python3 tools/decomp-permuter/permuter.py --debug --stack-diffs permuter-work/func_8002D8E0`).
+`PATH=permuter-work/bin:$PATH .venv/bin/python3 tools/decomp-permuter/permuter.py --debug --stack-diffs permuter-work/vmNoiseOn`).
 The penalty list it printed:
 
 ```
@@ -422,7 +424,7 @@ isolated scaffold's own `--debug` dump shows large blocks of the function's
 TAIL (the `D_8008E228`/`22C`/`80090C60`/`64`/`8008E230`/`234` enable-bit
 section) diverging in ways the real in-unit build does not -- confirmed by
 rebuilding the exact same 309/311 body in `src/code_179d8_l.c` and reading
-`tools/asm-differ/diff.py func_8002D8E0` directly: the realigned diff shows
+`tools/asm-differ/diff.py vmNoiseOn` directly: the realigned diff shows
 the SAME single 2-word gap (isolated to the opening register swap plus the
 frame size, exactly as this report already documents) with NO large
 tail-section divergence anywhere. **The isolated permuter scaffold and the
