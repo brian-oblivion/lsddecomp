@@ -122,6 +122,9 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   setup rather than the `jal` (a `do/while` copies that setup into the delay slot). Decide per loop:
   `ReadCdFile` has both kinds. `OpenCdFile`/`ReadCdFile` closed this way (round 74) after seven
   rounds filed them as CSE plus register rotation; round 54's "does not reach" was wrong. (a round 54)
+  The gate also covers STRENGTH REDUCTION: a function 28 words LONG with an eighth saved register
+  and a bigger frame, every loop carrying a second induction variable, closed at 954/954 once all
+  13 inner loops were `label: ...; if (--n != 0) goto label;` (`func_80018464`, round 76).
 - **A redundant guard is NOT dead code — 2.6.3 compiles it literally.** GCC does not dedupe an
   explicit `if` against a loop's implicit entry test (where retail has ONE check, `guard + do-while`
   says so), and a provably-dead `x != 5 && x != 8 && x == 0xA` chain is byte-exact while its
@@ -175,6 +178,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   copied into branch delay slots). A per-branch `return` blocks the merge; a `void` function lets
   three calls merge (`TaskObjF__func_8004F8A4`). Retail's `j` into a shared STORE is likewise two
   identical stores (`func_8004DCD0`). (round 75)
+- **When retail keeps BOTH arms of an if/else and the build presets the constant before the branch,
+  test the RESULT variable.** jump.c turns `if (x % 20) v = a; else v = 0;` into "set 0, then maybe
+  overwrite"; `v = (x / 20) * 20; if (x != v) ...` blocks it and leaves the product in the result
+  register (retail's `beq a1,v0`). Ternary, `switch`, both-arm stores and `if ((v = x % 20) != 0)` all
+  measured negative (`StyleFillEffectKind2`, 49/79 -> 79/79, round 76).
 
 ### 3b. Switch and jump tables
 
@@ -317,6 +325,9 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (66/69 -> 1/69) applied whole-function. Small straight-line bodies only, per-return, never
   whole-function. (a §"`do{...}while(0)` is a REGISTER-PRESSURE lever", §"`do { } while (0)`
   wrapping is a SMALL-BODY lever")
+  **It also restores LOOP-DEPTH weighting**: local-alloc weights a pseudo by the loop nesting it sits in,
+  so after goto loops remove a level, a `v0`/`v1` swap repeating at every site of one statement closes
+  by wrapping just that statement in `do { } while (0)` (`func_80018464`'s six CLUT updates, round 76).
 - **Levers measured INERT — do not re-derive.** C89 `register` (the legal form) is a no-op for
   allocation; a clobber-bearing barrier is no better than an empty one; a dummy unused SCALAR cannot
   nudge frame allocation; a same-valued alias is collapsed by copy propagation and an algebraic
@@ -360,6 +371,8 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   the index and let GCC produce the walk and its delay-slot increment. Hand-rolling `(u8 *)self +
   off; off += 0x1C` reproduces the arithmetic but not the schedule (`Class866E8__ResetAllElements`,
   9/74 -> 74/74 on the first build). (round 71)
+  Likewise a register stepping by a constant beside the counter is GCC's own `i * K`: write
+  `table + i * 3`, not a hand-stepped counter (`StyleBuildDecorSet`, 17/86 -> 86/86, round 76).
 - **A value in a callee-saved register with no call visibly crossing it was ASSIGNED before a
   call**: GCC sank the computation into a delay slot after the call, which reads as a pointless
   promotion. Move the assignment to right after its input is loaded (`Class866E8__ComputeFootprintFromRotation`, filed as a
@@ -425,6 +438,9 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   strictly left to right**, so untouched `$a1` with `$a2`/`$a3` set PROVES a forwarded parameter;
   the converse fails, so type a slot from its CALL SITES. (a §"3. A bare `nop` in a call's delay
   slot", §"Round 11")
+  A parameter `move`d into `$a2`/`$a3` at ENTRY is a forwarded argument of a later call until shown
+  otherwise: `func_8002C278`'s four-round "register identity" was `slot80` missing its fourth argument
+  (54/76 -> 76/76, round 76).
 - **A discarded return value is never evidence of `void`, and an empty-bodied occupant is never
   evidence the slot takes no arguments** — bytes constrain the return type only where the caller
   USES it; prefer the slot's OCCUPANT. **A declared RETURN TYPE can also block a cross-jump merge
@@ -565,6 +581,13 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 ### 3h. volatile and memory
 
+- **cc1's scheduler lets a load pass a STRUCT-FIELD store but not a plain `*p` store.** When one
+  store must sink below a later global load (often into a `jal` delay slot) and everything else
+  matches, store through a pointer to a one-field struct: `q->p = x`, not `*q = x`. The same rule
+  in the other direction: read a flags word through a struct field to let loads hoist above global
+  stores. Discriminator: the built code has the store first and the load after, with identical words.
+  Three closes in round 76 (`StyleFillEffectKind3` 81/81, `StyleFillEffectKind2`, `func_80018464`).
+
 - **`volatile` is the NARROW instrument for the instruction-ORDER class, not the banned construct**
   — it names no register, exactly like the sanctioned bare `__asm__("")`. Where three barrier
   placements across two rounds all regressed, declaring three hardware-shadow fields `volatile`
@@ -572,10 +595,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   memory-mapped I/O, not whether `volatile` helps**: a documented `I_STAT`/`I_MASK` pair (two
   closes) versus DECLINED on an ordinary global that measured no change — only two units touch
   hardware addresses. (a §"`volatile` is a legitimate, and much NARROWER, tool", §"Round 16")
-- **NARROW a `volatile` to the exact access that needs it** — qualifying only the WORD-sized field
-  un-fused a div/mod pair while preserving retail's `lh` (193/213 -> 211/213). When a qualifier
-  lever "works but with a side effect", check whether the side effect is intrinsic to the LEVER or
-  an artifact of WHERE it was applied. (a §"NARROW a `volatile` to the exact access that needs it")
 - **`volatile` on a POINTEE is a scheduling barrier, and cc1 2.6.3 orders volatile accesses only
   against OTHER volatile accesses.** With `D_8006DAD4` (the SPU voice registers, `0x1F801C00`)
   typed `u16 *`, cc1 hoisted an unrelated `volatile u16` global's store/reload pair across six
@@ -584,17 +603,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   ask which memory operand is memory-mapped I/O BEFORE reaching for a barrier or filing a
   scheduling stall. Discriminator: dump cc1's own output and look for a `#.set volatile` marker
   that has migrated past non-volatile stores. (a round 66, bravo)
-- **`volatile` has TWO independent effects** — on a global's DECLARATION it controls elision and
-  reordering of accesses; through a local `volatile T *` it also controls whether the ADDRESS
-  COMPUTATION is folded into the memory instruction, so "I tried it" is at most one of two
-  measurements. (a §"`volatile` has TWO independent effects")
-- **A sibling's `volatile` set is a HYPOTHESIS to sweep outward from, never a set to copy**, and it
-  is not confined to arithmetic locals: `func_80030980` closed to length-exact (324/324, zero drift,
-  from 292/324) on six divisor-chain locals PLUS a pure address-arithmetic local. Add ONE variable
-  at a time and switch the acceptance test to whole-image byte count once close, because **exact
-  length is a qualitatively different state from "closest so far"**. Two systematic sweeps (15
-  builds) found nothing better either side, so do not re-budget single-variable perturbation without
-  a new hypothesis. (round 50, alpha; `docs/match-reports/func_80030980.md`)
 - **`volatile` is the WRONG tool for an ADDRESS CSE, and it is NON-MONOTONIC** — it acts on the
   VALUE CSE and regresses a LICM residue (48/376 -> 6/376). **The address CSE yields to the
   asm-label alias**: `extern T D_8008A8F8_b __asm__("D_8008A8F8");` leaves nothing to fold and
@@ -621,23 +629,8 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 ### 3j. Permuter practice and false leads
 
-- **Validate the scaffold in three checks BEFORE searching, and record which you ran.** (1) Does it
-  compile and score. (2) Its insertion/deletion penalties — a near-0/0 scaffold suits a
-  source-mutation search, a 23/44 one wanders. (3) Does its base score AGREE with the same body's
-  score in the real build — the isolated compile can allocate differently for identical source. A
-  negative is not evidence unless check 3 passed. (a §"The permuter finding", §"The scaffold's
-  insertion/deletion count is a COST predictor", §"A recorded permuter search is only evidence of
-  COST")
-- **Check 3's discriminator is AGREEMENT, not zero-ness.** A 6/6 scaffold matching a 6/6 real build
-  AGREES and paid (19/52 -> 22/52); a 0/0 scaffold is NECESSARY, not SUFFICIENT; a PERFECT scaffold
-  score on a non-matching function means the residue is what the scorer NORMALIZES AWAY (a branch
-  target, round 67) or is outside it; the one-second isolated compile tells which. Check 3 licenses
-  the SEARCH, not its output.
-- **A permuter improvement can be oracle-confirmed and still be UNSOUND C**, and a zero is validated
-  in ISOLATION and cannot see cross-TU damage. A 208/223 candidate hoisted a string-literal address
-  into a CALLER-saved register outside a call-making loop; a genuine zero elsewhere required a
-  shared global `volatile` that corrupted a matched sibling. (a §"A permuter improvement can be
-  oracle-confirmed and still be UNSOUND C", §"A permuter zero is validated in ISOLATION")
+- Distilled to the archive (round 76): the scaffold three checks (PARALLEL-RUNS §3.5 is the live
+  procedure), check 3's agreement discriminator, and oracle-confirmed-but-unsound candidates.
 
 ## 4. Verdict classes and how far to trust them
 

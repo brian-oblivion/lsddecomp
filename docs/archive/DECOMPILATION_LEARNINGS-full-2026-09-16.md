@@ -9143,3 +9143,42 @@ already covered elsewhere in the sheet.
 - **Two levers that each MEASURE AS A REGRESSION alone can be byte-exact together.**
   `func_8004CFB8`: halves scored 17/28 and 10/28 singly, 28/28 jointly. Try the product before
   discarding either reading. (a round 58, bravo)
+
+## Distilled round 76 (2026-09-24)
+
+- **Validate the scaffold in three checks BEFORE searching, and record which you ran.** (1) Does it
+  compile and score. (2) Its insertion/deletion penalties — a near-0/0 scaffold suits a
+  source-mutation search, a 23/44 one wanders. (3) Does its base score AGREE with the same body's
+  score in the real build — the isolated compile can allocate differently for identical source. A
+  negative is not evidence unless check 3 passed. (a §"The permuter finding", §"The scaffold's
+  insertion/deletion count is a COST predictor", §"A recorded permuter search is only evidence of
+  COST")
+- **Check 3's discriminator is AGREEMENT, not zero-ness.** A 6/6 scaffold matching a 6/6 real build
+  AGREES and paid (19/52 -> 22/52); a 0/0 scaffold is NECESSARY, not SUFFICIENT; a PERFECT scaffold
+  score on a non-matching function means the residue is what the scorer NORMALIZES AWAY (a branch
+  target, round 67) or is outside it; the one-second isolated compile tells which. Check 3 licenses
+  the SEARCH, not its output.
+- **A permuter improvement can be oracle-confirmed and still be UNSOUND C**, and a zero is validated
+  in ISOLATION and cannot see cross-TU damage. A 208/223 candidate hoisted a string-literal address
+  into a CALLER-saved register outside a call-making loop; a genuine zero elsewhere required a
+  shared global `volatile` that corrupted a matched sibling. (a §"A permuter improvement can be
+  oracle-confirmed and still be UNSOUND C", §"A permuter zero is validated in ISOLATION")
+
+
+- **A sibling's `volatile` set is a HYPOTHESIS to sweep outward from, never a set to copy**, and it
+  is not confined to arithmetic locals: `func_80030980` closed to length-exact (324/324, zero drift,
+  from 292/324) on six divisor-chain locals PLUS a pure address-arithmetic local. Add ONE variable
+  at a time and switch the acceptance test to whole-image byte count once close, because **exact
+  length is a qualitatively different state from "closest so far"**. Two systematic sweeps (15
+  builds) found nothing better either side, so do not re-budget single-variable perturbation without
+  a new hypothesis. (round 50, alpha; `docs/match-reports/func_80030980.md`)
+
+- **NARROW a `volatile` to the exact access that needs it** — qualifying only the WORD-sized field
+  un-fused a div/mod pair while preserving retail's `lh` (193/213 -> 211/213). When a qualifier
+  lever "works but with a side effect", check whether the side effect is intrinsic to the LEVER or
+  an artifact of WHERE it was applied. (a §"NARROW a `volatile` to the exact access that needs it")
+
+- **`volatile` has TWO independent effects** — on a global's DECLARATION it controls elision and
+  reordering of accesses; through a local `volatile T *` it also controls whether the ADDRESS
+  COMPUTATION is folded into the memory instruction, so "I tried it" is at most one of two
+  measurements. (a §"`volatile` has TWO independent effects")
