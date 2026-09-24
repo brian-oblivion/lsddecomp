@@ -124,7 +124,7 @@ void func_80026348(Class6D3C8 *self) {
 
 /* Gated by self->arg->unk10. Checks the DreamSys's own status slot
  * (+0x1A0); if it isn't already "1" and self->unk24 hasn't latched, kicks
- * off one PollTask (func_80057F68) and, if THAT reports "2", runs
+ * off one PollTask (New_GraphRoomObj) and, if THAT reports "2", runs
  * func_8002658C. Then polls a second PollTask (New_Class86B60) in a loop,
  * restarting the first PollTask each time it reports "2", until it
  * reports anything else; clears self->unk24 and returns 0 or 2 depending
@@ -139,7 +139,7 @@ s32 func_80026410(Class6D3C8 *self) {
         status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->unk24 == 0) {
-                status = func_80026518(func_80057F68, self->dreamSys, self->unk1C);
+                status = func_80026518(New_GraphRoomObj, self->dreamSys, self->unk1C);
                 if (status == 2) {
                     func_8002658C(self);
                 }
@@ -150,7 +150,7 @@ s32 func_80026410(Class6D3C8 *self) {
     retry:
         status = func_80026518(New_Class86B60, self->dreamSys, self->unk1C);
         if (status == pollDone) {
-            func_80026518(func_80057F68, self->dreamSys, self->unk1C);
+            func_80026518(New_GraphRoomObj, self->dreamSys, self->unk1C);
             goto retry;
         }
 

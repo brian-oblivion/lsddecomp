@@ -1,4 +1,6 @@
-# func_800585B4 -- MATCHED (56/56 words, byte-exact)
+# GraphRoomObj__ScoreDayLog -- MATCHED (56/56 words, byte-exact)
+
+> Renamed from `func_800585B4` on 2026-09-24 (tools/rename.py). Address 0x800585b4.
 
 Unit: `src/class_3bb8c_t.c` · Size: 56 words (file 0x48DB4-0x48E94) · Round 41
 (2026-09-14), runner echo, worktree `lsddecomp2-wt-echo`.
@@ -121,7 +123,7 @@ extern s16 D_80087BD4[4];
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
  * words without). Do not "simplify" this without re-running
  * ./build-and-verify.sh. */
-s32 func_800585B4(D_80087AACObj *self, D_80087AACUnkA4Result *log)
+s32 GraphRoomObj__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *log)
 {
     u32 i;
     s16 *days;
@@ -220,3 +222,12 @@ re-verify with the whole-image oracle before believing a per-function
 score, since two of the four confirmed regressions here only showed up
 as `build exit=2` plus a length/drift warning, not as a wrong per-function
 byte count.
+
+## Naming (round 75, track 3)
+
+**`GraphRoomObj__ScoreDayLog`** -- tier B (name carried over verbatim from
+its round-41 provenance, `func_800585B4` -> `GraphRoomObj__ScoreDayLog` via
+`tools/rename.py` this round). Scans the day-log's 365-entry ring for four
+fixed day-type targets (`D_80087BD4`) and records, per target, the most
+recent matching day index into `matchedDayIndices` -- exactly "scoring"
+the log against those four targets, feeding `GraphRoomObj__TickHighlight`.

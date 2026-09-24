@@ -26,7 +26,7 @@
  * resolve slots with tools/classtable.py rather than by counting. The
  * class is `Obj86B60` (include/code_2cc8c.h), named after its base method
  * table gClass86B60Methods (78 slots; a derived override table also exists at
- * D_80087AAC, 73 slots -- see the header's own comment). The first two
+ * gGraphRoomMethods, 73 slots -- see the header's own comment). The first two
  * functions are switch dispatchers over a small event/message code.
  */
 
