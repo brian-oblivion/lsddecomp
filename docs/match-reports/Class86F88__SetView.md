@@ -25,7 +25,7 @@ void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
     }
     a3 -= a1;
     elem = self->unk40[a3];
-    elem->methods->slotB8(elem, &D_8008AB10);
+    elem->methods->slotB8(elem, &gClass86F88CursorColor);
 }
 ```
 
@@ -40,7 +40,7 @@ UNCONDITIONALLY (all three sit before the `a4 == 0` guard in retail's own
 instruction order -- the `unk28` store is in the guarding branch's delay
 slot, so it always executes even on the early-return path), then, only if
 `a4 != 0`, indexes `self->unk40[a3 - a1]` and dispatches that element's
-own `slotB8(elem, &D_8008AB10)`.
+own `slotB8(elem, &gClass86F88CursorColor)`.
 
 **Two independent residues, both register/scheduling, no register or CFG
 value was ever wrong:**

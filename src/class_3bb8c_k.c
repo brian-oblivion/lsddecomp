@@ -433,7 +433,7 @@ void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
     }
     a3 -= a1;
     elem = self->unk40[a3];
-    elem->methods->slotB8(elem, &D_8008AB10);
+    elem->methods->slotB8(elem, &gClass86F88CursorColor);
 }
 
 void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
@@ -454,7 +454,7 @@ void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
         self->unk28--;
         p--;
     }
-    (*p)->methods->slotB8(*p, &D_8008AB10);
+    (*p)->methods->slotB8(*p, &gClass86F88CursorColor);
     if (flag) {
         self->methods->slot60(self, 0);
     }

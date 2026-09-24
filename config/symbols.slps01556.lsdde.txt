@@ -2031,3 +2031,4 @@ gClass86F88Methods = 0x80086F88;
 gClass86F88RowOriginX = 0x8008AB00;
 gClass86F88RowOriginY = 0x8008AB04;
 gClass86F88RowColor = 0x8008AB0C;
+gClass86F88CursorColor = 0x8008AB10;

@@ -2907,7 +2907,7 @@ struct Class86F88Methods {
 
 /*
  * Each element of Class86F88::unk40[] -- resolved from Class86F88__SetView's own
- * dispatch, `elem->methods->slotB8(elem, &D_8008AB10)`. The `+0x004`
+ * dispatch, `elem->methods->slotB8(elem, &gClass86F88CursorColor)`. The `+0x004`
  * "release" slot is the same shared base-class implementation seen at
  * that offset in every vtable this project has resolved so far (compare
  * `GenericReleaseMethods_3bb8c_d` above) -- Class86F88__ReleaseRows dispatches
@@ -2966,14 +2966,14 @@ struct Class86F88 {
 extern Class86F88Methods gClass86F88Methods;
 /* Class86F88__StepCursorInView's fixed 2nd argument to Class86F88ElemMethods::slotB8 on
  * its own FIRST dispatch (the element at the "old" index) -- immediately
- * adjacent rodata to D_8008AB10 below (4 bytes before it), never
+ * adjacent rodata to gClass86F88CursorColor below (4 bytes before it), never
  * dereferenced by this unit's own code, only its address taken. */
 extern s32 gClass86F88RowColor;
 /* Class86F88__SetView's fixed 2nd argument to Class86F88ElemMethods::slotB8 --
  * a 4-byte rodata value (0x00008080), never dereferenced by this unit's
  * own code, only its address taken. Also Class86F88__StepCursorInView's own SECOND
  * dispatch (the element at the "new" index, after the increment/decrement). */
-extern s32 D_8008AB10;
+extern s32 gClass86F88CursorColor;
 
 /* GetObjMMethods: a plain class-vtable getter (`lui`/`addiu`, no
  * `lw`/`sw`), returns `&D_80087034` verbatim. Confirmed a BasicClass-

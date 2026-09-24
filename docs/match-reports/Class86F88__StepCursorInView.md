@@ -33,7 +33,7 @@ void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
         self->unk28--;
         p--;
     }
-    (*p)->methods->slotB8(*p, &D_8008AB10);
+    (*p)->methods->slotB8(*p, &gClass86F88CursorColor);
     if (flag) {
         self->methods->slot60(self, 0);
     }
@@ -53,9 +53,9 @@ the updated `unk28`.
   dispatch (still `INCLUDE_ASM` as of this function's match; both call
   sites pass `(self, 0)`).
 - `gClass86F88RowColor` (`extern s32`) -- 4 bytes of rodata immediately before the
-  already-declared `D_8008AB10` (itself `Class86F88__SetView`'s fixed 2nd
+  already-declared `gClass86F88CursorColor` (itself `Class86F88__SetView`'s fixed 2nd
   `slotB8` argument); this function's FIRST dispatch uses the new one, its
-  SECOND dispatch reuses `D_8008AB10`.
+  SECOND dispatch reuses `gClass86F88CursorColor`.
 
 Both additions are additive splits of existing padding/adjacent rodata, no
 existing declaration changed.
