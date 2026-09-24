@@ -78,7 +78,7 @@ the whole image after any further edit there.)
 - `self->methods->slotE0(self, self->unk14);` -- a NEW slot at +0x0E0 on
   `Class86B60Methods` (inside the previous `pad0DC[0xF0-0xDC]` gap),
   forwarding the already-established `unk14` (`void *`, from this round's
-  `func_8004DF64`) opaquely.
+  `Class86B60__BeginMemcardSave`) opaquely.
 - `self->unkA4->methods->slot19C(self->unkA4, &buf2);` -- the SAME slot
   already established (`Class86B60__RefreshViewValue`), but used here as an OUT
   parameter: `buf2` is uninitialized before the call and its value is read

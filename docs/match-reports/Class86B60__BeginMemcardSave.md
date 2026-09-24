@@ -1,4 +1,6 @@
-# func_8004DF64 -- MATCHED 60/60, round 43
+# Class86B60__BeginMemcardSave -- MATCHED 60/60, round 43
+
+> Renamed from `func_8004DF64` on 2026-09-24 (tools/rename.py). Address 0x8004df64.
 
 Unit `class_3bb8c_d`, class `Class86B60`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 1 `gp_rel` hit
@@ -9,7 +11,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ```c
 extern GenericReleaseObj_3bb8c_d *func_8003B39C(const char *path);
 
-void func_8004DF64(Class86B60 *self)
+void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
     if (self->unkAC == NULL) {
         self->unkA8 = func_8003B39C(D_800114F8);
@@ -24,7 +26,7 @@ void func_8004DF64(Class86B60 *self)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py func_8004DF64` -> `60/60 words
+Byte-exact on the first build: `funcdiff.py Class86B60__BeginMemcardSave` -> `60/60 words
 match (file 0x3E764-0x3E854)`; whole-image `OK: build matches retail
 SLPS_015.56`.
 

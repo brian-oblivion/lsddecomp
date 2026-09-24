@@ -229,7 +229,7 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
  * this call site actually stores it into (`self->unkA8`). */
 extern GenericReleaseObj_3bb8c_d *func_8003B39C(const char *path);
 
-void func_8004DF64(Class86B60 *self)
+void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
     if (self->unkAC == NULL) {
         self->unkA8 = func_8003B39C(D_800114F8);

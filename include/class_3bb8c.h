@@ -1134,7 +1134,7 @@ struct Class86B60UnkACObjMethods_3bb8c_d {
     u8 pad000[0x004];
     void (*release)(Class86B60UnkACObj_3bb8c_d *self); /* +0x004, Class86B60__Dtor */
     u8 pad008[0x06C - 0x008];
-    /* +0x06C, func_8004DF64's own call: `(self, D_8008A9D0, &D_80086D6C,
+    /* +0x06C, Class86B60__BeginMemcardSave's own call: `(self, D_8008A9D0, &D_80086D6C,
      * self->unkC->unk4, self->unk10, self->unk14, self->unk48)` -- 7
      * arguments, the last three on the stack. Every pointer beyond `self`
      * is forwarded opaquely (never dereferenced by this slot's own
@@ -1264,7 +1264,7 @@ struct Class86B60 {
     u8 pad004[0x00C - 0x004];
     Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, Class86B60__RegisterHandlers/func_8004E054 */
     void *unk10;                     /* +0x010, func_8004E054: opaque, forwarded verbatim */
-    void *unk14;                     /* +0x014, func_8004DF64: opaque, forwarded verbatim to unkAC->methods->slot6C */
+    void *unk14;                     /* +0x014, Class86B60__BeginMemcardSave: opaque, forwarded verbatim to unkAC->methods->slot6C */
     u8 pad018[0x02C - 0x018];
     s32 unk2C;                      /* +0x02C, Class86B60__ShowTitleIcon: set to 0x190 */
     u8 pad030[0x034 - 0x030];
@@ -1475,7 +1475,7 @@ extern s32 D_800114DC;
  * address is taken here. */
 extern s32 D_800114E8;
 
-/* func_8004DF64's own path string, passed to func_8003B39C -- a real
+/* Class86B60__BeginMemcardSave's own path string, passed to func_8003B39C -- a real
  * dlabel (`asm/data/1C34.rodata.s`: "CARD\FILEICN1.TIM"), so this is the
  * ONLY correct spelling (CLAUDE.md: never re-write a string splat has
  * already emitted as a symbol). */
@@ -1524,13 +1524,13 @@ extern void *D_8008AA24;
  * table is not plausible `strcpy` input. */
 extern void *D_8008AA14;
 
-/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `func_8004DF64`
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `Class86B60__BeginMemcardSave`
  * as `Class86B60UnkACObjMethods_3bb8c_d::slot6C`'s own `arg1`. Holds
  * `0x80011454` in the ROM image -- the "BISLPS-01556" string in
  * `D_80011434`, again with no `dlabel` of its own. */
 extern void *D_8008A9D0;
 
-/* Address-of only, round 43's `func_8004DF64`
+/* Address-of only, round 43's `Class86B60__BeginMemcardSave`
  * (`Class86B60UnkACObjMethods_3bb8c_d::slot6C`'s own `arg2`) -- a real
  * 16-entry pointer table (`asm/data/76DC8.data.s`, `D_8008AA0C` down to
  * `D_8008A9D4` then a NULL terminator), reached only by its own address
