@@ -52,7 +52,7 @@ SLPS_015.56`.
 - `if (arg1 == NULL) return;` -- the whole body is skipped on a single
   `beqz $s3` gate at function entry.
 - `self->unkA4->methods->slot1AC(self->unkA4)` -- the SAME slot this
-  round's `func_8004E0E4` established, reused verbatim.
+  round's `Class86B60__UpdateMemcardSaveWithIcon` established, reused verbatim.
 - Inside that gate: `strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14)`
   then `CopyMemcardIconTemplate(D_8008AA18, 0)` -- `CopyMemcardIconTemplate` is the
   already-canonical `extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);`

@@ -2138,3 +2138,4 @@ Class86B60__TickNameFieldCursor = 0x8004DCD0; // type:func
 Class86B60__CommitNameEntry = 0x8004DE08; // type:func
 Class86B60__BeginMemcardSave = 0x8004DF64; // type:func
 Class86B60__EndMemcardSave = 0x8004E054; // type:func
+Class86B60__UpdateMemcardSaveWithIcon = 0x8004E0E4; // type:func

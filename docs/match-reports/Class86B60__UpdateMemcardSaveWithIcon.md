@@ -1,4 +1,6 @@
-# func_8004E0E4 -- MATCHED 56/56, round 43
+# Class86B60__UpdateMemcardSaveWithIcon -- MATCHED 56/56, round 43
+
+> Renamed from `func_8004E0E4` on 2026-09-24 (tools/rename.py). Address 0x8004e0e4.
 
 Unit `class_3bb8c_d`, class `Class86B60`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 3 `gp_rel` hits
@@ -7,7 +9,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ## Body
 
 ```c
-void func_8004E0E4(Class86B60 *self)
+void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
 {
     s32 buf;
 
@@ -22,7 +24,7 @@ void func_8004E0E4(Class86B60 *self)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py func_8004E0E4` -> `56/56 words
+Byte-exact on the first build: `funcdiff.py Class86B60__UpdateMemcardSaveWithIcon` -> `56/56 words
 match (file 0x3E8E4-0x3E9C4)`; whole-image `OK: build matches retail
 SLPS_015.56`.
 

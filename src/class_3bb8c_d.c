@@ -251,7 +251,7 @@ void Class86B60__EndMemcardSave(Class86B60 *self)
     self->unkAC->methods->slot70(self->unkAC);
 }
 
-void func_8004E0E4(Class86B60 *self)
+void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
 {
     s32 buf;
 
