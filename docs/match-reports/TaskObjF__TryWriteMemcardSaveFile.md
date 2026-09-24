@@ -1,4 +1,98 @@
-# TaskObjF__TryWriteMemcardSaveFile -- STALL. Length: 1 word SHORT (239/240, 0x3BC/0x3C0). Word-match: 191/240 (re-measured round 37; previously recorded 188/240 -- see round-37 note). First real diff: file 0x3F774 / vram 0x8004EF74 (register-permutation set-up; the SEMANTIC first diff, ignoring the permuted callee-saved set, is file 0x3F7A4 / vram 0x8004EFA4, missing `sw $s0,0x30($sp)`, immediately followed by an empty `nop` at file 0x3F7F0 / vram 0x8004EFF0 where retail fills the delay slot with `move $s7,$s4`).
+# TaskObjF__TryWriteMemcardSaveFile -- MATCHED 240/240, round 75 (delta). Lever: `a3` is a `u8` parameter (not `s32` + a duplicate `flagCopy` local), and `arg6` is used directly (no early `payload` copy).
+
+REVISITED, round 75: MATCHED 240/240 in 3 builds, whole image `OK: build matches retail`; names/types used (the parameter TYPE was the lever).
+
+## Round 75 (delta): revisit
+
+**Baseline first.** The preserved body, rebuilt live exactly as below
+(round-37 snapshot), measured **191/240, `insertions 5 / deletions 5`**,
+47 positional skeleton diffs, 239 words (1 short).
+
+**What retail says, read word by word.** `$a3` is copied to `$s4` at entry
+and `$s4` is copied again to `$s7` in the first `bne`'s delay slot; `$s4`
+feeds the `sb` of `a3 + 0x10`, `$s7` feeds `andi 0xFF; sll 7` for the first
+`write` size. Two live pseudos holding one value, with the zero-extension
+deferred to the one use that needs it, is what a narrow (`u8`) parameter
+looks like in GCC 2.6.3: the promoted incoming word and its QImode copy.
+The preserved body imitated that with an `s32 a3` plus a hand-made
+`flagCopy = a3` duplicate, which the allocator coalesced differently (one
+s-register fewer, the permuted callee-saved set, the empty delay slot).
+
+| build | change | score | ins/del |
+| --- | --- | --- | --- |
+| 1 | preserved body as-is | 191/240 (239 words) | 5 / 5 |
+| 2 | `u8 a3` (definition + forward decl), drop `flagCopy`, size `(a3 << 7) + 0x80` | 238/240 (240 words) | 1 / 1 -- only `lw arg6`/`lw arg7` order swapped |
+| 3 | drop `payload = arg6`, pass `arg6` directly | **240/240**, whole image OK | 0 / 0 |
+
+The caller `TaskObjF__WriteMemcardSaveFile` (already matched, passes
+`a3 & 0xFF` from its own `char a3`) is byte-identical under the new
+prototype -- the whole-image oracle is green.
+
+Tell: two callee-saved registers holding copies of the same incoming
+argument register, with a mask (`andi 0xFF`/`0xFFFF`) applied only at one
+use, means a narrow parameter type -- not a duplicate local. The same
+round-37/-27 "register saturation" story for this function was an
+artefact of the duplicate locals invented to reach the frame size.
+
+### Proposed learning
+
+- **Duplicate-register copies of one argument = narrow parameter type.**
+  When retail copies `$aN` to one s-reg at entry and then that s-reg to a
+  second one later, with a zero/sign-extension appearing only at the
+  second's use, type the parameter `u8`/`u16` (both the definition and
+  every prototype in scope) instead of adding a copy local. Check the
+  caller still matches with the whole-image oracle.
+
+## Final C (matched)
+
+```c
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3, s32 arg5, s32 arg6, s32 arg7) {
+    char pathBuf[0x20];
+    char *path;
+    s32 fileHandle;
+    s32 openMode;
+    McIconSource *src;
+    McSaveHeader *req;
+
+    path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
+    delete(path);
+    openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
+    fileHandle = open(path, openMode);
+    if (fileHandle == -1) {
+        printf(D_80011530);
+        return 0;
+    }
+    close(fileHandle);
+    fileHandle = open(path, 2);
+    if (fileHandle == -1) {
+        return 0;
+    }
+    src = ((McIconSourceRef *)arg5)->iconSource;
+    req = (McSaveHeader *)BMemPMgrAlloc(0x200);
+    req->magic0 = 'S';
+    req->magic1 = 'C';
+    req->iconFrameFlag = a3 + 0x10;
+    req->blockCount = ((u32)arg7 + 0x1FFF) >> 13;
+    strcpy(req->title, (char *)handle);
+    req->palette[0] = src->palette[0];
+    req->palette[1] = src->palette[1];
+    req->frame0 = src->frame0;
+    req->frame1 = src->frame1;
+    req->frame2 = src->frame2;
+    write(fileHandle, req, (a3 << 7) + 0x80);
+    BMemPMgrFree(req);
+    write(fileHandle, (void *)arg6, (((u32)arg7 + 0x7F) >> 7) << 7);
+    close(fileHandle);
+    return 1;
+}
+```
+
+(Local types, externs and the history below are unchanged; the history
+is kept as the record of the pre-round-75 stall.)
+
+## Previous title (superseded)
+
+TaskObjF__TryWriteMemcardSaveFile -- STALL. Length: 1 word SHORT (239/240, 0x3BC/0x3C0). Word-match: 191/240 (re-measured round 37; previously recorded 188/240 -- see round-37 note). First real diff: file 0x3F774 / vram 0x8004EF74 (register-permutation set-up; the SEMANTIC first diff, ignoring the permuted callee-saved set, is file 0x3F7A4 / vram 0x8004EFA4, missing `sw $s0,0x30($sp)`, immediately followed by an empty `nop` at file 0x3F7F0 / vram 0x8004EFF0 where retail fills the delay slot with `move $s7,$s4`).
 
 > Renamed from `func_8004EF6C` on 2026-09-20 (tools/rename.py). Address 0x8004ef6c.
 

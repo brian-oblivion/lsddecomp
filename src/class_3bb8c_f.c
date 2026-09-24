@@ -46,7 +46,7 @@ void TaskObjF__FreeBuffers(TaskObjF *self);
 s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag);
 s32 WaitForReadyEvent(s32 *arr, s32 count);
 s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
-s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7);
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3, s32 arg5, s32 arg6, s32 arg7);
 char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix);
 
 /* PSX BIOS file trampolines, linked from Sony's own objects since round 34
@@ -119,21 +119,11 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, char a3, 
     return result;
 }
 
-/* STALL snapshot -- see docs/match-reports/TaskObjF__TryWriteMemcardSaveFile.md. Best
- * reached: 188/240 words, 0x3BC/0x3C0 (1 word / 4 bytes short, zero
- * address drift beyond that). Genuinely fresh derivation this round --
- * full struct layout (McIconSource/McSaveHeader/etc, all new) derived
- * from scratch and confirmed correct in control flow, arithmetic
- * (including two signed/unsigned shift fixes -- retail uses `srl`, a
- * naive signed `>>` on `s32 arg7` compiles to `sra`), and struct-copy
- * shape (the aligned-vs-unaligned runtime-checked copy idiom, matching
- * class_3bb8c_r.c's Block24 precedent). The residue is confirmed as
- * the SAME 9-register-saturation class already documented for this
- * function's own caller, TaskObjF__WriteMemcardSaveFile -- a single delay-slot
- * scheduling choice (which of two independent register-materializing
- * moves fills a branch's delay slot) that did not respond to any
- * position/type/declaration-order variant tried. Preserved here per
- * convention -- not live C. */
+/* TaskObjF__TryWriteMemcardSaveFile -- MATCHED round 75 (see its report).
+ * `a3` is a `u8` parameter: the caller's promoted word lives in one
+ * register for the `sb` of a3+0x10 and GCC's QImode copy in another for
+ * the zero-extended `(a3 << 7)` size, which is retail's `move $s7,$s4`
+ * and its late `andi 0xFF`. */
 /* TaskObjF__TryWriteMemcardSaveFile's own local types -- none shared
  * elsewhere in this unit.
  *
@@ -211,34 +201,18 @@ extern const char D_80011530[];  /* rodata string "File not create in WriteFile\
 extern s32 write(s32 handle, void *buf, s32 size);  /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
 extern void printf(const char *fmt);  /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
 
-#if 0
-/* ROUND 37 (delta): re-verified 239/240 (1 word short, 0x3BC/0x3C0), then
- * re-measured raw word-match at 191/240 (previously recorded as 188/240 --
- * the 3-word difference is not a regression, just the first re-measurement
- * since round 34 relinked the BIOS trampolines this body calls through;
- * `asm-differ` confirms the residue is IDENTICAL in kind and location to
- * the one this report already documents: the whole callee-saved register
- * set permuted relative to retail's own, plus the single missing
- * `sw $s0,0x30($sp)` / delay-slot `move $s7,$s4` at file 0x3F7A4/0x3F7F0).
- * Seeded a permuter search (never run before this round) -- see the report
- * for iteration count and result. Restored here, not left live -- see the
- * report. */
-s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s32 arg5, s32 arg6, s32 arg7) {
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3, s32 arg5, s32 arg6, s32 arg7) {
     char pathBuf[0x20];
     char *path;
     s32 fileHandle;
     s32 openMode;
-    s32 flagCopy;
-    s32 payload;
     McIconSource *src;
     McSaveHeader *req;
 
-    payload = arg6;
     path = BuildMemcardPath((DeviceName866E8 *)pathBuf, self->cardSlot, (char *)a1);
     delete(path);
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
-    flagCopy = a3;
     if (fileHandle == -1) {
         printf(D_80011530);
         return 0;
@@ -260,15 +234,13 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     req->frame0 = src->frame0;
     req->frame1 = src->frame1;
     req->frame2 = src->frame2;
-    write(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
+    write(fileHandle, req, (a3 << 7) + 0x80);
     BMemPMgrFree(req);
-    write(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
+    write(fileHandle, (void *)arg6, (((u32)arg7 + 0x7F) >> 7) << 7);
     close(fileHandle);
     return 1;
 }
-#endif
 
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_f", TaskObjF__TryWriteMemcardSaveFile);
 
 
 char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix) {
