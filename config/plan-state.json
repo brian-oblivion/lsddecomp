@@ -280,6 +280,16 @@
           "note": "REVISIT runners (8 sessions): code_2cc8c_e 3/3 (Class6E99C StartFadeToIndex/StartFadeDefault: forwarded-parameter arity to configure, parameter reused as result; PushPosition: whole-struct stash, movstrsi clobbers a0/a1); class_3bb8c_j 2/2 (func_80051F24 split reused handle; func_80051AC8 filed register rotation since round 9, really 2 long: unconditional assign, ternary max, inits before call); DreamSys 3/3 (StepLookYaw second name for this; CalcDreamColor row-pointer local; TryInstantTeleportLink early-return restructure); code_179d8_l 3/3 (func_8002CD08 one i++ after the join + arity; func_8002E138 (u8) cast -> & 0xFF; func_8002E308 sibling BeginVoiceFade + s16 params); class_3bb8c 3/3 (func_8004BE54 split local; func_8004BB3C loop-optimiser walker; func_8004C470 field-load operand order fixed at RTL, 183k-iteration negative); code_d294_b 1/1 (CheckBoundsOverlap 21 short -> 243/243: ternary min/max, pointer walkers); code_8220 1/1 (func_80017B34 split rounding statement, one pointer across arms); code_179d8_m 0/3 (StepVoiceFade 220/228 and StepVoiceEnvelope 223/231 length exact, one copy residue, 233k-iteration permuter negative; StartNote stopped: libsnd SpuVmKeyOn by call order + andi run). No match used a permuter.",
           "round": 73,
           "runners": 8
+        },
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-24",
+          "matches": 2,
+          "model": "opus",
+          "note": "REVISIT runner (charlie, code_179d8_h): OpenCdFile 43/43 and ReadCdFile 56/56, both 1 word long since round 17 and filed as path-address CSE / block placement plus register rotation. Real cause: a C loop (while/do) lets loop.c hoist &path out of the retry and puts arg setup in the back-edge delay slot; label+backward goto is not a loop. ReadCdFile mixes both (CdReadSync wait is a genuine do/while). No permuter.",
+          "round": 74,
+          "runners": 1
         }
       ],
       "status": "open"
@@ -406,6 +416,16 @@
           "note": "8 bodies promoted: VabStreamObj__PlayTone (code_179d8_e), func_80051AC8 + func_80051F24 (class_3bb8c_j), func_8004C470 (class_3bb8c), func_8002C278 (code_179d8_d, reader body B not the alias probe), TaskObjF__func_8004F8A4 (class_3bb8c_f), func_80064E34 (Entity_g); all hand-derived. Three of them (AC8, F24, C470) were then MATCHED by track-1 revisits the same round and their blocks replaced. func_80031A44 (code_179d8_j_c) NOT staffed: sits inside libsnd module range, calls SpuVmVSetUp; escalated.",
           "round": 73,
           "runners": 6
+        },
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-24",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "2 bodies promoted, both hand-derived: DreamSys__BuildLinkQueries (class_3bb8c_p, 13/116, not length-exact; head corrected the comment's 'scheduling only' to frame + register allocation) and Class876FC__DriftModelChildren (class_3bb8c_s, 117/121 length exact, commutative swap).",
+          "round": 74,
+          "runners": 2
         }
       ],
       "status": "auto"
@@ -441,6 +461,16 @@
           "model": "sonnet",
           "note": "bravo named all 61 of plan.py's unnamed list (libcd/bios CD_* and getintr/callback/cb_read; libsnd vmanager SpuVm*/SsUt*/note2pitch*, ssinit SsSetTickMode/_SsStart/SsEnd/_SsTrapIntrVSync/_SsSeqCalledTbyT_1per2, seqread SeqPlay/Cont*/NoteOn...; Snd_crescendo/decrescendo/play by ld pin). Head added two plan.py could not see: StartSeqTimer/StopSeqTimer -> SsStart/SsStart2 (4-way EXACT tie, position + body). No call-site/prototype disagreements. TRACK 2 DONE per plan.py. QuitSpu (18-way tie) left game-named, escalated.",
           "round": 71,
+          "runners": 1
+        },
+        {
+          "attempts": 25,
+          "calibration": false,
+          "date": "2026-09-24",
+          "matches": 23,
+          "model": "sonnet",
+          "note": "23 identified (shape >=0.93 + position; libsnd vmanager x20, ssinit _SsInit, seqread _SsSetControlChange, libcard _card_clear), incl. 6 game-worded names superseded (StepVoiceEnvelope->SetAutoVol, BeginVoiceFade->SeAutoPan, StepVoiceFade->SetAutoPan, InitSpuDriver->SpuVmInit, ClearNoiseVoices->SpuVmNoiseOff, StopNote->SpuVmKeyOff). 2 parked unidentified: func_8001F4E4 (best AddCOMB 0.80, position contradicts), func_8001F50C (TINY 4w, PadVersion/CdLastPos tie). Findings: SsUtKeyOn extern in code_179d8_e disagrees with header and definition; SsUtAllKeyOff preserved body void(void) but header/call site pass one arg.",
+          "round": 74,
           "runners": 1
         }
       ],
@@ -628,6 +658,16 @@
           "note": "Six Sonnet naming units, all reviewed and marked: StageGrid (1 fn + comment fix), class_3bb8c_g (16), code_2cc8c_d (33, Unk18Obj; fields named from GsSetLightMode/SetFarColor/SetFogNear/GsSortClear), code_2c054 (28, StreamTaskObj/TaskCoreObj; type-name collision fixed), class_39e08 (26, Obj865C8/Class86668), class_3bb8c_r (21 + a getter in class_3bb8c_o). No unit sent back; head corrections at merge: class_3bb8c_g's Class86E00_3bb8c_g__* -> TaskObjF__* (0x80086E00 is +0x3C inside gTaskObjFMethods) and a free function unprefixed; class_39e08's 4 inherited base slots Obj865C8__* -> Class86668__*; Unk18Obj setters renamed after their fields; LoadCardIcon tier A -> B.",
           "round": 73,
           "runners": 6
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-24",
+          "matches": 1,
+          "model": "sonnet",
+          "note": "code_8220 (Sonnet): BMemPMgr allocator (SetDefaultBMemPMgr, FreeMem, SetupBMemPMgrFreeList, BMemPMgrAlloc, BMemPMgrFree, gDefaultBMemPMgr) and BasicClass root methods named by vtable slot (Release, Finalize, Add/RemoveChild, RemoveAllChildren, GetNextChild, Add/Remove/ClearParentRefs, GetNextParentRef, Push/RemoveBasicClassListNode); func_80017EA8 kept (empty, zero callers). Reviewed, no wrong tier A; head added SetDefaultBMemPMgr's missing Naming section and restored FINISHING-PLAN's tier-C example rename.py had rewritten.",
+          "round": 74,
+          "runners": 1
         }
       ],
       "status": "open",
@@ -662,6 +702,7 @@
         "code_2cc8c_e": "2026-09-20",
         "code_2cc8c_f": "2026-09-18",
         "code_4cd08": "2026-09-21",
+        "code_8220": "2026-09-24",
         "code_8220_b": "2026-09-17",
         "code_d294": "2026-09-23",
         "code_d294_b": "2026-09-18",

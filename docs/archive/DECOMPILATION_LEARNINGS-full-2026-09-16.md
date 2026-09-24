@@ -9081,3 +9081,12 @@ already covered elsewhere in the sheet.
   shape -- round 50's seven-`volatile` sweep was structurally excluded by a number already printed
   at the top of the `.s`. Read the frame first and subtract args and saves; what remains is the
   spill budget your C must fit. (a round 62)
+
+## Distilled round 74 (2026-09-24)
+
+- **A recorded LENGTH figure is only comparable within one toolchain generation.** Round 45 filed
+  `SpuVmKeyOnNow` at 332 built words; the same preserved body rebuilt in round 65 gives 334, because
+  round 63 adopted `--nop-at-expansion`. Word-match was unaffected, so the two instruments decayed
+  differently: a maspsx flag that adds or drops an expansion nop changes every LENGTH figure recorded
+  before it and no MATCH figure. A title's "N words short/long" from before a flag landed is not
+  comparable with one after; rebuild the body and re-measure before ranking on it. (a round 65)

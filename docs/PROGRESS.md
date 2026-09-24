@@ -6,6 +6,103 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-24 — round 74: two one-word-long CD stalls were goto loops, and the SDK call surface closes
+
+**Five slots, five runner sessions, four tracks, every merge green.** The head
+ran on Opus as an ordinary head (not premium); nothing this round needed a
+premium head, and the plan-level findings are ESCALATED below. Gate 0 was
+clean and every worktree byte-verified before handover. Jobs 1-4 and 7 of the
+ready list were staffed. Jobs 5 (code_179d8_l naming) and 6 (code_179d8_e
+revisit) were skipped because the track 2 batch renamed functions both units
+define or call (call-graph contention, PARALLEL-RUNS §2.1). The one remaining
+edge, code_8220 naming -> class_3bb8c_p (`func_80017B34`), was handled by
+merging the class_3bb8c_p promotion first.
+
+| track | runner | model | outcome |
+| --- | --- | --- | --- |
+| 1 revisit | charlie, code_179d8_h | opus | **2 MATCHED of 2**: OpenCdFile 43/43, ReadCdFile 56/56 |
+| 1b | delta, class_3bb8c_p; echo, class_3bb8c_s | sonnet | 2 promoted: DreamSys__BuildLinkQueries (13/116, not length-exact), Class876FC__DriftModelChildren (117/121, length exact) |
+| 2 | bravo | sonnet | 23 of 25 identified, 2 parked unidentified; `plan.py` reads track 2 **done** |
+| 3 | alpha, code_8220 | sonnet | 17 placeholders named (BMemPMgr allocator, BasicClass root methods by slot); reviewed, marked |
+
+`plan.py` now reads 1120/1162 matched, revisit yield 42/62, track 3 at 35/75
+units.
+
+### The revisits: loop KIND, not register rotation
+
+Both CD functions had been one word long since round 17, and seven rounds had
+filed them as "path-address CSE plus register rotation" (OpenCdFile) or
+"block placement plus register rotation" (ReadCdFile). The cause was the kind
+of loop. A C `while`/`do` loop gets loop notes, so loop.c hoists `&path` out
+of the retry into a saved register. That costs one word and rotates the saved
+registers. A label plus a backward `goto` gets no loop notes, so nothing is
+hoisted. ReadCdFile needed its seek retry and its CdSync wait as goto loops,
+the error arm moved to an `else`, and one computation moved ahead of
+`CdControl`. Its CdReadSync wait is a genuine `do/while`, so one function
+mixes both kinds. The tell in the disassembly: a `do/while` back edge targets
+the `jal` and duplicates the argument setup in its delay slot, while a goto
+loop's back edge targets the setup itself. LEARNINGS' "syntax-gated" entry
+(3a) said round 54 had shown this lever does NOT reach OpenCdFile. It was
+corrected in place rather than given a new entry. No permuter was used.
+
+### Track 2
+
+The 23 names each rest on a shape fingerprint (0.93-1.00) plus link position.
+Twenty are libsnd vmanager; the others are `_SsInit` (ssinit),
+`_SsSetControlChange` (seqread) and `_card_clear` (libcard). Six replaced
+game-worded names given before the functions were known to be Sony's
+(StepVoiceEnvelope -> SetAutoVol, BeginVoiceFade -> SeAutoPan, StepVoiceFade ->
+SetAutoPan, InitSpuDriver -> SpuVmInit, ClearNoiseVoices -> SpuVmNoiseOff,
+StopNote -> SpuVmKeyOff). The two that stay `func_` carry an `unidentified`
+comment: `func_8001F4E4` (best AddCOMB 0.80, position contradicts) and
+`func_8001F50C` (4 words, exact tie PadVersion/CdLastPos). Two prototype
+findings were recorded rather than fixed: `SsUtKeyOn`'s extern at
+`src/code_179d8_e.c` disagrees with both the Psy-Q header and the unit's own
+byte-exact definition, and `SsUtAllKeyOff`'s preserved body is `void(void)`
+although the header and the call site pass one argument.
+
+Renaming onto Sony names rewrote four LEARNINGS citations
+(`func_8002CF18` -> `SpuVmAlloc` and so on). They were kept: those idioms were
+measured on bodies that matched as C, so they stand on real bytes, like
+`func_8003FC70` in CLAUDE.md.
+
+### Head corrections at merge
+
+- The BuildLinkQueries comment and the class_3bb8c_p header both said
+  "register-allocation/scheduling residue only". The body is not
+  length-exact and holds two extra callee-saved registers, which is a frame
+  difference, so both lines were corrected. The next revisit would have acted
+  on the wrong class.
+- rename.py rewrote FINISHING-PLAN §3 track 3's tier-C example,
+  `BasicClass__func_17eb0`, into `BasicClass__Release`, so the rule cited a
+  tier-A name as the placeholder form. It was restored with
+  `BasicClass__func_18350`, a live placeholder (escalation 1).
+- `SetDefaultBMemPMgr` had no `## Naming` section, so the head added it from
+  alpha's evidence. That is an omission, not a wrong tier-A name, so the
+  naming runner stays Sonnet.
+- The bravo merge conflicted in `config/symbols.slps01556.lsdde.txt` (both
+  runners appended at one spot; kept both, no duplicate name or address) and
+  in `src/code_179d8_e.c` (two rename passes on adjacent extern lines; both
+  applied). A tree-wide grep found no old name left from either pass.
+- LEARNINGS went 60 words over budget with the 3a correction. The round-65
+  entry "a recorded LENGTH figure is only comparable within one toolchain
+  generation" was moved to the archive.
+
+### ESCALATED (operator decisions; the head did not act)
+
+1. **rename.py still rewrites rule prose in FINISHING-PLAN.md.** Revision 14
+   lists "prose rewrites fixed", but this round it changed the tier-C example
+   in §3 track 3. A symbol cited as an EXAMPLE of a naming form is not a
+   reference to update. This is a tool change, so it is premium work.
+2. **plan.py's ready list does not price call-graph contention between its
+   own jobs.** Round 73 skipped three jobs for this reason and round 74
+   skipped two (the track 2 batch against code_179d8_l and code_179d8_e).
+   Under FINISHING-PLAN §6, a job the head keeps skipping for a good reason
+   means the fix belongs in the tool.
+3. **Track 2's two prototype findings** (`SsUtKeyOn` extern,
+   `SsUtAllKeyOff` arity) belong to no staffed job. They could fold into the
+   code_179d8_e revisit or an extern review, and the operator decides which.
+
 ## 2026-09-23 — round 73: sixteen of nineteen revisits match, none by permuter, and "register identity" was mostly shape
 
 **Five slots, twenty runner sessions, three tracks, every merge green.** The

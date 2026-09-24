@@ -116,9 +116,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **GCC 2.6.3's loop optimisations are SYNTAX-GATED, not CFG-gated.** LICM hoists a loop-carried
   literal comparison into a spare callee-saved register, one word SHORT; `label: …; if (cond) goto
   label;` defeats it, and register pressure is not the knob. Signature: extra `li $sN,<const>`
-  outside, missing `move` inside. Does not generalise across loops even within one function, and
-  does not reach a repeated LOCAL STACK-ADDRESS CSE across non-adjacent call sites (round 54,
-  `OpenCdFile`, two CFG shapes, neither). (a round 54)
+  outside, missing `move` inside. It also covers a loop-invariant STACK ADDRESS: retail recomputing
+  `addiu $sN,$sp,K` inside a retry loop while the built C holds it in a saved register (one word
+  long, saved registers rotated) is a goto loop, and so is a back edge that targets the argument
+  setup rather than the `jal` (a `do/while` copies that setup into the delay slot). Decide per loop:
+  `ReadCdFile` has both kinds. `OpenCdFile`/`ReadCdFile` closed this way (round 74) after seven
+  rounds filed them as CSE plus register rotation; round 54's "does not reach" was wrong. (a round 54)
 - **A redundant guard is NOT dead code — 2.6.3 compiles it literally.** GCC does not dedupe an
   explicit `if` against a loop's implicit entry test (where retail has ONE check, `guard + do-while`
   says so), and a provably-dead `x != 5 && x != 8 && x == 0xA` chain is byte-exact while its
@@ -686,12 +689,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   never-searched, ranking scaffold-rejected functions to the TOP. Rank a fresh unit by SIBLING GROUP
   and remember an unpromoted learning does not exist. (a §"\"Unscoreable\" describes a SESSION's
   state", §"Gate 1b's sixth screen is neither SOUND nor COMPLETE")
-- **A recorded LENGTH figure is only comparable within one toolchain generation.** Round 45 filed
-  `SpuVmKeyOnNow` at 332 built words; the same preserved body rebuilt in round 65 gives 334, because
-  round 63 adopted `--nop-at-expansion`. Word-match was unaffected, so the two instruments decayed
-  differently: a maspsx flag that adds or drops an expansion nop changes every LENGTH figure recorded
-  before it and no MATCH figure. A title's "N words short/long" from before a flag landed is not
-  comparable with one after; rebuild the body and re-measure before ranking on it. (a round 65)
 - **"Exact length" can be arithmetic rather than structure, and only the positional-skeleton figure
   notices.** `SpuVmAlloc` carried "EXACT LENGTH MATCH 167/167" from round 37 for 28 rounds; round
   65 found two one-word padding artifacts sitting on a body two words SHORT, summing to the right
