@@ -1946,3 +1946,12 @@ _SsInit = 0x8003221C; // type:func
 // internal-helper convention as _SsInit/_SsStart. Superseded game-style
 // func_80034690. Round 74 (bravo, track 2).
 _SsSetControlChange = 0x80034690; // type:func
+// identified: shape 1.00 vs libcard/card _card_clear (12w, exact length,
+// disc 3.3), position CONTIGUOUS on both sides with zero gap between
+// placed libcard objects (c171 _card_info ends exactly where this starts;
+// a78 _card_write starts exactly where this ends) -- confirmed
+// independently in round 39's own three-line analysis (banner comment,
+// src/class_3bb8c_v.c) that this is Sony libcard code whose object is not
+// on any disc in sdk/. Superseded game-style func_80050B28. Still a
+// STALL. Round 74 (bravo, track 2).
+_card_clear = 0x80050B28; // type:func

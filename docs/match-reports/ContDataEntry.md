@@ -543,7 +543,7 @@ real use). Four things were tried, in order:
    artifact).
 4. **A bare `__asm__("")` scheduling barrier** placed after each inner
    assignment: no effect (matches this round's HEAD BROADCAST finding that
-   a bare barrier was inert on a comparable residue in `func_80050B28`).
+   a bare barrier was inert on a comparable residue in `_card_clear`).
    The barrier is placed too late to affect the ANDI-hoisting/tail-merge
    decision, which is made while computing the assignment's RHS, not after
    the statement.

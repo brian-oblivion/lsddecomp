@@ -1,6 +1,6 @@
 /*
  * ===================================================================
- * ROUND 39 (head): func_80050B28 IS NOT GAME CODE.  DO NOT STAFF IT.
+ * ROUND 39 (head): _card_clear IS NOT GAME CODE.  DO NOT STAFF IT.
  * ===================================================================
  *
  * It is Psy-Q **libcard**.  Its object is simply not on the discs in `sdk/`,
@@ -26,7 +26,7 @@
  * So the round-32 "li-encoding residue is toolchain-unreachable" mechanism
  * is CORRECT and its conclusion was not: a rule that is wrong for 1
  * instruction in 1090 is not wrong, and the instruction came from Sony's
- * assembler.  Full evidence in docs/match-reports/func_80050B28.md.
+ * assembler.  Full evidence in docs/match-reports/_card_clear.md.
  *
  * Everything below this banner predates that finding.  It is kept because
  * the derivation is sound and because the comment's own history is the
@@ -38,7 +38,7 @@
 
 /*
  * class_3bb8c_v -- carved round 27 (2026-09-10).  ONE function,
- * func_80050B28 (12 words), file 0x41328..0x41358, vram 0x80050B28.
+ * _card_clear (12 words), file 0x41328..0x41358, vram 0x80050B28.
  *
  * A one-function unit is deliberate, not an accident of carving.  This
  * function is wedged between two PSX BIOS trampoline clusters inside the old
@@ -59,12 +59,12 @@
  * YOUR OWN.  `src/class_3bb8c_e.c` already carries the canonical
  * declaration, from its own call site at line 296:
  *
- *     extern s32 func_80050B28(s32 arg0);        // class_3bb8c_e.c:276
+ *     extern s32 _card_clear(s32 arg0);        // class_3bb8c_e.c:276
  *     ...
- *     func_80050B28(self->unk10);                // class_3bb8c_e.c:296
+ *     _card_clear(self->unk10);                // class_3bb8c_e.c:296
  *
  * and documents `unk10` (+0x010) as "a resource handle passed to
- * _card_info / _card_load / func_80050B28" -- the other two being the
+ * _card_info / _card_load / _card_clear" -- the other two being the
  * 0xA0 BIOS trampolines either side of this function.  So this is a small
  * resource/handle call returning `s32`.  MATCH THAT DECLARATION rather than
  * writing a second one: a competing prototype for a function another unit
@@ -88,4 +88,4 @@
  * toolchain-unreachable, frame-offset residue resists all tried levers, see
  * the match report). Restored to INCLUDE_ASM per the no-score-short-of-
  * byte-exact rule; the corrected, linkable body is preserved in the report. */
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_v", func_80050B28);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_v", _card_clear);

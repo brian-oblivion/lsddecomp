@@ -137,7 +137,7 @@ triggering it, not yet identified.
 
 Head broadcast round 27's callee-saved-register lever (a promoted
 parameter reaching a home-slot spill vs. a dedicated `$sN`, see
-`func_80050B28`'s writeup) with this function named as the live
+`_card_clear`'s writeup) with this function named as the live
 candidate. Checked directly rather than inferred from the frame-size gap:
 
 ```sh
