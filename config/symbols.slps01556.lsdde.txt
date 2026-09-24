@@ -1828,3 +1828,4 @@ BMemPMgrAlloc = 0x80017B34; // type:func
 BMemPMgrFree = 0x80017CFC; // type:func
 PushBasicClassListNode = 0x800181AC; // type:func
 RemoveBasicClassListNode = 0x80018208; // type:func
+gDefaultBMemPMgr = 0x8008A818;

@@ -30,7 +30,7 @@
  * List nodes come from the pool allocator (BMemPMgrInit/BMemPMgrAlloc/
  * BMemPMgrFree family; BMemPMgrAlloc and BMemPMgrFree's second
  * "pool" parameter is a fallback used only when a global default pool
- * pointer, D_8008A818, is unset -- established already by
+ * pointer, gDefaultBMemPMgr, is unset -- established already by
  * include/class_3ac78.h, include/DreamSys.h etc., which all declare
  * both as single-argument).
  */
@@ -111,7 +111,7 @@ struct BMemPMgr {
  * THIS header, uniquely, declares both with UNSPECIFIED parameters
  * (empty parens). Round 45 (BMemPMgrAlloc/BMemPMgrFree, matched): each
  * function's own BODY genuinely reads a second argument ($a1, a fallback
- * pool pointer used only when the global default pool D_8008A818 is
+ * pool pointer used only when the global default pool gDefaultBMemPMgr is
  * unset -- dead in practice at every decoded call site, confirmed by
  * SetupBMemPMgrFreeList/A9C setting that global before either is ever called).
  * Both are therefore DEFINED in code_8220.c with an old-style
@@ -131,17 +131,17 @@ extern void *BMemPMgrFree(); /* arity-ok: re-measured round 59, same -- `move s1
 /* BMemPMgr setup, gp_rel-blocked (docs/research/gp-relative-blocker.md).
  * Called only by BMemPMgrInit in this unit. Genuinely ONE argument: its
  * own body's $a1 is a fallback pool pointer (defaulting to $a0/self) used
- * only when the global default pool D_8008A818 is unset, and
+ * only when the global default pool gDefaultBMemPMgr is unset, and
  * BMemPMgrInit's call site never sets $a1 before the `jal` -- confirmed
  * by objdump: declaring a second parameter here forces the caller to
  * materialise a spurious `move a1,s1`, one word too many. */
 extern void SetupBMemPMgrFreeList(BMemPMgr *pool);
 
 /* The default-pool global itself (see the comment above). Setter is
- * SetDefaultBMemPMgr(BMemPMgr *pool), a one-line `D_8008A818 = pool;`. Not yet
+ * SetDefaultBMemPMgr(BMemPMgr *pool), a one-line `gDefaultBMemPMgr = pool;`. Not yet
  * called from any carved C -- BMemPMgrInit never calls it, so whoever
  * establishes the game's one default pool is still asm. */
-extern BMemPMgr *D_8008A818;
+extern BMemPMgr *gDefaultBMemPMgr;
 
 /* Pool allocator/free critical-section flag, code_8220_b (setter
  * SetBMemPMgrBusy, getter GetBMemPMgrBusy). BMemPMgrAlloc/BMemPMgrFree in

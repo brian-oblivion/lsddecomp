@@ -223,7 +223,7 @@ void *BMemPMgrFree(ptr, pool)
     u32 nextFree;
 
     SetBMemPMgrBusy(1);
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -347,7 +347,7 @@ before writing it:
 ```
 
 `$a1` is a fallback pool pointer, consumed only on the path where the
-`$gp`-relative default pool `D_8008A818` is unset (`lw t0,16(gp)` /
+`$gp`-relative default pool `gDefaultBMemPMgr` is unset (`lw t0,16(gp)` /
 `bnez t0,...` immediately before). It is dead in practice at every decoded call
 site, because `SetupBMemPMgrFreeList`/`SetDefaultBMemPMgr` set that global first — but it is
 read, so these are two-argument functions.

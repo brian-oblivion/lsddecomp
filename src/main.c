@@ -23,7 +23,7 @@ extern void SetMem(s32 mode);
  * code_8220.h already uses for BMemPMgrAlloc/BMemPMgrFree. */
 extern void *BMemPMgrInit(); /* arity-ok: the dead 2nd argument IS byte-load-bearing here -- retail emits `move a1,zero` in the jal's delay slot at 0x80011900 */
 
-/* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `D_8008A818 = pool;`, matched
+/* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `gDefaultBMemPMgr = pool;`, matched
  * in code_8220.c but not yet declared in code_8220.h (no carved caller
  * existed until now). */
 extern void SetDefaultBMemPMgr(BMemPMgr *pool);

@@ -36,7 +36,7 @@ void *BMemPMgrInit(s32 poolSize)
 
 void SetDefaultBMemPMgr(BMemPMgr *pool)
 {
-    D_8008A818 = pool;
+    gDefaultBMemPMgr = pool;
 }
 
 void FreeMem(void *ptr)
@@ -50,7 +50,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool)
     BMemBlockHdr *header;
     u8 *end;
 
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -80,7 +80,7 @@ void *BMemPMgrAlloc(size, pool)
 
     SetBMemPMgrBusy(1);
     result = NULL;
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -168,7 +168,7 @@ void *BMemPMgrFree(ptr, pool)
     u32 nextFree;
 
     SetBMemPMgrBusy(1);
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }

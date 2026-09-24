@@ -17,13 +17,13 @@ memory-pool subsystem's global default-pool pointer) was already correct.
 ```c
 void SetDefaultBMemPMgr(BMemPMgr *pool)
 {
-    D_8008A818 = pool;
+    gDefaultBMemPMgr = pool;
 }
 ```
 
-`D_8008A818` is the global "current default pool" pointer, the same global
+`gDefaultBMemPMgr` is the global "current default pool" pointer, the same global
 `SetupBMemPMgrFreeList`, `BMemPMgrAlloc` and `BMemPMgrFree` (this unit) all read.
-Declared `extern BMemPMgr *D_8008A818;` in `include/code_8220.h`, next to
+Declared `extern BMemPMgr *gDefaultBMemPMgr;` in `include/code_8220.h`, next to
 `SetupBMemPMgrFreeList`'s own doc comment which already named this global. Not
 called from any carved C yet — nothing in this unit or its siblings
 invokes it, so whoever establishes the game's one default pool at startup

@@ -33,7 +33,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool)
     BMemBlockHdr *header;
     u8 *end;
 
-    mgr = D_8008A818;
+    mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -77,7 +77,7 @@ already-matched `BMemPMgrInit`'s `pool->freeListHead = (u8 *)pool + 0x1C;`
 assignment; `void *` still converts implicitly into the local `header`
 variable with no cast needed.
 
-The `pool` argument is genuinely used only as the `D_8008A818 == NULL`
+The `pool` argument is genuinely used only as the `gDefaultBMemPMgr == NULL`
 fallback, confirmed byte-exact — the old report's read of the calling
 convention (one real argument; `$a1`'s "fallback pool" role) was correct
 and needed no revision.
