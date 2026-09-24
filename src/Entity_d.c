@@ -34,7 +34,7 @@ extern s16 sScaleTemplateZDenom;
  * Return value is unused at this, its only known call site, so void is a
  * safe read regardless of the real return type (same caveat CLAUDE.md notes
  * for every other such wrapper in this unit). */
-extern void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
+extern void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
 
 /* Data tables reached with a raw pointer by this unit's mood-dispatch
  * handlers -- same convention as Entity_c.c's own SCALE_Y2/SCALE_SIX/etc
@@ -118,7 +118,7 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
         this->moodState = rand() % 5 + 0xA;
     }
     if (this->moodState < 0xE || this->moodTimer < 0x140) {
-        Entity__AdvanceWobbleAndDeactivate(this, out, 0xBB8, 0x1F4, -0x100);
+        Entity__StepYawInWindowsThenDeactivate(this, out, 0xBB8, 0x1F4, -0x100);
         return;
     }
     if (this->moodState == 0xE) {

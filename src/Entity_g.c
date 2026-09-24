@@ -15,7 +15,7 @@
  * `handler` word, different data0/data1/data2) -- one function shared by
  * two mood-row configurations, named for its lower row.
  *
- * The 20th function, `Entity__AdvanceWobbleAndDeactivate` (formerly
+ * The 20th function, `Entity__StepYawInWindowsThenDeactivate` (formerly
  * `func_80064FBC`), is not itself a table row -- it is a shared per-tick
  * helper called directly (`jal`) by two different row handlers:
  * `Entity__MoodCue111` (this unit, twice) and `Entity__MoodCue40`
@@ -63,14 +63,14 @@ extern u8 ROTATION_YAW_MINUS9[];
 extern u8 ROTATION_YAW_PLUS9[];
 extern u8 SCALE_THIRTY_SECOND[];
 
-/* Entity__AdvanceWobbleAndDeactivate, this unit's own function, is called by Entity__MoodCue111
+/* Entity__StepYawInWindowsThenDeactivate, this unit's own function, is called by Entity__MoodCue111
  * (earlier in ROM order) before its own definition below -- forward
  * declaration, same convention CLAUDE.md documents for calling into a
  * function defined later in the same unit (the helper is itself matched,
  * not a stall; the forward declaration is only about ROM-order source
  * placement). Already known cross-unit from Entity_d.c's own extern
  * (Entity__MoodCue40's caller there), reproduced here matching. */
-extern void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
+extern void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
 
 void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
@@ -248,13 +248,13 @@ void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer >= 0xAF1) {
             this->methods->slotCC(this, -0x20, 0);
         }
-        Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, 0xFA0, -0x3C);
+        Entity__StepYawInWindowsThenDeactivate(this, out, 0x1E1, 0xFA0, -0x3C);
     } else {
-        Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, 0x884, -0x3C);
+        Entity__StepYawInWindowsThenDeactivate(this, out, 0x1E1, 0x884, -0x3C);
     }
 }
 
-void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
+void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
     s32 timer;
 
     out->unk10 = 0;

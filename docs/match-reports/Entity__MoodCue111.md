@@ -13,7 +13,7 @@ REVISITED, round 75: MATCHED 98/98 in 1 build (lever: two call sites); names/typ
 unchanged): `69/98`, `insertions 9 / deletions 9 (opcode-level; positional
 skeleton diffs 22)`, whole image red — the recorded figures reproduce.
 
-**The lever: retail has TWO calls to `Entity__AdvanceWobbleAndDeactivate`, one per arm of the
+**The lever: retail has TWO calls to `Entity__StepYawInWindowsThenDeactivate`, one per arm of the
 `unk44 != 0 && unkFC >= 0x870` test, not one call fed by `arg3`.** The tell
 was in the asm the whole time: two separate argument set-up blocks
 (`.L80064F70` with `a3 = 0xFA0`, `.L80064F88` with `a3 = 0x884`), each
@@ -33,9 +33,9 @@ there is only one such block, hence 7 words short.
         if (this->moodTimer >= 0xAF1) {
             this->methods->slotCC(this, -0x20, 0);
         }
-        Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, 0xFA0, -0x3C);
+        Entity__StepYawInWindowsThenDeactivate(this, out, 0x1E1, 0xFA0, -0x3C);
     } else {
-        Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, 0x884, -0x3C);
+        Entity__StepYawInWindowsThenDeactivate(this, out, 0x1E1, 0x884, -0x3C);
     }
 ```
 
@@ -84,7 +84,7 @@ methods->slot200(this->unk94) == 5` and `this->unkFC==0`. If `this->unk44
 != 0` and `this->unkFC >= 0x870`: a nested set of exact/range checks on
 `unkFC` early-returns after setting various `out->` fields or dispatching
 `slot130`/`slot12C`, or falls through to a shared tail call into
-`Entity__AdvanceWobbleAndDeactivate` (this unit's own next-in-queue function, forward-declared)
+`Entity__StepYawInWindowsThenDeactivate` (this unit's own next-in-queue function, forward-declared)
 with one of two `arg3` values (`0x884` default, `0xFA0` on the
 `unk44!=0 && unkFC>=0x870` path) and a constant `arg4 = -0x3C`.
 
@@ -131,13 +131,13 @@ void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
     } else {
         arg3 = 0x884;
     }
-    Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, arg3, -0x3C);
+    Entity__StepYawInWindowsThenDeactivate(this, out, 0x1E1, arg3, -0x3C);
 }
 #endif
 ```
 
 Every branch target, every field write, every literal, and the identity of
-the shared call to `Entity__AdvanceWobbleAndDeactivate` are confirmed correct against the
+the shared call to `Entity__StepYawInWindowsThenDeactivate` are confirmed correct against the
 disassembly -- the CONTROL FLOW is not in question.
 
 ## The residue
@@ -192,7 +192,7 @@ branch points and this round's remaining queue size.
 ## Struct/table knowledge established
 
 None beyond what the control-flow trace above already confirms
-(`unk44`, `unkFC`, `slot130`, `slot12C`, `slotCC`, and `Entity__AdvanceWobbleAndDeactivate`'s
+(`unk44`, `unkFC`, `slot130`, `slot12C`, `slotCC`, and `Entity__StepYawInWindowsThenDeactivate`'s
 own 5-argument signature, cross-checked against `Entity_d.c`'s existing
 extern for the same function).
 
@@ -238,7 +238,7 @@ Both of these branches, when TAKEN, jump to `.L80064F88` -- which is an
 EARLY-RETURN-adjacent path in the `this->unk44 == 0` / `unkFC < 0x870`
 case, i.e. neither delay slot's `-0x3C` is even consumed on the path that
 takes it; retail is filling otherwise-empty delay slots with a value it
-already knows it will need later (at the actual `Entity__AdvanceWobbleAndDeactivate` tail
+already knows it will need later (at the actual `Entity__StepYawInWindowsThenDeactivate` tail
 call), opportunistically, rather than paying to keep it live in a
 register across the intervening `jalr`s. This is a scheduler-level
 decision (which delay slots to fill with an unrelated-but-needed-later
@@ -268,11 +268,11 @@ iterations. Best score reached: **500** (down from base 800), never 0.
 **Both improving candidates found (760 and 500) are non-idiomatic and were
 rejected, not banked:**
 - The 760 candidate drops the `arg3 = 0xFA0;` assignment entirely (replaced
-  with a dead empty `else { ; }`) and hardcodes `Entity__AdvanceWobbleAndDeactivate`'s 4th
+  with a dead empty `else { ; }`) and hardcodes `Entity__StepYawInWindowsThenDeactivate`'s 4th
   argument to the literal `0x884` unconditionally -- this silently changes
   behavior on the `this->unk44 != 0 && this->unkFC >= 0x870` path (which
   should pass `0xFA0`, not `0x884`). A real bug, not a lead.
-- The 500 candidate wraps the single `Entity__AdvanceWobbleAndDeactivate(...)` call in a
+- The 500 candidate wraps the single `Entity__StepYawInWindowsThenDeactivate(...)` call in a
   redundant `if (arg3) { call } else { call }` with an IDENTICAL call in
   both arms -- a dead/tautological branch (`arg3` is always non-zero on
   every path that reaches this point) that apparently nudges the
@@ -300,7 +300,7 @@ shared with its neighbor even within the same merge group.
 **Six structural variants tried, spanning both directions of the size
 gap:**
 
-1. **Four fully independent `Entity__AdvanceWobbleAndDeactivate(...)` call statements**, one
+1. **Four fully independent `Entity__StepYawInWindowsThenDeactivate(...)` call statements**, one
    per branch, no shared `arg3` variable at all (on the theory retail's
    source might genuinely repeat the whole call four times and let
    cross-jump find its own merge, mirroring `Entity__MoodCue115`'s nested-merge
