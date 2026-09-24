@@ -1058,7 +1058,14 @@ GetClass6E99CMethods = 0x800404C0; // type:func
 New_ClassEAC0 = 0x800404D0; // type:func
 ClassEAC0__ClassEAC0 = 0x8004054C; // type:func
 ClassEAC0__FinishConstruct = 0x800405D0; // type:func
-BeginVoiceFade = 0x8002E874; // type:func
+// identified: shape 0.97 vs libsnd/vmanager SeAutoVol (110w vs our 116w,
+// disc 3.3) -- the same tied candidate as SeAutoVol (0x8002E308);
+// disambiguated by family: this function operates on the gVoiceFade*
+// globals, the family StepVoiceFade (-> SetAutoPan) uses, mirroring Sony's
+// public SsUtAutoVol/SsUtAutoPan pair (LIBSND.H) onto internal
+// SeAutoVol/SeAutoPan. Superseded game-style name BeginVoiceFade.
+// Round 74 (bravo, track 2).
+SeAutoPan = 0x8002E874; // type:func
 StepVoiceFade = 0x8002EA44; // type:func
 // identified: shape 0.99 vs libsnd/vmanager SetAutoVol (227w vs our 231w,
 // disc 3.3), position within the libsnd neighborhood, directly after

@@ -1,4 +1,6 @@
-# BeginVoiceFade -- MATCHED (116/116 words)
+# SeAutoPan -- MATCHED (116/116 words)
+
+> Renamed from `BeginVoiceFade` on 2026-09-24 (tools/rename.py). Address 0x8002e874.
 
 > Renamed from `func_8002E874` on 2026-09-20 (tools/rename.py). Address 0x8002e874.
 
@@ -24,7 +26,7 @@ extern Rec34Half gVoiceFadeCountdown[]; /* step/quotient (companion pair) */
 extern Rec34Half gVoiceFadeAccum[]; /* saved start value */
 extern Rec34Half gVoiceFadeLimit[]; /* saved end value */
 
-void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
+void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
 
     if (a1 == a2) {
@@ -152,7 +154,7 @@ empty, the block runs on every path through that point.
 
 ## Naming
 
-**BeginVoiceFade** (was `func_8002E874`) -- Tier B. Mechanics fully evident
+**SeAutoPan** (was `func_8002E874`) -- Tier B. Mechanics fully evident
 from the body: given a voice index and a from/to/rate triple, it
 unconditionally records the from/to pair and the "fading" flag into the
 `gVoiceFade*` arrays, then computes a per-tick step (and, in the

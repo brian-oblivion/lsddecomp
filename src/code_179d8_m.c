@@ -27,7 +27,7 @@
  *     code_179d8_l) and, if one exists, key it on (vmNoiseOn2, also
  *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
  *     two hardcoded constants.
- *   - BeginVoiceFade / StepVoiceFade: a linear-ramp pair over the
+ *   - SeAutoPan / StepVoiceFade: a linear-ramp pair over the
  *     gVoiceFade* per-voice arrays -- Begin sets a start/target/step-rate;
  *     Step advances the accumulator (throttled by an interval/countdown
  *     pair), clamps at the target, and writes the resulting stereo output
@@ -219,14 +219,14 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoVol);
  * own local view rather than sharing that file's header-less types.
  * Six independent 2-bytes-apart symbols share this one shape, same
  * idiom as code_179d8_j.c's own D_8008D994/D_8008D996/... family. */
-extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by BeginVoiceFade, cleared by StepVoiceFade when gVoiceFadeAccum reaches gVoiceFadeLimit */
+extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by SeAutoPan, cleared by StepVoiceFade when gVoiceFadeAccum reaches gVoiceFadeLimit */
 extern Rec34Half gVoiceFadeStep[]; /* per-tick increment/decrement applied to gVoiceFadeAccum */
 extern Rec34Half gVoiceFadeInterval[]; /* ticks between steps (0 = every tick); same throttle idiom as gVoiceEnvInterval above */
 extern Rec34Half gVoiceFadeCountdown[]; /* countdown to the next step, reloaded from gVoiceFadeInterval */
-extern Rec34Half gVoiceFadeAccum[]; /* running interpolated value, initialized to BeginVoiceFade's "from" argument */
-extern Rec34Half gVoiceFadeLimit[]; /* target value the fade is moving toward, BeginVoiceFade's "to" argument */
+extern Rec34Half gVoiceFadeAccum[]; /* running interpolated value, initialized to SeAutoPan's "from" argument */
+extern Rec34Half gVoiceFadeLimit[]; /* target value the fade is moving toward, SeAutoPan's "to" argument */
 
-void BeginVoiceFade(s16 a0, s16 a1, s16 a2, s16 a3) {
+void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
 
     if (a1 == a2) {
@@ -556,7 +556,7 @@ void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
 /* Same 0x34-stride channel-configuration record family documented in
  * code_179d8_j.c (Rec34D994/Rec34Byte); this unit keeps its own local
  * view rather than sharing that file's header-less types. Rec34Half
- * itself is declared above, before its first user BeginVoiceFade. */
+ * itself is declared above, before its first user SeAutoPan. */
 typedef struct {
     u8 unk0; /* +0x0 */
     u8 pad1[0x34 - 0x1];

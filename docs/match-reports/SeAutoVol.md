@@ -11,7 +11,7 @@ file), funcdiff raw 1/116 (drift), `insertions 55 / deletions 55`,
 positional skeleton diffs 114.
 
 **Lever: sibling body.** This report and the unit's carve note both said
-this function is a near-identical sibling of `BeginVoiceFade` in
+this function is a near-identical sibling of `SeAutoPan` in
 `code_179d8_m`, which is matched. That body was copied with the
 `gVoiceFade*` arrays renamed to the `gVoiceEnv*` family, and it matched on
 the first build. The whole five-round residue came from the preserved body
@@ -101,7 +101,7 @@ the unit's carve-time header comment**, not a BIOS trampoline: the opening
 `addu $t3,$a0,$zero` / `addu $t0,$a1,$zero` / `addu $t1,$a2,$zero` preserves
 each of three incoming parameters in a raw (un-narrowed) register BEFORE the
 same three registers get narrowed to `s16` in place (`sll..16`/`sra..16`).
-Confirmed by hand, matching the header's note that `BeginVoiceFade` in
+Confirmed by hand, matching the header's note that `SeAutoPan` in
 `code_179d8_m` (this round's runner bravo) opens with the identical
 three-register preserve-then-narrow prologue and the same early-out branch
 comparing two of the narrowed arguments — **this is the same shape as that

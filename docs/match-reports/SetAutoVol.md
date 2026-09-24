@@ -287,7 +287,7 @@ and rebuilt from scratch.
 **This function sits FIRST in `code_179d8_m.c`**, so the shared
 `Rec34Half`/`Rec34HalfU`/`Rec16D7F0`/`ObjE970`/scratch-global declarations
 this body needs (originally written for a standalone splice with their
-own flat externs) are declared LATER in the file, after `BeginVoiceFade`
+own flat externs) are declared LATER in the file, after `SeAutoPan`
 and `StepVoiceFade`'s own stall bodies. Re-declaring them again here under
 the same names is a hard conflict (duplicate typedef names, and for
 `D_8008E970`/`D_8008D7F0`/`D_8008D7F2` a redeclaration of the same extern
@@ -300,7 +300,7 @@ time rather than a symbol.
 `gVoiceFadeActive`.`gVoiceFadeLimit` externs, `Rec34HalfU`, `Rec16D7F0` +
 `D_8008D7F0`/`D_8008D7F2`, `D_8008D970`, `ObjE970` + `D_8008E970`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) from its old position (between
-`BeginVoiceFade` and `StepVoiceFade`) up to right after `#include
+`SeAutoPan` and `StepVoiceFade`) up to right after `#include
 "common.h"`, adding this function's own `gVoiceEnvActive`/`A6`/`A8`/`AA`/`AC`/`AE`
 externs (same `Rec34Half` shape, disjoint symbols) alongside the existing
 ones.** Declaration order carries no code -- only DEFINITIONS need strict

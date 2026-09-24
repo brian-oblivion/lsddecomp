@@ -195,7 +195,7 @@ positive, else reset from `gVoiceFadeInterval`" shape as the OTHER interpolation
 functions in this unit), then an accumulator update against a clamped limit
 (`gVoiceFadeStep`/`gVoiceFadeAccum`/`gVoiceFadeLimit`, the SAME "increment, clamp against
 a limit whose comparison direction depends on the increment's sign" shape
-already documented for `BeginVoiceFade`'s and `StopNote`'s siblings in
+already documented for `SeAutoPan`'s and `StopNote`'s siblings in
 this record family). Then a four-stage 7-bit-percentage blend chain:
 combine two byte-scratch globals through the identified 16129 divisor
 (twice, once signed once unsigned) to get a base level `q2`, then apply
@@ -595,13 +595,13 @@ void StepVoiceFade(s16 a0) {
 ## Naming
 
 **StepVoiceFade** (was `func_8002EA44`) -- Tier B. Companion to
-BeginVoiceFade: advances `gVoiceFadeAccum` toward `gVoiceFadeLimit` by
+SeAutoPan: advances `gVoiceFadeAccum` toward `gVoiceFadeLimit` by
 `gVoiceFadeStep`, throttled by `gVoiceFadeInterval`/`gVoiceFadeCountdown`,
 clears `gVoiceFadeActive` on reaching the limit, then computes and writes
 this voice's stereo output level from the resulting percentage (same
 final block as SetAutoVol, confirmed near-identical between the
 two reports). "Fade" rather than a more specific name for the same reason
-as BeginVoiceFade: what value is actually being interpolated in-game is
+as SeAutoPan: what value is actually being interpolated in-game is
 not established from this function's body alone.
 
 ## NON_MATCHING body promoted, round 67
