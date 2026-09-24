@@ -1,4 +1,6 @@
-# func_80052C10
+# ObjM__ObjM
+
+> Renamed from `func_80052C10` on 2026-09-24 (tools/rename.py). Address 0x80052c10.
 
 **Unit:** class_3bb8c_k · **Size:** 50 instructions (0xC8 bytes) ·
 **Status: MATCHED 50/50**, whole-image SHA1 green (matched together with
@@ -40,7 +42,7 @@ alloc size, a nice independent confirmation that this is the right object.
 ## Signature
 
 ```c
-void func_80052C10(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+void ObjM__ObjM(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 ```
 
 `arg1`'s type (`SubObjB *`) is fixed by the base-ctor call
@@ -52,7 +54,7 @@ call's `SubObjB *` argument, and separately stored into `self->unk6C`.
 ## Final source
 
 ```c
-void func_80052C10(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+void ObjM__ObjM(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
     GetClass86668Methods()->ctor((Obj865C8 *)self, 0, arg1);
     self->methods = GetObjMMethods();

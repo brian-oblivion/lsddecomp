@@ -2024,3 +2024,4 @@ Class86F88__StepCursorInView = 0x80052A58; // type:func
 Class86F88__GetCursorIndex = 0x80052B54; // type:func
 GetClass86F88Methods = 0x80052B60; // type:func
 New_ObjM = 0x80052B70; // type:func
+ObjM__ObjM = 0x80052C10; // type:func

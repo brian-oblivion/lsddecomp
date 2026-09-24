@@ -13,7 +13,7 @@ via `BMemPMgrAlloc`; if allocation succeeds, dispatches through the
 returned vtable's `+0x008` (ctor) slot with the 5 forwarded arguments and
 returns the new instance; returns `NULL` on allocation failure.
 
-`func_80052C10` (this unit, matched in the same round) IS the ctor slot
+`ObjM__ObjM` (this unit, matched in the same round) IS the ctor slot
 this function dispatches to.
 
 ## Signature

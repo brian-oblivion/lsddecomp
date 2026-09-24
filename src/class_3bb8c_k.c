@@ -47,9 +47,9 @@
  * Obj87034_3bb8c_l/Obj87034Methods_3bb8c_l (see include/class_3bb8c.h):
  * that unit reaches slots 0x004/0x010/0x014/0x048/0x074/0x07C/0x080/0x084/
  * 0x088/0x08C/0x0C0/0x0C4/0x0C8/0x0D0/0x0D4; this unit's own two functions
- * (New_ObjM, the New_X allocator, and func_80052C10, its ctor target)
+ * (New_ObjM, the New_X allocator, and ObjM__ObjM, its ctor target)
  * reach only +0x008 (ctor) and +0x040 (a post-construct hook dispatched by
- * func_80052C10 itself). Kept LOCAL to this unit (not added to either
+ * ObjM__ObjM itself). Kept LOCAL to this unit (not added to either
  * shared header) per the project's multiple-independent-local-views
  * convention and this round's header-contention rule -- echo is live on
  * class_3bb8c_l's own view of the SAME table this round.
@@ -60,7 +60,7 @@
  * site) -- this file includes class_39e08.h, so New_ObjM's definition
  * below must match that prototype exactly (return type and first-argument
  * type) or the two conflict. The richer view below is used only inside
- * New_ObjM/func_80052C10's own bodies.
+ * New_ObjM/ObjM__ObjM's own bodies.
  */
 typedef struct Class87034Methods_3bb8c_k Class87034Methods_3bb8c_k;
 typedef struct Obj87034_3bb8c_k Obj87034_3bb8c_k;
@@ -70,7 +70,7 @@ struct Class87034Methods_3bb8c_k {
     /* +0x008, New_ObjM's own dispatch (New_X's ctor call). */
     void (*ctor)(void *self, SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
     u8 pad00C[0x040 - 0x00C];
-    /* +0x040, func_80052C10's own dispatch, right after filling self's
+    /* +0x040, ObjM__ObjM's own dispatch, right after filling self's
      * fields -- a post-construct hook, self only. */
     void (*slot40)(void *self);
     u8 pad044[0x054 - 0x044];
@@ -98,21 +98,21 @@ struct Class87034Methods_3bb8c_k {
 };
 
 struct Obj87034_3bb8c_k {
-    Class87034Methods_3bb8c_k *methods; /* +0x000, func_80052C10 */
+    Class87034Methods_3bb8c_k *methods; /* +0x000, ObjM__ObjM */
     u8 pad004[0x038 - 0x004];
-    s32 unk38;                          /* +0x038, func_80052C10: arg5 */
+    s32 unk38;                          /* +0x038, ObjM__ObjM: arg5 */
     u8 pad3C[0x054 - 0x03C];
-    s32 unk54;                          /* +0x054, func_80052C10: arg2 */
+    s32 unk54;                          /* +0x054, ObjM__ObjM: arg2 */
     u8 pad58[0x060 - 0x058];
-    s32 unk60;                          /* +0x060, func_80052C10: set to 1 */
-    s32 unk64;                          /* +0x064, func_80052C10: zeroed */
-    s32 unk68;                          /* +0x068, func_80052C10: zeroed */
-    SubObjB *unk6C;                     /* +0x06C, func_80052C10: arg1, also forwarded as the base ctor's own arg2 */
-    s32 unk70;                          /* +0x070, func_80052C10: arg4 */
-    s32 unk74;                          /* +0x074, func_80052C10: arg3 */
+    s32 unk60;                          /* +0x060, ObjM__ObjM: set to 1 */
+    s32 unk64;                          /* +0x064, ObjM__ObjM: zeroed */
+    s32 unk68;                          /* +0x068, ObjM__ObjM: zeroed */
+    SubObjB *unk6C;                     /* +0x06C, ObjM__ObjM: arg1, also forwarded as the base ctor's own arg2 */
+    s32 unk70;                          /* +0x070, ObjM__ObjM: arg4 */
+    s32 unk74;                          /* +0x074, ObjM__ObjM: arg3 */
     u8 pad78[0x080 - 0x078];
-    s32 unk80;                          /* +0x080, func_80052C10: zeroed */
-    s32 unk84;                          /* +0x084, func_80052C10: zeroed */
+    s32 unk80;                          /* +0x080, ObjM__ObjM: zeroed */
+    s32 unk84;                          /* +0x084, ObjM__ObjM: zeroed */
 };
 
 void Class86F88__SetState(Class86F88 *self, s32 state)
@@ -484,7 +484,7 @@ Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
     return NULL;
 }
 
-void func_80052C10(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+void ObjM__ObjM(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
     GetClass86668Methods()->ctor((Obj865C8 *)self, 0, arg1);
     self->methods = GetObjMMethods();

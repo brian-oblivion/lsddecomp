@@ -9,7 +9,7 @@ Unit `src/class_3bb8c_k.c`. Round 26, runner delta.
 An event/code dispatcher for this unit's own local view of method table
 `D_80087034` (`Obj87034_3bb8c_k` / `Class87034Methods_3bb8c_k`, both
 already declared earlier in this same file for `New_ObjM`/
-`func_80052C10`/`Class86F88__SetState`/`Class86F88__TickClosing`). Owns `jtbl_800116F4`, a
+`ObjM__ObjM`/`Class86F88__SetState`/`Class86F88__TickClosing`). Owns `jtbl_800116F4`, a
 sparse 22-entry jump table for codes `4..25`, six of which have real
 handlers and the rest fall through doing nothing:
 
@@ -75,7 +75,7 @@ pad044[0x10] + slot54(4) + pad058[8] + slot60(4) + pad064[0x18]
 = 16+4+8+4+24+4+4+4+4+4 = 76  (matches the original span exactly)
 ```
 
-`slot40` (already used by `func_80052C10`) and `slot90`/`slotB0`/`slotB4`
+`slot40` (already used by `ObjM__ObjM`) and `slot90`/`slotB0`/`slotB4`
 (already used by `func_80052D10`) keep their original offsets --
 confirmed by rebuilding (whole-image SHA1 green) after the struct edit,
 before writing this function's body. No cross-unit prototype and no new
