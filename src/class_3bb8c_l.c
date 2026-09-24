@@ -31,7 +31,7 @@
  * The previous version of this comment ended "All three have stub reports;
  * do not attempt them" -- a stale DIRECTIVE, which is worse than a stale
  * count. Two of the three are free ground.
- * The other 17 are clean (ObjM__NoOpSlot40 and func_800534C0 are bare
+ * The other 17 are clean (ObjM__NoOpSlot40 and ObjM__NoOpSlot7C are bare
  * `jr $ra; nop` stubs splat generated itself, so 15 are real work).
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
@@ -278,7 +278,7 @@ void func_80053458(Obj87034_3bb8c_l *self) {
     }
 }
 
-void func_800534C0(void) {
+void ObjM__NoOpSlot7C(void) {
 }
 
 /* self->unkC's real pointee for THIS function -- a DIFFERENT reading from
