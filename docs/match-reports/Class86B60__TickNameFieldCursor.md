@@ -1,4 +1,6 @@
-# func_8004DCD0 -- MATCHED, round 75 (78/78, whole image OK)
+# Class86B60__TickNameFieldCursor -- MATCHED, round 75 (78/78, whole image OK)
+
+> Renamed from `func_8004DCD0` on 2026-09-24 (tools/rename.py). Address 0x8004dcd0.
 
 REVISITED, round 75: MATCHED 78/78 in 11 builds; names/types used (the
 `Arg1DCD0_3bb8c_d` type became the type of the local `buf`, copied whole).
@@ -38,7 +40,7 @@ struct Arg1DCD0_3bb8c_d {
     s8 b2;
 };
 
-void func_8004DCD0(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
+void Class86B60__TickNameFieldCursor(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
 {
     Arg1DCD0_3bb8c_d buf;
     u8 *base;
@@ -105,7 +107,7 @@ source.
 > blocked functions now match (see `docs/research/gp-relative-blocker.md`,
 > "RESOLVED"). Everything below is round 43's attempt AFTER the fix.
 
-# func_8004DCD0 -- STALL, round 43
+# Class86B60__TickNameFieldCursor -- STALL, round 43
 
 **Length: 2 words short (76/78, retail 0x138 bytes).**
 **Raw word-match (unaligned, from the length-shifted window): 3/78.**
@@ -136,7 +138,7 @@ struct Arg1DCD0_3bb8c_d {
     s8 b2;
 };
 
-void func_8004DCD0(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
+void Class86B60__TickNameFieldCursor(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
 {
     u8 buf[3];
     u8 *base;
@@ -210,7 +212,7 @@ This is preserved verbatim, `#if 0`-wrapped, immediately above the
   `D_8008AA28` back (the ordinary compiled shape of an unsigned-char
   increment-and-wrap).
 - `self->unkB0->methods->slotB8(self->unkB0, buf)` -- reuses this round's
-  `func_8004DCD0`... (no -- reuses the slot round 43 ALSO establishes
+  `Class86B60__TickNameFieldCursor`... (no -- reuses the slot round 43 ALSO establishes
   in this same function; see header changes). **Confirmed correct.**
 
 ## The one open residue
@@ -263,7 +265,7 @@ Ran `tools/decomp-permuter` on variant (4) above (300s, `-j 4`,
 whoever resumes this**: `tools/setup-permuter.sh`'s generated
 `compile.sh` did NOT include `--gp-symbols`/`--no-nop-mflo-mfhi` in its
 `MASPSX_FLAGS` (it predates round 42's fix landing in the Makefile) --
-patched by hand in the (gitignored) `permuter-work/func_8004DCD0/compile.sh`
+patched by hand in the (gitignored) `permuter-work/Class86B60__TickNameFieldCursor/compile.sh`
 for this run; `tools/setup-permuter.sh` itself was NOT touched (out of
 this unit's scope). Without that patch the base score is nonsense (>3000,
 comparing against a `%hi`/`%lo`-relocated build of the candidate against a

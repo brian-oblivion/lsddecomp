@@ -1086,7 +1086,7 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
     /* +0x04C, Class86B60__ForwardToNameField's own 2nd call: `(self, arg1, &D_8008A9B4)`. */
     void (*slot4C)(Class86B60UnkB0Obj_3bb8c_d *self, s32 arg1, void *arg2);
     u8 pad050[0x0B8 - 0x050];
-    /* +0x0B8, func_8004DCD0's own last call: `(self, buf)` where `buf` is
+    /* +0x0B8, Class86B60__TickNameFieldCursor's own last call: `(self, buf)` where `buf` is
      * that function's own 3-byte stack buffer. Lands at the SAME offset
      * as `include/class_3bb8c.h`'s own `FieldM7CMethods::slotB8` (a
      * different unit's independent view) and `code_2cc8c.h`'s
@@ -1278,7 +1278,7 @@ struct Class86B60 {
      * and not (as a first reading of the raw asm suggested) `self`
      * re-stored through a leftover register. */
     s32 unk38;
-    /* +0x03C, func_8004DCD0: a flag tested `!= 0`, gating whether that
+    /* +0x03C, Class86B60__TickNameFieldCursor: a flag tested `!= 0`, gating whether that
      * function fills its own local 3-byte buffer from `arg1`'s bytes or
      * zeroes it instead. No setter in this unit. */
     s32 unk3C;
@@ -1453,7 +1453,7 @@ struct BaseTaskCtorTable_3bb8c_c {
     /* +0x0E0, Class86B60__ForwardToNameField's own first call: `(self, arg1)`, arg1 its
      * own forwarded 2nd parameter. */
     void (*slotE0)(void *self, s32 arg1);
-    /* +0x0E4, func_8004DCD0's own first, unconditional call: `(self,
+    /* +0x0E4, Class86B60__TickNameFieldCursor's own first, unconditional call: `(self,
      * arg1)`, arg1 its own forwarded 2nd parameter (opaque here). */
     void (*slotE4)(void *self, void *arg1);
 };
@@ -1538,14 +1538,14 @@ extern void *D_8008A9D0;
  * taken. */
 extern s32 D_80086D6C;
 
-/* func_8004DCD0's own rolling byte index (0/1/2, wraps to 0 at 3) into
+/* Class86B60__TickNameFieldCursor's own rolling byte index (0/1/2, wraps to 0 at 3) into
  * that function's own 3-byte stack buffer -- declared in the ROM image
  * as a full `.word` (`asm/data/7B12C.sdata.s`), but accessed only via
  * `lbu`/`sb` here, so `u8` is the correct C type for this unit's own
  * reference regardless of the underlying storage's full width. */
 extern u8 D_8008AA28;
 
-/* func_8004DCD0's own rolling word counter (wraps to 0 at 0x101). */
+/* Class86B60__TickNameFieldCursor's own rolling word counter (wraps to 0 at 0x101). */
 extern s32 D_8008AA2C;
 
 /* func_8004E34C's own one-shot init guard: read, then unconditionally

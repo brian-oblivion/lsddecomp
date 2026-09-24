@@ -80,7 +80,7 @@ Builds: baseline (with missing prototype, discarded) + baseline + 4 variants
 > never-searched ground rather than as exhausted ground.
 >
 > Independently confirmed: runner delta hit the same gap the same round on
-> `func_8004DCD0`, diagnosed it, and hand-patched its own gitignored
+> `Class86B60__TickNameFieldCursor`, diagnosed it, and hand-patched its own gitignored
 > `compile.sh` -- so delta's 26500-iteration negative IS valid while this one
 > is not. Two searches in one round, one trustworthy and one not, separated
 > only by whether the runner happened to notice.

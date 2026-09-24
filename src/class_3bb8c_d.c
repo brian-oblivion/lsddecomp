@@ -145,7 +145,7 @@ void Class86B60__ForwardToNameField(Class86B60 *self, s32 arg1)
     self->unkB0->methods->slot4C(self->unkB0, arg1, &D_8008A9B4);
 }
 
-/* func_8004DCD0's own `arg1`: a 3-byte colour-like triple, copied whole into
+/* Class86B60__TickNameFieldCursor's own `arg1`: a 3-byte colour-like triple, copied whole into
  * a local (the copy is a BLKmode struct move: three `lb`, then three `sb`).
  * Kept a minimal, distinct local type rather than reusing this header's
  * broader `Descriptor10` (same 3-byte shape, but an unrelated context --
@@ -158,10 +158,10 @@ struct Arg1DCD0_3bb8c_d {
 };
 
 /* MATCHED round 75 (was STALL round 43) -- see
- * docs/match-reports/func_8004DCD0.md. `base` is taken BEFORE the first call
+ * docs/match-reports/Class86B60__TickNameFieldCursor.md. `base` is taken BEFORE the first call
  * (so it crosses a call and gets $s1), `buf = *arg1` is one struct copy, and
  * each arm indexes `base[D_8008AA28]` directly. */
-void func_8004DCD0(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
+void Class86B60__TickNameFieldCursor(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
 {
     Arg1DCD0_3bb8c_d buf;
     u8 *base;
