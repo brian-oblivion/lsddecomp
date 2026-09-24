@@ -389,11 +389,6 @@ void *func_800662BC(Class65650 *self, void *hdr, void *extra)
     return hdr;
 }
 
-/* NON_MATCHING: 252/258 words, length exact (no drift). Residue: two
- * symmetric 3-word instruction-scheduling clusters around a compiler-
- * synthesized magic-multiply constant (docs/match-reports/func_80066340.md).
- * Hand-derived. */
-#ifdef NON_MATCHING
 void *func_80066340(Class65650 *self, void *acc, void *extra)
 {
     u8 outbuf[4];
@@ -421,35 +416,22 @@ void *func_80066340(Class65650 *self, void *acc, void *extra)
     case 1: {
         if (outbuf[2] & 1) {
             if (outbuf[2] & 2) {
-                s32 *pin;
                 s16 *p16 = t0->arr10;
 
-                i = 0;
-                pin = (s32 *)s0;
-                while (i < 3) {
+                for (i = 0; i < 3; i++, p16++) {
                     s16 tmp;
-                    tmp = *p16 + *pin / 360;
+
+                    tmp = *p16 + ((s32 *)s0)[i] / 360;
                     *p16 = tmp;
                     *p16 = tmp % 4096;
-                    pin++;
-                    i++;
-                    p16++;
                 }
                 s0 = (u8 *)s0 + 0xC;
             }
             if (outbuf[2] & 4) {
                 s32 *p32 = t0->arr00;
 
-                i = 0;
-                {
-                    s16 *pin = (s16 *)s0;
-
-                    while (i < 3) {
-                        *p32 = (*pin * *p32) / 4096;
-                        pin++;
-                        i++;
-                        p32++;
-                    }
+                for (i = 0; i < 3; i++, p32++) {
+                    *p32 = (((s16 *)s0)[i] * *p32) / 4096;
                 }
                 s0 = (u8 *)s0 + 8;
             }
@@ -459,46 +441,24 @@ void *func_80066340(Class65650 *self, void *acc, void *extra)
             {
                 s32 *p32 = t0->arr18;
 
-                i = 0;
-                {
-                    s32 *pin = (s32 *)s0;
-
-                    while (i < 3) {
-                        *p32 += *pin;
-                        pin++;
-                        i++;
-                        p32++;
-                    }
+                for (i = 0; i < 3; i++, p32++) {
+                    *p32 += ((s32 *)s0)[i];
                 }
             }
         } else {
             if (outbuf[2] & 2) {
-                s32 *pin;
                 s16 *p16 = t0->arr10;
 
-                i = 0;
-                pin = (s32 *)s0;
-                while (i < 3) {
-                    *p16 = *pin / 360;
-                    pin++;
-                    i++;
-                    p16++;
+                for (i = 0; i < 3; i++, p16++) {
+                    *p16 = ((s32 *)s0)[i] / 360;
                 }
                 s0 = (u8 *)s0 + 0xC;
             }
             if (outbuf[2] & 4) {
                 s32 *p32 = t0->arr00;
 
-                i = 0;
-                {
-                    s16 *pin = (s16 *)s0;
-
-                    while (i < 3) {
-                        *p32 = *pin;
-                        pin++;
-                        i++;
-                        p32++;
-                    }
+                for (i = 0; i < 3; i++, p32++) {
+                    *p32 = ((s16 *)s0)[i];
                 }
                 s0 = (u8 *)s0 + 8;
             }
@@ -508,16 +468,8 @@ void *func_80066340(Class65650 *self, void *acc, void *extra)
             {
                 s32 *p32 = t0->arr18;
 
-                i = 0;
-                {
-                    s32 *pin = (s32 *)s0;
-
-                    while (i < 3) {
-                        *p32 = *pin;
-                        pin++;
-                        i++;
-                        p32++;
-                    }
+                for (i = 0; i < 3; i++, p32++) {
+                    *p32 = ((s32 *)s0)[i];
                 }
             }
         }
@@ -567,9 +519,6 @@ void *func_80066340(Class65650 *self, void *acc, void *extra)
 end:
     return (u8 *)acc + outbuf[3] * 4;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066340);
-#endif
 
 void func_80066748(Class65650 *self, Class65650 *other)
 {
