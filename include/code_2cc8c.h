@@ -1096,7 +1096,7 @@ struct Obj86B60Methods {
                                                       same shared slot);
                                                       OBSERVED: Obj86B60__OnNotify */
     void (*slot60)(Obj86B60 *self, s32 reason);  /* +0x060, external
-                                                      (func_8004D90C) */
+                                                      (Class86B60__SetState) */
     void (*slot64)(Obj86B60 *self);               /* +0x064, IS
                                                       Obj86B60__NotifyTargetReset (already
                                                       matched); OBSERVED:

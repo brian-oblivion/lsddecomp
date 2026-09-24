@@ -40,7 +40,7 @@ void Class86B60__RegisterHandlers(Class86B60 *self)
     }
 }
 
-void func_8004D90C(Class86B60 *self, s32 arg1)
+void Class86B60__SetState(Class86B60 *self, s32 arg1)
 {
     Get_vtable_TaskCore()->slot60(self, arg1);
     if (arg1 == 5) {

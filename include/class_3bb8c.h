@@ -1027,14 +1027,14 @@ struct Class86B60UnkCObj_3bb8c_d {
 };
 
 /*
- * self->unk4C's pointee. Only `unk8` is reached, by func_8004D90C, as an
+ * self->unk4C's pointee. Only `unk8` is reached, by Class86B60__SetState, as an
  * opaque value forwarded verbatim to `Class86B60Methods::slotF0`'s 2nd
  * argument.
  */
 typedef struct Class86B60Unk4CObj_3bb8c_d Class86B60Unk4CObj_3bb8c_d;
 struct Class86B60Unk4CObj_3bb8c_d {
     u8 pad0[0x008];
-    void *unk8; /* +0x008, func_8004D90C */
+    void *unk8; /* +0x008, Class86B60__SetState */
 };
 
 /*
@@ -1214,8 +1214,8 @@ struct Class86B60Methods {
     u8 pad064[0x06C - 0x064];
     void (*slot6C)(Class86B60 *self, s32 arg1); /* +0x06C, Class86B60__ShowTitleIcon's own 2nd call, arg1 = 0xA */
     u8 pad070[0x078 - 0x070];
-    void (*slot78)(Class86B60 *self); /* +0x078, func_8004D90C's own last call, `self` only */
-    void (*slot7C)(Class86B60 *self); /* +0x07C, func_8004D90C's own 2nd call, `self` only */
+    void (*slot78)(Class86B60 *self); /* +0x078, Class86B60__SetState's own last call, `self` only */
+    void (*slot7C)(Class86B60 *self); /* +0x07C, Class86B60__SetState's own 2nd call, `self` only */
     u8 pad080[0x094 - 0x080];
     /* +0x094, func_8004D9D4's shared tail call target for its `unk58==1`
      * and `unk58==4` cases -- a crossjump-merge-safe local function
@@ -1232,14 +1232,14 @@ struct Class86B60Methods {
      * forwarded opaquely. */
     void (*slotE0)(Class86B60 *self, void *arg1);
     u8 pad0E4[0x0F0 - 0x0E4];
-    /* +0x0F0, func_8004D90C's own 3rd call: `(self, self->unk4C->unk8,
+    /* +0x0F0, Class86B60__SetState's own 3rd call: `(self, self->unk4C->unk8,
      * 1)`. Distinct from `DreamSysViewMethods_3bb8c_c::slotF0` (see
      * Class86B60__ShowTitleIcon's report) -- same offset number, unrelated table.
      * func_8004DE08 (this round) also reaches this slot, forwarding an
      * `s32` (its own saved pre-overwrite copy of `self->unk58`) through
      * the SAME `void *arg1` parameter, cast at that call site rather than
      * retyping the slot -- the bit pattern is unchanged either way, and
-     * `func_8004D90C`'s own call already established the pointer type. */
+     * `Class86B60__SetState`'s own call already established the pointer type. */
     void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
     u8 pad0F4[0x11C - 0x0F4];
     /* +0x11C, func_8004DE08's own call: `(self, buf, 1)` where `buf` is
@@ -1247,7 +1247,7 @@ struct Class86B60Methods {
      * just filled through a stack out-parameter. */
     void (*slot11C)(Class86B60 *self, s32 arg1, s32 arg2);
     u8 pad120[0x124 - 0x120];
-    void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, func_8004D90C (arg1=0)/func_8004E230 (arg1=0x16) */
+    void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, Class86B60__SetState (arg1=0)/func_8004E230 (arg1=0x16) */
     /* +0x128, func_8004E1C4's own first call, `self` only. Return unused. */
     void (*slot128)(Class86B60 *self);
     void (*slot12C)(Class86B60 *self); /* +0x12C, func_8004E230's own first call, `self` only */
@@ -1290,7 +1290,7 @@ struct Class86B60 {
      * the two classes together and the one slot this unit dispatches
      * through (+0x09C) isn't among that type's own known slots. */
     struct Class86B60Unk48Obj *unk48;  /* +0x048, Class86B60__Class86B60 */
-    Class86B60Unk4CObj_3bb8c_d *unk4C; /* +0x04C, func_8004D90C */
+    Class86B60Unk4CObj_3bb8c_d *unk4C; /* +0x04C, Class86B60__SetState */
     u8 pad050[0x058 - 0x050];
     s32 unk58;                       /* +0x058, func_8004D9D4: 5-valued dispatch (0-4) */
     u8 pad05C[0x060 - 0x05C];
@@ -1436,7 +1436,7 @@ struct BaseTaskCtorTable_3bb8c_c {
      * all three of its own parameters verbatim. */
     void (*slot38)(void *self, void *arg1, s32 arg2);
     u8 pad03C[0x060 - 0x03C];
-    /* +0x060, func_8004D90C's own first call, `(self, arg1)` where arg1 is
+    /* +0x060, Class86B60__SetState's own first call, `(self, arg1)` where arg1 is
      * that function's own forwarded 2nd parameter. */
     void (*slot60)(void *self, s32 arg1);
     u8 pad064[0x090 - 0x064];

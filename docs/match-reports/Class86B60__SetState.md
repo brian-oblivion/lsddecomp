@@ -1,12 +1,14 @@
-# func_8004D90C -- MATCH
+# Class86B60__SetState -- MATCH
+
+> Renamed from `func_8004D90C` on 2026-09-24 (tools/rename.py). Address 0x8004d90c.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004D90C`: 50/50 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__SetState`: 50/50 words match.
 
 ## Source
 
 ```c
-void func_8004D90C(Class86B60 *self, s32 arg1)
+void Class86B60__SetState(Class86B60 *self, s32 arg1)
 {
     Get_vtable_TaskCore()->slot60(self, arg1);
     if (arg1 == 5) {

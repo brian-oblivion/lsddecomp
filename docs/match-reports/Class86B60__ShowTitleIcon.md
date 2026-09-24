@@ -42,7 +42,7 @@ reshaping needed.
   original location further down the file.
 - `DreamSysViewMethods_3bb8c_c::slotF0` (`self, s32 arg1, s32 arg2`, both
   call-site arguments literal `0`) -- new slot. Distinct from
-  `Class86B60Methods::slotF0` (see `func_8004D90C`'s report) -- same
+  `Class86B60Methods::slotF0` (see `Class86B60__SetState`'s report) -- same
   offset number, two unrelated tables, no conflict.
 - New `extern s32 D_800114E8;` (address-of only, placeholder type, same
   convention as the neighbouring `D_80086D44`/`D_800114DC`).
