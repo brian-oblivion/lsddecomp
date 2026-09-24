@@ -101,10 +101,6 @@ D_8008AAE4
 D_8008AAE8
 D_8008AAF0
 D_8008AAF8
-D_8008AB00
-D_8008AB04
-D_8008AB0C
-D_8008AB10
 D_8008AB14
 D_8008AB1C
 D_8008AB24
@@ -173,6 +169,10 @@ gCdState
 gCdTickStep
 gCdTimeoutCounter
 gCdUseVSyncCallback
+gClass86F88CursorColor
+gClass86F88RowColor
+gClass86F88RowOriginX
+gClass86F88RowOriginY
 gDefaultBMemPMgr
 gDefaultGridSpan
 gDreamAuxStage

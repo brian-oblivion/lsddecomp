@@ -17,7 +17,7 @@
  *     own change per that note). This unit's own 14 functions occupy that
  *     table's tail, offsets +0xA0..+0xD4, i.e. this class's own new virtual
  *     methods (the base Class86668/Obj865C8 table --
- *     docs/match-reports/func_80052CD8.md -- only goes up to about +0x88).
+ *     docs/match-reports/ObjM__Dtor.md -- only goes up to about +0x88).
  *     `ObjMMethods::notifyParents`/`checkAuxTrigger`/`teardownPauseOverlay`
  *     (+0x030/+0x0B8/+0x0D4) are confirmed the same way: +0x030 is
  *     `BasicClass__NotifyParents`, and +0x0B8/+0x0D4 are this unit's own

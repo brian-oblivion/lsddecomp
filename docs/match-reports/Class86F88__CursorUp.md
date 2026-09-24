@@ -1,9 +1,11 @@
-# func_800524F8 -- MATCH
+# Class86F88__CursorUp -- MATCH
+
+> Renamed from `func_800524F8` on 2026-09-24 (tools/rename.py). Address 0x800524f8.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_800524F8`: 40/40 words match.
+SHA1 matches retail. `funcdiff.py Class86F88__CursorUp`: 40/40 words match.
 
-This is vtable slot `+0x084` of `D_80086F88` (not declared in
+This is vtable slot `+0x084` of `gClass86F88Methods` (not declared in
 `Class86F88Methods` since nothing in this unit dispatches through it by
 name; the arity used below is fixed by the two `slot94`/`slot98` call
 sites, which ARE declared).
@@ -11,7 +13,7 @@ sites, which ARE declared).
 ## Source
 
 ```c
-void func_800524F8(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
+void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     s32 count;
     s32 newUnk20;
@@ -55,7 +57,7 @@ one change.
 
 **A second, independent residue remained after the polarity fix: a
 register-identity swap in the `slot94` call's arguments, in the SAME
-family as `func_80052430`'s.** `self->unk20--; self->unk28--;` followed
+family as `Class86F88__ScrollRight`'s.** `self->unk20--; self->unk28--;` followed
 directly by `self->methods->slot94(self, self->unk20, self->unk24,
 self->unk28, 1);` reproduced every value but landed the post-decrement
 `unk20`/`unk28` in the wrong registers relative to retail. `permuter.py`
@@ -64,15 +66,23 @@ double-read: assign the just-decremented field into its own named local
 (`newUnk20 = self->unk20;` right after `self->unk20--;`, same for
 `unk28`) and pass the LOCALS to the call rather than re-reading
 `self->unk20`/`self->unk28` inline. No UB or barrier needed here, unlike
-`func_80052430`'s permuter run which also surfaced a `(float)` cast that
+`Class86F88__ScrollRight`'s permuter run which also surfaced a `(float)` cast that
 turned out to be unnecessary.
 
 ### Proposed learning
 
-See `func_80052430`'s report for the general form of this lever
+See `Class86F88__ScrollRight`'s report for the general form of this lever
 (double-assign a value the permuter reads twice). This function is the
 second confirmed instance in the same round, on a POST-DECREMENT value
 rather than a freshly-loaded field, which broadens the pattern: it is not
 specific to "reading a struct field for a guard", it applies to "storing
 a locally-mutated value back to the struct, then immediately reusing that
 same value as a call argument."
+
+## Naming
+
+Round 75 (bravo, track 3). `func_800524F8` -> `Class86F88__CursorUp`, **tier A**.
+
+Slot +0x084 (`tools/classtable.py gClass86F88Methods`). Decrements `cursorIndex`: inside the window via stepCursorInView(self, 0, 1), or at the top row by decrementing both `topIndex` and `cursorIndex` and redrawing. Rows are laid out 0xA apart in increasing y (Class86F88__CreateRows), so a lower index is higher on screen. Dispatched by HandleInputCode on code 18.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

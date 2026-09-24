@@ -58,14 +58,14 @@
 Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`. This is `Class86F88_3bb8c_j`'s
 own constructor -- the occupant of `Class86F88Methods_3bb8c_j::ctor` (+0x008),
 reached indirectly by `New_Class86F88`
-(`func_80052B60()->ctor(self, arg0, arg1)`).
+(`GetClass86F88Methods()->ctor(self, arg0, arg1)`).
 
 ## Class identity (ROUND 75 correction -- read this before the rest of the file)
 
 This unit's local type for `self` was originally named `Class86ED0` and
 described as having vtable `D_80086ED0`. Both were wrong, and the error
 predates this round: `include/class_3bb8c.h`'s own round-15 HEAD NOTEs
-(search "D_80086ED0 and D_80086F88") already documented it and deferred
+(search "D_80086ED0 and gClass86F88Methods") already documented it and deferred
 the fix. Settled by address, not by guess:
 
 - `func_80051A4C` (this unit, now named `Get_vtable_Obj86ED0`) returns
@@ -73,9 +73,9 @@ the fix. Settled by address, not by guess:
   (42 slots, `tools/classtable.py D_80086ED0`), a DIFFERENT class
   established independently by class_3bb8c_i. It has NOTHING to do with
   this constructor's class.
-- This class's REAL table is `D_80086F88`, reached through
-  `func_80052B60()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
-  D_80086F88` places every one of this unit's remaining functions
+- This class's REAL table is `gClass86F88Methods`, reached through
+  `GetClass86F88Methods()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
+  gClass86F88Methods` places every one of this unit's remaining functions
   (this ctor at +0x008, plus `Class86F88__Finalize`/`AddChild`/
   `RemoveChild`/`RemoveAllChildren`/`NotifyChild`/`ResetCounters`/
   `LoadResources`/`ReleaseResources`/`AddChildAndSetState`/
@@ -84,7 +84,7 @@ the fix. Settled by address, not by guess:
   resolvable by `classtable.py` after all -- the earlier "no classtable
   entry exists for it" note was itself part of the same mistake (it
   looked up the wrong global).
-- class_3bb8c_k's OWN local view of this same D_80086F88 table already
+- class_3bb8c_k's OWN local view of this same gClass86F88Methods table already
   carries the name `Class86F88`/`Class86F88Methods` in the shared header,
   established independently from ITS OWN call sites. Reusing that bare
   name here would collide (both visible in this translation unit through
@@ -104,8 +104,8 @@ this same correction.
 mode flag (0 or 1), also stashed into `self->unkC`.
 
 1. Chain the base ctor: `Get_vtable_BasicClass()->ctor(self);` then
-   `self->methods = func_80052B60();` (this really is `Class86F88Methods_3bb8c_j
-   *func_80052B60(void)` -- NOT a separate "ctor table" type: this same
+   `self->methods = GetClass86F88Methods();` (this really is `Class86F88Methods_3bb8c_j
+   *GetClass86F88Methods(void)` -- NOT a separate "ctor table" type: this same
    getter is what `New_Class86F88` dereferences `->ctor` on, and here its
    return is assigned DIRECTLY as `self->methods`, so both call sites
    type-check against one declared return type).
@@ -140,7 +140,7 @@ void Class86F88__Class86F88(Class86F88_3bb8c_j *self, void **arg1, s32 arg2)
     s32 len;
 
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_80052B60();
+    self->methods = GetClass86F88Methods();
 
     count = 0;
     for (p = arg1; *p != NULL; p++) {
@@ -353,4 +353,4 @@ field. (Class86F88__Class86F88, one word, 66 -> 98/107.)
 
 ## Naming
 
-- `Class86F88__Class86F88` -- tier A. The ctor occupant (classtable.py D_80086F88 +0x008), named per the "constructors Class__Class" convention (e.g. Class869D8__Class869D8). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.
+- `Class86F88__Class86F88` -- tier A. The ctor occupant (classtable.py gClass86F88Methods +0x008), named per the "constructors Class__Class" convention (e.g. Class869D8__Class869D8). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.

@@ -6,7 +6,7 @@
 
 Unit: `src/class_3bb8c_j.c`. `New_Class86F88` -- the allocator for
 `Class86F88_3bb8c_j` (a small BasicClass-derived sibling class discovered this
-round, alloc size 0x54, vtable D_80086F88 reached through `func_80052B60()`
+round, alloc size 0x54, vtable gClass86F88Methods reached through `GetClass86F88Methods()`
 (class_3bb8c_k) -- NOT `D_80086ED0`/`Get_vtable_Obj86ED0`, which is a
 DIFFERENT, unrelated class (`Obj86ED0`, established by class_3bb8c_i) that
 this function's own body never touches; ROUND 75 CORRECTION, see
@@ -29,7 +29,7 @@ void *New_Class86F88(void *arg0, s32 arg1)
     if (self == NULL) {
         goto fail;
     }
-    func_80052B60()->ctor(self, arg0, arg1);
+    GetClass86F88Methods()->ctor(self, arg0, arg1);
     return self;
 fail:
     return NULL;
@@ -68,4 +68,4 @@ exit"), reinforcing that this sub-shape specifically wants `goto`.
 
 ## Naming
 
-- `New_Class86F88` -- tier A. BMemPMgrAlloc(0x54) + dispatch through func_80052B60()->ctor(...) -- the project's standard New_X allocator shape, named per the "constructors New_Class" convention. Class identity (0x54-byte Class86F88_3bb8c_j, table D_80086F88) from class_3bb8c.h's round-15 HEAD NOTE plus classtable.py D_80086F88.
+- `New_Class86F88` -- tier A. BMemPMgrAlloc(0x54) + dispatch through GetClass86F88Methods()->ctor(...) -- the project's standard New_X allocator shape, named per the "constructors New_Class" convention. Class identity (0x54-byte Class86F88_3bb8c_j, table gClass86F88Methods) from class_3bb8c.h's round-15 HEAD NOTE plus classtable.py gClass86F88Methods.

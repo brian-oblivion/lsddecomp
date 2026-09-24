@@ -1,15 +1,17 @@
-# func_8005278C -- MATCH
+# Class86F88__ReleaseRows -- MATCH
+
+> Renamed from `func_8005278C` on 2026-09-24 (tools/rename.py). Address 0x8005278c.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8005278C`: 36/36 words match.
+SHA1 matches retail. `funcdiff.py Class86F88__ReleaseRows`: 36/36 words match.
 
-This is vtable slot `+0x090` of `D_80086F88` (not declared in
+This is vtable slot `+0x090` of `gClass86F88Methods` (not declared in
 `Class86F88Methods` since nothing in this unit dispatches through it).
 
 ## Source
 
 ```c
-void func_8005278C(Class86F88 *self)
+void Class86F88__ReleaseRows(Class86F88 *self)
 {
     s32 count;
     s32 i;
@@ -73,3 +75,11 @@ nulling the slot. Four separate residues, closed one at a time with
    `u8 unused[8];` local (this project's established "GCC reserves stack
    space for a completely dead local" idiom, now with another confirmed
    instance).
+
+## Naming
+
+Round 75 (bravo, track 3). `func_8005278C` -> `Class86F88__ReleaseRows`, **tier A**.
+
+Slot +0x090 (`tools/classtable.py gClass86F88Methods`), called by Class86F88__ReleaseResources. Releases each of the min(itemCount, 4) row objects and clears its `rows[]` entry.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

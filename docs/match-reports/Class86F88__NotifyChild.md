@@ -33,4 +33,4 @@ Matched first try.
 
 ## Naming
 
-- `Class86F88__NotifyChild` -- tier B. The slot38 occupant (classtable.py D_80086F88 +0x038, the offset every sibling class in this header uses for its own "OnNotify"-shaped override): chains the base slot38 unconditionally, then dispatches to this class's own slot5C/slot58 by the child's tag nibble. Mechanics (notify then tag-dispatch) are clear; the in-game meaning of the notification is not.
+- `Class86F88__NotifyChild` -- tier B. The slot38 occupant (classtable.py gClass86F88Methods +0x038, the offset every sibling class in this header uses for its own "OnNotify"-shaped override): chains the base slot38 unconditionally, then dispatches to this class's own slot5C/slot58 by the child's tag nibble. Mechanics (notify then tag-dispatch) are clear; the in-game meaning of the notification is not.

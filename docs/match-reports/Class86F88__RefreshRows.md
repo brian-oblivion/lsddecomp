@@ -1,4 +1,6 @@
-# func_8005281C
+# Class86F88__RefreshRows
+
+> Renamed from `func_8005281C` on 2026-09-24 (tools/rename.py). Address 0x8005281c.
 
 **Unit:** class_3bb8c_k · **Size:** 68 instructions (0x110 bytes) ·
 **Status: MATCHED 68/68**, whole-image SHA1 green.
@@ -6,14 +8,14 @@
 ## Role
 
 Refreshes the active window's display text: for each of up to 4 active
-`self->unk40[]` elements, formats a fixed-width label via `func_8005292C`
+`self->unk40[]` elements, formats a fixed-width label via `Class86F88__FormatRowText`
 (this unit, matched this round) into a local stack buffer and dispatches
 `elem->methods->slotCC(elem, buf)`; then forwards `(arg1, arg2, arg3, 0)`
-to `func_800529FC` (already matched) and optionally notifies `self` via
-`slot60` (new this round, shared with `func_80052A58`).
+to `Class86F88__SetView` (already matched) and optionally notifies `self` via
+`slot60` (new this round, shared with `Class86F88__StepCursorInView`).
 
 ```c
-void func_8005281C(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 {
     s32 count;
     s32 i;
@@ -29,11 +31,11 @@ void func_8005281C(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
         count = 4;
     }
     for (i = 0; i < count; i++) {
-        func_8005292C(self, buf, i, arg1, (char *)arg2);
+        Class86F88__FormatRowText(self, buf, i, arg1, (char *)arg2);
         (*p)->methods->slotCC(*p, buf);
         p++;
     }
-    func_800529FC(self, arg1, arg2, arg3, 0);
+    Class86F88__SetView(self, arg1, arg2, arg3, 0);
     if (arg4) {
         self->methods->slot60(self, 0);
     }
@@ -48,7 +50,7 @@ else -- worth recording as a sequence, since fixing them in the wrong
 order or bundled together would have been much harder to diagnose.
 
 1. **Stack-buffer size, not padding.** The local formatting buffer only
-   ever needs indices `0..0x1A` (27 bytes, `func_8005292C`'s own fixed
+   ever needs indices `0..0x1A` (27 bytes, `Class86F88__FormatRowText`'s own fixed
    width), but declaring `char buf[0x28]` (matching a first guess at "the
    gap between the outgoing-args area and the saved registers") produced
    an 8-byte-OVERSIZED frame (`addiu $sp,$sp,-0x70` vs retail's `-0x68`) --
@@ -79,10 +81,10 @@ order or bundled together would have been much harder to diagnose.
 
 ## Notes
 
-`func_8005292C`'s call site here passes this function's own `arg2`
+`Class86F88__FormatRowText`'s call site here passes this function's own `arg2`
 (established as a plain `s32`, since it is ALSO forwarded unmodified to
-`func_800529FC`'s already-typed `s32 a2` parameter) through an explicit
-`(char *)` cast to match `func_8005292C`'s own `base` parameter type
+`Class86F88__SetView`'s already-typed `s32 a2` parameter) through an explicit
+`(char *)` cast to match `Class86F88__FormatRowText`'s own `base` parameter type
 (`char *`, fixed by that function's internal pointer arithmetic -- see its
 own report). Both typings are correct for their own function; the cast is
 the bridge, not a contradiction.
@@ -90,3 +92,11 @@ the bridge, not a contradiction.
 `Class86F88ElemMethods::slotCC` (new slot, `+0x0CC`,
 `void (*)(Class86F88Elem *, char *)`) added additively after the existing
 `slotB8`.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_8005281C` -> `Class86F88__RefreshRows`, **tier A**.
+
+Slot +0x094 (`tools/classtable.py gClass86F88Methods`). (self, top, column, cursor, notify): re-formats every visible row's text for the new top/column (setText), SetView without highlight, and if `notify` calls forwardToTarget(0). Callers: ScrollRight, ScrollLeft, CursorUp, CursorDown (all notify=1).
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

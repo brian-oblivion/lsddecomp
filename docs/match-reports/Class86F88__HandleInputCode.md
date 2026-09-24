@@ -1,4 +1,6 @@
-# func_800522DC -- MATCHED (69/69 words, first attempt)
+# Class86F88__HandleInputCode -- MATCHED (69/69 words, first attempt)
+
+> Renamed from `func_800522DC` on 2026-09-24 (tools/rename.py). Address 0x800522dc.
 
 Unit `src/class_3bb8c_k.c`. Round 26, runner delta.
 
@@ -6,13 +8,13 @@ Unit `src/class_3bb8c_k.c`. Round 26, runner delta.
 
 An event/code dispatcher for this unit's own local view of method table
 `D_80087034` (`Obj87034_3bb8c_k` / `Class87034Methods_3bb8c_k`, both
-already declared earlier in this same file for `func_80052B70`/
-`func_80052C10`/`func_800521D4`/`func_8005227C`). Owns `jtbl_800116F4`, a
+already declared earlier in this same file for `New_ObjM`/
+`ObjM__ObjM`/`Class86F88__SetState`/`Class86F88__TickClosing`). Owns `jtbl_800116F4`, a
 sparse 22-entry jump table for codes `4..25`, six of which have real
 handlers and the rest fall through doing nothing:
 
 ```c
-void func_800522DC(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
+void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
     switch (code) {
     case 25:
         self->methods->slot60(self, 0x10);
@@ -73,8 +75,8 @@ pad044[0x10] + slot54(4) + pad058[8] + slot60(4) + pad064[0x18]
 = 16+4+8+4+24+4+4+4+4+4 = 76  (matches the original span exactly)
 ```
 
-`slot40` (already used by `func_80052C10`) and `slot90`/`slotB0`/`slotB4`
-(already used by `func_80052D10`) keep their original offsets --
+`slot40` (already used by `ObjM__ObjM`) and `slot90`/`slotB0`/`slotB4`
+(already used by `ObjM__OnNotify`) keep their original offsets --
 confirmed by rebuilding (whole-image SHA1 green) after the struct edit,
 before writing this function's body. No cross-unit prototype and no new
 type went into either shared header (`class_3bb8c.h` or `class_39e08.h`);
@@ -85,8 +87,16 @@ for this unit, and neither was touched.
 
 Two back-to-back same-round data points on HEAD BROADCAST 1
 (`func_80053984`: table order == ascending value order, lever not needed;
-`func_800522DC`: table order == source declaration order, lever
+`Class86F88__HandleInputCode`: table order == source declaration order, lever
 essential) make the discriminator concrete: **check the jump table's own
 label order against sorted case-value order before writing the switch,
 every time** -- neither "always reorder" nor "never reorder" is safe, and
 the check costs nothing (the labels are right there in the `.s`).
+
+## Naming
+
+Round 75 (bravo, track 3). `func_800522DC` -> `Class86F88__HandleInputCode`, **tier B**.
+
+Slot +0x05C (`tools/classtable.py gClass86F88Methods`), which Class86F88__NotifyChild dispatches for notifications from its tag-2 child (the one Class86F88__AddChild caches as `inputSource`). Code 25: forwardToTarget(0x10) then setState(2); 23: forwardToTarget(0x10) then setState(3); 5: scrollRight; 4: scrollLeft; 18: cursorUp; 19: cursorDown (each resolved to its method through the same table). TaskObjF (class_3bb8c_g) also branches on 0x19/0x17. Tier B: that these codes are controller buttons is not established. Retyped round 75 from the unit's ObjM view to `Class86F88 *`: the function's own table is gClass86F88Methods and every slot it calls holds a Class86F88 method.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

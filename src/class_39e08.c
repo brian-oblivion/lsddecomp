@@ -151,7 +151,7 @@ void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
 }
 
 void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1) {
-    self->unk4C = func_80052B70(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
+    self->unk4C = New_ObjM(self->subB, (s32)self->unk40, (s32)self->unk44, (s32)self->unk48, arg1);
     self->methods->slot10(self, self->unk4C);
     self->unk4C->methods->slot44(self->unk4C, (s32)self->unk0C, (s32)self->unk38);
     self->state = 2;

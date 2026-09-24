@@ -1,4 +1,6 @@
-# func_8005292C
+# Class86F88__FormatRowText
+
+> Renamed from `func_8005292C` on 2026-09-24 (tools/rename.py). Address 0x8005292c.
 
 **Unit:** class_3bb8c_k · **Size:** 52 instructions (0xD0 bytes) ·
 **Status: MATCHED 52/52**, whole-image SHA1 green.
@@ -9,7 +11,7 @@ Formats a text-table entry into a fixed-width (0x1A = 26 char) buffer:
 looks up a string via `self->unk18[idx]` (a table of BYTE OFFSETS added to
 the caller-supplied `base` pointer), copies up to 0x1A bytes of it into
 `dest` via a Psy-Q strncpy-style helper, space-pads the remainder, and
-null-terminates at a fixed offset. Called by `func_8005281C` (this unit,
+null-terminates at a fixed offset. Called by `Class86F88__RefreshRows` (this unit,
 also matched this round) once per loop iteration with a local stack buffer
 as `dest`.
 
@@ -18,7 +20,7 @@ as `dest`.
 `Class86F88::unk18` (`s32 *`, offset 0x018, was opaque padding) -- a table
 of byte offsets, added additively to `include/class_3bb8c.h` (splitting the
 existing `pad018[0x020-0x018]` into `unk18` + a 4-byte `pad01C`, so no
-other field's offset moves). `Class86F88`/`D_80086F88` is this unit's own
+other field's offset moves). `Class86F88`/`gClass86F88Methods` is this unit's own
 class, not shared with any other live runner this round, so this edit
 carries no header-contention risk from a sibling unit.
 
@@ -39,7 +41,7 @@ function, same convention documented for `DecodeFullWidthSjis` in
 ## Final source
 
 ```c
-char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base)
+char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base)
 {
     s32 idx = arg4 + arg3;
     s32 len;
@@ -107,3 +109,11 @@ enough to force GCC 2.6.3 to re-materialize the value into a fresh
 register across an intervening call, rather than reusing the
 already-live callee-saved register. Worth trying as a cheaper first step
 before reaching for a differently-named variable on this residue class.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_8005292C` -> `Class86F88__FormatRowText`, **tier A**.
+
+Not a table slot (non-virtual helper). Copies item (top + row)'s text, starting `column` characters in, into `dest`, truncated to 26 characters, pads to 26 with spaces, NUL-terminates, returns dest. Callers: CreateRows, RefreshRows. The matched body types `column` as `char *` and `texts` as `s32 *` (their sum is the source pointer); retyping them the natural way is left alone because it touches a matched body.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

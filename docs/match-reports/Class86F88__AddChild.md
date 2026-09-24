@@ -39,4 +39,4 @@ disassembly rather than assuming a shared order.
 
 ## Naming
 
-- `Class86F88__AddChild` -- tier A. The addChild occupant (classtable.py D_80086F88 +0x010): chains the base addChild then caches arg1 into unk34/unk38 by its own tag nibble. Matches the BasicClass addChild-override convention used throughout this header.
+- `Class86F88__AddChild` -- tier A. The addChild occupant (classtable.py gClass86F88Methods +0x010): chains the base addChild then caches arg1 into unk34/unk38 by its own tag nibble. Matches the BasicClass addChild-override convention used throughout this header.

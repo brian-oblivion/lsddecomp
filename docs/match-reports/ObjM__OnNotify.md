@@ -1,12 +1,14 @@
-# func_80052D10
+# ObjM__OnNotify
+
+> Renamed from `func_80052D10` on 2026-09-24 (tools/rename.py). Address 0x80052d10.
 
 **Unit:** class_3bb8c_k · **Size:** 52 instructions (0xD0 bytes) ·
 **Status: MATCHED 52/52**, whole-image SHA1 green.
 
 ## Role
 
-Another method of the `D_80087034`-vtable class (`func_80052B70`/
-`func_80052C10`'s own class, see those reports) -- forwards to the shared
+Another method of the `D_80087034`-vtable class (`New_ObjM`/
+`ObjM__ObjM`'s own class, see those reports) -- forwards to the shared
 base-class event handler (`GetClass86668Methods()->slot38`), then reads the
 event's type tag (`arg1->target->header`, both `EventArg`/`HeaderObj`
 already established in `include/class_39e08.h`) and dispatches to ONE of
@@ -36,7 +38,7 @@ shape:
   no call at all.
 
 ```c
-void func_80052D10(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
+void ObjM__OnNotify(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
 {
     s32 tag;
 
@@ -59,7 +61,7 @@ a residue to reshape away from.
 ## Struct additions
 
 Extended this unit's own local `Class87034Methods_3bb8c_k` (see
-`func_80052B70`/`func_80052C10`'s reports) with three more slots this
+`New_ObjM`/`ObjM__ObjM`'s reports) with three more slots this
 function reaches: `+0x090` (`slot90`), `+0x0B0` (`slotB0`), `+0x0B4`
 (`slotB4`), all `void (*)(void *self, EventArg *arg1, s32 arg2)`. Stays
 local to this unit for the same header-contention reason as before.
@@ -76,3 +78,9 @@ a later, unrelated check. This is the same family of trap
 targets disagree, not just delay slots") but for a THREE-way dispatch
 specifically: worth checking each comparison's true predecessor/successor
 in the CFG before assuming linear `.s` order matches nesting order.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052D10` -> `ObjM__OnNotify`, **tier B**.
+
+Slot +0x038 of D_80087034 (`tools/classtable.py 0x80087034`), the slot called OnNotify elsewhere in this family (Obj865C8__OnNotify, Obj86B60__OnNotify). Calls the base's slot38, then dispatches on arg1->target->header: (tag & 0xFFF) == 0x114 -> ObjM__HandleEvent7 (+0x0B4), 0x164 -> ObjM__HandleEvent5Or6 (+0x0B0), (tag & 0xFFFF) == 0x1F34 -> func_80053984 (+0x090). Tier B: which objects carry those header tags is not established.

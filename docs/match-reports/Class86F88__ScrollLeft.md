@@ -1,16 +1,18 @@
-# func_80052498 -- MATCH
+# Class86F88__ScrollLeft -- MATCH
+
+> Renamed from `func_80052498` on 2026-09-24 (tools/rename.py). Address 0x80052498.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_80052498`: 24/24 words match.
+SHA1 matches retail. `funcdiff.py Class86F88__ScrollLeft`: 24/24 words match.
 
-This is vtable slot `+0x080` of `D_80086F88` (`Class86F88Methods::slot80`),
-dispatched by `func_800523F0` (this unit, on a DIFFERENT instance reached
+This is vtable slot `+0x080` of `gClass86F88Methods` (`Class86F88Methods::slot80`),
+dispatched by `Class86F88__ForwardToTarget` (this unit, on a DIFFERENT instance reached
 through `self->unk3C`) as `other->methods->slot80(other, arg1, 0x60, 0x60)`.
 
 ## Source
 
 ```c
-void func_80052498(Class86F88 *self)
+void Class86F88__ScrollLeft(Class86F88 *self)
 {
     s32 count;
 
@@ -31,7 +33,7 @@ void func_80052498(Class86F88 *self)
 The occupant's own body ignores every argument past `self` -- it never
 reads what a caller passes in `arg1`/`arg2`/`arg3` -- which is why it
 compiles cleanly as a plain `(Class86F88 *self)` function even though
-`func_800523F0`'s call site (a DIFFERENT instance's copy of this same
+`Class86F88__ForwardToTarget`'s call site (a DIFFERENT instance's copy of this same
 slot) passes 3 more arguments. Per this project's established
 per-call-site-arity convention this is not a contradiction: the slot's
 declared pointer type in the header carries the fuller signature the call
@@ -42,3 +44,11 @@ body reads.
 not a separate load followed by `- 1`) is what let the guard's own
 register become the exact value stored back to `self->unk24` and forwarded
 to `slot94` with no reload -- matched on the first attempt in this shape.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052498` -> `Class86F88__ScrollLeft`, **tier A**.
+
+Slot +0x080 (`tools/classtable.py gClass86F88Methods`). Decrements `column` if it stays >= 0, then refreshRows. Dispatched by HandleInputCode on code 4.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

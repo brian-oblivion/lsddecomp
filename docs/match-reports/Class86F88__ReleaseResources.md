@@ -28,4 +28,4 @@ call site. Matched first try.
 
 ## Naming
 
-- `Class86F88__ReleaseResources` -- tier B. The slot48 occupant (classtable.py D_80086F88 +0x048): if unk50 is set, calls slot90(self) then releases unk50 through its own slot4. Mirrors Class86F88__LoadResources's load in reverse -- mechanics clear, purpose not established beyond "release what LoadResources acquired".
+- `Class86F88__ReleaseResources` -- tier B. The slot48 occupant (classtable.py gClass86F88Methods +0x048): if unk50 is set, calls slot90(self) then releases unk50 through its own slot4. Mirrors Class86F88__LoadResources's load in reverse -- mechanics clear, purpose not established beyond "release what LoadResources acquired".

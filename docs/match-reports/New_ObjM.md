@@ -1,4 +1,6 @@
-# func_80052B70
+# New_ObjM
+
+> Renamed from `func_80052B70` on 2026-09-24 (tools/rename.py). Address 0x80052b70.
 
 **Unit:** class_3bb8c_k · **Size:** 40 instructions (0xA0 bytes) ·
 **Status: MATCHED 40/40**, whole-image SHA1 green.
@@ -11,7 +13,7 @@ via `BMemPMgrAlloc`; if allocation succeeds, dispatches through the
 returned vtable's `+0x008` (ctor) slot with the 5 forwarded arguments and
 returns the new instance; returns `NULL` on allocation failure.
 
-`func_80052C10` (this unit, matched in the same round) IS the ctor slot
+`ObjM__ObjM` (this unit, matched in the same round) IS the ctor slot
 this function dispatches to.
 
 ## Signature
@@ -22,7 +24,7 @@ function already has a pre-existing prototype in `include/class_39e08.h`
 into `Obj865C8::unk4C`):
 
 ```c
-extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
+extern Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 ```
 
 `class_3bb8c_k.c` includes `class_39e08.h`, so this function's definition
@@ -42,7 +44,7 @@ despite being semantically identical.
 Final, byte-exact form:
 
 ```c
-Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
+Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
     Obj4C *self;
     Class87034Methods_3bb8c_k *methods;
@@ -126,5 +128,11 @@ FAILURE path's `return NULL;` as the trailing unconditional statement (not
 an early-return guard clause, and not a single variable shared across both
 paths) -- this is the layout GCC 2.6.3 -O2 folds into a single branch with
 the failure value in the delay slot and no extra jump. Confirmed once, on
-`func_80052B70`; worth checking against future instances of this same
+`New_ObjM`; worth checking against future instances of this same
 project-wide `New_X` allocator shape before assuming it generalizes.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052B70` -> `New_ObjM`, **tier A**.
+
+New_X allocator: BMemPMgrAlloc(0x88), then GetObjMMethods()->ctor (+0x008 of D_80087034, `tools/classtable.py 0x80087034`) with the 5 forwarded arguments; returns the object or NULL. Caller: Obj865C8__EnterState2 (class_39e08). The class's type name is `ObjM` (include/class_3bb8c.h).

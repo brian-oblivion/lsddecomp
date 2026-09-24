@@ -34,4 +34,4 @@ already-documented "must reload after call" idiom.
 
 ## Naming
 
-- `Class86F88__Finalize` -- tier A. The finalize occupant (classtable.py D_80086F88 +0x00C): frees each unk18[i] buffer, then unk1C and unk18 themselves, then chains Get_vtable_BasicClass()->finalize(self). Matches the BasicClass finalize-slot convention used throughout this header.
+- `Class86F88__Finalize` -- tier A. The finalize occupant (classtable.py gClass86F88Methods +0x00C): frees each unk18[i] buffer, then unk1C and unk18 themselves, then chains Get_vtable_BasicClass()->finalize(self). Matches the BasicClass finalize-slot convention used throughout this header.

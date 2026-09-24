@@ -9,8 +9,8 @@
  *    Obj86ED0__DispatchLookupValue, +Get_vtable_Obj86ED0) are `Obj86ED0`
  *    methods -- D_80086ED0, a class ALREADY shared and fully typed in
  *    include/class_3bb8c.h, established by class_3bb8c_i.
- *  - Everything else is `Class86F88_3bb8c_j` (D_80086F88, a BasicClass
- *    subclass, alloc size 0x54, reached through `func_80052B60()` in
+ *  - Everything else is `Class86F88_3bb8c_j` (gClass86F88Methods, a BasicClass
+ *    subclass, alloc size 0x54, reached through `GetClass86F88Methods()` in
  *    class_3bb8c_k which already holds this SAME table under the bare
  *    name `Class86F88`) -- kept LOCAL under a disambiguating suffix
  *    rather than reusing that name, to avoid a collision in this TU.
@@ -141,7 +141,7 @@ void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
  * Class86F88_3bb8c_j -- a small BasicClass-derived sibling class, LOCAL to this
  * unit (see the file header comment for why this is not added to the
  * shared class_3bb8c.h). Alloc size 0x54 (New_Class86F88). Its real
- * vtable is D_80086F88, reached through func_80052B60() (class_3bb8c_k).
+ * vtable is gClass86F88Methods, reached through GetClass86F88Methods() (class_3bb8c_k).
  * `Get_vtable_Obj86ED0`/D_80086ED0 immediately below are UNRELATED to this
  * class -- they are Obj86ED0's own table and getter (see the file header
  * comment), merely defined in this same file.
@@ -179,11 +179,11 @@ struct Class86F88Handle_3bb8c_j {
 
 /*
  * Class86F88_3bb8c_j's own vtable. `ctor` at +0x008 is the standard New_X
- * constructor slot -- func_80052B60() (a real function, defined in the
+ * constructor slot -- GetClass86F88Methods() (a real function, defined in the
  * sibling unit class_3bb8c_k, still INCLUDE_ASM there) returns THIS EXACT
- * pointer type: New_Class86F88 calls `func_80052B60()->ctor(...)` to reach
+ * pointer type: New_Class86F88 calls `GetClass86F88Methods()->ctor(...)` to reach
  * it, and Class86F88__Class86F88 (that very ctor occupant) separately does
- * `self->methods = func_80052B60();` -- both compile against the same
+ * `self->methods = GetClass86F88Methods();` -- both compile against the same
  * declared return type, which is why this is not split into a separate
  * "ctor table" type the way class_3bb8c_c's BaseCtorTable_3bb8c_c is for
  * an unrelated base class.
@@ -254,7 +254,7 @@ Obj86ED0Methods *Get_vtable_Obj86ED0(void)
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
-extern Class86F88Methods_3bb8c_j *func_80052B60(void);
+extern Class86F88Methods_3bb8c_j *GetClass86F88Methods(void);
 
 void *New_Class86F88(void *arg0, s32 arg1)
 {
@@ -263,14 +263,14 @@ void *New_Class86F88(void *arg0, s32 arg1)
     if (self == NULL) {
         goto fail;
     }
-    func_80052B60()->ctor(self, arg0, arg1);
+    GetClass86F88Methods()->ctor(self, arg0, arg1);
     return self;
 fail:
     return NULL;
 }
 
 /*
- * Class86F88_3bb8c_j's own ctor (the func_80052B60()->ctor occupant, matched via
+ * Class86F88_3bb8c_j's own ctor (the GetClass86F88Methods()->ctor occupant, matched via
  * its own address -- classtable-style resolution doesn't apply here since
  * this vtable is a LOCAL, no `tools/classtable.py` slot list exists for
  * it; the identity comes from New_Class86F88's call site + this function's
@@ -299,7 +299,7 @@ void Class86F88__Class86F88(Class86F88_3bb8c_j *self, void **arg1, s32 arg2)
     i = 0;
     p = arg1;
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_80052B60();
+    self->methods = GetClass86F88Methods();
 
     while (*p++ != NULL) {
         i++;
