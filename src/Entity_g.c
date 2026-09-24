@@ -14,12 +14,12 @@ extern u8 D_80089E20[];
 extern u8 D_80089DCC[];
 extern u8 D_80089CB8[];
 extern u8 D_80089E2C[];
-extern u8 D_80089E38[];
+extern u8 SCALE_SIX[];
 extern u8 D_80089E44[];
 extern u8 D_80089D00[];
 extern u8 D_80089D18[];
-extern u8 D_80089C70[];
-extern u8 D_80089C64[];
+extern u8 ROTATION_YAW_MINUS9[];
+extern u8 ROTATION_YAW_PLUS9[];
 extern u8 D_80089E80[];
 
 /* func_80064FBC, this unit's own function, is called by func_80064E34
@@ -145,7 +145,7 @@ void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
 
 void func_80064CA4(Entity *this, EntityMoodHandlerArg *out) {
     func_80062570(this, out);
-    this->methods->updateScale(this, 1, D_80089E38);
+    this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
 void func_80064CEC(Entity *this, EntityMoodHandlerArg *out) {
@@ -262,19 +262,19 @@ void func_800650F4(Entity *this, EntityMoodHandlerArg *out) {
         return;
     }
     if (rand() % 3 != 0) {
-        a2 = D_80089C64;
+        a2 = ROTATION_YAW_PLUS9;
     } else {
-        a2 = D_80089C70;
+        a2 = ROTATION_YAW_MINUS9;
     }
     this->methods->updateRotation(this, 0, a2);
 }
 
 void func_8006519C(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->updateScale(this, 1, D_80089E38);
+    this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
 void func_800651D0(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->updateScale(this, 1, D_80089E38);
+    this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
 void func_80065204(Entity *this, EntityMoodHandlerArg *out) {

@@ -23,7 +23,7 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     if ((u32)(this->unkFC - 0x12C) < 0x14) {
         this->methods->slotC4(this, -0x3C, 0);
     } else if ((u32)(this->unkFC - 0x141) < 0x13) {
-        this->methods->slot44(this, 0, D_80089C70);
+        this->methods->slot44(this, 0, ROTATION_YAW_MINUS9);
     } else if (this->unkFC >= 0x141) {
         r1 = rand();
         a1val = -0x80;
@@ -32,9 +32,9 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
         }
         this->methods->slotC8(this, a1val, 1);
         r2 = rand();
-        table = D_80089C64;
+        table = ROTATION_YAW_PLUS9;
         if ((r2 & 3) != 0) {
-            table = D_80089C70;
+            table = ROTATION_YAW_MINUS9;
         }
         this->methods->slot44(this, 0, table);
     }
@@ -62,9 +62,9 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
   exactly (see that report) -- two independent instances now, worth
   treating as a general rule for this codebase.
 - `slotC4`/`slot44`/`slotC8`/`slot148` were all already correctly typed;
-  no header change needed. The only new extern was `D_80089C7C`-style
+  no header change needed. The only new extern was `ROTATION_YAW_PLUS180`-style
   data-table symbols already declared for sibling functions in this unit
-  (`D_80089C64`/`D_80089C70`, both reused here, no new declarations).
+  (`ROTATION_YAW_PLUS9`/`ROTATION_YAW_MINUS9`, both reused here, no new declarations).
 - All three branches funnel into a SHARED `jalr v0` at one physical
   address in retail's bytes (`L800606F0`), with each branch loading its
   own target function pointer, `a0`, `a1`, `a2` before falling into (or

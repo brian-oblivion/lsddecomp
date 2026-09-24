@@ -16,13 +16,13 @@ void Entity__func_80060710(Entity *this) {
     if (this->unkFC == 0) {
         r = rand() % 10;
         if (r >= 8) {
-            this->methods->slot48(this, 1, D_80089E8C);
+            this->methods->slot48(this, 1, SCALE_X3);
         } else if (r >= 5) {
             this->unk44 = 0xA;
         }
     }
     if (this->unk44 == 0xA && this->unkFC >= 0xC9) {
-        this->methods->slotBC(this, D_80089DC0);
+        this->methods->slotBC(this, TRANSLATE_Z_MINUS256);
     }
 }
 ```
@@ -54,9 +54,9 @@ void Entity__func_80060710(Entity *this) {
   simultaneous, severe, EVEN-NUMBERED-of-total mismatches with the drift
   warning firing at a five/six-figure byte count, suspect ONE upstream
   function's word count before doubting several unrelated ones.**
-- The two data-table arguments (`D_80089E8C` to `slot48`, `D_80089DC0` to
+- The two data-table arguments (`SCALE_X3` to `slot48`, `TRANSLATE_Z_MINUS256` to
   `slotBC`) are plain `extern u8 SYM[];` externs passed directly, no offset
-  arithmetic needed (contrast `Entity__MoodCue41`'s `D_80089EA2`, which does
+  arithmetic needed (contrast `Entity__MoodCue41`'s `sScaleTemplateZDenom`, which does
   need one).
 
 ### Proposed learning

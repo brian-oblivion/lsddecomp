@@ -10,13 +10,13 @@
 #include "common.h"
 #include "Entity.h"
 
-extern u8 D_80089E38[];
-extern u8 D_80089E50[];
+extern u8 SCALE_SIX[];
+extern u8 SCALE_Y2[];
 extern u8 SCALE_DOUBLE[];
 extern u8 D_80089DCC[];
 extern u8 ROTATION_YAW_PLUS2[];
-extern u8 D_80089C64[];
-extern u8 D_80089C70[];
+extern u8 ROTATION_YAW_PLUS9[];
+extern u8 ROTATION_YAW_MINUS9[];
 extern u8 D_80089C58[];
 extern u8 D_80089E74[];
 extern u8 D_80089D18[];
@@ -36,7 +36,7 @@ void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
 
 void func_8005EFF4(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0 && rand() % 7 == 0) {
-        this->methods->updateScale(this, 1, D_80089E50);
+        this->methods->updateScale(this, 1, SCALE_Y2);
     }
     if ((out->unk4 & 3) == 0) {
         out->unk10 = this->methods->getProximityRatio(this);
@@ -173,7 +173,7 @@ void func_8005F608(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 s32 func_8005F6D4(Entity *this) {
-    return this->methods->updateScale(this, 1, D_80089E38);
+    return this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
 void func_8005F708(Entity *this) {
@@ -254,11 +254,11 @@ void func_8005FB6C(Entity *this) {
     s32 arg1;
 
     if ((u32)(this->moodTimer - 0x190) < 0xA) {
-        this->methods->updateRotation(this, 0, D_80089C64);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
     } else if ((u32)(this->moodTimer - 0x2BC) < 0xA) {
-        this->methods->updateRotation(this, 0, D_80089C70);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
     } else if ((u32)(this->moodTimer - 0x33E) < 0x4) {
-        this->methods->updateRotation(this, 0, D_80089C70);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
     } else if (this->moodTimer >= 0x353) {
         this->methods->deactivate(this);
     }
@@ -318,7 +318,7 @@ void func_8005FDFC(Entity *this) {
 
     if (this->unk44 == 0) {
         roll = rand();
-        arg2 = D_80089E38;
+        arg2 = SCALE_SIX;
         if ((roll & 1) != 0) {
             arg2 = SCALE_DOUBLE;
         }

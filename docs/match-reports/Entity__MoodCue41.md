@@ -23,7 +23,7 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0xE) {
         if ((this->unkFC & 3) == 0) {
             rv = rand();
-            tablePtr = &D_80089EA2;
+            tablePtr = &sScaleTemplateZDenom;
             *tablePtr = rv % 32 + 1;
             this->methods->slot48(this, 1, (u8 *)tablePtr - 0xA);
         }
@@ -52,7 +52,7 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
   literals, and the FIRST-computed one goes on the stack as the 5th
   argument. Reading argument order off computation order is wrong; read it
   off which register/slot each value lands in.
-- The `D_80089EA2` pointer must be computed AFTER the second `rand()` call in
+- The `sScaleTemplateZDenom` pointer must be computed AFTER the second `rand()` call in
   source order, not before -- computing it first forces the compiler to keep
   it alive across the call in a callee-saved register (`s1`), where retail
   keeps it in caller-saved `a2` because nothing calls between computing the
@@ -60,9 +60,9 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
   family as "cache a vtable pointer before an intervening call" but the
   observation runs the other way: compute the ADDRESS after the call it
   would otherwise have to survive.
-- `D_80089EA2 - 0xA` (byte-pointer arithmetic) resolves to `D_80089E8C + 0xC`
+- `sScaleTemplateZDenom - 0xA` (byte-pointer arithmetic) resolves to `SCALE_X3 + 0xC`
   numerically (`asm/data/79528.data.s`), but retail's relocation is against
-  `D_80089EA2` specifically (own `lui`/`addiu` pair), so the C must reference
+  `sScaleTemplateZDenom` specifically (own `lui`/`addiu` pair), so the C must reference
   that symbol with a negative offset, not the neighbouring array with a
   positive one -- same final address, different symbol reference, and only
   one of them reproduces retail's bytes.

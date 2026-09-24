@@ -2,16 +2,16 @@
 #include "Entity.h"
 
 /* Data tables reached with a raw pointer by this unit's mood-dispatch
- * handlers -- same convention as Entity_d.c/Entity_c.c's own D_80089E50/
- * D_80089E38/etc externs (separate local view per translation unit, not
+ * handlers -- same convention as Entity_d.c/Entity_c.c's own SCALE_Y2/
+ * SCALE_SIX/etc externs (separate local view per translation unit, not
  * shared via the header). */
-extern u8 D_80089C64[];
-extern u8 D_80089C7C[];
+extern u8 ROTATION_YAW_PLUS9[];
+extern u8 ROTATION_YAW_PLUS180[];
 extern u8 D_80089CD0[];
 extern u8 D_80089CDC[];
 extern u8 D_80089D90[];
 extern u8 D_80089DE4[];
-extern u8 D_80089E38[];
+extern u8 SCALE_SIX[];
 
 /* Forward declarations: both are defined later in this file (in ROM
  * order), but func_80063874 and func_80063BC0 call them before their own
@@ -109,7 +109,7 @@ void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->unk44 == 0xA) {
         if (this->moodTimer < 0xA) {
-            this->methods->updateRotation(this, 0, D_80089C64);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
             if (this->target->methods->slot100(this->target) != 0) {
                 func_80063C84(out);
                 this->unk44 = 0xC;
@@ -142,7 +142,7 @@ void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
             this->target->methods->slot44(this->target, 0, D_80089CD0);
         } else {
             func_80063CAC(out);
-            this->target->methods->slot44(this->target, 1, D_80089C7C);
+            this->target->methods->slot44(this->target, 1, ROTATION_YAW_PLUS180);
             this->methods->notifyParents(this, (rand() % 5 != 0) ? 0xA : 0xC);
             this->unk44 = 0xE;
         }
@@ -314,12 +314,12 @@ void func_80064294(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot128(this, 1);
         if (this->unk44 != 0) {
             if ((rand() & 1) == 0) {
-                this->methods->updateScale(this, 1, D_80089E38);
+                this->methods->updateScale(this, 1, SCALE_SIX);
                 this->methods->slotCC(this, 0x800, 0);
             }
         }
         if (rand() % 3 == 0) {
-            this->methods->updateRotation(this, 0, D_80089C7C);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
         }
     }
     if (this->unk7C != 0) {

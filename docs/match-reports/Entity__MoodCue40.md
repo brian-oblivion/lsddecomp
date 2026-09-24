@@ -20,11 +20,11 @@ void Entity__MoodCue40(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0xC8) {
         table = ROTATION_YAW_MINUS90;
     } else if (this->unkFC == 0x190) {
-        table = D_80089C7C;
+        table = ROTATION_YAW_PLUS180;
     } else if (this->unkFC == 0x258) {
         table = ROTATION_YAW_PLUS90;
     } else if (this->unkFC == 0x320) {
-        table = D_80089C7C;
+        table = ROTATION_YAW_PLUS180;
         this->unkFC = -1;
     }
     if (table != NULL) {
@@ -61,7 +61,7 @@ describes the score, not the defect count").
   first statement) fixed this in one change, dropping the drift to ~79KB
   (the size of the two remaining residues below).
 - **Residue #2: two branches assign the textually IDENTICAL expression
-  `table = D_80089C7C;`** (the `unkFC == 0x190` and `unkFC == 0x320`
+  `table = ROTATION_YAW_PLUS180;`** (the `unkFC == 0x190` and `unkFC == 0x320`
   cases). GCC's cross-jump pass tail-merged them into ONE shared code block
   reached from both branches, which retail's bytes do NOT do -- retail
   keeps two separate, byte-identical `lui`/`addiu` pairs, one per branch.
@@ -75,10 +75,10 @@ describes the score, not the defect count").
   candidates may be worth retrying there too.
 - **Residue #3, and it turned out to make the barrier from #2
   unnecessary: statement order inside the `unkFC == 0x320` arm.** Retail
-  computes `table = D_80089C7C;` (the `lui`/`addiu` pair) BEFORE storing
+  computes `table = ROTATION_YAW_PLUS180;` (the `lui`/`addiu` pair) BEFORE storing
   `this->unkFC = -1;`, even though the natural narrative order (validate
   the state, THEN update it) suggests writing the store first. My first
-  attempt wrote `this->unkFC = -1; table = D_80089C7C;` and only the store
+  attempt wrote `this->unkFC = -1; table = ROTATION_YAW_PLUS180;` and only the store
   instruction's position was wrong (3 words off from retail, matching
   score 86/89). Swapping the two statements' order fixed it exactly to
   89/89 -- and, checked afterward, ALSO made the `__asm__("")` barrier

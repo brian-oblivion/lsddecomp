@@ -12,13 +12,13 @@ void Entity__MoodCue52(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (this->unkFC < 0xBC) {
         if (this->unkFC == 0x54) {
-            this->methods->slot44(this, 0, D_80089C7C);
+            this->methods->slot44(this, 0, ROTATION_YAW_PLUS180);
         }
         if (out->unk4 % 20 == 0) {
             out->unk1C = 9;
         }
     } else if (this->unkFC < 0xC8) {
-        this->methods->slot44(this, 0, D_80089C64);
+        this->methods->slot44(this, 0, ROTATION_YAW_PLUS9);
     } else {
         this->methods->slot160(this);
         out->unk30 = 0x1E;
@@ -48,7 +48,7 @@ which needed a fix:
 - All three vtable slots involved (`slot148`, `slot44`, `slot160`,
   `slotD0`) were already correctly typed in `include/Entity.h` from earlier
   units/functions; no header change needed here beyond adding the
-  `D_80089C7C` data-table extern (same convention as this unit's other
+  `ROTATION_YAW_PLUS180` data-table extern (same convention as this unit's other
   `D_80089Cxx`/`D_80089Exx` externs).
 
 ### Proposed learning

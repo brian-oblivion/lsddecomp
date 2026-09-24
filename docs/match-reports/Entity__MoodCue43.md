@@ -24,9 +24,9 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
         a1val = (rand() & 1) ? -0x3C : 0x3C;
         this->methods->slotC8(this, a1val, 0);
         r2 = rand();
-        table = D_80089C64;
+        table = ROTATION_YAW_PLUS9;
         if ((r2 & 3) != 0) {
-            table = D_80089C70;
+            table = ROTATION_YAW_MINUS9;
         }
         this->methods->slot44(this, 0, table);
     }
@@ -48,16 +48,16 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
   (unused by the callee, harmless). Typing the callee from its own body,
   not from what happens to be sitting in the caller's registers, avoided a
   wrong two-argument signature here.
-- **The `D_80089C64`/`D_80089C70` table selection is the "default value,
+- **The `ROTATION_YAW_PLUS9`/`ROTATION_YAW_MINUS9` table selection is the "default value,
   then conditionally overwritten" idiom** from
   `docs/DECOMPILATION_LEARNINGS.md`, not a ternary: retail loads
-  `D_80089C64` unconditionally right after the second `rand()` call, then
-  overwrites it with `D_80089C70` only if `rand() & 3 != 0`. Write it as
-  `table = D_80089C64; if (cond) table = D_80089C70;`, not
-  `table = cond ? D_80089C70 : D_80089C64;` -- the ternary form did not
+  `ROTATION_YAW_PLUS9` unconditionally right after the second `rand()` call, then
+  overwrites it with `ROTATION_YAW_MINUS9` only if `rand() & 3 != 0`. Write it as
+  `table = ROTATION_YAW_PLUS9; if (cond) table = ROTATION_YAW_MINUS9;`, not
+  `table = cond ? ROTATION_YAW_MINUS9 : ROTATION_YAW_PLUS9;` -- the ternary form did not
   reproduce the load-then-conditionally-overwrite instruction shape when
   tried first.
-- **The default assignment (`table = D_80089C64;`) must come AFTER the
+- **The default assignment (`table = ROTATION_YAW_PLUS9;`) must come AFTER the
   `rand()` call that feeds the guarding condition, not before it**, even
   though it reads naturally to write it first. Assigning it before the call
   forces the compiler to keep `table` alive across the `jal`, promoting it
@@ -65,7 +65,7 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
   because nothing calls between the default assignment and its last use.
   Introducing an explicit `r2 = rand();` local, then assigning the default
   from `r2`, fixed this. This is the SAME lever as `Entity__MoodCue41`'s
-  `D_80089EA2` pointer (see that report) applied to a plain data value
+  `sScaleTemplateZDenom` pointer (see that report) applied to a plain data value
   instead of a pointer -- worth generalizing.
 
 ### Proposed learning

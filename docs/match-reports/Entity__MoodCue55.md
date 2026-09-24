@@ -13,7 +13,7 @@ void Entity__MoodCue55(Entity *this, EntityMoodHandlerArg *out) {
 
     if (this->unkFC == 0) {
         if (rand() % 3 == 0) {
-            this->methods->slot48(this, 1, D_80089E50);
+            this->methods->slot48(this, 1, SCALE_Y2);
         }
     }
     out->unk10 = this->methods->slot148(this);
