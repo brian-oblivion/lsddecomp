@@ -139,7 +139,7 @@ extern Rec16D7F0 D_8008D7FA[];
  * stack-passed arguments at 0x18/0x1C($sp) instead of 0x10/0x14.  See this
  * function's match report -- the frame is the ONLY thing the idiom is for,
  * and adding anything else on top of it breaks the scheduling. */
-s32 func_80031BA4(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
+s32 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
     s32 dead[2];
 
     if ((u16)idx < 0x18) {

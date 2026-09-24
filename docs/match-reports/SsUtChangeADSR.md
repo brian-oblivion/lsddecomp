@@ -1,4 +1,6 @@
-# func_80031BA4 -- MATCHED 61/61 (head adjudication: a lever-stacking stall)
+# SsUtChangeADSR -- MATCHED 61/61 (head adjudication: a lever-stacking stall)
+
+> Renamed from `func_80031BA4` on 2026-09-24 (tools/rename.py). Address 0x80031ba4.
 
 Unit `code_179d8_j`. Round 22. Runner alpha reached 57/61 and filed this as a
 scheduling stall, concluding that **"stack-passed argument loads sit outside
@@ -6,7 +8,7 @@ ordinary scheduling-barrier reach"** -- i.e. that the four-instruction
 block-reorder at the top of the function was not source-reachable. That
 conclusion is wrong, and the way it is wrong is worth more than the function.
 
-`s32 func_80031BA4(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5)` -- a leaf
+`s32 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5)` -- a leaf
 that bounds-checks `idx` against 0x18, compares three parallel 52-byte-stride
 tables against `p1`/`p2`/`p3`, and on a full match writes `p4`/`p5` into two
 16-byte-stride tables and ORs `0x30` into a flag byte.

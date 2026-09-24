@@ -37,7 +37,7 @@ the same breath without saying how they relate) left ambiguous.
 
 Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `idx`, validates it against three parallel 52-byte-stride records
-(`D_8008D99E`/`D_8008D99A`/`D_8008D994`, same family as `func_80031BA4`/
+(`D_8008D99E`/`D_8008D99A`/`D_8008D994`, same family as `SsUtChangeADSR`/
 `SsUtKeyOff`), then on a full match calls `func_80032148`, sets the
 "current channel" mode globals, copies a per-channel byte into
 `D_8008EA18`, stores `note2pitch2`'s return into a 16-byte-stride table,
@@ -152,7 +152,7 @@ without it.
 Before finding the unused-parameter explanation, a scalar `s32 dead;` and
 a one-element `s32 dead[1];`, both guarded by an unreachable `if (0) { ... }`
 statement (this unit's established idiom for forcing a frame on an
-otherwise-frameless leaf, see `func_80031BA4`'s report), were tried here and
+otherwise-frameless leaf, see `SsUtChangeADSR`'s report), were tried here and
 had **zero effect** on the stack-argument offsets -- this function already
 has a real, non-zero frame from five callee-saved registers plus `$ra`, and
 the dead-local trick appears to only matter for sizing a frame that
@@ -197,7 +197,7 @@ zero -- one fewer instruction, not a different one). Tried and rejected:
   output; both spellings compile the same way.
 - Passing `func_80032148`'s two arguments as the raw parameters (`p1`, `p2`)
   instead of the just-validated record fields (`v1`, `v2`) -- **no effect**,
-  confirming (a second time, after `func_80031BA4`'s report) that GCC 2.6.3's
+  confirming (a second time, after `SsUtChangeADSR`'s report) that GCC 2.6.3's
   cse pass treats a value proven equal by an `if (x != y) return;` guard as
   fully interchangeable for a later call, regardless of which name the
   source uses.
