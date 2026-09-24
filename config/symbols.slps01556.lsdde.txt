@@ -2334,3 +2334,5 @@ ObjM__InitStyleAndWorld = 0x80052F10; // type:func
 ObjM__TeardownStyle = 0x80053134; // type:func
 ObjM__TransferToOther = 0x800531CC; // type:func
 ObjM__OnSelectTransfer = 0x800531A0; // type:func
+ObjM__DispatchEvent = 0x80053358; // type:func
+ObjM__TickTarget = 0x800533F0; // type:func

@@ -1,4 +1,6 @@
-# func_80053358
+# ObjM__DispatchEvent
+
+> Renamed from `func_80053358` on 2026-09-24 (tools/rename.py). Address 0x80053358.
 
 **Unit:** class_3bb8c_l · **Size:** 38 words (0x98 bytes) ·
 **Status: MATCHED 38/38**, whole-image SHA1 green.
@@ -10,7 +12,7 @@ slots on `self` (or does nothing if `self->unk68` is zero, or the event
 isn't one of the four recognised values).
 
 ```c
-void func_80053358(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
+void ObjM__DispatchEvent(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
     Obj87034Methods_3bb8c_l *m = self->methods;
     void (*fn)(Obj87034_3bb8c_l *);
 

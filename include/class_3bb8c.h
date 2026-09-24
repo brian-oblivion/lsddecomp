@@ -2504,13 +2504,13 @@ typedef struct Obj87034Methods_3bb8c_l {
     u8 pad4C[0x05C - 0x04C];
     void (*slot5C)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x05C, ObjM__InitStyleAndWorld (arg1 is func_80048F84's return value, forwarded opaquely) */
     u8 pad60[0x074 - 0x060];
-    void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, func_80053358 (event 0x21) */
+    void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, ObjM__DispatchEvent (event 0x21) */
     u8 pad78[0x07C - 0x078];
     void (*slot7C)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x07C, ObjM__TransferToOther */
     void (*slot80)(Obj87034_3bb8c_l *self);                        /* +0x080, ObjM__TransferToOther */
     void (*slot84)(Obj87034_3bb8c_l *self);                        /* +0x084, ObjM__TeardownStyle */
     void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, ObjM__TransferToOther */
-    void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, func_800533F0 */
+    void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, ObjM__TickTarget */
     u8 pad90[0x094 - 0x090];
     void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, func_80053984 (event/code 0xA, dense switch) */
     void (*slot98)(Obj87034_3bb8c_l *self);                        /* +0x098, func_80053984 (event/code 0xC) */
@@ -2520,11 +2520,11 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slotA8)(Obj87034_3bb8c_l *self);                        /* +0x0A8, func_80053984 (event/code 0x10) */
     void (*slotAC)(Obj87034_3bb8c_l *self);                        /* +0x0AC, func_80053984 (event/code 0x11) */
     u8 padB0[0x0C0 - 0x0B0];
-    void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, func_80053358 (event 0xC) */
-    void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, func_80053358 (event 0x2C)/func_80053458 */
-    void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, func_80053358 (event 0x16) */
+    void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, ObjM__DispatchEvent (event 0xC) */
+    void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, ObjM__DispatchEvent (event 0x2C)/func_80053458 */
+    void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, ObjM__DispatchEvent (event 0x16) */
     u8 padCC[0x0D0 - 0x0CC];
-    void (*slotD0)(Obj87034_3bb8c_l *self);                        /* +0x0D0, func_800533F0/func_80053458 */
+    void (*slotD0)(Obj87034_3bb8c_l *self);                        /* +0x0D0, ObjM__TickTarget/func_80053458 */
     void (*slotD4)(Obj87034_3bb8c_l *self);                        /* +0x0D4, func_800536B0/func_80053458 */
 } Obj87034Methods_3bb8c_l;
 
@@ -2535,7 +2535,7 @@ struct Obj87034_3bb8c_l {
     s32 unk10;                        /* +0x010, func_80053764 */
     Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/func_8005393C/func_800536B0 */
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, func_800536B0 */
-    s32 unk1C;                           /* +0x01C, func_800533F0: incremented once per call */
+    s32 unk1C;                           /* +0x01C, ObjM__TickTarget: incremented once per call */
     s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's func_800534C8: forwarded opaquely to SetDreamAuxWorld's own arg3 */
@@ -2551,12 +2551,12 @@ struct Obj87034_3bb8c_l {
     u8 pad5C[0x060 - 0x05C];
     s32 unk60;                                 /* +0x060, ObjM__TransferToOther: has-a-target gate, cleared after detaching */
     s32 unk64;                                  /* +0x064, ObjM__TransferToOther: set to 1 */
-    s32 unk68;                                   /* +0x068, ObjM__TransferToOther/func_80053358/func_800533F0: zero-checked gate */
+    s32 unk68;                                   /* +0x068, ObjM__TransferToOther/ObjM__DispatchEvent/ObjM__TickTarget: zero-checked gate */
     s32 unk6C;                                    /* +0x06C, ObjM__InitStyleAndWorld: out-parameter address passed to RegisterStyleConfig, own type unknown */
     u8 pad70[0x078 - 0x070];
     DreamSysObj_3bb8c_l *unk78;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->unk18 */
     u8 pad7C[0x080 - 0x07C];
-    s32 unk80;                                    /* +0x080, ObjM__TransferToOther (on `other`)/func_800533F0/func_80053458: zero-checked gate */
+    s32 unk80;                                    /* +0x080, ObjM__TransferToOther (on `other`)/ObjM__TickTarget/func_80053458: zero-checked gate */
 };
 
 /* Global BasicClass-family accessor shared across many classes (see

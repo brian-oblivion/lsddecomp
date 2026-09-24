@@ -27,7 +27,7 @@ return values are unused, declared as plain `extern void func(void);` in
 - `self->unk54` dispatches its OWN `+0x48` slot — the same numeric offset
   self dispatches directly in `ObjM__DetachTarget`, reused here on a sibling
   object of the presumed-same class (`Obj87034_3bb8c_l *unk54`).
-- Diffed clean immediately after `ObjM__TransferToOther` and `func_80053358` were
+- Diffed clean immediately after `ObjM__TransferToOther` and `ObjM__DispatchEvent` were
   fixed — this function's own two `jal` targets (`TickDreamAuxSlots2`,
   `StyleTeardown`) initially resolved to addresses 0xC bytes past retail's,
   purely because OTHER not-yet-fixed functions in this unit were still the

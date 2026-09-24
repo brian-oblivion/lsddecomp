@@ -215,7 +215,7 @@ void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     }
 }
 
-void func_80053358(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
+void ObjM__DispatchEvent(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
     Obj87034Methods_3bb8c_l *m = self->methods;
     void (*fn)(Obj87034_3bb8c_l *);
 
@@ -253,7 +253,7 @@ call:
     fn(self);
 }
 
-void func_800533F0(Obj87034_3bb8c_l *self) {
+void ObjM__TickTarget(Obj87034_3bb8c_l *self) {
     void (*fn)(Obj87034_3bb8c_l *);
 
     if (self->unk68 != 0) {

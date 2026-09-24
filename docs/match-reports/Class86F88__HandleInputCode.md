@@ -43,7 +43,7 @@ void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
 `arg1` (the incoming second register argument) is never referenced in the
 body -- matches this project's established event-dispatcher signature
 shape (`self`, an unused/opaque second argument, an `s32` code), the same
-one `class_3bb8c_l`'s `func_80053984`/`func_80053358` use.
+one `class_3bb8c_l`'s `func_80053984`/`ObjM__DispatchEvent` use.
 
 ## HEAD BROADCAST 1 (source-declaration-order case layout) DOES apply here
 
