@@ -226,7 +226,7 @@ void Class86F88__ScrollLeft(Class86F88 *self)
     self->methods->slot94(self, self->unk20, count, self->unk28, 1);
 }
 
-void func_800524F8(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
+void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     s32 count;
     s32 newUnk20;

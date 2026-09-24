@@ -2013,3 +2013,4 @@ Class86F88__HandleInputCode = 0x800522DC; // type:func
 Class86F88__ForwardToTarget = 0x800523F0; // type:func
 Class86F88__ScrollRight = 0x80052430; // type:func
 Class86F88__ScrollLeft = 0x80052498; // type:func
+Class86F88__CursorUp = 0x800524F8; // type:func

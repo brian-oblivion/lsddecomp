@@ -1,7 +1,9 @@
-# func_800524F8 -- MATCH
+# Class86F88__CursorUp -- MATCH
+
+> Renamed from `func_800524F8` on 2026-09-24 (tools/rename.py). Address 0x800524f8.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_800524F8`: 40/40 words match.
+SHA1 matches retail. `funcdiff.py Class86F88__CursorUp`: 40/40 words match.
 
 This is vtable slot `+0x084` of `D_80086F88` (not declared in
 `Class86F88Methods` since nothing in this unit dispatches through it by
@@ -11,7 +13,7 @@ sites, which ARE declared).
 ## Source
 
 ```c
-void func_800524F8(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
+void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     s32 count;
     s32 newUnk20;
