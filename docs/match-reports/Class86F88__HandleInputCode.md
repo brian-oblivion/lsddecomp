@@ -92,3 +92,11 @@ essential) make the discriminator concrete: **check the jump table's own
 label order against sorted case-value order before writing the switch,
 every time** -- neither "always reorder" nor "never reorder" is safe, and
 the check costs nothing (the labels are right there in the `.s`).
+
+## Naming
+
+Round 75 (bravo, track 3). `func_800522DC` -> `Class86F88__HandleInputCode`, **tier B**.
+
+Slot +0x05C (`tools/classtable.py gClass86F88Methods`), which Class86F88__NotifyChild dispatches for notifications from its tag-2 child (the one Class86F88__AddChild caches as `inputSource`). Code 25: forwardToTarget(0x10) then setState(2); 23: forwardToTarget(0x10) then setState(3); 5: scrollRight; 4: scrollLeft; 18: cursorUp; 19: cursorDown (each resolved to its method through the same table). TaskObjF (class_3bb8c_g) also branches on 0x19/0x17. Tier B: that these codes are controller buttons is not established. Retyped round 75 from the unit's ObjM view to `Class86F88 *`: the function's own table is gClass86F88Methods and every slot it calls holds a Class86F88 method.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

@@ -82,3 +82,9 @@ in a register from the earlier assignment) -- consistent with the rest of
 this project's observation that a struct-field read right after a
 struct-field write commonly recompiles as a genuine reload, not a cached
 register reuse.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052C10` -> `ObjM__ObjM`, **tier A**.
+
+Slot +0x008 of D_80087034 (`tools/classtable.py 0x80087034`), the ctor New_ObjM calls. Runs the base Class86668 ctor, sets methods = GetObjMMethods(), stores its arguments and clears fields, then calls +0x040.

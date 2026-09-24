@@ -109,3 +109,11 @@ enough to force GCC 2.6.3 to re-materialize the value into a fresh
 register across an intervening call, rather than reusing the
 already-live callee-saved register. Worth trying as a cheaper first step
 before reaching for a differently-named variable on this residue class.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_8005292C` -> `Class86F88__FormatRowText`, **tier A**.
+
+Not a table slot (non-virtual helper). Copies item (top + row)'s text, starting `column` characters in, into `dest`, truncated to 26 characters, pads to 26 with spaces, NUL-terminates, returns dest. Callers: CreateRows, RefreshRows. The matched body types `column` as `char *` and `texts` as `s32 *` (their sum is the source pointer); retyping them the natural way is left alone because it touches a matched body.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

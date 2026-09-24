@@ -75,3 +75,11 @@ nulling the slot. Four separate residues, closed one at a time with
    `u8 unused[8];` local (this project's established "GCC reserves stack
    space for a completely dead local" idiom, now with another confirmed
    instance).
+
+## Naming
+
+Round 75 (bravo, track 3). `func_8005278C` -> `Class86F88__ReleaseRows`, **tier A**.
+
+Slot +0x090 (`tools/classtable.py gClass86F88Methods`), called by Class86F88__ReleaseResources. Releases each of the min(itemCount, 4) row objects and clears its `rows[]` entry.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

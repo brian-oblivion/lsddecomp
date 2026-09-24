@@ -22,3 +22,11 @@ s32 Class86F88__GetCursorIndex(Class86F88 *self)
 ## Notes
 
 A plain one-field getter. Matched first attempt.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052B54` -> `Class86F88__GetCursorIndex`, **tier A**.
+
+Slot +0x09C (`tools/classtable.py gClass86F88Methods`), a getter returning `cursorIndex`. The caller TaskObjF__OnItemSelected (class_3bb8c_g) calls it through the child's +0x09C on result 2 and stores the value as `selectedItem`.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

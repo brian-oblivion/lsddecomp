@@ -44,3 +44,11 @@ body reads.
 not a separate load followed by `- 1`) is what let the guard's own
 register become the exact value stored back to `self->unk24` and forwarded
 to `slot94` with no reload -- matched on the first attempt in this shape.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052498` -> `Class86F88__ScrollLeft`, **tier A**.
+
+Slot +0x080 (`tools/classtable.py gClass86F88Methods`). Decrements `column` if it stays >= 0, then refreshRows. Dispatched by HandleInputCode on code 4.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

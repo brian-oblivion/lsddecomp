@@ -66,3 +66,11 @@ literally doubling the assignment of a value the permuter's zero-scoring
 candidate reads twice, and drop any UB (float casts, mismatched types)
 from that same candidate first -- the two are often independent, and the
 double-read is far more often the real lever.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052430` -> `Class86F88__ScrollRight`, **tier A**.
+
+Slot +0x07C (`tools/classtable.py gClass86F88Methods`). If rows exist (`resource`) and column+26 < maxTextLen, increments `column` (the character offset into every item string) and redraws via refreshRows. Mechanics are the purpose. Dispatched by HandleInputCode on code 5.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

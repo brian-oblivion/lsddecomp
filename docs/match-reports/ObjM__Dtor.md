@@ -33,3 +33,9 @@ wrapper, since nothing here reads any field specific to this unit's own
 class. `#include "class_39e08.h"` added to this unit's includes for this
 declaration (and `Obj865C8`/`GetClass86668Methods` used by nothing else in this
 unit). Matched first attempt.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052CD8` -> `ObjM__Dtor`, **tier A**.
+
+Slot +0x00C of D_80087034 (`tools/classtable.py 0x80087034`). Forwards to the base's dtor (GetClass86668Methods()->dtor). Named after the base family's own +0x00C names (Class86668__Dtor, Obj865C8__Dtor).

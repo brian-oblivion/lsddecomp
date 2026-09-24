@@ -92,3 +92,11 @@ the bridge, not a contradiction.
 `Class86F88ElemMethods::slotCC` (new slot, `+0x0CC`,
 `void (*)(Class86F88Elem *, char *)`) added additively after the existing
 `slotB8`.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_8005281C` -> `Class86F88__RefreshRows`, **tier A**.
+
+Slot +0x094 (`tools/classtable.py gClass86F88Methods`). (self, top, column, cursor, notify): re-formats every visible row's text for the new top/column (setText), SetView without highlight, and if `notify` calls forwardToTarget(0). Callers: ScrollRight, ScrollLeft, CursorUp, CursorDown (all notify=1).
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

@@ -130,3 +130,9 @@ paths) -- this is the layout GCC 2.6.3 -O2 folds into a single branch with
 the failure value in the delay slot and no extra jump. Confirmed once, on
 `New_ObjM`; worth checking against future instances of this same
 project-wide `New_X` allocator shape before assuming it generalizes.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052B70` -> `New_ObjM`, **tier A**.
+
+New_X allocator: BMemPMgrAlloc(0x88), then GetObjMMethods()->ctor (+0x008 of D_80087034, `tools/classtable.py 0x80087034`) with the 5 forwarded arguments; returns the object or NULL. Caller: Obj865C8__EnterState2 (class_39e08). The class's type name is `ObjM` (include/class_3bb8c.h).

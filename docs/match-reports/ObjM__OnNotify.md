@@ -78,3 +78,9 @@ a later, unrelated check. This is the same family of trap
 targets disagree, not just delay slots") but for a THREE-way dispatch
 specifically: worth checking each comparison's true predecessor/successor
 in the CFG before assuming linear `.s` order matches nesting order.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052D10` -> `ObjM__OnNotify`, **tier B**.
+
+Slot +0x038 of D_80087034 (`tools/classtable.py 0x80087034`), the slot called OnNotify elsewhere in this family (Obj865C8__OnNotify, Obj86B60__OnNotify). Calls the base's slot38, then dispatches on arg1->target->header: (tag & 0xFFF) == 0x114 -> ObjM__HandleEvent7 (+0x0B4), 0x164 -> ObjM__HandleEvent5Or6 (+0x0B0), (tag & 0xFFFF) == 0x1F34 -> func_80053984 (+0x090). Tier B: which objects carry those header tags is not established.

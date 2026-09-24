@@ -23,3 +23,9 @@ class table getters). `gClass86F88Methods` is this unit's own class's vtable
 `+0x058`, `+0x07C`..`+0x09C` of that table are this unit's own
 `Class86F88__SetState`/`Class86F88__TickClosing`/`Class86F88__ScrollRight`.../`Class86F88__GetCursorIndex`, all
 matched this round. Matched first attempt.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052B60` -> `GetClass86F88Methods`, **tier A**.
+
+Returns &gClass86F88Methods. Used as the ctor table by New_Class86F88 and Class86F88__Class86F88 (class_3bb8c_j). Named like GetClass86668Methods/GetObjMMethods.

@@ -59,3 +59,11 @@ the updated `unk28`.
 
 Both additions are additive splits of existing padding/adjacent rodata, no
 existing declaration changed.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052A58` -> `Class86F88__StepCursorInView`, **tier A**.
+
+Slot +0x098 (`tools/classtable.py gClass86F88Methods`). Re-colours the current cursor row gClass86F88RowColor, moves `cursorIndex` +1 (dir != 0) or -1, colours the new row gClass86F88CursorColor, and if `notify` calls forwardToTarget(0). Callers: CursorUp (dir 0), CursorDown (dir 1).
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

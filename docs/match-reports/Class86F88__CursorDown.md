@@ -75,3 +75,11 @@ instruction count and register choice.** Look for this whenever a
 function is a small, fixed number of words SHORT with everything else
 matching, especially around a subtraction/addition feeding a comparison or
 a call argument.
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052598` -> `Class86F88__CursorDown`, **tier A**.
+
+Slot +0x088 (`tools/classtable.py gClass86F88Methods`). Mirror of CursorUp: bounded by `itemCount`, steps within the window while cursor-top < 3, else scrolls the window down one item. Dispatched by HandleInputCode on code 19.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

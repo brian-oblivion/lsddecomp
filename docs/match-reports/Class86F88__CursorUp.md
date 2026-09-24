@@ -78,3 +78,11 @@ rather than a freshly-loaded field, which broadens the pattern: it is not
 specific to "reading a struct field for a guard", it applies to "storing
 a locally-mutated value back to the struct, then immediately reusing that
 same value as a call argument."
+
+## Naming
+
+Round 75 (bravo, track 3). `func_800524F8` -> `Class86F88__CursorUp`, **tier A**.
+
+Slot +0x084 (`tools/classtable.py gClass86F88Methods`). Decrements `cursorIndex`: inside the window via stepCursorInView(self, 0, 1), or at the top row by decrementing both `topIndex` and `cursorIndex` and redrawing. Rows are laid out 0xA apart in increasing y (Class86F88__CreateRows), so a lower index is higher on screen. Dispatched by HandleInputCode on code 18.
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).

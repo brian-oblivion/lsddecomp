@@ -115,3 +115,11 @@ SECOND such attribution trap this round (`CopyMemcardIconTemplate`'s report has 
 sibling case: a function-WIDE shared local, not a declaration-order issue,
 but the same family of "an unrelated-looking local variable decision
 shifts register allocation across the whole function").
+
+## Naming
+
+Round 75 (bravo, track 3). `func_80052644` -> `Class86F88__CreateRows`, **tier A**.
+
+Slot +0x08C (`tools/classtable.py gClass86F88Methods`). Called by Class86F88__LoadResources (class_3bb8c_j) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_Obj6EAC0(font, 26, text), lays each out at (gClass86F88RowOriginX, gClass86F88RowOriginY + 0xA*i), colours it gClass86F88RowColor, then SetView(..., highlight=1).
+
+Class86F88, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
