@@ -6,6 +6,28 @@
  * it is a BIOS trampoline. Entity/Entity_b's `include/Entity.h` is already
  * heavily typed and these functions are the same class family -- extend that
  * header rather than starting a new one.
+ *
+ * Named, round 78: all 20 functions are `gEntityMoodHandlerTable`
+ * mood-dispatch callbacks, `Entity__MoodCueNN` where NN is the table row
+ * (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot
+ * address - base) / 0x10) -- same family and naming convention as
+ * Entity_b/_d/_e/_g. Row order does not track code address, so this unit's
+ * rows (19-27, 29-38, plus 119) are not contiguous with each other or with
+ * source order; `Entity__MoodCue119` sits far from its neighbours by address
+ * alone, confirmed against the table rather than assumed from proximity
+ * (Entity_d/round 76's lesson). `Entity__MoodCue30` additionally occupies
+ * row 122 with the same handler and different data words -- one function
+ * shared by two distinct mood-row configurations, named for its lower row
+ * (same precedent as `Entity__MoodCue81`, Entity_e).
+ *
+ * Every field and vtable slot this unit's functions touch (`moodTimer`,
+ * `moodState`, `target`, `unk80`, `unk28`, `unkF4`, the `out->unkNN`
+ * `EntityMoodHandlerArg` members, `slotC4`/`slotC8`/`slotCC`/`slotD0`,
+ * `slot130`/`slot144`/`slot200`) is shared with at least one sibling
+ * Entity_x unit, so none of it was renamed here; see the individual match
+ * reports' `## Proposed field names` for the new evidence this unit adds
+ * (`Entity::unk80` -> `moodDuration` proposed in `Entity__MoodCue21.md`;
+ * `unkF4`/`slot144` corroborated against existing proposals elsewhere).
  */
 #include "common.h"
 #include "Entity.h"
