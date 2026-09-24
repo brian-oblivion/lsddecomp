@@ -2133,3 +2133,4 @@ Class86B60__Tick = 0x8004D9D4; // type:func
 Class86B60__RefreshViewValue = 0x8004DABC; // type:func
 Class86B60__CreateNameField = 0x8004DB18; // type:func
 Class86B60__DestroyNameField = 0x8004DC08; // type:func
+Class86B60__ForwardToNameField = 0x8004DC64; // type:func

@@ -1073,7 +1073,7 @@ struct GenericReleaseObj_3bb8c_d {
 /*
  * Class86B60::unkB0's pointee. Shares the same `release` slot at `+0x004`
  * as `GenericReleaseObj_3bb8c_d`, but also exposes `+0x04C` (reached by
- * func_8004DC64), so it gets its own local view rather than reusing that
+ * Class86B60__ForwardToNameField), so it gets its own local view rather than reusing that
  * minimal type.
  */
 typedef struct Class86B60UnkB0ObjMethods_3bb8c_d Class86B60UnkB0ObjMethods_3bb8c_d;
@@ -1083,7 +1083,7 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
     u8 pad000[0x004];
     void (*release)(Class86B60UnkB0Obj_3bb8c_d *self); /* +0x004, Class86B60__DestroyNameField */
     u8 pad008[0x04C - 0x008];
-    /* +0x04C, func_8004DC64's own 2nd call: `(self, arg1, &D_8008A9B4)`. */
+    /* +0x04C, Class86B60__ForwardToNameField's own 2nd call: `(self, arg1, &D_8008A9B4)`. */
     void (*slot4C)(Class86B60UnkB0Obj_3bb8c_d *self, s32 arg1, void *arg2);
     u8 pad050[0x0B8 - 0x050];
     /* +0x0B8, func_8004DCD0's own last call: `(self, buf)` where `buf` is
@@ -1329,7 +1329,7 @@ struct Class86B60 {
     /* +0x0B0, Class86B60__DestroyNameField: a third owned sub-object, released
      * unconditionally (no null check) through the same shared `release`
      * slot as `unkA8`/`unkAC`. Typed its own `Class86B60UnkB0Obj_3bb8c_d`
-     * rather than reusing `GenericReleaseObj_3bb8c_d` -- func_8004DC64
+     * rather than reusing `GenericReleaseObj_3bb8c_d` -- Class86B60__ForwardToNameField
      * reaches a SECOND slot (`+0x04C`) on the same pointer that
      * `unkA8`/`unkAC` never do, so it is kept a distinct local view
      * rather than assuming the other two share its fuller shape. */
@@ -1450,7 +1450,7 @@ struct BaseTaskCtorTable_3bb8c_c {
     /* +0x0DC, Class86B60__DestroyNameField's own last call, `self` only, right after
      * releasing `Class86B60::unkB0`. */
     void (*slotDC)(void *self);
-    /* +0x0E0, func_8004DC64's own first call: `(self, arg1)`, arg1 its
+    /* +0x0E0, Class86B60__ForwardToNameField's own first call: `(self, arg1)`, arg1 its
      * own forwarded 2nd parameter. */
     void (*slotE0)(void *self, s32 arg1);
     /* +0x0E4, func_8004DCD0's own first, unconditional call: `(self,
@@ -1487,7 +1487,7 @@ extern const char D_800114F8[];
  * itself. Placeholder s32 type; real element layout unknown. */
 extern s32 D_80086DAC;
 
-/* Address-of only in this unit (func_8004DC64 passes &D_8008A9B4 to
+/* Address-of only in this unit (Class86B60__ForwardToNameField passes &D_8008A9B4 to
  * `Class86B60UnkB0ObjMethods_3bb8c_d::slot4C`). Placeholder s32 type
  * since only the address is taken here. */
 extern s32 D_8008A9B4;

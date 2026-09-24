@@ -139,7 +139,7 @@ void Class86B60__DestroyNameField(Class86B60 *self)
     Get_vtable_TaskCore()->slotDC(self);
 }
 
-void func_8004DC64(Class86B60 *self, s32 arg1)
+void Class86B60__ForwardToNameField(Class86B60 *self, s32 arg1)
 {
     Get_vtable_TaskCore()->slotE0(self, arg1);
     self->unkB0->methods->slot4C(self->unkB0, arg1, &D_8008A9B4);
