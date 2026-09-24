@@ -308,7 +308,10 @@ def main():
                     print(f"  note: {rel}:{i} names both {old} and {new}; left as written, edit by hand if needed")
                     out.append(line)
                 else:
-                    out.append(pat.sub(new, line))
+                    # A quoted archive citation, `§"...func_X..."`, must keep
+                    # matching the frozen heading it points to (round 77).
+                    parts = re.split(r'(§"[^"]*")', line)
+                    out.append("".join(q if q.startswith('§"') else pat.sub(new, q) for q in parts))
             text = "\n".join(out)
         p.write_text(text)
         # A "PROPOSED RENAME: old -> new" note whose proposal this rename just

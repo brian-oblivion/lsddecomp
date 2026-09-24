@@ -3732,6 +3732,41 @@ across the two reports. All held when measured.
 - Round 75's point that the `SsUtKeyOn` extern is byte-invisible is right;
   it changed no bytes here either.
 
+**Revision 16 (2026-09-24, after rounds 76 to 78).** The operator asked for
+`func_80030980` to be settled. It is libsnd's `SpuVmSetVol`. Its only caller
+is Sony's `_SsSetControlChange`, which calls it at three sites. Sony's own
+`SetControlChange` (3.3 and 3.5 `seqread.o`, read from the relocations) calls
+`SpuVmSetVol` exactly three times, and every other callee lines up
+(`SpuVmDamperOn`/`Off`, `SpuVmSetProgVol` as in 3.5, `SsUtGetProgAtr`,
+`SsUtSetReverbDepth`). It starts on the byte where placed `libsnd/vm_prog`
+ends, in the run of identified `SsUtKeyOn`..`SsUtKeyOffV`, and its best shape
+candidate was already SpuVmSetVol (0.51). That is call-site correspondence
+plus position, two kinds. It was renamed and recorded as `identified`, image
+byte-identical. **Every game function now matches (1151/1151 after the
+leads below), and tracks 1, 1b and 2 read done.** The rest:
+- Weak Sony matches (round 78). Adjacency leads, measured, find all five of
+  round 78's hand finds plus SsStart/SsStart2, and no 2-word stub. Three new
+  ones go to track 2: `func_8002B3E4` (CD_set_test_parmnum, inside the bios
+  run), `QuitSpu` (SsQuit) and `Unk18Obj__SetGeomScreen` (GsSetProjection).
+  §4.2 is not lengthened; the tool now keeps these out of the naming queue.
+- Naming debt counts GAME bodies only. `code_179d8_g` showed 56 `D_` for one
+  game function, all libcd's, and now shows 1.
+- The naming review: an over-claimed name at any tier, or a contradicted class
+  prefix, is a send-back. A convention fix, or a Sony function no tool
+  flagged, is not. Under that rule round 77's two repairs send naming back to
+  Opus, and `plan.py set-model` did so. The remaining units are the heavy
+  Entity_* ones.
+- Track 4's first class is a premium job, and `plan.py` prints it on its own
+  "FOR A PREMIUM SESSION" line, never in a runner slot. TaskCoreObj vs
+  Obj86B60 (round 78) is that session's to settle.
+- `rename.py` leaves quoted archive citations (`§"..."`) alone (round 77).
+- `plan.py` tags a title with no length figure `len-?`, not `len-off`
+  (round 77).
+- Header sharing between naming jobs is annotated on the ready list, not
+  deferred. Round 77 paired two such jobs and nothing conflicted, and
+  PARALLEL-RUNS §2's additive-header rule covers it, so it is not a reason to
+  reorder.
+
 **Next round:** paste the head prompt from FINISHING-PLAN §4.1. `plan.py`
 will put the two fresh bodies and the first naming units at the top; the
 first track 2 job is the head building `tools/sdkname.py` (Fable).

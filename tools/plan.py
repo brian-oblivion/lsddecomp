@@ -173,14 +173,22 @@ def unit_metrics(info):
         if info:
             inc = [f for f in inc if not (f in info and progress.is_library(info[f][0]))]
         nm = nm_bodies(raw)
+        # Debt is measured in GAME bodies only (revision 16): code_179d8_g had
+        # one game function and 56 D_ globals, all of them libcd's, which is
+        # an invitation to name Sony data in game words (round 75).
+        game_text = live
+        if info:
+            ms = list(DEF_RE.finditer(live))
+            game_text = "\n".join(live[m.start():(ms[k + 1].start() if k + 1 < len(ms) else len(live))]
+                                  for k, m in enumerate(ms) if m.group(1) in defs)
         units[c.stem] = {
             "defs": len(defs),
             "func_named": sum(1 for d in defs if FUNC_PH.match(d)),
             "include_asm": len(inc),
             "nm_bodies": len(nm & set(inc)),
-            "unk_refs": len(re.findall(r"(?:->|\.)unk_?0?x?[0-9A-Fa-f]+", live)),
-            "slot_refs": len(re.findall(r"->slot0?x?[0-9A-Fa-f]+\s*\(", live)),
-            "d_refs": len(set(re.findall(r"\bD_800[0-9A-F]{5}\b", live))),
+            "unk_refs": len(re.findall(r"(?:->|\.)unk_?0?x?[0-9A-Fa-f]+", game_text)),
+            "slot_refs": len(re.findall(r"->slot0?x?[0-9A-Fa-f]+\s*\(", game_text)),
+            "d_refs": len(set(re.findall(r"\bD_800[0-9A-F]{5}\b", game_text))),
             "refs_out": 0,
             "centrality": 0,
             "live": live,
@@ -348,7 +356,12 @@ def cost_tag(func, title):
     tags = []
     tags.append("spent" if spent else "unspent")
     tags.append("searched" if searched else "never-searched")
-    tags.append("len-exact" if not notexact else "len-off")
+    if not notexact:
+        tags.append("len-exact")
+    elif re.search(r"\d+\s*/\s*\d+|\bshort\b|\blong\b|0x[0-9A-Fa-f]+", title, re.I):
+        tags.append("len-off")
+    else:
+        tags.append("len-?")     # the title states no length figure (round 77)
     return ",".join(tags)
 
 
@@ -493,6 +506,8 @@ def collect(st):
     t1b = st["tracks"]["1b"]
     if t1b["status"] == "auto":
         t1b_status = "open" if t1_status in ("parked", "done") else "waiting (opens when track 1 parks)"
+        if t1_status == "done" and not promotable and not stall_rows and not revisit:
+            t1b_status = "done"
     else:
         t1b_status = t1b["status"]
 
@@ -534,6 +549,7 @@ def collect(st):
         "units": units,
         "_fresh": fresh_funcs, "_stalls": stall_rows, "_promotable": promotable,
         "_todo3": todo3, "_revisit": revisit, "_revisit_label": revisit_label,
+        "_t4_rounds": st["tracks"]["4"].get("rounds", []),
     }
 
 
@@ -619,8 +635,14 @@ def jobs(d, n):
             names = ", ".join(f"{f} ({w}w)" for w, f in fs)
             q_promote.append(("1b", f"promote {len(fs)} preserved body(ies) in {unit} to #ifdef NON_MATCHING: {names}",
                               MODELS["mechanical_runner"]))
-    q_types = [("4", f"unify {t['4']['local_struct_views']} unit-local struct views into shared "
-                     "headers, one class at a time", "opus")] if t["4"]["status"] == "open" else []
+    first_class = not d.get("_t4_rounds")
+    q_types = [("4", (f"HEAD (premium, FINISHING-PLAN track 4): unify the FIRST class yourself and write the "
+                      f"recipe into track 4; {t['4']['local_struct_views']} unit-local struct views remain")
+                if first_class else
+                f"unify {t['4']['local_struct_views']} unit-local struct views into shared "
+                "headers, one class at a time",
+                MODELS["head_when_new_procedure"] if first_class else "opus")] \
+        if t["4"]["status"] == "open" else []
     q_close = [("5", f"{k}: {TRACK5_ITEMS[k]}", "opus")
                for k, done in t["5"]["checklist"].items() if not done] if t["5"]["status"] == "open" else []
     queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close]
@@ -738,8 +760,21 @@ def print_status(d, n, st):
         print()
     print(f"  READY JOBS (top {n}; head fills the operator's runner cap from the top, 5 if none is stated,"
           f" never more than 5; one unit per runner):")
-    for i, (track, desc, model) in enumerate(jobs(d, n), 1):
-        print(f"    {i:>2}. [{track:<2}] {model:<7} {desc}")
+    import headercontention
+    allj = jobs(d, n + 3)
+    premium = [j for j in allj if j[2] == MODELS["head_when_new_procedure"]]
+    shown, heads = [j for j in allj if j not in premium][:n], []
+    for i, (track, desc, model) in enumerate(shown, 1):
+        hs = set().union(*(headercontention.unit_headers(u) for u in job_units(d, desc))) \
+            if job_units(d, desc) else set()
+        share = [f"{h} with #{j}" for j, prev in enumerate(heads, 1) for h in sorted(hs & prev)]
+        heads.append(hs)
+        note = f"   (shares {', '.join(share[:2])}: header edits additive, PARALLEL-RUNS 2.1; not a reason to reorder)" \
+            if share else ""
+        print(f"    {i:>2}. [{track:<2}] {model:<7} {desc}{note}")
+    for track, desc, model in premium:
+        print(f"  FOR A PREMIUM SESSION (not a runner slot; an ordinary head reports it and staffs the rest):")
+        print(f"        [{track:<2}] {desc}")
     if d.get("_deferred"):
         print("  DEFERRED (would collide with a job above; staff after that one merges, or in a later slot):")
         for (track, desc, model), why in d["_deferred"]:

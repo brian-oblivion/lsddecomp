@@ -19,10 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 15 (2026-09-24, after rounds 74 and 75: `plan.py` defers
-jobs that would rename each other's files, rule docs are out of
-`rename.py`'s reach, Sony data keeps Sony's names, REVISIT-2 is track 1's
-last pass).
+Plan revision: 16 (2026-09-24, after rounds 76 to 78: `func_80030980` is
+libsnd's SpuVmSetVol, so every game function matches and tracks 1, 1b and 2
+are done; adjacency leads; naming debt counted in game bodies only; an
+over-claimed name at any tier is a send-back).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -229,7 +229,10 @@ game counts and every track 1, 1b and 3 queue, and a game-style name on one
 a pinned name is byte-identical and keeps the ld fragment current (measured).
 The generated file also carries LEAD lines: no exact fingerprint, but shape
 >= 0.90 at >= 40 words, the cliff below which only unrelated stubs score
-(revision 14; every lead above it was libsnd). A lead counts as library until
+(revision 14; every lead above it was libsnd), and ADJACENCY leads: a body of
+4+ words with a too-common exact fingerprint that touches Sony code, with a
+candidate from that side's library (revision 16; it finds round 78's five
+hand-found wrappers and no game stub). A lead counts as library until
 the runner either identifies it (comment line with `identified`, rename; any
 Sony name the evidence settles on closes it; `Rename pending` in that comment
 lists it for track 2 until the rename drops the words) or rejects it with a
@@ -367,10 +370,11 @@ those, oracle), then `make extract` (the symbols file changed) and the
 oracle.
 
 **Head review before `mark-unit`.** Sample five names per unit against their
-evidence. A tier-A name without evidence, a name that asserts purpose
-from a single call, or a class prefix `classtable.py` contradicts (round
-73: methods named for an address inside another class's table) sends the
-unit back. Two clean Opus units in a row and
+evidence. A name the head has to change because it claims more than its
+evidence shows, at ANY tier (round 77's "UnlessOverridden", "Wobble"), or a
+class prefix `classtable.py` contradicts (round 73), sends the unit back.
+Convention fixes (`g`/`s`, spelling) do not, and neither does a Sony
+function no tool flagged: that gap is the tool's. Two clean Opus units in a row and
 the naming runner becomes Sonnet (`plan.py set-model --role naming_runner
 --model sonnet`); one Sonnet unit sent back and it goes back to Opus. Then:
 

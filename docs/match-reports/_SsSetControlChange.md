@@ -26,13 +26,13 @@ Reading the diff again showed the gap was not a tail merge at all.
 
 Retail's cases 7/10/11 build `packed` from the sign-extended a0/a1
 (`sll/sra` into `$s1`/`$s2`), `or` them, and pass the result straight
-to `func_80030980` with NO narrowing. After the call they hand the
+to `SpuVmSetVol` with NO narrowing. After the call they hand the
 same widened registers to `ReadDeltaValue` with two `move`s. The
-preserved body's local prototype said `func_80030980(s16 packed, ...)`
+preserved body's local prototype said `SpuVmSetVol(s16 packed, ...)`
 (and `s16 packed` in the body), so every one of those cases narrowed
 the `or` result and then re-widened a0/a1 from scratch for the tail
 (4 words), and case 11 could jump into the default arm's widening.
-The callee's own report (`func_80030980.md`) and its asm read `a0` as a
+The callee's own report (`SpuVmSetVol.md`) and its asm read `a0` as a
 full word (`andi 0xFF` / `andi 0xFF00`), so the first parameter is `s32`.
 Retyping it (local prototype only; the callee is still `INCLUDE_ASM`, no
 other caller in the tree) and writing `s32 packed`: **195 -> 200 words,
@@ -95,9 +95,9 @@ the standard MIDI CC assignments:
 | --- | --- | --- |
 | 0 | Bank Select MSB | (stores into `rec->unk4C` directly) |
 | 6 | Data Entry MSB | `ContDataEntry` |
-| 7 | Volume | `func_80030980` (+ writes a 16-bit field) |
-| 10 | Pan | `func_80030980` (+ writes a byte field) |
-| 11 | Expression | `func_800307F0` then `func_80030980` |
+| 7 | Volume | `SpuVmSetVol` (+ writes a 16-bit field) |
+| 10 | Pan | `SpuVmSetVol` (+ writes a byte field) |
+| 11 | Expression | `func_800307F0` then `SpuVmSetVol` |
 | 64 | Sustain | `func_80036518` / `func_800363FC` (threshold 0x40) |
 | 65 | Portamento | `ContPortamento` |
 | 91 | Reverb Depth | `func_80036118` |
@@ -119,7 +119,7 @@ since the base address is only known at runtime).
 Cross-unit prototypes added (local guesses, kept in this .c only, per
 project convention): `func_800363FC(void)` and `func_80036118(s32, s32)`
 (both matched in `code_179d8_f.c`), `func_800307F0(s16, s16, s32) -> s32`
-(matched in `code_179d8_j.c`), and `func_80030980(s16 packed, s16 note,
+(matched in `code_179d8_j.c`), and `SpuVmSetVol(s16 packed, s16 note,
 u8 vol, s32 arg3, s32 arg4)` -- still `INCLUDE_ASM` in `code_179d8_j.c`,
 so this is this call site's own reading: a 5th argument spills to
 `0x10($sp)`, alongside the "packed = (slot<<8)|channel" first-argument
@@ -169,7 +169,7 @@ jumps into the MIDDLE of the shared `default` tail (reusing that block's
 widening instructions itself and jumping straight to the shared `jal`, the
 way retail -- and this function's OWN cases 7 and 10 -- do. Case 11 is
 the one arm with TWO calls before the tail (`func_800307F0` then
-`func_80030980`, vs. one call in cases 7/10), which is the only structural
+`SpuVmSetVol`, vs. one call in cases 7/10), which is the only structural
 difference that stands out, but it did not turn out to be steerable:
 
 **Reshapes tried, none of which changed the compiled size or the tail
@@ -257,7 +257,7 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
         u8 *blk = (u8 *)rec + offset;
         s16 packed = (a1 << 8) | a0;
 
-        func_80030980(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
+        SpuVmSetVol(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
         *(s16 *)((u8 *)rec + offset * 2 + 0x4E) = val;
         rec->unk88 = ReadDeltaValue(a0, a1);
         return;
@@ -267,7 +267,7 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
         s16 packed = (a1 << 8) | a0;
         s16 wide = *(s16 *)((u8 *)rec + offset * 2 + 0x4E);
 
-        func_80030980(packed, rec->unk4C, blk[0x2C], wide, val);
+        SpuVmSetVol(packed, rec->unk4C, blk[0x2C], wide, val);
         blk[0x17] = val;
         rec->unk88 = ReadDeltaValue(a0, a1);
         return;
@@ -276,7 +276,7 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
         u8 *blk = (u8 *)rec + offset;
 
         SpuVmSetProgVol(rec->unk4C, blk[0x2C], val);
-        func_80030980((a1 << 8) | a0, rec->unk4C, blk[0x2C],
+        SpuVmSetVol((a1 << 8) | a0, rec->unk4C, blk[0x2C],
                       *(s16 *)((u8 *)rec + offset * 2 + 0x4E), blk[0x17]);
         rec->unk88 = ReadDeltaValue(a0, a1);
         return;

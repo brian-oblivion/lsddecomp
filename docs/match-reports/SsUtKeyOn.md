@@ -26,7 +26,7 @@ one below, taken from the object rather than the linked image.
 
 The title is **not** falsified: it claims a length gap and names three
 residues, and a length gap is exactly what ins/del non-zero means. (Contrast
-`func_80030980` and `SsUtKeyOffV` this round, where the recorded verdicts
+`SpuVmSetVol` and `SsUtKeyOffV` this round, where the recorded verdicts
 *were* falsified by their ins/del.) What IS wrong is residue 2's **cause**,
 below.
 
@@ -759,7 +759,7 @@ STALL.
 ### The corrected, linkable body (241/252 words, this round's measurement)
 
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
-`SsUtKeyOn` in `src/code_179d8_j_b.c`, after `func_80030980`'s own
+`SsUtKeyOn` in `src/code_179d8_j_b.c`, after `SpuVmSetVol`'s own
 `INCLUDE_ASM` line. Requires (all now present in that file, added this
 round): `extern u16 D_8008EA22;` and the `SlotE968`/`D_8008E968`
 declarations shown below, alongside the file's existing `RecordE978`,

@@ -2420,3 +2420,10 @@ Obj86B60__SetFadeRate = 0x8003CBB8; // type:func
 Obj86B60__TickFadeCallback = 0x8003CBC0; // type:func
 Obj86B60__TickColorFade = 0x8003CC2C; // type:func
 Obj86B60__func_8003CCDC = 0x8003CCDC; // type:func
+// libsnd SpuVmSetVol, identified (plan revision 16): its only caller is Sony's
+// _SsSetControlChange, which calls it at the three sites where 3.3/3.5
+// seqread.o's SetControlChange calls SpuVmSetVol, every other callee agreeing
+// (SpuVmDamperOn/Off, SpuVmSetProgVol, SsUtGetProgAtr, SsUtSetReverbDepth);
+// position right after placed libsnd/vm_prog in the SsUt*/SpuVm* run; best
+// shape SpuVmSetVol (0.51, 3.5). No disc carries this build.
+SpuVmSetVol = 0x80030980; // type:func

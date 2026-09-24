@@ -1,7 +1,7 @@
 {
   "models": {
     "match_runner": "opus",
-    "naming_runner": "sonnet"
+    "naming_runner": "opus"
   },
   "stop_rule": {
     "attempts_per_model": 6,

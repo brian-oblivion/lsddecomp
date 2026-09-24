@@ -26,7 +26,7 @@
  * CLAUDE.md asks for, not a regression; their C is DELETED, not commented out.
  * A placed object cannot live inside a `c` segment, so the slice became
  * [c code_179d8_j][o libsnd/vm_prog][c code_179d8_j_b] and everything from
- * func_80030980 on moved to `src/code_179d8_j_b.c`.
+ * SpuVmSetVol on moved to `src/code_179d8_j_b.c`.
  *
  * THE `SlotE968` LOCAL VIEW LEFT WITH THEM.  Those four accessors were this
  * file's only readers of `D_8008E968`, so the typedef and the extern went with

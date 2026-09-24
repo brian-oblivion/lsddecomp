@@ -1,4 +1,6 @@
-# func_80030980 -- STALL (round 62 REVISIT: 315/324 built words -- 9 words SHORT, 10/324 raw word-match, **insertions 76 / deletions 76**, first real diff at the very first instruction, vram 0x80030980)
+# SpuVmSetVol -- STALL (round 62 REVISIT: 315/324 built words -- 9 words SHORT, 10/324 raw word-match, **insertions 76 / deletions 76**, first real diff at the very first instruction, vram 0x80030980)
+
+> Renamed from `func_80030980` on 2026-09-24 (tools/rename.py). Address 0x80030980.
 
 > **Head note, round 76: not staffed as a REVISIT-2, pending an ownership decision.**
 > The body reads Sony libsnd vmanager state pinned in `config/psyq-objects.ld`:
@@ -67,7 +69,7 @@ lesson of this revisit in one line.
 
 ## Step (b): fresh re-read of the disassembly, and what it gives
 
-Read cold from `asm/nonmatchings/code_179d8_j_b/func_80030980.s`, not from the
+Read cold from `asm/nonmatchings/code_179d8_j_b/SpuVmSetVol.s`, not from the
 previous attempts' line. Two source-level facts fell straight out, both kept:
 
 ### Fix 1 -- the loop index is `(u8)i`, not `i`. (`u8 i`)
@@ -177,7 +179,7 @@ before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `D800902E8Entry`,
 
 ```c
 #if 0
-s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
+s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     D800902E8Entry *e;
     u8 i;
     s32 result;
@@ -344,7 +346,7 @@ reading.
 
 ---
 
-# func_80030980 -- STALL (round 50: LENGTH-EXACT, 292/324 -> 324/324 built words -- 0 words off, 7/324 raw word-match, ZERO drift outside the function, first real diff at the very first instruction, vram 0x80030980)
+# SpuVmSetVol -- STALL (round 50: LENGTH-EXACT, 292/324 -> 324/324 built words -- 0 words off, 7/324 raw word-match, ZERO drift outside the function, first real diff at the very first instruction, vram 0x80030980)
 
 > Round 45 reached a complete structural derivation (every computational
 > piece already proven in the SPU-voice-level family) but landed 32 words
@@ -455,7 +457,7 @@ extern Rec34D994 D_8008D990[];   /* added round 45, in this unit's existing Rec3
 ## Best-derived body (324/324 words, ZERO drift; 7/324 raw word-match; preserved for the next attempt)
 
 ```c
-s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
+s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     D800902E8Entry *e;
     s32 i;
     s32 result;
@@ -576,7 +578,7 @@ boundary, only loop iterations, which is a different precondition.)
    $s1,zero` in a branch delay slot, well into the function). This is
    THE dominant residue: register-only ('r') diffs dominate almost the
    entire function body once past the setup sequence (confirmed by
-   reading `tools/asm-differ/diff.py func_80030980` directly on the new
+   reading `tools/asm-differ/diff.py SpuVmSetVol` directly on the new
    324/324 build). Per HARD RULE 6 this is not fixable by pinning a
    register identity, and per `vmNoiseOn`'s own extensively-searched
    history (12+ builds across `volatile` subsets, all documented as
@@ -633,7 +635,7 @@ oracle, no scaffold used):
 3. **`volatile` on `lvl1`/`lvl2` only** (the two names `vmNoiseOn`'s
    own report names): 292 -> **310/324** (14 short). Large, immediate
    win -- first confirmation this sibling lever transfers to
-   `func_80030980`'s own (differently-shaped) divisor chain.
+   `SpuVmSetVol`'s own (differently-shaped) divisor chain.
 4. **`volatile` on ALL SIX divisor-chain scalars** (`lvl0`, `prio`,
    `lvl1`, `lvl1b`, `lvl1c`, `lvl2`): 310 -> **321/324** (3 short). Beat
    every subset tried (see step 5).
@@ -682,7 +684,7 @@ intermediates" lever generalises across the SPU-voice-level family, but
 the specific SET of variables it needs is per-function, not
 transferable verbatim, and grows to include address-offset locals, not
 just arithmetic ones.** `vmNoiseOn`'s own report names `lvl1`/`lvl2`/
-`lvl1b`/`lvl2b` as its closing set; `func_80030980`'s closing set is
+`lvl1b`/`lvl2b` as its closing set; `SpuVmSetVol`'s closing set is
 `lvl0`/`prio`/`lvl1`/`lvl1b`/`lvl1c`/`lvl2` (six, not four, reflecting
 this function's own longer division chain) PLUS `off16`, a pure address
 arithmetic local with no division in it at all -- a NEW instance of the
@@ -725,7 +727,7 @@ than either prior attempt had.
 
 ---
 
-# (round 45, superseded by round 50's `volatile` lever above) func_80030980 -- STALL (first-ever attempt, 0 -> 292/324 built words -- 32 words SHORT, 3/324 raw word-match (drift-affected), first real diff at the very first instruction, vram 0x80030980)
+# (round 45, superseded by round 50's `volatile` lever above) SpuVmSetVol -- STALL (first-ever attempt, 0 -> 292/324 built words -- 32 words SHORT, 3/324 raw word-match (drift-affected), first real diff at the very first instruction, vram 0x80030980)
 
 > Both blockers this report previously cited (`addiu_at`, `nop_mflo_mfhi`)
 > are RESOLVED (rounds 21 and 42 respectively; see CLAUDE.md's "Open
@@ -758,7 +760,7 @@ signed 16-bit values). On a match:
 - Computes a base level through a THREE-STAGE division chain that is a new
   combination of pieces each individually already proven correct
   elsewhere: `D_8008D990[i].unk0 * (u16)a3 / 127` (signed, matches
-  `func_80030980`'s sibling `SpuVmKeyOnNow`'s first-stage magic exactly,
+  `SpuVmSetVol`'s sibling `SpuVmKeyOnNow`'s first-stage magic exactly,
   reproducer-verified there), times `0x3FFF`, times `D_8008E970->unk18`,
   divided by `16129` (signed, same magic `0x82061029` as `SpuVmKeyOnNow`'s
   second stage) -- **this exact `*0x3FFF /16129` combination, with the
@@ -833,7 +835,7 @@ extern Rec34D994 D_8008D990[];   /* added to this unit's existing Rec34D994 bloc
 ## Best-derived body (292/324 words, 32 words SHORT, preserved for the next attempt)
 
 ```c
-s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
+s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     D800902E8Entry *e;
     s32 i;
     s32 t0;
@@ -945,7 +947,7 @@ s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
    start of the function, and it cascades: nearly every subsequent
    instruction in the realigned diff shows the SAME two operands, doing
    the SAME operation, in a DIFFERENT register (confirmed by reading
-   `tools/asm-differ/diff.py func_80030980` directly -- register-only
+   `tools/asm-differ/diff.py SpuVmSetVol` directly -- register-only
    diffs (`r`) vastly outnumber any structural insertion/deletion for
    long stretches of the function).
 2. **Retail does NOT hoist `(s16)a0` out of the search loop; this
@@ -976,7 +978,7 @@ s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 
 Within the 30-attempt cap (3 real builds used):
 1. Direct transcription from an m2c-seeded skeleton
-   (`tools/m2ctx.py code_179d8_j_b --sig 's32 func_80030980(s32 a0, s32 a1,
+   (`tools/m2ctx.py code_179d8_j_b --sig 's32 SpuVmSetVol(s32 a0, s32 a1,
    s32 a2, s32 a3, u16 a4)' --run`), with EVERY divisor/magic-constant
    claim cross-checked against the pinned-pipeline reproducer before
    writing it down (the `/127` signed magic `0x81020409`/shift-6 was
@@ -1005,7 +1007,7 @@ Within the 30-attempt cap (3 real builds used):
 the same family has already proven (same divisors, same
 struct shapes, same blend cascade, same clamp) can still fail to match
 purely on whole-function register allocation, scaled up with function
-size.** `func_80030980` is the largest and most parameter-heavy member of
+size.** `SpuVmSetVol` is the largest and most parameter-heavy member of
 the SPU-voice-level family this project has now derived three times
 (`vmNoiseOn`, `SpuVmKeyOnNow`, this function).
 
@@ -1044,7 +1046,7 @@ for the current disposition and the next attempt's most promising avenue.
 
 ---
 
-# (round 21, superseded) func_80030980 -- STALL (addiu_at/nop_mflo_mfhi blocker, not attempted)
+# (round 21, superseded) SpuVmSetVol -- STALL (addiu_at/nop_mflo_mfhi blocker, not attempted)
 
 > **REOPENED by round 42, AND SINCE WORKED -- marker spent (head, round 51).**
 > This is a DOCUMENTED STALL, not fresh ground: rounds 45 and 50 both worked
@@ -1060,7 +1062,7 @@ Unit `code_179d8_j (round 21, 2026-09-06)`. **Not attempted at the time.**
 ### `addiu_at`
 
 ```sh
-grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_179d8_j/func_80030980.s
+grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_179d8_j/SpuVmSetVol.s
 ```
 
 Hit, on `D_8008D970`, `D_8008D990`, `D_8008D996`. RESOLVED round 21
@@ -1069,7 +1071,7 @@ Hit, on `D_8008D970`, `D_8008D990`, `D_8008D996`. RESOLVED round 21
 ### `nop_mflo_mfhi`
 
 ```sh
-grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_j/func_80030980.s \
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_j/SpuVmSetVol.s \
   | grep -E '\b(mult|multu|div|divu)\b'
 ```
 

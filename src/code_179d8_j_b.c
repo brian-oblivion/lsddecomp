@@ -13,7 +13,7 @@
  * code_179d8_j_b -- the MIDDLE third of the old code_179d8_j slice, after
  * round 34 (2026-09-12) linked TWO Sony objects into what used to be one unit.
  * Now 0x21180..0x221B4 (vram 0x80030980..0x800319B4), five functions
- * (func_80030980 .. SsUtKeyOffV).
+ * (SpuVmSetVol .. SsUtKeyOffV).
  *
  * WHY THIS UNIT EXISTS, IN TWO STEPS, BOTH IN ROUND 34.
  *   1. `libsnd/vm_prog.o` (Psy-Q 3.6 -- the only disc carrying the module)
@@ -216,7 +216,7 @@ extern Rec34Half D_8008D98C[];
 /* Shared with vmNoiseOn/SpuVmKeyOnNow in code_179d8_l.c (same
  * two-level entry table, same blend-cascade shape); this unit's own
  * reduced view, per the project's per-unit-local-view convention --
- * only the two fields func_80030980 itself touches are named. */
+ * only the two fields SpuVmSetVol itself touches are named. */
 typedef struct {
     u8 pad0[0x74];
     u16 unk74;
@@ -240,8 +240,8 @@ extern u8 D_8008D970[];
  * insertions 76 / deletions 76 (re-measured round 70, unchanged since
  * round 62). Residue: one GCC CSE decision on the
  * `D_8008E978[D_8008D99C[i].unk0]` address plus two loop-invariant
- * hoists (docs/match-reports/func_80030980.md). Hand-derived. */
-s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
+ * hoists (docs/match-reports/SpuVmSetVol.md). Hand-derived. */
+s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     D800902E8Entry *e;
     u8 i;
     s32 result;
@@ -336,7 +336,7 @@ s32 func_80030980(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     return result;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SpuVmSetVol);
 #endif
 #ifdef NON_MATCHING
 /* NON_MATCHING: 252/252 words, length exact; raw word-match 65/252,

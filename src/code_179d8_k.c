@@ -377,7 +377,7 @@ void SetProgramChange(s16 a0, s16 a1, u8 a2)
  * SsUtSetReverbDepth are Psy-Q libsnd (`vm_don`, `ut_rev`), linked from the
  * SDK objects since round 34 -- never write C for them.  So is
  * `SpuVmSetProgVol` (`libsnd/vm_prog`, 3.6), which was code_179d8_j.c's
- * matched func_800307F0 until the same round; func_80030980 is still
+ * matched func_800307F0 until the same round; SpuVmSetVol is still
  * INCLUDE_ASM
  * there, so its signature below is this call site's own reading -- a 5th
  * argument (the one spilling to the stack at 0x10($sp)) alongside the usual
@@ -386,7 +386,7 @@ void SetProgramChange(s16 a0, s16 a1, u8 a2)
 extern void SpuVmDamperOn(void);
 extern void SsUtSetReverbDepth(s16 a0, s16 a1);
 extern s32 SpuVmSetProgVol(s16 p0, s16 p1, s32 p2);
-extern void func_80030980(s32 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
+extern void SpuVmSetVol(s32 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
 
 /* Forward declarations for sibling functions defined later in THIS unit's
  * ROM-address order. ContDataEntry's signature is this call site's own
@@ -412,7 +412,7 @@ extern void ContResetAll(s16 a0, s16 a1);
  * through into the shared tail that re-arms the next scheduling delta via
  * ReadDeltaValue; those seven `return` immediately instead.
  *
- * Two choices below are byte-load-bearing (round 69): func_80030980's first
+ * Two choices below are byte-load-bearing (round 69): SpuVmSetVol's first
  * parameter is a full `s32` (its own body masks it with 0xFF/0xFF00), so
  * `packed` is not narrowed and the widened a0/a1 stay live across the call
  * for the final ReadDeltaValue; and each case copies `offset` into a
@@ -441,7 +441,7 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
         u8 *blk = (u8 *)rec + o;
         s32 packed = (a1 << 8) | a0;
 
-        func_80030980(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
+        SpuVmSetVol(packed, rec->unk4C, blk[0x2C], val, blk[0x17]);
         *(s16 *)((u8 *)rec + o * 2 + 0x4E) = val;
         rec->unk88 = ReadDeltaValue(a0, a1);
         return;
@@ -452,7 +452,7 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
         u8 *blk = (u8 *)rec + o;
         s16 wide = *(s16 *)((u8 *)rec + o * 2 + 0x4E);
 
-        func_80030980(packed, rec->unk4C, blk[0x2C], wide, val);
+        SpuVmSetVol(packed, rec->unk4C, blk[0x2C], wide, val);
         blk[0x17] = val;
         rec->unk88 = ReadDeltaValue(a0, a1);
         return;
@@ -462,7 +462,7 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
         u8 *blk = (u8 *)rec + o;
 
         SpuVmSetProgVol(rec->unk4C, blk[0x2C], val);
-        func_80030980((a1 << 8) | a0, rec->unk4C, blk[0x2C],
+        SpuVmSetVol((a1 << 8) | a0, rec->unk4C, blk[0x2C],
                       *(s16 *)((u8 *)rec + o * 2 + 0x4E), blk[0x17]);
         rec->unk88 = ReadDeltaValue(a0, a1);
         return;
