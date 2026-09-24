@@ -83,3 +83,15 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
   the LATER stack slot.** Do not assume the instruction stream's
   left-to-right literal order matches the parameter list; read each
   literal's actual destination register/slot.
+
+## Naming
+
+`Entity__MoodCue41` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 41, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.

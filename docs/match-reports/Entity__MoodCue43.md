@@ -78,3 +78,15 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
   even though the retail source (and a naive C reading) would put the
   assignment first. Compute the call's result into its own local first,
   *then* assign the default from that.
+
+## Naming
+
+`Entity__MoodCue43` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 43, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.

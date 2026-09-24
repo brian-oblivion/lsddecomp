@@ -343,3 +343,17 @@ off, which makes it the nearest thing to a control: one word is too small for
 a foreclosed merge, so if the return-type check fires there it would be
 evidence the mechanism has a second, cheaper mode, and if it does not fire the
 lever stays cleanly scoped.
+
+## Naming
+
+`Entity__MoodCue115` -- tier B (round 76, runner delta, FINISHING-PLAN track
+3). Renamed from `func_80061778`. Same convention as `Entity__MoodCue00`
+(round 71): the function's address (0x80061778) is the handler word of
+`gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base 0x80089EB0,
+0x10-byte stride) at row 115 (0x80089EB0 + 0x10*115 = 0x8008A5E0), read
+directly from `disk/SLPS_015.56`. Row 115 is NOT contiguous with this
+unit's other rows (39-52, 55-58) or with Entity_e's own rows (59-92ish),
+confirming the row index tracks moodIndex assignment rather than code
+address -- flagged in `src/Entity_d.c`'s unit header comment so the next
+reader doesn't assume a typo. Mechanics established (mood-tick sound-cue-set
+callback); which dream object owns the row is not.

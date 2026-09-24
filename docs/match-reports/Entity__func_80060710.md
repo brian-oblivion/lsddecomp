@@ -76,3 +76,19 @@ void Entity__func_80060710(Entity *this) {
   block and which is reached by an explicit jump -- and only one ordering
   reproduces a given retail layout, independent of which arm reads more
   naturally as the "primary" case.
+
+## Naming
+
+`Entity__func_80060710` -- tier C (round 76, runner delta, FINISHING-PLAN
+track 3). Renamed from `func_80060710`; class confirmed Entity by every
+call in its body going through `this->methods->...`. NOT itself a
+`gEntityMoodHandlerTable` row (checked against every row's handler word in
+`disk/SLPS_015.56`, base 0x80089EB0..0x8008A780ish -- no row holds
+0x80060710) -- it is a private helper `Entity__MoodCue43`/`Entity__MoodCue44`
+both call directly by name (`jal`), never through a vtable or the mood
+table. Mechanics: at moodTimer 0, an 80/20-ish dice roll either bumps scale
+via `SCALE_X3` or arms a delayed effect (`unk44 = 0xA`); once armed and
+moodTimer reaches 0xC9, calls `addVec14(TRANSLATE_Z_MINUS256)`. No second
+caller or additional context to say WHY MoodCue43/44 share this specific
+startup quirk, so the tier-C placeholder form is kept rather than guessing
+a purpose.

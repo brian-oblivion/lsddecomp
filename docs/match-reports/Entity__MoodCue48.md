@@ -60,3 +60,15 @@ void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
   same vtable slot pointer in one function do not need to share the cached
   local either -- only the one whose retail position is early needs
   hoisting; a later use can stay a fresh reload.
+
+## Naming
+
+`Entity__MoodCue48` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 48, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.

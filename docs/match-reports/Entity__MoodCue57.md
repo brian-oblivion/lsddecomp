@@ -146,3 +146,12 @@ None of these retype or rename an existing named declaration.
   dividend register `$v0`) through the whole mult/mfhi/sub expansion.
   Confirmed in an isolated reproducer, independent of this function's
   surroundings.
+
+## Naming
+
+`Entity__MoodCue57` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 57, read directly from
+`disk/SLPS_015.56`. Mechanics established (mood-tick sound-cue-set
+callback); which dream object owns the row is not.

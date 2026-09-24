@@ -143,3 +143,12 @@ convention as this unit's other raw data-table externs).
   independent top-level `if`s, even when the groups are textually adjacent
   and superficially look like one chain (four `this->unk44 == 0x*` checks in
   a row, here, are actually two `else if` plus two independent `if`s).
+
+## Naming
+
+`Entity__MoodCue58` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 58, read directly from
+`disk/SLPS_015.56`. Mechanics established (mood-tick sound-cue-set
+callback); which dream object owns the row is not.

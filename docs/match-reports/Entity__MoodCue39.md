@@ -80,3 +80,15 @@ with no new derivation needed this time).
   depending on an extra post-`mfhi` shift.** Do not assume two appearances
   of the same hex constant in one function imply the same divisor -- check
   the shift amount at each site independently.
+
+## Naming
+
+`Entity__MoodCue39` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 39, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.
