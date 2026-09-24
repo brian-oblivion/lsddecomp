@@ -69,3 +69,7 @@ guard clause that only conditions a LOOP, not the store itself, changed
 delay-slot scheduling far enough downstream to also produce a merge-point
 redundant move. Worth checking this lever before reaching for the
 permuter on future instances of this residue class.
+
+## Naming
+
+- `Obj86ED0__ResetAllAndFinish` -- tier B. Loops i from unk10-1 down to 0, setting unk18=i and calling slotA8(self, i, unk1C, 0) each iteration, then calls slotA4(self, unk18, 1) once after the loop. Reads as "re-initialise every index, then finalise/notify once" -- the in-game purpose of the loop is not established. classtable.py D_80086ED0 +0x0A0.

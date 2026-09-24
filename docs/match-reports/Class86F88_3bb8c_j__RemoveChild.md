@@ -28,3 +28,7 @@ void Class86F88_3bb8c_j__RemoveChild(Class86F88_3bb8c_j *self, void *arg1)
 ```
 
 Matched first try.
+
+## Naming
+
+- `Class86F88_3bb8c_j__RemoveChild` -- tier A. The removeChild occupant (classtable.py D_80086F88 +0x014): clears the matching tag cache then chains the base removeChild. Mirrors Class86F88_3bb8c_j__AddChild.

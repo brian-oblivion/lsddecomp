@@ -17,3 +17,7 @@ void Class86F88_3bb8c_j__ResetCounters(Class86F88_3bb8c_j *self)
 
 Trivial three-field reset, an unrelated field group from `Class86F88_3bb8c_j__ClearCachedRefs`'s
 (`unk34`/`unk38`/`unk50`). Matched first try.
+
+## Naming
+
+- `Class86F88_3bb8c_j__ResetCounters` -- tier A. The slot40 occupant (classtable.py D_80086F88 +0x040, the ctor's own tail dispatch): zeroes unk20/unk24/unk28. A pure leaf, tier A by the track-3 rule.

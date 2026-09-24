@@ -19,3 +19,7 @@ Calls `Class86F88Methods_3bb8c_j::slot14` (established this round from
 `Class86F88_3bb8c_j__AddChild`'s asm, self+one pointer arg) twice, once per tagged-child
 cache, then clears `self->unk3C` (also established this round, from
 `Class86F88_3bb8c_j__AddChildAndSetState`). Matched first try.
+
+## Naming
+
+- `Class86F88_3bb8c_j__RemoveCachedChildren` -- tier A. The slot50 occupant (classtable.py D_80086F88 +0x050): calls slot14 (this class's own removeChild override) on unk34 then unk38, then clears unk3C. Purpose (release the two tag-cached children) follows directly from the mechanics, matching the addChild/removeChild caching pattern established in Class86F88_3bb8c_j__AddChild -- tier A.

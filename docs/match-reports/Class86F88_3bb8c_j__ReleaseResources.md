@@ -23,3 +23,7 @@ slot4` (+0x004, self-only, returns a handle-typed pointer stored back into
 `self->unk50` -- a "release, returns the successor/NULL" shape) was
 already declared for `Class86F88_3bb8c_j__LoadResources`'s use; this is the second confirming
 call site. Matched first try.
+
+## Naming
+
+- `Class86F88_3bb8c_j__ReleaseResources` -- tier B. The slot48 occupant (classtable.py D_80086F88 +0x048): if unk50 is set, calls slot90(self) then releases unk50 through its own slot4. Mirrors Class86F88_3bb8c_j__LoadResources's load in reverse -- mechanics clear, purpose not established beyond "release what LoadResources acquired".

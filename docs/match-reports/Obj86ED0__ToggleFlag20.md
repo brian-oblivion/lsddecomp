@@ -19,3 +19,7 @@ void Obj86ED0__ToggleFlag20(Obj86ED0 *self)
 Trivial boolean toggle, matched first try. `self->unk20` is unrelated to
 the countdown fields (`unk10`/`unk14`/`unk18`/`unk1C`) the rest of this
 group uses -- it is XOR-toggled here and nowhere else read in this unit.
+
+## Naming
+
+- `Obj86ED0__ToggleFlag20` -- tier B. self->unk20 ^= 1, gated on self->unk48. A pure boolean toggle with no further use of unk20 in this unit -- mechanics are the whole of what's known. classtable.py D_80086ED0 +0x098.

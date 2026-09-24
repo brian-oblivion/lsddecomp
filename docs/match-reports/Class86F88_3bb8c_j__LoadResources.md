@@ -293,3 +293,7 @@ each half and never read across the boundary. Split it (Class86F88_3bb8c_j__Load
 across rounds 18-19). Discriminator against the dead-parameter-reuse
 lever: that one REMOVES a pseudo, and this one ADDS one. Check a matched
 cross-unit sibling with the same call skeleton first.
+
+## Naming
+
+- `Class86F88_3bb8c_j__LoadResources` -- tier B. The slot44 occupant (classtable.py D_80086F88 +0x044): builds two "CARD\\<name>.TIM" paths, loads them through func_8003B39C/func_80041C9C, and dispatches the second through self->methods->slot8C. Mechanics (load a pair of card-icon-shaped resources) are clear from the BuildFileName/CARD path evidence; what the two resources are FOR is not.

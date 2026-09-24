@@ -89,3 +89,7 @@ Same as above -- another confirmed instance of if/else arm order being
 load-bearing independent of the condition's logical polarity; worth a
 line in the "two-armed if/else" entry if not already covered by this
 exact shape (early-exit-style reset vs. a call as the "main" path).
+
+## Naming
+
+- `Obj86ED0__AdvanceCountdown` -- tier B. Decrements self->unk1C each call; while > 0 forwards (self->unk18, count, 1) to the same table's slotA8 (Obj86ED0__DispatchLookupValue); at 0, wraps back to self->unk14. Mechanics (a wrapping countdown that dispatches while running) are clear from the body; what it counts down IN THE GAME is not established. classtable.py D_80086ED0 +0x094.

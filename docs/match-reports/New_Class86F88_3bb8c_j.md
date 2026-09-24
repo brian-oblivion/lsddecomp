@@ -63,3 +63,7 @@ here too even though the "different value" is a pointer (`self` vs
 `NULL`) rather than two integer constants, and the caller is a `New_X`
 allocator wrapper (sub-shape "ignores the constructor's return, one early
 exit"), reinforcing that this sub-shape specifically wants `goto`.
+
+## Naming
+
+- `New_Class86F88_3bb8c_j` -- tier A. BMemPMgrAlloc(0x54) + dispatch through func_80052B60()->ctor(...) -- the project's standard New_X allocator shape, named per the "constructors New_Class" convention. Class identity (0x54-byte Class86F88_3bb8c_j, table D_80086F88) from class_3bb8c.h's round-15 HEAD NOTE plus classtable.py D_80086F88.

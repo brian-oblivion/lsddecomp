@@ -84,3 +84,7 @@ units and never collide.
 None beyond what `FormatNumberIntoBuffer`'s report already covers this round; this
 one matched cleanly on the first attempt once the stub's stale `gp_rel`
 verdict was set aside.
+
+## Naming
+
+- `Obj86ED0__DispatchIndexValue` -- tier B. slotA4 occupant. Computes arg1*7+D_8008AADC into a 2-word stack block together with the D_8008AAE0 constant, dispatches it through self->unk40's own slotBC, records self->unk18=arg1, and optionally notifies via slot60. "Index"/"Dispatch" describe the mechanics; what the computed value represents in-game is not established. classtable.py D_80086ED0 +0x0A4 (the real occupant -- corrects this unit's earlier Obj866E8 misattribution, see the ROUND 75 CORRECTION section above).

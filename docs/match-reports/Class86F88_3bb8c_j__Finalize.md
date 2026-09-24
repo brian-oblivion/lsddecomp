@@ -29,3 +29,7 @@ the `for` loop naturally re-reads `self->unk10` from memory each
 iteration (retail does too, since the intervening `BMemPMgrFree` call is
 opaque to the compiler and could in principle touch it), matching the
 already-documented "must reload after call" idiom.
+
+## Naming
+
+- `Class86F88_3bb8c_j__Finalize` -- tier A. The finalize occupant (classtable.py D_80086F88 +0x00C): frees each unk18[i] buffer, then unk1C and unk18 themselves, then chains Get_vtable_BasicClass()->finalize(self). Matches the BasicClass finalize-slot convention used throughout this header.

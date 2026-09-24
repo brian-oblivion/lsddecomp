@@ -28,3 +28,7 @@ OWN vtable (`slot5C`/`slot58`) based on the same tag-nibble convention as
 `Class86F88_3bb8c_j__AddChild`/`Class86F88_3bb8c_j__RemoveChild`. Established `Class86F88Methods_3bb8c_j::slot5C`
 (+0x05C, "tag==2") and `slot58` (+0x058, "tag==5") from this function.
 Matched first try.
+
+## Naming
+
+- `Class86F88_3bb8c_j__NotifyChild` -- tier B. The slot38 occupant (classtable.py D_80086F88 +0x038, the offset every sibling class in this header uses for its own "OnNotify"-shaped override): chains the base slot38 unconditionally, then dispatches to this class's own slot5C/slot58 by the child's tag nibble. Mechanics (notify then tag-dispatch) are clear; the in-game meaning of the notification is not.

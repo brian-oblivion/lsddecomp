@@ -312,3 +312,7 @@ size != the `.s`'s declared size means read the control flow first.
 store-back of the old value** (`lw; sw; slt; beqz; sw`). The `if` form
 omits it. Tell: a load of a field immediately stored back to the same
 field. (Class86F88_3bb8c_j__Class86F88_3bb8c_j, one word, 66 -> 98/107.)
+
+## Naming
+
+- `Class86F88_3bb8c_j__Class86F88_3bb8c_j` -- tier A. The ctor occupant (classtable.py D_80086F88 +0x008), named per the "constructors Class__Class" convention (e.g. Class869D8__Class869D8). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.

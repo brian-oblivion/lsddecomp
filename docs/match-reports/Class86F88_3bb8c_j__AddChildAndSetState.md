@@ -73,3 +73,7 @@ alone doesn't move it. Not yet understood WHY the wrapper changes
 scheduling (a basic-block boundary artifact of `-O2` in this compiler is
 the working guess); flagging as a confirmed-but-unexplained mechanism for
 whoever investigates next.
+
+## Naming
+
+- `Class86F88_3bb8c_j__AddChildAndSetState` -- tier B. The slot4C occupant (classtable.py D_80086F88 +0x04C): dispatches self->methods->slot10 (this class's own addChild override) twice, once at full arity and once narrowed to (self, arg2) via a local function-pointer typedef, then sets unk3C=arg3 and clears unk2C. Mechanics established across rounds 18-19's residue hunt; the double-arity dispatch's in-game reason is not.

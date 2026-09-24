@@ -21,3 +21,7 @@ An "immediate fire" sibling of `Obj86ED0__AdvanceCountdown`'s countdown: resets
 `self->unk1C` to 0 and calls `slotA8` unconditionally with a literal 0
 where `Obj86ED0__AdvanceCountdown` would pass the live decremented countdown. Matched
 first try -- no reshaping needed.
+
+## Naming
+
+- `Obj86ED0__ResetCountdown` -- tier B. self->unk1C = 0; slotA8(self, unk18, 0, 1) -- the same dispatch as Obj86ED0__AdvanceCountdown's expiry arm, called directly/unconditionally instead of reached by counting down. classtable.py D_80086ED0 +0x09C.

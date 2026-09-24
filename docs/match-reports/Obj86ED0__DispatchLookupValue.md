@@ -67,3 +67,7 @@ None beyond `FormatNumberIntoBuffer`'s this round — this pair matched cleanly 
 the stale `gp_rel` verdicts were set aside; the only real content was
 identifying the shared `Obj86ED0` "countdown/flush" struct fields and the
 notify-on-flag-set tail shape common to both siblings.
+
+## Naming
+
+- `Obj86ED0__DispatchLookupValue` -- tier B. slotA8 occupant. Looks up D_8008AAE4[arg2], stores it into self->unk28[arg1], forwards the same byte to self->unk44's slotC4, records self->unk18/unk1C, optionally notifies via slot60. Same evidence class as its sibling Obj86ED0__DispatchIndexValue. classtable.py D_80086ED0 +0x0A8.

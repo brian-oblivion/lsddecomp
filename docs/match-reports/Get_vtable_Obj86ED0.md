@@ -31,3 +31,7 @@ Obj86ED0Methods *Get_vtable_Obj86ED0(void)
 Plain address-of getter for `Obj86ED0`'s own vtable, same shape as
 `GetClass869D8Methods`/`GetClass86AA0Methods`/`GetClass6B5CCMethods` already documented in
 `include/class_3bb8c.h`. Matched first try.
+
+## Naming
+
+- `Get_vtable_Obj86ED0` -- tier A. Plain `return &D_80086ED0;` -- a table-getter's purpose IS its mechanics (a pure leaf returning a fixed vtable pointer), same shape as the project's other `Get_vtable_*`/`GetClass*Methods` accessors. Identity of D_80086ED0 as Obj86ED0's table is classtable.py D_80086ED0 (42 slots) cross-checked against class_3bb8c_i's own already-shared struct.

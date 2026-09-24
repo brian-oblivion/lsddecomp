@@ -34,3 +34,7 @@ pointer-deref instead of reusing that byte-typed struct). Matched first
 try; note the `addChild` call happens BEFORE the tag check here, but
 AFTER it in the sibling `Class86F88_3bb8c_j__RemoveChild` -- read each function's own
 disassembly rather than assuming a shared order.
+
+## Naming
+
+- `Class86F88_3bb8c_j__AddChild` -- tier A. The addChild occupant (classtable.py D_80086F88 +0x010): chains the base addChild then caches arg1 into unk34/unk38 by its own tag nibble. Matches the BasicClass addChild-override convention used throughout this header.

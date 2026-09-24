@@ -18,3 +18,7 @@ void Class86F88_3bb8c_j__ClearCachedRefs(Class86F88_3bb8c_j *self)
 Trivial three-field reset (the two "tagged child" caches plus `unk50`).
 Matched first try -- the trailing store naturally lands in the `jr $ra`
 delay slot.
+
+## Naming
+
+- `Class86F88_3bb8c_j__ClearCachedRefs` -- tier A. Plain three-field reset (unk34=unk38=unk50=NULL), called once from the ctor. A pure leaf whose mechanics ARE its purpose (tier A by the track-3 rule). Not a classtable.py slot -- called directly by name from the ctor.
