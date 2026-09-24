@@ -51,3 +51,7 @@ distinguishes divisor 5 (single post-`mfhi` `sra` by 1, single `sll 2`
 multiply-back) from divisor 10 (`Entity__MoodCue31`: `sra` by 2, `sll 2` +
 `addu` + extra `sll 1` multiply-back) purely by the sign-fix shift amount
 and whether the multiply-back chain has that trailing doubling step.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 29 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

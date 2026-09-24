@@ -75,3 +75,7 @@ per-branch reload, shrinking the function and shifting everything after it.
 This is the same `-O2` tail-merge behind the existing "write the literal
 jump graph with `goto`" entry, just triggering the merge instead of avoiding
 it.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 25 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

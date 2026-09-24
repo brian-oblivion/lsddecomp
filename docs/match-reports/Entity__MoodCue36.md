@@ -71,3 +71,15 @@ overwritten" idiom: that idiom's delay-slot-fusion benefit only applies
 when nothing between the default assignment and its use can clobber the
 value's register -- a call in between is exactly the case where it breaks,
 and reordering around the call (not adding a barrier) is the fix.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 36 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.
+
+## Proposed field names
+
+`EntityMethods::slot144` -- this unit's `slot144(this, this->unk94) < 0x7000`
+is a bare distance-threshold check, consistent with the existing tier-B
+proposal `distanceToRegion` (occupant `Entity__DistanceToRegion`,
+`Entity__MoodCue11.md`, Entity_d). Not re-proposed here, just corroborated
+with a fourth independent call site.

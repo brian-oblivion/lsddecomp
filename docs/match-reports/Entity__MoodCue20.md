@@ -45,3 +45,7 @@ A bare `andi $v0, $v0, N` (power-of-2 mask) with **no** accompanying sign-fix
 sequence is a source-level `& (N-1)`, not `% N` -- GCC 2.6.3 still inserts a
 correction for a genuinely signed `%` by a power of two, so its absence is a
 real discriminator, not just an equally-valid alternate spelling.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 20 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

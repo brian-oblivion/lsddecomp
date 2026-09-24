@@ -80,3 +80,6 @@ matter most are the ones still in assembly, and those are exactly the ones the
 check cannot see. Nothing here was done wrong — but a retype adopted on a
 tie-breaker rather than on evidence should be re-examined, not assumed settled,
 whenever a later caller in the same slot stalls on a tail merge.
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 37 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.
