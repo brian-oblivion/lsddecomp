@@ -500,9 +500,9 @@ struct Class6B5CCMethods {
      * value IS tested by this call site (truthy -> continue, falsy ->
      * early return), so non-void. */
     s32 (*checkBoundsOverlap)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
-    /* +0x0AC, occupant Class6B5CC__ClassifyAgainstPlanes -- the documented gp_rel blocker
-     * (docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md), NOT decompiled by this
-     * runner. Typed here only for this call site's own dispatch shape;
+    /* +0x0AC, occupant Class6B5CC__ClassifyAgainstPlanes (matched round 76, code_d294_b;
+     * docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md). Typed here for this call
+     * site's own dispatch shape;
      * return value is also tested truthy/falsy like slotA8's. */
     s32 (*classifyAgainstPlanes)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2, void *arg3);
 };
