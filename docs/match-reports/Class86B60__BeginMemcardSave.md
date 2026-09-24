@@ -15,7 +15,7 @@ void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
     if (self->unkAC == NULL) {
         self->unkA8 = func_8003B39C(D_800114F8);
-        self->unkAC = func_8004E2E0((void *)1, NULL);
+        self->unkAC = New_TaskObjF((void *)1, NULL);
     }
     self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &D_80086D6C,
                                   self->unkC->unk4, self->unk10, self->unk14,
@@ -42,7 +42,7 @@ SLPS_015.56`.
   `D_800114F8` is a real dlabel string, `"CARD\FILEICN1.TIM"`
   (`asm/data/1C34.rodata.s`) -- referenced by symbol per CLAUDE.md's rule
   against re-writing an already-emitted string literal.
-- `func_8004E2E0((void *)1, NULL)` -- the already-matched New_X allocator
+- `New_TaskObjF((void *)1, NULL)` -- the already-matched New_X allocator
   earlier in this same unit, called here with its own two literal
   arguments (`1`, `0`); return type `void *` needs no cast into
   `self->unkAC`.

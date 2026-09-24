@@ -233,7 +233,7 @@ void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
     if (self->unkAC == NULL) {
         self->unkA8 = func_8003B39C(D_800114F8);
-        self->unkAC = func_8004E2E0((void *)1, NULL);
+        self->unkAC = New_TaskObjF((void *)1, NULL);
     }
     self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &D_80086D6C,
                                   self->unkC->unk4, self->unk10, self->unk14,
@@ -290,7 +290,7 @@ Class86B60Methods *GetClass86B60Methods(void)
     return &gClass86B60Methods;
 }
 
-void *func_8004E2E0(void *arg0, void *arg1)
+void *New_TaskObjF(void *arg0, void *arg1)
 {
     void *self;
 

@@ -1584,17 +1584,17 @@ typedef struct Result678_3bb8c_c {
 } Result678_3bb8c_c;
 
 /*
- * func_8004E2E0's own New_X allocator target -- yet another small
+ * New_TaskObjF's own New_X allocator target -- yet another small
  * sibling class (same shape as `Class869D8`/`Class86AA0`/`Class86B60`
  * above): pool-allocate a fixed 0x84-byte block, and if it succeeds,
  * construct it through this table's own `ctor` slot at `+0x008`. Kept
- * fully opaque (no instance type at all) since func_8004E2E0 never
+ * fully opaque (no instance type at all) since New_TaskObjF never
  * dereferences the allocation itself, only forwards it.
  */
 typedef struct GenericCtorTable_3bb8c_d GenericCtorTable_3bb8c_d;
 struct GenericCtorTable_3bb8c_d {
     u8 pad000[0x008];
-    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, func_8004E2E0's own call; IS func_8004E34C -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention (BaseTaskCtorTable_3bb8c_c/Get_vtable_TaskCore) since nothing here type-checks the two against each other */
+    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, New_TaskObjF's own call; IS func_8004E34C -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention (BaseTaskCtorTable_3bb8c_c/Get_vtable_TaskCore) since nothing here type-checks the two against each other */
     u8 pad00C[0x040 - 0x00C];
     /* +0x040, func_8004E34C's own last call, forwarding its own 3rd
      * parameter verbatim; class_3bb8c_e's independent view (round 14,
