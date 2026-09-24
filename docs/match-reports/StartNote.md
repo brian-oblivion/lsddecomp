@@ -97,7 +97,7 @@ until you diff registers, not just word counts.
   per-channel byte-field block used in bulk) alongside the existing
   `unkC`/`unkD`, none of which overlap.
 - `ObjE970` (already declared with a `+0x18` byte field for the stalled
-  `SetAutoVol`/`StepVoiceFade` bodies) needed a NEW `u16` field at
+  `SetAutoVol`/`SetAutoPan` bodies) needed a NEW `u16` field at
   `+0x12` -- a "channel-count difficulty threshold" compared unsigned
   against `D_8008EA13`. Since neither prior user of `ObjE970` is currently
   compiled (both are `INCLUDE_ASM`), extending the struct in place was
@@ -368,7 +368,7 @@ SHA1 reconfirmed green.
 **Three for three on `code_179d8_m` this round: charlie's `dead[N]`/`if(0)`
 frame-padding idiom recovers frame byte-alignment exactly every time it is
 applied to a measured frame-size gap, and it has closed a missing-WORD-COUNT
-gap ZERO of three times on this unit** (`SpuVmFlush`, `StepVoiceFade`,
+gap ZERO of three times on this unit** (`SpuVmFlush`, `SetAutoPan`,
 `StartNote`) -- including on a function that is overall LONG (this one,
 15 words over) as readily as on the two that are SHORT. The common thread
 across the unit's three tests: every one of this unit's frame gaps is pure
@@ -586,7 +586,7 @@ Note: `ObjE970` gained a `+0x12` `u16` field for this attempt (see
 "Struct/global knowledge" above) -- that extension is left in place in
 `src/` (outside the `#if 0`) since it does not affect any currently
 compiled function and the next attempt at this function, or at
-`SetAutoVol`/`StepVoiceFade` (which also use `D_8008E970`), will need
+`SetAutoVol`/`SetAutoPan` (which also use `D_8008E970`), will need
 it again.
 
 ## Naming
@@ -610,7 +610,7 @@ velocity, pan-split pair, status).
 `masterVolume` field names this round) and `D_8008E978`/`Tbl32E978`
 (`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
 declared in this unit but only used by functions still `INCLUDE_ASM`
-(SetAutoVol, StepVoiceFade, SpuVmPBVoice, and this
+(SetAutoVol, SetAutoPan, SpuVmPBVoice, and this
 function) -- the field renames are live in `src/code_179d8_m.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
 themselves (`D_8008E970`, `D_8008E978`) were not renamed since

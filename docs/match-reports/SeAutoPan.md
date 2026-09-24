@@ -158,10 +158,10 @@ empty, the block runs on every path through that point.
 from the body: given a voice index and a from/to/rate triple, it
 unconditionally records the from/to pair and the "fading" flag into the
 `gVoiceFade*` arrays, then computes a per-tick step (and, in the
-"close" branch, a throttle interval) so that `StepVoiceFade` can advance
+"close" branch, a throttle interval) so that `SetAutoPan` can advance
 the value later. What in the game actually gets faded this way (a MIDI
 CC-driven volume slide? an automatic release curve?) is not established --
 only that the destination of the ramp feeds into a stereo-volume
-computation (see StepVoiceFade's own report), which is why "Fade" rather
+computation (see SetAutoPan's own report), which is why "Fade" rather
 than a more specific term. See the unit header comment in
 `src/code_179d8_m.c` for the cross-function picture.

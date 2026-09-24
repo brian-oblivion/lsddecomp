@@ -1,5 +1,7 @@
 # StepVoiceFade -- STALL: length exact (228/228, round 73), 220/228 raw word-match, first diff at vram 0x8002EC6C (the pan split: retail copies the volume into $a1 and multiplies the copy; this body masks val1). libsnd SetAutoPan.
 
+> Renamed from `StepVoiceFade` on 2026-09-24 (tools/rename.py). Address 0x8002ea44.
+
 > Renamed from `func_8002EA44` on 2026-09-20 (tools/rename.py). Address 0x8002ea44.
 
 Unit: `src/code_179d8_m.c`. Round 24 (second pass), runner bravo.
@@ -7,7 +9,7 @@ Unit: `src/code_179d8_m.c`. Round 24 (second pass), runner bravo.
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/StepVoiceFade.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SetAutoPan.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -27,7 +29,7 @@ the next attempt.
 
 Re-spliced this exact preserved body and rebuilt from scratch. **All title
 figures reconfirmed:** built length **223 words** (`objdump -t
-build/src/code_179d8_m.c.o` confirms `StepVoiceFade` at `0x37c` bytes = 223
+build/src/code_179d8_m.c.o` confirms `SetAutoPan` at `0x37c` bytes = 223
 words, retail 228, so 5 short), `funcdiff.py`'s in-range figure **13/228**
 with drift (238724 bytes this run, matching the report's own figure to
 within measurement noise).
@@ -321,7 +323,7 @@ its recorded score.
 
 **The rebuild reproduces the exact same C, but the true built length is
 222 words, not 223.** `objdump -t build/src/code_179d8_m.c.o` gives
-`StepVoiceFade` at `0x378` bytes = 222 words (confirmed independently by
+`SetAutoPan` at `0x378` bytes = 222 words (confirmed independently by
 counting disassembled instructions from the function's `addiu sp,sp,-0x18`
 line to its final `nop`, inclusive: 222 lines). Retail is 228, so this is
 **6 words short, not 5** as every prior round (26, 30, 32) recorded. The
@@ -340,7 +342,7 @@ was.
 
 ### Permuter search
 
-`tools/setup-permuter.sh StepVoiceFade <seed>` (seed: the preserved body
+`tools/setup-permuter.sh SetAutoPan <seed>` (seed: the preserved body
 below, `Rec34HalfU`'s three unsigned-view symbols routed through
 `__asm__`-aliased C names to avoid clashing with the plain signed
 declarations the same file needs elsewhere -- a scaffold-only device, not
@@ -365,7 +367,7 @@ Real search: `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
 --stack-diffs` via the harness's `run_in_background`. **Completed cleanly,
 `rc=124`** (own bound) after **63,989 iterations**. Best score: **2430**
 (from base 4125), saved at
-`permuter-work/StepVoiceFade/output-2430-1/`; no zero reached.
+`permuter-work/SetAutoPan/output-2430-1/`; no zero reached.
 
 The 2430 candidate's only content change from the scaffold is dropping the
 intermediate `limit = gVoiceFadeLimit[a0].unk0;` assignment in the
@@ -403,7 +405,7 @@ regardless of the immediate value -- it cannot by itself manufacture
 missing content words. It only recovers frame BYTE-ALIGNMENT, which makes
 the rest of the disassembly comparison meaningful again.
 
-With the frame realigned, `tools/asm-differ/diff.py StepVoiceFade` shows
+With the frame realigned, `tools/asm-differ/diff.py SetAutoPan` shows
 retail computing `t1 = v1 << 3` (the sign-extended `a0`, shifted) as its
 THIRD instruction and holding it live, exactly as this report's own "What's
 missing" section already diagnosed from the un-realigned disassembly —
@@ -421,7 +423,7 @@ Reverted to `INCLUDE_ASM`; whole-image SHA1 reconfirmed green.
 
 **Two-for-two this round: charlie's `dead[N]`/`if(0)` frame-padding idiom
 recovered frame byte-alignment exactly on both `SpuVmFlush` and
-`StepVoiceFade`, and closed the missing-WORD-count gap on NEITHER.** Both
+`SetAutoPan`, and closed the missing-WORD-count gap on NEITHER.** Both
 functions' extra retail frame bytes are pure unaddressed register-save-area
 padding with no companion missing-instruction elsewhere in THIS unit,
 unlike `ContDataEntry` (a different unit), whose length recovery came from
@@ -486,7 +488,7 @@ extern u8 D_8008EA1A;
  * when set to 1. */
 extern s16 D_8008E8C0;
 
-void StepVoiceFade(s16 a0) {
+void SetAutoPan(s16 a0) {
     s16 idxCopy;
     s16 step;
     u16 increment;
@@ -594,7 +596,7 @@ void StepVoiceFade(s16 a0) {
 
 ## Naming
 
-**StepVoiceFade** (was `func_8002EA44`) -- Tier B. Companion to
+**SetAutoPan** (was `func_8002EA44`) -- Tier B. Companion to
 SeAutoPan: advances `gVoiceFadeAccum` toward `gVoiceFadeLimit` by
 `gVoiceFadeStep`, throttled by `gVoiceFadeInterval`/`gVoiceFadeCountdown`,
 clears `gVoiceFadeActive` on reaching the limit, then computes and writes
@@ -786,7 +788,7 @@ extern Rec34Half gVoiceFadeCountdown[];
 extern Rec34Half gVoiceFadeAccum[];
 extern Rec34Half gVoiceFadeLimit[];
 
-void StepVoiceFade(s16 voice)
+void SetAutoPan(s16 voice)
 {
     s16 v;
     s16 off;

@@ -27,7 +27,7 @@
  *     code_179d8_l) and, if one exists, key it on (vmNoiseOn2, also
  *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
  *     two hardcoded constants.
- *   - SeAutoPan / StepVoiceFade: a linear-ramp pair over the
+ *   - SeAutoPan / SetAutoPan: a linear-ramp pair over the
  *     gVoiceFade* per-voice arrays -- Begin sets a start/target/step-rate;
  *     Step advances the accumulator (throttled by an interval/countdown
  *     pair), clamps at the target, and writes the resulting stereo output
@@ -42,7 +42,7 @@
  *     ring buffer of per-tick voice-activity bitmasks; when a voice has
  *     shown no activity for 16 consecutive ticks it force-releases it
  *     (disabling the SPU noise generator if that voice was in noise
- *     state); then calls SetAutoVol/StepVoiceFade for every voice
+ *     state); then calls SetAutoVol/SetAutoPan for every voice
  *     whose respective flag is set. Called once at the end of
  *     InitSpuDriver and, going by its own ring-buffer/mask-clearing logic,
  *     meant to run every frame thereafter.
@@ -60,7 +60,7 @@
  *     SpuVmFlush once.
  *
  * STALLS: SpuVmPBVoice, StartNote, SpuVmFlush,
- * SetAutoVol, StepVoiceFade -- all five are the same "whole-function
+ * SetAutoVol, SetAutoPan -- all five are the same "whole-function
  * register-count decision predates any of the function's own locals"
  * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
  */
@@ -77,7 +77,7 @@
  * record-family types its sibling stalls also use (Rec34Half, Rec34HalfU,
  * Rec16D7F0, ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
  * defined HERE instead of duplicated -- their old definitions further
- * down this file (originally written for StepVoiceFade's isolated splice)
+ * down this file (originally written for SetAutoPan's isolated splice)
  * are removed; the plain externs that used to accompany them there are
  * left in place and now just reference these same, earlier-defined types
  * (a harmless duplicate extern declaration, not a redefinition). Same
@@ -112,7 +112,7 @@ typedef struct {
     u8 pad[0x12];
     u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per StartNote's report */
     u8 pad14[0x18 - 0x14];
-    u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in SetAutoVol/StepVoiceFade */
+    u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in SetAutoVol/SetAutoPan */
 } ObjE970;
 extern ObjE970 *D_8008E970;
 
@@ -131,7 +131,7 @@ extern s16 D_8008E8C0;
  * (sdkname shape 0.99). Residue: in the pan split's `else` arm retail
  * copies the volume into $a1 first and multiplies THAT register (no
  * andi); this body multiplies the volume register directly and masks
- * val1 -- same residue as StepVoiceFade below
+ * val1 -- same residue as SetAutoPan below
  * (docs/match-reports/SetAutoVol.md). */
 void SetAutoVol(s16 voice)
 {
@@ -219,7 +219,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoVol);
  * own local view rather than sharing that file's header-less types.
  * Six independent 2-bytes-apart symbols share this one shape, same
  * idiom as code_179d8_j.c's own D_8008D994/D_8008D996/... family. */
-extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by SeAutoPan, cleared by StepVoiceFade when gVoiceFadeAccum reaches gVoiceFadeLimit */
+extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by SeAutoPan, cleared by SetAutoPan when gVoiceFadeAccum reaches gVoiceFadeLimit */
 extern Rec34Half gVoiceFadeStep[]; /* per-tick increment/decrement applied to gVoiceFadeAccum */
 extern Rec34Half gVoiceFadeInterval[]; /* ticks between steps (0 = every tick); same throttle idiom as gVoiceEnvInterval above */
 extern Rec34Half gVoiceFadeCountdown[]; /* countdown to the next step, reloaded from gVoiceFadeInterval */
@@ -253,8 +253,8 @@ void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
  * insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoPan.
  * Residue: the pan split's `else` arm -- retail copies the volume into
  * $a1 and multiplies that copy unmasked; this body masks val1 instead
- * (docs/match-reports/StepVoiceFade.md). */
-void StepVoiceFade(s16 voice)
+ * (docs/match-reports/SetAutoPan.md). */
+void SetAutoPan(s16 voice)
 {
     s16 v;
     s16 off;
@@ -332,7 +332,7 @@ void StepVoiceFade(s16 voice)
     D_8008D970[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceFade);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoPan);
 #endif
 
 extern void _spu_setInTransfer(s32 a0);
@@ -790,7 +790,7 @@ typedef struct {
 
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 extern void SetAutoVol(s16 a0);
-extern void StepVoiceFade(s16 a0);
+extern void SetAutoPan(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
 /* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
@@ -883,7 +883,7 @@ void SpuVmFlush(void) {
             SetAutoVol(i);
         }
         if (gVoiceFadeActive[i].unk0 != 0) {
-            StepVoiceFade(i);
+            SetAutoPan(i);
         }
     }
 

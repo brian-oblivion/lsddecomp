@@ -204,10 +204,10 @@ figures reconfirmed:** `objdump -t build/src/code_179d8_m.c.o` shows
 long, exactly as titled). No new axis attempted this round: this function
 was already worked twice in the immediately preceding rounds (26 and 27)
 with the callee-saved lever explicitly closed as inapplicable, and the
-`StepVoiceFade` sibling attempt this round (applying THIS function's own
-"woff" idiom back to `StepVoiceFade`) surfaced that the idiom's correct
+`SetAutoPan` sibling attempt this round (applying THIS function's own
+"woff" idiom back to `SetAutoPan`) surfaced that the idiom's correct
 placement is more context-sensitive than either report currently
-documents — see `StepVoiceFade.md`'s round-30 update for the negative
+documents — see `SetAutoPan.md`'s round-30 update for the negative
 result and its diagnosis, which is relevant background for anyone
 revisiting either function's split-index code next.
 
@@ -288,7 +288,7 @@ and rebuilt from scratch.
 `Rec34Half`/`Rec34HalfU`/`Rec16D7F0`/`ObjE970`/scratch-global declarations
 this body needs (originally written for a standalone splice with their
 own flat externs) are declared LATER in the file, after `SeAutoPan`
-and `StepVoiceFade`'s own stall bodies. Re-declaring them again here under
+and `SetAutoPan`'s own stall bodies. Re-declaring them again here under
 the same names is a hard conflict (duplicate typedef names, and for
 `D_8008E970`/`D_8008D7F0`/`D_8008D7F2` a redeclaration of the same extern
 symbol under an incompatible pointee type) -- not a new finding, but the
@@ -300,7 +300,7 @@ time rather than a symbol.
 `gVoiceFadeActive`.`gVoiceFadeLimit` externs, `Rec34HalfU`, `Rec16D7F0` +
 `D_8008D7F0`/`D_8008D7F2`, `D_8008D970`, `ObjE970` + `D_8008E970`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) from its old position (between
-`SeAutoPan` and `StepVoiceFade`) up to right after `#include
+`SeAutoPan` and `SetAutoPan`) up to right after `#include
 "common.h"`, adding this function's own `gVoiceEnvActive`/`A6`/`A8`/`AA`/`AC`/`AE`
 externs (same `Rec34Half` shape, disjoint symbols) alongside the existing
 ones.** Declaration order carries no code -- only DEFINITIONS need strict
@@ -325,7 +325,7 @@ the base `--debug --stack-diffs` score and the real search's outcome
 `--debug --stack-diffs` base score: **4155** (Register Differences 71 x 5
 = 355; Reorderings 10 x 60 = 600; Insertions 19 x 100 = 1900; Deletions 13
 x 100 = 1300; Stack Differences 0 and Branch Differences 0 -- same pattern
-as `StepVoiceFade`'s sibling search: this function's own documented frame
+as `SetAutoPan`'s sibling search: this function's own documented frame
 gap, `0x10` built vs retail's `0x18`, is likewise not reflected as a
 stack-slot difference, only as an immediate-operand difference on the
 `addiu sp,sp,-N` line itself).
@@ -395,11 +395,11 @@ frame did not reveal anything beyond what was already on file.
 
 **This unit is now 4-for-4 this round: charlie's `dead[N]`/`if(0)`
 padding idiom recovers frame byte-alignment exactly every time (four
-measured cases: `SpuVmFlush`, `StepVoiceFade`, `StartNote`, and
+measured cases: `SpuVmFlush`, `SetAutoPan`, `StartNote`, and
 this function), and has closed a missing-WORD-COUNT gap on none of them.**
 Every one of `code_179d8_m`'s frame gaps is pure unaddressed
 register-save-area padding — confirmed directly by grep in three of the
-four cases (`SetAutoVol`, `SpuVmFlush` here; `StepVoiceFade` and
+four cases (`SetAutoVol`, `SpuVmFlush` here; `SetAutoPan` and
 `StartNote`'s own permuter `--stack-diffs` runs independently
 confirmed zero stack differences) — with each function's real content
 residue (a redundant mask, a persisted early value, an addressing-cost
@@ -419,7 +419,7 @@ project's "one extern symbol/typedef cannot carry two conflicting
 declarations in one file" rule, exactly the same shape round 37 already
 hit and fixed the same way. The shared prelude now lives right after
 `#include "common.h"`, and the later, now-redundant typedef definitions
-(previously positioned for `StepVoiceFade`'s isolated splice) were
+(previously positioned for `SetAutoPan`'s isolated splice) were
 removed, leaving only their accompanying `extern` lines in place (which
 remain valid: same already-declared type, referenced from a later point
 in the file). Reverted the function itself to `INCLUDE_ASM`; the shared
@@ -616,7 +616,7 @@ void SetAutoVol(s16 a0) {
 ## Naming
 
 **SetAutoVol** (was `func_8002E4D8`) -- Tier B. Same shape as
-StepVoiceFade (accumulate-until-limit, throttled by an interval/countdown
+SetAutoPan (accumulate-until-limit, throttled by an interval/countdown
 pair, clear an active flag on reaching the limit, then compute and write
 a stereo output level from the result) but over its own `gVoiceEnv*`
 family, and with no "Begin"-style setup function in this unit -- nothing
@@ -648,7 +648,7 @@ needed there. `./build-and-verify.sh` green (zero bytes changed) and
 
 ## Round 73 (delta): REVISIT -- 238/231 (7 long) -> 231/231 length-exact, ins 1 / del 1
 
-REVISITED, round 73: STALL improved to length-exact 223/231 (ins 1 / del 1), residue is the same single pan-split register copy as StepVoiceFade; names/types used (same locals as StepVoiceFade's round-73 body).
+REVISITED, round 73: STALL improved to length-exact 223/231 (ins 1 / del 1), residue is the same single pan-split register copy as SetAutoPan; names/types used (same locals as SetAutoPan's round-73 body).
 
 ### Ownership
 
@@ -668,18 +668,18 @@ warning firing (278258 bytes).
 
 ### What moved it
 
-Retail SetAutoVol and StepVoiceFade are the same code with a
+Retail SetAutoVol and SetAutoPan are the same code with a
 different array family (a normalised `diff` of the two `.s` files differs
 only in: `$t0`/`$t1` naming, `lhu` of the accumulator stored to
 `D_8008EA10` and multiplied as `s16`, and a reload of `D_8008EA11` for the
-third pan test). So this body is StepVoiceFade's round-73 body ported with:
+third pan test). So this body is SetAutoPan's round-73 body ported with:
 
 - `acc` is `s16`, `acc = gVoiceEnvAccum[v].unk0; D_8008EA10 = acc;`
 - first quotient `q2 = (acc * vol) / 16129;`
 - third pan test `p = D_8008EA11;` (the global, reloaded -- retail's
   `lui a0; lbu a0; nop`).
 
-Every lever in StepVoiceFade.md's round-73 list applies unchanged (field ops
+Every lever in SetAutoPan.md's round-73 list applies unchanged (field ops
 instead of cached locals, `v` for the tail, `off = voice * 8`,
 `D_8008D7F0[off + 1]`, reused `s32 p` with `(u32)` bound tests, `q2` reused
 for both quotients, `val2 > val1`). The old report's "redundant
@@ -691,13 +691,13 @@ deletions 1**, positional skeleton diffs 7, no out-of-range drift.
 
 ### Residue
 
-Identical to StepVoiceFade's and at the same place (vram 0x8002E6FC..
+Identical to SetAutoPan's and at the same place (vram 0x8002E6FC..
 0x8002E724): retail copies the volume into `$a1` in the `else` arm of the
 first pan test and multiplies that copy unmasked; this body masks `val1`
-(`andi`). The shapes tried against it are tabulated in StepVoiceFade.md's
+(`andi`). The shapes tried against it are tabulated in SetAutoPan.md's
 round-73 section; they were not re-run here, since the two functions'
 section 1 is byte-identical in retail and in both bodies. No permuter spent
-on this function (StepVoiceFade's search covers the shared residue).
+on this function (SetAutoPan's search covers the shared residue).
 
 ## Preserved body (round 73 best -- compiles standalone through the pinned pipeline)
 

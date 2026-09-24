@@ -40,7 +40,7 @@ second instruction, `move t2,a0` (retail) vs `move t1,a0` (built).
 
 **New axis 12: applied this unit's own `idxCopy = a0;`-at-the-top idiom**
 (the pattern already established and proven in `SetAutoVol`/
-`StepVoiceFade`, sibling functions in this same unit) — declare `s16
+`SetAutoPan`, sibling functions in this same unit) — declare `s16
 idxCopy;`, assign it from `a0` as the function's first statement, and use
 `idxCopy` in place of `a0` for every one of the record-index accesses
 (`D_8008D996[idxCopy]`, `D_8008D99E[idxCopy]`, etc., through to the final
@@ -365,13 +365,13 @@ instruction (`move t2,a0` retail vs `move t1,a0` built).
 
 Read the raw disassembly directly this round (rather than re-deriving from
 the report's prose) to check whether the persisted-register class this
-unit's OTHER two large stalls (`StepVoiceFade`, `SetAutoVol`) show is the
+unit's OTHER two large stalls (`SetAutoPan`, `SetAutoVol`) show is the
 same mechanism here. It is not quite the same shape: this function's
 register renumbering starts at instruction 2 and is a near-total CLASS
 shift (both `$t`-temporaries and `$a`-arguments renumbered together) rather
 than one dedicated persisted value computed early and consumed once late.
 No new lever identified this round; not spending further attempts here
-given `StepVoiceFade` and `SetAutoVol` (this unit's two other open
+given `SetAutoPan` and `SetAutoVol` (this unit's two other open
 stalls) each had a specific, named, untried lever this round, and both of
 those also failed to move when tried (see their own round-32 updates) —
 consistent with all three of this unit's remaining stalls being the same

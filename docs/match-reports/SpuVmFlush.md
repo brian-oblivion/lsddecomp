@@ -85,7 +85,7 @@ window:
 4. Two unconditional bitmask updates:
    `D_8008E228 &= ~D_80090C60; D_8008E22C &= ~D_80090C64;`
 5. **Per-channel interpolation dispatch**, unconditional 0..0x17 loop:
-   `SetAutoVol(i)` if `gVoiceEnvActive[i] != 0`, `StepVoiceFade(i)` if
+   `SetAutoVol(i)` if `gVoiceEnvActive[i] != 0`, `SetAutoPan(i)` if
    `gVoiceFadeActive[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
    match reports).
 6. **Flag-driven per-channel field copy**, another unconditional 0..0x17
@@ -453,7 +453,7 @@ typedef struct {
 
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 extern void SetAutoVol(s16 a0);
-extern void StepVoiceFade(s16 a0);
+extern void SetAutoPan(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
 /* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
@@ -546,7 +546,7 @@ void SpuVmFlush(void) {
             SetAutoVol(i);
         }
         if (gVoiceFadeActive[i].unk0 != 0) {
-            StepVoiceFade(i);
+            SetAutoPan(i);
         }
     }
 
@@ -633,7 +633,7 @@ extern s32 D_8008E25C;
 
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 extern void SetAutoVol(s16 a0);
-extern void StepVoiceFade(s16 a0);
+extern void SetAutoPan(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
 /* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
@@ -721,7 +721,7 @@ void SpuVmFlush(void) {
             SetAutoVol(i);
         }
         if (gVoiceFadeActive[i].unk0 != 0) {
-            StepVoiceFade(i);
+            SetAutoPan(i);
         }
     }
 
@@ -789,7 +789,7 @@ activity bitmask to a 16-slot ring buffer (`gVoiceActivityRingIdx`/
 `gVoiceActivityRing`), and once 16 consecutive ticks show a voice as
 inactive, force-releases it (silencing the SPU noise generator first if
 its state was the `2`/noise value ClearNoiseVoices also reacts to); then
-clears the active-voice mask and calls SetAutoVol/StepVoiceFade
+clears the active-voice mask and calls SetAutoVol/SetAutoPan
 for every voice whose respective flag is set. Named for the dispatch
 role, which is unambiguous; the exact tick cadence (every video frame?
 every audio-driver callback?) is not established from this function's
@@ -836,7 +836,7 @@ kept in `#else`. Used the CURRENT best preserved body (round 48 echo,
 at the end of this report for reference. All of its supporting
 declarations (the `gVoiceActivityRing*` pair, `Rec34HalfU2`,
 `Rec16D7F0Wide`, `Rec16DAD4C`, `SpuSetNoiseVoice`, the `SetAutoVol`/
-`StepVoiceFade` externs, `D_8008D7F6`) are new to the unit and were kept
+`SetAutoPan` externs, `D_8008D7F6`) are new to the unit and were kept
 local to this function's `#ifdef` block, per CLAUDE.md's rule against
 adding to a shared header; everything else it touches (`D_8008D9A3`,
 `D_8006DAD4`, `D_8008D970`, `D_80090C60`/`64`, `D_8008E228`/`22C`,

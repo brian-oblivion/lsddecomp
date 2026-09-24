@@ -261,7 +261,7 @@ and stored identically to retail.
    not eliminate its residue and surfaced different register-pressure
    side effects. Loop vs. non-loop context is a real discriminator for
    this idiom, not a detail. **Round 30 adds a THIRD variant**:
-   `StepVoiceFade.md`'s round-30 update found the idiom REGRESSES a third
+   `SetAutoPan.md`'s round-30 update found the idiom REGRESSES a third
    sibling because retail derives the shift from an ALREADY-sign-extended
    working value shared with a neighbouring computation, not from a fresh
    copy of the raw parameter — so "top of function, `s16`, mask deferred to

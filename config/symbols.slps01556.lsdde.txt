@@ -1066,7 +1066,11 @@ ClassEAC0__FinishConstruct = 0x800405D0; // type:func
 // SeAutoVol/SeAutoPan. Superseded game-style name BeginVoiceFade.
 // Round 74 (bravo, track 2).
 SeAutoPan = 0x8002E874; // type:func
-StepVoiceFade = 0x8002EA44; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SetAutoPan (224w vs our 228w,
+// disc 3.3), position within the libsnd neighborhood, directly after
+// SeAutoPan (Se/Set pair). Superseded game-style name StepVoiceFade.
+// Round 74 (bravo, track 2).
+SetAutoPan = 0x8002EA44; // type:func
 // identified: shape 0.99 vs libsnd/vmanager SetAutoVol (227w vs our 231w,
 // disc 3.3), position within the libsnd neighborhood, directly after
 // SeAutoVol (Se/Set pair). Superseded game-style name StepVoiceEnvelope.
