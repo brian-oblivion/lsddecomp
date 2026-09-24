@@ -105,31 +105,17 @@ void func_800659D0(Class65650 *self)
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 30/33 words, length exact. Residue: prologue callee-save
- * store-order permutation ($s0/$ra/$s1)
- * (docs/match-reports/func_80065A5C.md). Hand-derived. */
 void func_80065A5C(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
-    u8 unused[8];
     s32 i;
 
-    __asm__("");
     p = self->unk70;
-    if (self->unk6C <= 0) {
-        return;
-    }
-    i = 0;
-    do {
-        (*p)->methods->slot60(*p, arg);
+    for (i = 0; i < self->unk6C; p++) {
         i++;
-        p++;
-    } while (i < self->unk6C);
+        (*p)->methods->slot60(*p, arg);
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065A5C);
-#endif
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 33/40 words, length exact. Residue: compound of the same
