@@ -310,6 +310,16 @@
           "note": "REVISIT-2 runners (4 sessions): class_3bb8c_n 3/3 (StyleBuildDecorSet indexed loop + i*3; StyleFillEffectKind3/2 one-field-struct store for the scheduler alias rule, % 6, result-variable test vs jump.c preset); code_8220_b 1/1 (func_80018464 954/954: 13 goto loops vs strength reduction, struct-field alias, s8 block move, parameter walking, do/while(0) loop-depth weight); code_179d8_d 1/1 (func_8002C278: slot80's forwarded fourth argument); code_d294_b 3/3 (TryAttachNearby count+corners one struct; ClassifyAgainstPlanes shared loop var, pointer walks, no Part-3 gate, two-arm bit set; NotifyTaggedParents do/while for loop.c's hoist). No match used a permuter. func_80030980 not staffed: reads pinned libsnd vmanager state, ownership escalated.",
           "round": 76,
           "runners": 4
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-24",
+          "matches": 1,
+          "model": "opus",
+          "note": "REVISIT-2 runner (1 session): class_3bb8c_b 1/1 (IsPointOutOfBounds 27/27: negated && chain returning 0 then return 1, so jump.c presets 1 in v0 and bounds lands in a2). func_80030980 not staffed (ownership escalated round 76). No permuter.",
+          "round": 77,
+          "runners": 1
         }
       ],
       "status": "open"

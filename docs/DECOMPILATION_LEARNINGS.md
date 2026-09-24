@@ -185,6 +185,9 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   overwrite"; `v = (x / 20) * 20; if (x != v) ...` blocks it and leaves the product in the result
   register (retail's `beq a1,v0`). Ternary, `switch`, both-arm stores and `if ((v = x % 20) != 0)` all
   measured negative (`StyleFillEffectKind2`, 49/79 -> 79/79, round 76).
+  The MIRROR: when retail DOES preset (`li v0,1` ahead of every test), write the tests as one `&&`
+  chain whose then-arm returns the other constant (`if (a && b && c) return 0; return 1;`); an `||`
+  chain or separate `if`s never preset (`IsPointOutOfBounds`, 2/27 -> 27/27, round 77).
 
 ### 3b. Switch and jump tables
 
@@ -610,13 +613,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   ask which memory operand is memory-mapped I/O BEFORE reaching for a barrier or filing a
   scheduling stall. Discriminator: dump cc1's own output and look for a `#.set volatile` marker
   that has migrated past non-volatile stores. (a round 66, bravo)
-- **`volatile` is the WRONG tool for an ADDRESS CSE, and it is NON-MONOTONIC** — it acts on the
-  VALUE CSE and regresses a LICM residue (48/376 -> 6/376). **The address CSE yields to the
-  asm-label alias**: `extern T D_8008A8F8_b __asm__("D_8008A8F8");` leaves nothing to fold and
-  closed `Unk18Obj__InitDefaults` 41/41; six byte-verified uses exist, and it renames a linker symbol, so it
-  is not HARD RULE 6's banned construct. Cheaper still, **try REORDERING first**. (a §"Negatives
-  worth not re-deriving", §"A repeated-global-address CSE is defeatable from C89")
-
 ### 3i. GTE and inline asm
 
 - **A BARE `__asm__("")` CAN change register allocation, which HARD RULE 6's own test calls
@@ -736,7 +732,7 @@ minimally, search-tail inert forms). Distilled out round 67: §"The arm-order le
 cheap COUNTER-indication", §"An explicit alias can force the parameter copy cc1 would
 otherwise coalesce away", §"Retail reuses the same counter pseudo-registers across sibling
 loops and SWAPS their outer/inner roles". Distilled out round 68: §"Two independent
-CFG/scheduling levers, both from `Class6D940__ResolveEntry`", §"The `mention a value twice` lever needs a
+CFG/scheduling levers, both from `func_8002C278`" (now `Class6D940__ResolveEntry`), §"The `mention a value twice` lever needs a
 genuine SECOND, INDEPENDENT USE POINT" (it reconciles the round-19 close with the INERT entry in
 3d), §"HImode constant narrowing". Distilled out round 69: §"Two long-standing near-misses closed by
 DELETING a named value" (the local-count entries in 3d carry the lever), §"When the residue
@@ -744,4 +740,4 @@ is a lone scheduling difference, sweep one statement's PLACEMENT", §"Inherited 
 statements must be tested in BOTH directions". Distilled out rounds 71-72: §"A narrow signed field may need an `s32` LOCAL", §"A missing `andi 0xff`" (getintr). Distilled out round 73: §"An INCOMPLETE-ARRAY global declaration" (contextual, single
 instance), §"A same-size pointer cast in a FUNCTION-SCOPE local", §"A permuter run that plateaus
 with NO MOVEMENT AT ALL", §"The frame size bounds how many spilled locals"; the 3j local-count entry
-folded into 3d's.
+folded into 3d's. Distilled out round 77: §"`volatile` is the WRONG tool for an ADDRESS CSE" (the asm-label alias lever).

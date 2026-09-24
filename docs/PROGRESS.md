@@ -6,6 +6,81 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-24 — round 77: eight units named, the last workable stall matched, and one game function left
+
+**Nine runner sessions across two tracks, and every merge green.** The head
+ran on Opus as an ordinary head, in the same session as round 76, at the
+operator's request. Gate 0 was clean. Slots were refilled as runners
+finished (§3.8). One ready job was skipped with a written reason, and two jobs
+were taken out of plan order to spread header use (below).
+
+| track | sessions | model | outcome |
+| --- | --- | --- | --- |
+| 1 REVISIT-2 | 1 | opus | `IsPointOutOfBounds` **MATCHED 27/27** (from 2/27). Round 71's root cause was right: 1 has to sit in `$v0` before the temps are allocated. The lever that gets it there is a negated `&&` chain whose then-arm returns 0, which jump.c rewrites as a preset. An `||` chain, separate `if`s and a returned comparison all measured negative |
+| 3 | 8 | sonnet | Entity_e, Entity_g (mood-cue handlers by `gEntityMoodHandlerTable` row), code_8220_c (SubmitPoly* RCpoly wrappers, StoreSxyPoly*, header/copy/cull leaves), code_1677c (Class6D3C8 startup/title controller), class_3bb8c_d (Class86B60 memcard save-naming UI, TaskObjF ctor), code_179d8_d (Class6D940, a SetActiveDataSource client, plus two gVabDriverMethods stubs), class_16334 (Pad, over Sony's PadInit/PadRead/PadStop), class_3bb8c_i (Obj86ED0 memcard name-entry UI). All eight were reviewed and marked |
+
+`plan.py` now reads 1159/1160 game functions matched. The one left is
+`func_80030980`, whose ownership was escalated in round 76 and is unresolved.
+The revisit yield is 81/102, and track 3 is at 50/75 units (track 4 opens at 60).
+
+### Head review and fixes at merge
+
+Every unit was sampled against its evidence. The head decoded
+`gEntityMoodHandlerTable` rows from retail for both Entity units (NULL rows
+and double-occupied rows included), confirmed the data constants as
+fraction triples, and confirmed each sampled method's classtable slot. No unit
+was sent back. The head fixed these at merge through `rename.py`, image
+byte-identical each time:
+
+- **`g` on unit-static data, six times**: `sMoodCue78TransitionDone`,
+  `sPolyOtCodeOverride{Set,}`, and `sModelPathDreamE5`/`sLogoPathAsmk`/`sLogoPathOsd`.
+  The runner prompt already states the convention, so this is a recurring
+  Sonnet miss, not a missing rule.
+- **Two tier-B names asserted a purpose the body does not show.**
+  `ForwardToBaseUnlessOverridden` became `ForwardToBaseSlot44UnlessFlagged`,
+  and `AdvanceWobbleAndDeactivate` became `StepYawInWindowsThenDeactivate`.
+  Neither was a wrong tier-A name, so neither triggered §2's back-to-Opus rule.
+  That judgement is ESCALATED below.
+- `new_class_6d3c8` became `New_Class6D3C8`, the constructor convention.
+- **Field names applied by type scope**: `Class6D3C8Methods.slot44` became
+  `forwardToBaseSlot44UnlessFlagged` (1 accessor). `Class86B60::unkA4` became
+  `dreamSysView` and `unkAC` became `saveCtrl` (11 each). `Obj86ED0::unk10`
+  became `nameLen` and `unk18` became `cursorIndex` (class_3bb8c_i and _j).
+  Declined: `saveInfoWord`/`saveInfoBuf`, which restate the types, and seven
+  lower-evidence `Obj86ED0` names, which stay proposed in their report.
+- **A type-scope rename across two units needs the pass REPEATED until the
+  build is clean.** make stops at the first failing unit, so one pass lists
+  only that unit's accessors (measured here: `nameLen`'s first pass missed
+  class_3bb8c_j's).
+- CLAUDE.md:74 now gives `func_8001A3EC`'s new name (`CopyPolyVtx3`).
+- Charlie corrected code_179d8_d's round-16 claim that "no class table" is
+  near its globals: `D_8006D940` is a 30-slot Class6D430-derived table.
+- LEARNINGS: one idiom mirror added (the `&&`-chain preset), one entry
+  distilled (volatile vs address CSE), and one archive citation repaired
+  (below). Every merge had the symbols-file append conflict; each was
+  resolved by keeping both sides and checking for duplicate names and
+  addresses.
+
+### ESCALATED (operator decisions; the head did not act)
+
+1. **`func_80030980`'s ownership** (from round 76) is now the ONLY
+   unmatched game function, so it alone keeps track 1 open.
+2. **Does a purpose-asserting tier-B name count as a failed review?** §2
+   switches the naming runner back to Opus only on a wrong tier-A name.
+   Two of eight Sonnet units this round needed one such fix each, plus the
+   `g`/`s` fixes. The head counted them as passes.
+3. **rename.py rewrites archive CITATIONS in DECOMPILATION_LEARNINGS but not
+   the archive headings they point to.** `§"Two independent CFG/scheduling
+   levers, both from func_8002C278"` had become `...Class6D940__ResolveEntry`
+   and no longer matched its heading. The head repaired this one by hand. The
+   fix belongs in the tool: skip `§"..."` spans, or rename the archive too.
+4. **Jobs taken out of plan order for header spread.** class_3bb8c_i was
+   deferred twice for `class_3bb8c.h`, then staffed alongside class_3bb8c_d
+   with no conflict. plan.py prices call-graph contention but not header
+   contention between naming jobs, so a head that follows PARALLEL-RUNS §4
+   will keep reordering.
+
+
 ## 2026-09-24 — round 76: eight of eight REVISIT-2s match, and the 954-word giant was thirteen goto loops
 
 **Seven runner sessions across three tracks, and every merge green.** The head

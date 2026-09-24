@@ -9182,3 +9182,13 @@ already covered elsewhere in the sheet.
   reordering of accesses; through a local `volatile T *` it also controls whether the ADDRESS
   COMPUTATION is folded into the memory instruction, so "I tried it" is at most one of two
   measurements. (a §"`volatile` has TWO independent effects")
+
+## Distilled round 77 (2026-09-24)
+
+- **`volatile` is the WRONG tool for an ADDRESS CSE, and it is NON-MONOTONIC** — it acts on the
+  VALUE CSE and regresses a LICM residue (48/376 -> 6/376). **The address CSE yields to the
+  asm-label alias**: `extern T D_8008A8F8_b __asm__("D_8008A8F8");` leaves nothing to fold and
+  closed `Unk18Obj__InitDefaults` 41/41; six byte-verified uses exist, and it renames a linker symbol, so it
+  is not HARD RULE 6's banned construct. Cheaper still, **try REORDERING first**. (a §"Negatives
+  worth not re-deriving", §"A repeated-global-address CSE is defeatable from C89")
+
