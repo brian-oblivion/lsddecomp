@@ -1,11 +1,35 @@
+/*
+ * class_3bb8c_i -- third carved slice of the class_3bb8c block, 20 functions,
+ * carved round 14. include/class_3bb8c.h is SHARED with every other
+ * class_3bb8c_* slice; header edits here must be strictly ADDITIVE.
+ *
+ * All 20 functions are `Obj86ED0` methods (vtable `gObj86ED0Methods`,
+ * `D_80086ED0`, 42 slots, `tools/classtable.py gObj86ED0Methods`) -- the
+ * ONLY class this unit defines methods for. `Obj86ED0` is a BasicClass
+ * subclass that resolves and drives the memory-card save-name-entry UI: it
+ * loads the `CARD\COMINPUT.TIM`/`CARD\FONTICON.TIM` icon/font resources
+ * (`Obj86ED0__LoadCardResources`), holds both a caller-owned name buffer
+ * (`nameBuf`) and its own half-width working copy (`unk28`, decoded/encoded
+ * via `DecodeFullWidthSjis`/`EncodeFullWidthSjis`), and routes a dense
+ * numeric command switch (`Obj86ED0__HandleCommand`) to cursor-move
+ * (`MoveCursorRight`/`Left`), character-select-cycle (`AdvanceCharSelect`)
+ * and the countdown/blink group class_3bb8c_j already named
+ * (`AdvanceCountdown`/`ToggleFlag20`/`ResetCountdown`/`ResetAllAndFinish`).
+ * Four vtable slots (`advanceCountdown`/`toggleFlag20`/`resetCountdown`/
+ * `resetAllAndFinish`) resolve to class_3bb8c_j's own functions but are
+ * referenced ONLY here, so they are named in the shared header as this
+ * unit's own (classtable.py-verified, compiler-checked clean). See
+ * `docs/match-reports/Obj86ED0__HandleCommand.md` for the remaining
+ * cross-unit fields/slots this unit could not rename alone.
+ */
 #include "common.h"
 #include "class_3bb8c.h"
 
-/* This project's own strcpy (matched elsewhere) -- func_80050F28's own
+/* This project's own strcpy (matched elsewhere) -- Obj86ED0__SetName's own
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */
 extern char *strcpy(char *dest, char *src);
 
-/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- func_80050F28's own
+/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- Obj86ED0__SetName's own
  * call. Translates each byte of `src` (a name string) into `dest` (folding a
  * couple of special-case byte ranges) and returns `dest`, same convention as
  * `strcpy`. Typed purely from this call site's own register usage. Declared
@@ -19,18 +43,18 @@ extern char *DecodeFullWidthSjis(char *dest, char *src);
  * `Class86ED0Methods` local view, and two incompatible declarations of one
  * symbol in a shared header reach both translation units. See the HEAD NOTE
  * next to Obj86ED0Methods in that header. */
-extern Obj86ED0Methods D_80086ED0;
+extern Obj86ED0Methods gObj86ED0Methods;
 
-/* This class's own table getter -- func_80050BA8/func_80050C14's shared
+/* This class's own table getter -- New_Obj86ED0/Obj86ED0__Obj86ED0's shared
  * dispatch. DEFINED in src/class_3bb8c_j.c (matched round 15 by runner
  * bravo, which returns it as its own `Class86ED0Methods *` local view of
- * the same table). Returns `&D_80086ED0`; confirmed in the disassembly as
+ * the same table). Returns `&gObj86ED0Methods`; confirmed in the disassembly as
  * `lui/addiu` materialising that exact address then `jr $ra`, the same
  * no-argument-getter shape as `Get_vtable_BasicClass`. Declared here rather than
  * in the shared header because the two units' return types differ. */
 extern Obj86ED0Methods *Get_vtable_Obj86ED0(void);
 
-void *func_80050BA8(s32 arg0, s32 arg1)
+void *New_Obj86ED0(s32 arg0, s32 arg1)
 {
     Obj86ED0 *self;
 
@@ -47,18 +71,18 @@ void *func_80050BA8(s32 arg0, s32 arg1)
 extern s32 strlen(char *s);
 
 /* VALUE-of `%gp_rel`, round 45's own local view -- same global as
- * class_3bb8c_j's `D_8008AAE4` (a byte lookup table whose length this
+ * class_3bb8c_j's `gNameCharTable` (a byte lookup table whose length this
  * function counts by hand rather than via `strlen`, since GCC 2.6.3 with
  * `-fno-builtin` never turns a `strlen` CALL into inline code -- the
  * inline loop below has to be literal source, not a call). */
-extern u8 *D_8008AAE4;
+extern u8 *gNameCharTable;
 
 /* Defined later in this file (ROM order); forward-declared here since
- * func_80050C14 calls it, same convention as Obj865C8__EnterState2 in
+ * Obj86ED0__Obj86ED0 calls it, same convention as Obj865C8__EnterState2 in
  * src/class_39e08.c. */
-extern void func_80050CD8(Obj86ED0 *self);
+extern void Obj86ED0__ClearChildRefs(Obj86ED0 *self);
 
-void func_80050C14(Obj86ED0 *self, char *arg1, s32 arg2)
+void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
 {
     u8 *p;
     s32 count;
@@ -68,7 +92,7 @@ void func_80050C14(Obj86ED0 *self, char *arg1, s32 arg2)
     self->unk10 = strlen(arg1);
     self->unk28 = BMemPMgrAlloc(self->unk10 + 4);
 
-    p = D_8008AAE4;
+    p = gNameCharTable;
     count = 0;
     while (*p != 0) {
         p++;
@@ -76,24 +100,24 @@ void func_80050C14(Obj86ED0 *self, char *arg1, s32 arg2)
     }
     self->unk14 = count;
 
-    func_80050CD8(self);
-    self->methods->slot40(self, arg1, arg2);
+    Obj86ED0__ClearChildRefs(self);
+    self->methods->setName(self, arg1, arg2);
 }
 
-void func_80050CD8(Obj86ED0 *self)
+void Obj86ED0__ClearChildRefs(Obj86ED0 *self)
 {
-    self->unk34 = NULL;
-    self->unk38 = NULL;
+    self->childType2 = NULL;
+    self->childType5 = NULL;
     self->unk48 = NULL;
 }
 
-void func_80050CE8(Obj86ED0 *self)
+void Obj86ED0__Finalize(Obj86ED0 *self)
 {
     BMemPMgrFree(self->unk28);
     Get_vtable_BasicClass()->finalize(self);
 }
 
-void func_80050D30(Obj86ED0 *self, void *arg1)
+void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -103,14 +127,14 @@ void func_80050D30(Obj86ED0 *self, void *arg1)
         tag = **(s32 **)arg1;
         mask = tag & 0xF;
         if (mask == 2) {
-            self->unk34 = arg1;
+            self->childType2 = arg1;
         } else if (mask == 5) {
-            self->unk38 = arg1;
+            self->childType5 = arg1;
         }
     }
 }
 
-void func_80050DB4(Obj86ED0 *self, void *arg1)
+void Obj86ED0__RemoveChild(Obj86ED0 *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -119,23 +143,23 @@ void func_80050DB4(Obj86ED0 *self, void *arg1)
         tag = **(s32 **)arg1;
         mask = tag & 0xF;
         if (mask == 2) {
-            self->unk34 = NULL;
+            self->childType2 = NULL;
         } else if (mask == 5) {
-            self->unk38 = NULL;
+            self->childType5 = NULL;
         }
         Get_vtable_BasicClass()->removeChild(self, arg1);
     }
 }
 
-void func_80050E34(Obj86ED0 *self)
+void Obj86ED0__RemoveAllChildren(Obj86ED0 *self)
 {
-    self->unk34 = NULL;
-    self->unk38 = NULL;
+    self->childType2 = NULL;
+    self->childType5 = NULL;
     self->unk48 = NULL;
     Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
-void func_80050E78(Obj86ED0 *self, void *arg1, s32 arg2)
+void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
 {
     s32 tag;
     s32 mask;
@@ -145,16 +169,16 @@ void func_80050E78(Obj86ED0 *self, void *arg1, s32 arg2)
     tag = **(s32 **)arg1;
     mask = tag & 0xF;
     if (mask == 2) {
-        self->methods->slot5C(self, arg1, arg2);
+        self->methods->handleCommand(self, arg1, arg2);
     } else if (mask == 5) {
-        self->methods->slot58(self, arg1, arg2);
+        self->methods->tickState(self, arg1, arg2);
     }
 }
 
-void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
+void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
 {
-    self->unkC = mode;
-    self->unk24 = arg1;
+    self->mode = mode;
+    self->nameBuf = arg1;
     self->unk18 = 0;
     self->unk1C = 0;
     if (mode == 1) {
@@ -166,7 +190,7 @@ void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
 }
 
 /*
- * func_80050F98's own helpers/data -- resolves two "CARD\\<name>.TIM"
+ * Obj86ED0__LoadCardResources's own helpers/data -- resolves two "CARD\\<name>.TIM"
  * memory-card icon/font resource paths (BuildFileName, already matched in
  * code_171e0.c) and loads each through func_8003B39C, then converts/wraps
  * the loaded handle into a ChildObj86ED0-shaped resource object (unk48 via
@@ -179,17 +203,17 @@ extern ChildObj86ED0 *func_8003B39C(char *path);
 extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 extern ChildObj86ED0 *func_80041AB4(ChildObj86ED0 *arg0, s32 arg1);
 
-extern const char D_80011610[]; /* "COMINPUT" */
-extern const char D_8001161C[]; /* "FONTICON" */
-extern const char D_8008AAE8[]; /* "CARD\\" */
-extern const char D_8008AAF0[]; /* ".TIM" */
+extern const char sStrComInput[]; /* "COMINPUT" */
+extern const char sStrFontIcon[]; /* "FONTICON" */
+extern const char sCardPathPrefix[]; /* "CARD\\" */
+extern const char sTimExt[]; /* ".TIM" */
 extern s32 D_80086F7C; /* 3-word opaque block, func_80041C9C's arg1, address-only here */
 extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
 extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
-void func_80050F98(Obj86ED0 *self, void *arg1)
+void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
 {
     char path[0x20];
     const char *dir;
@@ -204,16 +228,16 @@ void func_80050F98(Obj86ED0 *self, void *arg1)
         return;
     }
 
-    dir = D_8008AAE8;
-    ext = D_8008AAF0;
+    dir = sCardPathPrefix;
+    ext = sTimExt;
 
-    handle1 = func_8003B39C(BuildFileName(path, D_80011610, dir, ext));
+    handle1 = func_8003B39C(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
     self->unk48 = func_80041C9C(handle1, (void *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
 
-    handle2 = func_8003B39C(BuildFileName(path, D_8001161C, dir, ext));
+    handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = New_Obj6EAC0(handle2, self->unk10, self->unk28);
     self->unk40 = func_80041AB4(handle2, 0x5F);
@@ -223,7 +247,7 @@ void func_80050F98(Obj86ED0 *self, void *arg1)
     self->unk40->methods->slot4C(self->unk40, arg1, (void *)&D_8008AADC);
 }
 
-void func_80051174(Obj86ED0 *self)
+void Obj86ED0__ReleaseCardResources(Obj86ED0 *self)
 {
     if (self->unk48 != NULL) {
         self->unk48 = self->unk48->methods->release(self->unk48);
@@ -232,131 +256,131 @@ void func_80051174(Obj86ED0 *self)
     }
 }
 
-void func_80051200(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86ED0 *arg3)
+void Obj86ED0__AttachTarget(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86ED0 *arg3)
 {
     self->methods->addChild(self, arg1);
     self->methods->addChild(self, arg2);
-    self->unk3C = arg3;
-    self->unk2C = 0;
+    self->target = arg3;
+    self->closeState = 0;
     self->unk20 = 0;
 }
 
-void func_80051270(Obj86ED0 *self)
+void Obj86ED0__DetachTarget(Obj86ED0 *self)
 {
-    self->methods->removeChild(self, self->unk34);
-    self->methods->removeChild(self, self->unk38);
-    self->unk3C = NULL;
+    self->methods->removeChild(self, self->childType2);
+    self->methods->removeChild(self, self->childType5);
+    self->target = NULL;
 }
 
-void func_800512C8(Obj86ED0 *self, s32 arg1)
+void Obj86ED0__SetState(Obj86ED0 *self, s32 arg1)
 {
-    self->unk30 = 0;
+    self->closeTickCount = 0;
     if (arg1 < 2) {
         return;
     }
     switch (arg1) {
     case 2:
     case 3:
-        self->methods->removeChild(self, self->unk34);
-        self->methods->slot48(self);
-        self->unk2C = arg1;
+        self->methods->removeChild(self, self->childType2);
+        self->methods->releaseCardResources(self);
+        self->closeState = arg1;
         break;
     case 4:
-        self->methods->notifyParents(self, self->unk2C);
+        self->methods->notifyParents(self, self->closeState);
         break;
     }
 }
 
-void func_80051370(Obj86ED0 *self)
+void Obj86ED0__TickState(Obj86ED0 *self)
 {
     s32 tag;
     s32 old;
 
-    tag = self->unk2C;
+    tag = self->closeState;
     if (tag >= 4) {
         return;
     }
     if (tag < 2) {
         return;
     }
-    old = self->unk30;
-    self->unk30 = old + 1;
+    old = self->closeTickCount;
+    self->closeTickCount = old + 1;
     if (old != 0) {
-        self->methods->slot54(self, 4);
+        self->methods->setState(self, 4);
     }
 }
 
-/* func_800513D0's own name-copy helper -- uncarved elsewhere (`code_2cc8c_f`,
+/* Obj86ED0__HandleCommand's own name-copy helper -- uncarved elsewhere (`code_2cc8c_f`,
  * still `INCLUDE_ASM`), typed purely from this call site's own register
- * usage: `a0`/`a1` are `self->unk24`/`self->unk28` (both `char *`, the same
+ * usage: `a0`/`a1` are `self->nameBuf`/`self->unk28` (both `char *`, the same
  * pair `strcpy` is fed in the other arm), return value unused. Same
  * declare-locally convention as `DecodeFullWidthSjis` above (a different unit
  * types this same-shaped function with a different signature from its own
  * call site). */
 extern void EncodeFullWidthSjis(char *dest, char *src);
 
-void func_800513D0(Obj86ED0 *self, void *arg1, s32 arg2)
+void Obj86ED0__HandleCommand(Obj86ED0 *self, void *arg1, s32 arg2)
 {
     switch (arg2) {
     default:
         return;
     case 25:
-        if (self->unkC == 1) {
-            EncodeFullWidthSjis(self->unk24, self->unk28);
+        if (self->mode == 1) {
+            EncodeFullWidthSjis(self->nameBuf, self->unk28);
         } else {
-            strcpy(self->unk24, self->unk28);
+            strcpy(self->nameBuf, self->unk28);
         }
         self->methods->slot60(self, 0x10);
-        self->methods->slot54(self, 2);
+        self->methods->setState(self, 2);
         return;
     case 23:
         self->methods->slot60(self, 0x10);
-        self->methods->slot54(self, 3);
+        self->methods->setState(self, 3);
         return;
     case 32:
-        self->methods->slotA0(self);
+        self->methods->resetAllAndFinish(self);
         return;
     case 31:
-        self->methods->slot9C(self);
+        self->methods->resetCountdown(self);
         return;
     case 28:
-        self->methods->slot98(self);
+        self->methods->toggleFlag20(self);
         return;
     case 21:
         if (self->unk20 != 0) {
             return;
         }
-        self->methods->slot88(self);
+        self->methods->moveCursorRight(self);
         return;
     case 5:
         if (self->unk20 == 0) {
             return;
         }
-        self->methods->slot88(self);
+        self->methods->moveCursorRight(self);
         return;
     case 20:
         if (self->unk20 != 0) {
             return;
         }
-        self->methods->slot8C(self);
+        self->methods->moveCursorLeft(self);
         return;
     case 4:
         if (self->unk20 == 0) {
             return;
         }
-        self->methods->slot8C(self);
+        self->methods->moveCursorLeft(self);
         return;
     case 18:
         if (self->unk20 != 0) {
             return;
         }
-        self->methods->slot90(self);
+        self->methods->advanceCharSelect(self);
         return;
     case 2:
         if (self->unk20 == 0) {
             return;
         }
-        self->methods->slot90(self);
+        self->methods->advanceCharSelect(self);
         return;
     case 19:
         if (self->unk20 == 0) {
@@ -368,22 +392,22 @@ void func_800513D0(Obj86ED0 *self, void *arg1, s32 arg2)
             return;
         }
 slot94Call:
-        self->methods->slot94(self);
+        self->methods->advanceCountdown(self);
         return;
     }
 }
 
-void func_8005161C(Obj86ED0 *self, s32 arg1)
+void Obj86ED0__NotifyTarget(Obj86ED0 *self, s32 arg1)
 {
     TargetObj86ED0 *target;
 
-    target = self->unk3C;
+    target = self->target;
     if (target != NULL) {
         target->methods->slot80(target, arg1, 0x60, 0x60);
     }
 }
 
-void func_8005165C(Obj86ED0 *self)
+void Obj86ED0__MoveCursorRight(Obj86ED0 *self)
 {
     s32 old;
     s32 v;
@@ -400,7 +424,7 @@ void func_8005165C(Obj86ED0 *self)
     }
 }
 
-void func_800516C0(Obj86ED0 *self)
+void Obj86ED0__MoveCursorLeft(Obj86ED0 *self)
 {
     s32 old;
     s32 v;
@@ -417,7 +441,7 @@ void func_800516C0(Obj86ED0 *self)
     }
 }
 
-void func_80051720(Obj86ED0 *self)
+void Obj86ED0__AdvanceCharSelect(Obj86ED0 *self)
 {
     s32 v;
 

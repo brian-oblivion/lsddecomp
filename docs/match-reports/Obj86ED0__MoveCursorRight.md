@@ -1,12 +1,14 @@
-# func_8005165C -- MATCH (25/25 words)
+# Obj86ED0__MoveCursorRight -- MATCH (25/25 words)
+
+> Renamed from `func_8005165C` on 2026-09-24 (tools/rename.py). Address 0x8005165c.
 
 Unit `class_3bb8c_i`. Obj86ED0's own "advance frame counter, clamped at
-`unk10`" method. Mirror pair with `func_800516C0` (decrement/clamp-at-zero,
-matched alongside it) and `func_80051720` (a second increment/clamp pair on
+`unk10`" method. Mirror pair with `Obj86ED0__MoveCursorLeft` (decrement/clamp-at-zero,
+matched alongside it) and `Obj86ED0__AdvanceCharSelect` (a second increment/clamp pair on
 different fields, also matched this round).
 
 ```c
-void func_8005165C(Obj86ED0 *self)
+void Obj86ED0__MoveCursorRight(Obj86ED0 *self)
 {
     s32 old;
     s32 v;
@@ -46,7 +48,7 @@ For a "compute new value / clamp against a bound / restore old value (or
 reset) on overflow" pattern, write the unconditional store BEFORE the `if`
 (not inside the true branch) even though the retail asm shows it living in
 a branch delay slot -- the delay-slot placement is the scheduler's doing,
-not something the C needs to spell out. `func_80051720` in this same round
+not something the C needs to spell out. `Obj86ED0__AdvanceCharSelect` in this same round
 uses this exact same placement despite ALSO forwarding the new value on as
 a live call argument -- moving the store into the true branch there (by
 analogy, reasoning that a live call argument needed to be visibly tied to
@@ -55,3 +57,7 @@ the branch) was tried and made the score worse, not better. The
 this batch; that function's actual defect was an arity mismatch on the
 callee vtable slot, not statement placement. See its report for the full
 account.
+
+## Naming
+
+- `Obj86ED0__MoveCursorRight` -- tier A. gObj86ED0Methods +0x088 (moveCursorRight slot, classtable.py -- also confirmed as HandleCommand's own case 21/5 target). Increments the name-buffer index unk18, bounded by the name length unk10; reverts on overflow. Symmetric with Obj86ED0__MoveCursorLeft; forwards to Obj86ED0__DispatchIndexValue (class_3bb8c_j).

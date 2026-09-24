@@ -1,4 +1,6 @@
-# func_80050F28 -- MATCHED (28/28 words)
+# Obj86ED0__SetName -- MATCHED (28/28 words)
+
+> Renamed from `func_80050F28` on 2026-09-24 (tools/rename.py). Address 0x80050f28.
 
 Unit `class_3bb8c_i`, carved round 14.
 
@@ -11,7 +13,7 @@ round-toward-zero sequence), or falls back to a straight `strcpy` when
 `mode != 1`.
 
 ```c
-void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
+void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
 {
     self->unkC = mode;
     self->unk24 = arg1;
@@ -45,3 +47,7 @@ instruction had no dependency on the branch outcome, which is frequently an
 instruction that logically belongs BEFORE the branch. Check whether the
 value/target is used on BOTH sides of the branch (here: `unk1C` is zeroed
 regardless of which branch runs) before deciding it is conditional.
+
+## Naming
+
+- `Obj86ED0__SetName` -- tier A. gObj86ED0Methods +0x040 (setName slot, classtable.py), the ctor's own tail dispatch: sets mode and copies/decodes the name string into unk28 (DecodeFullWidthSjis when mode==1, else plain strcpy). Pure setter, mechanics are the purpose.

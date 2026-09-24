@@ -1,19 +1,21 @@
-# func_800512C8 -- MATCHED (42/42 words)
+# Obj86ED0__SetState -- MATCHED (42/42 words)
+
+> Renamed from `func_800512C8` on 2026-09-24 (tools/rename.py). Address 0x800512c8.
 
 Unit `class_3bb8c_i`, carved round 14.
 
-`Obj86ED0`'s vtable slot 0x054, called by `func_80051370` (that unit's own
+`Obj86ED0`'s vtable slot 0x054, called by `Obj86ED0__TickState` (that unit's own
 sibling function, still `INCLUDE_ASM` this round) with a literal `4`.
 Resets `unk30`, returns early for `arg1 < 2`, then dispatches on `arg1`:
 `{2,3}` detaches `unk34` and calls this class's own `slot48`
-(`func_80051174`) before stashing `arg1` into `unk2C`; `4` calls the
+(`Obj86ED0__ReleaseCardResources`) before stashing `arg1` into `unk2C`; `4` calls the
 UNMODIFIED base `notifyParents` (`BasicClass__NotifyParents`, confirmed not
-overridden via `tools/classtable.py D_80086ED0 --vs D_8006B58C`) with
+overridden via `tools/classtable.py gObj86ED0Methods --vs D_8006B58C`) with
 `unk2C` as its argument, reached through `self->methods` since that table
 slot is identical to the base's either way.
 
 ```c
-void func_800512C8(Obj86ED0 *self, s32 arg1)
+void Obj86ED0__SetState(Obj86ED0 *self, s32 arg1)
 {
     self->unk30 = 0;
     if (arg1 < 2) {
@@ -42,7 +44,7 @@ to an `arg1 == 4` test, then an EXPLICIT unconditional jump past both bodies
 for anything else.
 
 - **Attempt 1**: `if (arg1 < 4) { ... } else if (arg1 == 4) { ... }` scored
-  14/42 (also shorter than retail by 8 bytes, drifting `func_80050BA8`'s own
+  14/42 (also shorter than retail by 8 bytes, drifting `New_Obj86ED0`'s own
   `jal` target downstream). Disassembly showed GCC inverted the first test
   (`beqz`, skip-around) rather than retail's `bnez`-to-body, and merged the
   `else if` into one fallthrough chain with an extra `bne` retail does not
@@ -72,3 +74,7 @@ once integer promotion/multiple-case-labels are involved, even though an
 `if`/`else if` chain and a `return`-terminated sequential-`if` chain (which
 ARE semantically identical for a void function) compile IDENTICALLY to each
 other. Don't spend a second attempt re-testing that particular pair.
+
+## Naming
+
+- `Obj86ED0__SetState` -- tier B. gObj86ED0Methods +0x054 (setState slot, classtable.py). arg1-driven: zeroes closeTickCount; arg1<2 no-ops; arg1 in {2,3} detaches childType2, releases card resources, records closeState=arg1; arg1==4 notifies parents with closeState. Mechanics fully traced; the game meaning of the 2/3/4 codes (a close/commit sequence for the name-entry UI) is inferred from data flow, not confirmed by any string or external caller.

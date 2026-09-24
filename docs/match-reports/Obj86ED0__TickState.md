@@ -1,11 +1,13 @@
-# func_80051370 -- MATCH (24/24 words)
+# Obj86ED0__TickState -- MATCH (24/24 words)
+
+> Renamed from `func_80051370` on 2026-09-24 (tools/rename.py). Address 0x80051370.
 
 Unit `class_3bb8c_i`. Gated `self->unk30` increment: only proceeds when
 `self->unk2C` is 2 or 3, then increments `self->unk30` and dispatches
 `slot54(self, 4)` only when the OLD value of `self->unk30` was nonzero.
 
 ```c
-void func_80051370(Obj86ED0 *self)
+void Obj86ED0__TickState(Obj86ED0 *self)
 {
     s32 tag;
     s32 old;
@@ -32,3 +34,7 @@ checks are written in the same order as retail's two `slti` comparisons
 expression -- writing the fold produced a different (and, untested, possibly
 also-matching) instruction sequence, but there was no need to explore that
 once the direct transliteration matched first try.
+
+## Naming
+
+- `Obj86ED0__TickState` -- tier B. gObj86ED0Methods +0x058 (tickState slot, classtable.py), dispatched by Obj86ED0__Notify's tag==5 case. Per-notify advance while closeState is in [2,4): increments closeTickCount, and once it was already nonzero, calls setState(self,4) -- a one-tick-delayed close-to-finish handoff. Purpose (why a delay) not established.

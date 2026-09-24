@@ -1,4 +1,6 @@
-# func_80050F98 -- MATCH (119/119 words, ~5 attempts)
+# Obj86ED0__LoadCardResources -- MATCH (119/119 words, ~5 attempts)
+
+> Renamed from `func_80050F98` on 2026-09-24 (tools/rename.py). Address 0x80050f98.
 
 Unit `class_3bb8c_i`, 125-line body -- the largest function in this round's
 batch. Obj86ED0's own "load the two memory-card TIM resources" method:
@@ -12,17 +14,17 @@ extern ChildObj86ED0 *func_8003B39C(char *path);
 extern ChildObj86ED0 *func_80041C9C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 extern ChildObj86ED0 *func_80041AB4(ChildObj86ED0 *arg0, s32 arg1);
 
-extern const char D_80011610[]; /* "COMINPUT" */
-extern const char D_8001161C[]; /* "FONTICON" */
-extern const char D_8008AAE8[]; /* "CARD\\" */
-extern const char D_8008AAF0[]; /* ".TIM" */
+extern const char sStrComInput[]; /* "COMINPUT" */
+extern const char sStrFontIcon[]; /* "FONTICON" */
+extern const char sCardPathPrefix[]; /* "CARD\\" */
+extern const char sTimExt[]; /* ".TIM" */
 extern s32 D_80086F7C; /* 3-word opaque block, func_80041C9C's arg1, address-only here */
 extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
 extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
-void func_80050F98(Obj86ED0 *self, void *arg1)
+void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
 {
     char path[0x20];
     const char *dir;
@@ -37,16 +39,16 @@ void func_80050F98(Obj86ED0 *self, void *arg1)
         return;
     }
 
-    dir = D_8008AAE8;
-    ext = D_8008AAF0;
+    dir = sCardPathPrefix;
+    ext = sTimExt;
 
-    handle1 = func_8003B39C(BuildFileName(path, D_80011610, dir, ext));
+    handle1 = func_8003B39C(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
     self->unk48 = func_80041C9C(handle1, (void *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
 
-    handle2 = func_8003B39C(BuildFileName(path, D_8001161C, dir, ext));
+    handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = New_Obj6EAC0(handle2, self->unk10, self->unk28);
     self->unk40 = func_80041AB4(handle2, 0x5F);
@@ -65,7 +67,7 @@ void func_80050F98(Obj86ED0 *self, void *arg1)
 pass `(path, "COMINPUT", "CARD\\", ".TIM")` and
 `(path, "FONTICON", "CARD\\", ".TIM")`, i.e. building
 `CARD\COMINPUT.TIM` and `CARD\FONTICON.TIM` -- confirmed from the literal
-rodata bytes at `D_80011610`/`D_8001161C`/`D_8008AAE8`/`D_8008AAF0`
+rodata bytes at `sStrComInput`/`sStrFontIcon`/`sCardPathPrefix`/`sTimExt`
 (`asm/data/1DD0.rodata.s`, `asm/data/7B008.sdata.s`).
 
 `func_8003B39C` (a resource loader taking a path, returning a handle) is
@@ -77,7 +79,7 @@ this is the same function by address, given its own local reading here.
 The temp handle (`handle1`/`handle2`) dispatches `slot78` (self only, void)
 right after loading, and `release`/`slot4` (self only, return discarded)
 right before its own scope ends -- this matches `ChildObj86ED0`'s existing
-`release` slot (established elsewhere in this unit, `func_80051174`) in
+`release` slot (established elsewhere in this unit, `Obj86ED0__ReleaseCardResources`) in
 both offset (+0x004) and shape, so the temp handle and `self->unk40/44/48`
 share the SAME `ChildObj86ED0` type. Extended `ChildMethods86ED0`
 additively with `slot4C` (+0x04C, `(self, void *arg1, void *arg2)`, called
@@ -143,3 +145,7 @@ other values (like `dir`/`ext` here) that genuinely persist across both
 blocks unchanged. Reusing the single local measurably changed those OTHER
 values' register assignment too, not just the reused local's own -- the
 three-value swap was resolved by touching only the non-persistent one.
+
+## Naming
+
+- `Obj86ED0__LoadCardResources` -- tier A. gObj86ED0Methods +0x044 (classtable.py). Resolves 'CARD\\COMINPUT.TIM'/'CARD\\FONTICON.TIM' memory-card paths (sCardPathPrefix/sStrComInput/sStrFontIcon/sTimExt, all this unit's own strings) and loads/wraps them into the three resource handles (unk48/unk44/unk40). String evidence is direct, not inferred.

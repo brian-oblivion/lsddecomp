@@ -1,11 +1,13 @@
-# func_8005161C -- MATCH (16/16 words)
+# Obj86ED0__NotifyTarget -- MATCH (16/16 words)
+
+> Renamed from `func_8005161C` on 2026-09-24 (tools/rename.py). Address 0x8005161c.
 
 Unit `class_3bb8c_i`. Obj86ED0's own method: if `self->unk3C` (a
 `TargetObj86ED0 *`, a wholly separate class reached only through this one
 field) is non-NULL, dispatch its own `slot80` on it.
 
 ```c
-void func_8005161C(Obj86ED0 *self, s32 arg1)
+void Obj86ED0__NotifyTarget(Obj86ED0 *self, s32 arg1)
 {
     TargetObj86ED0 *target;
 
@@ -35,7 +37,7 @@ instead of the header's (incomplete) prior reading.
 
 Fixed `include/class_3bb8c.h`'s `TargetMethods86ED0::slot80` to
 `(TargetObj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)`. `TargetObj86ED0` is
-local to this unit's slice (only `func_8005161C` reaches it), so this is
+local to this unit's slice (only `Obj86ED0__NotifyTarget` reaches it), so this is
 safe to retype outright rather than additively.
 
 ### Proposed learning
@@ -46,3 +48,7 @@ existing `self->methods->slotN(self, arg1, LITERAL, LITERAL)`
 forward-and-repeat idiom before trusting it -- an unused/untouched `$a1`
 register in the callee is the tell that the slot takes one more argument
 than the call appears to set explicitly.
+
+## Naming
+
+- `Obj86ED0__NotifyTarget` -- tier B. gObj86ED0Methods +0x060 (classtable.py) -- this IS the `slot60` implementation dispatched by both Obj86ED0__HandleCommand (arg1=0x10) and class_3bb8c_j's Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue (arg1=0). Forwards arg1 to the attached `target`'s own slot80(target, arg1, 0x60, 0x60) when target != NULL. Mechanics clear (pings the linked TargetObj86ED0 whenever the name cursor or character selection changes); the on-screen meaning of the two 0x60 literals is not established. Since `slot60` is referenced by both this unit and class_3bb8c_j, the SLOT NAME is left as `slot60` in the shared header (PROPOSED name below), even though the FUNCTION name is confidently renamed here (function renames are tree-wide, not subject to the field-ownership rule).

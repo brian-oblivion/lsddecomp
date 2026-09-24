@@ -16,7 +16,7 @@ This report originally typed `self` as `Obj866E8` (D_800866E8) and typed
 duplicate. Both were wrong, for the same reason as its sibling
 `Obj86ED0__DispatchIndexValue` (see that report and
 `src/class_3bb8c_j.c`'s file header comment): `self` is `Obj86ED0`
-(`tools/classtable.py D_80086ED0` places this function at +0x0A8), whose
+(`tools/classtable.py gObj86ED0Methods` places this function at +0x0A8), whose
 shared struct already types `self->unk44` as `ChildObj86ED0 *`. The
 `+0x0C4` slot is now `ChildMethods86ED0::slotC4`, added additively next to
 the sibling's `slotBC`. Zero bytes affected.
@@ -24,16 +24,16 @@ the sibling's `slotBC`. Zero bytes affected.
 ## Derivation
 
 ```c
-extern u8 *D_8008AAE4;
+extern u8 *gNameCharTable;
 
 void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     ChildObj86ED0 *obj;
 
     if (self->unk48) {
-        self->unk28[arg1] = D_8008AAE4[arg2];
+        self->unk28[arg1] = gNameCharTable[arg2];
         obj = self->unk44;
-        obj->methods->slotC4(obj, D_8008AAE4[arg2], arg1);
+        obj->methods->slotC4(obj, gNameCharTable[arg2], arg1);
         self->unk18 = arg1;
         self->unk1C = arg2;
         if (arg3) {
@@ -45,7 +45,7 @@ void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
 
 Same `Obj86ED0` "countdown/flush" group as `Obj86ED0__DispatchIndexValue` (see that
 report): gated on `self->unk48`, this one copies one byte out of a lookup
-table (`D_8008AAE4`, VALUE-of `%gp_rel`, ROM image points it at
+table (`gNameCharTable`, VALUE-of `%gp_rel`, ROM image points it at
 still-uncarved rodata `D_800115D0`) into `self->unk28[arg1]`, forwards the
 same byte plus `arg1` to `self->unk44`'s own method table at slot `0xC4`,
 records `self->unk18`/`self->unk1C`, and — if `arg3` is non-zero — notifies
@@ -70,4 +70,4 @@ notify-on-flag-set tail shape common to both siblings.
 
 ## Naming
 
-- `Obj86ED0__DispatchLookupValue` -- tier B. slotA8 occupant. Looks up D_8008AAE4[arg2], stores it into self->unk28[arg1], forwards the same byte to self->unk44's slotC4, records self->unk18/unk1C, optionally notifies via slot60. Same evidence class as its sibling Obj86ED0__DispatchIndexValue. classtable.py D_80086ED0 +0x0A8.
+- `Obj86ED0__DispatchLookupValue` -- tier B. slotA8 occupant. Looks up gNameCharTable[arg2], stores it into self->unk28[arg1], forwards the same byte to self->unk44's slotC4, records self->unk18/unk1C, optionally notifies via slot60. Same evidence class as its sibling Obj86ED0__DispatchIndexValue. classtable.py gObj86ED0Methods +0x0A8.

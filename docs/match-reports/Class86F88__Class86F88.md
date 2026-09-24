@@ -63,14 +63,14 @@ reached indirectly by `New_Class86F88`
 ## Class identity (ROUND 75 correction -- read this before the rest of the file)
 
 This unit's local type for `self` was originally named `Class86ED0` and
-described as having vtable `D_80086ED0`. Both were wrong, and the error
+described as having vtable `gObj86ED0Methods`. Both were wrong, and the error
 predates this round: `include/class_3bb8c.h`'s own round-15 HEAD NOTEs
-(search "D_80086ED0 and gClass86F88Methods") already documented it and deferred
+(search "gObj86ED0Methods and gClass86F88Methods") already documented it and deferred
 the fix. Settled by address, not by guess:
 
 - `func_80051A4C` (this unit, now named `Get_vtable_Obj86ED0`) returns
-  `&D_80086ED0` directly -- but `D_80086ED0` is `Obj86ED0`'s OWN table
-  (42 slots, `tools/classtable.py D_80086ED0`), a DIFFERENT class
+  `&gObj86ED0Methods` directly -- but `gObj86ED0Methods` is `Obj86ED0`'s OWN table
+  (42 slots, `tools/classtable.py gObj86ED0Methods`), a DIFFERENT class
   established independently by class_3bb8c_i. It has NOTHING to do with
   this constructor's class.
 - This class's REAL table is `gClass86F88Methods`, reached through

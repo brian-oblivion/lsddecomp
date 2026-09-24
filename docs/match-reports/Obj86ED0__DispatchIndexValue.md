@@ -12,7 +12,7 @@ attempt once rebuilt against the fixed toolchain.
 
 This report originally typed `self` as `Obj866E8` (D_800866E8) and typed
 `self->unk40` through a unit-local `Unk40Obj866E8`/`Unk40Obj866E8Methods`
-duplicate. Both were wrong. `tools/classtable.py D_80086ED0` places this
+duplicate. Both were wrong. `tools/classtable.py gObj86ED0Methods` places this
 function at that table's +0x0A4 (`D_800866E8`'s 80 slots hold none of this
 group's six addresses) -- `self` is `Obj86ED0` (class_3bb8c_i's shared
 type), whose OWN struct in `include/class_3bb8c.h` already types
@@ -87,4 +87,4 @@ verdict was set aside.
 
 ## Naming
 
-- `Obj86ED0__DispatchIndexValue` -- tier B. slotA4 occupant. Computes arg1*7+D_8008AADC into a 2-word stack block together with the D_8008AAE0 constant, dispatches it through self->unk40's own slotBC, records self->unk18=arg1, and optionally notifies via slot60. "Index"/"Dispatch" describe the mechanics; what the computed value represents in-game is not established. classtable.py D_80086ED0 +0x0A4 (the real occupant -- corrects this unit's earlier Obj866E8 misattribution, see the ROUND 75 CORRECTION section above).
+- `Obj86ED0__DispatchIndexValue` -- tier B. slotA4 occupant. Computes arg1*7+D_8008AADC into a 2-word stack block together with the D_8008AAE0 constant, dispatches it through self->unk40's own slotBC, records self->unk18=arg1, and optionally notifies via slot60. "Index"/"Dispatch" describe the mechanics; what the computed value represents in-game is not established. classtable.py gObj86ED0Methods +0x0A4 (the real occupant -- corrects this unit's earlier Obj866E8 misattribution, see the ROUND 75 CORRECTION section above).

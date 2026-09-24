@@ -1,16 +1,18 @@
-# func_80050DB4 -- MATCHED (32/32 words)
+# Obj86ED0__RemoveChild -- MATCHED (32/32 words)
+
+> Renamed from `func_80050DB4` on 2026-09-24 (tools/rename.py). Address 0x80050db4.
 
 Unit `class_3bb8c_i`, carved round 14.
 
 `Obj86ED0`'s removeChild override (vtable slot 0x014) -- the mirror image of
-`func_80050D30`'s addChild override. Unlike the add side, the tag check runs
+`Obj86ED0__AddChild`'s addChild override. Unlike the add side, the tag check runs
 FIRST (clearing whichever of `unk34`/`unk38` matches, unconditionally to
 `NULL` rather than checking it was actually the same pointer), then the
 BASE class's `removeChild` is dispatched last, in the shared fallthrough of
 both tag branches.
 
 ```c
-void func_80050DB4(Obj86ED0 *self, void *arg1)
+void Obj86ED0__RemoveChild(Obj86ED0 *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -31,4 +33,8 @@ void func_80050DB4(Obj86ED0 *self, void *arg1)
 First attempt matched immediately -- the only trick was getting the
 tag-check-before-base-call ORDER right (confirmed by reading the raw
 disassembly's instruction sequence, not assumed by symmetry with
-func_80050D30).
+Obj86ED0__AddChild).
+
+## Naming
+
+- `Obj86ED0__RemoveChild` -- tier A. gObj86ED0Methods +0x014 (classtable.py), overrides BasicClass's removeChild: symmetric teardown of Obj86ED0__AddChild's tagging.
