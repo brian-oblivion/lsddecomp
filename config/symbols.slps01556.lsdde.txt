@@ -1839,3 +1839,8 @@ SpuVmDoAllocate = 0x8002D6A4; // type:func
 // public SpuVmNoiseOn (0x8002F368). Superseded game-style func_8002D8E0.
 // Round 74 (bravo, track 2).
 vmNoiseOn = 0x8002D8E0; // type:func
+// identified: shape 0.96 vs libsnd/vmanager vmNoiseOn2 (103w vs our
+// 112w, disc 3.5, also libsnd/vm_no2 disc 3.6), position within the
+// libsnd neighborhood, right after vmNoiseOn (paired helper). Superseded
+// game-style func_8002DDBC. Round 74 (bravo, track 2).
+vmNoiseOn2 = 0x8002DDBC; // type:func

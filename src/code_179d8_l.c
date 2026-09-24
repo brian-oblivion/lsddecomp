@@ -43,7 +43,7 @@
  * 9 CLEAN of 12, cheapest first:
  *   func_8002E2F8    2w  <- already matched: splat emitted the empty C body
  *   func_8002E300    2w  <- itself.  Not work, and not yours to redo.
- *   note2pitch   47w   note2pitch2   64w   func_8002DDBC  112w
+ *   note2pitch   47w   note2pitch2   64w   vmNoiseOn2  112w
  *   func_8002E138  112w   func_8002E308  116w   SpuVmDoAllocate  143w
  *   SpuVmAlloc  167w
  *
@@ -436,11 +436,11 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn);
 /* NON_MATCHING: 107/112 words, 5 words short. Residue: the a0/a3 role-swap
  * register-identity class (this unit's documented class) plus an 8-byte
  * frame retail allocates that this shape doesn't reach
- * (docs/match-reports/func_8002DDBC.md). Hand-derived. The byte-shaped
+ * (docs/match-reports/vmNoiseOn2.md). Hand-derived. The byte-shaped
  * body's order-only __asm__("") barrier is omitted here; it is in the report. */
 extern u8 D_8008D98A[];
 
-void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
+void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
     s32 off16;
     s32 v1;
@@ -490,7 +490,7 @@ void func_8002DDBC(s32 a0, s32 a1, s32 a2) {
     D_8006DAD4[0xCB] = highBit;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002DDBC);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn2);
 #endif
 
 extern u8 D_8008EA0E;

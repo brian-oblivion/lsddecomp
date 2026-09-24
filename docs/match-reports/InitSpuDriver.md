@@ -719,7 +719,7 @@ sound driver"; nothing about it is guessed beyond what the body does.
 Not this function's own struct, but noting here since this report already
 lists most of the cluster: `D_8006DAD4Edd4`/`D_8006DAD4` (this unit's two
 independent local views of the same base pointer) is the PS1 SPU hardware
-base address `0x1F801C00`, per `func_8002DDBC`'s own report in
+base address `0x1F801C00`, per `vmNoiseOn2`'s own report in
 `code_179d8_l`. Proposing (not applying -- shared with bravo's live
 `code_179d8_j_b.c` this round, see broadcast) a base-pointer rename to
 `gSpuRegs` once no live runner touches `code_179d8_j_b`/`_l`/`_j`/`_j_c`/

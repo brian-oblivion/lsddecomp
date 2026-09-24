@@ -816,14 +816,14 @@ here -- proposing for the head to apply once no runner is live on
   across the 0..0x1F channel space).
 - `D_8008E228`/`D_8008E22C` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
   (AND-NOT'd with the enable mask above -- the actual SPU key bitmask
-  pair, per `func_8002DDBC`'s report).
+  pair, per `vmNoiseOn2`'s report).
 - `D_8008D970` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by
   several functions in this cluster; never fully decoded here).
 - `D_8008D9A3` -> `gVoiceState` (the byte StopNote/ClearNoiseVoices/
   `SpuVmAlloc` all compare against `2` for "noise voice").
 - `D_8006DAD4` (and this unit's two local views `ObjDAD4`/`ObjDAD4Edd4`)
   -> `gSpuRegs`: confirmed to be the PS1 SPU's own hardware base address
-  `0x1F801C00` by `func_8002DDBC`'s report in `code_179d8_l`.
+  `0x1F801C00` by `vmNoiseOn2`'s report in `code_179d8_l`.
 
 Posted to the broadcast this round; see also InitSpuDriver.md's own
 `## Proposed field names`.

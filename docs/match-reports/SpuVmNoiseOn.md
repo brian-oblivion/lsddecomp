@@ -20,7 +20,7 @@ extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 
 extern s32 SpuVmAlloc(s32 a0);
-extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
+extern void vmNoiseOn2(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 void SpuVmNoiseOn(s32 a0, s32 a1) {
     s32 v0;
@@ -29,7 +29,7 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
     v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
     if (v0 < D_8008E9D0) {
-        func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
+        vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
     }
 }
 ```
@@ -45,13 +45,13 @@ Straight-line leaf, one conditional call:
    upper byte written is always 0).
 3. Compare that masked value against `D_8008E9D0` (loop-bound/threshold byte,
    documented in `code_179d8_j.c`). If it is `< D_8008E9D0`, call
-   `func_8002DDBC` (also owned by `code_179d8_l`) with five arguments: the
+   `vmNoiseOn2` (also owned by `code_179d8_l`) with five arguments: the
    LOW BYTE re-read from `D_8008EA26` (register `$a0`), this function's own
    two arguments narrowed to `u16` (`$a1`, `$a2`), the constant `0x80FF`
    (`$a3`), and the constant `0x5FC8` passed on the stack (5th argument,
    `0x10($sp)`).
 
-`SpuVmAlloc` and `func_8002DDBC` are declared here as unit-local `extern`
+`SpuVmAlloc` and `vmNoiseOn2` are declared here as unit-local `extern`
 prototypes only (per CLAUDE.md's rule on prototypes for functions another
 unit defines) -- they are not added to any shared header.
 
@@ -120,7 +120,7 @@ functions and moves them out of tracks 1/1b/3.
 
 **SpuVmNoiseOn** (was `func_8002F368`) -- Tier B. Identical shape to
 SpuVmNoiseOnWithAdsr (allocate a free voice, key it on) but with the trailing two
-`func_8002DDBC` parameters replaced by the constants `0x80FF`/`0x5FC8`
+`vmNoiseOn2` parameters replaced by the constants `0x80FF`/`0x5FC8`
 rather than forwarded from the caller -- i.e. a specific always-the-same
 sound rather than a general playback entry point. What that fixed sound
 IS (a UI cue? a fixed sample?) is not established from this function's

@@ -254,7 +254,7 @@ the STACK FRAME ALLOCATION.
    not better, confirming the two functions' frame gaps are not the same
    lever despite superficially similar division chains.
 2. **A register-identity swap at the `id != 0x21` join**, same unfixable
-   class as this unit's other three stalls (`func_8002DDBC`,
+   class as this unit's other three stalls (`vmNoiseOn2`,
    `func_8002E138`, `vmNoiseOn`): retail's unconditional delay-slot copy
    is `move $a2,$a3` (i.e. `pan1`'s fallback gets a fresh register, `pan2`'s
    fallback quietly reuses whichever register already held `lvl1`); every
@@ -470,7 +470,7 @@ plainly not byte-inert in situ, and the mechanism is now named: it is an
 ADDRESS-MATERIALISATION axis, and it only pays where the same global is read
 several times in one function.
 
-### Third: two more levers, one of them transferred straight from `func_8002DDBC` this same round
+### Third: two more levers, one of them transferred straight from `vmNoiseOn2` this same round
 
 - **`pan1sq` belongs AFTER the `D_8008E8C0` clamp, not before-and-again-inside.**
   Round 45's body computed `pan1sq = pan1*pan1;` before the `if`, then again
@@ -481,7 +481,7 @@ several times in one function.
   **Two `mult`s and one `mflo` is a delay-slot duplication, not two source
   multiplies** — counting `mult`s to infer source statements is what produced
   the round-45 shape.
-- **The `func_8002DDBC` tail lever transfers verbatim** (see that report's
+- **The `vmNoiseOn2` tail lever transfers verbatim** (see that report's
   round-65 section): write `G = x | G;` not `G |= x;` (retail's `or $v1,$a2,$v1`
   puts the loaded value SECOND), and order the four global updates by retail's
   LOAD order `E228, E22C, C60, C64` rather than `E228, C60, E22C, C64`. The
@@ -739,7 +739,7 @@ unit's standing finding that identifier choice does not reach the allocator.
 
 That is the local-COUNT lever again, in the direction the round-65 brief
 names — and it is the third instance this session across two functions
-(`func_8002DDBC`'s four deleted tail temps, this). **The consistent shape:
+(`vmNoiseOn2`'s four deleted tail temps, this). **The consistent shape:
 when a residue is register identity, the number of simultaneously-live
 pseudos is the axis, and it is reachable from C by merging or deleting
 locals, not by renaming or reordering them.**

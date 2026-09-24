@@ -502,7 +502,7 @@ would need to make the two array-index computations ACTUALLY different at
 the value level — e.g., have one of the two predecessor checks index
 through a different but provably-equal expression (a pointer walked by a
 running total rather than `idx*0x34`, matching this unit's own
-`func_8002DDBC` residue-3 "narrow-cast defeats strength reduction" family,
+`vmNoiseOn2` residue-3 "narrow-cast defeats strength reduction" family,
 though that lever targets loop induction, not a single recompute, so it is
 not a direct transplant) — untried this round for lack of a concrete
 mechanism, not for lack of budget.
@@ -824,7 +824,7 @@ oracle:
 
 *(Incidental, worth knowing for anyone else splicing this body back: the
 unit's own later `extern u8 D_8008D9A3[];` and `extern u8 D_8008E9D0;` —
-which exist for `SpuVmKeyOnNow`'s and `func_8002DDBC`'s preserved bodies —
+which exist for `SpuVmKeyOnNow`'s and `vmNoiseOn2`'s preserved bodies —
 CONFLICT with this function's `Rec34Flag`-typed view and must be commented
 out while it is live. The first build attempt failed on exactly that, and
 `funcdiff.py` refused the number with `WARNING: STALE BUILD` rather than
@@ -922,7 +922,7 @@ throughout:
   (`move $a1,$a2` at `1d7d8`, `move $v1,$v0` at `1d868`): retail loads into
   one register and copies to another before using it, i.e. one more pseudo
   than the built body has. Given how the local-count lever paid on
-  `func_8002DDBC` and `SpuVmKeyOnNow` this same round, **this is the first
+  `vmNoiseOn2` and `SpuVmKeyOnNow` this same round, **this is the first
   thing to try next: a named temp for the loaded priority/tertiary value.**
 - **`idx++` placement in the counter loop** (retail after the stride
   computation, built at the loop head) and the `D_8008EA1B` load position in
@@ -1085,7 +1085,7 @@ preserving:
   original `goto` pair, and the free-channel case is now the explicit `else`.
 - **The `Rec34*`-typed struct declarations were replaced with plain pointer
   arithmetic on `u8[]`.** `src/code_179d8_l.c` already declares
-  `D_8008D9A3` and `D_8008E9D0` (plain `u8[]`/`u8`) for `func_8002DDBC`'s and
+  `D_8008D9A3` and `D_8008E9D0` (plain `u8[]`/`u8`) for `vmNoiseOn2`'s and
   `SpuVmKeyOnNow`'s own preserved bodies, later in the SAME file; a
   struct-typed re-declaration of `D_8008D9A3` here would be a `conflicting
   types` error under `-DNON_MATCHING`, which compiles the whole unit at
@@ -1093,5 +1093,5 @@ preserving:
   `D_8008D988` as `u8[]` instead and indexed with explicit `idx * 0x34` (and
   `+2` for `D_8008D988`'s halfword field) — the same idiom this unit's other
   two promoted bodies already use for the identical stride. `D_8008D98A` in
-  particular is shared with `func_8002DDBC`'s promoted body and must keep
+  particular is shared with `vmNoiseOn2`'s promoted body and must keep
   the same type in both for the file to compile.

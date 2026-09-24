@@ -4,7 +4,7 @@
  * pair for a 24-voice (0..0x17) PS1 SPU wavetable player driven by MIDI-
  * shaped events (confirmed: code_179d8_k.c's caller switches on a status
  * byte with the MIDI 0x90/0xB0/0xC0/0xE0/0xFF nibbles; D_8006DAD4 is the
- * PS1 SPU's real hardware base, 0x1F801C00, per func_8002DDBC's report in
+ * PS1 SPU's real hardware base, 0x1F801C00, per vmNoiseOn2's report in
  * code_179d8_l). Plain free functions, no vtable -- `tools/classtable.py`
  * lists no method table at these addresses.
  *
@@ -24,7 +24,7 @@
  *     active-voice record; StopNote scans every voice for one whose
  *     identity fields match and releases it, returning the count released.
  *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (SpuVmAlloc, in
- *     code_179d8_l) and, if one exists, key it on (func_8002DDBC, also
+ *     code_179d8_l) and, if one exists, key it on (vmNoiseOn2, also
  *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
  *     two hardcoded constants.
  *   - BeginVoiceFade / StepVoiceFade: a linear-ramp pair over the
@@ -540,7 +540,7 @@ extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 
 extern s32 SpuVmAlloc(s32 a0); /* arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244 */
-extern void func_8002DDBC(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
+extern void vmNoiseOn2(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     s32 v0;
@@ -549,7 +549,7 @@ void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
     if (v0 < D_8008E9D0) {
-        func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, a2 & 0xFFFF, a3 & 0xFFFF);
+        vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, a2 & 0xFFFF, a3 & 0xFFFF);
     }
 }
 
@@ -597,7 +597,7 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
     v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
     if (v0 < D_8008E9D0) {
-        func_8002DDBC(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
+        vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
     }
 }
 

@@ -26,7 +26,7 @@ extra `move $t2,$a0` (preserving the raw channel parameter) one instruction
 earlier than retail schedules it -- confirmed with
 `tools/asm-differ/diff.py vmNoiseOn`, not inferred. This is the SAME
 "preserve raw copy before narrowing in place" register-identity residue
-already documented for `func_8002DDBC` and `func_8002E138` in this unit
+already documented for `vmNoiseOn2` and `func_8002E138` in this unit
 (both also stalled on it, across three prior rounds each) -- a fourth
 instance of the same class, in the same unit.
 
@@ -47,7 +47,7 @@ Three successive `if (byte < 0x40) ... else ...` blends (division by 63,
 using either the raw control byte or `0x7F` minus it) combine `lvl1b`/`lvl2b`
 into a final `pan1`/`pan2` pair, clamped so neither exceeds the other when a
 global flag (`D_8008E8C0 == 1`) is set. The rest is the tail this unit's
-`func_8002DDBC` already established byte-for-byte: write `pan1`/`pan2` into
+`vmNoiseOn2` already established byte-for-byte: write `pan1`/`pan2` into
 the 16-byte-stride `D_8008D7F0`/`D_8008D7F2` tables, OR `3` into
 `D_8008D970[chan]`, compute a 32-bit voice-enable bit split across
 `lowBit`/`highBit` by `chan<16`, reset the whole `D_8008D9A3` 52-byte-stride
@@ -55,7 +55,7 @@ table's low bit for every live voice (`D_8008E9D0` of them) then mark this
 channel's own slot `2`, OR the enable bits into `D_8008E228`/`D_8008E22C`
 and AND-NOT them out of `D_80090C60`/`D_80090C64`, conditionally OR/AND-NOT
 them into a second enable pair (`D_8008E230`/`D_8008E234`, gated on
-`D_8008EA20 & 4` -- new globals, not touched by `func_8002DDBC`), and
+`D_8008EA20 & 4` -- new globals, not touched by `vmNoiseOn2`), and
 finally write the bits to the SPU key-on registers via `D_8006DAD4`. Also
 patches one field of `D_8006DAD4[0xD5]` (byte offset `0x1AA`) with a 6-bit
 delta between `D_8008EA0E` and `D_8008EA1C`, shifted into the high byte.
@@ -298,9 +298,9 @@ void vmNoiseOn(s32 a0) {
    three prior reports on the same shape).** Retail computes the masked
    channel byte directly into its working register and defers the raw-value
    preserve by one instruction; every derivation here (and in
-   `func_8002DDBC`/`func_8002E138`) puts the preserve first. Per HARD RULE 6
+   `vmNoiseOn2`/`func_8002E138`) puts the preserve first. Per HARD RULE 6
    and this unit's own established finding ("variable identifier choice has
-   no influence on register assignment" -- `func_8002DDBC`'s report), not
+   no influence on register assignment" -- `vmNoiseOn2`'s report), not
    re-attempted as a distinct lever here; it is the same wall.
 2. **A 2-word stack-frame-size gap, now well isolated but not closed.**
    Without ANY `volatile`, the function compiles to 295/311 (16 short) and
@@ -346,10 +346,10 @@ Within the 30-attempt cap (roughly 12 real builds used):
 5. `volatile` added to `lvl1b`/`lvl2b` as well (all four): 304 -> **309/311**,
    this report's best. `addiu sp,sp,-0x10` vs retail's `-0x8`.
 6. The "narrow-cast defeats loop-strength-reduction" idiom (already
-   validated in this unit for `func_8002DDBC`/`SpuVmAlloc`) applied to
+   validated in this unit for `vmNoiseOn2`/`SpuVmAlloc`) applied to
    this function's OWN `D_8008D9A3`-clearing loop (`idx52 = (s16)i * 52`,
    `while ((s16)i < D_8008E9D0)`): **regressed hard**, to 320/311 -- this
-   loop is NOT the same shape as `func_8002DDBC`'s (retail already recomputes
+   loop is NOT the same shape as `vmNoiseOn2`'s (retail already recomputes
    the shift-add fresh per iteration WITHOUT any narrowing cast needed here,
    confirmed by re-reading the raw `.s`: `sll v1,a1,0x10`/`sra v1,v1,0x10` in
    retail is sign-extending the LOOP COUNTER for the COMPARISON only, not
@@ -370,11 +370,11 @@ Within the 30-attempt cap (roughly 12 real builds used):
 
 - **The unit's own established "narrow-cast defeats strength-reduction"
   idiom is NOT a blanket fix for every `D_8008E9D0`-bounded loop over
-  52-byte-stride tables in this unit** -- it fixed `func_8002DDBC`'s loop
+  52-byte-stride tables in this unit** -- it fixed `vmNoiseOn2`'s loop
   (10-word swing) but actively regressed this function's structurally
   similar-looking loop by 25 words. The two loops differ in whether the
   loop-carried index is ALSO used for anything besides the multiply
-  (`func_8002DDBC`'s is not; this one's `i` is compared with a narrower type
+  (`vmNoiseOn2`'s is not; this one's `i` is compared with a narrower type
   than it's declared, changing which sign-extension the compiler already
   emits for a DIFFERENT reason). Check the raw `.s` for what the narrowing
   instructions are actually FOR (comparison vs. multiply-strength-reduction)

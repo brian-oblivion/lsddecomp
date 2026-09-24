@@ -322,7 +322,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   in the same unit. (a docs/match-reports/func_80062C58.md, round 59; a round 64, charlie)
 - **Local COUNT is the lever on a register-identity residue in all THREE directions — delete, merge
   and add — not only delete.** Round 65 worked one unit's three stalls at once: deleting four cached
-  tail temps made `func_8002DDBC`'s whole 25-instruction tail byte-exact and fixed two registers four
+  tail temps made `vmNoiseOn2`'s whole 25-instruction tail byte-exact and fixed two registers four
   blocks UPSTREAM of the deletion; reusing an already-dead local in `SpuVmKeyOnNow` was worth 1700
   asm-differ points where a fresh one was worth 500; ADDING a hoisted base pointer moved
   `SpuVmAlloc`. The delete direction needs a CALL-crossing live range, so it does not apply to
