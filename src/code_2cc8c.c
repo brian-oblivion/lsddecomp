@@ -15,7 +15,8 @@
  * gained a `--addiu-at` flag that emits retail's unfolded four-instruction
  * indexed form directly (docs/research/addiu-at-blocker.md). `addiu_at` is
  * no longer a blocker anywhere; do not screen for it and do not file a stall
- * against it. The two remaining blockers are `gp_rel` and `nop_mflo_mfhi`.
+ * against it -- and as of round 63 (CLAUDE.md, "Open toolchain blockers")
+ * there are no open toolchain blockers of any kind left in this project.
  *
  * The history is kept rather than deleted because it is this unit that
  * established the jtbl-is-not-an-exception discriminator, and that finding
@@ -24,10 +25,33 @@
  * Shape: this is class-framework code. Objects carry their method table at
  * offset 0 (`lw $v1, 0x0($a0)` then `lw $v0, 0xNN($v1)` then `jalr`), so
  * resolve slots with tools/classtable.py rather than by counting. The
- * class is `Obj86B60` (include/code_2cc8c.h), named after its base method
- * table gClass86B60Methods (78 slots; a derived override table also exists at
- * gGraphRoomMethods, 73 slots -- see the header's own comment). The first two
- * functions are switch dispatchers over a small event/message code.
+ * struct is `Obj86B60` (include/code_2cc8c.h). Every function in this file
+ * is the DEFAULT implementation of its slot in `gTaskCoreMethods` (72 slots,
+ * `Get_vtable_TaskCore()`), the real base table for this whole class family
+ * -- NOT `gClass86B60Methods` (78 slots) or `gGraphRoomMethods` (73 slots),
+ * which are two independent, sibling DERIVED tables that inherit most of
+ * this unit's functions unmodified and override a few (`Class86B60`
+ * overrides SetState/Tick/RefreshViewValue; see the header's own top
+ * comment for the round-78 correction and the evidence). The first two
+ * functions (`Obj86B60__OnTag2Notify`/`Obj86B60__OnTag5Notify`) are
+ * `EventArg`-tag dispatchers reached from `Obj86B60__OnNotify`
+ * (code_2cc8c_c.c); the five `Obj86B60__func_8003Cxxx` handlers they
+ * dispatch to are undifferentiated leaf state-transition helpers (tier C --
+ * see each one's own match report); `Obj86B60__SetState` is the base
+ * `reason`-coded state-transition entry point (slot60); `Obj86B60__Tick`/
+ * `Obj86B60__RefreshViewValue` are per-frame slots (90/94); the rest are
+ * small setters/getters around a `frameCounter`+`activeSlot` ring-buffer
+ * bookkeeping scheme and a "fade" pair (`Obj86B60__SetFadeRate`,
+ * `Obj86B60__TickColorFade`, gated through `Obj86B60__SetFadeCallbackEnabled`/
+ * `Obj86B60__TickFadeCallback`) that computes a running RGB value from
+ * `frameCounter * unk84` against a base colour.
+ *
+ * Round 78 (delta): full track-3 naming pass. All 20 functions were already
+ * matched (rounds 10-23); this round named every one via `tools/rename.py`
+ * and corrected a pre-existing error in the header's slot74..slot84
+ * occupant mapping (it had the five message handlers reversed -- see
+ * include/code_2cc8c.h's own comment on that struct field). See each
+ * function's own match report's `## Naming` section for evidence.
  */
 
 #include "common.h"
