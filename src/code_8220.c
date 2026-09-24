@@ -1,6 +1,29 @@
 #include "common.h"
 #include "code_8220.h"
 
+/* This unit holds two unrelated things, decomp-adjacent by ROM address
+ * only:
+ *
+ *  - The `BMemPMgr` pool allocator: `BMemPMgrInit` carves a block out of
+ *    the Psy-Q heap (`malloc`) and hands it to `SetupBMemPMgrFreeList`,
+ *    which threads it onto a single doubly-linked free list of
+ *    `BMemBlockHdr` nodes. `BMemPMgrAlloc`/`BMemPMgrFree` split and
+ *    coalesce blocks off that list; both resolve their target pool
+ *    through the global `gDefaultBMemPMgr` (set by `SetDefaultBMemPMgr`)
+ *    when the caller doesn't name one directly. It is the game's
+ *    general-purpose small-object allocator -- called from a wide
+ *    cross-section of units, not just this one.
+ *  - `BasicClass`, the game's hand-rolled root class
+ *    (`docs/research/class-framework.md`; full design in the
+ *    `BasicClass`/`BasicClassMethods` comment in `code_8220.h`). Its
+ *    fourteen virtual methods live here; `PushBasicClassListNode`/
+ *    `RemoveBasicClassListNode` are the pool-backed list primitives both
+ *    of its linked lists (`children`, `parentRefs`) share.
+ *
+ * See `code_8220_b`/`code_8220_c` for this unit's siblings (GTE/GPU
+ * primitive code, unrelated to either of the above).
+ */
+
 /* Psy-Q heap, linked from Sony's own object (`_obj/malloc`) rather than
  * decompiled, so these carry Sony's exported names. The real prototypes are
  * in <malloc.h>; they are restated here rather than included because no unit
