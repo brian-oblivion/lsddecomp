@@ -2277,3 +2277,5 @@ sCardPathPrefix = 0x8008AAE8;
 sTimExt = 0x8008AAF0;
 gNameCharTable = 0x8008AAE4;
 gObj86ED0Methods = 0x80086ED0;
+SetPacketBufCursor = 0x8003FBE4; // type:func
+GsOUT_PACKET_P = 0x8008E794;

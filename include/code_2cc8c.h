@@ -820,7 +820,7 @@ void Unk18Obj__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2);
    (libgte/fog_01), declared locally in src/code_2cc8c_d.c under those names
    for the same collision reason as GsSetRefView2 and GsClearOt above. */
 extern void func_8003FB0C(void *a0);
-extern void func_8003FBE4(void *a0);
+extern void SetPacketBufCursor(void *a0);
 
 /* ResetGraph (asm/psyq_10ee0.s, PsyQ library, LIBGPU.H's own
    declared signature is `extern int ResetGraph(int mode);` -- declared

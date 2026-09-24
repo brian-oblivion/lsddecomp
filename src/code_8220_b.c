@@ -138,7 +138,7 @@ typedef struct { s8 r, g, b; } Rgb8;
  * CLUT, not the shifted depth, $v0 at all six sites. */
 #define ADD_CLUT_ROWS(p, rows) do { *(u16 *)((p) + 0xE) += (rows) << 6; } while (0)
 extern s8 D_8008A82C[3];
-extern void *D_8008E794;
+extern void *GsOUT_PACKET_P;
 
 extern void InitVtxRecordPtrs(void *dst, void *table, s32 count);
 extern void StoreSxyPolyFT4(void *dst, s32 storeFirst3);
@@ -183,7 +183,7 @@ void StoreSxyPolyG4(void *dst, s32 storeFirst3);
  * primitive tag (and one bit of the same word, the semi-transparency flag);
  * the tag selects one of thirteen case bodies, each with its own element
  * stride, index offsets, GTE colour op and submit wrapper. `prim` is the
- * packet-buffer write cursor, reloaded from D_8008E794 at the top of every
+ * packet-buffer write cursor, reloaded from GsOUT_PACKET_P at the top of every
  * group and advanced by each submit wrapper's return value.
  *
  * Every GTE access goes through include/gte.h. The RGB store macros are the
@@ -276,7 +276,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
         do {
             s32 count;
 
-            prim = (u8 *)D_8008E794;
+            prim = (u8 *)GsOUT_PACKET_P;
             *(s32 *)(ctx + 0x18) = *(u16 *)(list + 0x2) & 0xFD07;
             count = *(u16 *)(list + 0x0);
             *(s32 *)(ctx + 0x1C) = (*(u32 *)(list + 0x0) >> 25) & 0x1;
@@ -645,7 +645,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                 return;
             }
 
-            D_8008E794 = prim;
+            GsOUT_PACKET_P = prim;
         } while (remaining != 0);
     }
 }

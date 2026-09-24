@@ -1,4 +1,6 @@
-# func_8003FBE4 -- MATCH (4/4 words, first attempt)
+# SetPacketBufCursor -- MATCH (4/4 words, first attempt)
+
+> Renamed from `func_8003FBE4` on 2026-09-24 (tools/rename.py). Address 0x8003fbe4.
 
 > **ROUND 34 (2026-09-12), runner bravo -- UNIT MOVE, nothing else.** This
 > function is still game code and still MATCHED; it simply lives in a
@@ -14,4 +16,4 @@
 Unit `code_2cc8c_e`, carved round 14.
 
 Plain global-pointer setter, same shape as `func_8003FB0C`:
-`void func_8003FBE4(void *a0) { D_8008E794 = a0; }`.
+`void SetPacketBufCursor(void *a0) { GsOUT_PACKET_P = a0; }`.
