@@ -2,14 +2,14 @@
 
 > Renamed from `func_80051C84` on 2026-09-24 (tools/rename.py). Address 0x80051c84.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`. This is its destructor
+Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`. This is its destructor
 body (dispatched through `BasicClass`'s inherited `finalize` slot chain,
 `Get_vtable_BasicClass()->finalize`).
 
 ## Body
 
 ```c
-void Class86F88_3bb8c_j__Finalize(Class86ED0 *self)
+void Class86F88_3bb8c_j__Finalize(Class86F88_3bb8c_j *self)
 {
     s32 i;
 

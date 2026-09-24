@@ -2,7 +2,7 @@
 
 > Renamed from `func_80051D1C` on 2026-09-24 (tools/rename.py). Address 0x80051d1c.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`. This is the "add
+Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`. This is the "add
 child" method: registers `arg1` with the inherited `BasicClass::addChild`
 and additionally caches it into one of two single-slot fields depending
 on a tag read off `arg1`'s own vtable header word.
@@ -10,7 +10,7 @@ on a tag read off `arg1`'s own vtable header word.
 ## Body
 
 ```c
-void Class86F88_3bb8c_j__AddChild(Class86ED0 *self, void *arg1)
+void Class86F88_3bb8c_j__AddChild(Class86F88_3bb8c_j *self, void *arg1)
 {
     s32 tag;
 

@@ -53,9 +53,9 @@
 
 ---
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`. This is `Class86ED0`'s
-own constructor -- the occupant of `Class86ED0Methods::ctor` (+0x008),
-reached indirectly by `New_Class86F88_3bb8c_j`'s `New_Class86ED0`
+Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`. This is `Class86F88_3bb8c_j`'s
+own constructor -- the occupant of `Class86F88Methods_3bb8c_j::ctor` (+0x008),
+reached indirectly by `New_Class86F88_3bb8c_j`'s `New_Class86F88_3bb8c_j`
 (`func_80052B60()->ctor(self, arg0, arg1)`). Identity established from
 that call site's exact signature match, not from `tools/classtable.py`
 (this vtable is local to the unit, no classtable entry exists for it).
@@ -66,7 +66,7 @@ that call site's exact signature match, not from `tools/classtable.py`
 mode flag (0 or 1), also stashed into `self->unkC`.
 
 1. Chain the base ctor: `Get_vtable_BasicClass()->ctor(self);` then
-   `self->methods = func_80052B60();` (this really is `Class86ED0Methods
+   `self->methods = func_80052B60();` (this really is `Class86F88Methods_3bb8c_j
    *func_80052B60(void)` -- NOT a separate "ctor table" type: this same
    getter is what `New_Class86F88_3bb8c_j` dereferences `->ctor` on, and here its
    return is assigned DIRECTLY as `self->methods`, so both call sites
@@ -94,7 +94,7 @@ mode flag (0 or 1), also stashed into `self->unkC`.
 ```c
 #if 0
 /* stalesyms --fix 2026-09-22: func_80013348 -> strlen -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-void Class86F88_3bb8c_j__Class86F88_3bb8c_j(Class86ED0 *self, void **arg1, s32 arg2)
+void Class86F88_3bb8c_j__Class86F88_3bb8c_j(Class86F88_3bb8c_j *self, void **arg1, s32 arg2)
 {
     void **p;
     s32 count;
@@ -151,7 +151,7 @@ conditional `sw`) -- the plain `if (self->unk14 < len) self->unk14 = len;`
 above reproduces that shape with no local needed.
 
 Declarations it needs (all already live in `src/class_3bb8c_j.c`'s
-`Class86ED0`/`Class86ED0Methods` definitions, plus these locally-scoped
+`Class86F88_3bb8c_j`/`Class86F88Methods_3bb8c_j` definitions, plus these locally-scoped
 externs which were removed when the function was restored to
 `INCLUDE_ASM` -- re-add if resuming):
 

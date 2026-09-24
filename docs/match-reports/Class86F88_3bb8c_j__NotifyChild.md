@@ -2,12 +2,12 @@
 
 > Renamed from `func_80051E64` on 2026-09-24 (tools/rename.py). Address 0x80051e64.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`.
+Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
 
 ## Body
 
 ```c
-void Class86F88_3bb8c_j__NotifyChild(Class86ED0 *self, void *arg1, s32 arg2)
+void Class86F88_3bb8c_j__NotifyChild(Class86F88_3bb8c_j *self, void *arg1, s32 arg2)
 {
     s32 tag;
 
@@ -23,8 +23,8 @@ void Class86F88_3bb8c_j__NotifyChild(Class86ED0 *self, void *arg1, s32 arg2)
 
 Calls the inherited `BasicClass::slot38` (already declared in
 `include/class_3bb8c.h`'s `BasicMethods866E8F`, established by
-class_3bb8c_f) unconditionally first, then dispatches through Class86ED0's
+class_3bb8c_f) unconditionally first, then dispatches through Class86F88_3bb8c_j's
 OWN vtable (`slot5C`/`slot58`) based on the same tag-nibble convention as
-`Class86F88_3bb8c_j__AddChild`/`Class86F88_3bb8c_j__RemoveChild`. Established `Class86ED0Methods::slot5C`
+`Class86F88_3bb8c_j__AddChild`/`Class86F88_3bb8c_j__RemoveChild`. Established `Class86F88Methods_3bb8c_j::slot5C`
 (+0x05C, "tag==2") and `slot58` (+0x058, "tag==5") from this function.
 Matched first try.

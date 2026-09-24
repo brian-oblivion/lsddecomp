@@ -1870,7 +1870,9 @@ struct Class86E00_3bb8c_g {
 /* Address-of only in this unit's own screening -- TaskObjF__AttachChildB forwards
  * `self->unk38` and the literal `1` to this external helper; return
  * value stored into `self->childB`. Not this round's function here -- it
- * is class_3bb8c_j's New_Class86ED0 (matched round 15, src/class_3bb8c_j.c):
+ * is class_3bb8c_j's New_Class86F88_3bb8c_j (matched round 15,
+ * src/class_3bb8c_j.c; ROUND 75: its class is D_80086F88/Class86F88_3bb8c_j,
+ * not D_80086ED0 -- see that unit's file header comment):
  * `BMemPMgrAlloc(0x54)` then, on success, its own ctor-table getter's
  * `+0x008` slot called `(self, arg0, arg1)`. This call site's own
  * evidence (arg1 a literal `1`) is what fixed the 2nd parameter as `s32`
@@ -2839,6 +2841,15 @@ struct Obj86ED0 {
  * renamed here because runner bravo is still live in that unit as this is
  * written, and PARALLEL-RUNS collision rule 6 says a correction goes down
  * ONE channel -- bravo was messaged, not edited.
+ *
+ * APPLIED, round 75 (track 3 naming pass on class_3bb8c_j): the type is
+ * now `Class86F88_3bb8c_j`/`Class86F88Methods_3bb8c_j` (kept LOCAL to that
+ * unit rather than reusing the bare `Class86F88` name above, to avoid a
+ * name collision in that translation unit, which includes this header and
+ * so sees both). `Get_vtable_Obj86ED0` (that unit's own definition of the
+ * function still called `func_80051A4C` above) is now correctly typed
+ * `Obj86ED0Methods *`. See src/class_3bb8c_j.c's file header comment for
+ * the classtable.py evidence.
  * ------------------------------------------------------------------- */
 
 /*

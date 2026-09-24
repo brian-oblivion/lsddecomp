@@ -8,19 +8,24 @@ Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
 attempt once rebuilt against the fixed toolchain.
 
+## ROUND 75 CORRECTION
+
+This report originally typed `self` as `Obj866E8` (D_800866E8) and typed
+`self->unk40` through a unit-local `Unk40Obj866E8`/`Unk40Obj866E8Methods`
+duplicate. Both were wrong. `tools/classtable.py D_80086ED0` places this
+function at that table's +0x0A4 (`D_800866E8`'s 80 slots hold none of this
+group's six addresses) -- `self` is `Obj86ED0` (class_3bb8c_i's shared
+type), whose OWN struct in `include/class_3bb8c.h` already types
+`self->unk40` as `ChildObj86ED0 *`. The `+0x0BC` slot this function
+dispatches through was simply missing a name on the shared
+`ChildMethods86ED0` -- added additively there instead of duplicated
+locally. See `src/class_3bb8c_j.c`'s file header comment and
+`Obj86ED0__AdvanceCountdown.md` for the full evidence trail. Zero bytes
+affected (type names are not codegen).
+
 ## Derivation
 
 ```c
-typedef struct Unk40Obj866E8 Unk40Obj866E8;
-typedef struct Unk40Obj866E8Methods Unk40Obj866E8Methods;
-struct Unk40Obj866E8Methods {
-    u8 pad000[0x0BC];
-    void (*slotBC)(Unk40Obj866E8 *self, void *arg1); /* +0x0BC */
-};
-struct Unk40Obj866E8 {
-    Unk40Obj866E8Methods *methods; /* +0x000 */
-};
-
 typedef struct {
     s32 unk0;
     s32 unk4;
@@ -29,15 +34,15 @@ typedef struct {
 extern s32 D_8008AADC;
 extern s32 D_8008AAE0;
 
-void Obj86ED0__DispatchIndexValue(Obj866E8 *self, s32 arg1, s32 arg2)
+void Obj86ED0__DispatchIndexValue(Obj86ED0 *self, s32 arg1, s32 arg2)
 {
     SlotBCArg866E8_3bb8c_j local;
-    Unk40Obj866E8 *obj;
+    ChildObj86ED0 *obj;
 
     if (self->unk48) {
         local.unk4 = D_8008AAE0;
         local.unk0 = arg1 * 7 + D_8008AADC;
-        obj = (Unk40Obj866E8 *)self->unk40;
+        obj = self->unk40;
         obj->methods->slotBC(obj, &local);
         self->unk18 = arg1;
         if (arg2) {
@@ -47,7 +52,7 @@ void Obj86ED0__DispatchIndexValue(Obj866E8 *self, s32 arg1, s32 arg2)
 }
 ```
 
-Part of the same `Obj866E8` "countdown/flush" group established in round 15
+Part of the same `Obj86ED0` "countdown/flush" group established in round 15
 (`Obj86ED0__AdvanceCountdown`/`Obj86ED0__ToggleFlag20`/`Obj86ED0__ResetCountdown`/`Obj86ED0__ResetAllAndFinish`, same
 unit): tests `self->unk48` as a readiness gate, then calls through
 `self->unk40`'s own method table at slot `0xBC` with a 2-word stack-local
@@ -60,16 +65,12 @@ matching ordinary C where the assignment is a plain statement before the
 `if (arg2)` block, which the scheduler is free to move into the branch's
 delay slot since it doesn't depend on the branch outcome.
 
-**Header additions** (`include/class_3bb8c.h`, both additive, next to
-existing `Obj866E8`/`Obj866E8Methods` fields):
-- `Obj866E8::unk28` (`u8 *`, offset 0x28) — established by this round's
-  sibling `Obj86ED0__DispatchLookupValue`, see that report.
-- `Obj866E8::unk40`, `Obj866E8::unk44` (`void *`, offsets 0x40/0x44) — kept
-  opaque in the shared header since only this unit's own local method-table
-  views (`Unk40Obj866E8Methods` here, `Unk44Obj866E8Methods` in
-  `Obj86ED0__DispatchLookupValue`) dispatch through them.
-- `Obj866E8Methods::slot60` (offset 0x60) — the notify callback both this
-  function and `Obj86ED0__DispatchLookupValue` call with `(self, 0)`.
+**Header additions** (`include/class_3bb8c.h`, additive):
+- `ChildMethods86ED0::slotBC` (offset 0x0BC) — round 75, this function's own
+  dispatch target on the ALREADY-shared `ChildObj86ED0` (`self->unk40`).
+  `unk28`/`unk40`/`unk44`/`Obj86ED0Methods::slot60` were already present on
+  the shared `Obj86ED0`/`Obj86ED0Methods`, established by class_3bb8c_i —
+  no edit needed for those.
 
 `D_8008AADC` is read here as a plain VALUE (`s32`, used arithmetically:
 `arg1 * 7 + D_8008AADC`), a different reading from `class_3bb8c_i.c`'s own

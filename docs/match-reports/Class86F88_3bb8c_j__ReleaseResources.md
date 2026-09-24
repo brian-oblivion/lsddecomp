@@ -2,12 +2,12 @@
 
 > Renamed from `func_800520A0` on 2026-09-24 (tools/rename.py). Address 0x800520a0.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`.
+Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
 
 ## Body
 
 ```c
-void Class86F88_3bb8c_j__ReleaseResources(Class86ED0 *self)
+void Class86F88_3bb8c_j__ReleaseResources(Class86F88_3bb8c_j *self)
 {
     if (self->unk50) {
         self->methods->slot90(self);
@@ -16,9 +16,9 @@ void Class86F88_3bb8c_j__ReleaseResources(Class86ED0 *self)
 }
 ```
 
-Established `self->unk50`'s type as `Class86ED0Handle *` (already
+Established `self->unk50`'s type as `Class86F88Handle_3bb8c_j *` (already
 introduced this round from `Class86F88_3bb8c_j__LoadResources`'s evidence) and
-`Class86ED0Methods::slot90` (+0x090, self-only). `Class86ED0HandleMethods::
+`Class86F88Methods_3bb8c_j::slot90` (+0x090, self-only). `Class86F88HandleMethods_3bb8c_j::
 slot4` (+0x004, self-only, returns a handle-typed pointer stored back into
 `self->unk50` -- a "release, returns the successor/NULL" shape) was
 already declared for `Class86F88_3bb8c_j__LoadResources`'s use; this is the second confirming

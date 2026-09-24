@@ -2,15 +2,15 @@
 
 > Renamed from `func_80052110` on 2026-09-24 (tools/rename.py). Address 0x80052110.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`.
+Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
 
 ## Body
 
 ```c
-void Class86F88_3bb8c_j__AddChildAndSetState(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3)
+void Class86F88_3bb8c_j__AddChildAndSetState(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3)
 {
-    typedef void (*Slot10NarrowFn)(Class86ED0 *self, s32 arg1);
-    void (*fn)(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3);
+    typedef void (*Slot10NarrowFn)(Class86F88_3bb8c_j *self, s32 arg1);
+    void (*fn)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3);
     s32 zero;
 
     zero = 0;
@@ -24,7 +24,7 @@ void Class86F88_3bb8c_j__AddChildAndSetState(Class86ED0 *self, void *arg1, s32 a
 }
 ```
 
-Calls `Class86ED0Methods::slot10` (established this round) TWICE at
+Calls `Class86F88Methods_3bb8c_j::slot10` (established this round) TWICE at
 different arities from the SAME function -- the first call is a straight
 passthrough of this function's own `(self, arg1, arg2, arg3)` (nothing
 overwrites `$a1`-`$a3` between function entry and the first `jalr`), the
@@ -34,7 +34,7 @@ second passes only `(self, arg2)` (confirmed by the disassembly: no `$a2`/
 explicit function-pointer cast (`Slot10NarrowFn`) since C cannot call a
 4-parameter function pointer with 2 arguments.
 
-Also establishes `Class86ED0::unk2C` (cleared to 0) and `unk3C` (set to
+Also establishes `Class86F88_3bb8c_j::unk2C` (cleared to 0) and `unk3C` (set to
 `arg3`).
 
 ## Residue and how it closed

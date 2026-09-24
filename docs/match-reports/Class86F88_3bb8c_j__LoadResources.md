@@ -2,15 +2,15 @@
 
 > Renamed from `func_80051F24` on 2026-09-24 (tools/rename.py). Address 0x80051f24.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`.
+Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
 
 ## Semantics (established with reasonable confidence from the disassembly)
 
 ```c
 #if 0
 extern void *BuildFileName(void *out, void *a1, void *a2, void *a3);
-extern Class86ED0Handle *func_8003B39C(void *arg0);
-extern Class86ED0Handle *func_80041C9C(Class86ED0Handle *arg0, void *arg1, s32 arg2);
+extern Class86F88Handle_3bb8c_j *func_8003B39C(void *arg0);
+extern Class86F88Handle_3bb8c_j *func_80041C9C(Class86F88Handle_3bb8c_j *arg0, void *arg1, s32 arg2);
 extern s32 D_8008AB14;
 extern s32 D_8008AB1C;
 extern s32 D_8008AB24;
@@ -18,10 +18,10 @@ extern s32 D_80087028;
 extern s32 D_8008AAF8;
 extern s32 D_800116E4;
 
-void Class86F88_3bb8c_j__LoadResources(Class86ED0 *self, void *arg1)
+void Class86F88_3bb8c_j__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
 {
     s32 local[8];
-    Class86ED0Handle *h;
+    Class86F88Handle_3bb8c_j *h;
 
     if (!arg1) {
         return;
@@ -46,7 +46,7 @@ void Class86F88_3bb8c_j__LoadResources(Class86ED0 *self, void *arg1)
 
 If (`arg1` non-NULL AND `self->unk50` not already set): builds a
 16-byte-ish stack descriptor via `BuildFileName(&local, ...)` fed into
-`func_8003B39C`, producing an opaque "handle" (`Class86ED0Handle *`, the
+`func_8003B39C`, producing an opaque "handle" (`Class86F88Handle_3bb8c_j *`, the
 same type `Class86F88_3bb8c_j__ReleaseResources` -- matched this round -- also uses via
 `self->unk50`). Calls the handle's own `slot78` (init?), stores a SECOND
 derived handle into `self->unk50` via `func_80041C9C`, releases the FIRST
@@ -56,8 +56,8 @@ global, `D_800116E4` instead of `D_8008AB14`) to make a THIRD handle,
 which is passed into `self->methods->slot8C` (established this round)
 alongside `arg1` and three of `self`'s own fields, then released.
 
-This established `Class86ED0Handle`/`Class86ED0HandleMethods` (`slot4`,
-`slot4C`, `slot78`) and `Class86ED0Methods::slot8C` (+0x08C, 6 args).
+This established `Class86F88Handle_3bb8c_j`/`Class86F88HandleMethods_3bb8c_j` (`slot4`,
+`slot4C`, `slot78`) and `Class86F88Methods_3bb8c_j::slot8C` (+0x08C, 6 args).
 
 ## Residue: pure register-identity rotation, NOT a size/instruction defect
 
@@ -92,7 +92,7 @@ differently.
   minutes / ~7800 iterations): did not reach zero, but found a
   score-30 lead (down from the 140 base) whose only structural change
   from this body was caching `h->methods` into a separate local
-  (`Class86ED0HandleMethods *hm = h->methods; hm->slot4(h);`) before the
+  (`Class86F88HandleMethods_3bb8c_j *hm = h->methods; hm->slot4(h);`) before the
   FINAL `slot4` call only. Translating that lead by hand back into the
   real toolchain reproduced NO improvement at all (still 75/95,
   identical diff) -- the permuter's own mutated/stripped scaffold and

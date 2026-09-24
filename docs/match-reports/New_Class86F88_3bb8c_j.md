@@ -2,9 +2,13 @@
 
 > Renamed from `func_80051A5C` on 2026-09-24 (tools/rename.py). Address 0x80051a5c.
 
-Unit: `src/class_3bb8c_j.c`. `New_Class86ED0` -- the allocator for
-`Class86ED0` (a small BasicClass-derived sibling class discovered this
-round, alloc size 0x54, vtable `D_80086ED0`/`Get_vtable_Obj86ED0`).
+Unit: `src/class_3bb8c_j.c`. `New_Class86F88_3bb8c_j` -- the allocator for
+`Class86F88_3bb8c_j` (a small BasicClass-derived sibling class discovered this
+round, alloc size 0x54, vtable D_80086F88 reached through `func_80052B60()`
+(class_3bb8c_k) -- NOT `D_80086ED0`/`Get_vtable_Obj86ED0`, which is a
+DIFFERENT, unrelated class (`Obj86ED0`, established by class_3bb8c_i) that
+this function's own body never touches; ROUND 75 CORRECTION, see
+`Get_vtable_Obj86ED0.md`).
 
 This function ALREADY had an extern declaration in the shared
 `include/class_3bb8c.h` (class_3bb8c_f's own screening, "Address-of only
@@ -18,7 +22,7 @@ unit's own ctor-table `+0x008` slot signature to match.
 ```c
 void *New_Class86F88_3bb8c_j(void *arg0, s32 arg1)
 {
-    Class86ED0 *self = BMemPMgrAlloc(0x54);
+    Class86F88_3bb8c_j *self = BMemPMgrAlloc(0x54);
 
     if (self == NULL) {
         goto fail;
