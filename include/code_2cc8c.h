@@ -1393,8 +1393,9 @@ struct Obj86B60 {
     u8 pad044[0x048 - 0x044];
     Unk48Obj *unk48;            /* +0x048, func_8003C7B4 only */
     Unk4CObj *unk4C;            /* +0x04C, see Unk4CObj's own comment */
-    s32 unk50;                  /* +0x050, Obj86B60__FindNextFreeSlot: capacity/wrap
-                                    bound for the unk58 index into
+    s32 slotCount;               /* +0x050, renamed from unk50, round 78 --
+                                    Obj86B60__FindNextFreeSlot: capacity/wrap
+                                    bound for the activeSlot index into
                                     unk4C->unk18[] (also Obj86B60__BroadcastToSlots's
                                     loop count) */
     Unk64Elem **unk54;          /* +0x054, Obj86B60__BroadcastToSlots: walked with an

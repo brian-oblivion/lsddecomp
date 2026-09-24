@@ -66,7 +66,7 @@ void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
     self->unk5C = BMemPMgrAlloc(size);
     self->slotCounts = BMemPMgrAlloc(size);
     self->unk64 = BMemPMgrAlloc(size);
-    self->unk50 = count;
+    self->slotCount = count;
 
     if (a1->unk0 != NULL) {
         handle = func_8003B39C(a1->unk0);
@@ -112,7 +112,7 @@ void Obj86B60__ReleaseTarget(Obj86B60 *self)
     }
     self->unk68->methods->slot4(self->unk68);
     arr = self->unk54;
-    for (i = 0; i < self->unk50; arr++) {
+    for (i = 0; i < self->slotCount; arr++) {
         Unk64Elem *elem;
 
         if (self->unk4C->unk24[i] != NULL) {
@@ -140,7 +140,7 @@ void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
     }
     arr = self->unk54;
     ptr = self->unk4C->unk20;
-    for (i = 0; i < self->unk50; i++, arr++, ptr += 8) {
+    for (i = 0; i < self->slotCount; i++, arr++, ptr += 8) {
         if (self->unk4C->unk18[i] == NULL) {
             Unk64Elem *elem = *arr;
 
@@ -168,7 +168,7 @@ void Obj86B60__BroadcastToSlots(Obj86B60 *self, void *a1)
     }
     arr = self->unk54;
     origIdx = self->activeSlot;
-    for (i = 0; i < self->unk50;) {
+    for (i = 0; i < self->slotCount;) {
         Unk64Elem *elem = *arr;
 
         arr++;
@@ -193,7 +193,7 @@ void Obj86B60__FindNextFreeSlot(Obj86B60 *self)
     i = self->activeSlot;
     i++;
     for (;;) {
-        if (i >= self->unk50) {
+        if (i >= self->slotCount) {
             i = 0;
         }
         if (i == self->activeSlot) {
@@ -219,7 +219,7 @@ void Obj86B60__FindPrevFreeSlot(Obj86B60 *self)
     i--;
     for (;;) {
         if (i < 0) {
-            i = self->unk50 - 1;
+            i = self->slotCount - 1;
         }
         if (i == self->activeSlot) {
             break;
