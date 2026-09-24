@@ -1,8 +1,10 @@
-# func_800512C8 -- MATCHED (42/42 words)
+# Obj86ED0__SetState -- MATCHED (42/42 words)
+
+> Renamed from `func_800512C8` on 2026-09-24 (tools/rename.py). Address 0x800512c8.
 
 Unit `class_3bb8c_i`, carved round 14.
 
-`Obj86ED0`'s vtable slot 0x054, called by `func_80051370` (that unit's own
+`Obj86ED0`'s vtable slot 0x054, called by `Obj86ED0__TickState` (that unit's own
 sibling function, still `INCLUDE_ASM` this round) with a literal `4`.
 Resets `unk30`, returns early for `arg1 < 2`, then dispatches on `arg1`:
 `{2,3}` detaches `unk34` and calls this class's own `slot48`
@@ -13,7 +15,7 @@ overridden via `tools/classtable.py D_80086ED0 --vs D_8006B58C`) with
 slot is identical to the base's either way.
 
 ```c
-void func_800512C8(Obj86ED0 *self, s32 arg1)
+void Obj86ED0__SetState(Obj86ED0 *self, s32 arg1)
 {
     self->unk30 = 0;
     if (arg1 < 2) {

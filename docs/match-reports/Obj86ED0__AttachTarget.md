@@ -1,4 +1,6 @@
-# func_80051200 -- MATCHED (28/28 words)
+# Obj86ED0__AttachTarget -- MATCHED (28/28 words)
+
+> Renamed from `func_80051200` on 2026-09-24 (tools/rename.py). Address 0x80051200.
 
 Unit `class_3bb8c_i`, carved round 14.
 
@@ -6,11 +8,11 @@ Unit `class_3bb8c_i`, carved round 14.
 addChild` (the class's OWN overridden addChild, `Obj86ED0__AddChild`, reached
 through `self->methods` rather than the explicit base-table call this
 time), stashes a third pointer verbatim into `unk3C` (typed `TargetObj86ED0
-*`, the same opaque type `func_8005161C` dispatches through), and resets
+*`, the same opaque type `Obj86ED0__NotifyTarget` dispatches through), and resets
 two counters.
 
 ```c
-void func_80051200(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86ED0 *arg3)
+void Obj86ED0__AttachTarget(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86ED0 *arg3)
 {
     self->methods->addChild(self, arg1);
     self->methods->addChild(self, arg2);

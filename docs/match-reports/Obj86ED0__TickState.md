@@ -1,11 +1,13 @@
-# func_80051370 -- MATCH (24/24 words)
+# Obj86ED0__TickState -- MATCH (24/24 words)
+
+> Renamed from `func_80051370` on 2026-09-24 (tools/rename.py). Address 0x80051370.
 
 Unit `class_3bb8c_i`. Gated `self->unk30` increment: only proceeds when
 `self->unk2C` is 2 or 3, then increments `self->unk30` and dispatches
 `slot54(self, 4)` only when the OLD value of `self->unk30` was nonzero.
 
 ```c
-void func_80051370(Obj86ED0 *self)
+void Obj86ED0__TickState(Obj86ED0 *self)
 {
     s32 tag;
     s32 old;

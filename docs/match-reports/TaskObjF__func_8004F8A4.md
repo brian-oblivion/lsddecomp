@@ -282,7 +282,7 @@ variants each needed a full `build-and-verify.sh` cycle.
 
 ## ROUND 27 (delta): new lever found, best raised 36/77 -> 63/77, one residue class isolated
 
-Read per the head's own finding this round on `func_800513D0` (a shared
+Read per the head's own finding this round on `Obj86ED0__HandleCommand` (a shared
 function-pointer local can let GCC cross-jump-merge blocks retail keeps
 separate) -- but THIS function's residue turned out to be the OPPOSITE
 problem: the `dispatch` local is not causing an unwanted merge, it is
@@ -291,7 +291,7 @@ this function's ONLY way to reproduce retail's genuine partial sharing
 every call site" lever directly: dropping `dispatch` and writing
 `return self->methods->slot7C(self, code);` at all three leaves compiled
 to **0x144 (4 words too long)** -- worse than the `dispatch`-variable
-form in the OPPOSITE direction from `func_800513D0`. **The two functions
+form in the OPPOSITE direction from `Obj86ED0__HandleCommand`. **The two functions
 are the same LEVER (named-local-vs-inline) with opposite correct
 answers**, which is exactly what the project's "measure per function,
 never assume" convention predicts -- worth stating plainly since it would
@@ -455,10 +455,10 @@ unreproduced now matches byte-for-byte. Register-saturation census is
 still NOT the discriminator here (4 callee-saved registers, well under
 the round-13 stall threshold of 5+).
 
-**ROUND 27's second finding: `func_800513D0` and this function are the
+**ROUND 27's second finding: `Obj86ED0__HandleCommand` and this function are the
 SAME lever (named function-pointer local vs. inline call) with OPPOSITE
 correct answers, confirmed by testing both directions on both
-functions.** `func_800513D0` needed the local REMOVED (retail keeps two
+functions.** `Obj86ED0__HandleCommand` needed the local REMOVED (retail keeps two
 guard blocks separate that a shared local caused GCC to merge).
 `TaskObjF__func_8004F8A4` needs the local KEPT (retail's own partial-sharing shape
 is UNREACHABLE without it -- the fully-inlined form is 4 words too long

@@ -9,7 +9,7 @@ itself defines). Dispatches the BASE class's own `slot38` first, then reads
 the tag word off `arg1` exactly like `Obj86ED0__AddChild`/`Obj86ED0__RemoveChild`, and
 routes to one of this class's OWN two extra slots (`slot58`/`slot5C`,
 0x058/0x05C) via `self->methods` this time (not the base table) --
-`slot5C` is itself `func_800513D0`, STALLED in this same unit (addiu-$at /
+`slot5C` is itself `Obj86ED0__HandleCommand`, STALLED in this same unit (addiu-$at /
 jump-table blocker, see its own report), so its type only needed naming,
 not a body.
 

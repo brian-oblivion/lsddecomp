@@ -2688,18 +2688,18 @@ struct ChildObj86ED0 {
 };
 
 /* self->unk3C's pointee -- an unrelated class (own vtable, unconnected to
- * D_80086ED0), reached only through its own +0x080 slot by func_8005161C.
+ * D_80086ED0), reached only through its own +0x080 slot by Obj86ED0__NotifyTarget.
  * Field meaning beyond that slot is unestablished. */
 typedef struct TargetObj86ED0 TargetObj86ED0;
 typedef struct TargetMethods86ED0 TargetMethods86ED0;
 struct TargetMethods86ED0 {
     u8 pad000[0x080];
-    /* +0x080, func_8005161C: `self->methods->slot80(self, arg1, 0x60, 0x60)`.
+    /* +0x080, Obj86ED0__NotifyTarget: `self->methods->slot80(self, arg1, 0x60, 0x60)`.
      * 3 args, not 2 -- confirmed against this project's established
      * self->methods->slot80(self, arg1, 0x60, 0x60) idiom seen at several
      * other call sites (src/class_3bb8c_k.c, src/code_2cc8c.c,
      * src/class_3bb8c_g.c, src/code_55dd4.c), all forwarding a caller-
-     * supplied arg1 alongside a repeated literal. func_8005161C itself
+     * supplied arg1 alongside a repeated literal. Obj86ED0__NotifyTarget itself
      * takes that arg1 as its own second parameter and forwards it
      * unchanged (same register, no move instruction). */
     void (*slot80)(TargetObj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);
@@ -2720,10 +2720,10 @@ struct Obj86ED0Methods {
      * match the defining function's own prototype exactly. */
     void (*ctor)(Obj86ED0 *self, s32 arg1, s32 arg2);
     u8 pad00C[0x010 - 0x00C];
-    void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, func_80051200 (OVERRIDES BasicClass's addChild: Obj86ED0__AddChild) */
-    void (*removeChild)(Obj86ED0 *self, void *child);  /* +0x014, func_80051270/func_800512C8 (OVERRIDES BasicClass's removeChild: Obj86ED0__RemoveChild) */
+    void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, Obj86ED0__AttachTarget (OVERRIDES BasicClass's addChild: Obj86ED0__AddChild) */
+    void (*removeChild)(Obj86ED0 *self, void *child);  /* +0x014, Obj86ED0__DetachTarget/Obj86ED0__SetState (OVERRIDES BasicClass's removeChild: Obj86ED0__RemoveChild) */
     u8 pad018[0x030 - 0x018];
-    /* +0x030, func_800512C8's own dispatch -- UNMODIFIED BasicClass
+    /* +0x030, Obj86ED0__SetState's own dispatch -- UNMODIFIED BasicClass
      * notifyParents (BasicClass__NotifyParents, code_8220_b), reached through
      * self's own table this one time instead of `Get_vtable_BasicClass()`. */
     void (*notifyParents)(Obj86ED0 *self, s32 arg1);
@@ -2733,16 +2733,16 @@ struct Obj86ED0Methods {
      * own two arguments unchanged. */
     void (*slot40)(Obj86ED0 *self, s32 arg1, s32 arg2); /* +0x040 */
     u8 pad044[0x048 - 0x044];
-    void (*slot48)(Obj86ED0 *self);                      /* +0x048, func_800512C8 -- this class's own slot, Obj86ED0__ReleaseCardResources */
+    void (*slot48)(Obj86ED0 *self);                      /* +0x048, Obj86ED0__SetState -- this class's own slot, Obj86ED0__ReleaseCardResources */
     u8 pad04C[0x054 - 0x04C];
-    void (*slot54)(Obj86ED0 *self, s32 arg1);             /* +0x054, func_80051370 -- this class's own slot, func_800512C8 */
-    void (*slot58)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, Obj86ED0__Notify's tag==5 case -- this class's own slot, func_80051370 */
-    void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, Obj86ED0__Notify's tag==2 case -- this class's own slot, func_800513D0 */
-    /* +0x060, func_800513D0's own `arg2 == 25`/`23` cases: `self->methods->
+    void (*slot54)(Obj86ED0 *self, s32 arg1);             /* +0x054, Obj86ED0__TickState -- this class's own slot, Obj86ED0__SetState */
+    void (*slot58)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, Obj86ED0__Notify's tag==5 case -- this class's own slot, Obj86ED0__TickState */
+    void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, Obj86ED0__Notify's tag==2 case -- this class's own slot, Obj86ED0__HandleCommand */
+    /* +0x060, Obj86ED0__HandleCommand's own `arg2 == 25`/`23` cases: `self->methods->
      * slot60(self, 0x10)`, always with the same literal. */
     void (*slot60)(Obj86ED0 *self, s32 arg1);            /* +0x060 */
     u8 pad064[0x088 - 0x064];
-    /* +0x088..+0x0A0, func_800513D0's own dense `arg2` switch: each of
+    /* +0x088..+0x0A0, Obj86ED0__HandleCommand's own dense `arg2` switch: each of
      * these seven slots is resolved into a local function pointer then
      * called as `fn(self)` (no other args) once, after the switch --
      * `arg2 == 21`/`5` -> slot88, `20`/`4` -> slot8C, `18`/`2` -> slot90,
@@ -2777,14 +2777,14 @@ struct Obj86ED0 {
     s32 unk14;                   /* +0x014, func_80051720 (upper bound tested against unk1C+1) */
     s32 unk18;                   /* +0x018, Obj86ED0__SetName (zeroed)/func_8005165C/func_800516C0 (inc/dec counter, capped by unk10) */
     s32 unk1C;                   /* +0x01C, Obj86ED0__SetName (zeroed)/func_80051720 (inc counter or reset to 0, capped by unk14) */
-    s32 unk20;                   /* +0x020, func_80051200 (zeroed) */
+    s32 unk20;                   /* +0x020, Obj86ED0__AttachTarget (zeroed) */
     char *unk24;                 /* +0x024, Obj86ED0__SetName: its own `arg1` (name string) */
     char *unk28;                 /* +0x028, Obj86ED0__Finalize (freed in finalize)/Obj86ED0__SetName (DecodeFullWidthSjis/strcpy destination) */
-    s32 unk2C;                   /* +0x02C, func_80051200 (zeroed)/func_800512C8 (set to its own arg1 for arg1 in [2,4); read as notifyParents's arg1 for arg1==4)/func_80051370 (range-checked against [2,4)) */
-    s32 unk30;                   /* +0x030, func_800512C8 (zeroed)/func_80051370 (incremented; gates the slot54 call on the OLD value being nonzero) */
-    void *unk34;                 /* +0x034, Obj86ED0__AddChild/Obj86ED0__RemoveChild (addChild/removeChild target when child's tag==2)/func_800512C8/func_80051270 (removeChild target) */
-    void *unk38;                 /* +0x038, Obj86ED0__AddChild/Obj86ED0__RemoveChild (tag==5)/func_80051270 (removeChild target) */
-    TargetObj86ED0 *unk3C;        /* +0x03C, func_80051200 (its own arg3)/func_8005161C (dispatch target)/func_80051270 (zeroed) */
+    s32 unk2C;                   /* +0x02C, Obj86ED0__AttachTarget (zeroed)/Obj86ED0__SetState (set to its own arg1 for arg1 in [2,4); read as notifyParents's arg1 for arg1==4)/Obj86ED0__TickState (range-checked against [2,4)) */
+    s32 unk30;                   /* +0x030, Obj86ED0__SetState (zeroed)/Obj86ED0__TickState (incremented; gates the slot54 call on the OLD value being nonzero) */
+    void *unk34;                 /* +0x034, Obj86ED0__AddChild/Obj86ED0__RemoveChild (addChild/removeChild target when child's tag==2)/Obj86ED0__SetState/Obj86ED0__DetachTarget (removeChild target) */
+    void *unk38;                 /* +0x038, Obj86ED0__AddChild/Obj86ED0__RemoveChild (tag==5)/Obj86ED0__DetachTarget (removeChild target) */
+    TargetObj86ED0 *unk3C;        /* +0x03C, Obj86ED0__AttachTarget (its own arg3)/Obj86ED0__NotifyTarget (dispatch target)/Obj86ED0__DetachTarget (zeroed) */
     ChildObj86ED0 *unk40;          /* +0x040, Obj86ED0__ReleaseCardResources (released, no null-back store) */
     ChildObj86ED0 *unk44;           /* +0x044, Obj86ED0__ReleaseCardResources (released, no null-back store) */
     ChildObj86ED0 *unk48;            /* +0x048, Obj86ED0__ReleaseCardResources (release+null-back)/Obj86ED0__ClearChildRefs/Obj86ED0__RemoveAllChildren (zeroed)/func_8005165C/func_800516C0/func_80051720 (nonzero readiness gate)/Obj86ED0__LoadCardResources (set from a resolved resource handle) */

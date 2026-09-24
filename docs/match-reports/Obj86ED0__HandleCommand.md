@@ -1,4 +1,6 @@
-# func_800513D0 -- MATCHED (147/147 words, byte-exact)
+# Obj86ED0__HandleCommand -- MATCHED (147/147 words, byte-exact)
+
+> Renamed from `func_800513D0` on 2026-09-24 (tools/rename.py). Address 0x800513d0.
 
 Unit `class_3bb8c_i`. `Obj86ED0Methods::slot5C` (called by `Obj86ED0__Notify`'s
 `tag==2` case). No other caller in this unit. Carved with the rodata slot

@@ -1,11 +1,13 @@
-# func_8005161C -- MATCH (16/16 words)
+# Obj86ED0__NotifyTarget -- MATCH (16/16 words)
+
+> Renamed from `func_8005161C` on 2026-09-24 (tools/rename.py). Address 0x8005161c.
 
 Unit `class_3bb8c_i`. Obj86ED0's own method: if `self->unk3C` (a
 `TargetObj86ED0 *`, a wholly separate class reached only through this one
 field) is non-NULL, dispatch its own `slot80` on it.
 
 ```c
-void func_8005161C(Obj86ED0 *self, s32 arg1)
+void Obj86ED0__NotifyTarget(Obj86ED0 *self, s32 arg1)
 {
     TargetObj86ED0 *target;
 
@@ -35,7 +37,7 @@ instead of the header's (incomplete) prior reading.
 
 Fixed `include/class_3bb8c.h`'s `TargetMethods86ED0::slot80` to
 `(TargetObj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)`. `TargetObj86ED0` is
-local to this unit's slice (only `func_8005161C` reaches it), so this is
+local to this unit's slice (only `Obj86ED0__NotifyTarget` reaches it), so this is
 safe to retype outright rather than additively.
 
 ### Proposed learning

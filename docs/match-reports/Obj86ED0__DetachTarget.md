@@ -1,4 +1,6 @@
-# func_80051270 -- MATCHED (22/22 words)
+# Obj86ED0__DetachTarget -- MATCHED (22/22 words)
+
+> Renamed from `func_80051270` on 2026-09-24 (tools/rename.py). Address 0x80051270.
 
 Unit `class_3bb8c_i`, carved round 14.
 
@@ -9,7 +11,7 @@ then zeroes `unk3C`. Note `unk34`/`unk38` themselves are NOT zeroed here
 `Obj86ED0__ClearChildRefs`/`Obj86ED0__RemoveAllChildren`.
 
 ```c
-void func_80051270(Obj86ED0 *self)
+void Obj86ED0__DetachTarget(Obj86ED0 *self)
 {
     self->methods->removeChild(self, self->unk34);
     self->methods->removeChild(self, self->unk38);
