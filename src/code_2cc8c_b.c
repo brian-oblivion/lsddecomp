@@ -1,6 +1,18 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
+/* Unk24Elem's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
+ * copies it with a whole-struct assignment (lw/lw into two fresh
+ * temporaries, sw/sw, then a RELOAD of .y before adjusting it) -- see
+ * docs/match-reports/func_8003DAD4.md, round 75. Local view: the shared
+ * header still spells the pair as two s32 fields. */
+typedef struct {
+    s32 x;
+    s32 y;
+} SlotPos;
+
+#define SLOT_POS(target) (*(SlotPos *)&(target)->unk10)
+
 s32 func_8003CD48(Obj86B60 *self)
 {
     s32 c = 0x80 - (self->frameCounter * self->unk84);
@@ -285,25 +297,21 @@ void func_8003D6D4(Obj86B60 *self)
     BMemPMgrFree(self->unk64[self->activeSlot]);
 }
 
-/* STALL -- see docs/match-reports/func_8003D73C.md. Round 49 (delta):
- * a bare __asm__("") barrier between a NAMED `delta = counter * 10;` and
- * the reload-and-subtract fixed the long-standing sll/lw scheduling swap
- * outright (retail's own mult-before-reload order now reproduced
- * exactly) -- length now EXACT (145/145 total, no drift), raw 136/145.
- * The remaining 9 words are the SAME target->unk14 register-identity
- * residue this unit shares with func_8003DAD4 (2 words) plus a
- * register-role swap that appears tied to it (6 words) plus one
- * early-materialization delay-slot filler (`addiu $a2,sp,0x10` vs a
- * `nop`, the same class already carried permuter-exhausted elsewhere in
- * this project). Restored to INCLUDE_ASM per project rule. */
-#if 0
+/* Unk68ObjMethods.slot4C as this call site passes it: THREE arguments, the
+ * third being the slot position pair. The shared header types the slot with
+ * two (its only observed caller is this function); passing the third is what
+ * makes retail compute &pos before the branch -- see
+ * docs/match-reports/func_8003D73C.md, round 75. */
+typedef void (*Unk68Slot4CFn)(Unk68Obj *self, s32 a1, SlotPos *pos);
+
 void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
 {
     s32 idx;
     Unk64Elem **arr;
     s32 count;
     s32 counter;
-    s32 local[2];
+    SlotPos pos;
+    s32 i;
 
     idx = self->activeSlot;
     arr = (Unk64Elem **)self->unk64[idx];
@@ -314,63 +322,36 @@ void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
         counter = target->unk4;
     }
 
-    {
-        s32 i;
-
-        for (i = 0; i < count; i++) {
-            (*arr)->methods->slot50(*arr);
-            arr++;
-        }
+    for (i = 0; i < count; i++) {
+        (*arr)->methods->slot50(*arr);
+        arr++;
     }
 
-    {
-        Unk24Elem *target = (Unk24Elem *)self->unk4C->unk24[idx];
-        s32 t0 = target->unk10;
-        s32 t1 = target->unk14;
-
-        local[0] = t0;
-        local[1] = t1;
-    }
-    __asm__("" ::: "memory");
-    {
-        s32 delta = counter * 10;
-        __asm__("");
-        local[1] -= delta;
-    }
+    pos = SLOT_POS((Unk24Elem *)self->unk4C->unk24[idx]);
+    pos.y -= counter * 10;
 
     if (a2 != 0) {
-        s32 local2[2];
+        s32 buf[2];
 
-        self->unk68->methods->slot4C(self->unk68, self->unk14);
-        local2[0] = 0x28;
-        local2[1] = count * 12;
-        self->unk68->methods->slotC0(self->unk68, local2);
+        ((Unk68Slot4CFn)self->unk68->methods->slot4C)(self->unk68, self->unk14, &pos);
+        buf[0] = 0x28;
+        buf[1] = count * 12;
+        self->unk68->methods->slotC0(self->unk68, buf);
     } else {
         self->unk68->methods->slot50(self->unk68);
     }
 
     arr = (Unk64Elem **)self->unk64[idx];
-    {
-        s32 i;
-
-        for (i = 0; i < count; i++) {
-            (*arr)->methods->slot4C(*arr, a1, local);
-            (*arr)->methods->slot60(*arr, a2);
-            local[1] += 10;
-            arr++;
-        }
+    for (i = 0; i < count; i++) {
+        (*arr)->methods->slot4C(*arr, a1, &pos);
+        (*arr)->methods->slot60(*arr, a2);
+        pos.y += 10;
+        arr++;
     }
 
     arr = (Unk64Elem **)self->unk64[idx];
-    {
-        Unk64Elem *elem = arr[counter];
-
-        elem->methods->slot60(elem, 1);
-    }
+    arr[counter]->methods->slot60(arr[counter], 1);
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003D73C);
 
 void func_8003D980(Obj86B60 *self, void *a1)
 {
@@ -404,7 +385,46 @@ void func_8003DA10(Obj86B60 *self)
     self->methods->slot60(self, 14);
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2cc8c_b", func_8003DAD4);
+void func_8003DAD4(Obj86B60 *self)
+{
+    s32 idx;
+    s32 counter;
+    SlotPos pos;
+    Unk64Elem **arr;
+    s32 count;
+    s32 i;
+
+    if (self->unk3C != 2) {
+        return;
+    }
+    idx = self->activeSlot;
+    counter = self->slotCounts[idx];
+    pos = SLOT_POS((Unk24Elem *)self->unk4C->unk24[idx]);
+    pos.y -= counter * 10;
+
+    arr = (Unk64Elem **)self->unk64[idx];
+    count = self->unk5C[idx];
+    for (i = 0; i < count; i++) {
+        (*arr)->methods->slot60(*arr, 0);
+        (*arr)->methods->slotBC(*arr, &pos);
+        pos.y += 10;
+        arr++;
+    }
+
+    {
+        Unk64Elem *elem = ((Unk64Elem **)self->unk64[idx])[counter];
+
+        elem->methods->slot60(elem, 1);
+        elem->methods->slotB8(elem, self->unk4C->unk10);
+    }
+
+    ((Unk24Elem *)self->unk4C->unk24[idx])->unk4 = counter;
+
+    self->unk68->methods->slot50(self->unk68);
+
+    self->unk3C = 1;
+    self->methods->slot60(self, 0x10);
+}
 
 void func_8003DCAC(Obj86B60 *self)
 {
