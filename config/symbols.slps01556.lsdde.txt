@@ -2135,3 +2135,4 @@ Class86B60__CreateNameField = 0x8004DB18; // type:func
 Class86B60__DestroyNameField = 0x8004DC08; // type:func
 Class86B60__ForwardToNameField = 0x8004DC64; // type:func
 Class86B60__TickNameFieldCursor = 0x8004DCD0; // type:func
+Class86B60__CommitNameEntry = 0x8004DE08; // type:func

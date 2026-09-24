@@ -1,4 +1,6 @@
-# func_8004DE08 -- MATCHED 87/87, round 43
+# Class86B60__CommitNameEntry -- MATCHED 87/87, round 43
+
+> Renamed from `func_8004DE08` on 2026-09-24 (tools/rename.py). Address 0x8004de08.
 
 Unit `class_3bb8c_d`, class `Class86B60`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 1 `gp_rel` hit
@@ -9,7 +11,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ```c
 extern void CheckObj866E8CountFlag(void *arg0, void *arg1, void *arg2);
 
-void func_8004DE08(Class86B60 *self)
+void Class86B60__CommitNameEntry(Class86B60 *self)
 {
     s32 size;
     s32 origUnk58;
@@ -34,7 +36,7 @@ void func_8004DE08(Class86B60 *self)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py func_8004DE08` -> `87/87 words
+Byte-exact on the first build: `funcdiff.py Class86B60__CommitNameEntry` -> `87/87 words
 match (file 0x3E608-0x3E764)`; whole-image `OK: build matches retail
 SLPS_015.56`. (Measured with the unit's other stall, `Class86B60__TickNameFieldCursor`,
 temporarily restored to `INCLUDE_ASM` so its own known length residue could
@@ -71,7 +73,7 @@ the whole image after any further edit there.)
   local 3-argument extern matches what THIS call site actually needs;
   class_3bb8c_c.c's 2-argument declaration is untouched. (`include/class_
   3bb8c.h`'s own comment on `Ctx678_3bb8c_c`, written when this call site
-  was still uncarved asm, already named `func_8004DE08` as CheckObj866E8CountFlag's
+  was still uncarved asm, already named `Class86B60__CommitNameEntry` as CheckObj866E8CountFlag's
   "one caller" -- now confirmed and closed.)
 - `self->methods->slotE0(self, self->unk14);` -- a NEW slot at +0x0E0 on
   `Class86B60Methods` (inside the previous `pad0DC[0xF0-0xDC]` gap),
@@ -124,13 +126,13 @@ than changed.
 ### Proposed learning
 
 **A stalled sibling function's own drift can hide a clean match on the
-function next to it in the SAME unit.** `func_8004DE08` scored 6/87 with a
+function next to it in the SAME unit.** `Class86B60__CommitNameEntry` scored 6/87 with a
 128324-byte out-of-range warning on the first build -- not because of
-anything wrong in `func_8004DE08` itself, but because `Class86B60__TickNameFieldCursor`
+anything wrong in `Class86B60__CommitNameEntry` itself, but because `Class86B60__TickNameFieldCursor`
 (this unit's OTHER round-43 target, still an unresolved 2-word-short
 residue at the time) sits immediately before it in ROM order and was
 shifting every address after it. Restoring `Class86B60__TickNameFieldCursor` to
-`INCLUDE_ASM` in isolation revealed `func_8004DE08` was byte-exact all
+`INCLUDE_ASM` in isolation revealed `Class86B60__CommitNameEntry` was byte-exact all
 along. When a function's own diff looks structurally wrong immediately
 after editing an UNRELATED, EARLIER function in the same unit, check
 whether that earlier function is still drifting before assuming the

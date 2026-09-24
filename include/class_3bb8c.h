@@ -1095,7 +1095,7 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
      * that same real class. */
     void (*slotB8)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
     u8 pad0BC[0x0CC - 0x0BC];
-    /* +0x0CC, func_8004DE08's own call: `(self, buf)` where `buf` is a
+    /* +0x0CC, Class86B60__CommitNameEntry's own call: `(self, buf)` where `buf` is a
      * pool-allocated string this function fills with `DecodeFullWidthSjis`
      * before the call and frees right after. */
     void (*slotCC)(Class86B60UnkB0Obj_3bb8c_d *self, void *arg1);
@@ -1104,7 +1104,7 @@ struct Class86B60UnkB0ObjMethods_3bb8c_d {
 struct Class86B60UnkB0Obj_3bb8c_d {
     Class86B60UnkB0ObjMethods_3bb8c_d *methods; /* +0x000 */
     u8 pad004[0x0A9 - 0x004];
-    /* +0x0A9, func_8004DE08: read as an unsigned byte and used directly as
+    /* +0x0A9, Class86B60__CommitNameEntry: read as an unsigned byte and used directly as
      * an allocation SIZE (`BMemPMgrAlloc`'s own argument). */
     u8 unkA9;
     /* +0x0AA/+0x0AB/+0x0AC, Class86B60__CreateNameField: three literal byte fields
@@ -1207,7 +1207,7 @@ struct Class86B60Methods {
      * -- round 68. */
     void (*onConstruct)(Class86B60 *self, void *dreamSys);
     u8 pad044[0x060 - 0x044];
-    /* +0x060, func_8004DE08's own two calls, both `(self, literal)` --
+    /* +0x060, Class86B60__CommitNameEntry's own two calls, both `(self, literal)` --
      * once with `0xB` right after `self->unk58 = 5`, once with `0xF`
      * later in the same function. */
     void (*slot60)(Class86B60 *self, s32 arg1);
@@ -1228,21 +1228,21 @@ struct Class86B60Methods {
     void (*slotD4)(Class86B60 *self, void *arg1, s32 arg2);
     void (*slotD8)(Class86B60 *self, void *arg1);      /* +0x0D8, Class86B60__Class86B60's own call, arg1 = &D_80086D44 */
     u8 pad0DC[0x0E0 - 0x0DC];
-    /* +0x0E0, func_8004DE08's own call: `(self, self->unk14)`, arg1
+    /* +0x0E0, Class86B60__CommitNameEntry's own call: `(self, self->unk14)`, arg1
      * forwarded opaquely. */
     void (*slotE0)(Class86B60 *self, void *arg1);
     u8 pad0E4[0x0F0 - 0x0E4];
     /* +0x0F0, Class86B60__SetState's own 3rd call: `(self, self->unk4C->unk8,
      * 1)`. Distinct from `DreamSysViewMethods_3bb8c_c::slotF0` (see
      * Class86B60__ShowTitleIcon's report) -- same offset number, unrelated table.
-     * func_8004DE08 (this round) also reaches this slot, forwarding an
+     * Class86B60__CommitNameEntry (this round) also reaches this slot, forwarding an
      * `s32` (its own saved pre-overwrite copy of `self->unk58`) through
      * the SAME `void *arg1` parameter, cast at that call site rather than
      * retyping the slot -- the bit pattern is unchanged either way, and
      * `Class86B60__SetState`'s own call already established the pointer type. */
     void (*slotF0)(Class86B60 *self, void *arg1, s32 arg2);
     u8 pad0F4[0x11C - 0x0F4];
-    /* +0x11C, func_8004DE08's own call: `(self, buf, 1)` where `buf` is
+    /* +0x11C, Class86B60__CommitNameEntry's own call: `(self, buf, 1)` where `buf` is
      * the value `DreamSysViewMethods_3bb8c_c::slot19C` (via `self->unkA4`)
      * just filled through a stack out-parameter. */
     void (*slot11C)(Class86B60 *self, s32 arg1, s32 arg2);
@@ -1562,7 +1562,7 @@ extern void FormatNumberIntoBuffer(s32 arg0);
 
 /*
  * First argument of CheckObj866E8CountFlag: an unrelated, larger caller-side
- * struct (only seen from its one caller, func_8004DE08 in the still-
+ * struct (only seen from its one caller, Class86B60__CommitNameEntry in the still-
  * uncarved asm/class_3bb8c_d.s) whose own +0x0BC field is a pointer to
  * the Obj866E8 instance this function actually operates on -- NOT
  * Obj866E8's own +0x0BC (that offset on Obj866E8 itself is the

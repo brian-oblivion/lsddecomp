@@ -12,7 +12,7 @@
  *
  * Two free functions round out the unit: CheckObj866E8CountFlag, called
  * directly (not through any vtable) from the still-uncarved
- * func_8004DE08, computes a 0/1 flag from an Obj866E8's own fields; and
+ * Class86B60__CommitNameEntry, computes a 0/1 flag from an Obj866E8's own fields; and
  * FormatNumberIntoBuffer, called from Class86B60's own ctor, formats a
  * number into a shared buffer whose broader role (nearby rodata strings
  * hint at a memory-card save label) is not established from this unit

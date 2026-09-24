@@ -199,7 +199,7 @@ void Class86B60__TickNameFieldCursor(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
  * matches what THIS call site needs. */
 extern void CheckObj866E8CountFlag(void *arg0, void *arg1, void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
 
-void func_8004DE08(Class86B60 *self)
+void Class86B60__CommitNameEntry(Class86B60 *self)
 {
     s32 size;
     s32 origUnk58;
