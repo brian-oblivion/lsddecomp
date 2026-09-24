@@ -1,38 +1,26 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
- *
  * class_3bb8c_l -- sixth carved slice of the class_3bb8c block
- * (0x435E0..0x44518, vram 0x80052DE0..0x80053D18), 20 functions.
- * Carved round 15.
+ * (0x435E0..0x44518, vram 0x80052DE0..0x80053D18), 20 functions, ALL
+ * MATCHED. Carved round 15; fully matched by round 45.
  *
- * Blocker profile. The carve-time census was a THREE-grep screen and one of
- * its three blockers is DEAD: `addiu_at` was RESOLVED in round 21 (maspsx
- * `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
- * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   ObjM__SetupSceneStyle  gp_rel        -- MATCHED round 45 (122/122 words). The
- *                  `gp_rel` blocker itself was RESOLVED round 42; see the
- *                  file-top banner above.
- *   ObjM__InitStyleAndWorld  was addiu-$at ONLY -- NOT BLOCKED. 137w.
- *                  ROUND 32: MATCHED, 137/137.
- *   ObjM__HandleStateCode  was addiu-$at ONLY -- NOT BLOCKED. 82w.
- *                  ROUND 32: MATCHED, 82/82, first attempt.
- *                  It OWNS jtbl_8001174C; the rodata slot at 0x1F4C is
- *                  attached to this unit for that reason, and a
- *                  `%lo(jtbl_*)` load is ordinary matchable code now.
- * The previous version of this comment ended "All three have stub reports;
- * do not attempt them" -- a stale DIRECTIVE, which is worse than a stale
- * count. Two of the three are free ground.
- * The other 17 are clean (ObjM__NoOpSlot40 and ObjM__NoOpSlot7C are bare
- * `jr $ra; nop` stubs splat generated itself, so 15 are real work).
+ * This slice is entirely `ObjM`'s own methods -- confirmed, not guessed:
+ * `tools/classtable.py 0x80087034` resolves the class's vtable directly to
+ * `ObjM__ObjM` (ctor) and `ObjM__Dtor` (dtor), the SAME class sibling unit
+ * class_3bb8c_m independently reached and named. The two units are NOT
+ * unified (round-13 struct-edit hazard; see the HEAD NOTE above
+ * `Obj87034_3bb8c_l`'s definition in include/class_3bb8c.h) -- this unit
+ * keeps its own local struct view, `Obj87034_3bb8c_l`, but round 78 named
+ * every function here with the confirmed `ObjM__` prefix to match.
+ *
+ * Mechanically this is the class's target/child attach-detach pair
+ * (`ObjM__AttachTarget`/`ObjM__DetachTarget`), its style/scene/world setup
+ * and teardown routines, an event dispatcher, and three of the class's
+ * `EnterStateN` handlers (`ObjM__EnterState4/5/6`) -- continuing, on the
+ * same `phase` field, the numbering class_3bb8c_m already established for
+ * `ObjM__EnterState7/8/A`. `ObjM__HandleStateCode` is the state-transition
+ * dispatcher that routes codes 0xA..0x11 onto those `EnterStateN` slots
+ * one-to-one (owns `jtbl_8001174C`). Two slots (`ObjM__NoOpSlot40`,
+ * `ObjM__NoOpSlot7C`) are splat-generated `jr $ra; nop` stubs, not work.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
