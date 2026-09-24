@@ -2857,7 +2857,7 @@ struct Obj86ED0 {
  * (39 slots, tools/classtable.py D_80086F88 -- header word 0x20). Carved
  * round 15; this unit is the first to write any of its methods. Only the
  * slots/fields this unit's functions actually touch are typed; the rest
- * stays opaque. `func_80052644`/`Class86F88__HandleInputCode` are two more of this
+ * stays opaque. `Class86F88__CreateRows`/`Class86F88__HandleInputCode` are two more of this
  * class's own methods (toolchain-blocked, stub reports filed, still
  * INCLUDE_ASM) -- not reflected here since nothing in this unit's C reads
  * through them yet.
@@ -2917,7 +2917,7 @@ struct Class86F88ElemMethods {
     u8 pad000[0x004];
     void (*release)(Class86F88Elem *self); /* +0x004 */
     u8 pad008[0x04C - 0x008];
-    /* +0x04C, round 45's func_80052644 -- called once per freshly-created
+    /* +0x04C, round 45's Class86F88__CreateRows -- called once per freshly-created
      * element right after `New_Obj6EAC0` returns it, before the same
      * element's own `slotB8` call. `arg2` points at a 2-word stack-local
      * (`D_8008AB00`'s value, then a running `D_8008AB04`-seeded

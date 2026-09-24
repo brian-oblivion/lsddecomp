@@ -25,7 +25,7 @@
  *                  was live for six rounds and would have warned a runner off
  *                  matchable ground. It still OWNS jtbl_800116F4, which is why
  *                  the rodata slot at 0x1EF4 is attached to this unit.
- *   func_80052644  gp_rel -- MATCHED round 45 (82/82 words). The `gp_rel`
+ *   Class86F88__CreateRows  gp_rel -- MATCHED round 45 (82/82 words). The `gp_rel`
  *                  blocker itself was RESOLVED round 42; see the file-top
  *                  banner above.
  * So: ONE blocked function, not two, and even that one is resolved now. The
@@ -275,7 +275,7 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 }
 
 /* Defined later in this file (ROM order); forward-declared here since
- * func_80052644 calls both, same convention as Obj865C8__EnterState2 in
+ * Class86F88__CreateRows calls both, same convention as Obj865C8__EnterState2 in
  * src/class_39e08.c. Signatures must match their real definitions below
  * exactly. */
 extern char *func_8005292C(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
@@ -288,7 +288,7 @@ extern void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
 extern s32 D_8008AB00;
 extern s32 D_8008AB04;
 
-/* func_80052644's own stack-local argument to Class86F88ElemMethods::
+/* Class86F88__CreateRows's own stack-local argument to Class86F88ElemMethods::
  * slot4C -- `a` is D_8008AB00's value, set once; `b` starts at
  * D_8008AB04's value and accumulates by 0xA per loop iteration. Kept
  * local to this unit (see the shared header's own `void *arg2` for that
@@ -298,7 +298,7 @@ typedef struct {
     s32 b;
 } Elem4CArg_3bb8c_k;
 
-void func_80052644(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
     char buf[0x20];
     Elem4CArg_3bb8c_k local;

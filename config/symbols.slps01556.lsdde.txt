@@ -2015,3 +2015,4 @@ Class86F88__ScrollRight = 0x80052430; // type:func
 Class86F88__ScrollLeft = 0x80052498; // type:func
 Class86F88__CursorUp = 0x800524F8; // type:func
 Class86F88__CursorDown = 0x80052598; // type:func
+Class86F88__CreateRows = 0x80052644; // type:func

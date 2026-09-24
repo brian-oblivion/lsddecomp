@@ -1,4 +1,6 @@
-# func_80052644 — MATCHED (round 45, 82/82 words)
+# Class86F88__CreateRows — MATCHED (round 45, 82/82 words)
+
+> Renamed from `func_80052644` on 2026-09-24 (tools/rename.py). Address 0x80052644.
 
 **Unit:** class_3bb8c_k · **Size:** 82 words (0x148 bytes)
 
@@ -23,7 +25,7 @@ typedef struct {
     s32 b;
 } Elem4CArg_3bb8c_k;
 
-void func_80052644(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
     char buf[0x20];
     Elem4CArg_3bb8c_k local;
@@ -83,7 +85,7 @@ adding a second, conflicting declaration.
 
 `func_8005292C` and `func_800529FC` are defined LATER in this same file
 (ROM order), so both needed forward `extern` declarations above
-`func_80052644`, matching their real definitions exactly — same convention
+`Class86F88__CreateRows`, matching their real definitions exactly — same convention
 already used for `Obj865C8__EnterState2`/`func_80050CD8` elsewhere this round.
 
 **One register-identity trap, closed by reordering two local
