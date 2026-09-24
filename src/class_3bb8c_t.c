@@ -21,7 +21,7 @@
  * NOT BLOCKED.  This unit's one "blocked" function was blocked on `addiu_at`
  * ALONE, and `addiu_at` was RESOLVED in round 21 (maspsx `--addiu-at`;
  * docs/research/addiu-at-blocker.md).
- *   func_800585B4 (56w)  MATCHED round 41 (2026-09-14) from a first-ever
+ *   GraphRoomObj__ScoreDayLog (56w)  MATCHED round 41 (2026-09-14) from a first-ever
  *                        permuter search seeded on round 24's stall (was
  *                        55/56 words, 1 short, 15/56 raw).  See its match
  *                        report for the derivation -- the fix was a pair
@@ -47,7 +47,7 @@
  */
 #include "common.h"
 
-/* The class allocated by this unit's own func_80057F68, table D_800879C4
+/* The class allocated by this unit's own New_GraphRoomObj, table D_800879C4
  * (49 slots, resolved via tools/classtable.py). Its ctor (D800879C4__D800879C4)
  * and its own funcs 80057F38/40/48/50 live in the neighbouring
  * `class_3bb8c_p` unit (round 2026-09-04 earlier this round), which
@@ -71,22 +71,22 @@ typedef struct D_80087AACObj D_80087AACObj;
  * this same table with different slot arities). */
 typedef struct D_8006E730Methods {
     u8 pad00[0x8];
-    /* +0x008, called by this unit's own func_80057FC8 as (self, 0, str,
+    /* +0x008, called by this unit's own GraphRoomObj__GraphRoomObj as (self, 0, str,
      * 0). */
     void (*slot8)(D_80087AACObj *self, s32 arg1, char *str, s32 arg2);
     u8 pad0C[0x44 - 0xC];
-    /* +0x044, called by this unit's own func_80058390 as (self, arg1,
+    /* +0x044, called by this unit's own GraphRoomObj__func_80058390 as (self, arg1,
      * arg2). */
     void (*slot44)(D_80087AACObj *self, void *arg1, void *arg2);
     u8 pad48[0x5C - 0x48];
-    /* +0x05C, called by this unit's own func_800580E0 as (self, arg1,
+    /* +0x05C, called by this unit's own GraphRoomObj__UpdateFromLog as (self, arg1,
      * arg2). */
     void (*slot5C)(D_80087AACObj *self, void *arg1, void *arg2);
     u8 pad60[0xDC - 0x60];
-    /* +0x0DC, called by this unit's own func_80058308 as (self) -- the
+    /* +0x0DC, called by this unit's own GraphRoomObj__Destroy as (self) -- the
      * base-class dtor step. */
     void (*slotDC)(D_80087AACObj *self);
-    /* +0x0E0, called by this unit's own func_80058404 as (self, arg1) --
+    /* +0x0E0, called by this unit's own GraphRoomObj__PopulateGraphPoints as (self, arg1) --
      * the FIRST thing that function does, before touching anything else
      * (round 19). */
     void (*slotE0)(D_80087AACObj *self, void *arg1);
@@ -109,7 +109,7 @@ D_800879C4Table *func_80057F58(void) {
     return &D_800879C4;
 }
 
-/* The class allocated below, table D_80087AAC (73 slots, resolved via
+/* The class allocated below, table gGraphRoomMethods (73 slots, resolved via
  * tools/classtable.py). This unit owns the whole class -- ctor, dtor and
  * every slot referenced from within it are all in this file. Only the
  * fields/slots each function actually touches are typed; the rest stay
@@ -117,51 +117,51 @@ D_800879C4Table *func_80057F58(void) {
  * method to be named up front. */
 typedef struct D_80087AACMethods {
     u8 pad00[0x8];
-    /* +0x008, this unit's own ctor (func_80057FC8). */
+    /* +0x008, this unit's own ctor (GraphRoomObj__GraphRoomObj). */
     D_80087AACObj *(*ctor)(D_80087AACObj *self, void *arg1);
     u8 pad0C[0x40 - 0xC];
-    /* +0x040, called by this unit's own func_80057FC8 as (self, arg1) --
-     * a TAIL CALL, its return value forwarded as func_80057FC8's own. */
+    /* +0x040, called by this unit's own GraphRoomObj__GraphRoomObj as (self, arg1) --
+     * a TAIL CALL, its return value forwarded as GraphRoomObj__GraphRoomObj's own. */
     void *(*slot40)(D_80087AACObj *self, void *arg1);
     u8 pad44[0x6C - 0x44];
-    /* +0x06C, called by this unit's own func_80058078 as (self, flag). */
+    /* +0x06C, called by this unit's own GraphRoomObj__InitDisplay as (self, flag). */
     void (*slot6C)(D_80087AACObj *self, s32 arg1);
-    /* +0x070, called by this unit's own func_800581C4 as (self, size). */
+    /* +0x070, called by this unit's own GraphRoomObj__HandleUnscored as (self, size). */
     void (*slot70)(D_80087AACObj *self, s32 arg1);
     u8 pad74[0x94 - 0x74];
-    /* +0x094, called by this unit's own func_800581C4 as (self). */
+    /* +0x094, called by this unit's own GraphRoomObj__HandleUnscored as (self). */
     void (*slot94)(D_80087AACObj *self);
     u8 pad98[0xD4 - 0x98];
-    /* +0x0D4, called by this unit's own func_80058078 as (self, str,
+    /* +0x0D4, called by this unit's own GraphRoomObj__InitDisplay as (self, str,
      * 0). */
     void (*slotD4)(D_80087AACObj *self, char *str, s32 arg2);
-    /* +0x0D8, called by this unit's own func_80057FC8 as (self, 0). */
+    /* +0x0D8, called by this unit's own GraphRoomObj__GraphRoomObj as (self, 0). */
     void (*slotD8)(D_80087AACObj *self, s32 arg1);
     u8 padDC[0x124 - 0xDC];
-    /* +0x124, this unit's own func_80058694, called by func_800580E0 as
+    /* +0x124, this unit's own GraphRoomObj__TickHighlight, called by GraphRoomObj__UpdateFromLog as
      * (self). */
     void (*slot124)(D_80087AACObj *self);
 } D_80087AACMethods;
-extern D_80087AACMethods *func_80058764(void);
+extern D_80087AACMethods *GetGraphRoomMethods(void);
 
 /* This unit's own view of one entry of D_80087AACObj::unk_0xA8 -- only
- * the one slot this unit's own func_80058694 dispatches through is
+ * the one slot this unit's own GraphRoomObj__TickHighlight dispatches through is
  * typed. */
 typedef struct D_80087AACEntry D_80087AACEntry;
 typedef struct D_80087AACEntryMethods {
     u8 pad00[0x4];
-    /* +0x004, called by this unit's own func_80058308 as (self) -- a
+    /* +0x004, called by this unit's own GraphRoomObj__Destroy as (self) -- a
      * per-entry destructor, in a 100-iteration loop over unk_0xA8. */
     void (*slot4)(D_80087AACEntry *self);
     u8 pad08[0x60 - 0x8];
-    /* +0x060, called by this unit's own func_800580E0 as (self, flag). */
+    /* +0x060, called by this unit's own GraphRoomObj__UpdateFromLog as (self, flag). */
     void (*slot60)(D_80087AACEntry *self, s32 arg1);
     u8 pad64[0xB8 - 0x64];
-    /* +0x0B8, called by this unit's own func_80058694 as (self, 1,
+    /* +0x0B8, called by this unit's own GraphRoomObj__TickHighlight as (self, 1,
      * &global). */
     void (*slotB8)(D_80087AACEntry *self, s32 arg1, void *arg2);
     u8 padBC[0xC4 - 0xBC];
-    /* +0x0C4, called by this unit's own func_80058404 as (self, arg1,
+    /* +0x0C4, called by this unit's own GraphRoomObj__PopulateGraphPoints as (self, arg1,
      * &point, 0), where `point` is a 2-word {x, y}-shaped local (round
      * 19). */
     void (*slotC4)(D_80087AACEntry *self, void *arg1, s32 *point, s32 arg3);
@@ -171,11 +171,11 @@ struct D_80087AACEntry {
 };
 
 /* Object pointed to by D_80087AACObj::unk_0x48 -- only the one slot
- * this unit's own func_80057FC8 dispatches through is typed. */
+ * this unit's own GraphRoomObj__GraphRoomObj dispatches through is typed. */
 typedef struct D_80087AACUnk48Obj D_80087AACUnk48Obj;
 typedef struct D_80087AACUnk48Methods {
     u8 pad00[0x9C];
-    /* +0x09C, called by this unit's own func_80057FC8 as (self, -1). */
+    /* +0x09C, called by this unit's own GraphRoomObj__GraphRoomObj as (self, -1). */
     void (*slot9C)(D_80087AACUnk48Obj *self, s32 arg1);
 } D_80087AACUnk48Methods;
 struct D_80087AACUnk48Obj {
@@ -183,18 +183,18 @@ struct D_80087AACUnk48Obj {
 };
 
 /* Object pointed to by D_80087AACObj::unk_0xA4 -- passed in as this
- * unit's own ctor's `arg1` (func_80057FC8) and dispatched through by
- * func_800580E0/func_80058404 (both still queued at slot +0x1B0). Only
+ * unit's own ctor's `arg1` (GraphRoomObj__GraphRoomObj) and dispatched through by
+ * GraphRoomObj__UpdateFromLog/GraphRoomObj__PopulateGraphPoints (both still queued at slot +0x1B0). Only
  * that one slot is typed. */
 typedef struct D_80087AACUnkA4Obj D_80087AACUnkA4Obj;
 /* Return type of D_80087AACUnkA4Methods::slot1B0.
  *
- * It is a DAY-LOG object, established by func_800585B4 (round 24): the two
- * fields func_800580E0 reads at +0x4/+0x8 are a mode flag and a live day
+ * It is a DAY-LOG object, established by GraphRoomObj__ScoreDayLog (round 24): the two
+ * fields GraphRoomObj__UpdateFromLog reads at +0x4/+0x8 are a mode flag and a live day
  * count, and +0x18 is a 365-entry halfword year ring whose length is fixed
- * by func_800585B4's wrap constant (the index resets to 0x16C == 364 when
+ * by GraphRoomObj__ScoreDayLog's wrap constant (the index resets to 0x16C == 364 when
  * it goes negative, so 365 entries).  Extended ADDITIVELY -- +0x4 and +0x8
- * keep their offsets, so func_800580E0's codegen is unaffected.
+ * keep their offsets, so GraphRoomObj__UpdateFromLog's codegen is unaffected.
  *
  * LEAD, not a claim: a 365-entry log of 2-byte points is the shape of
  * `MoodGraphPoint moodPreviousDays[365]` in include/DreamSys.h, and the
@@ -215,12 +215,12 @@ typedef struct D_80087AACUnkA4Result {
     /* +0x018, the year ring, walked backwards from unk_0x8 - 1. */
     s16 days[365];
     u8 pad2F2[0x467 - 0x2F2];
-    /* +0x467, set once func_800585B4's scan has succeeded. */
+    /* +0x467, set once GraphRoomObj__ScoreDayLog's scan has succeeded. */
     s8 scored;
 } D_80087AACUnkA4Result;
 typedef struct D_80087AACUnkA4Methods {
     u8 pad00[0x1B0];
-    /* +0x1B0, called by this unit's own func_800580E0/func_80058404 as
+    /* +0x1B0, called by this unit's own GraphRoomObj__UpdateFromLog/GraphRoomObj__PopulateGraphPoints as
      * (self, 0). */
     D_80087AACUnkA4Result *(*slot1B0)(D_80087AACUnkA4Obj *self, s32 arg1);
 } D_80087AACUnkA4Methods;
@@ -231,44 +231,44 @@ struct D_80087AACUnkA4Obj {
 struct D_80087AACObj {
     D_80087AACMethods *methods;
     u8 pad04[0x1C - 0x4];
-    /* +0x01C, read by this unit's own func_80058694 (unsigned
+    /* +0x01C, read by this unit's own GraphRoomObj__TickHighlight (unsigned
      * comparisons -- `sltiu`). */
     u32 unk_0x1C;
     u8 pad20[0x2C - 0x20];
-    /* +0x02C, written by this unit's own func_80058078. */
+    /* +0x02C, written by this unit's own GraphRoomObj__InitDisplay. */
     s32 unk_0x2C;
     u8 pad30[0x38 - 0x30];
-    /* +0x038, read by this unit's own func_80058390. */
+    /* +0x038, read by this unit's own GraphRoomObj__func_80058390. */
     s32 unk_0x38;
-    /* +0x03C, read by this unit's own func_800580E0. */
+    /* +0x03C, read by this unit's own GraphRoomObj__UpdateFromLog. */
     s32 unk_0x3C;
     u8 pad40[0x48 - 0x40];
-    /* +0x048, read by this unit's own func_80057FC8. */
+    /* +0x048, read by this unit's own GraphRoomObj__GraphRoomObj. */
     D_80087AACUnk48Obj *unk_0x48;
     u8 pad4C[0x84 - 0x4C];
-    /* +0x084, written by this unit's own func_80058078. */
+    /* +0x084, written by this unit's own GraphRoomObj__InitDisplay. */
     s32 unk_0x84;
     u8 pad88[0xA4 - 0x88];
-    /* +0x0A4, set by this unit's own ctor (func_80057FC8) to its own
-     * `arg1`; dispatched through by func_800580E0/func_80058404. */
+    /* +0x0A4, set by this unit's own ctor (GraphRoomObj__GraphRoomObj) to its own
+     * `arg1`; dispatched through by GraphRoomObj__UpdateFromLog/GraphRoomObj__PopulateGraphPoints. */
     D_80087AACUnkA4Obj *unk_0xA4;
     /* +0x0A8, a 100-entry array of `D_80087AACEntry *` -- built by this
-     * unit's own func_80058228 (still queued), destroyed by
-     * func_80058308 (still queued), indexed by func_80058694. */
+     * unit's own GraphRoomObj__BuildGraphPoints (still queued), destroyed by
+     * GraphRoomObj__Destroy (still queued), indexed by GraphRoomObj__TickHighlight. */
     D_80087AACEntry *unk_0xA8[100];
-    /* +0x238, read by this unit's own func_800581C4/func_80058390. */
+    /* +0x238, read by this unit's own GraphRoomObj__HandleUnscored/GraphRoomObj__func_80058390. */
     s32 unk_0x238;
-    /* +0x23C, read/written by this unit's own func_80058694 (unsigned
+    /* +0x23C, read/written by this unit's own GraphRoomObj__TickHighlight (unsigned
      * comparison -- `sltiu`). */
     u32 unk_0x23C;
-    /* +0x240, read by this unit's own func_80058694. */
+    /* +0x240, read by this unit's own GraphRoomObj__TickHighlight. */
     s8 *unk_0x240;
 };
 
-void *func_80057F68(void *arg1) {
+void *New_GraphRoomObj(void *arg1) {
     void *obj = BMemPMgrAlloc(0x244);
     if (obj != NULL) {
-        func_80058764()->ctor(obj, arg1);
+        GetGraphRoomMethods()->ctor(obj, arg1);
         return obj;
     }
     return NULL;
@@ -276,9 +276,9 @@ void *func_80057F68(void *arg1) {
 
 extern char D_8001176C[];
 
-void *func_80057FC8(D_80087AACObj *self, void *arg1) {
+void *GraphRoomObj__GraphRoomObj(D_80087AACObj *self, void *arg1) {
     Get_vtable_TaskCore()->slot8(self, 0, D_8001176C, 0);
-    self->methods = func_80058764();
+    self->methods = GetGraphRoomMethods();
     self->unk_0x48->methods->slot9C(self->unk_0x48, -1);
     self->unk_0xA4 = arg1;
     self->methods->slotD8(self, 0);
@@ -287,14 +287,14 @@ void *func_80057FC8(D_80087AACObj *self, void *arg1) {
 
 extern char D_80011778[];
 
-void func_80058078(D_80087AACObj *self) {
+void GraphRoomObj__InitDisplay(D_80087AACObj *self) {
     self->unk_0x84 = 5;
     self->unk_0x2C = 0x190;
     self->methods->slotD4(self, D_80011778, 0);
     self->methods->slot6C(self, 0xA);
 }
 
-void func_800580E0(D_80087AACObj *self, void *arg1, void *arg2) {
+void GraphRoomObj__UpdateFromLog(D_80087AACObj *self, void *arg1, void *arg2) {
     Get_vtable_TaskCore()->slot5C(self, arg1, arg2);
     if (self->unk_0x3C == 1) {
         D_80087AACUnkA4Result *result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
@@ -305,7 +305,7 @@ void func_800580E0(D_80087AACObj *self, void *arg1, void *arg2) {
     self->methods->slot124(self);
 }
 
-void func_800581C4(D_80087AACObj *self) {
+void GraphRoomObj__HandleUnscored(D_80087AACObj *self) {
     if (self->unk_0x238 == 0) {
         self->methods->slot70(self, 0x10);
         self->methods->slot94(self);
@@ -327,7 +327,7 @@ extern u8 D_8008ABB4;
 extern D_8008ABB8Color D_8008ABB8;
 extern D_80087AACEntry *New_ClassEAC0(void *a0, void *a1, s32 a2);
 
-void func_80058228(D_80087AACObj *self) {
+void GraphRoomObj__BuildGraphPoints(D_80087AACObj *self) {
     D_8008ABB8Color rgb;
     s32 i;
 
@@ -350,7 +350,7 @@ void func_80058228(D_80087AACObj *self) {
 
 extern void BMemPMgrFree(void *arg);
 
-void func_80058308(D_80087AACObj *self) {
+void GraphRoomObj__Destroy(D_80087AACObj *self) {
     s32 i;
 
     BMemPMgrFree(self->unk_0x240);
@@ -360,7 +360,7 @@ void func_80058308(D_80087AACObj *self) {
     Get_vtable_TaskCore()->slotDC(self);
 }
 
-s32 func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
+s32 GraphRoomObj__func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
     s32 result;
     Get_vtable_TaskCore()->slot44(self, arg1, arg2);
     result = 2;
@@ -370,15 +370,15 @@ s32 func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
     return result;
 }
 
-extern s32 func_800585B4(D_80087AACObj *self, D_80087AACUnkA4Result *arg1);
+extern s32 GraphRoomObj__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *arg1);
 
-/* A 2-word {x, y}-shaped point, matching what this unit's own func_80058404
+/* A 2-word {x, y}-shaped point, matching what this unit's own GraphRoomObj__PopulateGraphPoints
  * passes to D_80087AACEntryMethods::slotC4 (round 19). */
 typedef struct Point2 {
     s32 x, y;
 } Point2;
 
-void func_80058404(D_80087AACObj *self, void *arg1) {
+void GraphRoomObj__PopulateGraphPoints(D_80087AACObj *self, void *arg1) {
     D_80087AACUnkA4Result *result;
     s32 count;
     s32 i;
@@ -389,7 +389,7 @@ void func_80058404(D_80087AACObj *self, void *arg1) {
 
     Get_vtable_TaskCore()->slotE0(self, arg1);
     result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
-    self->unk_0x238 = func_800585B4(self, result);
+    self->unk_0x238 = GraphRoomObj__ScoreDayLog(self, result);
 
     flag = 0;
     if (result->unk_0x4 != 0) {
@@ -448,7 +448,7 @@ extern s16 D_80087BD4[4];
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
  * words without). Do not "simplify" this without re-running
  * ./build-and-verify.sh. */
-s32 func_800585B4(D_80087AACObj *self, D_80087AACUnkA4Result *log)
+s32 GraphRoomObj__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *log)
 {
     u32 i;
     s16 *days;
@@ -503,7 +503,7 @@ fail:
 
 extern s32 D_8008ABBC;
 
-void func_80058694(D_80087AACObj *self) {
+void GraphRoomObj__TickHighlight(D_80087AACObj *self) {
     if (self->unk_0x238 != 0) {
         if (self->unk_0x1C >= 0x1F) {
             if (self->unk_0x23C < 4) {
@@ -517,8 +517,8 @@ void func_80058694(D_80087AACObj *self) {
     }
 }
 
-extern D_80087AACMethods D_80087AAC;
+extern D_80087AACMethods gGraphRoomMethods;
 
-D_80087AACMethods *func_80058764(void) {
-    return &D_80087AAC;
+D_80087AACMethods *GetGraphRoomMethods(void) {
+    return &gGraphRoomMethods;
 }

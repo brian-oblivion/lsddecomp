@@ -1,12 +1,14 @@
-# func_80058694 -- MATCHED (52/52)
+# GraphRoomObj__TickHighlight -- MATCHED (52/52)
 
-Unit: `src/class_3bb8c_t.c`. Class: `D_80087AAC`, own vtable slot `+0x124`
-(resolved via `tools/classtable.py D_80087AAC`).
+> Renamed from `func_80058694` on 2026-09-24 (tools/rename.py). Address 0x80058694.
+
+Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x124`
+(resolved via `tools/classtable.py gGraphRoomMethods`).
 
 ## Signature
 
 ```c
-void func_80058694(D_80087AACObj *self);
+void GraphRoomObj__TickHighlight(D_80087AACObj *self);
 ```
 
 ## Body
@@ -14,7 +16,7 @@ void func_80058694(D_80087AACObj *self);
 ```c
 extern s32 D_8008ABBC;
 
-void func_80058694(D_80087AACObj *self) {
+void GraphRoomObj__TickHighlight(D_80087AACObj *self) {
     if (self->unk_0x238 != 0) {
         if (self->unk_0x1C >= 0x1F) {
             if (self->unk_0x23C < 4) {
@@ -32,7 +34,7 @@ void func_80058694(D_80087AACObj *self) {
 Four nested guards, all gating a single call through
 `self->unk_0xA8[idx]->methods->slotB8` (a new opaque entry type,
 `D_80087AACEntry`, for the 100-entry `unk_0xA8` array this unit's own
-`func_80058228`/`func_80058308` build/destroy). `self->unk_0x1C % 24 ==
+`GraphRoomObj__BuildGraphPoints`/`GraphRoomObj__Destroy` build/destroy). `self->unk_0x1C % 24 ==
 0` reproduces retail's `multu`/`mfhi`/reconstruct-and-compare magic-number
 sequence with a plain `%`, per the existing `x % N for a compile-time
 constant N` learning.
@@ -57,5 +59,5 @@ constant N` learning.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80058694   # 52/52
+tools/funcdiff.py GraphRoomObj__TickHighlight   # 52/52
 ```

@@ -1,12 +1,14 @@
-# func_80058308 -- MATCHED (34/34)
+# GraphRoomObj__Destroy -- MATCHED (34/34)
 
-Unit: `src/class_3bb8c_t.c`. Class: `D_80087AAC`, own vtable slot `+0x0DC`
-(resolved via `tools/classtable.py D_80087AAC`) -- this class's dtor.
+> Renamed from `func_80058308` on 2026-09-24 (tools/rename.py). Address 0x80058308.
+
+Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x0DC`
+(resolved via `tools/classtable.py gGraphRoomMethods`) -- this class's dtor.
 
 ## Signature
 
 ```c
-void func_80058308(D_80087AACObj *self);
+void GraphRoomObj__Destroy(D_80087AACObj *self);
 ```
 
 ## Body
@@ -14,7 +16,7 @@ void func_80058308(D_80087AACObj *self);
 ```c
 extern void BMemPMgrFree(void *arg);
 
-void func_80058308(D_80087AACObj *self) {
+void GraphRoomObj__Destroy(D_80087AACObj *self) {
     s32 i;
 
     BMemPMgrFree(self->unk_0x240);
@@ -34,5 +36,5 @@ chains to the shared base class's own dtor (`+0x0DC`).
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80058308   # 34/34
+tools/funcdiff.py GraphRoomObj__Destroy   # 34/34
 ```

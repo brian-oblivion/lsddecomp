@@ -1,12 +1,14 @@
-# func_80058078 -- MATCHED (26/26)
+# GraphRoomObj__InitDisplay -- MATCHED (26/26)
 
-Unit: `src/class_3bb8c_t.c`. Class: `D_80087AAC`, own vtable slot `+0x040`
-(resolved via `tools/classtable.py D_80087AAC`).
+> Renamed from `func_80058078` on 2026-09-24 (tools/rename.py). Address 0x80058078.
+
+Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x040`
+(resolved via `tools/classtable.py gGraphRoomMethods`).
 
 ## Signature
 
 ```c
-void func_80058078(D_80087AACObj *self);
+void GraphRoomObj__InitDisplay(D_80087AACObj *self);
 ```
 
 ## Body
@@ -14,7 +16,7 @@ void func_80058078(D_80087AACObj *self);
 ```c
 extern char D_80011778[];
 
-void func_80058078(D_80087AACObj *self) {
+void GraphRoomObj__InitDisplay(D_80087AACObj *self) {
     self->unk_0x84 = 5;
     self->unk_0x2C = 0x190;
     self->methods->slotD4(self, D_80011778, 0);
@@ -32,5 +34,5 @@ and `D_80087AACObj::unk_0x2C/unk_0x84` (additive extensions).
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80058078   # 26/26
+tools/funcdiff.py GraphRoomObj__InitDisplay   # 26/26
 ```

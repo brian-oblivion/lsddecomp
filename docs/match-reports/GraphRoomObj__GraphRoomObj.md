@@ -1,14 +1,16 @@
-# func_80057FC8 -- MATCHED (44/44)
+# GraphRoomObj__GraphRoomObj -- MATCHED (44/44)
 
-Unit: `src/class_3bb8c_t.c`. Class: `D_80087AAC`, own vtable slot `+0x008`
--- THIS is `D_80087AAC`'s own ctor (resolved via `tools/classtable.py
-D_80087AAC`), the callee of this unit's own `func_80057F68`'s `ctor(...)`
+> Renamed from `func_80057FC8` on 2026-09-24 (tools/rename.py). Address 0x80057fc8.
+
+Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x008`
+-- THIS is `gGraphRoomMethods`'s own ctor (resolved via `tools/classtable.py
+gGraphRoomMethods`), the callee of this unit's own `New_GraphRoomObj`'s `ctor(...)`
 call.
 
 ## Signature
 
 ```c
-void *func_80057FC8(D_80087AACObj *self, void *arg1);
+void *GraphRoomObj__GraphRoomObj(D_80087AACObj *self, void *arg1);
 ```
 
 ## Body
@@ -16,9 +18,9 @@ void *func_80057FC8(D_80087AACObj *self, void *arg1);
 ```c
 extern char D_8001176C[];
 
-void *func_80057FC8(D_80087AACObj *self, void *arg1) {
+void *GraphRoomObj__GraphRoomObj(D_80087AACObj *self, void *arg1) {
     Get_vtable_TaskCore()->slot8(self, 0, D_8001176C, 0);
-    self->methods = func_80058764();
+    self->methods = GetGraphRoomMethods();
     self->unk_0x48->methods->slot9C(self->unk_0x48, -1);
     self->unk_0xA4 = arg1;
     self->methods->slotD8(self, 0);
@@ -28,7 +30,7 @@ void *func_80057FC8(D_80087AACObj *self, void *arg1) {
 
 Chains through the shared base class (`Get_vtable_TaskCore()`, this unit's own
 local view, extended with `+0x008`), then sets its own vtable
-(`self->methods = func_80058764()`, `&D_80087AAC` -- the standard ctor
+(`self->methods = GetGraphRoomMethods()`, `&gGraphRoomMethods` -- the standard ctor
 "set my own vtable" step), dispatches through `self->unk_0x48` (a new
 opaque object type, `D_80087AACUnk48Obj`), stashes `arg1` into
 `self->unk_0xA4`, and finally TAIL-CALLS its own class's `+0x040` slot
@@ -47,7 +49,7 @@ D_80087AACUnk48Obj *unk48 = self->unk_0x48;
 unk48->methods->slot9C(unk48, -1);
 ```
 scored 3/44 with the frame one word too long -- caching the field across
-the intervening `func_80058764()` call forces a spurious callee-saved
+the intervening `GetGraphRoomMethods()` call forces a spurious callee-saved
 register, same family as the existing "do not cache a `this->field`
 across an intervening vtable call" learning. Re-reading `self->unk_0x48`
 directly at both use sites matched exactly.
@@ -56,5 +58,5 @@ directly at both use sites matched exactly.
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80057FC8   # 44/44
+tools/funcdiff.py GraphRoomObj__GraphRoomObj   # 44/44
 ```

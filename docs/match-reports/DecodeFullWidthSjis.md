@@ -378,7 +378,7 @@ spends a register this build does not.** A candidate pool built on the
 latter phrasing will be mostly false, which is the same "a screen
 measures the obstruction it was built for" failure this project keeps
 rediscovering -- and I hit it twice inside one sitting building this very
-pool (`func_800585B4`'s "cursor" turned out to be a ring-buffer FIELD,
+pool (`GraphRoomObj__ScoreDayLog`'s "cursor" turned out to be a ring-buffer FIELD,
 not a register).
 
 ## ROUND 38 (bravo, salvaged by head): round 37's 22/24 body INDEPENDENTLY REBUILT and confirmed; permuter base score 60; search never ran

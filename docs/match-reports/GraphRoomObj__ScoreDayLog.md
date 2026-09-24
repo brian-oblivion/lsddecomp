@@ -1,4 +1,6 @@
-# func_800585B4 -- MATCHED (56/56 words, byte-exact)
+# GraphRoomObj__ScoreDayLog -- MATCHED (56/56 words, byte-exact)
+
+> Renamed from `func_800585B4` on 2026-09-24 (tools/rename.py). Address 0x800585b4.
 
 Unit: `src/class_3bb8c_t.c` · Size: 56 words (file 0x48DB4-0x48E94) · Round 41
 (2026-09-14), runner echo, worktree `lsddecomp2-wt-echo`.
@@ -121,7 +123,7 @@ extern s16 D_80087BD4[4];
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
  * words without). Do not "simplify" this without re-running
  * ./build-and-verify.sh. */
-s32 func_800585B4(D_80087AACObj *self, D_80087AACUnkA4Result *log)
+s32 GraphRoomObj__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *log)
 {
     u32 i;
     s16 *days;

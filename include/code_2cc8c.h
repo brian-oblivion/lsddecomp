@@ -13,8 +13,8 @@ typedef struct Pair32E99C Pair32E99C;
 
 /*
  * The class whose method table is gClass86B60Methods (78 slots, base) with a
- * derived override table at D_80087AAC (73 slots) -- resolved with
- * tools/classtable.py gClass86B60Methods / gClass86B60Methods --vs D_80087AAC. No FirecatFG
+ * derived override table at gGraphRoomMethods (73 slots) -- resolved with
+ * tools/classtable.py gClass86B60Methods / gClass86B60Methods --vs gGraphRoomMethods. No FirecatFG
  * name survives, so the struct is named `Obj86B60` after the base table's
  * address and fields are named by offset until real names are known. Per
  * this project's established multiple-independent-local-views convention

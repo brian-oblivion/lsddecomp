@@ -1,18 +1,20 @@
-# func_80058390 -- MATCHED (29/29)
+# GraphRoomObj__func_80058390 -- MATCHED (29/29)
 
-Unit: `src/class_3bb8c_t.c`. Class: `D_80087AAC`, own vtable slot `+0x044`
-(resolved via `tools/classtable.py D_80087AAC`).
+> Renamed from `func_80058390` on 2026-09-24 (tools/rename.py). Address 0x80058390.
+
+Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x044`
+(resolved via `tools/classtable.py gGraphRoomMethods`).
 
 ## Signature
 
 ```c
-s32 func_80058390(D_80087AACObj *self, void *arg1, void *arg2);
+s32 GraphRoomObj__func_80058390(D_80087AACObj *self, void *arg1, void *arg2);
 ```
 
 ## Body
 
 ```c
-s32 func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
+s32 GraphRoomObj__func_80058390(D_80087AACObj *self, void *arg1, void *arg2) {
     s32 result;
     Get_vtable_TaskCore()->slot44(self, arg1, arg2);
     result = 2;
@@ -47,5 +49,5 @@ Names `D_80087AACObj::unk_0x38` (additive split of the class struct's pad).
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-tools/funcdiff.py func_80058390   # 29/29
+tools/funcdiff.py GraphRoomObj__func_80058390   # 29/29
 ```
