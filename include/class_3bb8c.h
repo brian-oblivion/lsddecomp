@@ -1262,7 +1262,9 @@ struct Class86B60Methods {
 struct Class86B60 {
     Class86B60Methods *methods;    /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, Class86B60__RegisterHandlers/Class86B60__EndMemcardSave */
+    Class86B60UnkCObj_3bb8c_d *handlerTable; /* +0x00C, Class86B60__RegisterHandlers/Class86B60__EndMemcardSave.
+                                        RENAMED from unkC -- the fixed-entry table object
+                                        Class86B60__RegisterHandlers walks. */
     void *unk10;                     /* +0x010, Class86B60__EndMemcardSave: opaque, forwarded verbatim */
     void *unk14;                     /* +0x014, Class86B60__BeginMemcardSave: opaque, forwarded verbatim to unkAC->methods->slot6C */
     u8 pad018[0x02C - 0x018];
@@ -1320,7 +1322,10 @@ struct Class86B60 {
      * round's Class86B60__Dtor is what proves it is dereferenced through a
      * vtable, so it is retyped a pointer here (same size, no layout
      * change). */
-    GenericReleaseObj_3bb8c_d *unkA8; /* +0x0A8, Class86B60__Dtor: released iff unkAC != NULL */
+    GenericReleaseObj_3bb8c_d *iconHandle; /* +0x0A8, Class86B60__Dtor: released iff unkAC != NULL.
+                                        RENAMED from unkA8 -- the `func_8003B39C(D_800114F8)`
+                                        return value (D_800114F8 = "CARD\FILEICN1.TIM"), see
+                                        Class86B60__BeginMemcardSave. */
     /* +0x0AC, Class86B60__Class86B60: zeroed; Class86B60__Dtor: guards both releases.
      * RETYPED from the minimal `GenericReleaseObj_3bb8c_d *` to the
      * dedicated `Class86B60UnkACObj_3bb8c_d *` -- Class86B60__EndMemcardSave reaches a
@@ -1333,7 +1338,8 @@ struct Class86B60 {
      * reaches a SECOND slot (`+0x04C`) on the same pointer that
      * `unkA8`/`unkAC` never do, so it is kept a distinct local view
      * rather than assuming the other two share its fuller shape. */
-    Class86B60UnkB0Obj_3bb8c_d *unkB0;
+    Class86B60UnkB0Obj_3bb8c_d *nameField; /* RENAMED from unkB0 -- the New_Obj6EAC0 result
+                                        Class86B60__CreateNameField constructs. */
     u8 pad0B4[0x0BC - 0x0B4];
     s32 unkBC;                      /* +0x0BC, Class86B60__Class86B60: return value of dreamSys->methods->slot1B0 */
     s32 unkC0;                      /* +0x0C0, Class86B60__Class86B60: output buffer address passed BY REFERENCE

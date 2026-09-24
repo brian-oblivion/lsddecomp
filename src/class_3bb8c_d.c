@@ -5,7 +5,7 @@ void Class86B60__Dtor(Class86B60 *self)
 {
     if (self->unkAC != NULL) {
         self->unkAC->methods->release(self->unkAC);
-        self->unkA8->methods->release(self->unkA8);
+        self->iconHandle->methods->release(self->iconHandle);
     }
     Get_vtable_TaskCore()->slot0C(self);
 }
@@ -35,7 +35,7 @@ void Class86B60__RegisterHandlers(Class86B60 *self)
     i = 0;
     entry = (u8 *)&D_80086DAC;
     for (; i < 2; i++) {
-        self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk93, entry);
+        self->handlerTable->unk0->methods->slot78(self->handlerTable->unk0, &self->unk93, entry);
         entry += 0xC;
     }
 }
@@ -126,23 +126,23 @@ void Class86B60__CreateNameField(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     size = (size >> 1) + 4;
     buf = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf, D_8008AA18);
-    self->unkB0 = (Class86B60UnkB0Obj_3bb8c_d *)New_Obj6EAC0(arg1->unk4, size, buf);
-    self->unkB0->unkAB = 8;
-    self->unkB0->unkAC = 4;
-    self->unkB0->unkAA = 9;
+    self->nameField = (Class86B60UnkB0Obj_3bb8c_d *)New_Obj6EAC0(arg1->unk4, size, buf);
+    self->nameField->unkAB = 8;
+    self->nameField->unkAC = 4;
+    self->nameField->unkAA = 9;
     BMemPMgrFree(buf);
 }
 
 void Class86B60__DestroyNameField(Class86B60 *self)
 {
-    self->unkB0->methods->release(self->unkB0);
+    self->nameField->methods->release(self->nameField);
     Get_vtable_TaskCore()->slotDC(self);
 }
 
 void Class86B60__ForwardToNameField(Class86B60 *self, s32 arg1)
 {
     Get_vtable_TaskCore()->slotE0(self, arg1);
-    self->unkB0->methods->slot4C(self->unkB0, arg1, &D_8008A9B4);
+    self->nameField->methods->slot4C(self->nameField, arg1, &D_8008A9B4);
 }
 
 /* Class86B60__TickNameFieldCursor's own `arg1`: a 3-byte colour-like triple, copied whole into
@@ -188,7 +188,7 @@ void Class86B60__TickNameFieldCursor(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
     if (D_8008AA2C >= 0x101) {
         D_8008AA2C = 0;
     }
-    self->unkB0->methods->slotB8(self->unkB0, &buf);
+    self->nameField->methods->slotB8(self->nameField, &buf);
 }
 
 /* CheckObj866E8CountFlag is ALREADY MATCHED (src/class_3bb8c_c.c), as a genuinely
@@ -206,11 +206,11 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     void *buf1;
     s32 buf2;
 
-    size = self->unkB0->unkA9;
+    size = self->nameField->unkA9;
     origUnk58 = self->unk58;
     buf1 = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf1, D_8008AA18);
-    self->unkB0->methods->slotCC(self->unkB0, buf1);
+    self->nameField->methods->slotCC(self->nameField, buf1);
     BMemPMgrFree(buf1);
     CheckObj866E8CountFlag(self, self->unk4C, self->unkA4);
     self->methods->slotE0(self, self->unk14);
@@ -226,26 +226,26 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
 /* This unit's own local view of func_8003B39C (already matched elsewhere,
  * many independent-arity views project-wide -- see e.g.
  * src/class_3bb8c_g.c, src/class_3bb8c_i.c). Return type matches what
- * this call site actually stores it into (`self->unkA8`). */
+ * this call site actually stores it into (`self->iconHandle`). */
 extern GenericReleaseObj_3bb8c_d *func_8003B39C(const char *path);
 
 void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
     if (self->unkAC == NULL) {
-        self->unkA8 = func_8003B39C(D_800114F8);
+        self->iconHandle = func_8003B39C(D_800114F8);
         self->unkAC = New_TaskObjF((void *)1, NULL);
     }
     self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &D_80086D6C,
-                                  self->unkC->unk4, self->unk10, self->unk14,
+                                  self->handlerTable->unk4, self->unk10, self->unk14,
                                   self->unk48);
     self->methods->slot10(self, self->unkAC);
-    self->methods->slot14(self, self->unkC->unk4);
+    self->methods->slot14(self, self->handlerTable->unk4);
     self->methods->slot14(self, self->unk10);
 }
 
 void Class86B60__EndMemcardSave(Class86B60 *self)
 {
-    self->methods->slot10(self, self->unkC->unk4);
+    self->methods->slot10(self, self->handlerTable->unk4);
     self->methods->slot10(self, self->unk10);
     self->methods->slot14(self, self->unkAC);
     self->unkAC->methods->slot70(self->unkAC);
@@ -262,7 +262,7 @@ void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
         *(u8 *)D_8008AA10 = 0;
     }
     self->unkAC->methods->slot78(self->unkAC, D_8008AA10, D_8008AA18, 0xD, 3,
-                                  self->unkA8, self->unkBC, self->unkC0);
+                                  self->iconHandle, self->unkBC, self->unkC0);
 }
 
 void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self)
