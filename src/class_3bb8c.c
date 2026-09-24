@@ -21,7 +21,7 @@ s32 Class866E8__SetTargetAndBuildRates(Obj866E8 *self, void *arg1, Unk6CObj *arg
     self->unk6C = arg2;
     self->unkBC = *arg3;
     ret = ComputeCellWorldOffsets(arg1, stackBuf, self->unk68, &self->unk54, arg3);
-    return self->methods->slotF8(self, ret, stackBuf, &D_80086904);
+    return self->methods->slotF8(self, ret, stackBuf, sDefaultTargetSpecs);
 }
 
 s32 Class866E8__ComputeCellOffsets(Obj866E8 *self, void *arg1, void *arg2) {

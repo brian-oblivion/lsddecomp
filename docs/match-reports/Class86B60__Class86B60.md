@@ -88,7 +88,7 @@ presence anywhere in the project. Placed as one new block right before the
   prototype for a given external symbol and this unit does not otherwise
   need that header.
 - `D_80086D44`, `D_800114DC`: address-of-only placeholder `s32` globals
-  (same convention as this file's existing `D_80086904`).
+  (same convention as this file's existing `sDefaultTargetSpecs`).
 - `FormatNumberIntoBuffer` prototype: `extern void FormatNumberIntoBuffer(s32 arg0);` -- the
   unit's own still-blocked (gp_rel) function; needed here only as a
   forward declaration so this function can call it. Return value unused at

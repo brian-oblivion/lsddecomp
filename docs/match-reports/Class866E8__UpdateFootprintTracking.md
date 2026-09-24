@@ -125,7 +125,7 @@ a pointer-cast read, deliberately, to avoid introducing a union into
 
 - **`D_800868FC`** (new): `extern const s8 D_800868FC[8];` -- 8-entry
   signed-byte remap table. Bound PROVEN from `asm/data/76DC8.data.s` (next
-  symbol `D_80086904` starts immediately after byte 8).
+  symbol `sDefaultTargetSpecs` starts immediately after byte 8).
 - **`D_80086974`** (new): `extern s32 *D_80086974[7];` -- 7-entry pointer
   table (first entry NULL), bound PROVEN from the same data file. Element
   type `s32 *` matches the ALREADY-established `Obj866E8Methods::slotF8`

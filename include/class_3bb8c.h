@@ -213,11 +213,6 @@ typedef struct SetupSub866E8 {
  * rather than opaque `void *`. */
 extern s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4);
 
-/* Unidentified global, address-only use (Class866E8__SetTargetAndBuildRates passes `&D_80086904`
- * as an argument, never reads it directly here). Typed `s32` purely as a
- * placeholder since only its address is taken. */
-extern s32 D_80086904;
-
 /* Constant `Unk54Struct` (unk0=-1, unk4=0, unk8=0x140014) whole-struct-copied
  * by Class866E8__InitFootprintSlot into self+0x8C+key*0xC. */
 extern Unk54Struct D_80086990;
@@ -234,6 +229,15 @@ typedef struct TargetSpec866E8 {
     u8 key;   /* +0x0 */
     u8 flag;  /* +0x1 */
 } TargetSpec866E8;
+
+/* Retyped this round from `extern s32` (address-only placeholder) to a real
+ * 7-entry `TargetSpec866E8` array: Class866E8__SetTargetAndBuildRates's only use
+ * of `&sDefaultTargetSpecs` is as the `arg3` it forwards to its own slotF8
+ * (Class866E8__BuildRateEntries), whose real, already-matched signature reads
+ * exactly `arg3[i].key`/`arg3[i].flag` for `i < 7`. Every entry's `flag` byte
+ * is nonzero in the data (`asm/data/76DC8.data.s`), i.e. this is the default
+ * "enable every element" spec table. */
+extern TargetSpec866E8 sDefaultTargetSpecs[7];
 
 /* Data table, 0xC-byte stride, indexed by `TargetSpec866E8::key` in
  * Class866E8__BuildRateEntries -- reuses `Unk54Struct`'s shape (three consecutive `s32`
@@ -275,7 +279,7 @@ extern const Unk54Struct D_800868A8[7];
 /* `ElemTarget::unk32`-indexed remap table, read by Class866E8__UpdateFootprintTracking as a
  * signed byte (`lb`). 8-entry bound is PROVEN, not guessed: the data file
  * (`asm/data/76DC8.data.s`) places exactly 8 bytes here (values
- * `01 02 03 00 04 05 06 00`) before `D_80086904` starts. The fetched byte
+ * `01 02 03 00 04 05 06 00`) before `sDefaultTargetSpecs` starts. The fetched byte
  * (range 0..6) doubles as Class866E8__UpdateFootprintTracking's own return value and, scaled by
  * 4, as the index into `D_80086974` below. */
 extern const s8 D_800868FC[8];
@@ -328,9 +332,20 @@ typedef struct Obj866E8Methods {
     /* Called by Class866E8__Disable right before it clears self->enabled. */
     void (*slotC0)(Obj866E8 *self);            /* +0x0C0 */
     u8 pad0C4[0xF8 - 0xC4];
-    /* Called by Class866E8__SetTargetAndBuildRates with ComputeCellWorldOffsets's own return value, the
-     * SAME stack buffer that was ComputeCellWorldOffsets's `outBuf` argument, and
-     * the address of an unidentified global (`D_80086904`). */
+    /* = Class866E8__BuildRateEntries. This IS Class866E8__BuildRateEntries's own identity slot
+     * (verified via classtable, `D_800866E8`'s own +0x0F8 entry) -- its real
+     * signature (self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3, void
+     * return) is established by that function's own body, not by this call
+     * site's placeholder types. Called by Class866E8__SetTargetAndBuildRates with
+     * ComputeCellWorldOffsets's own return value, the SAME stack buffer that was
+     * ComputeCellWorldOffsets's `outBuf` argument (as `Unk54Struct *`), and
+     * `sDefaultTargetSpecs` (as `TargetSpec866E8 *`). Left `s32`/`s32 *`/`s32 *`
+     * here rather than retyped to match: `Class866E8__UpdateFootprintTracking`'s OWN
+     * call through this same slot passes `&buf.unkC` (`s32 *`) and a
+     * `D_80086974` entry (`s32 *`) instead, and retyping the field would need
+     * that already-matched call site re-cast rather than left alone -- the
+     * two call sites' real argument types genuinely differ, which is exactly
+     * what a `void *`-shaped vtable slot type papers over on this project. */
     s32 (*slotF8)(Obj866E8 *self, s32 arg1, s32 *arg2, s32 *arg3);   /* +0x0F8 */
     /* = Class866E8__ApplyRateEntries. This IS Class866E8__ApplyRateEntries's own identity slot (verified
      * via classtable), not something Class866E8__ApplyRateEntries calls -- its actual
@@ -3048,7 +3063,7 @@ extern s32 gClass86F88CursorColor;
  * derived vtable with `tools/classtable.py 0x80087034` (header word then
  * `BasicClass__Release` at +4, the class-framework fingerprint) --
  * nothing in this unit dereferences it, so it stays untyped beyond the
- * address itself, same convention as `D_80086904` above. */
+ * address itself, same convention as `sDefaultTargetSpecs` above. */
 extern s32 D_80087034;
 extern void *GetObjMMethods(void);
 

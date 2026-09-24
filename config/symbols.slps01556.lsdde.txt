@@ -2345,3 +2345,4 @@ Class866E8__ComputeDivisorSplit = 0x8004C368; // type:func
 Class866E8__GetLastTargetRateSplit = 0x8004C3F0; // type:func
 Class866E8__FindElemByUnk32 = 0x8004C434; // type:func
 Class866E8__FindElementForPosition = 0x8004C470; // type:func
+sDefaultTargetSpecs = 0x80086904;

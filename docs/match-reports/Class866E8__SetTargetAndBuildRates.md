@@ -14,7 +14,7 @@ s32 Class866E8__SetTargetAndBuildRates(Obj866E8 *self, void *arg1, Unk6CObj *arg
     self->unk6C = arg2;
     self->unkBC = *arg3;
     ret = ComputeCellWorldOffsets(arg1, stackBuf, self->unk68, &self->unk54, arg3);
-    return self->methods->slotF8(self, ret, stackBuf, &D_80086904);
+    return self->methods->slotF8(self, ret, stackBuf, &sDefaultTargetSpecs);
 }
 ```
 
@@ -24,7 +24,7 @@ First-pass reading of the raw asm badly mis-transcribed this function -- it
 looked like a single call to `ComputeCellWorldOffsets` whose result was the return
 value. It is actually **two calls**: `ComputeCellWorldOffsets` first, whose `s32`
 result is immediately forwarded (via `$a1`) as the **second argument** to a
-*second* dispatch, `self->methods->slotF8(self, ret, &stackBuf, &D_80086904)`
+*second* dispatch, `self->methods->slotF8(self, ret, &stackBuf, &sDefaultTargetSpecs)`
 -- and it's `slotF8`'s return that the function actually returns. Caught only
 by tracing every register from the `jal` through to the epilogue instead of
 stopping at the first call.
