@@ -186,3 +186,13 @@ the pointer TYPE at the point of dereference, not the pointee's own
 declared type, is the lever in both directions, and `SpuVmAlloc`'s
 still-open cross-branch-CSE residue this round is a candidate to revisit
 with this specific tool now that it has one confirmed win.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80052F10` | `ObjM__InitStyleAndWorld` | B | see below |
+
+**Evidence.** vtable slot +0x04C. The larger of the two setup routines: calls `RegisterStyleConfig`, wires the target/world fields (`self->unk78`, `self->unk6C`, `self->unk48/unk4C/unk40/unk44`), dispatches `self->target`'s own `slot134`, and ends by marking `self->phase = 5`.

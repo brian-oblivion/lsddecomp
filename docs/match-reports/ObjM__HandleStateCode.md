@@ -98,3 +98,13 @@ more slots on `Obj87034Methods_3bb8c_l` (`slot5C`), `DreamSysMethods_3bb8c_l`
 four more fields on `Obj87034_3bb8c_l` (`unk48`, `unk4C`, `unk6C`, `unk78`).
 Those edits are described in that report rather than duplicated here, since
 they were made together in the same session against the same shared header.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053984` | `ObjM__HandleStateCode` | B | see below |
+
+**Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterState4`, `ObjM__EnterState5`, `ObjM__EnterState6` (this unit) and `ObjM__EnterState7`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit class_3bb8c_m) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.

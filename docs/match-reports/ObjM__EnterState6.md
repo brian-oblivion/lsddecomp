@@ -41,3 +41,13 @@ named function and the vtable slot occupant are the same address, but
 bytes. Use the name only to confirm/cross-check the field's identity and
 signature; the actual C call must still go through the struct's function
 pointer field.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053C94` | `ObjM__EnterState6` | B | see below |
+
+**Evidence.** vtable slot +0x09C. Sets `self->phase = 6`; same evidence as `ObjM__EnterState4`.

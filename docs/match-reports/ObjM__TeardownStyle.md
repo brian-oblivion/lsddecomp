@@ -35,3 +35,13 @@ return values are unused, declared as plain `extern void func(void);` in
   function; a reminder that `funcdiff`'s "differs outside this range" warning
   means exactly what it says — don't trust an individual function's `jal`
   target mismatch while siblings in the same unit are still wrong.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053134` | `ObjM__TeardownStyle` | B | see below |
+
+**Evidence.** vtable slot +0x050. Calls the global `StyleTeardown()` and `TickDreamAuxSlots2()` directly, then notifies `self->unk54` (another `ObjM` instance) via its own `slot48`. Named for the one global call whose own name is already established.

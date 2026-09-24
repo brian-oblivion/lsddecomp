@@ -27,3 +27,13 @@ call site's own register usage.
   own two. Different arity, different class; `self->unk14`'s pointee is
   left as an unnamed local view (`Obj14_3bb8c_l`) with only this one slot
   and (from `ObjM__TransferToOther`) one plain `u16` field named.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8005393C` | `ObjM__TickStyle` | B | see below |
+
+**Evidence.** vtable slot +0x08C. A one-line wrapper: `TickStyle(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0)`. Named for the global `TickStyle` it calls, whose own name is already established.

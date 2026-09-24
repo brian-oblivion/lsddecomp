@@ -106,3 +106,13 @@ at the "natural" chain form failed to converge before this; the goto
 form matched on the first try. `docs/DECOMPILATION_LEARNINGS.md` already
 documents `goto fail;` for the `New_X` allocator idiom — this generalises
 it to "any multi-way vtable-slot dispatch with more than two arms".
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053358` | `ObjM__DispatchEvent` | B | see below |
+
+**Evidence.** vtable slot +0x058. A generic `eventId` dispatcher: four recognised numeric codes (0xC, 0x16, 0x21, 0x2C) each forward to one of self's own vtable slots; anything else, or `self->unk68 == 0`, is a no-op.

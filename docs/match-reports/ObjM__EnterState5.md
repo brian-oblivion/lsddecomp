@@ -72,3 +72,13 @@ disassembly disagree only in if/else polarity and block order, trust the
 seed's polarity — GCC 2.6.3 consistently places the branch-target block
 as the source's `else`-arm and the fallthrough as the `if`-arm, and eyeballing
 `bgez`/`bltz` cold is easy to get backwards.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053BE8` | `ObjM__EnterState5` | B | see below |
+
+**Evidence.** vtable slot +0x098. Sets `self->phase = 5`; same evidence as `ObjM__EnterState4`.

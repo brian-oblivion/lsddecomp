@@ -47,3 +47,13 @@ right at a glance — the offset comment on each field is trustworthy, the
 declared byte layout is not, until compiled and diffed. Compile after
 drafting a struct with more than 2 fields, before writing more than one
 function against it.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80052DE8` | `ObjM__AttachTarget` | B | see below |
+
+**Evidence.** vtable slot +0x044 of `D_80087034` (`ObjM`, confirmed via classtable.py's ctor/dtor slots). Registers `ObjM__OnRegistrantEvent` as a callback with `arg1->unkC` (a "registrant" object), stores `arg2` into `self->target`, forwards to the shared base accessor's own slot `+0x44`, then dispatches self's own `AddChild` (slot10). Mechanics -- subscribe + link a target + add a child -- are clear; the in-game reason is not.

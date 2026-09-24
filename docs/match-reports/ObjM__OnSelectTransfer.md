@@ -29,3 +29,13 @@ anyway since the caller passes three arguments at this call site.
   pointee to the same class as `self`.
 - `ObjM__TransferToOther` needed a forward declaration in the header (ROM order:
   this function is defined before it).
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_800531A0` | `ObjM__OnSelectTransfer` | B | see below |
+
+**Evidence.** vtable slot +0x054. A thin selector: forwards to `ObjM__TransferToOther` only when `sel == 2`, otherwise a no-op. The meaning of the other `sel` values is not established from this body alone.

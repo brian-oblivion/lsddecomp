@@ -91,3 +91,13 @@ earlier computation, check whether retail computed that base pointer
 EAGERLY (before the branch) rather than lazily (at first use) — the fix is
 a plain local variable assigned before the `if`, not a barrier or an
 `asm("")`.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_800531CC` | `ObjM__TransferToOther` | B | see below |
+
+**Evidence.** Private helper (not itself a vtable slot), called only from `ObjM__OnSelectTransfer`. The detach-from-current-target / link-to-new-target logic: `other` is confirmed to be the SAME class (`Obj87034_3bb8c_l`) by the identical field offsets both `self` and `other` are read through (`+0x0`, `+0x3C`, `+0x50`, `+0x60`, `+0x68`, `+0x80`).

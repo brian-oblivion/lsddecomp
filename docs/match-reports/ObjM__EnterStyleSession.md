@@ -158,3 +158,13 @@ hoist like this fixes one divergence but a second, later, structurally
 IDENTICAL divergence remains, don't reuse the same local for both -- their
 live ranges can interact and change which physical register GCC 2.6.3
 picks for the second one. Give each hoisted value its own name.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053764` | `ObjM__EnterStyleSession` | B | see below |
+
+**Evidence.** vtable slot +0x088. The largest setup routine in the unit: configures `self->target`, then spawns a NEW `DreamSysObj_3bb8c_l` via `self->unk18`'s own `slotAC` and dispatches it via self's `slot10` -- a heavier "begin" step than `ObjM__SetupSceneStyle`, consistent with the `EnterState`-family naming used for the class's other heavy setup slots.

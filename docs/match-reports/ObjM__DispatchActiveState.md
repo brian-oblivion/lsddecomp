@@ -64,3 +64,13 @@ is the same lever DECOMPILATION_LEARNINGS already documents for a
 crossjump-mergeable shared tail ("write the full call statement out in
 each branch rather than deferring through a function-pointer local"), just
 reached via a register-identity residue instead of a content-tail residue.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053458` | `ObjM__DispatchActiveState` | B | see below |
+
+**Evidence.** vtable slot +0x074. Gated on `self->unk80`: dispatches `slotC4` then `slotD4` when set, else `slotD0` alone -- structurally similar to `ObjM__TickTarget`'s own `unk80` branch but a distinct slot pair.

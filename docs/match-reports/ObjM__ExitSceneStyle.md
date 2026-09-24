@@ -33,3 +33,13 @@ passed as a plain argument). Matched on the first attempt.
   different arity at its own call site (`ObjM__TickStyle`, see that report),
   so it is NOT assumed to be DreamSys despite the coincidental offset
   match.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_800536B0` | `ObjM__ExitSceneStyle` | B | see below |
+
+**Evidence.** vtable slot +0x084. The structural teardown counterpart of `ObjM__SetupSceneStyle`: self's own `slotD4`, `self->target`'s `slotFC`/`slot50`, `self->unk18`'s `slot74`, then self's own `slot14` forwarding `self->unk14`.

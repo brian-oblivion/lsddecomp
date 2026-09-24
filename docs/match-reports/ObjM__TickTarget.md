@@ -30,3 +30,13 @@ delay slot) that is nonetheless UNCONDITIONAL relative to the `unk80`
 check — it happens on every call that gets past the `unk68` guard, which a
 plain post-increment statement placed before the nested `if` reproduces
 directly.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_800533F0` | `ObjM__TickTarget` | B | see below |
+
+**Evidence.** vtable slot +0x05C. Gated on `self->unk68`: increments the `unk1C` counter, then dispatches one of two slots (`slotD0`/`slot8C`) depending on `self->unk80`.

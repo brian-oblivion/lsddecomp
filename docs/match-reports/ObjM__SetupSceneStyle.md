@@ -127,3 +127,13 @@ before that earlier call and use the local as the argument** — this reads
 as a no-op in C but changes whether the compiler treats the field-read as
 part of the earlier call's argument-evaluation (different scheduling) or
 as a standalone statement whose result is reused verbatim by the call.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_800534C8` | `ObjM__SetupSceneStyle` | B | see below |
+
+**Evidence.** vtable slot +0x080. The larger of the two `unk14`-configuring routines: computes a value from `*(UnkCObj_3bb8c_l **)self->unkC`'s own `slot7C`, dispatches `self->target`'s `slot54` with it, then configures `self->unk14` (grid dimensions via `GetStageGridDimensions`, world settings, style block) and links it back into `self->target` via `slot4C`.

@@ -293,3 +293,13 @@ duplicate-arm forms reach zero, mark the class permuter-exhausted here.
 This is NOT a toolchain escalation. Nothing here has been reproduced in
 isolation, and a coupled register/delay-slot choice inside a switch is the
 kind of thing GCC 2.6.3 does legitimately.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053ACC` | `ObjM__EnterState4` | B | see below |
+
+**Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit class_3bb8c_m already established `ObjM__EnterState7`/`ObjM__EnterState8`/`ObjM__EnterStateA` for the SAME field on the SAME class, and this unit's own `ObjM__HandleStateCode` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.

@@ -51,3 +51,13 @@ compiled test, and the `if`-body always lands at the fallthrough. When a
 residue is "right content, wrong branch instruction and swapped
 target/fallthrough", don't hunt for a different algorithm — just invert
 the written comparison and swap the two bodies.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80052E7C` | `ObjM__OnRegistrantEvent` | B | see below |
+
+**Evidence.** The callback address-taken by `ObjM__AttachTarget` and handed to the registrant's `slotC8`. Matches `RegistrantMethods_3bb8c_l::slotC8`'s callback shape exactly. Dispatches on the sign of `code` to one of two still-uncarved helpers (`asm/psyq_memset.s`); their own purpose is unknown, so this stays tier B.

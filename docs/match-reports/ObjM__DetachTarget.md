@@ -26,3 +26,13 @@ slot). No branches, matched on the first correctly-typed attempt.
   `+0x48`, used by `ObjM__TeardownStyle` on a sibling object) — same numeric
   offset, unrelated classes, no naming collision since they're separate
   struct types.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80052EBC` | `ObjM__DetachTarget` | B | see below |
+
+**Evidence.** vtable slot +0x048. Forwards `self->target` through self's own `slot14`, then the shared base accessor's `slot48` -- the structural mirror of `ObjM__AttachTarget` (attach/register at +0x044, teardown counterpart immediately after at +0x048).
