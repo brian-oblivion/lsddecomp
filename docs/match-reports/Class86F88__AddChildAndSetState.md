@@ -1,4 +1,6 @@
-# Class86F88_3bb8c_j__AddChildAndSetState -- MATCHED (27/27 words)
+# Class86F88__AddChildAndSetState -- MATCHED (27/27 words)
+
+> Renamed from `Class86F88_3bb8c_j__AddChildAndSetState` on 2026-09-24 (tools/rename.py). Address 0x80052110.
 
 > Renamed from `func_80052110` on 2026-09-24 (tools/rename.py). Address 0x80052110.
 
@@ -7,7 +9,7 @@ Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
 ## Body
 
 ```c
-void Class86F88_3bb8c_j__AddChildAndSetState(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3)
+void Class86F88__AddChildAndSetState(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3)
 {
     typedef void (*Slot10NarrowFn)(Class86F88_3bb8c_j *self, s32 arg1);
     void (*fn)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3);
@@ -76,4 +78,4 @@ whoever investigates next.
 
 ## Naming
 
-- `Class86F88_3bb8c_j__AddChildAndSetState` -- tier B. The slot4C occupant (classtable.py D_80086F88 +0x04C): dispatches self->methods->slot10 (this class's own addChild override) twice, once at full arity and once narrowed to (self, arg2) via a local function-pointer typedef, then sets unk3C=arg3 and clears unk2C. Mechanics established across rounds 18-19's residue hunt; the double-arity dispatch's in-game reason is not.
+- `Class86F88__AddChildAndSetState` -- tier B. The slot4C occupant (classtable.py D_80086F88 +0x04C): dispatches self->methods->slot10 (this class's own addChild override) twice, once at full arity and once narrowed to (self, arg2) via a local function-pointer typedef, then sets unk3C=arg3 and clears unk2C. Mechanics established across rounds 18-19's residue hunt; the double-arity dispatch's in-game reason is not.

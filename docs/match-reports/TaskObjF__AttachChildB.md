@@ -14,7 +14,7 @@ void TaskObjF__AttachChildB(Class86E00_3bb8c_g *self)
 {
     if (self->unk68 != 0 && self->unk60 != 0) {
         if (self->unk7C == NULL) {
-            self->unk7C = New_Class86F88_3bb8c_j(self->unk38, 1);
+            self->unk7C = New_Class86F88(self->unk38, 1);
             self->unk74 = 1;
         }
         self->methods->slot10(self, self->unk7C);
@@ -26,8 +26,8 @@ void TaskObjF__AttachChildB(Class86E00_3bb8c_g *self)
 
 First attempt, byte-exact. The exact twin of `TaskObjF__AttachChildA` (same guard
 shape, same lazy-init-then-attach sequence), operating on `unk7C` instead
-of `unk78` and calling `New_Class86F88_3bb8c_j` instead of `func_80050BA8`. Unlike
-`TaskObjF__AttachChildA`, `New_Class86F88_3bb8c_j`'s second argument (`1`) is materialized
+of `unk78` and calling `New_Class86F88` instead of `func_80050BA8`. Unlike
+`TaskObjF__AttachChildA`, `New_Class86F88`'s second argument (`1`) is materialized
 right in the `jal`'s own delay slot -- an ordinary, unremarkable argument
 setup, not the "surprise 2nd parameter hoisted several instructions
 early" residue `TaskObjF__AttachChildA` needed to diagnose. Applying that
@@ -36,7 +36,7 @@ directly is what made this one match cold.
 
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
-None new -- every slot and the `New_Class86F88_3bb8c_j` extern were already
+None new -- every slot and the `New_Class86F88` extern were already
 declared correctly (the `slot44` arity fix came from `TaskObjF__AttachChildA`'s
 report, applied here without needing its own derivation).
 
@@ -50,6 +50,6 @@ mistake that cost `TaskObjF__AttachChildA` an extra attempt.
 
 `TaskObjF__AttachChildB` (was `func_800505A8`), tier B: the
 "B" twin of `TaskObjF__AttachChildA` -- identical guard and
-attach sequence, operating on `self->unk7C` via `New_Class86F88_3bb8c_j` instead of
+attach sequence, operating on `self->unk7C` via `New_Class86F88` instead of
 `self->unk78` via `func_80050BA8`. See `AttachChildA`'s naming note: the
 A/B suffixes are positional labels, not an established functional split.

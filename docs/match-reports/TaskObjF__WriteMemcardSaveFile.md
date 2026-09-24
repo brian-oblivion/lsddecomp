@@ -198,7 +198,7 @@ drift" stall class on the strength of "every value is already the right
 TYPE, only the register differs" should still have its ARGUMENT/LOCAL
 TYPES individually re-examined, not assumed correct, before accepting the
 classification.** This function's own residue was filed as a 3-instance
-confirmation of that class alongside `func_8004C93C`/`Class86F88_3bb8c_j__LoadResources` (see
+confirmation of that class alongside `func_8004C93C`/`Class86F88__LoadResources` (see
 those reports, also round 18) -- but unlike those two (where nine
 combined declaration-order attempts across three functions moved nothing),
 this one's actual cause was a narrower, single-parameter type mismatch
@@ -210,7 +210,7 @@ declared wider than a byte is exactly the shape worth re-typing before
 accepting a register-identity stall, the same way CLAUDE.md's `s8`/`s16`
 struct-field guidance already treats a narrow access as a signal about the
 DECLARED width. Suggest cross-referencing this note from
-`func_8004C93C`'s and `Class86F88_3bb8c_j__LoadResources`'s entries in
+`func_8004C93C`'s and `Class86F88__LoadResources`'s entries in
 `docs/DECOMPILATION_LEARNINGS.md`'s existing class writeup, since this
 round closed one of three instances that class currently claims and the
 mechanism that closed it does not generalize to the other two (both

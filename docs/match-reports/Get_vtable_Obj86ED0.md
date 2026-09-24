@@ -5,7 +5,7 @@
 Unit: `src/class_3bb8c_j.c`. ROUND 75 CORRECTION: this is NOT
 `Class86F88_3bb8c_j`'s own getter (an earlier round assumed so, since it was
 the only table getter this unit's C had resolved at the time, and named the
-whole sibling class after it -- see `Class86F88_3bb8c_j__Class86F88_3bb8c_j.md`
+whole sibling class after it -- see `Class86F88__Class86F88.md`
 and `include/class_3bb8c.h`'s round-15 HEAD NOTEs on D_80086ED0/D_80086F88
 for that history). `tools/classtable.py D_80086ED0` places
 `Obj86ED0__AdvanceCountdown` .. `Obj86ED0__DispatchLookupValue` (this same

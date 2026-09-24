@@ -1,4 +1,6 @@
-# Class86F88_3bb8c_j__Finalize -- MATCHED (38/38 words)
+# Class86F88__Finalize -- MATCHED (38/38 words)
+
+> Renamed from `Class86F88_3bb8c_j__Finalize` on 2026-09-24 (tools/rename.py). Address 0x80051c84.
 
 > Renamed from `func_80051C84` on 2026-09-24 (tools/rename.py). Address 0x80051c84.
 
@@ -9,7 +11,7 @@ body (dispatched through `BasicClass`'s inherited `finalize` slot chain,
 ## Body
 
 ```c
-void Class86F88_3bb8c_j__Finalize(Class86F88_3bb8c_j *self)
+void Class86F88__Finalize(Class86F88_3bb8c_j *self)
 {
     s32 i;
 
@@ -32,4 +34,4 @@ already-documented "must reload after call" idiom.
 
 ## Naming
 
-- `Class86F88_3bb8c_j__Finalize` -- tier A. The finalize occupant (classtable.py D_80086F88 +0x00C): frees each unk18[i] buffer, then unk1C and unk18 themselves, then chains Get_vtable_BasicClass()->finalize(self). Matches the BasicClass finalize-slot convention used throughout this header.
+- `Class86F88__Finalize` -- tier A. The finalize occupant (classtable.py D_80086F88 +0x00C): frees each unk18[i] buffer, then unk1C and unk18 themselves, then chains Get_vtable_BasicClass()->finalize(self). Matches the BasicClass finalize-slot convention used throughout this header.

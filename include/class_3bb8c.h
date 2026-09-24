@@ -1830,7 +1830,7 @@ struct Class86E00_3bb8c_g {
     /* +0x034, TaskObjF__SetState's own `slot58` arg3, forwarded verbatim
      * alongside `unk30` above. */
     s32 unk34;
-    void *unk38; /* +0x038, TaskObjF__AttachChildB: forwarded opaquely to `New_Class86F88_3bb8c_j`'s arg0 */
+    void *unk38; /* +0x038, TaskObjF__AttachChildB: forwarded opaquely to `New_Class86F88`'s arg0 */
     /* +0x03C, TaskObjF__AdvanceState's own `self->state==0xE` sub-case: base of a
      * pointer array indexed by `(s32)self->selectedItem`, `strcat`ed onto
      * `self->unk40` -- same shape as `unk38` just below, indexed the
@@ -1870,14 +1870,14 @@ struct Class86E00_3bb8c_g {
 /* Address-of only in this unit's own screening -- TaskObjF__AttachChildB forwards
  * `self->unk38` and the literal `1` to this external helper; return
  * value stored into `self->childB`. Not this round's function here -- it
- * is class_3bb8c_j's New_Class86F88_3bb8c_j (matched round 15,
+ * is class_3bb8c_j's New_Class86F88 (matched round 15,
  * src/class_3bb8c_j.c; ROUND 75: its class is D_80086F88/Class86F88_3bb8c_j,
  * not D_80086ED0 -- see that unit's file header comment):
  * `BMemPMgrAlloc(0x54)` then, on success, its own ctor-table getter's
  * `+0x008` slot called `(self, arg0, arg1)`. This call site's own
  * evidence (arg1 a literal `1`) is what fixed the 2nd parameter as `s32`
  * rather than a pointer. */
-extern void *New_Class86F88_3bb8c_j(void *arg0, s32 arg1);
+extern void *New_Class86F88(void *arg0, s32 arg1);
 
 /* Not this round's function (lives outside this unit's slice) --
  * TaskObjF__AttachChildA's own external helper, called with `((self->unk48 << 1)
@@ -2036,11 +2036,11 @@ struct BasicMethods866E8F {
      * (include/code_8220.h), reached through each unit's own local view of
      * the same real getter/table. Pure pad-to-field split: same total
      * size, `slot38`'s offset unchanged. */
-    void (*ctor)(void *self);                    /* +0x008, func_80050C14 (_i) / Class86F88_3bb8c_j__Class86F88_3bb8c_j (_j, STALLED) */
-    void (*finalize)(void *self);                /* +0x00C, func_80050CE8 (_i) / Class86F88_3bb8c_j__Finalize (_j) */
-    void (*addChild)(void *self, void *child);   /* +0x010, func_80050D30 (_i) / Class86F88_3bb8c_j__AddChild (_j) */
-    void (*removeChild)(void *self, void *child);/* +0x014, func_80050DB4 (_i) / Class86F88_3bb8c_j__RemoveChild (_j) */
-    void (*removeAllChildren)(void *self);       /* +0x018, func_80050E34 (_i) / Class86F88_3bb8c_j__RemoveAllChildren (_j) */
+    void (*ctor)(void *self);                    /* +0x008, func_80050C14 (_i) / Class86F88__Class86F88 (_j, STALLED) */
+    void (*finalize)(void *self);                /* +0x00C, func_80050CE8 (_i) / Class86F88__Finalize (_j) */
+    void (*addChild)(void *self, void *child);   /* +0x010, func_80050D30 (_i) / Class86F88__AddChild (_j) */
+    void (*removeChild)(void *self, void *child);/* +0x014, func_80050DB4 (_i) / Class86F88__RemoveChild (_j) */
+    void (*removeAllChildren)(void *self);       /* +0x018, func_80050E34 (_i) / Class86F88__RemoveAllChildren (_j) */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, TaskObjF__Notify's first dispatch */
 };
@@ -2619,7 +2619,7 @@ extern void StyleTeardown(void);
  *
  *   func_80050BA8  li a0,0x4c -> BMemPMgrAlloc, then ctors through
  *                  Get_vtable_Obj86ED0(), which returns &D_80086ED0.
- *   New_Class86F88_3bb8c_j  allocates 0x54 and ctors through func_80052B60(),
+ *   New_Class86F88  allocates 0x54 and ctors through func_80052B60(),
  *                  a DIFFERENT table getter living in class_3bb8c_k.
  *
  * So D_80086ED0's class is 0x4C bytes (alpha is right), and bravo's
@@ -2823,7 +2823,7 @@ struct Obj86ED0 {
  * from the alpha/bravo merge, and it is worth reading the two notes
  * together.
  *
- * That note established that bravo's 0x54-byte New_X (New_Class86F88_3bb8c_j in
+ * That note established that bravo's 0x54-byte New_X (New_Class86F88 in
  * class_3bb8c_j) ctors through func_80052B60(), "a DIFFERENT table getter
  * living in class_3bb8c_k" that bravo had not identified. charlie has now
  * MATCHED func_80052B60, and it returns &D_80086F88. So the 0x54-byte

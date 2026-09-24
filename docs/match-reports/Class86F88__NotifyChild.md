@@ -1,4 +1,6 @@
-# Class86F88_3bb8c_j__NotifyChild -- MATCHED (44/44 words)
+# Class86F88__NotifyChild -- MATCHED (44/44 words)
+
+> Renamed from `Class86F88_3bb8c_j__NotifyChild` on 2026-09-24 (tools/rename.py). Address 0x80051e64.
 
 > Renamed from `func_80051E64` on 2026-09-24 (tools/rename.py). Address 0x80051e64.
 
@@ -7,7 +9,7 @@ Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
 ## Body
 
 ```c
-void Class86F88_3bb8c_j__NotifyChild(Class86F88_3bb8c_j *self, void *arg1, s32 arg2)
+void Class86F88__NotifyChild(Class86F88_3bb8c_j *self, void *arg1, s32 arg2)
 {
     s32 tag;
 
@@ -25,10 +27,10 @@ Calls the inherited `BasicClass::slot38` (already declared in
 `include/class_3bb8c.h`'s `BasicMethods866E8F`, established by
 class_3bb8c_f) unconditionally first, then dispatches through Class86F88_3bb8c_j's
 OWN vtable (`slot5C`/`slot58`) based on the same tag-nibble convention as
-`Class86F88_3bb8c_j__AddChild`/`Class86F88_3bb8c_j__RemoveChild`. Established `Class86F88Methods_3bb8c_j::slot5C`
+`Class86F88__AddChild`/`Class86F88__RemoveChild`. Established `Class86F88Methods_3bb8c_j::slot5C`
 (+0x05C, "tag==2") and `slot58` (+0x058, "tag==5") from this function.
 Matched first try.
 
 ## Naming
 
-- `Class86F88_3bb8c_j__NotifyChild` -- tier B. The slot38 occupant (classtable.py D_80086F88 +0x038, the offset every sibling class in this header uses for its own "OnNotify"-shaped override): chains the base slot38 unconditionally, then dispatches to this class's own slot5C/slot58 by the child's tag nibble. Mechanics (notify then tag-dispatch) are clear; the in-game meaning of the notification is not.
+- `Class86F88__NotifyChild` -- tier B. The slot38 occupant (classtable.py D_80086F88 +0x038, the offset every sibling class in this header uses for its own "OnNotify"-shaped override): chains the base slot38 unconditionally, then dispatches to this class's own slot5C/slot58 by the child's tag nibble. Mechanics (notify then tag-dispatch) are clear; the in-game meaning of the notification is not.

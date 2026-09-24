@@ -91,6 +91,6 @@ factory for the same real class the sibling `class_3bb8c_i`/`class_3bb8c_j`
 units call `Obj86ED0`/`Class86ED0`, vtable `D_80086ED0`) on first use, then
 attaches and configures it through this class's own vtable. Named "A" to
 distinguish it from the identically-shaped `AttachChildB`
-(`self->unk7C`, `New_Class86F88_3bb8c_j`) below -- nothing in either function's own
+(`self->unk7C`, `New_Class86F88`) below -- nothing in either function's own
 body says what makes the two children functionally different, so the
 suffixes are arbitrary labels, not a claim about purpose.
