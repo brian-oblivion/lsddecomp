@@ -1,6 +1,8 @@
-# func_80051858 -- MATCHED (39/39 words)
+# Obj86ED0__ResetAllAndFinish -- MATCHED (39/39 words)
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Obj866E8` (see func_80051784.md for
+> Renamed from `func_80051858` on 2026-09-24 (tools/rename.py). Address 0x80051858.
+
+Unit: `src/class_3bb8c_j.c`. `self` is `Obj86ED0` (ROUND 75 CORRECTION: was misattributed to `Obj866E8`, actually `Obj86ED0` -- D_80086ED0, established by class_3bb8c_i; see Obj86ED0__AdvanceCountdown.md for
 the class-identity evidence shared across this group). This is the "flush
 all" sibling: fires `slotA8` once per remaining slot (counting down from
 `self->unk10 - 1` to 0), then always fires `slotA4` once at the end.
@@ -8,7 +10,7 @@ all" sibling: fires `slotA8` once per remaining slot (counting down from
 ## Body
 
 ```c
-void func_80051858(Obj866E8 *self)
+void Obj86ED0__ResetAllAndFinish(Obj86ED0 *self)
 {
     s32 i;
 
@@ -41,7 +43,7 @@ inside the `if (i >= 0)` guard) scored 23/39 with two separate defects:
    the project's known "redundant move" residue class
    (DECOMPILATION_LEARNINGS: "resists goto/return spelling, temp
    placement, barriers and volatile... best-posed permuter target").
-   Manual attempts (a `__asm__("")` barrier, an explicit `Obj866E8 *s =
+   Manual attempts (a `__asm__("")` barrier, an explicit `Obj86ED0 *s =
    self;` re-mention at the merge point) did not reproduce it and in one
    case made the score worse (barrier introduced an extra unrelated
    move).
@@ -67,3 +69,7 @@ guard clause that only conditions a LOOP, not the store itself, changed
 delay-slot scheduling far enough downstream to also produce a merge-point
 redundant move. Worth checking this lever before reaching for the
 permuter on future instances of this residue class.
+
+## Naming
+
+- `Obj86ED0__ResetAllAndFinish` -- tier B. Loops i from unk10-1 down to 0, setting unk18=i and calling slotA8(self, i, unk1C, 0) each iteration, then calls slotA4(self, unk18, 1) once after the loop. Reads as "re-initialise every index, then finalise/notify once" -- the in-game purpose of the loop is not established. classtable.py D_80086ED0 +0x0A0.

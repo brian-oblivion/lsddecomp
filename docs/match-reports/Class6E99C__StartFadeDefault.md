@@ -146,7 +146,7 @@ register swap, which is why the drift guard fires here and not there.
    place of `idx` in the else-branch's `idx * 3`: no change, still 40
    words (`Class6E99C__Configure` still links at `0x80040150`).
 2. Branch-forced-copy trick (`if (self->altMode) { t = idx; } else { t =
-   idx; }`, the `func_80051858`-precedent idiom used elsewhere in this
+   idx; }`, the `Obj86ED0__ResetAllAndFinish`-precedent idiom used elsewhere in this
    project): no change.
 3. Bare `__asm__("" ::: "memory")` immediately after the `configure`
    dispatch, attempting to block the `move a0,s0` hoist so the

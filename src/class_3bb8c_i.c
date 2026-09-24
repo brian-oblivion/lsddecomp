@@ -28,7 +28,7 @@ extern Obj86ED0Methods D_80086ED0;
  * `lui/addiu` materialising that exact address then `jr $ra`, the same
  * no-argument-getter shape as `Get_vtable_BasicClass`. Declared here rather than
  * in the shared header because the two units' return types differ. */
-extern Obj86ED0Methods *func_80051A4C(void);
+extern Obj86ED0Methods *Get_vtable_Obj86ED0(void);
 
 void *func_80050BA8(s32 arg0, s32 arg1)
 {
@@ -36,7 +36,7 @@ void *func_80050BA8(s32 arg0, s32 arg1)
 
     self = BMemPMgrAlloc(0x4C);
     if (self != NULL) {
-        func_80051A4C()->ctor(self, arg0, arg1);
+        Get_vtable_Obj86ED0()->ctor(self, arg0, arg1);
         return self;
     }
     return NULL;
@@ -64,7 +64,7 @@ void func_80050C14(Obj86ED0 *self, char *arg1, s32 arg2)
     s32 count;
 
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_80051A4C();
+    self->methods = Get_vtable_Obj86ED0();
     self->unk10 = strlen(arg1);
     self->unk28 = BMemPMgrAlloc(self->unk10 + 4);
 

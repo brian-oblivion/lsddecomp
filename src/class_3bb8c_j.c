@@ -1,53 +1,32 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
- *
  * class_3bb8c_j -- fourth carved slice of the class_3bb8c block
- * (0x41F84..0x429D4, vram 0x80051784..0x800521D4), 20 functions.
- * Carved round 15 out of the 193-function class_3bb8c_j remainder.
+ * (0x41F84..0x429D4, vram 0x80051784..0x800521D4), 20 functions, carved
+ * round 15. include/class_3bb8c.h is SHARED with every other class_3bb8c_*
+ * slice; header edits here must be strictly ADDITIVE.
  *
- * Blocker profile (head's Gate 1 three-grep screen at carve time):
- *   func_800518F4  gp_rel     -- MATCHED round 45 (41/41 words)
- *   func_80051998  gp_rel     -- MATCHED round 45 (45/45 words)
- * The other 18 are clean. This unit owns NO switch jump table.
+ * Two unrelated classes' methods live in this address range:
+ *  - The first six functions (Obj86ED0__AdvanceCountdown ..
+ *    Obj86ED0__DispatchLookupValue, +Get_vtable_Obj86ED0) are `Obj86ED0`
+ *    methods -- D_80086ED0, a class ALREADY shared and fully typed in
+ *    include/class_3bb8c.h, established by class_3bb8c_i.
+ *  - Everything else is `Class86F88_3bb8c_j` (D_80086F88, a BasicClass
+ *    subclass, alloc size 0x54, reached through `func_80052B60()` in
+ *    class_3bb8c_k which already holds this SAME table under the bare
+ *    name `Class86F88`) -- kept LOCAL under a disambiguating suffix
+ *    rather than reusing that name, to avoid a collision in this TU.
  *
- * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
- * Header edits must be strictly ADDITIVE.
- *
- * TWO classes share this unit's address range, discovered this round:
- *  - The first four functions (func_80051784/func_800517EC/func_80051814/
- *    func_80051858), plus the two gp_rel-blocked siblings, are Obj866E8
- *    methods (the SAME class already established across class_3bb8c_b/c/
- *    etc.) -- they touch offsets 0x10/0x14/0x18/0x1C/0x20/0x48, all
- *    previously-unnamed padding, and dispatch through the SAME
- *    Obj866E8Methods table (slotA4/slotA8, also newly named). See
- *    include/class_3bb8c.h's Obj866E8/Obj866E8Methods for the additive
- *    edits.
- *  - Everything from func_80051A4C on is a SEPARATE, much smaller sibling
- *    class (alloc size 0x54, vtable D_80086ED0 -- see func_80051A4C, a
- *    plain address-of getter, and func_80051A5C, its New_X allocator).
- *    Named `Class86ED0` here, LOCAL to this unit (not added to the shared
- *    header -- nothing else references it yet). Its base class IS
- *    BasicClass (include/code_8220.h): slots 0x0C/0x10/0x14/0x18 line up
- *    exactly with BasicClassMethods' finalize/addChild/removeChild/
- *    removeAllChildren. Reached via Get_vtable_BasicClass(), which class_3bb8c.h
- *    ALREADY declares (class_3bb8c_f's own local view, `BasicMethods866E8F`)
- *    -- this round additively named those four slots on THAT existing
- *    type rather than adding a second, incompatible local declaration of
- *    the same function (which would conflict in this translation unit).
+ * Both attributions were WRONG before round 75 (this unit's own C
+ * originally used a locally-defined, differently-tabled `Obj866E8` for
+ * the first group, and named the second group after `D_80086ED0` by
+ * mistake). See `Class86F88__Class86F88.md` for the full
+ * `tools/classtable.py` evidence trail -- this file's own git history has
+ * the mechanical fix (functions renamed via `tools/rename.py`, types
+ * fixed via plain Edit, zero bytes changed throughout).
  */
 #include "common.h"
 #include "class_3bb8c.h"
 
-void func_80051784(Obj866E8 *self)
+void Obj86ED0__AdvanceCountdown(Obj86ED0 *self)
 {
     s32 count;
 
@@ -62,14 +41,14 @@ void func_80051784(Obj866E8 *self)
     }
 }
 
-void func_800517EC(Obj866E8 *self)
+void Obj86ED0__ToggleFlag20(Obj86ED0 *self)
 {
     if (self->unk48) {
         self->unk20 ^= 1;
     }
 }
 
-void func_80051814(Obj866E8 *self)
+void Obj86ED0__ResetCountdown(Obj86ED0 *self)
 {
     if (self->unk48) {
         self->unk1C = 0;
@@ -77,7 +56,7 @@ void func_80051814(Obj866E8 *self)
     }
 }
 
-void func_80051858(Obj866E8 *self)
+void Obj86ED0__ResetAllAndFinish(Obj86ED0 *self)
 {
     s32 i;
 
@@ -95,23 +74,19 @@ void func_80051858(Obj866E8 *self)
     }
 }
 
-/* round 45 -- func_800518F4's own opaque handle at self->unk40, dispatched
- * only through this unit; not the same type as class_3bb8c_i's
- * ChildObj86ED0 despite the coincidental D_8008AADC overlap (that unit
- * reads D_8008AADC's ADDRESS as an opaque arg2, this one reads its VALUE
- * arithmetically -- independent local readings of the same global, per
- * the project's convention). */
-typedef struct Unk40Obj866E8 Unk40Obj866E8;
-typedef struct Unk40Obj866E8Methods Unk40Obj866E8Methods;
-struct Unk40Obj866E8Methods {
-    u8 pad000[0x0BC];
-    void (*slotBC)(Unk40Obj866E8 *self, void *arg1); /* +0x0BC */
-};
-struct Unk40Obj866E8 {
-    Unk40Obj866E8Methods *methods; /* +0x000 */
-};
+/* round 75 CORRECTION (track 3 naming) -- the round-45 comment that used to
+ * stand here declared a local Unk40Obj866E8/Unk40Obj866E8Methods type for
+ * self->unk40 and argued it was NOT class_3bb8c_i's ChildObj86ED0. That
+ * argument was about D_8008AADC (a value-vs-address reading of an
+ * unrelated global), not about self->unk40's own type -- and self is now
+ * confirmed (classtable.py, see the file header) to be Obj86ED0 itself,
+ * whose OWN shared struct in include/class_3bb8c.h already types unk40 as
+ * `ChildObj86ED0 *`. So self->unk40 IS a ChildObj86ED0, established by
+ * class_3bb8c_i, not a coincidence -- this unit just adds the +0x0BC slot
+ * that ChildMethods86ED0 didn't have a name for yet (additive, see that
+ * header's own comment on the change). No local duplicate type needed. */
 
-/* func_800518F4's own stack-local argument to slotBC -- a 2-word block
+/* Obj86ED0__DispatchIndexValue's own stack-local argument to slotBC -- a 2-word block
  * (D_8008AADC-derived value at +0x0, the D_8008AAE0 constant at +0x4). */
 typedef struct {
     s32 unk0;
@@ -119,17 +94,17 @@ typedef struct {
 } SlotBCArg866E8_3bb8c_j;
 
 extern s32 D_8008AADC; /* VALUE-of here (round 45): see the type comment above */
-extern s32 D_8008AAE0; /* VALUE-of, round 45's func_800518F4 only */
+extern s32 D_8008AAE0; /* VALUE-of, round 45's Obj86ED0__DispatchIndexValue only */
 
-void func_800518F4(Obj866E8 *self, s32 arg1, s32 arg2)
+void Obj86ED0__DispatchIndexValue(Obj86ED0 *self, s32 arg1, s32 arg2)
 {
     SlotBCArg866E8_3bb8c_j local;
-    Unk40Obj866E8 *obj;
+    ChildObj86ED0 *obj;
 
     if (self->unk48) {
         local.unk4 = D_8008AAE0;
         local.unk0 = arg1 * 7 + D_8008AADC;
-        obj = (Unk40Obj866E8 *)self->unk40;
+        obj = self->unk40;
         obj->methods->slotBC(obj, &local);
         self->unk18 = arg1;
         if (arg2) {
@@ -138,29 +113,21 @@ void func_800518F4(Obj866E8 *self, s32 arg1, s32 arg2)
     }
 }
 
-/* round 45 -- func_80051998's own opaque handle at self->unk44, dispatched
- * only through this unit. */
-typedef struct Unk44Obj866E8 Unk44Obj866E8;
-typedef struct Unk44Obj866E8Methods Unk44Obj866E8Methods;
-struct Unk44Obj866E8Methods {
-    u8 pad000[0x0C4];
-    void (*slotC4)(Unk44Obj866E8 *self, s32 arg1, s32 arg2); /* +0x0C4 */
-};
-struct Unk44Obj866E8 {
-    Unk44Obj866E8Methods *methods; /* +0x000 */
-};
+/* round 75 CORRECTION (track 3 naming): self->unk44 is likewise Obj86ED0's
+ * own ChildObj86ED0 *unk44 (see the note above Obj86ED0__DispatchIndexValue) -- no local
+ * duplicate type. */
 
-/* VALUE-of `%gp_rel`, round 45's func_80051998 only -- a byte lookup table
+/* VALUE-of `%gp_rel`, round 45's Obj86ED0__DispatchLookupValue only -- a byte lookup table
  * (ROM image initialises it to D_800115D0, still-uncarved rodata). */
 extern u8 *D_8008AAE4;
 
-void func_80051998(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3)
+void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
 {
-    Unk44Obj866E8 *obj;
+    ChildObj86ED0 *obj;
 
     if (self->unk48) {
         self->unk28[arg1] = D_8008AAE4[arg2];
-        obj = (Unk44Obj866E8 *)self->unk44;
+        obj = self->unk44;
         obj->methods->slotC4(obj, D_8008AAE4[arg2], arg1);
         self->unk18 = arg1;
         self->unk1C = arg2;
@@ -171,101 +138,107 @@ void func_80051998(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3)
 }
 
 /*
- * Class86ED0 -- a small BasicClass-derived sibling class, LOCAL to this
+ * Class86F88_3bb8c_j -- a small BasicClass-derived sibling class, LOCAL to this
  * unit (see the file header comment for why this is not added to the
- * shared class_3bb8c.h). Alloc size 0x54 (func_80051A5C). Vtable
- * D_80086ED0 (func_80051A4C, a plain address-of getter).
+ * shared class_3bb8c.h). Alloc size 0x54 (New_Class86F88). Its real
+ * vtable is D_80086F88, reached through func_80052B60() (class_3bb8c_k).
+ * `Get_vtable_Obj86ED0`/D_80086ED0 immediately below are UNRELATED to this
+ * class -- they are Obj86ED0's own table and getter (see the file header
+ * comment), merely defined in this same file.
  *
  * unk34/unk38 are single-slot caches for the most recently added child of
- * two distinguished "tag" kinds (established from func_80051D1C/
- * func_80051DA0: a child object's own `*(s32*)(*(void**)child) & 0xF`
+ * two distinguished "tag" kinds (established from Class86F88__AddChild/
+ * Class86F88__RemoveChild: a child object's own `*(s32*)(*(void**)child) & 0xF`
  * selects unk34 for tag 2, unk38 for tag 5), layered on top of the
  * INHERITED BasicClass generic children list (added/removed via
  * Get_vtable_BasicClass()'s addChild/removeChild in the same two functions).
  */
-typedef struct Class86ED0Methods Class86ED0Methods;
-typedef struct Class86ED0 Class86ED0;
+typedef struct Class86F88Methods_3bb8c_j Class86F88Methods_3bb8c_j;
+typedef struct Class86F88_3bb8c_j Class86F88_3bb8c_j;
 
 /*
- * Class86ED0's own opaque "handle" object (self->unk50's pointee, built by
- * func_80051F24 via BuildFileName/func_8003B39C/func_80041C9C: a
+ * Class86F88_3bb8c_j's own opaque "handle" object (self->unk50's pointee, built by
+ * Class86F88__LoadResources via BuildFileName/func_8003B39C/func_80041C9C: a
  * "CARD\\<name>.TIM" path is built and loaded, as in class_3bb8c_i's
  * func_80050F98). Only the three slots this unit's own
  * functions dispatch through are named.
  */
-typedef struct Class86ED0Handle Class86ED0Handle;
-typedef struct Class86ED0HandleMethods Class86ED0HandleMethods;
-struct Class86ED0HandleMethods {
+typedef struct Class86F88Handle_3bb8c_j Class86F88Handle_3bb8c_j;
+typedef struct Class86F88HandleMethods_3bb8c_j Class86F88HandleMethods_3bb8c_j;
+struct Class86F88HandleMethods_3bb8c_j {
     u8 pad000[0x004];
-    void *(*slot4)(Class86ED0Handle *self);                          /* +0x004, func_800520A0/func_80051F24 */
+    void *(*slot4)(Class86F88Handle_3bb8c_j *self);                          /* +0x004, Class86F88__ReleaseResources/Class86F88__LoadResources */
     u8 pad008[0x04C - 0x008];
-    void *(*slot4C)(Class86ED0Handle *self, void *arg1, void *arg2); /* +0x04C, func_80051F24 */
+    void *(*slot4C)(Class86F88Handle_3bb8c_j *self, void *arg1, void *arg2); /* +0x04C, Class86F88__LoadResources */
     u8 pad050[0x078 - 0x050];
-    void (*slot78)(Class86ED0Handle *self);                          /* +0x078, func_80051F24 */
+    void (*slot78)(Class86F88Handle_3bb8c_j *self);                          /* +0x078, Class86F88__LoadResources */
 };
-struct Class86ED0Handle {
-    Class86ED0HandleMethods *methods; /* +0x000 */
+struct Class86F88Handle_3bb8c_j {
+    Class86F88HandleMethods_3bb8c_j *methods; /* +0x000 */
 };
 
 /*
- * Class86ED0's own vtable. `ctor` at +0x008 is the standard New_X
+ * Class86F88_3bb8c_j's own vtable. `ctor` at +0x008 is the standard New_X
  * constructor slot -- func_80052B60() (a real function, defined in the
  * sibling unit class_3bb8c_k, still INCLUDE_ASM there) returns THIS EXACT
- * pointer type: func_80051A5C calls `func_80052B60()->ctor(...)` to reach
- * it, and func_80051AC8 (that very ctor occupant) separately does
+ * pointer type: New_Class86F88 calls `func_80052B60()->ctor(...)` to reach
+ * it, and Class86F88__Class86F88 (that very ctor occupant) separately does
  * `self->methods = func_80052B60();` -- both compile against the same
  * declared return type, which is why this is not split into a separate
  * "ctor table" type the way class_3bb8c_c's BaseCtorTable_3bb8c_c is for
  * an unrelated base class.
  */
-struct Class86ED0Methods {
+struct Class86F88Methods_3bb8c_j {
     u8 pad000[0x008];
-    void (*ctor)(Class86ED0 *self, void *arg0, s32 arg1); /* +0x008, func_80051AC8 (occupant); func_80051A5C's call site */
+    void (*ctor)(Class86F88_3bb8c_j *self, void *arg0, s32 arg1); /* +0x008, Class86F88__Class86F88 (occupant); New_Class86F88's call site */
     u8 pad00C[0x010 - 0x00C];
-    /* Called by func_80052110 at two arities: (self,arg1,arg2,arg3) at its
+    /* Called by Class86F88__AddChildAndSetState at two arities: (self,arg1,arg2,arg3) at its
      * first call site (a straight passthrough of that function's own
      * params) and (self,arg2) at its second -- see that function's report. */
-    void (*slot10)(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3); /* +0x010, func_80052110 */
-    void (*slot14)(Class86ED0 *self, void *arg1);          /* +0x014, func_8005217C */
+    void (*slot10)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3); /* +0x010, Class86F88__AddChildAndSetState */
+    void (*slot14)(Class86F88_3bb8c_j *self, void *arg1);          /* +0x014, Class86F88__RemoveCachedChildren */
     u8 pad018[0x040 - 0x018];
-    void (*slot40)(Class86ED0 *self);                        /* +0x040, func_80051AC8 tail */
+    void (*slot40)(Class86F88_3bb8c_j *self);                        /* +0x040, Class86F88__Class86F88 tail */
     u8 pad044[0x058 - 0x044];
-    void (*slot58)(Class86ED0 *self, void *arg1, s32 arg2);    /* +0x058, func_80051E64 (tag==5) */
-    void (*slot5C)(Class86ED0 *self, void *arg1, s32 arg2);     /* +0x05C, func_80051E64 (tag==2) */
+    void (*slot58)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2);    /* +0x058, Class86F88__NotifyChild (tag==5) */
+    void (*slot5C)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2);     /* +0x05C, Class86F88__NotifyChild (tag==2) */
     u8 pad060[0x08C - 0x060];
-    void (*slot8C)(Class86ED0 *self, void *arg1, Class86ED0Handle *arg2, s32 arg3, s32 arg4, s32 arg5); /* +0x08C, func_80051F24 */
-    void (*slot90)(Class86ED0 *self);                          /* +0x090, func_800520A0 */
+    void (*slot8C)(Class86F88_3bb8c_j *self, void *arg1, Class86F88Handle_3bb8c_j *arg2, s32 arg3, s32 arg4, s32 arg5); /* +0x08C, Class86F88__LoadResources */
+    void (*slot90)(Class86F88_3bb8c_j *self);                          /* +0x090, Class86F88__ReleaseResources */
 };
 
-struct Class86ED0 {
-    Class86ED0Methods *methods;    /* +0x000 */
+struct Class86F88_3bb8c_j {
+    Class86F88Methods_3bb8c_j *methods;    /* +0x000 */
     u8 pad04[0x0C - 0x04];
-    s32 unkC;                       /* +0x00C, func_80051AC8: set to its own arg2 (a mode: 0 or 1) */
-    s32 unk10;                       /* +0x010, func_80051C84/func_80051AC8: element count for unk18[]/unk1C[] */
-    s32 unk14;                        /* +0x014, func_80051AC8: a running MAX over the per-entry lengths computed in its fill loop */
-    void **unk18;                      /* +0x018, func_80051C84/func_80051AC8: array of unk10 individually-allocated buffers */
-    s32 *unk1C;                         /* +0x01C, func_80051C84 (freed as one block)/func_80051AC8 (array of unk10 per-entry lengths) */
-    s32 unk20;                           /* +0x020, func_80051F14 */
-    s32 unk24;                            /* +0x024, func_80051F14 */
-    s32 unk28;                             /* +0x028, func_80051F14 */
-    s32 unk2C;                               /* +0x02C, func_80052110: cleared to 0 */
+    s32 unkC;                       /* +0x00C, Class86F88__Class86F88: set to its own arg2 (a mode: 0 or 1) */
+    s32 unk10;                       /* +0x010, Class86F88__Finalize/Class86F88__Class86F88: element count for unk18[]/unk1C[] */
+    s32 unk14;                        /* +0x014, Class86F88__Class86F88: a running MAX over the per-entry lengths computed in its fill loop */
+    void **unk18;                      /* +0x018, Class86F88__Finalize/Class86F88__Class86F88: array of unk10 individually-allocated buffers */
+    s32 *unk1C;                         /* +0x01C, Class86F88__Finalize (freed as one block)/Class86F88__Class86F88 (array of unk10 per-entry lengths) */
+    s32 unk20;                           /* +0x020, Class86F88__ResetCounters */
+    s32 unk24;                            /* +0x024, Class86F88__ResetCounters */
+    s32 unk28;                             /* +0x028, Class86F88__ResetCounters */
+    s32 unk2C;                               /* +0x02C, Class86F88__AddChildAndSetState: cleared to 0 */
     u8 pad30[0x34 - 0x30];
     void *unk34;                            /* +0x034, "tag==2" registered-child cache */
     void *unk38;                             /* +0x038, "tag==5" registered-child cache */
-    s32 unk3C;                                /* +0x03C, func_8005217C (cleared)/func_80052110 (set from its own arg3) */
+    s32 unk3C;                                /* +0x03C, Class86F88__RemoveCachedChildren (cleared)/Class86F88__AddChildAndSetState (set from its own arg3) */
     u8 pad40[0x50 - 0x40];
-    Class86ED0Handle *unk50;                  /* +0x050 */
+    Class86F88Handle_3bb8c_j *unk50;                  /* +0x050 */
 };
 
-extern Class86ED0Methods D_80086ED0;
+/* D_80086ED0 is Obj86ED0's OWN table (Obj86ED0Methods, already shared in
+ * include/class_3bb8c.h, established by class_3bb8c_i) -- NOT this file's
+ * local Class86F88Methods_3bb8c_j. See the file header comment. */
+extern Obj86ED0Methods D_80086ED0;
 
-Class86ED0Methods *func_80051A4C(void)
+Obj86ED0Methods *Get_vtable_Obj86ED0(void)
 {
     return &D_80086ED0;
 }
 
 /*
- * New_Class86ED0. BMemPMgrAlloc/BMemPMgrFree already declared for the
+ * New_Class86F88. BMemPMgrAlloc/BMemPMgrFree already declared for the
  * Obj866E8 group above are the same generic pool allocator/free pair --
  * not redeclared here.
  *
@@ -281,11 +254,11 @@ Class86ED0Methods *func_80051A4C(void)
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
-extern Class86ED0Methods *func_80052B60(void);
+extern Class86F88Methods_3bb8c_j *func_80052B60(void);
 
-void *func_80051A5C(void *arg0, s32 arg1)
+void *New_Class86F88(void *arg0, s32 arg1)
 {
-    Class86ED0 *self = BMemPMgrAlloc(0x54);
+    Class86F88_3bb8c_j *self = BMemPMgrAlloc(0x54);
 
     if (self == NULL) {
         goto fail;
@@ -297,10 +270,10 @@ fail:
 }
 
 /*
- * Class86ED0's own ctor (the func_80052B60()->ctor occupant, matched via
+ * Class86F88_3bb8c_j's own ctor (the func_80052B60()->ctor occupant, matched via
  * its own address -- classtable-style resolution doesn't apply here since
  * this vtable is a LOCAL, no `tools/classtable.py` slot list exists for
- * it; the identity comes from func_80051A5C's call site + this function's
+ * it; the identity comes from New_Class86F88's call site + this function's
  * own signature matching it exactly).
  *
  * arg1 is a NUL-terminated array of string pointers; arg2 is a mode flag
@@ -317,7 +290,7 @@ extern s32 strlen(void *arg0);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 extern char *strcpy(char *dest, char *src);
 
-void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
+void Class86F88__Class86F88(Class86F88_3bb8c_j *self, void **arg1, s32 arg2)
 {
     void **p;
     s32 i;
@@ -355,18 +328,18 @@ void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
     }
 
     self->unkC = arg2;
-    func_80051C74(self);
+    Class86F88__ClearCachedRefs(self);
     self->methods->slot40(self);
 }
 
-void func_80051C74(Class86ED0 *self)
+void Class86F88__ClearCachedRefs(Class86F88_3bb8c_j *self)
 {
     self->unk34 = NULL;
     self->unk38 = NULL;
     self->unk50 = NULL;
 }
 
-void func_80051C84(Class86ED0 *self)
+void Class86F88__Finalize(Class86F88_3bb8c_j *self)
 {
     s32 i;
 
@@ -378,7 +351,7 @@ void func_80051C84(Class86ED0 *self)
     Get_vtable_BasicClass()->finalize(self);
 }
 
-void func_80051D1C(Class86ED0 *self, void *arg1)
+void Class86F88__AddChild(Class86F88_3bb8c_j *self, void *arg1)
 {
     s32 tag;
 
@@ -393,7 +366,7 @@ void func_80051D1C(Class86ED0 *self, void *arg1)
     }
 }
 
-void func_80051DA0(Class86ED0 *self, void *arg1)
+void Class86F88__RemoveChild(Class86F88_3bb8c_j *self, void *arg1)
 {
     s32 tag;
 
@@ -408,7 +381,7 @@ void func_80051DA0(Class86ED0 *self, void *arg1)
     }
 }
 
-void func_80051E20(Class86ED0 *self)
+void Class86F88__RemoveAllChildren(Class86F88_3bb8c_j *self)
 {
     self->unk34 = NULL;
     self->unk38 = NULL;
@@ -416,7 +389,7 @@ void func_80051E20(Class86ED0 *self)
     Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
-void func_80051E64(Class86ED0 *self, void *arg1, s32 arg2)
+void Class86F88__NotifyChild(Class86F88_3bb8c_j *self, void *arg1, s32 arg2)
 {
     s32 tag;
 
@@ -429,7 +402,7 @@ void func_80051E64(Class86ED0 *self, void *arg1, s32 arg2)
     }
 }
 
-void func_80051F14(Class86ED0 *self)
+void Class86F88__ResetCounters(Class86F88_3bb8c_j *self)
 {
     self->unk20 = 0;
     self->unk24 = 0;
@@ -437,8 +410,8 @@ void func_80051F14(Class86ED0 *self)
 }
 
 extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
-extern Class86ED0Handle *func_8003B39C(char *path);
-extern Class86ED0Handle *func_80041C9C(Class86ED0Handle *arg0, void *arg1, s32 arg2);
+extern Class86F88Handle_3bb8c_j *func_8003B39C(char *path);
+extern Class86F88Handle_3bb8c_j *func_80041C9C(Class86F88Handle_3bb8c_j *arg0, void *arg1, s32 arg2);
 extern const char D_8008AB14[]; /* "SELECT" */
 extern const char D_8008AB1C[]; /* "CARD\\" */
 extern const char D_8008AB24[]; /* ".TIM" */
@@ -452,13 +425,13 @@ extern const char D_800116E4[]; /* "FONTICON" */
  * round-18/19 stall (75/95, both addresses and the handle swapped among
  * $s0-$s2). Same shape as class_3bb8c_i's func_80050F98.
  */
-void func_80051F24(Class86ED0 *self, void *arg1)
+void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
 {
     char path[0x20];
     const char *dir;
     const char *ext;
-    Class86ED0Handle *handle1;
-    Class86ED0Handle *handle2;
+    Class86F88Handle_3bb8c_j *handle1;
+    Class86F88Handle_3bb8c_j *handle2;
 
     if (arg1 == NULL) {
         return;
@@ -482,7 +455,7 @@ void func_80051F24(Class86ED0 *self, void *arg1)
     handle2->methods->slot4(handle2);
 }
 
-void func_800520A0(Class86ED0 *self)
+void Class86F88__ReleaseResources(Class86F88_3bb8c_j *self)
 {
     if (self->unk50) {
         self->methods->slot90(self);
@@ -490,10 +463,10 @@ void func_800520A0(Class86ED0 *self)
     }
 }
 
-void func_80052110(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3)
+void Class86F88__AddChildAndSetState(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3)
 {
-    typedef void (*Slot10NarrowFn)(Class86ED0 *self, s32 arg1);
-    void (*fn)(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3);
+    typedef void (*Slot10NarrowFn)(Class86F88_3bb8c_j *self, s32 arg1);
+    void (*fn)(Class86F88_3bb8c_j *self, void *arg1, s32 arg2, s32 arg3);
     s32 zero;
 
     zero = 0;
@@ -506,7 +479,7 @@ void func_80052110(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3)
     } while (0);
 }
 
-void func_8005217C(Class86ED0 *self)
+void Class86F88__RemoveCachedChildren(Class86F88_3bb8c_j *self)
 {
     self->methods->slot14(self, self->unk34);
     self->methods->slot14(self, self->unk38);

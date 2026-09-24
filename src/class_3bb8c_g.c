@@ -292,7 +292,7 @@ void TaskObjF__AttachChildB(Class86E00_3bb8c_g *self)
 {
     if (self->childReady != 0 && self->unk60 != 0) {
         if (self->childB == NULL) {
-            self->childB = func_80051A5C(self->unk38, 1);
+            self->childB = New_Class86F88(self->unk38, 1);
             self->childAttached = 1;
         }
         self->methods->slot10(self, self->childB);

@@ -64,7 +64,7 @@ no existing-declaration retype to flag for this function.
   `Class86E00Methods_3bb8c_g`'s `slot10`/`slot78`/`slot7C`/`slot8C`/
   `slot90`/`slot94`/`slotA0`/`slotAC`, plus `extern` declarations for two
   external helpers this unit calls but does not own
-  (`func_80051A5C`, `func_80050BA8`). These are exercised by later
+  (`New_Class86F88`, `func_80050BA8`). These are exercised by later
   functions in this unit; see their own reports for confirmation.
 
 ### Proposed learning
