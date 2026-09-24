@@ -103,3 +103,7 @@ requiring the OUTER write (`*p2 = ...`) to be the one whose VALUE
 argument physically stores earlier. Found by the permuter after ~6 failed
 manual attempts; confirm via the permuter before manually iterating
 further on this residue class.
+
+## Naming (round 78, track 3)
+
+`func_8004E7D0` -> `TaskObjF__CardInfoStatus`. **Tier B.** Private helper called only by `TaskObjF__CardInfoAndLoadStatus`. Polls `_card_info(self->cardHandle)` until ready, waits for the resulting event (`TaskObjF__WaitForReadyEvent`), and decodes the status code into two output flags, clearing the card (`_card_clear`) on code 0x2000. Named for the BIOS call it wraps; the status codes' game-level meaning is not established.

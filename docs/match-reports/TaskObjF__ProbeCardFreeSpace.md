@@ -101,3 +101,7 @@ emitted, which is why it read as two). `src/class_3bb8c_e.c` now declares
 one real prototype, `extern void *BuildMemcardPath(void *dest, s32 selector,
 void *suffix);`, replacing the unprototyped `arity-ok` declarations; this
 function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).
+
+## Naming (round 78, track 3)
+
+`func_8004ECCC` -> `TaskObjF__ProbeCardFreeSpace`. **Tier A.** Private helper called only by `TaskObjF__CheckCardSpace`. Computes a sector count from `sizeArg` with the identical round-up formula class_3bb8c_f.c's already-matched `TaskObjF__TryWriteMemcardSaveFile` uses (`(size + 0x21FF) >> 13`), builds a path with the placeholder suffix `gMcTempFileSuffix` (literal "TEMP", asm/data/7B12C.sdata.s), OPENS a file of that many reserved sectors, then immediately closes and deletes it. This is the same create-then-delete idiom `TaskObjF__TryWriteMemcardSaveFile` uses on its real save path (open with `(sectors<<16)|0x200` fails with -1 if there isn't room) -- here applied to a throwaway file purely to test whether that much free space exists, without leaving a file behind. The `id` parameter is unused in the body. Tier A: the create/delete idiom and the dedicated placeholder suffix make the mechanism unambiguous.

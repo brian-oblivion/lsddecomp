@@ -307,3 +307,7 @@ otherwise unchanged in substance. Restored the `#ifdef
 NON_MATCHING`/`#else INCLUDE_ASM`/`#endif` wrapper after measuring;
 `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green with
 the wrapped form in place.
+
+## Naming (round 78, track 3)
+
+`func_8004EA38` -> `TaskObjF__OpenAndReadMemcardFile`. **Tier B.** Private helper called only by `TaskObjF__ProbeMemcardFile`. Builds a memcard path (`BuildMemcardPath(pathBuf, self->cardSlot, suffix)`), opens it, and if `destBuf` is non-NULL reads the first 0x80 bytes and `strcpy`s from offset +4 into `destBuf` (skipping what looks like a 4-byte header field). Mechanics only; what the copied bytes represent to the game (a save's title/comment field, by position) is not confirmed here.

@@ -34,3 +34,7 @@ void TaskObjF__ClearResourceSlots(Node3bb8cE *self)
 
 None beyond what's already recorded — a pure straight-line store sequence
 needs nothing beyond a direct transcription.
+
+## Naming (round 78, track 3)
+
+`func_8004E3F4` -> `TaskObjF__ClearResourceSlots`. **Tier B.** NOT a `gTaskObjFMethods` entry (checked against the full table) -- called once, directly, from `TaskObjF__TaskObjF`'s own ctor (class_3bb8c_d.c), before `self->methods->slot40(self, arg2)` (`TaskObjF__SetCardSlot`). Zeroes the same five resource-slot pointers (`res02`/`res05`/`unk68`/`res10`/`res20`) that `TaskObjF__RemoveAllChildren` zeroes before chaining to the base class. Mechanics are exact (construction-time init of the resource slots); tier B because it is one line of evidence (a single call site) rather than two independent callers agreeing.

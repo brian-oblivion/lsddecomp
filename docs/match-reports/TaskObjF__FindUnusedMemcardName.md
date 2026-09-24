@@ -61,3 +61,7 @@ entries) — here the tell was a spurious extra `move` and the wrong total
 instruction count, not a branch-target or value mismatch, so it read at
 first like "something is subtly wrong with the loop" rather than "this
 is a `do-while`, try `while` instead."
+
+## Naming (round 78, track 3)
+
+`func_8004EADC` -> `TaskObjF__FindUnusedMemcardName`. **Tier B.** Sits at `gTaskObjFMethods` +0x058. Walks a NULL-terminated `entries` array of candidate suffixes, builds `buf = middle + entries[i]`, and returns the first candidate for which `self->methods->slot54(self, 0, buf)` reports **not found** (`== 0`, `destBuf` NULL so existence-only). Mechanically this returns the first candidate name that does NOT already exist on the card -- named for that mechanism ("unused"), not for an assumed purpose (e.g. "next free save slot"), which the body alone does not establish; tier B.

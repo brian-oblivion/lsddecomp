@@ -95,3 +95,7 @@ actual `switch` — the superficially switch-shaped `andi`/`bne` sequence
 here is NOT reproducible by a real `switch` statement (tried, regressed
 badly); it wants the narrow-then-wide literal if-chain instead. See
 `TaskObjF__RemoveChild`, which needed the identical narrow-then-wide split.
+
+## Naming (round 78, track 3)
+
+`func_8004E444` -> `TaskObjF__AddChild`. **Tier A.** Sits at `gTaskObjFMethods` +0x010 (asm/data/76DC8.data.s), the exact offset this unit's own `BaseMethods3bb8cE` view had already named `addChild`. Classifies the incoming `Res3bb8cE`'s tag word into one of the four typed resource slots (`res02`/`res05`/`res10`/`res20`) after forwarding to the base class's own `addChild` -- a textbook override-then-chain-to-base shape. `TaskObjF__` prefix: see the unit header comment.

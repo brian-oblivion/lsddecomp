@@ -44,3 +44,7 @@ the actual instruction retail emits rather than the more idiomatic-looking
 None new — a straightforward "10 retries, then give up" idiom already
 established elsewhere in this project (`TaskObjF__ProbeMemcardFile`/`TaskObjF__CheckCardSpace` in
 this same unit share the shape).
+
+## Naming (round 78, track 3)
+
+`func_8004E940` -> `TaskObjF__FormatCard`. **Tier A.** Sits at `gTaskObjFMethods` +0x050. Retries up to 10 times: pick `gMcDevicePath1`/`gMcDevicePath0` (BIOS device names "bu10:"/"bu00:", asm/data/7B12C.sdata.s) by `self->cardSlot`, and call the linked BIOS `format()` on it. Direct call to a BIOS function named `format` -- tier A.

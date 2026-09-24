@@ -70,3 +70,7 @@ one, count it." Both are correct readings of their own disassembly;
 neither generalizes to the other. Consistent with the project's
 established "arity/typing is a per-call-site property" family, extended
 here to return-value POLARITY as well as arity.
+
+## Naming (round 78, track 3)
+
+`func_8004EB88` -> `TaskObjF__CollectExistingMemcardFiles`. **Tier B.** Sits at `gTaskObjFMethods` +0x05C, the sibling slot to `TaskObjF__FindUnusedMemcardName` (+0x058) with the inverted test: walks the same kind of `entries` array, and for each candidate where `self->methods->slot54(self, *values, buf) != 0` (found, with a real per-entry `destBuf` this time), records the matched entry pointer into `outArr`, advances `values`, and increments the returned count. Mechanics clear (collects the existing files among the candidates, reading each one's header into its own caller-supplied buffer); the caller-side use of the collected list is outside this unit, tier B.

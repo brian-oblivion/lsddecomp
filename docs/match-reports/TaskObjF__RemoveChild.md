@@ -53,3 +53,7 @@ target being the same shared instruction that also serves as the
 
 Confirms `TaskObjF__AddChild`'s narrow-then-wide mask lesson generalizes to
 its structural mirror. See that report for the full derivation.
+
+## Naming (round 78, track 3)
+
+`func_8004E4E8` -> `TaskObjF__RemoveChild`. **Tier A.** Sits at `gTaskObjFMethods` +0x014, the offset this unit's own `BaseMethods3bb8cE` view had already named `removeChild`. Clears whichever typed resource slot the tag word selects, then chains to the base class's `removeChild` -- the exact mirror of `TaskObjF__AddChild`.

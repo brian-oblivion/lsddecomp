@@ -67,3 +67,7 @@ emitted, which is why it read as two). `src/class_3bb8c_e.c` now declares
 one real prototype, `extern void *BuildMemcardPath(void *dest, s32 selector,
 void *suffix);`, replacing the unprototyped `arity-ok` declarations; this
 function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).
+
+## Naming (round 78, track 3)
+
+`func_8004E9AC` -> `TaskObjF__ProbeMemcardFile`. **Tier B.** Sits at `gTaskObjFMethods` +0x054, matching `Node3bb8cE`'s own `SelfMethods3bb8cE.slot54(self, s32, char*)` -- the slot `TaskObjF__FindUnusedMemcardName`/`TaskObjF__CollectExistingMemcardFiles` dispatch through on themselves. Guards an empty/NULL suffix, then makes a single (`retries = 0`, structurally never loops) call to `TaskObjF__OpenAndReadMemcardFile`. Named for what it mechanically is (a single-attempt existence/read probe used as the vtable's file-check slot); the two different calling conventions its callers use (`destBuf == NULL` for existence-only, non-NULL to also read) keep this tier B rather than A.

@@ -69,3 +69,7 @@ reproducing retail's "cheap base register + per-store fixed immediate"
 shape. This is a new variant of the already-recorded "explicit
 intermediate element pointer" family — here the fix is the opposite
 direction: NOT introducing the intermediate pointer.
+
+## Naming (round 78, track 3)
+
+`func_8004E5E4` -> `TaskObjF__OpenEvents`. **Tier A.** Sits at `gTaskObjFMethods` +0x044. Opens 4 PSX kernel events (`OpenEvent`) into `self->events[0..3]` (matches `TaskObjF::events`, include/class_3bb8c.h, at the identical +0x014 offset -- corroborated cross-unit since round 60, see TaskObjF__EnableEvents.md) inside a critical section, then calls `TaskObjF__EnableEvents(self)`. Paired with `TaskObjF__CloseEvents`.

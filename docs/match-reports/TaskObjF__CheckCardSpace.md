@@ -52,3 +52,7 @@ registers relative to retail; the narrow-parameter version matched
 immediately. Try the narrow parameter type before chasing this class of
 residue with barriers or declaration reordering (both tried here first
 and made things worse).
+
+## Naming (round 78, track 3)
+
+`func_8004EC5C` -> `TaskObjF__CheckCardSpace`. **Tier B.** Sits at `gTaskObjFMethods` +0x060. Retries `TaskObjF__ProbeCardFreeSpace` up to 10 times. Mechanics only (retry wrapper); see `TaskObjF__ProbeCardFreeSpace` for what it actually checks.

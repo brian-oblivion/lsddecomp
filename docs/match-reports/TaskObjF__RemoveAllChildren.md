@@ -31,3 +31,7 @@ void TaskObjF__RemoveAllChildren(Node3bb8cE *self)
 ### Proposed learning
 
 None new.
+
+## Naming (round 78, track 3)
+
+`func_8004E588` -> `TaskObjF__RemoveAllChildren`. **Tier A.** Sits at `gTaskObjFMethods` +0x018, the offset this unit's own `BaseMethods3bb8cE` view had already named `removeAllChildren`. Clears all five resource-slot pointers (the same five `TaskObjF__ClearResourceSlots` zeroes) then chains to the base class's `removeAllChildren`.

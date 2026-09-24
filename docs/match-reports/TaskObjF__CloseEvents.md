@@ -37,3 +37,7 @@ Declared locally in `src/class_3bb8c_e.c`, not in the shared
 None new — matches the established "discarded call for side effect, then
 unconditional literal return" shape already documented for one-line
 wrappers.
+
+## Naming (round 78, track 3)
+
+`func_8004E678` -> `TaskObjF__CloseEvents`. **Tier A.** Sits at `gTaskObjFMethods` +0x048. Disables events (`TaskObjF__DisableEvents`) then closes all 4 via `TaskObjF__ForEachEvent(self, CloseEvent, 1)` -- the exact teardown counterpart of `TaskObjF__OpenEvents`, which this unit's own +0x044 slot opens the same 4 events.

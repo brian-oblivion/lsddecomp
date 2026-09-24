@@ -54,3 +54,7 @@ forced adjacent (ahead of an intervening void call) write DIFFERENT
 values, the comma operator (`*a = (*b = v1, v2);`) is the equivalent of
 the same-value chained assignment (`*a = *b = v;`) — both remove GCC
 2.6.3's freedom to hoist the call across just one of the two stores.
+
+## Naming (round 78, track 3)
+
+`func_8004E890` -> `TaskObjF__CardLoadStatus`. **Tier B.** Private helper called only by `TaskObjF__CardInfoAndLoadStatus`. Same shape as `TaskObjF__CardInfoStatus` but polls `_card_load` instead of `_card_info`, and does not clear the card on code 0x2000. Named for the BIOS call it wraps.

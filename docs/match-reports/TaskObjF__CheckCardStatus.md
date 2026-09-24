@@ -409,3 +409,7 @@ title used to carry — the title above is now rewritten with these figures.
 Restored the `#ifdef NON_MATCHING`/`#else INCLUDE_ASM`/`#endif` wrapper
 after measuring; `./build-and-verify.sh` and `tools/check-nonmatching.sh`
 both green with the wrapped form in place.
+
+## Naming (round 78, track 3)
+
+`func_8004E6B8` -> `TaskObjF__CheckCardStatus`. **Tier B.** Sits at `gTaskObjFMethods` +0x04C, matching `TaskObjFMethods`'s own `slot4C(self, s32*, s32*, s32*)` signature exactly (include/class_3bb8c.h). Retries `TaskObjF__CardInfoAndLoadStatus` up to 10 times, combining its out-flags. Mechanics are clear (poll card info/load status with retry); what the three `s32*` outputs mean to the game beyond error/info-unformatted/load-unformatted is not established here, so tier B.
