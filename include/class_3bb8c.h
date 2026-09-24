@@ -468,7 +468,7 @@ struct ElemTarget {
     s16 unk2C;                     /* +0x02C, func_8004BD14/func_8004C5D0 (nonzero test) */
     s16 unk2E;                     /* +0x02E, func_8004BD14 */
     s16 unk30;                     /* +0x030, func_8004C0AC/func_8004C3F0/func_8004C5D0 */
-    s16 unk32;                     /* +0x032, func_8004C434/func_8004C588 */
+    s16 unk32;                     /* +0x032, func_8004C434/Class866E8__FindElemIndexByUnk32 */
 };
 
 /*
@@ -477,7 +477,7 @@ struct ElemTarget {
  * func_8004C0AC (+0x00C indirectly via unk4, +0x010) and func_8004BD14
  * (+0x000, +0x004). class_3bb8c_b's func_8004D1D0 independently reached
  * the same +0x010 pointer array, walked over the same 0x668 raw bytes,
- * and func_8004C5D0/func_8004C588 the same +0x004 target.
+ * and func_8004C5D0/Class866E8__FindElemIndexByUnk32 the same +0x004 target.
  */
 struct Elem {
     u16 flag;                      /* +0x000 */
@@ -754,7 +754,7 @@ struct Obj866E8 {
     GridSlot866E8 slots8C[4];      /* +0x08C, func_8004CE24 (reads); func_8004CDA4 (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
     Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
     u8 padC6[0xEC - 0xC6];
-    Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/func_8004C588/func_8004C5D0/func_8004BD14/func_8004D1D0 */
+    Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/Class866E8__FindElemIndexByUnk32/func_8004C5D0/func_8004BD14/func_8004D1D0 */
     s32 unk1B0;                    /* +0x1B0, func_8004BD14 */
     u16 unk1B4;                    /* +0x1B4, func_8004BD14 */
     u8 pad1B6[0x1B8 - 0x1B6];

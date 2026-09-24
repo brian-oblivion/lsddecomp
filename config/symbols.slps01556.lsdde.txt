@@ -2073,3 +2073,4 @@ Class65650__ApplyTodPacket = 0x80066340; // type:func
 Class65650__LinkPeer = 0x80066748; // type:func
 Class65650__UnlinkPeer = 0x800667B0; // type:func
 Class65650__AttachToParent = 0x80065918; // type:func
+Class866E8__FindElemIndexByUnk32 = 0x8004C588; // type:func

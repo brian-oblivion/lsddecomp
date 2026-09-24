@@ -1,4 +1,6 @@
-# func_8004C588 — MATCHED (18/18 words)
+# Class866E8__FindElemIndexByUnk32 — MATCHED (18/18 words)
+
+> Renamed from `func_8004C588` on 2026-09-24 (tools/rename.py). Address 0x8004c588.
 
 Not a vtable slot by call-site inspection needed — it IS one, per
 `tools/classtable.py D_800866E8` (`+0x120`), though nothing in this unit
@@ -34,7 +36,7 @@ Second attempt (with `e`) matched immediately.
 ## Final C
 
 ```c
-s32 func_8004C588(Obj866E8 *self, s32 key) {
+s32 Class866E8__FindElemIndexByUnk32(Obj866E8 *self, s32 key) {
     s32 result;
     s32 i;
     Elem *e;

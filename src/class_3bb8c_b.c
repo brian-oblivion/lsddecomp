@@ -5,7 +5,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-s32 func_8004C588(Obj866E8 *self, s32 key) {
+s32 Class866E8__FindElemIndexByUnk32(Obj866E8 *self, s32 key) {
     s32 result;
     s32 i;
     Elem *e;
