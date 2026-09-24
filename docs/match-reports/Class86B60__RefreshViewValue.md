@@ -1,12 +1,14 @@
-# func_8004DABC -- MATCH
+# Class86B60__RefreshViewValue -- MATCH
+
+> Renamed from `func_8004DABC` on 2026-09-24 (tools/rename.py). Address 0x8004dabc.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004DABC`: 23/23 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__RefreshViewValue`: 23/23 words match.
 
 ## Source
 
 ```c
-void func_8004DABC(Class86B60 *self)
+void Class86B60__RefreshViewValue(Class86B60 *self)
 {
     s32 buf;
 

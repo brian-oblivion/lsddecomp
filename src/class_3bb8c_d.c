@@ -80,7 +80,7 @@ void Class86B60__Tick(Class86B60 *self)
     fn(self);
 }
 
-void func_8004DABC(Class86B60 *self)
+void Class86B60__RefreshViewValue(Class86B60 *self)
 {
     s32 buf;
 

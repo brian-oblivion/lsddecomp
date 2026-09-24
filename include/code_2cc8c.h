@@ -1129,7 +1129,7 @@ struct Obj86B60Methods {
                                                       read off the
                                                       disassembly only) */
     void (*slot94)(Obj86B60 *self);                /* +0x094, external
-                                                       (func_8004DABC);
+                                                       (Class86B60__RefreshViewValue);
                                                        OBSERVED:
                                                        func_8003CA1C and
                                                        func_8003C63C (STALL) */
@@ -1160,7 +1160,7 @@ struct Obj86B60Methods {
                                                        (func_8003D444);
                                                        OBSERVED: func_8003C944 */
     void (*slotF0)(Obj86B60 *self, s32 a1, s32 a2); /* +0x0F0, external
-                                                       (func_8004DABC);
+                                                       (Class86B60__RefreshViewValue);
                                                        OBSERVED:
                                                        func_8003C63C (STALL,
                                                        not attempted) */

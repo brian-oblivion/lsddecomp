@@ -1038,14 +1038,14 @@ struct Class86B60Unk4CObj_3bb8c_d {
 };
 
 /*
- * self->unk60's pointee. Only `unk14` is reached, by func_8004DABC, as a
+ * self->unk60's pointee. Only `unk14` is reached, by Class86B60__RefreshViewValue, as a
  * plain `s32` copied into a one-word stack buffer before being forwarded
  * by address to `DreamSysViewMethods_3bb8c_c::slot19C`.
  */
 typedef struct Class86B60Unk60Obj_3bb8c_d Class86B60Unk60Obj_3bb8c_d;
 struct Class86B60Unk60Obj_3bb8c_d {
     u8 pad0[0x014];
-    s32 unk14; /* +0x014, func_8004DABC */
+    s32 unk14; /* +0x014, Class86B60__RefreshViewValue */
 };
 
 /*
@@ -1294,7 +1294,7 @@ struct Class86B60 {
     u8 pad050[0x058 - 0x050];
     s32 unk58;                       /* +0x058, Class86B60__Tick: 5-valued dispatch (0-4) */
     u8 pad05C[0x060 - 0x05C];
-    Class86B60Unk60Obj_3bb8c_d *unk60; /* +0x060, func_8004DABC */
+    Class86B60Unk60Obj_3bb8c_d *unk60; /* +0x060, Class86B60__RefreshViewValue */
     u8 pad064[0x093 - 0x064];
     /* +0x093, Class86B60__RegisterHandlers: address-of only, forwarded as
      * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`'s 2nd argument each
@@ -1382,7 +1382,7 @@ struct DreamSysViewMethods_3bb8c_c {
      * trailing arguments literal zero. */
     void (*slotF0)(DreamSysView_3bb8c_c *self, s32 arg1, s32 arg2);
     u8 pad0F4[0x19C - 0x0F4];
-    /* +0x19C, func_8004DABC's own call: `arg1` is the address of a
+    /* +0x19C, Class86B60__RefreshViewValue's own call: `arg1` is the address of a
      * one-word stack buffer this function fills from
      * `self->unk60->unk14` before the call. */
     void (*slot19C)(DreamSysView_3bb8c_c *self, s32 *arg1);
@@ -1442,7 +1442,7 @@ struct BaseTaskCtorTable_3bb8c_c {
     u8 pad064[0x090 - 0x064];
     /* +0x090, Class86B60__Tick's own first, unconditional call, `self` only. */
     void (*slot90)(void *self);
-    /* +0x094, func_8004DABC's own first, unconditional call, `self`
+    /* +0x094, Class86B60__RefreshViewValue's own first, unconditional call, `self`
      * only. Distinct from `Class86B60Methods::slot94` (see
      * Class86B60__Tick's report) -- same offset number, unrelated table. */
     void (*slot94)(void *self);
