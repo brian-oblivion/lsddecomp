@@ -729,3 +729,9 @@ $v0,0($sN)` immediately after the `jal`, then `beqz $v0` with `addiu
 $sN,$sN,4` in the delay slot. Same family as this round's loop-kind lever:
 a barrier (or a filler) that fixes one symptom is evidence the statement
 shape is wrong, not that the remainder is register allocation.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__CreateParts` (was `func_80065E1C`), tier A. Asks modelData->getObjectIds (D_8006F384 +0x080) for the count, allocates parts (count pointers) and partIds (count bytes), fills partIds, creates one New_BaseObjO per entry counting partCount up, sets mainPart = parts[buf[0]]; on any failure DestroyParts and return 1.

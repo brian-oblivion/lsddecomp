@@ -82,3 +82,9 @@ constructor's return, two early exits converging on one epilogue
 Identify which shape a given `New_X` is (does the retail asm test the
 constructor's own `$v0` after the `jalr`?) before assuming a `goto` rewrite is
 required.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `New_Class65650` (was `New_class_65650`), tier A. Allocates 0x98 bytes with BMemPMgrAlloc, runs `Get_vtable_Class65650()->ctor`, frees on failure: the project's `New_Class` allocator shape. Replaces FirecatFG's `New_class_65650` (same meaning, convention spelling).

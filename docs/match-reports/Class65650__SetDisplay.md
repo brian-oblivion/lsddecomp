@@ -640,3 +640,9 @@ never takes the `NON_MATCHING` branch) and `tools/check-nonmatching.sh`
 compiles it clean.
 
 NON_MATCHING body promoted, round 61.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__SetDisplay` (was `func_80065A5C`), tier A. Occupies +0x060, overriding Class6B5CC__SetDisplay; forwards its argument to every part's SetDisplay (Unk70ElemMethods +0x060 = Class6B5CC__SetDisplay, the parts being BaseObjO from New_BaseObjO).

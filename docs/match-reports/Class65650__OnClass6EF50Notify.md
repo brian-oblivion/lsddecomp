@@ -67,3 +67,9 @@ survived an EARLIER call untouched, the source cannot have named that
 argument at either call site. Check whether the surviving register's use
 is genuinely referenced by the C, or merely a side effect of the callee
 never being asked to preserve it.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__OnClass6EF50Notify` (was `func_80065B80`), tier B. Occupies +0x098, which Class6B5CC__OnNotify (code_d294.c) dispatches to when the sender's header tag is 5 (TAG_CLASS6EF50, D_8006EF50). Code 2 calls tick (+0x108), code 4 calls release. Mechanics known; what Class6EF50 is (the tag-5 companion held in BaseObjO companion2) is not, hence B. Entity overrides this slot as Entity__Update.

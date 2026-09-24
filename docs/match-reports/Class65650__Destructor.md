@@ -30,3 +30,9 @@ No reshaping needed; matched on the direct translation.
 
 None beyond what `Class65650__Class65650.md` and `New_Class65650.md`
 already record for this class.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__Destructor` (was `func_8006573C`), tier A. Occupies +0x00C (overrides Class6B5CC__Finalize): teardownModelData, then the base dtor. Named like Entity__Destructor, the subclass's own +0x00C.

@@ -1083,3 +1083,9 @@ and precedes both. Tell: `move aN,sM` (a copy of a base register used only
 as the loop's walking pointer) immediately after the `lui`/`ori` pair.
 Fix: write `base[i]` and drop the pointer variable. Six hand reshapes and
 ~192k permuter iterations missed it because all of them kept the pointer.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__ApplyTodPacket` (was `func_80066340`), tier A. Occupies +0x138. modelData->decodeTodPacket gives {object id, type, flag, length}; object id -> part via FindPartIndex; clears the part's coord2->flg. Type 0: attribute = (attribute & w0) | w1. Type 1: rotate (/360, %4096 when differential), scale (x/4096 when differential), trans into the part's GsCOORD2PARAM, flag bit 0 = differential, bits 1/2/3 = rotate/scale/translate, trans copied to coord.t. Type 2: link model tmd->getModel(id-1) if the part has none. Type 3: attach to self (id 0 or 0xFFFF) or to another part. Returns packet + length*4. Every packet type and flag bit matches the TOD packet format.

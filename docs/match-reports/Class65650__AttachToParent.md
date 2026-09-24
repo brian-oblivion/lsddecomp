@@ -55,3 +55,9 @@ dispatched through here" note still holds — the type derived from the
 now-confirmed target function's own signature (here, `Class65650 *other`
 instead of a generic `void *`) is strictly more useful than leaving the
 slot untyped.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__AttachToParent` (was `func_80065918`), tier A. Occupies +0x04C, overriding Class6B5CC__AttachToParent. While parent (+0x0C) is NULL: chains the base attach with (arg3, arg4) = (parent, offset), links arg2 as a companion if companion2 is empty, then linkPeer(arg1).

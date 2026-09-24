@@ -55,3 +55,9 @@ conditional — not two independent per-branch assignments to the same
 lvalue. This is the same family as the `New_X` `goto`-vs-`return` levers
 (one shared write site reached two ways) but for a plain assignment rather
 than a function return.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__ReleaseModelData` (was `func_80065CEC`), tier A. teardownParts (+0x104), then if ownsModelData stores modelData->release() (D_8006F384 +0x004, DestroyChained) back into modelData, else NULL.

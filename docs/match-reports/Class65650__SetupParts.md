@@ -32,3 +32,9 @@ Matched on the direct translation — same zero-residue result as
 ### Proposed learning
 
 None beyond `Class65650__SetupModelData.md`'s.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__SetupParts` (was `func_80065DBC`), tier A. Occupies +0x100 (AcquireModelData's success path). Returns 0 if parts is already set, otherwise CreateParts.

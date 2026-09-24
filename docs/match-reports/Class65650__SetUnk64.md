@@ -21,3 +21,9 @@ void Class65650__SetUnk64(Class65650 *self, s32 value)
 ### Proposed learning
 
 None; this is the plain single-instruction setter shape.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__SetUnk64` (was `func_80065BF4`), tier B. Occupies +0x0F0 (first slot of this class's own range); a one-line setter of +0x64. InitDefaults sets it to 1 and TickCallbackA acts only while it is 1; what the value means is not known, so the field keeps its offset name.

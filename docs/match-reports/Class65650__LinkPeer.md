@@ -41,3 +41,9 @@ the functions attempted so far can still turn out to be a pointer — `sw
 $zero` looks identical for a null pointer and an integer 0. Don't commit to
 a scalar type until a function that actually *uses* the field (not just
 initializes it) is decompiled.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__LinkPeer` (was `func_80066748`), tier A. Occupies +0x13C (called by AttachToParent). If `other` is set: other->linkCompanion(self), self->linkCompanion(other), peer = other. A symmetric link, fully evident from the body.

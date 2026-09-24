@@ -93,3 +93,9 @@ with no distinguishing feature (here: same fallthrough/jump split either
 way) — so the fix isn't "use goto", it's "put the block that should be a
 jump target physically last in the source", which sometimes only works in
 one of the two possible label placements.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__AcquireModelData` (was `func_80065C5C`), tier A. Borrows arg1->modelData (+0x0C) with ownsModelData = 0, or makes one with func_8004468C(arg1) with ownsModelData = 1. On success returns setupParts (+0x100); on NULL calls ReleaseModelData and returns 1.

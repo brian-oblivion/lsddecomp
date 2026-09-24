@@ -76,3 +76,9 @@ they were architecturally distinct, a plain "check then separately
 decrement in the body" would be more likely. This is a mechanical
 generalization of the project's known `p++`-in-condition idiom to a
 "field-in-condition" case; add it if this recurs.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__DestroyParts` (was `func_80065F2C`), tier A. Releases every part through its +0x004 (BasicClass__Release) while counting partCount down, clears mainPart, frees partIds and parts with BMemPMgrFree.

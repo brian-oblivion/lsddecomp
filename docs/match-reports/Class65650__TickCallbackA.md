@@ -41,3 +41,9 @@ Two independent field-guard branches, the first `bne`/`beqz`-style skipping
 straight past the second on failure, read naturally as a single `&&`
 condition rather than nested `if`s — worth trying `&&` first on this shape
 before nesting.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__TickCallbackA` (was `func_80066150`), tier B. Occupies +0x118, the callback SelectTickCallback installs for 'A' (InitDefaults' default). Calls slotC4 (BaseObjO__func_5748c) with (-0x1E, 0), and if unk64 == 1 and mainPart is set, mainPart->slot88(6) (BaseObjO__func_571f8). Neither callee has a purpose name yet, hence B.

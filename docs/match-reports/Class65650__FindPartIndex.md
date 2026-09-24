@@ -121,3 +121,9 @@ encoded branch offset can be nothing more than the branch's own position
 shifting by the same reorder that scrambled its delay slot, if it still
 targets the identical label. Confirming that first is what justified
 reaching for `__asm__("")` here instead of re-deriving the control flow.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__FindPartIndex` (was `func_80065D64`), tier A. Occupies +0x0FC. Linear search of partIds (one byte per part, partCount entries) for the low byte of its argument; returns the index or -1. ApplyTodPacket uses it to map a TOD packet's object id to a part.

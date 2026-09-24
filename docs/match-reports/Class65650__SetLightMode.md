@@ -724,3 +724,9 @@ verified build never compiles the NON_MATCHING half) and
 `tools/check-nonmatching.sh` green (11 NON_MATCHING bodies across 4 units,
 up from 10/4 before this round's addition). No new build attempt made;
 promotion only.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__SetLightMode` (was `func_80065AE0`), tier A. Occupies +0x070, overriding Class6B5CC__SetLightMode; forwards to every part's SetLightMode, then chains the base.

@@ -53,3 +53,9 @@ callee(...);` with no intervening use of the result), plain `if (...)
 return CONST; return callee(...);` matches directly — there is nothing left
 for `goto` to reposition. Check which shape you have before reaching for
 `goto`.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__SetupModelData` (was `func_80065BFC`), tier A. Occupies +0x0F4 (called by the ctor as setupModelData(self, arg1)). Returns 0 if modelData is already set, otherwise AcquireModelData.

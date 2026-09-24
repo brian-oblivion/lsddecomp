@@ -36,3 +36,9 @@ tested since the as-derived form matched immediately).
 ### Proposed learning
 
 None beyond `Class65650__LinkPeer.md`'s (the two are a matched link/unlink pair).
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__UnlinkPeer` (was `func_800667B0`), tier A. Occupies +0x140 (called by DetachFromParent). The mirror of LinkPeer: mutual unlinkCompanion, peer = NULL.

@@ -61,3 +61,9 @@ surprises).
 
 None beyond what's already recorded — straightforward once the six new
 slots were named from the call sites' own argument registers.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__InitDefaults` (was `func_80065830`), tier A. Occupies +0x040, overriding BaseObjO__InitDefaults. Body sets defaults through its own slots: base SetDisplay(0), setUnk64(1), setLastOffsetValue(0x12C) (the 0x12C BaseObjO__InitDefaults writes too), disableTickCallback, selectTickCallback('A'), stopTod, setTod(0), then links mainPart's model to itself.

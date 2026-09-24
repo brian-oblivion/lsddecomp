@@ -29,3 +29,9 @@ For a "set field to literal N and return N" shape, write
 assignment-expression reuses the same register GCC computes for the literal,
 matching retail's one-`ori` codegen. Two statements risk (though did not
 here) a second, redundant load of the same literal.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__EnableTickCallback` (was `func_8006613C`), tier A. Occupies +0x110; sets tickCallbackEnabled (+0x8C) = 1 and returns it. Tick calls tickCallback only while it is set. Entity__StartSoundCue calls this slot.

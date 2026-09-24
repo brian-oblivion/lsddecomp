@@ -704,3 +704,9 @@ INCLUDE_ASM ... #endif`. No new declarations needed; `slot138`'s signature
 changed) and `tools/check-nonmatching.sh` compiles it clean.
 
 NON_MATCHING body promoted, round 61.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__ApplyTodFrame` (was `func_800662BC`), tier A. Occupies +0x134. Reads the u16 packet count at frame +2, starts at frame +8, calls applyTodPacket (+0x138) once per packet threading the returned pointer, and returns the pointer past the frame. Frame header {u16 size, u16 packet count, u32 frame number} is the TOD frame layout; Tick stores the return as the next frame.

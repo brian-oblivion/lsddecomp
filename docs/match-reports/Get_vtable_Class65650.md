@@ -36,3 +36,10 @@ accessor rather than referencing the symbol directly, write the call in the
 caller too (`Get_vtable_Class65650()`), even though `&gClass65650Methods` would be
 semantically identical — retail's own bytes are the call, not the inlined
 address computation.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Get_vtable_Class65650` (was `func_80066818`), tier A. Returns &gClass65650Methods (lui/addiu). Named like Get_vtable_Entity, the same accessor for the subclass. Entity.c calls it as its base-table getter.
+- `gClass65650Methods` (was `D_8008A6C4`), tier A. The 80-slot method table (header 0x234) this function returns and the ctor installs; `g<Class>Methods` like gClass876FCMethods/gClass6B5CCMethods.

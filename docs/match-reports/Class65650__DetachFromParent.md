@@ -45,3 +45,9 @@ Adds `slot50` (`+0x050`) to `D800878D4Methods` and `slot140` (`+0x140`,
 None new; confirms the `unk94`/`slot10`/`slot14` "companion link" shape
 generalizes to a second, independent link slot (`unk50`) on the same
 class, unlinked through the identical `slot14`.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__DetachFromParent` (was `func_800659D0`), tier A. Occupies +0x050, overriding Class6B5CC__DetachFromParent. While parent is set: unlinkPeer, unlink companion2 if set, chain the base detach. The mirror of AttachToParent.

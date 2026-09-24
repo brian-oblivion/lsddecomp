@@ -21,3 +21,9 @@ void Class65650__DisableTickCallback(Class65650 *self)
 ### Proposed learning
 
 None; plain single-instruction setter shape.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__DisableTickCallback` (was `func_80066148`), tier A. Occupies +0x114; clears tickCallbackEnabled. Called by InitDefaults and Entity__StopSoundCue.

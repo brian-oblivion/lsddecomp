@@ -78,3 +78,9 @@ discards the result, leave a note (as `Class65650__SetTod`'s report and the
 header comment both now do) rather than committing to `void`, and prefer
 whichever caller DOES consume the value to fix the return type once one is
 found.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__Tick` (was `func_80065FD8`), tier B. Occupies +0x108; reached from OnClass6EF50Notify code 2. Increments Class6B5CC's tick (+0x24), calls tickCallback while tickCallbackEnabled, and while todPlaying with todFrameCount >= 2 applies the next frame (applyTodFrame), advances todFrame and wraps to the TOD's first frame at todFrameCount; finally clears coord2->flg. Mechanics are all in the body; B because the per-call driver is known only as 'code 2 from the tag-5 companion'.

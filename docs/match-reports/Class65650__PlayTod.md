@@ -21,3 +21,9 @@ s32 Class65650__PlayTod(Class65650 *self)
 ### Proposed learning
 
 None beyond `Class65650__EnableTickCallback.md`'s (same shape, different field).
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__PlayTod` (was `func_800662A8`), tier A. Occupies +0x12C; sets todPlaying (+0x90) = 1 and returns it. Tick advances frames only while it is set. Called from Entity code (func_800603C4).

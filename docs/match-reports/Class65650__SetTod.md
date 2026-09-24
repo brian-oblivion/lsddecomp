@@ -257,3 +257,9 @@ entirely. When two adjacent statements in a stalled function are provably
 independent of each other, swapping their order is a cheap, legitimate,
 un-tried axis worth checking explicitly -- even after a long attempt list,
 if that specific pairwise swap is not in the table.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__SetTod` (was `func_80066214`), tier A. Occupies +0x128. Selects TOD `index` from modelData->tods (arr + 8 + index*4 -> holder -> +0x10 TOD data), stores todIndex, todFrameCount = TOD +0x4 (frame count), todFramePtr = TOD + 8 (first frame), todFrame = 0, and applies that first frame. InitDefaults calls setTod(0); Entity_e calls setTod(1).

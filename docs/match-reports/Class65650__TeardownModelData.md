@@ -30,3 +30,9 @@ Matched on the direct translation, no reshaping.
 
 None beyond `Class65650__SetupModelData.md`'s (the setup/teardown pair share the same
 guard shape).
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__TeardownModelData` (was `func_80065C2C`), tier A. Occupies +0x0F8 (called by the Destructor). Calls ReleaseModelData only if modelData is set.

@@ -46,3 +46,9 @@ report, so no new speculation was needed there.
 
 None beyond what's already recorded for this unit — this one was a clean,
 single-pass match once the two new field/slot types were named.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__OnNotify` (was `func_80065790`), tier A. Occupies +0x038, overriding Class6B5CC__OnNotify, and chains it first. Then: if the sender's method-table header word is 0x5F03 (D_8006F384, the model-data class, per classtable) and the code is 1 and modelData is borrowed (ownsModelData == 0), it calls release on itself.

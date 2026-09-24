@@ -21,3 +21,9 @@ void Class65650__StopTod(Class65650 *self)
 ### Proposed learning
 
 None; plain single-instruction setter shape.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__StopTod` (was `func_800662B4`), tier A. Occupies +0x130; clears todPlaying. Called by InitDefaults and Entity__StopSoundCue.

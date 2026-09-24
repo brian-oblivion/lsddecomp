@@ -25,3 +25,9 @@ Matched on the direct translation, no reshaping.
 ### Proposed learning
 
 None beyond `Class65650__SetupModelData.md`'s.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__TeardownParts` (was `func_80065DEC`), tier A. Occupies +0x104 (called by ReleaseModelData). Calls DestroyParts only if parts is set.

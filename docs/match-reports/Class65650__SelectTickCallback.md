@@ -50,3 +50,9 @@ than calling it, don't force a function-pointer type onto that slot for
 this call site's sake — a plain `void *` avoids implying a signature no
 evidence yet supports, and callers that actually invoke it later can retype
 it then.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__SelectTickCallback` (was `func_800660BC`), tier A. Occupies +0x10C. Stores the VALUE of slot +0x118/+0x11C/+0x120 (TickCallbackA/B/C) in tickCallback for selector 0x41/0x42/0x43 ('A'/'B'/'C'); anything else leaves it. Callers: InitDefaults ('A'), Entity__InitState ('B', which Entity overrides with Entity__TickSoundCue).
