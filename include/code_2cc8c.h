@@ -1408,23 +1408,27 @@ struct Obj86B60 {
     s32 activeSlot;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
-    s32 *unk5C;                  /* +0x05C, array indexed by unk58: a
-                                     per-slot capacity/bound.
-                                     Obj86B60__ReleaseSlotElements passes unk5C[unk58] as
+    s32 *itemCounts;              /* +0x05C, renamed from unk5C, round 78 --
+                                     array indexed by activeSlot: a per-slot
+                                     item count (the size of that slot's own
+                                     itemLists[idx] array).
+                                     Obj86B60__ReleaseSlotElements passes
+                                     itemCounts[activeSlot] as
                                      ReleaseBasicClassArray's 2nd arg (raw register,
                                      type doesn't affect those bytes);
                                      Obj86B60__AdvanceSlotCursor/Obj86B60__RetreatSlotCursor use it as
                                      an explicit upper bound compared
-                                     against unk60[unk58], which is what
-                                     settles it as a count, not a pointer */
-    s32 *slotCounts;                   /* +0x060, array indexed by unk58: a
+                                     against slotCounts[activeSlot], which is
+                                     what settles it as a count, not a
+                                     pointer */
+    s32 *slotCounts;                   /* +0x060, array indexed by activeSlot: a
                                      per-slot running count, incremented
-                                     (wrapping to 0 past unk5C[unk58]) by
+                                     (wrapping to 0 past itemCounts[activeSlot]) by
                                      Obj86B60__AdvanceSlotCursor and decremented
-                                     (wrapping to unk5C[unk58]-1 below 0) by
+                                     (wrapping to itemCounts[activeSlot]-1 below 0) by
                                      Obj86B60__RetreatSlotCursor -- a ring-buffer index */
     void **unk64;                /* +0x064, Obj86B60__ReleaseSlotElements: array indexed by
-                                     unk58, giving ReleaseBasicClassArray's 1st arg
+                                     activeSlot, giving ReleaseBasicClassArray's 1st arg
                                      and BMemPMgrFree's arg */
     Unk68Obj *unk68;             /* +0x068, OBSERVED: Obj86B60__ReleaseTarget,
                                      Obj86B60__CommitElementScroll, Obj86B60__RefreshSlotView (round 12)
