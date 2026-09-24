@@ -1,4 +1,6 @@
-# func_80064E34 — MATCHED 98/98 (round 75): two call statements, one per arm, instead of one call with a merged `arg3` variable
+# Entity__MoodCue111 — MATCHED 98/98 (round 75): two call statements, one per arm, instead of one call with a merged `arg3` variable
+
+> Renamed from `func_80064E34` on 2026-09-24 (tools/rename.py). Address 0x80064e34.
 
 REVISITED, round 75: MATCHED 98/98 in 1 build (lever: two call sites); names/types not relevant
 
@@ -11,7 +13,7 @@ REVISITED, round 75: MATCHED 98/98 in 1 build (lever: two call sites); names/typ
 unchanged): `69/98`, `insertions 9 / deletions 9 (opcode-level; positional
 skeleton diffs 22)`, whole image red — the recorded figures reproduce.
 
-**The lever: retail has TWO calls to `func_80064FBC`, one per arm of the
+**The lever: retail has TWO calls to `Entity__AdvanceWobbleAndDeactivate`, one per arm of the
 `unk44 != 0 && unkFC >= 0x870` test, not one call fed by `arg3`.** The tell
 was in the asm the whole time: two separate argument set-up blocks
 (`.L80064F70` with `a3 = 0xFA0`, `.L80064F88` with `a3 = 0x884`), each
@@ -31,9 +33,9 @@ there is only one such block, hence 7 words short.
         if (this->moodTimer >= 0xAF1) {
             this->methods->slotCC(this, -0x20, 0);
         }
-        func_80064FBC(this, out, 0x1E1, 0xFA0, -0x3C);
+        Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, 0xFA0, -0x3C);
     } else {
-        func_80064FBC(this, out, 0x1E1, 0x884, -0x3C);
+        Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, 0x884, -0x3C);
     }
 ```
 
@@ -61,7 +63,7 @@ explanation for a shape that was really one call statement too few.
 
 ## History (superseded by the round 75 match above)
 
-Original title: func_80064E34 — STALL (7 words short: 91/98 compiled; raw word-match 69/98; first real diff at file offset 0x55694 / vram 0x80064E94)
+Original title: Entity__MoodCue111 — STALL (7 words short: 91/98 compiled; raw word-match 69/98; first real diff at file offset 0x55694 / vram 0x80064E94)
 
 NON_MATCHING body promoted, round 73
 
@@ -70,7 +72,7 @@ NON_MATCHING body promoted, round 73
 ## Blocker screen
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/func_80064E34.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/Entity__MoodCue111.s
 ```
 
 No hits. Not toolchain-blocked.
@@ -82,7 +84,7 @@ methods->slot200(this->unk94) == 5` and `this->unkFC==0`. If `this->unk44
 != 0` and `this->unkFC >= 0x870`: a nested set of exact/range checks on
 `unkFC` early-returns after setting various `out->` fields or dispatching
 `slot130`/`slot12C`, or falls through to a shared tail call into
-`func_80064FBC` (this unit's own next-in-queue function, forward-declared)
+`Entity__AdvanceWobbleAndDeactivate` (this unit's own next-in-queue function, forward-declared)
 with one of two `arg3` values (`0x884` default, `0xFA0` on the
 `unk44!=0 && unkFC>=0x870` path) and a constant `arg4 = -0x3C`.
 
@@ -90,7 +92,7 @@ with one of two `arg3` values (`0x884` default, `0xFA0` on the
 
 ```c
 #if 0
-void func_80064E34(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
     s32 arg3;
 
     if (this->unkFC == 0) {
@@ -129,13 +131,13 @@ void func_80064E34(Entity *this, EntityMoodHandlerArg *out) {
     } else {
         arg3 = 0x884;
     }
-    func_80064FBC(this, out, 0x1E1, arg3, -0x3C);
+    Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, arg3, -0x3C);
 }
 #endif
 ```
 
 Every branch target, every field write, every literal, and the identity of
-the shared call to `func_80064FBC` are confirmed correct against the
+the shared call to `Entity__AdvanceWobbleAndDeactivate` are confirmed correct against the
 disassembly -- the CONTROL FLOW is not in question.
 
 ## The residue
@@ -190,7 +192,7 @@ branch points and this round's remaining queue size.
 ## Struct/table knowledge established
 
 None beyond what the control-flow trace above already confirms
-(`unk44`, `unkFC`, `slot130`, `slot12C`, `slotCC`, and `func_80064FBC`'s
+(`unk44`, `unkFC`, `slot130`, `slot12C`, `slotCC`, and `Entity__AdvanceWobbleAndDeactivate`'s
 own 5-argument signature, cross-checked against `Entity_d.c`'s existing
 extern for the same function).
 
@@ -218,7 +220,7 @@ round 13 (2026-09-03), runner alpha, unit Entity_g. 3 attempts,
 
 ## Round: hand analysis (runner delta), confirms redundant-rematerialization reading
 
-Read `asm/nonmatchings/Entity_g/func_80064E34.s` directly. Confirmed the
+Read `asm/nonmatchings/Entity_g/Entity__MoodCue111.s` directly. Confirmed the
 report's claim precisely -- `addiu $v0, $zero, -0x3C` (i.e. `li v0,-0x3c`)
 appears TWICE in a row, at consecutive branch delay slots, before either
 branch's own condition is even resolved:
@@ -236,7 +238,7 @@ Both of these branches, when TAKEN, jump to `.L80064F88` -- which is an
 EARLY-RETURN-adjacent path in the `this->unk44 == 0` / `unkFC < 0x870`
 case, i.e. neither delay slot's `-0x3C` is even consumed on the path that
 takes it; retail is filling otherwise-empty delay slots with a value it
-already knows it will need later (at the actual `func_80064FBC` tail
+already knows it will need later (at the actual `Entity__AdvanceWobbleAndDeactivate` tail
 call), opportunistically, rather than paying to keep it live in a
 register across the intervening `jalr`s. This is a scheduler-level
 decision (which delay slots to fill with an unrelated-but-needed-later
@@ -266,11 +268,11 @@ iterations. Best score reached: **500** (down from base 800), never 0.
 **Both improving candidates found (760 and 500) are non-idiomatic and were
 rejected, not banked:**
 - The 760 candidate drops the `arg3 = 0xFA0;` assignment entirely (replaced
-  with a dead empty `else { ; }`) and hardcodes `func_80064FBC`'s 4th
+  with a dead empty `else { ; }`) and hardcodes `Entity__AdvanceWobbleAndDeactivate`'s 4th
   argument to the literal `0x884` unconditionally -- this silently changes
   behavior on the `this->unk44 != 0 && this->unkFC >= 0x870` path (which
   should pass `0xFA0`, not `0x884`). A real bug, not a lead.
-- The 500 candidate wraps the single `func_80064FBC(...)` call in a
+- The 500 candidate wraps the single `Entity__AdvanceWobbleAndDeactivate(...)` call in a
   redundant `if (arg3) { call } else { call }` with an IDENTICAL call in
   both arms -- a dead/tautological branch (`arg3` is always non-zero on
   every path that reaches this point) that apparently nudges the
@@ -298,7 +300,7 @@ shared with its neighbor even within the same merge group.
 **Six structural variants tried, spanning both directions of the size
 gap:**
 
-1. **Four fully independent `func_80064FBC(...)` call statements**, one
+1. **Four fully independent `Entity__AdvanceWobbleAndDeactivate(...)` call statements**, one
    per branch, no shared `arg3` variable at all (on the theory retail's
    source might genuinely repeat the whole call four times and let
    cross-jump find its own merge, mirroring `Entity__MoodCue115`'s nested-merge
@@ -395,7 +397,7 @@ Dropped the report's preserved body (verbatim, unchanged) back into
 
 ```
 ./build-and-verify.sh  ->  build exit=2, no compile-error grep hits
-tools/funcdiff.py func_80064E34  ->  69/98 words match (file 0x55634-0x557BC)
+tools/funcdiff.py Entity__MoodCue111  ->  69/98 words match (file 0x55634-0x557BC)
                                       WARNING: differs outside range (96481 bytes)
 ```
 
@@ -404,13 +406,13 @@ figure does not:
 
 ```
 tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/Entity_g.c.o
-  -> func_80064E34 compiles to 91 instructions (0x81c-0x984 in the .o)
+  -> Entity__MoodCue111 compiles to 91 instructions (0x81c-0x984 in the .o)
 ```
 
 Retail is confirmed 98 words independently two ways: `funcdiff`'s own file
 range (0x557BC-0x55634 = 0x188 bytes = 98 words) and a direct count of
 `glabel`-adjacent instruction comments in
-`asm/nonmatchings/Entity_g/func_80064E34.s` (98 lines matching the
+`asm/nonmatchings/Entity_g/Entity__MoodCue111.s` (98 lines matching the
 `/* OFS VRAM WORD */` pattern).
 
 **91 vs 98 is 7 words short, not the "~4 words" / "94 vs 98" this report
@@ -422,7 +424,7 @@ transcription slip, or an objdump range mis-boundary, it does not reproduce
 today's pinned pipeline. Rewrote the title with the three figures this
 round's brief asked for; the "4 words short" phrasing is retired.
 
-`tools/asm-differ/diff.py func_80064E34` locates the first REAL divergence
+`tools/asm-differ/diff.py Entity__MoodCue111` locates the first REAL divergence
 (not just delay-slot noise) at **file offset 0x55694 / vram 0x80064E94** —
 retail's `li v0,-0x3c` in the delay slot of the very first `beqz`, where the
 rewrite instead computes `li a3,0x884` (the `else` branch's `arg3`, which in
@@ -578,3 +580,16 @@ count is quoted in a title, re-derive it before trusting it across rounds —
 this one was off by 3 words (94 vs the actual 91) with no record of when or
 why it drifted, which is a small but real instance of PARALLEL-RUNS
 screen 4's warning that a title is only as good as the last rebuild.
+
+
+## Naming
+
+Why `MoodCue111`: the function's address sits in `gEntityMoodHandlerTable`
+row 111 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
+confirmed by reading `disk/SLPS_015.56` directly rather than trusting
+address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+order does not track code address). Tier B: the row-to-function mapping is
+a compiler fact, not a guess, but which dream state or object each row
+represents is not established -- the row number is kept decimal, matching
+the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+names sort in table order.

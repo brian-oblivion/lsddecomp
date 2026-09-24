@@ -1,4 +1,6 @@
-# func_80064B80 — MATCH (73/73 words)
+# Entity__MoodCue106 — MATCH (73/73 words)
+
+> Renamed from `func_80064B80` on 2026-09-24 (tools/rename.py). Address 0x80064b80.
 
 **Unit:** Entity_g · **Size:** 73 instructions
 
@@ -17,7 +19,7 @@ D_80089E2C)`. Otherwise: dispatches `slot128` (guarded by `unkFC==0`) then
 ## The C
 
 ```c
-void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if ((rand() & 1) == 0) {
             this->unk44 = 0xB;
@@ -109,3 +111,23 @@ Neither lever (negation idiom; dual-based-type array walkers) applies.
 ## Provenance
 
 round 13 (2026-09-03), runner alpha, unit Entity_g. 4 attempts.
+
+
+## Naming
+
+Why `MoodCue106`: the function's address sits in `gEntityMoodHandlerTable`
+row 106 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
+confirmed by reading `disk/SLPS_015.56` directly rather than trusting
+address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+order does not track code address). Tier B: the row-to-function mapping is
+a compiler fact, not a guess, but which dream state or object each row
+represents is not established -- the row number is kept decimal, matching
+the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+names sort in table order.
+
+## Data constant left unnamed this round
+
+`D_80089E2C` (`updateScale` arg, reached through a raw function-pointer
+indirect call in the `moodState == 0xB` branch): s16-pair decoded
+`(1,8, 2,1, 1,8, 6,1)` -- X=1/8, Y=2/1, Z=1/8, not uniform across X/Y/Z,
+so it is not one of this project's single-ratio `SCALE_*` names.

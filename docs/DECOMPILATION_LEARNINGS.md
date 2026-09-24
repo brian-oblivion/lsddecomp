@@ -176,7 +176,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (`func_8004E6B8`). Whatever precedes a branch in the source decides its delay slot. (round 75)
 - **Two argument set-ups sharing one `jal`, reached by a `j` whose delay slot sets the differing
   argument, are TWO calls GCC cross-jumped**, not one call with an argument chosen in a variable
-  (`func_80064E34`, seven words short: its four `li v0,-0x3C` were each block's first instruction
+  (`Entity__MoodCue111`, seven words short: its four `li v0,-0x3C` were each block's first instruction
   copied into branch delay slots). A per-branch `return` blocks the merge; a `void` function lets
   three calls merge (`TaskObjF__func_8004F8A4`). Retail's `j` into a shared STORE is likewise two
   identical stores (`Class86B60__TickNameFieldCursor`). (round 75)

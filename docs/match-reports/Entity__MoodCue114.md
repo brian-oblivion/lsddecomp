@@ -1,4 +1,6 @@
-# func_800650F4 — MATCH (42/42 words)
+# Entity__MoodCue114 — MATCH (42/42 words)
+
+> Renamed from `func_800650F4` on 2026-09-24 (tools/rename.py). Address 0x800650f4.
 
 **Unit:** Entity_g · **Size:** 42 instructions
 
@@ -15,7 +17,7 @@ No hits.
 ## The C
 
 ```c
-void func_800650F4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue114(Entity *this, EntityMoodHandlerArg *out) {
     void *a2;
 
     if (rand() % 3 == 0) {
@@ -42,3 +44,16 @@ the second build.
 ## Provenance
 
 round 13 (2026-09-03), runner alpha, unit Entity_g. 2 attempts.
+
+
+## Naming
+
+Why `MoodCue114`: the function's address sits in `gEntityMoodHandlerTable`
+row 114 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
+confirmed by reading `disk/SLPS_015.56` directly rather than trusting
+address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+order does not track code address). Tier B: the row-to-function mapping is
+a compiler fact, not a guess, but which dream state or object each row
+represents is not established -- the row number is kept decimal, matching
+the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+names sort in table order.

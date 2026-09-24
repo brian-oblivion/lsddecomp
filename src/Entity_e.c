@@ -13,7 +13,7 @@
  * (identical `handler` word, different data0/data1/data2) -- one function
  * shared by two mood-row configurations, named for its lower row.
  * `Entity__MoodCue71` (0x80062570) was already cross-unit called (Entity_g's
- * `func_80064CA4` forwards its own args straight through) before this round;
+ * `Entity__MoodCue108` forwards its own args straight through) before this round;
  * its `include/Entity.h` extern is updated by this rename.
  *
  * Four rotation/translate data constants named this round, decoded from

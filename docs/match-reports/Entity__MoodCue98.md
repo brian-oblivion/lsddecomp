@@ -1,11 +1,13 @@
-# func_80064618 — MATCH (48/48 words)
+# Entity__MoodCue98 — MATCH (48/48 words)
+
+> Renamed from `func_80064618` on 2026-09-24 (tools/rename.py). Address 0x80064618.
 
 **Unit:** Entity_g · **Size:** 48 instructions
 
 ## Blocker screen (mandatory)
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/func_80064618.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/Entity__MoodCue98.s
 ```
 
 No hits. Consistent with the coordinator's measured all-clear for this unit
@@ -35,7 +37,7 @@ with `(-0x1E, 1)`.
 ## The C
 
 ```c
-void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
         if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
             this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
@@ -71,3 +73,16 @@ function really is one of these handlers before assuming the signature.
 
 round 13 (2026-09-03), runner alpha, unit Entity_g. Matched on the first
 build.
+
+
+## Naming
+
+Why `MoodCue98`: the function's address sits in `gEntityMoodHandlerTable`
+row 98 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
+confirmed by reading `disk/SLPS_015.56` directly rather than trusting
+address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+order does not track code address). Tier B: the row-to-function mapping is
+a compiler fact, not a guess, but which dream state or object each row
+represents is not established -- the row number is kept decimal, matching
+the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+names sort in table order.

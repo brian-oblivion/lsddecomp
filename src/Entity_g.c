@@ -1,3 +1,44 @@
+/* One of the Entity class's split units (Entity_c through Entity_g cover
+ * its 97-function remainder after Entity/Entity_b), 0x80064618..0x800655D4,
+ * directly following Entity_e (Entity_f is a separate, not-yet-named,
+ * interleaved unit -- its own address range is not contiguous with this
+ * one's).
+ *
+ * 19 of this unit's 20 functions are `gEntityMoodHandlerTable` callbacks
+ * (Entity.h), named `Entity__MoodCueNN` for the row they occupy -- rows
+ * 98, 102-106, 108-111, 113-114, 117-118, 121, 123, 125, 128-129,
+ * confirmed by reading disk/SLPS_015.56 directly (base 0x80089EB0 +
+ * 0x10*row is the row's own `handler` word, checked against each
+ * candidate function's address; row order does not track code address,
+ * same finding as Entity_d/Entity_e, rounds 76-77). `Entity__MoodCue123`
+ * (0x80065238) also occupies row 126 of the same table (identical
+ * `handler` word, different data0/data1/data2) -- one function shared by
+ * two mood-row configurations, named for its lower row.
+ *
+ * The 20th function, `Entity__AdvanceWobbleAndDeactivate` (formerly
+ * `func_80064FBC`), is not itself a table row -- it is a shared per-tick
+ * helper called directly (`jal`) by two different row handlers:
+ * `Entity__MoodCue111` (this unit, twice) and `Entity__MoodCue40`
+ * (Entity_d.c, cross-unit, its first caller from outside that unit).
+ *
+ * Five rotation/scale data constants named this round, decoded from
+ * disk/SLPS_015.56 against the existing ROTATION_YAW_PLUS2/
+ * ROTATION_YAW_MINUS120/ROTATION_ZPLUS9/SCALE_HALF/SCALE_SIX tables
+ * (rotation/scale: four s16 {num,den} pairs for X/Y(yaw)/Z/W, W never
+ * reflected in the name per the ROTATION_YAW_MINUS120/SCALE_HALF/SCALE_SIX
+ * precedent): ROTATION_YAW_PLUS1, ROTATION_ZPLUS4, SCALE_EIGHTH,
+ * SCALE_QUARTER, SCALE_THIRTY_SECOND. Six more data constants
+ * (D_80089CAC, D_80089CB8, D_80089DE4, D_80089E14, D_80089E2C, D_80089E44)
+ * were decoded but left unnamed -- either a non-whole-degree rotation
+ * (no precedent for naming those) or a non-uniform-axis or non-unit-
+ * fraction scale (no precedent either). See each function's match
+ * report's `## Naming` / `## Data constant(s) ... unnamed` sections for
+ * the per-constant evidence. `ROTATION_YAW_PLUS1` and `SCALE_QUARTER`
+ * turned out to also be referenced from `src/Entity_c.c` (pre-existing,
+ * not new to this round) -- each unit keeps its own local `extern`, per
+ * this project's per-unit-local-view convention; the global rename
+ * updated both units' externs uniformly.
+ */
 #include "common.h"
 #include "Entity.h"
 
@@ -10,26 +51,28 @@ extern u8 D_80089CAC[];
 extern u8 D_80089E14[];
 extern u8 D_80089DE4[];
 extern u8 SCALE_HALF[];
-extern u8 D_80089E20[];
-extern u8 D_80089DCC[];
+extern u8 SCALE_EIGHTH[];
+extern u8 SCALE_QUARTER[];
 extern u8 D_80089CB8[];
 extern u8 D_80089E2C[];
 extern u8 SCALE_SIX[];
 extern u8 D_80089E44[];
-extern u8 D_80089D00[];
-extern u8 D_80089D18[];
+extern u8 ROTATION_ZPLUS4[];
+extern u8 ROTATION_YAW_PLUS1[];
 extern u8 ROTATION_YAW_MINUS9[];
 extern u8 ROTATION_YAW_PLUS9[];
-extern u8 D_80089E80[];
+extern u8 SCALE_THIRTY_SECOND[];
 
-/* func_80064FBC, this unit's own function, is called by func_80064E34
+/* Entity__AdvanceWobbleAndDeactivate, this unit's own function, is called by Entity__MoodCue111
  * (earlier in ROM order) before its own definition below -- forward
  * declaration, same convention CLAUDE.md documents for calling into a
- * still-INCLUDE_ASM function. Already known cross-unit from Entity_d.c's
- * own extern (Entity__MoodCue40's caller there), reproduced here matching. */
-extern void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
+ * function defined later in the same unit (the helper is itself matched,
+ * not a stall; the forward declaration is only about ROM-order source
+ * placement). Already known cross-unit from Entity_d.c's own extern
+ * (Entity__MoodCue40's caller there), reproduced here matching. */
+extern void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
 
-void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
         if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
             this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
@@ -40,7 +83,7 @@ void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x1E, 1);
 }
 
-void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
     void *a2;
 
     if (this->moodTimer == 0) {
@@ -65,9 +108,9 @@ void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
         } else if (this->moodTimer >= 0x786) {
             a2 = SCALE_HALF;
         } else if (this->moodTimer >= 0x781) {
-            a2 = D_80089DCC;
+            a2 = SCALE_QUARTER;
         } else {
-            a2 = D_80089E20;
+            a2 = SCALE_EIGHTH;
         }
         this->methods->updateScale(this, 1, a2);
         if (this->moodTimer < 0x7D0) {
@@ -88,7 +131,7 @@ void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80064928(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue103(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0x2BC) {
         if (rand() % 3 == 0) {
             this->moodState = 0xB;
@@ -110,18 +153,18 @@ void func_80064928(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x1E, 0);
 }
 
-void func_80064AA4(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->updateScale(this, 1, D_80089DCC);
+void Entity__MoodCue104(Entity *this, EntityMoodHandlerArg *out) {
+    this->methods->updateScale(this, 1, SCALE_QUARTER);
     if ((u32)(this->moodTimer - 0xC9) < 0x63) {
         this->methods->slotCC(this, -0x20, 0);
     }
 }
 
-void func_80064B14(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue105(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slot60(this, rand() % 20 == 0);
 }
 
-void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if ((rand() & 1) == 0) {
             this->moodState = 0xB;
@@ -143,17 +186,17 @@ void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC8(this, (this->moodTimer % 20 < 10) ? 0x20 : -0x20, 0);
 }
 
-void func_80064CA4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue108(Entity *this, EntityMoodHandlerArg *out) {
     Entity__MoodCue71(this, out);
     this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
-void func_80064CEC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue109(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateScale(this, 1, SCALE_HALF);
     this->methods->slotC4(this, -0xA, 0);
 }
 
-void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateScale(this, 1, D_80089E44);
     this->methods->slot130(this);
     if (this->moodState == 0) {
@@ -164,7 +207,7 @@ void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->moodState == 0xA) {
         if (this->moodTimer < 0x2D) {
-            this->methods->updateRotation(this, 0, D_80089D00);
+            this->methods->updateRotation(this, 0, ROTATION_ZPLUS4);
         }
         if (this->moodTimer >= 0x1F5) {
             this->moodState = 0;
@@ -172,7 +215,7 @@ void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80064E34(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (this->target->methods->slot200(this->target) == 5) {
             this->moodState = 0xB;
@@ -205,14 +248,14 @@ void func_80064E34(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer >= 0xAF1) {
             this->methods->slotCC(this, -0x20, 0);
         }
-        func_80064FBC(this, out, 0x1E1, 0xFA0, -0x3C);
+        Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, 0xFA0, -0x3C);
     } else {
-        func_80064FBC(this, out, 0x1E1, 0x884, -0x3C);
+        Entity__AdvanceWobbleAndDeactivate(this, out, 0x1E1, 0x884, -0x3C);
     }
 }
 
-void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
-    s32 unkFC;
+void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
+    s32 timer;
 
     out->unk10 = 0;
     if (out->unk4 == 6) {
@@ -220,29 +263,29 @@ void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, 
         out->unk30 = 4;
         out->unk44 = 4;
     }
-    unkFC = this->moodTimer;
-    if (unkFC < arg2) {
+    timer = this->moodTimer;
+    if (timer < arg2) {
         goto L18;
     }
-    if (!(arg2 + 0x5B < unkFC)) {
+    if (!(arg2 + 0x5B < timer)) {
         goto L50;
     }
 L18:
-    if (unkFC < arg2 + 0x155) {
+    if (timer < arg2 + 0x155) {
         goto L34;
     }
-    if (!(arg2 + 0x1B1 < unkFC)) {
+    if (!(arg2 + 0x1B1 < timer)) {
         goto L50;
     }
 L34:
-    if (unkFC < arg2 + 0x2BA) {
+    if (timer < arg2 + 0x2BA) {
         goto L74;
     }
-    if (arg2 + 0x317 < unkFC) {
+    if (arg2 + 0x317 < timer) {
         goto L74;
     }
 L50:
-    this->methods->updateRotation(this, 0, D_80089D18);
+    this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
 L74:
     this->methods->slotC4(this, arg4, 0);
     if (this->moodTimer == arg3) {
@@ -251,11 +294,11 @@ L74:
     }
 }
 
-void func_800650D4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue113(Entity *this, EntityMoodHandlerArg *out) {
     Entity__MoodCue51(this, out);
 }
 
-void func_800650F4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue114(Entity *this, EntityMoodHandlerArg *out) {
     void *a2;
 
     if (rand() % 3 == 0) {
@@ -269,19 +312,19 @@ void func_800650F4(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateRotation(this, 0, a2);
 }
 
-void func_8006519C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue117(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
-void func_800651D0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue118(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateScale(this, 1, SCALE_SIX);
 }
 
-void func_80065204(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->updateScale(this, 1, D_80089DCC);
+void Entity__MoodCue121(Entity *this, EntityMoodHandlerArg *out) {
+    this->methods->updateScale(this, 1, SCALE_QUARTER);
 }
 
-void func_80065238(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue123(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() % 5 == 0) {
             this->moodState = 0xB;
@@ -301,7 +344,7 @@ void func_80065238(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_8006536C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue125(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if ((rand() & 3) == 0) {
             goto trigger;
@@ -323,13 +366,13 @@ merge:
     this->methods->slotC4(this, -0xA, 0);
 }
 
-void func_800654A0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue128(Entity *this, EntityMoodHandlerArg *out) {
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-    this->methods->updateScale(this, 1, D_80089E80);
+    this->methods->updateScale(this, 1, SCALE_THIRTY_SECOND);
     this->methods->slotC4(this, -0x1E, 1);
 }
 
-void func_80065514(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue129(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         this->moodState = rand() % 2 + 0xA;
     }

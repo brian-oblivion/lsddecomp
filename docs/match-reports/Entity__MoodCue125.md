@@ -1,4 +1,6 @@
-# func_8006536C — MATCH (77/77 words)
+# Entity__MoodCue125 — MATCH (77/77 words)
+
+> Renamed from `func_8006536C` on 2026-09-24 (tools/rename.py). Address 0x8006536c.
 
 **Unit:** Entity_g · **Size:** 77 instructions
 
@@ -17,7 +19,7 @@ slot148(this)`, the established `out->unk4 % (this->unk80/2) == 0` gate
 ## The C
 
 ```c
-void func_8006536C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue125(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if ((rand() & 3) == 0) {
             goto trigger;
@@ -53,14 +55,14 @@ different branch instructions) closed it to 77/77 on the second build.
 ## Struct/table knowledge established
 
 None new; corroborates `out->unk4 % (this->unk80/2) == 0` (same idiom as
-`Entity__MoodCue09`/`func_8006536C`'s siblings) now also pairs with
+`Entity__MoodCue09`/`Entity__MoodCue125`'s siblings) now also pairs with
 `out->unk20=1`.
 
 ### Proposed learning
 
 Do not assume GCC 2.6.3 will cross-jump-merge two SYNTACTICALLY IDENTICAL
 call+assignment sequences reached from different branches just because the
-BODIES match -- `func_80064B80`'s report already showed it merges a shared
+BODIES match -- `Entity__MoodCue106`'s report already showed it merges a shared
 TRAILING INSTRUCTION SEQUENCE across DIFFERENT calls when written as one
 call through a local function-pointer; this function shows the opposite
 near-miss: two IDENTICAL statements in two different `if` bodies did NOT
@@ -79,3 +81,16 @@ merges it" shortcut to work.
 ## Provenance
 
 round 13 (2026-09-03), runner alpha, unit Entity_g. 2 attempts.
+
+
+## Naming
+
+Why `MoodCue125`: the function's address sits in `gEntityMoodHandlerTable`
+row 125 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
+confirmed by reading `disk/SLPS_015.56` directly rather than trusting
+address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+order does not track code address). Tier B: the row-to-function mapping is
+a compiler fact, not a guess, but which dream state or object each row
+represents is not established -- the row number is kept decimal, matching
+the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+names sort in table order.
