@@ -2720,53 +2720,90 @@ struct Obj86ED0Methods {
      * match the defining function's own prototype exactly. */
     void (*ctor)(Obj86ED0 *self, s32 arg1, s32 arg2);
     u8 pad00C[0x010 - 0x00C];
-    void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, Obj86ED0__AttachTarget (OVERRIDES BasicClass's addChild: Obj86ED0__AddChild) */
-    void (*removeChild)(Obj86ED0 *self, void *child);  /* +0x014, Obj86ED0__DetachTarget/Obj86ED0__SetState (OVERRIDES BasicClass's removeChild: Obj86ED0__RemoveChild) */
+    /* +0x010, CORRECTED round 77 (track 3 naming) -- `tools/classtable.py
+     * gObj86ED0Methods` proves the slot's own IMPLEMENTATION is
+     * `Obj86ED0__AddChild` (OVERRIDES BasicClass's addChild). The previous
+     * comment named the CALLER (`Obj86ED0__AttachTarget`, which reaches this
+     * slot through `self->methods->addChild`) as if it were the
+     * implementation -- backwards. Comment-only fix, zero bytes changed. */
+    void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, Obj86ED0__AddChild; called via self->methods by Obj86ED0__AttachTarget */
+    /* +0x014, same correction: implementation is `Obj86ED0__RemoveChild`,
+     * called via `self->methods->removeChild` by `Obj86ED0__DetachTarget`
+     * and `Obj86ED0__SetState`. */
+    void (*removeChild)(Obj86ED0 *self, void *child);  /* +0x014, Obj86ED0__RemoveChild; called via self->methods by Obj86ED0__DetachTarget/Obj86ED0__SetState */
     u8 pad018[0x030 - 0x018];
     /* +0x030, Obj86ED0__SetState's own dispatch -- UNMODIFIED BasicClass
      * notifyParents (BasicClass__NotifyParents, code_8220_b), reached through
      * self's own table this one time instead of `Get_vtable_BasicClass()`. */
     void (*notifyParents)(Obj86ED0 *self, s32 arg1);
     u8 pad034[0x040 - 0x034];
-    /* +0x040, round 45's Obj86ED0__Obj86ED0 -- its own tail dispatch,
-     * `self->methods->slot40(self, arg1, arg2)`, forwarding the ctor's
-     * own two arguments unchanged. */
-    void (*slot40)(Obj86ED0 *self, s32 arg1, s32 arg2); /* +0x040 */
+    /* +0x040, RENAMED round 77 (was slot40) -- implementation is
+     * `Obj86ED0__SetName` (classtable-confirmed), Obj86ED0__Obj86ED0's own
+     * tail dispatch `self->methods->setName(self, arg1, arg2)`, forwarding
+     * the ctor's own two arguments unchanged. Referenced only from this
+     * unit's own functions -- safe to name in the shared struct. */
+    void (*setName)(Obj86ED0 *self, s32 arg1, s32 arg2); /* +0x040, Obj86ED0__SetName; dispatched by Obj86ED0__Obj86ED0 */
     u8 pad044[0x048 - 0x044];
-    void (*slot48)(Obj86ED0 *self);                      /* +0x048, Obj86ED0__SetState -- this class's own slot, Obj86ED0__ReleaseCardResources */
+    /* +0x048, RENAMED round 77 (was slot48) -- implementation is
+     * `Obj86ED0__ReleaseCardResources`, dispatched by Obj86ED0__SetState's
+     * case 2/3. Unit-exclusive reference. */
+    void (*releaseCardResources)(Obj86ED0 *self);         /* +0x048, Obj86ED0__ReleaseCardResources; dispatched by Obj86ED0__SetState */
     u8 pad04C[0x054 - 0x04C];
-    void (*slot54)(Obj86ED0 *self, s32 arg1);             /* +0x054, Obj86ED0__TickState -- this class's own slot, Obj86ED0__SetState */
-    void (*slot58)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, Obj86ED0__Notify's tag==5 case -- this class's own slot, Obj86ED0__TickState */
-    void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, Obj86ED0__Notify's tag==2 case -- this class's own slot, Obj86ED0__HandleCommand */
-    /* +0x060, Obj86ED0__HandleCommand's own `arg2 == 25`/`23` cases: `self->methods->
-     * slot60(self, 0x10)`, always with the same literal. */
+    /* +0x054, RENAMED round 77 (was slot54) -- implementation is
+     * `Obj86ED0__SetState`, dispatched by Obj86ED0__TickState (arg1==4) and
+     * Obj86ED0__HandleCommand (arg1==2/3). Unit-exclusive reference. */
+    void (*setState)(Obj86ED0 *self, s32 arg1);             /* +0x054, Obj86ED0__SetState; dispatched by Obj86ED0__TickState/Obj86ED0__HandleCommand */
+    /* +0x058, RENAMED round 77 (was slot58) -- implementation is
+     * `Obj86ED0__TickState`, dispatched by Obj86ED0__Notify's tag==5 case.
+     * Unit-exclusive reference. */
+    void (*tickState)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, Obj86ED0__TickState; dispatched by Obj86ED0__Notify (tag==5) */
+    /* +0x05C, RENAMED round 77 (was slot5C) -- implementation is
+     * `Obj86ED0__HandleCommand`, dispatched by Obj86ED0__Notify's tag==2
+     * case. Unit-exclusive reference. */
+    void (*handleCommand)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, Obj86ED0__HandleCommand; dispatched by Obj86ED0__Notify (tag==2) */
+    /* +0x060, Obj86ED0__HandleCommand's own `arg2 == 25`/`23` cases AND
+     * class_3bb8c_j's Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue
+     * (`arg2`/`arg3` nonzero) -- referenced by TWO units, left as `slot60`
+     * (PROPOSED name in the match report/broadcast, not applied here). */
     void (*slot60)(Obj86ED0 *self, s32 arg1);            /* +0x060 */
     u8 pad064[0x088 - 0x064];
-    /* +0x088..+0x0A0, Obj86ED0__HandleCommand's own dense `arg2` switch: each of
-     * these seven slots is resolved into a local function pointer then
-     * called as `fn(self)` (no other args) once, after the switch --
-     * `arg2 == 21`/`5` -> slot88, `20`/`4` -> slot8C, `18`/`2` -> slot90,
-     * `19`/`3` -> slot94 (the two cases per slot gate on `self->unk20`
-     * with OPPOSITE polarity, same idiom as func_8004BA40's mask test),
-     * `32` -> slotA0, `31` -> slot9C, `28` -> slot98 (these three
-     * ungated). All seven share the identical `(Obj86ED0 *self)` shape,
-     * confirmed directly off the call site (`jalr $v0; addu $a0,$s0,$zero`,
-     * no other register set). */
-    void (*slot88)(Obj86ED0 *self);                      /* +0x088 */
-    void (*slot8C)(Obj86ED0 *self);                      /* +0x08C */
-    void (*slot90)(Obj86ED0 *self);                      /* +0x090 */
-    void (*slot94)(Obj86ED0 *self);                      /* +0x094 */
-    void (*slot98)(Obj86ED0 *self);                      /* +0x098 */
-    void (*slot9C)(Obj86ED0 *self);                      /* +0x09C */
-    void (*slotA0)(Obj86ED0 *self);                      /* +0x0A0 */
-    void (*slotA4)(Obj86ED0 *self, s32 arg1, s32 arg2);       /* +0x0A4, Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft -- Obj86ED0__DispatchIndexValue, outside this unit's slice */
-    /* +0x0A8, Obj86ED0__AdvanceCharSelect. 3 args, not 2 -- retail's call sets $a1/$a3
+    /* +0x088..+0x0A0, RENAMED round 77 (track 3 naming) -- `classtable.py
+     * gObj86ED0Methods` resolves these seven slots to their REAL
+     * implementations for the first time (the previous comment described
+     * only the dispatch shape, not the callees): `arg2 == 21`/`5` ->
+     * Obj86ED0__MoveCursorRight, `20`/`4` -> Obj86ED0__MoveCursorLeft,
+     * `18`/`2` -> Obj86ED0__AdvanceCharSelect (all three this unit's own,
+     * already named above), `19`/`3` -> Obj86ED0__AdvanceCountdown, `28` ->
+     * Obj86ED0__ToggleFlag20, `31` -> Obj86ED0__ResetCountdown, `32` ->
+     * Obj86ED0__ResetAllAndFinish (these four class_3bb8c_j's own, named
+     * round 15/75). All are referenced ONLY from Obj86ED0__HandleCommand's
+     * switch in this unit -- unit-exclusive, safe to name here even though
+     * four of the seven implementations live in class_3bb8c_j. The two
+     * cases per slot gate on `self->unk20` with OPPOSITE polarity, same
+     * idiom as func_8004BA40's mask test. All seven share the identical
+     * `(Obj86ED0 *self)` shape, confirmed directly off the call site
+     * (`jalr $v0; addu $a0,$s0,$zero`, no other register set). */
+    void (*moveCursorRight)(Obj86ED0 *self);              /* +0x088, Obj86ED0__MoveCursorRight (this unit) */
+    void (*moveCursorLeft)(Obj86ED0 *self);                /* +0x08C, Obj86ED0__MoveCursorLeft (this unit) */
+    void (*advanceCharSelect)(Obj86ED0 *self);              /* +0x090, Obj86ED0__AdvanceCharSelect (this unit) */
+    void (*advanceCountdown)(Obj86ED0 *self);                /* +0x094, Obj86ED0__AdvanceCountdown (class_3bb8c_j) */
+    void (*toggleFlag20)(Obj86ED0 *self);                      /* +0x098, Obj86ED0__ToggleFlag20 (class_3bb8c_j) */
+    void (*resetCountdown)(Obj86ED0 *self);                      /* +0x09C, Obj86ED0__ResetCountdown (class_3bb8c_j) */
+    void (*resetAllAndFinish)(Obj86ED0 *self);                    /* +0x0A0, Obj86ED0__ResetAllAndFinish (class_3bb8c_j) */
+    /* +0x0A4/+0x0A8, referenced by BOTH this unit (Obj86ED0__MoveCursorRight/
+     * Left call slotA4; Obj86ED0__AdvanceCharSelect calls slotA8) AND
+     * class_3bb8c_j (Obj86ED0__ResetAllAndFinish calls both;
+     * Obj86ED0__ResetCountdown calls slotA8) -- cross-unit, left unnamed
+     * (PROPOSED, not applied here). Implementations are class_3bb8c_j's own
+     * Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue. */
+    void (*slotA4)(Obj86ED0 *self, s32 arg1, s32 arg2);       /* +0x0A4, Obj86ED0__DispatchIndexValue */
+    /* +0x0A8. 3 args, not 2 -- retail's call sets $a1/$a3
      * (`self->unk18`, `1`) and leaves $a2 holding the just-computed
      * incremented `unk1C` value untouched from a few instructions earlier
      * (no fresh load/li for it), which only makes sense if that register
      * IS the call's own middle argument, forwarded because it was already
      * live there. Same shape as TargetMethods86ED0::slot80 above. */
-    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);        /* +0x0A8, Obj86ED0__AdvanceCharSelect -- Obj86ED0__DispatchLookupValue, outside this unit's slice */
+    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);        /* +0x0A8, Obj86ED0__DispatchLookupValue */
 };
 
 struct Obj86ED0 {

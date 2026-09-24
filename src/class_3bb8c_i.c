@@ -77,7 +77,7 @@ void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
     self->unk14 = count;
 
     Obj86ED0__ClearChildRefs(self);
-    self->methods->slot40(self, arg1, arg2);
+    self->methods->setName(self, arg1, arg2);
 }
 
 void Obj86ED0__ClearChildRefs(Obj86ED0 *self)
@@ -145,9 +145,9 @@ void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
     tag = **(s32 **)arg1;
     mask = tag & 0xF;
     if (mask == 2) {
-        self->methods->slot5C(self, arg1, arg2);
+        self->methods->handleCommand(self, arg1, arg2);
     } else if (mask == 5) {
-        self->methods->slot58(self, arg1, arg2);
+        self->methods->tickState(self, arg1, arg2);
     }
 }
 
@@ -258,7 +258,7 @@ void Obj86ED0__SetState(Obj86ED0 *self, s32 arg1)
     case 2:
     case 3:
         self->methods->removeChild(self, self->childType2);
-        self->methods->slot48(self);
+        self->methods->releaseCardResources(self);
         self->closeState = arg1;
         break;
     case 4:
@@ -282,7 +282,7 @@ void Obj86ED0__TickState(Obj86ED0 *self)
     old = self->closeTickCount;
     self->closeTickCount = old + 1;
     if (old != 0) {
-        self->methods->slot54(self, 4);
+        self->methods->setState(self, 4);
     }
 }
 
@@ -307,56 +307,56 @@ void Obj86ED0__HandleCommand(Obj86ED0 *self, void *arg1, s32 arg2)
             strcpy(self->nameBuf, self->unk28);
         }
         self->methods->slot60(self, 0x10);
-        self->methods->slot54(self, 2);
+        self->methods->setState(self, 2);
         return;
     case 23:
         self->methods->slot60(self, 0x10);
-        self->methods->slot54(self, 3);
+        self->methods->setState(self, 3);
         return;
     case 32:
-        self->methods->slotA0(self);
+        self->methods->resetAllAndFinish(self);
         return;
     case 31:
-        self->methods->slot9C(self);
+        self->methods->resetCountdown(self);
         return;
     case 28:
-        self->methods->slot98(self);
+        self->methods->toggleFlag20(self);
         return;
     case 21:
         if (self->unk20 != 0) {
             return;
         }
-        self->methods->slot88(self);
+        self->methods->moveCursorRight(self);
         return;
     case 5:
         if (self->unk20 == 0) {
             return;
         }
-        self->methods->slot88(self);
+        self->methods->moveCursorRight(self);
         return;
     case 20:
         if (self->unk20 != 0) {
             return;
         }
-        self->methods->slot8C(self);
+        self->methods->moveCursorLeft(self);
         return;
     case 4:
         if (self->unk20 == 0) {
             return;
         }
-        self->methods->slot8C(self);
+        self->methods->moveCursorLeft(self);
         return;
     case 18:
         if (self->unk20 != 0) {
             return;
         }
-        self->methods->slot90(self);
+        self->methods->advanceCharSelect(self);
         return;
     case 2:
         if (self->unk20 == 0) {
             return;
         }
-        self->methods->slot90(self);
+        self->methods->advanceCharSelect(self);
         return;
     case 19:
         if (self->unk20 == 0) {
@@ -368,7 +368,7 @@ void Obj86ED0__HandleCommand(Obj86ED0 *self, void *arg1, s32 arg2)
             return;
         }
 slot94Call:
-        self->methods->slot94(self);
+        self->methods->advanceCountdown(self);
         return;
     }
 }
