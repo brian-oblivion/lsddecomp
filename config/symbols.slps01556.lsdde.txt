@@ -2079,3 +2079,7 @@ Class866E8__RefreshFootprint = 0x8004C620; // type:func
 Class866E8__ComputeFootprintFromRotation = 0x8004C6A8; // type:func
 Class866E8__BuildFootprintSlots = 0x8004C93C; // type:func
 Class866E8__SplitFootprintSlot = 0x8004CAF0; // type:func
+Class866E8__SetFootprintFromQuery = 0x8004CC74; // type:func
+IsPointOutOfBounds = 0x8004CD38; // type:func
+Class866E8__InitFootprintSlot = 0x8004CDA4; // type:func
+Class866E8__SetFootprintCellFlag = 0x8004CE24; // type:func

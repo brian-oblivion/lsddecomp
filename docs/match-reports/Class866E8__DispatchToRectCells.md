@@ -379,13 +379,13 @@ the report and to the preserved body's identifiers, not to the shipped bytes.
 | `Class866E8+0x1C0` | `curCellTag` | B | Written per cell visit; `Class866E8__GetCurrentCellKey` returns its address. |
 | `Class866E8+0x1C2` | `curCellCol` | A | Written per cell visit with the rectangle's start column plus the inner loop offset. |
 | `Class866E8+0x1C3` | `curCellRow` | A | Same, row. |
-| `Class866E8+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `class_3bb8c`'s `func_8004CE24` walks the identical chain off `EntryChildObj::unk38`. |
+| `Class866E8+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `class_3bb8c`'s `Class866E8__SetFootprintCellFlag` walks the identical chain off `EntryChildObj::unk38`. |
 
 **Type caveat, recorded not fixed.** This unit declares the cell type as
 `Class866E8 *`. `class_3bb8c`'s independently derived view says
 `EntryChildObj *`, and its evidence is better: the ctor here ORs `0x80000000`
 into each freshly built cell's `+0x010`, which is `EntryChildObj::unk10`
-exactly (`func_8004C0AC` sets the same bit, matched `func_8004CE24` clears
+exactly (`func_8004C0AC` sets the same bit, matched `Class866E8__SetFootprintCellFlag` clears
 it), and `flags36`/`nextInCell` line up with `EntryChildObj::unk36`/`unk38`.
 Unifying the two views is track-4 work, so the declared type is unchanged and
 a note sits on the field in `include/class_3ac78.h`. Posted to the broadcast.

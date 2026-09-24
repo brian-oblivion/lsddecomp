@@ -347,7 +347,7 @@ prototype identical to that function's definition.
 > real in-context build does not have** (real build: 0 drift, exactly
 > 109 words). This is the THIRD confirmed instance in this exact
 > unit/header of the scaffold-vs-real-build mismatch already documented
-> in `func_8004CD38`'s and `Class866E8__SplitFootprintSlot`'s reports -- no search was run
+> in `IsPointOutOfBounds`'s and `Class866E8__SplitFootprintSlot`'s reports -- no search was run
 > against it. **This mismatch is now common enough in this one header
 > (`class_3bb8c.h`, three functions) that it looks systemic to something
 > about this class's real in-context register pressure, not
@@ -576,7 +576,7 @@ existing gap's size, so no other offset in the struct moves.
   `%N`/receiver-timing lore (all of which involved 1-2 registers, not a
   whole-function permutation) — worth flagging for whoever revisits this
   unit's remaining stalls, since `Class866E8__ComputeFootprintFromRotation` (this round's other
-  target) and `func_8004CD38`/`func_8004CFB8` (already-documented stalls)
+  target) and `IsPointOutOfBounds`/`func_8004CFB8` (already-documented stalls)
   are all in the same header/class and may share whatever is driving it.
 
 ---

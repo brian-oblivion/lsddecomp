@@ -54,7 +54,7 @@ struct UnkSlotEntry_3ac78 {
      * derived view calls the same block `EntryChildObj **`, and its evidence
      * is stronger -- the ctor here ORs 0x80000000 into each freshly-built
      * cell's +0x010, which is EntryChildObj::unk10 exactly (func_8004C0AC
-     * does the same OR, func_8004CE24 clears the same bit), and the
+     * does the same OR, Class866E8__SetFootprintCellFlag clears the same bit), and the
      * `flags36`/`nextInCell` fields NotifyGridCell walks line up with
      * EntryChildObj::unk36/unk38. Unifying the two views is a track-4 job,
      * not a naming one, so the declared type is left alone; read it as
@@ -171,7 +171,7 @@ struct Vec3_3ac78 {
  * 0xA000; Class866E8__SetGridSpan stores it at +0x74 and derives
  * gridCells = span >> 11 = 20 and gridHalfCells = span >> 12 = 10. The
  * ctor spaces cells 0x800 apart (0xA000 / 0x800 == 20), and 20 is also the
- * row stride class_3bb8c_b's BYTE-MATCHED func_8004CE24 uses over the same
+ * row stride class_3bb8c_b's BYTE-MATCHED Class866E8__SetFootprintCellFlag uses over the same
  * cell block. Three independent facts, one number.
  *
  * One thing that does NOT reconcile, recorded rather than resolved: the
@@ -180,7 +180,7 @@ struct Vec3_3ac78 {
  * pointers, which is neither 20 * 20 nor a whole number of 21-cell rows.
  * The ctor is byte-exact, so the constants are certainly right; what the
  * extra column and the 10 spare pointers are for is unknown. Do not "fix"
- * the stride to 21 on the strength of the ctor alone -- func_8004CE24's
+ * the stride to 21 on the strength of the ctor alone -- Class866E8__SetFootprintCellFlag's
  * 20 is the byte-verified one.
  */
 struct Class866E8Methods {

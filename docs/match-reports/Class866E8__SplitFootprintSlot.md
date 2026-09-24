@@ -190,7 +190,7 @@ s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 coun
 > its `--debug` base score (869: 24 stack differences, 3 insertions/3
 > deletions, 37 register diffs) does **not** match the real build's
 > structural state (55/97, 0 insertions/deletions, pure rotation) — the
-> same scaffold-vs-real-build mismatch `func_8004CD38`'s report already
+> same scaffold-vs-real-build mismatch `IsPointOutOfBounds`'s report already
 > documented for this project (the standalone compile schedules
 > differently than the in-context one). Running a search against that
 > scaffold would target the wrong residue, so none was run; this is a
@@ -238,7 +238,7 @@ STALL (best 8/92 words; frame size off by 8 bytes)
 The biggest attempted this round (97 words) and the one that resisted
 byte-exactness. An 8-parameter function that populates one or two
 `GridSlot866E8` entries (the same type established this round from
-`func_8004CE24`/`func_8004CDA4`), advancing and returning `self->unk88`
+`Class866E8__SetFootprintCellFlag`/`Class866E8__InitFootprintSlot`), advancing and returning `self->unk88`
 (the slot count) as it goes.
 
 ## What the function does (control flow and semantics, not in doubt)
@@ -312,7 +312,7 @@ own `-0x38` frame, i.e. the 5th-8th arguments):
 
 Confirmed against the raw asm line-by-line: every branch target, every
 field write (`elemIdx`@0, `h4`@4, `h6`@6, `h8`@8, `hA`@0xA — the SAME
-`GridSlot866E8` layout `func_8004CE24` established), and every arithmetic
+`GridSlot866E8` layout `Class866E8__SetFootprintCellFlag` established), and every arithmetic
 op matches retail's OPERATIONS. The residue is a REGISTER ALLOCATION /
 frame-size difference, not a logic difference.
 
@@ -333,7 +333,7 @@ uses onto one register/lifetime.
 Attempts:
 
 1. Reassigning `slot` in place (shown above) — 8/92 in the fixed window,
-   frame `-0x30`, `func_8004CC74` (the next function) shifts by -0x14
+   frame `-0x30`, `Class866E8__SetFootprintFromQuery` (the next function) shifts by -0x14
    (20 bytes) low, meaning this function compiles noticeably SHORTER
    than retail overall (missing register save/restore pairs, not just a
    handful of instructions).
@@ -527,7 +527,7 @@ successfully** (this scaffold: 869/24 stack diffs/3 ins/3 del vs the real
 build's 55/97/0 ins/0 del). Sanity-checking the base score against the
 CURRENT known-best structural state (not just against an old report's
 stale number) before running a search is the same discipline
-`func_8004CD38`'s report already flags, now confirmed on a second,
+`IsPointOutOfBounds`'s report already flags, now confirmed on a second,
 independently-carved function.
 
 **Checked against the head's second mid-round broadcast (aggregate/whole-
@@ -576,7 +576,7 @@ mismatch itself is root-caused.
 ## Round 53 (bravo) — CALIBRATION attempt, two fresh levers, both inert, negative
 
 Assigned as one of three functions in a round-53 Sonnet calibration slot for
-the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `func_8004CD38`
+the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `IsPointOutOfBounds`
 and `func_8004CFB8`. Round 33's disposition ("still a pure register-identity
 rotation with no new lever found") is the reason this unit was picked over
 the plan's higher-ranked but levers-measurably-spent `code_2cc8c_e` job.

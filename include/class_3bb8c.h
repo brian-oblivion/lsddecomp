@@ -219,7 +219,7 @@ extern s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct 
 extern s32 D_80086904;
 
 /* Constant `Unk54Struct` (unk0=-1, unk4=0, unk8=0x140014) whole-struct-copied
- * by func_8004CDA4 into self+0x8C+key*0xC. */
+ * by Class866E8__InitFootprintSlot into self+0x8C+key*0xC. */
 extern Unk54Struct D_80086990;
 
 /*
@@ -352,7 +352,7 @@ typedef struct Obj866E8Methods {
      * Return value unused. Distinct from slot104 above, which
      * func_8004BD14 dispatches under a different (mode==1) condition. */
     void (*slot108)(Obj866E8 *self, Elem *entry); /* +0x108 */
-    /* Called by func_8004CC74 with its own stack-local query buffer
+    /* Called by Class866E8__SetFootprintFromQuery with its own stack-local query buffer
      * (see `CC74QueryBuf`) and a literal 0; return value unused there.
      * Also called by Class866E8__ComputeFootprintFromRotation with the identical (own stack-local
      * CC74QueryBuf, 0) shape; return value unused there either. */
@@ -384,9 +384,9 @@ typedef struct Obj866E8Methods {
      * its own arg3; the return value is stored as a freshly-created
      * GridSlot866E8's `elemIdx`. */
     s32 (*slot120)(Obj866E8 *self, s32 arg1);      /* +0x120 */
-    /* Called by func_8004CDA4 with its own arg3 (unmodified); the return
+    /* Called by Class866E8__InitFootprintSlot with its own arg3 (unmodified); the return
      * value is stored into the first word of a freshly-copied 3-word
-     * slot at self+0x8C+key*0xC (see func_8004CDA4). */
+     * slot at self+0x8C+key*0xC (see Class866E8__InitFootprintSlot). */
     s32 (*slot124)(Obj866E8 *self, s32 arg1);      /* +0x124 */
     /* = Class866E8__RefreshFootprint (class_3bb8c_b, already matched: `void
      * Class866E8__RefreshFootprint(Obj866E8 *self)`). Called by func_8004B5BC as
@@ -525,7 +525,7 @@ typedef struct EntryChildObjMethods {
 struct EntryChildObj {
     EntryChildObjMethods *methods;  /* +0x000, func_8004D0D0/func_8004D108 */
     u8 pad04[0x10 - 0x04];
-    u32 unk10;                      /* +0x010, func_8004C0AC: OR'd with 0x80000000; func_8004CE24: bit31 set/cleared per its own arg1 */
+    u32 unk10;                      /* +0x010, func_8004C0AC: OR'd with 0x80000000; Class866E8__SetFootprintCellFlag: bit31 set/cleared per its own arg1 */
     /* func_8004BE54: a GsCOORDINATE2-shaped per-entry GPU link record --
      * full body (`EntryGpu`) kept in class_3bb8c.c. Note this sits right
      * where a `GsDOBJ2` embedded at THIS object's own +0x010 would put its
@@ -538,7 +538,7 @@ struct EntryChildObj {
     s32 unk20;                      /* +0x020, func_8004C0AC: zeroed */
     u8 pad24[0x36 - 0x24];
     s16 unk36;                       /* +0x036, func_8004BE54 */
-    EntryChildObj *unk38;           /* +0x038, func_8004CE24: singly-linked chain, walked while non-NULL */
+    EntryChildObj *unk38;           /* +0x038, Class866E8__SetFootprintCellFlag: singly-linked chain, walked while non-NULL */
 };
 
 /*
@@ -623,17 +623,17 @@ extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2); /* ar
 
 /*
  * Opaque target of Obj866E8::unk1DC (func_8004CFB0 stores it raw;
- * func_8004CD38 -- a plain, non-virtual helper, NOT a vtable slot, see
+ * IsPointOutOfBounds -- a plain, non-virtual helper, NOT a vtable slot, see
  * tools/classtable.py D_800866E8 -- dereferences it as a min/max bounding
  * box against an [x,y] byte pair). Field meaning inferred from the four
- * comparisons in func_8004CD38: `unk0`/`unk2` gate the LOW side, `unk4`/
+ * comparisons in IsPointOutOfBounds: `unk0`/`unk2` gate the LOW side, `unk4`/
  * `unk8` the HIGH side, of the point's two axes respectively.
  */
 typedef struct Bounds866E8_3bb8c_b {
-    s16 unk0;                      /* +0x000, func_8004CD38: point[0] < this -> out of range */
-    s16 unk2;                      /* +0x002, func_8004CD38: point[1] < this -> out of range */
-    s32 unk4;                      /* +0x004, func_8004CD38: this < point[0] -> out of range */
-    s32 unk8;                      /* +0x008, func_8004CD38: this < point[1] -> out of range (also the function's own return value) */
+    s16 unk0;                      /* +0x000, IsPointOutOfBounds: point[0] < this -> out of range */
+    s16 unk2;                      /* +0x002, IsPointOutOfBounds: point[1] < this -> out of range */
+    s32 unk4;                      /* +0x004, IsPointOutOfBounds: this < point[0] -> out of range */
+    s32 unk8;                      /* +0x008, IsPointOutOfBounds: this < point[1] -> out of range (also the function's own return value) */
 } Bounds866E8_3bb8c_b;
 
 /*
@@ -660,11 +660,11 @@ extern EntryDesc866E8 D_800869C0;
 
 /*
  * self+0x8C's array element (`Obj866E8::slots8C`, see below). Established
- * from func_8004CE24, which reads all five fields: `elemIdx` selects
+ * from Class866E8__SetFootprintCellFlag, which reads all five fields: `elemIdx` selects
  * `self->arr[elemIdx]`; `h4`/`h6` locate a starting cell in that element's
  * `unk10` pointer grid (row stride 20 cells, confirmed by the `* 20`
  * offset math); `h8`/`hA` are the sub-rectangle's width/height walked
- * from that starting cell. func_8004CDA4 (already matched, a different
+ * from that starting cell. Class866E8__InitFootprintSlot (already matched, a different
  * unit's round) writes a whole one of these via a 3-word block copy using
  * the coarser, already-committed `Unk54Struct` view of the SAME memory --
  * per this project's independent-views convention, that write-side view
@@ -673,27 +673,27 @@ extern EntryDesc866E8 D_800869C0;
  * about the internal layout it is copying.
  */
 typedef struct GridSlot866E8 {
-    s32 elemIdx;   /* +0x0, func_8004CE24: selects self->arr[elemIdx] */
-    s16 h4;        /* +0x4, func_8004CE24: starting column */
-    s16 h6;        /* +0x6, func_8004CE24: starting row (row stride 20) */
-    s16 h8;        /* +0x8, func_8004CE24: sub-rectangle width */
-    s16 hA;        /* +0xA, func_8004CE24: sub-rectangle height */
+    s32 elemIdx;   /* +0x0, Class866E8__SetFootprintCellFlag: selects self->arr[elemIdx] */
+    s16 h4;        /* +0x4, Class866E8__SetFootprintCellFlag: starting column */
+    s16 h6;        /* +0x6, Class866E8__SetFootprintCellFlag: starting row (row stride 20) */
+    s16 h8;        /* +0x8, Class866E8__SetFootprintCellFlag: sub-rectangle width */
+    s16 hA;        /* +0xA, Class866E8__SetFootprintCellFlag: sub-rectangle height */
 } GridSlot866E8;
 
 /*
- * func_8004CC74's own stack-local query buffer, filled by a call through
+ * Class866E8__SetFootprintFromQuery's own stack-local query buffer, filled by a call through
  * `Obj866E8Methods::slot10C` and read back at two offsets: `+0x2` (a
- * signed [x,y] byte pair, forwarded to func_8004CD38 as its `point`
- * argument) and `+0x28` (a plain `s32`, read directly by func_8004CC74
+ * signed [x,y] byte pair, forwarded to IsPointOutOfBounds as its `point`
+ * argument) and `+0x28` (a plain `s32`, read directly by Class866E8__SetFootprintFromQuery
  * itself). Everything else is unproven -- this is a local, not part of
  * `Obj866E8`, so it stays a minimal opaque type sized only to cover the
  * two known offsets.
  */
 typedef struct CC74QueryBuf {
     u8 pad0[0x2];
-    s8 point[2];        /* +0x2, func_8004CC74: forwarded to func_8004CD38 */
+    s8 point[2];        /* +0x2, Class866E8__SetFootprintFromQuery: forwarded to IsPointOutOfBounds */
     u8 pad4[0x28 - 0x4];
-    s32 count;          /* +0x28, func_8004CC74 */
+    s32 count;          /* +0x28, Class866E8__SetFootprintFromQuery */
 } CC74QueryBuf;
 
 struct Obj866E8 {
@@ -745,13 +745,13 @@ struct Obj866E8 {
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
     s32 gridSpan;                  /* +0x074, world span of the grid; gDefaultGridSpan = 0xA000. Class866E8__ComputeFootprintFromRotation copies it into its stack-local QueryTemplate866E8's unk1C before calling RotMatrix */
     s16 gridHalfCells;             /* +0x078, gridSpan >> 12 = 10; Class866E8__RefreshFootprint doubles it into an index (giving gridCells) */
-    s16 gridCells;                 /* +0x07A, gridSpan >> 11 = 20, the row stride byte-matched func_8004CE24 uses; Class866E8__RefreshFootprint passes it on as an arg */
+    s16 gridCells;                 /* +0x07A, gridSpan >> 11 = 20, the row stride byte-matched Class866E8__SetFootprintCellFlag uses; Class866E8__RefreshFootprint passes it on as an arg */
     s16 unk7C;                     /* +0x07C, Class866E8__BuildFootprintSlots: a signed sub-cell horizontal offset, clamped into [0,0x14) and combined with unk80 to decide whether the grid footprint spans one or two 20-unit cells; also written directly by Class866E8__ComputeFootprintFromRotation */
     s16 unk7E;                     /* +0x07E, Class866E8__BuildFootprintSlots: same convention as unk7C, vertical; also written directly by Class866E8__ComputeFootprintFromRotation */
     s32 unk80;                     /* +0x080, Class866E8__ComputeFootprintFromRotation (writes arg1 or arg2 depending on its own dispatch), then read/forwarded by Class866E8__BuildFootprintSlots to Class866E8__SplitFootprintSlot's p7 */
     s32 unk84;                     /* +0x084, Class866E8__ComputeFootprintFromRotation (writes the other of arg1/arg2), then read/forwarded by Class866E8__BuildFootprintSlots to Class866E8__SplitFootprintSlot's p8 */
-    s32 unk88;                     /* +0x088, func_8004CE24: loop count over slots8C[] (bounded by slots8C's own 4-element capacity) */
-    GridSlot866E8 slots8C[4];      /* +0x08C, func_8004CE24 (reads); func_8004CDA4 (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
+    s32 unk88;                     /* +0x088, Class866E8__SetFootprintCellFlag: loop count over slots8C[] (bounded by slots8C's own 4-element capacity) */
+    GridSlot866E8 slots8C[4];      /* +0x08C, Class866E8__SetFootprintCellFlag (reads); Class866E8__InitFootprintSlot (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
     Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
     u8 padC6[0xEC - 0xC6];
     Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/Class866E8__FindElemIndexByUnk32/Class866E8__FindElemIndexByUnk30/func_8004BD14/func_8004D1D0 */
@@ -763,7 +763,7 @@ struct Obj866E8 {
     u8 pad1C0[0x1CC - 0x1C0];
     s32 unk1CC;                    /* +0x1CC, func_8004CFA8 (address-of only, real type unknown) */
     u8 pad1D0[0x1DC - 0x1D0];
-    Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/func_8004CD38 (dereferences) */
+    Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/IsPointOutOfBounds (dereferences) */
     s32 unk1E0;                    /* +0x1E0, func_8004D028/func_8004D088: a countdown gate */
     EntryDesc866E8 *unk1E4;        /* +0x1E4, func_8004D0D0 (forwarded opaquely)/func_8004CFB8 (selects one of four statics and reads +0x6) */
     u8 pad1E8[0x2F4 - 0x1E8];

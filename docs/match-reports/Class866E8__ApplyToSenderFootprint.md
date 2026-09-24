@@ -152,11 +152,11 @@ Round 67 (track 3, naming pass).
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `Class866E8+0x08C` | `rects` | A | Saved and restored as one 0x30-byte block here; written a rectangle at a time by `Class866E8__SetFootprintRect`; read as a bounded array of grid rectangles by `Class866E8__DispatchToRectCells` here and by `class_3bb8c_b`'s BYTE-MATCHED `func_8004CE24`. |
+| `Class866E8+0x08C` | `rects` | A | Saved and restored as one 0x30-byte block here; written a rectangle at a time by `Class866E8__SetFootprintRect`; read as a bounded array of grid rectangles by `Class866E8__DispatchToRectCells` here and by `class_3bb8c_b`'s BYTE-MATCHED `Class866E8__SetFootprintCellFlag`. |
 
 Local types renamed this round: `HistoryEntry_3ac78` -> `GridRect_3ac78`,
 `HistoryBlock_3ac78` -> `GridRectList_3ac78`. The "History" name was a
-hypothesis from before the block's reader was understood; `func_8004CE24`
+hypothesis from before the block's reader was understood; `Class866E8__SetFootprintCellFlag`
 (matched, `class_3bb8c_b`) reads the same 0xC bytes as
 `{elemIdx, startCol, startRow, width, height}` and walks a grid rectangle with
 them. The members' own names (`elemIdx`/`col`/`row`/`width`/`height`) were

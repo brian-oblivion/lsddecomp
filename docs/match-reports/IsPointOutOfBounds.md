@@ -1,4 +1,6 @@
-# func_8004CD38 — STALL, 27 words (exact length, zero drift), 2/27 raw word-match (round 71 re-measure), first diff at vram 0x8004CD38 (retail's `move a2,a0`, which every C shape omits)
+# IsPointOutOfBounds — STALL, 27 words (exact length, zero drift), 2/27 raw word-match (round 71 re-measure), first diff at vram 0x8004CD38 (retail's `move a2,a0`, which every C shape omits)
+
+> Renamed from `func_8004CD38` on 2026-09-24 (tools/rename.py). Address 0x8004cd38.
 
 
 > **REVISITED, round 71: STALL, unchanged at 2/27; the recorded cause is refined to ONE root (block-local temps avoid `$v0` in retail), and a result-variable shape reaches 1/1 ins/del against the given body's 6/6; names/types not relevant (no type lever reached it; a narrower return type changes the caller).**
@@ -35,7 +37,7 @@ from the temps; it lands in `$a3` (shape below).
 | `?:` return, either polarity; single `if (\|\|) return 1;` | 2/27 or 0/27 | 6/6 or 1/1 |
 | `result = point[1]; result = b8 < result;` | 0/27 | 3/3 |
 | comparisons flipped (`p0 <= b4`, `p1 > b8`) | 0/27 | 3/3 |
-| return type `u8`/`s8`/`s16`/`u16` | 5/27, 0/0 in range, but **97 bytes differ in the caller** (`func_8004CC74`): rejected |
+| return type `u8`/`s8`/`s16`/`u16` | 5/27, 0/0 in range, but **97 bytes differ in the caller** (`Class866E8__SetFootprintFromQuery`): rejected |
 
 **Bounded search (one).** Gate 3, all three checks, on the 1/1 result-variable
 shape: (1) scaffold compiles, base 360; (2) `--debug --stack-diffs`: 1
@@ -58,7 +60,7 @@ that local-alloc's temps have already shut out of `$v0`.
 ```c
 #if 0
 /* needs: common.h, class_3bb8c.h (Bounds866E8_3bb8c_b) */
-s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
     s32 result;
 
     result = 1;
@@ -73,7 +75,7 @@ s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point) {
 
 ### Proposed learning
 
-**`func_8004CD38`: when retail keeps a constant return value in `$v0` across
+**`IsPointOutOfBounds`: when retail keeps a constant return value in `$v0` across
 several exits and your build re-materialises it in each delay slot, the
 decision was register allocation, not reorg**: retail's block-local temps
 avoided `$v0`. Check which register the FIRST temp of the first block gets
@@ -100,7 +102,7 @@ block live after any checkout.
 > `OK: build matches retail` confirmed afterward).
 >
 > Built a brand-new scaffold from scratch (`tools/setup-permuter.sh
-> func_8004CD38 <seed>`, seed = the same round-19 `goto` body just
+> IsPointOutOfBounds <seed>`, seed = the same round-19 `goto` body just
 > verified) specifically to check whether a longer or differently-seeded
 > search -- the "remaining lever" this report's round-18 entry names --
 > would be worth running. `--debug --stack-diffs`: **base score 2900 -- 14
@@ -146,7 +148,7 @@ block live after any checkout.
 
 Not a vtable slot (confirmed absent from `D_800866E8` via
 `tools/classtable.py`) — a plain, non-virtual bounding-box test. Only
-caller: `func_8004CC74` (`func_8004CD38(self->unk1DC, &stackBuf[0x12])`),
+caller: `Class866E8__SetFootprintFromQuery` (`IsPointOutOfBounds(self->unk1DC, &stackBuf[0x12])`),
 which established `Obj866E8::unk1DC`'s type (see `func_8004CFB0`'s
 report).
 
@@ -187,7 +189,7 @@ jr ra
 This maps directly onto:
 
 ```c
-s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
     if (bounds == NULL) return 1;
     if (point[0] < bounds->unk0) return 1;
     if (bounds->unk4 < point[0]) return 1;
@@ -305,7 +307,7 @@ existence.
 #if 0
 /* Shape B (attempt 2) -- matches retail's branch TARGETS for 3 of 4 early
  * exits, closest structural match found, still not byte-exact. */
-s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
     if (bounds == NULL || point[0] < bounds->unk0 || bounds->unk4 < point[0] ||
         point[1] < bounds->unk2) {
         return 1;
@@ -364,7 +366,7 @@ consistent, and a future reader should not downgrade this from a near-miss on
 the strength of the number.
 
 **The check that would settle whether it is really two instructions**:
-`.venv/bin/python3 tools/asm-differ/diff.py func_8004CD38` on the preserved
+`.venv/bin/python3 tools/asm-differ/diff.py IsPointOutOfBounds` on the preserved
 body reads the diff structurally rather than by word equality. Do that before
 spending a permuter run, so the run is aimed at a residue whose size you know.
 
@@ -441,7 +443,7 @@ all four field accesses, matching retail's literal register usage where
 even the null-check reads through the copied register) —
 
 ```c
-s32 func_8004CD38(Bounds866E8_3bb8c_b *arg0, s8 *point) {
+s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *arg0, s8 *point) {
     Bounds866E8_3bb8c_b *bounds;
     bounds = arg0;
     if (bounds == NULL) goto fail;
@@ -501,7 +503,7 @@ if/`||`/`goto` restatement of the same four-early-exit CFG — might make
 cc1's RTL expansion allocate differently:
 
 ```c
-s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
     return (bounds == NULL) ? 1
         : (point[0] < bounds->unk0) ? 1
         : (bounds->unk4 < point[0]) ? 1
@@ -570,12 +572,12 @@ build looks like.
 **Gate 3 check 3 run the way it is defined — on BYTES:**
 
 ```sh
-tools/setup-permuter.sh func_8004CD38 <Shape-A seed> permuter-work/cd38
+tools/setup-permuter.sh IsPointOutOfBounds <Shape-A seed> permuter-work/cd38
 tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/cd38/base.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/class_3bb8c_b.c.o
 ```
 
-The two disassemblies of `func_8004CD38` are **identical instruction for
+The two disassemblies of `IsPointOutOfBounds` are **identical instruction for
 instruction**. The only differing lines are the absolute targets of the four
 `beqz`/`bnez` and the one `j` (`beqz a0,64` vs `beqz a0,814`) — which every
 standalone object shows, because those are section-relative until link time.

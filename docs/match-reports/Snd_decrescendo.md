@@ -242,7 +242,7 @@ Gate 3, all three checks run 2026-09-19, on body A:
    happened to reach the same verdict, but it could not have detected a
    scaffold artifact, which is the only thing check 3 exists to detect. Bravo
    root-caused the same substitution in the reports for `Class866E8__SplitFootprintSlot` and
-   `func_8004CD38`, where it had blocked searches for 39 rounds. Confirmed
+   `IsPointOutOfBounds`, where it had blocked searches for 39 rounds. Confirmed
    here on a third function: do the bytes.
 
 **Search: ONE bounded run, NEGATIVE.** `-j 6 --stop-on-zero --best-only`,

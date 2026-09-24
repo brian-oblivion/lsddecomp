@@ -1,4 +1,6 @@
-# func_8004CE24 — MATCHED (97/97 words)
+# Class866E8__SetFootprintCellFlag — MATCHED (97/97 words)
+
+> Renamed from `func_8004CE24` on 2026-09-24 (tools/rename.py). Address 0x8004ce24.
 
 The largest function attempted this round. Iterates `self->slots8C[0..
 self->unk88-1]`; for each slot, resolves `self->arr[slot->elemIdx]`, skips
@@ -8,7 +10,7 @@ pointer grid (row stride 20 cells, `slot->h4`/`h6` the starting column/row,
 31 of `EntryChildObj::unk10` for every cell in the rectangle AND every
 node in that cell's `unk38` singly-linked chain.
 
-`self->slots8C` and `self->unk88` are the SAME memory `func_8004CDA4`
+`self->slots8C` and `self->unk88` are the SAME memory `Class866E8__InitFootprintSlot`
 (matched earlier this round, a different unit's function) writes via a
 coarser `Unk54Struct` whole-block-copy view — this function establishes
 the finer-grained field layout from the READ side.
@@ -23,7 +25,7 @@ the finer-grained field layout from the READ side.
   a hard ceiling, not an inferred one.
 - New type **`GridSlot866E8`** (0xC bytes): `elemIdx` (`s32`, +0x0),
   `h4`/`h6`/`h8`/`hA` (`s16` each, +0x4/+0x6/+0x8/+0xA). This is a
-  DIFFERENT, more granular view of the same memory `func_8004CDA4`
+  DIFFERENT, more granular view of the same memory `Class866E8__InitFootprintSlot`
   addresses as a flat `Unk54Struct` (3x `s32`) — kept as two independent
   views per the project's established convention (a whole-struct copy
   doesn't care about the internal layout it copies, so the coarser
@@ -39,7 +41,7 @@ the finer-grained field layout from the READ side.
 ## Final C
 
 ```c
-void func_8004CE24(Obj866E8 *self, s32 setBit) {
+void Class866E8__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
     s32 i;
     s32 j;
     s32 k;

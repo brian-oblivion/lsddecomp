@@ -39,8 +39,8 @@ s32 Class866E8__FindElemIndexByUnk30(Obj866E8 *self, s32 key) {
  * own definitions appear. Signatures are typed from the registers loaded
  * at each call site, per this unit's established convention for calling a
  * same-unit function whose body is still INCLUDE_ASM. */
-extern void func_8004CE24(Obj866E8 *self, s32 arg1);
-extern void func_8004CC74(Obj866E8 *self);
+extern void Class866E8__SetFootprintCellFlag(Obj866E8 *self, s32 arg1);
+extern void Class866E8__SetFootprintFromQuery(Obj866E8 *self);
 extern void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2);
 
 void Class866E8__RefreshFootprint(Obj866E8 *self) {
@@ -50,13 +50,13 @@ void Class866E8__RefreshFootprint(Obj866E8 *self) {
         return;
     }
     idx = self->gridHalfCells * 2;
-    func_8004CE24(self, 0);
+    Class866E8__SetFootprintCellFlag(self, 0);
     if (self->unk68->unk4 == 0) {
         Class866E8__ComputeFootprintFromRotation(self, idx, self->gridCells);
     } else {
-        func_8004CC74(self);
+        Class866E8__SetFootprintFromQuery(self);
     }
-    func_8004CE24(self, 1);
+    Class866E8__SetFootprintCellFlag(self, 1);
 }
 
 /* Forward declaration: defined later in this file (in ROM order, after
@@ -256,31 +256,31 @@ s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 coun
 }
 
 /* Forward declaration: defined later in this file (in ROM order, after
- * func_8004CC74), and EXCLUDED from this round's targets (documented
- * STALL, see docs/match-reports/func_8004CD38.md) -- calling into it
+ * Class866E8__SetFootprintFromQuery), and EXCLUDED from this round's targets (documented
+ * STALL, see docs/match-reports/IsPointOutOfBounds.md) -- calling into it
  * while it is still INCLUDE_ASM is fine, per this unit's established
  * convention. Signature per that report. */
-extern s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point);
+extern s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point);
 
 /* Forward declaration: defined later in this file (in ROM order, after
- * func_8004CD38), but func_8004CC74 calls it before its own definition
+ * IsPointOutOfBounds), but Class866E8__SetFootprintFromQuery calls it before its own definition
  * appears. */
-extern s32 func_8004CDA4(Obj866E8 *self, s32 unused, s32 key, s32 arg3);
+extern s32 Class866E8__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3);
 
-void func_8004CC74(Obj866E8 *self) {
+void Class866E8__SetFootprintFromQuery(Obj866E8 *self) {
     s32 junk;
     CC74QueryBuf buf;
 
     self->methods->slot10C(self, &buf, 0);
     self->unk88 = 0;
-    self->unk88 = func_8004CDA4(self, junk, 0, buf.count);
-    if (func_8004CD38(self->unk1DC, buf.point) != 0) {
+    self->unk88 = Class866E8__InitFootprintSlot(self, junk, 0, buf.count);
+    if (IsPointOutOfBounds(self->unk1DC, buf.point) != 0) {
         if (buf.count + 1 < self->unk68->count) {
-            self->unk88 = func_8004CDA4(self, junk, self->unk88, buf.count + 1);
+            self->unk88 = Class866E8__InitFootprintSlot(self, junk, self->unk88, buf.count + 1);
         }
     }
     if (buf.count - 1 >= 0) {
-        self->unk88 = func_8004CDA4(self, junk, self->unk88, buf.count - 1);
+        self->unk88 = Class866E8__InitFootprintSlot(self, junk, self->unk88, buf.count - 1);
     }
 }
 
@@ -298,8 +298,8 @@ void func_8004CC74(Obj866E8 *self) {
  * `result`/`do..while(0)` variable) all converge on this same shape or
  * worse; permuter search (round 18, 71363 iterations) also failed to
  * reach zero against the identical, since-confirmed-faithful scaffold
- * (round 58) (docs/match-reports/func_8004CD38.md). Hand-derived. */
-s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point) {
+ * (round 58) (docs/match-reports/IsPointOutOfBounds.md). Hand-derived. */
+s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
     if (bounds == NULL) {
         return 1;
     }
@@ -315,10 +315,10 @@ s32 func_8004CD38(Bounds866E8_3bb8c_b *bounds, s8 *point) {
     return bounds->unk8 < point[1];
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004CD38);
+INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", IsPointOutOfBounds);
 #endif
 
-s32 func_8004CDA4(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
+s32 Class866E8__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
     Unk54Struct *slot;
 
     slot = (Unk54Struct *) ((u8 *) self + 0x8C + key * sizeof(Unk54Struct));
@@ -327,7 +327,7 @@ s32 func_8004CDA4(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
     return key + 1;
 }
 
-void func_8004CE24(Obj866E8 *self, s32 setBit) {
+void Class866E8__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
     s32 i;
     s32 j;
     s32 k;

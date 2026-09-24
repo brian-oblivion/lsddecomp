@@ -11,7 +11,7 @@
  * cell with a world position on a 0x800 lattice. Indexing the grid uses a row
  * stride of 20 cells -- the same 20 that gDefaultGridSpan >> 11 produces
  * (0xA000 / 0x800, see Class866E8__SetGridSpan) and the same stride
- * class_3bb8c_b's byte-matched func_8004CE24 walks.
+ * class_3bb8c_b's byte-matched Class866E8__SetFootprintCellFlag walks.
  *
  * Work reaches the cells through a rectangle list (rects[4]/rectCount): a
  * notification arrives at Class866E8__OnNotify or Class866E8__OnCommand,

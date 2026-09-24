@@ -3,9 +3,9 @@
 > Renamed from `func_8004C620` on 2026-09-24 (tools/rename.py). Address 0x8004c620.
 
 Dispatcher: gated by `self->unk1B8`, doubles `self->unk78` into an index,
-calls `func_8004CE24(self, 0)` unconditionally, then branches on
-`self->unk68->unk4` between `Class866E8__ComputeFootprintFromRotation` and `func_8004CC74`, finishing
-with `func_8004CE24(self, 1)`.
+calls `Class866E8__SetFootprintCellFlag(self, 0)` unconditionally, then branches on
+`self->unk68->unk4` between `Class866E8__ComputeFootprintFromRotation` and `Class866E8__SetFootprintFromQuery`, finishing
+with `Class866E8__SetFootprintCellFlag(self, 1)`.
 
 ## New struct knowledge (`include/class_3bb8c.h`)
 
@@ -30,8 +30,8 @@ is read here too, no header change needed for that one.
  * own definitions appear. Signatures are typed from the registers loaded
  * at each call site, per this unit's established convention for calling a
  * same-unit function whose body is still INCLUDE_ASM. */
-extern void func_8004CE24(Obj866E8 *self, s32 arg1);
-extern void func_8004CC74(Obj866E8 *self);
+extern void Class866E8__SetFootprintCellFlag(Obj866E8 *self, s32 arg1);
+extern void Class866E8__SetFootprintFromQuery(Obj866E8 *self);
 extern void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2);
 
 void Class866E8__RefreshFootprint(Obj866E8 *self) {
@@ -41,29 +41,29 @@ void Class866E8__RefreshFootprint(Obj866E8 *self) {
         return;
     }
     idx = self->unk78 * 2;
-    func_8004CE24(self, 0);
+    Class866E8__SetFootprintCellFlag(self, 0);
     if (self->unk68->unk4 == 0) {
         Class866E8__ComputeFootprintFromRotation(self, idx, self->unk7A);
     } else {
-        func_8004CC74(self);
+        Class866E8__SetFootprintFromQuery(self);
     }
-    func_8004CE24(self, 1);
+    Class866E8__SetFootprintCellFlag(self, 1);
 }
 ```
 
 ## Attempts
 
 1. First attempt wrote the natural reading of the branch
-   (`if (self->unk68->unk4 != 0) { func_8004CC74(self); } else {
+   (`if (self->unk68->unk4 != 0) { Class866E8__SetFootprintFromQuery(self); } else {
    Class866E8__ComputeFootprintFromRotation(...); }`) — compiled, size matched, but 8/34 words
    differed: retail's branch is a `bnez` jumping FORWARD to the
-   `func_8004CC74` call (which sits as an out-of-line target after a `j`
+   `Class866E8__SetFootprintFromQuery` call (which sits as an out-of-line target after a `j`
    over it), with `Class866E8__ComputeFootprintFromRotation` as the in-line fallthrough. My version
    produced the mirror image: a `beqz` with `Class866E8__ComputeFootprintFromRotation` as the jump
-   target and `func_8004CC74` in-line.
+   target and `Class866E8__SetFootprintFromQuery` in-line.
 2. Inverting the condition and swapping the two arms
    (`if (self->unk68->unk4 == 0) { Class866E8__ComputeFootprintFromRotation(...); } else {
-   func_8004CC74(self); }`, semantically identical) reproduced retail's
+   Class866E8__SetFootprintFromQuery(self); }`, semantically identical) reproduced retail's
    exact branch polarity and instruction layout — 34/34.
 
 ### Proposed learning

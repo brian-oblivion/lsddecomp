@@ -278,7 +278,7 @@ its base pointer is loaded) before filing a register-class residue.
 whenever `self->unk68->unk4 == 0`. Resolves a signed/unsigned dual-width
 field on a three-level pointer chain
 (`self->unk6C->unk14->unk44`), fetches a `CC74QueryBuf` via
-`self->methods->slot10C` (same shape as `func_8004CC74`'s own use of that
+`self->methods->slot10C` (same shape as `Class866E8__SetFootprintFromQuery`'s own use of that
 slot), copies a constant 8-word template (`D_8008E98C`) onto the stack,
 patches three of its fields, and hands it to two uncarved library helpers
 (`func_800160B0`, `func_80015618`). The template's (patched) fields then
@@ -679,7 +679,7 @@ Notes on the derivation, for whoever revisits this:
   (`Class866E8__BuildFootprintSlots`) suggests this header/class's functions are unusually
   prone to GCC 2.6.3 register-allocation sensitivity that resists the
   usual small reshaping levers — worth flagging to whoever next works this
-  header (`func_8004CD38`/`func_8004CFB8`, already-documented stalls, are
+  header (`IsPointOutOfBounds`/`func_8004CFB8`, already-documented stalls, are
   also here) as a pattern, not three isolated incidents.
 - **Screening with the register-saturation grep BEFORE writing any C paid
   off as a time-management signal, even though it didn't change the

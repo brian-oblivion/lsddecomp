@@ -23,8 +23,8 @@ void func_8004CFB0(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
 ## New struct knowledge
 
 - `Obj866E8::unk1DC` (`Bounds866E8_3bb8c_b *`, +0x1DC) — typed from
-  `func_8004CD38`'s own body (see that function's report), the only place
-  in this unit that reads it back. `func_8004CD38` itself stalled, but the
+  `IsPointOutOfBounds`'s own body (see that function's report), the only place
+  in this unit that reads it back. `IsPointOutOfBounds` itself stalled, but the
   field's TYPE derivation (a 4-field min/max bounding-box struct) does not
   depend on that function's byte-match — it comes from reading the
   occupant's own disassembly, independent of whether the source shape

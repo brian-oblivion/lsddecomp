@@ -324,7 +324,7 @@ neutral one.
 ## Round 53 (bravo) — CALIBRATION attempt, one fresh shape, regressed the already-solved half, negative
 
 Assigned as one of three functions in a round-53 Sonnet calibration slot for
-the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `func_8004CD38`
+the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `IsPointOutOfBounds`
 and `Class866E8__SplitFootprintSlot`. This report's disposition (round 18: "bounded search
 exhausted its time budget with no improvement, NOT permuter-exhausted") is
 the reason it was picked over the plan's higher-ranked but
