@@ -27,7 +27,7 @@ void *BMemPMgrInit(s32 poolSize)
     if (pool != NULL) {
         pool->freeListHead = (u8 *)pool + 0x1C;
         pool->poolSize = poolSize;
-        func_80017AC8(pool);
+        SetupBMemPMgrFreeList(pool);
     } else {
         printf(D_8001028C, NULL, poolSize);
     }
@@ -44,7 +44,7 @@ void FreeMem(void *ptr)
     free(ptr);
 }
 
-void func_80017AC8(BMemPMgr *pool)
+void SetupBMemPMgrFreeList(BMemPMgr *pool)
 {
     BMemPMgr *mgr;
     BMemBlockHdr *header;

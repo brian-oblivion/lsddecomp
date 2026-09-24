@@ -1,4 +1,6 @@
-# func_80017AC8 — MATCHED (round 45)
+# SetupBMemPMgrFreeList — MATCHED (round 45)
+
+> Renamed from `func_80017AC8` on 2026-09-24 (tools/rename.py). Address 0x80017ac8.
 
 **Unit:** `code_8220` · **Size:** 27 words · **Status:** MATCHED, 27/27 words, byte-exact.
 
@@ -25,7 +27,7 @@ right shape, wrong two locations.
 ## The function
 
 ```c
-void func_80017AC8(BMemPMgr *pool)
+void SetupBMemPMgrFreeList(BMemPMgr *pool)
 {
     BMemPMgr *mgr;
     BMemBlockHdr *header;
@@ -83,7 +85,7 @@ and needed no revision.
 ## Provenance
 
 round 45 (2026-09-15), runner alpha. `./build-and-verify.sh` green,
-`tools/funcdiff.py func_80017AC8` reports 27/27 words match, one attempt.
+`tools/funcdiff.py SetupBMemPMgrFreeList` reports 27/27 words match, one attempt.
 
 ### Proposed learning
 
@@ -97,3 +99,12 @@ about being "gp_rel-blocked" made that paragraph any less checkable at
 the time it was written — the disassembly was already sitting right
 there. Read the actual instruction operands, not just the report's prose,
 even when a report is otherwise well-sourced.
+
+## Naming (round 74)
+
+`SetupBMemPMgrFreeList`, **tier A**: every write in the body is fully
+derived (round 45 above) -- it seeds `freeListStart`/`freeListEnd` from
+`freeListHead`, marks the whole pool area as one free block, and plants
+the two boundary sentinels used for coalescing. Called only by
+`BMemPMgrInit` (this unit), which is exactly what the name says: the
+free-list half of pool setup.

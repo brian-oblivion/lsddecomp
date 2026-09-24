@@ -73,7 +73,7 @@ struct BasicClass {
  * BMemBlockHdr -- a single free-list node inside a BMemPMgr's pool area.
  * `sizeAndFlags` packs the block's byte size into the low 28 bits and
  * flag bits into the high 4 (0x40000000 = free); `prev`/`next` link the
- * pool's doubly-linked free list. Derived from func_80017AC8 (round 45)
+ * pool's doubly-linked free list. Derived from SetupBMemPMgrFreeList (round 45)
  * and reused by func_80017B34/func_80017CFC's still-undecoded bodies,
  * which walk this same list via BMemPMgr's freeListStart/freeListEnd.
  */
@@ -87,7 +87,7 @@ struct BMemBlockHdr {
 /*
  * bMemPMgr -- BMemPMgrInit's own pool-header object. `freeListHead`/
  * `poolSize` are the two fields BMemPMgrInit itself writes; the three
- * below them (round 45, func_80017AC8) round out the pool's free-list
+ * below them (round 45, SetupBMemPMgrFreeList) round out the pool's free-list
  * bookkeeping. What remains opaque is the pool AREA itself (poolSize +
  * 0x20 bytes total, starting at `freeListHead`), walked as a chain of
  * BMemBlockHdr nodes rather than through any field of this struct.
@@ -96,9 +96,9 @@ typedef struct BMemPMgr BMemPMgr;
 struct BMemPMgr {
     /* +0x000 */ void *freeListHead;   /* set to `self + 0x1C` by BMemPMgrInit; the pool's first free-list node */
     /* +0x004 */ s32 poolSize;
-    /* +0x008 */ BMemBlockHdr *freeListStart; /* free list head, func_80017AC8/B34/CFC */
+    /* +0x008 */ BMemBlockHdr *freeListStart; /* free list head, SetupBMemPMgrFreeList/B34/CFC */
     /* +0x00C */ BMemBlockHdr *freeListEnd;   /* free list tail, same trio */
-    /* +0x010 */ s32 unk10;            /* set to 1 by func_80017AC8; not yet read by any decoded function */
+    /* +0x010 */ s32 unk10;            /* set to 1 by SetupBMemPMgrFreeList; not yet read by any decoded function */
 };
 
 /* The generic pool allocator/free pair, established already by
@@ -113,7 +113,7 @@ struct BMemPMgr {
  * function's own BODY genuinely reads a second argument ($a1, a fallback
  * pool pointer used only when the global default pool D_8008A818 is
  * unset -- dead in practice at every decoded call site, confirmed by
- * func_80017AC8/A9C setting that global before either is ever called).
+ * SetupBMemPMgrFreeList/A9C setting that global before either is ever called).
  * Both are therefore DEFINED in code_8220.c with an old-style
  * (K&R identifier-list) parameter list, which is the only way to expose
  * that second parameter to their own bodies without contradicting the
@@ -135,7 +135,7 @@ extern void *func_80017CFC(); /* arity-ok: re-measured round 59, same -- `move s
  * BMemPMgrInit's call site never sets $a1 before the `jal` -- confirmed
  * by objdump: declaring a second parameter here forces the caller to
  * materialise a spurious `move a1,s1`, one word too many. */
-extern void func_80017AC8(BMemPMgr *pool);
+extern void SetupBMemPMgrFreeList(BMemPMgr *pool);
 
 /* The default-pool global itself (see the comment above). Setter is
  * SetDefaultBMemPMgr(BMemPMgr *pool), a one-line `D_8008A818 = pool;`. Not yet
