@@ -4,17 +4,17 @@
 
 **Unit:** `src/class_16334.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (30/30 words, full build verified byte-exact)
-**Vtable slot:** `D_8006D370+0x50` (`PadMethods.loadButtonTable`)
+**Vtable slot:** `gPadMethods+0x50` (`PadMethods.loadButtonTable`)
 
 ## Context
 
-This class's method table (`D_8006D370`, 21 slots, see `tools/classtable.py
-D_8006D370`) inherits 14 slots verbatim from `BASICCLASS_METHODS`
+This class's method table (`gPadMethods`, 21 slots, see `tools/classtable.py
+gPadMethods`) inherits 14 slots verbatim from `BASICCLASS_METHODS`
 (`D_8006B58C`, returned by `Get_vtable_BasicClass`) and adds 7 of its own at
 `+0x38..+0x54`. `Pad__LoadButtonTable` is the slot at `+0x50`.
 
 It copies a 0x40-byte (16-word) block from `D_80010764` into the runtime
-global `D_8008B388`. `D_80010764`'s vram falls inside the `psyq_15d04`
+global `sButtonMasks`. `D_80010764`'s vram falls inside the `psyq_15d04`
 rodata blob (file offset 0xF64, between the `0xF28` and `0xFA4` rodata
 segment boundaries in `config/splat.slps01556.lsdde.yaml`) -- i.e. this
 function copies a Psy-Q-owned constant table into game-owned bss. Given the
@@ -22,7 +22,7 @@ surrounding class also drives `func_80025EAC`/`func_80025EFC`/`func_80025F2C`
 (which disassemble as part of `psyq_PadInit`, immediately adjacent in the
 yaml at file offset 0x166ac) and does edge-detected held/pressed/released
 button masking (see `Pad__UpdateMasks`), the working hypothesis for this whole
-unit is a Pad/controller wrapper class, and `D_80010764`/`D_8008B388` are the
+unit is a Pad/controller wrapper class, and `D_80010764`/`sButtonMasks` are the
 16 canonical digital-button bit masks. See `include/class_16334.h` for the
 full writeup and struct layout.
 
@@ -31,7 +31,7 @@ full writeup and struct layout.
 ```c
 typedef struct { u32 w[16]; } Block64;
 extern Block64 D_80010764;
-extern u32 D_8008B388[16];
+extern u32 sButtonMasks[16];
 
 void Pad__LoadButtonTable(void) {
     Block64 local;
@@ -39,7 +39,7 @@ void Pad__LoadButtonTable(void) {
     u32 *src;
     s32 i;
 
-    dst = D_8008B388;
+    dst = sButtonMasks;
     local = D_80010764;
     i = 0;
     src = local.w;
@@ -59,7 +59,7 @@ void Pad__LoadButtonTable(void) {
   copy and is 4 words *shorter*, which also shows up as address drift in
   every function after it. This was the first (wrong) attempt; see below.
 - The second half is a real source-level `for` loop copying word-by-word from
-  the local struct into `D_8008B388`, using two independently-incrementing
+  the local struct into `sButtonMasks`, using two independently-incrementing
   pointers (`v1`/read, `t0`/write) plus a separate loop counter (`a0`) --
   i.e. the source uses an explicit `for (i = 0; i < 16; i++) *dst++ = *src++;`
   rather than pointer-limit comparison.

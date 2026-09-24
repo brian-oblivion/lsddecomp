@@ -2196,3 +2196,6 @@ Pad__LoadButtonTable = 0x80025E1C; // type:func
 Get_vtable_Pad = 0x80025E9C; // type:func
 Pad__func_80025E14 = 0x80025E14; // type:func
 Pad__func_80025E94 = 0x80025E94; // type:func
+gPadMethods = 0x8006D370;
+sPadRefCount = 0x8008A848;
+sButtonMasks = 0x8008B388;

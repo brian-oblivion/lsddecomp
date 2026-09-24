@@ -8,7 +8,7 @@ round 2026-08-30-a.
 
 ## What it does
 
-The `New_X` allocator for the Pad class (`D_8006D370`, resolved with
+The `New_X` allocator for the Pad class (`gPadMethods`, resolved with
 `tools/classtable.py 0x8006D370 --vs 0x8006B58C`). Allocates a 0x20-byte
 instance through the game allocator `BMemPMgrAlloc`, and on success calls the
 class's own constructor — slot `+0x08` of the table returned by

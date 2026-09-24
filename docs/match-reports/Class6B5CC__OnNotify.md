@@ -80,7 +80,7 @@ own; caching the pointer in a variable first changes the code shape
 
 ## Naming
 
-Round 71 (alpha). `func_8001CD60` -> `Class6B5CC__OnNotify`, **tier A**. Overrides BasicClass slot +0x038, BasicClass__OnNotify (receiving half of notifyParents; include/code_8220.h). Forwards to the base first, then dispatches on the SENDER's class tag: 2 (the pad class D_8006D370) -> slot +0x094, 5 (D_8006EF50) -> +0x098, 4 (Class6B5CC family) -> +0x09C dispatchLinkCommand. Slots 94/98 keep placeholders: their occupants (func_8001D6A4/func_8001D6AC, code_d294_b) are not named.
+Round 71 (alpha). `func_8001CD60` -> `Class6B5CC__OnNotify`, **tier A**. Overrides BasicClass slot +0x038, BasicClass__OnNotify (receiving half of notifyParents; include/code_8220.h). Forwards to the base first, then dispatches on the SENDER's class tag: 2 (the pad class gPadMethods) -> slot +0x094, 5 (D_8006EF50) -> +0x098, 4 (Class6B5CC family) -> +0x09C dispatchLinkCommand. Slots 94/98 keep placeholders: their occupants (func_8001D6A4/func_8001D6AC, code_d294_b) are not named.
 
 ## Proposed field names
 

@@ -7,7 +7,7 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies (previously stub-stalled as
-`gp_rel`-blocked on the same `D_8008A848` global as `Pad__Pad`). The
+`gp_rel`-blocked on the same `sPadRefCount` global as `Pad__Pad`). The
 preserved body from the earlier runner/alpha attempt named the guarded call
 as `func_80025F2C()`; re-reading the `.s` directly shows the call target is
 `PadStop` (already declared in `include/class_16334.h`,
@@ -24,7 +24,7 @@ base-class destructor through the method table.
 
 ```c
 void *Pad__Destroy(Pad *self) {
-    if (--D_8008A848 == 0) {
+    if (--sPadRefCount == 0) {
         PadStop();
     }
     return Get_vtable_BasicClass()->dtor(self);

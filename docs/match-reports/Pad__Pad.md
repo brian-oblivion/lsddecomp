@@ -7,10 +7,10 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies: this had been stub-stalled
-as blocked by the `gp_rel` construct (`D_8008A848` accessed via
+as blocked by the `gp_rel` construct (`sPadRefCount` accessed via
 `%gp_rel($gp)`). That blocker is RESOLVED as of round 42
 (`--gp-symbols=config/gp-symbols.txt`, `docs/research/gp-relative-blocker.md`)
-and `D_8008A848` is already present in `config/gp-symbols.txt`, so no new
+and `sPadRefCount` is already present in `config/gp-symbols.txt`, so no new
 toolchain work was needed here. Matched byte-exact on the FIRST build.
 
 ## What it is
@@ -25,7 +25,7 @@ instance only — initializes the Psy-Q Pad library.
 void Pad__Pad(Pad *self, void *arg1, s32 port) {
     Get_vtable_BasicClass()->ctor(self);
     self->methods = Get_vtable_Pad();
-    if (D_8008A848++ == 0) {
+    if (sPadRefCount++ == 0) {
         PadInit(arg1);
     }
     self->methods->init(self, port);
@@ -34,7 +34,7 @@ void Pad__Pad(Pad *self, void *arg1, s32 port) {
 
 ## Notes
 
-The postfix increment (`D_8008A848++ == 0`) is the exact retail shape: retail
+The postfix increment (`sPadRefCount++ == 0`) is the exact retail shape: retail
 loads the OLD counter value first, uses it for the branch, stores `old + 1`
 back, and stores `self->methods` in between the load and the branch — all of
 which C's ordinary statement-order and postfix-increment semantics reproduce

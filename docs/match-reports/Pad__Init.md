@@ -4,7 +4,7 @@
 
 **Unit:** `src/class_16334.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (16/16 words, full build verified byte-exact)
-**Vtable slot:** `D_8006D370+0x40` (`PadMethods.init`)
+**Vtable slot:** `gPadMethods+0x40` (`PadMethods.init`)
 
 ## Context
 

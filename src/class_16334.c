@@ -17,14 +17,14 @@ fail:
 void Pad__Pad(Pad *self, void *arg1, s32 port) {
     Get_vtable_BasicClass()->ctor(self);
     self->methods = Get_vtable_Pad();
-    if (D_8008A848++ == 0) {
+    if (sPadRefCount++ == 0) {
         PadInit(arg1);
     }
     self->methods->init(self, port);
 }
 
 void *Pad__Destroy(Pad *self) {
-    if (--D_8008A848 == 0) {
+    if (--sPadRefCount == 0) {
         PadStop();
     }
     return Get_vtable_BasicClass()->dtor(self);
@@ -77,7 +77,7 @@ void Pad__DispatchEvents(Pad *self) {
     }
 
     for (i = 0; i < 16; i++) {
-        u32 mask = D_8008B388[i];
+        u32 mask = sButtonMasks[i];
 
         code = -1;
         if (released & mask) {
@@ -107,7 +107,7 @@ void Pad__LoadButtonTable(void) {
     u32 *src;
     s32 i;
 
-    dst = D_8008B388;
+    dst = sButtonMasks;
     local = D_80010764;
     i = 0;
     src = local.w;
@@ -120,5 +120,5 @@ void Pad__func_80025E94(void) {
 }
 
 PadMethods *Get_vtable_Pad(void) {
-    return &D_8006D370;
+    return &gPadMethods;
 }

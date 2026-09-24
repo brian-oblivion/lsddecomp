@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-/* Class table at D_8006D370 (see tools/classtable.py D_8006D370). 21 slots:
+/* Class table at gPadMethods (see tools/classtable.py gPadMethods). 21 slots:
  * header + 14 slots inherited verbatim from BASICCLASS_METHODS (D_8006B58C,
  * returned by Get_vtable_BasicClass) + 7 slots this class adds/overrides (+0x08
  * ctor, +0x0C dtor, +0x40.. new virtuals).
@@ -78,9 +78,9 @@ extern void PadInit(void *arg1);
 extern u32 PadRead(s32 port);
 extern void PadStop(void);
 
-extern PadMethods D_8006D370;
-extern s32 D_8008A848;          /* live-instance counter; the first ctor registers the Pad ISR, the last dtor tears it down */
-extern u32 D_8008B388[16];      /* runtime copy of the button-mask table, filled by Pad__LoadButtonTable */
+extern PadMethods gPadMethods;
+extern s32 sPadRefCount;          /* live-instance counter; the first ctor registers the Pad ISR, the last dtor tears it down */
+extern u32 sButtonMasks[16];      /* runtime copy of the button-mask table, filled by Pad__LoadButtonTable */
 
 /* A 0x40-byte block, copied as a whole (GCC's inlined block-move codegen for
  * a struct assignment, not a word loop) rather than word-indexed. */

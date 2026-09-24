@@ -9,7 +9,7 @@ round 2026-08-30-a.
 ## What it does
 
 The Pad class's per-frame button-event dispatch — slot `+0x48`
-(`dispatchEvents`) of `D_8006D370`. It runs after `Pad__UpdateMasks` has refreshed
+(`dispatchEvents`) of `gPadMethods`. It runs after `Pad__UpdateMasks` has refreshed
 the three edge masks, turns each set bit into an event code, and delivers the
 codes to the instance's overridable `onButtonEvent` handler (slot `+0x30`).
 
@@ -28,7 +28,7 @@ the field names:
    a 16-entry stack array and then walked back down from the last one. The
    highest-numbered button is handled first.
 
-`D_8008B388` is confirmed here as a 16-entry mask table indexed `0..15` — the
+`sButtonMasks` is confirmed here as a 16-entry mask table indexed `0..15` — the
 runtime copy that `Pad__LoadButtonTable` fills from Psy-Q's `D_80010764`.
 
 ## Derivation
