@@ -172,23 +172,7 @@ void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 91/98 words compiled (7 short), raw word-match 69/98
- * in-range. Residue: retail rematerializes the literal -0x3C into $v0 at
- * (at least) four separate delay-slot / post-call sites feeding two
- * different merge points, rather than computing it once at the single
- * call site below; confirmed via an isolated GCC 2.6.3 reproducer to be
- * delay-slot-filler opportunistic fill plus caller-saved-register
- * invalidation across an intervening call, with no C source shape found
- * that reproduces it (docs/match-reports/func_80064E34.md). First real
- * diff at vram 0x80064E94. Hand-derived (round 13, runner alpha; six
- * further structural variants tried rounds 19-20, mechanism isolated and
- * confirmed round 55; never a permuter candidate -- round 19's search
- * floored at score 500, no zero, both improving candidates rejected as
- * non-idiomatic). */
 void func_80064E34(Entity *this, EntityMoodHandlerArg *out) {
-    s32 arg3;
-
     if (this->moodTimer == 0) {
         if (this->target->methods->slot200(this->target) == 5) {
             this->unk44 = 0xB;
@@ -221,15 +205,11 @@ void func_80064E34(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer >= 0xAF1) {
             this->methods->slotCC(this, -0x20, 0);
         }
-        arg3 = 0xFA0;
+        func_80064FBC(this, out, 0x1E1, 0xFA0, -0x3C);
     } else {
-        arg3 = 0x884;
+        func_80064FBC(this, out, 0x1E1, 0x884, -0x3C);
     }
-    func_80064FBC(this, out, 0x1E1, arg3, -0x3C);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/Entity_g", func_80064E34);
-#endif
 
 void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
     s32 unkFC;
