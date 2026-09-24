@@ -115,11 +115,11 @@ extern s32 OpenEvent(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
 /* Two format-string-like globals selected by TaskObjF__FormatCard on self->cardSlot's
  * truth value; passed opaquely (never dereferenced in this unit). */
-extern s32 D_8008AA9C;
-extern s32 D_8008AAA4;
+extern s32 gMcDevicePath1;
+extern s32 gMcDevicePath0;
 /* Third such constant, passed as BuildMemcardPath's 3rd argument by
  * TaskObjF__ProbeCardFreeSpace only. */
-extern s32 D_8008AAAC;
+extern s32 gMcTempFileSuffix;
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
@@ -323,7 +323,7 @@ s32 TaskObjF__FormatCard(Node3bb8cE *self)
 
     retries = 10;
     do {
-        path = self->cardSlot != 0 ? &D_8008AA9C : &D_8008AAA4;
+        path = self->cardSlot != 0 ? &gMcDevicePath1 : &gMcDevicePath0;
         result = format(path);
     } while (result == 0 && retries-- != 0);
     return result;
@@ -434,7 +434,7 @@ s32 TaskObjF__ProbeCardFreeSpace(Node3bb8cE *self, u8 id, s32 sizeArg)
     s32 sectors;
 
     sectors = (u32)(sizeArg + 0x21FF) >> 13;
-    path = BuildMemcardPath(pathBuf, self->cardSlot, &D_8008AAAC);
+    path = BuildMemcardPath(pathBuf, self->cardSlot, &gMcTempFileSuffix);
     handle = open(path, (sectors << 16) | 0x200);
     if (handle == -1) {
         return 0;

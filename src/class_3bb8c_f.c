@@ -247,9 +247,9 @@ char *BuildMemcardPath(DeviceName866E8 *dest, s32 selector, char *suffix) {
     DeviceName866E8 *src;
 
     if (selector) {
-        src = &D_8008AA9C;
+        src = &gMcDevicePath1;
     } else {
-        src = &D_8008AAA4;
+        src = &gMcDevicePath0;
     }
     *dest = *src;
     strcat((char *)dest, suffix);

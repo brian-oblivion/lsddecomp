@@ -2296,3 +2296,6 @@ TaskObjF__CollectExistingMemcardFiles = 0x8004EB88; // type:func
 TaskObjF__CheckCardSpace = 0x8004EC5C; // type:func
 TaskObjF__ProbeCardFreeSpace = 0x8004ECCC; // type:func
 TaskObjF__ClearResourceSlots = 0x8004E3F4; // type:func
+gMcDevicePath1 = 0x8008AA9C;
+gMcDevicePath0 = 0x8008AAA4;
+gMcTempFileSuffix = 0x8008AAAC;

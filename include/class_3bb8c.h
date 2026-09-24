@@ -2009,8 +2009,8 @@ typedef struct DeviceName866E8 {
     s8 b0, b1, b2, b3, b4, b5;
 } DeviceName866E8;
 
-extern DeviceName866E8 D_8008AA9C;   /* "bu10:" */
-extern DeviceName866E8 D_8008AAA4;   /* "bu00:" */
+extern DeviceName866E8 gMcDevicePath1;   /* "bu10:" */
+extern DeviceName866E8 gMcDevicePath0;   /* "bu00:" */
 
 /* This project's own strcat (matched elsewhere, src/code_171e0.c) --
  * BuildMemcardPath is this unit's only caller. */

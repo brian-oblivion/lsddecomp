@@ -7,14 +7,14 @@
 ## What it does
 
 `s32 TaskObjF__FormatCard(Node3bb8cE *self)`. Retries up to 10 times: pick one of
-two candidate path/name constants (`D_8008AA9C` or `D_8008AAA4`) based on
+two candidate path/name constants (`gMcDevicePath1` or `gMcDevicePath0`) based on
 `self->unkC`'s truth value, call `func_80050918` on it, and stop as soon
 as it returns nonzero or the retry budget is exhausted.
 
 ## Result
 
 Reached 25/27 first try with the tag values swapped (my ternary picked
-`D_8008AAA4` when `unkC != 0`; retail picks `D_8008AA9C`). Swapping the
+`gMcDevicePath0` when `unkC != 0`; retail picks `gMcDevicePath1`). Swapping the
 ternary arms matched immediately:
 
 ```c
@@ -26,7 +26,7 @@ s32 TaskObjF__FormatCard(Node3bb8cE *self)
 
     retries = 10;
     do {
-        path = self->unkC != 0 ? &D_8008AA9C : &D_8008AAA4;
+        path = self->unkC != 0 ? &gMcDevicePath1 : &gMcDevicePath0;
         result = func_80050918(path);
     } while (result == 0 && retries-- != 0);
     return result;
