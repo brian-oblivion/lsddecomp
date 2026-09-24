@@ -61,7 +61,7 @@ extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
 `D_8008D9A3` / `D_8008D98E` / `D_8008D98A` / `D_8008D9A0` / `D_8008D988` are
 all 0x34-byte-stride, all with the SAME index (channel number), which is
-the same table family this unit's `func_8002D6A4` also touches
+the same table family this unit's `SpuVmDoAllocate` also touches
 (`D_8008D98E`). `func_800375E8` has no established prototype anywhere in
 the project yet; declared locally here per CLAUDE.md's rule on prototypes
 for another unit's function.
@@ -184,7 +184,7 @@ Starting point was a naive transcription using a signed `s32 idx` and plain
    the multiply-every-iteration shape.
 4. **Duplicating the divide/lookup in each `if`/`else` arm was NOT needed
    here** (that fix mattered for the sibling function, see
-   `func_8002D6A4.md`) — `SpuVmAlloc` has no such division split.
+   `SpuVmDoAllocate.md`) — `SpuVmAlloc` has no such division split.
 
 ## What is still wrong (the residue)
 

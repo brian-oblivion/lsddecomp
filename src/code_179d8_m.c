@@ -977,7 +977,7 @@ extern u16 D_8008EA24;
 
 extern Rec34Half D_8008D9A0[];
 
-extern void func_8002D6A4(void);
+extern void SpuVmDoAllocate(void);
 extern void func_8002D8E0(s32 a0);
 extern s32 note2pitch(void);
 extern void SpuVmKeyOnNow(s32 a0, u16 a1);
@@ -1084,7 +1084,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                     D_8008D9A0[D_8008EA26].unk0 = D_8008EA1B;
                     D_8008D988[D_8008EA26].unk0 = D_8008EA24;
 
-                    func_8002D6A4();
+                    SpuVmDoAllocate();
                     if (D_8008EA24 == 0xFF) {
                         func_8002D8E0(*(u8 *) &D_8008EA26);
                     } else {

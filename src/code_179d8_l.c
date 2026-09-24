@@ -44,7 +44,7 @@
  *   func_8002E2F8    2w  <- already matched: splat emitted the empty C body
  *   func_8002E300    2w  <- itself.  Not work, and not yours to redo.
  *   note2pitch   47w   note2pitch2   64w   func_8002DDBC  112w
- *   func_8002E138  112w   func_8002E308  116w   func_8002D6A4  143w
+ *   func_8002E138  112w   func_8002E308  116w   SpuVmDoAllocate  143w
  *   SpuVmAlloc  167w
  *
  * func_8002E308's opening `addu $t3, $a0, $zero` is REGISTER PRESSURE with
@@ -399,8 +399,8 @@ extern u8 D_8008EA18;
 
 /* Shared with note2pitch2 below (same base pointer, same table); this
  * function needs the +0x10/+0x12 halfwords too, so the struct is declared
- * once here (ROM-address order: func_8002D6A4 precedes note2pitch2) and
- * reused there rather than redeclared -- see docs/match-reports/func_8002D6A4.md. */
+ * once here (ROM-address order: SpuVmDoAllocate precedes note2pitch2) and
+ * reused there rather than redeclared -- see docs/match-reports/SpuVmDoAllocate.md. */
 typedef struct {
     u8 unk0[4];
     u8 unk4;
@@ -415,7 +415,7 @@ typedef struct {
 } D8008E978Entry;
 extern D8008E978Entry *D_8008E978;
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D6A4);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
 /* D800902E8Entry, D_800902E8 and the blend-cascade globals
  * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, D_80090C60/64,

@@ -153,7 +153,7 @@ extern u8 D_8008EA20;
 extern u16 D_8008EA24;
 
 extern s32 SpuVmAlloc(void);
-extern void func_8002D6A4(void);
+extern void SpuVmDoAllocate(void);
 extern void func_8002D8E0(s32 a0);
 extern s32 note2pitch2(u16 a0, u16 a1);
 extern void SpuVmKeyOnNow(s32 a0, u16 a1);
@@ -419,7 +419,7 @@ s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     __asm__("");
     D_8008D99C[(u8) result].unk0 = pending18;
 
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
         func_8002D8E0((u8) result);
     } else {
@@ -565,7 +565,7 @@ s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p
     D_8008D98A[idx].unk0 = 0;
     __asm__("");
     D_8008D99C[idx].unk0 = pending18;
-    func_8002D6A4();
+    SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
         func_8002D8E0((u8) idx);
     } else {
