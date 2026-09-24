@@ -77,3 +77,16 @@ handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
 track code address once row 115 is reached). Mechanics established
 (mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
 `Entity_b.c`'s own header comment); which dream object owns the row is not.
+
+## Proposed field names
+
+| field | proposed | tier | evidence |
+| --- | --- | --- | --- |
+| `Entity::unk44` (+0x44) | `moodState` | B | Read/written by all 7 Entity units (`Entity.c`, `Entity_b..g`, 173 whole-word hits), so this is a PROPOSAL, not a rename. Every accessor in this unit treats it as a small internal phase code, distinct from `moodTimer` (per-tick counter, reset alongside a phase change) and `moodIndex` (which row of `gEntityMoodHandlerTable` this entity dispatches through). `Entity__MoodCue47` is the clearest single example: `unk44` starts 0, becomes 0xC, then 0xB, then 0xA in sequence, each transition gated on `moodTimer` thresholds and gating what the rest of the function does -- a textbook small FSM register, not a flag or a count. `moodIndex`/`moodTimer` are already-established names in the same struct, so `moodState` extends that family rather than inventing a new one. Posted to `tools/broadcast.sh` for the head/other Entity-unit runners to weigh in before any unit applies it. |
+
+Not proposing `unk80`/`unk84`: both are read here as `moodTimer`-scaling
+constants (a divisor/multiplier derived from the mood row) but the existing
+header comment already flags `unk84` as carrying a SECOND, unrelated
+loop-counter meaning in `Entity_f.c` (`func_80063ED4`/`func_80064078`), so a
+single name would misdescribe one of the two uses -- exactly the ambiguity
+CLAUDE.md's field-ownership rule exists to keep out of a shared header.
