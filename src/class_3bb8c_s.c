@@ -285,16 +285,16 @@ extern Vec3S gModelChildDriftInit;
  * updateRotation(.., 0, ..) adds to self and to each model child. */
 extern s32 gSpinRotStep[];
 
-#if 0
-/* After 500 frames (tick >= 0x1F5), for kinds with model children and a
+#ifdef NON_MATCHING
+/* NON_MATCHING: 117/121 words, length exact. Residue: a commutative
+ * register-identity swap in the &gModelChildDriftZ[idx] pointer computation's
+ * two temp registers (docs/match-reports/Class876FC__DriftModelChildren.md).
+ * Hand-derived.
+ *
+ * After 500 frames (tick >= 0x1F5), for kinds with model children and a
  * nonzero gModelChildDriftZ step: spin self and both children, move the
  * children along z, and every 24500 / step frames snap them back to their
- * layout. Always marks self's coord2 for recompute.
- *
- * round 44 (2026-09-15): best-reached body, 117/121 words, NOT byte-exact.
- * See docs/match-reports/Class876FC__DriftModelChildren.md for the residue and what was
- * tried. Kept here per the hard rule -- restore this ahead of any future
- * attempt rather than re-deriving from scratch. */
+ * layout. Always marks self's coord2 for recompute. */
 void Class876FC__DriftModelChildren(Class876FC *self)
 {
     s32 idx;
@@ -341,9 +341,9 @@ void Class876FC__DriftModelChildren(Class876FC *self)
     }
     *self->coord2 = 0;
 }
-#endif
-
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", Class876FC__DriftModelChildren);
+#endif
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 
