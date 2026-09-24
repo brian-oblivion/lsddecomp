@@ -257,7 +257,7 @@ trial and error against the funcdiff score alone.
 A function whose funcdiff residue is "correct total length, wrong
 registers throughout, cascading from partway through the body" is
 categorically different from an entangled multi-defect residue
-(func_8005F544's class) or a genuine one-instruction residue
+(Entity__MoodCue26's class) or a genuine one-instruction residue
 (Obj86ED0__ResetAllAndFinish's class) -- it is the project's established "register
 saturation" pattern (`func_8003D73C`) but WITHOUT retail saturating all
 9 callee-saved registers (retail here uses only 7 of 9: s0-s6), so the

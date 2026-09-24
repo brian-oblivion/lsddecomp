@@ -1,4 +1,6 @@
-# func_8005F800
+# Entity__MoodCue30
+
+> Renamed from `func_8005F800` on 2026-09-24 (tools/rename.py). Address 0x8005f800.
 
 **Unit:** Entity_c · **Size:** 92 words · **Status:** MATCHED (92/92 words,
 whole-image build verified byte-exact)
@@ -10,7 +12,7 @@ into `unk44` (`0xB`/`0xC`, gated by `Unk94Obj::slot200`'s return value), then
 dispatches on that state:
 
 ```c
-void func_8005F800(Entity *this) {
+void Entity__MoodCue30(Entity *this) {
     if (this->unk44 == 0) {
         if (this->unk94->methods->slot200(this->unk94) == 1) {
             this->unk44 = 0xB;
@@ -45,7 +47,7 @@ void *arg1)`, added to `include/Entity.h` right before the existing
 the address of the 3-word position vector's `x` field, same "vector
 pointer" convention as `Entity__IsNearTarget`'s still-`INCLUDE_ASM` first argument.
 Third confirmed caller of `Unk94Methods::slot200` after `Entity__MoodCue00` and
-`func_8005F708` (this one compares its result against `1`; no new signature
+`Entity__MoodCue29` (this one compares its result against `1`; no new signature
 information). `D_80089DB4` is a new rodata pointer, extern-declared
 alongside this unit's other `D_80089*` constants.
 

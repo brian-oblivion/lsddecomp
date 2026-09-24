@@ -1,4 +1,6 @@
-# func_8005F454
+# Entity__MoodCue25
+
+> Renamed from `func_8005F454` on 2026-09-24 (tools/rename.py). Address 0x8005f454.
 
 **Unit:** Entity_c · **Size:** 60 words · **Status:** MATCHED (60/60 words,
 whole-image build verified byte-exact)
@@ -11,7 +13,7 @@ whole-image build verified byte-exact)
 call site:
 
 ```c
-void func_8005F454(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue25(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (this->unkFC < 0x64) {
         if (out->unk4 % 3 == 0) {

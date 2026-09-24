@@ -1,4 +1,6 @@
-# func_8005F1A8
+# Entity__MoodCue22
+
+> Renamed from `func_8005F1A8` on 2026-09-24 (tools/rename.py). Address 0x8005f1a8.
 
 **Unit:** Entity_c · **Size:** 11 words · **Status:** MATCHED (11/11 words,
 whole-image build verified byte-exact)
@@ -12,7 +14,7 @@ this->unk94, 1, 0, 0);` -- the exact same call shape `Entity__MoodCue01`/
 ## Final C
 
 ```c
-void func_8005F1A8(Entity *this) {
+void Entity__MoodCue22(Entity *this) {
     Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
 }
 ```

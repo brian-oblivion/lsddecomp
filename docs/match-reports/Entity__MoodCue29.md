@@ -1,4 +1,6 @@
-# func_8005F708
+# Entity__MoodCue29
+
+> Renamed from `func_8005F708` on 2026-09-24 (tools/rename.py). Address 0x8005f708.
 
 **Unit:** Entity_c · **Size:** 62 words · **Status:** MATCHED (62/62 words,
 whole-image build verified byte-exact)
@@ -12,7 +14,7 @@ one-shot effect via `Unk94Obj::slot200`'s return value, then always rerolls
 `slot44`:
 
 ```c
-void func_8005F708(Entity *this) {
+void Entity__MoodCue29(Entity *this) {
     if (this->unkFC == 0) {
         if (this->unk94->methods->slot200(this->unk94) == 7) {
             this->methods->slot48(this, 1, D_80089E74);
@@ -34,7 +36,7 @@ are new rodata pointers, extern-declared alongside this unit's other
 
 The `mult`/`mfhi`/`sra`-`subu` sign-fix chain on `rand()`'s result (magic
 constant `0x66666667`, single `sra $a0, $a0, 1` after `mfhi`, unlike
-`func_8005F970`'s divisor-10 chain which shifts by 2) reconstructs `5 *
+`Entity__MoodCue31`'s divisor-10 chain which shifts by 2) reconstructs `5 *
 quotient` via a plain `sll 2` + `addu` (no extra `sll 1` doubling step) --
 division by 5, so `rand() % 5` reproduces it directly.
 
@@ -46,6 +48,6 @@ Matched on the first attempt.
 
 None new -- confirms the `mult 0x66666667` magic-multiply family
 distinguishes divisor 5 (single post-`mfhi` `sra` by 1, single `sll 2`
-multiply-back) from divisor 10 (`func_8005F970`: `sra` by 2, `sll 2` +
+multiply-back) from divisor 10 (`Entity__MoodCue31`: `sra` by 2, `sll 2` +
 `addu` + extra `sll 1` multiply-back) purely by the sign-fix shift amount
 and whether the multiply-back chain has that trailing doubling step.

@@ -1,11 +1,13 @@
-# func_8005FDFC -- MATCHED (51/51 words)
+# Entity__MoodCue36 -- MATCHED (51/51 words)
+
+> Renamed from `func_8005FDFC` on 2026-09-24 (tools/rename.py). Address 0x8005fdfc.
 
 Unit: `Entity_c`. Runner: bravo.
 
 ## Shape
 
 ```c
-void func_8005FDFC(Entity *this) {
+void Entity__MoodCue36(Entity *this) {
     u8 *arg2;
     s32 roll;
 

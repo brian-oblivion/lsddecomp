@@ -1,11 +1,13 @@
-# func_8005F608 -- MATCHED (51/51 words)
+# Entity__MoodCue27 -- MATCHED (51/51 words)
+
+> Renamed from `func_8005F608` on 2026-09-24 (tools/rename.py). Address 0x8005f608.
 
 Unit: `Entity_c`. Runner: bravo.
 
 ## Shape
 
 ```c
-void func_8005F608(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue27(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 70 == 0) {
         out->unk10 = 0;
         out->unk1C = 0x1B;

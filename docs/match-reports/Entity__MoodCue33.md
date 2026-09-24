@@ -1,11 +1,13 @@
-# func_8005FA94 -- MATCHED (54/54 words)
+# Entity__MoodCue33 -- MATCHED (54/54 words)
+
+> Renamed from `func_8005FA94` on 2026-09-24 (tools/rename.py). Address 0x8005fa94.
 
 Unit: `Entity_c`. Runner: bravo.
 
 ## Shape
 
 ```c
-void func_8005FA94(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue33(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
         this->methods->slot48(this, 1, SCALE_QUARTER);
     } else if (out->unk4 % 30 == 0) {
@@ -28,7 +30,7 @@ void func_8005FA94(Entity *this, EntityMoodHandlerArg *out) {
   if` with no shared statements in between reproduces exactly.
 - `out->unk4 % 30` divisor recovered arithmetically from the
   mult(0x88888889)/mfhi/sra/subu/sll chain (`v0*16 -> v0*15 -> v0*30`) --
-  same magic constant as `func_8005F368`'s `% 15` gate in this same unit,
+  same magic constant as `Entity__MoodCue24`'s `% 15` gate in this same unit,
   different shift, different divisor. A reminder that the magic multiplier
   alone does not identify the divisor; the shift and the reconstruction
   chain do.

@@ -49,7 +49,7 @@ since only its address is ever taken here, never its value.
 
 None -- a direct application of the already-documented `slotC4`-must-stay-
 `void` constraint to a NEW occupant of the same shared slot, confirming it
-generalizes past the two instances (`func_8005FA64`, `Entity__MoodCue00`)
+generalizes past the two instances (`Entity__MoodCue32`, `Entity__MoodCue00`)
 `Entity.h` already names.
 
 ## Naming

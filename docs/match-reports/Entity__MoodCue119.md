@@ -1,4 +1,6 @@
-# func_8005F6D4
+# Entity__MoodCue119
+
+> Renamed from `func_8005F6D4` on 2026-09-24 (tools/rename.py). Address 0x8005f6d4.
 
 **Unit:** Entity_c · **Size:** 13 words · **Status:** MATCHED (13/13 words,
 whole-image build verified byte-exact)
@@ -20,7 +22,7 @@ convention as the ones already declared in `Entity_b.c`. Declared fresh in
 ## Final C
 
 ```c
-s32 func_8005F6D4(Entity *this) {
+s32 Entity__MoodCue119(Entity *this) {
     return this->methods->slot48(this, 1, SCALE_SIX);
 }
 ```

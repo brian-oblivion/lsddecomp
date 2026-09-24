@@ -1,4 +1,6 @@
-# func_8005FEF8
+# Entity__MoodCue38
+
+> Renamed from `func_8005FEF8` on 2026-09-24 (tools/rename.py). Address 0x8005fef8.
 
 **Unit:** Entity_c · **Size:** 33 words · **Status:** MATCHED (33/33 words,
 whole-image build verified byte-exact)
@@ -10,7 +12,7 @@ handler, same family as `Entity_b`'s `Entity__MoodCue14`/`Entity__MoodCue09`/etc
 but with the `slot148` opener made CONDITIONAL rather than unconditional:
 
 ```c
-void func_8005FEF8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue38(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 120 == 0) {
         out->unk10 = this->methods->slot148(this);
         out->unk1C = 1;

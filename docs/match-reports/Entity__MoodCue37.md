@@ -1,4 +1,6 @@
-# func_8005FEC8
+# Entity__MoodCue37
+
+> Renamed from `func_8005FEC8` on 2026-09-24 (tools/rename.py). Address 0x8005fec8.
 
 **Unit:** Entity_c · **Size:** 12 words · **Status:** MATCHED (12/12 words,
 whole-image build verified byte-exact) — **now `void`, retyped round 68**
@@ -10,8 +12,8 @@ this->methods->slotCC(this, -0x5A, 0);`.
 
 ## `slotCC` retyped to `s32`
 
-Same "one-line wrapper" situation as `func_8005FA64`/`slotC4`
-(`func_8005FA64.md`, same round) — `slotCC`'s only other known caller
+Same "one-line wrapper" situation as `Entity__MoodCue32`/`slotC4`
+(`Entity__MoodCue32.md`, same round) — `slotCC`'s only other known caller
 (`Entity__MoodCue11`, matched the previous round) discards the result, and this
 tail call is the first positive evidence either way. UNLIKE `slotC4`,
 retyping `slotCC` to `s32` was verified NOT to perturb `Entity__MoodCue11`'s own
@@ -23,7 +25,7 @@ and is retyped `s32 (*slotCC)(Entity *self, s32 arg1, s32 arg2)`.
 ## Final C
 
 ```c
-s32 func_8005FEC8(Entity *this) {
+s32 Entity__MoodCue37(Entity *this) {
     return this->methods->slotCC(this, -0x5A, 0);
 }
 ```
@@ -34,7 +36,7 @@ Matched on the first attempt.
 
 ## Proposed learning
 
-See `func_8005FA64.md` for the general rule this round established: verify
+See `Entity__MoodCue32.md` for the general rule this round established: verify
 a shared-slot retype against every OTHER known caller's compiled output
 before committing to it, since two superficially symmetric slots
 (`slotC4`/`slotCC`, same struct, same signature shape) can have opposite
@@ -47,7 +49,7 @@ answers.
 with it:
 
 ```c
-void func_8005FEC8(Entity *this) {
+void Entity__MoodCue37(Entity *this) {
     this->methods->slotCC(this, -0x5A, 0);
 }
 ```

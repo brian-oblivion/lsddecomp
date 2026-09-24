@@ -1,4 +1,6 @@
-# func_8005F544 -- MATCHED (49/49, closed by runner alpha)
+# Entity__MoodCue26 -- MATCHED (49/49, closed by runner alpha)
+
+> Renamed from `func_8005F544` on 2026-09-24 (tools/rename.py). Address 0x8005f544.
 
 Unit: `Entity_c`. Originally staffed to runner bravo (stalled at 30/49,
 ~7 attempts). Reopened for runner alpha per HEAD BROADCAST (round following
@@ -10,7 +12,7 @@ runners).
 ## Final matched form
 
 ```c
-void func_8005F544(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue26(Entity *this, EntityMoodHandlerArg *out) {
     s32 v1;
     s32 arg1;
     void (**slotD0)(Entity *self, s32 arg1, s32 arg2);
@@ -40,12 +42,12 @@ compare:
 ```
 
 Whole-image build verified byte-exact (`./build-and-verify.sh` green,
-`funcdiff.py func_8005F544` reports 49/49, no address drift).
+`funcdiff.py Entity__MoodCue26` reports 49/49, no address drift).
 
 ## Shape (bravo's finding, confirmed, matches 21/21 words up to the residue)
 
 ```c
-void func_8005F544(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue26(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % this->unk80 == 0) {
         out->unk10 = this->methods->slot148(this);
         out->unk1C = 0x1A;
@@ -97,7 +99,7 @@ bravo's #2/#4 as sanity checks and are omitted):
 |---|-------|-------|-------|
 | 9a | `goto`-based explicit CFG: `v1 = 0x6E;` written as its own statement in BOTH predecessors (inside the mod-gate arm, right before a `goto compare;`, and again on the fallthrough path), landing on a shared `compare:` label that does the comparison and the flat `if`/`else` two-call dispatch from attempt 1 | 30/49 | Same score as flat, but the SHAPE changed: the second `li v1,0x6e` now appears in the output for the first time in this function's history -- confirmed by direct disassembly diff -- but scheduled to the WRONG position (right after the `jalr`, before the `sw`/`sw` field stores, instead of after them). This is the key structural unlock: writing the constant as an explicit statement in EACH predecessor, rather than once at the merge point, is what gets GCC to emit it twice at all. Bravo's #3 tried duplicating the WHOLE `if`/`else` per predecessor (too much); this duplicates only the one assignment, landing it right before a shared label. |
 | 9b | Same as 9a plus a bare `__asm__("");` between `out->unk1C = 0x1A;` and `v1 = 0x6E;` | 34/49 | Pins the reordering: without the barrier GCC hoists the independent `v1=0x6E` store up past the two `sw`s (no dependency ties them, so the scheduler floats it to right after the call's delay slot); the barrier stops it, and the store lands in its correct, retail-matching position. This is CLAUDE.md's permitted "order-only" barrier -- confirmed by re-running without it and seeing the exact same register(s) hold the same values, just reordered, per the rule-6 test. |
-| 9c | Same as 9b plus `slotD0 = &this->methods->slotD0;` (alpha's `func_8005FC58` lever) taken right before the final `if`, called through `(*slotD0)(this, K, 0)` in each arm (two call sites, matching attempt 1's dispatch shape) | 35/49 | This closed the SECOND residue: `this->methods` now loads into `$a2` at exactly retail's position (right after the `unkFC` reload, before the branch) instead of being refetched via `$a0` after the branch merge. Everything through that load now matches byte-for-byte. The ONE remaining word: GCC's cross-jump pass merged the two call sites into a single physical dispatch (as it did for `func_8005F454`), but had to add an extra `j` to route the `unkFC == 0x6E` (fallthrough) case around the `unkFC != 0x6E` case's literal -- retail instead places the DEFAULT value in the branch's delay slot and OVERWRITES it in the fallthrough (no extra jump needed), i.e. the "default, then conditionally overwritten" idiom bravo's #4 already tried and rejected. |
+| 9c | Same as 9b plus `slotD0 = &this->methods->slotD0;` (alpha's `Entity__MoodCue35` lever) taken right before the final `if`, called through `(*slotD0)(this, K, 0)` in each arm (two call sites, matching attempt 1's dispatch shape) | 35/49 | This closed the SECOND residue: `this->methods` now loads into `$a2` at exactly retail's position (right after the `unkFC` reload, before the branch) instead of being refetched via `$a0` after the branch merge. Everything through that load now matches byte-for-byte. The ONE remaining word: GCC's cross-jump pass merged the two call sites into a single physical dispatch (as it did for `Entity__MoodCue25`), but had to add an extra `j` to route the `unkFC == 0x6E` (fallthrough) case around the `unkFC != 0x6E` case's literal -- retail instead places the DEFAULT value in the branch's delay slot and OVERWRITES it in the fallthrough (no extra jump needed), i.e. the "default, then conditionally overwritten" idiom bravo's #4 already tried and rejected. |
 | 9d | Same as 9c but converted to single-call default-then-overwrite (`arg1 = -0x180; if (...) arg1 = -0x2D00; (*slotD0)(this, arg1, 0);`), matching retail's exact branch/delay-slot layout | 37/49, but WORSE in kind | The instruction-count residue closed completely (right word count, right branch layout) -- but a NEW residue appeared: GCC swapped which callee-saved register holds `this` (`$a0`) vs `out` (`$a1`) for the ENTIRE function, from the very first prologue `sw`. Confirmed this was not about `arg1` specifically: replacing the named local with an inline ternary in the call argument position (`(*slotD0)(this, cond ? A : B, 0)`) produced the identical swap. It was specifically MERGING the two call sites into one that triggered it (attempt 9c, with two call sites, kept `$s0`=`this`/`$s1`=`out` correctly) -- apparently GCC 2.6.3's register-allocation order is sensitive to how many times `this` is textually mentioned in the function body, and dropping from two mentions (one per call site) to one flipped a tie-break. |
 | 10 | Permuter, seeded from 9d (base score 60 -- pure register differences, no insertions/deletions, per `permuter.py --debug`), found a ZERO in 23 iterations: wrap the outer mod-gate `if` in a no-op `do { ... } while (0)` block, everything else identical to 9d | **49/49, MATCH** | The `do/while(0)` is semantically inert (the block runs exactly once regardless) but changes GCC 2.6.3's live-range/scope bookkeeping enough to restore `$s0`=`this`/`$s1`=`out` while KEEPING the single-call, default-then-overwrite dispatch shape from 9d. Translated as-is (idiomatic C89, no permuter-specific artifacts) and re-verified with `build-and-verify.sh` + `funcdiff.py`: whole-image SHA1 green, 49/49. |
 
@@ -121,7 +123,7 @@ rematerialize axis) without first establishing the OTHER two:
    -- attempt 9b.
 3. **Where the vtable-method-table pointer load lands, and whether the
    two call sites merge into one dispatch or two.** Needed the
-   `&obj->vtable->slotNN` address-of-slot lever (from `func_8005FC58`) to
+   `&obj->vtable->slotNN` address-of-slot lever (from `Entity__MoodCue35`) to
    position the `this->methods` load correctly, and then a further
    change (the `do/while(0)` wrapper, found by the permuter) to keep BOTH
    the merged single-call dispatch AND the correct `$s0`/`$s1` assignment
@@ -179,7 +181,7 @@ from bravo's finding.
 4. **The permuter's `--debug` base score is itself diagnostic, not just a
    sanity check.** A score dominated by "Register Differences" with zero
    "Insertions"/"Deletions" (60, all-register, attempt 10's seed) versus one
-   dominated by "Insertions"/"Deletions" (665, `func_8005FC58`'s original
+   dominated by "Insertions"/"Deletions" (665, `Entity__MoodCue35`'s original
    seed; 1085/170, this function's earlier flat-form seeds) predicts how
    promising a from-scratch search is: the all-register case converged in
    23 iterations, the mixed cases ran 15,000-27,000+ iterations without
@@ -195,7 +197,7 @@ Bravo's original best (30/49), the starting point for this round:
 
 ```c
 #if 0
-void func_8005F544(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue26(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % this->unk80 == 0) {
         out->unk10 = this->methods->slot148(this);
         out->unk1C = 0x1A;
@@ -214,7 +216,7 @@ permuter's `do/while(0)` wrapper closed):
 
 ```c
 #if 0
-void func_8005F544(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue26(Entity *this, EntityMoodHandlerArg *out) {
     s32 v1;
     s32 arg1;
     void (**slotD0)(Entity *self, s32 arg1, s32 arg2);

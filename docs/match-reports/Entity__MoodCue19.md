@@ -1,4 +1,6 @@
-# func_8005EF54 -- MATCHED (40/40 words)
+# Entity__MoodCue19 -- MATCHED (40/40 words)
+
+> Renamed from `func_8005EF54` on 2026-09-24 (tools/rename.py). Address 0x8005ef54.
 
 Unit: `Entity_c`. Runner: bravo.
 
@@ -10,7 +12,7 @@ EntityMoodHandlerArg *out)`, computes `out->unk10` from `slot148`, maybe sets
 `out->unk1C` on a modulus gate, then always calls `slotC4`.
 
 ```c
-void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue19(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 % 10 == 0) {
         out->unk1C = 0x11;
