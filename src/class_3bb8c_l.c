@@ -349,7 +349,7 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     unk14->methods->slotCC(unk14, &D_8008710C);
 }
 
-void func_800536B0(Obj87034_3bb8c_l *self) {
+void ObjM__ExitSceneStyle(Obj87034_3bb8c_l *self) {
     self->methods->slotD4(self);
     self->unk3C->methods->slotFC(self->unk3C);
     self->unk3C->methods->slot50(self->unk3C);
@@ -357,7 +357,7 @@ void func_800536B0(Obj87034_3bb8c_l *self) {
     self->methods->slot14(self, self->unk14);
 }
 
-void func_80053764(Obj87034_3bb8c_l *self) {
+void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     DreamSysMethods_3bb8c_l *m;
     DreamSysMethods_3bb8c_l *m2;
     DreamSysObj_3bb8c_l *unk18;

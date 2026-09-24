@@ -2367,9 +2367,9 @@ typedef struct Unk50Struct_3bb8c_l {
     s32 unk8;      /* +0x008, round 45's ObjM__SetupSceneStyle: forwarded opaquely to Obj14Methods_3bb8c_l::slotBC's arg1 */
     void *unkC;   /* +0x00C, ObjM__TransferToOther (address taken, forwarded opaquely) */
     u8 pad10[0x014 - 0x010];
-    s32 unk14;    /* +0x014, ObjM__TransferToOther: discriminant compared against 2; also func_80053764: discriminant compared against 1 */
+    s32 unk14;    /* +0x014, ObjM__TransferToOther: discriminant compared against 2; also ObjM__EnterStyleSession: discriminant compared against 1 */
     void *unk18;  /* +0x018, ObjM__TransferToOther (address taken, forwarded opaquely) */
-    void *unk1C;  /* +0x01C, func_80053764 (address taken, forwarded opaquely) */
+    void *unk1C;  /* +0x01C, ObjM__EnterStyleSession (address taken, forwarded opaquely) */
 } Unk50Struct_3bb8c_l;
 
 /* Whatever self->unk14 points to: an object of some OTHER, unidentified
@@ -2398,7 +2398,7 @@ typedef struct Obj14Methods_3bb8c_l {
      * self->unk38))`. */
     void (*slotE0)(void *self, void *arg1); /* +0x0E0 */
     u8 pad0E4[0x0EC - 0x0E4];
-    void (*slotEC)(void *self);                        /* +0x0EC, func_80053764 */
+    void (*slotEC)(void *self);                        /* +0x0EC, ObjM__EnterStyleSession */
     u8 padF0[0x10C - 0x0F0];
     void *(*slot10C)(void *self, s32 arg1, s32 arg2); /* +0x10C, func_8005393C */
     u8 pad110[0x134 - 0x110];
@@ -2431,18 +2431,18 @@ typedef struct DreamSysMethods_3bb8c_l {
      * DreamSysObj_3bb8c_l instance from the `self->unk18` this function
      * dispatches every other slot through). */
     void (*slot4C)(void *self, void *arg1); /* +0x04C */
-    void (*slot50)(void *self);          /* +0x050, func_800536B0 */
+    void (*slot50)(void *self);          /* +0x050, ObjM__ExitSceneStyle */
     /* +0x054, round 45's ObjM__SetupSceneStyle: `(self, val)`, `val` a small
      * derived integer (`(*obj->methods->slot7C(obj, 0)) / 2 * 5 / 3 +
      * D_8008AB34`, `obj` being `*(void **)self->unkC`). */
     void (*slot54)(void *self, s32 arg1); /* +0x054 */
     u8 pad58[0x060 - 0x058];
-    void (*slot60)(void *self, s32 arg1);          /* +0x060, func_80053764 */
-    void (*slot64)(void *self, void *arg1);        /* +0x064, func_80053764 */
-    void (*slot68)(void *self, void *arg1);        /* +0x068, func_80053764 */
-    void (*slot6C)(void *self, void *arg1);        /* +0x06C, func_80053764 */
+    void (*slot60)(void *self, s32 arg1);          /* +0x060, ObjM__EnterStyleSession */
+    void (*slot64)(void *self, void *arg1);        /* +0x064, ObjM__EnterStyleSession */
+    void (*slot68)(void *self, void *arg1);        /* +0x068, ObjM__EnterStyleSession */
+    void (*slot6C)(void *self, void *arg1);        /* +0x06C, ObjM__EnterStyleSession */
     void (*slot70)(void *self, void *arg1, void *arg2, void *arg3, s32 arg4); /* +0x070, ObjM__InitStyleAndWorld */
-    void (*slot74)(void *self);          /* +0x074, func_800536B0 */
+    void (*slot74)(void *self);          /* +0x074, ObjM__ExitSceneStyle */
     u8 pad78[0x0AC - 0x078];
     /* Returns another DreamSysObj_3bb8c_l* -- its return value is dispatched
      * through methods->slotF0/slotD4 the same way self->unk3C/self->unk18
@@ -2452,17 +2452,17 @@ typedef struct DreamSysMethods_3bb8c_l {
      * not yet in scope this early in the header) to avoid a forward-typedef
      * redefinition -- GCC 2.6.3 rejects `typedef struct X X;` twice even
      * with an identical definition. */
-    struct DreamSysObj_3bb8c_l *(*slotAC)(void *self);    /* +0x0AC, func_80053764 */
-    void (*slotB0)(void *self, s32 arg1);          /* +0x0B0, func_80053764 */
-    void (*slotB4)(void *self, s32 arg1);          /* +0x0B4, func_80053764 */
+    struct DreamSysObj_3bb8c_l *(*slotAC)(void *self);    /* +0x0AC, ObjM__EnterStyleSession */
+    void (*slotB0)(void *self, s32 arg1);          /* +0x0B0, ObjM__EnterStyleSession */
+    void (*slotB4)(void *self, s32 arg1);          /* +0x0B4, ObjM__EnterStyleSession */
     u8 padB8[0x0D4 - 0x0B8];
-    void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, func_80053764 */
+    void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, ObjM__EnterStyleSession */
     u8 padD8[0x0EC - 0x0D8];
     s32 (*slotEC)(void *self, s32 arg1);              /* +0x0EC, ObjM__InitStyleAndWorld */
-    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md). ALSO func_80053764, on a DIFFERENT instance (the slotAC return value) with a DIFFERENT 2nd-arg shape (plain s32, not a pointer) -- same slot, two call-site views, per this project's established convention; see that function's report. */
+    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md). ALSO ObjM__EnterStyleSession, on a DIFFERENT instance (the slotAC return value) with a DIFFERENT 2nd-arg shape (plain s32, not a pointer) -- same slot, two call-site views, per this project's established convention; see that function's report. */
     u8 padF4[0x0F8 - 0x0F4];
-    void (*slotF8)(void *self, s32 arg1, s32 arg2); /* +0x0F8, func_80053764 */
-    void (*slotFC)(void *self);          /* +0x0FC, func_800536B0/func_80053C94 */
+    void (*slotF8)(void *self, s32 arg1, s32 arg2); /* +0x0F8, ObjM__EnterStyleSession */
+    void (*slotFC)(void *self);          /* +0x0FC, ObjM__ExitSceneStyle/func_80053C94 */
     u8 pad100[0x104 - 0x100];
     s32 (*slot104)(void *self, s32 arg1); /* +0x104, ObjM__TransferToOther */
     s32 (*slot108)(void *self);           /* +0x108, ObjM__TransferToOther */
@@ -2496,7 +2496,7 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slot04)(Obj87034_3bb8c_l *self);                        /* +0x004, BasicClass generic (func_80017EB0); dispatched directly by ObjM__TransferToOther on its `other` argument */
     u8 pad08[0x010 - 0x008];
     void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, ObjM__AttachTarget */
-    void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, ObjM__DetachTarget/func_800536B0 */
+    void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, ObjM__DetachTarget/ObjM__ExitSceneStyle */
     u8 pad18[0x030 - 0x018];
     void (*slot30)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x030, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md) */
     u8 pad34[0x048 - 0x034];
@@ -2525,24 +2525,24 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slotC8)(Obj87034_3bb8c_l *self);                        /* +0x0C8, ObjM__DispatchEvent (event 0x16) */
     u8 padCC[0x0D0 - 0x0CC];
     void (*slotD0)(Obj87034_3bb8c_l *self);                        /* +0x0D0, ObjM__TickTarget/ObjM__DispatchActiveState */
-    void (*slotD4)(Obj87034_3bb8c_l *self);                        /* +0x0D4, func_800536B0/ObjM__DispatchActiveState */
+    void (*slotD4)(Obj87034_3bb8c_l *self);                        /* +0x0D4, ObjM__ExitSceneStyle/ObjM__DispatchActiveState */
 } Obj87034Methods_3bb8c_l;
 
 struct Obj87034_3bb8c_l {
     Obj87034Methods_3bb8c_l *methods; /* +0x000 */
     u8 pad04[0x00C - 0x004];
     RegistrantObj_3bb8c_l *unkC;      /* +0x00C, ObjM__AttachTarget's `arg1->unkC` */
-    s32 unk10;                        /* +0x010, func_80053764 */
-    Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/func_8005393C/func_800536B0 */
-    DreamSysObj_3bb8c_l *unk18;         /* +0x018, func_800536B0 */
+    s32 unk10;                        /* +0x010, ObjM__EnterStyleSession */
+    Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/func_8005393C/ObjM__ExitSceneStyle */
+    DreamSysObj_3bb8c_l *unk18;         /* +0x018, ObjM__ExitSceneStyle */
     s32 unk1C;                           /* +0x01C, ObjM__TickTarget: incremented once per call */
     s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
     void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to func_80049060/func_80049098 */
     DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */
-    s32 unk40;                             /* +0x040, func_80053764 */
-    s32 unk44;                              /* +0x044, func_80053764 */
+    s32 unk40;                             /* +0x040, ObjM__EnterStyleSession */
+    s32 unk44;                              /* +0x044, ObjM__EnterStyleSession */
     s32 unk48;                               /* +0x048, ObjM__InitStyleAndWorld: set from arg1, or 0xA000 if arg1==0 */
     s32 unk4C;                                /* +0x04C, ObjM__InitStyleAndWorld: set from arg3 (only when self->unk38 != 0) */
     Unk50Struct_3bb8c_l *unk50;             /* +0x050, ObjM__TransferToOther */

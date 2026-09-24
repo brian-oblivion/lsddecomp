@@ -1,4 +1,6 @@
-# func_800536B0
+# ObjM__ExitSceneStyle
+
+> Renamed from `func_800536B0` on 2026-09-24 (tools/rename.py). Address 0x800536b0.
 
 **Unit:** class_3bb8c_l · **Size:** 45 words (0xB4 bytes) ·
 **Status: MATCHED 45/45**, whole-image SHA1 green.
@@ -6,7 +8,7 @@
 ## What it does
 
 ```c
-void func_800536B0(Obj87034_3bb8c_l *self) {
+void ObjM__ExitSceneStyle(Obj87034_3bb8c_l *self) {
     self->methods->slotD4(self);
     self->unk3C->methods->slotFC(self->unk3C);
     self->unk3C->methods->slot50(self->unk3C);

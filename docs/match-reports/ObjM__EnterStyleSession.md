@@ -1,4 +1,6 @@
-# func_80053764 -- MATCHED
+# ObjM__EnterStyleSession -- MATCHED
+
+> Renamed from `func_80053764` on 2026-09-24 (tools/rename.py). Address 0x80053764.
 
 Unit: `src/class_3bb8c_l.c`. Runner: echo, round 16.
 
@@ -8,13 +10,13 @@ verified).
 ## Signature
 
 ```c
-void func_80053764(Obj87034_3bb8c_l *self);
+void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self);
 ```
 
 ## Final C
 
 ```c
-void func_80053764(Obj87034_3bb8c_l *self) {
+void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     DreamSysMethods_3bb8c_l *m;
     DreamSysMethods_3bb8c_l *m2;
     DreamSysObj_3bb8c_l *unk18;
