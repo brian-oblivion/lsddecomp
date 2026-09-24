@@ -163,3 +163,15 @@ this unit alone: `Obj86B60__SetState` sets it to 0 or 1 (cases 4/7 and 5);
 `func_8003C944`/`func_8003C9B0` branch `==1` vs `==2`. Reads as a small mode
 enum selecting which of two/three notify-handling paths applies; "notifyMode"
 describes that mechanic without asserting which in-game states 1/2 are.
+
+**UPDATE (round 78, delta, same session):** echo posted a competing proposal
+for this exact field on the broadcast -- `unk3C -> scrollState` -- from
+code_2cc8c_b, with more context than this report has alone (that unit's own
+`unk4C -> target`/`Unk4CObj::unk24 -> slotEntries` proposals, and functions
+named `BeginElementScroll`/`SetTarget`, suggest `Obj86B60`'s `unk4C` target
+is a scrollable list and `unk3C` may be that scroll's own state). Echo's
+proposal is the better-corroborated one (cross-function agreement across two
+units' worth of naming rather than this unit's alone) and should win at
+merge if the head applies either -- this report's own `notifyMode` evidence
+above stands as independent confirmation of the VALUE SET (0/1/2, gating
+notify-handling) but not of the name. Do not apply both.
