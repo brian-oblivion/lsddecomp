@@ -1,4 +1,89 @@
-# ReadCdFile -- STALL, NON_MATCHING body promoted round 72 (best: 8/56 words at length 57/56 [1 word long], structural / block-layout)
+# ReadCdFile -- MATCHED round 74 (56/56, length exact, whole image byte-exact)
+
+REVISITED, round 74: MATCHED (56/56); names/types not relevant (existing
+field names used unchanged; the lever was control flow and block layout).
+
+> **ROUND 74 (2026-09-24), runner charlie -- MATCHED, four builds including the rebuild.**
+>
+> **Rebuild first.** The promoted `#ifdef NON_MATCHING` body, made live
+> unchanged (OpenCdFile already matched and live): `build exit=2`, 8/56,
+> `insertions 11 / deletions 11`, 48 positional skeleton diffs, built
+> length 57/56 (one word long) -- matches the round-72 title.
+>
+> **Build 2 (outer loop as label+goto, early return kept):** 12/56, ins/del
+> 11/11, still 57. The retry label moved but the cold `onError` block
+> still sat right after the entry test, where retail puts it last.
+>
+> **Build 3 (`if (isOpen != 0) { retry: ... } else { onError; }
+> return 0;`, `hi` computed before `CdControl`):** 20/56, **ins/del 1/1**,
+> 57. The else-block now comes last, `hi == 0` falls into the shared
+> `return 0` after `onError` (retail's `.L80028B40`), and `srl` lands in
+> `CdControl`'s delay slot. The one remaining diff, per asm-differ: the
+> CdSync wait loop's back-edge. Retail branches to `addu $a0,$zero,$zero`
+> (the argument setup) with `li $v0,5` in the delay slot. Built branches to
+> the `jal` with a COPY of `move $a0,$zero` stolen into the delay slot.
+> That copy is the extra word.
+>
+> **Build 4 (the CdSync wait as label+goto too) -- MATCH.** 56/56,
+> `insertions 0 / deletions 0`, `./build-and-verify.sh` OK,
+> `tools/check-nonmatching.sh` green. The CdReadSync wait stays a
+> `do/while`: its retail back-edge DOES target the `jal` with `a0 = 0`
+> copied into the delay slot, i.e. the do-while shape.
+>
+> ```c
+> s32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32 arg2) {
+>     s32 hi;
+>     s32 status;
+>     char scratch[0x800];
+>     char buf[0x10];
+>
+>     if (self->isOpen != 0) {
+>     retry:
+>         hi = (u32)arg2 >> 11;
+>         CdControl(2, &self->pos, 0);
+>     sync:
+>         status = CdSync(0, buf);
+>         if (status == 0) {
+>             goto sync;
+>         }
+>         if (status == 5) {
+>             goto retry;
+>         }
+>         if (hi != 0) {
+>             CdRead(hi, arg1, 0x80);
+>             do {
+>                 status = CdReadSync(0, 0);
+>             } while (status > 0);
+>             if (status == -1) {
+>                 goto retry;
+>             }
+>             return 0;
+>         }
+>     } else {
+>         self->methods->onError(self);
+>     }
+>     return 0;
+> }
+> ```
+>
+> ### Proposed learning
+>
+> **You can tell a goto loop from a do-while in GCC 2.6.3 output by where
+> the back-edge lands.** A `do { x = f(0, ..); } while (c);` back-edge
+> targets the `jal`, and reorg copies the argument setup into the branch's
+> delay slot, so that instruction appears twice (once before the loop, once
+> in the slot). A `L: x = f(0, ..); if (c) goto L;` back-edge targets the
+> argument setup itself, and the delay slot takes the next block's first
+> instruction. When a stall is one word long and the extra word is a
+> duplicated argument setup in a back-edge delay slot, rewrite that loop as
+> a goto. Loops in the same function can differ: here two were gotos and
+> one a do-while. Companion lever in OpenCdFile the same round: goto loops
+> also get no loop-invariant hoisting.
+
+---
+
+(Historical record below; its title was: ReadCdFile -- STALL, NON_MATCHING body promoted round 72 (best: 8/56 words at length 57/56 [1 word long], structural / block-layout))
+
 
 > **ROUND 72 (2026-09-23), runner charlie -- NON_MATCHING body promoted.**
 > Per `docs/FINISHING-PLAN.md` track 1b: the "## Result" body (the one the

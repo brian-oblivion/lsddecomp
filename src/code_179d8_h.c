@@ -42,7 +42,7 @@
  *     the still-uncarved `code_179d8` remainder), so WHICH broader purpose
  *     this reclassification serves is open; see both reports' `## Naming`.
  *   - `OpenCdFile`/`CloseCdFile`/`GetCdFileSize`/`ReadCdFile` (the
- *     `ObjA34_179D8H` quad, two still `INCLUDE_ASM`): resolves a CD-ROM file
+ *     `ObjA34_179D8H` quad, all four matched): resolves a CD-ROM file
  *     by name, tracks whether it is open, reports its sector-rounded size,
  *     and reads from it.  Not inferred from this unit alone --
  *     `src/code_179d8_s.c`'s `func_800272D0`/`func_80027480`/
@@ -205,23 +205,11 @@ void *Class6D430__DestroyCdReadDriver(Class6D430 *self) {
 void NoOp2(void) {
 }
 
-/* ROUND 36 (runner charlie): the round-17 preserved body (best 12/43,
- * structural -- path-address CSE across the loop's calls, plus a
- * register-role rotation, per docs/match-reports/OpenCdFile.md) spelled
- * its two callees func_8002B640/func_80012C20, which round 34's SDK-object
- * conversion retargeted to CdSearchFile/printf (already declared above,
- * per-call-site typed for this unit). Corrected and rebuilt: reproduces the
- * IDENTICAL structural residue (one extra cached-address instruction,
- * confirmed via asm-differ) -- the previously recorded figure is now
- * measured, not carried forward. Still genuinely stalled; restored to
- * INCLUDE_ASM. The report carries the corrected, linkable body. */
-/* NON_MATCHING body promoted, round 72 (charlie), per docs/FINISHING-PLAN.md
- * track 1b. Hand-derived (round 17/36/47/54/64, no permuter-found edit --
- * round 47's permuter check (b) declined the search: insertions=4,
- * deletions=3, base score 863). Live-measured under current maspsx flags
- * this round: 13/43 raw word-match, length 44/43 words (one word long,
- * unchanged) -- docs/match-reports/OpenCdFile.md. */
-#ifdef NON_MATCHING
+/* MATCHED round 74 (charlie). The retry loop is a label + backward goto,
+ * not while/for: a real loop gets loop notes, loop.c hoists &path out of it
+ * and CSEs it with BuildCdFilePath's argument (one word long, rotated
+ * saved registers). Retail recomputes &path inside the loop body --
+ * docs/match-reports/OpenCdFile.md. */
 void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
     s32 i;
     StatBuf179D8H statBuf;
@@ -230,24 +218,19 @@ void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
     i = 0;
     if (self->isOpen == 0) {
         BuildCdFilePath(path, suffix);
-        while (1) {
-            if (CdSearchFile(&statBuf, path) != 0) {
-                break;
+    retry:
+        if (CdSearchFile(&statBuf, path) == 0) {
+            if (i++ < 100) {
+                goto retry;
             }
-            i++;
-            if (i >= 100) {
-                printf(gCdFileNotFoundFmt, path);
-                return;
-            }
+            printf(gCdFileNotFoundFmt, path);
+            return;
         }
         self->pos = statBuf.pos;
-        self->isOpen = 1;
         self->size = statBuf.size;
+        self->isOpen = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", OpenCdFile);
-#endif
 
 char *BuildCdFilePath(char *dest, char *suffix) {
     dest[0] = '\\';
@@ -284,62 +267,46 @@ extern s32 CdSync(s32 arg0, void *buf);
 extern s32 CdRead(s32 arg0, void *arg1, s32 arg2);
 extern s32 CdReadSync(s32 arg0, s32 arg1);
 
-/* ROUND 36 (runner charlie): the round-17 preserved body (best 8/56
- * structural, via asm-differ realignment -- block-placement + a
- * register-role rotation, per docs/match-reports/ReadCdFile.md) spelled
- * its four callees func_80028DF0/func_80028D68/func_80029274/func_80029254,
- * which round 34's SDK-object conversion retargeted to
- * CdControl/CdSync/CdRead/CdReadSync (already declared above, per-call-site
- * typed for this unit). Corrected and rebuilt: reproduces the IDENTICAL
- * structural residue (one extra word, same block-placement/register-role
- * shape, confirmed via asm-differ) -- the previously recorded figure is now
- * measured, not carried forward. Tried one additional, previously-untested
- * reshape within budget -- writing the cold path as a single
- * `return self->methods->onError(self), 0;` expression instead of two
- * statements -- identical compiled length and shape, no improvement.
- * Still genuinely stalled; restored to INCLUDE_ASM. The report carries the
- * corrected, linkable body. */
-/* NON_MATCHING body promoted, round 72 (charlie), per docs/FINISHING-PLAN.md
- * track 1b. Hand-derived (round 17/36/47/54/64, no permuter-found edit --
- * round 47's permuter check (b) declined the search: insertions=5,
- * deletions=4, reorderings=6, base score 1333). Live-measured under current
- * maspsx flags this round: 8/56 raw word-match, length 57/56 words (one
- * word long, unchanged) -- docs/match-reports/ReadCdFile.md. */
-#ifdef NON_MATCHING
+/* MATCHED round 74 (charlie). Two of its three loops are label + goto
+ * (the seek retry and the CdSync wait); only the CdReadSync wait is a
+ * do-while. The loop kind is readable from the back-edge: a do-while's
+ * branch targets the jal with the argument setup copied into its delay
+ * slot, a goto loop's branch targets the argument setup itself --
+ * docs/match-reports/ReadCdFile.md. `scratch` is never touched; it only
+ * sizes the frame (retail's `buf` sits at sp+0x810). */
 s32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32 arg2) {
     s32 hi;
     s32 status;
     char scratch[0x800];
     char buf[0x10];
 
-    if (self->isOpen == 0) {
-        self->methods->onError(self);
-        return 0;
-    }
-    do {
-        CdControl(2, &self->pos, 0);
+    if (self->isOpen != 0) {
+    retry:
         hi = (u32)arg2 >> 11;
-        do {
-            status = CdSync(0, buf);
-        } while (status == 0);
+        CdControl(2, &self->pos, 0);
+    sync:
+        status = CdSync(0, buf);
+        if (status == 0) {
+            goto sync;
+        }
         if (status == 5) {
-            continue;
+            goto retry;
         }
-        if (hi == 0) {
+        if (hi != 0) {
+            CdRead(hi, arg1, 0x80);
+            do {
+                status = CdReadSync(0, 0);
+            } while (status > 0);
+            if (status == -1) {
+                goto retry;
+            }
             return 0;
         }
-        CdRead(hi, arg1, 0x80);
-        do {
-            status = CdReadSync(0, 0);
-        } while (status > 0);
-        if (status != -1) {
-            return 0;
-        }
-    } while (1);
+    } else {
+        self->methods->onError(self);
+    }
+    return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", ReadCdFile);
-#endif
 
 void NoOp4(void) {
 }

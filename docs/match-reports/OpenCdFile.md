@@ -1,4 +1,78 @@
-# OpenCdFile -- STALL, NON_MATCHING body promoted round 72 (promoted body: 13/43 words at length 44/43 [1 word long], structural; round-54 reshape 2 measured 14/43 at the same length but was reverted and is NOT the promoted body -- see round-72 note)
+# OpenCdFile -- MATCHED round 74 (43/43, length exact, whole image byte-exact)
+
+REVISITED, round 74: MATCHED (43/43); names/types not relevant (existing
+field names used unchanged; the lever was control flow).
+
+> **ROUND 74 (2026-09-24), runner charlie -- MATCHED.**
+>
+> **Rebuild first.** The promoted `#ifdef NON_MATCHING` body, made live
+> unchanged (ReadCdFile held at INCLUDE_ASM): `build exit=2`, 13/43,
+> `insertions 13 / deletions 13`, 27 positional skeleton diffs, built length
+> 44/43 (one word long) -- matches the round-72 title.
+>
+> **The diff, read.** Retail computes `&path` (`addiu $s2,$sp,0x28`) at the
+> TOP of the loop body, every iteration, and passes BuildCdFilePath a
+> separate fresh `addiu $a0,$sp,0x28`. The built body computes `&path` once
+> before BuildCdFilePath into a saved register and reuses it everywhere --
+> that is the extra word, and the saved-register rotation (i/self/path in
+> s1/s2/s0 vs retail s0/s1/s2) follows from the changed live ranges. That is
+> loop-invariant motion: a C `while`/`for`/`do` emits loop notes, loop.c
+> hoists the invariant address out, and CSE then merges it with the
+> pre-loop argument.
+>
+> **Shape tried 1 (while + post-increment):** `while (CdSearchFile(...) ==
+> 0) { if (i++ >= 100) { printf; return; } }` -- fixes the retail
+> `move v0,s0; slti v0,v0,100; bnez; addiu s0,s0,1` compare-before-increment
+> form (ins/del 13/13 -> 7/7) but still hoists &path, still 44 words.
+>
+> **Shape tried 2 (label + backward goto) -- MATCH.** A goto loop has no
+> loop notes, so loop.c never sees it and never hoists; `&path` is
+> recomputed in the loop's first block exactly as retail does. Built on the
+> first try: 43/43, `insertions 0 / deletions 0`, `./build-and-verify.sh`
+> OK, `tools/check-nonmatching.sh` green. Store order
+> `pos; size; isOpen = 1` was written to follow retail's load order; not
+> separately measured whether the other order also matches.
+>
+> ```c
+> void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
+>     s32 i;
+>     StatBuf179D8H statBuf;
+>     char path[0x40];
+>
+>     i = 0;
+>     if (self->isOpen == 0) {
+>         BuildCdFilePath(path, suffix);
+>     retry:
+>         if (CdSearchFile(&statBuf, path) == 0) {
+>             if (i++ < 100) {
+>                 goto retry;
+>             }
+>             printf(gCdFileNotFoundFmt, path);
+>             return;
+>         }
+>         self->pos = statBuf.pos;
+>         self->size = statBuf.size;
+>         self->isOpen = 1;
+>     }
+> }
+> ```
+>
+> ### Proposed learning
+>
+> **A loop-invariant stack address recomputed INSIDE a loop in retail means
+> the loop was a label+goto, not while/for.** Discriminator: retail has
+> `addiu $sN,$sp,K` at the top of the loop body while a call before the
+> loop passes the same `$sp+K` as its own fresh `addiu $a0,$sp,K`; the
+> built C instead computes it once before the loop into a saved register
+> (one word long, saved registers rotated). GCC 2.6.3's loop.c only
+> hoists invariants out of loops bracketed by loop notes, which goto loops
+> never get. Seven prior rounds (17/36/47/54/64/72) filed this as
+> "path-address CSE + register-role rotation"; it was control flow.
+
+---
+
+(Historical record below; its title was: OpenCdFile -- STALL, NON_MATCHING body promoted round 72 (promoted body: 13/43 words at length 44/43 [1 word long], structural; round-54 reshape 2 measured 14/43 at the same length but was reverted and is NOT the promoted body -- see round-72 note))
+
 
 > **ROUND 72 (2026-09-23), runner charlie -- NON_MATCHING body promoted.**
 > Per `docs/FINISHING-PLAN.md` track 1b: the "## Best result" body (the one
