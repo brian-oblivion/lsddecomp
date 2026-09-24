@@ -123,8 +123,8 @@ void Entity__MoodCue67(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-extern u8 D_80089CC4[];
-extern u8 D_80089D6C[];
+extern u8 ROTATION_ZPLUS9[];
+extern u8 TRANSLATE_Y_PLUS8[];
 
 void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
@@ -155,8 +155,8 @@ void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotC4(this, this->unk48, 1);
     } else if (this->moodState == 0xA) {
         if (this->moodTimer < 8) {
-            this->methods->updateRotation(this, 0, D_80089CC4);
-            this->methods->addVec14(this, D_80089D6C);
+            this->methods->updateRotation(this, 0, ROTATION_ZPLUS9);
+            this->methods->addVec14(this, TRANSLATE_Y_PLUS8);
         } else {
             u32 r;
 
@@ -338,7 +338,7 @@ void Entity__MoodCue77(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-extern u8 D_80089D0C[];
+extern u8 ROTATION_XPLUS90[];
 extern u8 SCALE_Y2[];
 extern u8 D_80089E14[];
 extern s32 D_8008ACCC;
@@ -384,7 +384,7 @@ void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
 
     if (this->moodState == 0xB && out->unk4 == 0x1FE) {
         this->methods->slotCC(this, -0x17C, 0);
-        this->methods->updateRotation(this, 0, D_80089D0C);
+        this->methods->updateRotation(this, 0, ROTATION_XPLUS90);
         this->methods->stopSoundCue(this);
         this->moodState = 1;
         D_8008ACCC = 1;
@@ -427,7 +427,7 @@ void Entity__MoodCue79(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-extern u8 D_80089D54[];
+extern u8 TRANSLATE_Y_MINUS512[];
 
 void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer < this->unk80) {
@@ -439,7 +439,7 @@ void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else {
         this->methods->slot130(this);
-        this->methods->addVec14(this, D_80089D54);
+        this->methods->addVec14(this, TRANSLATE_Y_MINUS512);
     }
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
 }

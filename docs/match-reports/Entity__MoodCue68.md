@@ -41,8 +41,8 @@ void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotC4(this, this->unk48, 1);
     } else if (this->unk44 == 0xA) {
         if (this->unkFC < 8) {
-            this->methods->slot44(this, 0, D_80089CC4);
-            this->methods->slotBC(this, D_80089D6C);
+            this->methods->slot44(this, 0, ROTATION_ZPLUS9);
+            this->methods->slotBC(this, TRANSLATE_Y_PLUS8);
         } else {
             u32 r;
 
@@ -92,7 +92,7 @@ void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
 
 No new struct or vtable-slot knowledge; `slot148`, `slotC4`, `slot44`,
 `slotBC`, `slot16C`, and `Unk94Methods::slot100` were all already typed
-from earlier work in this unit. `D_80089CC4`/`D_80089D6C` are new per-unit
+from earlier work in this unit. `ROTATION_ZPLUS9`/`TRANSLATE_Y_PLUS8` are new per-unit
 `extern u8 [];` data-table externs, same convention as the rest of this
 file.
 

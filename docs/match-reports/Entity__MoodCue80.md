@@ -20,7 +20,7 @@ void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else {
         this->methods->slot130(this);
-        this->methods->slotBC(this, D_80089D54);
+        this->methods->slotBC(this, TRANSLATE_Y_MINUS512);
     }
     Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
 }
