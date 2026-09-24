@@ -1,4 +1,6 @@
-# func_80066340 -- MATCHED 258/258 (round 75): lever = index the input blob (`((s32 *)s0)[i]`) instead of walking a separate `pin` pointer, so loop.c strength-reduces it AFTER hoisting the /360 magic constant (was STALL: length EXACT 258/258, 252/258 raw, first diff vram 0x8006644C)
+# Class65650__ApplyTodPacket -- MATCHED 258/258 (round 75): lever = index the input blob (`((s32 *)s0)[i]`) instead of walking a separate `pin` pointer, so loop.c strength-reduces it AFTER hoisting the /360 magic constant (was STALL: length EXACT 258/258, 252/258 raw, first diff vram 0x8006644C)
+
+> Renamed from `func_80066340` on 2026-09-24 (tools/rename.py). Address 0x80066340.
 
 **Unit:** code_55dd4 · **Size:** 258 words (0x408 bytes) · **Status:** STALL —
 **LENGTH exact (258/258 words, no drift); RAW WORD-MATCH 252/258 (97.7%);
@@ -16,7 +18,7 @@ still open after extensive attempts.
 ## What it does (fully derived — every branch target, every field, every call arity confirmed against the disassembly)
 
 `Class65650Methods` slot `+0x138`, the accumulator-threading callee
-`func_800662BC` (this unit's other pre-existing stall, 17/33) calls in a
+`Class65650__ApplyTodFrame` (this unit's other pre-existing stall, 17/33) calls in a
 fold: `acc = self->methods->slot138(self, acc, extra)`. Confirmed
 consistent with that call site — `self`, `acc`, `extra` match, and the
 return expression (`acc + outbuf[3] * 4`) is exactly the kind of
@@ -24,7 +26,7 @@ return expression (`acc + outbuf[3] * 4`) is exactly the kind of
 expects.
 
 ```c
-void *func_80066340(Class65650 *self, void *acc, void *extra)
+void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
 {
     u8 outbuf[4];
     void *s0;
@@ -264,7 +266,7 @@ Six real variations tried; none moved this specific 6-word residue.
 
 ```c
 #if 0
-void *func_80066340(Class65650 *self, void *acc, void *extra)
+void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
 {
     u8 outbuf[4];
     void *s0;
@@ -727,7 +729,7 @@ layout closure, where a jumping arm placed textually LAST let GCC drop the
 `j` and fall through instead): grepped for every bare unconditional `j`.
 
 ```
-grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/func_80066340.s
+grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/Class65650__ApplyTodPacket.s
 ```
 
 **Seven hits** — this function is large enough (258 words) to actually have
@@ -977,7 +979,7 @@ after any `mflo`/`mfhi` is 33+ instructions away — zero hazard pairs.
 Independently re-confirmed this round rather than taken on faith:
 
 ```sh
-grep -n 'mflo\|mfhi\|mult\|div' asm/nonmatchings/code_55dd4/func_80066340.s
+grep -n 'mflo\|mfhi\|mult\|div' asm/nonmatchings/code_55dd4/Class65650__ApplyTodPacket.s
 ```
 
 produces exactly the widely-separated pattern the head describes — the
@@ -991,7 +993,7 @@ theory that it is void.**
 No new lever applies here beyond what rounds 31/33 already screened
 (minimal-reproducer reshapes, volatile, named-constant divisor, all
 negative) — this round's actual search budget went to this unit's two
-never-freshly-searched siblings (`Class65650__CreateParts`, `func_800662BC`)
+never-freshly-searched siblings (`Class65650__CreateParts`, `Class65650__ApplyTodFrame`)
 instead, per the same "search coverage, not just search recency" priority
 recorded in `Class65650__SetDisplay`'s round-49 entry. Remains a STALL at 252/258,
 `INCLUDE_ASM` restored, `src/code_55dd4.c` confirmed clean before and

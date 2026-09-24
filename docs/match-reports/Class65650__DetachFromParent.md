@@ -10,10 +10,10 @@
 Guarded by a new field carved out of the first pass's `unk04` padding,
 `self->unk0C` (offset `+0x0C`, in the BasicClass/intermediate-class region):
 if set, unlinks the `+0x94` companion (`self->methods->slot140`, i.e.
-`func_800667B0`, already matched separately), then, if a *second* companion
+`Class65650__UnlinkPeer`, already matched separately), then, if a *second* companion
 pointer `self->unk50` (offset `+0x50`, likewise newly carved out) is set,
 unlinks it too via the class's `slot14` (`+0x014`, the same "unlink"
-inherited slot `func_800667B0` itself uses on `unk94`), and finally calls
+inherited slot `Class65650__UnlinkPeer` itself uses on `unk94`), and finally calls
 the base class's own `+0x050` slot on `self`.
 
 ```c
@@ -38,7 +38,7 @@ but nothing here proves the two fields are the same base-class field
 rather than each subclass's own; noted, not claimed.
 
 Adds `slot50` (`+0x050`) to `D800878D4Methods` and `slot140` (`+0x140`,
-`func_800667B0`) to `Class65650Methods`.
+`Class65650__UnlinkPeer`) to `Class65650Methods`.
 
 ### Proposed learning
 

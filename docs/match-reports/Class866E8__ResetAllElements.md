@@ -132,7 +132,7 @@ increment statement sits in the C source:**
    `entry`/`unk0`, one specifically for `&entry->unk4`), which retail does
    not do — retail re-reads `entry->unk4` twice through the SAME pointer.
 2. `entry++` (persisted incrementing pointer, C89-idiomatic "increment
-   pointer" per the project's own `func_80066340` lesson): 8/74. Same
+   pointer" per the project's own `Class65650__ApplyTodPacket` lesson): 8/74. Same
    general shape as (1) but with a single induction variable; still not
    retail's "fresh add each iteration" shape.
 3. `offset` accumulator (plain `s32`), `entry` recomputed from

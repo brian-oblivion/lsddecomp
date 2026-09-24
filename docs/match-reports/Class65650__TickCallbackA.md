@@ -1,4 +1,6 @@
-# func_80066150
+# Class65650__TickCallbackA
+
+> Renamed from `func_80066150` on 2026-09-24 (tools/rename.py). Address 0x80066150.
 
 **Unit:** code_55dd4 · **Size:** 29 words (0x74 bytes) · **Status:** MATCHED
 (29/29 words, whole-image `./build-and-verify.sh` green)
@@ -11,7 +13,7 @@ if `self->unk64 == 1` **and** `self->unk68` is set, calls `unk68`'s own
 vtable slot `+0x088` with the literal `6`.
 
 ```c
-void func_80066150(Class65650 *self)
+void Class65650__TickCallbackA(Class65650 *self)
 {
     self->methods->slotC4(self, -0x1E, 0);
     if (self->unk64 == 1 && self->unk68 != NULL) {

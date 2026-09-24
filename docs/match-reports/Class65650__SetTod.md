@@ -1,4 +1,6 @@
-# func_80066214 -- MATCHED (37/37, round 19)
+# Class65650__SetTod -- MATCHED (37/37, round 19)
+
+> Renamed from `func_80066214` on 2026-09-24 (tools/rename.py). Address 0x80066214.
 
 **Unit:** code_55dd4 · **Size:** 37 words (0x94 bytes) · **Status:** MATCHED,
 whole-image green. See "Round 19 (echo): MATCHED" at the end of this report
@@ -19,7 +21,7 @@ this unit), and uses the results to populate an iterator-looking group of
 fields before dispatching through the class's own vtable slot `+0x134`:
 
 ```c
-void func_80066214(Class65650 *self, s32 index)
+void Class65650__SetTod(Class65650 *self, s32 index)
 {
     self->unk7C = index;
     self->unk80 = (*(GroupObj **)(self->unk5C->unk30->arr + 8 + index * 4))->entry->unk4;
@@ -59,8 +61,8 @@ This also resolves four previously-opaque `Class65650` fields
   `slot134(self, self->unk88, 0)` with its return value discarded (the
   function has no `$v0` use after the `jalr`; this is NOT a tail call,
   there's a real prologue/epilogue with `$ra` saved around it). **Update
-  (`func_80065FD8`, matched later the same round): a discarded return is
-  never evidence of `void` — `func_80065FD8` calls the SAME slot and
+  (`Class65650__Tick`, matched later the same round): a discarded return is
+  never evidence of `void` — `Class65650__Tick` calls the SAME slot and
   stores the result into `self->unk88`, so the header now types it
   `u8 *(*slot134)(Class65650 *, void *, s32)`.** This function's own
   stall is unaffected (the residue below is purely a final-few-words
@@ -128,7 +130,7 @@ truncating the WARNING line — a real trap, worth remembering).
 
 ```c
 #if 0
-void func_80066214(Class65650 *self, s32 index)
+void Class65650__SetTod(Class65650 *self, s32 index)
 {
     self->unk7C = index;
     self->unk80 = (*(GroupObj **)(self->unk5C->unk30->arr + 8 + index * 4))->entry->unk4;
@@ -163,7 +165,7 @@ avoiding a reload) instead of the register retail's build ended up using
 and forced a reload). No source reshaping tried here (named local vs.
 inlined, barrier vs. none, statement order swaps) recovered retail's
 specific choice — this reads as the same class of "which physical register"
-residue documented for `Class65650__SetDisplay` and `func_800662BC` in this unit,
+residue documented for `Class65650__SetDisplay` and `Class65650__ApplyTodFrame` in this unit,
 just manifesting on a reload-vs-no-reload axis rather than a store-order
 axis.
 
@@ -220,7 +222,7 @@ herring left over from the incremental search, not part of the real
 fix. Final, translated form (no `__asm__`, no filler locals):
 
 ```c
-void func_80066214(Class65650 *self, s32 index)
+void Class65650__SetTod(Class65650 *self, s32 index)
 {
     self->unk7C = index;
     self->unk80 = (*(GroupObj **)(self->unk5C->unk30->arr + 8 + index * 4))->entry->unk4;
@@ -235,7 +237,7 @@ This is now the committed source in `src/code_55dd4.c`, replacing the
 already derived (`GroupObj`, `EntryObj2`, `Unk30Obj`, `Unk5CObj::unk30`,
 and the `Class65650`/`Class65650Methods` fields this body reads) --
 `slot134`'s return type was already correctly typed `u8 *` from
-`func_80065FD8`'s earlier finding, unaffected by this change.
+`Class65650__Tick`'s earlier finding, unaffected by this change.
 
 ### Proposed learning (supersedes the round-14 "register PAIR" framing above)
 

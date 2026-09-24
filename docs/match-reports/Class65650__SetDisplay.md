@@ -77,7 +77,7 @@ both compensations. Closed a 61-round stall on the second shape build.
 > first barrier was in place. A residue that (a) is three words, (b) is pure
 > scheduling, (c) never moves under source reshaping, and (d) sits in a
 > function whose every other word already matches is the textbook case for
-> the permuter -- and echo ran one on `func_800662BC` this round but not on
+> the permuter -- and echo ran one on `Class65650__ApplyTodFrame` this round but not on
 > this one. Next round should run it here FIRST, ahead of any further
 > hand-written reshape.
 >
@@ -334,7 +334,7 @@ internal label numbers that don't survive to machine code -- every
 actual instruction, including the exact three-store prologue permutation
 this report's whole history is about (`s2,s3,ra,s1,s0` instead of
 retail's `s2,s3,s0,ra,s1`), is unchanged. Confirmed the same result on
-`func_800662BC` (this unit's sibling with the identical numeric
+`Class65650__ApplyTodFrame` (this unit's sibling with the identical numeric
 signature) with an analogous probe -- see that function's own report.
 
 **This is a clean, cheap negative, and it did not cost a real build
@@ -560,7 +560,7 @@ already-correct body unchanged; the lever there was about accepting a
 barrier-free body, not substituting volatile for a barrier). Here,
 substituting volatile for the barrier lost ground (26/33) and adding it
 alongside changed nothing (30/33) — a second confirmation, after
-`func_80066340`'s round-33 entry, that volatile's narrower fencing has no
+`Class65650__ApplyTodPacket`'s round-33 entry, that volatile's narrower fencing has no
 purchase when the residue is a whole-prologue register-allocator decision
 rather than an access this project's C actually performs.
 
@@ -599,7 +599,7 @@ deciding where to spend this round's search budget:
 **This round's actual search budget went to this function's two
 never-touched-by-a-fresh-search siblings instead** (`Class65650__CreateParts`, 0
 genuine open-search iterations before this round despite a round-18
-manual 24-combination enumeration; `func_800662BC`, whose last search was
+manual 24-combination enumeration; `Class65650__ApplyTodFrame`, whose last search was
 round 31) — see their own reports. Re-running a THIRD blind campaign
 here, on an unchanged seed, against a search space that has already run
 to 192,610 iterations without ever finding a single sub-base candidate

@@ -65,7 +65,7 @@ typedef struct TagCheckArg {
 } TagCheckArg;
 
 /* Whatever class self->arg2 (below) points at: unidentified, only its
- * vtable slot +0x080 is needed so far, by func_800661D4. */
+ * vtable slot +0x080 is needed so far, by Class65650__func_800661D4. */
 typedef struct UnkArg2Methods {
     u8 pad00[0x80];                                       /* +0x000 .. +0x07C, unknown */
     void (*slot80)(void *self, void *arg1, s32 a2, s32 a3); /* +0x080 */
@@ -76,7 +76,7 @@ typedef struct UnkArg2Obj {
 } UnkArg2Obj;
 
 /* Whatever class self->unk68 (below) points at: unidentified, only its
- * vtable slot +0x088 is needed so far, by func_80066150. */
+ * vtable slot +0x088 is needed so far, by Class65650__TickCallbackA. */
 typedef struct Unk68Methods {
     u8 pad00[0x88];                                    /* +0x000 .. +0x084, unknown */
     void (*slot88)(void *self, s32 arg);                /* +0x088 */
@@ -94,7 +94,7 @@ typedef struct Unk70ElemMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
     void (*slot4)(void *self);                /* +0x004 -- called by Class65650__DestroyParts's teardown loop */
     u8 pad08[0x44];                            /* +0x008 .. +0x04B, unknown */
-    void (*slot4C)(void *self, void *arg1, s32 arg2); /* +0x04C -- called by func_80066340 (CASE3) as slot4C(elem, arg1, 0); arg1 varies between a Class65650* and an Unk70ElemObj* across call sites, hence void * */
+    void (*slot4C)(void *self, void *arg1, s32 arg2); /* +0x04C -- called by Class65650__ApplyTodPacket (CASE3) as slot4C(elem, arg1, 0); arg1 varies between a Class65650* and an Unk70ElemObj* across call sites, hence void * */
     u8 pad50[0x10];                             /* +0x050 .. +0x05F, unknown */
     void (*slot60)(void *self, void *arg);    /* +0x060 */
     u8 pad64[0x0C];                            /* +0x064 .. +0x06C, unknown */
@@ -102,13 +102,13 @@ typedef struct Unk70ElemMethods {
 } Unk70ElemMethods;
 
 /* self->unk70[i]'s own +0x14 field (below): unidentified, only the fields
- * func_80066340 actually touches are named. +0x00 is unconditionally
- * zeroed on every func_80066340 call; +0x44 is a SECOND pointer (to
+ * Class65650__ApplyTodPacket actually touches are named. +0x00 is unconditionally
+ * zeroed on every Class65650__ApplyTodPacket call; +0x44 is a SECOND pointer (to
  * TimeTargetObj, see below) whose own arrays get read/written depending
  * on the outBuf[1]==1 flags byte; +0x18/+0x1C/+0x20 are copied out of
  * that TimeTargetObj's own +0x18 array whenever outBuf[2]'s bit 3 is set. */
 typedef struct TimeTargetObj {
-    s32 arr00[3];    /* +0x000 .. +0x00B -- flags&4 target/source (func_80066340) */
+    s32 arr00[3];    /* +0x000 .. +0x00B -- flags&4 target/source (Class65650__ApplyTodPacket) */
     u8 pad0C[0x04];   /* +0x00C .. +0x00F */
     s16 arr10[3];      /* +0x010 .. +0x015 -- flags&2 target/source */
     u8 pad16[0x02];     /* +0x016 .. +0x017 */
@@ -116,7 +116,7 @@ typedef struct TimeTargetObj {
 } TimeTargetObj;
 
 typedef struct Elem14Obj {
-    s32 unk00;                /* +0x000 -- unconditionally zeroed by func_80066340 */
+    s32 unk00;                /* +0x000 -- unconditionally zeroed by Class65650__ApplyTodPacket */
     u8 pad04[0x14];            /* +0x004 .. +0x017, unknown */
     s32 unk18;                  /* +0x018 */
     s32 unk1C;                   /* +0x01C */
@@ -128,10 +128,10 @@ typedef struct Elem14Obj {
 typedef struct Unk70ElemObj {
     Unk70ElemMethods *methods;   /* +0x00 */
     u8 pad04[0x0C];                /* +0x04 .. +0x0F, unknown */
-    s32 unk10;                       /* +0x10 -- a bitmask field: func_80066340 CASE0 does `unk10 = (unk10 & mask) | bits;` */
+    s32 unk10;                       /* +0x10 -- a bitmask field: Class65650__ApplyTodPacket CASE0 does `unk10 = (unk10 & mask) | bits;` */
     Elem14Obj *unk14;                  /* +0x14 */
     u8 pad18[0x08];                      /* +0x18 .. +0x1F, unknown */
-    s32 unk20;                             /* +0x20 -- guard flag checked by func_80066340 CASE2 */
+    s32 unk20;                             /* +0x20 -- guard flag checked by Class65650__ApplyTodPacket CASE2 */
 } Unk70ElemObj;
 
 /* Whatever class self->unk5C (below) points at: unidentified, only its
@@ -143,11 +143,11 @@ typedef struct Unk5CMethods {
     Unk5CObj *(*slot4)(Unk5CObj *self);       /* +0x004 */
     u8 pad08[0x78];                            /* +0x008 .. +0x07C, unknown */
     s32 (*slot80)(Unk5CObj *self, void *arg1, s32 *outBuf); /* +0x080 -- called by Class65650__CreateParts twice: once as slot80(unk5C, NULL, buf) to get a count (low byte of the return) and populate a small scratch buffer, once as slot80(unk5C, self->unk74, buf) to fill self->unk74 with real data using the same buffer */
-    void *(*slot84)(Unk5CObj *self, void *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3); /* +0x084 -- called by func_80066340 as slot84(unk5C, acc, &outbuf[0..3]); outbuf[2..3] are passed as the o32 ABI's 5th/6th (stack) arguments, not registers */
+    void *(*slot84)(Unk5CObj *self, void *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3); /* +0x084 -- called by Class65650__ApplyTodPacket as slot84(unk5C, acc, &outbuf[0..3]); outbuf[2..3] are passed as the o32 ABI's 5th/6th (stack) arguments, not registers */
 } Unk5CMethods;
 
 /* self->unk5C->unk2C (below): unidentified, only its vtable slot +0x080 is
- * needed so far, by func_80066340's CASE2. */
+ * needed so far, by Class65650__ApplyTodPacket's CASE2. */
 typedef struct Unk2CMethods {
     u8 pad00[0x80];                           /* +0x000 .. +0x07C, unknown */
     s32 (*slot80)(void *self, s32 arg);         /* +0x080 */
@@ -157,11 +157,11 @@ typedef struct Unk2CObj {
     Unk2CMethods *methods;
 } Unk2CObj;
 
-/* self->unk5C->unk30's element chain (func_80066214 only):
+/* self->unk5C->unk30's element chain (Class65650__SetTod only):
  * Unk30Obj->arr is a header pointer; the element array itself starts 8
  * bytes past it (array[i] = *(GroupObj **)(arr + 8 + i * 4)). Each
  * GroupObj's own +0x10 field is an EntryObj*, whose +0x4 field is the
- * scalar func_80066214 copies into self->unk80, and whose address + 8
+ * scalar Class65650__SetTod copies into self->unk80, and whose address + 8
  * (NOT its +0x8 field's value -- the pointer itself, offset) is what
  * self->unk88 is set to, i.e. "the start of this entry's own inline data,
  * same +8-past-a-2-word-header shape yet again". */
@@ -183,8 +183,8 @@ typedef struct Unk30Obj {
 struct Unk5CObj {
     Unk5CMethods *methods;   /* +0x00 */
     u8 pad04[0x28];            /* +0x04 .. +0x2B, not this unit's to name */
-    Unk2CObj *unk2C;             /* +0x2C -- used by func_80066340's CASE2 */
-    Unk30Obj *unk30;            /* +0x30 -- func_80066214's index table, see Unk30Obj above */
+    Unk2CObj *unk2C;             /* +0x2C -- used by Class65650__ApplyTodPacket's CASE2 */
+    Unk30Obj *unk30;            /* +0x30 -- Class65650__SetTod's index table, see Unk30Obj above */
 };
 
 /* The constructor's `arg1` (forwarded through slot_setup5C into
@@ -203,12 +203,12 @@ typedef struct Class65650Methods {
     void (*slot04)(Class65650 *self);                               /* +0x004 BasicClass__Release, inherited -- used by Class65650__OnClass6EF50Notify when its `val` == 4 */
     Class65650 *(*ctor)(Class65650 *self, void *arg1, void *arg2);   /* +0x008 Class65650__Class65650 */
     void (*dtor)(Class65650 *self);                                   /* +0x00C Class65650__Destructor */
-    void (*slot10)(Class65650 *self, void *arg);                       /* +0x010 BaseObjO__LinkCompanion, inherited -- "link" companion of slot14, see func_80066748 */
-    void (*slot14)(Class65650 *self, void *arg);                        /* +0x014 BaseObjO__UnlinkCompanion, inherited -- "unlink" companion of slot10, see func_800667B0 */
+    void (*slot10)(Class65650 *self, void *arg);                       /* +0x010 BaseObjO__LinkCompanion, inherited -- "link" companion of slot14, see Class65650__LinkPeer */
+    void (*slot14)(Class65650 *self, void *arg);                        /* +0x014 BaseObjO__UnlinkCompanion, inherited -- "unlink" companion of slot10, see Class65650__UnlinkPeer */
     u8 pad18[0x28];                                                      /* +0x018 .. +0x03C, inherited from D_800878D4, not yet needed */
     void (*slot40)(Class65650 *self);                                    /* +0x040 Class65650__InitDefaults, this class's own */
     u8 pad44[0x80];                                                       /* +0x044 .. +0x0C0, inherited/not yet needed */
-    void (*slotC4)(Class65650 *self, s32 arg1, s32 arg2);                  /* +0x0C4 -- called by func_80066150 as slotC4(self, -0x1E, 0) */
+    void (*slotC4)(Class65650 *self, s32 arg1, s32 arg2);                  /* +0x0C4 -- called by Class65650__TickCallbackA as slotC4(self, -0x1E, 0) */
     u8 padC8[0x1C];                                                        /* +0x0C8 .. +0x0E3, inherited/not yet needed */
     void (*slotE4)(Class65650 *self, s32 arg);                              /* +0x0E4 -- called by Class65650__InitDefaults as slotE4(self, 0x12C) */
     u8 padE8[0x08];                                                          /* +0x0E8 .. +0x0EF, inherited/not yet needed */
@@ -218,21 +218,21 @@ typedef struct Class65650Methods {
     u8 padFC[0x04];                                                          /* +0x0FC, this unit's own slot (Class65650__FindPartIndex), not dispatched through here */
     s32 (*slot100)(Class65650 *self);                                         /* +0x100 -- called by Class65650__AcquireModelData on success (its own return value) */
     void (*slot_teardown70)(Class65650 *self);                                /* +0x104 Class65650__TeardownParts -- called by Class65650__ReleaseModelData */
-    void (*slot108)(Class65650 *self);                                        /* +0x108 func_80065FD8 -- used by Class65650__OnClass6EF50Notify when its `val` == 2 */
+    void (*slot108)(Class65650 *self);                                        /* +0x108 Class65650__Tick -- used by Class65650__OnClass6EF50Notify when its `val` == 2 */
     void (*slot10C)(Class65650 *self, s32 arg);                                 /* +0x10C -- called by Class65650__InitDefaults as slot10C(self, 0x41) */
     u8 pad110[0x04];                                                             /* +0x110 .. +0x113, not yet needed as a call target */
     void (*slot114)(Class65650 *self);                                           /* +0x114 -- called by Class65650__InitDefaults as slot114(self) */
-    void *slot118;                                                              /* +0x118 -- only ever taken as a pointer VALUE (func_800660BC), never called from this unit, so left untyped-as-function */
+    void *slot118;                                                              /* +0x118 -- only ever taken as a pointer VALUE (Class65650__SelectTickCallback), never called from this unit, so left untyped-as-function */
     void *slot11C;                                                               /* +0x11C ditto */
     void *slot120;                                                               /* +0x120 ditto */
     u8 pad124[0x04];                                                             /* +0x124 .. +0x127, this unit's own slot, not dispatched through here */
     void (*slot128)(Class65650 *self, s32 arg);                                    /* +0x128 -- called by Class65650__InitDefaults as slot128(self, 0) */
     u8 pad12C[0x04];                                                                /* +0x12C .. +0x12F, this unit's own slot, not dispatched through here */
     void (*slot130)(Class65650 *self);                                               /* +0x130 -- called by Class65650__InitDefaults as slot130(self) */
-    u8 *(*slot134)(Class65650 *self, void *ptr, s32 flag);                        /* +0x134 -- called by func_80066214 (which discards the return -- legal for any return type, not evidence it's void) and by func_80065FD8, which DOES consume it (self->unk88 = self->methods->slot134(self, self->unk88, 0)), confirming the return type is u8 * to match self->unk88's own type */
-    void *(*slot138)(Class65650 *self, void *acc, void *extra);                    /* +0x138 func_80066340 -- called by func_800662BC in a fold/reduce; func_80066340 itself is out of scope this round (258 words) */
-    void (*slot13C)(Class65650 *self, Class65650 *other);                            /* +0x13C func_80066748, this unit's own -- confirmed as a real dispatch target by func_80065918's self->methods->slot13C(self, arg1) call; func_80066748's own signature (self, other) matches */
-    void (*slot140)(Class65650 *self);                                               /* +0x140 func_800667B0 -- called by Class65650__DetachFromParent */
+    u8 *(*slot134)(Class65650 *self, void *ptr, s32 flag);                        /* +0x134 -- called by Class65650__SetTod (which discards the return -- legal for any return type, not evidence it's void) and by Class65650__Tick, which DOES consume it (self->unk88 = self->methods->slot134(self, self->unk88, 0)), confirming the return type is u8 * to match self->unk88's own type */
+    void *(*slot138)(Class65650 *self, void *acc, void *extra);                    /* +0x138 Class65650__ApplyTodPacket -- called by Class65650__ApplyTodFrame in a fold/reduce; Class65650__ApplyTodPacket itself is out of scope this round (258 words) */
+    void (*slot13C)(Class65650 *self, Class65650 *other);                            /* +0x13C Class65650__LinkPeer, this unit's own -- confirmed as a real dispatch target by func_80065918's self->methods->slot13C(self, arg1) call; Class65650__LinkPeer's own signature (self, other) matches */
+    void (*slot140)(Class65650 *self);                                               /* +0x140 Class65650__UnlinkPeer -- called by Class65650__DetachFromParent */
 } Class65650Methods;
 
 /* Object size is 0x98 (from the allocator call in New_Class65650). Field
@@ -242,31 +242,31 @@ struct Class65650 {
     u8 pad04[0x08];                  /* +0x04 .. +0x0B, BasicClass/intermediate-class instance fields, not this unit's to name */
     s32 unk0C;                       /* +0x0C guard flag gating Class65650__DetachFromParent's whole body (slot140/slot14/base-slot50 cleanup); parallels DreamSys's own unk_0xC gate field in the SAME shared base class, though not proven equivalent */
     u8 pad10[0x04];                   /* +0x10 .. +0x13, not this unit's to name */
-    s32 *unk14;                        /* +0x14 pointer whose first word func_80065FD8 unconditionally zeroes on every call (*self->unk14 = 0) */
+    s32 *unk14;                        /* +0x14 pointer whose first word Class65650__Tick unconditionally zeroes on every call (*self->unk14 = 0) */
     u8 pad18[0x0C];                     /* +0x18 .. +0x23, not this unit's to name */
-    s32 unk24;                           /* +0x24 counter, incremented unconditionally by func_80065FD8 on every call */
+    s32 unk24;                           /* +0x24 counter, incremented unconditionally by Class65650__Tick on every call */
     u8 pad28[0x28];                       /* +0x28 .. +0x4F, not this unit's to name */
     Class65650 *unk50;                 /* +0x50 companion-object pointer, unlinked via slot14 in Class65650__DetachFromParent when set -- a second link slot distinct from unk94's */
     u8 pad54[0x04];                     /* +0x54 .. +0x57, not this unit's to name */
 
-    UnkArg2Obj *arg2;               /* +0x58 the constructor's third parameter, stashed verbatim; read by func_800661D4, which calls arg2->methods->slot80(arg2, forwardedArg, 0x6E, 0x6E) when non-NULL */
+    UnkArg2Obj *arg2;               /* +0x58 the constructor's third parameter, stashed verbatim; read by Class65650__func_800661D4, which calls arg2->methods->slot80(arg2, forwardedArg, 0x6E, 0x6E) when non-NULL */
     Unk5CObj *unk5C;                /* +0x5C lazily-populated sub-object; guarded by unk60, set up by Class65650__AcquireModelData, torn down by Class65650__ReleaseModelData */
     s32 unk60;                     /* +0x60 guard flag for unk5C: 0 if unk5C already existed and was borrowed rather than allocated, 1 if this instance owns it */
     s32 unk64;                     /* +0x64 plain s32 field; set verbatim by Class65650__SetUnk64(self, value) */
-    Unk68Obj *unk68;                /* +0x68 zeroed in the constructor; consumed by func_80066150, which calls unk68->methods->slot88(unk68, 6) when self->unk64 == 1 and unk68 is set */
+    Unk68Obj *unk68;                /* +0x68 zeroed in the constructor; consumed by Class65650__TickCallbackA, which calls unk68->methods->slot88(unk68, 6) when self->unk64 == 1 and unk68 is set */
     s32 unk6C;                     /* +0x6C count, paired with the unk70/unk74 arrays */
     Unk70ElemObj **unk70;           /* +0x70 array of item pointers, allocated by Class65650__CreateParts; each element's own slot +0x060 is invoked (element, arg) by Class65650__SetDisplay */
     u8 *unk74;                     /* +0x74 parallel byte array (one byte per unk70 entry), allocated by Class65650__CreateParts; linearly searched by Class65650__FindPartIndex */
-    void *unk78;                    /* +0x78 callback pointer; func_800660BC copies one of slot118/11C/120's VALUE (never calls it) here based on a small dispatch value */
+    void *unk78;                    /* +0x78 callback pointer; Class65650__SelectTickCallback copies one of slot118/11C/120's VALUE (never calls it) here based on a small dispatch value */
 
-    s32 unk7C;                      /* +0x7C set verbatim from func_80066214's `index` argument */
-    s32 unk80;                       /* +0x80 set by func_80066214 from the resolved GroupObj's EntryObj2->unk4 */
-    s32 unk84;                        /* +0x84 reset to 0 by func_80066214 -- looks like an iteration count paired with unk88 */
-    u8 *unk88;                         /* +0x88 set by func_80066214 to (u8 *)entry + 8, then passed to methods->slot134 -- an iterator "current" pointer */
+    s32 unk7C;                      /* +0x7C set verbatim from Class65650__SetTod's `index` argument */
+    s32 unk80;                       /* +0x80 set by Class65650__SetTod from the resolved GroupObj's EntryObj2->unk4 */
+    s32 unk84;                        /* +0x84 reset to 0 by Class65650__SetTod -- looks like an iteration count paired with unk88 */
+    u8 *unk88;                         /* +0x88 set by Class65650__SetTod to (u8 *)entry + 8, then passed to methods->slot134 -- an iterator "current" pointer */
 
-    s32 unk8C;                     /* +0x8C boolean-ish flag; set to 0 by func_80066148, to 1 (and returned) by func_8006613C */
-    s32 unk90;                     /* +0x90 boolean-ish flag; set to 0 by func_800662B4, to 1 (and returned) by func_800662A8 */
-    Class65650 *unk94;              /* +0x94 companion-object pointer; zeroed in the constructor, linked via slot10/slot14 in func_80066748/func_800667B0 (a symmetric buddy-link, not the s32 the first pass guessed) */
+    s32 unk8C;                     /* +0x8C boolean-ish flag; set to 0 by Class65650__DisableTickCallback, to 1 (and returned) by Class65650__EnableTickCallback */
+    s32 unk90;                     /* +0x90 boolean-ish flag; set to 0 by Class65650__StopTod, to 1 (and returned) by Class65650__PlayTod */
+    Class65650 *unk94;              /* +0x94 companion-object pointer; zeroed in the constructor, linked via slot10/slot14 in Class65650__LinkPeer/Class65650__UnlinkPeer (a symmetric buddy-link, not the s32 the first pass guessed) */
 };
 
 extern Class65650Methods gClass65650Methods;
@@ -274,7 +274,7 @@ extern Class65650Methods *Get_vtable_Class65650(void);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
-extern void Class6B5CC__LinkModel(void *self, s32 arg); /* first param confirmed generic: Class65650__InitDefaults passes a Class65650 *, func_80066340's CASE2 passes an Unk70ElemObj * */
+extern void Class6B5CC__LinkModel(void *self, s32 arg); /* first param confirmed generic: Class65650__InitDefaults passes a Class65650 *, Class65650__ApplyTodPacket's CASE2 passes an Unk70ElemObj * */
 extern void *New_BaseObjO(void);
 
 /* Same-unit helpers called directly by name (still INCLUDE_ASM this round).

@@ -1,4 +1,6 @@
-# func_80065FD8
+# Class65650__Tick
+
+> Renamed from `func_80065FD8` on 2026-09-24 (tools/rename.py). Address 0x80065fd8.
 
 **Unit:** code_55dd4 · **Size:** 57 words (0xE4 bytes) · **Status:** MATCHED
 (57/57 words, whole-image `./build-and-verify.sh` green)
@@ -6,14 +8,14 @@
 ## What it does
 
 `Class65650Methods` slot `+0x108` (already known from the header comment:
-"func_80065FD8 -- used by Class65650__OnClass6EF50Notify when its `val` == 2"). A per-tick
+"Class65650__Tick -- used by Class65650__OnClass6EF50Notify when its `val` == 2"). A per-tick
 bookkeeping function: bumps a counter, optionally fires a no-argument
 callback, and optionally advances an iterator that wraps back to the start
-of the same array `func_80066214` sets up — then unconditionally zeroes
+of the same array `Class65650__SetTod` sets up — then unconditionally zeroes
 `*self->unk14`:
 
 ```c
-void func_80065FD8(Class65650 *self)
+void Class65650__Tick(Class65650 *self)
 {
     self->unk24 = self->unk24 + 1;
     if (self->unk8C != 0) {
@@ -41,27 +43,27 @@ void func_80065FD8(Class65650 *self)
 - **`self->unk78` is genuinely called with NO arguments.** Confirmed by
   the disassembly: no `$a0` setup precedes the `jalr` at all. Its field
   type stays `void *` (it's still assigned from the untyped-as-function
-  `slot118`/`slot11C`/`slot120` in `func_800660BC`, already matched —
+  `slot118`/`slot11C`/`slot120` in `Class65650__SelectTickCallback`, already matched —
   retyping the field itself would risk that function's bytes for no
   reason); the call site casts it explicitly instead:
   `((void (*)(void))self->unk78)();`.
 - **`Class65650Methods::slot134`'s return value IS used here, correcting
-  its type.** `func_80066214` (STALLED, see its report) called this same
+  its type.** `Class65650__SetTod` (STALLED, see its report) called this same
   slot and discarded the return — which is legal for ANY return type in C
   and was never evidence the slot is `void`. This function stores the
   result straight into `self->unk88` (a `u8 *`), so the slot is retyped
   `u8 *(*slot134)(Class65650 *, void *, s32)`. This doesn't reopen
-  `func_80066214`'s stall — that function's own residue was purely a
+  `Class65650__SetTod`'s stall — that function's own residue was purely a
   register-allocation question in its final few words, unrelated to the
   return type — but it's a correction worth recording for whoever revisits
   it.
 - **The iterator-wraparound reset reuses the EXACT SAME expression**
-  `func_80066214` writes for its own iterator setup:
+  `Class65650__SetTod` writes for its own iterator setup:
   `(u8 *)(*(GroupObj **)(self->unk5C->unk30->arr + 8 + self->unk7C * 4))->entry + 8`.
   This strongly confirms `self->unk7C`/`unk80`/`unk84`/`unk88` really are
   a single coherent "current index / limit / count / current pointer"
   iterator group, with this function being the "advance, and rewrap at
-  the limit" half and `func_80066214` the "(re)seek to an explicit index"
+  the limit" half and `Class65650__SetTod` the "(re)seek to an explicit index"
   half.
 
 No residue at all — matched on the first attempt once the two new fields
@@ -70,9 +72,9 @@ and the `slot134` return type were declared correctly.
 ### Proposed learning
 
 **A discarded return value is never evidence a vtable slot is `void`** —
-confirmed concretely here: `func_80066214` discarded `slot134`'s return
+confirmed concretely here: `Class65650__SetTod` discarded `slot134`'s return
 and this function consumes it. When a slot's first-observed call site
-discards the result, leave a note (as `func_80066214`'s report and the
+discards the result, leave a note (as `Class65650__SetTod`'s report and the
 header comment both now do) rather than committing to `void`, and prefer
 whichever caller DOES consume the value to fix the return type once one is
 found.

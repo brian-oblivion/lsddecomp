@@ -8,7 +8,7 @@
 ## What it does
 
 Dispatches on a small integer `val`: if `2`, calls the class's own vtable
-slot `+0x108` (`func_80065FD8`) on `self`; if `4`, calls slot `+0x004`
+slot `+0x108` (`Class65650__Tick`) on `self`; if `4`, calls slot `+0x004`
 (`BasicClass__Release`, inherited). Both are checked independently (two
 separate `if`s, not `if/else if`), matching the two independent `bne`
 guards in the disassembly.
@@ -57,7 +57,7 @@ function's *body* must not reference it.
 ### Proposed learning
 
 Refines the "forward an argument nobody names" pattern from
-`func_800661D4.md`: forwarding only reproduces retail when the forwarded
+`Class65650__func_800661D4.md`: forwarding only reproduces retail when the forwarded
 value is used **at most once, with no intervening call** (or, as here, used
 zero times but still physically present in the register at entry). The
 moment a source explicitly re-uses a parameter *after* a call that might

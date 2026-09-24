@@ -1,4 +1,6 @@
-# func_800662BC -- MATCHED (33/33, round 75): lever = LOOP KIND (`for` with the increment at the body top) + `count` widened to `s32`
+# Class65650__ApplyTodFrame -- MATCHED (33/33, round 75): lever = LOOP KIND (`for` with the increment at the body top) + `count` widened to `s32`
+
+> Renamed from `func_800662BC` on 2026-09-24 (tools/rename.py). Address 0x800662bc.
 
 REVISITED, round 75: MATCHED 33/33, whole-image `OK: build matches retail`; names/types used (`count` retyped `u16` -> `s32`; the incoming `hdr` parameter reused as the accumulator).
 
@@ -25,7 +27,7 @@ shape that closed `Class65650__SetDisplay` earlier this round.
 | 3 | build 2 with `s32 count` | **33/33, OK: build matches retail** |
 
 ```c
-void *func_800662BC(Class65650 *self, void *hdr, void *extra)
+void *Class65650__ApplyTodFrame(Class65650 *self, void *hdr, void *extra)
 {
     s32 count;
     u32 i;
@@ -58,7 +60,7 @@ into the delay slot and compensates on the fall-through. Write
 bound local costs an `andi` plus a `move` against retail's direct `lhu` into
 the saved register: widen the local, keep the narrow load.
 
-## History before round 75 (superseded title: "func_800662BC -- STALL: length EXACT (33/33 words, no drift); 17/33 raw word-match; first real diff at file 0x056ADC / vram 0x800662DC")
+## History before round 75 (superseded title: "Class65650__ApplyTodFrame -- STALL: length EXACT (33/33 words, no drift); 17/33 raw word-match; first real diff at file 0x056ADC / vram 0x800662DC")
 
 **Unit:** code_55dd4 · **Size:** 33 words (0x84 bytes) · **Status:** STALL —
 **LENGTH exact (33/33 words, no drift); RAW WORD-MATCH 17/33; FIRST REAL DIFF
@@ -70,12 +72,12 @@ at file 0x056ADC / vram 0x800662DC** (`count`'s `lhu` load routes through
 
 `Class65650Methods` slot `+0x134`. A fold/reduce: reads a `u16` count from
 offset `+2` of a small header (`hdr`), then calls the class's own vtable
-slot `+0x138` (`func_80066340`, out of scope this round — 258 words,
+slot `+0x138` (`Class65650__ApplyTodPacket`, out of scope this round — 258 words,
 flagged by the head for a dedicated assignment) once per item, threading
 the accumulator (`hdr + 8` initially) through each call:
 
 ```c
-void *func_800662BC(Class65650 *self, void *hdr, void *extra)
+void *Class65650__ApplyTodFrame(Class65650 *self, void *hdr, void *extra)
 {
     void *acc;
     u16 count;
@@ -153,7 +155,7 @@ vs. route-through-`$v0`" pattern that closed with a barrier in
 
 ```c
 #if 0
-void *func_800662BC(Class65650 *self, void *hdr, void *extra)
+void *Class65650__ApplyTodFrame(Class65650 *self, void *hdr, void *extra)
 {
     void *acc;
     u16 count;
@@ -203,7 +205,7 @@ This suggested eliminating the separate `acc` local entirely and instead
 reassigning `hdr` itself:
 
 ```c
-void *func_800662BC(Class65650 *self, void *hdr, void *extra)
+void *Class65650__ApplyTodFrame(Class65650 *self, void *hdr, void *extra)
 {
     u16 count;
     u32 i;
@@ -310,7 +312,7 @@ is invisible to the compiler. Reverted.
 **This function had never had a permuter pass, unlike its four siblings in
 this unit's queue** (checked: no "Round 18 (permuter pass...)" section exists
 above, and this unit's other four stalls all got one that round). Provisioned
-one this round: `tools/setup-permuter.sh func_800662BC` against the preserved
+one this round: `tools/setup-permuter.sh Class65650__ApplyTodFrame` against the preserved
 17/33 body, confirmed the scaffold's `--debug --stack-diffs` base score (625)
 matches this report's documented residue before any search (register
 differences plus insertions/deletions consistent with the "routes through
@@ -360,7 +362,7 @@ unconditional `j` (not `beq`/`bne`/`bgez`) whose target is a join with real
 work in its delay slot.
 
 ```
-grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/func_800662BC.s
+grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/Class65650__ApplyTodFrame.s
 ```
 
 **No bare `j` mnemonic anywhere in this function's disassembly.** The only
@@ -389,7 +391,7 @@ gitignored directory:
 #include "common.h"
 #include "code_55dd4.h"
 
-void *func_800662BC(Class65650 *self, void *hdr, void *extra)
+void *Class65650__ApplyTodFrame(Class65650 *self, void *hdr, void *extra)
 {
     void *acc;
     u16 count;
@@ -413,9 +415,9 @@ void *func_800662BC(Class65650 *self, void *hdr, void *extra)
 ```
 
 ```
-tools/setup-permuter.sh func_800662BC <this seed>.c
+tools/setup-permuter.sh Class65650__ApplyTodFrame <this seed>.c
 PATH=$PWD/permuter-work/bin:$PATH .venv/bin/python3 \
-  tools/decomp-permuter/permuter.py --debug --stack-diffs permuter-work/func_800662BC
+  tools/decomp-permuter/permuter.py --debug --stack-diffs permuter-work/Class65650__ApplyTodFrame
 ```
 
 Scaffold's `--debug --stack-diffs` base score reproduces **625** exactly,
@@ -485,7 +487,7 @@ Ran after `Class65650__SetLightMode`'s campaign completed:
 ```
 nohup timeout 600 env PATH=$PWD/permuter-work/bin:$PATH .venv/bin/python3 \
   tools/decomp-permuter/permuter.py -j 6 --stack-diffs --stop-on-zero \
-  --best-only permuter-work/func_800662BC > /tmp/alpha_permuter_800662BC.log 2>&1 &
+  --best-only permuter-work/Class65650__ApplyTodFrame > /tmp/alpha_permuter_800662BC.log 2>&1 &
 ```
 
 **50,313 iterations.** Exit inferred the same way as this round's other two
@@ -640,7 +642,7 @@ Launched under low contention (load average 3.85/32 at launch, well below
 round 24/31's documented "up to 38 permuter-related processes"):
 
 ```
-timeout 900 permuter.py -j 6 --stop-on-zero --best-only permuter-work/func_800662BC
+timeout 900 permuter.py -j 6 --stop-on-zero --best-only permuter-work/Class65650__ApplyTodFrame
 ```
 
 **48,607 iterations, rc=124 (bound fired on its own — confirmed via its

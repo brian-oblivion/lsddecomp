@@ -195,7 +195,7 @@ between two otherwise-unrelated locals/parameters) as a side effect of
 the same global register-allocation pass it perturbs.** This is a new
 combination for this unit's residue catalogue: previously a barrier
 either helped a specific instruction-order issue outright
-(`Class65650__FindPartIndex`) or did nothing (`func_80066214`'s slot134 case) or
+(`Class65650__FindPartIndex`) or did nothing (`Class65650__SetTod`'s slot134 case) or
 actively hurt (`Class65650__SetLightMode`'s parameter-copy deferral) — never
 "fixes one thing, breaks a different thing" in the same function. Since
 GCC's register allocator operates on the WHOLE function, a barrier placed
@@ -527,7 +527,7 @@ side effect into a worse, DIFFERENT residue (a real memory-traffic
 regression) rather than a neutral or beneficial substitution for a
 barrier** — this is the sharpest negative result among this round's three
 volatile experiments in this unit (compare `Class65650__SetDisplay`'s 26/33 and
-`func_80066340`'s "no change"): here it actively introduced address
+`Class65650__ApplyTodPacket`'s "no change"): here it actively introduced address
 drift, the worst outcome category this project tracks. Qualifying a
 pointer's POINTEE as volatile is not a narrow substitute for a barrier
 when the pointee is written and read repeatedly inside a loop — it

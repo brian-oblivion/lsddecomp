@@ -290,7 +290,7 @@ void Class65650__DestroyParts(Class65650 *self)
     self->unk70 = BMemPMgrFree(self->unk70);
 }
 
-void func_80065FD8(Class65650 *self)
+void Class65650__Tick(Class65650 *self)
 {
     self->unk24 = self->unk24 + 1;
     if (self->unk8C != 0) {
@@ -307,7 +307,7 @@ void func_80065FD8(Class65650 *self)
     *self->unk14 = 0;
 }
 
-void func_800660BC(Class65650 *self, s32 value)
+void Class65650__SelectTickCallback(Class65650 *self, s32 value)
 {
     switch ((u8)value) {
     case 0x41:
@@ -322,17 +322,17 @@ void func_800660BC(Class65650 *self, s32 value)
     }
 }
 
-s32 func_8006613C(Class65650 *self)
+s32 Class65650__EnableTickCallback(Class65650 *self)
 {
     return self->unk8C = 1;
 }
 
-void func_80066148(Class65650 *self)
+void Class65650__DisableTickCallback(Class65650 *self)
 {
     self->unk8C = 0;
 }
 
-void func_80066150(Class65650 *self)
+void Class65650__TickCallbackA(Class65650 *self)
 {
     self->methods->slotC4(self, -0x1E, 0);
     if (self->unk64 == 1 && self->unk68 != NULL) {
@@ -340,13 +340,13 @@ void func_80066150(Class65650 *self)
     }
 }
 
-void func_800661C4(void) {
+void Class65650__TickCallbackB(void) {
 }
 
-void func_800661CC(void) {
+void Class65650__TickCallbackC(void) {
 }
 
-void func_800661D4(Class65650 *self, void *arg1)
+void Class65650__func_800661D4(Class65650 *self, void *arg1)
 {
     UnkArg2Obj *obj;
 
@@ -356,7 +356,7 @@ void func_800661D4(Class65650 *self, void *arg1)
     }
 }
 
-void func_80066214(Class65650 *self, s32 index)
+void Class65650__SetTod(Class65650 *self, s32 index)
 {
     self->unk7C = index;
     self->unk80 = (*(GroupObj **)(self->unk5C->unk30->arr + 8 + index * 4))->entry->unk4;
@@ -365,17 +365,17 @@ void func_80066214(Class65650 *self, s32 index)
     self->methods->slot134(self, self->unk88, 0);
 }
 
-s32 func_800662A8(Class65650 *self)
+s32 Class65650__PlayTod(Class65650 *self)
 {
     return self->unk90 = 1;
 }
 
-void func_800662B4(Class65650 *self)
+void Class65650__StopTod(Class65650 *self)
 {
     self->unk90 = 0;
 }
 
-void *func_800662BC(Class65650 *self, void *hdr, void *extra)
+void *Class65650__ApplyTodFrame(Class65650 *self, void *hdr, void *extra)
 {
     s32 count;
     u32 i;
@@ -389,7 +389,7 @@ void *func_800662BC(Class65650 *self, void *hdr, void *extra)
     return hdr;
 }
 
-void *func_80066340(Class65650 *self, void *acc, void *extra)
+void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
 {
     u8 outbuf[4];
     void *s0;
@@ -520,7 +520,7 @@ end:
     return (u8 *)acc + outbuf[3] * 4;
 }
 
-void func_80066748(Class65650 *self, Class65650 *other)
+void Class65650__LinkPeer(Class65650 *self, Class65650 *other)
 {
     if (other != NULL) {
         other->methods->slot10(other, self);
@@ -529,7 +529,7 @@ void func_80066748(Class65650 *self, Class65650 *other)
     }
 }
 
-void func_800667B0(Class65650 *self)
+void Class65650__UnlinkPeer(Class65650 *self)
 {
     Class65650 *other;
 

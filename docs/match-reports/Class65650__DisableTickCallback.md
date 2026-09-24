@@ -1,4 +1,6 @@
-# func_80066148
+# Class65650__DisableTickCallback
+
+> Renamed from `func_80066148` on 2026-09-24 (tools/rename.py). Address 0x80066148.
 
 **Unit:** code_55dd4 · **Size:** 2 words (0x8 bytes) · **Status:** MATCHED
 (2/2 words, whole-image `./build-and-verify.sh` green)
@@ -7,10 +9,10 @@
 
 Sets `self->unk8C` (`+0x8C`) to 0. `$v0` is never touched, so the return
 value is unused (`void`). The "set to 1 and return 1" sibling is
-`func_8006613C`.
+`Class65650__EnableTickCallback`.
 
 ```c
-void func_80066148(Class65650 *self)
+void Class65650__DisableTickCallback(Class65650 *self)
 {
     self->unk8C = 0;
 }

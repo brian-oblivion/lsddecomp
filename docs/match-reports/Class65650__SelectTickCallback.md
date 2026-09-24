@@ -1,4 +1,6 @@
-# func_800660BC
+# Class65650__SelectTickCallback
+
+> Renamed from `func_800660BC` on 2026-09-24 (tools/rename.py). Address 0x800660bc.
 
 **Unit:** code_55dd4 · **Size:** 32 words (0x80 bytes) · **Status:** MATCHED
 (32/32 words, whole-image `./build-and-verify.sh` green)
@@ -11,7 +13,7 @@ new field carved out of what the first pass left as opaque `unk78`
 padding:
 
 ```c
-void func_800660BC(Class65650 *self, s32 value)
+void Class65650__SelectTickCallback(Class65650 *self, s32 value)
 {
     switch ((u8)value) {
     case 0x41:

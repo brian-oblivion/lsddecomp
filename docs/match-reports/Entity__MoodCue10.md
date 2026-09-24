@@ -18,7 +18,7 @@ calls `this->methods->slotC4(this, -0x1E, 0)`.
 Class65650's vtable (`gClass65650Methods`, `include/code_55dd4.h`) hold the identical
 function (`BaseObjO__func_5748c`) at `+0xC4`, and `code_55dd4.h`'s own
 `Class65650Methods.slotC4` already documents the exact same call shape
-(`slotC4(self, -0x1E, 0)`, from `func_80066150`) — so this is not a
+(`slotC4(self, -0x1E, 0)`, from `Class65650__TickCallbackA`) — so this is not a
 coincidence, it is the shared ancestor's method, reached the same way in two
 unrelated classes.
 

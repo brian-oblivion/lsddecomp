@@ -481,7 +481,7 @@ already embedded in `src/code_55dd4.c` and rebuilding: `funcdiff.py`
 reproduces **33/40** exactly (file `0x0562E0-0x056380`), no drift.
 `INCLUDE_ASM` restored immediately after; `git diff --stat` confirmed
 empty before moving on. This function is next in this round's priority
-order (after `func_800662BC`'s search) — its own permuter scaffold will
+order (after `Class65650__ApplyTodFrame`'s search) — its own permuter scaffold will
 be provisioned fresh at that point, since round 18's `permuter-work/` did
 not survive between rounds/worktrees.
 
@@ -600,7 +600,7 @@ confirmed clean before and after.
 
 ### Proposed learning
 
-A third data point (after `Class65650__SetDisplay` and `func_80066340` this same
+A third data point (after `Class65650__SetDisplay` and `Class65650__ApplyTodPacket` this same
 round) that the round-32 volatile lever has no purchase on this unit's
 callee-save-ordering-flavored residues: it is inert on an unused filler
 local and actively regressive as a barrier substitute, but never an
