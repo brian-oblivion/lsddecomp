@@ -1,16 +1,18 @@
-# func_80061A90 -- MATCHED (93/93 words)
+# Entity__MoodCue59 -- MATCHED (93/93 words)
+
+> Renamed from `func_80061A90` on 2026-09-24 (tools/rename.py). Address 0x80061a90.
 
 Unit: `Entity_e` (round 13, first function in this file). Two independent
 "divisible by 10" checks (one gated on `unkFC==0` against `rand()`, one on
 `out->unk4` unconditionally), a `unkFC==0` coin-flip `slotCC` call, an
 unconditional `slotC4`, and a final `unk44`/`unkFC` combo that reaches
-through `unk4C`'s own vtable. `void func_80061A90(Entity *this,
+through `unk4C`'s own vtable. `void Entity__MoodCue59(Entity *this,
 EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0 && rand() % 10 == 0) {
         this->unk44 = 0xC;
     }
@@ -34,9 +36,9 @@ void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
 ## Derivation notes
 
 - Both "divisible by 10" tests use the same `0x66666667`/shift-2 magic-
-  constant idiom identified in `func_80062FAC`'s report; matched clean on
+  constant idiom identified in `Entity__MoodCue79`'s report; matched clean on
   the first pass without needing to hoist either remainder into a named
-  local (unlike `func_80062570`), because neither result is subsequently
+  local (unlike `Entity__MoodCue71`), because neither result is subsequently
   multiplied by anything -- both are compared directly against the
   dividend.
 - **The shared `lui $v0, 0x6666` between the two divisibility checks is a
@@ -57,3 +59,7 @@ void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
 
 No new struct or vtable-slot knowledge; every field/slot here was already
 known from earlier work in `Entity_d`/`Entity_e`.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 59 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.

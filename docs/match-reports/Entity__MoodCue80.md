@@ -1,14 +1,16 @@
-# func_80063094 -- MATCHED (44/44 words)
+# Entity__MoodCue80 -- MATCHED (44/44 words)
+
+> Renamed from `func_80063094` on 2026-09-24 (tools/rename.py). Address 0x80063094.
 
 Unit: `Entity_e` (round 12). A three-way branch on `this->unkFC` vs
 `this->unk80`, with a nested (and, on the surface, logically redundant)
 double-guard on `this->unk84` in one arm.
-`void func_80063094(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80063094(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC < this->unk80) {
         if (this->unk84 != 0) {
             if (this->unk84 == 0x14) {
@@ -18,7 +20,7 @@ void func_80063094(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else {
         this->methods->slot130(this);
-        this->methods->slotBC(this, D_80089D54);
+        this->methods->slotBC(this, TRANSLATE_Y_MINUS512);
     }
     Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
 }
@@ -37,7 +39,7 @@ first check is behaviorally dead code from a pure input/output standpoint.
 That single-`if` version came out exactly 2 words (8 bytes) short of
 retail's 0xB0, confirmed by comparing `nm` addresses of the surrounding
 `INCLUDE_ASM` symbols in the built ELF against their expected retail
-addresses (`func_80063144`, the next symbol, landed 8 bytes early).
+addresses (`Entity__MoodCue81`, the next symbol, landed 8 bytes early).
 
 Restoring the outer `if (this->unk84 != 0)` guard around the `== 0x14`
 check reproduced retail's exact two-comparison shape and closed the gap.
@@ -65,3 +67,9 @@ addresses of the unit's *other*, still-`INCLUDE_ASM` symbols (their
 expected vs. built addresses reveal the exact byte delta and which
 function introduced it) rather than trusting funcdiff's own per-function
 window once a drift warning is present.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 80 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+**Data constant renamed this round:** `D_80089D54` -> `TRANSLATE_Y_MINUS512`, tier B. 32-bit value at the Y slot (offset +4) is `0xfffffe00` = -512, matching the `TRANSLATE_Y_MINUS64`/`TRANSLATE_Y_PLUS256` s32-triple format confirmed in `Entity__MoodCue68`'s report.

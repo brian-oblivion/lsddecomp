@@ -1,10 +1,12 @@
-# func_80062C58 -- MATCHED, round 59 (2026-09-20)
+# Entity__MoodCue78 -- MATCHED, round 59 (2026-09-20)
+
+> Renamed from `func_80062C58` on 2026-09-24 (tools/rename.py). Address 0x80062c58.
 
 REVISITED, round 59: MATCHED 213/213 byte-exact; names/types not relevant
 
 **Unit:** `Entity_e` · **Size:** 213 words · **Result:** 213/213 words,
 `insertions 0 / deletions 0`, `./build-and-verify.sh` green
-(`OK: build matches retail SLPS_015.56`), `func_80062FAC` back at its retail
+(`OK: build matches retail SLPS_015.56`), `Entity__MoodCue79` back at its retail
 address `0x80062fac`.
 
 Previously: STALL at 61/213 with the built function **+2 words long**
@@ -151,7 +153,7 @@ That build was byte-exact on the whole image.
 
 ## What was measured, in order (11 builds)
 
-| # | body | words | ins/del | `func_80062FAC` links at |
+| # | body | words | ins/del | `Entity__MoodCue79` links at |
 | --- | --- | --- | --- | --- |
 | 1 | round-45 inherited body (control) | 61/213 | 27/27 | `0x80062fb4` (+2w) |
 | 2 | +polarity fix, quarter before half | 56/213 | 11/11 | `0x80062fb4` (+2w) |
@@ -196,7 +198,7 @@ correct by the byte-exact match. No header was edited.
 
 **When a residue is a missing register-to-register COPY, try DELETING the
 named local and inlining the expression.** This is the exact inverse of the
-project's well-worn "name the subexpression" lever (`func_80062570`,
+project's well-worn "name the subexpression" lever (`Entity__MoodCue71`,
 `func_8002C048`, the named-remainder technique), and it is not in
 `DECOMPILATION_LEARNINGS.md` in either direction.
 
@@ -220,3 +222,11 @@ there.** A structural fix that corrects block order will move ins/del
 monotonically while the word score jumps around, because every instruction
 after the first shifted byte scores as a miss regardless of how right it
 is. Round 45 rejected a correct lever on a 5-word score drop.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 78 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+**Data/global renamed this round:** `D_80089D0C` -> `ROTATION_XPLUS90` (first {num,den} pair = (90,1), the X slot by the same X/Y/Z decoding as `Entity__MoodCue68`'s report), tier B. `D_8008ACCC` -> `gMoodCue78TransitionDone`, tier B: a one-shot s32 flag local to this function -- cleared at `out->unk4==0`, set when the `moodState==0xB` branch fires at `unk4==0x1FE`, read once more at `unk4==0x208` to gate a second `stopSoundCue`/`moodState` reset. No other file in `src/` references it.
+
+**`D_80089E14` left unnamed this round.** s16-pair-decoded it reads (1,1, 1,1, 1,1, 1,8) -- X=Y=Z=1 (no scale change on the three named axes), only the 4th/W pair differs (1,8). Every named `SCALE_*` table so far is named for its X/Y/Z content and ignores W (e.g. `SCALE_HALF`'s own W is (4,5), `SCALE_SIX`'s is (2,5)), so this table reads as an X/Y/Z-identity scale and there is no precedent for naming one on its W value alone.

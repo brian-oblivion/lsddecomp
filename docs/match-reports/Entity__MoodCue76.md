@@ -1,4 +1,6 @@
-# func_80062970 -- MATCHED (52/52 words)
+# Entity__MoodCue76 -- MATCHED (52/52 words)
+
+> Renamed from `func_80062970` on 2026-09-24 (tools/rename.py). Address 0x80062970.
 
 Unit: `Entity_e` (round 12). The hardest function in this batch: two
 branches each end in a vtable dispatch through a *different* slot
@@ -7,12 +9,12 @@ table arguments, and retail's compiled code shares a single `jalr`
 instruction between both branches (classic GCC crossjump/tail-merge:
 identical trailing machine code gets folded into one copy, reached by a
 jump from one branch and a fallthrough from the other).
-`void func_80062970(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80062970(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out) {
     void (*fn)(Entity *self, s32 arg1, void *arg2);
     void *table;
 
@@ -47,7 +49,7 @@ flow* but **did not tail-merge**: each branch got its own `jalr $2 / nop`
 pair before jumping to a shared epilogue, 2 words (8 bytes) longer than
 retail. This 8-byte size mismatch then shifted every symbol after it in
 the whole image (visible as a cascading `nm` address drift through
-`func_80062A40` and beyond, and as near-total funcdiff mismatches in the
+`Entity__MoodCue77` and beyond, and as near-total funcdiff mismatches in the
 *following* functions in this unit even though their own C was already
 correct).
 
@@ -100,3 +102,9 @@ probe before committing to it; it is a compiler internals question with a
 fast, cheap, and definitive answer available (a probe function takes under
 a second to compile and inspect), not something to reason about from first
 principles alone.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 76 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+**`D_80089DFC` left unnamed this round.** s16-pair-decoded it reads (-1,64,-1,64,-1,64,8,7) -- X=Y=Z=-1/64, none of the round-number ratios (1/2, 1/1, 6/1, ...) every named `SCALE_*` table uses so far. Passed to `updateScale` through a `void (*)(Entity*,s32,void*)` function pointer rather than a direct call, so it is genuinely a scale table by construction, just not one with an evident round value to name it after.

@@ -1,7 +1,35 @@
+/* Third 20-function slice of the Entity class's 97-function remainder,
+ * following Entity_c and Entity_d (Entity_d's own header comment names the
+ * split). Every function in this unit is a `gEntityMoodHandlerTable`
+ * callback (Entity.h), named `Entity__MoodCueNN` for the row it occupies --
+ * rows 59, 61-62, 64-71, 73-81, confirmed by reading disk/SLPS_015.56
+ * directly (base 0x80089EB0 + 0x10*row is the row's own `handler` word,
+ * checked against each candidate function's address; row order does not
+ * track code address, same finding as Entity_d/round 76). Rows 60, 63 and
+ * 72 have a NULL handler word in the table -- those mood indices legitimately
+ * dispatch no per-tick cue callback at all, not a gap in this unit's queue.
+ *
+ * `Entity__MoodCue81` (0x80063144) also occupies row 120 of the same table
+ * (identical `handler` word, different data0/data1/data2) -- one function
+ * shared by two mood-row configurations, named for its lower row.
+ * `Entity__MoodCue71` (0x80062570) was already cross-unit called (Entity_g's
+ * `func_80064CA4` forwards its own args straight through) before this round;
+ * its `include/Entity.h` extern is updated by this rename.
+ *
+ * Four rotation/translate data constants named this round, decoded from
+ * disk/SLPS_015.56 against the existing ROTATION_YAW_PLUS90/ROTATION_ZMINUS90/
+ * TRANSLATE_Y_PLUS256/SCALE_HALF tables (rotation/scale: four s16 {num,den}
+ * pairs for X/Y(yaw)/Z/W; translate: three consecutive s32 for X/Y/Z):
+ * ROTATION_ZPLUS9, ROTATION_XPLUS90, TRANSLATE_Y_PLUS8, TRANSLATE_Y_MINUS512.
+ * `gMoodCue78TransitionDone` (formerly D_8008ACCC) is a one-shot s32 flag
+ * local to Entity__MoodCue78's own state machine, referenced nowhere else in
+ * `src/`. See each function's match report's `## Naming` section for the
+ * per-constant evidence.
+ */
 #include "common.h"
 #include "Entity.h"
 
-void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0 && rand() % 10 == 0) {
         this->moodState = 0xC;
     }
@@ -21,7 +49,7 @@ void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061C04(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue61(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk84 == 0x1E) {
         out->unk1C = 0x12;
         out->unk10 = 0;
@@ -29,7 +57,7 @@ void func_80061C04(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061C2C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue62(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk84 % 30 == 0) {
         out->unk1C = 3;
         out->unk10 = 0;
@@ -65,7 +93,7 @@ void func_80061C2C(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061E60(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue64(Entity *this, EntityMoodHandlerArg *out) {
     s32 r = out->unk4 % 300;
 
     out->unk10 = this->methods->getProximityRatio(this);
@@ -82,7 +110,7 @@ extern u8 SCALE_HALF[];
 extern u8 ROTATION_YAW_PLUS90[];
 extern u8 ROTATION_YAW_MINUS90[];
 
-void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue65(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
             this->methods->updateScale(this, 1, SCALE_HALF);
@@ -99,14 +127,14 @@ void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_8006204C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue66(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 % 30 == 0) {
         out->unk1C = 0xD;
     }
 }
 
-void func_800620C4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue67(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
             this->moodState = 0xB;
@@ -123,10 +151,10 @@ void func_800620C4(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-extern u8 D_80089CC4[];
-extern u8 D_80089D6C[];
+extern u8 ROTATION_ZPLUS9[];
+extern u8 TRANSLATE_Y_PLUS8[];
 
-void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 == 0) {
         this->unk48 = (rand() & 1) ? -0x176 : -0xC0;
@@ -155,8 +183,8 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotC4(this, this->unk48, 1);
     } else if (this->moodState == 0xA) {
         if (this->moodTimer < 8) {
-            this->methods->updateRotation(this, 0, D_80089CC4);
-            this->methods->addVec14(this, D_80089D6C);
+            this->methods->updateRotation(this, 0, ROTATION_ZPLUS9);
+            this->methods->addVec14(this, TRANSLATE_Y_PLUS8);
         } else {
             u32 r;
 
@@ -169,7 +197,7 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800623E8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue69(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->unk84 == this->unk80 - 1) {
         out->unk1C = 0x19;
@@ -190,7 +218,7 @@ void func_800623E8(Entity *this, EntityMoodHandlerArg *out) {
  * per-unit externs, not shared via the header. */
 extern u8 ROTATION_YAW_PLUS180[];
 
-void func_800624BC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue70(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() & 1) {
             this->moodState = 0xB;
@@ -204,7 +232,7 @@ void func_800624BC(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80062570(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue71(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     out->unk10 = this->methods->getProximityRatio(this);
@@ -221,7 +249,7 @@ void func_80062570(Entity *this, EntityMoodHandlerArg *out) {
 
 extern u8 ROTATION_YAW_PLUS90[];
 
-void func_80062660(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue73(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (out->unk4 == 0) {
         this->target->methods->slot44(this->target, 1, ROTATION_YAW_PLUS90);
@@ -239,7 +267,7 @@ void func_80062660(Entity *this, EntityMoodHandlerArg *out) {
 
 extern u8 D_8008AC1C[];
 
-void func_80062730(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         this->target->unk5C->methods->slot64(this->target->unk5C, D_8008AC1C);
         this->moodState = rand() % 3;
@@ -264,7 +292,7 @@ void func_80062730(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800628D4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue75(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 == 0) {
         out->unk10 = 0;
         out->unk1C = 0x19;
@@ -281,7 +309,7 @@ void func_800628D4(Entity *this, EntityMoodHandlerArg *out) {
 extern u8 D_80089DFC[];
 extern u8 ROTATION_YAW_PLUS9[];
 
-void func_80062970(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out) {
     void (*fn)(Entity *self, s32 arg1, void *arg2);
     void *table;
 
@@ -301,7 +329,7 @@ void func_80062970(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue77(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 % 5 == 0) {
         out->unk1C = 0x11;
@@ -338,17 +366,17 @@ void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-extern u8 D_80089D0C[];
+extern u8 ROTATION_XPLUS90[];
 extern u8 SCALE_Y2[];
 extern u8 D_80089E14[];
-extern s32 D_8008ACCC;
+extern s32 gMoodCue78TransitionDone;
 
-void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
     s32 tmp;
     void *table;
 
     if (out->unk4 == 0) {
-        D_8008ACCC = 0;
+        gMoodCue78TransitionDone = 0;
         tmp = rand() % 3;
         if (tmp == 1) {
             this->moodState = 0xB;
@@ -384,10 +412,10 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
 
     if (this->moodState == 0xB && out->unk4 == 0x1FE) {
         this->methods->slotCC(this, -0x17C, 0);
-        this->methods->updateRotation(this, 0, D_80089D0C);
+        this->methods->updateRotation(this, 0, ROTATION_XPLUS90);
         this->methods->stopSoundCue(this);
         this->moodState = 1;
-        D_8008ACCC = 1;
+        gMoodCue78TransitionDone = 1;
     } else if (this->moodState >= 0xC && out->unk4 >= 0x14A && (out->unk4 % 60) == 30) {
         tmp = 0;
         if (rand() & 1) {
@@ -405,7 +433,7 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotCC(this, tmp, 0);
     }
 
-    if (out->unk4 == 0x208 && D_8008ACCC != 0) {
+    if (out->unk4 == 0x208 && gMoodCue78TransitionDone != 0) {
         this->methods->stopSoundCue(this);
         this->moodState = 1;
     }
@@ -414,7 +442,7 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
 
 extern u8 ROTATION_YAW_PLUS2[];
 
-void func_80062FAC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue79(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 % 10 == 0) {
         out->unk1C = 0x19;
@@ -427,9 +455,9 @@ void func_80062FAC(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-extern u8 D_80089D54[];
+extern u8 TRANSLATE_Y_MINUS512[];
 
-void func_80063094(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer < this->unk80) {
         if (this->unk84 != 0) {
             if (this->unk84 == 0x14) {
@@ -439,14 +467,14 @@ void func_80063094(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else {
         this->methods->slot130(this);
-        this->methods->addVec14(this, D_80089D54);
+        this->methods->addVec14(this, TRANSLATE_Y_MINUS512);
     }
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
 }
 
 extern u8 D_80089E08[];
 
-void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
     s32 mood;
 

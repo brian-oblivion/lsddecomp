@@ -82,7 +82,7 @@ struct EntityMethods {
     /* +0x110 */ void (*slot110)(Entity *self);            /* called by Entity__StartSoundCue */
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by Entity__StopSoundCue */
     /* +0x118 */ u8 pad118[0x128 - 0x118];
-    /* +0x128 */ void (*slot128)(Entity *self, s32 arg1); /* called by func_80062A40 (Entity_e) as slot128(this, 1); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
+    /* +0x128 */ void (*slot128)(Entity *self, s32 arg1); /* called by Entity__MoodCue77 (Entity_e) as slot128(this, 1); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
     /* +0x12C */ void (*slot12C)(Entity *self);           /* called by Entity__MoodCue42 */
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by Entity__StopSoundCue, Entity__MoodCue42 */
     /* +0x134 */ s32 (*slot134)(Entity *self, s32 arg1, s32 arg2); /* called by func_80063ED4 and func_80064078 (both Entity_f) in an identical loop, `this->unk88 = slot134(this, this->unk88, 0)` while `this->unk84++ < 0x18` -- value-returning, not void */
@@ -94,7 +94,7 @@ struct EntityMethods {
     /* +0x160 */ void (*deactivate)(Entity *self);             /* CROSS-UNIT (Entity_c/d/e/f/g also dispatch through this slot -- see docs/match-reports/Entity__Deactivate.md's Proposed field names) -- occupant is Entity__Deactivate, same self-referential idiom as slot15C above. Called by Entity__DetachUnk4C, Entity__NotifyReset, Entity__UpdateDeactivationState */
     /* +0x164 */ void (*setUnkF4)(Entity *self, s32 arg1);    /* called by Entity__Deactivate and Entity__UpdateTargetProximity (as slot164(self, 1)) */
     /* +0x168 */ void (*startSoundCue)(Entity *self);               /* called by Entity__UpdateSoundCueStart */
-    /* +0x16C */ void (*stopSoundCue)(Entity *self);                /* called by Entity__Deactivate, Entity__UpdateSoundCueStop, func_80062A40 (Entity_e) */
+    /* +0x16C */ void (*stopSoundCue)(Entity *self);                /* called by Entity__Deactivate, Entity__UpdateSoundCueStop, Entity__MoodCue77 (Entity_e) */
     /* +0x170 */ s32 (*activationState)(Entity *self);                  /* self-only slot: occupant is Entity__UpdateActivationState, called by Entity__Update as `if (this->methods->activationState(this) != 0) ...` */
     /* +0x174 */ s32 (*deactivationState)(Entity *self);                  /* self-only slot: occupant is Entity__UpdateDeactivationState, which returns s32 (`this->unkF0`) -- retyped from `void` to `s32` to match (CLAUDE.md: a discarded return, which is all Entity__Update does with it, is never evidence of void). Retype re-verified byte-exact; this slot has no other caller to perturb. Called by Entity__Update */
     /* +0x178 */ s32 (*updateTargetProximity)(Entity *self);                    /* called by Entity__Update; holds Entity__UpdateTargetProximity, which ends `return this->unkF4;` -- NOT void despite the one known caller discarding it, see CLAUDE.md's "discarded return is never evidence of void" */
@@ -168,7 +168,7 @@ struct Unk94Methods {
     u8 pad098[0xB8 - 0x98];
     void (*slotB8)(Unk94Obj *self, void *arg1); /* called by Entity__MoodCue49 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
     u8 pad0BC[0xC4 - 0xBC];
-    void (*slotC4)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80062730 (Entity_e) as slotC4(target, 0x80, 0) and slotC4(target, -N, 1); return value unused at both known call sites, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
+    void (*slotC4)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue74 (Entity_e) as slotC4(target, 0x80, 0) and slotC4(target, -N, 1); return value unused at both known call sites, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
     void (*slotC8)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue58 (Entity_d) as slotC8(target, (this->unkFC % 40 < 0x14) ? -5 : 5, 0); return value unused at this, its only known call site */
     void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue47 (Entity_d) as slotCC(target, -0x64, 0) and Entity__MoodCue58 (Entity_d) as slotCC(target, -0x14, 0); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
     u8 pad0D0[0x100 - 0xD0];
@@ -177,7 +177,7 @@ struct Unk94Methods {
     s32 (*slot120)(Unk94Obj *self, s32 arg1, s32 arg2, void *arg3, s32 arg4); /* called by Entity__IsNearTarget as a TAIL CALL, `return this->target->methods->slot120(this->target, 0, arg2<<11, &localVec, distValue)` -- value-returning per CLAUDE.md's one-line-wrapper rule, no positive evidence of void */
     u8 pad124[0x130 - 0x124];
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by Entity__MoodCue01 and Entity__MoodCue58 (Entity_d), as slot130(target, 0), and by Entity__MoodCue115 (Entity_d) as slot130(target, 1) */
-    void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue115 (Entity_d) and func_80062730 (Entity_e), both as slot134(target, 1, 1); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
+    void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue115 (Entity_d) and Entity__MoodCue74 (Entity_e), both as slot134(target, 1, 1); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
     u8 pad138[0x1A0 - 0x138];
     s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by Entity__MoodCue46 (Entity_d), its return value taken mod 3 -- value-returning, not void */
     u8 pad1A4[0x200 - 0x1A4];
@@ -191,7 +191,7 @@ struct Unk94Obj {
     u8 pad04[0x14 - 0x04];
     EntityPos *unk14;        /* +0x14, read by Entity__IsTargetInRange (its own +0x1C, i.e. y) */
     u8 pad18[0x5C - 0x18];
-    Unk5CObj *unk5C;          /* +0x5C, dereferenced through its OWN vtable (see Unk5CObj's own comment) by func_80062730 (Entity_e) -- yet another instance of the class-framework object-pointer-at-a-field convention, same shape as Entity::unk4C/Entity::unk100 */
+    Unk5CObj *unk5C;          /* +0x5C, dereferenced through its OWN vtable (see Unk5CObj's own comment) by Entity__MoodCue74 (Entity_e) -- yet another instance of the class-framework object-pointer-at-a-field convention, same shape as Entity::unk4C/Entity::unk100 */
 };
 
 /* Object pointed to by `Unk94Obj::unk5C` -- named for the offset it sits at
@@ -200,7 +200,7 @@ struct Unk94Obj {
  * one slot reached so far is unknown. */
 struct Unk5CMethods {
     u8 pad000[0x64];
-    void (*slot64)(Unk5CObj *self, void *arg1); /* called by func_80062730 (Entity_e) as slot64(target->unk5C, D_8008AC1C); no other argument passed (only self+arg1 set up before the jalr) */
+    void (*slot64)(Unk5CObj *self, void *arg1); /* called by Entity__MoodCue74 (Entity_e) as slot64(target->unk5C, D_8008AC1C); no other argument passed (only self+arg1 set up before the jalr) */
 };
 
 struct Unk5CObj {
@@ -309,12 +309,12 @@ struct Entity {
     /* +0x5C */ u8 pad5C[0x70 - 0x5C];
     /* +0x70 */ Unk70Obj *unk70;       /* read by Entity__MoodCue58 (Entity_d), see Unk70Obj's own comment */
     /* +0x74 */ u8 pad74[0x7C - 0x74];
-    /* +0x7C */ s32 unk7C;             /* gate flag read by func_80062A40 (Entity_e); when 0, that function returns immediately after its unkFC==unk80/slot128/rand() dice-roll block */
+    /* +0x7C */ s32 unk7C;             /* gate flag read by Entity__MoodCue77 (Entity_e); when 0, that function returns immediately after its unkFC==unk80/slot128/rand() dice-roll block */
     /* +0x80 */ s32 unk80;             /* read by Entity__MoodCue09/Entity__MoodCue11 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and Entity__MoodCue13 (compared to `out->unk4` as `this->unk80 - 1`) */
     /* +0x84 */ s32 unk84;             /* compared against a literal (Entity__MoodCue14: `== 0xA`) or against `this->unk80 / 2` (Entity__MoodCue07); also a loop counter in func_80063ED4/func_80064078 (Entity_f), incremented past `< 0x18` while `slot134` is called each iteration */
     /* +0x88 */ s32 unk88;             /* func_80063ED4/func_80064078 (Entity_f): threaded through the slot134 loop as its own running arg1/return value */
     /* +0x8C */ u8 pad8C[0x90 - 0x8C];
-    /* +0x90 */ s32 unk90;             /* func_80062C58 (Entity_e): nonzero gates `out->unk1C = 0x1C` when `out->unk4 & 3` is also 0 */
+    /* +0x90 */ s32 unk90;             /* Entity__MoodCue78 (Entity_e): nonzero gates `out->unk1C = 0x1C` when `out->unk4 & 3` is also 0 */
     /* +0x94 */ Unk94Obj *target;         /* passed as Class6B5CC__FaceTarget's (still INCLUDE_ASM, code_d294.s) second argument by Entity__UpdateTargetProximity/Entity__MoodCue01; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
     /* +0x98 */ s32 moodIndex;         /* selects a 16-byte row in the D_80089EAxx tables */
     /* +0x9C */ s32 soundCueSet;             /* zeroed by Entity__Entity; address-taken by Entity__TickSoundCue/Entity__StopSoundCue */
@@ -443,7 +443,7 @@ struct EntityMoodHandlerArg {
 /* Already matched in Entity_e.c (not INCLUDE_ASM), but not previously called
  * from outside that unit -- func_80064CA4 (Entity_g) is its first cross-unit
  * caller, forwarding its own (this, out) straight through. */
-extern void func_80062570(Entity *this, EntityMoodHandlerArg *out);
+extern void Entity__MoodCue71(Entity *this, EntityMoodHandlerArg *out);
 
 /* Already matched in Entity_d.c (not INCLUDE_ASM), but not previously called
  * from outside that unit -- func_800650D4 (Entity_g) is its first cross-unit

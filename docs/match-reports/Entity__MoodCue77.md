@@ -1,16 +1,18 @@
-# func_80062A40 -- MATCHED (134/134 words)
+# Entity__MoodCue77 -- MATCHED (134/134 words)
+
+> Renamed from `func_80062A40` on 2026-09-24 (tools/rename.py). Address 0x80062a40.
 
 Unit: `Entity_e` (round 13). A four-way dispatch: `slot148`+`%5` mood
 setup, then an early-return branch on a new gate field (`unk7C`), then a
 second early-return branch on `unk44 == 0` doing an unkFC-literal-set
 check, and finally the fallthrough path doing the same check against two
 different literals plus a threshold and an exact match.
-`void func_80062A40(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue77(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue77(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 % 5 == 0) {
         out->unk1C = 0x11;
@@ -87,8 +89,8 @@ fields carved from previously-unlabeled padding, plus one comment append.
   (`unkFC != 0x140`) skips past. Modeled directly as one `||`-chained
   condition guarding one call, which reproduced this exactly.
 - `ROTATION_YAW_PLUS90`/`ROTATION_YAW_MINUS90` reuse this file's existing per-unit externs
-  (already declared earlier in `Entity_e.c` for `func_80061F30`/
-  `func_80062660`); no new externs needed here.
+  (already declared earlier in `Entity_e.c` for `Entity__MoodCue65`/
+  `Entity__MoodCue73`); no new externs needed here.
 
 No other new struct or vtable-slot knowledge; `slot148`, `slot44`, `slotD0`,
 and `slot16C` were all already typed from earlier work in this unit.
@@ -99,15 +101,15 @@ Addressing the round-13 head broadcast (levers on `~x+1`-vs-`-x`,
 multi-walker array induction, and switch/jump-table drift sizing):
 
 - **Lever 1 (`~x + 1` vs `-x`)**: not encountered. Every negation in this
-  function and the rest of this round's queue (`func_80062730`'s
+  function and the rest of this round's queue (`Entity__MoodCue74`'s
   `-((...) * 0x20)`, etc.) is a plain `negu`/`li -N`-style literal or
   arithmetic negation, no `nor`+`addiu` pair seen in any of this unit's
   `.s` files screened so far.
 - **Lever 2 (multi-walker array induction)**: not applicable. Nothing in
   this unit's remaining queue loops over an array at all -- every function
-  handled this round (`func_800623E8`, `func_800620C4`, `func_80062FAC`,
-  `func_80062570`, `func_80061F30`, `func_80061A90`, `func_80062730`,
-  `func_80062A40`) is straight-line mood-handler dispatch logic with `if`
+  handled this round (`Entity__MoodCue69`, `Entity__MoodCue67`, `Entity__MoodCue79`,
+  `Entity__MoodCue71`, `Entity__MoodCue65`, `Entity__MoodCue59`, `Entity__MoodCue74`,
+  `Entity__MoodCue77`) is straight-line mood-handler dispatch logic with `if`
   chains, no loop construct anywhere in their disassembly.
 - **Lever 3 (switch/jump-table drift)**: not applicable. None of this
   unit's functions compile to a `switch`; every dispatch seen is `beq`/
@@ -116,5 +118,9 @@ multi-walker array induction, and switch/jump-table drift sizing):
   every function matched in this unit this round (each also cross-checked
   with `build exit=0` and a clean word-count match, never drift).
 - **Blocker screen on this function**: `grep -nE 'gp_rel|addiu *\$at,
-  *\$at, *%lo'` against `func_80062A40.s` -- no hit, consistent with round
+  *\$at, *%lo'` against `Entity__MoodCue77.s` -- no hit, consistent with round
   head's own pre-screen of this queue.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 77 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.

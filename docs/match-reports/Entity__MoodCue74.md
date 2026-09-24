@@ -1,4 +1,6 @@
-# func_80062730 -- MATCHED (105/105 words)
+# Entity__MoodCue74 -- MATCHED (105/105 words)
+
+> Renamed from `func_80062730` on 2026-09-24 (tools/rename.py). Address 0x80062730.
 
 Unit: `Entity_e` (round 13). Ignores `out` entirely. A first-tick block
 dispatches through a brand-new nested object (`unk94->unk5C`'s own
@@ -6,12 +8,12 @@ vtable), rolls `unk44 = rand() % 3` and clamps it to 0 based on a
 `z`-position gate; the rest of the function is an `if (unk44 != 0)` /
 `else` pair, each side making two more `Unk94Methods`-table calls (two new
 slots, `slotC4` and `slot134`, discovered here).
-`void func_80062730(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80062730(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         this->unk94->unk5C->methods->slot64(this->unk94->unk5C, D_8008AC1C);
         this->unk44 = rand() % 3;
@@ -75,7 +77,7 @@ same byte ranges.
 
 - **A register-identity-free "divisible by 3" and "value halved" idiom**,
   both already-confirmed patterns from earlier reports in this unit
-  (`func_800620C4`'s `rand() % 3`, and `this->unk80` field's own
+  (`Entity__MoodCue67`'s `rand() % 3`, and `this->unk80` field's own
   documented `(x + (unsigned)x>>31) >> 1` signed-halving comment in
   `include/Entity.h`).
 - **`(u32)(this->unkFC - 0x14) < 0x64` needs an explicit unsigned cast** to
@@ -108,3 +110,9 @@ same byte ranges.
 comparisons being combinable; the source has to already be unsigned typed
 at the subtraction. Byte-identical instruction count either way, only the
 opcode's low bits differ, so this is easy to misdiagnose as "close enough."
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 74 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+**`D_8008AC1C` left unnamed this round.** Already documented (this report's own body, pre-rename) as a single-word data table adjacent to `gEntityDefaultPos`/`gEntityDefaultOffset`, not a rotation/scale/translate-style {num,den} or s32-triple table, and passed to `Unk5CObj::slot64` whose own purpose is unestablished -- no evident value to name it from.

@@ -136,7 +136,6 @@ D_8008ACA0
 D_8008ACA4
 D_8008ACA8
 D_8008ACAC
-D_8008ACCC
 D_8008ACD0
 D_8008AEE8
 LINK_ANGLE_180
@@ -187,6 +186,7 @@ gLinkSpawnIndex
 gLinkSrcStage
 gLinkTriggerIndex
 gMemcardIconTemplate
+gMoodCue78TransitionDone
 gOpenVabCount
 gPendingVabBuffer
 gStyleColorTable

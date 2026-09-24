@@ -1,4 +1,6 @@
-# func_80063144 -- MATCHED, round 59 (2026-09-20)
+# Entity__MoodCue81 -- MATCHED, round 59 (2026-09-20)
+
+> Renamed from `func_80063144` on 2026-09-24 (tools/rename.py). Address 0x80063144.
 
 REVISITED, round 59: MATCHED 217/217 byte-exact; names/types not relevant
 
@@ -193,7 +195,7 @@ about divergence #2 being a scheduling residue are **wrong**; see above.
 The round-19 correction (218 words, a net insertion) is **right**, and was
 the finding that pointed at a source-shape cause.
 
-## (original title) func_80063144 -- STALL (TWO divergences, not one; --debug base score 465, funcdiff 77/217 after closing divergence #1)
+## (original title) Entity__MoodCue81 -- STALL (TWO divergences, not one; --debug base score 465, funcdiff 77/217 after closing divergence #1)
 
 
 **CORRECTION (round 19): divergence #2 is NOT a zero-cost pure reordering.**
@@ -262,7 +264,7 @@ Unit: `Entity_e` (round 13). The largest function in this round's queue
 blocker screen is clean:
 
 ```
-$ grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/Entity_e/func_80063144.s
+$ grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/Entity_e/Entity__MoodCue81.s
 (no output)
 ```
 
@@ -280,7 +282,7 @@ reshaping tried reproduces that extra register.
 ```c
 extern u8 D_80089E08[];
 
-void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
     s32 mood;
 
@@ -353,7 +355,7 @@ into `src/Entity_e.c` in place of the current `INCLUDE_ASM`):
 #if 0
 extern u8 D_80089E08[];
 
-void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
     s32 mood;
 
@@ -421,7 +423,7 @@ void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
 
 ## The residue, precisely
 
-`asm/nonmatchings/Entity_e/func_80063144.s` lines around `.L80063220`
+`asm/nonmatchings/Entity_e/Entity__MoodCue81.s` lines around `.L80063220`
 (`out->unk4 % 20 == 0` branch body):
 
 ```
@@ -441,7 +443,7 @@ j       .L80063260
 My best C reproduces every STORE (target offset, value, and order) exactly
 but collapses to a SINGLE register (`v0`) reused for `0x17`, then `-1`,
 then `-2` in sequence -- one `li` short, at exactly this spot. Confirmed
-via `tools/asm-differ/diff.py func_80063144`: past this one missing
+via `tools/asm-differ/diff.py Entity__MoodCue81`: past this one missing
 instruction, EVERY SUBSEQUENT instruction in the function (and in every
 function compiled after it in the same translation unit, checked out to
 several KB past this function) is byte-identical, just uniformly shifted
@@ -459,7 +461,7 @@ against the real function (also near-instant):
 1. **Baseline** (the source above): 69/217 in-range, missing exactly the
    one `li v1,-1`.
 2. **Named remainder** (`s32 r = out->unk4 % 20; if (r == 0) ... else if
-   (r == 0xE) ...`) -- the technique that fixed `func_80062570`'s
+   (r == 0xE) ...`) -- the technique that fixed `Entity__MoodCue71`'s
    register-identity residue in this same unit. Made it WORSE (62/217):
    it perturbs the shared division computation itself, which was already
    matching.
@@ -525,7 +527,7 @@ now with a fourth confirmed instance supporting, the standing guidance in
 ## HEAD FINDING, round 13: the reversed `Class6B5CC__FaceTarget` arguments are a DIRECTION FLAG
 
 Runner echo (`Entity__MoodCue115`, `Entity_d`) and runner bravo
-(`func_80063144`, `Entity_e`) each independently flagged a
+(`Entity__MoodCue81`, `Entity_e`) each independently flagged a
 `Class6B5CC__FaceTarget` call site whose first two arguments are swapped relative
 to every other known site. Both verified it against raw disassembly. The
 head then surveyed **every** call site in the executable, and the swap is
@@ -617,11 +619,11 @@ divergences, just measured differently).
 
 ### Permuter progress
 
-`tools/setup-permuter.sh func_80063144 <this report's preserved body>`,
+`tools/setup-permuter.sh Entity__MoodCue81 <this report's preserved body>`,
 then `-j 6 --stop-on-zero --best-only`, bounded by `timeout 600`.
 
 **Best found so far (still running at time of this update): score 230**,
-via `permuter-work/func_80063144/output-230-1/source.c`. The winning
+via `permuter-work/Entity__MoodCue81/output-230-1/source.c`. The winning
 mutation: a chained assignment plus a store reorder in the
 `out->unk4 % 20 == 0` block --
 
@@ -649,7 +651,7 @@ current `INCLUDE_ASM`):
 #if 0
 extern u8 D_80089E08[];
 
-void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
     s32 mood;
 
@@ -791,7 +793,7 @@ the report's original best-reached body above, which closed neither):
 #if 0
 extern u8 D_80089E08[];
 
-void func_80063144(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
     s32 mood;
 
@@ -903,7 +905,7 @@ Register Differences:          9  (5)
 Reorderings:                   2  (60)
 Insertions:                    2  (100)
 Deletions:                     1  (100)
-[func_80063144] base score = 465
+[Entity__MoodCue81] base score = 465
 ```
 
 **Identical to the original measurement -- `Stack Differences: 0` both
@@ -929,13 +931,13 @@ words in-range, no outside-range shift" does not hold up:**
 
 ```
 $ tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/Entity_e.c.o
-000016b4 <func_80063144>:
+000016b4 <Entity__MoodCue81>:
 ...
     1a18:	00000000 	nop
 ```
 `(0x1a18 + 4 - 0x16b4) / 4 = 0xda = 218 words` -- retail is 217
-(`asm/nonmatchings/Entity_e/func_80063144.s` header: `nonmatching
-func_80063144, 0x364` = 868 bytes = 217 words). **My build is 1 word
+(`asm/nonmatchings/Entity_e/Entity__MoodCue81.s` header: `nonmatching
+Entity__MoodCue81, 0x364` = 868 bytes = 217 words). **My build is 1 word
 LONGER.** `funcdiff.py` confirms with its own outside-range warning
 (107390 bytes) on this exact body, and `asm-differ`'s branch-target
 column shows the drift starting as early as word 19 (`beqz v0,53b80` in
@@ -1039,3 +1041,11 @@ already-permuter-searched residue). Disposition unchanged: STALL,
 divergence #1 closed (verified, isolable), divergence #2 open (confirmed
 independent, reclassified as a net insertion per round 19, not yet
 closed). `INCLUDE_ASM` restored; no source changes landed.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 81 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+**This handler also occupies row 120** of `gEntityMoodHandlerTable` (same `handler` word at both `0x80089EB0+0x10*81` and `0x80089EB0+0x10*120`; the row's other three words -- data0/data1/data2 -- differ between the two rows, so it is one function shared by two distinct mood-row configurations, not a naming collision). Named for its lower/first row per the existing convention; not a second name.
+
+**`D_80089E08` left unnamed this round.** s16-pair-decoded it reads (8,7, 8,7, 8,7, 1,1) -- X=Y=Z=8/7, a uniform ~1.14x enlarge, but 8/7 is not one of the round ratios (1/2, 6/1, 3/1, ...) any named `SCALE_*` table uses, so there is no clean `SCALE_EIGHTSEVENTHS`-style name to give it with confidence.

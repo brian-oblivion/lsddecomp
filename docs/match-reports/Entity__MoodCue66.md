@@ -1,12 +1,14 @@
-# func_8006204C -- MATCHED (30/30 words)
+# Entity__MoodCue66 -- MATCHED (30/30 words)
+
+> Renamed from `func_8006204C` on 2026-09-24 (tools/rename.py). Address 0x8006204c.
 
 Unit: `Entity_e` (round 12). A mood handler testing `out->unk4 % 30 == 0`.
-`void func_8006204C(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue66(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_8006204C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue66(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 % 30 == 0) {
         out->unk1C = 0xD;
@@ -16,7 +18,7 @@ void func_8006204C(Entity *this, EntityMoodHandlerArg *out) {
 
 ## Derivation notes
 
-Same division-by-constant idiom as `func_80061E60` above, this time for
+Same division-by-constant idiom as `Entity__MoodCue64` above, this time for
 `% 30` (magic `0x88888889`, `sra` shift 4, WITH the `addu` sign-correction
 step since this magic is `>= 0x80000000` -- the "negative magic" case).
 Verified against the pinned `cc1` the same way.
@@ -42,3 +44,7 @@ second look specifically at the *equality direction* before transcribing
 any `bne`/`beq` that gates a single store, since a same-size polarity
 inversion compiles clean and only shows up as a single-opcode byte diff
 that's easy to mis-file as "close enough" instead of "wrong".
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 66 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.

@@ -1,13 +1,15 @@
-# func_80061E60 -- MATCHED (52/52 words)
+# Entity__MoodCue64 -- MATCHED (52/52 words)
+
+> Renamed from `func_80061E60` on 2026-09-24 (tools/rename.py). Address 0x80061e60.
 
 Unit: `Entity_e` (round 12). A mood handler that reduces `out->unk4` modulo
 300 and dispatches on the remainder.
-`void func_80061E60(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue64(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80061E60(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue64(Entity *this, EntityMoodHandlerArg *out) {
     s32 r = out->unk4 % 300;
 
     out->unk10 = this->methods->slot148(this);
@@ -34,7 +36,7 @@ pipeline): compiling `int mod300(int x){return x%300;}` through
 `tools/gcc263/cc1` at `-mips1 -mcpu=3000 -O2` reproduces this exact
 instruction sequence (magic, shift, and the `sll 2/addu/sll 4/subu/sll 2`
 reconstruction) byte-for-byte. This is the same idiom as
-`func_8006204C` below (`% 30`) and `Entity__MoodCue40` in `Entity_d.c` (`% 7`)
+`Entity__MoodCue66` below (`% 30`) and `Entity__MoodCue40` in `Entity_d.c` (`% 7`)
 -- worth having a reproducer command on hand rather than re-deriving the
 magic-number-to-divisor mapping by arithmetic each time, which is
 error-prone (a first pass on this function mis-guessed divisor 150 instead
@@ -52,3 +54,7 @@ N;`) takes under a second and gives the exact magic/shift/reconstruction
 GCC would emit for a candidate divisor -- far faster and more reliable than
 reconstructing the divisor from the Hacker's-Delight magic-number formula
 by hand.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 64 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.

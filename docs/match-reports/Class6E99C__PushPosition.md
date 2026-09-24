@@ -353,7 +353,7 @@ structurally forced to appear early because the guard condition
 (`self->unkC`) reads it -- but `a1` is never read outside the `if`-block,
 so nothing in the C forces an early copy of it, yet retail makes one
 anyway. This is the project's documented "redundant move" residue class
-(see `Obj6EAC0__ApplyColor.md`, `func_80063144.md`, MATCHING-GUIDE): tried an
+(see `Obj6EAC0__ApplyColor.md`, `Entity__MoodCue81.md`, MATCHING-GUIDE): tried an
 explicit `SkipShort2 *src = a1;` local declared before the `if` and used in
 place of `a1` for both dereferences -- GCC 2.6.3 copy-propagates it away
 with NO instruction emitted, score unchanged at 210, matching how this

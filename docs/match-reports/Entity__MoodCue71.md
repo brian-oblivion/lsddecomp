@@ -1,14 +1,16 @@
-# func_80062570 -- MATCHED (60/60 words)
+# Entity__MoodCue71 -- MATCHED (60/60 words)
+
+> Renamed from `func_80062570` on 2026-09-24 (tools/rename.py). Address 0x80062570.
 
 Unit: `Entity_e` (round 13). Dispatches `slot148`, and on `out->unk4 == 0`
 picks one of three `slotC8` variants via `rand() % 3`; separately fires
 `Class6B5CC__FaceTarget` once `unkFC` crosses a threshold, then unconditionally
-calls `slotC4`. `void func_80062570(Entity *this, EntityMoodHandlerArg *out)`.
+calls `slotC4`. `void Entity__MoodCue71(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80062570(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue71(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     out->unk10 = this->methods->slot148(this);
@@ -43,7 +45,7 @@ void func_80062570(Entity *this, EntityMoodHandlerArg *out) {
   `docs/MATCHING-GUIDE.md`'s residue guide, this is exactly the
   declaration-order-driven register-identity class, not a toolchain issue --
   giving the intermediate remainder its own `s32 r` local (matching how the
-  neighboring `func_80061E60`/`func_8006204C` in this same file already
+  neighboring `Entity__MoodCue64`/`Entity__MoodCue66` in this same file already
   hoist their own modulo results into a named `r`) resolved it to a clean
   60/60 with no other source change.
 - `this->unkFC >= 0x961` reads off `slti $v0,$v0,0x961` + `bnez` skipping the
@@ -62,7 +64,13 @@ expression), hoist the modulo into a named local before writing the
 multiply/call.** Inlining it directly reproduces the identical instruction
 sequence but with `a1`/`v1`/`a3` register roles swapped relative to retail
 -- a pure register-identity residue, resolved by naming the intermediate
-the same way this unit's other mod-result locals (`r` in `func_80061E60`,
-`func_8006204C`) are already named. Consistent with, and reinforcing, the
+the same way this unit's other mod-result locals (`r` in `Entity__MoodCue64`,
+`Entity__MoodCue66`) are already named. Consistent with, and reinforcing, the
 existing "declaration-order or lifetime difference" entry in
 `docs/MATCHING-GUIDE.md`'s residue guide.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 71 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+Already cross-unit called before this rename: `func_80064CA4` (Entity_g) forwards its own `(this, out)` straight through to this function; `include/Entity.h` carried its extern declaration under the old name and is updated by this rename (tree-wide, via `tools/rename.py`).

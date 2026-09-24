@@ -144,7 +144,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   and the branch targets the outer join, so "retail assigns this in a delay slot, mine assigns it
   plainly" is evidence about if/else shape, not about the scheduler. Tell: a conditional branch
   targeting the OUTER join with a real assignment in its delay slot, the bare unconditional `j` of
-  the fallthrough rule absent. 77/217 -> 208/217. (a docs/match-reports/func_80063144.md, round 59)
+  the fallthrough rule absent. 77/217 -> 208/217. (a docs/match-reports/Entity__MoodCue81.md, round 59)
 - **A bare `__asm__("")` at a basic-block JOIN blocks GCC's eager delay-slot fill and can COST
   instructions.** It is legal under HARD RULE 6 (it moves no value between registers) and still made
   `SpuVmAlloc` worse for four rounds. The discriminator is WHERE it sits: inside a block a barrier
@@ -352,7 +352,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   LIVE-RANGE question, not the "redundant move" permuter class. **The live range must cross
   a CALL**: one `s32 r` reused for three `rand()` results cost one `move $a1,$v0` per call and
   deleting it closed 25/87 -> 87/87, while deleting a SINGLE-USE local measured exactly inert
-  in the same unit. (a docs/match-reports/func_80062C58.md, round 59; a round 64, charlie)
+  in the same unit. (a docs/match-reports/Entity__MoodCue78.md, round 59; a round 64, charlie)
 - **Local COUNT is the lever on a register-identity residue in all THREE directions — delete, merge
   and add — not only delete.** Round 65 worked one unit's three stalls at once: deleting four cached
   tail temps made `vmNoiseOn2`'s whole 25-instruction tail byte-exact and fixed two registers four

@@ -1,16 +1,18 @@
-# func_800621A8 -- MATCHED (144/144 words)
+# Entity__MoodCue68 -- MATCHED (144/144 words)
+
+> Renamed from `func_800621A8` on 2026-09-24 (tools/rename.py). Address 0x800621a8.
 
 Unit: `Entity_e` (round 13). Sets `Entity::unk48` (the s16 field, a
 different field from `EntityMoodHandlerArg::unk48`) via a coin flip, then
 branches on `this->unk44`: a `== 0` path doing two independent modulo
 checks (`% 10`, `% 20`) plus an "odd tick" gate that can promote `unk44` to
 `0xA`, and an `== 0xA` path doing an `unkFC < 8` threshold split.
-`void func_800621A8(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 == 0) {
         this->unk48 = (rand() & 1) ? -0x176 : -0xC0;
@@ -39,8 +41,8 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotC4(this, this->unk48, 1);
     } else if (this->unk44 == 0xA) {
         if (this->unkFC < 8) {
-            this->methods->slot44(this, 0, D_80089CC4);
-            this->methods->slotBC(this, D_80089D6C);
+            this->methods->slot44(this, 0, ROTATION_ZPLUS9);
+            this->methods->slotBC(this, TRANSLATE_Y_PLUS8);
         } else {
             u32 r;
 
@@ -90,7 +92,7 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
 
 No new struct or vtable-slot knowledge; `slot148`, `slotC4`, `slot44`,
 `slotBC`, `slot16C`, and `Unk94Methods::slot100` were all already typed
-from earlier work in this unit. `D_80089CC4`/`D_80089D6C` are new per-unit
+from earlier work in this unit. `ROTATION_ZPLUS9`/`TRANSLATE_Y_PLUS8` are new per-unit
 `extern u8 [];` data-table externs, same convention as the rest of this
 file.
 
@@ -109,6 +111,12 @@ yields `andi`+`slt` (right instruction count, wrong opcode -- `slt` vs
 `sltiu`, a class of near-miss easy to overlook since the word COUNT
 matches). Verify with the pinned `cc1` directly rather than guessing at
 which spelling GCC prefers; this is the third residue in this unit's
-reports (after `func_80062570`'s register-identity fix and
-`func_80062730`'s unsigned-cast fix) where the visible C had to diverge
+reports (after `Entity__MoodCue71`'s register-identity fix and
+`Entity__MoodCue74`'s unsigned-cast fix) where the visible C had to diverge
 from the "obvious" spelling to match retail's exact lowering.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 68 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+**Data constants renamed this round:** `D_80089CC4` -> `ROTATION_ZPLUS9` and `D_80089D6C` -> `TRANSLATE_Y_PLUS8`, tier B. Byte-decoded from `disk/SLPS_015.56` against the existing `ROTATION_YAW_PLUS9`/`ROTATION_ZMINUS90`/`TRANSLATE_Y_PLUS256` tables: rotation tables are four s16 {num,den} pairs for X/Y(yaw)/Z/W, only one pair with den=1; translate tables are three consecutive s32 (X,Y,Z), only one nonzero. `D_80089CC4`'s nonzero pair is the THIRD (Z) slot at (9,1) -- same slot `ROTATION_X50_YMINUS120_Z30` already confirmed is Z, so `ROTATION_ZPLUS9` follows `ROTATION_ZMINUS90`'s no-underscore single-letter-axis convention. `D_80089D6C`'s nonzero 32-bit slot is the second (Y) at +8, matching `TRANSLATE_Y_*`.

@@ -1,14 +1,16 @@
-# func_800623E8 -- MATCHED (53/53 words)
+# Entity__MoodCue69 -- MATCHED (53/53 words)
+
+> Renamed from `func_800623E8` on 2026-09-24 (tools/rename.py). Address 0x800623e8.
 
 Unit: `Entity_e` (round 13). A mood handler that dispatches `slot148`, gates a
 final-tick check against `this->unk80 - 1`, and fires two independent
 "every N ticks" checks against `out->unk4` (mod 4 and mod 200).
-`void func_800623E8(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue69(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800623E8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue69(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (this->unk84 == this->unk80 - 1) {
         out->unk1C = 0x19;
@@ -30,7 +32,7 @@ void func_800623E8(Entity *this, EntityMoodHandlerArg *out) {
 Two division-by-constant idioms, both resolved by compiling one-line probes
 through the pinned `cc1` rather than hand-decoding the magic constants (see
 CLAUDE.md's "Escalate, do not experiment" reproducer pipeline and
-`func_80061E60`'s match report, same technique):
+`Entity__MoodCue64`'s match report, same technique):
 
 - The `out->unk4 & 3` test (`andi $v0, $v0, 0x3`) is GCC's equality-to-zero
   form of `% 4 == 0` -- for a power-of-two modulus the low bits alone decide
@@ -60,6 +62,10 @@ faster than decoding the magic constant.** Probing `int f(int x){return
 x/N;}` for a handful of candidate `N` near the guess and comparing the `sra
 $2,$2,K` shift each produces is enough to identify the right `N` -- no two
 of the divisors this project has hit so far (30, 200, 300) share a shift
-amount. This generalizes `func_80061E60`'s reproducer-over-hand-decoding
+amount. This generalizes `Entity__MoodCue64`'s reproducer-over-hand-decoding
 learning: don't even need to match the whole instruction sequence, just the
 shift constant.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 69 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.

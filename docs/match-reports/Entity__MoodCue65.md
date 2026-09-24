@@ -1,16 +1,18 @@
-# func_80061F30 -- MATCHED (71/71 words)
+# Entity__MoodCue65 -- MATCHED (71/71 words)
+
+> Renamed from `func_80061F30` on 2026-09-24 (tools/rename.py). Address 0x80061f30.
 
 Unit: `Entity_e` (round 13). Ignores its `out` argument entirely (same shape
-as `func_800620C4`/`func_800624BC` in this unit): a one-shot 1-in-3 dice
+as `Entity__MoodCue67`/`Entity__MoodCue70` in this unit): a one-shot 1-in-3 dice
 roll on the first tick fires three vtable calls and sets `unk44 = 0xB`,
 then a second block guarded by that flag fires an `unkFC`-threshold call
 and an unconditional `slotC4`.
-`void func_80061F30(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue65(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue65(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if (rand() % 3 == 0) {
             this->methods->slot48(this, 1, SCALE_HALF);
@@ -30,12 +32,12 @@ void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
 
 ## Derivation notes
 
-Same "1-in-3" `rand() % 3 == 0` idiom as `func_800620C4` in this unit
+Same "1-in-3" `rand() % 3 == 0` idiom as `Entity__MoodCue67` in this unit
 (magic `0x55555556`, no post-`mfhi` shift, `sll 1`/`addu` reconstructing
 `q*3`, compared directly against the dividend). This one matched clean on
-the first pass, unlike `func_80062570`'s residue -- the difference is that
+the first pass, unlike `Entity__MoodCue71`'s residue -- the difference is that
 here the modulo result is never multiplied by anything afterward, it is
-only compared to the dividend inline; `func_80062570`'s stall was specific
+only compared to the dividend inline; `Entity__MoodCue71`'s stall was specific
 to scaling the remainder by a further constant.
 
 `slot48` (already `s32`-returning), `slotCC` (`s32`-returning), `slot44`
@@ -43,7 +45,11 @@ to scaling the remainder by a further constant.
 vtable slot types from earlier work in this unit and `Entity_d`; every
 call here discards its return value, consistent with those slots' existing
 types. `ROTATION_YAW_PLUS90` already has an extern/callsite later in this same file
-(`func_80062660`); `SCALE_HALF` and `ROTATION_YAW_MINUS90` are new per-unit `extern
+(`Entity__MoodCue73`); `SCALE_HALF` and `ROTATION_YAW_MINUS90` are new per-unit `extern
 u8 [];` data-table externs, same convention as the rest of this file.
 
 No new struct or vtable-slot knowledge.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 65 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
