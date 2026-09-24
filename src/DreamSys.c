@@ -1121,67 +1121,47 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 	return true;
 }
 
-#if 0
-/* Best-reached body, 57/88 words, no address drift -- see
-   docs/match-reports/DreamSys__TryStaircaseLink.md for the residue analysis. Restored to
-   INCLUDE_ASM below per project rule (no score short of byte-exact stays in
-   src/). Re-verified fresh round 39 (2026-09-14, runner echo); one new
-   reshape tried (hoisting `&this->linkCoordinates` into a function-top local
-   named `coords`, on the theory that computing it once outside both branches
-   might suppress the `fill_eager_delay_slots` duplication into the branch
-   target) -- regressed hard (18/88, 135807 bytes of whole-image drift, an
-   extra callee-saved register), confirming the same "cast/hoist to a
-   function-scope local costs a register" class already documented for
-   `DreamSys__InstanceEffectsOnJournal`. Reverted immediately. */
+/* MATCHED round 75 (alpha): the body is one nested `if` chain, not a run of
+   early `return false;` guards. Each early return leaves a CODE_LABEL after
+   its jump, and a label between the entry `move s0,a0` and the first
+   `staircaseTickFn(this)` call stops jump2's find_equiv_reg from seeing
+   that $a0 still holds `this` -- so the redundant `move a0,s0` survives,
+   $a0 goes dead on that path, and reorg steals the staircase arm's
+   `addiu a0,s0,0x16c` into the `beqz` delay slot. Nested, the move is
+   deleted and both slots stay `nop`, as retail. The 10-byte copy into
+   staircaseGridPos/staircaseOrigin is ONE whole-PlayerSpawnPoint copy
+   (load-all-then-store-all), hence the local cast. */
 bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
-	s32 result;
 	s32 local[4];
 
-	if (this->pendingLinkType != 0) {
-		return false;
+	if (this->pendingLinkType == 0) {
+		if (this->staircaseTickFn != 0) {
+			if (this->staircaseTickFn(this)) {
+				this->staircaseActive = 0;
+				this->staircaseTickFn = 0;
+				this->staircaseMoveGate = 0;
+				if (this->moveMode == 4) {
+					this->vt->DreamSys__RestorePreviousMoveMode(this);
+				}
+			}
+		} else if (Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
+			Class6B5CC__GetRotationDegrees(this, local);
+			if (DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local)
+			    && this->moveCommandLatch != 0) {
+				*(PlayerSpawnPoint *)&this->staircaseGridPos = *currentPos;
+				this->staircaseActive = 1;
+				this->staircaseMoveGate = 1;
+				this->staircaseFrame = 0;
+				this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
+				this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->enterRotation);
+				this->staircaseTickFn(this);
+			}
+		}
 	}
-
-	if (this->staircaseTickFn == 0) {
-		goto staircase;
-	}
-	if (!this->staircaseTickFn(this)) {
-		return false;
-	}
-	this->staircaseActive = 0;
-	this->staircaseTickFn = 0;
-	this->staircaseMoveGate = 0;
-	if (this->moveMode != 4) {
-		return false;
-	}
-	this->vt->DreamSys__RestorePreviousMoveMode(this);
-	return false;
-
-staircase:
-	result = Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage);
-	if (result < 0) {
-		return false;
-	}
-	Class6B5CC__GetRotationDegrees(this, local);
-	if (!DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local)) {
-		return false;
-	}
-	if (this->moveCommandLatch == 0) {
-		return false;
-	}
-
-	this->staircaseGridPos = *(PlayerSpawnGridPos *)currentPos;
-	this->staircaseOrigin = currentPos->position;
-	this->staircaseActive = 1;
-	this->staircaseMoveGate = 1;
-	this->staircaseFrame = 0;
-	this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
-	this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->enterRotation);
-	this->staircaseTickFn(this);
 	return false;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TryStaircaseLink);
+
 
 s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 {

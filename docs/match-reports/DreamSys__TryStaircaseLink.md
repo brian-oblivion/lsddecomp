@@ -1,4 +1,111 @@
-# DreamSys__TryStaircaseLink -- STALL: exact length (88/88 instructions, zero address drift), 57/88 raw word-match, first real diff at 0x4B1FC (retail's delay-slot `nop` after `beqz v0,.L8005AA44` vs a hoisted `addiu a0,s0,0x16c` -- `fill_eager_delay_slots` branch-target duplication, one instruction early)
+# DreamSys__TryStaircaseLink -- MATCHED round 75 (88/88, whole image OK): nested `if` chain instead of early-return guards (no CODE_LABEL between the entry `move s0,a0` and the first call, so jump2 deletes the redundant `move a0,s0`), plus ONE whole-`PlayerSpawnPoint` copy
+
+REVISITED, round 75: MATCHED (alpha); names/types used (existing field names; one local `PlayerSpawnPoint *` cast, no header edit)
+
+## Round 75 (alpha): MATCHED
+
+**Preserved body rebuilt first**, exactly as the `#if 0` block gave it:
+`57/88`, `insertions 3 / deletions 3 (opcode-level; positional skeleton
+diffs 31)`, zero drift -- same as every prior round.
+
+**Two independent residues, both source shape.**
+
+1. **The struct copy.** Retail's `lwl/lwr v0; lwl/lwr v1; lh a0; swl/swr v0;
+   swl/swr v1; sh a0` is load-all-then-store-all of TEN bytes: one
+   whole-struct copy of a `PlayerSpawnPoint` (alignment 2), not the
+   `PlayerSpawnGridPos` + `RelativePos` pair the old body wrote (which
+   interleaved: load/store the first word, then load the rest, and needed a
+   load-delay `nop` -- that `nop` is what kept the old body at exactly 88
+   words and hid residue 2's real size). Spelled
+   `*(PlayerSpawnPoint *)&this->staircaseGridPos = *currentPos;`. With that
+   alone the function went to 87 words: retail really has one MORE
+   instruction than the hoisting build.
+2. **The delay slot.** Diagnostic that decided it: casting the first call to
+   take no argument (`((s32 (*)(void))this->staircaseTickFn)()`) removed the
+   `move a0,s0` from the `jalr` slot but still hoisted the `addiu` -- so
+   retail's `$a0` is LIVE at that call (it is passed) and yet never set:
+   the move was deleted. `-da` dumps showed who deletes it: in the working
+   shape the `(set a0 s0)` is present in `.greg` and gone in `.jump2` --
+   jump.c's "no-op move resulting from fortuitous allocation" path, which
+   asks `find_equiv_reg` whether `$a0` already equals `$s0`. That backward
+   search stops at a CODE_LABEL. `if (x != 0) return false;` expands to
+   `if (x == 0) goto L; v0 = 0; goto ret; L:` -- a label between the entry
+   `move s0,a0` and the call. The nested form (`if (pendingLinkType == 0) {
+   if (tickFn != 0) { if (tickFn(this)) {...} } else if (...) {...} }
+   return false;`) has no label on that path, the move is deleted, `$a0`
+   stays live on the fall-through, reorg cannot steal the staircase arm's
+   `addiu a0,s0,0x16c`, both slots stay `nop`. Found on a 12-line
+   reproducer first (flat: `move a0,s0` in both slots; nested: two `nop`s),
+   then applied: **88/88 on the first build, `OK: build matches retail`.**
+
+Every prior round's verdict ("nothing in the C source controls this",
+"below the C source's visibility") was wrong for the same reason: all of
+them kept the early-return guard structure and varied only things inside
+it (`if/else` vs `goto` spell the same CFG, and both leave the label).
+
+Header note, not acted on (shared header, comment-only): the
+`PlayerSpawnGridPos` comment in `include/DreamSys.h` says retail copies
+the two halves separately; it copies them as one `PlayerSpawnPoint`. A
+union of `PlayerSpawnPoint staircaseSpawn` over `staircaseGridPos` /
+`staircaseOrigin` would remove the cast; the `DreamSys__TickStaircaseCase*`
+readers of `staircaseOrigin` would need checking.
+
+```c
+bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
+{
+	s32 local[4];
+
+	if (this->pendingLinkType == 0) {
+		if (this->staircaseTickFn != 0) {
+			if (this->staircaseTickFn(this)) {
+				this->staircaseActive = 0;
+				this->staircaseTickFn = 0;
+				this->staircaseMoveGate = 0;
+				if (this->moveMode == 4) {
+					this->vt->DreamSys__RestorePreviousMoveMode(this);
+				}
+			}
+		} else if (Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
+			Class6B5CC__GetRotationDegrees(this, local);
+			if (DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local)
+			    && this->moveCommandLatch != 0) {
+				*(PlayerSpawnPoint *)&this->staircaseGridPos = *currentPos;
+				this->staircaseActive = 1;
+				this->staircaseMoveGate = 1;
+				this->staircaseFrame = 0;
+				this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
+				this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->enterRotation);
+				this->staircaseTickFn(this);
+			}
+		}
+	}
+	return false;
+}
+```
+
+### Proposed learning (round 75)
+
+**A missing argument move (`$a0` passed straight through from entry, no
+`move a0,sN` before the call) means there is no CODE_LABEL between the
+entry copy and the call.** jump2 deletes `(set a0 s0)` when
+`find_equiv_reg` finds the entry `(set s0 a0)` scanning backward, and that
+scan stops at a label. Every `if (cond) return X;` guard leaves one; a
+nested `if (!cond) { ... }` does not. Tell: a call whose argument register
+is set nowhere after the prologue while the same value sits in an
+`$s` register -- and, downstream, a delay slot that retail leaves `nop`
+because that argument register is live on the fall-through. Diagnostic
+that separates it from a scheduling choice: make the call argument-less
+with a cast; if the hoist survives but the move vanishes, the argument is
+live in retail and a label is what you have to remove.
+
+**A whole-struct copy of N bytes is load-all-then-store-all; two adjacent
+member copies interleave.** If retail loads every word before storing any,
+it is one struct assignment covering the whole range.
+
+---
+
+## Earlier history
+
 
 > Renamed from `func_8005A9CC` on 2026-09-22 (tools/rename.py). Address 0x8005a9cc.
 
