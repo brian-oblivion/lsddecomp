@@ -272,7 +272,7 @@ void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self)
                                   self->unkBC, self->unkC0);
 }
 
-void func_8004E230(Class86B60 *self, s32 arg1, s32 value)
+void Class86B60__OnTagBValue(Class86B60 *self, s32 arg1, s32 value)
 {
     if (value < 0x18) {
         if (value >= 0x16) {

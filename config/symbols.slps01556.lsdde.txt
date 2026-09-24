@@ -2140,3 +2140,4 @@ Class86B60__BeginMemcardSave = 0x8004DF64; // type:func
 Class86B60__EndMemcardSave = 0x8004E054; // type:func
 Class86B60__UpdateMemcardSaveWithIcon = 0x8004E0E4; // type:func
 Class86B60__UpdateMemcardSaveStatus = 0x8004E1C4; // type:func
+Class86B60__OnTagBValue = 0x8004E230; // type:func

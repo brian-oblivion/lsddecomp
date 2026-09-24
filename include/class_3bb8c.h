@@ -1247,10 +1247,10 @@ struct Class86B60Methods {
      * just filled through a stack out-parameter. */
     void (*slot11C)(Class86B60 *self, s32 arg1, s32 arg2);
     u8 pad120[0x124 - 0x120];
-    void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, Class86B60__SetState (arg1=0)/func_8004E230 (arg1=0x16) */
+    void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, Class86B60__SetState (arg1=0)/Class86B60__OnTagBValue (arg1=0x16) */
     /* +0x128, Class86B60__UpdateMemcardSaveStatus's own first call, `self` only. Return unused. */
     void (*slot128)(Class86B60 *self);
-    void (*slot12C)(Class86B60 *self); /* +0x12C, func_8004E230's own first call, `self` only */
+    void (*slot12C)(Class86B60 *self); /* +0x12C, Class86B60__OnTagBValue's own first call, `self` only */
     void (*slot130)(Class86B60 *self); /* +0x130, Class86B60__Tick's `unk58==2` tail target */
     void (*slot134)(Class86B60 *self); /* +0x134, Class86B60__Tick's `unk58==3` tail target */
     /* +0x138, Class86B60__ForwardIfTagB's forward target, only reached when its own
@@ -1389,7 +1389,7 @@ struct DreamSysViewMethods_3bb8c_c {
     /* Return value forwarded straight to FormatNumberIntoBuffer's own arg0. */
     s32 (*slot1A0)(DreamSysView_3bb8c_c *self, s32 arg1);      /* +0x1A0 */
     u8 pad1A4[0x1A8 - 0x1A4];
-    /* +0x1A8, func_8004E230's own call, `self` only. */
+    /* +0x1A8, Class86B60__OnTagBValue's own call, `self` only. */
     void (*slot1A8)(DreamSysView_3bb8c_c *self);
     /* +0x1AC, Class86B60__UpdateMemcardSaveWithIcon's own call: `self->unkA4->methods->slot1AC(
      * self->unkA4)`. Nonzero return gates a one-byte-zero write into

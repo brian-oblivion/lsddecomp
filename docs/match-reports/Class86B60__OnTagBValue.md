@@ -1,12 +1,14 @@
-# func_8004E230 -- MATCH
+# Class86B60__OnTagBValue -- MATCH
+
+> Renamed from `func_8004E230` on 2026-09-24 (tools/rename.py). Address 0x8004e230.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004E230`: 40/40 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__OnTagBValue`: 40/40 words match.
 
 ## Source
 
 ```c
-void func_8004E230(Class86B60 *self, s32 arg1, s32 value)
+void Class86B60__OnTagBValue(Class86B60 *self, s32 arg1, s32 value)
 {
     if (value < 0x18) {
         if (value >= 0x16) {
