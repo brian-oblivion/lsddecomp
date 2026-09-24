@@ -1,83 +1,27 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
- *
  * class_3bb8c_j -- fourth carved slice of the class_3bb8c block
- * (0x41F84..0x429D4, vram 0x80051784..0x800521D4), 20 functions.
- * Carved round 15 out of the 193-function class_3bb8c_j remainder.
+ * (0x41F84..0x429D4, vram 0x80051784..0x800521D4), 20 functions, carved
+ * round 15. include/class_3bb8c.h is SHARED with every other class_3bb8c_*
+ * slice; header edits here must be strictly ADDITIVE.
  *
- * Blocker profile (head's Gate 1 three-grep screen at carve time):
- *   Obj86ED0__DispatchIndexValue  gp_rel     -- MATCHED round 45 (41/41 words)
- *   Obj86ED0__DispatchLookupValue  gp_rel     -- MATCHED round 45 (45/45 words)
- * The other 18 are clean. This unit owns NO switch jump table.
+ * Two unrelated classes' methods live in this address range:
+ *  - The first six functions (Obj86ED0__AdvanceCountdown ..
+ *    Obj86ED0__DispatchLookupValue, +Get_vtable_Obj86ED0) are `Obj86ED0`
+ *    methods -- D_80086ED0, a class ALREADY shared and fully typed in
+ *    include/class_3bb8c.h, established by class_3bb8c_i.
+ *  - Everything else is `Class86F88_3bb8c_j` (D_80086F88, a BasicClass
+ *    subclass, alloc size 0x54, reached through `func_80052B60()` in
+ *    class_3bb8c_k which already holds this SAME table under the bare
+ *    name `Class86F88`) -- kept LOCAL under a disambiguating suffix
+ *    rather than reusing that name, to avoid a collision in this TU.
  *
- * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
- * Header edits must be strictly ADDITIVE.
- *
- * ROUND 75 CORRECTION (naming pass, track 3) -- the "TWO classes" paragraph
- * that used to stand here misidentified BOTH classes; `tools/classtable.py`
- * settles both by address, not by guess:
- *
- *  - The first six functions (Obj86ED0__AdvanceCountdown/Obj86ED0__ToggleFlag20/Obj86ED0__ResetCountdown/
- *    Obj86ED0__ResetAllAndFinish/Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue) are NOT Obj866E8 methods.
- *    `tools/classtable.py D_80086ED0` places all six at +0x094/+0x098/
- *    +0x09C/+0x0A0/+0x0A4/+0x0A8 of D_80086ED0's 42-slot table, which is
- *    `Obj86ED0` -- ALREADY established, shared and fully typed in
- *    include/class_3bb8c.h by class_3bb8c_i (fields unk10/unk14/unk18/
- *    unk1C/unk20/unk48, dispatch slots slot88..slotA0 and slotA4/slotA8,
- *    all of which that unit's own comments already tie to these same six
- *    functions -- "outside this unit's slice"). This unit's OWN local
- *    `Obj866E8`/`Obj866E8Methods` (tied instead to D_800866E8, a DIFFERENT,
- *    80-slot table legitimately owned by class_3bb8c/class_3bb8c_b/etc.,
- *    `tools/classtable.py D_800866E8` -- none of whose 80 slots hold any of
- *    these six addresses) was simply the wrong shared type reused by
- *    coincidence of matching field offsets; nothing about the matched BYTES
- *    was ever affected (a type name is not codegen), but naming these
- *    `Class866E8__...`/`Obj866E8`-prefixed would have been a round-73-class
- *    "named for an address inside another class's table" error, so these
- *    six now take the already-correct, already-shared `Obj86ED0 *self`
- *    (no header edit: the type and every field they touch already exists,
- *    established by class_3bb8c_i) and an `Obj86ED0__` prefix.
- *  - Everything from Get_vtable_Obj86ED0 on (except Get_vtable_Obj86ED0 itself, below)
- *    is a SEPARATE, much smaller sibling class: alloc size 0x54,
- *    `func_80052B60()` (class_3bb8c_k, MATCHED) is its real table getter,
- *    returning `&D_80086F88`. `tools/classtable.py D_80086F88` places every
- *    one of this unit's remaining functions (Class86F88_3bb8c_j__Class86F88_3bb8c_j/Class86F88_3bb8c_j__Finalize/
- *    Class86F88_3bb8c_j__AddChild/Class86F88_3bb8c_j__RemoveChild/Class86F88_3bb8c_j__RemoveAllChildren/Class86F88_3bb8c_j__NotifyChild/Class86F88_3bb8c_j__ResetCounters/
- *    Class86F88_3bb8c_j__LoadResources/Class86F88_3bb8c_j__ReleaseResources/Class86F88_3bb8c_j__AddChildAndSetState/Class86F88_3bb8c_j__RemoveCachedChildren) at its
- *    ctor/+0x00C/+0x010/+0x014/+0x018/+0x038/+0x040/+0x044/+0x048/+0x04C/
- *    +0x050 slots. class_3bb8c_k's own local view of this SAME table
- *    already carries the name `Class86F88`/`Class86F88Methods` in the
- *    shared header (established from ITS OWN call sites -- see
- *    include/class_3bb8c.h's "HEAD NOTE, round 15 merge" comments on
- *    D_80086ED0 and D_80086F88, which already documented this unit's type
- *    as misnamed and left the correction for a later naming pass). Reusing
- *    that exact name here would collide (both visible in this TU through
- *    the shared header), so this unit's own local, independently-derived
- *    view keeps its own name, corrected to reflect the real table:
- *    `Class86F88_3bb8c_j`/`Class86F88Methods_3bb8c_j` (was `Class86ED0`/
- *    `Class86ED0Methods` -- that name came from Get_vtable_Obj86ED0, which
- *    returns `&D_80086ED0`, i.e. it is OBJ86ED0'S getter, not this class's;
- *    class_3bb8c_i's own header comment already says so). Its base class IS
- *    BasicClass (include/code_8220.h): slots 0x0C/0x10/0x14/0x18 line up
- *    exactly with BasicClassMethods' finalize/addChild/removeChild/
- *    removeAllChildren. Reached via Get_vtable_BasicClass(), which class_3bb8c.h
- *    ALREADY declares (class_3bb8c_f's own local view, `BasicMethods866E8F`)
- *    -- this round additively named those four slots on THAT existing
- *    type rather than adding a second, incompatible local declaration of
- *    the same function (which would conflict in this translation unit).
- *  - Get_vtable_Obj86ED0 is neither: it is OBJ86ED0's own table getter (returns
- *    `&D_80086ED0` directly, per class_3bb8c_i's own header comment), just
- *    DEFINED in this unit. Named `Get_vtable_Obj86ED0` below, matching the
- *    project's `Get_vtable_BasicClass` convention for such accessors.
+ * Both attributions were WRONG before round 75 (this unit's own C
+ * originally used a locally-defined, differently-tabled `Obj866E8` for
+ * the first group, and named the second group after `D_80086ED0` by
+ * mistake). See `Class86F88_3bb8c_j__Class86F88_3bb8c_j.md` for the full
+ * `tools/classtable.py` evidence trail -- this file's own git history has
+ * the mechanical fix (functions renamed via `tools/rename.py`, types
+ * fixed via plain Edit, zero bytes changed throughout).
  */
 #include "common.h"
 #include "class_3bb8c.h"

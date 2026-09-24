@@ -55,10 +55,46 @@
 
 Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`. This is `Class86F88_3bb8c_j`'s
 own constructor -- the occupant of `Class86F88Methods_3bb8c_j::ctor` (+0x008),
-reached indirectly by `New_Class86F88_3bb8c_j`'s `New_Class86F88_3bb8c_j`
-(`func_80052B60()->ctor(self, arg0, arg1)`). Identity established from
-that call site's exact signature match, not from `tools/classtable.py`
-(this vtable is local to the unit, no classtable entry exists for it).
+reached indirectly by `New_Class86F88_3bb8c_j`
+(`func_80052B60()->ctor(self, arg0, arg1)`).
+
+## Class identity (ROUND 75 correction -- read this before the rest of the file)
+
+This unit's local type for `self` was originally named `Class86ED0` and
+described as having vtable `D_80086ED0`. Both were wrong, and the error
+predates this round: `include/class_3bb8c.h`'s own round-15 HEAD NOTEs
+(search "D_80086ED0 and D_80086F88") already documented it and deferred
+the fix. Settled by address, not by guess:
+
+- `func_80051A4C` (this unit, now named `Get_vtable_Obj86ED0`) returns
+  `&D_80086ED0` directly -- but `D_80086ED0` is `Obj86ED0`'s OWN table
+  (42 slots, `tools/classtable.py D_80086ED0`), a DIFFERENT class
+  established independently by class_3bb8c_i. It has NOTHING to do with
+  this constructor's class.
+- This class's REAL table is `D_80086F88`, reached through
+  `func_80052B60()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
+  D_80086F88` places every one of this unit's remaining functions
+  (this ctor at +0x008, plus `Class86F88_3bb8c_j__Finalize`/`AddChild`/
+  `RemoveChild`/`RemoveAllChildren`/`NotifyChild`/`ResetCounters`/
+  `LoadResources`/`ReleaseResources`/`AddChildAndSetState`/
+  `RemoveCachedChildren` at +0x00C/+0x010/+0x014/+0x018/+0x038/+0x040/
+  +0x044/+0x048/+0x04C/+0x050) at those exact slots. So the identity IS
+  resolvable by `classtable.py` after all -- the earlier "no classtable
+  entry exists for it" note was itself part of the same mistake (it
+  looked up the wrong global).
+- class_3bb8c_k's OWN local view of this same D_80086F88 table already
+  carries the name `Class86F88`/`Class86F88Methods` in the shared header,
+  established independently from ITS OWN call sites. Reusing that bare
+  name here would collide (both visible in this translation unit through
+  the shared header), so this unit keeps its own, now-correctly-targeted
+  local name: `Class86F88_3bb8c_j`/`Class86F88Methods_3bb8c_j`.
+
+Nothing about the matched BYTES was ever affected by any of this (a type
+name is not codegen) -- `build-and-verify.sh` and `tools/check-nonmatching.sh`
+stayed green throughout. Only the class attribution and `self`'s type
+name were wrong. See `src/class_3bb8c_j.c`'s file header comment for the
+short version, and `Get_vtable_Obj86ED0.md` for the getter-side half of
+this same correction.
 
 ## Semantics (established with reasonable confidence from the disassembly)
 
