@@ -1442,7 +1442,14 @@ struct Obj86B60 {
                                      Obj86B60__ReleaseSlotElements: giving
                                      ReleaseBasicClassArray's 1st arg and
                                      BMemPMgrFree's arg */
-    Unk68Obj *unk68;             /* +0x068, OBSERVED: Obj86B60__ReleaseTarget,
+    Unk68Obj *listView;           /* +0x068, renamed from unk68, round 78 --
+                                     tier B: Obj86B60__RefreshSlotView feeds
+                                     it a position (slot4C) then either a
+                                     {0x28, count*12} size descriptor
+                                     (slotC0) or hides it (slot50), i.e. it
+                                     is the on-screen widget that shows the
+                                     current slot's item list.
+                                     OBSERVED: Obj86B60__ReleaseTarget,
                                      Obj86B60__CommitElementScroll, Obj86B60__RefreshSlotView (round 12)
                                      -- built once by Obj86B60__SetTarget via
                                      New_ClassEAC0(&D_8008A8E8, &D_8008A8F0,

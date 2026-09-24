@@ -94,7 +94,7 @@ void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
         } while (*list != NULL);
     }
 
-    self->unk68 = New_ClassEAC0(D_8008A8E8, D_8008A8F0, 0);
+    self->listView = New_ClassEAC0(D_8008A8E8, D_8008A8F0, 0);
     a1->unk4 = handle;
 }
 
@@ -110,7 +110,7 @@ void Obj86B60__ReleaseTarget(Obj86B60 *self)
         Unk74Obj *o = self->unk4C->unk4;
         o->methods->slot4(o);
     }
-    self->unk68->methods->slot4(self->unk68);
+    self->listView->methods->slot4(self->listView);
     arr = self->slotElements;
     for (i = 0; i < self->slotCount; arr++) {
         Unk64Elem *elem;
@@ -326,12 +326,12 @@ void Obj86B60__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
     if (a2 != 0) {
         s32 buf[2];
 
-        self->unk68->methods->slot4C(self->unk68, self->unk14, &pos);
+        self->listView->methods->slot4C(self->listView, self->unk14, &pos);
         buf[0] = 0x28;
         buf[1] = count * 12;
-        self->unk68->methods->slotC0(self->unk68, buf);
+        self->listView->methods->slotC0(self->listView, buf);
     } else {
-        self->unk68->methods->slot50(self->unk68);
+        self->listView->methods->slot50(self->listView);
     }
 
     arr = (Unk64Elem **)self->itemLists[idx];
@@ -413,7 +413,7 @@ void Obj86B60__CommitElementScroll(Obj86B60 *self)
 
     ((Unk24Elem *)self->unk4C->unk24[idx])->unk4 = counter;
 
-    self->unk68->methods->slot50(self->unk68);
+    self->listView->methods->slot50(self->listView);
 
     self->unk3C = 1;
     self->methods->slot60(self, 0x10);
