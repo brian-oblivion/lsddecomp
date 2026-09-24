@@ -142,7 +142,7 @@ void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out) {
         out->unk10 = 0;
         out->unk1C = 5;
     } else {
-        divisor = this->unk80 * 3 + 0x14;
+        divisor = this->moodDuration * 3 + 0x14;
         if (this->moodTimer % divisor == 0) {
             this->methods->slot130(this);
             out->unk1C = -2;
@@ -328,7 +328,7 @@ void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__MoodCue50(Entity *this, EntityMoodHandlerArg *out) {
-    if (this->moodTimer < this->unk80 * 5) {
+    if (this->moodTimer < this->moodDuration * 5) {
         if (this->unk84 == 0xF || this->unk84 == 0x46) {
             out->unk10 = 0;
             out->unk1C = 7;

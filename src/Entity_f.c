@@ -61,7 +61,7 @@ void func_800636E4(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0xC;
         out->unk20 = 2;
     }
-    if (this->moodTimer == this->unk80) {
+    if (this->moodTimer == this->moodDuration) {
         out->unk1C = -2;
         this->methods->stopSoundCue(this);
         this->moodState = 1;
@@ -102,7 +102,7 @@ void func_80063874(Entity *this, EntityMoodHandlerArg *out) {
         if (this->unk84 == 5) {
             func_80063C84(out);
         }
-        if (this->moodTimer == this->unk80) {
+        if (this->moodTimer == this->moodDuration) {
             this->methods->slot130(this);
             this->moodState = 0xA;
             this->moodTimer = -1;
@@ -166,7 +166,7 @@ void func_80063BC0(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk84 == 0xA) {
         func_80063CAC(out);
     }
-    if (this->moodTimer == this->unk80 + 0xA) {
+    if (this->moodTimer == this->moodDuration + 0xA) {
         this->methods->stopSoundCue(this);
         this->moodState = 1;
     }
@@ -194,17 +194,17 @@ void func_80063CC8(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 == 0) {
         out->unk1C = 0x12;
     }
-    if (out->unk4 >= this->unk80 - 1) {
+    if (out->unk4 >= this->moodDuration - 1) {
         out->unk4 = -1;
     }
 }
 
 void func_80063D40(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
-    if (out->unk4 == this->unk80 / 2) {
+    if (out->unk4 == this->moodDuration / 2) {
         out->unk1C = 0x12;
     }
-    if (out->unk4 >= this->unk80 - 1) {
+    if (out->unk4 >= this->moodDuration - 1) {
         out->unk4 = -1;
     }
 }
@@ -216,7 +216,7 @@ void func_80063DC8(Entity *this, EntityMoodHandlerArg *out) {
         out->unk30 = 3;
         return;
     }
-    if (this->moodTimer == this->unk80) {
+    if (this->moodTimer == this->moodDuration) {
         this->methods->stopSoundCue(this);
         this->moodState = 1;
         if (rand() & 1) {
@@ -278,7 +278,7 @@ void func_80064078(Entity *this, EntityMoodHandlerArg *out) {
         if (this->unk84 == 0) {
             out->unk10 = 0;
             out->unk1C = 0x16;
-        } else if (this->unk84 == this->unk80 - 1) {
+        } else if (this->unk84 == this->moodDuration - 1) {
             out->unk10 = 0;
             out->unk30 = 0x12;
             this->methods->notifyParents(this, 0xA);
@@ -292,7 +292,7 @@ void func_800641C0(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 10 == 0) {
         out->unk1C = 3;
     }
-    if (this->moodTimer == this->unk80) {
+    if (this->moodTimer == this->moodDuration) {
         this->methods->slot128(this, 1);
     }
     if (this->unk7C == 1) {
@@ -310,7 +310,7 @@ void func_80064294(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 10 == 0) {
         out->unk1C = 0xE;
     }
-    if (this->moodTimer == this->unk80) {
+    if (this->moodTimer == this->moodDuration) {
         this->methods->slot128(this, 1);
         if (this->moodState != 0) {
             if ((rand() & 1) == 0) {
@@ -330,7 +330,7 @@ void func_80064294(Entity *this, EntityMoodHandlerArg *out) {
 void func_80064450(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         this->methods->slot128(this, 3);
-    } else if (this->moodTimer == this->unk80) {
+    } else if (this->moodTimer == this->moodDuration) {
         this->methods->slot128(this, 1);
     }
     if (this->unk7C == 1) {
@@ -343,7 +343,7 @@ void func_800644E8(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot128(this, rand() % 4);
         return;
     }
-    if (this->moodTimer % this->unk80 == 0) {
+    if (this->moodTimer % this->moodDuration == 0) {
         this->methods->slot128(this, rand() % 4);
         out->unk10 = this->methods->getProximityRatio(this);
         out->unk1C = 0x16;

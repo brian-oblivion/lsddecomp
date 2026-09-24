@@ -204,7 +204,7 @@ void Entity__MoodCue05(Entity *this, EntityMoodHandlerArg *out) {
 
 void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
-    if (this->unk84 == this->unk80 / 2) {
+    if (this->unk84 == this->moodDuration / 2) {
         out->unk1C = 0x7;
         out->unk20 = -0x2;
         out->unk30 = 0x3;
@@ -235,7 +235,7 @@ void Entity__MoodCue08(Entity *this) {
 
 void Entity__MoodCue09(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
-    if (out->unk4 % (this->unk80 / 2) == 0) {
+    if (out->unk4 % (this->moodDuration / 2) == 0) {
         out->unk1C = 0xA;
     }
     this->methods->slotC4(this, -0x1E, 0);
@@ -257,7 +257,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
     this->unk48 = -0x14;
     out->unk10 = this->methods->getProximityRatio(this);
     row = 0;
-    if (out->unk4 % (this->unk80 / 2) == 0) {
+    if (out->unk4 % (this->moodDuration / 2) == 0) {
         out->unk1C = 0xA;
         out->unk20 = 1;
     }
@@ -344,7 +344,7 @@ void Entity__MoodCue13(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 == 0) {
         out->unk1C = 0xC;
         this->moodState++;
-    } else if (out->unk4 >= this->unk80 - 1) {
+    } else if (out->unk4 >= this->moodDuration - 1) {
         out->unk4 = -1;
     }
     if (this->moodState == 0x24) {

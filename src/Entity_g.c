@@ -90,7 +90,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotCC(this, -0x200, 0);
     }
     out->unk10 = this->methods->getProximityRatio(this);
-    if (this->unk84 == this->unk80 / 2) {
+    if (this->unk84 == this->moodDuration / 2) {
         out->unk1C = 7;
         out->unk20 = -2;
         out->unk30 = 3;
@@ -359,7 +359,7 @@ trigger:
 merge:
     this->methods->updateScale(this, 1, D_80089E44);
     out->unk10 = this->methods->getProximityRatio(this);
-    if (out->unk4 % (this->unk80 / 2) == 0) {
+    if (out->unk4 % (this->moodDuration / 2) == 0) {
         out->unk1C = 0xA;
         out->unk20 = 1;
     }

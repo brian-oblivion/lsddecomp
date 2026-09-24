@@ -72,7 +72,7 @@ void Entity__MoodCue21(Entity *this, EntityMoodHandlerArg *out) {
     s32 rem;
 
     out->unk10 = this->methods->getProximityRatio(this);
-    half = this->unk80 / 2;
+    half = this->moodDuration / 2;
     rem = out->unk4 % half;
     if (rem == 0) {
         out->unk1C = 0xA;
@@ -163,7 +163,7 @@ void Entity__MoodCue26(Entity *this, EntityMoodHandlerArg *out) {
      * swaps which callee-saved register holds `this` vs `out` for the
      * whole function. */
     do {
-        if (out->unk4 % this->unk80 == 0) {
+        if (out->unk4 % this->moodDuration == 0) {
             out->unk10 = this->methods->getProximityRatio(this);
             out->unk1C = 0x1A;
             __asm__("");
@@ -248,7 +248,7 @@ void Entity__MoodCue31(Entity *this, EntityMoodHandlerArg *out) {
         out->unk30 = 0xD;
         out->unk44 = 0xD;
     }
-    if (this->moodTimer == this->unk80) {
+    if (this->moodTimer == this->moodDuration) {
         this->methods->slot130(this);
         this->methods->notifyParents(this, 0xA);
     }

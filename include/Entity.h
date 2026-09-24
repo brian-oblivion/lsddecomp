@@ -310,7 +310,7 @@ struct Entity {
     /* +0x70 */ Unk70Obj *unk70;       /* read by Entity__MoodCue58 (Entity_d), see Unk70Obj's own comment */
     /* +0x74 */ u8 pad74[0x7C - 0x74];
     /* +0x7C */ s32 unk7C;             /* gate flag read by Entity__MoodCue77 (Entity_e); when 0, that function returns immediately after its unkFC==unk80/slot128/rand() dice-roll block */
-    /* +0x80 */ s32 unk80;             /* read by Entity__MoodCue09/Entity__MoodCue11 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and Entity__MoodCue13 (compared to `out->unk4` as `this->unk80 - 1`) */
+    /* +0x80 */ s32 moodDuration;           /* read by Entity__MoodCue09/Entity__MoodCue11 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and Entity__MoodCue13 (compared to `out->unk4` as `this->moodDuration - 1`) ; round 78 head: renamed from unk80 by type scope (echo, Entity__MoodCue21.md) */
     /* +0x84 */ s32 unk84;             /* compared against a literal (Entity__MoodCue14: `== 0xA`) or against `this->unk80 / 2` (Entity__MoodCue07); also a loop counter in func_80063ED4/func_80064078 (Entity_f), incremented past `< 0x18` while `slot134` is called each iteration */
     /* +0x88 */ s32 unk88;             /* func_80063ED4/func_80064078 (Entity_f): threaded through the slot134 loop as its own running arg1/return value */
     /* +0x8C */ u8 pad8C[0x90 - 0x8C];

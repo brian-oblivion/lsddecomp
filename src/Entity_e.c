@@ -199,7 +199,7 @@ void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
 
 void Entity__MoodCue69(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
-    if (this->unk84 == this->unk80 - 1) {
+    if (this->unk84 == this->moodDuration - 1) {
         out->unk1C = 0x19;
         out->unk20 = -2;
     }
@@ -260,7 +260,7 @@ void Entity__MoodCue73(Entity *this, EntityMoodHandlerArg *out) {
     } else if (out->unk4 == 0x14) {
         out->unk30 = 0xD;
     }
-    if (this->moodTimer == this->unk80 - 1) {
+    if (this->moodTimer == this->moodDuration - 1) {
         this->methods->deactivate(this);
     }
 }
@@ -276,10 +276,10 @@ void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
     if (this->moodState != 0) {
-        if (this->unk80 / 2 < this->moodTimer) {
+        if (this->moodDuration / 2 < this->moodTimer) {
             this->target->methods->slotC4(this->target, 0x80, 0);
         }
-        if (this->moodTimer == this->unk80 - 0x1E) {
+        if (this->moodTimer == this->moodDuration - 0x1E) {
             this->methods->notifyParents(this, 0xA);
         }
     } else {
@@ -300,7 +300,7 @@ void Entity__MoodCue75(Entity *this, EntityMoodHandlerArg *out) {
         out->unk44 = 0x19;
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
     }
-    if (this->moodTimer == this->unk80) {
+    if (this->moodTimer == this->moodDuration) {
         this->methods->slot130(this);
         this->methods->notifyParents(this, 0xA);
     }
@@ -315,7 +315,7 @@ void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out) {
 
     if (this->unkF4 != 0) {
         this->methods->slot12C(this);
-        if (this->unk84 == this->unk80 - 1) {
+        if (this->unk84 == this->moodDuration - 1) {
             this->methods->slot130(this);
             fn = (void (*)(Entity *, s32, void *))this->methods->updateScale;
             table = D_80089DFC;
@@ -336,7 +336,7 @@ void Entity__MoodCue77(Entity *this, EntityMoodHandlerArg *out) {
         out->unk20 = -2;
     }
     if (this->unk7C == 0) {
-        if (this->moodTimer == this->unk80) {
+        if (this->moodTimer == this->moodDuration) {
             this->methods->slot128(this, 1);
             if (rand() & 1) {
                 this->moodState = 0xB;
@@ -392,17 +392,17 @@ void Entity__MoodCue78(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 0x1C;
     }
 
-    if (this->moodTimer == this->unk80 - 1) {
+    if (this->moodTimer == this->moodDuration - 1) {
         this->moodTimer = -1;
     } else {
-        if (this->moodTimer >= this->unk80 / 2 + this->unk80 / 4) {
+        if (this->moodTimer >= this->moodDuration / 2 + this->moodDuration / 4) {
             this->methods->slot12C(this);
-        } else if (this->moodTimer >= this->unk80 / 2) {
-            if (this->moodTimer == this->unk80 / 2) {
+        } else if (this->moodTimer >= this->moodDuration / 2) {
+            if (this->moodTimer == this->moodDuration / 2) {
                 out->unk1C = 0x10;
             }
             this->methods->slotC4(this, 0x6E, 0);
-        } else if (this->moodTimer < this->unk80 / 4) {
+        } else if (this->moodTimer < this->moodDuration / 4) {
             /* nothing */
         } else {
             this->methods->slot130(this);
@@ -458,7 +458,7 @@ void Entity__MoodCue79(Entity *this, EntityMoodHandlerArg *out) {
 extern u8 TRANSLATE_Y_MINUS512[];
 
 void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
-    if (this->moodTimer < this->unk80) {
+    if (this->moodTimer < this->moodDuration) {
         if (this->unk84 != 0) {
             if (this->unk84 == 0x14) {
                 out->unk10 = 0;
