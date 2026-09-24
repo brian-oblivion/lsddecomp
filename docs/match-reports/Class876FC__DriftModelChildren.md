@@ -261,3 +261,14 @@ RatioToFixed12).
 The preserved `#if 0` body (in the .c and above) was renamed with the unit's
 fields and slots; it was pushed through cpp | cc1 once afterwards and still
 compiles.
+
+## NON_MATCHING body promoted, round 74
+
+Moved from `#if 0 ... #endif` (dead, INCLUDE_ASM always live) into the
+`#ifdef NON_MATCHING ... #else INCLUDE_ASM #endif` shape (docs/FINISHING-PLAN.md
+track 1b): field/slot names already matched the round-70 renamed unit, so no
+further renaming was needed. Re-measured with the body compiled live in place
+of `INCLUDE_ASM`: 117/121 words match, no address drift (positional skeleton
+diffs 4, all four inside the function's own window), confirming the figures
+above are current. `./build-and-verify.sh` and `tools/check-nonmatching.sh`
+both green with the body in its NON_MATCHING branch.
