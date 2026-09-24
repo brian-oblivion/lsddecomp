@@ -243,7 +243,7 @@ void Class86B60__BeginMemcardSave(Class86B60 *self)
     self->methods->slot14(self, self->unk10);
 }
 
-void func_8004E054(Class86B60 *self)
+void Class86B60__EndMemcardSave(Class86B60 *self)
 {
     self->methods->slot10(self, self->unkC->unk4);
     self->methods->slot10(self, self->unk10);

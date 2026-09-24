@@ -1,12 +1,14 @@
-# func_8004E054 -- MATCH
+# Class86B60__EndMemcardSave -- MATCH
+
+> Renamed from `func_8004E054` on 2026-09-24 (tools/rename.py). Address 0x8004e054.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004E054`: 36/36 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__EndMemcardSave`: 36/36 words match.
 
 ## Source
 
 ```c
-void func_8004E054(Class86B60 *self)
+void Class86B60__EndMemcardSave(Class86B60 *self)
 {
     self->methods->slot10(self, self->unkC->unk4);
     self->methods->slot10(self, self->unk10);

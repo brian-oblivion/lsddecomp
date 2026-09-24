@@ -44,7 +44,7 @@ this function).
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 - New types `Class86B60UnkCObj_3bb8c_d` (self->unkC's pointee: `unk0` a
-  vtable pointer, `unk4` an opaque value used by `func_8004E054`) and
+  vtable pointer, `unk4` an opaque value used by `Class86B60__EndMemcardSave`) and
   `Class86B60UnkC0Obj_3bb8c_d` / `Class86B60UnkC0ObjMethods_3bb8c_d` (the
   vtable `unk0` points to, `slot78` the only reached slot).
 - `Class86B60::unkC` -- new field, `Class86B60UnkCObj_3bb8c_d *`, carved

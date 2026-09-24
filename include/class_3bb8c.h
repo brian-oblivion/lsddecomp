@@ -1002,7 +1002,7 @@ typedef struct DreamSysView_3bb8c_c DreamSysView_3bb8c_c;
  * self->unkC's pointee. `unk0` is itself a pointer to a small vtable
  * object (`slot78`, reached by Class86B60__RegisterHandlers in a fixed 2-iteration loop
  * alongside a table walk); `unk4` is an opaque value forwarded verbatim
- * by func_8004E054 as an argument to `Class86B60Methods::slot10`.
+ * by Class86B60__EndMemcardSave as an argument to `Class86B60Methods::slot10`.
  */
 typedef struct Class86B60UnkCObj_3bb8c_d Class86B60UnkCObj_3bb8c_d;
 typedef struct Class86B60UnkC0ObjMethods_3bb8c_d Class86B60UnkC0ObjMethods_3bb8c_d;
@@ -1023,7 +1023,7 @@ struct Class86B60UnkC0Obj_3bb8c_d {
 
 struct Class86B60UnkCObj_3bb8c_d {
     Class86B60UnkC0Obj_3bb8c_d *unk0; /* +0x000, Class86B60__RegisterHandlers */
-    void *unk4;                        /* +0x004, func_8004E054: opaque, forwarded verbatim */
+    void *unk4;                        /* +0x004, Class86B60__EndMemcardSave: opaque, forwarded verbatim */
 };
 
 /*
@@ -1122,7 +1122,7 @@ struct Class86B60UnkB0Obj_3bb8c_d {
 /*
  * Class86B60::unkAC's fuller shape -- shares the same `release` slot at
  * `+0x004` as the generic view (established by Class86B60__Dtor), but
- * func_8004E054 also reaches `+0x070`. Same reasoning as
+ * Class86B60__EndMemcardSave also reaches `+0x070`. Same reasoning as
  * `Class86B60UnkB0Obj_3bb8c_d` above: kept a dedicated type rather than
  * assuming `unkA8` shares this fuller interface too, since nothing in
  * this unit ever dispatches a second slot on `unkA8`.
@@ -1141,7 +1141,7 @@ struct Class86B60UnkACObjMethods_3bb8c_d {
      * caller), so all stay `void *`/`s32 *` placeholders. */
     void (*slot6C)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, s32 *arg2,
                    void *arg3, void *arg4, void *arg5, void *arg6); /* +0x06C */
-    void (*slot70)(Class86B60UnkACObj_3bb8c_d *self); /* +0x070, func_8004E054 */
+    void (*slot70)(Class86B60UnkACObj_3bb8c_d *self); /* +0x070, Class86B60__EndMemcardSave */
     /* +0x074, func_8004E1C4's own 2nd call: `(self, D_8008AA10, D_8008AA18,
      * self->unkBC, self->unkC0)` -- the two middle arguments are the
      * VALUES of two `.sdata` globals loaded via `%gp_rel` (not their
@@ -1187,11 +1187,11 @@ struct Class86B60Methods {
     u8 pad000[0x008];
     void (*ctor)(Class86B60 *self, void *dreamSys);  /* +0x008, Class86B60__Class86B60 occupies this slot */
     u8 pad00C[0x010 - 0x00C];
-    /* +0x010, func_8004E054's own first two calls -- called TWICE with
+    /* +0x010, Class86B60__EndMemcardSave's own first two calls -- called TWICE with
      * different arguments (`self->unkC->unk4`, then `self->unk10`), both
      * opaque values forwarded verbatim. */
     void (*slot10)(Class86B60 *self, void *arg1);
-    /* +0x014, func_8004E054's own 3rd call: `(self, self->unkAC)`, the
+    /* +0x014, Class86B60__EndMemcardSave's own 3rd call: `(self, self->unkAC)`, the
      * pointer forwarded opaquely rather than dereferenced by this slot's
      * caller. */
     void (*slot14)(Class86B60 *self, void *arg1);
@@ -1262,8 +1262,8 @@ struct Class86B60Methods {
 struct Class86B60 {
     Class86B60Methods *methods;    /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, Class86B60__RegisterHandlers/func_8004E054 */
-    void *unk10;                     /* +0x010, func_8004E054: opaque, forwarded verbatim */
+    Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, Class86B60__RegisterHandlers/Class86B60__EndMemcardSave */
+    void *unk10;                     /* +0x010, Class86B60__EndMemcardSave: opaque, forwarded verbatim */
     void *unk14;                     /* +0x014, Class86B60__BeginMemcardSave: opaque, forwarded verbatim to unkAC->methods->slot6C */
     u8 pad018[0x02C - 0x018];
     s32 unk2C;                      /* +0x02C, Class86B60__ShowTitleIcon: set to 0x190 */
@@ -1323,7 +1323,7 @@ struct Class86B60 {
     GenericReleaseObj_3bb8c_d *unkA8; /* +0x0A8, Class86B60__Dtor: released iff unkAC != NULL */
     /* +0x0AC, Class86B60__Class86B60: zeroed; Class86B60__Dtor: guards both releases.
      * RETYPED from the minimal `GenericReleaseObj_3bb8c_d *` to the
-     * dedicated `Class86B60UnkACObj_3bb8c_d *` -- func_8004E054 reaches a
+     * dedicated `Class86B60UnkACObj_3bb8c_d *` -- Class86B60__EndMemcardSave reaches a
      * second slot (`+0x070`) on it. Same size, no layout change. */
     Class86B60UnkACObj_3bb8c_d *unkAC;
     /* +0x0B0, Class86B60__DestroyNameField: a third owned sub-object, released
