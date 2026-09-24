@@ -323,7 +323,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **Local COUNT is the lever on a register-identity residue in all THREE directions — delete, merge
   and add — not only delete.** Round 65 worked one unit's three stalls at once: deleting four cached
   tail temps made `func_8002DDBC`'s whole 25-instruction tail byte-exact and fixed two registers four
-  blocks UPSTREAM of the deletion; reusing an already-dead local in `func_8002D1B4` was worth 1700
+  blocks UPSTREAM of the deletion; reusing an already-dead local in `SpuVmKeyOnNow` was worth 1700
   asm-differ points where a fresh one was worth 500; ADDING a hoisted base pointer moved
   `SpuVmAlloc`. The delete direction needs a CALL-crossing live range, so it does not apply to
   leaves. A permuter never merges or deletes locals, so local count is a PARAMETER of its search
@@ -687,7 +687,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   and remember an unpromoted learning does not exist. (a §"\"Unscoreable\" describes a SESSION's
   state", §"Gate 1b's sixth screen is neither SOUND nor COMPLETE")
 - **A recorded LENGTH figure is only comparable within one toolchain generation.** Round 45 filed
-  `func_8002D1B4` at 332 built words; the same preserved body rebuilt in round 65 gives 334, because
+  `SpuVmKeyOnNow` at 332 built words; the same preserved body rebuilt in round 65 gives 334, because
   round 63 adopted `--nop-at-expansion`. Word-match was unaffected, so the two instruments decayed
   differently: a maspsx flag that adds or drops an expansion nop changes every LENGTH figure recorded
   before it and no MATCH figure. A title's "N words short/long" from before a flag landed is not

@@ -1825,3 +1825,7 @@ GetClass876FCMethods = 0x80056F4C; // type:func
 // disc 3.3), position between libc2/strncmp and libsnd/vm_prog (libsnd
 // neighborhood). Superseded game-style func_8002CF18. Round 74 (bravo, track 2).
 SpuVmAlloc = 0x8002CF18; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SpuVmKeyOnNow (312w vs our
+// 316w, disc 3.3), position within the libsnd neighborhood. Superseded
+// game-style func_8002D1B4. Round 74 (bravo, track 2).
+SpuVmKeyOnNow = 0x8002D1B4; // type:func

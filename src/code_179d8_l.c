@@ -32,7 +32,7 @@
  *
  * ROUND 44: THE THREE BELOW ARE ASSIGNABLE AND ARE THIS UNIT'S FRESH GROUND.
  * ~~BLOCKED on nop_mflo_mfhi, which is STILL OPEN -- do NOT spend attempts:~~
- *   func_8002CD08 (132w), func_8002D1B4 (316w), func_8002D8E0 (311w)
+ *   func_8002CD08 (132w), SpuVmKeyOnNow (316w), func_8002D8E0 (311w)
  * nop_mflo_mfhi was RESOLVED in round 42 (`--no-nop-mflo-mfhi`), so the
  * "do NOT spend attempts" directive above is WITHDRAWN.  All three are
  * never-attempted cold ground whose reports were marked REOPENED in round 44.
@@ -248,7 +248,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);
 #endif
 
 /* Shared with func_8002D8E0 below (same two-level entry table, same
- * blend-cascade shape); declared once here since func_8002D1B4 is
+ * blend-cascade shape); declared once here since SpuVmKeyOnNow is
  * ROM-earlier, reused there rather than redeclared. */
 typedef struct {
     u8 pad0[0x74];
@@ -276,14 +276,14 @@ extern u16 D_80090C64;
 extern u16 D_8008E230;
 extern u16 D_8008E234;
 
-/* STALL -- see docs/match-reports/func_8002D1B4.md. Best body reached
+/* STALL -- see docs/match-reports/SpuVmKeyOnNow.md. Best body reached
  * (332/316 built words, 16 words LONG; 33/316 raw word-match, drift-
  * affected) preserved there in #if 0. */
 #ifdef NON_MATCHING
 /* NON_MATCHING: 316/316 words, length exact (201/316 raw word-match; funcdiff
  * insertions/deletions 46/46). Residue: frame SIZE only -- addiu sp,sp,-8
  * against retail's -0x10 -- plus this unit's documented register-identity
- * class (docs/match-reports/func_8002D1B4.md). Hand-derived, plus one
+ * class (docs/match-reports/SpuVmKeyOnNow.md). Hand-derived, plus one
  * permuter hoist (round 65: pan1sq/16383 computed before pan2sq), reviewed
  * as a pure reordering and kept. */
 /* Object holding a per-note "priority"-ish scale byte at +0x18; only field
@@ -304,7 +304,7 @@ extern s16 D_8008EA26[];
 /* Independent 0x10-byte-stride s16 array. */
 extern s16 D_8008D7F4[];
 
-void func_8002D1B4(s32 a0, s32 a1) {
+void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D800902E8Entry *e;
     s32 prio;
     s32 lvl0;
@@ -391,7 +391,7 @@ void func_8002D1B4(s32 a0, s32 a1) {
     D_80090C64 = D_80090C64 & ~D_8008E22C;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D1B4);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmKeyOnNow);
 #endif
 
 extern u8 D_8008EA13;
@@ -420,7 +420,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", func_8002D6A4);
 /* D800902E8Entry, D_800902E8 and the blend-cascade globals
  * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, D_80090C60/64,
  * D_8008E230/234, D_8008D970/98C/9A3) are already declared above, before
- * func_8002D1B4 (ROM-earlier, same shapes) -- reused here, not redeclared. */
+ * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
 extern u16 *D_8006DAD4;

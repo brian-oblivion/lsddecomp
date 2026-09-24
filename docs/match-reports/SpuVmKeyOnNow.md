@@ -1,4 +1,6 @@
-# func_8002D1B4 -- STALL (round 65 revisit: **EXACT LENGTH 316/316** built words, up from round 45's 332-recorded / 334-rebuilt 18-words-LONG; raw word-match **201/316** after the round's one permuter search (195/316 before it) up from 33/316, measured with NO out-of-range drift; first real diff at file 0x1DA2C / vram 0x8002D22C -- unchanged in POSITION but no longer the same thing: it is now only the frame SIZE, `addiu sp,sp,-8` against retail's `-0x10`, per tools/asm-differ/diff.py. Round 45's `volatile s16 D_8008EA26` model is RETRACTED below -- the global is an ordinary non-volatile `s16` declared as an incomplete array)
+# SpuVmKeyOnNow -- STALL (round 65 revisit: **EXACT LENGTH 316/316** built words, up from round 45's 332-recorded / 334-rebuilt 18-words-LONG; raw word-match **201/316** after the round's one permuter search (195/316 before it) up from 33/316, measured with NO out-of-range drift; first real diff at file 0x1DA2C / vram 0x8002D22C -- unchanged in POSITION but no longer the same thing: it is now only the frame SIZE, `addiu sp,sp,-8` against retail's `-0x10`, per tools/asm-differ/diff.py. Round 45's `volatile s16 D_8008EA26` model is RETRACTED below -- the global is an ordinary non-volatile `s16` declared as an incomplete array)
+
+> Renamed from `func_8002D1B4` on 2026-09-24 (tools/rename.py). Address 0x8002d1b4.
 
 > Round 44's stub report (kept below the divider) predicted this would be
 > "promising rather than hard" by analogy with its unit-siblings
@@ -144,7 +146,7 @@ extern s16 D_8008D7F4[];
 ## Best-derived body (332/316 words, 16 words LONG, preserved for the next attempt)
 
 ```c
-void func_8002D1B4(s32 a0, s32 a1) {
+void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D800902E8Entry *e;
     s32 prio;
     s32 lvl0;
@@ -231,7 +233,7 @@ void func_8002D1B4(s32 a0, s32 a1) {
 ```
 
 **The opening ~30 instructions match retail BYTE-FOR-BYTE** (confirmed with
-`tools/asm-differ/diff.py func_8002D1B4`) once the multiply order was fixed
+`tools/asm-differ/diff.py SpuVmKeyOnNow`) once the multiply order was fixed
 to an explicit `prio` intermediate (see Attempts) -- including both
 magic-multiply divisions, the two-level `D_800902E8` entry lookup, and the
 `id != 0x21` early-out branch with its per-note scaling. The gap starts at
@@ -266,7 +268,7 @@ the STACK FRAME ALLOCATION.
 3. **`D_8008EA26`'s per-read signedness may not be uniform across the
    function** -- the very first read (feeding `chanIdx`) is confirmed `lh`,
    but a full per-call-site audit of the ~5 raw `D_8008EA26` references in
-   `asm/nonmatchings/code_179d8_l/func_8002D1B4.s` (rather than trusting one
+   `asm/nonmatchings/code_179d8_l/SpuVmKeyOnNow.s` (rather than trusting one
    blanket `volatile s16` declaration to cover all of them) was not
    completed this round -- next concrete step.
 
@@ -274,7 +276,7 @@ the STACK FRAME ALLOCATION.
 
 Within the 30-attempt cap (9 real builds used):
 1. m2c-seeded skeleton (`tools/m2ctx.py code_179d8_l --sig 'void
-   func_8002D1B4(s32 a0, s32 a1)' --run`) transcribed directly, entry-field-
+   SpuVmKeyOnNow(s32 a0, s32 a1)' --run`) transcribed directly, entry-field-
    first multiply order (`D_8008E970->unk18 * 0x3FFF * D_8008EA10 / 16129`):
    compiled, but the very FIRST instruction loaded `D_8008EA10` before
    `D_8008E970`/`unk18` -- opposite of retail. **Root cause confirmed via
@@ -320,7 +322,7 @@ Within the 30-attempt cap (9 real builds used):
 **A lever that fixes one function's frame-allocation gap can make a
 structurally-near-identical sibling's gap WORSE, even within the same unit
 and even when both chain the same family of magic-multiply divisions.**
-`func_8002D8E0` and `func_8002D1B4` share the two-level `D_800902E8`
+`func_8002D8E0` and `SpuVmKeyOnNow` share the two-level `D_800902E8`
 lookup, the exact same three-stage blend cascade, and the same
 `D_8008E8C0` clamp shape, and both have unresolved frame-size/position
 gaps -- but marking the chained-division intermediates `volatile` (which
@@ -355,7 +357,7 @@ restructuring reached it this round.
 
 ---
 
-# (round 44, superseded) func_8002D1B4 -- ASSIGNABLE, NEVER ATTEMPTED (316w, no figures existed before round 45)
+# (round 44, superseded) SpuVmKeyOnNow -- ASSIGNABLE, NEVER ATTEMPTED (316w, no figures existed before round 45)
 
 > **Round 44, head.** No length, word-match or first-diff figure is quoted here
 > because NONE HAS EVER BEEN MEASURED -- this function has never been compiled.
@@ -378,7 +380,7 @@ FOLLOWING lines -- the direction is load-bearing and every reimplementation so
 far has inverted it):
 
 ```sh
-grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_l/func_8002D1B4.s \
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_179d8_l/SpuVmKeyOnNow.s \
   | grep -E '\b(mult|multu|div|divu)\b'
 ```
 
@@ -552,7 +554,7 @@ extern s16 D_8008EA26[];
 /* Independent 0x10-byte-stride s16 array. */
 extern s16 D_8008D7F4[];
 
-void func_8002D1B4(s32 a0, s32 a1) {
+void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D800902E8Entry *e;
     s32 prio;
     s32 lvl0;
@@ -678,7 +680,7 @@ source multiplies is what produced round 45's duplicated `pan1sq`.
 ### Gate 3, all three checks, run BEFORE the search (PARALLEL-RUNS.md §3.5)
 
 - **Check 1 (correctness):** the scaffold compiles and scores.
-  `tools/setup-permuter.sh func_8002D1B4 <seed>` built cleanly; base score
+  `tools/setup-permuter.sh SpuVmKeyOnNow <seed>` built cleanly; base score
   **4470**, `Stack Differences: 0 (1)`, `Branch Differences: 0 (1)`,
   `Register Differences: 42 (5)`, `Reorderings: 1 (60)`.
 - **Check 2 (cost):** the scaffold's `--debug --stack-diffs`
@@ -705,7 +707,7 @@ basis, and the outcome (below) supports it — the search found a real lever.**
 
 `-j 6 --stop-on-zero --best-only`, bounded to 1500s, which it hit
 (`timeout` exit 124). Zero `score = 0` hits. Best candidate **2065** from a
-base of 4470/4325, at `permuter-work/func_8002D1B4/output-2065-1`.
+base of 4470/4325, at `permuter-work/SpuVmKeyOnNow/output-2065-1`.
 
 ### The candidate, and what translating it took
 
@@ -757,7 +759,7 @@ Same declarations as the previous preserved body (`D_8008EA26` an incomplete
 array, NOT volatile).
 
 #if 0
-void func_8002D1B4(s32 a0, s32 a1) {
+void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D800902E8Entry *e;
     s32 prio;
     s32 tmp;

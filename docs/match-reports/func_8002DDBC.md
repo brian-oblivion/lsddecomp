@@ -585,7 +585,7 @@ spending the session's one search where it can bite.
 ### Preserved body (107/112 words, 5 short — rebuild this FIRST next time)
 
 Needs, in addition to the unit's existing declarations before
-`func_8002D1B4` and `func_8002D8E0` (`D_8008D7F0`, `D_8008D7F2`,
+`SpuVmKeyOnNow` and `func_8002D8E0` (`D_8008D7F0`, `D_8008D7F2`,
 `D_8008D970`, `D_8008D98C`, `D_8008D9A3`, `D_8008E228`, `D_8008E22C`,
 `D_80090C60`, `D_80090C64`, `D_8008E9D0`, `D_8006DAD4`), one extra:
 

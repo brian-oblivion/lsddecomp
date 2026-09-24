@@ -824,7 +824,7 @@ oracle:
 
 *(Incidental, worth knowing for anyone else splicing this body back: the
 unit's own later `extern u8 D_8008D9A3[];` and `extern u8 D_8008E9D0;` —
-which exist for `func_8002D1B4`'s and `func_8002DDBC`'s preserved bodies —
+which exist for `SpuVmKeyOnNow`'s and `func_8002DDBC`'s preserved bodies —
 CONFLICT with this function's `Rec34Flag`-typed view and must be commented
 out while it is live. The first build attempt failed on exactly that, and
 `funcdiff.py` refused the number with `WARNING: STALE BUILD` rather than
@@ -922,7 +922,7 @@ throughout:
   (`move $a1,$a2` at `1d7d8`, `move $v1,$v0` at `1d868`): retail loads into
   one register and copies to another before using it, i.e. one more pseudo
   than the built body has. Given how the local-count lever paid on
-  `func_8002DDBC` and `func_8002D1B4` this same round, **this is the first
+  `func_8002DDBC` and `SpuVmKeyOnNow` this same round, **this is the first
   thing to try next: a named temp for the loaded priority/tertiary value.**
 - **`idx++` placement in the counter loop** (retail after the stride
   computation, built at the loop head) and the `D_8008EA1B` load position in
@@ -932,7 +932,7 @@ throughout:
 
 ~18 build/oracle iterations. Inside the 30-attempt cap; the last improvement
 was three iterations before the stop. No permuter search was spent here: the
-session's one search went to `func_8002D1B4`, and round 37's search on THIS
+session's one search went to `SpuVmKeyOnNow`, and round 37's search on THIS
 function is still citable for what it found, though note that what it found
 is now understood as padding rather than a fix.
 
@@ -1086,7 +1086,7 @@ preserving:
 - **The `Rec34*`-typed struct declarations were replaced with plain pointer
   arithmetic on `u8[]`.** `src/code_179d8_l.c` already declares
   `D_8008D9A3` and `D_8008E9D0` (plain `u8[]`/`u8`) for `func_8002DDBC`'s and
-  `func_8002D1B4`'s own preserved bodies, later in the SAME file; a
+  `SpuVmKeyOnNow`'s own preserved bodies, later in the SAME file; a
   struct-typed re-declaration of `D_8008D9A3` here would be a `conflicting
   types` error under `-DNON_MATCHING`, which compiles the whole unit at
   once. Declared `D_8008D9A3`/`D_8008D98E`/`D_8008D98A`/`D_8008D9A0`/
