@@ -1,13 +1,15 @@
-# func_800602AC -- MATCHED (70/70 words)
+# Entity__MoodCue41 -- MATCHED (70/70 words)
+
+> Renamed from `func_800602AC` on 2026-09-24 (tools/rename.py). Address 0x800602ac.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler, same
 family as `Entity_c.c`'s `func_8005EF54`/`func_8005EFF4`/etc: `void
-func_800602AC(Entity *this, EntityMoodHandlerArg *out)`.
+Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
     s32 rv;
     s16 *tablePtr;
 
@@ -21,7 +23,7 @@ void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0xE) {
         if ((this->unkFC & 3) == 0) {
             rv = rand();
-            tablePtr = &D_80089EA2;
+            tablePtr = &sScaleTemplateZDenom;
             *tablePtr = rv % 32 + 1;
             this->methods->slot48(this, 1, (u8 *)tablePtr - 0xA);
         }
@@ -50,7 +52,7 @@ void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
   literals, and the FIRST-computed one goes on the stack as the 5th
   argument. Reading argument order off computation order is wrong; read it
   off which register/slot each value lands in.
-- The `D_80089EA2` pointer must be computed AFTER the second `rand()` call in
+- The `sScaleTemplateZDenom` pointer must be computed AFTER the second `rand()` call in
   source order, not before -- computing it first forces the compiler to keep
   it alive across the call in a callee-saved register (`s1`), where retail
   keeps it in caller-saved `a2` because nothing calls between computing the
@@ -58,9 +60,9 @@ void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
   family as "cache a vtable pointer before an intervening call" but the
   observation runs the other way: compute the ADDRESS after the call it
   would otherwise have to survive.
-- `D_80089EA2 - 0xA` (byte-pointer arithmetic) resolves to `D_80089E8C + 0xC`
+- `sScaleTemplateZDenom - 0xA` (byte-pointer arithmetic) resolves to `SCALE_X3 + 0xC`
   numerically (`asm/data/79528.data.s`), but retail's relocation is against
-  `D_80089EA2` specifically (own `lui`/`addiu` pair), so the C must reference
+  `sScaleTemplateZDenom` specifically (own `lui`/`addiu` pair), so the C must reference
   that symbol with a negative offset, not the neighbouring array with a
   positive one -- same final address, different symbol reference, and only
   one of them reproduces retail's bytes.
@@ -81,3 +83,15 @@ void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
   the LATER stack slot.** Do not assume the instruction stream's
   left-to-right literal order matches the parameter list; read each
   literal's actual destination register/slot.
+
+## Naming
+
+`Entity__MoodCue41` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 41, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.

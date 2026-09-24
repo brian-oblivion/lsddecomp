@@ -1,12 +1,14 @@
-# func_80060148 -- MATCHED (89/89 words)
+# Entity__MoodCue40 -- MATCHED (89/89 words)
+
+> Renamed from `func_80060148` on 2026-09-24 (tools/rename.py). Address 0x80060148.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler:
-`void func_80060148(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue40(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue40(Entity *this, EntityMoodHandlerArg *out) {
     void *table = NULL;
 
     if (out->unk4 % 7 == 0) {
@@ -18,11 +20,11 @@ void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0xC8) {
         table = ROTATION_YAW_MINUS90;
     } else if (this->unkFC == 0x190) {
-        table = D_80089C7C;
+        table = ROTATION_YAW_PLUS180;
     } else if (this->unkFC == 0x258) {
         table = ROTATION_YAW_PLUS90;
     } else if (this->unkFC == 0x320) {
-        table = D_80089C7C;
+        table = ROTATION_YAW_PLUS180;
         this->unkFC = -1;
     }
     if (table != NULL) {
@@ -59,7 +61,7 @@ describes the score, not the defect count").
   first statement) fixed this in one change, dropping the drift to ~79KB
   (the size of the two remaining residues below).
 - **Residue #2: two branches assign the textually IDENTICAL expression
-  `table = D_80089C7C;`** (the `unkFC == 0x190` and `unkFC == 0x320`
+  `table = ROTATION_YAW_PLUS180;`** (the `unkFC == 0x190` and `unkFC == 0x320`
   cases). GCC's cross-jump pass tail-merged them into ONE shared code block
   reached from both branches, which retail's bytes do NOT do -- retail
   keeps two separate, byte-identical `lui`/`addiu` pairs, one per branch.
@@ -73,10 +75,10 @@ describes the score, not the defect count").
   candidates may be worth retrying there too.
 - **Residue #3, and it turned out to make the barrier from #2
   unnecessary: statement order inside the `unkFC == 0x320` arm.** Retail
-  computes `table = D_80089C7C;` (the `lui`/`addiu` pair) BEFORE storing
+  computes `table = ROTATION_YAW_PLUS180;` (the `lui`/`addiu` pair) BEFORE storing
   `this->unkFC = -1;`, even though the natural narrative order (validate
   the state, THEN update it) suggests writing the store first. My first
-  attempt wrote `this->unkFC = -1; table = D_80089C7C;` and only the store
+  attempt wrote `this->unkFC = -1; table = ROTATION_YAW_PLUS180;` and only the store
   instruction's position was wrong (3 words off from retail, matching
   score 86/89). Swapping the two statements' order fixed it exactly to
   89/89 -- and, checked afterward, ALSO made the `__asm__("")` barrier
@@ -97,7 +99,7 @@ describes the score, not the defect count").
 - **A `void*`/pointer local that must survive an intervening vtable call
   needs its INITIALIZER at the point of declaration, not a separate
   assignment statement positioned after the call** -- same "eager
-  initialization" family as `func_80061070`'s `mood` field-read, but for a
+  initialization" family as `Entity__MoodCue55`'s `mood` field-read, but for a
   local variable's default value rather than a struct field read. The tell
   is identical: a frame missing one callee-saved register pair versus
   retail, and a `funcdiff` "differs outside range" count in the tens- or
@@ -106,3 +108,15 @@ describes the score, not the defect count").
   OTHER residue in the same function** -- a later fix (here, statement
   reordering) can make an earlier barrier redundant, and the clean version
   without it is the one to commit.
+
+## Naming
+
+`Entity__MoodCue40` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 40, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.

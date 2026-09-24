@@ -11,7 +11,7 @@ void func_8005FDFC(Entity *this) {
 
     if (this->unk44 == 0) {
         roll = rand();
-        arg2 = D_80089E38;
+        arg2 = SCALE_SIX;
         if ((roll & 1) != 0) {
             arg2 = SCALE_DOUBLE;
         }
@@ -27,7 +27,7 @@ void func_8005FDFC(Entity *this) {
 
 ## Notes
 
-- **Attempt 1 (stored `arg2 = D_80089E38;` BEFORE calling `rand()`) scored
+- **Attempt 1 (stored `arg2 = SCALE_SIX;` BEFORE calling `rand()`) scored
   2/51 with an oversized frame** (retail saves only `$s0`/`$ra` in a 0x20
   frame; the first attempt added a spurious `$s1` save). Cause: with the
   default pointer assigned before `rand()`, that pointer local has to

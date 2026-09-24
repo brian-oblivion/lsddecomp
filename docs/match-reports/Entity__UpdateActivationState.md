@@ -316,7 +316,7 @@ returns); here there is no call at either merge site, only a plain
 for a type change to perturb. Confirmed empirically rather than assumed.
 
 **This function's residue, precisely characterized against
-`func_80061778`'s (this same round's OTHER tail-merge assignment) for the
+`Entity__MoodCue115`'s (this same round's OTHER tail-merge assignment) for the
 coordinator's discriminator question:** `Entity__UpdateActivationState`'s residue is a
 **whole-statement, single-level merge-count question** -- exactly THREE
 predecessors reach an identical trivial statement (`doDetach = 1;`, one

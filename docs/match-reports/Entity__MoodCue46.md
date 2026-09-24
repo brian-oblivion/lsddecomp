@@ -1,12 +1,14 @@
-# func_80060800 -- MATCHED (67/67 words)
+# Entity__MoodCue46 -- MATCHED (67/67 words)
+
+> Renamed from `func_80060800` on 2026-09-24 (tools/rename.py). Address 0x80060800.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler:
-`void func_80060800(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue46(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80060800(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue46(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     if (this->unkFC == 0) {
@@ -18,7 +20,7 @@ void func_80060800(Entity *this, EntityMoodHandlerArg *out) {
         } else if (r != 1) {
             goto skip48;
         }
-        this->methods->slot48(this, 1, D_80089E38);
+        this->methods->slot48(this, 1, SCALE_SIX);
     }
 skip48:
     if (out->unk4 == 0) {
@@ -81,3 +83,15 @@ skip48:
   adjacent to a following shared block can fall through into it for free;
   the other arm always needs an explicit jump. Guess wrong and you pay for
   a jump retail's bytes don't have.
+
+## Naming
+
+`Entity__MoodCue46` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 46, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.

@@ -1,4 +1,6 @@
-# func_80061400
+# Entity__MoodCue58
+
+> Renamed from `func_80061400` on 2026-09-24 (tools/rename.py). Address 0x80061400.
 
 **Unit:** Entity_d · **Size:** 222 words · **Status:** MATCHED (222/222 words)
 
@@ -20,7 +22,7 @@ respectively and clearing `unkFC`), `0xD` (an `unkFC`-range dispatch into
 ## Derivation
 
 Read directly off the disassembly (module family already established by
-`func_80061198`, same file). Verified each `this->unk44 == 0x*` group's
+`Entity__MoodCue57`, same file). Verified each `this->unk44 == 0x*` group's
 register reload pattern before writing the C: the `0xB`/`0xC` pair shares one
 `lw $v1, 0x44($s0)` (confirmed no reload between them in the raw bytes) — so
 they're a genuine `if`/`else if`; the `0xD` and `0xE` groups each carry their
@@ -77,7 +79,7 @@ full project build):**
    to try to force the `unk94` load between the remainder computation and the
    compare — this fixed the *timing* (unk94 landed in the right slot,
    reusing `$a0`) but reintroduced the register-identity swap from
-   `func_80061198`'s `%3` residue (`sra $v1`/`mfhi $v0` instead of
+   `Entity__MoodCue57`'s `%3` residue (`sra $v1`/`mfhi $v0` instead of
    `sra $v0`/`mfhi $v1`, etc.) in the `%40` expansion, because `rem` as a
    named local is exactly the shape that residue is about. Net loss.
 
@@ -115,7 +117,7 @@ which instruction-scheduling window the receiver's load competes in.
   caller, alongside the callers already on record. No type or name changed
   on any of them.
 
-`extern u8 D_80089D24[];` added to `src/Entity_d.c` (file-local, same
+`extern u8 ROTATION_ZMINUS90[];` added to `src/Entity_d.c` (file-local, same
 convention as this unit's other raw data-table externs).
 
 ## Proposed learning
@@ -131,7 +133,7 @@ convention as this unit's other raw data-table externs).
   `recv->m(recv, expr, ...);` before reaching for an intermediate local
   timed to "fix" the load position — the local's presence (not just its
   position) is often the thing perturbing the schedule, per this project's
-  established `%3`/`%N` local-vs-inline lesson from `func_80061198`, now
+  established `%3`/`%N` local-vs-inline lesson from `Entity__MoodCue57`, now
   confirmed to generalize past pure `field = expr` assignments to full call
   expressions.
 - **Before writing up a "which `if`-chain is it" derivation, check whether
@@ -141,3 +143,12 @@ convention as this unit's other raw data-table externs).
   independent top-level `if`s, even when the groups are textually adjacent
   and superficially look like one chain (four `this->unk44 == 0x*` checks in
   a row, here, are actually two `else if` plus two independent `if`s).
+
+## Naming
+
+`Entity__MoodCue58` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 58, read directly from
+`disk/SLPS_015.56`. Mechanics established (mood-tick sound-cue-set
+callback); which dream object owns the row is not.

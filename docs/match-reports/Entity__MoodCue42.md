@@ -1,12 +1,14 @@
-# func_800603C4 -- MATCHED (70/70 words)
+# Entity__MoodCue42 -- MATCHED (70/70 words)
+
+> Renamed from `func_800603C4` on 2026-09-24 (tools/rename.py). Address 0x800603c4.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler:
-`void func_800603C4(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800603C4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out) {
     s32 divisor;
 
     if (this->unkFC < 0x14) {
@@ -48,3 +50,15 @@ match once the mood-dispatch family's established shape (three-way dispatch
 on a small integer field, `this->methods->slotNN(this)` calls, `out->unkNN`
 writes) was recognized from the sibling functions already matched in
 `Entity_c.c`.
+
+## Naming
+
+`Entity__MoodCue42` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 42, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.

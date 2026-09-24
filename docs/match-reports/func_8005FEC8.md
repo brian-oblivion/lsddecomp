@@ -59,17 +59,17 @@ tie-breaker, not reading a fact off retail. That is what the rule is for and
 the original call was reasonable; this note records that the tie-breaker has
 since been overruled by an actual measurement.
 
-The measurement is `func_80061778` (Entity_d), a two-round stall that closes
+The measurement is `Entity__MoodCue115` (Entity_d), a two-round stall that closes
 198/198 the moment `slotCC` is `void`: retail tail-merges its `slotCC` call
 with sibling `slotC4`/`slot134` calls that are `void`, and GCC 2.6.3 cannot
 cross-jump a `(set (reg v0) (call ...))` against a bare `(call ...)`, so the
 `s32` typing cost that function 6 words. Full mechanism and the general lever
-are in `docs/match-reports/func_80061778.md`.
+are in `docs/match-reports/Entity__MoodCue115.md`.
 
 **The gap in this report's original verification is the transferable part.**
 The retype was checked against "every OTHER known caller's compiled output" —
 but that check recompiled `Entity_b.c` only, because `Entity__MoodCue11` was the
-only *known* caller at the time. `func_80061778` was still `INCLUDE_ASM`, so
+only *known* caller at the time. `Entity__MoodCue115` was still `INCLUDE_ASM`, so
 it was not a known caller and could not be checked, and an `INCLUDE_ASM`
 function contributes retail's own bytes and therefore cannot register the
 damage. **A shared-slot retype verified against the callers that happen to be

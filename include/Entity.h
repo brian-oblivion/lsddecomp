@@ -75,7 +75,7 @@ struct EntityMethods {
     /* +0xC0 */ u8 padC0[0xC4 - 0xC0];
     /* +0xC4 */ void (*slotC4)(Entity *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue10/Entity__MoodCue13/Entity__MoodCue14/Entity__MoodCue00/etc (all discard the result) and func_8005FA64 (its tail call) -- same shared BasicClass-inherited slot as Class65650Methods.slotC4 in code_55dd4.h (both tables hold BaseObjO__func_5748c at +0xC4, confirmed with tools/classtable.py). CLAUDE.md's "one-line wrapper" rule would normally push this toward s32-returning on func_8005FA64's strength alone -- but retyping it to s32 changes Entity__MoodCue00's OWN codegen (verified: GCC stops tail-merging its two identical slotC4(this,0x32,0)-reached-from-different-branches call sites, costing that ALREADY-MATCHED function 4 words and shifting every later function in the unit). Entity__MoodCue00's own bytes are the stronger, more direct evidence and they require void. Kept void; func_8005FA64 is void too, with a bare statement call, not `return`. (slotCC below faced the same question and was independently verified NOT to have this problem.) */
     /* +0xC8 */ void (*slotC8)(Entity *self, s32 arg1, s32 arg2); /* called by func_8005FC58 (discards the result); same (self,arg1,arg2) shape as slotC4/slotCC, no other caller yet so kept void by default like slotC4 */
-    /* +0xCC */ void (*slotCC)(Entity *self, s32 arg1, s32 arg2); /* RETYPED BACK s32 -> void, round 68, and this one is settled by retail's own bytes rather than by a convention. It had been s32 on the strength of func_8005FEC8 (Entity_c) being a lone `return this->methods->slotCC(this, -0x5A, 0);` wrapper -- CLAUDE.md's "one-line wrapper" rule. But func_8005FEC8 compiles BYTE-IDENTICALLY as `void func_8005FEC8(Entity *this) { this->methods->slotCC(this, -0x5A, 0); }`, so its bytes were never evidence either way, while func_80061778 (Entity_d) has POSITIVE evidence for void: retail tail-merges its slotCC call with sibling slot134/slotC4 calls that are void, and GCC 2.6.3 cannot cross-jump a `(set v0 (call ...))` against a bare `(call ...)`. s32 cost that function 6 words and was the whole of its two-round stall; void matches it 198/198. Same mechanism as slotC4 above, measured in the opposite direction -- see docs/match-reports/func_80061778.md. */
+    /* +0xCC */ void (*slotCC)(Entity *self, s32 arg1, s32 arg2); /* RETYPED BACK s32 -> void, round 68, and this one is settled by retail's own bytes rather than by a convention. It had been s32 on the strength of func_8005FEC8 (Entity_c) being a lone `return this->methods->slotCC(this, -0x5A, 0);` wrapper -- CLAUDE.md's "one-line wrapper" rule. But func_8005FEC8 compiles BYTE-IDENTICALLY as `void func_8005FEC8(Entity *this) { this->methods->slotCC(this, -0x5A, 0); }`, so its bytes were never evidence either way, while Entity__MoodCue115 (Entity_d) has POSITIVE evidence for void: retail tail-merges its slotCC call with sibling slot134/slotC4 calls that are void, and GCC 2.6.3 cannot cross-jump a `(set v0 (call ...))` against a bare `(call ...)`. s32 cost that function 6 words and was the whole of its two-round stall; void matches it 198/198. Same mechanism as slotC4 above, measured in the opposite direction -- see docs/match-reports/Entity__MoodCue115.md. */
     /* +0xD0 */ void (*slotD0)(Entity *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue16 as slotD0(this, -0x176, rand() % 2), and by Entity__MoodCue11 as slotD0(this, this->unk48, 0) */
     /* +0xD4 */ u8 padD4[0x10C - 0xD4];
     /* +0x10C */ void (*slot10C)(Entity *self, s32 arg1);  /* called by Entity__InitState as slot10C(this, 0x42), unconditionally */
@@ -83,8 +83,8 @@ struct EntityMethods {
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by Entity__StopSoundCue */
     /* +0x118 */ u8 pad118[0x128 - 0x118];
     /* +0x128 */ void (*slot128)(Entity *self, s32 arg1); /* called by func_80062A40 (Entity_e) as slot128(this, 1); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
-    /* +0x12C */ void (*slot12C)(Entity *self);           /* called by func_800603C4 */
-    /* +0x130 */ void (*slot130)(Entity *self);           /* called by Entity__StopSoundCue, func_800603C4 */
+    /* +0x12C */ void (*slot12C)(Entity *self);           /* called by Entity__MoodCue42 */
+    /* +0x130 */ void (*slot130)(Entity *self);           /* called by Entity__StopSoundCue, Entity__MoodCue42 */
     /* +0x134 */ s32 (*slot134)(Entity *self, s32 arg1, s32 arg2); /* called by func_80063ED4 and func_80064078 (both Entity_f) in an identical loop, `this->unk88 = slot134(this, this->unk88, 0)` while `this->unk84++ < 0x18` -- value-returning, not void */
     /* +0x138 */ u8 pad138[0x144 - 0x138];
     /* +0x144 */ s32 (*slot144)(Entity *self, Unk94Obj *arg1); /* called by Entity__IsTargetInRange, as slot144(this, this->target) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->target in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
@@ -135,7 +135,7 @@ struct Unk100Methods {
     /* +0x50 */ void (*slot50)(Unk100Obj *self);                           /* called by Entity__GetOrCreateUnk100 */
     /* +0x54 */ u8 pad54[0xD0 - 0x54];
     /* +0xD0 */ void (*slotD0)(Unk100Obj *self, void *arg1);                /* called by Entity__GetOrCreateUnk100 */
-    /* +0xD4 */ void (*slotD4)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by func_80061198 (Entity_d) as slotD4(this->unk100, this->unk50, 4, 0), and by func_80063874 (Entity_f) as slotD4(this->unk100, this->unk50, 7, 0) */
+    /* +0xD4 */ void (*slotD4)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by Entity__MoodCue57 (Entity_d) as slotD4(this->unk100, this->unk50, 4, 0), and by func_80063874 (Entity_f) as slotD4(this->unk100, this->unk50, 7, 0) */
     /* +0xD8 */ void (*slotD8)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by func_80063874 (Entity_f) as slotD8(this->unk100, this->unk50, 0, 0); return value unused at this, its only known call site */
 };
 
@@ -146,7 +146,7 @@ struct Unk100Obj {
 extern Unk100Obj *New_Class6E99C(void *name, s32 arg1, s32 arg2);
 
 /* Already matched in Entity.c (not INCLUDE_ASM), but not previously called
- * from outside that unit -- func_80061198 (Entity_d) is its first cross-unit
+ * from outside that unit -- Entity__MoodCue57 (Entity_d) is its first cross-unit
  * caller, hence the extern here rather than only a file-local definition. */
 extern Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2, void *arg3, s32 arg4);
 
@@ -162,26 +162,26 @@ extern Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2
  * share a numeric offset; do not conflate them. */
 struct Unk94Methods {
     u8 pad000[0x44];
-    void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by func_80060B34 (Entity_d) as slot44(target, 1, ROTATION_YAW_MINUS90); return value unused at this, its only known call site */
+    void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by Entity__MoodCue49 (Entity_d) as slot44(target, 1, ROTATION_YAW_MINUS90); return value unused at this, its only known call site */
     u8 pad048[0x94 - 0x48];
     void (*slot94)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80065238 (Entity_g), twice, as slot94(target, 0, 2) and slot94(target, 0, 7); return value unused at either call site */
     u8 pad098[0xB8 - 0x98];
-    void (*slotB8)(Unk94Obj *self, void *arg1); /* called by func_80060B34 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
+    void (*slotB8)(Unk94Obj *self, void *arg1); /* called by Entity__MoodCue49 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
     u8 pad0BC[0xC4 - 0xBC];
     void (*slotC4)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80062730 (Entity_e) as slotC4(target, 0x80, 0) and slotC4(target, -N, 1); return value unused at both known call sites, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
-    void (*slotC8)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80061400 (Entity_d) as slotC8(target, (this->unkFC % 40 < 0x14) ? -5 : 5, 0); return value unused at this, its only known call site */
-    void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_8006090C (Entity_d) as slotCC(target, -0x64, 0) and func_80061400 (Entity_d) as slotCC(target, -0x14, 0); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
+    void (*slotC8)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue58 (Entity_d) as slotC8(target, (this->unkFC % 40 < 0x14) ? -5 : 5, 0); return value unused at this, its only known call site */
+    void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue47 (Entity_d) as slotCC(target, -0x64, 0) and Entity__MoodCue58 (Entity_d) as slotCC(target, -0x14, 0); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
     u8 pad0D0[0x100 - 0xD0];
     s32 (*slot100)(Unk94Obj *self);            /* called by Entity__MoodCue11, compared against 0 -- value-returning, not void */
     u8 pad104[0x120 - 0x104];
     s32 (*slot120)(Unk94Obj *self, s32 arg1, s32 arg2, void *arg3, s32 arg4); /* called by Entity__IsNearTarget as a TAIL CALL, `return this->target->methods->slot120(this->target, 0, arg2<<11, &localVec, distValue)` -- value-returning per CLAUDE.md's one-line-wrapper rule, no positive evidence of void */
     u8 pad124[0x130 - 0x124];
-    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by Entity__MoodCue01 and func_80061400 (Entity_d), as slot130(target, 0), and by func_80061778 (Entity_d) as slot130(target, 1) */
-    void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80061778 (Entity_d) and func_80062730 (Entity_e), both as slot134(target, 1, 1); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
+    void (*slot130)(Unk94Obj *self, s32 arg1); /* called by Entity__MoodCue01 and Entity__MoodCue58 (Entity_d), as slot130(target, 0), and by Entity__MoodCue115 (Entity_d) as slot130(target, 1) */
+    void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue115 (Entity_d) and func_80062730 (Entity_e), both as slot134(target, 1, 1); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
     u8 pad138[0x1A0 - 0x138];
-    s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by func_80060800 (Entity_d), its return value taken mod 3 -- value-returning, not void */
+    s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by Entity__MoodCue46 (Entity_d), its return value taken mod 3 -- value-returning, not void */
     u8 pad1A4[0x200 - 0x1A4];
-    s32 (*slot200)(Unk94Obj *self);            /* called by Entity__MoodCue00, compared against the literal 5, and by func_80061400 (Entity_d), compared against 6 -- value-returning, not void */
+    s32 (*slot200)(Unk94Obj *self);            /* called by Entity__MoodCue00, compared against the literal 5, and by Entity__MoodCue58 (Entity_d), compared against 6 -- value-returning, not void */
     u8 pad204[0x21C - 0x204];
     void (*slot21C)(Unk94Obj *self);           /* called by func_80064618 (Entity_g); return value unused at this, its only known call site */
 };
@@ -222,14 +222,14 @@ struct Unk4CObj {
     Unk4CMethods *methods; /* +0x00 */
 };
 
-/* Object pointed to by `Entity::unk70`. func_80061400 (Entity_d) dereferences
+/* Object pointed to by `Entity::unk70`. Entity__MoodCue58 (Entity_d) dereferences
  * its own +0x04 to get a second, further object (`Unk70Sub`) and calls that
  * one's own vtable slot +0x60 -- the same two-level class-framework idiom as
  * `Unk94Obj`/`Unk100Obj`, just one hop deeper. Shape beyond the one slot
  * reached here is unknown. */
 struct Unk70SubMethods {
     u8 pad00[0x60];
-    void (*slot60)(Unk70Sub *self, s32 arg1); /* called by func_80061400 (Entity_d) as slot60(this->unk70->unk4, 0); return value unused at this, its only known call site */
+    void (*slot60)(Unk70Sub *self, s32 arg1); /* called by Entity__MoodCue58 (Entity_d) as slot60(this->unk70->unk4, 0); return value unused at this, its only known call site */
 };
 
 struct Unk70Sub {
@@ -238,7 +238,7 @@ struct Unk70Sub {
 
 struct Unk70Obj {
     u8 pad00[0x04];
-    Unk70Sub *unk4; /* +0x04, read by func_80061400 (Entity_d) */
+    Unk70Sub *unk4; /* +0x04, read by Entity__MoodCue58 (Entity_d) */
 };
 
 /* Default arguments Entity__GetOrCreateUnk100 substitutes when its own `name`/`arg2`
@@ -303,11 +303,11 @@ struct Entity {
     /* +0x48 */ s16 unk48;               /* a HALFWORD field (sh/lh, not the full-word sw/lw every other field here uses) -- Entity__MoodCue11 both writes it (-0x14, -0x78) and reads it back (as slotD0's arg1) */
     /* +0x4A */ u8 pad4A[0x4C - 0x4A];
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by Entity__DetachUnk4C; dereferenced through its own vtable by Entity__MoodCue12 -- see Unk4CObj's own comment */
-    /* +0x50 */ s32 unk50;              /* read by func_80061198 (Entity_d), passed opaquely to this->unk100->methods->slotD4 as its arg1 */
+    /* +0x50 */ s32 unk50;              /* read by Entity__MoodCue57 (Entity_d), passed opaquely to this->unk100->methods->slotD4 as its arg1 */
     /* +0x54 */ u8 pad54[0x58 - 0x54];
     /* +0x58 */ s32 soundCueChannel;             /* passed to ServiceSoundCueSet/FlushSoundCueSet */
     /* +0x5C */ u8 pad5C[0x70 - 0x5C];
-    /* +0x70 */ Unk70Obj *unk70;       /* read by func_80061400 (Entity_d), see Unk70Obj's own comment */
+    /* +0x70 */ Unk70Obj *unk70;       /* read by Entity__MoodCue58 (Entity_d), see Unk70Obj's own comment */
     /* +0x74 */ u8 pad74[0x7C - 0x74];
     /* +0x7C */ s32 unk7C;             /* gate flag read by func_80062A40 (Entity_e); when 0, that function returns immediately after its unkFC==unk80/slot128/rand() dice-roll block */
     /* +0x80 */ s32 unk80;             /* read by Entity__MoodCue09/Entity__MoodCue11 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and Entity__MoodCue13 (compared to `out->unk4` as `this->unk80 - 1`) */
@@ -409,7 +409,7 @@ extern EntityMethods ENTITY_METHODS;
 extern void Class6B5CC__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4);
 
 /* Already matched in Entity_b.c (not INCLUDE_ASM), but not previously called
- * from outside that unit -- func_80061778 (Entity_d) is its first cross-unit
+ * from outside that unit -- Entity__MoodCue115 (Entity_d) is its first cross-unit
  * caller. */
 extern s32 Entity__IsTargetInRange(Entity *this, s32 arg1);
 
@@ -430,8 +430,8 @@ struct EntityMoodHandlerArg {
     u8 pad14[0x08];
     s32 unk1C;     /* +0x1C, written by Entity__MoodCue15/Entity__MoodCue05/Entity__MoodCue10/... */
     s32 unk20;      /* +0x20, written by Entity__MoodCue07 only (paired with unk1C the same round) */
-    s32 unk24;       /* +0x24, written by func_80060148 (Entity_d) */
-    s32 unk28;        /* +0x28, written by func_80060148 (Entity_d) */
+    s32 unk24;       /* +0x24, written by Entity__MoodCue40 (Entity_d) */
+    s32 unk28;        /* +0x28, written by Entity__MoodCue40 (Entity_d) */
     u8 pad2C[0x04];
     s32 unk30;      /* +0x30, written by Entity__MoodCue10/Entity__MoodCue07 */
     s32 unk34;       /* +0x34, written by Entity__MoodCue07 only (paired with unk30) */
@@ -448,6 +448,6 @@ extern void func_80062570(Entity *this, EntityMoodHandlerArg *out);
 /* Already matched in Entity_d.c (not INCLUDE_ASM), but not previously called
  * from outside that unit -- func_800650D4 (Entity_g) is its first cross-unit
  * caller, forwarding its own (this, out) straight through. */
-extern void func_80060D80(Entity *this, EntityMoodHandlerArg *out);
+extern void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out);
 
 #endif

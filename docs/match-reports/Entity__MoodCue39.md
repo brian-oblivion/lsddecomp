@@ -1,13 +1,15 @@
-# func_8005FF7C -- MATCHED (115/115 words)
+# Entity__MoodCue39 -- MATCHED (115/115 words)
+
+> Renamed from `func_8005FF7C` on 2026-09-24 (tools/rename.py). Address 0x8005ff7c.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler,
 lowest ROM address in this unit's queue. `void
-func_8005FF7C(Entity *this, EntityMoodHandlerArg *out)`.
+Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_8005FF7C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     if (this->unkFC == 0) {
@@ -19,7 +21,7 @@ void func_8005FF7C(Entity *this, EntityMoodHandlerArg *out) {
         } else if (r != 2) {
             goto skip48;
         }
-        this->methods->slot48(this, 1, D_80089E5C);
+        this->methods->slot48(this, 1, SCALE_Y4);
     }
 skip48:
     if (out->unk4 % 22 == 0) {
@@ -38,13 +40,13 @@ skip48:
 
 Matched first attempt, no iteration needed -- this is the third function in
 this unit to reuse the exact `Unk94Methods::slot1A0` result-mod-3 dispatch
-shape first derived in `func_80060800`'s report (see that report for the
+shape first derived in `Entity__MoodCue46`'s report (see that report for the
 full residue history: the reachability condition `(r==0 && rand()%3==0) ||
 r==2` needed the same `goto skip48;` pattern proven there, applied directly
 with no new derivation needed this time).
 
 - `out->unk4 % 22 == 0` is the magic-multiply-by-22 idiom -- same family as
-  `func_80060F38`'s divide-by-20 and this unit's divide-by-5/divide-by-10
+  `Entity__MoodCue52`'s divide-by-20 and this unit's divide-by-5/divide-by-10
   instances, extending the confirmed generalization further (22 = not a
   power of 5 times 2^n this time, a genuinely different magic constant
   `0x2E8BA2E9`, and it still needed no manual reconstruction -- plain `%`
@@ -67,7 +69,7 @@ with no new derivation needed this time).
 
 ### Proposed learning
 
-- **A magic-multiply divisor family confirmed via `func_80060800`
+- **A magic-multiply divisor family confirmed via `Entity__MoodCue46`
   generalizes across functions with zero rederivation once the C idiom
   (`goto` to a shared label for a two-clause OR reachability condition) is
   established** -- this function needed no new investigation, just applying
@@ -78,3 +80,15 @@ with no new derivation needed this time).
   depending on an extra post-`mfhi` shift.** Do not assume two appearances
   of the same hex constant in one function imply the same divisor -- check
   the shift amount at each site independently.
+
+## Naming
+
+`Entity__MoodCue39` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 39, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.

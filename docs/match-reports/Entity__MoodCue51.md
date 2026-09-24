@@ -1,16 +1,18 @@
-# func_80060D80 -- MATCHED (110/110 words)
+# Entity__MoodCue51 -- MATCHED (110/110 words)
+
+> Renamed from `func_80060D80` on 2026-09-24 (tools/rename.py). Address 0x80060d80.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler:
-`void func_80060D80(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
     void *table;
 
     if (this->unkFC == 0 && rand() % 5 == 0 && this->unk44 == 0) {
-        this->methods->slot48(this, 1, D_80089E38);
+        this->methods->slot48(this, 1, SCALE_SIX);
         this->methods->slotCC(this, 0x320, 0);
         this->unk44 = 0xB;
     }
@@ -25,7 +27,7 @@ void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
         table = ROTATION_YAW_PLUS90;
     } else if (this->unkFC == 0xDC) {
         if (rand() & 1) {
-            table = D_80089C7C;
+            table = ROTATION_YAW_PLUS180;
         }
     }
     if (table != NULL) {
@@ -43,7 +45,7 @@ worth recording:
 
 - **`table`'s `= NULL` assignment sits AFTER the first `if
   (unkFC==0 && rand()%5==0 && unk44==0) {...}` block, not before it, and
-  this is the position that matched.** Contrast `func_80060148`, matched
+  this is the position that matched.** Contrast `Entity__MoodCue40`, matched
   earlier in this same unit, where the equivalent `void *table = NULL;`
   had to be the function's very FIRST statement (ahead of an early call) to
   avoid a size-drift residue. Here, retail's own bytes initialize the
@@ -52,7 +54,7 @@ worth recording:
   so `table` genuinely does not need to survive those first two calls, and
   writing the C in the same order as retail's actual initialization point
   (not the earliest possible point) reproduced it directly. **The general
-  rule from `func_80060148`/`func_800605D0` stands (a value that must
+  rule from `Entity__MoodCue40`/`Entity__MoodCue44` stands (a value that must
   survive a call needs its assignment positioned before that call), but
   this function is the confirming converse: don't reflexively hoist an
   initializer to the top of the function -- match retail's ACTUAL
@@ -61,7 +63,7 @@ worth recording:
 - A nested `if (A && B && C) { ... }` reproduced retail's three-stage
   early-exit chain (`unkFC==0`, then `rand()%5==0`, then `unk44==0`)
   directly, with all three skip paths converging on the same reload point
-  in retail's bytes -- no `goto` needed here, unlike `func_80060800`'s
+  in retail's bytes -- no `goto` needed here, unlike `Entity__MoodCue46`'s
   superficially similar-looking multi-predecessor shape. The difference:
   here it's a genuine short-circuit chain (each condition gates whether the
   NEXT is even evaluated), not four independent alternative branches
@@ -73,8 +75,20 @@ worth recording:
 
 - **When a local's initializer's correct POSITION isn't obvious, check
   where retail's own delay slot sets the corresponding register** -- it is
-  not always "as early as possible" (see `func_80060148`) and not always
+  not always "as early as possible" (see `Entity__MoodCue40`) and not always
   "right before first real use" either; it is specifically the position
   retail's compiler chose, which is often tied to a nearby branch's delay
   slot. Reading the disassembly's delay-slot placement directly, rather
   than guessing from C-level intuition, resolved this in one attempt.
+
+## Naming
+
+`Entity__MoodCue51` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 51, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.

@@ -188,7 +188,7 @@ void func_800623E8(Entity *this, EntityMoodHandlerArg *out) {
 /* Data tables reached with a raw pointer by this unit's mood-dispatch
  * handlers -- same convention as Entity_c.c/Entity_d.c's own separate
  * per-unit externs, not shared via the header. */
-extern u8 D_80089C7C[];
+extern u8 ROTATION_YAW_PLUS180[];
 
 void func_800624BC(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
@@ -197,7 +197,7 @@ void func_800624BC(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
     if (this->moodTimer == 0x12C) {
-        this->methods->updateRotation(this, 0, D_80089C7C);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
     }
     if (this->moodTimer < 0x258) {
         this->methods->slotC4(this, this->unk44 == 0 ? -0x100 : 0x100, 0);
@@ -279,7 +279,7 @@ void func_800628D4(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 extern u8 D_80089DFC[];
-extern u8 D_80089C64[];
+extern u8 ROTATION_YAW_PLUS9[];
 
 void func_80062970(Entity *this, EntityMoodHandlerArg *out) {
     void (*fn)(Entity *self, s32 arg1, void *arg2);
@@ -296,7 +296,7 @@ void func_80062970(Entity *this, EntityMoodHandlerArg *out) {
     } else {
         this->methods->slot130(this);
         fn = this->methods->updateRotation;
-        table = D_80089C64;
+        table = ROTATION_YAW_PLUS9;
         fn(this, 0, table);
     }
 }
@@ -339,7 +339,7 @@ void func_80062A40(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 extern u8 D_80089D0C[];
-extern u8 D_80089E50[];
+extern u8 SCALE_Y2[];
 extern u8 D_80089E14[];
 extern s32 D_8008ACCC;
 
@@ -391,7 +391,7 @@ void func_80062C58(Entity *this, EntityMoodHandlerArg *out) {
     } else if (this->unk44 >= 0xC && out->unk4 >= 0x14A && (out->unk4 % 60) == 30) {
         tmp = 0;
         if (rand() & 1) {
-            table = D_80089E50;
+            table = SCALE_Y2;
             tmp = (this->unk44 == 0xC) ? 0x190 : 0;
             this->unk44 = 0xD;
         } else {

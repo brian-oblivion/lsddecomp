@@ -1,7 +1,29 @@
+/* Second 20-function slice of the Entity class's 97-function remainder,
+ * 0x5077C..0x52290 (Entity_c is the first slice, Entity_e the third).
+ *
+ * 19 of the 20 are gEntityMoodHandlerTable callbacks (Entity.h), named
+ * Entity__MoodCueNN for the row they occupy -- rows 39-52 and 55-58 are
+ * consecutive with Entity_c's own tail, row 115 (Entity__MoodCue115, this
+ * unit's last function) is not, confirming row order tracks moodIndex
+ * assignment, not code address. The names were confirmed by reading
+ * disk/SLPS_015.56 directly rather than trusting address proximity: for
+ * each row, base 0x80089EB0 + 0x10*row is the row's `handler` word, and it
+ * was checked against every candidate function's own address. The one
+ * exception, `Entity__func_80060710`, is not itself a table row -- it is a
+ * private helper Entity__MoodCue43/44 both call directly (`jal`, not
+ * through any vtable or table), tier C because its own purpose beyond
+ * "sometimes bump scale, sometimes queue a delayed addVec14" is not
+ * established.
+ *
+ * `Entity__MoodCue45` is a real, matched, genuinely empty function (`{}`,
+ * `jr $ra; nop` after splat's own frame elision) -- row 45 of the table is
+ * a legitimate "this mood has no per-tick cue effect" entry, not an
+ * unfinished stub.
+ */
 #include "common.h"
 #include "Entity.h"
 
-extern s16 D_80089EA2;
+extern s16 sScaleTemplateZDenom;
 
 /* Still uncarved (asm/Entity_e.s). Called directly by name (jal), not
  * through a vtable -- typed from this function's own call site: a0=this,
@@ -15,26 +37,26 @@ extern s16 D_80089EA2;
 extern void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
 
 /* Data tables reached with a raw pointer by this unit's mood-dispatch
- * handlers -- same convention as Entity_c.c's own D_80089E50/D_80089E38/etc
+ * handlers -- same convention as Entity_c.c's own SCALE_Y2/SCALE_SIX/etc
  * externs (separate local view per translation unit, not shared via the
  * header). */
-extern u8 D_80089C64[];
-extern u8 D_80089C70[];
-extern u8 D_80089E8C[];
-extern u8 D_80089DC0[];
-extern u8 D_80089E50[];
-extern u8 D_80089E38[];
-extern u8 D_80089C7C[];
+extern u8 ROTATION_YAW_PLUS9[];
+extern u8 ROTATION_YAW_MINUS9[];
+extern u8 SCALE_X3[];
+extern u8 TRANSLATE_Z_MINUS256[];
+extern u8 SCALE_Y2[];
+extern u8 SCALE_SIX[];
+extern u8 ROTATION_YAW_PLUS180[];
 extern u8 ROTATION_YAW_MINUS90[];
 extern u8 ROTATION_YAW_PLUS90[];
-extern u8 D_80089E5C[];
-extern u8 D_80089D24[];
+extern u8 SCALE_Y4[];
+extern u8 ROTATION_ZMINUS90[];
 
-/* Forward declaration: func_80060710 is defined later in this file (higher
- * ROM address) but func_800604DC, at a lower address, calls it directly. */
-void func_80060710(Entity *this);
+/* Forward declaration: Entity__func_80060710 is defined later in this file (higher
+ * ROM address) but Entity__MoodCue43, at a lower address, calls it directly. */
+void Entity__func_80060710(Entity *this);
 
-void func_8005FF7C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     if (this->moodTimer == 0) {
@@ -46,7 +68,7 @@ void func_8005FF7C(Entity *this, EntityMoodHandlerArg *out) {
         } else if (r != 2) {
             goto skip48;
         }
-        this->methods->updateScale(this, 1, D_80089E5C);
+        this->methods->updateScale(this, 1, SCALE_Y4);
     }
 skip48:
     if (out->unk4 % 22 == 0) {
@@ -60,7 +82,7 @@ skip48:
     }
 }
 
-void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue40(Entity *this, EntityMoodHandlerArg *out) {
     void *table = NULL;
 
     if (out->unk4 % 7 == 0) {
@@ -72,11 +94,11 @@ void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0xC8) {
         table = ROTATION_YAW_MINUS90;
     } else if (this->moodTimer == 0x190) {
-        table = D_80089C7C;
+        table = ROTATION_YAW_PLUS180;
     } else if (this->moodTimer == 0x258) {
         table = ROTATION_YAW_PLUS90;
     } else if (this->moodTimer == 0x320) {
-        table = D_80089C7C;
+        table = ROTATION_YAW_PLUS180;
         this->moodTimer = -1;
     }
     if (table != NULL) {
@@ -88,7 +110,7 @@ void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
     s32 rv;
     s16 *tablePtr;
 
@@ -102,14 +124,14 @@ void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0xE) {
         if ((this->moodTimer & 3) == 0) {
             rv = rand();
-            tablePtr = &D_80089EA2;
+            tablePtr = &sScaleTemplateZDenom;
             *tablePtr = rv % 32 + 1;
             this->methods->updateScale(this, 1, (u8 *)tablePtr - 0xA);
         }
     }
 }
 
-void func_800603C4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out) {
     s32 divisor;
 
     if (this->moodTimer < 0x14) {
@@ -128,12 +150,12 @@ void func_800603C4(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800604DC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;
     s32 r2;
     u8 *table;
 
-    func_80060710(this);
+    Entity__func_80060710(this);
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->unk84 == 0 || this->unk84 == 0xF) {
         out->unk1C = 0x12;
@@ -143,21 +165,21 @@ void func_800604DC(Entity *this, EntityMoodHandlerArg *out) {
         a1val = (rand() & 1) ? -0x3C : 0x3C;
         this->methods->slotC8(this, a1val, 0);
         r2 = rand();
-        table = D_80089C64;
+        table = ROTATION_YAW_PLUS9;
         if ((r2 & 3) != 0) {
-            table = D_80089C70;
+            table = ROTATION_YAW_MINUS9;
         }
         this->methods->updateRotation(this, 0, table);
     }
 }
 
-void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;
     s32 r1;
     s32 r2;
     u8 *table;
 
-    func_80060710(this);
+    Entity__func_80060710(this);
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->unk84 == 7 || this->unk84 == 0x16) {
         out->unk1C = 3;
@@ -165,7 +187,7 @@ void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
     if ((u32)(this->moodTimer - 0x12C) < 0x14) {
         this->methods->slotC4(this, -0x3C, 0);
     } else if ((u32)(this->moodTimer - 0x141) < 0x13) {
-        this->methods->updateRotation(this, 0, D_80089C70);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
     } else if (this->moodTimer >= 0x141) {
         r1 = rand();
         a1val = -0x80;
@@ -174,34 +196,34 @@ void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
         }
         this->methods->slotC8(this, a1val, 1);
         r2 = rand();
-        table = D_80089C64;
+        table = ROTATION_YAW_PLUS9;
         if ((r2 & 3) != 0) {
-            table = D_80089C70;
+            table = ROTATION_YAW_MINUS9;
         }
         this->methods->updateRotation(this, 0, table);
     }
 }
 
-void func_80060710(Entity *this) {
+void Entity__func_80060710(Entity *this) {
     s32 r;
 
     if (this->moodTimer == 0) {
         r = rand() % 10;
         if (r >= 8) {
-            this->methods->updateScale(this, 1, D_80089E8C);
+            this->methods->updateScale(this, 1, SCALE_X3);
         } else if (r >= 5) {
             this->unk44 = 0xA;
         }
     }
     if (this->unk44 == 0xA && this->moodTimer >= 0xC9) {
-        this->methods->addVec14(this, D_80089DC0);
+        this->methods->addVec14(this, TRANSLATE_Z_MINUS256);
     }
 }
 
-void func_800607F8(void) {
+void Entity__MoodCue45(void) {
 }
 
-void func_80060800(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue46(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     if (this->moodTimer == 0) {
@@ -213,7 +235,7 @@ void func_80060800(Entity *this, EntityMoodHandlerArg *out) {
         } else if (r != 1) {
             goto skip48;
         }
-        this->methods->updateScale(this, 1, D_80089E38);
+        this->methods->updateScale(this, 1, SCALE_SIX);
     }
 skip48:
     if (out->unk4 == 0) {
@@ -223,7 +245,7 @@ skip48:
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
 }
 
-void func_8006090C(Entity *this) {
+void Entity__MoodCue47(Entity *this) {
     if (this->unkF4 == 0) {
         return;
     }
@@ -252,7 +274,7 @@ void func_8006090C(Entity *this) {
     }
 }
 
-void func_80060A4C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;
     EntityMethods *methods;
 
@@ -267,7 +289,7 @@ void func_80060A4C(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x1E, 1);
 }
 
-void func_80060B34(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
     Unk94Methods *methods94;
     void *a1;
 
@@ -305,7 +327,7 @@ void func_80060B34(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x100, 0);
 }
 
-void func_80060CF0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue50(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer < this->unk80 * 5) {
         if (this->unk84 == 0xF || this->unk84 == 0x46) {
             out->unk10 = 0;
@@ -319,11 +341,11 @@ void func_80060CF0(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
     void *table;
 
     if (this->moodTimer == 0 && rand() % 5 == 0 && this->unk44 == 0) {
-        this->methods->updateScale(this, 1, D_80089E38);
+        this->methods->updateScale(this, 1, SCALE_SIX);
         this->methods->slotCC(this, 0x320, 0);
         this->unk44 = 0xB;
     }
@@ -338,7 +360,7 @@ void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
         table = ROTATION_YAW_PLUS90;
     } else if (this->moodTimer == 0xDC) {
         if (rand() & 1) {
-            table = D_80089C7C;
+            table = ROTATION_YAW_PLUS180;
         }
     }
     if (table != NULL) {
@@ -347,17 +369,17 @@ void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x50, 1);
 }
 
-void func_80060F38(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue52(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->moodTimer < 0xBC) {
         if (this->moodTimer == 0x54) {
-            this->methods->updateRotation(this, 0, D_80089C7C);
+            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
         }
         if (out->unk4 % 20 == 0) {
             out->unk1C = 9;
         }
     } else if (this->moodTimer < 0xC8) {
-        this->methods->updateRotation(this, 0, D_80089C64);
+        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
     } else {
         this->methods->deactivate(this);
         out->unk30 = 0x1E;
@@ -366,12 +388,12 @@ void func_80060F38(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotD0(this, -0x200, 0);
 }
 
-void func_80061070(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue55(Entity *this, EntityMoodHandlerArg *out) {
     s32 mood = this->unk84;
 
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->methods->updateScale(this, 1, D_80089E50);
+            this->methods->updateScale(this, 1, SCALE_Y2);
         }
     }
     out->unk10 = this->methods->getProximityRatio(this);
@@ -386,13 +408,13 @@ void func_80061070(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061158(Entity *this) {
+void Entity__MoodCue56(Entity *this) {
     if (this->moodTimer == 0) {
         this->methods->slotCC(this, -0xC8, 0);
     }
 }
 
-void func_80061198(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue57(Entity *this, EntityMoodHandlerArg *out) {
     s32 mood;
 
     if (this->moodTimer == 0) {
@@ -439,7 +461,7 @@ void func_80061198(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue58(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         out->unk10 = 0;
         out->unk1C = 0xC;
@@ -485,7 +507,7 @@ void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
             out->unk1C = 0x12;
             out->unk10 = 0;
             out->unk30 = 3;
-            this->methods->updateRotation(this, 1, D_80089D24);
+            this->methods->updateRotation(this, 1, ROTATION_ZMINUS90);
             this->methods->slotC8(this, 0x960, 0);
             this->methods->slotCC(this, 0x5DC, 0);
             this->unk70->unk4->methods->slot60(this->unk70->unk4, 0);
@@ -494,7 +516,7 @@ void func_80061400(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061778(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk44 == 0) {
         if (Entity__IsTargetInRange(this, 0x800) != 0) {
             this->unk44 = 0xB;

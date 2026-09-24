@@ -1,26 +1,28 @@
-# func_80060710 -- MATCHED (58/58 words)
+# Entity__func_80060710 -- MATCHED (58/58 words)
+
+> Renamed from `func_80060710` on 2026-09-24 (tools/rename.py). Address 0x80060710.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch helper called
-by `func_800604DC`, but itself takes only `Entity *this` -- no `out`
+by `Entity__MoodCue43`, but itself takes only `Entity *this` -- no `out`
 parameter, despite the family convention. Signature: `void
-func_80060710(Entity *this)`.
+Entity__func_80060710(Entity *this)`.
 
 ## Final source
 
 ```c
-void func_80060710(Entity *this) {
+void Entity__func_80060710(Entity *this) {
     s32 r;
 
     if (this->unkFC == 0) {
         r = rand() % 10;
         if (r >= 8) {
-            this->methods->slot48(this, 1, D_80089E8C);
+            this->methods->slot48(this, 1, SCALE_X3);
         } else if (r >= 5) {
             this->unk44 = 0xA;
         }
     }
     if (this->unk44 == 0xA && this->unkFC >= 0xC9) {
-        this->methods->slotBC(this, D_80089DC0);
+        this->methods->slotBC(this, TRANSLATE_Z_MINUS256);
     }
 }
 ```
@@ -44,7 +46,7 @@ void func_80060710(Entity *this) {
   simultaneously.** Before fixing it, `funcdiff.py` reported "differs
   OUTSIDE this range" counts around 116,000 bytes for every other function
   in the file, and functions physically after this one in ROM order (e.g.
-  `func_80060A4C`, `func_80060CF0`, `func_80061158`) scored 0/N despite
+  `Entity__MoodCue48`, `Entity__MoodCue50`, `Entity__MoodCue56`) scored 0/N despite
   being logically correct, because their comparison window was reading from
   the wrong address entirely. Fixing this function's word count collapsed
   the drift to under 200 bytes project-wide and every other function's score
@@ -52,9 +54,9 @@ void func_80060710(Entity *this) {
   simultaneous, severe, EVEN-NUMBERED-of-total mismatches with the drift
   warning firing at a five/six-figure byte count, suspect ONE upstream
   function's word count before doubting several unrelated ones.**
-- The two data-table arguments (`D_80089E8C` to `slot48`, `D_80089DC0` to
+- The two data-table arguments (`SCALE_X3` to `slot48`, `TRANSLATE_Z_MINUS256` to
   `slotBC`) are plain `extern u8 SYM[];` externs passed directly, no offset
-  arithmetic needed (contrast `func_800602AC`'s `D_80089EA2`, which does
+  arithmetic needed (contrast `Entity__MoodCue41`'s `sScaleTemplateZDenom`, which does
   need one).
 
 ### Proposed learning
@@ -74,3 +76,19 @@ void func_80060710(Entity *this) {
   block and which is reached by an explicit jump -- and only one ordering
   reproduces a given retail layout, independent of which arm reads more
   naturally as the "primary" case.
+
+## Naming
+
+`Entity__func_80060710` -- tier C (round 76, runner delta, FINISHING-PLAN
+track 3). Renamed from `func_80060710`; class confirmed Entity by every
+call in its body going through `this->methods->...`. NOT itself a
+`gEntityMoodHandlerTable` row (checked against every row's handler word in
+`disk/SLPS_015.56`, base 0x80089EB0..0x8008A780ish -- no row holds
+0x80060710) -- it is a private helper `Entity__MoodCue43`/`Entity__MoodCue44`
+both call directly by name (`jal`), never through a vtable or the mood
+table. Mechanics: at moodTimer 0, an 80/20-ish dice roll either bumps scale
+via `SCALE_X3` or arms a delayed effect (`unk44 = 0xA`); once armed and
+moodTimer reaches 0xC9, calls `addVec14(TRANSLATE_Z_MINUS256)`. No second
+caller or additional context to say WHY MoodCue43/44 share this specific
+startup quirk, so the tier-C placeholder form is kept rather than guessing
+a purpose.

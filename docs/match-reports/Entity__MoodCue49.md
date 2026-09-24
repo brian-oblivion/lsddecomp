@@ -1,15 +1,17 @@
-# func_80060B34 -- MATCHED (111/111 words)
+# Entity__MoodCue49 -- MATCHED (111/111 words)
+
+> Renamed from `func_80060B34` on 2026-09-24 (tools/rename.py). Address 0x80060b34.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). The largest and most
 structurally complex function matched in this unit so far -- a three-way
 state machine on `this->unk44` (0, 0xA, 0xB), each state doing its own
 dispatch into `this->unk94`'s vtable.
-`void func_80060B34(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80060B34(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
     Unk94Methods *methods94;
     void *a1;
 
@@ -88,7 +90,7 @@ went cleanly, since the shape recurs.
   the first, `unkFC == 0x64` in the second) -- writing it twice, once per
   arm, as an ordinary duplicate statement reproduced retail's shared tail
   block via the compiler's own cross-jump merge, no `goto` needed (same
-  family as `func_800605D0`'s three-branch case: each call site is a
+  family as `Entity__MoodCue44`'s three-branch case: each call site is a
   complete, self-contained statement, so GCC merges the trailing bytes on
   its own without any source-level sharing).
 - The ternary `this->unk0C ? (u8 *)this->unk14 + 0x38 : NULL` reproduced
@@ -104,3 +106,15 @@ went cleanly, since the shape recurs.
   surrounding instructions for whether a reload happens; do not assume a
   single caching policy applies uniformly across one function just because
   it applied at the first site.
+
+## Naming
+
+`Entity__MoodCue49` -- tier B (round 76, runner delta, FINISHING-PLAN track 3). Same
+convention as `Entity__MoodCue00` (round 71): the function's address is the
+handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
+0x80089EB0, 0x10-byte stride) at row 49, read directly from
+`disk/SLPS_015.56` (not inferred from address proximity -- see
+`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+track code address once row 115 is reached). Mechanics established
+(mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
+`Entity_b.c`'s own header comment); which dream object owns the row is not.
