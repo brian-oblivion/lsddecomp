@@ -59,7 +59,7 @@ Evidence:
   same value: `Class6B5CC__OnNotify` (`src/code_d294.c`) calls
   `Get_vtable_BasicClass()->slot38(self, other, arg2)` and then dispatches
   to slot `+0x094`/`+0x098`/`+0x09C` **by the sender's class tag**, passing
-  `arg2` through each time; `func_80065790` (`src/code_55dd4.c`) calls the
+  `arg2` through each time; `Class65650__OnNotify` (`src/code_55dd4.c`) calls the
   base and then tests `arg1->tagged->tag == 0x5F03 && arg2 == 1`.
 - Slot census (`tools/classtable.py`, all 60 tables): 27 tables use this
   base implementation at `+0x038` and 14 more override it with

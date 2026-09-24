@@ -44,7 +44,7 @@ void Entity__SetUnkF4(Entity *this, s32 arg1) {
 Matched on the first attempt. The single branch here never affects the
 return value (the function is `void`, and the store after the branch runs
 unconditionally either way) — not the `goto`-lever shape from
-`func_80025B34`/`New_class_65650`, just a plain `if`.
+`func_80025B34`/`New_Class65650`, just a plain `if`.
 
 ## Proposed learning
 
@@ -62,7 +62,7 @@ own broader significance (read by every Entity_x unit) is not established.
 - `EntityMethods::slot30` -> `notifyParents` -- **tier B.** `tools/
   classtable.py` on `ENTITY_METHODS` shows +0x030 occupied by the already-
   named `BasicClass__NotifyParents` (a slot inherited from the shared
-  ancestor `func_80066818()` also returns -- same idiom, confirmed by
+  ancestor `Get_vtable_Class65650()` also returns -- same idiom, confirmed by
   offset match against that table). CROSS-UNIT: `slot30` is dispatched from
   every one of Entity_b/c/d/e/f/g (`grep -rn -- '->slot30(' src/Entity_*.c`)
   as well as this unit's own `Entity__SetUnkF4`/`Entity__NotifyIfTargetInRange` (the latter

@@ -7,7 +7,7 @@
 Entity's constructor, reached both directly (this function) and indirectly
 through the vtable's own `ctor` slot (`Get_vtable_Entity()->ctor`, see
 `New_Entity`). First calls the shared base-class constructor,
-`func_80066818()->ctor(this, arg2, arg3)` — `func_80066818()` (matched in
+`Get_vtable_Class65650()->ctor(this, arg2, arg3)` — `Get_vtable_Class65650()` (matched in
 `code_55dd4.c`) returns the SAME shared "BasicClass" ancestor vtable that
 `Class65650` also derives from (see the big comment at the top of
 `include/Entity.h`). Only on success does it finish initializing: assigns
@@ -30,7 +30,7 @@ convention (`docs/research/class-framework.md`).
 
 ```c
 Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
-    if (func_80066818()->ctor(this, arg2, arg3) != NULL) {
+    if (Get_vtable_Class65650()->ctor(this, arg2, arg3) != NULL) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = arg1;
         this->unk9C = 0;
@@ -75,5 +75,5 @@ choice.
 
 **Tier A.** Occupies `EntityMethods::ctor` (+0x008, `tools/classtable.py`).
 A constructor's mechanics are its purpose; matches the `Class__Class`
-convention already used by `class_65650__Constructor`/`DreamSys__DreamSys`.
+convention already used by `Class65650__Class65650`/`DreamSys__DreamSys`.
 Not renamed (already correct).

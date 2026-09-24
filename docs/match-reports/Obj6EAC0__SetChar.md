@@ -145,9 +145,9 @@ isolated to the two prologue `sw`s' order, confirming this is a purer
 instance of the class than it first looked.
 
 5. The previously-untried "unused padding local" lever
-   (`func_80065AE0`'s precedent): `s32 pad;` declared before the call
+   (`Class65650__SetLightMode`'s precedent): `s32 pad;` declared before the call
    body, unused otherwise -- NO CHANGE (17/19, identical object code
-   to attempt 1). The lever that worked for `func_80065AE0` does not
+   to attempt 1). The lever that worked for `Class65650__SetLightMode` does not
    generalise here.
 6. `s32 result = a3;` used in place of `a3` for BOTH the call argument
    and the `unk4C` store (an explicit single named copy, rather than

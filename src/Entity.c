@@ -40,7 +40,7 @@ Entity *New_Entity(void *arg0, void *arg1, void *arg2) {
 }
 
 Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
-    if (func_80066818()->ctor(this, arg2, arg3) != NULL) {
+    if (Get_vtable_Class65650()->ctor(this, arg2, arg3) != NULL) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = arg1;
         this->soundCueSet = 0;
@@ -89,7 +89,7 @@ void Entity__Destructor(Entity *this) {
     if (this->unk104 != NULL) {
         this->unk104->methods->slot04(this->unk104);
     }
-    func_80066818()->dtor(this);
+    Get_vtable_Class65650()->dtor(this);
 }
 
 void Entity__InitState(Entity *this) {
@@ -107,7 +107,7 @@ void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 a
     if (this->unk0C != 0) {
         return;
     }
-    func_80066818()->slot4C(this, arg1, arg2, arg3, arg4);
+    Get_vtable_Class65650()->slot4C(this, arg1, arg2, arg3, arg4);
     this->unk4C = arg3;
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
         return;
@@ -122,7 +122,7 @@ void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 a
 void Entity__DetachUnk4C(Entity *this) {
     if (this->unk0C != 0) {
         this->methods->deactivate(this);
-        func_80066818()->slot50(this);
+        Get_vtable_Class65650()->slot50(this);
         this->unk4C = 0;
     }
 }
@@ -135,7 +135,7 @@ void Entity__Update(Entity *this, s32 a1, s32 a2) {
         this->methods->updateSoundCueStop(this);
     }
     this->methods->updateTargetProximity(this);
-    func_80066818()->slot98(this, a1, a2);
+    Get_vtable_Class65650()->slot98(this, a1, a2);
 }
 
 void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
@@ -147,7 +147,7 @@ void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
             return;
         }
     }
-    func_80066818()->slotDC(this, arg1, arg2);
+    Get_vtable_Class65650()->slotDC(this, arg1, arg2);
     if (arg2 != 4) {
         return;
     }
@@ -165,7 +165,7 @@ void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
 }
 
 void Entity__NotifyReset(Entity *this, s32 a1, s32 a2) {
-    func_80066818()->slotE0(this, a1, a2);
+    Get_vtable_Class65650()->slotE0(this, a1, a2);
     if (a2 == 4) {
         this->methods->deactivate(this);
     }

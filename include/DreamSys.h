@@ -416,7 +416,7 @@ typedef struct DreamSysBaseMethods {
 	u8 pad0C[0x4C - 0xC];
 	/* Shared with Class65650's own inherited "slot4C" at the same offset in
 	   the SAME base table (code_55dd4.h's D800878D4Methods: "called by
-	   func_80065918 as slot4C(self, arg3, arg5)"). Called by
+	   Class65650__AttachToParent as slot4C(self, arg3, arg5)"). Called by
 	   DreamSys__SpawnAtLink as (this, arg1, &local) (round 2026-09-02). */
 	void (*slot4C)(struct DreamSys *self, void *arg1, void *arg2);
 	/* Deliberately `struct DreamSys *`, not `DreamSys *` -- this precedes

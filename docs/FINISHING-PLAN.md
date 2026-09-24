@@ -170,13 +170,13 @@ matching projects do; the default build never sees the body.
 ```c
 #ifdef NON_MATCHING
 /* NON_MATCHING: 252/258 words, length exact. Residue: register identity in
- * the second loop (docs/match-reports/func_80066340.md). Hand-derived. */
-void func_80066340(Foo *this, s32 arg1)
+ * the second loop (docs/match-reports/Class65650__ApplyTodPacket.md). Hand-derived. */
+void Class65650__ApplyTodPacket(Foo *this, s32 arg1)
 {
     ...
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80066340);
+INCLUDE_ASM("asm/nonmatchings/code_55dd4", Class65650__ApplyTodPacket);
 #endif
 ```
 

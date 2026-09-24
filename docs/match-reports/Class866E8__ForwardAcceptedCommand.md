@@ -83,7 +83,7 @@ a flat 24-byte (6-word) gap, with the same 4 callee-saved registers
 (`$s0`-`$s3`) plus `$ra` in both.
 
 This is the exact "unused local reserves stack space anyway" class
-documented in `func_80065D64.md` and `func_80065AE0.md`
+documented in `Class65650__FindPartIndex.md` and `Class65650__SetLightMode.md`
 (DECOMPILATION_LEARNINGS territory, GCC 2.6.3-specific): **an entirely
 dead, never-read-or-written local still gets a stack slot from this
 compiler.** Adding `u8 unused[24];` (sized to exactly the missing 24
@@ -112,7 +112,7 @@ offsets are all off by a constant, don't touch the logic — pad the frame.**
 Compute the gap (retail's `addiu sp,sp,-N` minus yours), add a `u8
 unused[gap];` local that's never referenced, and rebuild. This is now the
 THIRD confirmed instance of this exact idiom in the project (after
-`func_80065D64`, `func_80065AE0`), reinforcing it as a general GCC 2.6.3
+`Class65650__FindPartIndex`, `Class65650__SetLightMode`), reinforcing it as a general GCC 2.6.3
 quirk rather than something specific to those two functions' unit.
 
 ## Provenance

@@ -1,0 +1,69 @@
+# Class65650__InitDefaults
+
+> Renamed from `func_80065830` on 2026-09-24 (tools/rename.py). Address 0x80065830.
+
+**Unit:** code_55dd4 · **Size:** 58 words (0xE8 bytes) · **Status:** MATCHED
+(58/58 words, whole-image `./build-and-verify.sh` green)
+
+## What it does
+
+`Class65650Methods` slot `+0x040` (already known from the header's own
+comment: "Class65650__InitDefaults, this class's own"). A pure dispatch sequence —
+one call through the shared intermediate base class, six calls through
+`self`'s own vtable with assorted literal arguments, then a conditional
+call to a fixed function if `self->unk68` is set:
+
+```c
+void Class65650__InitDefaults(Class65650 *self)
+{
+    D800878D4Methods *base;
+
+    base = DreamSys__GetBaseMethods();
+    base->slot60(self, 0);
+    self->methods->slotF0(self, 1);
+    self->methods->slotE4(self, 0x12C);
+    self->methods->slot114(self);
+    self->methods->slot10C(self, 0x41);
+    self->methods->slot130(self);
+    self->methods->slot128(self, 0);
+    if (self->unk68 != NULL) {
+        Class6B5CC__LinkModel(self, self->unk68->unk20);
+    }
+}
+```
+
+Resolves six new `Class65650Methods` slots (`+0xE4`, `+0xF0`, `+0x10C`,
+`+0x114`, `+0x128`, `+0x130` — all carved out of previously-opaque `padNN`
+regions) and one new `D800878D4Methods` slot (`+0x060`, alongside the
+already-known `+0x038`/`+0x04C`/`+0x050`/`+0x070`). Also adds a real data
+field to `Unk68Obj`: `+0x020 s32 unk20`, read directly off the object (not
+through its vtable) and forwarded verbatim as `Class6B5CC__LinkModel`'s second
+argument.
+
+## The unconditional-load-in-a-delay-slot detail
+
+Retail's `beqz $v0, END` (testing `self->unk68`) has `lw $a1, 0x20($v0)`
+in its delay slot — i.e. the load of `unk68->unk20` executes
+UNCONDITIONALLY, even on the path where `self->unk68` is NULL and the
+branch is about to skip the call that would use it. This is ordinary
+MIPS1 delay-slot scheduling (the compiler proved the load itself has no
+side effect worth avoiding) and needed no special handling: writing the
+natural `if (self->unk68 != NULL) { Class6B5CC__LinkModel(self, self->unk68->unk20); }`
+reproduced it directly, with GCC choosing on its own to schedule the field
+load into the branch's delay slot.
+
+No residue otherwise — every one of the seven calls in this function
+matched immediately once its slot was declared with the right argument
+shape (all either `(Class65650 *)` alone or `(Class65650 *, s32)`, no
+surprises).
+
+### Proposed learning
+
+None beyond what's already recorded — straightforward once the six new
+slots were named from the call sites' own argument registers.
+
+## Naming
+
+Round 75 (charlie), track 3.
+
+- `Class65650__InitDefaults` (was `func_80065830`), tier A. Occupies +0x040, overriding BaseObjO__InitDefaults. Body sets defaults through its own slots: base SetDisplay(0), setUnk64(1), setLastOffsetValue(0x12C) (the 0x12C BaseObjO__InitDefaults writes too), disableTickCallback, selectTickCallback('A'), stopTod, setTod(0), then links mainPart's model to itself.

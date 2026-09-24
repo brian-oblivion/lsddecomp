@@ -21,7 +21,7 @@ void Entity__AttachUnk4C(Entity *this, s32 arg1, s32 arg2, Unk4CObj *arg3, s32 a
     if (this->unk0C != 0) {
         return;
     }
-    func_80066818()->slot4C(this, arg1, arg2, arg3, arg4);
+    Get_vtable_Class65650()->slot4C(this, arg1, arg2, arg3, arg4);
     this->unk4C = arg3;
     if (D_80089EA7[this->moodIndex * 0x10] != 0) {
         return;

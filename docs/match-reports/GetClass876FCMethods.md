@@ -3,7 +3,7 @@
 > Renamed from `func_80056F4C` on 2026-09-23 (tools/rename.py). Address 0x80056f4c.
 
 Unit: `class_3bb8c_o` (round 17). A sibling class's own method-table
-getter, analogous to `DreamSys__GetBaseMethods`/`func_80066818` already documented in
+getter, analogous to `DreamSys__GetBaseMethods`/`Get_vtable_Class65650` already documented in
 `code_55dd4.h`.
 
 ## Final source
@@ -31,7 +31,7 @@ this class's `+0x010`/`+0x014`/`+0x018`/`+0x088`/`+0x09C`/`+0x0B8`/`+0x0BC`/
 (`BaseObjO__LinkCompanion`, `BaseObjO__UnlinkCompanion`, `BaseObjO__ClearCompanions`, `BaseObjO__func_571f8`,
 `DispatchObjO__func_57320`, `BaseObjO__SetVec14`, `BaseObjO__AddVec14`, `BaseObjO__ApplyRotatedVec14`,
 `BaseObjO__func_5748c`) -- i.e. `gClass876FCMethods` is a SIBLING concrete class built on
-the same intermediate base, the same relationship `D_8008A6C4`
+the same intermediate base, the same relationship `gClass65650Methods`
 (Class65650) and `DREAMSYS_METHODS` (DreamSys) already have to it.
 
 ### Proposed learning
@@ -44,7 +44,7 @@ reasoning this getter's typing depends on.
 **`GetClass876FCMethods` -- NOT renamed, tier C.** A pure singleton vtable getter
 (`return &gClass876FCMethods;`), exactly the same shape as this codebase's other
 unnamed getters this unit calls but does not define --
-`GetClass6B5CCMethods`/`DreamSys__GetBaseMethods`/`func_80066818` -- none of which carry a
+`GetClass6B5CCMethods`/`DreamSys__GetBaseMethods`/`Get_vtable_Class65650` -- none of which carry a
 name either. The getter's own body establishes nothing about the identity
 of `gClass876FCMethods`'s class beyond "it is a sibling of `Class65650`/`BaseObjO`
 built on the same base" (see the file header comment); naming the FUNCTION

@@ -23,7 +23,7 @@ void Entity__Update(Entity *this, s32 a1, s32 a2) {
         this->methods->slot180(this);
     }
     this->methods->slot178(this);
-    func_80066818()->slot98(this, a1, a2);
+    Get_vtable_Class65650()->slot98(this, a1, a2);
 }
 ```
 
