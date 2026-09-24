@@ -84,7 +84,7 @@ void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
         return;
     }
 
-    list = a1->unk1C;
+    list = a1->names;
     count = 0;
     while (*list++ != NULL) {
         count++;
@@ -97,15 +97,15 @@ void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
     self->itemLists = BMemPMgrAlloc(size);
     self->slotCount = count;
 
-    if (a1->unk0 != NULL) {
-        handle = func_8003B39C(a1->unk0);
+    if (a1->path != NULL) {
+        handle = func_8003B39C(a1->path);
         handle->methods->slot78(handle);
         handle->methods->slot5C(handle);
     } else {
-        handle = a1->unk4;
+        handle = a1->handle;
     }
 
-    list = a1->unk1C;
+    list = a1->names;
     i = 0;
     if (*list != NULL) {
         do {
@@ -124,7 +124,7 @@ void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
     }
 
     self->listView = New_ClassEAC0(D_8008A8E8, D_8008A8F0, 0);
-    a1->unk4 = handle;
+    a1->handle = handle;
 }
 
 void Obj86B60__ReleaseTarget(Obj86B60 *self)
@@ -135,8 +135,8 @@ void Obj86B60__ReleaseTarget(Obj86B60 *self)
     if (self->unk4C == NULL) {
         return;
     }
-    if (self->unk4C->unk0 != NULL) {
-        Unk74Obj *o = self->unk4C->unk4;
+    if (self->unk4C->path != NULL) {
+        Unk74Obj *o = self->unk4C->handle;
         o->methods->slot4(o);
     }
     self->listView->methods->slot4(self->listView);
@@ -168,9 +168,9 @@ void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
         return;
     }
     arr = self->slotElements;
-    ptr = self->unk4C->unk20;
+    ptr = self->unk4C->externalRecords;
     for (i = 0; i < self->slotCount; i++, arr++, ptr += 8) {
-        if (self->unk4C->unk18[i] == NULL) {
+        if (self->unk4C->registrationSlots[i] == NULL) {
             Unk64Elem *elem = *arr;
 
             elem->methods->slot4C(elem, a1, ptr);
@@ -228,7 +228,7 @@ void Obj86B60__FindNextFreeSlot(Obj86B60 *self)
         if (i == self->activeSlot) {
             break;
         }
-        if (self->unk4C->unk18[i++] != NULL) {
+        if (self->unk4C->registrationSlots[i++] != NULL) {
             continue;
         }
         i--;
@@ -253,7 +253,7 @@ void Obj86B60__FindPrevFreeSlot(Obj86B60 *self)
         if (i == self->activeSlot) {
             break;
         }
-        if (self->unk4C->unk18[i--] != NULL) {
+        if (self->unk4C->registrationSlots[i--] != NULL) {
             continue;
         }
         i++;

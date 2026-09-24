@@ -137,22 +137,25 @@ struct EventArg {
  *    the same slot func_8003CC2C feeds a locally-built 3-byte buffer to).
  */
 struct Unk4CObj {
-    const char *unk0;   /* +0x000, OBSERVED: Obj86B60__SetTarget (round 12) -- a
-                            path: passed to func_8003B39C(unk0) when
-                            non-NULL to build unk4, mirroring
+    const char *path;   /* +0x000, renamed from unk0, round 78 -- exclusive
+                            to code_2cc8c_b, verified (every accessor is in
+                            this unit). OBSERVED: Obj86B60__SetTarget (round 12) -- a
+                            path: passed to func_8003B39C(path) when
+                            non-NULL to build handle, mirroring
                             Obj86B60->unk70's own path-cache idiom. ALSO
                             OBSERVED (truthy-only) by Obj86B60__ReleaseTarget, which
-                            gates a call through unk4 on this being
+                            gates a call through handle on this being
                             non-NULL -- corrects this struct's earlier
                             header note that nothing ever loads *(unk4C+0);
                             that was true only of the 16 functions attempted
                             through round 11. */
-    Unk74Obj *unk4;      /* +0x004, OBSERVED: Obj86B60__SetTarget (constructed via
-                            func_8003B39C(unk0) + slot78/slot5C when unk0 is
+    Unk74Obj *handle;    /* +0x004, renamed from unk4, round 78 -- exclusive
+                            to code_2cc8c_b, verified. OBSERVED: Obj86B60__SetTarget (constructed via
+                            func_8003B39C(path) + slot78/slot5C when path is
                             set, else read as an existing handle and written
                             back unchanged; same Unk74Obj slot4 interface
                             Obj86B60->unk74 uses) and Obj86B60__ReleaseTarget (slot4
-                            called on it, gated by unk0's truthiness) */
+                            called on it, gated by path's truthiness) */
     s32 unk8;           /* +0x008, OBSERVED: func_8003C63C (not attempted) */
     s32 unkC;            /* +0x00C, OBSERVED: func_8003CA1C */
     u8 unk10[3];          /* +0x010, INFERRED 3-byte colour buffer read by
@@ -162,19 +165,25 @@ struct Unk4CObj {
                               both already matched, passing it directly to
                               an Unk64Elem slotB8 call */
     u8 pad13[0x018 - 0x013];
-    void **unk18;          /* +0x018, OBSERVED: Obj86B60__FindNextFreeSlot, an array of
+    void **registrationSlots; /* +0x018, renamed from unk18, round 78 --
+                               exclusive to code_2cc8c_b, verified. OBSERVED:
+                               Obj86B60__FindNextFreeSlot, an array of
                                pointers indexed by an Obj86B60 index and
                                null-checked (never dereferenced) -- a
                                registration slot table, one entry per index
-                               tracked by Obj86B60->unk58/unk50 */
-    char **unk1C;           /* +0x01C, OBSERVED: Obj86B60__SetTarget (round 12) --
+                               tracked by Obj86B60->activeSlot/slotCount */
+    char **names;            /* +0x01C, renamed from unk1C, round 78 --
+                                exclusive to code_2cc8c_b, verified. OBSERVED:
+                                Obj86B60__SetTarget (round 12) --
                                 a NULL-terminated array of C strings, DISTINCT
-                                from unk18 at +0x018 (adjacent field, same
-                                shape, different slot). Walked with
+                                from registrationSlots at +0x018 (adjacent
+                                field, same shape, different slot). Walked with
                                 `strlen` and passed to
                                 `New_Obj6EAC0` to build each entry of
-                                Obj86B60->unk54[i]/unk64[i]. */
-    u8 *unk20;               /* +0x020, OBSERVED: Obj86B60__UpdateSlotElements (round 12) --
+                                Obj86B60->slotElements[i]/itemLists[i]. */
+    u8 *externalRecords;     /* +0x020, renamed from unk20, round 78 --
+                                exclusive to code_2cc8c_b, verified. OBSERVED:
+                                Obj86B60__UpdateSlotElements (round 12) --
                                 a pointer walked forward 8 bytes per loop
                                 iteration (an external array of 8-byte
                                 records this unit never reads through
