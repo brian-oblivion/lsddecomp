@@ -6,6 +6,107 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-24 — round 78: ten units named, five "game" functions were Sony's, and track 4 opens
+
+**Ten Sonnet naming sessions in two waves of five, all merged green.** The head
+ran on Opus as an ordinary head (not premium). Gate 0 was clean. Wave 2 refilled
+the slots after wave 1 merged (§3.8), with wave 1's findings in the prompt.
+
+| track | sessions | model | outcome |
+| --- | --- | --- | --- |
+| 3 | 10 | sonnet | class_3bb8c_e (TaskObjF card-I/O methods), Entity_c (20 `gEntityMoodHandlerTable` handlers; rows 19..38 and 119 checked against retail, row 28 NULL, row 30 also occupies 122), code_179d8_f_b, code_2cc8c_e0, code_2cc8c_e1, code_179d8_c, class_3bb8c (Class866E8 footprint/rate engine), class_3bb8c_l (ObjM methods), code_2cc8c and code_2cc8c_b (Obj86B60 base methods inherited from `gTaskCoreMethods`). All ten reviewed and marked |
+| 2 | head | opus | five functions plan.py counted as game code identified as Sony's (below) |
+| 1 | 0 | none | job #2 (`func_80030980` REVISIT-2) skipped: its ownership is still the operator's call (rounds 76, 77) |
+
+plan.py now reads 1154/1155 game functions matched (the game total fell by five,
+because five functions moved to library). Track 2 is at 233 named. Track 3 is at
+60/75 units, **so track 4 opens.**
+
+### Sony code hiding in one-function game units
+
+Every one of these had a game-code unit, passed every screen, and read as clean
+naming ground. Each has an `identified` symbols line and a head note in its report.
+
+- **`GsSetNearClip` (libgs/gs_101) and `GsSetWorkBase` (libgs/gs_124)**,
+  code_2cc8c_e0/_e1. Each is 4 words, `sdkname.py` EXACT but TINY, and stores only
+  to a `psyq-objects.ld`-pinned Sony global (`GsCLIP3near`, `GsOUT_PACKET_P`).
+  Both sit inside the run of placed libgs objects. The runners had named them
+  `SetClipNear` and `SetPacketBufCursor`. Charlie did not act on the head's
+  broadcast correction, so both were fixed at merge. The prototypes moved out of
+  `include/code_2cc8c.h` into code_2cc8c_d.c as local LIBGS.H externs, following
+  the round-34 `GsSetLightMode` precedent.
+- **`SsInit`/`SsInitHot` (libsnd/ssinit) and `SpuInitHot` (libspu/s_ih)**. Each
+  had a 4-way AMBIGUOUS EXACT fingerprint, and position plus body decided it:
+  `_SsInit(0)` and `_SsInit(1)` in the ssinit slot, and `_SsInit`'s mode!=0 arm
+  opposite `SpuInit`. `SpuInitHot` is bravo's wave-1 `func_80036AA8`, which it
+  correctly kept `func_`. That unit (code_179d8_f_b) now holds no game code.
+  `func_80038E44` (SpuInit's callee, probably `_SpuInit`) has no fingerprint and
+  stays parked.
+- Also renamed onto their `psyq-objects.ld` pins: `D_8008EA00` -> `_snd_openflag`,
+  `D_8008E934` -> `_snd_ev_flag`.
+- **Why the screens missed them:** plan.py's library set is fingerprint >= a bar,
+  a pin, or an `identified` line. A TINY or AMBIGUOUS EXACT hit meets none of
+  those, however strong its position evidence. Wave 2's prompt told runners to
+  run `sdkname.py` before naming anything, and alpha found the ssinit pair that
+  way. ESCALATED below.
+
+### Head review and fixes at merge
+
+- Every unit's class prefix was checked against `classtable.py`. TaskObjF: 14 of
+  19 functions are literal `gTaskObjFMethods` entries. ObjM (0x80087034) and
+  Class866E8 (0x800866E8): every slot claim matched. Obj86B60: the
+  `gClass86B60Methods --vs gTaskCoreMethods` slot diff confirms delta's
+  SetState/Tick/RefreshViewValue as the base occupants of the overridden slots.
+- `gMcTempFileSuffix` -> `sMcTempFileSuffix` (one unit only). The `g`/`s` miss
+  recurred once in ten units.
+- **Field and slot names applied by type scope** (definition first, compiler
+  lists the accessors, both oracles green each):
+  - Entity: `unk80` -> `moodDuration` (30 accessors), `unkF4` -> `targetReached`
+    (13, plus its setter `Entity__SetUnkF4` -> `Entity__SetTargetReached`), and
+    `EntityMethods::slot144` -> `distanceToRegion` (8).
+  - `Obj866E8::unk6C` -> `target`. Bravo proposed `posSource`, but the unit's own
+    `SetTarget...`/`GetTargetDescriptor` already call it the target.
+  - `GenericCtorTable_3bb8c_d::slot40` -> `setCardSlot`.
+  - Obj86B60: `unk4C` -> `target` (36 accessors), `unk88` -> `fadeCallback`,
+    `unk9C`/`unkA0` -> `viewCallback`/`viewCallbackCtx`, `unk90` -> `baseColor`.
+    `Unk4CObj::unk10` -> `unselectedColor`.
+  - Declined, with reasons in the reports:
+    - `Obj866E8::unkBC` -> `descriptor`: restates the type.
+    - `Obj86B60::unk3C`: echo's `scrollState` and delta's `notifyMode` disagree.
+    - `unk40` -> `frameBound`: its only source is the setter's own name.
+    - The `TaskObjFMethods` pad split and the `Unk4CObj::unk24` retype are view
+      unification, which is track 4 work.
+- The delta and echo branches each wrote report text naming the other's
+  pre-rename `func_` symbols. The head swept both maps over the reports, leaving
+  the historical `Renamed from` and `old -> new` lines alone. MATCHING-GUIDE's
+  four citations were updated by hand, since rule docs are outside `rename.py`.
+- A stale round-42 blocker banner was removed from code_179d8_f_b. Every merge
+  had the symbols-file append conflict; each was resolved by keeping both sides
+  and checking for duplicate names and addresses.
+
+### ESCALATED (operator decisions; the head did not act)
+
+1. **`func_80030980`'s ownership** (rounds 76, 77) is still open and still keeps
+   track 1 from done. Its call-graph neighbour code_179d8_c is now named and
+   marked, so nothing else blocks a decision.
+2. **Should plan.py treat a TINY or AMBIGUOUS EXACT fingerprint with position
+   evidence as library, or at least flag it?** Five functions this round sat in
+   the naming queue as game code. The runner-prompt line "run `sdkname.py` before
+   naming" worked in wave 2, but §4.2 does not carry it. That is a plan and tool
+   change, so it is the premium session's call.
+3. **Do these count as failed Sonnet reviews?** Two wave-1 Sonnet units gave a
+   tier-A game name to Sony code, and one ignored a head broadcast. The names
+   described the mechanics correctly, and the ownership was invisible to
+   plan.py. The head counted them as passes and kept the naming runner on
+   Sonnet. This is the same open question as round 77's item 2.
+4. **Track 4 is now open, and its first class needs a premium head** (§3 track 4:
+   "The head does the first class itself"). plan.py lists the track-4 job as
+   #3 with model `opus`, so an Opus head following the list would staff it.
+5. **One base class has two type names**: `TaskCoreObj` (code_2c054.h) and
+   `Obj86B60` (code_2cc8c.h), both for `gTaskCoreMethods`'s methods. The new
+   names followed the existing `Obj86B60__` precedent (89 uses of each
+   prefix at the round's start). Picking one is a track-4 unification decision.
+
 ## 2026-09-24 — round 77: eight units named, the last workable stall matched, and one game function left
 
 **Nine runner sessions across two tracks, and every merge green.** The head
