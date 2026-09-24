@@ -89,8 +89,8 @@ void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
 
     Get_vtable_BasicClass()->ctor(self);
     self->methods = Get_vtable_Obj86ED0();
-    self->unk10 = strlen(arg1);
-    self->unk28 = BMemPMgrAlloc(self->unk10 + 4);
+    self->nameLen = strlen(arg1);
+    self->unk28 = BMemPMgrAlloc(self->nameLen + 4);
 
     p = gNameCharTable;
     count = 0;
@@ -179,11 +179,11 @@ void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
 {
     self->mode = mode;
     self->nameBuf = arg1;
-    self->unk18 = 0;
+    self->cursorIndex = 0;
     self->unk1C = 0;
     if (mode == 1) {
         DecodeFullWidthSjis(self->unk28, arg1);
-        self->unk10 /= 2;
+        self->nameLen /= 2;
     } else {
         strcpy(self->unk28, arg1);
     }
@@ -239,7 +239,7 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
 
     handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
-    self->unk44 = New_Obj6EAC0(handle2, self->unk10, self->unk28);
+    self->unk44 = New_Obj6EAC0(handle2, self->nameLen, self->unk28);
     self->unk40 = func_80041AB4(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
@@ -413,13 +413,13 @@ void Obj86ED0__MoveCursorRight(Obj86ED0 *self)
     s32 v;
 
     if (self->unk48 != NULL) {
-        old = self->unk18;
+        old = self->cursorIndex;
         v = old + 1;
-        self->unk18 = v;
-        if (v < self->unk10) {
+        self->cursorIndex = v;
+        if (v < self->nameLen) {
             self->methods->slotA4(self, v, 1);
         } else {
-            self->unk18 = old;
+            self->cursorIndex = old;
         }
     }
 }
@@ -430,13 +430,13 @@ void Obj86ED0__MoveCursorLeft(Obj86ED0 *self)
     s32 v;
 
     if (self->unk48 != NULL) {
-        old = self->unk18;
+        old = self->cursorIndex;
         v = old - 1;
-        self->unk18 = v;
+        self->cursorIndex = v;
         if (v >= 0) {
             self->methods->slotA4(self, v, 1);
         } else {
-            self->unk18 = old;
+            self->cursorIndex = old;
         }
     }
 }
@@ -449,7 +449,7 @@ void Obj86ED0__AdvanceCharSelect(Obj86ED0 *self)
         v = self->unk1C + 1;
         self->unk1C = v;
         if (v < self->unk14) {
-            self->methods->slotA8(self, self->unk18, v, 1);
+            self->methods->slotA8(self, self->cursorIndex, v, 1);
         } else {
             self->unk1C = 0;
         }

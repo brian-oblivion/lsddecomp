@@ -34,7 +34,7 @@ void Obj86ED0__AdvanceCountdown(Obj86ED0 *self)
         count = self->unk1C - 1;
         self->unk1C = count;
         if (count > 0) {
-            self->methods->slotA8(self, self->unk18, count, 1);
+            self->methods->slotA8(self, self->cursorIndex, count, 1);
         } else {
             self->unk1C = self->unk14;
         }
@@ -52,7 +52,7 @@ void Obj86ED0__ResetCountdown(Obj86ED0 *self)
 {
     if (self->unk48) {
         self->unk1C = 0;
-        self->methods->slotA8(self, self->unk18, 0, 1);
+        self->methods->slotA8(self, self->cursorIndex, 0, 1);
     }
 }
 
@@ -62,15 +62,15 @@ void Obj86ED0__ResetAllAndFinish(Obj86ED0 *self)
 
     if (self->unk48) {
         self->unk1C = 0;
-        i = self->unk10 - 1;
+        i = self->nameLen - 1;
         if (i >= 0) {
             do {
-                self->unk18 = i;
+                self->cursorIndex = i;
                 self->methods->slotA8(self, i, self->unk1C, 0);
                 i--;
             } while (i >= 0);
         }
-        self->methods->slotA4(self, self->unk18, 1);
+        self->methods->slotA4(self, self->cursorIndex, 1);
     }
 }
 
@@ -106,7 +106,7 @@ void Obj86ED0__DispatchIndexValue(Obj86ED0 *self, s32 arg1, s32 arg2)
         local.unk0 = arg1 * 7 + D_8008AADC;
         obj = self->unk40;
         obj->methods->slotBC(obj, &local);
-        self->unk18 = arg1;
+        self->cursorIndex = arg1;
         if (arg2) {
             self->methods->slot60(self, 0);
         }
@@ -129,7 +129,7 @@ void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
         self->unk28[arg1] = gNameCharTable[arg2];
         obj = self->unk44;
         obj->methods->slotC4(obj, gNameCharTable[arg2], arg1);
-        self->unk18 = arg1;
+        self->cursorIndex = arg1;
         self->unk1C = arg2;
         if (arg3) {
             self->methods->slot60(self, 0);

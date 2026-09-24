@@ -133,6 +133,8 @@ No existing declaration's TYPE changed.
 
 ## Proposed field names
 
+**Head, round 77:** `unk10 -> nameLen` and `unk18 -> cursorIndex` APPLIED by type scope (set from `strlen(arg1)`; inc/dec by the cursor pair, capped by it). The rest remain PROPOSED for the base-class or track 4 pass; `altInputFlag` was self-rated low confidence.
+
 Cross-unit fields/slots of `Obj86ED0` (shared header `include/class_3bb8c.h`)
 that this unit's own functions read/write but that class_3bb8c_j ALSO
 accesses -- left unrenamed per the field-ownership rule (compiler-checked:

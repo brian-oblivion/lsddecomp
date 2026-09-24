@@ -81,6 +81,8 @@ entirely inside `src/class_3bb8c_d.c`).
 
 ## Proposed field names
 
+**Head, round 77:** `unkAC -> saveCtrl` APPLIED by type scope (11 accessors, class_3bb8c_c/_d).
+
 `Class86B60::unkAC` has a real accessor outside this unit
 (`src/class_3bb8c_c.c`'s `Class86B60__Class86B60` zeroes it), so per the
 compiler-ownership rule this is a PROPOSAL, not a rename. Also posted to

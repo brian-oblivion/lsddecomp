@@ -57,6 +57,8 @@ Renamed `func_8004D814` -> `Class86B60__ShowTitleIcon`. **Tier B**: Passes `&D_8
 
 ## Proposed field names
 
+**Head, round 77:** `unkA4 -> dreamSysView` APPLIED by type scope.
+
 `Class86B60::unkA4` has a real accessor outside this unit
 (`src/class_3bb8c_c.c`'s `Class86B60__Class86B60` sets it from its own
 `dreamSys` parameter), so per the compiler-ownership rule this is a

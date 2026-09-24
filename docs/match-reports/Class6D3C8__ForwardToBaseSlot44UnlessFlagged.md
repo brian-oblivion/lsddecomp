@@ -87,6 +87,8 @@ unit) dispatches it by field name directly
 struct definition here would break that unit's build, which is outside this
 runner's ownership. See `## Proposed field names` below.
 
+**Head, round 77:** applied as `forwardToBaseSlot44UnlessFlagged` (the method was renamed at review: 'overridden' asserted a purpose the body does not show).
+
 ## Proposed field names
 
 - **`Class6D3C8Methods.slot44` -> `forwardToBaseUnlessOverridden`**, tier B,

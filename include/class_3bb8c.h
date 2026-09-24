@@ -2816,9 +2816,9 @@ struct Obj86ED0 {
     Obj86ED0Methods *methods;  /* +0x000 */
     u8 pad004[0x00C - 0x004];   /* inherited BasicClass children/parentRefs, untouched by this unit */
     s32 mode;                    /* +0x00C, RENAMED round 77 (was unkC) -- Obj86ED0__SetName: its own `mode` argument, unit-exclusive (only class_3bb8c_i's own functions touch it) */
-    s32 unk10;                   /* +0x010, Obj86ED0__SetName (halved when mode==1)/Obj86ED0__MoveCursorRight (upper bound tested against unk18+1) */
+    s32 nameLen;                   /* +0x010, Obj86ED0__SetName (halved when mode==1)/Obj86ED0__MoveCursorRight (upper bound tested against cursorIndex+1) */
     s32 unk14;                   /* +0x014, Obj86ED0__AdvanceCharSelect (upper bound tested against unk1C+1) */
-    s32 unk18;                   /* +0x018, Obj86ED0__SetName (zeroed)/Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft (inc/dec counter, capped by unk10) */
+    s32 cursorIndex;                   /* +0x018, Obj86ED0__SetName (zeroed)/Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft (inc/dec counter, capped by nameLen) */
     s32 unk1C;                   /* +0x01C, Obj86ED0__SetName (zeroed)/Obj86ED0__AdvanceCharSelect (inc counter or reset to 0, capped by unk14) */
     s32 unk20;                   /* +0x020, Obj86ED0__AttachTarget (zeroed)/Obj86ED0__ToggleFlag20 (xor-toggled, class_3bb8c_j) */
     char *nameBuf;                /* +0x024, RENAMED round 77 (was unk24) -- Obj86ED0__SetName: its own `arg1` (caller-owned name-string buffer, unit-exclusive); Obj86ED0__HandleCommand's `case 25` re-encodes `unk28` back INTO this buffer on commit */

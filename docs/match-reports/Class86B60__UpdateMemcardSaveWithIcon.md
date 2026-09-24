@@ -84,6 +84,8 @@ Renamed `func_8004E0E4` -> `Class86B60__UpdateMemcardSaveWithIcon`. **Tier B, lo
 
 ## Proposed field names
 
+**Head, round 77: NOT APPLIED.** `saveInfoWord`/`saveInfoBuf` restate the types (a word, a buffer) without saying what they hold; kept `unkBC`/`unkC0` until a reader establishes it.
+
 `Class86B60::unkBC`/`unkC0` both have real accessors outside this unit
 (`src/class_3bb8c_c.c`'s `Class86B60__Class86B60` sets both from
 `dreamSysView->methods->slot1B0`), so per the compiler-ownership rule
