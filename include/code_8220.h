@@ -39,7 +39,7 @@ typedef struct BasicClassMethods BasicClassMethods;
 typedef struct BasicClassListNode BasicClassListNode;
 
 /* One node of either of BasicClass's two lists. 8 bytes -- the literal
- * allocation size func_800181AC passes to the pool allocator. */
+ * allocation size PushBasicClassListNode passes to the pool allocator. */
 struct BasicClassListNode {
     BasicClassListNode *next;  /* +0x000 */
     BasicClass *value;          /* +0x004 */
@@ -54,8 +54,8 @@ struct BasicClassMethods {
     /* +0x014 */ void (*removeChild)(BasicClass *self, BasicClass *child);        /* BasicClass__func_17ff0 */
     /* +0x018 */ void (*removeAllChildren)(BasicClass *self);                     /* BasicClass__func_18040 */
     /* +0x01C */ void (*getNextChild)(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor); /* BasicClass__func_180bc */
-    /* +0x020 */ s32 (*addParentRef)(BasicClass *self, BasicClass *parent);       /* BasicClass__func_180fc; tail-calls func_800181AC, so typed non-void per the one-line-wrapper rule */
-    /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__func_1811c; tail-calls func_80018208, which is void (see below) */
+    /* +0x020 */ s32 (*addParentRef)(BasicClass *self, BasicClass *parent);       /* BasicClass__func_180fc; tail-calls PushBasicClassListNode, so typed non-void per the one-line-wrapper rule */
+    /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__func_1811c; tail-calls RemoveBasicClassListNode, which is void (see below) */
     /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__func_1813c */
     /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__func_1816c */
     /* +0x030 */ void (*notifyParents)(BasicClass *self, s32 arg1);                  /* BasicClass__NotifyParents; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, event). Named round 51, tier A: the EMITTER, not a handler, and not finalize-specific -- `arg1` is a general event code the base only ever sees as 1. */
@@ -118,8 +118,8 @@ struct BMemPMgr {
  * (K&R identifier-list) parameter list, which is the only way to expose
  * that second parameter to their own bodies without contradicting the
  * ~15 external single-argument prototypes OR this same unit's own
- * single-argument call sites (func_800181AC's `BMemPMgrAlloc(0x8)`,
- * func_80018208's `BMemPMgrFree(node)`) that appear LATER in
+ * single-argument call sites (PushBasicClassListNode's `BMemPMgrAlloc(0x8)`,
+ * RemoveBasicClassListNode's `BMemPMgrFree(node)`) that appear LATER in
  * code_8220.c. A K&R-style definition does not install a prototype, so
  * those later 1-argument calls stay uncheck-and-compile clean; an
  * unspecified-parameter declaration here does the same for everything
@@ -161,11 +161,11 @@ extern s32 GetBMemPMgrBusy(void);
  * unit includes the SDK header first. See CLAUDE.md, "To include/ has one
  * exception". */
 
-/* BasicClass list primitives, this unit. func_800181AC/func_80018208
+/* BasicClass list primitives, this unit. PushBasicClassListNode/RemoveBasicClassListNode
  * stay INCLUDE_ASM this round; calling into a still-INCLUDE_ASM function
  * in the same or another unit is fine (docs/DECOMPILATION_LEARNINGS.md). */
-extern s32 func_800181AC(BasicClassListNode **head, BasicClass *value);  /* push: allocate a node, prepend to *head */
-extern void func_80018208(BasicClassListNode **head, BasicClass *value); /* find node by ->value == value, unlink, free; void -- see .md */
+extern s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value);  /* push: allocate a node, prepend to *head */
+extern void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value); /* find node by ->value == value, unlink, free; void -- see .md */
 
 /* Matched in code_8220_b, round 13. */
 extern void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor); /* pop *cursor into *outValue (or NULL), advance *cursor */

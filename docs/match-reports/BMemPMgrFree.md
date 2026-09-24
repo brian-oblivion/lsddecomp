@@ -369,8 +369,8 @@ register the caller happens to leave loaded.
 `src/code_8220.c` with old-style (K&R identifier-list) parameter lists, which is
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
-unit's own later one-argument call sites (`func_800181AC`'s
-`BMemPMgrAlloc(0x8)`, `func_80018208`'s `BMemPMgrFree(node)`). A K&R definition
+unit's own later one-argument call sites (`PushBasicClassListNode`'s
+`BMemPMgrAlloc(0x8)`, `RemoveBasicClassListNode`'s `BMemPMgrFree(node)`). A K&R definition
 installs no prototype, so those later calls stay clean; an unspecified-parameter
 declaration does the same for everything before the definition. A full prototype
 here reintroduces exactly that conflict.

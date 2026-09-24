@@ -277,14 +277,14 @@ void BasicClass__func_17f2c(BasicClass *self)
 
 void BasicClass__func_17f98(BasicClass *self, BasicClass *child)
 {
-    if (func_800181AC(&self->children, child)) {
+    if (PushBasicClassListNode(&self->children, child)) {
         child->methods->addParentRef(child, self);
     }
 }
 
 void BasicClass__func_17ff0(BasicClass *self, BasicClass *child)
 {
-    func_80018208(&self->children, child);
+    RemoveBasicClassListNode(&self->children, child);
     child->methods->removeParentRef(child, self);
 }
 
@@ -313,12 +313,12 @@ void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassL
 
 s32 BasicClass__func_180fc(BasicClass *self, BasicClass *parent)
 {
-    return func_800181AC(&self->parentRefs, parent);
+    return PushBasicClassListNode(&self->parentRefs, parent);
 }
 
 void BasicClass__func_1811c(BasicClass *self, BasicClass *parent)
 {
-    func_80018208(&self->parentRefs, parent);
+    RemoveBasicClassListNode(&self->parentRefs, parent);
 }
 
 void BasicClass__func_1813c(BasicClass *self)
@@ -335,7 +335,7 @@ void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClass
     GetNextBasicClass(outParent, cursor);
 }
 
-s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
+s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value)
 {
     BasicClassListNode *node;
     BasicClassListNode *oldHead;
@@ -351,7 +351,7 @@ s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
     return 0;
 }
 
-void func_80018208(BasicClassListNode **head, BasicClass *value)
+void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value)
 {
     BasicClassListNode *prev;
     BasicClassListNode *node;

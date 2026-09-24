@@ -19,7 +19,7 @@ until the list is exhausted.
 `GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor)`,
 `void`. Pop-and-advance: reads `node = *cursor`; if null, `*outValue = 0`;
 else `*outValue = node->value`, `*cursor = node->next`. Does NOT free the
-popped node (that's `removeChild`'s/`func_80018208`'s job, which is called
+popped node (that's `removeChild`'s/`RemoveBasicClassListNode`'s job, which is called
 separately on each extracted value by THIS function's caller-facing use of
 it — `GetNextBasicClass` only walks, it never frees). Also used, identically,
 by the still-`INCLUDE_ASM` `BasicClass__func_180bc`/`BasicClass__func_1816c`

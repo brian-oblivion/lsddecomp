@@ -1826,3 +1826,5 @@ FreeMem = 0x80017AA8; // type:func
 SetupBMemPMgrFreeList = 0x80017AC8; // type:func
 BMemPMgrAlloc = 0x80017B34; // type:func
 BMemPMgrFree = 0x80017CFC; // type:func
+PushBasicClassListNode = 0x800181AC; // type:func
+RemoveBasicClassListNode = 0x80018208; // type:func

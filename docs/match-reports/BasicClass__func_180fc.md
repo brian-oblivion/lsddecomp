@@ -9,7 +9,7 @@ through this slot on a child object.
 
 ## What it does
 
-A one-line wrapper: tail-calls `func_800181AC(&self->parentRefs, parent)`
+A one-line wrapper: tail-calls `PushBasicClassListNode(&self->parentRefs, parent)`
 — pushes `parent` onto `self`'s back-reference list. `$a0` is computed
 (`self + 0x8`, i.e. `&self->parentRefs`) but `$a1` (the value to push) is
 never touched in this function's own body, forwarded unchanged from the
@@ -20,13 +20,13 @@ caller.
 ```c
 s32 BasicClass__func_180fc(BasicClass *self, BasicClass *parent)
 {
-    return func_800181AC(&self->parentRefs, parent);
+    return PushBasicClassListNode(&self->parentRefs, parent);
 }
 ```
 
 ## Why `s32`, not `void`
 
-Per the one-line-wrapper rule: `func_800181AC` (matched this round, see
+Per the one-line-wrapper rule: `PushBasicClassListNode` (matched this round, see
 its own report) is a real `s32`-returning function (1 on successful push,
 0 on pool-allocation failure), and nothing in this function's own body
 overwrites `$v0` after the call — a genuine tail call, so `return` is

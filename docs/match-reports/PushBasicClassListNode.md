@@ -1,4 +1,6 @@
-# func_800181AC
+# PushBasicClassListNode
+
+> Renamed from `func_800181AC` on 2026-09-24 (tools/rename.py). Address 0x800181ac.
 
 **Unit:** code_8220 · **Size:** 23 instructions · **Status:** MATCHED (23/23 words)
 
@@ -20,7 +22,7 @@ returns `1`. On allocation failure, returns `0` without touching `*head`.
 ## The C
 
 ```c
-s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
+s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value)
 {
     BasicClassListNode *node;
     BasicClassListNode *oldHead;
@@ -60,3 +62,11 @@ attempt.
 
 round 11 (2026-09-03), runner delta, unit code_8220, second pass. 2
 attempts.
+
+## Naming (round 74)
+
+`PushBasicClassListNode`, **tier A**: allocates an 8-byte `BasicClassListNode`
+from `BMemPMgrAlloc` and prepends it to `*head`; used identically for both
+of `BasicClass`'s lists (`children` via `BasicClass__func_17f98`/AddChild,
+`parentRefs` via `BasicClass__func_180fc`/AddParentRef), confirming it is
+the shared list-push primitive rather than something list-specific.

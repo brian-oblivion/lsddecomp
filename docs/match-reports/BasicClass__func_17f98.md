@@ -7,7 +7,7 @@ for the class's overall design.
 
 ## What it does
 
-`AddChild`: pushes `child` onto `self->children` (via `func_800181AC`,
+`AddChild`: pushes `child` onto `self->children` (via `PushBasicClassListNode`,
 still `INCLUDE_ASM` this round but its extern signature is established —
 see below), and if the push succeeded, notifies the child by dispatching
 ITS OWN vtable slot `+0x020` (`addParentRef`) as `child->methods->
@@ -21,15 +21,15 @@ addParentRef(child, self)` — registering `self` in the child's
 ```c
 void BasicClass__func_17f98(BasicClass *self, BasicClass *child)
 {
-    if (func_800181AC(&self->children, child)) {
+    if (PushBasicClassListNode(&self->children, child)) {
         child->methods->addParentRef(child, self);
     }
 }
 ```
 
-## `func_800181AC`'s signature, established here
+## `PushBasicClassListNode`'s signature, established here
 
-`func_800181AC(BasicClassListNode **head, BasicClass *value)` returning
+`PushBasicClassListNode(BasicClassListNode **head, BasicClass *value)` returning
 `s32` (1 on success, 0 if the pool allocation failed) — allocates an
 8-byte `BasicClassListNode` from the pool (`BMemPMgrAlloc(0x8)`), sets
 `node->value = value`, prepends it to `*head`. Confirmed non-void by this
@@ -43,6 +43,6 @@ call sites.
 ## Provenance
 
 round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). One
-collateral-drift residue (1 word, the `jal func_800181AC` target address)
+collateral-drift residue (1 word, the `jal PushBasicClassListNode` target address)
 resolved itself once `BasicClass__func_18040` reached its correct size —
 see that function's own report; nothing needed changing here.

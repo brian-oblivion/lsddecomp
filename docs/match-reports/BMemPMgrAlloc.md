@@ -380,7 +380,7 @@ The old report was right that `BMemPMgrAlloc`'s own body genuinely reads
 `D_8008A818` is unset), and right that every external caller passes only one
 argument and must keep doing so. What it did not resolve is HOW a function
 can have a real second parameter in its own body while every external
-prototype — including a same-file call, `func_800181AC`'s
+prototype — including a same-file call, `PushBasicClassListNode`'s
 `BMemPMgrAlloc(0x8)` — stays single-argument. A single ANSI prototype cannot
 do both: whichever parameter count the header declares, either the body
 can't see the fallback or the 1-arg call sites stop compiling.
@@ -393,8 +393,8 @@ does NOT install a prototype for the rest of the translation unit:
  * so a same-file definition can use K&R syntax without conflicting with
  * the ~15 other headers' single-argument ANSI prototypes, or this same
  * file's own single-argument call sites that appear textually AFTER the
- * definition (func_800181AC's `BMemPMgrAlloc(0x8)`,
- * func_80018208's `BMemPMgrFree(node)`). */
+ * definition (PushBasicClassListNode's `BMemPMgrAlloc(0x8)`,
+ * RemoveBasicClassListNode's `BMemPMgrFree(node)`). */
 extern void *BMemPMgrAlloc();
 extern void *BMemPMgrFree();
 ```
@@ -409,7 +409,7 @@ void *BMemPMgrAlloc(size, pool)
 }
 ```
 
-Confirmed this actually works end to end: `func_800181AC`'s existing
+Confirmed this actually works end to end: `PushBasicClassListNode`'s existing
 `BMemPMgrAlloc(0x8)` call, appearing later in the same file, kept compiling
 with no arity warning once this was in place. This is the same
 escape-hatch class as the project's already-documented "vtable slot
@@ -728,8 +728,8 @@ register the caller happens to leave loaded.
 `src/code_8220.c` with old-style (K&R identifier-list) parameter lists, which is
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
-unit's own later one-argument call sites (`func_800181AC`'s
-`BMemPMgrAlloc(0x8)`, `func_80018208`'s `BMemPMgrFree(node)`). A K&R definition
+unit's own later one-argument call sites (`PushBasicClassListNode`'s
+`BMemPMgrAlloc(0x8)`, `RemoveBasicClassListNode`'s `BMemPMgrFree(node)`). A K&R definition
 installs no prototype, so those later calls stay clean; an unspecified-parameter
 declaration does the same for everything before the definition. A full prototype
 here reintroduces exactly that conflict.

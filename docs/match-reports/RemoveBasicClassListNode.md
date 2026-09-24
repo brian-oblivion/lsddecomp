@@ -1,4 +1,6 @@
-# func_80018208
+# RemoveBasicClassListNode
+
+> Renamed from `func_80018208` on 2026-09-24 (tools/rename.py). Address 0x80018208.
 
 **Unit:** code_8220 · **Size:** 32 instructions · **Status:** MATCHED (32/32 words)
 
@@ -20,7 +22,7 @@ nothing if no match is found.
 ## The C
 
 ```c
-void func_80018208(BasicClassListNode **head, BasicClass *value)
+void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value)
 {
     BasicClassListNode *prev;
     BasicClassListNode *node;
@@ -43,7 +45,7 @@ void func_80018208(BasicClassListNode **head, BasicClass *value)
 }
 ```
 
-## One branch-polarity flip needed, same family as func_800181AC's
+## One branch-polarity flip needed, same family as PushBasicClassListNode's
 
 First attempt wrote the intuitively-ordered `if (prev == NULL) { *head =
 ...; } else { prev->next = ...; }` — reads naturally as "handle the head
@@ -61,3 +63,12 @@ diff was two SWAPPED words, not two wrong ones).
 
 round 11 (2026-09-03), runner delta, unit code_8220, second pass. 2
 attempts.
+
+## Naming (round 74)
+
+`RemoveBasicClassListNode`, **tier A**: finds the node in `*head` whose
+`value == value`, unlinks it, and releases it via `BMemPMgrFree`; used
+identically for both of `BasicClass`'s lists (`children` via
+`BasicClass__func_17ff0`/RemoveChild, `parentRefs` via
+`BasicClass__func_1811c`/RemoveParentRef), the release-side mirror of
+`PushBasicClassListNode`.
