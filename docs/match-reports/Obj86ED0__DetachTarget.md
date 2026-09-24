@@ -21,3 +21,7 @@ void Obj86ED0__DetachTarget(Obj86ED0 *self)
 
 First attempt, matched immediately once the earlier in-unit drift was
 resolved.
+
+## Naming
+
+- `Obj86ED0__DetachTarget` -- tier A. gObj86ED0Methods +0x050 (classtable.py). Symmetric teardown of Obj86ED0__AttachTarget: removes childType2/childType5 via self->methods->removeChild, clears target.

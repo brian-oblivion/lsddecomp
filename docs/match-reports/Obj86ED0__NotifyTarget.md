@@ -48,3 +48,7 @@ existing `self->methods->slotN(self, arg1, LITERAL, LITERAL)`
 forward-and-repeat idiom before trusting it -- an unused/untouched `$a1`
 register in the callee is the tell that the slot takes one more argument
 than the call appears to set explicitly.
+
+## Naming
+
+- `Obj86ED0__NotifyTarget` -- tier B. gObj86ED0Methods +0x060 (classtable.py) -- this IS the `slot60` implementation dispatched by both Obj86ED0__HandleCommand (arg1=0x10) and class_3bb8c_j's Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue (arg1=0). Forwards arg1 to the attached `target`'s own slot80(target, arg1, 0x60, 0x60) when target != NULL. Mechanics clear (pings the linked TargetObj86ED0 whenever the name cursor or character selection changes); the on-screen meaning of the two 0x60 literals is not established. Since `slot60` is referenced by both this unit and class_3bb8c_j, the SLOT NAME is left as `slot60` in the shared header (PROPOSED name below), even though the FUNCTION name is confidently renamed here (function renames are tree-wide, not subject to the field-ownership rule).

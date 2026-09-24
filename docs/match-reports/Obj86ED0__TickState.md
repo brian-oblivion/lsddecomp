@@ -34,3 +34,7 @@ checks are written in the same order as retail's two `slti` comparisons
 expression -- writing the fold produced a different (and, untested, possibly
 also-matching) instruction sequence, but there was no need to explore that
 once the direct transliteration matched first try.
+
+## Naming
+
+- `Obj86ED0__TickState` -- tier B. gObj86ED0Methods +0x058 (tickState slot, classtable.py), dispatched by Obj86ED0__Notify's tag==5 case. Per-notify advance while closeState is in [2,4): increments closeTickCount, and once it was already nonzero, calls setState(self,4) -- a one-tick-delayed close-to-finish handoff. Purpose (why a delay) not established.

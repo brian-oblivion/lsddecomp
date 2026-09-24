@@ -82,3 +82,7 @@ None new beyond what's already documented project-wide (the `-fno-builtin`
 / hand-rolled-`strlen`-loop point is a specific instance of the general
 "retail's inline-looking code may really be inline SOURCE, not an
 optimized-away call" caution, not a new lever).
+
+## Naming
+
+- `Obj86ED0__Obj86ED0` -- tier A. The class's own ctor override (classtable.py gObj86ED0Methods +0x008), dispatched only by New_Obj86ED0. `Class__Class` is this project's established constructor convention.

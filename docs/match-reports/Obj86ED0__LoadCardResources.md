@@ -145,3 +145,7 @@ other values (like `dir`/`ext` here) that genuinely persist across both
 blocks unchanged. Reusing the single local measurably changed those OTHER
 values' register assignment too, not just the reused local's own -- the
 three-value swap was resolved by touching only the non-persistent one.
+
+## Naming
+
+- `Obj86ED0__LoadCardResources` -- tier A. gObj86ED0Methods +0x044 (classtable.py). Resolves 'CARD\\COMINPUT.TIM'/'CARD\\FONTICON.TIM' memory-card paths (sCardPathPrefix/sStrComInput/sStrFontIcon/sTimExt, all this unit's own strings) and loads/wraps them into the three resource handles (unk48/unk44/unk40). String evidence is direct, not inferred.

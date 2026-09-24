@@ -26,3 +26,7 @@ First attempt, transcribed directly (order matters: both `addChild` calls
 before any of the three stores), matched immediately once the earlier
 in-unit drift (from `Obj86ED0__Notify`/`Obj86ED0__SetName`, fixed first) was
 resolved -- this function's own C never changed.
+
+## Naming
+
+- `Obj86ED0__AttachTarget` -- tier B. gObj86ED0Methods +0x04C (classtable.py). Adds two children via self->methods->addChild, stores a third pointer as `target`, resets closeState/unk20. Mechanics clear (bind two tagged children plus a dispatch target); the game-level reason this bundle is attached together is not established.

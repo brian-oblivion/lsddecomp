@@ -1,3 +1,27 @@
+/*
+ * class_3bb8c_i -- third carved slice of the class_3bb8c block, 20 functions,
+ * carved round 14. include/class_3bb8c.h is SHARED with every other
+ * class_3bb8c_* slice; header edits here must be strictly ADDITIVE.
+ *
+ * All 20 functions are `Obj86ED0` methods (vtable `gObj86ED0Methods`,
+ * `D_80086ED0`, 42 slots, `tools/classtable.py gObj86ED0Methods`) -- the
+ * ONLY class this unit defines methods for. `Obj86ED0` is a BasicClass
+ * subclass that resolves and drives the memory-card save-name-entry UI: it
+ * loads the `CARD\COMINPUT.TIM`/`CARD\FONTICON.TIM` icon/font resources
+ * (`Obj86ED0__LoadCardResources`), holds both a caller-owned name buffer
+ * (`nameBuf`) and its own half-width working copy (`unk28`, decoded/encoded
+ * via `DecodeFullWidthSjis`/`EncodeFullWidthSjis`), and routes a dense
+ * numeric command switch (`Obj86ED0__HandleCommand`) to cursor-move
+ * (`MoveCursorRight`/`Left`), character-select-cycle (`AdvanceCharSelect`)
+ * and the countdown/blink group class_3bb8c_j already named
+ * (`AdvanceCountdown`/`ToggleFlag20`/`ResetCountdown`/`ResetAllAndFinish`).
+ * Four vtable slots (`advanceCountdown`/`toggleFlag20`/`resetCountdown`/
+ * `resetAllAndFinish`) resolve to class_3bb8c_j's own functions but are
+ * referenced ONLY here, so they are named in the shared header as this
+ * unit's own (classtable.py-verified, compiler-checked clean). See
+ * `docs/match-reports/Obj86ED0__HandleCommand.md` for the remaining
+ * cross-unit fields/slots this unit could not rename alone.
+ */
 #include "common.h"
 #include "class_3bb8c.h"
 

@@ -22,3 +22,7 @@ void Obj86ED0__RemoveAllChildren(Obj86ED0 *self)
 ```
 
 First attempt, straight transcription, matched immediately.
+
+## Naming
+
+- `Obj86ED0__RemoveAllChildren` -- tier A. gObj86ED0Methods +0x018 (classtable.py), overrides BasicClass's removeAllChildren: zeroes the same three fields Obj86ED0__ClearChildRefs zeroes, then dispatches the base class's removeAllChildren.

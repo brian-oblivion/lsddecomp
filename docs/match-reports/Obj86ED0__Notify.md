@@ -56,3 +56,7 @@ anyway costs a whole extra callee-saved register + frame growth that shows
 up as an 8-byte size regression shifting every later function in the unit.
 `TaskObjF__Notify`'s own cache was legitimate for THAT function (verify against
 its own disassembly, not by analogy); this one was not.
+
+## Naming
+
+- `Obj86ED0__Notify` -- tier A. gObj86ED0Methods +0x038 (classtable.py), overrides BasicClass's slot38 (the last BasicClass-defined slot): dispatches the base slot38, then tag-routes to handleCommand/tickState. Named to match the already-matched sibling TaskObjF__Notify (src/class_3bb8c_f.c), which reads the identical tag the identical way.

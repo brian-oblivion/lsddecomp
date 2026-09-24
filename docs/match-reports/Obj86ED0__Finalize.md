@@ -36,3 +36,7 @@ slot of this same getter must EXTEND `BasicMethods866E8F` in place (shrink
 the pad, add the field at its real offset) rather than declaring a second,
 differently-typed `Get_vtable_BasicClass` -- the latter is a straight redeclaration
 conflict the moment both land in one `.c` file via this shared header.
+
+## Naming
+
+- `Obj86ED0__Finalize` -- tier A. gObj86ED0Methods +0x00C (classtable.py), overrides BasicClass's finalize slot: frees unk28 then chains to Get_vtable_BasicClass()->finalize. Standard dtor-shaped override.

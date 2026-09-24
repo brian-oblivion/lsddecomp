@@ -34,3 +34,7 @@ First attempt matched immediately -- the only trick was getting the
 tag-check-before-base-call ORDER right (confirmed by reading the raw
 disassembly's instruction sequence, not assumed by symmetry with
 Obj86ED0__AddChild).
+
+## Naming
+
+- `Obj86ED0__RemoveChild` -- tier A. gObj86ED0Methods +0x014 (classtable.py), overrides BasicClass's removeChild: symmetric teardown of Obj86ED0__AddChild's tagging.

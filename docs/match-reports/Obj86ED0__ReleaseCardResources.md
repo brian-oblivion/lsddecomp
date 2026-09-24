@@ -33,3 +33,7 @@ policy as the project's other generic-child types (e.g.
 `Class86E00SubObj_3bb8c_g`). Reach for it (or add to it) rather than
 inventing a new minimal type per field when a function only needs `release`
 dispatched on an opaque child pointer.
+
+## Naming
+
+- `Obj86ED0__ReleaseCardResources` -- tier A. gObj86ED0Methods +0x048 (releaseCardResources slot, classtable.py). Symmetric teardown of Obj86ED0__LoadCardResources -- releases unk48/unk44/unk40.

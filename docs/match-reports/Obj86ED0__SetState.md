@@ -74,3 +74,7 @@ once integer promotion/multiple-case-labels are involved, even though an
 `if`/`else if` chain and a `return`-terminated sequential-`if` chain (which
 ARE semantically identical for a void function) compile IDENTICALLY to each
 other. Don't spend a second attempt re-testing that particular pair.
+
+## Naming
+
+- `Obj86ED0__SetState` -- tier B. gObj86ED0Methods +0x054 (setState slot, classtable.py). arg1-driven: zeroes closeTickCount; arg1<2 no-ops; arg1 in {2,3} detaches childType2, releases card resources, records closeState=arg1; arg1==4 notifies parents with closeState. Mechanics fully traced; the game meaning of the 2/3/4 codes (a close/commit sequence for the name-entry UI) is inferred from data flow, not confirmed by any string or external caller.

@@ -54,3 +54,7 @@ statements) both compile to something OTHER than retail's single shared
 epilogue under this pinned GCC 2.6.3, one by hoisting the return value
 computation above the branch, the other by failing to tail-merge the two
 exits at all.
+
+## Naming
+
+- `New_Obj86ED0` -- tier A. New_X factory shape already established project-wide (BMemPMgrAlloc(0x4C), then dispatch ctor through the class's own table getter, return self or NULL). Matches gObj86ED0Methods's own alloc size (classtable.py) exactly.

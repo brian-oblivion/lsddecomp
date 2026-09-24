@@ -68,3 +68,7 @@ preceding change (not a missing barrier) was the wrong direction. Revert
 the last structural change first and re-measure before adding anything.
 Here, undoing the store's relocation (not adding a barrier) was what
 fixed it.
+
+## Naming
+
+- `Obj86ED0__AdvanceCharSelect` -- tier B. gObj86ED0Methods +0x090 (advanceCharSelect slot, classtable.py -- HandleCommand's case 18/2). Increments the character-picker index unk1C, bounded by unk14 (gNameCharTable's own length, counted by the ctor); WRAPS to 0 on overflow (unlike the cursor pair's revert), forwarding to Obj86ED0__DispatchLookupValue (class_3bb8c_j). Tier B: the wrap-vs-revert asymmetry is measured, exact on-screen semantics (cycling a soft-keyboard character list) is inferred.

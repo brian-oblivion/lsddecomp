@@ -57,3 +57,7 @@ the branch) was tried and made the score worse, not better. The
 this batch; that function's actual defect was an arity mismatch on the
 callee vtable slot, not statement placement. See its report for the full
 account.
+
+## Naming
+
+- `Obj86ED0__MoveCursorRight` -- tier A. gObj86ED0Methods +0x088 (moveCursorRight slot, classtable.py -- also confirmed as HandleCommand's own case 21/5 target). Increments the name-buffer index unk18, bounded by the name length unk10; reverts on overflow. Symmetric with Obj86ED0__MoveCursorLeft; forwards to Obj86ED0__DispatchIndexValue (class_3bb8c_j).

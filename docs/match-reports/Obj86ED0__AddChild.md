@@ -34,3 +34,7 @@ void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
 
 First attempt, mirroring `TaskObjF__Notify`'s proven idiom, matched
 immediately.
+
+## Naming
+
+- `Obj86ED0__AddChild` -- tier A. gObj86ED0Methods +0x010 (classtable.py), overrides BasicClass's addChild: calls the base addChild, then reads the new child's type tag and stashes it into childType2/childType5 by mask. Mirrors the already-matched TaskObjF__Notify idiom.

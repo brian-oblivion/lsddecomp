@@ -19,3 +19,7 @@ void Obj86ED0__ClearChildRefs(Obj86ED0 *self)
 
 First attempt, straight transcription of the three `sw zero` stores in
 order, matched immediately.
+
+## Naming
+
+- `Obj86ED0__ClearChildRefs` -- tier A. Pure leaf: nulls childType2/childType5/unk48. Called once from the ctor to establish the initial (empty) child-tracking state -- mechanics are the purpose, tier A by the pure-leaf rule.
