@@ -111,6 +111,6 @@ yields `andi`+`slt` (right instruction count, wrong opcode -- `slt` vs
 `sltiu`, a class of near-miss easy to overlook since the word COUNT
 matches). Verify with the pinned `cc1` directly rather than guessing at
 which spelling GCC prefers; this is the third residue in this unit's
-reports (after `func_80062570`'s register-identity fix and
-`func_80062730`'s unsigned-cast fix) where the visible C had to diverge
+reports (after `Entity__MoodCue71`'s register-identity fix and
+`Entity__MoodCue74`'s unsigned-cast fix) where the visible C had to diverge
 from the "obvious" spelling to match retail's exact lowering.

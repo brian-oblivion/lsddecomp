@@ -1,14 +1,16 @@
-# func_80063094 -- MATCHED (44/44 words)
+# Entity__MoodCue80 -- MATCHED (44/44 words)
+
+> Renamed from `func_80063094` on 2026-09-24 (tools/rename.py). Address 0x80063094.
 
 Unit: `Entity_e` (round 12). A three-way branch on `this->unkFC` vs
 `this->unk80`, with a nested (and, on the surface, logically redundant)
 double-guard on `this->unk84` in one arm.
-`void func_80063094(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80063094(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC < this->unk80) {
         if (this->unk84 != 0) {
             if (this->unk84 == 0x14) {
@@ -37,7 +39,7 @@ first check is behaviorally dead code from a pure input/output standpoint.
 That single-`if` version came out exactly 2 words (8 bytes) short of
 retail's 0xB0, confirmed by comparing `nm` addresses of the surrounding
 `INCLUDE_ASM` symbols in the built ELF against their expected retail
-addresses (`func_80063144`, the next symbol, landed 8 bytes early).
+addresses (`Entity__MoodCue81`, the next symbol, landed 8 bytes early).
 
 Restoring the outer `if (this->unk84 != 0)` guard around the `== 0x14`
 check reproduced retail's exact two-comparison shape and closed the gap.

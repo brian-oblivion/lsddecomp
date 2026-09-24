@@ -36,9 +36,9 @@ void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
 ## Derivation notes
 
 - Both "divisible by 10" tests use the same `0x66666667`/shift-2 magic-
-  constant idiom identified in `func_80062FAC`'s report; matched clean on
+  constant idiom identified in `Entity__MoodCue79`'s report; matched clean on
   the first pass without needing to hoist either remainder into a named
-  local (unlike `func_80062570`), because neither result is subsequently
+  local (unlike `Entity__MoodCue71`), because neither result is subsequently
   multiplied by anything -- both are compared directly against the
   dividend.
 - **The shared `lui $v0, 0x6666` between the two divisibility checks is a

@@ -452,7 +452,7 @@ negative for assuming the first helps the second.
 **A preserved "near-miss" body's own drift claim is a claim, not a fact,
 and it does not stay true just because nobody edited the function
 since.** Two independent instances this round (`DreamSys__AdvanceMoveCycle` above;
-`func_80063144`'s divergence #2, see that report) each carried a
+`Entity__MoodCue81`'s divergence #2, see that report) each carried a
 "clean"/"pure reordering, same word count" claim that was wrong, in the
 SAME direction (both undercounted the real word length by exactly the
 same mechanism), across TWO SEPARATE prior rounds each. That is not a
@@ -495,7 +495,7 @@ one is decisive.
 **The specific trap that generalises past both instances found this
 round: a permuter `--debug` bucket label describes the scorer's internal
 edit-distance operation, not a guarantee about word count.**
-`func_80063144`'s divergence #2 was bucketed `Reorderings: 2` by
+`Entity__MoodCue81`'s divergence #2 was bucketed `Reorderings: 2` by
 `permuter.py --debug`, which reads as "same instructions, different
 positions, same total count" -- and was carried that way in a report for
 two rounds. Rebuilding the exact body showed the real compiled function

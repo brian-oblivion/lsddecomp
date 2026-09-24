@@ -218,7 +218,7 @@ actually belonged together in the source -- they treated the block as
 verified-correct because the VALUES and the vtable/vslot identities were
 right, and hunted for a scheduling explanation for the one register that
 wouldn't line up. The permuter doesn't have that bias: it mutates
-statement placement freely, and this is a second (after `func_80063144`'s
+statement placement freely, and this is a second (after `Entity__MoodCue81`'s
 divergence #1 this same round) case of it finding a real logic-grouping
 fix inside a body whose control flow and field IDENTITIES were already
 confirmed correct. When several C-level reshapes of a small block all

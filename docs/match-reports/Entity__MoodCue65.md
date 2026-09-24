@@ -35,9 +35,9 @@ void Entity__MoodCue65(Entity *this, EntityMoodHandlerArg *out) {
 Same "1-in-3" `rand() % 3 == 0` idiom as `Entity__MoodCue67` in this unit
 (magic `0x55555556`, no post-`mfhi` shift, `sll 1`/`addu` reconstructing
 `q*3`, compared directly against the dividend). This one matched clean on
-the first pass, unlike `func_80062570`'s residue -- the difference is that
+the first pass, unlike `Entity__MoodCue71`'s residue -- the difference is that
 here the modulo result is never multiplied by anything afterward, it is
-only compared to the dividend inline; `func_80062570`'s stall was specific
+only compared to the dividend inline; `Entity__MoodCue71`'s stall was specific
 to scaling the remainder by a further constant.
 
 `slot48` (already `s32`-returning), `slotCC` (`s32`-returning), `slot44`
@@ -45,7 +45,7 @@ to scaling the remainder by a further constant.
 vtable slot types from earlier work in this unit and `Entity_d`; every
 call here discards its return value, consistent with those slots' existing
 types. `ROTATION_YAW_PLUS90` already has an extern/callsite later in this same file
-(`func_80062660`); `SCALE_HALF` and `ROTATION_YAW_MINUS90` are new per-unit `extern
+(`Entity__MoodCue73`); `SCALE_HALF` and `ROTATION_YAW_MINUS90` are new per-unit `extern
 u8 [];` data-table externs, same convention as the rest of this file.
 
 No new struct or vtable-slot knowledge.

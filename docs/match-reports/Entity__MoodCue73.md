@@ -1,15 +1,17 @@
-# func_80062660 -- MATCHED (52/52 words)
+# Entity__MoodCue73 -- MATCHED (52/52 words)
+
+> Renamed from `func_80062660` on 2026-09-24 (tools/rename.py). Address 0x80062660.
 
 Unit: `Entity_e` (round 12). First function in this unit to dispatch through
 `Unk94Methods::slot44`/`slot130` directly (both slots were already typed
 from `Entity_d`'s `Entity__MoodCue49`/`Entity__MoodCue01` comments, but not yet
 exercised as a *call site* in this unit).
-`void func_80062660(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue73(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80062660(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue73(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (out->unk4 == 0) {
         this->unk94->methods->slot44(this->unk94, 1, ROTATION_YAW_PLUS90);

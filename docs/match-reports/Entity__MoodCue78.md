@@ -1,10 +1,12 @@
-# func_80062C58 -- MATCHED, round 59 (2026-09-20)
+# Entity__MoodCue78 -- MATCHED, round 59 (2026-09-20)
+
+> Renamed from `func_80062C58` on 2026-09-24 (tools/rename.py). Address 0x80062c58.
 
 REVISITED, round 59: MATCHED 213/213 byte-exact; names/types not relevant
 
 **Unit:** `Entity_e` · **Size:** 213 words · **Result:** 213/213 words,
 `insertions 0 / deletions 0`, `./build-and-verify.sh` green
-(`OK: build matches retail SLPS_015.56`), `func_80062FAC` back at its retail
+(`OK: build matches retail SLPS_015.56`), `Entity__MoodCue79` back at its retail
 address `0x80062fac`.
 
 Previously: STALL at 61/213 with the built function **+2 words long**
@@ -151,7 +153,7 @@ That build was byte-exact on the whole image.
 
 ## What was measured, in order (11 builds)
 
-| # | body | words | ins/del | `func_80062FAC` links at |
+| # | body | words | ins/del | `Entity__MoodCue79` links at |
 | --- | --- | --- | --- | --- |
 | 1 | round-45 inherited body (control) | 61/213 | 27/27 | `0x80062fb4` (+2w) |
 | 2 | +polarity fix, quarter before half | 56/213 | 11/11 | `0x80062fb4` (+2w) |
@@ -196,7 +198,7 @@ correct by the byte-exact match. No header was edited.
 
 **When a residue is a missing register-to-register COPY, try DELETING the
 named local and inlining the expression.** This is the exact inverse of the
-project's well-worn "name the subexpression" lever (`func_80062570`,
+project's well-worn "name the subexpression" lever (`Entity__MoodCue71`,
 `func_8002C048`, the named-remainder technique), and it is not in
 `DECOMPILATION_LEARNINGS.md` in either direction.
 

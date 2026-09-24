@@ -205,7 +205,7 @@ WRONG body -- these results do not carry over to the corrected function):
 **Search concluded.** 48078 iterations, `-j 6 --stop-on-zero`, bounded by
 `timeout 600`. Best score 50 (from base 255), plateaued, never reached
 zero. Exit code **124** this time read correctly from the harness's own
-captured output (the earlier `func_80063144` run's logging defect --
+captured output (the earlier `Entity__MoodCue81` run's logging defect --
 echo appended to the SAME redirected log file -- did not recur here
 because this run's echo was left unredirected, landing in the harness's
 own task-output file instead; consistent with that defect being specific

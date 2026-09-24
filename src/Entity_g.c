@@ -144,7 +144,7 @@ void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void func_80064CA4(Entity *this, EntityMoodHandlerArg *out) {
-    func_80062570(this, out);
+    Entity__MoodCue71(this, out);
     this->methods->updateScale(this, 1, SCALE_SIX);
 }
 

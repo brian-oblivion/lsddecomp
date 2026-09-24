@@ -1,4 +1,6 @@
-# func_80062970 -- MATCHED (52/52 words)
+# Entity__MoodCue76 -- MATCHED (52/52 words)
+
+> Renamed from `func_80062970` on 2026-09-24 (tools/rename.py). Address 0x80062970.
 
 Unit: `Entity_e` (round 12). The hardest function in this batch: two
 branches each end in a vtable dispatch through a *different* slot
@@ -7,12 +9,12 @@ table arguments, and retail's compiled code shares a single `jalr`
 instruction between both branches (classic GCC crossjump/tail-merge:
 identical trailing machine code gets folded into one copy, reached by a
 jump from one branch and a fallthrough from the other).
-`void func_80062970(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80062970(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out) {
     void (*fn)(Entity *self, s32 arg1, void *arg2);
     void *table;
 
@@ -47,7 +49,7 @@ flow* but **did not tail-merge**: each branch got its own `jalr $2 / nop`
 pair before jumping to a shared epilogue, 2 words (8 bytes) longer than
 retail. This 8-byte size mismatch then shifted every symbol after it in
 the whole image (visible as a cascading `nm` address drift through
-`func_80062A40` and beyond, and as near-total funcdiff mismatches in the
+`Entity__MoodCue77` and beyond, and as near-total funcdiff mismatches in the
 *following* functions in this unit even though their own C was already
 correct).
 

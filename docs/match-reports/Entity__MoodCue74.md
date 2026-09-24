@@ -1,4 +1,6 @@
-# func_80062730 -- MATCHED (105/105 words)
+# Entity__MoodCue74 -- MATCHED (105/105 words)
+
+> Renamed from `func_80062730` on 2026-09-24 (tools/rename.py). Address 0x80062730.
 
 Unit: `Entity_e` (round 13). Ignores `out` entirely. A first-tick block
 dispatches through a brand-new nested object (`unk94->unk5C`'s own
@@ -6,12 +8,12 @@ vtable), rolls `unk44 = rand() % 3` and clamps it to 0 based on a
 `z`-position gate; the rest of the function is an `if (unk44 != 0)` /
 `else` pair, each side making two more `Unk94Methods`-table calls (two new
 slots, `slotC4` and `slot134`, discovered here).
-`void func_80062730(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80062730(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         this->unk94->unk5C->methods->slot64(this->unk94->unk5C, D_8008AC1C);
         this->unk44 = rand() % 3;

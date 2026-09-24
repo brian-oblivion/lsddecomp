@@ -261,7 +261,7 @@ emitted.
 
 ## HEAD FINDING, round 13: the reversed `Class6B5CC__FaceTarget` arguments are a DIRECTION FLAG
 
-Runner echo (`Entity__MoodCue115`, `Entity_d`) and runner bravo (`func_80063144`,
+Runner echo (`Entity__MoodCue115`, `Entity_d`) and runner bravo (`Entity__MoodCue81`,
 `Entity_e`) each independently flagged a `Class6B5CC__FaceTarget` call site
 whose first two arguments are swapped relative to every other known site. Both
 verified it against raw disassembly. The head then surveyed **every** call site
