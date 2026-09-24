@@ -1,4 +1,6 @@
-# func_8004E1C4 -- MATCHED 27/27, round 43
+# Class86B60__UpdateMemcardSaveStatus -- MATCHED 27/27, round 43
+
+> Renamed from `func_8004E1C4` on 2026-09-24 (tools/rename.py). Address 0x8004e1c4.
 
 Unit `class_3bb8c_d`, class `Class86B60`. **REOPENED -- ASSIGNABLE** from round
 42's `gp_rel` resolution (`--gp-symbols`/`--no-nop-mflo-mfhi`, see CLAUDE.md
@@ -8,7 +10,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ## Body
 
 ```c
-void func_8004E1C4(Class86B60 *self)
+void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self)
 {
     self->methods->slot128(self);
     self->unkAC->methods->slot74(self->unkAC, D_8008AA10, D_8008AA18,
@@ -17,7 +19,7 @@ void func_8004E1C4(Class86B60 *self)
 ```
 
 Byte-exact on the first build: `./build-and-verify.sh` -> `OK: build matches
-retail SLPS_015.56`; `funcdiff.py func_8004E1C4` -> `27/27 words match (file
+retail SLPS_015.56`; `funcdiff.py Class86B60__UpdateMemcardSaveStatus` -> `27/27 words match (file
 0x3E9C4-0x3EA30)`.
 
 ## Derivation

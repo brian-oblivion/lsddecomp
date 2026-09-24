@@ -265,7 +265,7 @@ void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
                                   self->unkA8, self->unkBC, self->unkC0);
 }
 
-void func_8004E1C4(Class86B60 *self)
+void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self)
 {
     self->methods->slot128(self);
     self->unkAC->methods->slot74(self->unkAC, D_8008AA10, D_8008AA18,

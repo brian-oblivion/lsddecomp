@@ -1142,7 +1142,7 @@ struct Class86B60UnkACObjMethods_3bb8c_d {
     void (*slot6C)(Class86B60UnkACObj_3bb8c_d *self, void *arg1, s32 *arg2,
                    void *arg3, void *arg4, void *arg5, void *arg6); /* +0x06C */
     void (*slot70)(Class86B60UnkACObj_3bb8c_d *self); /* +0x070, Class86B60__EndMemcardSave */
-    /* +0x074, func_8004E1C4's own 2nd call: `(self, D_8008AA10, D_8008AA18,
+    /* +0x074, Class86B60__UpdateMemcardSaveStatus's own 2nd call: `(self, D_8008AA10, D_8008AA18,
      * self->unkBC, self->unkC0)` -- the two middle arguments are the
      * VALUES of two `.sdata` globals loaded via `%gp_rel` (not their
      * addresses), each holding a pointer into the still-uncarved rodata
@@ -1248,7 +1248,7 @@ struct Class86B60Methods {
     void (*slot11C)(Class86B60 *self, s32 arg1, s32 arg2);
     u8 pad120[0x124 - 0x120];
     void (*slot124)(Class86B60 *self, s32 arg1); /* +0x124, Class86B60__SetState (arg1=0)/func_8004E230 (arg1=0x16) */
-    /* +0x128, func_8004E1C4's own first call, `self` only. Return unused. */
+    /* +0x128, Class86B60__UpdateMemcardSaveStatus's own first call, `self` only. Return unused. */
     void (*slot128)(Class86B60 *self);
     void (*slot12C)(Class86B60 *self); /* +0x12C, func_8004E230's own first call, `self` only */
     void (*slot130)(Class86B60 *self); /* +0x130, Class86B60__Tick's `unk58==2` tail target */
@@ -1492,7 +1492,7 @@ extern s32 D_80086DAC;
  * since only the address is taken here. */
 extern s32 D_8008A9B4;
 
-/* VALUE-of, not address-of, in this unit -- func_8004E1C4 reaches these
+/* VALUE-of, not address-of, in this unit -- Class86B60__UpdateMemcardSaveStatus reaches these
  * through `%gp_rel` loads of the .sdata globals themselves, forwarding
  * whatever they hold. Each holds a pointer into the still-uncarved rodata
  * block at `D_80011434` (`asm/data/1C34.rodata.s`: 0x80011464 and

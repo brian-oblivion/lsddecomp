@@ -35,7 +35,7 @@ SLPS_015.56`.
   `Class86B60__RefreshViewValue` (stack-buffer-out-parameter call on the same
   `DreamSysView_3bb8c_c::slot19C`), just without that function's own
   leading `Get_vtable_TaskCore()->slot94(self)` base-class call.
-- `self->methods->slot128(self)` -- the slot this round's `func_8004E1C4`
+- `self->methods->slot128(self)` -- the slot this round's `Class86B60__UpdateMemcardSaveStatus`
   established (single-argument, `self` only).
 - `self->unkA4->methods->slot1AC(self->unkA4)` -- a NEW slot on
   `DreamSysViewMethods_3bb8c_c`, at the offset immediately after
@@ -45,14 +45,14 @@ SLPS_015.56`.
   so a `void` return would be observably wrong.
 - The nonzero-return branch writes a single zero byte through
   `D_8008AA10` (`*(u8 *)D_8008AA10 = 0;`) -- the same `void *` global
-  `func_8004E1C4` (this round) established as holding a precomputed
+  `Class86B60__UpdateMemcardSaveStatus` (this round) established as holding a precomputed
   pointer into unowned rodata (a `%gp_rel` load of the global's own
   VALUE, reloaded here with an identical `lw`).
 - The final call, `self->unkAC->methods->slot78(...)`, is an 8-argument
   dispatch (four in registers, four on the stack at `0x10`-`0x1C($sp)`):
   `self->unkAC`, `D_8008AA10`, `D_8008AA18`, the literal `0xD`, the
   literal `3`, `self->unkA8`, `self->unkBC`, `self->unkC0`. The offset
-  (+0x078) falls immediately after this round's `func_8004E1C4`-derived
+  (+0x078) falls immediately after this round's `Class86B60__UpdateMemcardSaveStatus`-derived
   `slot74` (+0x074, 4 bytes) with no gap, so it was appended there.
   `self->unkA8` is forwarded opaquely (this slot never dereferences it),
   so its parameter stays `void *` rather than the fuller
@@ -72,7 +72,7 @@ No existing declaration was retyped or resized.
 
 ### Proposed learning
 
-None beyond what round 43's earlier two reports (`func_8004E1C4`,
+None beyond what round 43's earlier two reports (`Class86B60__UpdateMemcardSaveStatus`,
 `func_8004E34C`) already recorded for this unit -- this function's own
 derivation was routine once those two slots (`slot128`, `D_8008AA10`)
 were on file, and it re-confirmed `slot74`'s exact byte offset by landing
