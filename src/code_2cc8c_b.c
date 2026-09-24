@@ -62,7 +62,7 @@ void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
     }
     size = count * 4;
     arr = BMemPMgrAlloc(size);
-    self->unk54 = arr;
+    self->slotElements = arr;
     self->unk5C = BMemPMgrAlloc(size);
     self->slotCounts = BMemPMgrAlloc(size);
     self->unk64 = BMemPMgrAlloc(size);
@@ -111,7 +111,7 @@ void Obj86B60__ReleaseTarget(Obj86B60 *self)
         o->methods->slot4(o);
     }
     self->unk68->methods->slot4(self->unk68);
-    arr = self->unk54;
+    arr = self->slotElements;
     for (i = 0; i < self->slotCount; arr++) {
         Unk64Elem *elem;
 
@@ -126,7 +126,7 @@ void Obj86B60__ReleaseTarget(Obj86B60 *self)
     BMemPMgrFree(self->unk64);
     BMemPMgrFree(self->slotCounts);
     BMemPMgrFree(self->unk5C);
-    BMemPMgrFree(self->unk54);
+    BMemPMgrFree(self->slotElements);
 }
 
 void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
@@ -138,7 +138,7 @@ void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
     if (self->unk4C == NULL) {
         return;
     }
-    arr = self->unk54;
+    arr = self->slotElements;
     ptr = self->unk4C->unk20;
     for (i = 0; i < self->slotCount; i++, arr++, ptr += 8) {
         if (self->unk4C->unk18[i] == NULL) {
@@ -166,7 +166,7 @@ void Obj86B60__BroadcastToSlots(Obj86B60 *self, void *a1)
     if (self->unk4C == NULL) {
         return;
     }
-    arr = self->unk54;
+    arr = self->slotElements;
     origIdx = self->activeSlot;
     for (i = 0; i < self->slotCount;) {
         Unk64Elem *elem = *arr;
@@ -243,8 +243,8 @@ void Obj86B60__SetActiveSlot(Obj86B60 *self, s32 a1, void *a2)
         return;
     }
     idx = self->activeSlot;
-    elemB = self->unk54[idx];
-    elemA = self->unk54[a1];
+    elemB = self->slotElements[idx];
+    elemA = self->slotElements[a1];
     if (idx >= 0) {
         elemB->methods->slotB8(elemB, self->unk4C->unk10);
     }

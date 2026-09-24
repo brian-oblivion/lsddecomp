@@ -1398,9 +1398,13 @@ struct Obj86B60 {
                                     bound for the activeSlot index into
                                     unk4C->unk18[] (also Obj86B60__BroadcastToSlots's
                                     loop count) */
-    Unk64Elem **unk54;          /* +0x054, Obj86B60__BroadcastToSlots: walked with an
-                                    incrementing pointer, dereferenced
-                                    directly for each element */
+    Unk64Elem **slotElements;   /* +0x054, renamed from unk54, round 78 --
+                                    one representative element per slot/tab
+                                    (self->slotCount of them), DISTINCT from
+                                    unk64[idx] below (the item LIST within
+                                    one slot). Obj86B60__BroadcastToSlots:
+                                    walked with an incrementing pointer,
+                                    dereferenced directly for each element */
     s32 activeSlot;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
