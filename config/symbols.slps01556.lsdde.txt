@@ -2020,3 +2020,4 @@ Class86F88__ReleaseRows = 0x8005278C; // type:func
 Class86F88__RefreshRows = 0x8005281C; // type:func
 Class86F88__FormatRowText = 0x8005292C; // type:func
 Class86F88__SetView = 0x800529FC; // type:func
+Class86F88__StepCursorInView = 0x80052A58; // type:func

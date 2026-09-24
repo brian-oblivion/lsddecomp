@@ -436,7 +436,7 @@ void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
     elem->methods->slotB8(elem, &D_8008AB10);
 }
 
-void func_80052A58(Class86F88 *self, s32 dir, s32 flag)
+void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
 {
     Class86F88Elem **p;
     s32 idx;

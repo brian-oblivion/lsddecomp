@@ -12,7 +12,7 @@ Refreshes the active window's display text: for each of up to 4 active
 (this unit, matched this round) into a local stack buffer and dispatches
 `elem->methods->slotCC(elem, buf)`; then forwards `(arg1, arg2, arg3, 0)`
 to `Class86F88__SetView` (already matched) and optionally notifies `self` via
-`slot60` (new this round, shared with `func_80052A58`).
+`slot60` (new this round, shared with `Class86F88__StepCursorInView`).
 
 ```c
 void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)

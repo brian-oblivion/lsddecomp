@@ -1,4 +1,6 @@
-# func_80052A58
+# Class86F88__StepCursorInView
+
+> Renamed from `func_80052A58` on 2026-09-24 (tools/rename.py). Address 0x80052a58.
 
 **Unit:** class_3bb8c_k · **Size:** 63 instructions (0xFC bytes) ·
 **Status: MATCHED 63/63**, whole-image SHA1 green. Matched on the first
@@ -13,7 +15,7 @@ and dispatching to the element that enters it, then optionally notifies
 `self` itself via its own `slot60`.
 
 ```c
-void func_80052A58(Class86F88 *self, s32 dir, s32 flag)
+void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
 {
     Class86F88Elem **p;
     s32 idx;
