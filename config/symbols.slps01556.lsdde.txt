@@ -1940,3 +1940,9 @@ SsUtAllKeyOff = 0x80031F3C; // type:func
 // in this project. Superseded game-style func_8003221C.
 // Round 74 (bravo, track 2).
 _SsInit = 0x8003221C; // type:func
+// identified: shape 0.99 vs libsnd/seqread _SsSetControlChange (198w vs
+// our 200w, disc 3.5), position within the libsnd neighborhood (after
+// libsnd/vs_vab, before libsnd/adsr), same underscore-prefixed
+// internal-helper convention as _SsInit/_SsStart. Superseded game-style
+// func_80034690. Round 74 (bravo, track 2).
+_SsSetControlChange = 0x80034690; // type:func

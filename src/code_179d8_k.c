@@ -34,10 +34,10 @@
  *   SeqPlay  69w   NoteOn  70w   ContNrpn1  77w
  *   ContModulation  79w   ContPortaTime  79w   ContNrpn2  82w
  *   ContPortamento  90w   GetSeqData 172w   Snd_setVabAttr 179w
- *   func_80034690 200w   GetMetaEvent 213w   ContDataEntry 376w
+ *   _SsSetControlChange 200w   GetMetaEvent 213w   ContDataEntry 376w
  *
  * THIS UNIT OWNS THREE SWITCH JUMP TABLES, not the two the old remainder
- * comment claimed: func_80034690 -> jtbl_80010CF0, and Snd_setVabAttr ->
+ * comment claimed: _SsSetControlChange -> jtbl_80010CF0, and Snd_setVabAttr ->
  * jtbl_80010ED8 AND jtbl_80010F38 (a double switch).  The 0x14F0 rodata
  * slot holds exactly those three tables and nothing else, is referenced
  * from nowhere outside this unit, and is attached whole in the splat yaml.
@@ -212,11 +212,11 @@ void SeqPlay(s16 a0, s16 a1, s16 a2)
  * needed because GetSeqData dispatches to them by MIDI-style status
  * byte before they appear in ROM-address order below.  NoteOn's
  * signature is the one already established in its own (still-stalled) STALL
- * comment above; func_80034690's and GetMetaEvent's are this function's own
+ * comment above; _SsSetControlChange's and GetMetaEvent's are this function's own
  * reading, derived from the registers loaded before each call below. */
 extern void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3);
 extern void SetProgramChange(s16 a0, s16 a1, u8 a2);
-extern void func_80034690(s16 a0, s16 a1, u8 a2);
+extern void _SsSetControlChange(s16 a0, s16 a1, u8 a2);
 extern void SetPitchBend(s16 a0, s16 a1);
 extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
 
@@ -268,7 +268,7 @@ void GetSeqData(s16 a0, s16 a1)
             rec->unk11 = 0xB0;
             rec->unk4 = p + 1;
             note = *p;
-            func_80034690(a0, a1, note);
+            _SsSetControlChange(a0, a1, note);
             return;
         case 0xC0:
             p = rec->unk4;
@@ -302,7 +302,7 @@ void GetSeqData(s16 a0, s16 a1)
             NoteOn(a0, a1, raw, vel);
             return;
         case 0xB0:
-            func_80034690(a0, a1, raw);
+            _SsSetControlChange(a0, a1, raw);
             return;
         case 0xC0:
             SetProgramChange(a0, a1, raw);
@@ -417,7 +417,7 @@ extern void ContResetAll(s16 a0, s16 a1);
  * case-local `u16`, which keeps the switch-wide byte in a caller-saved
  * register and gives each case its own callee-saved copy.
  */
-void func_80034690(s16 a0, s16 a1, u8 a2)
+void _SsSetControlChange(s16 a0, s16 a1, u8 a2)
 {
     Entry90902E8 *rec = &D_800902E8[a0][a1];
     u8 *p = rec->unk4;

@@ -440,7 +440,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   tail-merge or register-identity stall.** Beyond the sign-extend pair, the narrowed argument is not
   CSE'd with the widened value later calls reuse, so the build comes out N words short with one
   fewer callee-saved register. Discriminator: the callee masks the parameter wider than its declared
-  type (`0xFF00` on an `s16`). `func_80034690` went 195 -> 190 -> 200/200 on `s16`->`s32`; pair it
+  type (`0xFF00` on an `s16`). `_SsSetControlChange` went 195 -> 190 -> 200/200 on `s16`->`s32`; pair it
   with the return-type listing. (round 69)
 - **The DEFINITION's own parameters narrow too: a parameter that hops `$a0` -> `$a3` -> `$s5`
   with every use re-sign-extending it is an `s16` parameter, not an allocation residue.** Declaring

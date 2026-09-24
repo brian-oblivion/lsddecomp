@@ -637,7 +637,7 @@ measurement that put a NUMBER on how much else differs, and it says: a lot.
 **Per `docs/MATCHING-GUIDE.md`'s explicit instruction ("a scaffold that
 scores a different residue than the real build is ... scoring something
 other than this function's real residue ... not searched"), no search was
-run.** This is the same disposition `func_80034690.md` round 32 recorded
+run.** This is the same disposition `_SsSetControlChange.md` round 32 recorded
 for its own scaffold (base score 4982 against a documented 5-word residue) --
 a second confirmed instance of the same failure mode, worth trusting as a
 pattern: **a clean, narrow written residue does not by itself guarantee the
@@ -777,7 +777,7 @@ register-widening sequence (one re-widens from `$s8`/reloads from a stack
 slot at `0x90`; the other re-widens from `$s1`/`$s0` directly) -- not one
 shared block reached by two gotos, which is what this report's preserved
 body modeled. This is the project's already-documented tail-duplication
-idiom (`func_80034690.md`'s case-11 finding, `DECOMPILATION_LEARNINGS.md`'s
+idiom (`_SsSetControlChange.md`'s case-11 finding, `DECOMPILATION_LEARNINGS.md`'s
 "an arm that must jump has to be written not-last" family).
 
 **Fix: replaced both `goto combine;` sites with their own inlined

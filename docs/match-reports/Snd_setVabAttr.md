@@ -109,10 +109,10 @@ call site with **zero effect on any already-matched call site in the same
 unit** (confirmed by rebuilding after the prototype change alone, before
 writing a single line of this function's body: `build-and-verify.sh` still
 green). Same story for `SsUtSetReverbDepth`, previously declared
-`(s32, s32)` in this unit for `func_80034690`'s own call: widening to
+`(s32, s32)` in this unit for `_SsSetControlChange`'s own call: widening to
 `(s16, s16)` (again matching the real header) removed a spurious `andi
 ...,0xff` mask this function's `SsUtSetReverbDepth(arg6, arg6)` picked up
-under the wider declaration, again with no effect on `func_80034690`'s own
+under the wider declaration, again with no effect on `_SsSetControlChange`'s own
 already-matched bytes.
 
 ## Two real levers that closed a 7-words-short gap to 163/179
