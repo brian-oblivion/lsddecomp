@@ -24,4 +24,4 @@ cache, then clears `self->unk3C` (also established this round, from
 
 ## Naming
 
-- `Class86F88__RemoveCachedChildren` -- tier A. The slot50 occupant (classtable.py D_80086F88 +0x050): calls slot14 (this class's own removeChild override) on unk34 then unk38, then clears unk3C. Purpose (release the two tag-cached children) follows directly from the mechanics, matching the addChild/removeChild caching pattern established in Class86F88__AddChild -- tier A.
+- `Class86F88__RemoveCachedChildren` -- tier A. The slot50 occupant (classtable.py gClass86F88Methods +0x050): calls slot14 (this class's own removeChild override) on unk34 then unk38, then clears unk3C. Purpose (release the two tag-cached children) follows directly from the mechanics, matching the addChild/removeChild caching pattern established in Class86F88__AddChild -- tier A.

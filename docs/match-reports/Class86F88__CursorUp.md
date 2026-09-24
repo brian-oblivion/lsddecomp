@@ -5,7 +5,7 @@
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py Class86F88__CursorUp`: 40/40 words match.
 
-This is vtable slot `+0x084` of `D_80086F88` (not declared in
+This is vtable slot `+0x084` of `gClass86F88Methods` (not declared in
 `Class86F88Methods` since nothing in this unit dispatches through it by
 name; the arity used below is fixed by the two `slot94`/`slot98` call
 sites, which ARE declared).

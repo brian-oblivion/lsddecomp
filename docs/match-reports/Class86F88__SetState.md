@@ -6,7 +6,7 @@ Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0 (checked once
 the whole unit's batch of matches was in place); whole-image SHA1 matches
 retail. `funcdiff.py Class86F88__SetState`: 42/42 words match.
 
-This is vtable slot `+0x054` of `D_80086F88` (`Class86F88Methods::slot54`),
+This is vtable slot `+0x054` of `gClass86F88Methods` (`Class86F88Methods::slot54`),
 dispatched by `Class86F88__TickClosing` (this unit) as `self->methods->slot54(self, 4)`.
 
 ## Source

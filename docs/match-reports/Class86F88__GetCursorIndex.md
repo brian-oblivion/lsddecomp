@@ -5,8 +5,8 @@
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py Class86F88__GetCursorIndex`: 3/3 words match.
 
-This is vtable slot `+0x09C` of `D_80086F88`, the LAST slot in that table
-(`tools/classtable.py D_80086F88` reports 39 slots ending here). Not
+This is vtable slot `+0x09C` of `gClass86F88Methods`, the LAST slot in that table
+(`tools/classtable.py gClass86F88Methods` reports 39 slots ending here). Not
 declared in `Class86F88Methods` since nothing in this unit dispatches
 through it.
 

@@ -1871,7 +1871,7 @@ struct Class86E00_3bb8c_g {
  * `self->unk38` and the literal `1` to this external helper; return
  * value stored into `self->childB`. Not this round's function here -- it
  * is class_3bb8c_j's New_Class86F88 (matched round 15,
- * src/class_3bb8c_j.c; ROUND 75: its class is D_80086F88/Class86F88_3bb8c_j,
+ * src/class_3bb8c_j.c; ROUND 75: its class is gClass86F88Methods/Class86F88_3bb8c_j,
  * not D_80086ED0 -- see that unit's file header comment):
  * `BMemPMgrAlloc(0x54)` then, on success, its own ctor-table getter's
  * `+0x008` slot called `(self, arg0, arg1)`. This call site's own
@@ -2819,20 +2819,20 @@ struct Obj86ED0 {
  * must stay unit-local. */
 
 /* -------------------------------------------------------------------
- * HEAD NOTE, round 15 merge: D_80086F88 (below) CLOSES an open question
+ * HEAD NOTE, round 15 merge: gClass86F88Methods (below) CLOSES an open question
  * from the alpha/bravo merge, and it is worth reading the two notes
  * together.
  *
  * That note established that bravo's 0x54-byte New_X (New_Class86F88 in
  * class_3bb8c_j) ctors through GetClass86F88Methods(), "a DIFFERENT table getter
  * living in class_3bb8c_k" that bravo had not identified. charlie has now
- * MATCHED GetClass86F88Methods, and it returns &D_80086F88. So the 0x54-byte
- * class's method table is D_80086F88 -- charlie's Class86F88 -- and NOT
+ * MATCHED GetClass86F88Methods, and it returns &gClass86F88Methods. So the 0x54-byte
+ * class's method table is gClass86F88Methods -- charlie's Class86F88 -- and NOT
  * D_80086ED0.
  *
  * Consequence for the next reader: the type named `Class86ED0` in
  * src/class_3bb8c_j.c is MISNAMED. It is the object of the 0x54-byte
- * class (table D_80086F88); the name came from Get_vtable_Obj86ED0, the only
+ * class (table gClass86F88Methods); the name came from Get_vtable_Obj86ED0, the only
  * getter bravo had resolved at the time, which actually returns
  * D_80086ED0 -- alpha's separate 0x4C-byte class in class_3bb8c_i.
  *
@@ -2853,8 +2853,8 @@ struct Obj86ED0 {
  * ------------------------------------------------------------------- */
 
 /*
- * class_3bb8c_k's own view: the class whose method table is D_80086F88
- * (39 slots, tools/classtable.py D_80086F88 -- header word 0x20). Carved
+ * class_3bb8c_k's own view: the class whose method table is gClass86F88Methods
+ * (39 slots, tools/classtable.py gClass86F88Methods -- header word 0x20). Carved
  * round 15; this unit is the first to write any of its methods. Only the
  * slots/fields this unit's functions actually touch are typed; the rest
  * stays opaque. `Class86F88__CreateRows`/`Class86F88__HandleInputCode` are two more of this
@@ -2963,7 +2963,7 @@ struct Class86F88 {
     s32 unk50;                      /* +0x050, enable flag guarding most of this class's dispatch */
 };
 
-extern Class86F88Methods D_80086F88;
+extern Class86F88Methods gClass86F88Methods;
 /* Class86F88__StepCursorInView's fixed 2nd argument to Class86F88ElemMethods::slotB8 on
  * its own FIRST dispatch (the element at the "old" index) -- immediately
  * adjacent rodata to D_8008AB10 below (4 bytes before it), never

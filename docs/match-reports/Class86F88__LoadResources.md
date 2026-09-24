@@ -298,4 +298,4 @@ cross-unit sibling with the same call skeleton first.
 
 ## Naming
 
-- `Class86F88__LoadResources` -- tier B. The slot44 occupant (classtable.py D_80086F88 +0x044): builds two "CARD\\<name>.TIM" paths, loads them through func_8003B39C/func_80041C9C, and dispatches the second through self->methods->slot8C. Mechanics (load a pair of card-icon-shaped resources) are clear from the BuildFileName/CARD path evidence; what the two resources are FOR is not.
+- `Class86F88__LoadResources` -- tier B. The slot44 occupant (classtable.py gClass86F88Methods +0x044): builds two "CARD\\<name>.TIM" paths, loads them through func_8003B39C/func_80041C9C, and dispatches the second through self->methods->slot8C. Mechanics (load a pair of card-icon-shaped resources) are clear from the BuildFileName/CARD path evidence; what the two resources are FOR is not.

@@ -10,16 +10,16 @@ SHA1 matches retail. `funcdiff.py GetClass86F88Methods`: 4/4 words match.
 ```c
 Class86F88Methods *GetClass86F88Methods(void)
 {
-    return &D_80086F88;
+    return &gClass86F88Methods;
 }
 ```
 
 ## Notes
 
-A plain no-argument accessor returning `&D_80086F88`, the same shape as
+A plain no-argument accessor returning `&gClass86F88Methods`, the same shape as
 `GetClass86668Methods`/`gClass86668Methods` documented elsewhere in this project (base
-class table getters). `D_80086F88` is this unit's own class's vtable
-(39 slots, `tools/classtable.py D_80086F88`); the words at `+0x054`,
+class table getters). `gClass86F88Methods` is this unit's own class's vtable
+(39 slots, `tools/classtable.py gClass86F88Methods`); the words at `+0x054`,
 `+0x058`, `+0x07C`..`+0x09C` of that table are this unit's own
 `Class86F88__SetState`/`Class86F88__TickClosing`/`Class86F88__ScrollRight`.../`Class86F88__GetCursorIndex`, all
 matched this round. Matched first attempt.

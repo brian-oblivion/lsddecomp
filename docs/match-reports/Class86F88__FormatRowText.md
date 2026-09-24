@@ -20,7 +20,7 @@ as `dest`.
 `Class86F88::unk18` (`s32 *`, offset 0x018, was opaque padding) -- a table
 of byte offsets, added additively to `include/class_3bb8c.h` (splitting the
 existing `pad018[0x020-0x018]` into `unk18` + a 4-byte `pad01C`, so no
-other field's offset moves). `Class86F88`/`D_80086F88` is this unit's own
+other field's offset moves). `Class86F88`/`gClass86F88Methods` is this unit's own
 class, not shared with any other live runner this round, so this edit
 carries no header-contention risk from a sibling unit.
 

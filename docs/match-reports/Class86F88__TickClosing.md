@@ -5,7 +5,7 @@
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py Class86F88__TickClosing`: 24/24 words match.
 
-This is vtable slot `+0x058` of `D_80086F88` (`Class86F88Methods` does not
+This is vtable slot `+0x058` of `gClass86F88Methods` (`Class86F88Methods` does not
 declare this slot since nothing in this unit dispatches through it).
 
 ## Source

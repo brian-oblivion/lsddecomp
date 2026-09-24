@@ -5,7 +5,7 @@
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py Class86F88__ScrollLeft`: 24/24 words match.
 
-This is vtable slot `+0x080` of `D_80086F88` (`Class86F88Methods::slot80`),
+This is vtable slot `+0x080` of `gClass86F88Methods` (`Class86F88Methods::slot80`),
 dispatched by `Class86F88__ForwardToTarget` (this unit, on a DIFFERENT instance reached
 through `self->unk3C`) as `other->methods->slot80(other, arg1, 0x60, 0x60)`.
 

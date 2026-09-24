@@ -9,7 +9,7 @@
  *    Obj86ED0__DispatchLookupValue, +Get_vtable_Obj86ED0) are `Obj86ED0`
  *    methods -- D_80086ED0, a class ALREADY shared and fully typed in
  *    include/class_3bb8c.h, established by class_3bb8c_i.
- *  - Everything else is `Class86F88_3bb8c_j` (D_80086F88, a BasicClass
+ *  - Everything else is `Class86F88_3bb8c_j` (gClass86F88Methods, a BasicClass
  *    subclass, alloc size 0x54, reached through `GetClass86F88Methods()` in
  *    class_3bb8c_k which already holds this SAME table under the bare
  *    name `Class86F88`) -- kept LOCAL under a disambiguating suffix
@@ -141,7 +141,7 @@ void Obj86ED0__DispatchLookupValue(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
  * Class86F88_3bb8c_j -- a small BasicClass-derived sibling class, LOCAL to this
  * unit (see the file header comment for why this is not added to the
  * shared class_3bb8c.h). Alloc size 0x54 (New_Class86F88). Its real
- * vtable is D_80086F88, reached through GetClass86F88Methods() (class_3bb8c_k).
+ * vtable is gClass86F88Methods, reached through GetClass86F88Methods() (class_3bb8c_k).
  * `Get_vtable_Obj86ED0`/D_80086ED0 immediately below are UNRELATED to this
  * class -- they are Obj86ED0's own table and getter (see the file header
  * comment), merely defined in this same file.

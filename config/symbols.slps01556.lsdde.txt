@@ -2027,3 +2027,4 @@ New_ObjM = 0x80052B70; // type:func
 ObjM__ObjM = 0x80052C10; // type:func
 ObjM__Dtor = 0x80052CD8; // type:func
 ObjM__OnNotify = 0x80052D10; // type:func
+gClass86F88Methods = 0x80086F88;

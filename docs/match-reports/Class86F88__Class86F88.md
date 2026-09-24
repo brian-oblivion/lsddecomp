@@ -65,7 +65,7 @@ reached indirectly by `New_Class86F88`
 This unit's local type for `self` was originally named `Class86ED0` and
 described as having vtable `D_80086ED0`. Both were wrong, and the error
 predates this round: `include/class_3bb8c.h`'s own round-15 HEAD NOTEs
-(search "D_80086ED0 and D_80086F88") already documented it and deferred
+(search "D_80086ED0 and gClass86F88Methods") already documented it and deferred
 the fix. Settled by address, not by guess:
 
 - `func_80051A4C` (this unit, now named `Get_vtable_Obj86ED0`) returns
@@ -73,9 +73,9 @@ the fix. Settled by address, not by guess:
   (42 slots, `tools/classtable.py D_80086ED0`), a DIFFERENT class
   established independently by class_3bb8c_i. It has NOTHING to do with
   this constructor's class.
-- This class's REAL table is `D_80086F88`, reached through
+- This class's REAL table is `gClass86F88Methods`, reached through
   `GetClass86F88Methods()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
-  D_80086F88` places every one of this unit's remaining functions
+  gClass86F88Methods` places every one of this unit's remaining functions
   (this ctor at +0x008, plus `Class86F88__Finalize`/`AddChild`/
   `RemoveChild`/`RemoveAllChildren`/`NotifyChild`/`ResetCounters`/
   `LoadResources`/`ReleaseResources`/`AddChildAndSetState`/
@@ -84,7 +84,7 @@ the fix. Settled by address, not by guess:
   resolvable by `classtable.py` after all -- the earlier "no classtable
   entry exists for it" note was itself part of the same mistake (it
   looked up the wrong global).
-- class_3bb8c_k's OWN local view of this same D_80086F88 table already
+- class_3bb8c_k's OWN local view of this same gClass86F88Methods table already
   carries the name `Class86F88`/`Class86F88Methods` in the shared header,
   established independently from ITS OWN call sites. Reusing that bare
   name here would collide (both visible in this translation unit through
@@ -353,4 +353,4 @@ field. (Class86F88__Class86F88, one word, 66 -> 98/107.)
 
 ## Naming
 
-- `Class86F88__Class86F88` -- tier A. The ctor occupant (classtable.py D_80086F88 +0x008), named per the "constructors Class__Class" convention (e.g. Class869D8__Class869D8). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.
+- `Class86F88__Class86F88` -- tier A. The ctor occupant (classtable.py gClass86F88Methods +0x008), named per the "constructors Class__Class" convention (e.g. Class869D8__Class869D8). Parses arg1 as a NUL-terminated pointer array and allocates two parallel unk10-length arrays -- mechanics well established via asm-differ across rounds 9/13/19/73.

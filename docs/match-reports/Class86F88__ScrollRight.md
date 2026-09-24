@@ -5,7 +5,7 @@
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py Class86F88__ScrollRight`: 26/26 words match.
 
-This is vtable slot `+0x07C` of `D_80086F88` (not declared in
+This is vtable slot `+0x07C` of `gClass86F88Methods` (not declared in
 `Class86F88Methods` since nothing in this unit dispatches through it).
 
 ## Source

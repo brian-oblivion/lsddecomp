@@ -7,7 +7,7 @@ SHA1 matches retail. `funcdiff.py ObjM__Dtor`: 14/14 words match.
 
 This is vtable slot `+0x00C` (`dtor`) of `D_80087034` -- a SECOND class
 table this unit's tail overlaps (`tools/classtable.py D_80087034`, 53
-slots, header word `0x0002F230`, distinct from `D_80086F88` which covers
+slots, header word `0x0002F230`, distinct from `gClass86F88Methods` which covers
 this unit's earlier functions). `ObjM__ObjM` (this unit, still
 `INCLUDE_ASM`) is that same table's `ctor` (`+0x008`).
 

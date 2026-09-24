@@ -467,7 +467,7 @@ s32 Class86F88__GetCursorIndex(Class86F88 *self)
 
 Class86F88Methods *GetClass86F88Methods(void)
 {
-    return &D_80086F88;
+    return &gClass86F88Methods;
 }
 
 Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)

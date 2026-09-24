@@ -22,4 +22,4 @@ Trivial three-field reset, an unrelated field group from `Class86F88__ClearCache
 
 ## Naming
 
-- `Class86F88__ResetCounters` -- tier A. The slot40 occupant (classtable.py D_80086F88 +0x040, the ctor's own tail dispatch): zeroes unk20/unk24/unk28. A pure leaf, tier A by the track-3 rule.
+- `Class86F88__ResetCounters` -- tier A. The slot40 occupant (classtable.py gClass86F88Methods +0x040, the ctor's own tail dispatch): zeroes unk20/unk24/unk28. A pure leaf, tier A by the track-3 rule.

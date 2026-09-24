@@ -33,4 +33,4 @@ Matched first try.
 
 ## Naming
 
-- `Class86F88__RemoveChild` -- tier A. The removeChild occupant (classtable.py D_80086F88 +0x014): clears the matching tag cache then chains the base removeChild. Mirrors Class86F88__AddChild.
+- `Class86F88__RemoveChild` -- tier A. The removeChild occupant (classtable.py gClass86F88Methods +0x014): clears the matching tag cache then chains the base removeChild. Mirrors Class86F88__AddChild.
