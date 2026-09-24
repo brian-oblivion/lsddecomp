@@ -107,7 +107,7 @@ until you diff registers, not just word counts.
   `D_8008EA0D`, `D_8008EA0E`, `D_8008EA0F`, `D_8008EA1C`..`D_8008EA20`,
   `D_8008EA24`. All plain `u8`/`u16` scratch, all already declared with
   identical types in `code_179d8_j.c`'s own header block for the sibling
-  `func_80030E90` -- this was the single biggest time-saver this round
+  `SsUtKeyOn` -- this was the single biggest time-saver this round
   (see "Where this came from" below).
 
 ## Where this came from: a sibling unit had already typed almost everything
@@ -115,7 +115,7 @@ until you diff registers, not just word counts.
 Before deriving anything by hand, `grep -rn StartNote src/*.c` found
 this function's signature independently triple-corroborated (above), and
 `code_179d8_j.c`'s header comment for its OWN (still-`INCLUDE_ASM`)
-`func_80030E90` already named the exact same globals this function
+`SsUtKeyOn` already named the exact same globals this function
 touches (`D_8008EA0C` through `D_8008EA20`, `D_8008EA24`) as "a `start
 channel` setup routine that stages its parameters and a couple of table
 lookups into a block of one/two-byte globals before registering a new

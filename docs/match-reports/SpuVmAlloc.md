@@ -790,8 +790,8 @@ about what the body reads.
 ### Call-site / declaration disagreement, reported not fixed
 
 `src/code_179d8_j_b.c:155`'s `extern s32 SpuVmAlloc(void);` has **no live
-call site in that file** — the only other mention is prose in `func_80030E90`'s
-banner, and `func_80030E90` is itself still `INCLUDE_ASM`. It is a declaration
+call site in that file** — the only other mention is prose in `SsUtKeyOn`'s
+banner, and `SsUtKeyOn` is itself still `INCLUDE_ASM`. It is a declaration
 kept for a call that exists only in assembly. It is harmless (it agrees with
 what the body reads) and it is not mine to delete under a round-59 extern
 review, but a later reader should know the two declarations were never in

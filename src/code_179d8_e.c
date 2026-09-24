@@ -185,7 +185,7 @@ struct VabStreamObj {
  * declared LOCAL to this unit, per-call-site typed, since none of them have
  * an established prototype anywhere yet. */
 extern void *func_80017B34(s32 size);
-extern s16 func_80030E90(s16 a0, s16 hi, s16 lo, s16 a3, s32 b5, s32 argA, s32 argB);
+extern s16 SsUtKeyOn(s16 a0, s16 hi, s16 lo, s16 a3, s32 b5, s32 argA, s32 argB);
 extern void SsUtAutoVol(s16 a0, s16 a1, s16 a2, s32 a3);
 extern void func_80031890(s16 index);
 extern void func_80031F3C(s32 arg0);
@@ -514,7 +514,7 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
         hi = index / 16;
         lo = index - hi * 16;
         entry = &self->progVagTable[hi][lo];
-        result = func_80030E90(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
+        result = SsUtKeyOn(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
                                 entry->shift, (s16)arg2, (s16)arg2);
         if (result >= 0) {
             SsUtAutoVol(result, (s16)arg2, (s16)arg3, 2);

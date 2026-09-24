@@ -31,7 +31,7 @@
  * `D_8008EA22`'S OWN COMMENT WAS WRONG AND IS CORRECTED HERE (round 36): it
  * used to claim `SsUtPitchBend` and the deleted `SpuVmGetSeqRVol` were its
  * only readers in this family, and dropped the extern on that basis. That
- * was never true of this file's own two remaining stalls -- func_80030E90
+ * was never true of this file's own two remaining stalls -- SsUtKeyOn
  * and func_8003149C both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
  * unnoticed because both were still INCLUDE_ASM and nothing failed to
  * link. Declared again below.
@@ -48,7 +48,7 @@
  * shared code_179d8*.h.  The sibling slices are staffed independently and a
  * shared header is what makes their merges collide; see
  * `python3 tools/headercontention.py`.  Several externs below are read only by
- * functions still carried as INCLUDE_ASM (the `func_80030E90` scratch globals
+ * functions still carried as INCLUDE_ASM (the `SsUtKeyOn` scratch globals
  * in particular); they are knowledge about those functions, not dead code, and
  * were re-homed here deliberately rather than dropped.
  *
@@ -67,9 +67,9 @@
 #include "common.h"
 
 /* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
- * (func_80030E90's own computed index, not a channel id). Every field
+ * (SsUtKeyOn's own computed index, not a channel id). Every field
  * this unit's own accessor touches is named; offsets are exact (read
- * from func_80030E90's own lbu/lhu immediates), field names are not. */
+ * from SsUtKeyOn's own lbu/lhu immediates), field names are not. */
 typedef struct {
     u8 unk0;  /* +0x0 */
     u8 unk1;  /* +0x1 */
@@ -112,11 +112,11 @@ extern volatile u8 D_8008EA18;
 extern u16 D_8008EA22;
 
 /* Base pointer for a table of 0x10-byte slots, indexed by the same <0x18
- * channel space func_80030E90 validates via SpuVmVSetUp. This unit's own
- * reduced view: only the fields func_80030E90 itself touches are named.
+ * channel space SsUtKeyOn validates via SpuVmVSetUp. This unit's own
+ * reduced view: only the fields SsUtKeyOn itself touches are named.
  * The sibling accessors that used to share this typedef (SpuVmSetProgVol
  * and friends, code_179d8_j.c's old `SlotE968`) are Sony's own object as
- * of round 34's split and never touched offset 0; func_80030E90 does, so
+ * of round 34's split and never touched offset 0; SsUtKeyOn does, so
  * this unit's own copy of the type names it (see func_80030864.md, the
  * matched sibling's report, for the +0x1/+0x4 fields' provenance). */
 typedef struct SlotE968 {
@@ -128,7 +128,7 @@ typedef struct SlotE968 {
 } SlotE968;
 extern SlotE968 *D_8008E968;
 
-/* func_80030E90's own scratch globals -- a "start channel" setup
+/* SsUtKeyOn's own scratch globals -- a "start channel" setup
  * routine that stages its parameters and a couple of table lookups
  * into a block of one/two-byte globals before registering a new
  * active-channel record.  Offsets are exact (this unit's own field
@@ -343,8 +343,8 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030980);
  * insertions 11 / deletions 11 (re-measured round 70). Residue: the
  * busy-lock guard's branch polarity, with the rest not re-characterised
  * since `--nop-at-expansion` closed the old length gap
- * (docs/match-reports/func_80030E90.md). Hand-derived. */
-s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
+ * (docs/match-reports/SsUtKeyOn.md). Hand-derived. */
+s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
     SlotE968 *slot;
     RecordE978 *rec;
@@ -435,7 +435,7 @@ fail_nolock:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_80030E90);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOn);
 #endif
 
 s32 func_80031280(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)

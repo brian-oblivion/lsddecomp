@@ -1883,3 +1883,9 @@ SePitchBend = 0x8002E138; // type:func
 // SeAutoVol/SeAutoPan pair. Superseded game-style func_8002E308.
 // Round 74 (bravo, track 2).
 SeAutoVol = 0x8002E308; // type:func
+// identified: shape 1.00 vs libsnd/vmanager SsUtKeyOn (250w vs our 252w,
+// disc 3.3), position within the libsnd neighborhood, header LIBSND.H
+// (`extern short SsUtKeyOn(short,short,short,short,short,short,short);`,
+// 7 params -- this function's own 7-param shape agrees on count).
+// Superseded game-style func_80030E90. Round 74 (bravo, track 2).
+SsUtKeyOn = 0x80030E90; // type:func

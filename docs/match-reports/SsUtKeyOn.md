@@ -1,4 +1,6 @@
-# func_80030E90 -- STALL (round 70 re-measure: LENGTH-EXACT, 252/252 built; raw word-match 65/252; insertions 11 / deletions 11; first real diff not re-located since round 62, which put it at the busy-lock guard polarity. The round-62 "BLOCKED below cc1" verdict is RETRACTED: that load-delay nop is emitted by `--nop-at-expansion` since round 63)
+# SsUtKeyOn -- STALL (round 70 re-measure: LENGTH-EXACT, 252/252 built; raw word-match 65/252; insertions 11 / deletions 11; first real diff not re-located since round 62, which put it at the busy-lock guard polarity. The round-62 "BLOCKED below cc1" verdict is RETRACTED: that load-delay nop is emitted by `--nop-at-expansion` since round 63)
+
+> Renamed from `func_80030E90` on 2026-09-24 (tools/rename.py). Address 0x80030e90.
 
 **REVISITED, round 62: STALL, unchanged in score but RE-CLASSIFIED from
 "three exhausted source residues" to "toolchain-blocked, with a complete
@@ -8,7 +10,7 @@ below cc1 and no source shape reaches it).**
 > **Unit corrected:** this report's original header said `code_179d8_j`.
 > That unit was re-carved in round 34 and this function now lives in
 > **`src/code_179d8_j_b.c`**. The `asm/nonmatchings/` path is
-> `code_179d8_j_b/func_80030E90.s`.
+> `code_179d8_j_b/SsUtKeyOn.s`.
 
 Size: 252 words (0x3F0 bytes), file offset `0x21690`, vram `0x80030E90`.
 
@@ -34,8 +36,8 @@ below.
 reachable from C.**
 
 ```
-retail func_80030E90 : 252 words, 19 nops
-built  func_80030E90 : 241 words, 10 nops      (241 + 9 = 250)
+retail SsUtKeyOn : 252 words, 19 nops
+built  SsUtKeyOn : 241 words, 10 nops      (241 + 9 = 250)
 252 - 250 = 2 words  ->  the busy-lock guard polarity, and nothing else
 ```
 
@@ -117,7 +119,7 @@ whose retail bytes are used verbatim.
 | function | sites |
 | --- | --- |
 | `func_8003149C` (this unit, this function's near twin) | 11 |
-| **`func_80030E90`** | **9** |
+| **`SsUtKeyOn`** | **9** |
 | `func_8002FAC4` (`code_179d8_m`) | 2 |
 | `CD_cw`, `func_80031A44`, `SetupStyleSpawnParamsA`, `SetupStyleSpawnParamsB` | 1 each |
 
@@ -195,7 +197,7 @@ would have sunk a correct escalation.
 
 ---
 
-# func_80030E90 -- STALL (11 words short as of round 36: 241 built / 252 retail, a best-effort reproduction of round 31's 240/252; raw word-match 36/252; the three round-26 residues -- busy-lock branch polarity, missing field-copy nops, `result`'s register handling -- persist, and are treated as exhausted this round -- see round-36 addendum)
+# SsUtKeyOn -- STALL (11 words short as of round 36: 241 built / 252 retail, a best-effort reproduction of round 31's 240/252; raw word-match 36/252; the three round-26 residues -- busy-lock branch polarity, missing field-copy nops, `result`'s register handling -- persist, and are treated as exhausted this round -- see round-36 addendum)
 
 Unit `src/code_179d8_j_b.c` (CORRECTED round 62 -- this line said
 `code_179d8_j`, the pre-round-34 unit name), round 26 (2026-09-09). Not a class method. A "start
@@ -212,9 +214,9 @@ record's "note" field.
 ```c
 #if 0
 /* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
- * (func_80030E90's own computed index, not a channel id). Every field
+ * (SsUtKeyOn's own computed index, not a channel id). Every field
  * this unit's own accessor touches is named; offsets are exact (read
- * from func_80030E90's own lbu/lhu immediates), field names are not. */
+ * from SsUtKeyOn's own lbu/lhu immediates), field names are not. */
 typedef struct {
     u8 unk0;  /* +0x0 */
     u8 unk1;  /* +0x1 */
@@ -230,7 +232,7 @@ typedef struct {
 } RecordE978;
 extern RecordE978 *D_8008E978;
 
-/* func_80030E90's own scratch globals -- offsets are exact (this unit's
+/* SsUtKeyOn's own scratch globals -- offsets are exact (this unit's
  * own field accesses); names are opaque placeholders. */
 extern u8 D_8008EA0C;
 extern u8 D_8008EA0E;
@@ -257,7 +259,7 @@ extern void vmNoiseOn(s32 a0);
 extern s32 note2pitch2(u16 a0, u16 a1);
 extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 
-s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u8 result;
@@ -601,7 +603,7 @@ refuted**: F/G/H/I flip it with an ordinary source-level change.
 
 The simple rule the table suggests — *straight-line fallthrough sinks the
 early return and branches far; any further control flow inlines it and
-branches near* — **cannot be what is happening here.** `func_80030E90`'s
+branches near* — **cannot be what is happening here.** `SsUtKeyOn`'s
 fallthrough demonstrably DOES contain further control flow (this report's
 own description: it "dispatches one of two follow-up calls depending on the
 looked-up record's note field"), yet it still compiles to the `beq` FAR
@@ -757,7 +759,7 @@ STALL.
 ### The corrected, linkable body (241/252 words, this round's measurement)
 
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
-`func_80030E90` in `src/code_179d8_j_b.c`, after `func_80030980`'s own
+`SsUtKeyOn` in `src/code_179d8_j_b.c`, after `func_80030980`'s own
 `INCLUDE_ASM` line. Requires (all now present in that file, added this
 round): `extern u16 D_8008EA22;` and the `SlotE968`/`D_8008E968`
 declarations shown below, alongside the file's existing `RecordE978`,
@@ -773,7 +775,7 @@ typedef struct SlotE968 {
 } SlotE968;
 extern SlotE968 *D_8008E968;
 
-s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
     SlotE968 *slot;
     RecordE978 *rec;
@@ -937,7 +939,7 @@ will mislead; find the missing instructions first.
 
 ```c
 #if 0
-s32 func_80030E90(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
     SlotE968 *slot;
     RecordE978 *rec;

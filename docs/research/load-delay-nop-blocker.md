@@ -2,7 +2,7 @@
 
 **Status: RESOLVED 2026-09-21 by maspsx `--nop-at-expansion`, passed by the
 Makefile. Byte-exact across the whole image with every C unit recompiled from
-scratch. Found by runner bravo in round 62 on `func_80030E90`, reproduced by
+scratch. Found by runner bravo in round 62 on `SsUtKeyOn`, reproduced by
 round 62's head and again here before adoption.**
 
 ## The construct
@@ -42,7 +42,7 @@ register through `$at`. Counted 2026-09-21: **28 sites with the nop, 0
 without.** Round 62 counted 40 including the linked Sony objects, which this
 scan cannot see. None lies in a function written as C, which is why the
 image stayed green for 62 rounds: 25 sit inside `INCLUDE_ASM` bodies (11 in
-`func_8003149C`, 9 in `func_80030E90`, 2 in `StartNote`, 1 each in
+`func_8003149C`, 9 in `SsUtKeyOn`, 2 in `StartNote`, 1 each in
 `SetupStyleSpawnParamsA`, `func_80031A44`, `CD_cw`) and 3 in a `psyq_*`
 segment.
 
@@ -50,7 +50,7 @@ segment.
 
 Round 26's attribution of these missing words to GCC's delay-slot filler.
 cc1 never emits the `lui`; the residue was below cc1 and no source shape
-could reach it. `func_80030E90`'s 11-word gap was 9 of these nops plus 2
+could reach it. `SsUtKeyOn`'s 11-word gap was 9 of these nops plus 2
 guard words.
 
 ## Screen
