@@ -1,11 +1,11 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-/* This project's own strcpy (matched elsewhere) -- func_80050F28's own
+/* This project's own strcpy (matched elsewhere) -- Obj86ED0__SetName's own
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */
 extern char *strcpy(char *dest, char *src);
 
-/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- func_80050F28's own
+/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- Obj86ED0__SetName's own
  * call. Translates each byte of `src` (a name string) into `dest` (folding a
  * couple of special-case byte ranges) and returns `dest`, same convention as
  * `strcpy`. Typed purely from this call site's own register usage. Declared
@@ -151,7 +151,7 @@ void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
     }
 }
 
-void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
+void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
 {
     self->unkC = mode;
     self->unk24 = arg1;
@@ -166,7 +166,7 @@ void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
 }
 
 /*
- * func_80050F98's own helpers/data -- resolves two "CARD\\<name>.TIM"
+ * Obj86ED0__LoadCardResources's own helpers/data -- resolves two "CARD\\<name>.TIM"
  * memory-card icon/font resource paths (BuildFileName, already matched in
  * code_171e0.c) and loads each through func_8003B39C, then converts/wraps
  * the loaded handle into a ChildObj86ED0-shaped resource object (unk48 via
@@ -189,7 +189,7 @@ extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only 
 extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
-void func_80050F98(Obj86ED0 *self, void *arg1)
+void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
 {
     char path[0x20];
     const char *dir;
@@ -223,7 +223,7 @@ void func_80050F98(Obj86ED0 *self, void *arg1)
     self->unk40->methods->slot4C(self->unk40, arg1, (void *)&D_8008AADC);
 }
 
-void func_80051174(Obj86ED0 *self)
+void Obj86ED0__ReleaseCardResources(Obj86ED0 *self)
 {
     if (self->unk48 != NULL) {
         self->unk48 = self->unk48->methods->release(self->unk48);

@@ -6,7 +6,7 @@
 
 Unit `class_3bb8c_g`, class `Class86E00_3bb8c_g`. "Load a card-slot resource
 by index, if not already loaded" -- builds a `CARD\<NAME>.TIM` path (same
-naming shape as `func_80050F98`'s `CARD\COMINPUT.TIM`, a different unit),
+naming shape as `Obj86ED0__LoadCardResources`'s `CARD\COMINPUT.TIM`, a different unit),
 loads it through the `ChildObj86ED0` short-lived-handle idiom, and stashes
 the derived object into `self->unk70`.
 
@@ -69,7 +69,7 @@ out an actual call to that helper (a call would need the conditional
 branch). Reading the `strcat` argument order off the delay slots
 (`strcat(buf,"CARD\\")`, `strcat(buf,name)`, `strcat(buf,".TIM")`) gives
 `buf = "CARD\" + name + ".TIM"`, `name = gCardIconNames[arg1]` -- the same
-`CARD\<NAME>.TIM` shape as `func_80050F98`'s `CARD\COMINPUT.TIM` (that
+`CARD\<NAME>.TIM` shape as `Obj86ED0__LoadCardResources`'s `CARD\COMINPUT.TIM` (that
 unit builds it via a real `BuildFileName` call instead; this one just
 happens to inline the identical three-piece concatenation).
 
@@ -83,7 +83,7 @@ without needing the full contents.
 
 The `func_8003B39C` / `slot78` / `func_80041C9C` / `release` sequence on
 the temp `handle` is the exact idiom already established by
-`func_80050F98` (`docs/match-reports/func_80050F98.md`, a DIFFERENT unit,
+`Obj86ED0__LoadCardResources` (`docs/match-reports/Obj86ED0__LoadCardResources.md`, a DIFFERENT unit,
 `class_3bb8c_i`) using the SAME shared `ChildObj86ED0`/`ChildMethods86ED0`
 type from `class_3bb8c.h` (`slot78`/`release` already declared there).
 
@@ -91,7 +91,7 @@ type from `class_3bb8c.h` (`slot78`/`release` already declared there).
 (established by the already-matched `TaskObjF__TickCardIcon`, same file). Assigning
 `func_80041C9C`'s `ChildObj86ED0 *` return into it is the same
 implicit-pointer-type-mismatch-is-harmless pattern already documented in
-`func_80050F98`'s own report (`self->unk44 = New_Obj6EAC0(...)` there) --
+`Obj86ED0__LoadCardResources`'s own report (`self->unk44 = New_Obj6EAC0(...)` there) --
 a warning, not an error, zero byte cost. Extended
 `Class86E00Unk70ObjMethods_3bb8c_g` (in `include/class_3bb8c.h`)
 ADDITIVELY with `slot4C` at `+0x04C`
@@ -128,7 +128,7 @@ final call) closed this to byte-exact.
 
 ### Proposed learning
 
-Same shape as `func_80050F98`'s already-documented lesson, but for a
+Same shape as `Obj86ED0__LoadCardResources`'s already-documented lesson, but for a
 SINGLE-attach path rather than a two-block repeat: when a call's return
 value is BOTH stored into a struct field AND consumed again later in the
 same function, don't write `self->field = call(...); ...

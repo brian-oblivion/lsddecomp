@@ -1,4 +1,6 @@
-# func_80050F28 -- MATCHED (28/28 words)
+# Obj86ED0__SetName -- MATCHED (28/28 words)
+
+> Renamed from `func_80050F28` on 2026-09-24 (tools/rename.py). Address 0x80050f28.
 
 Unit `class_3bb8c_i`, carved round 14.
 
@@ -11,7 +13,7 @@ round-toward-zero sequence), or falls back to a straight `strcpy` when
 `mode != 1`.
 
 ```c
-void func_80050F28(Obj86ED0 *self, char *arg1, s32 mode)
+void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
 {
     self->unkC = mode;
     self->unk24 = arg1;

@@ -2653,26 +2653,26 @@ typedef struct Obj86ED0Methods Obj86ED0Methods;
 
 /* Generic BasicClass-family child object -- only `release` (+0x004,
  * matching BasicClassMethods's own layout) is dispatched on one of
- * these from this unit (func_80051174, on self->unk40/unk44/unk48).
+ * these from this unit (Obj86ED0__ReleaseCardResources, on self->unk40/unk44/unk48).
  * Kept minimal/opaque beyond that, same policy as
  * `Class86E00SubObj_3bb8c_g` elsewhere in this header. */
 typedef struct ChildObj86ED0 ChildObj86ED0;
 typedef struct ChildMethods86ED0 ChildMethods86ED0;
 struct ChildMethods86ED0 {
     u8 pad000[0x004];
-    void *(*release)(ChildObj86ED0 *self); /* +0x004, func_80051174 */
+    void *(*release)(ChildObj86ED0 *self); /* +0x004, Obj86ED0__ReleaseCardResources */
     u8 pad008[0x04C - 0x008];
-    /* +0x04C, func_80050F98 (three call sites, always through self->unk40/
+    /* +0x04C, Obj86ED0__LoadCardResources (three call sites, always through self->unk40/
      * unk44/unk48). Same offset/arity as the unrelated FieldM7CMethods::
      * slot4C above -- not unified with it, per this project's established
      * multiple-independent-local-views convention (this unit's own reading
-     * from its own call sites). arg1 is func_80050F98's own forwarded
+     * from its own call sites). arg1 is Obj86ED0__LoadCardResources's own forwarded
      * parameter; arg2 is a small opaque data blob passed only by address. */
     void (*slot4C)(ChildObj86ED0 *self, void *arg1, void *arg2);
     u8 pad050[0x078 - 0x050];
-    void (*slot78)(ChildObj86ED0 *self); /* +0x078, func_80050F98, on the short-lived handle before func_80041C9C/New_Obj6EAC0 consume it */
+    void (*slot78)(ChildObj86ED0 *self); /* +0x078, Obj86ED0__LoadCardResources, on the short-lived handle before func_80041C9C/New_Obj6EAC0 consume it */
     u8 pad07C[0x0B8 - 0x07C];
-    void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, func_80050F98, self->unk44 only */
+    void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, Obj86ED0__LoadCardResources, self->unk44 only */
     /* +0x0BC/+0x0C4, added round 75 (class_3bb8c_j, track 3 naming):
      * Obj86ED0__DispatchIndexValue/Obj86ED0__DispatchLookupValue dispatch through self->unk40/unk44 (both
      * already typed ChildObj86ED0* above, established by this same unit's
@@ -2733,7 +2733,7 @@ struct Obj86ED0Methods {
      * own two arguments unchanged. */
     void (*slot40)(Obj86ED0 *self, s32 arg1, s32 arg2); /* +0x040 */
     u8 pad044[0x048 - 0x044];
-    void (*slot48)(Obj86ED0 *self);                      /* +0x048, func_800512C8 -- this class's own slot, func_80051174 */
+    void (*slot48)(Obj86ED0 *self);                      /* +0x048, func_800512C8 -- this class's own slot, Obj86ED0__ReleaseCardResources */
     u8 pad04C[0x054 - 0x04C];
     void (*slot54)(Obj86ED0 *self, s32 arg1);             /* +0x054, func_80051370 -- this class's own slot, func_800512C8 */
     void (*slot58)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, Obj86ED0__Notify's tag==5 case -- this class's own slot, func_80051370 */
@@ -2772,22 +2772,22 @@ struct Obj86ED0Methods {
 struct Obj86ED0 {
     Obj86ED0Methods *methods;  /* +0x000 */
     u8 pad004[0x00C - 0x004];   /* inherited BasicClass children/parentRefs, untouched by this unit */
-    s32 unkC;                    /* +0x00C, func_80050F28: its own `mode` argument */
-    s32 unk10;                   /* +0x010, func_80050F28 (halved when mode==1)/func_8005165C (upper bound tested against unk18+1) */
+    s32 unkC;                    /* +0x00C, Obj86ED0__SetName: its own `mode` argument */
+    s32 unk10;                   /* +0x010, Obj86ED0__SetName (halved when mode==1)/func_8005165C (upper bound tested against unk18+1) */
     s32 unk14;                   /* +0x014, func_80051720 (upper bound tested against unk1C+1) */
-    s32 unk18;                   /* +0x018, func_80050F28 (zeroed)/func_8005165C/func_800516C0 (inc/dec counter, capped by unk10) */
-    s32 unk1C;                   /* +0x01C, func_80050F28 (zeroed)/func_80051720 (inc counter or reset to 0, capped by unk14) */
+    s32 unk18;                   /* +0x018, Obj86ED0__SetName (zeroed)/func_8005165C/func_800516C0 (inc/dec counter, capped by unk10) */
+    s32 unk1C;                   /* +0x01C, Obj86ED0__SetName (zeroed)/func_80051720 (inc counter or reset to 0, capped by unk14) */
     s32 unk20;                   /* +0x020, func_80051200 (zeroed) */
-    char *unk24;                 /* +0x024, func_80050F28: its own `arg1` (name string) */
-    char *unk28;                 /* +0x028, Obj86ED0__Finalize (freed in finalize)/func_80050F28 (DecodeFullWidthSjis/strcpy destination) */
+    char *unk24;                 /* +0x024, Obj86ED0__SetName: its own `arg1` (name string) */
+    char *unk28;                 /* +0x028, Obj86ED0__Finalize (freed in finalize)/Obj86ED0__SetName (DecodeFullWidthSjis/strcpy destination) */
     s32 unk2C;                   /* +0x02C, func_80051200 (zeroed)/func_800512C8 (set to its own arg1 for arg1 in [2,4); read as notifyParents's arg1 for arg1==4)/func_80051370 (range-checked against [2,4)) */
     s32 unk30;                   /* +0x030, func_800512C8 (zeroed)/func_80051370 (incremented; gates the slot54 call on the OLD value being nonzero) */
     void *unk34;                 /* +0x034, Obj86ED0__AddChild/Obj86ED0__RemoveChild (addChild/removeChild target when child's tag==2)/func_800512C8/func_80051270 (removeChild target) */
     void *unk38;                 /* +0x038, Obj86ED0__AddChild/Obj86ED0__RemoveChild (tag==5)/func_80051270 (removeChild target) */
     TargetObj86ED0 *unk3C;        /* +0x03C, func_80051200 (its own arg3)/func_8005161C (dispatch target)/func_80051270 (zeroed) */
-    ChildObj86ED0 *unk40;          /* +0x040, func_80051174 (released, no null-back store) */
-    ChildObj86ED0 *unk44;           /* +0x044, func_80051174 (released, no null-back store) */
-    ChildObj86ED0 *unk48;            /* +0x048, func_80051174 (release+null-back)/Obj86ED0__ClearChildRefs/Obj86ED0__RemoveAllChildren (zeroed)/func_8005165C/func_800516C0/func_80051720 (nonzero readiness gate)/func_80050F98 (set from a resolved resource handle) */
+    ChildObj86ED0 *unk40;          /* +0x040, Obj86ED0__ReleaseCardResources (released, no null-back store) */
+    ChildObj86ED0 *unk44;           /* +0x044, Obj86ED0__ReleaseCardResources (released, no null-back store) */
+    ChildObj86ED0 *unk48;            /* +0x048, Obj86ED0__ReleaseCardResources (release+null-back)/Obj86ED0__ClearChildRefs/Obj86ED0__RemoveAllChildren (zeroed)/func_8005165C/func_800516C0/func_80051720 (nonzero readiness gate)/Obj86ED0__LoadCardResources (set from a resolved resource handle) */
 };
 
 /* HEAD NOTE round 15: alpha's `extern Obj86ED0Methods *Get_vtable_Obj86ED0(void);`

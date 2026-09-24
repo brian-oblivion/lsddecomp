@@ -160,7 +160,7 @@ typedef struct Class86F88_3bb8c_j Class86F88_3bb8c_j;
  * Class86F88_3bb8c_j's own opaque "handle" object (self->unk50's pointee, built by
  * Class86F88__LoadResources via BuildFileName/func_8003B39C/func_80041C9C: a
  * "CARD\\<name>.TIM" path is built and loaded, as in class_3bb8c_i's
- * func_80050F98). Only the three slots this unit's own
+ * Obj86ED0__LoadCardResources). Only the three slots this unit's own
  * functions dispatch through are named.
  */
 typedef struct Class86F88Handle_3bb8c_j Class86F88Handle_3bb8c_j;
@@ -423,7 +423,7 @@ extern const char D_800116E4[]; /* "FONTICON" */
  * Two handle variables, not one: handle1 and handle2 are disjoint live
  * ranges, and merging them into one `h` gives the rotation filed as the
  * round-18/19 stall (75/95, both addresses and the handle swapped among
- * $s0-$s2). Same shape as class_3bb8c_i's func_80050F98.
+ * $s0-$s2). Same shape as class_3bb8c_i's Obj86ED0__LoadCardResources.
  */
 void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
 {

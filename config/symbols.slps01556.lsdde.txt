@@ -2177,3 +2177,6 @@ Obj86ED0__AddChild = 0x80050D30; // type:func
 Obj86ED0__RemoveChild = 0x80050DB4; // type:func
 Obj86ED0__RemoveAllChildren = 0x80050E34; // type:func
 Obj86ED0__Notify = 0x80050E78; // type:func
+Obj86ED0__SetName = 0x80050F28; // type:func
+Obj86ED0__LoadCardResources = 0x80050F98; // type:func
+Obj86ED0__ReleaseCardResources = 0x80051174; // type:func

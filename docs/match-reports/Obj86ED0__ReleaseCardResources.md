@@ -1,4 +1,6 @@
-# func_80051174 -- MATCHED (35/35 words)
+# Obj86ED0__ReleaseCardResources -- MATCHED (35/35 words)
+
+> Renamed from `func_80051174` on 2026-09-24 (tools/rename.py). Address 0x80051174.
 
 Unit `class_3bb8c_i`, carved round 14.
 
@@ -10,7 +12,7 @@ matching retail's asymmetric store pattern exactly (`sw v0,0x48(s0)` after
 the first `release` call, no corresponding store after the other two).
 
 ```c
-void func_80051174(Obj86ED0 *self)
+void Obj86ED0__ReleaseCardResources(Obj86ED0 *self)
 {
     if (self->unk48 != NULL) {
         self->unk48 = self->unk48->methods->release(self->unk48);
