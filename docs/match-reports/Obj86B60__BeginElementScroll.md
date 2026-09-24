@@ -71,3 +71,20 @@ for a computation this unit alone needs.
 ## Naming (round 78, naming runner echo)
 
 Renamed `func_` -> `Obj86B60__BeginElementScroll`. **Tier B**: Gated on `self->unk3C == 1`. Notifies the target (`slot100`), highlights the item at the slot's PERSISTED cursor (`slotCounts[idx]`, the same field Obj86B60__AdvanceSlotCursor/RetreatSlotCursor step), advances `unk3C` to 2, fires a closing notification. Opens interactive scrolling of the current slot's item list -- state 1 -> 2. Paired with Obj86B60__CommitElementScroll/Obj86B60__CancelElementScroll, both gated on state 2 and both returning to state 1; the data flow (DA10 highlights `slotCounts[idx]`, DAD4 later WRITES that same value into `SlotEntry::savedCursor`, DCAC READS `savedCursor` back out) is what grounds 'scroll session that a later step commits or cancels' rather than a guess.
+
+## Proposed field names
+
+Not renamed here -- `self->unk3C` is CROSS-UNIT (`code_2cc8c.c`'s
+`func_8003C858`/`func_8003C8D0`/`func_8003C944`/`func_8003C9B0` all gate on
+it too, plus the STALL `func_8003C48C`/`func_8003C63C`), not attempted as a
+compiler-verified rename this round. Proposing for the head to apply at
+merge:
+
+- `Obj86B60::unk3C` -> `scrollState` (tier B). In this unit it is exactly
+  the 1<->2 state this function/`Obj86B60__CommitElementScroll`/
+  `Obj86B60__CancelElementScroll` open and close (BeginElementScroll:
+  1->2; the other two: 2->1). Whether the sibling unit's own
+  `func_8003C858` etc. use the same two values for the same meaning, or a
+  wider range of states unrelated to scrolling, is NOT established from
+  this unit alone -- the head or whoever names that unit should confirm
+  `unk3C`'s full value range before applying this name tree-wide.
