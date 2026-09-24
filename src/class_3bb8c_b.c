@@ -128,18 +128,18 @@ void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     func_8004C93C(self);
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 45/109 words, length exact, zero drift. Residue: register
- * identity, a clean rotation across the whole function
- * (self/h4/h6/slot0/span all permuted, matching set of registers), which
- * CLAUDE.md HARD RULE 6 marks a STALL by definition, not a judgement call
- * (docs/match-reports/func_8004C93C.md). Two real CFG/scheduling fixes
- * closed most of the gap (a hoisted "flag=0" default matching the
- * project's established "default value in the guarding branch's delay
- * slot" idiom; a deliberately-duplicated `slot0 = &self->slots8C[0];` on
- * both arms of the h6<0 test, held apart with a bare `__asm__("")`
- * scheduling barrier to stop the compiler tail-merging the two identical
- * stores back into one). Hand-derived. */
+/* Forward declaration: defined next in this file (ROM order), called here
+ * before its own definition appears. */
+extern s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height);
+
+/* Matched round 75. Three source-shape levers closed what was filed since
+ * round 19 as a whole-function register rotation
+ * (docs/match-reports/func_8004C93C.md): ONE slot pointer reused for the
+ * second slot (no separate slot1), assigned once at the join after the
+ * h6<0 test (reorg fills the bgez delay slot from it and deletes the
+ * redundant copy on the other path -- no barrier, no duplicate); the
+ * clipped remainder in its own local `over` rather than `span -= 0x14`;
+ * and `count += 1` as a statement in each arm plus at the join. */
 void func_8004C93C(Obj866E8 *self) {
     s32 flag;
     s32 h4;
@@ -147,10 +147,10 @@ void func_8004C93C(Obj866E8 *self) {
     s32 height;
     s32 quadrant;
     s32 h6;
-    GridSlot866E8 *slot0;
+    GridSlot866E8 *slot;
     s32 span;
     s32 count;
-    GridSlot866E8 *slot1;
+    s32 over;
 
     flag = 0;
     h4 = self->unk7C;
@@ -164,49 +164,41 @@ void func_8004C93C(Obj866E8 *self) {
     }
     h6 = self->unk7E;
     if (h6 < 0) {
-        if (flag == 0) {
-            h6 += 0x14;
-            if (h4 < 0xA) {
-                h4 += 0xA;
-                quadrant = 0;
-            } else {
-                h4 -= 0xA;
-                quadrant = 1;
-            }
-        } else {
+        h6 += 0x14;
+        if (flag != 0) {
             h4 -= 0xA;
             quadrant = 0;
+        } else if (h4 < 0xA) {
+            h4 += 0xA;
+            quadrant = 0;
+        } else {
+            h4 -= 0xA;
+            quadrant = 1;
         }
-        slot0 = &self->slots8C[0];
-    } else {
-        __asm__("");
-        slot0 = &self->slots8C[0];
     }
-    slot0->elemIdx = self->methods->slot120(self, quadrant);
-    slot0->h4 = (h4 >= 0) ? h4 : 0;
-    slot0->h6 = h6;
+    slot = &self->slots8C[0];
+    slot->elemIdx = self->methods->slot120(self, quadrant);
+    slot->h4 = (h4 >= 0) ? h4 : 0;
+    slot->h6 = h6;
     span = h4 + width;
     if (span >= 0x15) {
-        span -= 0x14;
-        slot0->h8 = width - span;
-        count = func_8004CAF0(self, slot0, 0, quadrant, h4, h6, width, height);
+        over = span - 0x14;
+        slot->h8 = width - over;
+        count = func_8004CAF0(self, slot, 0, quadrant, h4, h6, width, height);
         count += 1;
-        slot1 = &self->slots8C[count];
-        slot1->elemIdx = self->methods->slot120(self, quadrant + 1);
-        slot1->h4 = 0;
-        slot1->h6 = self->slots8C[0].h6;
-        slot1->h8 = span;
-        slot1->hA = self->slots8C[0].hA;
+        slot = &self->slots8C[count];
+        slot->elemIdx = self->methods->slot120(self, quadrant + 1);
+        slot->h4 = 0;
+        slot->h6 = self->slots8C[0].h6;
+        slot->h8 = over;
+        slot->hA = self->slots8C[0].hA;
     } else {
-        slot0->h8 = width;
-        count = func_8004CAF0(self, slot0, 0, quadrant, h4, h6, width, height);
+        slot->h8 = width;
+        count = func_8004CAF0(self, slot, 0, quadrant, h4, h6, width, height);
     }
     count += 1;
     self->unk88 = count;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_b", func_8004C93C);
-#endif
 
 s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
     s32 overflow;
