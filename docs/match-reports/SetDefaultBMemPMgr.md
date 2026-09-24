@@ -39,3 +39,12 @@ round 45 (2026-09-15), runner alpha. `./build-and-verify.sh` green,
 None beyond the standing one already on file project-wide: a stale
 `gp_rel`-blocked stub, once rebuilt under the round-42 pin, needs zero new
 work for a one-line accessor — the old derivation transcribes directly.
+
+## Naming (round 74)
+
+`SetDefaultBMemPMgr`, **tier A** (head, from runner alpha's evidence): the
+body is exactly `gDefaultBMemPMgr = pool;`, a pure setter, and its one
+caller (`main.c`) calls it immediately after `BMemPMgrInit(pool)` with the
+same pool. `D_8008A818` -> `gDefaultBMemPMgr`, tier A: the pointer
+`SetupBMemPMgrFreeList`, `BMemPMgrAlloc` and `BMemPMgrFree` read as the
+current pool.

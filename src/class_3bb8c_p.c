@@ -22,9 +22,9 @@
  *    an unrelated, still-uncarved sibling class (table D_800879C4, in
  *    class_3bb8c_q.s).
  *
- * One stall: DreamSys__BuildLinkQueries (register-allocation/scheduling
- * residue only; control and data flow independently confirmed via
- * m2ctx.py). No switch jump table in this slice, and no gp_rel/addiu_at/
+ * One stall: DreamSys__BuildLinkQueries (13/116, length not exact: frame
+ * and register-allocation residue; control and data flow independently
+ * confirmed via m2ctx.py). No switch jump table in this slice, and no gp_rel/addiu_at/
  * nop_mflo_mfhi anywhere in it (all three are resolved toolchain
  * constructs anyway, CLAUDE.md "Open toolchain blockers").
  */
