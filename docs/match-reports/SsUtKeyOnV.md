@@ -1,4 +1,6 @@
-# func_8003149C -- STALL (round 70 re-measure: 5 words SHORT, 248/253 built; raw word-match 47/253 and insertions 18 / deletions 18 are drift-contaminated upper bounds while short; first real diff at word 23, the busy-lock guard's branch polarity, per round 36. The round-62 "BLOCKED below cc1" verdict is RETRACTED: 11 of the 16 missing words were the load-delay nop `--nop-at-expansion` emits since round 63)
+# SsUtKeyOnV -- STALL (round 70 re-measure: 5 words SHORT, 248/253 built; raw word-match 47/253 and insertions 18 / deletions 18 are drift-contaminated upper bounds while short; first real diff at word 23, the busy-lock guard's branch polarity, per round 36. The round-62 "BLOCKED below cc1" verdict is RETRACTED: 11 of the 16 missing words were the load-delay nop `--nop-at-expansion` emits since round 63)
+
+> Renamed from `func_8003149C` on 2026-09-24 (tools/rename.py). Address 0x8003149c.
 
 > **[RETRACTED round 70: the blocker below is resolved; see the title.]** **TOOLCHAIN-BLOCKED -- note added round 62 by bravo, who did not work this
 > function.** While revisiting its near twin `SsUtKeyOn` (same unit,
@@ -31,7 +33,7 @@ the SAME fixes.
 
 ```c
 #if 0
-s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u16 note;
@@ -262,13 +264,13 @@ STALL.
 ### The corrected, linkable body (237/253 words, this round's measurement)
 
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
-`func_8003149C` in `src/code_179d8_j_b.c`, between `SsUtKeyOff` and
+`SsUtKeyOnV` in `src/code_179d8_j_b.c`, between `SsUtKeyOff` and
 `func_80031890`. Needs the same `SlotE968`/`D_8008E968`/`D_8008EA22`
 declarations as `SsUtKeyOn`'s corrected body (see that report), all
 now present in the shared file.
 
 ```c
-s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u16 note;
@@ -410,7 +412,7 @@ will mislead; find the missing instructions first.
 
 ```c
 #if 0
-s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
+s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u16 note;
@@ -505,7 +507,7 @@ attempt" and explicitly NOT yet translated at the time of recovery. This
 session resumed (both this round's background permuter searches completed
 and their notifications were processed normally) and closed that open
 item -- for three candidates, not just the flagged one, since the saved
-`permuter-work/func_8003149C/output-*` directory held two more below the
+`permuter-work/SsUtKeyOnV/output-*` directory held two more below the
 4035 base worth checking at the same time:
 
 - **Score 3265**: a pointer-indirection idiom for the `note` read

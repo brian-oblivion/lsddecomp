@@ -42,7 +42,7 @@ register through `$at`. Counted 2026-09-21: **28 sites with the nop, 0
 without.** Round 62 counted 40 including the linked Sony objects, which this
 scan cannot see. None lies in a function written as C, which is why the
 image stayed green for 62 rounds: 25 sit inside `INCLUDE_ASM` bodies (11 in
-`func_8003149C`, 9 in `SsUtKeyOn`, 2 in `StartNote`, 1 each in
+`SsUtKeyOnV`, 9 in `SsUtKeyOn`, 2 in `StartNote`, 1 each in
 `SetupStyleSpawnParamsA`, `func_80031A44`, `CD_cw`) and 3 in a `psyq_*`
 segment.
 

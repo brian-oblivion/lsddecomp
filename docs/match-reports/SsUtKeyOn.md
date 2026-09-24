@@ -118,7 +118,7 @@ whose retail bytes are used verbatim.
 
 | function | sites |
 | --- | --- |
-| `func_8003149C` (this unit, this function's near twin) | 11 |
+| `SsUtKeyOnV` (this unit, this function's near twin) | 11 |
 | **`SsUtKeyOn`** | **9** |
 | `func_8002FAC4` (`code_179d8_m`) | 2 |
 | `CD_cw`, `func_80031A44`, `SetupStyleSpawnParamsA`, `SetupStyleSpawnParamsB` | 1 each |
@@ -167,7 +167,7 @@ missing words cannot be emitted by this pipeline for any C input, so the best
 reachable score is 250/252 and byte-exactness is unreachable. That is a
 different statement from "exhausted", which is what rounds 26/31/36/40 had to
 say without this measurement, and it is checkable in one command rather than
-re-derived. The same applies with more force to `func_8003149C`, which has 11
+re-derived. The same applies with more force to `SsUtKeyOnV`, which has 11
 sites and whose report carries the same inherited attribution.
 
 When the blocker is resolved, this function is a good early target: the body
@@ -891,7 +891,7 @@ waiting on a notification that was never coming (nothing runs on a runner's
 behalf). The head recovered the worktree by hand before teardown: measured the
 body, preserved it below, restored the `INCLUDE_ASM`, and wrote this entry. The
 MEASUREMENTS here are the head's own and were taken with the sibling
-`func_8003149C` restored to
+`SsUtKeyOnV` restored to
 `INCLUDE_ASM`, so this figure is free of that sibling's drift. The
 INTERPRETATION is reconstructed from the runner's artifacts, not from its
 reasoning, and is flagged where it is inference.
@@ -1045,7 +1045,7 @@ that open item.
 `__asm__("")` from between the `D_8008D99A[result]`/`D_8008D998[result]`
 store pair to between `D_8008EA1B = rec->unk0;` and `note = rec->unk16;`
 instead. Applied literally to the real source (isolating this function
-alone, sibling `func_8003149C` held at `INCLUDE_ASM` so its own shortfall
+alone, sibling `SsUtKeyOnV` held at `INCLUDE_ASM` so its own shortfall
 does not contaminate this function's window, per the attribution-hazard
 note in CLAUDE.md) and rebuilt through `./build-and-verify.sh` +
 `tools/funcdiff.py`: **byte-identical to baseline -- still 36/252 raw
@@ -1053,7 +1053,7 @@ word-match, still 11 words short (`build/lsdde.map`: `SsUtKeyOff` still
 lands at `0x80031254`, unchanged).** Reverted; no net effect.
 
 This is the same scaffold-vs-real-oracle disagreement `func_80031890`'s
-and `func_8003149C`'s round-40 entries document: the permuter's isolated
+and `SsUtKeyOnV`'s round-40 entries document: the permuter's isolated
 translation unit does not reproduce this project's real
 register-allocation pressure, so a scaffold-local score drop (4050 -> 2965,
 ~27%) is not evidence about the real function on its own. No new axis
@@ -1070,7 +1070,7 @@ restored, but it was not actually present in the committed file -- this
 function's preserved body cannot compile without it, and the round-36
 gap-check apparently checked the OTHER two declarations (`D_8008EA22`,
 `SlotE968`/`D_8008E968`) but not this one. Fixed once, shared with
-`func_8003149C`'s identical dependency.
+`SsUtKeyOnV`'s identical dependency.
 
 ### Proposed learning
 
@@ -1088,7 +1088,7 @@ flag closed the length gap, and the title's "TOOLCHAIN-BLOCKED" is retired
 This round is a promotion job (`docs/FINISHING-PLAN.md` track 1b), not a
 matching session: measure once under the current toolchain, do not iterate.
 The round-40 body above was put LIVE (replacing `INCLUDE_ASM`, no `#ifdef`,
-sibling `func_8003149C` left at `INCLUDE_ASM` so its own drift does not
+sibling `SsUtKeyOnV` left at `INCLUDE_ASM` so its own drift does not
 contaminate this window) and rebuilt through `./build-and-verify.sh` +
 `tools/funcdiff.py`.
 

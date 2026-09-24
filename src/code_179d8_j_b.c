@@ -32,7 +32,7 @@
  * used to claim `SsUtPitchBend` and the deleted `SpuVmGetSeqRVol` were its
  * only readers in this family, and dropped the extern on that basis. That
  * was never true of this file's own two remaining stalls -- SsUtKeyOn
- * and func_8003149C both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
+ * and SsUtKeyOnV both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
  * unnoticed because both were still INCLUDE_ASM and nothing failed to
  * link. Declared again below.
  *
@@ -494,8 +494,8 @@ fail_nolock:
  * Residue: the busy-lock guard's branch polarity and a second guard
  * flip; the 5-word gap is not re-characterised since
  * `--nop-at-expansion` closed 11 of the old 16
- * (docs/match-reports/func_8003149C.md). Hand-derived. */
-s32 func_8003149C(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
+ * (docs/match-reports/SsUtKeyOnV.md). Hand-derived. */
+s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
 {
     RecordE978 *rec;
     u16 note;
@@ -580,7 +580,7 @@ fail:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", func_8003149C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
 #endif
 
 /* The "release channel" twin of SsUtKeyOff's else-branch above: same
