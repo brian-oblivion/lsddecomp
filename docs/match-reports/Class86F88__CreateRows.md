@@ -15,7 +15,7 @@ of the same file; this function is ordinary matching work.
 
 ```c
 extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
-extern void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
+extern void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
 
 extern s32 D_8008AB00;
 extern s32 D_8008AB04;
@@ -54,7 +54,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
         p++;
     }
 
-    func_800529FC(self, arg3, arg4, arg5, 1);
+    Class86F88__SetView(self, arg3, arg4, arg5, 1);
 }
 ```
 
@@ -66,7 +66,7 @@ element's own `slot4C` (with a 2-word stack-local argument seeded from
 `D_8008AB00`/`D_8008AB04`, the second word accumulating by `0xA` per
 iteration) and `slotB8` before `Class86F88__RefreshRows`'s sibling code reaches its
 own `slotCC`, and this one always passes `1` (not a caller flag) as the
-final `func_800529FC` argument. `Class86F88ElemMethods::slot4C` (offset
+final `Class86F88__SetView` argument. `Class86F88ElemMethods::slot4C` (offset
 0x04C) is a new additive header field, typed `void *arg2` there (the
 concrete 2-word `Elem4CArg_3bb8c_k` struct is kept unit-local, since it's
 this one call site's own reading) — its offset and neighbor (`release` at
@@ -83,7 +83,7 @@ different local name for what the header comment already notes might be
 the same real object, so the return value is cast explicitly rather than
 adding a second, conflicting declaration.
 
-`Class86F88__FormatRowText` and `func_800529FC` are defined LATER in this same file
+`Class86F88__FormatRowText` and `Class86F88__SetView` are defined LATER in this same file
 (ROM order), so both needed forward `extern` declarations above
 `Class86F88__CreateRows`, matching their real definitions exactly — same convention
 already used for `Obj865C8__EnterState2`/`func_80050CD8` elsewhere this round.

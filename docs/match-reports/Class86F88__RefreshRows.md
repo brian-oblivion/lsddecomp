@@ -11,7 +11,7 @@ Refreshes the active window's display text: for each of up to 4 active
 `self->unk40[]` elements, formats a fixed-width label via `Class86F88__FormatRowText`
 (this unit, matched this round) into a local stack buffer and dispatches
 `elem->methods->slotCC(elem, buf)`; then forwards `(arg1, arg2, arg3, 0)`
-to `func_800529FC` (already matched) and optionally notifies `self` via
+to `Class86F88__SetView` (already matched) and optionally notifies `self` via
 `slot60` (new this round, shared with `func_80052A58`).
 
 ```c
@@ -35,7 +35,7 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32
         (*p)->methods->slotCC(*p, buf);
         p++;
     }
-    func_800529FC(self, arg1, arg2, arg3, 0);
+    Class86F88__SetView(self, arg1, arg2, arg3, 0);
     if (arg4) {
         self->methods->slot60(self, 0);
     }
@@ -83,7 +83,7 @@ order or bundled together would have been much harder to diagnose.
 
 `Class86F88__FormatRowText`'s call site here passes this function's own `arg2`
 (established as a plain `s32`, since it is ALSO forwarded unmodified to
-`func_800529FC`'s already-typed `s32 a2` parameter) through an explicit
+`Class86F88__SetView`'s already-typed `s32 a2` parameter) through an explicit
 `(char *)` cast to match `Class86F88__FormatRowText`'s own `base` parameter type
 (`char *`, fixed by that function's internal pointer arithmetic -- see its
 own report). Both typings are correct for their own function; the cast is

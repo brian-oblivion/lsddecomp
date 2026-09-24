@@ -1,15 +1,17 @@
-# func_800529FC -- MATCH
+# Class86F88__SetView -- MATCH
+
+> Renamed from `func_800529FC` on 2026-09-24 (tools/rename.py). Address 0x800529fc.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_800529FC`: 23/23 words match.
+SHA1 matches retail. `funcdiff.py Class86F88__SetView`: 23/23 words match.
 
 Called (not through a vtable) by `Class86F88__RefreshRows` (this unit, still
-`INCLUDE_ASM`) as `func_800529FC(self, arg1, arg2, arg3, arg4)`.
+`INCLUDE_ASM`) as `Class86F88__SetView(self, arg1, arg2, arg3, arg4)`.
 
 ## Source
 
 ```c
-void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
+void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
 {
     Class86F88Elem *elem;
     s32 flag = a4;

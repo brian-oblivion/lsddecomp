@@ -279,7 +279,7 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
  * src/class_39e08.c. Signatures must match their real definitions below
  * exactly. */
 extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
-extern void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
+extern void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
 
 /* VALUE-of `%gp_rel`, round 45's own local view -- two plain s32
  * constants (`D_8008AB00`=-0x5C, `D_8008AB04`=-0xF in the ROM image,
@@ -327,7 +327,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
         p++;
     }
 
-    func_800529FC(self, arg3, arg4, arg5, 1);
+    Class86F88__SetView(self, arg3, arg4, arg5, 1);
 }
 
 void Class86F88__ReleaseRows(Class86F88 *self)
@@ -392,7 +392,7 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32
         (*p)->methods->slotCC(*p, buf);
         p++;
     }
-    func_800529FC(self, arg1, arg2, arg3, 0);
+    Class86F88__SetView(self, arg1, arg2, arg3, 0);
     if (arg4) {
         self->methods->slot60(self, 0);
     }
@@ -419,7 +419,7 @@ char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4
     return dest;
 }
 
-void func_800529FC(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
+void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
 {
     Class86F88Elem *elem;
     s32 flag = a4;

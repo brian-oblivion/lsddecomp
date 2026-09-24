@@ -2906,7 +2906,7 @@ struct Class86F88Methods {
 };
 
 /*
- * Each element of Class86F88::unk40[] -- resolved from func_800529FC's own
+ * Each element of Class86F88::unk40[] -- resolved from Class86F88__SetView's own
  * dispatch, `elem->methods->slotB8(elem, &D_8008AB10)`. The `+0x004`
  * "release" slot is the same shared base-class implementation seen at
  * that offset in every vtable this project has resolved so far (compare
@@ -2927,7 +2927,7 @@ struct Class86F88ElemMethods {
      * local reading. */
     void (*slot4C)(Class86F88Elem *self, s32 arg1, void *arg2); /* +0x04C */
     u8 pad050[0x0B8 - 0x050];
-    void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, func_800529FC */
+    void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, Class86F88__SetView */
     u8 pad0BC[0x0CC - 0x0BC];
     /* +0x0CC, Class86F88__RefreshRows: called once per active window element with a
      * freshly-formatted (Class86F88__FormatRowText) fixed-width text buffer. */
@@ -2951,7 +2951,7 @@ struct Class86F88 {
      * pointer and this is an OFFSET table, not a pointer table. */
     s32 *unk18;                    /* +0x018, Class86F88__FormatRowText */
     u8 pad01C[0x020 - 0x01C];
-    s32 unk20;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/Class86F88__ScrollRight/Class86F88__ScrollLeft/Class86F88__CursorUp/Class86F88__CursorDown/func_800529FC */
+    s32 unk20;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/Class86F88__ScrollRight/Class86F88__ScrollLeft/Class86F88__CursorUp/Class86F88__CursorDown/Class86F88__SetView */
     s32 unk24;                     /* +0x024, ditto */
     s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
     s32 unk2C;                     /* +0x02C, Class86F88__TickClosing/Class86F88__SetState */
@@ -2959,7 +2959,7 @@ struct Class86F88 {
     s32 unk34;                     /* +0x034, Class86F88__SetState's slot14 argument */
     u8 pad038[0x03C - 0x038];
     Class86F88 *unk3C;              /* +0x03C, Class86F88__ForwardToTarget: another instance of this same class */
-    Class86F88Elem *unk40[4];       /* +0x040, Class86F88__ReleaseRows/Class86F88__RefreshRows/func_800529FC */
+    Class86F88Elem *unk40[4];       /* +0x040, Class86F88__ReleaseRows/Class86F88__RefreshRows/Class86F88__SetView */
     s32 unk50;                      /* +0x050, enable flag guarding most of this class's dispatch */
 };
 
@@ -2969,7 +2969,7 @@ extern Class86F88Methods D_80086F88;
  * adjacent rodata to D_8008AB10 below (4 bytes before it), never
  * dereferenced by this unit's own code, only its address taken. */
 extern s32 D_8008AB0C;
-/* func_800529FC's fixed 2nd argument to Class86F88ElemMethods::slotB8 --
+/* Class86F88__SetView's fixed 2nd argument to Class86F88ElemMethods::slotB8 --
  * a 4-byte rodata value (0x00008080), never dereferenced by this unit's
  * own code, only its address taken. Also func_80052A58's own SECOND
  * dispatch (the element at the "new" index, after the increment/decrement). */
