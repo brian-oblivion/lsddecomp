@@ -1299,20 +1299,11 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
 	}
 }
 
-#if 0
-/* Best-reached body, 1 word short (109/110 instructions), 106/110 words
-   truly correct after asm-differ realignment (see the match report for why
-   funcdiff's own raw count reads far lower) -- see
-   docs/match-reports/DreamSys__InstanceEffectsOnJournal.md for the residue
-   analysis. Restored to INCLUDE_ASM below per project rule (no score short
-   of byte-exact stays in src/). Re-verified fresh round 37 (2026-09-12,
-   runner charlie). Re-verified fresh again round 39 (2026-09-14, runner
-   echo); two new reshapes tried on the two established residues (an
-   uncast `void *e = entity;` alias local at case 4 -- a fifth form on the
-   already-closed "cast/typing axis", byte-identical; and a named `s32 idx
-   = effect; switch (idx)` for the switch-index register choice -- also
-   byte-identical). Both axes remain confirmed compiler-level, invisible to
-   source spelling. */
+/* MATCHED round 75 (alpha): case 4's +0x38 method takes `effect` as a third
+   argument. Forwarding it keeps `effect` live in $a2 past the switch, so the
+   bounds-check index gets its own register ($v1) instead of being computed
+   in place on $a2 -- the "switch-index register" and "case-4 delay slot"
+   residues were both this missing argument. */
 void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect)
 {
 	if (this->pendingLinkType != 0) {
@@ -1321,7 +1312,7 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
 
 	switch (effect) {
 	case 4:
-		((DreamSysEntityObj *)entity)->methods->slot0x38(entity, this);
+		((DreamSysEntityObj *)entity)->methods->slot0x38(entity, this, effect);
 		break;
 	case 5:
 	case 6:
@@ -1361,8 +1352,6 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
 		break;
 	}
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
 void DreamSys__GetPreviousDayMood(DreamSys *this, MoodGraphPoint *target, bool unknown)
 {

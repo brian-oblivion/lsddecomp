@@ -463,7 +463,10 @@ extern DreamSysBaseMethods *DreamSys__GetBaseMethods(void);
    kept `s32` for uniformity with its self-only siblings. */
 typedef struct DreamSysEntityMethods {
 	u8 pad00[0x38];
-	void (*slot0x38)(void *self, struct DreamSys *arg1);
+	/* Three arguments, not two (round 75, DreamSys__InstanceEffectsOnJournal):
+	   the caller forwards its own `effect` in $a2 untouched, which is why its
+	   switch index lives in $v1. Only caller: that function. */
+	void (*slot0x38)(void *self, struct DreamSys *arg1, s32 effect);
 	u8 pad3C[0x10C - 0x3C];
 	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
 	u8 pad110[0x14C - 0x110];

@@ -1,4 +1,82 @@
-# DreamSys__InstanceEffectsOnJournal -- STALL: 1 word short (109 instructions built vs retail's 110), 106/110 words truly correct after `asm-differ` realignment (funcdiff's own raw in-range count reads 15/110 -- a missing-word size-shift trap, not the true residue, see "Reading the score" below), first real diff at 0x4B860 (the switch-index bounds check: retail computes `addiu v1,a2,-4`/`sltiu v0,v1,9`/`sll v0,v1,0x2` into `$v1`, this build computes the identical three ops in place on `$a2`)
+# DreamSys__InstanceEffectsOnJournal -- MATCHED round 75 (110/110, whole image OK): case 4's `+0x38` method takes a THIRD argument, `effect` -- both residues (switch index in `$a2` vs `$v1`, case 4's missing `nop`) were that missing argument
+
+REVISITED, round 75: MATCHED (alpha); names/types used (`DreamSysEntityMethods::slot0x38` prototype corrected to 3 arguments -- the only caller is this function, checked with `grep -rn slot0x38 src/ include/`)
+
+## Round 75 (alpha): MATCHED
+
+**Preserved body rebuilt first**, exactly as the `#if 0` block gave it:
+109 words against 110, funcdiff `insertions 2 / deletions 2 (opcode-level;
+positional skeleton diffs 93)` with 134342 bytes of out-of-range drift (the
+2/2 is the one-word size shift folding the next function's first word into
+the window; `asm-differ` shows the true picture: one deletion, one
+reordering, three register replacements).
+
+**The lever: a missing argument.** Retail's switch index goes into a FRESH
+register (`addiu v1,a2,-4`) because `effect` is still needed after the
+bounds check -- as the third argument of case 4's call, passed in `$a2`
+where it already sits, so no instruction shows it. `-da` dumps of the old
+body confirmed the mechanism from the other side: the index pseudo had a
+copy preference for `$a2` (`106 preferences: 6` in `.greg`), which
+`expand_preferences` only records when the source register DIES in the
+index insn and does not conflict with it. Give `effect` a later use and it
+conflicts, the preference is gone, and the index takes `$v1` (`$v0` is held
+by the `sltiu` result). Spelled:
+
+```c
+	case 4:
+		((DreamSysEntityObj *)entity)->methods->slot0x38(entity, this, effect);
+		break;
+```
+
+with the header's `slot0x38` retyped `(void *self, struct DreamSys *arg1,
+s32 effect)`. **110/110 on the first build, `OK: build matches retail`;
+`tools/check-nonmatching.sh` green.** Case 4's `move a0,s1; lw v0,0(a0);
+nop` shape (the missing word) came back with it -- no separate lever.
+
+The preserved body otherwise stands unchanged (early `return;` guard,
+`case 5..8: break;`); a nested-`if` restructure of the same body, tried
+first, also matches with the argument and is byte-identical, so the
+argument is the whole lever.
+
+What did NOT move either residue this round, all measured on the nested
+body before the argument was found (each `insertions 2 / deletions 2`,
+unchanged): `switch (effect - 4)` with cases 0..8; `effect` typed `u32`
+(same), `s16` (adds `sll`/`sra`), `u16` (adds `andi`) -- the last two DO put
+the index in `$v1`, which is what pointed at "`effect`'s lifetime, not its
+type"; case-4 local `DreamSysEntityObj *e = entity`; a local function
+pointer; `(*fp)(...)` spelling; a cast to an `s32`-returning slot; a
+function-top `obj` used only in case 4 (entry `move a0,a1`, worse); a
+case-4 `obj` that is also used in case 11 (fixes case 4, moves the same
+shape into case 11 -- confirmed the `$a0`-canonical mechanism but is not
+the source). One bounded permuter search was started on the nested body
+(Gate 3: scaffold `--stack-diffs` 0 ins / 1 del / 1 reorder; real build
+2/2 from the size shift; objdumps of scaffold and in-tree object identical
+modulo relocations, so AGREE) and stopped at ~3736 iterations, best score
+unchanged from the base 180, when the argument lever matched.
+
+Every prior round (22, 35, 37, 39, 49) called both residues
+"compiler-level, invisible to source spelling" because every lever tried
+was a spelling of the SAME computation. A register chosen for a temporary
+because another value is still live is decided by what is live -- and
+here the live value was an argument nobody had written.
+
+### Proposed learning (round 75)
+
+**A switch index computed into a fresh register instead of in place on the
+parameter (`addiu v1,a2,-4` where you get `addiu a2,a2,-4`) means the
+parameter is still live after the bounds check.** GCC 2.6.3's global
+allocator ties the index to the parameter's register only when the
+parameter dies in the index insn. If no later instruction visibly reads
+the parameter, look for a call that passes it in the SAME argument
+register it arrived in: that use costs zero instructions and is invisible
+in the asm. Check every call in the function for an argument register that
+is never set before the call. (Same family as charlie's round-75 `slot4C`
+arity finding: a register that "should" be free is held by an argument the
+prototype is missing.)
+
+---
+
+## Earlier history
 
 > **ROUND 49 (2026-09-16, runner bravo): re-verified fresh, one new axis
 > tried on residue 2, clean negative.** This unit had not been touched
