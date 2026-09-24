@@ -1,7 +1,9 @@
-# func_8005278C -- MATCH
+# Class86F88__ReleaseRows -- MATCH
+
+> Renamed from `func_8005278C` on 2026-09-24 (tools/rename.py). Address 0x8005278c.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8005278C`: 36/36 words match.
+SHA1 matches retail. `funcdiff.py Class86F88__ReleaseRows`: 36/36 words match.
 
 This is vtable slot `+0x090` of `D_80086F88` (not declared in
 `Class86F88Methods` since nothing in this unit dispatches through it).
@@ -9,7 +11,7 @@ This is vtable slot `+0x090` of `D_80086F88` (not declared in
 ## Source
 
 ```c
-void func_8005278C(Class86F88 *self)
+void Class86F88__ReleaseRows(Class86F88 *self)
 {
     s32 count;
     s32 i;

@@ -330,7 +330,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
     func_800529FC(self, arg3, arg4, arg5, 1);
 }
 
-void func_8005278C(Class86F88 *self)
+void Class86F88__ReleaseRows(Class86F88 *self)
 {
     s32 count;
     s32 i;

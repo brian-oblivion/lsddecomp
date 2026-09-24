@@ -2910,7 +2910,7 @@ struct Class86F88Methods {
  * dispatch, `elem->methods->slotB8(elem, &D_8008AB10)`. The `+0x004`
  * "release" slot is the same shared base-class implementation seen at
  * that offset in every vtable this project has resolved so far (compare
- * `GenericReleaseMethods_3bb8c_d` above) -- func_8005278C dispatches
+ * `GenericReleaseMethods_3bb8c_d` above) -- Class86F88__ReleaseRows dispatches
  * through it on each element before clearing the slot.
  */
 struct Class86F88ElemMethods {
@@ -2941,7 +2941,7 @@ struct Class86F88Elem {
 struct Class86F88 {
     Class86F88Methods *methods;    /* +0x000 */
     u8 pad004[0x010 - 0x004];
-    s32 unk10;                     /* +0x010, func_8005278C/func_8005281C: element count, clamped to a max of 4 */
+    s32 unk10;                     /* +0x010, Class86F88__ReleaseRows/func_8005281C: element count, clamped to a max of 4 */
     s32 unk14;                     /* +0x014, Class86F88__ScrollRight: upper bound compared against unk24+0x1A */
     /* +0x018, func_8005292C: a table of BYTE OFFSETS (s32 each), added to
      * that function's own `base` (char *) argument to form a source
@@ -2959,7 +2959,7 @@ struct Class86F88 {
     s32 unk34;                     /* +0x034, Class86F88__SetState's slot14 argument */
     u8 pad038[0x03C - 0x038];
     Class86F88 *unk3C;              /* +0x03C, Class86F88__ForwardToTarget: another instance of this same class */
-    Class86F88Elem *unk40[4];       /* +0x040, func_8005278C/func_8005281C/func_800529FC */
+    Class86F88Elem *unk40[4];       /* +0x040, Class86F88__ReleaseRows/func_8005281C/func_800529FC */
     s32 unk50;                      /* +0x050, enable flag guarding most of this class's dispatch */
 };
 
