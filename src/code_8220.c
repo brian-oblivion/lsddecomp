@@ -268,21 +268,21 @@ void BasicClass__BasicClass(BasicClass *self)
     self->children = NULL;
 }
 
-void BasicClass__func_17f2c(BasicClass *self)
+void BasicClass__Finalize(BasicClass *self)
 {
     self->methods->notifyParents(self, 1);
     self->methods->removeAllChildren(self);
     self->methods->clearParentRefs(self);
 }
 
-void BasicClass__func_17f98(BasicClass *self, BasicClass *child)
+void BasicClass__AddChild(BasicClass *self, BasicClass *child)
 {
     if (PushBasicClassListNode(&self->children, child)) {
         child->methods->addParentRef(child, self);
     }
 }
 
-void BasicClass__func_17ff0(BasicClass *self, BasicClass *child)
+void BasicClass__RemoveChild(BasicClass *self, BasicClass *child)
 {
     RemoveBasicClassListNode(&self->children, child);
     child->methods->removeParentRef(child, self);

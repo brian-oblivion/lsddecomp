@@ -37,7 +37,7 @@ together.
 
 ## Struct/table knowledge established
 
-- `BasicClassMethodsCC8C`: added `slot14` (`BasicClass__func_17ff0`,
+- `BasicClassMethodsCC8C`: added `slot14` (`BasicClass__RemoveChild`,
   "removeChild").
 - No new fields -- this function only confirms (never contradicts)
   `Unk18Obj__AddChild`'s `unk10`/`unk30`/`unkC` derivation, by clearing exactly

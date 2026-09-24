@@ -11,7 +11,7 @@ class's overall design (two pool-allocated linked lists, `children` and
 ## What it does
 
 The base "release"/destroy method: dispatches the virtual finalize hook
-(`self->methods->finalize`, this unit's own `BasicClass__func_17f2c`, slot
+(`self->methods->finalize`, this unit's own `BasicClass__Finalize`, slot
 `+0x00C`) to let a subclass tear down its own state, then frees `self`
 itself back to the pool via `BMemPMgrFree` (one argument — see that
 function's own stub report for why), and always returns `NULL`.

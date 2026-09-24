@@ -1,10 +1,12 @@
-# BasicClass__func_17ff0
+# BasicClass__RemoveChild
+
+> Renamed from `BasicClass__func_17ff0` on 2026-09-24 (tools/rename.py). Address 0x80017ff0.
 
 **Unit:** code_8220 · **Size:** 20 instructions · **Status:** MATCHED (20/20 words)
 
 BasicClass vtable slot `+0x014` (`removeChild`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and
-`BasicClass__func_17f98.md` (`addChild`) for the symmetric add operation
+`BasicClass__AddChild.md` (`addChild`) for the symmetric add operation
 this one undoes.
 
 ## What it does
@@ -19,7 +21,7 @@ child's `parentRefs` back-reference list.
 ## The C
 
 ```c
-void BasicClass__func_17ff0(BasicClass *self, BasicClass *child)
+void BasicClass__RemoveChild(BasicClass *self, BasicClass *child)
 {
     RemoveBasicClassListNode(&self->children, child);
     child->methods->removeParentRef(child, self);

@@ -1,4 +1,6 @@
-# BasicClass__func_17f2c
+# BasicClass__Finalize
+
+> Renamed from `BasicClass__func_17f2c` on 2026-09-24 (tools/rename.py). Address 0x80017f2c.
 
 **Unit:** code_8220 · **Size:** 27 instructions · **Status:** MATCHED (27/27 words)
 
@@ -27,7 +29,7 @@ order:
 ## The C
 
 ```c
-void BasicClass__func_17f2c(BasicClass *self)
+void BasicClass__Finalize(BasicClass *self)
 {
     self->methods->notifyParents(self, 1);
     self->methods->removeAllChildren(self);

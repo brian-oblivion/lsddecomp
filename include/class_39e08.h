@@ -79,7 +79,7 @@ typedef struct Class865C8Methods {
      * Obj865C8__Obj865C8's own, defined just below. */
     void (*ctor)(Obj865C8 *self, struct Obj0C *arg1, SubObjD *arg2, s32 arg3); /* +0x008 Obj865C8__Obj865C8 */
     void (*dtor)(Obj865C8 *self);                  /* +0x00C Obj865C8__Dtor */
-    /* BasicClass-inherited (BasicClass__func_17f98 -- same address as
+    /* BasicClass-inherited (BasicClass__AddChild -- same address as
      * Class6D3C8.h's own local unk10 view of this same shared slot).
      * Called by Obj865C8__EnterState2 as self->methods->slot10(self, newObj). */
     void (*slot10)(Obj865C8 *self, Obj4C *arg1);   /* +0x010 */

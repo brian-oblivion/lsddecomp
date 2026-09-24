@@ -1030,7 +1030,7 @@ struct Obj86B60Methods {
     u8 pad000[0x010];
     void (*addChild)(Obj86B60 *self, void *a1);     /* +0x010, inherited
                                                       BasicClass addChild
-                                                      (BasicClass__func_17f98);
+                                                      (BasicClass__AddChild);
                                                       OBSERVED: Obj86B60__Init.
                                                       Renamed from slot10,
                                                       round 55 -- exclusive to
@@ -1041,7 +1041,7 @@ struct Obj86B60Methods {
                                                       offset). */
     void (*removeChild)(Obj86B60 *self, void *a1);     /* +0x014, inherited
                                                       BasicClass removeChild
-                                                      (BasicClass__func_17ff0);
+                                                      (BasicClass__RemoveChild);
                                                       OBSERVED: Obj86B60__Deinit
                                                       (round 13). Renamed from
                                                       slot14, round 55, same
@@ -1495,7 +1495,7 @@ struct BasicClassMethodsCC8C {
     u8 pad000[0x008];
     void (*ctor)(void *self); /* +0x008, IS BasicClass__BasicClass
                                   (code_8220.c); OBSERVED: IntermediateBase__IntermediateBase */
-    void (*finalize)(void *self); /* +0x00C, IS BasicClass__func_17f2c
+    void (*finalize)(void *self); /* +0x00C, IS BasicClass__Finalize
                                   (code_8220.c, "finalize"); OBSERVED:
                                   Unk18Obj__Finalize (round 13). Renamed from
                                   slot0C, round 55 -- exclusive to this unit
@@ -1503,12 +1503,12 @@ struct BasicClassMethodsCC8C {
                                   Get_vtable_BasicClass() in the code_2cc8c
                                   family). */
     void (*addChild)(void *self, void *child); /* +0x010, IS
-                                  BasicClass__func_17f98 (code_8220.c,
+                                  BasicClass__AddChild (code_8220.c,
                                   "addChild"); OBSERVED: Unk18Obj__AddChild
                                   (round 13). Renamed from slot10, round 55,
                                   same exclusivity as finalize above. */
     void (*removeChild)(void *self, void *child); /* +0x014, IS
-                                  BasicClass__func_17ff0 (code_8220.c,
+                                  BasicClass__RemoveChild (code_8220.c,
                                   "removeChild"); OBSERVED: Unk18Obj__RemoveChild
                                   (round 13). Renamed from slot14, round 55,
                                   same exclusivity as finalize above. */

@@ -72,7 +72,7 @@ committed source.)
   typed `Obj4C *` (the object `func_80052B70` returns) from the start,
   unaffected.
 - `Class865C8Methods::slot10` typed `void (*)(Obj865C8 *self, Obj4C *arg1)`
-  — a BasicClass-inherited slot (`BasicClass__func_17f98`, same address
+  — a BasicClass-inherited slot (`BasicClass__AddChild`, same address
   `Class6D3C8.h` already lists at its own local `+0x010` as an untyped
   `unk10`; not reconciled there per this project's per-unit local-view
   convention).

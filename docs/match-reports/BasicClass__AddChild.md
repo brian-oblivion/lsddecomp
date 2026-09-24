@@ -1,4 +1,6 @@
-# BasicClass__func_17f98
+# BasicClass__AddChild
+
+> Renamed from `BasicClass__func_17f98` on 2026-09-24 (tools/rename.py). Address 0x80017f98.
 
 **Unit:** code_8220 · **Size:** 22 instructions · **Status:** MATCHED (22/22 words)
 
@@ -19,7 +21,7 @@ addParentRef(child, self)` — registering `self` in the child's
 ## The C
 
 ```c
-void BasicClass__func_17f98(BasicClass *self, BasicClass *child)
+void BasicClass__AddChild(BasicClass *self, BasicClass *child)
 {
     if (PushBasicClassListNode(&self->children, child)) {
         child->methods->addParentRef(child, self);

@@ -48,7 +48,7 @@ Matched on the first build.
   to a null pointer implicitly either way).
 - `Unk18Obj`: new field `unk30` (`s32`), set from `arg1->unk14` on the same
   path as `unk10`.
-- `BasicClassMethodsCC8C`: added `slot10` (`BasicClass__func_17f98`,
+- `BasicClassMethodsCC8C`: added `slot10` (`BasicClass__AddChild`,
   "addChild").
 
 ### Proposed learning

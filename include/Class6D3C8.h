@@ -66,8 +66,8 @@ typedef struct Class6D3C8Methods {
     void *unk04;                                            /* +0x004 BasicClass__Release */
     void (*ctor)(Class6D3C8 *self, Class6D3C8CtorArgs *arg); /* +0x008 func_80025FDC */
     void *unk0C;                                            /* +0x00C func_8003B024 (dtor override) */
-    void *unk10;                                            /* +0x010 BasicClass__func_17f98 */
-    void *unk14;                                            /* +0x014 BasicClass__func_17ff0 */
+    void *unk10;                                            /* +0x010 BasicClass__AddChild */
+    void *unk14;                                            /* +0x014 BasicClass__RemoveChild */
     void *unk18;                                            /* +0x018 BasicClass__func_18040 */
     void *unk1C;                                            /* +0x01C BasicClass__func_180bc */
     void *unk20;                                            /* +0x020 BasicClass__func_180fc */

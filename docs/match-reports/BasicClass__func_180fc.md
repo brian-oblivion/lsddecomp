@@ -4,7 +4,7 @@
 
 BasicClass vtable slot `+0x020` (`addParentRef`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and
-`BasicClass__func_17f98.md` (`addChild`) for the caller that dispatches
+`BasicClass__AddChild.md` (`addChild`) for the caller that dispatches
 through this slot on a child object.
 
 ## What it does

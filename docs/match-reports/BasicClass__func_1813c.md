@@ -4,7 +4,7 @@
 
 BasicClass vtable slot `+0x028` (`clearParentRefs`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and
-`BasicClass__func_17f2c.md` (`finalize`) for the caller that dispatches
+`BasicClass__Finalize.md` (`finalize`) for the caller that dispatches
 through this slot as the last step of tearing an object down.
 
 ## What it does

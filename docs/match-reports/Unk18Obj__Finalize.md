@@ -11,7 +11,7 @@
 (inherited BasicClass "release", corroborating and extending
 `Unk18Obj__Unk18Obj`'s earlier discovery of that field), dispatches `slotA8`
 with a literal `0`, then runs `Get_vtable_BasicClass()->slot0C` (BasicClass's own
-`finalize`, `BasicClass__func_17f2c`).
+`finalize`, `BasicClass__Finalize`).
 
 ## The C
 
@@ -41,7 +41,7 @@ same convention as `Obj86B60__Deinit`.
   BasicClass release) this function reaches. `New_Class6B5CC`'s own extern
   declaration retyped to match (`include/code_d294.h`'s own view,
   `Class6B5CCObj *`, is a separate header and unaffected).
-- `BasicClassMethodsCC8C`: added `slot0C` (`BasicClass__func_17f2c`,
+- `BasicClassMethodsCC8C`: added `slot0C` (`BasicClass__Finalize`,
   "finalize").
 
 ### Proposed learning

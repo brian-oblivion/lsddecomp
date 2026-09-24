@@ -4,7 +4,7 @@
 
 BasicClass vtable slot `+0x024` (`removeParentRef`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and
-`BasicClass__func_17ff0.md` (`removeChild`) for the caller that dispatches
+`BasicClass__RemoveChild.md` (`removeChild`) for the caller that dispatches
 through this slot on a child object.
 
 ## What it does

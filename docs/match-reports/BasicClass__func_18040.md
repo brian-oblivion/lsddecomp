@@ -11,7 +11,7 @@ winning shape is non-obvious and generalizes.
 
 Iterates `self->children` via `GetNextBasicClass` (still `asm/code_8220_b.s`,
 not yet carved to C — see signature below), calling `removeChild` (slot
-`+0x014`, this unit's `BasicClass__func_17ff0`) on each extracted child
+`+0x014`, this unit's `BasicClass__RemoveChild`) on each extracted child
 until the list is exhausted.
 
 ## `GetNextBasicClass`'s signature, established here

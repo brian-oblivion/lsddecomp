@@ -5,7 +5,7 @@
 **Unit:** code_8220 · **Size:** 23 instructions · **Status:** MATCHED (23/23 words)
 
 The `BasicClassListNode` list-push primitive, used by both of BasicClass's
-lists (`children` via `BasicClass__func_17f98`, `parentRefs` via
+lists (`children` via `BasicClass__AddChild`, `parentRefs` via
 `BasicClass__func_180fc`) — see `BasicClass__BasicClass.md` for the
 class's overall design. Both call sites and this function's own
 signature were provisionally established last round while matching those
@@ -67,6 +67,6 @@ attempts.
 
 `PushBasicClassListNode`, **tier A**: allocates an 8-byte `BasicClassListNode`
 from `BMemPMgrAlloc` and prepends it to `*head`; used identically for both
-of `BasicClass`'s lists (`children` via `BasicClass__func_17f98`/AddChild,
+of `BasicClass`'s lists (`children` via `BasicClass__AddChild`/AddChild,
 `parentRefs` via `BasicClass__func_180fc`/AddParentRef), confirming it is
 the shared list-push primitive rather than something list-specific.

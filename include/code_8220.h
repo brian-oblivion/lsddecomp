@@ -49,9 +49,9 @@ struct BasicClassMethods {
     /* +0x000 */ s32 header;
     /* +0x004 */ void *(*release)(BasicClass *self);                              /* BasicClass__Release: virtual finalize, then free self */
     /* +0x008 */ void (*ctor)(BasicClass *self);                                  /* BasicClass__BasicClass */
-    /* +0x00C */ void (*finalize)(BasicClass *self);                              /* BasicClass__func_17f2c: notifyParents(1), removeAllChildren(), clearParentRefs() */
-    /* +0x010 */ void (*addChild)(BasicClass *self, BasicClass *child);           /* BasicClass__func_17f98 */
-    /* +0x014 */ void (*removeChild)(BasicClass *self, BasicClass *child);        /* BasicClass__func_17ff0 */
+    /* +0x00C */ void (*finalize)(BasicClass *self);                              /* BasicClass__Finalize: notifyParents(1), removeAllChildren(), clearParentRefs() */
+    /* +0x010 */ void (*addChild)(BasicClass *self, BasicClass *child);           /* BasicClass__AddChild */
+    /* +0x014 */ void (*removeChild)(BasicClass *self, BasicClass *child);        /* BasicClass__RemoveChild */
     /* +0x018 */ void (*removeAllChildren)(BasicClass *self);                     /* BasicClass__func_18040 */
     /* +0x01C */ void (*getNextChild)(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor); /* BasicClass__func_180bc */
     /* +0x020 */ s32 (*addParentRef)(BasicClass *self, BasicClass *parent);       /* BasicClass__func_180fc; tail-calls PushBasicClassListNode, so typed non-void per the one-line-wrapper rule */

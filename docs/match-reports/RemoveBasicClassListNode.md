@@ -5,7 +5,7 @@
 **Unit:** code_8220 · **Size:** 32 instructions · **Status:** MATCHED (32/32 words)
 
 The `BasicClassListNode` list find-unlink-free primitive, used by both of
-BasicClass's lists (`children` via `BasicClass__func_17ff0`, `parentRefs`
+BasicClass's lists (`children` via `BasicClass__RemoveChild`, `parentRefs`
 via `BasicClass__func_1811c`) — see `BasicClass__BasicClass.md` for the
 class's overall design. Both call sites and this function's `void`
 signature were provisionally established last round while matching those
@@ -69,6 +69,6 @@ attempts.
 `RemoveBasicClassListNode`, **tier A**: finds the node in `*head` whose
 `value == value`, unlinks it, and releases it via `BMemPMgrFree`; used
 identically for both of `BasicClass`'s lists (`children` via
-`BasicClass__func_17ff0`/RemoveChild, `parentRefs` via
+`BasicClass__RemoveChild`/RemoveChild, `parentRefs` via
 `BasicClass__func_1811c`/RemoveParentRef), the release-side mirror of
 `PushBasicClassListNode`.
