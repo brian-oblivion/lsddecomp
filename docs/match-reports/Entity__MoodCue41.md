@@ -1,13 +1,15 @@
-# func_800602AC -- MATCHED (70/70 words)
+# Entity__MoodCue41 -- MATCHED (70/70 words)
+
+> Renamed from `func_800602AC` on 2026-09-24 (tools/rename.py). Address 0x800602ac.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler, same
 family as `Entity_c.c`'s `func_8005EF54`/`func_8005EFF4`/etc: `void
-func_800602AC(Entity *this, EntityMoodHandlerArg *out)`.
+Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
     s32 rv;
     s16 *tablePtr;
 

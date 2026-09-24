@@ -1,13 +1,15 @@
-# func_8005FF7C -- MATCHED (115/115 words)
+# Entity__MoodCue39 -- MATCHED (115/115 words)
+
+> Renamed from `func_8005FF7C` on 2026-09-24 (tools/rename.py). Address 0x8005ff7c.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler,
 lowest ROM address in this unit's queue. `void
-func_8005FF7C(Entity *this, EntityMoodHandlerArg *out)`.
+Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_8005FF7C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     if (this->unkFC == 0) {

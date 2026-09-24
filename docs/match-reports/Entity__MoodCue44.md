@@ -1,13 +1,15 @@
-# func_800605D0 -- MATCHED (80/80 words)
+# Entity__MoodCue44 -- MATCHED (80/80 words)
+
+> Renamed from `func_800605D0` on 2026-09-24 (tools/rename.py). Address 0x800605d0.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler,
 calls `func_80060710` (already matched, earlier ROM address) as a helper:
-`void func_800605D0(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;
     s32 r1;
     s32 r2;
@@ -47,7 +49,7 @@ void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
   sltiu $v0,$v0,(HI-LO)` pair, same idiom as any bounds check against a
   compile-time range in this codebase.
 - **Same "default value must be assigned AFTER the call its guard depends
-  on" trap as `func_800604DC`'s table selection, but for a scalar this
+  on" trap as `Entity__MoodCue43`'s table selection, but for a scalar this
   time, not a pointer.** `a1val = -0x80; if ((rand()&1) != 0) a1val =
   0x80;` written with the default BEFORE the `rand()` call forced the
   compiler to keep `a1val` alive across that call in an extra callee-saved
@@ -56,7 +58,7 @@ void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
   branch. Retail computes `rand()` first, saves nothing, and only assigns
   the default (`-0x80`) in the branch's OWN delay slot, after the call has
   already returned. Introducing `r1 = rand();` before the default
-  assignment fixed it in one change, mirroring the `func_800604DC` fix
+  assignment fixed it in one change, mirroring the `Entity__MoodCue43` fix
   exactly (see that report) -- two independent instances now, worth
   treating as a general rule for this codebase.
 - `slotC4`/`slot44`/`slotC8`/`slot148` were all already correctly typed;
@@ -81,7 +83,7 @@ void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
 - **"Default value, then conditionally overwritten," second confirmed
   instance for a plain scalar (not just a pointer): the default assignment
   must be sequenced after any call the guarding condition depends on.**
-  Two independent functions in this unit (`func_800604DC`'s table pointer,
+  Two independent functions in this unit (`Entity__MoodCue43`'s table pointer,
   this function's `a1val`) both needed `result_of_call = f(); local =
   default; if (cond_on_result) local = override;` rather than `local =
   default; if (cond_on_call()) local = override;` -- the second form drags

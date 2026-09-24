@@ -83,8 +83,8 @@ struct EntityMethods {
     /* +0x114 */ void (*slot114)(Entity *self);           /* called by Entity__StopSoundCue */
     /* +0x118 */ u8 pad118[0x128 - 0x118];
     /* +0x128 */ void (*slot128)(Entity *self, s32 arg1); /* called by func_80062A40 (Entity_e) as slot128(this, 1); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
-    /* +0x12C */ void (*slot12C)(Entity *self);           /* called by func_800603C4 */
-    /* +0x130 */ void (*slot130)(Entity *self);           /* called by Entity__StopSoundCue, func_800603C4 */
+    /* +0x12C */ void (*slot12C)(Entity *self);           /* called by Entity__MoodCue42 */
+    /* +0x130 */ void (*slot130)(Entity *self);           /* called by Entity__StopSoundCue, Entity__MoodCue42 */
     /* +0x134 */ s32 (*slot134)(Entity *self, s32 arg1, s32 arg2); /* called by func_80063ED4 and func_80064078 (both Entity_f) in an identical loop, `this->unk88 = slot134(this, this->unk88, 0)` while `this->unk84++ < 0x18` -- value-returning, not void */
     /* +0x138 */ u8 pad138[0x144 - 0x138];
     /* +0x144 */ s32 (*slot144)(Entity *self, Unk94Obj *arg1); /* called by Entity__IsTargetInRange, as slot144(this, this->target) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->target in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
@@ -430,8 +430,8 @@ struct EntityMoodHandlerArg {
     u8 pad14[0x08];
     s32 unk1C;     /* +0x1C, written by Entity__MoodCue15/Entity__MoodCue05/Entity__MoodCue10/... */
     s32 unk20;      /* +0x20, written by Entity__MoodCue07 only (paired with unk1C the same round) */
-    s32 unk24;       /* +0x24, written by func_80060148 (Entity_d) */
-    s32 unk28;        /* +0x28, written by func_80060148 (Entity_d) */
+    s32 unk24;       /* +0x24, written by Entity__MoodCue40 (Entity_d) */
+    s32 unk28;        /* +0x28, written by Entity__MoodCue40 (Entity_d) */
     u8 pad2C[0x04];
     s32 unk30;      /* +0x30, written by Entity__MoodCue10/Entity__MoodCue07 */
     s32 unk34;       /* +0x34, written by Entity__MoodCue07 only (paired with unk30) */

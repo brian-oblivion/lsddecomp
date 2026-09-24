@@ -1,12 +1,14 @@
-# func_80060148 -- MATCHED (89/89 words)
+# Entity__MoodCue40 -- MATCHED (89/89 words)
+
+> Renamed from `func_80060148` on 2026-09-24 (tools/rename.py). Address 0x80060148.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler:
-`void func_80060148(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue40(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue40(Entity *this, EntityMoodHandlerArg *out) {
     void *table = NULL;
 
     if (out->unk4 % 7 == 0) {

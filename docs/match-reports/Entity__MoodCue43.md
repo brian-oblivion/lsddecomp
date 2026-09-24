@@ -1,13 +1,15 @@
-# func_800604DC -- MATCHED (61/61 words)
+# Entity__MoodCue43 -- MATCHED (61/61 words)
+
+> Renamed from `func_800604DC` on 2026-09-24 (tools/rename.py). Address 0x800604dc.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler that
 calls `func_80060710` (same unit, later ROM address) as a helper:
-`void func_800604DC(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800604DC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;
     s32 r2;
     u8 *table;
@@ -62,7 +64,7 @@ void func_800604DC(Entity *this, EntityMoodHandlerArg *out) {
   to a callee-saved register (`s1`) where retail uses caller-saved `a2`
   because nothing calls between the default assignment and its last use.
   Introducing an explicit `r2 = rand();` local, then assigning the default
-  from `r2`, fixed this. This is the SAME lever as `func_800602AC`'s
+  from `r2`, fixed this. This is the SAME lever as `Entity__MoodCue41`'s
   `D_80089EA2` pointer (see that report) applied to a plain data value
   instead of a pointer -- worth generalizing.
 

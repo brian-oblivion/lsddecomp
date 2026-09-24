@@ -31,10 +31,10 @@ extern u8 D_80089E5C[];
 extern u8 D_80089D24[];
 
 /* Forward declaration: func_80060710 is defined later in this file (higher
- * ROM address) but func_800604DC, at a lower address, calls it directly. */
+ * ROM address) but Entity__MoodCue43, at a lower address, calls it directly. */
 void func_80060710(Entity *this);
 
-void func_8005FF7C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     if (this->moodTimer == 0) {
@@ -60,7 +60,7 @@ skip48:
     }
 }
 
-void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue40(Entity *this, EntityMoodHandlerArg *out) {
     void *table = NULL;
 
     if (out->unk4 % 7 == 0) {
@@ -88,7 +88,7 @@ void func_80060148(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
     s32 rv;
     s16 *tablePtr;
 
@@ -109,7 +109,7 @@ void func_800602AC(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800603C4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out) {
     s32 divisor;
 
     if (this->moodTimer < 0x14) {
@@ -128,7 +128,7 @@ void func_800603C4(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800604DC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;
     s32 r2;
     u8 *table;
@@ -151,7 +151,7 @@ void func_800604DC(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800605D0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;
     s32 r1;
     s32 r2;

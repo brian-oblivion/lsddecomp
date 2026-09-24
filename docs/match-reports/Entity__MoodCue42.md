@@ -1,12 +1,14 @@
-# func_800603C4 -- MATCHED (70/70 words)
+# Entity__MoodCue42 -- MATCHED (70/70 words)
+
+> Renamed from `func_800603C4` on 2026-09-24 (tools/rename.py). Address 0x800603c4.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler:
-`void func_800603C4(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800603C4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out) {
     s32 divisor;
 
     if (this->unkFC < 0x14) {
