@@ -1,3 +1,27 @@
+/*
+ * class_3bb8c_d -- the bulk of `Class86B60`'s own methods (started in
+ * class_3bb8c_c.c: the ctor, `Class86B60__Class86B60`/`New_Class86B60`).
+ * All 20 functions here dispatch at fixed slots of `gClass86B60Methods`
+ * itself (confirmed via `tools/classtable.py 0x80086B60`); `Class86B60__Tick`
+ * is the base class's per-frame entry point, forwarding to a `state`-keyed
+ * sub-dispatch that also drives `Class86B60__SetState`.
+ *
+ * Two owned sub-objects carry most of the class's real work: `nameField`
+ * (constructed/destroyed by Class86B60__CreateNameField/DestroyNameField,
+ * a text-entry field holding an SJIS-decoded name, with its own cursor
+ * blink/colour tick, Class86B60__TickNameFieldCursor) and `unkAC` (a
+ * `New_TaskObjF`-constructed controller whose dispatches carry
+ * "BISLPS-01556", Sony's memcard save-header game-ID string --
+ * Class86B60__Begin/EndMemcardSave and the two Tick-driven
+ * Class86B60__UpdateMemcardSave* variants). Read together this is a
+ * memory-card save-naming UI: enter/edit a save name, then write it.
+ *
+ * Every function here is matched C. Names below describe mechanics
+ * established from the body and call sites (tier B throughout except the
+ * getter/ctor/allocator/destructor shapes, tier A); no in-game purpose is
+ * established for any of the numeric `state`/tag values. See each
+ * function's own match report for its evidence.
+ */
 #include "common.h"
 #include "class_3bb8c.h"
 
