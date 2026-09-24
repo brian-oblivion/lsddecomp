@@ -41,8 +41,8 @@ void TaskCoreObj__Reset(StreamTaskObj *self) {
   register, changing the instruction count.
 - Three new `StreamTaskObjMethods` slots, all void-returning (discarded
   results), confirmed to exist via `tools/classtable.py gStreamTaskObjMethods`:
-  `+0x09C = func_8003CAF8`, `+0x0A0 = func_8003CB30`,
-  `+0x0A4 = func_8003CB68` (all extern, other units).
+  `+0x09C = Obj86B60__SetFadeCallbackEnabled`, `+0x0A0 = Obj86B60__func_8003CB30`,
+  `+0x0A4 = Obj86B60__SetColors` (all extern, other units).
 - `slotA4`'s three pointer arguments are `&D_8006E860[0]`, `&D_8006E860[3]`,
   `&D_8006E860[6]` — a `lui`/`addiu` to the symbol with offsets added, never
   dereferenced here, so `D_8006E860` is declared as a plain `extern u8[]`

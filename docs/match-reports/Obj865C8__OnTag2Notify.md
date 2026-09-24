@@ -4,7 +4,7 @@
 
 Unit: `class_39e08` · Size: 107 words (0x1AC bytes) · Round 23 (2026-09-07),
 head. **Third of the five `REOPENED -- ASSIGNABLE` functions closed this round**
-(with `func_8003C48C` and `func_8003C63C`).
+(with `Obj86B60__OnTag2Notify` and `Obj86B60__SetState`).
 
 ## History
 

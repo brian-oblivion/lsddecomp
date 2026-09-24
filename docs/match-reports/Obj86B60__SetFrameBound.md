@@ -1,4 +1,6 @@
-# func_8003C794 — MATCH (8/8 words)
+# Obj86B60__SetFrameBound — MATCH (8/8 words)
+
+> Renamed from `func_8003C794` on 2026-09-24 (tools/rename.py). Address 0x8003c794.
 
 **Unit:** code_2cc8c · **Size:** 8 instructions
 
@@ -11,7 +13,7 @@ reduction for a multiply by 20 -- reproduced automatically by writing the
 plain `*`.
 
 ```c
-void func_8003C794(Obj86B60 *self, s32 a1)
+void Obj86B60__SetFrameBound(Obj86B60 *self, s32 a1)
 {
     self->unk40 = a1;
     if (a1 >= 0) {
@@ -28,7 +30,7 @@ non-negative path recomputes it as `a1*20`.
 ## Struct knowledge established
 
 `Obj86B60::unk40` (s32, +0x040) -- OBSERVED here as a setter target; also
-read (compared against `unk1C`) by `func_8003C51C`.
+read (compared against `unk1C`) by `Obj86B60__OnTag5Notify`.
 
 ## Provenance
 

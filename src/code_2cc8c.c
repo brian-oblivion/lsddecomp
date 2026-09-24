@@ -3,8 +3,8 @@
  *
  * Carved in round 10 on the belief that this block had the LOWEST
  * toolchain-blocker density of any uncarved segment. That belief was
- * retracted the same round for two of the 20 -- `func_8003C48C` and
- * `func_8003C63C`, whose jump-table dispatch hits
+ * retracted the same round for two of the 20 -- `Obj86B60__OnTag2Notify` and
+ * `Obj86B60__SetState`, whose jump-table dispatch hits
  * `addiu $at, $at, %lo(jtbl_*)`. The retraction was RIGHT: a `jtbl_*` symbol
  * is not a safe exception to that screen, because cc1 emits the same generic
  * pseudo-op for an indexed data global and a switch jump table and the fold
@@ -33,7 +33,7 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-void func_8003C48C(Obj86B60 *self, s32 a1, s32 a2)
+void Obj86B60__OnTag2Notify(Obj86B60 *self, s32 a1, s32 a2)
 {
     Obj86B60Methods *methods;
 
@@ -59,7 +59,7 @@ void func_8003C48C(Obj86B60 *self, s32 a1, s32 a2)
     }
 }
 
-void func_8003C51C(Obj86B60 *self, s32 a1, s32 a2)
+void Obj86B60__OnTag5Notify(Obj86B60 *self, s32 a1, s32 a2)
 {
     Obj86B60Methods *methods;
 
@@ -89,7 +89,7 @@ void func_8003C51C(Obj86B60 *self, s32 a1, s32 a2)
     }
 }
 
-void func_8003C63C(Obj86B60 *self, s32 a1)
+void Obj86B60__SetState(Obj86B60 *self, s32 a1)
 {
     Obj86B60Methods *methods;
 
@@ -138,7 +138,7 @@ void func_8003C63C(Obj86B60 *self, s32 a1)
     }
 }
 
-void func_8003C794(Obj86B60 *self, s32 a1)
+void Obj86B60__SetFrameBound(Obj86B60 *self, s32 a1)
 {
     self->unk40 = a1;
     if (a1 >= 0) {
@@ -146,7 +146,7 @@ void func_8003C794(Obj86B60 *self, s32 a1)
     }
 }
 
-void func_8003C7B4(Obj86B60 *self, s32 a1)
+void Obj86B60__ForwardToChild(Obj86B60 *self, s32 a1)
 {
     Unk48Obj *child;
 
@@ -156,7 +156,7 @@ void func_8003C7B4(Obj86B60 *self, s32 a1)
     }
 }
 
-void func_8003C7F4(Obj86B60 *self, s32 a1)
+void Obj86B60__func_8003C7F4(Obj86B60 *self, s32 a1)
 {
     if (self->unk4C != NULL) {
         self->methods->slot70(self, 0x10);
@@ -164,7 +164,7 @@ void func_8003C7F4(Obj86B60 *self, s32 a1)
     }
 }
 
-void func_8003C858(Obj86B60 *self, s32 a1)
+void Obj86B60__func_8003C858(Obj86B60 *self, s32 a1)
 {
     s32 reason;
 
@@ -178,7 +178,7 @@ void func_8003C858(Obj86B60 *self, s32 a1)
     }
 }
 
-void func_8003C8D0(Obj86B60 *self, s32 a1)
+void Obj86B60__func_8003C8D0(Obj86B60 *self, s32 a1)
 {
     if (self->unk4C != NULL && self->unk3C != 1) {
         self->methods->slot70(self, 0x10);
@@ -186,7 +186,7 @@ void func_8003C8D0(Obj86B60 *self, s32 a1)
     }
 }
 
-void func_8003C944(Obj86B60 *self, s32 a1)
+void Obj86B60__func_8003C944(Obj86B60 *self, s32 a1)
 {
     void (*handler)(Obj86B60 *self);
 
@@ -203,7 +203,7 @@ void func_8003C944(Obj86B60 *self, s32 a1)
     handler(self);
 }
 
-void func_8003C9B0(Obj86B60 *self, s32 a1)
+void Obj86B60__func_8003C9B0(Obj86B60 *self, s32 a1)
 {
     void (*handler)(Obj86B60 *self);
 
@@ -220,7 +220,7 @@ void func_8003C9B0(Obj86B60 *self, s32 a1)
     handler(self);
 }
 
-void func_8003CA1C(Obj86B60 *self)
+void Obj86B60__Tick(Obj86B60 *self)
 {
     Unk4CObj *target;
     s32 idx;
@@ -234,7 +234,7 @@ void func_8003CA1C(Obj86B60 *self)
     }
 }
 
-void func_8003CA94(Obj86B60 *self)
+void Obj86B60__RefreshViewValue(Obj86B60 *self)
 {
     if (self->unk9C != NULL) {
         self->unk9C(self->unkA0);
@@ -242,13 +242,13 @@ void func_8003CA94(Obj86B60 *self)
     self->methods->slot60(self, 7);
 }
 
-void func_8003CAEC(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
+void Obj86B60__SetCallback(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
 {
     self->unk9C = a1;
     self->unkA0 = a2;
 }
 
-void func_8003CAF8(Obj86B60 *self, s32 a1)
+void Obj86B60__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
 {
     Obj86B60Methods *methods;
 
@@ -263,7 +263,7 @@ void func_8003CAF8(Obj86B60 *self, s32 a1)
     }
 }
 
-void func_8003CB30(Obj86B60 *self, s32 a1)
+void Obj86B60__func_8003CB30(Obj86B60 *self, s32 a1)
 {
     Obj86B60Methods *methods;
 
@@ -280,19 +280,19 @@ void func_8003CB30(Obj86B60 *self, s32 a1)
 
 typedef struct { s8 r, g, b; } RGB8003CB68;
 
-void func_8003CB68(Obj86B60 *self, s8 *a1, s8 *a2, s8 *a3)
+void Obj86B60__SetColors(Obj86B60 *self, s8 *a1, s8 *a2, s8 *a3)
 {
     *(RGB8003CB68 *)self->unk90 = *(RGB8003CB68 *)a1;
     *(RGB8003CB68 *)self->unk93 = *(RGB8003CB68 *)a2;
     *(RGB8003CB68 *)self->unk96 = *(RGB8003CB68 *)a3;
 }
 
-void func_8003CBB8(Obj86B60 *self, s32 a1)
+void Obj86B60__SetFadeRate(Obj86B60 *self, s32 a1)
 {
     self->unk84 = a1;
 }
 
-s32 func_8003CBC0(Obj86B60 *self)
+s32 Obj86B60__TickFadeCallback(Obj86B60 *self)
 {
     s32 result;
 
@@ -306,7 +306,7 @@ s32 func_8003CBC0(Obj86B60 *self)
     return result;
 }
 
-s32 func_8003CC2C(Obj86B60 *self)
+s32 Obj86B60__TickColorFade(Obj86B60 *self)
 {
     s32 prod;
     u8 buffer[3];
@@ -320,7 +320,7 @@ s32 func_8003CC2C(Obj86B60 *self)
     return (u8)prod >= 0x81;
 }
 
-s32 func_8003CCDC(Obj86B60 *self)
+s32 Obj86B60__func_8003CCDC(Obj86B60 *self)
 {
     s32 result;
 

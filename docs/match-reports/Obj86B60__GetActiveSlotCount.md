@@ -23,7 +23,7 @@ s32 Obj86B60__GetActiveSlotCount(Obj86B60 *self)
 ## Struct knowledge established / corrected
 
 `include/code_2cc8c.h`'s `Obj86B60Methods` already had a `slot118` field
-whose comment attributed it to `Obj86B60__GetActiveSlotCount` (citing `func_8003C944.md`'s
+whose comment attributed it to `Obj86B60__GetActiveSlotCount` (citing `Obj86B60__func_8003C944.md`'s
 "Struct knowledge established" section as the source). **That attribution
 was wrong.** Reading the retail table bytes directly:
 
@@ -32,7 +32,7 @@ gClass86B60Methods+0x118 = 0x8003DE30  (func_8003DE30, NOT Obj86B60__GetActiveSl
 gClass86B60Methods+0x120 = 0x8003DFA0  (Obj86B60__GetActiveSlotCount's real slot)
 ```
 
-The byte OFFSET `func_8003C944` compiled against (0x118) was and is
+The byte OFFSET `Obj86B60__func_8003C944` compiled against (0x118) was and is
 correct -- that function still matches -- but the function pointer VALUE
 stored there at runtime is `func_8003DE30`, not `Obj86B60__GetActiveSlotCount`. The old
 report's error: a discarded/void-typed call site is not evidence of which
@@ -70,7 +70,7 @@ the getter itself is claimed.
 
 - `Obj86B60::unk58` -> `activeSlot` (tier B). The index into
   `unk4C->unk24[]`/`unk64[]`/`unk60[]`/`unk5C[]`, i.e. which ring-buffer
-  slot is currently selected -- established across `func_8003CA1C`,
+  slot is currently selected -- established across `Obj86B60__Tick`,
   `func_8003D3B0`, `func_8003D2CC`, `func_8003D6D4` (code_2cc8c.c/_b.c) and
   this function. NOT renamed directly: heavily shared with `code_2cc8c.c`
   and `code_2cc8c_b.c` (the same class, split by address range). Head

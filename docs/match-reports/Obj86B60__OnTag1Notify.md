@@ -50,7 +50,7 @@ Matched on the first build.
 
 `arg1` (the `EventArg *` `Obj86B60__OnNotify` forwards to `slot54`/`58`/`5C`)
 went completely unused here -- a live-but-unconsumed register at this call
-site, same shape as `func_8003C51C`'s own `$a1` note in
+site, same shape as `Obj86B60__OnTag5Notify`'s own `$a1` note in
 `include/code_2cc8c.h`. Declaring the parameter with its full established
 type (`EventArg *`, matching the vtable field) rather than degrading it to
 `s32`/`void *` costs nothing and keeps the signature consistent with its

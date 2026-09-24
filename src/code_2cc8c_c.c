@@ -8,8 +8,8 @@
  * two-argument constructor pair (`Obj86B60__Init`/`Obj86B60__Deinit`, which
  * install and later release up to three externally- or default-supplied
  * helper objects), its `OnNotify` override (dispatches on an incoming
- * `EventArg`'s dynamic class tag to `onTag1Notify`/an external func_8003C48C
- * STALL/func_8003C51C), and its `NotifyParents` override (`Obj86B60__
+ * `EventArg`'s dynamic class tag to `onTag1Notify`/an external Obj86B60__OnTag2Notify
+ * STALL/Obj86B60__OnTag5Notify), and its `NotifyParents` override (`Obj86B60__
  * NotifyParents`, matched round 72 -- see its match report)
  * with the two small helpers it forwards to on mode 2/3.
  *

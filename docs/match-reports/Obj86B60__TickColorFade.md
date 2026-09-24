@@ -1,11 +1,13 @@
-# func_8003CC2C — MATCH (44/44 words)
+# Obj86B60__TickColorFade — MATCH (44/44 words)
+
+> Renamed from `func_8003CC2C` on 2026-09-24 (tools/rename.py). Address 0x8003cc2c.
 
 **Unit:** code_2cc8c · **Size:** 44 instructions
 
 ## What it does
 
 ```c
-s32 func_8003CC2C(Obj86B60 *self)
+s32 Obj86B60__TickColorFade(Obj86B60 *self)
 {
     s32 prod;
     u8 buffer[3];

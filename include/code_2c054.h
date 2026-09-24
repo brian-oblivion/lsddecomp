@@ -86,11 +86,11 @@ struct StreamTaskObjMethods {
                                                 signature confirms the arity here) */
     u8 pad98[0x09C - 0x098];
     void (*slot9C)(StreamTaskObj *self, s32 a1); /* +0x09C, TaskCoreObj__Reset's forward target
-                                                      (gStreamTaskObjMethods+0x09C = func_8003CAF8) */
+                                                      (gStreamTaskObjMethods+0x09C = Obj86B60__SetFadeCallbackEnabled) */
     void (*slotA0)(StreamTaskObj *self, s32 a1); /* +0x0A0, TaskCoreObj__Reset's forward target
-                                                      (gStreamTaskObjMethods+0x0A0 = func_8003CB30) */
+                                                      (gStreamTaskObjMethods+0x0A0 = Obj86B60__func_8003CB30) */
     void (*slotA4)(StreamTaskObj *self, u8 *a1, u8 *a2, u8 *a3); /* +0x0A4, TaskCoreObj__Reset's
-                                                      forward target (gStreamTaskObjMethods+0x0A4 = func_8003CB68) */
+                                                      forward target (gStreamTaskObjMethods+0x0A4 = Obj86B60__SetColors) */
     u8 padA8[0x0D4 - 0x0A8];
     void (*slotD4)(StreamTaskObj *self, s32 a1, s32 a2); /* +0x0D4, TaskCoreObj__TaskCoreObj's forward
                                                       target (gStreamTaskObjMethods+0x0D4 = func_8003CDE0) */
@@ -330,12 +330,12 @@ struct TaskCoreMethods {
                                                                      (gTaskCoreMethods+0x04C = TaskCoreObj__func_8003C238) */
     u8 pad50[0x05C - 0x050];
     void (*slot5C)(StreamTaskObj *self, s32 a1, s32 a2);       /* +0x05C, StreamTaskObj__func_8003BB5C's forward target
-                                                                     (gTaskCoreMethods+0x05C = func_8003C51C) */
+                                                                     (gTaskCoreMethods+0x05C = Obj86B60__OnTag5Notify) */
     void (*slot60)(StreamTaskObj *self, s32 a1);                /* +0x060, StreamTaskObj__func_8003BC14's forward target
-                                                                     (gTaskCoreMethods+0x060 = func_8003C63C) */
+                                                                     (gTaskCoreMethods+0x060 = Obj86B60__SetState) */
     u8 pad64[0x078 - 0x064];
     void (*slot78)(StreamTaskObj *self);                        /* +0x078, StreamTaskObj__func_8003BD10's forward target
-                                                                      (gTaskCoreMethods+0x078 = func_8003C858) */
+                                                                      (gTaskCoreMethods+0x078 = Obj86B60__func_8003C858) */
     u8 pad7C[0x080 - 0x07C];
     void (*slot80)(StreamTaskObj *self);                        /* +0x080, StreamTaskObj__func_8003BD74's forward target */
     void (*slot84)(StreamTaskObj *self);                         /* +0x084, StreamTaskObj__func_8003BDAC's forward target */

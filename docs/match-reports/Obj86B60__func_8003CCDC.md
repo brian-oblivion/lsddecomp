@@ -1,4 +1,6 @@
-# func_8003CCDC — MATCHED (27/27 words)
+# Obj86B60__func_8003CCDC — MATCHED (27/27 words)
+
+> Renamed from `func_8003CCDC` on 2026-09-24 (tools/rename.py). Address 0x8003ccdc.
 
 **Unit:** code_2cc8c · **Size:** 27 instructions
 
@@ -21,7 +23,7 @@
 > rewrite"*).
 
 ```c
-s32 func_8003CCDC(Obj86B60 *self)
+s32 Obj86B60__func_8003CCDC(Obj86B60 *self)
 {
     s32 result;
 
@@ -40,18 +42,18 @@ epilogue:
 
 ## Signature update -- TRIED, did not move the residue
 
-Originally attempted as `s32 func_8003CCDC(Obj86B60 *self, s32 a1)`, an
-unused-but-forwarded parameter matching `func_8003CBC0`'s ORIGINAL
-signature. `func_8003C51C`'s own residue (matched separately, see its
+Originally attempted as `s32 Obj86B60__func_8003CCDC(Obj86B60 *self, s32 a1)`, an
+unused-but-forwarded parameter matching `Obj86B60__TickFadeCallback`'s ORIGINAL
+signature. `Obj86B60__OnTag5Notify`'s own residue (matched separately, see its
 report) proved this class of assumption wrong for its sibling slot
-`slotAC`/`func_8003CBC0`: the `s32 a1` at that call site was never a real
+`slotAC`/`Obj86B60__TickFadeCallback`: the `s32 a1` at that call site was never a real
 argument, just a leftover caller-saved register value from an earlier,
 unrelated call. `Obj86B60Methods::slotC0` (this function's own vtable
 slot, `+0x0C0`) was retyped to `s32 (*)(Obj86B60*)` (one argument) as part
-of matching `func_8003C51C`.
+of matching `Obj86B60__OnTag5Notify`.
 
 **Re-attempted this function itself with the corrected one-argument
-signature** (`s32 func_8003CCDC(Obj86B60 *self)`, body otherwise
+signature** (`s32 Obj86B60__func_8003CCDC(Obj86B60 *self)`, body otherwise
 unchanged) -- **still 26/27 at the time, IDENTICAL residue** (`move v0,s1`
 in retail vs. `li v0,0x0` here, same single instruction). This makes sense
 in hindsight: the dropped parameter was never read inside this function's
@@ -75,20 +77,20 @@ BASE SHAPE, not more search on this one, was needed.
 
 ## What it does
 
-The `self->unk8C` counterpart to `func_8003CBC0`'s `self->unk88` (both set
-by `func_8003CB30`/`func_8003CAF8` respectively). UNLIKE `func_8003CBC0`,
+The `self->unk8C` counterpart to `Obj86B60__TickFadeCallback`'s `self->unk88` (both set
+by `Obj86B60__func_8003CB30`/`Obj86B60__SetFadeCallbackEnabled` respectively). UNLIKE `Obj86B60__TickFadeCallback`,
 this function's control flow has a genuine extra early-exit: if the
 callback returns 0, retail branches DIRECTLY to the shared epilogue,
 skipping the `slot60` call entirely, rather than reaching the same skip via
-a single unified `if (result != 0)` test the way `func_8003CBC0` does.
+a single unified `if (result != 0)` test the way `Obj86B60__TickFadeCallback` does.
 
 ## Progression
 
-**Attempt 1: `func_8003CBC0`'s exact shape** (`result = 1; if (unk8C) result
+**Attempt 1: `Obj86B60__TickFadeCallback`'s exact shape** (`result = 1; if (unk8C) result
 = unk8C(self); if (result != 0) slot60(...); return result;`) scored
 **23/27**, four words off, with a DIFFERENT branch immediate at the first
 `beqz` and three more knock-on differences -- confirmed this function's CFG
-genuinely differs from `func_8003CBC0`'s (per DECOMPILATION_LEARNINGS'
+genuinely differs from `Obj86B60__TickFadeCallback`'s (per DECOMPILATION_LEARNINGS'
 "two structurally-similar residues want different C shapes" entry), not
 just that the same C compiles slightly differently.
 
@@ -127,7 +129,7 @@ constant.
  * Kept only as the permuter's seed record; the `return result;` inside the
  * nested `if` is exactly what let GCC constant-fold this to `li v0,0`
  * instead of retail's `move v0,s1`. */
-s32 func_8003CCDC(Obj86B60 *self)
+s32 Obj86B60__func_8003CCDC(Obj86B60 *self)
 {
     s32 result;
 
@@ -162,7 +164,7 @@ mutations never reach it from an `if`/`return` seed, so a stall in this
 exact shape (single register, a constant vs. a register-copy) is worth a
 manual `goto` rewrite before it's accepted as permuter-exhausted.
 
-`func_8003CBC0`/`func_8003CCDC` remain the same idiom (a callback stored by
+`Obj86B60__TickFadeCallback`/`Obj86B60__func_8003CCDC` remain the same idiom (a callback stored by
 a matching setter, defaulting to 1, invoked and conditionally followed by a
 `slot60` reason-code call) at two different offsets in the same class,
 needing genuinely different C shapes despite that.

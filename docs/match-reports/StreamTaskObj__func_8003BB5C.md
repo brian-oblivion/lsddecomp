@@ -28,7 +28,7 @@ void StreamTaskObj__func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
 ## Evidence
 
 - `Get_vtable_TaskCore()->slot5C`: `TaskCoreMethods` slot `+0x05C`, occupied by
-  `func_8003C51C` (a different unit, not touched here). Takes `(self, a1,
+  `Obj86B60__OnTag5Notify` (a different unit, not touched here). Takes `(self, a1,
   a2)` matching this function's own two forwarded parameters; result
   discarded, typed `void`.
 - `self->unkA4`: established this round (`StreamTaskObj__func_8003BAB4`'s report). Here it

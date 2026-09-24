@@ -1,4 +1,6 @@
-# func_8003CB68 — MATCHED (20/20), round 19
+# Obj86B60__SetColors — MATCHED (20/20), round 19
+
+> Renamed from `func_8003CB68` on 2026-09-24 (tools/rename.py). Address 0x8003cb68.
 
 **Unit:** code_2cc8c · **Size:** 20 instructions
 
@@ -13,7 +15,7 @@ struct type, one statement per group, reaches retail byte-for-byte:
 ```c
 typedef struct { s8 r, g, b; } RGB8003CB68;
 
-void func_8003CB68(Obj86B60 *self, s8 *a1, s8 *a2, s8 *a3)
+void Obj86B60__SetColors(Obj86B60 *self, s8 *a1, s8 *a2, s8 *a3)
 {
     *(RGB8003CB68 *)self->unk90 = *(RGB8003CB68 *)a1;
     *(RGB8003CB68 *)self->unk93 = *(RGB8003CB68 *)a2;

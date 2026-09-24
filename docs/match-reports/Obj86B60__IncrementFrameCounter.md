@@ -36,7 +36,7 @@ runner alpha). Tier A: a pure leaf increment (`self->unk1C++`) -- tier A by
 the same "mechanics ARE the purpose" rule as a getter/clamp/list-push.
 "FrameCounter" reuses the already-established cross-function reading of
 `unk1C` ("a running count/frame value multiplied against unk84",
-`func_8003CC2C`, code_2cc8c.c) rather than inventing a new one; `unk1C`
+`Obj86B60__TickColorFade`, code_2cc8c.c) rather than inventing a new one; `unk1C`
 itself is PROPOSED for rename to `frameCounter` in this unit's
 `## Proposed field names` (shared with code_2cc8c.c).
 
@@ -46,11 +46,11 @@ itself is PROPOSED for rename to `frameCounter` in this unit's
   three independent sources: incremented here unconditionally
   (`Obj86B60__IncrementFrameCounter`), zeroed on state-reset paths
   (`Obj86B60__ResetCounters`, `Obj86B60__NotifyTargetReset`,
-  `Obj86B60__NotifyChildReset`, and `func_8003C63C` in `code_2cc8c.c` on
-  several message codes), and consumed as a multiplier in `func_8003CC2C`
+  `Obj86B60__NotifyChildReset`, and `Obj86B60__SetState` in `code_2cc8c.c` on
+  several message codes), and consumed as a multiplier in `Obj86B60__TickColorFade`
   (code_2cc8c.c) against `unk84` -- consistent with a per-instance
   frame/tick counter. What in-game effect the resulting product drives is
   NOT established, hence tier B. NOT renamed directly: shared with
-  `code_2cc8c.c` (`func_8003C63C`, `func_8003CC2C`, and likely
-  `func_8003CBB8`/`func_8003CBC0`'s own callers of `self->unk1C`). Head
+  `code_2cc8c.c` (`Obj86B60__SetState`, `Obj86B60__TickColorFade`, and likely
+  `Obj86B60__SetFadeRate`/`Obj86B60__TickFadeCallback`'s own callers of `self->unk1C`). Head
   applies by type scope.

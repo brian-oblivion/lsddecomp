@@ -1,21 +1,23 @@
-# func_8003C63C — MATCHED (byte-exact, whole-image `build exit=0`)
+# Obj86B60__SetState — MATCHED (byte-exact, whole-image `build exit=0`)
+
+> Renamed from `func_8003C63C` on 2026-09-24 (tools/rename.py). Address 0x8003c63c.
 
 Unit: `code_2cc8c` · Size: 100 instructions · Round 23 (2026-09-07), head.
 Second of the five `REOPENED -- ASSIGNABLE` functions to be closed, sibling of
-`func_8003C48C`.
+`Obj86B60__OnTag2Notify`.
 
 ## History
 
 Filed round 2026-09-02 (runner echo) as **`addiu_at` toolchain blocked**, never
 attempted — its dispatch is `addiu $at, $at, %lo(jtbl_800110D0)`. That verdict
 was correct when written and expired when round 21 resolved `addiu_at`. See
-`func_8003C48C.md` for the shared history; the jtbl-is-not-an-exception
+`Obj86B60__OnTag2Notify.md` for the shared history; the jtbl-is-not-an-exception
 discriminator this unit established still stands.
 
 ## The match
 
 ```c
-void func_8003C63C(Obj86B60 *self, s32 a1)
+void Obj86B60__SetState(Obj86B60 *self, s32 a1)
 {
     Obj86B60Methods *methods;
 
@@ -80,7 +82,7 @@ control flow alone:
   `slti`. **A range-split compare in the middle of what looks like a compare
   chain means `switch`, not `if`.**
 - **Outer case order is 5, 6, 4/7, 8, group** — not numeric. Read off the arm
-  block addresses per the source-order lever in `func_8003C48C.md`.
+  block addresses per the source-order lever in `Obj86B60__OnTag2Notify.md`.
 
 ## The residue was a TYPE error in the header, not scheduling
 
@@ -107,7 +109,7 @@ this is a shared-header vtable slot edit** (`include/code_2cc8c.h`, six units):
   `src/code_2cc8c_b.c` as `void func_8003DCAC(Obj86B60 *self)`. That is positive
   evidence, not inference from the function under test.
 - Neither slot had any other caller anywhere: the header's own comment recorded
-  both as `OBSERVED: func_8003C63C (STALL, not attempted)` — i.e. the `s32` had
+  both as `OBSERVED: Obj86B60__SetState (STALL, not attempted)` — i.e. the `s32` had
   been read off the disassembly of a function nobody had ever compiled.
 - Whole-image SHA1 green after the retype, which is the only thing that can see
   a slot retype breaking another unit's already-matched codegen.

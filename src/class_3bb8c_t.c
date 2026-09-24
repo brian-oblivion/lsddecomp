@@ -83,7 +83,7 @@ typedef struct TaskCoreBaseTable {
     void (*slot44)(GraphRoomObj *self, void *arg1, void *arg2);
     u8 pad48[0x5C - 0x48];
     /* +0x05C, called by this unit's own GraphRoomObj__UpdateFromLog as (self, arg1,
-     * arg2). Not this unit's own function; still func_8003C51C elsewhere. */
+     * arg2). Not this unit's own function; still Obj86B60__OnTag5Notify elsewhere. */
     void (*slot5C)(GraphRoomObj *self, void *arg1, void *arg2);
     u8 pad60[0xDC - 0x60];
     /* +0x0DC, called by this unit's own GraphRoomObj__Destroy as (self) -- the

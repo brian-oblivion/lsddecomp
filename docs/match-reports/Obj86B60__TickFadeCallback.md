@@ -1,11 +1,13 @@
-# func_8003CBC0 — MATCH (27/27 words)
+# Obj86B60__TickFadeCallback — MATCH (27/27 words)
+
+> Renamed from `func_8003CBC0` on 2026-09-24 (tools/rename.py). Address 0x8003cbc0.
 
 **Unit:** code_2cc8c · **Size:** 27 instructions
 
 ## What it does
 
 ```c
-s32 func_8003CBC0(Obj86B60 *self)
+s32 Obj86B60__TickFadeCallback(Obj86B60 *self)
 {
     s32 result;
 
@@ -20,23 +22,23 @@ s32 func_8003CBC0(Obj86B60 *self)
 }
 ```
 
-The consumer of `self->unk88` (set by `func_8003CAF8`). Exactly the
+The consumer of `self->unk88` (set by `Obj86B60__SetFadeCallbackEnabled`). Exactly the
 "default value, then conditionally overwritten" idiom already documented
 in DECOMPILATION_LEARNINGS.md: the `beqz`'s delay slot sets `result = 1`
 UNCONDITIONALLY, then the taken call overwrites it. This IS this class's
 own vtable slot `+0x0AC` (per `classtable.py`).
 
-**Addendum after `func_8003C51C` was matched (its only caller in this
+**Addendum after `Obj86B60__OnTag5Notify` was matched (its only caller in this
 unit):** originally typed `(Obj86B60*, s32 a1)`, assuming the caller
 forwarded a genuine (if unused) `a1` argument, per CLAUDE.md's "unused
-parameter in the callee" idiom. `func_8003C51C`'s own residue proved this
+parameter in the callee" idiom. `Obj86B60__OnTag5Notify`'s own residue proved this
 wrong: its `jalr` to this slot sets up ONLY `a0=self`, and `$a1` at that
 call site is a caller-saved register left over from an EARLIER, unrelated
 call (`slot60(self, 6)`) a few instructions before -- not a value the
 source is deliberately forwarding. Retyped to `s32 (*)(Obj86B60*)`
 (one argument). This function's OWN compiled bytes are unaffected by the
 retype (the parameter was never read in its body either way); the earlier
-27/27 match stands unchanged. See `func_8003C51C`'s report for the full
+27/27 match stands unchanged. See `Obj86B60__OnTag5Notify`'s report for the full
 account and the generalized lesson (an argument register surviving an
 intervening CALL, not just the next instruction, is not reliably a real
 argument).

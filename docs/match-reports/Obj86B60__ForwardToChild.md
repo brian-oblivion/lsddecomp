@@ -1,11 +1,13 @@
-# func_8003C7B4 — MATCH (16/16 words)
+# Obj86B60__ForwardToChild — MATCH (16/16 words)
+
+> Renamed from `func_8003C7B4` on 2026-09-24 (tools/rename.py). Address 0x8003c7b4.
 
 **Unit:** code_2cc8c · **Size:** 16 instructions
 
 ## What it does
 
 ```c
-void func_8003C7B4(Obj86B60 *self, s32 a1)
+void Obj86B60__ForwardToChild(Obj86B60 *self, s32 a1)
 {
     Unk48Obj *child;
 
@@ -18,7 +20,7 @@ void func_8003C7B4(Obj86B60 *self, s32 a1)
 
 `self->unk48` is a pointer to a DIFFERENT class from `Obj86B60` -- its own
 vtable slot `+0x080` takes four arguments (self, a1, a2, a3), whereas
-`Obj86B60`'s OWN slot `+0x080` (`func_8003C944`) takes none beyond self. Two
+`Obj86B60`'s OWN slot `+0x080` (`Obj86B60__func_8003C944`) takes none beyond self. Two
 literal `0x60` constants are passed as the trailing two arguments; `a1` is
 forwarded from the caller unchanged.
 
