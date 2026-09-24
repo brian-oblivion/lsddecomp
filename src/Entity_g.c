@@ -1,3 +1,44 @@
+/* One of the Entity class's split units (Entity_c through Entity_g cover
+ * its 97-function remainder after Entity/Entity_b), 0x80064618..0x800655D4,
+ * directly following Entity_e (Entity_f is a separate, not-yet-named,
+ * interleaved unit -- its own address range is not contiguous with this
+ * one's).
+ *
+ * 19 of this unit's 20 functions are `gEntityMoodHandlerTable` callbacks
+ * (Entity.h), named `Entity__MoodCueNN` for the row they occupy -- rows
+ * 98, 102-106, 108-111, 113-114, 117-118, 121, 123, 125, 128-129,
+ * confirmed by reading disk/SLPS_015.56 directly (base 0x80089EB0 +
+ * 0x10*row is the row's own `handler` word, checked against each
+ * candidate function's address; row order does not track code address,
+ * same finding as Entity_d/Entity_e, rounds 76-77). `Entity__MoodCue123`
+ * (0x80065238) also occupies row 126 of the same table (identical
+ * `handler` word, different data0/data1/data2) -- one function shared by
+ * two mood-row configurations, named for its lower row.
+ *
+ * The 20th function, `Entity__AdvanceWobbleAndDeactivate` (formerly
+ * `func_80064FBC`), is not itself a table row -- it is a shared per-tick
+ * helper called directly (`jal`) by two different row handlers:
+ * `Entity__MoodCue111` (this unit, twice) and `Entity__MoodCue40`
+ * (Entity_d.c, cross-unit, its first caller from outside that unit).
+ *
+ * Five rotation/scale data constants named this round, decoded from
+ * disk/SLPS_015.56 against the existing ROTATION_YAW_PLUS2/
+ * ROTATION_YAW_MINUS120/ROTATION_ZPLUS9/SCALE_HALF/SCALE_SIX tables
+ * (rotation/scale: four s16 {num,den} pairs for X/Y(yaw)/Z/W, W never
+ * reflected in the name per the ROTATION_YAW_MINUS120/SCALE_HALF/SCALE_SIX
+ * precedent): ROTATION_YAW_PLUS1, ROTATION_ZPLUS4, SCALE_EIGHTH,
+ * SCALE_QUARTER, SCALE_THIRTY_SECOND. Six more data constants
+ * (D_80089CAC, D_80089CB8, D_80089DE4, D_80089E14, D_80089E2C, D_80089E44)
+ * were decoded but left unnamed -- either a non-whole-degree rotation
+ * (no precedent for naming those) or a non-uniform-axis or non-unit-
+ * fraction scale (no precedent either). See each function's match
+ * report's `## Naming` / `## Data constant(s) ... unnamed` sections for
+ * the per-constant evidence. `ROTATION_YAW_PLUS1` and `SCALE_QUARTER`
+ * turned out to also be referenced from `src/Entity_c.c` (pre-existing,
+ * not new to this round) -- each unit keeps its own local `extern`, per
+ * this project's per-unit-local-view convention; the global rename
+ * updated both units' externs uniformly.
+ */
 #include "common.h"
 #include "Entity.h"
 
@@ -25,8 +66,10 @@ extern u8 SCALE_THIRTY_SECOND[];
 /* Entity__AdvanceWobbleAndDeactivate, this unit's own function, is called by Entity__MoodCue111
  * (earlier in ROM order) before its own definition below -- forward
  * declaration, same convention CLAUDE.md documents for calling into a
- * still-INCLUDE_ASM function. Already known cross-unit from Entity_d.c's
- * own extern (Entity__MoodCue40's caller there), reproduced here matching. */
+ * function defined later in the same unit (the helper is itself matched,
+ * not a stall; the forward declaration is only about ROM-order source
+ * placement). Already known cross-unit from Entity_d.c's own extern
+ * (Entity__MoodCue40's caller there), reproduced here matching. */
 extern void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4);
 
 void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
@@ -212,7 +255,7 @@ void Entity__MoodCue111(Entity *this, EntityMoodHandlerArg *out) {
 }
 
 void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
-    s32 unkFC;
+    s32 timer;
 
     out->unk10 = 0;
     if (out->unk4 == 6) {
@@ -220,25 +263,25 @@ void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out,
         out->unk30 = 4;
         out->unk44 = 4;
     }
-    unkFC = this->moodTimer;
-    if (unkFC < arg2) {
+    timer = this->moodTimer;
+    if (timer < arg2) {
         goto L18;
     }
-    if (!(arg2 + 0x5B < unkFC)) {
+    if (!(arg2 + 0x5B < timer)) {
         goto L50;
     }
 L18:
-    if (unkFC < arg2 + 0x155) {
+    if (timer < arg2 + 0x155) {
         goto L34;
     }
-    if (!(arg2 + 0x1B1 < unkFC)) {
+    if (!(arg2 + 0x1B1 < timer)) {
         goto L50;
     }
 L34:
-    if (unkFC < arg2 + 0x2BA) {
+    if (timer < arg2 + 0x2BA) {
         goto L74;
     }
-    if (arg2 + 0x317 < unkFC) {
+    if (arg2 + 0x317 < timer) {
         goto L74;
     }
 L50:
