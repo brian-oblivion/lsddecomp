@@ -145,7 +145,8 @@ void func_8004DC64(Class86B60 *self, s32 arg1)
     self->unkB0->methods->slot4C(self->unkB0, arg1, &D_8008A9B4);
 }
 
-/* func_8004DCD0's own `arg1`: only the first three signed bytes are read.
+/* func_8004DCD0's own `arg1`: a 3-byte colour-like triple, copied whole into
+ * a local (the copy is a BLKmode struct move: three `lb`, then three `sb`).
  * Kept a minimal, distinct local type rather than reusing this header's
  * broader `Descriptor10` (same 3-byte shape, but an unrelated context --
  * nothing here shows a 4th byte or the two trailing halfwords). */
@@ -156,59 +157,39 @@ struct Arg1DCD0_3bb8c_d {
     s8 b2;
 };
 
-#if 0
-/* STALL, round 43 -- see docs/match-reports/func_8004DCD0.md.
- * 2 words short (76/78), register-class residue on the shared local
- * pointer ("base"): retail keeps it in a THIRD callee-saved register
- * ($s1, alongside self=$s2/arg1=$s0) across the whole function; every
- * structural variant tried here (with or without an explicit `goto` to
- * the shared store, with or without a named "base"/"p" pointer, folding
- * the offset into "base" itself) gets GCC 2.6.3 -O2 to allocate the same
- * value into a caller-saved temp ($a0/$a1) instead, 8 bytes short.
- * Preserved verbatim below -- it is the closest candidate found (only
- * this one register-class difference plus the two words it costs), not
- * a working match. */
+/* MATCHED round 75 (was STALL round 43) -- see
+ * docs/match-reports/func_8004DCD0.md. `base` is taken BEFORE the first call
+ * (so it crosses a call and gets $s1), `buf = *arg1` is one struct copy, and
+ * each arm indexes `base[D_8008AA28]` directly. */
 void func_8004DCD0(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
 {
-    u8 buf[3];
+    Arg1DCD0_3bb8c_d buf;
     u8 *base;
-    u8 v;
 
+    base = (u8 *)&buf;
     Get_vtable_TaskCore()->slotE4(self, arg1);
-    base = buf;
     if (self->unk3C != 0) {
         base[0] = 0;
         base[1] = 0;
         base[2] = 0;
-        base += D_8008AA28;
-        v = 0x80;
-        goto store;
+        base[D_8008AA28] = 0x80;
+    } else {
+        buf = *arg1;
+        if (D_8008AA2C < 0x80) {
+            base[0] += 0x80;
+        } else {
+            base[D_8008AA28] += 0x80;
+        }
     }
-    base[0] = arg1->b0;
-    base[1] = arg1->b1;
-    base[2] = arg1->b2;
-    if (D_8008AA2C < 0x80) {
-        base[0] = base[0] + 0x80;
-        goto skip;
-    }
-    base += D_8008AA28;
-    v = *base + 0x80;
-store:
-    *base = v;
-skip:
-    D_8008AA28++;
-    if (D_8008AA28 >= 3) {
+    if (++D_8008AA28 >= 3) {
         D_8008AA28 = 0;
     }
     D_8008AA2C++;
     if (D_8008AA2C >= 0x101) {
         D_8008AA2C = 0;
     }
-    self->unkB0->methods->slotB8(self->unkB0, buf);
+    self->unkB0->methods->slotB8(self->unkB0, &buf);
 }
-#endif
-
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_d", func_8004DCD0);
 
 /* CheckObj866E8CountFlag is ALREADY MATCHED (src/class_3bb8c_c.c), as a genuinely
  * 2-argument function -- but THIS call site sets up a 3rd argument

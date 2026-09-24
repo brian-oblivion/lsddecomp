@@ -1,3 +1,101 @@
+# func_8004DCD0 -- MATCHED, round 75 (78/78, whole image OK)
+
+REVISITED, round 75: MATCHED 78/78 in 11 builds; names/types used (the
+`Arg1DCD0_3bb8c_d` type became the type of the local `buf`, copied whole).
+
+**Lever: source shape, four levers, no permuter.** The round-43 residue
+("register-class choice on one local pointer, no C reshaping reproduces it")
+was a set of source-shape differences, one of which (the struct copy) the
+round-43 body could not show because its `lbu`s were read as `lb`s-with-renames.
+
+## Baseline (preserved round-43 body rebuilt live, before any change)
+
+`insertions 9 / deletions 9` (opcode-level), 3/78 raw, 76/78 length (2 short).
+
+## Levers, in order, with scores
+
+| # | change | funcdiff | reading |
+| --- | --- | --- | --- |
+| 0 | preserved body | 3/78, ins/del 9/9, 2 words short | baseline |
+| 1 | `base = buf;` moved ABOVE `Get_vtable_TaskCore()->slotE4(...)` | 47/78, 7/7, length exact | `$s1` appears: `base` now crosses a call, so it gets a callee-saved reg; sched1 still sinks the `addiu s1,sp,0x10` into the `beqz` delay slot, which is why retail shows it after the call |
+| 2 | separate `p = base + D_8008AA28` per arm (not `base += ...`) | 40/78, 7/7 | store address in `$v1` like retail; s1/s2 swapped (transient) |
+| 3 | `v` typed `s32` | same | `addiu 0x80` instead of `-0x80` (QImode const canonicalisation) |
+| 4 | `s32` temps for the three bytes | drift | `lb` appears (retail loads are SIGN-extending) but CSE then reuses the register for `buf[0]+0x80` where retail reloads with `lbu` |
+| 5 | one reused temp | drift | reload appears, but one register instead of retail's three |
+| 6 | **`buf` is an `Arg1DCD0_3bb8c_d` and `buf = *arg1;`** | drift, only regs + one extra reload left | the 3-byte BLKmode struct copy is lb,lb,lb then sb,sb,sb into three regs, and CSE does not know memory after it -> `lbu 0x10(sp)` reload |
+| 7 | `if (++D_8008AA28 >= 3)` instead of `D_8008AA28++; if (D_8008AA28 >= 3)` | 71/78, 0/0 | `andi v0,0xff` instead of a reload of the global |
+| 8 | drop `v`/`goto store`: `*p = 0x80;` and `*p += 0x80;` in if/else arms (GCC cross-jumps the shared `sb v0,0(v1)`) | 70/78, 1/1 | `v` now in `$v0` like retail; index reg wrong |
+| 9 | `p = D_8008AA28 + base` | 70/78, 1/1 | no change |
+| 10 | **no `p`: `base[D_8008AA28] = 0x80;` / `base[D_8008AA28] += 0x80;`** | **78/78, build exit=0, whole image OK** | index loaded straight into the address register |
+
+## Matched source
+
+```c
+typedef struct Arg1DCD0_3bb8c_d Arg1DCD0_3bb8c_d;
+struct Arg1DCD0_3bb8c_d {
+    s8 b0;
+    s8 b1;
+    s8 b2;
+};
+
+void func_8004DCD0(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
+{
+    Arg1DCD0_3bb8c_d buf;
+    u8 *base;
+
+    base = (u8 *)&buf;
+    Get_vtable_TaskCore()->slotE4(self, arg1);
+    if (self->unk3C != 0) {
+        base[0] = 0;
+        base[1] = 0;
+        base[2] = 0;
+        base[D_8008AA28] = 0x80;
+    } else {
+        buf = *arg1;
+        if (D_8008AA2C < 0x80) {
+            base[0] += 0x80;
+        } else {
+            base[D_8008AA28] += 0x80;
+        }
+    }
+    if (++D_8008AA28 >= 3) {
+        D_8008AA28 = 0;
+    }
+    D_8008AA2C++;
+    if (D_8008AA2C >= 0x101) {
+        D_8008AA2C = 0;
+    }
+    self->unkB0->methods->slotB8(self->unkB0, &buf);
+}
+```
+
+The two `goto`s the round-43 body needed are gone: retail's `j .L8004DD84`
+(first arm into the shared `sb v0,0(v1)`) is GCC cross-jumping the identical
+tails of `base[D] = 0x80` and `base[D] += 0x80`, not a shared label in the
+source.
+
+### Proposed learning
+
+- **A callee-saved register holding a value whose only set sits AFTER a call
+  can be a value the source computed BEFORE the call.** sched1 sinks the set
+  past the call (into a later delay slot) but the pseudo was already counted
+  as call-crossing, so it still gets an `$sN`. Tell: an `$sN` saved in the
+  prologue whose first write is after the only call it could have crossed.
+  Round 43 read this as "retail spends a third s-reg for no reason".
+- **`lb`,`lb`,`lb` then `sb`,`sb`,`sb` into three distinct registers, and a
+  later RELOAD of a byte just stored, is a small struct copy** (BLKmode move:
+  CSE forgets memory after it). Per-field assignment gives `lbu` and reuses
+  the register. Same family as "8-byte pair as one struct copy".
+- **`x++; if (x >= K)` on a `u8` global reloads the global; `if (++x >= K)`
+  gives the `andi 0xFF` re-mask.**
+- **An address register that is also the index's load target
+  (`lbu v1,idx; addu v1,s1,v1`) is `base[idx]` written inline, not a named
+  `p = base + idx`.**
+
+---
+
+## History (round 43 STALL report, superseded)
+
 > **REOPENED by round 42, AND SINCE WORKED -- marker spent (head, round 43).**
 > This is now a DOCUMENTED STALL, not fresh ground: see the three-figure
 > verdict below. The round-42 reopening text is kept for history. This function was
