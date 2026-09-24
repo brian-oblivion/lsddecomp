@@ -185,19 +185,15 @@ typedef struct {
     s16 x, y;
 } Vec2s16_EE4;
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 88/96 words, length exact. Residue: register identity
- * ($a2 vs $a1 for the OT mask) plus a missing load-delay-slot filler
- * `addiu $v0,$s1,0x28` = align_up_4(last touched self field + width)
- * (docs/match-reports/func_80019EE4.md). Hand-derived. */
-void func_80019EE4(void *arg0, void *arg1) {
+/* Returns the next packet pointer: arg0 + sizeof(POLY_GT3) = 0x28 when the
+ * primitive is spliced into the OT directly, else RCpolyGT3's own return
+ * (cast: RCpolyGT3 is declared void in code_8220.h). Same shape as
+ * func_800197C4. */
+void *func_80019EE4(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
 
-    if (*(s32 *)(prim + 0x78) == 0) {
-        ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
-        (*(OtTag **)(prim + 0x30))->addr = (u32)self;
-    } else {
+    if (*(s32 *)(prim + 0x78) != 0) {
         func_8001A380(D_8008ACD0, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         func_8001A3EC((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x14),
@@ -215,12 +211,12 @@ void func_80019EE4(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0x8) = *(u16 *)(self + 0x18);
         *(u16 *)(*(u8 **)(prim + 0x90) + 0x8) = *(u16 *)(self + 0x24);
 
-        RCpolyGT3(self, D_8008ACD0);
+        return ((void *(*)(void *, void *))RCpolyGT3)(arg0, D_8008ACD0);
     }
+    ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
+    (*(OtTag **)(prim + 0x30))->addr = (u32)self;
+    return (u8 *)arg0 + 0x28;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_80019EE4);
-#endif
 
 /* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
