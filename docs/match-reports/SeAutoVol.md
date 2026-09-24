@@ -455,3 +455,12 @@ whose best candidate was a dramatic-looking but confirmed-regressive
 wholesale register reallocation), and this round's budget shared across
 seven other queued functions in this unit, no new lever was attempted
 here. Restored to `INCLUDE_ASM` unchanged.
+
+## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
+
+Already carries its real name: identified round 74 (track 2, runner bravo)
+as `libsnd/vmanager SeAutoVol` (shape 0.97 vs the disc-3.3 reference, 110w
+reference vs our 116w; the same tied candidate at this shape score as its
+own sibling `SeAutoPan` in `code_179d8_m.c` -- see the symbols file for the
+disambiguation). Sony symbol; this pass does not rename it further. Matched
+round 73, 116/116.

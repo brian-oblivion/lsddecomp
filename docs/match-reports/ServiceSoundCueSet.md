@@ -481,3 +481,68 @@ The one lever from round 44 not yet tried is a targeted look at why `s1`
 anchors at `+0x1c` instead of `+0x28` (matching `vmNoiseOn2`'s
 already-documented anchor-point finding) -- not a permuter question, a
 by-hand structural one.
+
+## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
+
+**`ServiceSoundCueSet`** -- tier A. Renamed from `func_8002CD08` via
+`tools/rename.py`. Evidence: `DreamSys__TickDrift` calls it only when
+`this->cueServiceActive != 0` (`if (this->cueServiceActive != 0)
+func_8002CD08(...)`), and `DreamSys__StopDrift` calls the sibling
+`FlushSoundCueSet` (a DIFFERENT, already-matched function in
+`code_179d8_e.c`) to tear the same cue set down. A field literally named
+`cueServiceActive` gating the call is about as direct as tier-A evidence
+gets: this is the "service" (per-tick) half of the cue-set's start/stop
+pair, `FlushSoundCueSet` the "flush"/stop half. `include/DreamSys.h` and
+`include/Entity.h` both already carried a stale `func_8002CD08/
+FlushSoundCueSet` cross-reference from an earlier round's guess that this
+was the SAME function as `FlushSoundCueSet` -- it is not (confirmed: they
+are two distinct symbols at two distinct addresses, 0x8002CD08 vs
+0x8002CC84, with opposite roles). `rename.py` rewrote every such comment.
+
+Object/field identity (`self`/`set`): confirmed against `code_179d8_e.c`'s
+own `VabStreamObj`/`SoundCueSet`/`SoundCueSlot` and `gVabStreamObjMethods`
+(`tools/classtable.py gVabStreamObjMethods`) -- see the struct comment in
+`src/code_179d8_l.c` above the type definitions, and `FlushSoundCueSet.md`/
+`DreamSys__SetSoundObj.md` for the cross-unit trail. Renamed fields, tier A
+unless noted:
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `Obj179D8CD08` / `Obj179D8CD08Methods` | `VabStreamObj` / `VabStreamObjMethods` | A | same object `code_179d8_e.c` already names; slot offsets match exactly |
+| `slot80` | `playTone` | A | offset +0x80 == `gVabStreamObjMethods`'s `VabStreamObj__PlayTone` |
+| `slot84` | `stopVoice` | A | offset +0x84 == `VabStreamObj__StopVoice`; same `(self, index)` call shape as `FlushSoundCueSet`'s own call through the identical slot |
+| `slot9C` | `setPitchOffset` | A | offset +0x9C == `VabStreamObj__SetPitchOffset` |
+| `Entry179D8CD08` | `SoundCueSlot` | A | same 0x14-byte-stride struct `code_179d8_e.c` declares |
+| `result` | `index` | A | matches `SoundCueSlot.index` (`code_179d8_e.c`): -1 sentinel, `>= 0` forwarded to `stopVoice` -- identical pattern to `FlushSoundCueSet`'s `if (slot->index >= 0) slot->index = self->methods->slot84(self, slot->index);` |
+| `word0` | `note` | A | `note = e->note * 16` packs directly into `playTone`'s `index` argument (hi/lo split, see `VabStreamObj__PlayTone.md`) |
+| `word1` | `pitchOffset` | A | passed unchanged to `setPitchOffset` |
+| `S179D8CD08` | `SoundCueSet` | A | same object `code_179d8_e.c` names |
+| `unk0` | `tag` | A | matches `SoundCueSet.tag`; `> 0` guard here parallels that unit's `!= 0` guard |
+| `unk8` | `owner` | A | matches `SoundCueSet.owner`; passed as `callback`'s first argument unchanged |
+| `entries` | `slots` | A | matches `SoundCueSet.slots` |
+
+## Proposed field names (not renamed -- weaker evidence, posted to broadcast)
+
+- `SoundCueSlot.word2` / `word3` -- default `0x7F` (127) / `0x40` (64),
+  feed `playTone`'s `arg2`/`arg3` via an `x - (x/unk14)*unk10` remainder.
+  `VabStreamObj__PlayTone.md` shows `arg2`/`arg3` reach `SsUtAutoVol(result,
+  arg2, arg3, 2)` and `SsUtKeyOn(..., arg2, arg2)` (arg2 passed twice) --
+  consistent with a volume/pan pair (127 = full scale, 64 = center) but not
+  confirmed against a real Sony signature. Proposed: `volume` / `pan`,
+  tier B if adopted.
+- `SoundCueSet.unk4` -- incremented once per `ServiceSoundCueSet` call;
+  `code_179d8_e.c`'s own view of the same struct never reads it. Proposed:
+  `tickCount`, tier B (mechanics-only, purpose in the game not established).
+- `SoundCueSet.unk10` -- zeroed before the callback runs; the callback may
+  set it negative to skip processing this tick's slots entirely. No further
+  evidence of what a non-negative value beyond 0 means. Proposed:
+  `serviceGate` or similar, tier C -- too thin to commit to this pass.
+- `SoundCueSet.unk14` -- matches `code_179d8_e.c`'s own `unk14` (set to the
+  constant 10 by `InitSoundCueSet`); used here as a divisor
+  (`e->word2 - (e->word2/unk14)*unk10`). Purpose beyond "some kind of
+  scaling period" not established in either unit.
+
+None of the four above cross a header boundary (both units keep independent
+local views of this struct, per the project's convention), so these are
+recorded here rather than applied -- posted to the broadcast for visibility,
+not because another unit's file needs editing.

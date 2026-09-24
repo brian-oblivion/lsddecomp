@@ -628,3 +628,10 @@ order, algebraic rewrite, `volatile`, scheduling barriers at two different
 sites, and a round-37 permuter search at 74597 iterations), and this
 round's budget shared across seven other queued functions in this unit, no
 new lever was attempted here. Restored to `INCLUDE_ASM` unchanged.
+
+## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
+
+Already carries its real name: identified round 74 (track 2, runner bravo)
+as `libsnd/vmanager SePitchBend` (shape 0.99 vs the disc-3.3 reference,
+110w reference vs our 112w, position within the libsnd neighborhood). Sony
+symbol; this pass does not rename it further. Matched round 73, 112/112.

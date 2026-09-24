@@ -119,3 +119,11 @@ as a register-identity stall, try shrinking the type of one addend to the
 narrowest width the value can actually hold (matching its source, e.g. a
 shifted byte value as `u8` rather than `u32`/`s32`). Confirmed once here;
 worth a second data point before promoting further.
+
+## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
+
+Already carries its real name: identified round 71 (track 2, runner bravo)
+as `libsnd/vmanager note2pitch`, fingerprint EXACT masked 1.00 vs the
+disc-3.3 reference (position between `libc2/strncmp` and `libsnd/vm_prog`
+agrees). Sony symbol; this pass does not rename it further. Matched,
+47/47.
