@@ -105,59 +105,29 @@ void func_800659D0(Class65650 *self)
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 30/33 words, length exact. Residue: prologue callee-save
- * store-order permutation ($s0/$ra/$s1)
- * (docs/match-reports/func_80065A5C.md). Hand-derived. */
 void func_80065A5C(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
-    u8 unused[8];
     s32 i;
 
-    __asm__("");
     p = self->unk70;
-    if (self->unk6C <= 0) {
-        return;
-    }
-    i = 0;
-    do {
-        (*p)->methods->slot60(*p, arg);
+    for (i = 0; i < self->unk6C; p++) {
         i++;
-        p++;
-    } while (i < self->unk6C);
+        (*p)->methods->slot60(*p, arg);
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065A5C);
-#endif
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 33/40 words, length exact. Residue: compound of the same
- * 3-way callee-save store-order permutation as func_80065A5C ($s0/$ra/$s1)
- * plus the `arg` parameter's copy into $s3 deferred past the `blez` guard
- * (docs/match-reports/func_80065AE0.md). Hand-derived. */
 void func_80065AE0(Class65650 *self, void *arg)
 {
-    u8 unused[8];
     Unk70ElemObj **p;
     s32 i;
-    D800878D4Methods *base;
 
     p = self->unk70;
-    if (self->unk6C > 0) {
-        i = 0;
-        do {
-            (*p)->methods->slot70(*p, arg);
-            i++;
-            p++;
-        } while (i < self->unk6C);
+    for (i = 0; i < self->unk6C; i++, p++) {
+        (*p)->methods->slot70(*p, arg);
     }
-    base = DreamSys__GetBaseMethods();
-    base->slot70(self, arg);
+    DreamSys__GetBaseMethods()->slot70(self, arg);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065AE0);
-#endif
 
 void func_80065B80(Class65650 *self, void *arg1, s32 val)
 {
@@ -414,34 +384,19 @@ void func_800662B4(Class65650 *self)
     self->unk90 = 0;
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 17/33 words, length exact. Residue: count's lhu load
- * routes through $v0 instead of directly into its long-lived register $s2
- * (docs/match-reports/func_800662BC.md). Hand-derived. */
 void *func_800662BC(Class65650 *self, void *hdr, void *extra)
 {
-    void *acc;
-    u16 count;
+    s32 count;
     u32 i;
-    u8 unused[8];
 
     count = *(u16 *)((u8 *)hdr + 2);
-    acc = (u8 *)hdr + 8;
-    if (count != 0) {
-        s32 cont;
-
-        i = 1;
-        do {
-            acc = self->methods->slot138(self, acc, extra);
-            cont = i < count;
-            i++;
-        } while (cont);
+    hdr = (u8 *)hdr + 8;
+    for (i = 0; i < count;) {
+        i++;
+        hdr = self->methods->slot138(self, hdr, extra);
     }
-    return acc;
+    return hdr;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_800662BC);
-#endif
 
 /* NON_MATCHING: 252/258 words, length exact (no drift). Residue: two
  * symmetric 3-word instruction-scheduling clusters around a compiler-
