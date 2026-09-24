@@ -250,7 +250,7 @@ void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     }
 }
 
-void func_80052598(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
+void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     s32 newUnk20;
     s32 newUnk28;

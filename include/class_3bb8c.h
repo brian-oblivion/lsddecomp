@@ -2897,11 +2897,11 @@ struct Class86F88Methods {
     u8 pad084[0x094 - 0x084];
     /* +0x094 = func_8005281C itself (this unit, MATCHED). Signature fixed
      * by three independent callers in this
-     * unit (Class86F88__ScrollRight, Class86F88__ScrollLeft, Class86F88__CursorUp, func_80052598),
+     * unit (Class86F88__ScrollRight, Class86F88__ScrollLeft, Class86F88__CursorUp, Class86F88__CursorDown),
      * all of which pass exactly (self, arg1, arg2, arg3, arg4). */
     void (*slot94)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
     /* +0x098, occupant not in this unit's queue. Called by
-     * Class86F88__CursorUp/func_80052598 with (self, arg1, arg2, arg3). */
+     * Class86F88__CursorUp/Class86F88__CursorDown with (self, arg1, arg2, arg3). */
     void (*slot98)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
 };
 
@@ -2951,7 +2951,7 @@ struct Class86F88 {
      * pointer and this is an OFFSET table, not a pointer table. */
     s32 *unk18;                    /* +0x018, func_8005292C */
     u8 pad01C[0x020 - 0x01C];
-    s32 unk20;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/Class86F88__ScrollRight/Class86F88__ScrollLeft/Class86F88__CursorUp/func_80052598/func_800529FC */
+    s32 unk20;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/Class86F88__ScrollRight/Class86F88__ScrollLeft/Class86F88__CursorUp/Class86F88__CursorDown/func_800529FC */
     s32 unk24;                     /* +0x024, ditto */
     s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
     s32 unk2C;                     /* +0x02C, Class86F88__TickClosing/Class86F88__SetState */
