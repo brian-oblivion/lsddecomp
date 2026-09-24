@@ -16,8 +16,8 @@
  * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
  * `Class6B5CC__func_1d33c` no-op precedent); a command dispatcher over the same
  * "attach" state (`Class6B5CC__DispatchLinkCommand`, proposed `Class6B5CC__DispatchLinkCommand`);
- * a proximity-attach attempt (`Class6B5CC__TryAttachNearby`, STALL, proposed
- * `Class6B5CC__TryAttachNearby`) that hands off to a rotation compose-and-
+ * a proximity-attach attempt (`Class6B5CC__TryAttachNearby`, MATCHED round
+ * 76) that hands off to a rotation compose-and-
  * apply step (`Class6B5CC__ComposeAndApplyRotation`), a corner-list AABB
  * overlap test (`Class6B5CC__CheckBoundsOverlap`, MATCHED round 73), and a
  * plane-classification test (`Class6B5CC__ClassifyAgainstPlanes`, STALL, proposed
@@ -31,10 +31,10 @@
  * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
  * all) that `Class6B5CC__CheckBoundsOverlap` and `Class6B5CC__ClassifyAgainstPlanes` build on.
  *
- * Three functions remain INCLUDE_ASM: `Class6B5CC__TryAttachNearby`,
- * `Class6B5CC__ClassifyAgainstPlanes`, `Class6B5CC__NotifyTaggedParents` -- all documented stalls, see
- * docs/match-reports/. (`Class6B5CC__CheckBoundsOverlap` was the fourth
- * until round 73.)
+ * Two functions remain INCLUDE_ASM: `Class6B5CC__ClassifyAgainstPlanes`,
+ * `Class6B5CC__NotifyTaggedParents` -- documented stalls, see
+ * docs/match-reports/. (`Class6B5CC__CheckBoundsOverlap` matched round 73,
+ * `Class6B5CC__TryAttachNearby` round 76.)
  */
 
 #include "common.h"
@@ -166,27 +166,28 @@ void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2) {
     }
 }
 
+/* The corner list this function builds and hands to +0xA8/+0xAC: the count
+ * header and eight corners are ONE local (count at sp+0x50, corners at
+ * sp+0x54); round 76. Same layout as CornerList_d294 with the array made
+ * explicit. */
+typedef struct AttachCornerList_d294b {
+    s32 count;
+    Vec3S16_d294 v[8];
+} AttachCornerList_d294b;
+
 /* Range-checks `other` against `self` (each axis of position difference
  * must fit in +/-0x4000), then hands off to three vtable slots
  * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = Class6B5CC__ClassifyAgainstPlanes)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->unk28 and notifying it via its own +0x038 slot. */
-#ifdef NON_MATCHING
-/* NON_MATCHING: 140/143 words, length exact. Residue: a pure stack-slot-
- * address swap between buf54 and count's own address-taken slot
- * (docs/match-reports/Class6B5CC__TryAttachNearby.md). The preserved
- * best-scoring body reaches this axis-by-axis range check with a literal
- * goto-CFG mirroring retail's jump graph and a cached other->unk30 pointer;
- * both are byte-shaped levers with no effect on behavior, so this body
- * writes the plain if/else form and the direct other->unk30->unk4 access
- * instead -- see the report for the byte-shaped variant. Hand-derived. */
 void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     Vec3_d294 *posA;
     Vec3_d294 *posB;
     Vec3_d294 diffRaw;
     Vec3S16_d294 diff;
-    s32 count;
-    u8 buf54[0x4C];
+    s32 abs;
+    u8 unused[0x20]; /* sp+0x30, never referenced; reserves retail's slot */
+    AttachCornerList_d294b list;
 
     if (self->unk20 == NULL) {
         return;
@@ -203,48 +204,66 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;
 
-    if (diffRaw.x >= 0) {
-        if (diffRaw.x >= 0x4001) {
-            return;
-        }
-    } else if (-diffRaw.x >= 0x4001) {
+    if (diffRaw.x < 0) {
+        goto x_neg;
+    }
+    if (diffRaw.x < 0x4001) {
+        goto x_done;
+    }
+    return;
+x_neg:
+    abs = ~diffRaw.x + 1;
+    if (abs >= 0x4001) {
         return;
     }
-    if (diffRaw.y >= 0) {
-        if (diffRaw.y >= 0x4001) {
-            return;
-        }
-    } else if (-diffRaw.y >= 0x4001) {
+x_done:
+    if (diffRaw.y < 0) {
+        goto y_neg;
+    }
+    if (diffRaw.y < 0x4001) {
+        goto y_done;
+    }
+    return;
+y_neg:
+    abs = ~diffRaw.y + 1;
+    if (abs >= 0x4001) {
         return;
     }
-    if (diffRaw.z >= 0) {
-        if (diffRaw.z >= 0x4001) {
-            return;
-        }
-    } else if (-diffRaw.z >= 0x4001) {
+y_done:
+    if (diffRaw.z < 0) {
+        goto z_neg;
+    }
+    if (diffRaw.z < 0x4001) {
+        goto z_done;
+    }
+    return;
+z_neg:
+    abs = ~diffRaw.z + 1;
+    if (abs >= 0x4001) {
         return;
     }
+z_done:
 
     diff.x = diffRaw.x;
     diff.y = diffRaw.y;
     diff.z = diffRaw.z;
 
-    count = other->unk30->unk0;
-    self->methods->composeAndApplyRotation(self, &diff, buf54, &other->unk30->unk4, count * 8);
+    list.count = other->unk30->unk0;
+    {
+        GenericCountList_d294 *countList = other->unk30;
+        self->methods->composeAndApplyRotation(self, &diff, list.v, &countList->unk4, list.count * 8);
+    }
 
-    if (!self->methods->checkBoundsOverlap(self, &count, &diff)) {
+    if (!self->methods->checkBoundsOverlap(self, &list, &diff)) {
         return;
     }
-    if (!self->methods->classifyAgainstPlanes(self, other->unk2C, &diff, &count)) {
+    if (!self->methods->classifyAgainstPlanes(self, other->unk2C, &diff, &list)) {
         return;
     }
 
     self->unk28 = other;
     other->methods->onNotify(other, self, 4);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__TryAttachNearby);
-#endif
 
 /* Fills buf1 from self's own +0x84 slot, then folds in every node of the
  * self->unkC list (each node's own +0x84 slot combined into buf1 via

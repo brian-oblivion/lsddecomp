@@ -1,6 +1,67 @@
-# Class6B5CC__TryAttachNearby — STALL (round 55: length EXACT, 143/143 per `nm -S`, up from 141/143; raw funcdiff word-match 140/143; first real diff at file offset 0xE098 / vram 0x8001D898, a pure stack-slot-address swap between `buf54` and `count`'s own address-taken slot, zero other difference anywhere in the function; historical titles "47/143" (pre round-20) and "141/143, 2 short" (rounds 20-46) are superseded by this round's length fix)
+# Class6B5CC__TryAttachNearby — MATCHED (round 76, bravo: 143/143, whole image green; the round-55 "stack-slot swap" was one struct local, a count header plus eight corners, with an unused 0x20-byte array ahead of it)
 
 > Renamed from `func_8001D714` on 2026-09-18 (tools/rename.py). Address 0x8001d714.
+
+REVISITED, round 76: MATCHED 143/143 (build exit=0, whole-image SHA1 green); names/types used -- the fix is a TYPE: `count` and `buf54` are one `{s32 count; Vec3S16_d294 v[8];}` local, the shape `Class6B5CC__CheckBoundsOverlap`'s own `CornerList_d294` had already measured.
+
+## Round 76 (bravo): MATCHED -- the swap was one struct, not two locals
+
+**Rebuild first.** The round-55 preserved body, with round-54 field names
+applied (`unkC`->`parent`, `unk14`->`coord2`, `slot38`->`onNotify`, no
+offset change), rebuilt live: **140/143, insertions 0 / deletions 0,
+positional skeleton diffs 0**. So this was a real equal-length residue, not a
+false alignment. The three diffs were all stack offsets: `addiu a2,sp,0x54`
+(built `0x30`), `sw v0,0x50(sp)` (built `0x80`), `addiu s2,sp,0x50` (built
+`0x80`).
+
+**Reading the retail frame, not the swap.** Retail: `diffRaw` at `sp+0x18`
+(12 bytes), `diff` at `sp+0x28` (6 bytes), **nothing touches `sp+0x30..0x4F`**,
+`count` at `sp+0x50`, `buf54` at `sp+0x54`, callee-saves at `sp+0x88`. So
+`buf54` can only be 0x34 bytes, not the 0x4C bytes declared. And `count` sits
+EXACTLY 4 bytes before `buf54`. `&count` goes to `checkBoundsOverlap` and
+`classifyAgainstPlanes`, and `CheckBoundsOverlap` (matched round 73) reads
+its `arg1` as `CornerList_d294`: `s32 count` at +0, corners from +4, and
+`count*8` corners. `buf54` is where `composeAndApplyRotation` writes
+`count*8` corners. So `&count` and `buf54` are `&list` and `list.v`, one
+local: `{ s32 count; Vec3S16_d294 v[8]; }` = 0x34 bytes, 0x50..0x84, rounded
+up to 0x88.
+
+**Why no declaration order could fix it (the mechanism).** GCC 2.6.3 gives an
+array or struct local its stack slot when it expands the DECLARATION. It gives
+an address-taken scalar a slot only when it first expands `&x`
+(`put_var_into_stack`), which is after every array declared in the block. So a
+standalone scalar `count` always lands above `buf54`, whatever order the
+declarations are in. That is why round 55's seven declaration-order variants
+were all byte-identical. Putting the scalar inside the struct is the only way
+to place it below the array.
+
+**The 0x20-byte gap** at `sp+0x30` is an unused `u8 unused[0x20]` declared
+before the list (the frame-padding idiom, §3e). Nothing in the body reads it.
+It may be a MATRIX left in the source unused. Without it the list would sit
+at 0x30.
+
+Builds this round: 1 rebuild (140/143), 1 with a compile error (a
+replace-all typo, `listList`; the grep caught it and the score was stale),
+**1 build to the match**, then 1 simplification check: dropping round 55's
+cached `countList` (`&other->unk30->unk4` inline) -> 141/143, ins/del 1/1
+(the `lw a3`/`lw v1` pair reorders). So the cache is load-bearing and stays.
+The goto-CFG form was not re-tested; round 55 measured it as the length fix.
+No permuter. Gate 3 not run (no search spent).
+
+### Proposed learning (round 76)
+
+**When an address-taken scalar's slot is the wrong side of an array, and the
+scalar's slot sits exactly `sizeof` before the array in retail, the two are
+ONE struct.** 2.6.3 gives arrays and structs a slot at their declaration. It
+gives an address-taken scalar a slot at its first `&`, so the scalar always
+lands after every array in scope, and declaration order is inert (round 55
+measured this seven times). The tell: the scalar's address and the array go
+to related callees, often the SAME callee reading `p->count` and then
+`p->items`. Read the callee's own struct view before touching declaration
+order. A retail frame region nothing references is an unused array declared
+earlier (§3e), and it is part of the same fix.
+
+## History (rounds 13-55)
 
 Unit: `code_d294_b`. Round 13, runner delta. Best score: 47/143 words
 in-range, but a genuine size deficit remains (compiled body ~52 bytes/13
