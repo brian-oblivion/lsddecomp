@@ -1,4 +1,57 @@
-# SetActiveDataSource -- 3 words long (38 vs 35) -- 1/35 raw word match -- first real diff at vram 0x80026D00
+# SetActiveDataSource -- MATCHED round 75 (35/35) -- lever: table entries take NO argument, plus a label+goto loop
+
+REVISITED, round 75: MATCHED 35/35, whole image `OK: build matches retail`, 3 builds after the baseline; names/types used (the table's element type was the first lever).
+
+## Round 75 revisit (runner delta)
+
+**Game code check.** 0x80026CFC is not in `config/sdk-in-game.txt`, has no
+`config/psyq-objects.ld` pin and no `identified` comment; it sits among this
+unit's own Class6D430 methods, calls only game functions, and reads no strings.
+Game code.
+
+**Baseline.** The preserved body below, rebuilt live (with the
+`Class6D430__CopyFields` prototype it needs, since the definition follows it):
+`insertions 15 / deletions 15`, 1/35 raw, 38 words (3 long; out-of-range
+drift 316350 bytes). asm-differ showed the three extra words were `$s2` for
+`val` and `move a0,s0` before the `jalr` -- i.e. the built code PASSED `val`
+to each table entry.
+
+**Lever 1 -- the table entries take no argument.** Retail's `jalr $v0` has no
+`$a0` set up before it (`$a0` is whatever `Class6D430__CopyFields` left). The
+14 entries of `D_8006D4AC` are `Get*Methods` getters (`GetVabStreamObjMethods`
+is one of them by name). Typing the table `void *(*D_8006D4AC[])(void)` and
+calling `fn()` removed `$s2` and both moves: every register then matched and
+the length became 35 (24/35 raw, insertions 4 / deletions 4). So the
+round-43 REGISTER-ALLOCATION class was an arity error: `val` needed its own
+callee-saved register only because the C kept it live as the next call's
+argument.
+
+**Lever 2 -- loop layout.** The remaining 4/4 was loop rotation: retail jumps
+from the entry into a bottom test (`CopyFields; lw; bnez` back to `jalr`),
+the build tested at the top and `j`-ed back. `while (CopyFields(val, ret),
+(fn = *entry) != NULL)`, `for (;;) { ...; if (fn == NULL) break; ... }` and
+`for (val = ...; ; val = fn())` all gave the same 24/35 top-tested layout. A
+label+goto loop (`goto copy; next: entry++; methods = getMethods(); copy:
+CopyFields(...); getMethods = *entry; if (getMethods != NULL) goto next;`)
+matched 35/35 on the first build (LEARNINGS 3a, round 74's label+goto loops).
+
+Builds: baseline (with missing prototype, discarded) + baseline + 4 variants
++ 1 renaming rebuild + 1 final. No permuter.
+
+### Proposed learning
+
+- **A `jalr` with no `$aN` set up before it is a zero-argument call.** When a
+  report blames a "loop-carried argument" needing an extra s-register, check
+  whether retail actually loads `$a0` before the indirect call. Here the
+  "argument" was the previous call's return value, and the C passed it along
+  only because the table was typed `void *(*)(void *)`.
+- **Retail jumps into a bottom test and the test contains a call:** every
+  `while`/`for` spelling came out top-tested; label+goto reproduced it
+  (a second data point for 3a).
+
+---
+
+# (historical) SetActiveDataSource -- 3 words long (38 vs 35) -- 1/35 raw word match -- first real diff at vram 0x80026D00
 
 > Renamed from `SetActiveDataSource` on 2026-09-18 (tools/rename.py). Address 0x80026cfc.
 
@@ -37,8 +90,8 @@
 > Escalated in round 43's write-up.
 
 
-**Unit:** code_171e0 · **Size:** 35 words (retail) · **Status:** STALLED,
-class REGISTER-ALLOCATION (round 43, 2026-09-15, runner bravo).
+**Unit:** code_171e0 · **Size:** 35 words (retail) · **Status:** MATCHED round 75 (see top); was STALLED,
+class REGISTER-ALLOCATION (round 43, 2026-09-15, runner bravo) -- that class is withdrawn: the extra register came from a wrong callee arity.
 
 ## History
 

@@ -16,7 +16,7 @@
  * their own header words): Lock/UnlockActiveDataSource,
  * IsActiveDataSourceBusy/Idle, GetActiveDataSourceOperation/State/
  * DriverMode/Methods/UseVSyncCallback, SetActiveDataSourceDriverMode,
- * RegisterFileTableEntries and the stalled SetActiveDataSource all forward
+ * RegisterFileTableEntries and SetActiveDataSource all forward
  * to the CD driver's own functions when it is active, and to an SPU/VAB-
  * side fallback otherwise.
  *
@@ -133,7 +133,41 @@ Vec3_171e0 *SetVec3(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
     return this;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_171e0", SetActiveDataSource);
+/* D_8006D4AC: the class-method-table getters of every Class6D430-derived
+ * client, NULL-terminated (asm/data/5DB70.data.s). */
+extern void *(*D_8006D4AC[])(void);
+
+void Class6D430__CopyFields(Class6D430 *dst, Class6D430 *src);
+
+/* Install a new active data source, then copy its method block
+ * (Class6D430__CopyFields) into Class6D430's own table and into the table of
+ * every registered client. The label+goto loop is retail's layout (jump into a
+ * bottom test); every while/for spelling tried came out top-tested. */
+void SetActiveDataSource(s32 arg0) {
+    void *src;
+    void *methods;
+    void *(*getMethods)(void);
+    void *(**entry)(void);
+
+    entry = D_8006D4AC;
+    gActiveDataSource = arg0;
+    if (arg0 == DATASOURCE_CD) {
+        src = GetClass6D4E8Methods();
+    } else {
+        src = GetVabDriverMethods();
+    }
+    methods = GetClass6D430Methods();
+    goto copy;
+next:
+    entry++;
+    methods = getMethods();
+copy:
+    Class6D430__CopyFields(methods, src);
+    getMethods = *entry;
+    if (getMethods != NULL) {
+        goto next;
+    }
+}
 
 void Class6D430__CopyFields(Class6D430 *dst, Class6D430 *src) {
     dst->unk40 = src->unk40;
