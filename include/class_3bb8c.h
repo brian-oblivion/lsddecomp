@@ -1887,7 +1887,7 @@ extern void *New_Class86F88(void *arg0, s32 arg1);
  * this call -- nothing overwrites `$a1` in between, which is what
  * reveals it as a real 2nd argument rather than a scheduling artifact
  * (see TaskObjF__AttachChildA's report). */
-extern void *func_80050BA8(s32 arg0, s32 arg1);
+extern void *New_Obj86ED0(s32 arg0, s32 arg1);
 
 /*
  * class_3bb8c_f: a SEPARATE class from Obj866E8 above -- no evidence unifies
@@ -2021,8 +2021,8 @@ extern char *strcat(char *dest, char *src);
  *
  * Extended round 14 (class_3bb8c_i) to name the ctor/finalize/addChild/
  * removeChild/removeAllChildren slots -- previously opaque pad, now named
- * from that unit's own functions dispatching through them (func_80050C14's
- * base-ctor call, func_80050CE8/func_80050D30/func_80050DB4/func_80050E34's
+ * from that unit's own functions dispatching through them (Obj86ED0__Obj86ED0's
+ * base-ctor call, Obj86ED0__Finalize/Obj86ED0__AddChild/Obj86ED0__RemoveChild/Obj86ED0__RemoveAllChildren's
  * explicit `Get_vtable_BasicClass()->slotN(...)` base-class calls). Pure pad-to-
  * field split, same total size, offset of the pre-existing `slot38` is
  * unchanged. `void *self` throughout, matching `slot38`'s existing style. */
@@ -2036,11 +2036,11 @@ struct BasicMethods866E8F {
      * (include/code_8220.h), reached through each unit's own local view of
      * the same real getter/table. Pure pad-to-field split: same total
      * size, `slot38`'s offset unchanged. */
-    void (*ctor)(void *self);                    /* +0x008, func_80050C14 (_i) / Class86F88__Class86F88 (_j, STALLED) */
-    void (*finalize)(void *self);                /* +0x00C, func_80050CE8 (_i) / Class86F88__Finalize (_j) */
-    void (*addChild)(void *self, void *child);   /* +0x010, func_80050D30 (_i) / Class86F88__AddChild (_j) */
-    void (*removeChild)(void *self, void *child);/* +0x014, func_80050DB4 (_i) / Class86F88__RemoveChild (_j) */
-    void (*removeAllChildren)(void *self);       /* +0x018, func_80050E34 (_i) / Class86F88__RemoveAllChildren (_j) */
+    void (*ctor)(void *self);                    /* +0x008, Obj86ED0__Obj86ED0 (_i) / Class86F88__Class86F88 (_j, STALLED) */
+    void (*finalize)(void *self);                /* +0x00C, Obj86ED0__Finalize (_i) / Class86F88__Finalize (_j) */
+    void (*addChild)(void *self, void *child);   /* +0x010, Obj86ED0__AddChild (_i) / Class86F88__AddChild (_j) */
+    void (*removeChild)(void *self, void *child);/* +0x014, Obj86ED0__RemoveChild (_i) / Class86F88__RemoveChild (_j) */
+    void (*removeAllChildren)(void *self);       /* +0x018, Obj86ED0__RemoveAllChildren (_i) / Class86F88__RemoveAllChildren (_j) */
     u8 pad01C[0x038 - 0x01C];
     void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, TaskObjF__Notify's first dispatch */
 };
@@ -2617,7 +2617,7 @@ extern void StyleTeardown(void);
  * settles it. bravo reported this class as "alloc size 0x54, vtable
  * D_80086ED0"; alpha reported 0x4C. Measured:
  *
- *   func_80050BA8  li a0,0x4c -> BMemPMgrAlloc, then ctors through
+ *   New_Obj86ED0  li a0,0x4c -> BMemPMgrAlloc, then ctors through
  *                  Get_vtable_Obj86ED0(), which returns &D_80086ED0.
  *   New_Class86F88  allocates 0x54 and ctors through GetClass86F88Methods(),
  *                  a DIFFERENT table getter living in class_3bb8c_k.
@@ -2634,7 +2634,7 @@ extern void StyleTeardown(void);
  * `tools/classtable.py D_80086ED0`, 42 slots; the ONLY class this unit
  * (class_3bb8c_i) itself defines methods for). Get_vtable_Obj86ED0 (this class's
  * own table getter, `class_3bb8c_j`, still INCLUDE_ASM) returns
- * `&D_80086ED0`; func_80050BA8 is the `New_X`-shaped factory that
+ * `&D_80086ED0`; New_Obj86ED0 is the `New_X`-shaped factory that
  * allocates the 0x4C-byte instance and dispatches its ctor (slot 0x008).
  * Slots 0x004-0x038 line up one-for-one with BasicClass's own 14-slot
  * layout (include/code_8220.h's BasicClassMethods) -- `classtable.py --vs
@@ -2710,25 +2710,25 @@ struct TargetObj86ED0 {
 
 struct Obj86ED0Methods {
     u8 pad000[0x008];
-    /* +0x008, func_80050BA8's own dispatch target -- this class's own
+    /* +0x008, New_Obj86ED0's own dispatch target -- this class's own
      * ctor, OVERRIDING BasicClass's no-arg ctor with a 2-arg one.
-     * func_80050C14 itself, MATCHED round 45; the signature below is
+     * Obj86ED0__Obj86ED0 itself, MATCHED round 45; the signature below is
      * the vtable slot's own type (self, arg1, arg2), matching how
-     * func_80050BA8 calls it -- func_80050C14's own DEFINITION is typed
+     * New_Obj86ED0 calls it -- Obj86ED0__Obj86ED0's own DEFINITION is typed
      * more precisely (`char *arg1`, since it calls `strlen` on it), which
      * is fine: a data-table vtable slot's declared field type need not
      * match the defining function's own prototype exactly. */
     void (*ctor)(Obj86ED0 *self, s32 arg1, s32 arg2);
     u8 pad00C[0x010 - 0x00C];
-    void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, func_80051200 (OVERRIDES BasicClass's addChild: func_80050D30) */
-    void (*removeChild)(Obj86ED0 *self, void *child);  /* +0x014, func_80051270/func_800512C8 (OVERRIDES BasicClass's removeChild: func_80050DB4) */
+    void (*addChild)(Obj86ED0 *self, void *child);    /* +0x010, func_80051200 (OVERRIDES BasicClass's addChild: Obj86ED0__AddChild) */
+    void (*removeChild)(Obj86ED0 *self, void *child);  /* +0x014, func_80051270/func_800512C8 (OVERRIDES BasicClass's removeChild: Obj86ED0__RemoveChild) */
     u8 pad018[0x030 - 0x018];
     /* +0x030, func_800512C8's own dispatch -- UNMODIFIED BasicClass
      * notifyParents (BasicClass__NotifyParents, code_8220_b), reached through
      * self's own table this one time instead of `Get_vtable_BasicClass()`. */
     void (*notifyParents)(Obj86ED0 *self, s32 arg1);
     u8 pad034[0x040 - 0x034];
-    /* +0x040, round 45's func_80050C14 -- its own tail dispatch,
+    /* +0x040, round 45's Obj86ED0__Obj86ED0 -- its own tail dispatch,
      * `self->methods->slot40(self, arg1, arg2)`, forwarding the ctor's
      * own two arguments unchanged. */
     void (*slot40)(Obj86ED0 *self, s32 arg1, s32 arg2); /* +0x040 */
@@ -2736,8 +2736,8 @@ struct Obj86ED0Methods {
     void (*slot48)(Obj86ED0 *self);                      /* +0x048, func_800512C8 -- this class's own slot, func_80051174 */
     u8 pad04C[0x054 - 0x04C];
     void (*slot54)(Obj86ED0 *self, s32 arg1);             /* +0x054, func_80051370 -- this class's own slot, func_800512C8 */
-    void (*slot58)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, func_80050E78's tag==5 case -- this class's own slot, func_80051370 */
-    void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, func_80050E78's tag==2 case -- this class's own slot, func_800513D0 */
+    void (*slot58)(Obj86ED0 *self, void *arg1, s32 arg2);  /* +0x058, Obj86ED0__Notify's tag==5 case -- this class's own slot, func_80051370 */
+    void (*slot5C)(Obj86ED0 *self, void *arg1, s32 arg2);   /* +0x05C, Obj86ED0__Notify's tag==2 case -- this class's own slot, func_800513D0 */
     /* +0x060, func_800513D0's own `arg2 == 25`/`23` cases: `self->methods->
      * slot60(self, 0x10)`, always with the same literal. */
     void (*slot60)(Obj86ED0 *self, s32 arg1);            /* +0x060 */
@@ -2779,15 +2779,15 @@ struct Obj86ED0 {
     s32 unk1C;                   /* +0x01C, func_80050F28 (zeroed)/func_80051720 (inc counter or reset to 0, capped by unk14) */
     s32 unk20;                   /* +0x020, func_80051200 (zeroed) */
     char *unk24;                 /* +0x024, func_80050F28: its own `arg1` (name string) */
-    char *unk28;                 /* +0x028, func_80050CE8 (freed in finalize)/func_80050F28 (DecodeFullWidthSjis/strcpy destination) */
+    char *unk28;                 /* +0x028, Obj86ED0__Finalize (freed in finalize)/func_80050F28 (DecodeFullWidthSjis/strcpy destination) */
     s32 unk2C;                   /* +0x02C, func_80051200 (zeroed)/func_800512C8 (set to its own arg1 for arg1 in [2,4); read as notifyParents's arg1 for arg1==4)/func_80051370 (range-checked against [2,4)) */
     s32 unk30;                   /* +0x030, func_800512C8 (zeroed)/func_80051370 (incremented; gates the slot54 call on the OLD value being nonzero) */
-    void *unk34;                 /* +0x034, func_80050D30/func_80050DB4 (addChild/removeChild target when child's tag==2)/func_800512C8/func_80051270 (removeChild target) */
-    void *unk38;                 /* +0x038, func_80050D30/func_80050DB4 (tag==5)/func_80051270 (removeChild target) */
+    void *unk34;                 /* +0x034, Obj86ED0__AddChild/Obj86ED0__RemoveChild (addChild/removeChild target when child's tag==2)/func_800512C8/func_80051270 (removeChild target) */
+    void *unk38;                 /* +0x038, Obj86ED0__AddChild/Obj86ED0__RemoveChild (tag==5)/func_80051270 (removeChild target) */
     TargetObj86ED0 *unk3C;        /* +0x03C, func_80051200 (its own arg3)/func_8005161C (dispatch target)/func_80051270 (zeroed) */
     ChildObj86ED0 *unk40;          /* +0x040, func_80051174 (released, no null-back store) */
     ChildObj86ED0 *unk44;           /* +0x044, func_80051174 (released, no null-back store) */
-    ChildObj86ED0 *unk48;            /* +0x048, func_80051174 (release+null-back)/func_80050CD8/func_80050E34 (zeroed)/func_8005165C/func_800516C0/func_80051720 (nonzero readiness gate)/func_80050F98 (set from a resolved resource handle) */
+    ChildObj86ED0 *unk48;            /* +0x048, func_80051174 (release+null-back)/Obj86ED0__ClearChildRefs/Obj86ED0__RemoveAllChildren (zeroed)/func_8005165C/func_800516C0/func_80051720 (nonzero readiness gate)/func_80050F98 (set from a resolved resource handle) */
 };
 
 /* HEAD NOTE round 15: alpha's `extern Obj86ED0Methods *Get_vtable_Obj86ED0(void);`

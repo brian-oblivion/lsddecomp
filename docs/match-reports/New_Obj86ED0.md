@@ -1,17 +1,19 @@
-# func_80050BA8 -- MATCHED (27/27 words)
+# New_Obj86ED0 -- MATCHED (27/27 words)
+
+> Renamed from `func_80050BA8` on 2026-09-24 (tools/rename.py). Address 0x80050ba8.
 
 Unit `class_3bb8c_i`, carved round 14.
 
 `New_X`-shaped factory for `Obj86ED0` (see `include/class_3bb8c.h`, vtable
 `D_80086ED0`, resolved with `tools/classtable.py D_80086ED0`): allocates the
-0x4C-byte instance and dispatches its own ctor (slot 0x008, `func_80050C14`,
+0x4C-byte instance and dispatches its own ctor (slot 0x008, `Obj86ED0__Obj86ED0`,
 itself a STALLED gp_rel-blocked function in this same unit -- see its own
 report). `Get_vtable_Obj86ED0` (`class_3bb8c_j`, still `INCLUDE_ASM`) is this
 class's own table getter, mirroring `Get_vtable_BasicClass`'s no-argument shape;
 its return type only needed naming here (`Obj86ED0Methods *`), not a body.
 
 ```c
-void *func_80050BA8(s32 arg0, s32 arg1)
+void *New_Obj86ED0(s32 arg0, s32 arg1)
 {
     Obj86ED0 *self;
 

@@ -1,4 +1,6 @@
-# func_80050D30 -- MATCHED (33/33 words)
+# Obj86ED0__AddChild -- MATCHED (33/33 words)
+
+> Renamed from `func_80050D30` on 2026-09-24 (tools/rename.py). Address 0x80050d30.
 
 Unit `class_3bb8c_i`, carved round 14.
 
@@ -12,7 +14,7 @@ typed slots depending on the tag, mirroring the ALREADY-MATCHED
 identical way (`**(s32 **)arg1`, masked `& 0xF`).
 
 ```c
-void func_80050D30(Obj86ED0 *self, void *arg1)
+void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
 {
     s32 tag;
     s32 mask;

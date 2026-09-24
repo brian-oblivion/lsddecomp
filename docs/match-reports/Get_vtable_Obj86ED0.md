@@ -12,7 +12,7 @@ for that history). `tools/classtable.py D_80086ED0` places
 unit's own first six functions) at that table's +0x094..+0x0A8, and
 `include/class_3bb8c.h` already types and shares the WHOLE table as
 `Obj86ED0Methods`, established independently by class_3bb8c_i from its own
-call sites (`func_80050BA8` there is the actual `New_X` for THIS class,
+call sites (`New_Obj86ED0` there is the actual `New_X` for THIS class,
 allocating 0x4C bytes and dispatching its ctor through `->ctor(...)` on the
 pointer this function returns). So this function is `Obj86ED0`'s own
 table getter, simply DEFINED in this unit; `Class86F88_3bb8c_j`'s real

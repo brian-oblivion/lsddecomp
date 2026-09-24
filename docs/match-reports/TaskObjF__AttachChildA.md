@@ -14,7 +14,7 @@ void TaskObjF__AttachChildA(Class86E00_3bb8c_g *self)
 {
     if (self->unk68 != 0 && self->unk60 != 0) {
         if (self->unk78 == NULL) {
-            self->unk78 = func_80050BA8((self->unk48 << 1) + self->unk44, 1);
+            self->unk78 = New_Obj86ED0((self->unk48 << 1) + self->unk44, 1);
             self->unk74 = 1;
         }
         self->methods->slot10(self, self->unk78);
@@ -38,7 +38,7 @@ for that part.
 
 One residue: a redundant `ori $a1, $zero, 0x1` in retail, in the delay
 slot of the guard testing `self->unk78 == NULL` -- several instructions
-before `func_80050BA8` is even called, and dead on the "skip init" path.
+before `New_Obj86ED0` is even called, and dead on the "skip init" path.
 My first reading treated this as a scheduling artifact (nothing in my C
 mentioned `1` that early) and tried reordering `self->unk74 = 1;` earlier
 in the block to coax the compiler into hoisting it there -- that made
@@ -46,20 +46,20 @@ things WORSE (13/52, and the function shrank by a word, because the
 reorder let the compiler merge/reuse the literal differently instead of
 reproducing retail's layout).
 
-**The actual cause: `func_80050BA8` takes a second argument, not one.**
+**The actual cause: `New_Obj86ED0` takes a second argument, not one.**
 Nothing overwrites `$a1` between where it is set (the branch's delay
-slot) and the `jal func_80050BA8` several instructions later, which is
+slot) and the `jal New_Obj86ED0` several instructions later, which is
 exactly the established test for "a value surviving to a call is a real
 argument" (already documented for `$a0`-`$a3`, here applied to a
 helper OUTSIDE this unit's own slice, reached only through this one call
-site). Retyping the extern from `func_80050BA8(s32 arg0)` to
-`func_80050BA8(s32 arg0, s32 arg1)` and calling it with `(..., 1)`
+site). Retyping the extern from `New_Obj86ED0(s32 arg0)` to
+`New_Obj86ED0(s32 arg0, s32 arg1)` and calling it with `(..., 1)`
 matched immediately, with the ORIGINAL statement order (`unk78 = ...;
 unk74 = 1;`) restored.
 
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
-- `extern void *func_80050BA8(s32 arg0, s32 arg1);` **retyped** from a
+- `extern void *New_Obj86ED0(s32 arg0, s32 arg1);` **retyped** from a
   single-argument declaration added while surveying the unit
   (`TaskObjF__TickCardIcon`'s report) -- this function is the only call site in
   this unit, so the correction is fully contained.
@@ -86,7 +86,7 @@ call arity) cost one wasted, and materially WORSE, attempt.
 ## Naming
 
 `TaskObjF__AttachChildA` (was `func_80050340`), tier B: lazily
-allocates `self->unk78` via `func_80050BA8` (an already-named `New_X`-shaped
+allocates `self->unk78` via `New_Obj86ED0` (an already-named `New_X`-shaped
 factory for the same real class the sibling `class_3bb8c_i`/`class_3bb8c_j`
 units call `Obj86ED0`/`Class86ED0`, vtable `D_80086ED0`) on first use, then
 attaches and configures it through this class's own vtable. Named "A" to

@@ -1,10 +1,12 @@
-# func_80050E78 -- MATCHED (44/44 words)
+# Obj86ED0__Notify -- MATCHED (44/44 words)
+
+> Renamed from `func_80050E78` on 2026-09-24 (tools/rename.py). Address 0x80050e78.
 
 Unit `class_3bb8c_i`, carved round 14.
 
 `Obj86ED0`'s slot38 override (vtable slot 0x038, the last slot BasicClass
 itself defines). Dispatches the BASE class's own `slot38` first, then reads
-the tag word off `arg1` exactly like `func_80050D30`/`func_80050DB4`, and
+the tag word off `arg1` exactly like `Obj86ED0__AddChild`/`Obj86ED0__RemoveChild`, and
 routes to one of this class's OWN two extra slots (`slot58`/`slot5C`,
 0x058/0x05C) via `self->methods` this time (not the base table) --
 `slot5C` is itself `func_800513D0`, STALLED in this same unit (addiu-$at /
@@ -12,7 +14,7 @@ jump-table blocker, see its own report), so its type only needed naming,
 not a body.
 
 ```c
-void func_80050E78(Obj86ED0 *self, void *arg1, s32 arg2)
+void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
 {
     s32 tag;
     s32 mask;

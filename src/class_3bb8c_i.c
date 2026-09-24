@@ -21,7 +21,7 @@ extern char *DecodeFullWidthSjis(char *dest, char *src);
  * next to Obj86ED0Methods in that header. */
 extern Obj86ED0Methods D_80086ED0;
 
-/* This class's own table getter -- func_80050BA8/func_80050C14's shared
+/* This class's own table getter -- New_Obj86ED0/Obj86ED0__Obj86ED0's shared
  * dispatch. DEFINED in src/class_3bb8c_j.c (matched round 15 by runner
  * bravo, which returns it as its own `Class86ED0Methods *` local view of
  * the same table). Returns `&D_80086ED0`; confirmed in the disassembly as
@@ -30,7 +30,7 @@ extern Obj86ED0Methods D_80086ED0;
  * in the shared header because the two units' return types differ. */
 extern Obj86ED0Methods *Get_vtable_Obj86ED0(void);
 
-void *func_80050BA8(s32 arg0, s32 arg1)
+void *New_Obj86ED0(s32 arg0, s32 arg1)
 {
     Obj86ED0 *self;
 
@@ -54,11 +54,11 @@ extern s32 strlen(char *s);
 extern u8 *D_8008AAE4;
 
 /* Defined later in this file (ROM order); forward-declared here since
- * func_80050C14 calls it, same convention as Obj865C8__EnterState2 in
+ * Obj86ED0__Obj86ED0 calls it, same convention as Obj865C8__EnterState2 in
  * src/class_39e08.c. */
-extern void func_80050CD8(Obj86ED0 *self);
+extern void Obj86ED0__ClearChildRefs(Obj86ED0 *self);
 
-void func_80050C14(Obj86ED0 *self, char *arg1, s32 arg2)
+void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
 {
     u8 *p;
     s32 count;
@@ -76,24 +76,24 @@ void func_80050C14(Obj86ED0 *self, char *arg1, s32 arg2)
     }
     self->unk14 = count;
 
-    func_80050CD8(self);
+    Obj86ED0__ClearChildRefs(self);
     self->methods->slot40(self, arg1, arg2);
 }
 
-void func_80050CD8(Obj86ED0 *self)
+void Obj86ED0__ClearChildRefs(Obj86ED0 *self)
 {
     self->unk34 = NULL;
     self->unk38 = NULL;
     self->unk48 = NULL;
 }
 
-void func_80050CE8(Obj86ED0 *self)
+void Obj86ED0__Finalize(Obj86ED0 *self)
 {
     BMemPMgrFree(self->unk28);
     Get_vtable_BasicClass()->finalize(self);
 }
 
-void func_80050D30(Obj86ED0 *self, void *arg1)
+void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -110,7 +110,7 @@ void func_80050D30(Obj86ED0 *self, void *arg1)
     }
 }
 
-void func_80050DB4(Obj86ED0 *self, void *arg1)
+void Obj86ED0__RemoveChild(Obj86ED0 *self, void *arg1)
 {
     s32 tag;
     s32 mask;
@@ -127,7 +127,7 @@ void func_80050DB4(Obj86ED0 *self, void *arg1)
     }
 }
 
-void func_80050E34(Obj86ED0 *self)
+void Obj86ED0__RemoveAllChildren(Obj86ED0 *self)
 {
     self->unk34 = NULL;
     self->unk38 = NULL;
@@ -135,7 +135,7 @@ void func_80050E34(Obj86ED0 *self)
     Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
-void func_80050E78(Obj86ED0 *self, void *arg1, s32 arg2)
+void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
 {
     s32 tag;
     s32 mask;
