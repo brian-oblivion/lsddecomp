@@ -41,7 +41,7 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     self->dreamSys = New_DreamSys(func_80043840(&req), 0, 0);
     self->unk24 = 0;
     self->dreamSys->vt->func_228(self->dreamSys, arg->unk14);
-    self->methods->slot40(self);
+    self->methods->setDayFromTickCount(self);
 }
 
 extern void func_80048CFC(s32 day, s32 unused);
@@ -76,8 +76,8 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
         task = New_StreamTaskObj(0, 0, 0, 0);
         streamName = func_800490F4(&typeCode);
         typeLookup = func_800493C8(typeCode);
-        task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
-        task->methods->slot4(task);
+        task->methods->configure(task, self->unk1C, streamName, typeLookup, 1);
+        task->methods->start(task);
         Class6D3C8__StartLoaderTask(self, D_800107C8);
     }
 }
@@ -93,7 +93,7 @@ void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
     task->methods->slot6C(task, 0);
     task->methods->slotD4(task, path, 0);
     task->methods->slot44(task, self->unk1C, 0);
-    task->methods->slot4(task);
+    task->methods->start(task);
 }
 
 extern s32 func_8004A070(s32 a0);
@@ -117,8 +117,8 @@ void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
         task = New_StreamTaskObj(0, 0, 0, 0);
         derivedValue = func_8004913C(&typeCode, 0);
         typeLookup = func_800493C8(typeCode);
-        task->methods->slot44(task, self->unk1C, derivedValue, typeLookup, 1);
-        task->methods->slot4(task);
+        task->methods->configure(task, self->unk1C, derivedValue, typeLookup, 1);
+        task->methods->start(task);
     }
 }
 
@@ -191,8 +191,8 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
         extra = func_800493E4(&buf.count, 0, 10);
         task->methods->slot6C(task, buf.count / 15);
         task->methods->slot12C(task, 0);
-        task->methods->slot44(task, self->unk1C, extra, -1, 1);
-        task->methods->slot4(task);
+        task->methods->configure(task, self->unk1C, extra, -1, 1);
+        task->methods->start(task);
     }
 }
 
@@ -278,15 +278,15 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
 
             streamTask->methods->slot12C(streamTask, 0);
             lookup = func_800493C8(chanBuf.chan);
-            streamTask->methods->slot44(streamTask, self->unk1C, groupId, lookup, 1);
-            streamTask->methods->slot4(streamTask);
+            streamTask->methods->configure(streamTask, self->unk1C, groupId, lookup, 1);
+            streamTask->methods->start(streamTask);
         }
     } else {
         task = New_TaskCoreObj(0, 0, 0);
         task->methods->slot6C(task, 10);
         task->methods->slotD4(task, groupId, 0);
         task->methods->slot44(task, self->unk1C, 0);
-        task->methods->slot4(task);
+        task->methods->start(task);
     }
 }
 
@@ -308,7 +308,7 @@ void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
         task->methods->slot12C(task, 0);
         outerValue = func_800491FC(&typeCode, 0);
         typeLookup = func_800493C8(typeCode);
-        task->methods->slot44(task, self->unk1C, outerValue, typeLookup, 1);
-        task->methods->slot4(task);
+        task->methods->configure(task, self->unk1C, outerValue, typeLookup, 1);
+        task->methods->start(task);
     }
 }

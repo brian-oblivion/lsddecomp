@@ -78,16 +78,27 @@ typedef struct Class6D3C8Methods {
     void *unk34;                                            /* +0x034 BasicClass__func_18350 */
     void *unk38;                                            /* +0x038 BasicClass__OnNotify */
     void *unk3C;                                            /* +0x03C null slot */
-    void (*slot40)(Class6D3C8 *self);                       /* +0x040 Class6D3C8__SetDayFromTickCount (ignores self) */
-    void (*slot44)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 Class6D3C8__ForwardToBaseUnlessOverridden */
+    void (*setDayFromTickCount)(Class6D3C8 *self);          /* +0x040 Class6D3C8__SetDayFromTickCount (ignores self) */
+    void (*slot44)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 Class6D3C8__ForwardToBaseUnlessOverridden.
+                                                             * NOT renamed to match its occupant: src/main.c
+                                                             * dispatches this slot by name directly
+                                                             * (D_8008AC20->methods->slot44(...)), outside this
+                                                             * unit's ownership -- see the header's top comment
+                                                             * and the round 77 proposed-field-names note. */
     void *unk48;                                            /* +0x048 func_8003B108 */
-    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C func_8003B110, first dispatched by func_800118DC (src/main.c) */
-    void (*slot50)(Class6D3C8 *self);                       /* +0x050 Class6D3C8__LoadIntroLogoSequence */
-    void (*slot54)(Class6D3C8 *self);                       /* +0x054 Class6D3C8__StartWeeklyStreamTask */
-    s32 (*slot58)(Class6D3C8 *self);                        /* +0x058 Class6D3C8__PollGraphRoomStatus */
-    void (*slot5C)(void);                                   /* +0x05C Class6D3C8__NoOpSlot5C */
-    void (*slot60)(Class6D3C8 *self);                       /* +0x060 Class6D3C8__PollStatusObj */
-    void *slot64;                                           /* +0x064 Class6D3C8__StartStreamTaskWithInit */
+    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C func_8003B110, first dispatched by func_800118DC
+                                                             * (src/main.c) -- same cross-unit-slot44 reason, not renamed. */
+    void (*loadIntroLogoSequence)(Class6D3C8 *self);        /* +0x050 Class6D3C8__LoadIntroLogoSequence */
+    void (*startWeeklyStreamTask)(Class6D3C8 *self);        /* +0x054 Class6D3C8__StartWeeklyStreamTask */
+    s32 (*pollGraphRoomStatus)(Class6D3C8 *self);           /* +0x058 Class6D3C8__PollGraphRoomStatus */
+    void (*noOpSlot5C)(void);                               /* +0x05C Class6D3C8__NoOpSlot5C */
+    void (*pollStatusObj)(Class6D3C8 *self);                /* +0x060 Class6D3C8__PollStatusObj */
+    void (*startStreamTaskWithInit)(Class6D3C8 *self);      /* +0x064 Class6D3C8__StartStreamTaskWithInit.
+                                                             * Retyped from opaque `void *` to a real callable
+                                                             * signature: no carved caller dispatches this slot
+                                                             * yet, but its occupant's own signature (this unit,
+                                                             * matched) is known, so the opaque placeholder was
+                                                             * never load-bearing. */
 } Class6D3C8Methods;
 
 /* Object size is 0x2C (from the allocator call in new_class_6d3c8). Field
@@ -129,28 +140,51 @@ extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so 
 extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
 extern void *func_80043840(void *arg); /* code_1677c's own alloc+ctor shape, uncarved (psyq_memset.s); not this unit's to write */
 
-/* A "New_X"-shaped task object allocated by New_StreamTaskObj (uncarved,
- * asm/code_2c054.s) -- 0xDC bytes, constructed through Get_vtable_StreamTaskObj's
- * slot +0x008. Only the two slots Class6D3C8__LoadIntroLogoSequence dispatches through are
+/* A "New_X"-shaped task object allocated by New_StreamTaskObj -- 0xDC bytes,
+ * constructed through Get_vtable_StreamTaskObj's slot +0x008. `New_StreamTaskObj`
+ * itself is matched, byte-exact, as `StreamTaskObj` in src/code_2c054.c (same
+ * function name, same allocator, same 0xDC size) -- this typedef stays a
+ * separate LOCAL view rather than including that unit's header, per this
+ * project's multiple-independent-local-views convention (only the slots this
+ * unit actually dispatches through are typed here). Only the four slots
+ * Class6D3C8__LoadIntroLogoSequence and its siblings dispatch through are
  * typed; everything else about this class is unknown. */
 typedef struct StreamTaskMethods {
     s32 header;                                                    /* +0x000 */
-    void (*slot4)(void *self);                                      /* +0x004 */
+    void (*start)(void *self);                                      /* +0x004: always the LAST call in every
+                                                                         use site here, after every other slot
+                                                                         (configure/setChannel/etc.) has run --
+                                                                         a fire-and-forget "go" trigger. */
     u8 pad08[0x044 - 0x008];                                          /* +0x008 .. +0x043 */
-    /* +0x044: called with (self, a fixed word from the caller's own
-     * object, a second word whose meaning varies by call site -- a
-     * filename string in Class6D3C8__LoadIntroLogoSequence, a plain derived count in
-     * Class6D3C8__StartWeeklyStreamTask, func_800493E4's return value in Class6D3C8__StartGraphRoomStreamTask --
-     * a type/format code, and a literal 1 spilled onto the stack as a
-     * 5th argument -- confirmed a real 5th argument, not a scheduling
-     * artifact, because MIPS o32 only spills to the stack once a0-a3 are
-     * all otherwise assigned; a <=4-arg call would never need the
-     * sp+0x10 store. */
-    void (*slot44)(void *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag);
+    /* +0x044, named `configure`: called with (self, a fixed word from the
+     * caller's own object, a second word whose meaning varies by call site --
+     * a filename string in Class6D3C8__LoadIntroLogoSequence, a plain derived
+     * count in Class6D3C8__StartWeeklyStreamTask, func_800493E4's return
+     * value in Class6D3C8__StartGraphRoomStreamTask -- a type/format code,
+     * and a literal 1 spilled onto the stack as a 5th argument -- confirmed a
+     * real 5th argument, not a scheduling artifact, because MIPS o32 only
+     * spills to the stack once a0-a3 are all otherwise assigned; a <=4-arg
+     * call would never need the sp+0x10 store.
+     *
+     * Tier A, cross-unit evidence: `src/code_2c054.c`'s
+     * `StreamTaskObj__Configure(self, a1, arg2, typeLookup, flag)` has this
+     * EXACT parameter list, for the exact class this typedef is a local view
+     * of (both go through `New_StreamTaskObj`). */
+    void (*configure)(void *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag);
     u8 pad48[0x06C - 0x048];                                          /* +0x048 .. +0x06B */
-    void (*slot6C)(void *self, s32 a1);                                 /* +0x06C */
+    void (*slot6C)(void *self, s32 a1);                                 /* +0x06C: NOT renamed. Weak correlation
+                                                                            only -- `code_2c054.c`'s
+                                                                            `StreamTaskObj__SetUnk40(self, a1)` sets
+                                                                            self->unk40 = (a1 >= 0) ? a1*15 : a1,
+                                                                            and this unit's only two call sites pass
+                                                                            either 0 or `buf.count / 15` -- a
+                                                                            round-trip that fits, but is not proof
+                                                                            of slot alignment across the
+                                                                            TaskCore/StreamTaskObj override chain. */
     u8 pad70[0x12C - 0x070];                                              /* +0x070 .. +0x12B */
-    void (*slot12C)(void *self, s32 a1);                                    /* +0x12C */
+    void (*slot12C)(void *self, s32 a1);                                    /* +0x12C: both call sites here pass a
+                                                                                literal 0 -- not enough evidence for
+                                                                                a name. */
 } StreamTaskMethods;
 
 typedef struct StreamTask {
@@ -174,15 +208,20 @@ extern const char D_800107C8[]; /* "ETC\OSDLOGO.TIM" */
  * order) is called by Class6D3C8__LoadIntroLogoSequence, which comes first in the file. */
 void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path);
 
-/* A second "New_X"-shaped task object, allocated by New_TaskCoreObj
- * (uncarved, asm/code_2c054.s) -- 0xA4 bytes, constructed through
- * Get_vtable_TaskCore's slot +0x008. Different class from StreamTaskMethods
- * above (different allocator, different slot signatures at the same
- * offsets), used by Class6D3C8__StartLoaderTask to register a named resource with a
+/* A second "New_X"-shaped task object, allocated by New_TaskCoreObj -- 0xA4
+ * bytes, constructed through Get_vtable_TaskCore's slot +0x008. `TaskCoreObj`
+ * is matched in src/code_2c054.c (a separate real class, its own base under
+ * StreamTaskObj in that unit's inheritance chain -- see that file's own
+ * `TaskCoreObj__TaskCoreObj`). Different class from StreamTaskMethods above
+ * (different allocator, different slot signatures at the same offsets), used
+ * by Class6D3C8__StartLoaderTask to register a named resource with a
  * completion callback. */
 typedef struct LoaderTaskMethods {
     s32 header;                                              /* +0x000 */
-    void (*slot4)(void *self);                                 /* +0x004 */
+    void (*start)(void *self);                                 /* +0x004, same fire-and-forget "go" trigger
+                                                                    shape as StreamTaskMethods::start above --
+                                                                    always the last call at this unit's one
+                                                                    LoaderTask use site (Class6D3C8__StartLoaderTask). */
     u8 pad08[0x044 - 0x008];                                     /* +0x008 .. +0x043 */
     /* +0x044: RETURNS s32, not void. This slot's occupant is TaskCoreObj__func_8003C1DC
      * (matched in code_2c054), and its own body loads self->unk38 into $v0
