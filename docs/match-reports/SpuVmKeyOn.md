@@ -1,4 +1,4 @@
-# StartNote -- STALL, SDK-OWNED (libsnd SpuVmKeyOn, round 73): 27 words LONG (414/387 rebuilt round 73; previously recorded 402), 14/387 raw word-match, first diff at vram 0x8002FAC4 (function entry, register-save set / frame size)
+# SpuVmKeyOn (was StartNote) -- STALL, SDK-OWNED (libsnd/vmanager, identified round 73, renamed round 76): 27 words LONG (414/387 rebuilt round 73; previously recorded 402), 14/387 raw word-match, first diff at vram 0x8002FAC4 (function entry, register-save set / frame size)
 
 > Round 76 (bravo, track 2): renamed `StartNote` -> `SpuVmKeyOn` on 2026-09-24
 > (tools/rename.py). Evidence re-confirmed: `sdkname.py` still gives shape
