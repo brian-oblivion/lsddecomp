@@ -1121,67 +1121,47 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 	return true;
 }
 
-#if 0
-/* Best-reached body, 57/88 words, no address drift -- see
-   docs/match-reports/DreamSys__TryStaircaseLink.md for the residue analysis. Restored to
-   INCLUDE_ASM below per project rule (no score short of byte-exact stays in
-   src/). Re-verified fresh round 39 (2026-09-14, runner echo); one new
-   reshape tried (hoisting `&this->linkCoordinates` into a function-top local
-   named `coords`, on the theory that computing it once outside both branches
-   might suppress the `fill_eager_delay_slots` duplication into the branch
-   target) -- regressed hard (18/88, 135807 bytes of whole-image drift, an
-   extra callee-saved register), confirming the same "cast/hoist to a
-   function-scope local costs a register" class already documented for
-   `DreamSys__InstanceEffectsOnJournal`. Reverted immediately. */
+/* MATCHED round 75 (alpha): the body is one nested `if` chain, not a run of
+   early `return false;` guards. Each early return leaves a CODE_LABEL after
+   its jump, and a label between the entry `move s0,a0` and the first
+   `staircaseTickFn(this)` call stops jump2's find_equiv_reg from seeing
+   that $a0 still holds `this` -- so the redundant `move a0,s0` survives,
+   $a0 goes dead on that path, and reorg steals the staircase arm's
+   `addiu a0,s0,0x16c` into the `beqz` delay slot. Nested, the move is
+   deleted and both slots stay `nop`, as retail. The 10-byte copy into
+   staircaseGridPos/staircaseOrigin is ONE whole-PlayerSpawnPoint copy
+   (load-all-then-store-all), hence the local cast. */
 bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 {
-	s32 result;
 	s32 local[4];
 
-	if (this->pendingLinkType != 0) {
-		return false;
+	if (this->pendingLinkType == 0) {
+		if (this->staircaseTickFn != 0) {
+			if (this->staircaseTickFn(this)) {
+				this->staircaseActive = 0;
+				this->staircaseTickFn = 0;
+				this->staircaseMoveGate = 0;
+				if (this->moveMode == 4) {
+					this->vt->DreamSys__RestorePreviousMoveMode(this);
+				}
+			}
+		} else if (Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
+			Class6B5CC__GetRotationDegrees(this, local);
+			if (DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local)
+			    && this->moveCommandLatch != 0) {
+				*(PlayerSpawnPoint *)&this->staircaseGridPos = *currentPos;
+				this->staircaseActive = 1;
+				this->staircaseMoveGate = 1;
+				this->staircaseFrame = 0;
+				this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
+				this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->enterRotation);
+				this->staircaseTickFn(this);
+			}
+		}
 	}
-
-	if (this->staircaseTickFn == 0) {
-		goto staircase;
-	}
-	if (!this->staircaseTickFn(this)) {
-		return false;
-	}
-	this->staircaseActive = 0;
-	this->staircaseTickFn = 0;
-	this->staircaseMoveGate = 0;
-	if (this->moveMode != 4) {
-		return false;
-	}
-	this->vt->DreamSys__RestorePreviousMoveMode(this);
-	return false;
-
-staircase:
-	result = Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage);
-	if (result < 0) {
-		return false;
-	}
-	Class6B5CC__GetRotationDegrees(this, local);
-	if (!DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local)) {
-		return false;
-	}
-	if (this->moveCommandLatch == 0) {
-		return false;
-	}
-
-	this->staircaseGridPos = *(PlayerSpawnGridPos *)currentPos;
-	this->staircaseOrigin = currentPos->position;
-	this->staircaseActive = 1;
-	this->staircaseMoveGate = 1;
-	this->staircaseFrame = 0;
-	this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
-	this->vt->Class6B5CC__UpdateRotation(this, 1, (void *)this->enterRotation);
-	this->staircaseTickFn(this);
 	return false;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__TryStaircaseLink);
+
 
 s32 DreamSys__TickStaircaseCase0(DreamSys *this)
 {
@@ -1319,20 +1299,11 @@ void DreamSys__ProcessChunkChange(DreamSys *this, void *entity, s32 effect)
 	}
 }
 
-#if 0
-/* Best-reached body, 1 word short (109/110 instructions), 106/110 words
-   truly correct after asm-differ realignment (see the match report for why
-   funcdiff's own raw count reads far lower) -- see
-   docs/match-reports/DreamSys__InstanceEffectsOnJournal.md for the residue
-   analysis. Restored to INCLUDE_ASM below per project rule (no score short
-   of byte-exact stays in src/). Re-verified fresh round 37 (2026-09-12,
-   runner charlie). Re-verified fresh again round 39 (2026-09-14, runner
-   echo); two new reshapes tried on the two established residues (an
-   uncast `void *e = entity;` alias local at case 4 -- a fifth form on the
-   already-closed "cast/typing axis", byte-identical; and a named `s32 idx
-   = effect; switch (idx)` for the switch-index register choice -- also
-   byte-identical). Both axes remain confirmed compiler-level, invisible to
-   source spelling. */
+/* MATCHED round 75 (alpha): case 4's +0x38 method takes `effect` as a third
+   argument. Forwarding it keeps `effect` live in $a2 past the switch, so the
+   bounds-check index gets its own register ($v1) instead of being computed
+   in place on $a2 -- the "switch-index register" and "case-4 delay slot"
+   residues were both this missing argument. */
 void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect)
 {
 	if (this->pendingLinkType != 0) {
@@ -1341,7 +1312,7 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
 
 	switch (effect) {
 	case 4:
-		((DreamSysEntityObj *)entity)->methods->slot0x38(entity, this);
+		((DreamSysEntityObj *)entity)->methods->slot0x38(entity, this, effect);
 		break;
 	case 5:
 	case 6:
@@ -1381,8 +1352,6 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
 		break;
 	}
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/DreamSys", DreamSys__InstanceEffectsOnJournal);
 
 void DreamSys__GetPreviousDayMood(DreamSys *this, MoodGraphPoint *target, bool unknown)
 {
