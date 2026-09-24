@@ -305,12 +305,10 @@ void func_8001A224(void *arg0, void *arg1, s32 kind)
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 53/70 words, length exact. Residue: retail's
- * `addiu $sp,$sp,-0x20` frame adjustment is scheduled into the loop-skip
- * branch's delay slot (word 17) instead of the ordinary prologue position
- * (word 0); a pure placement difference with no data dependency, not
- * register identity (docs/match-reports/func_8001A268.md). Hand-derived. */
+/* Leaf with an unused 0x20 frame (the Vec2s16 copies' temporary). Retail's
+ * `addiu $sp,$sp,-0x20` sits in the loop-skip branch's delay slot because
+ * yp is set only inside the guard: nothing else before the branch is
+ * movable, so reorg takes the prologue's sp adjust (round 75). */
 /* A 2-s16 pair (alignment 2, not 4) -- forces the unaligned lwl/lwr whole-
  * struct copy retail uses for prim->0x60 -> prim->0x74 -> prim->0x70 even
  * though those particular offsets are accidentally 4-aligned; the compiler
@@ -329,22 +327,26 @@ void func_8001A268(void *arg0, s32 count)
     *(Vec2s16_268 *)(self + 0x70) = *(Vec2s16_268 *)(self + 0x74);
 
     xp = (s16 *)(self + 0x64);
-    yp = (s16 *)(self + 0x66);
-    end = (s16 *)(self + 0x5C + (count << 2));
+    end = (s16 *)(self + (count << 2) + 0x5C);
 
-    for (; xp < end; xp += 2, yp += 2) {
-        if (*xp < *(s16 *)(self + 0x70)) {
-            *(s16 *)(self + 0x70) = *xp;
-        }
-        if (*yp < *(s16 *)(self + 0x72)) {
-            *(s16 *)(self + 0x72) = *yp;
-        }
-        if (*(s16 *)(self + 0x74) < *xp) {
-            *(s16 *)(self + 0x74) = *xp;
-        }
-        if (*(s16 *)(self + 0x76) < *yp) {
-            *(s16 *)(self + 0x76) = *yp;
-        }
+    if (xp < end) {
+        yp = (s16 *)(self + 0x66);
+        do {
+            if (*xp < *(s16 *)(self + 0x70)) {
+                *(s16 *)(self + 0x70) = *xp;
+            }
+            if (*yp < *(s16 *)(self + 0x72)) {
+                *(s16 *)(self + 0x72) = *yp;
+            }
+            if (*(s16 *)(self + 0x74) < *xp) {
+                *(s16 *)(self + 0x74) = *xp;
+            }
+            if (*(s16 *)(self + 0x76) < *yp) {
+                *(s16 *)(self + 0x76) = *yp;
+            }
+            xp += 2;
+            yp += 2;
+        } while (xp < end);
     }
 
     if (*(s16 *)(self + 0x74) - *(s16 *)(self + 0x70) >= 0x101) {
@@ -354,9 +356,6 @@ void func_8001A268(void *arg0, s32 count)
         *(s32 *)(self + 0x78) = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001A268);
-#endif
 
 extern s32 D_8008A824;
 extern s32 D_8008A828;
