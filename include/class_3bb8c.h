@@ -2968,7 +2968,7 @@ extern Class86F88Methods gClass86F88Methods;
  * its own FIRST dispatch (the element at the "old" index) -- immediately
  * adjacent rodata to D_8008AB10 below (4 bytes before it), never
  * dereferenced by this unit's own code, only its address taken. */
-extern s32 D_8008AB0C;
+extern s32 gClass86F88RowColor;
 /* Class86F88__SetView's fixed 2nd argument to Class86F88ElemMethods::slotB8 --
  * a 4-byte rodata value (0x00008080), never dereferenced by this unit's
  * own code, only its address taken. Also Class86F88__StepCursorInView's own SECOND

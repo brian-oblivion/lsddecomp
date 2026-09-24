@@ -322,7 +322,7 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
         Class86F88__FormatRowText(self, buf, i, arg3, (char *)arg4);
         *p = (Class86F88Elem *)New_Obj6EAC0((void *)arg2, 0x1A, buf);
         (*p)->methods->slot4C(*p, arg1, &local);
-        (*p)->methods->slotB8(*p, &D_8008AB0C);
+        (*p)->methods->slotB8(*p, &gClass86F88RowColor);
         local.b += 0xA;
         p++;
     }
@@ -446,7 +446,7 @@ void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
     }
     idx = self->unk28 - self->unk20;
     p = &self->unk40[idx];
-    (*p)->methods->slotB8(*p, &D_8008AB0C);
+    (*p)->methods->slotB8(*p, &gClass86F88RowColor);
     if (dir) {
         self->unk28++;
         p++;
