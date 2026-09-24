@@ -1,15 +1,4 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
- *
  * code_179d8_f_b -- the TAIL half of the old code_179d8_f slice, split off in
  * round 34 (2026-09-12) when Sony's `libsnd/stop.o` was linked into the middle
  * of it. File 0x272A8..0x272C8, vram 0x80036AA8..0x80036AC8: ONE function.
@@ -31,10 +20,6 @@
  * rodata slot list names no `.rodata, code_179d8_f` line at all. So unlike
  * round 33's code_179d8_c_b there was nothing to move, and a link failure of
  * the form `undefined reference to '.L8003....'` would mean something else.
- *
- * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
- * re-implementing the greps and never for `addiu_at` (resolved round 21).
- * This unit's one function is matched, so there is nothing queued here.
  *
  * Declarations: keep anything that encodes THIS unit's reading next to the
  * code, in this file. Do not create a shared code_179d8*.h -- the sibling
