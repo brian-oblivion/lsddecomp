@@ -2853,84 +2853,87 @@ struct Obj86ED0 {
  * ------------------------------------------------------------------- */
 
 /*
- * class_3bb8c_k's own view: the class whose method table is gClass86F88Methods
- * (39 slots, tools/classtable.py gClass86F88Methods -- header word 0x20). Carved
- * round 15; this unit is the first to write any of its methods. Only the
- * slots/fields this unit's functions actually touch are typed; the rest
- * stays opaque. `Class86F88__CreateRows`/`Class86F88__HandleInputCode` are two more of this
- * class's own methods (toolchain-blocked, stub reports filed, still
- * INCLUDE_ASM) -- not reflected here since nothing in this unit's C reads
- * through them yet.
+ * class_3bb8c_k's own view of Class86F88, the class whose method table is
+ * gClass86F88Methods (39 slots, `tools/classtable.py gClass86F88Methods`,
+ * header word 0x20; class_3bb8c_j holds its ctor/dtor/child/resource
+ * methods under its own local view `Class86F88_3bb8c_j`). Round 75 naming
+ * pass: a scrolling list selector. It shows up to 4 rows of its item
+ * strings (26 characters each, one `New_Obj6EAC0` text object per row),
+ * with a highlighted cursor row, vertical cursor movement that scrolls the
+ * window at its edges, and a horizontal column offset into every string.
+ * Confirm/cancel set `result` (2/3), and the parent reads the chosen item
+ * back through slot +0x09C (Class86F88__GetCursorIndex; the one caller,
+ * TaskObjF__OnItemSelected in class_3bb8c_g, stores it as `selectedItem`).
+ * Only the slots/fields this unit's functions touch are typed.
  */
 typedef struct Class86F88Methods Class86F88Methods;
 typedef struct Class86F88 Class86F88;
 typedef struct Class86F88ElemMethods Class86F88ElemMethods;
 typedef struct Class86F88Elem Class86F88Elem;
+typedef struct Class86F88TargetMethods Class86F88TargetMethods;
+typedef struct Class86F88Target Class86F88Target;
 
+/* Slot names are the method each slot holds in gClass86F88Methods. */
 struct Class86F88Methods {
     u8 pad000[0x014];
-    /* +0x014, Class86F88__SetState's own first dispatch:
-     * `self->methods->slot14(self, self->unk34)`. */
+    /* +0x014 Class86F88__RemoveChild (class_3bb8c_j). Class86F88__SetState
+     * passes `inputSource`. */
     void (*removeChild)(Class86F88 *self, s32 arg1);
     u8 pad018[0x030 - 0x018];
-    /* +0x030, Class86F88__SetState's `state == 4` path:
-     * `self->methods->slot30(self, self->unk2C)`. */
+    /* +0x030 BasicClass__NotifyParents. Class86F88__SetState(4) passes
+     * `result`. */
     void (*notifyParents)(Class86F88 *self, s32 arg1);
     u8 pad034[0x048 - 0x034];
-    void (*releaseResources)(Class86F88 *self); /* +0x048, Class86F88__SetState's own 2nd dispatch, self only */
+    void (*releaseResources)(Class86F88 *self); /* +0x048 Class86F88__ReleaseResources (class_3bb8c_j) */
     u8 pad04C[0x054 - 0x04C];
-    /* +0x054 = Class86F88__SetState itself (this unit, matched). Dispatched by
-     * Class86F88__TickClosing as `self->methods->slot54(self, 4)`. */
+    /* +0x054 Class86F88__SetState. Dispatched by Class86F88__TickClosing
+     * as `(self, 4)` and by Class86F88__HandleInputCode as `(self, 2)` and
+     * `(self, 3)`. */
     void (*setState)(Class86F88 *self, s32 state);
     u8 pad058[0x060 - 0x058];
-    /* +0x060, Class86F88__StepCursorInView/Class86F88__RefreshRows's own trailing dispatch, both
-     * conditional on a caller-supplied flag, both `(self, 0)`. */
+    /* +0x060 Class86F88__ForwardToTarget. Class86F88__StepCursorInView and
+     * Class86F88__RefreshRows pass 0, Class86F88__HandleInputCode 0x10. */
     void (*forwardToTarget)(Class86F88 *self, s32 arg1);
-    u8 pad064[0x080 - 0x064];
-    /* +0x080 = Class86F88__ScrollLeft itself (this unit, matched), whose own body
-     * ignores every argument past `self` -- the 3-argument shape below is
-     * what Class86F88__ForwardToTarget's call site (dispatching through a DIFFERENT
-     * instance's slot80, `self->unk3C`) actually passes. Per-call-site
-     * arity is this project's established convention; it does not
-     * contradict Class86F88__ScrollLeft's own narrower body. */
-    void (*slot80)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
-    u8 pad084[0x094 - 0x084];
-    /* +0x094 = Class86F88__RefreshRows itself (this unit, MATCHED). Signature fixed
-     * by three independent callers in this
-     * unit (Class86F88__ScrollRight, Class86F88__ScrollLeft, Class86F88__CursorUp, Class86F88__CursorDown),
-     * all of which pass exactly (self, arg1, arg2, arg3, arg4). */
+    u8 pad064[0x07C - 0x064];
+    /* +0x07C..+0x088, Class86F88__HandleInputCode's four self-only
+     * dispatches (added round 75, when that function was retyped from
+     * class_3bb8c_k's ObjM view to this class: its table slot is +0x05C
+     * here, and these four offsets hold exactly these methods). */
+    void (*scrollRight)(Class86F88 *self);      /* +0x07C Class86F88__ScrollRight */
+    void (*scrollLeft)(Class86F88 *self);       /* +0x080 Class86F88__ScrollLeft */
+    void (*cursorUp)(Class86F88 *self);         /* +0x084 Class86F88__CursorUp */
+    void (*cursorDown)(Class86F88 *self);       /* +0x088 Class86F88__CursorDown */
+    u8 pad08C[0x094 - 0x08C];
+    /* +0x094 Class86F88__RefreshRows: (self, topIndex, column, cursorIndex,
+     * highlight). Callers: ScrollRight, ScrollLeft, CursorUp, CursorDown. */
     void (*refreshRows)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
-    /* +0x098, occupant not in this unit's queue. Called by
-     * Class86F88__CursorUp/Class86F88__CursorDown with (self, arg1, arg2, arg3). */
+    /* +0x098 Class86F88__StepCursorInView: (self, dir, notify). Callers:
+     * CursorUp (dir 0), CursorDown (dir 1); the 4th argument is forwarded
+     * from their own ignored arg3. */
     void (*stepCursorInView)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
 };
 
 /*
- * Each element of Class86F88::unk40[] -- resolved from Class86F88__SetView's own
- * dispatch, `elem->methods->slotB8(elem, &gClass86F88CursorColor)`. The `+0x004`
- * "release" slot is the same shared base-class implementation seen at
- * that offset in every vtable this project has resolved so far (compare
- * `GenericReleaseMethods_3bb8c_d` above) -- Class86F88__ReleaseRows dispatches
- * through it on each element before clearing the slot.
+ * Each element of Class86F88::rows[] -- a `New_Obj6EAC0` text object
+ * (derived table D_8006EB90, `tools/classtable.py D_8006EB90`: +0x04C
+ * Obj6EAC0__LayoutChildrenWithGap, +0x0B8 Obj6EAC0__PropagateColor, +0x0CC
+ * Obj6EAC0__SetText). `release` at +0x004 is BasicClass__Release.
  */
 struct Class86F88ElemMethods {
     u8 pad000[0x004];
     void (*release)(Class86F88Elem *self); /* +0x004 */
     u8 pad008[0x04C - 0x008];
-    /* +0x04C, round 45's Class86F88__CreateRows -- called once per freshly-created
-     * element right after `New_Obj6EAC0` returns it, before the same
-     * element's own `slotB8` call. `arg2` points at a 2-word stack-local
-     * (`gClass86F88RowOriginX`'s value, then a running `gClass86F88RowOriginY`-seeded
-     * accumulator incremented by 0xA per loop iteration) -- kept opaque
-     * `void *` here since only that one call site gives it any shape;
-     * see `Elem4CArg_3bb8c_k` in src/class_3bb8c_k.c for the concrete
-     * local reading. */
+    /* +0x04C, Class86F88__CreateRows: (elem, parent, &pos), `pos` a 2-word
+     * stack-local {x, y} (Pos_3bb8c_k in src/class_3bb8c_k.c), kept
+     * opaque here. */
     void (*layout)(Class86F88Elem *self, s32 arg1, void *arg2); /* +0x04C */
     u8 pad050[0x0B8 - 0x050];
-    void (*setColor)(Class86F88Elem *self, void *arg1); /* +0x0B8, Class86F88__SetView */
+    /* +0x0B8: `&gClass86F88RowColor` or `&gClass86F88CursorColor`, both
+     * 3-byte RGB values in sdata. */
+    void (*setColor)(Class86F88Elem *self, void *arg1);
     u8 pad0BC[0x0CC - 0x0BC];
-    /* +0x0CC, Class86F88__RefreshRows: called once per active window element with a
-     * freshly-formatted (Class86F88__FormatRowText) fixed-width text buffer. */
+    /* +0x0CC, Class86F88__RefreshRows: one fixed-width row string from
+     * Class86F88__FormatRowText. */
     void (*setText)(Class86F88Elem *self, char *arg1);
 };
 
@@ -2938,29 +2941,46 @@ struct Class86F88Elem {
     Class86F88ElemMethods *methods; /* +0x000 */
 };
 
+/*
+ * Class86F88::target's pointee, added round 75. Set by
+ * Class86F88__AddChildAndSetState (class_3bb8c_j) from its arg3, which
+ * TaskObjF__AttachChildA/B (class_3bb8c_g) pass as that object's `childC`.
+ * Its +0x080 is called as (target, code, 0x60, 0x60) here and as
+ * (childC, code, 0x7F, 0x7F) by TaskObjF__SetChildFlag8. Before round 75
+ * this field was typed `Class86F88 *` ("another instance of this same
+ * class"); nothing supports that, and Class86F88's own +0x080 is
+ * Class86F88__ScrollLeft, which takes no arguments.
+ */
+struct Class86F88TargetMethods {
+    u8 pad000[0x080];
+    void (*slot80)(Class86F88Target *self, s32 arg1, s32 arg2, s32 arg3); /* +0x080 */
+};
+
+struct Class86F88Target {
+    Class86F88TargetMethods *methods; /* +0x000 */
+};
+
 struct Class86F88 {
     Class86F88Methods *methods;    /* +0x000 */
     u8 pad004[0x010 - 0x004];
-    s32 itemCount;                     /* +0x010, Class86F88__ReleaseRows/Class86F88__RefreshRows: element count, clamped to a max of 4 */
-    s32 maxTextLen;                     /* +0x014, Class86F88__ScrollRight: upper bound compared against unk24+0x1A */
-    /* +0x018, Class86F88__FormatRowText: a table of BYTE OFFSETS (s32 each), added to
-     * that function's own `base` (char *) argument to form a source
-     * pointer -- `self->unk18[idx]` is never scaled by anything other than
-     * its own natural s32 stride, and the resulting sum is used as a plain
-     * byte address (strlen/strncpy-style calls), so `base` is a byte
-     * pointer and this is an OFFSET table, not a pointer table. */
-    s32 *texts;                    /* +0x018, Class86F88__FormatRowText */
+    s32 itemCount;                 /* +0x010, number of item strings (Class86F88__Class86F88 counts its NULL-terminated list); rows shown = min(itemCount, 4) */
+    s32 maxTextLen;                /* +0x014, longest item length (Class86F88__Class86F88); bounds `column` in Class86F88__ScrollRight */
+    /* +0x018, the item strings (Class86F88__Class86F88 allocates one
+     * buffer per item). Typed `s32 *` because Class86F88__FormatRowText's
+     * matched body adds `column` (passed as a `char *`) to an element; the
+     * sum is the same either way round. */
+    s32 *texts;
     u8 pad01C[0x020 - 0x01C];
-    s32 topIndex;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/Class86F88__ScrollRight/Class86F88__ScrollLeft/Class86F88__CursorUp/Class86F88__CursorDown/Class86F88__SetView */
-    s32 column;                     /* +0x024, ditto */
-    s32 cursorIndex;                     /* +0x028, ditto; also Class86F88__GetCursorIndex's own return value */
-    s32 result;                     /* +0x02C, Class86F88__TickClosing/Class86F88__SetState */
-    s32 closeTicks;                     /* +0x030, Class86F88__TickClosing/Class86F88__SetState */
-    s32 inputSource;                     /* +0x034, Class86F88__SetState's slot14 argument */
+    s32 topIndex;                  /* +0x020, item index shown in row 0 */
+    s32 column;                    /* +0x024, character offset into every item string (horizontal scroll) */
+    s32 cursorIndex;               /* +0x028, highlighted item index; Class86F88__GetCursorIndex returns it */
+    s32 result;                    /* +0x02C, Class86F88__SetState: 2 or 3 when closing, passed to notifyParents by state 4 */
+    s32 closeTicks;                /* +0x030, Class86F88__TickClosing's call counter; cleared by Class86F88__SetState */
+    s32 inputSource;               /* +0x034, the cached tag-2 child (Class86F88__AddChild, class_3bb8c_j), removed by Class86F88__SetState */
     u8 pad038[0x03C - 0x038];
-    Class86F88 *target;              /* +0x03C, Class86F88__ForwardToTarget: another instance of this same class */
-    Class86F88Elem *rows[4];       /* +0x040, Class86F88__ReleaseRows/Class86F88__RefreshRows/Class86F88__SetView */
-    s32 resource;                      /* +0x050, enable flag guarding most of this class's dispatch */
+    Class86F88Target *target;      /* +0x03C, Class86F88__ForwardToTarget */
+    Class86F88Elem *rows[4];       /* +0x040, the visible rows, index = item - topIndex */
+    s32 resource;                  /* +0x050, the handle Class86F88__LoadResources creates; non-zero guards every row operation */
 };
 
 extern Class86F88Methods gClass86F88Methods;

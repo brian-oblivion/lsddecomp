@@ -157,37 +157,37 @@ void Class86F88__TickClosing(Class86F88 *self)
     self->methods->setState(self, 4);
 }
 
-void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
+void Class86F88__HandleInputCode(Class86F88 *self, void *source, s32 code) {
     switch (code) {
     case 25:
-        self->methods->slot60(self, 0x10);
-        self->methods->slot54(self, 2);
+        self->methods->forwardToTarget(self, 0x10);
+        self->methods->setState(self, 2);
         break;
     case 23:
-        self->methods->slot60(self, 0x10);
-        self->methods->slot54(self, 3);
+        self->methods->forwardToTarget(self, 0x10);
+        self->methods->setState(self, 3);
         break;
     case 5:
-        self->methods->slot7C(self);
+        self->methods->scrollRight(self);
         break;
     case 4:
-        self->methods->slot80(self);
+        self->methods->scrollLeft(self);
         break;
     case 18:
-        self->methods->slot84(self);
+        self->methods->cursorUp(self);
         break;
     case 19:
-        self->methods->slot88(self);
+        self->methods->cursorDown(self);
         break;
     }
 }
 
-void Class86F88__ForwardToTarget(Class86F88 *self, s32 arg1)
+void Class86F88__ForwardToTarget(Class86F88 *self, s32 code)
 {
-    Class86F88 *other = self->target;
+    Class86F88Target *target = self->target;
 
-    if (other != NULL) {
-        other->methods->slot80(other, arg1, 0x60, 0x60);
+    if (target != NULL) {
+        target->methods->slot80(target, code, 0x60, 0x60);
     }
 }
 
