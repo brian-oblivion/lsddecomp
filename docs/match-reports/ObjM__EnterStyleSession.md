@@ -1,4 +1,6 @@
-# func_80053764 -- MATCHED
+# ObjM__EnterStyleSession -- MATCHED
+
+> Renamed from `func_80053764` on 2026-09-24 (tools/rename.py). Address 0x80053764.
 
 Unit: `src/class_3bb8c_l.c`. Runner: echo, round 16.
 
@@ -8,13 +10,13 @@ verified).
 ## Signature
 
 ```c
-void func_80053764(Obj87034_3bb8c_l *self);
+void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self);
 ```
 
 ## Final C
 
 ```c
-void func_80053764(Obj87034_3bb8c_l *self) {
+void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     DreamSysMethods_3bb8c_l *m;
     DreamSysMethods_3bb8c_l *m2;
     DreamSysObj_3bb8c_l *unk18;
@@ -98,7 +100,7 @@ before its full definition is in scope, no typedef required.
 
 `self->unk3C->methods->slotF0(self->unk3C, &local10, -1)` here matches the
 existing declaration exactly (`s32(void*, s32*, s32)`, established -- if
-unmatched -- by the `func_80053ACC` stall this same round). But this
+unmatched -- by the `ObjM__EnterState4` stall this same round). But this
 function ALSO dispatches `slotF0` a second time, on a *different* instance
 (`newObj`, the `slotAC` return value): `newObj->methods->slotF0(newObj,
 (s32*)ret, (ret != 0) ? 3 : 0)`, where the 2nd argument is a plain `s32`
@@ -112,7 +114,7 @@ cast documents the mismatch rather than hiding it.
 
 Two separate spots in this function needed the identical fix, and it is
 the same one CLAUDE.md's stalled-and-rescued `CopyPolyVtx3` guidance and
-this round's `func_80053BE8` report both independently rediscovered://
+this round's `ObjM__EnterState5` report both independently rediscovered://
 **GCC 2.6.3 -O2 hoists a load that both arms of an if/else need in common
 to BEFORE the branch, but only when the source hands it a name to hoist.**
 
@@ -132,7 +134,7 @@ to BEFORE the branch, but only when the source hands it a name to hoist.**
    (`if (== 1) {A} else {B}`) put `A` as the fallthrough instead (GCC's
    ordinary if/else lowering places the `if`-arm as the fallthrough and the
    `else`-arm as the branch target) -- the SAME polarity lesson as
-   `func_80053BE8` in this unit, this round. Inverting the source condition
+   `ObjM__EnterState5` in this unit, this round. Inverting the source condition
    and swapping the two arms (`if (!= 1) {B} else {A}`) fixed it.
 3. The identical hoist was needed AGAIN for `newObj->methods->slotD4(...)`
    after the `ret == 0` branch -- but reusing the SAME local (`m`) for both
@@ -156,3 +158,13 @@ hoist like this fixes one divergence but a second, later, structurally
 IDENTICAL divergence remains, don't reuse the same local for both -- their
 live ranges can interact and change which physical register GCC 2.6.3
 picks for the second one. Give each hoisted value its own name.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053764` | `ObjM__EnterStyleSession` | B | see below |
+
+**Evidence.** vtable slot +0x088. The largest setup routine in the unit: configures `self->target`, then spawns a NEW `DreamSysObj_3bb8c_l` via `self->unk18`'s own `slotAC` and dispatches it via self's `slot10` -- a heavier "begin" step than `ObjM__SetupSceneStyle`, consistent with the `EnterState`-family naming used for the class's other heavy setup slots.

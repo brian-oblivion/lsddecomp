@@ -1,38 +1,26 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
- *
  * class_3bb8c_l -- sixth carved slice of the class_3bb8c block
- * (0x435E0..0x44518, vram 0x80052DE0..0x80053D18), 20 functions.
- * Carved round 15.
+ * (0x435E0..0x44518, vram 0x80052DE0..0x80053D18), 20 functions, ALL
+ * MATCHED. Carved round 15; fully matched by round 45.
  *
- * Blocker profile. The carve-time census was a THREE-grep screen and one of
- * its three blockers is DEAD: `addiu_at` was RESOLVED in round 21 (maspsx
- * `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
- * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   func_800534C8  gp_rel        -- MATCHED round 45 (122/122 words). The
- *                  `gp_rel` blocker itself was RESOLVED round 42; see the
- *                  file-top banner above.
- *   func_80052F10  was addiu-$at ONLY -- NOT BLOCKED. 137w.
- *                  ROUND 32: MATCHED, 137/137.
- *   func_80053984  was addiu-$at ONLY -- NOT BLOCKED. 82w.
- *                  ROUND 32: MATCHED, 82/82, first attempt.
- *                  It OWNS jtbl_8001174C; the rodata slot at 0x1F4C is
- *                  attached to this unit for that reason, and a
- *                  `%lo(jtbl_*)` load is ordinary matchable code now.
- * The previous version of this comment ended "All three have stub reports;
- * do not attempt them" -- a stale DIRECTIVE, which is worse than a stale
- * count. Two of the three are free ground.
- * The other 17 are clean (func_80052DE0 and func_800534C0 are bare
- * `jr $ra; nop` stubs splat generated itself, so 15 are real work).
+ * This slice is entirely `ObjM`'s own methods -- confirmed, not guessed:
+ * `tools/classtable.py 0x80087034` resolves the class's vtable directly to
+ * `ObjM__ObjM` (ctor) and `ObjM__Dtor` (dtor), the SAME class sibling unit
+ * class_3bb8c_m independently reached and named. The two units are NOT
+ * unified (round-13 struct-edit hazard; see the HEAD NOTE above
+ * `Obj87034_3bb8c_l`'s definition in include/class_3bb8c.h) -- this unit
+ * keeps its own local struct view, `Obj87034_3bb8c_l`, but round 78 named
+ * every function here with the confirmed `ObjM__` prefix to match.
+ *
+ * Mechanically this is the class's target/child attach-detach pair
+ * (`ObjM__AttachTarget`/`ObjM__DetachTarget`), its style/scene/world setup
+ * and teardown routines, an event dispatcher, and three of the class's
+ * `EnterStateN` handlers (`ObjM__EnterState4/5/6`) -- continuing, on the
+ * same `phase` field, the numbering class_3bb8c_m already established for
+ * `ObjM__EnterState7/8/A`. `ObjM__HandleStateCode` is the state-transition
+ * dispatcher that routes codes 0xA..0x11 onto those `EnterStateN` slots
+ * one-to-one (owns `jtbl_8001174C`). Two slots (`ObjM__NoOpSlot40`,
+ * `ObjM__NoOpSlot7C`) are splat-generated `jr $ra; nop` stubs, not work.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
@@ -54,22 +42,22 @@
  * whole-image SHA1 re-verified after. */
 typedef struct BaseMethods87034_3bb8c_l {
     u8 pad00[0x044];
-    s32 (*slot44)(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2); /* +0x044, func_80052DE8 */
-    void (*slot48)(Obj87034_3bb8c_l *self); /* +0x048, func_80052EBC */
+    s32 (*slot44)(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2); /* +0x044, ObjM__AttachTarget */
+    void (*slot48)(Obj87034_3bb8c_l *self); /* +0x048, ObjM__DetachTarget */
 } BaseMethods87034_3bb8c_l;
 extern BaseMethods87034_3bb8c_l *GetClass86668Methods(void);
 
-void func_80052DE0(void) {
+void ObjM__NoOpSlot40(void) {
 }
 
-void func_80052DE8(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
-    arg1->unkC->methods->slotC8(arg1->unkC, func_80052E7C, self);
-    self->unk3C = (DreamSysObj_3bb8c_l *)arg2;
+void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
+    arg1->unkC->methods->slotC8(arg1->unkC, ObjM__OnRegistrantEvent, self);
+    self->target = (DreamSysObj_3bb8c_l *)arg2;
     GetClass86668Methods()->slot44(self, arg1, 1);
     self->methods->slot10(self, arg2);
 }
 
-void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
+void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
         func_80049060(self->unk38);
     } else {
@@ -77,8 +65,8 @@ void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     }
 }
 
-void func_80052EBC(Obj87034_3bb8c_l *self) {
-    self->methods->slot14(self, self->unk3C);
+void ObjM__DetachTarget(Obj87034_3bb8c_l *self) {
+    self->methods->slot14(self, self->target);
     GetClass86668Methods()->slot48(self);
 }
 
@@ -99,27 +87,27 @@ extern s32 D_80087168;
 extern s32 D_80087118[];
 extern s32 D_80087150;
 
-void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
-    DreamSysObj_3bb8c_l *unk18 = self->unk18;
+void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
+    DreamSysObj_3bb8c_l *unk18 = self->world;
     s32 ret1;
     s32 flag;
 
     unk18->methods->slot74(unk18);
-    self->unk60 = 1;
+    self->hasTarget = 1;
     ret1 = func_80048F84(self->unk38, 0);
     self->unk54->methods->slot5C(self->unk54, ret1);
 
-    ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
+    ret1 = self->target->methods->slot1A0(self->target, 0);
     ret1 = func_80048EA0(self->unk38, 0, ret1);
-    self->unk58 = (Obj87034_3bb8c_l *) func_80043008(ret1);
+    self->pendingOther = (Obj87034_3bb8c_l *) func_80043008(ret1);
 
-    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+    unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);
 
-    self->unk78 = unk18;
-    ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
-    self->unk50 = (Unk50Struct_3bb8c_l *) RegisterStyleConfig(self->unk14, self->unk38, &self->unk6C, ret1, 0);
+    self->cachedWorld = unk18;
+    ret1 = self->target->methods->slot1A0(self->target, 0);
+    self->styleConfig = (Unk50Struct_3bb8c_l *) RegisterStyleConfig(self->unk14, self->unk38, &self->unk6C, ret1, 0);
     if (arg2 != 0) {
-        self->unk50 = arg2;
+        self->styleConfig = arg2;
     }
 
     self->unk4C = arg3;
@@ -163,63 +151,63 @@ void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, 
     }
     func_8001EF60(flag);
 
-    self->unk3C->methods->slotEC(self->unk3C, D_80087118[(s32) self->unk38]);
-    self->unk20 = 5;
+    self->target->methods->slotEC(self->target, D_80087118[(s32) self->unk38]);
+    self->phase = 5;
 }
 
-void func_80053134(Obj87034_3bb8c_l *self) {
+void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
     self->methods->slot84(self);
     TickDreamAuxSlots2();
     StyleTeardown();
     self->unk54->methods->slot48(self->unk54);
 }
 
-void func_800531A0(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
+void ObjM__OnSelectTransfer(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
     if (sel == 2) {
-        func_800531CC(self, self->unk58);
+        ObjM__TransferToOther(self, self->pendingOther);
     }
 }
 
-void func_800531CC(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
+void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     s32 ret;
     s32 sel;
     void *a1;
     Obj87034Methods_3bb8c_l *m;
 
-    if (self->unk60 != 0) {
+    if (self->hasTarget != 0) {
         if (other->unk80 != 0) {
             other->methods->slot04(other);
-            self->unk60 = 0;
+            self->hasTarget = 0;
             self->methods->slot80(self);
-            ret = self->unk3C->methods->slot108(self->unk3C);
-            self->unk3C->methods->slot104(self->unk3C, ret + 0x1E);
-        } else if (other->unk3C != 0) {
-            sel = self->unk50->unk14;
+            ret = self->target->methods->slot108(self->target);
+            self->target->methods->slot104(self->target, ret + 0x1E);
+        } else if (other->target != 0) {
+            sel = self->styleConfig->unk14;
             m = other->methods;
             if (sel != 2) {
-                a1 = self->unk50->unk18;
+                a1 = self->styleConfig->unk18;
             } else {
-                a1 = self->unk50->unkC;
+                a1 = self->styleConfig->unkC;
             }
             m->slot7C(other, a1);
             other->methods->slot04(other);
-            self->unk60 = 0;
+            self->hasTarget = 0;
             self->methods->slot80(self);
         }
     }
-    if (self->unk60 == 0) {
-        if (self->unk14->unk1B4 == 0 && self->unk68 == 0) {
+    if (self->hasTarget == 0) {
+        if (self->unk14->unk1B4 == 0 && self->attached == 0) {
             self->unk64 = 1;
             self->methods->slot88(self);
         }
     }
 }
 
-void func_80053358(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
+void ObjM__DispatchEvent(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
     Obj87034Methods_3bb8c_l *m = self->methods;
     void (*fn)(Obj87034_3bb8c_l *);
 
-    if (self->unk68 == 0) {
+    if (self->attached == 0) {
         return;
     }
     if (eventId == 0x16) {
@@ -253,10 +241,10 @@ call:
     fn(self);
 }
 
-void func_800533F0(Obj87034_3bb8c_l *self) {
+void ObjM__TickTarget(Obj87034_3bb8c_l *self) {
     void (*fn)(Obj87034_3bb8c_l *);
 
-    if (self->unk68 != 0) {
+    if (self->attached != 0) {
         self->unk1C++;
         if (self->unk80 != 0) {
             fn = self->methods->slotD0;
@@ -267,7 +255,7 @@ void func_800533F0(Obj87034_3bb8c_l *self) {
     }
 }
 
-void func_80053458(Obj87034_3bb8c_l *self) {
+void ObjM__DispatchActiveState(Obj87034_3bb8c_l *self) {
     Obj87034Methods_3bb8c_l *m = self->methods;
 
     if (self->unk80 != 0) {
@@ -278,11 +266,11 @@ void func_80053458(Obj87034_3bb8c_l *self) {
     }
 }
 
-void func_800534C0(void) {
+void ObjM__NoOpSlot7C(void) {
 }
 
 /* self->unkC's real pointee for THIS function -- a DIFFERENT reading from
- * `RegistrantObj_3bb8c_l` (func_80052DE8's own local view of the same
+ * `RegistrantObj_3bb8c_l` (ObjM__AttachTarget's own local view of the same
  * field): here `*(self->unkC)` (one dereference through unkC's own first
  * word) yields an object with its OWN methods pointer at +0x000, matching
  * `RegistrantObj_3bb8c_l`'s own layout (a single `methods` field) exactly
@@ -292,7 +280,7 @@ typedef struct UnkCObj_3bb8c_l UnkCObj_3bb8c_l;
 typedef struct UnkCObjMethods_3bb8c_l UnkCObjMethods_3bb8c_l;
 struct UnkCObjMethods_3bb8c_l {
     u8 pad000[0x07C];
-    /* +0x07C, round 45's func_800534C8: `(self, 0)`, returning a pointer
+    /* +0x07C, round 45's ObjM__SetupSceneStyle: `(self, 0)`, returning a pointer
      * to a single `s32` this function dereferences immediately. */
     s32 *(*slot7C)(UnkCObj_3bb8c_l *self, s32 arg1); /* +0x07C */
 };
@@ -321,9 +309,9 @@ extern s32 D_8008AB34;
  * `Obj14Methods_3bb8c_l::slotCC`. */
 extern s32 D_8008710C;
 
-void func_800534C8(Obj87034_3bb8c_l *self) {
-    DreamSysObj_3bb8c_l *unk18 = self->unk18;
-    Unk50Struct_3bb8c_l *unk50 = self->unk50;
+void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
+    DreamSysObj_3bb8c_l *unk18 = self->world;
+    Unk50Struct_3bb8c_l *unk50 = self->styleConfig;
     UnkCObj_3bb8c_l *obj;
     s32 val;
     Obj14_3bb8c_l *unk14;
@@ -334,9 +322,9 @@ void func_800534C8(Obj87034_3bb8c_l *self) {
     val = *obj->methods->slot7C(obj, 0);
     unk18->methods->slot54(unk18, val / 2 * 5 / 3 + D_8008AB34);
 
-    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+    unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);
 
-    SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->unk3C, self->unk34, self->unk10);
+    SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->target, self->unk34, self->unk10);
 
     unk14 = self->unk14;
     self->methods->slot10(self, (s32)unk14);
@@ -344,20 +332,20 @@ void func_800534C8(Obj87034_3bb8c_l *self) {
     unk14->methods->slotBC(unk14, unk50->unk8, 0);
     unk14->methods->slotC4(unk14, 3, unk50->unk0, unk50->unk4);
     unk14->methods->slotE0(unk14, GetStageGridDimensions((s32)self->unk38));
-    self->unk3C->methods->slot4C(self->unk3C, unk14);
+    self->target->methods->slot4C(self->target, unk14);
     unk14->methods->slotDC(unk14, self->unk48);
     unk14->methods->slotCC(unk14, &D_8008710C);
 }
 
-void func_800536B0(Obj87034_3bb8c_l *self) {
+void ObjM__ExitSceneStyle(Obj87034_3bb8c_l *self) {
     self->methods->slotD4(self);
-    self->unk3C->methods->slotFC(self->unk3C);
-    self->unk3C->methods->slot50(self->unk3C);
-    self->unk18->methods->slot74(self->unk18);
+    self->target->methods->slotFC(self->target);
+    self->target->methods->slot50(self->target);
+    self->world->methods->slot74(self->world);
     self->methods->slot14(self, self->unk14);
 }
 
-void func_80053764(Obj87034_3bb8c_l *self) {
+void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     DreamSysMethods_3bb8c_l *m;
     DreamSysMethods_3bb8c_l *m2;
     DreamSysObj_3bb8c_l *unk18;
@@ -368,12 +356,12 @@ void func_80053764(Obj87034_3bb8c_l *self) {
     s32 a2;
     void *a1;
 
-    self->unk68 = 1;
-    self->unk3C->methods->slotF8(self->unk3C, self->unk44, self->unk40);
+    self->attached = 1;
+    self->target->methods->slotF8(self->target, self->unk44, self->unk40);
     self->unk14->methods->slotEC(self->unk14);
 
-    unk18 = self->unk18;
-    unk50 = self->unk50;
+    unk18 = self->world;
+    unk50 = self->styleConfig;
     unk18->methods->slot60(unk18, 1);
     unk18->methods->slot64(unk18, unk50->unkC);
     unk18->methods->slot6C(unk18, unk50->unk1C);
@@ -390,7 +378,7 @@ void func_80053764(Obj87034_3bb8c_l *self) {
     newObj = unk18->methods->slotAC(unk18);
     self->methods->slot10(self, (s32)newObj);
 
-    ret = self->unk3C->methods->slotF0(self->unk3C, &local10, -1);
+    ret = self->target->methods->slotF0(self->target, &local10, -1);
     newObj->methods->slotF0(newObj, (s32 *)ret, (ret != 0) ? 3 : 0);
     m2 = newObj->methods;
     if (ret == 0) {
@@ -401,12 +389,12 @@ void func_80053764(Obj87034_3bb8c_l *self) {
     m2->slotD4(newObj, self->unk10, a2, 0);
 }
 
-void func_8005393C(Obj87034_3bb8c_l *self) {
+void ObjM__TickStyle(Obj87034_3bb8c_l *self) {
     TickStyle(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
 }
 
-void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
-    if (self->unk20 == 0) {
+void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
+    if (self->phase == 0) {
         switch (code - 0xA) {
         case 0:
             self->methods->slot94(self);
@@ -433,11 +421,11 @@ void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
             break;
         }
     } else if (code >= 9) {
-        self->unk3C->unk44 = 0;
+        self->target->unk44 = 0;
     }
 }
 
-/* func_80053ACC's (and func_80053BE8's/func_80053C94's, further below) own
+/* ObjM__EnterState4's (and ObjM__EnterState5's/ObjM__EnterState6's, further below) own
  * helper, and it lives in the sibling slice class_3bb8c_m, where round 15's
  * runner echo matched it byte-exact as `void ObjM__ForwardToSubChild(ObjM *self, s32,
  * s32, s32, s32)`. Declared locally rather than in include/class_3bb8c.h on
@@ -448,14 +436,14 @@ void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
  * from the definition. */
 extern void ObjM__ForwardToSubChild(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
-void func_80053ACC(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
     s32 local18;
     s32 span;
     s32 t;
     s32 arg3;
 
-    self->unk20 = 4;
-    if (self->unk3C->methods->slotF0(self->unk3C, &local18, -1) == 0) {
+    self->phase = 4;
+    if (self->target->methods->slotF0(self->target, &local18, -1) == 0) {
         span = (self->unk1C + (s32)self->unk38) & 3;
         t = span;
         if (t == 0) {
@@ -481,24 +469,24 @@ void func_80053ACC(Obj87034_3bb8c_l *self) {
     ObjM__ForwardToSubChild(self, 0, 0, 5, 1);
 }
 
-void func_80053BE8(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
     s32 color;
 
-    if (self->unk3C->unk164 < 0) {
+    if (self->target->unk164 < 0) {
         self->methods->slot9C(self);
     } else {
-        self->unk20 = 5;
-        color = self->unk3C->methods->slot200(self->unk3C);
+        self->phase = 5;
+        color = self->target->methods->slot200(self->target);
         ObjM__ForwardToSubChild(self, color, 0, 0xA, 1);
-        self->unk3C->methods->slotFC(self->unk3C);
+        self->target->methods->slotFC(self->target);
     }
 }
 
-void func_80053C94(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState6(Obj87034_3bb8c_l *self) {
     s32 color;
 
-    self->unk20 = 6;
-    color = self->unk3C->methods->slot200(self->unk3C);
+    self->phase = 6;
+    color = self->target->methods->slot200(self->target);
     ObjM__ForwardToSubChild(self, color, 0, 0x1E, 1);
-    self->unk3C->methods->slotFC(self->unk3C);
+    self->target->methods->slotFC(self->target);
 }

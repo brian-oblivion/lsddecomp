@@ -1,4 +1,6 @@
-# func_8005393C
+# ObjM__TickStyle
+
+> Renamed from `func_8005393C` on 2026-09-24 (tools/rename.py). Address 0x8005393c.
 
 **Unit:** class_3bb8c_l · **Size:** 18 words (0x48 bytes) ·
 **Status: MATCHED 18/18**, whole-image SHA1 green.
@@ -6,7 +8,7 @@
 ## What it does
 
 ```c
-void func_8005393C(Obj87034_3bb8c_l *self) {
+void ObjM__TickStyle(Obj87034_3bb8c_l *self) {
     TickStyle(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
 }
 ```
@@ -24,4 +26,14 @@ call site's own register usage.
   passes `(self->unk14, 0, 0)`, three total arguments against DreamSys's
   own two. Different arity, different class; `self->unk14`'s pointee is
   left as an unnamed local view (`Obj14_3bb8c_l`) with only this one slot
-  and (from `func_800531CC`) one plain `u16` field named.
+  and (from `ObjM__TransferToOther`) one plain `u16` field named.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8005393C` | `ObjM__TickStyle` | B | see below |
+
+**Evidence.** vtable slot +0x08C. A one-line wrapper: `TickStyle(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0)`. Named for the global `TickStyle` it calls, whose own name is already established.

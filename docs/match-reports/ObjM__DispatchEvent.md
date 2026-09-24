@@ -1,4 +1,6 @@
-# func_80053358
+# ObjM__DispatchEvent
+
+> Renamed from `func_80053358` on 2026-09-24 (tools/rename.py). Address 0x80053358.
 
 **Unit:** class_3bb8c_l · **Size:** 38 words (0x98 bytes) ·
 **Status: MATCHED 38/38**, whole-image SHA1 green.
@@ -10,7 +12,7 @@ slots on `self` (or does nothing if `self->unk68` is zero, or the event
 isn't one of the four recognised values).
 
 ```c
-void func_80053358(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
+void ObjM__DispatchEvent(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
     Obj87034Methods_3bb8c_l *m = self->methods;
     void (*fn)(Obj87034_3bb8c_l *);
 
@@ -70,7 +72,7 @@ Three source forms were tried before this one matched, in order:
    0x17) { if (eventId == 0xC) ...; else return; } else ...`). This fixed
    the comparison ORDER but every individual `==` test came out with the
    wrong branch polarity (body at fallthrough instead of target, same
-   class of residue as `func_80052E7C`/`func_800531CC`) AND, worse, GCC
+   class of residue as `ObjM__OnRegistrantEvent`/`ObjM__TransferToOther`) AND, worse, GCC
    inlined each case body at its own comparison site instead of placing
    all four bodies out-of-line after the full compare chain the way
    retail does. Scored the same 11/38, different residue shape.
@@ -104,3 +106,13 @@ at the "natural" chain form failed to converge before this; the goto
 form matched on the first try. `docs/DECOMPILATION_LEARNINGS.md` already
 documents `goto fail;` for the `New_X` allocator idiom — this generalises
 it to "any multi-way vtable-slot dispatch with more than two arms".
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053358` | `ObjM__DispatchEvent` | B | see below |
+
+**Evidence.** vtable slot +0x058. A generic `eventId` dispatcher: four recognised numeric codes (0xC, 0x16, 0x21, 0x2C) each forward to one of self's own vtable slots; anything else, or `self->unk68 == 0`, is a no-op.

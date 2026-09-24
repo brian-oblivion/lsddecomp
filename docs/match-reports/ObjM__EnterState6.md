@@ -1,4 +1,6 @@
-# func_80053C94
+# ObjM__EnterState6
+
+> Renamed from `func_80053C94` on 2026-09-24 (tools/rename.py). Address 0x80053c94.
 
 **Unit:** class_3bb8c_l · **Size:** 33 words (0x84 bytes) ·
 **Status: MATCHED 33/33**, whole-image SHA1 green.
@@ -6,7 +8,7 @@
 ## What it does
 
 ```c
-void func_80053C94(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState6(Obj87034_3bb8c_l *self) {
     s32 color;
 
     self->unk20 = 6;
@@ -39,3 +41,13 @@ named function and the vtable slot occupant are the same address, but
 bytes. Use the name only to confirm/cross-check the field's identity and
 signature; the actual C call must still go through the struct's function
 pointer field.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053C94` | `ObjM__EnterState6` | B | see below |
+
+**Evidence.** vtable slot +0x09C. Sets `self->phase = 6`; same evidence as `ObjM__EnterState4`.

@@ -1,4 +1,6 @@
-# func_80053984 -- MATCHED (82/82 words, first attempt)
+# ObjM__HandleStateCode -- MATCHED (82/82 words, first attempt)
+
+> Renamed from `func_80053984` on 2026-09-24 (tools/rename.py). Address 0x80053984.
 
 Unit `src/class_3bb8c_l.c`. Round 26, runner delta.
 
@@ -10,7 +12,7 @@ An event/code dispatcher for `Obj87034_3bb8c_l` (method table `D_80087034`,
 (`self->methods->slotXX`):
 
 ```c
-void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
+void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
     if (self->unk20 == 0) {
         switch (code - 0xA) {
         case 0:
@@ -79,7 +81,7 @@ every step).
   and `slotA0`/`slotA4`/`slotA8`/`slotAC` (all `void (*)(Obj87034_3bb8c_l
   *self)`), splitting `pad90[0x09C-0x090]` and `padA0[0x0C0-0x0A0]`.
   `slot9C` already existed (added by a PRIOR unit's function,
-  `func_80053BE8`) -- extended its comment to note this function ALSO
+  `ObjM__EnterState5`) -- extended its comment to note this function ALSO
   calls it, rather than declaring a duplicate member.
 - `DreamSysObj_3bb8c_l` (self->unk3C's pointee): added `s32 unk44` at
   +0x044, splitting `pad04[0x164-0x004]` into `pad04[0x040]` + `unk44` +
@@ -90,9 +92,19 @@ every step).
 
 ## Notes for the sibling function in this unit
 
-`func_80052F10` (matched the same round, see its own report) needed THREE
+`ObjM__InitStyleAndWorld` (matched the same round, see its own report) needed THREE
 more slots on `Obj87034Methods_3bb8c_l` (`slot5C`), `DreamSysMethods_3bb8c_l`
 (`slot70`, `slotEC`, `slot1A0`), and `Obj14Methods_3bb8c_l` (`slot134`), plus
 four more fields on `Obj87034_3bb8c_l` (`unk48`, `unk4C`, `unk6C`, `unk78`).
 Those edits are described in that report rather than duplicated here, since
 they were made together in the same session against the same shared header.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053984` | `ObjM__HandleStateCode` | B | see below |
+
+**Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterState4`, `ObjM__EnterState5`, `ObjM__EnterState6` (this unit) and `ObjM__EnterState7`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit class_3bb8c_m) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.

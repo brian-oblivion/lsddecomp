@@ -1,4 +1,6 @@
-# func_800534C8 — MATCHED (round 45, 122/122 words)
+# ObjM__SetupSceneStyle — MATCHED (round 45, 122/122 words)
+
+> Renamed from `func_800534C8` on 2026-09-24 (tools/rename.py). Address 0x800534c8.
 
 **Unit:** class_3bb8c_l · **Size:** 122 words (0x1E8 bytes)
 
@@ -25,7 +27,7 @@ extern void *GetStageGridDimensions(s32 index);
 extern s32 D_8008AB34;
 extern s32 D_8008710C;
 
-void func_800534C8(Obj87034_3bb8c_l *self) {
+void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
     Unk50Struct_3bb8c_l *unk50 = self->unk50;
     UnkCObj_3bb8c_l *obj;
@@ -63,7 +65,7 @@ the middle.
 
 - **`self->unkC`'s pointee needed a SECOND, INDEPENDENT reading of the same
   field.** The existing shared type (`RegistrantObj_3bb8c_l`, established
-  by `func_80052DE8`) is a single-`methods`-field object — exactly the
+  by `ObjM__AttachTarget`) is a single-`methods`-field object — exactly the
   layout this call site also needs (`*(self->unkC)` dereferences to an
   object with its OWN `methods` at offset 0), so no struct-field retype was
   needed; `*(UnkCObj_3bb8c_l **)self->unkC` reinterprets the SAME memory
@@ -125,3 +127,13 @@ before that earlier call and use the local as the argument** — this reads
 as a no-op in C but changes whether the compiler treats the field-read as
 part of the earlier call's argument-evaluation (different scheduling) or
 as a standalone statement whose result is reused verbatim by the call.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_800534C8` | `ObjM__SetupSceneStyle` | B | see below |
+
+**Evidence.** vtable slot +0x080. The larger of the two `unk14`-configuring routines: computes a value from `*(UnkCObj_3bb8c_l **)self->unkC`'s own `slot7C`, dispatches `self->target`'s `slot54` with it, then configures `self->unk14` (grid dimensions via `GetStageGridDimensions`, world settings, style block) and links it back into `self->target` via `slot4C`.

@@ -1,0 +1,41 @@
+# ObjM__OnSelectTransfer
+
+> Renamed from `func_800531A0` on 2026-09-24 (tools/rename.py). Address 0x800531a0.
+
+**Unit:** class_3bb8c_l · **Size:** 11 words (0x2C bytes) ·
+**Status: MATCHED 11/11**, whole-image SHA1 green.
+
+## What it does
+
+```c
+void ObjM__OnSelectTransfer(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
+    if (sel == 2) {
+        ObjM__TransferToOther(self, self->unk58);
+    }
+}
+```
+
+`arg1` (the function's own second parameter) is never read in this body —
+only `sel` (compared against the literal 2) and `self->unk58` (forwarded as
+`ObjM__TransferToOther`'s second argument) are used. Kept as a real parameter
+anyway since the caller passes three arguments at this call site.
+
+## Notes
+
+- `self->unk58` typed as `Obj87034_3bb8c_l *` (not `void *`) precisely
+  because it's forwarded into `ObjM__TransferToOther`'s `other` parameter, which
+  the callee (below) dereferences with the same offsets as `self` itself
+  (`0x0`, `0x3C`, `0x50`, `0x60`... etc) — first evidence tying `unk58`'s
+  pointee to the same class as `self`.
+- `ObjM__TransferToOther` needed a forward declaration in the header (ROM order:
+  this function is defined before it).
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_800531A0` | `ObjM__OnSelectTransfer` | B | see below |
+
+**Evidence.** vtable slot +0x054. A thin selector: forwards to `ObjM__TransferToOther` only when `sel == 2`, otherwise a no-op. The meaning of the other `sel` values is not established from this body alone.

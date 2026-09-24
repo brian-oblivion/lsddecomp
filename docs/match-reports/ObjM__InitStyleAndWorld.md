@@ -1,4 +1,6 @@
-# func_80052F10 -- MATCHED (137/137 words)
+# ObjM__InitStyleAndWorld -- MATCHED (137/137 words)
+
+> Renamed from `func_80052F10` on 2026-09-24 (tools/rename.py). Address 0x80052f10.
 
 Unit `src/class_3bb8c_l.c`. Round 26, runner delta.
 
@@ -11,7 +13,7 @@ through `self->unk18` (a `DreamSysObj_3bb8c_l*`), `self->unk54` (another
 `self->unk14` (`Obj14_3bb8c_l*`), sets up several state fields, and ends by
 notifying `self->unk3C` and marking `self->unk20 = 5` (a phase tag this
 unit's other functions also write with 4/5/6 -- see
-`docs/match-reports/func_80053984.md` and the header's own comment on it).
+`docs/match-reports/ObjM__HandleStateCode.md` and the header's own comment on it).
 
 ```c
 extern s32 func_80048F84(void *arg0, s32 arg1);
@@ -25,7 +27,7 @@ extern s32 D_80087168;
 extern s32 D_80087118[];
 extern s32 D_80087150;
 
-void func_80052F10(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
+void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
     s32 ret1;
     s32 flag;
@@ -142,7 +144,7 @@ different residue, closed it:
    order fix, this one resolved by plain statement reordering (no barrier
    needed).
 
-## Struct edits (all additive; see `func_80053984.md` for the sibling
+## Struct edits (all additive; see `ObjM__HandleStateCode.md` for the sibling
 edits made in the same session)
 
 - `Obj87034Methods_3bb8c_l`: added `slot5C` (`void (*)(Obj87034_3bb8c_l
@@ -184,3 +186,13 @@ the pointer TYPE at the point of dereference, not the pointee's own
 declared type, is the lever in both directions, and `SpuVmAlloc`'s
 still-open cross-branch-CSE residue this round is a candidate to revisit
 with this specific tool now that it has one confirmed win.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80052F10` | `ObjM__InitStyleAndWorld` | B | see below |
+
+**Evidence.** vtable slot +0x04C. The larger of the two setup routines: calls `RegisterStyleConfig`, wires the target/world fields (`self->unk78`, `self->unk6C`, `self->unk48/unk4C/unk40/unk44`), dispatches `self->target`'s own `slot134`, and ends by marking `self->phase = 5`.

@@ -1,4 +1,6 @@
-# func_80053134
+# ObjM__TeardownStyle
+
+> Renamed from `func_80053134` on 2026-09-24 (tools/rename.py). Address 0x80053134.
 
 **Unit:** class_3bb8c_l · **Size:** 27 words (0x6C bytes) ·
 **Status: MATCHED 27/27**, whole-image SHA1 green.
@@ -6,7 +8,7 @@
 ## What it does
 
 ```c
-void func_80053134(Obj87034_3bb8c_l *self) {
+void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
     self->methods->slot84(self);
     TickDreamAuxSlots2();
     StyleTeardown();
@@ -23,9 +25,9 @@ return values are unused, declared as plain `extern void func(void);` in
 ## Notes
 
 - `self->unk54` dispatches its OWN `+0x48` slot — the same numeric offset
-  self dispatches directly in `func_80052EBC`, reused here on a sibling
+  self dispatches directly in `ObjM__DetachTarget`, reused here on a sibling
   object of the presumed-same class (`Obj87034_3bb8c_l *unk54`).
-- Diffed clean immediately after `func_800531CC` and `func_80053358` were
+- Diffed clean immediately after `ObjM__TransferToOther` and `ObjM__DispatchEvent` were
   fixed — this function's own two `jal` targets (`TickDreamAuxSlots2`,
   `StyleTeardown`) initially resolved to addresses 0xC bytes past retail's,
   purely because OTHER not-yet-fixed functions in this unit were still the
@@ -33,3 +35,13 @@ return values are unused, declared as plain `extern void func(void);` in
   function; a reminder that `funcdiff`'s "differs outside this range" warning
   means exactly what it says — don't trust an individual function's `jal`
   target mismatch while siblings in the same unit are still wrong.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_80053134` | `ObjM__TeardownStyle` | B | see below |
+
+**Evidence.** vtable slot +0x050. Calls the global `StyleTeardown()` and `TickDreamAuxSlots2()` directly, then notifies `self->unk54` (another `ObjM` instance) via its own `slot48`. Named for the one global call whose own name is already established.

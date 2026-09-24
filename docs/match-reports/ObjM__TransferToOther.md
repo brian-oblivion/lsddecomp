@@ -1,4 +1,6 @@
-# func_800531CC
+# ObjM__TransferToOther
+
+> Renamed from `func_800531CC` on 2026-09-24 (tools/rename.py). Address 0x800531cc.
 
 **Unit:** class_3bb8c_l · **Size:** 99 words (0x18C bytes) ·
 **Status: MATCHED 99/99**, whole-image SHA1 green. One of the two "large"
@@ -12,7 +14,7 @@ by the identical field offsets `self` and `other` are both read through:
 `0x0`, `0x3C`, `0x50`, `0x60`, `0x68`, `0x80`).
 
 ```c
-void func_800531CC(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
+void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     s32 ret;
     s32 sel;
     void *a1;
@@ -65,12 +67,12 @@ its `unknown_functions_0x..` padding arrays there).
    0x14 — one word of missing `u8 pad[...]`. Visible as a wrong field
    offset AND a register-role swap in the diff (retail: `v0`=field value,
    `v1`=literal 2; mine: reversed), both symptoms of the same root cause.
-2. **Branch polarity / body-placement, same class as `func_80052E7C`'s
+2. **Branch polarity / body-placement, same class as `ObjM__OnRegistrantEvent`'s
    residue.** The natural `if (sel == 2) { a1 = unkC; } else { a1 = unk18;
    }` compiles with the wrong body at the wrong branch target. Writing the
    negated form `if (sel != 2) { a1 = unk18; } else { a1 = unkC; }`
    reproduces retail's `beq`/target layout exactly — see
-   `func_80052E7C`'s report for the general rule.
+   `ObjM__OnRegistrantEvent`'s report for the general rule.
 3. **A load hoisted out of the `if`/`else`, not visible from the
    disassembly's literal instruction order until diffed against a body
    that DOESN'T hoist it.** Retail loads `other->methods` into a register
@@ -89,3 +91,13 @@ earlier computation, check whether retail computed that base pointer
 EAGERLY (before the branch) rather than lazily (at first use) — the fix is
 a plain local variable assigned before the `if`, not a barrier or an
 `asm("")`.
+
+## Naming
+
+Round 78 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier | evidence |
+| --- | --- | --- | --- |
+| `func_800531CC` | `ObjM__TransferToOther` | B | see below |
+
+**Evidence.** Private helper (not itself a vtable slot), called only from `ObjM__OnSelectTransfer`. The detach-from-current-target / link-to-new-target logic: `other` is confirmed to be the SAME class (`Obj87034_3bb8c_l`) by the identical field offsets both `self` and `other` are read through (`+0x0`, `+0x3C`, `+0x50`, `+0x60`, `+0x68`, `+0x80`).
