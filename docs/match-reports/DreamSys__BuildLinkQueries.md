@@ -1,5 +1,7 @@
 # DreamSys__BuildLinkQueries -- STALL (best 13/116 words, structurally correct)
 
+NON_MATCHING body promoted, round 74.
+
 > Renamed from `func_80057784` on 2026-09-19 (tools/rename.py). Address 0x80057784.
 
 Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain internal
@@ -226,3 +228,34 @@ not attempted this round -- it requires touching the caller
 `DreamSys__FindNearbyLink`'s buffer types too, and this round's time budget went to
 functions with a clearer path to closing). Left as-is, `INCLUDE_ASM`
 restored, no source changes.
+
+## Round: NON_MATCHING body promoted (runner delta, round 74)
+
+Placed the preserved body from this report into `src/class_3bb8c_p.c` under
+`#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif` (track 1b). Hand-derived,
+not permuter-searched -- confirmed by this report itself (round 19's
+instruction-by-instruction re-derivation, and the original derivation's own
+residue analysis above), so no separate review was needed beyond checking
+current symbol/field names.
+
+One rename needed: `self->unk_0x4C` is now `self->linkMgr` in
+`include/DreamSys.h` (renamed since this report was written); the promoted
+body uses the current name. Every other name the body references
+(`DreamSysUnk4CObj`, `DreamSysUnk4C68Obj`, `unk_0x68`, `unk_0x4`, `unk_0x2`,
+`getGridArrElemAt`, `LinkQueryBuf::queryCol/queryRow/source`) already matches
+`include/DreamSys.h` as committed; `tools/stalesyms.py` found nothing stale
+for this function.
+
+Re-measured the score with the body compiled live (temporarily, in place of
+`INCLUDE_ASM`, then reverted): still 13/116 in-range, confirming the figure
+above, but `funcdiff.py` flags the reading untrustworthy (98230 bytes differ
+outside the function's window) because this body is not length-exact, so
+swapping it in shifts every following symbol. That drift is expected and
+harmless for track 1b -- the verified build never compiles this branch -- so
+the comment cites the already-confirmed 13/116 figure rather than this
+drifted re-read.
+
+`./build-and-verify.sh` exit=0, unchanged (build/SLPS_015.56 still matches
+retail byte-exact -- this promotion changed no linked bytes).
+`tools/check-nonmatching.sh` exit=0, green (47 NON_MATCHING bodies in 16
+units compile and resolve, including this one).

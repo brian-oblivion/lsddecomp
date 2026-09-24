@@ -201,9 +201,86 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
     return 0;
 }
 
-/* STALL -- see docs/match-reports/DreamSys__BuildLinkQueries.md. Best reached: 13/116
- * words, preserved there in #if 0 with full declarations. */
+#ifdef NON_MATCHING
+/* NON_MATCHING: 13/116 words. Residue: register-allocation/scheduling only
+ * (two extra callee-saved registers survive throughout, and the
+ * `oddCount` ternary and the second `getGridArrElemAt` call site each
+ * codegen differently from retail in ways not yet reproduced). Control
+ * and data flow are independently confirmed against m2ctx.py.
+ * docs/match-reports/DreamSys__BuildLinkQueries.md. Hand-derived. */
+s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4) {
+    s32 f2 = arg3->queryCol;
+    s32 f3 = arg3->queryRow;
+    s32 oddCount = (arg4 & 1) ? arg4 : arg4 + 1;
+    s32 idx = 1;
+
+    if (oddCount == 1) {
+        DreamSysUnk4CObj *unk4C;
+        DreamSysUnk4C68Obj *unk68;
+        GridArrElem *src;
+        s16 s3;
+        s32 pos;
+
+        arr1[0].startCol = (s16) f2;
+        arr1[0].startRow = (s16) f3;
+        arr1[0].numCols = oddCount;
+        arr1[0].numRows = oddCount;
+        src = arg3->source;
+        arr2[0] = src;
+        unk4C = self->linkMgr;
+        unk68 = unk4C->unk_0x68;
+        if (unk68->unk_0x4 != 1) {
+            return 1;
+        }
+        s3 = src->info->unk32;
+        pos = s3 + 1;
+        if (pos < unk68->unk_0x2) {
+            idx = 2;
+            arr2[1] = unk4C->methods->getGridArrElemAt(unk4C, pos, f3, src);
+            arr1[1] = arr1[0];
+        }
+        pos = s3 - 1;
+        if (pos >= 0) {
+            arr2[idx] = unk4C->methods->getGridArrElemAt(unk4C, pos, f3, src);
+            arr1[idx] = arr1[0];
+            idx++;
+        }
+        return idx;
+    }
+
+    {
+        s32 t0 = oddCount;
+        s32 vv0 = oddCount;
+        s32 a1 = f2;
+        s32 a2 = f3;
+
+        if (f2 != 0) {
+            a1 = f2 - 1;
+        } else {
+            t0 = oddCount - 1;
+        }
+        if (f2 == 0x13) {
+            t0 -= 1;
+        }
+        if (f3 != 0x13) {
+            a2 = f3 + 1;
+        } else {
+            vv0 -= 1;
+        }
+        arr1[0].startCol = (s16) a1;
+        if (f3 == 0) {
+            vv0 -= 1;
+        }
+        arr1[0].startRow = (s16) a2;
+        arr1[0].numCols = t0;
+        arr1[0].numRows = vv0;
+        arr2[0] = arg3->source;
+        return 1;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", DreamSys__BuildLinkQueries);
+#endif
 
 void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source);
 
