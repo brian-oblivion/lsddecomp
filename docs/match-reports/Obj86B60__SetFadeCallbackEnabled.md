@@ -73,3 +73,25 @@ whole function reuses across a `switch`.
 ## Provenance
 
 round 2026-09-02, runner echo, unit code_2cc8c. 3 attempts.
+
+## Naming (round 78, delta)
+
+**Tier B.** `func_8003CAF8` -> `Obj86B60__SetFadeCallbackEnabled`. Body:
+`switch(a1) { case 0: self->unk88 = NULL; break; case 1: self->unk88 =
+methods->slotB0; break; }`. In this unit's evidence, `slotB0` is ALWAYS
+`Obj86B60__TickColorFade` (its own IS-occupant, see that report) and nothing
+else ever writes `self->unk88`, so "fade callback" is a grounded mechanical
+description, not a guess: this is a boolean enable/disable toggle for the
+colour-fade tick. Called with a literal boolean-shaped `a1` at every site we
+can see (0 or 1), which is why "Enabled" rather than a generic "Set".
+
+## Proposed field names (round 78, delta -- NOT applied, cross-unit)
+
+`Obj86B60::unk88` (`s32 (*)(Obj86B60 *self)`, +0x088) -> `fadeCallback`.
+Tier B: in this unit's own evidence the only value ever stored here besides
+NULL is `self->methods->slotB0` (`Obj86B60__TickColorFade`), and
+`Obj86B60__TickFadeCallback` is its sole invoker. Grep shows `unk88` textual
+hits in code_2c054.c/code_179d8_{k,f}.c/code_2cc8c_{d,e}.c/Entity_f.c
+(several genuinely this same shared Obj86B60 struct, per code_2cc8c_d/e), so
+proposal only -- the head should apply via type scope on `Obj86B60`, not a
+whole-tree replace.

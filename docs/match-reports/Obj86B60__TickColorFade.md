@@ -60,3 +60,17 @@ the C expression's operand order before looking for anything more exotic.
 ## Provenance
 
 round 2026-09-02, runner echo, unit code_2cc8c. 2 attempts.
+
+## Naming (round 78, delta)
+
+**Tier B.** `func_8003CC2C` -> `Obj86B60__TickColorFade`. Body: `prod =
+frameCounter * unk84` (the fade rate, see `SetFadeRate`); builds a 3-byte
+buffer `{unk90[i] + prod : i in 0..2}` (the base colour, see `SetColors`);
+forwards that buffer to `self->methods->slotE4` and to
+`self->unk78->methods->slotB8(self->unk78, 1, buffer)`; returns whether the
+low byte of `prod` has reached `0x81`. That return value is exactly what
+`TickFadeCallback` treats as "fade done" (nonzero -> `SetState(5)`).
+Mechanically this is a per-tick RGB fade computation forwarded to a display
+target; occupies slotB0 (also read as DATA -- a function pointer value, not
+called -- by `SetFadeCallbackEnabled`). What the fade represents in-game
+(and what `unk78` is) is not established, so tier B rather than A.

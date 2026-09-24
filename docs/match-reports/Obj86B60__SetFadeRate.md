@@ -20,3 +20,11 @@ slot). Confirms `Obj86B60::unk84` (already established as a multiplier by
 ## Provenance
 
 round 2026-09-02, runner echo, unit code_2cc8c. 1 attempt.
+
+## Naming (round 78, delta)
+
+**Tier A** (pure setter). `func_8003CBB8` -> `Obj86B60__SetFadeRate`. Body:
+`self->unk84 = a1;`, nothing else. Corroborated by `Obj86B60__TickColorFade`,
+the sole reader of `unk84`, which multiplies it against `frameCounter` to
+build the per-tick colour delta -- exactly what a "rate" describes
+mechanically, without asserting what the fade itself means in the game.

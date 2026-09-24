@@ -148,3 +148,12 @@ the unit after the rest were matched/stalled). Picked up and matched in a
 follow-up pass, ~6 attempts total (3 against the full build, plus the
 struct/slot-typing analysis carried over from the initial, pre-drafted
 design for this function).
+
+## Naming (round 78, delta)
+
+**Tier A.** `func_8003C51C` -> `Obj86B60__OnTag5Notify`. Occupies slot5C in
+`gTaskCoreMethods` and `gClass86B60Methods` identically (only `GraphRoomObj`
+overrides this slot, with its own `GraphRoomObj__UpdateFromLog`).
+`Obj86B60__OnNotify` dispatches `EventArg`s with `target->header & 0xF == 5`
+through `self->methods->slot5C`, same evidence shape as `OnTag2Notify` above.
+Tier A.

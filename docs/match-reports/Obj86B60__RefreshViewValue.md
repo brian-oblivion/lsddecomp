@@ -30,3 +30,12 @@ established first since it is the 3-instruction setter). The `slot60(self,
 ## Provenance
 
 round 2026-09-02, runner echo, unit code_2cc8c. 1 attempt.
+
+## Naming (round 78, delta)
+
+**Tier A.** `func_8003CA94` -> `Obj86B60__RefreshViewValue`. Occupies slot94
+in `gTaskCoreMethods`; `gClass86B60Methods` overrides the same slot with
+`Class86B60__RefreshViewValue`, same evidence shape as `Tick`/`SetState`
+above. Corroborated independently: this function's own body invokes
+`self->unk9C(self->unkA0)` when set, which is exactly the callback+ctx pair
+`Obj86B60__SetCallback` installs -- see that report.

@@ -52,3 +52,13 @@ argument).
 
 round 2026-09-02, runner echo, unit code_2cc8c. 1 attempt (plus a
 same-round retype with no rebuild-affecting change, see addendum).
+
+## Naming (round 78, delta)
+
+**Tier B.** `func_8003CBC0` -> `Obj86B60__TickFadeCallback`. Body: if
+`self->unk88` is set, calls it (`result = self->unk88(self)`, i.e. invokes
+`Obj86B60__TickColorFade` when the fade is enabled -- see
+`SetFadeCallbackEnabled`); if the result is nonzero, transitions to state 5
+via `SetState`. Occupies slotAC. This is the "run the enabled fade tick, and
+advance state when it signals done" half of the `unk88` pair; the meaning of
+state 5 itself is not established.

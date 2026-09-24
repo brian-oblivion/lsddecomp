@@ -134,3 +134,32 @@ split is a TYPE mismatch, not a scheduling residue, and no barrier or reordering
 will fix it. Count the groups, line them up against the slot declarations, and
 the odd one out is the wrong type. Here: 3 words, one edit, and the header was
 wrong rather than the C.
+
+## Naming (round 78, delta)
+
+**Tier A.** `func_8003C63C` -> `Obj86B60__SetState`. Occupies slot60 in
+`gTaskCoreMethods`; `gClass86B60Methods` overrides the SAME slot with the
+independently-named `Class86B60__SetState` (`tools/classtable.py
+gClass86B60Methods`), which is what settles both the slot's role (a
+`reason`-coded state-transition entry point, signature `(self, s32 reason)`
+matching `Obj86B60Methods::slot60`) and this function's name as the class
+family's DEFAULT implementation a sibling class overrides -- not something
+`Class86B60` or `GraphRoomObj` introduces (both keep it: `GraphRoomObj`'s own
+table has this exact occupant at slot60, unoverridden). See
+`include/code_2cc8c.h`'s round-78 header comment for the full derivation and
+why this rules out a `Class86B60__`/`GraphRoomObj__` prefix.
+
+## Proposed field names (round 78, delta -- NOT applied, cross-unit)
+
+`Obj86B60::unk3C` (s32, +0x03C) -> `notifyMode`. Tier B. Grep shows
+`code_2cc8c_b.c`, `code_2cc8c_d.c` and several unrelated `class_3bb8c_*`/
+`code_179d8_k.c`/`code_2c054.c` files also contain an `unk3C` textual hit, so
+per CLAUDE.md's "textual search over-counts" warning this is NOT renamed in
+the shared header -- only the compiler (a definition-only rename + rebuild)
+can settle which of those are the SAME struct. Evidence for the name from
+this unit alone: `Obj86B60__SetState` sets it to 0 or 1 (cases 4/7 and 5);
+`Obj86B60__OnTag2Notify` gates its whole body on `!= 0`;
+`Obj86B60__func_8003C858`/`func_8003C8D0` compare it `==1`/`!=1`;
+`func_8003C944`/`func_8003C9B0` branch `==1` vs `==2`. Reads as a small mode
+enum selecting which of two/three notify-handling paths applies; "notifyMode"
+describes that mechanic without asserting which in-game states 1/2 are.

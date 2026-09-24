@@ -109,3 +109,15 @@ reasoned, reproducer-backed stall verdict still expires when its blocker
 moves.** Echo's analysis was right and is still worth reading; only the verdict
 died. That is exactly what the `REOPENED -- ASSIGNABLE` marker is for, and this
 is its first realised match.
+
+## Naming (round 78, delta)
+
+**Tier A.** `func_8003C48C` -> `Obj86B60__OnTag2Notify`. Occupies slot58 in
+`gTaskCoreMethods` (the base table), `gClass86B60Methods` and
+`gGraphRoomMethods` identically (unoverridden by either derived class --
+`tools/classtable.py gTaskCoreMethods`/`gClass86B60Methods`/`gGraphRoomMethods`).
+`Obj86B60__OnNotify` (code_2cc8c_c.c) dispatches an incoming `EventArg` whose
+`target->header & 0xF == 2` through `self->methods->slot58`, matching the
+already-established `onTag1Notify` (header==1, slot54) naming convention one
+slot up. Two independent pieces of evidence agree (the dispatcher's own
+switch and the slot's universal, unoverridden occupancy), so tier A.

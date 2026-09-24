@@ -34,3 +34,12 @@ forwarded from the caller unchanged.
 ## Provenance
 
 round 2026-09-02, runner echo, unit code_2cc8c.
+
+## Naming (round 78, delta)
+
+**Tier B.** `func_8003C7B4` -> `Obj86B60__ForwardToChild`. Occupies slot70.
+Body: when `self->unk48` (a distinct, still-`Unk48Obj`-typed child) is
+non-NULL, forwards `(child, a1, 0x60, 0x60)` to `child->methods->slot80`.
+Mechanics are clear (a conditional forward to a child object, two args
+fixed); what the fixed `0x60, 0x60` pair or the child's real identity
+represent in the game is not established, so tier B rather than A.

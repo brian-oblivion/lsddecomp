@@ -102,3 +102,21 @@ promote to "closes any two-or-more-statement scalar copy in this
 codebase" without a confirmation outside the `code_2cc8c` family. Round
 18's over-promotion of the type/declaration-order lever on one success is
 the cautionary precedent this is deliberately not repeating.
+
+## Naming (round 78, delta)
+
+**Tier A** (pure setter). `func_8003CB68` -> `Obj86B60__SetColors`. Body:
+copies three independent 3-byte (`s8 r,g,b`) triples from `a1`, `a2`, `a3`
+into `self->unk90`, `self->unk93`, `self->unk96` respectively -- no other
+logic, a pure multi-field assignment.
+
+## Proposed field names (round 78, delta -- NOT applied, cross-unit)
+
+`Obj86B60::unk90` (`u8[3]`, +0x090) -> `baseColor`. Tier B: the only field
+of the three `SetColors` writes that is independently READ elsewhere in this
+unit -- `Obj86B60__TickColorFade` adds `frameCounter * unk84` to each of its
+three bytes as a fade base. `unk93`/`unk96` are set the same way by
+`SetColors` but never independently read in this unit's evidence, so no
+distinguishing name is proposed for them (kept `unk93`/`unk96`). Grep shows
+`unk90` textual hits in several genuinely-shared code_2cc8c_* siblings plus
+unrelated units, so proposal only.

@@ -21,3 +21,20 @@ A pure setter, establishing `Obj86B60::unk9C`/`unkA0` as an
 ## Provenance
 
 round 2026-09-02, runner echo, unit code_2cc8c. 1 attempt.
+
+## Naming (round 78, delta)
+
+**Tier A** (pure setter). `func_8003CAEC` -> `Obj86B60__SetCallback`. Body:
+`self->unk9C = a1; self->unkA0 = a2;` -- stores a callback pointer and its
+context argument verbatim, no other logic. Corroborated by
+`Obj86B60__RefreshViewValue`, the sole invoker of this pair
+(`self->unk9C(self->unkA0)`).
+
+## Proposed field names (round 78, delta -- NOT applied, cross-unit)
+
+`Obj86B60::unk9C` (`void (*)(void *ctx)`, +0x09C) -> `viewCallback`;
+`Obj86B60::unkA0` (`void *`, +0x0A0) -> `viewCallbackCtx`. Tier B (mechanics:
+a callback+context pair invoked by `Obj86B60__RefreshViewValue`, hence
+"view"; not a guess about what the callback itself does). Grep shows
+`unk9C`/`unkA0` textual hits in class_3bb8c_n.c/class_3bb8c_q.c/code_2c054.c/
+code_179d8_i.c (unrelated structs sharing the name), so proposal only.
