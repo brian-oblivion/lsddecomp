@@ -1,17 +1,19 @@
-# func_800199EC — MATCHED (78/78, round 75): lever = RETURN VALUE (next-packet pointer, arg0 + 0x20) + calls-arm-first branch order
+# SubmitPolyFT3 — MATCHED (78/78, round 75): lever = RETURN VALUE (next-packet pointer, arg0 + 0x20) + calls-arm-first branch order
 
-REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *func_800199EC(void *prim, void *ctx)` in `code_8220_b.c`).
+> Renamed from `func_800199EC` on 2026-09-24 (tools/rename.py). Address 0x800199ec.
+
+REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *SubmitPolyFT3(void *prim, void *ctx)` in `code_8220_b.c`).
 
 ## ROUND 75 (bravo): MATCHED
 
-Previous title: "func_800199EC — STALL: length EXACT (78/78 words, no drift); 70/78 raw word-match; first real diff at in-range word 12 (file 0xA21C / vram 0x80019A1C), register-identity choice (`$a2` vs `$a1`, duplicated OT mask)".
+Previous title: "SubmitPolyFT3 — STALL: length EXACT (78/78 words, no drift); 70/78 raw word-match; first real diff at in-range word 12 (file 0xA21C / vram 0x80019A1C), register-identity choice (`$a2` vs `$a1`, duplicated OT mask)".
 
 **Preserved body rebuilt first** (the `#ifdef NON_MATCHING` body compiled live
 in place of the `INCLUDE_ASM`): 70/78, `insertions 0 / deletions 0
 (opcode-level, built vs retail; positional skeleton diffs 8)`. The eight diffs
 are the `$a2`/`$a1` OT-mask register and the missing `addiu $v0,$s1,0x20`.
 
-**Lever: the one found on the siblings `func_800197C4` / `func_80019B24`
+**Lever: the one found on the siblings `SubmitPolyF3` / `SubmitPolyF4`
 earlier this round, applied unchanged.** The function returns the next packet
 pointer. `N = 0x20` is read off this function's own disassembly (the
 `addiu $v0, $s1, 0x20` at vram 0x80019A40 in the splice arm), and it agrees
@@ -29,14 +31,14 @@ other change, as it did on the siblings: it was a side effect of the missing
 return value, never a register choice.
 
 **Callers checked:** `func_80018464` in `src/code_8220_b.c` (two call sites,
-`prim = (u8 *)func_800199EC(prim, ctx);`), declared there as
-`extern void *func_800199EC(void *prim, void *ctx);`. The return type agrees.
+`prim = (u8 *)SubmitPolyFT3(prim, ctx);`), declared there as
+`extern void *SubmitPolyFT3(void *prim, void *ctx);`. The return type agrees.
 `RCpolyFT3` stays declared `void` in `include/code_8220.h` and is called
 through the local cast, as the matched siblings do.
 
 ## Earlier history
 
-# (previous title) # func_800199EC — STALL: length EXACT (78/78 words, no drift); 70/78 raw word-match; first real diff at in-range word 12 (file 0xA21C / vram 0x80019A1C), register-identity choice (`$a2` vs `$a1`, duplicated OT mask)
+# (previous title) # SubmitPolyFT3 — STALL: length EXACT (78/78 words, no drift); 70/78 raw word-match; first real diff at in-range word 12 (file 0xA21C / vram 0x80019A1C), register-identity choice (`$a2` vs `$a1`, duplicated OT mask)
 
 NON_MATCHING body promoted, round 65.
 
@@ -44,7 +46,7 @@ NON_MATCHING body promoted, round 65.
 
 Track 1b mechanical promotion. The standing `#if 0` snapshot in
 `src/code_8220_c.c` (family-shared register-identity residue, hand-derived
-per the round-13 HEAD PASS analysis — see `func_800197C4.md`) is not a
+per the round-13 HEAD PASS analysis — see `SubmitPolyF3.md`) is not a
 permuter candidate. Wrapped it in `#ifdef NON_MATCHING ... #else
 INCLUDE_ASM ... #endif` in place, no bytes changed. `./build-and-verify.sh`:
 `build exit=0`, `OK: build matches retail`. `tools/check-nonmatching.sh
@@ -54,7 +56,7 @@ current name).
 > **SEARCH PROVENANCE CORRECTED (round 41, head): the permuter figure in this
 > report is a SIBLING'S, not this function's.** The "40000 iterations" here is
 > a faithful cross-reference to the one deep search round 40 ran on
-> `func_800197C4`, the family's root case -- round 40's alpha labelled its own
+> `SubmitPolyF3`, the family's root case -- round 40's alpha labelled its own
 > section "base confirmed, cross-reference only" and was explicit about it.
 > What was validated against THIS function is its SCAFFOLD (`--debug` scores
 > it identically to the root), which is a different claim from a search having
@@ -85,12 +87,12 @@ permuter rc=124
 **76458 iterations.** Floor held at 260. Minimum score reached: **215**
 (pointer-truncation shape, two variants) plus **240** (OT-pointer-caching
 shape) — byte-identical to every other sibling searched this round
-(`func_80019C04`, `func_80019EE4`, `func_80019D84`). Both already
+(`SubmitPolyG4`, `SubmitPolyGT3`, `SubmitPolyFT4`). Both already
 oracle-falsified at the root; not translated.
 
 No zero reached. **Not permuter-exhausted — not closed in 76458 iterations
 under load (rc=124).** Fourth of four siblings searched this round, fourth
-identical outcome. See `func_80019D84.md`'s round 48 entry and the
+identical outcome. See `SubmitPolyFT4.md`'s round 48 entry and the
 round-48 broadcast for the family-wide reading: the two attractors are a
 property of the shared residue class, not of any one function's own
 instruction stream. Reverted; `git diff --stat` empty.
@@ -105,7 +107,7 @@ reference` hits.
 
 **Result: 70/78 words, byte-identical to round 36/39's figure. First diff at
 word 12 (file 0xA21C, vram 0x80019A1C): `retail=00ff063c built=00ff053c`** —
-same `$a2`/`$a1` family residue as `func_800197C4`. `git diff --stat` empty
+same `$a2`/`$a1` family residue as `SubmitPolyF3`. `git diff --stat` empty
 after revert.
 
 **Title rebuilt to the three-figure CLAUDE.md format.** Classification
@@ -121,7 +123,7 @@ This round's assignment asked whether `include/gte.h` (new, round 38 --
 `code_8220_b`'s `TransformAndCullPoly` closed 58/58 by replacing a whole-function
 `__asm__` with C over its macros) or the "hoist both values before either is
 consumed" lever moved this family. Both were tested concretely on the family
-ROOT case (`func_800197C4.md`, "ROUND 39" section) rather than repeated
+ROOT case (`SubmitPolyF3.md`, "ROUND 39" section) rather than repeated
 per-sibling, per the project's own "record a family-wide screen once"
 convention (round 20): **neither applies.** The GTE macro layer's domain
 (COP2 register transfer) is disjoint from this family's (a GPR-only 24-bit
@@ -160,18 +162,18 @@ The corrected, LINKABLE snapshot (identical to what's live in
  * 70/78 words, matching this report's own previously-recorded figure --
  * the rename did not disturb the residue.
  * Instruction-exact (asm-differ: zero inserted, zero deleted). Same
- * residue class as func_800197C4: $a2 vs $a1 for the OT high-byte mask,
+ * residue class as SubmitPolyF3: $a2 vs $a1 for the OT high-byte mask,
  * plus one missing `addiu $v0,$s1,0x20` = arg0 + 0x20, one byte past the
  * last self field this function touches (arg0+0x1E, a u16). Matches the
- * verified cross-sibling formula in func_800197C4.md. Not cracked.
+ * verified cross-sibling formula in SubmitPolyF3.md. Not cracked.
  */
-void func_800199EC(void *arg0, void *arg1) {
+void SubmitPolyFT3(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        func_8001A380(D_8008ACD0, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
-        func_8001A3EC((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
+        FillRCPolyHeader(gPolySubmitTableTri, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        CopyPolyVtx3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0x10),
                       (PolyUV4 *)((u8 *)arg0 + 0x18));
 
@@ -182,21 +184,21 @@ void func_800199EC(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x8C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x14);
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x90) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
 
-        RCpolyFT3(arg0, D_8008ACD0);
+        RCpolyFT3(arg0, gPolySubmitTableTri);
     }
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800199EC);
+INCLUDE_ASM("asm/nonmatchings/code_8220_c", SubmitPolyFT3);
 ```
 
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyFT3`'s prototype come from
 `include/code_8220.h`, already included by the unit.)
 
 Unit: `src/code_8220_c.c`. Gouraud-triangle-flavored sibling of
-`func_800197C4`/`func_80019B24`/`func_8001989C` (this unit, all stalled at
+`SubmitPolyF3`/`SubmitPolyF4`/`SubmitPolyG3` (this unit, all stalled at
 the same underlying residue) — same `prim->0x78`-gated OT-splice-or-calls
-shape. Calls-branch differs from `func_8001989C`'s: `func_8001A380` gets a
+shape. Calls-branch differs from `SubmitPolyG3`'s: `FillRCPolyHeader` gets a
 non-zero `a3` (`1`) and two `u16` stack args read from `self` (`+0xE`,
 `+0x16`) instead of the `0,0,0` triangle/quad-submission-path shape; the
 tail copies are three `u16` widen-and-store operations into `+0xA` from a
@@ -221,7 +223,7 @@ more `u16` stores into `+0x8` from three DIFFERENT `self` offsets; calls
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-void func_800199EC(void *arg0, void *arg1)
+void SubmitPolyFT3(void *arg0, void *arg1)
 {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
@@ -235,8 +237,8 @@ void func_800199EC(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        func_8001A380(D_8008ACD0, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
-        func_8001A3EC(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
+        FillRCPolyHeader(gPolySubmitTableTri, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
+        CopyPolyVtx3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u16 *)(self + 0x1E);
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0xA) = *(u16 *)(self + 0x1E);
@@ -245,7 +247,7 @@ void func_800199EC(void *arg0, void *arg1)
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0x8) = *(u16 *)(self + 0x14);
         *(u16 *)(*(u8 **)(prim + 0x90) + 0x8) = *(u16 *)(self + 0x1C);
 
-        func_8001B6B4(self, D_8008ACD0);
+        func_8001B6B4(self, gPolySubmitTableTri);
     }
 }
 #endif
@@ -253,7 +255,7 @@ void func_800199EC(void *arg0, void *arg1)
 
 Byte-exact on the calls branch, confirmed via the diff (nothing past word
 27 of 78 differs) and via objdump (`$s1`=self, `$s2`=prim, matching retail
-— the `func_8001989C` self/prim-swap issue did NOT recur here, consistent
+— the `SubmitPolyG3` self/prim-swap issue did NOT recur here, consistent
 with that report's theory that it's usage-frequency-dependent and this
 function's self/prim mention counts don't cross whatever threshold
 triggers it). One attempt, went in directly using the by-now-established
@@ -261,20 +263,20 @@ triggers it). One attempt, went in directly using the by-now-established
 
 ## Residue
 
-Identical class to `func_800197C4`/`func_80019B24` (this unit) — confined
+Identical class to `SubmitPolyF3`/`SubmitPolyF4` (this unit) — confined
 entirely to the `if` (list-splice) branch: the top-byte mask constant lands
 in `$a1` where retail wants `$a2`, and one dead `addiu $v0,$s1,0x20`
 (analogous to the siblings' own dead `addiu`s at different offsets) is
-absent. Not re-investigated — see `func_800197C4.md` for the six attempts
+absent. Not re-investigated — see `SubmitPolyF3.md` for the six attempts
 already spent establishing this residue is not reachable from C. Filed
 directly as a stall to preserve budget.
 
 ### Proposed learning
 
-Fourth confirmed instance of the `func_800197C4` list-splice register-
-identity residue, and useful negative evidence for `func_8001989C`'s
+Fourth confirmed instance of the `SubmitPolyF3` list-splice register-
+identity residue, and useful negative evidence for `SubmitPolyG3`'s
 self/prim-swap theory: this function's calls branch is COMPARABLE in size
-and self/prim reference count to `func_8001989C`'s (mid-size, self used
+and self/prim reference count to `SubmitPolyG3`'s (mid-size, self used
 somewhat more than prim) yet did NOT trigger the swap, landing `$s1`=self/
 `$s2`=prim correctly on the first attempt. The swap threshold is real but
 narrower than "self used more than prim" alone — worth measuring precisely
@@ -284,10 +286,10 @@ the fact.
 
 ## HEAD NOTE, round 13: this function's inherited cause is SUPERSEDED
 
-This report classified its residue by analogy to `func_800197C4`, the family's
+This report classified its residue by analogy to `SubmitPolyF3`, the family's
 root case, which was filed as an unreachable register-identity residue. **That
 root classification has been superseded** — see
-`docs/match-reports/func_800197C4.md`, "HEAD PASS". The head reached the
+`docs/match-reports/SubmitPolyF3.md`, "HEAD PASS". The head reached the
 correct instruction count and length there by changing two things, both of
 which apply to this function too:
 
@@ -309,38 +311,38 @@ changes above before spending anything on register-level reshaping.
 ## RUNNER PASS, round 13 continued: applied, instruction-exact, same residue class
 
 Applied both changes with this function's own offsets and its non-zero
-`func_8001A380` third stack arg. One attempt, 70/78 words, confirmed via
+`FillRCPolyHeader` third stack arg. One attempt, 70/78 words, confirmed via
 `asm-differ` zero-inserted/zero-deleted. Calls branch byte-exact. Remaining
 residue: `$a2`/`$a1` register identity plus one missing `addiu
 $v0,$s1,0x20` — matches the verified cross-sibling formula in
-`func_800197C4.md` (`0x20` = `0x1E + 2`, one byte past the last `arg0`
+`SubmitPolyF3.md` (`0x20` = `0x1E + 2`, one byte past the last `arg0`
 field this function touches, a `u16` at `+0x1E`). Not independently
-re-attempted; see `func_800197C4.md` for the ruled-out hypotheses.
+re-attempted; see `SubmitPolyF3.md` for the ruled-out hypotheses.
 
 ## RUNNER PASS, permuter round (alpha, code_8220_c): base confirmed, cross-reference only
 
 Framing correction: HARD RULE 6 bans the asm/operand-constraint MECHANISM
 for register identity, not the outcome of a register differing -- see
-`func_800197C4.md`'s new section for the full reasoning. Not "unreachable,
+`SubmitPolyF3.md`'s new section for the full reasoning. Not "unreachable,
 full stop."
 
 `--debug` confirms this function's scaffold scores identically to the
 family root: base = **260** (100 insertion + 100 deletion + 12x5 register
 diffs). Not independently full-searched this pass; time budget went to a
-deep single search on `func_800197C4` (40000 iterations, floor held at
+deep single search on `SubmitPolyF3` (40000 iterations, floor held at
 260, two false leads found and falsified against the real oracle) plus
 reading `code_8220_b`'s `func_80018464` for `self`'s real type -- see that
-report's new section for the trace, and `func_8001A064.md` for the one
+report's new section for the trace, and `SubmitPolyGT4.md` for the one
 sibling where the caller's own field writes independently confirm the
 size formula. Permuter scaffold left provisioned at
-`permuter-work/func_800199EC/` (gitignored, session-local).
+`permuter-work/SubmitPolyFT3/` (gitignored, session-local).
 
 ## RUNNER PASS, round 19 second head-directed pass (delta): drift-verified, aggregate-assignment axis checked -- clean negative
 
 Re-verified this report's exact preserved body by rebuilding it directly
 into `src/code_8220_c.c` (not just re-reading the report), per this
 round's standing drift-re-verification check: `build exit=2` (expected,
-not byte-exact), no compile error, `funcdiff.py func_800199EC` reports
+not byte-exact), no compile error, `funcdiff.py SubmitPolyFT3` reports
 **70/78, no outside-range drift warning** -- the claim holds, this is a
 real 8-word residue, not a misread.
 
@@ -348,7 +350,7 @@ This function was the head's specifically-named test case for whether the
 aggregate-assignment/whole-struct-copy lever (which closed two functions
 elsewhere this round, in unrelated units) reaches this family's shared
 "missing `addiu`" filler. It does not, and **not because the shape wasn't
-tried, but because it cannot be** -- see `func_800197C4.md`'s new section
+tried, but because it cannot be** -- see `SubmitPolyF3.md`'s new section
 for the full mechanism: the missing instruction here (`addiu
 $v0,$s1,0x20`) is confirmed, instruction-by-instruction on this
 function's OWN disassembly, to be a load-delay-slot filler for the
@@ -371,13 +373,13 @@ COP2/GTE-clobber-trap hypothesis tested against this function directly (its
 own disassembly grepped for every GTE/COP2 mnemonic: zero hits) as part of
 a whole-family screen — falsified for all ten functions in this unit's
 work list, not just this one. Full method and family-wide result in
-`func_800197C4.md`'s "ROUND 20" section. This function's own residue
+`SubmitPolyF3.md`'s "ROUND 20" section. This function's own residue
 remains the register-identity + code-motion-filler class already
 documented above, unaffected by this screen.
 
 ## ROUND 21 note
 
-Cross-sibling grep (`func_800197C4.md`, "ROUND 21" section) confirms this
+Cross-sibling grep (`SubmitPolyF3.md`, "ROUND 21" section) confirms this
 function's mask-constant `lui $a2` sits at the identical disassembly line
 (19) as all seven other siblings, and its own delay-slot filler satisfies the
 same align-4 formula. The `__asm__("")` barrier lever was evaluated against
@@ -396,7 +398,7 @@ continuing) rather than trusting the title line. Result: **70/78, no
 stale-build or drift warning, identical diff shape to every prior round's
 report.** Confirmed clean, not drifted.
 
-Read this family's full round-13/19/20/21 history (see `func_800197C4.md`
+Read this family's full round-13/19/20/21 history (see `SubmitPolyF3.md`
 for the shared root analysis) before attempting further reshaping this
 round: the register-identity + code-motion-filler residue has already been
 tested against six-plus independent axes (masking expression, reload/cache
@@ -417,3 +419,15 @@ output changes a REGISTER FIELD (e.g. `$a1` vs `$a2` in an otherwise-identical
 `lui`/`ori` instruction), not just an opcode's top bits with the same
 register operand -- these are the genuine, already-diagnosed register-identity
 residue, not a second hidden instance of the ADDIU/ORI blind spot.
+
+## Naming (round 77, alpha)
+
+`func_800199EC` -> `SubmitPolyFT3`, parameters (`arg0`, `arg1`) -> (`prim`, `ctx`). **Tier
+A.** code_8220_b's own comment (`src/code_8220_b.c`, the "eight submit
+wrappers" block) already names this whole family collectively: each is a
+tail call to Sony's `RCpolyFT3` (unrenamed, RCpoly* polygon-subdivision
+family, `libgte`) or a direct OT splice, matching every sibling's shape.
+This function's own discriminator: the splice arm returns
+`prim + 0x20` = `sizeof(POLY_FT3)`, and the calls arm falls straight
+into `jal RCpolyFT3`. `prim`/`ctx` match the parameter names code_8220_b's
+own `extern void *SubmitPolyFT3(void *prim, void *ctx);` view already used.

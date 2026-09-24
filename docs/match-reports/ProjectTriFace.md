@@ -9,7 +9,7 @@ them into the primitive/context struct (`prim`, same struct
 via `lwc2`, calls `TransformAndCullPoly` to transform/clip/OT-bucket, and — on
 success — writes the resulting screen Z into three separate output arrays
 (`prim->0x88/0x8c/0x90`, each element's `+0x14` field) via `swc2`, invokes
-a caller-supplied callback, and calls `func_8001A268(prim, 3)` (the literal
+a caller-supplied callback, and calls `UpdatePolyBBoxAndCull(prim, 3)` (the literal
 `3` looks like a "this is a triangle" primitive-kind tag, paired with `4` in
 `ProjectQuadFace`'s equivalent call).
 
@@ -50,7 +50,7 @@ s32 ProjectTriFace(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*ca
             : "memory");
     }
     callback(arg0);
-    func_8001A268(prim, 3);
+    UpdatePolyBBoxAndCull(prim, 3);
     return 0;
 fail:
     return 1;
@@ -180,9 +180,9 @@ offsets. See `docs/match-reports/SetupPrimCode.md` for the eight-for-eight
 `(len, code)` identification. Zero bytes changed; the swap is a naming fix,
 not a semantic one.
 
-`func_8001A268(ctx, 3)`'s literal `3` is a VERTEX COUNT, not a
+`UpdatePolyBBoxAndCull(ctx, 3)`'s literal `3` is a VERTEX COUNT, not a
 "primitive kind" tag -- that function walks `count` screen-XY pairs and
-computes their 2D bounding box (`docs/match-reports/func_8001A268.md`
+computes their 2D bounding box (`docs/match-reports/UpdatePolyBBoxAndCull.md`
 derives the body). The old "3 = triangle, 4 = quad" gloss in this report
 and in `include/code_8220.h` had the right numbers for the wrong reason
 and is corrected in both places.

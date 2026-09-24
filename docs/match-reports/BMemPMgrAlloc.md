@@ -129,9 +129,9 @@ of the `if (blockSize < size+0x10)` guard into an unconditional `u32 *next =
 
 **Verified against the real oracle, not trusted on the permuter's own
 number** (this project's own history has two prior instances of a permuter
--local improvement that was fake — `func_800197C4`'s cached-OT-pointer lead
-and `func_8001A268`'s rewritten-`end`-pointer lead, both in
-`func_800197C4.md`/`func_8001A268.md`). Translated verbatim into
+-local improvement that was fake — `SubmitPolyF3`'s cached-OT-pointer lead
+and `UpdatePolyBBoxAndCull`'s rewritten-`end`-pointer lead, both in
+`SubmitPolyF3.md`/`UpdatePolyBBoxAndCull.md`). Translated verbatim into
 `src/code_8220.c`, ran `./build-and-verify.sh` + `funcdiff.py`: **REAL,
 non-degenerate improvement — 96/114 words, still zero out-of-range drift**
 (the file 0x83DC-0x83F4 cluster shrank and shifted to 0x83CC-0x83E0, net

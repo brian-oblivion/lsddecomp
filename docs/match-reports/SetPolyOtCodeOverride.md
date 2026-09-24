@@ -1,4 +1,6 @@
-# func_8001A54C -- MATCHED (round 44, 6/6 words)
+# SetPolyOtCodeOverride -- MATCHED (round 44, 6/6 words)
+
+> Renamed from `func_8001A54C` on 2026-09-24 (tools/rename.py). Address 0x8001a54c.
 
 Unit `code_8220_c`. Reopened round 42 after the `gp_rel` blocker that stalled
 it at carve time (round 13) was resolved (`--gp-symbols`, see
@@ -10,7 +12,7 @@ stub, which recorded no attempt and no score.
 Matched on the first build, no permuter needed.
 
 ```
-func_8001A54C: 6/6 words match (file 0xAD4C-0xAD64)
+SetPolyOtCodeOverride: 6/6 words match (file 0xAD4C-0xAD64)
 ```
 
 Whole-image `./build-and-verify.sh` passes (`build exit=0`).
@@ -21,31 +23,31 @@ The function is a straight-line two-field setter with no branches beyond an
 early-out:
 
 ```
-sw   $a0, %gp_rel(D_8008A830)($gp)
+sw   $a0, %gp_rel(gPolyOtCodeOverrideSet)($gp)
 beqz $a0, .L8001A55C
  nop
-sw   $a1, %gp_rel(D_8008A834)($gp)
+sw   $a1, %gp_rel(gPolyOtCodeOverride)($gp)
 .L8001A55C:
 jr   $ra
  nop
 ```
 
-`D_8008A830` and `D_8008A834` (`asm/data/7B018.sdata.s`) are plain `.sdata`
+`gPolyOtCodeOverrideSet` and `gPolyOtCodeOverride` (`asm/data/7B018.sdata.s`) are plain `.sdata`
 words, initialized to `1` and `2` respectively, and referenced from nowhere
 else in the executable except this function and its `code_8220_c` sibling
-`func_8001A380` (also assigned this round -- see `func_8001A380.md`). No
+`FillRCPolyHeader` (also assigned this round -- see `FillRCPolyHeader.md`). No
 existing type information anywhere else in the codebase constrains them
 further, so they are declared `s32`.
 
 ```c
-extern s32 D_8008A830;
-extern s32 D_8008A834;
+extern s32 gPolyOtCodeOverrideSet;
+extern s32 gPolyOtCodeOverride;
 
-void func_8001A54C(s32 arg0, s32 arg1)
+void SetPolyOtCodeOverride(s32 arg0, s32 arg1)
 {
-    D_8008A830 = arg0;
+    gPolyOtCodeOverrideSet = arg0;
     if (arg0) {
-        D_8008A834 = arg1;
+        gPolyOtCodeOverride = arg1;
     }
 }
 ```
@@ -58,8 +60,18 @@ any GTE macro.
 
 ### Proposed learning
 
-`D_8008A830`/`D_8008A834` are declared locally in `src/code_8220_c.c` (not in
+`gPolyOtCodeOverrideSet`/`gPolyOtCodeOverride` are declared locally in `src/code_8220_c.c` (not in
 `include/code_8220.h`) per the project convention: nothing outside this unit
 currently references them, so putting the extern in a shared header would
 just be an unused collision surface for a sibling unit that never touches
 them.
+
+## Naming (round 77, alpha)
+
+`func_8001A54C` -> `SetPolyOtCodeOverride`, parameters (`arg0`, `arg1`) ->
+(`enable`, `code`). **Tier A**: a two-field setter whose read side
+(FillRCPolyHeader, this unit) is fully derived -- `enable` gates whether
+FillRCPolyHeader's header word 0 comes from `code` (stored only when
+`enable` is set) or the per-object D_80090C18 default. Matches the
+globals it writes, `gPolyOtCodeOverrideSet`/`gPolyOtCodeOverride` (named
+alongside this function).

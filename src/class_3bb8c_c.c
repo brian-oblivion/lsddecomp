@@ -177,7 +177,7 @@ extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
  * assignment. All-`s8` fields (alignment 1, not 2 or 4) is what makes
  * retail's block-move split this way: the leading 4 bytes go via the
  * unaligned lwl/lwr word copy regardless of declared alignment (same
- * idiom as Vec2s16, func_8001A268), but the trailing 2 bytes can no
+ * idiom as Vec2s16, UpdatePolyBBoxAndCull), but the trailing 2 bytes can no
  * longer be proven 2-byte aligned, so there is no safe halfword move for
  * them and the compiler falls back to two individual signed-byte
  * loads/stores. See docs/match-reports/FormatNumberIntoBuffer.md. */

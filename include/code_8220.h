@@ -211,13 +211,15 @@ extern s32 TransformAndCullPoly(void *arg0, void *arg1);
 
 /* Called by ProjectTriFace/ProjectQuadFace at the end of a face that was not
  * culled. `count` is the face's VERTEX COUNT (3 or 4), not a primitive-kind
- * code: docs/match-reports/func_8001A268.md derives the body, which walks
- * `count` screen-XY pairs from arg0+0x64 to arg0 + 0x5C + count*4, tracks the
+ * code: docs/match-reports/UpdatePolyBBoxAndCull.md derives the body, which walks
+ * `count` screen-XY pairs from ctx+0x64 to ctx + 0x5C + count*4, tracks the
  * 2D bounding box in +0x70../+0x76 and sets the culled flag at +0x78 when
  * either span reaches 0x101. The older "3 = triangle, 4 = quad" wording here
  * read the right numbers off the call sites for the wrong reason; corrected
- * round 51. code_8220_c, round 13. */
-extern void func_8001A268(void *prim, s32 count);
+ * round 51. `ctx` (named round 77) is the same per-face draw context
+ * TransformAndCullPoly above documents -- its SXY0-2 cache and culled flag
+ * are exactly the fields this function reads and sets. code_8220_c, round 13. */
+extern void UpdatePolyBBoxAndCull(void *ctx, s32 count);
 
 /* Round 13: this unit's own minimal, local view of the Psy-Q GPU primitive
  * tag word -- the same shape as `P_TAG` in include/psyq/LIBGPU.H, declared
@@ -235,7 +237,7 @@ typedef struct OtTag {
     u32 len  : 8;
 } OtTag;
 
-/* func_8001A3EC's payload types (round 13). Both are ALL-s16 and that is
+/* CopyPolyVtx3's payload types (round 13). Both are ALL-s16 and that is
  * load-bearing: all-s16 members give alignment 2, which is what makes a
  * whole-struct assignment compile to unaligned lwl/lwr + swl/swr instead of
  * aligned lw/sw. See DECOMPILATION_LEARNINGS, "A struct whose members are
@@ -253,7 +255,7 @@ typedef struct PolyUV4 {
     s16 v;
 } PolyUV4;
 
-/* func_8001A3EC's element type. Only the 8-byte payload at +0x000 and the
+/* CopyPolyVtx3's element type. Only the 8-byte payload at +0x000 and the
  * 4-byte payload at +0x010 are touched by that function; the span between
  * is opaque from it alone. */
 typedef struct PolyVtx {
@@ -264,31 +266,35 @@ typedef struct PolyVtx {
 
 /* Unaligned struct-field copy helper, code_8220_c (round 13). Takes two
  * 3-element arrays of PolyVtx pointers plus three UV sources. */
-extern void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0,
+extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0,
                           PolyUV4 *uv1, PolyUV4 *uv2);
 
-/* Populates a GPU primitive header at `arg0` (D_8008ACD0/D_8008AEE8):
- * +0x00 an OT/code word (D_8008A834 when D_8008A830 is set, else
+/* Populates a submit table's (`table`, gPolySubmitTableTri/gPolySubmitTableQuad):
+ * +0x00 an OT/code word (gPolyOtCodeOverride when gPolyOtCodeOverrideSet is set, else
  * D_80090C18), +0x04 D_8008A824, +0x08 D_8008A828 -- these three are
  * UNCONDITIONAL (the third rides in the branch's own delay slot in
  * retail); only the two u16 stack args at +0x0C/+0x0E are actually
- * gated on `arg3 != 0`. +0x10 is an unaligned PolyUV4 copied from
- * `*arg2` (same lwl/lwr idiom as func_8001A3EC, forced by PolyUV4's
+ * gated on `hasUv1Codes != 0`. +0x10 is an unaligned PolyUV4 copied from
+ * `*uv` (same lwl/lwr idiom as CopyPolyVtx3, forced by PolyUV4's
  * alignment-2 all-s16 layout); +0x14 is the plain word at
- * `arg1 + 0x30`. MATCHED round 44 after the gp_rel blocker that
+ * `ctx + 0x30`. MATCHED round 44 after the gp_rel blocker that
  * stalled it at carve time (round 13) was resolved -- see
- * docs/match-reports/func_8001A380.md. Declared here so its caller in
- * this unit, func_800197C4, can compile (still INCLUDE_ASM). */
-extern void func_8001A380(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5);
+ * docs/match-reports/FillRCPolyHeader.md. Declared here so its caller in
+ * this unit, SubmitPolyF3, can compile (still INCLUDE_ASM). Parameters
+ * named round 77 (alpha): `hasUv1Codes`/`uv1Clut`/`uv1TPage` from the
+ * FT3/GT3/FT4/GT4 call sites, which pass 1 plus the primitive's own
+ * `+0xE`/`+0x16` or `+0xE`/`+0x1A` fields (POLY_FTn/GTn's CLUT and TPAGE
+ * words); F3/G3/F4/G4 pass 0/0/0 and leave +0xC/+0xE untouched. */
+extern void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut, u16 uv1TPage);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf3.s, not a carved C unit). Called by
- * func_800197C4 (code_8220_c) with (self, table).
+ * SubmitPolyF3 (code_8220_c) with (self, table).
  *
  * Every RCpoly* wrapper in code_8220_c returns the next packet pointer:
  * `arg0 + sizeof(prim)` when it splices the primitive into the OT itself,
  * else its RCpoly* callee's own $v0 (a tail call). Round 50 measured this
- * as a lead; round 75 acted on it and matched func_800197C4 and
- * func_80019B24 with it (calls arm first, then the splice arm). The six
+ * as a lead; round 75 acted on it and matched SubmitPolyF3 and
+ * SubmitPolyF4 with it (calls arm first, then the splice arm). The six
  * other wrappers carry the same filler signature. The Sony functions' own
  * return type has no Psy-Q header prototype and stays `void` here, so the
  * matched wrappers call through a local `void *(*)(void *, void *)` cast
@@ -296,52 +302,52 @@ extern void func_8001A380(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 a
 extern void RCpolyF3(void *self, void *table);
 
 /* Opaque table, referenced only by ADDRESS (never dereferenced in this
- * unit) and handed to func_8001A380/RCpolyF3. asm/data, not yet
+ * unit) and handed to FillRCPolyHeader/RCpolyF3. asm/data, not yet
  * carved -- real element type unknown. */
-extern u8 D_8008ACD0[];
+extern u8 gPolySubmitTableTri[];
 
-/* Quad-flavored sibling of D_8008ACD0/func_8001A380/RCpolyF3,
- * referenced the same way by func_80019B24 (code_8220_c, round 13). */
-extern u8 D_8008AEE8[];
+/* Quad-flavored sibling of gPolySubmitTableTri/FillRCPolyHeader/RCpolyF3,
+ * referenced the same way by SubmitPolyF4 (code_8220_c, round 13). */
+extern u8 gPolySubmitTableQuad[];
 
 /* Unaligned struct-field copy helper (quad flavor: 4 fields, not 3).
- * Extends func_8001A3EC to a 4th vertex: forwards elements 0-2 to it
+ * Extends CopyPolyVtx3 to a 4th vertex: forwards elements 0-2 to it
  * unchanged, then does its own dst[3]->xy = src[3]->xy / dst[3]->uv = *uv3
  * (round 20). */
-extern void func_8001A4C0(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+extern void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
                           PolyUV4 *uv2, PolyUV4 *uv3);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf4.s, not a carved C unit). Called by
- * func_80019B24 (code_8220_c) with (self, table) -- quad-flavored sibling
+ * SubmitPolyF4 (code_8220_c) with (self, table) -- quad-flavored sibling
  * of RCpolyF3. */
 extern void RCpolyF4(void *self, void *table);
 
 /* Psy-Q SDK (asm/psyq_rcpolyg3.s, not a carved C unit). Called by
- * func_8001989C (code_8220_c) with (self, table) -- Gouraud-shaded
+ * SubmitPolyG3 (code_8220_c) with (self, table) -- Gouraud-shaded
  * sibling of RCpolyF3/RCpolyF4. */
 extern void RCpolyG3(void *self, void *table);
 
 /* Psy-Q SDK (asm/psyq_rcpolyg3.s, same file as RCpolyG3, not a
- * carved C unit). Called by func_800199EC (code_8220_c) with
+ * carved C unit). Called by SubmitPolyFT3 (code_8220_c) with
  * (self, table). */
 extern void RCpolyFT3(void *self, void *table);
 
 /* Psy-Q SDK (asm/psyq_rcpolyg3.s, same file as RCpolyG3/RCpolyFT3,
- * not a carved C unit). Called by func_80019C04 (code_8220_c) with
+ * not a carved C unit). Called by SubmitPolyG4 (code_8220_c) with
  * (self, table) -- Gouraud-shaded quad, quad-flavored sibling of
  * RCpolyG3. */
 extern void RCpolyG4(void *self, void *table);
 
 /* Psy-Q SDK (asm/psyq_rcpolyft3.s, not a carved C unit). Called by
- * func_80019D84 (code_8220_c) with (self, table). */
+ * SubmitPolyFT4 (code_8220_c) with (self, table). */
 extern void RCpolyFT4(void *self, void *table);
 
 /* Psy-Q SDK (asm/psyq_rcpolygt3.s, not a carved C unit). Called by
- * func_80019EE4 (code_8220_c) with (self, table). */
+ * SubmitPolyGT3 (code_8220_c) with (self, table). */
 extern void RCpolyGT3(void *self, void *table);
 
 /* Psy-Q SDK (asm/psyq_rcpolygt3.s, same file as RCpolyGT3, not a
- * carved C unit). Called by func_8001A064 (code_8220_c) with (self,
+ * carved C unit). Called by SubmitPolyGT4 (code_8220_c) with (self,
  * table) -- Gouraud-shaded quad, quad-flavored sibling of RCpolyGT3. */
 extern void RCpolyGT4(void *self, void *table);
 

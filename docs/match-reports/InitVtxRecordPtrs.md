@@ -1,10 +1,12 @@
-# func_8001A224 — MATCHED (17/17 words)
+# InitVtxRecordPtrs — MATCHED (17/17 words)
 
-Unit: `src/code_8220_c.c`. Immediately precedes `func_8001A268` in ROM
-order — likely a helper it calls, though `func_8001A268` itself is not yet
+> Renamed from `func_8001A224` on 2026-09-24 (tools/rename.py). Address 0x8001a224.
+
+Unit: `src/code_8220_c.c`. Immediately precedes `UpdatePolyBBoxAndCull` in ROM
+order — likely a helper it calls, though `UpdatePolyBBoxAndCull` itself is not yet
 matched (queued next). `kind` is the same "primitive kind" code seen
 already in `code_8220_b` (`ProjectTriFace`/`ProjectQuadFace` pass `3`
-triangle / `4` quad to `func_8001A268`): here it doubles as the LOOP COUNT
+triangle / `4` quad to `UpdatePolyBBoxAndCull`): here it doubles as the LOOP COUNT
 too, since a triangle needs 3 slots written and a quad 4 — one register,
 two jobs, matching how compactly retail keeps live values.
 
@@ -16,7 +18,7 @@ selected by `kind == 4`), `kind` times.
 ## Final source
 
 ```c
-void func_8001A224(void *arg0, void *arg1, s32 kind)
+void InitVtxRecordPtrs(void *arg0, void *arg1, s32 kind)
 {
     u8 *src = (u8 *)arg1 + 0x18;
     u8 *dst0 = (u8 *)arg0;
@@ -42,3 +44,18 @@ natural entry point already). `arg1`'s value used for `src` is the
 UNMODIFIED parameter, computed before the `dst1` selection — the two never
 alias the same C expression, matching retail's use of the original `$a1`
 for one purpose and a reassigned local pointer for the other.
+
+## Naming (round 77, alpha)
+
+`func_8001A224` -> `InitVtxRecordPtrs`, parameters (`arg0`, `arg1`) ->
+(`dst`, `table`); `kind` kept (dual-purpose primitive-kind/loop-count
+code, already documented in this report). **Tier B.** Mechanics are
+established (writes a running pointer through `table`'s own per-vertex
+records into two parallel arrays), matched by call site in code_8220_b:
+`InitVtxRecordPtrs(ctx + 0x88, gPolySubmitTableTri, 3)` and
+`InitVtxRecordPtrs(ctx + 0x94, gPolySubmitTableQuad, 4)`, confirming
+`dst`/`table` and that this is a one-time setup of the render context's
+vertex-record pointer slots (the same `ctx+0x88`/`ctx+0x94` the Submit*
+wrappers later read). WHY `table` also keeps its own mirror copy of the
+same pointers (at `+0xA8`/`+0xF0`) is not established, so the function
+name states only the mechanics, not that purpose.
