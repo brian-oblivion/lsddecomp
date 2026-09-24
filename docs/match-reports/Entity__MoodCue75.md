@@ -41,3 +41,7 @@ already established.
 None new; this one is a clean confirmation that the delay-slot-placement
 check from `Entity__MoodCue73`'s report generalizes correctly rather than
 over-correcting into "always hoist stores out of `if` bodies".
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 75 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.

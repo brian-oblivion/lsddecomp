@@ -114,3 +114,9 @@ which spelling GCC prefers; this is the third residue in this unit's
 reports (after `Entity__MoodCue71`'s register-identity fix and
 `Entity__MoodCue74`'s unsigned-cast fix) where the visible C had to diverge
 from the "obvious" spelling to match retail's exact lowering.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 68 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+**Data constants renamed this round:** `D_80089CC4` -> `ROTATION_ZPLUS9` and `D_80089D6C` -> `TRANSLATE_Y_PLUS8`, tier B. Byte-decoded from `disk/SLPS_015.56` against the existing `ROTATION_YAW_PLUS9`/`ROTATION_ZMINUS90`/`TRANSLATE_Y_PLUS256` tables: rotation tables are four s16 {num,den} pairs for X/Y(yaw)/Z/W, only one pair with den=1; translate tables are three consecutive s32 (X,Y,Z), only one nonzero. `D_80089CC4`'s nonzero pair is the THIRD (Z) slot at (9,1) -- same slot `ROTATION_X50_YMINUS120_Z30` already confirmed is Z, so `ROTATION_ZPLUS9` follows `ROTATION_ZMINUS90`'s no-underscore single-letter-axis convention. `D_80089D6C`'s nonzero 32-bit slot is the second (Y) at +8, matching `TRANSLATE_Y_*`.

@@ -1041,3 +1041,9 @@ already-permuter-searched residue). Disposition unchanged: STALL,
 divergence #1 closed (verified, isolable), divergence #2 open (confirmed
 independent, reclassified as a net insertion per round 19, not yet
 closed). `INCLUDE_ASM` restored; no source changes landed.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 81 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+**This handler also occupies row 120** of `gEntityMoodHandlerTable` (same `handler` word at both `0x80089EB0+0x10*81` and `0x80089EB0+0x10*120`; the row's other three words -- data0/data1/data2 -- differ between the two rows, so it is one function shared by two distinct mood-row configurations, not a naming collision). Named for its lower/first row per the existing convention; not a second name.

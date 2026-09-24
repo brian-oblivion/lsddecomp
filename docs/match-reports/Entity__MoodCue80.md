@@ -67,3 +67,9 @@ addresses of the unit's *other*, still-`INCLUDE_ASM` symbols (their
 expected vs. built addresses reveal the exact byte delta and which
 function introduced it) rather than trusting funcdiff's own per-function
 window once a drift warning is present.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 80 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+
+**Data constant renamed this round:** `D_80089D54` -> `TRANSLATE_Y_MINUS512`, tier B. 32-bit value at the Y slot (offset +4) is `0xfffffe00` = -512, matching the `TRANSLATE_Y_MINUS64`/`TRANSLATE_Y_PLUS256` s32-triple format confirmed in `Entity__MoodCue68`'s report.
