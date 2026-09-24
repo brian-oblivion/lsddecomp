@@ -270,7 +270,7 @@ extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0,
                           PolyUV4 *uv1, PolyUV4 *uv2);
 
 /* Populates a submit table's (`table`, gPolySubmitTableTri/gPolySubmitTableQuad):
- * +0x00 an OT/code word (gPolyOtCodeOverride when gPolyOtCodeOverrideSet is set, else
+ * +0x00 an OT/code word (sPolyOtCodeOverride when sPolyOtCodeOverrideSet is set, else
  * D_80090C18), +0x04 D_8008A824, +0x08 D_8008A828 -- these three are
  * UNCONDITIONAL (the third rides in the branch's own delay slot in
  * retail); only the two u16 stack args at +0x0C/+0x0E are actually

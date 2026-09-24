@@ -21,8 +21,8 @@ Whole-image `./build-and-verify.sh` passes (`build exit=0`).
 extern s32 D_8008A824;
 extern s32 D_8008A828;
 extern s32 D_80090C18;
-extern s32 gPolyOtCodeOverrideSet;
-extern s32 gPolyOtCodeOverride;
+extern s32 sPolyOtCodeOverrideSet;
+extern s32 sPolyOtCodeOverride;
 
 void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5)
 {
@@ -32,8 +32,8 @@ void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4,
     s32 code;
     s32 code2;
 
-    if (gPolyOtCodeOverrideSet) {
-        val = gPolyOtCodeOverride;
+    if (sPolyOtCodeOverrideSet) {
+        val = sPolyOtCodeOverride;
     } else {
         val = D_80090C18;
     }
@@ -109,7 +109,7 @@ it takes reading the raw `.s` (or the `~>` branch-target markers) and asking
 - **The two unconditional-global reads (`D_8008A824`, `D_8008A828`) must be
   assigned to locals placed AFTER the `val` if/else, not before it and not as
   initializers at the top of the function.** Putting them before the branch
-  hoists their loads ahead of the `gPolyOtCodeOverrideSet` test entirely, which is a
+  hoists their loads ahead of the `sPolyOtCodeOverrideSet` test entirely, which is a
   structurally different (and wrong, longer) instruction sequence. Putting
   them in the right position is also what gives the post-merge block enough
   bulk to stop GCC's single-instruction duplication reflex from the point

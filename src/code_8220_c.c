@@ -355,16 +355,16 @@ extern s32 D_8008A828;
  * to `dc_cb` itself, and this unit only ever reads the +0x4 word, so it
  * keeps the D_ spelling. Written by code_8220_b from a render object's
  * flags bits 9-11; read here as the default OT/code word when no override
- * is set (see gPolyOtCodeOverrideSet below). */
+ * is set (see sPolyOtCodeOverrideSet below). */
 extern s32 D_80090C18;
 
-extern s32 gPolyOtCodeOverrideSet;
-extern s32 gPolyOtCodeOverride;
+extern s32 sPolyOtCodeOverrideSet;
+extern s32 sPolyOtCodeOverride;
 
 /* Populates a submit table's (`table`, one of gPolySubmitTableTri/
  * gPolySubmitTableQuad) common header fields ahead of a Submit* wrapper's
- * RCpoly* call: +0x0 an OT/code word (gPolyOtCodeOverride when
- * gPolyOtCodeOverrideSet, else the D_80090C18 default), +0x4 D_8008A824,
+ * RCpoly* call: +0x0 an OT/code word (sPolyOtCodeOverride when
+ * sPolyOtCodeOverrideSet, else the D_80090C18 default), +0x4 D_8008A824,
  * +0x8 D_8008A828 -- these three are UNCONDITIONAL; only the two u16 args
  * at +0xC/+0xE are gated on `hasUv1Codes`. +0x10 is an unaligned PolyUV4
  * copied from `*uv` (same lwl/lwr idiom as CopyPolyVtx3); +0x14 is the
@@ -379,8 +379,8 @@ void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 
     s32 code;
     s32 code2;
 
-    if (gPolyOtCodeOverrideSet) {
-        val = gPolyOtCodeOverride;
+    if (sPolyOtCodeOverrideSet) {
+        val = sPolyOtCodeOverride;
     } else {
         val = D_80090C18;
     }
@@ -431,8 +431,8 @@ void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
     dst[3]->uv = *uv3;
 }
 
-extern s32 gPolyOtCodeOverrideSet;
-extern s32 gPolyOtCodeOverride;
+extern s32 sPolyOtCodeOverrideSet;
+extern s32 sPolyOtCodeOverride;
 
 /* Setter matching FillRCPolyHeader's read side: `enable` gates whether
  * FillRCPolyHeader's header word 0 comes from `code` (this call's second
@@ -440,8 +440,8 @@ extern s32 gPolyOtCodeOverride;
  * D_80090C18 default. Tier A. */
 void SetPolyOtCodeOverride(s32 enable, s32 code)
 {
-    gPolyOtCodeOverrideSet = enable;
+    sPolyOtCodeOverrideSet = enable;
     if (enable) {
-        gPolyOtCodeOverride = code;
+        sPolyOtCodeOverride = code;
     }
 }

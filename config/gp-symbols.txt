@@ -184,8 +184,6 @@ gLinkTriggerIndex
 gMemcardIconTemplate
 gOpenVabCount
 gPendingVabBuffer
-gPolyOtCodeOverride
-gPolyOtCodeOverrideSet
 gPolySubmitTableQuad
 gPolySubmitTableTri
 gStyleColorTable
@@ -218,3 +216,5 @@ gpDinamicLinkPenalty
 gpNavChallengesComplete
 sCdDriveInited
 sMoodCue78TransitionDone
+sPolyOtCodeOverride
+sPolyOtCodeOverrideSet
