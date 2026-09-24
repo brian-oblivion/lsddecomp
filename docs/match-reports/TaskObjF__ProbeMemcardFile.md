@@ -1,14 +1,16 @@
-# func_8004E9AC — MATCH (35/35 words)
+# TaskObjF__ProbeMemcardFile — MATCH (35/35 words)
+
+> Renamed from `func_8004E9AC` on 2026-09-24 (tools/rename.py). Address 0x8004e9ac.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
 
 ## What it does
 
-`s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *filterName)`. Guards
+`s32 TaskObjF__ProbeMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *filterName)`. Guards
 `filterName`: if it's NULL or points at an empty string, returns 0
 immediately without calling anything. Otherwise calls
-`func_8004EA38(self, destBuf, filterName)` — with a retry-loop skeleton
-identical in shape to `func_8004E940`/`func_8004EC5C` but initialized to
+`TaskObjF__OpenAndReadMemcardFile(self, destBuf, filterName)` — with a retry-loop skeleton
+identical in shape to `TaskObjF__FormatCard`/`TaskObjF__CheckCardSpace` but initialized to
 `retries = 0`, so it structurally never loops (a single attempt).
 
 ## Result
@@ -16,9 +18,9 @@ identical in shape to `func_8004E940`/`func_8004EC5C` but initialized to
 Matched on the first attempt.
 
 ```c
-extern s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *filterName);
+extern s32 TaskObjF__OpenAndReadMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *filterName);
 
-s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
+s32 TaskObjF__ProbeMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
 {
     s32 retries;
     s32 result;
@@ -28,7 +30,7 @@ s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
         return 0;
     }
     do {
-        result = func_8004EA38(self, destBuf, filterName);
+        result = TaskObjF__OpenAndReadMemcardFile(self, destBuf, filterName);
     } while (result == 0 && retries-- != 0);
     return result;
 }
@@ -37,18 +39,18 @@ s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *filterName)
 ## Parameter naming, corrected mid-derivation
 
 Reading the disassembly forward, it initially looked like this function's
-2nd parameter (forwarded as `func_8004EA38`'s 2nd argument) might be an
+2nd parameter (forwarded as `TaskObjF__OpenAndReadMemcardFile`'s 2nd argument) might be an
 opaque "arg1" distinct from the "name" string tested at the top — but
-`func_8004EA38`'s own body (see its report) reveals its 2nd parameter is
+`TaskObjF__OpenAndReadMemcardFile`'s own body (see its report) reveals its 2nd parameter is
 the `strcpy` DESTINATION buffer, and its 3rd parameter (this function's
 `filterName`, the one actually tested here) is never read by
-`func_8004EA38` at all. Named accordingly once `func_8004EA38` was read.
+`TaskObjF__OpenAndReadMemcardFile` at all. Named accordingly once `TaskObjF__OpenAndReadMemcardFile` was read.
 
 ### Proposed learning
 
 The `do { } while (result == 0 && retries-- != 0)` skeleton, seen three
-times in this unit (`func_8004E940` with `retries = 10`,
-`func_8004EC5C` with `retries = 10`, this function with `retries = 0`) is
+times in this unit (`TaskObjF__FormatCard` with `retries = 10`,
+`TaskObjF__CheckCardSpace` with `retries = 10`, this function with `retries = 0`) is
 a single retry-loop idiom parameterized purely by the initial constant —
 including the degenerate "run once" case. Reproduce the loop skeleton
 literally rather than special-casing `retries == 0` into a plain `if`; the
@@ -58,10 +60,10 @@ only ever executes once.
 ## Head correction, round 75
 
 The two-argument / `filterName` reading of `BuildMemcardPath` above is
-superseded. Round 75 matched `func_8004EA38` by calling it with THREE
+superseded. Round 75 matched `TaskObjF__OpenAndReadMemcardFile` by calling it with THREE
 arguments `(pathBuf, self->unkC, suffix)`, the third forwarded from the
 caller's own third parameter already in `$a2` (so no `$a2` set-up is
 emitted, which is why it read as two). `src/class_3bb8c_e.c` now declares
 one real prototype, `extern void *BuildMemcardPath(void *dest, s32 selector,
 void *suffix);`, replacing the unprototyped `arity-ok` declarations; this
-function's bytes are unchanged (see `func_8004EA38.md`).
+function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).

@@ -1604,7 +1604,7 @@ struct GenericCtorTable_3bb8c_d {
     u8 pad00C[0x040 - 0x00C];
     /* +0x040, TaskObjF__TaskObjF's own last call, forwarding its own 3rd
      * parameter verbatim; class_3bb8c_e's independent view (round 14,
-     * this same real object) names the concrete function `func_8004E5D4`,
+     * this same real object) names the concrete function `TaskObjF__SetCardSlot`,
      * still uncarved there. */
     void (*slot40)(void *self, s32 arg1);
 };
@@ -1948,7 +1948,7 @@ struct TaskObjF {
     u8 pad04[0x00C - 0x004];     /* BasicClass::children/parentRefs, untouched by this unit */
     s32 cardSlot;                  /* +0x00C, TaskObjF__TryReadMemcardFile: passed as BuildMemcardPath's "selector" (device slot 0/1) -- RENAMED round 60 (was unk0C) */
     u8 pad10[0x014 - 0x010];
-    s32 events[4];                  /* +0x014, TaskObjF__ForEachEvent (walks all 4, early-exit)/TaskObjF__WaitForReadyEvent (passes &events[0], count 4) -- RENAMED round 60 (was field14): 4 kernel event descriptors, corroborated cross-unit by class_3bb8c_e.c's func_8004E5E4, which fills the identical offset via OpenEvent() then passes the same object to this unit's own EnableEvents wrapper (see TaskObjF__EnableEvents's report) */
+    s32 events[4];                  /* +0x014, TaskObjF__ForEachEvent (walks all 4, early-exit)/TaskObjF__WaitForReadyEvent (passes &events[0], count 4) -- RENAMED round 60 (was field14): 4 kernel event descriptors, corroborated cross-unit by class_3bb8c_e.c's TaskObjF__OpenEvents, which fills the identical offset via OpenEvent() then passes the same object to this unit's own EnableEvents wrapper (see TaskObjF__EnableEvents's report) */
     s32 opMode;                       /* +0x024, RENAMED round 60 (was unk24): distinguishes which of this class's two operations is active -- TaskObjF__func_8004F638 sets 1, TaskObjF__func_8004F8A4 sets 2, TaskObjF__Validate reads (==1?); the values' exact meaning is not established */
     s32 statusCode;                    /* +0x028, RENAMED round 60 (was unk28): TaskObjF__Init/TaskObjF__func_8004F638 clear or set it, TaskObjF__func_8004F8A4/TaskObjF__Validate read it and dispatch it through slot7C -- a status/completion code, not confirmed to be error-only */
     s32 bufCount;                       /* +0x02C, RENAMED round 60 (was unk2C): TaskObjF__func_8004F638 (slot5C's return)/TaskObjF__FreeUnusedBuffers/TaskObjF__FreeBuffers (loop bound over bufArray) -- the number of bufArray entries actually in use */

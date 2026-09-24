@@ -1,10 +1,12 @@
-# func_8004E940 — MATCH (27/27 words)
+# TaskObjF__FormatCard — MATCH (27/27 words)
+
+> Renamed from `func_8004E940` on 2026-09-24 (tools/rename.py). Address 0x8004e940.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
 
 ## What it does
 
-`s32 func_8004E940(Node3bb8cE *self)`. Retries up to 10 times: pick one of
+`s32 TaskObjF__FormatCard(Node3bb8cE *self)`. Retries up to 10 times: pick one of
 two candidate path/name constants (`D_8008AA9C` or `D_8008AAA4`) based on
 `self->unkC`'s truth value, call `func_80050918` on it, and stop as soon
 as it returns nonzero or the retry budget is exhausted.
@@ -16,7 +18,7 @@ Reached 25/27 first try with the tag values swapped (my ternary picked
 ternary arms matched immediately:
 
 ```c
-s32 func_8004E940(Node3bb8cE *self)
+s32 TaskObjF__FormatCard(Node3bb8cE *self)
 {
     s32 retries;
     s32 result;
@@ -40,5 +42,5 @@ the actual instruction retail emits rather than the more idiomatic-looking
 ### Proposed learning
 
 None new — a straightforward "10 retries, then give up" idiom already
-established elsewhere in this project (`func_8004E9AC`/`func_8004EC5C` in
+established elsewhere in this project (`TaskObjF__ProbeMemcardFile`/`TaskObjF__CheckCardSpace` in
 this same unit share the shape).

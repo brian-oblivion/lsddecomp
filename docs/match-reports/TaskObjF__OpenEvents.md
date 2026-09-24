@@ -1,10 +1,12 @@
-# func_8004E5E4 — MATCH (37/37 words)
+# TaskObjF__OpenEvents — MATCH (37/37 words)
+
+> Renamed from `func_8004E5E4` on 2026-09-24 (tools/rename.py). Address 0x8004e5e4.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
 
 ## What it does
 
-`s32 func_8004E5E4(Node3bb8cE *self)`. Enters a critical section
+`s32 TaskObjF__OpenEvents(Node3bb8cE *self)`. Enters a critical section
 (`func_80024CE0`), starts 4 PSX threads via `func_80038F7C` (an
 `OpenTh`-style call: fixed mode `0xF4000001`, entry point from
 `D_80086E78[i]`, stack size `0x2000`, priority `0`), storing each returned
@@ -28,7 +30,7 @@ sub-pointer) and always indexing the FIRST array element on the shifting
 base:
 
 ```c
-s32 func_8004E5E4(Node3bb8cE *self)
+s32 TaskObjF__OpenEvents(Node3bb8cE *self)
 {
     s32 i;
     Node3bb8cE *cur;

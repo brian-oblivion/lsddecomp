@@ -328,11 +328,11 @@ fail:
     return NULL;
 }
 
-/* func_8004E3F4 is ALREADY MATCHED, but in class_3bb8c_e.c under its own
+/* TaskObjF__ClearResourceSlots is ALREADY MATCHED, but in class_3bb8c_e.c under its own
  * local type (`Node3bb8cE *`) -- this unit's own independent local view
  * of the same real object per the project's convention; only `self` is
  * ever forwarded here, never dereferenced. */
-extern void func_8004E3F4(void *self);
+extern void TaskObjF__ClearResourceSlots(void *self);
 
 /* libcard, linked SDK objects (config/psyq-objects.txt: libcard/a74,
  * libcard/a75, libcard/c112 -- see docs/match-reports/TaskObjF__TaskObjF.md).
@@ -355,6 +355,6 @@ void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
         StartCARD();
         _bu_init();
     }
-    func_8004E3F4(self);
+    TaskObjF__ClearResourceSlots(self);
     self->methods->slot40(self, arg2);
 }

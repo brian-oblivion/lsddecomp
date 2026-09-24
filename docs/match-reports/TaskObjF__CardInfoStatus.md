@@ -1,10 +1,12 @@
-# func_8004E7D0 — MATCH (48/48 words)
+# TaskObjF__CardInfoStatus — MATCH (48/48 words)
+
+> Renamed from `func_8004E7D0` on 2026-09-24 (tools/rename.py). Address 0x8004e7d0.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
 
 ## What it does
 
-`s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)`. Zeroes both
+`s32 TaskObjF__CardInfoStatus(Node3bb8cE *self, s32 *p1, s32 *p2)`. Zeroes both
 out-parameters, calls `TaskObjF__TestEvents(self)` (a still-INCLUDE_ASM helper in
 `class_3bb8c_f.c`), busy-waits on `func_80050B18(self->unk10)` until it
 returns nonzero, then reads a status code from `TaskObjF__WaitForReadyEvent(self)` and
@@ -36,7 +38,7 @@ second, even though `p1`'s store is the one that ends up physically
 FIRST in the compiled output):
 
 ```c
-s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
+s32 TaskObjF__CardInfoStatus(Node3bb8cE *self, s32 *p1, s32 *p2)
 {
     s32 status;
     s32 code;

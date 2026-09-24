@@ -1,10 +1,12 @@
-# func_8004EADC — MATCH (43/43 words)
+# TaskObjF__FindUnusedMemcardName — MATCH (43/43 words)
+
+> Renamed from `func_8004EADC` on 2026-09-24 (tools/rename.py). Address 0x8004eadc.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
 
 ## What it does
 
-`char *func_8004EADC(Node3bb8cE *self, char *buf, char *middle, char
+`char *TaskObjF__FindUnusedMemcardName(Node3bb8cE *self, char *buf, char *middle, char
 **entries)`. Walks a NULL-terminated array of candidate string suffixes
 (`entries`): for each, builds `buf = middle + entries[i]` (via
 `strcpy`/`strcat`) and tests it with `self->methods->slot54(self, 0,
@@ -26,7 +28,7 @@ to different code: the `while` form's test-then-branch-to-end sequence
 IS retail's bytes.
 
 ```c
-char *func_8004EADC(Node3bb8cE *self, char *buf, char *middle, char **entries)
+char *TaskObjF__FindUnusedMemcardName(Node3bb8cE *self, char *buf, char *middle, char **entries)
 {
     while (*entries != NULL) {
         strcpy(buf, middle);

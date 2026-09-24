@@ -1,28 +1,30 @@
-# func_8004E890 — MATCH (44/44 words)
+# TaskObjF__CardLoadStatus — MATCH (44/44 words)
+
+> Renamed from `func_8004E890` on 2026-09-24 (tools/rename.py). Address 0x8004e890.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
 
 ## What it does
 
-`s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)`. Structural sibling
-of `func_8004E7D0`: zeroes `*p1`, sets `*p2` to the default status (1),
+`s32 TaskObjF__CardLoadStatus(Node3bb8cE *self, s32 *p1, s32 *p2)`. Structural sibling
+of `TaskObjF__CardInfoStatus`: zeroes `*p1`, sets `*p2` to the default status (1),
 calls `TaskObjF__TestEvents(self)`, busy-waits on `func_80050B08(self->unk10)`
 until nonzero, reads a status code from `TaskObjF__WaitForReadyEvent(self)` and maps it
-identically to `func_8004E7D0`'s first two cases (`0x100` -> status 0 with
+identically to `TaskObjF__CardInfoStatus`'s first two cases (`0x100` -> status 0 with
 no out-writes; `0x8000` -> status 0, `*p1 = 1`), but its `0x2000` arm
 differs: it just sets `*p2 = 0` (no follow-up library call, unlike
-`func_8004E7D0`'s `_card_clear`).
+`TaskObjF__CardInfoStatus`'s `_card_clear`).
 
 ## Result
 
-Applied `func_8004E7D0`'s already-derived fix up front and matched
+Applied `TaskObjF__CardInfoStatus`'s already-derived fix up front and matched
 immediately. Since this function's two initial stores write DIFFERENT
 values (`*p1 = 0`, `*p2 = 1`, not the same value), the chained-assignment
-form from `func_8004E7D0` (`*p2 = *p1 = 0;`) doesn't apply verbatim; the
+form from `TaskObjF__CardInfoStatus` (`*p2 = *p1 = 0;`) doesn't apply verbatim; the
 comma-operator equivalent does:
 
 ```c
-s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
+s32 TaskObjF__CardLoadStatus(Node3bb8cE *self, s32 *p1, s32 *p2)
 {
     s32 status;
     s32 code;
@@ -47,7 +49,7 @@ s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
 
 ### Proposed learning
 
-Generalizes `func_8004E7D0`'s finding: when the two stores that need to be
+Generalizes `TaskObjF__CardInfoStatus`'s finding: when the two stores that need to be
 forced adjacent (ahead of an intervening void call) write DIFFERENT
 values, the comma operator (`*a = (*b = v1, v2);`) is the equivalent of
 the same-value chained assignment (`*a = *b = v;`) — both remove GCC

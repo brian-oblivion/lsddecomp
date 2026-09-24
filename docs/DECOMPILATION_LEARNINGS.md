@@ -173,7 +173,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   wrong shape. Where `i++` sits decides whether its `addiu` fills the `jalr` slot. The reverse also
   occurs (`UpdatePolyBBoxAndCull`: a value computed before the loop-skip test took the slot from the stack
   adjustment), and a retry loop testing its counter AFTER the call is a `while`, not a goto loop
-  (`func_8004E6B8`). Whatever precedes a branch in the source decides its delay slot. (round 75)
+  (`TaskObjF__CheckCardStatus`). Whatever precedes a branch in the source decides its delay slot. (round 75)
 - **Two argument set-ups sharing one `jal`, reached by a `j` whose delay slot sets the differing
   argument, are TWO calls GCC cross-jumped**, not one call with an argument chosen in a variable
   (`Entity__MoodCue111`, seven words short: its four `li v0,-0x3C` were each block's first instruction

@@ -1,10 +1,12 @@
-# func_8004E40C — MATCH (14/14 words)
+# TaskObjF__Finalize — MATCH (14/14 words)
+
+> Renamed from `func_8004E40C` on 2026-09-24 (tools/rename.py). Address 0x8004e40c.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
 
 ## What it does
 
-`void func_8004E40C(Node3bb8cE *self)`. A one-line base-class forward:
+`void TaskObjF__Finalize(Node3bb8cE *self)`. A one-line base-class forward:
 fetches the shared `BasicClass`-style vtable via the no-argument getter
 `Get_vtable_BasicClass()` (same base-class framework as `include/code_8220.h`'s
 `BasicClassMethods`, this unit's own independent local view named
@@ -17,7 +19,7 @@ to the base.
 Matched on the first attempt.
 
 ```c
-void func_8004E40C(Node3bb8cE *self)
+void TaskObjF__Finalize(Node3bb8cE *self)
 {
     Get_vtable_BasicClass()->finalize(self);
 }

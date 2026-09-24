@@ -1,4 +1,6 @@
-# func_8004E6B8 — MATCHED round 75 (echo): 49/49, whole image OK. Lever: LOOP SHAPE -- the retry loop is a plain `while (cond) { call; if (retries-- == 0) break; }` with the retry test AFTER the call, not a label+`goto` loop with the test before the call.
+# TaskObjF__CheckCardStatus — MATCHED round 75 (echo): 49/49, whole image OK. Lever: LOOP SHAPE -- the retry loop is a plain `while (cond) { call; if (retries-- == 0) break; }` with the retry test AFTER the call, not a label+`goto` loop with the test before the call.
+
+> Renamed from `func_8004E6B8` on 2026-09-24 (tools/rename.py). Address 0x8004e6b8.
 
 REVISITED, round 75: MATCHED on the first build; names/types not relevant.
 
@@ -11,10 +13,10 @@ diffs 44), plus drift outside the range (the body is one word short).
 **Reading retail's CFG instead of the preserved body's.** Retail's loop:
 
 ```
-    jal  func_8004E77C (self, p1, &localFlag, p3) ; first call
+    jal  TaskObjF__CardInfoAndLoadStatus (self, p1, &localFlag, p3) ; first call
     j    .L71C            ; a1 = result
 .L6FC:
-    jal  func_8004E77C (self, p1, p2, p3)
+    jal  TaskObjF__CardInfoAndLoadStatus (self, p1, p2, p3)
     a1 = result
     v0 = s2 ; beqz v0 -> done ; s2--      ; retries-- == 0, AFTER the call
 .L71C:
@@ -31,7 +33,7 @@ different loop, and GCC cross-jumped its two call sites into one `jal`.
 Written as the loop retail actually runs:
 
 ```c
-s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
+s32 TaskObjF__CheckCardStatus(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 {
     s32 retries;
     s32 localFlag;
@@ -39,9 +41,9 @@ s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 
     retries = 10;
     *p2 = 0;
-    result = func_8004E77C(self, p1, &localFlag, p3);
+    result = TaskObjF__CardInfoAndLoadStatus(self, p1, &localFlag, p3);
     while (result == 0 || *p1 != 0 || *p3 == 0) {
-        result = func_8004E77C(self, p1, p2, p3);
+        result = TaskObjF__CardInfoAndLoadStatus(self, p1, p2, p3);
         if (retries-- == 0) {
             break;
         }
@@ -67,7 +69,7 @@ compute the same thing, and the compiler is free to merge its calls.
 
 ---
 
-Previous title: func_8004E6B8 — NON_MATCHING body promoted, round 71. Length: 1 word SHORT (48/49, 0xC0/0xC4). Word-match: 5/49 in-range (live-measured round 71, matches round 37's remeasurement). First real diff: file 0x3EEC4 / vram 0x8004E6C4 (register set-up differs immediately; the compiled body is a CROSS-JUMP MERGE of the two call sites, not the register-permutation-only shape originally recorded in rounds 14/19).
+Previous title: TaskObjF__CheckCardStatus — NON_MATCHING body promoted, round 71. Length: 1 word SHORT (48/49, 0xC0/0xC4). Word-match: 5/49 in-range (live-measured round 71, matches round 37's remeasurement). First real diff: file 0x3EEC4 / vram 0x8004E6C4 (register set-up differs immediately; the compiled body is a CROSS-JUMP MERGE of the two call sites, not the register-permutation-only shape originally recorded in rounds 14/19).
 
 > **ROUND 37 (delta): rebuilt this EXACT preserved body before trusting
 > its recorded score, per this round's own directive -- and the recorded
@@ -75,7 +77,7 @@ Previous title: func_8004E6B8 — NON_MATCHING body promoted, round 71. Length: 
 > "correct CFG and correct values, register-identity + delay-slot-split"
 > as the residue, with the preserved body's attempt-4 goto/if-split
 > rewrite specifically credited with eliminating a cross-jump merge of
-> the two `func_8004E77C` call sites. Splicing that EXACT body back in
+> the two `TaskObjF__CardInfoAndLoadStatus` call sites. Splicing that EXACT body back in
 > (byte-for-byte identical to the block below) and rebuilding shows
 > otherwise: `funcdiff.py` reports 5/49 in-range with massive drift
 > outside range, and a direct `objdump` of the compiled object shows only
@@ -87,7 +89,7 @@ Previous title: func_8004E6B8 — NON_MATCHING body promoted, round 71. Length: 
 >
 > **Confirmed this is not a toolchain drift, with an isolated
 > `cpp|cc1|maspsx|as` reproducer** (a standalone `.c` holding nothing but
-> a stub `Node3bb8cE`/`func_8004E77C` declaration and this function's
+> a stub `Node3bb8cE`/`TaskObjF__CardInfoAndLoadStatus` declaration and this function's
 > body, run through today's pinned pipeline with zero project headers).
 > The merge reproduces there too, in total isolation from the rest of
 > this file and this project. The `addiu_at` maspsx flag (round 21, the
@@ -139,7 +141,7 @@ Previous title: func_8004E6B8 — NON_MATCHING body promoted, round 71. Length: 
 > only reading the actual disassembly against the report's own prose
 > claim did.
 
-# func_8004E6B8 (ORIGINAL REPORT, rounds 14/19 — see ROUND 37 note above: this residue description does not reproduce against today's toolchain and this exact preserved body; kept for its correct CFG/value derivation, which IS still accurate)
+# TaskObjF__CheckCardStatus (ORIGINAL REPORT, rounds 14/19 — see ROUND 37 note above: this residue description does not reproduce against today's toolchain and this exact preserved body; kept for its correct CFG/value derivation, which IS still accurate)
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class). Predicted hardest
 this round (5 distinct callee-saved registers). Restored to
@@ -147,12 +149,12 @@ this round (5 distinct callee-saved registers). Restored to
 
 ## What it does
 
-`s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)`. Zeroes
-`*p2`, then calls `func_8004E77C(self, p1, &localFlag, p3)` once (using a
+`s32 TaskObjF__CheckCardStatus(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)`. Zeroes
+`*p2`, then calls `TaskObjF__CardInfoAndLoadStatus(self, p1, &localFlag, p3)` once (using a
 LOCAL stack variable, not `p2`, for that call's own 3rd argument). If the
 result is 0, or `*p1` is nonzero, or `*p3` is zero, retries up to 10 more
 times — but every RETRY call uses `p2` itself (not the local) for
-`func_8004E77C`'s 3rd argument. On exit, ORs `*p2` with the local flag and
+`TaskObjF__CardInfoAndLoadStatus`'s 3rd argument. On exit, ORs `*p2` with the local flag and
 returns the last call's result.
 
 ## Where it stands
@@ -184,7 +186,7 @@ elsewhere retail spends a word my version saves, netting to a persistent
 1. A `while ((result==0 || *p1!=0 || *p3==0) && retries--) { call2; }`
    loop with the first call outside it — reached 15/49 in range, but with
    **176KB of drift outside the function**: GCC's cross-jump pass merged
-   the two textually-distinct calls to `func_8004E77C` into ONE physical
+   the two textually-distinct calls to `TaskObjF__CardInfoAndLoadStatus` into ONE physical
    call site (computing the 3rd argument differently on each incoming
    path, then jumping to a single shared `jal`), whereas retail keeps two
    separate `jal` instructions. This is the same family as the round-11
@@ -214,28 +216,28 @@ elsewhere retail spends a word my version saves, netting to a persistent
 
 ## Why restored to `INCLUDE_ASM`
 
-The compiled body is one word short, which would shift `func_8004E77C`
+The compiled body is one word short, which would shift `TaskObjF__CardInfoAndLoadStatus`
 and everything after it in this unit by 4 bytes. Restoring `INCLUDE_ASM`
 reproduces retail's own bytes verbatim, which is what let every function
-after this one (`func_8004E77C` through `func_8004ECCC`) be verified and
+after this one (`TaskObjF__CardInfoAndLoadStatus` through `TaskObjF__ProbeCardFreeSpace`) be verified and
 matched this round.
 
 ## An important adjacent finding, NOT specific to this function
 
-While deriving this function's needed return-value plumbing, `func_8004E77C`
+While deriving this function's needed return-value plumbing, `TaskObjF__CardInfoAndLoadStatus`
 (matched earlier this round as effectively `void`, since nothing in its
 own body used the return value explicitly) had to be given a REAL `s32`
-return type so `func_8004E6B8`'s C could read its result. **Adding
-explicit `return func_8004E890(...); return 0;` statements to
-`func_8004E77C` — changing NOTHING semantically — grew its compiled
+return type so `TaskObjF__CheckCardStatus`'s C could read its result. **Adding
+explicit `return TaskObjF__CardLoadStatus(...); return 0;` statements to
+`TaskObjF__CardInfoAndLoadStatus` — changing NOTHING semantically — grew its compiled
 length from 21 to 23 words** (confirmed via `objdump`, and it broke the
 whole unit's build, cascading a `sha1sum FAILED` even though `make`
-reported no compile errors). The fix was to keep `func_8004E77C`'s BODY
-exactly as originally written (the bare `if (cond) { func_8004E890(...);
+reported no compile errors). The fix was to keep `TaskObjF__CardInfoAndLoadStatus`'s BODY
+exactly as originally written (the bare `if (cond) { TaskObjF__CardLoadStatus(...);
 }` with no explicit `return`, letting `v0` carry through unmodified) while
 only changing its DECLARED return type to `s32` (compiles with a
 "control reaches end of non-void function" warning, which is expected
-and harmless here). See `func_8004E77C`'s own report, updated with this
+and harmless here). See `TaskObjF__CardInfoAndLoadStatus`'s own report, updated with this
 note.
 
 **This refines the project's "a byte match tells you nothing about the
@@ -257,7 +259,7 @@ described above, at exactly one missing word.
 
 ```c
 #if 0
-s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
+s32 TaskObjF__CheckCardStatus(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 {
     s32 retries;
     s32 localFlag;
@@ -265,14 +267,14 @@ s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 
     retries = 10;
     *p2 = 0;
-    result = func_8004E77C(self, p1, &localFlag, p3);
+    result = TaskObjF__CardInfoAndLoadStatus(self, p1, &localFlag, p3);
     goto check;
 retry:
     if (retries == 0) {
         goto done;
     }
     retries--;
-    result = func_8004E77C(self, p1, p2, p3);
+    result = TaskObjF__CardInfoAndLoadStatus(self, p1, p2, p3);
 check:
     if (result == 0) {
         goto retry;
@@ -291,7 +293,7 @@ done:
 ```
 
 Needs (already declared locally in `src/class_3bb8c_e.c`): `Node3bb8cE`,
-`func_8004E77C` (forward-declared, defined later in this same unit).
+`TaskObjF__CardInfoAndLoadStatus` (forward-declared, defined later in this same unit).
 
 ### Direction NOT tried, with reason
 
@@ -337,7 +339,7 @@ retail's disassembly relative to the `jal`:
 
 ```c
 retry:
-    result = func_8004E77C(self, p1, p2, p3);
+    result = TaskObjF__CardInfoAndLoadStatus(self, p1, p2, p3);
     if (retries == 0) {
         goto done;
     }
@@ -398,7 +400,7 @@ Live-measured under today's pinned toolchain (`--nop-at-expansion`
 included) before writing this entry, per this round's directive: made the
 body live C (not `#ifdef`), ran `./build-and-verify.sh` (clean compile,
 whole-image SHA1 mismatch as expected) and `tools/funcdiff.py
-func_8004E6B8`. Result: **5/49 words match in-range, 48/49 total length
+TaskObjF__CheckCardStatus`. Result: **5/49 words match in-range, 48/49 total length
 (1 word short)**, objdump confirms exactly ONE `jal` in the compiled body
 (the cross-jump merge round 37 found). This matches round 37's
 remeasurement exactly and supersedes the stale round-14/19 headline

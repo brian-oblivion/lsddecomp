@@ -57,18 +57,18 @@ real arguments, `$a2` being the suffix string it appends.
 pass different numbers of arguments, and retail's bytes show both:
 
 ```
-8004ea54:  lw    a1,12(v0)                 <- func_8004EA38: $a0/$a1 only, no $a2
+8004ea54:  lw    a1,12(v0)                 <- TaskObjF__OpenAndReadMemcardFile: $a0/$a1 only, no $a2
 8004ea58:  jal   8004f32c <BuildMemcardPath>
 
-8004ece4:  lw    a1,12(v0)                 <- func_8004ECCC: $a0/$a1 ...
+8004ece4:  lw    a1,12(v0)                 <- TaskObjF__ProbeCardFreeSpace: $a0/$a1 ...
 8004ece8:  lui   a2,0x8009                 <- ... and $a2, the &D_8008AAAC suffix
 8004ecec:  addiu a2,a2,-21844
 8004ecf0:  jal   8004f32c <BuildMemcardPath>
 ```
 
-`func_8004EA38`'s call (`BuildMemcardPath(pathBuf, self->unkC)`) relies on `$a2`
+`TaskObjF__OpenAndReadMemcardFile`'s call (`BuildMemcardPath(pathBuf, self->unkC)`) relies on `$a2`
 already holding a usable suffix pointer from the caller — the dead-argument
-idiom — while `func_8004ECCC`'s call materialises one. No single prototype
+idiom — while `TaskObjF__ProbeCardFreeSpace`'s call materialises one. No single prototype
 compiles both: a 3-parameter one makes the first call `too few arguments`, a
 2-parameter one makes the second `too many`. The unspecified parameter list is
 the only spelling, and it is the same idiom this unit already uses for
@@ -90,9 +90,9 @@ building a memory-card path string.
 ## Head correction, round 75
 
 The "must declare it unprototyped" reasoning above is disproved. Round 75
-matched `func_8004EA38` (class_3bb8c_e) by calling this function with THREE
+matched `TaskObjF__OpenAndReadMemcardFile` (class_3bb8c_e) by calling this function with THREE
 arguments; that call site's third argument is forwarded from its own third
 parameter, already in `$a2`, so no set-up is emitted and it read as a
 two-argument call. `src/class_3bb8c_e.c` now declares
 `extern void *BuildMemcardPath(void *dest, s32 selector, void *suffix);`
-and every call site in both units passes three. See `func_8004EA38.md`.
+and every call site in both units passes three. See `TaskObjF__OpenAndReadMemcardFile.md`.

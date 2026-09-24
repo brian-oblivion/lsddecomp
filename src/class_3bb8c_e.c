@@ -21,7 +21,7 @@
  * happened to be running. (3) The "UNRELATED class" claim above concerns
  * Obj866E8 and still stands, but round 60 found concrete evidence that this
  * unit's Node3bb8cE and class_3bb8c_f's TaskObjF may be ONE class seen
- * through two independent local views: func_8004E5E4 fills Node3bb8cE's
+ * through two independent local views: TaskObjF__OpenEvents fills Node3bb8cE's
  * threads[4] at +0x014 and hands the same pointer to TaskObjF__EnableEvents.
  * A track-4 lead; see docs/match-reports/TaskObjF__EnableEvents.md.
  *
@@ -35,17 +35,17 @@
 typedef struct BaseMethods3bb8cE BaseMethods3bb8cE;
 struct BaseMethods3bb8cE {
     u8 pad000[0x00C];
-    void (*finalize)(void *self);                 /* +0x00C, func_8004E40C */
-    void (*addChild)(void *self, void *child);    /* +0x010, func_8004E444 */
-    void (*removeChild)(void *self, void *child); /* +0x014, func_8004E4E8 */
-    void (*removeAllChildren)(void *self);        /* +0x018, func_8004E588 */
+    void (*finalize)(void *self);                 /* +0x00C, TaskObjF__Finalize */
+    void (*addChild)(void *self, void *child);    /* +0x010, TaskObjF__AddChild */
+    void (*removeChild)(void *self, void *child); /* +0x014, TaskObjF__RemoveChild */
+    void (*removeAllChildren)(void *self);        /* +0x018, TaskObjF__RemoveAllChildren */
 };
 extern BaseMethods3bb8cE *Get_vtable_BasicClass(void);
 
 /*
  * A typed child resource attached to a Node3bb8cE. Only the resource's own
  * header/type-tag word (methods->header, whose low byte(s) this unit tests
- * against literals 2/5/0x10/0x20) is read here -- func_8004E444/func_8004E4E8
+ * against literals 2/5/0x10/0x20) is read here -- TaskObjF__AddChild/TaskObjF__RemoveChild
  * never dereference the resource beyond that one word.
  */
 typedef struct ResHeader3bb8cE ResHeader3bb8cE;
@@ -60,8 +60,8 @@ struct Res3bb8cE {
 /*
  * The class itself. Offsets established purely from this unit's own 19
  * functions (see each field's comment). unk60/unk64/unk78/unk7C are four
- * typed resource slots, one per tag value func_8004E444/func_8004E4E8
- * dispatch on; unk68 is zeroed alongside them by func_8004E3F4/func_8004E588
+ * typed resource slots, one per tag value TaskObjF__AddChild/TaskObjF__RemoveChild
+ * dispatch on; unk68 is zeroed alongside them by TaskObjF__ClearResourceSlots/TaskObjF__RemoveAllChildren
  * but has no setter anywhere in this unit, so its pointee type is unproven.
  */
 typedef struct Node3bb8cE Node3bb8cE;
@@ -72,17 +72,17 @@ typedef struct Node3bb8cE Node3bb8cE;
 typedef struct SelfMethods3bb8cE SelfMethods3bb8cE;
 struct SelfMethods3bb8cE {
     u8 pad000[0x054];
-    /* func_8004EADC: called (self, 0, buf) per candidate string; 0 return
+    /* TaskObjF__FindUnusedMemcardName: called (self, 0, buf) per candidate string; 0 return
      * means "match" (buf is returned as the winning string). */
     s32 (*slot54)(Node3bb8cE *self, s32 arg1, char *arg2); /* +0x054 */
 };
 
 struct Node3bb8cE {
-    SelfMethods3bb8cE *methods;   /* +0x000, func_8004EADC */
+    SelfMethods3bb8cE *methods;   /* +0x000, TaskObjF__FindUnusedMemcardName */
     u8 pad04[0x00C - 0x004];
-    s32 unkC;              /* +0x00C, func_8004E5D4 sets it (caller value); func_8004E940 nonzero-tests it; func_8004EA38/func_8004ECCC forward it as BuildMemcardPath's arg1 */
-    s32 unk10;             /* +0x010, func_8004E5D4: unkC << 4; func_8004E7D0/func_8004E890: a resource handle passed to _card_info/_card_load/_card_clear */
-    s32 threads[4];        /* +0x014..+0x020, func_8004E5E4: 4 OpenTh-style thread handles, one per D_80086E78[] entry */
+    s32 unkC;              /* +0x00C, TaskObjF__SetCardSlot sets it (caller value); TaskObjF__FormatCard nonzero-tests it; TaskObjF__OpenAndReadMemcardFile/TaskObjF__ProbeCardFreeSpace forward it as BuildMemcardPath's arg1 */
+    s32 unk10;             /* +0x010, TaskObjF__SetCardSlot: unkC << 4; TaskObjF__CardInfoStatus/TaskObjF__CardLoadStatus: a resource handle passed to _card_info/_card_load/_card_clear */
+    s32 threads[4];        /* +0x014..+0x020, TaskObjF__OpenEvents: 4 OpenTh-style thread handles, one per D_80086E78[] entry */
     u8 pad24[0x060 - 0x024];
     Res3bb8cE *unk60;      /* +0x060, tag 2 */
     Res3bb8cE *unk64;      /* +0x064, tag 5 */
@@ -95,10 +95,10 @@ struct Node3bb8cE {
 /* Helpers this unit calls into, defined in class_3bb8c_f.c (extern for a
  * function OUTSIDE this unit). */
 /* BuildMemcardPath(dest, selector, suffix): 3-parameter, and both of this
- * unit's call sites pass all three. func_8004EA38 emits no $a2 set-up
+ * unit's call sites pass all three. TaskObjF__OpenAndReadMemcardFile emits no $a2 set-up
  * because its own 3rd parameter arrives in $a2 and is forwarded unchanged
  * (round 75; this was an `arity-ok` K&R declaration until then, on the
- * reading that func_8004EA38 made a 2-argument call). */
+ * reading that TaskObjF__OpenAndReadMemcardFile made a 2-argument call). */
 extern void *BuildMemcardPath(void *dest, s32 selector, void *suffix);
 extern void TaskObjF__EnableEvents(void *self);
 extern void *TaskObjF__DisableEvents(void *self);
@@ -106,19 +106,19 @@ extern void TaskObjF__TestEvents(void *self);
 extern void TaskObjF__ForEachEvent(void *self, void (*fn)(void), s32 arg2);
 extern s32 TaskObjF__WaitForReadyEvent(void *self);
 
-/* PSX thread-table constant walked by func_8004E5E4 (4 entries, one per
+/* PSX thread-table constant walked by TaskObjF__OpenEvents (4 entries, one per
  * OpenTh-style thread it starts). Address-only-derived walk (lui/addiu then
  * plain lw at increasing offsets), never gp-relative, so unaffected by the
  * project's gp_rel blocker. */
 extern s32 D_80086E78[4];
 extern s32 OpenEvent(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
-/* Two format-string-like globals selected by func_8004E940 on self->unkC's
+/* Two format-string-like globals selected by TaskObjF__FormatCard on self->unkC's
  * truth value; passed opaquely (never dereferenced in this unit). */
 extern s32 D_8008AA9C;
 extern s32 D_8008AAA4;
 /* Third such constant, passed as BuildMemcardPath's 3rd argument by
- * func_8004ECCC only. */
+ * TaskObjF__ProbeCardFreeSpace only. */
 extern s32 D_8008AAAC;
 
 extern void *BMemPMgrAlloc(s32 size);
@@ -126,7 +126,7 @@ extern void *BMemPMgrFree(void *ptr);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 
-void func_8004E3F4(Node3bb8cE *self)
+void TaskObjF__ClearResourceSlots(Node3bb8cE *self)
 {
     self->unk60 = NULL;
     self->unk64 = NULL;
@@ -135,12 +135,12 @@ void func_8004E3F4(Node3bb8cE *self)
     self->unk7C = NULL;
 }
 
-void func_8004E40C(Node3bb8cE *self)
+void TaskObjF__Finalize(Node3bb8cE *self)
 {
     Get_vtable_BasicClass()->finalize(self);
 }
 
-void func_8004E444(Node3bb8cE *self, Res3bb8cE *res)
+void TaskObjF__AddChild(Node3bb8cE *self, Res3bb8cE *res)
 {
     s32 tag;
 
@@ -166,7 +166,7 @@ void func_8004E444(Node3bb8cE *self, Res3bb8cE *res)
     }
 }
 
-void func_8004E4E8(Node3bb8cE *self, Res3bb8cE *res)
+void TaskObjF__RemoveChild(Node3bb8cE *self, Res3bb8cE *res)
 {
     s32 tag;
 
@@ -186,7 +186,7 @@ void func_8004E4E8(Node3bb8cE *self, Res3bb8cE *res)
     Get_vtable_BasicClass()->removeChild(self, res);
 }
 
-void func_8004E588(Node3bb8cE *self)
+void TaskObjF__RemoveAllChildren(Node3bb8cE *self)
 {
     self->unk60 = NULL;
     self->unk64 = NULL;
@@ -196,7 +196,7 @@ void func_8004E588(Node3bb8cE *self)
     Get_vtable_BasicClass()->removeAllChildren(self);
 }
 
-void func_8004E5D4(Node3bb8cE *self, s32 val)
+void TaskObjF__SetCardSlot(Node3bb8cE *self, s32 val)
 {
     self->unkC = val;
     self->unk10 = val << 4;
@@ -205,7 +205,7 @@ void func_8004E5D4(Node3bb8cE *self, s32 val)
 extern void EnterCriticalSection(void);
 extern void ExitCriticalSection(void);
 
-s32 func_8004E5E4(Node3bb8cE *self)
+s32 TaskObjF__OpenEvents(Node3bb8cE *self)
 {
     s32 i;
     Node3bb8cE *cur;
@@ -225,16 +225,16 @@ s32 func_8004E5E4(Node3bb8cE *self)
 
 extern void CloseEvent(void);
 
-s32 func_8004E678(Node3bb8cE *self)
+s32 TaskObjF__CloseEvents(Node3bb8cE *self)
 {
     TaskObjF__DisableEvents(self);
     TaskObjF__ForEachEvent(self, CloseEvent, 1);
     return 1;
 }
 
-extern s32 func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3);
+extern s32 TaskObjF__CardInfoAndLoadStatus(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3);
 
-s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
+s32 TaskObjF__CheckCardStatus(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 {
     s32 retries;
     s32 localFlag;
@@ -242,9 +242,9 @@ s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 
     retries = 10;
     *p2 = 0;
-    result = func_8004E77C(self, p1, &localFlag, p3);
+    result = TaskObjF__CardInfoAndLoadStatus(self, p1, &localFlag, p3);
     while (result == 0 || *p1 != 0 || *p3 == 0) {
-        result = func_8004E77C(self, p1, p2, p3);
+        result = TaskObjF__CardInfoAndLoadStatus(self, p1, p2, p3);
         if (retries-- == 0) {
             break;
         }
@@ -253,20 +253,20 @@ s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
     return result;
 }
 
-extern s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2);
-extern s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2);
+extern s32 TaskObjF__CardInfoStatus(Node3bb8cE *self, s32 *p1, s32 *p2);
+extern s32 TaskObjF__CardLoadStatus(Node3bb8cE *self, s32 *p1, s32 *p2);
 
-s32 func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
+s32 TaskObjF__CardInfoAndLoadStatus(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 {
-    if (func_8004E7D0(self, p1, p2) != 0) {
-        func_8004E890(self, p1, p3);
+    if (TaskObjF__CardInfoStatus(self, p1, p2) != 0) {
+        TaskObjF__CardLoadStatus(self, p1, p3);
     }
 }
 
 extern s32 _card_info(s32 arg0);
 extern s32 _card_clear(s32 arg0);
 
-s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
+s32 TaskObjF__CardInfoStatus(Node3bb8cE *self, s32 *p1, s32 *p2)
 {
     s32 status;
     s32 code;
@@ -291,7 +291,7 @@ s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2)
 
 extern s32 _card_load(s32 arg0);
 
-s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
+s32 TaskObjF__CardLoadStatus(Node3bb8cE *self, s32 *p1, s32 *p2)
 {
     s32 status;
     s32 code;
@@ -315,7 +315,7 @@ s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2)
 
 extern s32 format(s32 *arg0);
 
-s32 func_8004E940(Node3bb8cE *self)
+s32 TaskObjF__FormatCard(Node3bb8cE *self)
 {
     s32 retries;
     s32 result;
@@ -329,14 +329,14 @@ s32 func_8004E940(Node3bb8cE *self)
     return result;
 }
 
-/* func_8004EA38's 3rd parameter is the file-name suffix, forwarded verbatim
- * by func_8004E9AC (after rejecting NULL/empty) and by func_8004EA38 as
+/* TaskObjF__OpenAndReadMemcardFile's 3rd parameter is the file-name suffix, forwarded verbatim
+ * by TaskObjF__ProbeMemcardFile (after rejecting NULL/empty) and by TaskObjF__OpenAndReadMemcardFile as
  * BuildMemcardPath's 3rd argument. Round 75 corrected the earlier reading
- * that func_8004EA38 never used it: it never TOUCHES $a2, because the value
+ * that TaskObjF__OpenAndReadMemcardFile never used it: it never TOUCHES $a2, because the value
  * is already where the call wants it. */
-extern s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *suffix);
+extern s32 TaskObjF__OpenAndReadMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *suffix);
 
-s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
+s32 TaskObjF__ProbeMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
 {
     s32 retries;
     s32 result;
@@ -346,7 +346,7 @@ s32 func_8004E9AC(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
         return 0;
     }
     do {
-        result = func_8004EA38(self, destBuf, suffix);
+        result = TaskObjF__OpenAndReadMemcardFile(self, destBuf, suffix);
     } while (result == 0 && retries-- != 0);
     return result;
 }
@@ -355,7 +355,7 @@ extern s32 open(void *arg0, s32 arg1);
 extern s32 read(s32 arg0, void *arg1, s32 arg2);
 extern s32 close(s32 arg0);
 
-s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
+s32 TaskObjF__OpenAndReadMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
 {
     s32 pathBuf[8];
     void *path;
@@ -377,7 +377,7 @@ s32 func_8004EA38(Node3bb8cE *self, u8 *destBuf, u8 *suffix)
     return 1;
 }
 
-char *func_8004EADC(Node3bb8cE *self, char *buf, char *middle, char **entries)
+char *TaskObjF__FindUnusedMemcardName(Node3bb8cE *self, char *buf, char *middle, char **entries)
 {
     while (*entries != NULL) {
         strcpy(buf, middle);
@@ -390,7 +390,7 @@ char *func_8004EADC(Node3bb8cE *self, char *buf, char *middle, char **entries)
     return NULL;
 }
 
-s32 func_8004EB88(Node3bb8cE *self, s32 *values, char **outArr, char *middle, char **entries)
+s32 TaskObjF__CollectExistingMemcardFiles(Node3bb8cE *self, s32 *values, char **outArr, char *middle, char **entries)
 {
     s32 count;
     char buf[0x20];
@@ -410,23 +410,23 @@ s32 func_8004EB88(Node3bb8cE *self, s32 *values, char **outArr, char *middle, ch
     return count;
 }
 
-extern s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg);
+extern s32 TaskObjF__ProbeCardFreeSpace(Node3bb8cE *self, u8 id, s32 sizeArg);
 
-s32 func_8004EC5C(Node3bb8cE *self, u8 id, s32 sizeArg)
+s32 TaskObjF__CheckCardSpace(Node3bb8cE *self, u8 id, s32 sizeArg)
 {
     s32 retries;
     s32 result;
 
     retries = 10;
     do {
-        result = func_8004ECCC(self, id, sizeArg);
+        result = TaskObjF__ProbeCardFreeSpace(self, id, sizeArg);
     } while (result == 0 && retries-- != 0);
     return result;
 }
 
 extern s32 delete(void *arg0);
 
-s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg)
+s32 TaskObjF__ProbeCardFreeSpace(Node3bb8cE *self, u8 id, s32 sizeArg)
 {
     s32 pathBuf[8];
     void *path;

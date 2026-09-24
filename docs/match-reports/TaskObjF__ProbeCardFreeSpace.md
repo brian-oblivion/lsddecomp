@@ -1,14 +1,16 @@
-# func_8004ECCC — MATCH (29/29 words)
+# TaskObjF__ProbeCardFreeSpace — MATCH (29/29 words)
+
+> Renamed from `func_8004ECCC` on 2026-09-24 (tools/rename.py). Address 0x8004eccc.
 
 **Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
 
 ## What it does
 
-`s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg)`. Computes a
+`s32 TaskObjF__ProbeCardFreeSpace(Node3bb8cE *self, u8 id, s32 sizeArg)`. Computes a
 sector count from `sizeArg` (`(sizeArg + 0x21FF) >> 13`, i.e. round up to
 an 8KB/0x2000-byte boundary and divide by it), formats a path via
 `BuildMemcardPath(pathBuf, self->unkC, &D_8008AAAC)` (a 3-argument call, one
-more argument than `func_8004EA38`'s 2-argument call to the same
+more argument than `TaskObjF__OpenAndReadMemcardFile`'s 2-argument call to the same
 function — `id` itself is unused in this function's own body, same
 "unused-but-forwarded parameter" shape already established elsewhere),
 opens it with `func_80050938(path, (sectors << 16) | 0x200)`, and on
@@ -30,7 +32,7 @@ Three separate residues stacked, closed incrementally:
    separate mentions across the right statement boundaries, not one
    expression) moved this from garbled ordering to 28/29.
 2. **A missing redundant `move v0, a0` for `self`**, the same class as
-   `func_8004EA38`'s open stall (see that report) — but here it resolved
+   `TaskObjF__OpenAndReadMemcardFile`'s open stall (see that report) — but here it resolved
    itself once the `sectors` computation was split as above, without any
    extra source-level lever. The extra arithmetic apparently gave GCC a
    reason to evacuate `self` from `a0` into `v0` on its own.
@@ -53,7 +55,7 @@ extern s32 func_80050938(void *arg0, s32 arg1);
 extern s32 func_800508F8(s32 arg0);
 extern s32 func_80050908(void *arg0);
 
-s32 func_8004ECCC(Node3bb8cE *self, u8 id, s32 sizeArg)
+s32 TaskObjF__ProbeCardFreeSpace(Node3bb8cE *self, u8 id, s32 sizeArg)
 {
     s32 pathBuf[8];
     void *path;
@@ -92,10 +94,10 @@ revealed the shift issue as a clean single-word residue underneath.
 ## Head correction, round 75
 
 The two-argument / `filterName` reading of `BuildMemcardPath` above is
-superseded. Round 75 matched `func_8004EA38` by calling it with THREE
+superseded. Round 75 matched `TaskObjF__OpenAndReadMemcardFile` by calling it with THREE
 arguments `(pathBuf, self->unkC, suffix)`, the third forwarded from the
 caller's own third parameter already in `$a2` (so no `$a2` set-up is
 emitted, which is why it read as two). `src/class_3bb8c_e.c` now declares
 one real prototype, `extern void *BuildMemcardPath(void *dest, s32 selector,
 void *suffix);`, replacing the unprototyped `arity-ok` declarations; this
-function's bytes are unchanged (see `func_8004EA38.md`).
+function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).

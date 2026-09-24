@@ -20,7 +20,7 @@
  *   implements -- what those two entry points DO is not established
  *   here (see their own reports' Tier-C naming).
  * - `TaskObjF::events[4]` is corroborated cross-unit: class_3bb8c_e.c's
- *   func_8004E5E4 populates the identical +0x014 offset via OpenEvent()
+ *   TaskObjF__OpenEvents populates the identical +0x014 offset via OpenEvent()
  *   and hands the same object to this unit's own TaskObjF__EnableEvents.
  */
 
