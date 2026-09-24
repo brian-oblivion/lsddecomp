@@ -106,7 +106,7 @@ downstream register-identity residue noted below). This is the single
 biggest structural fix of the round and should be treated as the
 established idiom for this record family's D_8006DAD4-array writes
 whenever they occur inside a LOOP (see the caveat under
-`StepVoiceEnvelope`'s report on the non-loop case, which behaves differently).
+`SetAutoVol`'s report on the non-loop case, which behaves differently).
 
 **One sub-finding not in the head's message:** the `+0x8` field
 (`0x80FF`) needed a `u16 *` cast rather than `s16 *` at its specific store
@@ -256,7 +256,7 @@ and stored identically to retail.
 4. **The `woff`-halfword-index idiom for a small-struct array proven inside
    a loop (this function's D_8006DAD4 fix, confirmed byte-exact) does NOT
    transfer cleanly to the equivalent access OUTSIDE a loop** — see
-   `StepVoiceEnvelope`'s report, attempted this same round with the identical
+   `SetAutoVol`'s report, attempted this same round with the identical
    idiom against a single (non-looping) call site, which reduced but did
    not eliminate its residue and surfaced different register-pressure
    side effects. Loop vs. non-loop context is a real discriminator for
@@ -399,7 +399,7 @@ void InitSpuDriver(s32 a0) {
          * disassembly shows on the PRODUCT and the LATE base-pointer
          * load. This idiom, confirmed byte-exact for this loop, does
          * NOT transfer cleanly to the equivalent non-loop access in
-         * StepVoiceEnvelope -- see that function's report. */
+         * SetAutoVol -- see that function's report. */
         woff = (u16) i * 8;
 
         D_8008D98A[(u16) i].unk0 = 0x18;

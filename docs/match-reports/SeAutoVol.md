@@ -25,7 +25,7 @@ needed to change: `(from - to < 0 ? to - from : from - to) < duration` is
 retail's two-branch abs compare as written.
 
 This is the counterpart `code_179d8_m`'s header asks about: the "Begin"
-for `StepVoiceEnvelope`. It sets `gVoiceEnvActive`, `gVoiceEnvAccum`,
+for `SetAutoVol`. It sets `gVoiceEnvActive`, `gVoiceEnvAccum`,
 `gVoiceEnvLimit` and then either `Step=1, Interval=Countdown=q` or
 `Interval=0, Step=q`. Naming it (for example `BeginVoiceEnvelope`) is
 track-3 work and was not done here: this round's orders are no renames.

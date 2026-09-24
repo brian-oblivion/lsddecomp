@@ -97,7 +97,7 @@ until you diff registers, not just word counts.
   per-channel byte-field block used in bulk) alongside the existing
   `unkC`/`unkD`, none of which overlap.
 - `ObjE970` (already declared with a `+0x18` byte field for the stalled
-  `StepVoiceEnvelope`/`StepVoiceFade` bodies) needed a NEW `u16` field at
+  `SetAutoVol`/`StepVoiceFade` bodies) needed a NEW `u16` field at
   `+0x12` -- a "channel-count difficulty threshold" compared unsigned
   against `D_8008EA13`. Since neither prior user of `ObjE970` is currently
   compiled (both are `INCLUDE_ASM`), extending the struct in place was
@@ -586,7 +586,7 @@ Note: `ObjE970` gained a `+0x12` `u16` field for this attempt (see
 "Struct/global knowledge" above) -- that extension is left in place in
 `src/` (outside the `#if 0`) since it does not affect any currently
 compiled function and the next attempt at this function, or at
-`StepVoiceEnvelope`/`StepVoiceFade` (which also use `D_8008E970`), will need
+`SetAutoVol`/`StepVoiceFade` (which also use `D_8008E970`), will need
 it again.
 
 ## Naming
@@ -610,7 +610,7 @@ velocity, pan-split pair, status).
 `masterVolume` field names this round) and `D_8008E978`/`Tbl32E978`
 (`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
 declared in this unit but only used by functions still `INCLUDE_ASM`
-(StepVoiceEnvelope, StepVoiceFade, SpuVmPBVoice, and this
+(SetAutoVol, StepVoiceFade, SpuVmPBVoice, and this
 function) -- the field renames are live in `src/code_179d8_m.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
 themselves (`D_8008E970`, `D_8008E978`) were not renamed since
@@ -698,7 +698,7 @@ matching") no matching was attempted.
 
 - By the same call-slot correspondence: `StopNote` = `SpuVmKeyOff`,
   `func_8002CF18` = `SpuVmAlloc`, `func_8002D6A4` = `SpuVmDoAllocate`.
-- `sdkname.py` also gives `StepVoiceEnvelope` **shape 0.99** against
+- `sdkname.py` also gives `SetAutoVol` **shape 0.99** against
   libsnd `SetAutoVol` (3.3 vmanager, 227w vs 231w). Its sibling
   `StepVoiceFade` is `SetAutoPan` (3.3: 224w, same opening skeleton), and
   `BeginVoiceFade`/`SeAutoVol` are then `SsUtAutoPan`/`SsUtAutoVol`.

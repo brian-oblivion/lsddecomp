@@ -1060,7 +1060,11 @@ ClassEAC0__ClassEAC0 = 0x8004054C; // type:func
 ClassEAC0__FinishConstruct = 0x800405D0; // type:func
 BeginVoiceFade = 0x8002E874; // type:func
 StepVoiceFade = 0x8002EA44; // type:func
-StepVoiceEnvelope = 0x8002E4D8; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SetAutoVol (227w vs our 231w,
+// disc 3.3), position within the libsnd neighborhood, directly after
+// SeAutoVol (Se/Set pair). Superseded game-style name StepVoiceEnvelope.
+// Round 74 (bravo, track 2).
+SetAutoVol = 0x8002E4D8; // type:func
 InitSpuDriver = 0x8002EDD4; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager
 // SpuVmNoiseOnWithAdsr (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded

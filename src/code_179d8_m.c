@@ -32,7 +32,7 @@
  *     Step advances the accumulator (throttled by an interval/countdown
  *     pair), clamps at the target, and writes the resulting stereo output
  *     level.
- *   - StepVoiceEnvelope: the same accumulate-until-limit shape over its
+ *   - SetAutoVol: the same accumulate-until-limit shape over its
  *     own gVoiceEnv* family, but with no "Begin" counterpart in this
  *     unit -- whatever sets gVoiceEnvActive/gVoiceEnvStep/gVoiceEnvLimit
  *     is still undecompiled elsewhere. SeAutoVol in code_179d8_l opens
@@ -42,7 +42,7 @@
  *     ring buffer of per-tick voice-activity bitmasks; when a voice has
  *     shown no activity for 16 consecutive ticks it force-releases it
  *     (disabling the SPU noise generator if that voice was in noise
- *     state); then calls StepVoiceEnvelope/StepVoiceFade for every voice
+ *     state); then calls SetAutoVol/StepVoiceFade for every voice
  *     whose respective flag is set. Called once at the end of
  *     InitSpuDriver and, going by its own ring-buffer/mask-clearing logic,
  *     meant to run every frame thereafter.
@@ -60,7 +60,7 @@
  *     SpuVmFlush once.
  *
  * STALLS: SpuVmPBVoice, StartNote, SpuVmFlush,
- * StepVoiceEnvelope, StepVoiceFade -- all five are the same "whole-function
+ * SetAutoVol, StepVoiceFade -- all five are the same "whole-function
  * register-count decision predates any of the function's own locals"
  * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
  */
@@ -70,7 +70,7 @@
  * this function's frame gap (0x10 built vs retail's 0x18, 8 bytes; retail
  * saves ZERO callee-saved registers and addresses NOTHING via $sp beyond
  * the prologue/epilogue immediate itself, confirmed via grep -- textbook
- * pure-padding shape). See docs/match-reports/StepVoiceEnvelope.md for the
+ * pure-padding shape). See docs/match-reports/SetAutoVol.md for the
  * full derivation this body is otherwise unchanged from.
  *
  * This function sits FIRST in ROM order in this unit, so the shared
@@ -87,7 +87,7 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half gVoiceEnvActive[]; /* nonzero while this voice's envelope is still ramping; cleared by StepVoiceEnvelope when it reaches gVoiceEnvLimit */
+extern Rec34Half gVoiceEnvActive[]; /* nonzero while this voice's envelope is still ramping; cleared by SetAutoVol when it reaches gVoiceEnvLimit */
 extern Rec34Half gVoiceEnvStep[]; /* per-tick increment/decrement applied to gVoiceEnvAccum */
 extern Rec34Half gVoiceEnvInterval[]; /* ticks between steps (0 = every tick), same throttle idiom as gVoiceFadeInterval below */
 extern Rec34Half gVoiceEnvCountdown[]; /* countdown to the next step, reloaded from gVoiceEnvInterval */
@@ -112,7 +112,7 @@ typedef struct {
     u8 pad[0x12];
     u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per StartNote's report */
     u8 pad14[0x18 - 0x14];
-    u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in StepVoiceEnvelope/StepVoiceFade */
+    u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in SetAutoVol/StepVoiceFade */
 } ObjE970;
 extern ObjE970 *D_8008E970;
 
@@ -132,8 +132,8 @@ extern s16 D_8008E8C0;
  * copies the volume into $a1 first and multiplies THAT register (no
  * andi); this body multiplies the volume register directly and masks
  * val1 -- same residue as StepVoiceFade below
- * (docs/match-reports/StepVoiceEnvelope.md). */
-void StepVoiceEnvelope(s16 voice)
+ * (docs/match-reports/SetAutoVol.md). */
+void SetAutoVol(s16 voice)
 {
     s16 v;
     s16 off;
@@ -211,7 +211,7 @@ void StepVoiceEnvelope(s16 voice)
     D_8008D970[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StepVoiceEnvelope);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoVol);
 #endif
 
 /* Same 0x34-stride channel-configuration record family documented in
@@ -789,7 +789,7 @@ typedef struct {
 } Rec34HalfU2;
 
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
-extern void StepVoiceEnvelope(s16 a0);
+extern void SetAutoVol(s16 a0);
 extern void StepVoiceFade(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
@@ -880,7 +880,7 @@ void SpuVmFlush(void) {
 
     for (i = 0; i < 0x18; i++) {
         if (gVoiceEnvActive[i].unk0 != 0) {
-            StepVoiceEnvelope(i);
+            SetAutoVol(i);
         }
         if (gVoiceFadeActive[i].unk0 != 0) {
             StepVoiceFade(i);

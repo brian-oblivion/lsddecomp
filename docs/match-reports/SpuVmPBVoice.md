@@ -39,7 +39,7 @@ and `asm-differ` confirms the first real divergence is still the function's
 second instruction, `move t2,a0` (retail) vs `move t1,a0` (built).
 
 **New axis 12: applied this unit's own `idxCopy = a0;`-at-the-top idiom**
-(the pattern already established and proven in `StepVoiceEnvelope`/
+(the pattern already established and proven in `SetAutoVol`/
 `StepVoiceFade`, sibling functions in this same unit) — declare `s16
 idxCopy;`, assign it from `a0` as the function's first statement, and use
 `idxCopy` in place of `a0` for every one of the record-index accesses
@@ -357,7 +357,7 @@ duplicate-declaration conflicts by reusing the ALREADY-declared `Rec34U16`/
 `Tbl32E978`/etc. types this unit's later functions define, rather than
 redeclaring — this unit's own functions appear in ROM order after this one's
 declaration site, so the existing types were directly reusable this time,
-unlike `StepVoiceEnvelope`, which sits FIRST in the file and needs its own local
+unlike `SetAutoVol`, which sits FIRST in the file and needs its own local
 copies). **All three title figures reconfirmed exactly:** `funcdiff.py`
 reports **77/138 words match, file 0x1FBE8-0x1FE10** (zero out-of-range
 drift, genuinely exact length), first real diff still the function's second
@@ -365,13 +365,13 @@ instruction (`move t2,a0` retail vs `move t1,a0` built).
 
 Read the raw disassembly directly this round (rather than re-deriving from
 the report's prose) to check whether the persisted-register class this
-unit's OTHER two large stalls (`StepVoiceFade`, `StepVoiceEnvelope`) show is the
+unit's OTHER two large stalls (`StepVoiceFade`, `SetAutoVol`) show is the
 same mechanism here. It is not quite the same shape: this function's
 register renumbering starts at instruction 2 and is a near-total CLASS
 shift (both `$t`-temporaries and `$a`-arguments renumbered together) rather
 than one dedicated persisted value computed early and consumed once late.
 No new lever identified this round; not spending further attempts here
-given `StepVoiceFade` and `StepVoiceEnvelope` (this unit's two other open
+given `StepVoiceFade` and `SetAutoVol` (this unit's two other open
 stalls) each had a specific, named, untried lever this round, and both of
 those also failed to move when tried (see their own round-32 updates) —
 consistent with all three of this unit's remaining stalls being the same

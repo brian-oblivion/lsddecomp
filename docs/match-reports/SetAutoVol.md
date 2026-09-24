@@ -1,5 +1,7 @@
 # StepVoiceEnvelope -- STALL: length exact (231/231, round 73), 223/231 raw word-match, first diff at vram 0x8002E700 (the pan split: retail copies the volume into $a1 and multiplies the copy; this body masks val1). libsnd SetAutoVol.
 
+> Renamed from `StepVoiceEnvelope` on 2026-09-24 (tools/rename.py). Address 0x8002e4d8.
+
 > Renamed from `func_8002E4D8` on 2026-09-20 (tools/rename.py). Address 0x8002e4d8.
 
 Unit: `src/code_179d8_m.c`. Round 26 (second pass), runner bravo, applying
@@ -8,7 +10,7 @@ the HEAD's "split scaled index" diagnosis per the work order.
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/StepVoiceEnvelope.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_m/SetAutoVol.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -56,7 +58,7 @@ each time as the loop body's first statement — there is no "which value is
 `woff` derived from" ambiguity, because `i` IS the loop induction variable
 and nothing else touches it.
 
-`StepVoiceEnvelope` runs once per call with a single fixed `a0`. Here, `idx*8`
+`SetAutoVol` runs once per call with a single fixed `a0`. Here, `idx*8`
 has to be derived from the PARAMETER, which is ALSO used (via `idxCopy`) to
 index the unrelated 0x34-stride record family the rest of the function
 reads. Three placements were tried for where this derivation should read
@@ -139,7 +141,7 @@ parameter reaching a home-slot spill vs. a dedicated `$sN`, see
 candidate. Checked directly rather than inferred from the frame-size gap:
 
 ```sh
-grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_179d8_m/StepVoiceEnvelope.s
+grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_179d8_m/SetAutoVol.s
 # -> no hits at all
 ```
 
@@ -198,7 +200,7 @@ were renamed only to route around unrelated duplicate-declaration
 conflicts with OTHER still-`INCLUDE_ASM` functions sharing the file; the
 reported C itself is unchanged) and rebuilt from scratch. **All title
 figures reconfirmed:** `objdump -t build/src/code_179d8_m.c.o` shows
-`StepVoiceEnvelope` at `0x3b4` bytes = **237 words**, against retail's 231 (6
+`SetAutoVol` at `0x3b4` bytes = **237 words**, against retail's 231 (6
 long, exactly as titled). No new axis attempted this round: this function
 was already worked twice in the immediately preceding rounds (26 and 27)
 with the callee-saved lever explicitly closed as inapplicable, and the
@@ -217,7 +219,7 @@ across at least two different sibling functions, but its correct SOURCE
 FORM depends on whether the write site is inside a loop or not.** Inside a
 loop (`InitSpuDriver`), declaring `woff` fresh each iteration as the loop
 body's first statement, computed from the loop induction variable directly,
-reproduces retail exactly. Outside a loop (`StepVoiceEnvelope`, this report),
+reproduces retail exactly. Outside a loop (`SetAutoVol`, this report),
 the SAME idiom needs the intermediate value kept at its NATURAL type (here
 `s16`, matching the parameter's own type, with the `(u16)` mask deferred
 to the point of use) rather than materialized as `u16` immediately — an
@@ -246,7 +248,7 @@ Round 27's update named a specific untried next step for the remaining
 sign-extension residue: swap the `incS`/`incU` derivation order, or derive
 `incU` from `incS` via a cast rather than as an independent load. Read the
 raw `.s` directly first to confirm the exact shape at this site (lines
-1ED70-1EDB0 of `asm/nonmatchings/code_179d8_m/StepVoiceEnvelope.s`): retail
+1ED70-1EDB0 of `asm/nonmatchings/code_179d8_m/SetAutoVol.s`): retail
 issues TWO separate loads of `gVoiceEnvStep[a1]` — one `lhu` into `incU`, one
 `lh` into `incS` (a different register) — immediately adjacent, then adds
 `incU` into `accumU`.
@@ -306,12 +308,12 @@ ROM order, which this move does not disturb (no function moved). This is
 believed to generalize as a documented pattern below.
 
 **All title figures reconfirmed exactly:** `objdump -t
-build/src/code_179d8_m.c.o` shows `StepVoiceEnvelope` at `0x3b4` bytes = **237
+build/src/code_179d8_m.c.o` shows `SetAutoVol` at `0x3b4` bytes = **237
 words** (retail 231, 6 words LONG, exactly as titled).
 
 ### Permuter search
 
-`tools/setup-permuter.sh StepVoiceEnvelope <seed>` -- seed built from this
+`tools/setup-permuter.sh SetAutoVol <seed>` -- seed built from this
 report's preserved body (standalone, with its own flat-extern
 declarations, since the seed is compiled in isolation and does not need
 the in-file reorganization above). See the Permuter result subsection for
@@ -332,7 +334,7 @@ Real search: `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
 --stack-diffs` via the harness's `run_in_background`. **Completed cleanly,
 `rc=124`** (own bound) after **80,882 iterations** -- the deepest search
 of the five functions in this unit this round. Best score: **2105** (from
-base 4155), saved at `permuter-work/StepVoiceEnvelope/output-2105-1/`; no zero
+base 4155), saved at `permuter-work/SetAutoVol/output-2105-1/`; no zero
 reached, and none of the eight other intermediate best-score directories
 saved along the way (`2275`, `2310`, `2415`, `2935`, `3015`, `3315`,
 `3340`) reached one either. **Not closed; both open residues this report
@@ -368,7 +370,7 @@ callee-saved-lever check, above): built `-0x10` vs retail `-0x18`, an
 8-byte gap. Direct grep confirms the textbook shape:
 
 ```sh
-grep -oE '0x[0-9a-fA-F]+\(\$sp\)|\$sp,\$sp,' asm/nonmatchings/code_179d8_m/StepVoiceEnvelope.s
+grep -oE '0x[0-9a-fA-F]+\(\$sp\)|\$sp,\$sp,' asm/nonmatchings/code_179d8_m/SetAutoVol.s
 # -> only the prologue "addiu $sp,$sp,-0x18" and epilogue "addiu $sp,$sp,0x18"
 ```
 
@@ -397,7 +399,7 @@ measured cases: `SpuVmFlush`, `StepVoiceFade`, `StartNote`, and
 this function), and has closed a missing-WORD-COUNT gap on none of them.**
 Every one of `code_179d8_m`'s frame gaps is pure unaddressed
 register-save-area padding — confirmed directly by grep in three of the
-four cases (`StepVoiceEnvelope`, `SpuVmFlush` here; `StepVoiceFade` and
+four cases (`SetAutoVol`, `SpuVmFlush` here; `StepVoiceFade` and
 `StartNote`'s own permuter `--stack-diffs` runs independently
 confirmed zero stack differences) — with each function's real content
 residue (a redundant mask, a persisted early value, an addressing-cost
@@ -490,7 +492,7 @@ extern s16 D_8008D7F2[];
 
 extern u8 D_8008D970[];
 
-void StepVoiceEnvelope(s16 a0) {
+void SetAutoVol(s16 a0) {
     s16 idxCopy;
     s16 accum;
     u8 flagByte;
@@ -613,7 +615,7 @@ void StepVoiceEnvelope(s16 a0) {
 
 ## Naming
 
-**StepVoiceEnvelope** (was `func_8002E4D8`) -- Tier B. Same shape as
+**SetAutoVol** (was `func_8002E4D8`) -- Tier B. Same shape as
 StepVoiceFade (accumulate-until-limit, throttled by an interval/countdown
 pair, clear an active flag on reaching the limit, then compute and write
 a stereo output level from the result) but over its own `gVoiceEnv*`
@@ -650,7 +652,7 @@ REVISITED, round 73: STALL improved to length-exact 223/231 (ins 1 / del 1), res
 
 ### Ownership
 
-`sdkname.py StepVoiceEnvelope`: **masked 0.00, shape 0.99** against libsnd
+`sdkname.py SetAutoVol`: **masked 0.00, shape 0.99** against libsnd
 `SetAutoVol` (3.3 `vmanager`, 227w). This is Sony's `SetAutoVol` in a build
 no disc carries (the `seqread` situation; matching as C is the project's
 practice for those, counted as library by address). See `StartNote.md`,
@@ -666,7 +668,7 @@ warning firing (278258 bytes).
 
 ### What moved it
 
-Retail StepVoiceEnvelope and StepVoiceFade are the same code with a
+Retail SetAutoVol and StepVoiceFade are the same code with a
 different array family (a normalised `diff` of the two `.s` files differs
 only in: `$t0`/`$t1` naming, `lhu` of the accumulator stored to
 `D_8008EA10` and multiplied as `s16`, and a reload of `D_8008EA11` for the
@@ -727,7 +729,7 @@ extern Rec34Half gVoiceEnvCountdown[];
 extern Rec34Half gVoiceEnvAccum[];
 extern Rec34Half gVoiceEnvLimit[];
 
-void StepVoiceEnvelope(s16 voice)
+void SetAutoVol(s16 voice)
 {
     s16 v;
     s16 off;
