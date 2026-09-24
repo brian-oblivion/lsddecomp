@@ -125,6 +125,8 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   The gate also covers STRENGTH REDUCTION: a function 28 words LONG with an eighth saved register
   and a bigger frame, every loop carrying a second induction variable, closed at 954/954 once all
   13 inner loops were `label: ...; if (--n != 0) goto label;` (`func_80018464`, round 76).
+  The MIRROR: a constant retail hoists into `$sN` before a loop (`li s1,4`) needs a `do/while`, since
+  loop.c cannot see a goto loop (`Class6B5CC__NotifyTaggedParents`, 48/54 -> 54/54 first build).
 - **A redundant guard is NOT dead code — 2.6.3 compiles it literally.** GCC does not dedupe an
   explicit `if` against a loop's implicit entry test (where retail has ONE check, `guard + do-while`
   says so), and a provably-dead `x != 5 && x != 8 && x == 0xA` chain is byte-exact while its
@@ -408,6 +410,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 ### 3e. Frames and stack
 
+- **An array or struct gets its stack slot when its declaration expands; an address-taken SCALAR only
+  at its first `&`**, so a lone scalar always lands after every array and no declaration order moves it.
+  A scalar/array slot swap that resists reordering is ONE struct (`{s32 count; Vec3S16 v[8];}` in
+  `Class6B5CC__TryAttachNearby`, 140/143 -> 143/143 after seven order variants failed, round 76).
+
 - **An unused stack frame is reserved by an unused local ARRAY, never a scalar.** `s32 unused[2]`
   and `s16 unused[4]` green at 8 bytes; one scalar, two scalars, a 4-byte array and no local all
   RED; the `if (0)` guard is INERT. **SCOPE: only when your build emits NO `addiu $sp` at all** —
@@ -662,9 +669,9 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   verdict: at equal length an N/N figure can be a false alignment on a repeating loop skeleton
   (round 63: 26/26 on a zero-insertion input); funcdiff's positional skeleton diffs figure tells the
   two apart and forces 0/0 when it is zero. `func_8002C278` carried "pervasive register-allocation
-  residue" for four rounds at 7/7 and held four separable defects, three of them plain C. At 0/0
-  every instruction is retail's in retail's order and only the register pairing differs, which IS
-  the banned-fix category. Rebuild the preserved body and read the line. (a round 60)
+  residue" for four rounds at 7/7 and held four separable defects, three of them plain C. Even 0/0
+  is NOT the banned-fix category by itself: the same function at 0/0 (54/76) closed on a missing
+  forwarded argument (round 76). Rebuild the preserved body and read the line. (a round 60)
 - **"N words short" and "N/M words match" are DIFFERENT measurements that read identically, and a
   word count is not a count of DIVERGENCES.** A title must carry LENGTH, RAW WORD-MATCH and WHERE
   THE FIRST REAL DIFF IS: a body can be the right length and match almost nothing (144/145 compiled,

@@ -6,6 +6,117 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-24 — round 76: eight of eight REVISIT-2s match, and the 954-word giant was thirteen goto loops
+
+**Seven runner sessions across three tracks, and every merge green.** The head
+ran on Opus as an ordinary head. Gate 0 was clean, and every worktree
+byte-verified before handover. Slots were refilled as runners finished
+(§3.8). One ready job was skipped with a written reason (below). plan.py
+priced job contention itself for the first time (revision 15), and no merge
+was blocked by it.
+
+| track | sessions | model | outcome |
+| --- | --- | --- | --- |
+| 1 REVISIT-2 | 4 | opus | **8 MATCHED of 8**, none by permuter. class_3bb8c_n 3/3 (StyleBuildDecorSet 86/86, StyleFillEffectKind3 81/81, StyleFillEffectKind2 79/79); code_8220_b `func_80018464` 954/954; code_179d8_d `func_8002C278` 76/76; code_d294_b 3/3 (Class6B5CC__TryAttachNearby 143/143, ClassifyAgainstPlanes 199/199, NotifyTaggedParents 54/54). Four units now carry no `INCLUDE_ASM`: class_3bb8c_n, code_8220_b, code_179d8_d, code_d294_b |
+| 2 | 1 | sonnet | `StartNote` renamed `SpuVmKeyOn`. Track 2 is **done**: 0 still `func_` |
+| 3 | 2 | sonnet | class_3bb8c_b (Class866E8 footprint grid + rate countdown, 20 functions, 18 fields) and Entity_d (19 mood-cue handlers by `gEntityMoodHandlerTable` row, 10 data constants) named, reviewed and marked. Both passed review, so the naming runner stays on Sonnet |
+
+`plan.py` now reads 1158/1160 game functions matched. Two stalls are left:
+`func_80030980` (below) and `IsPointOutOfBounds` (class_3bb8c_b, deferred
+behind the naming pass and now free). The revisit yield is 80/101, and track 3
+is at 42/75 units.
+
+### What the revisits found
+
+None of the eight was register allocation, although four of the titles said
+so. Rebuilding each preserved body first gave the real signature:
+ClassifyAgainstPlanes' "register identity" was 12/12 ins/del, and
+NotifyTaggedParents' "length off" was length-exact. The levers:
+
+- **Loop kind, in both directions.** `func_80018464` was 28 words long with an
+  eighth saved register. All 13 inner loops were strength-reduced, and
+  rewriting them as `goto` loops (loop.c cannot see those) closed the whole
+  gap on the next build. This answers round 56's open question: its twelve
+  reproducers were all `for`/`while`/`do`. The mirror case is
+  NotifyTaggedParents: retail's `li s1,4` is a loop.c hoist, so it needed a
+  `do/while` where the preserved body had a goto CFG. Separately, a
+  `do { } while (0)` around one statement puts back the loop-depth weight the
+  goto loops removed, which closed a `v0`/`v1` swap repeating at six sites.
+- **The scheduler's alias rule.** cc1 lets a load pass a struct-field store
+  but not a plain `*p` store. A one-field-struct store closed
+  StyleFillEffectKind3 and helped close Kind2. The same rule in reverse
+  (flags read through a field) let `func_80018464`'s loads hoist.
+- **Arity again.** `func_8002C278`'s `move a3,a1` vs `move t0,a1` had been
+  filed as register identity for four rounds. It was `slot80` missing a
+  fourth argument forwarded from the function's own parameter.
+- **Stack slots.** An array gets its slot at declaration, and an
+  address-taken scalar only at its first `&`. TryAttachNearby's
+  `count`/`buf54` "slot swap" was one `{s32 count; Vec3S16 v[8];}` local,
+  after seven declaration orders had failed in round 55.
+- **Smaller ones.** A hand-stepped counter was GCC's own `i * 3`. `rand() % 6`
+  had been transcribed as `(r/3)*6`. A result-variable test
+  (`v = x/20*20; if (x != v)`) stops jump.c turning an if/else into "preset,
+  then maybe overwrite". ClassifyAgainstPlanes' Part 3 had a gate copied from
+  Part 2 that retail never had.
+
+Charlie probed an `__asm__("")` that gave 79/79 and **declined it**, because
+removing it changed which register held a value (HARD RULE 6's test). The
+same function then closed without it.
+
+### Head actions at merge
+
+- **`func_80030980` was not staffed** (it was job #4, a REVISIT-2). Its body
+  reads Sony libsnd vmanager state that `psyq-objects.ld` pins: `_svm_pg`,
+  `_svm_vh`, `_svm_tn`, `_svm_cur`+0x16 and `_ss_score`. It calls only
+  `SpuVmVSetUp`, and its only caller is the code_179d8_k sequencer. It sits
+  after placed `libsnd/vm_prog` and before Sony's `SsUtKeyOn`/`SsUtKeyOnV` in
+  its unit. `sdkname.py` has no fingerprint (best shape 0.51), so track 2's
+  two-evidence rule is not met, and the head placed no `NOT GAME CODE`
+  marker. There is a head note in its report. ESCALATED.
+- **`Entity::unk44 -> moodState`** (delta's proposal, tier B) was applied by
+  type scope: definition first, and the compiler listed 152 accessors across
+  Entity and Entity_b..g. The same-named `unk44` in the other struct at
+  `Entity.h:439` is untouched.
+- **Alpha's `ElemTarget` field proposals were declined**: `unk30` and `unk32`
+  were both proposed as `key`, and `class_3bb8c.h` already reads `unk30` as a
+  rate. The reason is in both reports.
+- **Review samples.** For Entity_d, the head decoded `gEntityMoodHandlerTable`
+  from retail for rows 39, 45, 48, 55 and 115 (all right, and the helper
+  correctly absent), and decoded two constants as s16 fraction triples. For
+  class_3bb8c_b, `classtable.py` confirms that slots +0x120..+0x128 are
+  Class866E8's, and the getter, setter and bounds test are what they say.
+- **Two reports corrected.** `SpuVmKeyOn`'s title still carried the old name.
+  The `code_d294.h` slotAC comment called ClassifyAgainstPlanes a gp_rel
+  blocker.
+- **Bravo's track 2 claim that `lib/` was absent from its worktree was
+  wrong**: it is a symlink into main. The head scanned all 178 objects, and
+  none defines `SpuVmKeyOn`. `LIBSND.H` has no prototype for this internal
+  vmanager function, so its three call-site externs stay byte-exact with a
+  comment.
+- LEARNINGS: 4 idioms added (scheduler struct-field alias rule,
+  result-variable test, array vs scalar slot assignment, do/while for a
+  loop.c hoist) and 4 entries extended with round-76 evidence. Five entries
+  were distilled to the archive (three §3j permuter-practice, two `volatile`).
+  `externcheck.py` and `stalesyms.py` are clean.
+- One symbols-file merge conflict (alpha after delta, both appending at one
+  point). Both sides were kept, with no duplicate name or address.
+
+### ESCALATED (operator decisions; the head did not act)
+
+1. **Is `func_80030980` Sony code?** The evidence is above. If it is, it
+   needs a `NOT GAME CODE` marker, or an `identified` entry if a name can be
+   settled, and it leaves track 1. That is the last matching job for track 1
+   apart from `IsPointOutOfBounds`. The same question arguably extends to its
+   only caller, the code_179d8_k sequencer, which calls `SpuVmKeyOn` directly.
+2. **plan.py tagged NotifyTaggedParents `len-off`**, but the rebuilt body was
+   length-exact (0xd8 by `nm -S`). The tag is read from a report title that
+   had no length figure, so it is a tool edge case, not a wrong measurement.
+3. **Track 1 is two jobs from done.** Revisits paid 8/8 this round and 80/101
+   overall. Once the last two are disposed of, `plan.py` marks track 1 done,
+   and 1b's queue holds whatever remains (currently two NON_MATCHING bodies
+   in src).
+
+
 ## 2026-09-24 — round 75: thirty of thirty-one revisits match, and "register identity" was the wrong argument count
 
 **Five slots, twenty-four runner sessions, three tracks, every merge green.**

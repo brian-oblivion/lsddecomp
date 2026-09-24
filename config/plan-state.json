@@ -300,6 +300,16 @@
           "note": "REVISIT runners (18 sessions, opus): 30 MATCHED of 31, none by permuter. code_179d8_e VabStreamObj__PlayTone (hi's first use must not be the multiply: combine andi fold); class_3bb8c_p DreamSys__BuildLinkQueries (method called with the 2 args retail passes; frame, not register); code_55dd4 5/5 (for loops not guard+do/while+barrier+filler x3; (*p++ = f()) == NULL; indexed input not a walking pointer); code_8220_c 9/9 (RCpoly wrappers return the next packet pointer x8, calls arm first; func_8001A268 guard+do/while); class_3bb8c_n StyleFillEffectKind0 (walk arg0, no copy: 'rotation' was entry-copy order); class_3bb8c_s DriftModelChildren (no named pointer before the branch; CSE supplies the move); code_2cc8c_b 2/2 (8-byte pair as one struct copy; slot4C third argument); code_171e0 SetActiveDataSource (table entries take no argument; goto loop); class_3bb8c_e 2/2 (while with counter tested after the call; forwarded third argument to BuildMemcardPath); class_3bb8c_f 2/2 (u8 parameter, no copy locals; void return lets three calls cross-jump); Entity_g func_80064E34 (two calls cross-jumped, not one with a chosen argument); class_3bb8c_b func_8004C93C (one slot pointer assigned at the join, separate remainder local); class_3bb8c_d func_8004DCD0 (base set before the call, 3-byte struct copy, ++x in the test); DreamSys 2/2 (whole-struct copy + nested if chain removes a label; slot0x38 third argument). The 31st: func_8002AA6C is Sony libcd bios.c cd_read_retry (position + strings + shape), identified, not matched.",
           "round": 75,
           "runners": 18
+        },
+        {
+          "attempts": 8,
+          "calibration": false,
+          "date": "2026-09-24",
+          "matches": 8,
+          "model": "opus",
+          "note": "REVISIT-2 runners (4 sessions): class_3bb8c_n 3/3 (StyleBuildDecorSet indexed loop + i*3; StyleFillEffectKind3/2 one-field-struct store for the scheduler alias rule, % 6, result-variable test vs jump.c preset); code_8220_b 1/1 (func_80018464 954/954: 13 goto loops vs strength reduction, struct-field alias, s8 block move, parameter walking, do/while(0) loop-depth weight); code_179d8_d 1/1 (func_8002C278: slot80's forwarded fourth argument); code_d294_b 3/3 (TryAttachNearby count+corners one struct; ClassifyAgainstPlanes shared loop var, pointer walks, no Part-3 gate, two-arm bit set; NotifyTaggedParents do/while for loop.c's hoist). No match used a permuter. func_80030980 not staffed: reads pinned libsnd vmanager state, ownership escalated.",
+          "round": 76,
+          "runners": 4
         }
       ],
       "status": "open"
