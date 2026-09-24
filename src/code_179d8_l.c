@@ -1,71 +1,27 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * code_179d8_l -- the SPU sound-effect voice manager (Sony's `libsnd/
+ * vmanager`): voice-steal allocation (`SpuVmAlloc`), key-on setup
+ * (`SpuVmKeyOnNow`, `SpuVmDoAllocate`), noise-voice setup (`vmNoiseOn`,
+ * `vmNoiseOn2`), note/pitch conversion (`note2pitch`, `note2pitch2`,
+ * `SePitchBend`) and volume fade-in/out (`SeAutoVol`). 9 of these 12
+ * functions were identified round 74 (track 2) as Sony's own `libsnd/
+ * vmanager` source by shape/fingerprint match against the disc-3.3 SDK --
+ * they carry Sony's real names, not game-style guesses, and this unit
+ * builds them as game C only because retail's copy diverges from the SDK
+ * reference build (see each function's own `## Naming` section). The
+ * exception, `ServiceSoundCueSet`, dispatches through a `VabStreamObj`
+ * (the SPU/VAB streaming backend, `code_179d8_e.c`) via its
+ * `gVabStreamObjMethods` vtable and is this unit's own game-style name,
+ * confirmed tier A against `DreamSys`'s `cueServiceActive` field.
+ * `func_8002E2F8`/`func_8002E300` are two unreferenced two-word stubs
+ * (splat-emitted empty bodies; no known caller or table attachment).
  *
- * code_179d8_l -- FRONT half of what was the `code_179d8_mid_c` asm
- * remainder: functions 149..160 of the original 274-function code_179d8
- * monolith, 0x1D508..0x1ECD8 (vram 0x8002CD08..0x8002E4D8), 12 functions.
- * Carved round 24 (2026-09-08).  `code_179d8_m` is the back half; between
- * them they consume the remainder whole.
- *
- * WHY IT WAS UNCARVED, AND WHY THAT VERDICT IS DEAD.  The splat comment on
- * the old remainder called 0x1D508 "the addiu-$at dense heart of this
- * monolith (of its 51 functions only ~12 are clean)".  `addiu_at` was
- * RESOLVED in round 21 (maspsx `--addiu-at`;
- * docs/research/addiu-at-blocker.md), so that census measured an
- * obstruction that no longer exists.  Re-censused 2026-09-08 over all 24
- * functions of the remainder with the four screens, canonical shell forms
- * (`grep -A2` FORWARD for nop_mflo_mfhi): 21 of 24 CLEAN, zero gp_rel,
- * zero `jr $t2` trampolines.
- *
- * The remainder is UNIFORM in density now, so the cut between _l and _m is
- * a STAFFING cut (one unit per runner) and not a density cut.  All three
- * surviving blocked functions landed in this half:
- *
- * ROUND 44: THE THREE BELOW ARE ASSIGNABLE AND ARE THIS UNIT'S FRESH GROUND.
- * ~~BLOCKED on nop_mflo_mfhi, which is STILL OPEN -- do NOT spend attempts:~~
- *   ServiceSoundCueSet (132w), SpuVmKeyOnNow (316w), vmNoiseOn (311w)
- * nop_mflo_mfhi was RESOLVED in round 42 (`--no-nop-mflo-mfhi`), so the
- * "do NOT spend attempts" directive above is WITHDRAWN.  All three are
- * never-attempted cold ground whose reports were marked REOPENED in round 44.
- * That blocker is an `mflo`/`mfhi` FOLLOWED WITHIN TWO INSTRUCTIONS BY a
- * `mult`/`div`; it is the one construct in docs/research/addiu-at-blocker.md
- * that round 21 did not fix.  Each has a stub report.
- *
- * 9 CLEAN of 12, cheapest first:
- *   func_8002E2F8    2w  <- already matched: splat emitted the empty C body
- *   func_8002E300    2w  <- itself.  Not work, and not yours to redo.
- *   note2pitch   47w   note2pitch2   64w   vmNoiseOn2  112w
- *   SePitchBend  112w   SeAutoVol  116w   SpuVmDoAllocate  143w
- *   SpuVmAlloc  167w
- *
- * SeAutoVol's opening `addu $t3, $a0, $zero` is REGISTER PRESSURE with
- * s16 argument narrowing, NOT a BIOS trampoline -- checked by hand at carve
- * time, because the `jr $t2` trampoline screen is blind to variants and a
- * trampoline-dense segment reads as the cleanest ground in the file while
- * being the least matchable (round 17, class_3bb8c_h).  It is also a
- * near-identical sibling of SeAutoPan in code_179d8_m: same prologue,
- * same narrowing shape, same early-out branch.  If you match one, say so in
- * the report -- the other unit's runner is deriving the same shape.
- *
- * Owns NO jump table: zero `jtbl_` references, and no rodata word anywhere
- * in the image points into 0x8002CD08..0x800300D0 (checked at carve time
- * both numerically and for symbolic `.word .L`), so no rodata attach.
- * Boundary checks both sides: no function has more than one
- * `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, zero `alabel`,
- * and the frameless ones open on their own arguments or on a global, never
- * on $sp.
- *
- * Expect this slice to span more than one class; identify each with
- * tools/classtable.py rather than assuming the unit has one.
+ * `code_179d8_l`/`code_179d8_m` split what was one uncarved 24-function
+ * remainder (carved round 24, 2026-09-08); the split is a staffing cut,
+ * not a density one. Owns no jump table and no rodata attach (checked at
+ * carve time). See `docs/PROGRESS.md` and individual match reports for
+ * carve/blocker history -- all four toolchain blockers this unit once
+ * screened against are RESOLVED project-wide (CLAUDE.md).
  */
 #include "common.h"
 
