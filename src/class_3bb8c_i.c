@@ -82,8 +82,8 @@ void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
 
 void Obj86ED0__ClearChildRefs(Obj86ED0 *self)
 {
-    self->unk34 = NULL;
-    self->unk38 = NULL;
+    self->childType2 = NULL;
+    self->childType5 = NULL;
     self->unk48 = NULL;
 }
 
@@ -103,9 +103,9 @@ void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
         tag = **(s32 **)arg1;
         mask = tag & 0xF;
         if (mask == 2) {
-            self->unk34 = arg1;
+            self->childType2 = arg1;
         } else if (mask == 5) {
-            self->unk38 = arg1;
+            self->childType5 = arg1;
         }
     }
 }
@@ -119,9 +119,9 @@ void Obj86ED0__RemoveChild(Obj86ED0 *self, void *arg1)
         tag = **(s32 **)arg1;
         mask = tag & 0xF;
         if (mask == 2) {
-            self->unk34 = NULL;
+            self->childType2 = NULL;
         } else if (mask == 5) {
-            self->unk38 = NULL;
+            self->childType5 = NULL;
         }
         Get_vtable_BasicClass()->removeChild(self, arg1);
     }
@@ -129,8 +129,8 @@ void Obj86ED0__RemoveChild(Obj86ED0 *self, void *arg1)
 
 void Obj86ED0__RemoveAllChildren(Obj86ED0 *self)
 {
-    self->unk34 = NULL;
-    self->unk38 = NULL;
+    self->childType2 = NULL;
+    self->childType5 = NULL;
     self->unk48 = NULL;
     Get_vtable_BasicClass()->removeAllChildren(self);
 }
@@ -153,8 +153,8 @@ void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
 
 void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
 {
-    self->unkC = mode;
-    self->unk24 = arg1;
+    self->mode = mode;
+    self->nameBuf = arg1;
     self->unk18 = 0;
     self->unk1C = 0;
     if (mode == 1) {
@@ -236,33 +236,33 @@ void Obj86ED0__AttachTarget(Obj86ED0 *self, void *arg1, void *arg2, TargetObj86E
 {
     self->methods->addChild(self, arg1);
     self->methods->addChild(self, arg2);
-    self->unk3C = arg3;
-    self->unk2C = 0;
+    self->target = arg3;
+    self->closeState = 0;
     self->unk20 = 0;
 }
 
 void Obj86ED0__DetachTarget(Obj86ED0 *self)
 {
-    self->methods->removeChild(self, self->unk34);
-    self->methods->removeChild(self, self->unk38);
-    self->unk3C = NULL;
+    self->methods->removeChild(self, self->childType2);
+    self->methods->removeChild(self, self->childType5);
+    self->target = NULL;
 }
 
 void Obj86ED0__SetState(Obj86ED0 *self, s32 arg1)
 {
-    self->unk30 = 0;
+    self->closeTickCount = 0;
     if (arg1 < 2) {
         return;
     }
     switch (arg1) {
     case 2:
     case 3:
-        self->methods->removeChild(self, self->unk34);
+        self->methods->removeChild(self, self->childType2);
         self->methods->slot48(self);
-        self->unk2C = arg1;
+        self->closeState = arg1;
         break;
     case 4:
-        self->methods->notifyParents(self, self->unk2C);
+        self->methods->notifyParents(self, self->closeState);
         break;
     }
 }
@@ -272,15 +272,15 @@ void Obj86ED0__TickState(Obj86ED0 *self)
     s32 tag;
     s32 old;
 
-    tag = self->unk2C;
+    tag = self->closeState;
     if (tag >= 4) {
         return;
     }
     if (tag < 2) {
         return;
     }
-    old = self->unk30;
-    self->unk30 = old + 1;
+    old = self->closeTickCount;
+    self->closeTickCount = old + 1;
     if (old != 0) {
         self->methods->slot54(self, 4);
     }
@@ -288,7 +288,7 @@ void Obj86ED0__TickState(Obj86ED0 *self)
 
 /* Obj86ED0__HandleCommand's own name-copy helper -- uncarved elsewhere (`code_2cc8c_f`,
  * still `INCLUDE_ASM`), typed purely from this call site's own register
- * usage: `a0`/`a1` are `self->unk24`/`self->unk28` (both `char *`, the same
+ * usage: `a0`/`a1` are `self->nameBuf`/`self->unk28` (both `char *`, the same
  * pair `strcpy` is fed in the other arm), return value unused. Same
  * declare-locally convention as `DecodeFullWidthSjis` above (a different unit
  * types this same-shaped function with a different signature from its own
@@ -301,10 +301,10 @@ void Obj86ED0__HandleCommand(Obj86ED0 *self, void *arg1, s32 arg2)
     default:
         return;
     case 25:
-        if (self->unkC == 1) {
-            EncodeFullWidthSjis(self->unk24, self->unk28);
+        if (self->mode == 1) {
+            EncodeFullWidthSjis(self->nameBuf, self->unk28);
         } else {
-            strcpy(self->unk24, self->unk28);
+            strcpy(self->nameBuf, self->unk28);
         }
         self->methods->slot60(self, 0x10);
         self->methods->slot54(self, 2);
@@ -377,7 +377,7 @@ void Obj86ED0__NotifyTarget(Obj86ED0 *self, s32 arg1)
 {
     TargetObj86ED0 *target;
 
-    target = self->unk3C;
+    target = self->target;
     if (target != NULL) {
         target->methods->slot80(target, arg1, 0x60, 0x60);
     }

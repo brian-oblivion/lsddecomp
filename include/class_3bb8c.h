@@ -2772,19 +2772,19 @@ struct Obj86ED0Methods {
 struct Obj86ED0 {
     Obj86ED0Methods *methods;  /* +0x000 */
     u8 pad004[0x00C - 0x004];   /* inherited BasicClass children/parentRefs, untouched by this unit */
-    s32 unkC;                    /* +0x00C, Obj86ED0__SetName: its own `mode` argument */
+    s32 mode;                    /* +0x00C, RENAMED round 77 (was unkC) -- Obj86ED0__SetName: its own `mode` argument, unit-exclusive (only class_3bb8c_i's own functions touch it) */
     s32 unk10;                   /* +0x010, Obj86ED0__SetName (halved when mode==1)/Obj86ED0__MoveCursorRight (upper bound tested against unk18+1) */
     s32 unk14;                   /* +0x014, Obj86ED0__AdvanceCharSelect (upper bound tested against unk1C+1) */
     s32 unk18;                   /* +0x018, Obj86ED0__SetName (zeroed)/Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft (inc/dec counter, capped by unk10) */
     s32 unk1C;                   /* +0x01C, Obj86ED0__SetName (zeroed)/Obj86ED0__AdvanceCharSelect (inc counter or reset to 0, capped by unk14) */
-    s32 unk20;                   /* +0x020, Obj86ED0__AttachTarget (zeroed) */
-    char *unk24;                 /* +0x024, Obj86ED0__SetName: its own `arg1` (name string) */
+    s32 unk20;                   /* +0x020, Obj86ED0__AttachTarget (zeroed)/Obj86ED0__ToggleFlag20 (xor-toggled, class_3bb8c_j) */
+    char *nameBuf;                /* +0x024, RENAMED round 77 (was unk24) -- Obj86ED0__SetName: its own `arg1` (caller-owned name-string buffer, unit-exclusive); Obj86ED0__HandleCommand's `case 25` re-encodes `unk28` back INTO this buffer on commit */
     char *unk28;                 /* +0x028, Obj86ED0__Finalize (freed in finalize)/Obj86ED0__SetName (DecodeFullWidthSjis/strcpy destination) */
-    s32 unk2C;                   /* +0x02C, Obj86ED0__AttachTarget (zeroed)/Obj86ED0__SetState (set to its own arg1 for arg1 in [2,4); read as notifyParents's arg1 for arg1==4)/Obj86ED0__TickState (range-checked against [2,4)) */
-    s32 unk30;                   /* +0x030, Obj86ED0__SetState (zeroed)/Obj86ED0__TickState (incremented; gates the slot54 call on the OLD value being nonzero) */
-    void *unk34;                 /* +0x034, Obj86ED0__AddChild/Obj86ED0__RemoveChild (addChild/removeChild target when child's tag==2)/Obj86ED0__SetState/Obj86ED0__DetachTarget (removeChild target) */
-    void *unk38;                 /* +0x038, Obj86ED0__AddChild/Obj86ED0__RemoveChild (tag==5)/Obj86ED0__DetachTarget (removeChild target) */
-    TargetObj86ED0 *unk3C;        /* +0x03C, Obj86ED0__AttachTarget (its own arg3)/Obj86ED0__NotifyTarget (dispatch target)/Obj86ED0__DetachTarget (zeroed) */
+    s32 closeState;               /* +0x02C, RENAMED round 77 (was unk2C) -- Obj86ED0__AttachTarget (zeroed)/Obj86ED0__SetState (set to its own arg1 for arg1 in [2,4); read as notifyParents's arg1 for arg1==4)/Obj86ED0__TickState (range-checked against [2,4)); unit-exclusive */
+    s32 closeTickCount;           /* +0x030, RENAMED round 77 (was unk30) -- Obj86ED0__SetState (zeroed)/Obj86ED0__TickState (incremented; gates the slot54 call on the OLD value being nonzero); unit-exclusive */
+    void *childType2;              /* +0x034, RENAMED round 77 (was unk34) -- Obj86ED0__AddChild/Obj86ED0__RemoveChild (addChild/removeChild target when child's tag==2)/Obj86ED0__SetState/Obj86ED0__DetachTarget (removeChild target); unit-exclusive */
+    void *childType5;              /* +0x038, RENAMED round 77 (was unk38) -- Obj86ED0__AddChild/Obj86ED0__RemoveChild (tag==5)/Obj86ED0__DetachTarget (removeChild target); unit-exclusive */
+    TargetObj86ED0 *target;         /* +0x03C, RENAMED round 77 (was unk3C) -- Obj86ED0__AttachTarget (its own arg3)/Obj86ED0__NotifyTarget (dispatch target)/Obj86ED0__DetachTarget (zeroed); unit-exclusive */
     ChildObj86ED0 *unk40;          /* +0x040, Obj86ED0__ReleaseCardResources (released, no null-back store) */
     ChildObj86ED0 *unk44;           /* +0x044, Obj86ED0__ReleaseCardResources (released, no null-back store) */
     ChildObj86ED0 *unk48;            /* +0x048, Obj86ED0__ReleaseCardResources (release+null-back)/Obj86ED0__ClearChildRefs/Obj86ED0__RemoveAllChildren (zeroed)/Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft/Obj86ED0__AdvanceCharSelect (nonzero readiness gate)/Obj86ED0__LoadCardResources (set from a resolved resource handle) */
