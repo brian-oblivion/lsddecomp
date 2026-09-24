@@ -8,7 +8,7 @@
 
 The class's own "GetMethods" accessor -- returns `&gStreamTaskObjMethods` and nothing
 else, the same shape as `Get_vtable_Entity` in `include/Entity.h` and
-`func_80066818` in `include/code_55dd4.h`. Called (still `INCLUDE_ASM`, not
+`Get_vtable_Class65650` in `include/code_55dd4.h`. Called (still `INCLUDE_ASM`, not
 this batch) by `New_StreamTaskObj` (the allocator) and `StreamTaskObj__StreamTaskObj` (the
 constructor) to fetch the class's ctor at slot `+0x008` and to install the
 methods pointer at object offset 0, respectively.

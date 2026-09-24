@@ -1,4 +1,6 @@
-# func_80065AE0 -- MATCHED (40/40, round 75): lever = LOOP KIND (plain `for`, no barrier, no frame filler)
+# Class65650__SetLightMode -- MATCHED (40/40, round 75): lever = LOOP KIND (plain `for`, no barrier, no frame filler)
+
+> Renamed from `func_80065AE0` on 2026-09-24 (tools/rename.py). Address 0x80065ae0.
 
 REVISITED, round 75: MATCHED 40/40, whole-image `OK: build matches retail`; names/types not relevant (control-flow shape only; the `base` temporary was also dropped for a direct call, not measured separately).
 
@@ -9,17 +11,17 @@ REVISITED, round 75: MATCHED 40/40, whole-image `OK: build matches retail`; name
 `src/`): 33/40, `insertions 2 / deletions 2`, positional skeleton diffs 7 --
 reproduces the recorded figure.
 
-Applied the lever that closed its sibling `func_80065A5C` earlier this round:
+Applied the lever that closed its sibling `Class65650__SetDisplay` earlier this round:
 
 | build | variant | result |
 | --- | --- | --- |
 | 1 | preserved body | 33/40, ins/del 2/2, skeleton 7 |
-| 2 | `for (i = 0; i < self->unk6C; p++) { i++; call; }` (the `func_80065A5C` shape) | 38/40, ins/del 0/0: prologue, frame and guard exact; `addiu $s0` and `move $a1,$s3` swapped around the vtable load / `jalr` slot |
+| 2 | `for (i = 0; i < self->unk6C; p++) { i++; call; }` (the `Class65650__SetDisplay` shape) | 38/40, ins/del 0/0: prologue, frame and guard exact; `addiu $s0` and `move $a1,$s3` swapped around the vtable load / `jalr` slot |
 | 3 | `for (i = 0; i < self->unk6C; p++) { call; i++; }` | **40/40** |
 | 4 | `for (i = 0; i < self->unk6C; i++, p++) { call; }` | **40/40, OK: build matches retail** (kept: the plainest spelling) |
 
 ```c
-void func_80065AE0(Class65650 *self, void *arg)
+void Class65650__SetLightMode(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
     s32 i;
@@ -38,34 +40,34 @@ all artefacts of writing the loop as guard + `do/while`; a `for` loop
 produces retail's prologue order, early parameter copy and 0x30 frame by
 itself. Where `i++` sits in the source picks where its `addiu` lands:
 at the body top it is scheduled before the vtable-slot load (retail
-`func_80065A5C`); after the call or in the increment clause it fills the
+`Class65650__SetDisplay`); after the call or in the increment clause it fills the
 `jalr` delay slot (retail here).
 
 ### Proposed learning
 
-See `func_80065A5C.md` round 75: a guard + `do/while` stall carrying a leading
+See `Class65650__SetDisplay.md` round 75: a guard + `do/while` stall carrying a leading
 `__asm__("")` and a `u8 unused[N]` frame filler is the wrong loop kind;
 rewrite as a `for` and drop both compensations. Three of three in this unit.
 
-## History before round 75 (superseded title: "func_80065AE0 -- STALL: length EXACT (40/40 words, no drift); 33/40 raw word-match; first real diff at file 0x0562F0 / vram 0x80065AF0")
+## History before round 75 (superseded title: "Class65650__SetLightMode -- STALL: length EXACT (40/40 words, no drift); 33/40 raw word-match; first real diff at file 0x0562F0 / vram 0x80065AF0")
 
 **Unit:** code_55dd4 · **Size:** 40 words (0xA0 bytes) · **Status:** STALL —
 **LENGTH exact (40/40 words, no drift); RAW WORD-MATCH 33/40; FIRST REAL DIFF
 at file 0x0562F0 / vram 0x80065AF0** (a compound: the same 3-way callee-save
-store-order permutation as `func_80065A5C`, immediately followed by the
+store-order permutation as `Class65650__SetDisplay`, immediately followed by the
 `arg` parameter's deferred copy into `$s3`). Whole-image red. Restored to
 `INCLUDE_ASM`.
 
 ## What it does (fully derived, and it is — everything past the prologue byte-matches)
 
-The same for-each-then-base-call shape as `func_80065A5C`'s STALLED loop
+The same for-each-then-base-call shape as `Class65650__SetDisplay`'s STALLED loop
 (same `self->unk70`/`self->unk6C` array), but through a DIFFERENT vtable
 slot (`+0x070`, not `+0x060`) on each element, and followed by one more
 call to the shared intermediate base class's OWN `+0x070` slot after the
 loop:
 
 ```c
-void func_80065AE0(Class65650 *self, void *arg)
+void Class65650__SetLightMode(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
     s32 i;
@@ -115,7 +117,7 @@ blez  $v0, TAIL / delay: $s0 = 0
 
 Every attempt here instead defers `move $s3, $a1` to right AFTER the
 `blez`, as an extra standalone instruction in the not-taken fallthrough —
-one word longer, which is exactly the `func_80065D64`/`func_80065A5C`
+one word longer, which is exactly the `func_80065D64`/`Class65650__SetDisplay`
 "parameter copy deferred into/past the branch" residue class. Two
 sub-issues bundled together, addressed separately:
 
@@ -123,16 +125,16 @@ sub-issues bundled together, addressed separately:
    `base`, no filler) produced a `$sp,0x28` frame instead of retail's
    `$sp,0x30` — an 8-byte shortfall, not the usual 0-byte one. Adding a
    fifth, genuinely unused `u8 unused[8];` local (the same lever as
-   `func_80065D64`/`func_80065A5C`) fixed the frame to `$sp,0x30` exactly
+   `func_80065D64`/`Class65650__SetDisplay`) fixed the frame to `$sp,0x30` exactly
    and, as a side effect, also fixed the callee-save STORE ORDER (which
    had independently come out wrong — `s2,s3,ra,s1,s0` instead of
    retail's `s2,s3,s0,ra,s1` — before the padding local was added; after
    adding it, the order matched with no further work). This is new: on
-   `func_80065A5C` the store-order residue needed a barrier and still
+   `Class65650__SetDisplay` the store-order residue needed a barrier and still
    never fully closed; here the padding local alone fixed it for free.
 2. **The `arg` copy deferral, 33/40 ceiling.** With the frame fixed, this
    is the ONLY remaining residue, and it is the mirror image of
-   `func_80065A5C`'s own first fix: there, `__asm__("")` as the function's
+   `Class65650__SetDisplay`'s own first fix: there, `__asm__("")` as the function's
    first statement closed an identical-looking deferral. **Here it does
    the opposite** — it not only fails to move the `$s3` copy earlier, it
    ALSO breaks something that was already correct (the `blez` delay
@@ -153,9 +155,9 @@ sub-issues bundled together, addressed separately:
 
 Six real attempts. The frame-size/store-order half of this residue is
 fully closed (a first for this unit's "prologue permutation" residue
-class — `func_80065A5C` never got its store order to close even with a
+class — `Class65650__SetDisplay` never got its store order to close even with a
 barrier). Only the parameter-copy deferral remains, and unlike its two
-prior instances in this unit (`func_80065D64`, `func_80065A5C`), the
+prior instances in this unit (`func_80065D64`, `Class65650__SetDisplay`), the
 established `__asm__("")` lever actively regresses it here rather than
 fixing it.
 
@@ -163,7 +165,7 @@ fixing it.
 
 ```c
 #if 0
-void func_80065AE0(Class65650 *self, void *arg)
+void Class65650__SetLightMode(Class65650 *self, void *arg)
 {
     u8 unused[8];
     Unk70ElemObj **p;
@@ -195,7 +197,7 @@ of this stall.)
 **The `__asm__("")`-as-first-statement lever for a deferred parameter copy
 is not safe to apply by pattern-match alone — verify each instance.**
 It fixed this exact-looking residue in `func_80065D64` and (partially) in
-`func_80065A5C`, but on `func_80065AE0` it actively regresses an
+`Class65650__SetDisplay`, but on `Class65650__SetLightMode` it actively regresses an
 ALREADY-correct delay-slot fill and reintroduces a full-word drift on top
 of failing to move the copy. Three instances of "a parameter copy is
 deferred past a branch" in one unit, two different correct responses (add
@@ -205,7 +207,7 @@ this lever; do not assume it from the previous function's report.
 
 Separately, confirmed positively this round: **an 8-byte unused padding
 local can fix a callee-save STORE ORDER for free, with no barrier at
-all**, when it's also needed to correct the frame size. `func_80065A5C`
+all**, when it's also needed to correct the frame size. `Class65650__SetDisplay`
 needed a barrier for its store-order residue and never fully closed it;
 this function's store order was wrong before the padding local and
 correct after, with nothing else changed.
@@ -215,11 +217,11 @@ correct after, with nothing else changed.
 **Important methodology finding, discovered here first:** the first bounded
 search (`permuter.py --debug`/search WITHOUT `--stack-diffs`) reported a
 "zero" at iteration 197. **The literal winning candidate** (from
-`permuter-work/func_80065AE0/output-0-1/source.c`, function body only):
+`permuter-work/Class65650__SetLightMode/output-0-1/source.c`, function body only):
 
 ```c
 #if 0
-void func_80065AE0(Class65650 *self, void *arg)
+void Class65650__SetLightMode(Class65650 *self, void *arg)
 {
     Unk70ElemObj **new_var;
     u8 unused[8];
@@ -365,7 +367,7 @@ it, the order matched with no further work" -- leaving only the `arg`
 parameter-copy deferral as the residue.** Reading the actual diff:
 retail's callee-save store order is `s0 (0x18), ra (0x28), s1 (0x1C)`;
 this build's is `ra (0x28), s1 (0x1C), s0 (0x18)` -- the **exact same
-three-way permutation** documented as unfixed in `func_80065A5C`'s own
+three-way permutation** documented as unfixed in `Class65650__SetDisplay`'s own
 report, still present, not fixed. The confusion is understandable: the
 missing/deferred `arg` copy (retail's word 4) shifts every subsequent
 word's file OFFSET by one position, so a naive "does word N match word
@@ -378,7 +380,7 @@ permutation is real and unchanged.
 known independent issues stacked together, not the arg-deferral alone:**
 
 1. The same `s0/ra/s1` callee-save store-order permutation that
-   `func_80065A5C` has never closed (3 words: `0x0562F4`-`0x0562FC`), and
+   `Class65650__SetDisplay` has never closed (3 words: `0x0562F4`-`0x0562FC`), and
 2. The `arg`-parameter-copy deferred into the `blez` delay slot instead
    of materializing early (the remaining words, cascading from the
    missing word 4 onward).
@@ -399,7 +401,7 @@ consistent with why it's inert rather than harmful (unlike the two
 before-the-branch positions, which actively regressed things). Reverted;
 confirmed clean rebuild.
 
-Given `func_80065A5C`'s own report -- with more attempts (15+),
+Given `Class65650__SetDisplay`'s own report -- with more attempts (15+),
 independent permuter search (47,952 iterations), AND this round's
 isolated-cc1 confirmation that the permutation is decoupled from frame
 composition -- has never closed this exact store-order permutation, it
@@ -432,10 +434,10 @@ the first real diff (after realignment) is at file offset **0x0562F0** /
 vram **0x80065AF0** -- retail's `move s3,a1` (the `arg` copy) is simply
 missing at that position in ours, consistent with round 20's corrected
 understanding that this residue is the SAME store-order permutation as
-`func_80065A5C` plus the deferred-copy cascade. Corrected this report's
+`Class65650__SetDisplay` plus the deferred-copy cascade. Corrected this report's
 title to the three-figure LENGTH/RAW-WORD-MATCH/FIRST-DIFF format.
 
-Screened against the same three round-21/22/23 levers as `func_80065A5C`
+Screened against the same three round-21/22/23 levers as `Class65650__SetDisplay`
 this round (see that report's round-24 entry for the full reasoning): no
 dead parameter to substitute, no register-pair-swap shape for the
 pointer-elimination lever to apply to (this is a store-order/deferred-copy
@@ -449,7 +451,7 @@ confirmed clean.
 
 ### Proposed learning
 
-Same as `func_80065A5C`'s round-24 entry: this unit's two store-order-flavor
+Same as `Class65650__SetDisplay`'s round-24 entry: this unit's two store-order-flavor
 stalls sit outside every lever the project has found since round 20, and
 that is worth recording explicitly rather than re-screening them fresh next
 round.
@@ -461,16 +463,16 @@ unconditional `j` (not `beq`/`bne`/`bgez`) whose target is a join with real
 work in its delay slot.
 
 ```
-grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/func_80065AE0.s
+grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/Class65650__SetLightMode.s
 ```
 
 **No bare `j` mnemonic anywhere in this function's disassembly.** Same
-shape as its sibling `func_80065A5C`: linear prologue, one `do`/`while`
+shape as its sibling `Class65650__SetDisplay`: linear prologue, one `do`/`while`
 loop guarded by `blez`/`bnez` (both conditional), linear epilogue, one
 trailing unconditional call. There is no candidate site for a
 basic-block-layout residue. This is consistent with — and further
 supports — round 20's corrected understanding that this function's 7-word
-residue is a compound of `func_80065A5C`'s own unclosed store-order
+residue is a compound of `Class65650__SetDisplay`'s own unclosed store-order
 permutation plus a deferred parameter copy, both genuinely scheduling
 questions, not a layout one.
 
@@ -509,7 +511,7 @@ Ran the bounded search:
 ```
 nohup timeout 600 env PATH=$PWD/permuter-work/bin:$PATH .venv/bin/python3 \
   tools/decomp-permuter/permuter.py -j 6 --stack-diffs --stop-on-zero \
-  --best-only permuter-work/func_80065AE0 > /tmp/alpha_permuter_80065AE0.log 2>&1 &
+  --best-only permuter-work/Class65650__SetLightMode > /tmp/alpha_permuter_80065AE0.log 2>&1 &
 ```
 
 **80,272 iterations. Best score reached 58 (down from the 107 base), the
@@ -582,7 +584,7 @@ inert here, same as the plain filler. No improvement, no regression.
 
 **Levers 2-5 screened:** (2) register-identity skepticism does not
 apply — round 20's corrected understanding (this residue is a compound of
-`func_80065A5C`'s own unclosed store-order permutation plus a deferred
+`Class65650__SetDisplay`'s own unclosed store-order permutation plus a deferred
 `arg` copy) was independently re-confirmed by round 31's callee-saved-set
 discriminator (`$ra,$s0,$s1,$s2,$s3` both sides); re-checked again this
 round, unchanged. (3) not applicable — no attempt this round derived
@@ -598,7 +600,7 @@ confirmed clean before and after.
 
 ### Proposed learning
 
-A third data point (after `func_80065A5C` and `func_80066340` this same
+A third data point (after `Class65650__SetDisplay` and `func_80066340` this same
 round) that the round-32 volatile lever has no purchase on this unit's
 callee-save-ordering-flavored residues: it is inert on an unused filler
 local and actively regressive as a barrier substitute, but never an
@@ -617,7 +619,7 @@ rebuilt. `funcdiff.py` reproduces exactly **33/40**, file range
 restored, `git diff --stat` confirmed clean before proceeding.
 
 Re-provisioned the permuter scaffold fresh against the preserved 33/40
-body (`tools/setup-permuter.sh func_80065AE0 <seed>`). `--debug
+body (`tools/setup-permuter.sh Class65650__SetLightMode <seed>`). `--debug
 --stack-diffs` reproduced base score **107** exactly, matching round 18
 and round 31's own documented figure -- **CHECK 3: AGREE**, scaffold
 targets the same residue as the real build before any search time spent.
@@ -627,7 +629,7 @@ LOW machine contention (`uptime` load average 3.85/32 at launch, a much
 quieter box than round 18/31's "up to 38 permuter-related processes"):
 
 ```
-timeout 900 permuter.py -j 6 --stop-on-zero --best-only permuter-work/func_80065AE0
+timeout 900 permuter.py -j 6 --stop-on-zero --best-only permuter-work/Class65650__SetLightMode
 ```
 
 **Found a score-0 candidate at iteration 501** (rc=0, `--stop-on-zero`
@@ -713,9 +715,9 @@ candidate is a confirmed frame-size regression — see round 49's CHECK-3
 entry above) is hand-derived, not permuter-sourced, so it qualifies for
 track 1b promotion as-is. Placed in `src/code_55dd4.c` in the project's
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif` shape, in ROM order,
-immediately after `func_80065A5C`'s own NON_MATCHING block. Comment names
+immediately after `Class65650__SetDisplay`'s own NON_MATCHING block. Comment names
 the score (33/40 words, length exact), the residue class (the compound of
-`func_80065A5C`'s own unclosed 3-way callee-save store-order permutation
+`Class65650__SetDisplay`'s own unclosed 3-way callee-save store-order permutation
 plus the `arg` parameter's copy into `$s3` deferred past the `blez` guard),
 and this report. `./build-and-verify.sh` green (zero bytes changed — the
 verified build never compiles the NON_MATCHING half) and

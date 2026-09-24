@@ -173,7 +173,7 @@ here appears to search past several intervening independent instructions
 residue, which stayed local) to find and hoist it, regardless of textual
 distance from where the C source puts it. A bare `__asm__("")` scheduling
 barrier did NOT block this hoist, which contradicts the working
-assumption from `func_80065E1C`/`func_80065AE0` that the barrier is a
+assumption from `func_80065E1C`/`Class65650__SetLightMode` that the barrier is a
 reliable local lever — worth flagging for whoever revisits the barrier's
 actual scope in this compiler. The remaining structural difference (two
 separate registers recomputed by addition vs. one incrementing pointer)

@@ -15,7 +15,7 @@ calls `this->methods->slotC4(this, -0x1E, 0)`.
 
 `slotC4` is a shared BasicClass-inherited slot: confirmed with
 `tools/classtable.py` that BOTH this unit's own vtable (`ENTITY_METHODS`) and
-Class65650's vtable (`D_8008A6C4`, `include/code_55dd4.h`) hold the identical
+Class65650's vtable (`gClass65650Methods`, `include/code_55dd4.h`) hold the identical
 function (`BaseObjO__func_5748c`) at `+0xC4`, and `code_55dd4.h`'s own
 `Class65650Methods.slotC4` already documents the exact same call shape
 (`slotC4(self, -0x1E, 0)`, from `func_80066150`) — so this is not a

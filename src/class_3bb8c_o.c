@@ -21,7 +21,7 @@
  *    concrete class (`GetClass876FCMethods` is that sibling's own vtable getter,
  *    named in round 73 by class_3bb8c_r's naming pass). `BaseObjO__BaseObjO` is proven to be the BASE's
  *    own constructor, not `Class65650`'s: `code_55dd4.c`'s real
- *    `class_65650__Constructor` calls it to chain to the base FIRST, then
+ *    `Class65650__Class65650` calls it to chain to the base FIRST, then
  *    overwrites `self->methods` with `Class65650`'s own, more specific
  *    table. This unit is where the base class's methods are DEFINED;
  *    `DreamSys.h`/`code_55dd4.h` keep their own independent local views of

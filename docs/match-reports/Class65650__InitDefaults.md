@@ -1,4 +1,6 @@
-# func_80065830
+# Class65650__InitDefaults
+
+> Renamed from `func_80065830` on 2026-09-24 (tools/rename.py). Address 0x80065830.
 
 **Unit:** code_55dd4 · **Size:** 58 words (0xE8 bytes) · **Status:** MATCHED
 (58/58 words, whole-image `./build-and-verify.sh` green)
@@ -6,13 +8,13 @@
 ## What it does
 
 `Class65650Methods` slot `+0x040` (already known from the header's own
-comment: "func_80065830, this class's own"). A pure dispatch sequence —
+comment: "Class65650__InitDefaults, this class's own"). A pure dispatch sequence —
 one call through the shared intermediate base class, six calls through
 `self`'s own vtable with assorted literal arguments, then a conditional
 call to a fixed function if `self->unk68` is set:
 
 ```c
-void func_80065830(Class65650 *self)
+void Class65650__InitDefaults(Class65650 *self)
 {
     D800878D4Methods *base;
 

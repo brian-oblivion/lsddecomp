@@ -1,4 +1,6 @@
-# func_80065B80
+# Class65650__OnClass6EF50Notify
+
+> Renamed from `func_80065B80` on 2026-09-24 (tools/rename.py). Address 0x80065b80.
 
 **Unit:** code_55dd4 · **Size:** 29 words (0x74 bytes) · **Status:** MATCHED
 (29/29 words, whole-image `./build-and-verify.sh` green)
@@ -12,7 +14,7 @@ separate `if`s, not `if/else if`), matching the two independent `bne`
 guards in the disassembly.
 
 ```c
-void func_80065B80(Class65650 *self, void *arg1, s32 val)
+void Class65650__OnClass6EF50Notify(Class65650 *self, void *arg1, s32 val)
 {
     if (val == 2) {
         self->methods->slot108(self);
@@ -47,7 +49,7 @@ and `$a1` is left holding whatever it already had — which, from the
 *outside*, looks like "forwarded", but which the source never actually
 says.
 
-`arg1` is kept in `func_80065B80`'s own signature (unused) purely because
+`arg1` is kept in `Class65650__OnClass6EF50Notify`'s own signature (unused) purely because
 retail's caller-side convention still passes something in `$a1` here and a
 future caller in this same slot family may turn out to need it — but this
 function's *body* must not reference it.

@@ -1,4 +1,6 @@
-# func_80065A5C -- MATCHED (33/33, round 75): lever = LOOP KIND (`for` loop, no barrier, no frame filler)
+# Class65650__SetDisplay -- MATCHED (33/33, round 75): lever = LOOP KIND (`for` loop, no barrier, no frame filler)
+
+> Renamed from `func_80065A5C` on 2026-09-24 (tools/rename.py). Address 0x80065a5c.
 
 REVISITED, round 75: MATCHED 33/33, whole-image `OK: build matches retail`; names/types not relevant (the lever is control-flow shape only).
 
@@ -19,7 +21,7 @@ figure reproduces exactly (`sw $s0`/`sw $ra`/`sw $s1` permuted at 0x80065A70).
 | 6 | `for (i = 0; i < self->unk6C; p++) { i++; call; }` | **33/33, OK: build matches retail** |
 
 ```c
-void func_80065A5C(Class65650 *self, void *arg)
+void Class65650__SetDisplay(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
     s32 i;
@@ -54,7 +56,7 @@ plain `for` with the counter increment placed where retail's `addiu` sits
 (here `i++` at the top of the body, `p++` in the increment clause) and drop
 both compensations. Closed a 61-round stall on the second shape build.
 
-## History before round 75 (superseded title: "func_80065A5C -- STALL: length EXACT (33/33 words, no drift); 30/33 raw word-match; first real diff at file 0x056270 / vram 0x80065A70")
+## History before round 75 (superseded title: "Class65650__SetDisplay -- STALL: length EXACT (33/33 words, no drift); 30/33 raw word-match; first real diff at file 0x056270 / vram 0x80065A70")
 
 > **HEAD ADJUDICATION, round 24 (2026-09-08). Classification CONFIRMED, and
 > the disposition is corrected: this is a PERMUTER target that has never had
@@ -106,7 +108,7 @@ A for-each over `self->unk70` (`self->unk6C` elements), calling each
 element's own vtable slot `+0x060` with `(element, arg)`:
 
 ```c
-void func_80065A5C(Class65650 *self, void *arg)
+void Class65650__SetDisplay(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
     s32 i;
@@ -183,7 +185,7 @@ placements did not close.
 
 ```c
 #if 0
-void func_80065A5C(Class65650 *self, void *arg)
+void Class65650__SetDisplay(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
     u8 unused[8];
@@ -228,7 +230,7 @@ counts each of the 3 mismatched-register store lines as one 5-point
 register-difference penalty).
 
 Ran the bounded search: `timeout 600 permuter.py -j 6 --stop-on-zero
---best-only permuter-work/func_80065A5C`. **47,952 iterations in the 600s
+--best-only permuter-work/Class65650__SetDisplay`. **47,952 iterations in the 600s
 window; best score never moved off the base 15 (30/33) at any point** —
 every candidate that touched the three-store region regressed (worst
 observed 2900) or reproduced the same baseline. The trailing `echo
@@ -410,7 +412,7 @@ layout closure): grepped this function's own `.s` for a bare unconditional
 with real work in its delay slot.
 
 ```
-grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/func_80065A5C.s
+grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/Class65650__SetDisplay.s
 ```
 
 **No bare `j` mnemonic anywhere in this function's disassembly.** The only
@@ -431,7 +433,7 @@ confirmed base score 15, matching round 18's figure exactly. Launched:
 ```
 PATH=$PWD/permuter-work/bin:$PATH timeout 900 .venv/bin/python3 \
   tools/decomp-permuter/permuter.py -j 5 --stop-on-zero --best-only \
-  permuter-work/func_80065A5C
+  permuter-work/Class65650__SetDisplay
 ```
 
 (Results appended below once the bound fires or a zero is found.)
@@ -442,7 +444,7 @@ PATH=$PWD/permuter-work/bin:$PATH timeout 900 .venv/bin/python3 \
 own exit status was not directly captured by a parent shell; inferred from
 evidence rather than a captured `$?`, per the same standard round 18 used
 for the same ambiguity on this same function: total wall-clock time from
-`permuter-work/func_80065A5C/` creation to the log's last write was ~951s
+`permuter-work/Class65650__SetDisplay/` creation to the log's last write was ~951s
 (consistent with the 900s bound plus the multiprocessing pool's own
 startup/shutdown overhead), the log's tail shows a graceful
 `resource_tracker` semaphore-cleanup warning (the shutdown path `timeout`'s
@@ -494,7 +496,7 @@ retyping it.
 **Applied round 27's callee-saved-register discriminator** (address-taken-
 parameter lever's decision procedure: diff the compiled prologue's saved-
 register SET against retail's) as a **confirmation** check, not a new
-attempt — `grep -oE 'sw +\$(s[0-7]|fp|ra),' asm/nonmatchings/code_55dd4/func_80065A5C.s
+attempt — `grep -oE 'sw +\$(s[0-7]|fp|ra),' asm/nonmatchings/code_55dd4/Class65650__SetDisplay.s
 | sort -u` against the preserved body's own compiled output: **both save the
 identical set, `$ra,$s0,$s1,$s2,$s3`**. Per the discriminator's own rule
 ("SAME set -> genuine register identity, stop"), this independently confirms
@@ -590,7 +592,7 @@ deciding where to spend this round's search budget:
   own two campaigns never produced ANY candidate below the base score of
   15 (round 25: "the minimum, reached 39,292 times; every other value
   observed is worse"), so there is no below-base candidate on file to
-  re-read. This is a genuinely different situation from `func_80065AE0`'s
+  re-read. This is a genuinely different situation from `Class65650__SetLightMode`'s
   and `func_80065E1C`'s siblings this round, where fresh searches
   immediately surfaced sub-base candidates worth inspecting.
 

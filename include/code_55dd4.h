@@ -4,16 +4,16 @@
 #include "common.h"
 
 /*
- * The class allocated by New_class_65650 / constructed by
- * class_65650__Constructor. Method table is D_8008A6C4 (80 slots, header
+ * The class allocated by New_Class65650 / constructed by
+ * Class65650__Class65650. Method table is gClass65650Methods (80 slots, header
  * word 0x234). No FirecatFG name survives for this class (only
- * New_class_65650 and class_65650__Constructor are named in the symbol
+ * New_Class65650 and Class65650__Class65650 are named in the symbol
  * file), so fields are named by offset until real names are known.
  *
  * Inheritance, resolved with tools/classtable.py (never by counting):
  * BasicClass (D_8006B58C, 14 slots) -> an intermediate class at D_800878D4
  * (59 slots, header 0x34: overrides BasicClass's ctor/dtor/+0x10/+0x14/+0x18
- * and +0x038, adds 0x040..0x0EC) -> this class (D_8008A6C4, 80 slots:
+ * and +0x038, adds 0x040..0x0EC) -> this class (gClass65650Methods, 80 slots:
  * overrides the intermediate class's ctor (+0x008) and dtor (+0x00C), keeps
  * every other inherited slot verbatim, and adds 0x0F0..0x140 of its own).
  * The SAME intermediate class D_800878D4 is DreamSys's immediate base too
@@ -41,19 +41,19 @@ typedef struct D800878D4Methods {
     void *unk14;                                        /* +0x014 BaseObjO__UnlinkCompanion */
     void *unk18;                                         /* +0x018 BaseObjO__ClearCompanions */
     u8 pad1C[0x1C];                                       /* +0x01C .. +0x037, not yet needed */
-    void (*slot38)(Class65650 *self, void *arg1, s32 arg2); /* +0x038 -- called by func_80065790 as slot38(self, arg1, arg2) */
+    void (*slot38)(Class65650 *self, void *arg1, s32 arg2); /* +0x038 -- called by Class65650__OnNotify as slot38(self, arg1, arg2) */
     u8 pad3C[0x10];                                         /* +0x03C .. +0x04B, not yet needed */
     void (*slot4C)(Class65650 *self, void *arg1, void *arg2); /* +0x04C -- called by func_80065918 as slot4C(self, arg3, arg5) */
-    void (*slot50)(Class65650 *self);                       /* +0x050 -- called by func_800659D0 */
+    void (*slot50)(Class65650 *self);                       /* +0x050 -- called by Class65650__DetachFromParent */
     u8 pad54[0x0C];                                          /* +0x054 .. +0x05F, not yet needed */
-    void (*slot60)(Class65650 *self, s32 arg);                /* +0x060 -- called by func_80065830 as slot60(self, 0) */
+    void (*slot60)(Class65650 *self, s32 arg);                /* +0x060 -- called by Class65650__InitDefaults as slot60(self, 0) */
     u8 pad64[0x0C];                                             /* +0x064 .. +0x06F, not yet needed */
-    void (*slot70)(Class65650 *self, void *arg);              /* +0x070 -- called by func_80065AE0 via DreamSys__GetBaseMethods()->slot70(self, arg) */
+    void (*slot70)(Class65650 *self, void *arg);              /* +0x070 -- called by Class65650__SetLightMode via DreamSys__GetBaseMethods()->slot70(self, arg) */
 } D800878D4Methods;
 
 extern D800878D4Methods *DreamSys__GetBaseMethods(void);
 
-/* func_80065790's `arg1`: unidentified, only its own +0x000 field (itself
+/* Class65650__OnNotify's `arg1`: unidentified, only its own +0x000 field (itself
  * a pointer) is needed so far -- that pointed-at object's +0x000 field is
  * a u16 "type tag", checked against the magic value 0x5F03. */
 typedef struct TaggedObj {
@@ -85,11 +85,11 @@ typedef struct Unk68Methods {
 typedef struct Unk68Obj {
     Unk68Methods *methods;   /* +0x00 */
     u8 pad04[0x1C];            /* +0x04 .. +0x1F, unknown */
-    s32 unk20;                  /* +0x20 -- read directly (not via ->methods) by func_80065830, passed as Class6B5CC__LinkModel's second argument */
+    s32 unk20;                  /* +0x20 -- read directly (not via ->methods) by Class65650__InitDefaults, passed as Class6B5CC__LinkModel's second argument */
 } Unk68Obj;
 
 /* Whatever class each self->unk70[i] (below) points at: unidentified,
- * only its vtable slot +0x060 is needed so far, by func_80065A5C. */
+ * only its vtable slot +0x060 is needed so far, by Class65650__SetDisplay. */
 typedef struct Unk70ElemMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
     void (*slot4)(void *self);                /* +0x004 -- called by func_80065F2C's teardown loop */
@@ -98,7 +98,7 @@ typedef struct Unk70ElemMethods {
     u8 pad50[0x10];                             /* +0x050 .. +0x05F, unknown */
     void (*slot60)(void *self, void *arg);    /* +0x060 */
     u8 pad64[0x0C];                            /* +0x064 .. +0x06C, unknown */
-    void (*slot70)(void *self, void *arg);      /* +0x070 -- called by func_80065AE0's loop, same signature as slot60 */
+    void (*slot70)(void *self, void *arg);      /* +0x070 -- called by Class65650__SetLightMode's loop, same signature as slot60 */
 } Unk70ElemMethods;
 
 /* self->unk70[i]'s own +0x14 field (below): unidentified, only the fields
@@ -200,53 +200,53 @@ extern Unk5CObj *func_8004468C(UnkArg1Obj *arg);
 
 typedef struct Class65650Methods {
     s32 header;                                                    /* +0x000 */
-    void (*slot04)(Class65650 *self);                               /* +0x004 BasicClass__Release, inherited -- used by func_80065B80 when its `val` == 4 */
-    Class65650 *(*ctor)(Class65650 *self, void *arg1, void *arg2);   /* +0x008 class_65650__Constructor */
-    void (*dtor)(Class65650 *self);                                   /* +0x00C func_8006573C */
+    void (*slot04)(Class65650 *self);                               /* +0x004 BasicClass__Release, inherited -- used by Class65650__OnClass6EF50Notify when its `val` == 4 */
+    Class65650 *(*ctor)(Class65650 *self, void *arg1, void *arg2);   /* +0x008 Class65650__Class65650 */
+    void (*dtor)(Class65650 *self);                                   /* +0x00C Class65650__Destructor */
     void (*slot10)(Class65650 *self, void *arg);                       /* +0x010 BaseObjO__LinkCompanion, inherited -- "link" companion of slot14, see func_80066748 */
     void (*slot14)(Class65650 *self, void *arg);                        /* +0x014 BaseObjO__UnlinkCompanion, inherited -- "unlink" companion of slot10, see func_800667B0 */
     u8 pad18[0x28];                                                      /* +0x018 .. +0x03C, inherited from D_800878D4, not yet needed */
-    void (*slot40)(Class65650 *self);                                    /* +0x040 func_80065830, this class's own */
+    void (*slot40)(Class65650 *self);                                    /* +0x040 Class65650__InitDefaults, this class's own */
     u8 pad44[0x80];                                                       /* +0x044 .. +0x0C0, inherited/not yet needed */
     void (*slotC4)(Class65650 *self, s32 arg1, s32 arg2);                  /* +0x0C4 -- called by func_80066150 as slotC4(self, -0x1E, 0) */
     u8 padC8[0x1C];                                                        /* +0x0C8 .. +0x0E3, inherited/not yet needed */
-    void (*slotE4)(Class65650 *self, s32 arg);                              /* +0x0E4 -- called by func_80065830 as slotE4(self, 0x12C) */
+    void (*slotE4)(Class65650 *self, s32 arg);                              /* +0x0E4 -- called by Class65650__InitDefaults as slotE4(self, 0x12C) */
     u8 padE8[0x08];                                                          /* +0x0E8 .. +0x0EF, inherited/not yet needed */
-    void (*slotF0)(Class65650 *self, s32 arg);                                /* +0x0F0 -- called by func_80065830 as slotF0(self, 1) */
+    void (*slotF0)(Class65650 *self, s32 arg);                                /* +0x0F0 -- called by Class65650__InitDefaults as slotF0(self, 1) */
     s32 (*slot_setup5C)(Class65650 *self, void *arg1);                     /* +0x0F4 func_80065BFC */
     void (*slot_teardown5C)(Class65650 *self);                              /* +0x0F8 func_80065C2C */
     u8 padFC[0x04];                                                          /* +0x0FC, this unit's own slot (func_80065D64), not dispatched through here */
     s32 (*slot100)(Class65650 *self);                                         /* +0x100 -- called by func_80065C5C on success (its own return value) */
     void (*slot_teardown70)(Class65650 *self);                                /* +0x104 func_80065DEC -- called by func_80065CEC */
-    void (*slot108)(Class65650 *self);                                        /* +0x108 func_80065FD8 -- used by func_80065B80 when its `val` == 2 */
-    void (*slot10C)(Class65650 *self, s32 arg);                                 /* +0x10C -- called by func_80065830 as slot10C(self, 0x41) */
+    void (*slot108)(Class65650 *self);                                        /* +0x108 func_80065FD8 -- used by Class65650__OnClass6EF50Notify when its `val` == 2 */
+    void (*slot10C)(Class65650 *self, s32 arg);                                 /* +0x10C -- called by Class65650__InitDefaults as slot10C(self, 0x41) */
     u8 pad110[0x04];                                                             /* +0x110 .. +0x113, not yet needed as a call target */
-    void (*slot114)(Class65650 *self);                                           /* +0x114 -- called by func_80065830 as slot114(self) */
+    void (*slot114)(Class65650 *self);                                           /* +0x114 -- called by Class65650__InitDefaults as slot114(self) */
     void *slot118;                                                              /* +0x118 -- only ever taken as a pointer VALUE (func_800660BC), never called from this unit, so left untyped-as-function */
     void *slot11C;                                                               /* +0x11C ditto */
     void *slot120;                                                               /* +0x120 ditto */
     u8 pad124[0x04];                                                             /* +0x124 .. +0x127, this unit's own slot, not dispatched through here */
-    void (*slot128)(Class65650 *self, s32 arg);                                    /* +0x128 -- called by func_80065830 as slot128(self, 0) */
+    void (*slot128)(Class65650 *self, s32 arg);                                    /* +0x128 -- called by Class65650__InitDefaults as slot128(self, 0) */
     u8 pad12C[0x04];                                                                /* +0x12C .. +0x12F, this unit's own slot, not dispatched through here */
-    void (*slot130)(Class65650 *self);                                               /* +0x130 -- called by func_80065830 as slot130(self) */
+    void (*slot130)(Class65650 *self);                                               /* +0x130 -- called by Class65650__InitDefaults as slot130(self) */
     u8 *(*slot134)(Class65650 *self, void *ptr, s32 flag);                        /* +0x134 -- called by func_80066214 (which discards the return -- legal for any return type, not evidence it's void) and by func_80065FD8, which DOES consume it (self->unk88 = self->methods->slot134(self, self->unk88, 0)), confirming the return type is u8 * to match self->unk88's own type */
     void *(*slot138)(Class65650 *self, void *acc, void *extra);                    /* +0x138 func_80066340 -- called by func_800662BC in a fold/reduce; func_80066340 itself is out of scope this round (258 words) */
     void (*slot13C)(Class65650 *self, Class65650 *other);                            /* +0x13C func_80066748, this unit's own -- confirmed as a real dispatch target by func_80065918's self->methods->slot13C(self, arg1) call; func_80066748's own signature (self, other) matches */
-    void (*slot140)(Class65650 *self);                                               /* +0x140 func_800667B0 -- called by func_800659D0 */
+    void (*slot140)(Class65650 *self);                                               /* +0x140 func_800667B0 -- called by Class65650__DetachFromParent */
 } Class65650Methods;
 
-/* Object size is 0x98 (from the allocator call in New_class_65650). Field
+/* Object size is 0x98 (from the allocator call in New_Class65650). Field
  * offsets below are only the ones observed so far in this unit's functions. */
 struct Class65650 {
     Class65650Methods *methods;   /* +0x00 */
     u8 pad04[0x08];                  /* +0x04 .. +0x0B, BasicClass/intermediate-class instance fields, not this unit's to name */
-    s32 unk0C;                       /* +0x0C guard flag gating func_800659D0's whole body (slot140/slot14/base-slot50 cleanup); parallels DreamSys's own unk_0xC gate field in the SAME shared base class, though not proven equivalent */
+    s32 unk0C;                       /* +0x0C guard flag gating Class65650__DetachFromParent's whole body (slot140/slot14/base-slot50 cleanup); parallels DreamSys's own unk_0xC gate field in the SAME shared base class, though not proven equivalent */
     u8 pad10[0x04];                   /* +0x10 .. +0x13, not this unit's to name */
     s32 *unk14;                        /* +0x14 pointer whose first word func_80065FD8 unconditionally zeroes on every call (*self->unk14 = 0) */
     u8 pad18[0x0C];                     /* +0x18 .. +0x23, not this unit's to name */
     s32 unk24;                           /* +0x24 counter, incremented unconditionally by func_80065FD8 on every call */
     u8 pad28[0x28];                       /* +0x28 .. +0x4F, not this unit's to name */
-    Class65650 *unk50;                 /* +0x50 companion-object pointer, unlinked via slot14 in func_800659D0 when set -- a second link slot distinct from unk94's */
+    Class65650 *unk50;                 /* +0x50 companion-object pointer, unlinked via slot14 in Class65650__DetachFromParent when set -- a second link slot distinct from unk94's */
     u8 pad54[0x04];                     /* +0x54 .. +0x57, not this unit's to name */
 
     UnkArg2Obj *arg2;               /* +0x58 the constructor's third parameter, stashed verbatim; read by func_800661D4, which calls arg2->methods->slot80(arg2, forwardedArg, 0x6E, 0x6E) when non-NULL */
@@ -255,7 +255,7 @@ struct Class65650 {
     s32 unk64;                     /* +0x64 plain s32 field; set verbatim by func_80065BF4(self, value) */
     Unk68Obj *unk68;                /* +0x68 zeroed in the constructor; consumed by func_80066150, which calls unk68->methods->slot88(unk68, 6) when self->unk64 == 1 and unk68 is set */
     s32 unk6C;                     /* +0x6C count, paired with the unk70/unk74 arrays */
-    Unk70ElemObj **unk70;           /* +0x70 array of item pointers, allocated by func_80065E1C; each element's own slot +0x060 is invoked (element, arg) by func_80065A5C */
+    Unk70ElemObj **unk70;           /* +0x70 array of item pointers, allocated by func_80065E1C; each element's own slot +0x060 is invoked (element, arg) by Class65650__SetDisplay */
     u8 *unk74;                     /* +0x74 parallel byte array (one byte per unk70 entry), allocated by func_80065E1C; linearly searched by func_80065D64 */
     void *unk78;                    /* +0x78 callback pointer; func_800660BC copies one of slot118/11C/120's VALUE (never calls it) here based on a small dispatch value */
 
@@ -269,12 +269,12 @@ struct Class65650 {
     Class65650 *unk94;              /* +0x94 companion-object pointer; zeroed in the constructor, linked via slot10/slot14 in func_80066748/func_800667B0 (a symmetric buddy-link, not the s32 the first pass guessed) */
 };
 
-extern Class65650Methods D_8008A6C4;
-extern Class65650Methods *func_80066818(void);
+extern Class65650Methods gClass65650Methods;
+extern Class65650Methods *Get_vtable_Class65650(void);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
-extern void Class6B5CC__LinkModel(void *self, s32 arg); /* first param confirmed generic: func_80065830 passes a Class65650 *, func_80066340's CASE2 passes an Unk70ElemObj * */
+extern void Class6B5CC__LinkModel(void *self, s32 arg); /* first param confirmed generic: Class65650__InitDefaults passes a Class65650 *, func_80066340's CASE2 passes an Unk70ElemObj * */
 extern void *New_BaseObjO(void);
 
 /* Same-unit helpers called directly by name (still INCLUDE_ASM this round).

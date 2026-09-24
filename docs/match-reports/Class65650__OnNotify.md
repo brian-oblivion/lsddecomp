@@ -1,4 +1,6 @@
-# func_80065790
+# Class65650__OnNotify
+
+> Renamed from `func_80065790` on 2026-09-24 (tools/rename.py). Address 0x80065790.
 
 **Unit:** code_55dd4 · **Size:** 40 words (0xA0 bytes) · **Status:** MATCHED
 (40/40 words, whole-image `./build-and-verify.sh` green)
@@ -12,7 +14,7 @@ three of its own arguments, then conditionally dispatches through its own
 `func_80065C5C`/`func_80065CEC`) is clear:
 
 ```c
-void func_80065790(Class65650 *self, TagCheckArg *arg1, s32 arg2)
+void Class65650__OnNotify(Class65650 *self, TagCheckArg *arg1, s32 arg2)
 {
     D800878D4Methods *base;
 
@@ -37,7 +39,7 @@ declared. The whole function is a straightforward sequence: one `jal` to a
 fixed function, one indirect call through the resolved base-class slot, a
 three-part `&&` guard (tag check, `arg2` check, `self->unk60` check), and
 one more indirect call through `self->methods->slot04` gated by that
-guard. `self->methods->slot04` was already typed from `func_80065B80`'s
+guard. `self->methods->slot04` was already typed from `Class65650__OnClass6EF50Notify`'s
 report, so no new speculation was needed there.
 
 ### Proposed learning

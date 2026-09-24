@@ -103,7 +103,7 @@ table `DreamSys__GetBaseMethods()` returns, (2) the functions defined right afte
 in this unit occupy that same table's `+0x010`/`+0x014`/`+0x018` slots and
 are independently named at the identical offsets in two sibling headers'
 own local views (`DreamSys.h`, `code_55dd4.h`), (3) `code_55dd4.c`'s real
-`Class65650` constructor (`class_65650__Constructor`) calls THIS function
+`Class65650` constructor (`Class65650__Class65650`) calls THIS function
 through `base->ctor(self)` to chain to it first, then immediately
 overwrites `self->methods` with `Class65650`'s own, more specific table --
 i.e. `Class65650` derives from this class, it is not this class.

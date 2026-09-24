@@ -5,7 +5,7 @@
 #include "common.h"
 #include "code_55dd4.h"
 
-void *New_class_65650(void *arg1, void *arg2)
+void *New_Class65650(void *arg1, void *arg2)
 {
     Class65650 *self;
     Class65650Methods *vt;
@@ -14,7 +14,7 @@ void *New_class_65650(void *arg1, void *arg2)
     if (self == NULL) {
         return NULL;
     }
-    vt = func_80066818();
+    vt = Get_vtable_Class65650();
     if (vt->ctor(self, arg1, arg2) != NULL) {
         return self;
     }
@@ -22,7 +22,7 @@ void *New_class_65650(void *arg1, void *arg2)
     return NULL;
 }
 
-Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
+Class65650 *Class65650__Class65650(Class65650 *self, void *arg1, void *arg2)
 {
     D800878D4Methods *base;
 
@@ -30,7 +30,7 @@ Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
     if (base->ctor(self) == NULL) {
         return NULL;
     }
-    self->methods = func_80066818();
+    self->methods = Get_vtable_Class65650();
     self->arg2 = arg2;
     self->unk5C = NULL;
     self->unk68 = NULL;
@@ -46,13 +46,13 @@ Class65650 *class_65650__Constructor(Class65650 *self, void *arg1, void *arg2)
     return self;
 }
 
-void func_8006573C(Class65650 *self)
+void Class65650__Destructor(Class65650 *self)
 {
     self->methods->slot_teardown5C(self);
     DreamSys__GetBaseMethods()->dtor(self);
 }
 
-void func_80065790(Class65650 *self, TagCheckArg *arg1, s32 arg2)
+void Class65650__OnNotify(Class65650 *self, TagCheckArg *arg1, s32 arg2)
 {
     D800878D4Methods *base;
 
@@ -63,7 +63,7 @@ void func_80065790(Class65650 *self, TagCheckArg *arg1, s32 arg2)
     }
 }
 
-void func_80065830(Class65650 *self)
+void Class65650__InitDefaults(Class65650 *self)
 {
     D800878D4Methods *base;
 
@@ -94,7 +94,7 @@ void func_80065918(Class65650 *self, Class65650 *other, void *arg2, void *arg3, 
     }
 }
 
-void func_800659D0(Class65650 *self)
+void Class65650__DetachFromParent(Class65650 *self)
 {
     if (self->unk0C != 0) {
         self->methods->slot140(self);
@@ -105,7 +105,7 @@ void func_800659D0(Class65650 *self)
     }
 }
 
-void func_80065A5C(Class65650 *self, void *arg)
+void Class65650__SetDisplay(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
     s32 i;
@@ -117,7 +117,7 @@ void func_80065A5C(Class65650 *self, void *arg)
     }
 }
 
-void func_80065AE0(Class65650 *self, void *arg)
+void Class65650__SetLightMode(Class65650 *self, void *arg)
 {
     Unk70ElemObj **p;
     s32 i;
@@ -129,7 +129,7 @@ void func_80065AE0(Class65650 *self, void *arg)
     DreamSys__GetBaseMethods()->slot70(self, arg);
 }
 
-void func_80065B80(Class65650 *self, void *arg1, s32 val)
+void Class65650__OnClass6EF50Notify(Class65650 *self, void *arg1, s32 val)
 {
     if (val == 2) {
         self->methods->slot108(self);
@@ -541,7 +541,7 @@ void func_800667B0(Class65650 *self)
     }
 }
 
-Class65650Methods *func_80066818(void)
+Class65650Methods *Get_vtable_Class65650(void)
 {
-    return &D_8008A6C4;
+    return &gClass65650Methods;
 }

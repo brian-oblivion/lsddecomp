@@ -15,7 +15,7 @@ through.
 
 ```c
 void Entity__NotifyReset(Entity *this, s32 a1, s32 a2) {
-    func_80066818()->slotE0(this, a1, a2);
+    Get_vtable_Class65650()->slotE0(this, a1, a2);
     if (a2 == 4) {
         this->methods->slot160(this);
     }

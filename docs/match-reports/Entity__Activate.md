@@ -34,7 +34,7 @@ void Entity__Activate(Entity *this) {
 `slot60` is typed `void (*slot60)(Entity *self, s32 arg1);` in
 `EntityMethods` (`Entity.h`) — a vtable-dispatched call to a still-unnamed,
 possibly-uncarved function, so per `docs/match-reports/
-class_65650__Constructor.md`'s finding no extern prototype is needed for the
+Class65650__Class65650.md`'s finding no extern prototype is needed for the
 target itself, only a correctly-typed function-pointer field.
 
 ## Attempt log

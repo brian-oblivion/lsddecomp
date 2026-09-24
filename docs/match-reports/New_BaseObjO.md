@@ -61,7 +61,7 @@ name in prose before anyone renamed it. Constructs a `BaseObjO`, not a
 argument, which only makes sense if that slot resolves to
 `BaseObjO__BaseObjO` (this unit's own 1-argument base ctor) rather than to
 `Class65650`'s real, 3-argument constructor
-(`code_55dd4.c:class_65650__Constructor`) -- confirmed directly by
+(`code_55dd4.c:Class65650__Class65650`) -- confirmed directly by
 `DreamSys__GetBaseMethods`'s declared return type, `BaseObjOMethods *` here (this
 unit's own reading of the SAME table `code_55dd4.h` calls
 `D800878D4Methods`).

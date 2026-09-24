@@ -26,9 +26,9 @@
  * addresses `code_55dd4.h`'s `Class65650Methods` holds at its own +0x004/
  * +0x010/+0x014, confirming Entity and Class65650 share the identical
  * "BasicClass" ancestor and its vtable layout convention (ctor at +0x008,
- * dtor at +0x00C universally). `func_80066818()` (matched in code_55dd4.c)
- * returns that SHARED ancestor's own vtable (`&D_8008A6C4`) directly -- so
- * a `func_80066818()->slotNN(...)` call from Entity's own functions is a
+ * dtor at +0x00C universally). `Get_vtable_Class65650()` (matched in code_55dd4.c)
+ * returns that SHARED ancestor's own vtable (`&gClass65650Methods`) directly -- so
+ * a `Get_vtable_Class65650()->slotNN(...)` call from Entity's own functions is a
  * call into a function inherited from the same base as Class65650, not a
  * Class65650-specific call, even though the accessor's name and declared
  * return type come from that unit. `BasicClassMethods` below is Entity's
@@ -103,7 +103,7 @@ struct EntityMethods {
 };
 
 /* Entity's own local view of the shared "BasicClass" ancestor vtable
- * returned by `func_80066818()` (matched in code_55dd4.c/code_55dd4.h,
+ * returned by `Get_vtable_Class65650()` (matched in code_55dd4.c/code_55dd4.h,
  * which owns the canonical `Class65650Methods` view of this SAME table --
  * see the big comment above). Only the offsets this unit's functions reach
  * through it are named; everything else is inherited/not-yet-needed
@@ -122,7 +122,7 @@ struct BasicClassMethods {
     /* +0x0E0 */ void (*slotE0)(void *self, s32 arg1, s32 arg2);        /* called by Entity__NotifyReset */
 };
 
-extern BasicClassMethods *func_80066818(void);
+extern BasicClassMethods *Get_vtable_Class65650(void);
 
 /* An object cached in `Entity::unk100`/`unk104`, unrelated to `EntityMethods`
  * -- its own method table, dispatched through in Entity__Destructor/Entity__GetOrCreateUnk100.

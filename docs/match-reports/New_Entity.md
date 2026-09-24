@@ -85,5 +85,5 @@ classes — worth trying the early-return form first on any future one.
 **Tier A.** The class's own dedicated allocator: allocate raw bytes, dispatch
 the vtable's own `ctor` slot, free and return NULL on either failure. Its
 mechanics (a `New_Class` allocator paired with a `Class__Class` constructor)
-ARE its purpose, and the shape matches `New_DreamSys`/`New_class_65650`
+ARE its purpose, and the shape matches `New_DreamSys`/`New_Class65650`
 elsewhere in the codebase. Not renamed (already correct).

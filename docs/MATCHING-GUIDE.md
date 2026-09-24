@@ -560,7 +560,7 @@ rediscovering them.
 **ALWAYS PASS `--stack-diffs`, to `--debug` AND to the real search.** Without
 it `permuter.py` does not measure the stack frame at all, and therefore
 **falsely scores ZERO on any pure frame-size residue**. Round 18 hit exactly
-this: `func_80065AE0` reported a zero that was really 28/40 with an 8-byte
+this: `Class65650__SetLightMode` reported a zero that was really 28/40 with an 8-byte
 frame overshoot, invisible until the flag was passed. The trap is sharpened by
 the display: **without the flag the output still prints `Stack Differences: 0`**
 — that line is not a measurement saying the frames agree, it is a field that
@@ -589,7 +589,7 @@ improvement found on a register-shaped residue that round was FALSE against
 - an algebraically-identical loop-end rewrite scoring 60 (reproducibly, found
   twice): real result 52/70, **one word WORSE** than the 53/70 it started from,
   an in-range regression the permuter's own diff could not see;
-- the `func_80065AE0` false zero above.
+- the `Class65650__SetLightMode` false zero above.
 
 The permuter's scorer and the project's oracle do not measure the same thing.
 Verify every candidate through the full chain before believing it, including —

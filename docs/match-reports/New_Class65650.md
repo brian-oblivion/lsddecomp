@@ -1,15 +1,17 @@
-# New_class_65650
+# New_Class65650
+
+> Renamed from `New_class_65650` on 2026-09-24 (tools/rename.py). Address 0x800655d4.
 
 **Unit:** code_55dd4 · **Size:** 31 words (0x7C bytes) · **Status:** MATCHED
 (31/31 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
 
-The `New_X` allocator for the class whose method table is `D_8008A6C4`
-(resolved with `tools/classtable.py D_8008A6C4 --vs 0x800878D4`; see
+The `New_X` allocator for the class whose method table is `gClass65650Methods`
+(resolved with `tools/classtable.py gClass65650Methods --vs 0x800878D4`; see
 `include/code_55dd4.h` for the full inheritance chain). Allocates a 0x98-byte
 instance through the game allocator `BMemPMgrAlloc`, fetches the class's own
-vtable via `func_80066818()` (a `Get_vtable`-style accessor, matched
+vtable via `Get_vtable_Class65650()` (a `Get_vtable`-style accessor, matched
 separately, see its own report), and calls the constructor slot (`+0x008`)
 with `(self, arg1, arg2)`. Unlike the simpler `New_X` shapes documented
 elsewhere in this project (`func_80025B34`, `new_class_6d3c8`), **this one
@@ -18,7 +20,7 @@ frees the object (`BMemPMgrFree`) and returns `NULL` instead of leaving it
 allocated.
 
 ```c
-void *New_class_65650(void *arg1, void *arg2)
+void *New_Class65650(void *arg1, void *arg2)
 {
     Class65650 *self;
     Class65650Methods *vt;
@@ -27,7 +29,7 @@ void *New_class_65650(void *arg1, void *arg2)
     if (self == NULL) {
         return NULL;
     }
-    vt = func_80066818();
+    vt = Get_vtable_Class65650();
     if (vt->ctor(self, arg1, arg2) != NULL) {
         return self;
     }
@@ -76,7 +78,7 @@ this codebase: (1) ignore the constructor's return, single early exit
 (`func_80025B34`, needs `goto`); (2) unconditional return, no early exit
 (`new_class_6d3c8`, open stall); (3) check *both* the allocation and the
 constructor's return, two early exits converging on one epilogue
-(`New_class_65650`, matched with plain `if`/`return` — no `goto` needed).
+(`New_Class65650`, matched with plain `if`/`return` — no `goto` needed).
 Identify which shape a given `New_X` is (does the retail asm test the
 constructor's own `$v0` after the `jalr`?) before assuming a `goto` rewrite is
 required.
