@@ -64,7 +64,7 @@ void ObjM__NoOpSlot40(void) {
 
 void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
     arg1->unkC->methods->slotC8(arg1->unkC, ObjM__OnRegistrantEvent, self);
-    self->unk3C = (DreamSysObj_3bb8c_l *)arg2;
+    self->target = (DreamSysObj_3bb8c_l *)arg2;
     GetClass86668Methods()->slot44(self, arg1, 1);
     self->methods->slot10(self, arg2);
 }
@@ -78,7 +78,7 @@ void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg
 }
 
 void ObjM__DetachTarget(Obj87034_3bb8c_l *self) {
-    self->methods->slot14(self, self->unk3C);
+    self->methods->slot14(self, self->target);
     GetClass86668Methods()->slot48(self);
 }
 
@@ -109,14 +109,14 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c
     ret1 = func_80048F84(self->unk38, 0);
     self->unk54->methods->slot5C(self->unk54, ret1);
 
-    ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
+    ret1 = self->target->methods->slot1A0(self->target, 0);
     ret1 = func_80048EA0(self->unk38, 0, ret1);
     self->unk58 = (Obj87034_3bb8c_l *) func_80043008(ret1);
 
-    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+    unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);
 
     self->unk78 = unk18;
-    ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
+    ret1 = self->target->methods->slot1A0(self->target, 0);
     self->unk50 = (Unk50Struct_3bb8c_l *) RegisterStyleConfig(self->unk14, self->unk38, &self->unk6C, ret1, 0);
     if (arg2 != 0) {
         self->unk50 = arg2;
@@ -163,7 +163,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c
     }
     func_8001EF60(flag);
 
-    self->unk3C->methods->slotEC(self->unk3C, D_80087118[(s32) self->unk38]);
+    self->target->methods->slotEC(self->target, D_80087118[(s32) self->unk38]);
     self->unk20 = 5;
 }
 
@@ -191,9 +191,9 @@ void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
             other->methods->slot04(other);
             self->unk60 = 0;
             self->methods->slot80(self);
-            ret = self->unk3C->methods->slot108(self->unk3C);
-            self->unk3C->methods->slot104(self->unk3C, ret + 0x1E);
-        } else if (other->unk3C != 0) {
+            ret = self->target->methods->slot108(self->target);
+            self->target->methods->slot104(self->target, ret + 0x1E);
+        } else if (other->target != 0) {
             sel = self->unk50->unk14;
             m = other->methods;
             if (sel != 2) {
@@ -334,9 +334,9 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     val = *obj->methods->slot7C(obj, 0);
     unk18->methods->slot54(unk18, val / 2 * 5 / 3 + D_8008AB34);
 
-    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+    unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);
 
-    SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->unk3C, self->unk34, self->unk10);
+    SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->target, self->unk34, self->unk10);
 
     unk14 = self->unk14;
     self->methods->slot10(self, (s32)unk14);
@@ -344,15 +344,15 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     unk14->methods->slotBC(unk14, unk50->unk8, 0);
     unk14->methods->slotC4(unk14, 3, unk50->unk0, unk50->unk4);
     unk14->methods->slotE0(unk14, GetStageGridDimensions((s32)self->unk38));
-    self->unk3C->methods->slot4C(self->unk3C, unk14);
+    self->target->methods->slot4C(self->target, unk14);
     unk14->methods->slotDC(unk14, self->unk48);
     unk14->methods->slotCC(unk14, &D_8008710C);
 }
 
 void ObjM__ExitSceneStyle(Obj87034_3bb8c_l *self) {
     self->methods->slotD4(self);
-    self->unk3C->methods->slotFC(self->unk3C);
-    self->unk3C->methods->slot50(self->unk3C);
+    self->target->methods->slotFC(self->target);
+    self->target->methods->slot50(self->target);
     self->unk18->methods->slot74(self->unk18);
     self->methods->slot14(self, self->unk14);
 }
@@ -369,7 +369,7 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     void *a1;
 
     self->unk68 = 1;
-    self->unk3C->methods->slotF8(self->unk3C, self->unk44, self->unk40);
+    self->target->methods->slotF8(self->target, self->unk44, self->unk40);
     self->unk14->methods->slotEC(self->unk14);
 
     unk18 = self->unk18;
@@ -390,7 +390,7 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     newObj = unk18->methods->slotAC(unk18);
     self->methods->slot10(self, (s32)newObj);
 
-    ret = self->unk3C->methods->slotF0(self->unk3C, &local10, -1);
+    ret = self->target->methods->slotF0(self->target, &local10, -1);
     newObj->methods->slotF0(newObj, (s32 *)ret, (ret != 0) ? 3 : 0);
     m2 = newObj->methods;
     if (ret == 0) {
@@ -433,7 +433,7 @@ void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
             break;
         }
     } else if (code >= 9) {
-        self->unk3C->unk44 = 0;
+        self->target->unk44 = 0;
     }
 }
 
@@ -455,7 +455,7 @@ void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
     s32 arg3;
 
     self->unk20 = 4;
-    if (self->unk3C->methods->slotF0(self->unk3C, &local18, -1) == 0) {
+    if (self->target->methods->slotF0(self->target, &local18, -1) == 0) {
         span = (self->unk1C + (s32)self->unk38) & 3;
         t = span;
         if (t == 0) {
@@ -484,13 +484,13 @@ void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
 void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
     s32 color;
 
-    if (self->unk3C->unk164 < 0) {
+    if (self->target->unk164 < 0) {
         self->methods->slot9C(self);
     } else {
         self->unk20 = 5;
-        color = self->unk3C->methods->slot200(self->unk3C);
+        color = self->target->methods->slot200(self->target);
         ObjM__ForwardToSubChild(self, color, 0, 0xA, 1);
-        self->unk3C->methods->slotFC(self->unk3C);
+        self->target->methods->slotFC(self->target);
     }
 }
 
@@ -498,7 +498,7 @@ void ObjM__EnterState6(Obj87034_3bb8c_l *self) {
     s32 color;
 
     self->unk20 = 6;
-    color = self->unk3C->methods->slot200(self->unk3C);
+    color = self->target->methods->slot200(self->target);
     ObjM__ForwardToSubChild(self, color, 0, 0x1E, 1);
-    self->unk3C->methods->slotFC(self->unk3C);
+    self->target->methods->slotFC(self->target);
 }

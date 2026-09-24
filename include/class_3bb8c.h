@@ -2540,7 +2540,7 @@ struct Obj87034_3bb8c_l {
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
     void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to func_80049060/func_80049098 */
-    DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */
+    DreamSysObj_3bb8c_l *target;            /* +0x03C, many functions in this unit */
     s32 unk40;                             /* +0x040, ObjM__EnterStyleSession */
     s32 unk44;                              /* +0x044, ObjM__EnterStyleSession */
     s32 unk48;                               /* +0x048, ObjM__InitStyleAndWorld: set from arg1, or 0xA000 if arg1==0 */
