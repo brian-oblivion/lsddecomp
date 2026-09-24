@@ -1,4 +1,6 @@
-# func_800522DC -- MATCHED (69/69 words, first attempt)
+# Class86F88__HandleInputCode -- MATCHED (69/69 words, first attempt)
+
+> Renamed from `func_800522DC` on 2026-09-24 (tools/rename.py). Address 0x800522dc.
 
 Unit `src/class_3bb8c_k.c`. Round 26, runner delta.
 
@@ -12,7 +14,7 @@ sparse 22-entry jump table for codes `4..25`, six of which have real
 handlers and the rest fall through doing nothing:
 
 ```c
-void func_800522DC(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
+void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
     switch (code) {
     case 25:
         self->methods->slot60(self, 0x10);
@@ -85,7 +87,7 @@ for this unit, and neither was touched.
 
 Two back-to-back same-round data points on HEAD BROADCAST 1
 (`func_80053984`: table order == ascending value order, lever not needed;
-`func_800522DC`: table order == source declaration order, lever
+`Class86F88__HandleInputCode`: table order == source declaration order, lever
 essential) make the discriminator concrete: **check the jump table's own
 label order against sorted case-value order before writing the switch,
 every time** -- neither "always reorder" nor "never reorder" is safe, and

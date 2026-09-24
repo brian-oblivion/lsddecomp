@@ -2857,7 +2857,7 @@ struct Obj86ED0 {
  * (39 slots, tools/classtable.py D_80086F88 -- header word 0x20). Carved
  * round 15; this unit is the first to write any of its methods. Only the
  * slots/fields this unit's functions actually touch are typed; the rest
- * stays opaque. `func_80052644`/`func_800522DC` are two more of this
+ * stays opaque. `func_80052644`/`Class86F88__HandleInputCode` are two more of this
  * class's own methods (toolchain-blocked, stub reports filed, still
  * INCLUDE_ASM) -- not reflected here since nothing in this unit's C reads
  * through them yet.

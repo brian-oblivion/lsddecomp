@@ -18,7 +18,7 @@
  * is TWO greps as of round 21, and screening for `addiu_at` now INVENTS
  * blockers, which is the strictly worse failure). Corrected round 27
  * (2026-09-10), re-screened with `python3 tools/nearmiss.py`:
- *   func_800522DC  was addiu-$at ONLY -- NOT BLOCKED. `addiu_at` was RESOLVED
+ *   Class86F88__HandleInputCode  was addiu-$at ONLY -- NOT BLOCKED. `addiu_at` was RESOLVED
  *                  in round 21 (maspsx `--addiu-at`;
  *                  docs/research/addiu-at-blocker.md). ALREADY MATCHED, so
  *                  this correction costs nothing -- but the directive below
@@ -74,13 +74,13 @@ struct Class87034Methods_3bb8c_k {
      * fields -- a post-construct hook, self only. */
     void (*slot40)(void *self);
     u8 pad044[0x054 - 0x044];
-    /* +0x054/+0x060, func_800522DC's own event/code dispatch (below) --
+    /* +0x054/+0x060, Class86F88__HandleInputCode's own event/code dispatch (below) --
      * both called with a constant second argument. */
     void (*slot54)(void *self, s32 arg1);
     u8 pad058[0x060 - 0x058];
     void (*slot60)(void *self, s32 arg1);
     u8 pad064[0x07C - 0x064];
-    /* +0x07C/+0x080/+0x084/+0x088, func_800522DC's own event/code
+    /* +0x07C/+0x080/+0x084/+0x088, Class86F88__HandleInputCode's own event/code
      * dispatch (below) -- self only, no other arguments. */
     void (*slot7C)(void *self);
     void (*slot80)(void *self);
@@ -157,7 +157,7 @@ void Class86F88__TickClosing(Class86F88 *self)
     self->methods->slot54(self, 4);
 }
 
-void func_800522DC(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
+void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
     switch (code) {
     case 25:
         self->methods->slot60(self, 0x10);
