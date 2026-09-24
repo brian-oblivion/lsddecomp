@@ -1,4 +1,6 @@
-# BasicClass__func_1811c
+# BasicClass__RemoveParentRef
+
+> Renamed from `BasicClass__func_1811c` on 2026-09-24 (tools/rename.py). Address 0x8001811c.
 
 **Unit:** code_8220 · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
@@ -16,7 +18,7 @@ whose value is `parent`.
 ## The C
 
 ```c
-void BasicClass__func_1811c(BasicClass *self, BasicClass *parent)
+void BasicClass__RemoveParentRef(BasicClass *self, BasicClass *parent)
 {
     RemoveBasicClassListNode(&self->parentRefs, parent);
 }
@@ -35,3 +37,9 @@ not a `return`, matched first attempt.
 
 round 11 (2026-09-03), runner delta, unit code_8220, second pass. Matched
 first attempt.
+
+## Naming (round 74)
+
+`BasicClass__RemoveParentRef`, **tier A**: matches vtable slot `+0x024`
+(`removeParentRef`), already documented in `code_8220.h`. One-line tail
+call into `RemoveBasicClassListNode(&self->parentRefs, parent)`.

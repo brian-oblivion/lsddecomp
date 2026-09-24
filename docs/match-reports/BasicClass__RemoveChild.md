@@ -47,3 +47,10 @@ round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). One
 collateral-drift residue (1 word, the `jal RemoveBasicClassListNode` target address)
 resolved itself once `BasicClass__RemoveAllChildren` reached its correct size —
 see that function's own report; nothing needed changing here.
+
+## Naming (round 74)
+
+`BasicClass__RemoveChild`, **tier A**: matches vtable slot `+0x014`
+(`removeChild`), already documented in `code_8220.h`. Unlinks `child`
+from `self->children` and unconditionally removes the back-reference via
+the child's `removeParentRef` slot.

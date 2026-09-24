@@ -24,7 +24,7 @@ else `*outValue = node->value`, `*cursor = node->next`. Does NOT free the
 popped node (that's `removeChild`'s/`RemoveBasicClassListNode`'s job, which is called
 separately on each extracted value by THIS function's caller-facing use of
 it — `GetNextBasicClass` only walks, it never frees). Also used, identically,
-by the still-`INCLUDE_ASM` `BasicClass__GetNextChild`/`BasicClass__func_1816c`
+by the still-`INCLUDE_ASM` `BasicClass__GetNextChild`/`BasicClass__GetNextParentRef`
 ("get next child"/"get next parent ref" iterators) — not derived
 independently here, just cross-checked for a consistent call shape.
 
@@ -149,3 +149,10 @@ concrete lever that exposes the merge to the compiler.
 round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). ~14
 build/measure iterations before landing on the final shape; well inside the
 30-attempt budget.
+
+## Naming (round 74)
+
+`BasicClass__RemoveAllChildren`, **tier A**: matches vtable slot `+0x018`
+(`removeAllChildren`), already documented in `code_8220.h`. Iterates
+`self->children` via `GetNextBasicClass`, dispatching `removeChild` on
+each until exhausted.

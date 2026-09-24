@@ -316,18 +316,18 @@ s32 BasicClass__AddParentRef(BasicClass *self, BasicClass *parent)
     return PushBasicClassListNode(&self->parentRefs, parent);
 }
 
-void BasicClass__func_1811c(BasicClass *self, BasicClass *parent)
+void BasicClass__RemoveParentRef(BasicClass *self, BasicClass *parent)
 {
     RemoveBasicClassListNode(&self->parentRefs, parent);
 }
 
-void BasicClass__func_1813c(BasicClass *self)
+void BasicClass__ClearParentRefs(BasicClass *self)
 {
     FreeBasicClassList(&self->parentRefs);
     self->parentRefs = NULL;
 }
 
-void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor)
+void BasicClass__GetNextParentRef(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor)
 {
     if (*outParent == NULL) {
         *cursor = self->parentRefs;

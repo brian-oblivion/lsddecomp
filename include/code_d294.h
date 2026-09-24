@@ -783,8 +783,8 @@ extern void RotMatrix(S16Quad_d294 *vec, s32 a1);
  * local buffers; declared only with that shape. */
 extern void MulMatrix2(void *arg0, void *arg1);
 
-/* BasicClass__func_1816c (src/code_8220.c, code_8220 unit, already matched
- * there as `void BasicClass__func_1816c(BasicClass *self, BasicClass
+/* BasicClass__GetNextParentRef (src/code_8220.c, code_8220 unit, already matched
+ * there as `void BasicClass__GetNextParentRef(BasicClass *self, BasicClass
  * **outParent, BasicClassListNode **cursor)` -- "getNextParentRef": on the
  * first call for a given walk (`*outParent == NULL`), seeds `*cursor` from
  * `self->parentRefs`; every call pops one entry via `GetNextBasicClass`.
@@ -792,7 +792,7 @@ extern void MulMatrix2(void *arg0, void *arg1);
  * `#include "code_8220.h"`, per this project's per-unit-local-view
  * convention (same precedent as BasicClassMethodsD294 above) -- pointer
  * shapes are ABI-identical across translation units, so this is safe. */
-extern void BasicClass__func_1816c(void *self, GenericObj_d294 **outParent, void **cursor);
+extern void BasicClass__GetNextParentRef(void *self, GenericObj_d294 **outParent, void **cursor);
 
 void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2);
 void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1);

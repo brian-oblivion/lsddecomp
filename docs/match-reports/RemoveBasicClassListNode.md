@@ -6,7 +6,7 @@
 
 The `BasicClassListNode` list find-unlink-free primitive, used by both of
 BasicClass's lists (`children` via `BasicClass__RemoveChild`, `parentRefs`
-via `BasicClass__func_1811c`) — see `BasicClass__BasicClass.md` for the
+via `BasicClass__RemoveParentRef`) — see `BasicClass__BasicClass.md` for the
 class's overall design. Both call sites and this function's `void`
 signature were provisionally established last round while matching those
 two callers (still `INCLUDE_ASM` at the time); this round derives the
@@ -70,5 +70,5 @@ attempts.
 `value == value`, unlinks it, and releases it via `BMemPMgrFree`; used
 identically for both of `BasicClass`'s lists (`children` via
 `BasicClass__RemoveChild`/RemoveChild, `parentRefs` via
-`BasicClass__func_1811c`/RemoveParentRef), the release-side mirror of
+`BasicClass__RemoveParentRef`/RemoveParentRef), the release-side mirror of
 `PushBasicClassListNode`.

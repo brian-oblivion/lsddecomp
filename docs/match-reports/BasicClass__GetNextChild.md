@@ -41,8 +41,15 @@ void BasicClass__GetNextChild(BasicClass *self, BasicClass **outChild, BasicClas
 Matched first attempt, straight transliteration of the disassembly — the
 generic-object-iterator pattern was already fully derived while matching
 `BasicClass__RemoveAllChildren` last round, so this one and its `parentRefs`
-sibling (`BasicClass__func_1816c`) needed no reshaping at all.
+sibling (`BasicClass__GetNextParentRef`) needed no reshaping at all.
 
 ## Provenance
 
 round 11 (2026-09-03), runner delta, unit code_8220, second pass.
+
+## Naming (round 74)
+
+`BasicClass__GetNextChild`, **tier A**: matches vtable slot `+0x01C`
+(`getNextChild`), already documented in `code_8220.h`. Seeds `*cursor`
+from `self->children` on the caller's first call, then pop-advances via
+`GetNextBasicClass`.

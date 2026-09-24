@@ -38,3 +38,9 @@ correct.
 
 round 11 (2026-09-03), runner delta, unit code_8220, second pass. Matched
 first attempt.
+
+## Naming (round 74)
+
+`BasicClass__AddParentRef`, **tier A**: matches vtable slot `+0x020`
+(`addParentRef`), already documented in `code_8220.h`. One-line tail
+call into `PushBasicClassListNode(&self->parentRefs, parent)`.

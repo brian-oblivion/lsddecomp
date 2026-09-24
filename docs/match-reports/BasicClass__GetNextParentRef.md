@@ -1,4 +1,6 @@
-# BasicClass__func_1816c
+# BasicClass__GetNextParentRef
+
+> Renamed from `BasicClass__func_1816c` on 2026-09-24 (tools/rename.py). Address 0x8001816c.
 
 **Unit:** code_8220 · **Size:** 16 instructions · **Status:** MATCHED (16/16 words)
 
@@ -16,7 +18,7 @@ The `parentRefs`-list iterator, identical shape to `getNextChild`: seeds
 ## The C
 
 ```c
-void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor)
+void BasicClass__GetNextParentRef(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor)
 {
     if (*outParent == NULL) {
         *cursor = self->parentRefs;
@@ -30,3 +32,10 @@ Matched first attempt — a plain field-name swap of `BasicClass__GetNextChild`.
 ## Provenance
 
 round 11 (2026-09-03), runner delta, unit code_8220, second pass.
+
+## Naming (round 74)
+
+`BasicClass__GetNextParentRef`, **tier A**: matches vtable slot `+0x02C`
+(`getNextParentRef`), already documented in `code_8220.h`. Identical
+shape to `BasicClass__GetNextChild`, over `parentRefs` instead of
+`children`.

@@ -71,9 +71,9 @@ typedef struct Class6D3C8Methods {
     void *unk18;                                            /* +0x018 BasicClass__RemoveAllChildren */
     void *unk1C;                                            /* +0x01C BasicClass__GetNextChild */
     void *unk20;                                            /* +0x020 BasicClass__AddParentRef */
-    void *unk24;                                            /* +0x024 BasicClass__func_1811c */
-    void *unk28;                                            /* +0x028 BasicClass__func_1813c */
-    void *unk2C;                                            /* +0x02C BasicClass__func_1816c */
+    void *unk24;                                            /* +0x024 BasicClass__RemoveParentRef */
+    void *unk28;                                            /* +0x028 BasicClass__ClearParentRefs */
+    void *unk2C;                                            /* +0x02C BasicClass__GetNextParentRef */
     void *unk30;                                            /* +0x030 BasicClass__NotifyParents */
     void *unk34;                                            /* +0x034 BasicClass__func_18350 */
     void *unk38;                                            /* +0x038 BasicClass__OnNotify */

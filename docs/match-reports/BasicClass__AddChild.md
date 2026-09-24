@@ -48,3 +48,10 @@ round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). One
 collateral-drift residue (1 word, the `jal PushBasicClassListNode` target address)
 resolved itself once `BasicClass__RemoveAllChildren` reached its correct size —
 see that function's own report; nothing needed changing here.
+
+## Naming (round 74)
+
+`BasicClass__AddChild`, **tier A**: matches vtable slot `+0x010`
+(`addChild`), already documented in `code_8220.h`. Pushes `child` onto
+`self->children` and, on success, registers `self` in the child's own
+`parentRefs` via the child's `addParentRef` slot.

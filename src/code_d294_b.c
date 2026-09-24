@@ -586,7 +586,7 @@ void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
 
     entry = NULL;
 loop:
-    BasicClass__func_1816c(node, &entry, &cursor);
+    BasicClass__GetNextParentRef(node, &entry, &cursor);
     if (entry == NULL) {
         goto check_cursor;
     }
