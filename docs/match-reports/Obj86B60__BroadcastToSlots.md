@@ -117,3 +117,7 @@ instead, costs a whole extra callee-saved register** — a stronger and more
 diagnosable version of "not every field read is CSE'd" (see
 `Obj86B60__BroadcastToSlotElements`), because here the tell is a FRAME SIZE mismatch (6 saved
 registers vs. retail's 5), not a register-identity swap.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__BroadcastToSlots`. **Tier B**: Forwards `a1` through every slot element's own `slotB8`, plus a secondary per-slot callback for slots with a target entry, saving/restoring `activeSlot` around the walk -- a broadcast to every slot, as opposed to Obj86B60__BroadcastToSlotElements which broadcasts only within the CURRENT slot's own item list.

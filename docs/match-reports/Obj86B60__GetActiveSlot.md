@@ -17,3 +17,7 @@ s32 Obj86B60__GetActiveSlot(Obj86B60 *self)
 
 No residue, no header change. Included here per the project rule that every
 touched function gets a report, matches included.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__GetActiveSlot`. **Tier A**: A one-line getter for `self->activeSlot`, an already-modelled field. Distinct from the pre-existing Obj86B60__GetActiveSlotCount (which returns `slotCounts[activeSlot]`, a COUNT, not the slot index itself).

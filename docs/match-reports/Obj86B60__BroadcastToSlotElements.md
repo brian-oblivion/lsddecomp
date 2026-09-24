@@ -74,3 +74,7 @@ three fields, declare/read them in that order even if the function's own
 control flow would naturally read them in a different sequence — the
 compiler reproduces retail's register assignment from source STATEMENT
 order, not from logical necessity.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__BroadcastToSlotElements`. **Tier B**: Forwards `a1` through `slotB8` of every element in the CURRENT slot's own item list (`self->itemLists[activeSlot]`) -- narrower in scope than Obj86B60__BroadcastToSlots (which walks every SLOT, not one slot's items). Confirmed as a real vtable slot (Obj86B60Methods, slot104) by `asm/data/76DC8.data.s`/`asm/data/57070.data.s` even though nothing in this unit dispatches through this exact slot.

@@ -67,3 +67,7 @@ than retyping the shared field `Unk4CObj::unk24` (still `void **`, used
 elsewhere in the sibling unit `code_2cc8c.c`'s already-matched
 `func_8003CA1C` as a pure null-check) — avoids a shared-header type change
 for a computation this unit alone needs.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__BeginElementScroll`. **Tier B**: Gated on `self->unk3C == 1`. Notifies the target (`slot100`), highlights the item at the slot's PERSISTED cursor (`slotCounts[idx]`, the same field Obj86B60__AdvanceSlotCursor/RetreatSlotCursor step), advances `unk3C` to 2, fires a closing notification. Opens interactive scrolling of the current slot's item list -- state 1 -> 2. Paired with Obj86B60__CommitElementScroll/Obj86B60__CancelElementScroll, both gated on state 2 and both returning to state 1; the data flow (DA10 highlights `slotCounts[idx]`, DAD4 later WRITES that same value into `SlotEntry::savedCursor`, DCAC READS `savedCursor` back out) is what grounds 'scroll session that a later step commits or cancels' rather than a guess.

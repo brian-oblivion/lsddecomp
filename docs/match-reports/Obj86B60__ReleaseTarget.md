@@ -78,3 +78,7 @@ showed a REGISTER-COUNT or SINGLE-WORD swap with the exact same
 instruction sequence otherwise, which is the signature of "right logic,
 wrong caching/ordering choice" rather than a wrong understanding of what
 the function does.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__ReleaseTarget`. **Tier B**: The exact teardown counterpart of Obj86B60__SetTarget: releases the same handle, walks the same four arrays, frees them. Named to pair with SetTarget.

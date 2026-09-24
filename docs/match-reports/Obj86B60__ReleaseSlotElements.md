@@ -38,3 +38,7 @@ void Obj86B60__ReleaseSlotElements(Obj86B60 *self)
 
 No residue — matched first attempt from a direct reading of the
 disassembly, no m2c seed needed.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__ReleaseSlotElements`. **Tier B**: Releases and frees `self->itemLists[activeSlot]` through two already-matched helpers -- the exact teardown counterpart of Obj86B60__CreateSlotElements.

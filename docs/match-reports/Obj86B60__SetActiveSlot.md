@@ -84,3 +84,7 @@ suspect is "inside an if" is actually sitting in a delay slot before
 concluding the C guard is right. A barrier will not fix this class (tried
 here, made the function longer); only widening the assignment's scope
 does.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__SetActiveSlot`. **Tier B**: Switches `self->activeSlot` to `a1`: un-highlights the old slot's representative element, highlights the new one (both via `slotElements[idx]->methods->slotB8`), then notifies (`slot70`) and fires a closing `slot60(self, 9)`. Same old/new-highlight-swap shape as Obj86B60__SetSlotCursor one level down (items within a slot instead of slots/tabs themselves) -- cross-confirms the pairing. Mechanics (switch the active slot, with a visible highlight swap) are clear; kept tier B since it has real side effects beyond a plain setter.

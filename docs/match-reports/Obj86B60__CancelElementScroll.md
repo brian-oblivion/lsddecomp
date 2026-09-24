@@ -68,3 +68,7 @@ function in this unit needed from it. Left unmodelled as a named struct
 field for now (accessed via a local `(s32 *)` cast at the point of use)
 since only this one access is confirmed; a future function establishing
 `[0]`'s meaning would be the natural point to give it a real name.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__CancelElementScroll`. **Tier B**: Also gated on `self->unk3C == 2` (state 2 -> 1), but reads a NEW cursor value out of `SlotEntry::savedCursor` (the SAME field Obj86B60__CommitElementScroll just wrote) instead of keeping whatever the interactive scroll left in `slotCounts[idx]`, then installs THAT value as the new `slotCounts[idx]` -- i.e. it discards the in-progress scroll and reverts to the last-committed position. 'Cancel' follows directly from reading back the persisted value rather than keeping the live one.

@@ -68,3 +68,7 @@ value used earlier in the same expression, tried as a parallel lever, made
 the residue worse rather than better — the two moves are not
 interchangeable even though both look like "help the compiler with an
 explicit local". (`Obj86B60__AdvanceSlotCursor`, `Obj86B60__RetreatSlotCursor`, same fix both times)
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__AdvanceSlotCursor`. **Tier B**: Advances `slotCounts[activeSlot]` by one, wrapping at `itemCounts[activeSlot]`, and forwards the new value through `slot11C` (== Obj86B60__SetSlotCursor, confirmed by classtable.py). Kept tier B rather than A since it dispatches into a second function with its own further side effects, not a self-contained leaf.

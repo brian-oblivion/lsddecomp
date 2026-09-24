@@ -83,3 +83,7 @@ running offset, not from the original (now-wrong) one. A single missed
 padding-size correction after inserting a leading pad reproduces the exact
 same class of off-by-N error one struct member later. (`Obj86B60__SetSubHandle`,
 Unk74ObjMethods slot4/slot78/slot5C)
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__SetSubHandle`. **Tier A**: A setter for `self->unk74`/`self->unk70` (load-by-path-or-install-directly): pure load-or-install mechanics, no purpose beyond that to guess at -- tier A by the 'a setter is tier A by definition' rule.

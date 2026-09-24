@@ -75,3 +75,7 @@ real use is the ring counter, whereas the four earlier functions all use
 observed total: five follow `unk64` before `unk60`/`unk5C`, this one
 reverses it. Read the disassembly's own base-pointer load order per
 function rather than assuming the majority order.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__SetSlotCursor`. **Tier B**: Un-highlights the item at the OLD cursor (`slotCounts[idx]`), highlights the item at the NEW one (`a1`), installs `a1` as the new `slotCounts[idx]`, optionally notifies, fires a closing `slot60(self, 9)`. Identical shape to Obj86B60__SetActiveSlot one level up (tabs instead of items) -- confirmed as the target of Obj86B60Methods::slot11C (classtable.py), which is exactly what Obj86B60__AdvanceSlotCursor/Obj86B60__RetreatSlotCursor call through.

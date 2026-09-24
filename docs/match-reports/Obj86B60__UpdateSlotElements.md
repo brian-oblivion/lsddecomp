@@ -102,3 +102,7 @@ being duplicated per-arm. Write the repeated statement explicitly in each
 arm rather than hoisting it to a common point after the `if` — the
 compiler does the hoisting itself when it's actually safe to, and won't
 if doing so would require skipping over an unrelated arm's code.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__UpdateSlotElements`. **Tier B**: Walks every slot's element (`self->slotElements[]`), forwarding a payload to unclaimed (`unk4C->unk18[i]==NULL`) slots and pinging already-claimed ones -- an update/refresh pass over all slots. What 'claimed' means in the game is not established, so the name stays at the mechanics level.

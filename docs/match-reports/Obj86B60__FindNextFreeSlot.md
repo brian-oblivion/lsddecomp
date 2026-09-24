@@ -114,3 +114,7 @@ this ties the increment to that specific branch's delay slot and makes it
 ineligible for cross-jump merging with an unrelated priming increment
 elsewhere in the function. (`Obj86B60__FindNextFreeSlot`, 30/37 -> 37/37 across four
 attempts)
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__FindNextFreeSlot`. **Tier A**: A pure search: scans `unk4C->unk18[]` forward from `activeSlot`, wrapping at `slotCount`, for the next NULL (free) entry, reporting the index found. A find/search leaf, tier A by the 'mechanics are the purpose' rule for a clamp/search leaf.

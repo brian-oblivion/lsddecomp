@@ -75,3 +75,7 @@ otherwise-matching subtraction, widen the intermediate to `s32` and narrow
 only at the point(s) of use (array store, explicit `(u8)` cast in a
 comparison) rather than typing the local at its "natural" narrow width.
 (`Obj86B60__TickFadeColor`, 37/38 -> 38/38)
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__TickFadeColor`. **Tier B**: Computes a decreasing grey/colour byte from `frameCounter*unk84` each call, forwards the 3-byte buffer to two colour-consuming slots (`slotE4`, `unk78->slotB8` -- both established elsewhere as colour consumers, see `Unk4CObj::unk10`'s own "3-byte colour buffer" comment), and returns whether the byte has wrapped past a threshold -- the shape of a per-frame fade/countdown with a completion flag. Mechanics are solid; the game-visible purpose (what fades) is not.

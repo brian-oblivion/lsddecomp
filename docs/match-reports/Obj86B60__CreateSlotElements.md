@@ -106,3 +106,7 @@ reinitialized?" If not, the idiom is a pure size-fix with no cleanup
 needed, which is easy to miss when the naive `while` translation looks
 completely reasonable and the only symptom is a two-word size mismatch
 rather than a visible register residue.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__CreateSlotElements`. **Tier B**: Builds `self->itemLists[idx]` (allocates an array sized off a NULL-terminated string list, resolves each string through `New_Obj6EAC0`) and installs the count/initial cursor -- the constructor for one slot's own item list, called at whatever slot is currently `activeSlot`. Pairs with Obj86B60__ReleaseSlotElements.

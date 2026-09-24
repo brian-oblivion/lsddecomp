@@ -764,3 +764,7 @@ byte-exact; the diff tool's lack of insert/delete markers across the
 WHOLE function (not just the part you're staring at) is what confirms
 you're chasing a real, localized-but-not-yet-found register, not a
 misunderstanding.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__RefreshSlotView`. **Tier B**: Pings every element of the current slot's item list, rebuilds the position buffer (`SlotPos`, the same shape Obj86B60__CommitElementScroll builds from the SAME `SlotEntry` record -- cross-confirms that struct), then either shows the list through `self->listView` with a size descriptor or hides it, re-walks the list installing the position on each element, and finally highlights the element at the target's own stashed cursor. The clearest single function establishing `listView`'s role (show/position/hide the item list).

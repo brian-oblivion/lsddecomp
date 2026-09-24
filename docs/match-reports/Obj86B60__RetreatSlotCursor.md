@@ -38,3 +38,7 @@ learning; not re-derived here.
 
 No new header changes beyond what `Obj86B60__AdvanceSlotCursor` already added
 (`slot11C`, `unk5C`, `unk60`, `unk58`) — this function reuses all of it.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__RetreatSlotCursor`. **Tier B**: The exact mirror of Obj86B60__AdvanceSlotCursor, stepping backward with wraparound at 0. Same reasoning.

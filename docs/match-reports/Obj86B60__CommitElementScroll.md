@@ -653,3 +653,7 @@ otherwise correct, look for exactly this: a local variable whose value is
 consumed by TWO OR MORE calls where retail re-derives it via a second
 cheap memory read instead of holding it in a register across the first
 call.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__CommitElementScroll`. **Tier B**: Gated on `self->unk3C == 2` (state 2 -> 1, the counterpart of Obj86B60__BeginElementScroll). Repositions every item, highlights the one at the slot's current ring cursor (`slotCounts[idx]`), and writes that cursor value into `SlotEntry::savedCursor` -- persisting the value the interactive scroll landed on. 'Commit' is the mechanics: the currently-scrolled-to position becomes the new persisted one.

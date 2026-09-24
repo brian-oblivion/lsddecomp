@@ -143,3 +143,7 @@ live in a register across whatever's in between (here, another call),
 which if retail's own register count doesn't support, shows up as a
 whole-function register-numbering shift (every s-register off by one)
 rather than a localized diff.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__SetTarget`. **Tier B**: Stores `a1` into `self->unk4C` (the cross-unit 'target' descriptor, named from six independent functions' evidence, see Unk4CObj's own header comment) and builds four parallel per-slot arrays from it. Mechanics (constructor for the target association) are clear; what the target itself represents in the game is not.

@@ -55,3 +55,7 @@ re-discovering it, is what made this one free.
 
 No header changes — reuses `unk4C`, `unk18`, `unk50`, `unk58`, `slotF0`,
 all already modelled from `Obj86B60__FindNextFreeSlot`.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__FindPrevFreeSlot`. **Tier A**: The exact mirror of FindNextFreeSlot, searching backward instead. Same tier-A reasoning.
