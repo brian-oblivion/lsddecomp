@@ -5,7 +5,7 @@ Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 {
     Obj865C8 *self;
 
-    self = func_80017B34(0x50);
+    self = BMemPMgrAlloc(0x50);
     if (self != NULL) {
         GetObj865C8Methods()->ctor(self, arg1, arg2, arg3);
         return self;
@@ -262,7 +262,7 @@ Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
 {
     Obj865C8 *self;
 
-    self = func_80017B34(0x38);
+    self = BMemPMgrAlloc(0x38);
     if (self != NULL) {
         GetClass86668Methods()->ctor(self, arg1, arg2);
         return self;

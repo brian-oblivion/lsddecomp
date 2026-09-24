@@ -49,11 +49,11 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
         count++;
     }
     size = count * 4;
-    arr = func_80017B34(size);
+    arr = BMemPMgrAlloc(size);
     self->unk54 = arr;
-    self->unk5C = func_80017B34(size);
-    self->slotCounts = func_80017B34(size);
-    self->unk64 = func_80017B34(size);
+    self->unk5C = BMemPMgrAlloc(size);
+    self->slotCounts = BMemPMgrAlloc(size);
+    self->unk64 = BMemPMgrAlloc(size);
     self->unk50 = count;
 
     if (a1->unk0 != NULL) {
@@ -262,7 +262,7 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
     while (*list++ != NULL) {
         count++;
     }
-    buf = func_80017B34(count * 4);
+    buf = BMemPMgrAlloc(count * 4);
     self->unk64[idx] = (void *)buf;
     self->slotCounts[idx] = a1->unk4;
     self->unk5C[idx] = count;

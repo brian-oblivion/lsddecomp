@@ -10,7 +10,7 @@ Unit: `code_179d8_e`. Runner: echo, round 17.
 void *New_VabStreamObj(s32 arg0) {
     void *self;
 
-    self = func_80017B34(0x64);
+    self = BMemPMgrAlloc(0x64);
     if (self != NULL) {
         GetVabStreamObjMethods()->slot08(self, arg0);
         return self;

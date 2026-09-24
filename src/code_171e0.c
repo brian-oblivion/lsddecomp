@@ -75,7 +75,7 @@ void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
     this->pendingGeneration = 0;
     this->methods->configureBuffer(this, arg1, 1, 0);
     size = this->methods->bufferControl(this, 0, 2);
-    newRes = func_80017B34(size);
+    newRes = BMemPMgrAlloc(size);
     if (newRes != NULL) {
         this->methods->bufferControl(this, 0, 0);
         this->methods->installBuffer(this, newRes, size);

@@ -265,7 +265,7 @@ Class86ED0Methods *func_80051A4C(void)
 }
 
 /*
- * New_Class86ED0. func_80017B34/func_80017CFC already declared for the
+ * New_Class86ED0. BMemPMgrAlloc/func_80017CFC already declared for the
  * Obj866E8 group above are the same generic pool allocator/free pair --
  * not redeclared here.
  *
@@ -278,14 +278,14 @@ Class86ED0Methods *func_80051A4C(void)
  * +0x00C/+0x010/+0x014/+0x018) in that header, matching
  * include/code_8220.h's canonical BasicClassMethods layout exactly.
  */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 extern void *func_80017CFC(void *ptr);
 
 extern Class86ED0Methods *func_80052B60(void);
 
 void *func_80051A5C(void *arg0, s32 arg1)
 {
-    Class86ED0 *self = func_80017B34(0x54);
+    Class86ED0 *self = BMemPMgrAlloc(0x54);
 
     if (self == NULL) {
         goto fail;
@@ -333,9 +333,9 @@ void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
     }
 
     self->unk10 = i;
-    self->unk18 = func_80017B34(i * 4);
+    self->unk18 = BMemPMgrAlloc(i * 4);
     p = arg1;
-    self->unk1C = func_80017B34(self->unk10 * 4);
+    self->unk1C = BMemPMgrAlloc(self->unk10 * 4);
     self->unk14 = 0;
 
     for (i = 0; i < self->unk10; i++) {
@@ -344,7 +344,7 @@ void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
             len /= 2;
         }
         self->unk1C[i] = len;
-        self->unk18[i] = func_80017B34(len + 4);
+        self->unk18[i] = BMemPMgrAlloc(len + 4);
         if (arg2 == 1) {
             DecodeFullWidthSjis(self->unk18[i], *p);
         } else {

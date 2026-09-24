@@ -111,7 +111,7 @@ extern void *GetClass6D3C8Methods(void);
 
 /* The game's allocator, in the uncarved code_8220 block. Returns void *
  * rather than a typed pointer because every New_X in the game calls it. */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 /* Model-file-load request block used by func_80025FDC: {type; path}. Only
  * one call site is known so far (func_80025FDC, loading "ETC\DREAME5.TMD"

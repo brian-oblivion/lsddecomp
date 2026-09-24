@@ -58,7 +58,7 @@
 typedef struct D_800879C4Table D_800879C4Table;
 extern D_800879C4Table D_800879C4;
 
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 typedef struct D_80087AACObj D_80087AACObj;
 
@@ -266,7 +266,7 @@ struct D_80087AACObj {
 };
 
 void *func_80057F68(void *arg1) {
-    void *obj = func_80017B34(0x244);
+    void *obj = BMemPMgrAlloc(0x244);
     if (obj != NULL) {
         func_80058764()->ctor(obj, arg1);
         return obj;
@@ -345,7 +345,7 @@ void func_80058228(D_80087AACObj *self) {
         rgb.g -= dec;
         rgb.b -= dec;
     }
-    self->unk_0x240 = func_80017B34(4);
+    self->unk_0x240 = BMemPMgrAlloc(4);
 }
 
 extern void func_80017CFC(void *arg);

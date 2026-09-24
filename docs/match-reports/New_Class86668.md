@@ -15,7 +15,7 @@ Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
 {
     ...
 
-    self = func_80017B34(0x38);
+    self = BMemPMgrAlloc(0x38);
     if (self != NULL) {
         GetClass86668Methods()->ctor(self, arg1, arg2);
         return self;

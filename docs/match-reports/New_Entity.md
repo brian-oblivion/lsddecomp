@@ -4,7 +4,7 @@
 
 ## What it does
 
-The allocator for `Entity`: `func_80017B34(0x108)` allocates 0x108 bytes,
+The allocator for `Entity`: `BMemPMgrAlloc(0x108)` allocates 0x108 bytes,
 then `Get_vtable_Entity()->ctor(obj, arg0, arg1, arg2)` (the vtable's own
 `ctor` slot, `Entity__Entity` — see that report) constructs it in place. On
 allocation failure, returns NULL immediately. On construction failure
@@ -23,7 +23,7 @@ Entity *New_Entity(void *arg0, void *arg1, void *arg2) {
     Entity *obj;
     Entity *result;
 
-    obj = func_80017B34(0x108);
+    obj = BMemPMgrAlloc(0x108);
     result = NULL;
     if (obj != NULL) {
         result = obj;

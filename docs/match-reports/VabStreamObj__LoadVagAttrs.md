@@ -36,11 +36,11 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
     if (result == -1) {
         return;
     }
-    self->vagAttrPool = func_80017B34(self->vabHdr.vs << 5);
+    self->vagAttrPool = BMemPMgrAlloc(self->vabHdr.vs << 5);
     if (self->vagAttrPool == NULL) {
         return;
     }
-    self->progVagTable = func_80017B34(self->vabHdr.ts << 2);
+    self->progVagTable = BMemPMgrAlloc(self->vabHdr.ts << 2);
     if (self->progVagTable == NULL) {
         return;
     }

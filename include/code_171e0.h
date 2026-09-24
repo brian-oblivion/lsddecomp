@@ -50,7 +50,7 @@ struct BasicClassMethods171e0 {
     /* +0x0C */ void *(*dtor)(void *self);
 };
 extern BasicClassMethods171e0 *Get_vtable_BasicClass(void);
-extern void *func_80017B34(s32 size); /* one arg confirmed by new_class_6d3c8.md (code_1677c) */
+extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by new_class_6d3c8.md (code_1677c) */
 extern void func_80017CFC(void *arg);
 extern s32 strlen(char *s);
 
@@ -96,7 +96,7 @@ struct Class6D430 {
     /* +0x00 */ Class6D430Methods *methods;
     /* +0x04 */ u8 pad04[0x0C - 0x04];       /* BasicClass instance fields; owned elsewhere */
     /* +0x0C */ s32 pendingGeneration;                   /* saved/restored around the buffer (re)alloc */
-    /* +0x10 */ void *buffer;                 /* resource from func_80017B34; freed via func_80017CFC */
+    /* +0x10 */ void *buffer;                 /* resource from BMemPMgrAlloc; freed via func_80017CFC */
     /* +0x14 */ s32 bufferSize;                   /* buffer's allocation size */
     /* +0x18 */ u8 pad18[0x20 - 0x18];       /* unknown, 8 bytes */
     /* +0x20 */ u16 freeGuard;                   /* nonzero blocks the buffer free in Class6D430__FreeBuffer */

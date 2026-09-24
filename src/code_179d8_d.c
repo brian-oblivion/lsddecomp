@@ -135,14 +135,14 @@ extern BaseTable6D940 *GetActiveDataSourceMethods(void);
 /* Pool allocator, already established elsewhere (e.g.
  * include/class_16334.h, include/code_8220.h) -- declared LOCAL here since
  * this unit does not include either header. */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 void *new_class_6d940(s32 arg1)
 {
     void *self;
     Table6D940 *table;
 
-    self = func_80017B34(0x34);
+    self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
         table = func_8002C3A8();
         table->slot08(self, arg1);

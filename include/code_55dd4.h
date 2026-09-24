@@ -272,7 +272,7 @@ struct Class65650 {
 extern Class65650Methods D_8008A6C4;
 extern Class65650Methods *func_80066818(void);
 
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 extern void *func_80017CFC(void *ptr);
 extern void Class6B5CC__LinkModel(void *self, s32 arg); /* first param confirmed generic: func_80065830 passes a Class65650 *, func_80066340's CASE2 passes an Unk70ElemObj * */
 extern void *New_BaseObjO(void);

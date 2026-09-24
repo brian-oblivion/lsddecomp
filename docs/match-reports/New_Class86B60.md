@@ -26,7 +26,7 @@ Class86B60 *New_Class86B60(void *dreamSys)
 {
     Class86B60 *self;
 
-    self = func_80017B34(0xC4);
+    self = BMemPMgrAlloc(0xC4);
     if (self != NULL) {
         func_8004E2D0()->ctor(self, dreamSys);
         return self;

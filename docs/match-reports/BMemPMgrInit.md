@@ -135,7 +135,7 @@ Replacing `extern void *BMemPMgrInit();` with the real one-parameter prototype
 would make that call a `too many arguments` compile error, and dropping the
 argument from the call site would delete `move a1,zero` and break the match.
 The unprototyped form is the only spelling that reproduces retail, and it is
-the same idiom `include/code_8220.h` uses for `func_80017B34`/`func_80017CFC`.
+the same idiom `include/code_8220.h` uses for `BMemPMgrAlloc`/`func_80017CFC`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/main.c:24`. Oracle green after the edit.

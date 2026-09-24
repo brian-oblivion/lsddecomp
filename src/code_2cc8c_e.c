@@ -68,7 +68,7 @@
 Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
     Class6E99CObj *self;
 
-    self = func_80017B34(0xA0);
+    self = BMemPMgrAlloc(0xA0);
     if (self != NULL) {
         GetClass6E99CMethods()->ctor(self, a1, a2, a3);
         return self;
@@ -282,7 +282,7 @@ Class6E99CMethods *GetClass6E99CMethods(void) {
 ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
     ClassEAC0Obj *self;
 
-    self = func_80017B34(0x6C);
+    self = BMemPMgrAlloc(0x6C);
     if (self != NULL) {
         ((ClassEAC0Methods *)Obj6EAC0__GetBaseMethods())->ctor(self, a0, a1, a2);
         return self;

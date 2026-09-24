@@ -259,7 +259,7 @@ extern Unk74Obj *func_8003B39C(const char *path); /* already matched in
                                                        view retyped to this
                                                        unit's own Unk74Obj */
 
-extern void *func_80017B34(s32 size);   /* allocator, confirmed across many
+extern void *BMemPMgrAlloc(s32 size);   /* allocator, confirmed across many
                                             units */
 extern void *func_80017CFC(void *ptr);  /* matching free/release. Its own
                                             disassembly (still INCLUDE_ASM,
@@ -390,7 +390,7 @@ struct Unk68Obj {
 
 /* Retyped round 14 once code_2cc8c_e's own body was matched: this is the
    New_X allocator for `ClassEAC0Obj` (see the Class6E99CObj/ClassEAC0Obj
-   section far below) -- `func_80017B34(0x6C)` then
+   section far below) -- `BMemPMgrAlloc(0x6C)` then
    `Obj6EAC0__GetBaseMethods()->ctor(self, a0, a1, a2)`. Parameter types are UNCHANGED
    from the existing declaration (both already pointer/pointer/s32, matching
    this call site's own real arguments exactly); only the RETURN type
@@ -423,7 +423,7 @@ struct SubHandleObj {
 
 /* Retyped round 14 once code_2cc8c_e's own body was matched: this is the
    New_X allocator for `Class6E99CObj` (this unit's own view, see the
-   Class6E99CObj/ClassEAC0Obj section far below) -- `func_80017B34(0xA0)`
+   Class6E99CObj/ClassEAC0Obj section far below) -- `BMemPMgrAlloc(0xA0)`
    then `GetClass6E99CMethods()->ctor(self, a1, a2, a3)`. `a1`/`a2`/`a3` forward
    straight through to that ctor unmodified; `a1` is a pointer (confirmed
    by THIS unit's own two real callers, `code_2cc8c_c.c` passing
@@ -718,7 +718,7 @@ struct Unk18Obj {
                                    double-buffer index, named after that
                                    mechanic. Exclusive to code_2cc8c_d.c. */
     /* +0x078..+0x08C, round 14 (Unk18Obj__InitOt): seven `s32`-typed
-       addresses/sizes carved out of one `func_80017B34` allocation --
+       addresses/sizes carved out of one `BMemPMgrAlloc` allocation --
        MEASURED, not modeled as real pointer types since retail computes
        every one of them via plain word arithmetic (not pointer-typed
        addition), and unk78/unk7C are ALSO dereferenced directly as raw

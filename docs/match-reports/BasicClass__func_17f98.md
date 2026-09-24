@@ -31,7 +31,7 @@ void BasicClass__func_17f98(BasicClass *self, BasicClass *child)
 
 `func_800181AC(BasicClassListNode **head, BasicClass *value)` returning
 `s32` (1 on success, 0 if the pool allocation failed) — allocates an
-8-byte `BasicClassListNode` from the pool (`func_80017B34(0x8)`), sets
+8-byte `BasicClassListNode` from the pool (`BMemPMgrAlloc(0x8)`), sets
 `node->value = value`, prepends it to `*head`. Confirmed non-void by this
 function's own `beqz $v0,...` check on the call result immediately after.
 Second argument typed `BasicClass *` rather than a generic `s32`/`void *`

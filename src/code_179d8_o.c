@@ -95,7 +95,7 @@ typedef struct {
     void (*ctor)(void *self);      /* +0x008 */
 } BaseCtorTable6D4E8;
 
-extern void *func_80017B34(s32 size);              /* Psy-Q allocator, matched signature used project-wide */
+extern void *BMemPMgrAlloc(s32 size);              /* Psy-Q allocator, matched signature used project-wide */
 /* ROUND 59 (extern review): parameter list only, return type untouched. This
  * is NOT still INCLUDE_ASM -- it is defined in src/code_171e0.c as
  * `void *GetClass6D430Methods(void)`, and the callee at 0x80026C9C is
@@ -114,7 +114,7 @@ Obj6D4E8 *new_class_6d4e8(void)
 {
     Obj6D4E8 *self;
 
-    self = func_80017B34(0x2C);
+    self = BMemPMgrAlloc(0x2C);
     if (self != NULL) {
         GetClass6D4E8Methods()->ctor(self);
         return self;

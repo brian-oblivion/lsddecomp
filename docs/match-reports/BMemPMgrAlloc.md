@@ -1,4 +1,6 @@
-# func_80017B34 — MATCHED (round 73): length exact (114/114 words), 114/114 words match, no diff
+# BMemPMgrAlloc — MATCHED (round 73): length exact (114/114 words), 114/114 words match, no diff
+
+> Renamed from `func_80017B34` on 2026-09-24 (tools/rename.py). Address 0x80017b34.
 
 REVISITED, round 73: MATCHED 114/114 (whole-image SHA1 green), 6 builds from the preserved body, no permuter; names/types not relevant (no struct or header edit; locals renamed only)
 
@@ -64,7 +66,7 @@ blocks gives 106/114. The naive unscoped `cursor->prev->next = ...` form gives
 ### Matched body (in `src/code_8220.c`)
 
 ```c
-void *func_80017B34(size, pool)
+void *BMemPMgrAlloc(size, pool)
     s32 size;
     void *pool;
 {
@@ -99,7 +101,7 @@ This function was flagged this round as "NEVER SEARCHED" despite being at a
 high raw word-match. Ran all three of round-45's mandated permuter checks
 before searching, all recorded:
 
-1. **Correctness.** `tools/setup-permuter.sh func_80017B34
+1. **Correctness.** `tools/setup-permuter.sh BMemPMgrAlloc
    permuter-work/func_80017B34_seed.c` (seed = round 45's preserved 92/114
    body verbatim) built a scaffold cleanly: "base compiles, target
    assembled."
@@ -167,7 +169,7 @@ round.
 The first sitting's bounded search (see above) was still running when that
 sitting ended its turn; it kept improving after the 250-score candidate
 above was written up and produced a strictly better one that was never
-collected: `permuter-work/func_80017B34/output-220-1/` (permuter score
+collected: `permuter-work/BMemPMgrAlloc/output-220-1/` (permuter score
 **220**, vs. the committed candidate's 250 — lower is better in permuter
 units). Recovered from the untracked `permuter-work/` directory (which does
 not survive this worktree) before doing anything else this sitting, per
@@ -211,7 +213,7 @@ behaviour.
 2. `./build-and-verify.sh` — clean compile (`build exit=2`, zero hits on the
    `error:`/`parse error`/`undefined reference`/`*** [….o]` grep — an
    ordinary "does not byte-match yet" state, not a build failure).
-3. `tools/funcdiff.py func_80017B34` — **101/114 words match, zero
+3. `tools/funcdiff.py BMemPMgrAlloc` — **101/114 words match, zero
    out-of-range drift** (no "differs OUTSIDE this range" warning). This is
    REAL: a genuine +5 words over the already-committed 96/114, on top of
    round 46's own already-oracle-verified gain over round 45's 92/114.
@@ -233,7 +235,7 @@ two documented counter-examples cited above from round 40/41 history.
 compiles to the same length as retail, no address drift. **Status:** STALL
 after ~22 attempts total (18 round-45 + 3 round-46-first-sitting + 1
 round-46-second-sitting), restored to `INCLUDE_ASM`. Best raw score
-**101/114 words**; `tools/asm-differ/diff.py func_80017B34` (realigned,
+**101/114 words**; `tools/asm-differ/diff.py BMemPMgrAlloc` (realigned,
 confirms no drift) shows the first real difference at file offset `0x8370`
 / vram `0x80017B70`. Thirteen words remain wrong in three clusters:
 `0x8370-0x837C` (4 words, mask-remainder rounding order), `0x83D4-0x83E0`
@@ -246,7 +248,7 @@ candidates for a further, deeper/longer search seeded from this round's
 ### Preserved body (current best, 101/114) — see `src/code_8220.c`, still `#if 0`
 
 ```c
-void *func_80017B34(size, pool)
+void *BMemPMgrAlloc(size, pool)
     s32 size;
     void *pool;
 {
@@ -373,13 +375,13 @@ remaining register-identity residues that stalled it short of byte-exact.
 
 ## Lever 1 (load-bearing): K&R (old-style) definition for the dead second parameter
 
-The old report was right that `func_80017B34`'s own body genuinely reads
+The old report was right that `BMemPMgrAlloc`'s own body genuinely reads
 `$a1` as a fallback pool pointer (live only when the global default pool
 `D_8008A818` is unset), and right that every external caller passes only one
 argument and must keep doing so. What it did not resolve is HOW a function
 can have a real second parameter in its own body while every external
 prototype — including a same-file call, `func_800181AC`'s
-`func_80017B34(0x8)` — stays single-argument. A single ANSI prototype cannot
+`BMemPMgrAlloc(0x8)` — stays single-argument. A single ANSI prototype cannot
 do both: whichever parameter count the header declares, either the body
 can't see the fallback or the 1-arg call sites stop compiling.
 
@@ -391,15 +393,15 @@ does NOT install a prototype for the rest of the translation unit:
  * so a same-file definition can use K&R syntax without conflicting with
  * the ~15 other headers' single-argument ANSI prototypes, or this same
  * file's own single-argument call sites that appear textually AFTER the
- * definition (func_800181AC's `func_80017B34(0x8)`,
+ * definition (func_800181AC's `BMemPMgrAlloc(0x8)`,
  * func_80018208's `func_80017CFC(node)`). */
-extern void *func_80017B34();
+extern void *BMemPMgrAlloc();
 extern void *func_80017CFC();
 ```
 
 ```c
 /* src/code_8220.c */
-void *func_80017B34(size, pool)
+void *BMemPMgrAlloc(size, pool)
     s32 size;
     void *pool;
 {
@@ -408,7 +410,7 @@ void *func_80017B34(size, pool)
 ```
 
 Confirmed this actually works end to end: `func_800181AC`'s existing
-`func_80017B34(0x8)` call, appearing later in the same file, kept compiling
+`BMemPMgrAlloc(0x8)` call, appearing later in the same file, kept compiling
 with no arity warning once this was in place. This is the same
 escape-hatch class as the project's already-documented "vtable slot
 declared unprototyped" lever (`docs/DECOMPILATION_LEARNINGS.md`, round 14),
@@ -549,7 +551,7 @@ struct BMemPMgr {
 
 ```c
 #if 0
-void *func_80017B34(size, pool)
+void *BMemPMgrAlloc(size, pool)
     s32 size;
     void *pool;
 {
@@ -696,7 +698,7 @@ odd-one-out declaration is the load-bearing one.
 before writing it:
 
 ```
-80017b34 <func_80017B34>:        80017cfc <func_80017CFC>:
+80017b34 <BMemPMgrAlloc>:        80017cfc <func_80017CFC>:
 80017b3c:  move  s0,a0           80017d04:  move  s0,a0
 80017b40:  move  s1,a1   <-      80017d0c:  move  s1,a1   <-
 ...                              ...
@@ -714,7 +716,7 @@ site passes one argument, and retail emits only `$a0` for it — e.g.
 `Class6D430__AllocBuffer`'s call:
 
 ```
-80026b70:  jal   80017b34 <func_80017B34>
+80026b70:  jal   80017b34 <BMemPMgrAlloc>
 80026b74:  move  a0,s2            <- $a0 only; $a1 is left as the caller had it
 ```
 
@@ -727,7 +729,7 @@ register the caller happens to leave loaded.
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
 unit's own later one-argument call sites (`func_800181AC`'s
-`func_80017B34(0x8)`, `func_80018208`'s `func_80017CFC(node)`). A K&R definition
+`BMemPMgrAlloc(0x8)`, `func_80018208`'s `func_80017CFC(node)`). A K&R definition
 installs no prototype, so those later calls stay clean; an unspecified-parameter
 declaration does the same for everything before the definition. A full prototype
 here reintroduces exactly that conflict.
@@ -739,3 +741,13 @@ unit correctly. Converging them would break one side or the other.
 **Declaration sites changed:** none (no arity anywhere changed).
 `/* arity-ok: ... */` added to the two lines in `include/code_8220.h`. Oracle
 green.
+
+## Naming (round 74)
+
+`BMemPMgrAlloc`, **tier A**: fully derived byte-exact free-list allocator
+(round 73), matching `SetupBMemPMgrFreeList`'s setup and `BMemPMgrFree`'s
+(this unit's `func_80017CFC`) release, same list, same `sizeAndFlags`
+encoding. Called from a wide cross-section of units (`code_171e0`,
+`code_179d8_*`, `code_2c054`, `code_2cc8c_*`, `code_55dd4`, `code_d294`,
+`main`, plus this unit's own `PushBasicClassListNode`) — confirming it is
+the game's general small-object pool allocator, not something narrower.

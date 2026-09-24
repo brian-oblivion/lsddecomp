@@ -300,7 +300,7 @@ struct BasicClassMethodsD294 {
 };
 
 extern BasicClassMethodsD294 *Get_vtable_BasicClass(void);
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 extern void func_80017CFC(void *arg);
 
 /* The PARENT object, seen through self->unkC (see Class6B5CCObj below) and

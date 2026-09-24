@@ -70,7 +70,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     }
     gOpenVabCount++;
     if (arg1 != NULL) {
-        buf = func_80017B34(strlen(arg1) + 1);
+        buf = BMemPMgrAlloc(strlen(arg1) + 1);
         if (buf != NULL) {
             self->baseFilename = buf;
             strcpy(buf, arg1);

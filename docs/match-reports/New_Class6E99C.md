@@ -18,7 +18,7 @@ Unit `code_2cc8c_e`, carved round 14.
 > Class6E99CObj *New_Class6E99C(void *a1, s32 a2, s32 a3) {
 >     Class6E99CObj *self;
 >
->     self = func_80017B34(0xA0);
+>     self = BMemPMgrAlloc(0xA0);
 >     if (self != NULL) {
 >         GetClass6E99CMethods()->ctor(self, a1, a2, a3);
 >         return self;

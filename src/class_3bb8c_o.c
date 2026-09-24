@@ -236,12 +236,12 @@ void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     } while (i < 2);
 }
 
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 extern void *func_80017CFC(void *ptr);
 extern BaseObjOMethods *DreamSys__GetBaseMethods(void);
 
 void *New_BaseObjO(void) {
-    BaseObjO *self = func_80017B34(0x58);
+    BaseObjO *self = BMemPMgrAlloc(0x58);
 
     if (self != NULL) {
         if (DreamSys__GetBaseMethods()->ctor(self) != NULL) {

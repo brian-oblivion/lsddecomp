@@ -34,7 +34,7 @@
 Class6B5CCObj *New_Class6B5CC(void) {
     Class6B5CCObj *obj;
 
-    obj = func_80017B34(0x44);
+    obj = BMemPMgrAlloc(0x44);
     if (obj == NULL) {
         return NULL;
     }
@@ -48,11 +48,11 @@ Class6B5CCObj *New_Class6B5CC(void) {
 void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     void *blockB;
 
-    self->coord2 = func_80017B34(0x50);
+    self->coord2 = BMemPMgrAlloc(0x50);
     if (self->coord2 == NULL) {
         return NULL;
     }
-    blockB = func_80017B34(0x28);
+    blockB = BMemPMgrAlloc(0x28);
     self->coord2->param = blockB;
     if (blockB == NULL) {
         func_80017CFC(self->coord2);

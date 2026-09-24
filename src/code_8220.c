@@ -66,7 +66,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool)
     *(u32 *)end = 0x80000000;
 }
 
-void *func_80017B34(size, pool)
+void *BMemPMgrAlloc(size, pool)
     s32 size;
     void *pool;
 {
@@ -340,7 +340,7 @@ s32 func_800181AC(BasicClassListNode **head, BasicClass *value)
     BasicClassListNode *node;
     BasicClassListNode *oldHead;
 
-    node = func_80017B34(0x8);
+    node = BMemPMgrAlloc(0x8);
     if (node != NULL) {
         oldHead = *head;
         node->value = value;

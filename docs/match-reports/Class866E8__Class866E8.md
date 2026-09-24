@@ -69,7 +69,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         entry->unkC = New_Class86AA0();
         entry->unkC->methods->slot4C(entry->unkC, self, &self->unk54);
 
-        entry->unk10 = (Class866E8 **)func_80017B34(0x668);
+        entry->unk10 = (Class866E8 **)BMemPMgrAlloc(0x668);
         if (entry->unk10 == NULL) {
             return;
         }

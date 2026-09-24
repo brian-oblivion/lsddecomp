@@ -90,7 +90,7 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     if (handle == -1) {
         return 0;
     }
-    hdr = func_80017B34(0x80);
+    hdr = BMemPMgrAlloc(0x80);
     read(handle, hdr, 0x80);
     raw = ((u8 *)hdr)[2];
     seekPos = (raw << 7) - 0x780;
@@ -249,7 +249,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
         return 0;
     }
     src = ((McIconSourceRef *)arg5)->iconSource;
-    req = (McSaveHeader *)func_80017B34(0x200);
+    req = (McSaveHeader *)BMemPMgrAlloc(0x200);
     req->magic0 = 'S';
     req->magic1 = 'C';
     req->iconFrameFlag = a3 + 0x10;
@@ -404,11 +404,11 @@ void TaskObjF__AllocBuffers(TaskObjF *self) {
     s32 i;
 
     if (self->bufArray == 0) {
-        self->bufArray = func_80017B34(0x40);
+        self->bufArray = BMemPMgrAlloc(0x40);
         for (i = 0; i < 15; i++) {
-            self->bufArray[i] = func_80017B34(0x41);
+            self->bufArray[i] = BMemPMgrAlloc(0x41);
         }
-        self->scratchBuf = func_80017B34(0x40);
+        self->scratchBuf = BMemPMgrAlloc(0x40);
     }
 }
 

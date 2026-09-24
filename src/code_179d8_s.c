@@ -288,7 +288,7 @@ typedef struct Node8008A894 {
 } Node8008A894;
 
 extern Node8008A894 *gCdRequestQueue;
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 void func_80027800(Obj80027480 *self, char *arg1) {
     Rec80028448 *rec;
@@ -321,7 +321,7 @@ void func_80027800(Obj80027480 *self, char *arg1) {
                 }
                 pos = gCdReadSectorCount << 11;
                 if (self->unk10 == NULL) {
-                    ret = func_80017B34(pos);
+                    ret = BMemPMgrAlloc(pos);
                     if (ret == NULL) {
                         self->methods->onError(self);
                         return;

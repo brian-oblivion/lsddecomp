@@ -21,7 +21,7 @@ void SetBMemPMgrBusy(s32 val)
 ```
 
 `gBMemPMgrBusy` is a pool allocator/free critical-section flag: this unit's
-`func_80017B34`/`func_80017CFC` (in `code_8220.c`, still `INCLUDE_ASM` this
+`BMemPMgrAlloc`/`func_80017CFC` (in `code_8220.c`, still `INCLUDE_ASM` this
 round) bracket their free-list walk with `SetBMemPMgrBusy(1)` on entry and
 `SetBMemPMgrBusy(0)` on exit, per those functions' own (stale-verdict, still
 undecoded) match reports. Declared `extern s32 gBMemPMgrBusy;` in
@@ -49,11 +49,11 @@ needs zero new work once rebuilt under the round-42 `--gp-symbols` pin.
 measured, but nothing establishes what the flag is called in the original
 source. Three independent pieces of evidence, two of them new this round:
 
-1. `func_80017B34` and `func_80017CFC` (the pool allocator's alloc/free
+1. `BMemPMgrAlloc` and `func_80017CFC` (the pool allocator's alloc/free
    pair, `code_8220.c`, still `INCLUDE_ASM`) bracket their free-list walk
    with `SetBMemPMgrBusy(1)` on entry and `SetBMemPMgrBusy(0)` on exit --
    visible as two `jal func_8001844C` in
-   `asm/nonmatchings/code_8220/func_80017B34.s`.
+   `asm/nonmatchings/code_8220/BMemPMgrAlloc.s`.
 2. **New this round:** `func_800280EC` in `src/code_179d8_q.c` reads it
    through the getter and BAILS OUT -- `if (GetBMemPMgrBusy() != 0) return
    0;` -- before doing `VSyncCallback` work. So the flag is read by

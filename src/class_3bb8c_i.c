@@ -34,7 +34,7 @@ void *func_80050BA8(s32 arg0, s32 arg1)
 {
     Obj86ED0 *self;
 
-    self = func_80017B34(0x4C);
+    self = BMemPMgrAlloc(0x4C);
     if (self != NULL) {
         func_80051A4C()->ctor(self, arg0, arg1);
         return self;
@@ -66,7 +66,7 @@ void func_80050C14(Obj86ED0 *self, char *arg1, s32 arg2)
     Get_vtable_BasicClass()->ctor(self);
     self->methods = func_80051A4C();
     self->unk10 = strlen(arg1);
-    self->unk28 = func_80017B34(self->unk10 + 4);
+    self->unk28 = BMemPMgrAlloc(self->unk10 + 4);
 
     p = D_8008AAE4;
     count = 0;

@@ -54,7 +54,7 @@ struct edit this round).
 
 ```c
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 void Unk18Obj__InitOt(Unk18Obj *self) {
     s32 size;
@@ -339,7 +339,7 @@ void Unk18Obj__InitOt(Unk18Obj *self) {
 
     size = self->unk48 * self->unk44 + (4 << self->unk3C) + 0x14;
 
-    buf = (s32)func_80017B34(size * 2);
+    buf = (s32)BMemPMgrAlloc(size * 2);
     if (buf == 0) {
         return;
     }
@@ -492,7 +492,7 @@ already existed in `src/code_2cc8c_d.c` (added when round 34 retyped this
 unit's other Sony calls), just declared after this function's own call
 sites; added a second, identical declaration ahead of `Unk18Obj__InitOt`
 itself (same pattern this unit already uses for its other local externs)
-rather than hoisting the existing one. `func_80017B34` also needed its own
+rather than hoisting the existing one. `BMemPMgrAlloc` also needed its own
 extern (not previously declared in this unit). Build: clean compile
 (`build exit=2`, zero grep hits on the compile-error patterns, ordinary
 SHA1 mismatch). **`funcdiff.py` reports 71/73 words, no out-of-range
@@ -513,7 +513,7 @@ are the documented instruction-order residue at vram `0x8003ED18`/`0x8003ED1C`.
 ```c
 #if 0
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 void Unk18Obj__InitOt(Unk18Obj *self) {
     s32 size;
@@ -525,7 +525,7 @@ void Unk18Obj__InitOt(Unk18Obj *self) {
 
     size = self->unk48 * self->unk44 + (4 << self->unk3C) + 0x14;
 
-    buf = (s32)func_80017B34(size * 2);
+    buf = (s32)BMemPMgrAlloc(size * 2);
     if (buf == 0) {
         return;
     }
@@ -573,7 +573,7 @@ each `source.c` against the seed:
   (`if (buf == 0) { size = size + 0x14; if (1) { return; } }`) that always
   returns before the modified `size` is ever read. The SURVIVING path's
   `size` therefore never gets `+0x14` added at all, which changes the
-  value handed to `self->unk7C`/`unk84`/`unk8C` and to the `func_80017B34`
+  value handed to `self->unk7C`/`unk84`/`unk8C` and to the `BMemPMgrAlloc`
   allocation call relative to the confirmed-correct semantics (the leading
   4 instructions of the 71/73 body already reproduce retail's own
   `mult`/reload/`sllv`/`mflo` sequence exactly, which only happens when

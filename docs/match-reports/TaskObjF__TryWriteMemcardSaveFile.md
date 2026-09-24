@@ -114,7 +114,7 @@ in WriteFile\n"`, confirmed in rodata at `D_80011530`):
    error log this time) if this second open also fails.
 5. Resolves `src = ((McIconSourceRef *)arg5)->iconSource` -- `arg5`'s own type is
    otherwise unestablished; only this one field is ever read.
-6. Allocates a 0x200-byte request buffer (`func_80017B34`), fills a 4-byte
+6. Allocates a 0x200-byte request buffer (`BMemPMgrAlloc`), fills a 4-byte
    header (`'S'`, `'C'`, `(u8)(a3+0x10)`, `(u8)ceil(arg7/0x2000)`),
    `strcpy`s a filename into it (source: `handle`, the function's OWN 3rd
    parameter -- see below), then copies FIVE regions from `src` into it:
@@ -243,7 +243,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
         return 0;
     }
     src = ((McIconSourceRef *)arg5)->iconSource;
-    req = (McSaveHeader *)func_80017B34(0x200);
+    req = (McSaveHeader *)BMemPMgrAlloc(0x200);
     req->magic0 = 'S';
     req->magic1 = 'C';
     req->iconFrameFlag = a3 + 0x10;

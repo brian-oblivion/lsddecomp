@@ -67,7 +67,7 @@ extern void CdFlush(void);
 #define CD_WAIT_TIMEOUT 0x259
 
 /* Psy-Q pool allocator, code_8220.c. */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 extern void *func_80017CFC(void *ptr);
 
 /* libc2/strstr.o, linked (see code_179d8_h.c's carve notes). */
@@ -111,7 +111,7 @@ CdRequestNode *AllocCdRequestNode(void)
     CdRequestNode *cur;
 
     LockCd();
-    node = func_80017B34(0x24);
+    node = BMemPMgrAlloc(0x24);
     if (node != NULL) {
         head = gCdRequestQueue;
         node->prev = NULL;

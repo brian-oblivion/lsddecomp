@@ -20,7 +20,7 @@ Every instance is a `New_X` class allocator. Canonical form, from
 
 ```
     ori   $a0, $zero, 0x38          ; sizeof the instance
-    jal   func_80017B34             ; the BasicClass-family allocator
+    jal   BMemPMgrAlloc             ; the BasicClass-family allocator
      sw   $s0, 0x10($sp)
     addu  $s0, $v0, $zero           ; s0 = self
     beqz  $s0, .Lepilogue

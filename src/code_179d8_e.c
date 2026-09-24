@@ -184,7 +184,7 @@ struct VabStreamObj {
 /* Cross-unit calls into the still-uncarved code_179d8_tail monolith --
  * declared LOCAL to this unit, per-call-site typed, since none of them have
  * an established prototype anywhere yet. */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 extern s16 func_80030E90(s16 a0, s16 hi, s16 lo, s16 a3, s32 b5, s32 argA, s32 argB);
 extern void SsUtAutoVol(s16 a0, s16 a1, s16 a2, s32 a3);
 extern void func_80031890(s16 index);
@@ -268,7 +268,7 @@ s32 func_8002C478(void) {
 void *New_VabStreamObj(s32 arg0) {
     void *self;
 
-    self = func_80017B34(0x64);
+    self = BMemPMgrAlloc(0x64);
     if (self != NULL) {
         GetVabStreamObjMethods()->slot08(self, arg0);
         return self;
@@ -356,7 +356,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     }
     gOpenVabCount++;
     if (arg1 != NULL) {
-        buf = func_80017B34(strlen(arg1) + 1);
+        buf = BMemPMgrAlloc(strlen(arg1) + 1);
         if (buf != NULL) {
             self->baseFilename = buf;
             strcpy(buf, arg1);
@@ -465,11 +465,11 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
     if (result == -1) {
         return;
     }
-    self->vagAttrPool = func_80017B34(self->vabHdr.vs << 5);
+    self->vagAttrPool = BMemPMgrAlloc(self->vabHdr.vs << 5);
     if (self->vagAttrPool == NULL) {
         return;
     }
-    self->progVagTable = func_80017B34(self->vabHdr.ts << 2);
+    self->progVagTable = BMemPMgrAlloc(self->vabHdr.ts << 2);
     if (self->progVagTable == NULL) {
         return;
     }

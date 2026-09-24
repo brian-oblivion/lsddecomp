@@ -67,7 +67,7 @@ DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
 {
 	DreamSys *this;
 
-	this = func_80017B34(sizeof(DreamSys));
+	this = BMemPMgrAlloc(sizeof(DreamSys));
 	if (this != NULL) {
 		Get_vtable_DreamSys()->Constructor(this, arg0, arg1, arg2);
 		return this;

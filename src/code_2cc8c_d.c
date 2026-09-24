@@ -197,7 +197,7 @@ void func_8003ECC8(void) {
  * literal, fold() reassociates the constant to the outside of the sum and
  * the final addu/addiu pair swaps (round 71). */
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 void Unk18Obj__InitOt(Unk18Obj *self) {
     s32 size;
@@ -210,7 +210,7 @@ void Unk18Obj__InitOt(Unk18Obj *self) {
 
     size = (4 << self->unk3C) + (self->unk48 * self->unk44 + hdrSize);
 
-    buf = (s32)func_80017B34(size * 2);
+    buf = (s32)BMemPMgrAlloc(size * 2);
     if (buf == 0) {
         return;
     }

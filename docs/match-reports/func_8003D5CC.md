@@ -29,7 +29,7 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
     while (*list++ != NULL) {
         count++;
     }
-    buf = func_80017B34(count * 4);
+    buf = BMemPMgrAlloc(count * 4);
     self->unk64[idx] = (void *)buf;
     self->unk60[idx] = a1->unk4;
     self->unk5C[idx] = count;

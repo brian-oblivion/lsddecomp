@@ -14,7 +14,7 @@ land in `code_8220_b`, next round's carve).
 
 It maintains two singly-linked lists of pool-allocated 8-byte nodes
 (`BasicClassListNode { next; BasicClass *value; }`, size confirmed by
-`func_800181AC`'s `func_80017B34(0x8)` allocation):
+`func_800181AC`'s `BMemPMgrAlloc(0x8)` allocation):
 
 - `children` (`+0x004`): objects added via `addChild`/`removeChild`
   (`BasicClass__func_17f98`/`BasicClass__func_17ff0`, own reports). Adding

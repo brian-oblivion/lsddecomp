@@ -20,7 +20,7 @@ extern void SetMem(s32 mode);
  * 31/31 words). THIS call site pushes a second, dead argument (0) that the
  * matched body never reads -- an unspecified-parameter declaration lets the
  * call carry it without contradicting the real prototype, the same idiom
- * code_8220.h already uses for func_80017B34/func_80017CFC. */
+ * code_8220.h already uses for BMemPMgrAlloc/func_80017CFC. */
 extern void *BMemPMgrInit(); /* arity-ok: the dead 2nd argument IS byte-load-bearing here -- retail emits `move a1,zero` in the jal's delay slot at 0x80011900 */
 
 /* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `D_8008A818 = pool;`, matched

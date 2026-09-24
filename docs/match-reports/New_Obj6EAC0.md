@@ -8,7 +8,7 @@ Unit: `src/code_2cc8c_f.c`. 3 attempts.
 Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void);
 
 Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name) {
-    Obj6EAC0 *self = func_80017B34(0xB8);
+    Obj6EAC0 *self = BMemPMgrAlloc(0xB8);
     if (self != NULL) {
         Obj6EAC0__GetDerivedMethods()->slot08(self, (s32)ctx, len, (s32)name);
         return (Unk64Elem *)self;
@@ -17,7 +17,7 @@ Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name) {
 }
 ```
 
-A `New_X`-shaped allocator: `func_80017B34` (the project's generic pool
+A `New_X`-shaped allocator: `BMemPMgrAlloc` (the project's generic pool
 allocator, already declared in this header) allocates 0xB8 bytes, then
 on success dispatches through the DERIVED class table's constructor
 slot (`Obj6EAC0__GetDerivedMethods()` returns `&D_8006EB90`, `slot08` is the ctor,

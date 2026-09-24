@@ -15,7 +15,7 @@ round 8 (2026-09-02) with the project's first permuter run.
 
 ```c
 Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
-    Class6D3C8 *self = func_80017B34(0x2C);
+    Class6D3C8 *self = BMemPMgrAlloc(0x2C);
 
     if (self != 0) {
         ((Class6D3C8Methods *)GetClass6D3C8Methods())->ctor(self, arg);
@@ -27,7 +27,7 @@ Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
 **The `return` moves INSIDE the `if`, and the null path falls off the end of
 a non-void function.** That is the whole fix, and it is why every reshaping
 attempt in the three rounds below failed: they all kept a `return` on the
-null path, and *any* `return` there costs the instruction. `func_80017B34`
+null path, and *any* `return` there costs the instruction. `BMemPMgrAlloc`
 already left the null in `$v0`, so the original source never had to restate
 it — which is exactly why retail's `beqz` delay slot is a bare `nop`.
 

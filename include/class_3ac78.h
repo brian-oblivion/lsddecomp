@@ -59,7 +59,7 @@ struct UnkSlotEntry_3ac78 {
      * EntryChildObj::unk36/unk38. Unifying the two views is a track-4 job,
      * not a naming one, so the declared type is left alone; read it as
      * "a cell object", not as "another Class866E8". */
-    Class866E8 **cells;              /* Class866E8__DispatchToRectCells: 2D grid, row stride 20 cells. Class866E8__Class866E8 (ctor): allocates 0x668 raw bytes (func_80017B34) and fills it with pointers built in an inner loop. Class866E8__Finalize (dtor, MATCHED): walks the same 0x668-byte span tearing down each non-NULL cell, then frees it. */
+    Class866E8 **cells;              /* Class866E8__DispatchToRectCells: 2D grid, row stride 20 cells. Class866E8__Class866E8 (ctor): allocates 0x668 raw bytes (BMemPMgrAlloc) and fills it with pointers built in an inner loop. Class866E8__Finalize (dtor, MATCHED): walks the same 0x668-byte span tearing down each non-NULL cell, then frees it. */
     GenericObject *heldObj;          /* Class866E8__Class866E8 (ctor): zeroed. Class866E8__OnElementEvent releases it through the shared BasicClass `release` slot on event 6 and stores the result back, the project's standard release-and-clear shape. RETYPED from `s32` this round: the only code that touches it dereferences it as an object with a vtable at +0x000. */
     s32 unk18;                       /* Class866E8__Class866E8 (ctor): zeroed */
 };
@@ -281,7 +281,7 @@ struct Class866E8 {
 extern Class866E8Methods *func_8004D244(void);
 
 /* The generic allocator, established already in DreamSys.h/Entity.h/etc. */
-extern void *func_80017B34(s32 size);
+extern void *BMemPMgrAlloc(s32 size);
 
 /*
  * Class86668 -- vtable gClass86668Methods (28 slots, header 0x230), resolved with

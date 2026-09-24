@@ -27,7 +27,7 @@ Class869D8 *New_Class869D8(void)
 {
     Class869D8 *self;
 
-    self = func_80017B34(0xDC);
+    self = BMemPMgrAlloc(0xDC);
     if (self != NULL) {
         GetClass869D8Methods()->ctor(self);
         return self;
@@ -73,7 +73,7 @@ Class86AA0 *New_Class86AA0(void)
 {
     Class86AA0 *self;
 
-    self = func_80017B34(0x3C);
+    self = BMemPMgrAlloc(0x3C);
     if (self != NULL) {
         GetClass86AA0Methods()->ctor(self);
         return self;
@@ -128,7 +128,7 @@ Class86B60 *New_Class86B60(void *dreamSys)
 {
     Class86B60 *self;
 
-    self = func_80017B34(0xC4);
+    self = BMemPMgrAlloc(0xC4);
     if (self != NULL) {
         func_8004E2D0()->ctor(self, dreamSys);
         return self;

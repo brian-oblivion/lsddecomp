@@ -15,7 +15,7 @@ Obj865C8 *New_Obj865C8(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 {
     ...
 
-    self = func_80017B34(0x50);
+    self = BMemPMgrAlloc(0x50);
     if (self != NULL) {
         GetObj865C8Methods()->ctor(self, arg1, arg2, arg3);
         return self;
