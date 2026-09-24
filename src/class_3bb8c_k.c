@@ -139,7 +139,7 @@ end:
     return;
 }
 
-void func_8005227C(Class86F88 *self)
+void Class86F88__TickClosing(Class86F88 *self)
 {
     s32 old;
 

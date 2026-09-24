@@ -7,7 +7,7 @@ the whole unit's batch of matches was in place); whole-image SHA1 matches
 retail. `funcdiff.py Class86F88__SetState`: 42/42 words match.
 
 This is vtable slot `+0x054` of `D_80086F88` (`Class86F88Methods::slot54`),
-dispatched by `func_8005227C` (this unit) as `self->methods->slot54(self, 4)`.
+dispatched by `Class86F88__TickClosing` (this unit) as `self->methods->slot54(self, 4)`.
 
 ## Source
 

@@ -2880,7 +2880,7 @@ struct Class86F88Methods {
     void (*slot48)(Class86F88 *self); /* +0x048, Class86F88__SetState's own 2nd dispatch, self only */
     u8 pad04C[0x054 - 0x04C];
     /* +0x054 = Class86F88__SetState itself (this unit, matched). Dispatched by
-     * func_8005227C as `self->methods->slot54(self, 4)`. */
+     * Class86F88__TickClosing as `self->methods->slot54(self, 4)`. */
     void (*slot54)(Class86F88 *self, s32 state);
     u8 pad058[0x060 - 0x058];
     /* +0x060, func_80052A58/func_8005281C's own trailing dispatch, both
@@ -2954,8 +2954,8 @@ struct Class86F88 {
     s32 unk20;                     /* +0x020, func_800523F0(fwd)/func_80052430/func_80052498/func_800524F8/func_80052598/func_800529FC */
     s32 unk24;                     /* +0x024, ditto */
     s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
-    s32 unk2C;                     /* +0x02C, func_8005227C/Class86F88__SetState */
-    s32 unk30;                     /* +0x030, func_8005227C/Class86F88__SetState */
+    s32 unk2C;                     /* +0x02C, Class86F88__TickClosing/Class86F88__SetState */
+    s32 unk30;                     /* +0x030, Class86F88__TickClosing/Class86F88__SetState */
     s32 unk34;                     /* +0x034, Class86F88__SetState's slot14 argument */
     u8 pad038[0x03C - 0x038];
     Class86F88 *unk3C;              /* +0x03C, func_800523F0: another instance of this same class */

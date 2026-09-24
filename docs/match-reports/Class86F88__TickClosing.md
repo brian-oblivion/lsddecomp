@@ -1,7 +1,9 @@
-# func_8005227C -- MATCH
+# Class86F88__TickClosing -- MATCH
+
+> Renamed from `func_8005227C` on 2026-09-24 (tools/rename.py). Address 0x8005227c.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8005227C`: 24/24 words match.
+SHA1 matches retail. `funcdiff.py Class86F88__TickClosing`: 24/24 words match.
 
 This is vtable slot `+0x058` of `D_80086F88` (`Class86F88Methods` does not
 declare this slot since nothing in this unit dispatches through it).
@@ -9,7 +11,7 @@ declare this slot since nothing in this unit dispatches through it).
 ## Source
 
 ```c
-void func_8005227C(Class86F88 *self)
+void Class86F88__TickClosing(Class86F88 *self)
 {
     s32 old;
 
