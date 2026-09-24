@@ -118,7 +118,7 @@ struct GridRect_3ac78 {
  * assignment to a batched 4-word-per-iteration block move, which is
  * exactly what Class866E8__ApplyToSenderFootprint's save/restore pair does. An indexed loop
  * translation does NOT reproduce this codegen; see
- * docs/match-reports/func_80025E1C.md for the earlier-established
+ * docs/match-reports/Pad__LoadButtonTable.md for the earlier-established
  * precedent this follows.
  */
 struct GridRectList_3ac78 {

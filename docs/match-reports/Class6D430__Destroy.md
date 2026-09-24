@@ -7,7 +7,7 @@
 ## What it does
 
 This class's own destructor — `D_8006D430`'s vtable slot `+0x00C`, called
-`DestroyChained` and `func_80025C30` (in `class_16334`, a different class'
+`DestroyChained` and `Pad__Destroy` (in `class_16334`, a different class'
 `dtor`, same convention) alike. It calls two more of its own slots in turn:
 `+0x048` (unimplemented/null at this level — a subclass-provided hook,
 `slot48`) and then `+0x05C`, which happens to resolve to `Class6D430__FreeBuffer` *at

@@ -27,14 +27,14 @@ s32 Class65650__SetupModelData(Class65650 *self, void *arg1)
 
 Matched with the plain, non-`goto` translation above — no reshaping needed.
 
-## On the broadcast's `goto` lever (`func_80025B34.md`)
+## On the broadcast's `goto` lever (`New_Pad.md`)
 
 This function has the *same shape* the broadcast flagged as needing `goto`:
 a guard that early-returns one constant, falling through to a `return` of a
 different value on the main path. Here the plain `if (...) return 0; return
 callee(...);` matched **first try, zero residue** — no `goto` required.
 
-The likely discriminator: in `func_80025B34`'s failing case, the main path's
+The likely discriminator: in `New_Pad`'s failing case, the main path's
 return value is a *separately named local* (`self`, computed earlier and
 reused) — GCC has to materialize it into `$v0` right before the shared
 epilogue, and that materialization is what needs the `goto`-shaped CFG to
@@ -44,7 +44,7 @@ instruction whose placement depends on which CFG shape you spell in C.
 
 ### Proposed learning
 
-Refines `func_80025B34.md`'s finding rather than contradicting it: the
+Refines `New_Pad.md`'s finding rather than contradicting it: the
 `goto`-vs-`return` sensitivity for a two-arm shared-epilogue early exit
 shows up when the **fall-through arm's return value is a stored local**
 that must be copied into `$v0` right before the epilogue. When the

@@ -44,7 +44,7 @@ void Entity__SetUnkF4(Entity *this, s32 arg1) {
 Matched on the first attempt. The single branch here never affects the
 return value (the function is `void`, and the store after the branch runs
 unconditionally either way) — not the `goto`-lever shape from
-`func_80025B34`/`New_Class65650`, just a plain `if`.
+`New_Pad`/`New_Class65650`, just a plain `if`.
 
 ## Proposed learning
 

@@ -7,7 +7,6 @@ D_8008A828
 D_8008A82C
 D_8008A838
 D_8008A83C
-D_8008A848
 D_8008A850
 D_8008A854
 D_8008A860
@@ -216,5 +215,6 @@ gpDinamicLinkPenalty
 gpNavChallengesComplete
 sCdDriveInited
 sMoodCue78TransitionDone
+sPadRefCount
 sPolyOtCodeOverride
 sPolyOtCodeOverrideSet

@@ -1,4 +1,6 @@
-# func_80025D10
+# Pad__DispatchEvents
+
+> Renamed from `func_80025D10` on 2026-09-24 (tools/rename.py). Address 0x80025d10.
 
 **Unit:** class_16334 · **Size:** 65 words (0x104 bytes) · **Status:** MATCHED
 (byte-exact, whole-image `./build-and-verify.sh` green) · Worked by the head in
@@ -7,7 +9,7 @@ round 2026-08-30-a.
 ## What it does
 
 The Pad class's per-frame button-event dispatch — slot `+0x48`
-(`dispatchEvents`) of `D_8006D370`. It runs after `func_80025CC4` has refreshed
+(`dispatchEvents`) of `gPadMethods`. It runs after `Pad__UpdateMasks` has refreshed
 the three edge masks, turns each set bit into an event code, and delivers the
 codes to the instance's overridable `onButtonEvent` handler (slot `+0x30`).
 
@@ -26,8 +28,8 @@ the field names:
    a 16-entry stack array and then walked back down from the last one. The
    highest-numbered button is handled first.
 
-`D_8008B388` is confirmed here as a 16-entry mask table indexed `0..15` — the
-runtime copy that `func_80025E1C` fills from Psy-Q's `D_80010764`.
+`sButtonMasks` is confirmed here as a 16-entry mask table indexed `0..15` — the
+runtime copy that `Pad__LoadButtonTable` fills from Psy-Q's `D_80010764`.
 
 ## Derivation
 
@@ -118,3 +120,11 @@ not equivalent to GCC 2.6.3: the hand-hoisted form allocates the callee-saved
 register before the guard and compares against it, losing the
 `temp → compare → copy-in-the-delay-slot` preheader shape that retail has. Here
 that was worth 23 words (38/65 → 61/65). Let GCC hoist its own loop invariants.
+
+## Naming
+
+**Tier A.** Vtable slot `+0x48`, already named `dispatchEvents`. This
+report's own "What it does" section establishes the full mechanics
+(priority-ordered per-bit scan, reverse-order delivery to the per-instance
+`onButtonEvent` handler at slot `+0x30`) directly from the body; nothing
+about the name asserts more than that.

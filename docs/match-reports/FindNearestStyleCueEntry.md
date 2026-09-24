@@ -304,7 +304,7 @@ second guard's `return 0;` into its own inline copy (`move v0,zero` + `j`
 to the epilogue) instead of sharing the first guard's exit point --
 producing a SIZE change (4 extra bytes) rather than a near-miss. This is a
 same-value variant of the already-documented "different value needs
-`goto`" lever (`func_80025B34`): here the values are identical, but the
+`goto`" lever (`New_Pad`): here the values are identical, but the
 shared-label unification still doesn't happen for free.
 
 ## Naming

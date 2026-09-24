@@ -106,7 +106,7 @@ this project that survived head scrutiny as a genuine toolchain issue.
 Retail reaches small-data globals gp-relatively, in one instruction:
 
 ```
-lw   $v0, 0x40($gp)          # $gp = 0x8008A808, so this is D_8008A848
+lw   $v0, 0x40($gp)          # $gp = 0x8008A808, so this is sPadRefCount
 sw   $a0, %gp_rel(D_8008A854)($gp)
 ```
 

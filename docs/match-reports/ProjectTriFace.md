@@ -118,7 +118,7 @@ treated as `u8 *` with raw offsets, matching that function's approach.
    exit as `goto fail; ... fail: return 1;` (rather than an inline `return
    1;`) moved the return-value materialization into the delay slot, matching
    retail exactly — the same `goto`-vs-`return` non-interchangeability
-   already documented for `func_80025B34` in DECOMPILATION_LEARNINGS, now
+   already documented for `New_Pad` in DECOMPILATION_LEARNINGS, now
    confirmed on an early exit whose value DIFFERS from a later same-`return`
    -type success path (`0` vs `1`), not just on the "different value on the
    `goto` path" shape it was originally found on. 45/57 -> 57/57.

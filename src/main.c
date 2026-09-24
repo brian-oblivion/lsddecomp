@@ -31,7 +31,7 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 /* Still asm (psyq_10ee0, game-code allocator, not yet carved). Zero
  * arguments -- its own asm never reads $a0/$a1, and the `addu $a0,$0,$0` /
  * `addu $a1,$0,$0` right after this call's `jal` are argument setup for the
- * NEXT call (`func_80025B34(0, 0)`), not for this one. Its return IS used
+ * NEXT call (`New_Pad(0, 0)`), not for this one. Its return IS used
  * here though: retail's delay slot for the *following* `jal` (`move
  * s0,v0`) captures it before that call can clobber v0 -- the return value
  * of THIS call, not of the one whose delay slot it sits in. */
@@ -56,7 +56,7 @@ void func_800118DC(void)
     SetDefaultBMemPMgr(D_8008A808);
     D_8008AC20 = New_Class6D3C8(&D_80066828);
     obj = new_class_6c078();
-    pad = func_80025B34(0, 0);
+    pad = New_Pad(0, 0);
     D_8008AC20->methods->forwardToBaseSlot44UnlessFlagged(D_8008AC20, obj, pad);
     D_8008AC20->methods->slot4C(D_8008AC20);
 }

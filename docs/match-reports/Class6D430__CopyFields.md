@@ -27,7 +27,7 @@ lw $v0, 0x74($a1)  / sw $v0, 0x74($a0)
 ```
 
 Each field is an independent `lw`/`sw` pair through `$v0` — not GCC's
-inlined block-move codegen (contrast `func_80025E1C.md` in `class_16334`,
+inlined block-move codegen (contrast `Pad__LoadButtonTable.md` in `class_16334`,
 which *is* a block copy) — so this is a straight sequence of per-field
 assignments, not a `struct` value copy or a loop. The 3-word gap
 (`+0x5C`..`+0x64`) is real: retail's instruction stream jumps straight from

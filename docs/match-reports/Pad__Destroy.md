@@ -1,11 +1,13 @@
-# func_80025C30 -- MATCHED (21/21 words)
+# Pad__Destroy -- MATCHED (21/21 words)
+
+> Renamed from `func_80025C30` on 2026-09-24 (tools/rename.py). Address 0x80025c30.
 
 **Unit:** class_16334 · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies (previously stub-stalled as
-`gp_rel`-blocked on the same `D_8008A848` global as `func_80025BA0`). The
+`gp_rel`-blocked on the same `sPadRefCount` global as `Pad__Pad`). The
 preserved body from the earlier runner/alpha attempt named the guarded call
 as `func_80025F2C()`; re-reading the `.s` directly shows the call target is
 `PadStop` (already declared in `include/class_16334.h`,
@@ -21,8 +23,8 @@ base-class destructor through the method table.
 ## C
 
 ```c
-void *func_80025C30(Pad *self) {
-    if (--D_8008A848 == 0) {
+void *Pad__Destroy(Pad *self) {
+    if (--sPadRefCount == 0) {
         PadStop();
     }
     return Get_vtable_BasicClass()->dtor(self);
@@ -42,3 +44,12 @@ A preserved/inherited body's call target should be re-verified against the
 otherwise looks solid — here the classification of "which stall this is" was
 right but the specific callee name (`func_80025F2C` vs. the already-known
 `PadStop`) had drifted.
+
+## Naming
+
+**Tier A.** Destructor: vtable slot `+0x0C`, which `classtable.py`'s diff
+shows overrides `BasicClass__Finalize`. Named `Pad__Destroy` rather than
+`Pad__Finalize` to match this round's `VabDriver__Destroy` precedent for the
+same overridden slot on a different class (round 77, code_179d8_d, see
+broadcast from charlie) -- the project's convention for a Finalize-slot
+override is `Class__Destroy`, not a literal `Finalize` transcription.

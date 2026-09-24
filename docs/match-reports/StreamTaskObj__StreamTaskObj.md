@@ -64,7 +64,7 @@ early function in the unit, most of the rest of the executable).
 source words first (`v0`/`v1`/`a0`), *then* stores all three
 (`sw v0,0xa8`/`sw v1,0xac`/`sw a0,0xb0`) — the already-documented
 "whole-struct assignment, not indexed access" idiom
-(`docs/DECOMPILATION_LEARNINGS.md`, `func_80025E1C`), just at 3 words instead
+(`docs/DECOMPILATION_LEARNINGS.md`, `Pad__LoadButtonTable`), just at 3 words instead
 of a larger block. Three separate `field = field` statements instead
 interleave load/store/load/store, one word longer per arm than the batched
 form. Modeling `self->unkA8` as an embedded `StreamTaskInitData` and writing

@@ -99,7 +99,7 @@ Fixes, in order:
    recursive tail call, plain `goto fail; ... fail: return false;` for the
    initial reject. This removed `$s7` and got every later register
    (`s0`-`s6`) to match retail's allocation. Consistent with the
-   `func_80025B34` broadcast's "goto vs return" lever, generalized: the
+   `New_Pad` broadcast's "goto vs return" lever, generalized: the
    lesson there was about a *single* early exit; here it applied to
    *multiple* exit points at once, and avoiding a persistent "result"
    variable across a function call was the bigger win.
@@ -126,7 +126,7 @@ Fixes, in order:
 
 ## Register/goto levers checked (per head broadcasts)
 
-- **Early exit returning a different value (Lever, `func_80025B34`):**
+- **Early exit returning a different value (Lever, `New_Pad`):**
   applies, generalized to *multiple* exit points converging on one epilogue
   via `goto`/direct `return` rather than a shared `result` variable -- see
   fix (1) above. This is the main lesson of this function.
@@ -137,7 +137,7 @@ Fixes, in order:
   CFG difference from a `do-while` vs. pre-test `while` choice, fixable from
   C. Filing that as a stall without the branch-target check would have been
   wrong.
-- **"Let GCC hoist its own loop invariants" (`func_80025D10`):** `p`/`end`
+- **"Let GCC hoist its own loop invariants" (`Pad__DispatchEvents`):** `p`/`end`
   are named pointers set once before the loop, not hand-maintained byte
   offsets -- already the natural shape here, no separate experiment needed.
 

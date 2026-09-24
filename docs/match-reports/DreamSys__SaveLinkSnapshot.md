@@ -140,7 +140,7 @@ statement overwrites `*p` -- caching the pointer, not the pointee, is what
 matters). Worth checking any other multi-step access through the same
 `this->fieldPtr` before assuming CSE will handle it for free -- this
 project had at least two prior struct-assignment idioms confirmed
-(`func_80025E1C`) but none combined with a repeated pointer-field read like
+(`Pad__LoadButtonTable`) but none combined with a repeated pointer-field read like
 this.
 
 ## Attempt log (abbreviated)

@@ -74,10 +74,10 @@ this function alone), so the type is deliberately generic
 ## Register/goto levers checked (per head broadcasts)
 
 - **Early exit returning a different value from the main path (Lever from
-  `func_80025B34`):** not applicable. This function is `void`, has one `if`
+  `New_Pad`):** not applicable. This function is `void`, has one `if`
   with no `else` and no early `return` at all.
 - **Prologue callee-save order / "let GCC hoist its own loop invariants"
-  (Levers from `func_80025D10`):** the second lever *is* what's happening
+  (Levers from `Pad__DispatchEvents`):** the second lever *is* what's happening
   here structurally -- `slot` is a pointer named directly at the top
   (`DreamAuxSlot *slot = gDreamAuxSlots;`), not a byte offset hand-maintained
   inside the loop, and it matched first try. Consistent with "let the

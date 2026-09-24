@@ -85,7 +85,7 @@ and `Class866E8`'s `unk88` (`s32`), `unk8C` (`void *`), `unk90`/`unk92`/
 copies the WHOLE region `self+0x8C..self+0xBC` (0x30 bytes) with retail's
 batched 4-word-per-iteration block-move codegen on both a save and a
 restore — the "whole-struct assignment, not an indexed loop" signature
-already established by `func_80025E1C`. The header now models this as
+already established by `Pad__LoadButtonTable`. The header now models this as
 `HistoryBlock_3ac78 unk8C` (3 x 0x10-byte `HistoryEntry_3ac78` elements).
 This function's own write (`self->unk8C = self->methods->slot124(...)`)
 is still consistent with the new layout — it's writing element `[0]`'s

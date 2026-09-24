@@ -96,7 +96,7 @@ function on to save one derivation step. The pointer-cast form
 (`*(Descriptor10Ext *)((u8 *)self + 0xBC) = buf;`) reaches the identical
 44-byte aligned-word copy without touching `unkBC`'s declared type or
 `func_8004B38C` at all -- confirmed: the two-iteration 4-word loop cycling
-`v0,v1,a0,a1` plus a 3-word tail is exactly the `func_80025E1C` whole-
+`v0,v1,a0,a1` plus a 3-word tail is exactly the `Pad__LoadButtonTable` whole-
 struct-assignment idiom documented in `docs/DECOMPILATION_LEARNINGS.md`
 ("A whole-struct assignment, not an indexed `for`, for a block copy"), not
 a hand-written copy loop.
