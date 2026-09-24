@@ -43,7 +43,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
     }
 
     Unk18Obj__SetGeomScreen((Unk18Obj *)self->unk40);
-    SetClipNear(self->unk4C);
+    GsSetNearClip(self->unk4C);
     func_8003FC70(self->unk54);
 
     if (self->unk54 == 1 || self->unk54 == 3) {
@@ -58,7 +58,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
     self->unk98 = (u32)(self->unk50 - self->unk4C) / (u32)(1 << self->unk3C) + 1;
 
     idx = self->unk74;
-    SetPacketBufCursor(*(s32 *)((u8 *)self + 0x88 + idx * 4));
+    GsSetWorkBase(*(s32 *)((u8 *)self + 0x88 + idx * 4));
 
     idx = self->unk74;
     func_8003FC18(0, 0, *(s32 *)((u8 *)self + 0x78 + idx * 4));
@@ -131,8 +131,8 @@ learning below.
   this slot" with "which function OCCUPIES it" — `slot9C`'s real occupant
   is this function (not `Unk18Obj__OnNotifyTag5`, which only dispatches it), and
   `slotA4`'s real occupant is `Unk18Obj__Flip` (not `Unk18Obj__OnNotifyTag1`, ditto).
-- New externs: `SetClipNear`/`func_8003FC70`/`func_8003FD4C`/
-  `SetPacketBufCursor` (all `asm/code_2cc8c_e.s`, next slice, uncarved) and
+- New externs: `GsSetNearClip`/`func_8003FC70`/`func_8003FD4C`/
+  `GsSetWorkBase` (all `asm/code_2cc8c_e.s`, next slice, uncarved) and
   `func_80024AE4` (PsyQ, `asm/psyq_GsLinkObject4.s`).
 
 ## Proposed learning
@@ -184,7 +184,7 @@ a future pass (or track 4) with more time to cross-check every call site.
   `unk48 * unk44` is the packet-area byte size in `Unk18Obj__InitOt`; which
   operand is "count" and which is "stride" is not distinguishable from a
   commutative multiply alone.
-- `unk4C` -> not proposed. Sole use is `SetClipNear(self->unk4C)`, an
+- `unk4C` -> not proposed. Sole use is `GsSetNearClip(self->unk4C)`, an
   UNCARVED callee (still `func_`, no signature evidence beyond "takes one
   word"), so naming the field ahead of that callee would be a pure guess.
 - `unk50` -> `otPacketLimit` or similar (tier C): only use is

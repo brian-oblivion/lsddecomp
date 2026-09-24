@@ -1,40 +1,31 @@
 /*
- * code_2cc8c_e1 -- ONE function, SetPacketBufCursor (4 words), 0x303E4..0x303F4
- * (vram 0x8003FBE4..0x8003FBF4).
+ * code_2cc8c_e1 -- ONE function, Sony's GsSetWorkBase (libgs/gs_124), 4 words,
+ * 0x303E4..0x303F4 (vram 0x8003FBE4..0x8003FBF4).
  *
- * Resets Sony's GsOUT_PACKET_P -- the GPU packet-buffer write cursor
- * `func_80018464` (src/code_8220_b.c) reloads at the top of every render
- * group and advances by each submit wrapper's return value -- to a given
- * pointer. Its one caller, Unk18Obj__Update (code_2cc8c_d.c), passes the
- * current OT slot's work-buffer base right before clearing that same slot
- * with GsClearOt, i.e. this points the cursor at the start of the packet
- * buffer for the frame about to render into it. See
- * docs/match-reports/SetPacketBufCursor.md `## Naming` for the full
- * derivation.
+ * SONY CODE, written as C. Round 78's head identified it under FINISHING-PLAN
+ * track 2: the body is exactly `GsOUT_PACKET_P = outpacketp;`, `sdkname.py`
+ * scores it EXACT (TINY, 4 words) against libgs/gs_124 GsSetWorkBase on discs
+ * 3.3/3.5/3.6, its one store target 0x8008E794 is Sony's `GsOUT_PACKET_P`
+ * (pinned in config/psyq-objects.ld; LIBGS.H: "Work Base pointer"), and it
+ * sits between placed libgs/gs_123 and gs_111 -- the gs_124 slot of the
+ * archive's link order. The prototype is LIBGS.H's own. `progress.py` counts
+ * it as library through the `identified` comment on its symbols entry.
  *
  * ROUND 34: this unit exists because the functions on BOTH SIDES of it are
- * Sony's. `code_2cc8c_e` used to hold a contiguous run from SetClipNear to
- * the end of the segment; seven of those functions turned out to be Psy-Q
- * library code, leaving this one wedged between `libgs/gs_123`
- * (Gssub_make_matrix, in front) and `libgs/gs_111` (GsDrawOt, behind). A
- * one-function unit is the only way to keep it as C without putting an `o`
- * segment inside a `c` one -- the same disposition class_3bb8c_v got in
- * round 27 for a function wedged between two trampoline clusters.
+ * Sony's linked objects (gs_123 Gssub_make_matrix in front, gs_111 GsDrawOt
+ * behind). gs_124 itself never placed as an object, so the function stays as
+ * C in its own unit rather than putting an `o` segment inside a `c` one.
  *
- * Deliberately includes only common.h. SetPacketBufCursor is also declared in
- * include/code_2cc8c.h for its one caller (Unk18Obj__Update, in code_2cc8c_d),
- * and that declaration -- `extern void SetPacketBufCursor(void *a0);` -- agrees
- * with the definition below; this unit does not pull the header in, so it
- * shares none and is free to staff alongside anything. Check with
- * `python3 tools/headercontention.py`.
- *
- * The body is unchanged from the one matched in src/code_2cc8c_e.c, and its
- * match report (docs/match-reports/SetPacketBufCursor.md) still applies verbatim.
+ * Deliberately includes only common.h. The one caller, Unk18Obj__Update
+ * (src/code_2cc8c_d.c), declares it locally from LIBGS.H; no shared header
+ * carries a Sony prototype (FINISHING-PLAN track 2).
  */
 #include "common.h"
 
-extern void *GsOUT_PACKET_P;
+/* LIBGS.H: typedef unsigned char PACKET; extern PACKET *GsOUT_PACKET_P; */
+extern unsigned char *GsOUT_PACKET_P;
 
-void SetPacketBufCursor(void *a0) {
-    GsOUT_PACKET_P = a0;
+/* LIBGS.H: void GsSetWorkBase(PACKET *outpacketp); */
+void GsSetWorkBase(unsigned char *outpacketp) {
+    GsOUT_PACKET_P = outpacketp;
 }

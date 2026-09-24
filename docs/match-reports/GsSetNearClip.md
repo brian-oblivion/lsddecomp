@@ -1,4 +1,8 @@
-# SetClipNear -- MATCH (4/4 words, first attempt)
+# GsSetNearClip -- MATCH (4/4 words, first attempt)
+
+> **Head, round 78: SONY CODE, re-identified under FINISHING-PLAN track 2.** This is `GsSetNearClip` (libgs/gs_101, Psy-Q 3.3/3.5/3.6), not game code. Evidence: `sdkname.py` EXACT masked 1.00 (TINY, 4 words) against libgs/gs_101; its sole store target is Sony's `GsCLIP3near` (pinned in `config/psyq-objects.ld`); position inside the run of placed libgs objects; prototype from `include/psyq/LIBGS.H`. The runner's game name `SetClipNear` in the `## Naming` section below is SUPERSEDED (a game name on Sony code is the thing track 3 forbids); the recorded mechanics are right. The function now counts as library and is outside every game queue.
+
+> Renamed from `SetClipNear` on 2026-09-24 (tools/rename.py). Address 0x8003fb0c.
 
 > Renamed from `CachePtr` on 2026-09-24 (tools/rename.py). Address 0x8003fb0c.
 
@@ -17,12 +21,12 @@
 
 Unit `code_2cc8c_e`, carved round 14.
 
-Plain global-pointer setter: `void SetClipNear(void *a0) { GsCLIP3near = a0;
+Plain global-pointer setter: `void GsSetNearClip(void *a0) { GsCLIP3near = a0;
 }`. `GsCLIP3near` is otherwise unreferenced anywhere else decompiled so far;
 declared `void *` since nothing dereferences it here.
 
 > **ROUND 78 (2026-09-24), runner charlie -- track 3 naming pass.** Renamed
-> `func_8003FB0C` -> `CachePtr` -> `SetClipNear`. The global went
+> `func_8003FB0C` -> `CachePtr` -> `GsSetNearClip`. The global went
 > `D_800902E4` -> `GsCLIP3near`, and it was NOT a free choice: `tools/rename.py`
 > refused any other spelling on the first try, because `0x800902e4` is
 > Sony's own `GsCLIP3near`, pinned in `config/psyq-objects.ld` by fourteen
@@ -41,7 +45,7 @@ declared `void *` since nothing dereferences it here.
 > near-clip-plane pointer" is not inferred from the one call site, it is
 > what Sony's own name for the write target says the write target IS.
 > `include/code_2cc8c.h`'s prototype and `src/code_2cc8c_d.c`'s one call
-> site (`SetClipNear(self->unk4C);`, inside `Unk18Obj__Update`) were updated
+> site (`GsSetNearClip(self->unk4C);`, inside `Unk18Obj__Update`) were updated
 > by `rename.py` tree-wide, automatically. No `Unk18Obj` field was touched
 > or proposed by this pass: `self->unk4C` belongs to `code_2cc8c_d.c`'s own
 > unit (PARALLEL-RUNS.md collision rule 1), and the value it holds is a
@@ -56,5 +60,5 @@ declared `void *` since nothing dereferences it here.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `SetClipNear` | A | body is exactly `GsCLIP3near = a0;`; the write target is Sony's own symbol name (`config/psyq-objects.ld`, pinned by 14 `libgs` objects), so the name states what the function does, not a guess at why. |
+| `GsSetNearClip` | A | body is exactly `GsCLIP3near = a0;`; the write target is Sony's own symbol name (`config/psyq-objects.ld`, pinned by 14 `libgs` objects), so the name states what the function does, not a guess at why. |
 | `GsCLIP3near` (global) | Sony's -- not a game name | `tools/rename.py D_800902E4 GsCLIP3near` refused any other spelling: the address is Sony's bss symbol, linked from `libgs/gs_103` through `gs_123`/`gs_127`. |

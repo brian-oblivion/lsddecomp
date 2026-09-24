@@ -819,8 +819,10 @@ void Unk18Obj__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2);
    here: they are Sony's `GsSetLightMode` (libgs/gs_108) and `SetFogNear`
    (libgte/fog_01), declared locally in src/code_2cc8c_d.c under those names
    for the same collision reason as GsSetRefView2 and GsClearOt above. */
-extern void SetClipNear(void *a0);
-extern void SetPacketBufCursor(void *a0);
+/* ROUND 78: the two setters that used to be declared here are Sony's too --
+   GsSetNearClip (libgs/gs_101) and GsSetWorkBase (libgs/gs_124) -- and are
+   now declared locally in src/code_2cc8c_d.c from LIBGS.H, like the pair
+   above. */
 
 /* ResetGraph (asm/psyq_10ee0.s, PsyQ library, LIBGPU.H's own
    declared signature is `extern int ResetGraph(int mode);` -- declared

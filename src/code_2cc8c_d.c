@@ -197,6 +197,13 @@ void func_8003ECC8(void) {
  * literal, fold() reassociates the constant to the outside of the sum and
  * the final addu/addiu pair swaps (round 71). */
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
+/* Two more, identified in round 78 (FINISHING-PLAN track 2) and moved here
+ * from include/code_2cc8c.h. Both prototypes are LIBGS.H's own; PACKET is
+ * LIBGS.H's `typedef unsigned char PACKET`.
+ *   GsSetNearClip   libgs/gs_101   was func_8003FB0C
+ *   GsSetWorkBase   libgs/gs_124   was func_8003FBE4 */
+extern void GsSetNearClip(long clip_near);
+extern void GsSetWorkBase(unsigned char *outpacketp);
 extern void *BMemPMgrAlloc(s32 size);
 
 void Unk18Obj__InitOt(Unk18Obj *self) {
@@ -315,7 +322,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
     }
 
     Unk18Obj__SetGeomScreen((Unk18Obj *)self->unk40);
-    SetClipNear(self->unk4C);
+    GsSetNearClip(self->unk4C);
     GsSetLightMode(self->lightMode);
 
     if (self->lightMode == 1 || self->lightMode == 3) {
@@ -330,7 +337,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
     self->unk98 = (u32)(self->unk50 - self->unk4C) / (u32)(1 << self->unk3C) + 1;
 
     idx = self->otIndex;
-    SetPacketBufCursor(*(s32 *)((u8 *)self + 0x88 + idx * 4));
+    GsSetWorkBase(*(unsigned char **)((u8 *)self + 0x88 + idx * 4));
 
     idx = self->otIndex;
     GsClearOt(0, 0, *(s32 *)((u8 *)self + 0x78 + idx * 4));

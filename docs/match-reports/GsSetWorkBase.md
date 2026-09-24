@@ -1,4 +1,8 @@
-# SetPacketBufCursor -- MATCH (4/4 words, first attempt)
+# GsSetWorkBase -- MATCH (4/4 words, first attempt)
+
+> **Head, round 78: SONY CODE, re-identified under FINISHING-PLAN track 2.** This is `GsSetWorkBase` (libgs/gs_124, Psy-Q 3.3/3.5/3.6), not game code. Evidence: `sdkname.py` EXACT masked 1.00 (TINY, 4 words) against libgs/gs_124; its sole store target is Sony's `GsOUT_PACKET_P` (pinned in `config/psyq-objects.ld`); position inside the run of placed libgs objects; prototype from `include/psyq/LIBGS.H`. The runner's game name `SetPacketBufCursor` in the `## Naming` section below is SUPERSEDED (a game name on Sony code is the thing track 3 forbids); the recorded mechanics are right. The function now counts as library and is outside every game queue.
+
+> Renamed from `SetPacketBufCursor` on 2026-09-24 (tools/rename.py). Address 0x8003fbe4.
 
 > Renamed from `func_8003FBE4` on 2026-09-24 (tools/rename.py). Address 0x8003fbe4.
 
@@ -16,11 +20,11 @@
 Unit `code_2cc8c_e`, carved round 14.
 
 Plain global-pointer setter, same shape as `func_8003FB0C`:
-`void SetPacketBufCursor(void *a0) { GsOUT_PACKET_P = a0; }`.
+`void GsSetWorkBase(void *a0) { GsOUT_PACKET_P = a0; }`.
 
 ## Naming
 
-**`SetPacketBufCursor`, tier A.** The whole body is the store
+**`GsSetWorkBase`, tier A.** The whole body is the store
 `GsOUT_PACKET_P = a0`, and a setter's mechanics ARE its purpose (CLAUDE.md
 naming rule: "a pure leaf whose mechanics ARE its purpose ... is tier A by
 definition"). `GsOUT_PACKET_P` is the target -- Sony's own name, recovered by
