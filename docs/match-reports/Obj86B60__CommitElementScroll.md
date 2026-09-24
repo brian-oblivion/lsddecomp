@@ -1,4 +1,6 @@
-# func_8003DAD4 -- MATCHED 118/118 (round 75): the `local[2]` pair was a WHOLE-STRUCT COPY
+# Obj86B60__CommitElementScroll -- MATCHED 118/118 (round 75): the `local[2]` pair was a WHOLE-STRUCT COPY
+
+> Renamed from `func_8003DAD4` on 2026-09-24 (tools/rename.py). Address 0x8003dad4.
 
 REVISITED, round 75: MATCHED; names/types used (the +0x10/+0x14 pair is now a local `SlotPos` struct view, `pos`)
 
@@ -50,7 +52,7 @@ distinct fresh registers, two `sw` to consecutive stack words, then an
 immediate reload of one of those stack words.** That is a struct copy, not
 two scalar assignments plus a barrier.
 
-The same lever transfers to the sibling `func_8003D73C` (see its report).
+The same lever transfers to the sibling `Obj86B60__RefreshSlotView` (see its report).
 
 ### Proposed learning
 
@@ -65,11 +67,11 @@ allocator was blamed for. The shared header still spells `Unk24Elem`'s
 +0x10/+0x14 as two scalars; retyping them as one struct member is a header
 change for the head (only `code_2cc8c_b.c` references `Unk24Elem`).
 
-## Earlier title: func_8003DAD4 -- STALL: length EXACT (118/118 words, no drift); 114/118 raw word-match; first real diff at in-range word 11 (file 0x2E304 / vram 0x8003DB04), the `bne $v1, $v0` delay slot
+## Earlier title: Obj86B60__CommitElementScroll -- STALL: length EXACT (118/118 words, no drift); 114/118 raw word-match; first real diff at in-range word 11 (file 0x2E304 / vram 0x8003DB04), the `bne $v1, $v0` delay slot
 
-## ROUND 49 (runner delta): confirmed negative -- the named-temp+barrier lever that closed a scheduling swap in the sibling `func_8003D73C` does NOT transfer here
+## ROUND 49 (runner delta): confirmed negative -- the named-temp+barrier lever that closed a scheduling swap in the sibling `Obj86B60__RefreshSlotView` does NOT transfer here
 
-`func_8003D73C` (same unit, same `Unk24Elem` struct, textually IDENTICAL
+`Obj86B60__RefreshSlotView` (same unit, same `Unk24Elem` struct, textually IDENTICAL
 `local[1] -= counter * 10;` line) had a `sll`/`lw` scheduling swap
 (product-vs-reload instruction order) that survived 5 hand attempts and
 a 27k-iteration permuter search until this round found that naming the
@@ -101,7 +103,7 @@ differs** -- confirmed per-function, not assumed per-idiom.
 
 ### Proposed learning (round 49)
 
-Companion negative to `func_8003D73C.md`'s round-49 positive: the same
+Companion negative to `Obj86B60__RefreshSlotView.md`'s round-49 positive: the same
 two functions, the same struct, the same literal C statement, and the
 lever helps one and badly hurts the other. The discriminator is not
 visible in the SOURCE (both start from identical text) -- it is in
@@ -312,11 +314,11 @@ via `tools/asm-differ` at the same two spots this report already names:
    than "one delay slot over," and the same mechanism this round's other
    reports name precisely (a scheduler filling an available slot with
    independent, already-computable work): `func_8003FCFC.md`,
-   `func_8003F848.md`, and this unit's own `func_8003D73C.md` (companion
+   `func_8003F848.md`, and this unit's own `Obj86B60__RefreshSlotView.md` (companion
    function, same round).
 2. `target->unk14`'s temp lands in `$v0` here vs `$a1` in retail --
    IDENTICAL residue and IDENTICAL surrounding code shape to
-   `func_8003D73C`'s own residue 2 (same `Unk24Elem` struct, same
+   `Obj86B60__RefreshSlotView`'s own residue 2 (same `Unk24Elem` struct, same
    `unk10`/`unk14` field pair, same local-buffer-build idiom). Confirmed
    side-by-side this round rather than assumed from the two reports'
    separate descriptions.
@@ -368,17 +370,17 @@ reach for.
 
 **This function's residue 1 (hoist DISTANCE, not just delay-slot choice)
 is a variant worth distinguishing from residue 2 (register CHOICE) and
-from `func_8003D73C`'s residue 1 (instruction ORDER swap that opens/
+from `Obj86B60__RefreshSlotView`'s residue 1 (instruction ORDER swap that opens/
 closes an available slot)** -- three related-looking but mechanically
 distinct sub-classes now confirmed within this one unit's `Unk24Elem`-
 touching family:
 - a wrong-slot hoist that travels ACROSS multiple branches (this
   function, residue 1),
 - a swap between two adjacent, commutative-order instructions that
-  changes which slot even EXISTS to be filled (`func_8003D73C`,
+  changes which slot even EXISTS to be filled (`Obj86B60__RefreshSlotView`,
   residue 1),
 - a same-instruction, different-register temp choice with no
-  scheduling component at all (`func_8003D73C` residue 2 and this
+  scheduling component at all (`Obj86B60__RefreshSlotView` residue 2 and this
   function's residue 2 -- confirmed identical this round).
 
 Restored to `INCLUDE_ASM`. Full oracle re-confirmed green
@@ -434,7 +436,7 @@ per `Obj86B60Methods`).
 ## What it does
 
 Gated on `self->unk3C == 2` (a twin of the already-matched
-`func_8003DCAC`, which is gated on the same value and undoes this
+`Obj86B60__CancelElementScroll`, which is gated on the same value and undoes this
 function's `unk3C = 1` at the end — the two form a state-machine pair).
 Builds a 2-word local buffer from a target-descriptor record
 (`self->unk4C->unk24[idx]`, typed here as the new `Unk24Elem`), walks the
@@ -442,20 +444,20 @@ current slot's element array calling two per-element slots with that
 buffer, then re-derives the "current" element by `counter` (the target
 record's own stashed index) and finishes by writing `counter` back into
 the target record's `unk4` field — which is exactly the field
-`func_8003DCAC` reads back out as `newVal`, confirming the two share this
+`Obj86B60__CancelElementScroll` reads back out as `newVal`, confirming the two share this
 record shape.
 
 ## New struct knowledge (all confirmed, not part of the stall)
 
 - New type `Unk24Elem` — the pointee of `self->unk4C->unk24[idx]`:
-  `+0x004 s32 unk4` (the counter slot `func_8003DCAC` reads as `newVal`,
+  `+0x004 s32 unk4` (the counter slot `Obj86B60__CancelElementScroll` reads as `newVal`,
   written here), `+0x010 s32 unk10`, `+0x014 s32 unk14` (combined with a
   per-slot counter into the 2-word local buffer passed to `slotBC`).
 - New `Unk64ElemMethods` slot `+0x0BC slotBC(self, void *buf)`.
 - `self->unk68->methods->slot50(self)` — new `Unk68ObjMethods` slot
   `+0x050` (no args beyond self).
 
-All of this is corroborated independently by `func_8003D73C` (the other
+All of this is corroborated independently by `Obj86B60__RefreshSlotView` (the other
 stall this round, which touches the SAME `Unk24Elem`/`slotBC`/`unk68.slot50`
 surface) and is safe to keep in `include/code_2cc8c.h` regardless of this
 function's own stall status.
@@ -500,29 +502,29 @@ function's logic (confirmed: every OTHER instruction in the function,
 including all four call sites, both loops, and the final field write,
 matches byte-for-byte).
 
-### Head note (round 12) — this stall is NOT the same class as `func_8003D73C`
+### Head note (round 12) — this stall is NOT the same class as `Obj86B60__RefreshSlotView`
 
 Accepted as written; the classification above is correct for THIS function.
 Flagging only because the companion report filed the same round
-(`func_8003D73C.md`) described itself as "the same whole-function s-register
-renumbering shift documented in `func_8003DAD4`'s report". It is not, and this
+(`Obj86B60__RefreshSlotView.md`) described itself as "the same whole-function s-register
+renumbering shift documented in `Obj86B60__CommitElementScroll`'s report". It is not, and this
 report never claimed such a shift:
 
 - Retail here saves **6** callee-saved registers (`$s0..$s5`), leaving two
   s-registers and `$fp` spare — no pressure, and the 114/118 residue is purely
   scheduling and one temp choice.
-- Retail in `func_8003D73C` saves **8** (`$s0..$s7`), saturating the file, and
+- Retail in `Obj86B60__RefreshSlotView` saves **8** (`$s0..$s7`), saturating the file, and
   that body's 40/145 comes from needing a 9th live cross-call value and
   spilling into `$fp`.
 
 ```sh
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/func_8003DAD4.s | sort -u | wc -l   # 6
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/func_8003D73C.s | sort -u | wc -l   # 8
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/Obj86B60__CommitElementScroll.s | sort -u | wc -l   # 6
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/Obj86B60__RefreshSlotView.s | sort -u | wc -l   # 8
 ```
 
 Do not carry this function's fixes to that one expecting them to transfer —
 the companion report observed that they did not, and the register census above
-is why. See the reclassification in `func_8003D73C.md`.
+is why. See the reclassification in `Obj86B60__RefreshSlotView.md`.
 
 ## What DID work, for the next attempt
 
@@ -576,7 +578,7 @@ order:
 ## Preserved near-miss body
 
 ```c
-void func_8003DAD4(Obj86B60 *self)
+void Obj86B60__CommitElementScroll(Obj86B60 *self)
 {
     s32 idx;
     s32 counter;
@@ -641,7 +643,7 @@ with `slot60`/`slotBC`/`slotB8`, `Unk68ObjMethods` with `slot50`,
 
 A CACHED single-load-reused-across-two-calls pattern and a
 DOUBLE-RELOAD-per-call pattern are BOTH real, observed shapes in this
-codebase (see `func_8003D194`'s report for the tail-merge angle) — which
+codebase (see `Obj86B60__UpdateSlotElements`'s report for the tail-merge angle) — which
 one retail used is NOT guessable from the C alone; it shows up ONLY as a
 register-count difference in the diff (one extra callee-saved register
 needed = the value is being kept alive across a call it doesn't need to
@@ -651,3 +653,7 @@ otherwise correct, look for exactly this: a local variable whose value is
 consumed by TWO OR MORE calls where retail re-derives it via a second
 cheap memory read instead of holding it in a register across the first
 call.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__CommitElementScroll`. **Tier B**: Gated on `self->unk3C == 2` (state 2 -> 1, the counterpart of Obj86B60__BeginElementScroll). Repositions every item, highlights the one at the slot's current ring cursor (`slotCounts[idx]`), and writes that cursor value into `SlotEntry::savedCursor` -- persisting the value the interactive scroll landed on. 'Commit' is the mechanics: the currently-scrolled-to position becomes the new persisted one.

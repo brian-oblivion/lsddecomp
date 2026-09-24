@@ -1,4 +1,6 @@
-# func_8003D4DC — MATCHED (57/57)
+# Obj86B60__SetActiveSlot — MATCHED (57/57)
+
+> Renamed from `func_8003D4DC` on 2026-09-24 (tools/rename.py). Address 0x8003d4dc.
 
 **Unit:** code_2cc8c_b · **Size:** 57 words · **Result:** byte-exact
 
@@ -13,7 +15,7 @@ notification (`slot70`) if `a2` is non-null, and always fires a final
 `slot60(self, 9)`.
 
 ```c
-void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
+void Obj86B60__SetActiveSlot(Obj86B60 *self, s32 a1, void *a2)
 {
     s32 idx;
     Unk64Elem *elemB;
@@ -82,3 +84,7 @@ suspect is "inside an if" is actually sitting in a delay slot before
 concluding the C guard is right. A barrier will not fix this class (tried
 here, made the function longer); only widening the assignment's scope
 does.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__SetActiveSlot`. **Tier B**: Switches `self->activeSlot` to `a1`: un-highlights the old slot's representative element, highlights the new one (both via `slotElements[idx]->methods->slotB8`), then notifies (`slot70`) and fires a closing `slot60(self, 9)`. Same old/new-highlight-swap shape as Obj86B60__SetSlotCursor one level down (items within a slot instead of slots/tabs themselves) -- cross-confirms the pairing. Mechanics (switch the active slot, with a visible highlight swap) are clear; kept tier B since it has real side effects beyond a plain setter.

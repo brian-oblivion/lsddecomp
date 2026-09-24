@@ -51,9 +51,9 @@ only the header's declared types.
 - `Get_vtable_IntermediateBase()->slot08(self)`: new `TaskUtilMethods` slot `+0x008`
   (`gIntermediateBaseMethods+0x008 = IntermediateBase__IntermediateBase`, extern, void, discarded return).
 - `Get_vtable_TaskCore()->slotD8(self, a1)`: new `TaskCoreMethods` slot `+0x0D8`
-  (`gTaskCoreMethods+0x0D8 = func_8003CE98`, extern, void).
+  (`gTaskCoreMethods+0x0D8 = Obj86B60__SetTarget`, extern, void).
 - `self->methods->slotD4(self, 0, 0)`: new `StreamTaskObjMethods` slot
-  `+0x0D4` (`gStreamTaskObjMethods+0x0D4 = func_8003CDE0`, extern, void).
+  `+0x0D4` (`gStreamTaskObjMethods+0x0D4 = Obj86B60__SetSubHandle`, extern, void).
 - New fields: `unk44` (`+0x044`, `s32`, set from `a2`), `unk48` (`+0x048`,
   originally guessed `s32`, either a call result or `a3` verbatim), `unk7C`
   (`+0x07C`, originally guessed `s32`, call result), `unk80` (`+0x080`,

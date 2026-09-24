@@ -304,7 +304,7 @@ register**: retail's frame is `-0x98` and saves NINE registers (`$s0`-`$s7`
 PLUS `$fp` — confirmed by
 `grep -oE 'sw +\$s[0-9]|sw +\$fp' asm/nonmatchings/class_3bb8c_b/Class866E8__ComputeFootprintFromRotation.s | sort -u | wc -l`
 → 9, one past the "8 means no spare register" saturation point CLAUDE.md's
-`func_8003D73C` lesson describes). Every C shape tried compiles to a
+`Obj86B60__RefreshSlotView` lesson describes). Every C shape tried compiles to a
 `-0x90` frame using only `$s0`-`$s7` (8 registers, no `$fp` spill) — one
 whole register short, the SAME symptom `Class866E8__SplitFootprintSlot`'s own report
 documents in this same header/unit ("retail's frame... saves EIGHT

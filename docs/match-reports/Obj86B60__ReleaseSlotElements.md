@@ -1,4 +1,6 @@
-# func_8003D6D4 — MATCHED (26/26)
+# Obj86B60__ReleaseSlotElements — MATCHED (26/26)
+
+> Renamed from `func_8003D6D4` on 2026-09-24 (tools/rename.py). Address 0x8003d6d4.
 
 **Unit:** code_2cc8c_b · **Size:** 26 words · **Result:** byte-exact, first attempt
 
@@ -9,7 +11,7 @@ two parallel arrays, and passes them to a pair of already-matched (in other
 units) helper functions.
 
 ```c
-void func_8003D6D4(Obj86B60 *self)
+void Obj86B60__ReleaseSlotElements(Obj86B60 *self)
 {
     ReleaseBasicClassArray(self->unk64[self->unk58], self->unk5C[self->unk58]);
     BMemPMgrFree(self->unk64[self->unk58]);
@@ -36,3 +38,7 @@ void func_8003D6D4(Obj86B60 *self)
 
 No residue — matched first attempt from a direct reading of the
 disassembly, no m2c seed needed.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__ReleaseSlotElements`. **Tier B**: Releases and frees `self->itemLists[activeSlot]` through two already-matched helpers -- the exact teardown counterpart of Obj86B60__CreateSlotElements.

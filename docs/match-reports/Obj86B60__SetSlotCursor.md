@@ -1,4 +1,6 @@
-# func_8003DE9C — MATCHED (65/65)
+# Obj86B60__SetSlotCursor — MATCHED (65/65)
+
+> Renamed from `func_8003DE9C` on 2026-09-24 (tools/rename.py). Address 0x8003de9c.
 
 **Unit:** code_2cc8c_b · **Size:** 65 words · **Result:** byte-exact, first attempt
 
@@ -11,10 +13,10 @@ outer array, indexed by both the current ring counter
 `slotB8`, each with a different fixed buffer derived from `self->unk4C`.
 Then installs `a1` as the new ring counter, optionally notifies via
 `slot70`, and always fires `slot60(self, 9)` — the same closing shape as
-`func_8003DA10` and `func_8003D4DC`.
+`Obj86B60__BeginElementScroll` and `Obj86B60__SetActiveSlot`.
 
 ```c
-void func_8003DE9C(Obj86B60 *self, s32 a1, void *a2)
+void Obj86B60__SetSlotCursor(Obj86B60 *self, s32 a1, void *a2)
 {
     s32 idx;
     s32 counter;
@@ -49,18 +51,18 @@ None — matched on the first attempt. Two things from this unit's prior
 reports were applied directly rather than re-derived:
 
 - `self->unk60[idx] = a1;` written UNCONDITIONALLY, before the
-  `if (a2 != NULL)` — reusing `func_8003D4DC`'s finding that a store which
+  `if (a2 != NULL)` — reusing `Obj86B60__SetActiveSlot`'s finding that a store which
   only looks relevant inside a following `if` can still belong outside it
   if retail's delay slot shows it executing unconditionally (confirmed
   here too: the store sits in the `beqz`'s delay slot).
 - `(u8 *)self->unk4C->unk24[idx] + 8` for the second buffer, reusing
-  `func_8003DA10`'s exact derivation for the identical expression.
+  `Obj86B60__BeginElementScroll`'s exact derivation for the identical expression.
 
 ## Field-read-order note (per head's request)
 
 **This function does NOT follow the `unk58 -> unk64 -> unk5C/unk60` order
-established by `func_8003D6D4`/`func_8003DDC8`/`func_8003DE30`/
-`func_8003D980`/`func_8003DA10`.** Retail's own base-pointer reads here go
+established by `Obj86B60__ReleaseSlotElements`/`Obj86B60__AdvanceSlotCursor`/`Obj86B60__RetreatSlotCursor`/
+`Obj86B60__BroadcastToSlotElements`/`Obj86B60__BeginElementScroll`.** Retail's own base-pointer reads here go
 `unk58, unk60, unk64, unk4C` — `unk60` BEFORE `unk64`, the reverse of every
 prior instance. Writing the C in that reversed order (`counter =
 self->unk60[idx];` before `arr = self->unk64[idx];`) matched immediately
@@ -73,3 +75,7 @@ real use is the ring counter, whereas the four earlier functions all use
 observed total: five follow `unk64` before `unk60`/`unk5C`, this one
 reverses it. Read the disassembly's own base-pointer load order per
 function rather than assuming the majority order.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__SetSlotCursor`. **Tier B**: Un-highlights the item at the OLD cursor (`slotCounts[idx]`), highlights the item at the NEW one (`a1`), installs `a1` as the new `slotCounts[idx]`, optionally notifies, fires a closing `slot60(self, 9)`. Identical shape to Obj86B60__SetActiveSlot one level up (tabs instead of items) -- confirmed as the target of Obj86B60Methods::slot11C (classtable.py), which is exactly what Obj86B60__AdvanceSlotCursor/Obj86B60__RetreatSlotCursor call through.

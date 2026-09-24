@@ -1,4 +1,6 @@
-# func_8003DDC8 — MATCHED (26/26)
+# Obj86B60__AdvanceSlotCursor — MATCHED (26/26)
+
+> Renamed from `func_8003DDC8` on 2026-09-24 (tools/rename.py). Address 0x8003ddc8.
 
 **Unit:** code_2cc8c_b · **Size:** 26 words · **Result:** byte-exact
 
@@ -11,7 +13,7 @@ capacity (`self->unk5C[idx]`), and reports the new index through a call
 that this function itself calls THROUGH a different slot, `+0x11C`.
 
 ```c
-void func_8003DDC8(Obj86B60 *self)
+void Obj86B60__AdvanceSlotCursor(Obj86B60 *self)
 {
     s32 idx = self->unk58;
     s32 v = self->unk60[idx];
@@ -65,4 +67,8 @@ the load site instead of only at the final copy. Caching an UNRELATED
 value used earlier in the same expression, tried as a parallel lever, made
 the residue worse rather than better — the two moves are not
 interchangeable even though both look like "help the compiler with an
-explicit local". (`func_8003DDC8`, `func_8003DE30`, same fix both times)
+explicit local". (`Obj86B60__AdvanceSlotCursor`, `Obj86B60__RetreatSlotCursor`, same fix both times)
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__AdvanceSlotCursor`. **Tier B**: Advances `slotCounts[activeSlot]` by one, wrapping at `itemCounts[activeSlot]`, and forwards the new value through `slot11C` (== Obj86B60__SetSlotCursor, confirmed by classtable.py). Kept tier B rather than A since it dispatches into a second function with its own further side effects, not a self-contained leaf.

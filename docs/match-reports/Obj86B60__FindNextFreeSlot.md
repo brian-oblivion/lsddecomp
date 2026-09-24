@@ -1,11 +1,13 @@
-# func_8003D3B0 — MATCHED (37/37)
+# Obj86B60__FindNextFreeSlot — MATCHED (37/37)
+
+> Renamed from `func_8003D3B0` on 2026-09-24 (tools/rename.py). Address 0x8003d3b0.
 
 **Unit:** code_2cc8c_b · **Size:** 37 words · **Result:** byte-exact
 
 ## What it does
 
 `Obj86B60Methods::slotE8` (already recorded in `code_2cc8c.h` as
-`func_8003D3B0`). Finds the next free (null) slot in
+`Obj86B60__FindNextFreeSlot`). Finds the next free (null) slot in
 `self->unk4C->unk18[]`, starting just after the current index
 `self->unk58` and wrapping at the capacity `self->unk50`, stopping either
 when an empty slot is found or when the search has wrapped all the way
@@ -14,7 +16,7 @@ whole function is a no-op. The found (or fallback) index is reported
 through `self->methods->slotF0`.
 
 ```c
-void func_8003D3B0(Obj86B60 *self)
+void Obj86B60__FindNextFreeSlot(Obj86B60 *self)
 {
     s32 i;
 
@@ -63,7 +65,7 @@ Four attempts before the match, in order:
    defect, not a simple value residue.
 2. **Dropped the cached `start`, re-read `self->unk58` directly** for the
    equality test (matching this unit's established pattern of not trusting
-   CSE across a branch — see `func_8003D980`'s report for the same class
+   CSE across a branch — see `Obj86B60__BroadcastToSlotElements`'s report for the same class
    of fix applied to a different pair of fields): fixed a register-identity
    residue on the initial load, but the function was still one word short.
 3. **`while`-loop rewrite** (wrap-check duplicated once before the loop and
@@ -110,5 +112,9 @@ that decides the branch (a post-increment inside an array index or a
 pointer dereference) instead of writing it as a following statement --
 this ties the increment to that specific branch's delay slot and makes it
 ineligible for cross-jump merging with an unrelated priming increment
-elsewhere in the function. (`func_8003D3B0`, 30/37 -> 37/37 across four
+elsewhere in the function. (`Obj86B60__FindNextFreeSlot`, 30/37 -> 37/37 across four
 attempts)
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__FindNextFreeSlot`. **Tier A**: A pure search: scans `unk4C->unk18[]` forward from `activeSlot`, wrapping at `slotCount`, for the next NULL (free) entry, reporting the index found. A find/search leaf, tier A by the 'mechanics are the purpose' rule for a clamp/search leaf.

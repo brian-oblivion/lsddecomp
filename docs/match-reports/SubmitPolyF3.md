@@ -1200,7 +1200,7 @@ barrier's own precondition before the experiment is even worth an attempt:
 - The mask-constant register (`$a2` vs `$a1`) is, by definition and by round
   20's own discriminator, a register CHOICE, not a placement of an existing
   statement. Round 20 measured this exact shape of lever regressing sharply
-  (`func_8003DAD4`, 114/118 → 23/118) when applied to a register-choice
+  (`Obj86B60__CommitElementScroll`, 114/118 → 23/118) when applied to a register-choice
   residue elsewhere in the project. Applying it here would be repeating an
   already-falsified experiment shape on a new function, not a new test.
 - The delay-slot filler is not a MISORDERED instruction, it is an ABSENT one —

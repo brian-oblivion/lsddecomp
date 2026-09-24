@@ -1,0 +1,90 @@
+# Obj86B60__BeginElementScroll — MATCHED (49/49)
+
+> Renamed from `func_8003DA10` on 2026-09-24 (tools/rename.py). Address 0x8003da10.
+
+**Unit:** code_2cc8c_b · **Size:** 49 words · **Result:** byte-exact, first attempt
+
+## What it does
+
+`Obj86B60Methods::slot108` (already recorded in `code_2cc8c.h`). Only acts
+when `self->unk3C == 1`: notifies a new slot (`slot100`), looks up an
+element from a computed doubly-indexed pointer array, hands it an 8-byte-
+offset buffer pointer through its own `+0x0B8` slot, then advances
+`self->unk3C` to state `2` and fires a fixed notification (`slot60(self,
+14)`).
+
+```c
+void Obj86B60__BeginElementScroll(Obj86B60 *self)
+{
+    s32 idx;
+    Unk64Elem *elem;
+    u8 *buf;
+
+    if (self->unk3C != 1) {
+        return;
+    }
+    idx = self->unk58;
+    self->methods->slot100(self, self->unk14, 1);
+    elem = ((Unk64Elem **)self->unk64[idx])[self->unk60[idx]];
+    buf = (u8 *)self->unk4C->unk24[idx] + 8;
+    elem->methods->slotB8(elem, buf);
+    self->unk3C = 2;
+    self->methods->slot60(self, 14);
+}
+```
+
+## Header additions
+
+`include/code_2cc8c.h`:
+
+- New field `unk14` on `Obj86B60` (`s32`, carved from existing padding
+  `0x004`-`0x01C`) — forwarded as an opaque word to `slot100`, never
+  dereferenced by this unit.
+- New slot `slot100` on `Obj86B60Methods`
+  (`void (*)(Obj86B60 *, s32, s32)`), carved from existing padding
+  `0xF4`-`0x108`.
+
+No existing declaration's type or offset changed.
+
+## Field-read-order check (per head's request)
+
+`idx` was read from `self->unk58` explicitly BEFORE the `slot100` call in
+the C, matching retail's own instruction order (`self->unk58` is loaded
+into a callee-saved register ahead of the call, even though the value is
+only consumed afterward — consistent with the source itself reading it
+early rather than the compiler hoisting it). After the call, `self->unk64`
+and `self->unk60` are read in that order (matching this unit's established
+`unk58 -> unk64 -> unk5C/unk60` pattern noted in `Obj86B60__BroadcastToSlotElements`'s and
+`Obj86B60__AdvanceSlotCursor`'s reports) — **fifth and sixth confirmed instances**,
+counting `Obj86B60__ReleaseSlotElements`, `Obj86B60__AdvanceSlotCursor`, `Obj86B60__RetreatSlotCursor`, `Obj86B60__BroadcastToSlotElements`.
+No violation found here.
+
+## Residue
+
+None — matched on the first attempt. The `self->unk4C->unk24[idx] + 8`
+pointer arithmetic was cast to `u8 *` locally at the point of use rather
+than retyping the shared field `Unk4CObj::unk24` (still `void **`, used
+elsewhere in the sibling unit `code_2cc8c.c`'s already-matched
+`func_8003CA1C` as a pure null-check) — avoids a shared-header type change
+for a computation this unit alone needs.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__BeginElementScroll`. **Tier B**: Gated on `self->unk3C == 1`. Notifies the target (`slot100`), highlights the item at the slot's PERSISTED cursor (`slotCounts[idx]`, the same field Obj86B60__AdvanceSlotCursor/RetreatSlotCursor step), advances `unk3C` to 2, fires a closing notification. Opens interactive scrolling of the current slot's item list -- state 1 -> 2. Paired with Obj86B60__CommitElementScroll/Obj86B60__CancelElementScroll, both gated on state 2 and both returning to state 1; the data flow (DA10 highlights `slotCounts[idx]`, DAD4 later WRITES that same value into `SlotEntry::savedCursor`, DCAC READS `savedCursor` back out) is what grounds 'scroll session that a later step commits or cancels' rather than a guess.
+
+## Proposed field names
+
+Not renamed here -- `self->unk3C` is CROSS-UNIT (`code_2cc8c.c`'s
+`func_8003C858`/`func_8003C8D0`/`func_8003C944`/`func_8003C9B0` all gate on
+it too, plus the STALL `func_8003C48C`/`func_8003C63C`), not attempted as a
+compiler-verified rename this round. Proposing for the head to apply at
+merge:
+
+- `Obj86B60::unk3C` -> `scrollState` (tier B). In this unit it is exactly
+  the 1<->2 state this function/`Obj86B60__CommitElementScroll`/
+  `Obj86B60__CancelElementScroll` open and close (BeginElementScroll:
+  1->2; the other two: 2->1). Whether the sibling unit's own
+  `func_8003C858` etc. use the same two values for the same meaning, or a
+  wider range of states unrelated to scrolling, is NOT established from
+  this unit alone -- the head or whoever names that unit should confirm
+  `unk3C`'s full value range before applying this name tree-wide.

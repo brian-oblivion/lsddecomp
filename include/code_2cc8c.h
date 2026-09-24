@@ -137,76 +137,89 @@ struct EventArg {
  *    the same slot func_8003CC2C feeds a locally-built 3-byte buffer to).
  */
 struct Unk4CObj {
-    const char *unk0;   /* +0x000, OBSERVED: func_8003CE98 (round 12) -- a
-                            path: passed to func_8003B39C(unk0) when
-                            non-NULL to build unk4, mirroring
+    const char *path;   /* +0x000, renamed from unk0, round 78 -- exclusive
+                            to code_2cc8c_b, verified (every accessor is in
+                            this unit). OBSERVED: Obj86B60__SetTarget (round 12) -- a
+                            path: passed to func_8003B39C(path) when
+                            non-NULL to build handle, mirroring
                             Obj86B60->unk70's own path-cache idiom. ALSO
-                            OBSERVED (truthy-only) by func_8003D050, which
-                            gates a call through unk4 on this being
+                            OBSERVED (truthy-only) by Obj86B60__ReleaseTarget, which
+                            gates a call through handle on this being
                             non-NULL -- corrects this struct's earlier
                             header note that nothing ever loads *(unk4C+0);
                             that was true only of the 16 functions attempted
                             through round 11. */
-    Unk74Obj *unk4;      /* +0x004, OBSERVED: func_8003CE98 (constructed via
-                            func_8003B39C(unk0) + slot78/slot5C when unk0 is
+    Unk74Obj *handle;    /* +0x004, renamed from unk4, round 78 -- exclusive
+                            to code_2cc8c_b, verified. OBSERVED: Obj86B60__SetTarget (constructed via
+                            func_8003B39C(path) + slot78/slot5C when path is
                             set, else read as an existing handle and written
                             back unchanged; same Unk74Obj slot4 interface
-                            Obj86B60->unk74 uses) and func_8003D050 (slot4
-                            called on it, gated by unk0's truthiness) */
+                            Obj86B60->unk74 uses) and Obj86B60__ReleaseTarget (slot4
+                            called on it, gated by path's truthiness) */
     s32 unk8;           /* +0x008, OBSERVED: func_8003C63C (not attempted) */
     s32 unkC;            /* +0x00C, OBSERVED: func_8003CA1C */
     u8 unk10[3];          /* +0x010, INFERRED 3-byte colour buffer read by
                               address only (func_8003C63C, not attempted);
                               CONFIRMED as a 3-byte buffer read (not just
-                              address-taken) by func_8003DCAC/func_8003DE9C,
+                              address-taken) by Obj86B60__CancelElementScroll/Obj86B60__SetSlotCursor,
                               both already matched, passing it directly to
                               an Unk64Elem slotB8 call */
     u8 pad13[0x018 - 0x013];
-    void **unk18;          /* +0x018, OBSERVED: func_8003D3B0, an array of
+    void **registrationSlots; /* +0x018, renamed from unk18, round 78 --
+                               exclusive to code_2cc8c_b, verified. OBSERVED:
+                               Obj86B60__FindNextFreeSlot, an array of
                                pointers indexed by an Obj86B60 index and
                                null-checked (never dereferenced) -- a
                                registration slot table, one entry per index
-                               tracked by Obj86B60->unk58/unk50 */
-    char **unk1C;           /* +0x01C, OBSERVED: func_8003CE98 (round 12) --
+                               tracked by Obj86B60->activeSlot/slotCount */
+    char **names;            /* +0x01C, renamed from unk1C, round 78 --
+                                exclusive to code_2cc8c_b, verified. OBSERVED:
+                                Obj86B60__SetTarget (round 12) --
                                 a NULL-terminated array of C strings, DISTINCT
-                                from unk18 at +0x018 (adjacent field, same
-                                shape, different slot). Walked with
+                                from registrationSlots at +0x018 (adjacent
+                                field, same shape, different slot). Walked with
                                 `strlen` and passed to
                                 `New_Obj6EAC0` to build each entry of
-                                Obj86B60->unk54[i]/unk64[i]. */
-    u8 *unk20;               /* +0x020, OBSERVED: func_8003D194 (round 12) --
+                                Obj86B60->slotElements[i]/itemLists[i]. */
+    u8 *externalRecords;     /* +0x020, renamed from unk20, round 78 --
+                                exclusive to code_2cc8c_b, verified. OBSERVED:
+                                Obj86B60__UpdateSlotElements (round 12) --
                                 a pointer walked forward 8 bytes per loop
                                 iteration (an external array of 8-byte
                                 records this unit never reads through
-                                directly, only forwards as func_8003D194's
+                                directly, only forwards as Obj86B60__UpdateSlotElements's
                                 3rd arg to an Unk64Elem slot4C call) */
     void **unk24;         /* +0x024, OBSERVED: func_8003CA1C, word-pointer
                               array indexed by self->unk58 */
 };
 
 /*
- * The pointee of Unk4CObj->unk24[idx] (round 12, from func_8003DAD4 and
- * func_8003D73C, cross-checked against already-matched func_8003DCAC's own
+ * The pointee of Unk4CObj->unk24[idx] (round 12, from Obj86B60__CommitElementScroll and
+ * Obj86B60__RefreshSlotView, cross-checked against already-matched Obj86B60__CancelElementScroll's own
  * `((s32 *)self->unk4C->unk24[idx])[1]` read at the same +0x004 offset).
  * Only the three offsets these functions actually touch are modelled;
- * func_8003DCAC/func_8003DE9C's own `(u8 *)...unk24[idx] + 8` buffer usage
+ * Obj86B60__CancelElementScroll/Obj86B60__SetSlotCursor's own `(u8 *)...unk24[idx] + 8` buffer usage
  * is left as a raw cast in those (already-matched) functions rather than
  * retrofitted onto this type, per this project's convention of not
  * editing matched functions to adopt a later, more specific type.
  */
-typedef struct Unk24Elem Unk24Elem;
-struct Unk24Elem {
+/* Renamed from Unk24Elem, round 78 -- tier B, exclusive to this unit (only
+ * code_2cc8c_b.c casts to this type; see this struct's own comment above
+ * for the cross-unit `target->unk24[idx]` reads that stay untyped). */
+typedef struct SlotEntry SlotEntry;
+struct SlotEntry {
     u8 pad000[0x004];
-    s32 unk4;    /* +0x004, a per-slot counter/index: SET here by
-                    func_8003DAD4, READ back as `newVal` by the
-                    already-matched func_8003DCAC */
+    s32 savedCursor; /* +0x004, renamed from unk4, round 78 -- the
+                    slot's own persisted ring-cursor value: SET here by
+                    Obj86B60__CommitElementScroll, READ back as `newVal` by the
+                    already-matched Obj86B60__CancelElementScroll */
     u8 pad008[0x010 - 0x008];
     s32 unk10;   /* +0x010 */
     s32 unk14;   /* +0x014, combined with unk10 and a per-slot counter into
                     a 2-word stack buffer (`{unk10, unk14 - counter*10}`)
                     passed by address to an Unk64Elem slotBC call, then
                     incremented by 10 per loop iteration -- see
-                    func_8003DAD4/func_8003D73C */
+                    Obj86B60__CommitElementScroll/Obj86B60__RefreshSlotView */
 };
 
 /* self->unk48's pointee ("child"). A DIFFERENT class from Obj86B60 -- its
@@ -232,7 +245,7 @@ struct Unk78Obj {
     Unk78ObjMethods *methods; /* +0x000 */
 };
 
-/* self->unk74's pointee ("sub-resource handle"). Only func_8003CDE0 touches
+/* self->unk74's pointee ("sub-resource handle"). Only Obj86B60__SetSubHandle touches
  * it, loaded via `func_8003B39C(path)` (already matched, `class_39e08.c`,
  * where it returns the unit's own local view `SubObjG *` -- this unit keeps
  * its own local view of the same table per the project's established
@@ -284,11 +297,11 @@ extern void *BMemPMgrFree(void *ptr);  /* matching free/release. Its own
                                             build reconfirmed green. */
 extern void ReleaseBasicClassArray(void *a0, void *a1); /* not yet seen elsewhere in
                                                     this project; typed from
-                                                    func_8003D6D4's own call
+                                                    Obj86B60__ReleaseSlotElements's own call
                                                     site only */
 
 /*
- * func_8003D5CC's 2nd parameter -- an unrelated "source list" descriptor,
+ * Obj86B60__CreateSlotElements's 2nd parameter -- an unrelated "source list" descriptor,
  * NOT an Obj86B60 or any class in this unit's own hierarchy (no method
  * table dereference anywhere in that function). Only the two fields it
  * touches are modelled.
@@ -307,17 +320,17 @@ extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
                                         own object; local view here */
 extern Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name); /* not
                                         yet seen elsewhere; typed from
-                                        func_8003D5CC's own call site --
+                                        Obj86B60__CreateSlotElements's own call site --
                                         its return value is stored directly
                                         into the same self->unk64[idx]
-                                        array func_8003D980/func_8003D2CC/
-                                        func_8003DA10/func_8003DE9C walk as
+                                        array Obj86B60__BroadcastToSlotElements/Obj86B60__BroadcastToSlots/
+                                        Obj86B60__BeginElementScroll/Obj86B60__SetSlotCursor walk as
                                         Unk64Elem * */
 
 /*
- * self->unk64[idx]'s pointee, as walked by func_8003D980 -- a DIFFERENT
- * reading of the same field func_8003D6D4/func_8003DDC8/func_8003DE30 use
- * as an opaque resource handle. func_8003D980 reinterprets that handle as
+ * self->unk64[idx]'s pointee, as walked by Obj86B60__BroadcastToSlotElements -- a DIFFERENT
+ * reading of the same field Obj86B60__ReleaseSlotElements/Obj86B60__AdvanceSlotCursor/Obj86B60__RetreatSlotCursor use
+ * as an opaque resource handle. Obj86B60__BroadcastToSlotElements reinterprets that handle as
  * `Unk64Elem **` (an array of `self->unk5C[idx]` object pointers) and
  * dispatches through each element's own +0x0B8 slot. Both readings are
  * kept -- the field itself stays `void **` in `Obj86B60` (the generic,
@@ -329,28 +342,28 @@ extern Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name); /* not
 struct Unk64ElemMethods {
     u8 pad000[0x004];
     void (*slot4)(Unk64Elem *self);            /* +0x004, OBSERVED:
-                                                    func_8003D050 (round 12) */
+                                                    Obj86B60__ReleaseTarget (round 12) */
     u8 pad008[0x04C - 0x008];
     void (*slot4C)(Unk64Elem *self, void *a1, void *buf); /* +0x04C,
-                                                    OBSERVED: func_8003D194
-                                                    and func_8003D73C
+                                                    OBSERVED: Obj86B60__UpdateSlotElements
+                                                    and Obj86B60__RefreshSlotView
                                                     (round 12) -- both pass a
                                                     raw buffer pointer as the
                                                     3rd arg (an 8-byte-stride
                                                     external record in
-                                                    func_8003D194, the
+                                                    Obj86B60__UpdateSlotElements, the
                                                     address of a 2-word stack
-                                                    pair in func_8003D73C),
+                                                    pair in Obj86B60__RefreshSlotView),
                                                     so `buf` stays untyped */
     void (*slot50)(Unk64Elem *self);            /* +0x050, OBSERVED:
-                                                    func_8003D73C (round 12) */
+                                                    Obj86B60__RefreshSlotView (round 12) */
     u8 pad054[0x060 - 0x054];
     void (*slot60)(Unk64Elem *self, s32 a1);   /* +0x060, OBSERVED:
-                                                    func_8003DCAC */
+                                                    Obj86B60__CancelElementScroll */
     u8 pad064[0x0B8 - 0x064];
     void (*slotB8)(Unk64Elem *self, void *a1); /* +0x0B8 */
     void (*slotBC)(Unk64Elem *self, void *a1); /* +0x0BC, OBSERVED:
-                                                    func_8003DAD4 (round 12),
+                                                    Obj86B60__CommitElementScroll (round 12),
                                                     address of a 2-word
                                                     stack pair */
 };
@@ -359,9 +372,9 @@ struct Unk64Elem {
 };
 
 /*
- * self->unk68's pointee (round 12, from func_8003D050/func_8003DAD4/
- * func_8003D73C). Built by `New_ClassEAC0(&D_8008A8E8, &D_8008A8F0, 0)` in
- * func_8003CE98 -- New_ClassEAC0 itself lives in the still-uncarved
+ * self->unk68's pointee (round 12, from Obj86B60__ReleaseTarget/Obj86B60__CommitElementScroll/
+ * Obj86B60__RefreshSlotView). Built by `New_ClassEAC0(&D_8008A8E8, &D_8008A8F0, 0)` in
+ * Obj86B60__SetTarget -- New_ClassEAC0 itself lives in the still-uncarved
  * code_2cc8c_d segment (not this unit's function to attempt), so it is
  * declared here only as an external returning this unit's own local view
  * of the type it constructs. D_8008A8E8/D_8008A8F0 are likewise only ever
@@ -371,18 +384,18 @@ struct Unk64Elem {
 struct Unk68ObjMethods {
     u8 pad000[0x004];
     void (*slot4)(Unk68Obj *self);              /* +0x004, OBSERVED:
-                                                     func_8003D050 */
+                                                     Obj86B60__ReleaseTarget */
     u8 pad008[0x04C - 0x008];
     void (*slot4C)(Unk68Obj *self, s32 a1, void *pos); /* +0x04C, OBSERVED:
-                                                     func_8003D73C, its only
+                                                     Obj86B60__RefreshSlotView, its only
                                                      caller, passes THREE
                                                      (round 75) */
     void (*slot50)(Unk68Obj *self);               /* +0x050, OBSERVED:
-                                                     func_8003DAD4,
-                                                     func_8003D73C */
+                                                     Obj86B60__CommitElementScroll,
+                                                     Obj86B60__RefreshSlotView */
     u8 pad054[0x0C0 - 0x054];
     void (*slotC0)(Unk68Obj *self, void *buf);     /* +0x0C0, OBSERVED:
-                                                     func_8003D73C, address
+                                                     Obj86B60__RefreshSlotView, address
                                                      of a 2-word stack pair
                                                      `{0x28, count*12}` */
 };
@@ -885,10 +898,10 @@ extern void *func_80042694(void); /* external, no args; not yet seen
 /*
  * An ALTERNATE reading of self->unk14 (round 13, Obj86B60__Init only): the
  * field itself stays `s32` in `Obj86B60` below (already established,
- * generic-word usage confirmed by a sibling unit's func_8003DA10 forwarding
+ * generic-word usage confirmed by a sibling unit's Obj86B60__BeginElementScroll forwarding
  * it untyped to slot100) -- same "keep the general field, cast locally"
  * shape already used for Unk4CObj->unk24[idx]/Unk64Elem's own
- * func_8003D980 alternate reading. Here Obj86B60__Init dispatches through it
+ * Obj86B60__BroadcastToSlotElements alternate reading. Here Obj86B60__Init dispatches through it
  * as a pointer to an object with its own vtable; only the one slot it
  * reaches is modelled.
  */
@@ -1145,7 +1158,7 @@ struct Obj86B60Methods {
     s32 (*slotC0)(Obj86B60 *self);                 /* +0x0C0, IS
                                                        func_8003CCDC */
     s32 (*slotC4)(Obj86B60 *self);                  /* +0x0C4, external
-                                                       (func_8003CD48); read
+                                                       (Obj86B60__TickFadeColor); read
                                                        as DATA by
                                                        func_8003CB30 */
     u8 pad0C8[0x0E4 - 0xC8];
@@ -1156,10 +1169,10 @@ struct Obj86B60Methods {
                                                        func_8003C63C (STALL,
                                                        not attempted) */
     void (*slotE8)(Obj86B60 *self);                 /* +0x0E8, external
-                                                       (func_8003D3B0);
+                                                       (Obj86B60__FindNextFreeSlot);
                                                        OBSERVED: func_8003C9B0 */
     void (*slotEC)(Obj86B60 *self);                 /* +0x0EC, external
-                                                       (func_8003D444);
+                                                       (Obj86B60__FindPrevFreeSlot);
                                                        OBSERVED: func_8003C944 */
     void (*slotF0)(Obj86B60 *self, s32 a1, s32 a2); /* +0x0F0, external
                                                        (Class86B60__RefreshViewValue);
@@ -1169,22 +1182,22 @@ struct Obj86B60Methods {
     u8 pad0F4[0x0F8 - 0xF4];
     void (*slotF8)(Obj86B60 *self, void *a1, Unk74Obj *a2); /* +0x0F8,
                                                        OBSERVED:
-                                                       func_8003CE98
+                                                       Obj86B60__SetTarget
                                                        (round 12) */
     void (*slotFC)(Obj86B60 *self);                 /* +0x0FC, OBSERVED:
-                                                       func_8003D050
+                                                       Obj86B60__ReleaseTarget
                                                        (round 12) */
     void (*slot100)(Obj86B60 *self, s32 a1, s32 a2); /* +0x100, external;
                                                        OBSERVED:
-                                                       func_8003DA10 */
+                                                       Obj86B60__BeginElementScroll */
     void (*slot104)(Obj86B60 *self, void *a1);      /* +0x104, external;
                                                        OBSERVED:
-                                                       func_8003D2CC */
+                                                       Obj86B60__BroadcastToSlots */
     void (*slot108)(Obj86B60 *self);                /* +0x108, external
-                                                       (func_8003DA10);
+                                                       (Obj86B60__BeginElementScroll);
                                                        OBSERVED: func_8003CA1C */
     void (*slot10C)(Obj86B60 *self);                /* +0x10C, external
-                                                       (func_8003DAD4).
+                                                       (Obj86B60__CommitElementScroll).
                                                        RETYPED s32 -> void,
                                                        round 23: the s32 was
                                                        read off func_8003C63C's
@@ -1199,24 +1212,24 @@ struct Obj86B60Methods {
                                                        finding. OBSERVED:
                                                        func_8003C63C */
     void (*slot110)(Obj86B60 *self);                /* +0x110, external
-                                                       (func_8003DCAC).
+                                                       (Obj86B60__CancelElementScroll).
                                                        RETYPED s32 -> void,
                                                        round 23, on positive
                                                        evidence independent of
                                                        that match: the occupant
-                                                       func_8003DCAC is ALREADY
+                                                       Obj86B60__CancelElementScroll is ALREADY
                                                        MATCHED in
                                                        src/code_2cc8c_b.c as
-                                                       `void func_8003DCAC(
+                                                       `void Obj86B60__CancelElementScroll(
                                                        Obj86B60 *self)`.
                                                        OBSERVED: func_8003C63C */
     void (*slot114)(Obj86B60 *self);                /* +0x114, external
-                                                       (func_8003DDC8);
+                                                       (Obj86B60__AdvanceSlotCursor);
                                                        OBSERVED: func_8003C9B0 */
     s32 (*slot118)(Obj86B60 *self);                 /* +0x118. CORRECTED
                                                        (round 12, runner
                                                        alpha): the occupant
-                                                       is func_8003DE30, NOT
+                                                       is Obj86B60__RetreatSlotCursor, NOT
                                                        Obj86B60__GetActiveSlotCount as this
                                                        comment previously
                                                        said -- verified by
@@ -1246,8 +1259,8 @@ struct Obj86B60Methods {
                                                        OBSERVED: func_8003C944 */
     void (*slot11C)(Obj86B60 *self, s32 a1, s32 a2); /* +0x11C, external;
                                                        OBSERVED:
-                                                       func_8003DDC8,
-                                                       func_8003DE30 (both
+                                                       Obj86B60__AdvanceSlotCursor,
+                                                       Obj86B60__RetreatSlotCursor (both
                                                        call it with a
                                                        computed index value
                                                        and a literal 1) */
@@ -1330,7 +1343,7 @@ struct Obj86B60 {
                                     this header's "keep the general field,
                                     cast locally" convention; see Unk14Obj's
                                     own comment above. */
-    s32 unk14;                  /* +0x014, func_8003DA10: forwarded as
+    s32 unk14;                  /* +0x014, Obj86B60__BeginElementScroll: forwarded as
                                     slot100's 2nd arg -- generic word.
                                     ALSO OBSERVED (round 13) by Obj86B60__Init,
                                     which both sets it (from an init-args
@@ -1393,44 +1406,72 @@ struct Obj86B60 {
     u8 pad044[0x048 - 0x044];
     Unk48Obj *unk48;            /* +0x048, func_8003C7B4 only */
     Unk4CObj *unk4C;            /* +0x04C, see Unk4CObj's own comment */
-    s32 unk50;                  /* +0x050, func_8003D3B0: capacity/wrap
-                                    bound for the unk58 index into
-                                    unk4C->unk18[] (also func_8003D2CC's
+    s32 slotCount;               /* +0x050, renamed from unk50, round 78 --
+                                    Obj86B60__FindNextFreeSlot: capacity/wrap
+                                    bound for the activeSlot index into
+                                    unk4C->unk18[] (also Obj86B60__BroadcastToSlots's
                                     loop count) */
-    Unk64Elem **unk54;          /* +0x054, func_8003D2CC: walked with an
-                                    incrementing pointer, dereferenced
-                                    directly for each element */
+    Unk64Elem **slotElements;   /* +0x054, renamed from unk54, round 78 --
+                                    one representative element per slot/tab
+                                    (self->slotCount of them), DISTINCT from
+                                    unk64[idx] below (the item LIST within
+                                    one slot). Obj86B60__BroadcastToSlots:
+                                    walked with an incrementing pointer,
+                                    dereferenced directly for each element */
     s32 activeSlot;                  /* +0x058, func_8003CA1C: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
-    s32 *unk5C;                  /* +0x05C, array indexed by unk58: a
-                                     per-slot capacity/bound.
-                                     func_8003D6D4 passes unk5C[unk58] as
+    s32 *itemCounts;              /* +0x05C, renamed from unk5C, round 78 --
+                                     array indexed by activeSlot: a per-slot
+                                     item count (the size of that slot's own
+                                     itemLists[idx] array).
+                                     Obj86B60__ReleaseSlotElements passes
+                                     itemCounts[activeSlot] as
                                      ReleaseBasicClassArray's 2nd arg (raw register,
                                      type doesn't affect those bytes);
-                                     func_8003DDC8/func_8003DE30 use it as
+                                     Obj86B60__AdvanceSlotCursor/Obj86B60__RetreatSlotCursor use it as
                                      an explicit upper bound compared
-                                     against unk60[unk58], which is what
-                                     settles it as a count, not a pointer */
-    s32 *slotCounts;                   /* +0x060, array indexed by unk58: a
+                                     against slotCounts[activeSlot], which is
+                                     what settles it as a count, not a
+                                     pointer */
+    s32 *slotCounts;                   /* +0x060, array indexed by activeSlot: a
                                      per-slot running count, incremented
-                                     (wrapping to 0 past unk5C[unk58]) by
-                                     func_8003DDC8 and decremented
-                                     (wrapping to unk5C[unk58]-1 below 0) by
-                                     func_8003DE30 -- a ring-buffer index */
-    void **unk64;                /* +0x064, func_8003D6D4: array indexed by
-                                     unk58, giving ReleaseBasicClassArray's 1st arg
-                                     and BMemPMgrFree's arg */
-    Unk68Obj *unk68;             /* +0x068, OBSERVED: func_8003D050,
-                                     func_8003DAD4, func_8003D73C (round 12)
-                                     -- built once by func_8003CE98 via
+                                     (wrapping to 0 past itemCounts[activeSlot]) by
+                                     Obj86B60__AdvanceSlotCursor and decremented
+                                     (wrapping to itemCounts[activeSlot]-1 below 0) by
+                                     Obj86B60__RetreatSlotCursor -- a ring-buffer index */
+    void **itemLists;             /* +0x064, renamed from unk64, round 78 --
+                                     array indexed by activeSlot, one item
+                                     LIST per slot (itemCounts[idx] elements,
+                                     built by Obj86B60__CreateSlotElements,
+                                     walked as `Unk64Elem **` by
+                                     Obj86B60__RefreshSlotView/
+                                     Obj86B60__BroadcastToSlotElements/
+                                     Obj86B60__BeginElementScroll/
+                                     Obj86B60__CommitElementScroll/
+                                     Obj86B60__CancelElementScroll/
+                                     Obj86B60__SetSlotCursor). Also read
+                                     opaquely (not as `Unk64Elem **`) by
+                                     Obj86B60__ReleaseSlotElements: giving
+                                     ReleaseBasicClassArray's 1st arg and
+                                     BMemPMgrFree's arg */
+    Unk68Obj *listView;           /* +0x068, renamed from unk68, round 78 --
+                                     tier B: Obj86B60__RefreshSlotView feeds
+                                     it a position (slot4C) then either a
+                                     {0x28, count*12} size descriptor
+                                     (slotC0) or hides it (slot50), i.e. it
+                                     is the on-screen widget that shows the
+                                     current slot's item list.
+                                     OBSERVED: Obj86B60__ReleaseTarget,
+                                     Obj86B60__CommitElementScroll, Obj86B60__RefreshSlotView (round 12)
+                                     -- built once by Obj86B60__SetTarget via
                                      New_ClassEAC0(&D_8008A8E8, &D_8008A8F0,
                                      0), then dispatched through repeatedly */
     u8 pad06C[0x070 - 0x06C];
-    const char *unk70;          /* +0x070, func_8003CDE0: truthy gate and a
+    const char *unk70;          /* +0x070, Obj86B60__SetSubHandle: truthy gate and a
                                     cache of the path last passed to
                                     func_8003B39C */
-    Unk74Obj *unk74;            /* +0x074, func_8003CDE0 only */
+    Unk74Obj *unk74;            /* +0x074, Obj86B60__SetSubHandle only */
     Unk78Obj *unk78;             /* +0x078, func_8003CC2C only */
     u8 pad07C[0x084 - 0x07C];
     s32 unk84;                  /* +0x084, func_8003CC2C: multiplied

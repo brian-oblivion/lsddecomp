@@ -287,11 +287,11 @@ immediately.
 
 This is now the SECOND confirmed instance this round where the
 `do/while(0)` lever (see `Obj6EAC0__SetChar.md`) does not generalise --
-`func_8003DAD4.md` also tried it this round and got the same kind of
+`Obj86B60__CommitElementScroll.md` also tried it this round and got the same kind of
 regression. The lever appears specific to a narrow shape (a single
 unconditional call-plus-field-writes block with no branches of its own
 inside the wrapped region); this function's own `if/else if` branch
-structure disqualifies it the same way `func_8003DAD4`'s loop did.
+structure disqualifies it the same way `Obj86B60__CommitElementScroll`'s loop did.
 Verdict unchanged: STALL at 21/32 (full swap of `self`/`arg1` into
 `$s1`/`$s0` vs the natural `$s0`/`$s1`), restored to `INCLUDE_ASM`, no
 compile errors in a fresh build.
@@ -416,7 +416,7 @@ A register-identity swap where BOTH parameters are simple scalars/pointers
 (no aggregate, no array), the swap is FULL (every use of both registers
 throughout the whole function body, not just the prologue), and the frame
 size matches retail exactly is a strong signature for this specific stall
-class -- distinguish it from `func_8003D73C`'s round-12 "callee-saved file
+class -- distinguish it from `Obj86B60__RefreshSlotView`'s round-12 "callee-saved file
 saturated" class (`grep -oE 'sw +\$s[0-9]' ... | sort -u | wc -l`, which
 here is only 3 registers, nowhere near saturating `s0`-`s7`) and from the
 documented "prologue store order" class (which keeps the SAME final

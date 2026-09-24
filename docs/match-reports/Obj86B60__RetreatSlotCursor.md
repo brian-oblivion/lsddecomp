@@ -1,16 +1,18 @@
-# func_8003DE30 — MATCHED (27/27)
+# Obj86B60__RetreatSlotCursor — MATCHED (27/27)
+
+> Renamed from `func_8003DE30` on 2026-09-24 (tools/rename.py). Address 0x8003de30.
 
 **Unit:** code_2cc8c_b · **Size:** 27 words · **Result:** byte-exact
 
 ## What it does
 
-The mirror-image of `func_8003DDC8`: retreats the same ring-buffer index
+The mirror-image of `Obj86B60__AdvanceSlotCursor`: retreats the same ring-buffer index
 (`self->unk60[idx]`), wrapping to `capacity - 1` when it goes negative
 instead of forward to 0 at the capacity, then reports it through the same
 `+0x11C` slot.
 
 ```c
-void func_8003DE30(Obj86B60 *self)
+void Obj86B60__RetreatSlotCursor(Obj86B60 *self)
 {
     s32 idx = self->unk58;
     s32 v = self->unk60[idx];
@@ -25,14 +27,18 @@ void func_8003DE30(Obj86B60 *self)
 
 ## Residue
 
-Same class as `func_8003DDC8`, same fix, applied directly from that
+Same class as `Obj86B60__AdvanceSlotCursor`, same fix, applied directly from that
 function's report: split the load of `self->unk60[idx]` from the `-1`
 into two statements (`s32 v = self->unk60[idx]; v--;`) rather than one
 combined initializer. Matched on the first attempt written this way — see
-`func_8003DDC8.md`'s report for the full derivation and the proposed
+`Obj86B60__AdvanceSlotCursor.md`'s report for the full derivation and the proposed
 learning; not re-derived here.
 
 ## Header
 
-No new header changes beyond what `func_8003DDC8` already added
+No new header changes beyond what `Obj86B60__AdvanceSlotCursor` already added
 (`slot11C`, `unk5C`, `unk60`, `unk58`) — this function reuses all of it.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__RetreatSlotCursor`. **Tier B**: The exact mirror of Obj86B60__AdvanceSlotCursor, stepping backward with wraparound at 0. Same reasoning.

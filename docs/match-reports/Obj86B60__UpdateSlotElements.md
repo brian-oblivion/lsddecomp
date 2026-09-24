@@ -1,4 +1,6 @@
-# func_8003D194 — MATCH (78/78 words)
+# Obj86B60__UpdateSlotElements — MATCH (78/78 words)
+
+> Renamed from `func_8003D194` on 2026-09-24 (tools/rename.py). Address 0x8003d194.
 
 **Unit:** code_2cc8c_b · round 12 straggler.
 
@@ -12,7 +14,7 @@ Walks the parallel `unk54`/`unk18`/`unk24` arrays: for each slot already
 index current.
 
 ```c
-void func_8003D194(Obj86B60 *self, void *a1)
+void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
 {
     Unk64Elem **arr;
     u8 *ptr;
@@ -100,3 +102,7 @@ being duplicated per-arm. Write the repeated statement explicitly in each
 arm rather than hoisting it to a common point after the `if` — the
 compiler does the hoisting itself when it's actually safe to, and won't
 if doing so would require skipping over an unrelated arm's code.
+
+## Naming (round 78, naming runner echo)
+
+Renamed `func_` -> `Obj86B60__UpdateSlotElements`. **Tier B**: Walks every slot's element (`self->slotElements[]`), forwarding a payload to unclaimed (`unk4C->unk18[i]==NULL`) slots and pinging already-claimed ones -- an update/refresh pass over all slots. What 'claimed' means in the game is not established, so the name stays at the mechanics level.

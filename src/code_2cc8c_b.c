@@ -1,10 +1,39 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-/* Unk24Elem's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
+/*
+ * code_2cc8c_b -- 20 of Obj86B60's own methods (class table gClass86B60Methods,
+ * see include/code_2cc8c.h for the class's own provenance). Round 78 naming
+ * pass (runner echo): every function in this file MATCHED before this round;
+ * the pass renamed all 20 and five exclusively-owned fields, no stalls.
+ *
+ * What this slice of the class implements: a tab/slot picker with a
+ * scrollable item list inside each tab. `self->activeSlot` selects the tab;
+ * `self->slotElements[i]` is each tab's own representative widget (walked/
+ * broadcast to by Obj86B60__BroadcastToSlots, switched by
+ * Obj86B60__SetActiveSlot); `self->itemLists[idx]`/`self->itemCounts[idx]`
+ * hold the item list WITHIN tab idx (built by Obj86B60__CreateSlotElements,
+ * torn down by Obj86B60__ReleaseSlotElements, positioned/shown by
+ * Obj86B60__RefreshSlotView through `self->listView`); `self->slotCounts[idx]`
+ * is a ring cursor into that per-tab item list.
+ * Obj86B60__BeginElementScroll/Obj86B60__CommitElementScroll/
+ * Obj86B60__CancelElementScroll form a `self->unk3C` state-1<->2 trio that
+ * opens interactive scrolling, then either commits the new cursor position
+ * back into the target descriptor (`SlotEntry::savedCursor`) or cancels back
+ * to the last-committed one; Obj86B60__AdvanceSlotCursor/
+ * Obj86B60__RetreatSlotCursor step the cursor by one (wrapping) and forward
+ * through Obj86B60__SetSlotCursor (vtable slot11C), which does the actual
+ * old/new element highlight swap -- the same shape Obj86B60__SetActiveSlot
+ * uses one level up, switching which TAB is active instead of which item.
+ * Obj86B60__SetTarget/Obj86B60__ReleaseTarget are the constructor/teardown
+ * pair for `self->unk4C` (the "target" descriptor, a cross-unit field --
+ * see Unk4CObj's own comment in the header).
+ */
+
+/* SlotEntry's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
  * copies it with a whole-struct assignment (lw/lw into two fresh
  * temporaries, sw/sw, then a RELOAD of .y before adjusting it) -- see
- * docs/match-reports/func_8003DAD4.md, round 75. Local view: the shared
+ * docs/match-reports/Obj86B60__CommitElementScroll.md, round 75. Local view: the shared
  * header still spells the pair as two s32 fields. */
 typedef struct {
     s32 x;
@@ -13,7 +42,7 @@ typedef struct {
 
 #define SLOT_POS(target) (*(SlotPos *)&(target)->unk10)
 
-s32 func_8003CD48(Obj86B60 *self)
+s32 Obj86B60__TickFadeColor(Obj86B60 *self)
 {
     s32 c = 0x80 - (self->frameCounter * self->unk84);
     u8 buf[3];
@@ -26,7 +55,7 @@ s32 func_8003CD48(Obj86B60 *self)
     return (u8)c >= 0x81;
 }
 
-void func_8003CDE0(Obj86B60 *self, const char *a1, Unk74Obj *a2)
+void Obj86B60__SetSubHandle(Obj86B60 *self, const char *a1, Unk74Obj *a2)
 {
     if (a1 != NULL) {
         if (self->unk70 != NULL) {
@@ -41,7 +70,7 @@ void func_8003CDE0(Obj86B60 *self, const char *a1, Unk74Obj *a2)
     self->unk70 = a1;
 }
 
-void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
+void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
 {
     char **list;
     s32 count;
@@ -55,28 +84,28 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
         return;
     }
 
-    list = a1->unk1C;
+    list = a1->names;
     count = 0;
     while (*list++ != NULL) {
         count++;
     }
     size = count * 4;
     arr = BMemPMgrAlloc(size);
-    self->unk54 = arr;
-    self->unk5C = BMemPMgrAlloc(size);
+    self->slotElements = arr;
+    self->itemCounts = BMemPMgrAlloc(size);
     self->slotCounts = BMemPMgrAlloc(size);
-    self->unk64 = BMemPMgrAlloc(size);
-    self->unk50 = count;
+    self->itemLists = BMemPMgrAlloc(size);
+    self->slotCount = count;
 
-    if (a1->unk0 != NULL) {
-        handle = func_8003B39C(a1->unk0);
+    if (a1->path != NULL) {
+        handle = func_8003B39C(a1->path);
         handle->methods->slot78(handle);
         handle->methods->slot5C(handle);
     } else {
-        handle = a1->unk4;
+        handle = a1->handle;
     }
 
-    list = a1->unk1C;
+    list = a1->names;
     i = 0;
     if (*list != NULL) {
         do {
@@ -94,11 +123,11 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
         } while (*list != NULL);
     }
 
-    self->unk68 = New_ClassEAC0(D_8008A8E8, D_8008A8F0, 0);
-    a1->unk4 = handle;
+    self->listView = New_ClassEAC0(D_8008A8E8, D_8008A8F0, 0);
+    a1->handle = handle;
 }
 
-void func_8003D050(Obj86B60 *self)
+void Obj86B60__ReleaseTarget(Obj86B60 *self)
 {
     Unk64Elem **arr;
     s32 i;
@@ -106,13 +135,13 @@ void func_8003D050(Obj86B60 *self)
     if (self->unk4C == NULL) {
         return;
     }
-    if (self->unk4C->unk0 != NULL) {
-        Unk74Obj *o = self->unk4C->unk4;
+    if (self->unk4C->path != NULL) {
+        Unk74Obj *o = self->unk4C->handle;
         o->methods->slot4(o);
     }
-    self->unk68->methods->slot4(self->unk68);
-    arr = self->unk54;
-    for (i = 0; i < self->unk50; arr++) {
+    self->listView->methods->slot4(self->listView);
+    arr = self->slotElements;
+    for (i = 0; i < self->slotCount; arr++) {
         Unk64Elem *elem;
 
         if (self->unk4C->unk24[i] != NULL) {
@@ -123,13 +152,13 @@ void func_8003D050(Obj86B60 *self)
         elem->methods->slot4(elem);
         i++;
     }
-    BMemPMgrFree(self->unk64);
+    BMemPMgrFree(self->itemLists);
     BMemPMgrFree(self->slotCounts);
-    BMemPMgrFree(self->unk5C);
-    BMemPMgrFree(self->unk54);
+    BMemPMgrFree(self->itemCounts);
+    BMemPMgrFree(self->slotElements);
 }
 
-void func_8003D194(Obj86B60 *self, void *a1)
+void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
 {
     Unk64Elem **arr;
     u8 *ptr;
@@ -138,10 +167,10 @@ void func_8003D194(Obj86B60 *self, void *a1)
     if (self->unk4C == NULL) {
         return;
     }
-    arr = self->unk54;
-    ptr = self->unk4C->unk20;
-    for (i = 0; i < self->unk50; i++, arr++, ptr += 8) {
-        if (self->unk4C->unk18[i] == NULL) {
+    arr = self->slotElements;
+    ptr = self->unk4C->externalRecords;
+    for (i = 0; i < self->slotCount; i++, arr++, ptr += 8) {
+        if (self->unk4C->registrationSlots[i] == NULL) {
             Unk64Elem *elem = *arr;
 
             elem->methods->slot4C(elem, a1, ptr);
@@ -157,7 +186,7 @@ void func_8003D194(Obj86B60 *self, void *a1)
     }
 }
 
-void func_8003D2CC(Obj86B60 *self, void *a1)
+void Obj86B60__BroadcastToSlots(Obj86B60 *self, void *a1)
 {
     s32 origIdx;
     Unk64Elem **arr;
@@ -166,9 +195,9 @@ void func_8003D2CC(Obj86B60 *self, void *a1)
     if (self->unk4C == NULL) {
         return;
     }
-    arr = self->unk54;
+    arr = self->slotElements;
     origIdx = self->activeSlot;
-    for (i = 0; i < self->unk50;) {
+    for (i = 0; i < self->slotCount;) {
         Unk64Elem *elem = *arr;
 
         arr++;
@@ -183,7 +212,7 @@ void func_8003D2CC(Obj86B60 *self, void *a1)
     self->activeSlot = origIdx;
 }
 
-void func_8003D3B0(Obj86B60 *self)
+void Obj86B60__FindNextFreeSlot(Obj86B60 *self)
 {
     s32 i;
 
@@ -193,13 +222,13 @@ void func_8003D3B0(Obj86B60 *self)
     i = self->activeSlot;
     i++;
     for (;;) {
-        if (i >= self->unk50) {
+        if (i >= self->slotCount) {
             i = 0;
         }
         if (i == self->activeSlot) {
             break;
         }
-        if (self->unk4C->unk18[i++] != NULL) {
+        if (self->unk4C->registrationSlots[i++] != NULL) {
             continue;
         }
         i--;
@@ -208,7 +237,7 @@ void func_8003D3B0(Obj86B60 *self)
     self->methods->slotF0(self, i, 1);
 }
 
-void func_8003D444(Obj86B60 *self)
+void Obj86B60__FindPrevFreeSlot(Obj86B60 *self)
 {
     s32 i;
 
@@ -219,12 +248,12 @@ void func_8003D444(Obj86B60 *self)
     i--;
     for (;;) {
         if (i < 0) {
-            i = self->unk50 - 1;
+            i = self->slotCount - 1;
         }
         if (i == self->activeSlot) {
             break;
         }
-        if (self->unk4C->unk18[i--] != NULL) {
+        if (self->unk4C->registrationSlots[i--] != NULL) {
             continue;
         }
         i++;
@@ -233,7 +262,7 @@ void func_8003D444(Obj86B60 *self)
     self->methods->slotF0(self, i, 1);
 }
 
-void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
+void Obj86B60__SetActiveSlot(Obj86B60 *self, s32 a1, void *a2)
 {
     s32 idx;
     Unk64Elem *elemB;
@@ -243,8 +272,8 @@ void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
         return;
     }
     idx = self->activeSlot;
-    elemB = self->unk54[idx];
-    elemA = self->unk54[a1];
+    elemB = self->slotElements[idx];
+    elemA = self->slotElements[a1];
     if (idx >= 0) {
         elemB->methods->slotB8(elemB, self->unk4C->unk10);
     }
@@ -256,12 +285,12 @@ void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
     self->methods->slot60(self, 9);
 }
 
-s32 func_8003D5C0(Obj86B60 *self)
+s32 Obj86B60__GetActiveSlot(Obj86B60 *self)
 {
     return self->activeSlot;
 }
 
-void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
+void Obj86B60__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
 {
     char **list;
     s32 idx;
@@ -275,9 +304,9 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
         count++;
     }
     buf = BMemPMgrAlloc(count * 4);
-    self->unk64[idx] = (void *)buf;
+    self->itemLists[idx] = (void *)buf;
     self->slotCounts[idx] = a1->unk4;
-    self->unk5C[idx] = count;
+    self->itemCounts[idx] = count;
 
     list = a1->unk18;
     if (*list != NULL) {
@@ -291,13 +320,13 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
     }
 }
 
-void func_8003D6D4(Obj86B60 *self)
+void Obj86B60__ReleaseSlotElements(Obj86B60 *self)
 {
-    ReleaseBasicClassArray(self->unk64[self->activeSlot], self->unk5C[self->activeSlot]);
-    BMemPMgrFree(self->unk64[self->activeSlot]);
+    ReleaseBasicClassArray(self->itemLists[self->activeSlot], self->itemCounts[self->activeSlot]);
+    BMemPMgrFree(self->itemLists[self->activeSlot]);
 }
 
-void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
+void Obj86B60__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
 {
     s32 idx;
     Unk64Elem **arr;
@@ -307,12 +336,12 @@ void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
     s32 i;
 
     idx = self->activeSlot;
-    arr = (Unk64Elem **)self->unk64[idx];
+    arr = (Unk64Elem **)self->itemLists[idx];
     {
-        Unk24Elem *target = (Unk24Elem *)self->unk4C->unk24[idx];
+        SlotEntry *target = (SlotEntry *)self->unk4C->unk24[idx];
 
-        count = self->unk5C[idx];
-        counter = target->unk4;
+        count = self->itemCounts[idx];
+        counter = target->savedCursor;
     }
 
     for (i = 0; i < count; i++) {
@@ -320,21 +349,21 @@ void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
         arr++;
     }
 
-    pos = SLOT_POS((Unk24Elem *)self->unk4C->unk24[idx]);
+    pos = SLOT_POS((SlotEntry *)self->unk4C->unk24[idx]);
     pos.y -= counter * 10;
 
     if (a2 != 0) {
         s32 buf[2];
 
-        self->unk68->methods->slot4C(self->unk68, self->unk14, &pos);
+        self->listView->methods->slot4C(self->listView, self->unk14, &pos);
         buf[0] = 0x28;
         buf[1] = count * 12;
-        self->unk68->methods->slotC0(self->unk68, buf);
+        self->listView->methods->slotC0(self->listView, buf);
     } else {
-        self->unk68->methods->slot50(self->unk68);
+        self->listView->methods->slot50(self->listView);
     }
 
-    arr = (Unk64Elem **)self->unk64[idx];
+    arr = (Unk64Elem **)self->itemLists[idx];
     for (i = 0; i < count; i++) {
         (*arr)->methods->slot4C(*arr, a1, &pos);
         (*arr)->methods->slot60(*arr, a2);
@@ -342,15 +371,15 @@ void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
         arr++;
     }
 
-    arr = (Unk64Elem **)self->unk64[idx];
+    arr = (Unk64Elem **)self->itemLists[idx];
     arr[counter]->methods->slot60(arr[counter], 1);
 }
 
-void func_8003D980(Obj86B60 *self, void *a1)
+void Obj86B60__BroadcastToSlotElements(Obj86B60 *self, void *a1)
 {
     s32 idx = self->activeSlot;
-    Unk64Elem **arr = (Unk64Elem **)self->unk64[idx];
-    s32 count = self->unk5C[idx];
+    Unk64Elem **arr = (Unk64Elem **)self->itemLists[idx];
+    s32 count = self->itemCounts[idx];
     s32 i;
 
     for (i = 0; i < count; i++) {
@@ -360,7 +389,7 @@ void func_8003D980(Obj86B60 *self, void *a1)
     }
 }
 
-void func_8003DA10(Obj86B60 *self)
+void Obj86B60__BeginElementScroll(Obj86B60 *self)
 {
     s32 idx;
     Unk64Elem *elem;
@@ -371,14 +400,14 @@ void func_8003DA10(Obj86B60 *self)
     }
     idx = self->activeSlot;
     self->methods->slot100(self, self->unk14, 1);
-    elem = ((Unk64Elem **)self->unk64[idx])[self->slotCounts[idx]];
+    elem = ((Unk64Elem **)self->itemLists[idx])[self->slotCounts[idx]];
     buf = (u8 *)self->unk4C->unk24[idx] + 8;
     elem->methods->slotB8(elem, buf);
     self->unk3C = 2;
     self->methods->slot60(self, 14);
 }
 
-void func_8003DAD4(Obj86B60 *self)
+void Obj86B60__CommitElementScroll(Obj86B60 *self)
 {
     s32 idx;
     s32 counter;
@@ -392,11 +421,11 @@ void func_8003DAD4(Obj86B60 *self)
     }
     idx = self->activeSlot;
     counter = self->slotCounts[idx];
-    pos = SLOT_POS((Unk24Elem *)self->unk4C->unk24[idx]);
+    pos = SLOT_POS((SlotEntry *)self->unk4C->unk24[idx]);
     pos.y -= counter * 10;
 
-    arr = (Unk64Elem **)self->unk64[idx];
-    count = self->unk5C[idx];
+    arr = (Unk64Elem **)self->itemLists[idx];
+    count = self->itemCounts[idx];
     for (i = 0; i < count; i++) {
         (*arr)->methods->slot60(*arr, 0);
         (*arr)->methods->slotBC(*arr, &pos);
@@ -405,21 +434,21 @@ void func_8003DAD4(Obj86B60 *self)
     }
 
     {
-        Unk64Elem *elem = ((Unk64Elem **)self->unk64[idx])[counter];
+        Unk64Elem *elem = ((Unk64Elem **)self->itemLists[idx])[counter];
 
         elem->methods->slot60(elem, 1);
         elem->methods->slotB8(elem, self->unk4C->unk10);
     }
 
-    ((Unk24Elem *)self->unk4C->unk24[idx])->unk4 = counter;
+    ((SlotEntry *)self->unk4C->unk24[idx])->savedCursor = counter;
 
-    self->unk68->methods->slot50(self->unk68);
+    self->listView->methods->slot50(self->listView);
 
     self->unk3C = 1;
     self->methods->slot60(self, 0x10);
 }
 
-void func_8003DCAC(Obj86B60 *self)
+void Obj86B60__CancelElementScroll(Obj86B60 *self)
 {
     s32 idx;
     s32 counter;
@@ -434,7 +463,7 @@ void func_8003DCAC(Obj86B60 *self)
     idx = self->activeSlot;
     counter = self->slotCounts[idx];
     self->methods->slot100(self, self->unk14, 0);
-    arr = (Unk64Elem **)self->unk64[idx];
+    arr = (Unk64Elem **)self->itemLists[idx];
     elem1 = arr[counter];
     elem1->methods->slotB8(elem1, self->unk4C->unk10);
     newVal = ((s32 *)self->unk4C->unk24[idx])[1];
@@ -445,31 +474,31 @@ void func_8003DCAC(Obj86B60 *self)
     self->methods->slot60(self, 17);
 }
 
-void func_8003DDC8(Obj86B60 *self)
+void Obj86B60__AdvanceSlotCursor(Obj86B60 *self)
 {
     s32 idx = self->activeSlot;
     s32 v = self->slotCounts[idx];
 
     v++;
-    if (v >= self->unk5C[idx]) {
+    if (v >= self->itemCounts[idx]) {
         v = 0;
     }
     self->methods->slot11C(self, v, 1);
 }
 
-void func_8003DE30(Obj86B60 *self)
+void Obj86B60__RetreatSlotCursor(Obj86B60 *self)
 {
     s32 idx = self->activeSlot;
     s32 v = self->slotCounts[idx];
 
     v--;
     if (v < 0) {
-        v = self->unk5C[idx] - 1;
+        v = self->itemCounts[idx] - 1;
     }
     self->methods->slot11C(self, v, 1);
 }
 
-void func_8003DE9C(Obj86B60 *self, s32 a1, void *a2)
+void Obj86B60__SetSlotCursor(Obj86B60 *self, s32 a1, void *a2)
 {
     s32 idx;
     s32 counter;
@@ -480,7 +509,7 @@ void func_8003DE9C(Obj86B60 *self, s32 a1, void *a2)
 
     idx = self->activeSlot;
     counter = self->slotCounts[idx];
-    arr = (Unk64Elem **)self->unk64[idx];
+    arr = (Unk64Elem **)self->itemLists[idx];
     elem1 = arr[counter];
     elem2 = arr[a1];
     elem1->methods->slotB8(elem1, self->unk4C->unk10);
