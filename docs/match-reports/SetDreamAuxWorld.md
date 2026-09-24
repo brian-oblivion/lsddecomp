@@ -110,7 +110,7 @@ Two independent instances now confirm it in this unit alone
 shared context globals (`gDreamAuxStage`, `gDreamAuxWorld` and three still-
 unnamed siblings), spawns one entity into `gDreamAuxSlots[0].entity` via
 `New_Entity`, then calls `SetTeleportsEnabled`. Called from
-`func_800534C8` (`class_3bb8c_l.c`), itself a per-object/per-level setup
+`ObjM__SetupSceneStyle` (`class_3bb8c_l.c`), itself a per-object/per-level setup
 routine. "World" reflects `gDreamAuxWorld`'s own established role (cast
 `TriggerWorld*`, dispatched through vtable slots 0x80/0x22 elsewhere in the
 unit) -- but this function's OWN purpose (why these five values, together,

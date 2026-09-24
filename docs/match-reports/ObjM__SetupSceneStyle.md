@@ -1,4 +1,6 @@
-# func_800534C8 — MATCHED (round 45, 122/122 words)
+# ObjM__SetupSceneStyle — MATCHED (round 45, 122/122 words)
+
+> Renamed from `func_800534C8` on 2026-09-24 (tools/rename.py). Address 0x800534c8.
 
 **Unit:** class_3bb8c_l · **Size:** 122 words (0x1E8 bytes)
 
@@ -25,7 +27,7 @@ extern void *GetStageGridDimensions(s32 index);
 extern s32 D_8008AB34;
 extern s32 D_8008710C;
 
-void func_800534C8(Obj87034_3bb8c_l *self) {
+void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
     Unk50Struct_3bb8c_l *unk50 = self->unk50;
     UnkCObj_3bb8c_l *obj;

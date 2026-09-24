@@ -18,7 +18,7 @@
  * its three blockers is DEAD: `addiu_at` was RESOLVED in round 21 (maspsx
  * `--addiu-at`; docs/research/addiu-at-blocker.md). Re-screened with
  * `python3 tools/nearmiss.py` on 2026-09-08 (round 24):
- *   func_800534C8  gp_rel        -- MATCHED round 45 (122/122 words). The
+ *   ObjM__SetupSceneStyle  gp_rel        -- MATCHED round 45 (122/122 words). The
  *                  `gp_rel` blocker itself was RESOLVED round 42; see the
  *                  file-top banner above.
  *   ObjM__InitStyleAndWorld  was addiu-$at ONLY -- NOT BLOCKED. 137w.
@@ -267,7 +267,7 @@ void ObjM__TickTarget(Obj87034_3bb8c_l *self) {
     }
 }
 
-void func_80053458(Obj87034_3bb8c_l *self) {
+void ObjM__DispatchActiveState(Obj87034_3bb8c_l *self) {
     Obj87034Methods_3bb8c_l *m = self->methods;
 
     if (self->unk80 != 0) {
@@ -292,7 +292,7 @@ typedef struct UnkCObj_3bb8c_l UnkCObj_3bb8c_l;
 typedef struct UnkCObjMethods_3bb8c_l UnkCObjMethods_3bb8c_l;
 struct UnkCObjMethods_3bb8c_l {
     u8 pad000[0x07C];
-    /* +0x07C, round 45's func_800534C8: `(self, 0)`, returning a pointer
+    /* +0x07C, round 45's ObjM__SetupSceneStyle: `(self, 0)`, returning a pointer
      * to a single `s32` this function dereferences immediately. */
     s32 *(*slot7C)(UnkCObj_3bb8c_l *self, s32 arg1); /* +0x07C */
 };
@@ -321,7 +321,7 @@ extern s32 D_8008AB34;
  * `Obj14Methods_3bb8c_l::slotCC`. */
 extern s32 D_8008710C;
 
-void func_800534C8(Obj87034_3bb8c_l *self) {
+void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
     Unk50Struct_3bb8c_l *unk50 = self->unk50;
     UnkCObj_3bb8c_l *obj;

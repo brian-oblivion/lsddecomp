@@ -1,4 +1,6 @@
-# func_80053458
+# ObjM__DispatchActiveState
+
+> Renamed from `func_80053458` on 2026-09-24 (tools/rename.py). Address 0x80053458.
 
 **Unit:** class_3bb8c_l · **Size:** 26 words (0x68 bytes) ·
 **Status: MATCHED 26/26**, whole-image SHA1 green.
@@ -6,7 +8,7 @@
 ## What it does
 
 ```c
-void func_80053458(Obj87034_3bb8c_l *self) {
+void ObjM__DispatchActiveState(Obj87034_3bb8c_l *self) {
     Obj87034Methods_3bb8c_l *m = self->methods;
 
     if (self->unk80 != 0) {
