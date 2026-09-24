@@ -27,7 +27,7 @@ void Class86B60__ShowTitleIcon(Class86B60 *self)
     self->unkA4->methods->slotF0(self->unkA4, 0, 0);
 }
 
-void func_8004D898(Class86B60 *self)
+void Class86B60__RegisterHandlers(Class86B60 *self)
 {
     u32 i;
     u8 *entry;

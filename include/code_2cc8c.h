@@ -1075,7 +1075,7 @@ struct Obj86B60Methods {
                                                       external (TaskCoreObj__func_8003C238);
                                                       OBSERVED: Obj86B60__Init */
     void (*slot50)(Obj86B60 *self);               /* +0x050, external
-                                                      (func_8004D898);
+                                                      (Class86B60__RegisterHandlers);
                                                       OBSERVED: Obj86B60__Deinit
                                                       (round 13) */
     void (*onTag1Notify)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x054, IS

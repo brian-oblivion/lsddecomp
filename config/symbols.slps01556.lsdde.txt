@@ -2127,3 +2127,4 @@ GetClass866E8Methods = 0x8004D244; // type:func
 Class86B60__Dtor = 0x8004D704; // type:func
 Class86B60__ForwardIfTagB = 0x8004D788; // type:func
 Class86B60__ShowTitleIcon = 0x8004D814; // type:func
+Class86B60__RegisterHandlers = 0x8004D898; // type:func

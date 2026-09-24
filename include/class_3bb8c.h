@@ -1000,7 +1000,7 @@ typedef struct DreamSysView_3bb8c_c DreamSysView_3bb8c_c;
 
 /*
  * self->unkC's pointee. `unk0` is itself a pointer to a small vtable
- * object (`slot78`, reached by func_8004D898 in a fixed 2-iteration loop
+ * object (`slot78`, reached by Class86B60__RegisterHandlers in a fixed 2-iteration loop
  * alongside a table walk); `unk4` is an opaque value forwarded verbatim
  * by func_8004E054 as an argument to `Class86B60Methods::slot10`.
  */
@@ -1010,7 +1010,7 @@ typedef struct Class86B60UnkC0Obj_3bb8c_d Class86B60UnkC0Obj_3bb8c_d;
 
 struct Class86B60UnkC0ObjMethods_3bb8c_d {
     u8 pad000[0x078];
-    /* +0x078, func_8004D898's own call: `(childObj, &self->unk93,
+    /* +0x078, Class86B60__RegisterHandlers's own call: `(childObj, &self->unk93,
      * tableEntry)`, where `tableEntry` walks a fixed external table
      * (`D_80086DAC`, stride 0xC) starting fresh each call to this
      * function. */
@@ -1022,7 +1022,7 @@ struct Class86B60UnkC0Obj_3bb8c_d {
 };
 
 struct Class86B60UnkCObj_3bb8c_d {
-    Class86B60UnkC0Obj_3bb8c_d *unk0; /* +0x000, func_8004D898 */
+    Class86B60UnkC0Obj_3bb8c_d *unk0; /* +0x000, Class86B60__RegisterHandlers */
     void *unk4;                        /* +0x004, func_8004E054: opaque, forwarded verbatim */
 };
 
@@ -1262,7 +1262,7 @@ struct Class86B60Methods {
 struct Class86B60 {
     Class86B60Methods *methods;    /* +0x000 */
     u8 pad004[0x00C - 0x004];
-    Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, func_8004D898/func_8004E054 */
+    Class86B60UnkCObj_3bb8c_d *unkC; /* +0x00C, Class86B60__RegisterHandlers/func_8004E054 */
     void *unk10;                     /* +0x010, func_8004E054: opaque, forwarded verbatim */
     void *unk14;                     /* +0x014, func_8004DF64: opaque, forwarded verbatim to unkAC->methods->slot6C */
     u8 pad018[0x02C - 0x018];
@@ -1296,7 +1296,7 @@ struct Class86B60 {
     u8 pad05C[0x060 - 0x05C];
     Class86B60Unk60Obj_3bb8c_d *unk60; /* +0x060, func_8004DABC */
     u8 pad064[0x093 - 0x064];
-    /* +0x093, func_8004D898: address-of only, forwarded as
+    /* +0x093, Class86B60__RegisterHandlers: address-of only, forwarded as
      * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`'s 2nd argument each
      * loop iteration; real extent beyond one byte unknown. */
     u8 unk93;
@@ -1481,7 +1481,7 @@ extern s32 D_800114E8;
  * already emitted as a symbol). */
 extern const char D_800114F8[];
 
-/* Address-of only in this unit -- func_8004D898 walks it with an
+/* Address-of only in this unit -- Class86B60__RegisterHandlers walks it with an
  * explicit 0xC-byte stride, passing each entry's address on to
  * `Class86B60UnkC0ObjMethods_3bb8c_d::slot78`, but never dereferences it
  * itself. Placeholder s32 type; real element layout unknown. */
