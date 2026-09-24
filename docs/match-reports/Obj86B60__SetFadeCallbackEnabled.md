@@ -95,3 +95,6 @@ hits in code_2c054.c/code_179d8_{k,f}.c/code_2cc8c_{d,e}.c/Entity_f.c
 (several genuinely this same shared Obj86B60 struct, per code_2cc8c_d/e), so
 proposal only -- the head should apply via type scope on `Obj86B60`, not a
 whole-tree replace.
+
+
+**Head disposition, round 78.** `unk88` -> `fadeCallback` APPLIED (type scope, 4 accessors).

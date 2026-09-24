@@ -120,3 +120,6 @@ three bytes as a fade base. `unk93`/`unk96` are set the same way by
 distinguishing name is proposed for them (kept `unk93`/`unk96`). Grep shows
 `unk90` textual hits in several genuinely-shared code_2cc8c_* siblings plus
 unrelated units, so proposal only.
+
+
+**Head disposition, round 78.** `unk90` -> `baseColor` APPLIED (type scope, 4 accessors).

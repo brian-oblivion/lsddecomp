@@ -175,3 +175,6 @@ units' worth of naming rather than this unit's alone) and should win at
 merge if the head applies either -- this report's own `notifyMode` evidence
 above stands as independent confirmation of the VALUE SET (0/1/2, gating
 notify-handling) but not of the name. Do not apply both.
+
+
+**Head disposition, round 78.** `unk3C` DECLINED (see Obj86B60__BeginElementScroll.md): two competing readings, value range unconfirmed.

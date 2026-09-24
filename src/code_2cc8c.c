@@ -121,8 +121,8 @@ void Obj86B60__SetState(Obj86B60 *self, s32 a1)
     Get_vtable_IntermediateBase()->slot60(self, a1);
     switch (a1) {
     case 5:
-        methods->slotE4(self, self->unk4C->unk10);
-        methods->slotF0(self, self->unk4C->unk8, 0);
+        methods->slotE4(self, self->target->unselectedColor);
+        methods->slotF0(self, self->target->unk8, 0);
         self->frameCounter = 0;
         self->unk3C = 1;
         break;
@@ -182,7 +182,7 @@ void Obj86B60__ForwardToChild(Obj86B60 *self, s32 a1)
 
 void Obj86B60__func_8003C7F4(Obj86B60 *self, s32 a1)
 {
-    if (self->unk4C != NULL) {
+    if (self->target != NULL) {
         self->methods->slot70(self, 0x10);
         self->methods->slot60(self, 0xA);
     }
@@ -192,7 +192,7 @@ void Obj86B60__func_8003C858(Obj86B60 *self, s32 a1)
 {
     s32 reason;
 
-    if (self->unk4C != NULL) {
+    if (self->target != NULL) {
         self->methods->slot70(self, 0x10);
         reason = 0xF;
         if (self->unk3C == 1) {
@@ -204,7 +204,7 @@ void Obj86B60__func_8003C858(Obj86B60 *self, s32 a1)
 
 void Obj86B60__func_8003C8D0(Obj86B60 *self, s32 a1)
 {
-    if (self->unk4C != NULL && self->unk3C != 1) {
+    if (self->target != NULL && self->unk3C != 1) {
         self->methods->slot70(self, 0x10);
         self->methods->slot60(self, 0x11);
     }
@@ -214,7 +214,7 @@ void Obj86B60__func_8003C944(Obj86B60 *self, s32 a1)
 {
     void (*handler)(Obj86B60 *self);
 
-    if (self->unk4C == NULL) {
+    if (self->target == NULL) {
         return;
     }
     if (self->unk3C == 1) {
@@ -231,7 +231,7 @@ void Obj86B60__func_8003C9B0(Obj86B60 *self, s32 a1)
 {
     void (*handler)(Obj86B60 *self);
 
-    if (self->unk4C == NULL) {
+    if (self->target == NULL) {
         return;
     }
     if (self->unk3C == 1) {
@@ -249,7 +249,7 @@ void Obj86B60__Tick(Obj86B60 *self)
     Unk4CObj *target;
     s32 idx;
 
-    target = self->unk4C;
+    target = self->target;
     idx = self->activeSlot;
     if (target->unk24[idx] != NULL) {
         self->methods->slot108(self);
@@ -260,16 +260,16 @@ void Obj86B60__Tick(Obj86B60 *self)
 
 void Obj86B60__RefreshViewValue(Obj86B60 *self)
 {
-    if (self->unk9C != NULL) {
-        self->unk9C(self->unkA0);
+    if (self->viewCallback != NULL) {
+        self->viewCallback(self->viewCallbackCtx);
     }
     self->methods->slot60(self, 7);
 }
 
 void Obj86B60__SetCallback(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
 {
-    self->unk9C = a1;
-    self->unkA0 = a2;
+    self->viewCallback = a1;
+    self->viewCallbackCtx = a2;
 }
 
 void Obj86B60__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
@@ -279,10 +279,10 @@ void Obj86B60__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
     methods = self->methods;
     switch (a1) {
     case 0:
-        self->unk88 = NULL;
+        self->fadeCallback = NULL;
         break;
     case 1:
-        self->unk88 = methods->slotB0;
+        self->fadeCallback = methods->slotB0;
         break;
     }
 }
@@ -306,7 +306,7 @@ typedef struct { s8 r, g, b; } RGB8003CB68;
 
 void Obj86B60__SetColors(Obj86B60 *self, s8 *a1, s8 *a2, s8 *a3)
 {
-    *(RGB8003CB68 *)self->unk90 = *(RGB8003CB68 *)a1;
+    *(RGB8003CB68 *)self->baseColor = *(RGB8003CB68 *)a1;
     *(RGB8003CB68 *)self->unk93 = *(RGB8003CB68 *)a2;
     *(RGB8003CB68 *)self->unk96 = *(RGB8003CB68 *)a3;
 }
@@ -321,8 +321,8 @@ s32 Obj86B60__TickFadeCallback(Obj86B60 *self)
     s32 result;
 
     result = 1;
-    if (self->unk88 != NULL) {
-        result = self->unk88(self);
+    if (self->fadeCallback != NULL) {
+        result = self->fadeCallback(self);
     }
     if (result != 0) {
         self->methods->slot60(self, 5);
@@ -336,9 +336,9 @@ s32 Obj86B60__TickColorFade(Obj86B60 *self)
     u8 buffer[3];
 
     prod = self->frameCounter * self->unk84;
-    buffer[0] = prod + self->unk90[0];
-    buffer[1] = prod + self->unk90[1];
-    buffer[2] = prod + self->unk90[2];
+    buffer[0] = prod + self->baseColor[0];
+    buffer[1] = prod + self->baseColor[1];
+    buffer[2] = prod + self->baseColor[2];
     self->methods->slotE4(self, buffer);
     self->unk78->methods->slotB8(self->unk78, 1, buffer);
     return (u8)prod >= 0x81;

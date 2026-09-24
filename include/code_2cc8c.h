@@ -175,7 +175,7 @@ struct Unk4CObj {
                             called on it, gated by path's truthiness) */
     s32 unk8;           /* +0x008, OBSERVED: Obj86B60__SetState */
     s32 unkC;            /* +0x00C, OBSERVED: Obj86B60__Tick */
-    u8 unk10[3];          /* +0x010, INFERRED 3-byte colour buffer read by
+    u8 unselectedColor[3];          /* +0x010, INFERRED 3-byte colour buffer read by
                               address only (Obj86B60__SetState);
                               CONFIRMED as a 3-byte buffer read (not just
                               address-taken) by Obj86B60__CancelElementScroll/Obj86B60__SetSlotCursor,
@@ -1448,7 +1448,7 @@ struct Obj86B60 {
                                     Obj86B60__OnTag5Notify compared against unk1C */
     u8 pad044[0x048 - 0x044];
     Unk48Obj *unk48;            /* +0x048, Obj86B60__ForwardToChild only */
-    Unk4CObj *unk4C;            /* +0x04C, see Unk4CObj's own comment */
+    Unk4CObj *target;            /* +0x04C, see Unk4CObj's own comment */
     s32 slotCount;               /* +0x050, renamed from unk50, round 78 --
                                     Obj86B60__FindNextFreeSlot: capacity/wrap
                                     bound for the activeSlot index into
@@ -1519,12 +1519,12 @@ struct Obj86B60 {
     u8 pad07C[0x084 - 0x07C];
     s32 unk84;                  /* +0x084, Obj86B60__TickColorFade: multiplied
                                     against unk1C */
-    s32 (*unk88)(Obj86B60 *self); /* +0x088, a callback: set (to NULL or
+    s32 (*fadeCallback)(Obj86B60 *self); /* +0x088, a callback: set (to NULL or
                                     self->methods->slotB0) by Obj86B60__SetFadeCallbackEnabled,
                                     invoked by Obj86B60__TickFadeCallback */
     s32 (*unk8C)(Obj86B60 *self); /* +0x08C, same idiom via slotC4/
                                     Obj86B60__func_8003CB30/Obj86B60__func_8003CCDC */
-    u8 unk90[3];                 /* +0x090, Obj86B60__SetColors (setter, from
+    u8 baseColor[3];                 /* +0x090, Obj86B60__SetColors (setter, from
                                     a1[0..2]); Obj86B60__TickColorFade reads it as a
                                     colour base */
     u8 unk93[3];                 /* +0x093, Obj86B60__SetColors (setter, from
@@ -1532,10 +1532,10 @@ struct Obj86B60 {
     u8 unk96[3];                 /* +0x096, Obj86B60__SetColors (setter, from
                                     a3[0..2]) */
     u8 unk99[0x09C - 0x099];
-    void (*unk9C)(void *ctx);   /* +0x09C, a callback: set by Obj86B60__SetCallback,
+    void (*viewCallback)(void *ctx);   /* +0x09C, a callback: set by Obj86B60__SetCallback,
                                     invoked (with unkA0 as its argument) by
                                     Obj86B60__RefreshViewValue */
-    void *unkA0;                 /* +0x0A0, set by Obj86B60__SetCallback, passed to
+    void *viewCallbackCtx;                 /* +0x0A0, set by Obj86B60__SetCallback, passed to
                                     unk9C by Obj86B60__RefreshViewValue */
 };
 

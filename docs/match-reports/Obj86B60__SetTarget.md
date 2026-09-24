@@ -174,3 +174,6 @@ accessors the compiler lists, in both units):
   stops being the current selection, not the selection's own colour.
   `Obj86B60__SetState` (code_2cc8c.c, not attempted) only takes its address, so a
   rename there is a pure rename, no cast needed.
+
+
+**Head disposition, round 78.** `unk4C` -> `target` APPLIED (type scope, 36 accessors across code_2cc8c*). `Unk4CObj::unk10` -> `unselectedColor` APPLIED (5 accessors). `Unk4CObj::unk24` -> `slotEntries` + retype NOT applied: the retype needs a cast at `Obj86B60__Tick`'s call site, which is a type change, left for track 4.

@@ -58,3 +58,6 @@ above. Grep shows `unk40` textual hits in many unrelated units
 (class_39e08.c, code_171e0.c, class_3bb8c_*.c, code_2c054.c, code_179d8_*.c,
 code_2cc8c_d.c) so this is a PROPOSAL, not a direct rename -- only a
 definition-only rename + rebuild can tell which are this same struct.
+
+
+**Head disposition, round 78.** `unk40` -> `frameBound` DECLINED: the only source of "frame" is this setter's own name, so the field name would restate the function's hypothesis; left for whoever establishes what the bound is compared against.

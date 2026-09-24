@@ -88,3 +88,6 @@ merge:
   wider range of states unrelated to scrolling, is NOT established from
   this unit alone -- the head or whoever names that unit should confirm
   `unk3C`'s full value range before applying this name tree-wide.
+
+
+**Head disposition, round 78.** `unk3C` DECLINED this round: echo (`scrollState`) and delta (`notifyMode`) read it differently, and this report itself asks for its full value range to be confirmed first. It stays `unk3C` with both readings on file.
