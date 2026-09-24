@@ -2759,24 +2759,24 @@ struct Obj86ED0Methods {
     void (*slot98)(Obj86ED0 *self);                      /* +0x098 */
     void (*slot9C)(Obj86ED0 *self);                      /* +0x09C */
     void (*slotA0)(Obj86ED0 *self);                      /* +0x0A0 */
-    void (*slotA4)(Obj86ED0 *self, s32 arg1, s32 arg2);       /* +0x0A4, func_8005165C/func_800516C0 -- Obj86ED0__DispatchIndexValue, outside this unit's slice */
-    /* +0x0A8, func_80051720. 3 args, not 2 -- retail's call sets $a1/$a3
+    void (*slotA4)(Obj86ED0 *self, s32 arg1, s32 arg2);       /* +0x0A4, Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft -- Obj86ED0__DispatchIndexValue, outside this unit's slice */
+    /* +0x0A8, Obj86ED0__AdvanceCharSelect. 3 args, not 2 -- retail's call sets $a1/$a3
      * (`self->unk18`, `1`) and leaves $a2 holding the just-computed
      * incremented `unk1C` value untouched from a few instructions earlier
      * (no fresh load/li for it), which only makes sense if that register
      * IS the call's own middle argument, forwarded because it was already
      * live there. Same shape as TargetMethods86ED0::slot80 above. */
-    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);        /* +0x0A8, func_80051720 -- Obj86ED0__DispatchLookupValue, outside this unit's slice */
+    void (*slotA8)(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3);        /* +0x0A8, Obj86ED0__AdvanceCharSelect -- Obj86ED0__DispatchLookupValue, outside this unit's slice */
 };
 
 struct Obj86ED0 {
     Obj86ED0Methods *methods;  /* +0x000 */
     u8 pad004[0x00C - 0x004];   /* inherited BasicClass children/parentRefs, untouched by this unit */
     s32 unkC;                    /* +0x00C, Obj86ED0__SetName: its own `mode` argument */
-    s32 unk10;                   /* +0x010, Obj86ED0__SetName (halved when mode==1)/func_8005165C (upper bound tested against unk18+1) */
-    s32 unk14;                   /* +0x014, func_80051720 (upper bound tested against unk1C+1) */
-    s32 unk18;                   /* +0x018, Obj86ED0__SetName (zeroed)/func_8005165C/func_800516C0 (inc/dec counter, capped by unk10) */
-    s32 unk1C;                   /* +0x01C, Obj86ED0__SetName (zeroed)/func_80051720 (inc counter or reset to 0, capped by unk14) */
+    s32 unk10;                   /* +0x010, Obj86ED0__SetName (halved when mode==1)/Obj86ED0__MoveCursorRight (upper bound tested against unk18+1) */
+    s32 unk14;                   /* +0x014, Obj86ED0__AdvanceCharSelect (upper bound tested against unk1C+1) */
+    s32 unk18;                   /* +0x018, Obj86ED0__SetName (zeroed)/Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft (inc/dec counter, capped by unk10) */
+    s32 unk1C;                   /* +0x01C, Obj86ED0__SetName (zeroed)/Obj86ED0__AdvanceCharSelect (inc counter or reset to 0, capped by unk14) */
     s32 unk20;                   /* +0x020, Obj86ED0__AttachTarget (zeroed) */
     char *unk24;                 /* +0x024, Obj86ED0__SetName: its own `arg1` (name string) */
     char *unk28;                 /* +0x028, Obj86ED0__Finalize (freed in finalize)/Obj86ED0__SetName (DecodeFullWidthSjis/strcpy destination) */
@@ -2787,7 +2787,7 @@ struct Obj86ED0 {
     TargetObj86ED0 *unk3C;        /* +0x03C, Obj86ED0__AttachTarget (its own arg3)/Obj86ED0__NotifyTarget (dispatch target)/Obj86ED0__DetachTarget (zeroed) */
     ChildObj86ED0 *unk40;          /* +0x040, Obj86ED0__ReleaseCardResources (released, no null-back store) */
     ChildObj86ED0 *unk44;           /* +0x044, Obj86ED0__ReleaseCardResources (released, no null-back store) */
-    ChildObj86ED0 *unk48;            /* +0x048, Obj86ED0__ReleaseCardResources (release+null-back)/Obj86ED0__ClearChildRefs/Obj86ED0__RemoveAllChildren (zeroed)/func_8005165C/func_800516C0/func_80051720 (nonzero readiness gate)/Obj86ED0__LoadCardResources (set from a resolved resource handle) */
+    ChildObj86ED0 *unk48;            /* +0x048, Obj86ED0__ReleaseCardResources (release+null-back)/Obj86ED0__ClearChildRefs/Obj86ED0__RemoveAllChildren (zeroed)/Obj86ED0__MoveCursorRight/Obj86ED0__MoveCursorLeft/Obj86ED0__AdvanceCharSelect (nonzero readiness gate)/Obj86ED0__LoadCardResources (set from a resolved resource handle) */
 };
 
 /* HEAD NOTE round 15: alpha's `extern Obj86ED0Methods *Get_vtable_Obj86ED0(void);`

@@ -383,7 +383,7 @@ void Obj86ED0__NotifyTarget(Obj86ED0 *self, s32 arg1)
     }
 }
 
-void func_8005165C(Obj86ED0 *self)
+void Obj86ED0__MoveCursorRight(Obj86ED0 *self)
 {
     s32 old;
     s32 v;
@@ -400,7 +400,7 @@ void func_8005165C(Obj86ED0 *self)
     }
 }
 
-void func_800516C0(Obj86ED0 *self)
+void Obj86ED0__MoveCursorLeft(Obj86ED0 *self)
 {
     s32 old;
     s32 v;
@@ -417,7 +417,7 @@ void func_800516C0(Obj86ED0 *self)
     }
 }
 
-void func_80051720(Obj86ED0 *self)
+void Obj86ED0__AdvanceCharSelect(Obj86ED0 *self)
 {
     s32 v;
 

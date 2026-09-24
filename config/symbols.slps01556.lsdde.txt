@@ -2186,3 +2186,6 @@ Obj86ED0__SetState = 0x800512C8; // type:func
 Obj86ED0__TickState = 0x80051370; // type:func
 Obj86ED0__HandleCommand = 0x800513D0; // type:func
 Obj86ED0__NotifyTarget = 0x8005161C; // type:func
+Obj86ED0__MoveCursorRight = 0x8005165C; // type:func
+Obj86ED0__MoveCursorLeft = 0x800516C0; // type:func
+Obj86ED0__AdvanceCharSelect = 0x80051720; // type:func

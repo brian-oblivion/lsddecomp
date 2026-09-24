@@ -1,13 +1,15 @@
-# func_80051720 -- MATCH (25/25 words, 2 real attempts after the header fix)
+# Obj86ED0__AdvanceCharSelect -- MATCH (25/25 words, 2 real attempts after the header fix)
+
+> Renamed from `func_80051720` on 2026-09-24 (tools/rename.py). Address 0x80051720.
 
 Unit `class_3bb8c_i`. Obj86ED0's own "advance `unk1C` counter, clamped at
 `unk14`, dispatch `slotA8` with `unk18`" method. Same family as
-`func_8005165C`/`func_800516C0` (increment/decrement clamp pairs on
+`Obj86ED0__MoveCursorRight`/`Obj86ED0__MoveCursorLeft` (increment/decrement clamp pairs on
 `unk18`), but on a different pair of fields (`unk1C`/`unk14`) and resetting
 to 0 rather than restoring the old value on overflow.
 
 ```c
-void func_80051720(Obj86ED0 *self)
+void Obj86ED0__AdvanceCharSelect(Obj86ED0 *self)
 {
     s32 v;
 
@@ -24,7 +26,7 @@ void func_80051720(Obj86ED0 *self)
 ```
 
 Note the store (`self->unk1C = v;`) is UNCONDITIONAL, written before the
-`if` -- the exact same shape as `func_8005165C`/`func_800516C0`'s clamp
+`if` -- the exact same shape as `Obj86ED0__MoveCursorRight`/`Obj86ED0__MoveCursorLeft`'s clamp
 idiom, not something written differently inside the true branch. That part
 was right from the very first attempt.
 
