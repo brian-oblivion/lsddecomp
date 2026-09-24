@@ -1,7 +1,7 @@
 {
   "models": {
     "match_runner": "opus",
-    "naming_runner": "opus"
+    "naming_runner": "sonnet"
   },
   "stop_rule": {
     "attempts_per_model": 6,
@@ -290,6 +290,16 @@
           "note": "REVISIT runner (charlie, code_179d8_h): OpenCdFile 43/43 and ReadCdFile 56/56, both 1 word long since round 17 and filed as path-address CSE / block placement plus register rotation. Real cause: a C loop (while/do) lets loop.c hoist &path out of the retry and puts arg setup in the back-edge delay slot; label+backward goto is not a loop. ReadCdFile mixes both (CdReadSync wait is a genuine do/while). No permuter.",
           "round": 74,
           "runners": 1
+        },
+        {
+          "attempts": 31,
+          "calibration": false,
+          "date": "2026-09-24",
+          "matches": 30,
+          "model": "opus",
+          "note": "REVISIT runners (18 sessions, opus): 30 MATCHED of 31, none by permuter. code_179d8_e VabStreamObj__PlayTone (hi's first use must not be the multiply: combine andi fold); class_3bb8c_p DreamSys__BuildLinkQueries (method called with the 2 args retail passes; frame, not register); code_55dd4 5/5 (for loops not guard+do/while+barrier+filler x3; (*p++ = f()) == NULL; indexed input not a walking pointer); code_8220_c 9/9 (RCpoly wrappers return the next packet pointer x8, calls arm first; func_8001A268 guard+do/while); class_3bb8c_n StyleFillEffectKind0 (walk arg0, no copy: 'rotation' was entry-copy order); class_3bb8c_s DriftModelChildren (no named pointer before the branch; CSE supplies the move); code_2cc8c_b 2/2 (8-byte pair as one struct copy; slot4C third argument); code_171e0 SetActiveDataSource (table entries take no argument; goto loop); class_3bb8c_e 2/2 (while with counter tested after the call; forwarded third argument to BuildMemcardPath); class_3bb8c_f 2/2 (u8 parameter, no copy locals; void return lets three calls cross-jump); Entity_g func_80064E34 (two calls cross-jumped, not one with a chosen argument); class_3bb8c_b func_8004C93C (one slot pointer assigned at the join, separate remainder local); class_3bb8c_d func_8004DCD0 (base set before the call, 3-byte struct copy, ++x in the test); DreamSys 2/2 (whole-struct copy + nested if chain removes a label; slot0x38 third argument). The 31st: func_8002AA6C is Sony libcd bios.c cd_read_retry (position + strings + shape), identified, not matched.",
+          "round": 75,
+          "runners": 18
         }
       ],
       "status": "open"
@@ -426,6 +436,16 @@
           "note": "2 bodies promoted, both hand-derived: DreamSys__BuildLinkQueries (class_3bb8c_p, 13/116, not length-exact; head corrected the comment's 'scheduling only' to frame + register allocation) and Class876FC__DriftModelChildren (class_3bb8c_s, 117/121 length exact, commutative swap).",
           "round": 74,
           "runners": 2
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-24",
+          "matches": 0,
+          "model": "sonnet",
+          "note": "1 body promoted, hand-derived: func_80018464 (code_8220_b, 982/954, +28 long, strength-reduction residue from round 56).",
+          "round": 75,
+          "runners": 1
         }
       ],
       "status": "auto"
@@ -706,6 +726,7 @@
         "code_2cc8c_e": "2026-09-20",
         "code_2cc8c_f": "2026-09-18",
         "code_4cd08": "2026-09-21",
+        "code_55dd4": "2026-09-24",
         "code_8220": "2026-09-24",
         "code_8220_b": "2026-09-17",
         "code_d294": "2026-09-23",

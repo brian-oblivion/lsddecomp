@@ -135,9 +135,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   pass runs over it, so it can change code a plain `{ }` in the identical place does not, and that
   bare-brace control IS the discriminator. Its effect is not fixed: scheduling on `func_8004CAF0`,
   global register allocation on `Snd_decrescendo`. (a round 58, bravo + charlie)
-- **Two levers that each MEASURE AS A REGRESSION alone can be byte-exact together.**
-  `func_8004CFB8`: halves scored 17/28 and 10/28 singly, 28/28 jointly. Try the product before
-  discarding either reading. (a round 58, bravo)
 - **A one-instruction `else` arm leaves NO BLOCK**: reorg steals it into the branch's own delay slot
   and the branch targets the outer join, so "retail assigns this in a delay slot, mine assigns it
   plainly" is evidence about if/else shape, not about the scheduler. Tell: a conditional branch
@@ -165,6 +162,19 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **An early `return <const>` near the top can decide delay-slot fillers at LATER branches.**
   Same instructions, equal length, fillers swapped: rewrite as `if (ok) { ...; return 1; } return
   0;`. Closed `DreamSys__TryInstantTeleportLink` 58/63. (PROGRESS round 73)
+- **Guard + `do/while` + a leading `__asm__("")` + a `u8 unused[N]` frame filler is ONE wrong
+  loop kind, and a plain `for` fixes all three symptoms** (prologue store order, the early
+  `move $sN,$aN`, frame size): three `code_55dd4` stalls, one with 192k permuter iterations on the
+  wrong shape. Where `i++` sits decides whether its `addiu` fills the `jalr` slot. The reverse also
+  occurs (`func_8001A268`: a value computed before the loop-skip test took the slot from the stack
+  adjustment), and a retry loop testing its counter AFTER the call is a `while`, not a goto loop
+  (`func_8004E6B8`). Whatever precedes a branch in the source decides its delay slot. (round 75)
+- **Two argument set-ups sharing one `jal`, reached by a `j` whose delay slot sets the differing
+  argument, are TWO calls GCC cross-jumped**, not one call with an argument chosen in a variable
+  (`func_80064E34`, seven words short: its four `li v0,-0x3C` were each block's first instruction
+  copied into branch delay slots). A per-branch `return` blocks the merge; a `void` function lets
+  three calls merge (`TaskObjF__func_8004F8A4`). Retail's `j` into a shared STORE is likewise two
+  identical stores (`func_8004DCD0`). (round 75)
 
 ### 3b. Switch and jump tables
 
@@ -255,18 +265,25 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 - **A named C variable gets ONE storage location for its whole scope, so any new name is a new
   allocno** — treat ANY change to the set of named locals as potentially renumbering every
-  callee-saved register, and re-measure LENGTH. Retail's transient rematerialization shape has no C
-  spelling, but its trigger is MEASURED: 2.6.3 rematerializes a constant when a delay-slot filler
+  callee-saved register, and re-measure LENGTH. Retail's transient rematerialization shape has a
+  measured trigger, and one instance was not rematerialization at all (round 75, below): 2.6.3 rematerializes a constant when a delay-slot filler
   materializes it early and an intervening CALL invalidates the caller-saved register holding it. N
   copies of one literal at a merge point can be TWO stacked sub-mechanisms answering to no one
   lever. (a §"One named C variable gets ONE storage location", round 55)
 - **The SCOPE of a named local is the lever, not the name.** Declaring it INSIDE the block where the
   value must survive one call closed `Snd_setVabAttr` 179/179 after three rounds failed by hoisting
   to function entry. (a §"The SCOPE of a named local is the lever")
-- **"Name it, THEN barrier it" is two-part and neither half works alone** — a named local plus a
-  bare `__asm__("")` immediately after the declaration took `func_8003D73C` to exact length;
-  named-temp-only reproduces the old baseline. The identical lever on a sibling's textually
-  identical line regressed it 114/118 -> 14/118. (a §"\"Name it, THEN barrier it\"")
+- **A block move is its own tell: N loads into fresh scratch registers, then N stores, then a
+  RELOAD of a word just stored.** That is a whole-struct copy (`pos = *src;`), opaque to later
+  passes, so the field is re-read from the stack. It closed `func_8003D73C`/`func_8003DAD4` (8-byte
+  pair; the "name it, then barrier it" pair this entry used to recommend was imitating it by
+  hand), `func_8004DCD0` (3 signed bytes) and `DreamSys__TryStaircaseLink` (10 bytes). (round 75)
+- **Write an expression twice rather than naming it before a branch, and walk a parameter rather
+  than a copy of it.** CSE supplies retail's `move sN,sM` for a second `&tab[idx]`, while a name
+  taken before the branch swapped the first address computation (`DriftModelChildren`); an
+  `arr = arg0` copy put arg0's entry `move` LAST, read for three rounds as a "whole-function
+  argument rotation" whose registers were in fact identical (`StyleFillEffectKind0`). Both also
+  apply in reverse: `(*p++ = f()) == NULL` as one expression dissolved a filed rule-6 swap. (round 75)
 - **What a value is NAMED and how many times it is LOADED are two knobs, and the helpful direction
   is function-specific.** REMOVING a dead reload was worth 12 and 10 words; ADDING a cached local
   pointer was the only thing that stopped strength reduction elsewhere. A variant that changes
@@ -463,6 +480,14 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   if the shared slot is under-declared); a `move $tN,$aK` whose `$tN` later takes a call result is
   the parameter reused as the result (`aK = f(..., aK)`). Closed `Class6E99C__StartFadeToIndex`/
   `StartFadeDefault` after 94k permuter iterations. (PROGRESS round 73)
+- **Read every call's argument registers in retail before any other lever; round 75's commonest
+  defect was the wrong NUMBER of arguments or a missing return, 17 functions.** A "filler"
+  `addiu $v0,...` before `jr $ra` is the return value (eight RCpoly wrappers). An argument FORWARDED
+  from the caller's own parameter emits no set-up, so a three-argument call reads as two
+  (`BuildMemcardPath`, `slot0x38`); a stray early `$aN` write is the omitted argument (`slot4C`).
+  A method typed WIDER than retail passes keeps values live: extra saved registers, a frame
+  difference (`BuildLinkQueries`). A `jalr` with no `$a0` set before it takes no argument
+  (`SetActiveDataSource`). Fix the slot or prototype once its callers are checked. (round 75)
 
 ### 3g. Delay slots, arithmetic, one-instruction residues
 
@@ -530,6 +555,13 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **A flat table indexed `&T[r*C]` then `[c]` wants a named row-pointer local, `T (*tbl)[C] = ...;
   tbl[r][c]`**: the local puts the table-address load before the index arithmetic; the inline
   cast does not. Closed `CalcDreamColor` 28/35. (round 73)
+- **A code label changes what later passes may delete or combine, and every `if (c) return X;`
+  leaves one.** jump2 deletes a redundant `move a0,s0` only if its backward scan reaches the entry
+  copy without crossing a label; turning early returns into a nested `if` chain let it, which stopped
+  `addiu a0,s0,0x16c` being hoisted into a delay slot (`DreamSys__TryStaircaseLink`, read with `-da`).
+  combine likewise folds `x - (x>>4)*16` to `andi` only when the multiply is the shifted value's
+  FIRST use in the block; use `hi` for something else first and retail's `sll`/`subu` stays
+  (`VabStreamObj__PlayTone`; a barrier between them does not stop the fold). (round 75)
 
 ### 3h. volatile and memory
 
@@ -601,33 +633,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   score on a non-matching function means the residue is what the scorer NORMALIZES AWAY (a branch
   target, round 67) or is outside it; the one-second isolated compile tells which. Check 3 licenses
   the SEARCH, not its output.
-- **`--stack-diffs` is MANDATORY on a frame or offset residue or you get a FALSE ZERO** — the scorer
-  normalizes stack-offset differences away, and a false zero is expensive because it is treated as a
-  lead to translate. (a §"`--stack-diffs` is MANDATORY")
-- **A permuter number is in PERMUTER units, and LOWER is not a synonym for CLOSER.** `"Reorderings:
-  2"` is a bucket label; `210` is a weighted penalty published as "1 word remaining" for a 22/25
-  body. Both directions measured: 2735-from-3735 rebuilt as 14/164 with drift, while sub-base
-  candidates translated to +13 and +24 real words. **Translate AND measure.** (a §"A permuter number
-  is in PERMUTER units", §"A permuter improvement is a LEAD unconditionally")
-- **Verification must match whether the candidate changes BEHAVIOUR.** A behaviour-changing
-  candidate must be traced by hand (hoisting a call across an un-unrolled loop's back-edge changed
-  only one branch immediate: 176/177, and wrong). A behaviour-preserving one must be real-build
-  verified. (a §"The permuter can produce a SEMANTICALLY WRONG candidate", §"A permuter candidate's
-  verification must match")
-- **The UB screen must be a FORWARD TRACE, not "reads before first assignment" — the scorer never
-  executes anything.** Four of six local-bests had correctness bugs and not all were uninitialised
-  reads: one left a variable unset on a rare path, one read a reassigned variable under its OLD
-  MEANING. Round 49 adds staleness across a LOOP BACK-EDGE and use-before-init from a reordered
-  pair. (a §"The permuter UB screen was too narrow", §"The forward-trace UB screen")
 - **A permuter improvement can be oracle-confirmed and still be UNSOUND C**, and a zero is validated
   in ISOLATION and cannot see cross-TU damage. A 208/223 candidate hoisted a string-literal address
   into a CALLER-saved register outside a call-making loop; a genuine zero elsewhere required a
   shared global `volatile` that corrupted a matched sibling. (a §"A permuter improvement can be
   oracle-confirmed and still be UNSOUND C", §"A permuter zero is validated in ISOLATION")
-- **A permuter negative is ONE SAMPLE of a stochastic process, in both directions.** A zero arrived
-  at iteration 149 where a 33,480-iteration search had plateaued; elsewhere 163,644 fresh iterations
-  reproduced an identical floor. Rank on whether a search EVER beat base, and track a manual
-  `PERM_GENERAL` enumeration separately. (a §"A permuter negative is ONE SAMPLE")
 
 ## 4. Verdict classes and how far to trust them
 
@@ -645,7 +655,9 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   of everything queued. Contaminants found, all ordinary C: a masked byte parameter mistyped `s32`,
   a missing field-offset term, a stale helper signature, a field-copy pair wanting whole-struct
   assignment. Round 19 closed 17 in one round. (a §"A \"register-identity\" verdict is the least
-  reliable class", §"Round 19 confirmed the class")
+  reliable class", §"Round 19 confirmed the class") Round 75 revisited 31 stalls, most filed as
+  register identity, scheduling or delay slots: 30 matched as ordinary source shape (arity, loop
+  kind, struct copy, CSE), none by permuter, and the 31st was Sony code. (PROGRESS round 75)
 - **It is a HYPOTHESIS about a mechanism; "the registers differ" does not establish it.** Differing
   registers fits both GCC wanting a different ALLOCATION (terminal) and GCC scheduling freely with
   allocation falling out (source-fixable); a sibling filed terminal for three rounds closed 14/14 on
@@ -660,17 +672,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   residue" for four rounds at 7/7 and held four separable defects, three of them plain C. At 0/0
   every instruction is retail's in retail's order and only the register pairing differs, which IS
   the banned-fix category. Rebuild the preserved body and read the line. (a round 60)
-- **"Pure register rotation" — zero reorderings, insertions and deletions, only register differences
-  — IS a stall under project rules**, and `--debug` establishes it early. "Tail merge" is an
-  UMBRELLA, not a class: merge COUNT versus merge DEPTH, neither lever transferring. A saturated
-  file (8 of `$s0`-`$s7`) is its own class with a permitted lever — reduce the values live across
-  each call — and looks catastrophic (40/145) at exact length. (a §"New residue classes opened this
-  round")
-- **Callee-saved demand is a ONE-DIRECTIONAL screen: use 7+ to DEPRIORITISE, never to decline.**
-  splat writes `$fp` where objdump writes `s8`, so a screen written for one undercounts by exactly
-  one; a LOW count predicts nothing. The threshold was corrected TWICE (5 -> 7, then the 7+ band
-  matched byte-exact at 8). (a §"Round 13: retail's callee-saved-register demand", §"Round 14
-  CORRECTION")
 - **"N words short" and "N/M words match" are DIFFERENT measurements that read identically, and a
   word count is not a count of DIVERGENCES.** A title must carry LENGTH, RAW WORD-MATCH and WHERE
   THE FIRST REAL DIFF IS: a body can be the right length and match almost nothing (144/145 compiled,
@@ -683,12 +684,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   rejected, the rejection has expired.** A class several reports agree on may be one error copied,
   so re-derive from asm-differ/objdump before acting on any report's DESCRIPTION. (a §"A lever's
   NEGATIVE is scoped to the state it was tested under")
-- **Budget by ATTEMPT HISTORY, not by score, and treat a screen over PROSE reports as a hint to
-  verify.** "Unscoreable" describes a SESSION, not a function (two salvaged bodies matched 56/56 and
-  119/223 unreshaped), and a permuter-history screen has counted the WORD "permuter" as
-  never-searched, ranking scaffold-rejected functions to the TOP. Rank a fresh unit by SIBLING GROUP
-  and remember an unpromoted learning does not exist. (a §"\"Unscoreable\" describes a SESSION's
-  state", §"Gate 1b's sixth screen is neither SOUND nor COMPLETE")
 - **"Exact length" can be arithmetic rather than structure, and only the positional-skeleton figure
   notices.** `SpuVmAlloc` carried "EXACT LENGTH MATCH 167/167" from round 37 for 28 rounds; round
   65 found two one-word padding artifacts sitting on a body two words SHORT, summing to the right

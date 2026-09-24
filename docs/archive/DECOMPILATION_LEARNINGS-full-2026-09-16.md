@@ -9090,3 +9090,56 @@ already covered elsewhere in the sheet.
   differently: a maspsx flag that adds or drops an expansion nop changes every LENGTH figure recorded
   before it and no MATCH figure. A title's "N words short/long" from before a flag landed is not
   comparable with one after; rebuild the body and re-measure before ranking on it. (a round 65)
+
+## Distilled round 75 (2026-09-24)
+
+- **`--stack-diffs` is MANDATORY on a frame or offset residue or you get a FALSE ZERO** — the scorer
+  normalizes stack-offset differences away, and a false zero is expensive because it is treated as a
+  lead to translate. (a §"`--stack-diffs` is MANDATORY")
+
+- **A permuter number is in PERMUTER units, and LOWER is not a synonym for CLOSER.** `"Reorderings:
+  2"` is a bucket label; `210` is a weighted penalty published as "1 word remaining" for a 22/25
+  body. Both directions measured: 2735-from-3735 rebuilt as 14/164 with drift, while sub-base
+  candidates translated to +13 and +24 real words. **Translate AND measure.** (a §"A permuter number
+  is in PERMUTER units", §"A permuter improvement is a LEAD unconditionally")
+
+- **Verification must match whether the candidate changes BEHAVIOUR.** A behaviour-changing
+  candidate must be traced by hand (hoisting a call across an un-unrolled loop's back-edge changed
+  only one branch immediate: 176/177, and wrong). A behaviour-preserving one must be real-build
+  verified. (a §"The permuter can produce a SEMANTICALLY WRONG candidate", §"A permuter candidate's
+  verification must match")
+
+- **The UB screen must be a FORWARD TRACE, not "reads before first assignment" — the scorer never
+  executes anything.** Four of six local-bests had correctness bugs and not all were uninitialised
+  reads: one left a variable unset on a rare path, one read a reassigned variable under its OLD
+  MEANING. Round 49 adds staleness across a LOOP BACK-EDGE and use-before-init from a reordered
+  pair. (a §"The permuter UB screen was too narrow", §"The forward-trace UB screen")
+
+- **A permuter negative is ONE SAMPLE of a stochastic process, in both directions.** A zero arrived
+  at iteration 149 where a 33,480-iteration search had plateaued; elsewhere 163,644 fresh iterations
+  reproduced an identical floor. Rank on whether a search EVER beat base, and track a manual
+  `PERM_GENERAL` enumeration separately. (a §"A permuter negative is ONE SAMPLE")
+
+- **Callee-saved demand is a ONE-DIRECTIONAL screen: use 7+ to DEPRIORITISE, never to decline.**
+  splat writes `$fp` where objdump writes `s8`, so a screen written for one undercounts by exactly
+  one; a LOW count predicts nothing. The threshold was corrected TWICE (5 -> 7, then the 7+ band
+  matched byte-exact at 8). (a §"Round 13: retail's callee-saved-register demand", §"Round 14
+  CORRECTION")
+
+- **Budget by ATTEMPT HISTORY, not by score, and treat a screen over PROSE reports as a hint to
+  verify.** "Unscoreable" describes a SESSION, not a function (two salvaged bodies matched 56/56 and
+  119/223 unreshaped), and a permuter-history screen has counted the WORD "permuter" as
+  never-searched, ranking scaffold-rejected functions to the TOP. Rank a fresh unit by SIBLING GROUP
+  and remember an unpromoted learning does not exist. (a §"\"Unscoreable\" describes a SESSION's
+  state", §"Gate 1b's sixth screen is neither SOUND nor COMPLETE")
+
+- **"Pure register rotation" — zero reorderings, insertions and deletions, only register differences
+  — IS a stall under project rules**, and `--debug` establishes it early. "Tail merge" is an
+  UMBRELLA, not a class: merge COUNT versus merge DEPTH, neither lever transferring. A saturated
+  file (8 of `$s0`-`$s7`) is its own class with a permitted lever — reduce the values live across
+  each call — and looks catastrophic (40/145) at exact length. (a §"New residue classes opened this
+  round")
+
+- **Two levers that each MEASURE AS A REGRESSION alone can be byte-exact together.**
+  `func_8004CFB8`: halves scored 17/28 and 10/28 singly, 28/28 jointly. Try the product before
+  discarding either reading. (a round 58, bravo)

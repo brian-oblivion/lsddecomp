@@ -6,6 +6,139 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-24 — round 75: thirty of thirty-one revisits match, and "register identity" was the wrong argument count
+
+**Five slots, twenty-four runner sessions, three tracks, every merge green.**
+The head ran on Opus as an ordinary head, not premium. Nothing this round
+needed a premium head, and the plan-level findings are ESCALATED below. Gate 0
+was clean, and every worktree byte-verified before handover. Slots were
+refilled as runners finished (§3.8), re-reading the ready list and re-pricing
+contention each time. Three jobs were skipped for call-graph contention:
+class_3bb8c_k naming while delta was naming class_3bb8c_j (it rewrites
+`func_80052B60`), and the DreamSys and class_3bb8c_n revisits while alpha was
+naming code_179d8_l (both reference `func_8002CD08`). All three ran later in
+the round. The extern-review job that appeared mid-round was done by the head:
+one `arity-ok` annotation (`Class876FC__DriftModelChildren`, dead second
+argument, retail `move a1,s1` at 0x800566D8).
+
+| track | sessions | model | outcome |
+| --- | --- | --- | --- |
+| 1 revisit | 18 | opus | **30 MATCHED of 31**, none by permuter. VabStreamObj__PlayTone 55/55; DreamSys__BuildLinkQueries 116/116; code_55dd4 5/5 (func_80066340 258/258); code_8220_c 9/9; StyleFillEffectKind0 99/99; Class876FC__DriftModelChildren 121/121; code_2cc8c_b 2/2; SetActiveDataSource 35/35; class_3bb8c_e 2/2; class_3bb8c_f 2/2 (TryWriteMemcardSaveFile 240/240); func_80064E34 98/98; func_8004C93C 109/109; func_8004DCD0 78/78; DreamSys 2/2. The 31st, `func_8002AA6C`, is Sony libcd `cd_read_retry` |
+| 1b | 1 | sonnet | func_80018464 promoted (982/954, +28 long) |
+| 3 | 5 | 3 sonnet, 2 opus | code_179d8_l, class_3bb8c_t, class_3bb8c_j, class_3bb8c_k, code_55dd4 named, reviewed, marked; two needed head repair (below) |
+
+`plan.py` now reads 1150/1161 game functions matched, 11 stalls left, each
+awaiting a REVISIT-2. The revisit yield is 72/93. Track 3 is at 40/75 units.
+Twelve units now carry no `INCLUDE_ASM`: code_55dd4, code_8220_c,
+class_3bb8c_s, class_3bb8c_e, class_3bb8c_f, class_3bb8c_d, class_3bb8c_p,
+DreamSys, code_2cc8c_b, code_179d8_e, code_171e0 and Entity_g.
+
+### What the revisits found
+
+None of the thirty matches was a register-allocation wall. The first act of
+every revisit, rebuilding the preserved body and reading the ins/del line and
+which words differ, was usually enough to show that the filed residue class was
+wrong. The levers fall into five families, each now a LEARNINGS entry:
+
+- **Argument count and return value (17 functions).** Eight RCpoly wrappers in
+  code_8220_c return the next packet pointer: the "filler" `addiu $v0` was the
+  return value, and the `$a2`/`$a1` "register identity" residue vanished once it
+  was written. Arguments forwarded from the caller's own parameter emit no
+  set-up, so three-argument calls read as two (`BuildMemcardPath`,
+  `slot0x38`, `slot4C`). A method typed too wide kept values live across calls
+  (`BuildLinkQueries`: a frame difference, two extra saved registers). A table
+  of functions that take no argument had been written passing one.
+- **Loop kind.** Guard + `do/while` + barrier + `u8 unused[8]` filler became a
+  plain `for` in three code_55dd4 functions; the barrier and the filler had
+  each been compensating for the wrong loop (one had 192k permuter
+  iterations). One function needed the reverse, one needed a `while` with the
+  counter tested after the call, and SetActiveDataSource needed round 74's
+  goto loop.
+- **Two calls, not one.** Argument set-up in two blocks sharing one `jal` is two
+  calls cross-jumped (`func_80064E34`, seven words short). A `void` return let
+  three calls merge (`TaskObjF__func_8004F8A4`).
+- **Struct copies and CSE.** Block-move tells (loads into fresh scratch
+  registers, stores, a reload) matched four functions. Writing an expression
+  twice rather than naming it before a branch, and walking a parameter rather
+  than a copy of it, dissolved two "rotations".
+- **Labels and first uses.** Early `return`s leave labels that stop jump2
+  deleting a redundant move (TryStaircaseLink, diagnosed with `-da` on a
+  12-line reproducer). combine's `x - (x>>4)*16` to `andi` fold needs the
+  multiply to be the shifted value's first use (PlayTone).
+
+### Head corrections at merge
+
+- **alpha (code_179d8_l naming) failed review and was rebuilt by the head.**
+  The unit is mostly Sony libsnd vmanager. Alpha gave game names to 24 libsnd
+  variables: `_svm_tn` (0x8008E978, pinned in `psyq-objects.ld`) became
+  `gNoteTable`, `_ss_score` (0x800902E8) became `gVoiceEnvTable`, and five
+  offsets inside `_svm_cur` (0x8008EA0C) were named as separate globals. It also
+  gave game type and field names to structs used inside Sony functions. The
+  head reset `runner/alpha` to its merge-base (old tip `bba972fb`) and
+  cherry-picked the four in-scope commits: `ServiceSoundCueSet` (the unit's one
+  game function, reviewed against its body), its local struct views, the
+  header comment and the stub reports. `SpuVmKeyOnNow.md`'s remaining
+  proposals were annotated as `_svm_cur` fields. Under FINISHING-PLAN §2 a
+  Sonnet unit sent back returns the naming runner to Opus. It went to Opus
+  mid-round, the next two Opus units (class_3bb8c_k, code_55dd4) reviewed
+  clean, and it is back on Sonnet.
+- **delta (class_3bb8c_j naming) put a unit suffix into symbol names**
+  (`Class86F88_3bb8c_j__AddChild`). The suffix was needed on the unit-local
+  TYPE, because `Class86F88` already exists in `class_3bb8c.h`, but never on a
+  function. The head ran 13 `rename.py` calls to `Class86F88__X` /
+  `New_Class86F88`. That is a convention miss, not a wrong tier-A name. Delta's
+  class attribution, corrected against `classtable.py` before naming, was
+  right.
+- **Slot arities were corrected in shared headers** after
+  their only callers matched: `getGridArrElemAt` (DreamSys.h, two arguments),
+  `Unk68ObjMethods.slot4C` (code_2cc8c.h, three). The local casts the runners
+  had used were dropped. `slot0x38` was corrected by alpha. RCpoly's own
+  return type stays `void` (no Psy-Q header prototype), and the wrappers call
+  through a documented local cast.
+- **`func_8002AA6C` identified as `cd_read_retry`** with rename.py and an
+  `identified` comment. The evidence is position between pinned `CD_init` and
+  `CD_readm` (the same slot in 3.3's `bios.o`), strings in the `bios.c $Id 1.71`
+  rodata block, and shape. It left the game count; its NON_MATCHING body stays.
+- **bravo's two ObjM field names applied by type scope**
+  (`unk80`/`unk84` -> `pauseSetupStep`/`closeReady`, 10 accessors, all in
+  class_3bb8c_m).
+- **Stale reports and docs corrected**: the code_8220.h RCpoly lead note
+  ("measured but NOT acted on"), BuildMemcardPath's "must declare it
+  unprototyped", two class_3bb8c_e sibling reports, and MATCHING-GUIDE's
+  `func_8003D73C`/`func_8003DAD4` "mis-grouped classes" example (both matched
+  on one lever). LEARNINGS: two 3d claims corrected ("name it, then barrier
+  it", and the rematerialization "no C spelling"), six entries added, nine
+  distilled to the archive (five permuter-practice, three §4 screens, one 3a).
+- **Symbols-file merge conflicts** (alpha/echo, delta, bravo, charlie): every
+  runner appends at one point. Both sides were kept each time; no duplicate
+  name or address.
+
+### ESCALATED (operator decisions; the head did not act)
+
+1. **Track 3 has no rule for Sony-owned DATA.** §3 track 3 forbids game names
+   on library FUNCTIONS; it says nothing about globals and struct fields that
+   Sony code owns. Alpha followed the letter and renamed 24 libsnd variables.
+   A rule sentence, and perhaps a check that a renamed address does not fall
+   within a pinned Sony symbol's extent, is a plan and tool change.
+2. **plan.py's ready list still does not price call-graph contention between
+   its own jobs** (round 74's escalation 2). This round it skipped three jobs,
+   the third round in a row.
+3. **rename.py still rewrites FINISHING-PLAN prose** (round 74's escalation
+   1). This round it renamed the track 1b shape example's `func_80066340` to
+   `Class65650__ApplyTodPacket`. Accepted, since that example illustrates the
+   shape and not a naming form, but the tool behaviour is unchanged.
+4. **plan.py offers `StartNote` (code_179d8_m) as a REVISIT-2 job**, but round
+   73 stopped it as Sony libsnd `SpuVmKeyOn` (call order plus an `andi` run).
+   It needs an `identified` comment or a `not SDK` rejection, and that is a
+   track 2 decision.
+5. **Round 74's `SsUtKeyOn` prototype finding is byte-invisible.** Bravo
+   measured it at the only call site: the extern's types change no bytes. The
+   `SsUtKeyOn` definition in `code_179d8_j_b.c` is a NON_MATCHING stall
+   (65/252), not byte-exact as round 74 said. The extern was left alone.
+6. **Track 1 is nearly exhausted.** 11 stalls remain, all REVISIT-2. Revisits
+   paid 30/31 this round against revision 14's 40/60 assumption. Whether
+   REVISIT-2 is the last pass before track 1 closes is the operator's call.
+
 ## 2026-09-24 — round 74: two one-word-long CD stalls were goto loops, and the SDK call surface closes
 
 **Five slots, five runner sessions, four tracks, every merge green.** The head

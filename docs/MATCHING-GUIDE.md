@@ -498,6 +498,14 @@ three are live rather than transcribed:
   both described as "register" problems, measure before believing they are one
   class**, because the shared label is doing the grouping, not the evidence.
 
+  **Round 75 falsified that example's conclusion, and the correction is the
+  point.** Both functions matched on the SAME lever, an 8-byte pair written as
+  one struct copy (plus a missing third argument on `func_8003D73C`), and the
+  saturated file was a symptom of the wrong shape, not a class. The census is
+  still a fine staffing screen; a count of 8 is not evidence that a stall is
+  terminal, and a shared residue label can be right while every "register"
+  verdict under it is wrong (LEARNINGS 3d, 4).
+
 There is no uncarved ground left (`python3 tools/uncarved.py` is the check).
 If a re-segmentation ever creates some, the carve recipe and its hazards are
 `docs/archive/PARALLEL-RUNS-full-2026-09-16.md`, Gate 2, summarised in
