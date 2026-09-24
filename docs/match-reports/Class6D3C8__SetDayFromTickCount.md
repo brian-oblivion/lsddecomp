@@ -1,4 +1,6 @@
-# func_800260A4
+# Class6D3C8__SetDayFromTickCount
+
+> Renamed from `func_800260A4` on 2026-09-24 (tools/rename.py). Address 0x800260a4.
 
 **Unit:** code_1677c · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
 
@@ -36,19 +38,19 @@ jal   func_80048CFC
 `0x1F800000` is the PS-X scratchpad region (data cache used as fast RAM,
 not a hardware register) — some running counter lives there as a plain
 `s32`, read once per call. m2c (`tools/m2ctx.py code_1677c --sig 'void
-func_800260A4(void)' --run`) independently produced the same `% 365`
+Class6D3C8__SetDayFromTickCount(void)' --run`) independently produced the same `% 365`
 reading, confirming the divisor and that GCC reproduces its own magic
 constant without any hand-tuning needed:
 
 ```c
-void func_800260A4(void) {
+void Class6D3C8__SetDayFromTickCount(void) {
     func_80048CFC(*(s32 *)0x1F800000 % 365, 0);
 }
 ```
 
 `func_80048CFC` (in `psyq_memset.s`, still `asm`) is called with `(day, 0)`
 — second argument's purpose unknown, always a literal 0 at every call in
-this unit's family (see `func_80026170`/`func_80026348` etc., all of which
+this unit's family (see `Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask` etc., all of which
 pass 0/0/0 into the sibling helper `SetActiveDataSourceDriverMode`, a related pattern this
 runner did not decompile).
 

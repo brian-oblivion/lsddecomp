@@ -1,10 +1,12 @@
-# func_80026518
+# Class6D3C8__RunPollTask
+
+> Renamed from `func_80026518` on 2026-09-24 (tools/rename.py). Address 0x80026518.
 
 **Unit:** code_1677c · **Size:** 29 instructions (0x74 bytes) · **Status:** MATCHED (29/29 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
-A small helper used by `func_80026410` (matched just before this): constructs
+A small helper used by `Class6D3C8__PollGraphRoomStatus` (matched just before this): constructs
 a `PollTask` by calling the caller-supplied constructor function pointer
 directly (`ctor(dreamSys)` -- not through any vtable, the function pointer
 itself IS the constructor), dispatches `slot44(task, extra, 0)` and
@@ -40,7 +42,7 @@ addu $v0, $s0, $zero                              ; return that saved value
 ```
 
 ```c
-s32 func_80026518(PollTaskCtor ctor, void *dreamSys, s32 extra) {
+s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
     PollTask *task = ctor(dreamSys);
     s32 result = task->methods->slot44(task, extra, 0);
 
@@ -51,11 +53,11 @@ s32 func_80026518(PollTaskCtor ctor, void *dreamSys, s32 extra) {
 
 Matched first attempt -- the "delay slot after a `jalr` captures the
 *preceding* call's return value, not the one about to run" idiom (first
-found the hard way in `func_80026170`) was already the expected read here.
+found the hard way in `Class6D3C8__LoadIntroLogoSequence`) was already the expected read here.
 
 ## Proposed learning
 
-None beyond what `func_80026170`'s report already recorded; this function is
+None beyond what `Class6D3C8__LoadIntroLogoSequence`'s report already recorded; this function is
 a clean instance of the same idiom with no new residue.
 
 ## HEAD BROADCAST cross-check (this round's two levers)

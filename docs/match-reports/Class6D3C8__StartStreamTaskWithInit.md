@@ -1,23 +1,25 @@
-# func_80026900
+# Class6D3C8__StartStreamTaskWithInit
+
+> Renamed from `func_80026900` on 2026-09-24 (tools/rename.py). Address 0x80026900.
 
 **Unit:** code_1677c · **Size:** 56 instructions (0xE0 bytes) · **Status:** MATCHED (56/56 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
 `Class6D3C8Methods` slot `+0x064`, the last function in this unit's queue.
-Gated by `self->arg->unk08` (the same gate `func_80026348` and
-`func_8002658C` use). Builds a `StreamTask`, runs its `slot12C`, derives a
+Gated by `self->arg->unk08` (the same gate `Class6D3C8__StartWeeklyStreamTask` and
+`Class6D3C8__StartGraphRoomStreamTask` use). Builds a `StreamTask`, runs its `slot12C`, derives a
 type code via `func_800491FC` (a new library helper with the same
 "write-to-`*out`, return-a-separate-value" shape as
 `func_800490F4`/`func_8004913C`/`func_800493E4`), looks it up via
 `func_800493C8`, initializes the task with it, then starts it -- the same
-overall shape as `func_80026170`/`func_80026348`, with a `slot12C` call
-added (matching `func_8002658C`'s use of that slot).
+overall shape as `Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask`, with a `slot12C` call
+added (matching `Class6D3C8__StartGraphRoomStreamTask`'s use of that slot).
 
 ## Final C
 
 ```c
-void func_80026900(Class6D3C8 *self) {
+void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
     StreamTask *task;
     s32 typeCode;
     s32 outerValue;
@@ -42,9 +44,9 @@ across --
   `outerValue` is a PRECEDING call's return (`func_800491FC`, captured via
   the delay slot of the `func_800493C8` `jal` right after it) and
   `typeLookup` is the REAL 4th argument (the delay slot of `slot44`'s own
-  `jalr`, per the idiom `func_80026170`'s report first documented);
+  `jalr`, per the idiom `Class6D3C8__LoadIntroLogoSequence`'s report first documented);
 - declaring `typeCode`/`outerValue`/`typeLookup` before `task` (the
-  register-allocation-by-declaration-order lesson from `func_80026170`),
+  register-allocation-by-declaration-order lesson from `Class6D3C8__LoadIntroLogoSequence`),
   though here it turned out not to matter -- the natural declaration order
   already put `task` last relative to its own first use, so no reordering
   was needed this time.
@@ -53,7 +55,7 @@ across --
 
 None beyond what this unit's earlier reports already established; this
 function is a clean fourth instance of the "StreamTask init" shape
-(`func_80026170`, `func_80026348`, `func_8002658C`, now this one), each
+(`Class6D3C8__LoadIntroLogoSequence`, `Class6D3C8__StartWeeklyStreamTask`, `Class6D3C8__StartGraphRoomStreamTask`, now this one), each
 gated by a different `Class6D3C8CtorArgs` field and differing only in
 which library helper derives the type code and whether extra slots
 (`slot12C`) are involved.

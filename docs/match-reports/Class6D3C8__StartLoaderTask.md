@@ -1,4 +1,6 @@
-# func_80026254
+# Class6D3C8__StartLoaderTask
+
+> Renamed from `func_80026254` on 2026-09-24 (tools/rename.py). Address 0x80026254.
 
 **Unit:** code_1677c · **Size:** 53 instructions (0xD4 bytes) · **Status:** MATCHED (53/53 words, whole-image SHA1 green), first attempt
 
@@ -6,21 +8,21 @@
 
 Registers a "loader" task for a named resource: allocates a `LoaderTask`
 (`New_TaskCoreObj`, a `New_X`-shaped allocator in uncarved `code_2c054`, 0xA4
-bytes), gives it a completion callback (`func_80026328`, already matched in
+bytes), gives it a completion callback (`Class6D3C8__LoaderTaskDoneCallback`, already matched in
 this unit) and a context pointer (`self`), then sets its remaining
 parameters (`path`, `self->unk1C`) and starts it. Called twice by
-`func_80026170` (already matched, same unit), once for
+`Class6D3C8__LoadIntroLogoSequence` (already matched, same unit), once for
 `"ETC\ASMKLOGO.TIM"` and once for `"ETC\OSDLOGO.TIM"`.
 
 ## Derivation
 
 ```
 jal  New_TaskCoreObj(0, 0, 0)             ; -> s0 = task
-lui  $a1, %hi(func_80026328)
-addiu $a1, $a1, %lo(func_80026328)
+lui  $a1, %hi(Class6D3C8__LoaderTaskDoneCallback)
+addiu $a1, $a1, %lo(Class6D3C8__LoaderTaskDoneCallback)
 lw   $v0, 0x0($s0)                       ; task->methods
 lw   $v0, 0x98($v0)                       ; slot98
-jalr $v0                                    ; task->methods->slot98(task, &func_80026328, self)
+jalr $v0                                    ; task->methods->slot98(task, &Class6D3C8__LoaderTaskDoneCallback, self)
  a2 = s1 (self)
 lw   $v0, 0x0($s0)
 lw   $v0, 0x6C($v0)                          ; slot6C
@@ -43,10 +45,10 @@ jalr $v0                                                    ; task->methods->slo
 ```
 
 ```c
-void func_80026254(Class6D3C8 *self, const char *path) {
+void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
     LoaderTask *task = New_TaskCoreObj(0, 0, 0);
 
-    task->methods->slot98(task, func_80026328, self);
+    task->methods->slot98(task, Class6D3C8__LoaderTaskDoneCallback, self);
     task->methods->slot6C(task, 0);
     task->methods->slotD4(task, path, 0);
     task->methods->slot44(task, self->unk1C, 0);
@@ -54,9 +56,9 @@ void func_80026254(Class6D3C8 *self, const char *path) {
 }
 ```
 
-Matched first attempt: the caller (`func_80026170`) had already forced a
+Matched first attempt: the caller (`Class6D3C8__LoadIntroLogoSequence`) had already forced a
 careful read of this exact vtable-call idiom (task->methods reloaded fresh
-before every dispatch), and `func_80026328`'s signature (`s32 (void)`)
+before every dispatch), and `Class6D3C8__LoaderTaskDoneCallback`'s signature (`s32 (void)`)
 happened to be exactly the type `slot98`'s callback parameter needed, so no
 cast was required.
 
@@ -64,9 +66,9 @@ cast was required.
 
 `include/Class6D3C8.h`: added `LoaderTaskMethods`/`LoaderTask` (the class
 behind `New_TaskCoreObj`, distinct from `StreamTaskMethods` used by
-`func_80026170` -- different allocator, different signatures at the same
+`Class6D3C8__LoadIntroLogoSequence` -- different allocator, different signatures at the same
 slot offsets) and the `New_TaskCoreObj` extern. Forward-declared
-`func_80026328` (defined later in this same file/ROM order) so it can be
+`Class6D3C8__LoaderTaskDoneCallback` (defined later in this same file/ROM order) so it can be
 passed as `slot98`'s callback argument.
 
 ## Proposed learning

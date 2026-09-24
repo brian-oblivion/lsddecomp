@@ -79,7 +79,7 @@ one-word class). Tried and rejected:
   are now two independent expressions rather than one shared variable.
   Matches CLAUDE.md/MATCHING-GUIDE's "early exit returning a DIFFERENT
   value: try goto and return both" family, landing on the `return`
-  form here (this shape has no loop, so the `func_80026410`-style
+  form here (this shape has no loop, so the `Class6D3C8__PollGraphRoomStatus`-style
   disqualifier for that lever doesn't apply).
 
 ### Proposed learning

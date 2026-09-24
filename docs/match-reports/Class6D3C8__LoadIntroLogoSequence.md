@@ -1,4 +1,6 @@
-# func_80026170
+# Class6D3C8__LoadIntroLogoSequence
+
+> Renamed from `func_80026170` on 2026-09-24 (tools/rename.py). Address 0x80026170.
 
 **Unit:** code_1677c · **Size:** 57 instructions (0xE4 bytes) · **Status:** MATCHED (57/57 words, whole-image SHA1 green)
 
@@ -6,7 +8,7 @@
 
 `Class6D3C8Methods` slot `+0x050`. Gated entirely by `self->arg->unk0C != 0`
 (the ctor argument's `+0x0C` field, opaque until this function): registers a
-"loader" task for `"ETC\ASMKLOGO.TIM"` (`func_80026254`), then builds a
+"loader" task for `"ETC\ASMKLOGO.TIM"` (`Class6D3C8__StartLoaderTask`), then builds a
 separate "stream" task, initializes it with a filename
 (`"ETC\ASMK.STR"`) and a type/format code looked up from a table, starts it,
 then registers a second loader task for `"ETC\OSDLOGO.TIM"`.
@@ -19,7 +21,7 @@ lw   $v0, 0xC($v0)            ; v0 = arg->unk0C
 beqz $v0, .L80026238            ; whole body gated on this
  ...
 jal  SetActiveDataSourceDriverMode(0, 0, 0)
-jal  func_80026254(self, D_800107B4)     ; "ETC\ASMKLOGO.TIM"
+jal  Class6D3C8__StartLoaderTask(self, D_800107B4)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTaskObj(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
 jal  func_800490F4                          ; writes 0x31 to local, returns &D_800113DC
@@ -41,11 +43,11 @@ lw   $v0, 0x0($s1)                                          ; reload task->metho
 lw   $v0, 0x4($v0)                                           ; slot4
 jalr $v0
  (delay: a0 = s1 = task)
-jal  func_80026254(self, D_800107C8)                          ; "ETC\OSDLOGO.TIM"
+jal  Class6D3C8__StartLoaderTask(self, D_800107C8)                          ; "ETC\OSDLOGO.TIM"
 ```
 
 ```c
-void func_80026170(Class6D3C8 *self) {
+void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
     const char *streamName;
     s32 typeCode;
     s32 typeLookup;
@@ -53,13 +55,13 @@ void func_80026170(Class6D3C8 *self) {
 
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        func_80026254(self, D_800107B4);
+        Class6D3C8__StartLoaderTask(self, D_800107B4);
         task = New_StreamTaskObj(0, 0, 0, 0);
         streamName = func_800490F4(&typeCode);
         typeLookup = func_800493C8(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
-        func_80026254(self, D_800107C8);
+        Class6D3C8__StartLoaderTask(self, D_800107C8);
     }
 }
 ```

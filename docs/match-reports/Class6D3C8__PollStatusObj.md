@@ -1,4 +1,6 @@
-# func_80026698
+# Class6D3C8__PollStatusObj
+
+> Renamed from `func_80026698` on 2026-09-24 (tools/rename.py). Address 0x80026698.
 
 **Unit:** code_1677c · **Size:** 57 words (0xE4 bytes) ·
 **Status: MATCHED 57/57**, whole-image SHA1 green. Closed by the head in
@@ -80,10 +82,10 @@ without reaching it. The fix came from re-reading four instructions of retail.
 `Class6D3C8Methods` slot `+0x060`. Builds a `StatusObj` (`New_Obj865C8`,
 New_X shape, 0x50 bytes), dispatches `slot44(obj)` (return kept) then
 `slot4(obj)` (return discarded -- via the same "delay slot after `jalr`
-captures the *preceding* call's return" idiom `func_80026518` uses), and
-switches on that status: `2` runs `func_8002677C`, `3` latches
+captures the *preceding* call's return" idiom `Class6D3C8__RunPollTask` uses), and
+switches on that status: `2` runs `Class6D3C8__StartCinematicStream`, `3` latches
 `self->unk24`. Then queries the `DreamSys` status slot again
-(`DreamSys__GetCurrentDayAndYear`, the same slot `func_80026410` uses) with an out-parameter
+(`DreamSys__GetCurrentDayAndYear`, the same slot `Class6D3C8__PollGraphRoomStatus` uses) with an out-parameter
 this time, and derives a 0/1 result from both the call's return and the
 out-param.
 
@@ -91,7 +93,7 @@ out-param.
 
 ```c
 #if 0
-s32 func_80026698(Class6D3C8 *self) {
+s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
     s32 status;
     StatusObj *obj;
     s32 outVal;
@@ -104,7 +106,7 @@ s32 func_80026698(Class6D3C8 *self) {
 
     switch (status) {
     case 2:
-        func_8002677C(self);
+        Class6D3C8__StartCinematicStream(self);
         break;
     case 3:
         self->unk24 = 3;
@@ -122,7 +124,7 @@ s32 func_80026698(Class6D3C8 *self) {
 ```
 
 This needs `Class6D3C8.h`'s `StatusObj`/`StatusObjMethods` (already
-committed) and the `func_8002677C` forward declaration (already committed).
+committed) and the `Class6D3C8__StartCinematicStream` forward declaration (already committed).
 
 ## Derivation and the levers that got this from 1/57 to 53/57
 
@@ -183,7 +185,7 @@ allocation, in three layers:
    lowering materializes an unused default-arm constant (`1`) in the
    `beq`'s delay slot even though nothing ever reads it (same "unused
    value in a delay slot" idiom documented elsewhere in this unit, e.g.
-   `func_80026410`'s `pollDone`). No `switch`/`if` reshaping reproduced it;
+   `Class6D3C8__PollGraphRoomStatus`'s `pollDone`). No `switch`/`if` reshaping reproduced it;
    adding an explicit `case 1: break;` regressed badly (27/57, GCC grew the
    whole switch, presumably crossing a density threshold into a different
    lowering strategy).

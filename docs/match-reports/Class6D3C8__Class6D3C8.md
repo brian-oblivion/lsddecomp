@@ -1,4 +1,6 @@
-# func_80025FDC
+# Class6D3C8__Class6D3C8
+
+> Renamed from `func_80025FDC` on 2026-09-24 (tools/rename.py). Address 0x80025fdc.
 
 **Unit:** code_1677c · **Size:** 50 instructions (0xC8 bytes) · **Status:** MATCHED (50/50 words, whole-image SHA1 green)
 
@@ -10,7 +12,7 @@ constructor through its ctor slot, installs this class's own vtable, stores
 the ctor argument, loads a 3D model ("ETC\DREAME5.TMD"), builds this
 object's owned `DreamSys` from the loaded model, makes one call into a
 not-yet-understood `DreamSys` vtable slot (`+0x228`), then finally invokes
-its own `slot40` (`func_800260A4`, the day-cursor advance already matched in
+its own `slot40` (`Class6D3C8__SetDayFromTickCount`, the day-cursor advance already matched in
 this unit).
 
 ## Derivation
@@ -66,7 +68,7 @@ jalr  $v0                                                  ; self->methods->slot
 Written as:
 
 ```c
-void func_80025FDC(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
+void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     LoadModelRequest req;
 
     func_8003B20C()->ctor(self, arg->unk00);

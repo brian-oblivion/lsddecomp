@@ -1,4 +1,6 @@
-# func_80026108
+# Class6D3C8__ForwardToBaseUnlessOverridden
+
+> Renamed from `func_80026108` on 2026-09-24 (tools/rename.py). Address 0x80026108.
 
 **Unit:** code_1677c · **Size:** 26 instructions · **Status:** MATCHED (26/26 words)
 
@@ -48,7 +50,7 @@ return value (if used at all) is whatever the base method leaves behind —
 treated as `void` here since nothing in this unit consumes it.
 
 ```c
-void func_80026108(Class6D3C8 *self, void *a1, void *a2) {
+void Class6D3C8__ForwardToBaseUnlessOverridden(Class6D3C8 *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
         func_8003B20C()->slot44(self, a1, a2, 0);
     }

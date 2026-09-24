@@ -28,8 +28,8 @@ Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
  * constructor (through its ctor slot), installs this class's own vtable,
  * stores the ctor argument, loads the "ETC\DREAME5.TMD" model, builds this
  * object's owned DreamSys from it, dispatches one DreamSys init call, then
- * runs this class's own slot40 (func_800260A4) once. */
-void func_80025FDC(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
+ * runs this class's own slot40 (Class6D3C8__SetDayFromTickCount) once. */
+void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     LoadModelRequest req;
 
     func_8003B20C()->ctor(self, arg->unk00);
@@ -48,23 +48,23 @@ extern void func_80048CFC(s32 day, s32 unused);
 
 /* Advances the day cursor: reads the running tick count kept in scratchpad
  * (0x1F800000, the PS-X data-cache-as-RAM region) and reduces it mod 365. */
-void func_800260A4(void) {
+void Class6D3C8__SetDayFromTickCount(void) {
     func_80048CFC(*(s32 *)0x1F800000 % 365, 0);
 }
 
 /* Defers to the base class's own implementation of this slot when this
  * object hasn't been given an override (unk18 == 0). */
-void func_80026108(Class6D3C8 *self, void *a1, void *a2) {
+void Class6D3C8__ForwardToBaseUnlessOverridden(Class6D3C8 *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
         func_8003B20C()->slot44(self, a1, a2, 0);
     }
 }
 
 /* Optional stream-load block, gated by self->arg->unk0C: registers a
- * "loader" task for "ETC\ASMKLOGO.TIM" (func_80026254), then a separate
+ * "loader" task for "ETC\ASMKLOGO.TIM" (Class6D3C8__StartLoaderTask), then a separate
  * "stream" task for whatever type code func_800490F4 hands back
  * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
-void func_80026170(Class6D3C8 *self) {
+void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
     const char *streamName;
     s32 typeCode;
     s32 typeLookup;
@@ -72,24 +72,24 @@ void func_80026170(Class6D3C8 *self) {
 
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        func_80026254(self, D_800107B4);
+        Class6D3C8__StartLoaderTask(self, D_800107B4);
         task = New_StreamTaskObj(0, 0, 0, 0);
         streamName = func_800490F4(&typeCode);
         typeLookup = func_800493C8(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
-        func_80026254(self, D_800107C8);
+        Class6D3C8__StartLoaderTask(self, D_800107C8);
     }
 }
 
 /* Registers a "loader" task for the given resource path: allocates the
- * task, gives it a completion callback (func_80026328) and context
+ * task, gives it a completion callback (Class6D3C8__LoaderTaskDoneCallback) and context
  * (self), then sets its remaining parameters (path, self->unk1C) and
  * starts it. */
-void func_80026254(Class6D3C8 *self, const char *path) {
+void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
     LoaderTask *task = New_TaskCoreObj(0, 0, 0);
 
-    task->methods->slot98(task, func_80026328, self);
+    task->methods->slot98(task, Class6D3C8__LoaderTaskDoneCallback, self);
     task->methods->slot6C(task, 0);
     task->methods->slotD4(task, path, 0);
     task->methods->slot44(task, self->unk1C, 0);
@@ -98,15 +98,15 @@ void func_80026254(Class6D3C8 *self, const char *path) {
 
 extern s32 func_8004A070(s32 a0);
 
-s32 func_80026328(void) {
+s32 Class6D3C8__LoaderTaskDoneCallback(void) {
     return func_8004A070(0);
 }
 
 /* Optional stream-task init block, gated by self->arg->unk08 (the same
- * shape as func_80026170's self->arg->unk0C gate, minus the two
- * func_80026254 loader-task calls, and using func_8004913C instead of
+ * shape as Class6D3C8__LoadIntroLogoSequence's self->arg->unk0C gate, minus the two
+ * Class6D3C8__StartLoaderTask loader-task calls, and using func_8004913C instead of
  * func_800490F4 to derive the type code). */
-void func_80026348(Class6D3C8 *self) {
+void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
     s32 derivedValue;
     s32 typeCode;
     s32 typeLookup;
@@ -125,11 +125,11 @@ void func_80026348(Class6D3C8 *self) {
 /* Gated by self->arg->unk10. Checks the DreamSys's own status slot
  * (+0x1A0); if it isn't already "1" and self->unk24 hasn't latched, kicks
  * off one PollTask (New_GraphRoomObj) and, if THAT reports "2", runs
- * func_8002658C. Then polls a second PollTask (New_Class86B60) in a loop,
+ * Class6D3C8__StartGraphRoomStreamTask. Then polls a second PollTask (New_Class86B60) in a loop,
  * restarting the first PollTask each time it reports "2", until it
  * reports anything else; clears self->unk24 and returns 0 or 2 depending
  * on whether that final status was below 1. */
-s32 func_80026410(Class6D3C8 *self) {
+s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
     s32 status;
     s32 pollDone;
 
@@ -139,18 +139,18 @@ s32 func_80026410(Class6D3C8 *self) {
         status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->unk24 == 0) {
-                status = func_80026518(New_GraphRoomObj, self->dreamSys, self->unk1C);
+                status = Class6D3C8__RunPollTask(New_GraphRoomObj, self->dreamSys, self->unk1C);
                 if (status == 2) {
-                    func_8002658C(self);
+                    Class6D3C8__StartGraphRoomStreamTask(self);
                 }
             }
         }
 
         pollDone = 2;
     retry:
-        status = func_80026518(New_Class86B60, self->dreamSys, self->unk1C);
+        status = Class6D3C8__RunPollTask(New_Class86B60, self->dreamSys, self->unk1C);
         if (status == pollDone) {
-            func_80026518(New_GraphRoomObj, self->dreamSys, self->unk1C);
+            Class6D3C8__RunPollTask(New_GraphRoomObj, self->dreamSys, self->unk1C);
             goto retry;
         }
 
@@ -163,7 +163,7 @@ s32 func_80026410(Class6D3C8 *self) {
 /* Constructs a PollTask via the caller-supplied `ctor`, dispatches
  * slot44(task, extra, 0) and slot4(task) on it (fire-and-forget), and
  * returns slot44's result. */
-s32 func_80026518(PollTaskCtor ctor, void *dreamSys, s32 extra) {
+s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
     PollTask *task = ctor(dreamSys);
     s32 result = task->methods->slot44(task, extra, 0);
 
@@ -171,12 +171,12 @@ s32 func_80026518(PollTaskCtor ctor, void *dreamSys, s32 extra) {
     return result;
 }
 
-/* Called by func_80026410 when its first PollTask reports "2". Gated by
- * self->arg->unk08 (same gate as func_80026348). Builds a StreamTask,
+/* Called by Class6D3C8__PollGraphRoomStatus when its first PollTask reports "2". Gated by
+ * self->arg->unk08 (same gate as Class6D3C8__StartWeeklyStreamTask). Builds a StreamTask,
  * derives a count via func_800493E4, initializes the task with that
  * count's quotient-by-9 and a fixed sub-slot, then a 5-argument slot44
  * call (a3 = -1, unlike the other slot44 call sites), then starts it. */
-void func_8002658C(Class6D3C8 *self) {
+void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
     StreamTask *task;
     struct {
         u32 unk00;
@@ -196,12 +196,12 @@ void func_8002658C(Class6D3C8 *self) {
     }
 }
 
-void func_80026690(void) {
+void Class6D3C8__NoOpSlot5C(void) {
 }
 
 /* Builds a StatusObj, dispatches slot44(obj) then reads slot4(obj)'s
- * return as a status code: 2 runs func_8002677C, 3 latches self->unk24.
- * Then queries the DreamSys status slot again (as func_80026410 does),
+ * return as a status code: 2 runs Class6D3C8__StartCinematicStream, 3 latches self->unk24.
+ * Then queries the DreamSys status slot again (as Class6D3C8__PollGraphRoomStatus does),
  * this time passing an out-param, and derives a 0/1 result from both the
  * call's return and the out-param. */
 /* Builds a StatusObj for this instance's current state, reads one status
@@ -209,7 +209,7 @@ void func_80026690(void) {
  * owned DreamSys a question and reports whether its answer was 1.
  *
  * Two things here were long-standing misreadings, both worth keeping written
- * down (docs/match-reports/func_80026698.md):
+ * down (docs/match-reports/Class6D3C8__PollStatusObj.md):
  *
  *  - `case 3` stores 1, NOT 3. Retail's `li $v0, 0x1` sits in the delay slot
  *    of the case-3 branch, so it executes before the jump is taken and $v0
@@ -224,7 +224,7 @@ void func_80026690(void) {
  *    back out of the disassembly as `(u32)(check ^ 1) < 1`. That transcription
  *    is arithmetically right and cost two instructions; the plain `== 1` is
  *    what the source said. */
-s32 func_80026698(Class6D3C8 *self) {
+s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
     s32 status;
     StatusObj *obj;
     s32 outVal;
@@ -237,7 +237,7 @@ s32 func_80026698(Class6D3C8 *self) {
 
     switch (status) {
     case 2:
-        func_8002677C(self);
+        Class6D3C8__StartCinematicStream(self);
         break;
     case 3:
         self->unk24 = 1;
@@ -257,7 +257,7 @@ s32 func_80026698(Class6D3C8 *self) {
  * "no cinematic" path; otherwise, if self->arg->unk08 gates it, starts a
  * StreamTask on the resolved channel. Either branch finishes by starting
  * whichever task it built; if neither branch runs, nothing happens. */
-void func_8002677C(Class6D3C8 *self) {
+void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
     CinematicCall cc;
     struct {
         s32 chan;
@@ -291,12 +291,12 @@ void func_8002677C(Class6D3C8 *self) {
 }
 
 /* Class6D3C8Methods slot +0x064. Gated by self->arg->unk08 (same gate as
- * func_80026348/func_8002658C). Builds a StreamTask, runs its slot12C,
+ * Class6D3C8__StartWeeklyStreamTask/Class6D3C8__StartGraphRoomStreamTask). Builds a StreamTask, runs its slot12C,
  * derives a type code via func_800491FC, looks it up via func_800493C8,
  * initializes the task with it, then starts it -- the same shape as
- * func_80026170/func_80026348, but with slot12C added and func_800491FC
+ * Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartWeeklyStreamTask, but with slot12C added and func_800491FC
  * in place of func_800490F4/func_8004913C. */
-void func_80026900(Class6D3C8 *self) {
+void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
     StreamTask *task;
     s32 typeCode;
     s32 outerValue;

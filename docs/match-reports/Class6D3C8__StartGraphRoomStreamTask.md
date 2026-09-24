@@ -1,12 +1,14 @@
-# func_8002658C
+# Class6D3C8__StartGraphRoomStreamTask
+
+> Renamed from `func_8002658C` on 2026-09-24 (tools/rename.py). Address 0x8002658c.
 
 **Unit:** code_1677c · **Size:** 65 instructions (0x104 bytes) · **Status:** MATCHED (65/65 words, whole-image SHA1 green)
 
 ## What it does
 
-Called by `func_80026410` (matched earlier) when its first `PollTask`
+Called by `Class6D3C8__PollGraphRoomStatus` (matched earlier) when its first `PollTask`
 reports `2`. Gated by `self->arg->unk08 != 0` (the same gate
-`func_80026348` uses). Builds a `StreamTask`, derives a count via
+`Class6D3C8__StartWeeklyStreamTask` uses). Builds a `StreamTask`, derives a count via
 `func_800493E4`, initializes the task with that count divided by 15 and a
 fixed sub-slot, then a 5-argument `slot44` call (`a3 = -1`, unlike this
 unit's other `slot44` call sites which pass a computed lookup), then starts
@@ -15,7 +17,7 @@ it.
 ## Final C
 
 ```c
-void func_8002658C(Class6D3C8 *self) {
+void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
     StreamTask *task;
     struct {
         u32 unk00;
@@ -52,7 +54,7 @@ CLAUDE.md already documents for `%`/`/`, just applied in the direction of
 *discovering* the divisor rather than confirming a known one.
 
 **2. Stack-local struct size AND field order both mattered, not just size.**
-Same 8-byte-shortfall shape as `func_80025FDC`'s `LoadModelRequest`: the
+Same 8-byte-shortfall shape as `Class6D3C8__Class6D3C8`'s `LoadModelRequest`: the
 `out`-parameter local only needed 4 bytes for what this call site reads
 back, but retail reserves 12. Padding it to 3 words fixed the frame size
 (`-0x38` matched) but left the field's *address* 8 bytes short
@@ -69,8 +71,8 @@ field's own address.**
 `include/Class6D3C8.h`: added `StreamTaskMethods.slot6C` and `.slot12C` (new
 slots, both `(void *self, s32 a1)`), retyped `slot44`'s 3rd parameter from
 `const char *path` to plain `s32 arg2` -- confirmed generic by this call
-site passing a computed count where `func_80026170` passed a string
-pointer and `func_80026348` passed another plain count; the field is a
+site passing a computed count where `Class6D3C8__LoadIntroLogoSequence` passed a string
+pointer and `Class6D3C8__StartWeeklyStreamTask` passed another plain count; the field is a
 raw 32-bit value whose interpretation is call-site-specific, not
 uniformly a string. Declared `func_800493E4` (day/count helper,
 `psyq_memset.s`, same "write to *out, return a separate value" shape as
