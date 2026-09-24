@@ -160,3 +160,11 @@ hazard, but cheap to avoid.
   form produces an interleaved schedule instead. This is a genuine, source-
   reachable fix for an "instruction order only" residue — worth trying
   before reaching for an `__asm__("")` barrier on this class of diff.
+
+## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
+
+Already carries its real name: identified round 71 (track 2, runner bravo)
+as `libsnd/vmanager note2pitch2`, fingerprint EXACT masked 1.00 vs the
+disc-3.3 reference (position between `libc2/strncmp` and `libsnd/vm_prog`
+agrees). Sony symbol; this pass does not rename it further. Matched,
+64/64.

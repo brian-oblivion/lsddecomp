@@ -6,7 +6,7 @@
 
 ## What it does
 
-Calls a still-uncarved function, `func_8002CD08(this->unk58, &this->unk9C)`,
+Calls a still-uncarved function, `ServiceSoundCueSet(this->unk58, &this->unk9C)`,
 then increments a counter, `this->unkFC++`. `this->unk9C` is address-taken
 only (an output buffer, never read within this unit), `this->unk58` is
 passed by value.
@@ -24,7 +24,7 @@ change.
 
 ```
 lw   $a0, 0x58($s0)          ; a0 = this->unk58
-jal  func_8002CD08
+jal  ServiceSoundCueSet
  addiu $a1, $s0, 0x9C          ; a1 = &this->unk9C
 lw   $v0, 0xFC($s0)
 addiu $v0, $v0, 0x1
@@ -35,7 +35,7 @@ sw   $v0, 0xFC($s0)          ; this->unkFC++
 
 ```c
 void Entity__TickSoundCue(Entity *this) {
-    func_8002CD08(this->unk58, &this->unk9C);
+    ServiceSoundCueSet(this->unk58, &this->unk9C);
     this->unkFC++;
 }
 ```
@@ -44,7 +44,7 @@ void Entity__TickSoundCue(Entity *this) {
 site takes its address explicitly with `&this->unk9C` — same
 `addiu $a1,$s0,0x9C` as the array-decay form it replaced.
 
-`func_8002CD08` is declared `extern void func_8002CD08(s32 arg0, void
+`ServiceSoundCueSet` is declared `extern void ServiceSoundCueSet(s32 arg0, void
 *arg1);` in `Entity.h` — still uncarved (no `asm/nonmatchings` file), called
 directly by name (`jal`), so it needs a real prototype per CLAUDE.md's
 "calling into a function that is still `INCLUDE_ASM`" guidance (this one
@@ -59,7 +59,7 @@ Matched on the first attempt.
 
 ## Proposed learning
 
-`func_8002CD08` takes `(s32, void *)` judging by this call site alone;
+`ServiceSoundCueSet` takes `(s32, void *)` judging by this call site alone;
 `Entity__StopSoundCue` (also in this unit, see its own report) calls a different
 uncarved function, `FlushSoundCueSet`, with the exact same two-argument shape
 (`this->unk58`, `this->unk9C`) — worth checking whether these two are a
@@ -69,12 +69,12 @@ eventually carved.
 ## Naming
 
 **Tier B.** Renamed from `func_8005D6D4` this round (tools/rename.py).
-Calls the still-uncarved `func_8002CD08(this->soundCueChannel,
+Calls the still-uncarved `ServiceSoundCueSet(this->soundCueChannel,
 &this->soundCueSet)` -- the exact same two-argument shape as
 `Entity__StartSoundCue`'s `InitSoundCueSet` and `Entity__StopSoundCue`'s
 `FlushSoundCueSet` calls on the identical field pair (renamed this round,
 see `docs/match-reports/... ` field-rename commit) -- then increments
-`this->unkFC`. Strongly suggests `func_8002CD08` is the third
+`this->unkFC`. Strongly suggests `ServiceSoundCueSet` is the third
 ("tick"/"update") member of an Init/Tick/Flush trio for the same resource;
 NOT renamed here since it is defined in no unit yet (still asm-only, no
 `src/*.c` owns it) and renaming a function outside this assignment's unit

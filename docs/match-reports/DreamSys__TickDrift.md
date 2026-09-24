@@ -10,7 +10,7 @@ Two independent guarded actions: if `unk_0xC4 != 0`, calls
 `this->vt->BaseObjO__AddVec14(this, &DRIFT_STEP)` (the same slot `DreamSys__ApplyRelativeOffset`
 calls, this time with a static global vector instead of a computed diff)
 and decrements `this->unk_0x5C->unk_0x24` by `0x258` (600); if `unk_0xC8 !=
-0`, calls `func_8002CD08(this->unk_0x58, this->unk_0xCC)`.
+0`, calls `ServiceSoundCueSet(this->unk_0x58, this->unk_0xCC)`.
 
 ## The C
 
@@ -22,12 +22,12 @@ void DreamSys__TickDrift(DreamSys *this)
 		this->unk_0x5C->unk_0x24 -= 0x258;
 	}
 	if (this->unk_0xC8 != 0)
-		func_8002CD08(this->unk_0x58, this->unk_0xCC);
+		ServiceSoundCueSet(this->unk_0x58, this->unk_0xCC);
 }
 ```
 
-`func_8002CD08` is already declared in `Entity.h` for a different struct's
-fields (`extern void func_8002CD08(s32 arg0, void *arg1);`); added the same
+`ServiceSoundCueSet` is already declared in `Entity.h` for a different struct's
+fields (`extern void ServiceSoundCueSet(s32 arg0, void *arg1);`); added the same
 declaration locally rather than cross-including `Entity.h`, same as
 `FlushSoundCueSet` in an earlier round. Matched first try -- the `DreamSysVec3`
 type and `BaseObjO__AddVec14` slot were already established by `DreamSys__ApplyRelativeOffset`
@@ -47,7 +47,7 @@ The function `DreamSys__SelectCallback98(this, 2)` installs in
 `callback_0x98`. Each tick, while `driftActive`, it adds the constant vector
 `DRIFT_STEP` -- (0, 512, 0), i.e. purely vertical -- to the object's position and
 lowers `heightCurve->endValue` by 600; while `cueServiceActive`, it services the
-sound cue set (`func_8002CD08(soundObj, soundCueSet)`).
+sound cue set (`ServiceSoundCueSet(soundObj, soundCueSet)`).
 Deliberately NOT called `TickFall` or `TickRise`: this unit never establishes which
 way +Y points, so the name says "drift" and the comment says "+512 on the Y
 axis".

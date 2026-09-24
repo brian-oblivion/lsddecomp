@@ -246,7 +246,7 @@ real structural defect -- there is no length or instruction-order
 mismatch left anywhere in the function).
 
 **This is now the textbook 0/0-insertion/deletion, pure-register-diff
-signature round 45's `func_8002CD08` report established as OUTSIDE a
+signature round 45's `ServiceSoundCueSet` report established as OUTSIDE a
 source-mutation search's reach entirely** -- per that finding, did NOT
 spend a search on this new, cleaner base score; it would not find
 anything a barrier or statement reorder can reach; only a banned

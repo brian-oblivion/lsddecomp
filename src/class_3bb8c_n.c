@@ -397,7 +397,7 @@ void StyleReleaseEffectSlots(void) {
  * (X/Z) position, read by `IsStyleCueNear`'s distance check; `lastDist` is
  * that check's own last-computed distance (also the out-parameter
  * `FindNearestStyleCueEntry` writes). `cueSet` is only ever address-taken,
- * as an embedded sub-object handed to `FlushSoundCueSet`/`func_8002CD08`
+ * as an embedded sub-object handed to `FlushSoundCueSet`/`ServiceSoundCueSet`
  * (same discard-return caveat as `include/Entity.h`'s `unk9C` -- a field
  * only ever address-taken carries no evidence about its own declared
  * type). */
@@ -815,11 +815,11 @@ s32 FlushStyleCue(StyleCueSlot *arg0) {
 }
 
 extern s32 IsStyleCueNear(StyleCueSlot *arg0, void *arg1);
-extern void func_8002CD08(s32 arg0, void *arg1);
+extern void ServiceSoundCueSet(s32 arg0, void *arg1);
 
 s32 StopStyleCueIfNear(StyleCueSlot *arg0, void *arg1, void *arg2) {
     if (IsStyleCueNear(arg0, arg1) != 0) {
-        func_8002CD08(*(s32 *) gStyleTargetObj, &arg0->cueSet);
+        ServiceSoundCueSet(*(s32 *) gStyleTargetObj, &arg0->cueSet);
         return 1;
     }
     return 0;

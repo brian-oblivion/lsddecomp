@@ -618,3 +618,11 @@ investigation in round 35, algebraic rewrite and a round-37 permuter
 search at 76056 iterations), and this round's budget shared across seven
 other queued functions, no new lever was attempted here. Restored to
 `INCLUDE_ASM` unchanged.
+
+## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
+
+Already carries its real name: identified round 74 (track 2, runner bravo)
+as `libsnd/vmanager SpuVmDoAllocate` (shape 0.99 vs the disc-3.3 reference,
+141w reference vs our 143w, position within the libsnd neighborhood). Sony
+symbol; this pass does not rename it further. The function remains a STALL
+(1 word short, see above).

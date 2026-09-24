@@ -473,3 +473,12 @@ EXPRESSION computes each intermediate, per residue 2's still-untried
 "introduce the `D800902E8Entry` read as two separate loads" idea), which
 remains the most concrete un-tried lever that doesn't depend on the
 permuter at all.
+
+## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
+
+Already carries its real name: identified round 74 (track 2, runner bravo)
+as `libsnd/vmanager vmNoiseOn` (shape 0.98 vs the disc-3.3 reference, 308w
+reference vs our 311w; also cross-checked against the public symbol
+`SpuVmNoiseOn` at 0x8002F368 elsewhere in the image). Sony symbol; this
+pass does not rename it further. The function remains a STALL (2 words
+short, see above).

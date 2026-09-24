@@ -9,7 +9,7 @@
  *    two range helpers; the vtable accessor Get_vtable_Entity.
  *  - Entity__MoodCue00..17: gEntityMoodHandlerTable's callbacks, NN = the
  *    row. Entity__StartSoundCue gives the row's callback to InitSoundCueSet,
- *    and func_8002CD08 calls it once per tick as callback(owner, set): it
+ *    and ServiceSoundCueSet calls it once per tick as callback(owner, set): it
  *    picks tones for the set's three voices and moves/rotates/scales the
  *    entity on moodTimer thresholds. Which dream object owns each row is
  *    not established.

@@ -4,7 +4,7 @@
 
 > Round 44's stub report (kept below the divider) predicted this would be
 > "promising rather than hard" by analogy with its unit-siblings
-> `func_8002CD08` and `vmNoiseOn`. That held for roughly the first 30
+> `ServiceSoundCueSet` and `vmNoiseOn`. That held for roughly the first 30
 > instructions (full byte-for-byte match, see below) and then did not: this
 > function needed real derivation work (a second, independent divisor
 > family -- 16129 = 127² used DIRECTLY rather than via two chained /127
@@ -366,7 +366,7 @@ restructuring reached it this round.
 > withdrawn: that blocker was RESOLVED in round 42 by `--no-nop-mflo-mfhi`.
 >
 > Its two unit-siblings were reopened on the same evidence and both moved a
-> long way on FIRST contact in round 44 -- `func_8002CD08` 0 -> 110/132 and
+> long way on FIRST contact in round 44 -- `ServiceSoundCueSet` 0 -> 110/132 and
 > `vmNoiseOn` 0 -> 309/311 -- so treat this as promising rather than hard.
 > Delta ran out of round budget before reaching it; nothing about it was tried
 > and found difficult.
@@ -860,3 +860,50 @@ second was the load-bearing part of the byte-shaped candidate) is split back
 into two plainly-named locals, `lvl0` and `pan1out`, for the promoted body.
 The report's own round-65-addendum section already confirms renaming is
 byte-inert, so this changes nothing about what was measured.
+
+## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
+
+Already carries its real name: identified round 74 (track 2, runner bravo)
+as `libsnd/vmanager SpuVmKeyOnNow` (shape 0.99 vs the disc-3.3 reference,
+312w reference vs our 316w, position within the libsnd neighborhood). Sony
+symbol; this pass does not rename it further. The function remains a STALL
+(frame-size residue, see above).
+
+## Proposed global names (not renamed this pass -- weak/thin evidence)
+
+Left as `D_` per the tier rubric ("a wrong tier-A name is worse than a
+placeholder"); recorded here rather than guessed into a rename:
+
+- `D_8008E970` (the `ObjE970`/`unk18` "priority-ish scale byte" object) --
+  single use (`prio = D_8008E970->unk18 * 0x3FFF`). Could be a
+  currently-playing-note object, not established.
+- `D_8008EA10` -- multiplies `prio` before the two chained `/16129`
+  divisions (`lvl0 = D_8008EA10 * prio / 16129`). Candidate "master
+  volume"-style scalar; not confirmed against a real Sony field name.
+- `D_8008EA16` / `D_8008EA19` -- the two `/127` multipliers producing
+  `lvl1`. Candidate main-volume/submix-volume pair (mirrors the same
+  cascade in `vmNoiseOn`'s already-matched `pAttack`/`pDecay` -> `lvl1`
+  chain), not confirmed.
+- `D_8008EA1A` / `D_8008EA17` / `D_8008EA11` -- the three `< 0x40` blend
+  control bytes (division by 63, `0x7F - byte` on the else branch).
+  Candidate pan/balance-style controls; three of them cascaded suggests a
+  main/aux/reverb-style stack, not confirmed.
+- `D_8008EA20` -- single bit (`& 4`) selects which direction
+  `D_8008E230`/`D_8008E234` gets updated. Candidate per-voice routing/output
+  flag byte; not confirmed.
+
+These recur identically in `vmNoiseOn` (same unit, matching cascade shape --
+see that report's "What it computes"), so a future pass with stronger
+evidence (e.g. a Sony reference for this shape, since `SpuVmKeyOnNow` is
+already identified as `libsnd/vmanager SpuVmKeyOnNow`) should rename them
+together in both functions at once.
+
+**Head note, round 75: none of these gets a game name.** `D_8008EA10` to
+`D_8008EA20` lie inside Sony's `_svm_cur` (pinned at 0x8008EA0C in
+`config/psyq-objects.ld`, extending to `_svm_vab_used` at 0x8008EA2C): they
+are FIELDS of one libsnd struct, not separate globals, and this is Sony data
+touched by Sony code. The right spelling is `_svm_cur.<field>` once that
+struct is typed, which is track 2 / track 4 work. The runner's first pass
+renamed 24 such addresses (including `_svm_tn` as `gNoteTable` and
+`_ss_score` as `gVoiceEnvTable`); the head dropped those commits
+(`docs/PROGRESS.md`, round 75).

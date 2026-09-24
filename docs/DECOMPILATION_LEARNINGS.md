@@ -362,7 +362,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   register an address uses. Closed `DreamSys__StepLookYaw` (1 short). (PROGRESS round 73)
 - **The same instruction in BOTH arms' delay slots is ONE source statement after the join**, copied
   by reorg; writing it per arm adds references, raises that pseudo's global-alloc priority and
-  rotates every saved register. Also: two loops may share ONE counter. Closed `func_8002CD08`
+  rotates every saved register. Also: two loops may share ONE counter. Closed `ServiceSoundCueSet`
   110/132. (PROGRESS round 73)
 - **`(u8)x` creates an 8-bit temporary that stays live in a saved register; `x & 0xFF` does not.**
   The tell is an entry `move aN,sM` nothing explains; a bound test may then need `(u32)`. Closed

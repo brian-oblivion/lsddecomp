@@ -1095,3 +1095,15 @@ preserving:
   two promoted bodies already use for the identical stride. `D_8008D98A` in
   particular is shared with `vmNoiseOn2`'s promoted body and must keep
   the same type in both for the file to compile.
+
+## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
+
+Already carries its real name: identified round 74 (track 2, runner bravo)
+as `libsnd/vmanager SpuVmAlloc` (shape 0.99 vs the disc-3.3 reference,
+167w here vs 167w reference [corrected -- symbols file: "vs our 167w"],
+confirmed by position in the libsnd neighborhood between `libc2/strncmp`
+and `libsnd/vm_prog`). This is a Sony symbol, not a game-style guess --
+HARD RULE 6/track-3's "never rename a Sony symbol" applies in the other
+direction too: the identification stands and this pass does not touch it.
+No further game-style naming applies; the function itself remains a STALL
+(register-rotation residue, see above), unaffected by this note.

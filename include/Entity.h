@@ -215,7 +215,7 @@ struct Unk5CObj {
  * that single slot is unknown. */
 struct Unk4CMethods {
     u8 pad000[0x138];
-    void (*slot138)(Unk4CObj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue12; return value discarded at this one call site, so void is a safe read for THIS call's bytes regardless of the real return type (same caveat as func_8002CD08/FlushSoundCueSet elsewhere in this unit -- a discarded return is never positive evidence of void) */
+    void (*slot138)(Unk4CObj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue12; return value discarded at this one call site, so void is a safe read for THIS call's bytes regardless of the real return type (same caveat as ServiceSoundCueSet/FlushSoundCueSet elsewhere in this unit -- a discarded return is never positive evidence of void) */
 };
 
 struct Unk4CObj {
@@ -285,7 +285,7 @@ struct EntityRegionRef {
 /* Field offsets derived from this unit's own functions (Entity__TickSoundCue,
  * Entity__Activate, Entity__SetUnkF4, Entity__StopSoundCue, and the Get*Effect/Stage/Video
  * family). `soundCueSet` is only ever address-taken (passed as an output buffer to
- * two still-uncarved functions, func_8002CD08/FlushSoundCueSet), never read
+ * two still-uncarved functions, ServiceSoundCueSet/FlushSoundCueSet), never read
  * here beyond its first word (zeroed by Entity__Entity), so its true
  * size/shape past that first s32 is still unconfirmed -- it's padded out
  * only as far as +0xF0, where the next known field starts. */
@@ -305,7 +305,7 @@ struct Entity {
     /* +0x4C */ Unk4CObj *unk4C;          /* cleared (NULL) by Entity__DetachUnk4C; dereferenced through its own vtable by Entity__MoodCue12 -- see Unk4CObj's own comment */
     /* +0x50 */ s32 unk50;              /* read by func_80061198 (Entity_d), passed opaquely to this->unk100->methods->slotD4 as its arg1 */
     /* +0x54 */ u8 pad54[0x58 - 0x54];
-    /* +0x58 */ s32 soundCueChannel;             /* passed to func_8002CD08/FlushSoundCueSet */
+    /* +0x58 */ s32 soundCueChannel;             /* passed to ServiceSoundCueSet/FlushSoundCueSet */
     /* +0x5C */ u8 pad5C[0x70 - 0x5C];
     /* +0x70 */ Unk70Obj *unk70;       /* read by func_80061400 (Entity_d), see Unk70Obj's own comment */
     /* +0x74 */ u8 pad74[0x7C - 0x74];
@@ -347,9 +347,9 @@ extern void BMemPMgrFree(void *arg);
  * narrowing on entry, and declaring them `s8` forces a spurious sign-extend
  * at any call site whose argument is already a full-width computed `s32`
  * (found via Entity__UpdateTargetProximity's own residue -- see its match report).
- * func_8002CD08/FlushSoundCueSet's return values are unused at both call
+ * ServiceSoundCueSet/FlushSoundCueSet's return values are unused at both call
  * sites, so void is a safe read regardless of the real return type. */
-extern void func_8002CD08(s32 arg0, void *arg1);
+extern void ServiceSoundCueSet(s32 arg0, void *arg1);
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 extern s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3);
 extern void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1);
@@ -405,7 +405,7 @@ extern EntityMethods ENTITY_METHODS;
  * dereferences that second argument at +0xC/+0x14, confirming it is a
  * pointer, not a plain word. Return value unused at this call site, so void
  * is a safe read regardless of the real return type (same caveat as
- * func_8002CD08/FlushSoundCueSet above). */
+ * ServiceSoundCueSet/FlushSoundCueSet above). */
 extern void Class6B5CC__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32 arg4);
 
 /* Already matched in Entity_b.c (not INCLUDE_ASM), but not previously called

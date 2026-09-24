@@ -1973,3 +1973,4 @@ _SsSetControlChange = 0x80034690; // type:func
 // on any disc in sdk/. Superseded game-style func_80050B28. Still a
 // STALL. Round 74 (bravo, track 2).
 _card_clear = 0x80050B28; // type:func
+ServiceSoundCueSet = 0x8002CD08; // type:func

@@ -62,7 +62,7 @@ mandated checks before spending the search:
 2. **Cost (`--debug --stack-diffs`):** base score **130** = 0 stack
    differences, 0 branch differences, 2 register differences (5 each),
    2 reorderings (60 each), 0 insertions, 0 deletions. This is NOT the
-   0/0-insertion/deletion signature that round 45's `func_8002CD08`
+   0/0-insertion/deletion signature that round 45's `ServiceSoundCueSet`
    correctly flagged as outside a source-mutation search's reach --
    there ARE two real reorderings in the score, meaning at least part of
    the residue (residue A, the `i = 0` delay-slot placement this report
@@ -107,7 +107,7 @@ before moving on.
 ### Proposed learning (round 46)
 
 **A base score with nonzero reorderings but zero insertions/deletions is
-a different animal from round 45's `func_8002CD08` (0/0, pure register
+a different animal from round 45's `ServiceSoundCueSet` (0/0, pure register
 identity, correctly unsearchable) even though both eventually resist a
 search** -- the PRESENCE of addressable reordering penalty in the base
 score is what justifies spending the search budget at all (check 2 is
