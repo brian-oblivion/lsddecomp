@@ -1084,7 +1084,11 @@ SpuVmInit = 0x8002EDD4; // type:func
 // SpuVmNoiseOnWithAdsr (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded
 // game-style name PlaySound. Round 71 (bravo, track 2).
 SpuVmNoiseOnWithAdsr = 0x8002F20C; // type:func
-ClearNoiseVoices = 0x8002F2A4; // type:func
+// identified: shape 0.97 vs libsnd/vmanager SpuVmNoiseOff (46w vs our 49w,
+// disc 3.5), position within the libsnd neighborhood, right after
+// SpuVmNoiseOnWithAdsr. Superseded game-style name ClearNoiseVoices.
+// Round 74 (bravo, track 2).
+SpuVmNoiseOff = 0x8002F2A4; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmNoiseOn
 // (discs 3.3,3.5; libsnd/vm_noise on 3.6). Superseded game-style name
 // PlayFixedSound. Round 71 (bravo, track 2).

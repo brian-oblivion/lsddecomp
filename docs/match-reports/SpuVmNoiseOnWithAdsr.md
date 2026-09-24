@@ -54,7 +54,7 @@ positions). Confirms `vmNoiseOn2`'s signature derived from the sibling:
 Reused the `D_8008EA26`/`D_8008E9D0`/`D_8008EA1B`/`SpuVmAlloc`/
 `vmNoiseOn2` declarations verbatim from `SpuVmNoiseOn` (moved up to
 before `SpuVmNoiseOnWithAdsr`, the first user in ROM order -- these two functions
-are adjacent modulo the frameless `ClearNoiseVoices` between them). One build
+are adjacent modulo the frameless `SpuVmNoiseOff` between them). One build
 snag along the way: declaring them only immediately above `SpuVmNoiseOn`
 left `SpuVmNoiseOnWithAdsr` (earlier in file/ROM order) compiling against
 undeclared identifiers -- `undeclared (first use this function)` on

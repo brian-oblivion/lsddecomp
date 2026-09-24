@@ -66,7 +66,7 @@ the same opening shape from the sibling side; this confirms it.
 `gVoiceFadeActive`..`gVoiceFadeLimit` are six 2-bytes-apart symbols in the SAME
 0x34-byte-stride channel-configuration record family `code_179d8_j.c`
 documents (`Rec34D994`, `Rec34Byte`) -- this unit's own local
-`Rec34Half` type (already declared for `ClearNoiseVoices`'s `D_8008D98C`,
+`Rec34Half` type (already declared for `SpuVmNoiseOff`'s `D_8008D98C`,
 hoisted above this function since it is the earlier ROM-order user).
 
 ## Shape

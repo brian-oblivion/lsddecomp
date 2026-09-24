@@ -1,4 +1,6 @@
-# ClearNoiseVoices -- MATCHED (49/49 words)
+# SpuVmNoiseOff -- MATCHED (49/49 words)
+
+> Renamed from `ClearNoiseVoices` on 2026-09-24 (tools/rename.py). Address 0x8002f2a4.
 
 > Renamed from `func_8002F2A4` on 2026-09-20 (tools/rename.py). Address 0x8002f2a4.
 
@@ -32,7 +34,7 @@ typedef struct {
 } ObjDAD4;
 extern ObjDAD4 *D_8006DAD4;
 
-void ClearNoiseVoices(void) {
+void SpuVmNoiseOff(void) {
     s16 i;
 
     for (i = 0; i < D_8008E9D0; i++) {
@@ -105,7 +107,7 @@ occurrence's own narrower codegen.
 
 ## Naming
 
-**ClearNoiseVoices** (was `func_8002F2A4`) -- Tier B. Releases every
+**SpuVmNoiseOff** (was `func_8002F2A4`) -- Tier B. Releases every
 voice whose state byte (`D_8008D9A3`) reads exactly `2`. The value `2` is
 the same one `SpuVmAlloc` (code_179d8_l) and SpuVmFlush both
 react to by calling their respective "silence the SPU noise generator"

@@ -46,7 +46,7 @@
  *     whose respective flag is set. Called once at the end of
  *     SpuVmInit and, going by its own ring-buffer/mask-clearing logic,
  *     meant to run every frame thereafter.
- *   - ClearNoiseVoices: releases every voice whose state byte reads
+ *   - SpuVmNoiseOff: releases every voice whose state byte reads
  *     exactly 2 (the same value StopNote/SpuVmFlush/SpuVmAlloc
  *     treat as "noise voice needing SpuSetNoiseVoice/func_800375E8 cleanup").
  *   - SpuVmPBVoice / SpuVmPitchBend: match a voice by
@@ -577,7 +577,7 @@ typedef struct {
 } ObjDAD4;
 extern ObjDAD4 *D_8006DAD4;
 
-void ClearNoiseVoices(void) {
+void SpuVmNoiseOff(void) {
     s16 i;
 
     for (i = 0; i < D_8008E9D0; i++) {
