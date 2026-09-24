@@ -88,26 +88,26 @@ extern s32 D_80087118[];
 extern s32 D_80087150;
 
 void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c_l *arg2, s32 arg3) {
-    DreamSysObj_3bb8c_l *unk18 = self->unk18;
+    DreamSysObj_3bb8c_l *unk18 = self->world;
     s32 ret1;
     s32 flag;
 
     unk18->methods->slot74(unk18);
-    self->unk60 = 1;
+    self->hasTarget = 1;
     ret1 = func_80048F84(self->unk38, 0);
     self->unk54->methods->slot5C(self->unk54, ret1);
 
     ret1 = self->target->methods->slot1A0(self->target, 0);
     ret1 = func_80048EA0(self->unk38, 0, ret1);
-    self->unk58 = (Obj87034_3bb8c_l *) func_80043008(ret1);
+    self->pendingOther = (Obj87034_3bb8c_l *) func_80043008(ret1);
 
     unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);
 
-    self->unk78 = unk18;
+    self->cachedWorld = unk18;
     ret1 = self->target->methods->slot1A0(self->target, 0);
-    self->unk50 = (Unk50Struct_3bb8c_l *) RegisterStyleConfig(self->unk14, self->unk38, &self->unk6C, ret1, 0);
+    self->styleConfig = (Unk50Struct_3bb8c_l *) RegisterStyleConfig(self->unk14, self->unk38, &self->unk6C, ret1, 0);
     if (arg2 != 0) {
-        self->unk50 = arg2;
+        self->styleConfig = arg2;
     }
 
     self->unk4C = arg3;
@@ -164,7 +164,7 @@ void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
 
 void ObjM__OnSelectTransfer(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
     if (sel == 2) {
-        ObjM__TransferToOther(self, self->unk58);
+        ObjM__TransferToOther(self, self->pendingOther);
     }
 }
 
@@ -174,29 +174,29 @@ void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
     void *a1;
     Obj87034Methods_3bb8c_l *m;
 
-    if (self->unk60 != 0) {
+    if (self->hasTarget != 0) {
         if (other->unk80 != 0) {
             other->methods->slot04(other);
-            self->unk60 = 0;
+            self->hasTarget = 0;
             self->methods->slot80(self);
             ret = self->target->methods->slot108(self->target);
             self->target->methods->slot104(self->target, ret + 0x1E);
         } else if (other->target != 0) {
-            sel = self->unk50->unk14;
+            sel = self->styleConfig->unk14;
             m = other->methods;
             if (sel != 2) {
-                a1 = self->unk50->unk18;
+                a1 = self->styleConfig->unk18;
             } else {
-                a1 = self->unk50->unkC;
+                a1 = self->styleConfig->unkC;
             }
             m->slot7C(other, a1);
             other->methods->slot04(other);
-            self->unk60 = 0;
+            self->hasTarget = 0;
             self->methods->slot80(self);
         }
     }
-    if (self->unk60 == 0) {
-        if (self->unk14->unk1B4 == 0 && self->unk68 == 0) {
+    if (self->hasTarget == 0) {
+        if (self->unk14->unk1B4 == 0 && self->attached == 0) {
             self->unk64 = 1;
             self->methods->slot88(self);
         }
@@ -207,7 +207,7 @@ void ObjM__DispatchEvent(Obj87034_3bb8c_l *self, void *arg1, s32 eventId) {
     Obj87034Methods_3bb8c_l *m = self->methods;
     void (*fn)(Obj87034_3bb8c_l *);
 
-    if (self->unk68 == 0) {
+    if (self->attached == 0) {
         return;
     }
     if (eventId == 0x16) {
@@ -244,7 +244,7 @@ call:
 void ObjM__TickTarget(Obj87034_3bb8c_l *self) {
     void (*fn)(Obj87034_3bb8c_l *);
 
-    if (self->unk68 != 0) {
+    if (self->attached != 0) {
         self->unk1C++;
         if (self->unk80 != 0) {
             fn = self->methods->slotD0;
@@ -310,8 +310,8 @@ extern s32 D_8008AB34;
 extern s32 D_8008710C;
 
 void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
-    DreamSysObj_3bb8c_l *unk18 = self->unk18;
-    Unk50Struct_3bb8c_l *unk50 = self->unk50;
+    DreamSysObj_3bb8c_l *unk18 = self->world;
+    Unk50Struct_3bb8c_l *unk50 = self->styleConfig;
     UnkCObj_3bb8c_l *obj;
     s32 val;
     Obj14_3bb8c_l *unk14;
@@ -341,7 +341,7 @@ void ObjM__ExitSceneStyle(Obj87034_3bb8c_l *self) {
     self->methods->slotD4(self);
     self->target->methods->slotFC(self->target);
     self->target->methods->slot50(self->target);
-    self->unk18->methods->slot74(self->unk18);
+    self->world->methods->slot74(self->world);
     self->methods->slot14(self, self->unk14);
 }
 
@@ -356,12 +356,12 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     s32 a2;
     void *a1;
 
-    self->unk68 = 1;
+    self->attached = 1;
     self->target->methods->slotF8(self->target, self->unk44, self->unk40);
     self->unk14->methods->slotEC(self->unk14);
 
-    unk18 = self->unk18;
-    unk50 = self->unk50;
+    unk18 = self->world;
+    unk50 = self->styleConfig;
     unk18->methods->slot60(unk18, 1);
     unk18->methods->slot64(unk18, unk50->unkC);
     unk18->methods->slot6C(unk18, unk50->unk1C);

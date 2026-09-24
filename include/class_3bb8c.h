@@ -2357,7 +2357,7 @@ struct ObjM {
  */
 typedef struct Obj87034_3bb8c_l Obj87034_3bb8c_l;
 
-/* self->unk50's pointee: a plain (non-vtable) record, read directly by
+/* self->styleConfig's pointee: a plain (non-vtable) record, read directly by
  * ObjM__TransferToOther via ordinary field offsets, never through a methods
  * pointer -- so it is NOT another Obj87034_3bb8c_l, just an opaque
  * 3-field descriptor. */
@@ -2381,11 +2381,11 @@ typedef struct Unk50Struct_3bb8c_l {
  * so this is a different class, not DreamSys; left unnamed. */
 typedef struct Obj14Methods_3bb8c_l {
     u8 pad000[0x0BC];
-    /* +0x0BC, round 45's ObjM__SetupSceneStyle: `(self, self->unk50->unk8, 0)`. */
+    /* +0x0BC, round 45's ObjM__SetupSceneStyle: `(self, self->styleConfig->unk8, 0)`. */
     void (*slotBC)(void *self, s32 arg1, s32 arg2); /* +0x0BC */
     u8 pad0C0[0x0C4 - 0x0C0];
-    /* +0x0C4, round 45's ObjM__SetupSceneStyle: `(self, 3, self->unk50->unk0,
-     * self->unk50->unk4)`. */
+    /* +0x0C4, round 45's ObjM__SetupSceneStyle: `(self, 3, self->styleConfig->unk0,
+     * self->styleConfig->unk4)`. */
     void (*slotC4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0C4 */
     u8 pad0C8[0x0CC - 0x0C8];
     /* +0x0CC, round 45's ObjM__SetupSceneStyle: `(self, &D_8008710C)`. */
@@ -2410,7 +2410,7 @@ typedef struct Obj14_3bb8c_l {
     u16 unk1B4;                     /* +0x1B4, ObjM__TransferToOther */
 } Obj14_3bb8c_l;
 
-/* Whatever self->unk3C/self->unk18 point to. Resolved by cross-checking
+/* Whatever self->target/self->world point to. Resolved by cross-checking
  * the exact offsets this unit's functions dispatch (+0x050, +0x074,
  * +0x0FC, +0x104, +0x108, +0x200) against tools/classtable.py's dump of
  * DREAMSYS_METHODS (0x80087BDC, include/DreamSys.h): every one lands on a
@@ -2427,8 +2427,8 @@ typedef struct Obj14_3bb8c_l {
 typedef struct DreamSysMethods_3bb8c_l {
     u8 pad00[0x04C];
     /* +0x04C, round 45's ObjM__SetupSceneStyle: `(self, self->unk14)`, dispatched
-     * on the OWNING Obj87034_3bb8c_l's own `unk3C` (a DIFFERENT
-     * DreamSysObj_3bb8c_l instance from the `self->unk18` this function
+     * on the OWNING Obj87034_3bb8c_l's own `target` (a DIFFERENT
+     * DreamSysObj_3bb8c_l instance from the `self->world` this function
      * dispatches every other slot through). */
     void (*slot4C)(void *self, void *arg1); /* +0x04C */
     void (*slot50)(void *self);          /* +0x050, ObjM__ExitSceneStyle */
@@ -2445,7 +2445,7 @@ typedef struct DreamSysMethods_3bb8c_l {
     void (*slot74)(void *self);          /* +0x074, ObjM__ExitSceneStyle */
     u8 pad78[0x0AC - 0x078];
     /* Returns another DreamSysObj_3bb8c_l* -- its return value is dispatched
-     * through methods->slotF0/slotD4 the same way self->unk3C/self->unk18
+     * through methods->slotF0/slotD4 the same way self->target/self->world
      * themselves are, so it is almost certainly a "related instance"
      * accessor rather than a plain getter of scalar data. Named via the
      * elaborated `struct DreamSysObj_3bb8c_l *` (not the typedef, which is
@@ -2534,7 +2534,7 @@ struct Obj87034_3bb8c_l {
     RegistrantObj_3bb8c_l *unkC;      /* +0x00C, ObjM__AttachTarget's `arg1->unkC` */
     s32 unk10;                        /* +0x010, ObjM__EnterStyleSession */
     Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/ObjM__TickStyle/ObjM__ExitSceneStyle */
-    DreamSysObj_3bb8c_l *unk18;         /* +0x018, ObjM__ExitSceneStyle */
+    DreamSysObj_3bb8c_l *world;         /* +0x018, ObjM__ExitSceneStyle; cached into `cachedWorld` by ObjM__InitStyleAndWorld -- a second DreamSysObj instance distinct from `target`, dispatched through style/world-setup slots (slot74/slotAC/slot60/slot64/slot6C/slot68/slotB0/slotB4) */
     s32 unk1C;                           /* +0x01C, ObjM__TickTarget: incremented once per call */
     s32 phase;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 and 5 by ObjM__EnterState5; read by ObjM__HandleStateCode, which is 0-gated) */
     u8 pad24[0x034 - 0x024];
@@ -2545,16 +2545,16 @@ struct Obj87034_3bb8c_l {
     s32 unk44;                              /* +0x044, ObjM__EnterStyleSession */
     s32 unk48;                               /* +0x048, ObjM__InitStyleAndWorld: set from arg1, or 0xA000 if arg1==0 */
     s32 unk4C;                                /* +0x04C, ObjM__InitStyleAndWorld: set from arg3 (only when self->unk38 != 0) */
-    Unk50Struct_3bb8c_l *unk50;             /* +0x050, ObjM__TransferToOther */
+    Unk50Struct_3bb8c_l *styleConfig;             /* +0x050, ObjM__TransferToOther; set from RegisterStyleConfig's return in ObjM__InitStyleAndWorld (or an explicit `arg2` override) */
     Obj87034_3bb8c_l *unk54;                 /* +0x054, ObjM__TeardownStyle */
-    Obj87034_3bb8c_l *unk58;                  /* +0x058, ObjM__OnSelectTransfer: forwarded as ObjM__TransferToOther's `other` */
+    Obj87034_3bb8c_l *pendingOther;                  /* +0x058, ObjM__OnSelectTransfer: forwarded as ObjM__TransferToOther's `other` */
     u8 pad5C[0x060 - 0x05C];
-    s32 unk60;                                 /* +0x060, ObjM__TransferToOther: has-a-target gate, cleared after detaching */
+    s32 hasTarget;                                 /* +0x060, ObjM__TransferToOther: has-a-target gate, cleared after detaching */
     s32 unk64;                                  /* +0x064, ObjM__TransferToOther: set to 1 */
-    s32 unk68;                                   /* +0x068, ObjM__TransferToOther/ObjM__DispatchEvent/ObjM__TickTarget: zero-checked gate */
+    s32 attached;                                   /* +0x068, ObjM__TransferToOther/ObjM__DispatchEvent/ObjM__TickTarget: zero-checked gate */
     s32 unk6C;                                    /* +0x06C, ObjM__InitStyleAndWorld: out-parameter address passed to RegisterStyleConfig, own type unknown */
     u8 pad70[0x078 - 0x070];
-    DreamSysObj_3bb8c_l *unk78;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->unk18 */
+    DreamSysObj_3bb8c_l *cachedWorld;                    /* +0x078, ObjM__InitStyleAndWorld: cached copy of self->world */
     u8 pad7C[0x080 - 0x07C];
     s32 unk80;                                    /* +0x080, ObjM__TransferToOther (on `other`)/ObjM__TickTarget/ObjM__DispatchActiveState: zero-checked gate */
 };
