@@ -1075,7 +1075,7 @@ struct Obj86B60Methods {
                                                       external (TaskCoreObj__func_8003C238);
                                                       OBSERVED: Obj86B60__Init */
     void (*slot50)(Obj86B60 *self);               /* +0x050, external
-                                                      (func_8004D898);
+                                                      (Class86B60__RegisterHandlers);
                                                       OBSERVED: Obj86B60__Deinit
                                                       (round 13) */
     void (*onTag1Notify)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x054, IS
@@ -1096,7 +1096,7 @@ struct Obj86B60Methods {
                                                       same shared slot);
                                                       OBSERVED: Obj86B60__OnNotify */
     void (*slot60)(Obj86B60 *self, s32 reason);  /* +0x060, external
-                                                      (func_8004D90C) */
+                                                      (Class86B60__SetState) */
     void (*slot64)(Obj86B60 *self);               /* +0x064, IS
                                                       Obj86B60__NotifyTargetReset (already
                                                       matched); OBSERVED:
@@ -1123,13 +1123,13 @@ struct Obj86B60Methods {
     void (*slot84)(Obj86B60 *self, s32 a1);       /* +0x084, IS func_8003C858 */
     u8 pad088[0x090 - 0x088];
     void (*slot90)(Obj86B60 *self);               /* +0x090, external
-                                                      (func_8004D9D4);
+                                                      (Class86B60__Tick);
                                                       OBSERVED: func_8003C63C
                                                       (STALL, not attempted --
                                                       read off the
                                                       disassembly only) */
     void (*slot94)(Obj86B60 *self);                /* +0x094, external
-                                                       (func_8004DABC);
+                                                       (Class86B60__RefreshViewValue);
                                                        OBSERVED:
                                                        func_8003CA1C and
                                                        func_8003C63C (STALL) */
@@ -1160,7 +1160,7 @@ struct Obj86B60Methods {
                                                        (func_8003D444);
                                                        OBSERVED: func_8003C944 */
     void (*slotF0)(Obj86B60 *self, s32 a1, s32 a2); /* +0x0F0, external
-                                                       (func_8004DABC);
+                                                       (Class86B60__RefreshViewValue);
                                                        OBSERVED:
                                                        func_8003C63C (STALL,
                                                        not attempted) */

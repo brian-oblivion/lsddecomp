@@ -1,4 +1,6 @@
-# func_8004DF64 -- MATCHED 60/60, round 43
+# Class86B60__BeginMemcardSave -- MATCHED 60/60, round 43
+
+> Renamed from `func_8004DF64` on 2026-09-24 (tools/rename.py). Address 0x8004df64.
 
 Unit `class_3bb8c_d`, class `Class86B60`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 1 `gp_rel` hit
@@ -9,30 +11,30 @@ and no derivation; this round wrote and matched the function from scratch.
 ```c
 extern GenericReleaseObj_3bb8c_d *func_8003B39C(const char *path);
 
-void func_8004DF64(Class86B60 *self)
+void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
     if (self->unkAC == NULL) {
-        self->unkA8 = func_8003B39C(D_800114F8);
-        self->unkAC = func_8004E2E0((void *)1, NULL);
+        self->iconHandle = func_8003B39C(D_800114F8);
+        self->unkAC = New_TaskObjF((void *)1, NULL);
     }
     self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &D_80086D6C,
-                                  self->unkC->unk4, self->unk10, self->unk14,
+                                  self->handlerTable->unk4, self->unk10, self->unk14,
                                   self->unk48);
     self->methods->slot10(self, self->unkAC);
-    self->methods->slot14(self, self->unkC->unk4);
+    self->methods->slot14(self, self->handlerTable->unk4);
     self->methods->slot14(self, self->unk10);
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py func_8004DF64` -> `60/60 words
+Byte-exact on the first build: `funcdiff.py Class86B60__BeginMemcardSave` -> `60/60 words
 match (file 0x3E764-0x3E854)`; whole-image `OK: build matches retail
 SLPS_015.56`.
 
 ## Derivation
 
 - Lazy-init guard: `if (self->unkAC == NULL) { ... }`, the mirror image of
-  `func_8004D704`'s destructor guard on the same two fields
-  (`unkA8`/`unkAC`).
+  `Class86B60__Dtor`'s destructor guard on the same two fields
+  (`iconHandle`/`unkAC`).
 - `func_8003B39C(D_800114F8)` -- `func_8003B39C` is already matched
   project-wide under many independent local arities/return types (see
   e.g. `src/class_3bb8c_g.c`, `src/class_3bb8c_i.c`); this unit's own view
@@ -40,26 +42,26 @@ SLPS_015.56`.
   `D_800114F8` is a real dlabel string, `"CARD\FILEICN1.TIM"`
   (`asm/data/1C34.rodata.s`) -- referenced by symbol per CLAUDE.md's rule
   against re-writing an already-emitted string literal.
-- `func_8004E2E0((void *)1, NULL)` -- the already-matched New_X allocator
+- `New_TaskObjF((void *)1, NULL)` -- the already-matched New_X allocator
   earlier in this same unit, called here with its own two literal
   arguments (`1`, `0`); return type `void *` needs no cast into
   `self->unkAC`.
 - `self->unkAC->methods->slot6C(...)` -- a NEW 7-argument slot (4 in
   registers, 3 on the stack) at `Class86B60UnkACObjMethods_3bb8c_d`'s
   +0x06C, immediately before the already-known `slot70`
-  (`func_8004E054`) with no gap. Every non-`self` argument is forwarded
+  (`Class86B60__EndMemcardSave`) with no gap. Every non-`self` argument is forwarded
   opaquely: `D_8008A9D0` (a NEW `%gp_rel` VALUE-of global, same pattern as
   `D_8008AA10`/`D_8008AA18`/`D_8008AA14` -- holds `0x80011454`, the
   "BISLPS-01556" string in the same unowned `D_80011434` rodata block,
   again with no `dlabel` of its own), `&D_80086D6C` (a real 16-entry
   pointer table, `asm/data/76DC8.data.s`, reached only by address here),
-  `self->unkC->unk4` (already `void *`), `self->unk10` (already `void
+  `self->handlerTable->unk4` (already `void *`), `self->unk10` (already `void
   *`), a NEW field `self->unk14` (`void *`, established here -- lands
   exactly at +0x014, right after `unk10` with no gap), and `self->unk48`
   (already typed `struct Class86B60Unk48Obj *`).
 - The three trailing calls reuse two ALREADY-established slots verbatim:
   `self->methods->slot10(self, self->unkAC)` and two calls to
-  `self->methods->slot14`, once with `self->unkC->unk4` and once with
+  `self->methods->slot14`, once with `self->handlerTable->unk4` and once with
   `self->unk10` -- both already `void *`-typed parameters, so both
   compile with no cast.
 
@@ -91,3 +93,7 @@ slot (`slot6C`) plus one new scalar field (`unk14`) -- the smoothest of
 the five matched so far, and further evidence that this unit's
 `gp_rel`-blocked stalls were uniformly straightforward once the toolchain
 blocker itself was the only thing stopping them.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004DF64` -> `Class86B60__BeginMemcardSave`. **Tier B**: Lazy-inits `self->iconHandle` (`func_8003B39C(D_800114F8)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.

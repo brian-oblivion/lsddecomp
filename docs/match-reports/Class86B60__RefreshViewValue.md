@@ -1,12 +1,14 @@
-# func_8004DABC -- MATCH
+# Class86B60__RefreshViewValue -- MATCH
+
+> Renamed from `func_8004DABC` on 2026-09-24 (tools/rename.py). Address 0x8004dabc.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004DABC`: 23/23 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__RefreshViewValue`: 23/23 words match.
 
 ## Source
 
 ```c
-void func_8004DABC(Class86B60 *self)
+void Class86B60__RefreshViewValue(Class86B60 *self)
 {
     s32 buf;
 
@@ -25,15 +27,19 @@ stack-local buffer whose address is forwarded to `self->unkA4`
 
 - `BaseTaskCtorTable_3bb8c_c::slot94` -- new slot, `void (*)(void *self)`.
   Distinct from `Class86B60Methods::slot94` (established by
-  `func_8004D9D4`'s report) -- same offset number, unrelated table, no
+  `Class86B60__Tick`'s report) -- same offset number, unrelated table, no
   conflict.
 - New type `Class86B60Unk60Obj_3bb8c_d` (self->unk60's pointee, only
   `unk14` reached, a plain `s32`).
 - `Class86B60::unk60` -- new field, carved from the `pad05C` gap.
 - `DreamSysViewMethods_3bb8c_c::slot19C` -- new slot (already added ahead
-  of this function while deriving `func_8004D814`'s neighbourhood; this
+  of this function while deriving `Class86B60__ShowTitleIcon`'s neighbourhood; this
   is the function that actually exercises it).
 
 ### Proposed learning
 
 None new.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004DABC` -> `Class86B60__RefreshViewValue`. **Tier B**: Calls the base class's `slot94`, copies `self->unk60->unk14` into a stack buffer, and forwards its address to `DreamSysView::slot19C` -- the same "read a value, push it through the view's slot19C out-parameter call" idiom that recurs in `Class86B60__UpdateMemcardSaveWithIcon` and `Class86B60__CommitNameEntry` in this same unit. Also the dispatch target for `Class86B60__Tick`'s case 1/case 4. Purpose of the value itself not established.

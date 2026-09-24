@@ -12,7 +12,7 @@
  *
  * Two free functions round out the unit: CheckObj866E8CountFlag, called
  * directly (not through any vtable) from the still-uncarved
- * func_8004DE08, computes a 0/1 flag from an Obj866E8's own fields; and
+ * Class86B60__CommitNameEntry, computes a 0/1 flag from an Obj866E8's own fields; and
  * FormatNumberIntoBuffer, called from Class86B60's own ctor, formats a
  * number into a shared buffer whose broader role (nearby rodata strings
  * hint at a memory-card save label) is not established from this unit
@@ -130,7 +130,7 @@ Class86B60 *New_Class86B60(void *dreamSys)
 
     self = BMemPMgrAlloc(0xC4);
     if (self != NULL) {
-        func_8004E2D0()->ctor(self, dreamSys);
+        GetClass86B60Methods()->ctor(self, dreamSys);
         return self;
     }
     return NULL;
@@ -142,7 +142,7 @@ void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
     Class86B60Unk48Obj *obj;
 
     Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0);
-    self->methods = func_8004E2D0();
+    self->methods = GetClass86B60Methods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
     self->unkA4 = dreamSys;

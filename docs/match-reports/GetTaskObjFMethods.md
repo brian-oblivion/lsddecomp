@@ -20,10 +20,10 @@ GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void)
 
 This function was already forward-declared, opaquely, in
 `include/class_3bb8c.h` as `GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void)`
-while deriving `class_3bb8c_d`'s own `func_8004E2E0` (a `New_X` allocator
+while deriving `class_3bb8c_d`'s own `New_TaskObjF` (a `New_X` allocator
 that calls `GetTaskObjFMethods()->ctor(...)`) last round -- that declaration
 predicted exactly this shape (a trivial vtable-getter, same pattern as
-`func_8004E2D0`/`gClass86B60Methods` and `Get_vtable_TaskCore`/`gTaskCoreMethods` elsewhere in
+`GetClass86B60Methods`/`gClass86B60Methods` and `Get_vtable_TaskCore`/`gTaskCoreMethods` elsewhere in
 this header) before this function's own body was ever read. Confirmed
 correct on the first attempt: the real global is `gTaskObjFMethods`, added here
 as `extern GenericCtorTable_3bb8c_d gTaskObjFMethods;` right next to the getter's

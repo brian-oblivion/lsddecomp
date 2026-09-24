@@ -60,7 +60,7 @@ not a subtraction) before trusting it.
 - `Unk4CObj::unkC` (s32, +0x00C), `::unk24` (`void **`, +0x024) -- both
   OBSERVED here.
 - `Obj86B60Methods::slot108` (+0x108, external `func_8003DA10`) and
-  `::slot94` (+0x094, external `func_8004DABC`, shared with `func_8003C63C`
+  `::slot94` (+0x094, external `Class86B60__RefreshViewValue`, shared with `func_8003C63C`
   STALL's case `a1==6`).
 
 ## Provenance

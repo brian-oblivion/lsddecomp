@@ -1,12 +1,14 @@
-# func_8004E230 -- MATCH
+# Class86B60__OnTagBValue -- MATCH
+
+> Renamed from `func_8004E230` on 2026-09-24 (tools/rename.py). Address 0x8004e230.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004E230`: 40/40 words match.
+SHA1 matches retail. `funcdiff.py Class86B60__OnTagBValue`: 40/40 words match.
 
 ## Source
 
 ```c
-void func_8004E230(Class86B60 *self, s32 arg1, s32 value)
+void Class86B60__OnTagBValue(Class86B60 *self, s32 arg1, s32 value)
 {
     if (value < 0x18) {
         if (value >= 0x16) {
@@ -44,7 +46,7 @@ the very next build with no other change.
 
 - `Class86B60Methods::slot12C` -- new slot, `void (*)(Class86B60 *self)`.
 - `DreamSysViewMethods_3bb8c_c::slot1A8` -- new slot (declared ahead of
-  this function while deriving `func_8004D814`'s neighbourhood; this is
+  this function while deriving `Class86B60__ShowTitleIcon`'s neighbourhood; this is
   the function that exercises it), `void (*)(DreamSysView_3bb8c_c *self)`.
 - Fixed a self-inflicted duplicate-member bug introduced while adding
   `slot12C`: an earlier edit accidentally left two identical `slot130`
@@ -63,3 +65,7 @@ its own data point rather than merged into that list, since the direction
 of the effect is reversed. The reliable move once a `&&`/`||` residue
 shows outside-range drift (not just a few different words) is to try the
 nested-`if` spelling before anything else.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004E230` -> `Class86B60__OnTagBValue`. **Tier B**: The exclusive dispatch target of `Class86B60__ForwardIfTagB`'s `slot138` forward (called only when `arg1`'s header nibble == 0xB), gating further work on ranges of its own `value` parameter (>= 0x16, < 0x18, == 0x16). Named for its role as the tag-0xB handler; the value ranges' meaning is not established.

@@ -1,12 +1,14 @@
-# func_8004E2E0 -- MATCH
+# New_TaskObjF -- MATCH
+
+> Renamed from `func_8004E2E0` on 2026-09-24 (tools/rename.py). Address 0x8004e2e0.
 
 Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_8004E2E0`: 27/27 words match.
+SHA1 matches retail. `funcdiff.py New_TaskObjF`: 27/27 words match.
 
 ## Source
 
 ```c
-void *func_8004E2E0(void *arg0, void *arg1)
+void *New_TaskObjF(void *arg0, void *arg1)
 {
     void *self;
 
@@ -69,3 +71,7 @@ state than not fixing the residue at all.** Worth flagging because the
 26/27 near-miss looked like "one more tweak away" and the natural next
 move (an explicit early return, the more idiomatic-looking C) made the
 score six times worse before the documented lever recovered it.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004E2E0` -> `New_TaskObjF`. **Tier A**: Standard `New_X` allocator (pool-alloc 0x84 bytes, null-check, construct through `GetTaskObjFMethods()->ctor`) for the class whose vtable is `gTaskObjFMethods` -- the same real class `class_3bb8c_f.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Distinct from the already-named `New_Class86B60` (a different class, alloc size 0xC4).

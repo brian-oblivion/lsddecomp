@@ -1,4 +1,6 @@
-# func_8004E1C4 -- MATCHED 27/27, round 43
+# Class86B60__UpdateMemcardSaveStatus -- MATCHED 27/27, round 43
+
+> Renamed from `func_8004E1C4` on 2026-09-24 (tools/rename.py). Address 0x8004e1c4.
 
 Unit `class_3bb8c_d`, class `Class86B60`. **REOPENED -- ASSIGNABLE** from round
 42's `gp_rel` resolution (`--gp-symbols`/`--no-nop-mflo-mfhi`, see CLAUDE.md
@@ -8,7 +10,7 @@ and no derivation; this round wrote and matched the function from scratch.
 ## Body
 
 ```c
-void func_8004E1C4(Class86B60 *self)
+void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self)
 {
     self->methods->slot128(self);
     self->unkAC->methods->slot74(self->unkAC, D_8008AA10, D_8008AA18,
@@ -17,7 +19,7 @@ void func_8004E1C4(Class86B60 *self)
 ```
 
 Byte-exact on the first build: `./build-and-verify.sh` -> `OK: build matches
-retail SLPS_015.56`; `funcdiff.py func_8004E1C4` -> `27/27 words match (file
+retail SLPS_015.56`; `funcdiff.py Class86B60__UpdateMemcardSaveStatus` -> `27/27 words match (file
 0x3E9C4-0x3EA30)`.
 
 ## Derivation
@@ -35,7 +37,7 @@ Two calls:
    VALUES, `self->unkBC`, `self->unkC0`), the fifth going to the stack at
    `0x10($sp)` exactly as a 5-argument call requires. `unkAC`'s methods
    table already had `release` (+0x004) and `slot70` (+0x070, from
-   `func_8004E054`); this call reaches +0x074 immediately after `slot70`
+   `Class86B60__EndMemcardSave`); this call reaches +0x074 immediately after `slot70`
    with no gap, so `slot74` was appended there.
 
    The two `%gp_rel` loads (`D_8008AA10`, `D_8008AA18`) read the globals'
@@ -80,3 +82,7 @@ case; the value-of case surfaces when the "address" being forwarded was
 itself precomputed into a `.sdata` pointer variable by someone else's static
 initializer, and the pointee (here, an offset into an unowned rodata blob
 with no `dlabel` of its own) may not even be nameable.
+
+## Naming (round 77, naming runner delta)
+
+Renamed `func_8004E1C4` -> `Class86B60__UpdateMemcardSaveStatus`. **Tier B, lower confidence**: Calls `slot128` then forwards `self->unkBC`/`unkC0` (no icon handle, no literal flags) through `unkAC`'s `slot74` -- the simpler sibling of `Class86B60__UpdateMemcardSaveWithIcon` and the dispatch target for `Class86B60__Tick`'s case-3. Purpose beyond "the icon-less variant of the two unkAC dispatch calls" is not established.
