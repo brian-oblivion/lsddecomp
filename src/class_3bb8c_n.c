@@ -166,19 +166,17 @@ struct PairXY {
     s32 y; /* +0x004 */
 };
 
-/* STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first
- * real diff at word 15 (0x4508C / vram 0x8005488C) -- see
- * docs/match-reports/StyleBuildDecorSet.md.  Round 61 REVISIT: 12/86 and 6 short
- * -> 17/86 and 1 short.  Residue is one redundant `move` retail emits and
- * two scheduling reorderings.  Preserved near-miss body: */
-#if 0
+/* Allocates the 18 decor objects into gStyleDecorSlots, each attached
+ * (slot4C) to slot 0, then attaches slot 0 to the target object's slotAC
+ * result.  MATCHED round 76 (charlie): an indexed for loop -- loop.c's
+ * strength reduction produces both the slot walker and the colour-table
+ * stride (`gStyleColorTable + i * 3`), which earlier rounds had written as
+ * hand-rolled pointer/counter variables.  See
+ * docs/match-reports/StyleBuildDecorSet.md. */
 void StyleBuildDecorSet(void) {
     PairXY paramA;
     PairXY paramB;
     s32 i;
-    s32 s1;
-    void **arr;
-    void **wp;
     void *obj;
     ObjSlotAC *self2;
     void *result;
@@ -191,30 +189,20 @@ void StyleBuildDecorSet(void) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *) &gStyleDecorPosBX;
-    i = 1;
-    s1 = 3;
-    obj = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
-    __asm__("");
-    arr = gStyleDecorSlots;
-    wp = arr + 1;
-    *arr = obj;
-    do {
-        obj = New_ClassEAC0(&paramB, (void *) (s1 + gStyleColorTable), 0x1FFF);
-        *wp = obj;
-        wp++;
-        ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], &paramA);
-        s1 += 3;
+    gStyleDecorSlots[0] = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
+    for (i = 1; i < 0x12; i++) {
+        obj = New_ClassEAC0(&paramB, (void *) (gStyleColorTable + i * 3), 0x1FFF);
+        gStyleDecorSlots[i] = obj;
+        ((ObjSlot4C *) obj)->methods->slot4C(obj, gStyleDecorSlots[0], &paramA);
         paramA.y += 3;
         paramB.y -= 7;
-        i++;
-    } while (i < 0x12);
+    }
 
     self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
     result = self2->methods->slotAC(self2);
     ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleBuildDecorSet);
+
 
 typedef struct ObjAC7CSub ObjAC7CSub;
 typedef struct ObjAC7CSubMethods ObjAC7CSubMethods;
@@ -498,30 +486,24 @@ extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;
 extern u8 D_8008721C[];
 
-/* STALL, 78/81 words, length EXACT (no drift), first real diff at word 69
- * (0x458EC / vram 0x800550EC) -- see docs/match-reports/StyleFillEffectKind3.md.
- * Round 61 REVISIT: 38/81 -> 78/81. Round 47's "pure arg0/arg1 register-
- * colour swap, ZERO drift" verdict was wrong on both counts; the equal
- * length was two defects cancelling. Residue is now ONE instruction's
- * placement: the `*q = D_80087174` store must sink below `lw a2` and
- * `move a3` into the jal's delay slot, and cannot because a store through
- * a pointer is an opaque MEM that gcc 2.6.3's scheduler will not let the
- * gp-relative load hoist across. Preserved near-miss body: */
-/* STALL, 79/81 words, length EXACT, insertions 0 / deletions 0, first real
- * diff at word 60 (0x458C8 / vram 0x800550C8) -- see
- * docs/match-reports/StyleFillEffectKind3.md.  Round 61 REVISIT: 38/81 -> 79/81.
- * Round 47's "pure arg0/arg1 register-colour swap, ZERO drift" verdict was
- * wrong on both counts; the equal length was two defects cancelling.  What
- * is left is 2 words of genuine register identity: the else branch's
- * computed value sits in $a2 here and in $v1 in retail, because `t`'s single
- * pseudo (deliberately shared -- splitting it into two variables costs 4
- * words) coalesces with the third-argument register.  Preserved near-miss
- * body: */
-#if 0
+/* Local view: D_8008E0B0 stored through a pointer to a ONE-FIELD STRUCT, not
+ * a plain `u8 **`.  Load-bearing: a store through a plain pointer is an
+ * opaque (mem (reg)) that gcc 2.6.3's scheduler will not move a later
+ * global load above; an in-struct store through a varying address does not
+ * conflict with a scalar at a fixed address, so the gStyleCueSelf load
+ * schedules above it and the store lands in the jal delay slot, as retail.
+ * Round 76; see docs/match-reports/StyleFillEffectKind3.md. */
+typedef struct PtrBoxK3 {
+    u8 *p; /* +0x000 */
+} PtrBoxK3;
+
+/* Appends one kind-3 New_Class876FC object; with the decor variant active
+ * and the default colour table it pins the spawn parameters, otherwise it
+ * clamps D_8008E0AC and picks a random colour triple.  MATCHED round 76
+ * (charlie). */
 void **StyleFillEffectKind3(void **arg0, void *arg1) {
-    s32 t;
     s32 *p;
-    u8 **q;
+    PtrBoxK3 *q;
 
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     if (gStyleDecorVariant != 0 && gStyleColorTable == (s32) D_8008726C) {
@@ -537,18 +519,14 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
         if (*p < -0x7800) {
             *p = -0x7800;
         }
-        t = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
-        D_8008E0C0[0] = t;
+        D_8008E0C0[0] = (s32) (D_8008721C + ((u32) rand() % 3) * 3);
     }
-    t = gStyleCueSelf;
-    q = &D_8008E0B0;
-    *q = D_80087174;
-    *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
+    q = (PtrBoxK3 *) &D_8008E0B0;
+    q->p = D_80087174;
+    *arg0 = New_Class876FC((void *) 3, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleFillEffectKind3);
 
 extern s32 D_80087430;
 extern u8 D_80087228[];
@@ -557,53 +535,46 @@ extern u8 *D_8008E0B0;
 extern u8 D_80087174[];
 extern s32 D_8008E0BC;
 
-/* STALL, 49/79 words, length EXACT (round 64, charlie: was 16/79 and 1 word
- * short).  Two levers closed the length gap and the whole prologue:
- *   (1) `u8 **q = &D_8008E0B0;` -- retail CACHES that address in a
- *       callee-saved register and derives D_8008E0A4's address from it as
- *       `q - 0xC`, which is the idiom StyleFillEffectKind3 below already uses.
- *       16/79 (1 short) -> 42/79 (exact).
- *   (2) the arg0 shape of the matched sibling StyleFillEffectKind1 -- `void **`
- *       parameter, `*arg0 = ...; arg0++; return arg0;` rather than a cast
- *       and `+ 4`.  42/79 -> 49/79, and the $s1/$s2 parameter colours and
- *       the entire prologue then matched exactly.
- * Residue is now ONLY the scheduling interleave (retail hoists the /20
- * `mult` and the gStyleCounter load into the /3 `multu`'s latency window,
- * ahead of the D_8008E0C0 address) plus the if/else block order.
- * MEASURED NEGATIVE, twice, on two different bodies: inverting the arms to
- * `% 20 != 0` first regresses (16->9/79 and 49->13/79) and reintroduces
- * length drift -- cc1 collapses `v0 = 0` into the branch delay slot and
- * loses retail's `addiu a2,a2,4` there.  Do not re-derive that.
- * Preserved near-miss body: */
-#if 0
+/* Local view, same reason as PtrBoxK3 above: the first D_8008E0C0 store goes
+ * through a pointer to a one-field struct so the gStyleCounter load may
+ * schedule above it (retail interleaves the % 20 into the % 3's multu
+ * latency).  Round 76; see docs/match-reports/StyleFillEffectKind2.md. */
+typedef struct S32BoxK2 {
+    s32 v; /* +0x000 */
+} S32BoxK2;
+
+/* Appends one kind-2 New_Class876FC object after picking a random colour
+ * triple and a per-20-ticks D_80087430 value.  MATCHED round 76 (charlie).
+ * `val = (gStyleCounter / 20) * 20; if (gStyleCounter != val)` is the
+ * load-bearing spelling of `% 20 != 0`: because the tested variable is also
+ * the assigned one, jump.c cannot rewrite the if/else into `val = 0; if (..)
+ * val = D_80087430;`, which is what every `% 20` spelling compiles to. */
 void **StyleFillEffectKind2(void **arg0, void *arg1) {
-    s32 idx;
-    s32 randval;
-    s32 v0;
-    s32 *slot;
+    s32 r;
+    s32 val;
+    S32BoxK2 *slot;
     u8 **q;
 
-    idx = (u32) rand() % 3;
-    slot = D_8008E0C0;
-    *slot = (s32) (D_80087228 + idx * 3);
+    r = rand();
+    slot = (S32BoxK2 *) D_8008E0C0;
+    slot->v = (s32) (D_80087228 + ((u32) r % 3) * 3);
     slot++;
-    if (gStyleCounter % 20 == 0) {
-        v0 = 0;
+    val = (gStyleCounter / 20) * 20;
+    if (gStyleCounter != val) {
+        val = D_80087430;
     } else {
-        v0 = D_80087430;
+        val = 0;
     }
-    *slot = v0;
+    slot->v = val;
     SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
     q = &D_8008E0B0;
     *q = D_80087174;
-    randval = rand();
-    D_8008E0BC = randval - (randval / 3) * 6;
+    D_8008E0BC = rand() % 6;
     *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
     arg0++;
     return arg0;
 }
-#endif
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_n", StyleFillEffectKind2);
+
 
 extern s32 D_8008E0A8;
 extern s32 D_8008E0AC;

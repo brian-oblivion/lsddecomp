@@ -1,4 +1,90 @@
-# StyleBuildDecorSet -- STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first real diff at word 15 (0x4508C / vram 0x8005488C)
+# StyleBuildDecorSet -- MATCHED 86/86 (round 76), lever: indexed `for` loop with `gStyleColorTable + i * 3` (loop.c strength reduction makes the walker and the stride)
+
+REVISITED, round 76: MATCHED 86/86 in 3 builds, no permuter, no barrier; names/types not relevant (existing names kept).
+
+## Round 76 (charlie): MATCHED
+
+**Preserved body rebuilt first**, verbatim from the `#if 0` block: `build
+exit=2`, no compile-error grep hits, 17/86, `insertions 4 / deletions 4
+(positional skeleton diffs 61)`, 156126 bytes of drift outside the range
+(the 1-word shortfall).
+
+**The residue was never register pressure or a redundant move; it was loop
+kind** (LEARNINGS family "loop kind"). Round 61 read two hand-rolled
+variables off the asm -- a walker `wp = arr + 1` and a counter `s1` stepping
+by 3 -- and wrote them as C variables. Both are loop.c's own induction
+variables:
+
+| build | change | score |
+| --- | --- | --- |
+| 1 | preserved body | 17/86, 1 short, ins 4 / del 4 |
+| 2 | `for (i = 1; i < 0x12; i++)`, `gStyleDecorSlots[0] = New(...)` before the loop, `gStyleDecorSlots[i] = obj` and `gStyleDecorSlots[0]` as the dispatch argument inside it; no `arr`/`wp`, no `__asm__("")` | **77/86, length EXACT**, ins 1 / del 1 |
+| 3 | + drop the `s1` counter: `(void *) (gStyleColorTable + i * 3)` | **86/86**, `OK: build matches retail` |
+
+- **Build 2 produces retail's `move s3,v1`.** The pre-loop store's address
+  is one pseudo (`$v1`); loop.c's invariant `&gStyleDecorSlots` for the
+  loop's `slots[i]`/`slots[0]` is another (`$s3`) initialised from it, and
+  the strength-reduced giv for `&slots[i]` starts at `$s3 + 4` -- exactly the
+  `addiu s0,s3,4` round 61 took for a hand-written `wp = arr + 1`. The
+  `__asm__("")` round 61 needed to keep `arr` after the first `jal` is no
+  longer needed.
+- **Build 3 fixes the `$s1`/`$s2` swap and the two reorderings together.**
+  With `s1` as a user variable, it and `i` were two ordinary pseudos and
+  colouring put them the other way round. Written as `i * 3`, loop.c creates
+  the giv itself, and its register, its initial `li s1,3` in the `jal` delay
+  slot, and its `addiu s1,s1,3` in the `jalr` delay slot all land where
+  retail has them.
+
+Whole image green, `tools/check-nonmatching.sh` green.
+
+```c
+void StyleBuildDecorSet(void) {
+    PairXY paramA;
+    PairXY paramB;
+    s32 i;
+    void *obj;
+    ObjSlotAC *self2;
+    void *result;
+
+    if (gStyleDecorVariant == 0) {
+        return;
+    }
+    paramA = *(PairXY *) &gStyleDecorPosAX;
+    if (gStyleDecorVariant == 2) {
+        paramA.y += 0x1E;
+    }
+    paramB = *(PairXY *) &gStyleDecorPosBX;
+    gStyleDecorSlots[0] = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
+    for (i = 1; i < 0x12; i++) {
+        obj = New_ClassEAC0(&paramB, (void *) (gStyleColorTable + i * 3), 0x1FFF);
+        gStyleDecorSlots[i] = obj;
+        ((ObjSlot4C *) obj)->methods->slot4C(obj, gStyleDecorSlots[0], &paramA);
+        paramA.y += 3;
+        paramB.y -= 7;
+    }
+
+    self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
+    result = self2->methods->slotAC(self2);
+    ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
+}
+```
+
+### Proposed learning
+
+**A callee-saved register stepping by a constant beside the loop counter is
+a strength-reduced `i * K`, not a variable.** If the asm shows an index
+register incremented by 1 plus a second register initialised to `K` (the
+first iteration's value) and incremented by `K`, write the multiply in the
+subscript/sum and let loop.c make the giv; writing the counter by hand makes
+two independent pseudos and colours them differently. Same for a pointer
+initialised to `base + K` and bumped by `K` in a loop whose index starts at
+1: that is `base[i]`. Tell in this function: retail had a `move` from the
+pre-loop address pseudo into the loop-invariant register, which only
+appears when the loop's address is loop.c's own invariant.
+
+---
+
+(Previous title: StyleBuildDecorSet -- STALL, 17/86 words (best), 1 word SHORT (map-measured 85 words), first real diff at word 15 (0x4508C / vram 0x8005488C))
 
 > Renamed from `func_80054850` on 2026-09-23 (tools/rename.py). Address 0x80054850.
 

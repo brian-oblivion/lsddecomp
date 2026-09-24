@@ -1,4 +1,110 @@
-# StyleFillEffectKind2 -- STALL, length EXACT (0x13C / 79 words), 49/79 words, first real diff at word 11 (file 0x45948 / vram 0x80055148)
+# StyleFillEffectKind2 -- MATCHED 79/79 (round 76), levers: one-field-struct store (scheduler alias), `% 6` not `(r/3)*6`, rand() result in its own local, and `val = x/20*20; if (x != val)` to stop jump.c's if/else-to-preset rewrite
+
+REVISITED, round 76: MATCHED 79/79 in ~22 builds, no permuter; the one `__asm__("")` build was a diagnostic probe and is NOT in the committed body; names/types used (local struct view `S32BoxK2`; locals renamed `r`/`val`).
+
+## Round 76 (charlie): MATCHED
+
+**Preserved body rebuilt first**, verbatim from the `#if 0` block: `build
+exit=2`, no compile-error grep hits, **49/79, `insertions 7 / deletions 7`
+(positional skeleton diffs 28)** -- reproduced exactly.
+
+Round 64's "levers marked spent" were about the arm order and the `idx`
+local. Four separate things were wrong, found in this order:
+
+| # | change | effect |
+| --- | --- | --- |
+| 1 | `D_8008E0BC = randval % 6;` | retail's magic is `0x2AAAAAAB` with no shift = signed **/6**; the preserved `randval - (randval / 3) * 6` computed a different function. 49 -> 51/79 |
+| 2 | first `D_8008E0C0` store through `S32BoxK2 *slot` (`slot->v = ...`) | the whole `% 20` prefix (`lui 0x6666`, `lw gStyleCounter`, `mult`) now interleaves into the `% 3`'s `multu` latency exactly as retail. Same mechanism as StyleFillEffectKind3 this round: a store through a plain `s32 *` is an opaque `(mem (reg))` the scheduler will not hoist a global load above; an in-struct store at a varying address does not conflict with a scalar at a fixed address. Went 1 word short (the if/else, below). |
+| 3 | `r = rand();` then `(u32) r % 3`, instead of inlining `rand()` or a separate `idx = rand() % 3` | inline put `slot` in `$s0`; `idx` put the remainder in `$a0`. With the rand RESULT in a local, both `$a2` (slot) and `$v0` (remainder) are retail's. |
+| 4 | `val = (gStyleCounter / 20) * 20; if (gStyleCounter != val) val = D_80087430; else val = 0;` | **79/79**, `OK: build matches retail` |
+
+### Step 4: the if/else was being rewritten by jump.c
+
+Retail keeps both arms: `beq a1,v0 -> zero-arm; lw v0,D_80087430; j join;
+nop; zero-arm: move v0,zero; join:`. Every `% 20` spelling with the load arm
+first (if/else, `!= 0`, ternary either way, `switch` with `default` first)
+compiled to `move a3,zero` ahead of the branch and a one-armed skip:
+gcc's jump.c rewrites `if (c) x = a; else x = b;` into `x = b; if (c) x = a;`
+whenever b is a constant/register and the test does not reference x. With
+the zero arm first (round 64's body) the rewrite cannot fire (the else value
+is a MEM) but the block order is then the reverse of retail's.
+
+Diagnosed with a PROBE, not a fix: an `__asm__("")` after the then-arm's
+assignment blocks the rewrite (it becomes the arm's last active insn) and
+the function went **79/79**. That was not kept -- removing it changes which
+register holds the value (`$a3` vs `$v0`), which is the rule-6 test for a
+banned use, and it is not a C form anyway.
+
+The C form uses the rewrite's own precondition: **the test must not
+reference x.** Written `v0 = x % 20; if (v0 != 0)` the test references x but
+CSE then knows `v0 == 0` on the else path and deletes `v0 = 0`. Written as
+`val = (x / 20) * 20; if (x != val)` the test references `val`, CSE knows
+only `x == val` on the else path, so the else arm's `val = 0` survives and
+the rewrite never fires. It is also exactly retail's register use: the
+`q*20` product is computed into `$v0`, the result register, which is what
+`beq a1,v0` shows. **Do not "simplify" it back to `% 20`.**
+
+Negatives measured on the way (all on the build-3 body): stores in both arms
+(`sw zero` in the else arm, no cross-jump); `v0 = x % 20; if (v0 != 0)` (else
+arm deleted); ternary `!= 0 ? D : 0` and `== 0 ? 0 : D` (rewritten);
+`switch` with `case 0` first (zero-first order) and `default` first
+(rewritten); sharing `r` for both `rand()` results (41 differing lines).
+
+Whole image green, `tools/check-nonmatching.sh` green. `class_3bb8c_n.c`
+now has no `INCLUDE_ASM`.
+
+```c
+typedef struct S32BoxK2 {
+    s32 v;
+} S32BoxK2;
+
+void **StyleFillEffectKind2(void **arg0, void *arg1) {
+    s32 r;
+    s32 val;
+    S32BoxK2 *slot;
+    u8 **q;
+
+    r = rand();
+    slot = (S32BoxK2 *) D_8008E0C0;
+    slot->v = (s32) (D_80087228 + ((u32) r % 3) * 3);
+    slot++;
+    val = (gStyleCounter / 20) * 20;
+    if (gStyleCounter != val) {
+        val = D_80087430;
+    } else {
+        val = 0;
+    }
+    slot->v = val;
+    SetupStyleSpawnParamsA(arg1, (void *) D_80087330);
+    q = &D_8008E0B0;
+    *q = D_80087174;
+    D_8008E0BC = rand() % 6;
+    *arg0 = New_Class876FC((void *) 2, (u8 *) q - 0xC, (void *) gStyleCueSelf, arg1);
+    arg0++;
+    return arg0;
+}
+```
+
+### Proposed learning
+
+1. **`if (c) x = a; else x = b;` with a constant b and a load-first layout in
+   retail: jump.c rewrote yours into `x = b; if (c) x = a;`.** Screen: retail
+   has `j join; nop` after the then-arm and a separate `move reg,zero` (or
+   `li`) block; yours has the constant set ABOVE the branch and no `j`. The
+   rewrite is blocked when the TEST references x -- so look for a spelling
+   where the compared value lives in the result variable (here
+   `val = x/20*20; if (x != val)`, with retail computing the product into
+   the result register as the tell). A test of `x` against 0 does not work,
+   because CSE then deletes the else arm's `x = 0` as redundant.
+2. **Read the magic constant before trusting a preserved body's arithmetic.**
+   `0x2AAAAAAB` with `sra 31`/`subu` and no shift is `/ 6`; `0x55555556` is
+   `/ 3`. The inherited body had carried a wrong `%` for three rounds.
+3. The one-field-struct store (StyleFillEffectKind3's learning) applied
+   here unchanged; it is a family, not a one-off.
+
+---
+
+(Previous title: StyleFillEffectKind2 -- STALL, length EXACT (0x13C / 79 words), 49/79 words, first real diff at word 11 (file 0x45948 / vram 0x80055148))
 
 > Renamed from `func_8005511C` on 2026-09-23 (tools/rename.py). Address 0x8005511c.
 
