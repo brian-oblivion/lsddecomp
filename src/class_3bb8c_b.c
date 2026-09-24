@@ -21,7 +21,7 @@ s32 Class866E8__FindElemIndexByUnk32(Obj866E8 *self, s32 key) {
     return result;
 }
 
-s32 func_8004C5D0(Obj866E8 *self, s32 key) {
+s32 Class866E8__FindElemIndexByUnk30(Obj866E8 *self, s32 key) {
     s32 i;
     Elem *e;
 
@@ -35,15 +35,15 @@ s32 func_8004C5D0(Obj866E8 *self, s32 key) {
 }
 
 /* Forward declarations: all three are defined later in this file (in ROM
- * order, after func_8004C620), but func_8004C620 calls them before their
+ * order, after Class866E8__RefreshFootprint), but Class866E8__RefreshFootprint calls them before their
  * own definitions appear. Signatures are typed from the registers loaded
  * at each call site, per this unit's established convention for calling a
  * same-unit function whose body is still INCLUDE_ASM. */
 extern void func_8004CE24(Obj866E8 *self, s32 arg1);
 extern void func_8004CC74(Obj866E8 *self);
-extern void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2);
+extern void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2);
 
-void func_8004C620(Obj866E8 *self) {
+void Class866E8__RefreshFootprint(Obj866E8 *self) {
     s32 idx;
 
     if (self->unk1B8 == 0) {
@@ -52,7 +52,7 @@ void func_8004C620(Obj866E8 *self) {
     idx = self->gridHalfCells * 2;
     func_8004CE24(self, 0);
     if (self->unk68->unk4 == 0) {
-        func_8004C6A8(self, idx, self->gridCells);
+        Class866E8__ComputeFootprintFromRotation(self, idx, self->gridCells);
     } else {
         func_8004CC74(self);
     }
@@ -60,10 +60,10 @@ void func_8004C620(Obj866E8 *self) {
 }
 
 /* Forward declaration: defined later in this file (in ROM order, after
- * func_8004CAF0), but tail-called here before its own definition appears. */
-extern void func_8004C93C(Obj866E8 *self);
+ * Class866E8__SplitFootprintSlot), but tail-called here before its own definition appears. */
+extern void Class866E8__BuildFootprintSlots(Obj866E8 *self);
 
-void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
+void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
     s32 point0;
@@ -125,22 +125,22 @@ void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     } else {
         self->unk7E = (u16)self->unk7E + offset;
     }
-    func_8004C93C(self);
+    Class866E8__BuildFootprintSlots(self);
 }
 
 /* Forward declaration: defined next in this file (ROM order), called here
  * before its own definition appears. */
-extern s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height);
+extern s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height);
 
 /* Matched round 75. Three source-shape levers closed what was filed since
  * round 19 as a whole-function register rotation
- * (docs/match-reports/func_8004C93C.md): ONE slot pointer reused for the
+ * (docs/match-reports/Class866E8__BuildFootprintSlots.md): ONE slot pointer reused for the
  * second slot (no separate slot1), assigned once at the join after the
  * h6<0 test (reorg fills the bgez delay slot from it and deletes the
  * redundant copy on the other path -- no barrier, no duplicate); the
  * clipped remainder in its own local `over` rather than `span -= 0x14`;
  * and `count += 1` as a statement in each arm plus at the join. */
-void func_8004C93C(Obj866E8 *self) {
+void Class866E8__BuildFootprintSlots(Obj866E8 *self) {
     s32 flag;
     s32 h4;
     s32 width;
@@ -184,7 +184,7 @@ void func_8004C93C(Obj866E8 *self) {
     if (span >= 0x15) {
         over = span - 0x14;
         slot->h8 = width - over;
-        count = func_8004CAF0(self, slot, 0, quadrant, h4, h6, width, height);
+        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, h4, h6, width, height);
         count += 1;
         slot = &self->slots8C[count];
         slot->elemIdx = self->methods->slot120(self, quadrant + 1);
@@ -194,13 +194,13 @@ void func_8004C93C(Obj866E8 *self) {
         slot->hA = self->slots8C[0].hA;
     } else {
         slot->h8 = width;
-        count = func_8004CAF0(self, slot, 0, quadrant, h4, h6, width, height);
+        count = Class866E8__SplitFootprintSlot(self, slot, 0, quadrant, h4, h6, width, height);
     }
     count += 1;
     self->unk88 = count;
 }
 
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;
     s32 elemArg;

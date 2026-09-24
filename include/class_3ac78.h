@@ -71,7 +71,7 @@ struct UnkSlotEntry_3ac78 {
  * independent pieces of evidence now agree:
  *  - Class866E8__SetFootprintRect (matched round 71) writes `self->rects.e[0].elemIdx = self->methods->
  *    slot124(...)` into element [0]'s first field; `slot124`'s real
- *    occupant (func_8004C5D0) was independently retyped, round 8, to
+ *    occupant (Class866E8__FindElemIndexByUnk30) was independently retyped, round 8, to
  *    return an s32 LOOP INDEX, never a pointer (see Class866E8Methods::
  *    slot124's own comment) -- so this field is an index, not a pointer.
  *  - Class866E8__DispatchToRectCells reads that same first field back and uses it as
@@ -215,10 +215,10 @@ struct Class866E8Methods {
     /* +0x10C */ u8 pad10C[0x110 - 0x10C];
     /* +0x110 */ s32 (*slot110)(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2); /* func_8004C1C0; called by Class866E8__ApplyToSenderFootprint */
     /* +0x114 */ u8 pad114[0x124 - 0x114];
-    /* +0x124 */ s32 (*slot124)(Class866E8 *self, s32 key);                     /* func_8004C5D0; called by Class866E8__SetFootprintRect.
+    /* +0x124 */ s32 (*slot124)(Class866E8 *self, s32 key);                     /* Class866E8__FindElemIndexByUnk30; called by Class866E8__SetFootprintRect.
                   * RETYPED round 8 from `void *(*)(Class866E8 *, void *)` on the strength of the
                   * occupant's own BYTE-EXACT body, matched that round in class_3bb8c_b as
-                  * `s32 func_8004C5D0(Obj866E8 *self, s32 key)`: it returns a loop INDEX
+                  * `s32 Class866E8__FindElemIndexByUnk30(Obj866E8 *self, s32 key)`: it returns a loop INDEX
                   * (`move v0,a2`) or -1, never a pointer, and `key` is compared against a
                   * s16 field so it is a scalar. Safe to change because slot124 has no C call
                   * site yet, and the whole-image SHA1 was re-verified after the change.

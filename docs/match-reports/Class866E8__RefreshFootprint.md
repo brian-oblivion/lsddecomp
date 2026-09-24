@@ -1,8 +1,10 @@
-# func_8004C620 — MATCHED (34/34 words)
+# Class866E8__RefreshFootprint — MATCHED (34/34 words)
+
+> Renamed from `func_8004C620` on 2026-09-24 (tools/rename.py). Address 0x8004c620.
 
 Dispatcher: gated by `self->unk1B8`, doubles `self->unk78` into an index,
 calls `func_8004CE24(self, 0)` unconditionally, then branches on
-`self->unk68->unk4` between `func_8004C6A8` and `func_8004CC74`, finishing
+`self->unk68->unk4` between `Class866E8__ComputeFootprintFromRotation` and `func_8004CC74`, finishing
 with `func_8004CE24(self, 1)`.
 
 ## New struct knowledge (`include/class_3bb8c.h`)
@@ -24,15 +26,15 @@ is read here too, no header change needed for that one.
 
 ```c
 /* Forward declarations: all three are defined later in this file (in ROM
- * order, after func_8004C620), but func_8004C620 calls them before their
+ * order, after Class866E8__RefreshFootprint), but Class866E8__RefreshFootprint calls them before their
  * own definitions appear. Signatures are typed from the registers loaded
  * at each call site, per this unit's established convention for calling a
  * same-unit function whose body is still INCLUDE_ASM. */
 extern void func_8004CE24(Obj866E8 *self, s32 arg1);
 extern void func_8004CC74(Obj866E8 *self);
-extern void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2);
+extern void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2);
 
-void func_8004C620(Obj866E8 *self) {
+void Class866E8__RefreshFootprint(Obj866E8 *self) {
     s32 idx;
 
     if (self->unk1B8 == 0) {
@@ -41,7 +43,7 @@ void func_8004C620(Obj866E8 *self) {
     idx = self->unk78 * 2;
     func_8004CE24(self, 0);
     if (self->unk68->unk4 == 0) {
-        func_8004C6A8(self, idx, self->unk7A);
+        Class866E8__ComputeFootprintFromRotation(self, idx, self->unk7A);
     } else {
         func_8004CC74(self);
     }
@@ -53,14 +55,14 @@ void func_8004C620(Obj866E8 *self) {
 
 1. First attempt wrote the natural reading of the branch
    (`if (self->unk68->unk4 != 0) { func_8004CC74(self); } else {
-   func_8004C6A8(...); }`) — compiled, size matched, but 8/34 words
+   Class866E8__ComputeFootprintFromRotation(...); }`) — compiled, size matched, but 8/34 words
    differed: retail's branch is a `bnez` jumping FORWARD to the
    `func_8004CC74` call (which sits as an out-of-line target after a `j`
-   over it), with `func_8004C6A8` as the in-line fallthrough. My version
-   produced the mirror image: a `beqz` with `func_8004C6A8` as the jump
+   over it), with `Class866E8__ComputeFootprintFromRotation` as the in-line fallthrough. My version
+   produced the mirror image: a `beqz` with `Class866E8__ComputeFootprintFromRotation` as the jump
    target and `func_8004CC74` in-line.
 2. Inverting the condition and swapping the two arms
-   (`if (self->unk68->unk4 == 0) { func_8004C6A8(...); } else {
+   (`if (self->unk68->unk4 == 0) { Class866E8__ComputeFootprintFromRotation(...); } else {
    func_8004CC74(self); }`, semantically identical) reproduced retail's
    exact branch polarity and instruction layout — 34/34.
 

@@ -409,7 +409,7 @@ void Class866E8__ApplyToSenderFootprint(Class866E8 *self, UnkListObj_3ac78 *send
     self->rects = saved;
 }
 
-extern void func_8004C93C(Class866E8 *self);
+extern void Class866E8__BuildFootprintSlots(Class866E8 *self);
 
 void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *desc, s32 span)
 {
@@ -420,7 +420,7 @@ void Class866E8__SetFootprintFromCell(Class866E8 *self, UnkArgObj_3ac78 *desc, s
     self->footprintW = span;
     self->footprintH = span;
     self->footprintRow = t;
-    func_8004C93C(self);
+    Class866E8__BuildFootprintSlots(self);
 }
 
 /* Clamp a span x span footprint centred on desc's cell to the 20 x 20 grid:

@@ -133,7 +133,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   same result")
 - **`do { ... } while (0)` is a REAL RTL construct to 2.6.3, not a no-op brace block.** The loop
   pass runs over it, so it can change code a plain `{ }` in the identical place does not, and that
-  bare-brace control IS the discriminator. Its effect is not fixed: scheduling on `func_8004CAF0`,
+  bare-brace control IS the discriminator. Its effect is not fixed: scheduling on `Class866E8__SplitFootprintSlot`,
   global register allocation on `Snd_decrescendo`. (a round 58, bravo + charlie)
 - **A one-instruction `else` arm leaves NO BLOCK**: reorg steals it into the branch's own delay slot
   and the branch targets the outer join, so "retail assigns this in a delay slot, mine assigns it
@@ -152,7 +152,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   hand at any loop-tail residue before a search. (round 71)
 - **One store retail shows at a join may be the SAME store written in both arms**: GCC merges the
   identical stores into the join block, and the label that merge creates stops a following reload
-  from hoisting above it. `func_8004CAF0` 97/97; the barriers and `do{}while(0)` it had carried were
+  from hoisting above it. `Class866E8__SplitFootprintSlot` 97/97; the barriers and `do{}while(0)` it had carried were
   compensating for that missing label. (round 71)
 - **A stall whose compiled LENGTH differs from retail is a control-flow defect until shown
   otherwise, whatever its title calls it.** `Class86F88__Class86F88`, filed "register rotation, 6/107" since
@@ -362,7 +362,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   9/74 -> 74/74 on the first build). (round 71)
 - **A value in a callee-saved register with no call visibly crossing it was ASSIGNED before a
   call**: GCC sank the computation into a delay slot after the call, which reads as a pointless
-  promotion. Move the assignment to right after its input is loaded (`func_8004C6A8`, filed as a
+  promotion. Move the assignment to right after its input is loaded (`Class866E8__ComputeFootprintFromRotation`, filed as a
   HARD RULE 6 stall in round 34, 85/165 -> 131/165 length-exact). (round 71)
 
 - **A full parameter register swap at 0/0 can be global-alloc PRIORITY, and `cc1 -dl` measures
@@ -551,7 +551,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (`s + (p + 0x14)` -> `(s + p) + 0x14`), so no spelling containing the literal reaches retail's
   grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`Unk18Obj__InitOt`,
   73/73 after 14 groupings and ~89k permuter iterations); splitting `(w + 20) - span` into two
-  statements closed `func_8004CAF0`. (round 71)
+  statements closed `Class866E8__SplitFootprintSlot`. (round 71)
 - **A flat table indexed `&T[r*C]` then `[c]` wants a named row-pointer local, `T (*tbl)[C] = ...;
   tbl[r][c]`**: the local puts the table-address load before the index arithmetic; the inline
   cast does not. Closed `CalcDreamColor` 28/35. (round 73)

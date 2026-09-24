@@ -73,7 +73,7 @@ allocation wrong.
 > correct prior disposition was already "not searched, scaffold
 > untrustworthy", and it still is. Not re-attempted; the family-wide
 > pattern is now 5 confirmed instances (`func_8004BB3C`, `func_8004C1C0`,
-> `func_8004CAF0`, `func_8004C93C`, `func_8004CD38`), reinforcing round
+> `Class866E8__SplitFootprintSlot`, `Class866E8__BuildFootprintSlots`, `func_8004CD38`), reinforcing round
 > 46's own read that this is structural to the family's
 > `self->methods->slotNN` call-chain shape, not a per-function fluke --
 > still a tooling question for the operator, not something to fix
@@ -127,8 +127,8 @@ allocation wrong.
 > round 13 (six prior rounds' worth of confirmation: 17, 19, 20, 27, 32,
 > 39, 40, 41), the isolated permuter scaffold provably scores a different
 > residue than the real build (round 17/40, and this class recurs
-> elsewhere in this unit this round -- see `func_8004CAF0`,
-> `func_8004C1C0`, `func_8004C93C`, `func_8004CD38`), and neither of this
+> elsewhere in this unit this round -- see `Class866E8__SplitFootprintSlot`,
+> `func_8004C1C0`, `Class866E8__BuildFootprintSlots`, `func_8004CD38`), and neither of this
 > round's two new levers applies. **SKIPPING further attempts this
 > round** per this round's own guidance on functions whose cheap levers
 > are spent.

@@ -354,7 +354,7 @@ typedef struct Obj866E8Methods {
     void (*slot108)(Obj866E8 *self, Elem *entry); /* +0x108 */
     /* Called by func_8004CC74 with its own stack-local query buffer
      * (see `CC74QueryBuf`) and a literal 0; return value unused there.
-     * Also called by func_8004C6A8 with the identical (own stack-local
+     * Also called by Class866E8__ComputeFootprintFromRotation with the identical (own stack-local
      * CC74QueryBuf, 0) shape; return value unused there either. */
     s32 (*slot10C)(Obj866E8 *self, void *outBuf, s32 arg2); /* +0x10C */
     /* = func_8004C1C0 (this round: STALLED at 72/106). Resolves `in` (may be NULL at
@@ -380,7 +380,7 @@ typedef struct Obj866E8Methods {
      * to slot118 (func_8004C434) -- not this round's function to match
      * (func_8004C470, still INCLUDE_ASM in this unit). */
     Elem *(*slot11C)(Obj866E8 *self, QueryPos866E8 *arg1);   /* +0x11C */
-    /* Called twice by func_8004CAF0, each time with a small offset off
+    /* Called twice by Class866E8__SplitFootprintSlot, each time with a small offset off
      * its own arg3; the return value is stored as a freshly-created
      * GridSlot866E8's `elemIdx`. */
     s32 (*slot120)(Obj866E8 *self, s32 arg1);      /* +0x120 */
@@ -388,8 +388,8 @@ typedef struct Obj866E8Methods {
      * value is stored into the first word of a freshly-copied 3-word
      * slot at self+0x8C+key*0xC (see func_8004CDA4). */
     s32 (*slot124)(Obj866E8 *self, s32 arg1);      /* +0x124 */
-    /* = func_8004C620 (class_3bb8c_b, already matched: `void
-     * func_8004C620(Obj866E8 *self)`). Called by func_8004B5BC as
+    /* = Class866E8__RefreshFootprint (class_3bb8c_b, already matched: `void
+     * Class866E8__RefreshFootprint(Obj866E8 *self)`). Called by func_8004B5BC as
      * `self->methods->slot128(self)`, return unused. Classtable-verified
      * (`D_800866E8`'s own +0x128 entry). */
     void (*slot128)(Obj866E8 *self);               /* +0x128 */
@@ -465,9 +465,9 @@ struct ElemTarget {
     ResInfo866E8 *field10;          /* +0x010, func_8004BE54 */
     u8 pad014[0x02A - 0x014];
     u16 unk2A;                     /* +0x02A, func_8004BD14 */
-    s16 unk2C;                     /* +0x02C, func_8004BD14/func_8004C5D0 (nonzero test) */
+    s16 unk2C;                     /* +0x02C, func_8004BD14/Class866E8__FindElemIndexByUnk30 (nonzero test) */
     s16 unk2E;                     /* +0x02E, func_8004BD14 */
-    s16 unk30;                     /* +0x030, func_8004C0AC/func_8004C3F0/func_8004C5D0 */
+    s16 unk30;                     /* +0x030, func_8004C0AC/func_8004C3F0/Class866E8__FindElemIndexByUnk30 */
     s16 unk32;                     /* +0x032, func_8004C434/Class866E8__FindElemIndexByUnk32 */
 };
 
@@ -477,7 +477,7 @@ struct ElemTarget {
  * func_8004C0AC (+0x00C indirectly via unk4, +0x010) and func_8004BD14
  * (+0x000, +0x004). class_3bb8c_b's func_8004D1D0 independently reached
  * the same +0x010 pointer array, walked over the same 0x668 raw bytes,
- * and func_8004C5D0/Class866E8__FindElemIndexByUnk32 the same +0x004 target.
+ * and Class866E8__FindElemIndexByUnk30/Class866E8__FindElemIndexByUnk32 the same +0x004 target.
  */
 struct Elem {
     u16 flag;                      /* +0x000 */
@@ -553,12 +553,12 @@ struct Unk1BCObj {
 };
 
 /*
- * self+0x6C->unk14's pointee (round 13, func_8004C6A8). Only field
+ * self+0x6C->unk14's pointee (round 13, Class866E8__ComputeFootprintFromRotation). Only field
  * established: +0x044, a further pointer (Unk6C14SubObj*).
  */
 struct Unk6C14Obj {
     u8 pad00[0x44];
-    Unk6C14SubObj *unk44;           /* +0x044, func_8004C6A8 */
+    Unk6C14SubObj *unk44;           /* +0x044, Class866E8__ComputeFootprintFromRotation */
 };
 
 /*
@@ -574,7 +574,7 @@ struct Unk6C14Obj {
  */
 struct Unk6C14SubObj {
     u8 pad00[0x12];
-    u16 unk12;                      /* +0x012, func_8004C6A8 */
+    u16 unk12;                      /* +0x012, Class866E8__ComputeFootprintFromRotation */
 };
 
 /*
@@ -582,18 +582,18 @@ struct Unk6C14SubObj {
  * raw (never dereferences it); func_8004C158 dereferences it and reads
  * +0x014, itself a pointer used only for address-of-plus-offset
  * arithmetic (`+0x018`), never further dereferenced. Retyped this round
- * (round 13, func_8004C6A8) from `void *` to `Unk6C14Obj *` -- the ONLY
+ * (round 13, Class866E8__ComputeFootprintFromRotation) from `void *` to `Unk6C14Obj *` -- the ONLY
  * other reader, func_8004C158, already casts it straight to `(u8 *)`
  * before doing arithmetic, so the retype does not change that already-
  * matched function's bytes (verified: full rebuild stays green).
  */
 struct Unk6CObj {
     u8 pad00[0x14];
-    Unk6C14Obj *unk14;              /* +0x014, func_8004C158/func_8004C6A8 */
+    Unk6C14Obj *unk14;              /* +0x014, func_8004C158/Class866E8__ComputeFootprintFromRotation */
 };
 
 /*
- * Template struct copied wholesale by func_8004C6A8 from the constant
+ * Template struct copied wholesale by Class866E8__ComputeFootprintFromRotation from the constant
  * global `D_8008E98C` into a stack-local descriptor, then partially
  * overwritten (`unk14`/`unk18` zeroed, `unk1C` set from `self->unk74`)
  * before being handed to two uncarved library helpers
@@ -602,15 +602,15 @@ struct Unk6CObj {
  * five words are read/written only as the opaque whole-struct copy.
  */
 struct QueryTemplate866E8 {
-    s32 unk0[5];                    /* +0x000..+0x010, opaque (untouched by func_8004C6A8) */
-    s32 unk14;                      /* +0x014, func_8004C6A8: zeroed before the call, then an in/out arg to ApplyMatrixLV */
-    s32 unk18;                      /* +0x018, func_8004C6A8: zeroed before the call */
-    s32 unk1C;                      /* +0x01C, func_8004C6A8: set to self->unk74 before the call */
+    s32 unk0[5];                    /* +0x000..+0x010, opaque (untouched by Class866E8__ComputeFootprintFromRotation) */
+    s32 unk14;                      /* +0x014, Class866E8__ComputeFootprintFromRotation: zeroed before the call, then an in/out arg to ApplyMatrixLV */
+    s32 unk18;                      /* +0x018, Class866E8__ComputeFootprintFromRotation: zeroed before the call */
+    s32 unk1C;                      /* +0x01C, Class866E8__ComputeFootprintFromRotation: set to self->unk74 before the call */
 };
 
 extern QueryTemplate866E8 D_8008E98C;
 
-/* Uncarved library helpers (round 13, func_8004C6A8's only known call
+/* Uncarved library helpers (round 13, Class866E8__ComputeFootprintFromRotation's only known call
  * site). `RotMatrix`'s first argument is `(u8 *)sub + 0x10` where
  * `sub` is a `Unk6C14SubObj *` -- never dereferenced in this unit, so
  * typed as a raw pointer rather than claiming a struct shape for it.
@@ -743,18 +743,18 @@ struct Obj866E8 {
     Unk68Struct *unk68;            /* +0x068, func_8004B418/func_8004B38C/func_8004B930/func_8004C470 */
     Unk6CObj *unk6C;               /* +0x06C, func_8004B38C stores it raw; func_8004C158 dereferences it */
     s32 unk70;                     /* +0x070, func_8004B570/func_8004B57C */
-    s32 gridSpan;                  /* +0x074, world span of the grid; gDefaultGridSpan = 0xA000. func_8004C6A8 copies it into its stack-local QueryTemplate866E8's unk1C before calling RotMatrix */
-    s16 gridHalfCells;             /* +0x078, gridSpan >> 12 = 10; func_8004C620 doubles it into an index (giving gridCells) */
-    s16 gridCells;                 /* +0x07A, gridSpan >> 11 = 20, the row stride byte-matched func_8004CE24 uses; func_8004C620 passes it on as an arg */
-    s16 unk7C;                     /* +0x07C, func_8004C93C: a signed sub-cell horizontal offset, clamped into [0,0x14) and combined with unk80 to decide whether the grid footprint spans one or two 20-unit cells; also written directly by func_8004C6A8 */
-    s16 unk7E;                     /* +0x07E, func_8004C93C: same convention as unk7C, vertical; also written directly by func_8004C6A8 */
-    s32 unk80;                     /* +0x080, func_8004C6A8 (writes arg1 or arg2 depending on its own dispatch), then read/forwarded by func_8004C93C to func_8004CAF0's p7 */
-    s32 unk84;                     /* +0x084, func_8004C6A8 (writes the other of arg1/arg2), then read/forwarded by func_8004C93C to func_8004CAF0's p8 */
+    s32 gridSpan;                  /* +0x074, world span of the grid; gDefaultGridSpan = 0xA000. Class866E8__ComputeFootprintFromRotation copies it into its stack-local QueryTemplate866E8's unk1C before calling RotMatrix */
+    s16 gridHalfCells;             /* +0x078, gridSpan >> 12 = 10; Class866E8__RefreshFootprint doubles it into an index (giving gridCells) */
+    s16 gridCells;                 /* +0x07A, gridSpan >> 11 = 20, the row stride byte-matched func_8004CE24 uses; Class866E8__RefreshFootprint passes it on as an arg */
+    s16 unk7C;                     /* +0x07C, Class866E8__BuildFootprintSlots: a signed sub-cell horizontal offset, clamped into [0,0x14) and combined with unk80 to decide whether the grid footprint spans one or two 20-unit cells; also written directly by Class866E8__ComputeFootprintFromRotation */
+    s16 unk7E;                     /* +0x07E, Class866E8__BuildFootprintSlots: same convention as unk7C, vertical; also written directly by Class866E8__ComputeFootprintFromRotation */
+    s32 unk80;                     /* +0x080, Class866E8__ComputeFootprintFromRotation (writes arg1 or arg2 depending on its own dispatch), then read/forwarded by Class866E8__BuildFootprintSlots to Class866E8__SplitFootprintSlot's p7 */
+    s32 unk84;                     /* +0x084, Class866E8__ComputeFootprintFromRotation (writes the other of arg1/arg2), then read/forwarded by Class866E8__BuildFootprintSlots to Class866E8__SplitFootprintSlot's p8 */
     s32 unk88;                     /* +0x088, func_8004CE24: loop count over slots8C[] (bounded by slots8C's own 4-element capacity) */
     GridSlot866E8 slots8C[4];      /* +0x08C, func_8004CE24 (reads); func_8004CDA4 (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
     Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
     u8 padC6[0xEC - 0xC6];
-    Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/Class866E8__FindElemIndexByUnk32/func_8004C5D0/func_8004BD14/func_8004D1D0 */
+    Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/Class866E8__FindElemIndexByUnk32/Class866E8__FindElemIndexByUnk30/func_8004BD14/func_8004D1D0 */
     s32 unk1B0;                    /* +0x1B0, func_8004BD14 */
     u16 unk1B4;                    /* +0x1B4, func_8004BD14 */
     u8 pad1B6[0x1B8 - 0x1B6];

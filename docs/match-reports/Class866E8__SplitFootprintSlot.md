@@ -1,4 +1,6 @@
-# func_8004CAF0 — MATCHED 97/97 (round 71, delta; revisit). Previously: STALL, 97 words exact length, 62/97, first diff at the prologue register saves
+# Class866E8__SplitFootprintSlot — MATCHED 97/97 (round 71, delta; revisit). Previously: STALL, 97 words exact length, 62/97, first diff at the prologue register saves
+
+> Renamed from `func_8004CAF0` on 2026-09-24 (tools/rename.py). Address 0x8004caf0.
 
 
 > **REVISITED, round 71: MATCHED 97/97, byte-exact, whole-image SHA1 green; names/types used (parameters renamed col/row/width/height, locals overflow/span/elemArg/widthLeft; no struct change).** The sections below this one are the history and are superseded by it.
@@ -60,7 +62,7 @@ spent (Gate 3 not run; not needed).
 ```c
 #if 0
 /* needs: common.h, class_3bb8c.h (Obj866E8, GridSlot866E8, slots8C, methods->slot120) */
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;
     s32 elemArg;
@@ -242,7 +244,7 @@ byte-exactness. An 8-parameter function that populates one or two
 ## What the function does (control flow and semantics, not in doubt)
 
 ```c
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 v;
     s32 hSpan;
     s32 h4sum;
@@ -359,7 +361,7 @@ a pure scheduling residue).
 
 ```c
 #if 0
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 v;
     s32 hSpan;
     s32 h4sum;
@@ -446,7 +448,7 @@ genuinely separate value neither attempt captured), not just the naming.
 
 ```c
 #if 0
-s32 func_8004CAF0(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 Class866E8__SplitFootprintSlot(Obj866E8 *self, GridSlot866E8 *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 hSpan;
     s32 hSpan2;
     s32 h4;
@@ -539,10 +541,10 @@ from one existing struct instance into another. The shape does not occur.
 
 ## Round 33 (charlie) — re-derived from the raw asm by hand, register rotation confirmed genuine; permuter scaffold mismatch re-checked, still unusable
 
-Traced every instruction in `asm/nonmatchings/class_3bb8c_b/func_8004CAF0.s`
+Traced every instruction in `asm/nonmatchings/class_3bb8c_b/Class866E8__SplitFootprintSlot.s`
 fresh against the round-19 preserved body, line by line, specifically hunting
 for anything the earlier rounds might have missed (in the spirit of this
-round's other stall on this unit, `func_8004C6A8`, where the same exercise
+round's other stall on this unit, `Class866E8__ComputeFootprintFromRotation`, where the same exercise
 found two real fixes). Found none here: every field write, every branch
 target, every delay-slot placement, and every value's SOURCE POSITION
 (including the `hSpan2 = hSpan;` copy sitting in the `p5<10` guard's own
@@ -737,11 +739,11 @@ body agree with that body rebuilt in the real tree? — was never actually run;
 what was compared was two tools' *summary numbers*. Run properly this round:
 
 ```sh
-tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/func_8004CAF0/base.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/Class866E8__SplitFootprintSlot/base.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/class_3bb8c_b.c.o
 ```
 
-`func_8004CAF0` is **byte-identical** between the two, instruction for
+`Class866E8__SplitFootprintSlot` is **byte-identical** between the two, instruction for
 instruction, with the only textual differences being the absolute targets of
 `j`/`bnez` (`j 4cbbc` vs `j cc`) — which is what a standalone object always
 shows, because those are section-relative until link time. 98 vs 99 lines,

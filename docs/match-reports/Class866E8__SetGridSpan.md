@@ -59,7 +59,7 @@ an arbitrary bit slice. That is what the names record.
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `Class866E8+0x074` | `gridSpan` | B | Stored raw here; `class_3bb8c`'s `func_8004C6A8` copies it into a matrix-query template. The world-space extent reading is from the arithmetic above. |
+| `Class866E8+0x074` | `gridSpan` | B | Stored raw here; `class_3bb8c`'s `Class866E8__ComputeFootprintFromRotation` copies it into a matrix-query template. The world-space extent reading is from the arithmetic above. |
 | `Class866E8+0x078` | `gridHalfCells` | B | `span >> 12`, half of `gridCells`. |
 | `Class866E8+0x07A` | `gridCells` | B | `span >> 11`; equals the byte-verified row stride. |
 

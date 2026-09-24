@@ -144,8 +144,8 @@ a pointer-cast read, deliberately, to avoid introducing a union into
   reason -- `Class86E00_3bb8c_g`, `ObjM`, `Obj87034_3bb8c_l`, `Class86F88`).
 - **`Obj866E8Methods::slot128`** (new field, appended -- no padding
   needed, `slot124` ends exactly at `+0x128`): resolves via classtable to
-  `func_8004C620`, already matched in the sibling unit `class_3bb8c_b`
-  with signature `void func_8004C620(Obj866E8 *self)`. Typed
+  `Class866E8__RefreshFootprint`, already matched in the sibling unit `class_3bb8c_b`
+  with signature `void Class866E8__RefreshFootprint(Obj866E8 *self)`. Typed
   `void (*slot128)(Obj866E8 *self);` to match.
 
 No existing declaration was retyped; `unkBC`'s type in `Obj866E8` is
@@ -157,7 +157,7 @@ UNCHANGED (see derivation note above for why).
   sibling function, and when it does, that function's real signature (not
   a fresh guess from the new call site alone) is the one to trust.** Both
   new slots here (`slot30` -> `BasicClass::notifyParents`, `slot128` ->
-  `func_8004C620`) had their true signatures already nailed down elsewhere
+  `Class866E8__RefreshFootprint`) had their true signatures already nailed down elsewhere
   in the codebase; classtable is what connects a raw `self->methods->slotNN`
   offset to that existing knowledge instead of re-deriving a shape from
   scratch.

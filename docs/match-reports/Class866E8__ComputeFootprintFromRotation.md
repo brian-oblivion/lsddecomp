@@ -1,4 +1,6 @@
-# func_8004C6A8 — MATCHED 165/165 (round 71, delta; revisit). Previously: STALL, 165 words (3 short), 85/165, first diff at the first word
+# Class866E8__ComputeFootprintFromRotation — MATCHED 165/165 (round 71, delta; revisit). Previously: STALL, 165 words (3 short), 85/165, first diff at the first word
+
+> Renamed from `func_8004C6A8` on 2026-09-24 (tools/rename.py). Address 0x8004c6a8.
 
 
 > **REVISITED, round 71: MATCHED 165/165, byte-exact, whole-image SHA1 green; names/types used (locals renamed angle/mat/offset/half/rot; the angle local's TYPE, u16, was the last lever; no struct change).** Hand-derived to 143/165, then the round's one bounded permuter search found the type at iteration 2260.
@@ -82,8 +84,8 @@ The in-tree definition is this body with `s32 angle` changed to `u16 angle`.
 #if 0
 /* needs: common.h, class_3bb8c.h (Obj866E8, Unk6C14SubObj, CC74QueryBuf,
  * QueryTemplate866E8, D_8008E98C, RotMatrix, ApplyMatrixLV), plus
- * extern void func_8004C93C(Obj866E8 *self); */
-void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
+ * extern void Class866E8__BuildFootprintSlots(Obj866E8 *self); */
+void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
     s32 point0;
@@ -144,7 +146,7 @@ void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
     } else {
         self->unk7E = (u16)self->unk7E + offset;
     }
-    func_8004C93C(self);
+    Class866E8__BuildFootprintSlots(self);
 }
 #endif
 ```
@@ -163,7 +165,7 @@ its base pointer is loaded) before filing a register-class residue.
 ---
 
 
-**Unit:** class_3bb8c_b · **Status:** STALL — register-class/frame-size gap (same class as `func_8004CAF0`)
+**Unit:** class_3bb8c_b · **Status:** STALL — register-class/frame-size gap (same class as `Class866E8__SplitFootprintSlot`)
 
 > **ROUND 34 UPDATE.** Re-derived from scratch (shallow attempt history per
 > this round's brief: only 2 hand attempts and a round-18 review with no new
@@ -218,7 +220,7 @@ its base pointer is loaded) before filing a register-class residue.
 > **Confirmed technique: `(u16)self->unk78` (and `(u16)self->unk7C`/
 > `unk7E` on the read-back in the final clamp) reliably compiles to a single
 > `lhu`, even though these fields are declared `s16` elsewhere in this same
-> header and read via plain `lh` in already-matched `func_8004C620`.** GCC
+> header and read via plain `lh` in already-matched `Class866E8__RefreshFootprint`.** GCC
 > 2.6.3 -O2 folds "sign-extending load, then truncate back to 16 bits" into a
 > literal zero-extending load — a real peephole, not a guess — so a local
 > per-site unsigned cast reproduces retail's `lhu` without touching the
@@ -271,8 +273,8 @@ its base pointer is loaded) before filing a register-class residue.
 
 ## What it does
 
-`void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2)`, called from
-`func_8004C620` as `func_8004C6A8(self, self->unk78 * 2, self->unk7A)`
+`void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2)`, called from
+`Class866E8__RefreshFootprint` as `Class866E8__ComputeFootprintFromRotation(self, self->unk78 * 2, self->unk7A)`
 whenever `self->unk68->unk4 == 0`. Resolves a signed/unsigned dual-width
 field on a three-level pointer chain
 (`self->unk6C->unk14->unk44`), fetches a `CC74QueryBuf` via
@@ -288,7 +290,7 @@ selecting one of two near-symmetric branches that write
 "do nothing extra" third path) converge on a shared clamp of a
 descriptor-derived value against `±self->unk78`, added into either
 `unk7C` or `unk7E` depending on which branch fired, before tail-calling
-`func_8004C93C(self)` (this unit's OTHER round-13 register-identity stall,
+`Class866E8__BuildFootprintSlots(self)` (this unit's OTHER round-13 register-identity stall,
 see its own report).
 
 ## Where it stands
@@ -300,11 +302,11 @@ value computations check out against `asm-differ`) — this is not a logic
 or CFG miss. The residue is address drift caused by a **missing
 register**: retail's frame is `-0x98` and saves NINE registers (`$s0`-`$s7`
 PLUS `$fp` — confirmed by
-`grep -oE 'sw +\$s[0-9]|sw +\$fp' asm/nonmatchings/class_3bb8c_b/func_8004C6A8.s | sort -u | wc -l`
+`grep -oE 'sw +\$s[0-9]|sw +\$fp' asm/nonmatchings/class_3bb8c_b/Class866E8__ComputeFootprintFromRotation.s | sort -u | wc -l`
 → 9, one past the "8 means no spare register" saturation point CLAUDE.md's
 `func_8003D73C` lesson describes). Every C shape tried compiles to a
 `-0x90` frame using only `$s0`-`$s7` (8 registers, no `$fp` spill) — one
-whole register short, the SAME symptom `func_8004CAF0`'s own report
+whole register short, the SAME symptom `Class866E8__SplitFootprintSlot`'s own report
 documents in this same header/unit ("retail's frame... saves EIGHT
 callee-saved registers... every C shape tried compiles to a frame of
 `-0x30`... saving at most six").
@@ -330,7 +332,7 @@ few wrong instructions.
    a *timing* residue in Entity_d, did not reach for the *count* residue
    here.
 
-Given `func_8004CAF0`'s own report already tried (and exhausted, within
+Given `Class866E8__SplitFootprintSlot`'s own report already tried (and exhausted, within
 that round's budget) the two most obvious levers for a missing-register
 gap — reassigning a pointer in place vs. introducing a second named
 variable for it — and BOTH still collapsed onto fewer registers than
@@ -348,9 +350,9 @@ names, not the old `func_800160B0`/`func_80015618` placeholders).
 
 ```c
 #if 0
-extern void func_8004C93C(Obj866E8 *self);
+extern void Class866E8__BuildFootprintSlots(Obj866E8 *self);
 
-void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
+void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
     s32 point0;
@@ -450,7 +452,7 @@ shared:
     } else {
         self->unk7E = (u16)self->unk7E + s3;
     }
-    func_8004C93C(self);
+    Class866E8__BuildFootprintSlots(self);
 }
 #endif
 ```
@@ -460,7 +462,7 @@ shared:
 **A value whose live range never crosses a function call can still be the
 one retail promotes into a callee-saved register, and this is a distinct
 mechanism from every other register-count residue documented so far**
-(`func_8004CAF0`'s "give each value its own named local", `func_8004C93C`'s
+(`Class866E8__SplitFootprintSlot`'s "give each value its own named local", `Class866E8__BuildFootprintSlots`'s
 pure permutation). Naming the value separately does not force the
 promotion — cc1 CSEs a call-free single-use pointer expression back into
 the call site regardless of source spelling (confirmed identical output
@@ -498,7 +500,7 @@ Reaches 60/165 in-range (address drift past that point, per the register
 gap above). Needs no additional header declarations beyond what is already
 committed (`Unk6C14SubObj`, `QueryTemplate866E8`, `D_8008E98C`,
 `func_800160B0`, `func_80015618`, all added this round — see below — plus
-`func_8004C93C`'s existing extern, needed as a forward declaration since it
+`Class866E8__BuildFootprintSlots`'s existing extern, needed as a forward declaration since it
 is defined AFTER this function in ROM order).
 
 ```c
@@ -515,9 +517,9 @@ is defined AFTER this function in ROM order).
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-extern void func_8004C93C(Obj866E8 *self);
+extern void Class866E8__BuildFootprintSlots(Obj866E8 *self);
 
-void func_8004C6A8(Obj866E8 *self, s32 arg1, s32 arg2) {
+void Class866E8__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
     s32 point0;
@@ -616,7 +618,7 @@ shared:
     } else {
         self->unk7E += s3;
     }
-    func_8004C93C(self);
+    Class866E8__BuildFootprintSlots(self);
 }
 #endif
 ```
@@ -659,7 +661,7 @@ Notes on the derivation, for whoever revisits this:
   `pad74[0x78-0x74]`, now a plain `s32` filling that exact 4-byte gap).
 - Comment-only additions to `Obj866E8Methods::slot10C` (new caller noted)
   and to the EXISTING `Obj866E8::unk7C`/`unk7E`/`unk80`/`unk84` field
-  comments (all four already added this round for `func_8004C93C` — now
+  comments (all four already added this round for `Class866E8__BuildFootprintSlots` — now
   noted as ALSO written directly by this function). No type or name
   changed on any of the four.
 
@@ -669,22 +671,22 @@ Notes on the derivation, for whoever revisits this:
   callee-saved `$s` registers, forcing a `$fp` spill) is the same residue
   CLASS regardless of which function in a unit exhibits it, and neither of
   the two "give it its own local" / "reassign in place" levers that failed
-  on `func_8004CAF0` fixed it here either (a THIRD source-shape lever —
+  on `Class866E8__SplitFootprintSlot` fixed it here either (a THIRD source-shape lever —
   collapsing a call argument into the call expression — moved the score by
   one word, not by a register).** Two independent functions in the same
-  header (`func_8004CAF0`, `func_8004C6A8`) and a THIRD in the same unit
+  header (`Class866E8__SplitFootprintSlot`, `Class866E8__ComputeFootprintFromRotation`) and a THIRD in the same unit
   showing a related-but-distinct register-PERMUTATION residue
-  (`func_8004C93C`) suggests this header/class's functions are unusually
+  (`Class866E8__BuildFootprintSlots`) suggests this header/class's functions are unusually
   prone to GCC 2.6.3 register-allocation sensitivity that resists the
   usual small reshaping levers — worth flagging to whoever next works this
   header (`func_8004CD38`/`func_8004CFB8`, already-documented stalls, are
   also here) as a pattern, not three isolated incidents.
 - **Screening with the register-saturation grep BEFORE writing any C paid
   off as a time-management signal, even though it didn't change the
-  outcome.** `func_8004C6A8` showed 9 saved registers before a single line
+  outcome.** `Class866E8__ComputeFootprintFromRotation` showed 9 saved registers before a single line
   of C was written; that number alone predicted (correctly) that this
   function would land in the same stall class as its already-documented
-  sibling `func_8004CAF0`, and bounded the number of reshaping attempts
+  sibling `Class866E8__SplitFootprintSlot`, and bounded the number of reshaping attempts
   worth spending before treating it as a stall rather than a
   still-in-progress match.
 
@@ -707,7 +709,7 @@ every C shape tried saturates at 8) is structurally different from
 type-driven register cascade — and the "check parameter/local types before
 accepting a register-identity stall" lever this round established does
 not apply here. Not re-attempted further this round (lowest priority of
-the four escalated register-shaped stalls; `func_8004CAF0`'s own report,
+the four escalated register-shaped stalls; `Class866E8__SplitFootprintSlot`'s own report,
 same class, already exhausted the two most obvious levers).
 
 ---

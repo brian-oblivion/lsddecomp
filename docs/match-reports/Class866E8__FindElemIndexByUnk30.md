@@ -1,4 +1,6 @@
-# func_8004C5D0 — MATCHED (20/20 words)
+# Class866E8__FindElemIndexByUnk30 — MATCHED (20/20 words)
+
+> Renamed from `func_8004C5D0` on 2026-09-24 (tools/rename.py). Address 0x8004c5d0.
 
 A vtable slot in `D_800866E8` (`+0x124`, per `tools/classtable.py`), and
 already independently visible from `class_3ac78.h`'s own view of the same
@@ -51,7 +53,7 @@ reads, closed it on the second attempt.
 ## Final C
 
 ```c
-s32 func_8004C5D0(Obj866E8 *self, s32 key) {
+s32 Class866E8__FindElemIndexByUnk30(Obj866E8 *self, s32 key) {
     s32 i;
     Elem *e;
 
