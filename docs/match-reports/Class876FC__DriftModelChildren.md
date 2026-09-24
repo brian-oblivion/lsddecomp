@@ -1,4 +1,55 @@
-# Class876FC__DriftModelChildren -- STALL (length now EXACT: 121/121 words emitted, no address drift; raw word-match 117/121; first real diff at word 12, `asm-differ` offset 0x471d8, the same commutative register-identity swap in the very first pointer computation as before)
+# Class876FC__DriftModelChildren -- MATCHED round 75 (121/121, whole image OK). Lever: read the step straight from the table in the guard, and take the loop pointer again AFTER the call (CSE makes retail's `move s4,s1`); the named pre-branch `tab70` pointer was the "commutative register-identity swap"
+
+REVISITED, round 75: MATCHED (3 builds); names/types not relevant (source shape only).
+
+## Round 75 (echo): MATCHED
+
+**Recorded first**, the preserved NON_MATCHING body rebuilt live in place of
+the `INCLUDE_ASM`: 117/121 words, `insertions 0 / deletions 0 (opcode-level;
+positional skeleton diffs 4)`, first real diff at word 12 (0x471D8):
+`sll v0,s5,2 / lui v1 / addiu v1 / addu s1,v0,v1` against retail's
+`sll v1 / lui v0 / addiu v0 / addu s1,v1,v0`.
+
+Builds, in order:
+
+1. **No named pointer at all**: `gModelChildDriftZ[idx]` in the guard
+   (`layout != 0 && gModelChildDriftZ[idx] != 0 && tick >= 0x1F5` as one
+   condition) and in the loop. The word-12 swap **closed** (sll v1 / lui v0,
+   as retail), but with no copy the address lived in `s4` directly: one word
+   short (retail's `move s4,s1`), 14/121 raw with drift.
+2. As 1, plus `stepZ = &gModelChildDriftZ[idx];` recomputed **after** the
+   `updateRotation` call, before `accumOffset = 0`, with `for (i = 0; ...)`.
+   Length exact again, 115/121: only `i` and `accumOffset` swapped `s1`/`s3`
+   and the order of `move s3,zero` / `move s4,s1`.
+3. As 2 with round 44's placement restored: `i = 0;` then the pointer, then
+   `accumOffset = 0;`, `for (; i < 2; i++)`. **121/121, build exit 0,
+   `OK: build matches retail SLPS_015.56`.**
+
+Why it works: retail's `move s4,s1` right before the call is not the copy of
+a C variable (round 44's `tab70b = tab70`). It is CSE finding that the loop's
+second `&gModelChildDriftZ[idx]` already sits in the guard's pseudo and
+replacing the recomputation with a register copy. With a NAMED pointer
+assigned before the branch, that variable's pseudo is born before the
+`lui`, which gives the shift the lower register; without one the
+address is a temporary of the comparison and the allocation comes out as
+retail's. Round 44's alias lever was right about the copy and wrong about
+where it came from.
+
+The matched body is the plain C in `src/class_3bb8c_s.c` (the round-44 body
+below is kept as history).
+
+### Proposed learning
+
+**A register-to-register copy into a fresh callee-saved register just before
+a call, whose source is then reused, can be CSE replacing a RECOMPUTED
+expression, not a source-level alias.** Write the expression twice (once
+where it is first tested, once where the loop needs it) rather than naming
+it once and copying the name. Tell: `move sN,sM` where `sM` held an address
+computed for a guard and `sM` is immediately given a new value. A named
+pointer assigned ahead of a branch can also be the whole cause of a "swapped
+temp registers" residue in the address computation itself (here
+`sll`/`lui` got `v0`/`v1` backwards).
+
 
 > Renamed from `func_800569A8` on 2026-09-23 (tools/rename.py). Address 0x800569a8.
 

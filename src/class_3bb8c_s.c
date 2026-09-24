@@ -10,8 +10,8 @@
  * the class's ctor, update slot (+0x0EC) and dtor in class_3bb8c_r.c, via
  * Class876FC__InitByKind / __UpdateByKind / __ReleaseByKind.
  *
- * 9 of 10 matched; Class876FC__DriftModelChildren is a stall (body kept
- * below). Named round 70; tiers in the reports. Game-level role unknown.
+ * All 10 matched (Class876FC__DriftModelChildren, the last, in round 75).
+ * Named round 70; tiers in the reports. Game-level role unknown.
  */
 #include "common.h"
 
@@ -285,65 +285,56 @@ extern Vec3S gModelChildDriftInit;
  * updateRotation(.., 0, ..) adds to self and to each model child. */
 extern s32 gSpinRotStep[];
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 117/121 words, length exact. Residue: a commutative
- * register-identity swap in the &gModelChildDriftZ[idx] pointer computation's
- * two temp registers (docs/match-reports/Class876FC__DriftModelChildren.md).
- * Hand-derived.
- *
- * After 500 frames (tick >= 0x1F5), for kinds with model children and a
+/* After 500 frames (tick >= 0x1F5), for kinds with model children and a
  * nonzero gModelChildDriftZ step: spin self and both children, move the
  * children along z, and every 24500 / step frames snap them back to their
- * layout. Always marks self's coord2 for recompute. */
+ * layout. Always marks self's coord2 for recompute.
+ *
+ * Matched round 75: the step is read straight from the table in the guard,
+ * and the loop's pointer is taken again after the call -- CSE turns that
+ * second &gModelChildDriftZ[idx] into retail's `move s4,s1`. */
 void Class876FC__DriftModelChildren(Class876FC *self)
 {
     s32 idx;
-    s32 *tab70;
-    s32 *tab70b;
     s32 accumOffset;
     s32 divq;
     s32 modend;
     LinkNode **p;
     s32 i;
+    s32 *stepZ;
 
     idx = self->tableIndex;
-    if (self->modelChildLayout != 0) {
-        tab70 = &gModelChildDriftZ[idx];
-        if (*tab70 != 0 && (u32) self->tick >= 0x1F5) {
-            p = self->modelChildren;
-            self->methods->updateRotation(self, 0, (s32) gSpinRotStep);
+    if (self->modelChildLayout != 0 && gModelChildDriftZ[idx] != 0
+        && (u32) self->tick >= 0x1F5) {
+        p = self->modelChildren;
+        self->methods->updateRotation(self, 0, (s32) gSpinRotStep);
+        i = 0;
+        stepZ = &gModelChildDriftZ[idx];
+        accumOffset = 0;
+        for (; i < 2; i++) {
+            Vec3S local = gModelChildDriftInit;
+            local.z += accumOffset + *stepZ;
+            (*p)->methods->addTranslation(*p, &local);
+            accumOffset += 3;
+            (*p)->methods->updateRotation(*p, 0, (s32) gSpinRotStep);
+            p++;
+        }
 
-            i = 0;
-            tab70b = tab70;
-            accumOffset = 0;
-            for (; i < 2; i++) {
-                Vec3S local = gModelChildDriftInit;
-                local.z += accumOffset + *tab70b;
-                (*p)->methods->addTranslation(*p, &local);
-                accumOffset += 3;
-                (*p)->methods->updateRotation(*p, 0, (s32) gSpinRotStep);
-                p++;
+        divq = 24500 / gModelChildDriftZ[idx];
+        modend = self->tick;
+        if (divq >= 0) {
+            if ((u32) modend % (u32) divq == 0) {
+                Class876FC__PlaceModelChildren(self, 1);
             }
-
-            divq = 24500 / gModelChildDriftZ[idx];
-            modend = self->tick;
-            if (divq >= 0) {
-                if ((u32) modend % (u32) divq == 0) {
-                    Class876FC__PlaceModelChildren(self, 1);
-                }
-            } else {
-                u32 adivq = ~divq + 1;
-                if ((u32) modend % adivq == 0) {
-                    Class876FC__PlaceModelChildren(self, 1);
-                }
+        } else {
+            u32 adivq = ~divq + 1;
+            if ((u32) modend % adivq == 0) {
+                Class876FC__PlaceModelChildren(self, 1);
             }
         }
     }
     *self->coord2 = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_s", Class876FC__DriftModelChildren);
-#endif
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 
