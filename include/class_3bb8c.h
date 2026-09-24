@@ -2536,7 +2536,7 @@ struct Obj87034_3bb8c_l {
     Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/ObjM__TickStyle/ObjM__ExitSceneStyle */
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, ObjM__ExitSceneStyle */
     s32 unk1C;                           /* +0x01C, ObjM__TickTarget: incremented once per call */
-    s32 unk20;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 (STALLED) and written 5 by ObjM__EnterState5, both round 16 echo) */
+    s32 phase;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 and 5 by ObjM__EnterState5; read by ObjM__HandleStateCode, which is 0-gated) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
     void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to func_80049060/func_80049098 */

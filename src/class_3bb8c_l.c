@@ -164,7 +164,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c
     func_8001EF60(flag);
 
     self->target->methods->slotEC(self->target, D_80087118[(s32) self->unk38]);
-    self->unk20 = 5;
+    self->phase = 5;
 }
 
 void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
@@ -406,7 +406,7 @@ void ObjM__TickStyle(Obj87034_3bb8c_l *self) {
 }
 
 void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
-    if (self->unk20 == 0) {
+    if (self->phase == 0) {
         switch (code - 0xA) {
         case 0:
             self->methods->slot94(self);
@@ -454,7 +454,7 @@ void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
     s32 t;
     s32 arg3;
 
-    self->unk20 = 4;
+    self->phase = 4;
     if (self->target->methods->slotF0(self->target, &local18, -1) == 0) {
         span = (self->unk1C + (s32)self->unk38) & 3;
         t = span;
@@ -487,7 +487,7 @@ void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
     if (self->target->unk164 < 0) {
         self->methods->slot9C(self);
     } else {
-        self->unk20 = 5;
+        self->phase = 5;
         color = self->target->methods->slot200(self->target);
         ObjM__ForwardToSubChild(self, color, 0, 0xA, 1);
         self->target->methods->slotFC(self->target);
@@ -497,7 +497,7 @@ void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
 void ObjM__EnterState6(Obj87034_3bb8c_l *self) {
     s32 color;
 
-    self->unk20 = 6;
+    self->phase = 6;
     color = self->target->methods->slot200(self->target);
     ObjM__ForwardToSubChild(self, color, 0, 0x1E, 1);
     self->target->methods->slotFC(self->target);
