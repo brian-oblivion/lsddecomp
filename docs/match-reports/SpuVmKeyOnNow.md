@@ -889,7 +889,7 @@ placeholder"); recorded here rather than guessed into a rename:
   Candidate pan/balance-style controls; three of them cascaded suggests a
   main/aux/reverb-style stack, not confirmed.
 - `D_8008EA20` -- single bit (`& 4`) selects which direction
-  `gVoiceKeyOnMask2Lo/Hi` gets updated. Candidate per-voice routing/output
+  `D_8008E230`/`D_8008E234` gets updated. Candidate per-voice routing/output
   flag byte; not confirmed.
 
 These recur identically in `vmNoiseOn` (same unit, matching cascade shape --
@@ -897,3 +897,13 @@ see that report's "What it computes"), so a future pass with stronger
 evidence (e.g. a Sony reference for this shape, since `SpuVmKeyOnNow` is
 already identified as `libsnd/vmanager SpuVmKeyOnNow`) should rename them
 together in both functions at once.
+
+**Head note, round 75: none of these gets a game name.** `D_8008EA10` to
+`D_8008EA20` lie inside Sony's `_svm_cur` (pinned at 0x8008EA0C in
+`config/psyq-objects.ld`, extending to `_svm_vab_used` at 0x8008EA2C): they
+are FIELDS of one libsnd struct, not separate globals, and this is Sony data
+touched by Sony code. The right spelling is `_svm_cur.<field>` once that
+struct is typed, which is track 2 / track 4 work. The runner's first pass
+renamed 24 such addresses (including `_svm_tn` as `gNoteTable` and
+`_ss_score` as `gVoiceEnvTable`); the head dropped those commits
+(`docs/PROGRESS.md`, round 75).
