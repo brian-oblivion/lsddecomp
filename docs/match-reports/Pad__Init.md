@@ -46,3 +46,11 @@ void Pad__Init(Pad *self, s32 port) {
 ### Proposed learning
 
 None beyond what's already recorded for `Pad__LoadButtonTable`/`Pad__UpdateMasks`.
+
+## Naming
+
+**Tier A.** Vtable slot `+0x40`, already named `init` in the struct (the
+project's `Class__Method` convention where `Method` matches the slot name).
+Called once, as the last step of `Pad__Pad`. Mechanics (boolify port, zero
+the three edge masks, load the button table) and purpose (finish setting up
+one Pad instance for a given controller port) are both evident from the body.

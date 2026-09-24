@@ -120,3 +120,11 @@ not equivalent to GCC 2.6.3: the hand-hoisted form allocates the callee-saved
 register before the guard and compares against it, losing the
 `temp → compare → copy-in-the-delay-slot` preheader shape that retail has. Here
 that was worth 23 words (38/65 → 61/65). Let GCC hoist its own loop invariants.
+
+## Naming
+
+**Tier A.** Vtable slot `+0x48`, already named `dispatchEvents`. This
+report's own "What it does" section establishes the full mechanics
+(priority-ordered per-bit scan, reverse-order delivery to the per-instance
+`onButtonEvent` handler at slot `+0x30`) directly from the body; nothing
+about the name asserts more than that.

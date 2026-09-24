@@ -108,3 +108,13 @@ For a GCC 2.6.3 early exit that returns a *different* value from the main path,
 the `return` spelling costs an extra `j` and leaves the branch delay slot as
 `nop`, the `goto` spelling sinks the exit value into the delay slot and reaches
 one shared epilogue. Try both before spending attempts on scheduling barriers.
+
+## Naming
+
+**Tier A.** `New_X` allocator+ctor-wrapper shape (matches `New_Class6D3C8`,
+`New_DreamSys`, `New_Class65650`, etc. project-wide): allocates the instance
+through `BMemPMgrAlloc`, then calls the class's own ctor slot through
+`Get_vtable_Pad()`. `Pad` is the class name established for this whole unit
+(see `include/class_16334.h`'s header comment, confirmed by the direct
+`PadInit`/`PadRead`/`PadStop` calls in `Pad__Pad`/`Pad__Destroy`/
+`Pad__UpdateMasks`). Only caller: `src/main.c`'s `New_Pad(0, 0)`.

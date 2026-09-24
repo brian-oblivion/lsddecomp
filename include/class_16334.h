@@ -8,17 +8,22 @@
  * returned by Get_vtable_BasicClass) + 7 slots this class adds/overrides (+0x08
  * ctor, +0x0C dtor, +0x40.. new virtuals).
  *
- * Working hypothesis (see docs/match-reports for the evidence trail): this
- * class is a thin C wrapper around the Psy-Q Pad library. PadInit/
- * PadRead/PadStop -- called from this unit's ctor/dtor/updater --
- * disassemble as part of the `psyq_PadInit` segment (config/splat...yaml,
- * file offset 0x166ac), and Pad__LoadButtonTable copies its default button-mask
- * table from `D_80010764`, which itself sits inside the `psyq_15d04` rodata
- * blob -- i.e. this class copies a Psy-Q-owned constant. Held/released/
- * pressed edge-detection (Pad__UpdateMasks) and a priority-ordered per-bit
- * event dispatch (Pad__DispatchEvents) are exactly the shape of a game-side Pad
- * wrapper. Names below are chosen on that hypothesis; not yet in
- * config/symbols (out of this unit's scope to rename).
+ * A game-side wrapper around the Psy-Q Pad library, confirmed (not just
+ * hypothesized) by the calls this unit's own matched bodies make: Pad__Pad
+ * and Pad__Destroy call PadInit/PadStop (include/psyq/LIBETC.H) on the
+ * first/last live instance, and Pad__UpdateMasks calls PadRead directly.
+ * Pad__LoadButtonTable copies the SDK's own default 16-entry digital-button
+ * mask table (D_80010764, inside the `psyq_15d04` rodata blob) into this
+ * unit's runtime copy (`sButtonMasks`). Pad__UpdateMasks turns two
+ * consecutive raw reads into held/pressed/released edge masks, and
+ * Pad__DispatchEvents (a priority-ordered, reverse-order per-bit scan) is
+ * the event fan-out this class's owner installs its own `onButtonEvent`
+ * (+0x30) handler into. Round 77 (naming pass): all 8 non-stub functions
+ * are tier A; the two vtable-only no-op slots (+0x4C/+0x54,
+ * Pad__func_80025E14/Pad__func_80025E94) stay tier C -- both compile to
+ * `jr $ra; nop` in retail, and neither slot is ever invoked anywhere in the
+ * decompiled tree (src/main.c's only Pad call is `New_Pad(0, 0)`), so there
+ * is nothing to derive their purpose from.
  */
 
 typedef struct Pad Pad;

@@ -50,3 +50,10 @@ u32 Pad__UpdateMasks(Pad *self) {
 ### Proposed learning
 
 None beyond what's already in `Pad__LoadButtonTable`'s report.
+
+## Naming
+
+**Tier A.** Vtable slot `+0x44`, already named `updateMasks`. The body calls
+`PadRead` (Sony's own Psy-Q pad-read function, `include/psyq/LIBETC.H`)
+directly and derives the classic held/pressed/released edge masks from the
+raw bits -- a pure computation whose mechanics are its purpose.

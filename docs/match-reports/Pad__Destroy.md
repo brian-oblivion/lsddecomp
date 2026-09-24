@@ -44,3 +44,12 @@ A preserved/inherited body's call target should be re-verified against the
 otherwise looks solid — here the classification of "which stall this is" was
 right but the specific callee name (`func_80025F2C` vs. the already-known
 `PadStop`) had drifted.
+
+## Naming
+
+**Tier A.** Destructor: vtable slot `+0x0C`, which `classtable.py`'s diff
+shows overrides `BasicClass__Finalize`. Named `Pad__Destroy` rather than
+`Pad__Finalize` to match this round's `VabDriver__Destroy` precedent for the
+same overridden slot on a different class (round 77, code_179d8_d, see
+broadcast from charlie) -- the project's convention for a Finalize-slot
+override is `Class__Destroy`, not a literal `Finalize` transcription.

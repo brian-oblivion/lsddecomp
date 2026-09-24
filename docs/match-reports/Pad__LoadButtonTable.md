@@ -96,3 +96,11 @@ four distinct temp registers (`v0,v1,a0,a1` cycling) -- that shape is GCC
 achievable from a per-word `for` loop, and an indexed loop will be both the
 wrong instruction count *and* will silently shift every following function's
 address (funcdiff's "differs OUTSIDE this range" warning is the tell).
+
+## Naming
+
+**Tier A.** Vtable slot `+0x50`, already named `loadButtonTable`. Copies
+Sony's own default 16-entry digital-button mask table (`D_80010764`, inside
+the `psyq_15d04` rodata blob) into this unit's runtime copy (`sButtonMasks`)
+-- mechanics fully derived in this report, matching the slot's existing name
+exactly.
