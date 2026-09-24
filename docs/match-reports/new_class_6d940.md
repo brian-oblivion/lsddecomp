@@ -7,7 +7,7 @@ attempt.
 ## Role
 
 Allocator: `BMemPMgrAlloc(0x34)`, and on success dispatches
-`func_8002C3A8()->slot08(self, arg1)` (that slot IS `func_8002C18C`, this
+`GetClass6D940Methods()->slot08(self, arg1)` (that slot IS `func_8002C18C`, this
 unit, matched this round -- see its own report), returning the new
 instance; returns `NULL` on allocation failure.
 
@@ -19,7 +19,7 @@ void *new_class_6d940(s32 arg1)
 
     self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
-        table = func_8002C3A8();
+        table = GetClass6D940Methods();
         table->slot08(self, arg1);
         return self;
     }

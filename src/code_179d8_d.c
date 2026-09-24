@@ -93,11 +93,11 @@ struct Table6D940 {
 };
 extern Table6D940 D_8006D940;
 
-/* Forward-declared: defined below at its own ROM address (func_8002C3A8),
+/* Forward-declared: defined below at its own ROM address (GetClass6D940Methods),
  * but called here (new_class_6d940, func_8002C18C) before that point in the
  * file. Without this, cc1 implicitly declares it `int`, which happens to be
  * byte-identical on this ABI but is a lie about the real signature. */
-Table6D940 *func_8002C3A8(void);
+Table6D940 *GetClass6D940Methods(void);
 
 /* The 0x34-byte object new_class_6d940 allocates. Only the fields
  * func_8002C18C itself touches are named. */
@@ -144,7 +144,7 @@ void *new_class_6d940(s32 arg1)
 
     self = BMemPMgrAlloc(0x34);
     if (self != NULL) {
-        table = func_8002C3A8();
+        table = GetClass6D940Methods();
         table->slot08(self, arg1);
         return self;
     }
@@ -154,7 +154,7 @@ void *new_class_6d940(s32 arg1)
 void func_8002C18C(Obj6D940 *self, s32 arg1)
 {
     GetActiveDataSourceMethods()->slot08(self);
-    self->methods = func_8002C3A8();
+    self->methods = GetClass6D940Methods();
     self->unk2C = 0;
     self->unk30 = 0;
     if (arg1 != 0) {
@@ -264,7 +264,7 @@ s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
 }
 
 
-Table6D940 *func_8002C3A8(void)
+Table6D940 *GetClass6D940Methods(void)
 {
     return &D_8006D940;
 }

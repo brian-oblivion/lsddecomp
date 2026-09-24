@@ -1,4 +1,6 @@
-# func_8002C3A8
+# GetClass6D940Methods
+
+> Renamed from `func_8002C3A8` on 2026-09-24 (tools/rename.py). Address 0x8002c3a8.
 
 **Unit:** code_179d8_d · **Size:** 4 instructions (0x10 bytes) ·
 **Status: MATCHED 4/4**, whole-image SHA1 green.
@@ -15,7 +17,7 @@ function-pointer-table getter, not claimed to be a real vtable accessor.
 through the returned table.
 
 ```c
-Table6D940 *func_8002C3A8(void)
+Table6D940 *GetClass6D940Methods(void)
 {
     return &D_8006D940;
 }
