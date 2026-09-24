@@ -76,7 +76,7 @@ pad044[0x10] + slot54(4) + pad058[8] + slot60(4) + pad064[0x18]
 ```
 
 `slot40` (already used by `ObjM__ObjM`) and `slot90`/`slotB0`/`slotB4`
-(already used by `func_80052D10`) keep their original offsets --
+(already used by `ObjM__OnNotify`) keep their original offsets --
 confirmed by rebuilding (whole-image SHA1 green) after the struct edit,
 before writing this function's body. No cross-unit prototype and no new
 type went into either shared header (`class_3bb8c.h` or `class_39e08.h`);

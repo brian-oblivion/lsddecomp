@@ -87,7 +87,7 @@ struct Class87034Methods_3bb8c_k {
     void (*slot84)(void *self);
     void (*slot88)(void *self);
     u8 pad08C[0x090 - 0x08C];
-    /* +0x090/+0x0B0/+0x0B4, func_80052D10's own 3-way event-type dispatch
+    /* +0x090/+0x0B0/+0x0B4, ObjM__OnNotify's own 3-way event-type dispatch
      * (self, the same EventArg* it was itself called with, and its own
      * arg2, forwarded verbatim to whichever slot the event's header tag
      * selects). */
@@ -506,7 +506,7 @@ void ObjM__Dtor(Obj865C8 *self)
     GetClass86668Methods()->dtor(self);
 }
 
-void func_80052D10(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
+void ObjM__OnNotify(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
 {
     s32 tag;
 

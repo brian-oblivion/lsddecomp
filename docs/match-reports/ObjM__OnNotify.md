@@ -1,4 +1,6 @@
-# func_80052D10
+# ObjM__OnNotify
+
+> Renamed from `func_80052D10` on 2026-09-24 (tools/rename.py). Address 0x80052d10.
 
 **Unit:** class_3bb8c_k · **Size:** 52 instructions (0xD0 bytes) ·
 **Status: MATCHED 52/52**, whole-image SHA1 green.
@@ -36,7 +38,7 @@ shape:
   no call at all.
 
 ```c
-void func_80052D10(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
+void ObjM__OnNotify(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
 {
     s32 tag;
 
