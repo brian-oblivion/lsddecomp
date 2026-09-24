@@ -93,10 +93,10 @@ struct StreamTaskObjMethods {
                                                       forward target (gStreamTaskObjMethods+0x0A4 = func_8003CB68) */
     u8 padA8[0x0D4 - 0x0A8];
     void (*slotD4)(StreamTaskObj *self, s32 a1, s32 a2); /* +0x0D4, TaskCoreObj__TaskCoreObj's forward
-                                                      target (gStreamTaskObjMethods+0x0D4 = func_8003CDE0) */
+                                                      target (gStreamTaskObjMethods+0x0D4 = Obj86B60__SetSubHandle) */
     u8 padD8[0x0DC - 0x0D8];
     void (*slotDC)(StreamTaskObj *self); /* +0x0DC, TaskCoreObj__Destroy's forward target
-                                                      (gStreamTaskObjMethods+0x0DC = func_8003D050) */
+                                                      (gStreamTaskObjMethods+0x0DC = Obj86B60__ReleaseTarget) */
     void (*slotE0)(StreamTaskObj *self, s32 a1); /* +0x0E0, TaskCoreObj__func_8003C238's forward target */
     void (*slotE4)(StreamTaskObj *self, u8 *a1); /* +0x0E4, TaskCoreObj__func_8003C238's forward target;
                                                       a1 is `&self->unk90`, an address into self */
@@ -347,7 +347,7 @@ struct TaskCoreMethods {
                                                                         this table's own pointer: a base-class
                                                                         constructor chaining pattern, see that
                                                                         function's report
-                                                                        (gTaskCoreMethods+0x0D8 = func_8003CE98) */
+                                                                        (gTaskCoreMethods+0x0D8 = Obj86B60__SetTarget) */
 };
 
 extern TaskCoreMethods *Get_vtable_TaskCore(void); /* returns &gTaskCoreMethods */

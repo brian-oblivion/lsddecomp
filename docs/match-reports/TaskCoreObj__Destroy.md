@@ -72,7 +72,7 @@ Beyond the correction:
 - New fields `unk70` (`+0x070`, `s32`, boolean guard) and `unk74` (`+0x074`,
   `StreamTaskUnkB4Obj *`).
 - New `StreamTaskObjMethods` slot `+0x0DC`, called (not occupied) by this
-  function: `gStreamTaskObjMethods+0x0DC = func_8003D050`, extern, void, confirmed to
+  function: `gStreamTaskObjMethods+0x0DC = Obj86B60__ReleaseTarget`, extern, void, confirmed to
   exist via `classtable.py gStreamTaskObjMethods`.
 - New `TaskUtilMethods` slot `+0x00C` (`gIntermediateBaseMethods+0x00C =
   BasicClass__Finalize`, extern, void — the generic base-class slot name

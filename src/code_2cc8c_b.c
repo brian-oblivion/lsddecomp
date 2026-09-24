@@ -4,7 +4,7 @@
 /* Unk24Elem's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
  * copies it with a whole-struct assignment (lw/lw into two fresh
  * temporaries, sw/sw, then a RELOAD of .y before adjusting it) -- see
- * docs/match-reports/func_8003DAD4.md, round 75. Local view: the shared
+ * docs/match-reports/Obj86B60__CommitElementScroll.md, round 75. Local view: the shared
  * header still spells the pair as two s32 fields. */
 typedef struct {
     s32 x;
@@ -13,7 +13,7 @@ typedef struct {
 
 #define SLOT_POS(target) (*(SlotPos *)&(target)->unk10)
 
-s32 func_8003CD48(Obj86B60 *self)
+s32 Obj86B60__TickFadeColor(Obj86B60 *self)
 {
     s32 c = 0x80 - (self->frameCounter * self->unk84);
     u8 buf[3];
@@ -26,7 +26,7 @@ s32 func_8003CD48(Obj86B60 *self)
     return (u8)c >= 0x81;
 }
 
-void func_8003CDE0(Obj86B60 *self, const char *a1, Unk74Obj *a2)
+void Obj86B60__SetSubHandle(Obj86B60 *self, const char *a1, Unk74Obj *a2)
 {
     if (a1 != NULL) {
         if (self->unk70 != NULL) {
@@ -41,7 +41,7 @@ void func_8003CDE0(Obj86B60 *self, const char *a1, Unk74Obj *a2)
     self->unk70 = a1;
 }
 
-void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
+void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
 {
     char **list;
     s32 count;
@@ -98,7 +98,7 @@ void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
     a1->unk4 = handle;
 }
 
-void func_8003D050(Obj86B60 *self)
+void Obj86B60__ReleaseTarget(Obj86B60 *self)
 {
     Unk64Elem **arr;
     s32 i;
@@ -129,7 +129,7 @@ void func_8003D050(Obj86B60 *self)
     BMemPMgrFree(self->unk54);
 }
 
-void func_8003D194(Obj86B60 *self, void *a1)
+void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
 {
     Unk64Elem **arr;
     u8 *ptr;
@@ -157,7 +157,7 @@ void func_8003D194(Obj86B60 *self, void *a1)
     }
 }
 
-void func_8003D2CC(Obj86B60 *self, void *a1)
+void Obj86B60__BroadcastToSlots(Obj86B60 *self, void *a1)
 {
     s32 origIdx;
     Unk64Elem **arr;
@@ -183,7 +183,7 @@ void func_8003D2CC(Obj86B60 *self, void *a1)
     self->activeSlot = origIdx;
 }
 
-void func_8003D3B0(Obj86B60 *self)
+void Obj86B60__FindNextFreeSlot(Obj86B60 *self)
 {
     s32 i;
 
@@ -208,7 +208,7 @@ void func_8003D3B0(Obj86B60 *self)
     self->methods->slotF0(self, i, 1);
 }
 
-void func_8003D444(Obj86B60 *self)
+void Obj86B60__FindPrevFreeSlot(Obj86B60 *self)
 {
     s32 i;
 
@@ -233,7 +233,7 @@ void func_8003D444(Obj86B60 *self)
     self->methods->slotF0(self, i, 1);
 }
 
-void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
+void Obj86B60__SetActiveSlot(Obj86B60 *self, s32 a1, void *a2)
 {
     s32 idx;
     Unk64Elem *elemB;
@@ -256,12 +256,12 @@ void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
     self->methods->slot60(self, 9);
 }
 
-s32 func_8003D5C0(Obj86B60 *self)
+s32 Obj86B60__GetActiveSlot(Obj86B60 *self)
 {
     return self->activeSlot;
 }
 
-void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
+void Obj86B60__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
 {
     char **list;
     s32 idx;
@@ -291,13 +291,13 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
     }
 }
 
-void func_8003D6D4(Obj86B60 *self)
+void Obj86B60__ReleaseSlotElements(Obj86B60 *self)
 {
     ReleaseBasicClassArray(self->unk64[self->activeSlot], self->unk5C[self->activeSlot]);
     BMemPMgrFree(self->unk64[self->activeSlot]);
 }
 
-void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
+void Obj86B60__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
 {
     s32 idx;
     Unk64Elem **arr;
@@ -346,7 +346,7 @@ void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
     arr[counter]->methods->slot60(arr[counter], 1);
 }
 
-void func_8003D980(Obj86B60 *self, void *a1)
+void Obj86B60__BroadcastToSlotElements(Obj86B60 *self, void *a1)
 {
     s32 idx = self->activeSlot;
     Unk64Elem **arr = (Unk64Elem **)self->unk64[idx];
@@ -360,7 +360,7 @@ void func_8003D980(Obj86B60 *self, void *a1)
     }
 }
 
-void func_8003DA10(Obj86B60 *self)
+void Obj86B60__BeginElementScroll(Obj86B60 *self)
 {
     s32 idx;
     Unk64Elem *elem;
@@ -378,7 +378,7 @@ void func_8003DA10(Obj86B60 *self)
     self->methods->slot60(self, 14);
 }
 
-void func_8003DAD4(Obj86B60 *self)
+void Obj86B60__CommitElementScroll(Obj86B60 *self)
 {
     s32 idx;
     s32 counter;
@@ -419,7 +419,7 @@ void func_8003DAD4(Obj86B60 *self)
     self->methods->slot60(self, 0x10);
 }
 
-void func_8003DCAC(Obj86B60 *self)
+void Obj86B60__CancelElementScroll(Obj86B60 *self)
 {
     s32 idx;
     s32 counter;
@@ -445,7 +445,7 @@ void func_8003DCAC(Obj86B60 *self)
     self->methods->slot60(self, 17);
 }
 
-void func_8003DDC8(Obj86B60 *self)
+void Obj86B60__AdvanceSlotCursor(Obj86B60 *self)
 {
     s32 idx = self->activeSlot;
     s32 v = self->slotCounts[idx];
@@ -457,7 +457,7 @@ void func_8003DDC8(Obj86B60 *self)
     self->methods->slot11C(self, v, 1);
 }
 
-void func_8003DE30(Obj86B60 *self)
+void Obj86B60__RetreatSlotCursor(Obj86B60 *self)
 {
     s32 idx = self->activeSlot;
     s32 v = self->slotCounts[idx];
@@ -469,7 +469,7 @@ void func_8003DE30(Obj86B60 *self)
     self->methods->slot11C(self, v, 1);
 }
 
-void func_8003DE9C(Obj86B60 *self, s32 a1, void *a2)
+void Obj86B60__SetSlotCursor(Obj86B60 *self, s32 a1, void *a2)
 {
     s32 idx;
     s32 counter;

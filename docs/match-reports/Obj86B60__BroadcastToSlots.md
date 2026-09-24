@@ -1,4 +1,6 @@
-# func_8003D2CC — MATCHED (57/57)
+# Obj86B60__BroadcastToSlots — MATCHED (57/57)
+
+> Renamed from `func_8003D2CC` on 2026-09-24 (tools/rename.py). Address 0x8003d2cc.
 
 **Unit:** code_2cc8c_b · **Size:** 57 words · **Result:** byte-exact
 
@@ -12,7 +14,7 @@ original value once the whole walk is done — a save/restore around the
 loop, not a permanent index change.
 
 ```c
-void func_8003D2CC(Obj86B60 *self, void *a1)
+void Obj86B60__BroadcastToSlots(Obj86B60 *self, void *a1)
 {
     s32 origIdx;
     Unk64Elem **arr;
@@ -43,7 +45,7 @@ void func_8003D2CC(Obj86B60 *self, void *a1)
 
 `include/code_2cc8c.h`: new field `unk54` on `Obj86B60`
 (`Unk64Elem **`, walked with an incrementing pointer — the established
-idiom from `func_8003D980`), carved from what had been 4 bytes of padding
+idiom from `Obj86B60__BroadcastToSlotElements`), carved from what had been 4 bytes of padding
 immediately after `unk50`. New slot `slot104` on `Obj86B60Methods`
 (`void (*)(Obj86B60 *, void *)`), carved from existing padding between
 `slot100` and `slot108`. No existing declaration's type or offset changed.
@@ -57,7 +59,7 @@ it RE-READS `self->unk50` from memory on every iteration (a caller-saved
 temp, not a persistent local), which is why retail's frame only needs 5
 saved registers (`s0`-`s4`) where my cached version needed 6. **Fix: use
 `self->unk50` directly in the loop condition instead of a cached local.**
-This is the same family as `func_8003D980`'s "this unit's field reads are
+This is the same family as `Obj86B60__BroadcastToSlotElements`'s "this unit's field reads are
 not reliably CSE'd across a call" lesson, but here it is about NOT
 introducing a persistent local for a value the source itself re-reads.
 
@@ -94,7 +96,7 @@ differed), satisfying CLAUDE.md rule 6's test for a legitimate barrier.
 
 **This is a genuinely new instance of "an `__asm__("")` barrier fixes a
 pure instruction-order residue" — not the previously-documented cross-jump
-class from `func_8003D3B0`.** There, the problem was two SOURCE-DISTINCT
+class from `Obj86B60__FindNextFreeSlot`.** There, the problem was two SOURCE-DISTINCT
 statements getting merged into one shared instruction, and a barrier could
 not stop it (cross-jump is block-level unification). Here, there was only
 ONE physical copy of `i++` in both retail and every C variant tried — the
@@ -113,5 +115,5 @@ Also: **caching a value into a local specifically to serve as a loop
 bound, when the source re-reads the underlying field every iteration
 instead, costs a whole extra callee-saved register** — a stronger and more
 diagnosable version of "not every field read is CSE'd" (see
-`func_8003D980`), because here the tell is a FRAME SIZE mismatch (6 saved
+`Obj86B60__BroadcastToSlotElements`), because here the tell is a FRAME SIZE mismatch (6 saved
 registers vs. retail's 5), not a register-identity swap.

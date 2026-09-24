@@ -1,4 +1,6 @@
-# func_8003D73C -- MATCHED 145/145 (round 75): struct assignment for the position pair, and the unk68 slot4C call takes the pair as a THIRD argument
+# Obj86B60__RefreshSlotView -- MATCHED 145/145 (round 75): struct assignment for the position pair, and the unk68 slot4C call takes the pair as a THIRD argument
+
+> Renamed from `func_8003D73C` on 2026-09-24 (tools/rename.py). Address 0x8003d73c.
 
 REVISITED, round 75: MATCHED; names/types used (local `SlotPos pos` view of `Unk24Elem`'s +0x10/+0x14 pair; a three-argument call type for `Unk68ObjMethods.slot4C`)
 
@@ -8,7 +10,7 @@ REVISITED, round 75: MATCHED; names/types used (local `SlotPos pos` view of `Unk
 live in place of the INCLUDE_ASM: **136/145, `insertions 0 / deletions 0`,
 positional skeleton diffs 9** -- the inherited figure, honest.
 
-### Lever 1: the `local[2]` pair is a whole-struct copy (shared with func_8003DAD4)
+### Lever 1: the `local[2]` pair is a whole-struct copy (shared with Obj86B60__CommitElementScroll)
 
 ```c
 typedef struct { s32 x; s32 y; } SlotPos;
@@ -68,7 +70,7 @@ before the word: a stray write to `$aN` right before a call site means read
 the call's arity first. This is the prototype-arity lever from the other
 direction (round 75's other revisit had one argument too MANY).
 
-## Earlier title: func_8003D73C — STALL, FURTHER PROGRESS: length EXACT (145/145, no drift); 136/145 raw word-match; two residues remain, both register-identity/delay-slot-filler, not scheduling
+## Earlier title: Obj86B60__RefreshSlotView — STALL, FURTHER PROGRESS: length EXACT (145/145, no drift); 136/145 raw word-match; two residues remain, both register-identity/delay-slot-filler, not scheduling
 
 ## Round 49 (runner delta): the sll/lw scheduling swap that survived 5 hand attempts and a 27k-iteration permuter search is CLOSED -- a named temp PLUS a bare barrier, not either alone
 
@@ -115,7 +117,7 @@ buckets:
 1. **The `target->unk14` register choice (2 words, vram `0x8003D9F8`/
    `0x8003DA00`)**: `a0` in retail vs `v0` in this body -- confirmed via
    `asm-differ` to be the IDENTICAL residue this unit's own
-   `func_8003DAD4` report already carries as its unfixable register-
+   `Obj86B60__CommitElementScroll` report already carries as its unfixable register-
    identity stall (same struct, same field, same load/store pair). Not
    new; already resistant to every C-level lever across two functions
    and 30+ combined rounds.
@@ -145,16 +147,16 @@ buckets:
    baseline; re-testing it under this round's NEW (order-fixed) baseline
    is the natural next attempt but was not reached this round.
 
-### Confirmed negative: this lever does NOT transfer to `func_8003DAD4`
+### Confirmed negative: this lever does NOT transfer to `Obj86B60__CommitElementScroll`
 
-`func_8003DAD4` has the textually IDENTICAL `local[1] -= counter * 10;`
+`Obj86B60__CommitElementScroll` has the textually IDENTICAL `local[1] -= counter * 10;`
 line (same struct, same idiom) but the plain baseline there is already
 114/118 with the swap NOT among its residues (its own two residues are a
 delay-slot placement for an unrelated `i = 0` and the same `target-
 >unk14` register choice as above). Applying the identical named-temp+
 barrier change there **regresses sharply to 14/118 with ~232KB drift**
 -- confirmed and reverted immediately. This is not a contradiction: the
-lever targets a scheduling swap that only exists in `func_8003D73C`'s
+lever targets a scheduling swap that only exists in `Obj86B60__RefreshSlotView`'s
 compiled form in the first place; forcing the same barrier into a
 function whose compiler-chosen order was already correct just injects
 an unwanted ordering constraint. **A lever closing one residue class in
@@ -266,7 +268,7 @@ category, not a new failure mode. **Also confirmed, separately: splat's
 `make extract` is match-status-aware of `src/*.c`** -- while this
 function was defined as real C (mid-investigation), a fresh `make
 clean && make extract` did not regenerate
-`asm/nonmatchings/code_2cc8c_b/func_8003D73C.s` at all, because splat
+`asm/nonmatchings/code_2cc8c_b/Obj86B60__RefreshSlotView.s` at all, because splat
 saw the symbol already implemented in C and skipped generating a
 nonmatching stub for it. Restoring `INCLUDE_ASM` and re-running `make
 extract` regenerated it correctly. Recording this because it means **an
@@ -327,7 +329,7 @@ retail fills differs by one swap."
 4. **Reversed declaration order of the two loaded temps** (`t1 =
    target->unk14;` before `t0 = target->unk10;`, targeting residue #2 --
    the `target->unk14` register-choice mismatch shared with
-   `func_8003DAD4`): no change -- identical output. Declaration order of
+   `Obj86B60__CommitElementScroll`): no change -- identical output. Declaration order of
    these two temps does not influence either residue.
 
 None of these four reached the swap; all four produced byte-identical
@@ -370,10 +372,10 @@ swap, since this looks close to the ideal case for that specific macro
 (two adjacent, provably-independent statements whose ORDER alone
 differs).
 
-Restored to `INCLUDE_ASM`. `asm/nonmatchings/code_2cc8c_b/func_8003D73C.s`
+Restored to `INCLUDE_ASM`. `asm/nonmatchings/code_2cc8c_b/Obj86B60__RefreshSlotView.s`
 regenerated via `make extract` in that state. Full oracle re-confirmed
 green (`build exit=0`, `OK: build matches retail`) before moving on to
-`func_8003DAD4`.
+`Obj86B60__CommitElementScroll`.
 
 ## Round 19: drift-checked the inherited body, applied the round-12 head's own suggested lever, closed the register-pressure problem
 
@@ -424,7 +426,7 @@ change.
 2. **One temp register choice**: `target->unk14`'s value lands in `$v0`
    in this body vs `$a0` in retail (the exact same "which caller-saved
    scratch register holds the second loaded field" residue as
-   `func_8003DAD4`'s own still-open residue #2 -- same unit, same
+   `Obj86B60__CommitElementScroll`'s own still-open residue #2 -- same unit, same
    `Unk24Elem` struct, same `unk10`/`unk14` field pair).
 
 **Attempted a fix for residue 1:** an explicit `s32 *buf = local;`
@@ -450,7 +452,7 @@ no longer the round-12 "9-registers-vs-8, saturated file" problem -- that
 is fixed. What remains is the SAME "redundant early move" class
 `Class6E99C__PushPosition` already carries as its own permuter-exhausted final
 residue, plus the SAME "loaded-field temp register choice" class
-`func_8003DAD4` carries as its own open residue. Both are now confirmed
+`Obj86B60__CommitElementScroll` carries as its own open residue. Both are now confirmed
 present in at least 3 functions across this unit's `Unk24Elem`-touching
 family, which is worth treating as a real recurring class rather than
 three unrelated coincidences.
@@ -458,7 +460,7 @@ three unrelated coincidences.
 ### Best body reached this round (144/145 compiled, 8 registers matching retail)
 
 ```c
-void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
+void Obj86B60__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
 {
     s32 idx;
     Unk64Elem **arr;
@@ -534,7 +536,7 @@ remaining residue is narrower and better-characterized.
 
 ### Proposed learning (round 19)
 
-A THIRD instance (with `Class6E99C__PushPosition`, `func_8003DAD4`) of an
+A THIRD instance (with `Class6E99C__PushPosition`, `Obj86B60__CommitElementScroll`) of an
 early-materialized "redundant move" filling a delay slot that resists
 every C-level lever tried (explicit early alias regressed hard here;
 `Class6E99C__PushPosition`'s branch-forced-copy trick and permuter both failed on
@@ -554,7 +556,7 @@ five, 145 words.
 
 Takes `(self, a1, a2)`. Walks the current slot's element array pinging
 each element (`slot50`), rebuilds the same 2-word local buffer
-`func_8003DAD4` builds (from the SAME `Unk24Elem` record at
+`Obj86B60__CommitElementScroll` builds (from the SAME `Unk24Elem` record at
 `self->unk4C->unk24[idx]`, using the SAME `unk10`/`unk14`/`counter*10`
 shape — cross-confirms that struct), then either builds a size descriptor
 and forwards it through `self->unk68` (when `a2 != 0`) or just pings
@@ -564,9 +566,9 @@ pings the element at the target's own stashed `counter` index.
 
 ## New struct knowledge (all confirmed, safe regardless of stall status)
 
-- Corroborates `Unk24Elem` (`unk4`/`unk10`/`unk14`) from `func_8003DAD4`.
+- Corroborates `Unk24Elem` (`unk4`/`unk10`/`unk14`) from `Obj86B60__CommitElementScroll`.
 - New `Unk64ElemMethods` slot `+0x050 slot50(self)` (also independently
-  needed by `func_8003D050`, already matched).
+  needed by `Obj86B60__ReleaseTarget`, already matched).
 - New `Unk68ObjMethods` slots: `+0x04C slot4C(self, s32 a1)` and
   `+0x0C0 slotC0(self, void *buf)` (buf = address of a 2-word
   `{0x28, count*12}` local pair — a size/descriptor of some kind, unit
@@ -582,12 +584,12 @@ the 105 non-matching words is a same-instruction, different-register-number
 diff (asm-differ shows zero inserted/deleted instructions across the
 entire function body, only `r`-tagged register renames) — the
 SAME whole-function s-register renumbering shift documented in
-`func_8003DAD4`'s report, one register wider throughout (this function has
-3 params — `self`/`a1`/`a2` — vs. `func_8003DAD4`'s 1, so the same
+`Obj86B60__CommitElementScroll`'s report, one register wider throughout (this function has
+3 params — `self`/`a1`/`a2` — vs. `Obj86B60__CommitElementScroll`'s 1, so the same
 one-register-too-many problem shows up as `s0..s8` where retail uses
 `s0..s7`).
 
-Applying every fix from `func_8003DAD4`'s report (memory-clobber barrier
+Applying every fix from `Obj86B60__CommitElementScroll`'s report (memory-clobber barrier
 around the raw-store-then-reload local-buffer build; no named `elem`
 cached across a call boundary in either loop; a fresh, narrowly-scoped
 variable for the post-loop `self->unk64[idx]` re-derivation) got the FIRST
@@ -599,11 +601,11 @@ within budget:
 1. A second `sll`/reload pair (part of the `counter*10` computation, same
    shape as the one the memory barrier fixed) schedules one slot later
    than retail in the build's current form, despite being structurally
-   identical C to the ALREADY-matching occurrence in `func_8003DAD4`.
+   identical C to the ALREADY-matching occurrence in `Obj86B60__CommitElementScroll`.
    Every variant tried (an extra named temp for the multiply, consolidating
    vs. splitting the `target`/`counter` computation into one vs. two
    blocks, an un-named `(*arr)->methods->slot50(*arr)` first loop matching
-   `func_8003DAD4`'s successful pattern) left this specific swap
+   `Obj86B60__CommitElementScroll`'s successful pattern) left this specific swap
    unchanged — meaning whatever is pinning it is upstream of anything
    these particular restructurings touch, likely interacting with the
    SECOND loop's or the `a2`-branch's own register needs in a way that
@@ -611,11 +613,11 @@ within budget:
 2. The whole-function register count itself: even with the first loop and
    local-buffer build both individually matching, the function as a whole
    still needs one MORE callee-saved register than retail (9 vs. 8, same
-   diagnostic as `func_8003DAD4`: epilogue restores `s0..s8` not
-   `s0..s7`). Given `func_8003DAD4`'s fixes did NOT fully transfer here
+   diagnostic as `Obj86B60__CommitElementScroll`: epilogue restores `s0..s8` not
+   `s0..s7`). Given `Obj86B60__CommitElementScroll`'s fixes did NOT fully transfer here
    despite being the closest available template, the extra register is
    evidently tied to something in the SECOND loop or the `a2`-branch
-   (neither of which `func_8003DAD4` has an analogue for) rather than to
+   (neither of which `Obj86B60__CommitElementScroll` has an analogue for) rather than to
    anything already isolated.
 
 Per CLAUDE.md, this is a register-identity mismatch, not a logic gap —
@@ -624,7 +626,7 @@ match or an exact match on a DIFFERENT but equally valid register, and no
 banned technique (`register T v asm("$N")`, an extended-asm operand
 constraint) is available to force it further. STALL.
 
-## Head reclassification (round 12) — this is NOT the same class as `func_8003DAD4`
+## Head reclassification (round 12) — this is NOT the same class as `Obj86B60__CommitElementScroll`
 
 The stall itself stands, and the runner's measurements are sound. **The
 CLASSIFICATION above is wrong, and correcting it changes what the next attempt
@@ -633,16 +635,16 @@ should do.**
 Measured on the retail side, which settles it:
 
 ```sh
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/func_8003D73C.s | sort -u | wc -l   # 8  ($s0..$s7)
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/func_8003DAD4.s | sort -u | wc -l   # 6  ($s0..$s5)
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/Obj86B60__RefreshSlotView.s | sort -u | wc -l   # 8  ($s0..$s7)
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/Obj86B60__CommitElementScroll.s | sort -u | wc -l   # 6  ($s0..$s5)
 ```
 
-- **`func_8003DAD4` has no register-count problem at all.** Its own report
+- **`Obj86B60__CommitElementScroll` has no register-count problem at all.** Its own report
   documents two independent *cosmetic* residues totalling 4 words — a
   delay-slot placement for a register-only `i = 0`, and one temp register
   (`a1` vs `v0`). Retail uses 6 callee-saved registers there, with two s-regs
   and `$fp` still spare. Nothing is saturated.
-- **`func_8003D73C` is a register-PRESSURE stall, which is a different thing.**
+- **`Obj86B60__RefreshSlotView` is a register-PRESSURE stall, which is a different thing.**
   Retail uses `$s0..$s7` — *the entire callee-saved s-register file*, with zero
   headroom. The body reached here needs a 9th live callee-saved value and
   therefore spills into `$s8`/`$fp`, which is why the epilogue restores one
@@ -650,7 +652,7 @@ grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/func_8003DAD4.s | sort -u 
   40/145 despite exactly correct length and zero inserted/deleted
   instructions.
 
-So the report's own observation that "`func_8003DAD4`'s fixes did NOT fully
+So the report's own observation that "`Obj86B60__CommitElementScroll`'s fixes did NOT fully
 transfer here despite being the closest available template" is not a puzzle —
 it is the expected result of the two stalls having different causes. DAD4's
 fixes target instruction scheduling; this one needs **fewer values live across
@@ -676,7 +678,7 @@ identity, which is unfixable by any allowed technique.
 ## Preserved near-miss body
 
 ```c
-void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
+void Obj86B60__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
 {
     s32 idx;
     Unk64Elem **arr;

@@ -87,12 +87,12 @@ typedef struct TaskCoreBaseTable {
     void (*slot5C)(GraphRoomObj *self, void *arg1, void *arg2);
     u8 pad60[0xDC - 0x60];
     /* +0x0DC, called by this unit's own GraphRoomObj__Destroy as (self) -- the
-     * base-class dtor step. Not this unit's own function; still func_8003D050
+     * base-class dtor step. Not this unit's own function; still Obj86B60__ReleaseTarget
      * elsewhere. */
     void (*slotDC)(GraphRoomObj *self);
     /* +0x0E0, called by this unit's own GraphRoomObj__PopulateGraphPoints as (self, arg1) --
      * the FIRST thing that function does, before touching anything else
-     * (round 19). Not this unit's own function; still func_8003D194 elsewhere. */
+     * (round 19). Not this unit's own function; still Obj86B60__UpdateSlotElements elsewhere. */
     void (*slotE0)(GraphRoomObj *self, void *arg1);
 } TaskCoreBaseTable;
 extern TaskCoreBaseTable *Get_vtable_TaskCore(void);

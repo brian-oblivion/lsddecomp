@@ -1,4 +1,6 @@
-# func_8003D194 — MATCH (78/78 words)
+# Obj86B60__UpdateSlotElements — MATCH (78/78 words)
+
+> Renamed from `func_8003D194` on 2026-09-24 (tools/rename.py). Address 0x8003d194.
 
 **Unit:** code_2cc8c_b · round 12 straggler.
 
@@ -12,7 +14,7 @@ Walks the parallel `unk54`/`unk18`/`unk24` arrays: for each slot already
 index current.
 
 ```c
-void func_8003D194(Obj86B60 *self, void *a1)
+void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
 {
     Unk64Elem **arr;
     u8 *ptr;

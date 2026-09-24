@@ -1,16 +1,18 @@
-# func_8003D050 — MATCH (81/81 words)
+# Obj86B60__ReleaseTarget — MATCH (81/81 words)
+
+> Renamed from `func_8003D050` on 2026-09-24 (tools/rename.py). Address 0x8003d050.
 
 **Unit:** code_2cc8c_b · round 12 straggler.
 
 ## What it does
 
-The teardown counterpart to `func_8003CE98`: releases `self->unk4C`'s
+The teardown counterpart to `Obj86B60__SetTarget`: releases `self->unk4C`'s
 handle (if any), dispatches through `self->unk68`, walks the parallel
 arrays calling a per-element release slot (and, for entries the target
 still owns, its own `slotFC`), then frees the four arrays themselves.
 
 ```c
-void func_8003D050(Obj86B60 *self)
+void Obj86B60__ReleaseTarget(Obj86B60 *self)
 {
     Unk64Elem **arr;
     s32 i;
@@ -44,7 +46,7 @@ void func_8003D050(Obj86B60 *self)
 
 ## New struct knowledge
 
-- Confirms `Unk4CObj.unk0`/`unk4` (see `func_8003CE98`'s report) from the
+- Confirms `Unk4CObj.unk0`/`unk4` (see `Obj86B60__SetTarget`'s report) from the
   OTHER side: `unk0` gates a call through `unk4->methods->slot4(unk4)`.
 - `self->unk68->methods->slot4(self->unk68)` — new `Unk68ObjMethods` slot
   `+0x004`, no args beyond self.
@@ -58,7 +60,7 @@ since this function hit it twice:
 
 1. **`s32 count = self->unk50;` used as the loop bound.** Retail reloads
    `self->unk50` fresh every iteration (a single `lw`, cheap — this is
-   NOT the array-index case where caching wins, see `func_8003D73C`'s
+   NOT the array-index case where caching wins, see `Obj86B60__RefreshSlotView`'s
    stall report for the contrast). Removing the cached `count` and writing
    `for (i = 0; i < self->unk50; ...)` directly dropped the function from
    8 live callee-saved registers to the correct 7.

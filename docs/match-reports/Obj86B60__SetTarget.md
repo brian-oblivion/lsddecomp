@@ -1,4 +1,6 @@
-# func_8003CE98 — MATCH (110/110 words)
+# Obj86B60__SetTarget — MATCH (110/110 words)
+
+> Renamed from `func_8003CE98` on 2026-09-24 (tools/rename.py). Address 0x8003ce98.
 
 **Unit:** code_2cc8c_b · round 12, one of the unit's 5 round-11-straggler
 functions (fresh ground, no prior report existed for any of the five).
@@ -11,7 +13,7 @@ arrays sized off a null-terminated name list, then constructs or reuses
 a handle object and fills each array slot from it.
 
 ```c
-void func_8003CE98(Obj86B60 *self, Unk4CObj *a1)
+void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
 {
     char **list;
     s32 count;
@@ -80,11 +82,11 @@ evidence available at the time.
 
 - `+0x000 const char *unk0` — a path, passed to `func_8003B39C(unk0)` when
   non-NULL to build `unk4`. Truthy-only gate also independently confirmed
-  by `func_8003D050` (round 12, same unit).
+  by `Obj86B60__ReleaseTarget` (round 12, same unit).
 - `+0x004 Unk74Obj *unk4` — either the freshly-constructed handle (when
   `unk0` is set) or a pre-existing handle passed straight through
   (`a1->unk4`), written back at the end either way. Matches the EXACT
-  `func_8003B39C(path)` + `slot78` + `slot5C` idiom `func_8003CDE0`
+  `func_8003B39C(path)` + `slot78` + `slot5C` idiom `Obj86B60__SetSubHandle`
   already uses for `self->unk74` — same `Unk74Obj` type, different field.
 - `+0x01C char **unk1C` — a null-terminated string array, DISTINCT from
   the already-known `+0x018 void **unk18` (adjacent field, same shape).
@@ -101,7 +103,7 @@ so they're typed minimally (`s32[2]`/`char[4]`) matching their observed
 byte layout in `asm/data/7B008.sdata.s`.
 
 New `self->unk68` field (`Unk68Obj *`, dispatched via `->methods->slot4`
-etc. by `func_8003D050`/`func_8003DAD4`/`func_8003D73C` — see those
+etc. by `Obj86B60__ReleaseTarget`/`Obj86B60__CommitElementScroll`/`Obj86B60__RefreshSlotView` — see those
 reports/stalls for the rest of `Unk68ObjMethods`).
 
 ## Getting to the match
@@ -125,7 +127,7 @@ matched by simply not naming it (`func_80013348(*list)` /
 
 After those two fixes: 106/110, remaining 4 words were pure address-drift
 from the OTHER 4 still-`INCLUDE_ASM` functions in this unit at the time —
-resolved automatically once `func_8003D050` and `func_8003D194` were also
+resolved automatically once `Obj86B60__ReleaseTarget` and `Obj86B60__UpdateSlotElements` were also
 matched (they precede this address range... actually follow it; the drift
 was in the trailing `D_8008A8E8`/`New_ClassEAC0` references, downstream
 data/code whose absolute addresses depend on total image size).

@@ -1,18 +1,20 @@
-# func_8003CD48 — MATCHED (38/38)
+# Obj86B60__TickFadeColor — MATCHED (38/38)
+
+> Renamed from `func_8003CD48` on 2026-09-24 (tools/rename.py). Address 0x8003cd48.
 
 **Unit:** code_2cc8c_b · **Size:** 38 words · **Result:** byte-exact
 
 ## What it does
 
 `Obj86B60Methods::slotC4` (confirmed by `code_2cc8c.h`'s own header comment,
-which already recorded this slot as "external (func_8003CD48)" from the
+which already recorded this slot as "external (Obj86B60__TickFadeColor)" from the
 `code_2cc8c` unit's own `classtable.py` work before this unit ever attempted
 the function). Computes a greyscale-ish colour byte from two fields, fills a
 3-byte buffer with it, forwards the buffer to two other objects, and returns
 whether the byte exceeds a threshold.
 
 ```c
-s32 func_8003CD48(Obj86B60 *self)
+s32 Obj86B60__TickFadeColor(Obj86B60 *self)
 {
     s32 c = 0x80 - (self->unk1C * self->unk84);
     u8 buf[3];
@@ -72,4 +74,4 @@ residue is a `li`/`ori` vs `addiu`-negative-immediate mismatch on an
 otherwise-matching subtraction, widen the intermediate to `s32` and narrow
 only at the point(s) of use (array store, explicit `(u8)` cast in a
 comparison) rather than typing the local at its "natural" narrow width.
-(`func_8003CD48`, 37/38 -> 38/38)
+(`Obj86B60__TickFadeColor`, 37/38 -> 38/38)

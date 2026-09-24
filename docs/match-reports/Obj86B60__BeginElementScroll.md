@@ -1,4 +1,6 @@
-# func_8003DA10 — MATCHED (49/49)
+# Obj86B60__BeginElementScroll — MATCHED (49/49)
+
+> Renamed from `func_8003DA10` on 2026-09-24 (tools/rename.py). Address 0x8003da10.
 
 **Unit:** code_2cc8c_b · **Size:** 49 words · **Result:** byte-exact, first attempt
 
@@ -12,7 +14,7 @@ offset buffer pointer through its own `+0x0B8` slot, then advances
 14)`).
 
 ```c
-void func_8003DA10(Obj86B60 *self)
+void Obj86B60__BeginElementScroll(Obj86B60 *self)
 {
     s32 idx;
     Unk64Elem *elem;
@@ -52,9 +54,9 @@ into a callee-saved register ahead of the call, even though the value is
 only consumed afterward — consistent with the source itself reading it
 early rather than the compiler hoisting it). After the call, `self->unk64`
 and `self->unk60` are read in that order (matching this unit's established
-`unk58 -> unk64 -> unk5C/unk60` pattern noted in `func_8003D980`'s and
-`func_8003DDC8`'s reports) — **fifth and sixth confirmed instances**,
-counting `func_8003D6D4`, `func_8003DDC8`, `func_8003DE30`, `func_8003D980`.
+`unk58 -> unk64 -> unk5C/unk60` pattern noted in `Obj86B60__BroadcastToSlotElements`'s and
+`Obj86B60__AdvanceSlotCursor`'s reports) — **fifth and sixth confirmed instances**,
+counting `Obj86B60__ReleaseSlotElements`, `Obj86B60__AdvanceSlotCursor`, `Obj86B60__RetreatSlotCursor`, `Obj86B60__BroadcastToSlotElements`.
 No violation found here.
 
 ## Residue

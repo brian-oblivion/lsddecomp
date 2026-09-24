@@ -1,4 +1,6 @@
-# func_8003D4DC — MATCHED (57/57)
+# Obj86B60__SetActiveSlot — MATCHED (57/57)
+
+> Renamed from `func_8003D4DC` on 2026-09-24 (tools/rename.py). Address 0x8003d4dc.
 
 **Unit:** code_2cc8c_b · **Size:** 57 words · **Result:** byte-exact
 
@@ -13,7 +15,7 @@ notification (`slot70`) if `a2` is non-null, and always fires a final
 `slot60(self, 9)`.
 
 ```c
-void func_8003D4DC(Obj86B60 *self, s32 a1, void *a2)
+void Obj86B60__SetActiveSlot(Obj86B60 *self, s32 a1, void *a2)
 {
     s32 idx;
     Unk64Elem *elemB;

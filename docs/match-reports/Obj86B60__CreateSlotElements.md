@@ -1,12 +1,14 @@
-# func_8003D5CC — MATCHED (66/66)
+# Obj86B60__CreateSlotElements — MATCHED (66/66)
+
+> Renamed from `func_8003D5CC` on 2026-09-24 (tools/rename.py). Address 0x8003d5cc.
 
 **Unit:** code_2cc8c_b · **Size:** 66 words · **Result:** byte-exact
 
 ## What it does
 
 The constructor that FILLS `self->unk64[idx]` — the array the sibling
-functions (`func_8003D980`, `func_8003D2CC`, `func_8003DA10`,
-`func_8003DE9C`) all walk as `Unk64Elem **`. Given a caller-supplied "source
+functions (`Obj86B60__BroadcastToSlotElements`, `Obj86B60__BroadcastToSlots`, `Obj86B60__BeginElementScroll`,
+`Obj86B60__SetSlotCursor`) all walk as `Unk64Elem **`. Given a caller-supplied "source
 list" descriptor (`SrcDesc *a1`, a NULL-terminated array of C strings plus
 one extra word), it counts the strings, allocates a same-sized array of
 `Unk64Elem *`, installs it (and the count, and `a1`'s extra word) into
@@ -16,7 +18,7 @@ length from `func_80013348`, a strlen-shaped helper already matched
 elsewhere in the project).
 
 ```c
-void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
+void Obj86B60__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
 {
     char **list;
     s32 idx;
@@ -60,8 +62,8 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
   keeps its own local view (established convention).
 - `extern Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name);` — not
   previously seen in this project. Typed from this call site: its return
-  value is stored directly into the same array `func_8003D980`,
-  `func_8003D2CC`, `func_8003DA10` and `func_8003DE9C` all walk as
+  value is stored directly into the same array `Obj86B60__BroadcastToSlotElements`,
+  `Obj86B60__BroadcastToSlots`, `Obj86B60__BeginElementScroll` and `Obj86B60__SetSlotCursor` all walk as
   `Unk64Elem *`, which settles the return type without needing to see
   the function's own body.
 
@@ -83,7 +85,7 @@ branch, meaning it executes unconditionally on every pass through the
 check — including the FINAL pass that finds the null terminator and exits
 the loop. That is the `while (*p++) {}` post-increment idiom (see
 DECOMPILATION_LEARNINGS, previously closed on `strcat` and reused this
-round on `func_8003D3B0`'s free-slot search): the pointer always advances
+round on `Obj86B60__FindNextFreeSlot`'s free-slot search): the pointer always advances
 one PAST where it stopped, and nothing after the loop cares because
 `list` is reloaded fresh from `a1->unk18` before the second loop anyway.
 **Fix: `while (*list++ != NULL) { count++; }`.** Matched immediately, no
@@ -93,7 +95,7 @@ again before being reloaded.
 ### Proposed learning
 
 **Third confirmed instance of the post-increment `while (*p++)` idiom in
-this unit alone** (after `strcat` project-wide and `func_8003D3B0`'s
+this unit alone** (after `strcat` project-wide and `Obj86B60__FindNextFreeSlot`'s
 free-slot search this round) — and the first where the "off" pointer value
 is simply never used again, so no compensating `p--;`/`i--;` was needed at
 all. The tell that distinguishes this from an ordinary counting loop is

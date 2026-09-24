@@ -1,4 +1,6 @@
-# func_8003CDE0 — MATCHED (46/46)
+# Obj86B60__SetSubHandle — MATCHED (46/46)
+
+> Renamed from `func_8003CDE0` on 2026-09-24 (tools/rename.py). Address 0x8003cde0.
 
 **Unit:** code_2cc8c_b · **Size:** 46 words · **Result:** byte-exact
 
@@ -11,7 +13,7 @@ init calls on it. If no path is given, the caller-supplied handle `a2` is
 installed directly with no teardown/init calls at all.
 
 ```c
-void func_8003CDE0(Obj86B60 *self, const char *a1, Unk74Obj *a2)
+void Obj86B60__SetSubHandle(Obj86B60 *self, const char *a1, Unk74Obj *a2)
 {
     if (a1 != NULL) {
         if (self->unk70 != NULL) {
@@ -79,5 +81,5 @@ offset comment you write next to it.** If the real vtable slot is not at
 one, re-derive every subsequent padding member's size from the corrected
 running offset, not from the original (now-wrong) one. A single missed
 padding-size correction after inserting a leading pad reproduces the exact
-same class of off-by-N error one struct member later. (`func_8003CDE0`,
+same class of off-by-N error one struct member later. (`Obj86B60__SetSubHandle`,
 Unk74ObjMethods slot4/slot78/slot5C)
