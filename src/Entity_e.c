@@ -67,13 +67,13 @@ void Entity__MoodCue62(Entity *this, EntityMoodHandlerArg *out) {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
     }
     this->methods->slotC4(this, -5, 0);
-    if (this->moodTimer == 0x12C && this->methods->slot144(this, this->target) < 0x1000) {
+    if (this->moodTimer == 0x12C && this->methods->distanceToRegion(this, this->target) < 0x1000) {
         this->target->methods->slot130(this->target, 0);
     } else if (this->moodTimer == 0x1F4) {
         this->target->methods->slot134(this->target, 1, 1);
     }
     if (this->moodState == 0) {
-        if (this->methods->slot144(this, this->target) < 0x400) {
+        if (this->methods->distanceToRegion(this, this->target) < 0x400) {
             if (rand() & 1) {
                 out->unk30 = 6;
                 out->unk10 = 0;
@@ -502,7 +502,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         if (mood == 1) {
             this->methods->updateScale(this, 0, D_80089E08);
             mod = -0x176;
-            if (this->methods->slot144(this, this->target) < 0x200) {
+            if (this->methods->distanceToRegion(this, this->target) < 0x200) {
                 this->methods->deactivate(this);
                 this->moodState = mood;
             }
@@ -510,7 +510,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
             this->target->methods->slot130(this->target, 1);
             Class6B5CC__FaceTarget((Entity *)this->target, this, 1, 1, 0);
             if (this->moodState == 2) {
-                if (this->methods->slot144(this, this->target) < 0x960) {
+                if (this->methods->distanceToRegion(this, this->target) < 0x960) {
                     this->moodState = 0xB;
                     this->methods->notifyParents(this, 0xC);
                 }
@@ -527,7 +527,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer >= 0x1F5) {
             Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         }
-        if (this->methods->slot144(this, this->target) < 0x800) {
+        if (this->methods->distanceToRegion(this, this->target) < 0x800) {
             this->target->methods->slotC4(this->target, -0x800, 0);
         }
         mod = -0x14;

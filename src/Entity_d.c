@@ -477,13 +477,13 @@ void Entity__MoodCue58(Entity *this, EntityMoodHandlerArg *out) {
         out->unk20 = -1;
     }
     if (this->moodState == 0xB) {
-        if (this->methods->slot144(this, this->target) < 0x400) {
+        if (this->methods->distanceToRegion(this, this->target) < 0x400) {
             this->target->methods->slot130(this->target, 0);
             this->moodState = 0xD;
             this->moodTimer = 0;
         }
     } else if (this->moodState == 0xC) {
-        if (this->methods->slot144(this, this->target) < 0x400) {
+        if (this->methods->distanceToRegion(this, this->target) < 0x400) {
             this->methods->slot130(this);
             this->moodState = 0xE;
             this->moodTimer = 0;
@@ -565,7 +565,7 @@ void Entity__MoodCue115(Entity *this, EntityMoodHandlerArg *out) {
         }
     }
 tail:
-    if (this->methods->slot144(this, this->target) < 0x200) {
+    if (this->methods->distanceToRegion(this, this->target) < 0x200) {
         this->methods->deactivate(this);
         this->methods->notifyParents(this, 0xA);
     }

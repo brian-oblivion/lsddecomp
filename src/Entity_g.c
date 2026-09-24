@@ -200,7 +200,7 @@ void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->updateScale(this, 1, D_80089E44);
     this->methods->slot130(this);
     if (this->moodState == 0) {
-        if (this->methods->slot144(this, this->target) < 0x800) {
+        if (this->methods->distanceToRegion(this, this->target) < 0x800) {
             this->moodState = 0xA;
             this->moodTimer = 0;
         }

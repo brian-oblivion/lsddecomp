@@ -110,7 +110,7 @@ s32 Entity__IsTargetInRange(Entity *this, s32 range) {
     if (ty < oy - 0x200) {
         goto fail;
     }
-    if (this->methods->slot144(this, other) < range) {
+    if (this->methods->distanceToRegion(this, other) < range) {
         return 1;
     }
 fail:
@@ -285,7 +285,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         this->unk48 = -0x78;
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
         this->methods->updateScale(this, 1, SCALE_HALF);
-        if (this->methods->slot144(this, this->target) < 0x400) {
+        if (this->methods->distanceToRegion(this, this->target) < 0x400) {
             this->methods->notifyParents(this, 0xB);
         }
     }
@@ -324,7 +324,7 @@ void Entity__MoodCue12(Entity *this) {
         Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
     }
     if (this->moodState == 0xB) {
-        result = this->methods->slot144(this, this->target);
+        result = this->methods->distanceToRegion(this, this->target);
         if (result < 0xA00) {
             this->unk4C->methods->slot138(this->unk4C, 1, 1);
             this->moodTimer = 1;

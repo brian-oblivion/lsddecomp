@@ -45,7 +45,7 @@ void func_800634A8(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->moodState == 0xB) {
         this->methods->slot130(this);
-        if (this->methods->slot144(this, this->target) < 0x200) {
+        if (this->methods->distanceToRegion(this, this->target) < 0x200) {
             if (rand() % 3 != 0) {
                 this->methods->deactivate(this);
             } else {

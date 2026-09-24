@@ -230,7 +230,7 @@ s32 Entity__GetProximityRatio(Entity *this) {
         }
     } while (0);
     self = this;
-    result = this->methods->slot144(this, self->target);
+    result = this->methods->distanceToRegion(this, self->target);
     threshold = gEntityProximityThresholdTable[self->moodIndex * 0x10] << 11;
     if (threshold < result) {
         return -1;

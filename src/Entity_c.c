@@ -348,7 +348,7 @@ void Entity__MoodCue36(Entity *this) {
         this->moodState = 0xB;
     }
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
-    if (this->methods->slot144(this, this->target) < 0x7000) {
+    if (this->methods->distanceToRegion(this, this->target) < 0x7000) {
         this->methods->slotC4(this, 0x100, 0);
     }
 }
