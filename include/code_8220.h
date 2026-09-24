@@ -212,12 +212,14 @@ extern s32 TransformAndCullPoly(void *arg0, void *arg1);
 /* Called by ProjectTriFace/ProjectQuadFace at the end of a face that was not
  * culled. `count` is the face's VERTEX COUNT (3 or 4), not a primitive-kind
  * code: docs/match-reports/UpdatePolyBBoxAndCull.md derives the body, which walks
- * `count` screen-XY pairs from arg0+0x64 to arg0 + 0x5C + count*4, tracks the
+ * `count` screen-XY pairs from ctx+0x64 to ctx + 0x5C + count*4, tracks the
  * 2D bounding box in +0x70../+0x76 and sets the culled flag at +0x78 when
  * either span reaches 0x101. The older "3 = triangle, 4 = quad" wording here
  * read the right numbers off the call sites for the wrong reason; corrected
- * round 51. code_8220_c, round 13. */
-extern void UpdatePolyBBoxAndCull(void *prim, s32 count);
+ * round 51. `ctx` (named round 77) is the same per-face draw context
+ * TransformAndCullPoly above documents -- its SXY0-2 cache and culled flag
+ * are exactly the fields this function reads and sets. code_8220_c, round 13. */
+extern void UpdatePolyBBoxAndCull(void *ctx, s32 count);
 
 /* Round 13: this unit's own minimal, local view of the Psy-Q GPU primitive
  * tag word -- the same shape as `P_TAG` in include/psyq/LIBGPU.H, declared
@@ -267,19 +269,23 @@ typedef struct PolyVtx {
 extern void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0,
                           PolyUV4 *uv1, PolyUV4 *uv2);
 
-/* Populates a GPU primitive header at `arg0` (gPolySubmitTableTri/gPolySubmitTableQuad):
+/* Populates a submit table's (`table`, gPolySubmitTableTri/gPolySubmitTableQuad):
  * +0x00 an OT/code word (gPolyOtCodeOverride when gPolyOtCodeOverrideSet is set, else
  * D_80090C18), +0x04 D_8008A824, +0x08 D_8008A828 -- these three are
  * UNCONDITIONAL (the third rides in the branch's own delay slot in
  * retail); only the two u16 stack args at +0x0C/+0x0E are actually
- * gated on `arg3 != 0`. +0x10 is an unaligned PolyUV4 copied from
- * `*arg2` (same lwl/lwr idiom as CopyPolyVtx3, forced by PolyUV4's
+ * gated on `hasUv1Codes != 0`. +0x10 is an unaligned PolyUV4 copied from
+ * `*uv` (same lwl/lwr idiom as CopyPolyVtx3, forced by PolyUV4's
  * alignment-2 all-s16 layout); +0x14 is the plain word at
- * `arg1 + 0x30`. MATCHED round 44 after the gp_rel blocker that
+ * `ctx + 0x30`. MATCHED round 44 after the gp_rel blocker that
  * stalled it at carve time (round 13) was resolved -- see
  * docs/match-reports/FillRCPolyHeader.md. Declared here so its caller in
- * this unit, SubmitPolyF3, can compile (still INCLUDE_ASM). */
-extern void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5);
+ * this unit, SubmitPolyF3, can compile (still INCLUDE_ASM). Parameters
+ * named round 77 (alpha): `hasUv1Codes`/`uv1Clut`/`uv1TPage` from the
+ * FT3/GT3/FT4/GT4 call sites, which pass 1 plus the primitive's own
+ * `+0xE`/`+0x16` or `+0xE`/`+0x1A` fields (POLY_FTn/GTn's CLUT and TPAGE
+ * words); F3/G3/F4/G4 pass 0/0/0 and leave +0xC/+0xE untouched. */
+extern void FillRCPolyHeader(void *table, void *ctx, PolyUV4 *uv, s32 hasUv1Codes, u16 uv1Clut, u16 uv1TPage);
 
 /* Psy-Q SDK (asm/psyq_rcpolyf3.s, not a carved C unit). Called by
  * SubmitPolyF3 (code_8220_c) with (self, table).
