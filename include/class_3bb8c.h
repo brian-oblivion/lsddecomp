@@ -1311,7 +1311,7 @@ struct Class86B60 {
      * in Class86B60__Class86B60 (`self->unkA4 = dreamSys;`, `dreamSys` a `void *`
      * parameter) still compiles under ordinary C pointer conversion
      * rules. */
-    DreamSysView_3bb8c_c *unkA4;
+    DreamSysView_3bb8c_c *dreamSysView;
     /* +0x0A8/+0x0AC, Class86B60__Dtor (this unit's destructor): two owned
      * sub-objects, each released through their own shared `release` slot.
      * BOTH releases sit inside the SAME `unkAC != NULL` guard -- retail's
@@ -1330,7 +1330,7 @@ struct Class86B60 {
      * RETYPED from the minimal `GenericReleaseObj_3bb8c_d *` to the
      * dedicated `Class86B60UnkACObj_3bb8c_d *` -- Class86B60__EndMemcardSave reaches a
      * second slot (`+0x070`) on it. Same size, no layout change. */
-    Class86B60UnkACObj_3bb8c_d *unkAC;
+    Class86B60UnkACObj_3bb8c_d *saveCtrl;
     /* +0x0B0, Class86B60__DestroyNameField: a third owned sub-object, released
      * unconditionally (no null check) through the same shared `release`
      * slot as `unkA8`/`unkAC`. Typed its own `Class86B60UnkB0Obj_3bb8c_d`

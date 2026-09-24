@@ -145,8 +145,8 @@ void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
     self->methods = GetClass86B60Methods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
-    self->unkA4 = dreamSys;
-    self->unkAC = 0;
+    self->dreamSysView = dreamSys;
+    self->saveCtrl = 0;
     dream = dreamSys;
     self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
     FormatNumberIntoBuffer(dream->methods->slot1A0(dream, 0));

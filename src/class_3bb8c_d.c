@@ -27,8 +27,8 @@
 
 void Class86B60__Dtor(Class86B60 *self)
 {
-    if (self->unkAC != NULL) {
-        self->unkAC->methods->release(self->unkAC);
+    if (self->saveCtrl != NULL) {
+        self->saveCtrl->methods->release(self->saveCtrl);
         self->iconHandle->methods->release(self->iconHandle);
     }
     Get_vtable_TaskCore()->slot0C(self);
@@ -48,7 +48,7 @@ void Class86B60__ShowTitleIcon(Class86B60 *self)
     self->unk2C = 0x190;
     self->methods->slotD4(self, &D_800114E8, 0);
     self->methods->slot6C(self, 0xA);
-    self->unkA4->methods->slotF0(self->unkA4, 0, 0);
+    self->dreamSysView->methods->slotF0(self->dreamSysView, 0, 0);
 }
 
 void Class86B60__RegisterHandlers(Class86B60 *self)
@@ -85,7 +85,7 @@ void Class86B60__Tick(Class86B60 *self)
     switch (self->state) {
     case 1:
         self->unk38 = 0;
-        self->unkA4->methods->slotF0(self->unkA4, 0, 1);
+        self->dreamSysView->methods->slotF0(self->dreamSysView, 0, 1);
         fn = self->methods->slot94;
         break;
     case 2:
@@ -110,7 +110,7 @@ void Class86B60__RefreshViewValue(Class86B60 *self)
 
     Get_vtable_TaskCore()->slot94(self);
     buf = self->unk60->unk14;
-    self->unkA4->methods->slot19C(self->unkA4, &buf);
+    self->dreamSysView->methods->slot19C(self->dreamSysView, &buf);
 }
 
 /* Class86B60__CreateNameField's own `arg1`: only its own +0x004 field is read, forwarded
@@ -142,7 +142,7 @@ void Class86B60__CreateNameField(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     if (arg1 == NULL) {
         return;
     }
-    if (self->unkA4->methods->slot1AC(self->unkA4)) {
+    if (self->dreamSysView->methods->slot1AC(self->dreamSysView)) {
         strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14);
         CopyMemcardIconTemplate((s32)D_8008AA18, 0);
     }
@@ -236,15 +236,15 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     DecodeFullWidthSjis(buf1, D_8008AA18);
     self->nameField->methods->slotCC(self->nameField, buf1);
     BMemPMgrFree(buf1);
-    CheckObj866E8CountFlag(self, self->unk4C, self->unkA4);
+    CheckObj866E8CountFlag(self, self->unk4C, self->dreamSysView);
     self->methods->slotE0(self, self->unk14);
-    self->unkA4->methods->slot19C(self->unkA4, &buf2);
+    self->dreamSysView->methods->slot19C(self->dreamSysView, &buf2);
     self->state = 5;
     self->methods->slot60(self, 0xB);
     self->methods->slot11C(self, buf2, 1);
     self->methods->slot60(self, 0xF);
     self->methods->slotF0(self, (void *)origState, 0);
-    self->unkA4->methods->slot19C(self->unkA4, &buf2);
+    self->dreamSysView->methods->slot19C(self->dreamSysView, &buf2);
 }
 
 /* This unit's own local view of func_8003B39C (already matched elsewhere,
@@ -255,14 +255,14 @@ extern GenericReleaseObj_3bb8c_d *func_8003B39C(const char *path);
 
 void Class86B60__BeginMemcardSave(Class86B60 *self)
 {
-    if (self->unkAC == NULL) {
+    if (self->saveCtrl == NULL) {
         self->iconHandle = func_8003B39C(D_800114F8);
-        self->unkAC = New_TaskObjF((void *)1, NULL);
+        self->saveCtrl = New_TaskObjF((void *)1, NULL);
     }
-    self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &D_80086D6C,
+    self->saveCtrl->methods->slot6C(self->saveCtrl, D_8008A9D0, &D_80086D6C,
                                   self->handlerTable->unk4, self->unk10, self->unk14,
                                   self->unk48);
-    self->methods->slot10(self, self->unkAC);
+    self->methods->slot10(self, self->saveCtrl);
     self->methods->slot14(self, self->handlerTable->unk4);
     self->methods->slot14(self, self->unk10);
 }
@@ -271,8 +271,8 @@ void Class86B60__EndMemcardSave(Class86B60 *self)
 {
     self->methods->slot10(self, self->handlerTable->unk4);
     self->methods->slot10(self, self->unk10);
-    self->methods->slot14(self, self->unkAC);
-    self->unkAC->methods->slot70(self->unkAC);
+    self->methods->slot14(self, self->saveCtrl);
+    self->saveCtrl->methods->slot70(self->saveCtrl);
 }
 
 void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
@@ -280,19 +280,19 @@ void Class86B60__UpdateMemcardSaveWithIcon(Class86B60 *self)
     s32 buf;
 
     buf = self->unk60->unk14;
-    self->unkA4->methods->slot19C(self->unkA4, &buf);
+    self->dreamSysView->methods->slot19C(self->dreamSysView, &buf);
     self->methods->slot128(self);
-    if (self->unkA4->methods->slot1AC(self->unkA4)) {
+    if (self->dreamSysView->methods->slot1AC(self->dreamSysView)) {
         *(u8 *)D_8008AA10 = 0;
     }
-    self->unkAC->methods->slot78(self->unkAC, D_8008AA10, D_8008AA18, 0xD, 3,
+    self->saveCtrl->methods->slot78(self->saveCtrl, D_8008AA10, D_8008AA18, 0xD, 3,
                                   self->iconHandle, self->unkBC, self->unkC0);
 }
 
 void Class86B60__UpdateMemcardSaveStatus(Class86B60 *self)
 {
     self->methods->slot128(self);
-    self->unkAC->methods->slot74(self->unkAC, D_8008AA10, D_8008AA18,
+    self->saveCtrl->methods->slot74(self->saveCtrl, D_8008AA10, D_8008AA18,
                                   self->unkBC, self->unkC0);
 }
 
@@ -302,7 +302,7 @@ void Class86B60__OnTagBValue(Class86B60 *self, s32 arg1, s32 value)
         if (value >= 0x16) {
             self->methods->slot12C(self);
             if (value == 0x16) {
-                self->unkA4->methods->slot1A8(self->unkA4);
+                self->dreamSysView->methods->slot1A8(self->dreamSysView);
                 self->methods->slot124(self, 0x16);
             }
         }
