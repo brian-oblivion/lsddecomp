@@ -465,7 +465,7 @@ s32 Class86F88__GetCursorIndex(Class86F88 *self)
     return self->unk28;
 }
 
-Class86F88Methods *func_80052B60(void)
+Class86F88Methods *GetClass86F88Methods(void)
 {
     return &D_80086F88;
 }

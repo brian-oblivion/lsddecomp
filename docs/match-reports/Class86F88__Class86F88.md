@@ -58,7 +58,7 @@
 Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`. This is `Class86F88_3bb8c_j`'s
 own constructor -- the occupant of `Class86F88Methods_3bb8c_j::ctor` (+0x008),
 reached indirectly by `New_Class86F88`
-(`func_80052B60()->ctor(self, arg0, arg1)`).
+(`GetClass86F88Methods()->ctor(self, arg0, arg1)`).
 
 ## Class identity (ROUND 75 correction -- read this before the rest of the file)
 
@@ -74,7 +74,7 @@ the fix. Settled by address, not by guess:
   established independently by class_3bb8c_i. It has NOTHING to do with
   this constructor's class.
 - This class's REAL table is `D_80086F88`, reached through
-  `func_80052B60()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
+  `GetClass86F88Methods()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
   D_80086F88` places every one of this unit's remaining functions
   (this ctor at +0x008, plus `Class86F88__Finalize`/`AddChild`/
   `RemoveChild`/`RemoveAllChildren`/`NotifyChild`/`ResetCounters`/
@@ -104,8 +104,8 @@ this same correction.
 mode flag (0 or 1), also stashed into `self->unkC`.
 
 1. Chain the base ctor: `Get_vtable_BasicClass()->ctor(self);` then
-   `self->methods = func_80052B60();` (this really is `Class86F88Methods_3bb8c_j
-   *func_80052B60(void)` -- NOT a separate "ctor table" type: this same
+   `self->methods = GetClass86F88Methods();` (this really is `Class86F88Methods_3bb8c_j
+   *GetClass86F88Methods(void)` -- NOT a separate "ctor table" type: this same
    getter is what `New_Class86F88` dereferences `->ctor` on, and here its
    return is assigned DIRECTLY as `self->methods`, so both call sites
    type-check against one declared return type).
@@ -140,7 +140,7 @@ void Class86F88__Class86F88(Class86F88_3bb8c_j *self, void **arg1, s32 arg2)
     s32 len;
 
     Get_vtable_BasicClass()->ctor(self);
-    self->methods = func_80052B60();
+    self->methods = GetClass86F88Methods();
 
     count = 0;
     for (p = arg1; *p != NULL; p++) {

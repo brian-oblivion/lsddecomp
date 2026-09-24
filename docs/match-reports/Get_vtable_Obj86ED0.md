@@ -16,7 +16,7 @@ call sites (`func_80050BA8` there is the actual `New_X` for THIS class,
 allocating 0x4C bytes and dispatching its ctor through `->ctor(...)` on the
 pointer this function returns). So this function is `Obj86ED0`'s own
 table getter, simply DEFINED in this unit; `Class86F88_3bb8c_j`'s real
-table is D_80086F88, reached instead through `func_80052B60()`
+table is D_80086F88, reached instead through `GetClass86F88Methods()`
 (class_3bb8c_k).
 
 ## Body

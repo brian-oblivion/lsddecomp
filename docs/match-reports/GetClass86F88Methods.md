@@ -1,12 +1,14 @@
-# func_80052B60 -- MATCH
+# GetClass86F88Methods -- MATCH
+
+> Renamed from `func_80052B60` on 2026-09-24 (tools/rename.py). Address 0x80052b60.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_80052B60`: 4/4 words match.
+SHA1 matches retail. `funcdiff.py GetClass86F88Methods`: 4/4 words match.
 
 ## Source
 
 ```c
-Class86F88Methods *func_80052B60(void)
+Class86F88Methods *GetClass86F88Methods(void)
 {
     return &D_80086F88;
 }

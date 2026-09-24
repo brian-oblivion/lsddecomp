@@ -2619,7 +2619,7 @@ extern void StyleTeardown(void);
  *
  *   func_80050BA8  li a0,0x4c -> BMemPMgrAlloc, then ctors through
  *                  Get_vtable_Obj86ED0(), which returns &D_80086ED0.
- *   New_Class86F88  allocates 0x54 and ctors through func_80052B60(),
+ *   New_Class86F88  allocates 0x54 and ctors through GetClass86F88Methods(),
  *                  a DIFFERENT table getter living in class_3bb8c_k.
  *
  * So D_80086ED0's class is 0x4C bytes (alpha is right), and bravo's
@@ -2824,9 +2824,9 @@ struct Obj86ED0 {
  * together.
  *
  * That note established that bravo's 0x54-byte New_X (New_Class86F88 in
- * class_3bb8c_j) ctors through func_80052B60(), "a DIFFERENT table getter
+ * class_3bb8c_j) ctors through GetClass86F88Methods(), "a DIFFERENT table getter
  * living in class_3bb8c_k" that bravo had not identified. charlie has now
- * MATCHED func_80052B60, and it returns &D_80086F88. So the 0x54-byte
+ * MATCHED GetClass86F88Methods, and it returns &D_80086F88. So the 0x54-byte
  * class's method table is D_80086F88 -- charlie's Class86F88 -- and NOT
  * D_80086ED0.
  *
