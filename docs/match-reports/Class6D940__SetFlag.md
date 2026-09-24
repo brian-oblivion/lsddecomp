@@ -28,3 +28,15 @@ round): the call is the function's last action with nothing touching
 returned per the project's default, absent positive void evidence.
 `slot64` (`BaseTable6D940::slot64`, `+0x064`) added to the same unit-local
 table `Class6D940__Destroy` uses.
+
+## Naming (round 77, charlie -- track 3)
+
+Renamed `func_8002C238 -> Class6D940__SetFlag`, tier B (mechanics, not
+purpose). Occupies `+0x064` of `D_8006D940` -- the exact slot
+`Class6D430__SetFlag` fills in the base class (`tools/classtable.py
+0x8006D430`) and its own verbatim-shared copy in `D_8006D4E8`
+(`tools/classtable.py 0x8006D4E8`). Named by SLOT POSITION, not by
+asserted behavior: this override does NOT just OR in a flag bit like the
+base -- it sets `self[0xC]` (offset 0x30, a field beyond `Class6D430`'s
+own layout) then forwards through `GetActiveDataSourceMethods()->slot64(self)`.
+That mechanics difference is why this is tier B and not A.

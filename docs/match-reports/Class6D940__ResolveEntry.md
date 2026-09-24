@@ -800,3 +800,23 @@ Two sub-lessons, both independently reusable:
   out the reverse of the source order. If a `nop` sits after a load that
   retail fills, try moving that load's statement earlier in the source,
   not later.
+
+## Naming (round 77, charlie -- track 3)
+
+Renamed `func_8002C278 -> Class6D940__ResolveEntry`, tier B (mechanics
+established, purpose not). This is `D_8006D940`'s own `+0x078` slot -- a
+unique extension beyond Class6D430's base layout, confirmed by
+`tools/classtable.py 0x8006D940`. Resolves an `Entry278` descriptor for a
+grid-cell-shaped index (cached byte offset, or fresh `index*12+8` lookup),
+and when present computes position-like fields on a 0x800/0x400 lattice
+with row stride 20 before forwarding to `ctx->unk2C->methods->slot80`.
+That lattice/stride matches `class_3ac78.c`'s own header comment for
+`Class866E8`'s 20-column grid verbatim ("seeds every cell with a world
+position on a 0x800 lattice") -- a real lead for a future round, not
+claimed as proof here, since nothing in this unit confirms `ctx`/`self`
+are actually reached from that class. The pre-round-77-correction "no
+classtable.py hit nearby ... not class-framework data" language inside the
+preserved `#if 0` bodies above (Entry278's own comment) predates the
+correction and is left as written history, not edited (rewriting text
+inside a preserved stall body risks silently changing what was actually
+built and scored).

@@ -25,3 +25,10 @@ exists in this window, so there is no positive evidence either way; per
 the project's stated default, `slot0C` is typed `s32` and the value is
 returned rather than discarded. Byte-verified identical either way -- this
 is a documented choice, not a measured one.
+
+## Naming (round 77, charlie -- track 3)
+
+Renamed `func_8002C200 -> Class6D940__Destroy`, tier A. `+0x00C` (dtor)
+slot of `D_8006D940` (confirmed by `tools/classtable.py 0x8006D940`),
+matching the `Class6D430__Destroy` naming precedent at the same slot
+position in the base class.

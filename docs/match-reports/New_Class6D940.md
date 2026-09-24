@@ -50,3 +50,13 @@ class-framework instance.
 `BMemPMgrAlloc` (the pool allocator, already established in
 `include/class_16334.h`/`include/code_8220.h`) declared LOCAL to this file
 since neither shared header is included here.
+
+## Naming (round 77, charlie -- track 3)
+
+Renamed `new_class_6d940 -> New_Class6D940`, tier A. Matches the project's
+`New_Class` allocator convention exactly. This function's own class,
+`D_8006D940`/`Class6D940Methods`, IS real class-framework data
+(`tools/classtable.py 0x8006D940`, 30 slots) -- the "NOT class-framework
+code" language in the `## Role` section above predates the round-77
+correction recorded in the unit header comment and is left as written
+history.

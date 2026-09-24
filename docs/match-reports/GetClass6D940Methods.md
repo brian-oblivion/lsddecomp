@@ -38,3 +38,20 @@ only via the uncarved accessor `GetActiveDataSourceMethods()`, with three known 
 `Class6D940__SetFlag` respectively (all this unit, this round). Kept entirely
 local to `code_179d8_d.c`, no shared header, per this round's rule for the
 `code_179d8` slices.
+
+## Naming (round 77, charlie -- track 3)
+
+Renamed `func_8002C3A8 -> GetClass6D940Methods`, tier A. This unit's earlier
+"NOT class-framework code" finding (round 16) was WRONG for `D_8006D940`
+specifically -- see the unit header comment's round-77 correction.
+`D_8006D940` is a real 30-slot Class6D430-derived vtable
+(`tools/classtable.py 0x8006D940`), and this function is its getter,
+confirmed as the FIRST entry of `D_8006D4AC` (code_171e0.c's
+NULL-terminated array of "class-method-table getters of every
+Class6D430-derived client", `asm/data/5DB70.data.s`). Matches the
+established `GetXXXMethods` convention for every other entry in that same
+array (`GetVabStreamObjMethods`) and elsewhere (`GetClass6D430Methods`,
+`GetClass6D3C8Methods`). The stale "NOT class-framework" language in this
+report's `## Role` section predates the correction and is left as written
+history rather than edited (the unit header comment and this `## Naming`
+section are authoritative).
