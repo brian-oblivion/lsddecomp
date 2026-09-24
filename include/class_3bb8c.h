@@ -2671,6 +2671,15 @@ struct ChildMethods86ED0 {
     void (*slot78)(ChildObj86ED0 *self); /* +0x078, func_80050F98, on the short-lived handle before func_80041C9C/New_Obj6EAC0 consume it */
     u8 pad07C[0x0B8 - 0x07C];
     void (*slotB8)(ChildObj86ED0 *self, void *arg1); /* +0x0B8, func_80050F98, self->unk44 only */
+    /* +0x0BC/+0x0C4, added round 75 (class_3bb8c_j, track 3 naming):
+     * func_800518F4/func_80051998 dispatch through self->unk40/unk44 (both
+     * already typed ChildObj86ED0* above, established by this same unit's
+     * own field comments). A round-45 comment in class_3bb8c_j had read
+     * these as a locally-typed, unrelated object instead -- additive fix,
+     * no existing offset moved. */
+    void (*slotBC)(ChildObj86ED0 *self, void *arg1); /* +0x0BC, func_800518F4, self->unk40 */
+    u8 pad0C0[0x0C4 - 0x0C0];
+    void (*slotC4)(ChildObj86ED0 *self, s32 arg1, s32 arg2); /* +0x0C4, func_80051998, self->unk44 */
 };
 struct ChildObj86ED0 {
     ChildMethods86ED0 *methods; /* +0x000 */
