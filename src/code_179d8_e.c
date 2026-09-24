@@ -495,25 +495,23 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 5/55 words match, length NOT exact (out-of-range byte drift).
- * Residue: compiler div/mod-fold residue -- GCC 2.6.3 -O2 folds
- * `index - (index>>4)*16` into `index & 0xF` once it can prove index >= 0,
- * and no plain-C spelling of the guarded hi/lo split reproduced here keeps
- * the unfolded `sll`+`subu` retail has; a later probe (in the same report)
- * gets every other instruction byte-identical and narrows the gap to one
- * operand, but has not been re-applied to this function's own body.
- * (docs/match-reports/VabStreamObj__PlayTone.md). Hand-derived. */
+/* Resolve a packed program/tone index, look up its VagAtr and key it on.
+ * `prog` is loaded BEFORE `lo` is computed on purpose: GCC 2.6.3's combine
+ * folds `index - (index >> 4) * 16` into `index & 0xF` whenever `hi`'s
+ * FIRST use is the multiply (flow.c links a set only to its next use), and
+ * retail kept the unfolded sll+subu (docs/match-reports/VabStreamObj__PlayTone.md). */
 s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
     s32 hi;
     s32 lo;
     VagAtrView *entry;
+    VagAtrView *prog;
     s16 result;
 
     if (index >= 0) {
-        hi = index / 16;
+        hi = index >> 4;
+        prog = self->progVagTable[hi];
         lo = index - hi * 16;
-        entry = &self->progVagTable[hi][lo];
+        entry = &prog[lo];
         result = SsUtKeyOn(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
                                 entry->shift, (s16)arg2, (s16)arg2);
         if (result >= 0) {
@@ -523,9 +521,6 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 arg2, s32 arg3) {
     }
     return -1;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_e", VabStreamObj__PlayTone);
-#endif
 
 /* The PS1 SPU's own hardware voice count -- the boundary VabStreamObj__StopVoice
  * checks `index` against. */
