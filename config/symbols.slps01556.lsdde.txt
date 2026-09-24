@@ -1933,3 +1933,10 @@ SsUtChangeADSR = 0x80031BA4; // type:func
 // derivation gap to close, not a naming disagreement. Superseded
 // game-style func_80031F3C. Still a STALL. Round 74 (bravo, track 2).
 SsUtAllKeyOff = 0x80031F3C; // type:func
+// identified: shape 0.99 vs libsnd/ssinit _SsInit (85w vs our 83w, disc
+// 3.3), position within the libsnd neighborhood (after libsnd/vm_vsu,
+// before libsnd/sstable), same underscore-prefixed internal-helper
+// convention already used for _SsStart (docs/match-reports/_SsStart.md)
+// in this project. Superseded game-style func_8003221C.
+// Round 74 (bravo, track 2).
+_SsInit = 0x8003221C; // type:func

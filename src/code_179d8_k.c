@@ -632,7 +632,7 @@ void ContResetAll(s16 a0, s16 a1)
 
 /* A per-(channel,slot) dispatch table of function pointers, row-major with
  * a 0x40 (64)-byte stride (16 pointers per row) -- also referenced from
- * code_179d8_c's func_8003221C. Not yet given a real element count; the
+ * code_179d8_c's _SsInit. Not yet given a real element count; the
  * outer dimension is left open. */
 typedef void (*Fn80090368)(s32 channel, u8 arg1);
 extern Fn80090368 D_80090368[][16];

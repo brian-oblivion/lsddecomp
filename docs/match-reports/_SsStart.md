@@ -224,7 +224,7 @@ equivalent-but-differently-composed form that scored 65/164.
 
 Beyond the case-body-order issue, the surviving diffs are the SAME
 class of register permutation seen throughout this unit this round
-(`func_8003221C`, `func_800323A8`): matching content, swapped physical
+(`_SsInit`, `func_800323A8`): matching content, swapped physical
 registers (`$s0`/`$s1`, `$v0`/`$v1`), plus the two `div`/`break`
 overflow-trap blocks and the final callback-dispatch tail (which is
 structurally the exact same shape already matched byte-for-byte in
@@ -246,7 +246,7 @@ multi-way dispatch needing the switch-vs-if/else distinction discovered
 here, the PSX div/break overflow-trap idiom, and the same register-
 permutation class seen in the other two big-three stalls) inside a
 164-word function, which is simply a lot of surface area for the
-session time available after `func_8003221C` and `func_800323A8` had
+session time available after `_SsInit` and `func_800323A8` had
 already consumed substantial budget this round. Stopped at 65/164 (up
 from an initial 24/164) with the switch-vs-if/else finding banked as
 the header-line result, not because of register count.

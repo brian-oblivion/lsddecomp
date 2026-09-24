@@ -21,7 +21,7 @@
  *     [c code_179d8_c][o sstable][c code_179d8_c_b] and everything from
  *     SsSetTickMode on now lives in `src/code_179d8_c_b.c`.
  * Neither was ever matchable as C; both stall reports are kept, re-titled
- * CONVERTED. This unit is now three functions: func_8003221C and its two
+ * CONVERTED. This unit is now three functions: _SsInit and its two
  * one-line callers.
  *
  * THE 0x14D8 RODATA ATTACH IS NO LONGER OURS. It belongs to SsSetTickMode
@@ -100,7 +100,7 @@ extern VoiceState80090368 D_80090368[0x20];
  * `i = 0;` before each loop is a statement in its own right, not a `for`
  * init clause: retail zeroes the counter BEFORE loading the source base.
  */
-void func_8003221C(s32 arg0)
+void _SsInit(s32 arg0)
 {
     s32 i, j;
     u16 *base;
@@ -160,10 +160,10 @@ void func_8003221C(s32 arg0)
 
 void func_80032368(void)
 {
-    func_8003221C(0);
+    _SsInit(0);
 }
 
 void func_80032388(void)
 {
-    func_8003221C(1);
+    _SsInit(1);
 }

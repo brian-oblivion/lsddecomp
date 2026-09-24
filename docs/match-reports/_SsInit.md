@@ -1,4 +1,6 @@
-# func_8003221C -- MATCH (83/83, ins 0 / del 0, round 63)
+# _SsInit -- MATCH (83/83, ins 0 / del 0, round 63)
+
+> Renamed from `func_8003221C` on 2026-09-24 (tools/rename.py). Address 0x8003221c.
 
 **MATCHED round 63 (runner bravo).** The round-16..20 STALL title was
 "register identity across three loop regions, not fixable by reshaping
@@ -60,7 +62,7 @@ typedef struct {
 
 extern VoiceState80090368 D_80090368[0x20];
 
-void func_8003221C(s32 arg0)
+void _SsInit(s32 arg0)
 {
     s32 i, j;
     u16 *base;
@@ -256,7 +258,7 @@ pinning.
 This unit's `GetRCnt` (this round) independently found the same
 "commutative-add operand/destination-register choice, cc1-canonicalised,
 not reachable from C" residue this report already documents (or, for
-`func_8003221C`, the same class of register-identity resistance) --
+`_SsInit`, the same class of register-identity resistance) --
 tried on a completely different pair of operands (a table-index address
 computation, not a field-offset one) and confirmed via five further
 reshapes (subscript-commutativity rewrite, pointer-arithmetic spelling,
@@ -289,8 +291,8 @@ No other character changed.
 
 ```
 build exit=2, no compile-error grep hit
-func_8003221C: 46/83 words match (file 0x22A1C-0x22B68)
-func_8003221C: insertions 14 / deletions 14
+_SsInit: 46/83 words match (file 0x22A1C-0x22B68)
+_SsInit: insertions 14 / deletions 14
 ```
 
 **The score reproduces exactly (46/83, length exact, no outside-range drift).
