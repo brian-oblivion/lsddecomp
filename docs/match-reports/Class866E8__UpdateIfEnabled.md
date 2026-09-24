@@ -10,7 +10,7 @@ A guard-and-dispatch method: if `self->unk70` is set, calls two of its own
 vtable slots (`+0xF4`, `+0x13C`) back to back with just `self`.
 
 Slot resolution used `tools/classtable.py D_800866E8` (the whole vtable was
-resolved in the previous commit for this unit): `+0xF4` -> `func_8004B5BC`,
+resolved in the previous commit for this unit): `+0xF4` -> `Class866E8__UpdateFootprintTracking`,
 `+0x13C` -> `Class866E8__AdvanceRateCountdown`. Neither is decompiled yet; only the slot
 existence/signature (self-only) was needed here.
 
@@ -50,12 +50,12 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AB24` | `Class866E8__UpdateIfEnabled` | B | Occupant of vtable slot `+0x098`. The gate field is `+0x070`, and `class_3bb8c`'s two matched accessors pin its meaning exactly: `func_8004B570` sets it to 1 and `func_8004B57C` runs `slotC0` and then clears it to 0 -- an enable/disable pair. When enabled this function dispatches `slotF4` then `slot13C`; `slot13C` is `class_3bb8c_b`'s matched `Class866E8__AdvanceRateCountdown`, which decrements a per-object countdown and sweeps every element's cells, i.e. periodic work. Tier B: "update" describes what the two dispatched slots do, not a purpose anyone has established. |
+| `func_8004AB24` | `Class866E8__UpdateIfEnabled` | B | Occupant of vtable slot `+0x098`. The gate field is `+0x070`, and `class_3bb8c`'s two matched accessors pin its meaning exactly: `Class866E8__Enable` sets it to 1 and `Class866E8__Disable` runs `slotC0` and then clears it to 0 -- an enable/disable pair. When enabled this function dispatches `slotF4` then `slot13C`; `slot13C` is `class_3bb8c_b`'s matched `Class866E8__AdvanceRateCountdown`, which decrements a per-object countdown and sweeps every element's cells, i.e. periodic work. Tier B: "update" describes what the two dispatched slots do, not a purpose anyone has established. |
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
 | `Class866E8+0x070` | `enabled` | A | Set to 1 / cleared to 0 by a matched setter pair in `class_3bb8c`, and used as a plain boolean gate here. A pure flag whose mechanics are its purpose. |
 
 `slotF4` and `slot13C` keep their `slotNN` names: their occupants
-(`func_8004B5BC`, `Class866E8__AdvanceRateCountdown`) are still `func_` in `class_3bb8c`, and
+(`Class866E8__UpdateFootprintTracking`, `Class866E8__AdvanceRateCountdown`) are still `func_` in `class_3bb8c`, and
 the convention is to name a slot after the method it dispatches to.

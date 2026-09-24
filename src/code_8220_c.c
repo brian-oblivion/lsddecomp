@@ -24,7 +24,7 @@
  * of the type, not the runtime address (DECOMPILATION_LEARNINGS, "A struct
  * whose members are all s8/s16 has alignment 2"). Same idiom as
  * FlashbackRotation (include/DreamSys.h), CopyPolyVtx3's PolyXY8/PolyUV4
- * (code_8220.h) and func_8004B38C. Formerly five separately typedef'd
+ * (code_8220.h) and Class866E8__SetTargetAndBuildRates. Formerly five separately typedef'd
  * copies (Vec2s16_98/_C04/_EE4/_A64/_268, one per call site, each named
  * for its own file offset); merged into one unit-local type round 77
  * (alpha) -- a typedef's spelling never affects codegen, only its layout,

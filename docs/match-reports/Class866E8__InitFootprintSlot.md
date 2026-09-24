@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004CDA4` on 2026-09-24 (tools/rename.py). Address 0x8004cda4.
 
-Writes a fresh copy of a constant 3-word struct (`D_80086990`) into
+Writes a fresh copy of a constant 3-word struct (`gDefaultElemRateOffset`) into
 `self+0x8C+key*0xC`, then overwrites just the first word of that copy
 with the return value of a vtable call (`self->methods->slot124(self,
 arg3)`), and returns `key + 1`.
@@ -16,7 +16,7 @@ a sized array field in `struct Obj866E8` — same policy already used for
 `Elem::unk10`'s walk in this header.
 
 The 4-arg register layout is notable: the second parameter (`$a1`) is
-loaded fresh from `D_80086990`'s own third word (`lw $a1, 0x8($a2)`)
+loaded fresh from `gDefaultElemRateOffset`'s own third word (`lw $a1, 0x8($a2)`)
 partway through the function and is NEVER READ as an incoming argument —
 it is a dead/unused parameter from this function's own perspective
 (its callers, in `Class866E8__SetFootprintFromQuery`, do pass a real value there, but this
@@ -28,9 +28,9 @@ function itself discards it).
   +0x124) — the struct previously ended right after `slot118` (+0x118)
   with no trailing padding; added `pad11C[0x124-0x11C]` before this new
   slot.
-- New extern `D_80086990` (`Unk54Struct`, whole-struct copy source) —
+- New extern `gDefaultElemRateOffset` (`Unk54Struct`, whole-struct copy source) —
   reuses the existing `Unk54Struct` type (already established from
-  `self->unk54` and `func_8004B44C`'s `arg3`).
+  `self->unk54` and `ComputeCellWorldOffsets`'s `arg3`).
 
 ## Final C
 
@@ -39,7 +39,7 @@ s32 Class866E8__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3)
     Unk54Struct *slot;
 
     slot = (Unk54Struct *) ((u8 *) self + 0x8C + key * sizeof(Unk54Struct));
-    *slot = D_80086990;
+    *slot = gDefaultElemRateOffset;
     slot->unk0 = self->methods->slot124(self, arg3);
     return key + 1;
 }
@@ -50,7 +50,7 @@ s32 Class866E8__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3)
 1 (matched on first attempt). The `key * sizeof(Unk54Struct)` (`key * 12`)
 multiply-by-constant naturally lowers to retail's `sll 1; addu; sll 2`
 (`*2, +key, *4` = `*12`) shift/add chain, and the whole-struct assignment
-(`*slot = D_80086990;`) naturally lowers to the three-word load/store
+(`*slot = gDefaultElemRateOffset;`) naturally lowers to the three-word load/store
 sequence — both already-confirmed idioms from
 `docs/DECOMPILATION_LEARNINGS.md`, so no iteration was needed once the
 register trace was right.
@@ -64,7 +64,7 @@ together in the same statement.
 ## Naming
 
 **Tier B.** Not a vtable slot. Writes the constant `Unk54Struct` template
-`D_80086990` into a `self->gridSlots[]`-shaped entry, then overwrites its
+`gDefaultElemRateOffset` into a `self->gridSlots[]`-shaped entry, then overwrites its
 `elemIdx` word via `slot124`. Called by both
 `Class866E8__BuildFootprintSlots`'s sibling paths and
 `Class866E8__SetFootprintFromQuery`, always to seed a fresh slot -- hence

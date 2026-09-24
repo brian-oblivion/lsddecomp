@@ -1,7 +1,9 @@
-# func_8004C434 — MATCHED (15/15 words)
+# Class866E8__FindElemByUnk32 — MATCHED (15/15 words)
+
+> Renamed from `func_8004C434` on 2026-09-24 (tools/rename.py). Address 0x8004c434.
 
 Not a vtable slot (not in `D_800866E8`), a plain non-virtual helper —
-companion to `func_8004BCE0`, walking the same `self->arr` array but
+companion to `Class866E8__CountFlaggedElements`, walking the same `self->arr` array but
 searching a different field.
 
 ## Disassembly
@@ -33,7 +35,7 @@ explicit statement for that path either; see below.
 ## Final C
 
 ```c
-Elem *func_8004C434(Obj866E8 *self, s32 key) {
+Elem *Class866E8__FindElemByUnk32(Obj866E8 *self, s32 key) {
     s32 i;
     Elem *e;
 
@@ -72,7 +74,7 @@ with the loop presumed always to find its key.
 
 First attempt typed `ElemTarget::unk32` as `u16`, producing `lhu` where
 retail has `lh` (signed halfword load) — 14/15. Retyped to `s16`, matching
-the SAME residue class already seen this round (`func_8004C434`'s own
+the SAME residue class already seen this round (`Class866E8__FindElemByUnk32`'s own
 comparison against a plain `s32 key`, decoded as signed). 15/15.
 
 ## New struct knowledge (`include/class_3bb8c.h`)
@@ -88,3 +90,11 @@ comparison against a plain `s32 key`, decoded as signed). 15/15.
 
 None new — same signed/unsigned halfword lesson already documented
 elsewhere this project (`Class86668__CheckTimeout`, `class_39e08`).
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C434` | `Class866E8__FindElemByUnk32` | A | Occupant of `D_800866E8` +0x118 (`slot118`). Pure linear search: loops `self->arr[7]`, returns the first `Elem *` whose `unk4->unk32 == key`. Named to parallel the already-matched sibling `Class866E8__FindElemIndexByUnk32` (+0x120), which searches the SAME field (`ElemTarget::unk32`) but returns an index rather than the element pointer -- consistent family naming for two functions doing the identical field comparison with a different return shape. A pure search-and-return is tier A by the "getter" clause. |

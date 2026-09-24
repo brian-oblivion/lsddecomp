@@ -1,4 +1,6 @@
-# func_8004C470 -- MATCHED round 73 (70/70, exact length, whole-image SHA1 green)
+# Class866E8__FindElementForPosition -- MATCHED round 73 (70/70, exact length, whole-image SHA1 green)
+
+> Renamed from `func_8004C470` on 2026-09-24 (tools/rename.py). Address 0x8004c470.
 
 REVISITED, round 73: MATCHED 70/70 (field named at the add, assigned inside the bound test); names/types not relevant (existing Unk14Obj/Unk54Struct views reused unchanged)
 
@@ -56,7 +58,7 @@ first in insn order.
 
 ## Earlier history (superseded by the match above)
 
-#### Old title: func_8004C470 -- STALL: length EXACT (70/70 words, no drift); **69/70 raw word-match (round 38, up from 68/70)**; first and ONLY real diff at file 0x3CD00 / vram 0x8004C500 -- the `addu` in the SECOND bounds comparison.
+#### Old title: Class866E8__FindElementForPosition -- STALL: length EXACT (70/70 words, no drift); **69/70 raw word-match (round 38, up from 68/70)**; first and ONLY real diff at file 0x3CD00 / vram 0x8004C500 -- the `addu` in the SECOND bounds comparison.
 
 NON_MATCHING body promoted, round 73
 
@@ -173,18 +175,18 @@ NON_MATCHING body promoted, round 73
 >
 > Round 40 explicitly judged this function exhausted and skipped it in
 > favor of never-searched ground. This round staffed it anyway, once the
-> unit's other targets (the dead-reload screen on `func_8004BB3C`/
-> `func_8004C1C0`, both negative; two structural probes each on
-> `func_8004B700`/`func_8004BE54`, all four negative) turned up nothing --
+> unit's other targets (the dead-reload screen on `Class866E8__ApplyRateEntries`/
+> `Class866E8__ComputeFootprintDescriptor`, both negative; two structural probes each on
+> `Class866E8__BuildRateEntries`/`Class866E8__LoadElementResources`, all four negative) turned up nothing --
 > per this round's own guidance to treat a "permuter-exhausted" verdict as
 > needing a CHANGED state, not a repeat, a **second independent RNG run**
 > (not a rerun of round 38's own search) qualifies, since round 38's run
 > was a single seed and CLAUDE.md documents elsewhere in this project
-> (`func_8004BA40`'s own round-32 history) that "a permuter plateau is not
+> (`Class866E8__ComputeRateEntry`'s own round-32 history) that "a permuter plateau is not
 > an exhaustion proof" until a SECOND independent search has also failed.
 >
 > **Scaffold, validated before searching:** `tools/setup-permuter.sh
-> func_8004C470 <seed>` (seed = this report's own 69/70 body verbatim),
+> Class866E8__FindElementForPosition <seed>` (seed = this report's own 69/70 body verbatim),
 > `--debug --stack-diffs` reported **base score 10, 2 register differences,
 > 0 reorderings/insertions/deletions/branch/stack differences** --
 > identical to round 38's own recorded residue (the single `addu v0,v1,s4`
@@ -207,7 +209,7 @@ NON_MATCHING body promoted, round 73
 > `--debug`-validated scaffolds confirmed to score the same residue as the
 > real build, on top of round 38's five manual variants and round 39's
 > four more. **This is now the most exhaustively permuter-tested residue
-> in the unit alongside `func_8004BA40`'s two 144k/40k-iteration searches**
+> in the unit alongside `Class866E8__ComputeRateEntry`'s two 144k/40k-iteration searches**
 > -- read as a hard floor of this specific commutative-operand-order class
 > under this compiler, not an unexplored lead. Not re-attempted further
 > this round; restored to `INCLUDE_ASM` unchanged, `git diff` against the
@@ -218,12 +220,12 @@ NON_MATCHING body promoted, round 73
 > **A second independent permuter run is worth the bounded cost even after
 > a first run plateaued at the same non-zero score, but two flat runs in a
 > row is a real stopping signal, not just an unlucky pair.** This report
-> and `func_8004BA40`'s now each carry two independently-seeded searches
+> and `Class866E8__ComputeRateEntry`'s now each carry two independently-seeded searches
 > (183k and 184k total iterations respectively) that never beat their own
 > base score -- both single-word/two-register commutative-operand-identity
 > residues. Given this project's confirmed, cross-function
-> commutative-canonicalization class (this function, `func_8004BE54`'s
-> `or`/`addu` sites, `func_8004BA40`'s `$v0`/`$v1` accumulators), a THIRD
+> commutative-canonicalization class (this function, `Class866E8__LoadElementResources`'s
+> `or`/`addu` sites, `Class866E8__ComputeRateEntry`'s `$v0`/`$v1` accumulators), a THIRD
 > search on any of these is unlikely to be a good use of a bounded permuter
 > slot; a differently-shaped seed (not just fresh RNG on the same shape)
 > would be needed to find new ground, and no such reshaping has been
@@ -270,7 +272,7 @@ NON_MATCHING body promoted, round 73
 > Remaining residue is now ONLY "Residue 1" (2 words): the commutative
 > `addu` register-operand-order class, already confirmed inert (both
 > operand-textual-orders tried, identical wrong output) both here and
-> independently on `func_8004BE54` this same project. Not re-attempted --
+> independently on `Class866E8__LoadElementResources` this same project. Not re-attempted --
 > this is now a stable, twice-confirmed GCC 2.6.3 RTL-canonicalization
 > property, not a per-function coincidence. See the near-miss body below
 > for the current best C (restored to `INCLUDE_ASM` in `src/`, per
@@ -280,13 +282,13 @@ NON_MATCHING body promoted, round 73
 > prose.** Rebuilt the exact preserved body below from a clean
 > `INCLUDE_ASM` baseline (one fix needed first: `Unk14Obj::unk18`/`unk20`
 > were retyped to `union { s32 w; u16 h; }` by a LATER round's
-> `func_8004C1C0`/`func_8004B700` work after this report was written, so
+> `Class866E8__ComputeFootprintDescriptor`/`Class866E8__BuildRateEntries` work after this report was written, so
 > the preserved body's plain `r->unk18`/`r->unk20` no longer compiled --
 > `.w` added at both sites, a mechanical header-drift fix, not a residue
 > change). Confirmed: still 63/70, no drift, identical residue.
 >
 > **Correction: Residue 1's prose has retail and built SWAPPED.** Reading
-> `asm/nonmatchings/class_3bb8c/func_8004C470.s` directly (not a
+> `asm/nonmatchings/class_3bb8c/Class866E8__FindElementForPosition.s` directly (not a
 > diff-tool's relabeled address) shows retail's OWN instruction at
 > `3CCDC`/`3CD00` is `addu $v0, $v1, $s4` (freshly-loaded field FIRST,
 > tolerance SECOND) -- the built object's `addu $v0, $s4, $v1` (verified via
@@ -303,7 +305,7 @@ NON_MATCHING body promoted, round 73
 >
 > This same commutative-operand-order class was independently confirmed a
 > SECOND time this round, on a different function and different operator
-> (`or`, plus another `addu`) -- see `func_8004BE54`'s report. Two
+> (`or`, plus another `addu`) -- see `Class866E8__LoadElementResources`'s report. Two
 > confirmations across two functions is enough to treat this as a stable
 > GCC 2.6.3 property, not a per-function coincidence: **do not spend
 > further attempts reordering commutative operands hoping to match a
@@ -315,7 +317,7 @@ NON_MATCHING body promoted, round 73
 
 ```c
 #if 0
-Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
+Elem *Class866E8__FindElementForPosition(Obj866E8 *self, Unk54Struct *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;
@@ -349,7 +351,7 @@ Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
 
 (`r->unk18`/`r->unk20` are written `.w` here because `Unk14Obj::unk18`/
 `unk20` were retyped to `union { s32 w; u16 h; }` by a later round's work
-on `func_8004C1C0`/`func_8004B700`, after this report's original body was
+on `Class866E8__ComputeFootprintDescriptor`/`Class866E8__BuildRateEntries`, after this report's original body was
 written -- mechanical header-drift fix, not a residue change, same as
 round 20 already noted.)
 
@@ -358,7 +360,7 @@ round 20 already noted.)
 
 ```c
 #if 0
-Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
+Elem *Class866E8__FindElementForPosition(Obj866E8 *self, Unk54Struct *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;
@@ -482,8 +484,8 @@ because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
-are honest** — `func_8004C470` 68/70, `func_8004B44C` 58/73,
-`func_8004B700` 125/140, `func_8004BE54` 130/150. No stale figure and no
+are honest** — `Class866E8__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
+`Class866E8__BuildRateEntries` 125/140, `Class866E8__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a
@@ -502,7 +504,7 @@ matched this report's 2-instruction/4-register residue exactly.
 
 ### The search
 
-Two searches exist in `permuter-work/func_8004C470/`: `output-10-1` from the
+Two searches exist in `permuter-work/Class866E8__FindElementForPosition/`: `output-10-1` from the
 first (infrastructure-killed) attempt on 2026-09-12 and `output-10-2` from
 this round. **Both reached score 10 from a base of 20; neither reached zero.**
 This round's ran **89,374 iterations**.
@@ -592,10 +594,18 @@ to call this a confirmed stall rather than an unexplored one.
 
 **The hoist-both-before-either lever has a precondition worth stating
 explicitly: it requires retail to actually LOAD both values before consuming
-either.** `func_8004C470`'s second field load is gated behind the first
+either.** `Class866E8__FindElementForPosition`'s second field load is gated behind the first
 comparison's branch in retail's own disassembly (checked directly, not
 inferred), so no source shape that computes it unconditionally can be
 length-preserving, let alone byte-exact -- the lever's "adjacent loads,
 later consumers" diagnostic from this round's brief is exactly the right
 test, and it says no here. Read the retail `.s` for that adjacency before
 spending an attempt on this lever, not after.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C470` | `Class866E8__FindElementForPosition` | B | Occupant of `D_800866E8` +0x11C (`slot11C`), called by `Class866E8__ComputeFootprintDescriptor` with its own `QueryPos866E8` world-position argument. Loops `self->arr[7]` via `slot118`, bounds-testing `arg1->unk0`/`arg1->unk8` against each candidate's `r->unk18`/`r->unk20` within a fixed `0xA000` tolerance (a spatial hit test), with a decreasing `threshold` and `self->unk68->unk4` gating an early-exit shortcut on ties. "Find...ForPosition" names the mechanic (locate the element whose bounds contain/are nearest a world position); the tie-break rule beyond "closer element wins" is not established. |

@@ -645,7 +645,7 @@ Notes on the derivation, for whoever revisits this:
 ## Header additions (`include/class_3bb8c.h`, additive only, except one retype)
 
 - **Retype**: `Unk6CObj::unk14` changed from `void *` to the new
-  `Unk6C14Obj *`. The only OTHER reader, `func_8004C158` (already matched,
+  `Unk6C14Obj *`. The only OTHER reader, `Class866E8__GetTargetDescriptor` (already matched,
   in `class_3bb8c.c`), immediately casts it to `(u8 *)` before doing
   pointer arithmetic, so this does not change that function's compiled
   bytes — verified with a full rebuild (`./build-and-verify.sh` stays

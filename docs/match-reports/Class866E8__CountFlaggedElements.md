@@ -1,6 +1,8 @@
-# func_8004BCE0 — MATCHED (13/13 words)
+# Class866E8__CountFlaggedElements — MATCHED (13/13 words)
 
-Not a vtable slot — `func_8004BCE0` does not appear in `D_800866E8`
+> Renamed from `func_8004BCE0` on 2026-09-24 (tools/rename.py). Address 0x8004bce0.
+
+Not a vtable slot — `Class866E8__CountFlaggedElements` does not appear in `D_800866E8`
 (confirmed via `tools/classtable.py 0x800866E8`), so it is a plain,
 non-virtual helper. Takes `self` directly as its only argument.
 
@@ -32,7 +34,7 @@ pointer-walking needed in the source; see the "final C" below.
 ## Final C
 
 ```c
-s32 func_8004BCE0(Obj866E8 *self) {
+s32 Class866E8__CountFlaggedElements(Obj866E8 *self) {
     s32 count;
     s32 i;
 
@@ -64,3 +66,11 @@ loop, rather than hand-rolling pointer arithmetic to mimic the observed
 `lhu 0xEC($a0)` / `addiu $a0,$a0,0x1C` register moves, reproduces retail
 exactly. The instinct to transcribe the moving-pointer shape literally
 would have been wrong and unnecessary.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004BCE0` | `Class866E8__CountFlaggedElements` | A | Pure leaf: loops `self->arr[7]`, counts entries with `flag != 0`, returns the count. A pure count is tier A by the naming rule's own "getter/clamp/list-push" clause -- the mechanics ARE the purpose. Called by `Class866E8__ApplyRateEntries` to refresh `self->unk1B4` after flagging/unflagging elements. |

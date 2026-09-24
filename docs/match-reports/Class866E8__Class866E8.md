@@ -222,7 +222,7 @@ no accessor outside `src/class_3ac78.c`):
 | `Class866E8+0x054` | `origin` | B | A 3-word block, copied here from `arg1` or `gDefaultOrigin`, then passed as the THIRD argument of `cellParent->methods->slot4C(cellParent, self, &self->origin)`. The same parameter position in the sibling call one loop deeper receives `buf = {x, 0, z}`, a literal world position on the 0x800 lattice -- so the slot takes a position and this field is one. |
 | `Class866E8+0x0EC` | `elems[7]` | A | Seven 0x1C-byte records, walked 0..6 here, in `Class866E8__Finalize` and in `Class866E8__ResetAllElements`; `class_3bb8c` reaches the same array from four more functions and calls it `arr[7]`. |
 | `UnkSlotEntry+0x000` | `flag` | B | Zeroed here and in `Class866E8__ResetAllElements`; `class_3bb8c`'s independent view names the same halfword `Elem::flag`. |
-| `UnkSlotEntry+0x002` | `key` | B | Set to the loop index here and copied on into `target->key`; `class_3bb8c`'s `func_8004B700` copies a caller-supplied key byte into the same field. |
+| `UnkSlotEntry+0x002` | `key` | B | Set to the loop index here and copied on into `target->key`; `class_3bb8c`'s `Class866E8__BuildRateEntries` copies a caller-supplied key byte into the same field. |
 | `UnkSlotEntry+0x004` | `target` | B | `class_3bb8c` types the same pointer `ElemTarget *` from six functions. |
 | `UnkSlotEntry+0x008` | `list` | C-ish/B | Built here by `New_Class6D940(0)`; the name records only that it is the list object the entry owns. |
 | `UnkSlotEntry+0x00C` | `cellParent` | B | Initialized here with `slot4C(cellParent, self, &self->origin)` and then passed as the PARENT argument of every grid cell's own `slot4C(cell, cellParent, buf)`. Its role in this function is exactly "the node the cells hang off". |

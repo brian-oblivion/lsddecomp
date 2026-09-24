@@ -224,7 +224,7 @@ struct Class6B5CCSub44 {
  * members give it alignment 2, which is what makes retail's own
  * struct-copy of it (in BisectSegmentToBox's loop tail) compile to unaligned
  * lwl/lwr + swl/swr, same idiom as S16Quad_d294 above and the already-
- * confirmed `func_8004B38C`/`FlashbackRotation` case in
+ * confirmed `Class866E8__SetTargetAndBuildRates`/`FlashbackRotation` case in
  * DECOMPILATION_LEARNINGS. */
 typedef struct Vec3S16_d294 {
     s16 x;

@@ -1,11 +1,13 @@
-# func_8004C0AC
+# Class866E8__ResetElementCells
+
+> Renamed from `func_8004C0AC` on 2026-09-24 (tools/rename.py). Address 0x8004c0ac.
 
 **Unit:** class_3bb8c · **Size:** 43 words · **Status:** MATCHED (5 attempts).
 
 ## Result
 
 ```c
-void func_8004C0AC(Obj866E8 *self, Elem *entry) {
+void Class866E8__ResetElementCells(Obj866E8 *self, Elem *entry) {
     EntryChildObj **p;
     EntryChildObj **end;
 
@@ -70,3 +72,11 @@ folding the loop variable directly into the temporary's register. This is a
 constructive counterpart to the broadcast-#1/#2 "redundant move" lever, for
 the case where the extra `move` genuinely IS present in retail rather than
 being a smell to remove.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C0AC` | `Class866E8__ResetElementCells` | B | Occupant of `D_800866E8` +0x108 (`slot108`), called by `class_3ac78`'s own `Class866E8__ResetAllElements` (already matched) once per element. Walks `entry->unk10` over exactly `0x668` bytes -- the SAME 0x668-byte figure `class_3ac78`'s own unit header names as "a 0x668-byte heap block holding that element's grid of CELL objects" -- clearing a flag bit and two fields on every cell. "Reset...Cells" names this directly against that established vocabulary. |

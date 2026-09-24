@@ -1,11 +1,13 @@
-# func_8004C158
+# Class866E8__GetTargetDescriptor
+
+> Renamed from `func_8004C158` on 2026-09-24 (tools/rename.py). Address 0x8004c158.
 
 **Unit:** class_3bb8c · **Size:** 26 words · **Status:** MATCHED (first attempt).
 
 ## Result
 
 ```c
-Descriptor10 *func_8004C158(Obj866E8 *self, s32 arg1, void **out) {
+Descriptor10 *Class866E8__GetTargetDescriptor(Obj866E8 *self, s32 arg1, void **out) {
     void *v1;
 
     v1 = (u8 *)self->unk6C->unk14 + 0x18;
@@ -24,7 +26,7 @@ Descriptor10 *func_8004C158(Obj866E8 *self, s32 arg1, void **out) {
 ## Derivation
 
 Two independent gates, both falling through to the same `return
-&self->unkBC;` (the `unkBC` `Descriptor10` established by `func_8004B38C`
+&self->unkBC;` (the `unkBC` `Descriptor10` established by `Class866E8__SetTargetAndBuildRates`
 this same round):
 
 - `arg1 == 0`: skip the `slot110` dispatch entirely, go straight to the
@@ -36,7 +38,7 @@ this same round):
   a `bnez`+`li v0,0` pair encodes "return 0 iff call succeeded").
 
 `self->unk6C` turned out to be a pointer (`Unk6CObj`), not the raw `s32` an
-earlier guess might suggest -- `func_8004B38C` (matched later in the same
+earlier guess might suggest -- `Class866E8__SetTargetAndBuildRates` (matched later in the same
 round) only ever stores its own `arg2` there raw, never dereferencing it, so
 nothing in that function alone would have caught the mistake; this function's
 own `+0x014` dereference is what pins the type down. `unk6C->unk14` is itself
@@ -54,3 +56,11 @@ the call result's zero-ness". Traced correctly here by working out, for each
 of the two fall-through targets (`L8004C1A8` vs `L8004C1AC`), what value `$v0`
 actually holds *at the target*, not at the branch -- the same discipline
 broadcast #3 (delay-slot-belongs-to-the-target) states more generally.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C158` | `Class866E8__GetTargetDescriptor` | B | Occupant of `D_800866E8` +0x10C. Resolves `self->unk6C`'s own position substruct, optionally hands it to `slot110` (`Class866E8__ComputeFootprintDescriptor`) to fill a caller-supplied `Descriptor10Ext`, and always returns `&self->unkBC` -- this object's own current footprint descriptor. "Get...Descriptor" names the return value's role; "Target" reflects `self->unk6C`'s established role as the stored position source (`Class866E8__SetTargetAndBuildRates` sets it). |

@@ -115,7 +115,7 @@ defeating any lever built on that member. **What it did not try: keeping
 field at all) and copying the record as ONE WHOLE-STRUCT ASSIGNMENT**,
 which is exactly the "`all-s8`/`s16` struct -> alignment 2 -> whole-struct
 copy compiles to unaligned `lwl`/`lwr` + `swl`/`swr`" idiom already on
-record in `docs/DECOMPILATION_LEARNINGS.md` (`func_8004B38C`,
+record in `docs/DECOMPILATION_LEARNINGS.md` (`Class866E8__SetTargetAndBuildRates`,
 `FlashbackRotation`) -- this report cited that same idiom as the likely
 answer but tested a DIFFERENT, already-known-wrong shape (individual
 field access) instead of the idiom itself.

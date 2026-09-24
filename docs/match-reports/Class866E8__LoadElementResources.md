@@ -1,4 +1,6 @@
-# func_8004BE54 -- MATCHED round 73 (150/150, exact length, whole-image SHA1 green)
+# Class866E8__LoadElementResources -- MATCHED round 73 (150/150, exact length, whole-image SHA1 green)
+
+> Renamed from `func_8004BE54` on 2026-09-24 (tools/rename.py). Address 0x8004be54.
 
 REVISITED, round 73: MATCHED 150/150 on the first changed build (split the twice-assigned `info` local); names/types not relevant (existing local views reused unchanged)
 
@@ -46,7 +48,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 
 ## Earlier history (superseded by the match above)
 
-#### Old title: func_8004BE54 -- STALL, close (142/150 words; round 40 permuter-found improvement, up from 132/150)
+#### Old title: Class866E8__LoadElementResources -- STALL, close (142/150 words; round 40 permuter-found improvement, up from 132/150)
 
 > **ROUND 47 (charlie): Gate 1b re-verified 142/150, no drift** (rebuild
 > via `make clean && make extract` then the standard `#if 0`->`#if 1`
@@ -59,7 +61,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > real-build residue description (a pure register-allocation choice, no
 > instruction-shape difference) exactly. This function is NOT one of the
 > five confirmed `class_3bb8c`/`Obj866E8` scaffold-mismatch cases
-> (`func_8004BB3C`, `func_8004C1C0`, `Class866E8__SplitFootprintSlot`, `Class866E8__BuildFootprintSlots`,
+> (`Class866E8__ApplyRateEntries`, `Class866E8__ComputeFootprintDescriptor`, `Class866E8__SplitFootprintSlot`, `Class866E8__BuildFootprintSlots`,
 > `IsPointOutOfBounds`); its 34,293-iteration search stands as a real,
 > validated negative, not a voided one.
 >
@@ -127,7 +129,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > computation) independently, and now a THIRD axis (removing the `hdr`
 > local altogether) this round -- all three inert or actively worse. Per
 > project rule 6, not to be forced with a register pin. Not attempted
-> further; time went to `func_8004C470`'s fresh permuter search instead
+> further; time went to `Class866E8__FindElementForPosition`'s fresh permuter search instead
 > (a one-word residue with a real prior signal is a better use of a
 > bounded permuter run than a fourth structural probe of an
 > already-triple-confirmed register-identity chain).
@@ -149,7 +151,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > **Search:** `timeout 900 ... -j 4 --stack-diffs --stop-on-zero
 > --best-only`, backgrounded. **34293 iterations. No `rc` captured** -- the
 > same "wrapping shell torn down before the trailing echo runs" trap as
-> this round's `func_8004B700` search (and round 17's `func_8004BB3C`
+> this round's `Class866E8__BuildRateEntries` search (and round 17's `Class866E8__ApplyRateEntries`
 > before it). No permuter workers remained in the process list once
 > checked, consistent with the 900s bound having fired; recorded as
 > uncaptured rather than inferred as `124`.
@@ -159,7 +161,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > 0. Two changes, both kept:
 > 1. The `gpu = (*slot)->unk14; gpu->unk0 = 0;` reload-then-store replaced
 >    with a direct `(*slot)->unk14->unk0 = 0;` -- the SAME lever that
->    closed part of `func_8004B700`'s residue this same round (see that
+>    closed part of `Class866E8__BuildRateEntries`'s residue this same round (see that
 >    report's proposed learning).
 > 2. The `found`-path tail's combined pointer-cast-and-dereference,
 >    `(*slot)->unk38 = *(EntryChildObj **)((u8 *)entry->unk10 + off2);`,
@@ -168,7 +170,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 >    *next;`.
 >
 > **Translated as found and re-verified through the full oracle:** isolated
-> single-function test (sibling `func_8004B700` restored to `INCLUDE_ASM`
+> single-function test (sibling `Class866E8__BuildRateEntries` restored to `INCLUDE_ASM`
 > while measuring) gives **142/150, no drift**. `asm-differ` confirms
 > EVERYTHING from `0x8004BEE0` through the epilogue now matches retail
 > byte-for-byte -- both fixes closed their targeted sites completely, with
@@ -181,7 +183,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > found the "redundant reload, re-derive inline instead" lever on a
 > residue this report's own five-round history had filed under plain
 > register identity without ever isolating this specific mechanism. See
-> `func_8004B700`'s report for the shared proposed learning. **Disposition:
+> `Class866E8__BuildRateEntries`'s report for the shared proposed learning. **Disposition:
 > 142/150, exact length, `INCLUDE_ASM` restored, preserved body updated in
 > `src/class_3bb8c.c`.**
 
@@ -192,7 +194,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > lever ("hoist both values before either is consumed") does not describe
 > either `|=` site directly -- each is a single field reload OR'd with one
 > already-live constant (`flagBit`), not two independently-loaded values --
-> but `func_8004C470`'s companion finding (a residue that survives operand-
+> but `Class866E8__FindElementForPosition`'s companion finding (a residue that survives operand-
 > order-alone and hoist-alone independently has not been shown to survive
 > their COMBINATION) does apply, since this report already confirmed
 > operand-order-alone is inert here (round 27/32) and never tried a hoist.
@@ -245,7 +247,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > drift, identical residue (register identity for `info` plus the two
 > already-twice-confirmed commutative `or`/`addu` operand-order instances).
 > Not re-attempted -- both classes are proven inert by direct testing
-> already recorded in this report. Time went to `func_8004C470` (matched)
+> already recorded in this report. Time went to `Class866E8__FindElementForPosition` (matched)
 > instead.
 
 > **ROUND 27 (delta): re-verified, no new attempt.** Rebuilt the exact
@@ -255,7 +257,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > (register identity for `info`/a handful of others -- banned to fix per
 > project rule 6; the `or`/`addu` commutative-canonicalization class --
 > confirmed inert TWICE, including once in this very function), so no new
-> structural variant was attempted this round; time went to `func_8004B5BC`
+> structural variant was attempted this round; time went to `Class866E8__UpdateFootprintTracking`
 > (matched) and the two other stalls' re-verification instead, per this
 > round's staffing guidance.
 
@@ -265,7 +267,7 @@ function's own signature exactly -- confirmed via the vtable data at
 `0x800867EC` in `asm/data/76DC8.data.s`, `0x104` past the table base
 `0x800866E8`). Not toolchain-blocked: no `gp_rel` hit, no
 `addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` dispatch in
-`asm/nonmatchings/class_3bb8c/func_8004BE54.s`.
+`asm/nonmatchings/class_3bb8c/Class866E8__LoadElementResources.s`.
 
 **This is the first C ever attempted against this function.** The previous
 round's report (structural analysis only) is superseded by this one -- every
@@ -276,7 +278,7 @@ round, not just read off the disassembly.
 
 `self` (`$a0`) is never dereferenced -- confirmed again this round, matches
 the previous report's finding. `entry` (`$a1`) is an `Elem*` (matches the
-one real call site, `func_8004BD14`'s `self->methods->slot104(self, e)`).
+one real call site, `Class866E8__OnNotifyTag1`'s `self->methods->slot104(self, e)`).
 
 1. `hdr = entry->unk4` (already-established `ElemTarget*`). `target =
    entry->unk8` -- **new field**, a per-frame GPU link/load coordinator
@@ -304,7 +306,7 @@ one real call site, `func_8004BD14`'s `self->methods->slot104(self, e)`).
      see residue below); `GsLinkObject4(tmd, (u8*)ent + 0x10, 0)` -- `ent`
      has an embedded `GsDOBJ2` at its own `+0x010` (its existing
      `unk10`/bitflags field IS `GsDOBJ2::attribute`, already established
-     by `func_8004C0AC`); fill `ent->unk14` (**new field**, a
+     by `Class866E8__ResetElementCells`); fill `ent->unk14` (**new field**, a
      `GsCOORDINATE2`-shaped `EntryGpu*`) from the loop's outBuf, then its
      own `unk44` sub-object (**new type** `EntryGpuVec`, three halfwords),
      then `ent->unk36` (**new field**, a halfword written DIRECTLY on
@@ -419,7 +421,7 @@ typedef struct BE54LoadReq {
 extern LinkResource *func_80043840(BE54LoadReq *req);
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
-void func_8004BE54(Obj866E8 *self, Elem *entry) {
+void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
     ResInfo866E8 *info;
     ElemTarget *hdr;
     LinkTarget866E8 *target;
@@ -545,8 +547,8 @@ fixes, worth recording since each is a small, generalizable lever:
    `idxVal` live. Routing both the `unk18` fill and `GsLinkObject4`'s `tmd`
    argument through `((LinkResEntry *)(*slot)->unk20)->unk10` instead of
    `((LinkResEntry *)idxVal)->unk10` recovered this. Same idiom as
-   `Unk14Obj::unk0` in `func_8004B700`'s report and `u14b` in
-   `func_8004C1C0`'s -- a THIRD independent confirmation this round.
+   `Unk14Obj::unk0` in `Class866E8__BuildRateEntries`'s report and `u14b` in
+   `Class866E8__ComputeFootprintDescriptor`'s -- a THIRD independent confirmation this round.
 4. **A cached pointer needs to be RE-cached (not reused) at each natural
    "batch" boundary, and the boundary is where retail's own delay-slot
    nop pattern changes.** The `gpu = ent->unk14` value is used for three
@@ -599,7 +601,7 @@ reload, one `vec` reload) show the same single-register swap with
 otherwise byte-identical surrounding instructions. Tried and confirmed
 inert: swapping the LOCAL DECLARATION ORDER of `info` relative to
 `hdr`/`target` (moved `info` to declare first) -- zero change in the
-compiled output, consistent with `func_8004BB3C`'s round-13 finding that
+compiled output, consistent with `Class866E8__ApplyRateEntries`'s round-13 finding that
 declaration order does not drive `$s`-register assignment in this
 codebase's GCC 2.6.3 build. Per CLAUDE.md/MATCHING-GUIDE, this is the
 textbook register-identity stall: **not** pursued with `register T v
@@ -613,12 +615,12 @@ third instance, the `found`-path tail's `entry->unk10 + off2`, compiling to
 `addu v0,s1,v0` in retail vs `addu v0,v0,s1` here. Operand-order-alone was
 **tried and confirmed inert** for all three (rounds 27/32): rewriting a `|=`
 explicitly as `flagBit | (*slot)->unk10` produced the IDENTICAL `or
-v0,s6,v0` -- zero change, matching this round's `func_8004C470` finding that
+v0,s6,v0` -- zero change, matching this round's `Class866E8__FindElementForPosition` finding that
 a commutative op's compiled register operand order is independent of source
 text order ALONE.
 
 **Round 39 closed BOTH `or` instances by combining that operand-order
-observation with a hoist**, per `func_8004C470`'s own generalisation (a
+observation with a hoist**, per `Class866E8__FindElementForPosition`'s own generalisation (a
 residue immune to each lever separately has not been shown immune to their
 combination): `s32 t = (*slot)->unk10; (*slot)->unk10 = t | flagBit;` at
 each site, turning the compound assignment's implicit re-dereference into an
@@ -707,8 +709,8 @@ because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
-are honest** — `func_8004C470` 68/70, `func_8004B44C` 58/73,
-`func_8004B700` 125/140, `func_8004BE54` 130/150. No stale figure and no
+are honest** — `Class866E8__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
+`Class866E8__BuildRateEntries` 125/140, `Class866E8__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a
@@ -721,7 +723,7 @@ unchanged.
 **This section's verdict is WRONG and the entry above is correct.** While
 runner bravo was between turns, the head read its saved permuter candidate,
 noticed it carried the same dead-reload construct that had just gained 12
-words on the sibling `func_8004B700`, tried to apply it, and **failed to build**
+words on the sibling `Class866E8__BuildRateEntries`, tried to apply it, and **failed to build**
 -- ``LinkResource' undeclared``. The head recorded the lever here as
 **UNTESTED** and flagged it as the next round's cheapest step. Bravo then
 resumed and tested it properly, reaching **142/150**.
@@ -749,7 +751,7 @@ which is what bravo did.
 
 ---
 
-## (superseded) ROUND 40 (bravo's search, head's analysis): first-ever permuter search, no zero -- but the saved candidate carries THE SAME LEVER that gained 12 words on func_8004B700, and it is UNTESTED here
+## (superseded) ROUND 40 (bravo's search, head's analysis): first-ever permuter search, no zero -- but the saved candidate carries THE SAME LEVER that gained 12 words on Class866E8__BuildRateEntries, and it is UNTESTED here
 
 **Provenance.** Runner bravo built the scaffold and ran the search, then ended
 its session waiting on a notification that was never coming, without writing
@@ -774,7 +776,7 @@ next round ranks on cost rather than re-deriving it.
 
 Reduced to statements, the score-65 candidate makes two real changes among a
 great deal of the permuter's own reformatting noise. The first is the
-**identical construct** that took the sibling `func_8004B700` from 125/140 to
+**identical construct** that took the sibling `Class866E8__BuildRateEntries` from 125/140 to
 **137/140** this same round -- eliminating a redundant reload of a pointer
 already held in a local:
 
@@ -817,3 +819,11 @@ typedefs), build, and measure. Try the reload elimination ALONE first -- on
 the sibling that single change carried the entire 12-word gain, and a combined
 result says nothing until each component is measured alone (round 39's
 head-side trap on `Unk18Obj__InitOt`).
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004BE54` | `Class866E8__LoadElementResources` | B | Occupant of `D_800866E8` +0x104 (`slot104`), and its own identity slot -- `Class866E8__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `func_80043840` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/class_3ac78.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |

@@ -1,4 +1,6 @@
-# func_8004B700 -- MATCH (140/140 words, ins 0 / del 0, exact length)
+# Class866E8__BuildRateEntries -- MATCH (140/140 words, ins 0 / del 0, exact length)
+
+> Renamed from `func_8004B700` on 2026-09-24 (tools/rename.py). Address 0x8004b700.
 
 REVISITED, round 63: MATCHED 140/140, whole-image SHA1 green; names/types not
 relevant (no header, symbol or type change -- the fix removed a local).
@@ -15,12 +17,12 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > Rebuilt the preserved `#if 0` body verbatim:
 >
 > ```
-> func_8004B700: 137/140 words match (file 0x3BF00-0x3C130)
-> func_8004B700: insertions 0 / deletions 0
+> Class866E8__BuildRateEntries: 137/140 words match (file 0x3BF00-0x3C130)
+> Class866E8__BuildRateEntries: insertions 0 / deletions 0
 > ```
 >
 > Exact length, no drift, and `asm-differ` shows zero `<`/`>` markers with
-> three `r` rows -- so like `func_8004BA40` and unlike `func_8004C1C0` this
+> three `r` rows -- so like `Class866E8__ComputeRateEntry` and unlike `Class866E8__ComputeFootprintDescriptor` this
 > round, **the inherited "pure register identity" verdict is CONFIRMED.**
 > Residue, all three words in the second loop:
 >
@@ -89,7 +91,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > The body carried a bare `__asm__("")` before `u14 = e->unkC->unk14;` in the
 > first loop. With `e` merged it is no longer needed: removed, and the
 > whole-image rebuild stays green. It was a crutch for the two-variable shape.
-> (Contrast `func_8004BA40`'s `do {} while (0);` this same round, which was
+> (Contrast `Class866E8__ComputeRateEntry`'s `do {} while (0);` this same round, which was
 > tested the same way and IS still load-bearing -- test, do not assume,
 > in either direction.)
 >
@@ -104,7 +106,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > is a register-colour difference on a loop's walking pointer and another loop
 > in the same function walks something similar, try reusing that loop's
 > variable before trying anything else. Measured twice this round on the same
-> axis (`func_8004BA40`: four locals to two; `func_8004B700`: `e2` deleted),
+> axis (`Class866E8__ComputeRateEntry`: four locals to two; `Class866E8__BuildRateEntries`: `e2` deleted),
 > and bravo's `_SsInit` is a third instance from the other direction.
 >
 > **And the operational form of it: "the permuter found nothing" bounds the
@@ -178,7 +180,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > structural axes this round on top of round 39's three (statement order,
 > commutative operand order, declaration order) and round 27's
 > callee-saved-register check. Per project rule 6, not to be forced with a
-> register pin. Not attempted further; time went to `func_8004C470`'s
+> register pin. Not attempted further; time went to `Class866E8__FindElementForPosition`'s
 > fresh permuter search instead, per this round's own closer-target
 > priority -- a one-word residue with a real prior signal (score 10 from
 > base 20, never 0) is a better use of a bounded permuter run than a third
@@ -203,7 +205,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > --best-only`, backgrounded. **37155 iterations. No `rc` was captured** --
 > the trailing `echo "permuter rc=$?"` never reached the log, the same
 > "wrapping shell torn down before the echo runs" trap round 17 documented
-> for `func_8004BB3C`'s own permuter invocation. The process list showed no
+> for `Class866E8__ApplyRateEntries`'s own permuter invocation. The process list showed no
 > surviving permuter workers when checked after the 900s bound should have
 > elapsed, consistent with the `timeout` bound firing rather than an
 > external kill, but this is inferred from absence, not read off an exit
@@ -218,7 +220,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > pointer chain inline instead of caching it in `u14` a second time.
 >
 > **Translated as found and re-verified through the full oracle:** isolated
-> single-function test (the sibling `func_8004BE54` restored to
+> single-function test (the sibling `Class866E8__LoadElementResources` restored to
 > `INCLUDE_ASM` while measuring) gives **137/140, no drift** --
 > `funcdiff.py` reports no "differs outside range" warning, confirming the
 > compiled length is still exactly retail's. `asm-differ` confirms every
@@ -246,7 +248,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 **The same source-level lever (drop a redundant reload-into-named-local,
 re-derive the pointer chain inline at the point of use) closed real residue
 on TWO different functions in the same unit this round**
-(`func_8004B700` here, `func_8004BE54` below) -- both permuter-found, both
+(`Class866E8__BuildRateEntries` here, `Class866E8__LoadElementResources` below) -- both permuter-found, both
 translating directly to idiomatic C with no cleanup needed. Worth adding to
 the standard lever list: when a value is loaded into a local, used once
 immediately, then the SAME expression is re-evaluated a second time into
@@ -266,7 +268,7 @@ its use site instead of caching it.
 > barrier between them, from round 13's own fix.** The lever is already
 > in place and the residue survives it, so this is a case where the lever
 > APPLIES (retail's shape matches the diagnostic) but is not SUFFICIENT on
-> its own -- consistent with `func_8004C470` needing a second axis
+> its own -- consistent with `Class866E8__FindElementForPosition` needing a second axis
 > combined with its hoist.
 >
 > Three combinatorial variants tried, targeting what that second axis
@@ -297,8 +299,8 @@ its use site instead of caching it.
 > drift, identical residue (`tbl`/`u14`/second-loop-row-pointer register
 > swaps only, no instruction shape differences). Given three prior rounds'
 > confirmation including a callee-saved-register-order check, no new
-> variant was attempted this round; time went to `func_8004C470` (matched)
-> and a permuter run on `func_8004BA40` instead.
+> variant was attempted this round; time went to `Class866E8__FindElementForPosition` (matched)
+> and a permuter run on `Class866E8__ComputeRateEntry` instead.
 
 > **ROUND 27 (delta): callee-saved-register check per the head's broadcast
 > (a parameter that must survive a call sometimes gets promoted to a
@@ -311,7 +313,7 @@ its use site instead of caching it.
 > `s3,s5,s2,s1,ra,fp(s8),s7,s6,s4,s0` at offsets `0x8C,0x94,0x88,0x84,0xA4,
 > 0xA0,0x9C,0x98,0x90,0x80` off a `-0xA8` frame -- **the IDENTICAL set, at
 > the IDENTICAL offsets, in the IDENTICAL order**, to retail's own prologue
-> (`asm/nonmatchings/class_3bb8c/func_8004B700.s`, lines 1-16). Same total
+> (`asm/nonmatchings/class_3bb8c/Class866E8__BuildRateEntries.s`, lines 1-16). Same total
 > frame size too (`0xA8` both). **The lever does NOT apply: retail does not
 > save fewer callee-saved registers than this body does, so the
 > register-identity verdict for this function is CONFIRMED, not merely
@@ -324,61 +326,61 @@ its use site instead of caching it.
 > `u14`, the second loop's row pointer -- three separate registers, no
 > instruction shape differences anywhere), the same class independently
 > re-confirmed as unfixable-by-reshaping on three OTHER functions in this
-> unit this round (`func_8004C470`, `func_8004B44C`, `func_8004BE54`'s
-> `info` residue). Time this round went to `func_8004BE54` instead, per
+> unit this round (`Class866E8__FindElementForPosition`, `ComputeCellWorldOffsets`, `Class866E8__LoadElementResources`'s
+> `info` residue). Time this round went to `Class866E8__LoadElementResources` instead, per
 > the staffing guidance to move to differently-shaped ground once a
 > register-identity wall is this well established.
 
 Unit: `class_3bb8c`. Not toolchain-blocked: no `gp_rel` hit, no
 `addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` table dispatch in
-`asm/nonmatchings/class_3bb8c/func_8004B700.s`. Has a genuine `div`
+`asm/nonmatchings/class_3bb8c/Class866E8__BuildRateEntries.s`. Has a genuine `div`
 (integer divide by a non-constant, `self->unk68->divisor`) via the standard
 maspsx-expanded zero/overflow-check sequence -- matched cleanly from the
 first attempt, no issue there.
 
 ## What it does
 
-`void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3)`.
+`void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3)`.
 If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
 
 1. `divisor = self->unk68->divisor` (s16); `flag = (val / divisor) & 1`
    (the quotient's low bit).
-2. `savedResult = func_8004B930(self, val, flag)` (already-matched sibling,
+2. `savedResult = Class866E8__ComputeRateFlags(self, val, flag)` (already-matched sibling,
    spilled to the stack and reused later).
 3. Loop `i = 0..6`: resolve `e = self->methods->slot118(self, i)`, copy
    `arg3[i].key` into `Elem::unk2` (new field). If `arg3[i].flag != 0`:
-   look up `tbl = &D_80086838[arg3[i].key]` (new 0xC-stride `Unk54Struct`
+   look up `tbl = &sRateOffsetTable[arg3[i].key]` (new 0xC-stride `Unk54Struct`
    data table, reused type), fill `e->unkC->unk14`'s `unk18`/`unk1C`/
    `unk20` from `arg2` combined with either `tbl` (when
    `self->unk68->unk4 == 0`) or a flat `-0x5000` adjustment (otherwise),
    zero the SAME `Unk14Obj`'s new `unk0` field (a genuine reload, not dead
-   code), call the still-raw sibling `func_8004BA40` (7 args, 2 on the
+   code), call the still-raw sibling `Class866E8__ComputeRateEntry` (7 args, 2 on the
    stack) to fill one slot of a 7-entry `SetupEntry866E8` stack buffer,
    increment `count`.
 4. A SECOND loop, `i = 0..6` again unconditionally: copies
    `self->arr[i].unk2` into `self->arr[i].unk4->unk32` (field
-   `func_8004C1C0`/`func_8004C434` already established).
+   `Class866E8__ComputeFootprintDescriptor`/`Class866E8__FindElemByUnk32` already established).
 5. `self->methods->slotFC(self, stackBuf, count)` -- dispatches into
-   `func_8004BB3C` (this unit, also stalled this round).
+   `Class866E8__ApplyRateEntries` (this unit, also stalled this round).
 
 New header additions (all committed, additive; unchanged from the previous
 draft of this report): `Elem::unk2` (u16 @+0x002), `Unk14Obj::unk0` (s32
 @+0x000), `TargetSpec866E8` (new: `u8 key`@0, `u8 flag`@1, size 2),
-`extern Unk54Struct D_80086838[]` (reuses the existing 3-`s32`-word shape),
-`extern void func_8004BA40(...)` (7-arg prototype, established from this
+`extern Unk54Struct sRateOffsetTable[]` (reuses the existing 3-`s32`-word shape),
+`extern void Class866E8__ComputeRateEntry(...)` (7-arg prototype, established from this
 call site only), and `Obj866E8Methods::slotFC` fixed to its real signature
-(see `func_8004BB3C`'s report for the mixup that entry had).
+(see `Class866E8__ApplyRateEntries`'s report for the mixup that entry had).
 
 ## Progress this round: 52/140 -> 125/140, and the size-drift bug is FIXED
 
 An earlier pass on this function stalled at 52/140 with a `funcdiff`
 DRIFT WARNING, which turned out to matter: direct `.o` inspection
 (`mipsel-linux-gnu-objdump -d build/src/class_3bb8c.c.o`, function
-`func_8004B700`, subtracting its start address from the next function's
+`Class866E8__BuildRateEntries`, subtracting its start address from the next function's
 start) showed the compiled body was **138 words, 2 words (8 bytes) SHORT**
 of retail's 140 -- `funcdiff`'s own reported byte RANGE is not proof of
 correct length; it can look plausible while a function is short, and the
-tell was an absolute data-symbol reference (`D_80086838`) resolving 8
+tell was an absolute data-symbol reference (`sRateOffsetTable`) resolving 8
 bytes low in the FINAL LINKED image, because everything downstream of a
 short function shifts, including unrelated data in another file entirely.
 **Always cross-check a stalled function's true compiled length against
@@ -386,7 +388,7 @@ short function shifts, including unrelated data in another file entirely.
 
 Both missing instructions were closed this round:
 
-1. **One `nop` for a load-delay slot.** In `tbl = &D_80086838[arg3[i].key];
+1. **One `nop` for a load-delay slot.** In `tbl = &sRateOffsetTable[arg3[i].key];
    u14 = e->unkC->unk14;`, GCC 2.6.3 scheduled `u14`'s independent load
    RIGHT AFTER the tbl-address computation, incidentally filling the
    load-delay slot that would otherwise follow the very next `lbu`
@@ -414,7 +416,7 @@ Both missing instructions were closed this round:
    shorter, and wrong. Applying this project's documented "explicit
    intermediate element pointer" idiom --
    `Elem *e2 = &self->arr[i]; e2->unk4->unk32 = e2->unk2;` -- closed this
-   exactly. (Note this is the SAME idiom that, in `func_8004BB3C`'s stall
+   exactly. (Note this is the SAME idiom that, in `Class866E8__ApplyRateEntries`'s stall
    this round, conspicuously did NOT help an analogous-looking situation;
    see that report. The difference: here the loop genuinely walks ONE
    array via ONE index for BOTH field accesses, so nothing prevents GCC
@@ -450,7 +452,7 @@ longer needed once `e` is merged; verified by whole-image rebuild).
 ## HISTORICAL -- best body reached in round 40 (125/140, NO drift warning)
 
 ```c
-void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
+void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;
@@ -465,14 +467,14 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
     if (arg3 != 0) {
         divisor = self->unk68->divisor;
         flag = (val / divisor) & 1;
-        savedResult = func_8004B930(self, val, flag);
+        savedResult = Class866E8__ComputeRateFlags(self, val, flag);
 
         count = 0;
         for (i = 0; i < 7; i++) {
             e = self->methods->slot118(self, i);
             e->unk2 = arg3[i].key;
             if (arg3[i].flag != 0) {
-                tbl = &D_80086838[arg3[i].key];
+                tbl = &sRateOffsetTable[arg3[i].key];
                 __asm__("");
                 u14 = e->unkC->unk14;
                 if (self->unk68->unk4 == 0) {
@@ -486,7 +488,7 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
                 }
                 u14 = e->unkC->unk14;
                 u14->unk0 = 0;
-                func_8004BA40(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
+                Class866E8__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
                 count++;
             }
         }
@@ -576,8 +578,8 @@ because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
-are honest** — `func_8004C470` 68/70, `func_8004B44C` 58/73,
-`func_8004B700` 125/140, `func_8004BE54` 130/150. No stale figure and no
+are honest** — `Class866E8__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
+`Class866E8__BuildRateEntries` 125/140, `Class866E8__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a
@@ -596,7 +598,7 @@ entry above is the fuller record and is authoritative; this section is kept
 for the two things it adds: an independent reproduction of the headline
 figure, and two negative variants bravo did not try.
 
-The head's provisional note that the `func_8004BE54` sibling lever was
+The head's provisional note that the `Class866E8__LoadElementResources` sibling lever was
 "UNTESTED" was correct when written and is now superseded -- bravo tested it
 and reached 142/150. See that report.
 
@@ -667,7 +669,7 @@ to be worth reading.
 
 ```c
 #if 0
-void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
+void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;
@@ -682,14 +684,14 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
     if (arg3 != 0) {
         divisor = self->unk68->divisor;
         flag = (val / divisor) & 1;
-        savedResult = func_8004B930(self, val, flag);
+        savedResult = Class866E8__ComputeRateFlags(self, val, flag);
 
         count = 0;
         for (i = 0; i < 7; i++) {
             e = self->methods->slot118(self, i);
             e->unk2 = arg3[i].key;
             if (arg3[i].flag != 0) {
-                tbl = &D_80086838[arg3[i].key];
+                tbl = &sRateOffsetTable[arg3[i].key];
                 __asm__("");
                 u14 = e->unkC->unk14;
                 if (self->unk68->unk4 == 0) {
@@ -702,7 +704,7 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
                     u14->unk20.w = arg2->unk8 - 0x5000;
                 }
                 e->unkC->unk14->unk0 = 0;
-                func_8004BA40(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
+                Class866E8__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
                 count++;
             }
         }
@@ -717,3 +719,11 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
 }
 #endif
 ```
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B700` | `Class866E8__BuildRateEntries` | B | Occupant of `D_800866E8` +0x0F8 (`slotF8`, verified its own identity via classtable -- see the corrected slot comment in `include/class_3bb8c.h`). Iterates a `TargetSpec866E8[7]` (`sDefaultTargetSpecs` at its one known call site), calling `Class866E8__ComputeRateFlags` once and `Class866E8__ComputeRateEntry` per enabled entry to fill a 7-slot `SetupEntry866E8` stack buffer, then dispatches the filled count through `slotFC` (`Class866E8__ApplyRateEntries`). "Build...RateEntries" names the mechanic (assembling the entry array that the next slot applies), consistent with the sibling already-matched functions in this same vtable region (`Class866E8__ConfigureRateEntry`, `Class866E8__AdvanceRateCountdown`, `Class866E8__FlushRateLatch`). |

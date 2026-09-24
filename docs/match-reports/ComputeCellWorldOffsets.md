@@ -1,4 +1,6 @@
-# func_8004B44C
+# ComputeCellWorldOffsets
+
+> Renamed from `func_8004B44C` on 2026-09-24 (tools/rename.py). Address 0x8004b44c.
 
 **Unit:** class_3bb8c · **Size:** 73 words · **Status:** MATCH (73/73), round 40.
 
@@ -15,7 +17,7 @@ which topped out at 58/73.
 drift, identical residue to what this report already documented. The
 recorded figure was honest.
 
-**Scaffold:** `tools/setup-permuter.sh func_8004B44C <seed>` built cleanly;
+**Scaffold:** `tools/setup-permuter.sh ComputeCellWorldOffsets <seed>` built cleanly;
 `--debug --stack-diffs` reported base score 415 (7 register differences, 3
 reorderings, 1 insertion, 1 deletion) -- matching the report's own
 description of the residue (a deferred store past independent loads), so
@@ -41,10 +43,10 @@ whole store-scheduling residue this report spent 5 rounds on.
 **Translated as found -- the permuter's candidate already was idiomatic C**,
 no UB, no duplicate-arm artifact to clean up. Re-verified through the full
 oracle: `./build-and-verify.sh` -- `OK: build matches retail SLPS_015.56`;
-`funcdiff.py func_8004B44C` -- `73/73 words match`. Byte-exact.
+`funcdiff.py ComputeCellWorldOffsets` -- `73/73 words match`. Byte-exact.
 
 ```c
-s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
+s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
     s32 sum;
@@ -118,8 +120,8 @@ despite ~15 manual attempts) is exactly what caught it.
 > Confirms round 20's diagnosis stands: this is a genuine GCC 2.6.3
 > list-scheduler choice (batching independent loads ahead of a store),
 > not reachable through source-level reordering or reload-caching
-> placement. Not attempted further this round; time went to `func_8004C470`
-> (matched) and a permuter run on `func_8004BA40` instead.
+> placement. Not attempted further this round; time went to `Class866E8__FindElementForPosition`
+> (matched) and a permuter run on `Class866E8__ComputeRateEntry` instead.
 
 > **ROUND 20 (charlie): re-verified, residue mechanism pinned down more
 > precisely via direct `.o` disassembly (not just `funcdiff`'s summary).**
@@ -144,7 +146,7 @@ despite ~15 manual attempts) is exactly what caught it.
 >
 > This confirms the report's own diagnosis exactly (retail defers a STORE
 > past independent later LOADS; mine stores immediately), and additionally
-> shows this function shares the SAME idiom `func_8004BE54` closed this
+> shows this function shares the SAME idiom `Class866E8__LoadElementResources` closed this
 > round in one of its own three-field groups: **an independent load can
 > fill a delay slot a nearby dependent load would otherwise need a `nop`
 > for, and WHICH load fills it is a real, GCC 2.6.3 list-scheduling choice
@@ -152,7 +154,7 @@ despite ~15 manual attempts) is exactly what caught it.
 > variations already tried here, per the attempts log below, all converged
 > on 58/73 or worse). Not re-attempted further this round beyond this
 > confirmation -- the two functions differ in one relevant way
-> (`func_8004BE54`'s fix worked by giving the LATE-reloaded value its own
+> (`Class866E8__LoadElementResources`'s fix worked by giving the LATE-reloaded value its own
 > named local positioned to match retail's exact delay-slot filler;
 > attempt 5 below already tried the equivalent for THIS function's
 > `outBuf[0]` reload and regressed to 44/73, so the lever that worked
@@ -166,7 +168,7 @@ despite ~15 manual attempts) is exactly what caught it.
 
 ```c
 #if 0
-s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
+s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
     s32 sum;
@@ -282,8 +284,8 @@ because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
 four preserved bodies in `class_3bb8c` were rebuilt this round and all four
-are honest** — `func_8004C470` 68/70, `func_8004B44C` 58/73,
-`func_8004B700` 125/140, `func_8004BE54` 130/150. No stale figure and no
+are honest** — `Class866E8__FindElementForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
+`Class866E8__BuildRateEntries` 125/140, `Class866E8__LoadElementResources` 130/150. No stale figure and no
 never-linked body in this unit.
 
 No new lever was tried — alpha died before attempting one. This is a
@@ -336,7 +338,7 @@ evidence now covers every source-level way to phrase "read this value early"
 without changing net register pressure, and none of them move the needle.
 
 **Round 39 did not find a combinatorial lever here analogous to
-`func_8004C470`'s.** That function's fix combined a hoist with an operand-order
+`Class866E8__FindElementForPosition`'s.** That function's fix combined a hoist with an operand-order
 flip on a commutative op; this function's residue is a straight
 reload-register-and-position choice with no analogous second axis to combine
 against (there is no commutative operator here to flip -- `outBuf[0]`/`outBuf[2]`
@@ -351,3 +353,11 @@ gradient** -- here the space is binary (regress-if-too-early,
 inert-otherwise) rather than continuous, so one mid-point probe closes off
 the whole axis rather than narrowing it. Worth stating so the next runner
 does not re-try five more placements expecting a smooth transition.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B44C` | `ComputeCellWorldOffsets` | B | Free function (no `self` parameter, per the naming convention's `VerbNoun` form for non-methods). Round 40's permuter-found fix hoisted a literal `0x400` used identically in both symmetric output blocks; both blocks compute `(byteN << 11) + outBufN + (halfM + 0x400)`, and `0x800`/`0xA000`/`0x5000` (all powers of the grid's own `0x800` lattice unit and `gDefaultGridSpan`, per `src/class_3ac78.c`'s unit header) recur throughout -- consistent with converting a `Descriptor10` grid-cell descriptor plus a base `Unk54Struct` into world-space offsets. The `sum` return value's own meaning is NOT established (no caller-agreed name for it beyond "also returns a scalar derived from the same divisor arithmetic"), so the name covers only the `arg0[]`/`outBuf[]` side, which is the function's dominant, better-evidenced behaviour. |

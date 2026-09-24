@@ -212,7 +212,7 @@ block live after any checkout.
 > function needs a scaffold with more real surrounding-file context before
 > it can be trusted, which is head-scale work, not a bounded runner
 > attempt -- consistent with three other functions in this unit
-> (`Class866E8__SplitFootprintSlot`, `func_8004C1C0`, `func_8004BB3C`, `Class866E8__BuildFootprintSlots`)
+> (`Class866E8__SplitFootprintSlot`, `Class866E8__ComputeFootprintDescriptor`, `Class866E8__ApplyRateEntries`, `Class866E8__BuildFootprintSlots`)
 > reaching the identical verdict this round and last.
 >
 > ### Proposed learning

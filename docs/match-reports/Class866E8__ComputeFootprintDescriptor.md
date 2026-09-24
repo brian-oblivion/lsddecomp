@@ -1,4 +1,6 @@
-# func_8004C1C0 -- MATCH (106/106 words, ins 0 / del 0, exact length)
+# Class866E8__ComputeFootprintDescriptor -- MATCH (106/106 words, ins 0 / del 0, exact length)
+
+> Renamed from `func_8004C1C0` on 2026-09-24 (tools/rename.py). Address 0x8004c1c0.
 
 REVISITED, round 63: MATCHED 106/106, whole-image SHA1 green; names/types used
 (the existing `Descriptor10Ext` / `QueryPos866E8` / `Unk14Obj` declarations
@@ -19,8 +21,8 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > Rebuilt the preserved `#if 0` body verbatim:
 >
 > ```
-> func_8004C1C0: 72/106 words match (file 0x3C9C0-0x3CB68)
-> func_8004C1C0: insertions 12 / deletions 12
+> Class866E8__ComputeFootprintDescriptor: 72/106 words match (file 0x3C9C0-0x3CB68)
+> Class866E8__ComputeFootprintDescriptor: insertions 12 / deletions 12
 > ```
 >
 > 72/106 reproduces exactly and there is no drift, so the recorded title's
@@ -145,10 +147,10 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > (round 32's own scaffold: 9 insertions/9 deletions isolated vs 0/0 in
 > context; round 40 rebuilt an independent scaffold from scratch and got
 > the SAME 9/9 mismatch). No search has ever been trusted here either --
-> both rounds correctly declined to search. As with `func_8004BB3C`, there
+> both rounds correctly declined to search. As with `Class866E8__ApplyRateEntries`, there
 > is no inherited "permuter tried, negative" to revert to UNKNOWN, because
 > none was ever recorded as trustworthy in the first place. Family count
-> now stands at 5 confirmed mismatches (`func_8004BB3C`, `func_8004C1C0`,
+> now stands at 5 confirmed mismatches (`Class866E8__ApplyRateEntries`, `Class866E8__ComputeFootprintDescriptor`,
 > `Class866E8__SplitFootprintSlot`, `Class866E8__BuildFootprintSlots`, `IsPointOutOfBounds`).
 >
 > Checked the 12th lever (hoist a field pair used on every path into
@@ -170,7 +172,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 >
 > **Checked this body specifically for the "already-held value reloaded a
 > second time into the same local" shape** (the lever that closed real
-> residue on `func_8004B700`/`func_8004BE54` last round). `u14a` and `u14b`
+> residue on `Class866E8__BuildRateEntries`/`Class866E8__LoadElementResources` last round). `u14a` and `u14b`
 > both come from `e->unkC->unk14`-shaped expressions, but they are
 > DIFFERENT VALUES: `u14a = self->methods->slot118(self, e->unk4->unk32)
 > ->unkC->unk14` (a *different* `Elem`, resolved via a key lookup) and
@@ -184,7 +186,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > documents (register identity for `u14b`, and a GCC 2.6.3 store/reread
 > sign-extension quirk, both isolated with reproducers across 5 prior
 > rounds). Not attempted further this round; time went to the closer
-> targets (`func_8004C470`, permuter search) instead, per this round's
+> targets (`Class866E8__FindElementForPosition`, permuter search) instead, per this round's
 > staffing priority.
 
 > **ROUND 40 (bravo): Gate 1b re-verified 72/106, no drift; fresh permuter
@@ -195,7 +197,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > class).
 >
 > Built a brand-new scaffold from scratch (`tools/setup-permuter.sh
-> func_8004C1C0 <seed>`, seed = this report's own 72/106 body verbatim) and
+> Class866E8__ComputeFootprintDescriptor <seed>`, seed = this report's own 72/106 body verbatim) and
 > ran `--debug --stack-diffs` before searching: **base score 2040, with 9
 > insertions and 9 deletions** -- matching round 32's exact finding (9/9)
 > on an independently-built scaffold, four rounds later. The real
@@ -208,10 +210,10 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > **No search was run** -- per the project's own rule, a result against a
 > scaffold provably scoring a different residue would not transfer, and
 > this scaffold's mismatch (9 vs 0 insertions/deletions) is even larger
-> than `func_8004BB3C`'s sibling case this same round. Not attempted
+> than `Class866E8__ApplyRateEntries`'s sibling case this same round. Not attempted
 > further this round; time went to the three never-searched functions in
 > this unit instead. **Both of this unit's "searched" functions
-> (`func_8004BB3C`, `func_8004C1C0`) turn out to have scaffolds that do not
+> (`Class866E8__ApplyRateEntries`, `Class866E8__ComputeFootprintDescriptor`) turn out to have scaffolds that do not
 > reproduce their real residue** -- worth flagging as a proposed learning:
 > a function whose match report says "permuter searched" should also say
 > whether the scaffold's `--debug` score was ever validated against the
@@ -228,7 +230,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > loaded again at `0x8004C280`) are **34 bytes apart with `u14a`'s entire
 > consumption (`out->unkC`/`unk10`/`unk14`, three stores) in between** --
 > retail loads `u14b` LAZILY, right at its own first use, not adjacently to
-> `u14a`. This is the mirror case of `func_8004C470`'s finding: the
+> `u14a`. This is the mirror case of `Class866E8__FindElementForPosition`'s finding: the
 > diagnostic ("are the two loads adjacent, with consumers later?") answers
 > NO here, so the lever's own precondition is unmet and no hoist-based
 > restructuring of `u14a`/`u14b` was attempted this round. The two residue
@@ -236,7 +238,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > store-then-reread narrow-field codegen sensitivity) are unchanged from 16
 > prior attempts across 5 rounds; not re-attempted further -- time went to
 > the two higher-pre-screen-count functions instead
-> (`func_8004B700`/`func_8004BE54`).
+> (`Class866E8__BuildRateEntries`/`Class866E8__LoadElementResources`).
 
 > **ROUND 32 (bravo2): re-verified, no drift; permuter scaffold checked and
 > found UNRELIABLE for this function.** Rebuilt the preserved body: 72/106
@@ -247,11 +249,11 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > insertions and 9 deletions** -- the real in-context build has ZERO of
 > either (72/106 is purely register-identity + one reread choice, no
 > missing/extra instructions). This is the identical scaffold-context-
-> mismatch trap documented for `func_8004BB3C` in round 17 (an isolated
+> mismatch trap documented for `Class866E8__ApplyRateEntries` in round 17 (an isolated
 > compile schedules a computation differently than the real surrounding
 > file does). Not searched -- a result against a scaffold provably scoring
 > a different residue would not transfer. Scaffold deleted. Not attempted
-> further this round; time went to `func_8004C470` (matched) instead.
+> further this round; time went to `Class866E8__FindElementForPosition` (matched) instead.
 
 > **ROUND 27 (delta): re-verified, one new attempt on class 2, negative.**
 > Rebuilt the exact preserved body from a clean `INCLUDE_ASM` baseline:
@@ -271,7 +273,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > immediately; not attempted further. This reinforces the existing
 > report's own conclusion (item 5 below, the isolated repro not
 > transferring to the real function) rather than adding a new lead. Time
-> this round went to `func_8004B5BC` (matched) instead.
+> this round went to `Class866E8__UpdateFootprintTracking` (matched) instead.
 
 > **ROUND 20 (charlie): re-verified, no new attempt.** Rebuilt the exact
 > preserved body below from a clean `INCLUDE_ASM` baseline: 72/106, no
@@ -279,10 +281,10 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > further -- both residue classes below (`$a1`/`$a3` register identity for
 > `u14b`, and the store-then-reread narrow-field codegen sensitivity) match
 > patterns independently re-confirmed elsewhere in this unit this round
-> (see `func_8004BE54`'s report for a THIRD confirmation of the
+> (see `Class866E8__LoadElementResources`'s report for a THIRD confirmation of the
 > "reread-from-memory rather than keep-the-register-live" idiom this
 > report's class-2 residue is an instance of). Time this round went to
-> `func_8004BE54` (fresh ground) instead, per the staffing guidance.
+> `Class866E8__LoadElementResources` (fresh ground) instead, per the staffing guidance.
 
 > **ROUND 19 (bravo): drift claim RE-VERIFIED per the head's mid-round
 > broadcast** (two other reports' "clean/drift-free" claims turned out
@@ -290,7 +292,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > `INCLUDE_ASM` baseline: `funcdiff.py` reports 72/106 with NO "differs
 > outside range" warning, and `objdump -t` confirms compiled length
 > `0x1A8` (106 words) -- IDENTICAL to retail's own `.s` header
-> (`nonmatching func_8004C1C0, 0x1A8`). **Claim confirmed accurate.**
+> (`nonmatching Class866E8__ComputeFootprintDescriptor, 0x1A8`). **Claim confirmed accurate.**
 >
 > Also checked against this round's other broadcast (aggregate/whole-struct
 > assignment closing 5 sibling functions elsewhere): **the shape does not
@@ -314,15 +316,15 @@ were correct and unchanged -- the stall was purely source SHAPE).
 
 Unit: `class_3bb8c`. Slot `Obj866E8Methods::slot110` (verified against
 `tools/classtable.py 0x800866E8`). Not toolchain-blocked: no `gp_rel` hit, no
-`addiu $at,$at,%lo` hit in `asm/nonmatchings/class_3bb8c/func_8004C1C0.s`.
+`addiu $at,$at,%lo` hit in `asm/nonmatchings/class_3bb8c/Class866E8__ComputeFootprintDescriptor.s`.
 
 ## What it does
 
 Resolves a query (`in`, a `QueryPos866E8*`) via `self->methods->slot11C`
-(still `INCLUDE_ASM`, `func_8004C470`). On a miss, returns `1`. On a hit
+(still `INCLUDE_ASM`, `Class866E8__FindElementForPosition`). On a miss, returns `1`. On a hit
 (`e`), fills `out` (`Descriptor10Ext*`):
 
-- `out->base.b0`/`b1` via `func_8004C368(self, out, e->unk4->unk30)` (mod/div
+- `out->base.b0`/`b1` via `Class866E8__ComputeDivisorSplit(self, out, e->unk4->unk30)` (mod/div
   by `self->unk68->divisor`), and `out->unk28` = the same raw rate.
 - `out->unkC/unk10/unk14` from `self->methods->slot118(self, e->unk4->unk32)
   ->unkC->unk14` (a *different* `Elem`'s `Unk14Obj`, called `u14a` below):
@@ -352,7 +354,7 @@ computed value), the `0x400` sits inside the subtracted group, and
 `out->unk24 = e;` is the last statement. Matching body:
 
 ```c
-s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
+s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     Elem *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
@@ -365,7 +367,7 @@ s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     if (e != 0) {
         rate = e->unk4->unk30;
         out->unk28 = rate;
-        func_8004C368(self, (u8 *)out, rate);
+        Class866E8__ComputeDivisorSplit(self, (u8 *)out, rate);
 
         u14a = self->methods->slot118(self, e->unk4->unk32)->unkC->unk14;
         out->unkC = u14a->unk18.w + 0x5000;
@@ -405,7 +407,7 @@ s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
 ## HISTORICAL -- best body reached before round 63 (72/106 words)
 
 ```c
-s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
+s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     Elem *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
@@ -418,7 +420,7 @@ s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     if (e != 0) {
         rate = e->unk4->unk30;
         out->unk28 = rate;
-        func_8004C368(self, (u8 *)out, rate);
+        Class866E8__ComputeDivisorSplit(self, (u8 *)out, rate);
 
         u14a = self->methods->slot118(self, e->unk4->unk32)->unkC->unk14;
         out->unkC = u14a->unk18.w + 0x5000;
@@ -567,3 +569,11 @@ spending attempts reshaping the surrounding statements one at a time --
 it likely needs either the permuter or a specific understanding of what
 retail's original source held live at that point that this derivation didn't
 reconstruct.
+
+## Naming
+
+Round 78 (track 3, naming pass, bravo).
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004C1C0` | `Class866E8__ComputeFootprintDescriptor` | B | Occupant of `D_800866E8` +0x110 (`slot110`). `class_3ac78`'s own `Class866E8__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `Class866E8__SetFootprintFromCell`/`Class866E8__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `QueryPos866E8` world position via `Class866E8__FindElementForPosition` and an `Unk14Obj` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |

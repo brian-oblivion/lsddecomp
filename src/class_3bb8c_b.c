@@ -318,7 +318,7 @@ s32 Class866E8__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3)
     Unk54Struct *slot;
 
     slot = (Unk54Struct *) ((u8 *) self + 0x8C + key * sizeof(Unk54Struct));
-    *slot = D_80086990;
+    *slot = gDefaultElemRateOffset;
     slot->unk0 = self->methods->slot124(self, arg3);
     return key + 1;
 }

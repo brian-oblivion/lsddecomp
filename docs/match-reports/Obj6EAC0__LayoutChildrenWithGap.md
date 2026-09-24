@@ -169,7 +169,7 @@ register numbering diverges from word 3 onward.
 **Did not try:** isolating and fixing the +2-word length gap BEFORE
 touching register order. Per
 `docs/DECOMPILATION_LEARNINGS.md`'s "one instruction short... shifts
-everything after it" family (and its `func_8004BB3C` example, where a
+everything after it" family (and its `Class866E8__ApplyRateEntries` example, where a
 low score was misread as a distant shape when it was one missing
 `addiu`), a 70-vs-72-word gap is small enough that it may be ONE OR TWO
 missing/duplicated instructions rather than a wholesale wrong shape --

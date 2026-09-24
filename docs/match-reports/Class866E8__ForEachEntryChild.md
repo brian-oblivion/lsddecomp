@@ -36,7 +36,7 @@ has, instead of folding the loop variable into the loaded register.
 ## Why this stalled, and it is the head's fault not the runner's
 
 This exact lever was **derived last round** by runner charlie on
-`func_8004C0AC`, in this same class block, and written up in that function's
+`Class866E8__ResetElementCells`, in this same class block, and written up in that function's
 `### Proposed learning` — "try mentioning the SAME source expression TWICE, in
 the order [dependent-quantity-first, loop-variable-second]". **The head did
 not promote it into `DECOMPILATION_LEARNINGS.md` during round-8

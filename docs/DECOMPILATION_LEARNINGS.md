@@ -363,7 +363,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   asm-differ points where a fresh one was worth 500; ADDING a hoisted base pointer moved
   `SpuVmAlloc`. The delete direction needs a CALL-crossing live range, so it does not apply to
   leaves. A permuter never merges or deletes locals, so local count is a PARAMETER of its search
-  space: `func_8004BA40` (four locals into two) and `func_8004B700` (one deleted) closed after ~330k
+  space: `Class866E8__ComputeRateEntry` (four locals into two) and `Class866E8__BuildRateEntries` (one deleted) closed after ~330k
   iterations missed both. (a round 65; round 63)
 
 - **A register swap that REPEATS at every expansion of a `do { } while (0)` macro closes as a
@@ -391,7 +391,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **Split a variable REUSED for two unrelated values** — the inverse of the delete-a-local lever.
   Discriminator: an equal-length rotation among saved registers, one local assigned in two
   independent halves. Closed `Class86F88__LoadResources` (three-way rotation, 75/95) on the
-  first build and `func_8004BE54` 142/150. (PROGRESS round 73)
+  first build and `Class866E8__LoadElementResources` 142/150. (PROGRESS round 73)
 - **An address whose BASE is `$a0` while the object lives in `$s0` means a second C variable
   aliasing `this`.** Scheduling and delay-slot filling move instructions but never change which
   register an address uses. Closed `DreamSys__StepLookYaw` (1 short). (PROGRESS round 73)
@@ -406,10 +406,10 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   whatever the source order; a NAMED local keeps its source position** (`cc1 -dr`). So flipping
   textual order is inert, and a field load FIRST in retail means the source had it in a local;
   assign it inside the expression (`a < (w = r->f) + tol`) to keep load order. Closed
-  `func_8004C470` 69/70 after ~183k permuter iterations. (PROGRESS round 73)
+  `Class866E8__FindElementForPosition` 69/70 after ~183k permuter iterations. (PROGRESS round 73)
 - **A `+4` walker set up from an ARGUMENT register after a loop's count check is GCC's loop
   optimiser, not a C pointer**: advance the parameter itself and take `&p->field` inside the body; a
-  C-initialised second pointer always lands before the check. Closed `func_8004BB3C`. (round 73)
+  C-initialised second pointer always lands before the check. Closed `Class866E8__ApplyRateEntries`. (round 73)
 
 ### 3e. Frames and stack
 

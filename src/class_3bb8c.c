@@ -1,6 +1,28 @@
 /* First slice of the 365-function class_3bb8c block -- 20 functions,
- * 0x3BB8C..0x3CD88. The remainder is `class_3bb8c_b` and is still a
- * monolithic asm segment.
+ * 0x3BB8C..0x3CD88, all matched C, occupants of `D_800866E8` +0x0E4..+0x11C
+ * (`tools/classtable.py 0x800866E8`). The remainder is `class_3bb8c_b` and
+ * is still a monolithic asm segment.
+ *
+ * This slice is Class866E8's FOOTPRINT/RATE engine: the position-to-grid-cell
+ * math and the per-element resource/GPU work that `class_3ac78`'s own unit
+ * header (src/class_3ac78.c) describes as living in "class_3bb8c*" --
+ * Class866E8__ComputeFootprintDescriptor converts a world position
+ * (QueryPos866E8) into a grid-cell descriptor (Descriptor10, byte row/column
+ * plus sub-cell halfword offsets); Class866E8__UpdateFootprintTracking runs
+ * every enabled tick (paired with class_3ac78's Class866E8__AdvanceRateCountdown)
+ * to refresh that descriptor and notify on change; Class866E8__BuildRateEntries
+ * / Class866E8__ComputeRateFlags / Class866E8__ComputeRateEntry /
+ * Class866E8__ApplyRateEntries build and apply a per-element rate table from
+ * a TargetSpec866E8 key/flag array (sDefaultTargetSpecs); and
+ * Class866E8__LoadElementResources / Class866E8__ResetElementCells own an
+ * element's resource-load and GPU-link cell array (the same 0x668-byte grid
+ * class_3ac78 calls out) and its teardown. Class866E8__Enable/Disable set
+ * the `enabled` flag class_3ac78 gates all of this on (cross-confirmed
+ * there independently, see docs/match-reports/Class866E8__Enable.md).
+ *
+ * Every function here keeps its own local struct view (`Obj866E8` etc.),
+ * distinct from class_3ac78's `Class866E8` -- see this unit's own header
+ * comment in include/class_3bb8c.h for why.
  *
  * Carve notes for whoever takes the NEXT slice: this block holds all 13 of
  * the game's PSX BIOS trampolines (`jr $t2` with the vector in $t2 and the
@@ -14,20 +36,20 @@
 #include "common.h"
 #include "class_3bb8c.h"
 
-s32 func_8004B38C(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
+s32 Class866E8__SetTargetAndBuildRates(Obj866E8 *self, void *arg1, Unk6CObj *arg2, Descriptor10 *arg3) {
     s32 stackBuf[3];
     s32 ret;
 
     self->unk6C = arg2;
     self->unkBC = *arg3;
-    ret = func_8004B44C(arg1, stackBuf, self->unk68, &self->unk54, arg3);
-    return self->methods->slotF8(self, ret, stackBuf, &D_80086904);
+    ret = ComputeCellWorldOffsets(arg1, stackBuf, self->unk68, &self->unk54, arg3);
+    return self->methods->slotF8(self, ret, stackBuf, sDefaultTargetSpecs);
 }
 
-s32 func_8004B418(Obj866E8 *self, void *arg1, void *arg2) {
+s32 Class866E8__ComputeCellOffsets(Obj866E8 *self, void *arg1, void *arg2) {
     s32 outBuf[3];
 
-    return func_8004B44C(arg1, outBuf, self->unk68, &self->unk54, arg2);
+    return ComputeCellWorldOffsets(arg1, outBuf, self->unk68, &self->unk54, arg2);
 }
 
 /* MATCH, round 40 (bravo): permuter-found zero, first-ever search on this
@@ -38,8 +60,8 @@ s32 func_8004B418(Obj866E8 *self, void *arg1, void *arg2) {
  * confirmed by the score dropping straight to 0. Every prior round's
  * attempts targeted the outBuf[0]/outBuf[2] STORE-vs-LOAD scheduling
  * directly and never touched this constant; the permuter found a
- * completely different axis. See docs/match-reports/func_8004B44C.md. */
-s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
+ * completely different axis. See docs/match-reports/ComputeCellWorldOffsets.md. */
+s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, Descriptor10 *arg4) {
     s32 idx;
     s32 factor;
     s32 sum;
@@ -73,17 +95,17 @@ s32 func_8004B44C(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Unk54Struct *arg3, 
     return sum;
 }
 
-void func_8004B570(Obj866E8 *self) {
-    self->unk70 = 1;
+void Class866E8__Enable(Obj866E8 *self) {
+    self->enabled = 1;
 }
 
-void func_8004B57C(Obj866E8 *self) {
+void Class866E8__Disable(Obj866E8 *self) {
     self->methods->slotC0(self);
-    self->unk70 = 0;
+    self->enabled = 0;
 }
 
-/* func_8004B5BC -- see docs/match-reports/func_8004B5BC.md. */
-s32 func_8004B5BC(Obj866E8 *self) {
+/* Class866E8__UpdateFootprintTracking -- see docs/match-reports/Class866E8__UpdateFootprintTracking.md. */
+s32 Class866E8__UpdateFootprintTracking(Obj866E8 *self) {
     Descriptor10Ext buf;
     Elem *e;
     s32 key;
@@ -96,10 +118,10 @@ s32 func_8004B5BC(Obj866E8 *self) {
 
     e = buf.unk24;
     key = e->unk4->unk32;
-    result = D_800868FC[key];
+    result = sFootprintResultRemap[key];
 
     if (self->unk68->unk4 == 0) {
-        self->methods->slotF8(self, buf.unk28, &buf.unkC, D_80086974[result]);
+        self->methods->slotF8(self, buf.unk28, &buf.unkC, sFootprintResultPtrTable[result]);
     }
 
     self->methods->slot128(self);
@@ -116,18 +138,18 @@ s32 func_8004B5BC(Obj866E8 *self) {
 
 /* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round
  * 40 across four re-verifications, ten inert structural variants and a
- * 37,155-iteration permuter search -- see docs/match-reports/func_8004B700.md.
+ * 37,155-iteration permuter search -- see docs/match-reports/Class866E8__BuildRateEntries.md.
  * The 3-word residue was a genuine pure register-identity difference (funcdiff
  * ins 0 / del 0, no asm-differ markers): retail held the second loop's element
  * pointer in $a2, the build in $v0. The fix was to DELETE a local -- the
  * second loop reuses `e`, the same variable the first loop walks, instead of a
  * separate `e2`. Nothing else in the body changed.
  * That axis is exactly the one a permuter cannot reach: it mutates a body, it
- * does not merge two of its locals into one. Same lever as func_8004BA40 this
+ * does not merge two of its locals into one. Same lever as Class866E8__ComputeRateEntry this
  * round.
  * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
  * with `e` merged it is no longer needed, verified by whole-image rebuild. */
-void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
+void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *arg3) {
     s32 divisor;
     s32 flag;
     s32 savedResult;
@@ -141,14 +163,14 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
     if (arg3 != 0) {
         divisor = self->unk68->divisor;
         flag = (val / divisor) & 1;
-        savedResult = func_8004B930(self, val, flag);
+        savedResult = Class866E8__ComputeRateFlags(self, val, flag);
 
         count = 0;
         for (i = 0; i < 7; i++) {
             e = self->methods->slot118(self, i);
             e->unk2 = arg3[i].key;
             if (arg3[i].flag != 0) {
-                tbl = &D_80086838[arg3[i].key];
+                tbl = &sRateOffsetTable[arg3[i].key];
                 u14 = e->unkC->unk14;
                 if (self->unk68->unk4 == 0) {
                     u14->unk18.w = arg2->unk0 + tbl->unk0;
@@ -160,7 +182,7 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
                     u14->unk20.w = arg2->unk8 - 0x5000;
                 }
                 e->unkC->unk14->unk0 = 0;
-                func_8004BA40(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
+                Class866E8__ComputeRateEntry(self, &stackBuf[count], divisor, flag, val, savedResult, arg3[i].key);
                 count++;
             }
         }
@@ -175,7 +197,7 @@ void func_8004B700(Obj866E8 *self, s32 val, Unk54Struct *arg2, TargetSpec866E8 *
 }
 
 
-s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
+s32 Class866E8__ComputeRateFlags(Obj866E8 *self, s32 val, s32 flag) {
     Unk68Struct *u;
     s32 divisor;
     s32 unk4;
@@ -211,7 +233,7 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
 
 /* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round
  * 27 across five re-verifications and ~330,000 permuter iterations -- see
- * docs/match-reports/func_8004BA40.md. The 5-word residue really was pure
+ * docs/match-reports/Class866E8__ComputeRateEntry.md. The 5-word residue really was pure
  * register identity (funcdiff ins 0 / del 0, no asm-differ markers), and the
  * fix was FEWER variables, not more: retail carries the multiply result AND
  * the running sum AND both branch addends in ONE local (`sum`, retail's
@@ -222,9 +244,9 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
  * iterations without ever reaching the merged shape.
  * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
  * image. It was inherited with the near-miss body and is verified here. */
-s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
+s32 Class866E8__ComputeRateEntry(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
-    s32 mask = D_8008688C[key];
+    s32 mask = sRateKeyMask[key];
     s32 result;
 
     if ((savedResult & mask) == 0) {
@@ -233,7 +255,7 @@ s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, 
     }
 
     if (self->unk68->unk4 == 0) {
-        const Unk54Struct *entry = &D_800868A8[key];
+        const Unk54Struct *entry = &sRateEntryTable[key];
         s32 value;
         s32 sum;
 
@@ -274,8 +296,8 @@ storeKey:
  * is `arr1` itself (initial value = the incoming argument register).
  * `sp` is therefore assigned from `arr1` inside the body and `arr1` is
  * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
- * See docs/match-reports/func_8004BB3C.md. */
-void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
+ * See docs/match-reports/Class866E8__ApplyRateEntries.md. */
+void Class866E8__ApplyRateEntries(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
     s32 i;
     Elem *e;
     SetupSub866E8 *sp;
@@ -303,10 +325,10 @@ void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
         }
         arr1++;
     }
-    self->unk1B4 = func_8004BCE0(self);
+    self->unk1B4 = Class866E8__CountFlaggedElements(self);
 }
 
-s32 func_8004BCE0(Obj866E8 *self) {
+s32 Class866E8__CountFlaggedElements(Obj866E8 *self) {
     s32 count;
     s32 i;
 
@@ -319,7 +341,7 @@ s32 func_8004BCE0(Obj866E8 *self) {
     return count;
 }
 
-void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
+void Class866E8__OnNotifyTag1(Obj866E8 *self, void *arg1, s32 mode) {
     s32 i;
     Elem *e;
     s32 curMode;
@@ -355,8 +377,8 @@ void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
  * round 40 (`info` in $a1 where retail has $v0) was ONE `info` local
  * assigned on both sides of the slot4 call. Two locals (`info`, `info2`)
  * make each block-local, so local-alloc ties each to its addu result.
- * See docs/match-reports/func_8004BE54.md. */
-/* func_8004BE54 (Obj866E8Methods::slot104) -- own local view of several
+ * See docs/match-reports/Class866E8__LoadElementResources.md. */
+/* Class866E8__LoadElementResources (Obj866E8Methods::slot104) -- own local view of several
  * classes reached only from here. Kept in this .c, not class_3bb8c.h: none
  * of the 11 sibling units sharing that header touch these. */
 
@@ -440,7 +462,7 @@ typedef struct BE54LoadReq {
 extern LinkResource *func_80043840(BE54LoadReq *req);
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
-void func_8004BE54(Obj866E8 *self, Elem *entry) {
+void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
     ResInfo866E8 *info;
     ResInfo866E8 *info2;
     ElemTarget *hdr;
@@ -534,7 +556,7 @@ void func_8004BE54(Obj866E8 *self, Elem *entry) {
     }
 }
 
-void func_8004C0AC(Obj866E8 *self, Elem *entry) {
+void Class866E8__ResetElementCells(Obj866E8 *self, Elem *entry) {
     EntryChildObj **p;
     EntryChildObj **end;
 
@@ -549,7 +571,7 @@ void func_8004C0AC(Obj866E8 *self, Elem *entry) {
     }
 }
 
-Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
+Descriptor10 *Class866E8__GetTargetDescriptor(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
     void *v1;
 
     v1 = (u8 *)self->unk6C->unk14 + 0x18;
@@ -566,7 +588,7 @@ Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
 
 /* MATCH, round 63 (delta): closed a six-round stall (72/106 since round 19)
  * with three source-shape corrections, none of them register pinning -- see
- * docs/match-reports/func_8004C1C0.md.
+ * docs/match-reports/Class866E8__ComputeFootprintDescriptor.md.
  *   1. `b2`/`b3` are s32 locals RE-READ from `out->base.b2`/`b3` after the
  *      byte stores. An s8 field shifted directly in the expression compiles
  *      to `lbu` + `sll 0x18` + `sra 0xd`; assigning it to an s32 local first
@@ -578,7 +600,7 @@ Descriptor10 *func_8004C158(Obj866E8 *self, Descriptor10Ext *arg1, void **out) {
  *   3. `out->unk24 = e;` is the LAST statement of the block. Every earlier
  *      placement schedules its `sw` too early; only trailing it after the
  *      h8 store reproduces retail's order. */
-s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
+s32 Class866E8__ComputeFootprintDescriptor(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     Elem *e;
     Unk14Obj *u14a;
     Unk14Obj *u14b;
@@ -591,7 +613,7 @@ s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
     if (e != 0) {
         rate = e->unk4->unk30;
         out->unk28 = rate;
-        func_8004C368(self, (u8 *)out, rate);
+        Class866E8__ComputeDivisorSplit(self, (u8 *)out, rate);
 
         u14a = self->methods->slot118(self, e->unk4->unk32)->unkC->unk14;
         out->unkC = u14a->unk18.w + 0x5000;
@@ -628,17 +650,17 @@ s32 func_8004C1C0(Obj866E8 *self, Descriptor10Ext *out, QueryPos866E8 *in) {
 }
 
 
-void func_8004C368(Obj866E8 *self, u8 *out, s32 val) {
+void Class866E8__ComputeDivisorSplit(Obj866E8 *self, u8 *out, s32 val) {
     out[0] = val % self->unk68->divisor;
     out[1] = val / self->unk68->divisor;
 }
 
-Unk1BCObj *func_8004C3F0(Obj866E8 *self, u8 *out) {
-    func_8004C368(self, out, self->unk1BC->unk4->unk30);
+Unk1BCObj *Class866E8__GetLastTargetRateSplit(Obj866E8 *self, u8 *out) {
+    Class866E8__ComputeDivisorSplit(self, out, self->unk1BC->unk4->unk30);
     return self->unk1BC;
 }
 
-Elem *func_8004C434(Obj866E8 *self, s32 key) {
+Elem *Class866E8__FindElemByUnk32(Obj866E8 *self, s32 key) {
     s32 i;
     Elem *e;
 
@@ -658,8 +680,8 @@ Elem *func_8004C434(Obj866E8 *self, s32 key) {
  * INSIDE the upper-bound test keeps the `arg1` load ahead of the field
  * load, as retail schedules it (a `w = ...;` statement before the `if`
  * fixes the add but swaps those two loads). See
- * docs/match-reports/func_8004C470.md. */
-Elem *func_8004C470(Obj866E8 *self, Unk54Struct *arg1) {
+ * docs/match-reports/Class866E8__FindElementForPosition.md. */
+Elem *Class866E8__FindElementForPosition(Obj866E8 *self, Unk54Struct *arg1) {
     s32 i;
     s32 tol;
     s32 threshold;
