@@ -2325,3 +2325,4 @@ TaskObjF__ClearResourceSlots = 0x8004E3F4; // type:func
 gMcDevicePath1 = 0x8008AA9C;
 gMcDevicePath0 = 0x8008AAA4;
 sMcTempFileSuffix = 0x8008AAAC;
+ObjM__NoOpSlot40 = 0x80052DE0; // type:func

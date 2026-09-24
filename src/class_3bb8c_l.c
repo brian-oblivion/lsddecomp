@@ -31,7 +31,7 @@
  * The previous version of this comment ended "All three have stub reports;
  * do not attempt them" -- a stale DIRECTIVE, which is worse than a stale
  * count. Two of the three are free ground.
- * The other 17 are clean (func_80052DE0 and func_800534C0 are bare
+ * The other 17 are clean (ObjM__NoOpSlot40 and func_800534C0 are bare
  * `jr $ra; nop` stubs splat generated itself, so 15 are real work).
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
@@ -59,7 +59,7 @@ typedef struct BaseMethods87034_3bb8c_l {
 } BaseMethods87034_3bb8c_l;
 extern BaseMethods87034_3bb8c_l *GetClass86668Methods(void);
 
-void func_80052DE0(void) {
+void ObjM__NoOpSlot40(void) {
 }
 
 void func_80052DE8(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
