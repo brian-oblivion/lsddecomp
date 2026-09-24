@@ -35,6 +35,6 @@ Table6D940 D_8006D940;`.
 Also added `BaseTable6D940` (this file only) -- a SEPARATE table reached
 only via the uncarved accessor `GetActiveDataSourceMethods()`, with three known slots
 (`+0x008`, `+0x00C`, `+0x064`) used by `Class6D940__Class6D940`/`Class6D940__Destroy`/
-`func_8002C238` respectively (all this unit, this round). Kept entirely
+`Class6D940__SetFlag` respectively (all this unit, this round). Kept entirely
 local to `code_179d8_d.c`, no shared header, per this round's rule for the
 `code_179d8` slices.

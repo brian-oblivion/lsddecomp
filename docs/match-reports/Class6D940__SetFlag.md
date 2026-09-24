@@ -1,4 +1,6 @@
-# func_8002C238
+# Class6D940__SetFlag
+
+> Renamed from `func_8002C238` on 2026-09-24 (tools/rename.py). Address 0x8002c238.
 
 **Unit:** code_179d8_d · **Size:** 16 instructions (0x40 bytes) ·
 **Status: MATCHED 16/16**, whole-image SHA1 green.
@@ -9,7 +11,7 @@ Sets a field then forwards to the same base accessor `Class6D940__Destroy`
 uses, a different slot:
 
 ```c
-s32 func_8002C238(s32 *self)
+s32 Class6D940__SetFlag(s32 *self)
 {
     self[0xC] = 1;
     return GetActiveDataSourceMethods()->slot64(self);

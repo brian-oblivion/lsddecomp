@@ -126,7 +126,7 @@ struct BaseTable6D940 {
      * `return callee(...)` absent positive void evidence. */
     s32 (*slot0C)(void *self);
     u8 pad010[0x064 - 0x010];
-    /* +0x064, func_8002C238's own dispatch -- same tail-call ambiguity as
+    /* +0x064, Class6D940__SetFlag's own dispatch -- same tail-call ambiguity as
      * slot0C above. */
     s32 (*slot64)(void *self);
 };
@@ -167,7 +167,7 @@ s32 Class6D940__Destroy(void *self)
     return GetActiveDataSourceMethods()->slot0C(self);
 }
 
-s32 func_8002C238(s32 *self)
+s32 Class6D940__SetFlag(s32 *self)
 {
     self[0xC] = 1;
     return GetActiveDataSourceMethods()->slot64(self);
