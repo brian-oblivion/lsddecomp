@@ -74,7 +74,7 @@ extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *new_class_6d940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
 extern s32 func_80020C5C(void);
-extern void func_80017CFC(void *arg1);
+extern void BMemPMgrFree(void *arg1);
 extern Vec3_3ac78 gDefaultOrigin;
 
 void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
@@ -197,7 +197,7 @@ void Class866E8__Finalize(Class866E8 *self)
             p += 4;
         }
 
-        func_80017CFC(entry->cells);
+        BMemPMgrFree(entry->cells);
     }
 
     func_800428E4()->dtor(self);

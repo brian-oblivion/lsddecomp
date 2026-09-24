@@ -348,12 +348,12 @@ void func_80058228(D_80087AACObj *self) {
     self->unk_0x240 = BMemPMgrAlloc(4);
 }
 
-extern void func_80017CFC(void *arg);
+extern void BMemPMgrFree(void *arg);
 
 void func_80058308(D_80087AACObj *self) {
     s32 i;
 
-    func_80017CFC(self->unk_0x240);
+    BMemPMgrFree(self->unk_0x240);
     for (i = 0; i < 100; i++) {
         self->unk_0xA8[i]->methods->slot4(self->unk_0xA8[i]);
     }

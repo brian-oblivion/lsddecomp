@@ -14,7 +14,7 @@ directly out of `disk/SLPS_015.56`; see `include/code_171e0.h`), so they only
 resolve to real code for whichever subclass overrides them — sizes a new
 allocation via `BMemPMgrAlloc`, and on success installs the new pointer/size
 into `this->unk10`/`this->unk14` and restores a temporarily-zeroed field
-(`this->unk0C`); on failure it releases a null pointer via `func_80017CFC`
+(`this->unk0C`); on failure it releases a null pointer via `BMemPMgrFree`
 and still calls slot `+0x048`.
 
 ## Derivation
@@ -45,7 +45,7 @@ sw    $s2, 0x14($s0)            ; this->unk14 = size
 j     END
  sw   $s3, 0xC($s0)             ; this->unk0C = saved value
 FAIL:
-jal   func_80017CFC              ; func_80017CFC(0)  -- literal NULL, not `this`
+jal   BMemPMgrFree              ; BMemPMgrFree(0)  -- literal NULL, not `this`
  move $a0, $zero
 ...slot48(this)
 END: epilogue
@@ -75,7 +75,7 @@ void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
         this->unk14 = size;
         this->unk0C = savedUnk0C;
     } else {
-        func_80017CFC(NULL);
+        BMemPMgrFree(NULL);
         this->methods->slot48(this);
     }
 }
@@ -169,7 +169,7 @@ PROPOSED, not renamed:
 | field | proposed name | tier | evidence |
 | --- | --- | --- | --- |
 | `unk0C` | `pendingGeneration` | C | Saved before being zeroed for the duration of the `slot44`/`slot4C` alloc dance, restored on success, left at `0` on failure. Read/write shape of a counter or sequence id, but no read site outside this dance was found to confirm what it counts -- kept speculative (tier C) rather than asserted. |
-| `unk10` | `buffer` | B | The lazily-(re)allocated resource itself: obtained from `BMemPMgrAlloc`, released via `func_80017CFC`. Mechanics fully known; what the buffer actually holds at this base-class level is not (subclass-specific, via the null hooks). |
+| `unk10` | `buffer` | B | The lazily-(re)allocated resource itself: obtained from `BMemPMgrAlloc`, released via `BMemPMgrFree`. Mechanics fully known; what the buffer actually holds at this base-class level is not (subclass-specific, via the null hooks). |
 | `unk14` | `bufferSize` | B | `unk10`'s allocation size, threaded through the same `slot4C`/`BMemPMgrAlloc` calls. |
 
 Posted to the broadcast for the head to apply (whole-tree replace + oracle,

@@ -41,7 +41,7 @@ Class6B5CCObj *New_Class6B5CC(void) {
     if (GetClass6B5CCMethods()->ctor(obj) != NULL) {
         return obj;
     }
-    func_80017CFC(obj);
+    BMemPMgrFree(obj);
     return NULL;
 }
 
@@ -55,7 +55,7 @@ void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     blockB = BMemPMgrAlloc(0x28);
     self->coord2->param = blockB;
     if (blockB == NULL) {
-        func_80017CFC(self->coord2);
+        BMemPMgrFree(self->coord2);
         return NULL;
     }
     Get_vtable_BasicClass()->ctor(self);
@@ -75,8 +75,8 @@ void Class6B5CC__Finalize(Class6B5CCObj *self) {
     self->methods->detachAttachedChildren(self);
     self->methods->slot5C(self, 0);
     sub = self->coord2;
-    func_80017CFC(sub->param);
-    func_80017CFC(self->coord2);
+    BMemPMgrFree(sub->param);
+    BMemPMgrFree(self->coord2);
     Get_vtable_BasicClass()->finalize(self);
 }
 

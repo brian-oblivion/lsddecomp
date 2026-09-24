@@ -28,7 +28,7 @@ Class6B5CCObj *New_Class6B5CC(void) {
     if (GetClass6B5CCMethods()->ctor(obj) != NULL) {
         return obj;
     }
-    func_80017CFC(obj);
+    BMemPMgrFree(obj);
     return NULL;
 }
 ```

@@ -111,10 +111,10 @@ void func_8003D050(Obj86B60 *self)
         elem->methods->slot4(elem);
         i++;
     }
-    func_80017CFC(self->unk64);
-    func_80017CFC(self->slotCounts);
-    func_80017CFC(self->unk5C);
-    func_80017CFC(self->unk54);
+    BMemPMgrFree(self->unk64);
+    BMemPMgrFree(self->slotCounts);
+    BMemPMgrFree(self->unk5C);
+    BMemPMgrFree(self->unk54);
 }
 
 void func_8003D194(Obj86B60 *self, void *a1)
@@ -282,7 +282,7 @@ void func_8003D5CC(Obj86B60 *self, SrcDesc *a1, void *a2)
 void func_8003D6D4(Obj86B60 *self)
 {
     ReleaseBasicClassArray(self->unk64[self->activeSlot], self->unk5C[self->activeSlot]);
-    func_80017CFC(self->unk64[self->activeSlot]);
+    BMemPMgrFree(self->unk64[self->activeSlot]);
 }
 
 /* STALL -- see docs/match-reports/func_8003D73C.md. Round 49 (delta):

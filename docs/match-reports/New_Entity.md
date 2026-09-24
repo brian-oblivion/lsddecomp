@@ -8,7 +8,7 @@ The allocator for `Entity`: `BMemPMgrAlloc(0x108)` allocates 0x108 bytes,
 then `Get_vtable_Entity()->ctor(obj, arg0, arg1, arg2)` (the vtable's own
 `ctor` slot, `Entity__Entity` — see that report) constructs it in place. On
 allocation failure, returns NULL immediately. On construction failure
-(`ctor` returns NULL), frees the allocation via `func_80017CFC` and returns
+(`ctor` returns NULL), frees the allocation via `BMemPMgrFree` and returns
 NULL. On success, returns the constructed object.
 
 ## Derivation
@@ -28,7 +28,7 @@ Entity *New_Entity(void *arg0, void *arg1, void *arg2) {
     if (obj != NULL) {
         result = obj;
         if (Get_vtable_Entity()->ctor(obj, arg0, arg1, arg2) == NULL) {
-            func_80017CFC(obj);
+            BMemPMgrFree(obj);
             result = NULL;
         }
     }
@@ -62,7 +62,7 @@ still eagerly spills `obj` into `$s0` right after the allocation call —
 exactly retail's shape. The naive assumption that an early return duplicates
 epilogue code (and would therefore *grow* the function) was wrong here; GCC
 2.6.3 merges both `return NULL;` sites (the early one and the
-post-`func_80017CFC` one) onto the same physical epilogue via branches, using
+post-`BMemPMgrFree` one) onto the same physical epilogue via branches, using
 the branch's delay slot for the free case.
 
 ## Proposed learning

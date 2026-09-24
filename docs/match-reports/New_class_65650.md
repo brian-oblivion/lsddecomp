@@ -14,7 +14,7 @@ separately, see its own report), and calls the constructor slot (`+0x008`)
 with `(self, arg1, arg2)`. Unlike the simpler `New_X` shapes documented
 elsewhere in this project (`func_80025B34`, `new_class_6d3c8`), **this one
 also checks the constructor's own return value**: on constructor failure it
-frees the object (`func_80017CFC`) and returns `NULL` instead of leaving it
+frees the object (`BMemPMgrFree`) and returns `NULL` instead of leaving it
 allocated.
 
 ```c
@@ -31,7 +31,7 @@ void *New_class_65650(void *arg1, void *arg2)
     if (vt->ctor(self, arg1, arg2) != NULL) {
         return self;
     }
-    func_80017CFC(self);
+    BMemPMgrFree(self);
     return NULL;
 }
 ```

@@ -154,7 +154,7 @@ adopted):**
   from computing it OUTSIDE the guard, unconditionally, not from anything
   about its position relative to the dereference.
 
-**Not re-run further this round** — time budget went to `func_80017CFC`'s
+**Not re-run further this round** — time budget went to `BMemPMgrFree`'s
 own first-ever search instead (see that report). The remaining 18 wrong
 words (four clusters: `0x8370-0x837C` mask-remainder rounding order,
 `0x83CC-0x83E0` the same OT-sentinel address computation one placement
@@ -394,9 +394,9 @@ does NOT install a prototype for the rest of the translation unit:
  * the ~15 other headers' single-argument ANSI prototypes, or this same
  * file's own single-argument call sites that appear textually AFTER the
  * definition (func_800181AC's `BMemPMgrAlloc(0x8)`,
- * func_80018208's `func_80017CFC(node)`). */
+ * func_80018208's `BMemPMgrFree(node)`). */
 extern void *BMemPMgrAlloc();
-extern void *func_80017CFC();
+extern void *BMemPMgrFree();
 ```
 
 ```c
@@ -416,7 +416,7 @@ escape-hatch class as the project's already-documented "vtable slot
 declared unprototyped" lever (`docs/DECOMPILATION_LEARNINGS.md`, round 14),
 generalised from a function POINTER to a plain external function.
 
-**`func_80017CFC` (this unit, next in ROM order, also in this round's queue)
+**`BMemPMgrFree` (this unit, next in ROM order, also in this round's queue)
 needs the identical treatment** — its own disassembly reads `$a1` the same
 way, for the same reason (see its own report, filed alongside this one).
 
@@ -529,7 +529,7 @@ independent-constant materialisation, (3) and (4) look like a preference
 whose direction flips between two structurally-identical blocks for a reason
 not evident from the C source.
 
-## The struct layout (confirmed, shared with SetupBMemPMgrFreeList and func_80017CFC)
+## The struct layout (confirmed, shared with SetupBMemPMgrFreeList and BMemPMgrFree)
 
 ```c
 typedef struct BMemBlockHdr {
@@ -646,7 +646,7 @@ void *BMemPMgrAlloc(size, pool)
 
 ## Next steps for whoever reopens this
 
-- Levers 1-3 above are almost certainly reusable verbatim on `func_80017CFC`
+- Levers 1-3 above are almost certainly reusable verbatim on `BMemPMgrFree`
   (same unit, same globals, same free-list data structure, same K&R
   parameter shape, same free-list-node reload pattern — it is the `free()`
   counterpart of this `malloc()`).
@@ -698,7 +698,7 @@ odd-one-out declaration is the load-bearing one.
 before writing it:
 
 ```
-80017b34 <BMemPMgrAlloc>:        80017cfc <func_80017CFC>:
+80017b34 <BMemPMgrAlloc>:        80017cfc <BMemPMgrFree>:
 80017b3c:  move  s0,a0           80017d04:  move  s0,a0
 80017b40:  move  s1,a1   <-      80017d0c:  move  s1,a1   <-
 ...                              ...
@@ -729,7 +729,7 @@ register the caller happens to leave loaded.
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
 unit's own later one-argument call sites (`func_800181AC`'s
-`BMemPMgrAlloc(0x8)`, `func_80018208`'s `func_80017CFC(node)`). A K&R definition
+`BMemPMgrAlloc(0x8)`, `func_80018208`'s `BMemPMgrFree(node)`). A K&R definition
 installs no prototype, so those later calls stay clean; an unspecified-parameter
 declaration does the same for everything before the definition. A full prototype
 here reintroduces exactly that conflict.
@@ -746,7 +746,7 @@ green.
 
 `BMemPMgrAlloc`, **tier A**: fully derived byte-exact free-list allocator
 (round 73), matching `SetupBMemPMgrFreeList`'s setup and `BMemPMgrFree`'s
-(this unit's `func_80017CFC`) release, same list, same `sizeAndFlags`
+(this unit's `BMemPMgrFree`) release, same list, same `sizeAndFlags`
 encoding. Called from a wide cross-section of units (`code_171e0`,
 `code_179d8_*`, `code_2c054`, `code_2cc8c_*`, `code_55dd4`, `code_d294`,
 `main`, plus this unit's own `PushBasicClassListNode`) — confirming it is

@@ -331,7 +331,7 @@ struct Entity {
 
 extern EntityMethods *Get_vtable_Entity(void);
 extern void *BMemPMgrAlloc(s32 size);
-extern void func_80017CFC(void *arg);
+extern void BMemPMgrFree(void *arg);
 
 /* All three still uncarved (no asm/nonmatchings file -- library or
  * not-yet-carved game code); called directly by name (jal), not through a

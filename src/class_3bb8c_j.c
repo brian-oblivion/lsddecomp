@@ -265,7 +265,7 @@ Class86ED0Methods *func_80051A4C(void)
 }
 
 /*
- * New_Class86ED0. BMemPMgrAlloc/func_80017CFC already declared for the
+ * New_Class86ED0. BMemPMgrAlloc/BMemPMgrFree already declared for the
  * Obj866E8 group above are the same generic pool allocator/free pair --
  * not redeclared here.
  *
@@ -279,7 +279,7 @@ Class86ED0Methods *func_80051A4C(void)
  * include/code_8220.h's canonical BasicClassMethods layout exactly.
  */
 extern void *BMemPMgrAlloc(s32 size);
-extern void *func_80017CFC(void *ptr);
+extern void *BMemPMgrFree(void *ptr);
 
 extern Class86ED0Methods *func_80052B60(void);
 
@@ -371,10 +371,10 @@ void func_80051C84(Class86ED0 *self)
     s32 i;
 
     for (i = 0; i < self->unk10; i++) {
-        func_80017CFC(self->unk18[i]);
+        BMemPMgrFree(self->unk18[i]);
     }
-    func_80017CFC(self->unk1C);
-    func_80017CFC(self->unk18);
+    BMemPMgrFree(self->unk1C);
+    BMemPMgrFree(self->unk18);
     Get_vtable_BasicClass()->finalize(self);
 }
 

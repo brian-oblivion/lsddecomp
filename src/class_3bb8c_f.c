@@ -94,7 +94,7 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     read(handle, hdr, 0x80);
     raw = ((u8 *)hdr)[2];
     seekPos = (raw << 7) - 0x780;
-    func_80017CFC(hdr);
+    BMemPMgrFree(hdr);
     lseek(handle, seekPos, 0);
     read(handle, outBuf, outSize);
     close(handle);
@@ -261,7 +261,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     req->frame1 = src->frame1;
     req->frame2 = src->frame2;
     write(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
-    func_80017CFC(req);
+    BMemPMgrFree(req);
     write(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
     close(fileHandle);
     return 1;
@@ -416,7 +416,7 @@ void TaskObjF__FreeUnusedBuffers(TaskObjF *self) {
     s32 i;
 
     for (i = self->bufCount; i < 15; i++) {
-        self->bufArray[i] = func_80017CFC(self->bufArray[i]);
+        self->bufArray[i] = BMemPMgrFree(self->bufArray[i]);
     }
     self->bufArray[i] = 0;
 }
@@ -425,11 +425,11 @@ void TaskObjF__FreeBuffers(TaskObjF *self) {
     s32 i;
 
     if (self->bufArray != 0) {
-        func_80017CFC(self->scratchBuf);
+        BMemPMgrFree(self->scratchBuf);
         for (i = 0; i < self->bufCount; i++) {
-            func_80017CFC(self->bufArray[i]);
+            BMemPMgrFree(self->bufArray[i]);
         }
-        func_80017CFC(self->bufArray);
+        BMemPMgrFree(self->bufArray);
         self->bufArray = 0;
     }
 }

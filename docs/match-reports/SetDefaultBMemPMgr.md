@@ -22,7 +22,7 @@ void SetDefaultBMemPMgr(BMemPMgr *pool)
 ```
 
 `D_8008A818` is the global "current default pool" pointer, the same global
-`SetupBMemPMgrFreeList`, `BMemPMgrAlloc` and `func_80017CFC` (this unit) all read.
+`SetupBMemPMgrFreeList`, `BMemPMgrAlloc` and `BMemPMgrFree` (this unit) all read.
 Declared `extern BMemPMgr *D_8008A818;` in `include/code_8220.h`, next to
 `SetupBMemPMgrFreeList`'s own doc comment which already named this global. Not
 called from any carved C yet — nothing in this unit or its siblings

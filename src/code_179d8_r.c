@@ -68,7 +68,7 @@ extern void CdFlush(void);
 
 /* Psy-Q pool allocator, code_8220.c. */
 extern void *BMemPMgrAlloc(s32 size);
-extern void *func_80017CFC(void *ptr);
+extern void *BMemPMgrFree(void *ptr);
 
 /* libc2/strstr.o, linked (see code_179d8_h.c's carve notes). */
 extern char *strstr(char *s1, char *s2);
@@ -152,7 +152,7 @@ void FreeCdRequestNode(CdRequestNode *node)
         if (next != NULL) {
             next->prev = node->prev;
         }
-        func_80017CFC(node);
+        BMemPMgrFree(node);
     }
     UnlockCd();
 }

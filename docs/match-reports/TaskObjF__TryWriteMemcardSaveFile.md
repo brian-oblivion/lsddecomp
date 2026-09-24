@@ -255,7 +255,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     req->frame1 = src->frame1;
     req->frame2 = src->frame2;
     write(fileHandle, req, (((flagCopy & 0xFF) << 7)) + 0x80);
-    func_80017CFC(req);
+    BMemPMgrFree(req);
     write(fileHandle, (void *)payload, (((u32)arg7 + 0x7F) >> 7) << 7);
     close(fileHandle);
     return 1;

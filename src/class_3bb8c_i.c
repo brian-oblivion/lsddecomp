@@ -89,7 +89,7 @@ void func_80050CD8(Obj86ED0 *self)
 
 void func_80050CE8(Obj86ED0 *self)
 {
-    func_80017CFC(self->unk28);
+    BMemPMgrFree(self->unk28);
     Get_vtable_BasicClass()->finalize(self);
 }
 

@@ -1986,11 +1986,11 @@ extern s32 D_80086E78[];
 extern s32 WaitForReadyEvent(s32 *arr, s32 count);
 
 /* The generic pool allocator/free pair, already established the same way
- * by include/code_8220.h, include/code_55dd4.h etc -- `func_80017CFC`
+ * by include/code_8220.h, include/code_55dd4.h etc -- `BMemPMgrFree`
  * returning `void *` (not `void`) matches TaskObjF__FreeUnusedBuffers's own use here,
  * which stores its return value back into the freed slot. */
-/* BMemPMgrAlloc/func_80017CFC already declared above in this header. */
-extern void *func_80017CFC(void *ptr);
+/* BMemPMgrAlloc/BMemPMgrFree already declared above in this header. */
+extern void *BMemPMgrFree(void *ptr);
 
 /* A fixed 6-byte memory-card device-name template ("bu00:"/"bu10:", PS-X
  * BIOS device names -- asm/data/7B008.sdata.s). An all-`s8` struct

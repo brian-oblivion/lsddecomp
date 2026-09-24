@@ -1,4 +1,6 @@
-# func_80017CFC — MATCHED (round 46): 107/107 words, byte-exact
+# BMemPMgrFree — MATCHED (round 46): 107/107 words, byte-exact
+
+> Renamed from `func_80017CFC` on 2026-09-24 (tools/rename.py). Address 0x80017cfc.
 
 ## ROUND 46 (bravo, second sitting): first-ever permuter search, MATCHED 99 -> 107/107
 
@@ -7,7 +9,7 @@ Picked up per this round's assignment as "never permuter-searched" despite
 all three of this round's mandated Gate-3 checks before searching, all
 recorded:
 
-1. **Correctness.** `tools/setup-permuter.sh func_80017CFC
+1. **Correctness.** `tools/setup-permuter.sh BMemPMgrFree
    permuter-work/func_80017CFC_seed.c` (seed checked byte-for-byte identical
    to the current in-tree preserved body first) built a scaffold cleanly:
    "base compiles, target assembled."
@@ -27,7 +29,7 @@ recorded:
 **Search: blind, no PERM macros, `-j 6`, bounded `timeout 1500` (backgrounded
 while `BMemPMgrAlloc`'s recovered-candidate work above was written up and
 committed).** Found a **zero score at iteration 373** —
-`permuter-work/func_80017CFC/output-0-1/`.
+`permuter-work/BMemPMgrFree/output-0-1/`.
 
 **The permuter's own diff carried two changes; only one was legitimate, and
 they were tested separately before either was trusted:**
@@ -51,7 +53,7 @@ they were tested separately before either was trusted:**
 - Applied ONLY change 2 (the `nextSize` reuse) on top of the committed
   99/107 body, leaving `SetBMemPMgrBusy`'s real single declaration untouched.
   `./build-and-verify.sh`: **`build exit=0`, `OK: build matches retail
-  SLPS_015.56`.** `tools/funcdiff.py func_80017CFC`: **107/107 words,
+  SLPS_015.56`.** `tools/funcdiff.py BMemPMgrFree`: **107/107 words,
   byte-exact.** The fabricated-prototype mutation was pure permuter noise
   that happened to ride along in the diff without being load-bearing — the
   real fix is entirely the dead-variable reuse.
@@ -61,7 +63,7 @@ they were tested separately before either was trusted:**
   fabrication against a real, differently-typed definition elsewhere in the
   project is not a legitimate translation, whatever the scorer says.)
 
-**Adopted. `func_80017CFC` is MATCHED, 107/107 words, byte-exact against
+**Adopted. `BMemPMgrFree` is MATCHED, 107/107 words, byte-exact against
 retail.** A short comment was added at the `nextSize` reuse site explaining
 why the dead variable is repurposed, since the idiom is unusual on its own
 and was found by search rather than derivation. Whole-image oracle re-run
@@ -92,7 +94,7 @@ timing right and only the register is wrong.
 
 **Unit:** `code_8220` · **Size:** 107 words, EXACT. **Status:** STALL after
 ~10 attempts, restored to `INCLUDE_ASM`. Best raw score 99/107 words (92.5%);
-`tools/asm-differ/diff.py func_80017CFC` (realigned) confirms zero drift and
+`tools/asm-differ/diff.py BMemPMgrFree` (realigned) confirms zero drift and
 the first real difference at file offset `0x85BC` / vram `0x80017DBC`.
 
 ## Verdict correction on the predecessor report
@@ -114,7 +116,7 @@ reusable project-wide, not one-off:
 
 1. **K&R old-style definition** for the dead second `pool` parameter,
    against the same unspecified-parameter declaration in `code_8220.h`
-   (`extern void *func_80017CFC();`, already in place from `BMemPMgrAlloc`'s
+   (`extern void *BMemPMgrFree();`, already in place from `BMemPMgrAlloc`'s
    round).
 2. **Reuse an existing pointer's register instead of a fresh local** where
    retail does. Here it's not a `+=` on the parameter (unlike
@@ -211,7 +213,7 @@ here; every offset this function touches was already established.
 
 ```c
 #if 0
-void *func_80017CFC(ptr, pool)
+void *BMemPMgrFree(ptr, pool)
     void *ptr;
     void *pool;
 {
@@ -337,7 +339,7 @@ odd-one-out declaration is the load-bearing one.
 before writing it:
 
 ```
-80017b34 <BMemPMgrAlloc>:        80017cfc <func_80017CFC>:
+80017b34 <BMemPMgrAlloc>:        80017cfc <BMemPMgrFree>:
 80017b3c:  move  s0,a0           80017d04:  move  s0,a0
 80017b40:  move  s1,a1   <-      80017d0c:  move  s1,a1   <-
 ...                              ...
@@ -368,7 +370,7 @@ register the caller happens to leave loaded.
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
 unit's own later one-argument call sites (`func_800181AC`'s
-`BMemPMgrAlloc(0x8)`, `func_80018208`'s `func_80017CFC(node)`). A K&R definition
+`BMemPMgrAlloc(0x8)`, `func_80018208`'s `BMemPMgrFree(node)`). A K&R definition
 installs no prototype, so those later calls stay clean; an unspecified-parameter
 declaration does the same for everything before the definition. A full prototype
 here reintroduces exactly that conflict.
@@ -380,3 +382,12 @@ unit correctly. Converging them would break one side or the other.
 **Declaration sites changed:** none (no arity anywhere changed).
 `/* arity-ok: ... */` added to the two lines in `include/code_8220.h`. Oracle
 green.
+
+## Naming (round 74)
+
+`BMemPMgrFree`, **tier A**: fully derived free-list release (round 46,
+99->107/107 permuter match) -- coalesces with the previous and following
+blocks and re-links the free list, the mirror of `BMemPMgrAlloc`. Called
+across the same wide set of units as `BMemPMgrAlloc` (`code_2cc8c_f`,
+`code_55dd4`, `code_d294`, `code_8220_b`, `main`, plus this unit's own
+`RemoveBasicClassListNode`), confirming the general-purpose pool pairing.

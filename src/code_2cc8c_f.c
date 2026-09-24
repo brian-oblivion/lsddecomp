@@ -144,7 +144,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 
 void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->children, self->totalChildCount);
-    self->children = func_80017CFC(self->children);
+    self->children = BMemPMgrFree(self->children);
     func_80041C3C()->slot0C(self);
 }
 

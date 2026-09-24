@@ -261,10 +261,10 @@ extern Unk74Obj *func_8003B39C(const char *path); /* already matched in
 
 extern void *BMemPMgrAlloc(s32 size);   /* allocator, confirmed across many
                                             units */
-extern void *func_80017CFC(void *ptr);  /* matching free/release. Its own
+extern void *BMemPMgrFree(void *ptr);  /* matching free/release. Its own
                                             disassembly (still INCLUDE_ASM,
                                             asm/nonmatchings/code_8220/
-                                            func_80017CFC.s) ends with an
+                                            BMemPMgrFree.s) ends with an
                                             explicit `addu $v0,$zero,$zero`
                                             -- it genuinely returns NULL,
                                             not void. code_171e0.h/Entity.h
@@ -1416,7 +1416,7 @@ struct Obj86B60 {
                                      func_8003DE30 -- a ring-buffer index */
     void **unk64;                /* +0x064, func_8003D6D4: array indexed by
                                      unk58, giving ReleaseBasicClassArray's 1st arg
-                                     and func_80017CFC's arg */
+                                     and BMemPMgrFree's arg */
     Unk68Obj *unk68;             /* +0x068, OBSERVED: func_8003D050,
                                      func_8003DAD4, func_8003D73C (round 12)
                                      -- built once by func_8003CE98 via

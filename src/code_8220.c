@@ -158,7 +158,7 @@ void *BMemPMgrAlloc(size, pool)
     return result;
 }
 
-void *func_80017CFC(ptr, pool)
+void *BMemPMgrFree(ptr, pool)
     void *ptr;
     void *pool;
 {
@@ -257,7 +257,7 @@ void func_80017EA8(void) {
 void *BasicClass__func_17eb0(BasicClass *self)
 {
     self->methods->finalize(self);
-    func_80017CFC(self);
+    BMemPMgrFree(self);
     return NULL;
 }
 
@@ -365,7 +365,7 @@ void func_80018208(BasicClassListNode **head, BasicClass *value)
             } else {
                 *head = node->next;
             }
-            func_80017CFC(node);
+            BMemPMgrFree(node);
             return;
         }
         prev = node;

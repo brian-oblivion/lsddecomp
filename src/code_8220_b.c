@@ -34,7 +34,7 @@ void FreeBasicClassList(BasicClassListNode **head)
     while (node != NULL) {
         BasicClassListNode *cur = node;
         node = node->next;
-        func_80017CFC(cur);
+        BMemPMgrFree(cur);
     }
 }
 

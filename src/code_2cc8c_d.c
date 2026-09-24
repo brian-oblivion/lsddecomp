@@ -248,7 +248,7 @@ extern void DrawSync(s32 mode);
 void Unk18Obj__DeinitOt(Unk18Obj *self) {
     if (self->otReady != 0) {
         DrawSync(0);
-        func_80017CFC((void *)self->unk78);
+        BMemPMgrFree((void *)self->unk78);
         self->otReady = 0;
     }
 }

@@ -64,7 +64,7 @@ void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2) {
 - `Class6B5CCSub14::unk44` retyped from `void *` to `Class6B5CCBlock44 *`.
   Checked both other referencing sites in `src/code_d294.c` before doing
   this (`self->unk14->unk44 = blockB;` where `blockB` is `void *`, and
-  `func_80017CFC(sub->unk44)`, which takes `void *`) — both are safe under
+  `BMemPMgrFree(sub->unk44)`, which takes `void *`) — both are safe under
   implicit pointer conversion, no cast needed.
 - New extern `func_800160B0(S16Quad_d294 *vec, s32 a1)`, PsyQ library,
   per-call-site typed (same precedent as `GetClass6B5CCMethods`'s note on

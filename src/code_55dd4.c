@@ -18,7 +18,7 @@ void *New_class_65650(void *arg1, void *arg2)
     if (vt->ctor(self, arg1, arg2) != NULL) {
         return self;
     }
-    func_80017CFC(self);
+    BMemPMgrFree(self);
     return NULL;
 }
 
@@ -325,8 +325,8 @@ void func_80065F2C(Class65650 *self)
         }
         self->unk68 = 0;
     }
-    self->unk74 = func_80017CFC(self->unk74);
-    self->unk70 = func_80017CFC(self->unk70);
+    self->unk74 = BMemPMgrFree(self->unk74);
+    self->unk70 = BMemPMgrFree(self->unk70);
 }
 
 void func_80065FD8(Class65650 *self)

@@ -58,11 +58,11 @@ void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
 
     if ((u32)(arg1 - 0x16) < 2) {
         if (self->unk24 == 1 && self->unk38 != NULL) {
-            func_80017CFC(self->unk3C);
+            BMemPMgrFree(self->unk3C);
             for (i = 0; i < self->unk2C; i++) {
-                func_80017CFC(((void **)self->unk38)[i]);
+                BMemPMgrFree(((void **)self->unk38)[i]);
             }
-            func_80017CFC(self->unk38);
+            BMemPMgrFree(self->unk38);
             self->unk38 = NULL;
         }
         self->unk28 = 0;
@@ -83,9 +83,9 @@ slot" shape already seen elsewhere in this project. The 5 live entries
 land on only 5 distinct labels this time (no shared groups, unlike
 `TaskObjF__AdvanceState`'s table) -- one `case` per label.
 
-`func_80017CFC` is already declared GLOBALLY in `include/class_3bb8c.h`
-(`extern void *func_80017CFC(void *ptr);`, established generic pool
-deallocator, `docs/match-reports/func_80017CFC.md`) -- no local
+`BMemPMgrFree` is already declared GLOBALLY in `include/class_3bb8c.h`
+(`extern void *BMemPMgrFree(void *ptr);`, established generic pool
+deallocator, `docs/match-reports/BMemPMgrFree.md`) -- no local
 declaration needed. Its return is discarded at all four call sites here
 (a legal, if unusual, use -- the project's own
 `docs/match-reports/TaskObjF__FreeUnusedBuffers.md` documents the OTHER common pattern,

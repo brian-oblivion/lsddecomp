@@ -26,7 +26,7 @@ proves `UnkSlotListObj_3ac78` has a `methods` pointer at offset 0, not
 just the `unk2C` field `Class866E8__ResetAllElements` already established); refreshes-
 and-discards a new field `entry->unkC`; scans a 0x668-byte array of
 `GenericObject*` at `entry->unk10`, refreshing-and-discarding every
-non-NULL entry; frees `entry->unk10` via `func_80017CFC`. After the loop:
+non-NULL entry; frees `entry->unk10` via `BMemPMgrFree`. After the loop:
 calls `((*(void***)func_800428E4(self))[3])(self)` — resolves a table
 through the return of `func_800428E4(self)` and calls its slot `+0xC`.
 
@@ -51,7 +51,7 @@ needs a complete type).
 ```c
 #if 0
 extern void *func_80020C5C(Class866E8 *self);
-extern void func_80017CFC(void *arg1);
+extern void BMemPMgrFree(void *arg1);
 extern void *func_800428E4(Class866E8 *self);
 
 void Class866E8__Finalize(Class866E8 *self)
@@ -98,7 +98,7 @@ void Class866E8__Finalize(Class866E8 *self)
             }
         }
 
-        func_80017CFC(entry->unk10);
+        BMemPMgrFree(entry->unk10);
         offset += 0x1C;
     }
 
@@ -299,7 +299,7 @@ void Class866E8__Finalize(Class866E8 *self)
             p += 4;
         }
 
-        func_80017CFC(entry->unk10);
+        BMemPMgrFree(entry->unk10);
     }
 
     func_800428E4()->dtor(self);

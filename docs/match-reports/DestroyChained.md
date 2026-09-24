@@ -11,7 +11,7 @@ Slot `+0x004` of the `D_8006D430` method table (see `include/code_171e0.h`'s
 **both** destructors available to it: the class's own (`this->methods->dtor`,
 itself `Class6D430__Destroy`, resolved through the vtable rather than by name) and
 the base class's (`Get_vtable_BasicClass()->dtor`, `BasicClassMethods.dtor`), then
-calls `func_80017CFC(this)` (a still-uncarved release/free routine, address
+calls `BMemPMgrFree(this)` (a still-uncarved release/free routine, address
 only) before returning `NULL` unconditionally.
 
 ## Derivation
@@ -25,7 +25,7 @@ jal   Get_vtable_BasicClass
 lw    $v0, 0xC($v0)      ; v0 = (base table)->dtor
 jalr  $v0                ; Get_vtable_BasicClass()->dtor(this) -- return discarded
  addu $a0, $s0, $zero
-jal   func_80017CFC
+jal   BMemPMgrFree
  addu $a0, $s0, $zero
 addu  $v0, $zero, $zero  ; explicit return 0, not derived from any callee
 ```
@@ -33,10 +33,10 @@ addu  $v0, $zero, $zero  ; explicit return 0, not derived from any callee
 The first pass at this function only wrote 3 calls (own dtor, base dtor via
 `Get_vtable_BasicClass()->dtor`) and used its return value directly — that produced a
 16/24-word body, 8 words short, because it silently dropped the 4th call
-(`func_80017CFC(this)`) and the *explicit* `addu v0,zero,zero` at the end.
+(`BMemPMgrFree(this)`) and the *explicit* `addu v0,zero,zero` at the end.
 The `v0=0` at the tail is real, not incidental: nothing after the last call
-touches `$v0`, so `return NULL;` (rather than `return func_80017CFC(this);`,
-which would also compile with a `nop` in the same slot were `func_80017CFC`
+touches `$v0`, so `return NULL;` (rather than `return BMemPMgrFree(this);`,
+which would also compile with a `nop` in the same slot were `BMemPMgrFree`
 non-void) is the form retail actually took — the byte pattern alone can't
 distinguish these two, but the presence of the explicit zeroing instruction
 after the 4th call rules out a tail-call return.
@@ -52,7 +52,7 @@ void *DestroyChained(Class6D430 *this) {
     this->unk20 = 0;
     this->methods->dtor(this);
     Get_vtable_BasicClass()->dtor(this);
-    func_80017CFC(this);
+    BMemPMgrFree(this);
     return NULL;
 }
 ```

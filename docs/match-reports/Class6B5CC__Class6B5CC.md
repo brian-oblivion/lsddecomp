@@ -32,7 +32,7 @@ void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
     blockB = BMemPMgrAlloc(0x28);
     self->unk14->unk44 = blockB;
     if (blockB == NULL) {
-        func_80017CFC(self->unk14);
+        BMemPMgrFree(self->unk14);
         return NULL;
     }
     Get_vtable_BasicClass()->ctor(self);

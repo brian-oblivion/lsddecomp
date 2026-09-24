@@ -363,7 +363,7 @@ typedef struct FixedBaseTableR {
 extern FixedBaseTableR *DreamSys__GetBaseMethods(void);
 
 extern void *BMemPMgrAlloc(s32 size);
-extern void *func_80017CFC(void *ptr);
+extern void *BMemPMgrFree(void *ptr);
 extern Class876FCMethods *GetClass876FCMethods(void); /* class_3bb8c_o.c, round 17, ALREADY MATCHED -- returns &gClass876FCMethods */
 extern void Class876FC__ReleaseByKind(Class876FC *self);
 extern void *Class876FC__InitByKind(Class876FC *self, void *arg1, void *arg2);
@@ -375,7 +375,7 @@ void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
         if (GetClass876FCMethods()->ctor(self, arg0, arg1, arg2, arg3) != NULL) {
             return self;
         }
-        func_80017CFC(self);
+        BMemPMgrFree(self);
         return NULL;
     }
     return NULL;

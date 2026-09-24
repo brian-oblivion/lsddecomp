@@ -28,7 +28,7 @@
  *    `children`, which fires the child's own vtable slot).
  *
  * List nodes come from the pool allocator (BMemPMgrInit/BMemPMgrAlloc/
- * func_80017CFC family; BMemPMgrAlloc and func_80017CFC's second
+ * BMemPMgrFree family; BMemPMgrAlloc and BMemPMgrFree's second
  * "pool" parameter is a fallback used only when a global default pool
  * pointer, D_8008A818, is unset -- established already by
  * include/class_3ac78.h, include/DreamSys.h etc., which all declare
@@ -74,7 +74,7 @@ struct BasicClass {
  * `sizeAndFlags` packs the block's byte size into the low 28 bits and
  * flag bits into the high 4 (0x40000000 = free); `prev`/`next` link the
  * pool's doubly-linked free list. Derived from SetupBMemPMgrFreeList (round 45)
- * and reused by BMemPMgrAlloc/func_80017CFC's still-undecoded bodies,
+ * and reused by BMemPMgrAlloc/BMemPMgrFree's still-undecoded bodies,
  * which walk this same list via BMemPMgr's freeListStart/freeListEnd.
  */
 typedef struct BMemBlockHdr BMemBlockHdr;
@@ -109,7 +109,7 @@ struct BMemPMgr {
  * declaration from this header.
  *
  * THIS header, uniquely, declares both with UNSPECIFIED parameters
- * (empty parens). Round 45 (BMemPMgrAlloc/func_80017CFC, matched): each
+ * (empty parens). Round 45 (BMemPMgrAlloc/BMemPMgrFree, matched): each
  * function's own BODY genuinely reads a second argument ($a1, a fallback
  * pool pointer used only when the global default pool D_8008A818 is
  * unset -- dead in practice at every decoded call site, confirmed by
@@ -119,14 +119,14 @@ struct BMemPMgr {
  * that second parameter to their own bodies without contradicting the
  * ~15 external single-argument prototypes OR this same unit's own
  * single-argument call sites (func_800181AC's `BMemPMgrAlloc(0x8)`,
- * func_80018208's `func_80017CFC(node)`) that appear LATER in
+ * func_80018208's `BMemPMgrFree(node)`) that appear LATER in
  * code_8220.c. A K&R-style definition does not install a prototype, so
  * those later 1-argument calls stay uncheck-and-compile clean; an
  * unspecified-parameter declaration here does the same for everything
  * before the definition. Do not "fix" this back to a full prototype --
  * that reintroduces the conflict this was written to route around. */
 extern void *BMemPMgrAlloc(); /* arity-ok: re-measured round 59 -- the body really does read $a1 -- `move s1,a1` at 0x80017B40, consumed as `move t0,s1` at 0x80017B68 only when the gp default pool is unset. The ~22 one-parameter declarations elsewhere are right about THEIR call sites (retail emits $a0 only, e.g. `move a0,s2` at 0x80026B74); this unprototyped pair is required by the K&R definitions in code_8220.c. */
-extern void *func_80017CFC(); /* arity-ok: re-measured round 59, same -- `move s1,a1` at 0x80017D0C, consumed as `move t0,s1` at 0x80017D2C on the unset-default-pool path. */
+extern void *BMemPMgrFree(); /* arity-ok: re-measured round 59, same -- `move s1,a1` at 0x80017D0C, consumed as `move t0,s1` at 0x80017D2C on the unset-default-pool path. */
 
 /* BMemPMgr setup, gp_rel-blocked (docs/research/gp-relative-blocker.md).
  * Called only by BMemPMgrInit in this unit. Genuinely ONE argument: its
@@ -144,7 +144,7 @@ extern void SetupBMemPMgrFreeList(BMemPMgr *pool);
 extern BMemPMgr *D_8008A818;
 
 /* Pool allocator/free critical-section flag, code_8220_b (setter
- * SetBMemPMgrBusy, getter GetBMemPMgrBusy). BMemPMgrAlloc/func_80017CFC in
+ * SetBMemPMgrBusy, getter GetBMemPMgrBusy). BMemPMgrAlloc/BMemPMgrFree in
  * THIS unit bracket their free-list walk with SetBMemPMgrBusy(1) on entry
  * and SetBMemPMgrBusy(0) on exit -- an enter/exit pair, not a real lock
  * (no busy-wait or check on entry visible in either caller). */

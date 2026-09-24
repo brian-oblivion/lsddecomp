@@ -21,7 +21,7 @@ void SetBMemPMgrBusy(s32 val)
 ```
 
 `gBMemPMgrBusy` is a pool allocator/free critical-section flag: this unit's
-`BMemPMgrAlloc`/`func_80017CFC` (in `code_8220.c`, still `INCLUDE_ASM` this
+`BMemPMgrAlloc`/`BMemPMgrFree` (in `code_8220.c`, still `INCLUDE_ASM` this
 round) bracket their free-list walk with `SetBMemPMgrBusy(1)` on entry and
 `SetBMemPMgrBusy(0)` on exit, per those functions' own (stale-verdict, still
 undecoded) match reports. Declared `extern s32 gBMemPMgrBusy;` in
@@ -49,7 +49,7 @@ needs zero new work once rebuilt under the round-42 `--gp-symbols` pin.
 measured, but nothing establishes what the flag is called in the original
 source. Three independent pieces of evidence, two of them new this round:
 
-1. `BMemPMgrAlloc` and `func_80017CFC` (the pool allocator's alloc/free
+1. `BMemPMgrAlloc` and `BMemPMgrFree` (the pool allocator's alloc/free
    pair, `code_8220.c`, still `INCLUDE_ASM`) bracket their free-list walk
    with `SetBMemPMgrBusy(1)` on entry and `SetBMemPMgrBusy(0)` on exit --
    visible as two `jal func_8001844C` in

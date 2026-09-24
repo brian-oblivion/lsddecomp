@@ -130,7 +130,7 @@ void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
     self->unkB0->unkAB = 8;
     self->unkB0->unkAC = 4;
     self->unkB0->unkAA = 9;
-    func_80017CFC(buf);
+    BMemPMgrFree(buf);
 }
 
 void func_8004DC08(Class86B60 *self)
@@ -230,7 +230,7 @@ void func_8004DE08(Class86B60 *self)
     buf1 = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf1, D_8008AA18);
     self->unkB0->methods->slotCC(self->unkB0, buf1);
-    func_80017CFC(buf1);
+    BMemPMgrFree(buf1);
     CheckObj866E8CountFlag(self, self->unk4C, self->unkA4);
     self->methods->slotE0(self, self->unk14);
     self->unkA4->methods->slot19C(self->unkA4, &buf2);

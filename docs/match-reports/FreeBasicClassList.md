@@ -16,14 +16,14 @@ void FreeBasicClassList(BasicClassListNode **head)
     while (node != NULL) {
         BasicClassListNode *cur = node;
         node = node->next;
-        func_80017CFC(cur);
+        BMemPMgrFree(cur);
     }
 }
 ```
 
 ## Notes
 
-First attempt used the more obvious shape (`next` computed, `func_80017CFC(node)`
+First attempt used the more obvious shape (`next` computed, `BMemPMgrFree(node)`
 called, then `node = next`) and built one word too long: 6/17 words matching,
 with the byte-length mismatch shifting everything after it in the unit. The
 extra instruction was a `move a0,s0` needed because that version tests the
@@ -32,13 +32,13 @@ retail's loop tests the SAME register (`$s0`) that already holds the
 about-to-be-freed node, and prepares the call argument in the branch's own
 delay slot from the previous iteration.
 
-Reordering to `cur = node; node = node->next; func_80017CFC(cur);` (the
+Reordering to `cur = node; node = node->next; BMemPMgrFree(cur);` (the
 "cur" temp copied BEFORE advancing) reproduced retail exactly — 2nd attempt,
 byte-exact. Retail's compiled loop:
 
 ```
 lw    s0, 0($s0)      ; node = node->next (in loop body, overwrites s0 early)
-jal   func_80017CFC    ; free(a0), a0 set from PRIOR iteration's delay slot
+jal   BMemPMgrFree    ; free(a0), a0 set from PRIOR iteration's delay slot
 bnez  s0, loop          ; test node directly
  move a0, s0            ; delay slot: a0 = node, for the NEXT free() call
 ```

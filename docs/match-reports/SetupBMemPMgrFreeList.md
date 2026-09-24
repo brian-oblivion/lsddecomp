@@ -11,7 +11,7 @@ Filed as `gp_rel`-blocked before round 42; reopened round 42
 
 **One part of the old stub's structural read was wrong, not just its
 verdict**, and it's worth flagging since the same misreading could have
-propagated into `BMemPMgrAlloc`/`func_80017CFC`'s still-open reports: it
+propagated into `BMemPMgrAlloc`/`BMemPMgrFree`'s still-open reports: it
 said this function "stores `pool` itself (self-pointer) into two places
 at `pool+0x1C+4` and `pool+0x1C+8`". The actual writes to those two words
 are `header->prev = NULL` and `header->next = NULL` (zero, not a

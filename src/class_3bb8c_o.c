@@ -237,7 +237,7 @@ void BaseObjO__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
 }
 
 extern void *BMemPMgrAlloc(s32 size);
-extern void *func_80017CFC(void *ptr);
+extern void *BMemPMgrFree(void *ptr);
 extern BaseObjOMethods *DreamSys__GetBaseMethods(void);
 
 void *New_BaseObjO(void) {
@@ -247,7 +247,7 @@ void *New_BaseObjO(void) {
         if (DreamSys__GetBaseMethods()->ctor(self) != NULL) {
             return self;
         }
-        func_80017CFC(self);
+        BMemPMgrFree(self);
         return NULL;
     }
     return NULL;

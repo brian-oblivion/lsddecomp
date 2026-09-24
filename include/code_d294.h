@@ -301,7 +301,7 @@ struct BasicClassMethodsD294 {
 
 extern BasicClassMethodsD294 *Get_vtable_BasicClass(void);
 extern void *BMemPMgrAlloc(s32 size);
-extern void func_80017CFC(void *arg);
+extern void BMemPMgrFree(void *arg);
 
 /* The PARENT object, seen through self->unkC (see Class6B5CCObj below) and
  * as Class6B5CC__AttachToParent's 2nd argument. Its +0x010/+0x014 slots are

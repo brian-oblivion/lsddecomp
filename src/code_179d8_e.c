@@ -313,7 +313,7 @@ extern void SsEnd(void);
 extern void QuitSpu(void);
 extern void SsSetTickMode(s32 a0);
 extern void SsStart(void);
-extern void *func_80017CFC(void *ptr);
+extern void *BMemPMgrFree(void *ptr);
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern s32 strlen(char *s);
 extern char *strcpy(char *dest, char *src);
@@ -379,9 +379,9 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
         SsEnd();
         QuitSpu();
     }
-    func_80017CFC(self->vagAttrPool);
-    func_80017CFC(self->progVagTable);
-    func_80017CFC(self->baseFilename);
+    BMemPMgrFree(self->vagAttrPool);
+    BMemPMgrFree(self->progVagTable);
+    BMemPMgrFree(self->baseFilename);
     return GetActiveDataSourceMethods()->slot0C(self);
 }
 
@@ -400,7 +400,7 @@ void VabStreamObj__Update(VabStreamObj *self) {
             self->streamBuffer = NULL;
             self->methods->slot58(self, path);
             if (self->baseFilename != NULL) {
-                func_80017CFC(self->baseFilename);
+                BMemPMgrFree(self->baseFilename);
                 self->baseFilename = NULL;
             }
         }
