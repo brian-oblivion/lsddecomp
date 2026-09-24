@@ -1,16 +1,18 @@
-# func_800621A8 -- MATCHED (144/144 words)
+# Entity__MoodCue68 -- MATCHED (144/144 words)
+
+> Renamed from `func_800621A8` on 2026-09-24 (tools/rename.py). Address 0x800621a8.
 
 Unit: `Entity_e` (round 13). Sets `Entity::unk48` (the s16 field, a
 different field from `EntityMoodHandlerArg::unk48`) via a coin flip, then
 branches on `this->unk44`: a `== 0` path doing two independent modulo
 checks (`% 10`, `% 20`) plus an "odd tick" gate that can promote `unk44` to
 `0xA`, and an `== 0xA` path doing an `unkFC < 8` threshold split.
-`void func_800621A8(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 == 0) {
         this->unk48 = (rand() & 1) ? -0x176 : -0xC0;

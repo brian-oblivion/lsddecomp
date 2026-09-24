@@ -1,16 +1,18 @@
-# func_80061F30 -- MATCHED (71/71 words)
+# Entity__MoodCue65 -- MATCHED (71/71 words)
+
+> Renamed from `func_80061F30` on 2026-09-24 (tools/rename.py). Address 0x80061f30.
 
 Unit: `Entity_e` (round 13). Ignores its `out` argument entirely (same shape
-as `func_800620C4`/`func_800624BC` in this unit): a one-shot 1-in-3 dice
+as `Entity__MoodCue67`/`Entity__MoodCue70` in this unit): a one-shot 1-in-3 dice
 roll on the first tick fires three vtable calls and sets `unk44 = 0xB`,
 then a second block guarded by that flag fires an `unkFC`-threshold call
 and an unconditional `slotC4`.
-`void func_80061F30(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue65(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue65(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if (rand() % 3 == 0) {
             this->methods->slot48(this, 1, SCALE_HALF);
@@ -30,7 +32,7 @@ void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
 
 ## Derivation notes
 
-Same "1-in-3" `rand() % 3 == 0` idiom as `func_800620C4` in this unit
+Same "1-in-3" `rand() % 3 == 0` idiom as `Entity__MoodCue67` in this unit
 (magic `0x55555556`, no post-`mfhi` shift, `sll 1`/`addu` reconstructing
 `q*3`, compared directly against the dividend). This one matched clean on
 the first pass, unlike `func_80062570`'s residue -- the difference is that

@@ -1,14 +1,16 @@
-# func_800624BC -- MATCHED (45/45 words)
+# Entity__MoodCue70 -- MATCHED (45/45 words)
+
+> Renamed from `func_800624BC` on 2026-09-24 (tools/rename.py). Address 0x800624bc.
 
 Unit: `Entity_e` (round 12). Three independent, unrelated checks on
 `this->unkFC` in sequence; `out` (the `EntityMoodHandlerArg *` parameter)
 is unused entirely -- confirmed by the disassembly never touching `$a1`.
-`void func_800624BC(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue70(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800624BC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue70(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if (rand() & 1) {
             this->unk44 = 0xB;
@@ -59,4 +61,4 @@ inversion (`bne`/`beq` swapped) with the two arms' *values* otherwise
 matching, try flipping the comparison operator and swapping the arms
 (`x != 0 ? A : B` &harr; `x == 0 ? B : A`) before reaching for anything
 heavier -- it's a one-line, zero-risk edit and resolved this residue and
-`func_8006204C`'s in this same round.
+`Entity__MoodCue66`'s in this same round.

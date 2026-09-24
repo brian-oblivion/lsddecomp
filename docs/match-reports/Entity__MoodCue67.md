@@ -1,15 +1,17 @@
-# func_800620C4 -- MATCHED (57/57 words)
+# Entity__MoodCue67 -- MATCHED (57/57 words)
+
+> Renamed from `func_800620C4` on 2026-09-24 (tools/rename.py). Address 0x800620c4.
 
 Unit: `Entity_e` (round 13). Never touches its `out` argument at all (same
-shape as `func_800624BC` below it in this unit) -- a one-shot "roll dice on
+shape as `Entity__MoodCue70` below it in this unit) -- a one-shot "roll dice on
 the first tick" gate that sets `unk44 = 0xB`, followed by two independent
 `unkFC`-threshold actions guarded by that flag.
-`void func_800620C4(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue67(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_800620C4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue67(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if (rand() % 3 == 0) {
             this->unk44 = 0xB;
@@ -33,7 +35,7 @@ void func_800620C4(Entity *this, EntityMoodHandlerArg *out) {
   `sra 31`+`mfhi`+`subu` sign fix, `sll 1`/`addu` reconstructing `q*3`, then
   compared directly against the dividend rather than materializing the
   remainder) -- verified against the pinned `cc1` (`int f(int x){return
-  x%3;}`) byte-for-byte, same technique as `func_800623E8`/`func_80061E60`.
+  x%3;}`) byte-for-byte, same technique as `Entity__MoodCue69`/`Entity__MoodCue64`.
 - Both post-`unk44==0xB` checks are guarded by the SAME outer `if`, not
   chained/nested against each other -- the `bne` at `.L80062118` branches
   all the way to the function's epilogue (`.L80062194`) when `unk44 != 0xB`,

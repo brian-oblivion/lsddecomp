@@ -1,16 +1,18 @@
-# func_80061C2C -- MATCHED (141/141 words)
+# Entity__MoodCue62 -- MATCHED (141/141 words)
+
+> Renamed from `func_80061C2C` on 2026-09-24 (tools/rename.py). Address 0x80061c2c.
 
 Unit: `Entity_e` (round 13). The unit's longest match so far this round: a
 `% 30` mood-code check, an `unkFC`-threshold `Class6B5CC__FaceTarget` call, an
 unconditional `slotC4`, a compound `unkFC==0x12C && slot144()<0x1000`
 vs. `unkFC==0x1F4` dispatch, a `rand()`-driven state machine that seeds
 `out`'s fields, and a final combined-condition `slot30` call.
-`void func_80061C2C(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue62(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80061C2C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue62(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk84 % 30 == 0) {
         out->unk1C = 3;
         out->unk10 = 0;
@@ -51,9 +53,9 @@ void func_80061C2C(Entity *this, EntityMoodHandlerArg *out) {
 
 - `this->unk84 % 30 == 0` reuses the same divisor-30 magic constant
   (`0x88888889`, with the negative-magic `addu`-before-`sra 4` rounding
-  correction) already confirmed in `func_80061E60`'s match report (its
+  correction) already confirmed in `Entity__MoodCue64`'s match report (its
   `out->unk4 % 300` uses a *different* divisor and thus a different magic
-  constant/shift, but the same idiom family; `func_8006204C`'s `% 30` is the
+  constant/shift, but the same idiom family; `Entity__MoodCue66`'s `% 30` is the
   direct precedent for THIS exact magic/shift pair).
 - **Residue: the `unkFC==0x12C` / `unkFC==0x1F4` dispatch is NOT
   `if (A) { if (B) C; } else if (D) E;`, it is `if (A && B) C; else if (D)

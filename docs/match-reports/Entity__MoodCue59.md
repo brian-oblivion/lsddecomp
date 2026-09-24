@@ -1,16 +1,18 @@
-# func_80061A90 -- MATCHED (93/93 words)
+# Entity__MoodCue59 -- MATCHED (93/93 words)
+
+> Renamed from `func_80061A90` on 2026-09-24 (tools/rename.py). Address 0x80061a90.
 
 Unit: `Entity_e` (round 13, first function in this file). Two independent
 "divisible by 10" checks (one gated on `unkFC==0` against `rand()`, one on
 `out->unk4` unconditionally), a `unkFC==0` coin-flip `slotCC` call, an
 unconditional `slotC4`, and a final `unk44`/`unkFC` combo that reaches
-through `unk4C`'s own vtable. `void func_80061A90(Entity *this,
+through `unk4C`'s own vtable. `void Entity__MoodCue59(Entity *this,
 EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0 && rand() % 10 == 0) {
         this->unk44 = 0xC;
     }

@@ -1,13 +1,15 @@
-# func_80061C04 -- MATCHED (10/10 words)
+# Entity__MoodCue61 -- MATCHED (10/10 words)
+
+> Renamed from `func_80061C04` on 2026-09-24 (tools/rename.py). Address 0x80061c04.
 
 Unit: `Entity_e` (round 12, first carve of this unit). Smallest function in
 the unit's queue, a one-shot mood handler with no loop or nested branch.
-`void func_80061C04(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue61(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80061C04(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue61(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk84 == 0x1E) {
         out->unk1C = 0x12;
         out->unk10 = 0;

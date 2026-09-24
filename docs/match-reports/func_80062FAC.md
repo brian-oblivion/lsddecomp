@@ -28,7 +28,7 @@ void func_80062FAC(Entity *this, EntityMoodHandlerArg *out) {
 - `out->unk4 % 10 == 0` is the magic-constant idiom for divisor 10
   (`0x66666667`, shift 2 after `mfhi`) -- verified against the pinned `cc1`
   with `int f(int x){return x/10;}`, byte-for-byte, continuing the
-  shift-fingerprints-the-divisor technique from `func_800623E8`'s report.
+  shift-fingerprints-the-divisor technique from `Entity__MoodCue69`'s report.
 - The `slot44(this, 0, ROTATION_YAW_PLUS2)` call is UNCONDITIONAL: it sits between
   the `% 10` check and the `unk44`/`unkF4` gate, not inside either `if`. The
   `a0 = this` set up in the `bne`'s delay slot at the end of the `% 10`

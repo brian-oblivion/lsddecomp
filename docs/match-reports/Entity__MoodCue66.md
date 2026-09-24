@@ -1,12 +1,14 @@
-# func_8006204C -- MATCHED (30/30 words)
+# Entity__MoodCue66 -- MATCHED (30/30 words)
+
+> Renamed from `func_8006204C` on 2026-09-24 (tools/rename.py). Address 0x8006204c.
 
 Unit: `Entity_e` (round 12). A mood handler testing `out->unk4 % 30 == 0`.
-`void func_8006204C(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue66(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_8006204C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue66(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 % 30 == 0) {
         out->unk1C = 0xD;
@@ -16,7 +18,7 @@ void func_8006204C(Entity *this, EntityMoodHandlerArg *out) {
 
 ## Derivation notes
 
-Same division-by-constant idiom as `func_80061E60` above, this time for
+Same division-by-constant idiom as `Entity__MoodCue64` above, this time for
 `% 30` (magic `0x88888889`, `sra` shift 4, WITH the `addu` sign-correction
 step since this magic is `>= 0x80000000` -- the "negative magic" case).
 Verified against the pinned `cc1` the same way.

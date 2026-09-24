@@ -1,13 +1,15 @@
-# func_80061E60 -- MATCHED (52/52 words)
+# Entity__MoodCue64 -- MATCHED (52/52 words)
+
+> Renamed from `func_80061E60` on 2026-09-24 (tools/rename.py). Address 0x80061e60.
 
 Unit: `Entity_e` (round 12). A mood handler that reduces `out->unk4` modulo
 300 and dispatches on the remainder.
-`void func_80061E60(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue64(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80061E60(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue64(Entity *this, EntityMoodHandlerArg *out) {
     s32 r = out->unk4 % 300;
 
     out->unk10 = this->methods->slot148(this);
@@ -34,7 +36,7 @@ pipeline): compiling `int mod300(int x){return x%300;}` through
 `tools/gcc263/cc1` at `-mips1 -mcpu=3000 -O2` reproduces this exact
 instruction sequence (magic, shift, and the `sll 2/addu/sll 4/subu/sll 2`
 reconstruction) byte-for-byte. This is the same idiom as
-`func_8006204C` below (`% 30`) and `Entity__MoodCue40` in `Entity_d.c` (`% 7`)
+`Entity__MoodCue66` below (`% 30`) and `Entity__MoodCue40` in `Entity_d.c` (`% 7`)
 -- worth having a reproducer command on hand rather than re-deriving the
 magic-number-to-divisor mapping by arithmetic each time, which is
 error-prone (a first pass on this function mis-guessed divisor 150 instead

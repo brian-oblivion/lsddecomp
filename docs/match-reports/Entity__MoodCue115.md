@@ -27,7 +27,7 @@ Entity__MoodCue115: insertions 8 / deletions 8 (opcode-level, built vs retail;
 **and one figure the inherited report never recorded: the built function was
 0x330 bytes = 204 words against retail's 0x318 = 198, i.e. 6 words LONG**
 (`build/lsdde.map`: `Entity__MoodCue115` at `0x80061778`, next symbol
-`func_80061A90` at `0x80061aa8`). That number is what cracked it, because it
+`Entity__MoodCue59` at `0x80061aa8`). That number is what cracked it, because it
 is exactly +3 in each of the two dispatch chains, and "the same deficit twice"
 is the opposite of the inherited report's "opposite-direction misses" reading.
 

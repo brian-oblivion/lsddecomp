@@ -1,7 +1,7 @@
 #include "common.h"
 #include "Entity.h"
 
-void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0 && rand() % 10 == 0) {
         this->moodState = 0xC;
     }
@@ -21,7 +21,7 @@ void func_80061A90(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061C04(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue61(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk84 == 0x1E) {
         out->unk1C = 0x12;
         out->unk10 = 0;
@@ -29,7 +29,7 @@ void func_80061C04(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061C2C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue62(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unk84 % 30 == 0) {
         out->unk1C = 3;
         out->unk10 = 0;
@@ -65,7 +65,7 @@ void func_80061C2C(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80061E60(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue64(Entity *this, EntityMoodHandlerArg *out) {
     s32 r = out->unk4 % 300;
 
     out->unk10 = this->methods->getProximityRatio(this);
@@ -82,7 +82,7 @@ extern u8 SCALE_HALF[];
 extern u8 ROTATION_YAW_PLUS90[];
 extern u8 ROTATION_YAW_MINUS90[];
 
-void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue65(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
             this->methods->updateScale(this, 1, SCALE_HALF);
@@ -99,14 +99,14 @@ void func_80061F30(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_8006204C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue66(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 % 30 == 0) {
         out->unk1C = 0xD;
     }
 }
 
-void func_800620C4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue67(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
             this->moodState = 0xB;
@@ -126,7 +126,7 @@ void func_800620C4(Entity *this, EntityMoodHandlerArg *out) {
 extern u8 D_80089CC4[];
 extern u8 D_80089D6C[];
 
-void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (out->unk4 == 0) {
         this->unk48 = (rand() & 1) ? -0x176 : -0xC0;
@@ -169,7 +169,7 @@ void func_800621A8(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_800623E8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue69(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->unk84 == this->unk80 - 1) {
         out->unk1C = 0x19;
@@ -190,7 +190,7 @@ void func_800623E8(Entity *this, EntityMoodHandlerArg *out) {
  * per-unit externs, not shared via the header. */
 extern u8 ROTATION_YAW_PLUS180[];
 
-void func_800624BC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue70(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (rand() & 1) {
             this->moodState = 0xB;
