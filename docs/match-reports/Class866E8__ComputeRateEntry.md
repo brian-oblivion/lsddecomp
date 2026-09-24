@@ -3,8 +3,8 @@
 > Renamed from `func_8004BA40` on 2026-09-24 (tools/rename.py). Address 0x8004ba40.
 
 REVISITED, round 63: MATCHED 63/63, whole-image SHA1 green; names/types not
-relevant (no header, symbol or type change was needed -- `D_8008688C`,
-`D_800868A8`, `Obj866E8::unk60`/`unk64`, `Unk54Struct` and `SetupEntry866E8`
+relevant (no header, symbol or type change was needed -- `sRateKeyMask`,
+`sRateEntryTable`, `Obj866E8::unk60`/`unk64`, `Unk54Struct` and `SetupEntry866E8`
 were all already correct; the stall was one variable too many).
 
 > **ROUND 63 (delta): MATCHED, 58/63 -> 63/63 in two builds.** Stalled at
@@ -161,7 +161,7 @@ were all already correct; the stall was one variable too many).
 >
 > **Split-combined-declaration lever, tried on all three untried
 > candidates in the `self->unk68->unk4 == 0` block:** `const Unk54Struct
-> *entry = &D_800868A8[key];`, `s32 fieldVal = entry->unk4;` and `s32 lo =
+> *entry = &sRateEntryTable[key];`, `s32 fieldVal = entry->unk4;` and `s32 lo =
 > divisor * entry->unk0;` are all combined declare-plus-initializer forms
 > that this report's history had not previously split (round 40's
 > "separating `fieldVal`/`sum` from `value`" tried a different axis --
@@ -318,7 +318,7 @@ Called once per element from `Class866E8__BuildRateEntries`'s outer loop, fillin
 `SetupEntry866E8` slot (`arg1`, `&stackBuf[count]` at the call site) and
 returning whether it produced a "real" entry (`1`) or a blank one (`0`):
 
-1. `mask = D_8008688C[key]` (a 7-entry `1 << key` bitmask table, proven-sized
+1. `mask = sRateKeyMask[key]` (a 7-entry `1 << key` bitmask table, proven-sized
    -- see below). If `(savedResult & mask) == 0`, the entry is blanked
    (`arg1->ptr0 = NULL`) and the function returns `0` early -- but the
    shared `arg1->id = key` write at the very end still happens (retail
@@ -327,8 +327,8 @@ returning whether it produced a "real" entry (`1`) or a blank one (`0`):
    word (see "rodata ownership" note below on why this is written as a raw
    `s32`, not `SetupEntry866E8::rate`):
    - If `self->unk68->unk4 == 0`: `value = val + key`.
-   - Else, index a second table `D_800868A8[key]` (7-entry `Unk54Struct`
-     array, same proof as `D_8008688C`'s bound):
+   - Else, index a second table `sRateEntryTable[key]` (7-entry `Unk54Struct`
+     array, same proof as `sRateKeyMask`'s bound):
      - If `entry->unk0 == 0`: `value = val + entry->unk4`.
      - Else: `value = val + divisor * entry->unk0 + (flag ? entry->unk4 : entry->unk8)`
        (the `divisor * entry->unk0` multiply is scheduled in the branch's
@@ -377,11 +377,11 @@ this function.
   prototype before assuming a new residue class -- the `s32` return here
   is evidence-backed (retail's own `$v0` sets, not a guess), so the fix is
   almost certainly on `Class866E8__BuildRateEntries`'s side, not this declaration's.
-- **Two new `extern` declarations**: `D_8008688C[7]` and
-  `D_800868A8[7]`. Both sizes are PROVEN, not guessed -- the data file
-  (`asm/data/76DC8.data.s`) places exactly 7 words at `D_8008688C` before
-  `D_800868A8` starts, and exactly 7 `Unk54Struct`-shaped (3-word) entries
-  at `D_800868A8` before the next symbol (`D_800868FC`) starts. Comments in
+- **Two new `extern` declarations**: `sRateKeyMask[7]` and
+  `sRateEntryTable[7]`. Both sizes are PROVEN, not guessed -- the data file
+  (`asm/data/76DC8.data.s`) places exactly 7 words at `sRateKeyMask` before
+  `sRateEntryTable` starts, and exactly 7 `Unk54Struct`-shaped (3-word) entries
+  at `sRateEntryTable` before the next symbol (`sFootprintResultRemap`) starts. Comments in
   the header point at this.
 
 ## SUPERSEDED by round 63 -- the matching body
@@ -394,7 +394,7 @@ round-63 entry at the top.
 
 ```c
     if (self->unk68->unk4 == 0) {
-        const Unk54Struct *entry = &D_800868A8[key];
+        const Unk54Struct *entry = &sRateEntryTable[key];
         s32 value;
         s32 sum;
 
@@ -420,7 +420,7 @@ round-63 entry at the top.
 ```c
 s32 Class866E8__ComputeRateEntry(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
-    s32 mask = D_8008688C[key];
+    s32 mask = sRateKeyMask[key];
     s32 result;
 
     if ((savedResult & mask) == 0) {
@@ -429,7 +429,7 @@ s32 Class866E8__ComputeRateEntry(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divi
     }
 
     if (self->unk68->unk4 == 0) {
-        const Unk54Struct *entry = &D_800868A8[key];
+        const Unk54Struct *entry = &sRateEntryTable[key];
         s32 value;
 
         if (entry->unk0 == 0) {
@@ -462,8 +462,8 @@ storeKey:
 }
 ```
 
-Needs (all added to `include/class_3bb8c.h` this round): `D_8008688C`,
-`D_800868A8`, `Obj866E8::unk60`/`unk64`. `Unk54Struct` and `SetupEntry866E8`
+Needs (all added to `include/class_3bb8c.h` this round): `sRateKeyMask`,
+`sRateEntryTable`, `Obj866E8::unk60`/`unk64`. `Unk54Struct` and `SetupEntry866E8`
 already existed.
 
 ## What was tried, in order
@@ -495,7 +495,7 @@ already existed.
 3. **Permuter**, `-j 6 --stack-diffs --stop-on-zero --best-only`, seeded
    with (2)'s body. `tools/setup-permuter.sh`'s two known bugs (missing
    `--addiu-at`, and the rodata-stripping `sed 1,4d`) were checked --
-   `D_8008688C`'s `%lo(...)` addressing DOES touch `addiu_at`, so
+   `sRateKeyMask`'s `%lo(...)` addressing DOES touch `addiu_at`, so
    `compile.sh`'s `MASPSX_FLAGS` was patched locally in
    `permuter-work/Class866E8__ComputeRateEntry/` (never in the shared script, this round's
    parallel-mode constraint) before trusting any score; no embedded rodata

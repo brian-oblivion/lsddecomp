@@ -29,10 +29,10 @@ s32 Class866E8__UpdateFootprintTracking(Obj866E8 *self) {
 
     e = buf.unk24;
     key = e->unk4->unk32;
-    result = D_800868FC[key];
+    result = sFootprintResultRemap[key];
 
     if (self->unk68->unk4 == 0) {
-        self->methods->slotF8(self, buf.unk28, &buf.unkC, D_80086974[result]);
+        self->methods->slotF8(self, buf.unk28, &buf.unkC, sFootprintResultPtrTable[result]);
     }
 
     self->methods->slot128(self);
@@ -53,15 +53,15 @@ s32 Class866E8__UpdateFootprintTracking(Obj866E8 *self) {
 2. Resolves `e = buf.unk24` (an `Elem*`, already the established meaning of
    `Descriptor10Ext::unk24` from `Class866E8__ComputeFootprintDescriptor`'s independent derivation)
    and reads `key = e->unk4->unk32` (`ElemTarget::unk32`, already typed).
-3. `result = D_800868FC[key]` -- an 8-entry signed-byte remap table
+3. `result = sFootprintResultRemap[key]` -- an 8-entry signed-byte remap table
    (values 0..6). This is both the eventual RETURN VALUE and (scaled by 4
    by the compiler, not by this C) the index used next.
 4. If `self->unk68->unk4 == 0`: calls `self->methods->slotF8(self,
-   buf.unk28, &buf.unkC, D_80086974[result])` -- forwarding the raw rate
+   buf.unk28, &buf.unkC, sFootprintResultPtrTable[result])` -- forwarding the raw rate
    (`buf.unk28`), a pointer to `buf`'s own next THREE consecutive `s32`
    fields (`unkC`/`unk10`/`unk14`, an in-place 3-word out-parameter, same
    shape as `slotF8`'s other established call site in `Class866E8__SetTargetAndBuildRates`) and
-   one of `D_80086974`'s 7 pointers (first NULL) selected by `result`.
+   one of `sFootprintResultPtrTable`'s 7 pointers (first NULL) selected by `result`.
 5. Unconditionally calls `self->methods->slot128(self)`.
 6. Reads the OLD raw first 16 bits of `self->unkBC` (`oldRaw`, BEFORE
    overwriting it -- this is why the read has to come before step 7, not
@@ -123,10 +123,10 @@ a pointer-cast read, deliberately, to avoid introducing a union into
 
 ## Header changes made this round
 
-- **`D_800868FC`** (new): `extern const s8 D_800868FC[8];` -- 8-entry
+- **`sFootprintResultRemap`** (new): `extern const s8 sFootprintResultRemap[8];` -- 8-entry
   signed-byte remap table. Bound PROVEN from `asm/data/76DC8.data.s` (next
   symbol `sDefaultTargetSpecs` starts immediately after byte 8).
-- **`D_80086974`** (new): `extern s32 *D_80086974[7];` -- 7-entry pointer
+- **`sFootprintResultPtrTable`** (new): `extern s32 *sFootprintResultPtrTable[7];` -- 7-entry pointer
   table (first entry NULL), bound PROVEN from the same data file. Element
   type `s32 *` matches the ALREADY-established `Obj866E8Methods::slotF8`
   `arg3` type.

@@ -215,13 +215,13 @@ extern s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, Unk68Struct *arg2, Un
 
 /* Constant `Unk54Struct` (unk0=-1, unk4=0, unk8=0x140014) whole-struct-copied
  * by Class866E8__InitFootprintSlot into self+0x8C+key*0xC. */
-extern Unk54Struct D_80086990;
+extern Unk54Struct gDefaultElemRateOffset;
 
 /*
  * Class866E8__BuildRateEntries's per-outer-loop-iteration key/enable pair, read from its
  * own `arg3` parameter (a 2-byte-strided array, one entry per element of
  * `self->arr`). `key` is copied into the resolved Elem's own `unk2` and
- * doubles as an index into `D_80086838` (`key * 0xC`, i.e. `D_80086838
+ * doubles as an index into `sRateOffsetTable` (`key * 0xC`, i.e. `sRateOffsetTable
  * + key`, since that table's own stride is 0xC == sizeof(Unk54Struct));
  * `flag` gates the whole per-element body (skip if 0).
  */
@@ -245,7 +245,7 @@ extern TargetSpec866E8 sDefaultTargetSpecs[7];
  * 0x0/0x4/0x8, all as plain `s32`, no evidence of any other width). Bound
  * unknown from this unit alone (`key` is an arbitrary byte from the
  * caller), so left unsized. */
-extern Unk54Struct D_80086838[];
+extern Unk54Struct sRateOffsetTable[];
 
 /* Called once per element from Class866E8__BuildRateEntries's outer loop with seven
  * arguments: `self`, the stack-buffer slot being filled (`&stackBuf[count]`,
@@ -262,36 +262,36 @@ extern s32 Class866E8__ComputeRateEntry(Obj866E8 *self, SetupEntry866E8 *arg1, s
 /* `key`-indexed bitmask table, one bit per key (`1 << key`), tested against
  * `savedResult` (Class866E8__ComputeRateFlags's return, forwarded through Class866E8__BuildRateEntries) by
  * Class866E8__ComputeRateEntry. Bound is PROVEN, not guessed: the data file places exactly
- * 7 words here (0x8008688C-0800868A8) before D_800868A8 starts, and
- * D_800868A8 below is independently proven to hold exactly 7 `Unk54Struct`
+ * 7 words here (0x8008688C-0800868A8) before sRateEntryTable starts, and
+ * sRateEntryTable below is independently proven to hold exactly 7 `Unk54Struct`
  * entries (0x800868A8-0x800868FC) -- same key domain, consistent. */
-extern const s32 D_8008688C[7];
+extern const s32 sRateKeyMask[7];
 
 /* `key`-indexed, reuses `Unk54Struct`'s 3-`s32` shape (same evidence as
- * `D_80086838` above: offsets 0x0/0x4/0x8, plain words). Read by
+ * `sRateOffsetTable` above: offsets 0x0/0x4/0x8, plain words). Read by
  * Class866E8__ComputeRateEntry as: `unk0` gates a `divisor * unk0` multiply (its low 32
  * bits used, `unk4` or `unk8` added depending on a caller-supplied `flag`);
  * when `unk0 == 0` the multiply is skipped entirely and `unk4` alone is
- * used. Sized at 7 (see D_8008688C's comment for why this one is provable
- * where `D_80086838` above is not). */
-extern const Unk54Struct D_800868A8[7];
+ * used. Sized at 7 (see sRateKeyMask's comment for why this one is provable
+ * where `sRateOffsetTable` above is not). */
+extern const Unk54Struct sRateEntryTable[7];
 
 /* `ElemTarget::unk32`-indexed remap table, read by Class866E8__UpdateFootprintTracking as a
  * signed byte (`lb`). 8-entry bound is PROVEN, not guessed: the data file
  * (`asm/data/76DC8.data.s`) places exactly 8 bytes here (values
  * `01 02 03 00 04 05 06 00`) before `sDefaultTargetSpecs` starts. The fetched byte
  * (range 0..6) doubles as Class866E8__UpdateFootprintTracking's own return value and, scaled by
- * 4, as the index into `D_80086974` below. */
-extern const s8 D_800868FC[8];
+ * 4, as the index into `sFootprintResultPtrTable` below. */
+extern const s8 sFootprintResultRemap[8];
 
-/* 7-entry pointer table, first entry NULL, indexed by `D_800868FC`'s
+/* 7-entry pointer table, first entry NULL, indexed by `sFootprintResultRemap`'s
  * fetched byte in Class866E8__UpdateFootprintTracking. Bound PROVEN by the data file: exactly 7
- * words at `D_80086974` (one NULL, six pointers into the 4-word tables
+ * words at `sFootprintResultPtrTable` (one NULL, six pointers into the 4-word tables
  * `D_80086914`..`D_80086964`) before the next symbol starts. Element type
  * `s32 *` matches `Obj866E8Methods::slotF8`'s own `arg3` (already `s32 *`
  * from `Class866E8__SetTargetAndBuildRates`'s call site) -- Class866E8__UpdateFootprintTracking forwards a
- * `D_80086974` entry there unchanged. */
-extern s32 *D_80086974[7];
+ * `sFootprintResultPtrTable` entry there unchanged. */
+extern s32 *sFootprintResultPtrTable[7];
 
 /* Only the slots this unit's functions dispatch through (via
  * self->methods->slotNN) are typed; everything else stays opaque so the
@@ -342,7 +342,7 @@ typedef struct Obj866E8Methods {
      * `sDefaultTargetSpecs` (as `TargetSpec866E8 *`). Left `s32`/`s32 *`/`s32 *`
      * here rather than retyped to match: `Class866E8__UpdateFootprintTracking`'s OWN
      * call through this same slot passes `&buf.unkC` (`s32 *`) and a
-     * `D_80086974` entry (`s32 *`) instead, and retyping the field would need
+     * `sFootprintResultPtrTable` entry (`s32 *`) instead, and retyping the field would need
      * that already-matched call site re-cast rather than left alone -- the
      * two call sites' real argument types genuinely differ, which is exactly
      * what a `void *`-shaped vtable slot type papers over on this project. */

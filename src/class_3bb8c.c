@@ -96,10 +96,10 @@ s32 Class866E8__UpdateFootprintTracking(Obj866E8 *self) {
 
     e = buf.unk24;
     key = e->unk4->unk32;
-    result = D_800868FC[key];
+    result = sFootprintResultRemap[key];
 
     if (self->unk68->unk4 == 0) {
-        self->methods->slotF8(self, buf.unk28, &buf.unkC, D_80086974[result]);
+        self->methods->slotF8(self, buf.unk28, &buf.unkC, sFootprintResultPtrTable[result]);
     }
 
     self->methods->slot128(self);
@@ -148,7 +148,7 @@ void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Ta
             e = self->methods->slot118(self, i);
             e->unk2 = arg3[i].key;
             if (arg3[i].flag != 0) {
-                tbl = &D_80086838[arg3[i].key];
+                tbl = &sRateOffsetTable[arg3[i].key];
                 u14 = e->unkC->unk14;
                 if (self->unk68->unk4 == 0) {
                     u14->unk18.w = arg2->unk0 + tbl->unk0;
@@ -224,7 +224,7 @@ s32 Class866E8__ComputeRateFlags(Obj866E8 *self, s32 val, s32 flag) {
  * image. It was inherited with the near-miss body and is verified here. */
 s32 Class866E8__ComputeRateEntry(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
-    s32 mask = D_8008688C[key];
+    s32 mask = sRateKeyMask[key];
     s32 result;
 
     if ((savedResult & mask) == 0) {
@@ -233,7 +233,7 @@ s32 Class866E8__ComputeRateEntry(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divi
     }
 
     if (self->unk68->unk4 == 0) {
-        const Unk54Struct *entry = &D_800868A8[key];
+        const Unk54Struct *entry = &sRateEntryTable[key];
         s32 value;
         s32 sum;
 

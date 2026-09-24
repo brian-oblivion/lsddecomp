@@ -349,7 +349,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
    spilled to the stack and reused later).
 3. Loop `i = 0..6`: resolve `e = self->methods->slot118(self, i)`, copy
    `arg3[i].key` into `Elem::unk2` (new field). If `arg3[i].flag != 0`:
-   look up `tbl = &D_80086838[arg3[i].key]` (new 0xC-stride `Unk54Struct`
+   look up `tbl = &sRateOffsetTable[arg3[i].key]` (new 0xC-stride `Unk54Struct`
    data table, reused type), fill `e->unkC->unk14`'s `unk18`/`unk1C`/
    `unk20` from `arg2` combined with either `tbl` (when
    `self->unk68->unk4 == 0`) or a flat `-0x5000` adjustment (otherwise),
@@ -366,7 +366,7 @@ If `arg3 == 0`, does nothing at all (whole body skipped). Otherwise:
 New header additions (all committed, additive; unchanged from the previous
 draft of this report): `Elem::unk2` (u16 @+0x002), `Unk14Obj::unk0` (s32
 @+0x000), `TargetSpec866E8` (new: `u8 key`@0, `u8 flag`@1, size 2),
-`extern Unk54Struct D_80086838[]` (reuses the existing 3-`s32`-word shape),
+`extern Unk54Struct sRateOffsetTable[]` (reuses the existing 3-`s32`-word shape),
 `extern void Class866E8__ComputeRateEntry(...)` (7-arg prototype, established from this
 call site only), and `Obj866E8Methods::slotFC` fixed to its real signature
 (see `Class866E8__ApplyRateEntries`'s report for the mixup that entry had).
@@ -380,7 +380,7 @@ DRIFT WARNING, which turned out to matter: direct `.o` inspection
 start) showed the compiled body was **138 words, 2 words (8 bytes) SHORT**
 of retail's 140 -- `funcdiff`'s own reported byte RANGE is not proof of
 correct length; it can look plausible while a function is short, and the
-tell was an absolute data-symbol reference (`D_80086838`) resolving 8
+tell was an absolute data-symbol reference (`sRateOffsetTable`) resolving 8
 bytes low in the FINAL LINKED image, because everything downstream of a
 short function shifts, including unrelated data in another file entirely.
 **Always cross-check a stalled function's true compiled length against
@@ -388,7 +388,7 @@ short function shifts, including unrelated data in another file entirely.
 
 Both missing instructions were closed this round:
 
-1. **One `nop` for a load-delay slot.** In `tbl = &D_80086838[arg3[i].key];
+1. **One `nop` for a load-delay slot.** In `tbl = &sRateOffsetTable[arg3[i].key];
    u14 = e->unkC->unk14;`, GCC 2.6.3 scheduled `u14`'s independent load
    RIGHT AFTER the tbl-address computation, incidentally filling the
    load-delay slot that would otherwise follow the very next `lbu`
@@ -474,7 +474,7 @@ void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Ta
             e = self->methods->slot118(self, i);
             e->unk2 = arg3[i].key;
             if (arg3[i].flag != 0) {
-                tbl = &D_80086838[arg3[i].key];
+                tbl = &sRateOffsetTable[arg3[i].key];
                 __asm__("");
                 u14 = e->unkC->unk14;
                 if (self->unk68->unk4 == 0) {
@@ -691,7 +691,7 @@ void Class866E8__BuildRateEntries(Obj866E8 *self, s32 val, Unk54Struct *arg2, Ta
             e = self->methods->slot118(self, i);
             e->unk2 = arg3[i].key;
             if (arg3[i].flag != 0) {
-                tbl = &D_80086838[arg3[i].key];
+                tbl = &sRateOffsetTable[arg3[i].key];
                 __asm__("");
                 u14 = e->unkC->unk14;
                 if (self->unk68->unk4 == 0) {
