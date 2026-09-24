@@ -1,6 +1,12 @@
-# DreamSys__BuildLinkQueries -- STALL (best 13/116 words, structurally correct)
+# DreamSys__BuildLinkQueries -- MATCHED (round 75: 2-argument method call removes both extra saved registers)
 
-NON_MATCHING body promoted, round 74.
+REVISITED, round 75: MATCHED 116/116, whole image `OK: build matches retail`; names/types used (the lever is a call-site function type).
+
+NON_MATCHING body promoted, round 74; replaced by plain C, round 75.
+
+Everything below the round-75 section is the stall history, kept because
+its diagnosis ("register-allocation residue only") is the instructive wrong
+turn. The round-75 section at the end supersedes it.
 
 > Renamed from `func_80057784` on 2026-09-19 (tools/rename.py). Address 0x80057784.
 
@@ -259,3 +265,107 @@ drifted re-read.
 retail byte-exact -- this promotion changed no linked bytes).
 `tools/check-nonmatching.sh` exit=0, green (47 NON_MATCHING bodies in 16
 units compile and resolve, including this one).
+
+## Round 75: MATCHED (runner echo)
+
+### Baseline, recorded before any change
+
+The round-74 NON_MATCHING body compiled live in place of the `INCLUDE_ASM`:
+**13/116 words, `insertions 17 / deletions 17`, positional skeleton diffs
+99**, frame `-0x30` vs retail `-0x28`, and 98230 bytes differing outside the
+window (length not exact).
+
+### What the two extra saved registers held
+
+Retail saves s0-s4: s0 = `idx` (and the constant 1), s1 = `arr1`, s2 =
+`linkMgr` (`unk4C`), s3 = `src->info->unk32`, s4 = `arr2`. The preserved body
+added **s5 and s6, holding `f3` (queryRow) and `src`**: the header types
+`getGridArrElemAt` as `(self, arg1, arg2, void *arg3)`, so the body passed
+`(unk4C, pos, f3, src)` to BOTH calls, and both values had to survive the
+first call to reach the second.
+
+Retail's second call sets only `a0`/`a1`. The `a2`/`a3` visible at the first
+call are not arguments: `a2` is the else-branch's `row` copy (initialised
+before the `== 1` test, see below) and `a3` is `arg3`'s register reused for
+`arg3->source`. So the method takes `(this, pos)`, and nothing keeps
+row/source live across the call. The header comment's "different argument
+count each time" was a reading of those leftovers.
+
+This was not a loop-hoist case: there is no loop in this function, so the
+round-74 goto lever (LEARNINGS 3a) does not apply here. Recorded as a
+negative.
+
+### Levers, in the order applied (one build each unless noted)
+
+| # | change | frame | length | score |
+|---|---|---|---|---|
+| 0 | round-74 body, live | -0x30 | long | 13/116 |
+| 1 | call through a local `GridArrElem *(*)(void *, s32)` cast, both sites | **-0x28** | 3 words short | 8/116 (misaligned, frame right) |
+| 2 | else-branch copies (`numCols`, `numRows`, `col`, `row`) declared and initialised at the top, before the `== 1` test; the `== 1` branch stores `col`/`row`/`numRows` | -0x28 | 3 short | (ins 16/del 16) |
+| 3 | `count = (arg4 & 1) ? arg4 : ++arg4`, test `arg4 == 1` | -0x28 | 2 short | 18/116 |
+| 4 | arm order `if (col == 0) numCols = numRows - 1; else col--;` and `if (f3 == 0x13) numRows--; else row++;` | -0x28 | 2 short | 18/116 (ins 2/del 2) |
+| 5 | `count = arg4; if (!(arg4 & 1)) { count++; arg4 = count; }` | -0x28 | **exact** | 100/116 |
+| 6 | drop `count`: `numRows = (arg4 & 1) ? arg4 : ++arg4; numCols = numRows;` | -0x28 | exact | 108/116 |
+| 7 | invert the test: `numRows = !(arg4 & 1) ? ++arg4 : arg4;` | -0x28 | exact | 113/116 (ins 0/del 0) |
+| 8 | `idx = 2;` moved AFTER the first call statement | -0x28 | exact | **116/116, OK** |
+
+Notes on each:
+
+- **1** is the frame fix and the whole of the head's round-74 question.
+- **3-7** are the `oddCount` codegen that the original report could not
+  reproduce: retail computes the even arm into the RESULT register
+  (`addiu v0,v1,1`) and copies it back into `arg4` (`move v1,v0`), with the
+  odd arm as the branch target doing `move v0,v1`. That is two pseudos
+  (the result and `arg4`, which is what `== 1` tests) with `++arg4` in the
+  even arm. A separate `count` variable adds one more copy (100/116); the
+  test's sense decides which arm is the fall-through (108 -> 113). Neither
+  an explicit if/else `numRows = arg4 + 1; arg4 = numRows;` nor
+  `count = arg4 = ternary` helped when a separate `count` existed (18 and
+  5/116), but with `numRows` as the ternary's own target the if/else
+  spelling scores the same 113 as the ternary.
+- **8**: with `idx = 2` before the call, `li s0,2` is scheduled into the
+  load-delay slot after `lw v0,0(s2)` and `move a0,s2` lands in the jalr
+  slot. With it after the call statement, `move a0,s2` fills the `beqz`
+  delay slot and `li s0,2` fills the jalr slot, as in retail.
+
+About 22 builds, every one improving or informative; no permuter search was
+needed, so Gate 3 was not run.
+
+### Negatives
+
+- The round-74 goto-loop lever (LEARNINGS 3a): not applicable, no loop.
+- `count = arg4 = (arg4 & 1) ? arg4 : arg4 + 1;`: 5/116, worse.
+- `count = arg4; if (!(arg4 & 1)) count = arg4 + 1; arg4 = count;`: 5/116.
+- if/else `count = arg4 + 1; arg4 = count;` with a separate `count`:
+  18/116, CSE rewrites it to `arg4++; count = arg4` and cross-jumps the
+  shared tail.
+
+No toolchain smell.
+
+### Proposed learning
+
+**A leftover argument register is not an argument.** When one call site of
+a method sets `a2`/`a3` and another sets only `a0`/`a1`, check whether the
+first site's `a2`/`a3` were written for some other purpose (an early
+`move a2, t1` initialising a local, or the incoming `a3` register reused
+for a field load of the same pointer). If so, the method takes two
+arguments at BOTH sites, and typing it with the fuller shape forces the
+extra values to be kept live across the first call, which shows up as extra
+callee-saved registers and a larger frame, not as a local register swap.
+Here it was the whole of a "13/116, register-allocation residue" stall;
+fixing the call type moved the frame from -0x30 to -0x28, and the rest was
+source shape. A shared header's per-slot type can be overridden with a local
+function-pointer cast at the call site, which leaves the header alone.
+
+The header comment on `DreamSysUnk4CMethods::getGridArrElemAt` in
+`include/DreamSys.h` still describes the 4-argument reading; it is left
+unedited here (shared header, additive edits only) and should be corrected
+by whoever owns that header: both calls take `(this, pos)`.
+
+### Verify
+
+```
+./build-and-verify.sh      # build exit=0, OK: build matches retail SLPS_015.56
+tools/funcdiff.py DreamSys__BuildLinkQueries   # 116/116, insertions 0 / deletions 0
+tools/check-nonmatching.sh # OK: 45 NON_MATCHING bodies in 15 units
+```

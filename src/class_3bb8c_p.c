@@ -10,7 +10,7 @@
  *    applies it as a rotated positional nudge via the inherited
  *    BaseObjO__ApplyRotatedVec14, resets that component, and falls back to
  *    a grid-based nearby-link search (DreamSys__FindNearbyLink,
- *    DreamSys__BuildLinkQueries [STALL], DreamSys__ScanLinkCandidates,
+ *    DreamSys__BuildLinkQueries, DreamSys__ScanLinkCandidates,
  *    DreamSys__ScanGridWindow, DreamSys__AcceptGridElem) when the offset
  *    alone did not attach to a link (DreamSys::unk_0x28).
  *  - A link-command dispatch pair (DreamSys__DispatchLinkCommand[AndTryAttach])
@@ -22,9 +22,8 @@
  *    an unrelated, still-uncarved sibling class (table D_800879C4, in
  *    class_3bb8c_q.s).
  *
- * One stall: DreamSys__BuildLinkQueries (13/116, length not exact: frame
- * and register-allocation residue; control and data flow independently
- * confirmed via m2ctx.py). No switch jump table in this slice, and no gp_rel/addiu_at/
+ * No stalls: DreamSys__BuildLinkQueries, the last one, matched in round 75
+ * (2-argument method call, see its report). No switch jump table in this slice, and no gp_rel/addiu_at/
  * nop_mflo_mfhi anywhere in it (all three are resolved toolchain
  * constructs anyway, CLAUDE.md "Open toolchain blockers").
  */
@@ -100,7 +99,7 @@ void DreamSys__ApplyOffsetOrFindNearby(DreamSys *self, void (*callback)(DreamSys
 }
 
 /* A 12-byte {s16,s16,s32,s32} query/result record. Built by this unit's
- * own DreamSys__BuildLinkQueries (still queued) into caller-supplied buffers, and
+ * own DreamSys__BuildLinkQueries into caller-supplied buffers, and
  * walked as an array (stride 0xC) by DreamSys__ScanLinkCandidates. Describes a
  * rectangular window of the grid DreamSys__ScanGridWindow walks: `startCol`/
  * `startRow` is the window's origin bucket, `numCols`/`numRows` its extent --
@@ -153,11 +152,8 @@ typedef struct GridArrElem {
 /* Output buffer filled in by DreamSysUnk4CMethods::queryLinkAtPos (see
  * include/DreamSys.h) and read back by this unit's own DreamSys__BuildLinkQueries.
  * Only the three fields actually touched are named. `queryCol`/`queryRow`
- * feed straight into GridQuery::startCol/startRow (DreamSys__BuildLinkQueries's
- * best-reached preserved body, its own report: `arr1[0].unk0 = f2` /
- * `arr1[0].unk2 = f3` where `f2 = arg3->unk2`, `f3 = arg3->unk3` --
- * data-flow confirmed even though that function itself is still a STALL,
- * round 57 naming pass). */
+ * feed straight into GridQuery::startCol/startRow (DreamSys__BuildLinkQueries,
+ * matched round 75; round 57 naming pass). */
 typedef struct LinkQueryBuf {
     u8 pad00[0x2];
     s8 queryCol;
@@ -201,87 +197,84 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
     return 0;
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 13/116 words, length NOT exact (live build drifts the image).
- * Residue: frame and register allocation (two extra callee-saved registers
- * survive throughout, which is a frame difference, not scheduling), and the
- * `oddCount` ternary and the second `getGridArrElemAt` call site each
- * codegen differently from retail in ways not yet reproduced). Control
- * and data flow are independently confirmed against m2ctx.py.
- * docs/match-reports/DreamSys__BuildLinkQueries.md. Hand-derived. */
+/* Both getGridArrElemAt calls pass only (this, pos): retail sets a0/a1
+ * and nothing else at the second call, and the a2/a3 values visible at
+ * the first are leftovers of this function's own register use. Calling it
+ * through the header's 4-argument shape kept row/source live across both
+ * calls in two extra callee-saved registers (round 75, see the report). */
+typedef GridArrElem *(*GetGridArrElemAt2Fn)(void *self, s32 pos);
+
 s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4) {
     s32 f2 = arg3->queryCol;
     s32 f3 = arg3->queryRow;
-    s32 oddCount = (arg4 & 1) ? arg4 : arg4 + 1;
-    s32 idx = 1;
+    s32 numCols;
+    s32 numRows;
+    s32 col;
+    s32 row;
+    s32 idx;
 
-    if (oddCount == 1) {
+    numRows = !(arg4 & 1) ? ++arg4 : arg4;
+    numCols = numRows;
+    col = f2;
+    row = f3;
+    idx = 1;
+    if (arg4 == 1) {
         DreamSysUnk4CObj *unk4C;
         DreamSysUnk4C68Obj *unk68;
         GridArrElem *src;
         s16 s3;
         s32 pos;
 
-        arr1[0].startCol = (s16) f2;
-        arr1[0].startRow = (s16) f3;
-        arr1[0].numCols = oddCount;
-        arr1[0].numRows = oddCount;
+        arr1[0].startCol = col;
+        arr1[0].startRow = row;
+        arr1[0].numCols = numRows;
+        arr1[0].numRows = numRows;
         src = arg3->source;
         arr2[0] = src;
         unk4C = self->linkMgr;
         unk68 = unk4C->unk_0x68;
-        if (unk68->unk_0x4 != 1) {
+        if (unk68->unk_0x4 != idx) {
             return 1;
         }
         s3 = src->info->unk32;
         pos = s3 + 1;
         if (pos < unk68->unk_0x2) {
+            arr2[1] = ((GetGridArrElemAt2Fn) unk4C->methods->getGridArrElemAt)(unk4C, pos);
             idx = 2;
-            arr2[1] = unk4C->methods->getGridArrElemAt(unk4C, pos, f3, src);
             arr1[1] = arr1[0];
         }
         pos = s3 - 1;
         if (pos >= 0) {
-            arr2[idx] = unk4C->methods->getGridArrElemAt(unk4C, pos, f3, src);
+            arr2[idx] = ((GetGridArrElemAt2Fn) unk4C->methods->getGridArrElemAt)(unk4C, pos);
             arr1[idx] = arr1[0];
             idx++;
         }
         return idx;
     }
 
-    {
-        s32 t0 = oddCount;
-        s32 vv0 = oddCount;
-        s32 a1 = f2;
-        s32 a2 = f3;
-
-        if (f2 != 0) {
-            a1 = f2 - 1;
-        } else {
-            t0 = oddCount - 1;
-        }
-        if (f2 == 0x13) {
-            t0 -= 1;
-        }
-        if (f3 != 0x13) {
-            a2 = f3 + 1;
-        } else {
-            vv0 -= 1;
-        }
-        arr1[0].startCol = (s16) a1;
-        if (f3 == 0) {
-            vv0 -= 1;
-        }
-        arr1[0].startRow = (s16) a2;
-        arr1[0].numCols = t0;
-        arr1[0].numRows = vv0;
-        arr2[0] = arg3->source;
-        return 1;
+    if (col == 0) {
+        numCols = numRows - 1;
+    } else {
+        col--;
     }
+    if (f2 == 0x13) {
+        numCols--;
+    }
+    if (f3 == 0x13) {
+        numRows--;
+    } else {
+        row++;
+    }
+    arr1[0].startCol = col;
+    if (f3 == 0) {
+        numRows--;
+    }
+    arr1[0].startRow = row;
+    arr1[0].numCols = numCols;
+    arr1[0].numRows = numRows;
+    arr2[0] = arg3->source;
+    return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_p", DreamSys__BuildLinkQueries);
-#endif
 
 void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source);
 
