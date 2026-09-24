@@ -1,12 +1,14 @@
-# func_80060A4C -- MATCHED (58/58 words)
+# Entity__MoodCue48 -- MATCHED (58/58 words)
+
+> Renamed from `func_80060A4C` on 2026-09-24 (tools/rename.py). Address 0x80060a4c.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler:
-`void func_80060A4C(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80060A4C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;
     EntityMethods *methods;
 

@@ -3,7 +3,7 @@
 > Renamed from `func_800605D0` on 2026-09-24 (tools/rename.py). Address 0x800605d0.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler,
-calls `func_80060710` (already matched, earlier ROM address) as a helper:
+calls `Entity__func_80060710` (already matched, earlier ROM address) as a helper:
 `void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
@@ -15,7 +15,7 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     s32 r2;
     u8 *table;
 
-    func_80060710(this);
+    Entity__func_80060710(this);
     out->unk10 = this->methods->slot148(this);
     if (this->unk84 == 7 || this->unk84 == 0x16) {
         out->unk1C = 3;
@@ -71,10 +71,10 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
   jumping to) the common call instruction. Writing three ordinary,
   separate `this->methods->slotNN(...)` calls in C reproduced this without
   any `goto` -- the compiler's own cross-jump pass merged the trailing
-  `jalr`/delay-slot pair on its own, unlike `func_80060800`'s case where an
+  `jalr`/delay-slot pair on its own, unlike `Entity__MoodCue46`'s case where an
   explicit `goto` was required. The difference: here each branch is a
   self-contained, complete call (own function pointer AND own arguments),
-  so nothing needs to survive from one branch into another; `func_80060800`
+  so nothing needs to survive from one branch into another; `Entity__MoodCue46`
   needed `goto` because multiple DIFFERENT control-flow predecessors had to
   reach the exact same single call with the exact same arguments.
 

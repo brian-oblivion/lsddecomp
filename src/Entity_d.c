@@ -30,9 +30,9 @@ extern u8 ROTATION_YAW_PLUS90[];
 extern u8 D_80089E5C[];
 extern u8 D_80089D24[];
 
-/* Forward declaration: func_80060710 is defined later in this file (higher
+/* Forward declaration: Entity__func_80060710 is defined later in this file (higher
  * ROM address) but Entity__MoodCue43, at a lower address, calls it directly. */
-void func_80060710(Entity *this);
+void Entity__func_80060710(Entity *this);
 
 void Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
@@ -133,7 +133,7 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
     s32 r2;
     u8 *table;
 
-    func_80060710(this);
+    Entity__func_80060710(this);
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->unk84 == 0 || this->unk84 == 0xF) {
         out->unk1C = 0x12;
@@ -157,7 +157,7 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     s32 r2;
     u8 *table;
 
-    func_80060710(this);
+    Entity__func_80060710(this);
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->unk84 == 7 || this->unk84 == 0x16) {
         out->unk1C = 3;
@@ -182,7 +182,7 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80060710(Entity *this) {
+void Entity__func_80060710(Entity *this) {
     s32 r;
 
     if (this->moodTimer == 0) {
@@ -198,10 +198,10 @@ void func_80060710(Entity *this) {
     }
 }
 
-void func_800607F8(void) {
+void Entity__MoodCue45(void) {
 }
 
-void func_80060800(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue46(Entity *this, EntityMoodHandlerArg *out) {
     s32 r;
 
     if (this->moodTimer == 0) {
@@ -223,7 +223,7 @@ skip48:
     Class6B5CC__FaceTarget(this, this->target, 1, 0, 0);
 }
 
-void func_8006090C(Entity *this) {
+void Entity__MoodCue47(Entity *this) {
     if (this->unkF4 == 0) {
         return;
     }
@@ -252,7 +252,7 @@ void func_8006090C(Entity *this) {
     }
 }
 
-void func_80060A4C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out) {
     s32 a1val;
     EntityMethods *methods;
 
@@ -267,7 +267,7 @@ void func_80060A4C(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x1E, 1);
 }
 
-void func_80060B34(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
     Unk94Methods *methods94;
     void *a1;
 
@@ -305,7 +305,7 @@ void func_80060B34(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x100, 0);
 }
 
-void func_80060CF0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue50(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer < this->unk80 * 5) {
         if (this->unk84 == 0xF || this->unk84 == 0x46) {
             out->unk10 = 0;
@@ -319,7 +319,7 @@ void func_80060CF0(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
     void *table;
 
     if (this->moodTimer == 0 && rand() % 5 == 0 && this->unk44 == 0) {
@@ -347,7 +347,7 @@ void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slotC4(this, -0x50, 1);
 }
 
-void func_80060F38(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue52(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->getProximityRatio(this);
     if (this->moodTimer < 0xBC) {
         if (this->moodTimer == 0x54) {

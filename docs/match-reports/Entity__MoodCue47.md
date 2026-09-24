@@ -1,14 +1,16 @@
-# func_8006090C -- MATCHED (80/80 words)
+# Entity__MoodCue47 -- MATCHED (80/80 words)
+
+> Renamed from `func_8006090C` on 2026-09-24 (tools/rename.py). Address 0x8006090c.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). State-machine-style
 dispatch on `this->unk44`, no "out" parameter (confirmed from its own body,
-same as `func_80060710`/`func_80061158` earlier in this unit).
-`void func_8006090C(Entity *this)`.
+same as `Entity__func_80060710`/`func_80061158` earlier in this unit).
+`void Entity__MoodCue47(Entity *this)`.
 
 ## Final source
 
 ```c
-void func_8006090C(Entity *this) {
+void Entity__MoodCue47(Entity *this) {
     if (this->unkF4 == 0) {
         return;
     }
@@ -60,6 +62,6 @@ also reuses the already-typed `Unk94Methods::slot100` (`s32 (*)(Unk94Obj
 
 None -- clean state-machine dispatch, no residue, no register-allocation
 surprises. Notable only for being the third distinct slot discovered on
-`Unk94Methods` in this unit (after `slot1A0` from `func_80060800`),
+`Unk94Methods` in this unit (after `slot1A0` from `Entity__MoodCue46`),
 confirming `Unk94Obj` carries a substantial vtable of its own worth
 resolving incrementally as more Entity_d functions touch it.

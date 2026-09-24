@@ -1,14 +1,16 @@
-# func_80060710 -- MATCHED (58/58 words)
+# Entity__func_80060710 -- MATCHED (58/58 words)
+
+> Renamed from `func_80060710` on 2026-09-24 (tools/rename.py). Address 0x80060710.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch helper called
 by `Entity__MoodCue43`, but itself takes only `Entity *this` -- no `out`
 parameter, despite the family convention. Signature: `void
-func_80060710(Entity *this)`.
+Entity__func_80060710(Entity *this)`.
 
 ## Final source
 
 ```c
-void func_80060710(Entity *this) {
+void Entity__func_80060710(Entity *this) {
     s32 r;
 
     if (this->unkFC == 0) {
@@ -44,7 +46,7 @@ void func_80060710(Entity *this) {
   simultaneously.** Before fixing it, `funcdiff.py` reported "differs
   OUTSIDE this range" counts around 116,000 bytes for every other function
   in the file, and functions physically after this one in ROM order (e.g.
-  `func_80060A4C`, `func_80060CF0`, `func_80061158`) scored 0/N despite
+  `Entity__MoodCue48`, `Entity__MoodCue50`, `func_80061158`) scored 0/N despite
   being logically correct, because their comparison window was reading from
   the wrong address entirely. Fixing this function's word count collapsed
   the drift to under 200 bytes project-wide and every other function's score

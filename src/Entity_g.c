@@ -252,7 +252,7 @@ L74:
 }
 
 void func_800650D4(Entity *this, EntityMoodHandlerArg *out) {
-    func_80060D80(this, out);
+    Entity__MoodCue51(this, out);
 }
 
 void func_800650F4(Entity *this, EntityMoodHandlerArg *out) {

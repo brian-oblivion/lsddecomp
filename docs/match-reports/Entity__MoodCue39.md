@@ -40,13 +40,13 @@ skip48:
 
 Matched first attempt, no iteration needed -- this is the third function in
 this unit to reuse the exact `Unk94Methods::slot1A0` result-mod-3 dispatch
-shape first derived in `func_80060800`'s report (see that report for the
+shape first derived in `Entity__MoodCue46`'s report (see that report for the
 full residue history: the reachability condition `(r==0 && rand()%3==0) ||
 r==2` needed the same `goto skip48;` pattern proven there, applied directly
 with no new derivation needed this time).
 
 - `out->unk4 % 22 == 0` is the magic-multiply-by-22 idiom -- same family as
-  `func_80060F38`'s divide-by-20 and this unit's divide-by-5/divide-by-10
+  `Entity__MoodCue52`'s divide-by-20 and this unit's divide-by-5/divide-by-10
   instances, extending the confirmed generalization further (22 = not a
   power of 5 times 2^n this time, a genuinely different magic constant
   `0x2E8BA2E9`, and it still needed no manual reconstruction -- plain `%`
@@ -69,7 +69,7 @@ with no new derivation needed this time).
 
 ### Proposed learning
 
-- **A magic-multiply divisor family confirmed via `func_80060800`
+- **A magic-multiply divisor family confirmed via `Entity__MoodCue46`
   generalizes across functions with zero rederivation once the C idiom
   (`goto` to a shared label for a two-clause OR reachability condition) is
   established** -- this function needed no new investigation, just applying

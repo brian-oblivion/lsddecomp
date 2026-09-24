@@ -162,15 +162,15 @@ extern Unk100Obj *Entity__GetOrCreateUnk100(Entity *this, void *name, void *arg2
  * share a numeric offset; do not conflate them. */
 struct Unk94Methods {
     u8 pad000[0x44];
-    void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by func_80060B34 (Entity_d) as slot44(target, 1, ROTATION_YAW_MINUS90); return value unused at this, its only known call site */
+    void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by Entity__MoodCue49 (Entity_d) as slot44(target, 1, ROTATION_YAW_MINUS90); return value unused at this, its only known call site */
     u8 pad048[0x94 - 0x48];
     void (*slot94)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80065238 (Entity_g), twice, as slot94(target, 0, 2) and slot94(target, 0, 7); return value unused at either call site */
     u8 pad098[0xB8 - 0x98];
-    void (*slotB8)(Unk94Obj *self, void *arg1); /* called by func_80060B34 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
+    void (*slotB8)(Unk94Obj *self, void *arg1); /* called by Entity__MoodCue49 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
     u8 pad0BC[0xC4 - 0xBC];
     void (*slotC4)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80062730 (Entity_e) as slotC4(target, 0x80, 0) and slotC4(target, -N, 1); return value unused at both known call sites, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
     void (*slotC8)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80061400 (Entity_d) as slotC8(target, (this->unkFC % 40 < 0x14) ? -5 : 5, 0); return value unused at this, its only known call site */
-    void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_8006090C (Entity_d) as slotCC(target, -0x64, 0) and func_80061400 (Entity_d) as slotCC(target, -0x14, 0); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
+    void (*slotCC)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue47 (Entity_d) as slotCC(target, -0x64, 0) and func_80061400 (Entity_d) as slotCC(target, -0x14, 0); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as the other such wrappers in this unit) */
     u8 pad0D0[0x100 - 0xD0];
     s32 (*slot100)(Unk94Obj *self);            /* called by Entity__MoodCue11, compared against 0 -- value-returning, not void */
     u8 pad104[0x120 - 0x104];
@@ -179,7 +179,7 @@ struct Unk94Methods {
     void (*slot130)(Unk94Obj *self, s32 arg1); /* called by Entity__MoodCue01 and func_80061400 (Entity_d), as slot130(target, 0), and by func_80061778 (Entity_d) as slot130(target, 1) */
     void (*slot134)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80061778 (Entity_d) and func_80062730 (Entity_e), both as slot134(target, 1, 1); return value unused at either call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
     u8 pad138[0x1A0 - 0x138];
-    s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by func_80060800 (Entity_d), its return value taken mod 3 -- value-returning, not void */
+    s32 (*slot1A0)(Unk94Obj *self, s32 arg1);  /* called by Entity__MoodCue46 (Entity_d), its return value taken mod 3 -- value-returning, not void */
     u8 pad1A4[0x200 - 0x1A4];
     s32 (*slot200)(Unk94Obj *self);            /* called by Entity__MoodCue00, compared against the literal 5, and by func_80061400 (Entity_d), compared against 6 -- value-returning, not void */
     u8 pad204[0x21C - 0x204];
@@ -448,6 +448,6 @@ extern void func_80062570(Entity *this, EntityMoodHandlerArg *out);
 /* Already matched in Entity_d.c (not INCLUDE_ASM), but not previously called
  * from outside that unit -- func_800650D4 (Entity_g) is its first cross-unit
  * caller, forwarding its own (this, out) straight through. */
-extern void func_80060D80(Entity *this, EntityMoodHandlerArg *out);
+extern void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out);
 
 #endif

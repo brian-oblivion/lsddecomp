@@ -1,12 +1,14 @@
-# func_80060D80 -- MATCHED (110/110 words)
+# Entity__MoodCue51 -- MATCHED (110/110 words)
+
+> Renamed from `func_80060D80` on 2026-09-24 (tools/rename.py). Address 0x80060d80.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). Mood-dispatch handler:
-`void func_80060D80(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80060D80(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
     void *table;
 
     if (this->unkFC == 0 && rand() % 5 == 0 && this->unk44 == 0) {
@@ -61,7 +63,7 @@ worth recording:
 - A nested `if (A && B && C) { ... }` reproduced retail's three-stage
   early-exit chain (`unkFC==0`, then `rand()%5==0`, then `unk44==0`)
   directly, with all three skip paths converging on the same reload point
-  in retail's bytes -- no `goto` needed here, unlike `func_80060800`'s
+  in retail's bytes -- no `goto` needed here, unlike `Entity__MoodCue46`'s
   superficially similar-looking multi-predecessor shape. The difference:
   here it's a genuine short-circuit chain (each condition gates whether the
   NEXT is even evaluated), not four independent alternative branches

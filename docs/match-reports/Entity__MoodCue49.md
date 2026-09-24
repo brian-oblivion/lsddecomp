@@ -1,15 +1,17 @@
-# func_80060B34 -- MATCHED (111/111 words)
+# Entity__MoodCue49 -- MATCHED (111/111 words)
+
+> Renamed from `func_80060B34` on 2026-09-24 (tools/rename.py). Address 0x80060b34.
 
 Unit: `Entity_d` (second pass, round 2026-09-03). The largest and most
 structurally complex function matched in this unit so far -- a three-way
 state machine on `this->unk44` (0, 0xA, 0xB), each state doing its own
 dispatch into `this->unk94`'s vtable.
-`void func_80060B34(Entity *this, EntityMoodHandlerArg *out)`.
+`void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
 
 ```c
-void func_80060B34(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
     Unk94Methods *methods94;
     void *a1;
 

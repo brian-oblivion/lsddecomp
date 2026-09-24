@@ -3,7 +3,7 @@
 > Renamed from `func_800604DC` on 2026-09-24 (tools/rename.py). Address 0x800604dc.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler that
-calls `func_80060710` (same unit, later ROM address) as a helper:
+calls `Entity__func_80060710` (same unit, later ROM address) as a helper:
 `void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
@@ -14,7 +14,7 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
     s32 r2;
     u8 *table;
 
-    func_80060710(this);
+    Entity__func_80060710(this);
     out->unk10 = this->methods->slot148(this);
     if (this->unk84 == 0 || this->unk84 == 0xF) {
         out->unk1C = 0x12;
@@ -35,13 +35,13 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
 
 ## Derivation notes
 
-- Calls `func_80060710`, which is defined LATER in this same file (higher
+- Calls `Entity__func_80060710`, which is defined LATER in this same file (higher
   ROM address). Needs a forward prototype above both definitions --
-  `void func_80060710(Entity *this);` -- since C requires a declaration
+  `void Entity__func_80060710(Entity *this);` -- since C requires a declaration
   before use and `INCLUDE_ASM`/`void`-returning functions get no implicit
   declaration. The prototype is not itself a "function" for the ROM-order
   rule, only the definitions are.
-- `func_80060710` takes a SINGLE argument (`Entity *this`), not the usual
+- `Entity__func_80060710` takes a SINGLE argument (`Entity *this`), not the usual
   `(this, out)` pair -- confirmed by reading its own body (never touches a
   second incoming register) even though the CALL SITE here happens to have
   `a1` still holding this function's own `out` parameter at the call
