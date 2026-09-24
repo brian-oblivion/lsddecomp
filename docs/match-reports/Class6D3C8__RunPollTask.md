@@ -65,3 +65,14 @@ a clean instance of the same idiom with no new residue.
 - **goto/return early-exit lever:** not applicable -- straight-line code, no
   branches at all.
 - **hand-hoisted loop invariant lever:** not applicable -- no loop.
+
+## Naming
+
+**`Class6D3C8__RunPollTask` -- tier A.** Pure leaf helper, mechanics ARE the
+purpose: constructs a `PollTask` via the caller-supplied `ctor`, dispatches
+`slot44(task, extra, 0)` and `slot4(task)` on it (fire-and-forget teardown),
+returns `slot44`'s result. Generic across both call sites
+(`New_GraphRoomObj`/`New_Class86B60`, both used only by
+`Class6D3C8__PollGraphRoomStatus`), so it is named for what it mechanically
+does (build, query, dispose a PollTask) rather than for either specific
+caller.

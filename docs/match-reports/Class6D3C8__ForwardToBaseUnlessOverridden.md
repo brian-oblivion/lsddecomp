@@ -66,3 +66,39 @@ line up byte-for-byte with a *different* candidate table's high slots too,
 re-run `--vs` against that candidate; a longer identical run there is the
 real parent. This class's real parent (D_8006E4F0, an intermediate between
 BasicClass and this class) was only found this way.
+
+## Naming
+
+**`Class6D3C8__ForwardToBaseUnlessOverridden` -- tier B.** Mechanics are
+clear from the body: when `self->unk18 == 0` it forwards straight to the
+intermediate base class's own `slot44` occupant (`func_8003B20C()->slot44`,
+same slot number as the one this function itself occupies, `+0x044`), and
+does nothing otherwise. What `unk18 != 0` actually MEANS in game terms (an
+override flag set by some other, uncarved code path) is not established, so
+the name describes the forwarding mechanism only, not why a caller would
+set the flag.
+
+**Field `Class6D3C8Methods.slot44` was NOT renamed** despite this
+function's clear mechanics, because `src/main.c` (`func_800118DC`, another
+unit) dispatches it by field name directly
+(`D_8008AC20->methods->slot44(D_8008AC20, obj, pad)`) -- renaming the
+struct definition here would break that unit's build, which is outside this
+runner's ownership. See `## Proposed field names` below.
+
+## Proposed field names
+
+- **`Class6D3C8Methods.slot44` -> `forwardToBaseUnlessOverridden`**, tier B,
+  same evidence as the function name above. Only accessor outside this unit
+  is `src/main.c:60-61` (`D_8008AC20->methods->slot44(D_8008AC20, obj, pad)`),
+  so the rename needs that call site updated in the same commit as the
+  struct definition.
+- **`Class6D3C8Methods.slot4C`** -- NOT proposing a name. Its occupant
+  (`func_8003B110`) is not in this unit and was not derived this round; all
+  that's observable locally is the call shape at `src/main.c:61`
+  (`D_8008AC20->methods->slot4C(D_8008AC20)`, no extra arguments, dispatched
+  once right after `slot44` during startup). That's a call-site pattern, not
+  a mechanics derivation of what the function itself does -- naming it from
+  that alone would be the "guess at purpose" the naming rules warn against.
+  Left as `slot4C` for whoever carves `func_8003B110`'s own unit.
+
+Posted to `tools/broadcast.sh post --from echo`.

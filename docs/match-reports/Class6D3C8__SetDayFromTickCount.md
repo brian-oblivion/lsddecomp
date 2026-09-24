@@ -64,3 +64,14 @@ it byte-for-byte with no manual reconstruction of the multiply-shift
 sequence needed. Worth checking any other modulo-looking arithmetic in this
 game (day/mood cycles are a strong candidate area) against this shape before
 assuming it needs special handling.
+
+## Naming
+
+**`Class6D3C8__SetDayFromTickCount` -- tier B.** Mechanics: reads the
+running tick count kept at the PS-X scratchpad address `0x1F800000`, reduces
+it mod 365 (a `%` on the day-count range), and forwards the result to
+`func_80048CFC(day, 0)`. "Set day" describes the mechanical destination
+(the second call takes what looks like a day index) rather than asserting
+why the game does this at this vtable slot (`+0x040`, dispatched once from
+the ctor); `func_80048CFC` itself is uncarved, so its own purpose (and
+therefore this function's ultimate game role) is not confirmed here.

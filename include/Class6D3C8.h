@@ -126,7 +126,7 @@ extern void *BMemPMgrAlloc(s32 size);
 
 /* Model-file-load request block used by Class6D3C8__Class6D3C8: {type; path}. Only
  * one call site is known so far (Class6D3C8__Class6D3C8, loading "ETC\DREAME5.TMD"
- * via D_800107A4), so field names are provisional. */
+ * via gModelPathDreamE5), so field names are provisional. */
 typedef struct LoadModelRequest {
     s32 type;
     const char *path;
@@ -134,7 +134,7 @@ typedef struct LoadModelRequest {
     s32 unk0C;
 } LoadModelRequest;
 
-extern const char D_800107A4[];       /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
+extern const char gModelPathDreamE5[];       /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
 
 extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so far */
 extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
@@ -201,8 +201,8 @@ extern const char *func_800490F4(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x
 extern s32 func_800493C8(s32 index);                   /* psyq_memset.s: signed-halfword lookup into D_80086170[index] */
 extern s32 func_8004913C(s32 *out, s32 param2);          /* psyq_memset.s: day/week-style calculation (divides func_80048CFC's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
 
-extern const char D_800107B4[]; /* "ETC\ASMKLOGO.TIM" */
-extern const char D_800107C8[]; /* "ETC\OSDLOGO.TIM" */
+extern const char gLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
+extern const char gLogoPathOsd[]; /* "ETC\OSDLOGO.TIM" */
 
 /* Forward declaration: Class6D3C8__StartLoaderTask (this unit, defined later in ROM
  * order) is called by Class6D3C8__LoadIntroLogoSequence, which comes first in the file. */

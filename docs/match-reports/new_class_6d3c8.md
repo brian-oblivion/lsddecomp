@@ -153,3 +153,16 @@ instances, just with retail choosing `nop` where those chose a
 value-restating `move` — a THIRD confirmed instance of the class, and if
 anything a stronger permuter case for it (three independent occurrences
 now, not two). The permuter-target recommendation above stands unchanged.
+
+## Naming
+
+**`new_class_6d3c8` -- already named (pre-round-77), tier A.** The `New_X`
+allocator for `Class6D3C8` (`BMemPMgrAlloc` + dispatch through the class's
+own ctor slot). Left as-is this round -- it predates this naming pass and
+already follows the project's `New_X` convention, just lowercase/underscore
+because it was named before the class's own type name (`Class6D3C8`) was
+established from `classtable.py`. Not renamed to `New_Class6D3C8` here:
+that would be a cosmetic-only rename with no new evidence behind it, and
+picking it up is better left to whoever names `Class6D3C8` itself formally
+(this runner did not establish a game-purpose name for the class, only its
+`ClassXXXXX`-by-table-address identity).

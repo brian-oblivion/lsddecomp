@@ -87,3 +87,15 @@ offset against an already-typed sibling class.
 - **goto/return early-exit lever:** not applicable -- no early exit at all,
   straight-line code.
 - **hand-hoisted loop invariant lever:** not applicable -- no loop.
+
+## Naming
+
+**`Class6D3C8__StartLoaderTask` -- tier A.** Pure leaf helper, mechanics ARE
+the purpose: allocates a `LoaderTask` (`New_TaskCoreObj`), registers a
+completion callback and context (`slot98`, `Class6D3C8__LoaderTaskDoneCallback`,
+`self`), sets its remaining parameters (path, `self->unk1C`) via `slot6C`/
+`slotD4`/`slot44`, and starts it (`start`, this unit's renamed
+`LoaderTaskMethods.start`). Called twice from
+`Class6D3C8__LoadIntroLogoSequence` with two different fixed paths, so the
+name is generic to the mechanic (registering and starting a LoaderTask for
+a given resource path) rather than either specific asset.

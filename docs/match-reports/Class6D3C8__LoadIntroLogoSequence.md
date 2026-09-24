@@ -21,7 +21,7 @@ lw   $v0, 0xC($v0)            ; v0 = arg->unk0C
 beqz $v0, .L80026238            ; whole body gated on this
  ...
 jal  SetActiveDataSourceDriverMode(0, 0, 0)
-jal  Class6D3C8__StartLoaderTask(self, D_800107B4)     ; "ETC\ASMKLOGO.TIM"
+jal  Class6D3C8__StartLoaderTask(self, gLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTaskObj(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
 jal  func_800490F4                          ; writes 0x31 to local, returns &D_800113DC
@@ -43,7 +43,7 @@ lw   $v0, 0x0($s1)                                          ; reload task->metho
 lw   $v0, 0x4($v0)                                           ; slot4
 jalr $v0
  (delay: a0 = s1 = task)
-jal  Class6D3C8__StartLoaderTask(self, D_800107C8)                          ; "ETC\OSDLOGO.TIM"
+jal  Class6D3C8__StartLoaderTask(self, gLogoPathOsd)                          ; "ETC\OSDLOGO.TIM"
 ```
 
 ```c
@@ -55,13 +55,13 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
 
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        Class6D3C8__StartLoaderTask(self, D_800107B4);
+        Class6D3C8__StartLoaderTask(self, gLogoPathAsmk);
         task = New_StreamTaskObj(0, 0, 0, 0);
         streamName = func_800490F4(&typeCode);
         typeLookup = func_800493C8(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
-        Class6D3C8__StartLoaderTask(self, D_800107C8);
+        Class6D3C8__StartLoaderTask(self, gLogoPathOsd);
     }
 }
 ```
@@ -115,3 +115,15 @@ register, a different axis).
   entire body and falls through to a shared epilogue either way.
 - **hand-hoisted loop invariant lever:** not applicable — no loop in this
   function.
+
+## Naming
+
+**`Class6D3C8__LoadIntroLogoSequence` -- tier B.** Mechanics established
+from the body and its string constants: gated by `arg->unk0C`, registers a
+loader task for `"ETC\ASMKLOGO.TIM"`, then a stream task for whatever
+`func_800490F4` resolves (`"ETC\ASMK.STR"` per the header comment), then a
+second loader task for `"ETC\OSDLOGO.TIM"` -- three named boot-time assets
+loaded in sequence. "Intro logo sequence" describes what the function DOES
+(loads these three specific assets, gated, in this order); it does not
+assert why the game shows them (splash-screen framing is a reasonable
+inference from the filenames but not confirmed by any code in this unit).

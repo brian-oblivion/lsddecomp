@@ -99,3 +99,16 @@ second local is involved.
   retail from the very first attempt; every residue here was instruction
   content (magic constant, stack offset), never a branch target, so there
   was never a CFG question to resolve.
+
+## Naming
+
+**`Class6D3C8__StartGraphRoomStreamTask` -- tier B.** Mechanics: gated by
+`arg->unk08`, builds a `StreamTask`, derives a count via `func_800493E4`,
+initializes the task from `count/15` and a fixed sub-slot, dispatches a
+5-argument `configure` (`a3 = -1`, unlike every other StreamTask launcher in
+this unit), then starts it. Named for its one and only caller:
+`Class6D3C8__PollGraphRoomStatus` invokes it exactly when its first
+`GraphRoom`-named PollTask (`New_GraphRoomObj`) reports status "2" -- the
+same "GraphRoom" vocabulary as that report's naming, not a guess (evidence:
+the call-site gate, not the function body alone, which by itself doesn't
+mention GraphRoom).

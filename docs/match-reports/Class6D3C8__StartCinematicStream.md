@@ -131,3 +131,17 @@ second call's own delay slot opportunistically claims it.
   and 76/97 attempts both had CORRECT branch targets once the polarity was
   fixed (lever 2), confirming the remaining residues at each stage were
   register/stack-layout content, not CFG mistakes.
+
+## Naming
+
+**`Class6D3C8__StartCinematicStream` -- tier B.** Mechanics: reads the owned
+`DreamSys`'s current cinematic slot (`vt->GetCinematic`, an already-named
+vtable accessor), resolves it to a channel index; if resolution fails (-1),
+starts a `LoaderTask` on a fixed "no cinematic" fallback path; otherwise, if
+gated by `arg->unk08`, starts a `StreamTask` on the resolved channel. Named
+for the dispatch mechanic ("start [a task streaming] the cinematic"); the
+`LoaderTask` fallback arm makes "stream" not literally universal (the
+no-cinematic path loads, it doesn't stream), but the function's dominant,
+gated behavior and its trigger (`GetCinematic`) are both clearly cinematic-
+related, which is stronger grounding than the generic "start task" shape
+shared by this unit's other four StreamTask launchers.

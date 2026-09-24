@@ -134,3 +134,17 @@ sequential code, not an early return.
   loop here), but the underlying idea — let a value's C-level liveness match
   where the compiler's own analysis would create it, rather than forcing it
   by hand — is exactly what closed this residue too.
+
+## Naming
+
+**`Class6D3C8__PollGraphRoomStatus` -- tier B.** Mechanics: gated by
+`arg->unk10`, checks the owned `DreamSys`'s own status accessor, then loops
+`Class6D3C8__RunPollTask(New_Class86B60, ...)`, restarting
+`Class6D3C8__RunPollTask(New_GraphRoomObj, ...)` on every "2" report, until
+the second poll task reports something else. `New_GraphRoomObj` is an
+established, evidence-backed name from another unit
+(`src/class_3bb8c_t.c:315`, `GraphRoomObj__GraphRoomObj`), so "GraphRoom" is
+real vocabulary, not a guess -- but `New_Class86B60`'s own class is still
+unnamed, and this function's ultimate purpose (what "graph room" readiness
+gates) is not established here. The name describes the poll/retry mechanics
+around the one named PollTask class involved.

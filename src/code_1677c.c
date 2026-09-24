@@ -37,7 +37,7 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     self->arg = arg;
     func_800270AC(func_80048CF0());
     req.type = 0;
-    req.path = D_800107A4;
+    req.path = gModelPathDreamE5;
     self->dreamSys = New_DreamSys(func_80043840(&req), 0, 0);
     self->unk24 = 0;
     self->dreamSys->vt->func_228(self->dreamSys, arg->unk14);
@@ -72,13 +72,13 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
 
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        Class6D3C8__StartLoaderTask(self, D_800107B4);
+        Class6D3C8__StartLoaderTask(self, gLogoPathAsmk);
         task = New_StreamTaskObj(0, 0, 0, 0);
         streamName = func_800490F4(&typeCode);
         typeLookup = func_800493C8(typeCode);
         task->methods->configure(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->start(task);
-        Class6D3C8__StartLoaderTask(self, D_800107C8);
+        Class6D3C8__StartLoaderTask(self, gLogoPathOsd);
     }
 }
 

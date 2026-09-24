@@ -65,3 +65,15 @@ which library helper derives the type code and whether extra slots
 - **goto/return early-exit lever:** not applicable -- single guard wraps
   the whole body, void function, no early exit.
 - **hand-hoisted loop invariant lever:** not applicable -- no loop.
+
+## Naming
+
+**`Class6D3C8__StartStreamTaskWithInit` -- tier B.** Mechanics: gated by
+`arg->unk08` (same gate as `Class6D3C8__StartWeeklyStreamTask`), builds a
+`StreamTask`, runs its `slot12C` (a step none of the other three
+StreamTask-launcher siblings besides `Class6D3C8__StartCinematicStream`
+perform), derives a type code via `func_800491FC`, looks it up, configures
+and starts the task. "WithInit" names the one mechanical difference from
+its closest sibling `Class6D3C8__StartWeeklyStreamTask` (the extra
+`slot12C` call); `func_800491FC`'s own meaning is not established, so no
+stronger, purpose-based name is supported yet.

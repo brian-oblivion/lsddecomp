@@ -2138,3 +2138,6 @@ Class6D3C8__NoOpSlot5C = 0x80026690; // type:func
 Class6D3C8__PollStatusObj = 0x80026698; // type:func
 Class6D3C8__StartCinematicStream = 0x8002677C; // type:func
 Class6D3C8__StartStreamTaskWithInit = 0x80026900; // type:func
+gModelPathDreamE5 = 0x800107A4;
+gLogoPathAsmk = 0x800107B4;
+gLogoPathOsd = 0x800107C8;

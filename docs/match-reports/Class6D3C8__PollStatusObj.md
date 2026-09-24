@@ -240,3 +240,15 @@ switched on," and only the former gets the free reuse.
   not a CFG problem; both remaining diffs are switch-lowering register/filler
   choices, consistent with the delay-slot-scheduling class of residue, not
   a wrong-shape stall.
+
+## Naming
+
+**`Class6D3C8__PollStatusObj` -- tier B.** Mechanics: builds a `StatusObj`
+(`New_Obj865C8`), reads one status code off it (`slot44`), tears it down
+(`slot4`), reacts to two of the codes (2 -> `Class6D3C8__StartCinematicStream`,
+3 -> latch `self->unk24`), then separately queries the owned `DreamSys`'s
+day/year status and derives a 0/1 result. Named for the StatusObj query
+mechanic, matching this unit's `Class6D3C8__PollGraphRoomStatus` naming
+shape (both are "poll an object for a status code and react to it"), since
+what the two status-code values actually MEAN in the game is not
+established from this body alone.

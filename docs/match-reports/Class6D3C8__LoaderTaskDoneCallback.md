@@ -45,3 +45,14 @@ None beyond the standing "wrapper return type" rule already in CLAUDE.md —
 this is a clean instance of it: the callee's own use of `$v0` as a real
 result (a loop-exit condition) is what tips the type call, not the wrapper's
 bytes.
+
+## Naming
+
+**`Class6D3C8__LoaderTaskDoneCallback` -- tier A.** Pure leaf: `return
+func_8004A070(0);`, mechanics ARE the purpose (a forwarding wrapper). Named
+from its one use, `Class6D3C8__StartLoaderTask`'s `task->methods->slot98(task,
+Class6D3C8__LoaderTaskDoneCallback, self)` call -- `slot98` registers a
+completion callback and a context pointer on a `LoaderTask`, so this
+function's role (not its ultimate game purpose, which depends on the
+uncarved `func_8004A070`) is exactly "the callback a LoaderTask runs on
+completion".
