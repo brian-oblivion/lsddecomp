@@ -117,7 +117,7 @@ struct Obj87034_3bb8c_k {
 
 void Class86F88__SetState(Class86F88 *self, s32 state)
 {
-    self->unk30 = 0;
+    self->closeTicks = 0;
     if (state < 2) {
         goto end;
     }
@@ -129,12 +129,12 @@ void Class86F88__SetState(Class86F88 *self, s32 state)
     }
     goto end;
 case_lt4:
-    self->methods->slot14(self, self->unk34);
-    self->methods->slot48(self);
-    self->unk2C = state;
+    self->methods->removeChild(self, self->inputSource);
+    self->methods->releaseResources(self);
+    self->result = state;
     goto end;
 case_eq4:
-    self->methods->slot30(self, self->unk2C);
+    self->methods->notifyParents(self, self->result);
 end:
     return;
 }
@@ -143,18 +143,18 @@ void Class86F88__TickClosing(Class86F88 *self)
 {
     s32 old;
 
-    if (self->unk2C >= 4) {
+    if (self->result >= 4) {
         return;
     }
-    if (self->unk2C < 2) {
+    if (self->result < 2) {
         return;
     }
-    old = self->unk30;
-    self->unk30 = old + 1;
+    old = self->closeTicks;
+    self->closeTicks = old + 1;
     if (old == 0) {
         return;
     }
-    self->methods->slot54(self, 4);
+    self->methods->setState(self, 4);
 }
 
 void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
@@ -184,7 +184,7 @@ void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
 
 void Class86F88__ForwardToTarget(Class86F88 *self, s32 arg1)
 {
-    Class86F88 *other = self->unk3C;
+    Class86F88 *other = self->target;
 
     if (other != NULL) {
         other->methods->slot80(other, arg1, 0x60, 0x60);
@@ -197,33 +197,33 @@ void Class86F88__ScrollRight(Class86F88 *self)
     s32 tmp;
     s32 count;
 
-    if (!self->unk50) {
+    if (!self->resource) {
         return;
     }
-    tmp = self->unk24;
+    tmp = self->column;
     count = tmp;
-    if (count + 0x1A >= self->unk14) {
+    if (count + 0x1A >= self->maxTextLen) {
         return;
     }
     methods = self->methods;
     count++;
-    self->unk24 = count;
-    methods->slot94(self, self->unk20, count, self->unk28, 1);
+    self->column = count;
+    methods->refreshRows(self, self->topIndex, count, self->cursorIndex, 1);
 }
 
 void Class86F88__ScrollLeft(Class86F88 *self)
 {
     s32 count;
 
-    if (!self->unk50) {
+    if (!self->resource) {
         return;
     }
-    count = self->unk24 - 1;
+    count = self->column - 1;
     if (count < 0) {
         return;
     }
-    self->unk24 = count;
-    self->methods->slot94(self, self->unk20, count, self->unk28, 1);
+    self->column = count;
+    self->methods->refreshRows(self, self->topIndex, count, self->cursorIndex, 1);
 }
 
 void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
@@ -232,21 +232,21 @@ void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     s32 newUnk20;
     s32 newUnk28;
 
-    if (!self->unk50) {
+    if (!self->resource) {
         return;
     }
-    count = self->unk28;
+    count = self->cursorIndex;
     if (count - 1 < 0) {
         return;
     }
-    if (count - self->unk20 > 0) {
-        self->methods->slot98(self, 0, 1, arg3);
+    if (count - self->topIndex > 0) {
+        self->methods->stepCursorInView(self, 0, 1, arg3);
     } else {
-        self->unk20--;
-        newUnk20 = self->unk20;
-        self->unk28--;
-        newUnk28 = self->unk28;
-        self->methods->slot94(self, newUnk20, self->unk24, newUnk28, 1);
+        self->topIndex--;
+        newUnk20 = self->topIndex;
+        self->cursorIndex--;
+        newUnk28 = self->cursorIndex;
+        self->methods->refreshRows(self, newUnk20, self->column, newUnk28, 1);
     }
 }
 
@@ -256,21 +256,21 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     s32 newUnk28;
     s32 prevUnk20;
 
-    if (!self->unk50) {
+    if (!self->resource) {
         return;
     }
-    if (self->unk28 + 1 >= self->unk10) {
+    if (self->cursorIndex + 1 >= self->itemCount) {
         return;
     }
-    prevUnk20 = self->unk20 - 1;
-    if (self->unk28 - prevUnk20 < 4) {
-        self->methods->slot98(self, 1, 1, arg3);
+    prevUnk20 = self->topIndex - 1;
+    if (self->cursorIndex - prevUnk20 < 4) {
+        self->methods->stepCursorInView(self, 1, 1, arg3);
     } else {
-        self->unk20++;
-        newUnk20 = self->unk20;
-        self->unk28++;
-        newUnk28 = self->unk28;
-        self->methods->slot94(self, newUnk20, self->unk24, newUnk28, 1);
+        self->topIndex++;
+        newUnk20 = self->topIndex;
+        self->cursorIndex++;
+        newUnk28 = self->cursorIndex;
+        self->methods->refreshRows(self, newUnk20, self->column, newUnk28, 1);
     }
 }
 
@@ -306,14 +306,14 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
     s32 count;
     s32 i;
 
-    if (!self->unk50) {
+    if (!self->resource) {
         return;
     }
 
     local.a = gClass86F88RowOriginX;
     local.b = gClass86F88RowOriginY;
-    count = self->unk10;
-    p = &self->unk40[0];
+    count = self->itemCount;
+    p = &self->rows[0];
     if (count >= 5) {
         count = 4;
     }
@@ -321,8 +321,8 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
     for (i = 0; i < count; i++) {
         Class86F88__FormatRowText(self, buf, i, arg3, (char *)arg4);
         *p = (Class86F88Elem *)New_Obj6EAC0((void *)arg2, 0x1A, buf);
-        (*p)->methods->slot4C(*p, arg1, &local);
-        (*p)->methods->slotB8(*p, &gClass86F88RowColor);
+        (*p)->methods->layout(*p, arg1, &local);
+        (*p)->methods->setColor(*p, &gClass86F88RowColor);
         local.b += 0xA;
         p++;
     }
@@ -336,10 +336,10 @@ void Class86F88__ReleaseRows(Class86F88 *self)
     s32 i;
     u8 unused[8];
 
-    if (!self->unk50) {
+    if (!self->resource) {
         return;
     }
-    count = self->unk10;
+    count = self->itemCount;
     i = 0;
     if (count >= 5) {
         count = 4;
@@ -348,8 +348,8 @@ void Class86F88__ReleaseRows(Class86F88 *self)
         return;
     }
     do {
-        self->unk40[i]->methods->release(self->unk40[i]);
-        self->unk40[i] = NULL;
+        self->rows[i]->methods->release(self->rows[i]);
+        self->rows[i] = NULL;
         i++;
     } while (i < count);
 }
@@ -379,22 +379,22 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32
     char buf[0x20];
     Class86F88Elem **p;
 
-    if (!self->unk50) {
+    if (!self->resource) {
         return;
     }
-    count = self->unk10;
-    p = &self->unk40[0];
+    count = self->itemCount;
+    p = &self->rows[0];
     if (count >= 5) {
         count = 4;
     }
     for (i = 0; i < count; i++) {
         Class86F88__FormatRowText(self, buf, i, arg1, (char *)arg2);
-        (*p)->methods->slotCC(*p, buf);
+        (*p)->methods->setText(*p, buf);
         p++;
     }
     Class86F88__SetView(self, arg1, arg2, arg3, 0);
     if (arg4) {
-        self->methods->slot60(self, 0);
+        self->methods->forwardToTarget(self, 0);
     }
 }
 
@@ -404,11 +404,11 @@ char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4
     s32 len;
     s32 i;
 
-    len = strlen(base + self->unk18[idx]);
+    len = strlen(base + self->texts[idx]);
     if (len >= 0x1B) {
         len = 0x1A;
     }
-    memcpy(dest, base + self->unk18[idx], len);
+    memcpy(dest, base + self->texts[idx], len);
     i = len;
     if (i < 0x1A) {
         for (; i < 0x1A; i++) {
@@ -425,15 +425,15 @@ void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
     s32 flag = a4;
 
     __asm__("");
-    self->unk20 = a1;
-    self->unk24 = a2;
-    self->unk28 = a3;
+    self->topIndex = a1;
+    self->column = a2;
+    self->cursorIndex = a3;
     if (flag == 0) {
         return;
     }
     a3 -= a1;
-    elem = self->unk40[a3];
-    elem->methods->slotB8(elem, &gClass86F88CursorColor);
+    elem = self->rows[a3];
+    elem->methods->setColor(elem, &gClass86F88CursorColor);
 }
 
 void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
@@ -441,28 +441,28 @@ void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
     Class86F88Elem **p;
     s32 idx;
 
-    if (!self->unk50) {
+    if (!self->resource) {
         return;
     }
-    idx = self->unk28 - self->unk20;
-    p = &self->unk40[idx];
-    (*p)->methods->slotB8(*p, &gClass86F88RowColor);
+    idx = self->cursorIndex - self->topIndex;
+    p = &self->rows[idx];
+    (*p)->methods->setColor(*p, &gClass86F88RowColor);
     if (dir) {
-        self->unk28++;
+        self->cursorIndex++;
         p++;
     } else {
-        self->unk28--;
+        self->cursorIndex--;
         p--;
     }
-    (*p)->methods->slotB8(*p, &gClass86F88CursorColor);
+    (*p)->methods->setColor(*p, &gClass86F88CursorColor);
     if (flag) {
-        self->methods->slot60(self, 0);
+        self->methods->forwardToTarget(self, 0);
     }
 }
 
 s32 Class86F88__GetCursorIndex(Class86F88 *self)
 {
-    return self->unk28;
+    return self->cursorIndex;
 }
 
 Class86F88Methods *GetClass86F88Methods(void)

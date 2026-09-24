@@ -2871,21 +2871,21 @@ struct Class86F88Methods {
     u8 pad000[0x014];
     /* +0x014, Class86F88__SetState's own first dispatch:
      * `self->methods->slot14(self, self->unk34)`. */
-    void (*slot14)(Class86F88 *self, s32 arg1);
+    void (*removeChild)(Class86F88 *self, s32 arg1);
     u8 pad018[0x030 - 0x018];
     /* +0x030, Class86F88__SetState's `state == 4` path:
      * `self->methods->slot30(self, self->unk2C)`. */
-    void (*slot30)(Class86F88 *self, s32 arg1);
+    void (*notifyParents)(Class86F88 *self, s32 arg1);
     u8 pad034[0x048 - 0x034];
-    void (*slot48)(Class86F88 *self); /* +0x048, Class86F88__SetState's own 2nd dispatch, self only */
+    void (*releaseResources)(Class86F88 *self); /* +0x048, Class86F88__SetState's own 2nd dispatch, self only */
     u8 pad04C[0x054 - 0x04C];
     /* +0x054 = Class86F88__SetState itself (this unit, matched). Dispatched by
      * Class86F88__TickClosing as `self->methods->slot54(self, 4)`. */
-    void (*slot54)(Class86F88 *self, s32 state);
+    void (*setState)(Class86F88 *self, s32 state);
     u8 pad058[0x060 - 0x058];
     /* +0x060, Class86F88__StepCursorInView/Class86F88__RefreshRows's own trailing dispatch, both
      * conditional on a caller-supplied flag, both `(self, 0)`. */
-    void (*slot60)(Class86F88 *self, s32 arg1);
+    void (*forwardToTarget)(Class86F88 *self, s32 arg1);
     u8 pad064[0x080 - 0x064];
     /* +0x080 = Class86F88__ScrollLeft itself (this unit, matched), whose own body
      * ignores every argument past `self` -- the 3-argument shape below is
@@ -2899,10 +2899,10 @@ struct Class86F88Methods {
      * by three independent callers in this
      * unit (Class86F88__ScrollRight, Class86F88__ScrollLeft, Class86F88__CursorUp, Class86F88__CursorDown),
      * all of which pass exactly (self, arg1, arg2, arg3, arg4). */
-    void (*slot94)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+    void (*refreshRows)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
     /* +0x098, occupant not in this unit's queue. Called by
      * Class86F88__CursorUp/Class86F88__CursorDown with (self, arg1, arg2, arg3). */
-    void (*slot98)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
+    void (*stepCursorInView)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
 };
 
 /*
@@ -2925,13 +2925,13 @@ struct Class86F88ElemMethods {
      * `void *` here since only that one call site gives it any shape;
      * see `Elem4CArg_3bb8c_k` in src/class_3bb8c_k.c for the concrete
      * local reading. */
-    void (*slot4C)(Class86F88Elem *self, s32 arg1, void *arg2); /* +0x04C */
+    void (*layout)(Class86F88Elem *self, s32 arg1, void *arg2); /* +0x04C */
     u8 pad050[0x0B8 - 0x050];
-    void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, Class86F88__SetView */
+    void (*setColor)(Class86F88Elem *self, void *arg1); /* +0x0B8, Class86F88__SetView */
     u8 pad0BC[0x0CC - 0x0BC];
     /* +0x0CC, Class86F88__RefreshRows: called once per active window element with a
      * freshly-formatted (Class86F88__FormatRowText) fixed-width text buffer. */
-    void (*slotCC)(Class86F88Elem *self, char *arg1);
+    void (*setText)(Class86F88Elem *self, char *arg1);
 };
 
 struct Class86F88Elem {
@@ -2941,26 +2941,26 @@ struct Class86F88Elem {
 struct Class86F88 {
     Class86F88Methods *methods;    /* +0x000 */
     u8 pad004[0x010 - 0x004];
-    s32 unk10;                     /* +0x010, Class86F88__ReleaseRows/Class86F88__RefreshRows: element count, clamped to a max of 4 */
-    s32 unk14;                     /* +0x014, Class86F88__ScrollRight: upper bound compared against unk24+0x1A */
+    s32 itemCount;                     /* +0x010, Class86F88__ReleaseRows/Class86F88__RefreshRows: element count, clamped to a max of 4 */
+    s32 maxTextLen;                     /* +0x014, Class86F88__ScrollRight: upper bound compared against unk24+0x1A */
     /* +0x018, Class86F88__FormatRowText: a table of BYTE OFFSETS (s32 each), added to
      * that function's own `base` (char *) argument to form a source
      * pointer -- `self->unk18[idx]` is never scaled by anything other than
      * its own natural s32 stride, and the resulting sum is used as a plain
      * byte address (strlen/strncpy-style calls), so `base` is a byte
      * pointer and this is an OFFSET table, not a pointer table. */
-    s32 *unk18;                    /* +0x018, Class86F88__FormatRowText */
+    s32 *texts;                    /* +0x018, Class86F88__FormatRowText */
     u8 pad01C[0x020 - 0x01C];
-    s32 unk20;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/Class86F88__ScrollRight/Class86F88__ScrollLeft/Class86F88__CursorUp/Class86F88__CursorDown/Class86F88__SetView */
-    s32 unk24;                     /* +0x024, ditto */
-    s32 unk28;                     /* +0x028, ditto; also Class86F88__GetCursorIndex's own return value */
-    s32 unk2C;                     /* +0x02C, Class86F88__TickClosing/Class86F88__SetState */
-    s32 unk30;                     /* +0x030, Class86F88__TickClosing/Class86F88__SetState */
-    s32 unk34;                     /* +0x034, Class86F88__SetState's slot14 argument */
+    s32 topIndex;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/Class86F88__ScrollRight/Class86F88__ScrollLeft/Class86F88__CursorUp/Class86F88__CursorDown/Class86F88__SetView */
+    s32 column;                     /* +0x024, ditto */
+    s32 cursorIndex;                     /* +0x028, ditto; also Class86F88__GetCursorIndex's own return value */
+    s32 result;                     /* +0x02C, Class86F88__TickClosing/Class86F88__SetState */
+    s32 closeTicks;                     /* +0x030, Class86F88__TickClosing/Class86F88__SetState */
+    s32 inputSource;                     /* +0x034, Class86F88__SetState's slot14 argument */
     u8 pad038[0x03C - 0x038];
-    Class86F88 *unk3C;              /* +0x03C, Class86F88__ForwardToTarget: another instance of this same class */
-    Class86F88Elem *unk40[4];       /* +0x040, Class86F88__ReleaseRows/Class86F88__RefreshRows/Class86F88__SetView */
-    s32 unk50;                      /* +0x050, enable flag guarding most of this class's dispatch */
+    Class86F88 *target;              /* +0x03C, Class86F88__ForwardToTarget: another instance of this same class */
+    Class86F88Elem *rows[4];       /* +0x040, Class86F88__ReleaseRows/Class86F88__RefreshRows/Class86F88__SetView */
+    s32 resource;                      /* +0x050, enable flag guarding most of this class's dispatch */
 };
 
 extern Class86F88Methods gClass86F88Methods;
