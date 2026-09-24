@@ -1107,7 +1107,7 @@ struct Class86B60UnkB0Obj_3bb8c_d {
     /* +0x0A9, func_8004DE08: read as an unsigned byte and used directly as
      * an allocation SIZE (`BMemPMgrAlloc`'s own argument). */
     u8 unkA9;
-    /* +0x0AA/+0x0AB/+0x0AC, func_8004DB18: three literal byte fields
+    /* +0x0AA/+0x0AB/+0x0AC, Class86B60__CreateNameField: three literal byte fields
      * (9/8/4) set right after allocation via `New_Obj6EAC0` -- this is
      * the SAME real object as `code_2cc8c.h`'s `Unk64Elem` (matching
      * slot offsets 0x004/0x04C/0x0B8, see that header's own note), so
@@ -1500,7 +1500,7 @@ extern s32 D_8008A9B4;
  * be spelled by the address they point to and are typed opaque `void *`
  * instead.
  *
- * `D_8008AA18` is also read by round 43's `func_8004DB18`, which
+ * `D_8008AA18` is also read by round 43's `Class86B60__CreateNameField`, which
  * `strcpy`s INTO `(char *)D_8008AA18 + 0x18` and reads it with `strlen` --
  * both require the RUNTIME value to be a writable buffer, not the .rodata
  * address the ROM image happens to initialise it to. Nothing in this unit
@@ -1516,7 +1516,7 @@ extern void *D_8008AA18;
  * writable-buffer placeholder rather than the real runtime value. */
 extern void *D_8008AA24;
 
-/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `func_8004DB18`
+/* Same VALUE-of `%gp_rel` pattern, read only by round 43's `Class86B60__CreateNameField`
  * as `strcpy`'s SOURCE argument. Holds `0x80011474` in the ROM image
  * (immediately past `D_8008AA10`'s own "BISLPS-01556xxx" string, i.e. the
  * start of the font-glyph word table in `D_80011434`) -- likely also a

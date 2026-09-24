@@ -1,4 +1,6 @@
-# func_8004DB18 -- MATCHED 60/60, round 43
+# Class86B60__CreateNameField -- MATCHED 60/60, round 43
+
+> Renamed from `func_8004DB18` on 2026-09-24 (tools/rename.py). Address 0x8004db18.
 
 Unit `class_3bb8c_d`, class `Class86B60`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 5 `gp_rel` hits
@@ -17,7 +19,7 @@ extern char *strcpy(char *dest, char *src);
 extern s32 strlen(char *s);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 
-void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
+void Class86B60__CreateNameField(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
 {
     u32 size;
     char *buf;
@@ -41,7 +43,7 @@ void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
 }
 ```
 
-Byte-exact on the first build: `funcdiff.py func_8004DB18` -> `60/60 words
+Byte-exact on the first build: `funcdiff.py Class86B60__CreateNameField` -> `60/60 words
 match (file 0x3E318-0x3E408)`; whole-image `OK: build matches retail
 SLPS_015.56`.
 
@@ -117,7 +119,7 @@ No EXISTING declaration was retyped or resized.
 ### Proposed learning
 
 A `%gp_rel`-loaded global whose static ROM-image value points into
-`.rodata` is not necessarily read-only in practice: `func_8004DB18` writes
+`.rodata` is not necessarily read-only in practice: `Class86B60__CreateNameField` writes
 through `D_8008AA18` (a `strcpy` destination) despite its ROM-image value
 sitting inside an unowned rodata string table. When a function treats a
 gp-relative global's value as a destination/buffer rather than a source,

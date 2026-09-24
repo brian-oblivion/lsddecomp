@@ -89,7 +89,7 @@ void Class86B60__RefreshViewValue(Class86B60 *self)
     self->unkA4->methods->slot19C(self->unkA4, &buf);
 }
 
-/* func_8004DB18's own `arg1`: only its own +0x004 field is read, forwarded
+/* Class86B60__CreateNameField's own `arg1`: only its own +0x004 field is read, forwarded
  * opaquely as New_Obj6EAC0's `ctx` argument. */
 typedef struct Arg1DB18_3bb8c_d Arg1DB18_3bb8c_d;
 struct Arg1DB18_3bb8c_d {
@@ -110,7 +110,7 @@ extern s32 strlen(char *s);
  * independent-arities convention. */
 extern void DecodeFullWidthSjis(void *dst, void *src);
 
-void func_8004DB18(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
+void Class86B60__CreateNameField(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
 {
     u32 size;
     char *buf;

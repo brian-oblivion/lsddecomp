@@ -2131,3 +2131,4 @@ Class86B60__RegisterHandlers = 0x8004D898; // type:func
 Class86B60__SetState = 0x8004D90C; // type:func
 Class86B60__Tick = 0x8004D9D4; // type:func
 Class86B60__RefreshViewValue = 0x8004DABC; // type:func
+Class86B60__CreateNameField = 0x8004DB18; // type:func
