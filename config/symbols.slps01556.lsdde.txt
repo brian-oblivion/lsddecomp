@@ -1117,11 +1117,12 @@ SpuVmPitchBend = 0x8002F610; // type:func
 // libsnd/vmanager SpuVmFlush (disc 3.3). Superseded game-style name
 // UpdateVoiceEnvelopes. Round 71 (bravo, track 2).
 SpuVmFlush = 0x8002F700; // type:func
-// libsnd/vmanager SpuVmKeyOn, identified: shape 0.76/0.75 vs SpuVmKeyOn on
-// discs 3.3/3.6 (no disc carries this build); position in the vmanager run
-// after pinned SpuVmFlush; call order SpuVmVSetUp/SpuVmKeyOff/SpuVmAlloc/
-// SpuVmDoAllocate (report, round 73). Rename pending for track 2.
-StartNote = 0x8002FAC4; // type:func
+// identified: fingerprint shape 0.76/0.75 vs libsnd/vmanager SpuVmKeyOn on
+// discs 3.3/3.6 (no disc carries this exact build); position in the
+// vmanager run after pinned SpuVmFlush and before pinned SpuVmKeyOff;
+// call order SpuVmVSetUp/SpuVmKeyOff/SpuVmAlloc/SpuVmDoAllocate (report,
+// round 73). Superseded game-style name StartNote. Round 76 (bravo, track 2).
+SpuVmKeyOn = 0x8002FAC4; // type:func
 // identified: shape 0.93 vs libsnd/vmanager SpuVmKeyOff (124w vs our
 // 131w, disc 3.5), position within the libsnd neighborhood. Superseded
 // game-style name StopNote. Round 74 (bravo, track 2).

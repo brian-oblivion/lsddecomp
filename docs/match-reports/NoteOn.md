@@ -162,7 +162,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
         u8 vol = ptr[0x2C];
-        StartNote(packed, note, vol, (u8)a3, (u16)divided, status);
+        SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status);
         rec->unkA8 = (u8)a3;
     } else {
         s16 packed = (a1 << 8) | a0;
@@ -195,7 +195,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
         s16 packed = (a1 << 8) | a0;
         s16 note = rec->unk4C;
         u8 vol = ptr[0x2C];
-        StartNote(packed, note, vol, (u8)a3, (u16)divided, status);
+        SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status);
         rec->unkA8 = (u8)speed;
     } else {
         s16 packed = (a1 << 8) | a0;
@@ -308,7 +308,7 @@ delay-slot `move $a3,$a2` (in `beqz $v0,.L800345FC`'s delay slot, i.e. the
 execute), so on the fallthrough (`flag!=0`) path retail's register `$a3`
 holds parameter `a2`'s original value for the REST of the function --
 including at the two `andi a3,a3,0xff` sites (0x24DB8, 0x24DF8) that feed
-the masked byte argument to `StartNote`/`SpuVmKeyOff`.** This raised
+the masked byte argument to `SpuVmKeyOn`/`SpuVmKeyOff`.** This raised
 the hypothesis that retail's actual passed value at those two call sites is
 `(u8)a2`, not `(u8)a3` as currently modeled. **Tested directly and
 REJECTED**: replacing both `(u8)a3` call arguments with `(u8)a2` regressed

@@ -18,9 +18,9 @@
  *
  * WHAT EACH FUNCTION DOES (see docs/match-reports/<name>.md for the full
  * derivation and evidence):
- *   - StartNote / SpuVmKeyOff: a matched NoteOn/NoteOff pair. Given a packed
- *     [screen|slot] identity, note, volume/program and (for StartNote) a
- *     velocity and a computed stereo pan split, StartNote registers a new
+ *   - SpuVmKeyOn / SpuVmKeyOff: a matched NoteOn/NoteOff pair. Given a packed
+ *     [screen|slot] identity, note, volume/program and (for SpuVmKeyOn) a
+ *     velocity and a computed stereo pan split, SpuVmKeyOn registers a new
  *     active-voice record; SpuVmKeyOff scans every voice for one whose
  *     identity fields match and releases it, returning the count released.
  *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (SpuVmAlloc, in
@@ -59,7 +59,7 @@
  *     volume globals (reset to 0x3FFF, the SPU's real max), then calls
  *     SpuVmFlush once.
  *
- * STALLS: SpuVmPBVoice, StartNote, SpuVmFlush,
+ * STALLS: SpuVmPBVoice, SpuVmKeyOn, SpuVmFlush,
  * SetAutoVol, SetAutoPan -- all five are the same "whole-function
  * register-count decision predates any of the function's own locals"
  * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
@@ -110,7 +110,7 @@ extern u8 D_8008D970[];
 
 typedef struct {
     u8 pad[0x12];
-    u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per StartNote's report */
+    u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per SpuVmKeyOn's report */
     u8 pad14[0x18 - 0x14];
     u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in SetAutoVol/SetAutoPan */
 } ObjE970;
@@ -636,7 +636,7 @@ extern u8 D_8008EA13;
 
 /* Pointer to a 0x20-byte-stride table. Originally only the two
  * trailing byte fields SpuVmPBVoice reads (unkC/unkD) were named;
- * StartNote (below) additionally needs unk0/unk1/unk2/unk3/unk4/
+ * SpuVmKeyOn (below) additionally needs unk0/unk1/unk2/unk3/unk4/
  * unk5/unk6/unk7/unk16, all in the same struct (no offset conflicts,
  * per this project's convention of extending rather than duplicating
  * a local view when the fields don't overlap). */
@@ -944,7 +944,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmFlush);
  * (~10-12 words); round 48's frame-padding lever realigned the frame
  * byte-exactly without closing either. A permuter search (round 37)
  * plateaued at 12471/15053 across 51,596 iterations with no candidate
- * reaching zero (docs/match-reports/StartNote.md). Hand-derived; two
+ * reaching zero (docs/match-reports/SpuVmKeyOn.md). Hand-derived; two
  * stale-symbol fixes applied per tools/stalesyms.py (round 37): the
  * renamed-to-SpuVmVSetUp call (was func_80032148) and D_8008EA0D, which
  * has no linker symbol of its own and is read through the already-linked
@@ -983,7 +983,7 @@ extern s32 note2pitch(void);
 extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 
-s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
+s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
 {
     Entry90902E8M *s6;
     SlotE968M *slot;
@@ -1101,7 +1101,7 @@ s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
     return s3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_m", StartNote);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmKeyOn);
 #endif
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low

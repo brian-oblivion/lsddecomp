@@ -20,7 +20,7 @@ idiom (DECOMPILATION_LEARNINGS), declare it and never reference it --
 that reproduces retail's silent register waste exactly.
 
 ```c
-extern s32 StartNote(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
+extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 
 s32 SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
 {
@@ -37,11 +37,11 @@ s32 SpuVmSeKeyOn(s32 p0, s32 p1, s32 p2, s32 p3, u16 p4, u16 p5)
         outA = p5;
         outB = 0x7F - ((p4 << 6) / p5);
     }
-    return StartNote(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);
+    return SpuVmKeyOn(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);
 }
 ```
 
-`StartNote` is itself still `INCLUDE_ASM` elsewhere (never seen in
+`SpuVmKeyOn` is itself still `INCLUDE_ASM` elsewhere (never seen in
 any other unit's source), so this extern is a per-call-site guess typed
 from the registers loaded before the `jal`: a literal `0x21` first, two
 `s16`-truncated args, then three `u16`s (the third truncated explicitly

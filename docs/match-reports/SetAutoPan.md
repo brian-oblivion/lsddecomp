@@ -630,7 +630,7 @@ libsnd `SetAutoVol` (3.3 `vmanager`), and Sony's 3.3 `SetAutoPan` has this
 function's opening skeleton (224w; the 0x30 voice stride there vs 0x34 here
 accounts for the length). This is libsnd's `SetAutoPan` in a build no disc
 carries -- the `seqread` situation, where the project does match as C and
-counts it as library by address. `StartNote.md` (round 73) has the unit-wide
+counts it as library by address. `SpuVmKeyOn.md` (round 73) has the unit-wide
 evidence (StartNote is `SpuVmKeyOn`).
 
 ### Preserved body rebuilt first
