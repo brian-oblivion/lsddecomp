@@ -1822,3 +1822,4 @@ Class876FC__Update = 0x800564F4; // type:func
 gClass876FCMethods = 0x800876FC;
 GetClass876FCMethods = 0x80056F4C; // type:func
 SetDefaultBMemPMgr = 0x80017A9C; // type:func
+FreeMem = 0x80017AA8; // type:func

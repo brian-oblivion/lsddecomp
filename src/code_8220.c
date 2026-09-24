@@ -39,7 +39,7 @@ void SetDefaultBMemPMgr(BMemPMgr *pool)
     D_8008A818 = pool;
 }
 
-void func_80017AA8(void *ptr)
+void FreeMem(void *ptr)
 {
     free(ptr);
 }
