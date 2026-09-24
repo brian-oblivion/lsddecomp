@@ -1,37 +1,23 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
- *
  * class_3bb8c_k -- fifth carved slice of the class_3bb8c block
- * (0x429D4..0x435E0, vram 0x800521D4..0x80052DE0), 20 functions.
- * Carved round 15.
+ * (0x429D4..0x435E0, vram 0x800521D4..0x80052DE0), 20 functions, carved
+ * round 15, all matched. Named round 75 (track 3).
  *
- * Blocker profile (head's Gate 1 THREE-grep screen at carve time -- the screen
- * is TWO greps as of round 21, and screening for `addiu_at` now INVENTS
- * blockers, which is the strictly worse failure). Corrected round 27
- * (2026-09-10), re-screened with `python3 tools/nearmiss.py`:
- *   Class86F88__HandleInputCode  was addiu-$at ONLY -- NOT BLOCKED. `addiu_at` was RESOLVED
- *                  in round 21 (maspsx `--addiu-at`;
- *                  docs/research/addiu-at-blocker.md). ALREADY MATCHED, so
- *                  this correction costs nothing -- but the directive below
- *                  was live for six rounds and would have warned a runner off
- *                  matchable ground. It still OWNS jtbl_800116F4, which is why
- *                  the rodata slot at 0x1EF4 is attached to this unit.
- *   Class86F88__CreateRows  gp_rel -- MATCHED round 45 (82/82 words). The `gp_rel`
- *                  blocker itself was RESOLVED round 42; see the file-top
- *                  banner above.
- * So: ONE blocked function, not two, and even that one is resolved now. The
- * old line here read "Both have stub
- * reports; do not attempt either" -- a stale DIRECTIVE, which is worse than a
- * stale fact, because a reader acts on it without re-measuring.
+ * Methods of two classes (`tools/classtable.py` resolves every one):
+ *  - Class86F88 (table gClass86F88Methods, slots +0x054..+0x09C, plus the
+ *    two non-virtual helpers FormatRowText/SetView and the table getter
+ *    GetClass86F88Methods). A scrolling list selector: up to 4 visible
+ *    rows of 26-character item text (one New_Obj6EAC0 text object each),
+ *    a highlighted cursor row (gClass86F88CursorColor, others
+ *    gClass86F88RowColor), cursor up/down that scrolls the window at its
+ *    edges, and a horizontal column offset. HandleInputCode maps input
+ *    codes 25/23 to closing with result 2/3; SetState(4) then reports the
+ *    result to the parents, which read the chosen item back through
+ *    GetCursorIndex. Its ctor, child and resource methods are in
+ *    class_3bb8c_j.
+ *  - ObjM (table D_80087034, slots +0x008/+0x00C/+0x038, plus New_ObjM):
+ *    its allocator, ctor, dtor and OnNotify. The rest of ObjM is in
+ *    class_3bb8c_l and class_3bb8c_m.
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
@@ -41,75 +27,50 @@
 #include "class_39e08.h"
 
 /*
- * class_3bb8c_k's own view of the class whose method table is D_80087034
- * (GetObjMMethods's return value) -- a DIFFERENT class from Class86F88
- * above, and a DIFFERENT (disjoint-slot) view from class_3bb8c_l's own
- * Obj87034_3bb8c_l/Obj87034Methods_3bb8c_l (see include/class_3bb8c.h):
- * that unit reaches slots 0x004/0x010/0x014/0x048/0x074/0x07C/0x080/0x084/
- * 0x088/0x08C/0x0C0/0x0C4/0x0C8/0x0D0/0x0D4; this unit's own two functions
- * (New_ObjM, the New_X allocator, and ObjM__ObjM, its ctor target)
- * reach only +0x008 (ctor) and +0x040 (a post-construct hook dispatched by
- * ObjM__ObjM itself). Kept LOCAL to this unit (not added to either
- * shared header) per the project's multiple-independent-local-views
- * convention and this round's header-contention rule -- echo is live on
- * class_3bb8c_l's own view of the SAME table this round.
+ * class_3bb8c_k's own view of ObjM (method table D_80087034, returned by
+ * GetObjMMethods; the shared `ObjM`/`Obj87034_3bb8c_l` views are in
+ * include/class_3bb8c.h). Only what New_ObjM, ObjM__ObjM and
+ * ObjM__OnNotify reach is typed. Kept local to this unit per the
+ * multiple-independent-local-views convention.
  *
- * New_ObjM itself is declared with a NARROWER opaque return type,
- * `Obj4C *`, by the pre-existing prototype in include/class_39e08.h (that
- * unit's own independent view, established from Obj865C8__EnterState2's call
- * site) -- this file includes class_39e08.h, so New_ObjM's definition
- * below must match that prototype exactly (return type and first-argument
- * type) or the two conflict. The richer view below is used only inside
- * New_ObjM/ObjM__ObjM's own bodies.
+ * New_ObjM is declared `Obj4C *New_ObjM(SubObjB *, ...)` by
+ * include/class_39e08.h (Obj865C8__EnterState2's call-site view), which
+ * this file includes, so its definition below must keep that exact return
+ * and first-argument type.
  */
-typedef struct Class87034Methods_3bb8c_k Class87034Methods_3bb8c_k;
-typedef struct Obj87034_3bb8c_k Obj87034_3bb8c_k;
+typedef struct ObjMMethods_3bb8c_k ObjMMethods_3bb8c_k;
+typedef struct ObjM_3bb8c_k ObjM_3bb8c_k;
 
-struct Class87034Methods_3bb8c_k {
+/* Slot names are the method each slot holds in D_80087034. */
+struct ObjMMethods_3bb8c_k {
     u8 pad000[0x008];
-    /* +0x008, New_ObjM's own dispatch (New_X's ctor call). */
+    /* +0x008 ObjM__ObjM, New_ObjM's ctor call. */
     void (*ctor)(void *self, SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
     u8 pad00C[0x040 - 0x00C];
-    /* +0x040, ObjM__ObjM's own dispatch, right after filling self's
-     * fields -- a post-construct hook, self only. */
+    /* +0x040 func_80052DE0 (class_3bb8c_l, an empty body), ObjM__ObjM's last call. */
     void (*slot40)(void *self);
-    u8 pad044[0x054 - 0x044];
-    /* +0x054/+0x060, Class86F88__HandleInputCode's own event/code dispatch (below) --
-     * both called with a constant second argument. */
-    void (*slot54)(void *self, s32 arg1);
-    u8 pad058[0x060 - 0x058];
-    void (*slot60)(void *self, s32 arg1);
-    u8 pad064[0x07C - 0x064];
-    /* +0x07C/+0x080/+0x084/+0x088, Class86F88__HandleInputCode's own event/code
-     * dispatch (below) -- self only, no other arguments. */
-    void (*slot7C)(void *self);
-    void (*slot80)(void *self);
-    void (*slot84)(void *self);
-    void (*slot88)(void *self);
-    u8 pad08C[0x090 - 0x08C];
-    /* +0x090/+0x0B0/+0x0B4, ObjM__OnNotify's own 3-way event-type dispatch
-     * (self, the same EventArg* it was itself called with, and its own
-     * arg2, forwarded verbatim to whichever slot the event's header tag
-     * selects). */
-    void (*slot90)(void *self, EventArg *arg1, s32 arg2);
+    u8 pad044[0x090 - 0x044];
+    /* +0x090/+0x0B0/+0x0B4, ObjM__OnNotify's 3-way dispatch on the event
+     * target's header tag; all get (self, arg1, arg2) forwarded. */
+    void (*slot90)(void *self, EventArg *arg1, s32 arg2);          /* +0x090 func_80053984 */
     u8 pad094[0x0B0 - 0x094];
-    void (*slotB0)(void *self, EventArg *arg1, s32 arg2);
-    void (*slotB4)(void *self, EventArg *arg1, s32 arg2);
+    void (*handleEvent5Or6)(void *self, EventArg *arg1, s32 arg2); /* +0x0B0 ObjM__HandleEvent5Or6 */
+    void (*handleEvent7)(void *self, EventArg *arg1, s32 arg2);    /* +0x0B4 ObjM__HandleEvent7 */
 };
 
-struct Obj87034_3bb8c_k {
-    Class87034Methods_3bb8c_k *methods; /* +0x000, ObjM__ObjM */
+struct ObjM_3bb8c_k {
+    ObjMMethods_3bb8c_k *methods;       /* +0x000, ObjM__ObjM */
     u8 pad004[0x038 - 0x004];
     s32 unk38;                          /* +0x038, ObjM__ObjM: arg5 */
     u8 pad3C[0x054 - 0x03C];
-    s32 unk54;                          /* +0x054, ObjM__ObjM: arg2 */
+    s32 unk54;                          /* +0x054, ObjM__ObjM: arg2 (shared ObjM view: a FieldM50 *) */
     u8 pad58[0x060 - 0x058];
     s32 unk60;                          /* +0x060, ObjM__ObjM: set to 1 */
     s32 unk64;                          /* +0x064, ObjM__ObjM: zeroed */
     s32 unk68;                          /* +0x068, ObjM__ObjM: zeroed */
     SubObjB *unk6C;                     /* +0x06C, ObjM__ObjM: arg1, also forwarded as the base ctor's own arg2 */
     s32 unk70;                          /* +0x070, ObjM__ObjM: arg4 */
-    s32 unk74;                          /* +0x074, ObjM__ObjM: arg3 */
+    s32 unk74;                          /* +0x074, ObjM__ObjM: arg3 (shared ObjM view: New_Obj6EAC0's ctx) */
     u8 pad78[0x080 - 0x078];
     s32 unk80;                          /* +0x080, ObjM__ObjM: zeroed */
     s32 unk84;                          /* +0x084, ObjM__ObjM: zeroed */
@@ -195,66 +156,66 @@ void Class86F88__ScrollRight(Class86F88 *self)
 {
     Class86F88Methods *methods;
     s32 tmp;
-    s32 count;
+    s32 column;
 
     if (!self->resource) {
         return;
     }
     tmp = self->column;
-    count = tmp;
-    if (count + 0x1A >= self->maxTextLen) {
+    column = tmp;
+    if (column + 0x1A >= self->maxTextLen) {
         return;
     }
     methods = self->methods;
-    count++;
-    self->column = count;
-    methods->refreshRows(self, self->topIndex, count, self->cursorIndex, 1);
+    column++;
+    self->column = column;
+    methods->refreshRows(self, self->topIndex, column, self->cursorIndex, 1);
 }
 
 void Class86F88__ScrollLeft(Class86F88 *self)
 {
-    s32 count;
+    s32 column;
 
     if (!self->resource) {
         return;
     }
-    count = self->column - 1;
-    if (count < 0) {
+    column = self->column - 1;
+    if (column < 0) {
         return;
     }
-    self->column = count;
-    self->methods->refreshRows(self, self->topIndex, count, self->cursorIndex, 1);
+    self->column = column;
+    self->methods->refreshRows(self, self->topIndex, column, self->cursorIndex, 1);
 }
 
 void Class86F88__CursorUp(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 {
-    s32 count;
-    s32 newUnk20;
-    s32 newUnk28;
+    s32 cursor;
+    s32 newTop;
+    s32 newCursor;
 
     if (!self->resource) {
         return;
     }
-    count = self->cursorIndex;
-    if (count - 1 < 0) {
+    cursor = self->cursorIndex;
+    if (cursor - 1 < 0) {
         return;
     }
-    if (count - self->topIndex > 0) {
+    if (cursor - self->topIndex > 0) {
         self->methods->stepCursorInView(self, 0, 1, arg3);
     } else {
         self->topIndex--;
-        newUnk20 = self->topIndex;
+        newTop = self->topIndex;
         self->cursorIndex--;
-        newUnk28 = self->cursorIndex;
-        self->methods->refreshRows(self, newUnk20, self->column, newUnk28, 1);
+        newCursor = self->cursorIndex;
+        self->methods->refreshRows(self, newTop, self->column, newCursor, 1);
     }
 }
 
 void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
 {
-    s32 newUnk20;
-    s32 newUnk28;
-    s32 prevUnk20;
+    s32 newTop;
+    s32 newCursor;
+    s32 prevTop;
 
     if (!self->resource) {
         return;
@@ -262,15 +223,15 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
     if (self->cursorIndex + 1 >= self->itemCount) {
         return;
     }
-    prevUnk20 = self->topIndex - 1;
-    if (self->cursorIndex - prevUnk20 < 4) {
+    prevTop = self->topIndex - 1;
+    if (self->cursorIndex - prevTop < 4) {
         self->methods->stepCursorInView(self, 1, 1, arg3);
     } else {
         self->topIndex++;
-        newUnk20 = self->topIndex;
+        newTop = self->topIndex;
         self->cursorIndex++;
-        newUnk28 = self->cursorIndex;
-        self->methods->refreshRows(self, newUnk20, self->column, newUnk28, 1);
+        newCursor = self->cursorIndex;
+        self->methods->refreshRows(self, newTop, self->column, newCursor, 1);
     }
 }
 
@@ -278,30 +239,26 @@ void Class86F88__CursorDown(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3)
  * Class86F88__CreateRows calls both, same convention as Obj865C8__EnterState2 in
  * src/class_39e08.c. Signatures must match their real definitions below
  * exactly. */
-extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base);
-extern void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4);
+extern char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, char *column);
+extern void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 highlight);
 
-/* VALUE-of `%gp_rel`, round 45's own local view -- two plain s32
- * constants (`gClass86F88RowOriginX`=-0x5C, `gClass86F88RowOriginY`=-0xF in the ROM image,
- * `asm/data/7B12C.sdata.s`) seeding a 2-word stack-local this function
- * builds and passes to each freshly-created element's own `slot4C`. */
+/* The first row's position, two sdata words (-0x5C, -0xF). Read by value
+ * into Class86F88__CreateRows's `pos`; each further row is 0xA lower. */
 extern s32 gClass86F88RowOriginX;
 extern s32 gClass86F88RowOriginY;
 
-/* Class86F88__CreateRows's own stack-local argument to Class86F88ElemMethods::
- * slot4C -- `a` is gClass86F88RowOriginX's value, set once; `b` starts at
- * gClass86F88RowOriginY's value and accumulates by 0xA per loop iteration. Kept
- * local to this unit (see the shared header's own `void *arg2` for that
- * slot) since nothing else gives this argument any shape. */
+/* Class86F88__CreateRows's stack-local {x, y}, passed by address to each
+ * row's `layout` (Class86F88ElemMethods +0x04C, opaque `void *` in the
+ * shared header). */
 typedef struct {
-    s32 a;
-    s32 b;
-} Elem4CArg_3bb8c_k;
+    s32 x;
+    s32 y;
+} Pos_3bb8c_k;
 
-void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+void Class86F88__CreateRows(Class86F88 *self, s32 parent, s32 font, s32 top, s32 column, s32 cursor)
 {
     char buf[0x20];
-    Elem4CArg_3bb8c_k local;
+    Pos_3bb8c_k pos;
     Class86F88Elem **p;
     s32 count;
     s32 i;
@@ -310,8 +267,8 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
         return;
     }
 
-    local.a = gClass86F88RowOriginX;
-    local.b = gClass86F88RowOriginY;
+    pos.x = gClass86F88RowOriginX;
+    pos.y = gClass86F88RowOriginY;
     count = self->itemCount;
     p = &self->rows[0];
     if (count >= 5) {
@@ -319,15 +276,15 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
     }
 
     for (i = 0; i < count; i++) {
-        Class86F88__FormatRowText(self, buf, i, arg3, (char *)arg4);
-        *p = (Class86F88Elem *)New_Obj6EAC0((void *)arg2, 0x1A, buf);
-        (*p)->methods->layout(*p, arg1, &local);
+        Class86F88__FormatRowText(self, buf, i, top, (char *)column);
+        *p = (Class86F88Elem *)New_Obj6EAC0((void *)font, 0x1A, buf);
+        (*p)->methods->layout(*p, parent, &pos);
         (*p)->methods->setColor(*p, &gClass86F88RowColor);
-        local.b += 0xA;
+        pos.y += 0xA;
         p++;
     }
 
-    Class86F88__SetView(self, arg3, arg4, arg5, 1);
+    Class86F88__SetView(self, top, column, cursor, 1);
 }
 
 void Class86F88__ReleaseRows(Class86F88 *self)
@@ -372,7 +329,7 @@ void Class86F88__ReleaseRows(Class86F88 *self)
 extern s32 strlen(char *s);
 extern void *memcpy(char *dest, char *src, s32 n);
 
-void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+void Class86F88__RefreshRows(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 notify)
 {
     s32 count;
     s32 i;
@@ -388,27 +345,27 @@ void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32
         count = 4;
     }
     for (i = 0; i < count; i++) {
-        Class86F88__FormatRowText(self, buf, i, arg1, (char *)arg2);
+        Class86F88__FormatRowText(self, buf, i, top, (char *)column);
         (*p)->methods->setText(*p, buf);
         p++;
     }
-    Class86F88__SetView(self, arg1, arg2, arg3, 0);
-    if (arg4) {
+    Class86F88__SetView(self, top, column, cursor, 0);
+    if (notify) {
         self->methods->forwardToTarget(self, 0);
     }
 }
 
-char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4, char *base)
+char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 row, s32 top, char *column)
 {
-    s32 idx = arg4 + arg3;
+    s32 idx = top + row;
     s32 len;
     s32 i;
 
-    len = strlen(base + self->texts[idx]);
+    len = strlen(column + self->texts[idx]);
     if (len >= 0x1B) {
         len = 0x1A;
     }
-    memcpy(dest, base + self->texts[idx], len);
+    memcpy(dest, column + self->texts[idx], len);
     i = len;
     if (i < 0x1A) {
         for (; i < 0x1A; i++) {
@@ -419,24 +376,24 @@ char *Class86F88__FormatRowText(Class86F88 *self, char *dest, s32 arg3, s32 arg4
     return dest;
 }
 
-void Class86F88__SetView(Class86F88 *self, s32 a1, s32 a2, s32 a3, s32 a4)
+void Class86F88__SetView(Class86F88 *self, s32 top, s32 column, s32 cursor, s32 highlight)
 {
     Class86F88Elem *elem;
-    s32 flag = a4;
+    s32 flag = highlight;
 
     __asm__("");
-    self->topIndex = a1;
-    self->column = a2;
-    self->cursorIndex = a3;
+    self->topIndex = top;
+    self->column = column;
+    self->cursorIndex = cursor;
     if (flag == 0) {
         return;
     }
-    a3 -= a1;
-    elem = self->rows[a3];
+    cursor -= top;
+    elem = self->rows[cursor];
     elem->methods->setColor(elem, &gClass86F88CursorColor);
 }
 
-void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
+void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 notify)
 {
     Class86F88Elem **p;
     s32 idx;
@@ -455,7 +412,7 @@ void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
         p--;
     }
     (*p)->methods->setColor(*p, &gClass86F88CursorColor);
-    if (flag) {
+    if (notify) {
         self->methods->forwardToTarget(self, 0);
     }
 }
@@ -473,7 +430,7 @@ Class86F88Methods *GetClass86F88Methods(void)
 Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
     Obj4C *self;
-    Class87034Methods_3bb8c_k *methods;
+    ObjMMethods_3bb8c_k *methods;
 
     self = BMemPMgrAlloc(0x88);
     if (self != NULL) {
@@ -484,7 +441,7 @@ Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
     return NULL;
 }
 
-void ObjM__ObjM(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+void ObjM__ObjM(ObjM_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
     GetClass86668Methods()->ctor((Obj865C8 *)self, 0, arg1);
     self->methods = GetObjMMethods();
@@ -506,16 +463,16 @@ void ObjM__Dtor(Obj865C8 *self)
     GetClass86668Methods()->dtor(self);
 }
 
-void ObjM__OnNotify(Obj87034_3bb8c_k *self, EventArg *arg1, s32 arg2)
+void ObjM__OnNotify(ObjM_3bb8c_k *self, EventArg *arg1, s32 arg2)
 {
     s32 tag;
 
     GetClass86668Methods()->slot38((Obj865C8 *)self, arg1, arg2);
     tag = arg1->target->header;
     if ((tag & 0xFFF) == 0x114) {
-        self->methods->slotB4(self, arg1, arg2);
+        self->methods->handleEvent7(self, arg1, arg2);
     } else if ((tag & 0xFFF) == 0x164) {
-        self->methods->slotB0(self, arg1, arg2);
+        self->methods->handleEvent5Or6(self, arg1, arg2);
     } else if ((tag & 0xFFFF) == 0x1F34) {
         self->methods->slot90(self, arg1, arg2);
     }
