@@ -1,11 +1,13 @@
-# func_8004B930
+# Class866E8__ComputeRateFlags
+
+> Renamed from `func_8004B930` on 2026-09-24 (tools/rename.py). Address 0x8004b930.
 
 **Unit:** class_3bb8c · **Size:** 68 words · **Status:** MATCHED (~6 attempts).
 
 ## Result
 
 ```c
-s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
+s32 Class866E8__ComputeRateFlags(Obj866E8 *self, s32 val, s32 flag) {
     Unk68Struct *u;
     s32 divisor;
     s32 unk4;
@@ -46,7 +48,7 @@ s32 func_8004B930(Obj866E8 *self, s32 val, s32 flag) {
 (`divisor`/`count`/`unk4`) read UNCONDITIONALLY at the top, before the branch
 on `unk4` -- even `divisor`, which only the `unk4 == 0` path uses. This
 confirmed `Unk68Struct`'s full layout: `s16 divisor @0`, `s16 count @2`, `s32
-unk4 @4` (corroborated independently by `func_8004C368` and by
+unk4 @4` (corroborated independently by `Class866E8__ComputeDivisorSplit` and by
 `ComputeCellWorldOffsets`'s own `arg2` parameter, fed this exact pointer at its one call
 site).
 

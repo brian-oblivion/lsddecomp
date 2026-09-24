@@ -1,11 +1,13 @@
-# func_8004C0AC
+# Class866E8__ResetElementCells
+
+> Renamed from `func_8004C0AC` on 2026-09-24 (tools/rename.py). Address 0x8004c0ac.
 
 **Unit:** class_3bb8c · **Size:** 43 words · **Status:** MATCHED (5 attempts).
 
 ## Result
 
 ```c
-void func_8004C0AC(Obj866E8 *self, Elem *entry) {
+void Class866E8__ResetElementCells(Obj866E8 *self, Elem *entry) {
     EntryChildObj **p;
     EntryChildObj **end;
 

@@ -32,7 +32,7 @@ typedef struct GenericObject GenericObject;
  */
 struct UnkSlotEntry_3ac78 {
     u16 flag;                        /* zeroed at the top of each loop pass (Class866E8__ResetAllElements) */
-    u16 key;                         /* Class866E8__Class866E8 (ctor): set to the loop index (0..6), and copied on into target->key. class_3bb8c's independent view (Elem::unk2) has func_8004B700 copy a caller-supplied key byte into the same field. */
+    u16 key;                         /* Class866E8__Class866E8 (ctor): set to the loop index (0..6), and copied on into target->key. class_3bb8c's independent view (Elem::unk2) has Class866E8__BuildRateEntries copy a caller-supplied key byte into the same field. */
     UnkSlotChildObj_3ac78 *target;
     UnkSlotListObj_3ac78 *list;
     GenericObject *cellParent;             /* Class866E8__Finalize: refreshed (discarded) through ->methods->release when non-NULL */
@@ -53,7 +53,7 @@ struct UnkSlotEntry_3ac78 {
      * below is this unit's own weaker reading. class_3bb8c's independently
      * derived view calls the same block `EntryChildObj **`, and its evidence
      * is stronger -- the ctor here ORs 0x80000000 into each freshly-built
-     * cell's +0x010, which is EntryChildObj::unk10 exactly (func_8004C0AC
+     * cell's +0x010, which is EntryChildObj::unk10 exactly (Class866E8__ResetElementCells
      * does the same OR, Class866E8__SetFootprintCellFlag clears the same bit), and the
      * `flags36`/`nextInCell` fields NotifyGridCell walks line up with
      * EntryChildObj::unk36/unk38. Unifying the two views is a track-4 job,
@@ -207,13 +207,13 @@ struct Class866E8Methods {
     /* +0x0D4 */ u8 pad0D4[0x0DC - 0x0D4];
     /* +0x0DC */ void (*setGridSpan)(Class866E8 *self, s32 span);                    /* Class866E8__Reset; called with self and the loaded value of gDefaultGridSpan (a lone .word, 0x0000A000, no other reference in the image) */
     /* +0x0E0 */ u8 pad0E0[0x0F4 - 0x0E0];
-    /* +0x0F4 */ void (*slotF4)(Class866E8 *self);                              /* func_8004B5BC; called by Class866E8__UpdateIfEnabled */
+    /* +0x0F4 */ void (*slotF4)(Class866E8 *self);                              /* Class866E8__UpdateFootprintTracking; called by Class866E8__UpdateIfEnabled */
     /* +0x0F8 */ u8 pad0F8[0x100 - 0x0F8];
-    /* +0x100 */ void (*slot100)(Class866E8 *self, void *arg1, s32 arg2);        /* func_8004BD14; called by Class866E8__OnNotify */
+    /* +0x100 */ void (*slot100)(Class866E8 *self, void *arg1, s32 arg2);        /* Class866E8__OnNotifyTag1; called by Class866E8__OnNotify */
     /* +0x104 */ u8 pad104[0x108 - 0x104];
-    /* +0x108 */ void (*slot108)(Class866E8 *self, UnkSlotEntry_3ac78 *entry);   /* func_8004C0AC; called by Class866E8__ResetAllElements */
+    /* +0x108 */ void (*slot108)(Class866E8 *self, UnkSlotEntry_3ac78 *entry);   /* Class866E8__ResetElementCells; called by Class866E8__ResetAllElements */
     /* +0x10C */ u8 pad10C[0x110 - 0x10C];
-    /* +0x110 */ s32 (*slot110)(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2); /* func_8004C1C0; called by Class866E8__ApplyToSenderFootprint */
+    /* +0x110 */ s32 (*slot110)(Class866E8 *self, UnkArgObj_3ac78 *arg1, s32 arg2); /* Class866E8__ComputeFootprintDescriptor; called by Class866E8__ApplyToSenderFootprint */
     /* +0x114 */ u8 pad114[0x124 - 0x114];
     /* +0x124 */ s32 (*slot124)(Class866E8 *self, s32 key);                     /* Class866E8__FindElemIndexByUnk30; called by Class866E8__SetFootprintRect.
                   * RETYPED round 8 from `void *(*)(Class866E8 *, void *)` on the strength of the
@@ -307,7 +307,7 @@ extern Class86668Methods gClass86668Methods;
  * Opaque descriptor buffer passed as Class866E8__SetFootprintFromCell's arg1, Class866E8__ApplyToSenderFootprint's
  * stack-local `buf` (passed on to slot110/Class866E8__SetFootprintFromCell/Class866E8__SetFootprintRect),
  * and Class866E8__SetFootprintRect's desc. Populated by a call through
- * Class866E8Methods slot +0x110 (func_8004C1C0, not decompiled anywhere
+ * Class866E8Methods slot +0x110 (Class866E8__ComputeFootprintDescriptor, not decompiled anywhere
  * yet), so only the bytes those functions actually read are typed. Named
  * after the convention in code_171e0.h (`Unk*Obj_<unit>`).
  */

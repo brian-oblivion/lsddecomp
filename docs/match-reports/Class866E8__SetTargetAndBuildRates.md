@@ -43,7 +43,7 @@ documented for `FlashbackRotation` in `include/DreamSys.h` -- confirmed as a
 second, independent instance.
 
 `self->unk6C = arg2;` (raw pointer store, no dereference in this function)
-combined with `func_8004C158`'s later dereference of the SAME field (`+0x014`,
+combined with `Class866E8__GetTargetDescriptor`'s later dereference of the SAME field (`+0x014`,
 see that report) is what pinned `unk6C`'s type to `Unk6CObj *` rather than
 leaving it `void *`/`s32`.
 

@@ -1,4 +1,6 @@
-# func_8004BB3C -- MATCHED round 73 (105/105, exact length, whole-image SHA1 green)
+# Class866E8__ApplyRateEntries -- MATCHED round 73 (105/105, exact length, whole-image SHA1 green)
+
+> Renamed from `func_8004BB3C` on 2026-09-24 (tools/rename.py). Address 0x8004bb3c.
 
 REVISITED, round 73: MATCHED 105/105 (walker is a strength-reduced giv of the walked parameter); names/types not relevant (existing SetupEntry866E8/SetupSub866E8 views reused unchanged)
 
@@ -53,7 +55,7 @@ allocation wrong.
 
 ## Earlier history (superseded by the match above)
 
-#### Old title: func_8004BB3C -- STALL (register-identity, 90/105 words at correct length)
+#### Old title: Class866E8__ApplyRateEntries -- STALL (register-identity, 90/105 words at correct length)
 
 > **ROUND 47 (charlie): Gate 1b re-verified 90/105, no drift** (rebuild via
 > `make clean && make extract` then the standard `#if 0`->`#if 1` swap,
@@ -72,7 +74,7 @@ allocation wrong.
 > no inherited "permuter tried, negative" to revert to UNKNOWN: the
 > correct prior disposition was already "not searched, scaffold
 > untrustworthy", and it still is. Not re-attempted; the family-wide
-> pattern is now 5 confirmed instances (`func_8004BB3C`, `func_8004C1C0`,
+> pattern is now 5 confirmed instances (`Class866E8__ApplyRateEntries`, `Class866E8__ComputeFootprintDescriptor`,
 > `Class866E8__SplitFootprintSlot`, `Class866E8__BuildFootprintSlots`, `IsPointOutOfBounds`), reinforcing round
 > 46's own read that this is structural to the family's
 > `self->methods->slotNN` call-chain shape, not a per-function fluke --
@@ -128,7 +130,7 @@ allocation wrong.
 > 39, 40, 41), the isolated permuter scaffold provably scores a different
 > residue than the real build (round 17/40, and this class recurs
 > elsewhere in this unit this round -- see `Class866E8__SplitFootprintSlot`,
-> `func_8004C1C0`, `Class866E8__BuildFootprintSlots`, `IsPointOutOfBounds`), and neither of this
+> `Class866E8__ComputeFootprintDescriptor`, `Class866E8__BuildFootprintSlots`, `IsPointOutOfBounds`), and neither of this
 > round's two new levers applies. **SKIPPING further attempts this
 > round** per this round's own guidance on functions whose cheap levers
 > are spent.
@@ -140,7 +142,7 @@ allocation wrong.
 > length, identical `$s3`<->`$s4` residue -- unchanged from round 39.
 >
 > **Read the body for the dead-reload shape before touching anything, per
-> this round's brief.** The lever closed on `func_8004B700`/`func_8004BE54`
+> this round's brief.** The lever closed on `Class866E8__BuildRateEntries`/`Class866E8__LoadElementResources`
 > this same unit last round is "a value already held in a local gets
 > reloaded via the same expression a second time, into the same local, for
 > a second single use" -- a same-block RELOAD of an already-computed value.
@@ -173,7 +175,7 @@ allocation wrong.
 > this body anywhere -- confirmed by direct inspection, not inferred. Per
 > project rule 6 this remains a register-identity stall, not to be forced
 > with a register pin. No permuter run this round (time went to
-> `func_8004C470` instead, per this round's own closer-target priority);
+> `Class866E8__FindElementForPosition` instead, per this round's own closer-target priority);
 > the existing round-17/40 finding that this function's isolated-compile
 > scaffold provably scores a DIFFERENT residue than the real build (0
 > insertions/deletions in context vs 2/2 isolated) still stands and still
@@ -190,7 +192,7 @@ allocation wrong.
 > scoring a DIFFERENT residue than the real build (2 insertions/2 deletions
 > in isolation vs 0/0 in context) -- a permuter-inconclusive result, not an
 > exhausted one. Built a brand-new scaffold from scratch this round
-> (`tools/setup-permuter.sh func_8004BB3C <seed>`, seed = this report's own
+> (`tools/setup-permuter.sh Class866E8__ApplyRateEntries <seed>`, seed = this report's own
 > 90/105 body verbatim) and ran `--debug --stack-diffs` BEFORE searching,
 > per the script's own advice: **base score 480, with 20 stack differences
 > and 2 insertions / 2 deletions** -- the real build has ZERO stack
@@ -225,7 +227,7 @@ allocation wrong.
 > instruction-adjacency hit -- the pre-screen's 11 adjacent load/mult pairs
 > here are the walker-pointer dereferences (`sp->id`, `sp->rate`, `ep->ptr0`)
 > that the identity swap already touches, not two independently-computed
-> VALUES feeding one later shared consumer the way `func_8004C470`'s two
+> VALUES feeding one later shared consumer the way `Class866E8__FindElementForPosition`'s two
 > field reads did. The residue here is a swap between the two INDUCTION
 > VARIABLES themselves (`ep`/`sp`), both already live across the whole loop
 > body by construction -- there is no "consume A late, consume B later
@@ -234,7 +236,7 @@ allocation wrong.
 > check, aggregate-assignment check, a permuter run whose scaffold was
 > proven to score a different residue) with nothing left un-checked; not
 > re-attempted further this round. Time went to the higher-yield queue
-> entries instead (`func_8004C470`, `ComputeCellWorldOffsets`, and the two large
+> entries instead (`Class866E8__FindElementForPosition`, `ComputeCellWorldOffsets`, and the two large
 > multi-load functions with higher pre-screen hit counts).
 
 > **ROUND 32 (bravo2): re-verified, no new attempt.** Rebuilt the exact
@@ -244,14 +246,14 @@ allocation wrong.
 > including a callee-saved-register-order check and a permuter run whose
 > scaffold was found to score a different residue than the real build), no
 > new structural variant was attempted this round; time went to
-> `func_8004C470` (matched, 63/70 -> 68/70) instead.
+> `Class866E8__FindElementForPosition` (matched, 63/70 -> 68/70) instead.
 
 > **ROUND 27 (delta): callee-saved-register check per the head's broadcast.**
 > Rebuilt the exact preserved body from a clean `INCLUDE_ASM` baseline
 > (90/105 confirmed, correct length) and disassembled the compiled `.o`'s
 > prologue directly: saves `s1,s3,s4,s2,s5,ra,s6,s0` at offsets
 > `0x1C,0x24,0x28,0x20,0x2C,0x34,0x30,0x18` off a `-0x38` frame. Retail's
-> own prologue (`asm/nonmatchings/class_3bb8c/func_8004BB3C.s`) saves
+> own prologue (`asm/nonmatchings/class_3bb8c/Class866E8__ApplyRateEntries.s`) saves
 > `s1,s4,s5,s2,ra,s6,s3,s0` at offsets `0x1C,0x28,0x2C,0x20,0x34,0x30,0x24,
 > 0x18` -- **the SAME seven registers (`s0`-`s6`) at the SAME per-register
 > stack slots, no `fp`, same `0x38` frame size, only the ORDER of the `sw`
@@ -263,7 +265,7 @@ allocation wrong.
 > re-attempted further this round.
 
 > **ROUND 20 (charlie): re-verified, no new attempt.** Confirmed against
-> this round's build (header additions from `func_8004BE54` this same
+> this round's build (header additions from `Class866E8__LoadElementResources` this same
 > round touch DIFFERENT structs -- `Elem::unk8`, `ElemTarget::field10`,
 > `EntryChildObj::unk14`/`unk36` -- none of which this function reads, so
 > no re-check needed beyond the standard `cmp -l`-clean whole-image build
@@ -272,7 +274,7 @@ allocation wrong.
 > already ran against this exact function (round 17, logged below,
 > inconclusive due to a scaffold mismatch, not exhausted) and a second
 > manual pass would only re-tread the same well-documented wall. Time this
-> round went to `func_8004BE54` (fresh ground) instead, per the staffing
+> round went to `Class866E8__LoadElementResources` (fresh ground) instead, per the staffing
 > guidance to move off a register-identity wall once it's this well
 > established.
 
@@ -282,7 +284,7 @@ allocation wrong.
 > `INCLUDE_ASM` baseline: `funcdiff.py` reports 90/105 with NO "differs
 > outside range" warning, and `objdump -t` confirms the compiled length is
 > `0x1A4` (105 words) -- IDENTICAL to retail's own `.s` header
-> (`nonmatching func_8004BB3C, 0x1A4`). `asm-differ` shows only the
+> (`nonmatching Class866E8__ApplyRateEntries, 0x1A4`). `asm-differ` shows only the
 > already-documented `$s3`<->`$s4` prologue-scheduling difference; no
 > genuine extra or missing instruction. **This report's claim is
 > accurate.** Restored to `INCLUDE_ASM` unchanged; no new attempt made
@@ -294,7 +296,7 @@ allocation wrong.
 > **Checked against the head's second mid-round broadcast, which named
 > this function as "a candidate shape" for a saturated-register-file
 > misdiagnosis (a cross-call cached local inflating the count by one).**
-> `grep -oE 'sw +\$s[0-9]' asm/nonmatchings/class_3bb8c/func_8004BB3C.s | sort -u`
+> `grep -oE 'sw +\$s[0-9]' asm/nonmatchings/class_3bb8c/Class866E8__ApplyRateEntries.s | sort -u`
 > gives exactly **7** distinct registers (`$s0`-`$s6`), both in retail
 > and in this build -- not 8 or 9, so this is NOT a saturated-plus-one
 > case. The register COUNT already matches exactly; the residue is a
@@ -312,7 +314,7 @@ allocation wrong.
 > **UPDATE, round 17, targeted permuter pass.** Still a STALL. Re-verified
 > the preserved 90/105 body against the current build first (per
 > CLAUDE.md's struct-edit/header-merge discipline after a `git merge main`)
-> -- confirmed unchanged: `funcdiff.py func_8004BB3C` reports 90/105 words,
+> -- confirmed unchanged: `funcdiff.py Class866E8__ApplyRateEntries` reports 90/105 words,
 > `build exit=2` (not byte-exact, correctly left as `INCLUDE_ASM`).
 >
 > **A permuter run was attempted and turned out to be measuring a DIFFERENT
@@ -340,7 +342,7 @@ allocation wrong.
 > as a low-cost check in case it stumbled onto a transferable lever despite
 > the mismatch. It did not: best score reached was **310** (never
 > approached 0), and the run eventually hit an internal scoring crash
-> (`KeyError: 'func_8004BCE0'`, from the same missing-prototype situation
+> (`KeyError: 'Class866E8__CountFlaggedElements'`, from the same missing-prototype situation
 > that produces an ordinary, harmless `implicit declaration` warning in the
 > real build) partway through, around iteration 40900. **No exit code was
 > captured** -- the trailing `echo "permuter exit=$?"` after the `timeout`
@@ -403,19 +405,19 @@ allocation wrong.
 
 Unit: `class_3bb8c`. Slot `Obj866E8Methods::slotFC` (verified against
 `tools/classtable.py 0x800866E8`). Not toolchain-blocked: no `gp_rel` hit,
-no `addiu $at,$at,%lo` hit in `asm/nonmatchings/class_3bb8c/func_8004BB3C.s`,
+no `addiu $at,$at,%lo` hit in `asm/nonmatchings/class_3bb8c/Class866E8__ApplyRateEntries.s`,
 and no dense-`switch`/`jr $v0` table dispatch either.
 
 ## What it does
 
-`void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count)`:
+`void Class866E8__ApplyRateEntries(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count)`:
 iterates `arr1[0..count)` (a 0xC-byte-strided array). Per entry:
 
 1. `e = self->methods->slot118(self, arr1[i].id)` (resolve an `Elem` by
    index/key).
 2. `self->methods->slot88(self, 6, e, i)` -- the SAME already-documented
    slot88 (dispatches to `Class866E8__OnElementEvent`, outside this unit) that
-   `func_8004BD14` also calls, there with a literal `7` instead of `6`. No
+   `Class866E8__OnNotifyTag1` also calls, there with a literal `7` instead of `6`. No
    header change needed for this slot, it already existed.
 3. If `arr1[i].ptr0 != 0`: conditionally call `slot108(self, e)` (new slot,
    guarded by `e->unk4->unk2C != 0`), copy `arr1[i].rate` into
@@ -426,13 +428,13 @@ iterates `arr1[0..count)` (a 0xC-byte-strided array). Per entry:
    `e->unk4->methods->slot74(e->unk4)` (new `ElemTargetMethods` slot,
    self-only) and clear `e->flag`.
 
-After the loop: `self->unk1B4 = func_8004BCE0(self)` (already matched, a
+After the loop: `self->unk1B4 = Class866E8__CountFlaggedElements(self)` (already matched, a
 plain count of `self->arr[i].flag != 0`).
 
 New header additions (all committed, additive): `Obj866E8Methods::slotFC`
-(func_8004BB3C's OWN identity slot, verified via classtable -- signature
+(Class866E8__ApplyRateEntries's OWN identity slot, verified via classtable -- signature
 `(self, SetupEntry866E8 *arr1, s32 count)`; later corrected once
-func_8004B700 needed to CALL this slot and the earlier draft signature here
+Class866E8__BuildRateEntries needed to CALL this slot and the earlier draft signature here
 turned out to have been copy-pasted from slot88's shape by mistake -- see
 that function's own report) and `::slot108` (split out of the
 `pad0FC`/`pad108` padding gaps -- `pad0FC` was actually TWO slots, `0xFC`
@@ -445,7 +447,7 @@ and `0x100`; `slot104` sits between them at `0x104`);
 ## Best body reached
 
 ```c
-void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
+void Class866E8__ApplyRateEntries(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
     s32 i;
     Elem *e;
 
@@ -470,20 +472,20 @@ void func_8004BB3C(Obj866E8 *self, SetupEntry866E8 *arr1, s32 count) {
             }
         }
     }
-    self->unk1B4 = func_8004BCE0(self);
+    self->unk1B4 = Class866E8__CountFlaggedElements(self);
 }
 ```
 (Correction from an earlier draft of this report: step 2 dispatches
-`slot88`, an ALREADY-DOCUMENTED slot shared with `func_8004BD14`
--- func_8004BB3C's own identity is `slotFC` at `+0xFC`, confirmed via
-`tools/classtable.py`, and is dispatched INTO from `func_8004B700`
+`slot88`, an ALREADY-DOCUMENTED slot shared with `Class866E8__OnNotifyTag1`
+-- Class866E8__ApplyRateEntries's own identity is `slotFC` at `+0xFC`, confirmed via
+`tools/classtable.py`, and is dispatched INTO from `Class866E8__BuildRateEntries`
 elsewhere in this unit, not from within this function's own body. An
 earlier draft of this report conflated the two and, worse, propagated
 `slot88`'s parameter shape onto the `slotFC` header entry itself -- that
-header mistake was caught and fixed while deriving func_8004B700's call
+header mistake was caught and fixed while deriving Class866E8__BuildRateEntries's call
 site, which needed `slotFC`'s REAL signature, `(self, SetupEntry866E8*,
 s32 count)`, to compile. If re-deriving this function, `self->methods`
-offset `0xFC` is `slotFC` = func_8004BB3C itself; do not use that name for
+offset `0xFC` is `slotFC` = Class866E8__ApplyRateEntries itself; do not use that name for
 the offset-`0x88` call above.)
 
 **This body is 104/105 instructions structurally IDENTICAL to retail** --

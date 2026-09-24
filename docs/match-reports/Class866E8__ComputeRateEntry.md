@@ -1,4 +1,6 @@
-# func_8004BA40 -- MATCH (63/63 words, ins 0 / del 0, exact length)
+# Class866E8__ComputeRateEntry -- MATCH (63/63 words, ins 0 / del 0, exact length)
+
+> Renamed from `func_8004BA40` on 2026-09-24 (tools/rename.py). Address 0x8004ba40.
 
 REVISITED, round 63: MATCHED 63/63, whole-image SHA1 green; names/types not
 relevant (no header, symbol or type change was needed -- `D_8008688C`,
@@ -18,11 +20,11 @@ were all already correct; the stall was one variable too many).
 > Rebuilt the committed `#if 0` body verbatim:
 >
 > ```
-> func_8004BA40: 58/63 words match (file 0x3C240-0x3C33C)
-> func_8004BA40: insertions 0 / deletions 0
+> Class866E8__ComputeRateEntry: 58/63 words match (file 0x3C240-0x3C33C)
+> Class866E8__ComputeRateEntry: insertions 0 / deletions 0
 > ```
 >
-> 58/63 reproduces exactly, length exact, no drift. **Unlike `func_8004C1C0`
+> 58/63 reproduces exactly, length exact, no drift. **Unlike `Class866E8__ComputeFootprintDescriptor`
 > this round, the recorded cause is CONFIRMED, not falsified**: ins/del is a
 > true 0/0 and `asm-differ` shows zero `<`/`>` markers, only five `r`
 > (register-substitution) rows. A "register identity" title with 0/0 is
@@ -125,9 +127,9 @@ were all already correct; the stall was one variable too many).
 > insertions/deletions/reorderings/branch/stack differences, matching the
 > real build's own residue shape exactly -- i.e. check 3 was already run
 > and PASSED, independently, both times. This function's negative is NOT
-> one of the five family members round 46 found voided (`func_8004BB3C`,
-> `func_8004C1C0`, `Class866E8__SplitFootprintSlot`, `Class866E8__BuildFootprintSlots`, `IsPointOutOfBounds` --
-> all confirmed scaffold-MISMATCHED); `func_8004BA40`'s scaffold has twice
+> one of the five family members round 46 found voided (`Class866E8__ApplyRateEntries`,
+> `Class866E8__ComputeFootprintDescriptor`, `Class866E8__SplitFootprintSlot`, `Class866E8__BuildFootprintSlots`, `IsPointOutOfBounds` --
+> all confirmed scaffold-MISMATCHED); `Class866E8__ComputeRateEntry`'s scaffold has twice
 > been confirmed to AGREE with the real build. The ~184,000-iteration
 > negative stands as evidence, not as a voided measurement.
 >
@@ -169,7 +171,7 @@ were all already correct; the stall was one variable too many).
 > fully inert.** Reverted (`git checkout -- src/class_3bb8c.c`; clean
 > build confirmed after).
 >
-> This is a FOURTH confirmed instance (joining `func_8004BB3C`,
+> This is a FOURTH confirmed instance (joining `Class866E8__ApplyRateEntries`,
 > `Snd_setVabAttr`, `NoteOn`) of the same scope limitation: none of
 > `entry`/`fieldVal`/`lo` cross a CALL boundary before their value is
 > consumed (the one call in this function, `self->unk60(...)`, happens
@@ -193,8 +195,8 @@ were all already correct; the stall was one variable too many).
 > residue in this unit, per round 40's own assessment, which this round's
 > reconfirmation agrees with. Given this round's staffing priority was the
 > functions with either an untried lever (dead-reload screen on
-> `func_8004BB3C`/`func_8004C1C0`) or a real prior permuter signal
-> (`func_8004C470`, score 10 from base 20, never 0), and this function has
+> `Class866E8__ApplyRateEntries`/`Class866E8__ComputeFootprintDescriptor`) or a real prior permuter signal
+> (`Class866E8__FindElementForPosition`, score 10 from base 20, never 0), and this function has
 > neither (both accumulator swaps have four independent negative manual
 > results each, plus two flat permuter searches that never beat the base
 > score), no new attempt was made here. Restored unchanged.
@@ -219,7 +221,7 @@ were all already correct; the stall was one variable too many).
 > to round 32's figure. This report's own history already tried "hoist the
 > field into a local" (round 32, natural order) and "reverse the operand
 > order" (round 27, unhoisted) as SEPARATE attempts on the
-> `entry->unk0 == 0` arm -- but per this round's `func_8004C470` finding,
+> `entry->unk0 == 0` arm -- but per this round's `Class866E8__FindElementForPosition` finding,
 > neither alone being sufficient does not prove their COMBINATION is
 > inert, and that specific combination (hoisted local, reversed order) had
 > not actually been tried here. Tested it directly:
@@ -230,7 +232,7 @@ were all already correct; the stall was one variable too many).
 >    `lo` already hoisted per the existing body) on the `entry->unk0 != 0`
 >    arm's accumulator -- **IDENTICAL 58/63**, same residue.
 >
-> **Unlike `func_8004C470` and `func_8004BE54`, the combination does NOT
+> **Unlike `Class866E8__FindElementForPosition` and `Class866E8__LoadElementResources`, the combination does NOT
 > move this residue.** Both `v0`/`v1` swaps here now have FOUR independent
 > negative results each (this report's rounds 24/25 baseline, round 27's
 > unhoisted reversal, round 32's hoisted-natural-order, and this round's
@@ -259,7 +261,7 @@ were all already correct; the stall was one variable too many).
 > `--debug` first confirmed the scaffold's base score (25) matches the
 > real build exactly, with the expected 5 pure register-difference
 > penalties and zero insertions/deletions/reorderings/branch/stack
-> differences -- a clean, trustworthy scaffold (unlike `func_8004C1C0`'s,
+> differences -- a clean, trustworthy scaffold (unlike `Class866E8__ComputeFootprintDescriptor`'s,
 > checked the same way this round and found unusable). Ran
 > `timeout 900 ... permuter.py -j 6 --stack-diffs --stop-on-zero
 > --best-only`, captured `rc=124` on the very next command (self-fired
@@ -273,7 +275,7 @@ were all already correct; the stall was one variable too many).
 > improvement on the `entry->unk0==0` arm's `$v0`/`$v1` swap. Read as a
 > genuine negative, not an inconclusive one -- both searches used a
 > scaffold independently confirmed to score the SAME residue as the real
-> build. Not attempted further this round; time went to `func_8004C470`
+> build. Not attempted further this round; time went to `Class866E8__FindElementForPosition`
 > (matched, 63/70 -> 68/70) instead.
 
 > **ROUND 27 (delta): re-verified, three more attempts, all negative.**
@@ -298,21 +300,21 @@ were all already correct; the stall was one variable too many).
 > conclusion: the `$v0`/`$v1` choice for this specific accumulator is
 > genuine register identity, unresponsive to any reshaping of the
 > surrounding C that does not regress the rest of the function. Not
-> re-attempted further this round; time went to `func_8004B5BC` (matched)
-> and `func_8004C1C0` instead, per this round's staffing guidance. Restored
+> re-attempted further this round; time went to `Class866E8__UpdateFootprintTracking` (matched)
+> and `Class866E8__ComputeFootprintDescriptor` instead, per this round's staffing guidance. Restored
 > to `INCLUDE_ASM` unchanged.
 
 Unit `class_3bb8c`. FRESH this round (no prior report). Restored to
 `INCLUDE_ASM`; no C left in `src/`.
 
 Only a caller-side prototype existed before this round (in
-`include/class_3bb8c.h`, established by `func_8004B700`'s own call site --
+`include/class_3bb8c.h`, established by `Class866E8__BuildRateEntries`'s own call site --
 see that header's comment). This round implements the body and finds the
 prototype's return type was wrong.
 
 ## What it does
 
-Called once per element from `func_8004B700`'s outer loop, filling one
+Called once per element from `Class866E8__BuildRateEntries`'s outer loop, filling one
 `SetupEntry866E8` slot (`arg1`, `&stackBuf[count]` at the call site) and
 returning whether it produced a "real" entry (`1`) or a blank one (`0`):
 
@@ -355,26 +357,26 @@ this function.
   `pad60[0x68 - 0x60]` into two named fields, `unk60` (the callback) and
   `unk64` (its opaque context arg) -- additive (same total size, same
   offsets), not a removal. Comment explains the split.
-- **`func_8004BA40`'s own prototype**: return type corrected `void` ->
+- **`Class866E8__ComputeRateEntry`'s own prototype**: return type corrected `void` ->
   `s32`. Retail explicitly sets `$v0` to 0 or 1 on every path before
   returning (see the tail sequence below) -- a `void` function would never
-  do this. `func_8004B700`, the only caller, discards the result, which is
+  do this. `Class866E8__BuildRateEntries`, the only caller, discards the result, which is
   presumably why nobody caught this from the caller side alone.
 
-  **This retype is safe today only because `func_8004B700` is still
+  **This retype is safe today only because `Class866E8__BuildRateEntries` is still
   `INCLUDE_ASM`, and it is a LOAD-BEARING fact for whoever attempts
-  `func_8004B700` next.** `func_8004B700` is a live 125/140 stall in this
-  same unit that calls `func_8004BA40` and discards the result -- exactly
+  `Class866E8__BuildRateEntries` next.** `Class866E8__BuildRateEntries` is a live 125/140 stall in this
+  same unit that calls `Class866E8__ComputeRateEntry` and discards the result -- exactly
   the condition under which a declared return type controls whether GCC
   tail-merges identical DISCARDED call sites into one shared block or
   keeps them separate (this round's own near-miss queue independently
   measured the same mechanism from the other direction: N calls merging
-  into groups partitions by declared return type). If `func_8004B700`'s
+  into groups partitions by declared return type). If `Class866E8__BuildRateEntries`'s
   own word count doesn't match expectations, or shows an unexplained
-  2-or-4-word residue around calls to `func_8004BA40`, check this
+  2-or-4-word residue around calls to `Class866E8__ComputeRateEntry`, check this
   prototype before assuming a new residue class -- the `s32` return here
   is evidence-backed (retail's own `$v0` sets, not a guess), so the fix is
-  almost certainly on `func_8004B700`'s side, not this declaration's.
+  almost certainly on `Class866E8__BuildRateEntries`'s side, not this declaration's.
 - **Two new `extern` declarations**: `D_8008688C[7]` and
   `D_800868A8[7]`. Both sizes are PROVEN, not guessed -- the data file
   (`asm/data/76DC8.data.s`) places exactly 7 words at `D_8008688C` before
@@ -416,7 +418,7 @@ round-63 entry at the top.
 ## HISTORICAL -- near-miss body before round 63 (58/63)
 
 ```c
-s32 func_8004BA40(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
+s32 Class866E8__ComputeRateEntry(Obj866E8 *self, SetupEntry866E8 *arg1, s32 divisor, s32 flag, s32 val, s32 savedResult, s32 key)
 {
     s32 mask = D_8008688C[key];
     s32 result;
@@ -495,7 +497,7 @@ already existed.
    `--addiu-at`, and the rodata-stripping `sed 1,4d`) were checked --
    `D_8008688C`'s `%lo(...)` addressing DOES touch `addiu_at`, so
    `compile.sh`'s `MASPSX_FLAGS` was patched locally in
-   `permuter-work/func_8004BA40/` (never in the shared script, this round's
+   `permuter-work/Class866E8__ComputeRateEntry/` (never in the shared script, this round's
    parallel-mode constraint) before trusting any score; no embedded rodata
    here so the second bug did not apply. **39,940 iterations, exit 124**
    (this round's own `timeout 280`, self-fired -- captured directly this
@@ -546,7 +548,7 @@ already existed.
   Two register swaps in the same function are not interchangeable just
   because they look alike in a diff -- each needs its own search, and a fix
   for one is not evidence about the other.
-- **`func_8004B700`'s own call-site-derived prototype for a not-yet-matched
+- **`Class866E8__BuildRateEntries`'s own call-site-derived prototype for a not-yet-matched
   sibling can still have the wrong RETURN TYPE**, even when every argument
   type is right. The caller discarding the value is exactly the condition
   under which this kind of mistake survives undetected until the callee

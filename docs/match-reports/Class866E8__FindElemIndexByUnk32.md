@@ -24,7 +24,7 @@ variable, since (in this shape) nothing needs `self` again after the
 loop. Retail instead keeps a genuinely SEPARATE running byte-offset
 register alongside the loop index, never touching `self` itself. Adding
 an explicit intermediate pointer variable, exactly mirroring the sibling
-function `func_8004C434`'s already-matched shape, closed it:
+function `Class866E8__FindElemByUnk32`'s already-matched shape, closed it:
 
 ```c
 Elem *e = &self->arr[i];
@@ -56,7 +56,7 @@ s32 Class866E8__FindElemIndexByUnk32(Obj866E8 *self, s32 key) {
 ## New struct knowledge
 
 None new (reuses `Elem`/`ElemTarget::unk32`, both already established by
-`class_3bb8c.c`'s `func_8004C434`/`func_8004BCE0`).
+`class_3bb8c.c`'s `Class866E8__FindElemByUnk32`/`Class866E8__CountFlaggedElements`).
 
 ## Attempts
 
@@ -70,7 +70,7 @@ pointer register as its own induction variable.** Without it, when the
 base pointer (here, `self`) is dead after the loop, GCC freely repurposes
 it into a moving pointer, dropping any separately-tracked byte offset.
 Retail's own code keeps a genuinely separate running-offset register in
-this function — the same shape `func_8004C434` (already matched) uses.
+this function — the same shape `Class866E8__FindElemByUnk32` (already matched) uses.
 This generalizes the existing "let GCC hoist its own loop invariants"
 guidance in `docs/DECOMPILATION_LEARNINGS.md`: that entry showed
 *keeping* an explicit local matters for a hand-hoisted `base`; here the
@@ -88,15 +88,15 @@ already-named slots (e.g. `Class866E8__ApplyToSenderFootprint` at +0x12C).
 Pure linear-search leaf: the body IS the evidence -- walk `self->arr`,
 compare `e->unk4->unk32` to `key`, return the matching index (default 0).
 Named by the field it searches on (`unk32`, still unrenamed -- it is a
-cross-unit `ElemTarget` field, also read by `func_8004C434` in
+cross-unit `ElemTarget` field, also read by `Class866E8__FindElemByUnk32` in
 class_3bb8c.c, so this unit does not own it) rather than by a guessed
 purpose, per this project's "name what the code does" rule.
 
 ## Proposed field names
 
-**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that func_8004C1C0 sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (class_3bb8c.c), where all readers are in one unit.
+**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that Class866E8__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (class_3bb8c.c), where all readers are in one unit.
 
-`ElemTarget::unk32` (also read by class_3bb8c.c's `func_8004C434`, so
+`ElemTarget::unk32` (also read by class_3bb8c.c's `Class866E8__FindElemByUnk32`, so
 cross-unit -- not renamed here). Proposed: `key` -- it is exactly what
 both `FindElemIndexByUnk32` and its caller-side context treat it as, a
 value compared for equality to select an element. Evidence: this

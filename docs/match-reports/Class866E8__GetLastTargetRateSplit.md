@@ -1,12 +1,14 @@
-# func_8004C3F0
+# Class866E8__GetLastTargetRateSplit
+
+> Renamed from `func_8004C3F0` on 2026-09-24 (tools/rename.py). Address 0x8004c3f0.
 
 **Unit:** class_3bb8c · **Size:** 17 words · **Status:** MATCHED (first attempt).
 
 ## Result
 
 ```c
-Unk1BCObj *func_8004C3F0(Obj866E8 *self, u8 *out) {
-    func_8004C368(self, out, self->unk1BC->unk4->unk30);
+Unk1BCObj *Class866E8__GetLastTargetRateSplit(Obj866E8 *self, u8 *out) {
+    Class866E8__ComputeDivisorSplit(self, out, self->unk1BC->unk4->unk30);
     return self->unk1BC;
 }
 ```
@@ -20,8 +22,8 @@ after a call to a non-`INCLUDE_ASM` function, not anything that needed a
 barrier or an explicit local.
 
 `self->unk1BC->unk4` turned out to be the same `ElemTarget` type already
-established from `func_8004C0AC`/`func_8004C434` (its own `+0x030` field lines
-up with `ElemTarget::unk30`, itself first seen in `func_8004C0AC`'s
+established from `Class866E8__ResetElementCells`/`Class866E8__FindElemByUnk32` (its own `+0x030` field lines
+up with `ElemTarget::unk30`, itself first seen in `Class866E8__ResetElementCells`'s
 `entry->unk4->unk30` read). New struct: `Unk1BCObj { u8 pad[4]; ElemTarget
 *unk4; }` for `self->unk1BC`'s pointee.
 
@@ -35,5 +37,5 @@ None beyond what's already documented -- this one was a clean, quick match
 that confirmed cross-referencing `ElemTarget`/`Elem` field offsets across this
 unit's own functions is a reliable way to spot repeated struct fields (here,
 `+0x030` on the target object, seen independently from two different call
-chains: `self->arr[i].unk4->unk30` in `func_8004C0AC` and
+chains: `self->arr[i].unk4->unk30` in `Class866E8__ResetElementCells` and
 `self->unk1BC->unk4->unk30` here).

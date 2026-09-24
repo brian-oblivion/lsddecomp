@@ -1,6 +1,8 @@
-# func_8004BCE0 — MATCHED (13/13 words)
+# Class866E8__CountFlaggedElements — MATCHED (13/13 words)
 
-Not a vtable slot — `func_8004BCE0` does not appear in `D_800866E8`
+> Renamed from `func_8004BCE0` on 2026-09-24 (tools/rename.py). Address 0x8004bce0.
+
+Not a vtable slot — `Class866E8__CountFlaggedElements` does not appear in `D_800866E8`
 (confirmed via `tools/classtable.py 0x800866E8`), so it is a plain,
 non-virtual helper. Takes `self` directly as its only argument.
 
@@ -32,7 +34,7 @@ pointer-walking needed in the source; see the "final C" below.
 ## Final C
 
 ```c
-s32 func_8004BCE0(Obj866E8 *self) {
+s32 Class866E8__CountFlaggedElements(Obj866E8 *self) {
     s32 count;
     s32 i;
 

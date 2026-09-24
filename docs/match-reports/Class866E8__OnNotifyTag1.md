@@ -1,11 +1,13 @@
-# func_8004BD14
+# Class866E8__OnNotifyTag1
+
+> Renamed from `func_8004BD14` on 2026-09-24 (tools/rename.py). Address 0x8004bd14.
 
 **Unit:** class_3bb8c · **Size:** 80 words · **Status:** MATCHED (first attempt).
 
 ## Result
 
 ```c
-void func_8004BD14(Obj866E8 *self, void *arg1, s32 mode) {
+void Class866E8__OnNotifyTag1(Obj866E8 *self, void *arg1, s32 mode) {
     s32 i;
     Elem *e;
     s32 curMode;

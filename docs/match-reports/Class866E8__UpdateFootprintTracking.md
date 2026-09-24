@@ -1,8 +1,10 @@
-# func_8004B5BC -- MATCHED (81/81 words, byte-exact)
+# Class866E8__UpdateFootprintTracking -- MATCHED (81/81 words, byte-exact)
+
+> Renamed from `func_8004B5BC` on 2026-09-24 (tools/rename.py). Address 0x8004b5bc.
 
 Unit `class_3bb8c`. Slot `Obj866E8Methods::slotF4` (verified against
 `tools/classtable.py 0x800866E8`, which resolves `D_800866E8`'s own
-`+0x0F4` entry directly to `func_8004B5BC`).
+`+0x0F4` entry directly to `Class866E8__UpdateFootprintTracking`).
 
 Round 26 (runner delta) picked this up as the only FRESH function on the
 work list; round 24 had left a hand-read-only structural note in the `.c`
@@ -14,7 +16,7 @@ open, and matched on the first build attempt.
 ## What it does
 
 ```c
-s32 func_8004B5BC(Obj866E8 *self) {
+s32 Class866E8__UpdateFootprintTracking(Obj866E8 *self) {
     Descriptor10Ext buf;
     Elem *e;
     s32 key;
@@ -49,7 +51,7 @@ s32 func_8004B5BC(Obj866E8 *self) {
 1. Fills a stack-local `Descriptor10Ext` via `self->methods->slot10C(self,
    &buf, 0)`. On failure (`0` returned) bails out early returning `0`.
 2. Resolves `e = buf.unk24` (an `Elem*`, already the established meaning of
-   `Descriptor10Ext::unk24` from `func_8004C1C0`'s independent derivation)
+   `Descriptor10Ext::unk24` from `Class866E8__ComputeFootprintDescriptor`'s independent derivation)
    and reads `key = e->unk4->unk32` (`ElemTarget::unk32`, already typed).
 3. `result = D_800868FC[key]` -- an 8-entry signed-byte remap table
    (values 0..6). This is both the eventual RETURN VALUE and (scaled by 4

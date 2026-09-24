@@ -1,11 +1,13 @@
-# func_8004C158
+# Class866E8__GetTargetDescriptor
+
+> Renamed from `func_8004C158` on 2026-09-24 (tools/rename.py). Address 0x8004c158.
 
 **Unit:** class_3bb8c · **Size:** 26 words · **Status:** MATCHED (first attempt).
 
 ## Result
 
 ```c
-Descriptor10 *func_8004C158(Obj866E8 *self, s32 arg1, void **out) {
+Descriptor10 *Class866E8__GetTargetDescriptor(Obj866E8 *self, s32 arg1, void **out) {
     void *v1;
 
     v1 = (u8 *)self->unk6C->unk14 + 0x18;

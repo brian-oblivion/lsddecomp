@@ -1,7 +1,9 @@
-# func_8004C434 — MATCHED (15/15 words)
+# Class866E8__FindElemByUnk32 — MATCHED (15/15 words)
+
+> Renamed from `func_8004C434` on 2026-09-24 (tools/rename.py). Address 0x8004c434.
 
 Not a vtable slot (not in `D_800866E8`), a plain non-virtual helper —
-companion to `func_8004BCE0`, walking the same `self->arr` array but
+companion to `Class866E8__CountFlaggedElements`, walking the same `self->arr` array but
 searching a different field.
 
 ## Disassembly
@@ -33,7 +35,7 @@ explicit statement for that path either; see below.
 ## Final C
 
 ```c
-Elem *func_8004C434(Obj866E8 *self, s32 key) {
+Elem *Class866E8__FindElemByUnk32(Obj866E8 *self, s32 key) {
     s32 i;
     Elem *e;
 
@@ -72,7 +74,7 @@ with the loop presumed always to find its key.
 
 First attempt typed `ElemTarget::unk32` as `u16`, producing `lhu` where
 retail has `lh` (signed halfword load) — 14/15. Retyped to `s16`, matching
-the SAME residue class already seen this round (`func_8004C434`'s own
+the SAME residue class already seen this round (`Class866E8__FindElemByUnk32`'s own
 comparison against a plain `s32 key`, decoded as signed). 15/15.
 
 ## New struct knowledge (`include/class_3bb8c.h`)
