@@ -1,4 +1,6 @@
-# func_80052DE8
+# ObjM__AttachTarget
+
+> Renamed from `func_80052DE8` on 2026-09-24 (tools/rename.py). Address 0x80052de8.
 
 **Unit:** class_3bb8c_l · **Size:** 37 words (0x94 bytes) ·
 **Status: MATCHED 37/37**, whole-image SHA1 green.
@@ -14,8 +16,8 @@ forwards to the shared BasicClass-family base accessor `GetClass86668Methods()`'
 slot `+0x44`, then calls its own `slot10`.
 
 ```c
-void func_80052DE8(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
-    arg1->unkC->methods->slotC8(arg1->unkC, func_80052E7C, self);
+void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
+    arg1->unkC->methods->slotC8(arg1->unkC, ObjM__OnRegistrantEvent, self);
     self->unk3C = (DreamSysObj_3bb8c_l *)arg2;
     GetClass86668Methods()->slot44(self, arg1, 1);
     self->methods->slot10(self, arg2);
@@ -24,7 +26,7 @@ void func_80052DE8(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
 
 ## Notes
 
-- `func_80052E7C` (this unit, ROM order right after this function) is
+- `ObjM__OnRegistrantEvent` (this unit, ROM order right after this function) is
   registered here as a callback — needed a forward declaration in the
   header since it's referenced before its own definition.
 - The struct field layout work for `Obj87034_3bb8c_l` done here (methods
@@ -34,8 +36,8 @@ void func_80052DE8(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
   directly after `methods` with no padding, landing it at offset 0x4
   instead of 0xC. Every subsequent field in the struct was silently
   8 bytes too low until fixed — visible immediately as an 8-byte-off field
-  offset in `func_80052DE8`'s own diff (`0x3c` vs `0x34`) and in
-  `func_80052E7C`'s (`0x38` vs `0x30`).
+  offset in `ObjM__AttachTarget`'s own diff (`0x3c` vs `0x34`) and in
+  `ObjM__OnRegistrantEvent`'s (`0x38` vs `0x30`).
 
 ### Proposed learning
 

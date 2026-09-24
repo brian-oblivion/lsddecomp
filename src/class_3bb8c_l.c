@@ -54,22 +54,22 @@
  * whole-image SHA1 re-verified after. */
 typedef struct BaseMethods87034_3bb8c_l {
     u8 pad00[0x044];
-    s32 (*slot44)(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2); /* +0x044, func_80052DE8 */
-    void (*slot48)(Obj87034_3bb8c_l *self); /* +0x048, func_80052EBC */
+    s32 (*slot44)(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2); /* +0x044, ObjM__AttachTarget */
+    void (*slot48)(Obj87034_3bb8c_l *self); /* +0x048, ObjM__DetachTarget */
 } BaseMethods87034_3bb8c_l;
 extern BaseMethods87034_3bb8c_l *GetClass86668Methods(void);
 
 void ObjM__NoOpSlot40(void) {
 }
 
-void func_80052DE8(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
-    arg1->unkC->methods->slotC8(arg1->unkC, func_80052E7C, self);
+void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
+    arg1->unkC->methods->slotC8(arg1->unkC, ObjM__OnRegistrantEvent, self);
     self->unk3C = (DreamSysObj_3bb8c_l *)arg2;
     GetClass86668Methods()->slot44(self, arg1, 1);
     self->methods->slot10(self, arg2);
 }
 
-void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
+void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
         func_80049060(self->unk38);
     } else {
@@ -77,7 +77,7 @@ void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     }
 }
 
-void func_80052EBC(Obj87034_3bb8c_l *self) {
+void ObjM__DetachTarget(Obj87034_3bb8c_l *self) {
     self->methods->slot14(self, self->unk3C);
     GetClass86668Methods()->slot48(self);
 }
@@ -282,7 +282,7 @@ void ObjM__NoOpSlot7C(void) {
 }
 
 /* self->unkC's real pointee for THIS function -- a DIFFERENT reading from
- * `RegistrantObj_3bb8c_l` (func_80052DE8's own local view of the same
+ * `RegistrantObj_3bb8c_l` (ObjM__AttachTarget's own local view of the same
  * field): here `*(self->unkC)` (one dereference through unkC's own first
  * word) yields an object with its OWN methods pointer at +0x000, matching
  * `RegistrantObj_3bb8c_l`'s own layout (a single `methods` field) exactly

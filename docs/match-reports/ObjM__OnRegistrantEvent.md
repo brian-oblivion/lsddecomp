@@ -1,16 +1,18 @@
-# func_80052E7C
+# ObjM__OnRegistrantEvent
+
+> Renamed from `func_80052E7C` on 2026-09-24 (tools/rename.py). Address 0x80052e7c.
 
 **Unit:** class_3bb8c_l · **Size:** 16 words (0x40 bytes) ·
 **Status: MATCHED 16/16**, whole-image SHA1 green.
 
 ## What it does
 
-The callback registered by `func_80052DE8` (address-taken there). Dispatches
+The callback registered by `ObjM__AttachTarget` (address-taken there). Dispatches
 on `code` to one of two still-uncarved helpers (`asm/psyq_memset.s`, despite
 the filename these are not Psy-Q library code).
 
 ```c
-void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
+void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
         func_80049060(self->unk38);
     } else {
@@ -42,7 +44,7 @@ void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
 
 ### Proposed learning
 
-Confirms (third instance, after `func_80052E7C`'s own sibling case in
+Confirms (third instance, after `ObjM__OnRegistrantEvent`'s own sibling case in
 `func_800531CC` and one more below) that GCC 2.6.3's `if`/`else` codegen
 convention is completely mechanical: `NOT(written condition)` is always the
 compiled test, and the `if`-body always lands at the fallthrough. When a

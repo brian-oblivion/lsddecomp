@@ -2327,3 +2327,6 @@ gMcDevicePath0 = 0x8008AAA4;
 sMcTempFileSuffix = 0x8008AAAC;
 ObjM__NoOpSlot40 = 0x80052DE0; // type:func
 ObjM__NoOpSlot7C = 0x800534C0; // type:func
+ObjM__AttachTarget = 0x80052DE8; // type:func
+ObjM__OnRegistrantEvent = 0x80052E7C; // type:func
+ObjM__DetachTarget = 0x80052EBC; // type:func

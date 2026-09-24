@@ -2479,13 +2479,13 @@ typedef struct DreamSysObj_3bb8c_l {
     s32 unk164;             /* +0x164, func_80053BE8: sign-checked gate */
 } DreamSysObj_3bb8c_l;
 
-/* Whatever arg1->unkC points to in func_80052DE8 -- a registration sink
+/* Whatever arg1->unkC points to in ObjM__AttachTarget -- a registration sink
  * of some kind (arg1->unkC->methods->slotC8(arg1->unkC, callback,
  * userdata) reads like "subscribe `callback` for `userdata`"). Only the
  * one slot this unit calls through is named. */
 typedef struct RegistrantMethods_3bb8c_l {
     u8 pad00[0x0C8];
-    void (*slotC8)(void *self, void (*callback)(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3), Obj87034_3bb8c_l *userdata); /* +0x0C8, func_80052DE8 */
+    void (*slotC8)(void *self, void (*callback)(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3), Obj87034_3bb8c_l *userdata); /* +0x0C8, ObjM__AttachTarget */
 } RegistrantMethods_3bb8c_l;
 typedef struct RegistrantObj_3bb8c_l {
     RegistrantMethods_3bb8c_l *methods;
@@ -2495,12 +2495,12 @@ typedef struct Obj87034Methods_3bb8c_l {
     s32 header;                                                    /* +0x000 */
     void (*slot04)(Obj87034_3bb8c_l *self);                        /* +0x004, BasicClass generic (func_80017EB0); dispatched directly by func_800531CC on its `other` argument */
     u8 pad08[0x010 - 0x008];
-    void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, func_80052DE8 */
-    void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, func_80052EBC/func_800536B0 */
+    void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, ObjM__AttachTarget */
+    void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, ObjM__DetachTarget/func_800536B0 */
     u8 pad18[0x030 - 0x018];
     void (*slot30)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x030, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md) */
     u8 pad34[0x048 - 0x034];
-    void (*slot48)(Obj87034_3bb8c_l *self);                        /* +0x048, func_80052EBC/func_80053134 (via self->unk54) */
+    void (*slot48)(Obj87034_3bb8c_l *self);                        /* +0x048, ObjM__DetachTarget/func_80053134 (via self->unk54) */
     u8 pad4C[0x05C - 0x04C];
     void (*slot5C)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x05C, func_80052F10 (arg1 is func_80048F84's return value, forwarded opaquely) */
     u8 pad60[0x074 - 0x060];
@@ -2531,7 +2531,7 @@ typedef struct Obj87034Methods_3bb8c_l {
 struct Obj87034_3bb8c_l {
     Obj87034Methods_3bb8c_l *methods; /* +0x000 */
     u8 pad04[0x00C - 0x004];
-    RegistrantObj_3bb8c_l *unkC;      /* +0x00C, func_80052DE8's `arg1->unkC` */
+    RegistrantObj_3bb8c_l *unkC;      /* +0x00C, ObjM__AttachTarget's `arg1->unkC` */
     s32 unk10;                        /* +0x010, func_80053764 */
     Obj14_3bb8c_l *unk14;              /* +0x014, func_800531CC/func_8005393C/func_800536B0 */
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, func_800536B0 */
@@ -2539,7 +2539,7 @@ struct Obj87034_3bb8c_l {
     s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's func_800534C8: forwarded opaquely to SetDreamAuxWorld's own arg3 */
-    void *unk38;                          /* +0x038, func_80052E7C: forwarded opaquely to func_80049060/func_80049098 */
+    void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to func_80049060/func_80049098 */
     DreamSysObj_3bb8c_l *unk3C;            /* +0x03C, many functions in this unit */
     s32 unk40;                             /* +0x040, func_80053764 */
     s32 unk44;                              /* +0x044, func_80053764 */
@@ -2564,7 +2564,7 @@ struct Obj87034_3bb8c_l {
  * table, gClass86668Methods) -- declared here as this unit's own minimal,
  * independent local view rather than including that header, per this
  * project's multiple-independent-local-views convention. Only the one
- * slot func_80052DE8 dispatches through is named. */
+ * slot ObjM__AttachTarget dispatches through is named. */
 /* HEAD NOTE round 15: `BaseMethods87034_3bb8c_l` and its
  * `extern ... *GetClass86668Methods(void);` prototype were moved into
  * src/class_3bb8c_l.c. THIRD instance this merge of one rule: a cross-unit
@@ -2582,19 +2582,19 @@ struct Obj87034_3bb8c_l {
  * Not done here -- it changes a byte-exact unit's types inside a merge
  * resolution, which is the round-13 hazard. */
 
-/* func_80052DE8's own registered callback -- forward-declared here since
- * func_80052DE8 (ROM order earlier) takes its address before its own
+/* ObjM__AttachTarget's own registered callback -- forward-declared here since
+ * ObjM__AttachTarget (ROM order earlier) takes its address before its own
  * definition (ROM order later) is reached. */
-extern void func_80052E7C(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3);
+extern void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3);
 
 /* func_800531A0's tail call -- forward-declared for the same ROM-order
- * reason as func_80052E7C above (func_800531CC is defined later). */
+ * reason as ObjM__OnRegistrantEvent above (func_800531CC is defined later). */
 extern void func_800531CC(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
 
-/* func_80052E7C's own two helpers -- still-uncarved ground
+/* ObjM__OnRegistrantEvent's own two helpers -- still-uncarved ground
  * (asm/psyq_memset.s). func_80049060 is genuinely called at two different
  * arities across the executable (func_80049098 forwards to it with 2 real
- * arguments; func_80052E7C's own `code < 0` branch calls it with only 1,
+ * arguments; ObjM__OnRegistrantEvent's own `code < 0` branch calls it with only 1,
  * the second register being whatever the caller's own incoming `code`
  * argument left behind -- a "leftover register", not a real second
  * argument), so it is declared K&R/unprototyped here, the documented
