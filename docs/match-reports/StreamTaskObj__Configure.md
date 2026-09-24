@@ -15,7 +15,7 @@ passing `self` and its own first argument, hardcoding the third argument to
 **This function's signature was independently cross-checked and confirmed
 against `include/Class6D3C8.h`.** That header already documents
 `StreamTaskMethods::slot44` (established from a *different* unit's call
-sites, `func_80026170`/`func_80026348`/`func_8002658C` in `code_1677c`) as
+sites, `Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask`/`Class6D3C8__StartGraphRoomStreamTask` in `code_1677c`) as
 `void (*slot44)(void *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag)` --
 five arguments, the fifth spilled to the stack, exactly matching what this
 function's own disassembly reads at entry (`lw $v0, 0x30($sp)`, the 5th
@@ -79,7 +79,7 @@ into a corroborated one.
 
 **StreamTaskObj__Configure** -- tier B. Occupies `gStreamTaskObjMethods` slot
 `+0x044`. Cross-unit call sites in `src/code_1677c.c`
-(`func_80026170`/`func_80026348`, via `include/Class6D3C8.h`'s independent
+(`Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask`, via `include/Class6D3C8.h`'s independent
 `StreamTaskMethods::slot44` view) show this stores a resource
 name-or-derived-value, a type lookup and a flag before up-calling the base
 slot -- the mechanics (store configuration words, then delegate) are clear,

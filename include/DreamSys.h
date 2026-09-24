@@ -1101,7 +1101,7 @@ struct vtable_DreamSys{
 	void (*DreamSys__SoundCueCallback)(void *arg0, SoundCueCallbackArg *arg1);
 	void (*InitNewGame)(DreamSys *this);
 	void (*GetSetScreenShake)(DreamSys *this, bool *value);
-	/* Called by Class6D3C8's slot58 (func_80026410, src/code_1677c.c) as
+	/* Called by Class6D3C8's slot58 (Class6D3C8__PollGraphRoomStatus, src/code_1677c.c) as
 	   this->vt->DreamSys__GetCurrentDayAndYear(this, 0), compared against 1. Real name and
 	   full semantics unknown outside that one call site. arg1 is an OUTPUT
 	   pointer (this->currentYear is written through it when non-NULL), not
@@ -1202,7 +1202,7 @@ struct vtable_DreamSys{
 	   at 0x21c; that was also wrong -- it directly follows
 	   ResetFlashbackList/DreamSys__SaveLinkSnapshot/DreamSys__RestoreLinkSnapshot above, no gap.
 	   Original call-site note preserved: called once, from Class6D3C8's
-	   constructor (func_80025FDC in src/code_1677c.c), as
+	   constructor (Class6D3C8__Class6D3C8 in src/code_1677c.c), as
 	   this->vt->func_228(this, arg->unk14) right after DreamSys is
 	   allocated by New_DreamSys -- the call site's own signature (single
 	   s32 arg, return value discarded) matches DreamSys__func_5ba20's own
@@ -1485,7 +1485,7 @@ struct vtable_DreamSys *Get_vtable_DreamSys(void);
 
 /* @brief Allocates and constructs a DreamSys instance.
  * Still INCLUDE_ASM in src/DreamSys.c; declared here so other units'
- * matched C (e.g. func_80025FDC in src/code_1677c.c) can call it -- see
+ * matched C (e.g. Class6D3C8__Class6D3C8 in src/code_1677c.c) can call it -- see
  * "Calling into a function that is still INCLUDE_ASM in another unit is
  * fine" in docs/DECOMPILATION_LEARNINGS.md. */
 DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2);

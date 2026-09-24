@@ -22,7 +22,7 @@ Just an address computation, no load — this is `&D_8006D3C8`, not
 `*D_8006D3C8`. Confirmed by its one caller, `new_class_6d3c8` in
 `asm/nonmatchings/code_1677c/new_class_6d3c8.s`: it calls this function, then
 does `lw $v0, 0x8($v0)` on the result and `jalr`s that — fetching the
-constructor slot (`+0x008`, `func_80025FDC`) from the table this function
+constructor slot (`+0x008`, `Class6D3C8__Class6D3C8`) from the table this function
 returned, exactly the "allocate, get methods, call ctor slot" idiom from
 CLAUDE.md's "Writing a class method".
 

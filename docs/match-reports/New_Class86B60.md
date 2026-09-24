@@ -14,8 +14,8 @@ own `dreamSys` argument.
 
 Also externally visible as a `PollTaskCtor` callback -- `include/Class6D3C8.h`
 (a different unit) already declares this exact symbol,
-`extern PollTask *New_Class86B60(void *dreamSys);`, used by `func_80026410`
-as `func_80026518`'s `ctor` argument. That declaration's return/param
+`extern PollTask *New_Class86B60(void *dreamSys);`, used by `Class6D3C8__PollGraphRoomStatus`
+as `Class6D3C8__RunPollTask`'s `ctor` argument. That declaration's return/param
 naming is kept as-is there (independent local view); this unit's own
 `dreamSys` parameter name/type was chosen to match it.
 

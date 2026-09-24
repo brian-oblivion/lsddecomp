@@ -488,7 +488,7 @@ extern const char D_800113EC[];
 extern const char D_800113F8[];
 
 /* Same request-block shape `Class6D3C8.h` already established at
- * `func_80025FDC`'s call site (`LoadModelRequest`, learned there to be
+ * `Class6D3C8__Class6D3C8`'s call site (`LoadModelRequest`, learned there to be
  * 0x10 bytes even though only the first two fields are ever written --
  * "local struct SIZE matters, not shape"). This unit's own local view,
  * not a shared header, per this project's per-unit-view convention. */

@@ -121,7 +121,7 @@ Five attempts spent, all at 23/24 or worse (never better):
    Needed one incidental fix along the way: calling
    `GetClass6D3C8Methods()->ctor(...)` directly (rather than through an
    intermediate `self->methods = GetClass6D3C8Methods();` assignment as in
-   `func_80025FDC`) requires an explicit `(Class6D3C8Methods *)` cast,
+   `Class6D3C8__Class6D3C8`) requires an explicit `(Class6D3C8Methods *)` cast,
    since `GetClass6D3C8Methods` returns bare `void *` and dereferencing a `void *`
    member is a hard error, not just a warning, in this compiler. **Result:
    23/24, identical residue** (delay slot: retail `nop`, ours
@@ -130,7 +130,7 @@ Five attempts spent, all at 23/24 or worse (never better):
    construct: ...`) — 15/24, WORSE: this shape doesn't merge the two exits
    into one epilogue at all (grows by 2 words, matching the general
    "early return with a separate epilogue" trap documented for
-   `func_80026410`).
+   `Class6D3C8__PollGraphRoomStatus`).
 3. **Bare `__asm__("")` as the very first statement of the function**
    (before the `malloc` call) — the one position broadcast #2 said closed
    an unrelated function's residue, and the existing report here had only
@@ -153,3 +153,16 @@ instances, just with retail choosing `nop` where those chose a
 value-restating `move` — a THIRD confirmed instance of the class, and if
 anything a stronger permuter case for it (three independent occurrences
 now, not two). The permuter-target recommendation above stands unchanged.
+
+## Naming
+
+**`new_class_6d3c8` -- already named (pre-round-77), tier A.** The `New_X`
+allocator for `Class6D3C8` (`BMemPMgrAlloc` + dispatch through the class's
+own ctor slot). Left as-is this round -- it predates this naming pass and
+already follows the project's `New_X` convention, just lowercase/underscore
+because it was named before the class's own type name (`Class6D3C8`) was
+established from `classtable.py`. Not renamed to `New_Class6D3C8` here:
+that would be a cosmetic-only rename with no new evidence behind it, and
+picking it up is better left to whoever names `Class6D3C8` itself formally
+(this runner did not establish a game-purpose name for the class, only its
+`ClassXXXXX`-by-table-address identity).

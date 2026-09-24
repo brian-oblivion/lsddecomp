@@ -14,7 +14,7 @@
 > an explicit cast back to signed before the final shift:
 > `len = (s32)(len + ((u32)len >> 31)) >> 1;`. This is the standard
 > truncating-divide-by-2 idiom already documented elsewhere in this
-> project (`func_800260A4`'s family) -- worth a general note: **the cast
+> project (`Class6D3C8__SetDayFromTickCount`'s family) -- worth a general note: **the cast
 > that makes the sign-bit extraction well-defined can silently poison the
 > whole expression's signedness if not scoped tightly.**
 >

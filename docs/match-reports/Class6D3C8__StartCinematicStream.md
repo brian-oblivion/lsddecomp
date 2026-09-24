@@ -1,10 +1,12 @@
-# func_8002677C
+# Class6D3C8__StartCinematicStream
+
+> Renamed from `func_8002677C` on 2026-09-24 (tools/rename.py). Address 0x8002677c.
 
 **Unit:** code_1677c · **Size:** 97 instructions (0x184 bytes) · **Status:** MATCHED (97/97 words, whole-image SHA1 green)
 
 ## What it does
 
-Called by `func_80026698` when its `StatusObj` slot44 result is `2` (per
+Called by `Class6D3C8__PollStatusObj` when its `StatusObj` slot44 result is `2` (per
 that function's still-stalled derivation). Reads `DreamSys`'s current
 cinematic slot (`GetCinematic`), packs its two 16-bit fields and resolves
 them to a channel index (`func_80049334`, which also returns a second,
@@ -17,7 +19,7 @@ resolved but the gate was off, nothing else happens.
 ## Final C
 
 ```c
-void func_8002677C(Class6D3C8 *self) {
+void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
     CinematicCall cc;
     struct {
         s32 chan;
@@ -72,8 +74,8 @@ void func_8002677C(Class6D3C8 *self) {
    which block sits inline vs. jumped-to. This alone was worth 53 words.
 
 3. **Two structurally-identical 8-byte-shortfall locals, both from the
-   "partially-used out-param" idiom already seen in `func_80025FDC` and
-   `func_8002658C`.** `CinematicCall cc` (a real return value, needs no
+   "partially-used out-param" idiom already seen in `Class6D3C8__Class6D3C8` and
+   `Class6D3C8__StartGraphRoomStreamTask`.** `CinematicCall cc` (a real return value, needs no
    padding of its own) sits fine as a standalone local, but combining it
    into ONE struct with the separate `chan` out-param broke the
    struct-return codegen entirely (GCC materialized `GetCinematic`'s hidden
@@ -92,15 +94,15 @@ void func_8002677C(Class6D3C8 *self) {
    (`groupId` assigned from `SetActiveDataSourceDriverMode`'s return, called after
    discarding `func_80049334`'s) -- swapping which call's return feeds
    `groupId`, and discarding `SetActiveDataSourceDriverMode`'s (matching its established
-   "called for side effect, return unused" role in `func_80026170` and
-   `func_80026348`), closed the last two words.
+   "called for side effect, return unused" role in `Class6D3C8__LoadIntroLogoSequence` and
+   `Class6D3C8__StartWeeklyStreamTask`), closed the last two words.
 
 ## New struct/header knowledge
 
 `include/Class6D3C8.h`: `SetActiveDataSourceDriverMode`'s extern retyped from `void` to
 `s32` (it does return a meaningful value -- whatever its internal dispatch
 loop last produced -- confirmed here even though this call site, like
-`func_80026170`/`func_80026348`, discards it). Added `func_80049334`
+`Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask`, discards it). Added `func_80049334`
 (psyq_memset.s: resolves a packed `{bank,entry}` `CinematicCall` to a
 channel index via an out-param, **and** returns a second, separate `s32`
 kept by this function -- easy to miss since most callers of "write to
@@ -129,3 +131,17 @@ second call's own delay slot opportunistically claims it.
   and 76/97 attempts both had CORRECT branch targets once the polarity was
   fixed (lever 2), confirming the remaining residues at each stage were
   register/stack-layout content, not CFG mistakes.
+
+## Naming
+
+**`Class6D3C8__StartCinematicStream` -- tier B.** Mechanics: reads the owned
+`DreamSys`'s current cinematic slot (`vt->GetCinematic`, an already-named
+vtable accessor), resolves it to a channel index; if resolution fails (-1),
+starts a `LoaderTask` on a fixed "no cinematic" fallback path; otherwise, if
+gated by `arg->unk08`, starts a `StreamTask` on the resolved channel. Named
+for the dispatch mechanic ("start [a task streaming] the cinematic"); the
+`LoaderTask` fallback arm makes "stream" not literally universal (the
+no-cinematic path loads, it doesn't stream), but the function's dominant,
+gated behavior and its trigger (`GetCinematic`) are both clearly cinematic-
+related, which is stronger grounding than the generic "start task" shape
+shared by this unit's other four StreamTask launchers.

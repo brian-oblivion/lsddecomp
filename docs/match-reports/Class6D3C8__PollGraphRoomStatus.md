@@ -1,15 +1,17 @@
-# func_80026410
+# Class6D3C8__PollGraphRoomStatus
+
+> Renamed from `func_80026410` on 2026-09-24 (tools/rename.py). Address 0x80026410.
 
 **Unit:** code_1677c · **Size:** 66 instructions (0x108 bytes) · **Status:** MATCHED (66/66 words, whole-image SHA1 green). Took roughly a dozen iterations — the most attempt-expensive function of this round.
 
 ## What it does
 
 `Class6D3C8Methods` slot `+0x058`. Gated by `self->arg->unk10 != 0` (a third
-sibling gate on the ctor argument, alongside `func_80026170`'s `unk0C` and
-`func_80026348`'s `unk08`). Checks the owned `DreamSys`'s own status slot
+sibling gate on the ctor argument, alongside `Class6D3C8__LoadIntroLogoSequence`'s `unk0C` and
+`Class6D3C8__StartWeeklyStreamTask`'s `unk08`). Checks the owned `DreamSys`'s own status slot
 (`+0x1A0`); if it isn't already `1` and `self->unk24` hasn't latched, kicks
 off one `PollTask` (`New_GraphRoomObj`) and, if *that* reports `2`, runs
-`func_8002658C`. Then polls a second `PollTask` (`New_Class86B60`) in a loop,
+`Class6D3C8__StartGraphRoomStreamTask`. Then polls a second `PollTask` (`New_Class86B60`) in a loop,
 restarting the first `PollTask` each time it reports `2`, until it reports
 anything else; clears `self->unk24` and returns `0` or `2` depending on
 whether that final status was below `1` (unsigned).
@@ -17,7 +19,7 @@ whether that final status was below `1` (unsigned).
 ## Final C
 
 ```c
-s32 func_80026410(Class6D3C8 *self) {
+s32 Class6D3C8__PollGraphRoomStatus(Class6D3C8 *self) {
     s32 status;
     s32 pollDone;
 
@@ -27,18 +29,18 @@ s32 func_80026410(Class6D3C8 *self) {
         status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->unk24 == 0) {
-                status = func_80026518(New_GraphRoomObj, self->dreamSys, self->unk1C);
+                status = Class6D3C8__RunPollTask(New_GraphRoomObj, self->dreamSys, self->unk1C);
                 if (status == 2) {
-                    func_8002658C(self);
+                    Class6D3C8__StartGraphRoomStreamTask(self);
                 }
             }
         }
 
         pollDone = 2;
     retry:
-        status = func_80026518(New_Class86B60, self->dreamSys, self->unk1C);
+        status = Class6D3C8__RunPollTask(New_Class86B60, self->dreamSys, self->unk1C);
         if (status == pollDone) {
-            func_80026518(New_GraphRoomObj, self->dreamSys, self->unk1C);
+            Class6D3C8__RunPollTask(New_GraphRoomObj, self->dreamSys, self->unk1C);
             goto retry;
         }
 
@@ -132,3 +134,17 @@ sequential code, not an early return.
   loop here), but the underlying idea — let a value's C-level liveness match
   where the compiler's own analysis would create it, rather than forcing it
   by hand — is exactly what closed this residue too.
+
+## Naming
+
+**`Class6D3C8__PollGraphRoomStatus` -- tier B.** Mechanics: gated by
+`arg->unk10`, checks the owned `DreamSys`'s own status accessor, then loops
+`Class6D3C8__RunPollTask(New_Class86B60, ...)`, restarting
+`Class6D3C8__RunPollTask(New_GraphRoomObj, ...)` on every "2" report, until
+the second poll task reports something else. `New_GraphRoomObj` is an
+established, evidence-backed name from another unit
+(`src/class_3bb8c_t.c:315`, `GraphRoomObj__GraphRoomObj`), so "GraphRoom" is
+real vocabulary, not a guess -- but `New_Class86B60`'s own class is still
+unnamed, and this function's ultimate purpose (what "graph room" readiness
+gates) is not established here. The name describes the poll/retry mechanics
+around the one named PollTask class involved.

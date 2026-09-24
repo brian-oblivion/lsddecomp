@@ -1,4 +1,6 @@
-# func_80026348
+# Class6D3C8__StartWeeklyStreamTask
+
+> Renamed from `func_80026348` on 2026-09-24 (tools/rename.py). Address 0x80026348.
 
 **Unit:** code_1677c · **Size:** 50 instructions (0xC8 bytes) · **Status:** MATCHED (50/50 words, whole-image SHA1 green), first attempt
 
@@ -6,20 +8,20 @@
 
 `Class6D3C8Methods` slot `+0x054`. Gated by `self->arg->unk08 != 0` (a
 second boolean/pointer gate on the ctor argument, sibling to
-`func_80026170`'s `unk0C` gate): builds a `StreamTask`, derives a type code
+`Class6D3C8__LoadIntroLogoSequence`'s `unk0C` gate): builds a `StreamTask`, derives a type code
 via `func_8004913C` (a day/week-style calculation, unrelated unit,
 `psyq_memset.s`), looks it up via `func_800493C8`, and initializes+starts
-the task the same way `func_80026170` does -- minus that function's two
-`func_80026254` loader-task registrations.
+the task the same way `Class6D3C8__LoadIntroLogoSequence` does -- minus that function's two
+`Class6D3C8__StartLoaderTask` loader-task registrations.
 
 ## Derivation
 
-Structurally identical to the second half of `func_80026170` (already
+Structurally identical to the second half of `Class6D3C8__LoadIntroLogoSequence` (already
 matched), with `func_8004913C(&typeCode, 0)` in place of
 `func_800490F4(&typeCode)`:
 
 ```c
-void func_80026348(Class6D3C8 *self) {
+void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
     s32 derivedValue;
     s32 typeCode;
     s32 typeLookup;
@@ -36,7 +38,7 @@ void func_80026348(Class6D3C8 *self) {
 }
 ```
 
-Matched first attempt, entirely on the strength of `func_80026170`'s
+Matched first attempt, entirely on the strength of `Class6D3C8__LoadIntroLogoSequence`'s
 already-solved register-allocation-by-declaration-order lesson (declared
 `derivedValue`/`typeCode` before `task`, mirroring that function's fix) and
 its "the delay slot after `jalr` is the real 4th argument, not a scratch
@@ -47,7 +49,7 @@ argument from the start).
 
 `include/Class6D3C8.h`: split `Class6D3C8CtorArgs`'s `+0x04..+0x0B` padding
 to expose `+0x08` (`unk08`, this function's gate) as its own field,
-matching the existing `+0x0C` (`unk0C`, `func_80026170`'s gate). Declared
+matching the existing `+0x0C` (`unk0C`, `Class6D3C8__LoadIntroLogoSequence`'s gate). Declared
 `func_8004913C` (day/week-style helper, `psyq_memset.s`, same "write an
 index to *out, return a related but different value" shape as
 `func_800490F4`).
@@ -68,3 +70,14 @@ for the same shape before re-deriving from scratch.
   whole body, shared epilogue either way, no differing-return-value early
   exit.
 - **hand-hoisted loop invariant lever:** not applicable -- no loop.
+
+## Naming
+
+**`Class6D3C8__StartWeeklyStreamTask` -- tier B.** Mechanics: gated by
+`arg->unk08`, builds a `StreamTask`, derives its type code via
+`func_8004913C` -- documented in this unit's header as "day/week-style
+calculation (divides func_80048CFC's result by 7)" -- looks it up, then
+configures and starts the task. "Weekly" is grounded in that documented
+`/7` derivation inside `func_8004913C` (real evidence, not a guess from the
+function's own body, which is otherwise the same generic StreamTask-launch
+shape as its three siblings in this unit).
