@@ -2330,7 +2330,7 @@ struct ObjM {
  * exactly the collision runner delta anticipated when it suffixed its
  * type names. The proof is a cross-unit call, not a guess:
  * ObjM__ForwardToSubChild is DEFINED in class_3bb8c_m.c taking `ObjM *self` and
- * CALLED from class_3bb8c_l.c (func_80053C94) passing its own
+ * CALLED from class_3bb8c_l.c (ObjM__EnterState6) passing its own
  * `Obj87034_3bb8c_l *self` as the same first argument.
  *
  * They are deliberately NOT unified yet. Both views are byte-exact as
@@ -2459,24 +2459,24 @@ typedef struct DreamSysMethods_3bb8c_l {
     void (*slotD4)(void *self, s32 arg1, s32 arg2, s32 arg3); /* +0x0D4, ObjM__EnterStyleSession */
     u8 padD8[0x0EC - 0x0D8];
     s32 (*slotEC)(void *self, s32 arg1);              /* +0x0EC, ObjM__InitStyleAndWorld */
-    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md). ALSO ObjM__EnterStyleSession, on a DIFFERENT instance (the slotAC return value) with a DIFFERENT 2nd-arg shape (plain s32, not a pointer) -- same slot, two call-site views, per this project's established convention; see that function's report. */
+    s32 (*slotF0)(void *self, s32 *outBuf, s32 arg2); /* +0x0F0, ObjM__EnterState4 (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/ObjM__EnterState4.md). ALSO ObjM__EnterStyleSession, on a DIFFERENT instance (the slotAC return value) with a DIFFERENT 2nd-arg shape (plain s32, not a pointer) -- same slot, two call-site views, per this project's established convention; see that function's report. */
     u8 padF4[0x0F8 - 0x0F4];
     void (*slotF8)(void *self, s32 arg1, s32 arg2); /* +0x0F8, ObjM__EnterStyleSession */
-    void (*slotFC)(void *self);          /* +0x0FC, ObjM__ExitSceneStyle/func_80053C94 */
+    void (*slotFC)(void *self);          /* +0x0FC, ObjM__ExitSceneStyle/ObjM__EnterState6 */
     u8 pad100[0x104 - 0x100];
     s32 (*slot104)(void *self, s32 arg1); /* +0x104, ObjM__TransferToOther */
     s32 (*slot108)(void *self);           /* +0x108, ObjM__TransferToOther */
     u8 pad10C[0x1A0 - 0x10C];
     s32 (*slot1A0)(void *self, s32 arg1); /* +0x1A0, ObjM__InitStyleAndWorld (return value forwarded opaquely to two other calls) */
     u8 pad1A4[0x200 - 0x1A4];
-    s32 (*slot200)(void *self);           /* +0x200, func_80053C94 */
+    s32 (*slot200)(void *self);           /* +0x200, ObjM__EnterState6 */
 } DreamSysMethods_3bb8c_l;
 typedef struct DreamSysObj_3bb8c_l {
     DreamSysMethods_3bb8c_l *methods;
     u8 pad04[0x044 - 0x004];
     s32 unk44;               /* +0x044, ObjM__HandleStateCode: cleared (only reached when self->unk20 != 0 and the event/code is >= 9) */
     u8 pad48[0x164 - 0x048];
-    s32 unk164;             /* +0x164, func_80053BE8: sign-checked gate */
+    s32 unk164;             /* +0x164, ObjM__EnterState5: sign-checked gate */
 } DreamSysObj_3bb8c_l;
 
 /* Whatever arg1->unkC points to in ObjM__AttachTarget -- a registration sink
@@ -2498,7 +2498,7 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slot10)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x010, ObjM__AttachTarget */
     void (*slot14)(Obj87034_3bb8c_l *self, void *arg1);            /* +0x014, ObjM__DetachTarget/ObjM__ExitSceneStyle */
     u8 pad18[0x030 - 0x018];
-    void (*slot30)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x030, func_80053ACC (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/func_80053ACC.md) */
+    void (*slot30)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x030, ObjM__EnterState4 (STALLED 28/71 -- offset/signature observed directly from the disassembly, reliable independent of the stall; see docs/match-reports/ObjM__EnterState4.md) */
     u8 pad34[0x048 - 0x034];
     void (*slot48)(Obj87034_3bb8c_l *self);                        /* +0x048, ObjM__DetachTarget/ObjM__TeardownStyle (via self->unk54) */
     u8 pad4C[0x05C - 0x04C];
@@ -2514,7 +2514,7 @@ typedef struct Obj87034Methods_3bb8c_l {
     u8 pad90[0x094 - 0x090];
     void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, ObjM__HandleStateCode (event/code 0xA, dense switch) */
     void (*slot98)(Obj87034_3bb8c_l *self);                        /* +0x098, ObjM__HandleStateCode (event/code 0xC) */
-    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, func_80053BE8; ALSO ObjM__HandleStateCode (event/code 0xD) */
+    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, ObjM__EnterState5; ALSO ObjM__HandleStateCode (event/code 0xD) */
     void (*slotA0)(Obj87034_3bb8c_l *self);                        /* +0x0A0, ObjM__HandleStateCode (event/code 0xE) */
     void (*slotA4)(Obj87034_3bb8c_l *self);                        /* +0x0A4, ObjM__HandleStateCode (event/code 0xF) */
     void (*slotA8)(Obj87034_3bb8c_l *self);                        /* +0x0A8, ObjM__HandleStateCode (event/code 0x10) */
@@ -2536,7 +2536,7 @@ struct Obj87034_3bb8c_l {
     Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/ObjM__TickStyle/ObjM__ExitSceneStyle */
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, ObjM__ExitSceneStyle */
     s32 unk1C;                           /* +0x01C, ObjM__TickTarget: incremented once per call */
-    s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
+    s32 unk20;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 (STALLED) and written 5 by ObjM__EnterState5, both round 16 echo) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
     void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to func_80049060/func_80049098 */

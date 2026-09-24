@@ -1,4 +1,6 @@
-# func_80053BE8 -- MATCHED
+# ObjM__EnterState5 -- MATCHED
+
+> Renamed from `func_80053BE8` on 2026-09-24 (tools/rename.py). Address 0x80053be8.
 
 Unit: `src/class_3bb8c_l.c`. Runner: echo, round 16.
 
@@ -7,13 +9,13 @@ Unit: `src/class_3bb8c_l.c`. Runner: echo, round 16.
 ## Signature
 
 ```c
-void func_80053BE8(Obj87034_3bb8c_l *self);
+void ObjM__EnterState5(Obj87034_3bb8c_l *self);
 ```
 
 ## Final C
 
 ```c
-void func_80053BE8(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
     s32 color;
 
     if (self->unk3C->unk164 < 0) {
@@ -42,8 +44,8 @@ void func_80053BE8(Obj87034_3bb8c_l *self) {
   padding gap additively.
 - `ObjM__ForwardToSubChild` is the sibling-unit helper (`class_3bb8c_m`, matched by
   echo round 15) already forward-declared in this file for
-  `func_80053C94`'s use; that `extern` declaration was moved earlier in the
-  file (still unit-local, not the shared header) since `func_80053BE8`
+  `ObjM__EnterState6`'s use; that `extern` declaration was moved earlier in the
+  file (still unit-local, not the shared header) since `ObjM__EnterState5`
   (ROM-earlier) now needs it too. No behavior change, pure reordering.
 
 ## Non-obvious lever: branch/block polarity

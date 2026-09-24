@@ -437,7 +437,7 @@ void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
     }
 }
 
-/* func_80053ACC's (and func_80053BE8's/func_80053C94's, further below) own
+/* ObjM__EnterState4's (and ObjM__EnterState5's/ObjM__EnterState6's, further below) own
  * helper, and it lives in the sibling slice class_3bb8c_m, where round 15's
  * runner echo matched it byte-exact as `void ObjM__ForwardToSubChild(ObjM *self, s32,
  * s32, s32, s32)`. Declared locally rather than in include/class_3bb8c.h on
@@ -448,7 +448,7 @@ void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
  * from the definition. */
 extern void ObjM__ForwardToSubChild(Obj87034_3bb8c_l *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
 
-void func_80053ACC(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
     s32 local18;
     s32 span;
     s32 t;
@@ -481,7 +481,7 @@ void func_80053ACC(Obj87034_3bb8c_l *self) {
     ObjM__ForwardToSubChild(self, 0, 0, 5, 1);
 }
 
-void func_80053BE8(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
     s32 color;
 
     if (self->unk3C->unk164 < 0) {
@@ -494,7 +494,7 @@ void func_80053BE8(Obj87034_3bb8c_l *self) {
     }
 }
 
-void func_80053C94(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState6(Obj87034_3bb8c_l *self) {
     s32 color;
 
     self->unk20 = 6;

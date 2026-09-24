@@ -1,4 +1,6 @@
-# func_80053C94
+# ObjM__EnterState6
+
+> Renamed from `func_80053C94` on 2026-09-24 (tools/rename.py). Address 0x80053c94.
 
 **Unit:** class_3bb8c_l · **Size:** 33 words (0x84 bytes) ·
 **Status: MATCHED 33/33**, whole-image SHA1 green.
@@ -6,7 +8,7 @@
 ## What it does
 
 ```c
-void func_80053C94(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState6(Obj87034_3bb8c_l *self) {
     s32 color;
 
     self->unk20 = 6;

@@ -81,7 +81,7 @@ every step).
   and `slotA0`/`slotA4`/`slotA8`/`slotAC` (all `void (*)(Obj87034_3bb8c_l
   *self)`), splitting `pad90[0x09C-0x090]` and `padA0[0x0C0-0x0A0]`.
   `slot9C` already existed (added by a PRIOR unit's function,
-  `func_80053BE8`) -- extended its comment to note this function ALSO
+  `ObjM__EnterState5`) -- extended its comment to note this function ALSO
   calls it, rather than declaring a duplicate member.
 - `DreamSysObj_3bb8c_l` (self->unk3C's pointee): added `s32 unk44` at
   +0x044, splitting `pad04[0x164-0x004]` into `pad04[0x040]` + `unk44` +

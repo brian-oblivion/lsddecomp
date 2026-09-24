@@ -1,4 +1,6 @@
-# func_80053ACC -- MATCHED 71/71, round 19 (bravo)
+# ObjM__EnterState4 -- MATCHED 71/71, round 19 (bravo)
+
+> Renamed from `func_80053ACC` on 2026-09-24 (tools/rename.py). Address 0x80053acc.
 
 Unit: `src/class_3bb8c_l.c`. Originally stalled by echo (round 16), CLOSED by
 bravo (round 19) via the permuter. `./build-and-verify.sh` green,
@@ -9,7 +11,7 @@ different unit).
 
 ## Round 19 close: the permuter found it, one variable rename made it real
 
-Set up `tools/setup-permuter.sh func_80053ACC` from the preserved body
+Set up `tools/setup-permuter.sh ObjM__EnterState4` from the preserved body
 below. `--debug --stack-diffs` confirmed the base score (165: 1 register
 diff, 1 reordering, 1 deletion, 0 insertions, 0 stack diffs) matched the
 report's own characterization exactly before spending any search budget.
@@ -76,14 +78,14 @@ Unit: `src/class_3bb8c_l.c`. Runner: echo, round 16. `INCLUDE_ASM` restored;
 ## Signature
 
 ```c
-void func_80053ACC(Obj87034_3bb8c_l *self);
+void ObjM__EnterState4(Obj87034_3bb8c_l *self);
 ```
 
 ## What is established (high confidence -- derived directly from the
 disassembly, not guessed)
 
 ```c
-void func_80053ACC(Obj87034_3bb8c_l *self) {
+void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
     s32 local18;
     s32 t;
     s32 arg3;
@@ -180,7 +182,7 @@ not force from any source variant tried.
    version above) -- 70/71 total length (1 word SHORT), and reproduces
    retail's per-path call-setup duplication exactly. This is the closest
    variant and the one preserved in `#if 0` in the source. Confirmed via
-   `tools/asm-differ/diff.py func_80053ACC` that from the `case 1` target
+   `tools/asm-differ/diff.py ObjM__EnterState4` that from the `case 1` target
    label onward (roughly the back half of the function) every single word
    matches retail; the only structural gap is the one delay-slot
    instruction described above and its downstream `beq a0,v0` vs
@@ -242,7 +244,7 @@ before consolidating. Three corrections, in increasing order of importance.
 with its own guard:
 
 ```
-func_80053ACC: 28/71 words match (file 0x442CC-0x443E8)
+ObjM__EnterState4: 28/71 words match (file 0x442CC-0x443E8)
 WARNING: the build differs OUTSIDE this range too (159121 bytes) - a size change may have
          shifted linked addresses, so this per-function read is NOT trustworthy.
 ```
