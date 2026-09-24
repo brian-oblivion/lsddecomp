@@ -104,6 +104,8 @@ class_3bb8c.c).
 
 ## Proposed field names
 
+**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that func_8004C1C0 sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (class_3bb8c.c), where all readers are in one unit.
+
 `ElemTarget::unk30` and `ElemTarget::unk2C` (also read by class_3bb8c.c's
 `func_8004BD14`/`func_8004C0AC` -- cross-unit, not renamed here).
 Proposed: `unk30` -> `key` (same reasoning as `unk32` above -- compared

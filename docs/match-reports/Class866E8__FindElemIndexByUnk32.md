@@ -94,6 +94,8 @@ purpose, per this project's "name what the code does" rule.
 
 ## Proposed field names
 
+**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that func_8004C1C0 sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (class_3bb8c.c), where all readers are in one unit.
+
 `ElemTarget::unk32` (also read by class_3bb8c.c's `func_8004C434`, so
 cross-unit -- not renamed here). Proposed: `key` -- it is exactly what
 both `FindElemIndexByUnk32` and its caller-side context treat it as, a
