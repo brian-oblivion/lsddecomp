@@ -48,7 +48,7 @@
  * Their stub reports are gone.  The previous version of this comment listed
  * both as "blocked, have stub reports", which by round 24 was a stale
  * DIRECTIVE over free ground -- the fourth unit in two rounds to carry one.
- * func_8002C278 was originally screened as a third (nop_mflo_mfhi) but
+ * Class6D940__ResolveEntry was originally screened as a third (nop_mflo_mfhi) but
  * that screen was inverted (checked mult/div BEFORE mflo/mfhi instead of
  * after) -- the head corrected it mid-round and deleted the stub report.
  * It is fresh ground; the mult/mfhi pair in its body is retail's signed-
@@ -174,7 +174,7 @@ s32 Class6D940__SetFlag(s32 *self)
 }
 
 /*
- * func_8002C278's own "descriptor" pointer, resolved either from a cached
+ * Class6D940__ResolveEntry's own "descriptor" pointer, resolved either from a cached
  * byte offset (Obj278::unk34) or freshly from `index*12+8` into
  * Ctx278::unk10's byte array. Field meaning unestablished beyond
  * offset/width -- this region reads as raw hardware/SIO register staging
@@ -190,7 +190,7 @@ typedef struct Entry278 {
     s32 unk8;  /* +0x8 */
 } Entry278;
 
-/* func_8002C278's own object (its own `arg1`). Only the fields this
+/* Class6D940__ResolveEntry's own object (its own `arg1`). Only the fields this
  * function itself touches are named. */
 typedef struct Obj278 {
     u8 pad0[0xC];
@@ -213,14 +213,14 @@ typedef struct Ctx278Sub Ctx278Sub;
 struct Ctx278SubMethods {
     u8 pad000[0x080];
     /* (self, desc->unk2, index, obj): the last two are forwarded from
-     * func_8002C278's own parameters, so they emit no set-up code. */
+     * Class6D940__ResolveEntry's own parameters, so they emit no set-up code. */
     s32 (*slot80)(Ctx278Sub *self, s32 unk2, s32 index, Obj278 *obj);
 };
 struct Ctx278Sub {
     Ctx278SubMethods *methods;
 };
 
-/* func_8002C278's own `arg0`. Only the fields this function itself
+/* Class6D940__ResolveEntry's own `arg0`. Only the fields this function itself
  * touches are named. */
 typedef struct Ctx278 {
     u8 pad0[0x10];
@@ -229,7 +229,7 @@ typedef struct Ctx278 {
     Ctx278Sub *unk2C; /* +0x2C */
 } Ctx278;
 
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 whole;

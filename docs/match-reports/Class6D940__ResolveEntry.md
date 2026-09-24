@@ -1,4 +1,6 @@
-# func_8002C278 -- MATCHED (round 76, REVISIT-2; 76/76, length exact, 0 insertions / 0 deletions)
+# Class6D940__ResolveEntry -- MATCHED (round 76, REVISIT-2; 76/76, length exact, 0 insertions / 0 deletions)
+
+> Renamed from `func_8002C278` on 2026-09-24 (tools/rename.py). Address 0x8002c278.
 
 REVISITED, round 76: MATCHED 76/76 byte-exact (from 54/76) by the argument-count lever -- slot80 takes four arguments; names/types used (the unit's own Ctx278/Obj278/Entry278, slot80 retyped)
 
@@ -71,7 +73,7 @@ No permuter search this round (not needed: 12 builds to the match). No
 /* in Ctx278SubMethods */
     s32 (*slot80)(Ctx278Sub *self, s32 unk2, s32 index, Obj278 *obj);
 
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 whole;
@@ -131,7 +133,7 @@ arity that mattered was the callee's, not the function's own.
 
 ## History: the stall as filed through round 60 (superseded)
 
-Original title: func_8002C278 -- STALL (length EXACT; 54/76 words; 0 insertions / 0 deletions -- every instruction is retail's, only register identity differs; first real diff 0x1CA88 `move a3,a1` vs `move t0,a1`)
+Original title: Class6D940__ResolveEntry -- STALL (length EXACT; 54/76 words; 0 insertions / 0 deletions -- every instruction is retail's, only register identity differs; first real diff 0x1CA88 `move a3,a1` vs `move t0,a1`)
 
 NON_MATCHING body promoted, round 73.
 
@@ -155,7 +157,7 @@ correction.
 ```c
 #if 0
 /*
- * func_8002C278's own "descriptor" pointer, resolved either from a cached
+ * Class6D940__ResolveEntry's own "descriptor" pointer, resolved either from a cached
  * byte offset (Obj278::unk34) or freshly from `index*12+8` into
  * Ctx278::unk10's byte array. Field meaning unestablished beyond
  * offset/width -- this region reads as raw hardware/SIO register staging
@@ -171,7 +173,7 @@ typedef struct Entry278 {
     s32 unk8;  /* +0x8 */
 } Entry278;
 
-/* func_8002C278's own object (its own `arg1`). Only the fields this
+/* Class6D940__ResolveEntry's own object (its own `arg1`). Only the fields this
  * function itself touches are named. */
 typedef struct Obj278 {
     u8 pad0[0xC];
@@ -199,7 +201,7 @@ struct Ctx278Sub {
     Ctx278SubMethods *methods;
 };
 
-/* func_8002C278's own `arg0`. Only the fields this function itself
+/* Class6D940__ResolveEntry's own `arg0`. Only the fields this function itself
  * touches are named. */
 typedef struct Ctx278 {
     u8 pad0[0x10];
@@ -208,7 +210,7 @@ typedef struct Ctx278 {
     Ctx278Sub *unk2C; /* +0x2C */
 } Ctx278;
 
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 cached;
@@ -668,7 +670,7 @@ needs is in `src/code_179d8_d.c` already (`Entry278`, `Obj278`, `Ctx278`,
 
 ```c
 #if 0
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     Obj278 *p;
@@ -724,7 +726,7 @@ both green.
 
 ```c
 #if 0
-s32 func_8002C278(Ctx278 *ctx, Obj278 *self, s32 index)
+s32 Class6D940__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 {
     Entry278 *desc;
     s32 cached;

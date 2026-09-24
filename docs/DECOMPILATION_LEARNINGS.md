@@ -446,7 +446,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   the converse fails, so type a slot from its CALL SITES. (a §"3. A bare `nop` in a call's delay
   slot", §"Round 11")
   A parameter `move`d into `$a2`/`$a3` at ENTRY is a forwarded argument of a later call until shown
-  otherwise: `func_8002C278`'s four-round "register identity" was `slot80` missing its fourth argument
+  otherwise: `Class6D940__ResolveEntry`'s four-round "register identity" was `slot80` missing its fourth argument
   (54/76 -> 76/76, round 76).
 - **A discarded return value is never evidence of `void`, and an empty-bodied occupant is never
   evidence the slot takes no arguments** — bytes constrain the return type only where the caller
@@ -668,7 +668,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   claim: 0/0 is consistent with it, anything else says READ THE DIFF for separable defects.** Not a
   verdict: at equal length an N/N figure can be a false alignment on a repeating loop skeleton
   (round 63: 26/26 on a zero-insertion input); funcdiff's positional skeleton diffs figure tells the
-  two apart and forces 0/0 when it is zero. `func_8002C278` carried "pervasive register-allocation
+  two apart and forces 0/0 when it is zero. `Class6D940__ResolveEntry` carried "pervasive register-allocation
   residue" for four rounds at 7/7 and held four separable defects, three of them plain C. Even 0/0
   is NOT the banned-fix category by itself: the same function at 0/0 (54/76) closed on a missing
   forwarded argument (round 76). Rebuild the preserved body and read the line. (a round 60)
@@ -736,7 +736,7 @@ minimally, search-tail inert forms). Distilled out round 67: §"The arm-order le
 cheap COUNTER-indication", §"An explicit alias can force the parameter copy cc1 would
 otherwise coalesce away", §"Retail reuses the same counter pseudo-registers across sibling
 loops and SWAPS their outer/inner roles". Distilled out round 68: §"Two independent
-CFG/scheduling levers, both from `func_8002C278`", §"The `mention a value twice` lever needs a
+CFG/scheduling levers, both from `Class6D940__ResolveEntry`", §"The `mention a value twice` lever needs a
 genuine SECOND, INDEPENDENT USE POINT" (it reconciles the round-19 close with the INERT entry in
 3d), §"HImode constant narrowing". Distilled out round 69: §"Two long-standing near-misses closed by
 DELETING a named value" (the local-count entries in 3d carry the lever), §"When the residue
