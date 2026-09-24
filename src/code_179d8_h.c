@@ -205,23 +205,11 @@ void *Class6D430__DestroyCdReadDriver(Class6D430 *self) {
 void NoOp2(void) {
 }
 
-/* ROUND 36 (runner charlie): the round-17 preserved body (best 12/43,
- * structural -- path-address CSE across the loop's calls, plus a
- * register-role rotation, per docs/match-reports/OpenCdFile.md) spelled
- * its two callees func_8002B640/func_80012C20, which round 34's SDK-object
- * conversion retargeted to CdSearchFile/printf (already declared above,
- * per-call-site typed for this unit). Corrected and rebuilt: reproduces the
- * IDENTICAL structural residue (one extra cached-address instruction,
- * confirmed via asm-differ) -- the previously recorded figure is now
- * measured, not carried forward. Still genuinely stalled; restored to
- * INCLUDE_ASM. The report carries the corrected, linkable body. */
-/* NON_MATCHING body promoted, round 72 (charlie), per docs/FINISHING-PLAN.md
- * track 1b. Hand-derived (round 17/36/47/54/64, no permuter-found edit --
- * round 47's permuter check (b) declined the search: insertions=4,
- * deletions=3, base score 863). Live-measured under current maspsx flags
- * this round: 13/43 raw word-match, length 44/43 words (one word long,
- * unchanged) -- docs/match-reports/OpenCdFile.md. */
-#ifdef NON_MATCHING
+/* MATCHED round 74 (charlie). The retry loop is a label + backward goto,
+ * not while/for: a real loop gets loop notes, loop.c hoists &path out of it
+ * and CSEs it with BuildCdFilePath's argument (one word long, rotated
+ * saved registers). Retail recomputes &path inside the loop body --
+ * docs/match-reports/OpenCdFile.md. */
 void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
     s32 i;
     StatBuf179D8H statBuf;
@@ -230,24 +218,19 @@ void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
     i = 0;
     if (self->isOpen == 0) {
         BuildCdFilePath(path, suffix);
-        while (1) {
-            if (CdSearchFile(&statBuf, path) != 0) {
-                break;
+    retry:
+        if (CdSearchFile(&statBuf, path) == 0) {
+            if (i++ < 100) {
+                goto retry;
             }
-            i++;
-            if (i >= 100) {
-                printf(gCdFileNotFoundFmt, path);
-                return;
-            }
+            printf(gCdFileNotFoundFmt, path);
+            return;
         }
         self->pos = statBuf.pos;
-        self->isOpen = 1;
         self->size = statBuf.size;
+        self->isOpen = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_h", OpenCdFile);
-#endif
 
 char *BuildCdFilePath(char *dest, char *suffix) {
     dest[0] = '\\';
