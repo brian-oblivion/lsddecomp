@@ -32,3 +32,12 @@ void StoreSxyPolyGT4(void *dst, s32 flag)
 Byte-exact on the first attempt, offsets `0x8`/`0x14`/`0x20` (if-branch) and
 `0x2c` (else-branch) substituted into the same established pattern as
 `StoreSxyPolyFT4`. No new residue, no new lever.
+
+## Naming (round 77, alpha)
+
+`func_8001979C` -> `StoreSxyPolyGT4`, parameter `flag` -> `storeFirst3`.
+**Tier A.** Sibling of StoreSxyPolyFT4 (above); the POLY_GT4 discriminator
+(`len = 12`, `code = 0x3C`) is already recorded in StoreSxyPolyG4.md, which
+named this function ahead of time as "func_8001979C ... whenever that unit
+is worked." Offsets `0x8`/`0x10`/`0x18` (true) / `0x2C` (false) match
+POLY_GT4's layout.

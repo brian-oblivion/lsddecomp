@@ -477,3 +477,15 @@ output changes a REGISTER FIELD (e.g. `$a1` vs `$a2` in an otherwise-identical
 `lui`/`ori` instruction), not just an opcode's top bits with the same
 register operand -- these are the genuine, already-diagnosed register-identity
 residue, not a second hidden instance of the ADDIU/ORI blind spot.
+
+## Naming (round 77, alpha)
+
+`func_8001A268` -> `UpdatePolyBBoxAndCull`, parameter `arg0` -> `ctx`.
+**Tier A.** `ctx` is the same per-face draw context TransformAndCullPoly's
+own extern comment documents (code_8220.h): its SXY0-2 cache at
+`+0x60/+0x64/+0x68` and its culled flag at `+0x78` are exactly the fields
+this function reads (`ctx+0x64`..`ctx+0x5C+count*4`) and writes
+(`ctx+0x78 = 1`). The name states the two things the body does: update the
+running 2D screen bounding box (`ctx+0x70..+0x76`) and set the cull flag
+when either span reaches `0x101`. Purpose (why 0x101, i.e. what draw-time
+constraint a >256px-wide/tall primitive violates) is not established.

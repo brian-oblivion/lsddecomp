@@ -514,3 +514,15 @@ output changes a REGISTER FIELD (e.g. `$a1` vs `$a2` in an otherwise-identical
 `lui`/`ori` instruction), not just an opcode's top bits with the same
 register operand -- these are the genuine, already-diagnosed register-identity
 residue, not a second hidden instance of the ADDIU/ORI blind spot.
+
+## Naming (round 77, alpha)
+
+`func_8001A064` -> `SubmitPolyGT4`, parameters (`arg0`, `arg1`) -> (`prim`, `ctx`). **Tier
+A.** code_8220_b's own comment (`src/code_8220_b.c`, the "eight submit
+wrappers" block) already names this whole family collectively: each is a
+tail call to Sony's `RCpolyGT4` (unrenamed, RCpoly* polygon-subdivision
+family, `libgte`) or a direct OT splice, matching every sibling's shape.
+This function's own discriminator: the splice arm returns
+`prim + 0x34` = `sizeof(POLY_GT4)`, and the calls arm falls straight
+into `jal RCpolyGT4`. `prim`/`ctx` match the parameter names code_8220_b's
+own `extern void *SubmitPolyGT4(void *prim, void *ctx);` view already used.

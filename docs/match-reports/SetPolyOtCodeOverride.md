@@ -65,3 +65,13 @@ any GTE macro.
 currently references them, so putting the extern in a shared header would
 just be an unused collision surface for a sibling unit that never touches
 them.
+
+## Naming (round 77, alpha)
+
+`func_8001A54C` -> `SetPolyOtCodeOverride`, parameters (`arg0`, `arg1`) ->
+(`enable`, `code`). **Tier A**: a two-field setter whose read side
+(FillRCPolyHeader, this unit) is fully derived -- `enable` gates whether
+FillRCPolyHeader's header word 0 comes from `code` (stored only when
+`enable` is set) or the per-object D_80090C18 default. Matches the
+globals it writes, `gPolyOtCodeOverrideSet`/`gPolyOtCodeOverride` (named
+alongside this function).

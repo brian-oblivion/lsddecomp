@@ -44,3 +44,18 @@ natural entry point already). `arg1`'s value used for `src` is the
 UNMODIFIED parameter, computed before the `dst1` selection — the two never
 alias the same C expression, matching retail's use of the original `$a1`
 for one purpose and a reassigned local pointer for the other.
+
+## Naming (round 77, alpha)
+
+`func_8001A224` -> `InitVtxRecordPtrs`, parameters (`arg0`, `arg1`) ->
+(`dst`, `table`); `kind` kept (dual-purpose primitive-kind/loop-count
+code, already documented in this report). **Tier B.** Mechanics are
+established (writes a running pointer through `table`'s own per-vertex
+records into two parallel arrays), matched by call site in code_8220_b:
+`InitVtxRecordPtrs(ctx + 0x88, gPolySubmitTableTri, 3)` and
+`InitVtxRecordPtrs(ctx + 0x94, gPolySubmitTableQuad, 4)`, confirming
+`dst`/`table` and that this is a one-time setup of the render context's
+vertex-record pointer slots (the same `ctx+0x88`/`ctx+0x94` the Submit*
+wrappers later read). WHY `table` also keeps its own mirror copy of the
+same pointers (at `+0xA8`/`+0xF0`) is not established, so the function
+name states only the mechanics, not that purpose.

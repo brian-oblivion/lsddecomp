@@ -142,3 +142,17 @@ its delay slot -- it always executes, taken or not. This cost the bulk of
 this function's attempts because the wrong C shape (store nested in the
 `if`) still produced a plausible-looking 19/27 near-miss that read like an
 ordinary register/scheduling residue, not a semantic error.
+
+## Naming (round 77, alpha)
+
+`func_8001A380` -> `FillRCPolyHeader`, parameters (`arg0..arg5`) ->
+(`table`, `ctx`, `uv`, `hasUv1Codes`, `uv1Clut`, `uv1TPage`). **Tier A**:
+pure header-populate leaf, same shape at all 8 call sites (code_8220.h's
+own extern comment already derived every field it writes). `hasUv1Codes`/
+`uv1Clut`/`uv1TPage`: tier B, evidenced by the FT3/GT3/FT4/GT4 call sites,
+which pass `1` plus the calling primitive's own `+0xE`/`+0x16` (FT3/FT4)
+or `+0xE`/`+0x1A` (GT3/GT4) fields -- POLY_FTn/GTn's CLUT and TPAGE words
+in the Psy-Q layout -- while F3/G3/F4/G4 pass `0, 0, 0` and leave the
+table's `+0xC`/`+0xE` untouched. `table`/`ctx` match code_8220_b's/this
+unit's own established terms for these two objects (gPolySubmitTableTri/
+Quad, and the per-face draw context).

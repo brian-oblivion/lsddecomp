@@ -339,3 +339,9 @@ settles the question for these seven files this round: the
 `CopyPolyVtx4` mistake (raw asm for a plain-C-expressible copy) does not
 recur in any of them. `CopyPolyVtx4` itself, now matched, remains the
 only confirmed instance of this mistake found so far project-wide.
+
+## Naming (round 77, alpha)
+
+`func_8001A4C0` -> `CopyPolyVtx4`. **Tier A**: same pure-leaf-copy
+reasoning as CopyPolyVtx3, which this function forwards to (elements 0-2)
+before doing its own element-3 copy. Parameters unchanged.

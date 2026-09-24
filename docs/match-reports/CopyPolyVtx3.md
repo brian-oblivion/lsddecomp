@@ -175,3 +175,10 @@ portion) is branch-free, the raw-register whole-block `__asm__` approach
 from `TransformAndCullPoly` is strictly safer: it reproduces the exact bytes by
 construction, with no struct-layout risk at all. (`CopyPolyVtx3`, 53/53 on
 first attempt.)
+
+## Naming (round 77, alpha)
+
+`func_8001A3EC` -> `CopyPolyVtx3`. **Tier A**: a pure leaf whose mechanics
+ARE its purpose (copy 3 vertices' xy+uv from src to dst), already
+documented in this report's HEAD REWORK section. Parameters (`dst`, `src`,
+`uv0..uv2`) were already named at match time; unchanged.
