@@ -1,12 +1,14 @@
-# func_800517EC -- MATCHED (10/10 words)
+# Obj86ED0__ToggleFlag20 -- MATCHED (10/10 words)
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Obj866E8` (see func_80051784.md for
+> Renamed from `func_800517EC` on 2026-09-24 (tools/rename.py). Address 0x800517ec.
+
+Unit: `src/class_3bb8c_j.c`. `self` is `Obj866E8` (see Obj86ED0__AdvanceCountdown.md for
 the class-identity evidence shared across this group).
 
 ## Body
 
 ```c
-void func_800517EC(Obj866E8 *self)
+void Obj86ED0__ToggleFlag20(Obj866E8 *self)
 {
     if (self->unk48) {
         self->unk20 ^= 1;

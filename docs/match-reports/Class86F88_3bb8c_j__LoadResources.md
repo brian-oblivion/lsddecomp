@@ -1,4 +1,6 @@
-# func_80051F24 -- MATCHED (95/95, round 73)
+# Class86F88_3bb8c_j__LoadResources -- MATCHED (95/95, round 73)
+
+> Renamed from `func_80051F24` on 2026-09-24 (tools/rename.py). Address 0x80051f24.
 
 Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`.
 
@@ -16,7 +18,7 @@ extern s32 D_80087028;
 extern s32 D_8008AAF8;
 extern s32 D_800116E4;
 
-void func_80051F24(Class86ED0 *self, void *arg1)
+void Class86F88_3bb8c_j__LoadResources(Class86ED0 *self, void *arg1)
 {
     s32 local[8];
     Class86ED0Handle *h;
@@ -45,7 +47,7 @@ void func_80051F24(Class86ED0 *self, void *arg1)
 If (`arg1` non-NULL AND `self->unk50` not already set): builds a
 16-byte-ish stack descriptor via `BuildFileName(&local, ...)` fed into
 `func_8003B39C`, producing an opaque "handle" (`Class86ED0Handle *`, the
-same type `func_800520A0` -- matched this round -- also uses via
+same type `Class86F88_3bb8c_j__ReleaseResources` -- matched this round -- also uses via
 `self->unk50`). Calls the handle's own `slot78` (init?), stores a SECOND
 derived handle into `self->unk50` via `func_80041C9C`, releases the FIRST
 handle (`slot4`), then forwards `arg1` and a literal global pointer into
@@ -203,7 +205,7 @@ reshaping).
 
 **Three independent functions across two different header families
 (`class_3bb8c_b`'s `func_8004C93C`, `class_3bb8c_f`'s `TaskObjF__WriteMemcardSaveFile`,
-`class_3bb8c_j`'s `func_80051F24`) now confirm the same negative result
+`class_3bb8c_j`'s `Class86F88_3bb8c_j__LoadResources`) now confirm the same negative result
 for the SAME lever (declaration/introduction order of the contested
 locals).** This is strong enough evidence to stop treating "try a
 different declaration order" as a live lever for this residue class at
@@ -286,7 +288,7 @@ pure callee-saved rotation, and it is the INVERSE of round 59/64's
 "delete the named local".** A value reassigned in two unrelated halves of a
 function gets one pseudo whose live range spans both, which lowers its
 global-alloc priority. Tell: the rotating value is re-produced by a call in
-each half and never read across the boundary. Split it (func_80051F24,
+each half and never read across the boundary. Split it (Class86F88_3bb8c_j__LoadResources,
 75/95 -> 95/95 on the first build, after ten inert ordering attempts
 across rounds 18-19). Discriminator against the dead-parameter-reuse
 lever: that one REMOVES a pseudo, and this one ADDS one. Check a matched

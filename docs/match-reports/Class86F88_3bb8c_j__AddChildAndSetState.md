@@ -1,11 +1,13 @@
-# func_80052110 -- MATCHED (27/27 words)
+# Class86F88_3bb8c_j__AddChildAndSetState -- MATCHED (27/27 words)
+
+> Renamed from `func_80052110` on 2026-09-24 (tools/rename.py). Address 0x80052110.
 
 Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`.
 
 ## Body
 
 ```c
-void func_80052110(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3)
+void Class86F88_3bb8c_j__AddChildAndSetState(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3)
 {
     typedef void (*Slot10NarrowFn)(Class86ED0 *self, s32 arg1);
     void (*fn)(Class86ED0 *self, void *arg1, s32 arg2, s32 arg3);

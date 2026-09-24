@@ -1,11 +1,13 @@
-# func_80051998 — MATCHED (round 45, 45/45 words)
+# Obj86ED0__DispatchLookupValue — MATCHED (round 45, 45/45 words)
+
+> Renamed from `func_80051998` on 2026-09-24 (tools/rename.py). Address 0x80051998.
 
 **Unit:** class_3bb8c_j · **Size:** 45 words (0xB4 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
 attempt once rebuilt against the fixed toolchain, alongside its sibling
-`func_800518F4`.
+`Obj86ED0__DispatchIndexValue`.
 
 ## Derivation
 
@@ -22,7 +24,7 @@ struct Unk44Obj866E8 {
 
 extern u8 *D_8008AAE4;
 
-void func_80051998(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3)
+void Obj86ED0__DispatchLookupValue(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     Unk44Obj866E8 *obj;
 
@@ -39,7 +41,7 @@ void func_80051998(Obj866E8 *self, s32 arg1, s32 arg2, s32 arg3)
 }
 ```
 
-Same `Obj866E8` "countdown/flush" group as `func_800518F4` (see that
+Same `Obj866E8` "countdown/flush" group as `Obj86ED0__DispatchIndexValue` (see that
 report): gated on `self->unk48`, this one copies one byte out of a lookup
 table (`D_8008AAE4`, VALUE-of `%gp_rel`, ROM image points it at
 still-uncarved rodata `D_800115D0`) into `self->unk28[arg1]`, forwards the
@@ -50,11 +52,11 @@ through the same `self->methods->slot60(self, 0)` as its sibling.
 `self->unk18 = arg1` and `self->unk1C = arg2` both land in retail's branch
 delay slots (of the `beqz arg3, end` branch and its own fallthrough),
 executing unconditionally whenever `self->unk48` is set — ordinary
-plain-statement-before-`if` C, same shape as `func_800518F4`.
+plain-statement-before-`if` C, same shape as `Obj86ED0__DispatchIndexValue`.
 
 `Obj866E8::unk28` (`u8 *`, offset 0x28) and `Obj866E8::unk44` (`void *`,
 offset 0x44) are new additive fields in `include/class_3bb8c.h`, alongside
-`unk40` and `Obj866E8Methods::slot60` — see `func_800518F4`'s report for
+`unk40` and `Obj866E8Methods::slot60` — see `Obj86ED0__DispatchIndexValue`'s report for
 the full set. `Unk44Obj866E8Methods` is a fresh, unit-local minimal view
 (only `slotC4` typed), independent of `Unk40Obj866E8Methods`.
 

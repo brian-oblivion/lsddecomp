@@ -322,7 +322,7 @@ early, and then keeps using `a1` directly for every store, while every C
 shape tried (plain `return dst;`, an explicit `s16 *result = dst;` cached
 before the loop and returned at the end, and a branch-forced-copy trick
 `if (src) { result = dst; } else { result = dst; }` copied from
-`func_80051858`'s own precedent) coalesces `dst` and its returned copy into
+`Obj86ED0__ResetAllAndFinish`'s own precedent) coalesces `dst` and its returned copy into
 ONE register throughout (`$v0` used for the return AND every store),
 where retail keeps them as two separate register identities (`$a1` for
 the stores, `$v0` for the return alone). All three variants scored
@@ -349,7 +349,7 @@ round; flagging as the strongest re-attempt candidate this sweep found.
 7. `s16 *result = dst;` cached before the loop, `return result;`: 135, no
    change -- copy-propagated to the same thing as attempt 6.
 8. Branch-forced-copy trick (`if (src) { result = dst; } else { result =
-   dst; }`, `func_80051858`'s own idiom) applied to `result`/`dst`: 135, no
+   dst; }`, `Obj86ED0__ResetAllAndFinish`'s own idiom) applied to `result`/`dst`: 135, no
    change -- the trick that worked elsewhere in this project does not
    transfer to this exact shape.
 

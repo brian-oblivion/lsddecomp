@@ -1,4 +1,6 @@
-# func_80051C84 -- MATCHED (38/38 words)
+# Class86F88_3bb8c_j__Finalize -- MATCHED (38/38 words)
+
+> Renamed from `func_80051C84` on 2026-09-24 (tools/rename.py). Address 0x80051c84.
 
 Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`. This is its destructor
 body (dispatched through `BasicClass`'s inherited `finalize` slot chain,
@@ -7,7 +9,7 @@ body (dispatched through `BasicClass`'s inherited `finalize` slot chain,
 ## Body
 
 ```c
-void func_80051C84(Class86ED0 *self)
+void Class86F88_3bb8c_j__Finalize(Class86ED0 *self)
 {
     s32 i;
 

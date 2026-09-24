@@ -1,4 +1,6 @@
-# func_80051784 -- MATCHED (26/26 words)
+# Obj86ED0__AdvanceCountdown -- MATCHED (26/26 words)
+
+> Renamed from `func_80051784` on 2026-09-24 (tools/rename.py). Address 0x80051784.
 
 Unit: `src/class_3bb8c_j.c` (class_3bb8c_j, newly carved round 15).
 
@@ -8,9 +10,9 @@ Unit: `src/class_3bb8c_j.c` (class_3bb8c_j, newly carved round 15).
 class_3bb8c_b/c/etc (vtable `D_800866E8`). This function only touches
 offsets 0x10-0x48, all of which were previously unnamed padding in
 `Obj866E8`. Established this as a "countdown/flush" subsystem alongside
-three siblings in this same unit (`func_800517EC`, `func_80051814`,
-`func_80051858`) and two gp_rel-blocked siblings that touch the identical
-fields (`func_800518F4`, `func_80051998`).
+three siblings in this same unit (`Obj86ED0__ToggleFlag20`, `Obj86ED0__ResetCountdown`,
+`Obj86ED0__ResetAllAndFinish`) and two gp_rel-blocked siblings that touch the identical
+fields (`Obj86ED0__DispatchIndexValue`, `Obj86ED0__DispatchLookupValue`).
 
 ## Header additions (additive, `include/class_3bb8c.h`)
 
@@ -25,7 +27,7 @@ as `(self, self->unk18, count, 1)`.
 ## Body
 
 ```c
-void func_80051784(Obj866E8 *self)
+void Obj86ED0__AdvanceCountdown(Obj866E8 *self)
 {
     s32 count;
 

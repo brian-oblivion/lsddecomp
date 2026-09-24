@@ -1,13 +1,15 @@
-# func_80051E20 -- MATCHED (17/17 words)
+# Class86F88_3bb8c_j__RemoveAllChildren -- MATCHED (17/17 words)
+
+> Renamed from `func_80051E20` on 2026-09-24 (tools/rename.py). Address 0x80051e20.
 
 Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`. Full reset: clears
-both tagged caches and `unk50` (same three fields as `func_80051C74`),
+both tagged caches and `unk50` (same three fields as `Class86F88_3bb8c_j__ClearCachedRefs`),
 then chains to the inherited `BasicClass::removeAllChildren`.
 
 ## Body
 
 ```c
-void func_80051E20(Class86ED0 *self)
+void Class86F88_3bb8c_j__RemoveAllChildren(Class86ED0 *self)
 {
     self->unk34 = NULL;
     self->unk38 = NULL;

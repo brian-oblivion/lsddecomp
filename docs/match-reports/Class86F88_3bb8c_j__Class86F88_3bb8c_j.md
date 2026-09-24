@@ -1,4 +1,6 @@
-# func_80051AC8 -- MATCHED (107/107, round 73)
+# Class86F88_3bb8c_j__Class86F88_3bb8c_j -- MATCHED (107/107, round 73)
+
+> Renamed from `func_80051AC8` on 2026-09-24 (tools/rename.py). Address 0x80051ac8.
 
 > **ROUND 19 (bravo) UPDATE.** Found and fixed a genuine, INDEPENDENT
 > correctness bug in the preserved body, unrelated to the register-identity
@@ -53,7 +55,7 @@
 
 Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`. This is `Class86ED0`'s
 own constructor -- the occupant of `Class86ED0Methods::ctor` (+0x008),
-reached indirectly by `func_80051A5C`'s `New_Class86ED0`
+reached indirectly by `New_Class86F88_3bb8c_j`'s `New_Class86ED0`
 (`func_80052B60()->ctor(self, arg0, arg1)`). Identity established from
 that call site's exact signature match, not from `tools/classtable.py`
 (this vtable is local to the unit, no classtable entry exists for it).
@@ -66,7 +68,7 @@ mode flag (0 or 1), also stashed into `self->unkC`.
 1. Chain the base ctor: `Get_vtable_BasicClass()->ctor(self);` then
    `self->methods = func_80052B60();` (this really is `Class86ED0Methods
    *func_80052B60(void)` -- NOT a separate "ctor table" type: this same
-   getter is what `func_80051A5C` dereferences `->ctor` on, and here its
+   getter is what `New_Class86F88_3bb8c_j` dereferences `->ctor` on, and here its
    return is assigned DIRECTLY as `self->methods`, so both call sites
    type-check against one declared return type).
 2. Count `arg1`'s entries (walk until a NULL pointer) -> `count`.
@@ -74,7 +76,7 @@ mode flag (0 or 1), also stashed into `self->unkC`.
    `BMemPMgrAlloc`: `self->unk18` (one individually-allocated buffer per
    entry) and `self->unk1C` (a flat `s32[count]` of per-entry lengths --
    NOT individually-allocated; freed as ONE block by the already-matched
-   `func_80051C84`, which is what fixed this typing).
+   `Class86F88_3bb8c_j__Finalize`, which is what fixed this typing).
 4. If `count > 0`: `self->unk14 = 0` (running max, see below), then for
    each entry `i`: `len = func_80013348(arg1[i])` (a string-length-ish
    helper; when `arg2 == 1`, `len` is HALVED via the standard
@@ -82,7 +84,7 @@ mode flag (0 or 1), also stashed into `self->unkC`.
    `self->unk1C[i] = len`; `self->unk18[i] = BMemPMgrAlloc(len + 4)`;
    fill it via `DecodeFullWidthSjis` (arg2==1) or `strcpy` (otherwise) from
    `arg1[i]`; update `self->unk14` to the running max of `len`.
-5. `self->unkC = arg2; func_80051C74(self);` (the already-matched
+5. `self->unkC = arg2; Class86F88_3bb8c_j__ClearCachedRefs(self);` (the already-matched
    3-field reset) `; self->methods->slot40(self);`.
 
 ## Best body reached (round 19: nominal 6/107, but with a real bug fixed and
@@ -92,7 +94,7 @@ mode flag (0 or 1), also stashed into `self->unkC`.
 ```c
 #if 0
 /* stalesyms --fix 2026-09-22: func_80013348 -> strlen -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
+void Class86F88_3bb8c_j__Class86F88_3bb8c_j(Class86ED0 *self, void **arg1, s32 arg2)
 {
     void **p;
     s32 count;
@@ -134,7 +136,7 @@ void func_80051AC8(Class86ED0 *self, void **arg1, s32 arg2)
     }
 
     self->unkC = arg2;
-    func_80051C74(self);
+    Class86F88_3bb8c_j__ClearCachedRefs(self);
     self->methods->slot40(self);
 }
 #endif
@@ -199,7 +201,7 @@ nowhere close. This function's search space (7 local values needing a
 specific register rotation across ~30 live instructions) appears to be
 beyond what an unguided permuter search closes quickly, unlike the
 smaller single-residue functions in this same unit
-(`func_80051858`, `func_80052110`) where 14-5000 iterations sufficed.
+(`Obj86ED0__ResetAllAndFinish`, `Class86F88_3bb8c_j__AddChildAndSetState`) where 14-5000 iterations sufficed.
 
 **Not re-staffed without a plan beyond "try more permuter time" or "try
 every p/q aliasing permutation by hand."** A structured next step: derive
@@ -218,7 +220,7 @@ A function whose funcdiff residue is "correct total length, wrong
 registers throughout, cascading from partway through the body" is
 categorically different from an entangled multi-defect residue
 (func_8005F544's class) or a genuine one-instruction residue
-(func_80051858's class) -- it is the project's established "register
+(Obj86ED0__ResetAllAndFinish's class) -- it is the project's established "register
 saturation" pattern (`func_8003D73C`) but WITHOUT retail saturating all
 9 callee-saved registers (retail here uses only 7 of 9: s0-s6), so the
 `grep -oE 'sw +\$s[0-9]'` == 8/9 predictor does not catch it. Consider
@@ -309,4 +311,4 @@ size != the `.s`'s declared size means read the control flow first.
 **`x = (x < y) ? y : x;` on a memory lvalue emits an unconditional
 store-back of the old value** (`lw; sw; slt; beqz; sw`). The `if` form
 omits it. Tell: a load of a field immediately stored back to the same
-field. (func_80051AC8, one word, 66 -> 98/107.)
+field. (Class86F88_3bb8c_j__Class86F88_3bb8c_j, one word, 66 -> 98/107.)

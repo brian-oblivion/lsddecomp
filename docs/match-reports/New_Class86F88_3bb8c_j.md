@@ -1,20 +1,22 @@
-# func_80051A5C -- MATCHED (27/27 words)
+# New_Class86F88_3bb8c_j -- MATCHED (27/27 words)
+
+> Renamed from `func_80051A5C` on 2026-09-24 (tools/rename.py). Address 0x80051a5c.
 
 Unit: `src/class_3bb8c_j.c`. `New_Class86ED0` -- the allocator for
 `Class86ED0` (a small BasicClass-derived sibling class discovered this
-round, alloc size 0x54, vtable `D_80086ED0`/`func_80051A4C`).
+round, alloc size 0x54, vtable `D_80086ED0`/`Get_vtable_Obj86ED0`).
 
 This function ALREADY had an extern declaration in the shared
 `include/class_3bb8c.h` (class_3bb8c_f's own screening, "Address-of only
 in this unit's own screening"), with the correct signature
-`void *func_80051A5C(void *arg0, s32 arg1)` -- confirms `arg1` is `s32`
+`void *New_Class86F88_3bb8c_j(void *arg0, s32 arg1)` -- confirms `arg1` is `s32`
 (class_3bb8c_f's own call site passes a literal `1`), which fixed this
 unit's own ctor-table `+0x008` slot signature to match.
 
 ## Body
 
 ```c
-void *func_80051A5C(void *arg0, s32 arg1)
+void *New_Class86F88_3bb8c_j(void *arg0, s32 arg1)
 {
     Class86ED0 *self = BMemPMgrAlloc(0x54);
 

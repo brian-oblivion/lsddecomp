@@ -1,6 +1,8 @@
-# func_80051858 -- MATCHED (39/39 words)
+# Obj86ED0__ResetAllAndFinish -- MATCHED (39/39 words)
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Obj866E8` (see func_80051784.md for
+> Renamed from `func_80051858` on 2026-09-24 (tools/rename.py). Address 0x80051858.
+
+Unit: `src/class_3bb8c_j.c`. `self` is `Obj866E8` (see Obj86ED0__AdvanceCountdown.md for
 the class-identity evidence shared across this group). This is the "flush
 all" sibling: fires `slotA8` once per remaining slot (counting down from
 `self->unk10 - 1` to 0), then always fires `slotA4` once at the end.
@@ -8,7 +10,7 @@ all" sibling: fires `slotA8` once per remaining slot (counting down from
 ## Body
 
 ```c
-void func_80051858(Obj866E8 *self)
+void Obj86ED0__ResetAllAndFinish(Obj866E8 *self)
 {
     s32 i;
 

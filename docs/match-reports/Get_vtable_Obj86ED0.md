@@ -1,14 +1,16 @@
-# func_80051A4C -- MATCHED (4/4 words)
+# Get_vtable_Obj86ED0 -- MATCHED (4/4 words)
+
+> Renamed from `func_80051A4C` on 2026-09-24 (tools/rename.py). Address 0x80051a4c.
 
 Unit: `src/class_3bb8c_j.c`. Not `Obj866E8` -- a SEPARATE, much smaller
 sibling class discovered this round, `Class86ED0` (local to this unit; see
-the file header comment and func_80051A5C.md for the class-identity
+the file header comment and New_Class86F88_3bb8c_j.md for the class-identity
 evidence).
 
 ## Body
 
 ```c
-Class86ED0Methods *func_80051A4C(void)
+Class86ED0Methods *Get_vtable_Obj86ED0(void)
 {
     return &D_80086ED0;
 }

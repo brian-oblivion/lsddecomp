@@ -1,11 +1,13 @@
-# func_80051E64 -- MATCHED (44/44 words)
+# Class86F88_3bb8c_j__NotifyChild -- MATCHED (44/44 words)
+
+> Renamed from `func_80051E64` on 2026-09-24 (tools/rename.py). Address 0x80051e64.
 
 Unit: `src/class_3bb8c_j.c`. `self` is `Class86ED0`.
 
 ## Body
 
 ```c
-void func_80051E64(Class86ED0 *self, void *arg1, s32 arg2)
+void Class86F88_3bb8c_j__NotifyChild(Class86ED0 *self, void *arg1, s32 arg2)
 {
     s32 tag;
 
@@ -23,6 +25,6 @@ Calls the inherited `BasicClass::slot38` (already declared in
 `include/class_3bb8c.h`'s `BasicMethods866E8F`, established by
 class_3bb8c_f) unconditionally first, then dispatches through Class86ED0's
 OWN vtable (`slot5C`/`slot58`) based on the same tag-nibble convention as
-`func_80051D1C`/`func_80051DA0`. Established `Class86ED0Methods::slot5C`
+`Class86F88_3bb8c_j__AddChild`/`Class86F88_3bb8c_j__RemoveChild`. Established `Class86ED0Methods::slot5C`
 (+0x05C, "tag==2") and `slot58` (+0x058, "tag==5") from this function.
 Matched first try.
