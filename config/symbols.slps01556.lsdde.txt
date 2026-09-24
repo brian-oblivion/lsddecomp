@@ -2129,3 +2129,5 @@ Class6D940__Class6D940 = 0x8002C18C; // type:func
 Class6D940__Destroy = 0x8002C200; // type:func
 Class6D940__SetFlag = 0x8002C238; // type:func
 Class6D940__ResolveEntry = 0x8002C278; // type:func
+VabDriver__VabDriver = 0x8002C3C0; // type:func
+VabDriver__Destroy = 0x8002C3C8; // type:func

@@ -29,7 +29,7 @@
  * Screened 17/20 clean on the three-grep blocker census -- the highest of
  * any window in this monolith -- but that number overstates its value: 9 of
  * the 20 are 4-6 word leaves, and splat matched five of those itself as
- * empty `jr $ra; nop` bodies (func_8002C3C0/C3C8/C3F0/C3F8/C400 below).
+ * empty `jr $ra; nop` bodies (VabDriver__VabDriver/C3C8/C3F0/C3F8/C400 below).
  * Those five count as `matched` in tools/progress.py without having been
  * work, which is exactly the caveat CLAUDE.md attaches to that column.
  *
@@ -274,10 +274,10 @@ s32 func_8002C3B8(void)
     return 0;
 }
 
-void func_8002C3C0(void) {
+void VabDriver__VabDriver(void) {
 }
 
-void func_8002C3C8(void) {
+void VabDriver__Destroy(void) {
 }
 
 void func_8002C3D0(void)

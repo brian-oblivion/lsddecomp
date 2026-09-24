@@ -28,7 +28,7 @@
  * accessor's return -- so `gVabDriverMethods` genuinely is the generic
  * driver-interface base class this backend's stream object derives from, not
  * an unrelated table that happens to live in the same file.  Its own
- * ctor/dtor (`func_8002C3C0`/`func_8002C3C8`, `code_179d8_d.c`, not this
+ * ctor/dtor (`VabDriver__VabDriver`/`VabDriver__Destroy`, `code_179d8_d.c`, not this
  * unit) and its five extra slots this unit defines
  * (`func_8002C408`/`410`/`418`/`420`/`428`/`430`, kept unnamed -- see their
  * own reports) are all empty no-ops: this backend needs no extra generic
@@ -87,7 +87,7 @@ typedef struct VabStreamObj VabStreamObj;
 /* gVabDriverMethods's own methods table -- the generic driver-interface base
  * class VabStreamObj chains its own ctor/close through (see the unit header
  * comment).  Its own ctor/dtor slots (+0x08/+0x0C) are code_179d8_d.c's
- * func_8002C3C0/func_8002C3C8, not this unit's to type; only the slots this
+ * VabDriver__VabDriver/VabDriver__Destroy, not this unit's to type; only the slots this
  * unit itself defines are named here. */
 typedef struct VabDriverMethods {
     u8 pad000[0x054];
