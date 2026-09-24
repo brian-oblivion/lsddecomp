@@ -154,7 +154,7 @@ struct Vec3_3ac78 {
 
 /*
  * Class866E8 -- constructed by New_Class866E8 (New_Class866E8: allocates
- * 0x1E8 bytes, gets the vtable via func_8004D244, calls ctor slot +0x008).
+ * 0x1E8 bytes, gets the vtable via GetClass866E8Methods, calls ctor slot +0x008).
  * Vtable is D_800866E8 (80 slots, header 0x114), resolved with
  * tools/classtable.py D_800866E8. Ctor is Class866E8__Class866E8 (177 words,
  * MATCHED) and the finalize slot (+0x00C) is Class866E8__Finalize (113 words, MATCHED round 19 --
@@ -278,7 +278,7 @@ struct Class866E8 {
 
 /* Get-vtable helper for Class866E8. Still raw asm: it lives in class_3bb8c,
  * an uncarved monolithic segment, not yet a carved src/ unit anywhere. */
-extern Class866E8Methods *func_8004D244(void);
+extern Class866E8Methods *GetClass866E8Methods(void);
 
 /* The generic allocator, established already in DreamSys.h/Entity.h/etc. */
 extern void *BMemPMgrAlloc(s32 size);

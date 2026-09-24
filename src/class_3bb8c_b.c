@@ -428,13 +428,13 @@ merge:
 }
 
 /* Forward declaration: defined later in this file (after Class866E8__AdvanceRateCountdown in
- * ROM-address order), but passed to func_8004D140 as a function-pointer
+ * ROM-address order), but passed to Class866E8__ForEachElem as a function-pointer
  * argument before its own definition appears. */
-void func_8004D0D0(Obj866E8 *self, EntryChildObj *item);
+void Class866E8__ApplyRateToChild(Obj866E8 *self, EntryChildObj *item);
 
 void Class866E8__AdvanceRateCountdown(Obj866E8 *self) {
     if (self->unk1E0 > 0) {
-        func_8004D140(self, func_8004D0D0, 0);
+        Class866E8__ForEachElem(self, Class866E8__ApplyRateToChild, 0);
         self->unk1E0 -= 1;
         if (self->unk1E0 == 0) {
             self->unk1E0 = -1;
@@ -443,26 +443,26 @@ void Class866E8__AdvanceRateCountdown(Obj866E8 *self) {
 }
 
 /* Forward declaration: defined later in this file (after Class866E8__FlushRateLatch in
- * ROM-address order), but passed to func_8004D140 as a function-pointer
+ * ROM-address order), but passed to Class866E8__ForEachElem as a function-pointer
  * argument before its own definition appears. */
-void func_8004D108(Obj866E8 *self, EntryChildObj *item);
+void Class866E8__ResetChildRate(Obj866E8 *self, EntryChildObj *item);
 
 void Class866E8__FlushRateLatch(Obj866E8 *self) {
     if (self->unk1E0 != 0) {
-        func_8004D140(self, func_8004D108, 0);
+        Class866E8__ForEachElem(self, Class866E8__ResetChildRate, 0);
         self->unk1E0 = 0;
     }
 }
 
-void func_8004D0D0(Obj866E8 *self, EntryChildObj *item) {
+void Class866E8__ApplyRateToChild(Obj866E8 *self, EntryChildObj *item) {
     item->methods->slot48(item, 0, self->unk1E4);
 }
 
-void func_8004D108(Obj866E8 *self, EntryChildObj *item) {
+void Class866E8__ResetChildRate(Obj866E8 *self, EntryChildObj *item) {
     item->methods->slot48(item, 1, D_800869CC);
 }
 
-void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item)) {
+void Class866E8__ForEachElem(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item)) {
     s32 i;
     Elem *e;
 
@@ -471,11 +471,11 @@ void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *i
         if (arg2 != 0) {
             arg2(self, e);
         }
-        func_8004D1D0(self, arg1, e);
+        Class866E8__ForEachEntryChild(self, arg1, e);
     }
 }
 
-void func_8004D1D0(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
+void Class866E8__ForEachEntryChild(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
     EntryChildObj **p;
     EntryChildObj **end;
 
@@ -486,6 +486,6 @@ void func_8004D1D0(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildOb
     }
 }
 
-Obj866E8Methods *func_8004D244(void) {
+Obj866E8Methods *GetClass866E8Methods(void) {
     return &D_800866E8;
 }

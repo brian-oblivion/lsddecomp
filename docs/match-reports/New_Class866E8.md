@@ -24,7 +24,7 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
 
     self = BMemPMgrAlloc(0x1E8);
     if (self != NULL) {
-        func_8004D244()->ctor(self, arg1, arg2);
+        GetClass866E8Methods()->ctor(self, arg1, arg2);
         return self;
     }
     return NULL;

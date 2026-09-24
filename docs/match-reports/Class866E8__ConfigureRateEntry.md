@@ -169,11 +169,11 @@ byte-exact first half, and useful for whoever picks this back up.
 - `D_8008699C`, `D_800869A8`, `D_800869B4`, `D_800869C0` — four static
   instances of `EntryDesc866E8`, addresses confirmed 0xC apart. The
   existing `D_800869CC` (`extern s32 D_800869CC[3]`, declared by an
-  earlier round from `func_8004D108`) is a plausible fifth entry of the
+  earlier round from `Class866E8__ResetChildRate`) is a plausible fifth entry of the
   same table by the same stride, but is left independently declared —
   nothing in this unit reaches it through the `EntryDesc866E8` type.
 - **`Obj866E8::unk1E4` retyped** from `void *` to `EntryDesc866E8 *`.
-  Only reference elsewhere in this unit is `func_8004D0D0`, which
+  Only reference elsewhere in this unit is `Class866E8__ApplyRateToChild`, which
   forwards it opaquely to a `void *` parameter (`EntryChildObjMethods::
   slot48`'s `arg2`) — implicit pointer-to-`void *` conversion, so this
   does not disturb that already-matched function's bytes. Flagging per

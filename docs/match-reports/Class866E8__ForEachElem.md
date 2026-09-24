@@ -1,8 +1,10 @@
-# func_8004D140 — MATCHED (36/36 words)
+# Class866E8__ForEachElem — MATCHED (36/36 words)
+
+> Renamed from `func_8004D140` on 2026-09-24 (tools/rename.py). Address 0x8004d140.
 
 Iterates `self->arr[0..6]`, invoking an optional per-element callback
 (`arg2`, called `(self, &arr[i])` when non-NULL) and then always forwarding
-`(self, arg1, &arr[i])` to `func_8004D1D0`. Already had a prototype and a
+`(self, arg1, &arr[i])` to `Class866E8__ForEachEntryChild`. Already had a prototype and a
 two-hop derivation in `include/class_3bb8c.h` from a previous round
 (established from `Class866E8__AdvanceRateCountdown`/`Class866E8__FlushRateLatch`'s call sites); this round
 supplied the body.
@@ -14,7 +16,7 @@ repeated `self->arr[i]` field access.
 ## Final C
 
 ```c
-void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item)) {
+void Class866E8__ForEachElem(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item)) {
     s32 i;
     Elem *e;
 
@@ -23,7 +25,7 @@ void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *i
         if (arg2 != 0) {
             arg2(self, e);
         }
-        func_8004D1D0(self, arg1, e);
+        Class866E8__ForEachEntryChild(self, arg1, e);
     }
 }
 ```

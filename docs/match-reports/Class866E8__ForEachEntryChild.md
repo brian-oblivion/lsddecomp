@@ -1,4 +1,6 @@
-# func_8004D1D0 — MATCHED 29/29
+# Class866E8__ForEachEntryChild — MATCHED 29/29
+
+> Renamed from `func_8004D1D0` on 2026-09-24 (tools/rename.py). Address 0x8004d1d0.
 
 **Status: MATCHED**, whole-image SHA1 green. Closed by the head in round 9
 (2026-09-02), same round the runner stalled it.
@@ -6,13 +8,13 @@
 Walks `item->unk10[]` (an array of `EntryChildObj *`, `0x668` bytes /
 `0x19A` elements from the base pointer read at `item->unk10`), calling
 `callback(self, element)` for each. Prototype came from a previous round
-(traced through `func_8004D0D0`/`func_8004D108` two hops via
-`func_8004D140`); this round supplied the body.
+(traced through `Class866E8__ApplyRateToChild`/`Class866E8__ResetChildRate` two hops via
+`Class866E8__ForEachElem`); this round supplied the body.
 
 ## RESOLUTION — mention the field twice, bound first
 
 ```c
-void func_8004D1D0(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
+void Class866E8__ForEachEntryChild(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
     EntryChildObj **p;
     EntryChildObj **end;
 
@@ -88,7 +90,7 @@ Per the documented guidance, did not burn further attempts chasing this
 
 ```c
 #if 0
-void func_8004D1D0(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
+void Class866E8__ForEachEntryChild(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item) {
     EntryChildObj **p;
     EntryChildObj **end;
 

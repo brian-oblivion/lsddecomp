@@ -9,7 +9,7 @@
 Get-vtable helper for a small sibling class: returns `&gClass869D8Methods`, the
 vtable this unit calls `Class869D8Methods`. Same shape as the game's other
 `func_80xxxxxx()->ctor(...)` vtable getters (e.g. class_3ac78.c's
-`GetClass86668Methods`/`func_8004D244`).
+`GetClass86668Methods`/`GetClass866E8Methods`).
 
 ## The C
 

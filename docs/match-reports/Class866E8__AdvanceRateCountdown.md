@@ -16,9 +16,9 @@ sw    $ra, 0x14($sp)
 lw    $v0, 0x1E0($s0)        ; v0 = self->unk1E0
 blez  $v0, .skip
  nop
-lui   $a1, %hi(func_8004D0D0)
-addiu $a1, $a1, %lo(func_8004D0D0)
-jal   func_8004D140
+lui   $a1, %hi(Class866E8__ApplyRateToChild)
+addiu $a1, $a1, %lo(Class866E8__ApplyRateToChild)
+jal   Class866E8__ForEachElem
  move $a2, $zero
 lw    $v0, 0x1E0($s0)         ; reload
 addiu $v0, $v0, -1
@@ -41,7 +41,7 @@ new value unconditionally, and the branch-not-taken path (decrement hit
 ```c
 void Class866E8__AdvanceRateCountdown(Obj866E8 *self) {
     if (self->unk1E0 > 0) {
-        func_8004D140(self, func_8004D0D0, 0);
+        Class866E8__ForEachElem(self, Class866E8__ApplyRateToChild, 0);
         self->unk1E0 -= 1;
         if (self->unk1E0 == 0) {
             self->unk1E0 = -1;
@@ -50,9 +50,9 @@ void Class866E8__AdvanceRateCountdown(Obj866E8 *self) {
 }
 ```
 
-`func_8004D0D0` is defined later in this file (ROM order), so it needs a
+`Class866E8__ApplyRateToChild` is defined later in this file (ROM order), so it needs a
 forward declaration here — same pattern already used for
-`func_8004D108` in `Class866E8__FlushRateLatch`.
+`Class866E8__ResetChildRate` in `Class866E8__FlushRateLatch`.
 
 ## New struct knowledge
 

@@ -36,7 +36,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     s32 buf[3];
 
     func_800428E4()->ctor(self);
-    self->methods = func_8004D244();
+    self->methods = GetClass866E8Methods();
 
     if (arg1 != NULL) {
         self->unk54 = *arg1;

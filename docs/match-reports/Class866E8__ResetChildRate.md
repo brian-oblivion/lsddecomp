@@ -1,7 +1,9 @@
-# func_8004D108 — MATCHED (14/14 words)
+# Class866E8__ResetChildRate — MATCHED (14/14 words)
 
-Sibling of `func_8004D0D0` (see that report for how the true call chain —
-`func_8004D140` forwards to `func_8004D1D0`, which does the actual
+> Renamed from `func_8004D108` on 2026-09-24 (tools/rename.py). Address 0x8004d108.
+
+Sibling of `Class866E8__ApplyRateToChild` (see that report for how the true call chain —
+`Class866E8__ForEachElem` forwards to `Class866E8__ForEachEntryChild`, which does the actual
 `jalr` — was resolved). Same `Unk10ChildMethods_3bb8c_b::slot48` slot,
 different literal arguments.
 
@@ -23,17 +25,17 @@ jalr  $v0
 Notable: the original first parameter (`self`) is never referenced after
 the top-of-function register shuffle overwrites `a0` with `item` — this
 function genuinely ignores its own `self` argument, unlike its sibling
-`func_8004D0D0` which uses it (`self->unk1E4`). Confirmed real, not a
+`Class866E8__ApplyRateToChild` which uses it (`self->unk1E4`). Confirmed real, not a
 missing-parameter bug, by cross-checking the only caller
 (`Class866E8__FlushRateLatch`, which passes this function's address to
-`func_8004D140` exactly like `Class866E8__AdvanceRateCountdown` passes `func_8004D0D0`'s —
+`Class866E8__ForEachElem` exactly like `Class866E8__AdvanceRateCountdown` passes `Class866E8__ApplyRateToChild`'s —
 same call shape, same two-parameter signature required by the eventual
-`func_8004D1D0` dispatcher).
+`Class866E8__ForEachEntryChild` dispatcher).
 
 ## Final C
 
 ```c
-void func_8004D108(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
+void Class866E8__ResetChildRate(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
     item->methods->slot48(item, 1, D_800869CC);
 }
 ```
@@ -49,4 +51,4 @@ void func_8004D108(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
 
 ### Proposed learning
 
-None new beyond `func_8004D0D0`'s (same call-chain-tracing lesson).
+None new beyond `Class866E8__ApplyRateToChild`'s (same call-chain-tracing lesson).

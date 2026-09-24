@@ -52,7 +52,7 @@ Class866E8 *New_Class866E8(s32 arg1, s32 arg2)
 
     self = BMemPMgrAlloc(0x1E8);
     if (self != NULL) {
-        func_8004D244()->ctor(self, arg1, arg2);
+        GetClass866E8Methods()->ctor(self, arg1, arg2);
         return self;
     }
     return NULL;
@@ -88,7 +88,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     s32 buf[3];
 
     func_800428E4()->ctor(self);
-    self->methods = func_8004D244();
+    self->methods = GetClass866E8Methods();
 
     if (arg1 != NULL) {
         self->origin = *arg1;

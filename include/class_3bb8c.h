@@ -475,7 +475,7 @@ struct ElemTarget {
  * self+0xEC's array element, one of Obj866E8::arr[7]. Established from
  * func_8004BCE0 (+0x000), func_8004C434 (+0x004), and this round's
  * func_8004C0AC (+0x00C indirectly via unk4, +0x010) and func_8004BD14
- * (+0x000, +0x004). class_3bb8c_b's func_8004D1D0 independently reached
+ * (+0x000, +0x004). class_3bb8c_b's Class866E8__ForEachEntryChild independently reached
  * the same +0x010 pointer array, walked over the same 0x668 raw bytes,
  * and Class866E8__FindElemIndexByUnk30/Class866E8__FindElemIndexByUnk32 the same +0x004 target.
  */
@@ -506,7 +506,7 @@ struct Elem {
  * views are why the offsets below have unrelated provenance:
  *  - class_3bb8c (func_8004C0AC) reached the DATA: it ORs a flag bit into
  *    +0x010 and zeroes +0x018 and +0x020.
- *  - class_3bb8c_b (func_8004D0D0/func_8004D108, via func_8004D1D0)
+ *  - class_3bb8c_b (Class866E8__ApplyRateToChild/Class866E8__ResetChildRate, via Class866E8__ForEachEntryChild)
  *    reached the METHOD TABLE at +0x000 and the one slot those two
  *    dispatch through.
  * They agree on the object's identity (both reach it as Elem::unk10[i]),
@@ -517,13 +517,13 @@ struct Elem {
 
 typedef struct EntryChildObjMethods {
     u8 pad00[0x48];
-    /* Called by func_8004D0D0 (arg2 = the parent's own unk1E4) and
-     * func_8004D108 (arg2 = &D_800869CC). Return value unused by both. */
+    /* Called by Class866E8__ApplyRateToChild (arg2 = the parent's own unk1E4) and
+     * Class866E8__ResetChildRate (arg2 = &D_800869CC). Return value unused by both. */
     void (*slot48)(EntryChildObj *self, s32 arg1, void *arg2); /* +0x048 */
 } EntryChildObjMethods;
 
 struct EntryChildObj {
-    EntryChildObjMethods *methods;  /* +0x000, func_8004D0D0/func_8004D108 */
+    EntryChildObjMethods *methods;  /* +0x000, Class866E8__ApplyRateToChild/Class866E8__ResetChildRate */
     u8 pad04[0x10 - 0x04];
     u32 unk10;                      /* +0x010, func_8004C0AC: OR'd with 0x80000000; Class866E8__SetFootprintCellFlag: bit31 set/cleared per its own arg1 */
     /* func_8004BE54: a GsCOORDINATE2-shaped per-entry GPU link record --
@@ -642,7 +642,7 @@ typedef struct Bounds866E8_3bb8c_b {
  * apart), selected by Class866E8__ConfigureRateEntry from (rate > 0, flag != 0) and never
  * dereferenced past +0x006. The same 0xC stride lines up with
  * D_800869CC (declared `extern s32 D_800869CC[3]` below, by
- * func_8004D108) as a plausible fifth entry of the same table, but
+ * Class866E8__ResetChildRate) as a plausible fifth entry of the same table, but
  * nothing in this unit reaches that entry through THIS pointer type, so
  * the two stay independently declared rather than unified into one
  * array of unproven length.
@@ -754,7 +754,7 @@ struct Obj866E8 {
     GridSlot866E8 slots8C[4];      /* +0x08C, Class866E8__SetFootprintCellFlag (reads); Class866E8__InitFootprintSlot (writes, via the coarser Unk54Struct view) -- exactly fills the gap up to the existing unkBC field, so this is a hard capacity, not a guess */
     Descriptor10 unkBC;            /* +0x0BC, func_8004B38C: whole-struct copy from its arg3 */
     u8 padC6[0xEC - 0xC6];
-    Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/Class866E8__FindElemIndexByUnk32/Class866E8__FindElemIndexByUnk30/func_8004BD14/func_8004D1D0 */
+    Elem arr[7];                   /* +0x0EC, func_8004BCE0/func_8004C434/Class866E8__FindElemIndexByUnk32/Class866E8__FindElemIndexByUnk30/func_8004BD14/Class866E8__ForEachEntryChild */
     s32 unk1B0;                    /* +0x1B0, func_8004BD14 */
     u16 unk1B4;                    /* +0x1B4, func_8004BD14 */
     u8 pad1B6[0x1B8 - 0x1B6];
@@ -765,13 +765,13 @@ struct Obj866E8 {
     u8 pad1D0[0x1DC - 0x1D0];
     Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, Class866E8__SetBounds (stores raw)/IsPointOutOfBounds (dereferences) */
     s32 unk1E0;                    /* +0x1E0, Class866E8__AdvanceRateCountdown/Class866E8__FlushRateLatch: a countdown gate */
-    EntryDesc866E8 *unk1E4;        /* +0x1E4, func_8004D0D0 (forwarded opaquely)/Class866E8__ConfigureRateEntry (selects one of four statics and reads +0x6) */
+    EntryDesc866E8 *unk1E4;        /* +0x1E4, Class866E8__ApplyRateToChild (forwarded opaquely)/Class866E8__ConfigureRateEntry (selects one of four statics and reads +0x6) */
     u8 pad1E8[0x2F4 - 0x1E8];
     s32 unk2F4;                    /* +0x2F4, CheckObj866E8CountFlag: zero-checked when unkC > 9999999 */
 };
 
 /* Get-vtable helper, same shape and same real function as
- * class_3ac78.h's `func_8004D244` (independent view: this unit names the
+ * class_3ac78.h's `GetClass866E8Methods` (independent view: this unit names the
  * return type Obj866E8Methods, not Class866E8Methods). It now has a real
  * body in this unit (class_3bb8c_b); class_3ac78 still calls it via `jal`
  * as a raw external. */
@@ -780,23 +780,23 @@ extern Obj866E8Methods D_800866E8;
 /* Still raw asm in this unit (not this round's target): walks
  * item->unk10[] (an array of EntryChildObj*, up to +0x668 bytes
  * from the base read at item->unk10), calling callback(self, element) for
- * each. Derived to resolve func_8004D0D0/func_8004D108's true call site --
+ * each. Derived to resolve Class866E8__ApplyRateToChild/Class866E8__ResetChildRate's true call site --
  * see those functions' reports. Not called by name anywhere in this
- * unit's own C (only from within func_8004D140's still-raw body), so this
+ * unit's own C (only from within Class866E8__ForEachElem's still-raw body), so this
  * prototype is documentation, not load-bearing. */
-extern void func_8004D1D0(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item);
+extern void Class866E8__ForEachEntryChild(Obj866E8 *self, void (*callback)(Obj866E8 *self, EntryChildObj *item), Elem *item);
 
 /* Still raw asm in this unit (not this round's target): iterates
  * self->arr, invoking an optional per-element callback (arg2, called
  * (self, &arr[i]) when non-NULL) and then always forwarding (self, arg1,
- * &arr[i]) to func_8004D1D0. Class866E8__AdvanceRateCountdown/Class866E8__FlushRateLatch both call it
+ * &arr[i]) to Class866E8__ForEachEntryChild. Class866E8__AdvanceRateCountdown/Class866E8__FlushRateLatch both call it
  * with arg2 = NULL (no per-element callback), passing a function POINTER
  * as arg1 instead -- that pointer is consumed further down in
- * func_8004D1D0, not by this function itself. */
-extern void func_8004D140(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item));
+ * Class866E8__ForEachEntryChild, not by this function itself. */
+extern void Class866E8__ForEachElem(Obj866E8 *self, void (*arg1)(Obj866E8 *self, EntryChildObj *item), void (*arg2)(Obj866E8 *self, Elem *item));
 
 /* 3-word (12-byte) data block, address-of only -- passed to
- * EntryChildObjMethods::slot48 as an opaque arg2 by func_8004D108.
+ * EntryChildObjMethods::slot48 as an opaque arg2 by Class866E8__ResetChildRate.
  * Never dereferenced in this unit, so left untyped in size only. */
 extern s32 D_800869CC[3];
 
