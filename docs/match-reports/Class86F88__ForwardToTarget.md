@@ -22,7 +22,7 @@ void Class86F88__ForwardToTarget(Class86F88 *self, s32 arg1)
 
 `self->unk3C` is another instance of this same class (`Class86F88`) --
 this function forwards to that OTHER instance's own `slot80` (which this
-unit's own occupant, `func_80052498`, does not itself read past `self`;
+unit's own occupant, `Class86F88__ScrollLeft`, does not itself read past `self`;
 the 3-argument shape here comes from this call site, per the project's
 established per-call-site-arity convention, not from the occupant's body).
 `arg1` is `Class86F88__ForwardToTarget`'s own second parameter, forwarded verbatim and

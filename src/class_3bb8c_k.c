@@ -211,7 +211,7 @@ void Class86F88__ScrollRight(Class86F88 *self)
     methods->slot94(self, self->unk20, count, self->unk28, 1);
 }
 
-void func_80052498(Class86F88 *self)
+void Class86F88__ScrollLeft(Class86F88 *self)
 {
     s32 count;
 
