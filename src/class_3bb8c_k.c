@@ -191,7 +191,7 @@ void Class86F88__ForwardToTarget(Class86F88 *self, s32 arg1)
     }
 }
 
-void func_80052430(Class86F88 *self)
+void Class86F88__ScrollRight(Class86F88 *self)
 {
     Class86F88Methods *methods;
     s32 tmp;

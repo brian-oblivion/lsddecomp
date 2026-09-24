@@ -2011,3 +2011,4 @@ Class86F88__SetState = 0x800521D4; // type:func
 Class86F88__TickClosing = 0x8005227C; // type:func
 Class86F88__HandleInputCode = 0x800522DC; // type:func
 Class86F88__ForwardToTarget = 0x800523F0; // type:func
+Class86F88__ScrollRight = 0x80052430; // type:func

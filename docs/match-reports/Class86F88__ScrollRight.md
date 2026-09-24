@@ -1,7 +1,9 @@
-# func_80052430 -- MATCH
+# Class86F88__ScrollRight -- MATCH
+
+> Renamed from `func_80052430` on 2026-09-24 (tools/rename.py). Address 0x80052430.
 
 Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py func_80052430`: 26/26 words match.
+SHA1 matches retail. `funcdiff.py Class86F88__ScrollRight`: 26/26 words match.
 
 This is vtable slot `+0x07C` of `D_80086F88` (not declared in
 `Class86F88Methods` since nothing in this unit dispatches through it).
@@ -9,7 +11,7 @@ This is vtable slot `+0x07C` of `D_80086F88` (not declared in
 ## Source
 
 ```c
-void func_80052430(Class86F88 *self)
+void Class86F88__ScrollRight(Class86F88 *self)
 {
     Class86F88Methods *methods;
     s32 tmp;
