@@ -27,12 +27,12 @@ void *new_class_6d940(s32 arg1)
 }
 ```
 
-This is the EXACT same shape as `class_3bb8c_k`'s `func_80052B70`
+This is the EXACT same shape as `class_3bb8c_k`'s `New_ObjM`
 (matched earlier this round, same runner) -- success path's `return self;`
 inside the `if`-body, failure path's `return NULL;` trailing and
 unconditional. Reused directly rather than re-derived, and it matched on
 the first attempt: further confirmation of the proposed learning in
-`func_80052B70`'s own report (GCC 2.6.3 -O2 folds only THAT shape into a
+`New_ObjM`'s own report (GCC 2.6.3 -O2 folds only THAT shape into a
 single branch with the failure value in the delay slot, no extra jump).
 
 Despite the "New_X + ctor-dispatch-through-a-table" shape being identical

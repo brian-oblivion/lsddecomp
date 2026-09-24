@@ -8,7 +8,7 @@ Unit `src/class_3bb8c_k.c`. Round 26, runner delta.
 
 An event/code dispatcher for this unit's own local view of method table
 `D_80087034` (`Obj87034_3bb8c_k` / `Class87034Methods_3bb8c_k`, both
-already declared earlier in this same file for `func_80052B70`/
+already declared earlier in this same file for `New_ObjM`/
 `func_80052C10`/`Class86F88__SetState`/`Class86F88__TickClosing`). Owns `jtbl_800116F4`, a
 sparse 22-entry jump table for codes `4..25`, six of which have real
 handlers and the rest fall through doing nothing:

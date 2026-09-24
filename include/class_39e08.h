@@ -177,7 +177,7 @@ typedef struct SubObjB {
     SubObjBMethods *methods;
 } SubObjB;
 
-/* Opaque view of whatever object func_80052B70 (uncarved, unit class_3bb8c)
+/* Opaque view of whatever object New_ObjM (uncarved, unit class_3bb8c)
  * returns and stores at Obj865C8::unk4C (used only by Obj865C8__EnterState2): same
  * "vtable at offset 0, only the one dispatched slot named" policy as
  * SubObjA/SubObjB above. */
@@ -327,14 +327,14 @@ struct Obj865C8 {
      * Obj865C8__AdvanceState/Obj865C8__OnTag2Notify. */
     s32 state;                     /* +0x03C, Obj865C8__ResetState */
     /* Retyped from `s32` (Obj865C8__EnterState2's own usage only ever forwards
-     * these as opaque register values into func_80052B70, never
+     * these as opaque register values into New_ObjM, never
      * dereferencing them): Obj865C8__Dtor dereferences all three directly
      * as `SubObjG *` (`self->unkNN->methods->slot4(self->unkNN)`, result
      * discarded). Obj865C8__EnterState2's call site got an explicit `(s32)` cast. */
-    SubObjG *unk40;                /* +0x040, Obj865C8__EnterState2 (2nd arg to func_80052B70), Obj865C8__Dtor */
-    SubObjG *unk44;                /* +0x044, Obj865C8__EnterState2 (3rd arg to func_80052B70), Obj865C8__Dtor */
-    SubObjG *unk48;                /* +0x048, Obj865C8__EnterState2 (4th arg to func_80052B70), Obj865C8__Dtor */
-    Obj4C *unk4C;                 /* +0x04C, Obj865C8__EnterState2 -- result of func_80052B70 */
+    SubObjG *unk40;                /* +0x040, Obj865C8__EnterState2 (2nd arg to New_ObjM), Obj865C8__Dtor */
+    SubObjG *unk44;                /* +0x044, Obj865C8__EnterState2 (3rd arg to New_ObjM), Obj865C8__Dtor */
+    SubObjG *unk48;                /* +0x048, Obj865C8__EnterState2 (4th arg to New_ObjM), Obj865C8__Dtor */
+    Obj4C *unk4C;                 /* +0x04C, Obj865C8__EnterState2 -- result of New_ObjM */
 };
 
 /* Base class table shared by D_800865C8 and gClass86668Methods (resolved with
@@ -371,7 +371,7 @@ extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);
  * cares about its signature; `a0`'s type is inherited from whatever the
  * caller actually passes (this unit's own `SubObjB *`), the remaining
  * scalar args are untyped beyond their register width. */
-extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
+extern Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 /* A sibling class (gClass86668Methods, 28 slots) that overrides several of
  * D_800865C8's slots (+0x008, +0x00C, +0x040, +0x044, +0x048) while sharing

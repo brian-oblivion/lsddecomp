@@ -47,27 +47,27 @@
  * Obj87034_3bb8c_l/Obj87034Methods_3bb8c_l (see include/class_3bb8c.h):
  * that unit reaches slots 0x004/0x010/0x014/0x048/0x074/0x07C/0x080/0x084/
  * 0x088/0x08C/0x0C0/0x0C4/0x0C8/0x0D0/0x0D4; this unit's own two functions
- * (func_80052B70, the New_X allocator, and func_80052C10, its ctor target)
+ * (New_ObjM, the New_X allocator, and func_80052C10, its ctor target)
  * reach only +0x008 (ctor) and +0x040 (a post-construct hook dispatched by
  * func_80052C10 itself). Kept LOCAL to this unit (not added to either
  * shared header) per the project's multiple-independent-local-views
  * convention and this round's header-contention rule -- echo is live on
  * class_3bb8c_l's own view of the SAME table this round.
  *
- * func_80052B70 itself is declared with a NARROWER opaque return type,
+ * New_ObjM itself is declared with a NARROWER opaque return type,
  * `Obj4C *`, by the pre-existing prototype in include/class_39e08.h (that
  * unit's own independent view, established from Obj865C8__EnterState2's call
- * site) -- this file includes class_39e08.h, so func_80052B70's definition
+ * site) -- this file includes class_39e08.h, so New_ObjM's definition
  * below must match that prototype exactly (return type and first-argument
  * type) or the two conflict. The richer view below is used only inside
- * func_80052B70/func_80052C10's own bodies.
+ * New_ObjM/func_80052C10's own bodies.
  */
 typedef struct Class87034Methods_3bb8c_k Class87034Methods_3bb8c_k;
 typedef struct Obj87034_3bb8c_k Obj87034_3bb8c_k;
 
 struct Class87034Methods_3bb8c_k {
     u8 pad000[0x008];
-    /* +0x008, func_80052B70's own dispatch (New_X's ctor call). */
+    /* +0x008, New_ObjM's own dispatch (New_X's ctor call). */
     void (*ctor)(void *self, SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
     u8 pad00C[0x040 - 0x00C];
     /* +0x040, func_80052C10's own dispatch, right after filling self's
@@ -470,7 +470,7 @@ Class86F88Methods *GetClass86F88Methods(void)
     return &D_80086F88;
 }
 
-Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
+Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
     Obj4C *self;
     Class87034Methods_3bb8c_k *methods;

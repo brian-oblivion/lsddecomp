@@ -1,4 +1,6 @@
-# func_80052B70
+# New_ObjM
+
+> Renamed from `func_80052B70` on 2026-09-24 (tools/rename.py). Address 0x80052b70.
 
 **Unit:** class_3bb8c_k · **Size:** 40 instructions (0xA0 bytes) ·
 **Status: MATCHED 40/40**, whole-image SHA1 green.
@@ -22,7 +24,7 @@ function already has a pre-existing prototype in `include/class_39e08.h`
 into `Obj865C8::unk4C`):
 
 ```c
-extern Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
+extern Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 ```
 
 `class_3bb8c_k.c` includes `class_39e08.h`, so this function's definition
@@ -42,7 +44,7 @@ despite being semantically identical.
 Final, byte-exact form:
 
 ```c
-Obj4C *func_80052B70(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
+Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
     Obj4C *self;
     Class87034Methods_3bb8c_k *methods;
@@ -126,5 +128,5 @@ FAILURE path's `return NULL;` as the trailing unconditional statement (not
 an early-return guard clause, and not a single variable shared across both
 paths) -- this is the layout GCC 2.6.3 -O2 folds into a single branch with
 the failure value in the delay slot and no extra jump. Confirmed once, on
-`func_80052B70`; worth checking against future instances of this same
+`New_ObjM`; worth checking against future instances of this same
 project-wide `New_X` allocator shape before assuming it generalizes.
