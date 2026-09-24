@@ -37,7 +37,7 @@ caller:
   its second confirmed caller, same signature.
 - `this->methods->slot130(this)` and `this->methods->slot30(this, 0xA)` --
   `EntityMethods::slot130`/`slot30` were known from `Entity__StopSoundCue` /
-  `Entity__SetUnkF4`+`Entity__NotifyIfTargetInRange` respectively; this adds a third/second
+  `Entity__SetTargetReached`+`Entity__NotifyIfTargetInRange` respectively; this adds a third/second
   caller with no new signature information.
 
 The `mult`/`mfhi`/`sra`-`subu` sign-fix chain (magic constant `0x66666667`,

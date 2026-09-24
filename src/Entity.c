@@ -272,7 +272,7 @@ void Entity__Deactivate(Entity *this) {
     this->active = 0;
 }
 
-void Entity__SetUnkF4(Entity *this, s32 arg1) {
+void Entity__SetTargetReached(Entity *this, s32 arg1) {
     if (arg1 != 0) {
         this->methods->notifyParents(this, 9);
     }

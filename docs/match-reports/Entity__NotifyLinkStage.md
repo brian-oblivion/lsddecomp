@@ -130,5 +130,5 @@ already established, tier A, in an earlier round) via the identical
   named `BasicClass__NotifyParents` (a shared-ancestor slot, same idiom as
   `Get_vtable_Class65650()`'s table). CROSS-UNIT: called from every one of Entity_b/
   c/d/e/f/g (grep -rn -- '->slot30(' src/Entity_*.c), so proposed here
-  rather than applied. Evidence and full writeup in `Entity__SetUnkF4.md`,
+  rather than applied. Evidence and full writeup in `Entity__SetTargetReached.md`,
   which also dispatches through it.

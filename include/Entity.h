@@ -60,7 +60,7 @@ struct EntityMethods {
     /* +0x04 */ void *unk04;
     /* +0x08 */ void *(*ctor)(Entity *self, void *arg0, void *arg1, void *arg2); /* New_Entity's call */
     /* +0x0C */ u8 pad0C[0x30 - 0x0C];
-    /* +0x30 */ void (*notifyParents)(Entity *self, s32 arg1);   /* called by Entity__SetUnkF4, Entity__NotifyIfTargetInRange */
+    /* +0x30 */ void (*notifyParents)(Entity *self, s32 arg1);   /* called by Entity__SetTargetReached, Entity__NotifyIfTargetInRange */
     /* +0x34 */ u8 pad34[0x40 - 0x34];
     /* +0x40 */ void (*initState)(Entity *self);              /* self-only slot: occupant is Entity__InitState (tools/classtable.py), called by Entity__Entity right after this->methods is (re)assigned */
     /* +0x44 */ void (*updateRotation)(Entity *self, s32 arg1, void *arg2); /* called by Entity__MoodCue07 as slot44(this, 0, ROTATION_YAW_PLUS2) */
@@ -283,7 +283,7 @@ struct EntityRegionRef {
 };
 
 /* Field offsets derived from this unit's own functions (Entity__TickSoundCue,
- * Entity__Activate, Entity__SetUnkF4, Entity__StopSoundCue, and the Get*Effect/Stage/Video
+ * Entity__Activate, Entity__SetTargetReached, Entity__StopSoundCue, and the Get*Effect/Stage/Video
  * family). `soundCueSet` is only ever address-taken (passed as an output buffer to
  * two still-uncarved functions, ServiceSoundCueSet/FlushSoundCueSet), never read
  * here beyond its first word (zeroed by Entity__Entity), so its true
@@ -322,7 +322,7 @@ struct Entity {
     /* +0xB0 */ s32 proximityDivisor;             /* divisor in Entity__GetProximityRatio's (getProximityRatio) computation, this unit */
     /* +0xB4 */ u8 padB4[0xF0 - 0xB4];
     /* +0xF0 */ s32 active;             /* set to 1 by Entity__Activate; gate flag for Entity__UpdateActivationState/Entity__UpdateDeactivationState */
-    /* +0xF4 */ s32 targetReached;           /* set from Entity__SetUnkF4's arg1; latched 1 by Entity__UpdateTargetProximity once the target is within proximityRange, cleared by Entity__Deactivate; round 78 head: renamed from unkF4 by type scope */
+    /* +0xF4 */ s32 targetReached;           /* set from Entity__SetTargetReached's arg1; latched 1 by Entity__UpdateTargetProximity once the target is within proximityRange, cleared by Entity__Deactivate; round 78 head: renamed from unkF4 by type scope */
     /* +0xF8 */ s32 soundCueActive;             /* cleared by Entity__StopSoundCue */
     /* +0xFC */ s32 moodTimer;             /* incremented by Entity__TickSoundCue */
     /* +0x100 */ Unk100Obj *unk100;      /* lazily created/cached by Entity__GetOrCreateUnk100; torn down by Entity__Destructor */

@@ -1,4 +1,6 @@
-# Entity__SetUnkF4
+# Entity__SetTargetReached
+
+> Renamed from `Entity__SetUnkF4` on 2026-09-24 (tools/rename.py). Address 0x8005daac.
 
 > Renamed from `func_8005DAAC` on 2026-09-19 (tools/rename.py). Address 0x8005daac.
 
@@ -6,7 +8,7 @@
 
 ## What it does
 
-`Entity__SetUnkF4(Entity *this, s32 arg1)`: if `arg1` is nonzero, calls this
+`Entity__SetTargetReached(Entity *this, s32 arg1)`: if `arg1` is nonzero, calls this
 entity's own vtable slot `+0x030` with a literal `9`; unconditionally stores
 `arg1` into `this->unkF4`.
 
@@ -31,7 +33,7 @@ the C needs to express explicitly.
 ## Final C
 
 ```c
-void Entity__SetUnkF4(Entity *this, s32 arg1) {
+void Entity__SetTargetReached(Entity *this, s32 arg1) {
     if (arg1 != 0) {
         this->methods->slot30(this, 9);
     }
@@ -65,5 +67,5 @@ own broader significance (read by every Entity_x unit) is not established.
   ancestor `Get_vtable_Class65650()` also returns -- same idiom, confirmed by
   offset match against that table). CROSS-UNIT: `slot30` is dispatched from
   every one of Entity_b/c/d/e/f/g (`grep -rn -- '->slot30(' src/Entity_*.c`)
-  as well as this unit's own `Entity__SetUnkF4`/`Entity__NotifyIfTargetInRange` (the latter
+  as well as this unit's own `Entity__SetTargetReached`/`Entity__NotifyIfTargetInRange` (the latter
   in Entity_b.c), so proposed rather than applied.

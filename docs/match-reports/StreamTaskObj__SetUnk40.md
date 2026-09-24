@@ -55,4 +55,4 @@ instruction" or a delay-slot store that looks unconditional at a glance.
 when the argument is non-negative) for `self->unk40`; a pure leaf whose
 mechanics are its whole purpose, matching the `Class__SetUnkNN` convention
 already used elsewhere for a field of unconfirmed game meaning
-(`Entity__SetUnkF4`, `src/Entity.c`).
+(`Entity__SetTargetReached`, `src/Entity.c`).
