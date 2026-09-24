@@ -14,12 +14,12 @@ extern void CheckObj866E8CountFlag(void *arg0, void *arg1, void *arg2);
 void Class86B60__CommitNameEntry(Class86B60 *self)
 {
     s32 size;
-    s32 origUnk58;
+    s32 origState;
     void *buf1;
     s32 buf2;
 
     size = self->nameField->unkA9;
-    origUnk58 = self->unk58;
+    origState = self->state;
     buf1 = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf1, D_8008AA18);
     self->nameField->methods->slotCC(self->nameField, buf1);
@@ -27,11 +27,11 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     CheckObj866E8CountFlag(self, self->unk4C, self->unkA4);
     self->methods->slotE0(self, self->unk14);
     self->unkA4->methods->slot19C(self->unkA4, &buf2);
-    self->unk58 = 5;
+    self->state = 5;
     self->methods->slot60(self, 0xB);
     self->methods->slot11C(self, buf2, 1);
     self->methods->slot60(self, 0xF);
-    self->methods->slotF0(self, (void *)origUnk58, 0);
+    self->methods->slotF0(self, (void *)origState, 0);
     self->unkA4->methods->slot19C(self->unkA4, &buf2);
 }
 ```
@@ -50,7 +50,7 @@ the whole image after any further edit there.)
   3bb8c_d`'s +0x0A9 (immediately before this round's `Class86B60__CreateNameField`-
   established `unkAA`/`unkAB`/`unkAC`), read unsigned and used directly as
   an allocation size.
-- `origUnk58 = self->unk58;` -- a snapshot of the CURRENT `unk58` value,
+- `origState = self->state;` -- a snapshot of the CURRENT `state` value,
   taken before this function overwrites it with the literal `5` later.
   Read at function entry (before the allocator call) in the disassembly,
   which is why the C statement is placed there too rather than immediately
@@ -87,15 +87,15 @@ the whole image after any further edit there.)
   (`DreamSysView_3bb8c_c *self, s32 *arg1`) needs no change -- a pointer
   argument works identically whether the callee reads or writes through
   it.
-- `self->unk58 = 5;` then two calls to a NEW slot `slot60` (+0x060 on
+- `self->state = 5;` then two calls to a NEW slot `slot60` (+0x060 on
   `Class86B60Methods`, inside the previous `pad044[0x06C-0x044]` gap) with
   literals `0xB` and `0xF`.
 - `self->methods->slot11C(self, buf2, 1);` -- a NEW slot at +0x11C (inside
   the previous `pad0F4[0x124-0xF4]` gap), taking the value `slot19C` just
   filled.
-- `self->methods->slotF0(self, (void *)origUnk58, 0);` -- reuses the
+- `self->methods->slotF0(self, (void *)origState, 0);` -- reuses the
   ALREADY-established `slotF0` (`void *arg1, s32 arg2`, from
-  `Class86B60__SetState`), but this call forwards an `s32` (`origUnk58`) through
+  `Class86B60__SetState`), but this call forwards an `s32` (`origState`) through
   the `void *` parameter. Cast at the call site rather than retyping the
   shared slot -- the bit pattern is identical either way (both are one
   register-width value), and `Class86B60__SetState`'s own already-matched call
@@ -143,4 +143,4 @@ round 20, just triggered by a same-unit sibling instead of a forgotten
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DE08` -> `Class86B60__CommitNameEntry`. **Tier B**: Allocates/fills/frees a temp buffer via `BMemPMgrAlloc`/`DecodeFullWidthSjis`/`BMemPMgrFree` and pushes it through `self->nameField->methods->slotCC`, then calls `CheckObj866E8CountFlag`, sets `unk58 = 5`, and runs two `Class86B60__SetState` calls (0xB then 0xF) bracketing a refresh of the DreamSysView. Read as committing the entered name-field text and advancing state; the two literal state values are not otherwise established.
+Renamed `func_8004DE08` -> `Class86B60__CommitNameEntry`. **Tier B**: Allocates/fills/frees a temp buffer via `BMemPMgrAlloc`/`DecodeFullWidthSjis`/`BMemPMgrFree` and pushes it through `self->nameField->methods->slotCC`, then calls `CheckObj866E8CountFlag`, sets `state = 5`, and runs two `Class86B60__SetState` calls (0xB then 0xF) bracketing a refresh of the DreamSysView. Read as committing the entered name-field text and advancing state; the two literal state values are not otherwise established.

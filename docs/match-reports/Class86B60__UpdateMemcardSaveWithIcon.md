@@ -81,3 +81,20 @@ its own new slot immediately after it.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004E0E4` -> `Class86B60__UpdateMemcardSaveWithIcon`. **Tier B, lower confidence**: Refreshes the view (same idiom as `Class86B60__RefreshViewValue`), calls `slot128`, conditionally clears `D_8008AA10` behind the same `self->unkA4->methods->slot1AC()` gate `Class86B60__CreateNameField` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `Class86B60__Tick`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
+
+## Proposed field names
+
+`Class86B60::unkBC`/`unkC0` both have real accessors outside this unit
+(`src/class_3bb8c_c.c`'s `Class86B60__Class86B60` sets both from
+`dreamSysView->methods->slot1B0`), so per the compiler-ownership rule
+these are PROPOSALS, not renames. Also posted to the round-77 broadcast.
+
+- **`unkBC` -> `saveInfoWord`, tier B.** The `s32` return value of
+  `dreamSysView->methods->slot1B0`, forwarded verbatim by this function
+  (and `Class86B60__UpdateMemcardSaveStatus`) into `unkAC`'s dispatch
+  calls alongside the memcard-icon/name buffers. Exact meaning of the
+  word not established.
+- **`unkC0` -> `saveInfoBuf`, tier B.** The output-buffer word `slot1B0`
+  fills by reference (same call as above); forwarded alongside
+  `saveInfoWord` in the same two call sites. Paired with `saveInfoWord` by
+  construction, not independently confirmed.

@@ -13,7 +13,7 @@ void Class86B60__Tick(Class86B60 *self)
     void (*fn)(Class86B60 *);
 
     Get_vtable_TaskCore()->slot90(self);
-    switch (self->unk58) {
+    switch (self->state) {
     case 1:
         self->unk38 = 0;
         self->unkA4->methods->slotF0(self->unkA4, 0, 1);
@@ -38,7 +38,7 @@ void Class86B60__Tick(Class86B60 *self)
 
 ## Derivation
 
-A 5-valued dispatch (`self->unk58` in `{0,1,2,3,4}`) whose `case 1` and
+A 5-valued dispatch (`self->state` in `{0,1,2,3,4}`) whose `case 1` and
 `case 4` branches share a physical call site (`self->methods->slot94`) and
 whose `case 2`/`case 3` reach the SAME call site with a different function
 pointer. Modeled as the round-12 "crossjump-merge-safe local function
@@ -54,7 +54,7 @@ first reading of `case 4`'s `sw $a0, 0x38($s0)` took it at face value as
 call's argument setup, never reassigned along that control path since none
 of the intervening comparisons touch `$a0`). That produced the right VALUE
 in this specific run only by accident of a stale register -- and it scored
-wrong twice over: the switch's own comparison constant (`self->unk58 ==
+wrong twice over: the switch's own comparison constant (`self->state ==
 2`) also landed in the WRONG register ($v0` instead of retail's `$a0`).
 Both residues resolved together once re-read correctly: `$a0` is never
 reassigned between the initial `ori $a0, $zero, 0x2` (materializing the
@@ -68,7 +68,7 @@ build; this is also why `Class86B60::unk38` is typed `s32`, not a pointer.
 ## Struct changes (additive, `include/class_3bb8c.h`)
 
 - `Class86B60::unk38` (s32; `0` or `2`, see the retyping story above),
-  `Class86B60::unk58` (s32, the dispatch value) -- new fields.
+  `Class86B60::state` (s32, the dispatch value) -- new fields.
 - `Class86B60Methods::slot94`/`slot130`/`slot134` -- three new slots, all
   `void (*)(Class86B60 *self)`.
 
@@ -88,4 +88,16 @@ change: it usually means they shared one cause, not two.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D9D4` -> `Class86B60__Tick`. **Tier B**: Unconditionally calls the base class's own `slot90`, then dispatches on the state field `unk58` among three of this class's own handler slots. Named for the "unconditional base call, then per-state sub-dispatch" shape; the individual state meanings are not established.
+Renamed `func_8004D9D4` -> `Class86B60__Tick`. **Tier B**: Unconditionally calls the base class's own `slot90`, then dispatches on the state field `state` among three of this class's own handler slots. Named for the "unconditional base call, then per-state sub-dispatch" shape; the individual state meanings are not established.
+
+## Field rename
+
+`Class86B60::unk58` -> `state`, **tier B**. Checked with the
+compiler-ownership recipe (renamed the field alone in the `Class86B60`
+struct definition, rebuilt default build and
+`tools/check-nonmatching.sh`): the accessor set landed entirely inside
+`src/class_3bb8c_d.c` (this function's own `switch`, and
+`Class86B60__CommitNameEntry`'s read/write), so this was renamed directly
+rather than proposed. `unk58` also names unrelated fields on other structs
+in this same header (e.g. `TaskObjF::unk58`) -- untouched, since their own
+definitions were not edited.

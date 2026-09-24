@@ -58,7 +58,7 @@ void Class86B60__Tick(Class86B60 *self)
     void (*fn)(Class86B60 *);
 
     Get_vtable_TaskCore()->slot90(self);
-    switch (self->unk58) {
+    switch (self->state) {
     case 1:
         self->unk38 = 0;
         self->unkA4->methods->slotF0(self->unkA4, 0, 1);
@@ -202,12 +202,12 @@ extern void CheckObj866E8CountFlag(void *arg0, void *arg1, void *arg2); /* arity
 void Class86B60__CommitNameEntry(Class86B60 *self)
 {
     s32 size;
-    s32 origUnk58;
+    s32 origState;
     void *buf1;
     s32 buf2;
 
     size = self->nameField->unkA9;
-    origUnk58 = self->unk58;
+    origState = self->state;
     buf1 = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf1, D_8008AA18);
     self->nameField->methods->slotCC(self->nameField, buf1);
@@ -215,11 +215,11 @@ void Class86B60__CommitNameEntry(Class86B60 *self)
     CheckObj866E8CountFlag(self, self->unk4C, self->unkA4);
     self->methods->slotE0(self, self->unk14);
     self->unkA4->methods->slot19C(self->unkA4, &buf2);
-    self->unk58 = 5;
+    self->state = 5;
     self->methods->slot60(self, 0xB);
     self->methods->slot11C(self, buf2, 1);
     self->methods->slot60(self, 0xF);
-    self->methods->slotF0(self, (void *)origUnk58, 0);
+    self->methods->slotF0(self, (void *)origState, 0);
     self->unkA4->methods->slot19C(self->unkA4, &buf2);
 }
 

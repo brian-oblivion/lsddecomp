@@ -1294,7 +1294,7 @@ struct Class86B60 {
     struct Class86B60Unk48Obj *unk48;  /* +0x048, Class86B60__Class86B60 */
     Class86B60Unk4CObj_3bb8c_d *unk4C; /* +0x04C, Class86B60__SetState */
     u8 pad050[0x058 - 0x050];
-    s32 unk58;                       /* +0x058, Class86B60__Tick: 5-valued dispatch (0-4) */
+    s32 state;                       /* +0x058, Class86B60__Tick: 5-valued dispatch (0-4). RENAMED from unk58 (compiler-ownership check: accessor set entirely inside src/class_3bb8c_d.c). */
     u8 pad05C[0x060 - 0x05C];
     Class86B60Unk60Obj_3bb8c_d *unk60; /* +0x060, Class86B60__RefreshViewValue */
     u8 pad064[0x093 - 0x064];

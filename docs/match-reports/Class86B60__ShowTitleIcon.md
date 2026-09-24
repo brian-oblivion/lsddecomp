@@ -54,3 +54,15 @@ None new.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004D814` -> `Class86B60__ShowTitleIcon`. **Tier B**: Passes `&D_800114E8` (a real dlabel string, "ETC\\TITLE.TIM" -- `asm/data/1C34.rodata.s`) to `slotD4`, sets `slot6C(self, 0xA)`, and resets `unk34`/`unk2C`. Named from the one concrete piece of evidence available (the TIM filename); the rest of the sequence's purpose is not established.
+
+## Proposed field names
+
+`Class86B60::unkA4` has a real accessor outside this unit
+(`src/class_3bb8c_c.c`'s `Class86B60__Class86B60` sets it from its own
+`dreamSys` parameter), so per the compiler-ownership rule this is a
+PROPOSAL, not a rename. Also posted to the round-77 broadcast.
+
+- **`unkA4` -> `dreamSysView`, tier A.** Already typed
+  `DreamSysView_3bb8c_c *`; this function is the first to dereference it
+  through its own vtable (`slotF0`). The name just mirrors the existing,
+  already-confirmed type name -- a pure rename, no new claim.
