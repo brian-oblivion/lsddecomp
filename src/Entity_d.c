@@ -1,3 +1,25 @@
+/* Second 20-function slice of the Entity class's 97-function remainder,
+ * 0x5077C..0x52290 (Entity_c is the first slice, Entity_e the third).
+ *
+ * 19 of the 20 are gEntityMoodHandlerTable callbacks (Entity.h), named
+ * Entity__MoodCueNN for the row they occupy -- rows 39-52 and 55-58 are
+ * consecutive with Entity_c's own tail, row 115 (Entity__MoodCue115, this
+ * unit's last function) is not, confirming row order tracks moodIndex
+ * assignment, not code address. The names were confirmed by reading
+ * disk/SLPS_015.56 directly rather than trusting address proximity: for
+ * each row, base 0x80089EB0 + 0x10*row is the row's `handler` word, and it
+ * was checked against every candidate function's own address. The one
+ * exception, `Entity__func_80060710`, is not itself a table row -- it is a
+ * private helper Entity__MoodCue43/44 both call directly (`jal`, not
+ * through any vtable or table), tier C because its own purpose beyond
+ * "sometimes bump scale, sometimes queue a delayed addVec14" is not
+ * established.
+ *
+ * `Entity__MoodCue45` is a real, matched, genuinely empty function (`{}`,
+ * `jr $ra; nop` after splat's own frame elision) -- row 45 of the table is
+ * a legitimate "this mood has no per-tick cue effect" entry, not an
+ * unfinished stub.
+ */
 #include "common.h"
 #include "Entity.h"
 
