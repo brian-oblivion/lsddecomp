@@ -26,13 +26,12 @@
  * slices are staffed independently and a shared header is what makes their
  * merges collide.
  *
- * ROUND 78 (bravo), track 3 naming pass: `func_80036AA8` stays a
- * placeholder. It is a free function (no class table entry, no vtable slot),
- * its only caller (`_SsInit`, `src/code_179d8_c.c`) has just this one call
- * site to go on, and its callee `func_80038E44` is itself unnamed and
- * uncarved. See `docs/match-reports/func_80036AA8.md`'s `## Naming` section
- * for the full evidence trail. No fields, slots or globals in this unit to
- * name.
+ * ROUND 78: the one function is Sony's `SpuInitHot` (libspu/s_ih),
+ * identified by the head under FINISHING-PLAN track 2 -- EXACT fingerprint,
+ * first function of the libspu run, and the call site: `_SsInit` calls it on
+ * mode!=0 where it calls `SpuInit` on mode==0. It calls func_80038E44 (still
+ * parked unidentified; SpuInit's own callee) with 1. It counts as library;
+ * nothing in this unit is game code.
  */
 #include "common.h"
 
@@ -43,7 +42,7 @@
  * just an unobserved return. */
 extern void func_80038E44(s32 a0);
 
-void func_80036AA8(void)
+void SpuInitHot(void)
 {
     func_80038E44(1);
 }

@@ -1,4 +1,8 @@
-# func_80032368
+# SsInit
+
+> **Head, round 78: SONY CODE, identified under FINISHING-PLAN track 2 as `SsInit`** (libsnd/ssinit, body `_SsInit(0)`): EXACT `sdkname.py` fingerprint, 4-way AMBIGUOUS, settled by position and body; evidence on its symbols-file `identified` line. It counts as library now; the `## Naming` section below that kept `func_` is superseded.
+
+> Renamed from `func_80032368` on 2026-09-24 (tools/rename.py). Address 0x80032368.
 
 **Unit:** code_179d8_c · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
@@ -7,7 +11,7 @@
 A one-argument tail-call wrapper around `_SsInit`, called with `0`.
 `_SsInit` (still `INCLUDE_ASM` in this unit -- not attempted this
 round) is an SPU/sound-system init routine: it branches on its argument,
-calls one of two setup helpers (`SpuInit` / `func_80036AA8`)
+calls one of two setup helpers (`SpuInit` / `SpuInitHot`)
 depending on whether the argument is zero, then unconditionally copies two
 fixed tables into the SPU control register window at `0x1F801C00`/
 `0x1F801D80` and clears several sound-system globals. It never sets `$v0`
@@ -18,7 +22,7 @@ on any return path, so it is `void`.
 ```c
 extern void _SsInit(s32 arg0);
 
-void func_80032368(void)
+void SsInit(void)
 {
     _SsInit(0);
 }
@@ -39,7 +43,7 @@ Matched first attempt.
 
 ## Naming (round 78, runner alpha)
 
-**Tier C, kept `func_`.** `.venv/bin/python3 tools/sdkname.py func_80032368`
+**Tier C, kept `func_`.** `.venv/bin/python3 tools/sdkname.py SsInit`
 returns an EXACT(1.00 masked, 1.00 shape) fingerprint, AMBIGUOUS across 4
 libsnd/libspu candidates (`SsInit`, `SsStart2`, `SsUtReverbOff`, `SpuInit`),
 position-decided to sit between the placed `libsnd/vm_vsu` object (ends

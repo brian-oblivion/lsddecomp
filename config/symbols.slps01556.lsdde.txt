@@ -2325,3 +2325,11 @@ TaskObjF__ClearResourceSlots = 0x8004E3F4; // type:func
 gMcDevicePath1 = 0x8008AA9C;
 gMcDevicePath0 = 0x8008AAA4;
 sMcTempFileSuffix = 0x8008AAAC;
+// identified: fingerprint EXACT (8w, 4-way AMBIGUOUS) vs libsnd/ssinit SsInit (3.3); position decides: inside the libsnd/ssinit slot right after _SsInit, between placed vm_vsu and sstable; body is _SsInit(0), which only SsInit of the tied names does. Header LIBSND.H. Round 78.
+SsInit = 0x80032368; // type:func
+// identified: fingerprint EXACT (8w, 4-way AMBIGUOUS) vs libsnd/ssinit SsInitHot (3.3); position: the ssinit slot after SsInit; body is _SsInit(1). Header LIBSND.H. Round 78.
+SsInitHot = 0x80032388; // type:func
+// identified: fingerprint EXACT (8w, 4-way AMBIGUOUS) vs libspu/s_ih SpuInitHot (3.3,3.5,3.6); position: first function of the libspu run (after libsnd/stop, before libspu/s_sm); call site: _SsInit's mode!=0 arm, opposite SpuInit on mode==0. Calls func_80038E44 (= SpuInit's own callee) with 1 where SpuInit passes 0. Not in this SDK's LIBSPU.H. Round 78.
+SpuInitHot = 0x80036AA8; // type:func
+_snd_openflag = 0x8008EA00;
+_snd_ev_flag = 0x8008E934;

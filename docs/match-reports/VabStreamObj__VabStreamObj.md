@@ -59,7 +59,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     self->bodyTransferPending = 0;
     self->baseFilename = NULL;
     if (gVabSizeTableInited == 0) {
-        func_80032368();
+        SsInit();
         gVabSizeTableInited = 1;
         SsSetTableSize(func_8003A068(), 2, 1);
     }

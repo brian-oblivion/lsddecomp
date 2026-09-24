@@ -19,10 +19,10 @@ s32 SsUtKeyOffV(s16 idx)
     u32 mask0;
     u16 mask1;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         goto fail_nolock;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if ((u16) idx >= 0x18) {
         goto fail;
     }
@@ -38,7 +38,7 @@ s32 SsUtKeyOffV(s16 idx)
     D_8008D9A3[chan].unk0 = 0;
     D_8008D98C[chan].unk0 = 0;
     D_8008D988[chan].unk0 = 0;
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     D_80090C60 = mask0 | D_80090C60;
     D_80090C64 |= mask1;
     D_8008E228 &= ~D_80090C60;
@@ -46,13 +46,13 @@ s32 SsUtKeyOffV(s16 idx)
     return 0;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 fail_nolock:
     return -1;
 }
 ```
 
-No new declarations: `D_8008E934`, `D_8008EA26` (`volatile u16`, per this
+No new declarations: `_snd_ev_flag`, `D_8008EA26` (`volatile u16`, per this
 report's round-23 CLOSED finding, which stands and is still load-bearing),
 `Rec34Byte D_8008D9A3[]`, `Rec34Half D_8008D988[]`/`D_8008D98C[]` and the four
 mask scalars were all already in the unit. Nothing was added to `include/`.
@@ -84,15 +84,15 @@ lhu  D_8008E228
 or / sh D_80090C60 / nor / and / sh D_8008E228
 lhu  D_8008E22C
 or / sh D_80090C64 / nor / and / sh D_8008E22C
-sw   zero, D_8008E934
+sw   zero, _snd_ev_flag
 ```
 
 That is **instruction for instruction** retail's `SsUtKeyOffV` from word 33
 to word 65 -- same four-global load order (C60, C64, E228, E22C), same
 or/store/nor/and/store pairing per channel, same `or` operand order (the mask
-first). The one difference is *where the `D_8008E934 = 0;` store lands*: the
+first). The one difference is *where the `_snd_ev_flag = 0;` store lands*: the
 sibling releases the lock after the mask block, retail's `SsUtKeyOffV`
-releases it before (`sw zero, %lo(D_8008E934)` at 0x80031950, between the
+releases it before (`sw zero, %lo(_snd_ev_flag)` at 0x80031950, between the
 `D_8008E228` load and the first `or`). Moving that one statement is the entire
 delta. First build of that shape: **73/73, ins 0 / del 0, whole-image SHA1
 green.**
@@ -226,7 +226,7 @@ are independent register-identity/scheduling residues, not an artifact of
 address drift.
 
 Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
-`idx` against 0x18 under a `D_8008E934` reentrancy lock (same lock/idiom as
+`idx` against 0x18 under a `_snd_ev_flag` reentrancy lock (same lock/idiom as
 `code_179d8_i.c`'s `func_80033738`), converts the channel into a 32-bit-wide
 `(loBit, hiBit)` bitmask pair, clears three per-channel fields, then ORs the
 new bits into two running masks (`D_80090C60`/`D_80090C64`) and clears the
@@ -244,9 +244,9 @@ s32 SsUtKeyOffV(s16 idx)
     u16 hiBit, loBit;
     u16 old60, old64, e228, e22c;
 
-    if (D_8008E934 == 1)
+    if (_snd_ev_flag == 1)
         goto fail_locked;
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if ((u16) idx >= 0x18)
         goto fail_unlock;
     D_8008EA26 = idx;
@@ -264,7 +264,7 @@ s32 SsUtKeyOffV(s16 idx)
     old60 = D_80090C60;
     old64 = D_80090C64;
     e228 = D_8008E228;
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     old60 = loBit | old60;
     D_80090C60 = old60;
     D_8008E228 = e228 & ~old60;
@@ -275,14 +275,14 @@ s32 SsUtKeyOffV(s16 idx)
     return 0;
 
 fail_unlock:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 fail_locked:
     return -1;
 }
 #endif
 ```
 
-(Uses this unit's already-shared `D_8008E934`, `Rec34Byte D_8008D9A3[]`,
+(Uses this unit's already-shared `_snd_ev_flag`, `Rec34Byte D_8008D9A3[]`,
 `Rec34Half D_8008D988[]`/`D_8008D98C[]`, and the scalar `D_80090C60`,
 `D_80090C64`, `D_8008E228`, `D_8008E22C` globals declared near the top of
 `code_179d8_j.c`.)
@@ -316,7 +316,7 @@ this unit's top block.
 
 Writing the lock/bounds guards as ordinary `if (cond) { ...; return -1; }`
 blocks produces an **extra, unconditional `j`+delay-slot pair** for the
-first (`D_8008E934 == 1`) check, because GCC did not perform cross-jump
+first (`_snd_ev_flag == 1`) check, because GCC did not perform cross-jump
 merging between that check's return and the bounds-check's return even
 though both ultimately return the same `-1`. Retail's actual shape has the
 very first check's `beq` branch **directly** to the shared tail that also
@@ -539,7 +539,7 @@ scaffold-local artifacts, not real levers**:
   51/73, same exact diff offsets** (confirmed via the full diff list, not
   just the raw count). Zero effect on the real oracle.
 - **Score 145** (`output-145-1`): a dead-store idiom
-  (`new_var = 0; D_8008E934 = new_var;` instead of `D_8008E934 = 0;`)
+  (`new_var = 0; _snd_ev_flag = new_var;` instead of `_snd_ev_flag = 0;`)
   combined with folding the `D_80090C60` store into the `old60` assignment
   expression (`old60 = (D_80090C60 = loBit | old60);`). Tried the
   assignment-fold half in isolation (the dead-store half is unambiguous

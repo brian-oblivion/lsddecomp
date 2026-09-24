@@ -65,20 +65,15 @@
  * as C rather than linked as an object, matching the `libsnd/vm_vsu` and
  * `libsnd/sstable` objects placed immediately before and after it.
  * `_SsInit` is already Sony-identified and MATCHED (round 63); leave it.
- * `func_80032368`/`func_80032388` (its arg=0/arg=1 wrappers) each score an
- * EXACT(1.00) `sdkname.py` fingerprint, position-decided to the same
- * libsnd/libspu window as the two placed objects flanking this slice --
- * the same shape as this round's `GsSetNearClip`/`GsSetWorkBase` finding
- * (CLAUDE.md, "never write C for a function a Sony object owns"). NOT
- * given game names; left `func_`. Do not rename `func_80036AA8` (called
- * from `_SsInit`, arg=1 path) -- its Sony ownership is an open question
- * with the head/operator, per this round's brief.
+ * `SsInit`/`SsInitHot` (its arg=0/arg=1 wrappers) are Sony's too: the
+ * head identified them under track 2 (EXACT fingerprint, the ssinit slot
+ * position, and the `_SsInit(0)`/`_SsInit(1)` bodies), and `_SsInit`'s
+ * mode!=0 arm calls Sony's `SpuInitHot` (code_179d8_f_b), identified the
+ * same way. All three count as library.
  *
- * `_SsInit`'s data: `D_8008EA00`/`D_8008E934` are Sony-pinned in
- * `config/psyq-objects.ld` (`_snd_openflag`/`_snd_ev_flag`, same
- * addresses) but still carry placeholder names here -- proposed to the
- * head for `rename.py` rather than applied directly, since `_snd_ev_flag`
- * also appears in `src/code_179d8_j_b.c`, outside this unit. The two SPU
+ * `_SsInit`'s data: `_snd_openflag`/`_snd_ev_flag` are Sony-pinned in
+ * `config/psyq-objects.ld` and carry those names (the head applied them
+ * with `rename.py` in round 78). The two SPU
  * register-init templates `D_8006DC5C`/`D_8006DC6C` and the per-voice
  * state array `D_80090368` are read only by `_SsInit` itself (a Sony
  * function), so per the "field only Sony functions read" rule they are
@@ -90,19 +85,19 @@
 
 extern s32 ResetCallback(void);
 extern void SpuInit(void); /* Psy-Q LIBSPU.H: extern void SpuInit (void); -- track 2 identification, round 64 */
-extern void func_80036AA8(void);
+extern void SpuInitHot(void); /* Sony libspu/s_ih, track 2 identification, round 78 (not in this SDK's LIBSPU.H) */
 extern void SpuVmInit(s32 arg0);
 extern s32 GetVideoMode(void);
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
 extern s32 VBLANK_MINUS;
-extern s32 D_8008EA00;
+extern s32 _snd_openflag;
 extern s32 gSeqTimerStopPending;
 extern s32 gSeqTimerId;
 extern s32 gSeqTimerRateFlag;
 extern void (*gSeqTimerChainedCallback)(void);
 extern s32 gVideoMode;
-extern s32 D_8008E934;
+extern s32 _snd_ev_flag;
 
 /* One 0x40-byte per-voice software state slot; the init below just zeroes it. */
 typedef struct {
@@ -112,8 +107,8 @@ typedef struct {
 extern VoiceState80090368 D_80090368[0x20];
 
 /*
- * Sound-system init.  Reached only through func_80032368 (arg0 = 0) and
- * func_80032388 (arg0 = 1) below.
+ * Sound-system init.  Reached only through SsInit (arg0 = 0) and
+ * SsInitHot (arg0 = 1) below.
  *
  * DO NOT "TIDY" THE LOOP VARIABLES -- the pairing is byte-load-bearing
  * (round 63).  Retail reuses exactly two counter pseudos across all three
@@ -137,7 +132,7 @@ void _SsInit(s32 arg0)
     if (arg0 == 0) {
         SpuInit();
     } else {
-        func_80036AA8();
+        SpuInitHot();
     }
 
     /* Stamp the same 8-halfword template into all 24 SPU voice register
@@ -174,21 +169,21 @@ void _SsInit(s32 arg0)
     }
 
     VBLANK_MINUS = 0x3C;
-    D_8008EA00 = 0;
+    _snd_openflag = 0;
     gSeqTimerStopPending = 0;
     gSeqTimerId = -1;
     gSeqTimerRateFlag = 0;
     gSeqTimerChainedCallback = NULL;
     gVideoMode = GetVideoMode();
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 }
 
-void func_80032368(void)
+void SsInit(void)
 {
     _SsInit(0);
 }
 
-void func_80032388(void)
+void SsInitHot(void)
 {
     _SsInit(1);
 }

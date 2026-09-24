@@ -66,7 +66,7 @@ void SpuVmSeqKeyOff(s32 p0)
 #endif
 ```
 
-Needs this unit's shared `D_8008E934`-adjacent globals declared near the
+Needs this unit's shared `_snd_ev_flag`-adjacent globals declared near the
 top of `code_179d8_j.c` (`D_8008EA26`, `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/
 `D_8008D988`/`D_8008D98C`, `D_80090C60`/`D_80090C64`, `D_8008E228`/`D_8008E22C`).
 

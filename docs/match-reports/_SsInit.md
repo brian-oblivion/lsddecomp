@@ -16,9 +16,9 @@ the deprioritisation band; register count was not why this stalled (see
 
 ## What it does
 
-The sound-system init routine `func_80032368`/`func_80032388` tail-call
+The sound-system init routine `SsInit`/`SsInitHot` tail-call
 into (see those reports). Calls `func_80024D10(arg0)`, then
-`SpuInit()` if `arg0 == 0` else `func_80036AA8()`. Then:
+`SpuInit()` if `arg0 == 0` else `SpuInitHot()`. Then:
 
 1. Writes a fixed 8-halfword template (`D_8006DC5C`) into each of 24
    PSX SPU voice register blocks (`0x1F801C00`, stride `0x10` -- matches
@@ -29,9 +29,9 @@ into (see those reports). Calls `func_80024D10(arg0)`, then
 4. Zeroes the first `0x40` bytes of each of 32 `D_80090368` entries
    (stride `0x40`, confirmed by the pointer increment).
 5. Initializes the whole sound-system global block this unit has been
-   working all round: `VBLANK_MINUS=0x3C`, `D_8008EA00=0`, `gSeqTimerStopPending=0`,
+   working all round: `VBLANK_MINUS=0x3C`, `_snd_openflag=0`, `gSeqTimerStopPending=0`,
    `gSeqTimerId=-1`, `gSeqTimerRateFlag=0`, `gSeqTimerChainedCallback=NULL`,
-   `gVideoMode=func_8002551C()`, `D_8008E934=0`. Every one of these
+   `gVideoMode=func_8002551C()`, `_snd_ev_flag=0`. Every one of these
    globals is already established from `_SsSeqCalledTbyT_1per2`, `_SsTrapIntrVSync`
    and `SsEnd`'s reports this round -- this function is their
    init.
@@ -42,19 +42,19 @@ into (see those reports). Calls `func_80024D10(arg0)`, then
 #if 0
 extern void func_80024D10(s32 arg0);
 extern void SpuInit(void);
-extern void func_80036AA8(void);
+extern void SpuInitHot(void);
 extern void SpuVmInit(s32 arg0);
 extern s32 func_8002551C(void);
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
 extern s32 VBLANK_MINUS;
-extern s32 D_8008EA00;
+extern s32 _snd_openflag;
 extern s32 gSeqTimerStopPending;
 extern s32 gSeqTimerId;
 extern s32 gSeqTimerRateFlag;
 extern void (*gSeqTimerChainedCallback)(void);
 extern s32 gVideoMode;
-extern s32 D_8008E934;
+extern s32 _snd_ev_flag;
 
 typedef struct {
     s32 pad0[0x10];
@@ -74,7 +74,7 @@ void _SsInit(s32 arg0)
     if (arg0 == 0) {
         SpuInit();
     } else {
-        func_80036AA8();
+        SpuInitHot();
     }
 
     reg = (u16 *)0x1F801C00;
@@ -107,13 +107,13 @@ void _SsInit(s32 arg0)
     }
 
     VBLANK_MINUS = 0x3C;
-    D_8008EA00 = 0;
+    _snd_openflag = 0;
     gSeqTimerStopPending = 0;
     gSeqTimerId = -1;
     gSeqTimerRateFlag = 0;
     gSeqTimerChainedCallback = NULL;
     gVideoMode = func_8002551C();
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 }
 #endif
 ```
@@ -132,10 +132,10 @@ fix below was applied).
 
 The if/else at the top needed the `_SsSeqCalledTbyT_1per2` block-order lever
 (raw `arg0` feeding `bnez` directly -- writing `if (arg0 != 0) {
-func_80036AA8(); } else { SpuInit(); }` produced a `beqz` where
+SpuInitHot(); } else { SpuInit(); }` produced a `beqz` where
 retail has `bnez`, plus a wrong-length inline early block, cascading
 ~280 bytes of address drift through the rest of the function). Flipping
-to `if (arg0 == 0) { SpuInit(); } else { func_80036AA8(); }`
+to `if (arg0 == 0) { SpuInit(); } else { SpuInitHot(); }`
 fixed the branch AND collapsed the drift back to zero everywhere except
 the loop regions -- another confirmation this lever generalises to raw
 truthy tests (see `SsEnd.md` for the sibling finding).
@@ -454,7 +454,7 @@ untouched this round. Confirmed the unit as a whole has no class
 Sony sound-init C sandwiched between the placed `libsnd/vm_vsu` and
 `libsnd/sstable` objects.
 
-Data this function touches: `D_8008EA00`/`D_8008E934` are Sony-pinned in
+Data this function touches: `_snd_openflag`/`_snd_ev_flag` are Sony-pinned in
 `config/psyq-objects.ld` as `_snd_openflag`/`_snd_ev_flag` (same
 addresses) -- proposed to the head for `rename.py` rather than applied
 directly, since `_snd_ev_flag` also appears in `src/code_179d8_j_b.c`,

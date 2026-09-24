@@ -101,7 +101,7 @@ extern EntryDAD4 *D_8006DAD4;
  * Sony's `SsSeqCalledTbyT` (`libsnd/sscall`, linked since round 34; it was
  * code_179d8_i.c's matched func_80033738) -- "if already busy, return/skip;
  * set; ...; clear before returning" guarding a per-channel operation. */
-extern s32 D_8008E934;
+extern s32 _snd_ev_flag;
 
 /* "Currently selected channel" scratch globals: written as a side
  * effect and then re-read from the global (not from the parameter) by
@@ -352,10 +352,10 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     u16 note;
     u8 pending18;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         goto fail_nolock;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if (SpuVmVSetUp(p0, p1) != 0) {
         goto fail;
     }
@@ -426,11 +426,11 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         s32 ret = note2pitch2((u16) p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return (u8) result;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 fail_nolock:
     return -1;
 }
@@ -444,10 +444,10 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
     u32 mask0;
     u16 mask1;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         goto fail_nolock;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if ((u16) idx >= 0x18) {
         goto fail;
     }
@@ -480,11 +480,11 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
         D_8008E228 &= ~D_80090C60;
         D_8008E22C &= ~D_80090C64;
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return 0;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 fail_nolock:
     return -1;
 }
@@ -501,10 +501,10 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     u16 note;
     u8 pending18;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         return -1;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if ((u16) idx >= 0x18) {
         goto fail;
     }
@@ -572,11 +572,11 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
         s32 ret = note2pitch2(p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return idx;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return -1;
 }
 #else
@@ -584,7 +584,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
 #endif
 
 /* The "release channel" twin of SsUtKeyOff's else-branch above: same
- * D_8008E934 lock, same (mask0, mask1) split of a 0..0x17 channel across two
+ * _snd_ev_flag lock, same (mask0, mask1) split of a 0..0x17 channel across two
  * 16-bit mask words, same three per-channel field clears, same mask update.
  * MATCHED round 62 by writing it in exactly that sibling's idiom -- direct
  * global expressions with NO cached locals. Four earlier rounds carried four
@@ -592,7 +592,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
  * unreachable register-identity stall; the caching was the whole residue.
  * The only structural difference from the sibling is that the lock is
  * released BEFORE the mask block rather than after it (retail's
- * `sw zero, D_8008E934` sits at 0x80031950, between the D_8008E228 load and
+ * `sw zero, _snd_ev_flag` sits at 0x80031950, between the D_8008E228 load and
  * the first `or`). See docs/match-reports/SsUtKeyOffV.md. */
 s32 SsUtKeyOffV(s16 idx)
 {
@@ -600,10 +600,10 @@ s32 SsUtKeyOffV(s16 idx)
     u32 mask0;
     u16 mask1;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         goto fail_nolock;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if ((u16) idx >= 0x18) {
         goto fail;
     }
@@ -619,7 +619,7 @@ s32 SsUtKeyOffV(s16 idx)
     D_8008D9A3[chan].unk0 = 0;
     D_8008D98C[chan].unk0 = 0;
     D_8008D988[chan].unk0 = 0;
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     D_80090C60 = mask0 | D_80090C60;
     D_80090C64 |= mask1;
     D_8008E228 &= ~D_80090C60;
@@ -627,7 +627,7 @@ s32 SsUtKeyOffV(s16 idx)
     return 0;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 fail_nolock:
     return -1;
 }

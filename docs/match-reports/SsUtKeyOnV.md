@@ -39,10 +39,10 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     u16 note;
     u8 pending18;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         return -1;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if ((u16) idx >= 0x18) {
         goto fail;
     }
@@ -101,11 +101,11 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
         s32 ret = note2pitch2(p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return idx;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return -1;
 }
 #endif
@@ -121,7 +121,7 @@ and confirmed to work identically -- see finding 2).
 
 - The busy-lock guard's shape (`bne v0,v1,NEAR; ...; j FAR; li v0,-1;
   NEAR: ...`) is byte-for-byte the same construct, and a plain `if
-  (D_8008E934 == 1) return -1;` reproduces `SsUtKeyOn`'s WRONG ("far
+  (_snd_ev_flag == 1) return -1;` reproduces `SsUtKeyOn`'s WRONG ("far
   jump") polarity here too -- same residue, same non-result from every
   guard-clause reshape tried previously (see that report's finding 4 for
   the full experiment log; not repeated here since the outcome is
@@ -276,10 +276,10 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     u16 note;
     u8 pending18;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         return -1;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if ((u16) idx >= 0x18) {
         goto fail;
     }
@@ -347,11 +347,11 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
         s32 ret = note2pitch2(p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return idx;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return -1;
 }
 ```
@@ -418,10 +418,10 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     u16 note;
     u8 pending18;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         return -1;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if ((u16) idx >= 0x18) {
         goto fail;
     }
@@ -489,11 +489,11 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
         s32 ret = note2pitch2(p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return idx;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return -1;
 }
 #endif

@@ -266,10 +266,10 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     u16 note;
     u8 pending18;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         goto fail_nolock;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if (SpuVmVSetUp(p0, p1) != 0) {
         goto fail;
     }
@@ -329,11 +329,11 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         s32 ret = note2pitch2((u16) p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return result;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 fail_nolock:
     return -1;
 }
@@ -445,7 +445,7 @@ neighbors. This was reached by direct experimentation, not derived.
 
 ### 4. NOT CLOSED: three residues survived every reshape tried
 
-- **Busy-lock guard branch polarity.** `if (D_8008E934 == 1) return -1;`
+- **Busy-lock guard branch polarity.** `if (_snd_ev_flag == 1) return -1;`
   as the function's first statement compiles, here, to `beq
   v0,v1,FAR_LABEL` with the whole rest of the function as the fallthrough
   (locked case jumps far away). Retail's ACTUAL shape is the reverse: `bne
@@ -783,10 +783,10 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     u16 note;
     u8 pending18;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         goto fail_nolock;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if (SpuVmVSetUp(p0, p1) != 0) {
         goto fail;
     }
@@ -857,11 +857,11 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         s32 ret = note2pitch2((u16) p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return (u8) result;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 fail_nolock:
     return -1;
 }
@@ -947,10 +947,10 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     u16 note;
     u8 pending18;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         goto fail_nolock;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if (SpuVmVSetUp(p0, p1) != 0) {
         goto fail;
     }
@@ -1021,11 +1021,11 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         s32 ret = note2pitch2((u16) p3, p4);
         SpuVmKeyOnNow(1, (u16) ret);
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return (u8) result;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 fail_nolock:
     return -1;
 }

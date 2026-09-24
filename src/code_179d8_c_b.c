@@ -19,7 +19,7 @@
  * (2026-09-12) when Sony's `libsnd/sstable.o` was linked into the middle of
  * it. File 0x22D88..0x23500, vram 0x80032588..0x80032D00.
  *
- * WHY THE SPLIT EXISTS. `func_800323A8` (120w) sat between func_80032388 and
+ * WHY THE SPLIT EXISTS. `func_800323A8` (120w) sat between SsInitHot and
  * SsSetTickMode and is Sony's `SsSetTableSize`; the object covers exactly
  * those 120 words. A placed object cannot live inside a `c` segment, so the
  * slice had to become [c][o][c] and the second `c` needed its own name. The

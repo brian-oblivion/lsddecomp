@@ -30,7 +30,7 @@ void SsStart(void)
 
 ## Signature note
 
-Same tail-call caveat as `func_80032368`: the byte pattern alone doesn't
+Same tail-call caveat as `SsInit`: the byte pattern alone doesn't
 tell you the callee's return type. Resolved from `_SsStart`'s own
 body -- no exit path sets `$v0`.
 

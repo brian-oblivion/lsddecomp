@@ -307,8 +307,10 @@ extern s16 SsUtGetVagAtr(s16 vabId, s16 prog, s16 tone, void *out);
 extern void SsSetMVol(s16 a0, s16 a1);
 extern void SsSetTableSize(char *a0, s16 a1, s16 a2);
 
+/* Psy-Q LIBSND.H: extern void SsInit (void); -- track 2 identification,
+ * round 78 (was func_80032368, declared s32; the one call discards it). */
+extern void SsInit(void);
 /* Uncarved code_179d8_tail helpers this cluster calls. */
-extern s32 func_80032368(void);
 extern char *func_8003A068(void);
 extern s32 func_8003A05C(void);
 extern void SsEnd(void);
@@ -347,7 +349,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     self->bodyTransferPending = 0;
     self->baseFilename = NULL;
     if (gVabSizeTableInited == 0) {
-        func_80032368();
+        SsInit();
         gVabSizeTableInited = 1;
         SsSetTableSize(func_8003A068(), 2, 1);
     }

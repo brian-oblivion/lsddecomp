@@ -20,10 +20,10 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
     u32 mask0;
     u16 mask1;
 
-    if (D_8008E934 == 1) {
+    if (_snd_ev_flag == 1) {
         goto fail_nolock;
     }
-    D_8008E934 = 1;
+    _snd_ev_flag = 1;
     if ((u16) idx >= 0x18) {
         goto fail;
     }
@@ -56,11 +56,11 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
         D_8008E228 &= ~D_80090C60;
         D_8008E22C &= ~D_80090C64;
     }
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
     return 0;
 
 fail:
-    D_8008E934 = 0;
+    _snd_ev_flag = 0;
 fail_nolock:
     return -1;
 }
@@ -107,7 +107,7 @@ with no index" pattern in the `.s`.
 The busy-lock check, the bounds check, and the 4-way field-mismatch OR-chain
 all target ONE shared fail block in retail (`L80031488`/`L80031490`, the
 former falling into the latter). Writing four independent
-`{ D_8008E934 = 0; return -1; }` bodies let GCC 2.6.3 tail-merge only SOME
+`{ _snd_ev_flag = 0; return -1; }` bodies let GCC 2.6.3 tail-merge only SOME
 of them (3 of 4 OR-chain arms merged into a shared far block; the 4th,
 being immediately followed by the large `if/else` body, got its consequent
 inlined instead, and the very first busy-lock check similarly got its
