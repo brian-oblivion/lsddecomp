@@ -1605,8 +1605,9 @@ struct GenericCtorTable_3bb8c_d {
     /* +0x040, TaskObjF__TaskObjF's own last call, forwarding its own 3rd
      * parameter verbatim; class_3bb8c_e's independent view (round 14,
      * this same real object) names the concrete function `TaskObjF__SetCardSlot`,
-     * still uncarved there. */
-    void (*slot40)(void *self, s32 arg1);
+     * still uncarved there. Round 78: renamed slot40 -> setCardSlot
+     * (classtable-confirmed occupant TaskObjF__SetCardSlot). */
+    void (*setCardSlot)(void *self, s32 arg1);
 };
 
 extern GenericCtorTable_3bb8c_d gTaskObjFMethods;

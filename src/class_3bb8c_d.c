@@ -356,5 +356,5 @@ void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
         _bu_init();
     }
     TaskObjF__ClearResourceSlots(self);
-    self->methods->slot40(self, arg2);
+    self->methods->setCardSlot(self, arg2);
 }

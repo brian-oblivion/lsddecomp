@@ -56,3 +56,12 @@ void (*slot40)(TaskObjF *self, s32 arg1);   /* +0x040, TaskObjF__SetCardSlot (cl
 (concretely: shrink `pad3C` to cover only `0x03C`, insert the `slot40`
 field, and the existing `slot44` field immediately follows -- no other
 offset in the struct moves). Posted to the broadcast.
+
+**Head disposition, round 78.** The +0x040 slot is dispatched only through
+`GenericCtorTable_3bb8c_d` (class_3bb8c_d's view of `gTaskObjFMethods`, used by
+`TaskObjF__TaskObjF`), not through `TaskObjFMethods`. So the head renamed THAT
+view's `slot40` -> `setCardSlot` by type scope (one accessor,
+`src/class_3bb8c_d.c`), and declined the `TaskObjFMethods` pad split: adding a
+field no code reads through that struct is unifying two views of one table,
+which is track 4's job. Left for track 4: `TaskObjFMethods` and
+`GenericCtorTable_3bb8c_d` are two views of `gTaskObjFMethods`.

@@ -21,13 +21,14 @@
  * (same precedent as `Entity__MoodCue81`, Entity_e).
  *
  * Every field and vtable slot this unit's functions touch (`moodTimer`,
- * `moodState`, `target`, `unk80`, `unk28`, `unkF4`, the `out->unkNN`
+ * `moodState`, `target`, `moodDuration`, `unk28`, `targetReached`, the `out->unkNN`
  * `EntityMoodHandlerArg` members, `slotC4`/`slotC8`/`slotCC`/`slotD0`,
- * `slot130`/`slot144`/`slot200`) is shared with at least one sibling
- * Entity_x unit, so none of it was renamed here; see the individual match
- * reports' `## Proposed field names` for the new evidence this unit adds
- * (`Entity::unk80` -> `moodDuration` proposed in `Entity__MoodCue21.md`;
- * `unkF4`/`slot144` corroborated against existing proposals elsewhere).
+ * `slot130`/`distanceToRegion`/`slot200`) is shared with at least one sibling
+ * Entity_x unit, so the runner renamed none of it; the head applied three
+ * by type scope in round 78 (`unk80` -> `moodDuration`, `unkF4` ->
+ * `targetReached`, `slot144` -> `distanceToRegion`; evidence in
+ * `Entity__MoodCue21.md`, `Entity__UpdateTargetProximity.md`,
+ * `Entity__MoodCue11.md`).
  */
 #include "common.h"
 #include "Entity.h"
