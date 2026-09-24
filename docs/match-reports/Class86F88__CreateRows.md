@@ -58,13 +58,13 @@ void Class86F88__CreateRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 
 }
 ```
 
-**A close sibling of the already-matched `func_8005281C`** (same unit, same
+**A close sibling of the already-matched `Class86F88__RefreshRows`** (same unit, same
 `self->unk40[]` element array, same `count = self->unk10; if (count >= 5)
 count = 4;` clamp, same `func_8005292C` text-formatting call inside the
 loop): the two differ in that this function ALSO calls each freshly-created
 element's own `slot4C` (with a 2-word stack-local argument seeded from
 `D_8008AB00`/`D_8008AB04`, the second word accumulating by `0xA` per
-iteration) and `slotB8` before `func_8005281C`'s sibling code reaches its
+iteration) and `slotB8` before `Class86F88__RefreshRows`'s sibling code reaches its
 own `slotCC`, and this one always passes `1` (not a caller flag) as the
 final `func_800529FC` argument. `Class86F88ElemMethods::slot4C` (offset
 0x04C) is a new additive header field, typed `void *arg2` there (the

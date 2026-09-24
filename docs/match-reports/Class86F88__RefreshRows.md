@@ -1,4 +1,6 @@
-# func_8005281C
+# Class86F88__RefreshRows
+
+> Renamed from `func_8005281C` on 2026-09-24 (tools/rename.py). Address 0x8005281c.
 
 **Unit:** class_3bb8c_k · **Size:** 68 instructions (0x110 bytes) ·
 **Status: MATCHED 68/68**, whole-image SHA1 green.
@@ -13,7 +15,7 @@ to `func_800529FC` (already matched) and optionally notifies `self` via
 `slot60` (new this round, shared with `func_80052A58`).
 
 ```c
-void func_8005281C(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 {
     s32 count;
     s32 i;

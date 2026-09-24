@@ -372,7 +372,7 @@ void Class86F88__ReleaseRows(Class86F88 *self)
 extern s32 strlen(char *s);
 extern void *memcpy(char *dest, char *src, s32 n);
 
-void func_8005281C(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+void Class86F88__RefreshRows(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
 {
     s32 count;
     s32 i;

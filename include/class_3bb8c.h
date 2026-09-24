@@ -2883,7 +2883,7 @@ struct Class86F88Methods {
      * Class86F88__TickClosing as `self->methods->slot54(self, 4)`. */
     void (*slot54)(Class86F88 *self, s32 state);
     u8 pad058[0x060 - 0x058];
-    /* +0x060, func_80052A58/func_8005281C's own trailing dispatch, both
+    /* +0x060, func_80052A58/Class86F88__RefreshRows's own trailing dispatch, both
      * conditional on a caller-supplied flag, both `(self, 0)`. */
     void (*slot60)(Class86F88 *self, s32 arg1);
     u8 pad064[0x080 - 0x064];
@@ -2895,7 +2895,7 @@ struct Class86F88Methods {
      * contradict Class86F88__ScrollLeft's own narrower body. */
     void (*slot80)(Class86F88 *self, s32 arg1, s32 arg2, s32 arg3);
     u8 pad084[0x094 - 0x084];
-    /* +0x094 = func_8005281C itself (this unit, MATCHED). Signature fixed
+    /* +0x094 = Class86F88__RefreshRows itself (this unit, MATCHED). Signature fixed
      * by three independent callers in this
      * unit (Class86F88__ScrollRight, Class86F88__ScrollLeft, Class86F88__CursorUp, Class86F88__CursorDown),
      * all of which pass exactly (self, arg1, arg2, arg3, arg4). */
@@ -2929,7 +2929,7 @@ struct Class86F88ElemMethods {
     u8 pad050[0x0B8 - 0x050];
     void (*slotB8)(Class86F88Elem *self, void *arg1); /* +0x0B8, func_800529FC */
     u8 pad0BC[0x0CC - 0x0BC];
-    /* +0x0CC, func_8005281C: called once per active window element with a
+    /* +0x0CC, Class86F88__RefreshRows: called once per active window element with a
      * freshly-formatted (func_8005292C) fixed-width text buffer. */
     void (*slotCC)(Class86F88Elem *self, char *arg1);
 };
@@ -2941,7 +2941,7 @@ struct Class86F88Elem {
 struct Class86F88 {
     Class86F88Methods *methods;    /* +0x000 */
     u8 pad004[0x010 - 0x004];
-    s32 unk10;                     /* +0x010, Class86F88__ReleaseRows/func_8005281C: element count, clamped to a max of 4 */
+    s32 unk10;                     /* +0x010, Class86F88__ReleaseRows/Class86F88__RefreshRows: element count, clamped to a max of 4 */
     s32 unk14;                     /* +0x014, Class86F88__ScrollRight: upper bound compared against unk24+0x1A */
     /* +0x018, func_8005292C: a table of BYTE OFFSETS (s32 each), added to
      * that function's own `base` (char *) argument to form a source
@@ -2959,7 +2959,7 @@ struct Class86F88 {
     s32 unk34;                     /* +0x034, Class86F88__SetState's slot14 argument */
     u8 pad038[0x03C - 0x038];
     Class86F88 *unk3C;              /* +0x03C, Class86F88__ForwardToTarget: another instance of this same class */
-    Class86F88Elem *unk40[4];       /* +0x040, Class86F88__ReleaseRows/func_8005281C/func_800529FC */
+    Class86F88Elem *unk40[4];       /* +0x040, Class86F88__ReleaseRows/Class86F88__RefreshRows/func_800529FC */
     s32 unk50;                      /* +0x050, enable flag guarding most of this class's dispatch */
 };
 
