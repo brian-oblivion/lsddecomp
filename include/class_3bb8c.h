@@ -2312,8 +2312,8 @@ struct ObjM {
     void *unk74;               /* +0x074, ObjM__AdvancePauseSetup: forwarded opaquely to New_Obj6EAC0's ctx arg */
     u8 pad078[0x07C - 0x078];
     FieldM7C *unk7C;          /* +0x07C, ObjM__AdvancePauseSetup (written)/ObjM__TeardownPauseOverlay (dispatched) */
-    s32 unk80;                 /* +0x080, ObjM__UpdateCloseReadyFlag/ObjM__AdvancePauseSetup */
-    s32 unk84;                 /* +0x084, ObjM__UpdateCloseReadyFlag/ObjM__ClearCloseReadyFlag/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
+    s32 pauseSetupStep;                 /* +0x080, ObjM__UpdateCloseReadyFlag/ObjM__AdvancePauseSetup */
+    s32 closeReady;                   /* +0x084, ObjM__UpdateCloseReadyFlag/ObjM__ClearCloseReadyFlag/ObjM__CloseAndNotifyD/ObjM__CloseAndNotifyC */
 };
 
 /* -------------------------------------------------------------------

@@ -147,39 +147,39 @@ void func_800541CC(void) {
 }
 
 void ObjM__UpdateCloseReadyFlag(ObjM *self) {
-    if (self->unk80 != 0 && self->mode == 0) {
-        self->unk84 = 1;
+    if (self->pauseSetupStep != 0 && self->mode == 0) {
+        self->closeReady = 1;
     }
 }
 
 void ObjM__ClearCloseReadyFlag(ObjM *self) {
-    self->unk84 = 0;
+    self->closeReady = 0;
 }
 
 void ObjM__CloseAndNotifyD(ObjM *self) {
-    if (self->unk84) {
+    if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
         self->methods->notifyParents(self, 0xD);
     }
 }
 
 void ObjM__CloseAndNotifyC(ObjM *self) {
-    if (self->unk84) {
+    if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
         self->methods->notifyParents(self, 0xC);
     }
 }
 
 void ObjM__AdvancePauseSetup(ObjM *self) {
-    s32 state = self->unk80;
+    s32 state = self->pauseSetupStep;
     if (state == 0) {
         self->unk7C = New_Obj6EAC0(self->unk74, 5, &D_8008AB44[0]);
         self->unk7C->methods->slot4C(self->unk7C, self->unk14, &D_8008AB38);
         self->unk7C->methods->slotB8(self->unk7C, &D_8008AB40);
-        self->unk80 = state + 1;
+        self->pauseSetupStep = state + 1;
         return;
     }
-    self->unk80 = state + 1;
+    self->pauseSetupStep = state + 1;
     if (state != 4) {
         return;
     }
@@ -190,14 +190,14 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
 }
 
 void ObjM__TeardownPauseOverlay(ObjM *self) {
-    if (self->unk80 != 0) {
+    if (self->pauseSetupStep != 0) {
         self->unk7C->methods->slot4(self->unk7C);
     }
     self->unk34->methods->slot8C(self->unk34);
     self->unk54->methods->slot50(self->unk54);
     self->unk10->methods->slot50(self->unk10);
     self->unk18->methods->slotB4(self->unk18, 1);
-    self->unk80 = 0;
+    self->pauseSetupStep = 0;
 }
 
 void *GetObjMMethods(void) {
