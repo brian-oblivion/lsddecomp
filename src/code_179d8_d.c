@@ -74,7 +74,7 @@
 
 /*
  * D_8006D940: a function-pointer table this unit's own `New_Class6D940`/
- * `func_8002C18C` dispatch through. Named/typed as a plain local struct,
+ * `Class6D940__Class6D940` dispatch through. Named/typed as a plain local struct,
  * NOT claimed to be a class-framework vtable -- per this unit's header
  * comment (sibling-slice finding: no classtable.py hit anywhere near this
  * region). Only the two slots this unit's own functions reach are typed;
@@ -84,29 +84,29 @@
 typedef struct Table6D940 Table6D940;
 struct Table6D940 {
     u8 pad000[0x008];
-    /* +0x008, New_Class6D940's own dispatch -- this IS func_8002C18C
+    /* +0x008, New_Class6D940's own dispatch -- this IS Class6D940__Class6D940
      * itself (same 2-arg (self, arg1) shape). */
     void (*slot08)(void *self, s32 arg1);
     u8 pad00C[0x06C - 0x00C];
-    /* +0x06C, func_8002C18C's own conditional dispatch. */
+    /* +0x06C, Class6D940__Class6D940's own conditional dispatch. */
     void (*slot6C)(void *self, s32 arg1);
 };
 extern Table6D940 D_8006D940;
 
 /* Forward-declared: defined below at its own ROM address (GetClass6D940Methods),
- * but called here (New_Class6D940, func_8002C18C) before that point in the
+ * but called here (New_Class6D940, Class6D940__Class6D940) before that point in the
  * file. Without this, cc1 implicitly declares it `int`, which happens to be
  * byte-identical on this ABI but is a lie about the real signature. */
 Table6D940 *GetClass6D940Methods(void);
 
 /* The 0x34-byte object New_Class6D940 allocates. Only the fields
- * func_8002C18C itself touches are named. */
+ * Class6D940__Class6D940 itself touches are named. */
 typedef struct Obj6D940 Obj6D940;
 struct Obj6D940 {
-    Table6D940 *methods; /* +0x000, func_8002C18C */
+    Table6D940 *methods; /* +0x000, Class6D940__Class6D940 */
     u8 pad004[0x02C - 0x004];
-    s32 unk2C;            /* +0x02C, func_8002C18C: zeroed */
-    s32 unk30;             /* +0x030, func_8002C18C: zeroed */
+    s32 unk2C;            /* +0x02C, Class6D940__Class6D940: zeroed */
+    s32 unk30;             /* +0x030, Class6D940__Class6D940: zeroed */
 };
 
 /*
@@ -118,7 +118,7 @@ struct Obj6D940 {
 typedef struct BaseTable6D940 BaseTable6D940;
 struct BaseTable6D940 {
     u8 pad000[0x008];
-    void (*slot08)(void *self); /* +0x008, func_8002C18C's own base-chain call */
+    void (*slot08)(void *self); /* +0x008, Class6D940__Class6D940's own base-chain call */
     /* +0x00C, func_8002C200's own dispatch -- that function's whole body
      * is this one call with nothing after it, so its own return type is
      * genuinely ambiguous (a void wrapper around an s32 tail call is
@@ -151,7 +151,7 @@ void *New_Class6D940(s32 arg1)
     return NULL;
 }
 
-void func_8002C18C(Obj6D940 *self, s32 arg1)
+void Class6D940__Class6D940(Obj6D940 *self, s32 arg1)
 {
     GetActiveDataSourceMethods()->slot08(self);
     self->methods = GetClass6D940Methods();

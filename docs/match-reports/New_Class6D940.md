@@ -9,7 +9,7 @@ attempt.
 ## Role
 
 Allocator: `BMemPMgrAlloc(0x34)`, and on success dispatches
-`GetClass6D940Methods()->slot08(self, arg1)` (that slot IS `func_8002C18C`, this
+`GetClass6D940Methods()->slot08(self, arg1)` (that slot IS `Class6D940__Class6D940`, this
 unit, matched this round -- see its own report), returning the new
 instance; returns `NULL` on allocation failure.
 

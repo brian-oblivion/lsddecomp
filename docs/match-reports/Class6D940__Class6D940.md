@@ -1,4 +1,6 @@
-# func_8002C18C
+# Class6D940__Class6D940
+
+> Renamed from `func_8002C18C` on 2026-09-24 (tools/rename.py). Address 0x8002c18c.
 
 **Unit:** code_179d8_d · **Size:** 29 instructions (0x74 bytes) ·
 **Status: MATCHED 29/29**, whole-image SHA1 green. Matched on the first
@@ -16,7 +18,7 @@ two fields, then conditionally dispatches through its own freshly-set
 table's `slot6C` if `arg1` is non-zero.
 
 ```c
-void func_8002C18C(Obj6D940 *self, s32 arg1)
+void Class6D940__Class6D940(Obj6D940 *self, s32 arg1)
 {
     GetActiveDataSourceMethods()->slot08(self);
     self->methods = GetClass6D940Methods();
