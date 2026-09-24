@@ -144,7 +144,7 @@ extern s32 gMcDevicePath0;
 /* Literal "TEMP" (asm/data/7B12C.sdata.s) -- the throwaway suffix
  * TaskObjF__ProbeCardFreeSpace passes as BuildMemcardPath's 3rd argument to
  * build a placeholder file name when probing free space. */
-extern s32 gMcTempFileSuffix;
+extern s32 sMcTempFileSuffix;
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
@@ -459,7 +459,7 @@ s32 TaskObjF__ProbeCardFreeSpace(Node3bb8cE *self, u8 id, s32 sizeArg)
     s32 sectors;
 
     sectors = (u32)(sizeArg + 0x21FF) >> 13;
-    path = BuildMemcardPath(pathBuf, self->cardSlot, &gMcTempFileSuffix);
+    path = BuildMemcardPath(pathBuf, self->cardSlot, &sMcTempFileSuffix);
     handle = open(path, (sectors << 16) | 0x200);
     if (handle == -1) {
         return 0;

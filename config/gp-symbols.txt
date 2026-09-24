@@ -176,7 +176,6 @@ gLinkSrcStage
 gLinkTriggerIndex
 gMcDevicePath0
 gMcDevicePath1
-gMcTempFileSuffix
 gMemcardIconTemplate
 gNameCharTable
 gOpenVabCount
@@ -213,6 +212,7 @@ gpDinamicLinkPenalty
 gpNavChallengesComplete
 sCardPathPrefix
 sCdDriveInited
+sMcTempFileSuffix
 sMoodCue78TransitionDone
 sPadRefCount
 sPolyOtCodeOverride

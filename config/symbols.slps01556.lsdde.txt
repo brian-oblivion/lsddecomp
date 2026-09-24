@@ -2324,4 +2324,4 @@ TaskObjF__ProbeCardFreeSpace = 0x8004ECCC; // type:func
 TaskObjF__ClearResourceSlots = 0x8004E3F4; // type:func
 gMcDevicePath1 = 0x8008AA9C;
 gMcDevicePath0 = 0x8008AAA4;
-gMcTempFileSuffix = 0x8008AAAC;
+sMcTempFileSuffix = 0x8008AAAC;

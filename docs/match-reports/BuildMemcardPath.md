@@ -61,7 +61,7 @@ pass different numbers of arguments, and retail's bytes show both:
 8004ea58:  jal   8004f32c <BuildMemcardPath>
 
 8004ece4:  lw    a1,12(v0)                 <- TaskObjF__ProbeCardFreeSpace: $a0/$a1 ...
-8004ece8:  lui   a2,0x8009                 <- ... and $a2, the &gMcTempFileSuffix suffix
+8004ece8:  lui   a2,0x8009                 <- ... and $a2, the &sMcTempFileSuffix suffix
 8004ecec:  addiu a2,a2,-21844
 8004ecf0:  jal   8004f32c <BuildMemcardPath>
 ```

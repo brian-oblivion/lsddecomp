@@ -9,7 +9,7 @@
 `s32 TaskObjF__ProbeCardFreeSpace(Node3bb8cE *self, u8 id, s32 sizeArg)`. Computes a
 sector count from `sizeArg` (`(sizeArg + 0x21FF) >> 13`, i.e. round up to
 an 8KB/0x2000-byte boundary and divide by it), formats a path via
-`BuildMemcardPath(pathBuf, self->unkC, &gMcTempFileSuffix)` (a 3-argument call, one
+`BuildMemcardPath(pathBuf, self->unkC, &sMcTempFileSuffix)` (a 3-argument call, one
 more argument than `TaskObjF__OpenAndReadMemcardFile`'s 2-argument call to the same
 function — `id` itself is unused in this function's own body, same
 "unused-but-forwarded parameter" shape already established elsewhere),
@@ -43,7 +43,7 @@ Three separate residues stacked, closed incrementally:
 
 ```c
 sectors = (u32)(sizeArg + 0x21FF) >> 13;
-path = BuildMemcardPath(pathBuf, self->unkC, &gMcTempFileSuffix);
+path = BuildMemcardPath(pathBuf, self->unkC, &sMcTempFileSuffix);
 handle = func_80050938(path, (sectors << 16) | 0x200);
 ```
 
@@ -63,7 +63,7 @@ s32 TaskObjF__ProbeCardFreeSpace(Node3bb8cE *self, u8 id, s32 sizeArg)
     s32 sectors;
 
     sectors = (u32)(sizeArg + 0x21FF) >> 13;
-    path = BuildMemcardPath(pathBuf, self->unkC, &gMcTempFileSuffix);
+    path = BuildMemcardPath(pathBuf, self->unkC, &sMcTempFileSuffix);
     handle = func_80050938(path, (sectors << 16) | 0x200);
     if (handle == -1) {
         return 0;
@@ -104,4 +104,4 @@ function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).
 
 ## Naming (round 78, track 3)
 
-`func_8004ECCC` -> `TaskObjF__ProbeCardFreeSpace`. **Tier A.** Private helper called only by `TaskObjF__CheckCardSpace`. Computes a sector count from `sizeArg` with the identical round-up formula class_3bb8c_f.c's already-matched `TaskObjF__TryWriteMemcardSaveFile` uses (`(size + 0x21FF) >> 13`), builds a path with the placeholder suffix `gMcTempFileSuffix` (literal "TEMP", asm/data/7B12C.sdata.s), OPENS a file of that many reserved sectors, then immediately closes and deletes it. This is the same create-then-delete idiom `TaskObjF__TryWriteMemcardSaveFile` uses on its real save path (open with `(sectors<<16)|0x200` fails with -1 if there isn't room) -- here applied to a throwaway file purely to test whether that much free space exists, without leaving a file behind. The `id` parameter is unused in the body. Tier A: the create/delete idiom and the dedicated placeholder suffix make the mechanism unambiguous.
+`func_8004ECCC` -> `TaskObjF__ProbeCardFreeSpace`. **Tier A.** Private helper called only by `TaskObjF__CheckCardSpace`. Computes a sector count from `sizeArg` with the identical round-up formula class_3bb8c_f.c's already-matched `TaskObjF__TryWriteMemcardSaveFile` uses (`(size + 0x21FF) >> 13`), builds a path with the placeholder suffix `sMcTempFileSuffix` (literal "TEMP", asm/data/7B12C.sdata.s), OPENS a file of that many reserved sectors, then immediately closes and deletes it. This is the same create-then-delete idiom `TaskObjF__TryWriteMemcardSaveFile` uses on its real save path (open with `(sectors<<16)|0x200` fails with -1 if there isn't room) -- here applied to a throwaway file purely to test whether that much free space exists, without leaving a file behind. The `id` parameter is unused in the body. Tier A: the create/delete idiom and the dedicated placeholder suffix make the mechanism unambiguous.
