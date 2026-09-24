@@ -117,33 +117,17 @@ void func_80065A5C(Class65650 *self, void *arg)
     }
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 33/40 words, length exact. Residue: compound of the same
- * 3-way callee-save store-order permutation as func_80065A5C ($s0/$ra/$s1)
- * plus the `arg` parameter's copy into $s3 deferred past the `blez` guard
- * (docs/match-reports/func_80065AE0.md). Hand-derived. */
 void func_80065AE0(Class65650 *self, void *arg)
 {
-    u8 unused[8];
     Unk70ElemObj **p;
     s32 i;
-    D800878D4Methods *base;
 
     p = self->unk70;
-    if (self->unk6C > 0) {
-        i = 0;
-        do {
-            (*p)->methods->slot70(*p, arg);
-            i++;
-            p++;
-        } while (i < self->unk6C);
+    for (i = 0; i < self->unk6C; i++, p++) {
+        (*p)->methods->slot70(*p, arg);
     }
-    base = DreamSys__GetBaseMethods();
-    base->slot70(self, arg);
+    DreamSys__GetBaseMethods()->slot70(self, arg);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_55dd4", func_80065AE0);
-#endif
 
 void func_80065B80(Class65650 *self, void *arg1, s32 val)
 {
