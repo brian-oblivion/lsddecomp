@@ -255,7 +255,7 @@ the STACK FRAME ALLOCATION.
    lever despite superficially similar division chains.
 2. **A register-identity swap at the `id != 0x21` join**, same unfixable
    class as this unit's other three stalls (`vmNoiseOn2`,
-   `func_8002E138`, `vmNoiseOn`): retail's unconditional delay-slot copy
+   `SePitchBend`, `vmNoiseOn`): retail's unconditional delay-slot copy
    is `move $a2,$a3` (i.e. `pan1`'s fallback gets a fresh register, `pan2`'s
    fallback quietly reuses whichever register already held `lvl1`); every
    derivation tried here either omits the copy entirely (when `pan1`/`pan2`

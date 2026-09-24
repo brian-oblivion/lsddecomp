@@ -363,7 +363,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   110/132. (PROGRESS round 73)
 - **`(u8)x` creates an 8-bit temporary that stays live in a saved register; `x & 0xFF` does not.**
   The tell is an entry `move aN,sM` nothing explains; a bound test may then need `(u32)`. Closed
-  `func_8002E138` after four rounds. (PROGRESS round 73)
+  `SePitchBend` after four rounds. (PROGRESS round 73)
 - **Commutative `+` operand order is fixed at RTL generation: a FIELD-LOAD operand goes second
   whatever the source order; a NAMED local keeps its source position** (`cc1 -dr`). So flipping
   textual order is inert, and a field load FIRST in retail means the source had it in a local;

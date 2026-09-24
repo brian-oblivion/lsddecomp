@@ -415,7 +415,7 @@ only structural change from the seed: wrapping the tail's
 **still 108/112 (0x1b0), no length change** -- the isolated scaffold's
 score improvement (3100 -> 1800) did not translate, consistent with this
 unit's other three same-round instances of this exact divergence
-(`SpuVmAlloc`, `func_8002E138`, `SpuVmDoAllocate`, all round 37) EXCEPT
+(`SpuVmAlloc`, `SePitchBend`, `SpuVmDoAllocate`, all round 37) EXCEPT
 for `func_8002CD08` this round, where the identical construct DID
 translate -- confirming again that a `do-while(0)` candidate must be
 verified by direct rebuild every time, in both directions, never assumed

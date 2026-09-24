@@ -44,7 +44,7 @@
  *   func_8002E2F8    2w  <- already matched: splat emitted the empty C body
  *   func_8002E300    2w  <- itself.  Not work, and not yours to redo.
  *   note2pitch   47w   note2pitch2   64w   vmNoiseOn2  112w
- *   func_8002E138  112w   func_8002E308  116w   SpuVmDoAllocate  143w
+ *   SePitchBend  112w   func_8002E308  116w   SpuVmDoAllocate  143w
  *   SpuVmAlloc  167w
  *
  * func_8002E308's opening `addu $t3, $a0, $zero` is REGISTER PRESSURE with
@@ -563,7 +563,7 @@ s32 note2pitch2(s32 a0, s32 a1) {
     return v1;
 }
 
-/* Matched round 73 -- docs/match-reports/func_8002E138.md. */
+/* Matched round 73 -- docs/match-reports/SePitchBend.md. */
 typedef struct {
     u8 unk0;
     u8 pad1[0x34 - 0x1];
@@ -578,7 +578,7 @@ extern Rec34H_E138 D_8008D994[];
 extern s16 D_8008EA26[];
 extern u8 D_8008D970[];
 
-void func_8002E138(s32 chan, s32 bend) {
+void SePitchBend(s32 chan, s32 bend) {
     s32 off;
     s32 prod;
     s32 q;

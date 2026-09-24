@@ -551,7 +551,7 @@ this needs the `echo` to happen in a script that `wait`s on the actual
 permuter PID specifically, not just relies on `bash -c`'s own sequencing.
 Inferred (not captured) as `rc=124` (bound fired) from wall-clock timing:
 the process ended almost exactly at the 900s mark, matching
-`func_8002E138`'s same-shaped exit earlier this round.
+`SePitchBend`'s same-shaped exit earlier this round.
 
 **Result: 76056 iterations, ZERO hits at `score = 0`.** Best score reached
 was **4245**, down from the 5710 baseline.
@@ -573,7 +573,7 @@ iterations under shared-machine load (concurrent permuter searches were
 running in sibling worktrees this round). The permuter's own scorer
 improved (5710 -> 4245) via a change that is a confirmed regression against
 the real project oracle — a second instance this round (after
-`func_8002E138`) of the isolated-scaffold-score / real-build-score
+`SePitchBend`) of the isolated-scaffold-score / real-build-score
 divergence CLAUDE.md warns about. Not promoting to "permuter-exhausted";
 recording as "not closed in ~76k iterations under load, and the only
 lower-scoring candidate found reintroduces an already-rejected sharing
@@ -587,7 +587,7 @@ round's derivation already tried and rejected for THIS function** — worth
 checking any permuter candidate's structural change against the function's
 own report history before assuming a lower isolated-scaffold score means
 anything, not just checking the final word count. This is the same
-underlying caution as `func_8002E138`'s round-37 finding (permuter score
+underlying caution as `SePitchBend`'s round-37 finding (permuter score
 improvement does not imply real-build improvement) from a different angle:
 here the specific mechanism (re-sharing a deliberately-duplicated
 computation) was independently already known-bad from this same function's

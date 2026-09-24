@@ -716,7 +716,7 @@ genuinely different, non-asm, C-level lever from a bare `__asm__("")`
 barrier, and here it closed a 4-word LENGTH gap that three prior rounds of
 barriers, aliasing, and algebraic rewrites could not touch** — the first
 positive (if partial) result on this function across four rounds. This
-generalizes the round-37 `func_8002E138` finding (where the same construct
+generalizes the round-37 `SePitchBend` finding (where the same construct
 was tried and did NOT help) in the opposite direction: the construct is a
 real, distinct lever, and whether it helps is function-specific, not
 predictable in advance. Worth trying as a standard move on any

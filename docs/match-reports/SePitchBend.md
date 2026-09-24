@@ -1,4 +1,6 @@
-# func_8002E138 -- MATCHED (round 73, 112/112, whole-image SHA1 green)
+# SePitchBend -- MATCHED (round 73, 112/112, whole-image SHA1 green)
+
+> Renamed from `func_8002E138` on 2026-09-24 (tools/rename.py). Address 0x8002e138.
 
 REVISITED, round 73: MATCHED 112/112, fresh transcription, no permuter; names/types used (params `chan`/`bend`, local 0x34-stride record views, `D_8008D7F4` written as `((u16 *)D_8008D7F0)[off + 2]`)
 
@@ -83,7 +85,7 @@ extern Rec34H_E138 D_8008D994[];
 extern s16 D_8008EA26[];
 extern u8 D_8008D970[];
 
-void func_8002E138(s32 chan, s32 bend) {
+void SePitchBend(s32 chan, s32 bend) {
     s32 off;
     s32 prod;
     s32 q;
@@ -146,7 +148,7 @@ Raw word-match is not meaningful under that drift. **First real diff is the
 second instruction**, vram `0x8002E140`/file `0x1E940` is the last matching
 one (`move $s0,$a0`); retail's very next instruction, `andi $v1,$s0,0xFF`,
 has an extra `move $a0,$s0` inserted before it in every derivation tried —
-confirmed with `tools/asm-differ/diff.py func_8002E138`, not inferred.
+confirmed with `tools/asm-differ/diff.py SePitchBend`, not inferred.
 
 `code_179d8_l`, vram `0x8002E138`, file offset `0x1E938`, 112 words
 (0x1C0 bytes), real frame (`-0x20`, saves `$s0`,`$s1`,`$ra`). No
@@ -241,7 +243,7 @@ extern u8 D_8008D7F4[];
 extern u16 D_8008EA26;
 extern u8 D_8008D970[];
 
-void func_8002E138(s32 a0, s32 a1) {
+void SePitchBend(s32 a0, s32 a1) {
     s32 s0;
     s32 off16;
     s32 idx52;
@@ -386,7 +388,7 @@ extern u8 D_8008D7F4[];
 extern u16 D_8008EA26;
 extern u8 D_8008D970[];
 
-void func_8002E138(s32 a0, s32 a1) {
+void SePitchBend(s32 a0, s32 a1) {
     s32 s0;
     s32 off16;
     s32 idx52;
@@ -457,7 +459,7 @@ the observed range so far).
 
 Re-verified the inherited 113/112 body first (per the "compile every inherited
 body before trusting it" instruction): it reproduces exactly — `objdump -t`
-on `build/src/code_179d8_l.c.o` shows `func_8002E138` at `0x1c4` bytes = 113
+on `build/src/code_179d8_l.c.o` shows `SePitchBend` at `0x1c4` bytes = 113
 words, matching round 33's claim exactly. Confirmed via `asm-differ`'s
 realigned diff that the residues are exactly as round 33 described: the
 extra `move a0,s0` (later reappearing in a different register depending on
@@ -537,7 +539,7 @@ changes the allocator sees through.
 Per this round's thesis (permuter is the primary lever for the four
 never-searched functions in this unit), re-verified the inherited 113/112
 body first: `objdump -t` on `build/src/code_179d8_l.c.o` confirms
-`func_8002E138` compiles to `0x1c4` bytes = 113 words, matching round 33's
+`SePitchBend` compiles to `0x1c4` bytes = 113 words, matching round 33's
 figure exactly.
 
 **`--debug --stack-diffs` sanity check:** base score = **2020** (not the
@@ -563,7 +565,7 @@ for the next runner: launch as
 status regardless of which shell later reads it.
 
 **Result: 74597 iterations, ZERO hits at `score = 0`.** Best score reached
-was **795** (`permuter-work/func_8002E138/output-795-1`), down from the
+was **795** (`permuter-work/SePitchBend/output-795-1`), down from the
 2020 baseline, found within the first ~4 minutes; no further improvement in
 the remaining ~11 minutes of search.
 
@@ -618,7 +620,7 @@ scramble rather than a simple candidate rewrite).
 ## Round 44 update (runner delta): inherited body re-verified real, not re-attempted further
 
 Re-verified the inherited 113/112 body: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `func_8002E138` compiles to `0x1c4`
+`build/src/code_179d8_l.c.o` confirms `SePitchBend` compiles to `0x1c4`
 bytes = 113 words, matching rounds 33/35/37's figure exactly -- this is a
 genuine, reproducible near-miss, not a stale claim. Given three prior
 rounds' worth of levers already tried and confirmed negative (declaration

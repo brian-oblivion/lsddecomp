@@ -1844,3 +1844,7 @@ vmNoiseOn = 0x8002D8E0; // type:func
 // libsnd neighborhood, right after vmNoiseOn (paired helper). Superseded
 // game-style func_8002DDBC. Round 74 (bravo, track 2).
 vmNoiseOn2 = 0x8002DDBC; // type:func
+// identified: shape 0.99 vs libsnd/vmanager SePitchBend (110w vs our
+// 112w, disc 3.3), position within the libsnd neighborhood. Superseded
+// game-style func_8002E138. Round 74 (bravo, track 2).
+SePitchBend = 0x8002E138; // type:func

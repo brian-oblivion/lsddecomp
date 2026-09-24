@@ -26,7 +26,7 @@ extra `move $t2,$a0` (preserving the raw channel parameter) one instruction
 earlier than retail schedules it -- confirmed with
 `tools/asm-differ/diff.py vmNoiseOn`, not inferred. This is the SAME
 "preserve raw copy before narrowing in place" register-identity residue
-already documented for `vmNoiseOn2` and `func_8002E138` in this unit
+already documented for `vmNoiseOn2` and `SePitchBend` in this unit
 (both also stalled on it, across three prior rounds each) -- a fourth
 instance of the same class, in the same unit.
 
@@ -298,7 +298,7 @@ void vmNoiseOn(s32 a0) {
    three prior reports on the same shape).** Retail computes the masked
    channel byte directly into its working register and defers the raw-value
    preserve by one instruction; every derivation here (and in
-   `vmNoiseOn2`/`func_8002E138`) puts the preserve first. Per HARD RULE 6
+   `vmNoiseOn2`/`SePitchBend`) puts the preserve first. Per HARD RULE 6
    and this unit's own established finding ("variable identifier choice has
    no influence on register assignment" -- `vmNoiseOn2`'s report), not
    re-attempted as a distinct lever here; it is the same wall.
