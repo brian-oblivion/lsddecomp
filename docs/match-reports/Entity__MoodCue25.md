@@ -1,4 +1,6 @@
-# func_8005F454
+# Entity__MoodCue25
+
+> Renamed from `func_8005F454` on 2026-09-24 (tools/rename.py). Address 0x8005f454.
 
 **Unit:** Entity_c · **Size:** 60 words · **Status:** MATCHED (60/60 words,
 whole-image build verified byte-exact)
@@ -11,7 +13,7 @@ whole-image build verified byte-exact)
 call site:
 
 ```c
-void func_8005F454(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue25(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (this->unkFC < 0x64) {
         if (out->unk4 % 3 == 0) {
@@ -73,3 +75,7 @@ per-branch reload, shrinking the function and shifting everything after it.
 This is the same `-O2` tail-merge behind the existing "write the literal
 jump graph with `goto`" entry, just triggering the merge instead of avoiding
 it.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 25 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

@@ -1,4 +1,6 @@
-# func_8005F1D4
+# Entity__MoodCue23
+
+> Renamed from `func_8005F1D4` on 2026-09-24 (tools/rename.py). Address 0x8005f1d4.
 
 **Unit:** Entity_c · **Size:** 101 words · **Status:** MATCHED (101/101 words,
 whole-image build verified byte-exact)
@@ -10,7 +12,7 @@ whole-image build verified byte-exact)
 different rodata pointer / literal:
 
 ```c
-void func_8005F1D4(Entity *this) {
+void Entity__MoodCue23(Entity *this) {
     s32 arg1;
 
     Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
@@ -99,7 +101,11 @@ call), cache it into a local in that ONE arm only. This breaks the
 byte-identity between call sites that the cross-jump pass needs to fold
 them together, without touching the other arms' source at all. This is the
 same GCC 2.6.3 cross-jump/tail-merge mechanism behind the existing "write
-the literal jump graph with `goto`" and `func_8005F454` learnings, but from
+the literal jump graph with `goto`" and `Entity__MoodCue25` learnings, but from
 a new direction: those entries are about triggering or avoiding merges by
 choosing WHERE a call is written; this one is about breaking an
 over-eager merge by choosing WHICH arm gets an early-cached pointer.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 23 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

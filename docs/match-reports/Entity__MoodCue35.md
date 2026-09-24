@@ -1,4 +1,6 @@
-# func_8005FC58
+# Entity__MoodCue35
+
+> Renamed from `func_8005FC58` on 2026-09-24 (tools/rename.py). Address 0x8005fc58.
 
 **Unit:** Entity_c · **Size:** 105 words · **Status:** MATCHED (105/105 words,
 whole-image build verified byte-exact)
@@ -9,7 +11,7 @@ whole-image build verified byte-exact)
 gated on a different modulus of `unkFC`:
 
 ```c
-void func_8005FC58(Entity *this) {
+void Entity__MoodCue35(Entity *this) {
     s32 rem500;
     s32 arg1a;
     s32 arg1b;
@@ -60,7 +62,7 @@ added to `include/Entity.h` between the existing `slotC4` and `slotCC`, same
 Three of the four gates go through the `mult`/`mfhi`/sign-fix magic-multiply
 family: `%6` and `%12` share the same `0x2AAAAAAB` magic constant (only the
 post-`mfhi` `sra` shift differs, 0 vs 1, doubling the effective divisor —
-same discriminator documented for `func_8005F708`'s `%5` vs `func_8005F970`'s
+same discriminator documented for `Entity__MoodCue29`'s `%5` vs `Entity__MoodCue31`'s
 `%10`), and `%500` uses a distinct constant (`0x10624DD3`) kept live in `$s1`
 across all three nudge calls since its comparison happens only at the very
 end. The fourth, `%64`, is a power of 2 and compiles to the classic
@@ -132,7 +134,7 @@ computes the call's other argument, splits a vtable dispatch into its two
 constituent loads the way GCC 2.6.3 sometimes does on its own.** A plain
 `obj->vtable_ptr->slotNN(...)` call bundles "load the vtable pointer" and
 "load the slot from it" into one expression evaluated adjacent to the call;
-retail's disassembly here (and in `func_8005F1D4`, `func_8005FC58`)
+retail's disassembly here (and in `Entity__MoodCue23`, `Entity__MoodCue35`)
 sometimes shows the FIRST of those two loads scheduled well before the
 call, at the point right after an unrelated computation finishes and
 before a branch that doesn't affect it. A bare local `EntityMethods
@@ -156,3 +158,7 @@ The permuter (`tools/setup-permuter.sh`) surfaced the address-of-slot lever
 directly; it is worth reaching for on a "same shape, off-by-one-word,
 several manual attempts failed" residue like this one rather than
 continuing to guess source shapes by hand.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 35 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

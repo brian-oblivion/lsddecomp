@@ -53,7 +53,7 @@ this table, even though neither is called from this unit.
 
 - `EntityMethods::slotB8` -> `setVec14` -- **tier A.** `tools/classtable.py`
   on `ENTITY_METHODS` shows +0x0B8 occupied by the already-named
-  `BaseObjO__SetVec14`. CROSS-UNIT (called by `func_8005F800`, not yet in
+  `BaseObjO__SetVec14`. CROSS-UNIT (called by `Entity__MoodCue30`, not yet in
   any Entity_x unit read so far, plus this unit's own header notes a
   same-shape argument at `Entity__IsNearTarget`'s still-`INCLUDE_ASM` call
   site) -- not renamed here, proposed for the head to apply by type scope.

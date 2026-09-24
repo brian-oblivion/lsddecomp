@@ -1,4 +1,6 @@
-# func_8005FEF8
+# Entity__MoodCue38
+
+> Renamed from `func_8005FEF8` on 2026-09-24 (tools/rename.py). Address 0x8005fef8.
 
 **Unit:** Entity_c · **Size:** 33 words · **Status:** MATCHED (33/33 words,
 whole-image build verified byte-exact)
@@ -10,7 +12,7 @@ handler, same family as `Entity_b`'s `Entity__MoodCue14`/`Entity__MoodCue09`/etc
 but with the `slot148` opener made CONDITIONAL rather than unconditional:
 
 ```c
-void func_8005FEF8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue38(Entity *this, EntityMoodHandlerArg *out) {
     if (out->unk4 % 120 == 0) {
         out->unk10 = this->methods->slot148(this);
         out->unk1C = 1;
@@ -33,3 +35,7 @@ Matched on the first attempt.
 None new -- confirms the mood-dispatch handler family extends into
 `Entity_c` with the same idioms `Entity_b` established, including a new
 variant (conditional rather than unconditional `slot148` opener).
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 38 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

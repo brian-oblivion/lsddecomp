@@ -1,4 +1,6 @@
-# func_8005EF54 -- MATCHED (40/40 words)
+# Entity__MoodCue19 -- MATCHED (40/40 words)
+
+> Renamed from `func_8005EF54` on 2026-09-24 (tools/rename.py). Address 0x8005ef54.
 
 Unit: `Entity_c`. Runner: bravo.
 
@@ -10,7 +12,7 @@ EntityMoodHandlerArg *out)`, computes `out->unk10` from `slot148`, maybe sets
 `out->unk1C` on a modulus gate, then always calls `slotC4`.
 
 ```c
-void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue19(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 % 10 == 0) {
         out->unk1C = 0x11;
@@ -31,3 +33,7 @@ void func_8005EF54(Entity *this, EntityMoodHandlerArg *out) {
   blockers.
 
 Matched first attempt (1/30).
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 19 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

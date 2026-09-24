@@ -1,4 +1,6 @@
-# func_8005FA64
+# Entity__MoodCue32
+
+> Renamed from `func_8005FA64` on 2026-09-24 (tools/rename.py). Address 0x8005fa64.
 
 **Unit:** Entity_c · **Size:** 12 words · **Status:** MATCHED (12/12 words,
 whole-image build verified byte-exact)
@@ -20,7 +22,7 @@ positive evidence either way, and the naive next step would be to retype
 same move that resolved `slot48`/`Entity__MoodCue17` in `Entity_b`).
 
 **That move was tried and reverted.** Retyping `EntityMethods::slotC4` to
-`s32` compiles byte-identically for `func_8005FA64` itself, but it also
+`s32` compiles byte-identically for `Entity__MoodCue32` itself, but it also
 changes `Entity__MoodCue00`'s OWN codegen — a function matched in the PREVIOUS
 round, unrelated to this one except for also calling `slotC4` (discarding
 the result, from two different branches, with the same literal arguments).
@@ -35,13 +37,13 @@ output line-for-line against the unmodified baseline.
 
 `Entity__MoodCue00`'s own bytes are the stronger, more direct evidence (an
 ACTUAL verified byte-exact match, not an inference from a single tail-call
-shape), so `slotC4` stays `void`, and `func_8005FA64` is written as a plain
+shape), so `slotC4` stays `void`, and `Entity__MoodCue32` is written as a plain
 `void` wrapper with a bare statement call, not `return`.
 
 ## Final C
 
 ```c
-void func_8005FA64(Entity *this) {
+void Entity__MoodCue32(Entity *this) {
     this->methods->slotC4(this, -0x1E, 0);
 }
 ```
@@ -63,7 +65,11 @@ function elsewhere in the same header's blast radius, by changing whether
 GCC tail-merges two of that function's own discarded calls. When a vtable
 slot has multiple discarding callers already matched, recompile ALL of them
 (not just spot-check the one being worked) before committing to a retype
-motivated by a single tail-call site. `slotCC` (`func_8005FEC8.md`, same
+motivated by a single tail-call site. `slotCC` (`Entity__MoodCue37.md`, same
 round) faced the identical question and was independently verified NOT to
 have this problem — the two slots needed opposite answers despite looking
 symmetric.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 32 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

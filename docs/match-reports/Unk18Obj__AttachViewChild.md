@@ -50,7 +50,7 @@ void Unk18Obj__AttachViewChild(Unk18Obj *self, void *a1, void *a2, void *a3, voi
    optimizer, so it can't assume the field is unchanged), one word short
    per re-read. This is the OPPOSITE of DECOMPILATION_LEARNINGS' existing
    "do not cache a `this->field` across an intervening vtable call" entry
-   (`func_8005FB6C`) — that entry is about a case where caching was WRONG;
+   (`Entity__MoodCue34`) — that entry is about a case where caching was WRONG;
    here it's required. Both are real, and only the disassembly (does the
    register hold across the call, or get reloaded?) tells you which one a
    given function needs.
@@ -83,7 +83,7 @@ Confirms the register-caching question ("does `this->field` need to
 survive across an intervening call, or does re-reading it match?") is
 genuinely per-function and has to be read off the disassembly each time —
 this function needed caching where an earlier-documented one (round 12's
-`func_8005FB6C`) needed the opposite. Also: **a parameter used exactly
+`Entity__MoodCue34`) needed the opposite. Also: **a parameter used exactly
 once, defaulted via `if (param == NULL) param = X;` immediately before its
 one use, can still get promoted into an extra callee-saved register if the
 compiler can't prove no intervening call needs it preserved — spelling the

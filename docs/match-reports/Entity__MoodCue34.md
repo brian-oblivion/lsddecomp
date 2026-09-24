@@ -1,11 +1,13 @@
-# func_8005FB6C -- MATCHED (59/59 words)
+# Entity__MoodCue34 -- MATCHED (59/59 words)
+
+> Renamed from `func_8005FB6C` on 2026-09-24 (tools/rename.py). Address 0x8005fb6c.
 
 Unit: `Entity_c`. Runner: bravo.
 
 ## Shape
 
 ```c
-void func_8005FB6C(Entity *this) {
+void Entity__MoodCue34(Entity *this) {
     EntityMethods *methods;
     s32 arg1;
 
@@ -107,3 +109,7 @@ against the right symbol, the wrong-looking linked value is downstream of
 an unrelated size mismatch in the SAME function (or an earlier one), not a
 new bug at the site of the anomaly. Fix the size mismatch first; do not
 spend attempts theorizing about symbol/table layout while it stands.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 34 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

@@ -1,4 +1,6 @@
-# func_8005F970
+# Entity__MoodCue31
+
+> Renamed from `func_8005F970` on 2026-09-24 (tools/rename.py). Address 0x8005f970.
 
 **Unit:** Entity_c · **Size:** 61 words · **Status:** MATCHED (61/61 words,
 whole-image build verified byte-exact)
@@ -11,7 +13,7 @@ update instead of the usual `slot148` snapshot, and closes with a distance
 check against `this->unk80` instead of the usual `slotC4` nudge:
 
 ```c
-void func_8005F970(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue31(Entity *this, EntityMoodHandlerArg *out) {
     Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     this->unk94->methods->slot130(this->unk94, 1);
     if ((out->unk4 % 10) < 3) {
@@ -41,7 +43,7 @@ caller:
 The `mult`/`mfhi`/`sra`-`subu` sign-fix chain (magic constant `0x66666667`,
 extra `sra $v1, $v1, 2` after `mfhi`) reconstructs `10 * quotient` via
 `(q<<2 + q)<<1`, i.e. division by 10 -- `out->unk4 % 10` reproduces it
-directly, same idiom as `func_8005FEF8` (divisor 120) and `Entity_b`'s
+directly, same idiom as `Entity__MoodCue38` (divisor 120) and `Entity_b`'s
 `Entity__MoodCue00`/`Entity__MoodCue13` (divisor 10/3). The guard compares the
 remainder against `3` with `slti` (`< 3`), not `== 0` like the other
 handlers in this unit -- a wider mood-trigger window, not a different
@@ -57,3 +59,7 @@ None new -- confirms `EntityMethods::slot130`/`slot30` and
 `Unk94Methods::slot130` each have a second/third caller with no new
 signature information, and that this unit's mood-dispatch handlers can gate
 on `remainder < K` as well as `remainder == 0`.
+
+## Naming
+
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 31 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.

@@ -55,7 +55,7 @@ translated to idiomatic naming:
   documents the exact same lever from `Class86F88__AddChildAndSetState` ("A `do { ... }
   while (0)` wrapper around an otherwise-unconditional body can be
   load-bearing for delay-slot scheduling... mechanism unexplained"), and
-  `src/Entity_c.c`'s `func_8005F544` already ships it in matched,
+  `src/Entity_c.c`'s `Entity__MoodCue26` already ships it in matched,
   committed code with an identical comment ("load-bearing for register
   allocation only... without it GCC swaps which callee-saved register
   holds `this` vs `out`"). This is a THIRD confirmed instance of the same
@@ -66,7 +66,7 @@ translated to idiomatic naming:
 ### Proposed learning
 
 Broadens the existing `do { ... } while (0)`-wrapper learning
-(`Class86F88__AddChildAndSetState`, `func_8005F544`) with a third data point: the same
+(`Class86F88__AddChildAndSetState`, `Entity__MoodCue26`) with a third data point: the same
 no-op-loop lever also fixes a pure **prologue callee-save STORE ORDER**
 residue, not just a register-identity swap. Given this project's own
 "prologue store order is not reachable from C" class (this function's

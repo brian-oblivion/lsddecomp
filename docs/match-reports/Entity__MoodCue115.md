@@ -74,14 +74,14 @@ out with no source change at all.
 
 ### Why the old typing was adopted, and why it was never evidence
 
-`slotCC` was typed `s32` on the strength of `func_8005FEC8` (Entity_c) being a
+`slotCC` was typed `s32` on the strength of `Entity__MoodCue37` (Entity_c) being a
 lone one-line wrapper, `return this->methods->slotCC(this, -0x5A, 0);` —
 CLAUDE.md's "one-line wrapper" rule, which says a discarded return is never
 evidence of `void`, so a wrapper returning the callee's value should be typed
 value-returning absent contrary evidence.
 
-**`func_8005FEC8` compiles byte-identically either way**, as
-`void func_8005FEC8(Entity *this) { this->methods->slotCC(this, -0x5A, 0); }`
+**`Entity__MoodCue37` compiles byte-identically either way**, as
+`void Entity__MoodCue37(Entity *this) { this->methods->slotCC(this, -0x5A, 0); }`
 — verified by the whole-image oracle. Its bytes were never evidence in either
 direction. This function's bytes ARE evidence, and they say `void`.
 
@@ -92,7 +92,7 @@ use the value, both in `src/Entity_c.c`:
 
 - the local function-pointer variable in `func_8005FE1C`'s block
   (`s32 (**slotCC)(Entity *, s32, s32);` → `void (**slotCC)(...)`)
-- `func_8005FEC8`'s `return` → a bare statement call, and its own return type
+- `Entity__MoodCue37`'s `return` → a bare statement call, and its own return type
   `s32` → `void`. It has no prototype in any header and no other caller, so
   this is a purely local retype.
 
@@ -223,7 +223,7 @@ both directions, on two different slots, by two different rounds.
 CLAUDE.md's "one-line wrapper" rule is a tie-breaker for when there is no
 evidence, and it says so ("no positive evidence of void"). The trap is that it
 reads like evidence once it has been written into a header comment, and the
-header is then what everyone else builds on. `func_8005FEC8` compiles
+header is then what everyone else builds on. `Entity__MoodCue37` compiles
 byte-identically both ways: **a tail-call wrapper's bytes are not evidence in
 EITHER direction**, so the rule never produced a fact here, only a default.
 When a sibling cross-jump elsewhere does produce a fact, it outranks the
