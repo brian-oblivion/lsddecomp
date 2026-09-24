@@ -16,25 +16,23 @@
  * (`func_8001D6A4`/`D6AC`, kept `func_` per this class's own
  * `Class6B5CC__func_1d33c` no-op precedent); a command dispatcher over the same
  * "attach" state (`Class6B5CC__DispatchLinkCommand`, proposed `Class6B5CC__DispatchLinkCommand`);
- * a proximity-attach attempt (`Class6B5CC__TryAttachNearby`, STALL, proposed
- * `Class6B5CC__TryAttachNearby`) that hands off to a rotation compose-and-
+ * a proximity-attach attempt (`Class6B5CC__TryAttachNearby`, MATCHED round
+ * 76) that hands off to a rotation compose-and-
  * apply step (`Class6B5CC__ComposeAndApplyRotation`), a corner-list AABB
  * overlap test (`Class6B5CC__CheckBoundsOverlap`, MATCHED round 73), and a
- * plane-classification test (`Class6B5CC__ClassifyAgainstPlanes`, STALL, proposed
- * `Class6B5CC__ClassifyAgainstPlanes` -- the RESOLVED former `gp_rel`
- * blocker, ordinary matching work now); a third no-op stub
- * (`func_8001E49C`); a parent-list notify walk (`Class6B5CC__NotifyTaggedParents`, STALL,
- * proposed `Class6B5CC__NotifyTaggedParents` -- naming only, matching
- * this one is explicitly out of scope for this round); this unit's own
+ * plane-classification test (`Class6B5CC__ClassifyAgainstPlanes`, MATCHED
+ * round 76); a third no-op stub
+ * (`func_8001E49C`); a parent-list notify walk (`Class6B5CC__NotifyTaggedParents`,
+ * MATCHED round 76); this unit's own
  * vtable getter (`GetClass6B5CCMethods`, proposed `GetClass6B5CCMethods`,
  * cross-unit); and a small free-function pair for segment/AABB clipping
  * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
  * all) that `Class6B5CC__CheckBoundsOverlap` and `Class6B5CC__ClassifyAgainstPlanes` build on.
  *
- * Three functions remain INCLUDE_ASM: `Class6B5CC__TryAttachNearby`,
- * `Class6B5CC__ClassifyAgainstPlanes`, `Class6B5CC__NotifyTaggedParents` -- all documented stalls, see
- * docs/match-reports/. (`Class6B5CC__CheckBoundsOverlap` was the fourth
- * until round 73.)
+ * Every function in this unit is matched. (`Class6B5CC__CheckBoundsOverlap`
+ * matched round 73; `Class6B5CC__TryAttachNearby`,
+ * `Class6B5CC__ClassifyAgainstPlanes` and `Class6B5CC__NotifyTaggedParents`
+ * round 76.)
  */
 
 #include "common.h"
@@ -166,27 +164,28 @@ void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2) {
     }
 }
 
+/* The corner list this function builds and hands to +0xA8/+0xAC: the count
+ * header and eight corners are ONE local (count at sp+0x50, corners at
+ * sp+0x54); round 76. Same layout as CornerList_d294 with the array made
+ * explicit. */
+typedef struct AttachCornerList_d294b {
+    s32 count;
+    Vec3S16_d294 v[8];
+} AttachCornerList_d294b;
+
 /* Range-checks `other` against `self` (each axis of position difference
  * must fit in +/-0x4000), then hands off to three vtable slots
  * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = Class6B5CC__ClassifyAgainstPlanes)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->unk28 and notifying it via its own +0x038 slot. */
-#ifdef NON_MATCHING
-/* NON_MATCHING: 140/143 words, length exact. Residue: a pure stack-slot-
- * address swap between buf54 and count's own address-taken slot
- * (docs/match-reports/Class6B5CC__TryAttachNearby.md). The preserved
- * best-scoring body reaches this axis-by-axis range check with a literal
- * goto-CFG mirroring retail's jump graph and a cached other->unk30 pointer;
- * both are byte-shaped levers with no effect on behavior, so this body
- * writes the plain if/else form and the direct other->unk30->unk4 access
- * instead -- see the report for the byte-shaped variant. Hand-derived. */
 void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     Vec3_d294 *posA;
     Vec3_d294 *posB;
     Vec3_d294 diffRaw;
     Vec3S16_d294 diff;
-    s32 count;
-    u8 buf54[0x4C];
+    s32 abs;
+    u8 unused[0x20]; /* sp+0x30, never referenced; reserves retail's slot */
+    AttachCornerList_d294b list;
 
     if (self->unk20 == NULL) {
         return;
@@ -203,48 +202,66 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;
 
-    if (diffRaw.x >= 0) {
-        if (diffRaw.x >= 0x4001) {
-            return;
-        }
-    } else if (-diffRaw.x >= 0x4001) {
+    if (diffRaw.x < 0) {
+        goto x_neg;
+    }
+    if (diffRaw.x < 0x4001) {
+        goto x_done;
+    }
+    return;
+x_neg:
+    abs = ~diffRaw.x + 1;
+    if (abs >= 0x4001) {
         return;
     }
-    if (diffRaw.y >= 0) {
-        if (diffRaw.y >= 0x4001) {
-            return;
-        }
-    } else if (-diffRaw.y >= 0x4001) {
+x_done:
+    if (diffRaw.y < 0) {
+        goto y_neg;
+    }
+    if (diffRaw.y < 0x4001) {
+        goto y_done;
+    }
+    return;
+y_neg:
+    abs = ~diffRaw.y + 1;
+    if (abs >= 0x4001) {
         return;
     }
-    if (diffRaw.z >= 0) {
-        if (diffRaw.z >= 0x4001) {
-            return;
-        }
-    } else if (-diffRaw.z >= 0x4001) {
+y_done:
+    if (diffRaw.z < 0) {
+        goto z_neg;
+    }
+    if (diffRaw.z < 0x4001) {
+        goto z_done;
+    }
+    return;
+z_neg:
+    abs = ~diffRaw.z + 1;
+    if (abs >= 0x4001) {
         return;
     }
+z_done:
 
     diff.x = diffRaw.x;
     diff.y = diffRaw.y;
     diff.z = diffRaw.z;
 
-    count = other->unk30->unk0;
-    self->methods->composeAndApplyRotation(self, &diff, buf54, &other->unk30->unk4, count * 8);
+    list.count = other->unk30->unk0;
+    {
+        GenericCountList_d294 *countList = other->unk30;
+        self->methods->composeAndApplyRotation(self, &diff, list.v, &countList->unk4, list.count * 8);
+    }
 
-    if (!self->methods->checkBoundsOverlap(self, &count, &diff)) {
+    if (!self->methods->checkBoundsOverlap(self, &list, &diff)) {
         return;
     }
-    if (!self->methods->classifyAgainstPlanes(self, other->unk2C, &diff, &count)) {
+    if (!self->methods->classifyAgainstPlanes(self, other->unk2C, &diff, &list)) {
         return;
     }
 
     self->unk28 = other;
     other->methods->onNotify(other, self, 4);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__TryAttachNearby);
-#endif
 
 /* Fills buf1 from self's own +0x84 slot, then folds in every node of the
  * self->unkC list (each node's own +0x84 slot combined into buf1 via
@@ -335,31 +352,30 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
 }
 
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 29/199 words, length exact. Residue: whole-function
- * register-pressure interaction, not a simple two-value swap -- Part 1's
- * own induction-variable decomposition (four raw read pointers plus two
- * write pointers in retail, against the indexed mid[row].x/y/z form here)
- * competes for callee-saved registers with everything else in the function
- * (docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md). Hand-derived. */
+/* Tests the corner list against every model plane. Part 1 averages two
+ * diagonal corner pairs into mid[0]/mid[1] and tests that segment against
+ * each plane, setting bit i of self->unk2C on a hit; any hit returns at once.
+ * Otherwise every 8-corner box k in `list` has its two vertical edges
+ * (corner m against corner m+4, m = 1, 2) tested against every plane, and a
+ * hit sets plane bit i in self->unk2C and box bit k in *outFlag. `hit` is
+ * written only as 0, but retail still tests it. Round 76. Byte levers:
+ * the D_8008A838 gate is two arms that each set the bit, so loop.c sees two
+ * equal constant-1 loads (savings 2) and hoists the 1 into $s1; Part 1 walks
+ * `p`, `v` and `hi` as pointers. */
 extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
-s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
+s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, AttachCornerList_d294b *list) {
     Vec3S16_d294 mid[2];
-    s16 *loPtr;
-    s16 *hiPtr;
-    s32 row;
+    Vec3S16_d294 *p;
+    Vec3S16_d294 *hi;
     s32 count1;
     s32 i;
     Sixteen6_d294 *plane;
-    s32 flag2;
+    s32 hit;
     s32 cnt2;
-    s32 j;
-    u8 *rowBase;
+    Vec3S16_d294 *v;
     s32 k;
-    s32 bitJ;
-    s32 bitK;
     s32 m;
     s32 bigConst;
     s32 outWord;
@@ -367,25 +383,27 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
 
     bigConst = 0x7FFFFFFF;
 
-    loPtr = (s16 *)((u8 *)list + 4);
-    hiPtr = (s16 *)((u8 *)list + 0x10);
-    for (row = 0; row < 2; row++) {
-        mid[row].x = (loPtr[0] + hiPtr[0]) >> 1;
-        mid[row].y = (loPtr[1] + hiPtr[1]) >> 1;
-        mid[row].z = (loPtr[2] + hiPtr[2]) >> 1;
-        loPtr = (s16 *)((u8 *)loPtr + 0x18);
-        hiPtr = (s16 *)((u8 *)hiPtr + 0x18);
+    v = list->v;
+    hi = list->v + 2;
+    for (p = mid; p < &mid[2]; p++) {
+        p->x = (v->x + hi->x) >> 1;
+        p->y = (v->y + hi->y) >> 1;
+        p->z = (v->z + hi->z) >> 1;
+        v += 4;
+        hi += 4;
     }
 
-    count1 = func_8001F3A4(self->unk20);
     self->unk2C = 0;
-    flag2 = 0;
+    count1 = func_8001F3A4(self->unk20);
+    hit = 0;
     for (i = 0; i < count1; i++) {
         plane = func_8001F50C(self->unk20, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
-                if (D_8008A838 == 0 || outWord >= 0x201) {
-                    self->unk2C |= (1 << i);
+                if (D_8008A838 == 0) {
+                    self->unk2C |= 1 << i;
+                } else if (outWord >= 0x201) {
+                    self->unk2C |= 1 << i;
                 }
             }
         }
@@ -393,44 +411,37 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
 
     if (self->unk2C != 0) {
         *outFlag = 1;
-        if (flag2 != 0) {
+        if (hit != 0) {
             return 2;
         }
         return 1;
     }
 
     *outFlag = 0;
-    cnt2 = *(s32 *)list;
-    for (j = 0; j < count1; j++) {
-        plane = func_8001F50C(self->unk20, j);
-        bitJ = 1 << j;
-        rowBase = (u8 *)list + 4;
+    cnt2 = list->count;
+    for (i = 0; i < count1; i++) {
+        plane = func_8001F50C(self->unk20, i);
+        v = list->v;
         for (k = 0; k < cnt2; k++) {
-            bitK = 1 << k;
             for (m = 0; m < 4; m++) {
                 if (m == 1 || m == 2) {
-                    u8 *rowM = rowBase;
-                    u8 *rowMplus1 = rowBase + 0x18;
-                    if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
-                        if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
-                            if (D_8008A838 == 0 || outWord >= 0x201) {
-                                self->unk2C |= bitJ;
-                                *outFlag |= bitK;
+                    if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, v, v + 4)) {
+                        if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, v, v + 4)) {
+                            if (outWord >= 0x201) {
+                                self->unk2C |= 1 << i;
+                                *outFlag |= 1 << k;
                             }
                         }
                     }
                 }
-                rowBase += 6;
+                v++;
             }
-            rowBase += 0x18;
+            v += 4;
         }
     }
 
     return (*outFlag != 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__ClassifyAgainstPlanes);
-#endif
 
 /* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
  * tail-merge/shared-block dispatch, see the git history for the full
@@ -571,49 +582,31 @@ void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *ne
 void func_8001E49C(void) {
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 48/54 words, length exact. Residue: register identity --
- * self and the literal tag value 4 land in $s1/$s2 swapped from retail's
- * own assignment (docs/match-reports/Class6B5CC__NotifyTaggedParents.md).
- * The preserved best-scoring body indirects self/node/the tag literal
- * through named locals and splits the tag comparison into its own
- * statement, both purely to influence register allocation; this body
- * writes the plain, direct form instead -- see the report for the
- * byte-shaped variant. Hand-derived. */
+/* Walks node's parent refs. For each run it finds the next entry whose class
+ * kind (low nibble of its method table's first word) is 4. If that entry's
+ * tag byte is also 0x34, it calls the entry's +0x010 slot with self. Round 76:
+ * the two nested do/while loops are real loops for loop.c, which hoists the
+ * literal 4 into $s1. The goto form of earlier rounds had no loop notes, so
+ * it needed a named `tag` and could not get retail's register order. */
 void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
     GenericObj_d294 *entry;
     void *cursor;
 
     entry = NULL;
-loop:
-    BasicClass__GetNextParentRef(node, &entry, &cursor);
-    if (entry == NULL) {
-        goto check_cursor;
-    }
-    if ((entry->methods->header & 0xF) == 4) {
-        goto dispatch;
-    }
-check_cursor:
-    if (cursor != NULL) {
-        goto loop;
-    }
-    entry = NULL;
-dispatch:
-    if (entry == NULL) {
-        goto tail;
-    }
-    if (*(u8 *)entry->methods != 0x34) {
-        goto tail;
-    }
-    entry->methods->slot10(entry, self);
-tail:
-    if (cursor != NULL) {
-        goto loop;
-    }
+    do {
+        do {
+            BasicClass__GetNextParentRef(node, &entry, &cursor);
+            if (entry != NULL && (entry->methods->header & 0xF) == 4) {
+                goto found;
+            }
+        } while (cursor != NULL);
+        entry = NULL;
+    found:
+        if (entry != NULL && *(u8 *)entry->methods == 0x34) {
+            entry->methods->slot10(entry, self);
+        }
+    } while (cursor != NULL);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__NotifyTaggedParents);
-#endif
 
 /* This unit's own no-argument vtable getter -- see the extended note on
  * gClass6B5CCMethods in include/code_d294.h and the file banner up top. */

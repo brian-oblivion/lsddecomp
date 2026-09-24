@@ -1,6 +1,90 @@
-# Class6B5CC__ClassifyAgainstPlanes -- STALL: length EXACT (199/199 words, no drift); 29/199 raw word-match; first real diff at vram 0x8001DDF8 (register identity, `self` in $s4 vs retail's $s5)
+# Class6B5CC__ClassifyAgainstPlanes -- MATCHED (round 76, bravo: 199/199, whole image green; was 29/199 length-exact)
 
 > Renamed from `func_8001DDF4` on 2026-09-18 (tools/rename.py). Address 0x8001ddf4.
+
+REVISITED, round 76: MATCHED 199/199 (build exit=0, whole-image SHA1 green); names/types used -- `list` retyped to the corner-list struct TryAttachNearby's match established (`AttachCornerList_d294b`), `flag2` renamed `hit`.
+
+## Round 76 (bravo): MATCHED -- four levers, none of them register allocation
+
+**Rebuild first.** The round-69 `#ifdef NON_MATCHING` body (the round-46/55
+preserved body) rebuilt live: **29/199, insertions 12 / deletions 12,
+positional skeleton diffs 166**. So the "register identity" title was never
+a same-length swap. There was real structure to find.
+
+Twelve builds took it to the match, in this order (`funcdiff` / ins-del):
+
+1. **Argument type, one loop variable for both plane loops, and
+   `self->unk2C = 0` before the `func_8001F3A4` call.** `list` is the same
+   `{s32 count; Vec3S16_d294 v[8];}` local that TryAttachNearby passes (same
+   round). Retail keeps the plane index for Part 2 AND Part 3 in `$s4`, so
+   the source uses ONE variable `i` where the old body had `i` and `j`. And
+   retail's `sw zero,0x2C(s5)` sits in the call's delay slot, which reorg can
+   only fill from BEFORE the call. With these three changes `self` moved from
+   `$s4` to retail's `$s5` and every Part 2/3 saved register agreed. (Round
+   55 had measured the `unk2C` reorder alone as inert. It was, alone.) Part 1
+   written indexed at this stage was 196 words, 7/199.
+2. **Part 1 is three pointer walks.** `for (p = mid; p < &mid[2]; p++)`
+   gives retail's un-folded entry test (`sltu a3,t1; beqz`) and its
+   x-pointer plus y/z-pointer split (`sh -2(a2)`/`sh 0(a2)`, the second a
+   giv at `&p->z`). `v` and `hi = list->v + 2`, each `+= 4`, give the four
+   read pointers. A single `v` with `v[2]` combined all reads into one giv
+   (20/199). Two pointers: 59/199, ins/del 5/5.
+3. **Part 3 has no `D_8008A838` gate.** Retail's inner test is only
+   `lw 0x44(sp); slti 0x201; bnez`. The derived body copied Part 2's
+   `D_8008A838 == 0 ||`. Removing it: 56/199 raw, but ins/del **1/1**, and
+   the `m`-loop's early `addiu s2,s2,1` in the delay slot fixed itself.
+4. **The last residue was a loop.c movable decision, read from `cc1 -dL`.**
+   Retail hoists the constant `1` of `1 << i` into `$s1` in the Part 2 loop
+   preheader (`li s1,1` after `addiu s0,sp,0x1e`). The build rematerialized
+   `li v0,1` in two delay slots. The loop dump said
+   `Insn 193: regno 125 (life 1), move-insn savings 1 not desirable`. The
+   test is `threshold * savings * lifetime >= insn_count`, with threshold
+   about `1 + n_non_fixed_regs - 3` for a loop with calls, against 37 real
+   insns. Negatives, each one build: `x = x | (1 << i)` was inert. A named
+   `bit = 1` before the loop reached 195/199, but in the wrong place (before
+   the entry test). `bit = 1` as the first loop statement reached 197/199,
+   but its movable came BEFORE `&mid[1]`'s, so the two preheader insns
+   swapped. `bit = 1` inside either `if` was worse (183/199 and 56/199).
+   **Closing form:** the `||` is two arms that each set the bit,
+
+   ```c
+   if (D_8008A838 == 0) {
+       self->unk2C |= 1 << i;
+   } else if (outWord >= 0x201) {
+       self->unk2C |= 1 << i;
+   }
+   ```
+
+   That gives loop.c two equal constant-1 movables, which it combines
+   (savings 2). The pair is then desirable and hoisted, in its textual
+   position after `&mid[1]`, and cross-jumping merges the two arms back into
+   retail's single tail. 199/199, build exit=0.
+
+A final cleanup build (`for (i = 0; ...)` restored, with `self->unk2C = 0`
+still before the call) stayed 199/199. The `u8 pad[0x18]` from round 46
+stays: it is `sp+0x24..0x3B`, which nothing references. No permuter was run,
+so Gate 3 was not needed. `tools/check-nonmatching.sh` is green (22 bodies:
+this function's `#ifdef` is gone).
+
+### Proposed learning (round 76)
+
+**A constant that retail hoists into a saved register and your build
+rematerializes is a loop.c DESIRABILITY miss, not register allocation.**
+`cc1 -dL` says it outright: `(life 1) ... savings 1 not desirable`. The rule
+is `threshold * savings * lifetime >= insn_count`. `savings` goes up when
+the loop holds two equal invariant loads, so an `a || b` guarding one
+statement that was really two arms setting the same thing (`if (a) S; else
+if (b) S;`) doubles it. Cross-jumping then merges the arms, so the only
+trace left in the bytes is the hoist. A named variable set to the constant
+moves the hoist to the wrong place (before the entry test, or in the wrong
+movable order), and that difference is the discriminator.
+
+**A body that was DERIVED rather than written can copy one arm's condition
+into another.** Part 3's `D_8008A838 == 0 ||` was never in retail. Before
+anything else, check every branch in the derived body against a `lw`/`beqz`
+in the asm.
+
+## History (rounds 45-55)
 
 Round 46 (echo). **This is the first time C was ever written or built for
 this function.** Round 45 (delta) filed a structure-only derivation with NO
