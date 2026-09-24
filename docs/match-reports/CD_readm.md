@@ -11,7 +11,7 @@ stages the three call arguments and the current `D_8006D5FC`/`D_8006D600`
 callback pointers into the driver's staging globals, resets the retry
 counter (`D_8006D8DC = 8`), optionally kicks `CD_cw(9, 0, 0, 0)` if
 `D_8006D60C & 0xE0`, then calls `CD_sync(0, 0)` and
-`func_8002AA6C()`, reducing the latter's result to a `0`/`-1` status.
+`cd_read_retry()`, reducing the latter's result to a `0`/`-1` status.
 
 ## The C
 
@@ -69,7 +69,7 @@ join:
         CD_cw(9, 0, 0, 0);
     }
     CD_sync(0, 0);
-    return -(func_8002AA6C() < 1);
+    return -(cd_read_retry() < 1);
 }
 ```
 

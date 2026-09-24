@@ -410,7 +410,7 @@ narrow the mutation surface itself (isolate just the affected call and its
 immediate neighbors into a much smaller seed, per round 20's own
 alternative suggestion) rather than requesting a still-longer flat search.
 
-**Symbol-name note**: this report's body (like `func_8002AA6C`'s) predates
+**Symbol-name note**: this report's body (like `cd_read_retry`'s) predates
 this unit's rename of `func_80025AE4`/`func_80012C20`/`func_80024D10`/
 `func_80024D40`/`func_80025900` to `puts`/`printf`/`ResetCallback`/
 `InterruptCallback`/`VSync`. Translated all five for this round's build and
@@ -454,7 +454,7 @@ already-correct statements and dilute the search.
 `func_80025AE4`->`puts`) alongside its five siblings in this unit. Round 33
 already translated the names for its own build, so this report was NOT an
 instance of this round's assigned trap (the prose-says-renamed-but-body-
-still-raw-names pattern found in `func_8002AA6C.md`/`CD_readsync.md`/
+still-raw-names pattern found in `cd_read_retry.md`/`CD_readsync.md`/
 `cb_read.md` this same round -- see those reports).
 
 Rebuilt the round-19 fix-1+fix-2 body verbatim, **with all five other
@@ -639,7 +639,7 @@ siblings (`CD_readsync`, matched; `CD_datasync`, improved). Restored to
 
 ### Proposed learning
 
-Confirms `docs/match-reports/func_8002AA6C.md`'s round-39 finding from the
+Confirms `docs/match-reports/cd_read_retry.md`'s round-39 finding from the
 opposite direction: the "always-true either-branch" trick and the
 hoist-both lever both target REGISTER-ALLOCATION-shaped residues (which
 value competes for which slot). A residue that is confirmed PURE

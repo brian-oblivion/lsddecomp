@@ -6,12 +6,12 @@
 
 ## What it does
 
-Registered as a callback (`D_8006D600 = cb_read` in `func_8002AA6C`,
+Registered as a callback (`D_8006D600 = cb_read` in `cd_read_retry`,
 still `INCLUDE_ASM`). If `arg0 == 1` and the retry counter `D_8006D8F4` is
 still positive, calls `CD_getsector(D_8006D8E8, D_8006D8F0)`, advances
 `D_8006D8E8` by `D_8006D8F0 * 4`, and decrements `D_8006D8F4`; otherwise
 sets `D_8006D8F4 = -1`. Records `D_8006D8F8 = func_80025900(-1)`. If
-`D_8006D8F4 < 0` and `D_8006D8DC > 0`, calls `func_8002AA6C()`. If
+`D_8006D8F4 < 0` and `D_8006D8DC > 0`, calls `cd_read_retry()`. If
 `D_8006D8F4 <= 0`, restores the `D_8006D5FC`/`D_8006D600` callback pair from
 `D_8006D8FC`/`D_8006D900` and dispatches `D_8006D604(2 or 5, arg1)`.
 
@@ -38,7 +38,7 @@ void cb_read(s32 arg0, s32 arg1)
     D_8006D8F8 = func_80025900(-1);
 
     if (D_8006D8F4 < 0 && D_8006D8DC > 0) {
-        func_8002AA6C();
+        cd_read_retry();
     }
 
     if (D_8006D8F4 <= 0) {
@@ -131,7 +131,7 @@ shared:
     D_8006D8F8 = func_80025900(-1);
 
     if (D_8006D8F4 < 0 && D_8006D8DC > 0) {
-        func_8002AA6C();
+        cd_read_retry();
     }
 
     if (D_8006D8F4 <= 0) {
@@ -261,7 +261,7 @@ Direct `objdump`/`asm-differ` comparison showed retail computing
 v0,0(v1)` -- 3 instructions) immediately after the `func_80025900(-1)`
 call, where the round-19 body's plain `D_8006D8F8 = func_80025900(-1);`
 compiled FOLDED (`lui at,...; sw v0,...(at)` -- 2 instructions). This is
-the exact `CD_readm`/`CD_flush`/`func_8002AA6C` unfolded-
+the exact `CD_readm`/`CD_flush`/`cd_read_retry` unfolded-
 addressing lever, applied to a THIRD driver-state scalar in this same
 unit:
 
@@ -371,7 +371,7 @@ shared:
     }
 
     if (D_8006D8F4 < 0 && D_8006D8DC > 0) {
-        func_8002AA6C();
+        cd_read_retry();
     }
 
     if (D_8006D8F4 <= 0) {
@@ -405,7 +405,7 @@ the function's shape, rather than treating one negative test as
 permanent.
 
 Also: **this function is now a second confirmed instance (after
-`CD_readm`/`CD_flush`/`func_8002AA6C`) of "a global already
+`CD_readm`/`CD_flush`/`cd_read_retry`) of "a global already
 declared `volatile` at file scope still needs a local `volatile T *`
 pointer at a SPECIFIC access site to get unfolded addressing"** --
 `D_8006D8F8` here, `D_8006D8F4` in the round-19 body already in this same
@@ -462,9 +462,9 @@ build re-verified clean.
    `addiu`/`ori` rendering coincidence.
 
 ### Symbol-name note
-Same finding as `func_8002AA6C.md`/`CD_readsync.md` this round: this
-report's preserved body already calls `VSync`/`func_8002AA6C` by their
-current names, so no translation was needed here (unlike `func_8002AA6C`'s
+Same finding as `cd_read_retry.md`/`CD_readsync.md` this round: this
+report's preserved body already calls `VSync`/`cd_read_retry` by their
+current names, so no translation was needed here (unlike `cd_read_retry`'s
 and `CD_init`'s reports, which still carry the pre-rename raw names).
 
 > **ROUND-36 CORRECTION: the paragraph above is FALSE, and is itself an
@@ -486,7 +486,7 @@ and `CD_init`'s reports, which still carry the pre-rename raw names).
 `func_80025900`->`VSync`. Per the note above, round 33's claim that "no
 translation was needed" was checked against this report's PROSE, not its
 preserved code block, which still uses the raw name. Translated it (the
-`func_8002AA6C` call was already correctly named -- that one really is
+`cd_read_retry` call was already correctly named -- that one really is
 current, it is only `func_80025900`/`VSync` that needed the fix).
 
 Rebuilt the round-20 60/91 body with the fix, **in isolation** (all five
@@ -578,7 +578,7 @@ shared:
     }
 
     if (D_8006D8F4 < 0 && D_8006D8DC > 0) {
-        func_8002AA6C();
+        cd_read_retry();
     }
 
     if (D_8006D8F4 <= 0) {
@@ -771,7 +771,7 @@ own repeated `lui $s0,.../addiu $s0,...` at both use sites, per
 for. This is a clean win with no correctness caveat: `new_var` is a
 straightforward local whose address is read twice in the same
 straight-line block with nothing else able to invalidate it in between,
-unlike this same round's `func_8002AA6C` finding where an equivalent-
+unlike this same round's `cd_read_retry` finding where an equivalent-
 looking hoist broke across a LOOP boundary.
 
 **This is exactly the "same failure mode can be conditioned on the
@@ -852,7 +852,7 @@ shared:
     }
 
     if (D_8006D8F4 < 0 && D_8006D8DC[0] > 0) {
-        func_8002AA6C();
+        cd_read_retry();
     }
 
     if ((*(new_var = &D_8006D8F4)) <= 0) {

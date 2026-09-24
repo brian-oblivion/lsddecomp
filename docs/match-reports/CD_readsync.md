@@ -191,7 +191,7 @@ actually load-bearing here, just mis-filed as a group with its two siblings.
 A CD-subsystem poll/dispatch driver, structurally the same "poll with
 timeout, print a 4-string diagnostic on timeout, close the port, run a
 button/callback dispatch loop, copy 8 bytes, then conditionally chain to
-`func_8002AA6C`/`CD_datasync`" shape as the sibling `CD_datasync`
+`cd_read_retry`/`CD_datasync`" shape as the sibling `CD_datasync`
 (itself a stall in this same unit), wrapped in an OUTER retry loop keyed off
 `arg0` and `D_8006D8F4`.
 
@@ -218,8 +218,8 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
 - Copies 8 bytes from `D_8008B3D4` into `*(u8 *)arg1` — but ONLY if `arg1 !=
   0` (a null-destination guard retail has that is easy to miss reading the
   raw disassembly out of order).
-- If `func_80025900(-1) > D_8006D8F8 + 0x3C`, calls `func_8002AA6C()`
-  (itself a stall in this unit, `docs/match-reports/func_8002AA6C.md`).
+- If `func_80025900(-1) > D_8006D8F8 + 0x3C`, calls `cd_read_retry()`
+  (itself a stall in this unit, `docs/match-reports/cd_read_retry.md`).
 - If `D_8006D8F4 == 0`, calls `CD_datasync(0)` (also a stall).
 - Loops back to the very top of the poll (NOT re-initializing the deadline
   the way this comment described, but jumping back to the SAME `for(;;)`
@@ -230,7 +230,7 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
 `CD_datasync` and `func_80024E64` both needed forward `extern` prototypes
 added to this unit (`CD_datasync` is still `INCLUDE_ASM` later in this
 same file; `func_80024E64` is `INCLUDE_ASM` in a different segment
-entirely) — both added near this file's existing `func_8002AA6C` forward
+entirely) — both added near this file's existing `cd_read_retry` forward
 declaration.
 
 ## Best-derived body (153/174 words, compiled length EXACT at 174/174 — confirmed via `objdump`/`build/lsdde.map`, zero drift outside range)
@@ -325,7 +325,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
         }
 
         if (func_80025900(-1) > pF8[0] + 0x3C) {
-            func_8002AA6C();
+            cd_read_retry();
         }
         if (pF8[-1] == 0) {
             CD_datasync(0);
@@ -457,7 +457,7 @@ would trust it most.
 
 ### Redundant-raw-copy-elision investigation (this round's assigned question)
 
-See the shared writeup in `docs/match-reports/func_8002AA6C.md` (filed
+See the shared writeup in `docs/match-reports/cd_read_retry.md` (filed
 there since that function is the round's primary target for this
 question); this function's own residue 2 above is cited there as a fourth,
 independently-found data point (partial-improvement, not full-transfer)
@@ -517,9 +517,9 @@ swap)** -- four prior attempts (declaration order, assignment order,
 first-use order, spelling) are all already confirmed inert; a fifth guess
 with no new mechanism would just re-spend budget confirming that.
 
-**Symbol-name note (same finding as `func_8002AA6C.md` this round)**: this
+**Symbol-name note (same finding as `cd_read_retry.md` this round)**: this
 report's preserved body already used the current names (`puts`, `printf`,
-`VSync`, `CheckCallback`) -- unlike `func_8002AA6C`/`CD_init`'s
+`VSync`, `CheckCallback`) -- unlike `cd_read_retry`/`CD_init`'s
 reports, whoever wrote this one had already picked up the rename. Worth
 flagging the inconsistency across this unit's reports rather than assuming
 any one of them reflects current symbol names.
@@ -528,7 +528,7 @@ any one of them reflects current symbol names.
 > a few sections above (`## Best-derived body`) calls `func_80025900`,
 > `func_80025AE4`, `func_80012C20`, `func_80024E64` throughout -- all four
 > raw, pre-rename names, not the current ones. `tools/stalesyms.py` confirms
-> all four for this report. This is the SAME trap as `func_8002AA6C.md`'s and
+> all four for this report. This is the SAME trap as `cd_read_retry.md`'s and
 > `cb_read.md`'s own round-36 corrections: round 33 apparently
 > confirmed the rename by reading prose/a nearby paraphrase rather than
 > grepping the actual preserved code block. See the round-36 entry below for
@@ -738,7 +738,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
         }
 
         if (VSync(-1) > pF8[0] + 0x3C) {
-            func_8002AA6C();
+            cd_read_retry();
         }
         if (pF8[-1] == 0) {
             CD_datasync(0);
@@ -844,7 +844,7 @@ the function outright: 173 -> 174/174, BYTE-EXACT.**
 
 Confirmed via the strongest available check, not just `funcdiff.py`'s
 in-range read: reverted every other stalled sibling in this unit
-(`func_8002AA6C`, `CD_init`, `CD_datasync`, `callback`,
+(`cd_read_retry`, `CD_init`, `CD_datasync`, `callback`,
 `cb_read`) to `INCLUDE_ASM`, rebuilt, and `./build-and-verify.sh`
 reports **`OK: build matches retail SLPS_015.56`, exit 0** -- the whole-image
 SHA1, not a per-function window.
@@ -969,7 +969,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
         }
 
         if (VSync(-1) > pF8[0] + 0x3C) {
-            func_8002AA6C();
+            cd_read_retry();
         }
         if (pF8[-1] == 0) {
             CD_datasync(0);

@@ -9,7 +9,7 @@
 Drains the link driver's status byte (`*D_8006D8CC & 7`) by repeatedly
 poking mode byte 1 and status 7 into the staging pointers until it clears,
 then runs the same "close port" tail seen in `CD_init`'s middle and
-`func_8002AA6C`'s tail: clear `D_8006D8DA`, mirror it into `D_8006D8D9`,
+`cd_read_retry`'s tail: clear `D_8006D8DA`, mirror it into `D_8006D8D9`,
 clear `D_8006D61C`, set `D_8006D8D8 = 2`, zero `*D_8006D8C0`/`*D_8006D8CC`,
 and program `*D_8006D8D0 = 0x1325`.
 

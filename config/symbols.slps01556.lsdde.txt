@@ -2007,3 +2007,5 @@ Class86F88__LoadResources = 0x80051F24; // type:func
 Class86F88__ReleaseResources = 0x800520A0; // type:func
 Class86F88__AddChildAndSetState = 0x80052110; // type:func
 Class86F88__RemoveCachedChildren = 0x8005217C; // type:func
+// identified: position (between pinned libcd/bios CD_init 0x8002A75C and CD_readm 0x8002ADE8; same slot as cd_read_retry in 3.3 libcd/bios.o), strings ("CD read retry:" in the bios.c $Id 1.71 1995/12/01 rodata block), shape (CD_cw 2/0xE/6 + VSync(-1) sequence); libcd build on no disc, round 75
+cd_read_retry = 0x8002AA6C; // type:func

@@ -416,7 +416,7 @@ staleness warning, 220/224 bytes (1 instruction short of retail's 56)**.
 Matches this report's own claim exactly.
 
 **First real diff.** With this function's siblings (`CD_init`,
-`func_8002AA6C`, `CD_readsync`) also mid-experiment in the same session,
+`cd_read_retry`, `CD_readsync`) also mid-experiment in the same session,
 `asm-differ`'s naive read was polluted by their own still-open residues
 upstream (a genuine instance of CLAUDE.md's "drift need not come from the
 function you're editing" attribution hazard -- checked `build/lsdde.map` and
@@ -603,7 +603,7 @@ predicts a miss rather than costing a wasted build.
 
 ## Round 49 (runner echo): fresh permuter search (first ever, per this round's assignment) -- negative, one candidate is UB, a safe hand variant of the same idiom regresses
 
-Rebuilt the preserved 30/56 body verbatim in isolation (`func_8002AA6C` also
+Rebuilt the preserved 30/56 body verbatim in isolation (`cd_read_retry` also
 mid-experiment in the same session; checked `build/lsdde.map`/`objdump`
 directly rather than trusting `funcdiff.py`'s own outside-range warning to
 distinguish the two, per this report's own round-33 caution): `build exit=2`,
@@ -658,7 +658,7 @@ if (flags & 2) {
 ```
 
 This LOOKS like the unit's established "reuse an already-hot register as a
-throwaway sink" idiom (`func_8002AA6C`, `CD_datasync`, `CD_readsync` all
+throwaway sink" idiom (`cd_read_retry`, `CD_datasync`, `CD_readsync` all
 confirmed instances), but tracing `pd9` FORWARD to its next use (per this
 round's broadcast lever 3, from delta's round-48 finding) shows it is NOT a
 dead sink: `pd9` is set ONCE before the loop and read on EVERY iteration's
@@ -712,7 +712,7 @@ reverting all of this session's siblings.
   explicitly because it was always satisfied by construction: the reused
   variable's OLD value must be dead at every point reachable from the reuse
   site, not merely "not read immediately after."** `pd9` fails this (read
-  again on a LATER loop iteration under its old meaning); `func_8002AA6C`'s
+  again on a LATER loop iteration under its old meaning); `cd_read_retry`'s
   `n`/`saved` and `CD_datasync`'s `ok` all pass it (each is either about
   to `return` or is unconditionally overwritten before the next read, with
   no loop-carried path back to a stale read). Before adopting ANY

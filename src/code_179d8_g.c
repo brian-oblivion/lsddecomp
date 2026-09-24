@@ -153,12 +153,12 @@ extern s32 CheckCallback(void);                                /* lib/libetc/int
                                                                    (u16)D_8006C272 getter */
 /* Still INCLUDE_ASM in THIS unit (not yet converted) -- INCLUDE_ASM leaves no
  * C-level prototype of its own, so callers within this file need one. */
-extern s32 func_8002AA6C(void);
+extern s32 cd_read_retry(void);
 extern s32 CD_datasync(s32 arg0);
 
 /* Forward declarations: taken by address before their own ROM-order definition
  * further down this file (CD_initintr/CD_init hand callback to
- * InterruptCallback as a thread entry; func_8002AA6C hands cb_read to
+ * InterruptCallback as a thread entry; cd_read_retry hands cb_read to
  * D_8006D600 as a callback). */
 void callback(void);
 void cb_read(s32 arg0, s32 arg1);
@@ -361,13 +361,13 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_g", CD_init);
  * clusters -- a loop-setup scheduling swap at 0x8002AABC (p2 computed from
  * $a0 before vs. after the move into $s5) and a register-identity swap in
  * the final D_8006D8F4=-1 block at 0x8002ADAC -- neither reachable by any
- * reorder or spelling variant tried (docs/match-reports/func_8002AA6C.md).
+ * reorder or spelling variant tried (docs/match-reports/cd_read_retry.md).
  * Hand-derived structure (rounds 17-39); the n/saved throwaway-sink reuse
  * a few lines below is a permuter find (round 41) reviewed here and
  * confirmed sound (both are freshly written on every path before their
  * next read) against a rejected sibling candidate that hoisted a value
  * across a loop boundary unsoundly. */
-s32 func_8002AA6C(void)
+s32 cd_read_retry(void)
 {
     s32 n;
     s32 *tmp;
@@ -474,7 +474,7 @@ s32 func_8002AA6C(void)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_g", func_8002AA6C);
+INCLUDE_ASM("asm/nonmatchings/code_179d8_g", cd_read_retry);
 #endif
 
 s32 CD_readm(s32 arg0, s32 arg1, s32 arg2)
@@ -530,7 +530,7 @@ join:
         CD_cw(9, 0, 0, 0);
     }
     CD_sync(0, 0);
-    return -(func_8002AA6C() < 1);
+    return -(cd_read_retry() < 1);
 }
 
 s32 CD_readsync(s32 arg0, s32 arg1)
@@ -680,7 +680,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
         }
 
         if (VSync(-1) > pF8[0] + 0x3C) {
-            func_8002AA6C();
+            cd_read_retry();
         }
         if (pF8[-1] == 0) {
             CD_datasync(0);
@@ -842,7 +842,7 @@ shared:
     }
 
     if (D_8006D8F4 < 0 && D_8006D8DC[0] > 0) {
-        func_8002AA6C();
+        cd_read_retry();
     }
 
     if ((*(new_var = &D_8006D8F4)) <= 0) {

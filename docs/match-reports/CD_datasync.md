@@ -451,7 +451,7 @@ exact at 364/364 bytes** -- matches round 36's recorded figure exactly.
 
 **Tried the register-pairing reorder axis once more against the CURRENT
 seed** (round 36's permuter fix changed the diagnostic call's last argument,
-which shifted the register-numbering residue from `func_8002AA6C`-style
+which shifted the register-numbering residue from `cd_read_retry`-style
 `p6A0`/`p8D8` at `$s1`/`$s0` to a NEW pairing, `p620`/`p6A0` swapped at
 `$s3`/`$s1`/`$s0` -- confirmed via `objdump -dr build/src/code_179d8_g.c.o`:
 this build assigns `s3=p620` correctly but `s1=p6A0`/`s0=p8D8` where retail
@@ -465,7 +465,7 @@ current order (`p620; p6A0; p8D8;`) remains the local optimum.
 searched -- round 36's only permuter run was against the STALE 45/91 seed,
 before that round's own fix). Base score 1405 (`--debug --stack-diffs`:
 `Register Differences: 21, Reorderings: 5, Insertions: 5, Deletions: 5` --
-messier than `func_8002AA6C`'s pure-register residue, consistent with this
+messier than `cd_read_retry`'s pure-register residue, consistent with this
 being the same "ok-flag vs direct branch" structural class this unit's other
 reports already document). Searched `timeout 600 ... -j 6 --stack-diffs
 --stop-on-zero --best-only`, ~95,476 iterations, best found **995** (four

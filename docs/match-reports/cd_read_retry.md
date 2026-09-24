@@ -1,4 +1,6 @@
-# func_8002AA6C -- STALL (length EXACT 223/223, 215/223 words match, first real diff at vram 0x8002AABC)
+# cd_read_retry -- STALL (length EXACT 223/223, 215/223 words match, first real diff at vram 0x8002AABC)
+
+> Renamed from `func_8002AA6C` on 2026-09-24 (tools/rename.py). Address 0x8002aa6c.
 
 Unit `code_179d8_g`. Runner delta, round 17. 223 instructions.
 
@@ -45,7 +47,7 @@ for this unit.
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_8002AA6C(void)
+s32 cd_read_retry(void)
 {
     s32 n;
     s32 *tmp;
@@ -231,9 +233,9 @@ functions touching the same global.
 
 Per the head's brief, worked from round 19's 119/223 baseline (ignore the
 superseded "Score: NONE" section above this one -- see round 19's own
-entry for why). Read `asm/nonmatchings/code_179d8_g/func_8002AA6C.s`
+entry for why). Read `asm/nonmatchings/code_179d8_g/cd_read_retry.s`
 directly alongside `objdump -dr build/src/code_179d8_g.c.o` and
-`tools/asm-differ/diff.py func_8002AA6C` to localize the actual
+`tools/asm-differ/diff.py cd_read_retry` to localize the actual
 instruction-count gap, rather than trusting the round-19 report's prose
 description of it (which turned out to describe the opposite register
 than what this round's own build actually produced -- see below).
@@ -349,7 +351,7 @@ preserved below for the next attempt.
 ```c
 #if 0
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-s32 func_8002AA6C(void)
+s32 cd_read_retry(void)
 {
     s32 n;
     s32 *tmp;
@@ -685,11 +687,11 @@ its title. Re-compiled the round-20 body verbatim (with symbol names updated
 to what this unit now calls the same functions -- see note below) and
 confirmed it independently: `build exit=2`, no compile errors, `funcdiff.py`
 reports **202/223 words, no staleness warning, compiled length exact at
-223/223** (0x37C bytes, matches retail's own `nonmatching func_8002AA6C, 0x37C`
+223/223** (0x37C bytes, matches retail's own `nonmatching cd_read_retry, 0x37C`
 header). This matches the round-20 report's own claim exactly -- the
 preserved body was NOT one of the "one in six" false claims this round.
 
-**First real diff, read off `tools/asm-differ/diff.py func_8002AA6C` on a
+**First real diff, read off `tools/asm-differ/diff.py cd_read_retry` on a
 clean isolated build: file offset `0x1B270`, vram `0x8002AA70`** -- the very
 first instruction after the prologue's `addiu sp,sp,-0x40`. This is exactly
 the address/value register swap round 20's "what's left" section already
@@ -779,7 +781,7 @@ for making the same choice.
 
 ```c
 #if 0
-s32 func_8002AA6C(void)
+s32 cd_read_retry(void)
 {
     s32 n;
     s32 *tmp;
@@ -974,8 +976,8 @@ confirms **202/223, no staleness warning, compiled length exact at
 223/223** -- matches every prior round's recorded figure exactly, no
 discrepancy.
 
-Set up `tools/setup-permuter.sh func_8002AA6C <seed>` from that body (seed
-kept in `permuter-seeds/func_8002AA6C.c` in this worktree; not committed,
+Set up `tools/setup-permuter.sh cd_read_retry <seed>` from that body (seed
+kept in `permuter-seeds/cd_read_retry.c` in this worktree; not committed,
 mirrors this report's body). One adjustment was needed relative to the
 literal round-36 text: `D_8006D8DC` is now (since round 40's data-model
 correction elsewhere in this unit) declared `extern s32 D_8006D8DC[10];`,
@@ -992,7 +994,7 @@ prior rounds. Scaffold trusted.
 ### Search: 1800s bound, ~194,000 iterations, rc=0 (ran to its own timeout, not killed)
 
 ```
-timeout 1800 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/func_8002AA6C
+timeout 1800 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/cd_read_retry
 ```
 
 Ran the full 1800s to completion (the process's own timeout fired; verified
@@ -1014,7 +1016,7 @@ instead of `puts(D_80010AAC)` directly. Verified against the real oracle:
 on the resulting object shows GCC materializes `D_80010AAC`'s address into
 `$a0` ONCE, before the loop label, and the loop body's `jal puts` relies on
 `$a0` STILL holding it -- while retail's own disassembly
-(`asm/nonmatchings/code_179d8_g/func_8002AA6C.s`, `.L8002AAC8:`) recomputes
+(`asm/nonmatchings/code_179d8_g/cd_read_retry.s`, `.L8002AAC8:`) recomputes
 the same `lui`/`addiu` pair FRESH INSIDE the loop, every iteration. Because
 `$a0` is caller-saved and every iteration of this loop makes several calls
 (`printf`, `CD_cw` more than once) that clobber it, **the hoisted
@@ -1120,7 +1122,7 @@ exit 0, after reverting). Corrected, linkable 215/223 body below.
 
 ```c
 #if 0
-s32 func_8002AA6C(void)
+s32 cd_read_retry(void)
 {
     s32 n;
     s32 *tmp;
@@ -1282,7 +1284,7 @@ exactly, no discrepancy.
 
 ### Fresh permuter search: check 3 passes (AGREE, with the residue's own reorder built in), ~76,160 + 82,965 = 159,125 iterations across two runs, no safe improvement
 
-Set up `tools/setup-permuter.sh func_8002AA6C permuter-seeds/func_8002AA6C.c`
+Set up `tools/setup-permuter.sh cd_read_retry permuter-seeds/cd_read_retry.c`
 from the round-41 215/223 body. `--debug --stack-diffs`: base score **235**
 (`Register Differences: 7, Insertions: 1, Deletions: 1`). Read the `--debug`
 disassembly diff directly rather than trusting the summary numbers alone:
@@ -1297,7 +1299,7 @@ captured -- see below -- so a bounded second run gives a trustworthy
 iteration count and rc for the record):
 
 ```
-timeout 900 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/func_8002AA6C
+timeout 900 ... permuter.py -j 6 --stop-on-zero --best-only permuter-work/cd_read_retry
 ```
 
 First run: ~76,160 iterations (background job, rc not captured to its own
