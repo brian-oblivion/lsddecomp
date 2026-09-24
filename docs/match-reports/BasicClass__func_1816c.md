@@ -4,7 +4,7 @@
 
 BasicClass vtable slot `+0x02C` (`getNextParentRef`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and
-`BasicClass__func_180bc.md` (`getNextChild`) for the `children`-list
+`BasicClass__GetNextChild.md` (`getNextChild`) for the `children`-list
 sibling this one mirrors exactly, over `parentRefs` instead.
 
 ## What it does
@@ -25,7 +25,7 @@ void BasicClass__func_1816c(BasicClass *self, BasicClass **outParent, BasicClass
 }
 ```
 
-Matched first attempt — a plain field-name swap of `BasicClass__func_180bc`.
+Matched first attempt — a plain field-name swap of `BasicClass__GetNextChild`.
 
 ## Provenance
 

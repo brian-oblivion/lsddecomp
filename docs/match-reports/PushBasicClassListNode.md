@@ -6,7 +6,7 @@
 
 The `BasicClassListNode` list-push primitive, used by both of BasicClass's
 lists (`children` via `BasicClass__AddChild`, `parentRefs` via
-`BasicClass__func_180fc`) — see `BasicClass__BasicClass.md` for the
+`BasicClass__AddParentRef`) — see `BasicClass__BasicClass.md` for the
 class's overall design. Both call sites and this function's own
 signature were provisionally established last round while matching those
 two callers (still `INCLUDE_ASM` at the time); this round derives the
@@ -68,5 +68,5 @@ attempts.
 `PushBasicClassListNode`, **tier A**: allocates an 8-byte `BasicClassListNode`
 from `BMemPMgrAlloc` and prepends it to `*head`; used identically for both
 of `BasicClass`'s lists (`children` via `BasicClass__AddChild`/AddChild,
-`parentRefs` via `BasicClass__func_180fc`/AddParentRef), confirming it is
+`parentRefs` via `BasicClass__AddParentRef`/AddParentRef), confirming it is
 the shared list-push primitive rather than something list-specific.

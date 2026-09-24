@@ -38,7 +38,7 @@ void BasicClass__AddChild(BasicClass *self, BasicClass *child)
 function's own `beqz $v0,...` check on the call result immediately after.
 Second argument typed `BasicClass *` rather than a generic `s32`/`void *`
 because every call site in this unit passes an actual `BasicClass *` (this
-function passes `child`; `BasicClass__func_180fc` passes the parent
+function passes `child`; `BasicClass__AddParentRef` passes the parent
 `self`) — see `include/code_8220.h` for the full declaration and the other
 call sites.
 
@@ -46,5 +46,5 @@ call sites.
 
 round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). One
 collateral-drift residue (1 word, the `jal PushBasicClassListNode` target address)
-resolved itself once `BasicClass__func_18040` reached its correct size —
+resolved itself once `BasicClass__RemoveAllChildren` reached its correct size —
 see that function's own report; nothing needed changing here.

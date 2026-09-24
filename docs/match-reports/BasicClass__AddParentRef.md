@@ -1,4 +1,6 @@
-# BasicClass__func_180fc
+# BasicClass__AddParentRef
+
+> Renamed from `BasicClass__func_180fc` on 2026-09-24 (tools/rename.py). Address 0x800180fc.
 
 **Unit:** code_8220 · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
@@ -18,7 +20,7 @@ caller.
 ## The C
 
 ```c
-s32 BasicClass__func_180fc(BasicClass *self, BasicClass *parent)
+s32 BasicClass__AddParentRef(BasicClass *self, BasicClass *parent)
 {
     return PushBasicClassListNode(&self->parentRefs, parent);
 }

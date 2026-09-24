@@ -1,4 +1,6 @@
-# BasicClass__func_18040
+# BasicClass__RemoveAllChildren
+
+> Renamed from `BasicClass__func_18040` on 2026-09-24 (tools/rename.py). Address 0x80018040.
 
 **Unit:** code_8220 · **Size:** 31 instructions · **Status:** MATCHED (31/31 words)
 
@@ -22,14 +24,14 @@ else `*outValue = node->value`, `*cursor = node->next`. Does NOT free the
 popped node (that's `removeChild`'s/`RemoveBasicClassListNode`'s job, which is called
 separately on each extracted value by THIS function's caller-facing use of
 it — `GetNextBasicClass` only walks, it never frees). Also used, identically,
-by the still-`INCLUDE_ASM` `BasicClass__func_180bc`/`BasicClass__func_1816c`
+by the still-`INCLUDE_ASM` `BasicClass__GetNextChild`/`BasicClass__func_1816c`
 ("get next child"/"get next parent ref" iterators) — not derived
 independently here, just cross-checked for a consistent call shape.
 
 ## The final C
 
 ```c
-void BasicClass__func_18040(BasicClass *self)
+void BasicClass__RemoveAllChildren(BasicClass *self)
 {
     BasicClass *child;
     BasicClass **childPtr;

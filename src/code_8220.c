@@ -288,7 +288,7 @@ void BasicClass__RemoveChild(BasicClass *self, BasicClass *child)
     child->methods->removeParentRef(child, self);
 }
 
-void BasicClass__func_18040(BasicClass *self)
+void BasicClass__RemoveAllChildren(BasicClass *self)
 {
     BasicClass *child;
     BasicClass **childPtr;
@@ -303,7 +303,7 @@ void BasicClass__func_18040(BasicClass *self)
     }
 }
 
-void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor)
+void BasicClass__GetNextChild(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor)
 {
     if (*outChild == NULL) {
         *cursor = self->children;
@@ -311,7 +311,7 @@ void BasicClass__func_180bc(BasicClass *self, BasicClass **outChild, BasicClassL
     GetNextBasicClass(outChild, cursor);
 }
 
-s32 BasicClass__func_180fc(BasicClass *self, BasicClass *parent)
+s32 BasicClass__AddParentRef(BasicClass *self, BasicClass *parent)
 {
     return PushBasicClassListNode(&self->parentRefs, parent);
 }

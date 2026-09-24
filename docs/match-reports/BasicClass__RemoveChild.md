@@ -37,7 +37,7 @@ things depending on path (the freed node's pool-free result on the
 match-and-remove path; untouched loop-scan garbage on the not-found path),
 which cannot be a real, usable return value — no caller could rely on it.
 Confirmed void from the USE side too: this function calls it and never
-reads `$v0` afterward, and `BasicClass__func_18040`'s own dispatch through
+reads `$v0` afterward, and `BasicClass__RemoveAllChildren`'s own dispatch through
 `removeChild` (this function, at slot `+0x014`) likewise discards whatever
 comes back. See `include/code_8220.h` for the full declaration.
 
@@ -45,5 +45,5 @@ comes back. See `include/code_8220.h` for the full declaration.
 
 round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). One
 collateral-drift residue (1 word, the `jal RemoveBasicClassListNode` target address)
-resolved itself once `BasicClass__func_18040` reached its correct size —
+resolved itself once `BasicClass__RemoveAllChildren` reached its correct size —
 see that function's own report; nothing needed changing here.

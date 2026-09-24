@@ -11,7 +11,7 @@ through this slot as the last step of tearing an object down.
 
 Frees every node in `self->parentRefs` (via `FreeBasicClassList`, still
 `asm/code_8220_b.s`, not yet carved — signature established last round
-matching `BasicClass__func_18040`: `void FreeBasicClassList(BasicClassListNode
+matching `BasicClass__RemoveAllChildren`: `void FreeBasicClassList(BasicClassListNode
 **head)`, walks and frees every node but does not clear `*head` itself),
 then nulls the list head. Order matters: the call happens BEFORE the
 field is cleared, not after — the walk needs the old head value.

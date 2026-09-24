@@ -40,7 +40,7 @@ Evidence: pops the `BasicClass *` out of the node `*cursor` points at,
 advances `*cursor` to that node's `next`, and writes `NULL` when the cursor
 is exhausted -- one iterator step, nothing else. It is what both of
 BasicClass's public iteration slots are built from: `+0x01C` getNextChild
-(`BasicClass__func_180bc`) and `+0x02C` getNextParentRef
+(`BasicClass__GetNextChild`) and `+0x02C` getNextParentRef
 (`BasicClass__func_1816c`), and it is called directly by
 `BasicClass__NotifyParents` in this unit. The name is `BasicClass`, not
 `BasicClassListNode`, because the value it yields is the `BasicClass *`;

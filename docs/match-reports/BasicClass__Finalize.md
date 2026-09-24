@@ -19,7 +19,7 @@ order:
   (`code_8220_b`), so its own behaviour is unconfirmed here; only that this
   function calls it with a literal `1` second argument.
 - `+0x018` (`removeAllChildren`, `self`) — this unit's own
-  `BasicClass__func_18040` (own report): walks and detaches every entry in
+  `BasicClass__RemoveAllChildren` (own report): walks and detaches every entry in
   `children`.
 - `+0x028` (`clearParentRefs`, `self`) — this unit's own
   `BasicClass__func_1813c` (still `INCLUDE_ASM` this round, but its

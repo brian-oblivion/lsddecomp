@@ -61,7 +61,7 @@ mechanics are its purpose.
 
 Evidence: the body frees every node of a `BasicClassListNode` chain through
 the pool allocator and nothing else. Its two callers in `code_8220.c` are
-`BasicClass__func_18040` (removeAllChildren) and `BasicClass__func_1813c`
+`BasicClass__RemoveAllChildren` (removeAllChildren) and `BasicClass__func_1813c`
 (clearParentRefs), and both do `FreeBasicClassList(&self->list);
 self->list = NULL;` -- i.e. the caller, not this function, clears the head
 pointer. The name says "free the list", and the "does not clear `*head`"

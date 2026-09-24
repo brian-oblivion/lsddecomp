@@ -52,9 +52,9 @@ struct BasicClassMethods {
     /* +0x00C */ void (*finalize)(BasicClass *self);                              /* BasicClass__Finalize: notifyParents(1), removeAllChildren(), clearParentRefs() */
     /* +0x010 */ void (*addChild)(BasicClass *self, BasicClass *child);           /* BasicClass__AddChild */
     /* +0x014 */ void (*removeChild)(BasicClass *self, BasicClass *child);        /* BasicClass__RemoveChild */
-    /* +0x018 */ void (*removeAllChildren)(BasicClass *self);                     /* BasicClass__func_18040 */
-    /* +0x01C */ void (*getNextChild)(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor); /* BasicClass__func_180bc */
-    /* +0x020 */ s32 (*addParentRef)(BasicClass *self, BasicClass *parent);       /* BasicClass__func_180fc; tail-calls PushBasicClassListNode, so typed non-void per the one-line-wrapper rule */
+    /* +0x018 */ void (*removeAllChildren)(BasicClass *self);                     /* BasicClass__RemoveAllChildren */
+    /* +0x01C */ void (*getNextChild)(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor); /* BasicClass__GetNextChild */
+    /* +0x020 */ s32 (*addParentRef)(BasicClass *self, BasicClass *parent);       /* BasicClass__AddParentRef; tail-calls PushBasicClassListNode, so typed non-void per the one-line-wrapper rule */
     /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__func_1811c; tail-calls RemoveBasicClassListNode, which is void (see below) */
     /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__func_1813c */
     /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__func_1816c */

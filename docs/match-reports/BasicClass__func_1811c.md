@@ -24,7 +24,7 @@ void BasicClass__func_1811c(BasicClass *self, BasicClass *parent)
 
 ## Why `void`, not a `return`
 
-Same shape as `BasicClass__func_180fc` (its `addParentRef` sibling), but
+Same shape as `BasicClass__AddParentRef` (its `addParentRef` sibling), but
 the OPPOSITE typing conclusion: `RemoveBasicClassListNode` (matched this round, see
 its own report) is genuinely `void` — its own body leaves `$v0` holding
 one of several unusable values depending on which path is taken, and no
