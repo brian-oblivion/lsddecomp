@@ -1,6 +1,35 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
+/*
+ * code_2cc8c_b -- 20 of Obj86B60's own methods (class table gClass86B60Methods,
+ * see include/code_2cc8c.h for the class's own provenance). Round 78 naming
+ * pass (runner echo): every function in this file MATCHED before this round;
+ * the pass renamed all 20 and five exclusively-owned fields, no stalls.
+ *
+ * What this slice of the class implements: a tab/slot picker with a
+ * scrollable item list inside each tab. `self->activeSlot` selects the tab;
+ * `self->slotElements[i]` is each tab's own representative widget (walked/
+ * broadcast to by Obj86B60__BroadcastToSlots, switched by
+ * Obj86B60__SetActiveSlot); `self->itemLists[idx]`/`self->itemCounts[idx]`
+ * hold the item list WITHIN tab idx (built by Obj86B60__CreateSlotElements,
+ * torn down by Obj86B60__ReleaseSlotElements, positioned/shown by
+ * Obj86B60__RefreshSlotView through `self->listView`); `self->slotCounts[idx]`
+ * is a ring cursor into that per-tab item list.
+ * Obj86B60__BeginElementScroll/Obj86B60__CommitElementScroll/
+ * Obj86B60__CancelElementScroll form a `self->unk3C` state-1<->2 trio that
+ * opens interactive scrolling, then either commits the new cursor position
+ * back into the target descriptor (`SlotEntry::savedCursor`) or cancels back
+ * to the last-committed one; Obj86B60__AdvanceSlotCursor/
+ * Obj86B60__RetreatSlotCursor step the cursor by one (wrapping) and forward
+ * through Obj86B60__SetSlotCursor (vtable slot11C), which does the actual
+ * old/new element highlight swap -- the same shape Obj86B60__SetActiveSlot
+ * uses one level up, switching which TAB is active instead of which item.
+ * Obj86B60__SetTarget/Obj86B60__ReleaseTarget are the constructor/teardown
+ * pair for `self->unk4C` (the "target" descriptor, a cross-unit field --
+ * see Unk4CObj's own comment in the header).
+ */
+
 /* SlotEntry's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
  * copies it with a whole-struct assignment (lw/lw into two fresh
  * temporaries, sw/sw, then a RELOAD of .y before adjusting it) -- see
