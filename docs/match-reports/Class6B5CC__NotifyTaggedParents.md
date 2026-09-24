@@ -1,4 +1,4 @@
-# Class6B5CC__NotifyTaggedParents — STALL (register identity, near miss: 48/54; round-37 permuter search, 73118 iterations rc=124, never beat the base score -- see that round's addendum)
+# Class6B5CC__NotifyTaggedParents — MATCHED (round 76, bravo: 54/54 on the first build of the new shape, whole image green; was 48/54 length-exact)
 
 > Renamed from `func_8001E4A4` on 2026-09-18 (tools/rename.py). Address 0x8001e4a4.
 
@@ -9,6 +9,70 @@ in-range, build clean at that point (verified: this score was read with
 round-19 pass. Restored to
 `INCLUDE_ASM` per project rule — no score short of byte-exact stays in
 `src/`.
+
+REVISITED, round 76: MATCHED 54/54 (build exit=0, whole-image SHA1 green); names/types not relevant -- the fix is loop KIND (goto -> two nested do/while), with the literal 4 unnamed.
+
+## Round 76 (bravo): MATCHED -- the goto CFG was the wall
+
+**Rebuild first.** The round-19 preserved body rebuilt live: **48/54,
+insertions 0 / deletions 0, positional skeleton diffs 6**, `nm -S` `0xd8`,
+the same as retail. So `plan.py`'s "length off" reading was wrong: length is
+exact. The six diffs are the `$s1`/`$s2` exchange of `self` and the literal
+4 (prologue save and set, `beq`, `move a1`).
+
+**The lever (loop kind).** Retail's `ori s1,zero,4` is a loop.c invariant
+hoist. A constant that sits in a callee-saved register and is read only by a
+`beq` inside the loop is what loop.c's move_movables produces. But loop.c only
+sees loops that have NOTE_INSN_LOOP_BEG/END, that is SYNTACTIC loops. Every
+earlier round wrote this function as a `goto` CFG. That form has no loop for
+loop.c to optimise, so the 4 was rematerialized (the 8/54 shape round 13
+started from) until round 13 named it `tag = 4`. A named local set at entry
+is a different pseudo, with different refs and live length, and global-alloc
+priority put it after `self`. That is why no assignment order, declaration
+order or barrier in rounds 13, 19, 20, 37, 41 or 55 (plus 73118 permuter
+iterations) could fix it. None of them changed the loop kind, and a permuter
+never turns a goto into a loop.
+
+The body is two nested do/while loops: an inner "find the next kind-4 entry"
+loop that leaves by `goto found`, and an outer loop over the rest of the
+refs. The 4 is a bare literal:
+
+```c
+entry = NULL;
+do {
+    do {
+        BasicClass__GetNextParentRef(node, &entry, &cursor);
+        if (entry != NULL && (entry->methods->header & 0xF) == 4) {
+            goto found;
+        }
+    } while (cursor != NULL);
+    entry = NULL;
+found:
+    if (entry != NULL && *(u8 *)entry->methods == 0x34) {
+        entry->methods->slot10(entry, self);
+    }
+} while (cursor != NULL);
+```
+
+This matched 54/54 on its first build, with no `s`/`n`/`tag` copies. Round
+13's `for(;;)`/`continue`/`break` attempt (9/54, four saved registers) was a
+different CFG. It was not a proof that syntactic loops cannot work. One
+build, no permuter, so Gate 3 was not needed.
+
+### Proposed learning (round 76)
+
+**A constant in a callee-saved register, set in the prologue and read only
+by a compare inside a loop, is a loop.c hoist, so the loop must be
+SYNTACTIC.** A `goto` loop has no loop notes, and loop.c never touches it.
+Naming the constant (`tag = 4`) gets the register COUNT right but not the
+register ORDER: global-alloc priority depends on the pseudo's refs and live
+length, and a named local has different ones from a hoisted constant.
+Screen: a `li sN,K` in the prologue with no other use of K, and a goto-form
+body. Rewrite the loop as `do/while` before touching locals. This is the
+mirror of echo's round-76 finding (a goto loop AVOIDS strength reduction):
+loop kind decides what loop.c does, in both directions.
+
+## History (rounds 13-55)
 
 ## Signature (as attempted)
 

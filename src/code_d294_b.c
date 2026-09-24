@@ -22,18 +22,17 @@
  * overlap test (`Class6B5CC__CheckBoundsOverlap`, MATCHED round 73), and a
  * plane-classification test (`Class6B5CC__ClassifyAgainstPlanes`, MATCHED
  * round 76); a third no-op stub
- * (`func_8001E49C`); a parent-list notify walk (`Class6B5CC__NotifyTaggedParents`, STALL,
- * proposed `Class6B5CC__NotifyTaggedParents` -- naming only, matching
- * this one is explicitly out of scope for this round); this unit's own
+ * (`func_8001E49C`); a parent-list notify walk (`Class6B5CC__NotifyTaggedParents`,
+ * MATCHED round 76); this unit's own
  * vtable getter (`GetClass6B5CCMethods`, proposed `GetClass6B5CCMethods`,
  * cross-unit); and a small free-function pair for segment/AABB clipping
  * (`ClipSegmentToBox`/`BisectSegmentToBox`, both MATCHED, no `self` at
  * all) that `Class6B5CC__CheckBoundsOverlap` and `Class6B5CC__ClassifyAgainstPlanes` build on.
  *
- * One function remains INCLUDE_ASM: `Class6B5CC__NotifyTaggedParents`, a
- * documented stall, see docs/match-reports/. (`Class6B5CC__CheckBoundsOverlap`
- * matched round 73; `Class6B5CC__TryAttachNearby` and
- * `Class6B5CC__ClassifyAgainstPlanes` round 76.)
+ * Every function in this unit is matched. (`Class6B5CC__CheckBoundsOverlap`
+ * matched round 73; `Class6B5CC__TryAttachNearby`,
+ * `Class6B5CC__ClassifyAgainstPlanes` and `Class6B5CC__NotifyTaggedParents`
+ * round 76.)
  */
 
 #include "common.h"
@@ -583,49 +582,31 @@ void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *ne
 void func_8001E49C(void) {
 }
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 48/54 words, length exact. Residue: register identity --
- * self and the literal tag value 4 land in $s1/$s2 swapped from retail's
- * own assignment (docs/match-reports/Class6B5CC__NotifyTaggedParents.md).
- * The preserved best-scoring body indirects self/node/the tag literal
- * through named locals and splits the tag comparison into its own
- * statement, both purely to influence register allocation; this body
- * writes the plain, direct form instead -- see the report for the
- * byte-shaped variant. Hand-derived. */
+/* Walks node's parent refs. For each run it finds the next entry whose class
+ * kind (low nibble of its method table's first word) is 4. If that entry's
+ * tag byte is also 0x34, it calls the entry's +0x010 slot with self. Round 76:
+ * the two nested do/while loops are real loops for loop.c, which hoists the
+ * literal 4 into $s1. The goto form of earlier rounds had no loop notes, so
+ * it needed a named `tag` and could not get retail's register order. */
 void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
     GenericObj_d294 *entry;
     void *cursor;
 
     entry = NULL;
-loop:
-    BasicClass__GetNextParentRef(node, &entry, &cursor);
-    if (entry == NULL) {
-        goto check_cursor;
-    }
-    if ((entry->methods->header & 0xF) == 4) {
-        goto dispatch;
-    }
-check_cursor:
-    if (cursor != NULL) {
-        goto loop;
-    }
-    entry = NULL;
-dispatch:
-    if (entry == NULL) {
-        goto tail;
-    }
-    if (*(u8 *)entry->methods != 0x34) {
-        goto tail;
-    }
-    entry->methods->slot10(entry, self);
-tail:
-    if (cursor != NULL) {
-        goto loop;
-    }
+    do {
+        do {
+            BasicClass__GetNextParentRef(node, &entry, &cursor);
+            if (entry != NULL && (entry->methods->header & 0xF) == 4) {
+                goto found;
+            }
+        } while (cursor != NULL);
+        entry = NULL;
+    found:
+        if (entry != NULL && *(u8 *)entry->methods == 0x34) {
+            entry->methods->slot10(entry, self);
+        }
+    } while (cursor != NULL);
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_d294_b", Class6B5CC__NotifyTaggedParents);
-#endif
 
 /* This unit's own no-argument vtable getter -- see the extended note on
  * gClass6B5CCMethods in include/code_d294.h and the file banner up top. */
