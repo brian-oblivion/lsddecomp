@@ -54,3 +54,14 @@ including the degenerate "run once" case. Reproduce the loop skeleton
 literally rather than special-casing `retries == 0` into a plain `if`; the
 skeleton's bytes are present in the disassembly even when the loop body
 only ever executes once.
+
+## Head correction, round 75
+
+The two-argument / `filterName` reading of `BuildMemcardPath` above is
+superseded. Round 75 matched `func_8004EA38` by calling it with THREE
+arguments `(pathBuf, self->unkC, suffix)`, the third forwarded from the
+caller's own third parameter already in `$a2` (so no `$a2` set-up is
+emitted, which is why it read as two). `src/class_3bb8c_e.c` now declares
+one real prototype, `extern void *BuildMemcardPath(void *dest, s32 selector,
+void *suffix);`, replacing the unprototyped `arity-ok` declarations; this
+function's bytes are unchanged (see `func_8004EA38.md`).
