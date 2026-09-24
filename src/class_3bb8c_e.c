@@ -233,12 +233,6 @@ s32 func_8004E678(Node3bb8cE *self)
 
 extern s32 func_8004E77C(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3);
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 5/49 words in-range, length 1 short (48/49). Residue: GCC
- * 2.6.3 cross-jump-merges the two func_8004E77C call sites into a single
- * shared `jal` reached by two argument-setup paths, where retail keeps two
- * separate `jal` instructions (docs/match-reports/func_8004E6B8.md, round
- * 37 remeasurement). Hand-derived. */
 s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
 {
     s32 retries;
@@ -248,30 +242,15 @@ s32 func_8004E6B8(Node3bb8cE *self, s32 *p1, s32 *p2, s32 *p3)
     retries = 10;
     *p2 = 0;
     result = func_8004E77C(self, p1, &localFlag, p3);
-    goto check;
-retry:
-    if (retries == 0) {
-        goto done;
+    while (result == 0 || *p1 != 0 || *p3 == 0) {
+        result = func_8004E77C(self, p1, p2, p3);
+        if (retries-- == 0) {
+            break;
+        }
     }
-    retries--;
-    result = func_8004E77C(self, p1, p2, p3);
-check:
-    if (result == 0) {
-        goto retry;
-    }
-    if (*p1 != 0) {
-        goto retry;
-    }
-    if (*p3 == 0) {
-        goto retry;
-    }
-done:
     *p2 = *p2 | localFlag;
     return result;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/class_3bb8c_e", func_8004E6B8);
-#endif
 
 extern s32 func_8004E7D0(Node3bb8cE *self, s32 *p1, s32 *p2);
 extern s32 func_8004E890(Node3bb8cE *self, s32 *p1, s32 *p2);
