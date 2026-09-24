@@ -182,7 +182,7 @@ void Class86F88__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
     }
 }
 
-void func_800523F0(Class86F88 *self, s32 arg1)
+void Class86F88__ForwardToTarget(Class86F88 *self, s32 arg1)
 {
     Class86F88 *other = self->unk3C;
 

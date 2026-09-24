@@ -2889,7 +2889,7 @@ struct Class86F88Methods {
     u8 pad064[0x080 - 0x064];
     /* +0x080 = func_80052498 itself (this unit, matched), whose own body
      * ignores every argument past `self` -- the 3-argument shape below is
-     * what func_800523F0's call site (dispatching through a DIFFERENT
+     * what Class86F88__ForwardToTarget's call site (dispatching through a DIFFERENT
      * instance's slot80, `self->unk3C`) actually passes. Per-call-site
      * arity is this project's established convention; it does not
      * contradict func_80052498's own narrower body. */
@@ -2951,14 +2951,14 @@ struct Class86F88 {
      * pointer and this is an OFFSET table, not a pointer table. */
     s32 *unk18;                    /* +0x018, func_8005292C */
     u8 pad01C[0x020 - 0x01C];
-    s32 unk20;                     /* +0x020, func_800523F0(fwd)/func_80052430/func_80052498/func_800524F8/func_80052598/func_800529FC */
+    s32 unk20;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/func_80052430/func_80052498/func_800524F8/func_80052598/func_800529FC */
     s32 unk24;                     /* +0x024, ditto */
     s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
     s32 unk2C;                     /* +0x02C, Class86F88__TickClosing/Class86F88__SetState */
     s32 unk30;                     /* +0x030, Class86F88__TickClosing/Class86F88__SetState */
     s32 unk34;                     /* +0x034, Class86F88__SetState's slot14 argument */
     u8 pad038[0x03C - 0x038];
-    Class86F88 *unk3C;              /* +0x03C, func_800523F0: another instance of this same class */
+    Class86F88 *unk3C;              /* +0x03C, Class86F88__ForwardToTarget: another instance of this same class */
     Class86F88Elem *unk40[4];       /* +0x040, func_8005278C/func_8005281C/func_800529FC */
     s32 unk50;                      /* +0x050, enable flag guarding most of this class's dispatch */
 };
