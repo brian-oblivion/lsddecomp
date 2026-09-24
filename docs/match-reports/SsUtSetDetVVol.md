@@ -98,6 +98,6 @@ reach for `__asm__`. It is a **size measurement**: read the `addiu $sp, $sp,
 Getting N wrong fails the whole-image build outright rather than scoring
 low, so the oracle tells you immediately.
 
-This is directly actionable on the live queue: `func_8001A268`
+This is directly actionable on the live queue: `UpdatePolyBBoxAndCull`
 (`code_8220_c`) is filed as *"unused-frame placement residue, 53/70 words"*
 and has never been tried against this lever.

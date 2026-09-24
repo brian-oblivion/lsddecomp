@@ -1,4 +1,6 @@
-# func_8001A3EC — MATCHED (53/53 words, as ordinary C)
+# CopyPolyVtx3 — MATCHED (53/53 words, as ordinary C)
+
+> Renamed from `func_8001A3EC` on 2026-09-24 (tools/rename.py). Address 0x8001a3ec.
 
 > **HEAD REWORK, round 13 (2026-09-03).** This was first matched with a
 > whole-function raw-register `__asm__` transcription (preserved below for
@@ -6,7 +8,7 @@
 > byte-exact, whole image green:
 >
 > ```c
-> void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+> void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
 >                    PolyUV4 *uv2) {
 >     dst[0]->xy = src[0]->xy;
 >     dst[1]->xy = src[1]->xy;
@@ -49,7 +51,7 @@ Unit: `src/code_8220_c.c`. Copies three unaligned 8-byte fields
 (`arg1[0]`/`[4]`/`[8]` -> `arg0[0]`/`[4]`/`[8]`, treating `arg0`/`arg1` as
 arrays of 3 pointers) and, for each of the three destinations, an unaligned
 4-byte field from a separate source pointer (`arg2`, `arg3`, `arg4`
-respectively) into `dst+0x10`. Called by `func_8001A4C0` (this unit, next
+respectively) into `dst+0x10`. Called by `CopyPolyVtx4` (this unit, next
 in the queue), which forwards its own unused `a2`/`a3` straight through as
 this function's `arg2`/`arg3`.
 
@@ -74,7 +76,7 @@ as a clobber while also relying on it as an input.
  * the o32-ish calling convention (5th integer arg) and is read directly
  * from 0x10($sp) rather than through a C-level operand.
  */
-void func_8001A3EC(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4)
+void CopyPolyVtx3(void *arg0, void *arg1, void *arg2, void *arg3, void *arg4)
 {
     (void)arg0;
     (void)arg1;
@@ -171,5 +173,5 @@ inference matching retail's, and there's no way to verify the guess from
 this function's body alone. If the whole function (or the unaligned-copy
 portion) is branch-free, the raw-register whole-block `__asm__` approach
 from `TransformAndCullPoly` is strictly safer: it reproduces the exact bytes by
-construction, with no struct-layout risk at all. (`func_8001A3EC`, 53/53 on
+construction, with no struct-layout risk at all. (`CopyPolyVtx3`, 53/53 on
 first attempt.)

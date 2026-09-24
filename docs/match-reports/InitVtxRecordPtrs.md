@@ -1,10 +1,12 @@
-# func_8001A224 — MATCHED (17/17 words)
+# InitVtxRecordPtrs — MATCHED (17/17 words)
 
-Unit: `src/code_8220_c.c`. Immediately precedes `func_8001A268` in ROM
-order — likely a helper it calls, though `func_8001A268` itself is not yet
+> Renamed from `func_8001A224` on 2026-09-24 (tools/rename.py). Address 0x8001a224.
+
+Unit: `src/code_8220_c.c`. Immediately precedes `UpdatePolyBBoxAndCull` in ROM
+order — likely a helper it calls, though `UpdatePolyBBoxAndCull` itself is not yet
 matched (queued next). `kind` is the same "primitive kind" code seen
 already in `code_8220_b` (`ProjectTriFace`/`ProjectQuadFace` pass `3`
-triangle / `4` quad to `func_8001A268`): here it doubles as the LOOP COUNT
+triangle / `4` quad to `UpdatePolyBBoxAndCull`): here it doubles as the LOOP COUNT
 too, since a triangle needs 3 slots written and a quad 4 — one register,
 two jobs, matching how compactly retail keeps live values.
 
@@ -16,7 +18,7 @@ selected by `kind == 4`), `kind` times.
 ## Final source
 
 ```c
-void func_8001A224(void *arg0, void *arg1, s32 kind)
+void InitVtxRecordPtrs(void *arg0, void *arg1, s32 kind)
 {
     u8 *src = (u8 *)arg1 + 0x18;
     u8 *dst0 = (u8 *)arg0;

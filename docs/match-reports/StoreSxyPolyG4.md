@@ -49,7 +49,7 @@ the `storeFirst3` protocol in `docs/match-reports/StoreSxyPolyF4.md`.
    with POLY_FT4, exactly as the tri-flavoured G3/FT3 pair is shared.
 2. **Call site, the discriminator.** The case that passes it (0x8001915C)
    writes `len = 8`, `code = 0x38` -- POLY_G4. The POLY_FT4 cases
-   (`len = 9`, `code = 0x2C`) pass `func_80019774` instead, which lives in
+   (`len = 9`, `code = 0x2C`) pass `StoreSxyPolyFT4` instead, which lives in
    `code_8220_c` and is not this unit's to name; the same two-source
-   argument will name it, and `func_8001979C` as POLY_GT4 (`len = 12`,
+   argument will name it, and `StoreSxyPolyGT4` as POLY_GT4 (`len = 12`,
    `code = 0x3C`), whenever that unit is worked.

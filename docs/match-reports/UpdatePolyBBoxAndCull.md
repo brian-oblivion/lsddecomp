@@ -1,10 +1,12 @@
-# func_8001A268 — MATCHED (70/70, round 75): lever = LOOP KIND (guard + do/while with `yp` set inside the guard) + `end = self + (count << 2) + 0x5C`
+# UpdatePolyBBoxAndCull — MATCHED (70/70, round 75): lever = LOOP KIND (guard + do/while with `yp` set inside the guard) + `end = self + (count << 2) + 0x5C`
+
+> Renamed from `func_8001A268` on 2026-09-24 (tools/rename.py). Address 0x8001a268.
 
 REVISITED, round 75: MATCHED; names/types not relevant (source shape only).
 
 ## ROUND 75 (bravo): MATCHED
 
-Previous title: "func_8001A268 — STALL: length EXACT (70/70 words, no drift); 53/70 raw word-match; first real diff at in-range word 16 (file 0xAAA8 / vram 0x8001A2A8), the stack-frame-adjustment placement residue".
+Previous title: "UpdatePolyBBoxAndCull — STALL: length EXACT (70/70 words, no drift); 53/70 raw word-match; first real diff at in-range word 16 (file 0xAAA8 / vram 0x8001A2A8), the stack-frame-adjustment placement residue".
 
 **Preserved body rebuilt first** (the `#ifdef NON_MATCHING` body compiled
 live): 53/70, `insertions 2 / deletions 2 (positional skeleton diffs 17)`.
@@ -66,7 +68,7 @@ in `src/code_8220_c.c` (noted in rounds 39/44 — it was only ever flipped in
 live temporarily for reproduction). Took the "Best body reached (53/70
 words)" snapshot below verbatim and placed it, wrapped in
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif`, in the unit at its
-existing ROM position (immediately before `func_8001A380`). The local
+existing ROM position (immediately before `FillRCPolyHeader`). The local
 `Vec2s16` typedef was renamed `Vec2s16_268` to follow this unit's existing
 per-function disambiguation convention (`Vec2s16_98`/`_C04`/`_EE4`/`_A64`
 already exist for the sibling family) and avoid any future name collision
@@ -80,7 +82,7 @@ structurally distinct hand attempts plus an 8600+-iteration permuter search
 ## ROUND 48 (bravo): search provenance checked (this function DOES have its own real search, unlike 6 siblings), no new search staffed
 
 My brief listed this function as having "none recorded" for prior search
-depth, alongside `func_8001989C`, and asked to verify whether either was
+depth, alongside `SubmitPolyG3`, and asked to verify whether either was
 ever really searched. For this function that premise is WRONG and worth
 correcting explicitly: this report's own "RUNNER PASS, permuter round"
 section already records a REAL, dedicated, ~8600+-iteration blind search
@@ -88,9 +90,9 @@ section already records a REAL, dedicated, ~8600+-iteration blind search
 genuine sub-baseline candidate (base 120 -> 60), verified it against the
 live oracle, and it was FALSE (52/70, one word worse than the 53/70 this
 report already carries). That is the opposite situation from
-`func_80019C04`/`func_80019EE4`/`func_80019D84`/`func_800199EC`/
-`func_80019B24`/`func_8001A064`, whose "40000 iterations" in my brief's
-table belongs to the family ROOT (`func_800197C4`) only, per round 41's
+`SubmitPolyG4`/`SubmitPolyGT3`/`SubmitPolyFT4`/`SubmitPolyFT3`/
+`SubmitPolyF4`/`SubmitPolyGT4`, whose "40000 iterations" in my brief's
+table belongs to the family ROOT (`SubmitPolyF3`) only, per round 41's
 own correction — see the broadcast post and those six functions' round 48
 entries.
 
@@ -101,7 +103,7 @@ register-identity/OT-mask class at all — see the title line and the
 artifact (`grep -n '($sp)'` on the function's own `.s` returns nothing in
 either version; the reserved 0x20 bytes are never used for storage).
 `docs/DECOMPILATION_LEARNINGS.md`'s "SCOPE — measured, and it is narrower
-than the paragraph above implies" section (search `func_8001A268` there)
+than the paragraph above implies" section (search `UpdatePolyBBoxAndCull` there)
 is ABOUT this exact function and generalises the finding: **a raw
 `$sp` adjustment with zero data dependency can be scheduled by GCC 2.6.3
 into an early branch's delay slot, and this placement is emitted by the
@@ -118,9 +120,9 @@ Re-verified the preserved body in-tree this round anyway (Check 3, full
 oracle): `build exit=2`, zero compile-error hits, **53/70, identical diff
 to every prior round** (`git diff --stat` empty after revert). Time went
 to the six siblings that had never had a real per-function search instead
-(`func_80019C04`, `func_80019EE4`, `func_80019D84`, `func_800199EC`,
-`func_80019B24`, `func_8001A064` — see their own round 48 entries) plus
-`func_8001989C` (see that report — DOES need a fresh full search, unlike
+(`SubmitPolyG4`, `SubmitPolyGT3`, `SubmitPolyFT4`, `SubmitPolyFT3`,
+`SubmitPolyF4`, `SubmitPolyGT4` — see their own round 48 entries) plus
+`SubmitPolyG3` (see that report — DOES need a fresh full search, unlike
 this one).
 
 ### Proposed learning
@@ -128,8 +130,8 @@ this one).
 **"Has this function had a real search" and "would a real search be able
 to reach this residue" are two different questions, and my brief's table
 conflated them by using the same "none recorded" label for both.**
-`func_8001A268` had a real search AND a residue a search structurally
-cannot reach (prologue-generator placement, pre-C-statement). `func_8001989C`
+`UpdatePolyBBoxAndCull` had a real search AND a residue a search structurally
+cannot reach (prologue-generator placement, pre-C-statement). `SubmitPolyG3`
 had NO real search and a residue nothing yet rules unreachable. Screening
 "never searched" functions for search priority should also ask whether the
 residue's own diagnosis (absent-instruction vs. substitution, prologue vs.
@@ -155,7 +157,7 @@ permuter search already on file (below), and this round's broadcast
 confirming the `gp_rel`/`nop_mflo_mfhi` fixes are unrelated to this
 function's residue (it carries neither construct), no new attempt was made.
 Time went to the family's other six near-misses instead, all reconfirmed
-this round at their recorded figures (see `func_800197C4.md` and siblings).
+this round at their recorded figures (see `SubmitPolyF3.md` and siblings).
 
 Rebuilt this function's preserved body (the report's own "Best body reached"
 snapshot, inserted live over `INCLUDE_ASM` since this function has no
@@ -191,7 +193,7 @@ first). No axis remains identified, in three separate reports' own closing
 sections, that has not already been tried and found either inert or
 regressing. Re-running any of the above would reproduce an existing
 negative, not test anything new — see the family-wide summary in
-`func_800197C4.md`'s round 40 section for why this is being called
+`SubmitPolyF3.md`'s round 40 section for why this is being called
 explicitly rather than silently skipped.
 
 **Title rebuilt to the three-figure CLAUDE.md format.** Classification
@@ -211,7 +213,7 @@ finding still holds by checking the built object before touching anything:
 
 ```
 $ tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/code_8220_c.c.o \
-    | awk '/<func_8001A268>:/,/^$/' | grep 'addiu.*sp,sp'
+    | awk '/<UpdatePolyBBoxAndCull>:/,/^$/' | grep 'addiu.*sp,sp'
 addiu   sp,sp,-32
 ```
 
@@ -225,12 +227,12 @@ adjustment itself (moved into a branch's delay slot), not a register
 identity choice and not a missing/misordered pair of VALUE computations —
 see "Residue" below, unchanged this round. No new attempt made.
 
-Unit: `src/code_8220_c.c`. `void func_8001A268(void *arg0, s32 count)` —
+Unit: `src/code_8220_c.c`. `void UpdatePolyBBoxAndCull(void *arg0, s32 count)` —
 computes `arg0`'s 2D bounding box over `count` vertices: seeds min/max
 (fields `+0x70`/`+0x72`/`+0x74`/`+0x76`, X/Y min/max as `s16`) from a
 2-`s16` value at `+0x60`, walks `count` vertices starting at `+0x64`
 (X) / `+0x66` (Y), each 4 bytes apart, updating the running min/max, then
-sets `arg0->0x78` (the same "culled" flag `TransformAndCullPoly`/`func_800197C4`
+sets `arg0->0x78` (the same "culled" flag `TransformAndCullPoly`/`SubmitPolyF3`
 use, this unit) to `1` if either axis's span is `>= 0x101`. This is the
 `code = 3`/`code = 4` callee `ProjectTriFace`/`ProjectQuadFace`
 (`code_8220_b`, matched round 13) call at the end of triangle/quad
@@ -249,7 +251,7 @@ typedef struct {
     s16 x, y;
 } Vec2s16;
 
-void func_8001A268(void *arg0, s32 count)
+void UpdatePolyBBoxAndCull(void *arg0, s32 count)
 {
     u8 *self = (u8 *)arg0;
     s16 *xp, *yp, *end;
@@ -300,7 +302,7 @@ at word 0 where a normal prologue would put it. My best body puts it at
 word 0 (an ordinary immediate prologue), which shifts every following
 instruction earlier by exactly one slot until word 17, where the SAME
 instruction reappears in mine and the two streams re-align (confirmed:
-`grep -n '($sp)' asm/nonmatchings/code_8220_c/func_8001A268.s` returns
+`grep -n '($sp)' asm/nonmatchings/code_8220_c/UpdatePolyBBoxAndCull.s` returns
 NOTHING — this function never reads or writes through `$sp` anywhere, in
 EITHER version; the reserved 0x20 bytes are never used for storage in
 retail either). This is a placement-only difference in an instruction with
@@ -362,7 +364,7 @@ array would produce hits and rule this out. When that grep is empty and a
 loop-shape or declaration-order permutations; the loop body byte-matching
 already on the first attempt (as it did here) is itself strong evidence the
 C model is correct and the residue is purely this scheduling artifact.
-(`func_8001A268`, 53/70 across all 6 structurally distinct attempts,
+(`UpdatePolyBBoxAndCull`, 53/70 across all 6 structurally distinct attempts,
 identical diff on 4 of them.)
 
 ## RUNNER PASS, permuter round (alpha): a real partial lead found, not yet closed
@@ -392,13 +394,13 @@ fluke on the permuter's own metric.
 into `src/code_8220_c.c` in place of the preserved body, ran the real
 oracle: `build-and-verify.sh` reports `build exit=2` (the whole-image
 verification step fails -- SHA1 does not match), and `funcdiff.py
-func_8001A268` reports **52/70**, one word WORSE than this report's
+UpdatePolyBBoxAndCull` reports **52/70**, one word WORSE than this report's
 existing 53/70, with no drift warning (the in-range comparison is trusted,
 it is simply wrong). Reverted immediately; `git diff --stat` confirmed
 clean before continuing.
 
 So this round now has TWO instances of the identical trap on two different
-residues: a permuter-local score improvement (`func_800197C4`'s cached-OT-
+residues: a permuter-local score improvement (`SubmitPolyF3`'s cached-OT-
 pointer lead, and this rewritten-`end`-pointer lead) that is not real
 against the true oracle, for two different underlying reasons (address
 drift there, an outright in-range regression here). **Do not trust a
@@ -425,7 +427,7 @@ COP2/GTE-clobber-trap hypothesis tested against this function directly (its
 own disassembly grepped for every GTE/COP2 mnemonic: zero hits) as part of
 a whole-family screen — falsified for all ten functions in this unit's
 work list, not just this one. Full method and family-wide result in
-`func_800197C4.md`'s "ROUND 20" section. This function's own residue
+`SubmitPolyF3.md`'s "ROUND 20" section. This function's own residue
 remains the register-identity + code-motion-filler class already
 documented above, unaffected by this screen.
 
@@ -454,7 +456,7 @@ continuing) rather than trusting the title line. Result: **53/70, no
 stale-build or drift warning, identical diff shape to every prior round's
 report.** Confirmed clean, not drifted.
 
-Read this family's full round-13/19/20/21 history (see `func_800197C4.md`
+Read this family's full round-13/19/20/21 history (see `SubmitPolyF3.md`
 for the shared root analysis) before attempting further reshaping this
 round: the register-identity + code-motion-filler residue has already been
 tested against six-plus independent axes (masking expression, reload/cache

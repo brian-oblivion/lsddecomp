@@ -1,13 +1,15 @@
-# func_8001979C — MATCHED (10/10 words)
+# StoreSxyPolyGT4 — MATCHED (10/10 words)
 
-Unit: `src/code_8220_c.c`. Same COP2-store-leaf class as `func_80019774`
+> Renamed from `func_8001979C` on 2026-09-24 (tools/rename.py). Address 0x8001979c.
+
+Unit: `src/code_8220_c.c`. Same COP2-store-leaf class as `StoreSxyPolyFT4`
 (this unit) and `code_8220_b`'s `StoreSxyPolyF4`/`StoreSxyPolyG4` family —
 `flag`-gated choice of which COP2 registers to write into `dst`.
 
 ## Final source
 
 ```c
-void func_8001979C(void *dst, s32 flag)
+void StoreSxyPolyGT4(void *dst, s32 flag)
 {
     if (flag) {
         __asm__ volatile (
@@ -29,4 +31,4 @@ void func_8001979C(void *dst, s32 flag)
 
 Byte-exact on the first attempt, offsets `0x8`/`0x14`/`0x20` (if-branch) and
 `0x2c` (else-branch) substituted into the same established pattern as
-`func_80019774`. No new residue, no new lever.
+`StoreSxyPolyFT4`. No new residue, no new lever.

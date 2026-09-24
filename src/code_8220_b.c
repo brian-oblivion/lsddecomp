@@ -140,9 +140,9 @@ typedef struct { s8 r, g, b; } Rgb8;
 extern s8 D_8008A82C[3];
 extern void *D_8008E794;
 
-extern void func_8001A224(void *dst, void *table, s32 count);
-extern void func_80019774(void *dst, s32 storeFirst3);
-extern void func_8001979C(void *dst, s32 storeFirst3);
+extern void InitVtxRecordPtrs(void *dst, void *table, s32 count);
+extern void StoreSxyPolyFT4(void *dst, s32 storeFirst3);
+extern void StoreSxyPolyGT4(void *dst, s32 storeFirst3);
 
 /*
  * The eight submit wrappers in code_8220_c, which are still INCLUDE_ASM there
@@ -153,14 +153,14 @@ extern void func_8001979C(void *dst, s32 storeFirst3);
  * consumes exactly that value, so this file declares its own view rather than
  * importing the stale one (round 50's finding; see the report).
  */
-extern void *func_800197C4(void *prim, void *ctx);
-extern void *func_8001989C(void *prim, void *ctx);
-extern void *func_800199EC(void *prim, void *ctx);
-extern void *func_80019B24(void *prim, void *ctx);
-extern void *func_80019C04(void *prim, void *ctx);
-extern void *func_80019D84(void *prim, void *ctx);
-extern void *func_80019EE4(void *prim, void *ctx);
-extern void *func_8001A064(void *prim, void *ctx);
+extern void *SubmitPolyF3(void *prim, void *ctx);
+extern void *SubmitPolyG3(void *prim, void *ctx);
+extern void *SubmitPolyFT3(void *prim, void *ctx);
+extern void *SubmitPolyF4(void *prim, void *ctx);
+extern void *SubmitPolyG4(void *prim, void *ctx);
+extern void *SubmitPolyFT4(void *prim, void *ctx);
+extern void *SubmitPolyGT3(void *prim, void *ctx);
+extern void *SubmitPolyGT4(void *prim, void *ctx);
 
 /* Defined below, in ROM order. Forward-declared because this function comes
  * first in the segment and calls all of them. */
@@ -216,8 +216,8 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
 
     *(void **)(ctx + 0x0) = *(void **)((u8 *)otSrc + 0x4);
     *(s32 *)(ctx + 0x4) = otShift;
-    func_8001A224(ctx + 0x88, D_8008ACD0, 3);
-    func_8001A224(ctx + 0x94, D_8008AEE8, 4);
+    InitVtxRecordPtrs(ctx + 0x88, gPolySubmitTableTri, 3);
+    InitVtxRecordPtrs(ctx + 0x94, gPolySubmitTableQuad, 4);
 
     remaining = *(s32 *)(*(u8 **)(obj + 0x8) + 0x14);
     list = *(u8 **)(*(u8 **)(obj + 0x8) + 0x10);
@@ -305,7 +305,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_ncds();
                     gte_strgb(prim + 0x4);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_800197C4(prim, ctx);
+                    prim = (u8 *)SubmitPolyF3(prim, ctx);
                 }
                 elem += 0x10;
                 list += 0x10;
@@ -335,7 +335,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_ldrgb(elem);
                     gte_ncds();
                     gte_strgb(prim + 0x14);
-                    prim = (u8 *)func_8001989C(prim, ctx);
+                    prim = (u8 *)SubmitPolyG3(prim, ctx);
                 }
                 elem += 0x18;
                 list += 0x18;
@@ -358,7 +358,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_dpcs();
                     gte_strgb(prim + 0x4);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_800197C4(prim, ctx);
+                    prim = (u8 *)SubmitPolyF3(prim, ctx);
                 }
                 elem += 0x10;
                 list += 0x10;
@@ -387,7 +387,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_ncds();
                     gte_strgb(prim + 0x4);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_800199EC(prim, ctx);
+                    prim = (u8 *)SubmitPolyFT3(prim, ctx);
                 }
                 elem += 0x18;
                 list += 0x18;
@@ -414,7 +414,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_dpcs();
                     gte_strgb(prim + 0x4);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_800199EC(prim, ctx);
+                    prim = (u8 *)SubmitPolyFT3(prim, ctx);
                 }
                 elem += 0x1C;
                 list += 0x1C;
@@ -439,7 +439,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_ncds();
                     gte_strgb(prim + 0x4);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_80019B24(prim, ctx);
+                    prim = (u8 *)SubmitPolyF4(prim, ctx);
                 }
                 elem += 0x14;
                 list += 0x14;
@@ -463,7 +463,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_dpcs();
                     gte_strgb(prim + 0x4);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_80019B24(prim, ctx);
+                    prim = (u8 *)SubmitPolyF4(prim, ctx);
                 }
                 elem += 0x10;
                 list += 0x10;
@@ -483,7 +483,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
             loopH:
                 if (ProjectQuadFace(prim, ctx, *(u16 *)(elem + 0x2), *(u16 *)(elem + 0x4),
                                     *(u16 *)(elem + 0x6), *(u16 *)(elem + 0x8),
-                                    func_80019774) == 0) {
+                                    StoreSxyPolyFT4) == 0) {
                     *(u32 *)(prim + 0xC) = *(u32 *)(elem - 0x10);
                     *(u32 *)(prim + 0x14) = *(u32 *)(elem - 0xC);
                     *(u32 *)(prim + 0x1C) = *(u32 *)(elem - 0x8);
@@ -493,7 +493,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_ncds();
                     gte_strgb(prim + 0x4);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_80019D84(prim, ctx);
+                    prim = (u8 *)SubmitPolyFT4(prim, ctx);
                 }
                 elem += 0x20;
                 list += 0x20;
@@ -512,7 +512,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
             loopI:
                 if (ProjectQuadFace(prim, ctx, *(u16 *)(elem + 0x4), *(u16 *)(elem + 0x6),
                                     *(u16 *)(elem + 0x8), *(u16 *)(elem + 0xA),
-                                    func_80019774) == 0) {
+                                    StoreSxyPolyFT4) == 0) {
                     *(u32 *)(prim + 0xC) = *(u32 *)(elem - 0x10);
                     *(u32 *)(prim + 0x14) = *(u32 *)(elem - 0xC);
                     *(u32 *)(prim + 0x1C) = *(u32 *)(elem - 0x8);
@@ -522,7 +522,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_dpcs();
                     gte_strgb(prim + 0x4);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_80019D84(prim, ctx);
+                    prim = (u8 *)SubmitPolyFT4(prim, ctx);
                 }
                 elem += 0x20;
                 list += 0x20;
@@ -545,7 +545,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_dpct();
                     gte_strgb3_g3(prim);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_8001989C(prim, ctx);
+                    prim = (u8 *)SubmitPolyG3(prim, ctx);
                 }
                 elem += 0x18;
                 list += 0x18;
@@ -572,7 +572,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_dpct();
                     gte_strgb3(prim + 0x4, prim + 0x10, prim + 0x1C);
                     prim[7] = ctx[0x15];
-                    prim = (u8 *)func_80019EE4(prim, ctx);
+                    prim = (u8 *)SubmitPolyGT3(prim, ctx);
                 }
                 elem += 0x24;
                 list += 0x24;
@@ -600,7 +600,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_ldrgb(elem);
                     gte_dpcs();
                     gte_strgb(prim + 0x1C);
-                    prim = (u8 *)func_80019C04(prim, ctx);
+                    prim = (u8 *)SubmitPolyG4(prim, ctx);
                 }
                 elem += 0x1C;
                 list += 0x1C;
@@ -620,7 +620,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
             loopM:
                 if (ProjectQuadFace(prim, ctx, *(u16 *)(elem + 0x4), *(u16 *)(elem + 0x6),
                                     *(u16 *)(elem + 0x8), *(u16 *)(elem + 0xA),
-                                    func_8001979C) == 0) {
+                                    StoreSxyPolyGT4) == 0) {
                     *(u32 *)(prim + 0xC) = *(u32 *)(elem - 0x1C);
                     *(u32 *)(prim + 0x18) = *(u32 *)(elem - 0x18);
                     *(u32 *)(prim + 0x24) = *(u32 *)(elem - 0x14);
@@ -633,7 +633,7 @@ void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
                     gte_ldrgb(elem);
                     gte_dpcs();
                     gte_strgb(prim + 0x28);
-                    prim = (u8 *)func_8001A064(prim, ctx);
+                    prim = (u8 *)SubmitPolyGT4(prim, ctx);
                 }
                 elem += 0x2C;
                 list += 0x2C;
@@ -700,7 +700,7 @@ void SetupPrimCode(void *prim, void *ctx)
  * Z goes into the sort slot at +0x14 of the three per-vertex records the
  * context lists at +0x88/+0x8C/+0x90, `storeSxy` writes the screen XY into
  * `prim` at that primitive type's own offsets (one of the StoreSxyPoly**
- * leaves at the bottom of this file), and func_8001A268 computes the screen
+ * leaves at the bottom of this file), and UpdatePolyBBoxAndCull computes the screen
  * bounding box over the 3 vertices. Returns 0 drawn, 1 culled.
  *
  * `prim` is only ever handed straight through, so it stays void * here.
@@ -726,7 +726,7 @@ s32 ProjectTriFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, void (*sto
         gte_stsz3(p0, p1, p2);
     }
     storeSxy(prim);
-    func_8001A268(ctx, 3);
+    UpdatePolyBBoxAndCull(ctx, 3);
     return 0;
 fail:
     return 1;
@@ -775,7 +775,7 @@ s32 ProjectQuadFace(void *prim, u8 *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
 
     gte_stsxy2(ctx + 0x6c);
 
-    func_8001A268(ctx, 4);
+    UpdatePolyBBoxAndCull(ctx, 4);
     return 0;
 fail:
     return 1;
@@ -870,8 +870,8 @@ s32 TransformAndCullPoly(void *primIn, void *ctxIn)
 
 /* The six screen-XY store callbacks ProjectTri/QuadFace invoke, one per
  * Psy-Q primitive type: each writes the GTE's SXY FIFO into that POLY_xx's
- * own vertex offsets. POLY_FT4 and POLY_GT4's equivalents are func_80019774
- * and func_8001979C in code_8220_c. POLY_F3: xy0/xy1/xy2 at +0x8/+0xC/+0x10. */
+ * own vertex offsets. POLY_FT4 and POLY_GT4's equivalents are StoreSxyPolyFT4
+ * and StoreSxyPolyGT4 in code_8220_c. POLY_F3: xy0/xy1/xy2 at +0x8/+0xC/+0x10. */
 void StoreSxyPolyF3(void *dst)
 {
     gte_stsxy3_f3(dst);

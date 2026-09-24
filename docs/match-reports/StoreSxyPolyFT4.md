@@ -1,4 +1,6 @@
-# func_80019774 — MATCHED (10/10 words)
+# StoreSxyPolyFT4 — MATCHED (10/10 words)
+
+> Renamed from `func_80019774` on 2026-09-24 (tools/rename.py). Address 0x80019774.
 
 Unit: `src/code_8220_c.c` (carved round 13, third slice of `code_8220`).
 Same COP2-store-leaf class already established in `code_8220_b`
@@ -10,7 +12,7 @@ possible.
 ## Final source
 
 ```c
-void func_80019774(void *dst, s32 flag)
+void StoreSxyPolyFT4(void *dst, s32 flag)
 {
     if (flag) {
         __asm__ volatile (

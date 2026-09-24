@@ -726,7 +726,7 @@ rounds.
 is a real, reproducible scheduling lever distinct from a bare
 `__asm__("")` barrier** — it fixed an instruction-order residue here that a
 barrier could not reach (this function has no barrier-lever precedent
-tried, but `func_8001A268`'s report shows a case where `__asm__("")` had NO
+tried, but `UpdatePolyBBoxAndCull`'s report shows a case where `__asm__("")` had NO
 effect; this wrapper is a different, apparently more disruptive-to-the-
 scheduler construct, worth trying as a distinct next step before that
 report's "not reachable" verdict is extended to a case that hasn't tried

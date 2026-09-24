@@ -2,7 +2,7 @@
 #include "code_8220.h"
 #include "gte.h"
 
-void func_80019774(void *dst, s32 flag)
+void StoreSxyPolyFT4(void *dst, s32 flag)
 {
     if (flag) {
         gte_stsxy3_ft4(dst);
@@ -13,7 +13,7 @@ void func_80019774(void *dst, s32 flag)
     }
 }
 
-void func_8001979C(void *dst, s32 flag)
+void StoreSxyPolyGT4(void *dst, s32 flag)
 {
     if (flag) {
         gte_stsxy3_gt4(dst);
@@ -28,20 +28,20 @@ void func_8001979C(void *dst, s32 flag)
  * primitive is spliced into the OT directly, else RCpolyF3's own return.
  * RCpolyF3 is declared void in code_8220.h (its return type is track 2's to
  * settle), hence the cast. */
-void *func_800197C4(void *arg0, void *arg1) {
+void *SubmitPolyF3(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) != 0) {
-        func_8001A380(D_8008ACD0, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
-        func_8001A3EC((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
+        FillRCPolyHeader(gPolySubmitTableTri, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        CopyPolyVtx3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0xC),
                       (PolyUV4 *)((u8 *)arg0 + 0x10));
-        return ((void *(*)(void *, void *))RCpolyF3)(arg0, D_8008ACD0);
+        return ((void *(*)(void *, void *))RCpolyF3)(arg0, gPolySubmitTableTri);
     }
     ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
     (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     return (u8 *)arg0 + 0x14;
 }
 
-/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -50,14 +50,14 @@ typedef struct {
 /* Returns the next packet pointer: arg0 + sizeof(POLY_G3) = 0x1C when the
  * primitive is spliced into the OT directly, else RCpolyG3's own return
  * (cast: RCpolyG3 is declared void in code_8220.h). Same shape as
- * func_800197C4. */
-void *func_8001989C(void *arg0, void *arg1) {
+ * SubmitPolyF3. */
+void *SubmitPolyG3(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
 
     if (*(s32 *)(prim + 0x78) != 0) {
-        func_8001A380(D_8008ACD0, prim, self + 0x4, 0, 0, 0);
-        func_8001A3EC((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
+        FillRCPolyHeader(gPolySubmitTableTri, prim, self + 0x4, 0, 0, 0);
+        CopyPolyVtx3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
 
@@ -69,7 +69,7 @@ void *func_8001989C(void *arg0, void *arg1) {
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
 
-        return ((void *(*)(void *, void *))RCpolyG3)(self, D_8008ACD0);
+        return ((void *(*)(void *, void *))RCpolyG3)(self, gPolySubmitTableTri);
     }
     ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
     (*(OtTag **)(prim + 0x30))->addr = (u32)self;
@@ -79,11 +79,11 @@ void *func_8001989C(void *arg0, void *arg1) {
 /* Returns the next packet pointer: arg0 + sizeof(POLY_FT3) = 0x20 when the
  * primitive is spliced into the OT directly, else RCpolyFT3's own return
  * (cast: RCpolyFT3 is declared void in code_8220.h). Same shape as
- * func_800197C4. */
-void *func_800199EC(void *arg0, void *arg1) {
+ * SubmitPolyF3. */
+void *SubmitPolyFT3(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) != 0) {
-        func_8001A380(D_8008ACD0, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
-        func_8001A3EC((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
+        FillRCPolyHeader(gPolySubmitTableTri, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        CopyPolyVtx3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0x10),
                       (PolyUV4 *)((u8 *)arg0 + 0x18));
 
@@ -94,7 +94,7 @@ void *func_800199EC(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x8C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x14);
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x90) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
 
-        return ((void *(*)(void *, void *))RCpolyFT3)(arg0, D_8008ACD0);
+        return ((void *(*)(void *, void *))RCpolyFT3)(arg0, gPolySubmitTableTri);
     }
     ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
     (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
@@ -104,20 +104,20 @@ void *func_800199EC(void *arg0, void *arg1) {
 /* Returns the next packet pointer: arg0 + sizeof(POLY_F4) = 0x18 when the
  * primitive is spliced into the OT directly, else RCpolyF4's own return
  * (cast: RCpolyF4 is declared void in code_8220.h). Same shape as
- * func_800197C4. */
-void *func_80019B24(void *arg0, void *arg1) {
+ * SubmitPolyF3. */
+void *SubmitPolyF4(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) != 0) {
-        func_8001A380(D_8008AEE8, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
-        func_8001A4C0((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
+        FillRCPolyHeader(gPolySubmitTableQuad, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        CopyPolyVtx4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
                       (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
-        return ((void *(*)(void *, void *))RCpolyF4)(arg0, D_8008AEE8);
+        return ((void *(*)(void *, void *))RCpolyF4)(arg0, gPolySubmitTableQuad);
     }
     ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
     (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     return (u8 *)arg0 + 0x18;
 }
 
-/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -126,14 +126,14 @@ typedef struct {
 /* Returns the next packet pointer: arg0 + sizeof(POLY_G4) = 0x24 when the
  * primitive is spliced into the OT directly, else RCpolyG4's own return
  * (cast: RCpolyG4 is declared void in code_8220.h). Same shape as
- * func_800197C4. */
-void *func_80019C04(void *arg0, void *arg1) {
+ * SubmitPolyF3. */
+void *SubmitPolyG4(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
 
     if (*(s32 *)(prim + 0x78) != 0) {
-        func_8001A380(D_8008AEE8, prim, self + 0x4, 0, 0, 0);
-        func_8001A4C0(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10,
+        FillRCPolyHeader(gPolySubmitTableQuad, prim, self + 0x4, 0, 0, 0);
+        CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10,
                       self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u8 *)(self + 0xF);
@@ -146,7 +146,7 @@ void *func_80019C04(void *arg0, void *arg1) {
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_C04 *)(self + 0x14);
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_C04 *)(self + 0x1C);
 
-        return ((void *(*)(void *, void *))RCpolyG4)(arg0, D_8008AEE8);
+        return ((void *(*)(void *, void *))RCpolyG4)(arg0, gPolySubmitTableQuad);
     }
     ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
     (*(OtTag **)(prim + 0x30))->addr = (u32)self;
@@ -156,11 +156,11 @@ void *func_80019C04(void *arg0, void *arg1) {
 /* Returns the next packet pointer: arg0 + sizeof(POLY_FT4) = 0x28 when the
  * primitive is spliced into the OT directly, else RCpolyFT4's own return
  * (cast: RCpolyFT4 is declared void in code_8220.h). Same shape as
- * func_800197C4. */
-void *func_80019D84(void *arg0, void *arg1) {
+ * SubmitPolyF3. */
+void *SubmitPolyFT4(void *arg0, void *arg1) {
     if (*(s32 *)((u8 *)arg1 + 0x78) != 0) {
-        func_8001A380(D_8008AEE8, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
-        func_8001A4C0((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
+        FillRCPolyHeader(gPolySubmitTableQuad, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        CopyPolyVtx4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
                       (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x18, (u8 *)arg0 + 0x20);
 
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x94) + 0xA) = *(u16 *)((u8 *)arg0 + 0x1E);
@@ -172,14 +172,14 @@ void *func_80019D84(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x9C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0xA0) + 0x8) = *(u16 *)((u8 *)arg0 + 0x24);
 
-        return ((void *(*)(void *, void *))RCpolyFT4)(arg0, D_8008AEE8);
+        return ((void *(*)(void *, void *))RCpolyFT4)(arg0, gPolySubmitTableQuad);
     }
     ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
     (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     return (u8 *)arg0 + 0x28;
 }
 
-/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -188,14 +188,14 @@ typedef struct {
 /* Returns the next packet pointer: arg0 + sizeof(POLY_GT3) = 0x28 when the
  * primitive is spliced into the OT directly, else RCpolyGT3's own return
  * (cast: RCpolyGT3 is declared void in code_8220.h). Same shape as
- * func_800197C4. */
-void *func_80019EE4(void *arg0, void *arg1) {
+ * SubmitPolyF3. */
+void *SubmitPolyGT3(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
 
     if (*(s32 *)(prim + 0x78) != 0) {
-        func_8001A380(D_8008ACD0, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        func_8001A3EC((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
+        FillRCPolyHeader(gPolySubmitTableTri, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        CopyPolyVtx3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x14),
                       (PolyUV4 *)(self + 0x20));
 
@@ -211,14 +211,14 @@ void *func_80019EE4(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0x8) = *(u16 *)(self + 0x18);
         *(u16 *)(*(u8 **)(prim + 0x90) + 0x8) = *(u16 *)(self + 0x24);
 
-        return ((void *(*)(void *, void *))RCpolyGT3)(arg0, D_8008ACD0);
+        return ((void *(*)(void *, void *))RCpolyGT3)(arg0, gPolySubmitTableTri);
     }
     ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
     (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     return (u8 *)arg0 + 0x28;
 }
 
-/* A 2-s16 pair (alignment 2, not 4) -- see func_8001A268's stall report for
+/* A 2-s16 pair (alignment 2, not 4) -- see UpdatePolyBBoxAndCull's stall report for
  * why this is needed even at accidentally-4-aligned offsets. */
 typedef struct {
     s16 x, y;
@@ -227,14 +227,14 @@ typedef struct {
 /* Returns the next packet pointer: arg0 + sizeof(POLY_GT4) = 0x34 when the
  * primitive is spliced into the OT directly, else RCpolyGT4's own return
  * (cast: RCpolyGT4 is declared void in code_8220.h). Same shape as
- * func_800197C4. */
-void *func_8001A064(void *arg0, void *arg1) {
+ * SubmitPolyF3. */
+void *SubmitPolyGT4(void *arg0, void *arg1) {
     u8 *self = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
 
     if (*(s32 *)(prim + 0x78) != 0) {
-        func_8001A380(D_8008AEE8, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
-        func_8001A4C0(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
+        FillRCPolyHeader(gPolySubmitTableQuad, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        CopyPolyVtx4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x14,
                       self + 0x20, self + 0x2C);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u16 *)(self + 0x26);
@@ -252,14 +252,14 @@ void *func_8001A064(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)(prim + 0x9C) + 0x8) = *(u16 *)(self + 0x24);
         *(u16 *)(*(u8 **)(prim + 0xA0) + 0x8) = *(u16 *)(self + 0x30);
 
-        return ((void *(*)(void *, void *))RCpolyGT4)(arg0, D_8008AEE8);
+        return ((void *(*)(void *, void *))RCpolyGT4)(arg0, gPolySubmitTableQuad);
     }
     ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
     (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     return (u8 *)arg0 + 0x34;
 }
 
-void func_8001A224(void *arg0, void *arg1, s32 kind)
+void InitVtxRecordPtrs(void *arg0, void *arg1, s32 kind)
 {
     u8 *src = (u8 *)arg1 + 0x18;
     u8 *dst0 = (u8 *)arg0;
@@ -287,7 +287,7 @@ typedef struct {
     s16 x, y;
 } Vec2s16_268;
 
-void func_8001A268(void *arg0, s32 count)
+void UpdatePolyBBoxAndCull(void *arg0, s32 count)
 {
     u8 *self = (u8 *)arg0;
     s16 *xp, *yp, *end;
@@ -329,10 +329,10 @@ void func_8001A268(void *arg0, s32 count)
 extern s32 D_8008A824;
 extern s32 D_8008A828;
 extern s32 D_80090C18;
-extern s32 D_8008A830;
-extern s32 D_8008A834;
+extern s32 gPolyOtCodeOverrideSet;
+extern s32 gPolyOtCodeOverride;
 
-void func_8001A380(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5)
+void FillRCPolyHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u16 arg5)
 {
     u8 *dst = (u8 *)arg0;
     u8 *prim = (u8 *)arg1;
@@ -340,8 +340,8 @@ void func_8001A380(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u1
     s32 code;
     s32 code2;
 
-    if (D_8008A830) {
-        val = D_8008A834;
+    if (gPolyOtCodeOverrideSet) {
+        val = gPolyOtCodeOverride;
     } else {
         val = D_80090C18;
     }
@@ -374,7 +374,7 @@ void func_8001A380(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 arg4, u1
  * these six assignments, byte-exact, and CLAUDE.md HARD RULE 6 cites it as
  * the example of "hard to type" not being "no C form".
  */
-void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+void CopyPolyVtx3(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
                    PolyUV4 *uv2) {
     dst[0]->xy = src[0]->xy;
     dst[1]->xy = src[1]->xy;
@@ -385,20 +385,20 @@ void func_8001A3EC(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
 }
 
 
-void func_8001A4C0(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
+void CopyPolyVtx4(PolyVtx **dst, PolyVtx **src, PolyUV4 *uv0, PolyUV4 *uv1,
                    PolyUV4 *uv2, PolyUV4 *uv3) {
-    func_8001A3EC(dst, src, uv0, uv1, uv2);
+    CopyPolyVtx3(dst, src, uv0, uv1, uv2);
     dst[3]->xy = src[3]->xy;
     dst[3]->uv = *uv3;
 }
 
-extern s32 D_8008A830;
-extern s32 D_8008A834;
+extern s32 gPolyOtCodeOverrideSet;
+extern s32 gPolyOtCodeOverride;
 
-void func_8001A54C(s32 arg0, s32 arg1)
+void SetPolyOtCodeOverride(s32 arg0, s32 arg1)
 {
-    D_8008A830 = arg0;
+    gPolyOtCodeOverrideSet = arg0;
     if (arg0) {
-        D_8008A834 = arg1;
+        gPolyOtCodeOverride = arg1;
     }
 }
