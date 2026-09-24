@@ -1,4 +1,6 @@
-# func_8004CFB8 — MATCHED (round 58), 28/28, whole-image SHA1 green
+# Class866E8__ConfigureRateEntry — MATCHED (round 58), 28/28, whole-image SHA1 green
+
+> Renamed from `func_8004CFB8` on 2026-09-24 (tools/rename.py). Address 0x8004cfb8.
 
 > **HEAD VERIFICATION, round 9. Classification CONFIRMED as a stall, but
 > RECLASSIFIED as to kind: this is a SOURCE-SHAPE stall and a permuter
@@ -124,7 +126,7 @@ tool artifact.
 
 ```c
 #if 0
-void func_8004CFB8(Obj866E8 *self, s32 rate, s32 flag) {
+void Class866E8__ConfigureRateEntry(Obj866E8 *self, s32 rate, s32 flag) {
     EntryDesc866E8 *table;
     s32 val;
 
@@ -211,7 +213,7 @@ well-characterized.
 
 Seed: the "Best-attempt body" above (25/28-equivalent shape after the
 first, byte-exact half). `--debug` base score: **360** (1 reordering + 3
-insertions, `func_8004CFB8` header), consistent with the report's own
+insertions, `Class866E8__ConfigureRateEntry` header), consistent with the report's own
 "3 extra words" reading of the second half's residue (the eager `mflo`
 plus its knock-on reordering).
 

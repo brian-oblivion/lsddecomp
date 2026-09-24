@@ -1,4 +1,6 @@
-# func_8004D088 — MATCHED (18/18 words)
+# Class866E8__FlushRateLatch — MATCHED (18/18 words)
+
+> Renamed from `func_8004D088` on 2026-09-24 (tools/rename.py). Address 0x8004d088.
 
 Not a vtable slot in this unit's own dispatch (`class_3ac78.h` documents
 it as its OWN independent view's `Class866E8Methods::slot140`, called
@@ -27,7 +29,7 @@ sw    $zero, 0x1E0($s0)    ; self->unk1E0 = 0 (unconditional on this path)
 ## Final C
 
 ```c
-void func_8004D088(Obj866E8 *self) {
+void Class866E8__FlushRateLatch(Obj866E8 *self) {
     if (self->unk1E0 != 0) {
         func_8004D140(self, func_8004D108, 0);
         self->unk1E0 = 0;
@@ -38,7 +40,7 @@ void func_8004D088(Obj866E8 *self) {
 `func_8004D140` is still `INCLUDE_ASM` in this unit; forward-declared per
 the established "calling into a still-INCLUDE_ASM function is fine"
 convention. Its own signature was derived from THIS call site plus
-`func_8004D028`'s (own report): `(Obj866E8 *self, void
+`Class866E8__AdvanceRateCountdown`'s (own report): `(Obj866E8 *self, void
 (*itemCallback)(Obj866E8*, Unk10ChildObj_3bb8c_b*), void
 (*perArrCallback)(Obj866E8*, Elem*))` — both known callers pass 0 for the
 third argument, so its true type is inferred from `func_8004D140`'s own
@@ -47,7 +49,7 @@ body (still unmatched) rather than confirmed live.
 ## New struct/global knowledge
 
 - `Obj866E8::unk1E0` (`s32`, +0x1E0) — a gate/countdown value, also used
-  by the sibling `func_8004D028` (own report).
+  by the sibling `Class866E8__AdvanceRateCountdown` (own report).
 - `extern void func_8004D140(...)` added (still raw asm in this unit).
 
 ## Attempts

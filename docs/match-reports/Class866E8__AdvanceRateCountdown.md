@@ -1,6 +1,8 @@
-# func_8004D028 — MATCHED (24/24 words)
+# Class866E8__AdvanceRateCountdown — MATCHED (24/24 words)
 
-Sibling of `func_8004D088` (own report) — same shape, one instruction
+> Renamed from `func_8004D028` on 2026-09-24 (tools/rename.py). Address 0x8004d028.
+
+Sibling of `Class866E8__FlushRateLatch` (own report) — same shape, one instruction
 longer because the gate here is a genuine countdown rather than a
 one-shot latch.
 
@@ -37,7 +39,7 @@ new value unconditionally, and the branch-not-taken path (decrement hit
 ## Final C
 
 ```c
-void func_8004D028(Obj866E8 *self) {
+void Class866E8__AdvanceRateCountdown(Obj866E8 *self) {
     if (self->unk1E0 > 0) {
         func_8004D140(self, func_8004D0D0, 0);
         self->unk1E0 -= 1;
@@ -50,11 +52,11 @@ void func_8004D028(Obj866E8 *self) {
 
 `func_8004D0D0` is defined later in this file (ROM order), so it needs a
 forward declaration here — same pattern already used for
-`func_8004D108` in `func_8004D088`.
+`func_8004D108` in `Class866E8__FlushRateLatch`.
 
 ## New struct knowledge
 
-None new (reuses `Obj866E8::unk1E0`, established by `func_8004D088`).
+None new (reuses `Obj866E8::unk1E0`, established by `Class866E8__FlushRateLatch`).
 
 ## Attempts
 

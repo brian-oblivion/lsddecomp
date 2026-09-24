@@ -1,4 +1,6 @@
-# func_8004CFB0 — MATCHED (2/2 words)
+# Class866E8__SetBounds — MATCHED (2/2 words)
+
+> Renamed from `func_8004CFB0` on 2026-09-24 (tools/rename.py). Address 0x8004cfb0.
 
 Two-instruction leaf: `jr $ra` / `sw $a1, 0x1DC($a0)`. Not a vtable slot,
 no caller found anywhere in the executable — a plain setter, presumably
@@ -15,7 +17,7 @@ jr   $ra
 ## Final C
 
 ```c
-void func_8004CFB0(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
+void Class866E8__SetBounds(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
     self->unk1DC = arg1;
 }
 ```

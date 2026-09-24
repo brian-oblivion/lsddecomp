@@ -149,7 +149,7 @@ block live after any checkout.
 Not a vtable slot (confirmed absent from `D_800866E8` via
 `tools/classtable.py`) — a plain, non-virtual bounding-box test. Only
 caller: `Class866E8__SetFootprintFromQuery` (`IsPointOutOfBounds(self->unk1DC, &stackBuf[0x12])`),
-which established `Obj866E8::unk1DC`'s type (see `func_8004CFB0`'s
+which established `Obj866E8::unk1DC`'s type (see `Class866E8__SetBounds`'s
 report).
 
 ## What the function does (not in doubt)
@@ -322,7 +322,7 @@ s32 IsPointOutOfBounds(Bounds866E8_3bb8c_b *bounds, s8 *point) {
 - New type `Bounds866E8_3bb8c_b` (`unk0`/`unk2` s16, `unk4`/`unk8` s32) —
   derived from reading THIS function's own body, independent of whether a
   byte-exact source form for it has been found. Used by `Obj866E8::unk1DC`
-  (see `func_8004CFB0`'s report).
+  (see `Class866E8__SetBounds`'s report).
 
 ## Attempts
 
@@ -393,7 +393,7 @@ real residue cascades widely.
 Bounded search (`timeout 600`, `-j 6 --stop-on-zero`): **71363
 iterations**, best score **770** (down from 1040, never reached zero).
 `timeout`'s own exit code line was not captured (same outer-Bash/inner-
-`timeout` race as `func_8004CFB8`/`strcpy` this round -- the trailing
+`timeout` race as `Class866E8__ConfigureRateEntry`/`strcpy` this round -- the trailing
 `echo "permuter exit=$?"` never lands in the log); treated as an ordinary
 self-stop given the clean iteration count and no crash signature.
 

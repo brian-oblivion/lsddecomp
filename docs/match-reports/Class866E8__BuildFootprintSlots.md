@@ -576,7 +576,7 @@ existing gap's size, so no other offset in the struct moves.
   `%N`/receiver-timing lore (all of which involved 1-2 registers, not a
   whole-function permutation) — worth flagging for whoever revisits this
   unit's remaining stalls, since `Class866E8__ComputeFootprintFromRotation` (this round's other
-  target) and `IsPointOutOfBounds`/`func_8004CFB8` (already-documented stalls)
+  target) and `IsPointOutOfBounds`/`Class866E8__ConfigureRateEntry` (already-documented stalls)
   are all in the same header/class and may share whatever is driving it.
 
 ---

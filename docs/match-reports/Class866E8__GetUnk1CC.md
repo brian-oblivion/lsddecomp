@@ -1,4 +1,6 @@
-# func_8004CFA8 — MATCHED (2/2 words)
+# Class866E8__GetUnk1CC — MATCHED (2/2 words)
+
+> Renamed from `func_8004CFA8` on 2026-09-24 (tools/rename.py). Address 0x8004cfa8.
 
 Two-instruction leaf: `jr $ra` / `addiu $v0, $a0, 0x1CC`. Not a vtable slot
 (not in `D_800866E8`, per `tools/classtable.py`), and no caller found
@@ -15,7 +17,7 @@ jr   $ra
 ## Final C
 
 ```c
-void *func_8004CFA8(Obj866E8 *self) {
+void *Class866E8__GetUnk1CC(Obj866E8 *self) {
     return &self->unk1CC;
 }
 ```

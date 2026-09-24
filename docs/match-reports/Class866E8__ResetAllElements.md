@@ -70,7 +70,7 @@ straight from the disassembly): `Class866E8Methods::slot88` (declared with
 a 4th `s32 arg3` parameter that the occupant, `Class866E8__OnElementEvent`, doesn't
 read — same "field type need not match every occupant's real signature"
 precedent as `Class866E8__OnNotify`/`Class866E8__OnElementEvent`'s `GetClass6B5CCMethods`), `slot108`
-(`func_8004C0AC`, not decompiled), `slot140` (`func_8004D088`, not
+(`func_8004C0AC`, not decompiled), `slot140` (`Class866E8__FlushRateLatch`, not
 decompiled — this promotes what was previously just end-of-struct
 padding into a real slot), `Class866E8::unkEC[7]` (`UnkSlotEntry_3ac78`,
 0x1C bytes each), `unk1B4`/`unk1B8`, and three new opaque types

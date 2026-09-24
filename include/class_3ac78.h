@@ -227,8 +227,8 @@ struct Class866E8Methods {
     /* +0x128 */ u8 pad128[0x12C - 0x128];
     /* +0x12C */ void (*applyToSenderFootprint)(Class866E8 *self, void *sender, s32 command);       /* Class866E8__ApplyToSenderFootprint; called by Class866E8__ForwardAcceptedCommand */
     /* +0x130 */ u8 pad130[0x13C - 0x130];
-    /* +0x13C */ void (*slot13C)(Class866E8 *self);                             /* func_8004D028; called by Class866E8__UpdateIfEnabled */
-    /* +0x140 */ void (*slot140)(Class866E8 *self);                             /* func_8004D088; called by Class866E8__ResetAllElements */
+    /* +0x13C */ void (*slot13C)(Class866E8 *self);                             /* Class866E8__AdvanceRateCountdown; called by Class866E8__UpdateIfEnabled */
+    /* +0x140 */ void (*slot140)(Class866E8 *self);                             /* Class866E8__FlushRateLatch; called by Class866E8__ResetAllElements */
 };
 
 /* Object size is 0x1E8, from New_Class866E8's allocator call. Field offsets

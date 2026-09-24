@@ -679,7 +679,7 @@ Notes on the derivation, for whoever revisits this:
   (`Class866E8__BuildFootprintSlots`) suggests this header/class's functions are unusually
   prone to GCC 2.6.3 register-allocation sensitivity that resists the
   usual small reshaping levers — worth flagging to whoever next works this
-  header (`IsPointOutOfBounds`/`func_8004CFB8`, already-documented stalls, are
+  header (`IsPointOutOfBounds`/`Class866E8__ConfigureRateEntry`, already-documented stalls, are
   also here) as a pattern, not three isolated incidents.
 - **Screening with the register-saturation grep BEFORE writing any C paid
   off as a time-management signal, even though it didn't change the

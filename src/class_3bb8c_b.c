@@ -366,11 +366,11 @@ void Class866E8__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
     }
 }
 
-void *func_8004CFA8(Obj866E8 *self) {
+void *Class866E8__GetUnk1CC(Obj866E8 *self) {
     return &self->unk1CC;
 }
 
-void func_8004CFB0(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
+void Class866E8__SetBounds(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
     self->unk1DC = arg1;
 }
 
@@ -392,10 +392,10 @@ void func_8004CFB0(Obj866E8 *self, Bounds866E8_3bb8c_b *arg1) {
  *    default-then-overwrite spelling makes cc1 extract it eagerly, and
  *    storing to self->unk1E0 directly instead of through `val` perturbs the
  *    table-selection half as well. Both were measured -- round 58 and
- *    docs/match-reports/func_8004CFB8.md.
+ *    docs/match-reports/Class866E8__ConfigureRateEntry.md.
  *
  * `~rate + 1` is retail's own negation (`nor`/`addiu`), not `-rate`. */
-void func_8004CFB8(Obj866E8 *self, s32 rate, s32 flag) {
+void Class866E8__ConfigureRateEntry(Obj866E8 *self, s32 rate, s32 flag) {
     EntryDesc866E8 *table;
     s32 val;
     s32 scale;
@@ -427,12 +427,12 @@ merge:
     self->unk1E0 = val;
 }
 
-/* Forward declaration: defined later in this file (after func_8004D028 in
+/* Forward declaration: defined later in this file (after Class866E8__AdvanceRateCountdown in
  * ROM-address order), but passed to func_8004D140 as a function-pointer
  * argument before its own definition appears. */
 void func_8004D0D0(Obj866E8 *self, EntryChildObj *item);
 
-void func_8004D028(Obj866E8 *self) {
+void Class866E8__AdvanceRateCountdown(Obj866E8 *self) {
     if (self->unk1E0 > 0) {
         func_8004D140(self, func_8004D0D0, 0);
         self->unk1E0 -= 1;
@@ -442,12 +442,12 @@ void func_8004D028(Obj866E8 *self) {
     }
 }
 
-/* Forward declaration: defined later in this file (after func_8004D088 in
+/* Forward declaration: defined later in this file (after Class866E8__FlushRateLatch in
  * ROM-address order), but passed to func_8004D140 as a function-pointer
  * argument before its own definition appears. */
 void func_8004D108(Obj866E8 *self, EntryChildObj *item);
 
-void func_8004D088(Obj866E8 *self) {
+void Class866E8__FlushRateLatch(Obj866E8 *self) {
     if (self->unk1E0 != 0) {
         func_8004D140(self, func_8004D108, 0);
         self->unk1E0 = 0;

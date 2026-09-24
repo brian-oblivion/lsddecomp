@@ -622,7 +622,7 @@ extern void RotMatrix(void *arg0, QueryTemplate866E8 *arg1);
 extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2); /* arity-ok: this IS the callee's real signature (Sony libgte, 0x80015618 reads $a0 matrix / $a1 in / $a2 out); include/code_d294.h's unprototyped copy is round 19's deliberate frame-sizing shape, not a claim about arity */
 
 /*
- * Opaque target of Obj866E8::unk1DC (func_8004CFB0 stores it raw;
+ * Opaque target of Obj866E8::unk1DC (Class866E8__SetBounds stores it raw;
  * IsPointOutOfBounds -- a plain, non-virtual helper, NOT a vtable slot, see
  * tools/classtable.py D_800866E8 -- dereferences it as a min/max bounding
  * box against an [x,y] byte pair). Field meaning inferred from the four
@@ -639,7 +639,7 @@ typedef struct Bounds866E8_3bb8c_b {
 /*
  * self->unk1E4's pointee: one of four static 0xC-byte table entries at
  * D_8008699C/D_800869A8/D_800869B4/D_800869C0 (addresses confirmed 0xC
- * apart), selected by func_8004CFB8 from (rate > 0, flag != 0) and never
+ * apart), selected by Class866E8__ConfigureRateEntry from (rate > 0, flag != 0) and never
  * dereferenced past +0x006. The same 0xC stride lines up with
  * D_800869CC (declared `extern s32 D_800869CC[3]` below, by
  * func_8004D108) as a plausible fifth entry of the same table, but
@@ -649,7 +649,7 @@ typedef struct Bounds866E8_3bb8c_b {
  */
 typedef struct EntryDesc866E8 {
     u8 pad0[0x6];
-    s16 unk6;          /* +0x006, func_8004CFB8: multiplied against abs(rate) */
+    s16 unk6;          /* +0x006, Class866E8__ConfigureRateEntry: multiplied against abs(rate) */
     u8 pad8[0xC - 0x8];
 } EntryDesc866E8;
 
@@ -761,11 +761,11 @@ struct Obj866E8 {
     s32 unk1B8;                    /* +0x1B8, func_8004BD14 */
     Unk1BCObj *unk1BC;             /* +0x1BC, func_8004C3F0 */
     u8 pad1C0[0x1CC - 0x1C0];
-    s32 unk1CC;                    /* +0x1CC, func_8004CFA8 (address-of only, real type unknown) */
+    s32 unk1CC;                    /* +0x1CC, Class866E8__GetUnk1CC (address-of only, real type unknown) */
     u8 pad1D0[0x1DC - 0x1D0];
-    Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, func_8004CFB0 (stores raw)/IsPointOutOfBounds (dereferences) */
-    s32 unk1E0;                    /* +0x1E0, func_8004D028/func_8004D088: a countdown gate */
-    EntryDesc866E8 *unk1E4;        /* +0x1E4, func_8004D0D0 (forwarded opaquely)/func_8004CFB8 (selects one of four statics and reads +0x6) */
+    Bounds866E8_3bb8c_b *unk1DC;   /* +0x1DC, Class866E8__SetBounds (stores raw)/IsPointOutOfBounds (dereferences) */
+    s32 unk1E0;                    /* +0x1E0, Class866E8__AdvanceRateCountdown/Class866E8__FlushRateLatch: a countdown gate */
+    EntryDesc866E8 *unk1E4;        /* +0x1E4, func_8004D0D0 (forwarded opaquely)/Class866E8__ConfigureRateEntry (selects one of four statics and reads +0x6) */
     u8 pad1E8[0x2F4 - 0x1E8];
     s32 unk2F4;                    /* +0x2F4, CheckObj866E8CountFlag: zero-checked when unkC > 9999999 */
 };
@@ -789,7 +789,7 @@ extern void func_8004D1D0(Obj866E8 *self, void (*callback)(Obj866E8 *self, Entry
 /* Still raw asm in this unit (not this round's target): iterates
  * self->arr, invoking an optional per-element callback (arg2, called
  * (self, &arr[i]) when non-NULL) and then always forwarding (self, arg1,
- * &arr[i]) to func_8004D1D0. func_8004D028/func_8004D088 both call it
+ * &arr[i]) to func_8004D1D0. Class866E8__AdvanceRateCountdown/Class866E8__FlushRateLatch both call it
  * with arg2 = NULL (no per-element callback), passing a function POINTER
  * as arg1 instead -- that pointer is consumed further down in
  * func_8004D1D0, not by this function itself. */
