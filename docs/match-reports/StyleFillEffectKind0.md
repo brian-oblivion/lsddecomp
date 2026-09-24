@@ -1,4 +1,57 @@
-# StyleFillEffectKind0 -- STALL, 93/99 words (length matches, 0x18C), whole-function arg0/arg1/arg2 register-colour rotation
+# StyleFillEffectKind0 -- MATCHED 99/99 (round 75), lever: the parameter is the walking pointer (no `arr = arg0` copy)
+
+REVISITED, round 75: MATCHED 99/99; names/types used (return type `void **`, matching siblings StyleFillEffectKind1/2/3).
+
+## Round 75 (bravo): MATCHED on the second build
+
+**Preserved body rebuilt first**, verbatim from the `#if 0` block, live in
+place of the INCLUDE_ASM: `build exit=2`, no compile-error grep hits, 93/99,
+`insertions 2 / deletions 2 (positional skeleton diffs 6)`.
+
+**The recorded diagnosis was wrong, and reading the diff showed it.** All six
+differing words are the first six after `addiu $sp`: the three
+`sw $sN` / `move $sN,$aN` pairs of the prologue. The REGISTERS were already
+right (built also had `$s2=arg0`, `$s5=arg1`, `$s4=arg2`); only the ORDER of
+the three argument copies differed -- built `a1,a2,a0`, retail `a0,a1,a2`.
+Every other word, including the loop and epilogue, was byte-identical. So
+"whole-function 3-way register rotation" (rounds 47/48, and the Check-3
+"AGREE" + 90k-iteration permuter search built on it) described a prologue
+ORDER residue, not register identity.
+
+**Lever (build 2):** drop the `arr = (void **) arg0;` local and walk `arg0`
+itself, exactly as the already-matched sibling `StyleFillEffectKind1` does:
+
+```c
+void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
+    ...
+    for (i = 0; i < arg1; i++) {
+        fp(arg2, (void *) t3);
+        *arg0 = New_Class876FC((void *) 0, &D_8008E0A4, (void *) gStyleCueSelf, arg2);
+        arg0++;
+    }
+    return arg0;
+}
+```
+
+With the copy, arg0's move into its saved register became the `arr` pseudo's
+initialisation and was emitted after the other parameters' copies; with the
+parameter itself as the accumulator, the three copies come out in parameter
+order. The return type became `void **` (the caller's forward declaration in
+`StyleBuildEffectSlots` updated and its `(void **)` cast dropped; byte-neutral).
+Whole image `OK: build matches retail`, `tools/check-nonmatching.sh` green.
+
+2 builds total. No permuter, no barrier.
+
+### Proposed learning
+
+**Read which words differ before naming the residue.** A diff confined to
+the prologue's `sw $sN` / `move $sN,$aN` pairs with the same register set on
+both sides is an ORDER difference in the parameter copies, not a register
+rotation. Tell: retail copies `$a0,$a1,$a2` in order, built copies arg0
+LAST. Cause: `local = argN;` then walking the local instead of the
+parameter. Fix: use the parameter as the accumulator. (Sibling of this
+round's "parameter reused as accumulator" match.)
+
 
 > Renamed from `func_80054DA4` on 2026-09-23 (tools/rename.py). Address 0x80054da4.
 
