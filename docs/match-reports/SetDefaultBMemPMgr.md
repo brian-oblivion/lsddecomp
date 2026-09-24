@@ -1,4 +1,6 @@
-# func_80017A9C — MATCHED (round 45)
+# SetDefaultBMemPMgr — MATCHED (round 45)
+
+> Renamed from `func_80017A9C` on 2026-09-24 (tools/rename.py). Address 0x80017a9c.
 
 **Unit:** `code_8220` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
 
@@ -13,7 +15,7 @@ memory-pool subsystem's global default-pool pointer) was already correct.
 ## The function
 
 ```c
-void func_80017A9C(BMemPMgr *pool)
+void SetDefaultBMemPMgr(BMemPMgr *pool)
 {
     D_8008A818 = pool;
 }
@@ -30,7 +32,7 @@ is still asm elsewhere.
 ## Provenance
 
 round 45 (2026-09-15), runner alpha. `./build-and-verify.sh` green,
-`tools/funcdiff.py func_80017A9C` reports 3/3 words match.
+`tools/funcdiff.py SetDefaultBMemPMgr` reports 3/3 words match.
 
 ### Proposed learning
 

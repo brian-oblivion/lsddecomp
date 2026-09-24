@@ -138,7 +138,7 @@ extern void *func_80017CFC(); /* arity-ok: re-measured round 59, same -- `move s
 extern void func_80017AC8(BMemPMgr *pool);
 
 /* The default-pool global itself (see the comment above). Setter is
- * func_80017A9C(BMemPMgr *pool), a one-line `D_8008A818 = pool;`. Not yet
+ * SetDefaultBMemPMgr(BMemPMgr *pool), a one-line `D_8008A818 = pool;`. Not yet
  * called from any carved C -- BMemPMgrInit never calls it, so whoever
  * establishes the game's one default pool is still asm. */
 extern BMemPMgr *D_8008A818;

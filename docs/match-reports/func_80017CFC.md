@@ -347,7 +347,7 @@ before writing it:
 `$a1` is a fallback pool pointer, consumed only on the path where the
 `$gp`-relative default pool `D_8008A818` is unset (`lw t0,16(gp)` /
 `bnez t0,...` immediately before). It is dead in practice at every decoded call
-site, because `func_80017AC8`/`func_80017A9C` set that global first — but it is
+site, because `func_80017AC8`/`SetDefaultBMemPMgr` set that global first — but it is
 read, so these are two-argument functions.
 
 **Why the 22 one-parameter declarations are right anyway.** Every carved call

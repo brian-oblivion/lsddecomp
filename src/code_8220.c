@@ -34,7 +34,7 @@ void *BMemPMgrInit(s32 poolSize)
     return pool;
 }
 
-void func_80017A9C(BMemPMgr *pool)
+void SetDefaultBMemPMgr(BMemPMgr *pool)
 {
     D_8008A818 = pool;
 }

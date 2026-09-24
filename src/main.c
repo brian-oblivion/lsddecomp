@@ -23,10 +23,10 @@ extern void SetMem(s32 mode);
  * code_8220.h already uses for func_80017B34/func_80017CFC. */
 extern void *BMemPMgrInit(); /* arity-ok: the dead 2nd argument IS byte-load-bearing here -- retail emits `move a1,zero` in the jal's delay slot at 0x80011900 */
 
-/* func_80017A9C(BMemPMgr *pool) -- one-line `D_8008A818 = pool;`, matched
+/* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `D_8008A818 = pool;`, matched
  * in code_8220.c but not yet declared in code_8220.h (no carved caller
  * existed until now). */
-extern void func_80017A9C(BMemPMgr *pool);
+extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 
 /* Still asm (psyq_10ee0, game-code allocator, not yet carved). Zero
  * arguments -- its own asm never reads $a0/$a1, and the `addu $a0,$0,$0` /
@@ -53,7 +53,7 @@ void func_800118DC(void)
     func_80011994();
     SetMem(2);
     D_8008A808 = BMemPMgrInit(0x166C00, 0);
-    func_80017A9C(D_8008A808);
+    SetDefaultBMemPMgr(D_8008A808);
     D_8008AC20 = new_class_6d3c8(&D_80066828);
     obj = new_class_6c078();
     pad = func_80025B34(0, 0);
