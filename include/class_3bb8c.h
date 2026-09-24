@@ -2953,7 +2953,7 @@ struct Class86F88 {
     u8 pad01C[0x020 - 0x01C];
     s32 unk20;                     /* +0x020, Class86F88__ForwardToTarget(fwd)/Class86F88__ScrollRight/Class86F88__ScrollLeft/Class86F88__CursorUp/Class86F88__CursorDown/Class86F88__SetView */
     s32 unk24;                     /* +0x024, ditto */
-    s32 unk28;                     /* +0x028, ditto; also func_80052B54's own return value */
+    s32 unk28;                     /* +0x028, ditto; also Class86F88__GetCursorIndex's own return value */
     s32 unk2C;                     /* +0x02C, Class86F88__TickClosing/Class86F88__SetState */
     s32 unk30;                     /* +0x030, Class86F88__TickClosing/Class86F88__SetState */
     s32 unk34;                     /* +0x034, Class86F88__SetState's slot14 argument */

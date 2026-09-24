@@ -460,7 +460,7 @@ void Class86F88__StepCursorInView(Class86F88 *self, s32 dir, s32 flag)
     }
 }
 
-s32 func_80052B54(Class86F88 *self)
+s32 Class86F88__GetCursorIndex(Class86F88 *self)
 {
     return self->unk28;
 }
