@@ -1,4 +1,6 @@
-# func_80065E1C -- MATCHED 68/68 (round 75): lever = store-and-increment in one expression, `if ((*p++ = New_BaseObjO()) == NULL) goto fail;` (was STALL: length EXACT 68/68, 49/68 raw, first diff vram 0x80065E20)
+# Class65650__CreateParts -- MATCHED 68/68 (round 75): lever = store-and-increment in one expression, `if ((*p++ = New_BaseObjO()) == NULL) goto fail;` (was STALL: length EXACT 68/68, 49/68 raw, first diff vram 0x80065E20)
+
+> Renamed from `func_80065E1C` on 2026-09-24 (tools/rename.py). Address 0x80065e1c.
 
 **Round 75: MATCHED — see the round 75 section at the end. Everything
 between here and that section is the stall history, kept because its
@@ -14,8 +16,8 @@ register-identity swap, `$s1`/`$s2`). Whole-image red. Restored to
 ## What it does (fully derived, control flow and every field/slot confirmed)
 
 The `+0x70`/`+0x74` array pair's setup body (dispatched through
-`slot_setup70`, already known from `func_80065DBC`'s report; the existing
-`extern s32 func_80065E1C(Class65650 *self);` prototype already had the
+`slot_setup70`, already known from `Class65650__SetupParts`'s report; the existing
+`extern s32 Class65650__CreateParts(Class65650 *self);` prototype already had the
 right signature). Queries a count from `self->unk5C`'s own vtable slot
 `+0x080` (new slot, `Unk5CMethods::slot80`), allocates the two parallel
 arrays, re-queries the same slot to populate `self->unk74` with real data,
@@ -24,7 +26,7 @@ finally priming `self->unk68` by indexing `self->unk70` with a value the
 FIRST `slot80` call wrote into a small stack scratch buffer:
 
 ```c
-s32 func_80065E1C(Class65650 *self)
+s32 Class65650__CreateParts(Class65650 *self)
 {
     s32 buf[4];
     s32 count;
@@ -62,7 +64,7 @@ s32 func_80065E1C(Class65650 *self)
 alloc_fail:
     self->unk74 = NULL;
 fail:
-    func_80065F2C(self);
+    Class65650__DestroyParts(self);
     return 1;
 }
 ```
@@ -75,7 +77,7 @@ plain function, not a vtable dispatch, called with literally no arguments
 set up in `$a0`). The `goto`-based control flow mirrors the disassembly
 exactly: two allocation-failure paths converge on a shared
 `self->unk74 = NULL;` before falling into the teardown call
-(`func_80065F2C`, matched earlier this round) shared with the per-element
+(`Class65650__DestroyParts`, matched earlier this round) shared with the per-element
 allocation-failure path.
 
 Every word of the setup/query/allocation section (roughly the first 17
@@ -136,7 +138,7 @@ same 49/68 either way, before OR after the barrier fix was in place).
 
 ```c
 #if 0
-s32 func_80065E1C(Class65650 *self)
+s32 Class65650__CreateParts(Class65650 *self)
 {
     s32 buf[4];
     s32 count;
@@ -175,7 +177,7 @@ s32 func_80065E1C(Class65650 *self)
 alloc_fail:
     self->unk74 = NULL;
 fail:
-    func_80065F2C(self);
+    Class65650__DestroyParts(self);
     return 1;
 }
 #endif
@@ -193,7 +195,7 @@ between two otherwise-unrelated locals/parameters) as a side effect of
 the same global register-allocation pass it perturbs.** This is a new
 combination for this unit's residue catalogue: previously a barrier
 either helped a specific instruction-order issue outright
-(`func_80065D64`) or did nothing (`func_80066214`'s slot134 case) or
+(`Class65650__FindPartIndex`) or did nothing (`func_80066214`'s slot134 case) or
 actively hurt (`Class65650__SetLightMode`'s parameter-copy deferral) — never
 "fixes one thing, breaks a different thing" in the same function. Since
 GCC's register allocator operates on the WHOLE function, a barrier placed
@@ -284,7 +286,7 @@ same offsets as every prior round -- no drift, no contamination.
 
 **Screened against the round-20 outgoing-arg dead-code lever:** this
 function is not a candidate. It has four real `jal`s (`BMemPMgrAlloc`
-x2, `New_BaseObjO`, `func_80065F2C`) and does not appear in round 19's
+x2, `New_BaseObjO`, `Class65650__DestroyParts`) and does not appear in round 19's
 live census of unexplained-outgoing-area functions -- its residue is a
 whole-function register-IDENTITY swap, not a frame-size question, so the
 lever's mechanism (a wider dead call inflating
@@ -356,7 +358,7 @@ different register-pressure shape, not a smaller version of the same one.
 fresh local immediately at function entry, tried on `Class65650__SetLightMode` last
 round for a different residue class and found inert there). Introduced
 `Class65650 *s2 = self;` at the top and rewrote every `self->` access to
-`s2->` (including the `func_80065F2C(s2)` tail call), keeping `self` itself
+`s2->` (including the `Class65650__DestroyParts(s2)` tail call), keeping `self` itself
 otherwise unused after the alias. **Result: 49/68, IDENTICAL residue, no
 change whatsoever** (same offset, same diff). A second confirmation that
 this axis does nothing for parameter/self register-identity questions in
@@ -391,7 +393,7 @@ unconditional `j` (not `beq`/`bne`/`bgez`) whose target is a join with real
 work in its delay slot.
 
 ```
-grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/func_80065E1C.s
+grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/Class65650__CreateParts.s
 ```
 
 **One hit**, at file offset `0x566F4` / vram `0x80065EF4`:
@@ -404,7 +406,7 @@ j    .L80065F0C
 .L80065EFC:
  sw  $zero, 0x74($s2)      ; self->unk74 = NULL   (alloc_fail:)
 .L80065F00:
- jal func_80065F2C
+ jal Class65650__DestroyParts
   addu $a0, $s2, $zero
  ori  $v0, $zero, 0x1
 .L80065F0C:                 ; shared epilogue (lw $ra / $s3 / $s2 / $s1, jr $ra)
@@ -449,7 +451,7 @@ Blocker screens (`gp_rel`, `mflo`/`mfhi`-into-`mult`/`div`) both clean.
 **Applied round 27's callee-saved-register discriminator** (developed seven
 rounds after this function's swap was first classified, so this is an
 independent re-check with a tool that did not exist when the verdict was
-made): `grep -oE 'sw +\$(s[0-7]|fp|ra),' asm/nonmatchings/code_55dd4/func_80065E1C.s
+made): `grep -oE 'sw +\$(s[0-7]|fp|ra),' asm/nonmatchings/code_55dd4/Class65650__CreateParts.s
 | sort -u` against retail gives `$ra,$s0,$s1,$s2,$s3`, and the preserved
 body's own compiled prologue saves the identical set. Per the discriminator
 ("SAME set on both sides -> genuine register identity, stop, CLAUDE.md rule 6
@@ -547,7 +549,7 @@ DID run `permuter.py` (a `PERM_GENERAL` seed, exhaustively enumerated over
 24 concrete combinations) — but that is a bounded manual enumeration over
 four hand-picked axes, not an open random search over the permuter's full
 mutation set.** This round is the first of the latter kind. Provisioned a
-fresh scaffold (`tools/setup-permuter.sh func_80065E1C <seed>` against the
+fresh scaffold (`tools/setup-permuter.sh Class65650__CreateParts <seed>` against the
 preserved 49/68 body). `--debug --stack-diffs` reproduced base score
 **368** exactly, matching round 18's own documented figure — **CHECK 3:
 AGREE**, scaffold targets the same residue as the real build.
@@ -555,7 +557,7 @@ AGREE**, scaffold targets the same residue as the real build.
 Launched under low contention (load average 3.85/32 at launch):
 
 ```
-timeout 900 permuter.py -j 8 --stop-on-zero --best-only permuter-work/func_80065E1C
+timeout 900 permuter.py -j 8 --stop-on-zero --best-only permuter-work/Class65650__CreateParts
 ```
 
 **61,377 iterations, rc=124 (bound fired on its own — confirmed via its
@@ -637,7 +639,7 @@ lever's validated `ResetRCnt` use case.
 Re-measured live under current maspsx flags (rounds 42/63) per the head's
 note that titles may predate them: dropped the preserved body in as live C
 (no `#ifdef`), `build exit=2` with no compile error (only a pre-existing
-unrelated warning in `func_80065D64`), `funcdiff.py` reproduces **49/68
+unrelated warning in `Class65650__FindPartIndex`), `funcdiff.py` reproduces **49/68
 words match (file 0x5661C-0x5672C), no size drift** — identical to the
 title figure, confirming it was already current. Restored the `#ifdef
 NON_MATCHING ... #else INCLUDE_ASM ... #endif` shape (this project's only

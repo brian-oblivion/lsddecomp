@@ -117,7 +117,7 @@ blez  $v0, TAIL / delay: $s0 = 0
 
 Every attempt here instead defers `move $s3, $a1` to right AFTER the
 `blez`, as an extra standalone instruction in the not-taken fallthrough —
-one word longer, which is exactly the `func_80065D64`/`Class65650__SetDisplay`
+one word longer, which is exactly the `Class65650__FindPartIndex`/`Class65650__SetDisplay`
 "parameter copy deferred into/past the branch" residue class. Two
 sub-issues bundled together, addressed separately:
 
@@ -125,7 +125,7 @@ sub-issues bundled together, addressed separately:
    `base`, no filler) produced a `$sp,0x28` frame instead of retail's
    `$sp,0x30` — an 8-byte shortfall, not the usual 0-byte one. Adding a
    fifth, genuinely unused `u8 unused[8];` local (the same lever as
-   `func_80065D64`/`Class65650__SetDisplay`) fixed the frame to `$sp,0x30` exactly
+   `Class65650__FindPartIndex`/`Class65650__SetDisplay`) fixed the frame to `$sp,0x30` exactly
    and, as a side effect, also fixed the callee-save STORE ORDER (which
    had independently come out wrong — `s2,s3,ra,s1,s0` instead of
    retail's `s2,s3,s0,ra,s1` — before the padding local was added; after
@@ -157,7 +157,7 @@ Six real attempts. The frame-size/store-order half of this residue is
 fully closed (a first for this unit's "prologue permutation" residue
 class — `Class65650__SetDisplay` never got its store order to close even with a
 barrier). Only the parameter-copy deferral remains, and unlike its two
-prior instances in this unit (`func_80065D64`, `Class65650__SetDisplay`), the
+prior instances in this unit (`Class65650__FindPartIndex`, `Class65650__SetDisplay`), the
 established `__asm__("")` lever actively regresses it here rather than
 fixing it.
 
@@ -196,7 +196,7 @@ of this stall.)
 
 **The `__asm__("")`-as-first-statement lever for a deferred parameter copy
 is not safe to apply by pattern-match alone — verify each instance.**
-It fixed this exact-looking residue in `func_80065D64` and (partially) in
+It fixed this exact-looking residue in `Class65650__FindPartIndex` and (partially) in
 `Class65650__SetDisplay`, but on `Class65650__SetLightMode` it actively regresses an
 ALREADY-correct delay-slot fill and reintroduces a full-word drift on top
 of failing to move the copy. Three instances of "a parameter copy is

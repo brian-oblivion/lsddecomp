@@ -92,7 +92,7 @@ typedef struct Unk68Obj {
  * only its vtable slot +0x060 is needed so far, by Class65650__SetDisplay. */
 typedef struct Unk70ElemMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
-    void (*slot4)(void *self);                /* +0x004 -- called by func_80065F2C's teardown loop */
+    void (*slot4)(void *self);                /* +0x004 -- called by Class65650__DestroyParts's teardown loop */
     u8 pad08[0x44];                            /* +0x008 .. +0x04B, unknown */
     void (*slot4C)(void *self, void *arg1, s32 arg2); /* +0x04C -- called by func_80066340 (CASE3) as slot4C(elem, arg1, 0); arg1 varies between a Class65650* and an Unk70ElemObj* across call sites, hence void * */
     u8 pad50[0x10];                             /* +0x050 .. +0x05F, unknown */
@@ -135,14 +135,14 @@ typedef struct Unk70ElemObj {
 } Unk70ElemObj;
 
 /* Whatever class self->unk5C (below) points at: unidentified, only its
- * vtable slot +0x004 is needed so far, by func_80065CEC (a "release,
+ * vtable slot +0x004 is needed so far, by Class65650__ReleaseModelData (a "release,
  * returns the new value to store back" idiom -- typically NULL). */
 typedef struct Unk5CObj Unk5CObj;
 typedef struct Unk5CMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
     Unk5CObj *(*slot4)(Unk5CObj *self);       /* +0x004 */
     u8 pad08[0x78];                            /* +0x008 .. +0x07C, unknown */
-    s32 (*slot80)(Unk5CObj *self, void *arg1, s32 *outBuf); /* +0x080 -- called by func_80065E1C twice: once as slot80(unk5C, NULL, buf) to get a count (low byte of the return) and populate a small scratch buffer, once as slot80(unk5C, self->unk74, buf) to fill self->unk74 with real data using the same buffer */
+    s32 (*slot80)(Unk5CObj *self, void *arg1, s32 *outBuf); /* +0x080 -- called by Class65650__CreateParts twice: once as slot80(unk5C, NULL, buf) to get a count (low byte of the return) and populate a small scratch buffer, once as slot80(unk5C, self->unk74, buf) to fill self->unk74 with real data using the same buffer */
     void *(*slot84)(Unk5CObj *self, void *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3); /* +0x084 -- called by func_80066340 as slot84(unk5C, acc, &outbuf[0..3]); outbuf[2..3] are passed as the o32 ABI's 5th/6th (stack) arguments, not registers */
 } Unk5CMethods;
 
@@ -188,7 +188,7 @@ struct Unk5CObj {
 };
 
 /* The constructor's `arg1` (forwarded through slot_setup5C into
- * func_80065C5C): unidentified, only its +0x00C field is needed so far --
+ * Class65650__AcquireModelData): unidentified, only its +0x00C field is needed so far --
  * a Unk5CObj* this class can either borrow (if already set) or allocate
  * a fresh one of its own (via func_8004468C) and own outright. */
 typedef struct UnkArg1Obj {
@@ -213,11 +213,11 @@ typedef struct Class65650Methods {
     void (*slotE4)(Class65650 *self, s32 arg);                              /* +0x0E4 -- called by Class65650__InitDefaults as slotE4(self, 0x12C) */
     u8 padE8[0x08];                                                          /* +0x0E8 .. +0x0EF, inherited/not yet needed */
     void (*slotF0)(Class65650 *self, s32 arg);                                /* +0x0F0 -- called by Class65650__InitDefaults as slotF0(self, 1) */
-    s32 (*slot_setup5C)(Class65650 *self, void *arg1);                     /* +0x0F4 func_80065BFC */
-    void (*slot_teardown5C)(Class65650 *self);                              /* +0x0F8 func_80065C2C */
-    u8 padFC[0x04];                                                          /* +0x0FC, this unit's own slot (func_80065D64), not dispatched through here */
-    s32 (*slot100)(Class65650 *self);                                         /* +0x100 -- called by func_80065C5C on success (its own return value) */
-    void (*slot_teardown70)(Class65650 *self);                                /* +0x104 func_80065DEC -- called by func_80065CEC */
+    s32 (*slot_setup5C)(Class65650 *self, void *arg1);                     /* +0x0F4 Class65650__SetupModelData */
+    void (*slot_teardown5C)(Class65650 *self);                              /* +0x0F8 Class65650__TeardownModelData */
+    u8 padFC[0x04];                                                          /* +0x0FC, this unit's own slot (Class65650__FindPartIndex), not dispatched through here */
+    s32 (*slot100)(Class65650 *self);                                         /* +0x100 -- called by Class65650__AcquireModelData on success (its own return value) */
+    void (*slot_teardown70)(Class65650 *self);                                /* +0x104 Class65650__TeardownParts -- called by Class65650__ReleaseModelData */
     void (*slot108)(Class65650 *self);                                        /* +0x108 func_80065FD8 -- used by Class65650__OnClass6EF50Notify when its `val` == 2 */
     void (*slot10C)(Class65650 *self, s32 arg);                                 /* +0x10C -- called by Class65650__InitDefaults as slot10C(self, 0x41) */
     u8 pad110[0x04];                                                             /* +0x110 .. +0x113, not yet needed as a call target */
@@ -250,13 +250,13 @@ struct Class65650 {
     u8 pad54[0x04];                     /* +0x54 .. +0x57, not this unit's to name */
 
     UnkArg2Obj *arg2;               /* +0x58 the constructor's third parameter, stashed verbatim; read by func_800661D4, which calls arg2->methods->slot80(arg2, forwardedArg, 0x6E, 0x6E) when non-NULL */
-    Unk5CObj *unk5C;                /* +0x5C lazily-populated sub-object; guarded by unk60, set up by func_80065C5C, torn down by func_80065CEC */
+    Unk5CObj *unk5C;                /* +0x5C lazily-populated sub-object; guarded by unk60, set up by Class65650__AcquireModelData, torn down by Class65650__ReleaseModelData */
     s32 unk60;                     /* +0x60 guard flag for unk5C: 0 if unk5C already existed and was borrowed rather than allocated, 1 if this instance owns it */
-    s32 unk64;                     /* +0x64 plain s32 field; set verbatim by func_80065BF4(self, value) */
+    s32 unk64;                     /* +0x64 plain s32 field; set verbatim by Class65650__SetUnk64(self, value) */
     Unk68Obj *unk68;                /* +0x68 zeroed in the constructor; consumed by func_80066150, which calls unk68->methods->slot88(unk68, 6) when self->unk64 == 1 and unk68 is set */
     s32 unk6C;                     /* +0x6C count, paired with the unk70/unk74 arrays */
-    Unk70ElemObj **unk70;           /* +0x70 array of item pointers, allocated by func_80065E1C; each element's own slot +0x060 is invoked (element, arg) by Class65650__SetDisplay */
-    u8 *unk74;                     /* +0x74 parallel byte array (one byte per unk70 entry), allocated by func_80065E1C; linearly searched by func_80065D64 */
+    Unk70ElemObj **unk70;           /* +0x70 array of item pointers, allocated by Class65650__CreateParts; each element's own slot +0x060 is invoked (element, arg) by Class65650__SetDisplay */
+    u8 *unk74;                     /* +0x74 parallel byte array (one byte per unk70 entry), allocated by Class65650__CreateParts; linearly searched by Class65650__FindPartIndex */
     void *unk78;                    /* +0x78 callback pointer; func_800660BC copies one of slot118/11C/120's VALUE (never calls it) here based on a small dispatch value */
 
     s32 unk7C;                      /* +0x7C set verbatim from func_80066214's `index` argument */
@@ -278,15 +278,15 @@ extern void Class6B5CC__LinkModel(void *self, s32 arg); /* first param confirmed
 extern void *New_BaseObjO(void);
 
 /* Same-unit helpers called directly by name (still INCLUDE_ASM this round).
- * func_80065C5C/func_80065CEC are the +0x5C sub-object's setup/teardown
- * bodies (dispatched through slot_setup5C/slot_teardown5C); func_80065E1C/
- * func_80065F2C are the +0x70/+0x74 arrays' setup/teardown bodies
+ * Class65650__AcquireModelData/Class65650__ReleaseModelData are the +0x5C sub-object's setup/teardown
+ * bodies (dispatched through slot_setup5C/slot_teardown5C); Class65650__CreateParts/
+ * Class65650__DestroyParts are the +0x70/+0x74 arrays' setup/teardown bodies
  * (dispatched through slot_setup70/slot_teardown70). Neither E1C nor F2C
  * reference their own $a1 anywhere in their bodies, so they take only
  * `self`; C5C does use its own second argument (a1->0xC), so it keeps one. */
-extern s32 func_80065C5C(Class65650 *self, UnkArg1Obj *other);
-extern void func_80065CEC(Class65650 *self);
-extern s32 func_80065E1C(Class65650 *self);
-extern void func_80065F2C(Class65650 *self);
+extern s32 Class65650__AcquireModelData(Class65650 *self, UnkArg1Obj *other);
+extern void Class65650__ReleaseModelData(Class65650 *self);
+extern s32 Class65650__CreateParts(Class65650 *self);
+extern void Class65650__DestroyParts(Class65650 *self);
 
 #endif

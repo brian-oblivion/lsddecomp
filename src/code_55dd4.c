@@ -139,27 +139,27 @@ void Class65650__OnClass6EF50Notify(Class65650 *self, void *arg1, s32 val)
     }
 }
 
-void func_80065BF4(Class65650 *self, s32 value)
+void Class65650__SetUnk64(Class65650 *self, s32 value)
 {
     self->unk64 = value;
 }
 
-s32 func_80065BFC(Class65650 *self, void *arg1)
+s32 Class65650__SetupModelData(Class65650 *self, void *arg1)
 {
     if (self->unk5C != NULL) {
         return 0;
     }
-    return func_80065C5C(self, arg1);
+    return Class65650__AcquireModelData(self, arg1);
 }
 
-void func_80065C2C(Class65650 *self)
+void Class65650__TeardownModelData(Class65650 *self)
 {
     if (self->unk5C != NULL) {
-        func_80065CEC(self);
+        Class65650__ReleaseModelData(self);
     }
 }
 
-s32 func_80065C5C(Class65650 *self, UnkArg1Obj *other)
+s32 Class65650__AcquireModelData(Class65650 *self, UnkArg1Obj *other)
 {
     if (other->unk0C != NULL) {
         self->unk5C = other->unk0C;
@@ -173,11 +173,11 @@ s32 func_80065C5C(Class65650 *self, UnkArg1Obj *other)
     }
     return self->methods->slot100(self);
 fail:
-    func_80065CEC(self);
+    Class65650__ReleaseModelData(self);
     return 1;
 }
 
-void func_80065CEC(Class65650 *self)
+void Class65650__ReleaseModelData(Class65650 *self)
 {
     Unk5CObj *result;
 
@@ -190,7 +190,7 @@ void func_80065CEC(Class65650 *self)
     self->unk5C = result;
 }
 
-s32 func_80065D64(Class65650 *self, s32 value)
+s32 Class65650__FindPartIndex(Class65650 *self, s32 value)
 {
     u8 *arr;
     s32 count;
@@ -219,22 +219,22 @@ s32 func_80065D64(Class65650 *self, s32 value)
     return -1;
 }
 
-s32 func_80065DBC(Class65650 *self)
+s32 Class65650__SetupParts(Class65650 *self)
 {
     if (self->unk70 != NULL) {
         return 0;
     }
-    return func_80065E1C(self);
+    return Class65650__CreateParts(self);
 }
 
-void func_80065DEC(Class65650 *self)
+void Class65650__TeardownParts(Class65650 *self)
 {
     if (self->unk70 != NULL) {
-        func_80065F2C(self);
+        Class65650__DestroyParts(self);
     }
 }
 
-s32 func_80065E1C(Class65650 *self)
+s32 Class65650__CreateParts(Class65650 *self)
 {
     s32 buf[4];
     s32 count;
@@ -270,11 +270,11 @@ s32 func_80065E1C(Class65650 *self)
 alloc_fail:
     self->unk74 = NULL;
 fail:
-    func_80065F2C(self);
+    Class65650__DestroyParts(self);
     return 1;
 }
 
-void func_80065F2C(Class65650 *self)
+void Class65650__DestroyParts(Class65650 *self)
 {
     Unk70ElemObj **p;
 
@@ -400,7 +400,7 @@ void *func_80066340(Class65650 *self, void *acc, void *extra)
     s32 i;
 
     s0 = self->unk5C->methods->slot84(self->unk5C, acc, &outbuf[0], &outbuf[1], &outbuf[2], &outbuf[3]);
-    idx = func_80065D64(self, outbuf[0]);
+    idx = Class65650__FindPartIndex(self, outbuf[0]);
     if (idx < 0) {
         goto end;
     }
@@ -509,7 +509,7 @@ void *func_80066340(Class65650 *self, void *acc, void *extra)
         } else {
             s32 idx2;
 
-            idx2 = func_80065D64(self, *(u8 *)s0);
+            idx2 = Class65650__FindPartIndex(self, *(u8 *)s0);
             elem->methods->slot4C(elem, self->unk70[idx2], 0);
         }
         break;

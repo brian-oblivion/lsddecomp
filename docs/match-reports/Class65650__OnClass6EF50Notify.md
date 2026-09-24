@@ -29,7 +29,7 @@ void Class65650__OnClass6EF50Notify(Class65650 *self, void *arg1, s32 val)
 
 First attempt wrote both calls as `slot108(self, arg1)` /
 `slot04(self, arg1)`, forwarding this function's own second parameter —
-reasoning by analogy with `func_80065BFC`'s forwarding shape. That compiled
+reasoning by analogy with `Class65650__SetupModelData`'s forwarding shape. That compiled
 29 words too **long** (30 vs 29) and every word from the prologue on
 differed: with `arg1` referenced after a call (the first `if`'s call sits
 between the two uses), GCC has to assume the callee might clobber `$a1` and

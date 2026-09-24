@@ -1,4 +1,6 @@
-# func_80065BFC
+# Class65650__SetupModelData
+
+> Renamed from `func_80065BFC` on 2026-09-24 (tools/rename.py). Address 0x80065bfc.
 
 **Unit:** code_55dd4 · **Size:** 12 words (0x30 bytes) · **Status:** MATCHED
 (12/12 words, whole-image `./build-and-verify.sh` green)
@@ -8,18 +10,18 @@
 `Class65650Methods` slot `+0x0F4` (`slot_setup5C`, already typed in
 `include/code_55dd4.h` from the constructor's call site). Guards
 `self->unk5C`: if it is already set, returns 0 (success, nothing to do);
-otherwise defers to `func_80065C5C(self, arg1)` and returns its result
+otherwise defers to `Class65650__AcquireModelData(self, arg1)` and returns its result
 directly. `arg1` is never touched in this function's own body — retail
-leaves `$a1` untouched from entry and lets `func_80065C5C`'s call inherit it,
+leaves `$a1` untouched from entry and lets `Class65650__AcquireModelData`'s call inherit it,
 which is why the signature carries a second parameter purely to forward it.
 
 ```c
-s32 func_80065BFC(Class65650 *self, void *arg1)
+s32 Class65650__SetupModelData(Class65650 *self, void *arg1)
 {
     if (self->unk5C != NULL) {
         return 0;
     }
-    return func_80065C5C(self, arg1);
+    return Class65650__AcquireModelData(self, arg1);
 }
 ```
 

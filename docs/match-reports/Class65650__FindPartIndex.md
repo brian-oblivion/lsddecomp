@@ -1,4 +1,6 @@
-# func_80065D64
+# Class65650__FindPartIndex
+
+> Renamed from `func_80065D64` on 2026-09-24 (tools/rename.py). Address 0x80065d64.
 
 **Unit:** code_55dd4 · **Size:** 22 words (0x58 bytes) · **Status:** MATCHED
 (22/22 words, whole-image `./build-and-verify.sh` green)
@@ -11,7 +13,7 @@
 NULL, the count is `<= 0`, or nothing matches.
 
 ```c
-s32 func_80065D64(Class65650 *self, s32 value)
+s32 Class65650__FindPartIndex(Class65650 *self, s32 value)
 {
     u8 *arr;
     s32 count;

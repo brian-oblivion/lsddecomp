@@ -1,20 +1,22 @@
-# func_80065CEC
+# Class65650__ReleaseModelData
+
+> Renamed from `func_80065CEC` on 2026-09-24 (tools/rename.py). Address 0x80065cec.
 
 **Unit:** code_55dd4 · **Size:** 30 words (0x78 bytes) · **Status:** MATCHED
 (30/30 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
 
-The teardown for the `+0x5C` sub-object, dispatched from `func_80065C2C`
+The teardown for the `+0x5C` sub-object, dispatched from `Class65650__TeardownModelData`
 (`slot_teardown5C`). Tears down the `+0x70`/`+0x74` arrays first (through
-`slot_teardown70`, `+0x104`, i.e. `func_80065DEC`), then either releases
+`slot_teardown70`, `+0x104`, i.e. `Class65650__TeardownParts`), then either releases
 `self->unk5C` through its own vtable slot `+0x004` (if `self->unk60`
 records that this instance owns it) or simply clears it to `NULL`
-(if it was only borrowed — see `func_80065C5C`'s report for the
+(if it was only borrowed — see `Class65650__AcquireModelData`'s report for the
 borrow/allocate distinction that sets `unk60`).
 
 ```c
-void func_80065CEC(Class65650 *self)
+void Class65650__ReleaseModelData(Class65650 *self)
 {
     Unk5CObj *result;
 

@@ -1,4 +1,6 @@
-# func_80065C5C
+# Class65650__AcquireModelData
+
+> Renamed from `func_80065C5C` on 2026-09-24 (tools/rename.py). Address 0x80065c5c.
 
 **Unit:** code_55dd4 · **Size:** 36 words (0x90 bytes) · **Status:** MATCHED
 (36/36 words, whole-image `./build-and-verify.sh` green)
@@ -6,17 +8,17 @@
 ## What it does
 
 `Class65650Methods` slot `+0x0F4`'s implementation, dispatched from
-`func_80065BFC` (`slot_setup5C`). Sets up `self->unk5C`, borrowing an
+`Class65650__SetupModelData` (`slot_setup5C`). Sets up `self->unk5C`, borrowing an
 existing sub-object from the constructor's `arg1` if it already has one at
 its own `+0x00C` field, or allocating a fresh one via `func_8004468C`
 otherwise — recording which case happened in `self->unk60` (the guard flag
-`func_80065CEC`'s teardown already reads). If the result is still `NULL`
-(allocation failed), tears itself back down via `func_80065CEC` and
+`Class65650__ReleaseModelData`'s teardown already reads). If the result is still `NULL`
+(allocation failed), tears itself back down via `Class65650__ReleaseModelData` and
 reports failure (`1`); otherwise dispatches to the class's own `+0x100`
 slot and returns *its* result as the final success/failure code.
 
 ```c
-s32 func_80065C5C(Class65650 *self, UnkArg1Obj *other)
+s32 Class65650__AcquireModelData(Class65650 *self, UnkArg1Obj *other)
 {
     if (other->unk0C != NULL) {
         self->unk5C = other->unk0C;
@@ -30,7 +32,7 @@ s32 func_80065C5C(Class65650 *self, UnkArg1Obj *other)
     }
     return self->methods->slot100(self);
 fail:
-    func_80065CEC(self);
+    Class65650__ReleaseModelData(self);
     return 1;
 }
 ```
@@ -38,7 +40,7 @@ fail:
 Adds `UnkArg1Obj` (`include/code_55dd4.h`) for the constructor's `arg1`,
 typed only at its `+0x00C` field (a `Unk5CObj *`, borrowed or freshly
 allocated), and retypes the `arg1` parameter all the way from
-`Class65650__Class65650` through `slot_setup5C`/`func_80065BFC` to here as
+`Class65650__Class65650` through `slot_setup5C`/`Class65650__SetupModelData` to here as
 `UnkArg1Obj *` instead of the generic `void *` the first pass used
 (implicit `void *` -> `UnkArg1Obj *` conversions at the two call sites
 needed no changes). Also adds `func_8004468C`'s prototype (from

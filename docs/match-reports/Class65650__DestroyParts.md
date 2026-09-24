@@ -1,4 +1,6 @@
-# func_80065F2C
+# Class65650__DestroyParts
+
+> Renamed from `func_80065F2C` on 2026-09-24 (tools/rename.py). Address 0x80065f2c.
 
 **Unit:** code_55dd4 · **Size:** 43 words (0xAC bytes) · **Status:** MATCHED
 (43/43 words, whole-image `./build-and-verify.sh` green)
@@ -6,14 +8,14 @@
 ## What it does
 
 The `+0x70`/`+0x74` array pair's teardown body (dispatched through
-`slot_teardown70`, already known from `func_80065DEC`'s report). If both
+`slot_teardown70`, already known from `Class65650__TeardownParts`'s report). If both
 arrays are non-NULL, releases each element via its own vtable slot `+0x004`
 (a new slot on `Unk70ElemMethods`, distinct from the already-known
 `+0x060`/`+0x070`), resets `self->unk68`, then unconditionally frees and
 clears both array pointers:
 
 ```c
-void func_80065F2C(Class65650 *self)
+void Class65650__DestroyParts(Class65650 *self)
 {
     Unk70ElemObj **p;
 

@@ -92,7 +92,7 @@ both compensations. Closed a 61-round stall on the second shape build.
 >   `$s1` both receive their values only AFTER the prologue. That is the
 >   specific decision to aim at.
 >
-> `func_80065D64` and `func_80025D10` are recorded as the same class and were
+> `Class65650__FindPartIndex` and `func_80025D10` are recorded as the same class and were
 > CLOSED by a single barrier, so the class is not uniformly hard; this
 > instance is the residual tail of it.
 
@@ -162,8 +162,8 @@ consistently come out in the order `$ra, $s1, $s0` instead of retail's
 | --- | --- |
 | straightforward translation, no barrier, 4 locals (`p`, `i`, `element`, no filler) | 1/33 — also 2 words short (no stack frame at all) |
 | add a genuinely unused `u8 unused[8]` local to force the 8-byte frame retail has (confirmed by matching `.frame` output from `cc1` directly: `vars=8` reproduces retail's `$sp,0x30`) | still 2 words short — the `$s3`=`arg` copy was being deferred all the way into the `blez` delay slot instead of happening early like retail |
-| `__asm__("")` as the very first statement (closed a near-identical issue in `func_80065D64` and, per the head's broadcast, in `func_80025D10`) | **jumped straight to 30/33** — closed the `$s3` deferral, leaving only the three-store permutation above |
-| six declaration-order permutations of `p`/`i`/`unused` | 30/33 every time — declaration order does not reach this scheduler decision, matching the finding already recorded for `func_80025D10` and `func_80065D64` |
+| `__asm__("")` as the very first statement (closed a near-identical issue in `Class65650__FindPartIndex` and, per the head's broadcast, in `func_80025D10`) | **jumped straight to 30/33** — closed the `$s3` deferral, leaving only the three-store permutation above |
+| six declaration-order permutations of `p`/`i`/`unused` | 30/33 every time — declaration order does not reach this scheduler decision, matching the finding already recorded for `func_80025D10` and `Class65650__FindPartIndex` |
 | inlining the `element` temporary (`(*p)->methods->slot60(*p, arg)`) | 30/33, unchanged |
 | a second `__asm__("")` before `i = 0` (in addition to the first) | **worse** — 7/33, and the delay slot's `$s0 = 0` no longer got filled (extra `nop`), so a second barrier here costs more than it fixes |
 | moving `i = 0` before the first barrier, ahead of the null check | **much worse** — 5/33, changed which hard register holds `i` entirely, breaking downstream matches |
@@ -210,7 +210,7 @@ void Class65650__SetDisplay(Class65650 *self, void *arg)
 
 A single `__asm__("")` at the top of a function is not guaranteed to fully
 normalize prologue store order — it closed the *parameter-copy-deferral*
-half of this residue (matching `func_80065D64`'s single-barrier fix) but
+half of this residue (matching `Class65650__FindPartIndex`'s single-barrier fix) but
 left a three-way store permutation among the *other* callee-saved
 registers untouched. Whether one barrier suffices seems to depend on how
 many independent store operations the scheduler is juggling in the
@@ -593,11 +593,11 @@ deciding where to spend this round's search budget:
   15 (round 25: "the minimum, reached 39,292 times; every other value
   observed is worse"), so there is no below-base candidate on file to
   re-read. This is a genuinely different situation from `Class65650__SetLightMode`'s
-  and `func_80065E1C`'s siblings this round, where fresh searches
+  and `Class65650__CreateParts`'s siblings this round, where fresh searches
   immediately surfaced sub-base candidates worth inspecting.
 
 **This round's actual search budget went to this function's two
-never-touched-by-a-fresh-search siblings instead** (`func_80065E1C`, 0
+never-touched-by-a-fresh-search siblings instead** (`Class65650__CreateParts`, 0
 genuine open-search iterations before this round despite a round-18
 manual 24-combination enumeration; `func_800662BC`, whose last search was
 round 31) — see their own reports. Re-running a THIRD blind campaign

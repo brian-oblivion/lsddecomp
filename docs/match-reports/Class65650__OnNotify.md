@@ -11,7 +11,7 @@ Forwards to the shared intermediate base class's `+0x038` slot with all
 three of its own arguments, then conditionally dispatches through its own
 `slot04` when `arg1` carries a specific type tag, `arg2 == 1`, and
 `self->unk60` (the "do I own `unk5C`" guard, already known from
-`func_80065C5C`/`func_80065CEC`) is clear:
+`Class65650__AcquireModelData`/`Class65650__ReleaseModelData`) is clear:
 
 ```c
 void Class65650__OnNotify(Class65650 *self, TagCheckArg *arg1, s32 arg2)
