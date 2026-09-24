@@ -297,13 +297,6 @@ void func_8003D6D4(Obj86B60 *self)
     BMemPMgrFree(self->unk64[self->activeSlot]);
 }
 
-/* Unk68ObjMethods.slot4C as this call site passes it: THREE arguments, the
- * third being the slot position pair. The shared header types the slot with
- * two (its only observed caller is this function); passing the third is what
- * makes retail compute &pos before the branch -- see
- * docs/match-reports/func_8003D73C.md, round 75. */
-typedef void (*Unk68Slot4CFn)(Unk68Obj *self, s32 a1, SlotPos *pos);
-
 void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
 {
     s32 idx;
@@ -333,7 +326,7 @@ void func_8003D73C(Obj86B60 *self, void *a1, s32 a2)
     if (a2 != 0) {
         s32 buf[2];
 
-        ((Unk68Slot4CFn)self->unk68->methods->slot4C)(self->unk68, self->unk14, &pos);
+        self->unk68->methods->slot4C(self->unk68, self->unk14, &pos);
         buf[0] = 0x28;
         buf[1] = count * 12;
         self->unk68->methods->slotC0(self->unk68, buf);

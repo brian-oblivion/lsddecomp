@@ -373,8 +373,10 @@ struct Unk68ObjMethods {
     void (*slot4)(Unk68Obj *self);              /* +0x004, OBSERVED:
                                                      func_8003D050 */
     u8 pad008[0x04C - 0x008];
-    void (*slot4C)(Unk68Obj *self, s32 a1);      /* +0x04C, OBSERVED:
-                                                     func_8003D73C */
+    void (*slot4C)(Unk68Obj *self, s32 a1, void *pos); /* +0x04C, OBSERVED:
+                                                     func_8003D73C, its only
+                                                     caller, passes THREE
+                                                     (round 75) */
     void (*slot50)(Unk68Obj *self);               /* +0x050, OBSERVED:
                                                      func_8003DAD4,
                                                      func_8003D73C */
