@@ -5,9 +5,9 @@
 #include "DreamSys.h"
 
 /*
- * The class allocated by new_class_6d3c8 / constructed by Class6D3C8__Class6D3C8.
+ * The class allocated by New_Class6D3C8 / constructed by Class6D3C8__Class6D3C8.
  * Method table is D_8006D3C8 (25 slots). No FirecatFG name survives for
- * this class (only new_class_6d3c8 itself is named in the symbol file), so
+ * this class (only New_Class6D3C8 itself is named in the symbol file), so
  * fields are named by offset until real names are known.
  *
  * Inheritance, resolved with tools/classtable.py (never by counting):
@@ -48,7 +48,7 @@
  */
 
 /* The intermediate base class at D_8006E4F0. Same policy: only slots this
- * unit actually dispatches through (+0x044, from Class6D3C8__ForwardToBaseUnlessOverridden) are typed. */
+ * unit actually dispatches through (+0x044, from Class6D3C8__ForwardToBaseSlot44UnlessFlagged) are typed. */
 typedef struct MiddleClassMethods {
     s32 header;                                             /* +0x000 */
     void *unk04;                                             /* +0x004 */
@@ -97,7 +97,7 @@ typedef struct Class6D3C8Methods {
     void *unk38;                                            /* +0x038 BasicClass__OnNotify */
     void *unk3C;                                            /* +0x03C null slot */
     void (*setDayFromTickCount)(Class6D3C8 *self);          /* +0x040 Class6D3C8__SetDayFromTickCount (ignores self) */
-    void (*slot44)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 Class6D3C8__ForwardToBaseUnlessOverridden.
+    void (*forwardToBaseSlot44UnlessFlagged)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 Class6D3C8__ForwardToBaseSlot44UnlessFlagged.
                                                              * NOT renamed to match its occupant: src/main.c
                                                              * dispatches this slot by name directly
                                                              * (D_8008AC20->methods->slot44(...)), outside this
@@ -119,12 +119,12 @@ typedef struct Class6D3C8Methods {
                                                              * never load-bearing. */
 } Class6D3C8Methods;
 
-/* Object size is 0x2C (from the allocator call in new_class_6d3c8). Field
+/* Object size is 0x2C (from the allocator call in New_Class6D3C8). Field
  * offsets below are only the ones observed so far in Class6D3C8__Class6D3C8. */
 struct Class6D3C8 {
     Class6D3C8Methods *methods;    /* +0x00 */
     u8 unk04[0x14];                 /* +0x04 .. +0x17, not yet decoded */
-    s32 unk18;                       /* +0x18 guards Class6D3C8__ForwardToBaseUnlessOverridden's fallback to the base class */
+    s32 unk18;                       /* +0x18 guards Class6D3C8__ForwardToBaseSlot44UnlessFlagged's fallback to the base class */
     s32 unk1C;                        /* +0x1C, forwarded as a plain word arg by Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartLoaderTask */
     Class6D3C8CtorArgs *arg;        /* +0x20 the constructor's `arg` parameter */
     s32 unk24;                      /* +0x24 */
@@ -144,7 +144,7 @@ extern void *BMemPMgrAlloc(s32 size);
 
 /* Model-file-load request block used by Class6D3C8__Class6D3C8: {type; path}. Only
  * one call site is known so far (Class6D3C8__Class6D3C8, loading "ETC\DREAME5.TMD"
- * via gModelPathDreamE5), so field names are provisional. */
+ * via sModelPathDreamE5), so field names are provisional. */
 typedef struct LoadModelRequest {
     s32 type;
     const char *path;
@@ -152,7 +152,7 @@ typedef struct LoadModelRequest {
     s32 unk0C;
 } LoadModelRequest;
 
-extern const char gModelPathDreamE5[];       /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
+extern const char sModelPathDreamE5[];       /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
 
 extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so far */
 extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
@@ -219,8 +219,8 @@ extern const char *func_800490F4(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x
 extern s32 func_800493C8(s32 index);                   /* psyq_memset.s: signed-halfword lookup into D_80086170[index] */
 extern s32 func_8004913C(s32 *out, s32 param2);          /* psyq_memset.s: day/week-style calculation (divides func_80048CFC's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
 
-extern const char gLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
-extern const char gLogoPathOsd[]; /* "ETC\OSDLOGO.TIM" */
+extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
+extern const char sLogoPathOsd[]; /* "ETC\OSDLOGO.TIM" */
 
 /* Forward declaration: Class6D3C8__StartLoaderTask (this unit, defined later in ROM
  * order) is called by Class6D3C8__LoadIntroLogoSequence, which comes first in the file. */

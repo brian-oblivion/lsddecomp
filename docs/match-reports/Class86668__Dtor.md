@@ -11,7 +11,7 @@ class of `D_800865C8` (resolved with
 `tools/classtable.py 0x800865C8 --vs 0x8006E878`, then cross-checked against
 `0x80086668` -- both share the same base, `gIntermediateBaseMethods`). If `self->unk30` is
 set, notifies `self->subB` (guarded slot, same pattern as
-`include/Class6D3C8.h`'s `unk18`/`Class6D3C8__ForwardToBaseUnlessOverridden` comment). Then chains to the
+`include/Class6D3C8.h`'s `unk18`/`Class6D3C8__ForwardToBaseSlot44UnlessFlagged` comment). Then chains to the
 BASE class's own dtor, fetched through `Get_vtable_IntermediateBase()` (a plain
 no-parameter accessor returning `&gIntermediateBaseMethods`, same shape as
 `Get_vtable_DreamSys`).

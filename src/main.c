@@ -43,7 +43,7 @@ extern Class6D3C8CtorArgs D_80066828;
 
 /* Matched in code_1677c.c; not yet declared in any header (no other carved
  * caller existed until now). */
-extern Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg);
+extern Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg);
 
 void func_800118DC(void)
 {
@@ -54,10 +54,10 @@ void func_800118DC(void)
     SetMem(2);
     D_8008A808 = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(D_8008A808);
-    D_8008AC20 = new_class_6d3c8(&D_80066828);
+    D_8008AC20 = New_Class6D3C8(&D_80066828);
     obj = new_class_6c078();
     pad = func_80025B34(0, 0);
-    D_8008AC20->methods->slot44(D_8008AC20, obj, pad);
+    D_8008AC20->methods->forwardToBaseSlot44UnlessFlagged(D_8008AC20, obj, pad);
     D_8008AC20->methods->slot4C(D_8008AC20);
 }
 

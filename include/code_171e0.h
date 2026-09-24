@@ -4,9 +4,9 @@
 #include "common.h"
 
 /* Method table (25 slots per tools/classtable.py) for the class whose
- * constructor caller is new_class_6d3c8 (src unit code_1677c). Not yet named
+ * constructor caller is New_Class6D3C8 (src unit code_1677c). Not yet named
  * or typed field-by-field -- only its address is needed here, by
- * GetClass6D3C8Methods, which hands it to new_class_6d3c8 so the constructor slot
+ * GetClass6D3C8Methods, which hands it to New_Class6D3C8 so the constructor slot
  * (+0x008, Class6D3C8__Class6D3C8) can be fetched and called indirectly. See
  * CLAUDE.md's "Writing a class method" for the +0x008 constructor-slot
  * convention. */
@@ -50,7 +50,7 @@ struct BasicClassMethods171e0 {
     /* +0x0C */ void *(*dtor)(void *self);
 };
 extern BasicClassMethods171e0 *Get_vtable_BasicClass(void);
-extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by new_class_6d3c8.md (code_1677c) */
+extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by New_Class6D3C8.md (code_1677c) */
 extern void BMemPMgrFree(void *arg);
 extern s32 strlen(char *s);
 

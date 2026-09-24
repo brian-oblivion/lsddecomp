@@ -1,4 +1,6 @@
-# Class6D3C8__ForwardToBaseUnlessOverridden
+# Class6D3C8__ForwardToBaseSlot44UnlessFlagged
+
+> Renamed from `Class6D3C8__ForwardToBaseUnlessOverridden` on 2026-09-24 (tools/rename.py). Address 0x80026108.
 
 > Renamed from `func_80026108` on 2026-09-24 (tools/rename.py). Address 0x80026108.
 
@@ -50,7 +52,7 @@ return value (if used at all) is whatever the base method leaves behind —
 treated as `void` here since nothing in this unit consumes it.
 
 ```c
-void Class6D3C8__ForwardToBaseUnlessOverridden(Class6D3C8 *self, void *a1, void *a2) {
+void Class6D3C8__ForwardToBaseSlot44UnlessFlagged(Class6D3C8 *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
         func_8003B20C()->slot44(self, a1, a2, 0);
     }
@@ -69,7 +71,7 @@ BasicClass and this class) was only found this way.
 
 ## Naming
 
-**`Class6D3C8__ForwardToBaseUnlessOverridden` -- tier B.** Mechanics are
+**`Class6D3C8__ForwardToBaseSlot44UnlessFlagged` -- tier B.** Mechanics are
 clear from the body: when `self->unk18 == 0` it forwards straight to the
 intermediate base class's own `slot44` occupant (`func_8003B20C()->slot44`,
 same slot number as the one this function itself occupies, `+0x044`), and

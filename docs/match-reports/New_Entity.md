@@ -76,7 +76,7 @@ right after the call, and (b) fold the failure return value into the
 branch's own delay slot — a single-variable, single-purpose local matches
 retail's register allocation more often than a "value defaults to failure,
 gets overwritten on success" flag pattern does, at least for this compiler
-at `-O2`. This generalizes the project's existing note (`new_class_6d3c8`,
+at `-O2`. This generalizes the project's existing note (`New_Class6D3C8`,
 `docs/MATCHING-GUIDE.md`) that the `New_X` shape is common across ~60
 classes — worth trying the early-return form first on any future one.
 

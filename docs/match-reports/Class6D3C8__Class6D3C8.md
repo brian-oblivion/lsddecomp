@@ -38,11 +38,11 @@ jal   func_80048CF0                  ; reads an unnamed small-data global
 jal   func_800270AC                     ; stores its arg into another unnamed global
  addu $a0, $v0, $zero
 addiu $a0, $sp, 0x10                     ; &local request buffer
-lui   $v0, %hi(gModelPathDreamE5)
-addiu $v0, $v0, %lo(gModelPathDreamE5)            ; &"ETC\DREAME5.TMD"
+lui   $v0, %hi(sModelPathDreamE5)
+addiu $v0, $v0, %lo(sModelPathDreamE5)            ; &"ETC\DREAME5.TMD"
 sw    $zero, 0x10($sp)                      ; req.type = 0
 jal   func_80043840                           ; loads the model, returns a handle
- sw   $v0, 0x14($sp)                            ; req.path = &gModelPathDreamE5
+ sw   $v0, 0x14($sp)                            ; req.path = &sModelPathDreamE5
 addu  $a0, $v0, $zero
 addu  $a1, $zero, $zero
 jal   New_DreamSys                               ; New_DreamSys(handle, 0, 0)
@@ -76,7 +76,7 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     self->arg = arg;
     func_800270AC(func_80048CF0());
     req.type = 0;
-    req.path = gModelPathDreamE5;
+    req.path = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(func_80043840(&req), 0, 0);
     self->unk24 = 0;
     self->dreamSys->vt->func_228(self->dreamSys, arg->unk14);
@@ -120,7 +120,7 @@ another caller is found that writes them.
   opaque `void *` to real callable signatures now that this function
   exercises them, retyped `Class6D3C8::arg` and `::dreamSys` from `void *`
   to their real pointer types, and declared the small externs this function
-  needed (`GetClass6D3C8Methods`, `gModelPathDreamE5`, `func_80048CF0`, `func_800270AC`,
+  needed (`GetClass6D3C8Methods`, `sModelPathDreamE5`, `func_80048CF0`, `func_800270AC`,
   `func_80043840`).
 - `include/DreamSys.h`: extended `struct vtable_DreamSys` past its
   previously-documented end (`0x21c`) with 3 padding words and a new named

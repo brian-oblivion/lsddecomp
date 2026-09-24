@@ -14,8 +14,8 @@
  * costs an extra instruction that retail does not have. GCC 2.6.3 warns
  * "control reaches end of non-void function" here, and the warning is
  * correct about the C -- the bytes are what say the original had it too.
- * See docs/match-reports/new_class_6d3c8.md for the full derivation. */
-Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
+ * See docs/match-reports/New_Class6D3C8.md for the full derivation. */
+Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg) {
     Class6D3C8 *self = BMemPMgrAlloc(0x2C);
 
     if (self != 0) {
@@ -37,7 +37,7 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     self->arg = arg;
     func_800270AC(func_80048CF0());
     req.type = 0;
-    req.path = gModelPathDreamE5;
+    req.path = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(func_80043840(&req), 0, 0);
     self->unk24 = 0;
     self->dreamSys->vt->func_228(self->dreamSys, arg->unk14);
@@ -54,7 +54,7 @@ void Class6D3C8__SetDayFromTickCount(void) {
 
 /* Defers to the base class's own implementation of this slot when this
  * object hasn't been given an override (unk18 == 0). */
-void Class6D3C8__ForwardToBaseUnlessOverridden(Class6D3C8 *self, void *a1, void *a2) {
+void Class6D3C8__ForwardToBaseSlot44UnlessFlagged(Class6D3C8 *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
         func_8003B20C()->slot44(self, a1, a2, 0);
     }
@@ -72,13 +72,13 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
 
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        Class6D3C8__StartLoaderTask(self, gLogoPathAsmk);
+        Class6D3C8__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTaskObj(0, 0, 0, 0);
         streamName = func_800490F4(&typeCode);
         typeLookup = func_800493C8(typeCode);
         task->methods->configure(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->start(task);
-        Class6D3C8__StartLoaderTask(self, gLogoPathOsd);
+        Class6D3C8__StartLoaderTask(self, sLogoPathOsd);
     }
 }
 

@@ -1,4 +1,6 @@
-# new_class_6d3c8
+# New_Class6D3C8
+
+> Renamed from `new_class_6d3c8` on 2026-09-24 (tools/rename.py). Address 0x80025f7c.
 
 **Unit:** code_1677c · **Size:** 24 words (0x60 bytes) ·
 **Status: MATCHED 24/24**, whole-image SHA1 green. Closed by the head in
@@ -14,7 +16,7 @@ round 8 (2026-09-02) with the project's first permuter run.
 ## RESOLUTION — the matching form
 
 ```c
-Class6D3C8 *new_class_6d3c8(Class6D3C8CtorArgs *arg) {
+Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg) {
     Class6D3C8 *self = BMemPMgrAlloc(0x2C);
 
     if (self != 0) {
@@ -156,7 +158,7 @@ now, not two). The permuter-target recommendation above stands unchanged.
 
 ## Naming
 
-**`new_class_6d3c8` -- already named (pre-round-77), tier A.** The `New_X`
+**`New_Class6D3C8` -- already named (pre-round-77), tier A.** The `New_X`
 allocator for `Class6D3C8` (`BMemPMgrAlloc` + dispatch through the class's
 own ctor slot). Left as-is this round -- it predates this naming pass and
 already follows the project's `New_X` convention, just lowercase/underscore

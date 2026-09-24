@@ -137,7 +137,7 @@ mine:    jal 13348 / nop
 This *is* the class the runner named, and its reasoning about this half stands:
 same register, same value, retail's delay-slot filler restates an already-live
 value and ours does not. It is now isolated to exactly one instruction, which
-makes it directly comparable to `new_class_6d3c8` (23/24, one instruction, same
+makes it directly comparable to `New_Class6D3C8` (23/24, one instruction, same
 phenomenon).
 
 Nine further source shapes were built against the 41/42 body and none moved it:
@@ -236,7 +236,7 @@ is 1 word and after both it is netted against retail's own count correctly
 > reachable from C and is now closed. It remains correct for Gap 1 alone.
 
 Both gaps are the same phenomenon documented in
-`docs/match-reports/new_class_6d3c8.md` (a different unit, `code_1677c`,
+`docs/match-reports/New_Class6D3C8.md` (a different unit, `code_1677c`,
 found independently by a different runner): GCC 2.6.3's `-O2` delay-slot
 filler (`fill_eager_delay_slots`/`fill_slots_from_thread` in reorg.c-era
 GCC) sometimes duplicates an already-live value into a delay slot and
@@ -281,14 +281,14 @@ independent loops — strictly harder terrain for the same problem.
 7. Bare `__asm__("");` immediately before the overlap-check expression
    (attempt #2's shape) — no change, 16/42. Neither helps nor hurts; the
    barrier has no effect on this specific filler choice, same as
-   `new_class_6d3c8`'s finding that an `asm("")` barrier didn't touch its
+   `New_Class6D3C8`'s finding that an `asm("")` barrier didn't touch its
    analogous residue either.
 
 None of these are register-identity changes (CLAUDE.md rule 6's test: would
 removing/changing the attempt move a value to a DIFFERENT register? No —
 every attempt either matches retail's registers or fails outright by
 choosing different ones for unrelated reasons, e.g. attempt 5). This is
-consistent with the finding in `new_class_6d3c8.md` that this residue class
+consistent with the finding in `New_Class6D3C8.md` that this residue class
 does not yield to `if`/`goto`/`return` spelling, temp-variable placement, or
 scheduling barriers.
 
@@ -365,7 +365,7 @@ The runner's original body differed from this only in the scan loop
 residues closed this round were a mismatch in how many times the SOURCE
 mentions a value, not a scheduling choice:
 
-- `new_class_6d3c8` mentioned its return value once too MANY (a `return` on a
+- `New_Class6D3C8` mentioned its return value once too MANY (a `return` on a
   path where the value was already in `$v0`) — the fix removed a mention.
 - `strcat` mentioned `dest` once too FEW on the null path (`return NULL`
   where retail returned the pointer itself) — the fix added a mention.
@@ -393,6 +393,6 @@ Retail's delay-slot filler restates an already-live value (`move a0,s1` where
 `$a0` already holds it); ours emits `nop`. Same register, same value, no
 control-flow difference, and the branch targets agree — which is what makes
 this one a real instance of the class rather than a misread. See
-`new_class_6d3c8.md` (23/24) for the other. Both are one instruction, both
+`New_Class6D3C8.md` (23/24) for the other. Both are one instruction, both
 resist reshaping and barriers, and together they are the project's best-posed
 permuter target.

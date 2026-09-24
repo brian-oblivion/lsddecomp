@@ -38,7 +38,7 @@ Matched first attempt.
 
 ## The head's broadcast lever applied directly
 
-This round's head broadcast (`new_class_6d3c8`, closed 24/24) was: a
+This round's head broadcast (`New_Class6D3C8`, closed 24/24) was: a
 constructor-family function often should NOT restate a return value with an
 explicit `return X;` when the value is already sitting in `$v0` from the
 immediately preceding call. This function's disassembly ends with a `jalr` to
@@ -85,7 +85,7 @@ anywhere) made it obvious before writing any C.
 ### Proposed learning
 
 None beyond what the head's own broadcast already captured for
-`new_class_6d3c8` — this is a second, independent, zero-attempt confirmation
+`New_Class6D3C8` — this is a second, independent, zero-attempt confirmation
 of the same lever ("a constructor's tail call already leaves the return value
 in the right place; do not restate it"), which is worth noting only as
 reinforcement, not as a new finding.

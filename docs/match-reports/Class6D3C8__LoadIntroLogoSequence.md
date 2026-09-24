@@ -21,7 +21,7 @@ lw   $v0, 0xC($v0)            ; v0 = arg->unk0C
 beqz $v0, .L80026238            ; whole body gated on this
  ...
 jal  SetActiveDataSourceDriverMode(0, 0, 0)
-jal  Class6D3C8__StartLoaderTask(self, gLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
+jal  Class6D3C8__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTaskObj(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
 jal  func_800490F4                          ; writes 0x31 to local, returns &D_800113DC
@@ -43,7 +43,7 @@ lw   $v0, 0x0($s1)                                          ; reload task->metho
 lw   $v0, 0x4($v0)                                           ; slot4
 jalr $v0
  (delay: a0 = s1 = task)
-jal  Class6D3C8__StartLoaderTask(self, gLogoPathOsd)                          ; "ETC\OSDLOGO.TIM"
+jal  Class6D3C8__StartLoaderTask(self, sLogoPathOsd)                          ; "ETC\OSDLOGO.TIM"
 ```
 
 ```c
@@ -55,13 +55,13 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
 
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        Class6D3C8__StartLoaderTask(self, gLogoPathAsmk);
+        Class6D3C8__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTaskObj(0, 0, 0, 0);
         streamName = func_800490F4(&typeCode);
         typeLookup = func_800493C8(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
-        Class6D3C8__StartLoaderTask(self, gLogoPathOsd);
+        Class6D3C8__StartLoaderTask(self, sLogoPathOsd);
     }
 }
 ```

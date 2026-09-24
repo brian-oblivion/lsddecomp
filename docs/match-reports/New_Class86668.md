@@ -42,9 +42,9 @@ epilogue merge. Put it first and it costs an extra `j`.
 ## History
 
 Previously filed as **STALLED 26/27** after two attempts, correctly
-recognising the precedent in `new_class_6d3c8` and stopping rather than
+recognising the precedent in `New_Class6D3C8` and stopping rather than
 burning budget. The precedent was real; the conclusion drawn from it -- that
-the class needed a permuter -- was not. Note that `new_class_6d3c8` is in
+the class needed a permuter -- was not. Note that `New_Class6D3C8` is in
 fact the OTHER sub-shape of the class and is still open; see the canonical
 report for the distinction.
 

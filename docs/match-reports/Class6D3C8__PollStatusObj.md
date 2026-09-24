@@ -157,7 +157,7 @@ allocation, in three layers:
    cross-case code hoisting for `switch`, since it tripled the emitted code
    instead). This is presumably an instruction-scheduling-level decision
    (which delay slot filler is "available") rather than something a source
-   rewrite reaches, matching the class of residue in `new_class_6d3c8` and
+   rewrite reaches, matching the class of residue in `New_Class6D3C8` and
    the two instances the head's round-3 broadcast #3 already confirmed.
 3. **Reusing the SAME variable name across two semantically-unrelated
    purposes forces GCC to keep it alive across everything in between.**

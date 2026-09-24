@@ -58,7 +58,7 @@ retail's null-path materialises a literal `move $v0,$zero` in the
 `beqz`'s own delay slot, where GCC naturally produces `move $v0,$s0`
 instead (since `$s0` already holds `self`, which equals 0 on that exact
 path -- a value-correct but differently-SPELLED "surplus mention"
-residue, same family as the project's `new_class_6d3c8`/`strcat`
+residue, same family as the project's `New_Class6D3C8`/`strcat`
 one-word class). Tried and rejected:
 
 - Restructuring as a genuine early exit
