@@ -87,16 +87,12 @@ void func_8001989C(void *arg0, void *arg1) {
 INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_8001989C);
 #endif
 
-#ifdef NON_MATCHING
-/* NON_MATCHING: 70/78 words, length exact. Residue: register identity
- * ($a2 vs $a1 for the OT high-byte mask) plus a missing load-delay-slot
- * filler `addiu $v0,$s1,0x20` (docs/match-reports/func_800199EC.md).
- * Hand-derived. */
-void func_800199EC(void *arg0, void *arg1) {
-    if (*(s32 *)((u8 *)arg1 + 0x78) == 0) {
-        ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
-        (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
-    } else {
+/* Returns the next packet pointer: arg0 + sizeof(POLY_FT3) = 0x20 when the
+ * primitive is spliced into the OT directly, else RCpolyFT3's own return
+ * (cast: RCpolyFT3 is declared void in code_8220.h). Same shape as
+ * func_800197C4. */
+void *func_800199EC(void *arg0, void *arg1) {
+    if (*(s32 *)((u8 *)arg1 + 0x78) != 0) {
         func_8001A380(D_8008ACD0, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
         func_8001A3EC((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0x10),
@@ -109,12 +105,12 @@ void func_800199EC(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x8C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x14);
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x90) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
 
-        RCpolyFT3(arg0, D_8008ACD0);
+        return ((void *(*)(void *, void *))RCpolyFT3)(arg0, D_8008ACD0);
     }
+    ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
+    (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
+    return (u8 *)arg0 + 0x20;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", func_800199EC);
-#endif
 
 /* Returns the next packet pointer: arg0 + sizeof(POLY_F4) = 0x18 when the
  * primitive is spliced into the OT directly, else RCpolyF4's own return
