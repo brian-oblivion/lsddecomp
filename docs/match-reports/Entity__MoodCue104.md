@@ -1,4 +1,6 @@
-# func_80064AA4 — MATCH (28/28 words)
+# Entity__MoodCue104 — MATCH (28/28 words)
+
+> Renamed from `func_80064AA4` on 2026-09-24 (tools/rename.py). Address 0x80064aa4.
 
 **Unit:** Entity_g · **Size:** 28 instructions
 
@@ -16,7 +18,7 @@ check, `(u32)(this->unkFC - 0xC9) < 0x63`).
 ## The C
 
 ```c
-void func_80064AA4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue104(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slot48(this, 1, D_80089DCC);
     if ((u32)(this->unkFC - 0xC9) < 0x63) {
         this->methods->slotCC(this, -0x20, 0);

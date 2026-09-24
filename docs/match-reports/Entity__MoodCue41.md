@@ -17,7 +17,7 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
         this->unk44 = rand() % 5 + 0xA;
     }
     if (this->unk44 < 0xE || this->unkFC < 0x140) {
-        func_80064FBC(this, out, 0xBB8, 0x1F4, -0x100);
+        Entity__AdvanceWobbleAndDeactivate(this, out, 0xBB8, 0x1F4, -0x100);
         return;
     }
     if (this->unk44 == 0xE) {
@@ -40,11 +40,11 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
   residue closed purely by removing the intermediate.
 - **Branch polarity trap, and the biggest time sink in this function.** My
   first reading of the `slti v0,v1,0x140 / beqz v0,L80060350` pair had the
-  condition backwards: reaching the `func_80064FBC` call requires `unk44 <
+  condition backwards: reaching the `Entity__AdvanceWobbleAndDeactivate` call requires `unk44 <
   0xE || unkFC < 0x140`, not `unkFC >= 0x140` as an initial (wrong) read
   suggested. Always trace which branch is TAKEN vs FALLTHROUGH explicitly
   instead of pattern-matching the mnemonic.
-- `func_80064FBC`'s argument order is NOT the order the literals appear in
+- `Entity__AdvanceWobbleAndDeactivate`'s argument order is NOT the order the literals appear in
   the instruction stream. The instruction sequence computes the stack
   argument (`-0x100`) FIRST, then `a2=0xBB8`, then `a3=0x1F4` in the `jal`'s
   delay slot -- but positionally that means the CALL's actual parameter list

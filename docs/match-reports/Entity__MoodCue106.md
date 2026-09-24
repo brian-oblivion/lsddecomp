@@ -1,4 +1,6 @@
-# func_80064B80 — MATCH (73/73 words)
+# Entity__MoodCue106 — MATCH (73/73 words)
+
+> Renamed from `func_80064B80` on 2026-09-24 (tools/rename.py). Address 0x80064b80.
 
 **Unit:** Entity_g · **Size:** 73 instructions
 
@@ -17,7 +19,7 @@ D_80089E2C)`. Otherwise: dispatches `slot128` (guarded by `unkFC==0`) then
 ## The C
 
 ```c
-void func_80064B80(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if ((rand() & 1) == 0) {
             this->unk44 = 0xB;

@@ -1,4 +1,6 @@
-# func_80065238 — MATCH (77/77 words)
+# Entity__MoodCue123 — MATCH (77/77 words)
+
+> Renamed from `func_80065238` on 2026-09-24 (tools/rename.py). Address 0x80065238.
 
 **Unit:** Entity_g · **Size:** 77 instructions
 
@@ -16,7 +18,7 @@ unkFC>=0x12D`, two calls to a NEW `Unk94Obj` slot (`+0x94`).
 ## The C
 
 ```c
-void func_80065238(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue123(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if (rand() % 5 == 0) {
             this->unk44 = 0xB;

@@ -888,7 +888,7 @@ Confirmed both values' consumer types are already exactly `s32`
 (`Unk94Methods::slot130`'s second parameter and `EntityMethods::slotD0`'s
 first parameter, both declared `s32` in `include/Entity.h`) -- there is
 no declared-type ambiguity to vary. This divergence is a scheduler
-delay-slot-filling decision, the same class as `func_80064E34`'s
+delay-slot-filling decision, the same class as `Entity__MoodCue111`'s
 redundant-rematerialization residue, not a candidate for the type/width
 lever. No source changes.
 

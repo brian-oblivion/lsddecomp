@@ -336,7 +336,7 @@ finding precisely. And `count` (`this->unk_0xB4 + 1`) really does live in
 "for the next attempt" guidance stands. Seed already validated
 (`--debug` base 640: 8 register differences, 4 insertions, 2 deletions,
 0 reorderings/stack/branch). Queued behind `DreamSys__SoundCueCallback`, `callback`
-and `func_80064E34` for a search slot. No source changes; `INCLUDE_ASM`
+and `Entity__MoodCue111` for a search slot. No source changes; `INCLUDE_ASM`
 untouched.
 
 ## Round: coordinator-directed type-axis test (runner delta) -- negative, evidence attached
@@ -421,7 +421,7 @@ DreamSys__AdvanceMoveCycle <this body>`) is the next reasonable step, and should
 also close the tail-merge residue in addition to the two previously known
 ones -- it was not tried this round due to time budget, and the seed used
 for a PRIOR round's queued-but-not-yet-run permuter mention (`callback`,
-`func_80064E34`) never actually included this residue since it wasn't known
+`Entity__MoodCue111`) never actually included this residue since it wasn't known
 to exist yet.
 
 ### Proposed learning

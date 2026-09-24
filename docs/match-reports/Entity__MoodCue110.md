@@ -1,4 +1,6 @@
-# func_80064D48 — MATCH (59/59 words)
+# Entity__MoodCue110 — MATCH (59/59 words)
+
+> Renamed from `func_80064D48` on 2026-09-24 (tools/rename.py). Address 0x80064d48.
 
 **Unit:** Entity_g · **Size:** 59 instructions
 
@@ -16,7 +18,7 @@ range gates on `unk44==0xA`.
 ## The C
 
 ```c
-void func_80064D48(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slot48(this, 1, D_80089E44);
     this->methods->slot130(this);
     if (this->unk44 == 0) {

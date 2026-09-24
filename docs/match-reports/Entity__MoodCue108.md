@@ -1,4 +1,6 @@
-# func_80064CA4 — MATCH (18/18 words)
+# Entity__MoodCue108 — MATCH (18/18 words)
+
+> Renamed from `func_80064CA4` on 2026-09-24 (tools/rename.py). Address 0x80064ca4.
 
 **Unit:** Entity_g · **Size:** 18 instructions
 
@@ -15,7 +17,7 @@ out)` through unchanged, then dispatches `slot48(this, 1, SCALE_SIX)`.
 ## The C
 
 ```c
-void func_80064CA4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue108(Entity *this, EntityMoodHandlerArg *out) {
     Entity__MoodCue71(this, out);
     this->methods->slot48(this, 1, SCALE_SIX);
 }

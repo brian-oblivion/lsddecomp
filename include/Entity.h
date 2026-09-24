@@ -164,7 +164,7 @@ struct Unk94Methods {
     u8 pad000[0x44];
     void (*slot44)(Unk94Obj *self, s32 arg1, void *arg2); /* called by Entity__MoodCue49 (Entity_d) as slot44(target, 1, ROTATION_YAW_MINUS90); return value unused at this, its only known call site */
     u8 pad048[0x94 - 0x48];
-    void (*slot94)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by func_80065238 (Entity_g), twice, as slot94(target, 0, 2) and slot94(target, 0, 7); return value unused at either call site */
+    void (*slot94)(Unk94Obj *self, s32 arg1, s32 arg2); /* called by Entity__MoodCue123 (Entity_g), twice, as slot94(target, 0, 2) and slot94(target, 0, 7); return value unused at either call site */
     u8 pad098[0xB8 - 0x98];
     void (*slotB8)(Unk94Obj *self, void *arg1); /* called by Entity__MoodCue49 (Entity_d), arg1 is either NULL or &this->unk14->unk38 depending on this->unk0C; return value unused at this, its only known call site */
     u8 pad0BC[0xC4 - 0xBC];
@@ -183,7 +183,7 @@ struct Unk94Methods {
     u8 pad1A4[0x200 - 0x1A4];
     s32 (*slot200)(Unk94Obj *self);            /* called by Entity__MoodCue00, compared against the literal 5, and by Entity__MoodCue58 (Entity_d), compared against 6 -- value-returning, not void */
     u8 pad204[0x21C - 0x204];
-    void (*slot21C)(Unk94Obj *self);           /* called by func_80064618 (Entity_g); return value unused at this, its only known call site */
+    void (*slot21C)(Unk94Obj *self);           /* called by Entity__MoodCue98 (Entity_g); return value unused at this, its only known call site */
 };
 
 struct Unk94Obj {
@@ -441,12 +441,12 @@ struct EntityMoodHandlerArg {
 };
 
 /* Already matched in Entity_e.c (not INCLUDE_ASM), but not previously called
- * from outside that unit -- func_80064CA4 (Entity_g) is its first cross-unit
+ * from outside that unit -- Entity__MoodCue108 (Entity_g) is its first cross-unit
  * caller, forwarding its own (this, out) straight through. */
 extern void Entity__MoodCue71(Entity *this, EntityMoodHandlerArg *out);
 
 /* Already matched in Entity_d.c (not INCLUDE_ASM), but not previously called
- * from outside that unit -- func_800650D4 (Entity_g) is its first cross-unit
+ * from outside that unit -- Entity__MoodCue113 (Entity_g) is its first cross-unit
  * caller, forwarding its own (this, out) straight through. */
 extern void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out);
 

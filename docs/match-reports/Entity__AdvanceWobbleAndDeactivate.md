@@ -1,4 +1,6 @@
-# func_80064FBC — MATCHED (was misdiagnosed as register-store-order; real fix was a wrong conditional grouping)
+# Entity__AdvanceWobbleAndDeactivate — MATCHED (was misdiagnosed as register-store-order; real fix was a wrong conditional grouping)
+
+> Renamed from `func_80064FBC` on 2026-09-24 (tools/rename.py). Address 0x80064fbc.
 
 **Unit:** Entity_g · **Size:** 70 instructions · **Attempts:** 5
 
@@ -8,9 +10,9 @@ No `gp_rel`/`addiu_at`/`nop_mflo_mfhi` hits.
 
 ## What it does
 
-Called by `func_80064E34` (this unit, also stalled) and already known
+Called by `Entity__MoodCue111` (this unit, also stalled) and already known
 cross-unit from `Entity_d.c`'s own extern
-(`extern void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32
+(`extern void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32
 arg2, s32 arg3, s32 arg4);`). Sets four `out->` fields when `out->unk4 ==
 6`. Tests `this->unkFC` against a cascade of six `arg2`-relative
 thresholds (`arg2`, `arg2+0x5B`, `arg2+0x155`, `arg2+0x1B1`, `arg2+0x2BA`,
@@ -24,7 +26,7 @@ either way, falls through to `slotC4(this, arg4, 0)`, then `slot160`/
 
 ```c
 #if 0
-void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
+void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
     s32 unkFC;
 
     if (out->unk4 == 6) {
@@ -152,7 +154,7 @@ outside the `if` is the entire fix -- no barrier, no local, no reordering
 of anything else.
 
 ```c
-void func_80064FBC(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
+void Entity__AdvanceWobbleAndDeactivate(Entity *this, EntityMoodHandlerArg *out, s32 arg2, s32 arg3, s32 arg4) {
     s32 unkFC;
 
     out->unk10 = 0;
@@ -194,7 +196,7 @@ L74:
 ```
 
 Verified byte-exact: `./build-and-verify.sh` -- `OK: build matches retail
-SLPS_015.56` -- and `tools/funcdiff.py func_80064FBC` -- `70/70 words
+SLPS_015.56` -- and `tools/funcdiff.py Entity__AdvanceWobbleAndDeactivate` -- `70/70 words
 match`. This is now the live body in `src/Entity_g.c` (`INCLUDE_ASM`
 removed).
 

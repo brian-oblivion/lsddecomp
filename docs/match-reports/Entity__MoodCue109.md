@@ -1,4 +1,6 @@
-# func_80064CEC — MATCH (23/23 words)
+# Entity__MoodCue109 — MATCH (23/23 words)
+
+> Renamed from `func_80064CEC` on 2026-09-24 (tools/rename.py). Address 0x80064cec.
 
 **Unit:** Entity_g · **Size:** 23 instructions
 
@@ -14,7 +16,7 @@ No hits.
 ## The C
 
 ```c
-void func_80064CEC(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue109(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slot48(this, 1, SCALE_HALF);
     this->methods->slotC4(this, -0xA, 0);
 }

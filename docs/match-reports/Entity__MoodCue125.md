@@ -1,4 +1,6 @@
-# func_8006536C — MATCH (77/77 words)
+# Entity__MoodCue125 — MATCH (77/77 words)
+
+> Renamed from `func_8006536C` on 2026-09-24 (tools/rename.py). Address 0x8006536c.
 
 **Unit:** Entity_g · **Size:** 77 instructions
 
@@ -17,7 +19,7 @@ slot148(this)`, the established `out->unk4 % (this->unk80/2) == 0` gate
 ## The C
 
 ```c
-void func_8006536C(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue125(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if ((rand() & 3) == 0) {
             goto trigger;
@@ -53,14 +55,14 @@ different branch instructions) closed it to 77/77 on the second build.
 ## Struct/table knowledge established
 
 None new; corroborates `out->unk4 % (this->unk80/2) == 0` (same idiom as
-`Entity__MoodCue09`/`func_8006536C`'s siblings) now also pairs with
+`Entity__MoodCue09`/`Entity__MoodCue125`'s siblings) now also pairs with
 `out->unk20=1`.
 
 ### Proposed learning
 
 Do not assume GCC 2.6.3 will cross-jump-merge two SYNTACTICALLY IDENTICAL
 call+assignment sequences reached from different branches just because the
-BODIES match -- `func_80064B80`'s report already showed it merges a shared
+BODIES match -- `Entity__MoodCue106`'s report already showed it merges a shared
 TRAILING INSTRUCTION SEQUENCE across DIFFERENT calls when written as one
 call through a local function-pointer; this function shows the opposite
 near-miss: two IDENTICAL statements in two different `if` bodies did NOT

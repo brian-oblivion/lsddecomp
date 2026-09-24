@@ -1,4 +1,6 @@
-# func_80064B14 — MATCH (27/27 words)
+# Entity__MoodCue105 — MATCH (27/27 words)
+
+> Renamed from `func_80064B14` on 2026-09-24 (tools/rename.py). Address 0x80064b14.
 
 **Unit:** Entity_g · **Size:** 27 instructions
 
@@ -15,7 +17,7 @@ rand() % 20 == 0)` -- the plain magic-number `% 20` idiom (mult by
 ## The C
 
 ```c
-void func_80064B14(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue105(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slot60(this, rand() % 20 == 0);
 }
 ```

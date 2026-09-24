@@ -1,11 +1,13 @@
-# func_800646D8 — MATCH (148/148 words)
+# Entity__MoodCue102 — MATCH (148/148 words)
+
+> Renamed from `func_800646D8` on 2026-09-24 (tools/rename.py). Address 0x800646d8.
 
 **Unit:** Entity_g · **Size:** 148 instructions
 
 ## Blocker screen
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/func_800646D8.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/Entity__MoodCue102.s
 ```
 
 No hits.
@@ -22,7 +24,7 @@ picking one of five `D_8008xxxx` row pointers via a cascading `>=` chain,
 ## The C
 
 ```c
-void func_800646D8(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
     void *a2;
 
     if (this->unkFC == 0) {
@@ -86,7 +88,7 @@ row pointer; closed to 148/148 on the second build.
 ## Struct/table knowledge established
 
 - No new fields; corroborates every field this unit's first function
-  (`func_80064618`) and the existing `Entity_b.c` siblings already
+  (`Entity__MoodCue98`) and the existing `Entity_b.c` siblings already
   established (`unkFC`, `unk44`, `unk80`, `unk84`, `unkF4`, `unk94`).
 
 ### Proposed learning

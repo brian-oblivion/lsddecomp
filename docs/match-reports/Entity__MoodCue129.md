@@ -1,4 +1,6 @@
-# func_80065514 — MATCH (48/48 words)
+# Entity__MoodCue129 — MATCH (48/48 words)
+
+> Renamed from `func_80065514` on 2026-09-24 (tools/rename.py). Address 0x80065514.
 
 **Unit:** Entity_g · **Size:** 48 instructions
 
@@ -17,7 +19,7 @@ this->unk94, 1, 0, 0)`, then `slotD0(this, -0x200, 0)` if `this->unk44 ==
 ## The C
 
 ```c
-void func_80065514(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue129(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         this->unk44 = rand() % 2 + 0xA;
     }

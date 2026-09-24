@@ -1,4 +1,6 @@
-# func_800654A0 — MATCH (29/29 words)
+# Entity__MoodCue128 — MATCH (29/29 words)
+
+> Renamed from `func_800654A0` on 2026-09-24 (tools/rename.py). Address 0x800654a0.
 
 **Unit:** Entity_g · **Size:** 29 instructions
 
@@ -14,7 +16,7 @@ No hits.
 ## The C
 
 ```c
-void func_800654A0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue128(Entity *this, EntityMoodHandlerArg *out) {
     Class6B5CC__FaceTarget(this, this->unk94, 1, 0, 0);
     this->methods->slot48(this, 1, D_80089E80);
     this->methods->slotC4(this, -0x1E, 1);

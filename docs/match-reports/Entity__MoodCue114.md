@@ -1,4 +1,6 @@
-# func_800650F4 — MATCH (42/42 words)
+# Entity__MoodCue114 — MATCH (42/42 words)
+
+> Renamed from `func_800650F4` on 2026-09-24 (tools/rename.py). Address 0x800650f4.
 
 **Unit:** Entity_g · **Size:** 42 instructions
 
@@ -15,7 +17,7 @@ No hits.
 ## The C
 
 ```c
-void func_800650F4(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue114(Entity *this, EntityMoodHandlerArg *out) {
     void *a2;
 
     if (rand() % 3 == 0) {

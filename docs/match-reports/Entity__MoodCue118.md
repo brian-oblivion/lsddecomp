@@ -1,4 +1,6 @@
-# func_800651D0 — MATCH (13/13 words)
+# Entity__MoodCue118 — MATCH (13/13 words)
+
+> Renamed from `func_800651D0` on 2026-09-24 (tools/rename.py). Address 0x800651d0.
 
 **Unit:** Entity_g · **Size:** 13 instructions
 
@@ -9,12 +11,12 @@ No hits.
 ## What it does
 
 `gEntityMoodHandlerTable` handler row; `out` unused. Byte-identical body to
-`func_8006519C`: `slot48(this, 1, SCALE_SIX)`.
+`Entity__MoodCue117`: `slot48(this, 1, SCALE_SIX)`.
 
 ## The C
 
 ```c
-void func_800651D0(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue118(Entity *this, EntityMoodHandlerArg *out) {
     this->methods->slot48(this, 1, SCALE_SIX);
 }
 ```

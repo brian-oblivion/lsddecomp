@@ -1,11 +1,13 @@
-# func_80064618 — MATCH (48/48 words)
+# Entity__MoodCue98 — MATCH (48/48 words)
+
+> Renamed from `func_80064618` on 2026-09-24 (tools/rename.py). Address 0x80064618.
 
 **Unit:** Entity_g · **Size:** 48 instructions
 
 ## Blocker screen (mandatory)
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/func_80064618.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/Entity__MoodCue98.s
 ```
 
 No hits. Consistent with the coordinator's measured all-clear for this unit
@@ -35,7 +37,7 @@ with `(-0x1E, 1)`.
 ## The C
 
 ```c
-void func_80064618(Entity *this, EntityMoodHandlerArg *out) {
+void Entity__MoodCue98(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
         if (Entity__GetOrCreateUnk100(this, NULL, 0, 0xA, 0) != 0) {
             this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
