@@ -1,4 +1,6 @@
-# func_80053984 -- MATCHED (82/82 words, first attempt)
+# ObjM__HandleStateCode -- MATCHED (82/82 words, first attempt)
+
+> Renamed from `func_80053984` on 2026-09-24 (tools/rename.py). Address 0x80053984.
 
 Unit `src/class_3bb8c_l.c`. Round 26, runner delta.
 
@@ -10,7 +12,7 @@ An event/code dispatcher for `Obj87034_3bb8c_l` (method table `D_80087034`,
 (`self->methods->slotXX`):
 
 ```c
-void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
+void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
     if (self->unk20 == 0) {
         switch (code - 0xA) {
         case 0:

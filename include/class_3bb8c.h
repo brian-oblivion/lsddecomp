@@ -2373,7 +2373,7 @@ typedef struct Unk50Struct_3bb8c_l {
 } Unk50Struct_3bb8c_l;
 
 /* Whatever self->unk14 points to: an object of some OTHER, unidentified
- * class -- it has its own methods pointer at +0x000 (func_8005393C
+ * class -- it has its own methods pointer at +0x000 (ObjM__TickStyle
  * dispatches +0x10C on it) AND a plain u16 field at +0x1B4 (ObjM__TransferToOther
  * reads it directly). Offset +0x10C happens to coincide with a DreamSys
  * vtable offset, but DreamSys's own occupant there (DreamSys__SetSoundObj) takes
@@ -2400,7 +2400,7 @@ typedef struct Obj14Methods_3bb8c_l {
     u8 pad0E4[0x0EC - 0x0E4];
     void (*slotEC)(void *self);                        /* +0x0EC, ObjM__EnterStyleSession */
     u8 padF0[0x10C - 0x0F0];
-    void *(*slot10C)(void *self, s32 arg1, s32 arg2); /* +0x10C, func_8005393C */
+    void *(*slot10C)(void *self, s32 arg1, s32 arg2); /* +0x10C, ObjM__TickStyle */
     u8 pad110[0x134 - 0x110];
     void (*slot134)(void *self, void *arg1);           /* +0x134, ObjM__InitStyleAndWorld */
 } Obj14Methods_3bb8c_l;
@@ -2474,7 +2474,7 @@ typedef struct DreamSysMethods_3bb8c_l {
 typedef struct DreamSysObj_3bb8c_l {
     DreamSysMethods_3bb8c_l *methods;
     u8 pad04[0x044 - 0x004];
-    s32 unk44;               /* +0x044, func_80053984: cleared (only reached when self->unk20 != 0 and the event/code is >= 9) */
+    s32 unk44;               /* +0x044, ObjM__HandleStateCode: cleared (only reached when self->unk20 != 0 and the event/code is >= 9) */
     u8 pad48[0x164 - 0x048];
     s32 unk164;             /* +0x164, func_80053BE8: sign-checked gate */
 } DreamSysObj_3bb8c_l;
@@ -2512,13 +2512,13 @@ typedef struct Obj87034Methods_3bb8c_l {
     void (*slot88)(Obj87034_3bb8c_l *self);                        /* +0x088, ObjM__TransferToOther */
     void (*slot8C)(Obj87034_3bb8c_l *self);                        /* +0x08C, ObjM__TickTarget */
     u8 pad90[0x094 - 0x090];
-    void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, func_80053984 (event/code 0xA, dense switch) */
-    void (*slot98)(Obj87034_3bb8c_l *self);                        /* +0x098, func_80053984 (event/code 0xC) */
-    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, func_80053BE8; ALSO func_80053984 (event/code 0xD) */
-    void (*slotA0)(Obj87034_3bb8c_l *self);                        /* +0x0A0, func_80053984 (event/code 0xE) */
-    void (*slotA4)(Obj87034_3bb8c_l *self);                        /* +0x0A4, func_80053984 (event/code 0xF) */
-    void (*slotA8)(Obj87034_3bb8c_l *self);                        /* +0x0A8, func_80053984 (event/code 0x10) */
-    void (*slotAC)(Obj87034_3bb8c_l *self);                        /* +0x0AC, func_80053984 (event/code 0x11) */
+    void (*slot94)(Obj87034_3bb8c_l *self);                        /* +0x094, ObjM__HandleStateCode (event/code 0xA, dense switch) */
+    void (*slot98)(Obj87034_3bb8c_l *self);                        /* +0x098, ObjM__HandleStateCode (event/code 0xC) */
+    void (*slot9C)(Obj87034_3bb8c_l *self);                        /* +0x09C, func_80053BE8; ALSO ObjM__HandleStateCode (event/code 0xD) */
+    void (*slotA0)(Obj87034_3bb8c_l *self);                        /* +0x0A0, ObjM__HandleStateCode (event/code 0xE) */
+    void (*slotA4)(Obj87034_3bb8c_l *self);                        /* +0x0A4, ObjM__HandleStateCode (event/code 0xF) */
+    void (*slotA8)(Obj87034_3bb8c_l *self);                        /* +0x0A8, ObjM__HandleStateCode (event/code 0x10) */
+    void (*slotAC)(Obj87034_3bb8c_l *self);                        /* +0x0AC, ObjM__HandleStateCode (event/code 0x11) */
     u8 padB0[0x0C0 - 0x0B0];
     void (*slotC0)(Obj87034_3bb8c_l *self);                        /* +0x0C0, ObjM__DispatchEvent (event 0xC) */
     void (*slotC4)(Obj87034_3bb8c_l *self);                        /* +0x0C4, ObjM__DispatchEvent (event 0x2C)/ObjM__DispatchActiveState */
@@ -2533,7 +2533,7 @@ struct Obj87034_3bb8c_l {
     u8 pad04[0x00C - 0x004];
     RegistrantObj_3bb8c_l *unkC;      /* +0x00C, ObjM__AttachTarget's `arg1->unkC` */
     s32 unk10;                        /* +0x010, ObjM__EnterStyleSession */
-    Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/func_8005393C/ObjM__ExitSceneStyle */
+    Obj14_3bb8c_l *unk14;              /* +0x014, ObjM__TransferToOther/ObjM__TickStyle/ObjM__ExitSceneStyle */
     DreamSysObj_3bb8c_l *unk18;         /* +0x018, ObjM__ExitSceneStyle */
     s32 unk1C;                           /* +0x01C, ObjM__TickTarget: incremented once per call */
     s32 unk20;                            /* +0x020, func_80053C94: written 6 (a state/phase tag; also written 4 by func_80053ACC (STALLED) and written 5 by func_80053BE8, both round 16 echo) */
@@ -2603,7 +2603,7 @@ extern void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *othe
 extern s32 func_80049060();
 extern void func_80049098(void *arg0, s32 arg1, s32 arg2);
 
-/* func_8005393C's own helper -- MATCHED, src/class_3bb8c_n.c. Typed purely
+/* ObjM__TickStyle's own helper -- MATCHED, src/class_3bb8c_n.c. Typed purely
  * from this call site's own register usage. */
 extern void TickStyle(void *arg0, void *arg1, s32 arg2);
 

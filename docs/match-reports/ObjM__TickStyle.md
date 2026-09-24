@@ -1,4 +1,6 @@
-# func_8005393C
+# ObjM__TickStyle
+
+> Renamed from `func_8005393C` on 2026-09-24 (tools/rename.py). Address 0x8005393c.
 
 **Unit:** class_3bb8c_l · **Size:** 18 words (0x48 bytes) ·
 **Status: MATCHED 18/18**, whole-image SHA1 green.
@@ -6,7 +8,7 @@
 ## What it does
 
 ```c
-void func_8005393C(Obj87034_3bb8c_l *self) {
+void ObjM__TickStyle(Obj87034_3bb8c_l *self) {
     TickStyle(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
 }
 ```

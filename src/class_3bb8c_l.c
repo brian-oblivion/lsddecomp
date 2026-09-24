@@ -23,7 +23,7 @@
  *                  file-top banner above.
  *   ObjM__InitStyleAndWorld  was addiu-$at ONLY -- NOT BLOCKED. 137w.
  *                  ROUND 32: MATCHED, 137/137.
- *   func_80053984  was addiu-$at ONLY -- NOT BLOCKED. 82w.
+ *   ObjM__HandleStateCode  was addiu-$at ONLY -- NOT BLOCKED. 82w.
  *                  ROUND 32: MATCHED, 82/82, first attempt.
  *                  It OWNS jtbl_8001174C; the rodata slot at 0x1F4C is
  *                  attached to this unit for that reason, and a
@@ -401,11 +401,11 @@ void ObjM__EnterStyleSession(Obj87034_3bb8c_l *self) {
     m2->slotD4(newObj, self->unk10, a2, 0);
 }
 
-void func_8005393C(Obj87034_3bb8c_l *self) {
+void ObjM__TickStyle(Obj87034_3bb8c_l *self) {
     TickStyle(self->unk14->methods->slot10C(self->unk14, 0, 0), 0, 0);
 }
 
-void func_80053984(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
+void ObjM__HandleStateCode(Obj87034_3bb8c_l *self, void *arg1, s32 code) {
     if (self->unk20 == 0) {
         switch (code - 0xA) {
         case 0:

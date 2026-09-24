@@ -30,6 +30,6 @@ passed as a plain argument). Matched on the first attempt.
   `DreamSysObj_3bb8c_l` header comment in `include/class_3bb8c.h`.
 - `self->unk14` is a DIFFERENT, unidentified class (`Obj14_3bb8c_l`) —
   offset `+0x10C` happens to also exist in `DREAMSYS_METHODS` but with a
-  different arity at its own call site (`func_8005393C`, see that report),
+  different arity at its own call site (`ObjM__TickStyle`, see that report),
   so it is NOT assumed to be DreamSys despite the coincidental offset
   match.

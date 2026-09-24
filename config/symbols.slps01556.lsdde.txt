@@ -2340,3 +2340,5 @@ ObjM__DispatchActiveState = 0x80053458; // type:func
 ObjM__SetupSceneStyle = 0x800534C8; // type:func
 ObjM__ExitSceneStyle = 0x800536B0; // type:func
 ObjM__EnterStyleSession = 0x80053764; // type:func
+ObjM__TickStyle = 0x8005393C; // type:func
+ObjM__HandleStateCode = 0x80053984; // type:func

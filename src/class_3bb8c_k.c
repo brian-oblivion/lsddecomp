@@ -52,7 +52,7 @@ struct ObjMMethods_3bb8c_k {
     u8 pad044[0x090 - 0x044];
     /* +0x090/+0x0B0/+0x0B4, ObjM__OnNotify's 3-way dispatch on the event
      * target's header tag; all get (self, arg1, arg2) forwarded. */
-    void (*slot90)(void *self, EventArg *arg1, s32 arg2);          /* +0x090 func_80053984 */
+    void (*slot90)(void *self, EventArg *arg1, s32 arg2);          /* +0x090 ObjM__HandleStateCode */
     u8 pad094[0x0B0 - 0x094];
     void (*handleEvent5Or6)(void *self, EventArg *arg1, s32 arg2); /* +0x0B0 ObjM__HandleEvent5Or6 */
     void (*handleEvent7)(void *self, EventArg *arg1, s32 arg2);    /* +0x0B4 ObjM__HandleEvent7 */
