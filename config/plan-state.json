@@ -888,6 +888,11 @@
           "date": "2026-09-25",
           "header": "include/IntermediateBase.h"
         },
+        "gLightRigMethods": {
+          "class": "LightRig",
+          "date": "2026-09-26",
+          "header": "include/LightRig.h"
+        },
         "gPadMethods": {
           "class": "Pad",
           "date": "2026-09-25",

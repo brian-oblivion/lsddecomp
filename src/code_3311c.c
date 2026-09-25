@@ -23,11 +23,10 @@
  * collide in shared headers, so the one used here is declared locally with
  * a local copy of the struct.
  *
- * The unit's only outside caller (LightRig__LightRig, asm/nonmatchings/code_322b4)
- * calls New_FlatLightObj three times with light ids 0, 1, 2 in a row and
- * stores each returned pointer into a 3-slot array -- consistent with a
- * fixed 3-light flat-lighting rig, but the rest of that caller is another
- * unit's C to write, so no more is asserted here.
+ * The unit's only outside caller, LightRig__LightRig (src/code_322b4.c,
+ * include/LightRig.h), calls New_FlatLightObj with light ids 0, 1, 2 and
+ * keeps the three in LightRig::lights, the fixed 3-light flat-lighting rig
+ * that also sets the ambient colour (round 86).
  */
 typedef struct FlatLightObj FlatLightObj;
 typedef struct FlatLightObjMethods FlatLightObjMethods;
