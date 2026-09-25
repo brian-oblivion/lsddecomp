@@ -540,7 +540,7 @@ void D8006EFAC__Finalize(D_8006EFACObj *self) {
     GetClass6B5CCMethods()->finalize((Class6B5CC *)self);
 }
 /* D_8006EFAC slot +0x040 (reset): mark the coordinate for recompute. */
-void func_80042814(Class6B5CC *self) {
+void D8006EFAC__Reset(Class6B5CC *self) {
     self->coord2->flg = 0;
 }
 /* D_8006EFAC slot +0x09C (dispatchLinkCommand): empty override. */
