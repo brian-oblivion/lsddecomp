@@ -1,0 +1,179 @@
+DreamSys: src/DreamSys.c: At top level:
+DreamSys: warning: `DreamSys__ApplyRelativeOffset' was previously implicitly declared to return `int'
+DreamSys: warning: `struct DreamSys' declared inside parameter list
+DreamSys: warning: control reaches end of non-void function
+DreamSys: warning: implicit declaration of function `DreamSys__ApplyRelativeOffset'
+DreamSys: warning: its scope is only this definition or declaration,
+DreamSys: warning: passing arg 3 from incompatible pointer type
+DreamSys: warning: previous external decl of `DreamSys__ApplyRelativeOffset'
+DreamSys: warning: previous implicit declaration of `DreamSys__ApplyRelativeOffset'
+DreamSys: warning: type mismatch with previous external decl
+DreamSys: warning: type mismatch with previous implicit declaration
+DreamSys: warning: which is probably not what you want.
+Entity_d: warning: passing arg 1 of `Class6B5CC__FaceTarget' from incompatible pointer type
+Entity_g: warning: passing arg 4 of `Entity__GetOrCreateUnk100' makes pointer from integer without a cast
+class_3ac78: warning: unused variable `unused'
+class_3bb8c: src/class_3bb8c.c: At top level:
+class_3bb8c: warning: `Class866E8__ComputeDivisorSplit' was previously implicitly declared to return `int'
+class_3bb8c: warning: control reaches end of non-void function
+class_3bb8c: warning: implicit declaration of function `Class866E8__ComputeDivisorSplit'
+class_3bb8c: warning: implicit declaration of function `Class866E8__ComputeRateFlags'
+class_3bb8c: warning: implicit declaration of function `Class866E8__CountFlaggedElements'
+class_3bb8c: warning: passing arg 4 from incompatible pointer type
+class_3bb8c: warning: previous external decl of `Class866E8__ComputeDivisorSplit'
+class_3bb8c: warning: previous implicit declaration of `Class866E8__ComputeDivisorSplit'
+class_3bb8c: warning: type mismatch with previous external decl
+class_3bb8c: warning: type mismatch with previous implicit declaration
+class_3bb8c_b: warning: `flag' might be used uninitialized in this function
+class_3bb8c_b: warning: `junk' might be used uninitialized in this function
+class_3bb8c_b: warning: `offset' might be used uninitialized in this function
+class_3bb8c_d: src/class_3bb8c_d.c: At top level:
+class_3bb8c_d: warning: `New_TaskObjF' was previously implicitly declared to return `int'
+class_3bb8c_d: warning: assignment makes pointer from integer without a cast
+class_3bb8c_d: warning: implicit declaration of function `New_TaskObjF'
+class_3bb8c_d: warning: previous external decl of `New_TaskObjF'
+class_3bb8c_d: warning: previous implicit declaration of `New_TaskObjF'
+class_3bb8c_d: warning: type mismatch with previous external decl
+class_3bb8c_d: warning: type mismatch with previous implicit declaration
+class_3bb8c_e: warning: control reaches end of non-void function
+class_3bb8c_f: warning: `code' might be used uninitialized in this function
+class_3bb8c_f: warning: implicit declaration of function `strcpy'
+class_3bb8c_g: warning: assignment from incompatible pointer type
+class_3bb8c_g: warning: implicit declaration of function `strcpy'
+class_3bb8c_g: warning: passing arg 2 of `strcat' discards `const' from pointer target type
+class_3bb8c_g: warning: passing arg 2 of `strcat' discards `const' from pointer target type
+class_3bb8c_i: warning: assignment from incompatible pointer type
+class_3bb8c_i: warning: passing arg 2 makes integer from pointer without a cast
+class_3bb8c_i: warning: passing arg 2 of `BuildFileName' discards `const' from pointer target type
+class_3bb8c_i: warning: passing arg 2 of `BuildFileName' discards `const' from pointer target type
+class_3bb8c_i: warning: passing arg 3 of `BuildFileName' discards `const' from pointer target type
+class_3bb8c_i: warning: passing arg 3 of `BuildFileName' discards `const' from pointer target type
+class_3bb8c_i: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
+class_3bb8c_i: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
+class_3bb8c_j: src/class_3bb8c_j.c: At top level:
+class_3bb8c_j: warning: `Class86F88__ClearCachedRefs' was previously implicitly declared to return `int'
+class_3bb8c_j: warning: implicit declaration of function `Class86F88__ClearCachedRefs'
+class_3bb8c_j: warning: previous external decl of `Class86F88__ClearCachedRefs'
+class_3bb8c_j: warning: previous implicit declaration of `Class86F88__ClearCachedRefs'
+class_3bb8c_j: warning: type mismatch with previous external decl
+class_3bb8c_j: warning: type mismatch with previous implicit declaration
+class_3bb8c_k: warning: unused variable `unused'
+class_3bb8c_l: warning: passing arg 2 of `RegisterStyleConfig' makes integer from pointer without a cast
+class_3bb8c_m: warning: passing arg 2 makes integer from pointer without a cast
+class_3bb8c_m: warning: return makes integer from pointer without a cast
+class_3bb8c_n: src/class_3bb8c_n.c: At top level:
+class_3bb8c_n: warning: `AdjustRgbByDelta' was previously implicitly declared to return `int'
+class_3bb8c_n: warning: implicit declaration of function `AdjustRgbByDelta'
+class_3bb8c_n: warning: implicit declaration of function `ApplyStyleDecorationIfSet'
+class_3bb8c_n: warning: previous external decl of `AdjustRgbByDelta'
+class_3bb8c_n: warning: previous implicit declaration of `AdjustRgbByDelta'
+class_3bb8c_n: warning: type mismatch with previous external decl
+class_3bb8c_n: warning: type mismatch with previous implicit declaration
+class_3bb8c_p: warning: `struct DreamSys' declared inside parameter list
+class_3bb8c_p: warning: its scope is only this definition or declaration,
+class_3bb8c_p: warning: unused variable `pad48Tail'
+class_3bb8c_p: warning: which is probably not what you want.
+class_3bb8c_s: warning: implicit declaration of function `rand'
+code_1677c: warning: `struct DreamSys' declared inside parameter list
+code_1677c: warning: control reaches end of non-void function
+code_1677c: warning: its scope is only this definition or declaration,
+code_1677c: warning: passing arg 2 makes pointer from integer without a cast
+code_1677c: warning: passing arg 3 makes integer from pointer without a cast
+code_1677c: warning: which is probably not what you want.
+code_171e0: warning: assignment from incompatible pointer type
+code_179d8_d: warning: unused variable `buf'
+code_179d8_d: warning: unused variable `buf'
+code_179d8_e: warning: passing arg 2 makes pointer from integer without a cast
+code_179d8_e: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
+code_179d8_e: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
+code_179d8_g: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast
+code_179d8_h: warning: unused variable `scratch'
+code_179d8_j_c: warning: unused variable `unused'
+code_179d8_j_c: warning: unused variable `unused'
+code_179d8_m: warning: comparison between signed and unsigned
+code_179d8_q: src/code_179d8_q.c: At top level:
+code_179d8_q: warning: `LockCd' was previously implicitly declared to return `int'
+code_179d8_q: warning: `UnlockCd' was previously implicitly declared to return `int'
+code_179d8_q: warning: `s2' might be used uninitialized in this function
+code_179d8_q: warning: implicit declaration of function `LockCd'
+code_179d8_q: warning: implicit declaration of function `UnlockCd'
+code_179d8_q: warning: previous external decl of `LockCd'
+code_179d8_q: warning: previous external decl of `UnlockCd'
+code_179d8_q: warning: previous implicit declaration of `LockCd'
+code_179d8_q: warning: previous implicit declaration of `UnlockCd'
+code_179d8_q: warning: type mismatch with previous external decl
+code_179d8_q: warning: type mismatch with previous external decl
+code_179d8_q: warning: type mismatch with previous implicit declaration
+code_179d8_q: warning: type mismatch with previous implicit declaration
+code_2c054: warning: assignment makes pointer from integer without a cast
+code_2c054: warning: assignment makes pointer from integer without a cast
+code_2c054: warning: implicit declaration of function `BMemPMgrAlloc'
+code_2cc8c: warning: `/*' within comment
+code_2cc8c: warning: `/*' within comment
+code_2cc8c: warning: `/*' within comment
+code_2cc8c: warning: assignment from incompatible pointer type
+code_2cc8c_b: warning: `/*' within comment
+code_2cc8c_b: warning: `/*' within comment
+code_2cc8c_b: warning: `/*' within comment
+code_2cc8c_b: warning: assignment from incompatible pointer type
+code_2cc8c_b: warning: passing arg 2 makes integer from pointer without a cast
+code_2cc8c_b: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
+code_2cc8c_c: warning: `/*' within comment
+code_2cc8c_c: warning: `/*' within comment
+code_2cc8c_c: warning: `/*' within comment
+code_2cc8c_c: warning: assignment from incompatible pointer type
+code_2cc8c_d: warning: `/*' within comment
+code_2cc8c_d: warning: `/*' within comment
+code_2cc8c_d: warning: `/*' within comment
+code_2cc8c_e: warning: `/*' within comment
+code_2cc8c_e: warning: `/*' within comment
+code_2cc8c_e: warning: `/*' within comment
+code_2cc8c_e: warning: `/*' within comment
+code_2cc8c_e: warning: passing arg 2 makes integer from pointer without a cast
+code_2cc8c_f: warning: `/*' within comment
+code_2cc8c_f: warning: `/*' within comment
+code_2cc8c_f: warning: `/*' within comment
+code_2cc8c_f: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
+code_55dd4: warning: assignment from incompatible pointer type
+code_55dd4: warning: unused variable `unused'
+code_8220_c: warning: `/*' within comment
+code_8220_c: warning: `/*' within comment
+code_8220_c: warning: passing arg 1 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 1 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 1 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 1 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 2 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 2 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 2 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 2 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 3 of `FillRCPolyHeader' from incompatible pointer type
+code_8220_c: warning: passing arg 4 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 4 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 4 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 4 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 5 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 5 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 5 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 5 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
+code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
+code_d294: warning: assignment makes integer from pointer without a cast
+code_d294_b: warning: assignment makes pointer from integer without a cast
+code_d294_b: warning: unused variable `pad'
+code_d294_b: warning: unused variable `unused'
+main: warning: `struct DreamSys' declared inside parameter list
+main: warning: its scope is only this definition or declaration,
+main: warning: which is probably not what you want.
