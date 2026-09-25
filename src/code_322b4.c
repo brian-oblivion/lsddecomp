@@ -26,7 +26,7 @@ typedef struct D_8006EF50Obj {
     s32 unkC;  /* +0x00C, read by func_8004264C */
     s32 unk10; /* +0x010, set to 1 by func_80042658, cleared by func_80042664, read by func_8004266C */
     s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by func_800425D8 */
-    s32 unk18; /* +0x018, cleared by func_800425D8 */
+    BasicClassListNode *unk18; /* +0x018, cleared by func_800425D8; a parentRefs cursor func_800424E0 steps past a removed parent */
 } D_8006EF50Obj;
 struct D_8006EF50Methods {
     u8 pad00[0x30];
@@ -55,8 +55,10 @@ extern s32 D_8006EF50[];
 extern s32 D_8006EFAC[];
 
 /* Local view of a D_8006EED8 (class id 0xB03) object: func_800423E4 sets +0x2C. */
+typedef struct D_8006EED8Methods D_8006EED8Methods;
 typedef struct D_8006EED8Obj {
-    u8 pad00[0x2C];
+    D_8006EED8Methods *methods; /* +0x000 */
+    u8 pad04[0x2C - 0x4];
     s32 unk2C;
 } D_8006EED8Obj;
 
@@ -81,9 +83,15 @@ typedef struct SpriteView_322b4 {
     u8 unkA8;                     /* +0x0A8, the cell index func_80041BDC stores */
 } SpriteView_322b4;
 struct SpriteMethods_322b4 {
-    u8 pad00[0xC4];
+    u8 pad00[0xBC];
+    void (*slotBC)(SpriteView_322b4 *self, Pair_322b4 *src);   /* +0x0BC = func_80041E2C */
+    u8 padC0[0xC4 - 0xC0];
     void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = func_80041BDC */
 };
+
+/* The zero offset func_80041DAC attaches with. */
+extern Vec3_d294 D_8006EE10;
+extern char *strcpy(char *dst, char *src);
 
 /* The cell origin func_80041C4C copies: {0, 0, 8, 8}. */
 extern SpriteRect D_8006ED40;
@@ -109,6 +117,22 @@ typedef struct CellCtorMethods_322b4 {
     u8 pad00[0x8];
     void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = func_80041B20 */
 } CellCtorMethods_322b4;
+
+void *func_80041ED8(void);
+typedef struct CtorArg3Methods_322b4 {
+    u8 pad00[0x8];
+    void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = func_80041D18 */
+} CtorArg3Methods_322b4;
+
+struct D_8006EED8Methods {
+    u8 pad00[0x6C];
+    void (*slot6C)(D_8006EED8Obj *self, char *name); /* +0x06C */
+};
+
+typedef struct Slot08Arg0Methods_322b4 {
+    u8 pad00[0x8];
+    void (*ctor)(void *self); /* +0x008 */
+} Slot08Arg0Methods_322b4;
 
 typedef struct CtorArg1Methods_322b4 {
     u8 pad00[0x8];
@@ -158,7 +182,16 @@ void func_80041C4C(SpriteRect *dst, u32 cell) {
     dst->u += (cell & 0x1F) * 8;
     dst->v += (cell >> 5) * 8;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C9C);
+/* Allocate and construct a D_8006ED4C object (0xA8 bytes). */
+void *func_80041C9C(void *a1, void *a2, void *a3) {
+    void *obj = BMemPMgrAlloc(0xA8);
+
+    if (obj != NULL) {
+        ((CtorArg3Methods_322b4 *)func_80041ED8())->ctor(obj, a1, a2, a3);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041D18);
 /* D_8006ED4C slot +0x040 (reset): empty override. */
 void func_80041DA4(Class6B5CC *self) {
