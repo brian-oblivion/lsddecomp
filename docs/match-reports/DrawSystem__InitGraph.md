@@ -1,4 +1,6 @@
-# func_800207DC -- MATCHED (32/32 words), round 82
+# DrawSystem__InitGraph -- MATCHED (32/32 words), round 82
+
+> Renamed from `func_800207DC` on 2026-09-25 (tools/rename.py). Address 0x800207dc.
 
 Round 82, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
@@ -24,7 +26,7 @@ extern void GsInitGraph(unsigned short x_res, unsigned short y_res,
 extern void GsDefDispBuff(unsigned short x0, unsigned short y0,
                           unsigned short x1, unsigned short y1); /* LIBGS.H */
 
-void func_800207DC(Class6C070 *self, Class6C070Size *size, s32 vramMode) {
+void DrawSystem__InitGraph(Class6C070 *self, Class6C070Size *size, s32 vramMode) {
     GsInitGraph(size->w, size->h, 0, 1, vramMode);
     GsDefDispBuff(0, 0, 0, size->h);
     self->size = *size;

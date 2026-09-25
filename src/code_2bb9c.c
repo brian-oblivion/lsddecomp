@@ -113,7 +113,7 @@ struct Class6C070 {
     /* +0x000 */ Class6C070Methods *methods;
 };
 
-extern Class6C070 *func_80020C5C(void); /* returns the draw singleton */
+extern Class6C070 *GetDrawSystem(void); /* returns the draw singleton */
 extern void *BMemPMgrAlloc(s32 size);
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 TimImageMethods *GetTimImageMethods(void);
@@ -153,7 +153,7 @@ void TimImage__Upload(TimImage *self) {
     DrawRect rect;
     GsIMAGE *tim;
 
-    draw = func_80020C5C();
+    draw = GetDrawSystem();
     tim = &self->tim;
     if (self->buffer != NULL) {
         self->methods->getTimInfo(self, tim);
@@ -214,7 +214,7 @@ void func_8003B624(DrawRect *r, s32 count, DrawPoint *p) {
     DrawRect rect;
     s32 i;
 
-    draw = func_80020C5C();
+    draw = GetDrawSystem();
     fn = draw->methods->moveImage;
     if (count != 0) {
         for (i = 0; i < count; i++) {

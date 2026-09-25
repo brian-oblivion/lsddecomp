@@ -1,24 +1,23 @@
-# new_class_6c078 -- MATCHED (20/20 words), round 81
+# DrawSystem__Init -- MATCHED (22/22 words), round 81
+
+> Renamed from `func_80020784` on 2026-09-25 (tools/rename.py). Address 0x80020784.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** allocator (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** allocates 0x34 bytes with BMemPMgrAlloc and runs the ctor through the class table (func_80020C4C()->ctor); the broadcast alloc-then-ctor shape `if (p != NULL) { ctor; return p; } return NULL;`.
+- **Where:** D_8006C070 slot +0x040 (init) (slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** clears +0x10, calls slot +0x070 (DrawSystem__SetVSyncCount) with 3 and slot +0x080 (DrawSystem__SetSyncMode) with 1, clears +0x30.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
-  20/20 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
+  22/22 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
 
 ## Source
 
 ```c
-Class6C070 *new_class_6c078(void) {
-    Class6C070 *p = BMemPMgrAlloc(0x34);
-
-    if (p != NULL) {
-        func_80020C4C()->ctor(p);
-        return p;
-    }
-    return NULL;
+void DrawSystem__Init(Class6C070 *self) {
+    self->unk10 = 0;
+    self->methods->slot70(self, 3);
+    self->methods->slot80(self, 1);
+    self->unk30 = 0;
 }
 ```
 
@@ -50,7 +49,7 @@ struct Class6C070 {
 
 struct Class6C070Methods {
     BASICCLASS_SLOTS(Class6C070, (Class6C070 *self));
-    /* +0x040 */ void (*init)(Class6C070 *self);                 /* func_80020784 */
+    /* +0x040 */ void (*init)(Class6C070 *self);                 /* DrawSystem__Init */
     /* +0x044 */ void *slot44;
     /* +0x048 */ void *slot48;
     /* +0x04C */ void *slot4C;
@@ -60,16 +59,20 @@ struct Class6C070Methods {
     /* +0x05C */ void *slot5C;
     /* +0x060 */ void *slot60;
     /* +0x064 */ void *slot64;
-    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* func_80020A74 */
+    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* DrawSystem__RunLoop */
     /* +0x06C */ void *slot6C;
-    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* func_80020B4C */
+    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* DrawSystem__SetVSyncCount */
     /* +0x074 */ void *slot74;
     /* +0x078 */ void *slot78;
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* func_80020C3C */
+    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* DrawSystem__SetSyncMode */
 };
 ```
 
 ## Naming
 
-Proposed name `New_Class6C070` (tier B: shape of every other New_* allocator); not applied, class unnamed.
+Kept func_.
+
+## Round 82 note
+
+Round 82 (alpha) retyped +0x030 from `s32 unk30` to `void (*callback)(void)`: DrawSystem__RunLoop calls it (`jalr`) once per VSync. The live source now reads `self->callback = ...`; DrawSystem__SetCallback takes `void (*callback)(void)`. Still byte-exact (whole-image SHA1 green).

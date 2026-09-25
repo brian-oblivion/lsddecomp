@@ -1,21 +1,26 @@
-# func_80020A24 -- MATCHED (20/20 words), round 81
+# DrawSystem__CountFrames -- MATCHED (22/22 words), round 81
+
+> Renamed from `func_80020AF4` on 2026-09-25 (tools/rename.py). Address 0x80020af4.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x064 (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** RECT from func_80020970, then MoveImage(&rect, x, y). Declaring x/y as `s16` parameters gives retail exactly: the raw args are held in s0/s1 across the call and sign-extended (sll/sra 16) only at the MoveImage call.
+- **Where:** D_8006C070 slot +0x06C (slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** ignores self; on the singleton GetDrawSystem() increments +0x24, and once it reaches +0x20 and +0xC is clear, sets +0xC = 1 and resets +0x24.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
-  20/20 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
+  22/22 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
 
 ## Source
 
 ```c
-void func_80020A24(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) {
-    RECT rect;
+void DrawSystem__CountFrames(Class6C070 *self) {
+    Class6C070 *obj = GetDrawSystem();
 
-    func_80020970(&rect, src);
-    MoveImage(&rect, x, y);
+    obj->unk24++;
+    if (obj->unk24 >= obj->unk20 && obj->unkC == 0) {
+        obj->unkC = 1;
+        obj->unk24 = 0;
+    }
 }
 ```
 
@@ -27,19 +32,6 @@ LIBGPU.H/LIBGS.H prototypes):
 ```c
 typedef struct Class6C070 Class6C070;
 typedef struct Class6C070Methods Class6C070Methods;
-typedef struct {
-    short x, y;
-    short w, h;
-} RECT;
-
-typedef struct {
-    /* +0x0 */ s16 x;
-    /* +0x2 */ s16 y;
-    /* +0x4 */ s16 w;
-    /* +0x6 */ s16 unk6;
-    /* +0x8 */ s16 h;
-} Class6C070Rect;
-
 typedef struct {
     /* +0x0 */ s32 w;
     /* +0x4 */ s32 h;
@@ -61,4 +53,4 @@ struct Class6C070 {
 
 ## Naming
 
-Proposed `Class6C070__MoveImage` (tier B).
+Kept func_.

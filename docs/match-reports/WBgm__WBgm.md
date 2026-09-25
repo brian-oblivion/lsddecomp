@@ -6,7 +6,7 @@ Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** D_8006E48C slot +0x008 (ctor) (slots resolved with `tools/classtable.py D_8006E48C`).
-- **What:** constructor: base ctor via `Get_vtable_BasicClass()->ctor`, installs `Get_vtable_WBgm()`, zeroes +0x0C/+0x10/+0x14/+0x1A/+0x1C/+0x1E, stores the third argument at +0x20 (auto-play flag), sets `gWBgmActive = 1` (gp_rel global), then calls its own slots +0x05C (with arg 2) and +0x060 (with arg 1) and registers itself as a child of the `func_80020C5C()` singleton.
+- **What:** constructor: base ctor via `Get_vtable_BasicClass()->ctor`, installs `Get_vtable_WBgm()`, zeroes +0x0C/+0x10/+0x14/+0x1A/+0x1C/+0x1E, stores the third argument at +0x20 (auto-play flag), sets `gWBgmActive = 1` (gp_rel global), then calls its own slots +0x05C (with arg 2) and +0x060 (with arg 1) and registers itself as a child of the `GetDrawSystem()` singleton.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 54/54
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -21,11 +21,11 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 Not renamed here -- both are defined in a unit this round did not touch, and
 one of them (`code_10ee0.c`) has a live matching runner this round
-(`func_80020C5C`, per the round-82 broadcast: alpha finished it just before
+(`GetDrawSystem`, per the round-82 broadcast: alpha finished it just before
 this pass started). Recorded as proposals for the head to apply with
 `tools/rename.py` once safe.
 
-- `func_80020C5C` (defined `src/code_10ee0.c`, returns `Class6C070 *`): called
+- `GetDrawSystem` (defined `src/code_10ee0.c`, returns `Class6C070 *`): called
   here only as `addChild`/`removeChild`'s argument, registering `WBgm` as a
   child of that singleton for lifecycle notification -- the same pattern
   `class_3ac78.c` and `code_2bb9c.c` use it for. No WBgm-specific evidence for
@@ -63,7 +63,7 @@ void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
     gWBgmActive = 1;
     self->methods->setSeq(self, seqArg);
     self->methods->setVab(self, vabArg);
-    self->methods->addChild(self, func_80020C5C());
+    self->methods->addChild(self, GetDrawSystem());
 }
 ```
 
@@ -131,7 +131,7 @@ extern void SsSeqClose(short);
 extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
-extern BasicClass *func_80020C5C(void);
+extern BasicClass *GetDrawSystem(void);
 extern SeqData *func_800422CC(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);

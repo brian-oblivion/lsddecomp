@@ -1,10 +1,12 @@
-# func_80020B4C -- MATCHED (7/7 words), round 81
+# GetDrawSystem -- MATCHED (3/3 words), round 81
+
+> Renamed from `func_80020C5C` on 2026-09-25 (tools/rename.py). Address 0x80020c5c.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x070 (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** stores its argument to +0x20 only while +0x10 is zero (`bnez` around the store).
+- **Where:** not a method: the singleton getter (method-table slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** returns the gp-relative sdata global D_8008A83C (`lw %gp_rel`).
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -14,10 +16,8 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020B4C(Class6C070 *self, s32 value) {
-    if (self->unk10 == 0) {
-        self->unk20 = value;
-    }
+Class6C070 *GetDrawSystem(void) {
+    return D_8008A83C;
 }
 ```
 

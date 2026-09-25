@@ -15,14 +15,14 @@ byte-identical, and the `## Naming` section at the end of this report
 carries the evidence for each one.
 
 ```c
-extern s32 func_80020C5C(void); /* returns D_8008A83C, a singleton object */
+extern s32 GetDrawSystem(void); /* returns D_8008A83C, a singleton object */
 extern s32 ServiceCdDriver(void);
 extern s32 gCdBusy;
 extern s32 gCdAsyncEnabled;
 extern s32 D_8008A860;
 extern s32 gCdUseVSyncCallback;
 
-/* The singleton func_80020C5C returns; only the slot this call site
+/* The singleton GetDrawSystem returns; only the slot this call site
  * dispatches (+0x84 of its method table) is typed here. That slot is handed
  * either ServiceCdDriver or 0, so it installs and clears a callback -- named
  * for what this one call site does with it, which is all the evidence
@@ -44,7 +44,7 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
 
     if (gCdBusy == 0) {
         if (useVSyncCallback == 0) {
-            obj = (ObjF18 *)func_80020C5C();
+            obj = (ObjF18 *)GetDrawSystem();
 
             if (gCdAsyncEnabled == 0) {
                 if (async != 0) {
@@ -92,8 +92,8 @@ drift) and corrected on the second:
    near-miss diff showed `a0`/`a1` register roles and the materialized
    `&ServiceCdDriver` address swapped between them, which was the tell.
 
-`func_80020C5C` is declared exactly as `class_3ac78.c` already declares it
-(`extern s32 func_80020C5C(void);`, cast to a pointer type at the call
+`GetDrawSystem` is declared exactly as `class_3ac78.c` already declares it
+(`extern s32 GetDrawSystem(void);`, cast to a pointer type at the call
 site) — reused convention, not a new one. `ServiceCdDriver` (this unit,
 matched earlier this round) needed only a forward `extern s32
 ServiceCdDriver(void);` since this function sits earlier in ROM order.
@@ -135,7 +135,7 @@ full contract is not established.
 **Evidence for `gCdUseVSyncCallback`.** Every one of its five readers is
 `if (gCdUseVSyncCallback != 0) VSyncCallback(...)` -- register or clear the
 tick. And this function only installs the ALTERNATIVE delivery path (the
-`+0x84` slot of the singleton `func_80020C5C` returns, handed
+`+0x84` slot of the singleton `GetDrawSystem` returns, handed
 `ServiceCdDriver` or 0) when the argument is zero. So the flag chooses which
 of two callbacks drives the service; tier A.
 

@@ -22,7 +22,7 @@ extern BaseCtorTable_3ac78 *func_800428E4(void);
 extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
-extern s32 func_80020C5C(void);
+extern s32 GetDrawSystem(void);
 extern Vec3_3ac78 gDefaultOrigin;
 
 void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
@@ -100,7 +100,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
         }
     }
 
-    self->methods->slot10(self, func_80020C5C());
+    self->methods->slot10(self, GetDrawSystem());
     self->methods->slot40(self);
 }
 ```
@@ -119,7 +119,7 @@ of pointers -- each pointer itself a `New_Class86AA0()`-created object,
 initialized via a rect-packing-style budget (`buf[0]`/`buf[2]`, wrapping
 at `0xA400` back to `0x400`, stepping `0x800` per cell) and flagged with a
 high bit on `unk10` after a `slot70(obj, 1)` dispatch. Finishes with two
-more dispatches on `self->methods` (`slot10` with a fresh `func_80020C5C()`
+more dispatches on `self->methods` (`slot10` with a fresh `GetDrawSystem()`
 value, then `slot40`, already known gp_rel-blocked as a CALLEE -- irrelevant
 here since this function only DISPATCHES to it, never inlines its body).
 

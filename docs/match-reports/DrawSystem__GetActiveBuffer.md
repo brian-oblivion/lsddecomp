@@ -1,24 +1,20 @@
-# func_80020AF4 -- MATCHED (22/22 words), round 81
+# DrawSystem__GetActiveBuffer -- MATCHED (8/8 words), round 81
+
+> Renamed from `func_800208D8` on 2026-09-25 (tools/rename.py). Address 0x800208d8.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x06C (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** ignores self; on the singleton func_80020C5C() increments +0x24, and once it reaches +0x20 and +0xC is clear, sets +0xC = 1 and resets +0x24.
+- **Where:** D_8006C070 slot +0x054 (slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** tail of GsGetActiveBuff (LIBGS.H `int GsGetActiveBuff(void)`); returning its value is a guess -- the bytes cannot tell void from int (tail-call wrapper rule).
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
-  22/22 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
+  8/8 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
 
 ## Source
 
 ```c
-void func_80020AF4(Class6C070 *self) {
-    Class6C070 *obj = func_80020C5C();
-
-    obj->unk24++;
-    if (obj->unk24 >= obj->unk20 && obj->unkC == 0) {
-        obj->unkC = 1;
-        obj->unk24 = 0;
-    }
+s32 DrawSystem__GetActiveBuffer(Class6C070 *self) {
+    return GsGetActiveBuff();
 }
 ```
 
@@ -51,4 +47,4 @@ struct Class6C070 {
 
 ## Naming
 
-Kept func_.
+Proposed `Class6C070__GetActiveBuff` (tier B).

@@ -1,10 +1,12 @@
-# func_80020C44 -- MATCHED (2/2 words), round 81
+# DrawSystem__SetVSyncCount -- MATCHED (7/7 words), round 81
+
+> Renamed from `func_80020B4C` on 2026-09-25 (tools/rename.py). Address 0x80020b4c.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x084 (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** setter of the s32 at +0x30.
+- **Where:** D_8006C070 slot +0x070 (method-table slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** stores its argument to +0x20 only while +0x10 is zero (`bnez` around the store).
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -14,8 +16,10 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020C44(Class6C070 *self, s32 value) {
-    self->unk30 = value;
+void DrawSystem__SetVSyncCount(Class6C070 *self, s32 value) {
+    if (self->unk10 == 0) {
+        self->unk20 = value;
+    }
 }
 ```
 
@@ -43,7 +47,3 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
-
-## Round 82 note
-
-Round 82 (alpha) retyped +0x030 from `s32 unk30` to `void (*callback)(void)`: func_80020A74 calls it (`jalr`) once per VSync. The live source now reads `self->callback = ...`; func_80020C44 takes `void (*callback)(void)`. Still byte-exact (whole-image SHA1 green).

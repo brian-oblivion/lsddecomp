@@ -1,10 +1,12 @@
-# func_80020C5C -- MATCHED (3/3 words), round 81
+# Get_vtable_DrawSystem -- MATCHED (4/4 words), round 81
+
+> Renamed from `func_80020C4C` on 2026-09-25 (tools/rename.py). Address 0x80020c4c.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** not a method: the singleton getter (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** returns the gp-relative sdata global D_8008A83C (`lw %gp_rel`).
+- **Where:** not a method: the table getter (method-table slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** returns &D_8006C070 (`lui/addiu`).
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -14,8 +16,8 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-Class6C070 *func_80020C5C(void) {
-    return D_8008A83C;
+Class6C070Methods *Get_vtable_DrawSystem(void) {
+    return &D_8006C070;
 }
 ```
 

@@ -47,7 +47,7 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
  * here though: retail's delay slot for the *following* `jal` (`move
  * s0,v0`) captures it before that call can clobber v0 -- the return value
  * of THIS call, not of the one whose delay slot it sits in. */
-extern void *new_class_6c078(void);
+extern void *New_DrawSystem(void);
 
 extern BMemPMgr *gStartupBMemPMgr;
 extern Class6D3C8 *gClass6D3C8;
@@ -66,7 +66,7 @@ void main(void)
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
     gClass6D3C8 = New_Class6D3C8(&gClass6D3C8CtorArgs);
-    obj = new_class_6c078();
+    obj = New_DrawSystem();
     pad = New_Pad(0, 0);
     gClass6D3C8->methods->forwardToBaseSlot44UnlessFlagged(gClass6D3C8, obj, pad);
     gClass6D3C8->methods->slot4C(gClass6D3C8);

@@ -14,7 +14,7 @@ This is the game's own `main()`. It runs an empty startup stub
 it as the default pool (`SetDefaultBMemPMgr`), constructs the `Class6D3C8`
 instance at `gClass6D3C8` (`New_Class6D3C8`, seeded from the constant block
 `gClass6D3C8CtorArgs = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
-still-uncarved `new_class_6c078`, opens a `Pad` (`New_Pad(NULL, 0)`),
+still-uncarved `New_DrawSystem`, opens a `Pad` (`New_Pad(NULL, 0)`),
 and dispatches two methods through `gClass6D3C8`'s own vtable (`+0x044` and
 `+0x04C`) before returning. It never loops -- the real game loop presumably
 lives inside whatever `slot4C` (`Class6E4F0__RunMainLoop`) or a callee reached from it
@@ -62,7 +62,7 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
  * here though: retail's delay slot for the *following* `jal` (`move
  * s0,v0`) captures it before that call can clobber v0 -- the return value
  * of THIS call, not of the one whose delay slot it sits in. */
-extern void *new_class_6c078(void);
+extern void *New_DrawSystem(void);
 
 extern BMemPMgr *gStartupBMemPMgr;
 extern Class6D3C8 *gClass6D3C8;
@@ -82,7 +82,7 @@ void main(void)
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
     gClass6D3C8 = New_Class6D3C8(&gClass6D3C8CtorArgs);
-    obj = new_class_6c078();
+    obj = New_DrawSystem();
     pad = New_Pad(0, 0);
     gClass6D3C8->methods->forwardToBaseSlot44UnlessFlagged(gClass6D3C8, obj, pad);
     gClass6D3C8->methods->slot4C(gClass6D3C8);
@@ -229,7 +229,7 @@ by any carved C before this) is retyped from `void *` to `void
    return into `$s0`". It is not: the delay slot instruction executes
    architecturally *before* the jump is taken, so `$v0` at that point is
    still whatever it held *before* `New_Pad` ran -- i.e. the return
-   of the PRECEDING call, `new_class_6c078()`. `New_Pad`'s own
+   of the PRECEDING call, `New_DrawSystem()`. `New_Pad`'s own
    return only becomes available in `$v0` *after* it returns, several
    instructions later (`2158: jalr $v1` / `215c: move $a2,$v0`). First
    draft read both `$a1` and `$a2` at the `slot44` dispatch as the SAME
@@ -237,12 +237,12 @@ by any carved C before this) is retyped from `void *` to `void
    the same hex bytes in this one build -- the actual instruction ordering
    (an entirely separate `move a0,zero`/`move a1,zero` pair for
    `New_Pad`'s own two arguments intervening between the `jal
-   new_class_6c078` and the `jal New_Pad`) never lines up under
+   New_DrawSystem` and the `jal New_Pad`) never lines up under
    that reading, and no amount of restructuring `pad`'s C (separate
    locals, `register`, an unprototyped `slot44` field) moved the
    registers even one bit -- because the C was describing the wrong
    value's lifetime, not the wrong shape. Reassigning `$s0` to
-   `new_class_6c078()`'s return (crossing the real call boundary,
+   `New_DrawSystem()`'s return (crossing the real call boundary,
    `New_Pad`) and `$a2`/`pad` to `New_Pad`'s own return
    (never crossing a call after its own) closed to 46/46 on the next
    build, with zero further changes.

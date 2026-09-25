@@ -10,7 +10,7 @@ Slot `+0x044` of D_8006E4F0; Class6D3C8's own +0x044
 (ForwardToBaseSlot44UnlessFlagged) forwards here. One-time system init,
 guarded by `self->initialized` (+0x18):
 
-- `func_80020C68(source)` (stores the source to a gp global);
+- `SetDrawSystem(source)` (stores the source to a gp global);
 - `source->methods->slot44(source, &self->dims, self->dimsArg)`;
 - `SsInit(); GsInit3D();`
 - allocates a 0x14-byte aux block into `self->aux` (+0x1C) holding
@@ -20,7 +20,7 @@ guarded by `self->initialized` (+0x18):
 ```c
 void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
     if (self->initialized == 0) {
-        func_80020C68(source);
+        SetDrawSystem(source);
         source->methods->slot44(source, &self->dims, self->dimsArg);
         SsInit();
         GsInit3D();

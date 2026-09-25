@@ -1,4 +1,6 @@
-# func_80020970 -- MATCHED (12/12 words), round 81
+# ConvertRect -- MATCHED (12/12 words), round 81
+
+> Renamed from `func_80020970` on 2026-09-25 (tools/rename.py). Address 0x80020970.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
@@ -11,7 +13,7 @@ Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020970(RECT *dst, Class6C070Rect *src) {
+void ConvertRect(RECT *dst, Class6C070Rect *src) {
     dst->x = src->x;
     dst->y = src->y;
     dst->w = src->w;

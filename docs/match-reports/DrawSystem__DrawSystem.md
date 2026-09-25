@@ -1,9 +1,11 @@
-# func_80020730 -- MATCHED (21/21 words), round 81
+# DrawSystem__DrawSystem -- MATCHED (21/21 words), round 81
+
+> Renamed from `func_80020730` on 2026-09-25 (tools/rename.py). Address 0x80020730.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
 - **Where:** D_8006C070 slot +0x008 (ctor) (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** base ctor through Get_vtable_BasicClass()->ctor, then installs the table from func_80020C4C() and calls slot +0x040 (func_80020784). The `sw v0,0(s0); lw v0,0x40(v0)` reuse falls out of plain sequential C.
+- **What:** base ctor through Get_vtable_BasicClass()->ctor, then installs the table from Get_vtable_DrawSystem() and calls slot +0x040 (DrawSystem__Init). The `sw v0,0(s0); lw v0,0x40(v0)` reuse falls out of plain sequential C.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   21/21 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
@@ -11,9 +13,9 @@ Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020730(Class6C070 *self) {
+void DrawSystem__DrawSystem(Class6C070 *self) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_80020C4C();
+    self->methods = Get_vtable_DrawSystem();
     self->methods->init(self);
 }
 ```
@@ -46,7 +48,7 @@ struct Class6C070 {
 
 struct Class6C070Methods {
     BASICCLASS_SLOTS(Class6C070, (Class6C070 *self));
-    /* +0x040 */ void (*init)(Class6C070 *self);                 /* func_80020784 */
+    /* +0x040 */ void (*init)(Class6C070 *self);                 /* DrawSystem__Init */
     /* +0x044 */ void *slot44;
     /* +0x048 */ void *slot48;
     /* +0x04C */ void *slot4C;
@@ -56,13 +58,13 @@ struct Class6C070Methods {
     /* +0x05C */ void *slot5C;
     /* +0x060 */ void *slot60;
     /* +0x064 */ void *slot64;
-    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* func_80020A74 */
+    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* DrawSystem__RunLoop */
     /* +0x06C */ void *slot6C;
-    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* func_80020B4C */
+    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* DrawSystem__SetVSyncCount */
     /* +0x074 */ void *slot74;
     /* +0x078 */ void *slot78;
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* func_80020C3C */
+    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* DrawSystem__SetSyncMode */
 };
 ```
 

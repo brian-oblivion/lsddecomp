@@ -1,10 +1,12 @@
-# func_80020C68 -- MATCHED (3/3 words), round 81
+# DrawSystem__func_80020A1C -- MATCHED (2/2 words), round 81
+
+> Renamed from `func_80020A1C` on 2026-09-25 (tools/rename.py). Address 0x80020a1c.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** not a method: the singleton setter (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** stores its argument to D_8008A83C (`sw %gp_rel`).
+- **Where:** D_8006C070 slot +0x060 (method-table slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** returns 0 (`jr $ra; addu $v0,$zero,$zero`).
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -14,8 +16,8 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020C68(Class6C070 *obj) {
-    D_8008A83C = obj;
+s32 DrawSystem__func_80020A1C(Class6C070 *self) {
+    return 0;
 }
 ```
 
