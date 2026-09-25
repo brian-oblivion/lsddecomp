@@ -65,6 +65,7 @@
  */
 
 #include "common.h"
+#include "SvmVoice.h"
 
 /* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
  * (SsUtKeyOn's own computed index, not a channel id). Every field
@@ -173,46 +174,6 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-/* 52 (0x34)-byte-stride channel-configuration record, referenced by
- * several unrelated top-level symbols 2 bytes apart (D_8008D994,
- * D_8008D996, D_8008D99A, D_8008D99C, D_8008D99E, ...) -- each function
- * in this unit only touches the one or two fields it actually reads,
- * per this project's reduced-local-view convention. Only the leading
- * s16 is named; every array below shares this one shape. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34D994;
-extern Rec34D994 D_8008D994[];
-extern Rec34D994 D_8008D990[];
-extern Rec34D994 D_8008D996[];
-extern Rec34D994 D_8008D998[];
-extern Rec34D994 D_8008D99A[];
-extern Rec34D994 D_8008D99C[];
-extern Rec34D994 D_8008D99E[];
-
-/* Same 0x34 stride, byte-sized "in use" flag at offset 0 (retail always
- * clears it with `sb`, never `sh`). */
-typedef struct {
-    u8 unk0; /* +0x0 */
-    u8 pad1[0x34 - 0x1];
-} Rec34Byte;
-extern Rec34Byte D_8008D9A3[];
-
-/* Same 0x34 stride, halfword field at offset 0 (retail always clears it
- * with `sh`). Three independent arrays share this shape (_svm_voice,
- * D_8008D98A and D_8008D98C, each 2 bytes apart in the data section --
- * same "several unrelated top-level symbols" convention as the
- * Rec34D994 group above). _svm_voice's field is read signed
- * (SsUtKeyOff compares it against 0xFF with `lh`, not `lhu`). */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34Half;
-extern Rec34Half _svm_voice[];
-extern Rec34Half D_8008D98A[];
-extern Rec34Half D_8008D98C[];
-
 /* Shared with vmNoiseOn/SpuVmKeyOnNow in code_179d8_l.c (same
  * two-level entry table, same blend-cascade shape); this unit's own
  * reduced view, per the project's per-unit-local-view convention --
@@ -239,7 +200,7 @@ extern u8 D_8008D970[];
 /* NON_MATCHING: 315/324 words, 9 words short; raw word-match 10/324,
  * insertions 76 / deletions 76 (re-measured round 70, unchanged since
  * round 62). Residue: one GCC CSE decision on the
- * `D_8008E978[D_8008D99C[i].unk0]` address plus two loop-invariant
+ * `D_8008E978[_svm_voice[i].unk14]` address plus two loop-invariant
  * hoists (docs/match-reports/SpuVmSetVol.md). Hand-derived. */
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     D800902E8Entry *e;
@@ -256,10 +217,10 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     if (D_8008E9D0 != 0) {
         i = 0;
         do {
-            if (D_8008D996[i].unk0 == (s16)a0) {
-                s32 t0 = D_8008D99A[i].unk0;
-                if (t0 == (s16)a2 && D_8008D99E[i].unk0 == (s16)a1) {
-                    u8 e968FromD998 = D_8008E968[D_8008D998[i].unk0].unk1;
+            if (_svm_voice[i].unk0E == (s16)a0) {
+                s32 t0 = _svm_voice[i].unk12;
+                if (t0 == (s16)a2 && _svm_voice[i].unk16 == (s16)a1) {
+                    u8 e968FromD998 = D_8008E968[_svm_voice[i].unk10].unk1;
                     u8 e968FromT0 = D_8008E968[t0].unk1;
                     s32 lvl0;
                     s32 prio;
@@ -274,7 +235,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     u32 pan2sq;
                     s32 off16;
 
-                    lvl0 = D_8008D990[i].unk0 * (u16)a3 / 127;
+                    lvl0 = _svm_voice[i].unk08 * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
                     lvl1 = D_8008E970->unk18 * prio / 16129;
 
@@ -284,21 +245,21 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         lvl1b = lvl1 * e968FromD998;
                     }
 
-                    e978c = D_8008E978[D_8008D99C[i].unk0].unk2;
+                    e978c = D_8008E978[_svm_voice[i].unk14].unk2;
                     lvl1c = lvl1b * e978c;
                     lvl2 = lvl1c / 16129;
 
                     pan1 = (lvl2 * e->unk74) / 127;
                     pan2 = (lvl2 * e->unk76) / 127;
 
-                    e978d = D_8008E978[D_8008D99C[i].unk0].unk3;
+                    e978d = D_8008E978[_svm_voice[i].unk14].unk3;
                     if (e978d < 0x40) {
                         pan2 = (pan2 * e978d) / 63;
                     } else {
                         pan1 = (pan1 * (0x7F - e978d)) / 63;
                     }
 
-                    e968d = D_8008E968[D_8008D998[i].unk0].unk4;
+                    e968d = D_8008E968[_svm_voice[i].unk10].unk4;
                     if (e968d < 0x40) {
                         pan2 = (pan2 * e968d) / 63;
                     } else {
@@ -401,23 +362,23 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     __asm__("");
     D_8008EA26 = (u8) result;
     __asm__("");
-    D_8008D996[(u8) result].unk0 = 0x21;
+    _svm_voice[(u8) result].unk0E = 0x21;
     __asm__("");
-    D_8008D99E[(u8) result].unk0 = p0;
+    _svm_voice[(u8) result].unk16 = p0;
     __asm__("");
-    D_8008D99A[(u8) result].unk0 = p1;
+    _svm_voice[(u8) result].unk12 = p1;
     __asm__("");
-    D_8008D998[(u8) result].unk0 = D_8008EA13;
+    _svm_voice[(u8) result].unk10 = D_8008EA13;
     __asm__("");
-    _svm_voice[(u8) result].unk0 = D_8008EA24;
+    _svm_voice[(u8) result].unk00 = D_8008EA24;
     __asm__("");
     pending18 = D_8008EA18;
-    D_8008D994[(u8) result].unk0 = p3;
-    D_8008D9A3[(u8) result].unk0 = 1;
+    _svm_voice[(u8) result].unk0C = p3;
+    _svm_voice[(u8) result].unk1B = 1;
     __asm__("");
-    D_8008D98A[(u8) result].unk0 = 0;
+    _svm_voice[(u8) result].unk02 = 0;
     __asm__("");
-    D_8008D99C[(u8) result].unk0 = pending18;
+    _svm_voice[(u8) result].unk14 = pending18;
 
     SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
@@ -451,15 +412,15 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
     if ((u16) idx >= 0x18) {
         goto fail;
     }
-    if (D_8008D99E[idx].unk0 != p1
-     || D_8008D99A[idx].unk0 != p2
-     || D_8008D99C[idx].unk0 != p3
-     || D_8008D994[idx].unk0 != p4) {
+    if (_svm_voice[idx].unk16 != p1
+     || _svm_voice[idx].unk12 != p2
+     || _svm_voice[idx].unk14 != p3
+     || _svm_voice[idx].unk0C != p4) {
         goto fail;
     }
-    if (_svm_voice[idx].unk0 == 0xFF) {
-        D_8008D9A3[(u8) idx].unk0 = 0;
-        D_8008D98C[(u8) idx].unk0 = 0;
+    if (_svm_voice[idx].unk00 == 0xFF) {
+        _svm_voice[(u8) idx].unk1B = 0;
+        _svm_voice[(u8) idx].unk04 = 0;
         D_8006DAD4[25].unk4 = 0;
         D_8006DAD4[25].unk6 = 0;
     } else {
@@ -472,9 +433,9 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
             mask0 = 0;
             mask1 = 1 << (chan - 0x10);
         }
-        D_8008D9A3[chan].unk0 = 0;
-        D_8008D98C[chan].unk0 = 0;
-        _svm_voice[chan].unk0 = 0;
+        _svm_voice[chan].unk1B = 0;
+        _svm_voice[chan].unk04 = 0;
+        _svm_voice[chan].unk00 = 0;
         D_80090C60 = mask0 | D_80090C60;
         D_80090C64 |= mask1;
         D_8008E228 &= ~D_80090C60;
@@ -548,23 +509,23 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     __asm__("");
     D_8008EA26 = idx;
     __asm__("");
-    D_8008D996[idx].unk0 = 0x21;
+    _svm_voice[idx].unk0E = 0x21;
     __asm__("");
-    D_8008D99E[idx].unk0 = p0;
+    _svm_voice[idx].unk16 = p0;
     __asm__("");
-    D_8008D99A[idx].unk0 = p1;
+    _svm_voice[idx].unk12 = p1;
     __asm__("");
-    D_8008D998[idx].unk0 = D_8008EA13;
+    _svm_voice[idx].unk10 = D_8008EA13;
     __asm__("");
-    _svm_voice[idx].unk0 = D_8008EA24;
+    _svm_voice[idx].unk00 = D_8008EA24;
     __asm__("");
     pending18 = D_8008EA18;
-    D_8008D994[idx].unk0 = p3;
-    D_8008D9A3[idx].unk0 = 1;
+    _svm_voice[idx].unk0C = p3;
+    _svm_voice[idx].unk1B = 1;
     __asm__("");
-    D_8008D98A[idx].unk0 = 0;
+    _svm_voice[idx].unk02 = 0;
     __asm__("");
-    D_8008D99C[idx].unk0 = pending18;
+    _svm_voice[idx].unk14 = pending18;
     SpuVmDoAllocate();
     if ((s16) D_8008EA24 == 0xFF) {
         vmNoiseOn((u8) idx);
@@ -616,9 +577,9 @@ s32 SsUtKeyOffV(s16 idx)
         mask0 = 0;
         mask1 = 1 << (chan - 0x10);
     }
-    D_8008D9A3[chan].unk0 = 0;
-    D_8008D98C[chan].unk0 = 0;
-    _svm_voice[chan].unk0 = 0;
+    _svm_voice[chan].unk1B = 0;
+    _svm_voice[chan].unk04 = 0;
+    _svm_voice[chan].unk00 = 0;
     _snd_ev_flag = 0;
     D_80090C60 = mask0 | D_80090C60;
     D_80090C64 |= mask1;
