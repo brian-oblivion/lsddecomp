@@ -1,5 +1,5 @@
 /*
- * The game's entry point. `GameMain` (formerly `func_800118DC`) is called
+ * The game's entry point. `main` (formerly `func_800118DC`) is called
  * directly by Sony's `crt0` (config/splat.slps01556.lsdde.yaml, the `main`
  * c-segment) and runs once: it sets the Psy-Q memory mode, stands up the
  * game's `BMemPMgr` heap, constructs the root `Class6D3C8` object from a
@@ -8,14 +8,12 @@
  * the real game loop lives inside whatever the dispatched vtable slots (or
  * a callee reached from them) do.
  *
- * `func_80011994`, called as `GameMain`'s first statement, is left
- * unrenamed: it is likely the toolchain's own `__main` ritual stub, not
- * authored game code (docs/match-reports/func_80011994.md has the
- * evidence, including a build-level experiment, not just a corpus
- * fingerprint). `GameMain` itself is deliberately NOT spelled literally
- * `main` -- GCC 2.6.3 auto-inserts a `jal __main` for any function named
- * exactly that, which breaks the link under this project's pinned flags
- * (see the same report).
+ * The first thing `main` calls is `__main`, and the C does not write that
+ * call: cc1 inserts `jal __main` at the top of any function spelled `main`,
+ * and retail's first instruction pair is exactly that call (round 79: the
+ * explicit call removed, the image stays byte-identical). `__main` is
+ * Sony's empty stub from the SDK's `_obj/none` module (see its symbols
+ * entry). It lives here as matched C only because no object places it.
  */
 #include "common.h"
 #include "Class6D3C8.h"
@@ -27,8 +25,6 @@
  * confirms the two units' local views collide), and nothing here
  * dereferences a BMemPMgr, only passes the pointer through. */
 typedef struct BMemPMgr BMemPMgr;
-
-extern void func_80011994(void);
 
 /* Psy-Q libapi (`SetMem`, linked from `libapi/c159`, splat `o` segment).
  * One `s32` argument observed at this, its only call site. */
@@ -64,12 +60,11 @@ extern Class6D3C8CtorArgs gClass6D3C8CtorArgs;
  * caller existed until now). */
 extern Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg);
 
-void GameMain(void)
+void main(void)
 {
     void *obj;
     Pad *pad;
 
-    func_80011994();
     SetMem(2);
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
@@ -80,5 +75,6 @@ void GameMain(void)
     gClass6D3C8->methods->slot4C(gClass6D3C8);
 }
 
-void func_80011994(void) {
+/* Sony's _obj/none (round 79); the call to it is cc1's, inside main. */
+void __main(void) {
 }

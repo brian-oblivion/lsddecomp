@@ -1,4 +1,6 @@
-# GameMain (round 47)
+# main (round 47)
+
+> Renamed from `GameMain` on 2026-09-25 (tools/rename.py). Address 0x800118dc.
 
 > Renamed from `func_800118DC` on 2026-09-25 (tools/rename.py). Address 0x800118dc.
 
@@ -7,7 +9,7 @@
 ## What it does
 
 This is the game's own `main()`. It runs an empty startup stub
-(`func_80011994`, already matched, a no-op), sets a Psy-Q memory mode via
+(`__main`, already matched, a no-op), sets a Psy-Q memory mode via
 `SetMem(2)`, stands up the game's `BMemPMgr` heap (`BMemPMgrInit`), installs
 it as the default pool (`SetDefaultBMemPMgr`), constructs the `Class6D3C8`
 instance at `gClass6D3C8` (`New_Class6D3C8`, seeded from the constant block
@@ -34,7 +36,7 @@ correctly left untouched per the runner brief).
  * dereferences a BMemPMgr, only passes the pointer through. */
 typedef struct BMemPMgr BMemPMgr;
 
-extern void func_80011994(void);
+extern void __main(void);
 
 /* Psy-Q libapi (`SetMem`, linked from `libapi/c159`, splat `o` segment).
  * One `s32` argument observed at this, its only call site. */
@@ -70,12 +72,12 @@ extern Class6D3C8CtorArgs gClass6D3C8CtorArgs;
  * caller existed until now). */
 extern Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg);
 
-void GameMain(void)
+void main(void)
 {
     void *obj;
     Pad *pad;
 
-    func_80011994();
+    __main();
     SetMem(2);
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
@@ -86,7 +88,7 @@ void GameMain(void)
     gClass6D3C8->methods->slot4C(gClass6D3C8);
 }
 
-void func_80011994(void) {
+void __main(void) {
 }
 ```
 
@@ -99,7 +101,7 @@ this is a documentation sync only.)
 
 ## Naming (round 79)
 
-- **`func_800118DC` -> `GameMain`, tier A.** Evidence: `crt0` (Sony's,
+- **`func_800118DC` -> `main`, tier A.** Evidence: `crt0` (Sony's,
   `config/splat.slps01556.lsdde.yaml`'s `main` c-segment comment: "main: the
   game's own `main()` (func_800118DC) plus a two-word stub") calls this
   function directly as the game's entry point; its body stands up the heap,
@@ -111,17 +113,17 @@ this is a documentation sync only.)
   `-ffreestanding`, which this project's pinned flags do not pass). Verified
   directly: renaming to `main` compiled clean but failed to LINK
   (`undefined reference to '__main'`), because our C's own explicit
-  `func_80011994()` call sits ALONGSIDE the compiler's now-auto-inserted
-  one, not in place of it. Reverted before committing; picked `GameMain`
+  `__main()` call sits ALONGSIDE the compiler's now-auto-inserted
+  one, not in place of it. Reverted before committing; picked `main`
   instead, which is not special-cased. Image byte-identical either way for
   the body itself, since the byte match here has always come from the
   explicit call, not from a live `main`-triggered auto-insertion.
 
-  **This is also new evidence for `func_80011994`'s own identity, below.**
+  **This is also new evidence for `__main`'s own identity, below.**
 
-- **`func_80011994` -- NOT renamed. Likely Sony's/the toolchain's own
+- **`__main` -- NOT renamed. Likely Sony's/the toolchain's own
   `__main`, not authored game code; flagged to the head, not renamed.**
-  `tools/sdkname.py func_80011994` returns only a TINY (2-word) EXACT
+  `tools/sdkname.py __main` returns only a TINY (2-word) EXACT
   fingerprint shared by a dozen unrelated library functions (`ClearOTag`,
   several `gte_*` macros, `SeVibOn`/`SetVib`, `KeyOnCheck`, `__nulldev`,
   and, notably, `__main _obj/none`) with no disambiguating position (both
@@ -134,17 +136,17 @@ this is a documentation sync only.)
   stubs. So the corpus fingerprint ALONE is not enough, and the runner brief's
   screen (round 78's five TINY/AMBIGUOUS misses) says not to act on it alone.
 
-  But the `GameMain` rename experiment above produces a SECOND, independent,
-  build-level signal that points the same way: `func_80011994` is called as
-  literally the FIRST statement inside `GameMain`, at the exact position
+  But the `main` rename experiment above produces a SECOND, independent,
+  build-level signal that points the same way: `__main` is called as
+  literally the FIRST statement inside `main`, at the exact position
   GCC 2.6.3 auto-inserts a call to a symbol named `__main` when the
   enclosing function is itself named `main` (unconditional under this
   project's flags, confirmed by reproducing the undefined-reference error
   above). The parsimonious reading is that retail's own source named this
   function `main` and let the compiler insert the call implicitly; our
-  explicit `func_80011994()` call is a source-level workaround that happens
+  explicit `__main()` call is a source-level workaround that happens
   to reproduce the exact same bytes GCC would have emitted on its own,
-  which is consistent with -- not proof against -- `func_80011994` being
+  which is consistent with -- not proof against -- `__main` being
   the linked definition of `__main` that made that original build succeed
   (Sony's crt/libgcc-provided stub, the standard ritual symbol GCC's `main`
   special-case expects, not a Psy-Q library function with its own SDK
@@ -164,7 +166,7 @@ this is a documentation sync only.)
   - `D_8008A808` -> `gStartupBMemPMgr`, tier B. Holds `BMemPMgrInit`'s
     return value between that call and the immediately following
     `SetDefaultBMemPMgr(...)` call -- set once, read once, both in
-    `GameMain`. Mechanics are clear (it stages the newly created heap
+    `main`. Mechanics are clear (it stages the newly created heap
     pointer); whether any still-uncarved code elsewhere also reads this
     exact global (as opposed to `gDefaultBMemPMgr`, a different address,
     `code_8220.c`) is not established, hence tier B rather than A.
@@ -197,7 +199,7 @@ a positive identification tool: a function that a `main`-rename experiment
 demands a `__main` definition for, at the exact call site an existing
 matched callee already occupies, is independent (build-level, not corpus-
 fingerprint) evidence that the callee IS that toolchain-standard symbol.
-Use a non-colliding name (`GameMain`, `EntryMain`, etc.) for the game's
+Use a non-colliding name (`main`, `EntryMain`, etc.) for the game's
 real entry point instead.
 
 Also in `include/Class6D3C8.h`: `Class6D3C8Methods.unk4C` (never dispatched
@@ -260,3 +262,16 @@ the call boundary, not about how that value's C expression is shaped. Round
 46's session (bravo, alpha) already established the general "value crossing
 a CALL boundary needs its own local" pattern; this is the sharper corollary
 for reading which call the crossing value belongs to in the first place.
+
+## Head note, round 79: the entry point is `main`, the stub is `__main`
+
+Alpha found that spelling the entry point `main` makes cc1 insert
+`jal __main`, which failed to link. The head measured the conclusion in a
+worktree. With `func_80011994` renamed `__main`, `GameMain` renamed `main`,
+and `main`'s explicit first-statement call to the stub DELETED, the image is
+byte-identical: retail's first call is the one cc1 inserts itself, so the
+original source spelled it `main` and never wrote the call. `__main` is
+Sony's empty `_obj/none` stub: an EXACT (TINY) fingerprint, placed directly
+before the `_obj/malloc` object, and the call only cc1 emits. Both oracles
+green. `GameMain` is withdrawn: the name was a workaround for the link
+failure, not a claim about the code.
