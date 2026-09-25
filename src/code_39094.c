@@ -189,7 +189,11 @@ Rec1C *func_80048E2C(s32 index) {
 Rec1C *func_80048E80(s32 index) {
     return func_80048E2C(index);
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048EA0);
+Rec1C *func_80048EA0(s32 index, s32 arg1, s32 day) {
+    s32 n = ((day - 1) % 40) / 10 + 1;
+    s32 r = func_80048CFC(0, arg1) % n;
+    return &func_80048E80(index)[r];
+}
 Rec1C *func_80048F60(s32 index) {
     return &func_80048E2C(index)[4];
 }
