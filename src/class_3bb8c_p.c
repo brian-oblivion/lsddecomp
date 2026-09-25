@@ -424,9 +424,9 @@ typedef struct D800879C4Methods {
      * successor `class_3bb8c_q` -- out of this unit/runner's range.
      * Tail-called by this unit's own `D800879C4__D800879C4` (its own ctor, see
      * that function's report) as (self, arg1) once construction is
-     * otherwise complete (round 2026-09-04) -- named `postConstruct` for
-     * that reason (round 57 naming pass). */
-    void *(*postConstruct)(D800879C4Obj *self, s32 arg1);
+     * otherwise complete (round 2026-09-04). Named `postConstruct` in the
+     * round 57 naming pass; renamed after its occupant in round 79. */
+    void *(*setVariantClut)(D800879C4Obj *self, s32 arg1);
 } D800879C4Methods;
 extern D800879C4Methods *func_80057F58(void);
 
@@ -472,5 +472,5 @@ void *D800879C4__D800879C4(D800879C4Obj *self, s32 arg1, void *arg2, void *arg3)
     func_800422BC()->ctor(self, arg3, 0, &D_80087A8C[arg1], arg2, 0);
     self->methods = func_80057F58();
     self->unk_0xA4 = 0;
-    return self->methods->postConstruct(self, arg1);
+    return self->methods->setVariantClut(self, arg1);
 }

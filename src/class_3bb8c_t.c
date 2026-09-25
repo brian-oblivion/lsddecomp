@@ -139,7 +139,8 @@ typedef struct GraphRoomMethods {
      * a TAIL CALL, its return value forwarded as GraphRoomObj__GraphRoomObj's own.
      * Same "ctor ends by calling another of its own class's slot +0x040"
      * shape, at the SAME offset, as the sibling class_3bb8c_p's own
-     * D800879C4Methods::postConstruct -- named to match. */
+     * D800879C4Methods::setVariantClut, which was called postConstruct when
+     * this slot was named to match it (renamed after its occupant, round 79). */
     void *(*postConstruct)(GraphRoomObj *self, void *arg1);
     u8 pad44[0x6C - 0x44];
     /* +0x06C, called by this unit's own GraphRoomObj__InitDisplay as (self, flag). */
