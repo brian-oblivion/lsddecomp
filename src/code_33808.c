@@ -307,7 +307,18 @@ extern s32 D_8006F2C4[];
 void *func_8004467C(void) {
     return D_8006F2C4;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004468C);
+/* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
+void *func_8004468C(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x38);
+
+    if (obj != NULL) {
+        if (((Ctor33808 *)func_800449FC())->ctor(obj, arg0, 1)) {
+            return obj;
+        }
+        BMemPMgrFree(obj);
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800446FC);
 /* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
 void func_800447B4(DataSrc33808 *self) {
