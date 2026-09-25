@@ -1,4 +1,8 @@
-# func_800451A8 -- MATCHED (4/4 words)
+# GetTileMapMethods -- MATCHED (4/4 words)
+
+> Renamed from `GetGridIndexSrcMethods` on 2026-09-25 (tools/rename.py). Address 0x80044f20.
+
+> Renamed from `func_80044F20` on 2026-09-25 (tools/rename.py). Address 0x80044f20.
 
 Round 82, runner echo (code_33808 session, echo #5), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,17 +11,17 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Table getter: returns the method table `D_8006F514` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F514[];`.
+Table getter: returns the method table `D_8006F498` (`lui/addiu; jr; nop`), declared locally as `extern s32 D_8006F498[];`.
 
-Table slot (`tools/classtable.py`): `D_8006D430` +0x084.
+Table slot (`tools/classtable.py`): `D_8006D430` +0x088.
 
 ## Source
 
 ```c
-extern s32 D_8006F514[];
+extern s32 D_8006F498[];
 
-void *func_800451A8(void) {
-    return D_8006F514;
+void *GetTileMapMethods(void) {
+    return D_8006F498;
 }
 ```
 

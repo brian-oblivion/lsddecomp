@@ -1,4 +1,6 @@
-# func_80044F30 -- MATCHED (24/24 words)
+# New_TileAtlas -- MATCHED (24/24 words)
+
+> Renamed from `func_80044F30` on 2026-09-25 (tools/rename.py). Address 0x80044f30.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,11 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a D_8006F514 object. */
-void *func_80044F30(s32 arg0) {
+void *New_TileAtlas(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_800451A8())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTileAtlasMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;

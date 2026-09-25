@@ -1,4 +1,6 @@
-# func_800450B4 -- MATCHED (61/61 words)
+# TileAtlas__BuildCells -- MATCHED (61/61 words)
+
+> Renamed from `func_800450B4` on 2026-09-25 (tools/rename.py). Address 0x800450b4.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -34,7 +36,7 @@ typedef struct Cell450B4 {       /* LIBGS.H GsCELL */
 /* LIBGPU.H */
 extern u16 GetTPage(int tp, int abr, int x, int y);
 
-void func_800450B4(Obj6F514 *self) {
+void TileAtlas__BuildCells(Obj6F514 *self) {
     Cell450B4 *c;
     s32 x = 0x280;
     s32 u;

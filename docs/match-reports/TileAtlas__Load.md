@@ -1,4 +1,6 @@
-# func_80044E10 -- MATCHED (21/21 words)
+# TileAtlas__Load -- MATCHED (21/21 words)
+
+> Renamed from `func_80045060` on 2026-09-25 (tools/rename.py). Address 0x80045060.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-When the base field +0x2A is zero, calls slot +0x078 with no arguments ($a0 is never set up for the call) and stores 1 to the u16 at +0x42.
+As TileMap__Load but marks the u16 at +0x32. Retail has a 0x38-byte frame although nothing but $ra/$s0 touches the stack.
 
-Table slot (`tools/classtable.py`): D_8006F498 +0x064 (setFlag).
+Table slot (`tools/classtable.py`): D_8006F514 +0x064 (setFlag).
 
 ## Source
 
@@ -18,25 +20,27 @@ The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
 fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
-/* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
-typedef struct Obj6F498 {
+/* D_8006F514 +0x064: unless +0x2A is set, slot +0x078 and mark +0x32. */
+typedef struct Obj6F514 {
     CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ u8 pad2C[0x16];
-    /* +0x042 */ u16 unk42;
-} Obj6F498;
+    /* +0x02C */ u8 pad2C[6];
+    /* +0x032 */ u16 unk32;
+} Obj6F514;
 
-void func_80044E10(Obj6F498 *self) {
+void TileAtlas__Load(Obj6F514 *self) {
+    s32 unused[8];
+
     if (self->unk2A == 0) {
         ((void (*)())self->methods->slot78)();
-        self->unk42 = 1;
+        self->unk32 = 1;
     }
 }
 ```
 
 ## Notes
 
-- Byte-exact on the first build.
-- Unit-local view Obj6F498 (CLASS6D430_FIELDS(DataSrc33808Methods) + u16 at +0x42).
+- The 0x38 frame (vs 0x18 in TileMap__Load) is reproduced by an unused local `s32 unused[8];`. Without it the frame is 0x18. Whether the original held an unused buffer or something dead-code-eliminated is not recoverable; the bytes are.
+- Unit-local view Obj6F514 (u16 at +0x32).
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.

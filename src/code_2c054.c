@@ -181,9 +181,9 @@ void TaskCoreObj__TaskCoreObj(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnk
     }
     self->unk44 = a2;
     self->methods->slotD4(self, 0, 0);
-    tmp = func_80044F30(0);
+    tmp = New_TileAtlas(0);
     self->unk80 = tmp;
-    tmp = func_80044CD4(0, tmp);
+    tmp = New_TileMap(0, tmp);
     self->unk7C = tmp;
     self->unk78 = New_BgLayer(tmp, 1);
     self->methods->slot40(self);

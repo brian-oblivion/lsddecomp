@@ -1,4 +1,8 @@
-# func_80044CD4 -- MATCHED (27/27 words)
+# New_TileMap -- MATCHED (27/27 words)
+
+> Renamed from `New_GridIndexSrc` on 2026-09-25 (tools/rename.py). Address 0x80044cd4.
+
+> Renamed from `func_80044CD4` on 2026-09-25 (tools/rename.py). Address 0x80044cd4.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,11 +23,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a D_8006F498 object. */
-void *func_80044CD4(s32 arg0, s32 arg1) {
+void *New_TileMap(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x44);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_80044F20())->ctor(obj, arg0, arg1);
+        ((Ctor33808 *)GetTileMapMethods())->ctor(obj, arg0, arg1);
         return obj;
     }
     return NULL;

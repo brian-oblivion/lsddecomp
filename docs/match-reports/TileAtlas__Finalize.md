@@ -1,4 +1,6 @@
-# func_8004500C -- MATCHED (21/21 words)
+# TileAtlas__Finalize -- MATCHED (21/21 words)
+
+> Renamed from `func_8004500C` on 2026-09-25 (tools/rename.py). Address 0x8004500c.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -20,7 +22,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 ```c
 /* D_8006F514 +0x00C: finalize -- free +0x34 and +0x2C, then the active
  * driver's. */
-void func_8004500C(DataSrc33808 *self) {
+void TileAtlas__Finalize(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk34);
     BMemPMgrFree((void *)self->unk2C);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);

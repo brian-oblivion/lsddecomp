@@ -57,8 +57,8 @@ void *GetTodMethods(void);
 void *GetBgLayerMethods(void);
 void *GetModelDataMethods(void);
 void *GetTriggerWorldMethods(void);
-void *func_80044F20(void);
-void *func_800451A8(void);
+void *GetTileMapMethods(void);
+void *GetTileAtlasMethods(void);
 void *func_80045428(void);
 
 /* The allocators below reach a class's constructor through its table
@@ -1110,11 +1110,11 @@ void *GetTriggerWorldMethods(void) {
     return D_8006F40C;
 }
 /* Allocate and construct a D_8006F498 object. */
-void *func_80044CD4(s32 arg0, s32 arg1) {
+void *New_TileMap(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x44);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_80044F20())->ctor(obj, arg0, arg1);
+        ((Ctor33808 *)GetTileMapMethods())->ctor(obj, arg0, arg1);
         return obj;
     }
     return NULL;
@@ -1137,11 +1137,11 @@ typedef struct Obj6F498 {
 /* D_8006F498 +0x008: constructor -- the active driver's, then this table;
  * store `arg2` at +0x3C, clear +0x42, and with no `arg1` set +0x40, clear
  * +0x2A and run its own +0x064. */
-void func_80044D40(Obj6F498 *self, s32 arg1, s32 arg2) {
+void TileMap__TileMap(Obj6F498 *self, s32 arg1, s32 arg2) {
     s32 unused[8];
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80044F20();
+    self->methods = GetTileMapMethods();
     self->unk3C = arg2;
     self->unk42 = 0;
     if (arg1 == 0) {
@@ -1151,13 +1151,13 @@ void func_80044D40(Obj6F498 *self, s32 arg1, s32 arg2) {
     }
 }
 /* D_8006F498 +0x00C: finalize -- free +0x38, then the active driver's. */
-void func_80044DC8(DataSrc33808 *self) {
+void TileMap__Finalize(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk38);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
 
-void func_80044E10(Obj6F498 *self) {
+void TileMap__Load(Obj6F498 *self) {
     if (self->unk2A == 0) {
         ((void (*)())self->methods->slot78)();
         self->unk42 = 1;
@@ -1167,7 +1167,7 @@ void func_80044E10(Obj6F498 *self) {
  * is set, lay out a 20 x 15 grid (16 x 16 cells) and fill an allocated
  * index table 0..n-1 at +0x38; otherwise, or when the allocation fails,
  * free the buffer (own +0x05C). */
-void func_80044E64(Obj6F498 *self) {
+void TileMap__BuildMap(Obj6F498 *self) {
     s32 n;
     s32 i;
     u16 *p;
@@ -1192,15 +1192,15 @@ void func_80044E64(Obj6F498 *self) {
 }
 extern s32 D_8006F498[];
 
-void *func_80044F20(void) {
+void *GetTileMapMethods(void) {
     return D_8006F498;
 }
 /* Allocate and construct a D_8006F514 object. */
-void *func_80044F30(s32 arg0) {
+void *New_TileAtlas(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_800451A8())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTileAtlasMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
@@ -1208,7 +1208,7 @@ void *func_80044F30(s32 arg0) {
 /* The D_8006F514 object. */
 typedef struct Obj6F514 {
     CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ struct Cell450B4 *cells;  /* 300 GsCELLs, built by func_800450B4 */
+    /* +0x02C */ struct Cell450B4 *cells;  /* 300 GsCELLs, built by TileAtlas__BuildCells */
     /* +0x030 */ u16 unk30;
     /* +0x032 */ u16 unk32;
     /* +0x034 */ s32 unk34;
@@ -1217,11 +1217,11 @@ typedef struct Obj6F514 {
 /* D_8006F514 +0x008: constructor -- the active driver's, then this table;
  * clear +0x34/+0x32, and with no `arg` set +0x30, clear +0x2A and run its
  * own +0x064. */
-void func_80044F90(Obj6F514 *self, s32 arg) {
+void TileAtlas__TileAtlas(Obj6F514 *self, s32 arg) {
     s32 unused[8];
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_800451A8();
+    self->methods = GetTileAtlasMethods();
     self->unk34 = 0;
     self->unk32 = 0;
     if (arg == 0) {
@@ -1232,14 +1232,14 @@ void func_80044F90(Obj6F514 *self, s32 arg) {
 }
 /* D_8006F514 +0x00C: finalize -- free +0x34 and +0x2C, then the active
  * driver's. */
-void func_8004500C(DataSrc33808 *self) {
+void TileAtlas__Finalize(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk34);
     BMemPMgrFree((void *)self->unk2C);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F514 +0x064: unless +0x2A is set, slot +0x078 and mark +0x32. */
 
-void func_80045060(Obj6F514 *self) {
+void TileAtlas__Load(Obj6F514 *self) {
     s32 unused[8];
 
     if (self->unk2A == 0) {
@@ -1262,7 +1262,7 @@ typedef struct Cell450B4 {       /* LIBGS.H GsCELL */
 /* LIBGPU.H */
 extern u16 GetTPage(int tp, int abr, int x, int y);
 
-void func_800450B4(Obj6F514 *self) {
+void TileAtlas__BuildCells(Obj6F514 *self) {
     Cell450B4 *c;
     s32 x = 0x280;
     s32 u;
@@ -1306,7 +1306,7 @@ void func_800450B4(Obj6F514 *self) {
 }
 extern s32 D_8006F514[];
 
-void *func_800451A8(void) {
+void *GetTileAtlasMethods(void) {
     return D_8006F514;
 }
 /* Allocate and construct a D_8006F590 object; freed and NULL when the constructor fails. */

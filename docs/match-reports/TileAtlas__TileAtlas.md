@@ -1,4 +1,6 @@
-# func_80044F90 -- MATCHED (31/31 words)
+# TileAtlas__TileAtlas -- MATCHED (31/31 words)
+
+> Renamed from `func_80044F90` on 2026-09-25 (tools/rename.py). Address 0x80044f90.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: active driver's ctor, install D_8006F514 (func_800451A8), clear +0x34 (word) and +0x32 (halfword); when `arg` is 0, set +0x30 = 1, clear +0x2A, and call its own +0x064 slot (func_80045060) with self.
+Constructor: active driver's ctor, install D_8006F514 (GetTileAtlasMethods), clear +0x34 (word) and +0x32 (halfword); when `arg` is 0, set +0x30 = 1, clear +0x2A, and call its own +0x064 slot (TileAtlas__Load) with self.
 
 Table slot (`tools/classtable.py`): D_8006F514 +0x008.
 
@@ -30,11 +32,11 @@ typedef struct Obj6F514 {
 /* D_8006F514 +0x008: constructor -- the active driver's, then this table;
  * clear +0x34/+0x32, and with no `arg` set +0x30, clear +0x2A and run its
  * own +0x064. */
-void func_80044F90(Obj6F514 *self, s32 arg) {
+void TileAtlas__TileAtlas(Obj6F514 *self, s32 arg) {
     s32 unused[8];
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_800451A8();
+    self->methods = GetTileAtlasMethods();
     self->unk34 = 0;
     self->unk32 = 0;
     if (arg == 0) {
@@ -47,4 +49,4 @@ void func_80044F90(Obj6F514 *self, s32 arg) {
 
 ## Notes
 
-First build. The 0x40 frame with nothing on the stack past ra/s0/s1 is the unused-local-array lever (`s32 unused[8];`, same as func_80045060 in this class). The unit-local `Obj6F514` moved up the file to precede this function and gained +0x30 (u16) and +0x34 (s32); func_80045060 still uses it unchanged (re-verified by the whole-image oracle).
+First build. The 0x40 frame with nothing on the stack past ra/s0/s1 is the unused-local-array lever (`s32 unused[8];`, same as TileAtlas__Load in this class). The unit-local `Obj6F514` moved up the file to precede this function and gained +0x30 (u16) and +0x34 (s32); TileAtlas__Load still uses it unchanged (re-verified by the whole-image oracle).

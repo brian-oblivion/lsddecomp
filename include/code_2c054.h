@@ -427,7 +427,7 @@ extern StreamTaskUnkB4Obj *func_80045438(StreamTaskInitData *a0, s32 a1, s32 a2)
 /* Four more externs reached only by TaskCoreObj__TaskCoreObj's own tail, none of them
  * in this unit. Types are the call sites' own register usage only.
  *
- * New_VabStreamObj/func_80044F30/func_80044CD4's return types were originally
+ * New_VabStreamObj/New_TileAtlas/New_TileMap's return types were originally
  * guessed `s32` (no counter-evidence at the time). TaskCoreObj__Destroy (round 2)
  * dereferences StreamTaskObj::unk48/unk7C/unk80 -- all three fed directly by
  * these calls -- as `methods->slot04(...)` objects, which is impossible for
@@ -436,8 +436,8 @@ extern StreamTaskUnkB4Obj *func_80045438(StreamTaskInitData *a0, s32 a1, s32 a2)
  * but corrects the semantics -- see TaskCoreObj__Destroy's report and
  * TaskCoreObj__TaskCoreObj's report addendum. */
 extern StreamTaskUnkB4Obj *New_VabStreamObj(s32 a0);
-extern StreamTaskUnkB4Obj *func_80044F30(s32 a0);
-extern StreamTaskUnkB4Obj *func_80044CD4(s32 a0, StreamTaskUnkB4Obj *a1);
+extern StreamTaskUnkB4Obj *New_TileAtlas(s32 a0);
+extern StreamTaskUnkB4Obj *New_TileMap(s32 a0, StreamTaskUnkB4Obj *a1);
 extern StreamTaskUnk78Obj *New_BgLayer(StreamTaskUnkB4Obj *a0, s32 a1); /* return type
                                         StreamTaskUnk78Obj* (feeds self->unk78, un-unified
                                         from StreamTaskUnkB4Obj this round -- see that

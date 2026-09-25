@@ -441,7 +441,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `$a0` already holds it. Declare the slot UNPROTOTYPED (`T (*slot)();`) in the local view so
   callers passing `self` stay legal C. **Neither form is a safe default**: the same situation matched
   as `slot(self)` in `func_80045C94` (the zero-argument form moved a constant out of the delay slot
-  and ran one word long) and as `slot()` in `func_80048BC0` and `func_80044E10`. Try the other
+  and ran one word long) and as `slot()` in `func_80048BC0` and `TileMap__Load`. Try the other
   first when one misses. (round 82, code_39094 and code_33808)
 - **The same forward trace applies to a DEAD PARAMETER's register, which 2.6.3 reuses as scratch.**
   A delay-slot `move $aN, $vM` is filler only once `$aN`'s next READ on every path is found; in

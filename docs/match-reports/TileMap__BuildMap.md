@@ -1,4 +1,8 @@
-# func_80044E64 -- MATCHED (47/47 words)
+# TileMap__BuildMap -- MATCHED (47/47 words)
+
+> Renamed from `GridIndexSrc__BuildIndex` on 2026-09-25 (tools/rename.py). Address 0x80044e64.
+
+> Renamed from `func_80044E64` on 2026-09-25 (tools/rename.py). Address 0x80044e64.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -9,7 +13,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Copies +0x2C of the object at +0x3C into +0x34. When +0x40 is set: +0x2E = 20, +0x2C = +0x2D = 16 (bytes), +0x30 = 15, then allocates +0x2E * +0x30 halfwords into +0x38 and fills them 0..n-1, returning. With +0x40 clear, or when the allocation fails, calls its own freeBuffer (+0x05C).
 
-Table slot (`tools/classtable.py`): D_8006F498 +0x078 (called by its setFlag override func_80044E10).
+Table slot (`tools/classtable.py`): D_8006F498 +0x078 (called by its setFlag override TileMap__Load).
 
 ## Source
 
@@ -37,7 +41,7 @@ typedef struct Obj6F498 {
  * is set, lay out a 20 x 15 grid (16 x 16 cells) and fill an allocated
  * index table 0..n-1 at +0x38; otherwise, or when the allocation fails,
  * free the buffer (own +0x05C). */
-void func_80044E64(Obj6F498 *self) {
+void TileMap__BuildMap(Obj6F498 *self) {
     s32 n;
     s32 i;
     u16 *p;
@@ -64,4 +68,4 @@ void func_80044E64(Obj6F498 *self) {
 
 ## Notes
 
-Matched on build 2. **Lever: `mult` by a register holding a constant the function just stored = multiply by the FIELD, not the literal.** `n = self->unk2E * 15` compiled to sll/subu (GCC expands a literal multiply to shifts) and 1 word short; `n = self->unk2E * self->unk30` right after `self->unk30 = 15` lets CSE substitute the stored constant into a register and keeps the real `mult`. The +0x2E operand is reloaded (`lhu` after its own `sh`) because the two byte stores in between invalidate it, while +0x30 was stored after them. Also: the 0x28 frame (8 bytes above the outgoing-args area) came for free -- an `s32 unused[2]` on top of it overshot to 0x30; do not pad it. The loop guard is `beqz` (not `blez`) with a signed `slt` in the body from a plain `for (i = 0; i < n; i++) *p++ = i;`. Unit-local `Obj6F498` gained +0x2C..+0x38 fields in place of its pad (additive; func_80044D40/func_80044E10 re-verified by the whole-image oracle).
+Matched on build 2. **Lever: `mult` by a register holding a constant the function just stored = multiply by the FIELD, not the literal.** `n = self->unk2E * 15` compiled to sll/subu (GCC expands a literal multiply to shifts) and 1 word short; `n = self->unk2E * self->unk30` right after `self->unk30 = 15` lets CSE substitute the stored constant into a register and keeps the real `mult`. The +0x2E operand is reloaded (`lhu` after its own `sh`) because the two byte stores in between invalidate it, while +0x30 was stored after them. Also: the 0x28 frame (8 bytes above the outgoing-args area) came for free -- an `s32 unused[2]` on top of it overshot to 0x30; do not pad it. The loop guard is `beqz` (not `blez`) with a signed `slt` in the body from a plain `for (i = 0; i < n; i++) *p++ = i;`. Unit-local `Obj6F498` gained +0x2C..+0x38 fields in place of its pad (additive; TileMap__TileMap/TileMap__Load re-verified by the whole-image oracle).

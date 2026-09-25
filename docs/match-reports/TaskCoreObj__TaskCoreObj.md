@@ -31,9 +31,9 @@ void TaskCoreObj__TaskCoreObj(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnk
     }
     self->unk44 = a2;
     self->methods->slotD4(self, 0, 0);
-    tmp = func_80044F30(0);
+    tmp = New_TileAtlas(0);
     self->unk80 = tmp;
-    tmp = func_80044CD4(0, tmp);
+    tmp = New_TileMap(0, tmp);
     self->unk7C = tmp;
     self->unk78 = New_BgLayer(tmp, 1);
     self->methods->slot40(self);
@@ -63,7 +63,7 @@ only the header's declared types.
   here from `New_BgLayer`'s return — confirms the pointer type again.
   **`StreamTaskUnk78Obj` itself was later folded into `StreamTaskUnkB4Obj`,
   see below.**
-- Four new plain externs (`New_VabStreamObj`, `func_80044F30`, `func_80044CD4`,
+- Four new plain externs (`New_VabStreamObj`, `New_TileAtlas`, `New_TileMap`,
   `New_BgLayer`), none in this unit; typed purely from this call site's own
   register usage. **Return types corrected, see below.**
 
@@ -75,8 +75,8 @@ function, never dereferenced. `TaskCoreObj__Destroy` (this unit's next queued
 function, address order 0x8003C008, right after this one) reads all three
 back and dereferences each as `field->methods->slot04(field)`, which is
 impossible for a plain integer. Retyped all three (and `TaskCoreObj__TaskCoreObj`'s own
-`a3` parameter and `tmp` local, and `New_VabStreamObj`/`func_80044F30`/
-`func_80044CD4`/`New_BgLayer`'s signatures) to `StreamTaskUnkB4Obj *` in
+`a3` parameter and `tmp` local, and `New_VabStreamObj`/`New_TileAtlas`/
+`New_TileMap`/`New_BgLayer`'s signatures) to `StreamTaskUnkB4Obj *` in
 `include/code_2c054.h`. Also, `StreamTaskUnk78Obj`/`StreamTaskUnk78Methods`
 (the type `unk78` used up to this point) is retired and folded into
 `StreamTaskUnkB4Obj` — see `TaskCoreObj__Destroy.md` for the five-way evidence.
@@ -104,7 +104,7 @@ fixed a 45-word-shifted build in one step — visible immediately in
 retail does not have.
 
 **Residue class not hit a second time:** the tail chain
-(`func_80044F30`→`func_80044CD4`→`New_BgLayer`, each result both stored to
+(`New_TileAtlas`→`New_TileMap`→`New_BgLayer`, each result both stored to
 a field and fed to the next call) was written with a `tmp` local from the
 start, informed directly by residue 1 — no second build cycle needed for it.
 

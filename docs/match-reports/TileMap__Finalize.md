@@ -1,4 +1,8 @@
-# func_80044DC8 -- MATCHED (18/18 words)
+# TileMap__Finalize -- MATCHED (18/18 words)
+
+> Renamed from `GridIndexSrc__Finalize` on 2026-09-25 (tools/rename.py). Address 0x80044dc8.
+
+> Renamed from `func_80044DC8` on 2026-09-25 (tools/rename.py). Address 0x80044dc8.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -20,7 +24,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
 /* D_8006F498 +0x00C: finalize -- free +0x38, then the active driver's. */
-void func_80044DC8(DataSrc33808 *self) {
+void TileMap__Finalize(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk38);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
