@@ -139,7 +139,17 @@ void func_800208B8(Class6C070 *self) {
 s32 func_800208D8(Class6C070 *self) {
     return GsGetActiveBuff();
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800208F8);
+void func_800208F8(Class6C070 *self, Class6C070Rect *src, u_long *pixels) {
+    RECT rect;
+
+    if (self->unk10 == 0 || self->unk2C != 0) {
+        func_80020970(&rect, src);
+        LoadImage(&rect, pixels);
+        if (self->unk2C != 0) {
+            DrawSync(0);
+        }
+    }
+}
 void func_80020970(RECT *dst, Class6C070Rect *src) {
     dst->x = src->x;
     dst->y = src->y;
