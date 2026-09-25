@@ -26,7 +26,7 @@ typedef struct Class6E99CObj Class6E99CObj;
  * `BasicClass *` and the accessors here cast to the view (`Unk48Obj`:
  * `sound`, a VabStreamObj; `Unk78Obj`: `bgLayer`; `Unk74Obj`: `subHandle`
  * and TaskCoreTarget's `handle`; `Unk64Elem`: the slot and item widgets,
- * New_Obj6EAC0; `Unk68Obj`: `listView`, New_BoxFill). `SlotEntry` and
+ * New_Obj6EAC0; `listView` is a BoxFill, include/BoxFill.h). `SlotEntry` and
  * `SrcDesc` are two readings of one TaskCoreTarget::unk24[] record.
  */
 typedef struct Unk48Obj Unk48Obj;
@@ -37,8 +37,6 @@ typedef struct Unk74Obj Unk74Obj;
 typedef struct Unk74ObjMethods Unk74ObjMethods;
 typedef struct Unk64Elem Unk64Elem;
 typedef struct Unk64ElemMethods Unk64ElemMethods;
-typedef struct Unk68Obj Unk68Obj;
-typedef struct Unk68ObjMethods Unk68ObjMethods;
 typedef struct SrcDesc SrcDesc;
 typedef struct HeaderObj HeaderObj;
 typedef struct EventArg EventArg;
@@ -270,37 +268,8 @@ struct Unk64Elem {
     Unk64ElemMethods *methods; /* +0x000 */
 };
 
-/*
- * self->unk68's pointee (round 12, from TaskCore__ReleaseTarget/TaskCore__CommitElementScroll/
- * TaskCore__RefreshSlotView). Built by `New_BoxFill(&D_8008A8E8, &D_8008A8F0, 0)` in
- * TaskCore__SetTarget -- New_BoxFill itself lives in the still-uncarved
- * code_2cc8c_d segment (not this unit's function to attempt), so it is
- * declared here only as an external returning this unit's own local view
- * of the type it constructs. D_8008A8E8/D_8008A8F0 are likewise only ever
- * address-taken here (never dereferenced by this unit), so they stay
- * minimally typed.
- */
-struct Unk68ObjMethods {
-    u8 pad000[0x004];
-    void (*slot4)(Unk68Obj *self);              /* +0x004, OBSERVED:
-                                                     TaskCore__ReleaseTarget */
-    u8 pad008[0x04C - 0x008];
-    void (*slot4C)(Unk68Obj *self, void *parent, void *pos); /* +0x04C, OBSERVED:
-                                                     TaskCore__RefreshSlotView, its only
-                                                     caller, passes THREE
-                                                     (round 75) */
-    void (*slot50)(Unk68Obj *self);               /* +0x050, OBSERVED:
-                                                     TaskCore__CommitElementScroll,
-                                                     TaskCore__RefreshSlotView */
-    u8 pad054[0x0C0 - 0x054];
-    void (*slotC0)(Unk68Obj *self, void *buf);     /* +0x0C0, OBSERVED:
-                                                     TaskCore__RefreshSlotView, address
-                                                     of a 2-word stack pair
-                                                     `{0x28, count*12}` */
-};
-struct Unk68Obj {
-    Unk68ObjMethods *methods; /* +0x000 */
-};
+/* listView (+0x068) is a BoxFill (include/BoxFill.h): the accessors cast
+ * TaskCore's `BasicClass *` to it. */
 
 /* New_BoxFill: include/BoxFill.h. */
 extern s32 D_8008A8E8[2];   /* address-taken only by this unit */

@@ -354,12 +354,13 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2)
     if (a2 != 0) {
         s32 buf[2];
 
-        ((Unk68Obj *)self->listView)->methods->slot4C((Unk68Obj *)self->listView, self->unk14, &pos);
+        ((BoxFillAttachToParentFn)((BoxFill *)self->listView)->methods->attachToParent)(
+            (BoxFill *)self->listView, (Class6B5CC *)self->unk14, (Pair32E99C *)&pos);
         buf[0] = 0x28;
         buf[1] = count * 12;
-        ((Unk68Obj *)self->listView)->methods->slotC0((Unk68Obj *)self->listView, buf);
+        ((BoxFill *)self->listView)->methods->setSize((BoxFill *)self->listView, buf);
     } else {
-        ((Unk68Obj *)self->listView)->methods->slot50((Unk68Obj *)self->listView);
+        ((BoxFill *)self->listView)->methods->detachFromParent((BoxFill *)self->listView);
     }
 
     arr = (Unk64Elem **)self->itemLists[idx];
@@ -441,7 +442,7 @@ void TaskCore__CommitElementScroll(TaskCore *self)
 
     ((SlotEntry *)self->target->unk24[idx])->savedCursor = counter;
 
-    ((Unk68Obj *)self->listView)->methods->slot50((Unk68Obj *)self->listView);
+    ((BoxFill *)self->listView)->methods->detachFromParent((BoxFill *)self->listView);
 
     self->inputMode = 1;
     self->methods->setState(self, 0x10);
