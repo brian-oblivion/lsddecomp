@@ -8,7 +8,7 @@
 ## What it does
 
 `Class65650Methods` slot `+0x0F8` (`slot_teardown5C`, called from the
-destructor `Class65650__Destructor`). The teardown mirror of `Class65650__SetupModelData`'s setup:
+destructor `Class65650__Finalize`). The teardown mirror of `Class65650__SetupModelData`'s setup:
 if `self->unk5C` is set, tears it down via `Class65650__ReleaseModelData(self)`; otherwise
 does nothing. Retail never explicitly sets `$v0` to a fixed value here (the
 reload of `self->unk5C` for the guard already leaves it at 0 on the

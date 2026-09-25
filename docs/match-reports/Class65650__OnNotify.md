@@ -39,7 +39,7 @@ declared. The whole function is a straightforward sequence: one `jal` to a
 fixed function, one indirect call through the resolved base-class slot, a
 three-part `&&` guard (tag check, `arg2` check, `self->unk60` check), and
 one more indirect call through `self->methods->slot04` gated by that
-guard. `self->methods->slot04` was already typed from `Class65650__OnClass6EF50Notify`'s
+guard. `self->methods->slot04` was already typed from `Class65650__Update`'s
 report, so no new speculation was needed there.
 
 ### Proposed learning

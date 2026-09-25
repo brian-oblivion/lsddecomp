@@ -1,4 +1,6 @@
-# Class65650__Destructor
+# Class65650__Finalize
+
+> Renamed from `Class65650__Destructor` on 2026-09-25 (tools/rename.py). Address 0x8006573c.
 
 > Renamed from `func_8006573C` on 2026-09-24 (tools/rename.py). Address 0x8006573c.
 
@@ -17,7 +19,7 @@ cleanup, then the base dtor through the base table's own slot" idiom from
 `docs/research/class-framework.md`.
 
 ```c
-void Class65650__Destructor(Class65650 *self)
+void Class65650__Finalize(Class65650 *self)
 {
     self->methods->slot_teardown5C(self);
     GetActorMethods()->dtor(self);
@@ -35,4 +37,8 @@ already record for this class.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__Destructor` (was `func_8006573C`), tier A. Occupies +0x00C (overrides Class6B5CC__Finalize): teardownModelData, then the base dtor. Named like Entity__Destructor, the subclass's own +0x00C.
+- `Class65650__Finalize` (was `func_8006573C`), tier A. Occupies +0x00C (overrides Class6B5CC__Finalize): teardownModelData, then the base dtor. Named like Entity__Destructor, the subclass's own +0x00C.
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+Renamed from `Class65650__Destructor`. Override of +0x00C, BasicClass's `finalize` (Actor's occupant is Class6B5CC__Finalize, `classtable.py gClass65650Methods --vs gActorMethods`), named for its slot: teardownModelData (+0x0F8), then the base finalize through GetActorMethods(). The body does nothing a finalize does not, so the slot name stands. The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass, Entity's base. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.

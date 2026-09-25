@@ -69,7 +69,7 @@ typedef struct Unk68Methods {
 typedef struct Unk68Obj {
     Unk68Methods *methods;   /* +0x00 */
     u8 pad04[0x1C];            /* +0x04 .. +0x1F, unknown */
-    s32 unk20;                  /* +0x20 Class6B5CC's +0x20 (what Class6B5CC__LinkModel stores); Class65650__InitDefaults links self to the same value */
+    s32 unk20;                  /* +0x20 Class6B5CC's +0x20 (what Class6B5CC__LinkModel stores); Class65650__Reset links self to the same value */
 } Unk68Obj;
 
 /* Each self->parts[i]: an Actor allocated by New_Actor, so these slots
@@ -189,11 +189,11 @@ typedef struct Class65650Methods {
     s32 header;                                                    /* +0x000 */
     void (*release)(Class65650 *self);                               /* +0x004 BasicClass__Release */
     Class65650 *(*ctor)(Class65650 *self, void *arg1, void *arg2);   /* +0x008 Class65650__Class65650 */
-    void (*dtor)(Class65650 *self);                                   /* +0x00C Class65650__Destructor */
+    void (*dtor)(Class65650 *self);                                   /* +0x00C Class65650__Finalize */
     void (*linkCompanion)(Class65650 *self, void *arg);                       /* +0x010 Actor__AddChild */
     void (*unlinkCompanion)(Class65650 *self, void *arg);                        /* +0x014 Actor__RemoveChild */
     u8 pad18[0x28];                                                      /* +0x018 .. +0x03F, not yet needed */
-    void (*initDefaults)(Class65650 *self);                                    /* +0x040 Class65650__InitDefaults */
+    void (*initDefaults)(Class65650 *self);                                    /* +0x040 Class65650__Reset */
     u8 pad44[0x80];                                                       /* +0x044 .. +0x0C3, not yet needed */
     void (*slotC4)(Class65650 *self, s32 arg1, s32 arg2);                  /* +0x0C4 Actor__MoveLocalZ; Class65650__TickCallbackA calls it with (-0x1E, 0) */
     u8 padC8[0x1C];                                                        /* +0x0C8 .. +0x0E3, not yet needed */
@@ -266,7 +266,7 @@ extern Class65650Methods *Get_vtable_Class65650(void);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
-/* Class6B5CC__LinkModel: include/Class6B5CC.h. Class65650__InitDefaults passes a Class65650 *, Class65650__ApplyTodPacket an Unk70ElemObj *; both upcast. */
+/* Class6B5CC__LinkModel: include/Class6B5CC.h. Class65650__Reset passes a Class65650 *, Class65650__ApplyTodPacket an Unk70ElemObj *; both upcast. */
 
 /* Same-unit helpers called by name ahead of their definitions. AcquireModelData
  * / ReleaseModelData are the bodies behind setupModelData/teardownModelData;

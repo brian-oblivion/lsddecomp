@@ -60,7 +60,7 @@ Class65650 *Class65650__Class65650(Class65650 *self, void *arg1, void *arg2)
     return self;
 }
 
-void Class65650__Destructor(Class65650 *self)
+void Class65650__Finalize(Class65650 *self)
 {
     self->methods->teardownModelData(self);
     GetActorMethods()->finalize((Actor *)self);
@@ -77,7 +77,7 @@ void Class65650__OnNotify(Class65650 *self, TagCheckArg *arg1, s32 arg2)
     }
 }
 
-void Class65650__InitDefaults(Class65650 *self)
+void Class65650__Reset(Class65650 *self)
 {
     ActorMethods *base;
 
@@ -143,7 +143,7 @@ void Class65650__SetLightMode(Class65650 *self, void *arg)
     GetActorMethods()->setLightMode((Actor *)self, (u32)arg);
 }
 
-void Class65650__OnClass6EF50Notify(Class65650 *self, void *arg1, s32 val)
+void Class65650__Update(Class65650 *self, void *arg1, s32 val)
 {
     if (val == 2) {
         self->methods->tick(self);

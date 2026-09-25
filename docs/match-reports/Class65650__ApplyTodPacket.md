@@ -158,7 +158,7 @@ if (*(u16 *)s0 != 0 && elem->unk20 == 0) {
 ```
 New field `Unk5CObj+0x2C` (`Unk2CObj *`, an unidentified class whose only
 known member is vtable slot `+0x080`). **Corrects `Class6B5CC__LinkModel`'s
-signature**: previously typed `(Class65650 *, s32)` from `Class65650__InitDefaults`'s
+signature**: previously typed `(Class65650 *, s32)` from `Class65650__Reset`'s
 usage; this call site passes `elem` (`Unk70ElemObj *`), so the first
 parameter is generically `void *` — a real, useful correction, not a
 guess (confirmed: this function's OWN types are solid, both call sites
