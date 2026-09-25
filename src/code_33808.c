@@ -138,7 +138,10 @@ void *func_80043E74(void) {
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043E84);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043EE4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043F78);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043FB0);
+/* D_8006F240 +0x078: slot +0x07C over the buffer past its first two words. */
+u8 func_80043FB0(DataSrc33808 *self, s32 arg1, s32 arg2) {
+    return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043FE4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004416C);
 extern s32 D_8006F240[];
