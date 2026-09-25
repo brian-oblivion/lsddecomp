@@ -1047,8 +1047,13 @@ gVoiceFadeInterval = 0x8008D9B4;
 gVoiceFadeCountdown = 0x8008D9B6;
 gVoiceFadeAccum = 0x8008D9B8;
 gVoiceFadeLimit = 0x8008D9BA;
-gVoiceActivityRingIdx = 0x8008DE68;
-gVoiceActivityRing = 0x8008DE6C;
+// identified: libsnd/vmanager.o (disc 3.5) bss: _svm_sreg_buf +0x000,
+// _svm_voice +0x198 (24 x 0x34), _svm_envx_ptr +0x678, _svm_envx_hist
+// +0x67C; anchored at 0x8008D7F0 both land exactly (3.3's 0x30 voice
+// stride does not). Superseded game-style names gVoiceActivityRingIdx /
+// gVoiceActivityRing. Round 86 (head, track 2).
+_svm_envx_ptr = 0x8008DE68;
+_svm_envx_hist = 0x8008DE6C;
 gMasterVolL = 0x8008E260;
 gMasterVolR = 0x8008E262;
 gDisableVoiceStarveScan = 0x8008EA40;

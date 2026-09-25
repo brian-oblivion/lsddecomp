@@ -774,9 +774,9 @@ s32 SpuVmPitchBend(s16 a0, s16 a1, s16 a2, u16 a3) {
  * Hand-derived. */
 
 /* Ring buffer of "channel activity" bitmasks, one slot appended per
- * call, most-recent index tracked by gVoiceActivityRingIdx (mod 16). */
-extern s32 gVoiceActivityRingIdx;
-extern s32 gVoiceActivityRing[];
+ * call, most-recent index tracked by _svm_envx_ptr (mod 16). */
+extern s32 _svm_envx_ptr;
+extern s32 _svm_envx_hist[];
 
 /* 0x34-stride record family, UNSIGNED 16-bit view -- this function
  * writes it via `lhu`-driven re-reads (store, then re-check the SAME
@@ -834,9 +834,9 @@ void SpuVmFlush(void) {
         dead[0] = 0;
     }
 
-    ringIdx = (gVoiceActivityRingIdx + 1) & 0xF;
-    gVoiceActivityRingIdx = ringIdx;
-    slot = &gVoiceActivityRing[ringIdx];
+    ringIdx = (_svm_envx_ptr + 1) & 0xF;
+    _svm_envx_ptr = ringIdx;
+    slot = &_svm_envx_hist[ringIdx];
     count = D_8008E9D0;
     *slot = 0;
 
@@ -860,7 +860,7 @@ void SpuVmFlush(void) {
 
         mask = -1;
         for (j = 0; j < 0xF; j++) {
-            mask &= gVoiceActivityRing[j];
+            mask &= _svm_envx_hist[j];
         }
 
         for (i = 0; i < D_8008E9D0; i++) {

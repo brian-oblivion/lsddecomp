@@ -62,8 +62,8 @@ overwriting it). Five phases, each independently verified against the
 disassembly instruction-by-instruction within the true `0x1ff00`-`0x202c4`
 window:
 
-1. **Ring-buffer bookkeeping.** `gVoiceActivityRingIdx` is a rotating index (`(x+1)
-   & 0xF`), stored back immediately; `gVoiceActivityRing[ringIdx]` (an `s32[16]`
+1. **Ring-buffer bookkeeping.** `_svm_envx_ptr` is a rotating index (`(x+1)
+   & 0xF`), stored back immediately; `_svm_envx_hist[ringIdx]` (an `s32[16]`
    array) is the new ring slot, zeroed.
 2. **Per-channel "ready" snapshot**, guarded by `D_8008E9D0 > 0`: for each
    channel `i`, copy `D_8006DAD4[i].unkC` (a NEW field on the already
@@ -77,7 +77,7 @@ window:
    #1, the single highest-value fix this round.
 3. **Starved-channel force-release**, guarded by `gDisableVoiceStarveScan == 0`: AND all
    FIFTEEN of the OTHER ring slots together (a plain `for (j=0;j<0xF;j++)
-   mask &= gVoiceActivityRing[j];` loop — note this reads only 15 of the 16 slots,
+   mask &= _svm_envx_hist[j];` loop — note this reads only 15 of the 16 slots,
    confirmed against the raw instruction count), then for each channel
    whose bit is set in that combined mask, force-release it
    (`func_800375E8(0, 0xFFFFFF)` if `D_8008D9A3[i] == 2`, then zero it
@@ -108,7 +108,7 @@ window:
 
 ## Struct/global knowledge derived this round
 
-- `gVoiceActivityRingIdx` (`s32`, ring index 0-15) and `gVoiceActivityRing[]` (`s32[16]`, ring
+- `_svm_envx_ptr` (`s32`, ring index 0-15) and `_svm_envx_hist[]` (`s32[16]`, ring
   buffer of per-call "channel ready" bitmasks).
 - `D_8008D98E[]`: needs an UNSIGNED 16-bit view (`Rec34HalfU2`, not the
   existing signed `Rec34Half`) — confirmed by the `lhu` re-read after the
@@ -434,9 +434,9 @@ length gap itself has closed.
  * 233/241,16/241). */
 
 /* Ring buffer of "channel activity" bitmasks, one slot appended per
- * call, most-recent index tracked by gVoiceActivityRingIdx (mod 16). */
-extern s32 gVoiceActivityRingIdx;
-extern s32 gVoiceActivityRing[];
+ * call, most-recent index tracked by _svm_envx_ptr (mod 16). */
+extern s32 _svm_envx_ptr;
+extern s32 _svm_envx_hist[];
 
 /* 0x34-stride record family, UNSIGNED 16-bit view -- this function
  * writes it via `lhu`-driven re-reads (store, then re-check the SAME
@@ -497,9 +497,9 @@ void SpuVmFlush(void) {
         dead[0] = 0;
     }
 
-    ringIdx = (gVoiceActivityRingIdx + 1) & 0xF;
-    gVoiceActivityRingIdx = ringIdx;
-    slot = &gVoiceActivityRing[ringIdx];
+    ringIdx = (_svm_envx_ptr + 1) & 0xF;
+    _svm_envx_ptr = ringIdx;
+    slot = &_svm_envx_hist[ringIdx];
     count = D_8008E9D0;
     *slot = 0;
 
@@ -523,7 +523,7 @@ void SpuVmFlush(void) {
 
         mask = -1;
         for (j = 0; j < 0xF; j++) {
-            mask &= gVoiceActivityRing[j];
+            mask &= _svm_envx_hist[j];
         }
 
         for (i = 0; i < D_8008E9D0; i++) {
@@ -604,9 +604,9 @@ void SpuVmFlush(void) {
 ```c
 #if 0
 /* Ring buffer of "channel activity" bitmasks, one slot appended per
- * call, most-recent index tracked by gVoiceActivityRingIdx (mod 16). */
-extern s32 gVoiceActivityRingIdx;
-extern s32 gVoiceActivityRing[];
+ * call, most-recent index tracked by _svm_envx_ptr (mod 16). */
+extern s32 _svm_envx_ptr;
+extern s32 _svm_envx_hist[];
 
 /* 0x34-stride record family, UNSIGNED 16-bit view -- this function
  * writes it via `lhu`-driven re-reads (store, then re-check the SAME
@@ -672,9 +672,9 @@ void SpuVmFlush(void) {
     s32 *slot;
     u8 count;
 
-    ringIdx = (gVoiceActivityRingIdx + 1) & 0xF;
-    gVoiceActivityRingIdx = ringIdx;
-    slot = &gVoiceActivityRing[ringIdx];
+    ringIdx = (_svm_envx_ptr + 1) & 0xF;
+    _svm_envx_ptr = ringIdx;
+    slot = &_svm_envx_hist[ringIdx];
     count = D_8008E9D0;
     *slot = 0;
 
@@ -698,7 +698,7 @@ void SpuVmFlush(void) {
 
         mask = -1;
         for (j = 0; j < 0xF; j++) {
-            mask &= gVoiceActivityRing[j];
+            mask &= _svm_envx_hist[j];
         }
 
         for (i = 0; i < D_8008E9D0; i++) {
@@ -785,8 +785,8 @@ track 2 names those functions and moves them out of tracks 1/1b/3.
 
 **SpuVmFlush** (was `func_8002F700`) -- Tier B. Body mostly
 evident (preserved below, 4 words short): appends this tick's voice-
-activity bitmask to a 16-slot ring buffer (`gVoiceActivityRingIdx`/
-`gVoiceActivityRing`), and once 16 consecutive ticks show a voice as
+activity bitmask to a 16-slot ring buffer (`_svm_envx_ptr`/
+`_svm_envx_hist`), and once 16 consecutive ticks show a voice as
 inactive, force-releases it (silencing the SPU noise generator first if
 its state was the `2`/noise value SpuVmNoiseOff also reacts to); then
 clears the active-voice mask and calls SetAutoVol/SetAutoPan
@@ -834,7 +834,7 @@ Placed in `src/code_179d8_m.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. Used the CURRENT best preserved body (round 48 echo,
 236/241 words, 5 short) rather than the older superseded 237/241 one kept
 at the end of this report for reference. All of its supporting
-declarations (the `gVoiceActivityRing*` pair, `Rec34HalfU2`,
+declarations (the `_svm_envx_hist*` pair, `Rec34HalfU2`,
 `Rec16D7F0Wide`, `Rec16DAD4C`, `SpuSetNoiseVoice`, the `SetAutoVol`/
 `SetAutoPan` externs, `D_8008D7F6`) are new to the unit and were kept
 local to this function's `#ifdef` block, per CLAUDE.md's rule against

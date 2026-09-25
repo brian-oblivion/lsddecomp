@@ -31,7 +31,7 @@ No arguments, no return value. It:
    `D_8008D98E[chan].unk0` to `0x7FFF` (priority-table reset, same 0x34
    -stride family `SpuVmAlloc` uses).
 3. Clears one bit (`1 << D_8008EA26`, read through the pointer from step 1)
-   across all 16 words of the `gVoiceActivityRing` array — a "clear this channel's
+   across all 16 words of the `_svm_envx_hist` array — a "clear this channel's
    bit everywhere" sweep.
 4. Picks one of two adjacent `u16` fields (`+0xC` or `+0xE`) of a
    0x10-stride table `D_8008E968`, indexed by
@@ -49,7 +49,7 @@ No arguments, no return value. It:
 ```c
 extern volatile s16 D_8008EA28;
 extern volatile s16 D_8008EA26;
-extern s32 gVoiceActivityRing[];
+extern s32 _svm_envx_hist[];
 extern u8 D_8008EA13;
 extern u8 D_8008EA18;
 
@@ -137,7 +137,7 @@ void SpuVmDoAllocate(void)
     p28 = &D_8008EA28;
     maskPtr = p28 - 1;
     chan = D_8008EA26;
-    p = gVoiceActivityRing;
+    p = _svm_envx_hist;
     *p28 = chan << 3;
     idx = D_8008EA18 + (D_8008EA13 << 4);
     D_8008EA2A = idx;
@@ -405,7 +405,7 @@ which remains the primary blocker.
 ```c
 extern volatile s16 D_8008EA28;
 extern volatile s16 D_8008EA26;
-extern s32 gVoiceActivityRing[];
+extern s32 _svm_envx_hist[];
 extern u8 D_8008EA13;
 extern u8 D_8008EA18;
 
@@ -467,7 +467,7 @@ void SpuVmDoAllocate(void)
     p28 = &D_8008EA28;
     maskPtr = p28 - 1;
     chan = D_8008EA26;
-    p = gVoiceActivityRing;
+    p = _svm_envx_hist;
     *p28 = chan << 3;
     idx = D_8008EA18 + (D_8008EA13 << 4);
     D_8008EA2A = idx;
