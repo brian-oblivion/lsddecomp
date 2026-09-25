@@ -60,7 +60,11 @@ FlatLightObj *func_8004291C(s32 lightId) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_3311c", func_8004297C);
+void func_8004297C(FlatLightObj *self, s32 lightId) {
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = func_80042A7C();
+    self->methods->setLightId(self, lightId);
+}
 void func_800429E0(FlatLightObj *self, s32 lightId) {
     self->lightId = lightId;
 }
