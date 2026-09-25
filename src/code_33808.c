@@ -666,6 +666,9 @@ void func_80043F78(Class6D430 *self) {
 u8 func_80043FB0(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
 }
+/* Defined below (ROM order); called directly here, not through slot +0x080. */
+u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3);
+
 /* D_8006F240/D_8006F590 +0x07C: walk the packet words after the u16 count
  * at data +2 (from data +8), each decoded by +0x080 into a value, a type, a
  * sub-type and a length in words. Type 8 sub-type 0 appends the value to
@@ -973,7 +976,8 @@ typedef struct Buf44858 {
     /* +0x08 */ s32 offset;
 } Buf44858;
 
-extern void *SetVec3();
+extern Req44858 *SetVec3(Req44858 *req, void *buffer, s32 unk4, s32 unk8);  /* code_171e0.c: stores its three words into *req, returns req */
+void *func_800451B8(s32 arg0);  /* defined below (ROM order) */
 
 s32 func_80044858(DataSrc33808 *self) {
     Req44858 req;
@@ -1947,6 +1951,8 @@ typedef struct Obj45CFC {
 /* LIBPRESS.H */
 extern void DecDCTin(u32 *buf, int mode);
 
+void func_80045E18(Obj45CFC *self);  /* defined below (ROM order) */
+
 s32 func_80045CFC(Obj45CFC *self) {
     Obj45CFC *cur = (Obj45CFC *)D_8008A940;
 
@@ -1975,13 +1981,9 @@ void func_80045DE0(void) {
         ((void (*)())D_8008A940->methods->slot60)(D_8008A940);
     }
 }
-/* Hang until +0x4C is nonzero (it is read once). */
-typedef struct Obj45E18 {
-    u8 pad0[0x4C];
-    s32 unk4C;
-} Obj45E18;
-
-void func_80045E18(Obj45E18 *self) {
+/* Hang until +0x4C is nonzero (it is read once). func_80045CFC's only call
+ * passes its D_8008A940 object, so the parameter is that Obj45CFC view. */
+void func_80045E18(Obj45CFC *self) {
     while (self->unk4C == 0) {
     }
 }

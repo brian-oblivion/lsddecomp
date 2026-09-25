@@ -251,9 +251,8 @@ Rec1C *PickDailyVariant(s32 index, s32 arg1, s32 day) {
 Rec1C *GetVariantBlock(s32 index) {
     return &GetRecordGroup(index)[4];
 }
-Rec1C *PickVariant(s32 index) {
-    s32 unused;
-    u32 r = (u32)SeedAndRandom(0, unused) % 5;
+Rec1C *PickVariant(s32 index, s32 arg1) {
+    u32 r = (u32)SeedAndRandom(0, arg1) % 5;  /* arg1 only forwarded, like PickDailyVariant's */
     Rec1C *rec;
     if (index == 9) {
         if (r == 2) {
@@ -287,9 +286,8 @@ Rec1C *GetWeeklyStreamPool(s32 *countOut) {
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x230];
 }
-Rec1C *PickWeeklyStreamChannel(s32 *countOut) {
-    s32 unused;
-    u32 r = (u32)SeedAndRandom(0, unused) % 7;
+Rec1C *PickWeeklyStreamChannel(s32 *countOut, s32 arg1) {
+    u32 r = (u32)SeedAndRandom(0, arg1) % 7;  /* arg1 only forwarded, like PickDailyVariant's */
     s32 count;
     Rec1C *rec = GetWeeklyStreamPool(&count);
     if (countOut != NULL) {

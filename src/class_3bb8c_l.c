@@ -59,7 +59,7 @@ void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2
 
 void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
-        GetGridRecordAt(self->unk38);
+        GetGridRecordAt(self->unk38, code);
     } else {
         GetGridRecordXY(self->unk38, arg2, arg3);
     }

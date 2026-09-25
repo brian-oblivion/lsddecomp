@@ -2518,16 +2518,14 @@ extern void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, 
  * reason as ObjM__OnRegistrantEvent above (ObjM__TransferToOther is defined later). */
 extern void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
 
-/* ObjM__OnRegistrantEvent's own two helpers -- still-uncarved ground
- * (asm/psyq_memset.s). GetGridRecordAt is genuinely called at two different
- * arities across the executable (GetGridRecordXY forwards to it with 2 real
- * arguments; ObjM__OnRegistrantEvent's own `code < 0` branch calls it with only 1,
- * the second register being whatever the caller's own incoming `code`
- * argument left behind -- a "leftover register", not a real second
- * argument), so it is declared K&R/unprototyped here, the documented
- * escape hatch for a genuinely multi-arity call (see
- * DECOMPILATION_LEARNINGS round 14). */
-extern s32 GetGridRecordAt();
+/* ObjM__OnRegistrantEvent's own two helpers -- MATCHED, src/code_39094.c.
+ * GetGridRecordAt(index, sub) reads both $a0 and $a1. ObjM__OnRegistrantEvent's
+ * `code >= 0` branch leaves its own incoming `code` in $a1 at the jal (no
+ * write to $a1 before it), so `code` IS the second argument: a non-negative
+ * code is a linear cell index, a negative one sends x/y to GetGridRecordXY.
+ * (Was declared K&R/unprototyped and called with one argument until round
+ * 82's externcheck pass; the forwarded form is byte-identical.) */
+extern s32 GetGridRecordAt(void *arg0, s32 sub);
 extern void GetGridRecordXY(void *arg0, s32 arg1, s32 arg2);
 
 /* ObjM__TickStyle's own helper -- MATCHED, src/class_3bb8c_n.c. Typed purely

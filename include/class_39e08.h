@@ -440,11 +440,10 @@ extern void TickDreamAuxSlots(void);
  * views; this unit keeps its own, per the project's established
  * multiple-independent-local-views policy). */
 
-/* Reads an unnamed small-data global's first field; return value is
- * forwarded, unread by its own body, as the sibling ctor's arg1 (which
- * that ctor stores directly into `Obj865C8::unk30`, an `s32`). Uncarved,
- * asm/psyq_memset.s. */
-extern s32 GetSoundEffectDir(s32 arg1);
+/* MATCHED, src/code_39094.c (`char *GetSoundEffectDir(void)`): returns the
+ * "SND\\SE" directory string pointer; forwarded as the sibling ctor's arg1
+ * (which that ctor stores directly into `Obj865C8::unk30`, an `s32`). */
+extern s32 GetSoundEffectDir(s32 arg1); /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
 
 /* Matched in code_4cd08.c (still called `InitDreamAux` there, STALLED at
  * 40/56 -- see docs/match-reports/InitDreamAux.md). Takes no arguments,

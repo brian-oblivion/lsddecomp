@@ -307,8 +307,9 @@ extern PollTask *New_GraphRoomObj(void *dreamSys);
 extern PollTask *New_Class86B60(void *dreamSys);
 
 extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
-extern s32 GetStreamChannelInit(s32 *out, s32 unused); /* psyq_memset.s: same "write to *out, return a
-    separate value" shape as GetIntroStreamName/PickWeeklyStreamChannel/GetGraphRoomStreamChannel */
+/* code_39094.c: same "write to *out, return a separate value" shape as
+ * GetIntroStreamName/PickWeeklyStreamChannel/GetGraphRoomStreamChannel. */
+extern s32 GetStreamChannelInit(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
 extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
     {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
     to *out (-1 if unresolved); the packing must zero-extend both halves before combining

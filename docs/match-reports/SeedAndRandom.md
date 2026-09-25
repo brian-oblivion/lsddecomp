@@ -17,7 +17,7 @@ Seeds the Sony RNG when the argument is nonzero, then returns `rand()`. code_167
 extern int rand(void);
 extern void srand(unsigned int seed);
 
-s32 SeedAndRandom(s32 seed) {
+s32 SeedAndRandom(s32 seed, s32 unused) {
     if (seed != 0) {
         srand(seed);
     }
@@ -34,6 +34,19 @@ s32 SeedAndRandom(s32 seed) {
 - Callers in other units still declare their own prototypes (`s32` returns in
   class_39e08.h / class_3bb8c.h); those are independent declarations and were
   not touched.
+
+## The second parameter (round 82, alpha, track 3 externcheck)
+
+The source block above had drifted from `src/code_39094.c`, which has
+always compiled the 2-parameter form. The second parameter is dead in the
+body (`$a1` is never read), but it is real at every call: two callers load
+it explicitly (Class6D3C8__SetDayFromTickCount: `move a1,zero` at
+0x800260F4; PickWeeklyGroup: `move a1,a0` at 0x80048D78), and the other
+three (PickDailyVariant, PickVariant, PickWeeklyStreamChannel) forward their
+own incoming second parameter. PickVariant and PickWeeklyStreamChannel used
+to pass an uninitialised local instead; round 82 gave each the parameter it
+forwards (byte-identical, two cc1 warnings gone). So the dead parameter
+stays: dropping it would make both explicit callers' loads unexplainable.
 
 ## Naming
 
