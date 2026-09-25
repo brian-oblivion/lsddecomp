@@ -12,6 +12,28 @@
 #include "common.h"
 #include "Class6D430.h"
 
+/* The D_80081940 object: a Class6D430 data source with its own fields from
+ * +0x2C (local view; only this unit's methods read them). */
+typedef struct D_80081940Obj {
+    CLASS6D430_FIELDS(Class6D430Methods);
+    /* +0x02C */ u16 unk2C;
+    /* +0x02E */ u16 unk2E;
+    /* +0x030 */ u8 pad30[4];
+    /* +0x034 */ void *unk34;   /* BMemPMgr allocation, released by slot +0x084 */
+    /* +0x038 */ s32 unk38;
+} D_80081940Obj;
+
+/* One 0x1C-byte record of the table func_80048D48 returns (D_80081A04,
+ * 0x230 records); only its size is known here. */
+typedef struct Rec1C {
+    u8 data[0x1C];
+} Rec1C;
+
+extern int rand(void);
+extern void srand(unsigned int seed);
+extern void *BMemPMgrFree(void *ptr);
+extern Class6D430Methods *GetActiveDataSourceMethods(void);
+
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048894);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800488E4);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048960);
@@ -21,14 +43,6 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048AAC);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048B78);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048BC0);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048C98);
-/* The D_80081940 object: a Class6D430 data source with its own fields from
- * +0x2C (local view; only this unit's methods read them). */
-typedef struct D_80081940Obj {
-    CLASS6D430_FIELDS(Class6D430Methods);
-    /* +0x02C */ u8 pad2C[0xC];
-    /* +0x038 */ s32 unk38;
-} D_80081940Obj;
-
 extern u8 D_80081940[];   /* method table, 34 slots */
 extern s32 D_8008A960;
 extern s32 D_8008A964;
@@ -71,11 +85,13 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048D74);
 char **func_80048DF8(void) {
     return &D_8008A96C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048E08);
+char *func_80048E08(void) {
+    return *func_80048DF8();
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048E2C);
-void *func_80048E2C(s32 index);
+Rec1C *func_80048E2C(s32 index);
 
-void *func_80048E80(s32 index) {
+Rec1C *func_80048E80(s32 index) {
     return func_80048E2C(index);
 }
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048EA0);
