@@ -1,4 +1,6 @@
-# func_8003B02C
+# Class6E4F0__SetScreenDims
+
+> Renamed from `func_8003B02C` on 2026-09-25 (tools/rename.py). Address 0x8003b02c.
 
 **Round 81 (delta)** · **Unit:** code_2b78c · **Size:** 6 words · **Status:** MATCHED (6/6 words, whole-image SHA1 green)
 
@@ -13,7 +15,7 @@ as `setDims(self, &D_8008A8E0, 0)`, and D_8008A8E0 in sdata is
 ```c
 typedef struct ScreenDims { s32 w; s32 h; } ScreenDims;
 
-void func_8003B02C(Class6E4F0 *self, ScreenDims *dims, s32 arg) {
+void Class6E4F0__SetScreenDims(Class6E4F0 *self, ScreenDims *dims, s32 arg) {
     self->dims = *dims;
     self->dimsArg = arg;
 }
