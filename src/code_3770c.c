@@ -117,7 +117,14 @@ s32 func_80047240(CdStreamObj *self) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_8004728C);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800472EC);
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047388);
+void func_80047388(u8 status, u8 *result) {
+    if (D_8008A950 != NULL && status == 2) {
+        CdSyncCallback(NULL);
+        if (D_8008A950->cb54 != NULL) {
+            D_8008A950->cb54(D_8008A950->cbArg);
+        }
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800473E4);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800474C8);
 void func_80047574(CdStreamObj *self) {
