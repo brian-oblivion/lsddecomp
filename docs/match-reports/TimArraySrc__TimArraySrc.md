@@ -1,4 +1,6 @@
-# func_80043BE8 -- MATCHED (30/30 words)
+# TimArraySrc__TimArraySrc -- MATCHED (30/30 words)
+
+> Renamed from `func_80043BE8` on 2026-09-25 (tools/rename.py). Address 0x80043be8.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: runs the active data-source driver's ctor (GetActiveDataSourceMethods()->ctor), installs D_8006F1C4 (func_80043E74), zeroes +0x2C/+0x30/+0x38, and when `name` is non-NULL calls its own requestLoadFile (+0x06C) with it. Returns nothing (v0 is left as the last jalr's).
+Constructor: runs the active data-source driver's ctor (GetActiveDataSourceMethods()->ctor), installs D_8006F1C4 (GetTimArraySrcMethods), zeroes +0x2C/+0x30/+0x38, and when `name` is non-NULL calls its own requestLoadFile (+0x06C) with it. Returns nothing (v0 is left as the last jalr's).
 
 Table slot (`tools/classtable.py`): D_8006F1C4 +0x008.
 
@@ -21,9 +23,9 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 ```c
 /* D_8006F1C4 +0x008: constructor -- the active driver's, then this table,
  * clear +0x2C/+0x30/+0x38, and request `name` when there is one. */
-void func_80043BE8(DataSrc33808 *self, char *name) {
+void TimArraySrc__TimArraySrc(DataSrc33808 *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80043E74();
+    self->methods = GetTimArraySrcMethods();
     self->unk2C = 0;
     self->unk30 = NULL;
     self->unk38 = 0;

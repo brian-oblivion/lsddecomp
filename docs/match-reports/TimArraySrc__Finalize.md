@@ -1,4 +1,6 @@
-# func_80043C60 -- MATCHED (22/22 words)
+# TimArraySrc__Finalize -- MATCHED (22/22 words)
+
+> Renamed from `func_80043C60` on 2026-09-25 (tools/rename.py). Address 0x80043c60.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,7 +21,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
-void func_80043C60(DataSrc33808 *self) {
+void TimArraySrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
     BMemPMgrFree(self->unk30);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);

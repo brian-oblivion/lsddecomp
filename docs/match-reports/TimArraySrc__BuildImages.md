@@ -1,4 +1,6 @@
-# func_80043CB8 -- MATCHED (81/81 words)
+# TimArraySrc__BuildImages -- MATCHED (81/81 words)
+
+> Renamed from `func_80043CB8` on 2026-09-25 (tools/rename.py). Address 0x80043cb8.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -65,7 +67,7 @@ typedef struct Obj43CB8 {
 extern Tim43CB8 *func_8003B39C(char *name);
 extern s16 D_8008A934;
 
-void func_80043CB8(Obj43CB8 *self) {
+void TimArraySrc__BuildImages(Obj43CB8 *self) {
     Image43CB8 info;
     Tim43CB8 **objs;
     s32 i;

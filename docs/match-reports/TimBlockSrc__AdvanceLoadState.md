@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-The D_8006F0B8 loader's state machine, run under Lock/UnlockActiveDataSource and only once the read has completed (flags bit 0x80). State 9 (header sector read by the ctor TimBlockSrc__TimBlockSrc): copy the 0x24-byte header -- a u32 block count and eight u32 file offsets -- from the sector buffer (+0x34) into the 0x24-byte buffer, free the sector buffer, take the largest offset (MaxOfBufferWords) as the new sector-buffer size, allocate the object array (+0x30, count words) and the sector buffer (+0x34, size at +0x38), seek (own +0x04C) to offset[0] and read (own +0x054) one block: state 10. State 10: wrap the block in a new D_8006F1C4 source (func_80043B88(NULL)), buffer = the sector buffer, size 0, its +0x34 = &self->entries (+0x40, the CLUT base func_80043CB8 adds to), run its setFlag (func_80043CB8, which builds the TimImages) and +0x078; count it at +0x2C, then seek/read the next block (state 10 again) or, after the last, free the sector buffer, clear +0x34/+0x38/+0x2A, set +0x3C and call the active driver's setFlag. Either allocation failing sets +0x80.
+The D_8006F0B8 loader's state machine, run under Lock/UnlockActiveDataSource and only once the read has completed (flags bit 0x80). State 9 (header sector read by the ctor TimBlockSrc__TimBlockSrc): copy the 0x24-byte header -- a u32 block count and eight u32 file offsets -- from the sector buffer (+0x34) into the 0x24-byte buffer, free the sector buffer, take the largest offset (MaxOfBufferWords) as the new sector-buffer size, allocate the object array (+0x30, count words) and the sector buffer (+0x34, size at +0x38), seek (own +0x04C) to offset[0] and read (own +0x054) one block: state 10. State 10: wrap the block in a new D_8006F1C4 source (New_TimArraySrc(NULL)), buffer = the sector buffer, size 0, its +0x34 = &self->entries (+0x40, the CLUT base TimArraySrc__BuildImages adds to), run its setFlag (TimArraySrc__BuildImages, which builds the TimImages) and +0x078; count it at +0x2C, then seek/read the next block (state 10 again) or, after the last, free the sector buffer, clear +0x34/+0x38/+0x2A, set +0x3C and call the active driver's setFlag. Either allocation failing sets +0x80.
 
 Table slot (`tools/classtable.py`): D_8006F0B8 +0x064 (setFlag override).
 
@@ -38,7 +38,7 @@ typedef struct Hdr43200 {
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
 u32 MaxOfBufferWords(Class6D430 *self);
-void *func_80043B88(s32 arg0);
+void *New_TimArraySrc(s32 arg0);
 
 void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
     DataSrc33808 **p;
@@ -70,7 +70,7 @@ void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
             if (self->flags & 0x80) {
                 n = self->unk2C;
                 p = (DataSrc33808 **)self->unk30 + n;
-                *p = func_80043B88(0);
+                *p = New_TimArraySrc(0);
                 (*p)->buffer = self->sector;
                 (*p)->bufferSize = 0;
                 (*p)->unk34 = (s32)self->entries;

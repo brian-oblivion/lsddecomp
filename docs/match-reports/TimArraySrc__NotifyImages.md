@@ -1,4 +1,6 @@
-# func_80043DFC -- MATCHED (30/30 words)
+# TimArraySrc__NotifyImages -- MATCHED (30/30 words)
+
+> Renamed from `func_80043DFC` on 2026-09-25 (tools/rename.py). Address 0x80043dfc.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -21,7 +23,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 ```c
 /* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
  * (+0x2C entries). */
-void func_80043DFC(DataSrc33808 *self) {
+void TimArraySrc__NotifyImages(DataSrc33808 *self) {
     DataSrc33808 **objs = (DataSrc33808 **)self->unk30;
     s32 i;
 

@@ -52,7 +52,7 @@ extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
 void *GetTimBlockSrcMethods(void);
 void *GetLinkResourceMethods(void);
-void *func_80043E74(void);
+void *GetTimArraySrcMethods(void);
 void *func_800441A4(void);
 void *func_8004467C(void);
 void *func_800449FC(void);
@@ -172,7 +172,7 @@ typedef struct Hdr43200 {
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
 u32 MaxOfBufferWords(Class6D430 *self);
-void *func_80043B88(s32 arg0);
+void *New_TimArraySrc(s32 arg0);
 
 void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
     DataSrc33808 **p;
@@ -204,7 +204,7 @@ void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
             if (self->flags & 0x80) {
                 n = self->unk2C;
                 p = (DataSrc33808 **)self->unk30 + n;
-                *p = func_80043B88(0);
+                *p = New_TimArraySrc(0);
                 (*p)->buffer = self->sector;
                 (*p)->bufferSize = 0;
                 (*p)->unk34 = (s32)self->entries;
@@ -519,20 +519,20 @@ void *GetLinkResourceMethods(void) {
     return D_8006F13C;
 }
 /* Allocate and construct a D_8006F1C4 object. */
-void *func_80043B88(s32 arg0) {
+void *New_TimArraySrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x3C);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_80043E74())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTimArraySrcMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
 }
 /* D_8006F1C4 +0x008: constructor -- the active driver's, then this table,
  * clear +0x2C/+0x30/+0x38, and request `name` when there is one. */
-void func_80043BE8(DataSrc33808 *self, char *name) {
+void TimArraySrc__TimArraySrc(DataSrc33808 *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80043E74();
+    self->methods = GetTimArraySrcMethods();
     self->unk2C = 0;
     self->unk30 = NULL;
     self->unk38 = 0;
@@ -541,7 +541,7 @@ void func_80043BE8(DataSrc33808 *self, char *name) {
     }
 }
 /* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
-void func_80043C60(DataSrc33808 *self) {
+void TimArraySrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
     BMemPMgrFree(self->unk30);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
@@ -592,7 +592,7 @@ typedef struct Obj43CB8 {
 extern Tim43CB8 *func_8003B39C(char *name);
 extern s16 D_8008A934;
 
-void func_80043CB8(Obj43CB8 *self) {
+void TimArraySrc__BuildImages(Obj43CB8 *self) {
     Image43CB8 info;
     Tim43CB8 **objs;
     s32 i;
@@ -620,7 +620,7 @@ void func_80043CB8(Obj43CB8 *self) {
 }
 /* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
  * (+0x2C entries). */
-void func_80043DFC(DataSrc33808 *self) {
+void TimArraySrc__NotifyImages(DataSrc33808 *self) {
     DataSrc33808 **objs = (DataSrc33808 **)self->unk30;
     s32 i;
 
@@ -631,7 +631,7 @@ void func_80043DFC(DataSrc33808 *self) {
 }
 extern s32 D_8006F1C4[];
 
-void *func_80043E74(void) {
+void *GetTimArraySrcMethods(void) {
     return D_8006F1C4;
 }
 /* Allocate and construct a D_8006F240 object. */
