@@ -1,4 +1,6 @@
-# func_80057DF4 -- MATCHED (81/81)
+# D800879C4__UpdateScale -- MATCHED (81/81)
+
+> Renamed from `func_80057DF4` on 2026-09-25 (tools/rename.py). Address 0x80057df4.
 
 Round 47 (runner charlie). Unit: `src/class_3bb8c_q.c`, a BRAND NEW carve
 (this unit did not exist before round 47). Class: table `D_800879C4` (49
@@ -14,7 +16,7 @@ function blocker-clean.
 ## Signature
 
 ```c
-void func_80057DF4(D_800879C4Obj_q *self, s32 arg1, s16 *pair);
+void D800879C4__UpdateScale(D_800879C4Obj_q *self, s32 arg1, s16 *pair);
 ```
 
 `arg1` ($a1) is read by NOTHING in the whole function body -- retail
@@ -31,7 +33,7 @@ not a shared type").
 ## Body
 
 ```c
-void func_80057DF4(D_800879C4Obj_q *self, s32 arg1, s16 *pair) {
+void D800879C4__UpdateScale(D_800879C4Obj_q *self, s32 arg1, s16 *pair) {
     s32 q1, r1, q2, ratio1;
     s32 q3, r3, q4, ratio2;
     s16 short1, short2;

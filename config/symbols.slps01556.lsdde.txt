@@ -2428,3 +2428,4 @@ Obj86B60__func_8003CCDC = 0x8003CCDC; // type:func
 // shape SpuVmSetVol (0.51, 3.5). No disc carries this build.
 SpuVmSetVol = 0x80030980; // type:func
 D800879C4__SetVariantClut = 0x80057DBC; // type:func
+D800879C4__UpdateScale = 0x80057DF4; // type:func

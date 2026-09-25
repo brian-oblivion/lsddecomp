@@ -78,7 +78,7 @@ without any extra hoisting). Values, read at the real stride:
 ## Verification
 
 `./build-and-verify.sh` -- whole-image SHA1 matches retail. Committed
-alongside `func_80057DF4` (same unit, same commit, ROM-address order
+alongside `D800879C4__UpdateScale` (same unit, same commit, ROM-address order
 preserved).
 
 ### Proposed learning

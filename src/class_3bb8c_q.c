@@ -4,7 +4,7 @@
  *
  * THE CARVE NOTE THAT STOOD HERE FOR 26 ROUNDS WAS STALE AND SAID "nothing to
  * staff here": D800879C4__SetVariantClut was filed as addiu-$at blocked (resolved round
- * 21) and func_80057DF4 as nop_mflo_mfhi blocked (resolved round 42).
+ * 21) and D800879C4__UpdateScale as nop_mflo_mfhi blocked (resolved round 42).
  * `tools/uncarved.py` measures both blocker-clean.  Both are frameless leaves
  * (zero `addiu $sp, $sp, -N`), so neither is expected to have a stack frame.
  *
@@ -16,7 +16,7 @@
 
 /*
  * Table D_800879C4 (49 slots, resolved with `tools/classtable.py
- * 0x800879C4`): D800879C4__SetVariantClut is slot40, func_80057DF4 is slot48.  The
+ * 0x800879C4`): D800879C4__SetVariantClut is slot40, D800879C4__UpdateScale is slot48.  The
  * neighbouring class_3bb8c_p unit already carries its OWN local view of
  * this same table/object (`D_800879C4Methods`/`D_800879C4Obj` in that
  * file, only exposing the ctor slot and `+0xA4`) -- per the project's
@@ -28,15 +28,15 @@
 typedef struct D_800879C4Obj_q D_800879C4Obj_q;
 struct D_800879C4Obj_q {
     u8 pad00[0x58];
-    s32 unk58;                  /* +0x058, func_80057DF4: non-zero selects the scale-in-place path */
-    s32 unk5C;                  /* +0x05C, func_80057DF4: scaled in place by the first ratio when unk58 != 0 */
-    s32 unk60;                  /* +0x060, func_80057DF4: scaled in place by the second ratio when unk58 != 0 */
+    s32 unk58;                  /* +0x058, D800879C4__UpdateScale: non-zero selects the scale-in-place path */
+    s32 unk5C;                  /* +0x05C, D800879C4__UpdateScale: scaled in place by the first ratio when unk58 != 0 */
+    s32 unk60;                  /* +0x060, D800879C4__UpdateScale: scaled in place by the second ratio when unk58 != 0 */
     u8 pad64[0x74 - 0x64];
     s16 unk74;                  /* +0x074, D800879C4__SetVariantClut: D_80087AA4[arg1] */
     s16 unk76;                  /* +0x076, D800879C4__SetVariantClut: D_80087AA6[arg1] */
     u8 pad78[0x80 - 0x78];
-    s16 unk80;                  /* +0x080, func_80057DF4: raw first ratio (truncated) when unk58 == 0 */
-    s16 unk82;                  /* +0x082, func_80057DF4: raw second ratio (truncated) when unk58 == 0 */
+    s16 unk80;                  /* +0x080, D800879C4__UpdateScale: raw first ratio (truncated) when unk58 == 0 */
+    s16 unk82;                  /* +0x082, D800879C4__UpdateScale: raw second ratio (truncated) when unk58 == 0 */
     u8 pad84[0xA0 - 0x84];
     s32 unkA0;                  /* +0x0A0, D800879C4__SetVariantClut: the raw index argument, stored verbatim */
 };
@@ -72,7 +72,7 @@ void D800879C4__SetVariantClut(D_800879C4Obj_q *self, s32 arg1) {
  * never touches it after entry) -- kept as an unused parameter to match
  * the real arity.
  */
-void func_80057DF4(D_800879C4Obj_q *self, s32 arg1, s16 *pair) {
+void D800879C4__UpdateScale(D_800879C4Obj_q *self, s32 arg1, s16 *pair) {
     s32 q1, r1, q2, ratio1;
     s32 q3, r3, q4, ratio2;
     s16 short1, short2;
