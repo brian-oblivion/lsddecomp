@@ -784,6 +784,7 @@
         "code_2cc8c_e1": "2026-09-24",
         "code_2cc8c_f": "2026-09-18",
         "code_3311c": "2026-09-25",
+        "code_3770c": "2026-09-25",
         "code_4cd08": "2026-09-21",
         "code_55dd4": "2026-09-24",
         "code_8220": "2026-09-24",
@@ -821,6 +822,11 @@
           "class": "Pad",
           "date": "2026-09-25",
           "header": "include/Pad.h"
+        },
+        "gSpriteMethods": {
+          "class": "Sprite",
+          "date": "2026-09-25",
+          "header": "include/Sprite.h"
         }
       },
       "reason": "",
