@@ -1,4 +1,6 @@
-# func_80012064 -- MATCHED (round 81, alpha)
+# Unk18Obj__DrawNode -- MATCHED (round 81, alpha)
+
+> Renamed from `func_80012064` on 2026-09-25 (tools/rename.py). Address 0x80012064.
 
 Unit `src/code_2864.c` (the unit's only function, 449 words, 0x80012064..0x80012768).
 Byte-exact, whole-image SHA1 green (`./build-and-verify.sh`: OK), `tools/check-nonmatching.sh` green.
@@ -61,9 +63,11 @@ Six builds; no permuter search was spent.
 
 ## Naming
 
-Left as `func_80012064` (naming is a separate pass). Proposed: `Unk18Obj__DrawNode`
-(tier B: slot occupant of Unk18Obj's table, behaviour read from the body; the class itself is
-still a placeholder name).
+Renamed `func_80012064` -> `Unk18Obj__DrawNode` (round 81, charlie), tier B: confirmed as slot
++0x0A0 of Unk18Obj's method table (`tools/classtable.py D_8006E8E4`, inherited by
+`gClass869D8Methods`), behaviour (draws one scene node and its 0x4-nibble children into the
+current OT) read from the body. `Unk18Obj` itself is still a placeholder class name -- the
+prefix is inherited, not re-derived here -- so the method name is tier B rather than A.
 
 ### Proposed learning
 
