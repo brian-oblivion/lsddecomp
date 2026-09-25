@@ -1,4 +1,6 @@
-# func_80020050 -- MATCHED (288/288 words), round 82
+# TmdModel__NextPrimitive -- MATCHED (288/288 words), round 82
+
+> Renamed from `func_80020050` on 2026-09-25 (tools/rename.py). Address 0x80020050.
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
@@ -26,7 +28,7 @@ typedef struct Rec28_fa50 {
 } Rec28_fa50;
 /* Class6BEA0: +0x010 Rec28_fa50 *unk10 (see New_TmdModel.md) */
 
-TmdPrim_fa50 *func_80020050(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
+TmdPrim_fa50 *TmdModel__NextPrimitive(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
     s32 idx[4];
     Rec28_fa50 *rec = self->unk10;
     SVec_fa50 *verts;

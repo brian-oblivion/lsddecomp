@@ -133,7 +133,7 @@ extern void GsMapModelingData(unsigned long *p);
 extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
 extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
 extern s32 SquareRoot0(s32 a);
-TmdPrim_fa50 *func_80020050(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count);
+TmdPrim_fa50 *TmdModel__NextPrimitive(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count);
 extern s32 gTmdModelConstructed;
 extern s32 gTmdModelBoundsBuf[];
 extern s32 D_8006BEA0[];
@@ -308,7 +308,7 @@ s32 func_8001F8B8(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, V
     ray.dir.y = end->y - origin->y;
     ray.dir.z = end->z - origin->z;
     found = 0;
-    while ((p = func_80020050(self, p, &nverts, tri, &count)) != NULL) {
+    while ((p = TmdModel__NextPrimitive(self, p, &nverts, tri, &count)) != NULL) {
         Vec4_fa50 v60;
         SVec_fa50 e1;
         SVec_fa50 e2;
@@ -446,7 +446,7 @@ s32 func_8001F8B8(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, V
     }
     return found;
 }
-TmdPrim_fa50 *func_80020050(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
+TmdPrim_fa50 *TmdModel__NextPrimitive(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
     s32 idx[4];
     Rec28_fa50 *rec = self->unk10;
     SVec_fa50 *verts;
