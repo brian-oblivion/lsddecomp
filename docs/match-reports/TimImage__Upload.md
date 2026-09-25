@@ -5,7 +5,7 @@
 Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 Three builds.
 
-- **Where:** gTimImageMethods slot +0x078 (`tools/classtable.py gTimImageMethods`).
+- **Where:** TimImage's table (`gTimImageMethods`) slot +0x078 (`tools/classtable.py D_8006E558`).
 - **What:** fetches the draw singleton (`func_80020C5C()`), and when the
   buffer is loaded has slot +0x09C describe the TIM into `self->tim`
   (+0x02C, a full `GsIMAGE`), then passes `{px, py, pw, ph}` and the pixel
@@ -22,8 +22,8 @@ Three builds.
   `return` changed nothing; retyping `func_80020C5C` as `void *` changed
   nothing.
 - **Result:** byte-exact, whole-image SHA1 green.
-- **Name:** kept `func_`. Looks like "upload TIM to VRAM", but the singleton's
-  slot +0x058 is not confirmed as LoadImage, so no name is claimed.
+- **Name:** `TimImage__Upload`, tier A (round 81 naming pass, runner bravo).
+  See `## Naming` below.
 
 ## Source
 
@@ -34,11 +34,13 @@ typedef struct DrawRect {
     s32 w;
     s32 h;
 } DrawRect;
-/* DrawObj: methods at +0; slot +0x058 loadImage(self, DrawRect *, u32 *). */
-extern DrawObj *func_80020C5C(void);
+/* Class6C070 (the draw singleton, code_10ee0.c): methods at +0; slot +0x058
+ * loadImage(self, DrawRect *, u32 *) -- confirmed against LIBGPU.H's
+ * LoadImage(RECT *rect, u_long *p), see ## Naming below. */
+extern Class6C070 *func_80020C5C(void);
 
-void TimImage__Upload(D_8006E558Obj *self) {
-    DrawObj *draw;
+void TimImage__Upload(TimImage *self) {
+    Class6C070 *draw;
     DrawRect rect;
     GsIMAGE *tim;
 
@@ -70,3 +72,25 @@ is a local pointer assigned before the test. Symptom when it is written
 inline at the call: one word short, the guard's load lands in a different
 temp register, and a pending call-result copy fills the branch delay slot
 instead.
+
+## Naming
+
+- **`TimImage__Upload`** (was `func_8003B4A8`), tier A. Slot +0x078; every
+  project-wide caller of `New_TimImage`/`func_8003B39C` invokes this slot
+  (`handle->methods->slot78(handle)`) immediately after construction, and
+  its body describes the loaded TIM (`GsGetTimInfo`) then hands the pixel
+  block, and CLUT when present, to the draw singleton's `loadImage` slot --
+  uploading the decoded image to VRAM is both the mechanics and the purpose.
+- **`draw->methods->loadImage`** (this unit's own local field on its private
+  `Class6C070Methods` view; not a rename, `code_10ee0.c` owns that struct):
+  tier A. Signature `void (*)(Class6C070 *self, DrawRect *rect, u32 *data)`
+  matches LIBGPU.H's `extern int LoadImage(RECT *rect, u_long *p)` exactly
+  in shape.
+- **`Class6C070`/`Class6C070Methods`** (was the local placeholder
+  `DrawObj`/`DrawObjMethods`), tier B: confirmed as the real class the draw
+  singleton (`func_80020C5C`) returns -- `code_10ee0.c`'s own header comment
+  identifies `D_8008A83C`'s class as `Class6C070` -- replacing the
+  placeholder name per the round's instruction to confirm or replace it.
+  `code_10ee0.c` itself is still mostly `INCLUDE_ASM`, so this unit's struct
+  stays a partial two-slot local view (pad + `loadImage` + `moveImage`), not
+  a full definition.

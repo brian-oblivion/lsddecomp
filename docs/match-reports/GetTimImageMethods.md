@@ -5,18 +5,18 @@
 Round 81, runner echo. Unit `src/code_2bb9c.c` (carved from `psyq_2bb9c` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
-- **Where:** not a slot: the table getter for gTimImageMethods.
-- **What:** the class's method-table getter (`lui/addiu %hi/%lo(gTimImageMethods)`). It is not a table slot. func_8003B39C and TimImage__TimImage call it. The table is declared `extern Class6D430Methods gTimImageMethods;` in the unit, which is a base-class view of a 39-slot table.
+- **Where:** not a slot: the table getter for TimImage's table `gTimImageMethods`.
+- **What:** the class's method-table getter (`lui/addiu %hi/%lo(gTimImageMethods)`). It is not a table slot. `func_8003B39C` and `TimImage__TimImage` call it. The table is declared `extern Class6D430Methods gTimImageMethods;` in this report's own local view, which is a base-class view of a 39-slot table; `src/code_2bb9c.c` itself now declares the full `TimImageMethods` view.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 4/4,
   and the whole-image SHA1 is green (`OK: build matches retail`).
-- **Name:** kept as the bare `func_` name. The class (gTimImageMethods, a Class6D430
-  data-source subclass) has no confirmed name yet, so no class prefix is
-  justified.
+- **Name:** `GetTimImageMethods`, tier A (round 81 naming pass, runner
+  bravo): matches the project's established `Get<Class>Methods` convention
+  for table getters. See `## Naming` below.
 
 ## Source
 
 ```c
-Class6D430Methods *GetTimImageMethods(void) {
+TimImageMethods *GetTimImageMethods(void) {
     return &gTimImageMethods;
 }
 ```
@@ -36,3 +36,10 @@ typedef struct GsIMAGE GsIMAGE;
 void GsGetTimInfo(u32 *im, GsIMAGE *tim);
 extern Class6D430Methods gTimImageMethods;
 ```
+
+## Naming
+
+- **`GetTimImageMethods`** (was `func_8003B614`), tier A: matches the
+  project's established `Get<Class>Methods` table-getter convention
+  (`GetClass6D430Methods`, `GetObj865C8Methods`, ...); the body is exactly
+  `return &gTimImageMethods;`.

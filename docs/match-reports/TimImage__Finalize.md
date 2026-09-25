@@ -4,7 +4,7 @@
 
 Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 
-- **Where:** gTimImageMethods slot +0x00C (finalize; `tools/classtable.py gTimImageMethods`).
+- **Where:** TimImage's table (`gTimImageMethods`) slot +0x00C (finalize; `tools/classtable.py D_8006E558`).
 - **What:** forwards to the active data-source driver's finalize
   (`GetActiveDataSourceMethods()->finalize(self)`). Written `void`: the
   base's `finalize` slot is `void`, and a byte match of a forwarder says
@@ -14,7 +14,13 @@ Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void TimImage__Finalize(D_8006E558Obj *self) {
+void TimImage__Finalize(TimImage *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 ```
+
+## Naming
+
+- **`TimImage__Finalize`**, tier A: dispatched from slot +0x00C
+  (`Class6D430`'s `finalize` slot), a pure forward to the active
+  data-source driver's own finalize -- mechanics are the whole purpose.
