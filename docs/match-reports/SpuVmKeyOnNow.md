@@ -53,15 +53,15 @@ source object and a DIFFERENT tail:
   SQUARED and divided by a THIRD divisor, `16383` (`=0x3FFF`, confirmed via
   the pinned-pipeline reproducer -- see below), then written together with
   the RAW `a1` parameter into a THIRD 16-byte-stride table, `D_8008D7F4`
-  (distinct from `vmNoiseOn`'s `D_8008D7F0`/`D_8008D7F2`), at constant
+  (distinct from `vmNoiseOn`'s `_svm_sreg_buf`/`D_8008D7F2`), at constant
   BYTE offsets `-4`/`-2`/`0` from one base-index computation
   (`D_8008EA26 * 8`, i.e. an s16-ELEMENT index of `D_8008D7F4[idx-2]`,
   `[idx-1]`, `[idx]`) -- retail computes ONE `lui`/`addiu` for `D_8008D7F4`
   and does constant -4/-2 arithmetic from it, not three separate symbol
   loads, which is why the model here is `D_8008D7F4[idx-2]` rather than
-  reusing `D_8008D7F0`/`D_8008D7F2` (those ARE separate, independently-named
+  reusing `_svm_sreg_buf`/`D_8008D7F2` (those ARE separate, independently-named
   16-byte-stride tables elsewhere in the project -- see
-  `src/code_179d8_j_c.c`'s own `D_8008D7F0`/`D_8008D7F4` pair, declared
+  `src/code_179d8_j_c.c`'s own `_svm_sreg_buf`/`D_8008D7F4` pair, declared
   "independent array, same shape" there -- so this is NOT presumed to be the
   same physical memory as D8E0's pair, just a THIRD table with the same
   stride).
@@ -118,7 +118,7 @@ extern u8 D_8008EA1A;
 extern s16 D_8008E8C0;
 extern u16 D_8008EA22;
 extern u8 D_8008EA20;
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 extern u16 D_8008E228;
@@ -205,7 +205,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D_8008D7F4[chanIdx - 2] = (s16)(pan1sq / 16383);
     D_8008D7F4[chanIdx - 1] = (s16)(pan2sq / 16383);
 
-    D_8008D970[D_8008EA26] |= 7;
+    _svm_sreg_dirty[D_8008EA26] |= 7;
     *(u16 *)(D_8008D98C + D_8008EA26 * 0x34) = (s16)a1;
     *(u8 *)(D_8008D9A3 + D_8008EA26 * 0x34) = 1;
 
@@ -438,7 +438,7 @@ The five reads line up one-for-one with the intervening STORES:
 | --- | --- | --- |
 | 1 | 1DA34 | — (first) |
 | 2 | 1DD10 | the three `D_8008D7F4[...]` stores |
-| 3 | 1DD40 | `D_8008D970[...]` |
+| 3 | 1DD40 | `_svm_sreg_dirty[...]` |
 | 4 | 1DD6C | `D_8008D98C + ...` |
 | 5 | 1DD9C | `D_8008D9A3 + ...` |
 
@@ -613,7 +613,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D_8008D7F4[(u16)chanIdx - 2] = (s16)(pan1sq / 16383);
     D_8008D7F4[(u16)chanIdx - 1] = (s16)(pan2sq / 16383);
 
-    D_8008D970[D_8008EA26[0]] |= 7;
+    _svm_sreg_dirty[D_8008EA26[0]] |= 7;
     *(u16 *)(D_8008D98C + D_8008EA26[0] * 0x34) = (s16)a1;
     *(u8 *)(D_8008D9A3 + D_8008EA26[0] * 0x34) = 1;
 
@@ -820,7 +820,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D_8008D7F4[(u16)chanIdx - 2] = tmp;
     D_8008D7F4[(u16)chanIdx - 1] = (s16)(pan2sq / 16383);
 
-    D_8008D970[D_8008EA26[0]] |= 7;
+    _svm_sreg_dirty[D_8008EA26[0]] |= 7;
     *(u16 *)(D_8008D98C + D_8008EA26[0] * 0x34) = (s16)a1;
     *(u8 *)(D_8008D9A3 + D_8008EA26[0] * 0x34) = 1;
 
@@ -905,5 +905,13 @@ are FIELDS of one libsnd struct, not separate globals, and this is Sony data
 touched by Sony code. The right spelling is `_svm_cur.<field>` once that
 struct is typed, which is track 2 / track 4 work. The runner's first pass
 renamed 24 such addresses (including `_svm_tn` as `gNoteTable` and
-`_ss_score` as `gVoiceEnvTable`); the head dropped those commits
+`_ss_score` under a voice-envelope game name); the head dropped those commits
 (`docs/PROGRESS.md`, round 75).
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+The NON_MATCHING body now stores `_svm_voice[D_8008EA26[0]].unk04/unk1B`; normalized disassembly identical.
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body keeps its halfword indexing, now `((s16 *)_svm_sreg_buf)[(u16)chanIdx + 2]` / `[(u16)chanIdx]` / `[(u16)chanIdx + 1]` for the old `D_8008D7F4[(u16)chanIdx]` / `[-2]` / `[-1]`; normalized disassembly identical.

@@ -978,8 +978,8 @@ BoxFill__BoxFill = 0x8004054C; // type:func
 BoxFill__Reset = 0x800405D0; // type:func
 // identified: shape 0.97 vs libsnd/vmanager SeAutoVol (110w vs our 116w,
 // disc 3.3) -- the same tied candidate as SeAutoVol (0x8002E308);
-// disambiguated by family: this function operates on the gVoiceFade*
-// globals, the family StepVoiceFade (-> SetAutoPan) uses, mirroring Sony's
+// disambiguated by family: this function operates on _svm_voice
+// +0x28..+0x32, the family StepVoiceFade (-> SetAutoPan) uses, mirroring Sony's
 // public SsUtAutoVol/SsUtAutoPan pair (LIBSND.H) onto internal
 // SeAutoVol/SeAutoPan. Superseded game-style name BeginVoiceFade.
 // Round 74 (bravo, track 2).
@@ -1035,18 +1035,22 @@ SpuVmKeyOn = 0x8002FAC4; // type:func
 // 131w, disc 3.5), position within the libsnd neighborhood. Superseded
 // game-style name StopNote. Round 74 (bravo, track 2).
 SpuVmKeyOff = 0x800300D0; // type:func
-gVoiceEnvActive = 0x8008D9A4;
-gVoiceEnvStep = 0x8008D9A6;
-gVoiceEnvInterval = 0x8008D9A8;
-gVoiceEnvCountdown = 0x8008D9AA;
-gVoiceEnvAccum = 0x8008D9AC;
-gVoiceEnvLimit = 0x8008D9AE;
-gVoiceFadeActive = 0x8008D9B0;
-gVoiceFadeStep = 0x8008D9B2;
-gVoiceFadeInterval = 0x8008D9B4;
-gVoiceFadeCountdown = 0x8008D9B6;
-gVoiceFadeAccum = 0x8008D9B8;
-gVoiceFadeLimit = 0x8008D9BA;
+// identified: libsnd/vmanager.o (disc 3.5) bss: _svm_sreg_buf +0x000,
+// _svm_sreg_dirty +0x180, _svm_voice +0x198, _svm_envx_ptr +0x678;
+// anchored at 0x8008D7F0, _svm_voice = 0x8008D988 and its 0x4E0 bytes
+// (24 voices x 0x34) end exactly at _svm_envx_ptr. One Sony table, not
+// per-field globals. Supersedes twelve game-style per-field names over
+// +0x1C..+0x33 (two six-halfword ramp groups; docs/PROGRESS.md has them).
+// identified: libsnd/vmanager.o (disc 3.5) bss: _svm_sreg_buf +0x000
+// (0x180 = 24 voices x 0x10), _svm_sreg_dirty +0x180 (0x18 = one byte per
+// voice), then _svm_voice +0x198; anchored at 0x8008D7F0 with the three
+// neighbours above. Replaces splat's per-address auto-symbols
+// D_8008D7F0..D_8008D7FA and D_8008D970 (never game-named). Record type:
+// include/SvmData.h. Round 86 (alpha, track 2).
+_svm_sreg_buf = 0x8008D7F0; // size:0x180
+_svm_sreg_dirty = 0x8008D970; // size:0x18
+// Record type: include/SvmData.h. Round 86 (alpha, track 2).
+_svm_voice = 0x8008D988; // size:0x4E0
 // identified: libsnd/vmanager.o (disc 3.5) bss: _svm_sreg_buf +0x000,
 // _svm_voice +0x198 (24 x 0x34), _svm_envx_ptr +0x678, _svm_envx_hist
 // +0x67C; anchored at 0x8008D7F0 both land exactly (3.3's 0x30 voice
@@ -1851,9 +1855,9 @@ SePitchBend = 0x8002E138; // type:func
 // identified: shape 0.97 vs libsnd/vmanager SeAutoVol (110w vs our 116w,
 // disc 3.3), position within the libsnd neighborhood. sdkname.py ties this
 // same shape candidate against BeginVoiceFade (0x8002E874); disambiguated by
-// family: this function operates on the gVoiceEnv* globals, the same family
+// family: this function operates on _svm_voice +0x1C..+0x26, the same family
 // StepVoiceEnvelope (-> SetAutoVol) uses, while BeginVoiceFade operates on
-// gVoiceFade* (the family StepVoiceFade -> SetAutoPan uses) -- matching
+// _svm_voice +0x28..+0x32 (the family StepVoiceFade -> SetAutoPan uses) -- matching
 // Sony's public SsUtAutoVol/SsUtAutoPan pair (LIBSND.H) onto its internal
 // SeAutoVol/SeAutoPan pair. Superseded game-style func_8002E308.
 // Round 74 (bravo, track 2).

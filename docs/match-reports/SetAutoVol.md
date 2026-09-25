@@ -30,7 +30,7 @@ issue the loop case does not have.
 
 ## What the head's fix looks like applied here
 
-Two single-field, 0x10-stride arrays (`D_8008D7F2`, `D_8008D7F0`, each with
+Two single-field, 0x10-stride arrays (`D_8008D7F2`, `_svm_sreg_buf`, each with
 only one `s16` field at offset 0) replace the earlier attempt's
 `Rec16D7F0`-typed `array[idxCopy].unk0` struct-cast form:
 
@@ -41,7 +41,7 @@ idxCopy = a0;
 woff = idxCopy << 3;              /* idx*8, computed at the very top */
 ...
 ((s16 *) D_8008D7F2)[(u16) woff] = val2;   /* mask applied at the point of use */
-((s16 *) D_8008D7F0)[(u16) woff] = val1;
+((s16 *) _svm_sreg_buf)[(u16) woff] = val1;
 ```
 
 This alone reproduced the missing early `sll #3` — confirmed directly (the
@@ -94,7 +94,7 @@ spurious `sll`/`sra` re-extension pair at each comparison site, because
 the compiler will not treat a value it derived through an unsigned load as
 already sign-clean for a later signed comparison. This round tried the
 next lever on that specific bug — reading `accumS` back from MEMORY
-(`gVoiceEnvAccum[idxCopy].unk0`, a genuine fresh `lh`) instead of assigning it
+(`D_8008D9AC[idxCopy].unk0`, a genuine fresh `lh`) instead of assigning it
 from the already-computed `accumU` register (a register-level reinterpret
 cast) — on the theory that a fresh signed load, rather than a same-register
 reinterpretation, is what retail's disassembly actually shows at the
@@ -108,7 +108,7 @@ triggering it, not yet identified.
 ### Axes tried this round, in order, effect on length (retail 231)
 
 1. Baseline `array[idxCopy].unk0`-style indexing for `D_8008D7F2`/
-   `D_8008D7F0` (carried over from the prior stall): 236/231 (5 long) --
+   `_svm_sreg_buf` (carried over from the prior stall): 236/231 (5 long) --
    this is the number the PRIOR report closed on; preserved here as the
    comparison point.
 2. Applied the halfword-index idiom, `woff` derived from `idxCopy`,
@@ -120,7 +120,7 @@ triggering it, not yet identified.
    the early-`sll`-#3 gap, one word worse overall than the pre-idiom
    baseline because of the pre-existing sign-extension bug documented
    above (unaffected either way by this idiom).
-5. Replaced `gVoiceEnvInterval`/`gVoiceEnvCountdown`/etc. array indices from the raw
+5. Replaced `D_8008D9A8`/`D_8008D9AA`/etc. array indices from the raw
    parameter `a0` to the local `idxCopy` throughout the function (matching
    retail's apparent single-variable-for-everything usage): no change
    (still 237/231) -- ruled out as a lever for the remaining gap.
@@ -174,7 +174,7 @@ stored sum, rather than once before either):
    spelled in the source -- the compiler hoists the sign-extend to that
    point regardless.
 2. **A bare `__asm__("")` between `incU`'s read and `incS`'s read** (both
-   read the SAME `gVoiceEnvStep[idxCopy]` address, one unsigned one signed --
+   read the SAME `D_8008D9A6[idxCopy]` address, one unsigned one signed --
    retail's disassembly shows this as two SEPARATE loads, `lhu` then `lh`,
    while my build shows only the `lhu` with `incS` derived from it via a
    register-level sign-extend instead of its own `lh`): **no change
@@ -249,7 +249,7 @@ sign-extension residue: swap the `incS`/`incU` derivation order, or derive
 `incU` from `incS` via a cast rather than as an independent load. Read the
 raw `.s` directly first to confirm the exact shape at this site (lines
 1ED70-1EDB0 of `asm/nonmatchings/code_179d8_m/SetAutoVol.s`): retail
-issues TWO separate loads of `gVoiceEnvStep[a1]` — one `lhu` into `incU`, one
+issues TWO separate loads of `D_8008D9A6[a1]` — one `lhu` into `incU`, one
 `lh` into `incS` (a different register) — immediately adjacent, then adds
 `incU` into `accumU`.
 
@@ -290,18 +290,18 @@ this body needs (originally written for a standalone splice with their
 own flat externs) are declared LATER in the file, after `SeAutoPan`
 and `SetAutoPan`'s own stall bodies. Re-declaring them again here under
 the same names is a hard conflict (duplicate typedef names, and for
-`D_8008E970`/`D_8008D7F0`/`D_8008D7F2` a redeclaration of the same extern
+`D_8008E970`/`_svm_sreg_buf`/`D_8008D7F2` a redeclaration of the same extern
 symbol under an incompatible pointee type) -- not a new finding, but the
 concrete case the project's own "one extern symbol cannot carry two
 conflicting C types in one file" rule warns about, hitting a typedef this
 time rather than a symbol.
 
 **Fix: moved the shared typedef block (`Rec34Half` and its
-`gVoiceFadeActive`.`gVoiceFadeLimit` externs, `Rec34HalfU`, `Rec16D7F0` +
-`D_8008D7F0`/`D_8008D7F2`, `D_8008D970`, `ObjE970` + `D_8008E970`, the six
+`D_8008D9B0`.`D_8008D9BA` externs, `Rec34HalfU`, `Rec16D7F0` +
+`_svm_sreg_buf`/`D_8008D7F2`, `_svm_sreg_dirty`, `ObjE970` + `D_8008E970`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) from its old position (between
 `SeAutoPan` and `SetAutoPan`) up to right after `#include
-"common.h"`, adding this function's own `gVoiceEnvActive`/`A6`/`A8`/`AA`/`AC`/`AE`
+"common.h"`, adding this function's own `D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`
 externs (same `Rec34Half` shape, disjoint symbols) alongside the existing
 ones.** Declaration order carries no code -- only DEFINITIONS need strict
 ROM order, which this move does not disturb (no function moved). This is
@@ -410,8 +410,8 @@ tail-duplication fix, not from the padding move itself.
 
 **Housekeeping note on this splice**: this function sits FIRST in ROM
 order in the unit, so its shared record-family types (`Rec34Half` and
-`gVoiceEnvActive`/`A6`/`A8`/`AA`/`AC`/`AE`, `Rec34HalfU`, `Rec16D7F0` +
-`D_8008D7F0`/`D_8008D7F2`, `D_8008D970`, `ObjE970` + `D_8008E970`, the six
+`D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`, `Rec34HalfU`, `Rec16D7F0` +
+`_svm_sreg_buf`/`D_8008D7F2`, `_svm_sreg_dirty`, `ObjE970` + `D_8008E970`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) had to be declared BEFORE this
 function rather than duplicated under function-local names — duplicating
 them (tried first, see the compile errors this produced) hits the
@@ -452,16 +452,16 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half gVoiceEnvActive[];
-extern Rec34Half gVoiceEnvStep[];
-extern Rec34Half gVoiceEnvInterval[];
-extern Rec34Half gVoiceEnvCountdown[];
-extern Rec34Half gVoiceEnvAccum[];
-extern Rec34Half gVoiceEnvLimit[];
+extern Rec34Half D_8008D9A4[];
+extern Rec34Half D_8008D9A6[];
+extern Rec34Half D_8008D9A8[];
+extern Rec34Half D_8008D9AA[];
+extern Rec34Half D_8008D9AC[];
+extern Rec34Half D_8008D9AE[];
 
-/* Same 0x34-stride record family, UNSIGNED 16-bit view -- gVoiceEnvStep and
- * gVoiceEnvAccum each need this width (`lhu`) at least once in this function,
- * on top of the plain signed `Rec34Half` view above (which gVoiceEnvStep
+/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D9A6 and
+ * D_8008D9AC each need this width (`lhu`) at least once in this function,
+ * on top of the plain signed `Rec34Half` view above (which D_8008D9A6
  * ALSO needs, at a DIFFERENT read site: retail issues TWO separate loads
  * of the same address, one `lhu` and one `lh`). */
 typedef struct {
@@ -487,10 +487,10 @@ extern s16 D_8008E8C0;
 /* Same 0x10-byte-stride record family code_179d8_j.c documents as
  * Rec16D7F0 -- accessed here through a flat `s16 *` halfword-indexed
  * cast (the `woff` idiom below), so only a plain extern is needed. */
-extern s16 D_8008D7F0[];
+extern s16 _svm_sreg_buf[];
 extern s16 D_8008D7F2[];
 
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 void SetAutoVol(s16 a0) {
     s16 idxCopy;
@@ -508,7 +508,7 @@ void SetAutoVol(s16 a0) {
     s16 limit;
     s16 woff;
 
-    /* Halfword-indexed byte-offset for the D_8008D7F2/D_8008D7F0 stores
+    /* Halfword-indexed byte-offset for the D_8008D7F2/_svm_sreg_buf stores
      * near the end of this function: idx*8 computed here, kept `s16`
      * (matching retail's dependency -- its early `sll #3` reads the
      * sign-extended parameter and stays a plain register value, with no
@@ -523,44 +523,44 @@ void SetAutoVol(s16 a0) {
     idxCopy = a0;
     woff = idxCopy << 3;
 
-    if (gVoiceEnvInterval[idxCopy].unk0 != 0) {
-        s16 orig = gVoiceEnvCountdown[idxCopy].unk0;
+    if (D_8008D9A8[idxCopy].unk0 != 0) {
+        s16 orig = D_8008D9AA[idxCopy].unk0;
 
-        gVoiceEnvCountdown[idxCopy].unk0 = orig - 1;
+        D_8008D9AA[idxCopy].unk0 = orig - 1;
         if (orig > 0) {
             return;
         }
-        gVoiceEnvCountdown[idxCopy].unk0 = gVoiceEnvInterval[idxCopy].unk0;
+        D_8008D9AA[idxCopy].unk0 = D_8008D9A8[idxCopy].unk0;
     }
 
     {
-        u16 accumU = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
-        u16 incU = ((Rec34HalfU *) gVoiceEnvStep)[idxCopy].unk0;
-        s16 incS = gVoiceEnvStep[idxCopy].unk0;
+        u16 accumU = ((Rec34HalfU *) D_8008D9AC)[idxCopy].unk0;
+        u16 incU = ((Rec34HalfU *) D_8008D9A6)[idxCopy].unk0;
+        s16 incS = D_8008D9A6[idxCopy].unk0;
         s16 accumS;
 
         accumU = accumU + incU;
-        gVoiceEnvAccum[idxCopy].unk0 = accumU;
-        accumS = gVoiceEnvAccum[idxCopy].unk0;
+        D_8008D9AC[idxCopy].unk0 = accumU;
+        accumS = D_8008D9AC[idxCopy].unk0;
 
         if (incS > 0) {
-            limit = gVoiceEnvLimit[idxCopy].unk0;
+            limit = D_8008D9AE[idxCopy].unk0;
             if (accumS >= limit) {
                 accumU = limit;
-                gVoiceEnvAccum[idxCopy].unk0 = accumU;
-                gVoiceEnvActive[idxCopy].unk0 = 0;
+                D_8008D9AC[idxCopy].unk0 = accumU;
+                D_8008D9A4[idxCopy].unk0 = 0;
             }
         } else if (incS < 0) {
-            limit = gVoiceEnvLimit[idxCopy].unk0;
+            limit = D_8008D9AE[idxCopy].unk0;
             if (limit >= accumS) {
                 accumU = limit;
-                gVoiceEnvAccum[idxCopy].unk0 = accumU;
-                gVoiceEnvActive[idxCopy].unk0 = 0;
+                D_8008D9AC[idxCopy].unk0 = accumU;
+                D_8008D9A4[idxCopy].unk0 = 0;
             }
         }
     }
 
-    accum = ((Rec34HalfU *) gVoiceEnvAccum)[idxCopy].unk0;
+    accum = ((Rec34HalfU *) D_8008D9AC)[idxCopy].unk0;
     D_8008EA10 = (u8) accum;
     tableval = D_8008E970->unk18;
 
@@ -605,10 +605,10 @@ void SetAutoVol(s16 a0) {
     }
 
     ((s16 *) D_8008D7F2)[(u16) woff] = val2;
-    flagByte = D_8008D970[idxCopy];
-    ((s16 *) D_8008D7F0)[(u16) woff] = val1;
+    flagByte = _svm_sreg_dirty[idxCopy];
+    ((s16 *) _svm_sreg_buf)[(u16) woff] = val1;
     flagByte |= 3;
-    D_8008D970[idxCopy] = flagByte;
+    _svm_sreg_dirty[idxCopy] = flagByte;
 }
 #endif
 ```
@@ -618,9 +618,9 @@ void SetAutoVol(s16 a0) {
 **SetAutoVol** (was `func_8002E4D8`) -- Tier B. Same shape as
 SetAutoPan (accumulate-until-limit, throttled by an interval/countdown
 pair, clear an active flag on reaching the limit, then compute and write
-a stereo output level from the result) but over its own `gVoiceEnv*`
+a stereo output level from the result) but over its own `_svm_voice +0x1C..+0x26`
 family, and with no "Begin"-style setup function in this unit -- nothing
-here writes `gVoiceEnvActive`, `gVoiceEnvStep` or `gVoiceEnvLimit`.
+here writes `D_8008D9A4`, `D_8008D9A6` or `D_8008D9AE`.
 `SeAutoVol` in `code_179d8_l` opens with the identical prologue and
 argument-narrowing shape this unit's header already calls out as a
 register-pressure sibling, not a coincidence worth re-deriving; worth
@@ -640,7 +640,7 @@ real field-name update: the body's own local `ObjE970` (`unk18`) collided
 with the shared `ObjE970` the prelude already declares at the same offset
 under the name `masterVolume`; changed the access to
 `D_8008E970->masterVolume`, same offset, no behavior change. The body's
-own flat `extern s16 D_8008D7F0[]/D_8008D7F2[]` declarations were also
+own flat `extern s16 _svm_sreg_buf[]/D_8008D7F2[]` declarations were also
 dropped -- the shared prelude already declares both as `Rec16D7F0[]`, and
 the body already casts to `(s16 *)` before indexing, so no code change was
 needed there. `./build-and-verify.sh` green (zero bytes changed) and
@@ -674,14 +674,14 @@ only in: `$t0`/`$t1` naming, `lhu` of the accumulator stored to
 `D_8008EA10` and multiplied as `s16`, and a reload of `D_8008EA11` for the
 third pan test). So this body is SetAutoPan's round-73 body ported with:
 
-- `acc` is `s16`, `acc = gVoiceEnvAccum[v].unk0; D_8008EA10 = acc;`
+- `acc` is `s16`, `acc = D_8008D9AC[v].unk0; D_8008EA10 = acc;`
 - first quotient `q2 = (acc * vol) / 16129;`
 - third pan test `p = D_8008EA11;` (the global, reloaded -- retail's
   `lui a0; lbu a0; nop`).
 
 Every lever in SetAutoPan.md's round-73 list applies unchanged (field ops
 instead of cached locals, `v` for the tail, `off = voice * 8`,
-`D_8008D7F0[off + 1]`, reused `s32 p` with `(u32)` bound tests, `q2` reused
+`_svm_sreg_buf[off + 1]`, reused `s32 p` with `(u32)` bound tests, `q2` reused
 for both quotients, `val2 > val1`). The old report's "redundant
 sign-extension around the incU/incS accumulator add" was the cached-local
 residue: it disappears with lever 1. Frame is 0x18 without padding.
@@ -713,8 +713,8 @@ typedef struct {
     u8 masterVolume; /* +0x18 */
 } ObjE970;
 extern ObjE970 *D_8008E970;
-extern s16 D_8008D7F0[];   /* SPU voice-register shadow, 8 halfwords per voice */
-extern u8 D_8008D970[];
+extern s16 _svm_sreg_buf[];   /* SPU voice-register shadow, 8 halfwords per voice */
+extern u8 _svm_sreg_dirty[];
 extern u8 D_8008EA10;
 extern u8 D_8008EA11;
 extern u8 D_8008EA16;
@@ -722,12 +722,12 @@ extern u8 D_8008EA17;
 extern u8 D_8008EA19;
 extern u8 D_8008EA1A;
 extern s16 D_8008E8C0;
-extern Rec34Half gVoiceEnvActive[];
-extern Rec34Half gVoiceEnvStep[];
-extern Rec34Half gVoiceEnvInterval[];
-extern Rec34Half gVoiceEnvCountdown[];
-extern Rec34Half gVoiceEnvAccum[];
-extern Rec34Half gVoiceEnvLimit[];
+extern Rec34Half D_8008D9A4[];
+extern Rec34Half D_8008D9A6[];
+extern Rec34Half D_8008D9A8[];
+extern Rec34Half D_8008D9AA[];
+extern Rec34Half D_8008D9AC[];
+extern Rec34Half D_8008D9AE[];
 
 void SetAutoVol(s16 voice)
 {
@@ -744,26 +744,26 @@ void SetAutoVol(s16 voice)
 
     v = voice;
     off = voice * 8;
-    if (gVoiceEnvInterval[voice].unk0 != 0) {
-        if (gVoiceEnvCountdown[voice].unk0-- > 0) {
+    if (D_8008D9A8[voice].unk0 != 0) {
+        if (D_8008D9AA[voice].unk0-- > 0) {
             return;
         }
-        gVoiceEnvCountdown[voice].unk0 = gVoiceEnvInterval[voice].unk0;
+        D_8008D9AA[voice].unk0 = D_8008D9A8[voice].unk0;
     }
-    gVoiceEnvAccum[voice].unk0 += gVoiceEnvStep[voice].unk0;
-    if (gVoiceEnvStep[voice].unk0 > 0) {
-        if (gVoiceEnvAccum[voice].unk0 >= gVoiceEnvLimit[voice].unk0) {
-            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
-            gVoiceEnvActive[voice].unk0 = 0;
+    D_8008D9AC[voice].unk0 += D_8008D9A6[voice].unk0;
+    if (D_8008D9A6[voice].unk0 > 0) {
+        if (D_8008D9AC[voice].unk0 >= D_8008D9AE[voice].unk0) {
+            D_8008D9AC[voice].unk0 = D_8008D9AE[voice].unk0;
+            D_8008D9A4[voice].unk0 = 0;
         }
-    } else if (gVoiceEnvStep[voice].unk0 < 0) {
-        if (gVoiceEnvAccum[voice].unk0 <= gVoiceEnvLimit[voice].unk0) {
-            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
-            gVoiceEnvActive[voice].unk0 = 0;
+    } else if (D_8008D9A6[voice].unk0 < 0) {
+        if (D_8008D9AC[voice].unk0 <= D_8008D9AE[voice].unk0) {
+            D_8008D9AC[voice].unk0 = D_8008D9AE[voice].unk0;
+            D_8008D9A4[voice].unk0 = 0;
         }
     }
 
-    acc = gVoiceEnvAccum[v].unk0;
+    acc = D_8008D9AC[v].unk0;
     D_8008EA10 = acc;
 
     vol = D_8008E970->masterVolume * 0x3FFF;
@@ -802,8 +802,16 @@ void SetAutoVol(s16 voice)
         }
     }
 
-    D_8008D7F0[off + 1] = val2;
-    D_8008D7F0[off] = val1;
-    D_8008D970[v] |= 3;
+    _svm_sreg_buf[off + 1] = val2;
+    _svm_sreg_buf[off] = val1;
+    _svm_sreg_dirty[v] |= 3;
 }#endif
 ```
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+The NON_MATCHING body now uses `_svm_voice[voice].unk1C`..`unk26`; its normalized disassembly is identical to the per-field version, so the stall and its residue are unchanged.
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body keeps `((s16 *) _svm_sreg_buf)[off]`/`[off + 1]` and `_svm_sreg_dirty`; normalized disassembly identical.

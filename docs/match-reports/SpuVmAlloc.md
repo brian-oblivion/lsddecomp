@@ -41,7 +41,7 @@ typedef struct {
 extern Rec34S16 D_8008D9A0[];
 
 /* Same 0x34 stride; only the +0x2 halfword this function's tail loop
- * writes is named. The store computes its address as D_8008D988's own
+ * writes is named. The store computes its address as _svm_voice's own
  * (loop-hoisted) base plus idx*0x34 plus a literal 2, which lands in the
  * exact byte range D_8008D98A[idx] occupies -- but the read half of that
  * same statement re-materialises D_8008D98A's OWN base rather than reusing
@@ -52,14 +52,14 @@ typedef struct {
     u16 unk2; /* +0x2 */
     u8 pad4[0x34 - 0x4];
 } Rec34D988;
-extern Rec34D988 D_8008D988[];
+extern Rec34D988 _svm_voice[];
 
 extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 ```
 
-`D_8008D9A3` / `D_8008D98E` / `D_8008D98A` / `D_8008D9A0` / `D_8008D988` are
+`D_8008D9A3` / `D_8008D98E` / `D_8008D98A` / `D_8008D9A0` / `_svm_voice` are
 all 0x34-byte-stride, all with the SAME index (channel number), which is
 the same table family this unit's `SpuVmDoAllocate` also touches
 (`D_8008D98E`). `func_800375E8` has no established prototype anywhere in
@@ -135,7 +135,7 @@ s32 SpuVmAlloc(void)
     if ((u8) chosen < count) {
         if (count != 0) {
             for (idx = 0; idx < count; idx++) {
-                D_8008D988[(u8) idx].unk2 = D_8008D98A[(u8) idx].unk0 + 1;
+                _svm_voice[(u8) idx].unk2 = D_8008D98A[(u8) idx].unk0 + 1;
             }
         }
         D_8008D98A[(u8) chosen].unk0 = 0;
@@ -180,7 +180,7 @@ Starting point was a naive transcription using a signed `s32 idx` and plain
    index retail computes is over an explicitly `(u8)`-masked value, which
    apparently defeats old GCC's induction-variable analysis (the masked
    value isn't recognized as a clean affine induction variable). Adding
-   `(u8)` to the tail loop's `D_8008D988[idx]`/`D_8008D98A[idx]` restored
+   `(u8)` to the tail loop's `_svm_voice[idx]`/`D_8008D98A[idx]` restored
    the multiply-every-iteration shape.
 4. **Duplicating the divide/lookup in each `if`/`else` arm was NOT needed
    here** (that fix mattered for the sibling function, see
@@ -365,7 +365,7 @@ typedef struct {
     u16 unk2; /* +0x2 */
     u8 pad4[0x34 - 0x4];
 } Rec34D988;
-extern Rec34D988 D_8008D988[];
+extern Rec34D988 _svm_voice[];
 
 extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
@@ -439,7 +439,7 @@ s32 SpuVmAlloc(void)
     if ((u8) chosen < count) {
         if (count != 0) {
             for (idx = 0; idx < count; idx++) {
-                D_8008D988[(u8) idx].unk2 = D_8008D98A[(u8) idx].unk0 + 1;
+                _svm_voice[(u8) idx].unk2 = D_8008D98A[(u8) idx].unk0 + 1;
             }
         }
         D_8008D98A[(u8) chosen].unk0 = 0;
@@ -620,7 +620,7 @@ typedef struct {
     u16 unk2; /* +0x2 */
     u8 pad4[0x34 - 0x4];
 } Rec34D988;
-extern Rec34D988 D_8008D988[];
+extern Rec34D988 _svm_voice[];
 
 extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
@@ -696,7 +696,7 @@ s32 SpuVmAlloc(void)
     if ((u8) chosen < count) {
         if (count != 0) {
             for (idx = 0; idx < count; idx++) {
-                D_8008D988[(u8) idx].unk2 = D_8008D98A[(u8) idx].unk0 + newVar;
+                _svm_voice[(u8) idx].unk2 = D_8008D98A[(u8) idx].unk0 + newVar;
             }
         }
         D_8008D98A[(u8) chosen].unk0 = 0;
@@ -882,9 +882,9 @@ before anything else.
    loop-tail `andi` back where retail has it. **165 -> 167 (exact again, this
    time with retail's own two instructions), 2230 -> 1375.**
 2. **The trailing counter loop needs a loop-hoisted base POINTER.**
-   `D_8008D988[(u8)idx].unk2 = ...` folds `D_8008D988 + 2` into one symbol,
+   `_svm_voice[(u8)idx].unk2 = ...` folds `_svm_voice + 2` into one symbol,
    which maspsx then expands as a second `--addiu-at` triple — whereas retail
-   hoists `$a1 = &D_8008D988` out of the loop and stores with
+   hoists `$a1 = &_svm_voice` out of the loop and stores with
    `addu $v0,$v0,$a1` / `sh $v1,2($v0)`, keeping the `+2` as a displacement.
    Assigning the array to a `Rec34D988 *p988;` before the loop and indexing
    through it reproduces retail's form **instruction-for-instruction**
@@ -1010,7 +1010,7 @@ s32 SpuVmAlloc(void)
     count = D_8008E9D0;
     if ((u8) chosen < count) {
         if (count != 0) {
-            p988 = D_8008D988;
+            p988 = _svm_voice;
             for (idx = 0; (u8) idx < count; idx++) {
                 p988[(u8) idx].unk2 = D_8008D98A[(u8) idx].unk0 + 1;
             }
@@ -1052,9 +1052,9 @@ the body masks an induction variable everywhere it is used as a subscript,
 check whether retail masks it in the compare too.
 
 **4. `extern T sym[]` + `sym[i].field` folds a non-zero field offset into the
-symbol; a POINTER local does not.** `D_8008D988[i].unk2` became a second
+symbol; a POINTER local does not.** `_svm_voice[i].unk2` became a second
 `%hi/%lo` symbol reference (and a second `--addiu-at` expansion) at
-`D_8008D988+2`, while retail kept a loop-invariant base register and a `2`
+`_svm_voice+2`, while retail kept a loop-invariant base register and a `2`
 displacement. Assigning the array to a pointer local before the loop is what
 gives GCC something to hoist. Worth reaching for whenever retail shows
 `addu $x,$idx,$base` / `st $v,K($x)` with a small constant `K` and your build
@@ -1090,8 +1090,8 @@ preserving:
   struct-typed re-declaration of `D_8008D9A3` here would be a `conflicting
   types` error under `-DNON_MATCHING`, which compiles the whole unit at
   once. Declared `D_8008D9A3`/`D_8008D98E`/`D_8008D98A`/`D_8008D9A0`/
-  `D_8008D988` as `u8[]` instead and indexed with explicit `idx * 0x34` (and
-  `+2` for `D_8008D988`'s halfword field) — the same idiom this unit's other
+  `_svm_voice` as `u8[]` instead and indexed with explicit `idx * 0x34` (and
+  `+2` for `_svm_voice`'s halfword field) — the same idiom this unit's other
   two promoted bodies already use for the identical stride. `D_8008D98A` in
   particular is shared with `vmNoiseOn2`'s promoted body and must keep
   the same type in both for the file to compile.
@@ -1107,3 +1107,9 @@ HARD RULE 6/track-3's "never rename a Sony symbol" applies in the other
 direction too: the identification stands and this pass does not touch it.
 No further game-style naming applies; the function itself remains a STALL
 (register-rotation residue, see above), unaffected by this note.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (`D_8008D988` itself now reads `_svm_voice` above) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+The NON_MATCHING body moves from byte-pointer arithmetic over per-field symbols (`*(u16 *)(D_8008D98E + idx * 0x34)`) to `_svm_voice[(u8) idx].unk06/unk02/unk18/unk1B`, and gets CLOSER to retail: the old shape hoisted three field bases into t4-t6, the struct shape emits retail's per-access `lui`/`addiu`/`addu $at`; compiled length 153 -> 162 of 167 words, mnemonic-sequence ratio vs retail 0.637 -> 0.778. Still a stall; re-measure with funcdiff before quoting a word score.

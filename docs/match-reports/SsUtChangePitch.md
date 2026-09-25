@@ -41,7 +41,7 @@ Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `SsUtKeyOff`), then on a full match calls `func_80032148`, sets the
 "current channel" mode globals, copies a per-channel byte into
 `D_8008EA18`, stores `note2pitch2`'s return into a 16-byte-stride table,
-and ORs a flag bit into `D_8008D970`.
+and ORs a flag bit into `_svm_sreg_dirty`.
 
 ## What it is
 
@@ -110,7 +110,7 @@ s32 SsUtChangePitch(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5
     D_8008EA26 = idx;
     D_8008EA18 = *(u8 *) &D_8008D99C[idx].unk0;
     D_8008D7F4[idx].unk0 = note2pitch2(p4, p5);
-    D_8008D970[idx] |= 4;
+    _svm_sreg_dirty[idx] |= 4;
     return 0;
 }
 #endif
@@ -326,7 +326,7 @@ extern Rec34D994 D_8008D99A[];
 extern Rec34D994 D_8008D99C[];
 extern Rec34D994 D_8008D99E[];
 extern Rec16D7F0 D_8008D7F4[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern void SpuVmVSetUp(s16 p1, s16 p2);   /* was func_80032148 until round 34 */
 extern volatile u16 D_8008EA26;
 extern volatile u8 D_8008EA18;
@@ -354,7 +354,7 @@ s32 SsUtChangePitch(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5
     D_8008EA22 = 0x21;
     D_8008EA18 = *(u8 *) &D_8008D99C[idx].unk0;
     D_8008D7F4[idx].unk0 = note2pitch2(p4, p5);
-    D_8008D970[idx] |= 4;
+    _svm_sreg_dirty[idx] |= 4;
     return 0;
 }
 ```
@@ -648,3 +648,7 @@ edit. It is the first thing the next runner on this function should settle,
 and it is why delta's "84/88, exact reproduction" should be read as measured
 against delta's working tree rather than against anything this report can
 currently reproduce.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/SvmData.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (code_179d8_j_b/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols).

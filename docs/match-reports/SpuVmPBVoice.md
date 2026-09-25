@@ -101,7 +101,7 @@ own score (77/138 before and after), so it is recorded as a correction to
 
 - `Rec34U16` / `D_8008D99C[]`: the SAME 0x34-stride record family as
   `Rec34S16` (already declared above for `D_8008D994`/`D_8008D996`/
-  `D_8008D99A`/`D_8008D99E`/`D_8008D988`), but this function reads
+  `D_8008D99A`/`D_8008D99E`/`_svm_voice`), but this function reads
   `D_8008D99C` UNSIGNED (`lhu`) where `SpuVmKeyOff` (same unit, already
   matched) reads it -- and `D_8008D994` -- SIGNED (`lh`). Since one extern
   symbol cannot carry two conflicting C types in one translation unit, the
@@ -120,8 +120,8 @@ own score (77/138 before and after), so it is recorded as a correction to
   after `unkD` to get the right stride.
 - `Rec16D7F4` / `D_8008D7F4[]`: same 0x10-byte-stride record family
   `code_179d8_j.c` already documents as `Rec16D7F0` (its own
-  `D_8008D7F0`/`D_8008D7F4` pair) -- local view, `s16 unk0`.
-- `D_8008D970[]`: plain byte-stride flags array (no per-record multiply in
+  `_svm_sreg_buf`/`D_8008D7F4` pair) -- local view, `s16 unk0`.
+- `_svm_sreg_dirty[]`: plain byte-stride flags array (no per-record multiply in
   its own addressing, unlike every 0x34/0x10-stride array above).
 - `D_8008EA13`, `D_8008EA18`: plain byte globals.
 - `note2pitch2` (defined in `code_179d8_l`, still `INCLUDE_ASM` there):
@@ -148,7 +148,7 @@ negative, each producing a quotient/remainder pair fed into `outA2`/`outA1`
 0`. Finally: read `D_8008D99C[a0]`'s low BYTE, stash `a0` into the
 "currently selected channel" scratch `D_8008EA26`, store the byte into
 `D_8008EA18`, call `note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF)` and store
-its return into `D_8008D7F4[a0]`, OR a flag bit into `D_8008D970[a0]`, and
+its return into `D_8008D7F4[a0]`, OR a flag bit into `_svm_sreg_dirty[a0]`, and
 return `1`.
 
 ## Axes tried, roughly in order, with effect on the in-range word count (drift in parens where nonzero)
@@ -277,7 +277,7 @@ typedef struct {
 extern Tbl32E978 *D_8008E978;
 
 /* Same 0x10-byte-stride record family code_179d8_j.c documents as
- * Rec16D7F0 (that unit's D_8008D7F0/D_8008D7F4 pair); local view. */
+ * Rec16D7F0 (that unit's _svm_sreg_buf/D_8008D7F4 pair); local view. */
 typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x10 - 0x2];
@@ -286,7 +286,7 @@ extern Rec16D7F4 D_8008D7F4[];
 
 /* Plain byte-stride flags array (no per-record multiply in its own
  * addressing -- unlike every 0x34/0x10-stride array above). */
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 /* Selected-channel debug byte, write-only here. */
 extern u8 D_8008EA18;
@@ -344,7 +344,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     D_8008EA26 = a0;
     D_8008EA18 = byteVal;
     D_8008D7F4[a0].unk0 = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
-    D_8008D970[a0] |= 4;
+    _svm_sreg_dirty[a0] |= 4;
     return 1;
 }
 #endif
@@ -554,3 +554,11 @@ the opposite polarity, which looks like a naming-pass error worth a
 separate look, not something this promotion should silently paper over).
 `./build-and-verify.sh` green (zero bytes changed) and
 `tools/check-nonmatching.sh code_179d8_m` green.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (`D_8008D988` itself now reads `_svm_voice` above) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+The NON_MATCHING body now reads `_svm_voice[a0].unk0E/unk16/unk12/unk14/unk0C`; the old unsigned views (`Rec34U16`) became plain `s16` field reads assigned to the same `u16` locals, and the normalized disassembly is identical. Stall unchanged.
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body now stores the pitch to `_svm_sreg_buf[a0].unk4` (was `D_8008D7F4[a0].unk0`); normalized disassembly identical.

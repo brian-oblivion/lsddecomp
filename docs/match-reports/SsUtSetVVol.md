@@ -30,9 +30,9 @@ s32 SsUtSetVVol(s16 idx, s16 p1, s16 p2)
     if ((u16) idx < 0x18) {
         t1 = p1 * 129;
         t2 = p2 * 129;
-        D_8008D7F0[idx].unk2 = t2;
-        D_8008D970[idx] |= 3;
-        D_8008D7F0[idx].unk0 = t1;
+        _svm_sreg_buf[idx].unk2 = t2;
+        _svm_sreg_dirty[idx] |= 3;
+        _svm_sreg_buf[idx].unk0 = t1;
         return 0;
     }
     return -1;
@@ -41,12 +41,12 @@ s32 SsUtSetVVol(s16 idx, s16 p1, s16 p2)
 
 The multiply-by-129 sibling of `SsUtSetDetVVol`'s setter and the counterpart
 of `SsUtGetVVol`'s divide-by-129 getter -- same bounds check, same
-`D_8008D7F0` table (this unit's shared `Rec16D7F0`, `unk0`/`unk2` two
+`_svm_sreg_buf` table (this unit's shared `Rec16D7F0`, `unk0`/`unk2` two
 `s16` fields per 0x10-byte slot; splat's `D_8008D7F2` symbol used in the raw
-`.s` is simply `&D_8008D7F0[idx].unk2`, confirmed by the identical address
+`.s` is simply `&_svm_sreg_buf[idx].unk2`, confirmed by the identical address
 computation and by `config/symbols.slps01556.lsdde.txt` carrying no manual
 entry for it -- it is an auto-named address, not a distinct object), same
-`D_8008D970` per-slot flag byte `SsUtSetDetVVol` also touches.
+`_svm_sreg_dirty` per-slot flag byte `SsUtSetDetVVol` also touches.
 
 ## Two separable levers, found in sequence
 
@@ -77,18 +77,18 @@ diagnosis picks up).
 ### Lever 2 -- hoist BOTH scaled values before either table write
 
 With the frame fixed, `asm-differ` showed retail computes `p1 * 129` AND
-`p2 * 129` **both**, back-to-back, before touching the `D_8008D7F0` index
+`p2 * 129` **both**, back-to-back, before touching the `_svm_sreg_buf` index
 arithmetic or writing anything -- the same "load/compute both values before
 consuming either" shape that closed `SsUtGetVVol` this round (see that
-report). The direct-computation form (`D_8008D7F0[idx].unk2 = p2 * 129;`
-inline, `D_8008D7F0[idx].unk0 = p1 * 129;` inline) computes each value
+report). The direct-computation form (`_svm_sreg_buf[idx].unk2 = p2 * 129;`
+inline, `_svm_sreg_buf[idx].unk0 = p1 * 129;` inline) computes each value
 immediately before its own store, interleaved with that store's own index
 arithmetic -- exactly the shape the two prior reports' `asm-differ` reading
 called a register-rescue residue.
 
 Introducing two explicit temporaries, `t1 = p1 * 129;` and `t2 = p2 * 129;`,
 assigned as the FIRST two statements (before any indexing into
-`D_8008D7F0`/`D_8008D970` at all), reproduces retail's instruction order and
+`_svm_sreg_buf`/`_svm_sreg_dirty` at all), reproduces retail's instruction order and
 register roles exactly -- confirmed via `asm-differ`, zero remaining diff.
 One intermediate step (`t1` alone, `t2` computed inline at its use site)
 reached 26/39: better than lever-1-alone's 17/39, but still short, because
@@ -135,3 +135,7 @@ no multi-value computation in that function to test it on. Reading its
 closure as validating the ENTIRE "register-rescue residue" diagnosis these
 two sibling reports share would have been an overreach the frame-only fix
 could not have supported by itself.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). `src/` spelling only: `_svm_sreg_buf[idx].unk0/unk2` and `_svm_sreg_dirty[idx]`. Byte-exact.

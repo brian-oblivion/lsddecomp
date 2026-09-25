@@ -37,12 +37,12 @@ No arguments, no return value. It:
    0x10-stride table `D_8008E968`, indexed by
    `((s16) D_8008EA24 - 1) / 2`, based on `D_8008EA24 & 1`, and stores the
    result into `D_8008D7F6[D_8008EA28]`.
-5. Sets flag bit `0x8` in `D_8008D970[D_8008EA26]`.
+5. Sets flag bit `0x8` in `_svm_sreg_dirty[D_8008EA26]`.
 6. Copies two more fields (`+0x10`, `+0x12`, the second plus `D_8008E84C`)
    out of the SAME 0x20-stride `D_8008E978` table `note2pitch2` already
    established in this unit, into `D_8008D7F8[D_8008EA28]` /
    `D_8008D7FA[D_8008EA28]`.
-7. Sets flag bits `0x30` in `D_8008D970[D_8008EA26]`.
+7. Sets flag bits `0x30` in `_svm_sreg_dirty[D_8008EA26]`.
 
 ## Struct/global model
 
@@ -70,7 +70,7 @@ typedef struct {
 extern D8008E968RecCE *D_8008E968;
 
 extern s16 D_8008D7F6[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 /* Same base pointer as this unit's own note2pitch2 (D8008E978Entry) --
  * extended here with the two halfwords at +0x10/+0x12 this function reads,
@@ -159,7 +159,7 @@ void SpuVmDoAllocate(void)
     }
 
     chan = D_8008EA26;
-    D_8008D970[chan] |= 8;
+    _svm_sreg_dirty[chan] |= 8;
 
     idx = D_8008EA18 + (D_8008EA13 << 4);
     D_8008D7F8[D_8008EA28] = D_8008E978[idx].unk16;
@@ -169,7 +169,7 @@ void SpuVmDoAllocate(void)
     __asm__("");
 
     chan = D_8008EA26;
-    D_8008D970[chan] |= 0x30;
+    _svm_sreg_dirty[chan] |= 0x30;
 }
 ```
 
@@ -217,7 +217,7 @@ unaffected.
    keeps. Marking it volatile restored every one of them across the whole
    function in one change (went from 134 to 140/143).
 6. **A bare `__asm__("")` between the LAST `D_8008D7FA[...] = ...;` store
-   and the trailing `D_8008D970[...] |= 0x30;`.** Without it, GCC schedules
+   and the trailing `_svm_sreg_dirty[...] |= 0x30;`.** Without it, GCC schedules
    the (independent, differently-addressed) `D_8008D7FA` store AFTER the
    `|=0x30` store even though it is written first in source — a pure
    instruction-order rearrangement (confirmed: removing the barrier changes
@@ -230,7 +230,7 @@ unaffected.
 **One word short, and a small number of narrow-load register-selection
 differences that don't change instruction count but do change bytes.**
 
-- **The `chan = D_8008EA26; D_8008D970[chan] |= N;` idiom (used twice, for
+- **The `chan = D_8008EA26; _svm_sreg_dirty[chan] |= N;` idiom (used twice, for
   the `|=8` and `|=0x30` bit-sets) compiles to an `lhu` immediately followed
   by a manual `sll #0x10`/`sra #0x10` sign-extend pair (2 extra
   instructions each = 4 extra words total), where retail does the
@@ -238,11 +238,11 @@ differences that don't change instruction count but do change bytes.**
   GCC 2.6.3 quirk specific to a signed `volatile` scalar being used
   (directly OR through an intermediate plain local freshly assigned from
   it) as an array index — every variant tried triggers it identically:
-  - Direct `D_8008D970[D_8008EA26]` (no intermediate variable): same
+  - Direct `_svm_sreg_dirty[D_8008EA26]` (no intermediate variable): same
     `lhu`+extend pair.
-  - `s16 chan = D_8008EA26; D_8008D970[chan]`: same pair (the version kept
+  - `s16 chan = D_8008EA26; _svm_sreg_dirty[chan]`: same pair (the version kept
     in the body above).
-  - `s32 chan = D_8008EA26; D_8008D970[chan]`: same pair, AND it additionally
+  - `s32 chan = D_8008EA26; _svm_sreg_dirty[chan]`: same pair, AND it additionally
     REGRESSES the earlier `chan = D_8008EA26; *p28 = chan << 3;` sequence
     from a clean `lh` to the same `lhu`+extend pattern — so `s32` is
     strictly worse and was reverted.
@@ -299,12 +299,12 @@ name and a plain-typed copy. This is the natural next lever.
 
 The coordinator asked for a bounded (5-attempt) re-check of the one lever
 this report had flagged as untested: reading `D_8008EA26` through a
-`volatile s16 *` pointer variable for the two `D_8008D970[D_8008EA26]`
+`volatile s16 *` pointer variable for the two `_svm_sreg_dirty[D_8008EA26]`
 sites, by analogy with fix #1 (`p28`). Result: **no improvement, still
 142/143.** Five variants tried, all compiling clean:
 
 1. `chanPtr = &D_8008EA26;` immediately before each of the two sites,
-   `D_8008D970[*chanPtr] |= N;` — **142/143 (neutral)**. Changed the
+   `_svm_sreg_dirty[*chanPtr] |= N;` — **142/143 (neutral)**. Changed the
    instruction MIX at that site from retail's target shape but kept the
    same total: `lhu`+`sll`+`sra` (3 instr, the original bare-symbol form)
    became `addiu`+`lhu` (2 instr) — one instruction cheaper locally, but
@@ -342,7 +342,7 @@ instructions, but the wrong 2 — `addiu`+`lhu`, unsigned, not `lui`+`lh`,
 signed). Neither the plain-local, s32-local, pointer-variable, nor
 inline-cast phrasing reproduces the combination of (freshly-materialized
 base) AND (signed load) retail shows together. Something about this
-specific `D_8008D970[...]` array-index USE of a `volatile s16` scalar
+specific `_svm_sreg_dirty[...]` array-index USE of a `volatile s16` scalar
 makes GCC 2.6.3 treat the sign-extension and the addressing as mutually
 exclusive optimizations in this codebase's exact configuration — pick
 either a clean address (unsigned) or a clean sign (bare symbol, unsigned
@@ -426,7 +426,7 @@ typedef struct {
 extern D8008E968RecCE *D_8008E968;
 
 extern s16 D_8008D7F6[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 /* Same base pointer as this unit's own note2pitch2 (D8008E978Entry) --
  * extended here with the two halfwords at +0x10/+0x12 this function reads.
@@ -489,7 +489,7 @@ void SpuVmDoAllocate(void)
     }
 
     chan = D_8008EA26;
-    D_8008D970[chan] |= 8;
+    _svm_sreg_dirty[chan] |= 8;
 
     idx = D_8008EA18 + (D_8008EA13 << 4);
     D_8008D7F8[D_8008EA28] = D_8008E978[idx].unk16;
@@ -499,7 +499,7 @@ void SpuVmDoAllocate(void)
     __asm__("");
 
     chan = D_8008EA26;
-    D_8008D970[chan] |= 0x30;
+    _svm_sreg_dirty[chan] |= 0x30;
 }
 ```
 
@@ -626,3 +626,7 @@ as `libsnd/vmanager SpuVmDoAllocate` (shape 0.99 vs the disc-3.3 reference,
 141w reference vs our 143w, position within the libsnd neighborhood). Sony
 symbol; this pass does not rename it further. The function remains a STALL
 (1 word short, see above).
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/SvmData.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (code_179d8_j_b/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols).

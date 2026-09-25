@@ -313,7 +313,7 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34S16;
-extern Rec34S16 D_8008D988[];
+extern Rec34S16 _svm_voice[];
 extern Rec34S16 D_8008D996[];
 extern Rec34S16 D_8008D99A[];
 
@@ -321,10 +321,10 @@ extern Rec34Half D_8008D990[];
 extern Rec34Half D_8008D98C[];
 extern Rec34Half D_8008D98E[];
 extern Rec34Half D_8008D998[];
-extern Rec34Half gVoiceEnvStep[];
-extern Rec34Half gVoiceEnvInterval[];
-extern Rec34Half gVoiceEnvCountdown[];
-extern Rec34Half gVoiceEnvAccum[];
+extern Rec34Half D_8008D9A6[];
+extern Rec34Half D_8008D9A8[];
+extern Rec34Half D_8008D9AA[];
+extern Rec34Half D_8008D9AC[];
 
 typedef struct {
     u16 unk0; /* +0x0 */
@@ -338,7 +338,7 @@ typedef struct {
 } Rec34Byte;
 extern Rec34Byte D_8008D992[]; /* byte field, forced to 0x40 at init */
 extern Rec34Byte D_8008D9A3[];
-extern Rec34Half gVoiceEnvActive[];
+extern Rec34Half D_8008D9A4[];
 
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
@@ -365,11 +365,11 @@ void SpuVmInit(s32 a0) {
     SpuInitMalloc(0x20, gSpuMallocArea);
 
     for (i = 0; (u16) i < 0xC0; i++) {
-        ((u16 *) D_8008D7F0)[(u16) i] = 0;
+        ((u16 *) _svm_sreg_buf)[(u16) i] = 0;
     }
 
     for (i = 0; (u16) i < 0x18; i++) {
-        D_8008D970[(u16) i] = 0;
+        _svm_sreg_dirty[(u16) i] = 0;
     }
 
     D_80090BD0 = 0;
@@ -406,7 +406,7 @@ void SpuVmInit(s32 a0) {
 
         D_8008D98A[(u16) i].unk0 = 0x18;
         D_8008D996[(u16) i].unk0 = -1;
-        D_8008D988[(u16) i].unk0 = 0xFF;
+        _svm_voice[(u16) i].unk0 = 0xFF;
         D_8008D9A3[(u16) i].unk0 = 0;
         D_8008D98C[(u16) i].unk0 = 0;
         D_8008D98E[(u16) i].unk0 = 0;
@@ -415,16 +415,16 @@ void SpuVmInit(s32 a0) {
         D_8008D99C[(u16) i].unk0 = 0xFF;
         D_8008D990[(u16) i].unk0 = 0;
         D_8008D992[(u16) i].unk0 = 0x40;
-        gVoiceEnvActive[(u16) i].unk0 = 0;
-        gVoiceEnvStep[(u16) i].unk0 = 0;
-        gVoiceEnvInterval[(u16) i].unk0 = 0;
-        gVoiceEnvCountdown[(u16) i].unk0 = 0;
-        gVoiceFadeActive[(u16) i].unk0 = 0;
-        gVoiceFadeStep[(u16) i].unk0 = 0;
-        gVoiceFadeInterval[(u16) i].unk0 = 0;
-        gVoiceFadeCountdown[(u16) i].unk0 = 0;
-        gVoiceFadeAccum[(u16) i].unk0 = 0;
-        gVoiceEnvAccum[(u16) i].unk0 = 0;
+        D_8008D9A4[(u16) i].unk0 = 0;
+        D_8008D9A6[(u16) i].unk0 = 0;
+        D_8008D9A8[(u16) i].unk0 = 0;
+        D_8008D9AA[(u16) i].unk0 = 0;
+        D_8008D9B0[(u16) i].unk0 = 0;
+        D_8008D9B2[(u16) i].unk0 = 0;
+        D_8008D9B4[(u16) i].unk0 = 0;
+        D_8008D9B6[(u16) i].unk0 = 0;
+        D_8008D9B8[(u16) i].unk0 = 0;
+        D_8008D9AC[(u16) i].unk0 = 0;
 
         ((s16 *) D_8006DAD4)[woff + 3] = 0x200;   /* +0x6 */
         ((s16 *) D_8006DAD4)[woff + 2] = 0x1000;  /* +0x4 */
@@ -453,7 +453,7 @@ void SpuVmInit(s32 a0) {
 
         D_8008D9A3[chan].unk0 = 0;
         D_8008D98C[chan].unk0 = 0;
-        D_8008D988[chan].unk0 = 0;
+        _svm_voice[chan].unk0 = 0;
         D_80090C60 |= lowMask;
         D_80090C64 |= highMask;
         D_8008E228 &= ~D_80090C60;
@@ -729,5 +729,13 @@ base address `0x1F801C00`, per `vmNoiseOn2`'s own report in
 globals this unit shares with that cluster (`D_8008EA26` -> `gSelectedVoice`,
 `D_8008E9D0` -> `gVoiceCount`, `D_80090C60`/`D_80090C64` ->
 `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`, `D_8008E228`/`D_8008E22C` ->
-`gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`, `D_8008D970` -> `gVoiceFlags`,
+`gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`, `_svm_sreg_dirty` -> `gVoiceFlags`,
 `D_8008D9A3` -> `gVoiceState`).
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (`D_8008D988` itself now reads `_svm_voice` above) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+`src/` now writes all 21 per-voice fields as `_svm_voice[(u16) i].unkNN` (the `*Edd4` `__asm__` label aliases are gone). Byte-exact on the first build: no CSE of the record address appeared, even in this 21-store loop.
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). `src/` keeps the flat halfword clear `((u16 *) _svm_sreg_buf)[(u16) i]` over all 0xC0 halfwords and clears `_svm_sreg_dirty`. Byte-exact.

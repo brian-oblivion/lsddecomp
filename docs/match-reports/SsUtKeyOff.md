@@ -33,7 +33,7 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
      || D_8008D994[idx].unk0 != p4) {
         goto fail;
     }
-    if (D_8008D988[idx].unk0 == 0xFF) {
+    if (_svm_voice[idx].unk0 == 0xFF) {
         D_8008D9A3[(u8) idx].unk0 = 0;
         D_8008D98C[(u8) idx].unk0 = 0;
         D_8006DAD4[25].unk4 = 0;
@@ -50,7 +50,7 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
         }
         D_8008D9A3[chan].unk0 = 0;
         D_8008D98C[chan].unk0 = 0;
-        D_8008D988[chan].unk0 = 0;
+        _svm_voice[chan].unk0 = 0;
         D_80090C60 = mask0 | D_80090C60;
         D_80090C64 |= mask1;
         D_8008E228 &= ~D_80090C60;
@@ -75,15 +75,15 @@ fail_nolock:
   the existing `unk0`/`unk2` offsets are unchanged, so this is safe for the
   already-matched sibling per CLAUDE.md's "struct edits are non-local" rule
   (confirmed: whole-image build stays green).
-- `Rec34Half` (`D_8008D988`, `D_8008D98C`) retyped from `u16 unk0` to
+- `Rec34Half` (`_svm_voice`, `D_8008D98C`) retyped from `u16 unk0` to
   `s16 unk0` -- neither array was read by any already-matched function in
   this unit yet (only written, via `sh`, which doesn't care about
   signedness), so this was a free retype. It matters here because
-  `SsUtKeyOff` compares `D_8008D988[idx].unk0` against `0xFF` with a
+  `SsUtKeyOff` compares `_svm_voice[idx].unk0` against `0xFF` with a
   genuinely *signed* `lh`, not `lhu` -- confirmed from the `.s` opcode
   encoding (top 6 bits `100001` = `LH`), not inferred.
 - New sibling array `D_8008D98A[]`, same `Rec34Half` shape, 2 bytes after
-  `D_8008D988` and 2 bytes before `D_8008D98C` -- a third member of the
+  `_svm_voice` and 2 bytes before `D_8008D98C` -- a third member of the
   "several unrelated top-level symbols 2 bytes apart" convention already
   documented for the `D_8008D994` group. Declared but not used by this
   function (found via `SsUtKeyOn`'s disassembly while scoping the
@@ -192,3 +192,9 @@ declared width of the two operands, not just their written order, especially
 when the two operands are NOT symmetric in the source (one is a bare global
 already known to be `u16`, the other a local the decompiler guessed as
 `u32` by default).
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (`D_8008D988` itself now reads `_svm_voice` above) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+`src/` now reads `_svm_voice[idx].unk16/unk12/unk14/unk0C/unk00` (all `s16`, as the old views) and clears `unk1B/unk04/unk00`. Byte-exact.

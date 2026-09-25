@@ -78,7 +78,7 @@ Retail keeps the counter full-width in `$t1` (`addiu $t1,$t1,0x1`, unmasked)
 and re-derives `andi $vX,$t1,0xFF` at **every** use: the 0x34-stride record
 index at the loop head (0x80030A50 in the preheader, 0x80030E5C in the
 backedge delay slot), again at 0x80030C0C, again at 0x80030CB4, again at
-0x80030DE0 for the `D_8008D7F0` store offset and the `D_8008D970` index.
+0x80030DE0 for the `_svm_sreg_buf` store offset and the `_svm_sreg_dirty` index.
 Rounds 45 and 50 both declared `s32 i` and indexed with plain `i`, masking only
 in the loop condition. Declaring `u8 i` and dropping the cast from the
 condition reproduces retail's mask-at-every-use shape.
@@ -153,8 +153,8 @@ Two further differences, both already-known classes, both small:
   input to the register-assignment difference below. `volatile` on the
   parameter is not spellable usefully and retail keeps `a4` in `$s3`, a
   register, so the spill lever is ruled out by retail's own bytes.
-- **The two `D_8008D7F0` store addresses.** Retail hoists `&D_8008D7F0` into
-  `$t6` and `&D_8008D7F0 + 2` into `$t7` (3 preheader words) and spends 2 words
+- **The two `_svm_sreg_buf` store addresses.** Retail hoists `&_svm_sreg_buf` into
+  `$t6` and `&_svm_sreg_buf + 2` into `$t7` (3 preheader words) and spends 2 words
   in the loop (`addu $v0,$v1,$t6`, `addu $v1,$v1,$t7`); our build spends 8 in
   the loop as two `lui/addiu/addu` sequences and hoists nothing. Net +1 for us.
 
@@ -174,8 +174,8 @@ it is *downstream* of the shape difference above, not the thing to attack.
 
 Declarations used, all of them already present in `src/code_179d8_j_b.c`
 before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `D800902E8Entry`,
-`ObjE970`, `D_8008E9D0`, `D_8008EA22`, `D_8008E8C0`, `D_8008D7F0`,
-`D_8008D970`, `SpuVmVSetUp`).
+`ObjE970`, `D_8008E9D0`, `D_8008EA22`, `D_8008E8C0`, `_svm_sreg_buf`,
+`_svm_sreg_dirty`, `SpuVmVSetUp`).
 
 ```c
 #if 0
@@ -261,11 +261,11 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     pan2sq = pan2 * pan2;
 
                     off16 = i << 4;
-                    *(u16 *)(D_8008D7F0 + off16) = (u16)(pan1sq / 16383);
-                    *(u16 *)(D_8008D7F0 + off16 + 2) = (u16)(pan2sq / 16383);
+                    *(u16 *)(_svm_sreg_buf + off16) = (u16)(pan1sq / 16383);
+                    *(u16 *)(_svm_sreg_buf + off16 + 2) = (u16)(pan2sq / 16383);
 
                     result++;
-                    D_8008D970[i] |= 3;
+                    _svm_sreg_dirty[i] |= 3;
                 }
             }
             i++;
@@ -407,7 +407,7 @@ artifact of a downstream address shift.
 
 **`off16` is a NEW instance of the sibling's lever, not previously tried
 on any of the three SPU-voice-level functions.** It is the byte offset
-(`i << 4`) used twice, to compute the two `D_8008D7F0` store addresses.
+(`i << 4`) used twice, to compute the two `_svm_sreg_buf` store addresses.
 Marking it `volatile` forces the offset to be recomputed from memory
 rather than kept live across both stores in a register, which is what
 retail's own bytes show happening structurally at that point (retail
@@ -449,8 +449,8 @@ typedef struct {
 extern ObjE970 *D_8008E970;
 
 extern s16 D_8008E8C0;
-extern u8 D_8008D7F0[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_buf[];
+extern u8 _svm_sreg_dirty[];
 extern Rec34D994 D_8008D990[];   /* added round 45, in this unit's existing Rec34D994 block */
 ```
 
@@ -539,11 +539,11 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     pan2sq = pan2 * pan2;
 
                     off16 = i << 4;
-                    *(u16 *)(D_8008D7F0 + off16) = (u16)(pan1sq / 16383);
-                    *(u16 *)(D_8008D7F0 + off16 + 2) = (u16)(pan2sq / 16383);
+                    *(u16 *)(_svm_sreg_buf + off16) = (u16)(pan1sq / 16383);
+                    *(u16 *)(_svm_sreg_buf + off16 + 2) = (u16)(pan2sq / 16383);
 
                     result++;
-                    D_8008D970[i] |= 3;
+                    _svm_sreg_dirty[i] |= 3;
                 }
             }
             i++;
@@ -791,10 +791,10 @@ signed 16-bit values). On a match:
 - The same `D_8008E8C0`-gated clamp shape as both siblings.
 - Squares both final pan values and divides each by `16383` (same magic
   `0x00040011` `SpuVmKeyOnNow`'s tail already established), writing the
-  results into `D_8008D7F0`'s 16-byte-stride slots (`vmNoiseOn`'s own
+  results into `_svm_sreg_buf`'s 16-byte-stride slots (`vmNoiseOn`'s own
   table, offset `i<<4` and `i<<4 + 2`) and incrementing a result counter.
-  Also sets `D_8008D970[i] |= 3` (byte array, direct `i`-indexed, no
-  scaling -- matches `vmNoiseOn`'s own `D_8008D970` usage exactly).
+  Also sets `_svm_sreg_dirty[i] |= 3` (byte array, direct `i`-indexed, no
+  scaling -- matches `vmNoiseOn`'s own `_svm_sreg_dirty` usage exactly).
 
 **No new struct or divisor family was needed anywhere in this function** --
 every single computational piece is a direct reuse of something
@@ -827,8 +827,8 @@ typedef struct {
 extern ObjE970 *D_8008E970;
 
 extern s16 D_8008E8C0;
-extern u8 D_8008D7F0[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_buf[];
+extern u8 _svm_sreg_dirty[];
 extern Rec34D994 D_8008D990[];   /* added to this unit's existing Rec34D994 block */
 ```
 
@@ -920,11 +920,11 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     pan2sq = pan2 * pan2;
 
                     off16 = i << 4;
-                    *(u16 *)(D_8008D7F0 + off16) = (u16)(pan1sq / 16383);
-                    *(u16 *)(D_8008D7F0 + off16 + 2) = (u16)(pan2sq / 16383);
+                    *(u16 *)(_svm_sreg_buf + off16) = (u16)(pan1sq / 16383);
+                    *(u16 *)(_svm_sreg_buf + off16 + 2) = (u16)(pan2sq / 16383);
 
                     result++;
-                    D_8008D970[i] |= 3;
+                    _svm_sreg_dirty[i] |= 3;
                 }
             }
             i++;
@@ -1065,7 +1065,7 @@ Unit `code_179d8_j (round 21, 2026-09-06)`. **Not attempted at the time.**
 grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_179d8_j/SpuVmSetVol.s
 ```
 
-Hit, on `D_8008D970`, `D_8008D990`, `D_8008D996`. RESOLVED round 21
+Hit, on `_svm_sreg_dirty`, `D_8008D990`, `D_8008D996`. RESOLVED round 21
 (`--addiu-at`).
 
 ### `nop_mflo_mfhi`
@@ -1109,3 +1109,11 @@ unchanged (`./build-and-verify.sh` green, `tools/check-nonmatching.sh`
 green).
 
 NON_MATCHING body promoted, round 70
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+The NON_MATCHING body now reads `_svm_voice[i].unk0E/unk12/unk16/unk10/unk08/unk14`; normalized disassembly identical.
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body now stores `_svm_sreg_buf[i].unk0/unk2` in place of `*(u16 *)(D_8008D7F0 + off16)` / `+ 2`; the `off16` local is gone and the normalized disassembly is identical.

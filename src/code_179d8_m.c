@@ -27,17 +27,13 @@
  *     code_179d8_l) and, if one exists, key it on (vmNoiseOn2, also
  *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
  *     two hardcoded constants.
- *   - SeAutoPan / SetAutoPan: a linear-ramp pair over the
- *     gVoiceFade* per-voice arrays -- Begin sets a start/target/step-rate;
+ *   - SeAutoPan / SetAutoPan: a linear-ramp pair over _svm_voice
+ *     +0x28..+0x32 (include/SvmData.h) -- Se sets a start/target/step-rate;
  *     Step advances the accumulator (throttled by an interval/countdown
  *     pair), clamps at the target, and writes the resulting stereo output
  *     level.
- *   - SetAutoVol: the same accumulate-until-limit shape over its
- *     own gVoiceEnv* family, but with no "Begin" counterpart in this
- *     unit -- whatever sets gVoiceEnvActive/gVoiceEnvStep/gVoiceEnvLimit
- *     is still undecompiled elsewhere. SeAutoVol in code_179d8_l opens
- *     with the identical prologue/argument-narrowing shape and is worth
- *     checking as that counterpart.
+ *   - SetAutoVol: the same accumulate-until-limit shape over _svm_voice
+ *     +0x1C..+0x26; its setter is SeAutoVol in code_179d8_l.
  *   - SpuVmFlush: the per-tick dispatcher. Maintains a 16-slot
  *     ring buffer of per-tick voice-activity bitmasks; when a voice has
  *     shown no activity for 16 consecutive ticks it force-releases it
@@ -65,6 +61,7 @@
  * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
  */
 #include "common.h"
+#include "SvmData.h"
 
 /* Round 48 (echo): testing charlie's ContDataEntry frame-padding lever on
  * this function's frame gap (0x10 built vs retail's 0x18, 8 bytes; retail
@@ -74,8 +71,7 @@
  * full derivation this body is otherwise unchanged from.
  *
  * This function sits FIRST in ROM order in this unit, so the shared
- * record-family types its sibling stalls also use (Rec34Half, Rec34HalfU,
- * Rec16D7F0, ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
+ * record-family types its sibling stalls also use (ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
  * defined HERE instead of duplicated -- their old definitions further
  * down this file (originally written for SetAutoPan's isolated splice)
  * are removed; the plain externs that used to accompany them there are
@@ -83,31 +79,6 @@
  * (a harmless duplicate extern declaration, not a redefinition). Same
  * "move the shared prelude up, do not duplicate" fix round 37 already
  * used here; declaration order carries no code. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34Half;
-extern Rec34Half gVoiceEnvActive[]; /* nonzero while this voice's envelope is still ramping; cleared by SetAutoVol when it reaches gVoiceEnvLimit */
-extern Rec34Half gVoiceEnvStep[]; /* per-tick increment/decrement applied to gVoiceEnvAccum */
-extern Rec34Half gVoiceEnvInterval[]; /* ticks between steps (0 = every tick), same throttle idiom as gVoiceFadeInterval below */
-extern Rec34Half gVoiceEnvCountdown[]; /* countdown to the next step, reloaded from gVoiceEnvInterval */
-extern Rec34Half gVoiceEnvAccum[]; /* running envelope value */
-extern Rec34Half gVoiceEnvLimit[]; /* value the envelope clamps to once reached */
-
-typedef struct {
-    u16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34HalfU;
-
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x10 - 0x2];
-} Rec16D7F0;
-extern Rec16D7F0 D_8008D7F0[];
-extern Rec16D7F0 D_8008D7F2[];
-
-extern u8 D_8008D970[];
-
 typedef struct {
     u8 pad[0x12];
     u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per SpuVmKeyOn's report */
@@ -148,26 +119,26 @@ void SetAutoVol(s16 voice)
 
     v = voice;
     off = voice * 8;
-    if (gVoiceEnvInterval[voice].unk0 != 0) {
-        if (gVoiceEnvCountdown[voice].unk0-- > 0) {
+    if (_svm_voice[voice].unk20 != 0) {
+        if (_svm_voice[voice].unk22-- > 0) {
             return;
         }
-        gVoiceEnvCountdown[voice].unk0 = gVoiceEnvInterval[voice].unk0;
+        _svm_voice[voice].unk22 = _svm_voice[voice].unk20;
     }
-    gVoiceEnvAccum[voice].unk0 += gVoiceEnvStep[voice].unk0;
-    if (gVoiceEnvStep[voice].unk0 > 0) {
-        if (gVoiceEnvAccum[voice].unk0 >= gVoiceEnvLimit[voice].unk0) {
-            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
-            gVoiceEnvActive[voice].unk0 = 0;
+    _svm_voice[voice].unk24 += _svm_voice[voice].unk1E;
+    if (_svm_voice[voice].unk1E > 0) {
+        if (_svm_voice[voice].unk24 >= _svm_voice[voice].unk26) {
+            _svm_voice[voice].unk24 = _svm_voice[voice].unk26;
+            _svm_voice[voice].unk1C = 0;
         }
-    } else if (gVoiceEnvStep[voice].unk0 < 0) {
-        if (gVoiceEnvAccum[voice].unk0 <= gVoiceEnvLimit[voice].unk0) {
-            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
-            gVoiceEnvActive[voice].unk0 = 0;
+    } else if (_svm_voice[voice].unk1E < 0) {
+        if (_svm_voice[voice].unk24 <= _svm_voice[voice].unk26) {
+            _svm_voice[voice].unk24 = _svm_voice[voice].unk26;
+            _svm_voice[voice].unk1C = 0;
         }
     }
 
-    acc = gVoiceEnvAccum[v].unk0;
+    acc = _svm_voice[v].unk24;
     D_8008EA10 = acc;
 
     vol = D_8008E970->masterVolume * 0x3FFF;
@@ -206,25 +177,13 @@ void SetAutoVol(s16 voice)
         }
     }
 
-    ((s16 *) D_8008D7F0)[off + 1] = val2;
-    ((s16 *) D_8008D7F0)[off] = val1;
-    D_8008D970[v] |= 3;
+    ((s16 *) _svm_sreg_buf)[off + 1] = val2;
+    ((s16 *) _svm_sreg_buf)[off] = val1;
+    _svm_sreg_dirty[v] |= 3;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoVol);
 #endif
-
-/* Same 0x34-stride channel-configuration record family documented in
- * code_179d8_j.c (Rec34D994/Rec34Byte/Rec34Half); this unit keeps its
- * own local view rather than sharing that file's header-less types.
- * Six independent 2-bytes-apart symbols share this one shape, same
- * idiom as code_179d8_j.c's own D_8008D994/D_8008D996/... family. */
-extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by SeAutoPan, cleared by SetAutoPan when gVoiceFadeAccum reaches gVoiceFadeLimit */
-extern Rec34Half gVoiceFadeStep[]; /* per-tick increment/decrement applied to gVoiceFadeAccum */
-extern Rec34Half gVoiceFadeInterval[]; /* ticks between steps (0 = every tick); same throttle idiom as gVoiceEnvInterval above */
-extern Rec34Half gVoiceFadeCountdown[]; /* countdown to the next step, reloaded from gVoiceFadeInterval */
-extern Rec34Half gVoiceFadeAccum[]; /* running interpolated value, initialized to SeAutoPan's "from" argument */
-extern Rec34Half gVoiceFadeLimit[]; /* target value the fade is moving toward, SeAutoPan's "to" argument */
 
 void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
@@ -232,18 +191,18 @@ void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
     if (a1 == a2) {
         return;
     }
-    gVoiceFadeActive[a0].unk0 = 1;
-    gVoiceFadeAccum[a0].unk0 = a1;
-    gVoiceFadeLimit[a0].unk0 = a2;
+    _svm_voice[a0].unk28 = 1;
+    _svm_voice[a0].unk30 = a1;
+    _svm_voice[a0].unk32 = a2;
     if ((a1 - a2 < 0 ? a2 - a1 : a1 - a2) < a3) {
         q = a3 / (a1 - a2);
-        gVoiceFadeStep[a0].unk0 = 1;
-        gVoiceFadeInterval[a0].unk0 = q;
-        gVoiceFadeCountdown[a0].unk0 = q;
+        _svm_voice[a0].unk2A = 1;
+        _svm_voice[a0].unk2C = q;
+        _svm_voice[a0].unk2E = q;
     } else {
         q = (a1 - a2) / a3;
-        gVoiceFadeInterval[a0].unk0 = 0;
-        gVoiceFadeStep[a0].unk0 = q;
+        _svm_voice[a0].unk2C = 0;
+        _svm_voice[a0].unk2A = q;
     }
 }
 
@@ -269,26 +228,26 @@ void SetAutoPan(s16 voice)
 
     v = voice;
     off = voice * 8;
-    if (gVoiceFadeInterval[voice].unk0 != 0) {
-        if (gVoiceFadeCountdown[voice].unk0-- > 0) {
+    if (_svm_voice[voice].unk2C != 0) {
+        if (_svm_voice[voice].unk2E-- > 0) {
             return;
         }
-        gVoiceFadeCountdown[voice].unk0 = gVoiceFadeInterval[voice].unk0;
+        _svm_voice[voice].unk2E = _svm_voice[voice].unk2C;
     }
-    gVoiceFadeAccum[voice].unk0 += gVoiceFadeStep[voice].unk0;
-    if (gVoiceFadeStep[voice].unk0 > 0) {
-        if (gVoiceFadeAccum[voice].unk0 >= gVoiceFadeLimit[voice].unk0) {
-            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
-            gVoiceFadeActive[voice].unk0 = 0;
+    _svm_voice[voice].unk30 += _svm_voice[voice].unk2A;
+    if (_svm_voice[voice].unk2A > 0) {
+        if (_svm_voice[voice].unk30 >= _svm_voice[voice].unk32) {
+            _svm_voice[voice].unk30 = _svm_voice[voice].unk32;
+            _svm_voice[voice].unk28 = 0;
         }
-    } else if (gVoiceFadeStep[voice].unk0 < 0) {
-        if (gVoiceFadeAccum[voice].unk0 <= gVoiceFadeLimit[voice].unk0) {
-            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
-            gVoiceFadeActive[voice].unk0 = 0;
+    } else if (_svm_voice[voice].unk2A < 0) {
+        if (_svm_voice[voice].unk30 <= _svm_voice[voice].unk32) {
+            _svm_voice[voice].unk30 = _svm_voice[voice].unk32;
+            _svm_voice[voice].unk28 = 0;
         }
     }
 
-    acc = *(u8 *) &gVoiceFadeAccum[v].unk0;
+    acc = *(u8 *) &_svm_voice[v].unk30;
     D_8008EA11 = acc;
 
     vol = D_8008E970->masterVolume * 0x3FFF;
@@ -327,9 +286,9 @@ void SetAutoPan(s16 voice)
         }
     }
 
-    ((s16 *) D_8008D7F0)[off + 1] = val2;
-    ((s16 *) D_8008D7F0)[off] = val1;
-    D_8008D970[v] |= 3;
+    ((s16 *) _svm_sreg_buf)[off + 1] = val2;
+    ((s16 *) _svm_sreg_buf)[off] = val1;
+    _svm_sreg_dirty[v] |= 3;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoPan);
@@ -350,39 +309,6 @@ extern s32 D_8008E258;
 extern s32 D_8008E25C;
 extern u8 gDisableVoiceStarveScan;
 extern s16 D_8008E938;
-
-extern Rec34Half D_8008D98A[]; /* value forced to 0x18 at init */
-
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34S16Edd4;
-extern Rec34S16Edd4 D_8008D988Edd4[] __asm__("D_8008D988");
-extern Rec34S16Edd4 D_8008D996Edd4[] __asm__("D_8008D996");
-extern Rec34S16Edd4 D_8008D99AEdd4[] __asm__("D_8008D99A");
-
-extern Rec34Half D_8008D990[];
-extern Rec34Half D_8008D98C[];
-extern Rec34Half D_8008D98E[];
-extern Rec34Half D_8008D998[];
-extern Rec34Half gVoiceEnvStep[];
-extern Rec34Half gVoiceEnvInterval[];
-extern Rec34Half gVoiceEnvCountdown[];
-extern Rec34Half gVoiceEnvAccum[];
-
-typedef struct {
-    u16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34U16Edd4;
-extern Rec34U16Edd4 D_8008D99CEdd4[] __asm__("D_8008D99C");
-
-typedef struct {
-    u8 unk0; /* +0x0 */
-    u8 pad1[0x34 - 0x1];
-} Rec34ByteEdd4;
-extern Rec34ByteEdd4 D_8008D992[]; /* byte field, forced to 0x40 at init */
-extern Rec34ByteEdd4 D_8008D9A3Edd4[] __asm__("D_8008D9A3");
-extern Rec34Half gVoiceEnvActive[];
 
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
@@ -423,11 +349,11 @@ void SpuVmInit(s32 a0) {
     SpuInitMalloc(0x20, gSpuMallocArea);
 
     for (i = 0; (u16) i < 0xC0; i++) {
-        ((u16 *) D_8008D7F0)[(u16) i] = 0;
+        ((u16 *) _svm_sreg_buf)[(u16) i] = 0;
     }
 
     for (i = 0; (u16) i < 0x18; i++) {
-        D_8008D970[(u16) i] = 0;
+        _svm_sreg_dirty[(u16) i] = 0;
     }
 
     D_80090BD0 = 0;
@@ -452,27 +378,27 @@ void SpuVmInit(s32 a0) {
 
         woff = (u16) i * 8;
 
-        D_8008D98A[(u16) i].unk0 = 0x18;
-        D_8008D996Edd4[(u16) i].unk0 = -1;
-        D_8008D988Edd4[(u16) i].unk0 = 0xFF;
-        D_8008D9A3Edd4[(u16) i].unk0 = 0;
-        D_8008D98C[(u16) i].unk0 = 0;
-        D_8008D98E[(u16) i].unk0 = 0;
-        D_8008D998[(u16) i].unk0 = 0;
-        D_8008D99AEdd4[(u16) i].unk0 = 0;
-        D_8008D99CEdd4[(u16) i].unk0 = 0xFF;
-        D_8008D990[(u16) i].unk0 = 0;
-        D_8008D992[(u16) i].unk0 = 0x40;
-        gVoiceEnvActive[(u16) i].unk0 = 0;
-        gVoiceEnvStep[(u16) i].unk0 = 0;
-        gVoiceEnvInterval[(u16) i].unk0 = 0;
-        gVoiceEnvCountdown[(u16) i].unk0 = 0;
-        gVoiceFadeActive[(u16) i].unk0 = 0;
-        gVoiceFadeStep[(u16) i].unk0 = 0;
-        gVoiceFadeInterval[(u16) i].unk0 = 0;
-        gVoiceFadeCountdown[(u16) i].unk0 = 0;
-        gVoiceFadeAccum[(u16) i].unk0 = 0;
-        gVoiceEnvAccum[(u16) i].unk0 = 0;
+        _svm_voice[(u16) i].unk02 = 0x18;
+        _svm_voice[(u16) i].unk0E = -1;
+        _svm_voice[(u16) i].unk00 = 0xFF;
+        _svm_voice[(u16) i].unk1B = 0;
+        _svm_voice[(u16) i].unk04 = 0;
+        _svm_voice[(u16) i].unk06 = 0;
+        _svm_voice[(u16) i].unk10 = 0;
+        _svm_voice[(u16) i].unk12 = 0;
+        _svm_voice[(u16) i].unk14 = 0xFF;
+        _svm_voice[(u16) i].unk08 = 0;
+        _svm_voice[(u16) i].unk0A = 0x40;
+        _svm_voice[(u16) i].unk1C = 0;
+        _svm_voice[(u16) i].unk1E = 0;
+        _svm_voice[(u16) i].unk20 = 0;
+        _svm_voice[(u16) i].unk22 = 0;
+        _svm_voice[(u16) i].unk28 = 0;
+        _svm_voice[(u16) i].unk2A = 0;
+        _svm_voice[(u16) i].unk2C = 0;
+        _svm_voice[(u16) i].unk2E = 0;
+        _svm_voice[(u16) i].unk30 = 0;
+        _svm_voice[(u16) i].unk24 = 0;
 
         ((s16 *) D_8006DAD4Edd4)[woff + 3] = 0x200;   /* +0x6 */
         scratch = woff;
@@ -493,9 +419,9 @@ void SpuVmInit(s32 a0) {
             highMask = 1 << (chan - 0x10);
         }
 
-        D_8008D9A3Edd4[chan].unk0 = 0;
-        D_8008D98C[chan].unk0 = 0;
-        D_8008D988Edd4[chan].unk0 = 0;
+        _svm_voice[chan].unk1B = 0;
+        _svm_voice[chan].unk04 = 0;
+        _svm_voice[chan].unk00 = 0;
         D_80090C60 |= lowMask;
         D_80090C64 |= highMask;
         woff = D_80090C60;
@@ -553,17 +479,6 @@ void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     }
 }
 
-/* Same 0x34-stride channel-configuration record family documented in
- * code_179d8_j.c (Rec34D994/Rec34Byte); this unit keeps its own local
- * view rather than sharing that file's header-less types. Rec34Half
- * itself is declared above, before its first user SeAutoPan. */
-typedef struct {
-    u8 unk0; /* +0x0 */
-    u8 pad1[0x34 - 0x1];
-} Rec34Byte;
-extern Rec34Byte D_8008D9A3[];
-
-extern Rec34Half D_8008D98C[];
 
 /* Pointer to a "current object" whose only fields this function
  * touches sit at a fixed byte offset from the base, not scaled by any
@@ -581,9 +496,9 @@ void SpuVmNoiseOff(void) {
     s16 i;
 
     for (i = 0; i < D_8008E9D0; i++) {
-        if (D_8008D9A3[i].unk0 == 2) {
-            D_8008D9A3[(u8) i].unk0 = 0;
-            D_8008D98C[(u8) i].unk0 = 0;
+        if (_svm_voice[i].unk1B == 2) {
+            _svm_voice[(u8) i].unk1B = 0;
+            _svm_voice[(u8) i].unk04 = 0;
             D_8006DAD4->unk194 = 0;
             D_8006DAD4->unk196 = 0;
         }
@@ -600,36 +515,6 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
         vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
     }
 }
-
-/* Same 0x34-stride channel-configuration record family, s16-field
- * view -- matches code_179d8_j.c's own Rec34D994 shape (that unit's
- * D_8008D994/D_8008D996/D_8008D99A/D_8008D99C/D_8008D99E family); this
- * unit keeps its own independent view rather than sharing the header-
- * less type. D_8008D988 shares the shape too (read here with `lh`, a
- * signed load, unlike D_8008D98C's `lhu`-driven Rec34Half above). */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34S16;
-extern Rec34S16 D_8008D994[];
-extern Rec34S16 D_8008D996[];
-extern Rec34S16 D_8008D99A[];
-extern Rec34S16 D_8008D99E[];
-extern Rec34S16 D_8008D988[];
-
-/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D99C
- * needs this width (`lhu`) here, and BOTH this width and a plain byte
- * width (`lbu`, same offset) elsewhere in this same function; the byte
- * view is reached via a plain pointer cast, same idiom as D_8008EA26's
- * mixed sh/lbu access.  D_8008D994 needs the same unsigned re-reading
- * here even though SpuVmKeyOff (above) reads the SAME symbol signed
- * (`lh`) -- reinterpreted through a cast rather than redeclared, since
- * one extern symbol cannot carry two conflicting C types in one file. */
-typedef struct {
-    u16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34U16;
-extern Rec34U16 D_8008D99C[];
 
 /* Debug/selected-difficulty byte, read fresh each call. */
 extern u8 D_8008EA13;
@@ -658,18 +543,6 @@ typedef struct {
 } Tbl32E978;
 extern Tbl32E978 *D_8008E978;
 
-/* Same 0x10-byte-stride record family code_179d8_j.c documents as
- * Rec16D7F0 (that unit's D_8008D7F0/D_8008D7F4 pair); local view. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x10 - 0x2];
-} Rec16D7F4;
-extern Rec16D7F4 D_8008D7F4[];
-
-/* Plain byte-stride flags array (no per-record multiply in its own
- * addressing -- unlike every 0x34/0x10-stride array above). */
-extern u8 D_8008D970[];
-
 /* Selected-channel debug byte, write-only here. */
 extern u8 D_8008EA18;
 
@@ -695,18 +568,18 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
     u8 byteVal;
 
     threshold = a4 - 0x40;
-    if (D_8008D996[a0].unk0 != a1) {
+    if (_svm_voice[a0].unk0E != a1) {
         return 0;
     }
-    if (D_8008D99E[a0].unk0 != a2) {
+    if (_svm_voice[a0].unk16 != a2) {
         return 0;
     }
-    if (D_8008D99A[a0].unk0 != a3) {
+    if (_svm_voice[a0].unk12 != a3) {
         return 0;
     }
 
-    someTotal = D_8008D99C[a0].unk0 + (D_8008EA13 << 4);
-    baseValue = ((Rec34U16 *) D_8008D994)[a0].unk0;
+    someTotal = _svm_voice[a0].unk14 + (D_8008EA13 << 4);
+    baseValue = _svm_voice[a0].unk0C;
 
     if (threshold > 0) {
         tableByte = D_8008E978[someTotal].bendCurveDown;
@@ -729,11 +602,11 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
         }
     }
 
-    byteVal = *(u8 *) &D_8008D99C[a0].unk0;
+    byteVal = *(u8 *) &_svm_voice[a0].unk14;
     D_8008EA26 = a0;
     D_8008EA18 = byteVal;
-    D_8008D7F4[a0].unk0 = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
-    D_8008D970[a0] |= 4;
+    _svm_sreg_buf[a0].unk4 = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
+    _svm_sreg_dirty[a0] |= 4;
     return 1;
 }
 #else
@@ -778,11 +651,10 @@ s32 SpuVmPitchBend(s16 a0, s16 a1, s16 a2, u16 a3) {
 extern s32 _svm_envx_ptr;
 extern s32 _svm_envx_hist[];
 
-/* 0x34-stride record family, UNSIGNED 16-bit view -- this function
- * writes it via `lhu`-driven re-reads (store, then re-check the SAME
- * field unsigned) rather than the `Rec34Half` signed view. D_8008D98E
- * already declared elsewhere in the unit as `Rec34Half`; reinterpreted
- * here via cast, not redeclared. */
+/* A u16 at a 0x34 stride: SpuVmFlush walks _svm_voice's +0x06 field
+ * with a pointer of this type (store, then re-check the SAME field via
+ * `lhu`). Kept as the walk's own element type so the pointer steps one
+ * record at a time from &_svm_voice[0].unk06. */
 typedef struct {
     u16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
@@ -791,21 +663,6 @@ typedef struct {
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 extern void SetAutoVol(s16 a0);
 extern void SetAutoPan(s16 a0);
-extern Rec16D7F4 D_8008D7F6[];
-
-/* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
- * field (declared above, `unk0` only) -- this function ALSO reads this
- * array's `+0x2`, `+0x8` and `+0xA` sub-fields, so it needs a wider
- * local view of the same base symbol, reached via a cast per this
- * project's multiple-independent-local-views convention. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    s16 unk2; /* +0x2 */
-    u8 pad4[0x8 - 0x4];
-    s16 unk8; /* +0x8 */
-    s16 unkA; /* +0xA */
-    u8 padC[0x10 - 0xC];
-} Rec16D7F0Wide;
 
 /* D_8006DAD4, already declared above as `ObjDAD4 *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
@@ -841,7 +698,7 @@ void SpuVmFlush(void) {
     *slot = 0;
 
     if (count > 0) {
-        Rec34HalfU2 *p98E = (Rec34HalfU2 *) D_8008D98E;
+        Rec34HalfU2 *p98E = (Rec34HalfU2 *) &_svm_voice[0].unk06;
         Rec16DAD4C *pDad = (Rec16DAD4C *) D_8006DAD4;
 
         for (i = 0; i < count; i++) {
@@ -867,10 +724,10 @@ void SpuVmFlush(void) {
             s32 bit = 1 << i;
 
             if (mask & bit) {
-                if (D_8008D9A3[i].unk0 == 2) {
+                if (_svm_voice[i].unk1B == 2) {
                     SpuSetNoiseVoice(0, 0xFFFFFF);
                 }
-                D_8008D9A3[i].unk0 = 0;
+                _svm_voice[i].unk1B = 0;
             }
         }
     }
@@ -879,34 +736,34 @@ void SpuVmFlush(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (gVoiceEnvActive[i].unk0 != 0) {
+        if (_svm_voice[i].unk1C != 0) {
             SetAutoVol(i);
         }
-        if (gVoiceFadeActive[i].unk0 != 0) {
+        if (_svm_voice[i].unk28 != 0) {
             SetAutoPan(i);
         }
     }
 
     {
-    Rec16D7F0Wide *p7F0 = D_8008D7F0;
+    SvmSreg *p7F0 = _svm_sreg_buf;
 
     for (i = 0; i < 0x18; i++) {
-        if (D_8008D970[i] & 1) {
+        if (_svm_sreg_dirty[i] & 1) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk0 = p7F0->unk0;
             ((Rec16DAD4C *) D_8006DAD4)[i].unk2 = p7F0->unk2;
         }
-        if (D_8008D970[i] & 4) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = D_8008D7F4[i].unk0;
+        if (_svm_sreg_dirty[i] & 4) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = _svm_sreg_buf[i].unk4;
         }
-        if (D_8008D970[i] & 8) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = D_8008D7F6[i].unk0;
+        if (_svm_sreg_dirty[i] & 8) {
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = _svm_sreg_buf[i].unk6;
         }
-        if (D_8008D970[i] & 0x10) {
+        if (_svm_sreg_dirty[i] & 0x10) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk8 = p7F0->unk8;
             ((Rec16DAD4C *) D_8006DAD4)[i].unkA = p7F0->unkA;
         }
 
-        D_8008D970[i] = 0;
+        _svm_sreg_dirty[i] = 0;
         p7F0++;
     }
     }
@@ -975,7 +832,6 @@ extern u8 D_8008EA1F;
 extern u8 D_8008EA20;
 extern u16 D_8008EA24;
 
-extern Rec34Half D_8008D9A0[];
 
 extern void SpuVmDoAllocate(void);
 extern void vmNoiseOn(s32 a0);
@@ -1065,24 +921,24 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                 chan = SpuVmAlloc(0) & 0xFF;
                 D_8008EA26 = chan;
                 if (chan < D_8008E9D0) {
-                    D_8008D9A3[chan].unk0 = 1;
-                    D_8008D98A[D_8008EA26].unk0 = 0;
-                    D_8008D996[D_8008EA26].unk0 = (s16) a0;
-                    D_8008D99E[D_8008EA26].unk0 = *((u8 *) &D_8008EA24 - 0x17);
-                    D_8008D998[D_8008EA26].unk0 = D_8008EA13;
-                    D_8008D99A[D_8008EA26].unk0 = origA2;
+                    _svm_voice[chan].unk1B = 1;
+                    _svm_voice[D_8008EA26].unk02 = 0;
+                    _svm_voice[D_8008EA26].unk0E = (s16) a0;
+                    _svm_voice[D_8008EA26].unk16 = *((u8 *) &D_8008EA24 - 0x17);
+                    _svm_voice[D_8008EA26].unk10 = D_8008EA13;
+                    _svm_voice[D_8008EA26].unk12 = origA2;
 
                     if ((s16) a0 != 0x21) {
                         s16 speed = *(s16 *) ((u8 *) s6 + 0x4E + s6->unk12 * 2);
 
-                        D_8008D990[D_8008EA26].unk0 = s2 / speed;
+                        _svm_voice[D_8008EA26].unk08 = s2 / speed;
                     }
 
-                    D_8008D992[D_8008EA26].unk0 = (u8) a5;
-                    D_8008D99C[D_8008EA26].unk0 = D_8008EA18;
-                    D_8008D994[D_8008EA26].unk0 = a3;
-                    D_8008D9A0[D_8008EA26].unk0 = D_8008EA1B;
-                    D_8008D988[D_8008EA26].unk0 = D_8008EA24;
+                    _svm_voice[D_8008EA26].unk0A = (u8) a5;
+                    _svm_voice[D_8008EA26].unk14 = D_8008EA18;
+                    _svm_voice[D_8008EA26].unk0C = a3;
+                    _svm_voice[D_8008EA26].unk18 = D_8008EA1B;
+                    _svm_voice[D_8008EA26].unk00 = D_8008EA24;
 
                     SpuVmDoAllocate();
                     if (D_8008EA24 == 0xFF) {
@@ -1119,21 +975,21 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
 
     count = 0;
     for (i = 0; i < D_8008E9D0; i++) {
-        if (D_8008D994[i].unk0 != a3) {
+        if (_svm_voice[i].unk0C != a3) {
             continue;
         }
-        if (D_8008D99A[i].unk0 != a2) {
+        if (_svm_voice[i].unk12 != a2) {
             continue;
         }
-        if (D_8008D996[i].unk0 != a0) {
+        if (_svm_voice[i].unk0E != a0) {
             continue;
         }
-        if (D_8008D99E[i].unk0 != a1) {
+        if (_svm_voice[i].unk16 != a1) {
             continue;
         }
-        if (D_8008D988[i].unk0 == 0xFF) {
-            D_8008D9A3[i].unk0 = 0;
-            D_8008D98C[i].unk0 = 0;
+        if (_svm_voice[i].unk00 == 0xFF) {
+            _svm_voice[i].unk1B = 0;
+            _svm_voice[i].unk04 = 0;
             D_8006DAD4->unk194 = 0;
             D_8006DAD4->unk196 = 0;
         } else {
@@ -1150,9 +1006,9 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
                 lowMask = 0;
                 highMask = 1 << (chan - 0x10);
             }
-            D_8008D9A3[chan].unk0 = 0;
-            D_8008D98C[chan].unk0 = 0;
-            D_8008D988[chan].unk0 = 0;
+            _svm_voice[chan].unk1B = 0;
+            _svm_voice[chan].unk04 = 0;
+            _svm_voice[chan].unk00 = 0;
             D_80090C60 |= lowMask;
             D_80090C64 |= highMask;
             D_8008E228 &= ~D_80090C60;

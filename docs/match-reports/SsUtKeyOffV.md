@@ -37,7 +37,7 @@ s32 SsUtKeyOffV(s16 idx)
     }
     D_8008D9A3[chan].unk0 = 0;
     D_8008D98C[chan].unk0 = 0;
-    D_8008D988[chan].unk0 = 0;
+    _svm_voice[chan].unk0 = 0;
     _snd_ev_flag = 0;
     D_80090C60 = mask0 | D_80090C60;
     D_80090C64 |= mask1;
@@ -54,7 +54,7 @@ fail_nolock:
 
 No new declarations: `_snd_ev_flag`, `D_8008EA26` (`volatile u16`, per this
 report's round-23 CLOSED finding, which stands and is still load-bearing),
-`Rec34Byte D_8008D9A3[]`, `Rec34Half D_8008D988[]`/`D_8008D98C[]` and the four
+`Rec34Byte D_8008D9A3[]`, `Rec34Half _svm_voice[]`/`D_8008D98C[]` and the four
 mask scalars were all already in the unit. Nothing was added to `include/`.
 
 ## What four rounds had wrong, and the lever
@@ -79,7 +79,7 @@ retail, and its `else` branch is this function's whole body. Dumping
 ```
 sb   zero, D_8008D9A3[chan]
 lhu  D_80090C60 ; lhu D_80090C64
-sh   zero, D_8008D98C[chan] ; sh zero, D_8008D988[chan]
+sh   zero, D_8008D98C[chan] ; sh zero, _svm_voice[chan]
 lhu  D_8008E228
 or / sh D_80090C60 / nor / and / sh D_8008E228
 lhu  D_8008E22C
@@ -260,7 +260,7 @@ s32 SsUtKeyOffV(s16 idx)
     }
     D_8008D9A3[bankIdx].unk0 = 0;
     D_8008D98C[bankIdx].unk0 = 0;
-    D_8008D988[bankIdx].unk0 = 0;
+    _svm_voice[bankIdx].unk0 = 0;
     old60 = D_80090C60;
     old64 = D_80090C64;
     e228 = D_8008E228;
@@ -283,7 +283,7 @@ fail_locked:
 ```
 
 (Uses this unit's already-shared `_snd_ev_flag`, `Rec34Byte D_8008D9A3[]`,
-`Rec34Half D_8008D988[]`/`D_8008D98C[]`, and the scalar `D_80090C60`,
+`Rec34Half _svm_voice[]`/`D_8008D98C[]`, and the scalar `D_80090C60`,
 `D_80090C64`, `D_8008E228`, `D_8008E22C` globals declared near the top of
 `code_179d8_j.c`.)
 
@@ -458,7 +458,7 @@ Rebuilt the preserved body verbatim through the current pinned pipeline.
 
 Noticed that `SsUtKeyOff` -- an ALREADY-MATCHED sibling in this same
 unit whose `else` branch is the identical bit-mask/store idiom used here
-(same `D_8008D9A3`/`D_8008D98C`/`D_8008D988` clears, same
+(same `D_8008D9A3`/`D_8008D98C`/`_svm_voice` clears, same
 `D_80090C60`/`D_80090C64`/`D_8008E228`/`D_8008E22C` mask-update sequence)
 -- declares its two mask locals with ASYMMETRIC types: `u32 mask0` (the
 `D_80090C60`-bound one) against `u16 mask1` (the `D_80090C64`-bound one),
@@ -578,3 +578,9 @@ scaffold and both were byte-identical-or-worse against the real
 "translate and re-verify every candidate, including the ones that look
 best" is not a formality here -- it is the only thing that prevented two
 false leads from being reported as progress.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (`D_8008D988` itself now reads `_svm_voice` above) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+`src/` now clears `_svm_voice[chan].unk1B/unk04/unk00`. Byte-exact.

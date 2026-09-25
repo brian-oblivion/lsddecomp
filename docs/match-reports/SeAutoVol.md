@@ -13,7 +13,7 @@ positional skeleton diffs 114.
 **Lever: sibling body.** This report and the unit's carve note both said
 this function is a near-identical sibling of `SeAutoPan` in
 `code_179d8_m`, which is matched. That body was copied with the
-`gVoiceFade*` arrays renamed to the `gVoiceEnv*` family, and it matched on
+`_svm_voice +0x28..+0x32` arrays renamed to the `_svm_voice +0x1C..+0x26` family, and it matched on
 the first build. The whole five-round residue came from the preserved body
 declaring its parameters `s32` and hand-narrowing them into `s16` locals.
 Declaring the parameters `s16` gives GCC 2.6.3's own shape: raw copies in
@@ -25,8 +25,8 @@ needed to change: `(from - to < 0 ? to - from : from - to) < duration` is
 retail's two-branch abs compare as written.
 
 This is the counterpart `code_179d8_m`'s header asks about: the "Begin"
-for `SetAutoVol`. It sets `gVoiceEnvActive`, `gVoiceEnvAccum`,
-`gVoiceEnvLimit` and then either `Step=1, Interval=Countdown=q` or
+for `SetAutoVol`. It sets `D_8008D9A4`, `D_8008D9AC`,
+`D_8008D9AE` and then either `Step=1, Interval=Countdown=q` or
 `Interval=0, Step=q`. Naming it (for example `BeginVoiceEnvelope`) is
 track-3 work and was not done here: this round's orders are no renames.
 
@@ -37,12 +37,12 @@ typedef struct {
     s16 unk0;
     u8 pad2[0x34 - 0x2];
 } Rec34Half_E308;
-extern Rec34Half_E308 gVoiceEnvActive[];
-extern Rec34Half_E308 gVoiceEnvStep[];
-extern Rec34Half_E308 gVoiceEnvInterval[];
-extern Rec34Half_E308 gVoiceEnvCountdown[];
-extern Rec34Half_E308 gVoiceEnvAccum[];
-extern Rec34Half_E308 gVoiceEnvLimit[];
+extern Rec34Half_E308 D_8008D9A4[];
+extern Rec34Half_E308 D_8008D9A6[];
+extern Rec34Half_E308 D_8008D9A8[];
+extern Rec34Half_E308 D_8008D9AA[];
+extern Rec34Half_E308 D_8008D9AC[];
+extern Rec34Half_E308 D_8008D9AE[];
 
 void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
@@ -50,18 +50,18 @@ void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     if (from == to) {
         return;
     }
-    gVoiceEnvActive[voice].unk0 = 1;
-    gVoiceEnvAccum[voice].unk0 = from;
-    gVoiceEnvLimit[voice].unk0 = to;
+    D_8008D9A4[voice].unk0 = 1;
+    D_8008D9AC[voice].unk0 = from;
+    D_8008D9AE[voice].unk0 = to;
     if ((from - to < 0 ? to - from : from - to) < duration) {
         q = duration / (from - to);
-        gVoiceEnvStep[voice].unk0 = 1;
-        gVoiceEnvInterval[voice].unk0 = q;
-        gVoiceEnvCountdown[voice].unk0 = q;
+        D_8008D9A6[voice].unk0 = 1;
+        D_8008D9A8[voice].unk0 = q;
+        D_8008D9AA[voice].unk0 = q;
     } else {
         q = (from - to) / duration;
-        gVoiceEnvInterval[voice].unk0 = 0;
-        gVoiceEnvStep[voice].unk0 = q;
+        D_8008D9A8[voice].unk0 = 0;
+        D_8008D9A6[voice].unk0 = q;
     }
 }
 ```
@@ -112,14 +112,14 @@ Semantically: 4 params (call them `start`, `a1`, `a2`, `duration`, matching
 `t3`/`t0`/`t1`/`t2`). If the narrowed `a1==a2`, return immediately (nothing
 to interpolate). Otherwise this looks like ramp/tween setup: it writes
 `1` / `a1` / `a2` into three per-channel 52-byte-stride tables
-(`gVoiceEnvActive`/`gVoiceEnvAccum`/`gVoiceEnvLimit`, same stride-52 "channel record"
+(`D_8008D9A4`/`D_8008D9AC`/`D_8008D9AE`, same stride-52 "channel record"
 convention seen in `vmNoiseOn2` and `SePitchBend` this round — index
 `chan*52` where `chan` is the narrowed `start` param) marking the channel
 "active" with its start/end values, then picks a numerator/denominator pair
 depending on whether `a1-a2` (or its negation) is closer to zero than
 `duration`, divides, and writes the quotient (plus a second `1`-flag and a
 duplicate) into three MORE stride-52 tables
-(`gVoiceEnvStep`/`gVoiceEnvInterval`/`gVoiceEnvCountdown`). The two branches (`diff<0` vs
+(`D_8008D9A6`/`D_8008D9A8`/`D_8008D9AA`). The two branches (`diff<0` vs
 `diff>=0`, and within each, "close" vs "far") are NOT symmetric in their
 final formula — transcribed faithfully from the `.s`, not simplified, since
 the byte-match depends on which exact subtraction/division retail performs
@@ -157,12 +157,12 @@ other two stalls this round, worth noting since it means the fix direction
 here is REMOVING material, not restoring a missing instruction)
 
 ```c
-extern u8 gVoiceEnvActive[];
-extern u8 gVoiceEnvStep[];
-extern u8 gVoiceEnvInterval[];
-extern u8 gVoiceEnvCountdown[];
-extern u8 gVoiceEnvAccum[];
-extern u8 gVoiceEnvLimit[];
+extern u8 D_8008D9A4[];
+extern u8 D_8008D9A6[];
+extern u8 D_8008D9A8[];
+extern u8 D_8008D9AA[];
+extern u8 D_8008D9AC[];
+extern u8 D_8008D9AE[];
 
 void SeAutoVol(s32 a0in, s32 a1, s32 a2, s32 a3) {
     s32 t3;
@@ -187,9 +187,9 @@ void SeAutoVol(s32 a0in, s32 a1, s32 a2, s32 a3) {
     if (na1 != na2) {
         t2 = a3;
         idx52 = (s16)t3 * 52;
-        *(u16 *)(gVoiceEnvActive + idx52) = 1;
-        *(u16 *)(gVoiceEnvAccum + idx52) = t0;
-        *(u16 *)(gVoiceEnvLimit + idx52) = t1;
+        *(u16 *)(D_8008D9A4 + idx52) = 1;
+        *(u16 *)(D_8008D9AC + idx52) = t0;
+        *(u16 *)(D_8008D9AE + idx52) = t1;
 
         na3 = t2;
         diff = na1 - na2;
@@ -208,16 +208,16 @@ void SeAutoVol(s32 a0in, s32 a1, s32 a2, s32 a3) {
         dividend = numer - (s16)t1;
         q = dividend / (s16)t2;
         idx52 = (s16)t3 * 52;
-        *(u16 *)(gVoiceEnvInterval + idx52) = 0;
-        *(u16 *)(gVoiceEnvStep + idx52) = q;
+        *(u16 *)(D_8008D9A8 + idx52) = 0;
+        *(u16 *)(D_8008D9A6 + idx52) = q;
         goto end;
 common:
         dividend = (s16)t0 - (s16)t1;
         q = numer / dividend;
         idx52 = (s16)t3 * 52;
-        *(u16 *)(gVoiceEnvStep + idx52) = 1;
-        *(u16 *)(gVoiceEnvInterval + idx52) = q;
-        *(u16 *)(gVoiceEnvCountdown + idx52) = q;
+        *(u16 *)(D_8008D9A6 + idx52) = 1;
+        *(u16 *)(D_8008D9A8 + idx52) = q;
+        *(u16 *)(D_8008D9AA + idx52) = q;
 end:
         ;
     }
@@ -464,3 +464,9 @@ reference vs our 116w; the same tied candidate at this shape score as its
 own sibling `SeAutoPan` in `code_179d8_m.c` -- see the symbols file for the
 disambiguation). Sony symbol; this pass does not rename it further. Matched
 round 73, 116/116.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+`src/` now writes `_svm_voice[voice].unk1C`..`unk26`. Byte-exact on the first build.

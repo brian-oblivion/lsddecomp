@@ -48,8 +48,8 @@ using either the raw control byte or `0x7F` minus it) combine `lvl1b`/`lvl2b`
 into a final `pan1`/`pan2` pair, clamped so neither exceeds the other when a
 global flag (`D_8008E8C0 == 1`) is set. The rest is the tail this unit's
 `vmNoiseOn2` already established byte-for-byte: write `pan1`/`pan2` into
-the 16-byte-stride `D_8008D7F0`/`D_8008D7F2` tables, OR `3` into
-`D_8008D970[chan]`, compute a 32-bit voice-enable bit split across
+the 16-byte-stride `_svm_sreg_buf`/`D_8008D7F2` tables, OR `3` into
+`_svm_sreg_dirty[chan]`, compute a 32-bit voice-enable bit split across
 `lowBit`/`highBit` by `chan<16`, reset the whole `D_8008D9A3` 52-byte-stride
 table's low bit for every live voice (`D_8008E9D0` of them) then mark this
 channel's own slot `2`, OR the enable bits into `D_8008E228`/`D_8008E22C`
@@ -117,9 +117,9 @@ extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
 extern u16 *D_8006DAD4;
-extern u8 D_8008D7F0[];
+extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 extern u8 D_8008E9D0;
@@ -163,9 +163,9 @@ extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
 extern u16 *D_8006DAD4;
-extern u8 D_8008D7F0[];
+extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 extern u8 D_8008E9D0;
@@ -242,8 +242,8 @@ void vmNoiseOn(s32 a0) {
 
     off16 = chan << 4;
     *(u16 *)(D_8008D7F2 + off16) = pan2;
-    *(u16 *)(D_8008D7F0 + off16) = pan1;
-    D_8008D970[chan] |= 3;
+    *(u16 *)(_svm_sreg_buf + off16) = pan1;
+    _svm_sreg_dirty[chan] |= 3;
 
     if (chan < 16) {
         lowBit = 1 << chan;
@@ -482,3 +482,7 @@ reference vs our 311w; also cross-checked against the public symbol
 `SpuVmNoiseOn` at 0x8002F368 elsewhere in the image). Sony symbol; this
 pass does not rename it further. The function remains a STALL (2 words
 short, see above).
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/SvmData.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (code_179d8_j_b/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols).

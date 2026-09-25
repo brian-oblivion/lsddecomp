@@ -85,15 +85,15 @@ window:
 4. Two unconditional bitmask updates:
    `D_8008E228 &= ~D_80090C60; D_8008E22C &= ~D_80090C64;`
 5. **Per-channel interpolation dispatch**, unconditional 0..0x17 loop:
-   `SetAutoVol(i)` if `gVoiceEnvActive[i] != 0`, `SetAutoPan(i)` if
-   `gVoiceFadeActive[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
+   `SetAutoVol(i)` if `D_8008D9A4[i] != 0`, `SetAutoPan(i)` if
+   `D_8008D9B0[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
    match reports).
 6. **Flag-driven per-channel field copy**, another unconditional 0..0x17
-   loop, testing four independent bits of `D_8008D970[i]` (1, 4, 8, 0x10)
-   and copying the corresponding `D_8008D7F0`/`D_8008D7F4`/`D_8008D7F6`
+   loop, testing four independent bits of `_svm_sreg_dirty[i]` (1, 4, 8, 0x10)
+   and copying the corresponding `_svm_sreg_buf`/`D_8008D7F4`/`D_8008D7F6`
    field into the matching `D_8006DAD4[i]` field (`+0`/`+2` for bit 1,
    `+4` for bit 4, `+6` for bit 8, `+8`/`+0xA` for bit 0x10), then zeroing
-   `D_8008D970[i]`. **`D_8008D970[i]` must be re-read fresh for EACH of the
+   `_svm_sreg_dirty[i]`. **`_svm_sreg_dirty[i]` must be re-read fresh for EACH of the
    four `if` conditions, not cached in a local** — caching it into one
    `u8 flags` local changed nothing measurably here (this function had a
    different problem at the time), but is the established idiom project-
@@ -122,7 +122,7 @@ window:
   final-tail single-struct-again view (`+0x188` through `+0x19A`). Three
   independent readings of the SAME base pointer in different parts of ONE
   function, all confirmed structurally correct against the disassembly.
-- `Rec16D7F0Wide`: `D_8008D7F0`'s existing `Rec16D7F0` type (declared
+- `Rec16D7F0Wide`: `_svm_sreg_buf`'s existing `Rec16D7F0` type (declared
   earlier in this file, field `unk0` only) needs widening for this
   function, which ALSO reads `+0x2`, `+0x8` and `+0xA` — reached via a cast
   to a wider local struct type, not a redeclaration (same rule as every
@@ -169,8 +169,8 @@ window:
 3. **Applied both fixes together**: **236/241 (5 words short)** — the two
    fixes combined moved it further from 231, i.e. in the right direction
    but with 5 words still missing.
-4. **Rewrote phase 6 (the `D_8008D970`-flag loop) with a SINGLE walking
-   pointer for `D_8008D7F0` (all four field offsets via one struct
+4. **Rewrote phase 6 (the `_svm_sreg_dirty`-flag loop) with a SINGLE walking
+   pointer for `_svm_sreg_buf` (all four field offsets via one struct
    pointer), but KEPT a second walking pointer (`pDad`) for `D_6006DAD4`
    as well**: **233/241 (8 words short)** — WORSE than #3. Reading the
    disassembly closely at this point showed retail RE-LOADS `D_8006DAD4`
@@ -178,7 +178,7 @@ window:
    individually, rather than hoisting it once — the opposite of what
    phase 2 does for the SAME symbol. Introducing a shared `pDad` pointer
    here was the wrong lever for this specific loop.
-5. **Kept the `D_8008D7F0` walking pointer from #4, but switched
+5. **Kept the `_svm_sreg_buf` walking pointer from #4, but switched
    `D_6006DAD4` back to a fresh `((Rec16DAD4C *) D_8006DAD4)[i]` cast in
    EACH of the four conditional blocks** (matching the fresh-reload
    pattern observed): **237/241 (4 words short)** — the best result
@@ -456,7 +456,7 @@ extern void SetAutoVol(s16 a0);
 extern void SetAutoPan(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
-/* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
+/* Same 0x10-byte-stride record family as `Rec16D7F0`/_svm_sreg_buf's other
  * field (declared above, `unk0` only) -- this function ALSO reads this
  * array's `+0x2`, `+0x8` and `+0xA` sub-fields, so it needs a wider
  * local view of the same base symbol, reached via a cast per this
@@ -542,34 +542,34 @@ void SpuVmFlush(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (gVoiceEnvActive[i].unk0 != 0) {
+        if (D_8008D9A4[i].unk0 != 0) {
             SetAutoVol(i);
         }
-        if (gVoiceFadeActive[i].unk0 != 0) {
+        if (D_8008D9B0[i].unk0 != 0) {
             SetAutoPan(i);
         }
     }
 
     {
-    Rec16D7F0Wide *p7F0 = D_8008D7F0;
+    Rec16D7F0Wide *p7F0 = _svm_sreg_buf;
 
     for (i = 0; i < 0x18; i++) {
-        if (D_8008D970[i] & 1) {
+        if (_svm_sreg_dirty[i] & 1) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk0 = p7F0->unk0;
             ((Rec16DAD4C *) D_8006DAD4)[i].unk2 = p7F0->unk2;
         }
-        if (D_8008D970[i] & 4) {
+        if (_svm_sreg_dirty[i] & 4) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = D_8008D7F4[i].unk0;
         }
-        if (D_8008D970[i] & 8) {
+        if (_svm_sreg_dirty[i] & 8) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = D_8008D7F6[i].unk0;
         }
-        if (D_8008D970[i] & 0x10) {
+        if (_svm_sreg_dirty[i] & 0x10) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk8 = p7F0->unk8;
             ((Rec16DAD4C *) D_8006DAD4)[i].unkA = p7F0->unkA;
         }
 
-        D_8008D970[i] = 0;
+        _svm_sreg_dirty[i] = 0;
         p7F0++;
     }
     }
@@ -616,7 +616,7 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34HalfU2;
 extern Rec34HalfU2 D_8008D98E[];
-extern Rec34Half gVoiceEnvActive[];
+extern Rec34Half D_8008D9A4[];
 
 /* Flag byte: when set, skip the "channel starved for N frames -> force
  * release" scan below. */
@@ -636,7 +636,7 @@ extern void SetAutoVol(s16 a0);
 extern void SetAutoPan(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
-/* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
+/* Same 0x10-byte-stride record family as `Rec16D7F0`/_svm_sreg_buf's other
  * field (declared above, `unk0` only) -- this function ALSO reads this
  * array's `+0x2`, `+0x8` and `+0xA` sub-fields, so it needs a wider
  * local view of the same base symbol, reached via a cast per this
@@ -717,34 +717,34 @@ void SpuVmFlush(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (gVoiceEnvActive[i].unk0 != 0) {
+        if (D_8008D9A4[i].unk0 != 0) {
             SetAutoVol(i);
         }
-        if (gVoiceFadeActive[i].unk0 != 0) {
+        if (D_8008D9B0[i].unk0 != 0) {
             SetAutoPan(i);
         }
     }
 
     {
-    Rec16D7F0Wide *p7F0 = D_8008D7F0;
+    Rec16D7F0Wide *p7F0 = _svm_sreg_buf;
 
     for (i = 0; i < 0x18; i++) {
-        if (D_8008D970[i] & 1) {
+        if (_svm_sreg_dirty[i] & 1) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk0 = p7F0->unk0;
             ((Rec16DAD4C *) D_8006DAD4)[i].unk2 = p7F0->unk2;
         }
-        if (D_8008D970[i] & 4) {
+        if (_svm_sreg_dirty[i] & 4) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = D_8008D7F4[i].unk0;
         }
-        if (D_8008D970[i] & 8) {
+        if (_svm_sreg_dirty[i] & 8) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = D_8008D7F6[i].unk0;
         }
-        if (D_8008D970[i] & 0x10) {
+        if (_svm_sreg_dirty[i] & 0x10) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk8 = p7F0->unk8;
             ((Rec16DAD4C *) D_8006DAD4)[i].unkA = p7F0->unkA;
         }
 
-        D_8008D970[i] = 0;
+        _svm_sreg_dirty[i] = 0;
         p7F0++;
     }
     }
@@ -817,7 +817,7 @@ here -- proposing for the head to apply once no runner is live on
 - `D_8008E228`/`D_8008E22C` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
   (AND-NOT'd with the enable mask above -- the actual SPU key bitmask
   pair, per `vmNoiseOn2`'s report).
-- `D_8008D970` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by
+- `_svm_sreg_dirty` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by
   several functions in this cluster; never fully decoded here).
 - `D_8008D9A3` -> `gVoiceState` (the byte SpuVmKeyOff/SpuVmNoiseOff/
   `SpuVmAlloc` all compare against `2` for "noise voice").
@@ -839,9 +839,17 @@ declarations (the `_svm_envx_hist*` pair, `Rec34HalfU2`,
 `SetAutoPan` externs, `D_8008D7F6`) are new to the unit and were kept
 local to this function's `#ifdef` block, per CLAUDE.md's rule against
 adding to a shared header; everything else it touches (`D_8008D9A3`,
-`D_8006DAD4`, `D_8008D970`, `D_80090C60`/`64`, `D_8008E228`/`22C`,
-`D_8008E230`/`234`, `D_8008D7F0`, `D_8008D7F4`, `D_8008E9D0`,
-`gDisableVoiceStarveScan`, `gVoiceEnvActive`, `gVoiceFadeActive`) was
+`D_8006DAD4`, `_svm_sreg_dirty`, `D_80090C60`/`64`, `D_8008E228`/`22C`,
+`D_8008E230`/`234`, `_svm_sreg_buf`, `D_8008D7F4`, `D_8008E9D0`,
+`gDisableVoiceStarveScan`, `D_8008D9A4`, `D_8008D9B0`) was
 already declared earlier in the unit and needed no change.
 `./build-and-verify.sh` green (zero bytes changed) and
 `tools/check-nonmatching.sh code_179d8_m` green.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+The NON_MATCHING body reads `_svm_voice[i].unk1C/unk28/unk1B` and walks +0x06 with its u16 0x34-stride pointer, now started at `&_svm_voice[0].unk06`; normalized disassembly identical. Tried and rejected: walking a `SvmVoice *` and reading `->unk06` (one instruction longer, mnemonic ratio vs retail 0.876 -> 0.874).
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body now walks `SvmSreg *p7F0 = _svm_sreg_buf` and reads `_svm_sreg_buf[i].unk4/unk6` (the `Rec16D7F0Wide`/`Rec16D7F4` views of `D_8008D7F0`/`D_8008D7F4`/`D_8008D7F6` are gone); normalized disassembly identical.
