@@ -153,4 +153,7 @@ void func_80042820(Class6B5CC *self, void *sender, s32 event) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042828);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004283C);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800428E4);
+/* Returns the D_8006EFAC method table. */
+void *func_800428E4(void) {
+    return D_8006EFAC;
+}
