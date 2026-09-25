@@ -185,8 +185,6 @@ typedef struct UnkArg1Obj {
     Unk5CObj *modelData;
 } UnkArg1Obj;
 
-extern Unk5CObj *New_ModelData(UnkArg1Obj *arg);
-
 typedef struct Class65650Methods {
     s32 header;                                                    /* +0x000 */
     void (*release)(Class65650 *self);                               /* +0x004 BasicClass__Release */

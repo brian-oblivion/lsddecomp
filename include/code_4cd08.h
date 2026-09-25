@@ -109,7 +109,6 @@ typedef struct DreamAuxLoadReq {
 } DreamAuxLoadReq;
 
 extern DreamAuxLoadReq *SetVec3(DreamAuxLoadReq *this, s32 flag, const char *name, s32 mode);
-extern void *New_ModelData(DreamAuxLoadReq *req);
 
 /* A trigger/spawn record walked by ProcessDreamAuxTriggerRecord and CheckDreamAuxTriggerCondition. Only
  * three fields and the overall stride (0x38 -- ProcessDreamAuxTriggerRecord recurses on
