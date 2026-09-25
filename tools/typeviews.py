@@ -492,11 +492,66 @@ def census(views, funcs):
     for v in views:
         vbyname.setdefault(v["name"], []).append(v)
     out = []
-    for t in sorted(tabs.values(), key=lambda t: (len(f"{t['id']:x}"), t["id"])):
+    data = (ROOT / "disk/SLPS_015.56").read_bytes()
+
+    def rw(v):
+        o = v - 0x80010000 + 0x800
+        return int.from_bytes(data[o:o + 4], "little") if 0 <= o < len(data) - 4 else 0
+
+    def first_jal(fn):
+        """Target of a function's first `jal`, read from retail (C and asm alike)."""
+        for i in range(200):
+            w = rw(fn + 4 * i)
+            if w >> 26 == 3:
+                return (fn & 0xF0000000) | ((w & 0x3FFFFFF) << 2)
+            if w == 0x03E00008:                   # jr ra
+                return None
+        return None
+
+    def getter_table(g):
+        """The table a getter returns: `lui v0,hi; jr ra; addiu v0,v0,lo`."""
+        hi = None
+        for i in range(4):
+            w = rw(g + 4 * i)
+            op, rs, rt, imm = w >> 26, (w >> 21) & 31, (w >> 16) & 31, w & 0xFFFF
+            if op == 0x0F:
+                hi = imm << 16
+            elif op == 0x09 and hi is not None:
+                a = (hi + (imm - 0x10000 if imm & 0x8000 else imm)) & 0xFFFFFFFF
+                return tabs.get(a)
+        return None
+
+    def id_parent(t):
         p = parent(t["id"])
         while p is not None and p not in byid:
             p = parent(p)
-        pt = byid[p][0] if p is not None and p in byid else None
+        return byid[p][0] if p is not None and p in byid else None
+
+    def struct_parent(t):
+        """The id tree is not always inheritance (round 83: Tod, TodSet,
+        ModelData and TriggerWorld sit under TimBlockSrc's id, 0xF03, and
+        Tod and ModelData chain their ctors to the ACTIVE DATA SOURCE, as
+        TimBlockSrc's does: siblings, not subclasses). A subclass's ctor
+        calls its parent's first, so the ctor's first call decides: a getter
+        of another constant table names the parent; the same call the id
+        parent's ctor makes means the two are siblings, so move up."""
+        pt = id_parent(t)
+        ctor = t["words"][1] if len(t["words"]) > 1 else 0
+        if pt is None or not ctor or (len(pt["words"]) > 1 and pt["words"][1] == ctor):
+            return pt, "id"
+        g = first_jal(ctor)
+        if g is None:
+            return pt, "id"
+        gt = getter_table(g)
+        if gt is not None and gt is not t:
+            return gt, ("id" if gt is pt else "ctor")
+        by = "id"
+        while pt is not None and len(pt["words"]) > 1 and first_jal(pt["words"][1]) == g:
+            pt, by = id_parent(pt), "ctor"
+        return pt, by
+
+    for t in sorted(tabs.values(), key=lambda t: (len(f"{t['id']:x}"), t["id"])):
+        pt, parent_by = struct_parent(t)
         pw = pt["words"] if pt else []
         owned = sorted({syms.get(w) for i, w in enumerate(t["words"])
                         if w and (i >= len(pw) or pw[i] != w) and syms.get(w)})
@@ -521,7 +576,7 @@ def census(views, funcs):
         def home(n):
             return sorted({v["file"] for v in vbyname.get(n, [])}) or ["?"]
         out.append({"table": t["name"], "addr": t["addr"], "id": t["id"], "slots": t["slots"],
-                    "parent": pt["name"] if pt else None, "owned": owned,
+                    "parent": pt["name"] if pt else None, "parent_by": parent_by, "owned": owned,
                     "owned_c": [fn for fn in owned if fn in funcs],
                     "objects": {o: {"units": sorted(u), "defined": home(o)} for o, u in objs.items()},
                     "tables": {o: {"users": sorted(u), "defined": home(o)} for o, u in tviews.items()}})

@@ -6,6 +6,35 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — premium session: plan revision 20 (rounds 82 and 83)
+
+- **The class id tree is not always inheritance (round 83).** Verified. Under
+  TimBlockSrc (0xF03) the id tree puts Tod (0x4F03) and ModelData (0x5F03).
+  Both ctors chain to `GetActiveDataSourceMethods()->ctor`, exactly as
+  TimBlockSrc's does, and Tod's un-overridden +0x064 is Class6D430's
+  SetFlag, not TimBlockSrc's AdvanceLoadState. They are TimBlockSrc's
+  siblings under Class6D430. TodSet and TriggerWorld chain to Tod's and
+  ModelData's ctors, so those two id edges are right. `typeviews.census` now
+  reads each ctor's first `jal` from retail. A getter of another constant
+  table names the parent; the same first call as the id parent's ctor makes
+  the two siblings. Across all 48 id edges it moves exactly Tod and
+  ModelData to D_8006D430 and leaves every other edge alone. `plan.py
+  classes` marks them "parent by CTOR CHAIN". The id text in track 4 and
+  CLAUDE.md now says the id is a first guess.
+- **One class per round (rounds 82, 83).** Loosened to strictly sequential:
+  each class is merged and marked before the next is staffed, as many per
+  round as that allows. The rule's reason, that a class merge touches every
+  unit seeing the class, is what sequencing protects. Round 82's three held
+  it.
+- **Actor (round 82).** Kept. Its banner states what its own methods do
+  (translation setters, local-axis moves, nearby-link search), so it is a
+  mechanics name, not a purpose guess. Step 2 now allows that with the
+  evidence in the banner, and never a guess.
+- **`--warnings` at every merge (round 82).** Adopted. PARALLEL-RUNS §3.9's
+  merge block runs `typeviews.py --warnings`, because 27 new warnings passed
+  a merge that read only the build exit and funcdiff. The §3.9 pipe paragraph
+  was shortened to hold the budget.
+
 ## 2026-09-25 — round 83: track 3 done (code_33808 named), TimBlockSrc unified
 
 Opus head, operator cap 5, but `plan.py` listed one runner job (the Sonnet

@@ -288,8 +288,10 @@ Gate 2.
   `this` first parameter, the table pointer sits at object offset 0, and the
   tables are data. Resolve a slot with `tools/classtable.py`, never by counting.
   Word +0x000 of a table is a nibble-path class id (the parent of 0x1F234 is
-  0xF234, then 0x234, 0x34, 0x4, 0x0), so the whole hierarchy is mechanical:
-  `python3 tools/typeviews.py --tree`.
+  0xF234, then 0x234, 0x34, 0x4, 0x0). It is a first guess, not always
+  inheritance: a ctor chains to its real parent first, and `typeviews.py`
+  corrects the id tree from that chain (round 83: Tod and ModelData sit under
+  TimBlockSrc's id but are its siblings). `python3 tools/plan.py classes`.
   **The suggestive symbol names are FirecatFG's hypotheses, not evidence** —
   they look like C++ because someone who suspected C++ chose them.
 - **The Psy-Q SDK is LINKED, not decompiled.** The libraries shipped on the

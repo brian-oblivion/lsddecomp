@@ -958,6 +958,8 @@ def print_classes(d):
         tag = {"unified": "UNIFIED", "parked": "PARKED", "ready": "ready", "waiting": "waiting",
                "no C": "no C", "no C yet": "no C yet"}[c["state"]]
         name = f" = {c['name']}" if c.get("name") else ""
+        if c.get("parent_by") == "ctor":
+            name += "  (parent by CTOR CHAIN, not by id: the id tree is wrong here)"
         print(f"  {'  ' * depth}0x{c['id']:X} {c['table']}{name}  [{tag}]  below={c['below']} "
               f"C={len(c['owned_c'])}/{len(c['owned'])} views={c['nviews']}"
               + (f"  in {', '.join(c['files'])}" if c["files"] and c["state"] != "unified" else ""))

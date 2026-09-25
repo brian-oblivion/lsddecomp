@@ -19,10 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 19 (2026-09-25, after round 81: `rename.py` handles
-placeholders with their own symbols line, 2-word Sony stubs are caught when
-sandwiched, track 2's position rule reads the neighbours, no second naming
-pass: track 4 names what track 3 left).
+Plan revision: 20 (2026-09-25, after rounds 82 and 83: the class id tree is
+corrected by the ctor chain, track 4 runs classes strictly in sequence rather
+than one per round, a behaviour name for a class is allowed with evidence,
+`--warnings` at every merge).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -250,7 +250,12 @@ first, so accessors stay flat at any depth and nothing is re-pathed (GCC
 2.6.3 has no anonymous struct members, and embedding the base would turn
 Entity's accessors into `this->base.base.base.x`). The table word +0x000 is a
 nibble-path class id (the parent of 0x1F234 is 0xF234, 0x234, 0x34, 0x4, 0x0),
-so the tree is mechanical and classes are unified root first: `plan.py`
+a first guess at the tree: a ctor calls its parent's ctor first, and
+`typeviews.py` moves a class whose ctor makes the SAME first call as its id
+parent's up beside it (round 83: Tod and ModelData, id children of
+TimBlockSrc, chain to the active data source as TimBlockSrc does, so they are
+its siblings; `plan.py classes` marks such a class "parent by CTOR CHAIN").
+Classes are unified root first: `plan.py`
 offers a class only when its ancestors are unified, parked, `no C` or `no C
 yet`. A `no C` class (no own method C, no view anywhere) is not a job; its
 subclasses expand the nearest unified ancestor's macros and list its slots
@@ -263,7 +268,10 @@ ordinary class when track 1 matches one.
    table view. Grep the table symbol, its getter and its method names too: a
    unit's local `extern` of any of them is a view.
 2. Names: `<Class>` from the existing object view (drop an `Obj`/unit
-   suffix) or the table's stem, `<Class>Methods`, `include/<Class>.h`.
+   suffix) or the table's stem, `<Class>Methods`, `include/<Class>.h`. A
+   name for what the class's own methods DO is allowed when its header
+   banner states that evidence (Actor: translation setters, local-axis
+   moves, link search; round 82); never one for what it is guessed to be.
 3. Union: `--merge` the object views, then the table views. Every CONFLICT
    is settled by the accessors' bytes; a slot's return type is its
    occupant's unless a caller's bytes need otherwise (a void call cannot
@@ -302,9 +310,11 @@ contradiction with the parent. Once a class is unified, CLAUDE.md's
 independent-local-views convention ends for it: no unit declares its own
 view again, and `plan.py classes` lists any that appears as a STRAY VIEW.
 
-**Staffing.** Opus runners, one class per round: a class merge touches every
-unit that sees the class, so classes merge SEQUENTIALLY and `plan.py` lists
-only the top ready class (most classes below it first). Prompt §4.6. Head
+**Staffing.** Opus runners, classes strictly in SEQUENCE: a class merge
+touches every unit that sees the class, so the next class is staffed only
+after the previous one is merged and marked, as many per round as that
+allows (revision 20; round 82 ran three this way). `plan.py` lists only the
+top ready class (most classes below it first). Prompt §4.6. Head
 review before `python3 tools/plan.py mark-class --table <sym> --class
 <Class>`: `plan.py classes` shows no stray view, the three oracles are green,
 and three sampled slot or field names agree with their occupants or

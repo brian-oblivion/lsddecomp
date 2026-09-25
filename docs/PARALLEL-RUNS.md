@@ -164,6 +164,7 @@ on a missing `.s` (archive §Gate 0). Every round, first:
 python3 tools/progress.py            # read the TOP: stale-asm warnings print above the table
 rm -f asm/<each stale monolith it named>.s
 make extract && ./build-and-verify.sh; echo "build exit=$?"
+.venv/bin/python3 tools/typeviews.py --warnings   # 0 new, at EVERY merge (round 82: 27 slipped)
 ```
 
 Not green after this: stop and diagnose. Do not triage, spawn or carve. The
@@ -355,6 +356,7 @@ git status --porcelain                       # your own tree must be clean first
 git merge --no-ff runner/<name>; echo "merge exit=$?"
 git rev-parse -q --verify MERGE_HEAD >/dev/null && echo "MERGE IN PROGRESS"
 ./build-and-verify.sh; echo "build exit=$?"
+.venv/bin/python3 tools/typeviews.py --warnings   # 0 new, at EVERY merge (round 82: 27 slipped)
 ```
 
 A green build on top of `MERGE IN PROGRESS` means nothing (CLAUDE.md, fourth
@@ -376,11 +378,9 @@ merging `runner/charlie`: `src/code_55dd4.c` against `func_8001E770`).
 depends on it, so a changed file recompiles what it must; commit it if
 `git status` shows it (round 73's red merge was that file stale by hand).
 
-**Do not pipe `build-and-verify.sh` into `tail`/`head` to read its tail.**
-`$?` is then the PIPE's last command and is always 0, which is the "necessary
-but not sufficient" hazard reinstalled by hand. Redirect to your own log and
-echo `$?` before grepping it (round 50, the head did this and read `build
-exit=0` off a failed link).
+**Do not pipe `build-and-verify.sh` into `tail`/`head`:** `$?` is then the
+pipe's and always 0. Redirect to your own log and echo `$?` before grepping
+(round 50 read `build exit=0` off a failed link).
 
 After all merges: grep the tree for every symbol a shared-header resolution
 declares; promote `Proposed learning` entries into DECOMPILATION_LEARNINGS.md
