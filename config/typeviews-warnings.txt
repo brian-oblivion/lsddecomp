@@ -111,12 +111,10 @@ code_2c054: warning: implicit declaration of function `BMemPMgrAlloc'
 code_2cc8c: warning: `/*' within comment
 code_2cc8c: warning: `/*' within comment
 code_2cc8c: warning: `/*' within comment
-code_2cc8c: warning: assignment from incompatible pointer type
 code_2cc8c_b: warning: `/*' within comment
 code_2cc8c_b: warning: `/*' within comment
 code_2cc8c_b: warning: `/*' within comment
 code_2cc8c_b: warning: assignment from incompatible pointer type
-code_2cc8c_b: warning: passing arg 2 makes integer from pointer without a cast
 code_2cc8c_b: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
 code_2cc8c_c: warning: `/*' within comment
 code_2cc8c_c: warning: `/*' within comment

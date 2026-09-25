@@ -22,29 +22,16 @@
  * established the jtbl-is-not-an-exception discriminator, and that finding
  * outlived the blocker it was about.
  *
- * Shape: this is class-framework code. Objects carry their method table at
- * offset 0 (`lw $v1, 0x0($a0)` then `lw $v0, 0xNN($v1)` then `jalr`), so
- * resolve slots with tools/classtable.py rather than by counting. The
- * struct is `Obj86B60` (include/code_2cc8c.h). Every function in this file
- * is the DEFAULT implementation of its slot in `gTaskCoreMethods` (72 slots,
- * `Get_vtable_TaskCore()`), the real base table for this whole class family
- * -- NOT `gClass86B60Methods` (78 slots) or `gGraphRoomMethods` (73 slots),
- * which are two independent, sibling DERIVED tables that inherit most of
- * this unit's functions unmodified and override a few (`Class86B60`
- * overrides SetState/Tick/RefreshViewValue; see the header's own top
- * comment for the round-78 correction and the evidence). The first two
- * functions (`TaskCore__OnPadEvent`/`TaskCore__Update`) are
- * `EventArg`-tag dispatchers reached from `IntermediateBase__OnNotify`
- * (code_2cc8c_c.c); the five `Obj86B60__func_8003Cxxx` handlers they
- * dispatch to are undifferentiated leaf state-transition helpers (tier C --
- * see each one's own match report); `TaskCore__SetState` is the base
- * `reason`-coded state-transition entry point (slot60); `TaskCore__Tick`/
- * `TaskCore__RefreshViewValue` are per-frame slots (90/94); the rest are
- * small setters/getters around a `frameCounter`+`activeSlot` ring-buffer
- * bookkeeping scheme and a "fade" pair (`TaskCore__SetFadeRate`,
- * `TaskCore__TickColorFade`, gated through `TaskCore__SetFadeCallbackEnabled`/
- * `TaskCore__TickFadeCallback`) that computes a running RGB value from
- * `frameCounter * unk84` against a base colour.
+ * Shape: this is class-framework code. Every function in this file is
+ * TaskCore's own (include/TaskCore.h, track 4 round 84; its object was
+ * viewed here as `Obj86B60` until then), the default for its slot in
+ * gTaskCoreMethods, which StreamTaskObj, Class86B60 and GraphRoomObj
+ * inherit or override. TaskCore__OnPadEvent is IntermediateBase's Pad
+ * case, switching on the event to the five onPad* handlers;
+ * TaskCore__Update and TaskCore__SetState drive the state machine the
+ * header's banner describes; the rest are the frame bound, the sound
+ * call, the view callback and the fade-in/fade-out pair (a running colour
+ * from `frameCounter * fadeRate` against `baseColor`).
  *
  * Round 78 (delta): full track-3 naming pass. All 20 functions were already
  * matched (rounds 10-23); this round named every one via `tools/rename.py`
@@ -57,83 +44,83 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-void TaskCore__OnPadEvent(Obj86B60 *self, s32 a1, s32 a2)
+void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event)
 {
-    Obj86B60Methods *methods;
+    TaskCoreMethods *methods;
 
     methods = self->methods;
-    if (self->unk3C != 0) {
-        switch (a2) {
+    if (self->inputMode != 0) {
+        switch (event) {
         case 0x12:
-            methods->slot80(self, a1);
+            methods->onPadPrev(self, sender);
             break;
         case 0x13:
-            methods->slot84(self, a1);
+            methods->onPadNext(self, sender);
             break;
         case 0x21:
-            methods->slot74(self, a1);
+            methods->onPad21(self, sender);
             break;
         case 0x17:
-            methods->slot7C(self, a1);
+            methods->onPadCancel(self, sender);
             break;
         case 0x19:
-            methods->slot78(self, a1);
+            methods->onPadConfirm(self, sender);
             break;
         }
     }
 }
 
-void TaskCore__Update(Obj86B60 *self, s32 a1, s32 a2)
+void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event)
 {
-    Obj86B60Methods *methods;
+    TaskCoreMethods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, (BasicClass *)a1, a2);
-    if (self->unk3C != 0) {
+    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
+    if (self->inputMode != 0) {
         u32 bound;
 
         bound = self->frameCounter;
-        if ((u32)self->unk40 < bound) {
-            methods->slot60(self, 6);
+        if ((u32)self->frameBound < bound) {
+            methods->setState(self, 6);
         }
     }
-    switch (self->unk20) {
+    switch (self->state) {
     case 2:
-        methods->slot60(self, 4);
+        methods->setState(self, 4);
         break;
     case 4:
-        methods->slotAC(self);
+        methods->tickFadeCallback(self);
         break;
     case 7:
-        methods->slotC0(self);
+        methods->tickFadeOutCallback(self);
         break;
     case 8:
-        methods->slot60(self, 3);
+        methods->setState(self, 3);
         break;
     }
 }
 
-void TaskCore__SetState(Obj86B60 *self, s32 a1)
+void TaskCore__SetState(TaskCore *self, s32 state)
 {
-    Obj86B60Methods *methods;
+    TaskCoreMethods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, a1);
-    switch (a1) {
+    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
+    switch (state) {
     case 5:
-        methods->slotE4(self, self->target->unselectedColor);
-        methods->slotF0(self, self->target->unk8, 0);
+        methods->broadcastToSlots(self, self->target->unselectedColor);
+        methods->setActiveSlot(self, self->target->unk8, 0);
         self->frameCounter = 0;
-        self->unk3C = 1;
+        self->inputMode = 1;
         break;
     case 6:
-        self->unk38 = 1;
-        methods->slot94(self);
+        self->result = 1;
+        methods->refreshViewValue(self);
         break;
     case 4:
     case 7:
         self->frameCounter = 0;
-        self->unk3C = 0;
+        self->inputMode = 0;
         break;
     case 8:
         self->frameCounter = 0;
@@ -145,217 +132,217 @@ void TaskCore__SetState(Obj86B60 *self, s32 a1)
     case 0xF:
     case 0x10:
     case 0x11:
-        self->unk20 = 5;
+        self->state = 5;
         self->frameCounter = 0;
-        switch (a1) {
+        switch (state) {
         case 0xB:
-            methods->slot90(self);
+            methods->tick(self);
             break;
         case 0xF:
-            methods->slot10C(self);
+            methods->commitElementScroll(self);
             break;
         case 0x11:
-            methods->slot110(self);
+            methods->cancelElementScroll(self);
             break;
         }
         break;
     }
 }
 
-void TaskCore__SetFrameBound(Obj86B60 *self, s32 a1)
+void TaskCore__SetFrameBound(TaskCore *self, s32 bound)
 {
-    self->unk40 = a1;
-    if (a1 >= 0) {
-        self->unk40 = a1 * 20;
+    self->frameBound = bound;
+    if (bound >= 0) {
+        self->frameBound = bound * 20;
     }
 }
 
-void TaskCore__PlaySound(Obj86B60 *self, s32 a1)
+void TaskCore__PlaySound(TaskCore *self, s32 tone)
 {
-    Unk48Obj *child;
+    Unk48Obj *sound;
 
-    child = self->unk48;
-    if (child != NULL) {
-        child->methods->slot80(child, a1, 0x60, 0x60);
+    sound = (Unk48Obj *)self->sound;
+    if (sound != NULL) {
+        sound->methods->slot80(sound, tone, 0x60, 0x60);
     }
 }
 
-void TaskCore__func_8003C7F4(Obj86B60 *self, s32 a1)
+void TaskCore__func_8003C7F4(TaskCore *self, BasicClass *sender)
 {
     if (self->target != NULL) {
-        self->methods->slot70(self, 0x10);
-        self->methods->slot60(self, 0xA);
+        self->methods->playSound(self, 0x10);
+        self->methods->setState(self, 0xA);
     }
 }
 
-void TaskCore__OnPadConfirm(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadConfirm(TaskCore *self, BasicClass *sender)
 {
     s32 reason;
 
     if (self->target != NULL) {
-        self->methods->slot70(self, 0x10);
+        self->methods->playSound(self, 0x10);
         reason = 0xF;
-        if (self->unk3C == 1) {
+        if (self->inputMode == 1) {
             reason = 0xB;
         }
-        self->methods->slot60(self, reason);
+        self->methods->setState(self, reason);
     }
 }
 
-void TaskCore__OnPadCancel(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadCancel(TaskCore *self, BasicClass *sender)
 {
-    if (self->target != NULL && self->unk3C != 1) {
-        self->methods->slot70(self, 0x10);
-        self->methods->slot60(self, 0x11);
+    if (self->target != NULL && self->inputMode != 1) {
+        self->methods->playSound(self, 0x10);
+        self->methods->setState(self, 0x11);
     }
 }
 
-void TaskCore__OnPadPrev(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadPrev(TaskCore *self, BasicClass *sender)
 {
-    void (*handler)(Obj86B60 *self);
+    void (*handler)(TaskCore *self);
 
     if (self->target == NULL) {
         return;
     }
-    if (self->unk3C == 1) {
-        handler = self->methods->slotEC;
-    } else if (self->unk3C == 2) {
-        handler = self->methods->slot118;
+    if (self->inputMode == 1) {
+        handler = self->methods->findPrevFreeSlot;
+    } else if (self->inputMode == 2) {
+        handler = self->methods->retreatSlotCursor;
     } else {
         return;
     }
     handler(self);
 }
 
-void TaskCore__OnPadNext(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadNext(TaskCore *self, BasicClass *sender)
 {
-    void (*handler)(Obj86B60 *self);
+    void (*handler)(TaskCore *self);
 
     if (self->target == NULL) {
         return;
     }
-    if (self->unk3C == 1) {
-        handler = self->methods->slotE8;
-    } else if (self->unk3C == 2) {
-        handler = self->methods->slot114;
+    if (self->inputMode == 1) {
+        handler = self->methods->findNextFreeSlot;
+    } else if (self->inputMode == 2) {
+        handler = self->methods->advanceSlotCursor;
     } else {
         return;
     }
     handler(self);
 }
 
-void TaskCore__Tick(Obj86B60 *self)
+void TaskCore__Tick(TaskCore *self)
 {
-    Unk4CObj *target;
+    TaskCoreTarget *target;
     s32 idx;
 
     target = self->target;
     idx = self->activeSlot;
     if (target->unk24[idx] != NULL) {
-        self->methods->slot108(self);
+        self->methods->beginElementScroll(self);
     } else if (idx == target->unkC) {
-        self->methods->slot94(self);
+        self->methods->refreshViewValue(self);
     }
 }
 
-void TaskCore__RefreshViewValue(Obj86B60 *self)
+void TaskCore__RefreshViewValue(TaskCore *self)
 {
     if (self->viewCallback != NULL) {
         self->viewCallback(self->viewCallbackCtx);
     }
-    self->methods->slot60(self, 7);
+    self->methods->setState(self, 7);
 }
 
-void TaskCore__SetCallback(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
+void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx)
 {
-    self->viewCallback = a1;
-    self->viewCallbackCtx = a2;
+    self->viewCallback = callback;
+    self->viewCallbackCtx = ctx;
 }
 
-void TaskCore__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
+void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable)
 {
-    Obj86B60Methods *methods;
+    TaskCoreMethods *methods;
 
     methods = self->methods;
-    switch (a1) {
+    switch (enable) {
     case 0:
-        self->fadeCallback = NULL;
+        self->fadeInCallback = NULL;
         break;
     case 1:
-        self->fadeCallback = methods->slotB0;
+        self->fadeInCallback = methods->tickColorFade;
         break;
     }
 }
 
-void TaskCore__SetFadeOutCallbackEnabled(Obj86B60 *self, s32 a1)
+void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable)
 {
-    Obj86B60Methods *methods;
+    TaskCoreMethods *methods;
 
     methods = self->methods;
-    switch (a1) {
+    switch (enable) {
     case 0:
-        self->unk8C = NULL;
+        self->fadeOutCallback = NULL;
         break;
     case 1:
-        self->unk8C = methods->slotC4;
+        self->fadeOutCallback = methods->tickFadeColor;
         break;
     }
 }
 
 typedef struct { s8 r, g, b; } RGB8003CB68;
 
-void TaskCore__SetColors(Obj86B60 *self, s8 *a1, s8 *a2, s8 *a3)
+void TaskCore__SetColors(TaskCore *self, u8 *a1, u8 *a2, u8 *a3)
 {
     *(RGB8003CB68 *)self->baseColor = *(RGB8003CB68 *)a1;
     *(RGB8003CB68 *)self->unk93 = *(RGB8003CB68 *)a2;
     *(RGB8003CB68 *)self->unk96 = *(RGB8003CB68 *)a3;
 }
 
-void TaskCore__SetFadeRate(Obj86B60 *self, s32 a1)
+void TaskCore__SetFadeRate(TaskCore *self, s32 rate)
 {
-    self->unk84 = a1;
+    self->fadeRate = rate;
 }
 
-s32 TaskCore__TickFadeCallback(Obj86B60 *self)
+s32 TaskCore__TickFadeCallback(TaskCore *self)
 {
     s32 result;
 
     result = 1;
-    if (self->fadeCallback != NULL) {
-        result = self->fadeCallback(self);
+    if (self->fadeInCallback != NULL) {
+        result = self->fadeInCallback(self);
     }
     if (result != 0) {
-        self->methods->slot60(self, 5);
+        self->methods->setState(self, 5);
     }
     return result;
 }
 
-s32 TaskCore__TickColorFade(Obj86B60 *self)
+s32 TaskCore__TickColorFade(TaskCore *self)
 {
     s32 prod;
     u8 buffer[3];
 
-    prod = self->frameCounter * self->unk84;
+    prod = self->frameCounter * self->fadeRate;
     buffer[0] = prod + self->baseColor[0];
     buffer[1] = prod + self->baseColor[1];
     buffer[2] = prod + self->baseColor[2];
-    self->methods->slotE4(self, buffer);
-    self->unk78->methods->slotB8(self->unk78, 1, buffer);
+    self->methods->broadcastToSlots(self, buffer);
+    ((Unk78Obj *)self->bgLayer)->methods->slotB8((Unk78Obj *)self->bgLayer, 1, buffer);
     return (u8)prod >= 0x81;
 }
 
-s32 TaskCore__TickFadeOutCallback(Obj86B60 *self)
+s32 TaskCore__TickFadeOutCallback(TaskCore *self)
 {
     s32 result;
 
     result = 1;
-    if (self->unk8C != NULL) {
-        result = self->unk8C(self);
+    if (self->fadeOutCallback != NULL) {
+        result = self->fadeOutCallback(self);
         if (result == 0) {
             goto epilogue;
         }
     }
-    self->methods->slot60(self, 8);
+    self->methods->setState(self, 8);
 epilogue:
     return result;
 }
