@@ -88,7 +88,25 @@ void func_800431A8(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043200);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800434DC);
+/* The largest of the buffer's `count` words from +0x14. */
+typedef struct Buf434DC {
+    /* +0x00 */ u32 count;
+    /* +0x04 */ u8 pad4[0x10];
+    /* +0x14 */ u32 vals[1];
+} Buf434DC;
+
+u32 func_800434DC(Class6D430 *self) {
+    Buf434DC *buf = self->buffer;
+    u32 i;
+    u32 max = 0;
+
+    for (i = 0; i < buf->count; i++) {
+        if (max < buf->vals[i]) {
+            max = buf->vals[i];
+        }
+    }
+    return max;
+}
 /* D_8006F0B8 +0x078: set entry `index`'s shift, and its mask from it. */
 typedef struct Ent6F0B8 {
     /* +0x00 */ u16 shift;
