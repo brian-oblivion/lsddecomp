@@ -781,7 +781,51 @@ void func_800452AC(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
     ((DataSrc33808Methods *)func_800441A4())->finalize(self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800452FC);
+/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
+ * buffer's counted offset table, into the table's own words; 0 when all
+ * exist, otherwise release the ones already built and 1. */
+/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
+ * buffer's counted offset table, into the table's own words; 0 when all
+ * exist, otherwise release the ones already built and 1. */
+/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
+ * buffer's counted offset table, into the table's own words; 0 when all
+ * exist, otherwise release the ones already built and 1. */
+/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
+ * buffer's counted offset table, into the table's own words; 0 when all
+ * exist, otherwise release the ones already built and 1. */
+/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
+ * buffer's counted offset table, into the table's own words; 0 when all
+ * exist, otherwise release the ones already built and 1. */
+/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
+ * buffer's counted offset table, into the table's own words; 0 when all
+ * exist, otherwise release the ones already built and 1. */
+s32 func_800452FC(DataSrc33808 *self) {
+    Req44858 req;
+    CountedBuf33808 *buf;
+    DataSrc33808 **p;
+    s32 i;
+    s32 n;
+
+    SetVec3(&req, 0, 0, 1);
+    buf = self->buffer;
+    i = 0;
+    n = buf->count;
+    p = (DataSrc33808 **)buf->entries;
+    for (; i < n; i++) {
+        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
+        *p = func_80043E84((s32)&req);
+        if (*p == NULL) {
+while (i != 0) {
+ i--;
+ p--;
+ (*p)->methods->release(*p);
+ }
+            return 1;
+        }
+        p++;
+    }
+    return 0;
+}
 /* D_8006F590 +0x078: slot +0x07C over the data past the buffer's counted
  * array. */
 u8 func_800453DC(DataSrc33808 *self, s32 arg1, s32 arg2) {
