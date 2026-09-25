@@ -11,14 +11,14 @@ object stashed on `self` (`unk48`, `unk44`, `unk40`).
 ```c
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern ChildObj86ED0 *func_8003B39C(char *path);
-extern ChildObj86ED0 *New_D8006ED4C(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
+extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 extern ChildObj86ED0 *New_D8006EC74(ChildObj86ED0 *arg0, s32 arg1);
 
 extern const char sStrComInput[]; /* "COMINPUT" */
 extern const char sStrFontIcon[]; /* "FONTICON" */
 extern const char sCardPathPrefix[]; /* "CARD\\" */
 extern const char sTimExt[]; /* ".TIM" */
-extern s32 D_80086F7C; /* 3-word opaque block, New_D8006ED4C's arg1, address-only here */
+extern s32 D_80086F7C; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
 extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
 extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
@@ -44,7 +44,7 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
 
     handle1 = func_8003B39C(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
-    self->unk48 = New_D8006ED4C(handle1, (void *)&D_80086F7C, 0);
+    self->unk48 = New_ScreenSprite(handle1, (void *)&D_80086F7C, 0);
     handle1->methods->release(handle1);
     self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
 
@@ -99,7 +99,7 @@ what may well be the same underlying vtable.
 (`FieldM7C *` into `ChildObj86ED0 *`) -- a harmless warning under this
 project's `-Wall`-without-`-Werror` build, not a compile error, and zero
 bytes of cost (pointer reinterpretation is free). `New_D8006EC74` and
-`New_D8006ED4C` are NOT reachable from any header this unit includes, so
+`New_ScreenSprite` are NOT reachable from any header this unit includes, so
 they got fresh local `extern` declarations here, typed purely from this
 call site's own register usage (same convention as `DecodeFullWidthSjis` above
 in this file) -- and diverge from `New_D8006EC74`'s OTHER call-site typing
@@ -149,3 +149,7 @@ three-value swap was resolved by touching only the non-persistent one.
 ## Naming
 
 - `Obj86ED0__LoadCardResources` -- tier A. gObj86ED0Methods +0x044 (classtable.py). Resolves 'CARD\\COMINPUT.TIM'/'CARD\\FONTICON.TIM' memory-card paths (sCardPathPrefix/sStrComInput/sStrFontIcon/sTimExt, all this unit's own strings) and loads/wraps them into the three resource handles (unk48/unk44/unk40). String evidence is direct, not inferred.
+
+## Track 4
+
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0)`: D_80086F7C is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position D_8008AACC = (-70, -60). Image byte-identical.

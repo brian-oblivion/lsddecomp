@@ -12,7 +12,7 @@ Unit: `src/class_3bb8c_j.c`. `self` is `Class86F88_3bb8c_j`.
 #if 0
 extern void *BuildFileName(void *out, void *a1, void *a2, void *a3);
 extern Class86F88Handle_3bb8c_j *func_8003B39C(void *arg0);
-extern Class86F88Handle_3bb8c_j *New_D8006ED4C(Class86F88Handle_3bb8c_j *arg0, void *arg1, s32 arg2);
+extern Class86F88Handle_3bb8c_j *New_ScreenSprite(Class86F88Handle_3bb8c_j *arg0, void *arg1, s32 arg2);
 extern s32 D_8008AB14;
 extern s32 D_8008AB1C;
 extern s32 D_8008AB24;
@@ -34,7 +34,7 @@ void Class86F88__LoadResources(Class86F88_3bb8c_j *self, void *arg1)
 
     h = func_8003B39C(BuildFileName(local, &D_8008AB14, &D_8008AB1C, &D_8008AB24));
     h->methods->slot78(h);
-    self->unk50 = New_D8006ED4C(h, &D_80087028, 0);
+    self->unk50 = New_ScreenSprite(h, &D_80087028, 0);
     h->methods->slot4(h);
     self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
 
@@ -51,7 +51,7 @@ If (`arg1` non-NULL AND `self->unk50` not already set): builds a
 `func_8003B39C`, producing an opaque "handle" (`Class86F88Handle_3bb8c_j *`, the
 same type `Class86F88__ReleaseResources` -- matched this round -- also uses via
 `self->unk50`). Calls the handle's own `slot78` (init?), stores a SECOND
-derived handle into `self->unk50` via `New_D8006ED4C`, releases the FIRST
+derived handle into `self->unk50` via `New_ScreenSprite`, releases the FIRST
 handle (`slot4`), then forwards `arg1` and a literal global pointer into
 `self->unk50`'s own `slot4C`. Repeats the whole build (with a different
 global, `D_800116E4` instead of `D_8008AB14`) to make a THIRD handle,
@@ -258,7 +258,7 @@ The template was the MATCHED sibling `Obj86ED0__LoadCardResources` in
 `src/class_3bb8c_i.c`: the same "CARD\\<name>.TIM" resource loader, with
 `char path[0x20]`, `dir`/`ext` locals and `handle1`/`handle2`. Screen for the
 next case: a cross-unit sibling with the same call skeleton (here
-`BuildFileName` -> `func_8003B39C` -> `slot78` -> `New_D8006ED4C`).
+`BuildFileName` -> `func_8003B39C` -> `slot78` -> `New_ScreenSprite`).
 
 Builds, all through `./build-and-verify.sh`:
 
@@ -299,3 +299,7 @@ cross-unit sibling with the same call skeleton first.
 ## Naming
 
 - `Class86F88__LoadResources` -- tier B. The slot44 occupant (classtable.py gClass86F88Methods +0x044): builds two "CARD\\<name>.TIM" paths, loads them through func_8003B39C/New_D8006ED4C, and dispatches the second through self->methods->slot8C. Mechanics (load a pair of card-icon-shaped resources) are clear from the BuildFileName/CARD path evidence; what the two resources are FOR is not.
+
+## Track 4
+
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (Class86F88Handle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0)`: D_80087028 is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position D_8008AAF8 = (-100, -60). Image byte-identical.

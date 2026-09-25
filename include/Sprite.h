@@ -8,11 +8,12 @@
  * gSpriteMethods): a Class6B5CC subclass that draws a libgs GsSPRITE embedded
  * at +0x064 instead of its GsDOBJ2 model. Unk18Obj__DrawNode hands
  * `self + 0x64` to GsSortSprite for every class whose id's low byte is 0x44:
- * screen-space for 0x144 (D_8006ED4C and below), otherwise world-space,
+ * screen-space for 0x144 (ScreenSprite and below), otherwise world-space,
  * projected from the inherited coordinate. Methods in src/code_322b4.c; four
- * classes derive from it (`typeviews.py --tree`): D_8006ED4C (0x144, the
- * screen-space sprite), D_8006EC74 (0x1144, one 8x8 cell of a 32-wide grid),
- * D_8006EB90 (0x11144) and D_800879C4 (0x1F44, class_3bb8c_p/q/t).
+ * classes derive from it (`typeviews.py --tree`): ScreenSprite (0x144, the
+ * screen-space sprite, include/ScreenSprite.h), D_8006EC74 (0x1144, one 8x8
+ * cell of a 32-wide grid), D_8006EB90 (0x11144) and D_800879C4 (0x1F44,
+ * class_3bb8c_p/q/t).
  *
  * The texture is bound by reset (+0x040), which the ctor calls with its own
  * arguments: `texture` is a TimImage (code_2bb9c.c: its GsIMAGE is at +0x02C,
@@ -101,7 +102,7 @@ struct SpriteGs {
     /* +0x05C */ s32 unk5C;             /* D800879C4__UpdateScale: times the x ratio when unk58 != 0 */ \
     /* +0x060 */ s32 unk60;             /* D800879C4__UpdateScale: times the y ratio when unk58 != 0 */ \
     /* +0x064 */ SpriteGs sprite;       /* InitGsSprite fills it; Unk18Obj__DrawNode sorts it */    \
-    /* +0x088 */ u8 pad88[0xA0 - 0x88]  /* the object is 0xA0 bytes (New_Sprite); D_8006ED4C's own fields start at +0x0A0 */
+    /* +0x088 */ u8 pad88[0xA0 - 0x88]  /* the object is 0xA0 bytes (New_Sprite); ScreenSprite's own fields start at +0x0A0 */
 
 struct SpriteMethods {
     SPRITE_SLOTS(Sprite, (Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5));
