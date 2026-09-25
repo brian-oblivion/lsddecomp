@@ -3,20 +3,31 @@
  * revision 18). 0x3311C..0x3328C (vram 0x8004291C..0x80042A8C). It was counted
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: the four methods of
- * gFlatLightObjMethods.
+ * those, and no Sony fingerprint). What it holds: the whole of class
+ * gFlatLightObjMethods -- allocator, ctor, its three own vtable slots
+ * (+0x40/+0x44/+0x48), and the table getter.
  *
- * All six functions matched in round 81 (alpha).
+ * All six functions matched and named in round 81 (alpha).
  */
 #include "common.h"
 #include "BasicClass.h"
 
 /*
- * The class of gFlatLightObjMethods: a BasicClass that owns one Psy-Q flat light.
- * 0x20 bytes (New_FlatLightObj's allocation). Fields past BasicClass's are a
- * GsF_LIGHT (LIBGS.H) at +0x010, handed to GsSetFlatLight by address.
- * LIBGS.H is not included: its prototypes collide in shared headers, so the
- * one used here is declared locally with a local copy of the struct.
+ * FlatLightObj: a BasicClass (class id 0x6, direct BasicClass child) that
+ * owns one Psy-Q flat light. 0x20 bytes (New_FlatLightObj's allocation).
+ * Fields past BasicClass's are a Psy-Q light id at +0x00C and a GsF_LIGHT
+ * (LIBGS.H: `int vx,vy,vz; unsigned char r,g,b;`) at +0x010, laid out here
+ * as FlatLightParams -- same fields, same offsets -- and handed to
+ * GsSetFlatLight by address. "FlatLight" is Sony's own name (GsF_LIGHT,
+ * GsSetFlatLight), not a guess. LIBGS.H is not included: its prototypes
+ * collide in shared headers, so the one used here is declared locally with
+ * a local copy of the struct.
+ *
+ * The unit's only outside caller (func_800426E4, asm/nonmatchings/code_322b4)
+ * calls New_FlatLightObj three times with light ids 0, 1, 2 in a row and
+ * stores each returned pointer into a 3-slot array -- consistent with a
+ * fixed 3-light flat-lighting rig, but the rest of that caller is another
+ * unit's C to write, so no more is asserted here.
  */
 typedef struct FlatLightObj FlatLightObj;
 typedef struct FlatLightObjMethods FlatLightObjMethods;
