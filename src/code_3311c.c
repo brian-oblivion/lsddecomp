@@ -60,7 +60,7 @@ FlatLightObj *New_FlatLightObj(s32 lightId) {
     }
     return NULL;
 }
-void func_8004297C(FlatLightObj *self, s32 lightId) {
+void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = func_80042A7C();
     self->methods->setLightId(self, lightId);

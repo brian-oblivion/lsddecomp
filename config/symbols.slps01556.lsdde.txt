@@ -2515,3 +2515,4 @@ gClass6D3C8CtorArgs = 0x80066828;
 __main = 0x80011994; // type:func
 gDataSourceClientGetters = 0x8006D4AC;
 New_FlatLightObj = 0x8004291C; // type:func
+FlatLightObj__FlatLightObj = 0x8004297C; // type:func

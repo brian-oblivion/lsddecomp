@@ -1,4 +1,6 @@
-# func_8004297C -- MATCHED (25/25 words, round 81, alpha)
+# FlatLightObj__FlatLightObj -- MATCHED (25/25 words, round 81, alpha)
+
+> Renamed from `func_8004297C` on 2026-09-25 (tools/rename.py). Address 0x8004297c.
 
 **Unit:** `src/code_3311c.c` (carved from `psyq_3311c` in FINISHING-PLAN revision 18). **Class:** method table `D_8006F06C` (class id 0x6, direct BasicClass child), read here as `FlatLightObj`: a 0x20-byte BasicClass holding a Psy-Q light id at +0x00C and a `GsF_LIGHT` (LIBGS.H) at +0x010. The name is a hypothesis from the `GsSetFlatLight` calls, not evidence. Slots resolved with `python3 tools/classtable.py D_8006F06C`.
 
@@ -11,7 +13,7 @@ slot +0x008 (ctor): `Get_vtable_BasicClass()->ctor(self)`, install `func_80042A7
 ## Source
 
 ```c
-void func_8004297C(FlatLightObj *self, s32 lightId) {
+void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = func_80042A7C();
     self->methods->setLightId(self, lightId);
