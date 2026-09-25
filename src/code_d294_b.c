@@ -42,7 +42,7 @@
  * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
  * pass-through value and raw pass-through result -- same shape as
  * Class6B5CC__SetSemiTrans/D3A0/D3F8 (no `== 0` on either side). */
-u32 Class6B5CC__GetSetUnk10Field0(Class6B5CCObj *self, u32 a1) {
+u32 Class6B5CC__GetSetUnk10Field0(Class6B5CC *self, u32 a1) {
     return GetSetBitField(&self->attribute, 0, 3, a1);
 }
 
@@ -52,17 +52,17 @@ u32 Class6B5CC__GetSetUnk10Field0(Class6B5CCObj *self, u32 a1) {
  * exactly that double-inversion, at shift 7 width 1, hence the same `s32`
  * return type as Class6B5CC__SetDisplay rather than the plain `u32` of the other
  * three siblings. */
-s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CCObj *self, s32 a1) {
+s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CC *self, s32 a1) {
     return GetSetBitField(&self->attribute, 7, 1, a1 == 0) == 0;
 }
 
 /* Same family as Class6B5CC__GetSetUnk10Field0, shift 9 width 3. Raw pass-through. */
-u32 Class6B5CC__GetSetUnk10Field9(Class6B5CCObj *self, u32 a1) {
+u32 Class6B5CC__GetSetUnk10Field9(Class6B5CC *self, u32 a1) {
     return GetSetBitField(&self->attribute, 9, 3, a1);
 }
 
 /* Same family as Class6B5CC__GetSetUnk10Flag7: double-inversion shape, shift 8 width 1. */
-s32 Class6B5CC__GetSetUnk10Flag8(Class6B5CCObj *self, s32 a1) {
+s32 Class6B5CC__GetSetUnk10Flag8(Class6B5CC *self, s32 a1) {
     return GetSetBitField(&self->attribute, 8, 1, a1 == 0) == 0;
 }
 
@@ -72,7 +72,7 @@ s32 Class6B5CC__GetSetUnk10Flag8(Class6B5CCObj *self, s32 a1) {
  * own negate path never stores to it) or copying the quad verbatim, then
  * forwards the result -- plus a1, passed straight through -- to the PsyQ
  * helper RotMatrix. */
-void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2) {
+void Class6B5CC__GetRotMatrix(Class6B5CC *self, s32 a1, s32 a2) {
     S16Quad_d294 buf;
     S16Quad_d294 *src = &self->coord2->param->rotate;
 
@@ -86,14 +86,14 @@ void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2) {
     RotMatrix(&buf, a1);
 }
 
-/* a1 gates a small range (2 <= a1 < 4). When self->unk20 is set and
- * func_8001F3A4(self->unk20) reports true, fills a stack buffer through
+/* a1 gates a small range (2 <= a1 < 4). When self->model is set and
+ * func_8001F3A4(self->model) reports true, fills a stack buffer through
  * this class's own +0x8C slot (Class6B5CC__ReadUnk20Data, already matched in this
- * unit -- fills it via func_8001F51C(self->unk20, dest)) then forwards
+ * unit -- fills it via func_8001F51C(self->model, dest)) then forwards
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
  * (Class6B5CC__TransformAndNotifyParents, also already matched in this unit), with the original
  * a1 passed through as Class6B5CC__TransformAndNotifyParents's own a2. */
-void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
+void Class6B5CC__NotifyIfUnk20Active(Class6B5CC *self, s32 a1) {
     /* Sized to reproduce retail's own frame (0x58): Class6B5CC__ReadUnk20Data's own
      * target (func_8001F51C, PsyQ, asm/psyq_fa50.s, not
      * decompiled here) fills fields out past +0x32 of its own `dest`
@@ -109,23 +109,23 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
     if (a1 < 2) {
         return;
     }
-    if (self->unk20 == NULL) {
+    if (self->model == NULL) {
         return;
     }
-    if (!func_8001F3A4(self->unk20)) {
+    if (!func_8001F3A4(self->model)) {
         return;
     }
     self->methods->readUnk20Data(self, buf);
     self->methods->transformAndNotifyParents(self, (GenericCountList_d294 *)buf, a1);
 }
 
-/* Forwards self->unk20 (still opaque, retyped `void *` this round -- see
+/* Forwards self->model (still opaque, retyped `void *` this round -- see
  * include/code_d294.h) and its own 2nd argument straight through to
  * func_8001F51C, untouched. func_8001F51C's own body (psyq_fa50.s)
  * has no deliberate return value -- see the extern's own comment -- so this
  * wrapper is void, not `return func_8001F51C(...)`. */
-void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest) {
-    func_8001F51C(self->unk20, dest);
+void Class6B5CC__ReadUnk20Data(Class6B5CC *self, void *dest) {
+    func_8001F51C(self->model, dest);
 }
 
 /* Copies a1's own count*8 elements into self->unk14->unk24 (via
@@ -134,13 +134,13 @@ void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest) {
  * for the duration of a single self->methods->slot30(self, a2) dispatch
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
-void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2) {
+void Class6B5CC__TransformAndNotifyParents(Class6B5CC *self, GenericCountList_d294 *a1, s32 a2) {
     ApplyMatrixToSVArray(&a1->unk4, &a1->unk4, a1->unk0 * 8, &self->coord2->unk24);
-    self->unk28 = 0;
-    self->unk2C = 0;
-    self->unk30 = a1;
+    self->linkTarget = 0;
+    self->hitMask = 0;
+    self->notifyVerts = a1;
     self->methods->notifyParents(self, a2);
-    self->unk30 = NULL;
+    self->notifyVerts = NULL;
 }
 
 void func_8001D6A4(void) {
@@ -150,16 +150,16 @@ void func_8001D6AC(void) {
 }
 
 /* a2 selects one of three behaviors: 2 or 3 dispatches through the vtable
- * (self->methods->slotA0), exactly 4 stores a1 into self->unk28, and
+ * (self->methods->slotA0), exactly 4 stores a1 into self->linkTarget, and
  * anything else (< 2 or > 4) is a no-op. */
-void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2) {
-    switch (a2) {
+void Class6B5CC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
+    switch (event) {
     case 2:
     case 3:
         self->methods->tryAttachNearby(self);
         break;
     case 4:
-        self->unk28 = a1;
+        self->linkTarget = sender;
         break;
     }
 }
@@ -168,17 +168,14 @@ void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2) {
  * header and eight corners are ONE local (count at sp+0x50, corners at
  * sp+0x54); round 76. Same layout as CornerList_d294 with the array made
  * explicit. */
-typedef struct AttachCornerList_d294b {
-    s32 count;
-    Vec3S16_d294 v[8];
-} AttachCornerList_d294b;
+/* AttachCornerList_d294b: include/Class6B5CC.h. */
 
 /* Range-checks `other` against `self` (each axis of position difference
  * must fit in +/-0x4000), then hands off to three vtable slots
  * (+0xA4 = Class6B5CC__ComposeAndApplyRotation, +0xA8 = Class6B5CC__CheckBoundsOverlap, +0xAC = Class6B5CC__ClassifyAgainstPlanes)
  * with the resulting Vec3S16 difference, before registering `other` into
- * self->unk28 and notifying it via its own +0x038 slot. */
-void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
+ * self->linkTarget and notifying it via its own +0x038 slot. */
+void Class6B5CC__TryAttachNearby(Class6B5CC *self, Class6B5CC *other) {
     Vec3_d294 *posA;
     Vec3_d294 *posB;
     Vec3_d294 diffRaw;
@@ -187,10 +184,10 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     u8 unused[0x20]; /* sp+0x30, never referenced; reserves retail's slot */
     AttachCornerList_d294b list;
 
-    if (self->unk20 == NULL) {
+    if (self->model == NULL) {
         return;
     }
-    if (!func_8001F3A4(self->unk20)) {
+    if (!func_8001F3A4(self->model)) {
         return;
     }
 
@@ -246,20 +243,20 @@ z_done:
     diff.y = diffRaw.y;
     diff.z = diffRaw.z;
 
-    list.count = other->unk30->unk0;
+    list.count = other->notifyVerts->unk0;
     {
-        GenericCountList_d294 *countList = other->unk30;
+        GenericCountList_d294 *countList = other->notifyVerts;
         self->methods->composeAndApplyRotation(self, &diff, list.v, &countList->unk4, list.count * 8);
     }
 
     if (!self->methods->checkBoundsOverlap(self, &list, &diff)) {
         return;
     }
-    if (!self->methods->classifyAgainstPlanes(self, other->unk2C, &diff, &list)) {
+    if (!self->methods->classifyAgainstPlanes(self, &other->hitMask, &diff, &list)) {
         return;
     }
 
-    self->unk28 = other;
+    self->linkTarget = other;
     other->methods->onNotify(other, self, 4);
 }
 
@@ -268,19 +265,19 @@ z_done:
  * MulMatrix2) before using buf1 as ApplyMatrixToSVArray's own "out" argument,
  * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
  * arg1 is non-NULL. */
-void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count) {
+void Class6B5CC__ComposeAndApplyRotation(Class6B5CC *self, void *arg1, void *arg2, void *arg3, s32 count) {
     u8 buf2[0x20];
     u8 buf1[0x20];
-    UnkOwner_d294 *node;
+    Class6B5CC *node;
 
     self->methods->getRotMatrix(self, buf1, 1);
 
     node = self->parent;
     if (node != NULL) {
         do {
-            node->methods->slot84(node, buf2, 1);
+            node->methods->getRotMatrix(node, buf2, 1);
             MulMatrix2(buf2, buf1);
-            node = node->next;
+            node = node->parent;
         } while (node != NULL);
     }
 
@@ -296,7 +293,7 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *
  * three axes. Each running min/max is a ternary stored back unconditionally
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
-s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *d) {
+s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d) {
     CornerList_d294 *list;
     Vec3S16_d294 *v;
     Vec3S16_d294 *end;
@@ -329,9 +326,9 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
         b->hi.z = (b->hi.z < v->z) ? v->z : b->hi.z;
     }
 
-    func_8001F4E4(self->unk20);
-    p = (BoundsBox_d294 *)func_8001F50C(self->unk20, 0);
-    n = func_8001F3A4(self->unk20);
+    func_8001F4E4(self->model);
+    p = (BoundsBox_d294 *)func_8001F50C(self->model, 0);
+    n = func_8001F3A4(self->model);
     box = *p;
     end2 = p + n;
     for (p++; p < end2; p++) {
@@ -354,10 +351,10 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
 
 /* Tests the corner list against every model plane. Part 1 averages two
  * diagonal corner pairs into mid[0]/mid[1] and tests that segment against
- * each plane, setting bit i of self->unk2C on a hit; any hit returns at once.
+ * each plane, setting bit i of self->hitMask on a hit; any hit returns at once.
  * Otherwise every 8-corner box k in `list` has its two vertical edges
  * (corner m against corner m+4, m = 1, 2) tested against every plane, and a
- * hit sets plane bit i in self->unk2C and box bit k in *outFlag. `hit` is
+ * hit sets plane bit i in self->hitMask and box bit k in *outFlag. `hit` is
  * written only as 0, but retail still tests it. Round 76. Byte levers:
  * the D_8008A838 gate is two arms that each set the bit, so loop.c sees two
  * equal constant-1 loads (savings 2) and hoists the 1 into $s1; Part 1 walks
@@ -365,7 +362,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
 extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
-s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, AttachCornerList_d294b *list) {
+s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d294 *diff, AttachCornerList_d294b *list) {
     Vec3S16_d294 mid[2];
     Vec3S16_d294 *p;
     Vec3S16_d294 *hi;
@@ -393,23 +390,23 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
         hi += 4;
     }
 
-    self->unk2C = 0;
-    count1 = func_8001F3A4(self->unk20);
+    self->hitMask = 0;
+    count1 = func_8001F3A4(self->model);
     hit = 0;
     for (i = 0; i < count1; i++) {
-        plane = func_8001F50C(self->unk20, i);
+        plane = func_8001F50C(self->model, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
-            if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
+            if (func_8001F8B8(self->model, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0) {
-                    self->unk2C |= 1 << i;
+                    self->hitMask |= 1 << i;
                 } else if (outWord >= 0x201) {
-                    self->unk2C |= 1 << i;
+                    self->hitMask |= 1 << i;
                 }
             }
         }
     }
 
-    if (self->unk2C != 0) {
+    if (self->hitMask != 0) {
         *outFlag = 1;
         if (hit != 0) {
             return 2;
@@ -420,15 +417,15 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
     *outFlag = 0;
     cnt2 = list->count;
     for (i = 0; i < count1; i++) {
-        plane = func_8001F50C(self->unk20, i);
+        plane = func_8001F50C(self->model, i);
         v = list->v;
         for (k = 0; k < cnt2; k++) {
             for (m = 0; m < 4; m++) {
                 if (m == 1 || m == 2) {
                     if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, v, v + 4)) {
-                        if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, v, v + 4)) {
+                        if (func_8001F8B8(self->model, &bigConst, diff, &outWord, v, v + 4)) {
                             if (outWord >= 0x201) {
-                                self->unk2C |= 1 << i;
+                                self->hitMask |= 1 << i;
                                 *outFlag |= 1 << k;
                             }
                         }
@@ -588,8 +585,8 @@ void func_8001E49C(void) {
  * the two nested do/while loops are real loops for loop.c, which hoists the
  * literal 4 into $s1. The goto form of earlier rounds had no loop notes, so
  * it needed a named `tag` and could not get retail's register order. */
-void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
-    GenericObj_d294 *entry;
+void Class6B5CC__NotifyTaggedParents(Class6B5CC *self, void *node) {
+    Class6B5CC *entry;
     void *cursor;
 
     entry = NULL;
@@ -603,7 +600,7 @@ void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
         entry = NULL;
     found:
         if (entry != NULL && *(u8 *)entry->methods == 0x34) {
-            entry->methods->slot10(entry, self);
+            entry->methods->addChild(entry, (BasicClass *)self);
         }
     } while (cursor != NULL);
 }

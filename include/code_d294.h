@@ -2,45 +2,19 @@
 #define CODE_D294_H
 
 #include "common.h"
-#include "BasicClass.h"
+#include "Class6B5CC.h"
 
-/* code_d294: a FRESH CARVE (round 10), the first 20-function slice of a
- * 55-function segment never carved before. `tools/classtable.py gClass6B5CCMethods`
- * shows this unit's own method table starts at gClass6B5CCMethods and its slots,
- * in order, ARE this unit's functions: +0x008 Class6B5CC__Class6B5CC (ctor),
- * +0x00C Class6B5CC__Finalize (BasicClass's finalize slot), +0x010 Class6B5CC__AddChild, +0x014 Class6B5CC__RemoveChild,
- * +0x018 Class6B5CC__RemoveAllChildren, [+0x01C..+0x038 seven slots inherited verbatim from
- * BasicClass, D_8006B58C], +0x038 Class6B5CC__OnNotify (override), +0x03C null,
- * +0x040 Class6B5CC__Reset, +0x044 Class6B5CC__UpdateRotation, +0x048 Class6B5CC__UpdateScale,
- * +0x04C Class6B5CC__AttachToParent, +0x050 Class6B5CC__DetachFromParent, +0x054 Class6B5CC__DetachAttachedChildren,
- * +0x058 Class6B5CC__GetNextAttachedChild, +0x05C Class6B5CC__func_1d33c (already-matched no-op stub),
- * +0x060 Class6B5CC__SetDisplay, +0x064 Class6B5CC__SetSemiTrans, +0x068 Class6B5CC__SetSemiTransRate,
- * +0x06C Class6B5CC__SetLighting, +0x070 Class6B5CC__SetLightMode, and continuing past this
- * unit's slice into the next carve (code_d294_b) up to +0x0B4
- * Class6B5CC__NotifyTaggedParents (45 slots total). This is proof, not a guess -- `--vs
- * D_8006B58C` confirms the class overrides 5 BasicClass slots (+0x008,
- * +0x00C, +0x010, +0x014, +0x018), inherits 7 verbatim (+0x01C..+0x038),
- * then overrides +0x038 and adds everything from +0x040 on as new virtuals.
+/* code_d294, code_d294_b, code_d294_c: the methods of Class6B5CC, whose one
+ * definition (object, method table, getter, method prototypes) is
+ * include/Class6B5CC.h since track 4 (round 81). This header keeps what only
+ * these three units use: the bounds-box helpers' types and the prototypes of
+ * the Psy-Q and utility functions the methods call.
  *
- * Named `Class6B5CC` after its table address (this project's convention for
- * classes found by table rather than by role; see Class6D3C8, Class86AA0).
- * Its ROLE is known since round 50: a positioned 3D scene object wrapping a
- * libgs GsDOBJ2 + GsCOORDINATE2 (see the PSY-Q IDENTIFICATION block below).
- * Class tag (low nibble of the table header) is 4; every subclass table
- * keeps that nibble, which is what the `(header & 0xF) == 4` tests mean.
- * Method names from round 71 (alpha); tiers in the match reports.
- *
- * New_Class6B5CC is NOT a table slot -- it is the `New_Class6B5CC` allocator
- * wrapper (allocates 0x44 bytes, calls the ctor via `GetClass6B5CCMethods()->ctor`,
- * frees and returns NULL on ctor failure). GetClass6B5CCMethods is a plain
- * no-argument getter, `lui/addiu %hi/%lo(gClass6B5CCMethods); jr $ra` -- MEASURED,
- * see include/class_3bb8c.h's own note on this exact symbol for the
- * "arity/signature is per-call-site, not a callee property" precedent this
- * follows: other units call the same GetClass6B5CCMethods symbol with a different
- * argument count and are equally byte-exact. Declared here with 0 arguments
- * and a Class6B5CCMethods* return type, matching only THIS unit's call site
- * (New_Class6B5CC).
- */
+ * GetClass6B5CCMethods is a plain no-argument getter (`lui/addiu
+ * %hi/%lo(gClass6B5CCMethods); jr $ra`). Several units used to call it with
+ * one or two arguments through an unprototyped declaration; round 59 measured
+ * every one of those arguments as zero-cost (the `jal`'s delay slot holds a
+ * callee-save spill), and track 4 dropped them. */
 
 /* ================= PSY-Q IDENTIFICATION (round 50, charlie) =================
  *
@@ -89,150 +63,6 @@
  * derivation above, so that round does not have to rediscover it.
  * ========================================================================= */
 
-typedef struct Class6B5CCObj Class6B5CCObj;
-typedef struct Class6B5CCMethods Class6B5CCMethods;
-typedef struct Class6B5CCSub14 Class6B5CCSub14;
-typedef struct Class6B5CCSub44 Class6B5CCSub44;
-
-/* Round 13 (code_d294_b, Class6B5CC__GetRotMatrix): a plain s16 quad, all-s16 members
- * (alignment 2) -- MEASURED, this is what makes retail's whole-struct copy
- * of it compile to unaligned lwl/lwr instead of a plain lw/sw (see
- * DECOMPILATION_LEARNINGS' "struct whose members are all s8/s16" idiom).
- * Only x/y/z are ever written by Class6B5CC__GetRotMatrix's own two paths; w is left
- * as whatever was already in the destination on the negate path, exactly
- * as retail's own disassembly does (no store to it there). Likely an
- * SVECTOR-shaped angle triple (PsyQ's own SVECTOR isn't typedef'd anywhere
- * reachable from this unit's headers, so this is a fresh local type, not a
- * borrowed one). */
-typedef struct S16Quad_d294 S16Quad_d294;
-struct S16Quad_d294 {
-    s16 x;  /* +0x000 */
-    s16 y;  /* +0x002 */
-    s16 z;  /* +0x004 */
-    s16 w;  /* +0x006, never written by Class6B5CC__GetRotMatrix's negate path */
-};
-
-/* Round 13: self->unk14->unk44's own struct (the 0x28-byte second heap
- * block) -- only the S16Quad_d294 at +0x10 is known, from Class6B5CC__GetRotMatrix.
- * Everything else in the block is still opaque, so this stays a
- * pad-then-known-field shape like Class6B5CCSub14 itself. */
-typedef struct Class6B5CCBlock44 Class6B5CCBlock44;
-struct Class6B5CCBlock44 {
-    u8 pad0[0x010];
-    S16Quad_d294 vec;  /* +0x010 */
-};
-
-/* self->unk14's target: a 0x50-byte block allocated by the ctor
- * (Class6B5CC__Class6B5CC). Round 2 (Class6B5CC__AttachToParent, Class6B5CC__Reset, Class6B5CC__DetachFromParent)
- * filled in most of the rest of this layout:
- *   +0x000  a flag/state word: 1 after Class6B5CC__Reset (the ctor's own init
- *           hook) runs, 0 again after Class6B5CC__AttachToParent's "attach" and after
- *           Class6B5CC__UpdateRotation/Class6B5CC__UpdateScale do their work
- *           (renamed `flg` round 71: GsCOORDINATE2.flg, 0 = recompute).
- *   +0x018..+0x020  a Vec3 (x,y,z), written wholesale by Class6B5CC__AttachToParent from
- *           its optional 3rd argument (or zeroed if that argument is NULL).
- *   +0x044  a second heap block (0x28 bytes, alloc'd by the ctor).
- *   +0x048  `super` (GsCOORDINATE2.super, renamed round 71): zeroed by
- *           the ctor and by Class6B5CC__DetachFromParent, set to the parent's
- *           own coordinate by Class6B5CC__AttachToParent.
- * +0x004..+0x018 and +0x024..+0x044 are still unknown -- not padded out
- * field-by-field, since nothing this unit's chosen functions touch reads
- * them. */
-/* A plain 3-word vector, used as Class6B5CC__AttachToParent's optional 3rd argument
- * (copied wholesale into Class6B5CCSub14::unk18/unk1C/unk20) and as
- * Class6B5CCSub14's own +0x038 field below. Declared here, ahead of
- * Class6B5CCSub14, so the struct below can use it directly. */
-typedef struct Vec3_d294 {
-    s32 x;
-    s32 y;
-    s32 z;
-} Vec3_d294;
-
-struct Class6B5CCSub14 {
-    s32 flg;                    /* +0x000, state/pending flag -- see above */
-    u8 pad04[0x018 - 0x004];
-    s32 tx;                   /* +0x018, Vec3.x */
-    s32 ty;                   /* +0x01C, Vec3.y */
-    s32 tz;                   /* +0x020, Vec3.z */
-    /* +0x024, round 12 (code_d294_b, Class6B5CC__TransformAndNotifyParents): only its ADDRESS is
-     * taken (`&self->unk14->unk24`, forwarded to ApplyMatrixToSVArray as a
-     * write-destination base) -- nothing dereferences through it in this
-     * unit's chosen functions, so it stays an opaque byte span rather than
-     * a typed field. Renamed from `pad24` now that something references it
-     * by name. */
-    u8 unk24[0x038 - 0x024];
-    /* +0x038, a 3-word (0xC-byte) per-axis `s32` quantity. TWO runners
-     * measured this field in the same round from different units and agreed
-     * on the LAYOUT while disagreeing on the name and the reading:
-     *   - code_d294_b's Class6B5CC__TryAttachNearby (STALLED) subtracts
-     *     `other->unk14`'s +0x038 from `self->unk14`'s to get a relative
-     *     offset and range-checks each axis -- read as a position.
-     *   - code_d294_c's Class6B5CC__LocalOffsetToWorldPos and Class6B5CC__FaceTarget (both MATCHED) take
-     *     its ADDRESS and walk it as `[i]` for `i` in 0..2, adding each word
-     *     into a caller-supplied vector as a per-axis delta.
-     * The head kept the INDEXABLE array form, because matched code requires
-     * indexing and a `Vec3_d294` cannot be indexed, whereas nothing matched
-     * used the named-vector form. The two readings are compatible: a
-     * per-axis delta and a position differ in interpretation, not in shape.
-     * Real per-word meaning still unknown. */
-    s32 unk38[3];
-    /* +0x044, RETYPED (round 13) from an opaque `void *` to
-     * `Class6B5CCSub44 *`. Two runners retyped this field in the same round
-     * from different call sites and gave the type two different NAMES
-     * (`Class6B5CCSub44` from Class6B5CC__UpdateScale/Class6B5CC__UpdateRotation, and
-     * `Class6B5CCBlock44` from Class6B5CC__GetRotMatrix); the head unified them on
-     * `Class6B5CCSub44`, which matches the sibling `Class6B5CCSub14`'s
-     * naming and is the one already referenced from src/code_d294.c. Their
-     * two views of the CONTENTS agreed and are unioned below. Still a
-     * second heap block (0x28 bytes, alloc'd by the ctor); the retype only
-     * narrows what is KNOWN about its contents, it does not change the
-     * allocation. */
-    Class6B5CCSub44 *param;
-    s32 super;    /* +0x048, zeroed by the ctor and by Class6B5CC__DetachFromParent (slot +0x050);
-                   * set to `obj->unk14` by Class6B5CC__AttachToParent's "attach" */
-};
-
-/* Class6B5CCSub14::unk44's target (round 13). Two independent derivations,
- * unioned by the head: Class6B5CC__UpdateScale/Class6B5CC__UpdateRotation established the three
- * s32 words at the base, and Class6B5CC__GetRotMatrix established that +0x010 holds an
- * S16Quad_d294 -- which subsumes the first derivation's separate
- * `unk10`/`unk12`/`unk14` s16 fields as `vec.x`/`vec.y`/`vec.z` and adds
- * `vec.w` at +0x016, a byte range the first derivation had recorded as
- * still opaque. Exactly one name per field, deliberately: two names for one
- * field inside a single header is a trap for the next reader.
- *
- * Class6B5CC__UpdateScale and Class6B5CC__UpdateRotation both apply `RatioToFixed12` three times to
- * a 3-entry `{s16,s16}` table (their own 3rd argument, `data`) and write the
- * three s32 results into this block -- Class6B5CC__UpdateScale into
- * +0x000/+0x004/+0x008 (either overwriting or accumulating, per its own
- * `flag` argument); Class6B5CC__UpdateRotation into `vec.x`/`vec.y`/`vec.z` as u16
- * (either overwriting after dividing each result by 360, or accumulating a
- * /360'd delta into the existing value and wrapping the sum modulo 4096 -- a
- * full-turn wrap, consistent with these being PSX-native 4096-per-circle
- * angle units). +0x00C..+0x010 is still unknown (not read or written by any
- * of the three functions); the block is 0x28 bytes total per the ctor's own
- * allocation size, so the tail past +0x018 is still opaque padding. */
-struct Class6B5CCSub44 {
-    s32 scaleX;  /* +0x000, GsCOORD2PARAM.scale.vx (round 71) */
-    s32 scaleY;  /* +0x004, scale.vy */
-    s32 scaleZ;  /* +0x008, scale.vz */
-    u8 padC[0x010 - 0x00C];
-    S16Quad_d294 rotate;  /* +0x010, x/y/z/w at +0x010/+0x012/+0x014/+0x016 */
-    u8 pad18[0x028 - 0x018];
-};
-
-/* Round 13 (BisectSegmentToBox): a 6-byte, all-s16 Vec3 -- MEASURED, all-s16
- * members give it alignment 2, which is what makes retail's own
- * struct-copy of it (in BisectSegmentToBox's loop tail) compile to unaligned
- * lwl/lwr + swl/swr, same idiom as S16Quad_d294 above and the already-
- * confirmed `Class866E8__SetTargetAndBuildRates`/`FlashbackRotation` case in
- * DECOMPILATION_LEARNINGS. */
-typedef struct Vec3S16_d294 {
-    s16 x;
-    s16 y;
-    s16 z;
-} Vec3S16_d294;
-
 /* Round 13 (BisectSegmentToBox): an axis-aligned bounding box, low corner then
  * high corner -- MEASURED from BisectSegmentToBox's own field offsets
  * (+0x0/+0x2/+0x4 = lo.x/y/z, +0x6/+0x8/+0xA = hi.x/y/z). */
@@ -273,286 +103,6 @@ struct CornerList_d294 {
 extern void *BMemPMgrAlloc(s32 size);
 extern void BMemPMgrFree(void *arg);
 
-/* The PARENT object, seen through self->unkC (see Class6B5CCObj below) and
- * as Class6B5CC__AttachToParent's 2nd argument. Its +0x010/+0x014 slots are
- * BasicClass's addChild/removeChild (include/code_8220.h), which is what
- * Class6B5CC__AttachToParent/Class6B5CC__DetachFromParent call on it with
- * `self` (renamed from slot10/slot14 round 71). `unk14` is its own
- * coordinate (Class6B5CC__AttachToParent copies it into
- * `self->unk14->super`). Real class identity
- * unknown -- named for the field it lives behind, per this unit's own
- * convention (see Class6B5CCSub14, also field-named).
- *
- * Round 13 (Class6B5CC__ComposeAndApplyRotation): self->unkC is also walked as an intrusive
- * singly-linked list -- MEASURED, `lw $s0, 0xC($s0)` repeated with a
- * `bnez` back-edge -- so this class has its own self-referential `next` at
- * +0xC, and its vtable has a slot at +0x84 with the same `(self, void
- * *out, s32 flag)` shape Class6B5CCMethods' own +0x84 has (see below);
- * likely a shared ancestor slot both classes inherit, not a coincidence,
- * but the ancestor itself is out of this unit's reach. */
-typedef struct UnkOwner_d294 UnkOwner_d294;
-typedef struct UnkOwnerMethods_d294 UnkOwnerMethods_d294;
-struct UnkOwnerMethods_d294 {
-    u8 pad0[0x010];
-    void (*addChild)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x010, BasicClass addChild */
-    void (*removeChild)(UnkOwner_d294 *owner, Class6B5CCObj *self); /* +0x014, BasicClass removeChild */
-    /* +0x084, Class6B5CC__ComposeAndApplyRotation's own call target on each list node (round 13).
-     * `out` is a 0x20-byte buffer (MATRIX-shaped -- MulMatrix2, this
-     * call site's own consumer, loads it into GTE control regs 0-4 via
-     * `ctc2`, PsyQ, not decompiled). */
-    u8 pad018[0x084 - 0x018];
-    void (*slot84)(UnkOwner_d294 *self, void *out, s32 flag);
-};
-struct UnkOwner_d294 {
-    UnkOwnerMethods_d294 *methods; /* +0x000 */
-    u8 pad04[0x00C - 0x004];
-    UnkOwner_d294 *next;            /* +0x00C, round 13 (Class6B5CC__ComposeAndApplyRotation) -- MEASURED, see above */
-    u8 pad10[0x014 - 0x010];
-    /* RETYPED round 19 (echo, func_8001E7BC): from a plain `s32` to
-     * `Class6B5CCSub14 *` -- func_8001E7BC dereferences it
-     * (`node->unk14->unk18/unk1C/unk20`, the same position shape as
-     * `Class6B5CCObj::unk14`'s own field). Safe: `Class6B5CC__AttachToParent` (already
-     * matched, same unit) only ever COPIES this field's raw value
-     * (`sub->super = obj->unk14;`, a plain 32-bit word copy either way,
-     * never dereferenced there) -- reverified after this retype,
-     * Class6B5CC__AttachToParent's own match is unaffected (whole-image SHA1 stays
-     * green with it still compiled as real C). */
-    Class6B5CCSub14 *coord2;        /* +0x014 */
-};
-
-/* A generic "just enough to dispatch" view of some OTHER class, used where
- * this unit's queued functions read another object's own vtable header tag
- * or call one specific slot without knowing (or needing) the rest of that
- * class's layout. Same shape/convention as class_3bb8c.h's
- * `GenericTagInst_3bb8c_c`. */
-typedef struct GenericMethods_d294 GenericMethods_d294;
-typedef struct GenericObj_d294 GenericObj_d294;
-/* Forward-declared here (full definition below, with the other small
- * "count + data" shapes) so GenericObj_d294's own +0x030 field (round 13,
- * Class6B5CC__TryAttachNearby) can be typed to it. */
-typedef struct GenericCountList_d294 GenericCountList_d294;
-struct GenericMethods_d294 {
-    s32 header;                  /* +0x000, low nibble is a class-tag; Class6B5CC__AddChild/CCB4 compare it against 9 */
-    u8 pad004[0x010 - 0x004];
-    /* +0x010, round 13 (Class6B5CC__NotifyTaggedParents): dispatched as `(entry, arg)` where
-     * `entry` is the receiver itself and `arg` is Class6B5CC__NotifyTaggedParents's own
-     * `self` parameter (a Class6B5CCObj*) -- only reached once the FULL
-     * byte at +0x000 (not just its low nibble) equals 0x34, i.e. a more
-     * specific check than the header-tag-4 test guarding entry into this
-     * whole block. */
-    void (*slot10)(GenericObj_d294 *self, Class6B5CCObj *arg); /* +0x010 */
-    u8 pad014[0x038 - 0x014];
-    /* +0x038, round 13 (Class6B5CC__TryAttachNearby's own call site): dispatched as
-     * `(other, self, 4)` where `self` is Class6B5CC__TryAttachNearby's own Class6B5CCObj*
-     * parameter and `4` a literal -- MEASURED from that call site alone,
-     * real meaning of the literal unknown. */
-    void (*onNotify)(GenericObj_d294 *self, Class6B5CCObj *arg1, s32 arg2); /* +0x038 */
-    u8 pad03C[0x050 - 0x03C];
-    void (*detachFromParent)(GenericObj_d294 *self); /* +0x050, Class6B5CC__DetachAttachedChildren's call target */
-};
-struct GenericObj_d294 {
-    GenericMethods_d294 *methods; /* +0x000 */
-    u8 pad04[0x00C - 0x004];
-    void *parent;                    /* +0x00C, Class6B5CC__GetNextAttachedChild compares this to a Class6B5CCObj* */
-    s32 unk10;                     /* +0x010, round 13 (code_d294_c, Class6B5CC__LinkModel): read into self->unk18 */
-    /* +0x014, round 13 (Class6B5CC__TryAttachNearby): same role as Class6B5CCObj's own
-     * `unk14` -- `other->unk14`'s +0x038 is subtracted from
-     * `self->unk14`'s. MEASURED, not a name unification guess: both call
-     * sites reach the identical +0x038 field through this one, at the same
-     * offset, in the same function. */
-    Class6B5CCSub14 *coord2;
-    u8 pad18[0x02C - 0x018];
-    /* +0x02C, round 13 (Class6B5CC__TryAttachNearby): only its ADDRESS is taken
-     * (forwarded as a vtable call's own opaque argument) -- real shape
-     * unknown, so this stays an opaque byte span like Class6B5CCSub14's
-     * own `unk24`. */
-    u8 unk2C[0x030 - 0x02C];
-    /* +0x030, round 13 (Class6B5CC__TryAttachNearby): same shape/usage as
-     * Class6B5CC__TransformAndNotifyParents's own 2nd argument -- `unk0` read once and multiplied
-     * by 8, `&unk4` forwarded as an opaque data pointer. */
-    GenericCountList_d294 *unk30;
-};
-
-/* A third small "count + data" shape, seen only through Class6B5CC__TransformAndNotifyParents's own
- * 2nd argument (round 12): `unk0` is read once and multiplied by 8 to form
- * ApplyMatrixToSVArray's own iteration count, and `&unk4` (the address only, never
- * dereferenced here) is ApplyMatrixToSVArray's own source/dest base pointer. Real
- * class identity unknown -- opaque past `unk4`'s own address, so `unk4` is
- * left a single byte rather than a guessed element type. */
-struct GenericCountList_d294 {
-    s32 unk0;  /* +0x000, multiplied by 8 to form ApplyMatrixToSVArray's count arg */
-    u8 unk4;   /* +0x004, address-only */
-};
-
-/* Class6B5CC's own table (gClass6B5CCMethods). Only the slots this unit's chosen
- * functions actually dispatch through are typed; see the file banner above
- * for the full slot census from classtable.py. */
-struct Class6B5CCMethods {
-    s32 header;                              /* +0x000 */
-    void *unk04;                              /* +0x004, BasicClass__Release, inherited, unused here */
-    void *(*ctor)(void *self);                /* +0x008, Class6B5CC__Class6B5CC (this unit) */
-    void  (*finalize)(void *self);                /* +0x00C, Class6B5CC__Finalize (this unit) */
-    u8 pad010[0x030 - 0x010];
-    /* +0x030, BasicClass__NotifyParents, inherited verbatim (per the file
-     * banner's `--vs D_8006B58C` census) -- NOT decompiled here, BasicClass
-     * is a different unit's own ancestor code. Class6B5CC__TransformAndNotifyParents (round 12,
-     * this unit) dispatches through it as `(self, s32 arg1)`. */
-    void (*notifyParents)(Class6B5CCObj *self, s32 arg1);
-    u8 pad034[0x040 - 0x034];
-    void (*reset)(Class6B5CCObj *self);      /* +0x040, Class6B5CC__Reset (this unit) */
-    /* +0x044/+0x048, a `(self, s32 flag, void *data)` pair -- Class6B5CC__Reset
-     * calls both with flag=1 and `data` pointing at a 3-entry table of
-     * {s16,s16} pairs (ROTATION_ZERO/SCALE_ONE, 0xC bytes each). Class6B5CC__UpdateScale
-     * (slot +0x048's own occupant) confirms the `data` shape:
-     * it reads three such pairs via RatioToFixed12. */
-    void (*updateRotation)(Class6B5CCObj *self, s32 flag, void *data); /* +0x044, Class6B5CC__UpdateRotation */
-    void (*updateScale)(Class6B5CCObj *self, s32 flag, void *data); /* +0x048, Class6B5CC__UpdateScale */
-    u8 pad04C[0x050 - 0x04C];
-    void (*detachFromParent)(Class6B5CCObj *self);      /* +0x050, Class6B5CC__DetachFromParent (this unit) */
-    void (*detachAttachedChildren)(Class6B5CCObj *self);      /* +0x054, Class6B5CC__DetachAttachedChildren (this unit) */
-    /* +0x058, Class6B5CC__GetNextAttachedChild. Class6B5CC__DetachAttachedChildren's own call site
-     * establishes its signature: writes an output entry pointer and an
-     * output "more remain" flag through its 2nd/3rd arguments. */
-    void (*getNextAttachedChild)(Class6B5CCObj *self, GenericObj_d294 **outEntry, s32 *outCont); /* +0x058 */
-    /* +0x05C, Class6B5CC__func_1d33c -- already matched as a no-op `void(void)`
-     * body, but THIS call site (Class6B5CC__Finalize) passes it 2 args
-     * (self, 0). Both are right about their own codegen: the callee body
-     * ignores every argument, so the caller's arity is unconstrained. Same
-     * "per-call-site signature" precedent as GetClass6B5CCMethods above. */
-    void (*slot5C)(Class6B5CCObj *self, s32 arg1);
-    /* +0x060..+0x084: Class6B5CC__SetDisplay/D374/D3A0/D3CC/D3F8/D424/D450/D480/D4AC
-     * (all this unit, all already matched) -- not typed here as struct
-     * fields because nothing dispatches through the table at these offsets;
-     * every call site invokes them directly by symbol name. */
-    u8 pad060[0x084 - 0x060];
-    /* +0x084, occupant `Class6B5CC__GetRotMatrix` per `tools/classtable.py
-     * gClass6B5CCMethods` (it lives in code_d294_b). Class6B5CC__RotateLocalVector (code_d294_c)
-     * dispatches to it as `slot84(self, out, 0)`, `out` pointing at a
-     * 0x20-byte stack buffer -- MEASURED from the caller's own frame size:
-     * Class6B5CC__RotateLocalVector's stack layout only closes if `out` is a full 0x20
-     * bytes, not the 0xC that would fit just the leading vector its own
-     * caller reads back. Only those leading 0xC bytes are read back, by
-     * Class6B5CC__RotateLocalVector's `ApplyMatrixToLVArray` call a few lines later; the rest is
-     * opaque callback output that call site never touches. Class6B5CC__ComposeAndApplyRotation
-     * (code_d294_b) calls the same slot on `self` itself, and
-     * UnkOwnerMethods_d294's own +0x084 has the same number and shape --
-     * likely a shared ancestor method. */
-    void (*getRotMatrix)(Class6B5CCObj *self, void *out, s32 arg2);
-    u8 pad088[0x08C - 0x088];
-    /* +0x08C/+0x090, round 13 (Class6B5CC__NotifyIfUnk20Active's own call site): dispatched
-     * as `(self, dest)` and `(self, a1, a2)` respectively, matching
-     * Class6B5CC__ReadUnk20Data/Class6B5CC__TransformAndNotifyParents's own direct-call prototypes below
-     * exactly (both already matched, code_d294_b) -- `tools/classtable.py
-     * gClass6B5CCMethods` confirms they occupy these two slots. */
-    void (*readUnk20Data)(Class6B5CCObj *self, void *dest); /* +0x08C, Class6B5CC__ReadUnk20Data */
-    void (*transformAndNotifyParents)(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2); /* +0x090, Class6B5CC__TransformAndNotifyParents */
-    /* +0x094/+0x098/+0x09C, a `(self, GenericObj_d294 *other, s32 arg2)`
-     * triple -- Class6B5CC__OnNotify (code_d294) dispatches to exactly one of
-     * these three depending on `other->methods->header & 0xF` (2 -> +0x094,
-     * 5 -> +0x098, 4 -> +0x09C; any other tag value fires none of them).
-     * Real per-slot meaning unknown from that call site alone. */
-    void (*slot94)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
-    void (*slot98)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
-    void (*dispatchLinkCommand)(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2);
-    /* +0x0A0, Class6B5CC__DispatchLinkCommand's own call target (round 12): dispatched with
-     * only `self`, per that function's own disassembly (`jalr $v0` with
-     * `$a0` untouched since function entry). Class6B5CC__TryAttachNearby
-     * is this slot's occupant per `tools/classtable.py gClass6B5CCMethods`. */
-    void (*tryAttachNearby)(Class6B5CCObj *self);
-    /* +0x0A4, round 13 (Class6B5CC__TryAttachNearby's own call site): this slot's
-     * occupant is Class6B5CC__ComposeAndApplyRotation itself (`tools/classtable.py gClass6B5CCMethods`),
-     * already matched this round -- dispatched indirectly (through the
-     * vtable, not a direct `jal`) since the slot is polymorphic even
-     * though this class's own table happens to point at it. Signature
-     * matches Class6B5CC__ComposeAndApplyRotation's own exactly. */
-    void (*composeAndApplyRotation)(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
-    /* +0x0A8, occupant Class6B5CC__CheckBoundsOverlap. Return
-     * value IS tested by this call site (truthy -> continue, falsy ->
-     * early return), so non-void. */
-    s32 (*checkBoundsOverlap)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
-    /* +0x0AC, occupant Class6B5CC__ClassifyAgainstPlanes (matched round 76, code_d294_b;
-     * docs/match-reports/Class6B5CC__ClassifyAgainstPlanes.md). Typed here for this call
-     * site's own dispatch shape;
-     * return value is also tested truthy/falsy like slotA8's. */
-    s32 (*classifyAgainstPlanes)(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2, void *arg3);
-};
-
-/* MEASURED: GetClass6B5CCMethods's whole body is `lui/addiu %hi/%lo(gClass6B5CCMethods);
- * jr $ra` (asm/code_d294_b.s) -- a plain no-argument getter for this unit's
- * own vtable. See the file banner for the cross-unit precedent on why this
- * local 0-argument declaration doesn't need to agree with other units'. */
-extern Class6B5CCMethods *GetClass6B5CCMethods(void);
-
-/* This unit's own vtable data, gClass6B5CCMethods (see `tools/classtable.py
- * gClass6B5CCMethods` in the file banner above) -- GetClass6B5CCMethods (round 12,
- * code_d294_b) just returns `&gClass6B5CCMethods`. Still rodata (not carved as C
- * here), so only the address is declared, typed to the return of the one
- * getter this unit implements. */
-extern Class6B5CCMethods gClass6B5CCMethods;
-
-struct Class6B5CCObj {
-    Class6B5CCMethods *methods; /* +0x000 */
-    /* +0x004..+0x00C: BasicClass instance fields (include/code_8220.h:
-     * +0x004 children, +0x008 parentRefs). Only +0x004 is read here, by
-     * Class6B5CC__GetNextAttachedChild as the head of its walk; renamed
-     * `children` round 71 after BasicClass's own name for it. */
-    void *children;
-    u8 unk8[0x00C - 0x008];
-    /* +0x00C, an owner back-reference. RETYPED round 2 from an untyped
-     * `void *` to `UnkOwner_d294 *` once Class6B5CC__AttachToParent (this unit's own
-     * "attach" -- sets `self->unkC = obj` and calls `obj->methods->addChild`)
-     * and Class6B5CC__DetachFromParent (the "detach", `self->unkC->methods->removeChild`)
-     * were both matched: both dispatch through the exact same 2-slot
-     * shape, `UnkOwnerMethods_d294`, at the exact same slot offsets. Not
-     * just a plausible guess -- the two call sites agree byte-for-byte on
-     * what lives at +0x010/+0x014 of whatever this points to. */
-    UnkOwner_d294 *parent;
-    u32 attribute;                  /* +0x010, a packed bit-flags word -- see GetSetBitField below */
-    Class6B5CCSub14 *coord2;     /* +0x014, the ctor's 0x50-byte allocation */
-    s32 unk18;                  /* +0x018, zeroed by the ctor */
-    u8 unk1C[0x020 - 0x01C];    /* unknown; not touched by this unit's chosen functions */
-    /* +0x020, zeroed by the ctor. Class6B5CC__AddChild's still-queued forward
-     * target Class6B5CC__LinkModel (code_d294_b.s) stores its own 2nd argument into
-     * this offset. RETYPED round 12 (code_d294_b, Class6B5CC__ReadUnk20Data): that
-     * function passes `self->unk20` straight through as func_8001F51C's own
-     * `void *` arg0 (psyq_fa50.s; func_8001F51C forwards it
-     * unmodified to func_8001F3B0, which dereferences it at +0x10) --
-     * genuinely a pointer, not an always-zero s32. Still opaque: nothing
-     * this unit's chosen functions dereference through it directly. */
-    void *unk20;
-    s32 tick;                  /* +0x024, zeroed by Class6B5CC__Reset; tier B name: gClass876FCMethods's update slot increments it once per call (class_3bb8c_s.c LinkNode.tick) */
-    /* +0x028, round 12 (code_d294_b): Class6B5CC__DispatchLinkCommand sets this to its own
-     * `a1` (a plain `s32`, per m2c's own inference) when called with
-     * a2==4. RETYPED round 13 (Class6B5CC__TryAttachNearby): `self->unk28 = other;`
-     * where `other` is a `GenericObj_d294 *` -- same offset, genuinely a
-     * pointer here. Class6B5CC__DispatchLinkCommand's own `self->unk28 = a1;` (a1 still
-     * `s32`) keeps compiling under this type (int-to-pointer, a warning
-     * not an error, and identical codegen either way -- MEASURED: rebuilt
-     * whole-image after this retype and Class6B5CC__DispatchLinkCommand is still
-     * byte-exact). */
-    GenericObj_d294 *unk28;
-    s32 unk2C;  /* +0x02C, round 12 (Class6B5CC__TransformAndNotifyParents): zeroed, alongside unk28 */
-    /* +0x030, round 12 (Class6B5CC__TransformAndNotifyParents): set to that call's own 2nd argument
-     * for the duration of a single `self->methods->slot30(self, a2)`
-     * dispatch, then zeroed again right after -- reads like a "currently
-     * processing" scratch slot rather than a durable field. */
-    GenericCountList_d294 *unk30;
-};
-
-/* The `{s16 whole; s16 frac;}` pair `RatioToFixed12` (below) reads and
- * `Class6B5CC__GetRotationDegrees` (round 14, code_d294_c) writes, three-in-a-row, at
- * +0x0/+0x4/+0x8 of a 3-entry table (an angle-like x/y/z triple,
- * degrees-and-fraction each -- `ROTATION_ZERO`/`SCALE_ONE` are exactly this
- * shape). `Class6B5CC__GetRotationDegrees` writes `frac` as a constant `1` in every entry
- * it produces; real per-field meaning of `frac` beyond that one producer
- * is still only inferred from `RatioToFixed12`'s own `div`-by-`frac` body,
- * not independently confirmed. */
-typedef struct WholeFrac_d294 WholeFrac_d294;
-struct WholeFrac_d294 {
-    s16 whole;
-    s16 frac;
-};
-
 /* RatioToFixed12 (round 54 correction: this banner was STALE -- it is
  * now carved and MATCHED in src/code_d294_c.c, not code_d294_b, and the
  * nop_mflo_mfhi toolchain flag it was once blocked on is RESOLVED per
@@ -577,17 +127,8 @@ extern s32 RatioToFixed12(void *pair);
 extern u8 ROTATION_ZERO[0xC];
 extern u8 SCALE_ONE[0xC];
 
-/* Class6B5CC__LinkModel/Class6B5CC__UnlinkModel -- now carved (round 14, src/code_d294_c.c),
- * and GsInitCoordinate2 (Psy-Q libgs/matrix, linked from Sony's object,
- * not game code): three
- * helpers this unit's own +0x010/+0x014/+0x018/+0x040 overrides forward
- * into. Class6B5CC__UnlinkModel's whole body is `self->unk18 = 0; self->unk20 = 0;`
- * (MEASURED, two `sw $zero` stores, no branches) -- confirms unk18/unk20
- * above independently of the ctor. GsInitCoordinate2 is NOT decompiled
- * here (Psy-Q, linked as an object); declared only with the argument shape
- * its call site needs. */
-extern void Class6B5CC__UnlinkModel(Class6B5CCObj *self);
-extern void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other);
+/* GsInitCoordinate2 (Psy-Q libgs/matrix, linked from Sony's object, not game
+ * code): Class6B5CC__Reset's call; declared with the shape it needs. */
 extern void GsInitCoordinate2(s32 arg0, void *dest);
 
 
@@ -679,18 +220,6 @@ extern void ApplyMatrixLV(); /* arity-ok: deliberately unprototyped (round 19, s
  * applies to ApplyMatrixToSVArray's declaration above. */
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 
-extern Class6B5CCObj *New_Class6B5CC(void);
-void *Class6B5CC__Class6B5CC(Class6B5CCObj *self);
-void Class6B5CC__Finalize(Class6B5CCObj *self);
-void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other);
-void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other);
-void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self);
-void Class6B5CC__Reset(Class6B5CCObj *self);
-Class6B5CCObj *Class6B5CC__AttachToParent(Class6B5CCObj *self, UnkOwner_d294 *obj, Vec3_d294 *vec);
-Class6B5CCObj *Class6B5CC__DetachFromParent(Class6B5CCObj *self);
-void Class6B5CC__DetachAttachedChildren(Class6B5CCObj *self);
-void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **entry, GenericObj_d294 **cursor);
-
 /* GetSetBitField (round 54 correction: this banner was STALE -- it is
  * now carved and MATCHED in src/code_d294_c.c, not code_d294_b): a
  * generic packed-bitfield accessor. Given a word pointer, a bit SHIFT, a
@@ -708,20 +237,6 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **ent
  * shift 31 width 1) -- i.e. self->unk10 is a packed flags/small-fields
  * register and these five functions are its per-field setters. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
-
-s32 Class6B5CC__SetDisplay(Class6B5CCObj *self, s32 a1);
-u32 Class6B5CC__SetSemiTrans(Class6B5CCObj *self, s32 a1);
-u32 Class6B5CC__SetSemiTransRate(Class6B5CCObj *self, u32 a1);
-u32 Class6B5CC__SetLighting(Class6B5CCObj *self, s32 a1);
-u32 Class6B5CC__SetLightMode(Class6B5CCObj *self, u32 a1);
-
-/* Round 12 (code_d294_b): four more self->unk10 bitfield siblings, same
- * family as the five above. See src/code_d294_b.c for the per-function
- * shift/width/return-type notes. */
-u32 Class6B5CC__GetSetUnk10Field0(Class6B5CCObj *self, u32 a1);
-s32 Class6B5CC__GetSetUnk10Flag7(Class6B5CCObj *self, s32 a1);
-u32 Class6B5CC__GetSetUnk10Field9(Class6B5CCObj *self, u32 a1);
-s32 Class6B5CC__GetSetUnk10Flag8(Class6B5CCObj *self, s32 a1);
 
 /* RotMatrix (Psy-Q libgte/fgo_01, linked from Sony's object, not game
  * code): takes an
@@ -741,15 +256,6 @@ extern void RotMatrix(S16Quad_d294 *vec, s32 a1);
  * local buffers; declared only with that shape. */
 extern void MulMatrix2(void *arg0, void *arg1);
 
-
-void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2);
-void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1);
-
-void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest);
-void Class6B5CC__TransformAndNotifyParents(Class6B5CCObj *self, GenericCountList_d294 *a1, s32 a2);
-void Class6B5CC__DispatchLinkCommand(Class6B5CCObj *self, s32 a1, s32 a2);
-void Class6B5CC__ComposeAndApplyRotation(Class6B5CCObj *self, void *arg1, void *arg2, void *arg3, s32 count);
-void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node);
 void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *near, Vec3S16_d294 *far);
 
 /* CalcBoxOutcode (round 54 correction: this banner was STALE -- it is
@@ -763,7 +269,6 @@ void BisectSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *ne
 extern s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point);
 
 s32 ClipSegmentToBox(Vec3S16_d294 *out, BoundsBox_d294 *box, Vec3S16_d294 *p1, Vec3S16_d294 *p2);
-s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294 *arg2);
 
 /* ratan2 (Psy-Q library, not game code; symbol address per
  * config/symbols.slps01556.lsdde.txt, 0x8001F0C8): arctangent of
@@ -774,7 +279,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
  * below. */
 extern s32 ratan2(s32 dy, s32 dx);
 
-/* Class6B5CC__FaceTarget (round 14, this unit -- the SAME external symbol
+/* Class6B5CC__FaceTarget (prototype in include/Class6B5CC.h; round 14, this unit -- the SAME external symbol
  * Entity_b/c/d/e.c call via their own separate `Entity.h` declaration,
  * `Class6B5CC__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32
  * arg4)`; same "per-call-site signature, not a callee property"
@@ -815,6 +320,5 @@ extern s32 ratan2(s32 dy, s32 dx);
  * the real vtable type), and `target`'s `->unkC`/`->unk14->unk38` shape
  * matches `Class6B5CCObj` exactly, with no evidence in this call site
  * alone for anything narrower or wider. */
-void Class6B5CC__FaceTarget(Class6B5CCObj *self, Class6B5CCObj *target, s32 arg2, s32 arg3, void *arg4);
 
 #endif

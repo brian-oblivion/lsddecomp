@@ -170,8 +170,6 @@ code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer 
 code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
 code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
 code_8220_c: warning: passing arg 6 of `CopyPolyVtx4' from incompatible pointer type
-code_d294: warning: assignment makes integer from pointer without a cast
-code_d294_b: warning: assignment makes pointer from integer without a cast
 code_d294_b: warning: unused variable `pad'
 code_d294_b: warning: unused variable `unused'
 main: warning: `struct DreamSys' declared inside parameter list

@@ -46,7 +46,9 @@
  * implementation goes through the base table and upcasts:
  * `Get_vtable_BasicClass()->finalize((BasicClass *)self)`. Nothing else in a
  * slot differs between a class and its subclasses: an override that needed a
- * different return type or parameter list would be a different slot.
+ * different return type or parameter list would be a different slot. The one
+ * exception is the ctor's return type, for the same reason as its parameters:
+ * BASICCLASS_SLOTS_R takes it (include/Class6B5CC.h, whose ctor returns self).
  */
 
 typedef struct BasicClass BasicClass;
@@ -63,10 +65,16 @@ struct BasicClassListNode {
 /* The fifteen slots every method table starts with. Occupants in BasicClass's
  * own table named at each slot; `tools/classtable.py <table> --vs D_8006B58C`
  * lists a subclass's overrides. */
-#define BASICCLASS_SLOTS(Self, CtorParams)                                                         \
+#define BASICCLASS_SLOTS(Self, CtorParams) BASICCLASS_SLOTS_R(Self, void, CtorParams)
+
+/* The same fifteen slots with the ctor's RETURN type as a parameter too: a
+ * class whose constructor returns self or NULL (Class6B5CC and everything
+ * below it: New_Class6B5CC tests `ctor(obj) != NULL`) passes `void *`.
+ * BasicClass's own ctor returns nothing, so BASICCLASS_SLOTS passes `void`. */
+#define BASICCLASS_SLOTS_R(Self, CtorRet, CtorParams)                                              \
     /* +0x000 */ s32 header; /* class id; `(header & mask) == id` is is-kind-of */                 \
     /* +0x004 */ void *(*release)(Self *self);                 /* BasicClass__Release: finalize, free self, NULL */ \
-    /* +0x008 */ void (*ctor) CtorParams;                      /* BasicClass__BasicClass */        \
+    /* +0x008 */ CtorRet (*ctor) CtorParams;                   /* BasicClass__BasicClass */        \
     /* +0x00C */ void (*finalize)(Self *self);                 /* BasicClass__Finalize: notifyParents(1), removeAllChildren, clearParentRefs */ \
     /* +0x010 */ void (*addChild)(Self *self, BasicClass *child);      /* BasicClass__AddChild */  \
     /* +0x014 */ void (*removeChild)(Self *self, BasicClass *child);   /* BasicClass__RemoveChild */ \
