@@ -8,6 +8,8 @@
     python3 tools/typeviews.py --tree                 # class hierarchy from the method-table ids
     python3 tools/typeviews.py --json                 # everything, machine-readable
     python3 tools/typeviews.py --warnings [--baseline] # every unit's -Wall warnings vs config/typeviews-warnings.txt
+    python3 tools/typeviews.py --census               # per class: its own methods, and every view of its object and table
+    python3 tools/typeviews.py --globals              # globals declared extern with more than one type (track 4b)
     python3 tools/typeviews.py --upcast Get_vtable_BasicClass BasicClass src/x.c ...
                                                       # base-table calls: cast `self` (and object args) to the base
 
@@ -401,7 +403,8 @@ def collect(only=None):
             })
         for fn, pt in st.funcs.items():
             pointee = None
-            if pt is not None and pt.kind == "ptr" and pt.target is not None:
+            if pt is not None and pt.kind == "ptr" and pt.target is not None \
+                    and pt.target.kind in ("struct", "union", "fwd"):
                 pointee = pt.target.name
             funcs.setdefault(fn, (u, spell(pt), pointee))
     return views, funcs
@@ -427,8 +430,27 @@ def class_tree():
             a, n, h = int(p[0], 16), int(p[1]), int(p[4], 16)
             if h >= 0x100000 and h >> 28:      # not an id (a code pointer): D_8006C0F8
                 continue
+            # a table ends where another DATA symbol begins: D_8006D4AC, the
+            # NULL-terminated list of Class6D430's subclass getters, sits right
+            # after D_8006D430's last slot and the scan reads straight on
+            for i in range(1, n):
+                nm = syms.get(a + 4 + 4 * i)
+                if nm and not nm.startswith("func_") and ct.DATA[0] <= a + 4 + 4 * i < ct.DATA[1] \
+                        and nm != ct.name_of(a, syms):
+                    n = i
+                    break
             tabs[a] = {"addr": a, "slots": n, "id": h, "name": ct.name_of(a, syms),
                        "words": ct.words(data, a + 4, n)}
+    # A method table shares slots with its relatives (BasicClass's own are
+    # inherited nearly everywhere); a table sharing none with any other is a
+    # callback array that happens to start with a zero word, not a class
+    # (gStyleCueCallbacks).
+    allw = {}
+    for t in tabs.values():
+        for w in set(t["words"]):
+            if w:
+                allw[w] = allw.get(w, 0) + 1
+    tabs = {a: t for a, t in tabs.items() if any(allw[w] > 1 for w in set(t["words"]) if w)}
     byid = {}
     for t in tabs.values():
         byid.setdefault(t["id"], []).append(t)
@@ -439,6 +461,83 @@ def class_tree():
         top = max(sh for sh in range(0, 32, 4) if (h >> sh) & 0xF)
         return h & ((1 << top) - 1)
     return tabs, byid, parent, syms
+
+
+def census(views, funcs):
+    """Per method table: the functions the class OWNS (slots that differ from
+    its nearest ancestor's table, or lie beyond it), the struct types those
+    functions take as `this` (the object views), the pointee of each object
+    view's +0x000 field and every `extern T <table>;` (the table views), and
+    where each view is defined. A class is unified when it has exactly one
+    object view and one table view, both defined in include/<Class>.h."""
+    tabs, byid, parent, syms = class_tree()
+    ext = {}
+    for f in list(SRC.glob("*.c")) + list((ROOT / "include").glob("*.h")):
+        for m in re.finditer(r"^\s*extern\s+(?:const\s+)?(\w+)\s+(\w+)\s*;", f.read_text(errors="replace"), re.M):
+            ext.setdefault(m.group(2), set()).add((m.group(1), str(f.relative_to(ROOT))))
+    # table getters: a C function whose body is `return &TABLE;` (or `return TABLE;`)
+    getters, gdecl = {}, {}
+    for f in SRC.glob("*.c"):
+        t = f.read_text(errors="replace")
+        for m in re.finditer(r"^[\w *]*?\b(\w+)\s*\(\s*(?:void)?\s*\)\s*\{\s*return\s+&?\s*(\w+)\s*;\s*\}", t, re.M):
+            getters.setdefault(m.group(2), set()).add(m.group(1))
+    allg = {g for gs in getters.values() for g in gs}
+    for f in list(SRC.glob("*.c")) + list((ROOT / "include").glob("*.h")):
+        t = re.sub(r"/\*.*?\*/", "", f.read_text(errors="replace"), flags=re.S)
+        for m in re.finditer(r"^\s*(?:extern\s+)?(?:const\s+)?(\w+)\s*\*\s*(\w+)\s*\([^)]*\)\s*[;{]", t, re.M):
+            if m.group(2) in allg:
+                gdecl.setdefault(m.group(2), set()).add((m.group(1), str(f.relative_to(ROOT))))
+    vbyname = {}
+    for v in views:
+        vbyname.setdefault(v["name"], []).append(v)
+    out = []
+    for t in sorted(tabs.values(), key=lambda t: (len(f"{t['id']:x}"), t["id"])):
+        p = parent(t["id"])
+        while p is not None and p not in byid:
+            p = parent(p)
+        pt = byid[p][0] if p is not None and p in byid else None
+        pw = pt["words"] if pt else []
+        owned = sorted({syms.get(w) for i, w in enumerate(t["words"])
+                        if w and (i >= len(pw) or pw[i] != w) and syms.get(w)})
+        objs = {}
+        for fn in owned:
+            if fn in funcs and funcs[fn][2]:
+                objs.setdefault(funcs[fn][2], set()).add(funcs[fn][0])
+        tviews = {}
+        for o in objs:
+            for v in vbyname.get(o, []):
+                f0 = next((f for f in v["fields"] if f["off"] == 0), None)
+                if f0 and f0["pointee"]:
+                    tviews.setdefault(f0["pointee"], set()).add(v["unit"])
+        for ty, where in ext.get(t["name"], ()):
+            tviews.setdefault(ty, set()).add(where)
+        # every declared return type of the table's getter(s) is a table view too
+        for g in getters.get(t["name"], ()):
+            for ty, where in gdecl.get(g, ()):
+                if ty not in ("void", "s32", "u32", "u8", "char"):
+                    tviews.setdefault(ty, set()).add(where)
+
+        def home(n):
+            return sorted({v["file"] for v in vbyname.get(n, [])}) or ["?"]
+        out.append({"table": t["name"], "addr": t["addr"], "id": t["id"], "slots": t["slots"],
+                    "parent": pt["name"] if pt else None, "owned": owned,
+                    "owned_c": [fn for fn in owned if fn in funcs],
+                    "objects": {o: {"units": sorted(u), "defined": home(o)} for o, u in objs.items()},
+                    "tables": {o: {"users": sorted(u), "defined": home(o)} for o, u in tviews.items()}})
+    return out
+
+
+def shared_globals():
+    """Globals `extern`-declared with more than one type across src/ and
+    include/ (track 4b): the same data described by several local types, or a
+    field of one table declared as a symbol of its own. Comments stripped."""
+    ext = {}
+    for f in list(SRC.glob("*.c")) + list((ROOT / "include").glob("*.h")):
+        t = re.sub(r"/\*.*?\*/", "", f.read_text(errors="replace"), flags=re.S)
+        for m in re.finditer(r"^\s*extern\s+(?:const\s+)?((?:struct\s+)?\w+)\s*(\**)\s*(\w+)\s*(\[[^\]]*\])?\s*;", t, re.M):
+            ty = m.group(1) + m.group(2) + ("[]" if m.group(4) else "")
+            ext.setdefault(m.group(3), {}).setdefault(ty, set()).add(str(f.relative_to(ROOT)))
+    return {k: {t: sorted(fs) for t, fs in v.items()} for k, v in ext.items() if len(v) > 1}
 
 
 # --------------------------------------------------------------------------
@@ -481,6 +580,8 @@ def merge(vs):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--census", action="store_true")
+    ap.add_argument("--globals", action="store_true")
     ap.add_argument("--struct", nargs="+")
     ap.add_argument("--class", dest="klass")
     ap.add_argument("--merge", nargs="+", help="struct names (or unit:name) to union")
@@ -515,6 +616,13 @@ def main():
         print(f"{len(got)} warning(s); {sum(new.values())} new, {sum(gone.values())} gone vs baseline")
         sys.exit(1 if new else 0)
 
+    if a.globals:
+        g = shared_globals()
+        for k in sorted(g):
+            print(f"{k:24s} " + "; ".join(f"{t} in {', '.join(Path(x).name for x in fs)}" for t, fs in sorted(g[k].items())))
+        print(f"\n{len(g)} global(s) declared with more than one type")
+        return
+
     if a.tree:
         tabs, byid, parent, _ = class_tree()
         kids = {}
@@ -537,6 +645,16 @@ def main():
     views, funcs = collect(a.units)
     if a.json:
         json.dump({"views": views, "funcs": funcs}, sys.stdout, indent=1)
+        return
+
+    if a.census:
+        for c in census(views, funcs):
+            print(f"0x{c['id']:X} {c['table']}  ({c['slots']} slots, parent {c['parent']}, "
+                  f"{len(c['owned'])} own methods, {len(c['owned_c'])} of them C)")
+            for o, d in sorted(c["objects"].items()):
+                print(f"    object {o:28s} in {', '.join(d['defined'])}   used by {', '.join(d['units'])}")
+            for o, d in sorted(c["tables"].items()):
+                print(f"    table  {o:28s} in {', '.join(d['defined'])}")
         return
 
     if a.list:

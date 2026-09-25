@@ -781,6 +781,18 @@
       }
     },
     "4": {
+      "classes": {
+        "D_8006B58C": {
+          "class": "BasicClass",
+          "date": "2026-09-25",
+          "header": "include/BasicClass.h"
+        },
+        "gPadMethods": {
+          "class": "Pad",
+          "date": "2026-09-25",
+          "header": "include/Pad.h"
+        }
+      },
       "reason": "",
       "status": "auto"
     },

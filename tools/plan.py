@@ -10,6 +10,8 @@ and on which model.
     python3 tools/plan.py record-round --track 1 --round N --model sonnet|opus \\
                           --runners R --attempts A --matches M [--note "..."] [--not-calibration]
     python3 tools/plan.py mark-unit --unit <unit> [--undo]        # track 3 pass done
+    python3 tools/plan.py mark-class --table <sym> --class <Name> [--park "reason"] [--undo]  # track 4 class unified
+    python3 tools/plan.py classes              # track 4: every class, its state and its views
     python3 tools/plan.py set-track --track N --status open|parked|done --reason "..."
     python3 tools/plan.py check --item <id> [--undo]              # track 5 checklist
     python3 tools/plan.py set-model --role naming_runner|match_runner --model sonnet|opus
@@ -96,7 +98,7 @@ DEFAULT_STATE = {
         "1b": {"status": "auto", "reason": ""},
         "2": {"status": "open", "reason": ""},
         "3": {"status": "open", "reason": "", "units_done": {}},
-        "4": {"status": "auto", "reason": ""},
+        "4": {"status": "auto", "reason": "", "classes": {}},
         "5": {"status": "auto", "reason": "", "checklist": {}},
     },
 }
@@ -491,8 +493,12 @@ def collect(st):
     stall_rows = [r for r in stall_rows if r[2] not in rv]
 
     t4 = st["tracks"]["4"]
+    classes, shared = track4_classes(st)
     if t4["status"] == "auto":
         t4_status = "open" if pct3 >= 0.8 else "waiting (opens at 80% of units through track 3)"
+        if t4_status == "open" and classes and all(c["state"] in ("unified", "parked") for c in classes) \
+                and not shared:
+            t4_status = "done"
     else:
         t4_status = t4["status"]
 
@@ -542,7 +548,13 @@ def collect(st):
                   "d_refs": sum(u["d_refs"] for u in units.values()),
                   "naming_model": st["models"].get("naming_runner") or MODELS["naming_runner_default"]},
             "4": {"status": t4_status,
-                  "local_struct_views": sum(len(re.findall(r"^typedef struct", (ROOT / "src" / f"{u}.c").read_text(errors='replace'), re.M)) for u in units)},
+                  "local_struct_views": sum(len(re.findall(r"^typedef struct", (ROOT / "src" / f"{u}.c").read_text(errors='replace'), re.M)) for u in units),
+                  "classes_total": len(classes),
+                  "classes_unified": sum(c["state"] == "unified" for c in classes),
+                  "classes_parked": sum(c["state"] == "parked" for c in classes),
+                  "classes_ready": [c["table"] for c in classes if c["state"] == "ready"],
+                  "classes_incomplete": [c["table"] for c in classes if c["state"] == "unified" and c["stray"]],
+                  "shared_globals": len(shared)},
             "5": {"status": t5_status, "checklist": {k: bool(ticked.get(k)) for k in TRACK5_ITEMS}},
         },
         "docs": docs,
@@ -550,7 +562,68 @@ def collect(st):
         "_fresh": fresh_funcs, "_stalls": stall_rows, "_promotable": promotable,
         "_todo3": todo3, "_revisit": revisit, "_revisit_label": revisit_label,
         "_t4_rounds": st["tracks"]["4"].get("rounds", []),
+        "_classes": classes, "_shared_globals": shared,
+        "_globals_recipe": st["tracks"]["4"].get("globals_recipe"),
     }
+
+
+def track4_classes(st):
+    """Every class (method table) in tree order with its track-4 state.
+
+    unified / parked: the ledger says so (mark-class). A unified class is
+    re-measured every run: any object or table view of it defined outside
+    its ledger header is listed as `stray` (a regression, or a view the
+    unification missed). ready: every ancestor is unified or parked, so the
+    class header can expand its parent's macros. waiting: an ancestor is not.
+    Ready classes rank by how many classes sit below them (unifying a base
+    unblocks its subtree), then by how few views they have."""
+    import typeviews
+    views, funcs = typeviews.collect()
+    cen = typeviews.census(views, funcs)
+    shared = typeviews.shared_globals()
+    ledger = st["tracks"]["4"].get("classes", {})
+    byname = {c["table"]: c for c in cen}
+    kids = {}
+    for c in cen:
+        kids.setdefault(c["parent"], []).append(c["table"])
+
+    def below(t):
+        return sum(1 + below(k) for k in kids.get(t, []))
+    out = []
+    for c in cen:
+        led = ledger.get(c["table"])
+        hdr = led.get("header") if led else None
+        stray = []
+        if led and not led.get("parked"):
+            for kind in ("objects", "tables"):
+                for v, d in c[kind].items():
+                    if any(f != hdr for f in d["defined"]):
+                        stray.append(f"{v} ({', '.join(f for f in d['defined'] if f != hdr)})")
+        def settled(t):
+            # an ancestor with no C methods and no views cannot be unified from
+            # C; it does not block its subclasses (track 4 recipe, "no C")
+            b = byname.get(t)
+            return t in ledger or (b is not None and not b["owned_c"] and not b["objects"] and not b["tables"])
+        anc, ok = c["parent"], True
+        while anc:
+            if not settled(anc):
+                ok = False
+                break
+            anc = byname[anc]["parent"] if anc in byname else None
+        if led:
+            state = "parked" if led.get("parked") else "unified"
+        elif not c["owned_c"] and not c["objects"] and not c["tables"]:
+            state = "no C"
+        else:
+            state = "ready" if ok else "waiting"
+        files = sorted({f for kind in ("objects", "tables") for d in c[kind].values() for f in d["defined"]
+                        if f != "?"})
+        units_ = sorted({u for d in c["objects"].values() for u in d["units"]} |
+                        {Path(f).stem for f in files if f.startswith("src/")})
+        out.append(dict(c, state=state, stray=stray, below=below(c["table"]),
+                        nviews=len(c["objects"]) + len(c["tables"]), files=files, units=units_,
+                        name=(led or {}).get("class")))
+    return out, shared
 
 
 _nm_cache = {}
@@ -635,14 +708,27 @@ def jobs(d, n):
             names = ", ".join(f"{f} ({w}w)" for w, f in fs)
             q_promote.append(("1b", f"promote {len(fs)} preserved body(ies) in {unit} to #ifdef NON_MATCHING: {names}",
                               MODELS["mechanical_runner"]))
-    first_class = not d.get("_t4_rounds")
-    q_types = [("4", (f"HEAD (premium, FINISHING-PLAN track 4): unify the FIRST class yourself and write the "
-                      f"recipe into track 4; {t['4']['local_struct_views']} unit-local struct views remain")
-                if first_class else
-                f"unify {t['4']['local_struct_views']} unit-local struct views into shared "
-                "headers, one class at a time",
-                MODELS["head_when_new_procedure"] if first_class else "opus")] \
-        if t["4"]["status"] == "open" else []
+    first_class = not any(c["state"] == "unified" for c in d["_classes"])
+    q_types = []
+    if t["4"]["status"] == "open":
+        if first_class:
+            q_types.append(("4", f"HEAD (premium, FINISHING-PLAN track 4): unify the FIRST class yourself and write "
+                                 f"the recipe into track 4; {t['4']['local_struct_views']} unit-local struct views remain",
+                            MODELS["head_when_new_procedure"]))
+        else:
+            # Classes merge SEQUENTIALLY (track 4 staffing): one class job per round.
+            ready = sorted((c for c in d["_classes"] if c["state"] == "ready"),
+                           key=lambda c: (-c["below"], c["nviews"], c["id"]))
+            for c in ready[:1]:
+                q_types.append(("4", f"unify class {c['table']} (id 0x{c['id']:X}, parent {c['parent']}, "
+                                     f"{c['below']} class(es) below it; {c['nviews']} view(s) in "
+                                     f"{', '.join(c['files']) or 'none found'}) (units: {','.join(c['units'])})",
+                                "opus"))
+            if not d.get("_globals_recipe"):
+                q_types.append(("4", f"HEAD (premium, FINISHING-PLAN track 4b): unify the FIRST shared global yourself "
+                                     f"and write its recipe; {t['4']['shared_globals']} global(s) declared with more "
+                                     "than one type (typeviews.py --globals)",
+                                MODELS["head_when_new_procedure"]))
     q_close = [("5", f"{k}: {TRACK5_ITEMS[k]}", "opus")
                for k, done in t["5"]["checklist"].items() if not done] if t["5"]["status"] == "open" else []
     queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close]
@@ -656,11 +742,15 @@ def jobs(d, n):
 
 RENAMES = ("naming pass on", "identify and name", "extern review")
 JOB_UNIT_RES = (r"naming pass on (\w+)", r"runner on (\w+):", r"in (\w+) to #ifdef", r"match \w+ \((\w+),")
+RENAMES = RENAMES + ("unify class",)   # a class job rewrites accessors in every unit that sees the class
 
 
 def job_units(d, desc):
     """The units a job's runner edits: its one unit, or for the track-2 batch
     every unit holding one of the listed functions."""
+    m = re.search(r"\(units: ([\w,]*)\)$", desc)
+    if m:
+        return set(filter(None, m.group(1).split(",")))
     for rx in JOB_UNIT_RES:
         m = re.search(rx, desc)
         if m:
@@ -748,7 +838,13 @@ def print_status(d, n, st):
     print(f"  3      {t3['status']:<10} readability: {t3['units_done']}/{t3['units_total']} units passed; "
           f"{t3['func_named_defs']}/{t3['defs']} defs still func_; {t3['unk_refs']} unk refs, "
           f"{t3['slot_refs']} slotNN calls, {t3['d_refs']} D_ globals; naming runner {t3['naming_model']}")
-    print(f"  4      {t['4']['status']:<10} types: {t['4']['local_struct_views']} unit-local struct typedefs in src/")
+    t4 = t["4"]
+    print(f"  4      {t4['status']:<10} types: {t4['classes_unified']}/{t4['classes_total']} classes unified "
+          f"({t4['classes_parked']} parked, {len(t4['classes_ready'])} ready); {t4['shared_globals']} global(s) "
+          f"declared with more than one type; {t4['local_struct_views']} unit-local struct typedefs in src/")
+    if t4["classes_incomplete"]:
+        print(f"                    UNIFIED BUT A VIEW REMAINS OUTSIDE ITS HEADER: {', '.join(t4['classes_incomplete'])}"
+              " (plan.py classes)")
     c5 = t["5"]["checklist"]
     print(f"  5      {t['5']['status']:<10} close-out: {sum(c5.values())}/{len(c5)} items ticked")
     print()
@@ -787,7 +883,30 @@ def print_status(d, n, st):
     print()
     print("  Models: head runs on", MODELS["head"], "unless the round writes a new procedure, tool or doc,",
           "or adjudicates a HARD RULE or toolchain lead: then", MODELS["head_when_new_procedure"] + ".")
-    print("  Ledger: config/plan-state.json (record-round / mark-unit / set-track / check / set-model).")
+    print("  Ledger: config/plan-state.json (record-round / mark-unit / mark-class / set-track / check / set-model).")
+
+
+def print_classes(d):
+    """Track 4, per class, in tree order: state, subtree size, C methods, views."""
+    kids = {}
+    for c in d["_classes"]:
+        kids.setdefault(c["parent"], []).append(c)
+
+    def show(c, depth):
+        tag = {"unified": "UNIFIED", "parked": "PARKED", "ready": "ready", "waiting": "waiting",
+               "no C": "no C"}[c["state"]]
+        name = f" = {c['name']}" if c.get("name") else ""
+        print(f"  {'  ' * depth}0x{c['id']:X} {c['table']}{name}  [{tag}]  below={c['below']} "
+              f"C={len(c['owned_c'])}/{len(c['owned'])} views={c['nviews']}"
+              + (f"  in {', '.join(c['files'])}" if c["files"] and c["state"] != "unified" else ""))
+        for sv in c["stray"]:
+            print(f"  {'  ' * depth}    STRAY VIEW: {sv}")
+        for k in sorted(kids.get(c["table"], []), key=lambda k: k["id"]):
+            show(k, depth + 1)
+    for r in sorted(kids.get(None, []), key=lambda k: k["id"]):
+        show(r, 0)
+    print("\n  C=a/b: a of the class's b own methods are C. 'no C': every own method is asm (most in psyq_*")
+    print("  segments, PROGRESS round 80) and no view exists; it does not block its subclasses.")
 
 
 def print_units(d):
@@ -806,6 +925,12 @@ def main():
     j = sub.add_parser("jobs")
     j.add_argument("--n", type=int, default=12, dest="n_jobs")
     sub.add_parser("units")
+    sub.add_parser("classes")
+    mc = sub.add_parser("mark-class")
+    mc.add_argument("--table", required=True, help="the method-table symbol (typeviews.py --census)")
+    mc.add_argument("--class", dest="klass", help="the class's type name; its header is include/<Class>.h")
+    mc.add_argument("--park", default="", help="park instead of unify: the reason (track 4 park rule)")
+    mc.add_argument("--undo", action="store_true")
     r = sub.add_parser("record-round")
     r.add_argument("--track", required=True)
     r.add_argument("--round", type=int, required=True)
@@ -862,6 +987,27 @@ def main():
         save_state(st)
         print(f"track 3: {a.unit} {'un' if a.undo else ''}marked")
         return
+    if a.cmd == "mark-class":
+        led = st["tracks"]["4"].setdefault("classes", {})
+        if a.undo:
+            led.pop(a.table, None)
+            save_state(st)
+            print(f"track 4: {a.table} unmarked")
+            return
+        import typeviews
+        tabs, _, _, _ = typeviews.class_tree()
+        if a.table not in {t["name"] for t in tabs.values()}:
+            sys.exit(f"FATAL: {a.table} is not a method table (typeviews.py --tree)")
+        if not a.park and not a.klass:
+            sys.exit("FATAL: --class is required to mark a class unified")
+        hdr = f"include/{a.klass}.h" if a.klass else None
+        if hdr and not (ROOT / hdr).exists():
+            sys.exit(f"FATAL: {hdr} does not exist; a unified class has its own header")
+        led[a.table] = {"class": a.klass, "header": hdr, "date": today,
+                        **({"parked": a.park} if a.park else {})}
+        save_state(st)
+        print(f"track 4: {a.table} {'parked' if a.park else 'unified as ' + a.klass + ' (' + hdr + ')'}")
+        return
     if a.cmd == "set-track":
         st["tracks"].setdefault(a.track, {})
         st["tracks"][a.track]["status"] = a.status
@@ -892,6 +1038,8 @@ def main():
             print(f"[{track:<2}] {model:<7} {desc}")
     elif a.cmd == "units":
         print_units(d)
+    elif a.cmd == "classes":
+        print_classes(d)
     else:
         print_status(d, a.n, st)
 
