@@ -2563,3 +2563,11 @@ GsGetActiveBuff = 0x80024820; // type:func  (Psy-Q libgs/gs_002, fingerprint+pos
 // LIBSND.H `extern short SsSeqOpen(unsigned long*, short);`, no C call
 // site yet. Round 81 (bravo, track 2), not yet linked from an SDK object.
 SsSeqOpen = 0x8003A99C; // type:func  (Psy-Q libsnd/seqinit, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libpress/libpress.o (discs
+// 3.3,3.5,3.6), unique (next candidate GetDrawEnv, masked 0.57). Position:
+// after placed libgs/gs_107 (3.3), before placed libc2/exit (3.3); this
+// round's DecDCTin/DecDCTout/DecDCToutCallback/DecDCTvlc fill the rest of
+// the gap. Header LIBPRESS.H `extern void DecDCTReset(int mode);`, no C
+// call site yet. Round 81 (bravo, track 2), not yet linked from an SDK
+// object.
+DecDCTReset = 0x80045E54; // type:func  (Psy-Q libpress/libpress, fingerprint)
