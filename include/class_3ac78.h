@@ -201,7 +201,7 @@ struct Class866E8Methods {
     /* +0x084 */ u8 pad084[0x088 - 0x084];
     /* +0x088 */ void (*onElementEvent)(Class866E8 *self, s32 command, void *elem, s32 index); /* Class866E8__OnElementEvent; called by Class866E8__ResetAllElements with a 4th arg AA6C's own body never reads */
     /* +0x08C */ u8 pad08C[0x0B8 - 0x08C];
-    /* +0x0B8 */ UnkChildObj_3ac78 *(*getChild)(Class866E8 *self, s32 index);      /* func_80042828; called by Class866E8__SetChildParams */
+    /* +0x0B8 */ UnkChildObj_3ac78 *(*getChild)(Class866E8 *self, s32 index);      /* D8006EFAC__GetChild; called by Class866E8__SetChildParams */
     /* +0x0BC */ u8 pad0BC[0x0D0 - 0x0BC];
     /* +0x0D0 */ void (*forwardAcceptedCommand)(Class866E8 *self, void *sender, s32 command);        /* Class866E8__ForwardAcceptedCommand; called by Class866E8__OnCommand */
     /* +0x0D4 */ u8 pad0D4[0x0DC - 0x0D4];

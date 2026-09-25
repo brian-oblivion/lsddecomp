@@ -12,7 +12,7 @@ A simple counted loop: for `i` in `[0, count)`, fetch a child object via
 accumulator that steps by a different amount per call (`arg3 += 3` for
 `slot44`, `arg2 += 6` for `slot48`).
 
-`slotB8` (`func_80042828`) and the child's own class are not decompiled;
+`slotB8` (`D8006EFAC__GetChild`) and the child's own class are not decompiled;
 only the two slots this function reaches on the child are typed, as
 `UnkChildObj_3ac78`/`UnkChildMethods_3ac78` in `include/class_3ac78.h`.
 
@@ -50,12 +50,12 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004ACF8` | `Class866E8__SetChildParams` | B | Occupant of vtable slot `+0x0C4`. `getChild` (`+0x0B8`) resolves to `func_80042828`, whose whole body is `return ((void **)((u8 *)self + 0x44))[index]` -- a plain indexed fetch from a small pointer array in the object, so it really is "get child i". This function fetches `count` of them and feeds each a pair of values through the child's own `+0x44` and `+0x48` slots, with the two values advancing by 3 and by 6 per child. Tier B, deliberately: the two accumulators' meaning is unknown (they step at different rates, which rules out a single shared index), so the name claims only "sets per-child parameters". |
+| `func_8004ACF8` | `Class866E8__SetChildParams` | B | Occupant of vtable slot `+0x0C4`. `getChild` (`+0x0B8`) resolves to `D8006EFAC__GetChild`, whose whole body is `return ((void **)((u8 *)self + 0x44))[index]` -- a plain indexed fetch from a small pointer array in the object, so it really is "get child i". This function fetches `count` of them and feeds each a pair of values through the child's own `+0x44` and `+0x48` slots, with the two values advancing by 3 and by 6 per child. Tier B, deliberately: the two accumulators' meaning is unknown (they step at different rates, which rules out a single shared index), so the name claims only "sets per-child parameters". |
 
 Slot named this round: `Class866E8Methods::slotB8` -> `getChild`, tier A
 (the occupant's body is the whole evidence).
 
-NOT named, and why: the child class itself. `func_80042828` returns an
+NOT named, and why: the child class itself. `D8006EFAC__GetChild` returns an
 untyped pointer out of an array this unit never populates, and the two slots
 dispatched on it (`+0x44`, `+0x48`) have no decompiled occupant. The local
 view stays `UnkChildObj_3ac78`/`UnkChildMethods_3ac78`.

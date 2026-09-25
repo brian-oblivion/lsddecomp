@@ -58,7 +58,7 @@ typedef struct D_8006EFACObj {
 } D_8006EFACObj;
 struct D_8006EFACMethods {
     CLASS6B5CC_SLOTS(D_8006EFACObj, (D_8006EFACObj *self));
-    /* +0x0B8 */ BasicClass *(*getChild)(D_8006EFACObj *self, s32 index); /* func_80042828 */
+    /* +0x0B8 */ BasicClass *(*getChild)(D_8006EFACObj *self, s32 index); /* D8006EFAC__GetChild */
 };
 extern BasicClass *New_FlatLightObj(s32 lightId);
 extern void GsSetAmbient(long r, long g, long b);
@@ -547,7 +547,7 @@ void D8006EFAC__Reset(Class6B5CC *self) {
 void D8006EFAC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
 }
 /* D_8006EFAC and D_800866E8 slot +0x0B8 (getChild). */
-void *func_80042828(ChildArrayObj_322b4 *self, s32 index) {
+void *D8006EFAC__GetChild(ChildArrayObj_322b4 *self, s32 index) {
     return self->children[index];
 }
 /* D_8006EFAC slot +0x0BC: set the ambient colour (swapping the old one out
