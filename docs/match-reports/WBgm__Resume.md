@@ -1,4 +1,6 @@
-# func_80039DB0 -- MATCHED (17/17 words), round 81
+# WBgm__Resume -- MATCHED (17/17 words), round 81
+
+> Renamed from `func_80039DB0` on 2026-09-25 (tools/rename.py). Address 0x80039db0.
 
 Round 81, runner echo. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
@@ -14,7 +16,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 ## Source
 
 ```c
-void func_80039DB0(SeqObj *self) {
+void WBgm__Resume(SeqObj *self) {
     if (self->paused != 0) {
         SsSeqReplay(self->seqId);
         self->paused = 0;
@@ -35,8 +37,8 @@ typedef struct SeqObjMethods SeqObjMethods;
 
 struct SeqObjMethods {
     BASICCLASS_SLOTS(SeqObj, (SeqObj *self));
-    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* func_80039B90 */
-    /* +0x044 */ void (*play)(SeqObj *self);                       /* func_80039CBC */
+    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* WBgm__Update */
+    /* +0x044 */ void (*play)(SeqObj *self);                       /* WBgm__Play */
 };
 
 struct SeqObj {
@@ -61,9 +63,9 @@ extern void SsSeqSetCrescendo(short, short, long);
 extern void SsSeqClose(short);
 
 extern s32 func_8002CC28(void);
-s32 func_80039C04(SeqObj *self);
+s32 WBgm__HandleMonitorEvent(SeqObj *self);
 
 extern SeqObjMethods D_8006E48C;
-extern s32 D_8008A8D8;
-extern u8 D_8008DF38[];
+extern s32 gWBgmActive;
+extern u8 gSsSizeTableBuf[];
 ```

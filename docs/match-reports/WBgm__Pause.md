@@ -1,10 +1,12 @@
-# func_80039B90 -- MATCHED (29/29 words), round 81
+# WBgm__Pause -- MATCHED (18/18 words), round 81
+
+> Renamed from `func_80039D68` on 2026-09-25 (tools/rename.py). Address 0x80039d68.
 
 Round 81, runner echo. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
-- **Where:** D_8006E48C slot +0x040 (resolved with `tools/classtable.py D_8006E48C`).
-- **What:** update: `if (arg2 == 2 && state == 1 && func_80039C04(self) && unk20 != 0) self->methods->play(self);` (slot +0x44 is func_80039CBC per classtable.py).
+- **Where:** D_8006E48C slot +0x04C (resolved with `tools/classtable.py D_8006E48C`).
+- **What:** pause: if not `paused`, `SsSeqPause` and set it to 1.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 0
   insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`). No levers were needed.
@@ -14,9 +16,10 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 ## Source
 
 ```c
-void func_80039B90(SeqObj *self, s32 arg1, s32 arg2) {
-    if (arg2 == 2 && self->state == 1 && func_80039C04(self) && self->unk20 != 0) {
-        self->methods->play(self);
+void WBgm__Pause(SeqObj *self) {
+    if (self->paused == 0) {
+        SsSeqPause(self->seqId);
+        self->paused = 1;
     }
 }
 ```
@@ -34,8 +37,8 @@ typedef struct SeqObjMethods SeqObjMethods;
 
 struct SeqObjMethods {
     BASICCLASS_SLOTS(SeqObj, (SeqObj *self));
-    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* func_80039B90 */
-    /* +0x044 */ void (*play)(SeqObj *self);                       /* func_80039CBC */
+    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* WBgm__Update */
+    /* +0x044 */ void (*play)(SeqObj *self);                       /* WBgm__Play */
 };
 
 struct SeqObj {
@@ -60,9 +63,9 @@ extern void SsSeqSetCrescendo(short, short, long);
 extern void SsSeqClose(short);
 
 extern s32 func_8002CC28(void);
-s32 func_80039C04(SeqObj *self);
+s32 WBgm__HandleMonitorEvent(SeqObj *self);
 
 extern SeqObjMethods D_8006E48C;
-extern s32 D_8008A8D8;
-extern u8 D_8008DF38[];
+extern s32 gWBgmActive;
+extern u8 gSsSizeTableBuf[];
 ```

@@ -16,7 +16,7 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
     if (--gOpenVabCount < 0) {
         gOpenVabCount = 0;
     }
-    if (gOpenVabCount == 0 && func_8003A05C() == 0) {
+    if (gOpenVabCount == 0 && IsWBgmActive() == 0) {
         gVabSizeTableInited = 0;
         gVabVolumeInited = 0;
         gVabStreamInited = 0;
@@ -36,7 +36,7 @@ unchanged.)
 
 Closes the VAB handle, decrements the module-wide open-VAB refcount
 (clamped at zero), and if that count hit zero and the streaming-idle check
-(`func_8003A05C`) also says idle, tears down the shared VAB table state. Then
+(`IsWBgmActive`) also says idle, tears down the shared VAB table state. Then
 frees the three per-object allocations (`vagAttrPool`'s VagAtr pool,
 `progVagTable`'s pointer array, `baseFilename`'s filename copy) and chains
 to the base class's own

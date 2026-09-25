@@ -1,14 +1,16 @@
-# func_80039C04 -- MATCHED (46/46 words), round 81
+# WBgm__Finalize -- MATCHED (52/52 words), round 81
+
+> Renamed from `func_80039A34` on 2026-09-25 (tools/rename.py). Address 0x80039a34.
 
 Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006E48C slot none (called from +0x040, +0x05C, +0x060) (slots resolved with `tools/classtable.py D_8006E48C`).
-- **What:** try-open: needs the +0x0C VAB object (+0x58 u16 ready, +0x54 s16 vab id) and the +0x10 SEQ data object (+0x2C loaded flag, +0x10 data address); `SsSeqOpen`, prints rodata `D_80010FEC` ("Seq Open error in WBgmHandleMonitorEvent") on -1, sets volume 0x34/0x34, `state = 2`, returns 1; every failed guard returns 0.
-- **Result:** byte-exact on the first build. `funcdiff.py` reports 46/46
+- **Where:** D_8006E48C slot +0x00C (finalize) (slots resolved with `tools/classtable.py D_8006E48C`).
+- **What:** finalize: `gWBgmActive = 0`, own `stop` (+0x048), `SsSeqClose(seqId)`, `release` (+0x004) on the +0x0C and +0x10 objects when non-NULL, `removeChild(self, func_80020C5C())`, then the base finalize.
+- **Result:** byte-exact on the first build. `funcdiff.py` reports 52/52
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
-- **Levers:** none. The string is referenced as `extern const char D_80010FEC[]`, never a literal. The two `ori a1,0x34` (one after printf, one in the branch delay slot) are the delay-slot filler duplicating the join, not source.
+- **Levers:** none. The `sw $zero, gWBgmActive` scheduled between the slot load and the `jalr` is the global store written FIRST in source (a store to memory cannot move ahead of a call that follows it in source, so its position pins the source order).
 - **Name:** kept as the bare `func_` name (the class has no confirmed name;
   rodata `D_80010FEC` calls the code around it `WBgmHandleMonitorEvent`, a
   lead for naming the class `WBgm...`, not evidence yet).
@@ -25,21 +27,18 @@ still matches after the change.
 ## Source
 
 ```c
-s32 func_80039C04(SeqObj *self);
-
-extern SeqObjMethods D_8006E48C;
-extern s32 D_8008A8D8;
-extern u8 D_8008DF38[];
-
-SeqObj *func_800398E0(s32 vabArg, s32 seqArg, s32 autoPlay) {
-    SeqObj *self;
-
-    self = BMemPMgrAlloc(0x24);
-    if (self != NULL) {
-        func_8003A04C()->ctor(self, vabArg, seqArg, autoPlay);
-        return self;
+void WBgm__Finalize(SeqObj *self) {
+    gWBgmActive = 0;
+    self->methods->stop(self);
+    SsSeqClose(self->seqId);
+    if (self->unkC != NULL) {
+        self->unkC->methods->release((BasicClass *)self->unkC);
     }
-    return NULL;
+    if (self->unk10 != NULL) {
+        self->unk10->methods->release((BasicClass *)self->unk10);
+    }
+    self->methods->removeChild(self, func_80020C5C());
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 ```
 
@@ -54,16 +53,16 @@ typedef struct SeqObj SeqObj;
 typedef struct SeqObjMethods SeqObjMethods;
 
 struct SeqObjMethods {
-    BASICCLASS_SLOTS(SeqObj, (SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay)); /* func_8003995C */
-    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* func_80039B90 */
-    /* +0x044 */ void (*play)(SeqObj *self);                       /* func_80039CBC */
-    /* +0x048 */ void (*stop)(SeqObj *self);                       /* func_80039D14 */
-    /* +0x04C */ void (*pause)(SeqObj *self);                      /* func_80039D68 */
-    /* +0x050 */ void (*resume)(SeqObj *self);                     /* func_80039DB0 */
-    /* +0x054 */ void (*setVol)(SeqObj *self, s16 l, s16 r);       /* func_80039DF4 */
-    /* +0x058 */ void (*crescendo)(SeqObj *self, s16 v, s32 s);    /* func_80039E24 */
-    /* +0x05C */ void (*setSeq)(SeqObj *self, s32 arg);            /* func_80039E7C */
-    /* +0x060 */ void (*setVab)(SeqObj *self, s32 arg);            /* func_80039F64 */
+    BASICCLASS_SLOTS(SeqObj, (SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay)); /* WBgm__WBgm */
+    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* WBgm__Update */
+    /* +0x044 */ void (*play)(SeqObj *self);                       /* WBgm__Play */
+    /* +0x048 */ void (*stop)(SeqObj *self);                       /* WBgm__Stop */
+    /* +0x04C */ void (*pause)(SeqObj *self);                      /* WBgm__Pause */
+    /* +0x050 */ void (*resume)(SeqObj *self);                     /* WBgm__Resume */
+    /* +0x054 */ void (*setVol)(SeqObj *self, s16 l, s16 r);       /* WBgm__SetVol */
+    /* +0x058 */ void (*crescendo)(SeqObj *self, s16 v, s32 s);    /* WBgm__Crescendo */
+    /* +0x05C */ void (*setSeq)(SeqObj *self, s32 arg);            /* WBgm__SetSeq */
+    /* +0x060 */ void (*setVab)(SeqObj *self, s32 arg);            /* WBgm__SetVab */
 };
 
 /* What +0x0C holds: a New_VabStreamObj object. Only the fields read here. */
@@ -112,12 +111,12 @@ extern SeqData *func_800422CC(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-SeqObjMethods *func_8003A04C(void);
+SeqObjMethods *Get_vtable_WBgm(void);
 
 extern s32 func_8002CC28(void);
-s32 func_80039C04(SeqObj *self);
+s32 WBgm__HandleMonitorEvent(SeqObj *self);
 
 extern SeqObjMethods D_8006E48C;
-extern s32 D_8008A8D8;
-extern u8 D_8008DF38[];
+extern s32 gWBgmActive;
+extern u8 gSsSizeTableBuf[];
 ```

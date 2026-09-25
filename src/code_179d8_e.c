@@ -311,8 +311,8 @@ extern void SsSetTableSize(char *a0, s16 a1, s16 a2);
  * round 78 (was func_80032368, declared s32; the one call discards it). */
 extern void SsInit(void);
 /* Uncarved code_179d8_tail helpers this cluster calls. */
-extern char *func_8003A068(void);
-extern s32 func_8003A05C(void);
+extern char *GetSsSizeTableBuf(void);
+extern s32 IsWBgmActive(void);
 extern void SsEnd(void);
 extern void SsQuit(void);
 extern void SsSetTickMode(s32 a0);
@@ -351,7 +351,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     if (gVabSizeTableInited == 0) {
         SsInit();
         gVabSizeTableInited = 1;
-        SsSetTableSize(func_8003A068(), 2, 1);
+        SsSetTableSize(GetSsSizeTableBuf(), 2, 1);
     }
     if (gVabStreamInited == 0) {
         D_8008A8CC = 0x3C;
@@ -376,7 +376,7 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
     if (--gOpenVabCount < 0) {
         gOpenVabCount = 0;
     }
-    if (gOpenVabCount == 0 && func_8003A05C() == 0) {
+    if (gOpenVabCount == 0 && IsWBgmActive() == 0) {
         gVabSizeTableInited = 0;
         gVabVolumeInited = 0;
         gVabStreamInited = 0;

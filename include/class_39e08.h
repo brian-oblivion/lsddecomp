@@ -508,13 +508,13 @@ extern SubObjG *func_80043840(LoadRequest *req);
 
 /* Uncarved, asm/psyq_memset.s: a magic-multiply division idiom over its one
  * argument (not an allocator -- no `BMemPMgrAlloc` call in its own body).
- * Its return value is forwarded as `func_800398E0`'s own 1st argument. */
+ * Its return value is forwarded as `New_WBgm`'s own 1st argument. */
 extern s32 func_80048D74(s32 arg1);
 
 /* "New_X"-shaped allocator (uncarved, in the Psy-Q SPU/SND block at
  * 0x272C8..0x2C054), 3 forwarded
  * arguments. Stored into `Obj865C8::unk40`. */
-extern SubObjG *func_800398E0(s32 arg1, s32 arg2, s32 arg3);
+extern SubObjG *New_WBgm(s32 arg1, s32 arg2, s32 arg3);
 
 /* Already declared elsewhere (code_1677c.c) as `extern s32
  * func_8004A070(s32 a0)`; this unit's own local view, same signature.

@@ -19,16 +19,16 @@ typedef struct SeqObj SeqObj;
 typedef struct SeqObjMethods SeqObjMethods;
 
 struct SeqObjMethods {
-    BASICCLASS_SLOTS(SeqObj, (SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay)); /* func_8003995C */
-    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* func_80039B90 */
-    /* +0x044 */ void (*play)(SeqObj *self);                       /* func_80039CBC */
-    /* +0x048 */ void (*stop)(SeqObj *self);                       /* func_80039D14 */
-    /* +0x04C */ void (*pause)(SeqObj *self);                      /* func_80039D68 */
-    /* +0x050 */ void (*resume)(SeqObj *self);                     /* func_80039DB0 */
-    /* +0x054 */ void (*setVol)(SeqObj *self, s16 l, s16 r);       /* func_80039DF4 */
-    /* +0x058 */ void (*crescendo)(SeqObj *self, s16 v, s32 s);    /* func_80039E24 */
-    /* +0x05C */ void (*setSeq)(SeqObj *self, s32 arg);            /* func_80039E7C */
-    /* +0x060 */ void (*setVab)(SeqObj *self, s32 arg);            /* func_80039F64 */
+    BASICCLASS_SLOTS(SeqObj, (SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay)); /* WBgm__WBgm */
+    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* WBgm__Update */
+    /* +0x044 */ void (*play)(SeqObj *self);                       /* WBgm__Play */
+    /* +0x048 */ void (*stop)(SeqObj *self);                       /* WBgm__Stop */
+    /* +0x04C */ void (*pause)(SeqObj *self);                      /* WBgm__Pause */
+    /* +0x050 */ void (*resume)(SeqObj *self);                     /* WBgm__Resume */
+    /* +0x054 */ void (*setVol)(SeqObj *self, s16 l, s16 r);       /* WBgm__SetVol */
+    /* +0x058 */ void (*crescendo)(SeqObj *self, s16 v, s32 s);    /* WBgm__Crescendo */
+    /* +0x05C */ void (*setSeq)(SeqObj *self, s32 arg);            /* WBgm__SetSeq */
+    /* +0x060 */ void (*setVab)(SeqObj *self, s32 arg);            /* WBgm__SetVab */
 };
 
 /* What +0x0C holds: a New_VabStreamObj object. Only the fields read here. */
@@ -77,28 +77,28 @@ extern SeqData *func_800422CC(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-SeqObjMethods *func_8003A04C(void);
+SeqObjMethods *Get_vtable_WBgm(void);
 
 extern s32 func_8002CC28(void);
-s32 func_80039C04(SeqObj *self);
+s32 WBgm__HandleMonitorEvent(SeqObj *self);
 
 extern SeqObjMethods D_8006E48C;
-extern s32 D_8008A8D8;
-extern u8 D_8008DF38[];
+extern s32 gWBgmActive;
+extern u8 gSsSizeTableBuf[];
 
-SeqObj *func_800398E0(s32 vabArg, s32 seqArg, s32 autoPlay) {
+SeqObj *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
     SeqObj *self;
 
     self = BMemPMgrAlloc(0x24);
     if (self != NULL) {
-        func_8003A04C()->ctor(self, vabArg, seqArg, autoPlay);
+        Get_vtable_WBgm()->ctor(self, vabArg, seqArg, autoPlay);
         return self;
     }
     return NULL;
 }
-void func_8003995C(SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
+void WBgm__WBgm(SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_8003A04C();
+    self->methods = Get_vtable_WBgm();
     self->unkC = NULL;
     self->unk10 = NULL;
     self->seqId = 0;
@@ -106,13 +106,13 @@ void func_8003995C(SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
     self->paused = 0;
     self->playing = 0;
     self->unk20 = autoPlay;
-    D_8008A8D8 = 1;
+    gWBgmActive = 1;
     self->methods->setSeq(self, seqArg);
     self->methods->setVab(self, vabArg);
     self->methods->addChild(self, func_80020C5C());
 }
-void func_80039A34(SeqObj *self) {
-    D_8008A8D8 = 0;
+void WBgm__Finalize(SeqObj *self) {
+    gWBgmActive = 0;
     self->methods->stop(self);
     SsSeqClose(self->seqId);
     if (self->unkC != NULL) {
@@ -124,18 +124,18 @@ void func_80039A34(SeqObj *self) {
     self->methods->removeChild(self, func_80020C5C());
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
-void func_80039B04(SeqObj *self, void *sender, s32 event) {
+void WBgm__OnNotify(SeqObj *self, void *sender, s32 event) {
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
     if ((((BasicClass *)sender)->methods->header & 0xF) == 1) {
         self->methods->update(self, (s32)sender, event);
     }
 }
-void func_80039B90(SeqObj *self, s32 arg1, s32 arg2) {
-    if (arg2 == 2 && self->state == 1 && func_80039C04(self) && self->unk20 != 0) {
+void WBgm__Update(SeqObj *self, s32 arg1, s32 arg2) {
+    if (arg2 == 2 && self->state == 1 && WBgm__HandleMonitorEvent(self) && self->unk20 != 0) {
         self->methods->play(self);
     }
 }
-s32 func_80039C04(SeqObj *self) {
+s32 WBgm__HandleMonitorEvent(SeqObj *self) {
     SeqVab *vab;
     SeqData *seq;
 
@@ -161,14 +161,14 @@ s32 func_80039C04(SeqObj *self) {
     self->state = 2;
     return 1;
 }
-void func_80039CBC(SeqObj *self) {
+void WBgm__Play(SeqObj *self) {
     if (self->playing == 0) {
         SsSeqSetVol(self->seqId, 0x34, 0x34);
         SsSeqPlay(self->seqId, 1, 0);
         self->playing = 1;
     }
 }
-void func_80039D14(SeqObj *self) {
+void WBgm__Stop(SeqObj *self) {
     if (self->playing != 0) {
         SsSeqStop(self->seqId);
         SsSeqClose(self->seqId);
@@ -176,25 +176,25 @@ void func_80039D14(SeqObj *self) {
         self->state = 0;
     }
 }
-void func_80039D68(SeqObj *self) {
+void WBgm__Pause(SeqObj *self) {
     if (self->paused == 0) {
         SsSeqPause(self->seqId);
         self->paused = 1;
     }
 }
-void func_80039DB0(SeqObj *self) {
+void WBgm__Resume(SeqObj *self) {
     if (self->paused != 0) {
         SsSeqReplay(self->seqId);
         self->paused = 0;
     }
 }
-void func_80039DF4(SeqObj *self, s16 left, s16 right) {
+void WBgm__SetVol(SeqObj *self, s16 left, s16 right) {
     SsSeqSetVol(self->seqId, left, right);
 }
-void func_80039E24(SeqObj *self, s16 vol, s32 scale) {
+void WBgm__Crescendo(SeqObj *self, s16 vol, s32 scale) {
     SsSeqSetCrescendo(self->seqId, vol, func_8002CC28() * scale);
 }
-void func_80039E7C(SeqObj *self, s32 arg) {
+void WBgm__SetSeq(SeqObj *self, s32 arg) {
     if (self->playing != 0) {
         self->methods->stop(self);
     }
@@ -204,7 +204,7 @@ void func_80039E7C(SeqObj *self, s32 arg) {
     }
     if (arg != 0) {
         self->unk10 = func_800422CC(arg);
-        if (func_80039C04(self)) {
+        if (WBgm__HandleMonitorEvent(self)) {
             if (self->unk20 != 0) {
                 self->methods->play(self);
             }
@@ -213,7 +213,7 @@ void func_80039E7C(SeqObj *self, s32 arg) {
         }
     }
 }
-void func_80039F64(SeqObj *self, s32 arg) {
+void WBgm__SetVab(SeqObj *self, s32 arg) {
     if (self->playing != 0) {
         self->methods->stop(self);
     }
@@ -223,7 +223,7 @@ void func_80039F64(SeqObj *self, s32 arg) {
     }
     if (arg != 0) {
         self->unkC = New_VabStreamObj(arg);
-        if (func_80039C04(self)) {
+        if (WBgm__HandleMonitorEvent(self)) {
             if (self->unk20 != 0) {
                 self->methods->play(self);
             }
@@ -232,12 +232,12 @@ void func_80039F64(SeqObj *self, s32 arg) {
         }
     }
 }
-SeqObjMethods *func_8003A04C(void) {
+SeqObjMethods *Get_vtable_WBgm(void) {
     return &D_8006E48C;
 }
-s32 func_8003A05C(void) {
-    return D_8008A8D8;
+s32 IsWBgmActive(void) {
+    return gWBgmActive;
 }
-void *func_8003A068(void) {
-    return &D_8008DF38;
+void *GetSsSizeTableBuf(void) {
+    return &gSsSizeTableBuf;
 }

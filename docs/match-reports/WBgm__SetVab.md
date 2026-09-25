@@ -1,14 +1,16 @@
-# func_800398E0 -- MATCHED (31/31 words), round 81
+# WBgm__SetVab -- MATCHED (58/58 words), round 81
+
+> Renamed from `func_80039F64` on 2026-09-25 (tools/rename.py). Address 0x80039f64.
 
 Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006E48C slot none (not in the table); allocator (slots resolved with `tools/classtable.py D_8006E48C`).
-- **What:** `New_` wrapper: `BMemPMgrAlloc(0x24)`, then the ctor through `func_8003A04C()->ctor` (slot +0x008) with the three arguments, `return self` / `return NULL`.
-- **Result:** byte-exact on the first build. `funcdiff.py` reports 31/31
+- **Where:** D_8006E48C slot +0x060 (setVab) (slots resolved with `tools/classtable.py D_8006E48C`).
+- **What:** set the VAB: the twin of WBgm__SetSeq on +0x0C with `New_VabStreamObj(arg)`.
+- **Result:** byte-exact on the first build. `funcdiff.py` reports 58/58
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
-- **Levers:** the round lever `if (p != NULL) { ctor; return p; } return NULL;`, applied first time.
+- **Levers:** none.
 - **Name:** kept as the bare `func_` name (the class has no confirmed name;
   rodata `D_80010FEC` calls the code around it `WBgmHandleMonitorEvent`, a
   lead for naming the class `WBgm...`, not evidence yet).
@@ -25,15 +27,24 @@ still matches after the change.
 ## Source
 
 ```c
-SeqObj *func_800398E0(s32 vabArg, s32 seqArg, s32 autoPlay) {
-    SeqObj *self;
-
-    self = BMemPMgrAlloc(0x24);
-    if (self != NULL) {
-        func_8003A04C()->ctor(self, vabArg, seqArg, autoPlay);
-        return self;
+void WBgm__SetVab(SeqObj *self, s32 arg) {
+    if (self->playing != 0) {
+        self->methods->stop(self);
     }
-    return NULL;
+    if (self->unkC != NULL) {
+        self->unkC->methods->release((BasicClass *)self->unkC);
+        self->unkC = NULL;
+    }
+    if (arg != 0) {
+        self->unkC = New_VabStreamObj(arg);
+        if (WBgm__HandleMonitorEvent(self)) {
+            if (self->unk20 != 0) {
+                self->methods->play(self);
+            }
+        } else if (self->state == 0) {
+            self->state = 1;
+        }
+    }
 }
 ```
 
@@ -48,16 +59,16 @@ typedef struct SeqObj SeqObj;
 typedef struct SeqObjMethods SeqObjMethods;
 
 struct SeqObjMethods {
-    BASICCLASS_SLOTS(SeqObj, (SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay)); /* func_8003995C */
-    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* func_80039B90 */
-    /* +0x044 */ void (*play)(SeqObj *self);                       /* func_80039CBC */
-    /* +0x048 */ void (*stop)(SeqObj *self);                       /* func_80039D14 */
-    /* +0x04C */ void (*pause)(SeqObj *self);                      /* func_80039D68 */
-    /* +0x050 */ void (*resume)(SeqObj *self);                     /* func_80039DB0 */
-    /* +0x054 */ void (*setVol)(SeqObj *self, s16 l, s16 r);       /* func_80039DF4 */
-    /* +0x058 */ void (*crescendo)(SeqObj *self, s16 v, s32 s);    /* func_80039E24 */
-    /* +0x05C */ void (*setSeq)(SeqObj *self, s32 arg);            /* func_80039E7C */
-    /* +0x060 */ void (*setVab)(SeqObj *self, s32 arg);            /* func_80039F64 */
+    BASICCLASS_SLOTS(SeqObj, (SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay)); /* WBgm__WBgm */
+    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* WBgm__Update */
+    /* +0x044 */ void (*play)(SeqObj *self);                       /* WBgm__Play */
+    /* +0x048 */ void (*stop)(SeqObj *self);                       /* WBgm__Stop */
+    /* +0x04C */ void (*pause)(SeqObj *self);                      /* WBgm__Pause */
+    /* +0x050 */ void (*resume)(SeqObj *self);                     /* WBgm__Resume */
+    /* +0x054 */ void (*setVol)(SeqObj *self, s16 l, s16 r);       /* WBgm__SetVol */
+    /* +0x058 */ void (*crescendo)(SeqObj *self, s16 v, s32 s);    /* WBgm__Crescendo */
+    /* +0x05C */ void (*setSeq)(SeqObj *self, s32 arg);            /* WBgm__SetSeq */
+    /* +0x060 */ void (*setVab)(SeqObj *self, s32 arg);            /* WBgm__SetVab */
 };
 
 /* What +0x0C holds: a New_VabStreamObj object. Only the fields read here. */
@@ -106,12 +117,12 @@ extern SeqData *func_800422CC(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-SeqObjMethods *func_8003A04C(void);
+SeqObjMethods *Get_vtable_WBgm(void);
 
 extern s32 func_8002CC28(void);
-s32 func_80039C04(SeqObj *self);
+s32 WBgm__HandleMonitorEvent(SeqObj *self);
 
 extern SeqObjMethods D_8006E48C;
-extern s32 D_8008A8D8;
-extern u8 D_8008DF38[];
+extern s32 gWBgmActive;
+extern u8 gSsSizeTableBuf[];
 ```

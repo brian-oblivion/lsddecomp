@@ -1,10 +1,12 @@
-# func_8003A04C -- MATCHED (4/4 words), round 81
+# IsWBgmActive -- MATCHED (3/3 words), round 81
+
+> Renamed from `func_8003A05C` on 2026-09-25 (tools/rename.py). Address 0x8003a05c.
 
 Round 81, runner echo. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** not a class slot; unit-level getter.
-- **What:** table getter `return &D_8006E48C;` -- the class's own method table.
+- **What:** sdata getter: `lw $v0, %gp_rel(gWBgmActive)($gp)`. `gWBgmActive` is defined in `.sdata`, so maspsx `--gp-symbols` gp-relativises the load.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 0
   insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`). No levers were needed.
@@ -14,8 +16,8 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 ## Source
 
 ```c
-SeqObjMethods *func_8003A04C(void) {
-    return &D_8006E48C;
+s32 IsWBgmActive(void) {
+    return gWBgmActive;
 }
 ```
 
@@ -32,8 +34,8 @@ typedef struct SeqObjMethods SeqObjMethods;
 
 struct SeqObjMethods {
     BASICCLASS_SLOTS(SeqObj, (SeqObj *self));
-    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* func_80039B90 */
-    /* +0x044 */ void (*play)(SeqObj *self);                       /* func_80039CBC */
+    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* WBgm__Update */
+    /* +0x044 */ void (*play)(SeqObj *self);                       /* WBgm__Play */
 };
 
 struct SeqObj {
@@ -58,9 +60,9 @@ extern void SsSeqSetCrescendo(short, short, long);
 extern void SsSeqClose(short);
 
 extern s32 func_8002CC28(void);
-s32 func_80039C04(SeqObj *self);
+s32 WBgm__HandleMonitorEvent(SeqObj *self);
 
 extern SeqObjMethods D_8006E48C;
-extern s32 D_8008A8D8;
-extern u8 D_8008DF38[];
+extern s32 gWBgmActive;
+extern u8 gSsSizeTableBuf[];
 ```
