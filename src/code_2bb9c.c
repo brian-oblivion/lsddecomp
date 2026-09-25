@@ -99,7 +99,16 @@ D_8006E558Obj *func_8003B39C(char *name) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B3FC);
+/* D_8006E558 +0x008: the ctor. */
+void func_8003B3FC(D_8006E558Obj *self, char *name) {
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_8003B614();
+    self->unk48 = 0;
+    self->unk4C = 0;
+    if (name != NULL) {
+        self->methods->requestLoadFile(self, name);
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B470);
 INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B4A8);
 /* D_8006E558 slot (tools/classtable.py); empty body. */
