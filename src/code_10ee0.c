@@ -110,7 +110,11 @@ Class6C070 *new_class_6c078(void) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020730);
+void func_80020730(Class6C070 *self) {
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = func_80020C4C();
+    self->methods->init(self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020784);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800207DC);
 void func_8002085C(Class6C070 *self) {
