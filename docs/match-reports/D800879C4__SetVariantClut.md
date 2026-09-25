@@ -1,4 +1,6 @@
-# func_80057DBC -- MATCHED (14/14)
+# D800879C4__SetVariantClut -- MATCHED (14/14)
+
+> Renamed from `func_80057DBC` on 2026-09-25 (tools/rename.py). Address 0x80057dbc.
 
 Round 47 (runner charlie). Unit: `src/class_3bb8c_q.c`, a BRAND NEW carve
 (this unit did not exist before round 47). Class: table `D_800879C4` (49
@@ -15,7 +17,7 @@ blocker-clean. Matched first attempt, no iteration needed.
 ## Signature
 
 ```c
-void func_80057DBC(D_800879C4Obj_q *self, s32 arg1);
+void D800879C4__SetVariantClut(D_800879C4Obj_q *self, s32 arg1);
 ```
 
 `D_800879C4Obj_q` is THIS unit's own local view of the class -- the
@@ -50,7 +52,7 @@ struct D_800879C4Obj_q {
 extern const s16 D_80087AA4[];
 extern const s16 D_80087AA6[];
 
-void func_80057DBC(D_800879C4Obj_q *self, s32 arg1) {
+void D800879C4__SetVariantClut(D_800879C4Obj_q *self, s32 arg1) {
     self->unkA0 = arg1;
     self->unk74 = D_80087AA4[arg1 * 2];
     self->unk76 = D_80087AA6[arg1 * 2];

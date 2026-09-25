@@ -3,7 +3,7 @@
  * 0x485BC..0x48738 (95 words).  Carved round 47 (2026-09-16).
  *
  * THE CARVE NOTE THAT STOOD HERE FOR 26 ROUNDS WAS STALE AND SAID "nothing to
- * staff here": func_80057DBC was filed as addiu-$at blocked (resolved round
+ * staff here": D800879C4__SetVariantClut was filed as addiu-$at blocked (resolved round
  * 21) and func_80057DF4 as nop_mflo_mfhi blocked (resolved round 42).
  * `tools/uncarved.py` measures both blocker-clean.  Both are frameless leaves
  * (zero `addiu $sp, $sp, -N`), so neither is expected to have a stack frame.
@@ -16,7 +16,7 @@
 
 /*
  * Table D_800879C4 (49 slots, resolved with `tools/classtable.py
- * 0x800879C4`): func_80057DBC is slot40, func_80057DF4 is slot48.  The
+ * 0x800879C4`): D800879C4__SetVariantClut is slot40, func_80057DF4 is slot48.  The
  * neighbouring class_3bb8c_p unit already carries its OWN local view of
  * this same table/object (`D_800879C4Methods`/`D_800879C4Obj` in that
  * file, only exposing the ctor slot and `+0xA4`) -- per the project's
@@ -32,13 +32,13 @@ struct D_800879C4Obj_q {
     s32 unk5C;                  /* +0x05C, func_80057DF4: scaled in place by the first ratio when unk58 != 0 */
     s32 unk60;                  /* +0x060, func_80057DF4: scaled in place by the second ratio when unk58 != 0 */
     u8 pad64[0x74 - 0x64];
-    s16 unk74;                  /* +0x074, func_80057DBC: D_80087AA4[arg1] */
-    s16 unk76;                  /* +0x076, func_80057DBC: D_80087AA6[arg1] */
+    s16 unk74;                  /* +0x074, D800879C4__SetVariantClut: D_80087AA4[arg1] */
+    s16 unk76;                  /* +0x076, D800879C4__SetVariantClut: D_80087AA6[arg1] */
     u8 pad78[0x80 - 0x78];
     s16 unk80;                  /* +0x080, func_80057DF4: raw first ratio (truncated) when unk58 == 0 */
     s16 unk82;                  /* +0x082, func_80057DF4: raw second ratio (truncated) when unk58 == 0 */
     u8 pad84[0xA0 - 0x84];
-    s32 unkA0;                  /* +0x0A0, func_80057DBC: the raw index argument, stored verbatim */
+    s32 unkA0;                  /* +0x0A0, D800879C4__SetVariantClut: the raw index argument, stored verbatim */
 };
 
 /*
@@ -53,7 +53,7 @@ struct D_800879C4Obj_q {
 extern const s16 D_80087AA4[];
 extern const s16 D_80087AA6[];
 
-void func_80057DBC(D_800879C4Obj_q *self, s32 arg1) {
+void D800879C4__SetVariantClut(D_800879C4Obj_q *self, s32 arg1) {
     self->unkA0 = arg1;
     self->unk74 = D_80087AA4[arg1 * 2];
     self->unk76 = D_80087AA6[arg1 * 2];
