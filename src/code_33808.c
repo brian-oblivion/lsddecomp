@@ -180,7 +180,18 @@ void *func_80043840(s32 arg0) {
     return NULL;
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800438B0);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043954);
+/* D_8006F13C +0x00C: finalize -- release every object in the NULL-ended
+ * array at +0x2C, free the array, then the active driver's. */
+void func_80043954(DataSrc33808 *self) {
+    DataSrc33808 **objs = (DataSrc33808 **)self->unk2C;
+
+    while (*objs != NULL) {
+        (*objs)->methods->release(*objs);
+        objs++;
+    }
+    BMemPMgrFree((void *)self->unk2C);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800439EC);
 /* LIBGS.H: void GsMapModelingData(unsigned long *p); */
 void GsMapModelingData(u32 *p);
