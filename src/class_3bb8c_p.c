@@ -29,6 +29,7 @@
  */
 #include "common.h"
 #include "DreamSys.h"
+#include "Sprite.h"
 
 /* Two-element s16 array -- DreamSys__ApplyOffsetSlot0 and DreamSys__ApplyOffsetSlot1 each write one
  * element (index 0 and 1 respectively) via a plain `sh` through a pointer
@@ -430,28 +431,16 @@ void *New_D800879C4(void *arg1, void *arg2, void *arg3) {
     return NULL;
 }
 
-/* 2-element, 0xC-byte-stride table -- address-of only here (never
- * dereferenced by this function), forwarded as the ctor call's `arg3`.
- * Field layout unconfirmed beyond the stride; kept opaque. */
-typedef struct D80087A8CEntry {
-    u8 unk[0xC];
-} D80087A8CEntry;
-extern D80087A8CEntry D_80087A8C[2];
+/* D800879C4's two texture cells, forwarded as the Sprite ctor's `rect`
+ * (Sprite__Reset copies it into Sprite.rect): u,v = (0x00,0x20) and
+ * (0x10,0x20), 16x16. */
+extern SpriteRect D_80087A8C[2];
 
-/* Another uncarved-ground getter (asm/psyq_memset.s, of all places --
- * splat's segmentation, not a meaningful grouping): plain no-argument,
- * `return &D_8006EE1C;`. Only the ctor slot is needed; the callee ignores
- * this call's "arguments" (this function's OWN a0..a3, left untouched in
- * registers from entry -- the "per-call-site signature" precedent again,
- * see DreamSys__AcceptGridElem's report), so the C call site takes none either. */
-typedef struct D8006EE1CMethods {
-    u8 pad00[0x8];
-    void *(*ctor)(void *self, void *arg1, s32 arg2, void *arg3, void *arg4, s32 arg5);
-} D8006EE1CMethods;
-extern D8006EE1CMethods *func_800422BC(void);
+/* The base-class ctor, Sprite__Sprite, through GetSpriteMethods()
+ * (include/Sprite.h); `self` is upcast to the Sprite it derives from. */
 
 void *D800879C4__D800879C4(D800879C4Obj *self, s32 arg1, void *arg2, void *arg3) {
-    func_800422BC()->ctor(self, arg3, 0, &D_80087A8C[arg1], arg2, 0);
+    GetSpriteMethods()->ctor((Sprite *)self, arg3, 0, &D_80087A8C[arg1], arg2, 0);
     self->methods = func_80057F58();
     self->unk_0xA4 = 0;
     return self->methods->setVariantClut(self, arg1);

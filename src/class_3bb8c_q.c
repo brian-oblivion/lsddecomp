@@ -1,7 +1,7 @@
 /*
  * class_3bb8c_q -- 0x485BC..0x48738, two methods of class D800879C4 (table
  * D_800879C4, 49 slots; tools/classtable.py). D800879C4 is a 0xA8-byte
- * sprite object: a subclass of the sprite class whose table is D_8006EE1C
+ * sprite object: a subclass of the sprite class whose table is gSpriteMethods
  * (tag 0x44; GsSPRITE embedded at +0x64, drawn by Unk18Obj__DrawNode through
  * GsSortSprite), which is itself a Class6B5CC subclass. Its ctor and
  * allocator (D800879C4__D800879C4, New_D800879C4) are in class_3bb8c_p.c,
@@ -31,14 +31,14 @@ typedef struct D800879C4Obj D800879C4Obj;
 struct D800879C4Obj {
     u8 pad00[0x58];
     /* +0x058..+0x063: written by the base class's slot +0x040 init
-     * (func_8004202C, asm/psyq_322b4.s: unk58 = 0) and read by
+     * (Sprite__Reset, asm/psyq_322b4.s: unk58 = 0) and read by
      * D800879C4__UpdateScale below; Unk18Obj__DrawNode's sprite draw path does
      * not read them. What sets unk58 non-zero is not established. */
     s32 unk58;                  /* +0x058, UpdateScale: non-zero selects the scale-in-place path */
     s32 unk5C;                  /* +0x05C, UpdateScale: multiplied by the x ratio when unk58 != 0 */
     s32 unk60;                  /* +0x060, UpdateScale: multiplied by the y ratio when unk58 != 0 */
     /* +0x064: an embedded GsSPRITE (layout confirmed by the base init
-     * func_8004208C, which fills attribute/w/h/tpage/u/v/cx/cy/rgb/mx/my/
+     * InitGsSprite, which fills attribute/w/h/tpage/u/v/cx/cy/rgb/mx/my/
      * scalex/scaley/rotate at their GsSPRITE offsets, and by
      * Unk18Obj__DrawNode, which hands self+0x64 to GsSortSprite). Only the
      * members this unit touches are spelled out. */

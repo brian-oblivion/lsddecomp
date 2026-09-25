@@ -12,7 +12,7 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b
 ```c
 /* D_8006EC74 slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
 void func_80041BDC(SpriteView_322b4 *self, u8 cell) {
-    CellRect_322b4 r;
+    SpriteRect r;
 
     self->unkA8 = cell;
     func_80041C4C(&r, cell);
@@ -20,3 +20,7 @@ void func_80041BDC(SpriteView_322b4 *self, u8 cell) {
     self->v = r.v;
 }
 ```
+
+## Track 4 (2026-09-25, round 82, alpha)
+
+`CellRect_322b4` became `SpriteRect` (include/Sprite.h): the same 12-byte {u16 u, v; s32 w, h} cell Sprite__Reset copies into Sprite.rect. This function belongs to D_8006EC74 (a Sprite subclass) and keeps its unit-local `SpriteView_322b4` self type. The the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).

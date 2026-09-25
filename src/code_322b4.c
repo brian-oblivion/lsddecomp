@@ -4,7 +4,7 @@
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint). What it holds: methods of D_8006EC74,
- * D_8006ED4C, D_8006EE1C, D_8006EF50, D_8006EFAC, D_8006EB90, D_8006EED8,
+ * D_8006ED4C, gSpriteMethods, D_8006EF50, D_8006EFAC, D_8006EB90, D_8006EED8,
  * D_800879C4 and D_800866E8, calling GetClass6B5CCMethods, GetSetBitField and
  * the BasicClass framework. Owns jtbl_80011290 (attached rodata sub-slot
  * 0x1A90).
@@ -15,7 +15,7 @@
  * allocator); the remaining bodies are still INCLUDE_ASM.
  */
 #include "common.h"
-#include "Class6B5CC.h"
+#include "Sprite.h"
 
 /* Local view of a D_8006EF50 (class id 0x5) object: only the three words its
  * +0x048..+0x058 accessors touch. */
@@ -33,16 +33,6 @@ typedef struct D_8006EC74Obj {
     u8 unkA8;
 } D_8006EC74Obj;
 
-/* Local view of a sprite object (D_8006EC74/ED4C/EE1C/879C4): the embedded
- * GsSPRITE's r,g,b bytes at +0x78..+0x7A. */
-typedef struct Rgb_322b4 {
-    s8 r, g, b;
-} Rgb_322b4;
-typedef struct SpriteObj_322b4 {
-    u8 pad00[0x78];
-    Rgb_322b4 rgb;
-} SpriteObj_322b4;
-
 /* Local view of a D_8006EFAC/D_800866E8 object: a child array at +0x44. */
 typedef struct ChildArrayObj_322b4 {
     u8 pad00[0x44];
@@ -52,7 +42,6 @@ typedef struct ChildArrayObj_322b4 {
 /* The method tables the getters below return. */
 extern s32 D_8006EC74[];
 extern s32 D_8006ED4C[];
-extern s32 D_8006EE1C[];
 extern s32 D_8006EED8[];
 extern s32 D_8006EF50[];
 extern s32 D_8006EFAC[];
@@ -63,10 +52,9 @@ typedef struct D_8006EED8Obj {
     s32 unk2C;
 } D_8006EED8Obj;
 
-/* Local view of a sprite-class object (D_8006EC74/ED4C/EE1C/879C4/EB90) as
- * the round-82 batch-3 methods see it: an embedded GsSPRITE at +0x064 whose
- * attribute word is the packed flags GetSetBitField edits, and whose u,v
- * bytes sit at +0x072/+0x073. */
+/* Local view of a D_8006EC74/D_8006ED4C object (subclasses of Sprite,
+ * include/Sprite.h) as their round-82 methods see it. attribute and u,v are
+ * Sprite's sprite.attribute/u/v; this view is the subclasses' to unify. */
 typedef struct SpriteMethods_322b4 SpriteMethods_322b4;
 typedef struct Pair_322b4 {
     s32 a, b;
@@ -89,12 +77,8 @@ struct SpriteMethods_322b4 {
     void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = func_80041BDC */
 };
 
-/* The 12-byte record func_80041C4C copies from D_8006ED40 = {0, 0, 8, 8}. */
-typedef struct CellRect_322b4 {
-    u16 u, v;
-    s32 w, h;
-} CellRect_322b4;
-extern CellRect_322b4 D_8006ED40;
+/* The cell origin func_80041C4C copies: {0, 0, 8, 8}. */
+extern SpriteRect D_8006ED40;
 
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 extern void *BMemPMgrAlloc(s32 size);
@@ -110,7 +94,7 @@ typedef struct Slot08Methods_322b4 {
     void (*init)(void *self); /* +0x008 */
 } Slot08Methods_322b4;
 void *func_80042684(void);
-void func_80041C4C(CellRect_322b4 *dst, u32 cell);
+void func_80041C4C(SpriteRect *dst, u32 cell);
 
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041AB4);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041B20);
@@ -120,7 +104,7 @@ void func_80041BAC(SpriteView_322b4 *self, u8 cell) {
 }
 /* D_8006EC74 slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
 void func_80041BDC(SpriteView_322b4 *self, u8 cell) {
-    CellRect_322b4 r;
+    SpriteRect r;
 
     self->unkA8 = cell;
     func_80041C4C(&r, cell);
@@ -138,7 +122,7 @@ void *func_80041C3C(void) {
     return D_8006EC74;
 }
 /* Cell index -> 8x8 rect in a 32-wide grid, offset from D_8006ED40. */
-void func_80041C4C(CellRect_322b4 *dst, u32 cell) {
+void func_80041C4C(SpriteRect *dst, u32 cell) {
     *dst = D_8006ED40;
     cell &= 0xFF;
     dst->u += (cell & 0x1F) * 8;
@@ -161,34 +145,34 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041E58);
 void *func_80041ED8(void) {
     return D_8006ED4C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041EE8);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041F88);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004202C);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004208C);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042170);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", New_Sprite);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__Sprite);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__Reset);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", InitGsSprite);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__UpdateRotation);
 /* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
-s32 func_8004220C(SpriteView_322b4 *self, s32 a1) {
-    return GetSetBitField(&self->attribute, 0x1F, 1, a1 == 0) == 0;
+s32 Sprite__SetDisplay(Sprite *self, s32 a1) {
+    return GetSetBitField(&self->sprite.attribute, 0x1F, 1, a1 == 0) == 0;
 }
 /* Sprite classes slot +0x064: attribute bit 30. */
-s32 func_8004223C(SpriteView_322b4 *self, s32 a1) {
-    return GetSetBitField(&self->attribute, 0x1E, 1, a1 != 0);
+s32 Sprite__SetSemiTrans(Sprite *self, s32 a1) {
+    return GetSetBitField(&self->sprite.attribute, 0x1E, 1, a1 != 0);
 }
 /* Sprite classes slot +0x068: attribute bits 28..29. */
-s32 func_80042268(SpriteView_322b4 *self, s32 a1) {
-    return GetSetBitField(&self->attribute, 0x1C, 2, a1);
+s32 Sprite__SetSemiTransRate(Sprite *self, s32 a1) {
+    return GetSetBitField(&self->sprite.attribute, 0x1C, 2, a1);
 }
 /* D_8006EB90 and D_8006EC74 slot +0x098 (update): empty override. */
-void func_80042294(Class6B5CC *self, void *sender, s32 event) {
+void Sprite__Update(Sprite *self, void *sender, s32 event) {
 }
-/* Slot +0x0B8 of D_8006EC74, D_8006ED4C, D_8006EE1C and D_800879C4 (the
+/* Slot +0x0B8 of D_8006EC74, D_8006ED4C, gSpriteMethods and D_800879C4 (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
-void func_8004229C(SpriteObj_322b4 *self, Rgb_322b4 *rgb) {
-    self->rgb = *rgb;
+void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
+    self->sprite.rgb = *rgb;
 }
-/* Returns the D_8006EE1C method table. */
-void *func_800422BC(void) {
-    return D_8006EE1C;
+/* Returns the gSpriteMethods method table. */
+SpriteMethods *GetSpriteMethods(void) {
+    return &gSpriteMethods;
 }
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800422CC);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004232C);

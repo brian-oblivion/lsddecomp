@@ -32,7 +32,7 @@ convention.
 **`DreamSys__GetBaseMethods` -- tier A.** A pure no-argument getter
 (`return &D_800878D4;`) for the shared intermediate base-class table --
 mechanics ARE the purpose, matching the project's own convention for
-such getters (compare `func_80057F58`/`func_800422BC`, still `func_`
+such getters (compare `func_80057F58`/`GetSpriteMethods`, still `func_`
 because they live in uncarved ground this runner cannot touch).
 
 ## Verify
