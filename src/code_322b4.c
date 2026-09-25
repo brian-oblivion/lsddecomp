@@ -94,6 +94,7 @@ typedef struct Slot08Methods_322b4 {
     void (*init)(void *self); /* +0x008 */
 } Slot08Methods_322b4;
 void *func_80042684(void);
+void *func_800428E4(void);
 void func_80041C4C(SpriteRect *dst, u32 cell);
 
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041AB4);
@@ -238,7 +239,16 @@ void func_80042678(D_8006EF50Obj *self) {
 void *func_80042684(void) {
     return D_8006EF50;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042694);
+/* Allocate and construct a D_8006EFAC object (0x54 bytes). */
+void *func_80042694(void) {
+    void *obj = BMemPMgrAlloc(0x54);
+
+    if (obj != NULL) {
+        ((Slot08Methods_322b4 *)func_800428E4())->init(obj);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800426E4);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042790);
 /* D_8006EFAC slot +0x040 (reset): mark the coordinate for recompute. */
