@@ -7,22 +7,36 @@
  * and helpers called only from Class6D3C8, Obj865C8 and ObjM code (stream
  * tasks, the intro logo sequence).
  *
- * Round 82 matched ten of the small methods and record accessors; the rest
- * are still INCLUDE_ASM.
+ * Round 82 matched twenty: the allocator, ctor/finalize and small methods of
+ * D_80081940, and the record accessors. The eight larger bodies left are
+ * still INCLUDE_ASM.
  */
 #include "common.h"
 #include "Class6D430.h"
+#include "StageGrid.h"
+
+typedef struct D_80081940Obj D_80081940Obj;
+
+/* D_80081940's own method table (local view): the Class6D430 interface plus
+ * this class's extra slots. */
+typedef struct D_80081940Methods {
+    CLASS6D430_SLOTS(D_80081940Obj, (D_80081940Obj *self));
+    /* +0x07C */ void *slot7C;
+    /* +0x080 */ void *slot80;
+    /* +0x084 */ void (*releaseAlloc)(D_80081940Obj *self);  /* func_80048C98 */
+} D_80081940Methods;
 
 /* The D_80081940 object: a Class6D430 data source with its own fields from
  * +0x2C (local view; only this unit's methods read them). */
-typedef struct D_80081940Obj {
-    CLASS6D430_FIELDS(Class6D430Methods);
+struct D_80081940Obj {
+    CLASS6D430_FIELDS(D_80081940Methods);
     /* +0x02C */ u16 unk2C;
     /* +0x02E */ u16 unk2E;
-    /* +0x030 */ u8 pad30[4];
+    /* +0x030 */ s16 unk30;
+    /* +0x032 */ u16 unk32;
     /* +0x034 */ void *unk34;   /* BMemPMgr allocation, released by slot +0x084 */
     /* +0x038 */ s32 unk38;
-} D_80081940Obj;
+};
 
 /* One 0x1C-byte record of the table func_80048D48 returns (D_80081A04,
  * 0x230 records); only its size is known here. */
@@ -34,6 +48,8 @@ extern int rand(void);
 extern void srand(unsigned int seed);
 extern void *BMemPMgrFree(void *ptr);
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
+extern void *BMemPMgrAlloc(s32 size);
+void *func_80048CE0(void);
 
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048894);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800488E4);
@@ -65,6 +81,7 @@ extern u8 D_80081A04[];
 extern char *D_8008A96C;  /* -> "SND\\SE" */
 extern const char D_800113DC[];
 extern s16 D_80086170[];
+extern s16 D_800819E8[];
 
 /* slot +0x088 of D_80081940 */
 void func_80048CD8(D_80081940Obj *self, s32 value) {
@@ -76,7 +93,7 @@ void *func_80048CE0(void) {
 s32 func_80048CF0(void) {
     return D_8008A960;
 }
-s32 func_80048CFC(s32 seed) {
+s32 func_80048CFC(s32 seed, s32 unused) {
     if (seed != 0) {
         srand(seed);
     }
@@ -143,7 +160,14 @@ Rec1C *func_800491CC(s32 *countOut) {
     }
     return &((Rec1C *)func_80048D48(NULL))[0x237];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800491FC);
+Rec1C *func_800491FC(s32 *countOut) {
+    s32 count;
+    Rec1C *rec = func_800491CC(&count);
+    if (countOut != NULL) {
+        *countOut = count;
+    }
+    return rec;
+}
 Rec1C *func_80049240(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 8;
