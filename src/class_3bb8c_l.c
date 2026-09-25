@@ -76,7 +76,7 @@ void ObjM__DetachTarget(Obj87034_3bb8c_l *self) {
  * calls, never dereferenced here). */
 extern s32 PickVariant(void *arg0, s32 arg1);
 extern s32 PickDailyVariant(void *arg0, s32 arg1, s32 arg2);
-extern s32 func_80043008(s32 arg0);
+extern s32 New_TimBlockSrc(s32 arg0);
 extern void func_8001EF60(s32 arg0);
 extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
 
@@ -99,7 +99,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c
 
     ret1 = self->target->methods->slot1A0(self->target, 0);
     ret1 = PickDailyVariant(self->unk38, 0, ret1);
-    self->pendingOther = (Obj87034_3bb8c_l *) func_80043008(ret1);
+    self->pendingOther = (Obj87034_3bb8c_l *) New_TimBlockSrc(ret1);
 
     unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);
 

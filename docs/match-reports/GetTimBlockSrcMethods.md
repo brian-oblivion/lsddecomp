@@ -1,4 +1,6 @@
-# func_80043830 -- MATCHED (4/4 words)
+# GetTimBlockSrcMethods -- MATCHED (4/4 words)
+
+> Renamed from `func_80043830` on 2026-09-25 (tools/rename.py). Address 0x80043830.
 
 Round 82, runner echo (code_33808 session), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -16,7 +18,7 @@ Table slot (`tools/classtable.py`): `D_8006D430` +0x090 (the Class6D430 `Get...M
 ```c
 extern s32 D_8006F0B8[];
 
-void *func_80043830(void) {
+void *GetTimBlockSrcMethods(void) {
     return D_8006F0B8;
 }
 ```

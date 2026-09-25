@@ -1,4 +1,6 @@
-# func_80043068 -- MATCHED (80/80 words)
+# TimBlockSrc__TimBlockSrc -- MATCHED (80/80 words)
+
+> Renamed from `func_80043068` on 2026-09-25 (tools/rename.py). Address 0x80043068.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: the active driver's ctor, install D_8006F0B8, clear +0x2C/+0x30/+0x3C/+0x34/+0x38, and lay out four 16-byte channel entries at +0x40: shift = D_8008A92C, mask = 1 << shift, +4 = 0, +6 = 0x1E0 + the running sum of masks, +8 = 0x100, +0xA = 1 (func_80043538 later rewrites one entry's shift/mask, func_800435D0 its vector at +0xC). Then allocate a 0x24-byte header buffer and a 0x800-byte sector buffer (+0x34); with both, adopt the header as the data-source buffer (size 0x24), set state 9 at +0x2A, clear +0x80, open `name` (own +0x044 with 1, 0) and read one sector into +0x34 (own +0x054).
+Constructor: the active driver's ctor, install D_8006F0B8, clear +0x2C/+0x30/+0x3C/+0x34/+0x38, and lay out four 16-byte channel entries at +0x40: shift = D_8008A92C, mask = 1 << shift, +4 = 0, +6 = 0x1E0 + the running sum of masks, +8 = 0x100, +0xA = 1 (TimBlockSrc__SetEntryShift later rewrites one entry's shift/mask, TimBlockSrc__FadeEntry its vector at +0xC). Then allocate a 0x24-byte header buffer and a 0x800-byte sector buffer (+0x34); with both, adopt the header as the data-source buffer (size 0x24), set state 9 at +0x2A, clear +0x80, open `name` (own +0x044 with 1, 0) and read one sector into +0x34 (own +0x054).
 
-Table slot (`tools/classtable.py`): D_8006F0B8 +0x008 (its allocator func_80043008 passes one argument).
+Table slot (`tools/classtable.py`): D_8006F0B8 +0x008 (its allocator New_TimBlockSrc passes one argument).
 
 ## Source
 
@@ -47,7 +49,7 @@ typedef struct Obj43068 {
 
 extern s16 D_8008A92C;
 
-void func_80043068(Obj43068 *self, char *name) {
+void TimBlockSrc__TimBlockSrc(Obj43068 *self, char *name) {
     Ent43068 *e;
     void *hdr;
     s32 i;
@@ -56,7 +58,7 @@ void func_80043068(Obj43068 *self, char *name) {
     u16 mask;
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80043830();
+    self->methods = GetTimBlockSrcMethods();
     self->unk2C = 0;
     self->unk30 = 0;
     self->unk3C = 0;

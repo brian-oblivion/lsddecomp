@@ -1,4 +1,6 @@
-# func_80043008 -- MATCHED (24/24 words)
+# New_TimBlockSrc -- MATCHED (24/24 words)
+
+> Renamed from `func_80043008` on 2026-09-25 (tools/rename.py). Address 0x80043008.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,11 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a D_8006F0B8 object. */
-void *func_80043008(s32 arg0) {
+void *New_TimBlockSrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x84);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_80043830())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTimBlockSrcMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;

@@ -1,4 +1,6 @@
-# func_80043648 -- MATCHED (122/122 words)
+# FadeClutRow -- MATCHED (122/122 words)
+
+> Renamed from `func_80043648` on 2026-09-25 (tools/rename.py). Address 0x80043648.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -9,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Fade one 256-colour CLUT row toward the entry's colour. StoreImage reads the row (x 0, y (index << D_8008A92C) + 0x1E0, 256 x 1) into a local buffer; then for each of mask - 1 steps, with f = (step + 1) << (12 - shift), every non-zero 15-bit colour is blended channel by channel ((c * (0x1000 - f) + colour * f) >> 15 on the <<3-scaled 5-bit channels, keeping the STP bit) into a second buffer, which LoadImage uploads to the next row down (dst.y = src.y + step + src.h), DrawSync between. Also copies the entry's mask to its +0x0A.
 
-Table slot (`tools/classtable.py`): not in any method table (called by func_800435D0, D_8006F0B8 +0x080).
+Table slot (`tools/classtable.py`): not in any method table (called by TimBlockSrc__FadeEntry, D_8006F0B8 +0x080).
 
 ## Source
 
@@ -35,7 +37,7 @@ extern int StoreImage(Rect43648 *rect, u32 *p);
 extern int LoadImage(Rect43648 *rect, u32 *p);
 extern int DrawSync(int mode);
 
-void func_80043648(Ent6F0B8 *e, s32 index) {
+void FadeClutRow(Ent6F0B8 *e, s32 index) {
     Rect43648 dst;
     Rect43648 src;
     u16 out[256];
@@ -99,4 +101,4 @@ void func_80043648(Ent6F0B8 *e, s32 index) {
 
 ## Notes
 
-Seventh build. Levers, each measured: (1) the colour held in a `u32 c` read ONCE for the zero test and the g/b channels, while the r channel and the STP bit re-read `in[j]` -- retail reloads in[j] in both arms; a `u16 c` let cc1 merge every read, add an `andi 0xffff` and cross-jump the copy arm into the blend's store (49/122); `s32 c` got the reload shape but `sra` for `c >> 2` (90/122); (2) per-channel `s32 cr/cg/cb` temporaries so the unsigned `c` does not make the products unsigned (`srl` where retail has `sra` for `>> 15`), and each channel's blend assigned back to its temporary before one final OR -- retail computes all three then ORs (92 -> 110/122); (3) the blend factor reused in place, `f = 0x1000 - f;` rather than a separate `inv` -- the last register difference (t0 for both, t1 for j) (110 -> 122/122). The frame (0x450: two RECTs and two 256-entry buffers) matched from the first build. The unit-local `Ent6F0B8` view gained `u16 unkA` at +0x0A (its `pad4[8]` became `pad4[6]` + unkA; func_80043538/func_800435D0 still byte-exact, whole image green). StoreImage/LoadImage/DrawSync are Sony's (LIBGPU), extern only, with a unit-local RECT view `Rect43648`.
+Seventh build. Levers, each measured: (1) the colour held in a `u32 c` read ONCE for the zero test and the g/b channels, while the r channel and the STP bit re-read `in[j]` -- retail reloads in[j] in both arms; a `u16 c` let cc1 merge every read, add an `andi 0xffff` and cross-jump the copy arm into the blend's store (49/122); `s32 c` got the reload shape but `sra` for `c >> 2` (90/122); (2) per-channel `s32 cr/cg/cb` temporaries so the unsigned `c` does not make the products unsigned (`srl` where retail has `sra` for `>> 15`), and each channel's blend assigned back to its temporary before one final OR -- retail computes all three then ORs (92 -> 110/122); (3) the blend factor reused in place, `f = 0x1000 - f;` rather than a separate `inv` -- the last register difference (t0 for both, t1 for j) (110 -> 122/122). The frame (0x450: two RECTs and two 256-entry buffers) matched from the first build. The unit-local `Ent6F0B8` view gained `u16 unkA` at +0x0A (its `pad4[8]` became `pad4[6]` + unkA; TimBlockSrc__SetEntryShift/TimBlockSrc__FadeEntry still byte-exact, whole image green). StoreImage/LoadImage/DrawSync are Sony's (LIBGPU), extern only, with a unit-local RECT view `Rect43648`.

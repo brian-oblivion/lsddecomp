@@ -50,7 +50,7 @@ extern Class6D430Methods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
-void *func_80043830(void);
+void *GetTimBlockSrcMethods(void);
 void *func_80043B78(void);
 void *func_80043E74(void);
 void *func_800441A4(void);
@@ -70,11 +70,11 @@ typedef struct Ctor33808 {
 } Ctor33808;
 
 /* Allocate and construct a D_8006F0B8 object. */
-void *func_80043008(s32 arg0) {
+void *New_TimBlockSrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x84);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_80043830())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTimBlockSrcMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
@@ -107,7 +107,7 @@ typedef struct Obj43068 {
 
 extern s16 D_8008A92C;
 
-void func_80043068(Obj43068 *self, char *name) {
+void TimBlockSrc__TimBlockSrc(Obj43068 *self, char *name) {
     Ent43068 *e;
     void *hdr;
     s32 i;
@@ -116,7 +116,7 @@ void func_80043068(Obj43068 *self, char *name) {
     u16 mask;
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80043830();
+    self->methods = GetTimBlockSrcMethods();
     self->unk2C = 0;
     self->unk30 = 0;
     self->unk3C = 0;
@@ -150,7 +150,7 @@ void func_80043068(Obj43068 *self, char *name) {
 }
 /* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
  * entries), free it, then the active driver's. */
-void func_800431A8(DataSrc33808 *self) {
+void TimBlockSrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
     BMemPMgrFree(self->unk30);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
@@ -171,10 +171,10 @@ typedef struct Hdr43200 {
 
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
-u32 func_800434DC(Class6D430 *self);
+u32 MaxOfBufferWords(Class6D430 *self);
 void *func_80043B88(s32 arg0);
 
-void func_80043200(Obj43068 *self) {
+void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
     DataSrc33808 **p;
     s32 max;
     s32 n;
@@ -185,7 +185,7 @@ void func_80043200(Obj43068 *self) {
             if (self->flags & 0x80) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
                 BMemPMgrFree(self->sector);
-                max = func_800434DC((Class6D430 *)self);
+                max = MaxOfBufferWords((Class6D430 *)self);
                 self->unk30 = (s32)BMemPMgrAlloc(*(u32 *)self->buffer * 4);
                 if (self->unk30 == 0) {
                     goto fail;
@@ -240,7 +240,7 @@ typedef struct Buf434DC {
     /* +0x14 */ u32 vals[1];
 } Buf434DC;
 
-u32 func_800434DC(Class6D430 *self) {
+u32 MaxOfBufferWords(Class6D430 *self) {
     Buf434DC *buf = self->buffer;
     u32 i;
     u32 max = 0;
@@ -264,7 +264,7 @@ typedef struct Ent6F0B8 {
     /* +0x00 */ u16 shift;
     /* +0x02 */ u16 mask;
     /* +0x04 */ u8 pad4[6];
-    /* +0x0A */ u16 unkA;         /* set to the mask by func_80043648 */
+    /* +0x0A */ u16 unkA;         /* set to the mask by FadeClutRow */
     /* +0x0C */ Vec3S8 vec;
     /* +0x0F */ u8 padF;
 } Ent6F0B8;
@@ -274,7 +274,7 @@ typedef struct Obj6F0B8 {
     /* +0x040 */ Ent6F0B8 entries[1];
 } Obj6F0B8;
 
-void func_80043538(Obj6F0B8 *self, s32 index, s32 shift) {
+void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
     Ent6F0B8 *e = &self->entries[index];
 
     e->shift = shift;
@@ -285,7 +285,7 @@ void func_80043538(Obj6F0B8 *self, s32 index, s32 shift) {
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
 
-void func_8004355C(DataSrc33808 *self, s32 arg) {
+void TimBlockSrc__FadeAllEntries(DataSrc33808 *self, s32 arg) {
     s32 i;
 
     LockActiveDataSource();
@@ -295,16 +295,16 @@ void func_8004355C(DataSrc33808 *self, s32 arg) {
     UnlockActiveDataSource();
 }
 /* D_8006F0B8 +0x080: under the data-source lock, set entry `index`'s
- * three-byte vector and hand the entry to func_80043648. */
-void func_80043648(Ent6F0B8 *entry, s32 index);
+ * three-byte vector and hand the entry to FadeClutRow. */
+void FadeClutRow(Ent6F0B8 *entry, s32 index);
 
-void func_800435D0(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
+void TimBlockSrc__FadeEntry(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
     Ent6F0B8 *e;
 
     LockActiveDataSource();
     e = &self->entries[index];
     e->vec = *src;
-    func_80043648(e, index);
+    FadeClutRow(e, index);
     UnlockActiveDataSource();
 }
 /* Fade one 256-colour CLUT row (the entry's `index`, from VRAM y 0x1E0)
@@ -323,7 +323,7 @@ extern int StoreImage(Rect43648 *rect, u32 *p);
 extern int LoadImage(Rect43648 *rect, u32 *p);
 extern int DrawSync(int mode);
 
-void func_80043648(Ent6F0B8 *e, s32 index) {
+void FadeClutRow(Ent6F0B8 *e, s32 index) {
     Rect43648 dst;
     Rect43648 src;
     u16 out[256];
@@ -385,7 +385,7 @@ void func_80043648(Ent6F0B8 *e, s32 index) {
 }
 extern s32 D_8006F0B8[];
 
-void *func_80043830(void) {
+void *GetTimBlockSrcMethods(void) {
     return D_8006F0B8;
 }
 /* Allocate and construct a D_8006F13C object; freed and NULL when the constructor fails. */

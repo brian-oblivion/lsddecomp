@@ -1,4 +1,6 @@
-# func_8004355C -- MATCHED (29/29 words)
+# TimBlockSrc__FadeAllEntries -- MATCHED (29/29 words)
+
+> Renamed from `func_8004355C` on 2026-09-25 (tools/rename.py). Address 0x8004355c.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -23,7 +25,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
 
-void func_8004355C(DataSrc33808 *self, s32 arg) {
+void TimBlockSrc__FadeAllEntries(DataSrc33808 *self, s32 arg) {
     s32 i;
 
     LockActiveDataSource();

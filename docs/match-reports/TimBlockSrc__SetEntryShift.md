@@ -1,4 +1,6 @@
-# func_80043538 -- MATCHED (9/9 words)
+# TimBlockSrc__SetEntryShift -- MATCHED (9/9 words)
+
+> Renamed from `func_80043538` on 2026-09-25 (tools/rename.py). Address 0x80043538.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -31,7 +33,7 @@ typedef struct Obj6F0B8 {
     /* +0x040 */ Ent6F0B8 entries[1];
 } Obj6F0B8;
 
-void func_80043538(Obj6F0B8 *self, s32 index, s32 shift) {
+void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
     Ent6F0B8 *e = &self->entries[index];
 
     e->shift = shift;

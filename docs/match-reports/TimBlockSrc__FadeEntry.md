@@ -1,4 +1,6 @@
-# func_800435D0 -- MATCHED (30/30 words)
+# TimBlockSrc__FadeEntry -- MATCHED (30/30 words)
+
+> Renamed from `func_800435D0` on 2026-09-25 (tools/rename.py). Address 0x800435d0.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Under Lock/UnlockActiveDataSource: copies a three-byte s8 vector into entry `index` (16-byte entries from +0x40, vector at entry +0x0C), then calls func_80043648(entry, index) (which reads the entry's shift/mask/vector and does a StoreImage).
+Under Lock/UnlockActiveDataSource: copies a three-byte s8 vector into entry `index` (16-byte entries from +0x40, vector at entry +0x0C), then calls FadeClutRow(entry, index) (which reads the entry's shift/mask/vector and does a StoreImage).
 
 Table slot (`tools/classtable.py`): D_8006F0B8 +0x080.
 
@@ -33,17 +35,17 @@ typedef struct Ent6F0B8 {
     /* +0x0F */ u8 padF;
 } Ent6F0B8;
 
-void func_800435D0(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
+void TimBlockSrc__FadeEntry(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
     Ent6F0B8 *e;
 
     LockActiveDataSource();
     e = &self->entries[index];
     e->vec = *src;
-    func_80043648(e, index);
+    FadeClutRow(e, index);
     UnlockActiveDataSource();
 }
 ```
 
 ## Notes
 
-First build. The three lb then three sb is whole-struct assignment of the 3 x s8 `Vec3S8` (the lever from func_8004464C). Vec3S8's typedef moved up the file (no code change) and the local `Ent6F0B8` gained `vec` at +0x0C (size unchanged, 16). func_80043648 is prototyped locally from its asm (a0 = entry pointer, a1 = index used in sllv).
+First build. The three lb then three sb is whole-struct assignment of the 3 x s8 `Vec3S8` (the lever from func_8004464C). Vec3S8's typedef moved up the file (no code change) and the local `Ent6F0B8` gained `vec` at +0x0C (size unchanged, 16). FadeClutRow is prototyped locally from its asm (a0 = entry pointer, a1 = index used in sllv).

@@ -1,4 +1,6 @@
-# func_800431A8 -- MATCHED (22/22 words)
+# TimBlockSrc__Finalize -- MATCHED (22/22 words)
+
+> Renamed from `func_800431A8` on 2026-09-25 (tools/rename.py). Address 0x800431a8.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -20,7 +22,7 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 ```c
 /* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
  * entries), free it, then the active driver's. */
-void func_800431A8(DataSrc33808 *self) {
+void TimBlockSrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
     BMemPMgrFree(self->unk30);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);

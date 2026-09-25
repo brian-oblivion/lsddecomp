@@ -1,4 +1,6 @@
-# func_800434DC -- MATCHED (23/23 words)
+# MaxOfBufferWords -- MATCHED (23/23 words)
+
+> Renamed from `func_800434DC` on 2026-09-25 (tools/rename.py). Address 0x800434dc.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -25,7 +27,7 @@ typedef struct Buf434DC {
     /* +0x14 */ u32 vals[1];
 } Buf434DC;
 
-u32 func_800434DC(Class6D430 *self) {
+u32 MaxOfBufferWords(Class6D430 *self) {
     Buf434DC *buf = self->buffer;
     u32 i;
     u32 max = 0;
