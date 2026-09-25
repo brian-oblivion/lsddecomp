@@ -5,9 +5,9 @@
 Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior attempt.
 
 - **Where:** not in any method table (allocator for D_8006ED4C, the screen-space sprite, 0xA8 bytes).
-- **What:** `BMemPMgrAlloc(0xA8)`; if non-NULL, calls slot +0x008 (ctor, func_80041D18) of `func_80041ED8()` (the D_8006ED4C table) with `(obj, a1, a2, a3)` and returns obj, else NULL.
+- **What:** `BMemPMgrAlloc(0xA8)`; if non-NULL, calls slot +0x008 (ctor, D8006ED4C__D8006ED4C) of `func_80041ED8()` (the D_8006ED4C table) with `(obj, a1, a2, a3)` and returns obj, else NULL.
 - **Result:** byte-exact, 31/31 words, 0 ins / 0 del, whole-image SHA1 green. First build (round-82 allocator shape, three pass-through args in `$s1..$s3`).
-- **Types:** the three arguments are left `void *` (their meaning belongs to func_80041D18, still INCLUDE_ASM). Unit-local `CtorArg3Methods_322b4` and a prototype for `func_80041ED8`; no shared header touched.
+- **Types:** the three arguments are left `void *` (their meaning belongs to D8006ED4C__D8006ED4C, still INCLUDE_ASM). Unit-local `CtorArg3Methods_322b4` and a prototype for `func_80041ED8`; no shared header touched.
 
 ## Source
 
@@ -15,7 +15,7 @@ Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fre
 void *func_80041ED8(void);
 typedef struct CtorArg3Methods_322b4 {
     u8 pad00[0x8];
-    void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = func_80041D18 */
+    void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = D8006ED4C__D8006ED4C */
 } CtorArg3Methods_322b4;
 
 void *New_D8006ED4C(void *a1, void *a2, void *a3) {

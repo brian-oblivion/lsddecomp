@@ -156,7 +156,7 @@ typedef struct CellCtorMethods_322b4 {
 void *func_80041ED8(void);
 typedef struct CtorArg3Methods_322b4 {
     u8 pad00[0x8];
-    void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = func_80041D18 */
+    void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = D8006ED4C__D8006ED4C */
 } CtorArg3Methods_322b4;
 
 struct D_8006EED8Methods {
@@ -238,7 +238,7 @@ void *New_D8006ED4C(void *a1, void *a2, void *a3) {
 }
 /* D_8006ED4C slot +0x008 (ctor): the Sprite ctor with abr 0 and arg4 NULL,
  * install the table, then reset. */
-void func_80041D18(Sprite *self, void *texture, SpriteRect *rect, s32 arg3) {
+void D8006ED4C__D8006ED4C(Sprite *self, void *texture, SpriteRect *rect, s32 arg3) {
     GetSpriteMethods()->ctor(self, texture, 0, rect, NULL, arg3);
     self->methods = func_80041ED8();
     self->methods->reset(self);
