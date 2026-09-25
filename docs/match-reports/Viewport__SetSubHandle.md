@@ -79,3 +79,7 @@ outside this unit's ownership per track 3's rule.
   documentation; this unit only forwards it opaquely (`arg1->methods->
   slot4C(arg1, self->unkAC, D_8008A904)`), no new evidence over what
   `include/code_2cc8c.h`'s own comment on `Unk18Obj::unkAC` already records.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__SetSubHandle`. Slot +0x0A8 `setSubHandle`. The handle is a `Class6B5CC *` (the ctor's is a Class6E99C, id 0x164): release is BasicClass's +0x004 and the attach is Class6B5CC's +0x04C `attachToParent`, whose occupant in Class6E99C's table (Obj6EAC0__Layout) takes a screen position, so D_8008A904 (-100, -100) is passed with a `(Vec3_d294 *)` cast (no code). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

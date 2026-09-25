@@ -95,3 +95,7 @@ occupant (called by `New_Viewport` via `GetViewportMethods()->ctor(self)`,
 Chains `Get_vtable_BasicClass()->ctor` first, then installs its own vtable
 and sets up `self->unkAC`/`self->unkB0` -- the standard base-then-derived
 construction shape.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__Unk18Obj`. The +0x008 ctor. Chains to BasicClass's ctor first (Get_vtable_BasicClass()->ctor); Class869D8__Class869D8 chains to this one, so the id tree 0x0 -> 0x7 -> 0x17 is the ctor chain. Fields: +0x00C drawSystem, +0x010 viewNode, +0x0AC sceneRoot (New_Class6B5CC), +0x0B0 subHandle (New_Class6E99C, attached under sceneRoot through Class6B5CC's attachToParent slot with D_8008A904 cast to Vec3_d294 *, because the occupant, Obj6EAC0__Layout, takes a screen position), then the +0x040 initDefaults slot. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

@@ -39,3 +39,7 @@ beyond "a stored word".
 ## Naming
 
 `Unk18Obj__SetUnk44` -- tier A. Plain setter for `unk44`, guarded by the `unk70` one-time-init latch (only writes the first time). The guard is part of the mechanics; the field's real meaning is unestablished.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__SetUnk44`. Slot +0x04C `setUnk44`. unk44 * unk48 is each buffer's packet area (InitOt); which of the two is the packet count and which the size is not shown, so the field keeps its offset name. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

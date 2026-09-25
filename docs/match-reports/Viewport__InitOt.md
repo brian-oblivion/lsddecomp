@@ -669,3 +669,7 @@ otherwise.
 ## Naming
 
 `Unk18Obj__InitOt` -- tier A. One-time allocator/init guarded by `self->unk70`: allocates one buffer sized for two `GsOT` headers (`0x14` bytes each, `sizeof(GsOT)`) plus tag arrays plus packet area, carves it into the `unk78`/`unk80`/`unk88` and `unk7C`/`unk84`/`unk8C` base/size pairs, writes each `GsOT` header, and calls Sony's `GsClearOt` on both halves. "Ot" (ordering table) is Sony's own GPU term for exactly this structure, evident from the `GsClearOt`/`GsOT` shape itself.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__InitOt`. Slot +0x08C `initOt`. Its carving names the fields: `ot[2]` (+0x078, each a 0x14-byte GsOT header, `ViewportOt`, whose `length` and `org` it sets), `otTags[2]` (+0x080, each OT's tag array) and `workBase[2]` (+0x088, each half's packet area). The arithmetic is unchanged: ot[1] is still `(ViewportOt *)(size + (s32)ot[0])`, the int form, and GsClearOt's local prototype takes a `ViewportOt *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

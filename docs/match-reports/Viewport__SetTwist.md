@@ -62,3 +62,7 @@ often, not a coincidence.
 ## Naming
 
 `Unk18Obj__SetRatio12` -- tier B. Computes a 20.12 fixed-point value from a caller-supplied `{s16 whole; s16 frac;}` pair via the same split-division idiom as `code_d294_c`'s `RatioToFixed12` (divide for quotient+remainder, divide the shifted remainder again for the fraction), guarded by `self->unk10`, stores to `unk2C`. Named after the identified idiom (matches an existing, already-named sibling function's own algorithm), not after any established in-game meaning for the ratio.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__SetRatio12`. Renamed for the GsRVIEW2 member it writes: `refView.rz`, the twist, as a 20.12 value from a `WholeFrac_d294` (the same split division as RatioToFixed12, which reads the same type). Slot +0x080 `setTwist`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

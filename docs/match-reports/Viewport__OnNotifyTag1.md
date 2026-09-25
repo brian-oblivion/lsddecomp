@@ -34,3 +34,7 @@ already-typed `slotA8`.
 ## Naming
 
 `Unk18Obj__OnNotifyTag1` -- tier B. The `slot98` occupant `Viewport__OnNotify` dispatches to when the sender's tag is 1; dispatches `slotA4` (`Viewport__Flip`) only when `event == 2`. Same tier-B reasoning as `Viewport__OnNotifyTag5`: named after the dispatch mechanism, not an unestablished event meaning.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__OnNotifyTag1`. Slot +0x098 `onNotifyTag1`, onNotify's DrawSystem (class 1) case: runs +0x0A4 `flip` on event 2. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

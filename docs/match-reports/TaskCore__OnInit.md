@@ -155,3 +155,7 @@ verb covers what the function accomplishes as a whole, so left
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from TaskCoreObj__func_8003C238 (tools/rename.py). Occupant of +0x04C (`onInit`, the call IntermediateBase__Init makes after adding the children), named for the slot. IntermediateBase types the slot (self, s32, s32, s32) from that call; this occupant takes self alone. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view, and its slots are called by name: +0x048 setOtLength (unk28), +0x04C setUnk44 (unk2C), +0x050 setUnk48 (unk30), +0x070 attachViewChild (unk14, &D_8006E86C twice, NULL twist), +0x08C initOt. D_8006E86C is a zero Vec3_d294. Byte-identical.

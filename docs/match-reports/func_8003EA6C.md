@@ -27,3 +27,7 @@ Kept `func_8003EA6C`. No evidence of any kind: no `self` parameter to tie it
 to `Unk18Obj` or any other class, no caller, no vtable slot. Tier-C's
 `Class__func_xxxxx` form does not apply because no class is established.
 Nothing to propose.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Occupant of Viewport's +0x058 (`slot58` in `include/Viewport.h`; also in gClass869D8Methods). Empty and never called, so neither the slot nor the function is named. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

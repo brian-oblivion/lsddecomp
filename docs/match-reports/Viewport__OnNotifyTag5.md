@@ -47,3 +47,7 @@ what retail's own disassembly shows, not a general rule either way.
 ## Naming
 
 `Unk18Obj__OnNotifyTag5` -- tier B. The `slot94` occupant `Viewport__OnNotify` dispatches to when the sender's dynamic-class tag is 5. Body always increments `unk90` and additionally dispatches `slot9C` (`Viewport__Update`) when `event` is 2 or 3. Named after the dispatch mechanism (which tag reaches it), not after what tag 5 or event codes 2/3 mean in the game -- that is not established.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__OnNotifyTag5`. Slot +0x094 `onNotifyTag5`, onNotify's class-5 (D_8006EF50) case: counts in unk90 and runs +0x09C `update` on events 2 and 3. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

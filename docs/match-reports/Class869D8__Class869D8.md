@@ -50,3 +50,7 @@ freshly-installed table's own post-construct hook. The identity of the
 class and the fact that this occupies its own `ctor` slot (+0x008) are both
 evident from the body and from the vtable dump (`tools/classtable.py
 0x800869D8`).
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Class869D8's parent is Viewport (id 0x7, include/Viewport.h, round 85): the base ctor call is `GetViewportMethods()->ctor((Viewport *)self)`, replacing class_3bb8c.h's BaseCtorTable_3bb8c_c view. This is the ctor chain that makes 0x17 Viewport's subclass. Class869D8's own views are unchanged. Byte-identical.

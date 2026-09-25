@@ -57,3 +57,7 @@ own occupant slot on `Obj86B60Methods` is not otherwise identified.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 NOT TaskCore's: it occupies +0x018 (removeAllChildren) of gViewportMethods (Unk18Obj) and of gClass869D8Methods, and never of gTaskCoreMethods, and its three fields are Unk18Obj's child caches (unkC/unk10/unk30, set by Viewport__AddChild). `self` is now `Unk18Obj *` (the Obj86B60 view is gone); byte-identical. The name is left for Unk18Obj's own track-4 job.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Obj86B60__ResetAndRemoveAllChildren`. The +0x018 removeAllChildren override (also Class869D8's). Its old name was given when TaskCore was still viewed as `Obj86B60`, the table it was thought to belong to; it clears the same three child caches as AddChild/RemoveChild do, so it is named for its slot like them. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

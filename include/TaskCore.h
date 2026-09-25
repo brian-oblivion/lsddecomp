@@ -62,9 +62,11 @@
  * the one up-call that passes self alone casts the slot.
  *
  * The objects TaskCore holds from classes with no header yet (VabStreamObj,
- * BgLayer, TileMap, TileAtlas, the slot and list widgets, the viewport's
- * Unk18Obj) are `BasicClass *`, the parent every one of them has; a unit
- * that calls one past BasicClass's slots casts to its own view of it.
+ * BgLayer, TileMap, TileAtlas, the slot and list widgets) are `BasicClass *`,
+ * the parent every one of them has; a unit that calls one past BasicClass's
+ * slots casts to its own view of it. The viewport (IntermediateBase's field)
+ * is a Viewport, unified in include/Viewport.h in round 85; its callers cast
+ * to that type.
  */
 
 typedef struct TaskCore TaskCore;

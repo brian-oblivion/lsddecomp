@@ -56,3 +56,7 @@ precedent already used elsewhere in this codebase for a gated-forward shape
 inventing a semantic verb ("Notify"/"Release"/etc.) the body does not
 support. `unk10`/`unk70` themselves are left unnamed -- no evidence beyond
 "nonzero gate" exists for either.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+The forward is Viewport's +0x09C `update` (`GetViewportMethods()->update((Viewport *)self)`, include/Viewport.h, round 85). In Viewport's layout, `unk10` is `viewNode` and `unk70` is `otReady`; Class869D8's own view keeps its names. Byte-identical.

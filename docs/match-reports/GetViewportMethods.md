@@ -40,3 +40,7 @@ comment to reflect it is now matched, not external.
 ## Naming
 
 `GetUnk18ObjMethods` -- tier A. Plain no-argument getter, `return &gViewportMethods;` -- `Unk18Obj`'s own class table. Named to match the established sibling convention for this exact shape (`Get_vtable_BasicClass`, `GetClass6E99CMethods`, `GetClass86AA0Methods`), which is a free function (no `self`), not a `Class__Method`.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `GetUnk18ObjMethods`. The table getter, named `Get<Class>Methods` like the other unified classes. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

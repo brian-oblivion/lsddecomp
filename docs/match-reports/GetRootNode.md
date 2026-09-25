@@ -72,3 +72,7 @@ rather than recognizing the guard as already covered by the loop.
 ## Naming
 
 `Unk18Obj__GetTail` -- tier A. Walks `self->unkC` while non-NULL to find the tail of a singly-linked chain rooted at `self`; a pure leaf whose mechanics (list-tail walk) are its whole purpose.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__GetTail`. Not a Viewport method: it is in no table, and its one caller, Viewport__Update, passes it the view node, a Class6B5CC. The chain it walks is +0x00C, Class6B5CC's `parent` (DrawNode's `parent` too), so it returns the top of the node's hierarchy: renamed GetRootNode, typed `Class6B5CC *GetRootNode(Class6B5CC *node)`, byte-identical. The Viewport class is unified in `include/Viewport.h` (round 85).

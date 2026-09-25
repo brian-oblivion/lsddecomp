@@ -50,3 +50,7 @@ void Viewport__SetViewPoint(Unk18Obj *self, Vec3_2cc8c *a1) {
 ## Naming
 
 `Unk18Obj__SetViewPos` -- tier B. Copies `a1` wholesale into `self->unk14`, guarded by `self->unk10`. The ONLY other reader of `unk14` in this unit is `Viewport__Update`, which hands `&self->unk14` straight to Sony's `GsSetRefView2` (a GPU reference-viewpoint setter) -- a real, identified consumer, which is why this crosses from a bare `SetUnk14` into a purpose-carrying name, but still tier B (the consumer establishes 'some kind of view position', not the field's full meaning).
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__SetViewPos`. Renamed for the GsRVIEW2 member it writes: `refView.vp`, the viewpoint (&self+0x014 is GsSetRefView2's argument). Slot +0x078 `setViewPoint`, parameter `Vec3_d294 *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

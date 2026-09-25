@@ -78,3 +78,7 @@ tag-keyed cached reference, THEN forwards to
   type scope (rename in `Unk18ObjMethods`'s own definition, fix the
   compiler-listed accessors in both `code_2cc8c_c.c` and
   `code_2cc8c_d.c`, oracle).
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__RemoveChild`. The +0x014 removeChild override; clears the caches AddChild fills (`refView.super`, `viewNode`, `drawSystem`). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

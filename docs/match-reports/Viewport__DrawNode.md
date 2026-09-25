@@ -77,3 +77,7 @@ A dead 8-byte aggregate in the INNER block reproduces unused frame bytes that si
 inner-block aggregate; placement of the filler follows the same block rule as the live
 aggregate (outer-block address-taken scalars first, then inner-block aggregates in
 declaration order).
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__DrawNode`. Slot +0x0A0 `drawNode`. `self` is now `Viewport *`: DrawView's names were carried into the header at their offsets (width/height -> screenSize.width/height, otLen -> otLength, buf -> otIndex; ot, projH, nearZ, zDiv unchanged). The node keeps code_2864's local DrawNode view, so the method is not prototyped in Viewport.h. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

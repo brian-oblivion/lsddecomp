@@ -82,3 +82,7 @@ its own cleanup, then calls the base finalize" idiom, which is what
 licenses the name despite `slot90`/`slot74`/`slotA8`'s own occupants being
 unidentified (left as `slotNN`, insufficient evidence for a name, tier
 C/unnamed).
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__Finalize`. The +0x00C finalize override: deinitOt (+0x090), detachViewChild (+0x074), releases sceneRoot, setSubHandle(NULL) (+0x0A8), then BasicClass's finalize. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

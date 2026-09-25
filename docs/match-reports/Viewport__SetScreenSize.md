@@ -56,3 +56,7 @@ to sequential per-field code.
 ## Naming
 
 `Unk18Obj__SetUnk34` -- tier A. Whole-struct-assignment setter for `unk34` (a `Pair32_d294`); one instruction group, no guard, no other effect. Field's own real meaning is not established (kept `unk34`, not renamed -- see `## Proposed field names`), so the function is named after its mechanics only.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+Renamed from `Unk18Obj__SetUnk34`. Renamed for the field it stores: +0x034 is `screenSize` (width, height), which Viewport__DrawNode reads as the screen size its box and screen-space sprite paths take percentages of (DrawView's `width`/`height`). Slot +0x044 `setScreenSize`; the parameter is a `ViewportSize *` (the former Pair32_d294, same two words, same lw,lw,sw,sw copy). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
