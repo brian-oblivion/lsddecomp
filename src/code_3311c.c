@@ -74,7 +74,7 @@ void FlatLightObj__SetColor(FlatLightObj *self, s32 update, FlatLightColor *rgb)
     }
     GsSetFlatLight(self->lightId, &self->light);
 }
-void func_80042A2C(FlatLightObj *self, s32 update, s16 *dir) {
+void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
     if (update) {
         self->light.vx = dir[0];
         self->light.vy = dir[1];

@@ -1,4 +1,6 @@
-# func_80042A2C -- MATCHED (20/20 words, round 81, alpha)
+# FlatLightObj__SetDirection -- MATCHED (20/20 words, round 81, alpha)
+
+> Renamed from `func_80042A2C` on 2026-09-25 (tools/rename.py). Address 0x80042a2c.
 
 **Unit:** `src/code_3311c.c` (carved from `psyq_3311c` in FINISHING-PLAN revision 18). **Class:** method table `D_8006F06C` (class id 0x6, direct BasicClass child), read here as `FlatLightObj`: a 0x20-byte BasicClass holding a Psy-Q light id at +0x00C and a `GsF_LIGHT` (LIBGS.H) at +0x010. The name is a hypothesis from the `GsSetFlatLight` calls, not evidence. Slots resolved with `python3 tools/classtable.py D_8006F06C`.
 
@@ -11,7 +13,7 @@ slot +0x048 (`setDirection`): if `update`, widen three `s16` into the light's vx
 ## Source
 
 ```c
-void func_80042A2C(FlatLightObj *self, s32 update, s16 *dir) {
+void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
     if (update) {
         self->light.vx = dir[0];
         self->light.vy = dir[1];
