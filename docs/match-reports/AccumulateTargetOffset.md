@@ -1,4 +1,6 @@
-# func_800204D0 -- MATCHED (16/16 words), round 82
+# AccumulateTargetOffset -- MATCHED (16/16 words), round 82
+
+> Renamed from `func_800204D0` on 2026-09-25 (tools/rename.py). Address 0x800204d0.
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
@@ -14,7 +16,7 @@ typedef struct Target_fa50 { u8 pad0[0x6]; s16 unk6; } Target_fa50;
 typedef struct Inner_fa50 { u8 pad0[0x10]; Target_fa50 *unk10; } Inner_fa50;
 typedef struct Outer_fa50 { u8 pad0[0x10]; Inner_fa50 *unk10; } Outer_fa50;
 
-void func_800204D0(Outer_fa50 *self, s32 *xy) {
+void AccumulateTargetOffset(Outer_fa50 *self, s32 *xy) {
     Target_fa50 *t = self->unk10->unk10;
 
     t->unk6 += xy[0] / 16;

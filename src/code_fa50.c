@@ -628,7 +628,7 @@ TmdPrim_fa50 *TmdModel__NextPrimitive(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n,
     (*count)++;
     return (TmdPrim_fa50 *)((u8 *)p + size);
 }
-void func_800204D0(Outer_fa50 *self, s32 *xy) {
+void AccumulateTargetOffset(Outer_fa50 *self, s32 *xy) {
     Target_fa50 *t = self->unk10->unk10;
 
     t->unk6 += xy[0] / 16;
