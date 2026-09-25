@@ -1073,7 +1073,62 @@ void func_800458B8(Obj458B8 *self) {
 void func_8004593C(Obj33808_50 *self) {
     self->unk50 = -1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045948);
+/* D_8006F614 +0x048: when this is the object in D_8008A940 -- with the
+ * stream running (+0x50), call the stream object's +0x050 (1, +0x5C); if
+ * +0x50 then went negative, count down the loops left at +0x58 and at the
+ * last one (or with none) call the stream's +0x064; clear +0x50, set +0x64,
+ * 0. Stopped with +0x64 set: tail-return its own +0x068. */
+typedef struct StreamMethods45948 {
+    /* +0x000 */ u8 pad0[0x50];
+    /* +0x050 */ void (*slot50)();
+    /* +0x054 */ u8 pad54[0x10];
+    /* +0x064 */ void (*slot64)();
+} StreamMethods45948;
+
+typedef struct Stream45948 {
+    /* +0x000 */ StreamMethods45948 *methods;
+} Stream45948;
+
+typedef struct Methods45948 {
+    /* +0x000 */ u8 pad0[0x68];
+    /* +0x068 */ s32 (*slot68)();
+} Methods45948;
+
+typedef struct Obj45948 {
+    /* +0x000 */ Methods45948 *methods;
+    /* +0x004 */ u8 pad4[0x4C];
+    /* +0x050 */ s32 unk50;
+    /* +0x054 */ s32 unk54;
+    /* +0x058 */ s32 loops;
+    /* +0x05C */ s32 unk5C;
+    /* +0x060 */ Stream45948 *unk60;
+    /* +0x064 */ s32 unk64;
+} Obj45948;
+
+s32 func_80045948(Obj45948 *self) {
+    Obj45948 *cur = (Obj45948 *)D_8008A940;
+
+    if (cur == self) {
+        if (cur->unk50 == 0) {
+            if (cur->unk64 == 0) {
+                goto out;
+            }
+        } else {
+            cur->unk60->methods->slot50(cur->unk60, 1, cur->unk5C);
+            if (cur->unk50 < 0) {
+                if (cur->loops == 0 || --cur->loops == 0) {
+                    cur->unk60->methods->slot64(cur->unk60);
+                }
+            }
+            self->unk50 = 0;
+            self->unk64 = 1;
+            return 0;
+        }
+        return cur->methods->slot68(cur);
+    }
+out:
+    ;
+}
 /* D_8006F614 +0x04C: when this is the object in D_8008A940, set +0x48,
  * clear +0x54, call the +0x60 object's +0x048, set +0x44, and the first
  * time (+0x64 clear) clear that object's +0x07C callback and set +0x64. */
