@@ -16,8 +16,8 @@ extern u8 SCALE_SIX[];
 /* Forward declarations: both are defined later in this file (in ROM
  * order), but Entity__MoodCue85 and Entity__MoodCue86 call them before their own
  * definitions appear -- same convention as Entity_d.c's own forward calls. */
-void func_80063C84(EntityMoodHandlerArg *out);
-void func_80063CAC(EntityMoodHandlerArg *out);
+void SetCueTones7_7_7(EntityMoodHandlerArg *out);
+void SetCueTones18_3_3(EntityMoodHandlerArg *out);
 
 void Entity__MoodCue82(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodState == 0 && this->moodTimer == 0) {
@@ -100,7 +100,7 @@ void Entity__MoodCue84(Entity *this, EntityMoodHandlerArg *out) {
 void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodState == 0) {
         if (this->unk84 == 5) {
-            func_80063C84(out);
+            SetCueTones7_7_7(out);
         }
         if (this->moodTimer == this->moodDuration) {
             this->methods->slot130(this);
@@ -111,7 +111,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer < 0xA) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
             if (this->target->methods->slot100(this->target) != 0) {
-                func_80063C84(out);
+                SetCueTones7_7_7(out);
                 this->moodState = 0xC;
                 this->moodTimer = -1;
             }
@@ -125,7 +125,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer < 0x1E) {
             this->methods->slotC4(this, -0xA, 0);
         } else {
-            func_80063C84(out);
+            SetCueTones7_7_7(out);
             if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)0x1E, 0) != NULL) {
                 this->unk100->methods->slotD4(this->unk100, this->unk50, 7, 0);
             }
@@ -141,7 +141,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
             }
             this->target->methods->slot44(this->target, 0, D_80089CD0);
         } else {
-            func_80063CAC(out);
+            SetCueTones18_3_3(out);
             this->target->methods->slot44(this->target, 1, ROTATION_YAW_PLUS180);
             this->methods->notifyParents(this, (rand() % 5 != 0) ? 0xA : 0xC);
             this->moodState = 0xE;
@@ -150,7 +150,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
         if (this->moodTimer < 0xA) {
             this->methods->updateRotation(this, 0, D_80089CDC);
         } else {
-            func_80063CAC(out);
+            SetCueTones18_3_3(out);
             this->methods->stopSoundCue(this);
             this->moodState = 1;
         }
@@ -164,7 +164,7 @@ void Entity__MoodCue86(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slot12C(this);
     }
     if (this->unk84 == 0xA) {
-        func_80063CAC(out);
+        SetCueTones18_3_3(out);
     }
     if (this->moodTimer == this->moodDuration + 0xA) {
         this->methods->stopSoundCue(this);
@@ -172,7 +172,7 @@ void Entity__MoodCue86(Entity *this, EntityMoodHandlerArg *out) {
     }
 }
 
-void func_80063C84(EntityMoodHandlerArg *out) {
+void SetCueTones7_7_7(EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     out->unk1C = 7;
     out->unk20 = -2;
@@ -182,7 +182,7 @@ void func_80063C84(EntityMoodHandlerArg *out) {
     out->unk48 = -2;
 }
 
-void func_80063CAC(EntityMoodHandlerArg *out) {
+void SetCueTones18_3_3(EntityMoodHandlerArg *out) {
     out->unk1C = 0x12;
     out->unk10 = 0;
     out->unk30 = 3;

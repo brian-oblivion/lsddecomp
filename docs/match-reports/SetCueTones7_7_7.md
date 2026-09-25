@@ -1,10 +1,12 @@
-# func_80063C84
+# SetCueTones7_7_7
+
+> Renamed from `func_80063C84` on 2026-09-25 (tools/rename.py). Address 0x80063c84.
 
 **Unit:** Entity_f · **Size:** 10 words · **Status:** MATCHED (10/10 words)
 
 ## What it does
 
-A trivial one-parameter setter, `void func_80063C84(EntityMoodHandlerArg
+A trivial one-parameter setter, `void SetCueTones7_7_7(EntityMoodHandlerArg
 *out)`: `out->unk10=0; out->unk1C=7; out->unk20=-2; out->unk30=7;
 out->unk34=-2; out->unk44=7; out->unk48=-2;`. Called from several other
 functions in this unit as a shared "reset to state 7" helper — the ONLY

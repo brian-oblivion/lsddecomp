@@ -1,11 +1,13 @@
-# func_80063CAC
+# SetCueTones18_3_3
+
+> Renamed from `func_80063CAC` on 2026-09-25 (tools/rename.py). Address 0x80063cac.
 
 **Unit:** Entity_f · **Size:** 7 words · **Status:** MATCHED (7/7 words)
 
 ## What it does
 
-Sibling of `func_80063C84`: another one-parameter `out`-only setter,
-`void func_80063CAC(EntityMoodHandlerArg *out)`: `out->unk1C=0x12;
+Sibling of `SetCueTones7_7_7`: another one-parameter `out`-only setter,
+`void SetCueTones18_3_3(EntityMoodHandlerArg *out)`: `out->unk1C=0x12;
 out->unk10=0; out->unk30=3; out->unk44=3;`.
 
 ## Derivation

@@ -9,7 +9,7 @@
 The biggest function in this unit: a `this->unk44`-keyed state machine
 (values `0`, `0xA`, `0xB`, `0xD`, `0xC`, in retail's ACTUAL test order —
 see below) driving this Entity's mood/AI transitions. Calls
-`func_80063C84`/`func_80063CAC` (this unit's own trivial `out`-only
+`SetCueTones7_7_7`/`SetCueTones18_3_3` (this unit's own trivial `out`-only
 setters, matched separately) at several transition points, plus
 `Class6B5CC__FaceTarget`, `Entity__GetOrCreateUnk100`, and two new `Unk100Methods` slots
 (`slotD4`, `slotD8`).
@@ -29,7 +29,7 @@ link's `bne` compares `this->unk44` against, i.e. the block immediately
 following belongs to `unk44 == 0xD`, not `0xC`. The block's own CONTENT
 (the `unkFC < 0x5A` / `Entity__GetOrCreateUnk100(...,0xA,...)` / `slotD8` /
 `slot44(unk94,0,D_80089CD0)` logic, vs. the sibling block's `unkFC < 0xA`
-/ `slot44(this,0,D_80089CDC)` / `func_80063CAC`+`slot16C`+`unk44=1`
+/ `slot44(this,0,D_80089CDC)` / `SetCueTones18_3_3`+`slot16C`+`unk44=1`
 logic) was derived correctly on the first pass; only the LABEL — which
 `unk44` value routes to which block — was backwards, discovered by
 re-tracing every delay-slot value link-by-link rather than reading each
