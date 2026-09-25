@@ -8,8 +8,22 @@
  * game's own libsnd build".
  *
  * Round 81 (delta): all seven functions matched. They are the whole of one
- * class, D_8006E4F0 (local view Class6E4F0 below): its ctor, empty dtor,
- * four own slots and the table getter.
+ * class, D_8006E4F0 (local view Class6E4F0 below, class id 0x60): its ctor
+ * (`Class6E4F0__Class6E4F0`), empty finalize override, four own slots
+ * (`SetScreenDims`, `InitSystems`, a no-op, and `RunMainLoop` -- the
+ * subclass Class6D3C8's per-frame dispatcher, first run from `src/main.c`)
+ * and the table getter.
+ *
+ * Round 81 (delta), track 3 naming pass: all seven functions and both
+ * unit-local globals (`gCdInitDone`, `gDefaultScreenDims`) named -- tiers
+ * and evidence in each function's own match report's `## Naming` section.
+ * One exception: `func_8003B20C` (the table getter, proposed
+ * `GetClass6E4F0Methods`) is NOT renamed -- `tools/rename.py` cannot apply
+ * it because this address already carried an explicit, now-stale, track-2
+ * "unidentified" line in the symbols file and the tool's placeholder-name
+ * address resolution never finds it to replace; see
+ * docs/match-reports/func_8003B20C.md and the round-81 broadcast for the
+ * head to apply by hand.
  */
 #include "common.h"
 #include "BasicClass.h"
@@ -53,10 +67,10 @@ typedef struct Class6E4F0Source {
 
 struct Class6E4F0Methods {
     BASICCLASS_SLOTS(Class6E4F0, (Class6E4F0 *self, s32 source));
-    /* +0x040 */ void (*setDims)(Class6E4F0 *self, ScreenDims *dims, s32 arg); /* Class6E4F0__SetScreenDims */
-    /* +0x044 */ void (*init)(Class6E4F0 *self, Class6E4F0Source *source, s32 arg); /* Class6E4F0__InitSystems */
+    /* +0x040 */ void (*setScreenDims)(Class6E4F0 *self, ScreenDims *dims, s32 arg); /* Class6E4F0__SetScreenDims */
+    /* +0x044 */ void (*initSystems)(Class6E4F0 *self, Class6E4F0Source *source, s32 arg); /* Class6E4F0__InitSystems */
     /* +0x048 */ void (*slot48)(Class6E4F0 *self);                             /* Class6E4F0__NoOpSlot48, empty */
-    /* +0x04C */ void (*run)(Class6E4F0 *self);                                /* Class6E4F0__RunMainLoop */
+    /* +0x04C */ void (*runMainLoop)(Class6E4F0 *self);                                /* Class6E4F0__RunMainLoop */
     /* +0x050.. the subclass's slots, called by Class6E4F0__RunMainLoop */
     /* +0x050 */ void (*slot50)(Class6E4F0 *self);
     /* +0x054 */ void (*slot54)(Class6E4F0 *self);
@@ -98,7 +112,7 @@ void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 source) {
     }
     self->initialized = 0;
     SetActiveDataSource(source);
-    self->methods->setDims(self, &gDefaultScreenDims, 0);
+    self->methods->setScreenDims(self, &gDefaultScreenDims, 0);
 }
 
 void Class6E4F0__Finalize(Class6E4F0 *self) {
