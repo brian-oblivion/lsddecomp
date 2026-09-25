@@ -66,4 +66,5 @@ Src6F240 moved up the file to precede this function (no layout change); Tod__Tod
 
 ## Naming
 
-- **LinkResource__LinkResource**, tier A. Constructor of the class external code already names LinkResource.
+- **LinkResource__LinkResource**, tier B (head review, round 83: was A). Constructor of the class external code already names LinkResource.
+  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.

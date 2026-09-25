@@ -42,4 +42,5 @@ First build; the same shape as TodSet__TodSet (D_8006F590's ctor). The allocator
 
 ## Naming
 
-- **TriggerWorld__TriggerWorld**, tier A. Constructor: the parent ModelData's ctor (owns=0), then this table; runs its own Load when the argument's first word is set.
+- **TriggerWorld__TriggerWorld**, tier B (head review, round 83: was A). Constructor: the parent ModelData's ctor (owns=0), then this table; runs its own Load when the argument's first word is set.
+  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.

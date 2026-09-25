@@ -44,4 +44,5 @@ void *New_LinkResource(s32 arg0) {
 
 ## Naming
 
-- **New_LinkResource**, tier A. src/class_3bb8c.c and include/code_55dd4.h already declare this allocator's return type as `LinkResource *` at their own call sites.
+- **New_LinkResource**, tier B (head review, round 83: was A). src/class_3bb8c.c and include/code_55dd4.h already declare this allocator's return type as `LinkResource *` at their own call sites.
+  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
