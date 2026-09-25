@@ -60,7 +60,21 @@ D_80081940Obj *func_80048894(void) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800488E4);
+/* slot +0x008 of D_80081940 (ctor) */
+void func_800488E4(D_80081940Obj *self) {
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_80048CE0();
+    self->unk30 = -1;
+    self->unk2C = 0;
+    self->unk2E = 0;
+    self->unk32 = 0;
+    self->unk34 = NULL;
+    self->unk38 = 1;
+    self->buffer = BMemPMgrAlloc(0xB358);
+    if (self->buffer != NULL) {
+        self->bufferSize = 0xB358;
+    }
+}
 /* slot +0x00C of D_80081940 (finalize) */
 void func_80048960(D_80081940Obj *self) {
     self->methods->releaseAlloc(self);
