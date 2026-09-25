@@ -463,7 +463,18 @@ extern s32 D_8006F514[];
 void *func_800451A8(void) {
     return D_8006F514;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800451B8);
+/* Allocate and construct a D_8006F590 object; freed and NULL when the constructor fails. */
+void *func_800451B8(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x2C);
+
+    if (obj != NULL) {
+        if (((Ctor33808 *)func_80045428())->ctor(obj, arg0)) {
+            return obj;
+        }
+        BMemPMgrFree(obj);
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045228);
 /* D_8006F590 +0x00C: finalize -- release the buffer's counted object array,
  * then the parent D_8006F240's. */
