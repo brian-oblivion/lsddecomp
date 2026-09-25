@@ -135,7 +135,18 @@ void func_8004728C(CdStreamObj *self) {
         }
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800472EC);
+void func_800472EC(CdStreamObj *self, u8 *loc) {
+    if (self->unk2C != 2 && D_8008A950 == self) {
+        if (self->cb54 != NULL) {
+            CdSyncCallback(func_80047388);
+            CdControlF(0x15, loc);
+        } else {
+            while (CdControl(0x15, loc, 0) == 0) {
+            }
+        }
+        self->unk2C = 1;
+    }
+}
 void func_80047388(u8 status, u8 *result) {
     if (D_8008A950 != NULL && status == 2) {
         CdSyncCallback(NULL);
