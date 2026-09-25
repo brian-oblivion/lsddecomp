@@ -853,6 +853,11 @@
           "date": "2026-09-25",
           "header": "include/Actor.h"
         },
+        "gClass65650Methods": {
+          "class": "Class65650",
+          "date": "2026-09-25",
+          "header": "include/Class65650.h"
+        },
         "gClass6B5CCMethods": {
           "class": "Class6B5CC",
           "date": "2026-09-25",
