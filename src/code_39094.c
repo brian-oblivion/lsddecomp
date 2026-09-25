@@ -7,28 +7,55 @@
  * and helpers called only from Class6D3C8, Obj865C8 and ObjM code (stream
  * tasks, the intro logo sequence).
  *
- * Nothing here is matched yet: every function is fresh track-1 ground.
+ * Round 82 matched ten of the small methods and record accessors; the rest
+ * are still INCLUDE_ASM.
  */
 #include "common.h"
 #include "Class6D430.h"
+
+/* The D_80081940 object: a Class6D430 data source with its own fields from
+ * +0x2C (local view; only this unit's methods read them). */
+typedef struct D_80081940Obj {
+    CLASS6D430_FIELDS(Class6D430Methods);
+    /* +0x02C */ u16 unk2C;
+    /* +0x02E */ u16 unk2E;
+    /* +0x030 */ u8 pad30[4];
+    /* +0x034 */ void *unk34;   /* BMemPMgr allocation, released by slot +0x084 */
+    /* +0x038 */ s32 unk38;
+} D_80081940Obj;
+
+/* One 0x1C-byte record of the table func_80048D48 returns (D_80081A04,
+ * 0x230 records); only its size is known here. */
+typedef struct Rec1C {
+    u8 data[0x1C];
+} Rec1C;
+
+extern int rand(void);
+extern void srand(unsigned int seed);
+extern void *BMemPMgrFree(void *ptr);
+extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048894);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800488E4);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048960);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800489B4);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048A68);
+/* slot +0x074 of D_80081940 (cancelRequests) */
+void func_80048A68(D_80081940Obj *self) {
+    GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
+    self->unk2C = 0;
+    self->unk2E = 0;
+    self->unk2A = 0;
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048AAC);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048B78);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048BC0);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048C98);
-/* The D_80081940 object: a Class6D430 data source with its own fields from
- * +0x2C (local view; only this unit's methods read them). */
-typedef struct D_80081940Obj {
-    CLASS6D430_FIELDS(Class6D430Methods);
-    /* +0x02C */ u8 pad2C[0xC];
-    /* +0x038 */ s32 unk38;
-} D_80081940Obj;
-
+/* slot +0x084 of D_80081940 */
+void func_80048C98(D_80081940Obj *self) {
+    self->unk2E = 0;
+    if (self->unk34 != NULL) {
+        self->unk34 = BMemPMgrFree(self->unk34);
+    }
+}
 extern u8 D_80081940[];   /* method table, 34 slots */
 extern s32 D_8008A960;
 extern s32 D_8008A964;
@@ -49,7 +76,12 @@ void *func_80048CE0(void) {
 s32 func_80048CF0(void) {
     return D_8008A960;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048CFC);
+s32 func_80048CFC(s32 seed) {
+    if (seed != 0) {
+        srand(seed);
+    }
+    return rand();
+}
 void func_80048D28(s32 a, s32 b) {
     if (a >= 0) {
         D_8008A964 = a;
@@ -71,18 +103,26 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048D74);
 char **func_80048DF8(void) {
     return &D_8008A96C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048E08);
+char *func_80048E08(void) {
+    return *func_80048DF8();
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048E2C);
-void *func_80048E2C(s32 index);
+Rec1C *func_80048E2C(s32 index);
 
-void *func_80048E80(s32 index) {
+Rec1C *func_80048E80(s32 index) {
     return func_80048E2C(index);
 }
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048EA0);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048F60);
+Rec1C *func_80048F60(s32 index) {
+    return &func_80048E2C(index)[4];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048F84);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_8004903C);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049060);
+Rec1C *func_8004903C(s32 index) {
+    return &func_80048E2C(index)[9];
+}
+Rec1C *func_80049060(s32 index, s32 sub) {
+    return &func_8004903C(index)[sub];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049098);
 const char *func_800490F4(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
@@ -90,11 +130,26 @@ const char *func_800490F4(s32 *typeCodeOut) {
     }
     return D_800113DC;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049110);
+Rec1C *func_80049110(s32 *countOut) {
+    if (countOut != NULL) {
+        *countOut = 0;
+    }
+    return &((Rec1C *)func_80048D48(NULL))[0x230];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_8004913C);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800491CC);
+Rec1C *func_800491CC(s32 *countOut) {
+    if (countOut != NULL) {
+        *countOut = 7;
+    }
+    return &((Rec1C *)func_80048D48(NULL))[0x237];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800491FC);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049240);
+Rec1C *func_80049240(s32 *countOut) {
+    if (countOut != NULL) {
+        *countOut = 8;
+    }
+    return &((Rec1C *)func_80048D48(NULL))[0x238];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049270);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800492D0);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049334);
