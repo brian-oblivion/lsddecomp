@@ -6,8 +6,7 @@
  * those, and no Sony fingerprint). What it holds: the 18 methods of
  * D_800817E0.
  *
- * Round 81 matched the ten smallest methods (empty slots, the table getter,
- * the libcd/libspu wrappers); the rest are still INCLUDE_ASM.
+ * Round 82 matched all 18 methods (the unit has no INCLUDE_ASM left).
  */
 #include "common.h"
 #include "BasicClass.h"
@@ -61,6 +60,7 @@ CdStreamObjMethods *func_80047900(void);
 void func_80047388(u8 status, u8 *result);
 void func_800477B0(CdStreamObj *self, u32 *base, u32 frame);
 void func_80047810(CdStreamObj *self);
+s32 func_80047240(CdStreamObj *self);
 
 /* LIBCD.H */
 extern void StSetRing(u32 *ring_addr, u32 ring_size);
@@ -73,6 +73,15 @@ extern int CdControl(u8 com, u8 *param, u8 *result);
 extern int CdControlF(u8 com, u8 *param);
 extern int CdRead2(u32 mode);
 extern int StGetNext(u32 **addr, u32 **header);
+extern void *CdSearchFile(void *fp, char *name);
+
+/* libc2 (Sony's, linked) */
+extern char *strcpy(char *dest, char *src);
+extern char *strcat(char *dest, char *src);
+
+void *func_800270B8(void);   /* code_171e0.c: the data directory string */
+extern s32 D_8008A94C;
+extern char D_8008A954[];    /* ";1" */
 extern void StSetStream(u32 mode, u32 start_frame, u32 end_frame, void (*func1)(), void (*func2)());
 
 extern void *BMemPMgrAlloc(s32 size);
@@ -133,7 +142,35 @@ void func_800470C8(CdStreamObj *self, u32 *ring, u32 size) {
         self->ring = ring;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047114);
+s32 func_80047114(CdStreamObj *self, char *name, s32 tries) {
+    char path[0x20];
+    s32 n;
+
+    n = tries;
+    if (self->unk2C == 0) {
+        if (self->ring == NULL) {
+            return 1;
+        }
+        if (D_8008A950 != NULL) {
+            return 0;
+        }
+        path[0] = '\\';
+        strcpy(&path[1], func_800270B8());
+        strcat(path, name);
+        strcat(path, D_8008A954);
+        while (CdSearchFile(self->loc, path) == 0) {
+            if (n >= 0 && --tries < 0) {
+                return 1;
+            }
+        }
+        self->unk40 = *(u32 *)&self->loc[4] / self->unk38;
+        D_8008A94C = func_80047240(self);
+        D_8008A950 = self;
+        self->methods->seek(self, self->loc);
+        return 0;
+    }
+    return 1;
+}
 s32 func_80047240(CdStreamObj *self) {
     SpuCommonAttr attr;
 
