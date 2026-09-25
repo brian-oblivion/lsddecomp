@@ -44,13 +44,15 @@ struct CdStreamObj {
     /* +0x024 */ u8 cdResult[8];      /* CdSync result buffer (func_800478D0) */
     /* +0x02C */ s32 unk2C;           /* state: 0 idle, 1 seeking, 2, 4 */
     /* +0x030 */ s32 muted;           /* func_800475D8 / func_80047638 */
-    /* +0x034 */ u8 pad34[0x44 - 0x34];
+    /* +0x034 */ s32 unk34;           /* < 4 selects read mode 0x1C0, else 0x140 */
+    /* +0x038 */ u8 pad38[0x40 - 0x38];
+    /* +0x040 */ s32 unk40;
     /* +0x044 */ void *cbArg;
     /* +0x048 */ void (*cb48)(void *arg);
     /* +0x04C */ void (*cb4C)(void *arg);
     /* +0x050 */ u32 *ring;           /* StSetRing's ring_addr (func_800470C8) */
     /* +0x054 */ void (*cb54)(void *arg);
-    /* +0x058 */ u8 pad58[0x5C - 0x58];
+    /* +0x058 */ s32 unk58;
 };
 
 extern CdStreamObjMethods D_800817E0;  /* the class's method table */
@@ -66,6 +68,8 @@ extern int CdSync(int mode, u8 *result);
 extern void *CdSyncCallback(void (*func)(u8 status, u8 *result));
 extern int CdControl(u8 com, u8 *param, u8 *result);
 extern int CdControlF(u8 com, u8 *param);
+extern int CdRead2(u32 mode);
+extern void StSetStream(u32 mode, u32 start_frame, u32 end_frame, void (*func1)(), void (*func2)());
 
 extern void *BMemPMgrAlloc(s32 size);
 extern CdStreamObj *D_8008A950;  /* the active stream object */
@@ -158,7 +162,26 @@ void func_80047388(u8 status, u8 *result) {
         }
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800473E4);
+void func_800473E4(CdStreamObj *self, u32 startFrame, s32 arg2) {
+    u32 mode;
+
+    if (self->unk2C == 1 && D_8008A950 == self) {
+        mode = 0x140;
+        if (self->unk34 < 4) {
+            mode = 0x1C0;
+        }
+        if (arg2 != 0) {
+            self->unk40 = arg2;
+        }
+        self->unk58 = 0;
+        StSetStream(0, startFrame, -1, 0, 0);
+        self->methods->mute(self);
+        while (CdControl(2, self->loc, 0) == 0 || CdRead2(mode) == 0) {
+        }
+        self->methods->demute(self);
+        self->unk2C = 2;
+    }
+}
 void func_800474C8(CdStreamObj *self) {
     if (self->unk2C == 2 && D_8008A950 == self) {
         self->methods->mute(self);
