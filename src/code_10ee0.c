@@ -157,7 +157,15 @@ void func_80020A24(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) {
     MoveImage(&rect, x, y);
 }
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020A74);
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020AF4);
+void func_80020AF4(Class6C070 *self) {
+    Class6C070 *obj = func_80020C5C();
+
+    obj->unk24++;
+    if (obj->unk24 >= obj->unk20 && obj->unkC == 0) {
+        obj->unkC = 1;
+        obj->unk24 = 0;
+    }
+}
 void func_80020B4C(Class6C070 *self, s32 value) {
     if (self->unk10 == 0) {
         self->unk20 = value;
