@@ -28,7 +28,7 @@
  *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
  *     two hardcoded constants.
  *   - SeAutoPan / SetAutoPan: a linear-ramp pair over _svm_voice
- *     +0x28..+0x32 (include/SvmVoice.h) -- Se sets a start/target/step-rate;
+ *     +0x28..+0x32 (include/SvmData.h) -- Se sets a start/target/step-rate;
  *     Step advances the accumulator (throttled by an interval/countdown
  *     pair), clamps at the target, and writes the resulting stereo output
  *     level.
@@ -61,7 +61,7 @@
  * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
  */
 #include "common.h"
-#include "SvmVoice.h"
+#include "SvmData.h"
 
 /* Round 48 (echo): testing charlie's ContDataEntry frame-padding lever on
  * this function's frame gap (0x10 built vs retail's 0x18, 8 bytes; retail
@@ -71,7 +71,7 @@
  * full derivation this body is otherwise unchanged from.
  *
  * This function sits FIRST in ROM order in this unit, so the shared
- * record-family types its sibling stalls also use (Rec16D7F0, ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
+ * record-family types its sibling stalls also use (ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
  * defined HERE instead of duplicated -- their old definitions further
  * down this file (originally written for SetAutoPan's isolated splice)
  * are removed; the plain externs that used to accompany them there are
@@ -79,15 +79,6 @@
  * (a harmless duplicate extern declaration, not a redefinition). Same
  * "move the shared prelude up, do not duplicate" fix round 37 already
  * used here; declaration order carries no code. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x10 - 0x2];
-} Rec16D7F0;
-extern Rec16D7F0 _svm_sreg_buf[];
-extern Rec16D7F0 D_8008D7F2[];
-
-extern u8 _svm_sreg_dirty[];
-
 typedef struct {
     u8 pad[0x12];
     u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per SpuVmKeyOn's report */
@@ -552,18 +543,6 @@ typedef struct {
 } Tbl32E978;
 extern Tbl32E978 *D_8008E978;
 
-/* Same 0x10-byte-stride record family code_179d8_j.c documents as
- * Rec16D7F0 (that unit's _svm_sreg_buf/D_8008D7F4 pair); local view. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    u8 pad2[0x10 - 0x2];
-} Rec16D7F4;
-extern Rec16D7F4 D_8008D7F4[];
-
-/* Plain byte-stride flags array (no per-record multiply in its own
- * addressing -- unlike every 0x34/0x10-stride array above). */
-extern u8 _svm_sreg_dirty[];
-
 /* Selected-channel debug byte, write-only here. */
 extern u8 D_8008EA18;
 
@@ -626,7 +605,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
     byteVal = *(u8 *) &_svm_voice[a0].unk14;
     D_8008EA26 = a0;
     D_8008EA18 = byteVal;
-    D_8008D7F4[a0].unk0 = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
+    _svm_sreg_buf[a0].unk4 = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
     _svm_sreg_dirty[a0] |= 4;
     return 1;
 }
@@ -684,21 +663,6 @@ typedef struct {
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 extern void SetAutoVol(s16 a0);
 extern void SetAutoPan(s16 a0);
-extern Rec16D7F4 D_8008D7F6[];
-
-/* Same 0x10-byte-stride record family as `Rec16D7F0`/_svm_sreg_buf's other
- * field (declared above, `unk0` only) -- this function ALSO reads this
- * array's `+0x2`, `+0x8` and `+0xA` sub-fields, so it needs a wider
- * local view of the same base symbol, reached via a cast per this
- * project's multiple-independent-local-views convention. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    s16 unk2; /* +0x2 */
-    u8 pad4[0x8 - 0x4];
-    s16 unk8; /* +0x8 */
-    s16 unkA; /* +0xA */
-    u8 padC[0x10 - 0xC];
-} Rec16D7F0Wide;
 
 /* D_8006DAD4, already declared above as `ObjDAD4 *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
@@ -781,7 +745,7 @@ void SpuVmFlush(void) {
     }
 
     {
-    Rec16D7F0Wide *p7F0 = _svm_sreg_buf;
+    SvmSreg *p7F0 = _svm_sreg_buf;
 
     for (i = 0; i < 0x18; i++) {
         if (_svm_sreg_dirty[i] & 1) {
@@ -789,10 +753,10 @@ void SpuVmFlush(void) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk2 = p7F0->unk2;
         }
         if (_svm_sreg_dirty[i] & 4) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = D_8008D7F4[i].unk0;
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = _svm_sreg_buf[i].unk4;
         }
         if (_svm_sreg_dirty[i] & 8) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = D_8008D7F6[i].unk0;
+            ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = _svm_sreg_buf[i].unk6;
         }
         if (_svm_sreg_dirty[i] & 0x10) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk8 = p7F0->unk8;

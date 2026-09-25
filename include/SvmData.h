@@ -1,9 +1,14 @@
-#ifndef SVMVOICE_H
-#define SVMVOICE_H
+#ifndef SVMDATA_H
+#define SVMDATA_H
 
 #include "common.h"
 
 /*
+ * SvmData.h -- libsnd vmanager's per-voice bss tables: _svm_sreg_buf,
+ * _svm_sreg_dirty and _svm_voice. (Round 86 created this file as
+ * SvmVoice.h for _svm_voice alone and renamed it when the other two
+ * joined.)
+ *
  * SvmVoice -- one record of libsnd's per-voice table _svm_voice.
  *
  * Sony's, not the game's. libsnd/vmanager.o (Psy-Q disc 3.5) defines the
@@ -70,5 +75,26 @@ typedef struct SvmVoice {
 } SvmVoice; /* 0x34 */
 
 extern SvmVoice _svm_voice[]; /* 24 voices */
+
+/*
+ * SvmSreg -- one record of libsnd's _svm_sreg_buf, the per-voice shadow
+ * of the SPU voice registers that SpuVmFlush copies out through
+ * D_8006DAD4 (the SPU voice register block) for every voice whose
+ * _svm_sreg_dirty byte has bits set. Same provenance and naming rule as
+ * SvmVoice: libsnd/vmanager.o bss +0x000, 24 voices x 0x10, 0x8008D7F0;
+ * fields by offset only.
+ */
+typedef struct SvmSreg {
+    s16 unk0; /* +0x0 -- SpuVmFlush copies +0x0/+0x2 out when dirty bit 0x1 is set */
+    s16 unk2; /* +0x2 */
+    u16 unk4; /* +0x4 -- note2pitch2 result (SePitchBend, SpuVmPBVoice); copied out on dirty bit 0x4 */
+    u16 unk6; /* +0x6 -- copied out on dirty bit 0x8 */
+    s16 unk8; /* +0x8 -- SsUtChangeADSR stores its p4; +0x8/+0xA copied out on dirty bit 0x10 */
+    s16 unkA; /* +0xA -- SsUtChangeADSR stores its p5 */
+    u8 padC[0x10 - 0xC];
+} SvmSreg; /* 0x10 */
+
+extern SvmSreg _svm_sreg_buf[];   /* 24 voices */
+extern u8 _svm_sreg_dirty[];      /* 24 voices: which _svm_sreg_buf fields SpuVmFlush must copy out */
 
 #endif

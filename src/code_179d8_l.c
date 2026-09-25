@@ -24,7 +24,7 @@
  * screened against are RESOLVED project-wide (CLAUDE.md).
  */
 #include "common.h"
-#include "SvmVoice.h"
+#include "SvmData.h"
 
 /* Matched round 73 -- docs/match-reports/ServiceSoundCueSet.md.
  * Round 75 (naming): `self`/`set` confirmed the same objects
@@ -227,7 +227,6 @@ extern u8 D_8008EA1A;
 extern s16 D_8008E8C0;
 extern u16 D_8008EA22;
 extern u8 D_8008EA20;
-extern u8 _svm_sreg_dirty[];
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 extern u16 D_80090C60;
@@ -259,9 +258,6 @@ extern u8 D_8008EA10;
  * and spend one word per read, which is retail. Retail's five reloads come
  * from ordinary CSE invalidation by the stores between them. */
 extern s16 D_8008EA26[];
-
-/* Independent 0x10-byte-stride s16 array. */
-extern s16 D_8008D7F4[];
 
 void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D800902E8Entry *e;
@@ -320,9 +316,9 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     pan1out = (s16)(pan1sq / 16383);
     pan2sq = pan2 * pan2;
 
-    D_8008D7F4[(u16)chanIdx] = (s16)a1;
-    D_8008D7F4[(u16)chanIdx - 2] = pan1out;
-    D_8008D7F4[(u16)chanIdx - 1] = (s16)(pan2sq / 16383);
+    ((s16 *)_svm_sreg_buf)[(u16)chanIdx + 2] = (s16)a1;
+    ((s16 *)_svm_sreg_buf)[(u16)chanIdx] = pan1out;
+    ((s16 *)_svm_sreg_buf)[(u16)chanIdx + 1] = (s16)(pan2sq / 16383);
 
     _svm_sreg_dirty[D_8008EA26[0]] |= 7;
     _svm_voice[D_8008EA26[0]].unk04 = (s16)a1;
@@ -383,8 +379,6 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
 extern u16 *D_8006DAD4;
-extern u8 _svm_sreg_buf[];
-extern u8 D_8008D7F2[];
 extern u8 D_8008E9D0;
 
 /* STALL -- see docs/match-reports/vmNoiseOn.md. Best body reached
@@ -400,7 +394,6 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn);
 
 void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
-    s32 off16;
     s32 v1;
     s32 lowBit;
     s32 highBit;
@@ -409,10 +402,9 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
 
     a3 = a0;
     a0 = (u8)a0;
-    off16 = a0 << 4;
-    *(u16 *)(D_8008D7F2 + off16) = a2;
+    _svm_sreg_buf[a0].unk2 = a2;
     v1 = _svm_sreg_dirty[a0];
-    *(u16 *)(_svm_sreg_buf + off16) = a1;
+    _svm_sreg_buf[a0].unk0 = a1;
     v1 |= 3;
     _svm_sreg_dirty[a0] = v1;
     if ((u32)a0 < 16) {
@@ -518,7 +510,6 @@ s32 note2pitch2(s32 a0, s32 a1) {
 
 /* Matched round 73 -- docs/match-reports/SePitchBend.md. */
 extern s16 D_8008EA26[];
-extern u8 _svm_sreg_dirty[];
 
 void SePitchBend(s32 chan, s32 bend) {
     s32 off;

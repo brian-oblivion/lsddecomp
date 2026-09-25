@@ -53,7 +53,7 @@
  */
 
 #include "common.h"
-#include "SvmVoice.h"
+#include "SvmData.h"
 
 /* ------------------------------------------------------------------------
  * Cross-unit calls, typed per-call-site from the registers loaded before
@@ -86,23 +86,6 @@ typedef struct EntryDAD4 {
 } EntryDAD4;
 extern EntryDAD4 *D_8006DAD4;
 
-/* 16 (0x10)-byte-stride record with two s16 fields 2 bytes apart --
- * modeled as ONE struct here (not two independent arrays) because
- * SpuVmSetSeqVol computes the second field's address as the first
- * field's cached base register plus a compile-time +0x2, which only
- * happens when the compiler knows both offsets belong to the same
- * object. */
-typedef struct {
-    s16 unk0; /* +0x0 */
-    s16 unk2; /* +0x2 */
-    u8 pad4[0x10 - 0x4];
-} Rec16D7F0;
-extern Rec16D7F0 _svm_sreg_buf[];
-extern Rec16D7F0 D_8008D7F4[]; /* independent array, same shape */
-
-/* Per-slot flag byte, same 0..0x17 id as several of the tables above. */
-extern u8 _svm_sreg_dirty[];
-
 /* STALL -- see docs/match-reports/SsUtChangePitch.md.  HEAD SALVAGE, round 31,
  * confirmed round 32 (permuter, ~54k iterations, not closed). Round 36:
  * rebuilt with SpuVmVSetUp's real name (was func_80032148 in the report's
@@ -113,15 +96,6 @@ extern u8 _svm_sreg_dirty[];
  * function up drastically instead of fixing the swap -- see this round's
  * report update. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", SsUtChangePitch);
-
-/* _svm_voice comes from include/SvmVoice.h; Rec16D7F0 (D_8008D7F8/D_8008D7FA
- * below) is declared once, near the top of this file, and shared by
- * every function in this unit that needs it -- see the comment there.
- * See SsUtSetDetVVol's report for why D_8008D7F8/D_8008D7FA are modeled
- * as independent arrays rather than fields of one struct (each access
- * computes its own address), unlike _svm_sreg_buf/D_8008D7F4 above. */
-extern Rec16D7F0 D_8008D7F8[];
-extern Rec16D7F0 D_8008D7FA[];
 
 /* `dead` is never read and the write is unreachable; it exists to make GCC
  * allocate retail's empty 8-byte frame, which is what puts the two
@@ -141,9 +115,9 @@ s32 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
         if (_svm_voice[idx].unk0C != p3) {
             return -1;
         }
-        D_8008D7F8[idx].unk0 = p4;
+        _svm_sreg_buf[idx].unk8 = p4;
         __asm__("");
-        D_8008D7FA[idx].unk0 = p5;
+        _svm_sreg_buf[idx].unkA = p5;
         __asm__("");
         _svm_sreg_dirty[idx] |= 0x30;
         return 0;

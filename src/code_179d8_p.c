@@ -29,7 +29,7 @@
  * second copy and shifts the whole image).
  *
  * READ THIS BEFORE STARTING: SsUtAllKeyOff touches the same global family as
- * `code_179d8_m` -- libsnd's _svm_voice table (include/SvmVoice.h) and
+ * `code_179d8_m` -- libsnd's _svm_voice table (include/SvmData.h) and
  * D_8006DAD4.  The "split scaled index" entry in
  * docs/DECOMPILATION_LEARNINGS.md (a mask on the PRODUCT means a halfword
  * array indexed by a truncated `idx*8`, NOT a struct array indexed by a cast
@@ -37,10 +37,10 @@
  * loop-versus-non-loop refinement.  It is very likely to apply here.
  *
  * This unit's extern declarations stay LOCAL to this file, except Sony's
- * _svm_voice, whose one type is include/SvmVoice.h (round 86, track 2).
+ * _svm_voice, whose one type is include/SvmData.h (round 86, track 2).
  */
 #include "common.h"
-#include "SvmVoice.h"
+#include "SvmData.h"
 
 /* code_179d8_m.c's own comment on this exact symbol: "written as a side
  * effect, then re-read from the global (not a cached register) a few

@@ -65,7 +65,7 @@
  */
 
 #include "common.h"
-#include "SvmVoice.h"
+#include "SvmData.h"
 
 /* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
  * (SsUtKeyOn's own computed index, not a channel id). Every field
@@ -193,8 +193,6 @@ typedef struct {
 extern ObjE970 *D_8008E970;
 
 extern s16 D_8008E8C0;
-extern u8 _svm_sreg_buf[];
-extern u8 _svm_sreg_dirty[];
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 315/324 words, 9 words short; raw word-match 10/324,
@@ -233,7 +231,6 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     u8 e968d;
                     u32 pan1sq;
                     u32 pan2sq;
-                    s32 off16;
 
                     lvl0 = _svm_voice[i].unk08 * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
@@ -283,9 +280,8 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     }
                     pan2sq = pan2 * pan2;
 
-                    off16 = i << 4;
-                    *(u16 *)(_svm_sreg_buf + off16) = (u16)(pan1sq / 16383);
-                    *(u16 *)(_svm_sreg_buf + off16 + 2) = (u16)(pan2sq / 16383);
+                    _svm_sreg_buf[i].unk0 = (u16)(pan1sq / 16383);
+                    _svm_sreg_buf[i].unk2 = (u16)(pan2sq / 16383);
 
                     result++;
                     _svm_sreg_dirty[i] |= 3;

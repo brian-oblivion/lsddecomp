@@ -1046,10 +1046,10 @@ SpuVmKeyOff = 0x800300D0; // type:func
 // voice), then _svm_voice +0x198; anchored at 0x8008D7F0 with the three
 // neighbours above. Replaces splat's per-address auto-symbols
 // D_8008D7F0..D_8008D7FA and D_8008D970 (never game-named). Record type:
-// include/SvmVoice.h. Round 86 (alpha, track 2).
+// include/SvmData.h. Round 86 (alpha, track 2).
 _svm_sreg_buf = 0x8008D7F0; // size:0x180
 _svm_sreg_dirty = 0x8008D970; // size:0x18
-// Record type: include/SvmVoice.h. Round 86 (alpha, track 2).
+// Record type: include/SvmData.h. Round 86 (alpha, track 2).
 _svm_voice = 0x8008D988; // size:0x4E0
 // identified: libsnd/vmanager.o (disc 3.5) bss: _svm_sreg_buf +0x000,
 // _svm_voice +0x198 (24 x 0x34), _svm_envx_ptr +0x678, _svm_envx_hist
