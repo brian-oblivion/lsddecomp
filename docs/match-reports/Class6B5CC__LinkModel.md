@@ -84,3 +84,14 @@ not in registers.
   (`include/code_55dd4.h`, `src/class_3bb8c_s.c`); the `Class6B5CC__` prefix
   is still right, because any caller must carry the GsDOBJ2 layout this body
   dereferences.
+
+## Track 4 (2026-09-25, round 81, charlie)
+
+The signature is now `(Class6B5CC *self, void *model)`. The argument is the
+class-9 child (D_8006BEA0) that Class6B5CC__AddChild tag-tests. That class
+has no C yet, so the two words LinkModel reads live in a local
+`ModelObj_d294` view in `src/code_d294_c.c`: `+0x0C tmdFile` and `+0x10 tmd`.
+The object fields are renamed: +0x18 `unk18` is now `tmd` (GsDOBJ2.tmd), and
++0x20 `unk20` is now `model`. The local externs in `include/code_55dd4.h` and
+`src/class_3bb8c_s.c`, `(void *self, s32 arg)`, are deleted, and their
+callers upcast. Byte-identical.

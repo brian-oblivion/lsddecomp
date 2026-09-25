@@ -46,7 +46,7 @@
  *   so S16Quad_d294 is an SVECTOR, and the 4096-per-turn angle reading
  *   Class6B5CC__UpdateRotation's full-turn wrap already established is Sony's own.
  *
- *   Class6B5CCObj +0x10 .. +0x1C  ==  an embedded GsDOBJ2
+ *   Class6B5CC +0x10 .. +0x1C  ==  an embedded GsDOBJ2
  *     +0x10 unk10 == attribute  (the packed flags word the GetSetBitField
  *                                family sets fields in)
  *     +0x14 unk14 == coord2     (the GsCOORDINATE2 above)
@@ -55,12 +55,13 @@
  *   its GsDOBJ2 argument, which only type-checks at this layout, and the
  *   ctor calls GsInitCoordinate2 on the 0x50-byte block.
  *
- * NOT ACTED ON HERE, DELIBERATELY. Retyping these to Sony's names and
- * renaming their fields is cross-unit work: code_d294.c, code_d294_b.c,
- * class_3bb8c_o.c and class_3bb8c_p.c all read these fields, and a naming
- * runner owns ONE unit (docs/PARALLEL-RUNS.md section 2). It is a
- * FINISHING-PLAN track 4 job, and a large one -- flagged, with the
- * derivation above, so that round does not have to rediscover it.
+ * TRACK 4 (round 81, include/Class6B5CC.h) named the GsDOBJ2 words on the
+ * object (attribute, coord2, tmd, id) and GsCOORDINATE2's super/sub, but kept
+ * the project's own Class6B5CCSub14/Class6B5CCSub44 types and their field
+ * names (tx/ty/tz, unk24, unk38, param, rotate): retyping them to LIBGS.H's
+ * GsCOORDINATE2/GsCOORD2PARAM re-paths every accessor (`coord.t[0]` for `tx`,
+ * `workm.t` for `unk38`) in the class's units and in the subclass views that
+ * reach these blocks. A later pass can do it with the offsets above.
  * ========================================================================= */
 
 /* Round 13 (BisectSegmentToBox): an axis-aligned bounding box, low corner then
@@ -298,7 +299,7 @@ extern s32 ratan2(s32 dy, s32 dx);
  *
  * THE ARGUMENT-SWAP FINDING, CONFIRMED FROM THIS FUNCTION'S OWN BODY:
  * `self` and `target` (this unit's own params 1/2) are used completely
- * SYMMETRICALLY -- both need only a `Class6B5CCObj`-SHAPED object
+ * SYMMETRICALLY -- both need only a `Class6B5CC`-SHAPED object
  * (`->unkC` null-checked, `->unk14->unk38` read as a 3-word table), and
  * the position subtraction is always `target - self`. `arg3` is what
  * makes this safe to call with the roles swapped: `Entity.h`'s own
@@ -312,13 +313,13 @@ extern s32 ratan2(s32 dy, s32 dx);
  * them in the "natural" order (`a3==0`) gets the correction applied
  * internally. This resolves the mechanism (not just the correlation)
  * without asserting a name for whatever base type `Entity`/`Unk94Obj`/
- * `Class6B5CCObj` share -- that question stays open, per the caller-side
+ * `Class6B5CC` share -- that question stays open, per the caller-side
  * finding in Entity.h and DECOMPILATION_LEARNINGS.
  *
- * This unit's own two parameters are typed `Class6B5CCObj *` rather than
+ * This unit's own two parameters are typed `Class6B5CC *` rather than
  * a shared/generic type: `self->methods` is dispatched directly (needs
  * the real vtable type), and `target`'s `->unkC`/`->unk14->unk38` shape
- * matches `Class6B5CCObj` exactly, with no evidence in this call site
+ * matches `Class6B5CC` exactly, with no evidence in this call site
  * alone for anything narrower or wider. */
 
 #endif

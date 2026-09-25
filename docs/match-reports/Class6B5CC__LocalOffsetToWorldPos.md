@@ -109,3 +109,14 @@ ignores the value; the caller still has to place it.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/DreamSys.c:364` and `src/code_4cd08.c:443`. Oracle green.
+
+## Track 4 (2026-09-25, round 81, charlie)
+
+The two 4-argument `arity-ok` externs (`src/DreamSys.c`, `src/code_4cd08.c`)
+are gone. Class6B5CC's one header, `include/Class6B5CC.h`, declares the
+method, and a 3-parameter prototype there would make both callers a compile
+error. Both callers set `$a3 = 0` (0x80059460, 0x8005CF7C), so the
+definition now takes that word as an unused 4th parameter, `s32 unused`. The
+body never reads `$a3`, and the whole image is byte-identical with the
+parameter added. The callers upcast (`(Class6B5CC *)this`,
+`(Class6B5CC *)gDreamAuxWorld`).

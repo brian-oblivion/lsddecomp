@@ -144,3 +144,15 @@ callee-save spill or a `nop` and the value is already in the register), the
 declaration is free and must agree with the definition — via `()` when a call
 site passes arguments the definition does not have, since call sites are not
 ours to change.
+
+## Track 4 (2026-09-25, round 81, charlie)
+
+One declaration is left: `extern Class6B5CCMethods *GetClass6B5CCMethods(void);`
+in `include/Class6B5CC.h`. The deleted local return-type views were
+`BaseCtorTableB_3bb8c_c` (include/class_3bb8c.h), `FixedBaseTable`
+(src/class_3bb8c_o.c), `Class6B5CCBaseTable` (src/class_3bb8c_p.c),
+`D6B5CCGetterMethodsCC8C` (include/code_2cc8c.h) and the untyped `void *` in
+src/class_3ac78.c. The one- and two-argument calls in class_3bb8c_c.c and
+class_3ac78.c now pass nothing, because round 59 measured those arguments as
+zero-cost. The raw `+ 0x38`/`+ 0x88` offset calls in class_3ac78.c are now
+`onNotify`/`notifyIfUnk20Active` slot calls. Byte-identical.

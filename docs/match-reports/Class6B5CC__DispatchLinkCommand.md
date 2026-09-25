@@ -91,3 +91,13 @@ from this function alone. Held back from an actual rename because this
 symbol is referenced (in a comment) from `include/code_2cc8c.h:752` --
 a different unit's own header, discussing the same-shaped `switch`
 residue as cross-unit precedent. Posted to the broadcast.
+
+## Track 4 (2026-09-25, round 81, charlie)
+
+`(self, s32 a1, s32 a2)` is now `(self, void *sender, s32 event)`. It is
+slot +0x09C, which Class6B5CC__OnNotify calls with its own `(sender, event)`
+when the sender's class nibble is 4. Event 4 stores the sender in
+`linkTarget` (+0x28, was `unk28`). Class6B5CC__TryAttachNearby stores its
+`other` in the same field and then sends `other` event 4 with itself as the
+sender, so the link is recorded on both objects. The int-to-pointer store
+warning went away with the retype, and the bytes are identical.
