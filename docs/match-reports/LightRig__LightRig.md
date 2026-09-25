@@ -18,9 +18,9 @@ About ten builds on the loop's source shape, all equal length. `self->lights[i]`
 ## Source
 
 ```c
-/* gLightRigMethods slot +0x008 (ctor): the Class6B5CC ctor, install the table,
+/* LightRig slot +0x008 (ctor): the Class6B5CC ctor, install the table,
  * create and add the three flat lights, then reset. */
-void LightRig__LightRig(D_8006EFACObj *self) {
+void LightRig__LightRig(LightRig *self) {
     s32 i;
     BasicClass **light;
 
@@ -41,3 +41,7 @@ With a counter and a pointer walking together, the order of the comma operands i
 ## Naming
 
 - `D8006EFAC__D8006EFAC` -- tier A. Ctor (slot +0x008): the Class6B5CC ctor, installs the table, creates and adds three FlatLightObj children (round-82 broadcast: "holds three FlatLightObj children"), then resets.
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__D8006EFAC`, tier A: slot +0x008, the ctor, named for its class as every ctor is. `self` is `LightRig *` (was the unit-local `D_8006EFACObj`); the three FlatLightObj it makes into `lights[3]` are the evidence for the class name (include/LightRig.h's banner). The Source block above is the unified spelling. Image byte-identical.

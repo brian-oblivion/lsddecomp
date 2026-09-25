@@ -355,3 +355,7 @@ the `x = x->methods->release(x)` release-and-store-back shape on
 `entry->target`, `entry->list->unk2C`, `entry->list` itself and
 `entry->cellParent`. The local views' `unk04` slots were renamed `release`
 on that basis.
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the last call is `GetLightRigMethods()->finalize((LightRig *)self)` through include/LightRig.h (was `->dtor(self)` on the unit-local `BaseCtorTable_3ac78`: `dtor` was BasicClass's +0x00C `finalize` slot under another name). A pointer cast emits no code; image byte-identical.

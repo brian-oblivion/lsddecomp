@@ -15,11 +15,11 @@ Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fre
 
 ```c
 /* Allocate and construct a LightRig (0x54 bytes). */
-void *New_LightRig(void) {
-    void *obj = BMemPMgrAlloc(0x54);
+LightRig *New_LightRig(void) {
+    LightRig *obj = BMemPMgrAlloc(0x54);
 
     if (obj != NULL) {
-        ((Slot08Methods_322b4 *)GetLightRigMethods())->init(obj);
+        GetLightRigMethods()->ctor(obj);
         return obj;
     }
     return NULL;
@@ -29,3 +29,7 @@ void *New_LightRig(void) {
 ## Naming
 
 - `New_D8006EFAC` -- tier A. Allocator: BMemPMgrAlloc(0x54) then the ctor slot.
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `New_D8006EFAC`, tier A: the allocator, `BMemPMgrAlloc(0x54)` (the object size in include/LightRig.h). Returns `LightRig *` (was `void *`) and calls `GetLightRigMethods()->ctor(obj)` (was a `Slot08Methods_322b4` cast). Its one caller, IntermediateBase__Init, casts the result to IntermediateBase's `BasicClass *unk14`. The Source block above is the unified spelling. Image byte-identical.

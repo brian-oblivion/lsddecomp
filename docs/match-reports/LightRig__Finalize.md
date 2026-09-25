@@ -14,14 +14,14 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 ## Source
 
 ```c
-/* gLightRigMethods slot +0x00C (finalize): release the three lights, then the
+/* LightRig slot +0x00C (finalize): release the three lights, then the
  * Class6B5CC finalize. */
-void LightRig__Finalize(D_8006EFACObj *self) {
+void LightRig__Finalize(LightRig *self) {
     s32 i;
     BasicClass *light;
 
     for (i = 0; i < 3; i++) {
-        light = self->methods->getChild(self, i);
+        light = self->methods->getLight(self, i);
         light->methods->release(light);
     }
     GetClass6B5CCMethods()->finalize((Class6B5CC *)self);
@@ -31,3 +31,7 @@ void LightRig__Finalize(D_8006EFACObj *self) {
 ## Naming
 
 - `D8006EFAC__Finalize` -- tier A. Finalize (slot +0x00C): releases the three light children then calls the Class6B5CC finalize.
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__Finalize`, tier A: slot +0x00C. `self` is `LightRig *` (was `D_8006EFACObj`); the +0x0B8 call is now `getLight` (was `getChild`). The Source block above is the unified spelling. Image byte-identical.

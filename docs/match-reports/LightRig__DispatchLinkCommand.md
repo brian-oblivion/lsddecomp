@@ -19,11 +19,15 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 ## Source
 
 ```c
-/* gLightRigMethods slot +0x09C (dispatchLinkCommand): empty override. */
-void LightRig__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
+/* LightRig slot +0x09C (dispatchLinkCommand): empty override. */
+void LightRig__DispatchLinkCommand(LightRig *self, void *sender, s32 event) {
 }
 ```
 
 ## Naming
 
 - `D8006EFAC__DispatchLinkCommand` -- tier A. Override of Class6B5CC's dispatchLinkCommand (slot +0x09C): empty body.
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__DispatchLinkCommand`, tier A: slot +0x09C, empty override. `self` is `LightRig *` (was `Class6B5CC *`). The Source block above is the unified spelling. Image byte-identical.

@@ -19,8 +19,8 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 ## Source
 
 ```c
-/* gLightRigMethods slot +0x040 (reset): mark the coordinate for recompute. */
-void LightRig__Reset(Class6B5CC *self) {
+/* LightRig slot +0x040 (reset): mark the coordinate for recompute. */
+void LightRig__Reset(LightRig *self) {
     self->coord2->flg = 0;
 }
 ```
@@ -28,3 +28,7 @@ void LightRig__Reset(Class6B5CC *self) {
 ## Naming
 
 - `D8006EFAC__Reset` -- tier A. Reset override (slot +0x040): marks the Class6B5CC coordinate dirty (coord2->flg = 0, include/Class6B5CC.h's documented "0 = recompute").
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__Reset`, tier A: slot +0x040. `self` is `LightRig *` (was `Class6B5CC *`; `coord2` is inherited, so the access is unchanged). The Source block above is the unified spelling. Image byte-identical.

@@ -14,12 +14,16 @@ Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322
 ## Source
 
 ```c
-/* Returns the gLightRigMethods method table. */
-void *GetLightRigMethods(void) {
-    return gLightRigMethods;
+/* Returns the LightRig method table. */
+LightRigMethods *GetLightRigMethods(void) {
+    return &gLightRigMethods;
 }
 ```
 
 ## Naming
 
 - `Get_vtable_D8006EFAC` -- tier A. Table getter ("return D_8006EFAC;").
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `Get_vtable_D8006EFAC`, tier A: the table getter, spelled like every unified class's (`Get<Class>Methods`). Returns `LightRigMethods *` and `&gLightRigMethods` (was `void *` over a local `extern s32 D_8006EFAC[]`). The Source block above is the unified spelling. Image byte-identical.

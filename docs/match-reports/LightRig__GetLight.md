@@ -14,12 +14,16 @@ Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322
 ## Source
 
 ```c
-/* gLightRigMethods and D_800866E8 slot +0x0B8 (getChild). */
-void *LightRig__GetLight(ChildArrayObj_322b4 *self, s32 index) {
-    return self->children[index];
+/* LightRig slot +0x0B8 (getLight), inherited unchanged by D_800866E8. */
+BasicClass *LightRig__GetLight(LightRig *self, s32 index) {
+    return self->lights[index];
 }
 ```
 
 ## Naming
 
 - `D8006EFAC__GetChild` -- tier A. Slot +0x0B8: returns children[index]. Shared, unchanged, with D_800866E8's own slot +0x0B8 (include/Class6B5CC.h documents D_8006EFAC as "the base of Class866E8"), i.e. Class866E8 simply inherits this getChild rather than overriding it. Pure getter.
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__GetChild`, tier A: slot +0x0B8, named `getLight` in the header. It returns `lights[index]`, the three FlatLightObj the ctor made, not an entry of BasicClass's `children` list (that is getNextChild, +0x01C), so `GetChild` described the wrong thing. Its callers agree: LightRig__Finalize releases getLight(0..2), and Class866E8__SetChildParams calls each result's FlatLightObj setColor (+0x044) and setDirection (+0x048). `self` is `LightRig *` and it returns `BasicClass *` (was `ChildArrayObj_322b4 *`, `void *children[1]` at +0x044, and `void *`). Class866E8's own view (include/class_3ac78.h) still calls the slot `getChild`; that is the subclass's to rename. The Source block above is the unified spelling. Image byte-identical.

@@ -59,3 +59,7 @@ NOT named, and why: the child class itself. `LightRig__GetLight` returns an
 untyped pointer out of an array this unit never populates, and the two slots
 dispatched on it (`+0x44`, `+0x48`) have no decompiled occupant. The local
 view stays `UnkChildObj_3ac78`/`UnkChildMethods_3ac78`.
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the +0x0B8 slot it calls is LightRig's `getLight` (LightRig__GetLight, `lights[index]`), and the two slots it drives on each result, +0x044 and +0x048, are FlatLightObj's setColor and setDirection (src/code_3311c.c), consistent with the 3- and 6-byte strides. Class866E8's own view (include/class_3ac78.h) still names the slot `getChild` and its result `UnkChildObj_3ac78`; the body is untouched.
