@@ -2495,7 +2495,16 @@ TRANSLATE_Y_MINUS256 = 0x80089D90;
 // neighbours already identified as that object. Round 79 (bravo's finding
 // as a naming runner, applied by the head).
 KeyOnCheck = 0x800303FC; // type:func
-GameMain = 0x800118DC; // type:func
+// main: the C entry point; crt0 calls it at 0x80011A3C (`jal` word 0x0C004637).
+main = 0x800118DC; // type:func
 gStartupBMemPMgr = 0x8008A808;
 gClass6D3C8 = 0x8008AC20;
 gClass6D3C8CtorArgs = 0x80066828;
+// identified: Psy-Q _obj/none __main (discs 3.0, 3.6), the empty stub
+// cc1 calls from `main`. Fingerprint EXACT masked 1.00 but TINY (2 words);
+// position: directly before the placed _obj/malloc object, the same _obj
+// family. Build evidence: with the game's entry point spelled `main` and
+// its explicit call to this function deleted, cc1's own `jal __main`
+// reproduces retail byte-for-byte. Was func_80011994. Round 79 (alpha's
+// lead in the main naming pass; head measured and applied).
+__main = 0x80011994; // type:func
