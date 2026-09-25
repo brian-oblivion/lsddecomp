@@ -15,7 +15,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1);
 Gated on `2 <= a1 < 4`, `self->unk20 != NULL`, and `func_8001F3A4(self->unk20)`
 being true: fills a local stack buffer via this class's own `+0x8C` vtable
 slot (`Class6B5CC__ReadUnk20Data`, already matched in this unit — forwards to
-`func_8001F51C(self->unk20, dest)`), then forwards that same buffer into
+`TmdModel__GetHull(self->unk20, dest)`), then forwards that same buffer into
 `+0x90` (`Class6B5CC__TransformAndNotifyParents`, also already matched), with the original `a1`
 passed through as `Class6B5CC__TransformAndNotifyParents`'s own `a2`.
 
@@ -55,7 +55,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
    (`Class6B5CC__TransformAndNotifyParents`) only reads its own `a1` argument's `+0x0`/`+0x4`, so
    `GenericCountList_d294`'s minimal 8-byte shape is sufficient for THAT
    call to compile and match. But the SAME buffer is also the `dest` argument
-   to `Class6B5CC__ReadUnk20Data` → `func_8001F51C` (PsyQ, `asm/psyq_GsLinkObject4.s`,
+   to `Class6B5CC__ReadUnk20Data` → `TmdModel__GetHull` (PsyQ, `asm/psyq_GsLinkObject4.s`,
    not decompiled), whose own disassembly stores through offsets out past
    `+0x32` of `dest`. An 8-byte local buffer compiles fine (nothing checks
    bounds) but reserves too little stack, giving a frame 0x30 bytes
@@ -82,7 +82,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
   dispatched through it — no longer true once this call site was written).
 - New extern `func_8001F3A4(void *arg0)` returning `s32`, PsyQ library
   (`asm/psyq_GsLinkObject4.s`), same opaque `self->unk20` shape as
-  `func_8001F51C`/`Class6B5CC__ReadUnk20Data`'s own declarations.
+  `TmdModel__GetHull`/`Class6B5CC__ReadUnk20Data`'s own declarations.
 
 ## Proposed learning
 
@@ -102,7 +102,7 @@ DIFFERENT, non-decompiled callee (reached transitively through another
 already-matched slot) writes into it, not for what the function you're
 currently writing reads back out of it.** `Class6B5CC__NotifyIfUnk20Active` itself never reads
 `buf`'s contents; it only forwards the pointer twice. The size that makes
-the frame match came from PsyQ's `func_8001F51C`, three calls away. When a
+the frame match came from PsyQ's `TmdModel__GetHull`, three calls away. When a
 "send a same buffer to two vtable slots" shape scores an in-range match but
 funcdiff's outside-range byte count is huge, check what the buffer's
 producer (not just its declared field-access pattern) writes through it

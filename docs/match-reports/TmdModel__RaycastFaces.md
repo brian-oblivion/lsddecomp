@@ -1,8 +1,10 @@
-# func_8001F8B8 -- MATCHED (486/486 words), round 82
+# TmdModel__RaycastFaces -- MATCHED (486/486 words), round 82
+
+> Renamed from `func_8001F8B8` on 2026-09-25 (tools/rename.py). Address 0x8001f8b8.
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
-- **What:** segment-vs-model hit test. It walks every primitive of the model with `func_80020050`. For each one it builds the plane from the first three vertices (`OuterProduct0` of two edges, /4096, `d = -(v0 . n)`) and intersects the segment `origin -> end` with it. The parameter is a 16.16 fixed-point quotient of two fraction structs. It rejects a parallel face (status 2), a negative t, and a hit beyond the segment length (`Square0`/`SquareRoot0` on both vectors). It then checks the hit against the face's bounding box grown by 24, and keeps the nearest hit: `*best` = distance, `*hitOut` = point, `*height` = point.y - box.min.y (when `height != NULL`). Returns 1 if any face was hit. Callers: `code_d294_b.c`, `code_d294_c.c` (their own local prototypes, not touched).
+- **What:** segment-vs-model hit test. It walks every primitive of the model with `TmdModel__NextPrimitive`. For each one it builds the plane from the first three vertices (`OuterProduct0` of two edges, /4096, `d = -(v0 . n)`) and intersects the segment `origin -> end` with it. The parameter is a 16.16 fixed-point quotient of two fraction structs. It rejects a parallel face (status 2), a negative t, and a hit beyond the segment length (`Square0`/`SquareRoot0` on both vectors). It then checks the hit against the face's bounding box grown by 24, and keeps the nearest hit: `*best` = distance, `*hitOut` = point, `*height` = point.y - box.min.y (when `height != NULL`). Returns 1 if any face was hit. Callers: `code_d294_b.c`, `code_d294_c.c` (their own local prototypes, not touched).
 - **Result:** byte-exact; 486/486 words, whole-image SHA1 green. Build 12 on this function.
 - **Builds / levers, measured:**
   1. first draft (all locals at function top, `org`/`dir` as separate Vec3, `ABS(x) = x < 0 ? -x : x`): 10/486, frame 0x1A0.
@@ -13,7 +15,7 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
   6. removing the spare VECTORs: frame 0x168. `s32 dist[1]` went into a register (an extra `s7` save, size changed).
   7. **`s32 dist[2]`** (8 bytes, 4-byte aligned, so BLKmode, so memory): 486/486.
 - **Frame, measured:** the 0x38 bytes above the locals (0x104..0x13F in retail) are dead reload slots. The six box-field pointers have `sp+K` equivalences, and each of the loop's six compares plus the `nverts - 1` bound adds 8 bytes to `vars=` in cc1's `.frame` comment (delete them one at a time and it shrinks by 8 each time), with no access ever made to them. Do not fill that gap with locals.
-- **Types:** new `Ray_fa50`, `Vec4_fa50` (LIBGTE `VECTOR`, local), `VecBox_fa50`, the `ABS_fa50` macro, local prototypes for `OuterProduct0`/`Square0`/`SquareRoot0` (Sony libgte, called and not written) and for `func_80020050` (defined after this function). All in this unit.
+- **Types:** new `Ray_fa50`, `Vec4_fa50` (LIBGTE `VECTOR`, local), `VecBox_fa50`, the `ABS_fa50` macro, local prototypes for `OuterProduct0`/`Square0`/`SquareRoot0` (Sony libgte, called and not written) and for `TmdModel__NextPrimitive` (defined after this function). All in this unit.
 
 ## Source
 
@@ -28,9 +30,9 @@ typedef union VecBox_fa50 { Vec4_fa50 v; Box_fa50 b; } VecBox_fa50;
 extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
 extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
 extern s32 SquareRoot0(s32 a);
-/* TmdPrim_fa50 / Class6BEA0 / func_80020050: see func_80020050.md */
+/* TmdPrim_fa50 / TmdModel / TmdModel__NextPrimitive: see TmdModel__NextPrimitive.md */
 
-s32 func_8001F8B8(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
+s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
     Vec3_fa50 tri[4];
     Vec4_fa50 plane;
     Ray_fa50 ray;
@@ -49,7 +51,7 @@ s32 func_8001F8B8(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, V
     ray.dir.y = end->y - origin->y;
     ray.dir.z = end->z - origin->z;
     found = 0;
-    while ((p = func_80020050(self, p, &nverts, tri, &count)) != NULL) {
+    while ((p = TmdModel__NextPrimitive(self, p, &nverts, tri, &count)) != NULL) {
         Vec4_fa50 v60;
         SVec_fa50 e1;
         SVec_fa50 e2;
@@ -195,3 +197,14 @@ s32 func_8001F8B8(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, V
 - A scalar that retail keeps in a frame slot with no address-take, while an equivalent `s32` gets a callee-saved register, can be an 8-byte `s32 x[2]`. It is BLKmode under STRICT_ALIGNMENT (4-byte alignment < DImode's 8), so it lives in memory. `s32 x[1]` gets SImode and a register.
 - Dead reload slots (pseudos with `sp+K` equivalences) enlarge the frame with no access to them. Measure them from cc1's `.frame ... vars=` comment by deleting uses, before padding a frame gap with invented locals.
 - Locals whose frame slots sit AFTER address-taken scalars used in a `while` condition were declared inside the loop body.
+
+## Naming
+
+`TmdModel__RaycastFaces` -- tier A. Casts a segment (`origin`..`end`)
+against every primitive of the model (via `TmdModel__NextPrimitive`),
+rejects a parallel or out-of-range hit, checks the candidate hit against the
+face's own bounding box (grown by 24), and keeps the nearest one:
+`*best`/`*hitOut`/`*height`. Returns whether anything was hit. Mechanics
+fully describe the function; the game-level purpose (what calls this with
+what segment) is settled by its callers in `code_d294_b.c`/`code_d294_c.c`,
+not touched by this pass.

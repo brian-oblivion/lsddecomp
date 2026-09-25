@@ -26,7 +26,7 @@ void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other) {
 - **New extern for `GsLinkObject4`** (`void(void*, void*, s32)`), the raw
   Psy-Q symbol (`config/symbols.slps01556.lsdde.txt`, `0x8001EF70`,
   segment `psyq_GsLinkObject4` immediately after this carve) -- not
-  previously given its own prototype (only its wrapper `func_8001F51C`
+  previously given its own prototype (only its wrapper `TmdModel__GetHull`
   was declared). Declared with only the shape this one call site needs.
 
 No existing field was retyped or renamed; `Class6B5CC__UnlinkModel`'s comment in the

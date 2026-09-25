@@ -8,19 +8,19 @@ Round 12, runner delta. `code_d294_b`.
 
 A plain forwarding wrapper: passes `self->unk20` as arg0 and its own 2nd
 argument straight through (untouched, still in `$a1` from the caller) to
-`func_8001F51C` (Psy-Q, `psyq_GsLinkObject4.s`).
+`TmdModel__GetHull` (Psy-Q, `psyq_GsLinkObject4.s`).
 
 ```c
 void Class6B5CC__ReadUnk20Data(Class6B5CCObj *self, void *dest) {
-    func_8001F51C(self->unk20, dest);
+    TmdModel__GetHull(self->unk20, dest);
 }
 ```
 
-## Return type: `void`, not `return func_8001F51C(...)`
+## Return type: `void`, not `return TmdModel__GetHull(...)`
 
 `Class6B5CC__ReadUnk20Data` never touches `$v0` after the `jal`, so the byte match alone
 doesn't distinguish `void` from a pass-through `return`. Checked
-`func_8001F51C`'s own disassembly instead: its last write to `$v0` before
+`TmdModel__GetHull`'s own disassembly instead: its last write to `$v0` before
 `jr $ra` is leftover from an unrelated `lhu $v0, 0x1E($sp)` a few
 instructions earlier (used only to feed the very next `sh` store), not a
 value the function computed to hand back to its caller. Read as `void`.
@@ -29,8 +29,8 @@ value the function computed to hand back to its caller. Read as `void`.
 
 `Class6B5CCObj::unk20` was `s32` (a placeholder the round-10/11 header
 explicitly flagged for a later carve to retype). This function passes it
-straight through as `func_8001F51C`'s own `void *` arg0 (which
-`func_8001F51C` forwards unmodified to `func_8001F3B0`, which dereferences
+straight through as `TmdModel__GetHull`'s own `void *` arg0 (which
+`TmdModel__GetHull` forwards unmodified to `TmdModel__ComputeBounds`, which dereferences
 it at `+0x10`) -- genuinely a pointer. Retyped to `void *unk20` in
 `include/code_d294.h`. The only existing write site, `self->unk20 = 0;` in
 `Class6B5CC__Class6B5CC` (`src/code_d294.c`), is an integer-constant-zero assignment
@@ -42,7 +42,7 @@ image SHA1 still green).
 Disassembly (`asm/nonmatchings/code_d294_b/Class6B5CC__ReadUnk20Data.s`):
 ```
 lw  $a0, 0x20($a0)      # a0 = self->unk20
-jal func_8001F51C
+jal TmdModel__GetHull
  nop                     # a1 untouched -- passes through the caller's own arg1
 ```
 
@@ -54,7 +54,7 @@ None beyond the retype itself, which is local to this unit's own header.
 
 Renamed from `func_8001D600` via `tools/rename.py`. **Tier B** -- slot
 `+0x08C` occupant. Mechanics fully confirmed (forwards `self->unk20` and
-its own 2nd argument straight through to Psy-Q `func_8001F51C`, which
+its own 2nd argument straight through to Psy-Q `TmdModel__GetHull`, which
 fills the caller's buffer), but `unk20`'s own real content/purpose is
 still opaque, so the name describes the READ operation, not what is
 actually being read. Purely local to this unit + its header.

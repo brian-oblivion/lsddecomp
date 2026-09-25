@@ -7,7 +7,7 @@ screen clean: no `gp_rel`, no `addiu $at,$at,%lo`, no `mfhi`/`mflo`-
 adjacent-`mult`/`div` hit.
 
 **No C was written or built for this function.** Given the size, the two
-still-uncarved callees it depends on (`func_8001F8B8`, `slotA4`'s
+still-uncarved callees it depends on (`TmdModel__RaycastFaces`, `slotA4`'s
 occupant `Class6B5CC__ComposeAndApplyRotation`), and the amount of genuinely new field/struct
 derivation needed, a full structural read was the higher-value use of
 this session's remaining time over a first, likely-incomplete C attempt.
@@ -30,8 +30,8 @@ if (self->unk10 < 0) {
 }
 <compute a 3-entry s16 delta between arg2 and self->unk14->unk38 (or {0,0,0} if self->unkC==0)>
 self->methods->slotA4(self, 0, /* &sp+0x18-ish scratch */, /* &delta */, 1);  /* 5 args, occupant Class6B5CC__ComposeAndApplyRotation, code_d294_b, out of scope */
-if (!func_8001F8B8(self->unk20, &scratch1, &scratch2, 0, &scratch3, delta_minus_1024)) {
-    if (!func_8001F8B8(self->unk20, &scratch1, &scratch2, 0, &scratch3, delta_plus_1024)) {
+if (!TmdModel__RaycastFaces(self->unk20, &scratch1, &scratch2, 0, &scratch3, delta_minus_1024)) {
+    if (!TmdModel__RaycastFaces(self->unk20, &scratch1, &scratch2, 0, &scratch3, delta_plus_1024)) {
         return 0;
     }
 }
@@ -46,7 +46,7 @@ return 1;
   off `self` (not through `unk14`):
   - `+0x20`: ALREADY typed `void *unk20` (round 12, `Class6B5CC__ReadUnk20Data`) --
     this function is a SECOND confirming use, null-checked at entry (a
-    `return 0` guard) and later passed as `func_8001F8B8`'s own first
+    `return 0` guard) and later passed as `TmdModel__RaycastFaces`'s own first
     argument. No retype needed, just a second confirmed non-NULL-checked
     use.
   - `+0x10`: a NEW `s32` field, compared with `bgez` (signed, so `s32`
@@ -97,7 +97,7 @@ return 1;
   direct `self->unk14 == 0` check, which would NOT match retail's bytes
   (confirmed by the disassembly computing the sum FIRST, then testing
   it, not testing `self->unk14` before the addition).
-- **New extern needed: `func_8001F8B8`** (still uncarved, presumably the
+- **New extern needed: `TmdModel__RaycastFaces`** (still uncarved, presumably the
   NEXT slice past this one or a sibling segment) -- called twice with
   identical arguments except the LAST (a candidate angle table, one
   computed with `-0x400`/`+0x400` applied to one axis, i.e. a +/-90-degree
@@ -112,7 +112,7 @@ return 1;
 
 ## Derivation notes / open questions for whoever attempts the C
 
-- The TWO `func_8001F8B8` calls are near-identical (`self->unk20`,
+- The TWO `TmdModel__RaycastFaces` calls are near-identical (`self->unk20`,
   `&scratch1`, `&scratch2`, literal `0`, `&scratch3` as the 5th
   stack-passed argument, a locally-built 3-entry `s16` angle table as the
   6th) -- almost certainly a shared subexpression/pattern worth writing
@@ -133,7 +133,7 @@ return 1;
   candidate to SPLIT into sub-attempts: get the two guard checks + list
   accumulation matching first (word count 0xEFE0..0xF154, roughly the
   first 96 bytes / 24 words), confirm against retail before tackling the
-  `func_8001F8B8`-dependent tail, rather than attempting the whole 180
+  `TmdModel__RaycastFaces`-dependent tail, rather than attempting the whole 180
   words in one pass.
 
 ### Proposed learning
@@ -187,7 +187,7 @@ idiom already on record for this project, just at a larger scale (4
 independent re-derivations of one conceptual value) than any prior
 documented instance.
 
-**Closed: `func_8001F8B8`'s real arity is 6, not "5-ish".** Register
+**Closed: `TmdModel__RaycastFaces`'s real arity is 6, not "5-ish".** Register
 trace: `a0 = self->unk20`, `a1 = &buf30` (an output buffer),
 `a2 = &buf28` (a second output buffer), `a3 = 0` (literal), plus TWO
 stack-passed arguments at `sp+0x10`/`sp+0x14` -- `arg5 = &buf18` (an
@@ -204,10 +204,10 @@ one axis" reading, specifically axis index 1).
 to back**, `sp+0x18` (`buf18`, written by `slotA4`, read as `s16[?]` at
 indices 0/1/2 later), `sp+0x20` (`delta`, written before `slotA4`, then
 its SAME memory reused for the angle table after), `sp+0x28` (`buf28`,
-an output-only buffer for `func_8001F8B8`), `sp+0x30` (`buf30`, likewise)
+an output-only buffer for `TmdModel__RaycastFaces`), `sp+0x30` (`buf30`, likewise)
 -- derived from the frame total (`0x58`), the saved-register block
 (`0x38`..`0x54`, seven registers `s0`-`s5`+`ra`), and the outgoing-arg
-area (`sp+0x00`..`sp+0x18`, 24 bytes/6 words, sized by `func_8001F8B8`'s
+area (`sp+0x00`..`sp+0x18`, 24 bytes/6 words, sized by `TmdModel__RaycastFaces`'s
 own 6-argument arity, 4 in registers + 2 on the stack -- consistent with
 this round's `ApplyMatrixToLVArray` finding that outgoing-arg sizing reflects
 the WIDEST call in the function, though here the wide call is genuinely
@@ -277,7 +277,7 @@ progress: the backup-copy block's instructions now appear at
 approximately retail's own positions, with what looks like a register
 identity difference (`$a1`/`$a3` swapped for the "node"/list-walk
 pointer) as the visible residue in that section, and the tail
-(`func_8001F8B8` calls, buffer layout) not yet independently verified
+(`TmdModel__RaycastFaces` calls, buffer layout) not yet independently verified
 correct.
 
 **Preserved the 29/180 body in `src/code_d294_c.c` as `#if 0`** (this
@@ -285,7 +285,7 @@ function's FIRST-EVER inline preserved body -- there was none before
 this round). Stopped here rather than continuing to iterate the
 register-identity/buffer-layout residue: this function's remaining
 distance to a match is still substantial (the four-buffer stack layout,
-the two `func_8001F8B8` calls, and `SubVec3S16`'s argument buffers are
+the two `TmdModel__RaycastFaces` calls, and `SubVec3S16`'s argument buffers are
 all unverified against the real oracle beyond "compiles and produces a
 plausible partial score"), and this round's remaining time was better
 spent finishing verification of the rest of this runner's work list.
@@ -415,7 +415,7 @@ could not be obtained SIMULTANEOUSLY with anything tried this round.
    `$s3`=`&delta`, `$s4`=`&buf30`, `$s2`=`&buf28`, `$s1`=`&buf18` (in THAT
    order of first address-taken use); my build assigns the same FOUR
    addresses to `$s1`/`$s3`/`$s4`/`$s2` respectively -- a full permutation,
-   not a simple pair swap. Every instruction in the `slotA4`/`func_8001F8B8`
+   not a simple pair swap. Every instruction in the `slotA4`/`TmdModel__RaycastFaces`
    x2/`SubVec3S16` call sequence (vram 0x8001E994 onward) that touches
    one of these four addresses shows the SAME register substituted for its
    retail counterpart, consistently. Tried reordering the four buffer
@@ -530,7 +530,7 @@ the eventual lever will take.
 
 ```c
 #if 0
-extern s32 func_8001F8B8(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
+extern s32 TmdModel__RaycastFaces(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
 extern void SubVec3S16(s32 *dest, s16 *b, s16 *a);
 
 s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
@@ -578,9 +578,9 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     delta[0] = buf18[0];
     delta[1] = (u16)buf18[1] - 0x400;
     delta[2] = buf18[2];
-    if (!func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
+    if (!TmdModel__RaycastFaces(self->unk20, buf30, buf28, 0, buf18, delta)) {
         delta[1] = (u16)buf18[1] + 0x400;
-        if (!func_8001F8B8(self->unk20, buf30, buf28, 0, buf18, delta)) {
+        if (!TmdModel__RaycastFaces(self->unk20, buf30, buf28, 0, buf18, delta)) {
             return 0;
         }
     }
@@ -605,17 +605,17 @@ s32 func_8001E7BC(Class6B5CCObj *self, s32 *arg1, s32 *arg2) {
     position, rotates the delta into the object's own frame via `slotA4`
     (Class6B5CC__ComposeAndApplyRotation, the inverse-chain matrix: `slot84` with the NEGATED
     angle flag, composed down the owner list with `MulMatrix2`), then calls
-    `func_8001F8B8` twice -- once with the Y component minus 0x400 and, on
+    `TmdModel__RaycastFaces` twice -- once with the Y component minus 0x400 and, on
     failure, once plus 0x400, i.e. +/- 90 degrees -- and finally returns
     `SubVec3S16(arg1, buf18, buf28)`.
-  - **Why no name.** `func_8001F8B8` lives in the Psy-Q block
+  - **Why no name.** `TmdModel__RaycastFaces` lives in the Psy-Q block
     (`psyq_fa50`), is not decompiled, and is the whole point of the second
     half; without it, any verb for this function ("probe", "trace", "clip",
     "aim") is a guess about what the two +/-90-degree attempts are FOR. The
     first half alone would justify something like
     `Class6B5CC__UpdateWorldPos`, but that would name a third of the body
     and mislead about the return value, which is the second half's result.
-  - Reopening it is cheap once `func_8001F8B8` is identified (track 2).
+  - Reopening it is cheap once `TmdModel__RaycastFaces` is identified (track 2).
 - Naming touched nothing in this function's preserved `#if 0` body except
   the callee names `rename.py` rewrote (`SubVec3S16`). It is still
   `INCLUDE_ASM`; the stall verdict above is unchanged.
@@ -640,15 +640,15 @@ body). `build exit=2`, no compile-error grep hits.
 ### Lever 1 (re-reading): retail's tail is CROSS-JUMPED -- write the success body TWICE. 142 -> 155
 
 The tell-tale is in the delay slots. Retail has `addu $a0, $s5, $zero` in the
-delay slot of BOTH `func_8001F8B8` result branches (vram 0x8001EA18 and
+delay slot of BOTH `TmdModel__RaycastFaces` result branches (vram 0x8001EA18 and
 0x8001EA48) but only ONE `jal SubVec3S16`. That is `jump.c` cross-jumping two
 identical tails and hoisting the first surviving insn of the shared block
 into the earlier branch's delay slot. So the source duplicates the body:
 
 ```c
-if (func_8001F8B8(...)) { SubVec3S16(arg1, buf18, buf28); return 1; }
+if (TmdModel__RaycastFaces(...)) { SubVec3S16(arg1, buf18, buf28); return 1; }
 delta[1] = (u16)buf18[1] + 0x400;
-if (func_8001F8B8(...)) { SubVec3S16(arg1, buf18, buf28); return 1; }
+if (TmdModel__RaycastFaces(...)) { SubVec3S16(arg1, buf18, buf28); return 1; }
 ```
 
 rather than round 46's single trailing call under a doubly-negated `if`.

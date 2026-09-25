@@ -98,7 +98,7 @@ resolved below.
 Signature `s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294
 *diff, void *list)`, with Part 1 (a fixed 2-row box-midpoint average into a
 local `Vec3S16_d294 mid[2]`) and Part 2 (a `count1`-driven loop over
-`func_8001F50C` planes, gated by `ClipSegmentToBox`/`func_8001F8B8`, setting
+`GetTmdModelBoundsBuffer` planes, gated by `ClipSegmentToBox`/`TmdModel__RaycastFaces`, setting
 bits in `self->unk2C`) both fully derived and high-confidence. Part 3 (a
 second, `list`-driven double loop) was flagged NOT fully decoded: "the
 precise relationship between the middle `k` loop ... and the inner fixed-4
@@ -110,7 +110,7 @@ Re-read `asm/nonmatchings/code_d294_b/Class6B5CC__ClassifyAgainstPlanes.s` lines
 (`.L8001DFD0` through `.L8001E0B4`) instruction-by-instruction:
 
 - The innermost loop runs `m = 0..3` (4 passes, unconditional), but the
-  box-test body (the `ClipSegmentToBox`/`func_8001F8B8` pair) only executes
+  box-test body (the `ClipSegmentToBox`/`TmdModel__RaycastFaces` pair) only executes
   when `(u32)(m - 1) < 2`, i.e. **`m == 1` or `m == 2`** -- confirmed at
   `sltiu $v0, $v0, 2` / `beqz $v0, .L8001E094` (vram 0x8001E00C-0x8001E010).
   `m == 0` and `m == 3` fall straight through to the loop-continue check with
@@ -173,7 +173,7 @@ residue here is register identity, not branch presence/absence.
 ## New symbols added (own-file, not shared header)
 
 ```c
-extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
+extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 ```
 
@@ -231,7 +231,7 @@ register permutation with no tool support for exploring it directly.
 
 ```c
 #if 0
-extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
+extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
 s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
@@ -270,9 +270,9 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
     self->unk2C = 0;
     flag2 = 0;
     for (i = 0; i < count1; i++) {
-        plane = func_8001F50C(self->unk20, i);
+        plane = GetTmdModelBoundsBuffer(self->unk20, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
-            if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
+            if (TmdModel__RaycastFaces(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0 || outWord >= 0x201) {
                     self->unk2C |= (1 << i);
                 }
@@ -291,7 +291,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
     *outFlag = 0;
     cnt2 = *(s32 *)list;
     for (j = 0; j < count1; j++) {
-        plane = func_8001F50C(self->unk20, j);
+        plane = GetTmdModelBoundsBuffer(self->unk20, j);
         bitJ = 1 << j;
         rowBase = (u8 *)list + 4;
         for (k = 0; k < cnt2; k++) {
@@ -301,7 +301,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
                     u8 *rowM = rowBase;
                     u8 *rowMplus1 = rowBase + 0x18;
                     if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
-                        if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
+                        if (TmdModel__RaycastFaces(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                             if (D_8008A838 == 0 || outWord >= 0x201) {
                                 self->unk2C |= bitJ;
                                 *outFlag |= bitK;
@@ -354,7 +354,7 @@ blocker's successor -- see CLAUDE.md's "Open toolchain blockers" table,
 now RESOLVED, so this function is ordinary matching work for whoever
 picks it up next). Slot `+0x0AC` occupant: computes a fixed 2-row
 box-midpoint average, then classifies it against every one of
-`self->unk20`'s planes (via `ClipSegmentToBox`/`func_8001F8B8`,
+`self->unk20`'s planes (via `ClipSegmentToBox`/`TmdModel__RaycastFaces`,
 setting bits in `self->unk2C`), and if none set, runs a second,
 `list`-driven sliding-window pass doing the same per-plane
 classification over a corner list. "ClassifyAgainstPlanes" describes
@@ -501,8 +501,8 @@ does not have to re-derive which are safe.
 
 **Explicit answer to the revisit's own question: the round-54 naming gave NO
 new shape here either**, for the same reason as `NotifyTaggedParents` --
-this function's own symbols (`func_8001F8B8`, `D_8008A838`,
-`self->unk2C`/`unk20`, `ClipSegmentToBox`, `func_8001F50C`,
+this function's own symbols (`TmdModel__RaycastFaces`, `D_8008A838`,
+`self->unk2C`/`unk20`, `ClipSegmentToBox`, `GetTmdModelBoundsBuffer`,
 `func_8001F3A4`) were untouched by round 54's `Class6B5CCMethods` slot
 renames. What DID move the investigation forward was reading the
 disassembly's own pointer arithmetic directly rather than trusting the
