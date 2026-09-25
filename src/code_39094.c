@@ -7,9 +7,10 @@
  * and helpers called only from Class6D3C8, Obj865C8 and ObjM code (stream
  * tasks, the intro logo sequence).
  *
- * Round 82 matched twenty: the allocator, ctor/finalize and small methods of
- * D_80081940, and the record accessors. The eight larger bodies left are
- * still INCLUDE_ASM.
+ * Round 82 matched all 28: the allocator, ctor/finalize and methods of
+ * D_80081940 (a file-streaming state machine: state 9 = header load, state
+ * 10 = data block load, both completed in the setFlag override), and the
+ * record accessors and random pickers over func_80048D48's table.
  */
 #include "common.h"
 #include "Class6D430.h"
