@@ -200,3 +200,46 @@ statements) the outer loop's body carried. When a retry loop's plain
 "next-iteration setup" instruction landing in a branch's delay slot instead
 of the retail's own unrelated constant, try the goto rewrite before assuming
 the earlier negative applies.
+
+## Naming
+
+Round 79 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027800` | `Class6D4E8__LoadFile` | A |
+
+**Evidence.** Overrides the base class's `+0x058` (`Class6D430__AllocBuffer`,
+which does open/size/alloc/rewind/read/close through the slots above). Sync
+mode calls that base method, then ORs `CD_FLAG_LOAD_FILE_DONE` (0x200) and
+calls `setFlag`. Otherwise it enqueues op 7 (`CD_OP_LOAD_FILE`, the name
+code_179d8_q already gives it), or inside a queue dispatch: looks the file
+up by name, rounds its size up to whole sectors, allocates `self->buffer`
+with `BMemPMgrAlloc` if it has none (calling `close` if that fails), and
+seeks + reads the whole file into it, recording the rounded size in
+`self->bufferSize`. `Class6D4E8__RequestLoadFile` (code_179d8_q) dispatches
+this slot as `loadFile`, so the slot name and the function name agree.
+
+**Class prefix.** `Class6D4E8` is the placeholder token for the method
+table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+at slot `+0x058`. The prefix names the table, not the developers' class.
+
+## Proposed field names
+
+For the head to apply by type scope (out of unit). `Class6D430__AllocBuffer`
+(code_171e0), the base method this function overrides and calls in sync
+mode, drives these slots in the order open, size query, alloc, rewind, read,
+close; the one class that fills them (`D_8006D4E8`) fills them with the
+methods named here.
+
+| unit | type | field | proposed | tier | evidence |
+| --- | --- | --- | --- | --- | --- |
+| include/code_171e0.h | `Class6D430Methods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `Class6D4E8__Open` |
+| include/code_171e0.h | `Class6D430Methods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `Class6D4E8__Seek` |
+| include/code_171e0.h | `Class6D430Methods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `Class6D4E8__Read` |
+| include/code_171e0.h | `Class6D430` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
+
+Also noted for whoever names code_171e0 again: `Class6D430__AllocBuffer`
+opens, sizes, allocates for, reads and closes a named file, i.e. it is the
+base-class LoadFile. Not renamed here (out of unit).

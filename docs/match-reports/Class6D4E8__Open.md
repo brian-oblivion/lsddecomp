@@ -178,3 +178,74 @@ conflated:**
   branches are mutually exclusive and a from-source reading suggests no
   interaction. Confirmed via isolated pinned-pipeline reproduction, not
   just observed once.
+
+## Naming
+
+Round 79 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800272D0` | `Class6D4E8__Open` | A |
+
+**Evidence.** With the driver in plain sync mode it tail-forwards to
+`OpenCdFile` (code_179d8_h). Otherwise, outside a queue dispatch, it
+enqueues request op 2 with `FindCdFileIndex(name)`; inside one, if the
+object is not already open, it looks the name up (`FindCdFileEntry` on the
+async path, `BuildCdFilePath` + `CdSearchFile` on the blocking path), copies
+the entry's disc position and byte size into `self->pos`/`self->size`, seeks
+there (CdlSetloc) and sets `self->isOpen = 1`. The base-class caller
+`Class6D430__AllocBuffer` calls this slot first, with the file name, before
+sizing and reading. Every path is "resolve a file by name and make it the
+open one", hence tier A. `arg2`/`arg3` are only passed through to the
+queued request and are not read otherwise, so they stay unnamed.
+
+**Class prefix.** `Class6D4E8` is the placeholder token for the method
+table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+at slot `+0x044`. The prefix names the table, not the developers' class.
+
+## Field, slot and type names (this unit's local views, APPLIED)
+
+All of these are local typedefs of code_179d8_s.c, which includes no project
+header, so the compiler's accessor list after renaming the definitions was
+this unit alone (69 `has no member` errors, all in code_179d8_s.c); both
+oracles green after.
+
+| type (was) | field (was) | now | tier | evidence |
+| --- | --- | --- | --- | --- |
+| `Obj80027480` | -- | `Class6D4E8` | A | the object whose methods are `D_8006D4E8`'s slots |
+| `Methods80027480` | -- | `Class6D4E8Methods` | A | `D_8006D4E8` itself |
+| `Pos18` | -- | `CdLoc16` | A | code_179d8_q's name for the same 2-aligned CdlLOC shape |
+| `Rec80028448` | -- | `CdFileEntry` | A | code_179d8_q's name for the 0x1C-byte file-table record |
+| `StatBuf80027` | -- | `CdFileInfo` | A | code_179d8_q's name for CdSearchFile's CdlFILE output |
+| `Node8008A894` | -- | `CdRequestNode` | A | code_179d8_r's name for the queue node |
+| `Class6D4E8` | `unk0C` | `isOpen` | A | set 1 by Open, 0 by Close; Seek/Read require it; code_179d8_h's name |
+| `Class6D4E8` | `unk10` | `buffer` | A | LoadFile's BMemPMgrAlloc result / read target; Class6D430's name |
+| `Class6D4E8` | `unk14` | `bufferSize` | A | LoadFile stores the sector-rounded read size; Class6D430's name |
+| `Class6D4E8` | `unk18` | `pos` | A | the file's disc position, CdlSetloc target; code_179d8_h's name |
+| `Class6D4E8` | `unk1C` | `size` | A | the file's byte size from the entry / CdSearchFile; code_179d8_h's name |
+| `Class6D4E8` | `unk20` | `freeGuard` | B | Class6D430's name; here only: nonzero lets LoadFile reuse an existing buffer |
+| `Class6D4E8` | `unk22` | `pendingRequests` | A | code_179d8_q's name; RunRequestQueue decrements it per completion |
+| `Class6D4E8` | `unk24` | `flags` | A | code_179d8_q's name; only ORed with CD_FLAG_* bits |
+| `Class6D4E8` | `unk28` | `inQueueDispatch` | A | written only by the ctor (0) and RunRequestQueue (1 around the dispatch call, 0 after); every method starts its operation when set, enqueues when clear |
+| `Class6D4E8Methods` | `slot44` | `open` | A | resolves to `Class6D4E8__Open` |
+| `Class6D4E8Methods` | `onError` | `close` | A | resolves to `Class6D4E8__Close` (see that report) |
+| `Class6D4E8Methods` | `slot4C` | `seek` | B | resolves to `Class6D4E8__Seek` |
+| `Class6D4E8Methods` | `slot54` | `read` | A | resolves to `Class6D4E8__Read` |
+| `Class6D4E8Methods` | `slot58` | `loadFile` | A | resolves to `Class6D4E8__LoadFile`; code_179d8_q's name |
+| `Class6D4E8Methods` | `slot64` | `setFlag` | A | resolves to `Class6D430__SetFlag` |
+| `Class6D4E8Methods` | `slot70` | `stopCdService` | A | resolves to `Class6D4E8__StopCdService` |
+| `CdFileEntry` | `pad0`/`unk14`/`unk18` | `name`/`pos`/`size` | A | code_179d8_q's CdFileEntry |
+| `CdFileInfo` | `unk0`/`unk4` | `pos`/`size` | A | code_179d8_q's CdFileInfo |
+| `CdRequestNode` | `unk0`,`unk8`,`unkC`,`unk10`,`unk14`,`unk18` | `active`,`op`,`owner`,`fileIndex`,`param0`,`param1` | A (params B) | EnqueueCdRequest's writes and StartCdOperation's `active = 1`, per their reports' proposals |
+
+`CdRequestNode::unk4` keeps its placeholder: it is zeroed at allocation and
+its one reader here ORs flags bit 0, but no writer of a nonzero value is
+identified (code_179d8_q's `UnkC80::unk04` store goes through an
+uninitialised pointer).
+
+Globals: `D_8006D574` -> `gCdSeekLoc` (A: 8 bytes of .data written only by
+`Class6D4E8__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
+`D_8008A860` keeps its placeholder for code_179d8_q's stated reason: every
+read here is the `gCdAsyncEnabled == 0 && D_8008A860 == 0` sync-mode test and
+nothing names the second mode.

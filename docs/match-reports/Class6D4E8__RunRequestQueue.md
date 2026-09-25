@@ -158,18 +158,6 @@ No permuter search was run and none was needed. `Obj80027480`, `Methods80027480`
 round 47; no struct was edited, so the shared-struct oracle re-run is the same green
 whole-image build above.
 
-## Naming
-
-Left as `Class6D4E8__RunRequestQueue`. It is the CD request-queue pump: under `LockCd`/`UnlockCd` it
-takes the head node of `gCdRequestQueue` and, on `node->unk0 == 0`, dispatches
-`node->unk8` (2/3/4/5/7) to one of five method slots with `unk28` held at 1 across the
-call; otherwise, once `gCdIdle` is set, it folds per-request status bits into
-`self->unk24`, decrements the outstanding count `self->unk22`, calls `slot64`, frees the
-node, and calls `slot70` when the queue drains. A name in the `RunCdRequestQueue` /
-`ServiceCdRequest` family would fit, but the two dispatch halves and `unk0`'s
-event-vs-flag-update meaning are this unit's own local reading, so naming it is left to
-the unit's naming pass rather than guessed here.
-
 ## Proposed learning
 
 1. **N identical 2-instruction tails ending in `j <exit>` with a store in the delay slot
@@ -206,3 +194,38 @@ the unit's naming pass rather than guessed here.
    not a code change: **spell it `length exact (0x25C/151 words)` in stall titles**, which
    the regex does match. Flagged rather than fixed here because `tools/plan.py` is a shared
    file and this is a runner branch. Round 67.
+
+## Naming
+
+Round 79 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027A24` | `Class6D4E8__RunRequestQueue` | A |
+
+**Evidence.** Called every service tick through the class table by
+`ServiceCdDriver` (code_179d8_q), whose local view already names the slot
+`runRequestQueue`. It takes the head of `gCdRequestQueue`: if the node is
+not yet active it raises `owner->inQueueDispatch` and calls the owner's
+slot for `node->op` (open/close/seek/read/loadFile, the CD_OP_* values the
+five methods above enqueue); once `gCdIdle` says the drive finished, it
+decrements `owner->pendingRequests`, ORs `CD_FLAG_DONE`, `CD_FLAG_NONE_PENDING`
+(when the count hits 0) and the op's own completion bit into `owner->flags`,
+calls `setFlag`, frees the node, and calls `stopCdService` when the queue
+is empty. "Run" rather than "drain": one call advances only the head node.
+It takes no `self`; the object it works on is the node's owner.
+
+**Class prefix.** `Class6D4E8` is the placeholder token for the method
+table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+at slot `+0x068`. The prefix names the table, not the developers' class.
+
+## Proposed field names
+
+For the head to apply by type scope (out of unit):
+
+| unit | type | field | proposed | tier | evidence |
+| --- | --- | --- | --- | --- | --- |
+| code_179d8_o | `Obj6D4E8` | `unk28` | `inQueueDispatch` | A | the constructor's clear of the same field this function raises around each dispatch (note that view types it `s16`, this unit `u16`) |
+| include/code_171e0.h | `Class6D430` | `unk28` | `inQueueDispatch` | B | the base ctor zeroes it; only this derived class reads it |
+| include/code_171e0.h | `Class6D430` | `unk22` | `pendingRequests` | B | the base ctor zeroes it; EnqueueCdRequest/this function count it |

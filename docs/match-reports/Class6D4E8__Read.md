@@ -110,3 +110,23 @@ does not. Discriminator for when to reach for it: the diff shows an EXTRA
 that copies a call's return value into its own register inside the loop --
 that pairing is the hoist's signature, not a generic register-identity
 residue.
+
+## Naming
+
+Round 79 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800276D0` | `Class6D4E8__Read` | A |
+
+**Evidence.** `(self, buf, size)`. Sync mode forwards to `ReadCdFile`;
+otherwise it enqueues op 5 with `buf`/`size`, or inside a queue dispatch on
+an open file reads `size >> 11` sectors into `buf` (CdRead + CdReadSync
+retry loop, or hands `gCdReadSectorCount`/`gCdReadBuffer` to the state
+machine). `Class6D430__AllocBuffer` calls this slot with the buffer it just
+allocated and its size, between the rewind and the close.
+
+**Class prefix.** `Class6D4E8` is the placeholder token for the method
+table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+at slot `+0x054`. The prefix names the table, not the developers' class.

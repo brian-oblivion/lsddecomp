@@ -133,3 +133,33 @@ found in the previous function. The `goto`-defeats-loop.c's-invariant-motion
 lever from `Class6D4E8__Read` is real, but its APPLICATION is per-loop: read
 whether retail's own `.s` shows a `li $sN,<const>` sitting above the retry
 label before reaching for `goto` instead of `do`/`while`.
+
+## Naming
+
+Round 79 (charlie), FINISHING-PLAN track 3.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_80027528` | `Class6D4E8__Seek` | B |
+
+**Evidence.** `(self, offset, mode)`. Inside a queue dispatch on an open
+file it converts `self->pos` to a sector number (`CdPosToInt`), adds
+`offset` rounded up to whole 0x800-byte sectors, and writes the result to
+`gCdSeekLoc` (`CdIntToPos`). With `mode == 0` it then seeks there
+(CdlSetloc, or queues the seek on the state machine) and returns 0; with
+`mode != 0` it instead returns `self->size` rounded up to a whole sector.
+Outside a dispatch it enqueues op 4 with both arguments. The base-class
+caller agrees with that reading: `Class6D430__AllocBuffer` calls this slot
+as `(0, 2)` to get the size it allocates and `(0, 0)` to rewind before
+reading, the shape of `lseek(fd, 0, SEEK_END)` / `lseek(fd, 0, SEEK_SET)`.
+
+**Why tier B.** The sync-mode path does not seek at all: it forwards to
+`GetCdFileSize` and ignores both arguments. And only `mode` 0 and "nonzero"
+are distinguished, so the lseek analogy is a description of the two
+callers, not an established `whence` enumeration. The name covers the
+async body and the rewind use; the size query is the other half of it.
+
+**Class prefix.** `Class6D4E8` is the placeholder token for the method
+table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
+siblings already use); `tools/classtable.py D_8006D4E8` lists this function
+at slot `+0x04C`. The prefix names the table, not the developers' class.
