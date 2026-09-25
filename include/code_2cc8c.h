@@ -878,7 +878,7 @@ extern void *New_D8006EF50(void); /* external, no args; local view returns
                                     void* (used as a generic word/child
                                     pointer here); same callee as
                                     class_39e08.h's own `SubObjG *` view */
-extern void *func_80042694(void); /* external, no args; not yet seen
+extern void *New_D8006EFAC(void); /* external, no args; not yet seen
                                     elsewhere in this project */
 
 

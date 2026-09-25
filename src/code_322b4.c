@@ -504,7 +504,7 @@ void *Get_vtable_D8006EF50(void) {
     return D_8006EF50;
 }
 /* Allocate and construct a D_8006EFAC object (0x54 bytes). */
-void *func_80042694(void) {
+void *New_D8006EFAC(void) {
     void *obj = BMemPMgrAlloc(0x54);
 
     if (obj != NULL) {

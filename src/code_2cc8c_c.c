@@ -114,7 +114,7 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     if (args->unkC != NULL) {
         self->unk14 = args->unkC;
     } else {
-        self->unk14 = func_80042694();
+        self->unk14 = New_D8006EFAC();
     }
     if (args->viewport != NULL) {
         self->viewport = args->viewport;
