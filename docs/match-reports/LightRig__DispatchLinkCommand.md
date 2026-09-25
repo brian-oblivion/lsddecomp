@@ -1,11 +1,13 @@
-# D8006EFAC__DispatchLinkCommand -- MATCHED (2/2 words), round 82
+# LightRig__DispatchLinkCommand -- MATCHED (2/2 words), round 82
+
+> Renamed from `D8006EFAC__DispatchLinkCommand` on 2026-09-26 (tools/rename.py). Address 0x80042820.
 
 > Renamed from `func_80042820` on 2026-09-25 (tools/rename.py). Address 0x80042820.
 
 Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
-- **Where:** D_8006EFAC slot +0x09C (dispatchLinkCommand, over Class6B5CC__DispatchLinkCommand) (`tools/classtable.py`).
+- **Where:** gLightRigMethods slot +0x09C (dispatchLinkCommand, over Class6B5CC__DispatchLinkCommand) (`tools/classtable.py`).
 - **What:** empty override: `jr $ra; nop`.
 - **Result:** byte-exact on the FIRST build; 2/2 words, 0 insertions /
   0 deletions, whole-image SHA1 green. No levers needed.
@@ -17,8 +19,8 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 ## Source
 
 ```c
-/* D_8006EFAC slot +0x09C (dispatchLinkCommand): empty override. */
-void D8006EFAC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
+/* gLightRigMethods slot +0x09C (dispatchLinkCommand): empty override. */
+void LightRig__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
 }
 ```
 
