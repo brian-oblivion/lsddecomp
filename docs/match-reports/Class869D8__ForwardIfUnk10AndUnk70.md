@@ -16,7 +16,7 @@ ctor table's own `+0x09C` slot with `self` as the only argument.
 void Class869D8__ForwardIfUnk10AndUnk70(Class869D8 *self)
 {
     if (self->unk10 != 0 && self->unk70 != 0) {
-        GetUnk18ObjMethods()->slot9C(self);
+        GetViewportMethods()->slot9C(self);
     }
 }
 ```
@@ -28,7 +28,7 @@ void Class869D8__ForwardIfUnk10AndUnk70(Class869D8 *self)
   its allocation size, 0xDC (from `New_Class869D8`'s `BMemPMgrAlloc(0xDC)`
   call) -- purely additive, the existing `methods` field at +0x000 is
   untouched.
-- `BaseCtorTable_3bb8c_c` (GetUnk18ObjMethods's return type): added `slot9C`
+- `BaseCtorTable_3bb8c_c` (GetViewportMethods's return type): added `slot9C`
   (`void (*)(void *self)`, +0x09C). Additive; the existing `ctor` slot
   (+0x008, used by `Class869D8__Class869D8`) is untouched.
 
@@ -56,3 +56,7 @@ precedent already used elsewhere in this codebase for a gated-forward shape
 inventing a semantic verb ("Notify"/"Release"/etc.) the body does not
 support. `unk10`/`unk70` themselves are left unnamed -- no evidence beyond
 "nonzero gate" exists for either.
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+The forward is Viewport's +0x09C `update` (`GetViewportMethods()->update((Viewport *)self)`, include/Viewport.h, round 85). In Viewport's layout, `unk10` is `viewNode` and `unk70` is `otReady`; Class869D8's own view keeps its names. Byte-identical.

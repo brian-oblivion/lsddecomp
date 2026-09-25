@@ -165,7 +165,7 @@ near-miss):
   `+0x09C` on that getter's table with a 3-argument call
   (`self, arg1, arg2`), which conflicts in arity with
   `BaseCtorTable_3bb8c_c::slot9C` (1-argument, established this same round
-  from `Class869D8__ForwardIfUnk10AndUnk70` via the OTHER getter, `GetUnk18ObjMethods` -- a DIFFERENT
+  from `Class869D8__ForwardIfUnk10AndUnk70` via the OTHER getter, `GetViewportMethods` -- a DIFFERENT
   global/table). Same-offset arity conflict means different table/different
   class, per this project's established split policy (see
   `TaskCoreObjMethods` in `include/code_2c054.h` for the precedent this

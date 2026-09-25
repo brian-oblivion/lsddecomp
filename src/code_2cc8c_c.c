@@ -8,20 +8,17 @@
  * include/IntermediateBase.h, whose banner says what it does (track 4,
  * round 82); these functions take `IntermediateBase *self`.
  *
- * The remaining functions are `Unk18Obj`'s own constructor chain (`New_
- * Unk18Obj`, `Unk18Obj__Unk18Obj`, `Unk18Obj__Finalize`) and its `addChild`/
- * `removeChild` overrides (`Unk18Obj__AddChild`/`Unk18Obj__RemoveChild`,
- * which cache a child's pointer by its dynamic class tag) -- `Unk18Obj` is
- * SHARED with code_2cc8c_d.c, which carves the rest of its own vtable slots;
- * see include/code_2cc8c.h's own struct comment for what evidence is
- * exclusive to which unit. `Get_vtable_TaskCore`/`GetDefaultStreamTaskInitData`
+ * The remaining functions are Viewport's (class id 0x7, gViewportMethods,
+ * include/Viewport.h; track 4, round 85): New_Viewport, the ctor, finalize
+ * and the addChild/removeChild/removeAllChildren overrides, which cache a
+ * child by its class-id nibble. code_2cc8c_d.c holds the rest of its table. `Get_vtable_TaskCore`/`GetDefaultStreamTaskInitData`
  * are plain accessors for tables SHARED far more widely (code_2c054.c,
  * class_3bb8c_t.c) that simply happen to live in this unit's address range.
  *
  * Round 55 (runner alpha): full track-3 naming pass. Every definition named;
  * see each function's own match report for the `## Naming` evidence.
- * Unk18Obj/Unk18ObjMethods/GenericObjMethods (and until round 84 the
- * TaskCore view Obj86B60, now include/TaskCore.h) are
+ * Unk18Obj (now Viewport, include/Viewport.h) and until round 84 the
+ * TaskCore view Obj86B60 (now include/TaskCore.h) were
  * SHARED with one or more of code_2cc8c.c, code_2cc8c_b.c and
  * code_2cc8c_d.c (same classes, split by address range across sibling
  * units), so most field/slot renames on those particular structs are
@@ -32,6 +29,7 @@
 
 #include "common.h"
 #include "code_2cc8c.h"
+#include "Viewport.h"
 
 s32 TaskCore__GetActiveSlotCount(TaskCore *self)
 {
@@ -116,7 +114,7 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     if (args->viewport != NULL) {
         self->viewport = args->viewport;
     } else {
-        self->viewport = (BasicClass *)New_Unk18Obj();
+        self->viewport = (BasicClass *)New_Viewport();
     }
     self->initArgs = args;
     viewport = self->viewport;
@@ -224,77 +222,77 @@ IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
     return &gIntermediateBaseMethods;
 }
 
-Unk18Obj *New_Unk18Obj(void)
+Viewport *New_Viewport(void)
 {
-    Unk18Obj *self;
+    Viewport *self;
 
     self = BMemPMgrAlloc(0xBC);
     if (self != NULL) {
-        GetUnk18ObjMethods()->ctor(self);
+        GetViewportMethods()->ctor(self);
         return self;
     }
     return NULL;
 }
 
-void Unk18Obj__Unk18Obj(Unk18Obj *self)
+void Viewport__Viewport(Viewport *self)
 {
-    SubHandleObj *obj;
+    Class6B5CC *obj;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = GetUnk18ObjMethods();
-    self->unkC = 0;
-    self->unk10 = 0;
-    self->unkAC = New_Class6B5CC();
-    obj = New_Class6E99C(D_8008A90C, 0, 0);
-    self->unkB0 = obj;
-    obj->methods->slot4C(obj, self->unkAC, D_8008A904);
-    self->methods->slot40(self);
+    self->methods = GetViewportMethods();
+    self->drawSystem = 0;
+    self->viewNode = 0;
+    self->sceneRoot = New_Class6B5CC();
+    obj = (Class6B5CC *)New_Class6E99C(D_8008A90C, 0, 0);
+    self->subHandle = obj;
+    obj->methods->attachToParent(obj, self->sceneRoot, (Vec3_d294 *)D_8008A904);
+    self->methods->initDefaults(self);
 }
 
-void Unk18Obj__Finalize(Unk18Obj *self)
+void Viewport__Finalize(Viewport *self)
 {
-    self->methods->slot90(self);
-    self->methods->slot74(self);
-    self->unkAC->methods->release(self->unkAC);
-    self->methods->slotA8(self, 0);
+    self->methods->deinitOt(self);
+    self->methods->detachViewChild(self);
+    self->sceneRoot->methods->release(self->sceneRoot);
+    self->methods->setSubHandle(self, 0);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void Unk18Obj__AddChild(Unk18Obj *self, GenericObj *arg1)
+void Viewport__AddChild(Viewport *self, BasicClass *child)
 {
     s32 header;
 
-    Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)arg1);
-    header = arg1->methods->header & 0xF;
+    Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
+    header = child->methods->header & 0xF;
     if (header == 4) {
-        self->unk10 = arg1;
-        self->unk30 = arg1->unk14;
+        self->viewNode = (Class6B5CC *)child;
+        self->refView.super = ((Class6B5CC *)child)->coord2;
     } else if (header == 1) {
-        self->unkC = arg1;
+        self->drawSystem = child;
     }
 }
 
-void Unk18Obj__RemoveChild(Unk18Obj *self, GenericObj *arg1)
+void Viewport__RemoveChild(Viewport *self, BasicClass *child)
 {
     s32 header;
 
-    header = arg1->methods->header & 0xF;
+    header = child->methods->header & 0xF;
     if (header == 4) {
-        self->unk30 = 0;
-        self->unk10 = NULL;
+        self->refView.super = 0;
+        self->viewNode = NULL;
     } else if (header == 1) {
-        self->unkC = NULL;
+        self->drawSystem = NULL;
     }
-    Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)arg1);
+    Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
 }
 
-/* Unk18Obj's removeAllChildren override (+0x018 of D_8006E8E4 and of
- * gClass869D8Methods), not TaskCore's: the name predates that reading. The
- * three fields are Unk18Obj's child caches (see Unk18Obj__AddChild above). */
-void Obj86B60__ResetAndRemoveAllChildren(Unk18Obj *self)
+/* Viewport's removeAllChildren override (+0x018 of gViewportMethods and of
+ * gClass869D8Methods): clears the three child caches AddChild fills, then
+ * the base. */
+void Viewport__RemoveAllChildren(Viewport *self)
 {
-    self->unk30 = 0;
-    self->unk10 = 0;
-    self->unkC = NULL;
+    self->refView.super = 0;
+    self->viewNode = 0;
+    self->drawSystem = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }

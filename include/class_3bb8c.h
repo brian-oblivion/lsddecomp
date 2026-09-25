@@ -858,20 +858,8 @@ struct Class869D8 {
 extern Class869D8Methods gClass869D8Methods;
 extern Class869D8Methods *GetClass869D8Methods(void);
 
-/*
- * Base-class ctor-table getter, chained by Class869D8__Class869D8. Only the ctor
- * slot (+0x008, single `self` argument -- this call site sets up no
- * second argument register) is needed here.
- */
-typedef struct BaseCtorTable_3bb8c_c {
-    u8 pad0[0x008];
-    void (*ctor)(void *self);
-    u8 pad00C[0x09C - 0x00C];
-    void (*slot9C)(void *self);   /* +0x09C, Class869D8__ForwardIfUnk10AndUnk70's forward target (gated by
-                                      Class869D8::unk10/unk70 both being nonzero) */
-} BaseCtorTable_3bb8c_c;
-
-extern BaseCtorTable_3bb8c_c *GetUnk18ObjMethods(void);
+/* Class869D8's parent is Viewport (0x7): its ctor chains to
+ * GetViewportMethods()->ctor, declared in include/Viewport.h. */
 
 extern void *BMemPMgrAlloc(s32 size);
 

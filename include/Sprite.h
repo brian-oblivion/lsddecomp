@@ -6,7 +6,7 @@
 /*
  * Sprite -- the base of the game's 2-D sprites (class id 0x44, method table
  * gSpriteMethods): a Class6B5CC subclass that draws a libgs GsSPRITE embedded
- * at +0x064 instead of its GsDOBJ2 model. Unk18Obj__DrawNode hands
+ * at +0x064 instead of its GsDOBJ2 model. Viewport__DrawNode hands
  * `self + 0x64` to GsSortSprite for every class whose id's low byte is 0x44:
  * screen-space for 0x144 (ScreenSprite and below), otherwise world-space,
  * projected from the inherited coordinate. Methods in src/code_322b4.c; four
@@ -101,7 +101,7 @@ struct SpriteGs {
     /* +0x058 */ s32 unk58;             /* zeroed by reset; D800879C4__UpdateScale: non-zero scales unk5C/unk60 instead of the sprite */ \
     /* +0x05C */ s32 unk5C;             /* D800879C4__UpdateScale: times the x ratio when unk58 != 0 */ \
     /* +0x060 */ s32 unk60;             /* D800879C4__UpdateScale: times the y ratio when unk58 != 0 */ \
-    /* +0x064 */ SpriteGs sprite;       /* InitGsSprite fills it; Unk18Obj__DrawNode sorts it */    \
+    /* +0x064 */ SpriteGs sprite;       /* InitGsSprite fills it; Viewport__DrawNode sorts it */    \
     /* +0x088 */ u8 pad88[0xA0 - 0x88]  /* the object is 0xA0 bytes (New_Sprite); ScreenSprite's own fields start at +0x0A0 */
 
 struct SpriteMethods {

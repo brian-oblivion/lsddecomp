@@ -818,7 +818,7 @@ Apply both halves of the candidate to the preserved body below (with its
 typedefs), build, and measure. Try the reload elimination ALONE first -- on
 the sibling that single change carried the entire 12-word gain, and a combined
 result says nothing until each component is measured alone (round 39's
-head-side trap on `Unk18Obj__InitOt`).
+head-side trap on `Viewport__InitOt`).
 
 ## Naming
 

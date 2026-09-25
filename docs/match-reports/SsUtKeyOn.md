@@ -752,7 +752,7 @@ and confirmed the guard-polarity residue is context-sensitive in a way
 this project's source-level view cannot reach, and a round-31 addendum
 that gained exactly one word from the one lever it had left -- reads as
 exhausted for hand reshaping. Time this round went to the two tighter
-gaps (`Unk18Obj__InitOt`, `SsUtChangePitch`) instead, per this round's own
+gaps (`Viewport__InitOt`, `SsUtChangePitch`) instead, per this round's own
 stated priority. Restored to `INCLUDE_ASM`. Classification unchanged:
 STALL.
 

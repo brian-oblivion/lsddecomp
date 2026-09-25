@@ -63,9 +63,9 @@ literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x03
 `+0x048 IntermediateBase__Deinit`, `+0x054 IntermediateBase__OnTag1Notify`, `+0x05C IntermediateBase__IncrementFrameCounter`
 (already matched), `+0x060 IntermediateBase__SetState`, `+0x064 IntermediateBase__OnState2` (already
 matched), `+0x068 IntermediateBase__OnState3`. Every one of this round's 12 fresh
-functions except `New_Unk18Obj`/`Unk18Obj__Unk18Obj`/`Unk18Obj__Finalize`/
-`Unk18Obj__AddChild`/`Unk18Obj__RemoveChild` (a SECOND, unrelated shared table,
-`D_8006E8E4`, see `New_Unk18Obj.md`) is a slot of this one table.
+functions except `New_Viewport`/`Viewport__Viewport`/`Viewport__Finalize`/
+`Viewport__AddChild`/`Viewport__RemoveChild` (a SECOND, unrelated shared table,
+`gViewportMethods`, see `New_Viewport.md`) is a slot of this one table.
 
 ### Proposed learning
 
@@ -97,7 +97,7 @@ dynamic class tag -- the textbook "override calls base first, then does its
 own work" shape for a virtual method whose base identity is independently
 confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
 `onNotify` in this unit's `## Proposed field names` (shared with
-`code_2cc8c_d.c`'s own `Unk18Obj__OnNotify`).
+`code_2cc8c_d.c`'s own `Viewport__OnNotify`).
 
 ## Proposed field names
 
@@ -105,7 +105,7 @@ confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
   matches `include/code_8220.h`'s own canonical, already-named
   `BasicClassMethods::slot38` = `onNotify` exactly (`IS BasicClass__OnNotify`,
   code_8220_b, per this header's own comment). NOT renamed directly:
-  `code_2cc8c_d.c`'s `Unk18Obj__OnNotify` also calls
+  `code_2cc8c_d.c`'s `Viewport__OnNotify` also calls
   `Get_vtable_BasicClass()->slot38(self, arg1, arg2)`, so this field is
   shared within the code_2cc8c family. Head applies by type scope (rename
   the field in `BasicClassMethodsCC8C`'s own definition,

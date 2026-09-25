@@ -186,8 +186,9 @@ struct Class86F88Handle_3bb8c_j {
  * it, and Class86F88__Class86F88 (that very ctor occupant) separately does
  * `self->methods = GetClass86F88Methods();` -- both compile against the same
  * declared return type, which is why this is not split into a separate
- * "ctor table" type the way class_3bb8c_c's BaseCtorTable_3bb8c_c is for
- * an unrelated base class.
+ * "ctor table" type the way class_3bb8c_c's BaseCtorTable_3bb8c_c was for
+ * an unrelated base class (that view is gone: it was Viewport's table,
+ * include/Viewport.h, round 85).
  */
 struct Class86F88Methods_3bb8c_j {
     u8 pad000[0x008];

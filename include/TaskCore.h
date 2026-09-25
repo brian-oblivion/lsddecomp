@@ -62,9 +62,11 @@
  * the one up-call that passes self alone casts the slot.
  *
  * The objects TaskCore holds from classes with no header yet (VabStreamObj,
- * BgLayer, TileMap, TileAtlas, the slot and list widgets, the viewport's
- * Unk18Obj) are `BasicClass *`, the parent every one of them has; a unit
- * that calls one past BasicClass's slots casts to its own view of it.
+ * BgLayer, TileMap, TileAtlas, the slot and list widgets) are `BasicClass *`,
+ * the parent every one of them has; a unit that calls one past BasicClass's
+ * slots casts to its own view of it. The viewport (IntermediateBase's field)
+ * is a Viewport, unified in include/Viewport.h in round 85; its callers cast
+ * to that type.
  */
 
 typedef struct TaskCore TaskCore;
@@ -142,7 +144,7 @@ struct TaskCoreTarget {
 
 #define TASKCORE_FIELDS(Methods)                                                                   \
     INTERMEDIATEBASE_FIELDS(Methods);                                                              \
-    /* +0x028 */ s32 unk28;             /* reset: 3; onInit: the viewport's +0x048 (Unk18Obj__SetUnk3C) */ \
+    /* +0x028 */ s32 unk28;             /* reset: 3; onInit: the viewport's +0x048 (Viewport__SetOtLength) */ \
     /* +0x02C */ s32 unk2C;             /* reset: 0x12C (GraphRoomObj 0x190); onInit: viewport +0x04C (SetUnk44) */ \
     /* +0x030 */ s32 unk30;             /* reset: 0x40; onInit: viewport +0x050 (SetUnk48) */      \
     /* +0x034 */ s32 unk34;             /* reset: 1; nonzero: onDeinit hands unk93 to initArgs->unk0's +0x078 */ \

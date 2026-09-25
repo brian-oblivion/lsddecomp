@@ -106,3 +106,7 @@ dtor slot, so left `Class__func_xxxxx` rather than assert "Stop" or
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from TaskCoreObj__func_8003C3D0 (tools/rename.py). Occupant of +0x050 (`onDeinit`, IntermediateBase__Deinit's first call), named for the slot. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-25, round 85, bravo)
+
+The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view; +0x090 is deinitOt and +0x074 detachViewChild. Byte-identical.

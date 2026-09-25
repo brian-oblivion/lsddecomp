@@ -1,0 +1,214 @@
+#ifndef VIEWPORT_H
+#define VIEWPORT_H
+
+#include "BasicClass.h"
+#include "Class6B5CC.h"
+
+/*
+ * Viewport -- the object that renders a scene (class id 0x7, method table
+ * gViewportMethods): a BasicClass subclass. Methods in src/code_2cc8c_c.c
+ * (ctor, finalize and the child overrides), src/code_2cc8c_d.c (everything
+ * from +0x038 on) and src/code_2864.c (drawNode). IntermediateBase and
+ * TaskCore hold one as `viewport` (New_Viewport, or the caller's own).
+ *
+ * The name is for what the class's own methods do:
+ *  - it holds a libgs GsRVIEW2 at +0x014: AttachViewChild and Update hand
+ *    &refView to GsSetRefView2, setViewPoint/setViewRef/setTwist write its
+ *    vp, vr and rz, and AddChild points its `super` at the view node's
+ *    GsCOORDINATE2 (Class6B5CC::coord2), which Update marks for recompute
+ *    (flg = 0) every frame;
+ *  - Update sets the projection distance, near clip, light mode and fog
+ *    (GsSetProjection(projH), GsSetNearClip(nearZ), GsSetLightMode,
+ *    SetFarColor, SetFogNear) and draws the scene tree through drawNode:
+ *    the view node, `sceneRoot` (a New_Class6B5CC), and the root of the view
+ *    node's parent chain (GetRootNode);
+ *  - InitOt allocates a double-buffered pair of 0x14-byte GsOT headers, each
+ *    followed by its 1 << otLength tags and its packet area; drawNode sorts
+ *    into ot[otIndex], and Flip clears and draws that half (GsSortClear,
+ *    GsDrawOt), then takes the next index from the DrawSystem child's
+ *    getActiveBuffer and swapBuffers slots.
+ *
+ * Children are cached by their class-id nibble (AddChild/RemoveChild): 1 is
+ * the DrawSystem (D_8006C070, id 0x1), 4 a Class6B5CC, the node the view is
+ * attached to. Both are typed by the class that owns the slot they reach
+ * through (drawSystem as BasicClass: DrawSystem has no header yet, so
+ * code_2cc8c_d casts it to its GenericObj view).
+ *
+ * The ctor chains to BasicClass's first (Get_vtable_BasicClass()->ctor),
+ * and gClass869D8Methods's (0x17, include/class_3bb8c.h) chains to this one,
+ * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. Class869D8's own
+ * views are its own and do not expand these macros yet.
+ *
+ * Not settled here: subHandle is a Class6E99C (0x164, below D_8006EAC0,
+ * 0x64), whose +0x04C override (Obj6EAC0__Layout) takes a two-word screen
+ * position where Class6B5CC's attachToParent slot takes a Vec3_d294 offset;
+ * the ctor and SetSubHandle pass D_8008A904 (-100, -100) through the
+ * inherited slot with a pointer cast. unk44 and unk48 multiply to each
+ * buffer's packet area (InitOt; defaults 2000 and 64); which is the count
+ * and which the size is not shown. drawNode (Viewport__DrawNode) reads its
+ * node through code_2864.c's own DrawNode view, so it is not prototyped
+ * here.
+ *
+ * The object is 0xBC bytes (New_Viewport).
+ */
+
+typedef struct Viewport Viewport;
+typedef struct ViewportMethods ViewportMethods;
+typedef struct ViewportSize ViewportSize;
+typedef struct ViewportRgb ViewportRgb;
+typedef struct ViewportRefView ViewportRefView;
+typedef struct ViewportOt ViewportOt;
+
+/* The screen size: drawNode reads it as the width and height the box and
+ * screen-space sprite paths take percentages of. Defaults 256 x 240
+ * (D_8008A8FC, D_8008A900). setScreenSize copies it whole: retail loads both
+ * words before storing either. */
+struct ViewportSize {
+    s32 width;
+    s32 height;
+};
+
+/* An RGB triple, copied whole (retail loads all three bytes before storing
+ * any). Written as signed bytes, read unsigned by GsSortClear/SetFarColor. */
+struct ViewportRgb {
+    s8 r;
+    s8 g;
+    s8 b;
+};
+
+/* libgs GsRVIEW2, 0x20 bytes: the argument GsSetRefView2 takes. */
+struct ViewportRefView {
+    Vec3_d294 vp;              /* +0x000, viewpoint: setViewPoint */
+    Vec3_d294 vr;              /* +0x00C, reference point: setViewRef */
+    s32 rz;                    /* +0x018, twist, 20.12 (setTwist) */
+    Class6B5CCSub14 *super;    /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
+};
+
+/* libgs GsOT header, 0x14 bytes: InitOt fills the two words it sets. */
+struct ViewportOt {
+    s32 length;                /* +0x000, otLength */
+    s32 org;                   /* +0x004, this half's otTags */
+    u8 pad08[0x14 - 0x08];
+};
+
+/* BasicClass's slots, then this class's own. `tools/classtable.py
+ * gViewportMethods --vs D_8006B58C` lists the overrides of the inherited
+ * ones (ctor, finalize, addChild, removeChild, removeAllChildren, onNotify). */
+#define VIEWPORT_SLOTS(Self, CtorParams)                                                           \
+    BASICCLASS_SLOTS(Self, CtorParams);                                                            \
+    /* +0x040 */ void (*initDefaults)(Self *self);                  /* Viewport__InitDefaults; Class869D8: func_8004D2F8, empty */ \
+    /* +0x044 */ void (*setScreenSize)(Self *self, ViewportSize *size); /* Viewport__SetScreenSize */ \
+    /* +0x048 */ void (*setOtLength)(Self *self, s32 length);      /* Viewport__SetOtLength */       \
+    /* +0x04C */ void (*setUnk44)(Self *self, s32 value);          /* Viewport__SetUnk44, before InitOt only */ \
+    /* +0x050 */ void (*setUnk48)(Self *self, s32 value);          /* Viewport__SetUnk48, before InitOt only */ \
+    /* +0x054 */ void (*setProjection)(Self *self, s32 h);         /* Viewport__SetProjection */     \
+    /* +0x058 */ void (*slot58)(void);                             /* func_8003EA6C, empty */        \
+    /* +0x05C */ void (*slot5C)(void);                             /* func_8003EA74, empty */        \
+    /* +0x060 */ void (*setLightMode)(Self *self, s32 mode);       /* Viewport__SetLightMode */      \
+    /* +0x064 */ void (*setClearColor)(Self *self, ViewportRgb *color); /* Viewport__SetClearColor */ \
+    /* +0x068 */ void (*setFarColor)(Self *self, ViewportRgb *color);   /* Viewport__SetFarColor */ \
+    /* +0x06C */ void (*setFogNear)(Self *self, s32 fogNear);      /* Viewport__SetFogNear */        \
+    /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, Vec3_d294 *vp, Vec3_d294 *vr, WholeFrac_d294 *twist); /* Viewport__AttachViewChild; NULL twist: D_8008A8F4 */ \
+    /* +0x074 */ void (*detachViewChild)(Self *self);              /* Viewport__DetachViewChild */   \
+    /* +0x078 */ void (*setViewPoint)(Self *self, Vec3_d294 *vp);  /* Viewport__SetViewPoint */      \
+    /* +0x07C */ void (*setViewRef)(Self *self, Vec3_d294 *vr);    /* Viewport__SetViewRef */        \
+    /* +0x080 */ void (*setTwist)(Self *self, WholeFrac_d294 *twist); /* Viewport__SetTwist */       \
+    /* +0x084 */ void (*slot84)(void);                             /* func_8003ECC0, empty */        \
+    /* +0x088 */ void (*slot88)(void);                             /* func_8003ECC8, empty */        \
+    /* +0x08C */ void (*initOt)(Self *self);                       /* Viewport__InitOt */            \
+    /* +0x090 */ void (*deinitOt)(Self *self);                     /* Viewport__DeinitOt */          \
+    /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (D_8006EF50) case */ \
+    /* +0x098 */ void (*onNotifyTag1)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag1: onNotify's DrawSystem (1) case */ \
+    /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; Class869D8__ForwardIfUnk10AndUnk70 */ \
+    /* +0x0A0 */ void (*drawNode)(Self *self, Class6B5CC *node);   /* Viewport__DrawNode (code_2864) */ \
+    /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
+    /* +0x0A8 */ void (*setSubHandle)(Self *self, Class6B5CC *handle); /* Viewport__SetSubHandle */  \
+    /* +0x0AC */ Class6B5CC *(*getSubHandle)(Self *self);          /* Viewport__GetSubHandle */      \
+    /* +0x0B0 */ void (*setUnkB4)(Self *self, s32 value);          /* Viewport__SetUnkB4 */          \
+    /* +0x0B4 */ void (*setDrawEnabled)(Self *self, s32 on)        /* Viewport__SetDrawEnabled */
+
+#define VIEWPORT_FIELDS(Methods)                                                                   \
+    BASICCLASS_FIELDS(Methods);                                                                    \
+    /* +0x00C */ BasicClass *drawSystem;  /* the class-1 child (AddChild); Flip's getActiveBuffer/swapBuffers */ \
+    /* +0x010 */ Class6B5CC *viewNode;    /* the class-4 child (AddChild); refView.super is its coord2 */ \
+    /* +0x014 */ ViewportRefView refView; /* GsSetRefView2's argument */                          \
+    /* +0x034 */ ViewportSize screenSize;                                                          \
+    /* +0x03C */ s32 otLength;            /* GsOT length: 1 << otLength tags; drawNode's priority range */ \
+    /* +0x040 */ s32 projH;               /* GsSetProjection's h; drawNode's sprite projection */  \
+    /* +0x044 */ s32 unk44;               /* unk44 * unk48: each buffer's packet area */           \
+    /* +0x048 */ s32 unk48;                                                                        \
+    /* +0x04C */ s32 nearZ;               /* GsSetNearClip; drawNode's sprite near limit */        \
+    /* +0x050 */ s32 farZ;                /* zDiv = (farZ - nearZ) / (1 << otLength) + 1 */        \
+    /* +0x054 */ s32 lightMode;           /* GsSetLightMode; 1 or 3 also sets the fog */           \
+    /* +0x058 */ ViewportRgb clearColor;  /* Flip's GsSortClear */                                 \
+    /* +0x05B */ ViewportRgb farColor;    /* Update's SetFarColor */                               \
+    /* +0x05E */ u8 pad05E[2];                                                                     \
+    /* +0x060 */ s32 fogNear;             /* Update's SetFogNear */                                \
+    /* +0x064 */ u8 pad064[0x070 - 0x064];                                                         \
+    /* +0x070 */ s32 otReady;             /* InitOt sets, DeinitOt clears; Update/Flip need it */  \
+    /* +0x074 */ s32 otIndex;             /* the half being drawn; Flip takes the next one */      \
+    /* +0x078 */ ViewportOt *ot[2];       /* InitOt's two GsOT headers */                          \
+    /* +0x080 */ s32 otTags[2];           /* each header's org: its tag array */                   \
+    /* +0x088 */ s32 workBase[2];         /* each half's packet area: GsSetWorkBase */             \
+    /* +0x090 */ s32 unk90;               /* counts class-5 notifications (OnNotifyTag5) */        \
+    /* +0x094 */ u8 pad094[0x098 - 0x094];                                                         \
+    /* +0x098 */ s32 zDiv;                /* Update: the depth per OT tag; drawNode's sprite z */  \
+    /* +0x09C */ u8 pad09C[0x0AC - 0x09C];                                                         \
+    /* +0x0AC */ Class6B5CC *sceneRoot;   /* the ctor's New_Class6B5CC; Update draws it; finalize releases it */ \
+    /* +0x0B0 */ Class6B5CC *subHandle;   /* the ctor's New_Class6E99C, attached under sceneRoot */ \
+    /* +0x0B4 */ s32 unkB4;               /* Flip: nonzero swaps once more on buffer 0 */          \
+    /* +0x0B8 */ s32 drawEnabled          /* Flip: 0 skips the clear and draw; default 1 */
+
+struct ViewportMethods {
+    VIEWPORT_SLOTS(Viewport, (Viewport *self));
+};
+
+struct Viewport {
+    VIEWPORT_FIELDS(ViewportMethods);
+};
+
+extern ViewportMethods gViewportMethods;
+extern ViewportMethods *GetViewportMethods(void); /* returns &gViewportMethods */
+
+/* The occupants of gViewportMethods, in slot order (drawNode excepted, see
+ * the banner), then the class's allocator and one helper. */
+void Viewport__Viewport(Viewport *self);
+void Viewport__Finalize(Viewport *self);
+void Viewport__AddChild(Viewport *self, BasicClass *child);
+void Viewport__RemoveChild(Viewport *self, BasicClass *child);
+void Viewport__RemoveAllChildren(Viewport *self);
+void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event);
+void Viewport__InitDefaults(Viewport *self);
+void Viewport__SetScreenSize(Viewport *self, ViewportSize *size);
+void Viewport__SetOtLength(Viewport *self, s32 length);
+void Viewport__SetUnk44(Viewport *self, s32 value);
+void Viewport__SetUnk48(Viewport *self, s32 value);
+void Viewport__SetProjection(Viewport *self, s32 h);
+void func_8003EA6C(void);
+void func_8003EA74(void);
+void Viewport__SetLightMode(Viewport *self, s32 mode);
+void Viewport__SetClearColor(Viewport *self, ViewportRgb *color);
+void Viewport__SetFarColor(Viewport *self, ViewportRgb *color);
+void Viewport__SetFogNear(Viewport *self, s32 fogNear);
+void Viewport__AttachViewChild(Viewport *self, BasicClass *node, Vec3_d294 *vp, Vec3_d294 *vr, WholeFrac_d294 *twist);
+void Viewport__DetachViewChild(Viewport *self);
+void Viewport__SetViewPoint(Viewport *self, Vec3_d294 *vp);
+void Viewport__SetViewRef(Viewport *self, Vec3_d294 *vr);
+void Viewport__SetTwist(Viewport *self, WholeFrac_d294 *twist);
+void func_8003ECC0(void);
+void func_8003ECC8(void);
+void Viewport__InitOt(Viewport *self);
+void Viewport__DeinitOt(Viewport *self);
+void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event);
+void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event);
+void Viewport__Update(Viewport *self);
+void Viewport__Flip(Viewport *self);
+void Viewport__SetSubHandle(Viewport *self, Class6B5CC *handle);
+Class6B5CC *Viewport__GetSubHandle(Viewport *self);
+void Viewport__SetUnkB4(Viewport *self, s32 value);
+void Viewport__SetDrawEnabled(Viewport *self, s32 on);
+
+Viewport *New_Viewport(void);                 /* BMemPMgrAlloc(0xBC), then ctor */
+Class6B5CC *GetRootNode(Class6B5CC *node);    /* follow `parent` to the top */
+
+#endif

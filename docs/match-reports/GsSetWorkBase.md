@@ -34,7 +34,7 @@ confirms the mechanics from the reader side: its own comment calls this same
 global "the packet-buffer write cursor, reloaded ... at the top of every
 group and advanced by each submit wrapper's return value"
 (`prim = (u8 *)GsOUT_PACKET_P; ...; GsOUT_PACKET_P = prim;`). The one caller,
-`Unk18Obj__Update`, passes `self->unk88[idx]` (a per-OT-slot work-buffer base)
+`Viewport__Update`, passes `self->unk88[idx]` (a per-OT-slot work-buffer base)
 right before calling `GsClearOt` on the same slot -- i.e. this resets the
 cursor to the start of that slot's packet buffer for the frame about to
 render into it, which is consistent with, and does not exceed, what the body
@@ -49,7 +49,7 @@ global, not unit-static -- moot here since it already carries its Sony name.
 
 `func_8003FB0C` (`src/code_2cc8c_e0.c`, charlie's unit this round) is the
 identical shape one function earlier in the same original segment
-(`D_800902E4 = a0`), called from the same caller (`Unk18Obj__Update`) two
+(`D_800902E4 = a0`), called from the same caller (`Viewport__Update`) two
 lines above this one. `D_800902E4` is NOT referenced outside
 `code_2cc8c_e0.c` (checked: `grep -rn D_800902E4 src/ include/`), so unlike
 `GsOUT_PACKET_P` it does not carry a Sony pin as far as this unit can see --

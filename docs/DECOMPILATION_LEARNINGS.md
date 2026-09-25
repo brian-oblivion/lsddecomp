@@ -424,7 +424,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **The filler follows the block rule too.** Untouched frame bytes ABOVE an inner-block aggregate
   are an unused aggregate declared in that SAME inner block, after it: outer-block address-taken
   scalars get the lower slots, inner-block aggregates stack above them in declaration order
-  (`Unk18Obj__DrawNode`, an unused `SVECTOR` beside `VECTOR pos`, frame 0x90 -> 0x98, round 81).
+  (`Viewport__DrawNode`, an unused `SVECTOR` beside `VECTOR pos`, frame 0x90 -> 0x98, round 81).
 
 ### 3f. Calls, arguments and return types
 
@@ -526,7 +526,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   a pointer local assigned before the test.** Inline at the call it is one word short
   (`func_8003B4A8`, round 81).
 - **A callee-saved register holding a stack struct's address from the prologue on is an explicit
-  pointer local** (`MATRIX *ls = &lsBuf;`): `Unk18Obj__DrawNode` 19 -> 150 of 449, round 81.
+  pointer local** (`MATRIX *ls = &lsBuf;`): `Viewport__DrawNode` 19 -> 150 of 449, round 81.
 
 - **A delay-slot instruction executes on the TAKEN path too, and a delay-slot store is
   UNCONDITIONAL.** Evaluate the value at the TARGET: `li $v0, 0x1` in a slot with `sw $v0, 0x24(s1)`
@@ -586,7 +586,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (cond) return 1; return 0;` with `flag = 1; return flag;`. (a §"Defeat 2.6.3's constant
   canonicalization") The mechanism is the TREE folder, before RTL: it hoists a literal out of a sum
   (`s + (p + 0x14)` -> `(s + p) + 0x14`), so no spelling containing the literal reaches retail's
-  grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`Unk18Obj__InitOt`,
+  grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`Viewport__InitOt`,
   73/73 after 14 groupings and ~89k permuter iterations); splitting `(w + 20) - span` into two
   statements closed `Class866E8__SplitFootprintSlot`. (round 71) The same goes for a multiply and a byte constant: retail's `li; mult` right after storing that constant is the multiply BY THE STORED FIELD (a literal `* 15` strength-reduces to `sll`/`subu`, one word short; round 82, code_33808), and `li 0x80` feeding `s8` stores is `s32 grey = 0x80;` (the literal folds to `li -0x80`; `InitGsSprite`, round 82).
 - **A flat table indexed `&T[r*C]` then `[c]` wants a named row-pointer local, `T (*tbl)[C] = ...;
@@ -705,7 +705,7 @@ entries below: archive, "Distilled out on 2026-09-22").
 - §"Two DISTINCT permuter false-lead patterns" and §"A residue next to a just-fixed defect" —
   libcd instances only, illustrations not measurements.
 - §"NEW STALL CLASS: retail recomputes an address our GCC CSEs away" — original example Sony's
-  `strcmp`; `Unk18Obj__InitDefaults` is game code, CLOSED (3h).
+  `strcmp`; `Viewport__InitDefaults` is game code, CLOSED (3h).
 - **Not a fifth way a score lies** (forgotten-`padNN` pad, drift misattributed to the cursor
   function, jump-table funcdiff window, `.bss`-shifting length-short function): CLAUDE.md covers
   all four by name; do not re-propose.
