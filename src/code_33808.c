@@ -13,7 +13,7 @@
  * and GetClass6B5CCMethods. libpress starts right after, at DecDCTReset
  * (now psyq_36654).
  *
- * Nothing here is matched yet: every function is fresh track-1 ground.
+ * Matching began in round 82: `grep -c INCLUDE_ASM` gives what is left.
  */
 #include "common.h"
 
