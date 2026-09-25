@@ -152,7 +152,10 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041F88);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004202C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004208C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042170);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004220C);
+/* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
+s32 func_8004220C(SpriteView_322b4 *self, s32 a1) {
+    return GetSetBitField(&self->attribute, 0x1F, 1, a1 == 0) == 0;
+}
 /* Sprite classes slot +0x064: attribute bit 30. */
 s32 func_8004223C(SpriteView_322b4 *self, s32 a1) {
     return GetSetBitField(&self->attribute, 0x1E, 1, a1 != 0);
