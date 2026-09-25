@@ -90,3 +90,21 @@ array that a single C declaration should unify -- check whether the
 disassembly takes ONE relocation or TWO before merging them. Here it's
 two, so the correct C is two parallel arrays over one strided index, not
 one struct-array declaration.
+
+## Naming
+
+Round 79 naming pass (runner echo). The body above is the round-47 match;
+the live source now spells the struct `D800879C4Obj` with the field names
+below, byte-identical.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `D800879C4__SetVariantClut` (was `func_80057DBC`) | A | Pure leaf whose mechanics are its purpose: stores its argument at `+0xA0` and loads `+0x74`/`+0x76` from a two-entry table indexed by it. `+0x64` is an embedded GsSPRITE: the base class's init `func_8004208C` (asm/psyq_322b4.s) writes attribute `+0`, w/h `+8`/`+A`, tpage `+C` (from `func_80023F08`), u/v `+E`/`+F`, cx/cy `+0x10`/`+0x12` (from the image), r,g,b = 0x80 at `+0x14..0x16`, mx/my = w/2,h/2 at `+0x18`/`+0x1A`, scalex/scaley = 0x1000 at `+0x1C`/`+0x1E`, rotate = 0 at `+0x20`, all at GsSPRITE offsets relative to `+0x64`; `func_80012064` (asm/psyq_2864.s) passes `self+0x64` to `GsSortSprite` for tag-0x44 objects (header 0x1F44). So `+0x74`/`+0x76` are GsSPRITE.cx/cy. The values {0x3D0, 0x1FF} and {0x3E0, 0x1FF} are 16-aligned VRAM x on the bottom line, which is where CLUTs go. "Variant": the same argument is the ctor's arg1 (`D800879C4__D800879C4`), which also selects the texture cell `&D_80087A8C[arg1]` (u,v = (0x00,0x20) or (0x10,0x20), 16x16) handed to the base ctor. Slot `+0x040` per `tools/classtable.py D_800879C4`. |
+| class prefix `D800879C4` | -- | The prefix the tree already uses for this table's class (`D800879C4__D800879C4`, `New_D800879C4`, class_3bb8c_p.c's `D800879C4Obj`/`D800879C4Methods`); `classtable.py` resolves slots `+0x040` and `+0x048` of `D_800879C4` to these two functions. No evidence yet for a game-level class name. |
+| `gD800879C4ClutX` / `gD800879C4ClutY` (were `D_80087AA4` / `D_80087AA6`) | A | Read only here, into GsSPRITE.cx / .cy. Really one `{s16 x, y}[2]` array; retail takes two relocations, so it stays two externs (see "The rodata shape"). |
+| field `spriteClutX` / `spriteClutY` (`+0x74`/`+0x76`) | A | GsSPRITE.cx/cy, above. Unit-local struct: renamed in place. |
+| field `variant` (`+0xA0`) | B | Mechanics certain (the index that picks the CLUT and, in the ctor, the texture cell); no reader of `+0xA0` on this class found (`func_80012064` reads `+0xA0` only on tag 0x144 objects, a different class). |
+
+## Proposed field names
+
+- `class_3bb8c_p.c`, `D800879C4Methods::postConstruct` (`+0x040`) -> `setVariantClut`, tier A: the slot resolves to this function (`tools/classtable.py D_800879C4`), and slots are named like the method they dispatch to. Only that one local view; do NOT touch `GraphRoomMethods::postConstruct` in class_3bb8c_t.c, which is a different class's slot. Not applied here (another unit's file).
