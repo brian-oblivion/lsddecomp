@@ -441,7 +441,7 @@ void func_80043954(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F13C +0x064: build a NULL-ended array at +0x2C of one
- * new_class_6bea0 object per 0x1C-byte record of the buffer (from +0x0C,
+ * New_TmdModel object per 0x1C-byte record of the buffer (from +0x0C,
  * +0x08 of them), after mapping the TMD (own +0x078); 1 when an allocation
  * fails (everything built so far released and the array freed), otherwise
  * the active driver's setFlag and 0. */
@@ -451,7 +451,7 @@ typedef struct Buf439EC {
     /* +0x0C */ u8 recs[1][0x1C];
 } Buf439EC;
 
-extern void *new_class_6bea0(void *arg);
+extern void *New_TmdModel(void *arg);
 
 s32 func_800439EC(DataSrc33808 *self) {
     DataSrc33808 **objs;
@@ -464,7 +464,7 @@ s32 func_800439EC(DataSrc33808 *self) {
     self->unk2C = (s32)objs;
     ((void (*)())self->methods->slot78)(self);
     for (i = 0; i < ((Buf439EC *)self->buffer)->count; i++) {
-        *objs = new_class_6bea0(((Buf439EC *)self->buffer)->recs[i]);
+        *objs = New_TmdModel(((Buf439EC *)self->buffer)->recs[i]);
         if (*objs == NULL) {
             while (i != 0) {
                 i--;
