@@ -858,6 +858,11 @@
           "date": "2026-09-26",
           "header": "include/BoxFill.h"
         },
+        "gCharSpriteMethods": {
+          "class": "CharSprite",
+          "date": "2026-09-26",
+          "header": "include/CharSprite.h"
+        },
         "gClass65650Methods": {
           "class": "Class65650",
           "date": "2026-09-25",
