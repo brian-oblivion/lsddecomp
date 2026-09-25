@@ -33,6 +33,9 @@ struct CdStreamObjMethods {
     /* +0x068 */ void (*demute)(CdStreamObj *self);                       /* func_80047638 */
     /* +0x06C */ void *slot6C;                                            /* func_80047694 */
     /* +0x070 */ u32 (*freeRing)(CdStreamObj *self, u32 *base);           /* func_80047870 */
+    /* +0x074 */ void (*unsetRing)(CdStreamObj *self);                    /* func_80047890 */
+    /* +0x078 */ void (*clearRing)(CdStreamObj *self);                    /* func_800478B0 */
+    /* +0x07C */ void (*slot7C)(CdStreamObj *self);                       /* func_800478F8, empty */
 };
 
 struct CdStreamObj {
@@ -156,7 +159,16 @@ void func_80047388(u8 status, u8 *result) {
     }
 }
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800473E4);
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800474C8);
+void func_800474C8(CdStreamObj *self) {
+    if (self->unk2C == 2 && D_8008A950 == self) {
+        self->methods->mute(self);
+        self->methods->clearRing(self);
+        self->methods->unsetRing(self);
+        while (CdControl(9, 0, 0) == 0) {
+        }
+        self->unk2C = 4;
+    }
+}
 void func_80047574(CdStreamObj *self) {
     CdStreamObj *cur;
 
