@@ -230,7 +230,18 @@ void *func_80043B88(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043BE8);
+/* D_8006F1C4 +0x008: constructor -- the active driver's, then this table,
+ * clear +0x2C/+0x30/+0x38, and request `name` when there is one. */
+void func_80043BE8(DataSrc33808 *self, char *name) {
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_80043E74();
+    self->unk2C = 0;
+    self->unk30 = NULL;
+    self->unk38 = 0;
+    if (name != NULL) {
+        self->methods->requestLoadFile(self, name);
+    }
+}
 /* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
 void func_80043C60(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
