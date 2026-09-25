@@ -298,16 +298,27 @@ extern void _spu_setInTransfer(s32 a0);
 extern void SpuInitMalloc(s32 a0, void *a1);
 extern void SpuVmFlush(void);
 
-extern u8 gSpuMallocArea[];
+extern u8 D_8008DEB0[]; /* Sony's _ss_spu_vm_rec + 8 (libsnd/vmanager.o bss; symbols file) */
+
 extern s16 D_8008E9FC;
 extern s16 D_8008E84C;
-extern s16 gMasterVolL;
-extern s16 gMasterVolR;
 extern s16 D_8008E230;
 extern s16 D_8008E234;
-extern s32 D_8008E258;
-extern s32 D_8008E25C;
-extern u8 gDisableVoiceStarveScan;
+/* libspu's SpuReverbAttr (Psy-Q LIBSPU.H), mirrored rather than included:
+ * LIBSPU.H's prototypes disagree with this unit's (SpuInitMalloc). */
+typedef struct {
+    s16 left;
+    s16 right;
+} SpuVolume;
+typedef struct {
+    u32 mask;
+    s32 mode;
+    SpuVolume depth;
+    s32 delay;
+    s32 feedback;
+} SpuReverbAttr;
+extern SpuReverbAttr _svm_rattr; /* pinned in config/psyq-objects.ld (libsnd/vm_g.o) */
+extern u8 _svm_auto_kof_mode;
 extern s16 D_8008E938;
 
 extern volatile u16 D_8008EA26;
@@ -346,7 +357,7 @@ void SpuVmInit(s32 a0) {
     _spu_setInTransfer(0);
     D_8008E9FC = 0;
     D_8008E84C = 0;
-    SpuInitMalloc(0x20, gSpuMallocArea);
+    SpuInitMalloc(0x20, D_8008DEB0);
 
     for (i = 0; (u16) i < 0xC0; i++) {
         ((u16 *) _svm_sreg_buf)[(u16) i] = 0;
@@ -429,16 +440,16 @@ void SpuVmInit(s32 a0) {
         D_8008E22C &= ~D_80090C64;
     }
 
-    gMasterVolL = 0x3FFF;
-    gMasterVolR = 0x3FFF;
+    _svm_rattr.depth.left = 0x3FFF;
+    _svm_rattr.depth.right = 0x3FFF;
     D_8008E228 = 0;
     D_8008E22C = 0;
     D_80090C60 = 0;
     D_8008E230 = 0;
     D_8008E234 = 0;
-    D_8008E258 = 0;
-    D_8008E25C = 0;
-    gDisableVoiceStarveScan = 0;
+    _svm_rattr.mask = 0;
+    _svm_rattr.mode = 0;
+    _svm_auto_kof_mode = 0;
     D_8008E8C0 = 0;
     D_8008E938 = 0x80;
     SpuVmFlush();
@@ -711,7 +722,7 @@ void SpuVmFlush(void) {
         }
     }
 
-    if (gDisableVoiceStarveScan == 0) {
+    if (_svm_auto_kof_mode == 0) {
         s32 mask;
         s32 j;
 

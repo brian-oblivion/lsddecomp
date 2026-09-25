@@ -1058,10 +1058,21 @@ _svm_voice = 0x8008D988; // size:0x4E0
 // gVoiceActivityRing. Round 86 (head, track 2).
 _svm_envx_ptr = 0x8008DE68;
 _svm_envx_hist = 0x8008DE6C;
-gMasterVolL = 0x8008E260;
-gMasterVolR = 0x8008E262;
-gDisableVoiceStarveScan = 0x8008EA40;
-gSpuMallocArea = 0x8008DEB0;
+// identified (round 86, head, track 2; tools/sonydata.py): libsnd/vm_g.o's
+// weak bss, which Sony's linker scattered (no layout to anchor); every aligned
+// access in SpuVmFlush/SpuVmInit on discs 3.0, 3.3, 3.5 and 3.6 names it.
+// Superseded game-style name gDisableVoiceStarveScan.
+_svm_auto_kof_mode = 0x8008EA40;
+// identified (round 86, head, track 2): libsnd/vmanager.o bss +0x6B8 on disc
+// 3.5, anchored from _svm_sreg_buf (0x8008D7F0) like _svm_voice; bounded at
+// 0x90 by _svm_orev1. SpuVmInit hands SpuInitMalloc `.bss+0x6C0`, i.e. +8,
+// and the 0x88 left is (16+1) malloc records of 8 bytes. So 0x8008DEB0 is
+// _ss_spu_vm_rec+8, spelled as its placeholder: splat emits a name only for an
+// address some asm references, and nothing references the record's base.
+// Superseded game-style name gSpuMallocArea. Round 86 also removed gMasterVolL/R
+// (0x8008E260/2): _svm_rattr+8/+0xA, i.e. SpuReverbAttr.depth.left/right,
+// reverb depth rather than a master volume; SpuVmInit now writes the fields.
+D_8008DEB0 = 0x8008DEB0;
 InitDreamAux = 0x8005C508; // type:func
 TickDreamAuxSlots = 0x8005C5E8; // type:func
 SetDreamAuxWorld = 0x8005C650; // type:func

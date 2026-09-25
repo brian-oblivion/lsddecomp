@@ -304,7 +304,7 @@ extern s16 D_8008E230;
 extern s16 D_8008E234;
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
-extern u8 gDisableVoiceStarveScan;
+extern u8 _svm_auto_kof_mode;
 extern s16 D_8008E938;
 
 extern Rec34Half D_8008D98A[]; /* value forced to 0x18 at init */
@@ -469,7 +469,7 @@ void SpuVmInit(s32 a0) {
     D_8008E234 = 0;
     D_8008E258 = 0;
     D_8008E25C = 0;
-    gDisableVoiceStarveScan = 0;
+    _svm_auto_kof_mode = 0;
     D_8008E8C0 = 0;
     D_8008E938 = 0x80;
     SpuVmFlush();
@@ -739,3 +739,15 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 `src/` now writes all 21 per-voice fields as `_svm_voice[(u16) i].unkNN` (the `*Edd4` `__asm__` label aliases are gone). Byte-exact on the first build: no CSE of the record address appeared, even in this 21-store loop.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). `src/` keeps the flat halfword clear `((u16 *) _svm_sreg_buf)[(u16) i]` over all 0xC0 halfwords and clears `_svm_sreg_dirty`. Byte-exact.
+
+## Track 2 (round 86, 2026-09-26, head)
+
+Game names off Sony data (`tools/sonydata.py`; symbols-file `identified`
+comments hold the evidence): `gDisableVoiceStarveScan` is libsnd/vm_g.o's
+`_svm_auto_kof_mode` (every aligned access, discs 3.0 to 3.6). In SpuVmInit,
+`gMasterVolL/R` and `D_8008E258/5C` were four loose words of the pinned
+`_svm_rattr`, libspu's `SpuReverbAttr` (LIBSPU.H): `.mask`, `.mode`,
+`.depth.left/right` = 0x3FFF, i.e. reverb depth, not a master volume; the C now
+writes the fields through a local mirror of the SDK struct. `gSpuMallocArea`
+is `_ss_spu_vm_rec + 8` (vmanager.o bss, 3.5 layout), spelled `D_8008DEB0`
+because splat names only addresses some asm references. Byte-identical.

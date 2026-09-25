@@ -75,7 +75,7 @@ window:
    Written with EXPLICIT WALKING POINTERS (`p98E`, `pDad`, each `++`
    advancing one whole record), not `array[i]` indexing — see "Axes tried"
    #1, the single highest-value fix this round.
-3. **Starved-channel force-release**, guarded by `gDisableVoiceStarveScan == 0`: AND all
+3. **Starved-channel force-release**, guarded by `_svm_auto_kof_mode == 0`: AND all
    FIFTEEN of the OTHER ring slots together (a plain `for (j=0;j<0xF;j++)
    mask &= _svm_envx_hist[j];` loop — note this reads only 15 of the 16 slots,
    confirmed against the raw instruction count), then for each channel
@@ -129,7 +129,7 @@ window:
   other multi-width symbol in this file).
 - `D_8008D7F6[]`: a NEW 0x10-byte-stride array, same shape as the already-
   established `Rec16D7F4`/`D_8008D7F4`.
-- `gDisableVoiceStarveScan` (`u8` flag), `D_8008E230`/`D_8008E234` (`s16`).
+- `_svm_auto_kof_mode` (`u8` flag), `D_8008E230`/`D_8008E234` (`s16`).
 
 ## Axes tried, in order, with effect on built length (retail is 241 words)
 
@@ -517,7 +517,7 @@ void SpuVmFlush(void) {
         }
     }
 
-    if (gDisableVoiceStarveScan == 0) {
+    if (_svm_auto_kof_mode == 0) {
         s32 mask;
         s32 j;
 
@@ -620,7 +620,7 @@ extern Rec34Half D_8008D9A4[];
 
 /* Flag byte: when set, skip the "channel starved for N frames -> force
  * release" scan below. */
-extern u8 gDisableVoiceStarveScan;
+extern u8 _svm_auto_kof_mode;
 
 extern u16 D_80090C60;
 extern u16 D_80090C64;
@@ -692,7 +692,7 @@ void SpuVmFlush(void) {
         }
     }
 
-    if (gDisableVoiceStarveScan == 0) {
+    if (_svm_auto_kof_mode == 0) {
         s32 mask;
         s32 j;
 
@@ -841,7 +841,7 @@ local to this function's `#ifdef` block, per CLAUDE.md's rule against
 adding to a shared header; everything else it touches (`D_8008D9A3`,
 `D_8006DAD4`, `_svm_sreg_dirty`, `D_80090C60`/`64`, `D_8008E228`/`22C`,
 `D_8008E230`/`234`, `_svm_sreg_buf`, `D_8008D7F4`, `D_8008E9D0`,
-`gDisableVoiceStarveScan`, `D_8008D9A4`, `D_8008D9B0`) was
+`_svm_auto_kof_mode`, `D_8008D9A4`, `D_8008D9B0`) was
 already declared earlier in the unit and needed no change.
 `./build-and-verify.sh` green (zero bytes changed) and
 `tools/check-nonmatching.sh code_179d8_m` green.
@@ -853,3 +853,15 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 The NON_MATCHING body reads `_svm_voice[i].unk1C/unk28/unk1B` and walks +0x06 with its u16 0x34-stride pointer, now started at `&_svm_voice[0].unk06`; normalized disassembly identical. Tried and rejected: walking a `SvmVoice *` and reading `->unk06` (one instruction longer, mnemonic ratio vs retail 0.876 -> 0.874).
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body now walks `SvmSreg *p7F0 = _svm_sreg_buf` and reads `_svm_sreg_buf[i].unk4/unk6` (the `Rec16D7F0Wide`/`Rec16D7F4` views of `D_8008D7F0`/`D_8008D7F4`/`D_8008D7F6` are gone); normalized disassembly identical.
+
+## Track 2 (round 86, 2026-09-26, head)
+
+Game names off Sony data (`tools/sonydata.py`; symbols-file `identified`
+comments hold the evidence): `gDisableVoiceStarveScan` is libsnd/vm_g.o's
+`_svm_auto_kof_mode` (every aligned access, discs 3.0 to 3.6). In SpuVmInit,
+`gMasterVolL/R` and `D_8008E258/5C` were four loose words of the pinned
+`_svm_rattr`, libspu's `SpuReverbAttr` (LIBSPU.H): `.mask`, `.mode`,
+`.depth.left/right` = 0x3FFF, i.e. reverb depth, not a master volume; the C now
+writes the fields through a local mirror of the SDK struct. `gSpuMallocArea`
+is `_ss_spu_vm_rec + 8` (vmanager.o bss, 3.5 layout), spelled `D_8008DEB0`
+because splat names only addresses some asm references. Byte-identical.
