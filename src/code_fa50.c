@@ -177,7 +177,7 @@ void MarkTmdModelConstructed(Class6BEA0 *self) {
 s32 func_8001F3A4(void *self) {
     return D_8008AC4C;
 }
-void func_8001F3B0(Class6BEA0 *self, Box_fa50 *box) {
+void TmdModel__ComputeBounds(Class6BEA0 *self, Box_fa50 *box) {
     s32 i;
     s32 n;
     SVec_fa50 *v;
@@ -204,7 +204,7 @@ void func_8001F3B0(Class6BEA0 *self, Box_fa50 *box) {
     }
 }
 void func_8001F4E4(Class6BEA0 *self) {
-    func_8001F3B0(self, (Box_fa50 *)D_8008B21C);
+    TmdModel__ComputeBounds(self, (Box_fa50 *)D_8008B21C);
 }
 void *func_8001F50C(void *self, s32 i) {
     return D_8008B21C;
@@ -212,7 +212,7 @@ void *func_8001F50C(void *self, s32 i) {
 void func_8001F51C(Class6BEA0 *self, Hull_fa50 *out) {
     TypedBox_fa50 b;
 
-    func_8001F3B0(self, &b.box);
+    TmdModel__ComputeBounds(self, &b.box);
     b.type = 1;
     out->v[0].x = b.box.min.x;
     out->v[0].y = b.box.min.y;

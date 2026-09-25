@@ -66,7 +66,7 @@ cnt2 = func_8001F3A4(self->unk20);       /* returns a count */
 **`func_8001F50C`'s whole body is `lui/addiu %hi/%lo(D_8008B21C); jr $ra`** —
 MEASURED (`asm/psyq_GsLinkObject4.s`), it is a plain getter for a PsyQ-
 internal global that `func_8001F4E4` fills one instruction earlier via
-`func_8001F3B0`. This resolved what looked at first like a confusing
+`TmdModel__ComputeBounds`. This resolved what looked at first like a confusing
 "return value used as both a pointer and a scalar simultaneously" — it
 isn't; `func_8001F50C`'s return (a pointer) and `func_8001F3A4`'s return (a
 count) are two DIFFERENT values that happen to both be freshly in `$v0` at

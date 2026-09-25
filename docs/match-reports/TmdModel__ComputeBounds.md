@@ -1,4 +1,6 @@
-# func_8001F3B0 -- MATCHED (77/77 words), round 82
+# TmdModel__ComputeBounds -- MATCHED (77/77 words), round 82
+
+> Renamed from `func_8001F3B0` on 2026-09-25 (tools/rename.py). Address 0x8001f3b0.
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
@@ -12,7 +14,7 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
   5. declaration reorder: no change.
   6. `n = nverts; ... n--;` -> `n = nverts - 1;` in one expression: **77/77**.
   7. same, WITHOUT the pointer locals: 0/77 (size change) -- the pointer locals are load-bearing.
-- **Types:** `Rec28_fa50` got `SVec_fa50 *verts; s32 nverts;` (same 28-byte size); `Class6BEA0::unk10` retyped `void *` -> `Rec28_fa50 *`; `func_8001F4E4` now takes `Class6BEA0 *` and casts `D_8008B21C` to `Box_fa50 *`; the local `extern s32 func_8001F3B0(void *, void *)` was dropped (the definition precedes its callers). All in this unit; no shared header.
+- **Types:** `Rec28_fa50` got `SVec_fa50 *verts; s32 nverts;` (same 28-byte size); `Class6BEA0::unk10` retyped `void *` -> `Rec28_fa50 *`; `func_8001F4E4` now takes `Class6BEA0 *` and casts `D_8008B21C` to `Box_fa50 *`; the local `extern s32 TmdModel__ComputeBounds(void *, void *)` was dropped (the definition precedes its callers). All in this unit; no shared header.
 
 ## Source
 
@@ -23,7 +25,7 @@ typedef struct Box_fa50 { Vec3_fa50 min; Vec3_fa50 max; } Box_fa50;
 typedef struct Rec28_fa50 { SVec_fa50 *verts; s32 nverts; u8 pad8[0x14]; } Rec28_fa50;
 /* Class6BEA0: +0x010 Rec28_fa50 *unk10 (see New_TmdModel.md) */
 
-void func_8001F3B0(Class6BEA0 *self, Box_fa50 *box) {
+void TmdModel__ComputeBounds(Class6BEA0 *self, Box_fa50 *box) {
     s32 i;
     s32 n;
     SVec_fa50 *v;

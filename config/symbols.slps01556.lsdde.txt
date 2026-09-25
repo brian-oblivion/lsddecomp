@@ -2631,3 +2631,4 @@ TmdModel__SetQuad = 0x8001F314; // type:func
 TmdModel__MapModelingData = 0x8001F33C; // type:func
 TmdModel__GetObject = 0x8001F360; // type:func
 TmdModel__func_8001F37C = 0x8001F37C; // type:func
+TmdModel__ComputeBounds = 0x8001F3B0; // type:func

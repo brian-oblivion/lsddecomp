@@ -135,7 +135,7 @@ extern void GsInitCoordinate2(s32 arg0, void *dest);
 
 /* func_8001F51C (asm/psyq_fa50.s, Psy-Q library, not game code):
  * fills a caller-supplied struct (its own arg1) from a small on-stack
- * buffer via func_8001F3B0 (its own arg0 forwarded straight through). Its
+ * buffer via TmdModel__ComputeBounds (its own arg0 forwarded straight through). Its
  * own last write to $v0 is leftover from an unrelated `lhu` a few
  * instructions earlier, not a deliberate return value -- read as `void`.
  * Class6B5CC__ReadUnk20Data (this unit, round 12) calls it as `func_8001F51C(self->unk20,
@@ -152,7 +152,7 @@ extern s32 func_8001F3A4(void *arg0);
 
 /* func_8001F4E4/func_8001F50C (asm/psyq_fa50.s, PsyQ library, not
  * game code): func_8001F4E4 fills a PsyQ-internal global
- * (D_8008B21C, via func_8001F3B0) from its own argument; func_8001F50C
+ * (D_8008B21C, via TmdModel__ComputeBounds) from its own argument; func_8001F50C
  * IGNORES both its arguments and just returns `&D_8008B21C` -- MEASURED,
  * its whole body is `lui/addiu %hi/%lo(D_8008B21C); jr $ra`. Class6B5CC__CheckBoundsOverlap
  * (round 13, code_d294_b) calls the pair as `func_8001F4E4(self->unk20);

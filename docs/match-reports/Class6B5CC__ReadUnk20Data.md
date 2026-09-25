@@ -30,7 +30,7 @@ value the function computed to hand back to its caller. Read as `void`.
 `Class6B5CCObj::unk20` was `s32` (a placeholder the round-10/11 header
 explicitly flagged for a later carve to retype). This function passes it
 straight through as `func_8001F51C`'s own `void *` arg0 (which
-`func_8001F51C` forwards unmodified to `func_8001F3B0`, which dereferences
+`func_8001F51C` forwards unmodified to `TmdModel__ComputeBounds`, which dereferences
 it at `+0x10`) -- genuinely a pointer. Retyped to `void *unk20` in
 `include/code_d294.h`. The only existing write site, `self->unk20 = 0;` in
 `Class6B5CC__Class6B5CC` (`src/code_d294.c`), is an integer-constant-zero assignment
