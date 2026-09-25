@@ -48,29 +48,18 @@
 
 #include "common.h"
 #include "Actor.h"
+#include "BoxFill.h"
 
-/* Local view only, not the shared header: `gStyleDecorObj` is already established
- * as a `LocalM4D0Obj *` in `src/class_3bb8c_m.c` (round 15, own local type),
- * with named slots at +0x04C/+0x064/+0x068.  This function dispatches +0x004
- * instead, a slot that unit never names -- kept as its own minimal local
- * view rather than importing that unit's type (multiple-independent-local-
- * views convention; class_3bb8c_m.c is not this unit's to edit). */
-typedef struct ObjAB54 ObjAB54;
-typedef struct ObjAB54Methods ObjAB54Methods;
-struct ObjAB54Methods {
-    u8 pad0[0x4];
-    void (*slot4)(ObjAB54 *self); /* +0x004 */
-};
-struct ObjAB54 {
-    ObjAB54Methods *methods; /* +0x000 */
-};
+/* gStyleDecorObj and gStyleDecorSlots[] hold BoxFill objects
+ * (include/BoxFill.h, New_BoxFill), in globals typed `s32`/`void *[]`
+ * (track 4b's to retype). */
 
 extern const u8 *gStyleDecorColor;
 extern s32 gStyleDecorObj;
 
 void StyleFlushDecoration(void) {
     if (gStyleDecorColor != 0) {
-        ((ObjAB54 *) gStyleDecorObj)->methods->slot4((ObjAB54 *) gStyleDecorObj);
+        ((BoxFill *) gStyleDecorObj)->methods->release((BoxFill *) gStyleDecorObj);
         gStyleDecorColor = 0;
     }
 }
@@ -128,19 +117,8 @@ extern s32 gStyleDecorPosAX;
 extern s32 gStyleDecorPosAY;
 extern s32 gStyleDecorPosBX;
 extern s32 gStyleDecorPosBY;
-extern void *New_BoxFill(void *a0, void *a1, s32 a2);
 extern void *gStyleDecorSlots[];
 extern s32 gStyleTargetObj;
-
-typedef struct ObjSlot4C ObjSlot4C;
-typedef struct ObjSlot4CMethods ObjSlot4CMethods;
-struct ObjSlot4CMethods {
-    u8 pad4C[0x4C];
-    void (*slot4C)(ObjSlot4C *self, void *arg1, void *arg2); /* +0x04C */
-};
-struct ObjSlot4C {
-    ObjSlot4CMethods *methods; /* +0x000 */
-};
 
 typedef struct ObjSlotAC ObjSlotAC;
 typedef struct ObjSlotACMethods ObjSlotACMethods;
@@ -168,7 +146,7 @@ struct PairXY {
 };
 
 /* Allocates the 18 decor objects into gStyleDecorSlots, each attached
- * (slot4C) to slot 0, then attaches slot 0 to the target object's slotAC
+ * (attachToParent, +0x04C) to slot 0, then attaches slot 0 to the target object's slotAC
  * result.  MATCHED round 76 (charlie): an indexed for loop -- loop.c's
  * strength reduction produces both the slot walker and the colour-table
  * stride (`gStyleColorTable + i * 3`), which earlier rounds had written as
@@ -194,14 +172,16 @@ void StyleBuildDecorSet(void) {
     for (i = 1; i < 0x12; i++) {
         obj = New_BoxFill(&paramB, (void *) (gStyleColorTable + i * 3), 0x1FFF);
         gStyleDecorSlots[i] = obj;
-        ((ObjSlot4C *) obj)->methods->slot4C(obj, gStyleDecorSlots[0], &paramA);
+        ((BoxFillAttachToParentFn)((BoxFill *) obj)->methods->attachToParent)(
+            obj, gStyleDecorSlots[0], (Pair32E99C *) &paramA);
         paramA.y += 3;
         paramB.y -= 7;
     }
 
     self2 = *(ObjSlotAC **) (gStyleTargetObj + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
+    ((BoxFillAttachToParentFn)((BoxFill *) gStyleDecorSlots[0])->methods->attachToParent)(
+        gStyleDecorSlots[0], result, (Pair32E99C *) &paramA);
 }
 
 
@@ -334,7 +314,7 @@ void StyleBuildEffectSlots(void *arg0) {
 
 /* Local view: array elements at gStyleEffectSlots are objects with a method table
  * pointer at offset 0, dispatched here through slot +0xEC as
- * slotEC(self, arg1) -- mirrors the ObjAB54 pattern above. */
+ * slotEC(self, arg1). */
 typedef struct ObjE0C8 ObjE0C8;
 typedef struct ObjE0C8Methods ObjE0C8Methods;
 struct ObjE0C8Methods {
