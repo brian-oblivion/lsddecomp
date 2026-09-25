@@ -1,0 +1,228 @@
+#ifndef TASKCORE_H
+#define TASKCORE_H
+
+#include "IntermediateBase.h"
+
+/*
+ * TaskCore -- class id 0x130, method table gTaskCoreMethods: the
+ * IntermediateBase subclass behind the game's menu/screen tasks. Methods in
+ * src/code_2c054.c (ctor, finalize, reset and the init/deinit hooks) and
+ * src/code_2cc8c.c, code_2cc8c_b.c, code_2cc8c_c.c (everything from +0x058
+ * on). The object is 0xA4 bytes (New_TaskCore). Three classes derive from
+ * it, each ctor calling TaskCore__TaskCore first (`typeviews.py --tree`):
+ * StreamTaskObj (0x1130, gStreamTaskObjMethods, code_2c054), Class86B60
+ * (0x1F130, class_3bb8c_c/_d) and GraphRoomObj (0x2F130, class_3bb8c_t).
+ *
+ * Construction, ctor(target, soundBankPath, sound): the base ctor, then
+ * setTarget(target), `sound` = New_VabStreamObj(soundBankPath) when a path
+ * is given (both subclass ctors pass "ETC\ETCSE") or the caller's object,
+ * setSubHandle(NULL, NULL), a TileAtlas -> TileMap -> BgLayer chain, and
+ * resetCounters (TaskCore__Reset: colours, fade callbacks, fadeRate 9,
+ * the three viewport words). Finalize releases what the ctor made
+ * (`sound` only when it made it) and runs releaseTarget.
+ *
+ * init/deinit (IntermediateBase's) call onInit/onDeinit: onInit hangs the
+ * slot widgets and the BgLayer under +0x014, sets the colours, configures
+ * the viewport (its +0x048/+0x04C/+0x050 take unk28/unk2C/unk30) and opens
+ * its OT; onDeinit closes it. TaskCore__Init returns `result`.
+ *
+ * The state machine (setState, update). IntermediateBase's update counts
+ * frames; TaskCore's then steps the state: 2 -> 4 (fade in: tickFadeCallback
+ * runs fadeInCallback, TickColorFade, until it reports done) -> 5 (active:
+ * the target's slot unk8 selected, inputMode 1) ... 7 (fade out:
+ * tickFadeOutCallback, TickFadeColor) -> 8 -> 3 (IntermediateBase's
+ * onState3). While inputMode is nonzero, frameCounter passing frameBound
+ * is setState(6): result = 1, then refreshViewValue, which calls
+ * viewCallback and goes to 7. States 9..0x11 set state 5 and reset the
+ * frame counter; 0xB runs tick, 0xF commitElementScroll, 0x11
+ * cancelElementScroll.
+ *
+ * Input. onPadEvent (IntermediateBase's Pad case) is a switch on the event
+ * while inputMode is nonzero: 0x12 onPadPrev, 0x13 onPadNext, 0x17
+ * onPadCancel, 0x19 onPadConfirm, 0x21 onPad21. inputMode 1 moves between
+ * the target's slots (find{Next,Prev}FreeSlot, setActiveSlot), 2 scrolls
+ * the active slot's item list (beginElementScroll from tick, then
+ * {advance,retreat}SlotCursor and commit/cancel). Confirm, cancel and 0x21
+ * call playSound(0x10), VabStreamObj's PlayTone on `sound`; setActiveSlot
+ * and setSlotCursor call playSound(0) when their last argument is nonzero.
+ *
+ * The subclasses' own views stay theirs (FINISHING-PLAN track 4, round 84)
+ * and are NOT expanded from these macros yet; two reasons are measured:
+ * StreamTaskObj's +0x044 override, StreamTaskObj__Configure, takes five
+ * arguments where IntermediateBase's init takes (args, mode), and
+ * GraphRoomObj's ctor returns a value where INTERMEDIATEBASE_SLOTS fixes the
+ * ctor's return type to void. The objects of all three do extend this
+ * class's layout: StreamTaskObj's own fields start at +0x0A4.
+ *
+ * The objects TaskCore holds from classes with no header yet (VabStreamObj,
+ * BgLayer, TileMap, TileAtlas, the slot and list widgets, the viewport's
+ * Unk18Obj) are `BasicClass *`, the parent every one of them has; a unit
+ * that calls one past BasicClass's slots casts to its own view of it.
+ */
+
+typedef struct TaskCore TaskCore;
+typedef struct TaskCoreMethods TaskCoreMethods;
+typedef struct TaskCoreTarget TaskCoreTarget;
+
+/* The menu description setTarget builds its slot widgets from (the ctor's
+ * first argument; Class86B60 passes &D_80086D44). One slot per `names`
+ * entry. */
+struct TaskCoreTarget {
+    /* +0x000 */ const char *path;      /* non-NULL: setTarget loads `handle` from it (func_8003B39C) and releaseTarget releases that */
+    /* +0x004 */ BasicClass *handle;    /* func_8003B39C(path), or the caller's own when path is NULL; the slot widgets' first argument */
+    /* +0x008 */ s32 unk8;              /* setState(5): setActiveSlot(unk8, 0) */
+    /* +0x00C */ s32 unkC;              /* tick: confirming this slot runs refreshViewValue */
+    /* +0x010 */ u8 unselectedColor[3]; /* broadcastToSlots at state 5; the colour a slot or item loses focus to */
+    /* +0x013 */ u8 selectedColor[3];   /* setActiveSlot's colour for the new slot */
+    /* +0x016 */ u8 pad16[2];
+    /* +0x018 */ void **registrationSlots; /* NULL entries are the slots find{Next,Prev}FreeSlot stop at */
+    /* +0x01C */ char **names;          /* NULL-terminated; one New_Obj6EAC0 widget per name */
+    /* +0x020 */ u8 *externalRecords;   /* 8 bytes a slot, updateSlotElements' position for each widget */
+    /* +0x024 */ void **unk24;          /* per slot: NULL, or the item-list record createSlotElements and the scroll methods read */
+};
+
+#define TASKCORE_SLOTS(Self, CtorParams)                                                           \
+    INTERMEDIATEBASE_SLOTS(Self, CtorParams);                                                      \
+    /* +0x06C */ void (*setFrameBound)(Self *self, s32 bound);   /* TaskCore__SetFrameBound: frameBound = bound * 20 (negative: kept) */ \
+    /* +0x070 */ void (*playSound)(Self *self, s32 tone);        /* TaskCore__PlaySound */         \
+    /* +0x074 */ void (*onPad21)(Self *self, BasicClass *sender);      /* TaskCore__func_8003C7F4: onPadEvent's 0x21 */ \
+    /* +0x078 */ void (*onPadConfirm)(Self *self, BasicClass *sender); /* TaskCore__OnPadConfirm: 0x19 */ \
+    /* +0x07C */ void (*onPadCancel)(Self *self, BasicClass *sender);  /* TaskCore__OnPadCancel: 0x17 */ \
+    /* +0x080 */ void (*onPadPrev)(Self *self, BasicClass *sender);    /* TaskCore__OnPadPrev: 0x12 */ \
+    /* +0x084 */ void (*onPadNext)(Self *self, BasicClass *sender);    /* TaskCore__OnPadNext: 0x13 */ \
+    /* +0x088 */ void *slot88;                                   /* NULL; StreamTaskObj__NoOpSlot88 */ \
+    /* +0x08C */ void *slot8C;                                   /* NULL; StreamTaskObj__NoOpSlot8C */ \
+    /* +0x090 */ void (*tick)(Self *self);                       /* TaskCore__Tick: setState(0xB) */ \
+    /* +0x094 */ void (*refreshViewValue)(Self *self);           /* TaskCore__RefreshViewValue */  \
+    /* +0x098 */ void (*setCallback)(Self *self, void (*callback)(void *ctx), void *ctx); /* TaskCore__SetCallback */ \
+    /* +0x09C */ void (*setFadeCallbackEnabled)(Self *self, s32 enable);    /* TaskCore__SetFadeCallbackEnabled */ \
+    /* +0x0A0 */ void (*setFadeOutCallbackEnabled)(Self *self, s32 enable); /* TaskCore__SetFadeOutCallbackEnabled */ \
+    /* +0x0A4 */ void (*setColors)(Self *self, u8 *base, u8 *color93, u8 *color96); /* TaskCore__SetColors */ \
+    /* +0x0A8 */ void (*setFadeRate)(Self *self, s32 rate);      /* TaskCore__SetFadeRate */       \
+    /* +0x0AC */ s32 (*tickFadeCallback)(Self *self);            /* TaskCore__TickFadeCallback: update's state 4 */ \
+    /* +0x0B0 */ s32 (*tickColorFade)(Self *self);               /* TaskCore__TickColorFade: the fade-in callback */ \
+    /* +0x0B4 */ void *slotB4;                                   /* NULL in every TaskCore table */ \
+    /* +0x0B8 */ void *slotB8;                                   /* NULL */                        \
+    /* +0x0BC */ void *slotBC;                                   /* NULL */                        \
+    /* +0x0C0 */ s32 (*tickFadeOutCallback)(Self *self);         /* TaskCore__TickFadeOutCallback: update's state 7 */ \
+    /* +0x0C4 */ s32 (*tickFadeColor)(Self *self);               /* TaskCore__TickFadeColor: the fade-out callback */ \
+    /* +0x0C8 */ void *slotC8;                                   /* NULL */                        \
+    /* +0x0CC */ void *slotCC;                                   /* NULL */                        \
+    /* +0x0D0 */ void *slotD0;                                   /* NULL */                        \
+    /* +0x0D4 */ void (*setSubHandle)(Self *self, const char *path, BasicClass *handle); /* TaskCore__SetSubHandle; GraphRoomObj passes "ETC\HGRAPH.TIM" */ \
+    /* +0x0D8 */ void (*setTarget)(Self *self, TaskCoreTarget *target); /* TaskCore__SetTarget */  \
+    /* +0x0DC */ void (*releaseTarget)(Self *self);              /* TaskCore__ReleaseTarget */     \
+    /* +0x0E0 */ void (*updateSlotElements)(Self *self, void *parent); /* TaskCore__UpdateSlotElements */ \
+    /* +0x0E4 */ void (*broadcastToSlots)(Self *self, u8 *color); /* TaskCore__BroadcastToSlots */ \
+    /* +0x0E8 */ void (*findNextFreeSlot)(Self *self);           /* TaskCore__FindNextFreeSlot */  \
+    /* +0x0EC */ void (*findPrevFreeSlot)(Self *self);           /* TaskCore__FindPrevFreeSlot */  \
+    /* +0x0F0 */ void (*setActiveSlot)(Self *self, s32 slot, s32 withSound); /* TaskCore__SetActiveSlot */ \
+    /* +0x0F4 */ s32 (*getActiveSlot)(Self *self);               /* TaskCore__GetActiveSlot */     \
+    /* +0x0F8 */ void (*createSlotElements)(Self *self, void *desc, void *handle); /* TaskCore__CreateSlotElements */ \
+    /* +0x0FC */ void (*releaseSlotElements)(Self *self);        /* TaskCore__ReleaseSlotElements */ \
+    /* +0x100 */ void (*refreshSlotView)(Self *self, void *parent, s32 show); /* TaskCore__RefreshSlotView */ \
+    /* +0x104 */ void (*broadcastToSlotElements)(Self *self, void *color); /* TaskCore__BroadcastToSlotElements */ \
+    /* +0x108 */ void (*beginElementScroll)(Self *self);         /* TaskCore__BeginElementScroll */ \
+    /* +0x10C */ void (*commitElementScroll)(Self *self);        /* TaskCore__CommitElementScroll */ \
+    /* +0x110 */ void (*cancelElementScroll)(Self *self);        /* TaskCore__CancelElementScroll */ \
+    /* +0x114 */ void (*advanceSlotCursor)(Self *self);          /* TaskCore__AdvanceSlotCursor */ \
+    /* +0x118 */ void (*retreatSlotCursor)(Self *self);          /* TaskCore__RetreatSlotCursor */ \
+    /* +0x11C */ void (*setSlotCursor)(Self *self, s32 cursor, s32 withSound); /* TaskCore__SetSlotCursor */ \
+    /* +0x120 */ s32 (*getActiveSlotCount)(Self *self)           /* TaskCore__GetActiveSlotCount */
+
+#define TASKCORE_FIELDS(Methods)                                                                   \
+    INTERMEDIATEBASE_FIELDS(Methods);                                                              \
+    /* +0x028 */ s32 unk28;             /* reset: 3; onInit: the viewport's +0x048 (Unk18Obj__SetUnk3C) */ \
+    /* +0x02C */ s32 unk2C;             /* reset: 0x12C (GraphRoomObj 0x190); onInit: viewport +0x04C (SetUnk44) */ \
+    /* +0x030 */ s32 unk30;             /* reset: 0x40; onInit: viewport +0x050 (SetUnk48) */      \
+    /* +0x034 */ s32 unk34;             /* reset: 1; nonzero: onDeinit hands unk93 to initArgs->unk0's +0x078 */ \
+    /* +0x038 */ s32 result;            /* TaskCore__Init returns it; onInit 0, setState(6) 1 */   \
+    /* +0x03C */ s32 inputMode;         /* 0 none, 1 choosing a slot, 2 scrolling its items; onPadEvent needs nonzero */ \
+    /* +0x040 */ s32 frameBound;        /* setFrameBound; update: frameCounter past it is setState(6) */ \
+    /* +0x044 */ char *soundBankPath;   /* the ctor's; nonzero: finalize releases `sound` */       \
+    /* +0x048 */ BasicClass *sound;     /* New_VabStreamObj(soundBankPath) or the ctor's own; playSound's target */ \
+    /* +0x04C */ TaskCoreTarget *target; /* setTarget */                                           \
+    /* +0x050 */ s32 slotCount;         /* target->names' length */                               \
+    /* +0x054 */ BasicClass **slotElements; /* one widget a slot (New_Obj6EAC0) */                \
+    /* +0x058 */ s32 activeSlot;                                                                   \
+    /* +0x05C */ s32 *itemCounts;       /* per slot: its item list's length */                     \
+    /* +0x060 */ s32 *slotCounts;       /* per slot: the item cursor, a ring over itemCounts */    \
+    /* +0x064 */ void **itemLists;      /* per slot: its item widgets (createSlotElements) */      \
+    /* +0x068 */ BasicClass *listView;  /* New_ClassEAC0: the frame around the scrolled list */    \
+    /* +0x06C */ u8 pad06C[4];                                                                     \
+    /* +0x070 */ const char *subHandlePath; /* setSubHandle's path; nonzero: the handle is owned */ \
+    /* +0x074 */ BasicClass *subHandle; /* func_8003B39C(subHandlePath), or the caller's; NULL: onInit also passes baseColor with gDefaultStreamTaskInitData */ \
+    /* +0x078 */ BasicClass *bgLayer;   /* New_BgLayer(tileMap, 1) */                              \
+    /* +0x07C */ BasicClass *tileMap;   /* New_TileMap(0, tileAtlas) */                            \
+    /* +0x080 */ BasicClass *tileAtlas; /* New_TileAtlas(0) */                                     \
+    /* +0x084 */ s32 fadeRate;          /* setFadeRate; reset: 9 */                                \
+    /* +0x088 */ s32 (*fadeInCallback)(TaskCore *self);  /* setFadeCallbackEnabled: NULL or tickColorFade; nonzero: onInit sets baseColor */ \
+    /* +0x08C */ s32 (*fadeOutCallback)(TaskCore *self); /* setFadeOutCallbackEnabled: NULL or tickFadeColor */ \
+    /* +0x090 */ u8 baseColor[3];       /* setColors; the fade-in's start colour */                \
+    /* +0x093 */ u8 unk93[3];           /* setColors */                                            \
+    /* +0x096 */ u8 unk96[3];           /* setColors */                                            \
+    /* +0x099 */ u8 pad099[3];                                                                     \
+    /* +0x09C */ void (*viewCallback)(void *ctx); /* setCallback; refreshViewValue calls it */     \
+    /* +0x0A0 */ void *viewCallbackCtx  /* the object is 0xA4 bytes: StreamTaskObj's own fields start at +0x0A4 */
+
+struct TaskCoreMethods {
+    TASKCORE_SLOTS(TaskCore, (TaskCore *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound));
+};
+
+struct TaskCore {
+    TASKCORE_FIELDS(TaskCoreMethods);
+};
+
+extern TaskCoreMethods gTaskCoreMethods;
+extern TaskCoreMethods *Get_vtable_TaskCore(void); /* returns &gTaskCoreMethods */
+
+TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound);
+void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound);
+void TaskCore__Finalize(TaskCore *self);
+void TaskCore__Reset(TaskCore *self);
+s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode);
+void TaskCore__OnInit(TaskCore *self);
+void TaskCore__OnDeinit(TaskCore *self);
+void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event);
+void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event);
+void TaskCore__SetState(TaskCore *self, s32 state);
+void TaskCore__SetFrameBound(TaskCore *self, s32 bound);
+void TaskCore__PlaySound(TaskCore *self, s32 tone);
+void TaskCore__func_8003C7F4(TaskCore *self, BasicClass *sender);
+void TaskCore__OnPadConfirm(TaskCore *self, BasicClass *sender);
+void TaskCore__OnPadCancel(TaskCore *self, BasicClass *sender);
+void TaskCore__OnPadPrev(TaskCore *self, BasicClass *sender);
+void TaskCore__OnPadNext(TaskCore *self, BasicClass *sender);
+void TaskCore__Tick(TaskCore *self);
+void TaskCore__RefreshViewValue(TaskCore *self);
+void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx);
+void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable);
+void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable);
+void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *color93, u8 *color96);
+void TaskCore__SetFadeRate(TaskCore *self, s32 rate);
+s32 TaskCore__TickFadeCallback(TaskCore *self);
+s32 TaskCore__TickColorFade(TaskCore *self);
+s32 TaskCore__TickFadeOutCallback(TaskCore *self);
+s32 TaskCore__TickFadeColor(TaskCore *self);
+void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle);
+void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *target);
+void TaskCore__ReleaseTarget(TaskCore *self);
+void TaskCore__UpdateSlotElements(TaskCore *self, void *parent);
+void TaskCore__BroadcastToSlots(TaskCore *self, void *color);
+void TaskCore__FindNextFreeSlot(TaskCore *self);
+void TaskCore__FindPrevFreeSlot(TaskCore *self);
+void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, void *withSound);
+s32 TaskCore__GetActiveSlot(TaskCore *self);
+void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *handle);
+void TaskCore__ReleaseSlotElements(TaskCore *self);
+void TaskCore__RefreshSlotView(TaskCore *self, void *parent, s32 show);
+void TaskCore__BroadcastToSlotElements(TaskCore *self, void *color);
+void TaskCore__BeginElementScroll(TaskCore *self);
+void TaskCore__CommitElementScroll(TaskCore *self);
+void TaskCore__CancelElementScroll(TaskCore *self);
+void TaskCore__AdvanceSlotCursor(TaskCore *self);
+void TaskCore__RetreatSlotCursor(TaskCore *self);
+void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound);
+s32 TaskCore__GetActiveSlotCount(TaskCore *self);
+
+#endif
