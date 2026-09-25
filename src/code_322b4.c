@@ -87,7 +87,7 @@ extern s32 D_8006EED8[];
 extern s32 D_8006EF50[];
 extern s32 D_8006EFAC[];
 
-/* Local view of a D_8006EED8 (class id 0xB03) object: func_800423E4 sets +0x2C. */
+/* Local view of a D_8006EED8 (class id 0xB03) object: D8006EED8__SetFlag2C sets +0x2C. */
 typedef struct D_8006EED8Methods D_8006EED8Methods;
 typedef struct D_8006EED8Obj {
     D_8006EED8Methods *methods; /* +0x000 */
@@ -410,7 +410,7 @@ void D8006EED8__Finalize(D_8006EED8Obj *self) {
     GetActiveDataSourceMethods()->slot0C(self);
 }
 /* D_8006EED8 slot +0x064. */
-void func_800423E4(D_8006EED8Obj *self) {
+void D8006EED8__SetFlag2C(D_8006EED8Obj *self) {
     self->unk2C = 1;
 }
 /* Returns the D_8006EED8 method table. */

@@ -2638,3 +2638,4 @@ Get_vtable_D8006ED4C = 0x80041ED8; // type:func
 New_D8006EED8 = 0x800422CC; // type:func
 D8006EED8__D8006EED8 = 0x8004232C; // type:func
 D8006EED8__Finalize = 0x800423A8; // type:func
+D8006EED8__SetFlag2C = 0x800423E4; // type:func

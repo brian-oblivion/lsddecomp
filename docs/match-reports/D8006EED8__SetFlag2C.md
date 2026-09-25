@@ -1,4 +1,6 @@
-# func_800423E4 -- MATCHED (3/3 words), round 82
+# D8006EED8__SetFlag2C -- MATCHED (3/3 words), round 82
+
+> Renamed from `func_800423E4` on 2026-09-25 (tools/rename.py). Address 0x800423e4.
 
 Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
@@ -16,7 +18,7 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 ```c
 /* D_8006EED8 slot +0x064. */
-void func_800423E4(D_8006EED8Obj *self) {
+void D8006EED8__SetFlag2C(D_8006EED8Obj *self) {
     self->unk2C = 1;
 }
 ```
