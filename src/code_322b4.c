@@ -205,7 +205,16 @@ void func_800423E4(D_8006EED8Obj *self) {
 void *func_800423F0(void) {
     return D_8006EED8;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042400);
+/* Allocate and construct a D_8006EF50 object (0x1C bytes). */
+void *func_80042400(void) {
+    void *obj = BMemPMgrAlloc(0x1C);
+
+    if (obj != NULL) {
+        ((Slot08Methods_322b4 *)func_80042684())->init(obj);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042450);
 /* D_8006EF50 slot +0x00C (finalize): the BasicClass finalize. */
 void func_800424A8(BasicClass *self) {
