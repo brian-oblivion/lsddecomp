@@ -102,6 +102,12 @@ typedef struct Slot08Methods_322b4 {
     void (*init)(void *self); /* +0x008 */
 } Slot08Methods_322b4;
 void *func_80042684(void);
+void *func_800423F0(void);
+
+typedef struct CtorArg1Methods_322b4 {
+    u8 pad00[0x8];
+    void (*ctor)(void *self, s32 arg); /* +0x008 */
+} CtorArg1Methods_322b4;
 void *func_800428E4(void);
 void func_80041C4C(SpriteRect *dst, u32 cell);
 
@@ -189,7 +195,16 @@ void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
 SpriteMethods *GetSpriteMethods(void) {
     return &gSpriteMethods;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800422CC);
+/* Allocate and construct a D_8006EED8 object (0x30 bytes). */
+void *func_800422CC(s32 arg) {
+    void *obj = BMemPMgrAlloc(0x30);
+
+    if (obj != NULL) {
+        ((CtorArg1Methods_322b4 *)func_800423F0())->ctor(obj, arg);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004232C);
 /* D_8006EED8 slot +0x00C (finalize): clear +0x2C, then the base finalize. */
 void func_800423A8(D_8006EED8Obj *self) {
