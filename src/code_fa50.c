@@ -134,7 +134,7 @@ extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
 extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
 extern s32 SquareRoot0(s32 a);
 TmdPrim_fa50 *func_80020050(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count);
-extern s32 D_8008AC4C;
+extern s32 gTmdModelConstructed;
 extern s32 gTmdModelBoundsBuf[];
 extern s32 D_8006BEA0[];
 extern void *BMemPMgrAlloc(s32 size);
@@ -172,10 +172,10 @@ Class6BEA0Methods *Get_vtable_TmdModel(void) {
     return (Class6BEA0Methods *)D_8006BEA0;
 }
 void MarkTmdModelConstructed(Class6BEA0 *self) {
-    D_8008AC4C = 1;
+    gTmdModelConstructed = 1;
 }
 s32 func_8001F3A4(void *self) {
-    return D_8008AC4C;
+    return gTmdModelConstructed;
 }
 void TmdModel__ComputeBounds(Class6BEA0 *self, Box_fa50 *box) {
     s32 i;

@@ -114,7 +114,6 @@ D_8008ABFC
 D_8008AC04
 D_8008AC08
 D_8008AC1C
-D_8008AC4C
 D_8008AC78
 D_8008AC84
 D_8008ACA0
@@ -199,6 +198,7 @@ gStyleKind
 gStyleTargetObj
 gStyleTickCount
 gStyleVariant
+gTmdModelConstructed
 gTrackedYSnapshot
 gVabBodySuffix
 gVabDriverMode
