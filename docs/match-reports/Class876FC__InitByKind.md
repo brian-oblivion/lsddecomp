@@ -199,3 +199,10 @@ For the HEAD, by type scope; none applied here (other units' views).
 - `include/code_d294.h` `Class6B5CCMethods`: `slot44` -> `updateRotation`,
   `slot48` -> `updateScale` (B; Class6B5CC__UpdateRotation / Class6B5CC__UpdateScale bodies, both
   matched since those comments said "still queued").
+
+## Track 4b (2026-09-25, round 85)
+
+`D_8008ACA4`/`D_8008ACA8`/`D_8008ACAC` were `s32` in class_3bb8c_o.c and
+`D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
+declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `Actor__func_56f5c` calls the same slot by. Byte-identical; no new `-Wall`
+warning.
