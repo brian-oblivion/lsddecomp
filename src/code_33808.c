@@ -956,7 +956,62 @@ void *func_80045438(s32 arg0, s32 arg1, s32 arg2) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800454C4);
+/* D_8006F614 +0x008: constructor -- BasicClass's, then this table; open a
+ * CD stream object (New_CdStreamObj(arg2, 15, 0)) at +0x60 and set up the
+ * decode buffers (func_8004564C); 1 when either fails. Then reset the MDEC
+ * the first time any player is built (D_8008A93C), route its output
+ * callback to func_80045DE0, hand the stream the ring buffer at +0x10
+ * (0x12000), clear +0x50 and store 1 through its own +0x06C. 0. */
+typedef struct StreamMethods454C4 {
+    /* +0x000 */ u8 pad0[0x40];
+    /* +0x040 */ void (*slot40)();
+} StreamMethods454C4;
+
+typedef struct Stream454C4 {
+    /* +0x000 */ StreamMethods454C4 *methods;
+} Stream454C4;
+
+typedef struct Methods454C4 {
+    /* +0x000 */ u8 pad0[0x6C];
+    /* +0x06C */ void (*slot6C)();
+} Methods454C4;
+
+typedef struct Obj454C4 {
+    /* +0x000 */ Methods454C4 *methods;
+    /* +0x004 */ u8 pad4[0xC];
+    /* +0x010 */ void *ring;
+    /* +0x014 */ u8 pad14[0x3C];
+    /* +0x050 */ s32 unk50;
+    /* +0x054 */ u8 pad54[0xC];
+    /* +0x060 */ Stream454C4 *stream;
+} Obj454C4;
+
+extern void *New_CdStreamObj(s32 arg1, s32 arg2, s32 arg3);
+s32 func_8004564C();
+extern s32 D_8008A93C;
+extern void DecDCTReset(int mode);
+extern int DecDCToutCallback(void (*func)());
+void func_80045DE0(void);
+
+s32 func_800454C4(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = func_80045E44();
+    self->stream = New_CdStreamObj(arg2, 15, 0);
+    if (self->stream != NULL) {
+        if (func_8004564C(self, arg1, arg3) == 0) {
+            if (D_8008A93C == 0) {
+                DecDCTReset(0);
+            }
+            D_8008A93C = 1;
+            DecDCToutCallback(func_80045DE0);
+            self->stream->methods->slot40(self->stream, self->ring, 0x12000);
+            self->unk50 = 0;
+            self->methods->slot6C(self, 1);
+            return 0;
+        }
+    }
+    return 1;
+}
 /* D_8006F614 +0x00C: finalize -- release the object at +0x60, detach and
  * reset the MDEC decoder, free the four buffers (func_8004575C), then
  * BasicClass's finalize. */
