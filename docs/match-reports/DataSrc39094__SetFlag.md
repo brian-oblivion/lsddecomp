@@ -1,4 +1,6 @@
-# func_800489B4 -- MATCHED (45/45 words)
+# DataSrc39094__SetFlag -- MATCHED (45/45 words)
+
+> Renamed from `func_800489B4` on 2026-09-25 (tools/rename.py). Address 0x800489b4.
 
 Round 82, runner echo (third echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the first build; whole-image SHA1 green, funcdiff 45/45.
@@ -14,7 +16,7 @@ active data source's setFlag(self).
 
 ```c
 /* slot +0x064 of D_80081940 (setFlag) */
-void func_800489B4(D_80081940Obj *self) {
+void DataSrc39094__SetFlag(D_80081940Obj *self) {
     if (self->unk2A == 9) {
         if (self->flags & 0x80) {
             self->unk2A = 0;

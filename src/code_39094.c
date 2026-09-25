@@ -23,7 +23,7 @@ typedef struct D_80081940Obj D_80081940Obj;
 typedef struct D_80081940Methods {
     CLASS6D430_SLOTS(D_80081940Obj, (D_80081940Obj *self));
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ s32 (*slot80)();  /* func_80048BC0(self); unprototyped: func_800489B4 calls it with no argument */
+    /* +0x080 */ s32 (*slot80)();  /* func_80048BC0(self); unprototyped: DataSrc39094__SetFlag calls it with no argument */
     /* +0x084 */ void (*releaseAlloc)();  /* func_80048C98(self); unprototyped: func_80048BC0 calls it with no argument */
 } D_80081940Methods;
 
@@ -53,7 +53,7 @@ extern void *BMemPMgrAlloc(s32 size);
 void *func_80048CE0(void);
 
 /* allocator: new D_80081940 object */
-D_80081940Obj *func_80048894(void) {
+D_80081940Obj *New_DataSrc39094(void) {
     D_80081940Obj *obj = BMemPMgrAlloc(0x3C);
     if (obj != NULL) {
         ((Class6D430Methods *)func_80048CE0())->ctor((Class6D430 *)obj);
@@ -62,7 +62,7 @@ D_80081940Obj *func_80048894(void) {
     return NULL;
 }
 /* slot +0x008 of D_80081940 (ctor) */
-void func_800488E4(D_80081940Obj *self) {
+void DataSrc39094__DataSrc39094(D_80081940Obj *self) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = func_80048CE0();
     self->unk30 = -1;
@@ -77,12 +77,12 @@ void func_800488E4(D_80081940Obj *self) {
     }
 }
 /* slot +0x00C of D_80081940 (finalize) */
-void func_80048960(D_80081940Obj *self) {
+void DataSrc39094__Finalize(D_80081940Obj *self) {
     self->methods->releaseAlloc(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* slot +0x064 of D_80081940 (setFlag) */
-void func_800489B4(D_80081940Obj *self) {
+void DataSrc39094__SetFlag(D_80081940Obj *self) {
     if (self->unk2A == 9) {
         if (self->flags & 0x80) {
             self->unk2A = 0;
@@ -100,7 +100,7 @@ void func_800489B4(D_80081940Obj *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
 }
 /* slot +0x074 of D_80081940 (cancelRequests) */
-void func_80048A68(D_80081940Obj *self) {
+void DataSrc39094__CancelRequests(D_80081940Obj *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
     self->unk2C = 0;
     self->unk2E = 0;

@@ -1,4 +1,6 @@
-# func_800488E4 -- MATCHED (31/31 words)
+# DataSrc39094__DataSrc39094 -- MATCHED (31/31 words)
+
+> Renamed from `func_800488E4` on 2026-09-25 (tools/rename.py). Address 0x800488e4.
 
 Round 82, runner echo (second echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
@@ -16,7 +18,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 
 ```c
 /* slot +0x008 of D_80081940 (ctor) */
-void func_800488E4(D_80081940Obj *self) {
+void DataSrc39094__DataSrc39094(D_80081940Obj *self) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = func_80048CE0();
     self->unk30 = -1;

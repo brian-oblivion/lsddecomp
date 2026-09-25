@@ -1,4 +1,6 @@
-# func_80048894 -- MATCHED (20/20 words)
+# New_DataSrc39094 -- MATCHED (20/20 words)
+
+> Renamed from `func_80048894` on 2026-09-25 (tools/rename.py). Address 0x80048894.
 
 Round 82, runner echo (second echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
@@ -16,7 +18,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 
 ```c
 /* allocator: new D_80081940 object */
-D_80081940Obj *func_80048894(void) {
+D_80081940Obj *New_DataSrc39094(void) {
     D_80081940Obj *obj = BMemPMgrAlloc(0x3C);
     if (obj != NULL) {
         ((Class6D430Methods *)func_80048CE0())->ctor((Class6D430 *)obj);

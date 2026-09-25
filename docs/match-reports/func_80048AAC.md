@@ -8,7 +8,7 @@ Byte-exact on the first build; whole-image SHA1 green, funcdiff 51/51.
 Slot +0x078 of D_80081940. With a buffer and a non-NULL name: reset (`unk2C
 = 0` when idle, else cancelRequests), enter state 9, then close / open(name,
 1, 0) / read(buffer, 0xB358) through the object's own (run-time-bound)
-Class6D430 interface slots. State 9 is completed by func_800489B4 (setFlag).
+Class6D430 interface slots. State 9 is completed by DataSrc39094__SetFlag (setFlag).
 
 ## Source
 

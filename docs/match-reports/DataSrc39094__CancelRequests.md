@@ -1,4 +1,6 @@
-# func_80048A68 -- MATCHED (17/17 words)
+# DataSrc39094__CancelRequests -- MATCHED (17/17 words)
+
+> Renamed from `func_80048A68` on 2026-09-25 (tools/rename.py). Address 0x80048a68.
 
 Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
@@ -17,7 +19,7 @@ Method slot +0x074 of D_80081940 (cancelRequests; table word at 0x800819B4). Cal
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
 /* slot +0x074 of D_80081940 (cancelRequests) */
-void func_80048A68(D_80081940Obj *self) {
+void DataSrc39094__CancelRequests(D_80081940Obj *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
     self->unk2C = 0;
     self->unk2E = 0;

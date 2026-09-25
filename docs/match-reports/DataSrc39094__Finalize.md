@@ -1,4 +1,6 @@
-# func_80048960 -- MATCHED (21/21 words)
+# DataSrc39094__Finalize -- MATCHED (21/21 words)
+
+> Renamed from `func_80048960` on 2026-09-25 (tools/rename.py). Address 0x80048960.
 
 Round 82, runner echo (second echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
@@ -16,7 +18,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 
 ```c
 /* slot +0x00C of D_80081940 (finalize) */
-void func_80048960(D_80081940Obj *self) {
+void DataSrc39094__Finalize(D_80081940Obj *self) {
     self->methods->releaseAlloc(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
