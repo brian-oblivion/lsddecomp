@@ -12,7 +12,7 @@
  * Round 82 matched the one- to eight-word bodies (getters, accessors, empty
  * overrides), then a third batch of 11- to 20-word bodies (the sprite
  * attribute-bit setters, cell selection, finalize chains, the D_8006EF50
- * allocator); the remaining bodies are still INCLUDE_ASM.
+ * allocator), and then the rest: every function in the unit is C.
  */
 #include "common.h"
 #include "Sprite.h"
