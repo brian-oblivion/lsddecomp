@@ -115,7 +115,12 @@ const char *func_800490F4(s32 *typeCodeOut) {
     }
     return D_800113DC;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049110);
+Rec1C *func_80049110(s32 *countOut) {
+    if (countOut != NULL) {
+        *countOut = 0;
+    }
+    return &((Rec1C *)func_80048D48(NULL))[0x230];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_8004913C);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800491CC);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800491FC);
