@@ -1,7 +1,7 @@
 /* code_2cc8c_c -- third slice of the 0x2CC8C block (0x8003DFA0..0x8003E874,
  * 19 functions plus one stall), continuing directly from code_2cc8c_b.
  *
- * After TaskCore's Obj86B60__GetActiveSlotCount and the two getters come
+ * After TaskCore's TaskCore__GetActiveSlotCount and the two getters come
  * IntermediateBase's own methods, the ctor through OnState3 and its getter
  * Get_vtable_IntermediateBase (class id 0x30, gIntermediateBaseMethods, the
  * parent of TaskCore and Class86668). The class is declared once, in
@@ -32,7 +32,7 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-s32 Obj86B60__GetActiveSlotCount(Obj86B60 *self)
+s32 TaskCore__GetActiveSlotCount(Obj86B60 *self)
 {
     return self->slotCounts[self->activeSlot];
 }

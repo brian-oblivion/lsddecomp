@@ -29,7 +29,7 @@
  *   - TileMap / TileAtlas (D_8006F498 / D_8006F514): a 20x15 grid of
  *     16x16-cell map data (a GsMAP, consumed by BgLayer as its map source)
  *     and the 300-GsCELL texture atlas it indexes; built together and used
- *     together in src/code_2c054.c's TaskCoreObj__TaskCoreObj.
+ *     together in src/code_2c054.c's TaskCore__TaskCore.
  *
  * Two more classes, not Class6D430 subclasses:
  *

@@ -58,6 +58,6 @@ convention basis, unconfirmed by any found caller.
 slot `+0x00C` (a base-class layout convention independently confirmed in
 `include/class_39e08.h`'s own `ctor`/`dtor` pair at `+0x008`/`+0x00C`, and in
 `include/code_171e0.h`'s `Class6D430__Finalize`). Tears down the private
-`unkB4` sub-object, then up-calls `TaskCoreObj__Destroy` at the same slot --
+`unkB4` sub-object, then up-calls `TaskCore__Finalize` at the same slot --
 the "override, do extra work, call the base" shape this whole unit's slot
 comparison confirms (see the unit header comment).

@@ -30,19 +30,19 @@ typedef struct Pair32E99C Pair32E99C;
  * see code_2cc8c_c.c). Checked directly against the raw table bytes with
  * `tools/classtable.py gTaskCoreMethods`: every one of this unit's 20
  * functions occupies gTaskCoreMethods at the SAME offset it occupies in
- * gClass86B60Methods, and 9 of them (Obj86B60__OnTag2Notify,
- * Obj86B60__OnTag5Notify, Obj86B60__SetState, Obj86B60__Tick,
- * Obj86B60__RefreshViewValue and the five func_8003Cxxx handlers at
+ * gClass86B60Methods, and 9 of them (TaskCore__OnPadEvent,
+ * TaskCore__Update, TaskCore__SetState, TaskCore__Tick,
+ * TaskCore__RefreshViewValue and the five func_8003Cxxx handlers at
  * +0x074..+0x084) ALSO occupy the second derived table, `gGraphRoomMethods`
  * (the `GraphRoomObj` class, src/class_3bb8c_t.c), unmodified. gClass86B60Methods
  * (the `Class86B60` class, external to this unit) overrides three of them --
  * slot60 with `Class86B60__SetState`, slot90 with `Class86B60__Tick`, slot94
  * with `Class86B60__RefreshViewValue` -- which is exactly the evidence that
- * settles those three names (this unit's own Obj86B60__SetState/Tick/
+ * settles those three names (this unit's own TaskCore__SetState/Tick/
  * RefreshViewValue are the DEFAULT implementations a sibling class
  * overrides, not the override itself; do not rename them to a
  * `Class86B60__`- or `GraphRoomObj__`-prefixed name -- see
- * TaskCoreObj__TaskCoreObj/TaskCoreObj__Reset et al, already established in
+ * TaskCore__TaskCore/TaskCore__Reset et al, already established in
  * this same gTaskCoreMethods table, for why "Obj86B60" and not "TaskCoreObj"
  * is still the right prefix for the non-identity-defining methods: this
  * unit's own struct is typed `Obj86B60 *self` throughout). Until round 82
@@ -138,56 +138,56 @@ struct EventArg {
 /*
  * self->unk4C's pointee ("target"). Established from six independent
  * functions all agreeing:
- *  - Obj86B60__func_8003C7F4/Obj86B60__func_8003C858/Obj86B60__func_8003C8D0/Obj86B60__func_8003C944/Obj86B60__func_8003C9B0
+ *  - TaskCore__func_8003C7F4/TaskCore__OnPadConfirm/TaskCore__OnPadCancel/TaskCore__OnPadPrev/TaskCore__OnPadNext
  *    each use it ONLY as a null/non-null gate (never dereferenced), so it
  *    is at minimum a pointer.
- *  - Obj86B60__Tick dereferences +0x00C (s32, compared directly against
+ *  - TaskCore__Tick dereferences +0x00C (s32, compared directly against
  *    self->unk58) and +0x024 (a pointer to a word-pointer array, indexed
  *    by self->unk58 and null-checked -- `target->unk24[self->unk58]`).
- *  - Obj86B60__SetState (case a1==5) reads
+ *  - TaskCore__SetState (case a1==5) reads
  *    +0x008 (s32, forwarded as an argument) and takes the ADDRESS of
  *    +0x010 (passed as a 3-byte colour-ish buffer to self->methods->slotE4,
- *    the same slot Obj86B60__TickColorFade feeds a locally-built 3-byte buffer to).
+ *    the same slot TaskCore__TickColorFade feeds a locally-built 3-byte buffer to).
  */
 struct Unk4CObj {
     const char *path;   /* +0x000, renamed from unk0, round 78 -- exclusive
                             to code_2cc8c_b, verified (every accessor is in
-                            this unit). OBSERVED: Obj86B60__SetTarget (round 12) -- a
+                            this unit). OBSERVED: TaskCore__SetTarget (round 12) -- a
                             path: passed to func_8003B39C(path) when
                             non-NULL to build handle, mirroring
                             Obj86B60->unk70's own path-cache idiom. ALSO
-                            OBSERVED (truthy-only) by Obj86B60__ReleaseTarget, which
+                            OBSERVED (truthy-only) by TaskCore__ReleaseTarget, which
                             gates a call through handle on this being
                             non-NULL -- corrects this struct's earlier
                             header note that nothing ever loads *(unk4C+0);
                             that was true only of the 16 functions attempted
                             through round 11. */
     Unk74Obj *handle;    /* +0x004, renamed from unk4, round 78 -- exclusive
-                            to code_2cc8c_b, verified. OBSERVED: Obj86B60__SetTarget (constructed via
+                            to code_2cc8c_b, verified. OBSERVED: TaskCore__SetTarget (constructed via
                             func_8003B39C(path) + slot78/slot5C when path is
                             set, else read as an existing handle and written
                             back unchanged; same Unk74Obj slot4 interface
-                            Obj86B60->unk74 uses) and Obj86B60__ReleaseTarget (slot4
+                            Obj86B60->unk74 uses) and TaskCore__ReleaseTarget (slot4
                             called on it, gated by path's truthiness) */
-    s32 unk8;           /* +0x008, OBSERVED: Obj86B60__SetState */
-    s32 unkC;            /* +0x00C, OBSERVED: Obj86B60__Tick */
+    s32 unk8;           /* +0x008, OBSERVED: TaskCore__SetState */
+    s32 unkC;            /* +0x00C, OBSERVED: TaskCore__Tick */
     u8 unselectedColor[3];          /* +0x010, INFERRED 3-byte colour buffer read by
-                              address only (Obj86B60__SetState);
+                              address only (TaskCore__SetState);
                               CONFIRMED as a 3-byte buffer read (not just
-                              address-taken) by Obj86B60__CancelElementScroll/Obj86B60__SetSlotCursor,
+                              address-taken) by TaskCore__CancelElementScroll/TaskCore__SetSlotCursor,
                               both already matched, passing it directly to
                               an Unk64Elem slotB8 call */
     u8 pad13[0x018 - 0x013];
     void **registrationSlots; /* +0x018, renamed from unk18, round 78 --
                                exclusive to code_2cc8c_b, verified. OBSERVED:
-                               Obj86B60__FindNextFreeSlot, an array of
+                               TaskCore__FindNextFreeSlot, an array of
                                pointers indexed by an Obj86B60 index and
                                null-checked (never dereferenced) -- a
                                registration slot table, one entry per index
                                tracked by Obj86B60->activeSlot/slotCount */
     char **names;            /* +0x01C, renamed from unk1C, round 78 --
                                 exclusive to code_2cc8c_b, verified. OBSERVED:
-                                Obj86B60__SetTarget (round 12) --
+                                TaskCore__SetTarget (round 12) --
                                 a NULL-terminated array of C strings, DISTINCT
                                 from registrationSlots at +0x018 (adjacent
                                 field, same shape, different slot). Walked with
@@ -196,22 +196,22 @@ struct Unk4CObj {
                                 Obj86B60->slotElements[i]/itemLists[i]. */
     u8 *externalRecords;     /* +0x020, renamed from unk20, round 78 --
                                 exclusive to code_2cc8c_b, verified. OBSERVED:
-                                Obj86B60__UpdateSlotElements (round 12) --
+                                TaskCore__UpdateSlotElements (round 12) --
                                 a pointer walked forward 8 bytes per loop
                                 iteration (an external array of 8-byte
                                 records this unit never reads through
-                                directly, only forwards as Obj86B60__UpdateSlotElements's
+                                directly, only forwards as TaskCore__UpdateSlotElements's
                                 3rd arg to an Unk64Elem slot4C call) */
-    void **unk24;         /* +0x024, OBSERVED: Obj86B60__Tick, word-pointer
+    void **unk24;         /* +0x024, OBSERVED: TaskCore__Tick, word-pointer
                               array indexed by self->unk58 */
 };
 
 /*
- * The pointee of Unk4CObj->unk24[idx] (round 12, from Obj86B60__CommitElementScroll and
- * Obj86B60__RefreshSlotView, cross-checked against already-matched Obj86B60__CancelElementScroll's own
+ * The pointee of Unk4CObj->unk24[idx] (round 12, from TaskCore__CommitElementScroll and
+ * TaskCore__RefreshSlotView, cross-checked against already-matched TaskCore__CancelElementScroll's own
  * `((s32 *)self->unk4C->unk24[idx])[1]` read at the same +0x004 offset).
  * Only the three offsets these functions actually touch are modelled;
- * Obj86B60__CancelElementScroll/Obj86B60__SetSlotCursor's own `(u8 *)...unk24[idx] + 8` buffer usage
+ * TaskCore__CancelElementScroll/TaskCore__SetSlotCursor's own `(u8 *)...unk24[idx] + 8` buffer usage
  * is left as a raw cast in those (already-matched) functions rather than
  * retrofitted onto this type, per this project's convention of not
  * editing matched functions to adopt a later, more specific type.
@@ -224,21 +224,21 @@ struct SlotEntry {
     u8 pad000[0x004];
     s32 savedCursor; /* +0x004, renamed from unk4, round 78 -- the
                     slot's own persisted ring-cursor value: SET here by
-                    Obj86B60__CommitElementScroll, READ back as `newVal` by the
-                    already-matched Obj86B60__CancelElementScroll */
+                    TaskCore__CommitElementScroll, READ back as `newVal` by the
+                    already-matched TaskCore__CancelElementScroll */
     u8 pad008[0x010 - 0x008];
     s32 unk10;   /* +0x010 */
     s32 unk14;   /* +0x014, combined with unk10 and a per-slot counter into
                     a 2-word stack buffer (`{unk10, unk14 - counter*10}`)
                     passed by address to an Unk64Elem slotBC call, then
                     incremented by 10 per loop iteration -- see
-                    Obj86B60__CommitElementScroll/Obj86B60__RefreshSlotView */
+                    TaskCore__CommitElementScroll/TaskCore__RefreshSlotView */
 };
 
 /* self->unk48's pointee ("child"). A DIFFERENT class from Obj86B60 -- its
  * own vtable slot +0x080 takes FOUR args (self, a1, a2, a3), whereas
- * Obj86B60's OWN slot +0x080 (Obj86B60__func_8003C944) takes none beyond self. Only
- * Obj86B60__ForwardToChild touches it, so only that one slot is modelled. */
+ * Obj86B60's OWN slot +0x080 (TaskCore__OnPadPrev) takes none beyond self. Only
+ * TaskCore__PlaySound touches it, so only that one slot is modelled. */
 struct Unk48ObjMethods {
     u8 pad000[0x080];
     void (*slot80)(Unk48Obj *self, s32 a1, s32 a2, s32 a3); /* +0x080 */
@@ -247,8 +247,8 @@ struct Unk48Obj {
     Unk48ObjMethods *methods; /* +0x000 */
 };
 
-/* self->unk78's pointee. Only Obj86B60__TickColorFade touches it, calling one slot
- * with a literal 1 and the same 3-byte colour buffer Obj86B60__TickColorFade builds
+/* self->unk78's pointee. Only TaskCore__TickColorFade touches it, calling one slot
+ * with a literal 1 and the same 3-byte colour buffer TaskCore__TickColorFade builds
  * for its own self->methods->slotE4 call just above. */
 struct Unk78ObjMethods {
     u8 pad000[0x0B8];
@@ -258,7 +258,7 @@ struct Unk78Obj {
     Unk78ObjMethods *methods; /* +0x000 */
 };
 
-/* self->unk74's pointee ("sub-resource handle"). Only Obj86B60__SetSubHandle touches
+/* self->unk74's pointee ("sub-resource handle"). Only TaskCore__SetSubHandle touches
  * it, loaded via `func_8003B39C(path)` (already matched, `class_39e08.c`,
  * where it returns the unit's own local view `SubObjG *` -- this unit keeps
  * its own local view of the same table per the project's established
@@ -310,11 +310,11 @@ extern void *BMemPMgrFree(void *ptr);  /* matching free/release. Its own
                                             build reconfirmed green. */
 extern void ReleaseBasicClassArray(void *a0, void *a1); /* not yet seen elsewhere in
                                                     this project; typed from
-                                                    Obj86B60__ReleaseSlotElements's own call
+                                                    TaskCore__ReleaseSlotElements's own call
                                                     site only */
 
 /*
- * Obj86B60__CreateSlotElements's 2nd parameter -- an unrelated "source list" descriptor,
+ * TaskCore__CreateSlotElements's 2nd parameter -- an unrelated "source list" descriptor,
  * NOT an Obj86B60 or any class in this unit's own hierarchy (no method
  * table dereference anywhere in that function). Only the two fields it
  * touches are modelled.
@@ -333,17 +333,17 @@ extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
                                         own object; local view here */
 extern Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name); /* not
                                         yet seen elsewhere; typed from
-                                        Obj86B60__CreateSlotElements's own call site --
+                                        TaskCore__CreateSlotElements's own call site --
                                         its return value is stored directly
                                         into the same self->unk64[idx]
-                                        array Obj86B60__BroadcastToSlotElements/Obj86B60__BroadcastToSlots/
-                                        Obj86B60__BeginElementScroll/Obj86B60__SetSlotCursor walk as
+                                        array TaskCore__BroadcastToSlotElements/TaskCore__BroadcastToSlots/
+                                        TaskCore__BeginElementScroll/TaskCore__SetSlotCursor walk as
                                         Unk64Elem * */
 
 /*
- * self->unk64[idx]'s pointee, as walked by Obj86B60__BroadcastToSlotElements -- a DIFFERENT
- * reading of the same field Obj86B60__ReleaseSlotElements/Obj86B60__AdvanceSlotCursor/Obj86B60__RetreatSlotCursor use
- * as an opaque resource handle. Obj86B60__BroadcastToSlotElements reinterprets that handle as
+ * self->unk64[idx]'s pointee, as walked by TaskCore__BroadcastToSlotElements -- a DIFFERENT
+ * reading of the same field TaskCore__ReleaseSlotElements/TaskCore__AdvanceSlotCursor/TaskCore__RetreatSlotCursor use
+ * as an opaque resource handle. TaskCore__BroadcastToSlotElements reinterprets that handle as
  * `Unk64Elem **` (an array of `self->unk5C[idx]` object pointers) and
  * dispatches through each element's own +0x0B8 slot. Both readings are
  * kept -- the field itself stays `void **` in `Obj86B60` (the generic,
@@ -355,28 +355,28 @@ extern Unk64Elem *New_Obj6EAC0(void *ctx, s32 len, char *name); /* not
 struct Unk64ElemMethods {
     u8 pad000[0x004];
     void (*slot4)(Unk64Elem *self);            /* +0x004, OBSERVED:
-                                                    Obj86B60__ReleaseTarget (round 12) */
+                                                    TaskCore__ReleaseTarget (round 12) */
     u8 pad008[0x04C - 0x008];
     void (*slot4C)(Unk64Elem *self, void *a1, void *buf); /* +0x04C,
-                                                    OBSERVED: Obj86B60__UpdateSlotElements
-                                                    and Obj86B60__RefreshSlotView
+                                                    OBSERVED: TaskCore__UpdateSlotElements
+                                                    and TaskCore__RefreshSlotView
                                                     (round 12) -- both pass a
                                                     raw buffer pointer as the
                                                     3rd arg (an 8-byte-stride
                                                     external record in
-                                                    Obj86B60__UpdateSlotElements, the
+                                                    TaskCore__UpdateSlotElements, the
                                                     address of a 2-word stack
-                                                    pair in Obj86B60__RefreshSlotView),
+                                                    pair in TaskCore__RefreshSlotView),
                                                     so `buf` stays untyped */
     void (*slot50)(Unk64Elem *self);            /* +0x050, OBSERVED:
-                                                    Obj86B60__RefreshSlotView (round 12) */
+                                                    TaskCore__RefreshSlotView (round 12) */
     u8 pad054[0x060 - 0x054];
     void (*slot60)(Unk64Elem *self, s32 a1);   /* +0x060, OBSERVED:
-                                                    Obj86B60__CancelElementScroll */
+                                                    TaskCore__CancelElementScroll */
     u8 pad064[0x0B8 - 0x064];
     void (*slotB8)(Unk64Elem *self, void *a1); /* +0x0B8 */
     void (*slotBC)(Unk64Elem *self, void *a1); /* +0x0BC, OBSERVED:
-                                                    Obj86B60__CommitElementScroll (round 12),
+                                                    TaskCore__CommitElementScroll (round 12),
                                                     address of a 2-word
                                                     stack pair */
 };
@@ -385,9 +385,9 @@ struct Unk64Elem {
 };
 
 /*
- * self->unk68's pointee (round 12, from Obj86B60__ReleaseTarget/Obj86B60__CommitElementScroll/
- * Obj86B60__RefreshSlotView). Built by `New_ClassEAC0(&D_8008A8E8, &D_8008A8F0, 0)` in
- * Obj86B60__SetTarget -- New_ClassEAC0 itself lives in the still-uncarved
+ * self->unk68's pointee (round 12, from TaskCore__ReleaseTarget/TaskCore__CommitElementScroll/
+ * TaskCore__RefreshSlotView). Built by `New_ClassEAC0(&D_8008A8E8, &D_8008A8F0, 0)` in
+ * TaskCore__SetTarget -- New_ClassEAC0 itself lives in the still-uncarved
  * code_2cc8c_d segment (not this unit's function to attempt), so it is
  * declared here only as an external returning this unit's own local view
  * of the type it constructs. D_8008A8E8/D_8008A8F0 are likewise only ever
@@ -397,18 +397,18 @@ struct Unk64Elem {
 struct Unk68ObjMethods {
     u8 pad000[0x004];
     void (*slot4)(Unk68Obj *self);              /* +0x004, OBSERVED:
-                                                     Obj86B60__ReleaseTarget */
+                                                     TaskCore__ReleaseTarget */
     u8 pad008[0x04C - 0x008];
     void (*slot4C)(Unk68Obj *self, s32 a1, void *pos); /* +0x04C, OBSERVED:
-                                                     Obj86B60__RefreshSlotView, its only
+                                                     TaskCore__RefreshSlotView, its only
                                                      caller, passes THREE
                                                      (round 75) */
     void (*slot50)(Unk68Obj *self);               /* +0x050, OBSERVED:
-                                                     Obj86B60__CommitElementScroll,
-                                                     Obj86B60__RefreshSlotView */
+                                                     TaskCore__CommitElementScroll,
+                                                     TaskCore__RefreshSlotView */
     u8 pad054[0x0C0 - 0x054];
     void (*slotC0)(Unk68Obj *self, void *buf);     /* +0x0C0, OBSERVED:
-                                                     Obj86B60__RefreshSlotView, address
+                                                     TaskCore__RefreshSlotView, address
                                                      of a 2-word stack pair
                                                      `{0x28, count*12}` */
 };
@@ -889,16 +889,16 @@ extern void *New_D8006EFAC(void); /* external, no args; not yet seen
  * unit never itself invokes.
  *
  * slotB0/slotC4 are read as DATA (a raw function-pointer VALUE stashed into
- * self->unk88/self->unk8C by Obj86B60__SetFadeCallbackEnabled/Obj86B60__func_8003CB30), never called
+ * self->unk88/self->unk8C by TaskCore__SetFadeCallbackEnabled/TaskCore__SetFadeOutCallbackEnabled), never called
  * directly through the vtable in this unit -- their type is inferred from
- * how self->unk88/unk8C are later CALLED (Obj86B60__TickFadeCallback/Obj86B60__func_8003CCDC).
+ * how self->unk88/unk8C are later CALLED (TaskCore__TickFadeCallback/TaskCore__TickFadeOutCallback).
  *
- * slotAC/slotC0 ARE Obj86B60__TickFadeCallback/Obj86B60__func_8003CCDC respectively (OBSERVED from
- * classtable.py). Obj86B60__OnTag5Notify calls them with `self` only -- register
+ * slotAC/slotC0 ARE TaskCore__TickFadeCallback/TaskCore__TickFadeOutCallback respectively (OBSERVED from
+ * classtable.py). TaskCore__Update calls them with `self` only -- register
  * `$a1` is genuinely live-but-unconsumed at those two call sites (leftover
  * from an earlier `self->methods->slot60(self, 6)` call a few instructions
  * before, on the branch that reaches them), not a real argument; neither
- * callee's own body reads it. See Obj86B60__OnTag5Notify's own report.
+ * callee's own body reads it. See TaskCore__Update's own report.
  */
 struct Obj86B60Methods {
     u8 pad000[0x010];
@@ -944,7 +944,7 @@ struct Obj86B60Methods {
                                                       exclusivity as
                                                       resetCounters above. */
     void (*slot4C)(Obj86B60 *self, s32 a1, s32 a2, s32 a3); /* +0x04C,
-                                                      external (TaskCoreObj__func_8003C238);
+                                                      external (TaskCore__OnInit);
                                                       OBSERVED: IntermediateBase__Init */
     void (*slot50)(Obj86B60 *self);               /* +0x050, external
                                                       (Class86B60__RegisterHandlers);
@@ -957,11 +957,11 @@ struct Obj86B60Methods {
                                                       round 55 -- exclusive to
                                                       this unit. */
     void (*slot58)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x058, IS
-                                                      Obj86B60__OnTag2Notify
+                                                      TaskCore__OnPadEvent
                                                       (already matched);
                                                       OBSERVED: IntermediateBase__OnNotify */
     void (*slot5C)(Obj86B60 *self, EventArg *arg1, s32 arg2); /* +0x05C, IS
-                                                      Obj86B60__OnTag5Notify (already
+                                                      TaskCore__Update (already
                                                       matched there with a1
                                                       typed s32 -- an
                                                       independent local view,
@@ -979,7 +979,7 @@ struct Obj86B60Methods {
                                                       OBSERVED: IntermediateBase__SetState
                                                       (round 13) */
     void (*slot6C)(Obj86B60 *self, s32 a1);       /* +0x06C, IS
-                                                      Obj86B60__SetFrameBound
+                                                      TaskCore__SetFrameBound
                                                       (round 78 -- previously
                                                       padded over as unoccupied;
                                                       it is a real slot,
@@ -990,34 +990,34 @@ struct Obj86B60Methods {
                                                       and asm/data/5E140.data.s
                                                       (gTaskCoreMethods+0x06C)) */
     void (*slot70)(Obj86B60 *self, s32 a1);       /* +0x070, IS
-                                                      Obj86B60__ForwardToChild */
-    /* +0x074..+0x084: the five message handlers Obj86B60__OnTag2Notify dispatches to
+                                                      TaskCore__PlaySound */
+    /* +0x074..+0x084: the five message handlers TaskCore__OnPadEvent dispatches to
      * (round 23). Read off jtbl_80011090: message code 0x12 -> slot80,
      * 0x13 -> slot84, 0x17 -> slot7C, 0x19 -> slot78, 0x21 -> slot74.
      *
      * CORRECTED round 78 (delta): the occupants below were previously listed
-     * REVERSED (slot74 said "IS Obj86B60__func_8003C9B0", slot84 said "IS Obj86B60__func_8003C858",
+     * REVERSED (slot74 said "IS TaskCore__OnPadNext", slot84 said "IS TaskCore__OnPadConfirm",
      * etc -- a mirror image of the truth). Read the raw table bytes directly
      * (asm/data/76DC8.data.s lines for gClass86B60Methods+0x074..+0x084, and
      * the same offsets in gTaskCoreMethods, asm/data/5E140.data.s): the five
      * `.word` entries are in ASCENDING function-address order, matching
      * ASCENDING slot-offset order exactly, with no mirroring. That makes the
-     * message-code -> occupant mapping 0x21->Obj86B60__func_8003C7F4 (slot74),
-     * 0x19->Obj86B60__func_8003C858 (slot78), 0x17->Obj86B60__func_8003C8D0
+     * message-code -> occupant mapping 0x21->TaskCore__func_8003C7F4 (slot74),
+     * 0x19->TaskCore__OnPadConfirm (slot78), 0x17->TaskCore__OnPadCancel
      * (slot7C, unaffected -- the middle slot of five is its own mirror),
-     * 0x12->Obj86B60__func_8003C944 (slot80), 0x13->Obj86B60__func_8003C9B0
+     * 0x12->TaskCore__OnPadPrev (slot80), 0x13->TaskCore__OnPadNext
      * (slot84) -- every code_2cc8c.c source order (C7F4, C858, C8D0, C944,
      * C9B0 -- see src/code_2cc8c.c's own function order) reads straight down
      * the table starting at slot74, which is the tell that the OLD comment
      * had it backwards. Pad split is ADDITIVE and preserves the original
      * 0x1C total (5 * 4 + 8). */
-    void (*slot74)(Obj86B60 *self, s32 a1);       /* +0x074, IS Obj86B60__func_8003C7F4 */
-    void (*slot78)(Obj86B60 *self, s32 a1);       /* +0x078, IS Obj86B60__func_8003C858 */
-    void (*slot7C)(Obj86B60 *self, s32 a1);       /* +0x07C, IS Obj86B60__func_8003C8D0 */
-    void (*slot80)(Obj86B60 *self, s32 a1);       /* +0x080, IS Obj86B60__func_8003C944 */
-    void (*slot84)(Obj86B60 *self, s32 a1);       /* +0x084, IS Obj86B60__func_8003C9B0 */
+    void (*slot74)(Obj86B60 *self, s32 a1);       /* +0x074, IS TaskCore__func_8003C7F4 */
+    void (*slot78)(Obj86B60 *self, s32 a1);       /* +0x078, IS TaskCore__OnPadConfirm */
+    void (*slot7C)(Obj86B60 *self, s32 a1);       /* +0x07C, IS TaskCore__OnPadCancel */
+    void (*slot80)(Obj86B60 *self, s32 a1);       /* +0x080, IS TaskCore__OnPadPrev */
+    void (*slot84)(Obj86B60 *self, s32 a1);       /* +0x084, IS TaskCore__OnPadNext */
     u8 pad088[0x090 - 0x088];
-    void (*slot90)(Obj86B60 *self);               /* +0x090, IS Obj86B60__Tick
+    void (*slot90)(Obj86B60 *self);               /* +0x090, IS TaskCore__Tick
                                                       (already matched);
                                                       gClass86B60Methods
                                                       overrides this slot with
@@ -1025,100 +1025,100 @@ struct Obj86B60Methods {
                                                       Class86B60__Tick, which
                                                       is what settles the
                                                       "Tick" name -- see
-                                                      Obj86B60__Tick's own
+                                                      TaskCore__Tick's own
                                                       report. OBSERVED:
-                                                      Obj86B60__SetState */
+                                                      TaskCore__SetState */
     void (*slot94)(Obj86B60 *self);                /* +0x094, IS
-                                                       Obj86B60__RefreshViewValue
+                                                       TaskCore__RefreshViewValue
                                                        (already matched);
                                                        gClass86B60Methods
                                                        overrides this slot with
                                                        Class86B60__RefreshViewValue,
                                                        same evidence shape as
                                                        slot90 above. OBSERVED:
-                                                       Obj86B60__Tick and
-                                                       Obj86B60__SetState */
+                                                       TaskCore__Tick and
+                                                       TaskCore__SetState */
     u8 pad098[0x0AC - 0x098];
     s32 (*slotAC)(Obj86B60 *self);                 /* +0x0AC, OBSERVED:
-                                                       IS Obj86B60__TickFadeCallback */
+                                                       IS TaskCore__TickFadeCallback */
     s32 (*slotB0)(Obj86B60 *self);                 /* +0x0B0, IS
-                                                       Obj86B60__TickColorFade; read as
-                                                       DATA by Obj86B60__SetFadeCallbackEnabled */
+                                                       TaskCore__TickColorFade; read as
+                                                       DATA by TaskCore__SetFadeCallbackEnabled */
     u8 pad0B4[0x0C0 - 0xB4];
     s32 (*slotC0)(Obj86B60 *self);                 /* +0x0C0, IS
-                                                       Obj86B60__func_8003CCDC */
+                                                       TaskCore__TickFadeOutCallback */
     s32 (*slotC4)(Obj86B60 *self);                  /* +0x0C4, external
-                                                       (Obj86B60__TickFadeColor); read
+                                                       (TaskCore__TickFadeColor); read
                                                        as DATA by
-                                                       Obj86B60__func_8003CB30 */
+                                                       TaskCore__SetFadeOutCallbackEnabled */
     u8 pad0C8[0x0E4 - 0xC8];
     void (*slotE4)(Obj86B60 *self, u8 *buf);        /* +0x0E4, external
                                                        (func_8003D9D4);
                                                        OBSERVED:
-                                                       Obj86B60__TickColorFade and
-                                                       Obj86B60__SetState */
+                                                       TaskCore__TickColorFade and
+                                                       TaskCore__SetState */
     void (*slotE8)(Obj86B60 *self);                 /* +0x0E8, external
-                                                       (Obj86B60__FindNextFreeSlot);
-                                                       OBSERVED: Obj86B60__func_8003C9B0 */
+                                                       (TaskCore__FindNextFreeSlot);
+                                                       OBSERVED: TaskCore__OnPadNext */
     void (*slotEC)(Obj86B60 *self);                 /* +0x0EC, external
-                                                       (Obj86B60__FindPrevFreeSlot);
-                                                       OBSERVED: Obj86B60__func_8003C944 */
+                                                       (TaskCore__FindPrevFreeSlot);
+                                                       OBSERVED: TaskCore__OnPadPrev */
     void (*slotF0)(Obj86B60 *self, s32 a1, s32 a2); /* +0x0F0, external
                                                        (Class86B60__RefreshViewValue);
                                                        OBSERVED:
-                                                       Obj86B60__SetState */
+                                                       TaskCore__SetState */
     u8 pad0F4[0x0F8 - 0xF4];
     void (*slotF8)(Obj86B60 *self, void *a1, Unk74Obj *a2); /* +0x0F8,
                                                        OBSERVED:
-                                                       Obj86B60__SetTarget
+                                                       TaskCore__SetTarget
                                                        (round 12) */
     void (*slotFC)(Obj86B60 *self);                 /* +0x0FC, OBSERVED:
-                                                       Obj86B60__ReleaseTarget
+                                                       TaskCore__ReleaseTarget
                                                        (round 12) */
     void (*slot100)(Obj86B60 *self, s32 a1, s32 a2); /* +0x100, external;
                                                        OBSERVED:
-                                                       Obj86B60__BeginElementScroll */
+                                                       TaskCore__BeginElementScroll */
     void (*slot104)(Obj86B60 *self, void *a1);      /* +0x104, external;
                                                        OBSERVED:
-                                                       Obj86B60__BroadcastToSlots */
+                                                       TaskCore__BroadcastToSlots */
     void (*slot108)(Obj86B60 *self);                /* +0x108, external
-                                                       (Obj86B60__BeginElementScroll);
-                                                       OBSERVED: Obj86B60__Tick */
+                                                       (TaskCore__BeginElementScroll);
+                                                       OBSERVED: TaskCore__Tick */
     void (*slot10C)(Obj86B60 *self);                /* +0x10C, external
-                                                       (Obj86B60__CommitElementScroll).
+                                                       (TaskCore__CommitElementScroll).
                                                        RETYPED s32 -> void,
                                                        round 23: the s32 was
-                                                       read off Obj86B60__SetState's
+                                                       read off TaskCore__SetState's
                                                        disassembly while that
                                                        function was UNATTEMPTED,
                                                        and a discarded return
                                                        value is invisible in
                                                        the bytes. Matching
-                                                       Obj86B60__SetState requires
+                                                       TaskCore__SetState requires
                                                        void -- see that
                                                        report's tail-merge
                                                        finding. OBSERVED:
-                                                       Obj86B60__SetState */
+                                                       TaskCore__SetState */
     void (*slot110)(Obj86B60 *self);                /* +0x110, external
-                                                       (Obj86B60__CancelElementScroll).
+                                                       (TaskCore__CancelElementScroll).
                                                        RETYPED s32 -> void,
                                                        round 23, on positive
                                                        evidence independent of
                                                        that match: the occupant
-                                                       Obj86B60__CancelElementScroll is ALREADY
+                                                       TaskCore__CancelElementScroll is ALREADY
                                                        MATCHED in
                                                        src/code_2cc8c_b.c as
-                                                       `void Obj86B60__CancelElementScroll(
+                                                       `void TaskCore__CancelElementScroll(
                                                        Obj86B60 *self)`.
-                                                       OBSERVED: Obj86B60__SetState */
+                                                       OBSERVED: TaskCore__SetState */
     void (*slot114)(Obj86B60 *self);                /* +0x114, external
-                                                       (Obj86B60__AdvanceSlotCursor);
-                                                       OBSERVED: Obj86B60__func_8003C9B0 */
+                                                       (TaskCore__AdvanceSlotCursor);
+                                                       OBSERVED: TaskCore__OnPadNext */
     s32 (*slot118)(Obj86B60 *self);                 /* +0x118. CORRECTED
                                                        (round 12, runner
                                                        alpha): the occupant
-                                                       is Obj86B60__RetreatSlotCursor, NOT
-                                                       Obj86B60__GetActiveSlotCount as this
+                                                       is TaskCore__RetreatSlotCursor, NOT
+                                                       TaskCore__GetActiveSlotCount as this
                                                        comment previously
                                                        said -- verified by
                                                        reading the raw table
@@ -1130,7 +1130,7 @@ struct Obj86B60Methods {
                                                        tools/classtable.py
                                                        gClass86B60Methods). The old
                                                        attribution came from
-                                                       Obj86B60__func_8003C944.md's
+                                                       TaskCore__OnPadPrev.md's
                                                        "Struct knowledge
                                                        established" section,
                                                        which was itself
@@ -1144,19 +1144,19 @@ struct Obj86B60Methods {
                                                        discarding a return
                                                        value says nothing
                                                        about slot identity.
-                                                       OBSERVED: Obj86B60__func_8003C944 */
+                                                       OBSERVED: TaskCore__OnPadPrev */
     void (*slot11C)(Obj86B60 *self, s32 a1, s32 a2); /* +0x11C, external;
                                                        OBSERVED:
-                                                       Obj86B60__AdvanceSlotCursor,
-                                                       Obj86B60__RetreatSlotCursor (both
+                                                       TaskCore__AdvanceSlotCursor,
+                                                       TaskCore__RetreatSlotCursor (both
                                                        call it with a
                                                        computed index value
                                                        and a literal 1) */
     s32 (*slot120)(Obj86B60 *self);                 /* +0x120, external:
-                                                       IS Obj86B60__GetActiveSlotCount
+                                                       IS TaskCore__GetActiveSlotCount
                                                        (verified the same
                                                        way as slot118 above;
-                                                       `Obj86B60__GetActiveSlotCount` itself
+                                                       `TaskCore__GetActiveSlotCount` itself
                                                        returns
                                                        `self->unk60[self->
                                                        unk58]`, s32) */
@@ -1233,7 +1233,7 @@ struct Obj86B60 {
                                     IntermediateBase__Init's reading; it is
                                     gone (round 82): IntermediateBase.h types
                                     +0x010/+0x014 BasicClass *. */
-    s32 unk14;                  /* +0x014, Obj86B60__BeginElementScroll: forwarded as
+    s32 unk14;                  /* +0x014, TaskCore__BeginElementScroll: forwarded as
                                     slot100's 2nd arg -- generic word.
                                     ALSO OBSERVED (round 13) by IntermediateBase__Init,
                                     which both sets it (from an init-args
@@ -1260,12 +1260,12 @@ struct Obj86B60 {
                                     unit's own New_X allocator
                                     (New_Unk18Obj), then dispatched through
                                     (`self->viewport->methods->slot10(...)`) */
-    s32 frameCounter;                  /* +0x01C, Obj86B60__TickColorFade (a running count/
+    s32 frameCounter;                  /* +0x01C, TaskCore__TickColorFade (a running count/
                                     frame value multiplied against unk84);
-                                    Obj86B60__SetState zeroes it on
+                                    TaskCore__SetState zeroes it on
                                     several message codes. */
     u8 pad020[0x020 - 0x020];
-    s32 unk20;                  /* +0x020, Obj86B60__SetState sets it
+    s32 unk20;                  /* +0x020, TaskCore__SetState sets it
                                     to a literal 5 */
     s32 initMode;               /* +0x024, renamed from unk24 round 55 --
                                     tier B, exclusive to this unit.
@@ -1278,43 +1278,43 @@ struct Obj86B60 {
                                     same ctor-shaped function as initArgs/unk10;
                                     real meaning unknown, generic word */
     u8 pad034[0x038 - 0x034];
-    s32 unk38;                  /* +0x038, Obj86B60__SetState sets it
+    s32 unk38;                  /* +0x038, TaskCore__SetState sets it
                                     to 1 */
-    s32 unk3C;                  /* +0x03C, a mode/state value: Obj86B60__func_8003C858
-                                    compares ==1, Obj86B60__func_8003C8D0 !=1,
-                                    Obj86B60__func_8003C944/Obj86B60__func_8003C9B0 ==1/==2,
-                                    Obj86B60__OnTag2Notify gates on !=0,
-                                    Obj86B60__SetState sets 0/1 */
-    s32 unk40;                  /* +0x040, Obj86B60__SetFrameBound (setter: raw value
+    s32 unk3C;                  /* +0x03C, a mode/state value: TaskCore__OnPadConfirm
+                                    compares ==1, TaskCore__OnPadCancel !=1,
+                                    TaskCore__OnPadPrev/TaskCore__OnPadNext ==1/==2,
+                                    TaskCore__OnPadEvent gates on !=0,
+                                    TaskCore__SetState sets 0/1 */
+    s32 unk40;                  /* +0x040, TaskCore__SetFrameBound (setter: raw value
                                     if negative, value*20 if >= 0);
-                                    Obj86B60__OnTag5Notify compared against unk1C */
+                                    TaskCore__Update compared against unk1C */
     u8 pad044[0x048 - 0x044];
-    Unk48Obj *unk48;            /* +0x048, Obj86B60__ForwardToChild only */
+    Unk48Obj *unk48;            /* +0x048, TaskCore__PlaySound only */
     Unk4CObj *target;            /* +0x04C, see Unk4CObj's own comment */
     s32 slotCount;               /* +0x050, renamed from unk50, round 78 --
-                                    Obj86B60__FindNextFreeSlot: capacity/wrap
+                                    TaskCore__FindNextFreeSlot: capacity/wrap
                                     bound for the activeSlot index into
-                                    unk4C->unk18[] (also Obj86B60__BroadcastToSlots's
+                                    unk4C->unk18[] (also TaskCore__BroadcastToSlots's
                                     loop count) */
     Unk64Elem **slotElements;   /* +0x054, renamed from unk54, round 78 --
                                     one representative element per slot/tab
                                     (self->slotCount of them), DISTINCT from
                                     unk64[idx] below (the item LIST within
-                                    one slot). Obj86B60__BroadcastToSlots:
+                                    one slot). TaskCore__BroadcastToSlots:
                                     walked with an incrementing pointer,
                                     dereferenced directly for each element */
-    s32 activeSlot;                  /* +0x058, Obj86B60__Tick: index into
+    s32 activeSlot;                  /* +0x058, TaskCore__Tick: index into
                                     unk4C->unk24[] and compared against
                                     unk4C->unkC */
     s32 *itemCounts;              /* +0x05C, renamed from unk5C, round 78 --
                                      array indexed by activeSlot: a per-slot
                                      item count (the size of that slot's own
                                      itemLists[idx] array).
-                                     Obj86B60__ReleaseSlotElements passes
+                                     TaskCore__ReleaseSlotElements passes
                                      itemCounts[activeSlot] as
                                      ReleaseBasicClassArray's 2nd arg (raw register,
                                      type doesn't affect those bytes);
-                                     Obj86B60__AdvanceSlotCursor/Obj86B60__RetreatSlotCursor use it as
+                                     TaskCore__AdvanceSlotCursor/TaskCore__RetreatSlotCursor use it as
                                      an explicit upper bound compared
                                      against slotCounts[activeSlot], which is
                                      what settles it as a count, not a
@@ -1322,63 +1322,63 @@ struct Obj86B60 {
     s32 *slotCounts;                   /* +0x060, array indexed by activeSlot: a
                                      per-slot running count, incremented
                                      (wrapping to 0 past itemCounts[activeSlot]) by
-                                     Obj86B60__AdvanceSlotCursor and decremented
+                                     TaskCore__AdvanceSlotCursor and decremented
                                      (wrapping to itemCounts[activeSlot]-1 below 0) by
-                                     Obj86B60__RetreatSlotCursor -- a ring-buffer index */
+                                     TaskCore__RetreatSlotCursor -- a ring-buffer index */
     void **itemLists;             /* +0x064, renamed from unk64, round 78 --
                                      array indexed by activeSlot, one item
                                      LIST per slot (itemCounts[idx] elements,
-                                     built by Obj86B60__CreateSlotElements,
+                                     built by TaskCore__CreateSlotElements,
                                      walked as `Unk64Elem **` by
-                                     Obj86B60__RefreshSlotView/
-                                     Obj86B60__BroadcastToSlotElements/
-                                     Obj86B60__BeginElementScroll/
-                                     Obj86B60__CommitElementScroll/
-                                     Obj86B60__CancelElementScroll/
-                                     Obj86B60__SetSlotCursor). Also read
+                                     TaskCore__RefreshSlotView/
+                                     TaskCore__BroadcastToSlotElements/
+                                     TaskCore__BeginElementScroll/
+                                     TaskCore__CommitElementScroll/
+                                     TaskCore__CancelElementScroll/
+                                     TaskCore__SetSlotCursor). Also read
                                      opaquely (not as `Unk64Elem **`) by
-                                     Obj86B60__ReleaseSlotElements: giving
+                                     TaskCore__ReleaseSlotElements: giving
                                      ReleaseBasicClassArray's 1st arg and
                                      BMemPMgrFree's arg */
     Unk68Obj *listView;           /* +0x068, renamed from unk68, round 78 --
-                                     tier B: Obj86B60__RefreshSlotView feeds
+                                     tier B: TaskCore__RefreshSlotView feeds
                                      it a position (slot4C) then either a
                                      {0x28, count*12} size descriptor
                                      (slotC0) or hides it (slot50), i.e. it
                                      is the on-screen widget that shows the
                                      current slot's item list.
-                                     OBSERVED: Obj86B60__ReleaseTarget,
-                                     Obj86B60__CommitElementScroll, Obj86B60__RefreshSlotView (round 12)
-                                     -- built once by Obj86B60__SetTarget via
+                                     OBSERVED: TaskCore__ReleaseTarget,
+                                     TaskCore__CommitElementScroll, TaskCore__RefreshSlotView (round 12)
+                                     -- built once by TaskCore__SetTarget via
                                      New_ClassEAC0(&D_8008A8E8, &D_8008A8F0,
                                      0), then dispatched through repeatedly */
     u8 pad06C[0x070 - 0x06C];
-    const char *unk70;          /* +0x070, Obj86B60__SetSubHandle: truthy gate and a
+    const char *unk70;          /* +0x070, TaskCore__SetSubHandle: truthy gate and a
                                     cache of the path last passed to
                                     func_8003B39C */
-    Unk74Obj *unk74;            /* +0x074, Obj86B60__SetSubHandle only */
-    Unk78Obj *unk78;             /* +0x078, Obj86B60__TickColorFade only */
+    Unk74Obj *unk74;            /* +0x074, TaskCore__SetSubHandle only */
+    Unk78Obj *unk78;             /* +0x078, TaskCore__TickColorFade only */
     u8 pad07C[0x084 - 0x07C];
-    s32 unk84;                  /* +0x084, Obj86B60__TickColorFade: multiplied
+    s32 unk84;                  /* +0x084, TaskCore__TickColorFade: multiplied
                                     against unk1C */
     s32 (*fadeCallback)(Obj86B60 *self); /* +0x088, a callback: set (to NULL or
-                                    self->methods->slotB0) by Obj86B60__SetFadeCallbackEnabled,
-                                    invoked by Obj86B60__TickFadeCallback */
+                                    self->methods->slotB0) by TaskCore__SetFadeCallbackEnabled,
+                                    invoked by TaskCore__TickFadeCallback */
     s32 (*unk8C)(Obj86B60 *self); /* +0x08C, same idiom via slotC4/
-                                    Obj86B60__func_8003CB30/Obj86B60__func_8003CCDC */
-    u8 baseColor[3];                 /* +0x090, Obj86B60__SetColors (setter, from
-                                    a1[0..2]); Obj86B60__TickColorFade reads it as a
+                                    TaskCore__SetFadeOutCallbackEnabled/TaskCore__TickFadeOutCallback */
+    u8 baseColor[3];                 /* +0x090, TaskCore__SetColors (setter, from
+                                    a1[0..2]); TaskCore__TickColorFade reads it as a
                                     colour base */
-    u8 unk93[3];                 /* +0x093, Obj86B60__SetColors (setter, from
+    u8 unk93[3];                 /* +0x093, TaskCore__SetColors (setter, from
                                     a2[0..2]) */
-    u8 unk96[3];                 /* +0x096, Obj86B60__SetColors (setter, from
+    u8 unk96[3];                 /* +0x096, TaskCore__SetColors (setter, from
                                     a3[0..2]) */
     u8 unk99[0x09C - 0x099];
-    void (*viewCallback)(void *ctx);   /* +0x09C, a callback: set by Obj86B60__SetCallback,
+    void (*viewCallback)(void *ctx);   /* +0x09C, a callback: set by TaskCore__SetCallback,
                                     invoked (with unkA0 as its argument) by
-                                    Obj86B60__RefreshViewValue */
-    void *viewCallbackCtx;                 /* +0x0A0, set by Obj86B60__SetCallback, passed to
-                                    unk9C by Obj86B60__RefreshViewValue */
+                                    TaskCore__RefreshViewValue */
+    void *viewCallbackCtx;                 /* +0x0A0, set by TaskCore__SetCallback, passed to
+                                    unk9C by TaskCore__RefreshViewValue */
 };
 
 /* IntermediateBase (gIntermediateBaseMethods, TaskCore's parent):

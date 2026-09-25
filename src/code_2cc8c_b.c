@@ -10,22 +10,22 @@
  * What this slice of the class implements: a tab/slot picker with a
  * scrollable item list inside each tab. `self->activeSlot` selects the tab;
  * `self->slotElements[i]` is each tab's own representative widget (walked/
- * broadcast to by Obj86B60__BroadcastToSlots, switched by
- * Obj86B60__SetActiveSlot); `self->itemLists[idx]`/`self->itemCounts[idx]`
- * hold the item list WITHIN tab idx (built by Obj86B60__CreateSlotElements,
- * torn down by Obj86B60__ReleaseSlotElements, positioned/shown by
- * Obj86B60__RefreshSlotView through `self->listView`); `self->slotCounts[idx]`
+ * broadcast to by TaskCore__BroadcastToSlots, switched by
+ * TaskCore__SetActiveSlot); `self->itemLists[idx]`/`self->itemCounts[idx]`
+ * hold the item list WITHIN tab idx (built by TaskCore__CreateSlotElements,
+ * torn down by TaskCore__ReleaseSlotElements, positioned/shown by
+ * TaskCore__RefreshSlotView through `self->listView`); `self->slotCounts[idx]`
  * is a ring cursor into that per-tab item list.
- * Obj86B60__BeginElementScroll/Obj86B60__CommitElementScroll/
- * Obj86B60__CancelElementScroll form a `self->unk3C` state-1<->2 trio that
+ * TaskCore__BeginElementScroll/TaskCore__CommitElementScroll/
+ * TaskCore__CancelElementScroll form a `self->unk3C` state-1<->2 trio that
  * opens interactive scrolling, then either commits the new cursor position
  * back into the target descriptor (`SlotEntry::savedCursor`) or cancels back
- * to the last-committed one; Obj86B60__AdvanceSlotCursor/
- * Obj86B60__RetreatSlotCursor step the cursor by one (wrapping) and forward
- * through Obj86B60__SetSlotCursor (vtable slot11C), which does the actual
- * old/new element highlight swap -- the same shape Obj86B60__SetActiveSlot
+ * to the last-committed one; TaskCore__AdvanceSlotCursor/
+ * TaskCore__RetreatSlotCursor step the cursor by one (wrapping) and forward
+ * through TaskCore__SetSlotCursor (vtable slot11C), which does the actual
+ * old/new element highlight swap -- the same shape TaskCore__SetActiveSlot
  * uses one level up, switching which TAB is active instead of which item.
- * Obj86B60__SetTarget/Obj86B60__ReleaseTarget are the constructor/teardown
+ * TaskCore__SetTarget/TaskCore__ReleaseTarget are the constructor/teardown
  * pair for `self->unk4C` (the "target" descriptor, a cross-unit field --
  * see Unk4CObj's own comment in the header).
  */
@@ -33,7 +33,7 @@
 /* SlotEntry's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
  * copies it with a whole-struct assignment (lw/lw into two fresh
  * temporaries, sw/sw, then a RELOAD of .y before adjusting it) -- see
- * docs/match-reports/Obj86B60__CommitElementScroll.md, round 75. Local view: the shared
+ * docs/match-reports/TaskCore__CommitElementScroll.md, round 75. Local view: the shared
  * header still spells the pair as two s32 fields. */
 typedef struct {
     s32 x;
@@ -42,7 +42,7 @@ typedef struct {
 
 #define SLOT_POS(target) (*(SlotPos *)&(target)->unk10)
 
-s32 Obj86B60__TickFadeColor(Obj86B60 *self)
+s32 TaskCore__TickFadeColor(Obj86B60 *self)
 {
     s32 c = 0x80 - (self->frameCounter * self->unk84);
     u8 buf[3];
@@ -55,7 +55,7 @@ s32 Obj86B60__TickFadeColor(Obj86B60 *self)
     return (u8)c >= 0x81;
 }
 
-void Obj86B60__SetSubHandle(Obj86B60 *self, const char *a1, Unk74Obj *a2)
+void TaskCore__SetSubHandle(Obj86B60 *self, const char *a1, Unk74Obj *a2)
 {
     if (a1 != NULL) {
         if (self->unk70 != NULL) {
@@ -70,7 +70,7 @@ void Obj86B60__SetSubHandle(Obj86B60 *self, const char *a1, Unk74Obj *a2)
     self->unk70 = a1;
 }
 
-void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
+void TaskCore__SetTarget(Obj86B60 *self, Unk4CObj *a1)
 {
     char **list;
     s32 count;
@@ -127,7 +127,7 @@ void Obj86B60__SetTarget(Obj86B60 *self, Unk4CObj *a1)
     a1->handle = handle;
 }
 
-void Obj86B60__ReleaseTarget(Obj86B60 *self)
+void TaskCore__ReleaseTarget(Obj86B60 *self)
 {
     Unk64Elem **arr;
     s32 i;
@@ -158,7 +158,7 @@ void Obj86B60__ReleaseTarget(Obj86B60 *self)
     BMemPMgrFree(self->slotElements);
 }
 
-void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
+void TaskCore__UpdateSlotElements(Obj86B60 *self, void *a1)
 {
     Unk64Elem **arr;
     u8 *ptr;
@@ -186,7 +186,7 @@ void Obj86B60__UpdateSlotElements(Obj86B60 *self, void *a1)
     }
 }
 
-void Obj86B60__BroadcastToSlots(Obj86B60 *self, void *a1)
+void TaskCore__BroadcastToSlots(Obj86B60 *self, void *a1)
 {
     s32 origIdx;
     Unk64Elem **arr;
@@ -212,7 +212,7 @@ void Obj86B60__BroadcastToSlots(Obj86B60 *self, void *a1)
     self->activeSlot = origIdx;
 }
 
-void Obj86B60__FindNextFreeSlot(Obj86B60 *self)
+void TaskCore__FindNextFreeSlot(Obj86B60 *self)
 {
     s32 i;
 
@@ -237,7 +237,7 @@ void Obj86B60__FindNextFreeSlot(Obj86B60 *self)
     self->methods->slotF0(self, i, 1);
 }
 
-void Obj86B60__FindPrevFreeSlot(Obj86B60 *self)
+void TaskCore__FindPrevFreeSlot(Obj86B60 *self)
 {
     s32 i;
 
@@ -262,7 +262,7 @@ void Obj86B60__FindPrevFreeSlot(Obj86B60 *self)
     self->methods->slotF0(self, i, 1);
 }
 
-void Obj86B60__SetActiveSlot(Obj86B60 *self, s32 a1, void *a2)
+void TaskCore__SetActiveSlot(Obj86B60 *self, s32 a1, void *a2)
 {
     s32 idx;
     Unk64Elem *elemB;
@@ -285,12 +285,12 @@ void Obj86B60__SetActiveSlot(Obj86B60 *self, s32 a1, void *a2)
     self->methods->slot60(self, 9);
 }
 
-s32 Obj86B60__GetActiveSlot(Obj86B60 *self)
+s32 TaskCore__GetActiveSlot(Obj86B60 *self)
 {
     return self->activeSlot;
 }
 
-void Obj86B60__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
+void TaskCore__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
 {
     char **list;
     s32 idx;
@@ -320,13 +320,13 @@ void Obj86B60__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
     }
 }
 
-void Obj86B60__ReleaseSlotElements(Obj86B60 *self)
+void TaskCore__ReleaseSlotElements(Obj86B60 *self)
 {
     ReleaseBasicClassArray(self->itemLists[self->activeSlot], self->itemCounts[self->activeSlot]);
     BMemPMgrFree(self->itemLists[self->activeSlot]);
 }
 
-void Obj86B60__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
+void TaskCore__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
 {
     s32 idx;
     Unk64Elem **arr;
@@ -375,7 +375,7 @@ void Obj86B60__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
     arr[counter]->methods->slot60(arr[counter], 1);
 }
 
-void Obj86B60__BroadcastToSlotElements(Obj86B60 *self, void *a1)
+void TaskCore__BroadcastToSlotElements(Obj86B60 *self, void *a1)
 {
     s32 idx = self->activeSlot;
     Unk64Elem **arr = (Unk64Elem **)self->itemLists[idx];
@@ -389,7 +389,7 @@ void Obj86B60__BroadcastToSlotElements(Obj86B60 *self, void *a1)
     }
 }
 
-void Obj86B60__BeginElementScroll(Obj86B60 *self)
+void TaskCore__BeginElementScroll(Obj86B60 *self)
 {
     s32 idx;
     Unk64Elem *elem;
@@ -407,7 +407,7 @@ void Obj86B60__BeginElementScroll(Obj86B60 *self)
     self->methods->slot60(self, 14);
 }
 
-void Obj86B60__CommitElementScroll(Obj86B60 *self)
+void TaskCore__CommitElementScroll(Obj86B60 *self)
 {
     s32 idx;
     s32 counter;
@@ -448,7 +448,7 @@ void Obj86B60__CommitElementScroll(Obj86B60 *self)
     self->methods->slot60(self, 0x10);
 }
 
-void Obj86B60__CancelElementScroll(Obj86B60 *self)
+void TaskCore__CancelElementScroll(Obj86B60 *self)
 {
     s32 idx;
     s32 counter;
@@ -474,7 +474,7 @@ void Obj86B60__CancelElementScroll(Obj86B60 *self)
     self->methods->slot60(self, 17);
 }
 
-void Obj86B60__AdvanceSlotCursor(Obj86B60 *self)
+void TaskCore__AdvanceSlotCursor(Obj86B60 *self)
 {
     s32 idx = self->activeSlot;
     s32 v = self->slotCounts[idx];
@@ -486,7 +486,7 @@ void Obj86B60__AdvanceSlotCursor(Obj86B60 *self)
     self->methods->slot11C(self, v, 1);
 }
 
-void Obj86B60__RetreatSlotCursor(Obj86B60 *self)
+void TaskCore__RetreatSlotCursor(Obj86B60 *self)
 {
     s32 idx = self->activeSlot;
     s32 v = self->slotCounts[idx];
@@ -498,7 +498,7 @@ void Obj86B60__RetreatSlotCursor(Obj86B60 *self)
     self->methods->slot11C(self, v, 1);
 }
 
-void Obj86B60__SetSlotCursor(Obj86B60 *self, s32 a1, void *a2)
+void TaskCore__SetSlotCursor(Obj86B60 *self, s32 a1, void *a2)
 {
     s32 idx;
     s32 counter;

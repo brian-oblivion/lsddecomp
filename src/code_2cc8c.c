@@ -3,8 +3,8 @@
  *
  * Carved in round 10 on the belief that this block had the LOWEST
  * toolchain-blocker density of any uncarved segment. That belief was
- * retracted the same round for two of the 20 -- `Obj86B60__OnTag2Notify` and
- * `Obj86B60__SetState`, whose jump-table dispatch hits
+ * retracted the same round for two of the 20 -- `TaskCore__OnPadEvent` and
+ * `TaskCore__SetState`, whose jump-table dispatch hits
  * `addiu $at, $at, %lo(jtbl_*)`. The retraction was RIGHT: a `jtbl_*` symbol
  * is not a safe exception to that screen, because cc1 emits the same generic
  * pseudo-op for an indexed data global and a switch jump table and the fold
@@ -33,17 +33,17 @@
  * this unit's functions unmodified and override a few (`Class86B60`
  * overrides SetState/Tick/RefreshViewValue; see the header's own top
  * comment for the round-78 correction and the evidence). The first two
- * functions (`Obj86B60__OnTag2Notify`/`Obj86B60__OnTag5Notify`) are
+ * functions (`TaskCore__OnPadEvent`/`TaskCore__Update`) are
  * `EventArg`-tag dispatchers reached from `IntermediateBase__OnNotify`
  * (code_2cc8c_c.c); the five `Obj86B60__func_8003Cxxx` handlers they
  * dispatch to are undifferentiated leaf state-transition helpers (tier C --
- * see each one's own match report); `Obj86B60__SetState` is the base
- * `reason`-coded state-transition entry point (slot60); `Obj86B60__Tick`/
- * `Obj86B60__RefreshViewValue` are per-frame slots (90/94); the rest are
+ * see each one's own match report); `TaskCore__SetState` is the base
+ * `reason`-coded state-transition entry point (slot60); `TaskCore__Tick`/
+ * `TaskCore__RefreshViewValue` are per-frame slots (90/94); the rest are
  * small setters/getters around a `frameCounter`+`activeSlot` ring-buffer
- * bookkeeping scheme and a "fade" pair (`Obj86B60__SetFadeRate`,
- * `Obj86B60__TickColorFade`, gated through `Obj86B60__SetFadeCallbackEnabled`/
- * `Obj86B60__TickFadeCallback`) that computes a running RGB value from
+ * bookkeeping scheme and a "fade" pair (`TaskCore__SetFadeRate`,
+ * `TaskCore__TickColorFade`, gated through `TaskCore__SetFadeCallbackEnabled`/
+ * `TaskCore__TickFadeCallback`) that computes a running RGB value from
  * `frameCounter * unk84` against a base colour.
  *
  * Round 78 (delta): full track-3 naming pass. All 20 functions were already
@@ -57,7 +57,7 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-void Obj86B60__OnTag2Notify(Obj86B60 *self, s32 a1, s32 a2)
+void TaskCore__OnPadEvent(Obj86B60 *self, s32 a1, s32 a2)
 {
     Obj86B60Methods *methods;
 
@@ -83,7 +83,7 @@ void Obj86B60__OnTag2Notify(Obj86B60 *self, s32 a1, s32 a2)
     }
 }
 
-void Obj86B60__OnTag5Notify(Obj86B60 *self, s32 a1, s32 a2)
+void TaskCore__Update(Obj86B60 *self, s32 a1, s32 a2)
 {
     Obj86B60Methods *methods;
 
@@ -113,7 +113,7 @@ void Obj86B60__OnTag5Notify(Obj86B60 *self, s32 a1, s32 a2)
     }
 }
 
-void Obj86B60__SetState(Obj86B60 *self, s32 a1)
+void TaskCore__SetState(Obj86B60 *self, s32 a1)
 {
     Obj86B60Methods *methods;
 
@@ -162,7 +162,7 @@ void Obj86B60__SetState(Obj86B60 *self, s32 a1)
     }
 }
 
-void Obj86B60__SetFrameBound(Obj86B60 *self, s32 a1)
+void TaskCore__SetFrameBound(Obj86B60 *self, s32 a1)
 {
     self->unk40 = a1;
     if (a1 >= 0) {
@@ -170,7 +170,7 @@ void Obj86B60__SetFrameBound(Obj86B60 *self, s32 a1)
     }
 }
 
-void Obj86B60__ForwardToChild(Obj86B60 *self, s32 a1)
+void TaskCore__PlaySound(Obj86B60 *self, s32 a1)
 {
     Unk48Obj *child;
 
@@ -180,7 +180,7 @@ void Obj86B60__ForwardToChild(Obj86B60 *self, s32 a1)
     }
 }
 
-void Obj86B60__func_8003C7F4(Obj86B60 *self, s32 a1)
+void TaskCore__func_8003C7F4(Obj86B60 *self, s32 a1)
 {
     if (self->target != NULL) {
         self->methods->slot70(self, 0x10);
@@ -188,7 +188,7 @@ void Obj86B60__func_8003C7F4(Obj86B60 *self, s32 a1)
     }
 }
 
-void Obj86B60__func_8003C858(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadConfirm(Obj86B60 *self, s32 a1)
 {
     s32 reason;
 
@@ -202,7 +202,7 @@ void Obj86B60__func_8003C858(Obj86B60 *self, s32 a1)
     }
 }
 
-void Obj86B60__func_8003C8D0(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadCancel(Obj86B60 *self, s32 a1)
 {
     if (self->target != NULL && self->unk3C != 1) {
         self->methods->slot70(self, 0x10);
@@ -210,7 +210,7 @@ void Obj86B60__func_8003C8D0(Obj86B60 *self, s32 a1)
     }
 }
 
-void Obj86B60__func_8003C944(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadPrev(Obj86B60 *self, s32 a1)
 {
     void (*handler)(Obj86B60 *self);
 
@@ -227,7 +227,7 @@ void Obj86B60__func_8003C944(Obj86B60 *self, s32 a1)
     handler(self);
 }
 
-void Obj86B60__func_8003C9B0(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadNext(Obj86B60 *self, s32 a1)
 {
     void (*handler)(Obj86B60 *self);
 
@@ -244,7 +244,7 @@ void Obj86B60__func_8003C9B0(Obj86B60 *self, s32 a1)
     handler(self);
 }
 
-void Obj86B60__Tick(Obj86B60 *self)
+void TaskCore__Tick(Obj86B60 *self)
 {
     Unk4CObj *target;
     s32 idx;
@@ -258,7 +258,7 @@ void Obj86B60__Tick(Obj86B60 *self)
     }
 }
 
-void Obj86B60__RefreshViewValue(Obj86B60 *self)
+void TaskCore__RefreshViewValue(Obj86B60 *self)
 {
     if (self->viewCallback != NULL) {
         self->viewCallback(self->viewCallbackCtx);
@@ -266,13 +266,13 @@ void Obj86B60__RefreshViewValue(Obj86B60 *self)
     self->methods->slot60(self, 7);
 }
 
-void Obj86B60__SetCallback(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
+void TaskCore__SetCallback(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
 {
     self->viewCallback = a1;
     self->viewCallbackCtx = a2;
 }
 
-void Obj86B60__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
+void TaskCore__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
 {
     Obj86B60Methods *methods;
 
@@ -287,7 +287,7 @@ void Obj86B60__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
     }
 }
 
-void Obj86B60__func_8003CB30(Obj86B60 *self, s32 a1)
+void TaskCore__SetFadeOutCallbackEnabled(Obj86B60 *self, s32 a1)
 {
     Obj86B60Methods *methods;
 
@@ -304,19 +304,19 @@ void Obj86B60__func_8003CB30(Obj86B60 *self, s32 a1)
 
 typedef struct { s8 r, g, b; } RGB8003CB68;
 
-void Obj86B60__SetColors(Obj86B60 *self, s8 *a1, s8 *a2, s8 *a3)
+void TaskCore__SetColors(Obj86B60 *self, s8 *a1, s8 *a2, s8 *a3)
 {
     *(RGB8003CB68 *)self->baseColor = *(RGB8003CB68 *)a1;
     *(RGB8003CB68 *)self->unk93 = *(RGB8003CB68 *)a2;
     *(RGB8003CB68 *)self->unk96 = *(RGB8003CB68 *)a3;
 }
 
-void Obj86B60__SetFadeRate(Obj86B60 *self, s32 a1)
+void TaskCore__SetFadeRate(Obj86B60 *self, s32 a1)
 {
     self->unk84 = a1;
 }
 
-s32 Obj86B60__TickFadeCallback(Obj86B60 *self)
+s32 TaskCore__TickFadeCallback(Obj86B60 *self)
 {
     s32 result;
 
@@ -330,7 +330,7 @@ s32 Obj86B60__TickFadeCallback(Obj86B60 *self)
     return result;
 }
 
-s32 Obj86B60__TickColorFade(Obj86B60 *self)
+s32 TaskCore__TickColorFade(Obj86B60 *self)
 {
     s32 prod;
     u8 buffer[3];
@@ -344,7 +344,7 @@ s32 Obj86B60__TickColorFade(Obj86B60 *self)
     return (u8)prod >= 0x81;
 }
 
-s32 Obj86B60__func_8003CCDC(Obj86B60 *self)
+s32 TaskCore__TickFadeOutCallback(Obj86B60 *self)
 {
     s32 result;
 

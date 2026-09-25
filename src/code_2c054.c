@@ -154,7 +154,7 @@ StreamTaskObjMethods *Get_vtable_StreamTaskObj(void) {
 /* The TaskCore allocator: 0xA4 bytes, constructed through the base class's
  * own slot +0x008. The cast is because TaskCoreMethods::slot08 is typed for
  * StreamTaskObj (its usual caller) rather than for the base object. */
-TaskCoreObj *New_TaskCoreObj(s32 a1, s32 a2, s32 a3)
+TaskCoreObj *New_TaskCore(s32 a1, s32 a2, s32 a3)
 {
     TaskCoreObj *self;
 
@@ -166,7 +166,7 @@ TaskCoreObj *New_TaskCoreObj(s32 a1, s32 a2, s32 a3)
     return NULL;
 }
 
-void TaskCoreObj__TaskCoreObj(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj *a3) {
+void TaskCore__TaskCore(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj *a3) {
     StreamTaskUnkB4Obj *tmp;
     TaskCoreMethods *core;
 
@@ -189,7 +189,7 @@ void TaskCoreObj__TaskCoreObj(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnk
     self->methods->slot40(self);
 }
 
-void TaskCoreObj__Destroy(StreamTaskObj *self) {
+void TaskCore__Finalize(StreamTaskObj *self) {
     self->unk78->methods->slot04(self->unk78);
     self->unk7C->methods->slot04(self->unk7C);
     self->unk80->methods->slot04(self->unk80);
@@ -203,7 +203,7 @@ void TaskCoreObj__Destroy(StreamTaskObj *self) {
     Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
 }
 
-void TaskCoreObj__Reset(StreamTaskObj *self) {
+void TaskCore__Reset(StreamTaskObj *self) {
     StreamTaskObjMethods *methods = self->methods;
     methods->slot6C(self, -1);
     methods->slotA4(self, &D_8006E860[0], &D_8006E860[3], &D_8006E860[6]);
@@ -219,12 +219,12 @@ void TaskCoreObj__Reset(StreamTaskObj *self) {
     self->unk3C = 0;
 }
 
-s32 TaskCoreObj__func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
+s32 TaskCore__Init(StreamTaskObj *self, s32 a1, s32 a2) {
     Get_vtable_IntermediateBase()->init((IntermediateBase *)self, (IntermediateBaseInitArgs *)a1, a2);
     return self->unk38;
 }
 
-void TaskCoreObj__func_8003C238(StreamTaskObj *self) {
+void TaskCore__OnInit(StreamTaskObj *self) {
     StreamTaskUnk18Obj *unk18;
     StreamTaskUnk18Methods *core;
 
@@ -248,7 +248,7 @@ void TaskCoreObj__func_8003C238(StreamTaskObj *self) {
     self->unk38 = 0;
 }
 
-void TaskCoreObj__func_8003C3D0(StreamTaskObj *self) {
+void TaskCore__OnDeinit(StreamTaskObj *self) {
     StreamTaskUnk18Obj *obj = self->unk18;
     obj->methods->slot90(obj);
     obj->methods->slot74(obj);

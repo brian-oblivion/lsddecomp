@@ -226,11 +226,11 @@ extern const char sLogoPathOsd[]; /* "ETC\OSDLOGO.TIM" */
  * order) is called by Class6D3C8__LoadIntroLogoSequence, which comes first in the file. */
 void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path);
 
-/* A second "New_X"-shaped task object, allocated by New_TaskCoreObj -- 0xA4
+/* A second "New_X"-shaped task object, allocated by New_TaskCore -- 0xA4
  * bytes, constructed through Get_vtable_TaskCore's slot +0x008. `TaskCoreObj`
  * is matched in src/code_2c054.c (a separate real class, its own base under
  * StreamTaskObj in that unit's inheritance chain -- see that file's own
- * `TaskCoreObj__TaskCoreObj`). Different class from StreamTaskMethods above
+ * `TaskCore__TaskCore`). Different class from StreamTaskMethods above
  * (different allocator, different slot signatures at the same offsets), used
  * by Class6D3C8__StartLoaderTask to register a named resource with a
  * completion callback. */
@@ -241,7 +241,7 @@ typedef struct LoaderTaskMethods {
                                                                     always the last call at this unit's one
                                                                     LoaderTask use site (Class6D3C8__StartLoaderTask). */
     u8 pad08[0x044 - 0x008];                                     /* +0x008 .. +0x043 */
-    /* +0x044: RETURNS s32, not void. This slot's occupant is TaskCoreObj__func_8003C1DC
+    /* +0x044: RETURNS s32, not void. This slot's occupant is TaskCore__Init
      * (matched in code_2c054), and its own body loads self->unk38 into $v0
      * immediately before the epilogue with nothing else consuming it -- a
      * load whose only purpose is to be the return value. The earlier `void`
@@ -263,7 +263,7 @@ typedef struct LoaderTask {
     LoaderTaskMethods *methods;
 } LoaderTask;
 
-extern LoaderTask *New_TaskCoreObj(s32 a0, s32 a1, s32 a2);
+extern LoaderTask *New_TaskCore(s32 a0, s32 a1, s32 a2);
 
 /* Forward declaration: Class6D3C8__LoaderTaskDoneCallback (this unit, defined right after
  * Class6D3C8__StartLoaderTask in ROM order) is used by Class6D3C8__StartLoaderTask as a completion

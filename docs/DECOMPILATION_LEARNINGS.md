@@ -281,7 +281,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   to function entry. (a §"The SCOPE of a named local is the lever")
 - **A block move is its own tell: N loads into fresh scratch registers, then N stores, then a
   RELOAD of a word just stored.** That is a whole-struct copy (`pos = *src;`), opaque to later
-  passes, so the field is re-read from the stack. It closed `Obj86B60__RefreshSlotView`/`Obj86B60__CommitElementScroll` (8-byte
+  passes, so the field is re-read from the stack. It closed `TaskCore__RefreshSlotView`/`TaskCore__CommitElementScroll` (8-byte
   pair; the "name it, then barrier it" pair this entry used to recommend was imitating it by
   hand), `Class86B60__TickNameFieldCursor` (3 signed bytes) and `DreamSys__TryStaircaseLink` (10 bytes). (round 75; again round 81,
   `FlatLightObj__SetColor`: 3 `s8` bytes; the per-field copy is 3 words longer)

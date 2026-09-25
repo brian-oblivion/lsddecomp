@@ -87,7 +87,7 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
  * (self), then sets its remaining parameters (path, self->unk1C) and
  * starts it. */
 void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
-    LoaderTask *task = New_TaskCoreObj(0, 0, 0);
+    LoaderTask *task = New_TaskCore(0, 0, 0);
 
     task->methods->slot98(task, Class6D3C8__LoaderTaskDoneCallback, self);
     task->methods->slot6C(task, 0);
@@ -282,7 +282,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
             streamTask->methods->start(streamTask);
         }
     } else {
-        task = New_TaskCoreObj(0, 0, 0);
+        task = New_TaskCore(0, 0, 0);
         task->methods->slot6C(task, 10);
         task->methods->slotD4(task, groupId, 0);
         task->methods->slot44(task, self->unk1C, 0);

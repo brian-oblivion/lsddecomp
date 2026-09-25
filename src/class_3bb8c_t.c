@@ -71,11 +71,11 @@ typedef struct GraphRoomObj GraphRoomObj;
  * match the field names include/code_2c054.h's own independent view of
  * this same table already uses, for cross-unit readability; +0x008 is
  * renamed `ctor` here since `tools/classtable.py gTaskCoreMethods` resolves
- * it to `TaskCoreObj__TaskCoreObj`, an already-established real name. */
+ * it to `TaskCore__TaskCore`, an already-established real name. */
 typedef struct TaskCoreBaseTable {
     u8 pad00[0x8];
     /* +0x008, called by this unit's own GraphRoomObj__GraphRoomObj as (self, 0, str,
-     * 0). Resolves to TaskCoreObj__TaskCoreObj (tools/classtable.py gTaskCoreMethods). */
+     * 0). Resolves to TaskCore__TaskCore (tools/classtable.py gTaskCoreMethods). */
     void (*ctor)(GraphRoomObj *self, s32 arg1, char *str, s32 arg2);
     u8 pad0C[0x44 - 0xC];
     /* +0x044, called by this unit's own GraphRoomObj__func_80058390 as (self, arg1,
@@ -83,16 +83,16 @@ typedef struct TaskCoreBaseTable {
     void (*slot44)(GraphRoomObj *self, void *arg1, void *arg2);
     u8 pad48[0x5C - 0x48];
     /* +0x05C, called by this unit's own GraphRoomObj__UpdateFromLog as (self, arg1,
-     * arg2). Not this unit's own function; still Obj86B60__OnTag5Notify elsewhere. */
+     * arg2). Not this unit's own function; still TaskCore__Update elsewhere. */
     void (*slot5C)(GraphRoomObj *self, void *arg1, void *arg2);
     u8 pad60[0xDC - 0x60];
     /* +0x0DC, called by this unit's own GraphRoomObj__Destroy as (self) -- the
-     * base-class dtor step. Not this unit's own function; still Obj86B60__ReleaseTarget
+     * base-class dtor step. Not this unit's own function; still TaskCore__ReleaseTarget
      * elsewhere. */
     void (*slotDC)(GraphRoomObj *self);
     /* +0x0E0, called by this unit's own GraphRoomObj__PopulateGraphPoints as (self, arg1) --
      * the FIRST thing that function does, before touching anything else
-     * (round 19). Not this unit's own function; still Obj86B60__UpdateSlotElements elsewhere. */
+     * (round 19). Not this unit's own function; still TaskCore__UpdateSlotElements elsewhere. */
     void (*slotE0)(GraphRoomObj *self, void *arg1);
 } TaskCoreBaseTable;
 extern TaskCoreBaseTable *Get_vtable_TaskCore(void);

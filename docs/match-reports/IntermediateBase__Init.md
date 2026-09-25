@@ -86,7 +86,7 @@ the next build.
   child pointers forwarded to `addChild`; `unk8`/`unkC`/`unk10` are the
   three optional overrides for `self->unk10`/`unk14`/`unk18`.
 - `Obj86B60.unk10`/`unk14`: BOTH were previously modelled as opaque
-  generic words (`Obj86B60__ResetAndRemoveAllChildren`/`Obj86B60__BeginElementScroll` in a sibling unit). This
+  generic words (`Obj86B60__ResetAndRemoveAllChildren`/`TaskCore__BeginElementScroll` in a sibling unit). This
   function CONFIRMS both are pointer-valued in this unit's own reading too
   -- `unk10` is forwarded as an `addChild`-style child and as `Unk14Obj::
   slot10`'s 2nd arg; `unk14` is dispatched through as `Unk14Obj *`. Kept
@@ -102,7 +102,7 @@ the next build.
   types, one dispatch slot (`slot10`) each, both OBSERVED only by this
   function.
 - `Obj86B60Methods`: added `slot10` (inherited BasicClass `addChild`),
-  `slot4C` (external `TaskCoreObj__func_8003C238`), `slot48` (`IntermediateBase__Deinit`, next in
+  `slot4C` (external `TaskCore__OnInit`), `slot48` (`IntermediateBase__Deinit`, next in
   this queue).
 
 ### Proposed learning
@@ -152,4 +152,4 @@ caller-overridable defaults" idiom this project uses elsewhere. Paired with
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Init (class prefix). Occupies +0x044, slot `init(self, IntermediateBaseInitArgs *args, s32 mode)`, typed s32 because the callers use the result: Class6D3C8__RunPollTask returns `task->methods->slot44(task, extra, 0)` and Class6D3C8__PollStatusObj switches on it; the overrides Class86668__Init and TaskCoreObj__func_8003C1DC call this base and return a field (eventCode, +0x038). This occupant itself returns nothing. Obj86B60InitArgs is IntermediateBaseInitArgs; its five fields and +0x010/+0x014/+0x018 are only ever added, removed or released through BasicClass slots here, so they are `BasicClass *` (casts dropped). +0x04C, called after the children are added, is `onInit` (NULL here; Obj865C8__StartSubA, ObjM__InitStyleAndWorld, TaskCoreObj__func_8003C238). The name is kept, tier B: with mode 0 the body also runs setState(2) and deinit, so "Init" says less than it does.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Init (class prefix). Occupies +0x044, slot `init(self, IntermediateBaseInitArgs *args, s32 mode)`, typed s32 because the callers use the result: Class6D3C8__RunPollTask returns `task->methods->slot44(task, extra, 0)` and Class6D3C8__PollStatusObj switches on it; the overrides Class86668__Init and TaskCore__Init call this base and return a field (eventCode, +0x038). This occupant itself returns nothing. Obj86B60InitArgs is IntermediateBaseInitArgs; its five fields and +0x010/+0x014/+0x018 are only ever added, removed or released through BasicClass slots here, so they are `BasicClass *` (casts dropped). +0x04C, called after the children are added, is `onInit` (NULL here; Obj865C8__StartSubA, ObjM__InitStyleAndWorld, TaskCore__OnInit). The name is kept, tier B: with mode 0 the body also runs setState(2) and deinit, so "Init" says less than it does.

@@ -289,11 +289,11 @@ immediately.
 
 This is now the SECOND confirmed instance this round where the
 `do/while(0)` lever (see `Obj6EAC0__SetChar.md`) does not generalise --
-`Obj86B60__CommitElementScroll.md` also tried it this round and got the same kind of
+`TaskCore__CommitElementScroll.md` also tried it this round and got the same kind of
 regression. The lever appears specific to a narrow shape (a single
 unconditional call-plus-field-writes block with no branches of its own
 inside the wrapped region); this function's own `if/else if` branch
-structure disqualifies it the same way `Obj86B60__CommitElementScroll`'s loop did.
+structure disqualifies it the same way `TaskCore__CommitElementScroll`'s loop did.
 Verdict unchanged: STALL at 21/32 (full swap of `self`/`arg1` into
 `$s1`/`$s0` vs the natural `$s0`/`$s1`), restored to `INCLUDE_ASM`, no
 compile errors in a fresh build.
@@ -418,7 +418,7 @@ A register-identity swap where BOTH parameters are simple scalars/pointers
 (no aggregate, no array), the swap is FULL (every use of both registers
 throughout the whole function body, not just the prologue), and the frame
 size matches retail exactly is a strong signature for this specific stall
-class -- distinguish it from `Obj86B60__RefreshSlotView`'s round-12 "callee-saved file
+class -- distinguish it from `TaskCore__RefreshSlotView`'s round-12 "callee-saved file
 saturated" class (`grep -oE 'sw +\$s[0-9]' ... | sort -u | wc -l`, which
 here is only 3 registers, nowhere near saturating `s0`-`s7`) and from the
 documented "prologue store order" class (which keeps the SAME final
@@ -470,4 +470,4 @@ linked symbols`). The report's recorded 23/32 figure and residue class
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyParents. The round-55 name rested on the header's claim that this function is `slot30`'s occupant; it occupies +0x060 (`classtable.py gIntermediateBaseMethods`), and +0x030 is BasicClass__NotifyParents, which it CALLS. It stores its argument in +0x020 (now `state`), passes it to notifyParents, and runs +0x064 (`onState2`) on 2 and +0x068 (`onState3`) on 3. The overrides of +0x060 are named SetState (Obj86B60__SetState, Class86B60__SetState) and forward to this base, so the slot is `setState` and so is this occupant. Tier B. The base call is now the inherited `methods->notifyParents(self, state)` rather than a one-argument `slot30(self)`: byte-identical, the state is already in $a1.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyParents. The round-55 name rested on the header's claim that this function is `slot30`'s occupant; it occupies +0x060 (`classtable.py gIntermediateBaseMethods`), and +0x030 is BasicClass__NotifyParents, which it CALLS. It stores its argument in +0x020 (now `state`), passes it to notifyParents, and runs +0x064 (`onState2`) on 2 and +0x068 (`onState3`) on 3. The overrides of +0x060 are named SetState (TaskCore__SetState, Class86B60__SetState) and forward to this base, so the slot is `setState` and so is this occupant. Tier B. The base call is now the inherited `methods->notifyParents(self, state)` rather than a one-argument `slot30(self)`: byte-identical, the state is already in $a1.

@@ -20,7 +20,7 @@ void StreamTaskObj__func_8003BAB4(StreamTaskObj *self) {
 ## Evidence
 
 - `Get_vtable_TaskCore()->slot4C`: `TaskCoreMethods` slot `+0x04C`. `classtable.py
-  gTaskCoreMethods` shows it occupied by `TaskCoreObj__func_8003C238`, this unit's own (still
+  gTaskCoreMethods` shows it occupied by `TaskCore__OnInit`, this unit's own (still
   queued, larger) function — confirms existence/arity, result discarded here
   so typed `void`.
 - `self->unkB4->methods->slot6C(self->unkB4, self->unkC0)`: two-argument
@@ -66,7 +66,7 @@ directly.
 
 **StreamTaskObj__func_8003BAB4** -- tier C (class known, purpose not
 established). Occupies `gStreamTaskObjMethods` slot `+0x04C`; up-calls
-`TaskCoreObj__func_8003C238` at the same slot, then forwards the fields
+`TaskCore__OnInit` at the same slot, then forwards the fields
 `StreamTaskObj__Configure` set into the private `unkB4` sub-object and
 conditionally resets a value. No external caller was found (dispatched only
 through the vtable), and no single verb for the combined effect is
