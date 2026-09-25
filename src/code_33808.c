@@ -535,7 +535,26 @@ void *func_80045428(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045438);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800454C4);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800455D4);
+/* D_8006F614 +0x00C: finalize -- release the object at +0x60, detach and
+ * reset the MDEC decoder, free the four buffers (func_8004575C), then
+ * BasicClass's finalize. */
+typedef struct Obj455D4 {
+    /* +0x000 */ u8 pad0[0x60];
+    /* +0x060 */ BasicClass *unk60;
+} Obj455D4;
+
+/* LIBPRESS.H */
+extern void DecDCTReset(int mode);
+extern int DecDCToutCallback(void (*func)());
+void func_8004575C();
+
+void func_800455D4(Obj455D4 *self) {
+    self->unk60 = self->unk60->methods->release(self->unk60);
+    DecDCToutCallback(NULL);
+    DecDCTReset(0);
+    func_8004575C(self);
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004564C);
 /* Unless +0x0C is set, free the four allocations at +0x14, +0x18, +0x10,
  * +0x1C. Not referenced by any data word. */
