@@ -46,12 +46,14 @@
 #include "Class6B5CC.h"
 #include "Class6D430.h"
 #include "TimBlockSrc.h"
+#include "ModelData.h"
 
 typedef struct DataSrc33808 DataSrc33808;
 
 /* Unit-local view of this unit's Class6D430 data-source subclasses: the
  * interface plus the extra slots their methods call. Unprototyped where a
- * caller passes no argument. */
+ * caller passes no argument. Not ModelData's (D_8006F384): that class is
+ * include/ModelData.h (track 4, round 84). */
 typedef struct DataSrc33808Methods {
     CLASS6D430_SLOTS(DataSrc33808, (DataSrc33808 *self));
     /* +0x07C */ s32 (*slot7C)();
@@ -61,7 +63,7 @@ typedef struct DataSrc33808Methods {
 struct DataSrc33808 {
     CLASS6D430_FIELDS(DataSrc33808Methods);
     /* +0x02C */ s32 unk2C;
-    /* +0x030 */ DataSrc33808 *unk30;  /* forwarded to by +0x080/+0x084 of D_8006F384/D_8006F40C */
+    /* +0x030 */ DataSrc33808 *unk30;  /* D_8006F40C: ModelData's todSet, forwarded to by +0x080/+0x084 */
     /* +0x034 */ s32 unk34;
     /* +0x038 */ s32 unk38;            /* D_8006F40C: count; D_8006F498: an allocation */
 };
@@ -81,7 +83,6 @@ void *GetLinkResourceMethods(void);
 void *GetTimArraySrcMethods(void);
 void *GetTodMethods(void);
 void *GetBgLayerMethods(void);
-void *GetModelDataMethods(void);
 void *GetTriggerWorldMethods(void);
 void *GetTileMapMethods(void);
 void *GetTileAtlasMethods(void);
@@ -906,11 +907,11 @@ void *GetBgLayerMethods(void) {
     return D_8006F2C4;
 }
 /* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
-void *New_ModelData(s32 arg0) {
+ModelData *New_ModelData(Src6F240 *src) {
     void *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, arg0, 1)) {
+        if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, src, 1)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -921,10 +922,10 @@ void *New_ModelData(s32 arg0) {
  * `owns` at +0x34; adopt the descriptor's buffer (size 0) and run its own
  * +0x064, whose nonzero result fails the construction (NULL), or else
  * request its file. */
-void *ModelData__ModelData(DataSrc33808 *self, Src6F240 *src, s32 owns) {
+void *ModelData__ModelData(ModelData *self, Src6F240 *src, s32 owns) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetModelDataMethods();
-    self->unk34 = owns;
+    self->ownsResources = owns;
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
         self->bufferSize = 0;
@@ -939,12 +940,12 @@ fail:
     return NULL;
 }
 /* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
-void ModelData__Finalize(DataSrc33808 *self) {
-    self->methods->slot7C();
+void ModelData__Finalize(ModelData *self) {
+    self->methods->releaseResources(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F384 +0x064: the active driver's setFlag, then slot +0x078. */
-void ModelData__Load(DataSrc33808 *self) {
+void ModelData__Load(ModelData *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
     ((s32 (*)())self->methods->slot78)(self);
 }
@@ -966,49 +967,47 @@ typedef struct Buf44858 {
 extern Req44858 *SetVec3(Req44858 *req, void *buffer, s32 unk4, s32 unk8);  /* code_171e0.c: stores its three words into *req, returns req */
 void *New_TodSet(s32 arg0);  /* defined below (ROM order) */
 
-s32 ModelData__BuildResources(DataSrc33808 *self) {
+s32 ModelData__BuildResources(ModelData *self) {
     Req44858 req;
 
-    if (self->unk34 != 0) {
+    if (self->ownsResources != 0) {
         SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
-        self->unk2C = (s32)New_LinkResource((s32)&req);
-        if ((void *)self->unk2C != NULL) {
+        self->linkResource = New_LinkResource((s32)&req);
+        if (self->linkResource != NULL) {
             req.buffer = (u8 *)self->buffer + 0xC;
-            self->unk30 = New_TodSet((s32)&req);
-            if (self->unk30 != NULL) {
+            self->todSet = New_TodSet((s32)&req);
+            if (self->todSet != NULL) {
                 return 0;
             }
-            self->unk30 = NULL;
+            self->todSet = NULL;
         }
-        self->methods->slot7C(self);
+        self->methods->releaseResources(self);
         return 1;
     }
     return 0;
 }
 /* D_8006F384 +0x07C: when +0x34 is set, release the objects at +0x30 and
  * +0x2C (each when there is one). */
-void ModelData__ReleaseResources(DataSrc33808 *self) {
-    if (self->unk34 != 0) {
-        if (self->unk30 != NULL) {
-            self->unk30->methods->release(self->unk30);
+void ModelData__ReleaseResources(ModelData *self) {
+    if (self->ownsResources != 0) {
+        if (self->todSet != NULL) {
+            self->todSet->methods->release(self->todSet);
         }
-        if ((DataSrc33808 *)self->unk2C != NULL) {
-            ((DataSrc33808 *)self->unk2C)->methods->release((DataSrc33808 *)self->unk2C);
+        if (self->linkResource != NULL) {
+            self->linkResource->methods->release(self->linkResource);
         }
     }
 }
 /* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
-u8 ModelData__ForwardScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
-    return ((s32 (*)())self->unk30->methods->slot78)(self->unk30, arg1, arg2);
+u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
+    return ((s32 (*)())self->todSet->methods->slot78)(self->todSet, arg1, arg2);
 }
 /* D_8006F384/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
-void *ModelData__ForwardDecodePacketWord(DataSrc33808 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    return self->unk30->methods->slot80(self->unk30, arg1, arg2, arg3, arg4, arg5);
+void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    return ((DataSrc33808 *)self->todSet)->methods->slot80(self->todSet, arg1, arg2, arg3, arg4, arg5);
 }
-extern s32 D_8006F384[];
-
-void *GetModelDataMethods(void) {
-    return D_8006F384;
+ModelDataMethods *GetModelDataMethods(void) {
+    return &D_8006F384;
 }
 /* Allocate and construct a D_8006F40C object; freed and NULL when the constructor fails. */
 void *New_TriggerWorld(s32 arg0) {
@@ -1063,7 +1062,7 @@ s32 TriggerWorld__BuildParts(DataSrc33808 *self) {
     self->unk38 = 0;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = (s32)New_ModelData((s32)&req);
+        *p = (s32)New_ModelData((Src6F240 *)&req);
         if (*p == 0) {
             goto fail;
         }
