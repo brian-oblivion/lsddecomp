@@ -46,13 +46,20 @@
  * call playSound(0x10), VabStreamObj's PlayTone on `sound`; setActiveSlot
  * and setSlotCursor call playSound(0) when their last argument is nonzero.
  *
- * The subclasses' own views stay theirs (FINISHING-PLAN track 4, round 84)
- * and are NOT expanded from these macros yet; two reasons are measured:
- * StreamTaskObj's +0x044 override, StreamTaskObj__Configure, takes five
- * arguments where IntermediateBase's init takes (args, mode), and
+ * The subclasses' own classes are later track-4 jobs. StreamTaskObj's
+ * object and table (include/code_2c054.h) already expand these macros:
+ * straightforward and byte-identical in round 84, with one contradiction
+ * left standing: its +0x044 override, StreamTaskObj__Configure, takes five
+ * arguments where IntermediateBase's init takes (args, mode). Class86B60
+ * (include/class_3bb8c.h) and GraphRoomObj (src/class_3bb8c_t.c) keep their
+ * own views: Class86B60's names +0x058 `state` (this class's activeSlot)
+ * and types +0x060 a struct pointer (this class's s32 *slotCounts), and
  * GraphRoomObj's ctor returns a value where INTERMEDIATEBASE_SLOTS fixes the
- * ctor's return type to void. The objects of all three do extend this
- * class's layout: StreamTaskObj's own fields start at +0x0A4.
+ * ctor's return type to void. Their objects extend this layout all the same.
+ *
+ * IntermediateBase's onInit slot is (self, s32, s32, s32), from init's
+ * call; TaskCore__OnInit and StreamTaskObj's override take self alone, and
+ * the one up-call that passes self alone casts the slot.
  *
  * The objects TaskCore holds from classes with no header yet (VabStreamObj,
  * BgLayer, TileMap, TileAtlas, the slot and list widgets, the viewport's
