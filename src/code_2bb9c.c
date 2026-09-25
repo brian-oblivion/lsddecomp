@@ -55,7 +55,10 @@ void func_8003B5D4(void) {
 /* D_8006E558 slot (tools/classtable.py); empty body. */
 void func_8003B5DC(void) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B5E4);
+/* D_8006E558 +0x098. */
+void func_8003B5E4(D_8006E558Obj *self) {
+    self->unk48 = 1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B5F0);
 INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B614);
 INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B624);
