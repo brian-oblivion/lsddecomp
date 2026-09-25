@@ -170,7 +170,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 		return true;
 	this->unknwon_int_0x44 = 0;
 	this->unk_0x4C->methods->slot0xE8(this->unk_0x4C, local, &this->linkCoordinates);
-	this->vt->BaseObjO__SetVec14(this, local);
+	this->vt->Actor__SetTranslation(this, local);
 	if (saved == 0)
 		return true;
 	if (this->isFlashbackSession)
@@ -198,10 +198,10 @@ encodes it, at exactly two sites.
   slot fills and the next call consumes.
 - `vtable_DreamSys` gained a name for `+0xB8` (previously folded into an
   anonymous `u32 unknown_functions_0xa0[7]`, right before the already-named
-  `BaseObjO__AddVec14` at `+0xBC`): resolved via `tools/classtable.py
-  DREAMSYS_METHODS` to `BaseObjO__SetVec14`, address outside this
+  `Actor__AddTranslation` at `+0xBC`): resolved via `tools/classtable.py
+  DREAMSYS_METHODS` to `Actor__SetTranslation`, address outside this
   unit/runner's range, still `INCLUDE_ASM`. Called as `this->vt->
-  BaseObjO__SetVec14(this, &local)` -- same buffer as the slot above.
+  Actor__SetTranslation(this, &local)` -- same buffer as the slot above.
 - The tail two calls, `vt->slot0x108(this)` and `vt->slot0x104(this, ...)`,
   turned out to be ALREADY-NAMED existing slots read at the wrong offset in
   a first pass: `+0x108` is `DreamSys__GetDreamTimerScaled(DreamSys *this)` (existing

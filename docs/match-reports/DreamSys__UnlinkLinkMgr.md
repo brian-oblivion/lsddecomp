@@ -12,13 +12,13 @@ class's method table:
 1. `this->unk_0x4C->methods->slot0xF0(this->unk_0x4C)` -- a call through an
    unidentified object's OWN vtable (not `this->vt`), with itself as the
    sole argument.
-2. `this->vt->BaseObjO__UnlinkCompanion(this, this->unk_0x4C)` -- resolved via
+2. `this->vt->Actor__RemoveChild(this, this->unk_0x4C)` -- resolved via
    `tools/classtable.py DREAMSYS_METHODS` to vtable offset `+0x014`, shared
    with `Class65650`'s inherited "slot14" (`code_55dd4.h` calls it the
    "'unlink' companion of slot10"). Still `INCLUDE_ASM`; its address
    (`0x80057130`) is below this unit/runner's range.
-3. `DreamSys__GetBaseMethods()->slot0x50(this)` -- the shared intermediate base class
-   table (`D_800878D4`), same one `code_55dd4.h`'s `D800878D4Methods` types
+3. `GetActorMethods()->slot0x50(this)` -- the shared intermediate base class
+   table (`gActorMethods`), same one `code_55dd4.h`'s `D800878D4Methods` types
    for `Class65650` (a DreamSys sibling under that base, per
    `docs/research/class-framework.md`).
 
@@ -28,8 +28,8 @@ class's method table:
 void DreamSys__UnlinkLinkMgr(DreamSys *this)
 {
 	this->unk_0x4C->methods->slot0xF0(this->unk_0x4C);
-	this->vt->BaseObjO__UnlinkCompanion(this, this->unk_0x4C);
-	DreamSys__GetBaseMethods()->slot0x50(this);
+	this->vt->Actor__RemoveChild(this, this->unk_0x4C);
+	GetActorMethods()->slot0x50(this);
 }
 ```
 
@@ -52,7 +52,7 @@ typedef struct DreamSysBaseMethods {
 	u8 pad00[0x50];
 	void (*slot0x50)(struct DreamSys *self);
 } DreamSysBaseMethods;
-extern DreamSysBaseMethods *DreamSys__GetBaseMethods(void);
+extern DreamSysBaseMethods *GetActorMethods(void);
 ```
 
 ## Note: deliberate `struct DreamSys *`, not `DreamSys *`, in `DreamSysBaseMethods`
@@ -77,4 +77,4 @@ round 2026-08-30-b, runner ALPHA, address range
 
 ## Naming
 
-- **Tier B.** Calls the linkMgr companion's own slot0xF0, then vt->BaseObjO__UnlinkCompanion(this, linkMgr) (the ctor's slot10 buddy-link's own unlink counterpart), then the shared base's own +0x050 slot. Mechanics (undoes the ctor's companion link) are solid; why it is invoked is not.
+- **Tier B.** Calls the linkMgr companion's own slot0xF0, then vt->Actor__RemoveChild(this, linkMgr) (the ctor's slot10 buddy-link's own unlink counterpart), then the shared base's own +0x050 slot. Mechanics (undoes the ctor's companion link) are solid; why it is invoked is not.

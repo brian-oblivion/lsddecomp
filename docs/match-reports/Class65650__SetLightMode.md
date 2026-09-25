@@ -30,7 +30,7 @@ void Class65650__SetLightMode(Class65650 *self, void *arg)
     for (i = 0; i < self->unk6C; i++, p++) {
         (*p)->methods->slot70(*p, arg);
     }
-    DreamSys__GetBaseMethods()->slot70(self, arg);
+    GetActorMethods()->slot70(self, arg);
 }
 ```
 
@@ -82,7 +82,7 @@ void Class65650__SetLightMode(Class65650 *self, void *arg)
             p++;
         } while (i < self->unk6C);
     }
-    base = DreamSys__GetBaseMethods();
+    base = GetActorMethods();
     base->slot70(self, arg);
 }
 ```
@@ -181,7 +181,7 @@ void Class65650__SetLightMode(Class65650 *self, void *arg)
             p++;
         } while (i < self->unk6C);
     }
-    base = DreamSys__GetBaseMethods();
+    base = GetActorMethods();
     base->slot70(self, arg);
 }
 #endif
@@ -239,7 +239,7 @@ void Class65650__SetLightMode(Class65650 *self, void *arg)
             p++;
         } while (i < self->unk6C);
     }
-    base = DreamSys__GetBaseMethods();
+    base = GetActorMethods();
     base->slot70(self, arg);
 }
 #endif

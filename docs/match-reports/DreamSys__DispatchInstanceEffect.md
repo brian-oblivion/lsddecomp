@@ -9,13 +9,13 @@
 
 Structurally identical to the already-matched `DreamSys__DispatchChunkChange` (vtable
 `+0x9C`, see `docs/match-reports/DreamSys__DispatchChunkChange.md`): unconditionally calls a
-shared base-class method through `DreamSys__GetBaseMethods()`'s returned table, then
+shared base-class method through `GetActorMethods()`'s returned table, then
 conditionally dispatches a second, class-specific call gated on `arg1`'s own
 class-id header word. The only differences from `DreamSys__DispatchChunkChange` are the two
 offsets involved and the class-id constant being compared.
 
-`DreamSys__GetBaseMethods()->slot0xDC` resolves (via `tools/classtable.py D_800878D4`)
-to `DreamSys__DispatchLinkCommandAndTryAttach`, out of this unit's scope. `this->vt->slot0x1E8` resolves
+`GetActorMethods()->slot0xDC` resolves (via `tools/classtable.py gActorMethods`)
+to `Actor__OnActorLinkCommand`, out of this unit's scope. `this->vt->slot0x1E8` resolves
 (via `tools/classtable.py DREAMSYS_METHODS`) to
 `DreamSys__InstanceEffectsOnJournal` -- already forward-declared in
 `include/DreamSys.h` and already has a real body pending as
@@ -33,7 +33,7 @@ fix, not a rename requiring an out-of-scope edit.
 ```c
 void DreamSys__DispatchInstanceEffect(DreamSys *this, void *arg1, s32 arg2)
 {
-	DreamSys__GetBaseMethods()->slot0xDC(this, arg1, arg2);
+	GetActorMethods()->slot0xDC(this, arg1, arg2);
 	if ((*(s32 *)(*(void **)arg1) & 0xFFFFF) == 0x1F234) {
 		this->vt->InstanceEffectsOnJournal(this, arg1, arg2);
 	}
@@ -86,7 +86,7 @@ true width.
 
 Matched on the first attempt: the shape was already proven by
 `DreamSys__DispatchChunkChange` in the same unit, and `tools/classtable.py` resolved both
-the base-class slot (`+0xDC` -> `DreamSys__DispatchLinkCommandAndTryAttach`) and this class's own slot
+the base-class slot (`+0xDC` -> `Actor__OnActorLinkCommand`) and this class's own slot
 (`+0x1E8` -> `DreamSys__InstanceEffectsOnJournal`) directly.
 
 ## Provenance

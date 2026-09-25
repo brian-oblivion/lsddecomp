@@ -4,7 +4,7 @@
 
 Unit `class_3bb8c_s`. `self` is the owning `LinkNode`; this is the function
 that either attaches a fresh child (via `class_3bb8c_o.c`'s
-`New_BaseObjO`/`Class6B5CC__LinkModel` plus this unit's own `AttachWithRotScale`) or
+`New_Actor`/`Class6B5CC__LinkModel` plus this unit's own `AttachWithRotScale`) or
 re-touches an existing one (`self->arr7C[i]->methods->slotB8`), driven by its
 own `reuse` argument.
 
@@ -41,7 +41,7 @@ void Class876FC__PlaceModelChildren(LinkNode *self, s32 reuse) {
             LinkNode *child = *p;
             child->methods->slotB8(child, &accum);
         } else {
-            LinkNode *child = New_BaseObjO();
+            LinkNode *child = New_Actor();
             *p = child;
             Class6B5CC__LinkModel(child, self->unk20);
             AttachWithRotScale(*p, self, &accum, self->unk64, self->unk68);
@@ -89,9 +89,9 @@ changes how many callee-saved registers the function needs at all.
 Round 70 (alpha). `func_80056858` -> `Class876FC__PlaceModelChildren`, **tier B**.
 
 Two callers: Class876FC__InitByKind with reuse = 0 (creates both children:
-New_BaseObjO, Class6B5CC__LinkModel with the owner's `model`,
+New_Actor, Class6B5CC__LinkModel with the owner's `model`,
 AttachWithRotScale under the owner) and Class876FC__DriftModelChildren with
-reuse = 1 (only slotB8 = BaseObjO__SetVec14, set translation). Both place
+reuse = 1 (only slotB8 = Actor__SetTranslation, set translation). Both place
 child i at (i+1) * gModelChildSpacing[modelChildLayout] along x (layouts 1-2,
 scaled by the scale triple's first s16) or y (3-4). "Place" covers both
 paths; B because the layout's purpose on screen is not known.

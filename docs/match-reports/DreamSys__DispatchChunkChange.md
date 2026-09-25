@@ -7,7 +7,7 @@
 ## What it does
 
 Vtable `+0x09C` (this function's own slot). Unconditionally calls a shared
-base-class method (`DreamSys__GetBaseMethods()->slot0x9C(this, arg1, arg2)`), then, if
+base-class method (`GetActorMethods()->slot0x9C(this, arg1, arg2)`), then, if
 `arg1`'s own class-id header word (masked to the low 12 bits) equals
 `0x114`, ALSO calls `this->vt->ProcessChunkChange(this, arg1, arg2)`
 (matched earlier this round, same unit).
@@ -17,7 +17,7 @@ base-class method (`DreamSys__GetBaseMethods()->slot0x9C(this, arg1, arg2)`), th
 ```c
 void DreamSys__DispatchChunkChange(DreamSys *this, void *arg1, s32 arg2)
 {
-	DreamSys__GetBaseMethods()->slot0x9C(this, arg1, arg2);
+	GetActorMethods()->slot0x9C(this, arg1, arg2);
 	if ((*(s32 *)(*(void **)arg1) & 0xFFF) == 0x114) {
 		this->vt->ProcessChunkChange(this, arg1, arg2);
 	}

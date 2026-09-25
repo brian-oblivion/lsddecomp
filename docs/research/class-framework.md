@@ -40,7 +40,7 @@ addu  $v0, $s0, $zero          ; return the object
 `DreamSys__DreamSys` (0x800587F0), the constructor itself:
 
 ```
-jal   DreamSys__GetBaseMethods            ; -> &D_800878D4 (the BASE class table)
+jal   GetActorMethods            ; -> &gActorMethods (the BASE class table)
 lw    $v0, 0x8($v0)            ; slot +0x008 again
 jalr  $v0, $a0 = this          ; BASE CONSTRUCTOR, ALSO INDIRECT
 jal   Get_vtable_DreamSys
@@ -143,7 +143,7 @@ flat 4-byte function-pointer tables (>=8 slots):    128
 
   The `--vs` form is the useful one: a derived table is its base's with some
   slots replaced, so the diff *is* the subclass's behaviour. DreamSys inherits
-  48 slots from `D_800878D4` and adds 90, overriding 8.
+  48 slots from `gActorMethods` and adds 90, overriding 8.
 
 - **58 classes (round 80's count; 60 tables), ~1425 method slots.** This framework is the game's backbone,
   not a corner of it. `class_39e08`'s 415 functions are almost certainly its

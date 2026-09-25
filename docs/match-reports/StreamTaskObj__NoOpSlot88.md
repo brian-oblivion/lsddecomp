@@ -21,5 +21,5 @@ still needed a name.
 override; the mechanics ARE the whole purpose (do nothing when this slot is
 dispatched). Matches the `Class__NoOpSlotNN` convention already established
 in this codebase for the identical shape (`DreamSys.h`'s
-`DreamSys__NoOpSlotE8Default`/`DreamSys__NoOpSlotD8`, `code_2cc8c.h`'s
+`DreamSys__NoOpSlotE8Default`/`Actor__NoOpSlotD8`, `code_2cc8c.h`'s
 `Obj6EAC0__NoOpSetter`/`Obj6EAC0__NoOpSlotD0`).

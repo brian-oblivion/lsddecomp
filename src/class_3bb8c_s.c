@@ -3,7 +3,7 @@
  * table is gClass876FCMethods (called Class876FC here; class_3bb8c_r.c's Obj876FC).
  * A 0x98-byte scene object built by New_Class876FC with a `kind` 0..3: it
  * attaches itself under a parent at pos + offset, links a model for kinds
- * 0-1, and owns up to two child arrays -- two BaseObjO model children laid
+ * 0-1, and owns up to two child arrays -- two Actor model children laid
  * out in a row that spin and drift along z after frame 500 (kind 0), or
  * five D800879C4 sprites (a GsSPRITE at +0x64) that are randomised at build
  * time (kind 2) or every frame (kind 3, class_3bb8c_o.c). Entry points are
@@ -14,13 +14,13 @@
  * Named round 70; tiers in the reports. Game-level role unknown.
  */
 #include "common.h"
-#include "Class6B5CC.h"
+#include "Actor.h"
 
 /* ------------------------------------------------------------------ *
  * LinkNode is this unit's ONE local view of every object it touches: the
  * owner (a gClass876FCMethods instance, 0x98 bytes -- the size New_Class876FC
  * allocates, which is exactly where `sprites` ends) and, for vtable
- * calls only, its children (`modelChildren`: BaseObjO, table D_800878D4;
+ * calls only, its children (`modelChildren`: Actor, table gActorMethods;
  * `sprites`: D800879C4 objects). Class876FC is the same struct under the
  * owner's name, used in the owner's method signatures. Fields +0x058..
  * +0x07B are the 0x24-byte parameter block the class's slot +0x040
@@ -35,7 +35,7 @@ typedef struct Vec3S {
 } Vec3S;
 
 /* Slot names follow the base implementation they dispatch to (resolved with
- * tools/classtable.py on gClass876FCMethods / D_800878D4 / D_800879C4). `set` is
+ * tools/classtable.py on gClass876FCMethods / gActorMethods / D_800879C4). `set` is
  * 1 = assign, 0 = accumulate; `data` is a triple of s16 num/den ratios
  * (RatioToFixed12). */
 typedef struct LinkNodeMethods {
@@ -49,11 +49,11 @@ typedef struct LinkNodeMethods {
     void (*setSemiTransRate)(LinkNode *self, s32 rate);         /* +0x068, Class6B5CC__SetSemiTransRate: attribute bits 28-29 (GsAZERO..GsATHREE) */
     u8 pad6C[0xB8 - 0x6C];
     /* +0x0B8 is CLASS-DEPENDENT, so it keeps its placeholder: on the owner
-     * and on modelChildren it is BaseObjO__SetVec14 (set translation); on
+     * and on modelChildren it is Actor__SetTranslation (set translation); on
      * sprites it is Sprite__SetColor, which copies three bytes into the
      * embedded GsSPRITE's r,g,b. */
     void (*slotB8)(LinkNode *self, void *arg1);                 /* +0x0B8 */
-    void (*addTranslation)(LinkNode *self, void *delta);        /* +0x0BC, BaseObjO__AddVec14; only called on modelChildren */
+    void (*addTranslation)(LinkNode *self, void *delta);        /* +0x0BC, Actor__AddTranslation; only called on modelChildren */
 } LinkNodeMethods;
 
 struct LinkNode {
@@ -77,14 +77,13 @@ struct LinkNode {
     s32 tableIndex;             /* +0x070, index into gModelChildDriftZ and gSpriteShiftX */
     void *color;                /* +0x074, passed to every sprite's slotB8 (RGB) */
     void *altColor;             /* +0x078, sprites[1]'s colour instead, when non-NULL */
-    LinkNode *modelChildren[2]; /* +0x07C..+0x083, BaseObjO children */
+    LinkNode *modelChildren[2]; /* +0x07C..+0x083, Actor children (New_Actor) */
     LinkNode *sprites[5];       /* +0x084..+0x097, D800879C4 children; class_3bb8c_o.c's
                                    LinkOwnerObj::links is the same array */
 };
 
 extern void LinkOwnerObj__ReleaseLinks(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void LinkOwnerObj__ReleaseLinksB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
-extern void BaseObjO__AddVec14(void *self, Vec3S *v);   /* class_3bb8c_o.c */
 extern void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl); /* below */
 extern s32 gSpriteShiftX[];
 extern s32 gSpriteScaleLarge[];
@@ -119,7 +118,7 @@ extern void Class876FC__DriftModelChildren(); /* arity-ok: the definition is 1-p
  * three arguments for real. */
 extern void *New_D800879C4(void *arg1, void *arg2, void *arg3);
 
-/* Three globals a class_3bb8c_o.c ctor-shaped function (BaseObjO__func_56f5c)
+/* Three globals a class_3bb8c_o.c ctor-shaped function (Actor__func_56f5c)
  * captures once from its own three pointer-typed parameters -- D_8008ACA4 is
  * some other object (first field a methods pointer, called through a new
  * +0x080 slot below), D_8008ACA8 is forwarded opaquely to New_D800879C4 as
@@ -176,7 +175,7 @@ void Class876FC__InitByKind(Class876FC *self, void *parent, Vec3S *pos) {
 
 /* Called every frame from the class's slot +0x0EC (Class876FC__Update, right
  * after it increments `tick`): set self's translation (owner's slotB8 is
- * BaseObjO__SetVec14) to pos + offset, plus however far D_8008ACAC's +0x018
+ * Actor__SetTranslation) to pos + offset, plus however far D_8008ACAC's +0x018
  * word has moved since Class876FC__InitByKind snapshotted it, then run the
  * per-kind update. */
 void Class876FC__UpdateByKind(Class876FC *self, void *pos) {
@@ -238,10 +237,9 @@ void AttachWithRotScale(LinkNode *node, void *parent, void *trans, s32 rotation,
 /* Lay the two model children out in a row: child i sits at (i + 1) *
  * gModelChildSpacing[modelChildLayout], along x (scaled by scale's x
  * numerator) for layouts 1-2 and along y for 3-4. reuse = 0 creates them
- * (New_BaseObjO, sharing the owner's model, attached to the owner);
+ * (New_Actor, sharing the owner's model, attached to the owner);
  * reuse = 1 only resets their translation (their slotB8 is
- * BaseObjO__SetVec14). */
-extern void *New_BaseObjO(void);        /* class_3bb8c_o.c, New_X allocator */
+ * Actor__SetTranslation). */
 extern Vec3S gModelChildOffsetInit;
 extern s32 gModelChildSpacing[];
 
@@ -266,7 +264,7 @@ void Class876FC__PlaceModelChildren(Class876FC *self, s32 reuse) {
             LinkNode *child = *p;
             child->methods->slotB8(child, &accum);
         } else {
-            LinkNode *child = New_BaseObjO();
+            LinkNode *child = New_Actor();
             *p = child;
             Class6B5CC__LinkModel((Class6B5CC *)child, (void *)self->model);
             AttachWithRotScale(*p, self, &accum, self->rotation, self->scale);
@@ -361,7 +359,10 @@ void Class876FC__BuildRandomSprites(Class876FC *self) {
 
         child = self->sprites[1];
         gSpriteShiftScratch.x = gSpriteShiftX[self->tableIndex];
-        BaseObjO__AddVec14(child, &gSpriteShiftScratch);
+        /* Called directly, not through the child's table: the child is a
+         * sprite (D800879C4, a Sprite), not an Actor, and the function only
+         * touches the Class6B5CC coord2 both share. */
+        Actor__AddTranslation((Actor *)child, (Vec3_d294 *)&gSpriteShiftScratch);
         m = child->methods;
         arg = (self->altColor != NULL) ? self->altColor : self->color;
         m->slotB8(child, arg);

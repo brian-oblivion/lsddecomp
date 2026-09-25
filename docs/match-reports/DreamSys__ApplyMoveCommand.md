@@ -80,7 +80,7 @@ All in `include/DreamSys.h`:
 - **`extern s32 MOVE_MODE_SPEEDS[5]`, `extern s8 MOVE_COMMAND_SIGNS[8]`, and
   `extern void (*MOVE_COMMAND_DISPATCH[5])(DreamSys *this, s32 val, void *extra)`**
   (the last declared after the real `DreamSys` typedef, matching
-  `DreamSys__DispatchOffsetSlotC4`/`DreamSys__DispatchOffsetSlot0`'s element signature -- those are two of
+  `Actor__MoveLocalZOrFindLink`/`Actor__MoveLocalXOrFindLink`'s element signature -- those are two of
   MOVE_COMMAND_DISPATCH's five entries).
 - **`this->unk_0x164` turned out to already be a named field**: offset
   arithmetic through `unknown_values_0x138[12]` + two `MoodGraphContributor`

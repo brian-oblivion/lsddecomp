@@ -40,7 +40,7 @@
  * Per-name evidence and tiers are in docs/match-reports/<func>.md. */
 
 #include "common.h"
-#include "Class6B5CC.h"
+#include "Actor.h"
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood
    (round 2026-08-30-d). */
 #include "StageGrid.h"
@@ -79,7 +79,7 @@ extern s32 MOVE_MODE_SPEEDS[5];
 extern s8 MOVE_COMMAND_SIGNS[8];
 /* Declared further down (after the real `DreamSys` typedef exists) as
    `extern void (*MOVE_COMMAND_DISPATCH[5])(DreamSys *this, s32 val, void *extra);` --
-   same element type as DreamSys__DispatchOffsetSlotC4/DreamSys__DispatchOffsetSlot0 below, which this table
+   same element type as Actor__MoveLocalZOrFindLink/Actor__MoveLocalXOrFindLink below, which this table
    holds pointers to. */
 
 /* A single {numerator, denominator} degree ratio. This is not a guess about
@@ -358,9 +358,9 @@ typedef struct DreamSysUnk4CMethods {
 	   straight into vtable slot +0x1D4 (DreamSys__TryStageTimerLink)'s `currentPos`
 	   argument (round 2026-09-02) -- same signature, different caller. */
 	PlayerSpawnPoint *(*slot0x10C)(void *self, s32 arg1, s32 arg2);
-	/* Called by this unit's own DreamSys__FindNearbyLink as (this->unk_0x4C, out,
+	/* Called by this unit's own Actor__FindNearbyLink as (this->unk_0x4C, out,
 	   this->unk_0x14 + 0x18) -- an output buffer (`out`, later read by
-	   DreamSys__BuildLinkQueries as its own `arg3`) and the same "self->unk_0x14 + 0x18"
+	   Actor__BuildLinkQueries as its own `arg3`) and the same "self->unk_0x14 + 0x18"
 	   raw byte-offset position pointer as slot0x11C's own call site above
 	   (round 2026-09-04). Named `queryLinkAtPos`: it fills a `LinkQueryBuf`
 	   (`class_3bb8c_p.c`'s own type) from a world position, returning 0 on
@@ -368,13 +368,13 @@ typedef struct DreamSysUnk4CMethods {
 	   pass). */
 	s32 (*queryLinkAtPos)(void *self, void *out, void *pos);
 	u8 pad_0x114[0x118 - 0x114];
-	/* DreamSys__BuildLinkQueries (class_3bb8c_p.c) dispatches to it twice,
+	/* Actor__BuildLinkQueries (class_3bb8c_p.c) dispatches to it twice,
 	   both times as (this->unk_0x4C, pos) with pos an adjacent grid index
 	   (s3 +/- 1), and stores the result into a `GridArrElem *` array slot.
 	   Round 75 corrected the arity: retail sets only a0/a1 at the second
 	   call, and the a2/a3 values visible at the first are the caller's own
 	   leftovers; a 4-argument type kept two extra callee-saved registers
-	   live (DreamSys__BuildLinkQueries's report). Named `getGridArrElemAt`
+	   live (Actor__BuildLinkQueries's report). Named `getGridArrElemAt`
 	   in the round 57 naming pass; accessed only from class_3bb8c_p.c. */
 	void *(*getGridArrElemAt)(void *self, s32 pos);
 	/* Called by DreamSys__NotifyLinkAttempt's `arg1 == -2` path as (this->unk_0x4C,
@@ -384,7 +384,7 @@ typedef struct DreamSysUnk4CMethods {
 } DreamSysUnk4CMethods;
 
 /* Object pointed to by DreamSysUnk4CObj::unk_0x68 -- only the two fields
- * this unit's own DreamSys__BuildLinkQueries reads are named (round 2026-09-04). */
+ * this unit's own Actor__BuildLinkQueries reads are named (round 2026-09-04). */
 typedef struct DreamSysUnk4C68Obj {
 	u8 pad00[0x2];
 	s16 unk_0x2;
@@ -394,60 +394,17 @@ typedef struct DreamSysUnk4C68Obj {
 typedef struct DreamSysUnk4CObj {
 	DreamSysUnk4CMethods *methods;
 	u8 pad04[0x68 - 0x4];
-	/* Read by this unit's own DreamSys__BuildLinkQueries (round 2026-09-04). */
+	/* Read by this unit's own Actor__BuildLinkQueries (round 2026-09-04). */
 	DreamSysUnk4C68Obj *unk_0x68;
 } DreamSysUnk4CObj;
 
-/* Shared intermediate base class table (D_800878D4 -- see
-   docs/research/class-framework.md and code_55dd4.h's D800878D4Methods,
-   which types the same table for Class65650, a sibling of DreamSys under
-   this same base). Declared locally here rather than pulled in from
-   code_55dd4.h to avoid a cross-unit include; only slot +0x050 is needed by
-   this unit (DreamSys__UnlinkLinkMgr, this round). */
-typedef struct DreamSysBaseMethods {
-	u8 pad00[0x8];
-	/* Shared with Class65650's own inherited "ctor" slot at the same offset
-	   in the SAME base table (code_55dd4.h's D800878D4Methods, which already
-	   names and resolves this exact slot as `BaseObjO__BaseObjO`, taking/
-	   returning `Class65650 *self`). Called by DreamSys__DreamSys as
-	   (this), its return value discarded (round 2026-09-02) -- consistent
-	   with the base ctor returning `self` for chaining, unneeded here since
-	   the caller already has `this`. */
-	struct DreamSys *(*ctor)(struct DreamSys *self);
-	u8 pad0C[0x4C - 0xC];
-	/* Shared with Class65650's own inherited "slot4C" at the same offset in
-	   the SAME base table (code_55dd4.h's D800878D4Methods: "called by
-	   Class65650__AttachToParent as slot4C(self, arg3, arg5)"). Called by
-	   DreamSys__SpawnAtLink as (this, arg1, &local) (round 2026-09-02). */
-	void (*slot4C)(struct DreamSys *self, void *arg1, void *arg2);
-	/* Deliberately `struct DreamSys *`, not `DreamSys *` -- this precedes
-	   the real `typedef struct DreamSys {...}` below, so GCC 2.6.3 warns
-	   "declared inside parameter list ... probably not what you want" and
-	   scopes a distinct tag here. A forward `typedef struct DreamSys
-	   DreamSys;` to avoid the warning does NOT work: this compiler treats
-	   the later real typedef as a "redefinition of DreamSys" error instead.
-	   The warning is cosmetic -- both tags are pointer-compatible at the
-	   ABI level, and the call site casts implicitly with no codegen
-	   difference (round 2026-08-30-b). */
-	void (*slot0x50)(struct DreamSys *self);
-	u8 pad54[0x88 - 0x54];
-	/* Called by DreamSys__NotifyLinkAttempt (this unit's own +0x088 slot) as
-	   (this, arg1), return value discarded (round 2026-09-02). */
-	void (*slot0x88)(struct DreamSys *self, s32 arg1);
-	u8 pad8C[0x9C - 0x8C];
-	/* Called by DreamSys__DispatchChunkChange as (this, arg1, arg2) -- round 2026-08-30-d. */
-	void (*slot0x9C)(struct DreamSys *self, void *arg1, s32 arg2);
-	u8 padA0[0xDC - 0xA0];
-	/* Called unconditionally by DreamSys__DispatchInstanceEffect (this unit's own +0xDC slot)
-	   as (this, arg1, arg2) -- same argument shape as slot0x9C above
-	   (round 2026-09-02). Resolves to DreamSys__DispatchLinkCommandAndTryAttach in D_800878D4, out of
-	   this unit's scope. */
-	void (*slot0xDC)(struct DreamSys *self, void *arg1, s32 arg2);
-	/* Called by DreamSys__WallLink as (this, arg1, arg2) -- same argument
-	   shape as slot0x9C/slot0xDC above (round 2026-09-02). */
-	void (*slot0xE0)(struct DreamSys *self, void *arg1, s32 arg2);
-} DreamSysBaseMethods;
-extern DreamSysBaseMethods *DreamSys__GetBaseMethods(void);
+/* DreamSys's base class is Actor (include/Actor.h): DreamSys's own methods
+   reach the base implementations through GetActorMethods() and upcast. */
+/* A file-scope declaration of the tag. The table view this replaces
+   declared it as a side effect (its ctor slot RETURNED `struct DreamSys *`,
+   which is not a parameter list), so every `struct DreamSys *` parameter
+   below refers to this one type, as it did before. */
+struct DreamSys;
 
 /* Opaque view of whatever object DreamSys__ProcessChunkChange's `entity`
    parameter points to -- almost certainly an `Entity*` (include/Entity.h),
@@ -456,7 +413,7 @@ extern DreamSysBaseMethods *DreamSys__GetBaseMethods(void);
    for this unit's own call sites only (round 2026-08-30-d;
    +0x38/+0x14C/+0x150/+0x154/+0x158 added round 2026-09-06 by
    DreamSys__InstanceEffectsOnJournal). +0x38 takes the DreamSys instance
-   as its own second argument, same shape as DreamSysBaseMethods::slot0x50
+   as its own second argument, same shape as ActorMethods::detachFromParent (+0x050)
    above; +0x14C returns a pointer forwarded straight into
    LogInstanceMood, so `MoodGraphPoint *`; +0x150/+0x154 return plain s32
    (added to/negated into DreamSys fields); +0x158's return is stored with
@@ -500,7 +457,7 @@ typedef struct SoundCueCallbackArg {
    -- the on-disk/network form). DreamSys__ApplyRelativeOffset builds one of these on the
    stack as a-b with y forced to 0; DreamSys__TickDrift passes the static
    DRIFT_STEP instance of one. Both feed vtable slot +0xBC
-   (BaseObjO__AddVec14, round 2026-08-30-d). */
+   (Actor__AddTranslation, round 2026-08-30-d). */
 typedef struct DreamSysVec3 {
 	s32 x, y, z;
 } DreamSysVec3;
@@ -642,13 +599,13 @@ typedef struct DreamSys {
 	s8 unknown_values_0x2C[24];
 
 	s32 pendingLinkType;
-	/* Written by DreamSys__ApplyOffsetSlotAndNotify (this unit's own helper, invoked via its own
-	   +0x0C8/+0x0CC slots DreamSys__ApplyOffsetSlot0/DreamSys__ApplyOffsetSlot1) and by DreamSys__SetLastOffsetValue
+	/* Written by Actor__MoveAlongLocalAxis (this unit's own helper, invoked via its own
+	   +0x0C8/+0x0CC slots Actor__MoveLocalX/Actor__MoveLocalY) and by Actor__SetLastOffsetValue
 	   (this unit's own +0x0E4 slot), both as a plain `sh` store of a `s16`
 	   value (round 2026-09-04). Named `lastOffsetValue`: it mirrors whichever
 	   local-offset component was most recently written, but survives the
 	   transient scratch buffer's own reset back to 0 right after
-	   DreamSys__ApplyOffsetSlotAndNotify applies it -- accessed only from
+	   Actor__MoveAlongLocalAxis applies it -- accessed only from
 	   `class_3bb8c_p.c` (round 57 naming pass). */
 	s16 lastOffsetValue;
 	s8 unknown_values_0x4A[2];
@@ -657,7 +614,7 @@ typedef struct DreamSys {
 	   DreamSys__UnlinkLinkMgr (round 2026-08-30-b); see DreamSysUnk4CObj above. */
 	DreamSysUnk4CObj *linkMgr;
 	s8 unknown_values_0x50[4];
-	/* Written by this unit's own DreamSys__SetPendingExtra (its own +0x0EC slot), a
+	/* Written by this unit's own Actor__SetPendingExtra (its own +0x0EC slot), a
 	   plain `sw` store of its `extra` argument (round 2026-09-04). Named
 	   `pendingExtra`: no reader is confirmed yet, and it is accessed only
 	   from `class_3bb8c_p.c` (round 57 naming pass). */
@@ -870,7 +827,7 @@ typedef struct DreamSys {
 
 /* Dispatch table indexed by DreamSys__ApplyMoveCommand's `arg1`; see that table's own
    comment near MOVE_MODE_SPEEDS/MOVE_COMMAND_SIGNS above. Same element signature as
-   DreamSys__DispatchOffsetSlotC4/DreamSys__DispatchOffsetSlot0 below. */
+   Actor__MoveLocalZOrFindLink/Actor__MoveLocalXOrFindLink below. */
 extern void (*MOVE_COMMAND_DISPATCH[5])(DreamSys *this, s32 val, void *extra);
 
 /* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseCase0,
@@ -902,9 +859,9 @@ struct vtable_DreamSys{
 	DreamSys *(*Constructor)(DreamSys *this, void *arg1, s32 arg2, s32 arg3);
 	u32 unknown_functions_0xc[1];
 	/* Shared with Class65650's own vtable at the same offset (code_55dd4.h:
-	   `slot10`, resolved there as `BaseObjO__LinkCompanion`, the "link" companion of
-	   `slot14`/`BaseObjO__UnlinkCompanion` immediately below -- this unit already names
-	   THAT slot `BaseObjO__UnlinkCompanion` and notes the same companion relationship).
+	   `slot10`, resolved there as `Actor__AddChild`, the "link" companion of
+	   `slot14`/`Actor__RemoveChild` immediately below -- this unit already names
+	   THAT slot `Actor__RemoveChild` and notes the same companion relationship).
 	   Called by DreamSys__DreamSys as (this, arg1->methods->slot0x80(arg1,
 	   0)) -- the constructor's own "buddy-link" step (round 2026-09-02). */
 	void (*slot10)(DreamSys *this, void *arg);
@@ -913,7 +870,7 @@ struct vtable_DreamSys{
 	   of slot10"). Called by DreamSys__UnlinkLinkMgr as (this, this->unk_0x4C)
 	   (round 2026-08-30-b). Still INCLUDE_ASM; address 0x80057130 is
 	   outside this unit/runner's range. */
-	void (*BaseObjO__UnlinkCompanion)(DreamSys *this, DreamSysUnk4CObj *arg1);
+	void (*Actor__RemoveChild)(DreamSys *this, DreamSysUnk4CObj *arg1);
 	u32 unknown_functions_0x18[6];
 	/* +0x030, BasicClass__NotifyParents -- shared base-class slot, same one
 	   `class_3ac78.h`/`Class6D3C8.h` name (see their comments); called by
@@ -949,9 +906,9 @@ struct vtable_DreamSys{
 	/* This function's OWN slot; resolved via tools/classtable.py
 	   (round 2026-08-30-d). */
 	void (*DreamSys__DispatchChunkChange)(DreamSys *this, void *arg1, s32 arg2);
-	/* Called by this unit's own DreamSys__DispatchLinkCommandAndTryAttach as (this, arg1, count) when
+	/* Called by this unit's own Actor__OnActorLinkCommand as (this, arg1, count) when
 	   `5 <= count < 9` -- dispatched through THIS object's own vtable
-	   (unlike DreamSys__DispatchLinkCommandAndTryAttach's other, unconditional call, which goes
+	   (unlike Actor__OnActorLinkCommand's other, unconditional call, which goes
 	   through the shared base table via GetClass6B5CCMethods() instead).
 	   Resolves to Class6B5CC__TryAttachNearby, not overridden at the DreamSys level
 	   (round 2026-09-04). */
@@ -961,52 +918,52 @@ struct vtable_DreamSys{
 	   DreamSys__TryInstantTeleportLink right after unk_0x4C->methods->slot0xE8, as (this,
 	   &local) using that same output buffer (round 2026-09-02). Address
 	   0x80057384 is outside this unit/runner's range; still INCLUDE_ASM. */
-	void (*BaseObjO__SetVec14)(DreamSys *this, void *arg1);
+	void (*Actor__SetTranslation)(DreamSys *this, void *arg1);
 	/* Resolved via tools/classtable.py DREAMSYS_METHODS (+0x0BC). Called by
 	   DreamSys__ApplyRelativeOffset and DreamSys__TickDrift with a DreamSysVec3* second argument
 	   (round 2026-08-30-d). */
-	void (*BaseObjO__AddVec14)(DreamSys *this, DreamSysVec3 *arg1);
-	/* Called by DreamSys__ApplyOffsetSlotAndNotify (this unit's own helper, invoked by its own
+	void (*Actor__AddTranslation)(DreamSys *this, DreamSysVec3 *arg1);
+	/* Called by Actor__MoveAlongLocalAxis (this unit's own helper, invoked by its own
 	   +0x0C8/+0x0CC slots) as (this, &D_8008ABA4) -- resolves to
-	   BaseObjO__ApplyRotatedVec14, out of this unit/runner's range (round 2026-09-04). */
-	void (*BaseObjO__ApplyRotatedVec14)(DreamSys *this, void *arg1);
-	/* Read (not called) by this unit's own +0x0D0 slot (DreamSys__DispatchOffsetSlotC4) and
-	   forwarded as a raw callback value to DreamSys__ApplyOffsetOrFindNearby -- resolves to
-	   BaseObjO__func_5748c, out of this unit/runner's range (round 2026-09-04). */
-	void (*BaseObjO__func_5748c)(DreamSys *this, s32 val, void *extra);
+	   Actor__AddLocalTranslation, out of this unit/runner's range (round 2026-09-04). */
+	void (*Actor__AddLocalTranslation)(DreamSys *this, void *arg1);
+	/* Read (not called) by this unit's own +0x0D0 slot (Actor__MoveLocalZOrFindLink) and
+	   forwarded as a raw callback value to Actor__MoveOrFindNearbyLink -- resolves to
+	   Actor__MoveLocalZ, out of this unit/runner's range (round 2026-09-04). */
+	void (*Actor__MoveLocalZ)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; forwards (val, extra) to
-	   DreamSys__ApplyOffsetSlotAndNotify(this, &D_8008ABA4[0], val, extra, 7)
+	   Actor__MoveAlongLocalAxis(this, &D_8008ABA4[0], val, extra, 7)
 	   (round 2026-09-04). */
-	void (*DreamSys__ApplyOffsetSlot0)(DreamSys *this, s32 val, void *extra);
+	void (*Actor__MoveLocalX)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; forwards (val, extra) to
-	   DreamSys__ApplyOffsetSlotAndNotify(this, &D_8008ABA4[1], val, extra, 8)
+	   Actor__MoveAlongLocalAxis(this, &D_8008ABA4[1], val, extra, 8)
 	   (round 2026-09-04). */
-	void (*DreamSys__ApplyOffsetSlot1)(DreamSys *this, s32 val, void *extra);
+	void (*Actor__MoveLocalY)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; reads its NEIGHBOUR slot +0x0C4
-	   (BaseObjO__func_5748c) as a raw callback value and forwards it, with its
-	   own two arguments, to DreamSys__ApplyOffsetOrFindNearby (round 2026-09-04). */
-	void (*DreamSys__DispatchOffsetSlotC4)(DreamSys *this, s32 val, void *extra);
+	   (Actor__MoveLocalZ) as a raw callback value and forwards it, with its
+	   own two arguments, to Actor__MoveOrFindNearbyLink (round 2026-09-04). */
+	void (*Actor__MoveLocalZOrFindLink)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; reads its NEIGHBOUR slot +0x0C8
-	   (DreamSys__ApplyOffsetSlot0, self-referential) as a raw callback value and
-	   forwards it, with its own two arguments, to DreamSys__ApplyOffsetOrFindNearby
+	   (Actor__MoveLocalX, self-referential) as a raw callback value and
+	   forwards it, with its own two arguments, to Actor__MoveOrFindNearbyLink
 	   (round 2026-09-04). */
-	void (*DreamSys__DispatchOffsetSlot0)(DreamSys *this, s32 val, void *extra);
+	void (*Actor__MoveLocalXOrFindLink)(DreamSys *this, s32 val, void *extra);
 	/* This function's OWN slot; empty stub `{ }` (round 2026-09-04). */
-	void (*DreamSys__NoOpSlotD8)(DreamSys *this);
+	void (*Actor__NoOpSlotD8)(DreamSys *this);
 	u32 unknown_functions_0xdc[1];
 	/* This function's OWN slot; resolved via tools/classtable.py
 	   (round 2026-09-02). */
 	void (*LinkWall)(DreamSys *this, void *arg1, s32 arg2);
 	/* This function's OWN slot; a single `sh a1, 0x48(a0)` store
 	   (`this->lastOffsetValue = val`) (round 2026-09-04). */
-	void (*DreamSys__SetLastOffsetValue)(DreamSys *this, s16 val);
+	void (*Actor__SetLastOffsetValue)(DreamSys *this, s16 val);
 	/* This unit's own no-op stub (`DreamSys__NoOpSlotE8Default`, `{ }`). Called by
 	   DreamSys__WallLink as (this) -- the callee ignores its argument
 	   (round 2026-09-02). */
 	void (*DreamSys__NoOpSlotE8Default)(DreamSys *this);
 	/* This function's OWN slot; a single `sw a1, 0x54(a0)` store
 	   (`this->pendingExtra = extra`) (round 2026-09-04). */
-	void (*DreamSys__SetPendingExtra)(DreamSys *this, void *extra);
+	void (*Actor__SetPendingExtra)(DreamSys *this, void *extra);
 	u32 unknown_functions_0xf0[2];
 	/* This function's OWN slot (+0x0F8, resolved via
 	   tools/classtable.py DREAMSYS_METHODS). A straight-line initializer:

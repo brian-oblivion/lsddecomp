@@ -1,58 +1,59 @@
 /*
  * class_3bb8c_p -- vram 0x800574C4..0x80057DBC, carved round 17
- * (2026-09-04), immediately behind class_3bb8c_o. Two DreamSys-method
- * families plus one unrelated constructor:
+ * (2026-09-04), immediately behind class_3bb8c_o. Actor methods
+ * (include/Actor.h; before round 82 they carried DreamSys's name, but they
+ * are occupants of the BASE table gActorMethods, +0x0C8..+0x0EC) plus one
+ * unrelated constructor:
  *
- *  - A local-offset family (DreamSys__ApplyOffsetSlot0/1, the shared
- *    DreamSys__ApplyOffsetSlotAndNotify helper, and the
- *    DreamSys__DispatchOffsetSlot0/SlotC4 + DreamSys__ApplyOffsetOrFindNearby
- *    pair): writes one component of a shared local-space offset buffer,
- *    applies it as a rotated positional nudge via the inherited
- *    BaseObjO__ApplyRotatedVec14, resets that component, and falls back to
- *    a grid-based nearby-link search (DreamSys__FindNearbyLink,
- *    DreamSys__BuildLinkQueries, DreamSys__ScanLinkCandidates,
- *    DreamSys__ScanGridWindow, DreamSys__AcceptGridElem) when the offset
- *    alone did not attach to a link (DreamSys::unk_0x28).
- *  - A link-command dispatch pair (DreamSys__DispatchLinkCommand[AndTryAttach])
- *    forwarding through the inherited Class6B5CC base table and, for a
- *    count in [5,9), the object's own inherited TryAttachNearby slot.
- *  - DreamSys__SetLastOffsetValue/SetPendingExtra/GetBaseMethods: plain
+ *  - The local-axis moves (Actor__MoveLocalX/Y, the shared
+ *    Actor__MoveAlongLocalAxis, and Actor__MoveLocalZOrFindLink /
+ *    MoveLocalXOrFindLink through Actor__MoveOrFindNearbyLink): write one
+ *    component of the local move vector D_8008ABA4, apply it through
+ *    addLocalTranslation, clear it, and fall back to a grid-based
+ *    nearby-link search (Actor__FindNearbyLink, Actor__BuildLinkQueries,
+ *    Actor__ScanLinkCandidates, Actor__ScanGridWindow, AcceptGridElem) when
+ *    the move alone did not set linkTarget.
+ *  - The link-command pair (Actor__OnActorLinkCommand,
+ *    Actor__OnClass86AA0LinkCommand) forwarding through the Class6B5CC base
+ *    table and, for an event in [5,9), the object's own tryAttachNearby.
+ *  - Actor__SetLastOffsetValue/SetPendingExtra, GetActorMethods: plain
  *    setters/getter.
  *  - New_D800879C4 + D800879C4__D800879C4: allocator and constructor for
  *    an unrelated, still-uncarved sibling class (table D_800879C4, in
  *    class_3bb8c_q.s).
  *
- * No stalls: DreamSys__BuildLinkQueries, the last one, matched in round 75
+ * No stalls: Actor__BuildLinkQueries, the last one, matched in round 75
  * (2-argument method call, see its report). No switch jump table in this slice, and no gp_rel/addiu_at/
  * nop_mflo_mfhi anywhere in it (all three are resolved toolchain
  * constructs anyway, CLAUDE.md "Open toolchain blockers").
  */
 #include "common.h"
+#include "Actor.h"
 #include "DreamSys.h"
 #include "Sprite.h"
 
-/* Two-element s16 array -- DreamSys__ApplyOffsetSlot0 and DreamSys__ApplyOffsetSlot1 each write one
+/* Two-element s16 array -- Actor__MoveLocalX and Actor__MoveLocalY each write one
  * element (index 0 and 1 respectively) via a plain `sh` through a pointer
  * computed as %hi/%lo of `D_8008ABA4 + 2*index`, so splat's single-word
  * dlabel is really this 2-element array, not a lone s32 (round 2026-09-04).
  * Not referenced anywhere else in the repo (checked with grep), so this is
  * this unit's own reading -- kept local rather than added to a shared
- * header. */
+ * header. It is the x and y of Actor's local move vector: the z is the next
+ * halfword, D_8008ABA8, which class_3bb8c_o's Actor__MoveLocalZ writes, and
+ * Class6B5CC__RotateLocalVector reads src[0..2]. */
 extern s16 D_8008ABA4[2];
 
-void DreamSys__ApplyOffsetSlotAndNotify(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32 count);
-
-void DreamSys__ApplyOffsetSlot0(DreamSys *self, s32 val, void *extra) {
-    DreamSys__ApplyOffsetSlotAndNotify(self, &D_8008ABA4[0], val, extra, 7);
+void Actor__MoveLocalX(Actor *self, s32 val, void *notify) {
+    Actor__MoveAlongLocalAxis(self, &D_8008ABA4[0], val, notify, 7);
 }
 
-void DreamSys__ApplyOffsetSlot1(DreamSys *self, s32 val, void *extra) {
-    DreamSys__ApplyOffsetSlotAndNotify(self, &D_8008ABA4[1], val, extra, 8);
+void Actor__MoveLocalY(Actor *self, s32 val, void *notify) {
+    Actor__MoveAlongLocalAxis(self, &D_8008ABA4[1], val, notify, 8);
 }
 
 /* `count` is `volatile` so it stays a stack reference reloaded at its one use
  * site, rather than being promoted to a callee-saved register across the
- * intervening BaseObjO__ApplyRotatedVec14 call -- confirmed with a standalone reproducer
+ * intervening Actor__AddLocalTranslation call -- confirmed with a standalone reproducer
  * through the pinned toolchain: dropping `volatile` grows the frame by one
  * callee-saved register (s3) and changes 0x1c/0x20 byte offsets throughout,
  * which is not what retail does (round 2026-09-04).
@@ -65,44 +66,40 @@ void DreamSys__ApplyOffsetSlot1(DreamSys *self, s32 val, void *extra) {
  * retail's callee-saved register assignment for `slot`/`extra`
  * (confirmed with a standalone reproducer: inline truncation swaps which
  * of s0/s1 holds which, round 2026-09-04). */
-void DreamSys__ApplyOffsetSlotAndNotify(DreamSys *self, s16 *slot, s32 val, void *extra, volatile s32 count) {
+void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, volatile s32 event) {
     s16 val16 = (s16) val;
-    *slot = val16;
+    *axis = val16;
     self->lastOffsetValue = val16;
-    self->vt->BaseObjO__ApplyRotatedVec14(self, &D_8008ABA4[0]);
-    *slot = 0;
-    if (extra != NULL) {
-        self->vt->DreamSys__NotifyLinkAttempt(self, count);
+    self->methods->addLocalTranslation(self, &D_8008ABA4[0]);
+    *axis = 0;
+    if (notify != NULL) {
+        self->methods->notifyIfUnk20Active(self, event);
     }
 }
 
-void DreamSys__ApplyOffsetOrFindNearby(DreamSys *self, void (*callback)(DreamSys *, s32, void *), s32 val, void *extra);
-
-void DreamSys__DispatchOffsetSlotC4(DreamSys *self, s32 val, void *extra) {
-    DreamSys__ApplyOffsetOrFindNearby(self, self->vt->BaseObjO__func_5748c, val, extra);
+void Actor__MoveLocalZOrFindLink(Actor *self, s32 val, void *notify) {
+    Actor__MoveOrFindNearbyLink(self, self->methods->moveLocalZ, val, notify);
 }
 
-void DreamSys__DispatchOffsetSlot0(DreamSys *self, s32 val, void *extra) {
-    DreamSys__ApplyOffsetOrFindNearby(self, self->vt->DreamSys__ApplyOffsetSlot0, val, extra);
+void Actor__MoveLocalXOrFindLink(Actor *self, s32 val, void *notify) {
+    Actor__MoveOrFindNearbyLink(self, self->methods->moveLocalX, val, notify);
 }
 
-void DreamSys__NoOpSlotD8(void) {
+void Actor__NoOpSlotD8(void) {
 }
 
-s32 DreamSys__FindNearbyLink(DreamSys *self);
-
-void DreamSys__ApplyOffsetOrFindNearby(DreamSys *self, void (*callback)(DreamSys *, s32, void *), s32 val, void *extra) {
+void Actor__MoveOrFindNearbyLink(Actor *self, void (*move)(Actor *, s32, void *), s32 val, void *notify) {
     self->linkTarget = NULL;
-    callback(self, val, extra);
+    move(self, val, notify);
     if (self->linkTarget == NULL) {
-        DreamSys__FindNearbyLink(self);
+        Actor__FindNearbyLink(self);
     }
 }
 
 /* A 12-byte {s16,s16,s32,s32} query/result record. Built by this unit's
- * own DreamSys__BuildLinkQueries into caller-supplied buffers, and
- * walked as an array (stride 0xC) by DreamSys__ScanLinkCandidates. Describes a
- * rectangular window of the grid DreamSys__ScanGridWindow walks: `startCol`/
+ * own Actor__BuildLinkQueries into caller-supplied buffers, and
+ * walked as an array (stride 0xC) by Actor__ScanLinkCandidates. Describes a
+ * rectangular window of the grid Actor__ScanGridWindow walks: `startCol`/
  * `startRow` is the window's origin bucket, `numCols`/`numRows` its extent --
  * confirmed directly from that function's own body (round 57 naming pass). */
 typedef struct GridQuery {
@@ -116,22 +113,23 @@ typedef struct GridQuery {
  * "self-typed next pointer" idiom already established for `EntryChildObj`
  * in include/class_3bb8c.h (an UNRELATED class, per this round's own
  * research -- convergent shape, not a shared type). Walked by
- * DreamSys__ScanGridWindow; matched against with DreamSys__AcceptGridElem (already matched,
+ * Actor__ScanGridWindow; matched against with AcceptGridElem (already matched,
  * this unit, below). */
 typedef struct GridElem {
     u8 pad00[0x38];
     struct GridElem *next;
 } GridElem;
 
-/* self->linkMgr's pointee dereferences to one of these via its own
- * `+0x4` field (a s16 flag at +0x2C, read by DreamSys__ScanLinkCandidates, and a second
- * s16 at +0x32, read by DreamSys__BuildLinkQueries) and, when treated as
- * DreamSys__ScanGridWindow's 5th argument, a grid-array base pointer at `+0x10`.
+/* self->grid's pointee (DreamSys.h's DreamSysUnk4CObj view of the grid
+ * manager) dereferences to one of these via its own
+ * `+0x4` field (a s16 flag at +0x2C, read by Actor__ScanLinkCandidates, and a second
+ * s16 at +0x32, read by Actor__BuildLinkQueries) and, when treated as
+ * Actor__ScanGridWindow's 5th argument, a grid-array base pointer at `+0x10`.
  * Multiple independent call sites agree on this shape; kept opaque
  * beyond the fields actually read. */
 typedef struct GridArrElemInner {
     u8 pad00[0x2C];
-    /* Gates whether DreamSys__ScanLinkCandidates processes this array
+    /* Gates whether Actor__ScanLinkCandidates processes this array
      * entry at all (`if (elem->info->enabled != 0)`) -- confirmed
      * directly from that function's own body. */
     s16 enabled;
@@ -144,16 +142,16 @@ typedef struct GridArrElem {
      * unit's matched code. */
     GridArrElemInner *info;
     u8 pad08[0x10 - 0x8];
-    /* The grid-array base pointer DreamSys__ScanGridWindow indexes as
+    /* The grid-array base pointer Actor__ScanGridWindow indexes as
      * `(GridElem **)` (confirmed directly from that function's own
      * body). */
     GridElem **buckets;
 } GridArrElem;
 
 /* Output buffer filled in by DreamSysUnk4CMethods::queryLinkAtPos (see
- * include/DreamSys.h) and read back by this unit's own DreamSys__BuildLinkQueries.
+ * include/DreamSys.h) and read back by this unit's own Actor__BuildLinkQueries.
  * Only the three fields actually touched are named. `queryCol`/`queryRow`
- * feed straight into GridQuery::startCol/startRow (DreamSys__BuildLinkQueries,
+ * feed straight into GridQuery::startCol/startRow (Actor__BuildLinkQueries,
  * matched round 75; round 57 naming pass). */
 typedef struct LinkQueryBuf {
     u8 pad00[0x2];
@@ -164,11 +162,11 @@ typedef struct LinkQueryBuf {
     u8 pad28[0x30 - 0x28];
 } LinkQueryBuf;
 
-void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2);
-s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4);
-void *DreamSys__ScanLinkCandidates(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2);
+void *AcceptGridElem(void *arg0, void *arg1, void *arg2);
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4);
+void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2);
 
-s32 DreamSys__FindNearbyLink(DreamSys *self) {
+s32 Actor__FindNearbyLink(Actor *self) {
     LinkQueryBuf sp18;
     GridQuery sp48[3];
     /* No known field needs this gap; empirically required to reproduce
@@ -176,29 +174,29 @@ s32 DreamSys__FindNearbyLink(DreamSys *self) {
      * see this function's match report). */
     u8 pad48Tail[8];
     GridArrElem *sp78[3];
-    DreamSysVec3 sp88;
+    Vec3_d294 sp88;
 
-    if (self->linkMgr != NULL) {
-        void *pos = (u8 *) self->unk_0x14 + 0x18;
+    if (self->grid != NULL) {
+        void *pos = &self->coord2->tx;
 
-        if (self->linkMgr->methods->queryLinkAtPos(self->linkMgr, &sp18, pos) == 0) {
-            s32 count = DreamSys__BuildLinkQueries(self, sp48, sp78, &sp18, 1);
-            void *result = DreamSys__ScanLinkCandidates(self, &sp88, pos, count, sp48, sp78);
+        if (((DreamSysUnk4CObj *)self->grid)->methods->queryLinkAtPos((DreamSysUnk4CObj *)self->grid, &sp18, pos) == 0) {
+            s32 count = Actor__BuildLinkQueries(self, sp48, sp78, &sp18, 1);
+            void *result = Actor__ScanLinkCandidates(self, &sp88, pos, count, sp48, sp78);
 
             self->linkTarget = result;
             if (result != NULL) {
-                self->vt->BaseObjO__AddVec14(self, &sp88);
-                self->vt->DreamSys__NotifyLinkAttempt(self, -1);
+                self->methods->addTranslation(self, &sp88);
+                self->methods->notifyIfUnk20Active(self, -1);
                 return 1;
             }
-            self->vt->DreamSys__NotifyLinkAttempt(self, -2);
+            self->methods->notifyIfUnk20Active(self, -2);
             return 0;
         }
     }
     return 0;
 }
 
-s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4) {
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, GridArrElem **arr2, LinkQueryBuf *arg3, s32 arg4) {
     s32 f2 = arg3->queryCol;
     s32 f3 = arg3->queryRow;
     s32 numCols;
@@ -225,7 +223,7 @@ s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **ar
         arr1[0].numRows = numRows;
         src = arg3->source;
         arr2[0] = src;
-        unk4C = self->linkMgr;
+        unk4C = (DreamSysUnk4CObj *)self->grid;
         unk68 = unk4C->unk_0x68;
         if (unk68->unk_0x4 != idx) {
             return 1;
@@ -270,22 +268,22 @@ s32 DreamSys__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **ar
     return 1;
 }
 
-void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source);
+void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source);
 
 /* Walks `count` entries of `arr1` (a `GridQuery[]`, stride 0xC) paired
  * element-for-element with `arr2` (a `GridArrElem *[]`, stride 4),
  * skipping any entry whose `GridArrElem` doesn't have its `enabled` flag
- * set, and calling `DreamSys__ScanGridWindow` on the rest; returns the first
+ * set, and calling `Actor__ScanGridWindow` on the rest; returns the first
  * non-NULL result, or NULL if every entry was skipped or came back empty
  * (round 2026-09-04). */
-void *DreamSys__ScanLinkCandidates(DreamSys *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2) {
+void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1, GridArrElem **arr2) {
     s32 i;
 
     for (i = 0; i < count;) {
         GridArrElem *elem = *arr2;
         i++;
         if (elem->info->enabled != 0) {
-            void *result = DreamSys__ScanGridWindow(self, arg1, arg2, arr1, elem);
+            void *result = Actor__ScanGridWindow(self, arg1, arg2, arr1, elem);
             if (result != NULL) {
                 return result;
             }
@@ -300,13 +298,13 @@ void *DreamSys__ScanLinkCandidates(DreamSys *self, void *arg1, void *arg2, s32 c
  * at `source->buckets`, `query->numRows` rows by `query->numCols` columns,
  * starting at row `query->startRow`, column `query->startCol` (each row is
  * 0x50 bytes = 20 bucket-head pointers; each column step is one bucket-head
- * pointer, 4 bytes). For each bucket, tries `DreamSys__AcceptGridElem` against the
+ * pointer, 4 bytes). For each bucket, tries `AcceptGridElem` against the
  * head first, then each linked element in turn (`->next`), returning the
- * first one `DreamSys__AcceptGridElem` accepts (non-NULL); NULL if the whole window
+ * first one `AcceptGridElem` accepts (non-NULL); NULL if the whole window
  * comes up empty. `self` (this function's own first argument) is read
  * from `a0` in the disassembly but never touched by the body -- present
  * only to match its caller's calling convention (round 2026-09-04). */
-void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source) {
+void *Actor__ScanGridWindow(Actor *self, void *arg1, void *arg2, GridQuery *query, GridArrElem *source) {
     s32 row, col;
     GridElem **bucket;
 
@@ -315,11 +313,11 @@ void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery
         for (col = 0; col < query->numCols; col++) {
             GridElem *node;
 
-            if (DreamSys__AcceptGridElem(*bucket, arg1, arg2) != NULL) {
+            if (AcceptGridElem(*bucket, arg1, arg2) != NULL) {
                 return *bucket;
             }
             for (node = (*bucket)->next; node != NULL; node = node->next) {
-                if (DreamSys__AcceptGridElem(node, arg1, arg2) != NULL) {
+                if (AcceptGridElem(node, arg1, arg2) != NULL) {
                     return node;
                 }
             }
@@ -338,7 +336,7 @@ void *DreamSys__ScanGridWindow(DreamSys *self, void *arg1, void *arg2, GridQuery
  * visible; verified byte-exact. */
 extern s32 func_8001E7BC(void *self, void *out, void *target);
 
-void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2) {
+void *AcceptGridElem(void *arg0, void *arg1, void *arg2) {
     if (arg0 != NULL) {
         if (func_8001E7BC(arg0, arg1, arg2) != 0) {
             return arg0;
@@ -348,39 +346,36 @@ void *DreamSys__AcceptGridElem(void *arg0, void *arg1, void *arg2) {
 }
 
 
-void DreamSys__DispatchLinkCommandAndTryAttach(DreamSys *self, void *arg1, s32 count) {
-    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, arg1, count);
-    if (count < 9) {
-        if (count >= 5) {
-            self->vt->tryAttachNearby(self, arg1, count);
+/* tryAttachNearby is called with (self, sender, event): Class6B5CC's slot
+ * declares self alone (its occupant's second parameter arrives in the
+ * caller's untouched $a1), and here both are reloaded after the base call,
+ * so the call spells them out through a cast. */
+void Actor__OnActorLinkCommand(Actor *self, void *sender, s32 event) {
+    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, sender, event);
+    if (event < 9) {
+        if (event >= 5) {
+            ((void (*)(Actor *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
         }
     }
 }
 
-void DreamSys__DispatchLinkCommand(DreamSys *self, void *arg1, s32 count) {
-    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, arg1, count);
+void Actor__OnClass86AA0LinkCommand(Actor *self, void *sender, s32 event) {
+    GetClass6B5CCMethods()->dispatchLinkCommand((Class6B5CC *)self, sender, event);
 }
 
-void DreamSys__SetLastOffsetValue(DreamSys *self, s16 val) {
+void Actor__SetLastOffsetValue(Actor *self, s16 val) {
     self->lastOffsetValue = val;
 }
 
-void DreamSys__NoOpSlotE8(void) {
+void Actor__NoOpSlotE8(void) {
 }
 
-void DreamSys__SetPendingExtra(DreamSys *self, void *extra) {
+void Actor__SetPendingExtra(Actor *self, s32 extra) {
     self->pendingExtra = extra;
 }
 
-/* The shared intermediate base-class table -- see include/DreamSys.h's
- * `DreamSysBaseMethods` comment and include/code_55dd4.h's own independent
- * view (`D800878D4Methods`) of the SAME table. This unit's own extern,
- * typed to match the return type `DreamSys__GetBaseMethods` already carried in
- * include/DreamSys.h (round 2026-09-04). */
-extern DreamSysBaseMethods D_800878D4;
-
-DreamSysBaseMethods *DreamSys__GetBaseMethods(void) {
-    return &D_800878D4;
+ActorMethods *GetActorMethods(void) {
+    return &gActorMethods;
 }
 
 extern void *BMemPMgrAlloc(s32 size);

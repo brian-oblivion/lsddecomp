@@ -42,7 +42,7 @@ What broke the tie is the slot, not this function. `Class866E8__Enable` occupies
 `+0x0EC` of `D_800866E8`, and a cross-table survey of that offset
 (`tools/classtable.py` over all 60 tables) finds five distinct occupants —
 `Obj86B60__FindPrevFreeSlot` (the base implementation, shared by four separate class
-tables), `Class6E99C__PopPosition`, `Class876FC__Update`, `DreamSys__SetPendingExtra` and this one.
+tables), `Class6E99C__PopPosition`, `Class876FC__Update`, `Actor__SetPendingExtra` and this one.
 `Obj86B60__FindPrevFreeSlot`'s body ends in a bare `jr $ra` after a `jalr`, materializing
 no return value on either of its two paths. A base implementation that
 returns nothing is evidence the SLOT is `void`, so an override asserting

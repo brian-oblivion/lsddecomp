@@ -46,4 +46,4 @@ before nesting.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__TickCallbackA` (was `func_80066150`), tier B. Occupies +0x118, the callback SelectTickCallback installs for 'A' (InitDefaults' default). Calls slotC4 (BaseObjO__func_5748c) with (-0x1E, 0), and if unk64 == 1 and mainPart is set, mainPart->slot88(6) (BaseObjO__func_571f8). Neither callee has a purpose name yet, hence B.
+- `Class65650__TickCallbackA` (was `func_80066150`), tier B. Occupies +0x118, the callback SelectTickCallback installs for 'A' (InitDefaults' default). Calls slotC4 (Actor__MoveLocalZ) with (-0x1E, 0), and if unk64 == 1 and mainPart is set, mainPart->slot88(6) (Actor__NotifyMove). Neither callee has a purpose name yet, hence B.

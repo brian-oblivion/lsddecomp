@@ -125,7 +125,7 @@ Round 70 (alpha). `func_80056640` -> `Class876FC__UpdateByKind`, **tier B**.
 
 Only caller is `Class876FC__Update`, which sits in gClass876FCMethods's slot +0x0EC
 (asm/data/76DC8.data.s, the table's last word) and increments `tick` (+0x024)
-before the call. Body: owner's slotB8 (BaseObjO__SetVec14 in gClass876FCMethods,
+before the call. Body: owner's slotB8 (Actor__SetTranslation in gClass876FCMethods,
 i.e. set translation) with pos + offset + (D_8008ACAC's +0x018 word now -
 gTrackedYSnapshot); then kind 0 -> Class876FC__DriftModelChildren, 2 ->
 NoOpIgnoreArgs, 3 -> LinkOwnerObj__RandomizeLinks. "Update" rests on the

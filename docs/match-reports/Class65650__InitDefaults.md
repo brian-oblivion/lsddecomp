@@ -18,7 +18,7 @@ void Class65650__InitDefaults(Class65650 *self)
 {
     D800878D4Methods *base;
 
-    base = DreamSys__GetBaseMethods();
+    base = GetActorMethods();
     base->slot60(self, 0);
     self->methods->slotF0(self, 1);
     self->methods->slotE4(self, 0x12C);
@@ -66,4 +66,4 @@ slots were named from the call sites' own argument registers.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__InitDefaults` (was `func_80065830`), tier A. Occupies +0x040, overriding BaseObjO__InitDefaults. Body sets defaults through its own slots: base SetDisplay(0), setUnk64(1), setLastOffsetValue(0x12C) (the 0x12C BaseObjO__InitDefaults writes too), disableTickCallback, selectTickCallback('A'), stopTod, setTod(0), then links mainPart's model to itself.
+- `Class65650__InitDefaults` (was `func_80065830`), tier A. Occupies +0x040, overriding Actor__Reset. Body sets defaults through its own slots: base SetDisplay(0), setUnk64(1), setLastOffsetValue(0x12C) (the 0x12C Actor__Reset writes too), disableTickCallback, selectTickCallback('A'), stopTod, setTod(0), then links mainPart's model to itself.

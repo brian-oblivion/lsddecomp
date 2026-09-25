@@ -324,7 +324,7 @@ struct UnkArgObj_3ac78 {
  * Generic "object with a vtable pointer at offset 0" view, used only by
  * Class866E8__OnCommand to read the low byte of another object's vtable header
  * word as a type tag (0x34 here). Several unrelated class tables share
- * that low byte (D_800878D4 and DREAMSYS_METHODS among them, per
+ * that low byte (gActorMethods and DREAMSYS_METHODS among them, per
  * docs/research/class-framework.md), so this reads as a family/base-class
  * check, not an exact-class check. True type of the pointed-to object is
  * unconfirmed; only the one byte this function reads is modeled here.

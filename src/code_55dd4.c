@@ -1,6 +1,6 @@
 /*
- * Class65650 (include/code_55dd4.h): a BaseObjO subclass that owns one
- * BaseObjO "part" per object of a TOD animation and plays TODs over them.
+ * Class65650 (include/code_55dd4.h): a Actor subclass that owns one
+ * Actor "part" per object of a TOD animation and plays TODs over them.
  * Method table gClass65650Methods; Entity derives from it.
  *
  * - construction: modelData (+0x5C) is borrowed from the ctor's arg1 or made
@@ -37,10 +37,10 @@ void *New_Class65650(void *arg1, void *arg2)
 
 Class65650 *Class65650__Class65650(Class65650 *self, void *arg1, void *arg2)
 {
-    D800878D4Methods *base;
+    ActorMethods *base;
 
-    base = DreamSys__GetBaseMethods();
-    if (base->ctor(self) == NULL) {
+    base = GetActorMethods();
+    if (base->ctor((Actor *)self) == NULL) {
         return NULL;
     }
     self->methods = Get_vtable_Class65650();
@@ -50,8 +50,8 @@ Class65650 *Class65650__Class65650(Class65650 *self, void *arg1, void *arg2)
     self->parts = NULL;
     self->peer = 0;
     if (self->methods->setupModelData(self, arg1) != 0) {
-        base = DreamSys__GetBaseMethods();
-        base->dtor(self);
+        base = GetActorMethods();
+        base->finalize((Actor *)self);
         return NULL;
     }
     self->methods->linkCompanion(self, self->modelData);
@@ -62,15 +62,15 @@ Class65650 *Class65650__Class65650(Class65650 *self, void *arg1, void *arg2)
 void Class65650__Destructor(Class65650 *self)
 {
     self->methods->teardownModelData(self);
-    DreamSys__GetBaseMethods()->dtor(self);
+    GetActorMethods()->finalize((Actor *)self);
 }
 
 void Class65650__OnNotify(Class65650 *self, TagCheckArg *arg1, s32 arg2)
 {
-    D800878D4Methods *base;
+    ActorMethods *base;
 
-    base = DreamSys__GetBaseMethods();
-    base->onNotify(self, arg1, arg2);
+    base = GetActorMethods();
+    base->onNotify((Actor *)self, arg1, arg2);
     if (arg1->methods->header == MODEL_DATA_CLASS_HEADER && arg2 == 1 && self->ownsModelData == 0) {
         self->methods->release(self);
     }
@@ -78,10 +78,10 @@ void Class65650__OnNotify(Class65650 *self, TagCheckArg *arg1, s32 arg2)
 
 void Class65650__InitDefaults(Class65650 *self)
 {
-    D800878D4Methods *base;
+    ActorMethods *base;
 
-    base = DreamSys__GetBaseMethods();
-    base->setDisplay(self, 0);
+    base = GetActorMethods();
+    base->setDisplay((Actor *)self, 0);
     self->methods->setUnk64(self, 1);
     self->methods->setLastOffsetValue(self, 0x12C);
     self->methods->disableTickCallback(self);
@@ -95,11 +95,11 @@ void Class65650__InitDefaults(Class65650 *self)
 
 void Class65650__AttachToParent(Class65650 *self, Class65650 *other, void *arg2, void *arg3, void *arg4)
 {
-    D800878D4Methods *base;
+    ActorMethods *base;
 
     if (self->parent == 0) {
-        base = DreamSys__GetBaseMethods();
-        base->attachToParent(self, arg3, arg4);
+        base = GetActorMethods();
+        base->attachToParent((Actor *)self, arg3, arg4);
         if (arg2 != NULL && self->companion2 == NULL) {
             self->methods->linkCompanion(self, arg2);
         }
@@ -114,7 +114,7 @@ void Class65650__DetachFromParent(Class65650 *self)
         if (self->companion2 != NULL) {
             self->methods->unlinkCompanion(self, self->companion2);
         }
-        DreamSys__GetBaseMethods()->detachFromParent(self);
+        GetActorMethods()->detachFromParent((Actor *)self);
     }
 }
 
@@ -139,7 +139,7 @@ void Class65650__SetLightMode(Class65650 *self, void *arg)
     for (i = 0; i < self->partCount; i++, p++) {
         (*p)->methods->setLightMode(*p, arg);
     }
-    DreamSys__GetBaseMethods()->setLightMode(self, arg);
+    GetActorMethods()->setLightMode((Actor *)self, (u32)arg);
 }
 
 void Class65650__OnClass6EF50Notify(Class65650 *self, void *arg1, s32 val)
@@ -270,7 +270,7 @@ s32 Class65650__CreateParts(Class65650 *self)
     self->partCount = 0;
     if (count != 0) {
         do {
-            if ((*p++ = New_BaseObjO()) == NULL) {
+            if ((*p++ = New_Actor()) == NULL) {
                 goto fail;
             }
             self->partCount++;

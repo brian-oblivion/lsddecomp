@@ -18,7 +18,7 @@ void Class65650__OnNotify(Class65650 *self, TagCheckArg *arg1, s32 arg2)
 {
     D800878D4Methods *base;
 
-    base = DreamSys__GetBaseMethods();
+    base = GetActorMethods();
     base->slot38(self, arg1, arg2);
     if (arg1->tagged->tag == 0x5F03 && arg2 == 1 && self->unk60 == 0) {
         self->methods->slot04(self);
