@@ -43,3 +43,7 @@ void *New_Tod(s32 arg0) {
 ## Naming
 
 - **New_Tod**, tier A. Allocator for D_8006F240; the packet fields it decodes (byte value, 4-bit type/sub-type nibbles, byte length) match include/code_55dd4.h's own description of TOD packets (attribute, coordinate, model-id, parent), and its array-of-these subclass is externally named TodSet.
+
+## Track 4 (2026-09-26, round 86, charlie)
+
+Now `Tod *New_Tod(Src6F240 *src)` (include/Tod.h): its one caller, TodSet__BuildTods, passes the address of a descriptor whose first word is the buffer Tod__Tod adopts, and stores the result as an object; the caller casts both (`(Src6F240 *)&req`, `(DataSrc33808 *)`), no code. Bytes unchanged.

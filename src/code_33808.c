@@ -47,13 +47,15 @@
 #include "Class6D430.h"
 #include "TimBlockSrc.h"
 #include "ModelData.h"
+#include "Tod.h"
 
 typedef struct DataSrc33808 DataSrc33808;
 
 /* Unit-local view of this unit's Class6D430 data-source subclasses: the
  * interface plus the extra slots their methods call. Unprototyped where a
- * caller passes no argument. Not ModelData's (D_8006F384): that class is
- * include/ModelData.h (track 4, round 84). */
+ * caller passes no argument. Not ModelData's (D_8006F384) nor Tod's
+ * (D_8006F240): those classes are include/ModelData.h (track 4, round 84)
+ * and include/Tod.h (round 86). */
 typedef struct DataSrc33808Methods {
     CLASS6D430_SLOTS(DataSrc33808, (DataSrc33808 *self));
     /* +0x07C */ s32 (*slot7C)();
@@ -81,7 +83,6 @@ extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
 void *GetLinkResourceMethods(void);
 void *GetTimArraySrcMethods(void);
-void *GetTodMethods(void);
 void *GetBgLayerMethods(void);
 void *GetTriggerWorldMethods(void);
 void *GetTileMapMethods(void);
@@ -623,11 +624,11 @@ void *GetTimArraySrcMethods(void) {
     return D_8006F1C4;
 }
 /* Allocate and construct a D_8006F240 object. */
-void *New_Tod(s32 arg0) {
+Tod *New_Tod(Src6F240 *src) {
     void *obj = BMemPMgrAlloc(0x2C);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTodMethods())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTodMethods())->ctor(obj, src);
         return obj;
     }
     return NULL;
@@ -635,7 +636,7 @@ void *New_Tod(s32 arg0) {
 /* D_8006F240 +0x008: constructor -- the active driver's, then this table;
  * adopt a buffer handed in (size 0) and run its own +0x064, or else request
  * the named file. */
-void Tod__Tod(DataSrc33808 *self, Src6F240 *src) {
+void Tod__Tod(Tod *self, Src6F240 *src) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetTodMethods();
     if (src->buffer != NULL) {
@@ -647,15 +648,13 @@ void Tod__Tod(DataSrc33808 *self, Src6F240 *src) {
     }
 }
 /* D_8006F240 +0x00C: finalize, straight to the active driver's. */
-void Tod__Finalize(Class6D430 *self) {
-    GetActiveDataSourceMethods()->finalize(self);
+void Tod__Finalize(Tod *self) {
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F240 +0x078: slot +0x07C over the buffer past its first two words. */
-u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
-    return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
+u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel) {
+    return self->methods->scanTodPackets(self, out, sel, (u32 *)((u8 *)self->buffer + 8));
 }
-/* Defined below (ROM order); called directly here, not through slot +0x080. */
-u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3);
 
 /* D_8006F240/D_8006F590 +0x07C: walk the packet words after the u16 count
  * at data +2 (from data +8), each decoded by +0x080 into a value, a type, a
@@ -664,7 +663,7 @@ u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *o
  * value up among the ones appended so far when its halfword at +4 matches
  * `*sel` -- keeping its index -- or, without `out`, counts it. The index /
  * count goes back through `sel`; returns the number appended. */
-u8 ScanTodPackets(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
+u8 ScanTodPackets(Tod *self, u8 *out, u32 *sel, u32 *data) {
     u8 value;
     u8 type;
     u8 sub;
@@ -711,7 +710,7 @@ u8 ScanTodPackets(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
 /* D_8006F240/D_8006F590 +0x080: decode one packet word -- the low byte, then
  * the two nibbles at bits 16 and 20, then the top byte -- and return the
  * pointer past it. */
-u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
+u32 *DecodeTodPacketWord(Tod *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
     u32 v = *acc;
 
     *out0 = v;
@@ -720,10 +719,8 @@ u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *o
     *out3 = v >> 24;
     return acc + 1;
 }
-extern s32 D_8006F240[];
-
-void *GetTodMethods(void) {
-    return D_8006F240;
+TodMethods *GetTodMethods(void) {
+    return &D_8006F240;
 }
 /* Allocate and construct a D_8006F2C4 object. */
 void *New_BgLayer(s32 arg0, s32 arg1) {
@@ -1360,7 +1357,7 @@ s32 TodSet__BuildTods(DataSrc33808 *self) {
     p = (DataSrc33808 **)buf->entries;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = New_Tod((s32)&req);
+        *p = (DataSrc33808 *)New_Tod((Src6F240 *)&req);
         if (*p == NULL) {
 while (i != 0) {
  i--;

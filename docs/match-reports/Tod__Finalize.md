@@ -37,3 +37,7 @@ void Tod__Finalize(Class6D430 *self) {
 ## Naming
 
 - **Tod__Finalize**, tier A. Class6D430 finalize override, straight to the active driver's.
+
+## Track 4 (2026-09-26, round 86, charlie)
+
+`self` is now `Tod *` (include/Tod.h), no longer `Class6D430 *`; the call to the active driver's finalize upcasts `(Class6D430 *)self` (a pointer cast, no code). Bytes unchanged.

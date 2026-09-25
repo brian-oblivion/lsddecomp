@@ -46,3 +46,7 @@ First build. The else branch reuses the just-stored table pointer (GCC CSE of `s
 ## Naming
 
 - **Tod__Tod**, tier A. Constructor: adopts a buffer or requests a named file, matching the interface a data source uses for its own resource.
+
+## Track 4 (2026-09-26, round 86, charlie)
+
+`self` is now `Tod *` (include/Tod.h), no longer the unit-local `DataSrc33808 *`; `self->methods = GetTodMethods()` is a `TodMethods *` and `setFlag`/`requestLoadFile` are Class6D430's inherited slots. Bytes unchanged.
