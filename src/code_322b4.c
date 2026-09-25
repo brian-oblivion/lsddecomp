@@ -120,7 +120,13 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042450);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800424A8);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800424E0);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042550);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800425D8);
+/* D_8006EF50 slot +0x040 (reset). */
+void func_800425D8(D_8006EF50Obj *self, s32 a1) {
+    self->unkC = a1;
+    self->unk14 = 0;
+    self->unk10 = 0;
+    self->unk18 = 0;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800425EC);
 /* D_8006EF50 slot +0x048. */
 s32 func_8004264C(D_8006EF50Obj *self) {
