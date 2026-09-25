@@ -95,6 +95,7 @@ extern int GsGetActiveBuff(void);     /* LIBGS.H */
 extern int LoadImage(RECT *rect, u_long *p);        /* LIBGPU.H */
 extern int MoveImage(RECT *rect, int x, int y);     /* LIBGPU.H */
 extern int DrawSync(int mode);                      /* LIBGPU.H */
+extern int StoreImage(RECT *rect, u_long *p);       /* LIBGPU.H */
 extern void *BMemPMgrAlloc(s32 size);
 
 Class6C070Methods *func_80020C4C(void);
@@ -156,7 +157,17 @@ void func_80020970(RECT *dst, Class6C070Rect *src) {
     dst->w = src->w;
     dst->h = src->h;
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800209A0);
+void func_800209A0(Class6C070 *self, u_long *pixels, Class6C070Rect *src) {
+    RECT rect;
+
+    if (self->unk10 == 0 || self->unk2C != 0) {
+        func_80020970(&rect, src);
+        StoreImage(&rect, pixels);
+        if (self->unk2C != 0) {
+            DrawSync(0);
+        }
+    }
+}
 s32 func_80020A1C(Class6C070 *self) {
     return 0;
 }
