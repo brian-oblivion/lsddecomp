@@ -9214,3 +9214,27 @@ Moved verbatim from §3c to meet the word budget after round 81 promoted four id
   Read the report's own earlier stale-symbol write-up before trusting the block to compile as
   literally written: `stalesyms.py` scans report TEXT, so it cannot see what a promoted `.c` body
   needs. (a round 67, `code_179d8_m`)
+
+## Distilled round 82 (2026-09-25)
+
+Moved verbatim from §4 to meet the word budget after round 82 promoted two idioms and three clauses. Both are process rules the matching-runner prompt (PARALLEL-RUNS §5, "Revisit?" and "Stalls") states in full.
+
+- **`funcdiff`'s `insertions N / deletions M` line is the first thing to read on a register-identity
+  claim: 0/0 is consistent with it, anything else says READ THE DIFF for separable defects.** Not a
+  verdict: at equal length an N/N figure can be a false alignment on a repeating loop skeleton
+  (round 63: 26/26 on a zero-insertion input); funcdiff's positional skeleton diffs figure tells the
+  two apart and forces 0/0 when it is zero. `Class6D940__ResolveEntry` carried "pervasive register-allocation
+  residue" for four rounds at 7/7 and held four separable defects, three of them plain C. Even 0/0
+  is NOT the banned-fix category by itself: the same function at 0/0 (54/76) closed on a missing
+  forwarded argument (round 76). Rebuild the preserved body and read the line. (a round 60)
+- **"N words short" and "N/M words match" are DIFFERENT measurements that read identically, and a
+  word count is not a count of DIVERGENCES.** A title must carry LENGTH, RAW WORD-MATCH and WHERE
+  THE FIRST REAL DIFF IS: a body can be the right length and match almost nothing (144/145 compiled,
+  50/145 raw), a 216/217 "one-word residue" scored 465 on `--debug`. Figures at different LENGTHS
+  are not comparable, and a raw match may legitimately DROP as a function gets closer. (a §"Two
+  figures measured at different LENGTHS")
+- **"Exact length" can be arithmetic rather than structure, and only the positional-skeleton figure
+  notices.** `SpuVmAlloc` carried "EXACT LENGTH MATCH 167/167" from round 37 for 28 rounds; round
+  65 found two one-word padding artifacts sitting on a body two words SHORT, summing to the right
+  total. Length is a SUM and cancels; the skeleton figure was 118 at that "exact length". Read the
+  skeleton figure before believing a length claim, exactly as for ins/del. (a round 65)

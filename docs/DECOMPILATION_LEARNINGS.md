@@ -155,6 +155,11 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `i++, p++` to `p++, i++` fixed a loop tail's `addu`/`addiu` pairing, and the inner loop's swap
   closed `Class866E8__DispatchToRectCells` 117/117 after a round-19 permuter bound fired. Try it by
   hand at any loop-tail residue before a search. (round 71)
+- **A loop whose ONLY call sits at the bottom, reached by an entry `j`, and is also the loop's first
+  action is `for (f(); cond; f())` with the call written TWICE**: cross-jump merges the copies into
+  retail's single bottom call. `while (f(), cond)` puts the exit test at the top and is four words
+  short. The operand order inside a for-init (`i = 0, p = base`) is a scheduling lever like the
+  increment's, deciding which setup lands around an intervening `jalr`. (round 82, code_322b4)
 - **One store retail shows at a join may be the SAME store written in both arms**: GCC merges the
   identical stores into the join block, and the label that merge creates stops a following reload
   from hoisting above it. `Class866E8__SplitFootprintSlot` 97/97; the barriers and `do{}while(0)` it had carried were
@@ -237,7 +242,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   wants `u32` (kills a spurious `andi`) or `s32` (gets `slt`, not `sltu`); `andi 0xff` -> `blez` was
   +44 raw words. It can TRADE one defect for another (15/24 either way) — a changed SET of differing
   words means the lever worked and exposed a second defect. (a §"The lever the diagnostic step
-  actually surfaced")
+  actually surfaced") The converse holds for a PARAMETER: an `andi 0xff` at the USE (a call's delay slot) with the prologue's `li` moved is a `u8` parameter (s32/u32: same length, 24/27); an `andi` mid-body before `srl`/`sll` is a `u32` parameter masked by an explicit `x &= 0xFF;` (`u8` drops the mask, `s32` gives `sra`). (round 82, code_322b4)
 - **A struct of all `s8`/`s16` has alignment 2, and alignment is a TWO-WAY lever read off retail's
   instruction WIDTH.** Alignment 2 makes a whole-struct assignment compile to `lwl`/`lwr` +
   `swl`/`swr` and one stray `s32` breaks it (4x); inversely, if retail's tail is `lb`/`sb` where
@@ -431,6 +436,13 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   one merely surviving an intervening call is NOT this. The cause is usually a vtable slot typed
   with too few parameters — `grep -rn 'slotNN' src/` across units first. (a §"Confirmed on this
   game", §"A delay-slot residue writing `$a0`-`$a3`")
+- **A slot `jalr` with `$a0` never set before it (it still holds `self` from entry) may be a
+  ZERO-argument call in the source**: 2.6.3 emits `move $a0,$s0` for an explicit `self` even when
+  `$a0` already holds it. Declare the slot UNPROTOTYPED (`T (*slot)();`) in the local view so
+  callers passing `self` stay legal C. **Neither form is a safe default**: the same situation matched
+  as `slot(self)` in `func_80045C94` (the zero-argument form moved a constant out of the delay slot
+  and ran one word long) and as `slot()` in `func_80048BC0` and `func_80044E10`. Try the other
+  first when one misses. (round 82, code_39094 and code_33808)
 - **The same forward trace applies to a DEAD PARAMETER's register, which 2.6.3 reuses as scratch.**
   A delay-slot `move $aN, $vM` is filler only once `$aN`'s next READ on every path is found; in
   `SeqPlay` a store two blocks on read it, so the source stored the wrong value (the unused
@@ -576,7 +588,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (`s + (p + 0x14)` -> `(s + p) + 0x14`), so no spelling containing the literal reaches retail's
   grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`Unk18Obj__InitOt`,
   73/73 after 14 groupings and ~89k permuter iterations); splitting `(w + 20) - span` into two
-  statements closed `Class866E8__SplitFootprintSlot`. (round 71)
+  statements closed `Class866E8__SplitFootprintSlot`. (round 71) The same goes for a multiply and a byte constant: retail's `li; mult` right after storing that constant is the multiply BY THE STORED FIELD (a literal `* 15` strength-reduces to `sll`/`subu`, one word short; round 82, code_33808), and `li 0x80` feeding `s8` stores is `s32 grey = 0x80;` (the literal folds to `li -0x80`; `InitGsSprite`, round 82).
 - **A flat table indexed `&T[r*C]` then `[c]` wants a named row-pointer local, `T (*tbl)[C] = ...;
   tbl[r][c]`**: the local puts the table-address load before the index arithmetic; the inline
   cast does not. Closed `CalcDreamColor` 28/35. (round 73)
@@ -659,31 +671,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   a type change. Screen with `--debug`: a differing register COUNT is not identity at all. (a §"A
   register-identity verdict is a HYPOTHESIS", §"Round 27: the register COUNT and the addressing-mode
   IMMEDIATE")
-- **`funcdiff`'s `insertions N / deletions M` line is the first thing to read on a register-identity
-  claim: 0/0 is consistent with it, anything else says READ THE DIFF for separable defects.** Not a
-  verdict: at equal length an N/N figure can be a false alignment on a repeating loop skeleton
-  (round 63: 26/26 on a zero-insertion input); funcdiff's positional skeleton diffs figure tells the
-  two apart and forces 0/0 when it is zero. `Class6D940__ResolveEntry` carried "pervasive register-allocation
-  residue" for four rounds at 7/7 and held four separable defects, three of them plain C. Even 0/0
-  is NOT the banned-fix category by itself: the same function at 0/0 (54/76) closed on a missing
-  forwarded argument (round 76). Rebuild the preserved body and read the line. (a round 60)
-- **"N words short" and "N/M words match" are DIFFERENT measurements that read identically, and a
-  word count is not a count of DIVERGENCES.** A title must carry LENGTH, RAW WORD-MATCH and WHERE
-  THE FIRST REAL DIFF IS: a body can be the right length and match almost nothing (144/145 compiled,
-  50/145 raw), a 216/217 "one-word residue" scored 465 on `--debug`. Figures at different LENGTHS
-  are not comparable, and a raw match may legitimately DROP as a function gets closer. (a §"Two
-  figures measured at different LENGTHS")
 - **A lever's NEGATIVE is scoped to the (function, lever, STATE) triple, and so is a POSITIVE.** A
   guard polarity inert in round 19 closed three words in round 33; a fix rejected in rounds 19 and
   20 closed the function in round 49. **If you have changed anything else since a lever was
   rejected, the rejection has expired.** A class several reports agree on may be one error copied,
   so re-derive from asm-differ/objdump before acting on any report's DESCRIPTION. (a §"A lever's
   NEGATIVE is scoped to the state it was tested under")
-- **"Exact length" can be arithmetic rather than structure, and only the positional-skeleton figure
-  notices.** `SpuVmAlloc` carried "EXACT LENGTH MATCH 167/167" from round 37 for 28 rounds; round
-  65 found two one-word padding artifacts sitting on a body two words SHORT, summing to the right
-  total. Length is a SUM and cancels; the skeleton figure was 118 at that "exact length". Read the
-  skeleton figure before believing a length claim, exactly as for ins/del. (a round 65)
 
 ## 5. Withdrawn or SDK-voided — do not re-add
 
