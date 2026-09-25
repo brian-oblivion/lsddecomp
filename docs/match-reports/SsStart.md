@@ -12,7 +12,7 @@ A one-argument tail-call wrapper around `_SsStart`, called with `1`.
 `_SsStart` (still `INCLUDE_ASM` in this unit -- not attempted this
 round, 185-line body) is a CD-audio/root-counter driven playback-rate
 routine: it busy-waits on two software delay loops, reads a CD status
-global (`gSeqTimerRateMode`), branches into several `div`-based rate
+global (`_snd_seq_tick_mode`), branches into several `div`-based rate
 calculations, and conditionally calls `SetRCnt`/`StartRCnt`/
 `ResetRCnt` (all in this same unit) among others. It never sets `$v0`
 on any exit path, so it is `void`.
@@ -45,6 +45,6 @@ Round 69 (delta). `SsStart` (was `func_80032998`): tail-call wrapper
 calling `_SsStart(1)`. Tier B -- `_SsStart`'s own `arg0==1`
 path is the one that sets a fresh device tag and rate and proceeds to the
 actual `SetRCnt` arm/callback-registration work (`arg0==0`'s case-5 arm
-instead increments `gSeqTimerStopPending` and jumps straight to the
+instead increments `_snd_use_vsync_cb` and jumps straight to the
 teardown check), so "start" describes the observed effect; the in-game
 call site that reaches this wrapper is not in this unit to confirm further.

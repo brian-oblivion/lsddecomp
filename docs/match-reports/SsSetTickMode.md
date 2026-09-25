@@ -19,26 +19,26 @@ recorded below for completeness (it was superseded mid-run, not exhausted).
 `void SsSetTickMode(s32 a0)`. Two parts, unchanged from the round-23
 description:
 
-1. Splits `a0` into a "cmd" value stored in `gSeqTimerRateMode` and a flag in
-   `gSeqTimerModeFlag`: if `a0 & 0x1000`, `gSeqTimerModeFlag = 1` and `gSeqTimerRateMode = a0 &
-   0xFFF`; else `gSeqTimerModeFlag = 0` and `gSeqTimerRateMode = a0` (the raw value).
-2. Reloads `cmd = gSeqTimerRateMode` and dispatches:
+1. Splits `a0` into a "cmd" value stored in `_snd_seq_tick_mode` and a flag in
+   `_snd_seq_no_tick`: if `a0 & 0x1000`, `_snd_seq_no_tick = 1` and `_snd_seq_tick_mode = a0 &
+   0xFFF`; else `_snd_seq_no_tick = 0` and `_snd_seq_tick_mode = a0` (the raw value).
+2. Reloads `cmd = _snd_seq_tick_mode` and dispatches:
    - `cmd >= 6` (signed): `VBLANK_MINUS = cmd` (raw passthrough).
    - `cmd < 0` (falls out of the unsigned `cmd < 6` recheck): `VBLANK_MINUS
      = 0x3c`.
    - `0 <= cmd < 6`: a genuine `switch` over `jtbl_80010CD8` (6 dense
      cases), each setting `VBLANK_MINUS` to a per-case tempo/rate constant,
-     and cases 1 and 4 additionally rewriting `gSeqTimerRateMode` based on
-     `gVideoMode` (a play-state flag: 0/1/other).
+     and cases 1 and 4 additionally rewriting `_snd_seq_tick_mode` based on
+     `_snd_video_mode` (a play-state flag: 0/1/other).
 
-| case | VBLANK_MINUS | gSeqTimerRateMode side effect |
+| case | VBLANK_MINUS | _snd_seq_tick_mode side effect |
 | --- | --- | --- |
-| 0 | `(gVideoMode==1) ? 0x32 : 0x3c` | none |
-| 1 | `0x3c` (always) | `(gVideoMode==0) ? 5 : 0x3c` |
+| 0 | `(_snd_video_mode==1) ? 0x32 : 0x3c` | none |
+| 1 | `0x3c` (always) | `(_snd_video_mode==0) ? 5 : 0x3c` |
 | 2 | `0xf0` | none |
 | 3 | `0x78` | none |
-| 4 | `0x32` (always) | `(gVideoMode==1) ? 5 : 0x32` |
-| 5 | `(gVideoMode==1) ? 0x32 : 0x3c` | none |
+| 4 | `0x32` (always) | `(_snd_video_mode==1) ? 5 : 0x32` |
+| 5 | `(_snd_video_mode==1) ? 0x32 : 0x3c` | none |
 
 Round 23's two structural findings both still hold and were not touched
 this round:
@@ -223,12 +223,12 @@ Round 69 (delta), track 3 pass on `code_179d8_c_b`.
 | name | tier | evidence |
 | --- | --- | --- |
 | `SsSetTickMode` (was `func_80032588`) | B | mechanics are fully known (splits an input word into a rate-mode selector and a flag, then picks a tick rate from a 6-way table); the in-game reason a caller picks each mode is not established. |
-| `gSeqTimerRateMode` (was `D_8006DCA4`) | B | the "cmd" this function derives from its argument and `_SsStart` (the timer-arming stall) dispatches on for its own device-tag/rate selection -- see that report. |
-| `gSeqTimerModeFlag` (was `D_8006DCA8`) | B | the flag bit (`a0 & 0x1000`) extracted alongside the rate mode; `_SsStart`'s `default:` arm returns immediately without touching the timer when this is set, so it gates whether the computed-rate path runs at all. |
-| `gVideoMode` (was `D_8006DC98`) | A | assigned directly from Psy-Q's `GetVideoMode()` in `_SsInit` (sibling unit `code_179d8_c.c`, its own match report). This function only reads it, to choose between the two named tick rates. |
+| `_snd_seq_tick_mode` (was `D_8006DCA4`) | B | the "cmd" this function derives from its argument and `_SsStart` (the timer-arming stall) dispatches on for its own device-tag/rate selection -- see that report. |
+| `_snd_seq_no_tick` (was `D_8006DCA8`) | B | the flag bit (`a0 & 0x1000`) extracted alongside the rate mode; `_SsStart`'s `default:` arm returns immediately without touching the timer when this is set, so it gates whether the computed-rate path runs at all. |
+| `_snd_video_mode` (was `D_8006DC98`) | A | assigned directly from Psy-Q's `GetVideoMode()` in `_SsInit` (sibling unit `code_179d8_c.c`, its own match report). This function only reads it, to choose between the two named tick rates. |
 | `VBLANK_MINUS` (was `D_8009024C`) | B | `src/code_179d8_k.c` (a different, uninvolved unit) independently reads this same global and comments it as "a tick-rate/PPQN-style constant" used in a MIDI Set-Tempo scheduling formula (`GetMetaEvent`/`SetTempo`-style handler) -- two unrelated units converging on the same reading. This function is the one that WRITES it, from the 6-way rate table below. |
-| `SEQ_TICKRATE_50`/`_60`/`_120`/`_240` (magic constants `0x32`/`0x3c`/`0x78`/`0xf0`) | B | named by value only (the numbers themselves), not by an NTSC/PAL region claim -- `gVideoMode` (0/1) does select between the 50 and 60 values in three of the six cases, which is suggestive, but this file has no direct evidence pinning which region is which value. |
+| `SEQ_TICKRATE_50`/`_60`/`_120`/`_240` (magic constants `0x32`/`0x3c`/`0x78`/`0xf0`) | B | named by value only (the numbers themselves), not by an NTSC/PAL region claim -- `_snd_video_mode` (0/1) does select between the 50 and 60 values in three of the six cases, which is suggestive, but this file has no direct evidence pinning which region is which value. |
 
-See `_SsStart.md` for the globals `gSeqTimerId`/`gSeqTimerRateFlag`/
-`gSeqTimerStopPending`/`gSeqTimerChainedCallback`, which this function does
+See `_SsStart.md` for the globals `_snd_use_interrupt_id`/`_snd_1per2`/
+`_snd_use_vsync_cb`/`_snd_vsync_cb`, which this function does
 not touch.

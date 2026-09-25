@@ -9,15 +9,15 @@
 ## What it does
 
 A callback-registration teardown/re-arm routine, guarded by
-`gSeqTimerModeFlag` (returns immediately, doing nothing, if it's nonzero).
-Clears `gSeqTimerRateFlag`, calls `func_80024CE0` (unconditional per-call
+`_snd_seq_no_tick` (returns immediately, doing nothing, if it's nonzero).
+Clears `_snd_1per2`, calls `func_80024CE0` (unconditional per-call
 setup), then:
 
-- if `gSeqTimerStopPending` is set, calls `func_80024DA0(0)` and clears it;
-- otherwise, if `gSeqTimerId` isn't the sentinel `-1`: when it holds a
+- if `_snd_use_vsync_cb` is set, calls `func_80024DA0(0)` and clears it;
+- otherwise, if `_snd_use_interrupt_id` isn't the sentinel `-1`: when it holds a
   real id (`!= 0`) deregisters via `func_80024D40(id, NULL)`, else
-  registers the callback `gSeqTimerChainedCallback` via `func_80024D40(0,
-  gSeqTimerChainedCallback)`; either way resets `gSeqTimerId` to `-1` afterward.
+  registers the callback `_snd_vsync_cb` via `func_80024D40(0,
+  _snd_vsync_cb)`; either way resets `_snd_use_interrupt_id` to `-1` afterward.
 
 Both paths fall through to a final `func_80024CF0()` call before
 returning.
@@ -29,35 +29,35 @@ extern void func_80024CE0(void);
 extern void func_80024DA0(s32 arg0);
 extern void func_80024D40(s32 arg0, void (*callback)(void));
 extern void func_80024CF0(void);
-extern s32 gSeqTimerModeFlag;
-extern s32 gSeqTimerRateFlag;
-extern s32 gSeqTimerStopPending;
-extern s32 gSeqTimerId;
-extern void (*gSeqTimerChainedCallback)(void);
+extern s32 _snd_seq_no_tick;
+extern s32 _snd_1per2;
+extern s32 _snd_use_vsync_cb;
+extern s32 _snd_use_interrupt_id;
+extern void (*_snd_vsync_cb)(void);
 
 void SsEnd(void)
 {
     s32 v;
 
-    if (gSeqTimerModeFlag != 0) {
+    if (_snd_seq_no_tick != 0) {
         return;
     }
 
-    gSeqTimerRateFlag = 0;
+    _snd_1per2 = 0;
     func_80024CE0();
 
-    if (gSeqTimerStopPending != 0) {
+    if (_snd_use_vsync_cb != 0) {
         func_80024DA0(0);
-        gSeqTimerStopPending = 0;
+        _snd_use_vsync_cb = 0;
     } else {
-        v = gSeqTimerId;
+        v = _snd_use_interrupt_id;
         if (v != -1) {
             if (v != 0) {
                 func_80024D40(v, NULL);
             } else {
-                func_80024D40(0, gSeqTimerChainedCallback);
+                func_80024D40(0, _snd_vsync_cb);
             }
-            gSeqTimerId = -1;
+            _snd_use_interrupt_id = -1;
         }
     }
 
@@ -67,13 +67,13 @@ void SsEnd(void)
 
 ## Residue note: another instance of the `_SsSeqCalledTbyT_1per2` block-order lever
 
-First attempt wrote the if/else in "natural" order (`if (gSeqTimerStopPending ==
-0) { the gSeqTimerId logic } else { the func_80024DA0 teardown }`), which
+First attempt wrote the if/else in "natural" order (`if (_snd_use_vsync_cb ==
+0) { the _snd_use_interrupt_id logic } else { the func_80024DA0 teardown }`), which
 compiled with the WRONG block placed inline: GCC 2.6.3 put the `==0`
 branch inline/fallthrough and the `!=0` branch out-of-line, where retail
 does the opposite (the `!=0`/teardown branch is the fallthrough, the
 `==0`/re-arm branch is reached by a taken `beqz`). Swapping the C to test
-`gSeqTimerStopPending != 0` first (matching which block retail places first)
+`_snd_use_vsync_cb != 0` first (matching which block retail places first)
 reproduced the exact instruction sequence with no other change --
 consistent with the `_SsSeqCalledTbyT_1per2` finding, though note this is a
 *different* shape than that one: this is a full `if/else` where BOTH
@@ -111,10 +111,10 @@ game logic; track 2 names those functions and moves them out of tracks
 1/1b/3.
 
 Round 69 (delta). `SsEnd` (was `func_800329D8`): guarded by
-`gSeqTimerModeFlag`, clears `gSeqTimerRateFlag`, and either cancels a
-pending stop (`VSyncCallback(0)`, clearing `gSeqTimerStopPending`) or
+`_snd_seq_no_tick`, clears `_snd_1per2`, and either cancels a
+pending stop (`VSyncCallback(0)`, clearing `_snd_use_vsync_cb`) or
 deregisters/registers the RCnt interrupt callback via `InterruptCallback`
-and resets `gSeqTimerId` to its `-1` sentinel -- the inverse of what
+and resets `_snd_use_interrupt_id` to its `-1` sentinel -- the inverse of what
 `_SsStart` arms. Tier B: the mechanism (tear down whatever
 `_SsStart` set up) is clear from the shared globals; the caller
 that decides WHEN to cancel is outside this unit.

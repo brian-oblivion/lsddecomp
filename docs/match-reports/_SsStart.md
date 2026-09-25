@@ -13,28 +13,28 @@ the head's question" below).
 
 A CD-audio/root-counter rate-selection dispatcher, called with `arg0`
 from `SsStart`/`SsStart2` (`1`/`0`). Busy-waits ~1000 cycles,
-then dispatches on the CD status global `gSeqTimerRateMode`:
+then dispatches on the CD status global `_snd_seq_tick_mode`:
 
 - `2`/`3`: fixed device tag `0xF2000002` with a fixed rate constant
-  (`0x44E8`/`0x89D0`), then a shared `gSeqTimerId = 6`.
-- `5`: if `arg0 != 0`, sets tag `0xF2000003`, clears `gSeqTimerId`, rate
-  `1`; if `arg0 == 0`, just increments `gSeqTimerStopPending` and jumps straight
+  (`0x44E8`/`0x89D0`), then a shared `_snd_use_interrupt_id = 6`.
+- `5`: if `arg0 != 0`, sets tag `0xF2000003`, clears `_snd_use_interrupt_id`, rate
+  `1`; if `arg0 == 0`, just increments `_snd_use_vsync_cb` and jumps straight
   to the shared teardown-check near the end (skipping the whole
   SetRCnt/delay-loop/callback body below).
 - `0`: returns immediately, doing nothing at all (not even the trailing
   `func_80024CF0()`).
-- `1` or anything else (default): guarded by `gSeqTimerModeFlag`; computes a
+- `1` or anything else (default): guarded by `_snd_seq_no_tick`; computes a
   rate via one of two divisions (`0x204CC0/v1` or `0x409980/v1`,
   selected by `v1 < 0x46`) with the classic PSX `div`+`break 7`/`break 6`
   overflow-trap idiom, and only the `< 0x46` branch additionally ORs `2`
-  into the device tag and increments `gSeqTimerRateFlag`.
+  into the device tag and increments `_snd_1per2`.
 
-Then (except the `5`/`arg0==0` and `0` early-outs): if `gSeqTimerStopPending` is
+Then (except the `5`/`arg0==0` and `0` early-outs): if `_snd_use_vsync_cb` is
 set, tears down via `func_80024DA0(func_80033738)` and returns; else
 calls `func_80024CE0()`, `ResetRCnt(tag)`, `SetRCnt(tag,
 (s16)rate, 0x1000)`, two more ~2000-cycle busy-waits, `StartRCnt(tag)`,
 then the SAME callback-(re)registration shape already matched in
-`SsEnd` (dispatching on `gSeqTimerId`/`gSeqTimerRateFlag` to pick
+`SsEnd` (dispatching on `_snd_use_interrupt_id`/`_snd_1per2` to pick
 `_SsTrapIntrVSync`/`_SsSeqCalledTbyT_1per2`/`func_80033738` as the callback for
 `func_80024D40`), and finally `func_80024CF0()`.
 
@@ -54,12 +54,12 @@ then the SAME callback-(re)registration shape already matched in
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-extern s32 gSeqTimerRateMode;
-extern s32 gSeqTimerModeFlag;
-extern s32 gSeqTimerId;
-extern s32 gSeqTimerRateFlag;
-extern s32 gSeqTimerStopPending;
-extern void (*gSeqTimerChainedCallback)(void);
+extern s32 _snd_seq_tick_mode;
+extern s32 _snd_seq_no_tick;
+extern s32 _snd_use_interrupt_id;
+extern s32 _snd_1per2;
+extern s32 _snd_use_vsync_cb;
+extern void (*_snd_vsync_cb)(void);
 extern void func_80024CE0(void);
 extern void func_80024DA0(void (*cb)(void));
 extern void (*func_80024D40(s32 arg0, void (*callback)(void)))(void);
@@ -82,39 +82,39 @@ void _SsStart(s32 arg0)
     for (i = 999; i >= 0; i--) {
     }
 
-    v1 = gSeqTimerRateMode;
+    v1 = _snd_seq_tick_mode;
     switch (v1) {
     case 2:
         s1 = 0xF2000002;
         s0 = 0x44E8;
-        gSeqTimerId = 6;
+        _snd_use_interrupt_id = 6;
         break;
     case 3:
         s1 = 0xF2000002;
         s0 = 0x89D0;
-        gSeqTimerId = 6;
+        _snd_use_interrupt_id = 6;
         break;
     case 5:
         if (arg0 != 0) {
             s1 = 0xF2000003;
-            gSeqTimerId = 0;
+            _snd_use_interrupt_id = 0;
             s0 = 1;
         } else {
-            gSeqTimerStopPending++;
+            _snd_use_vsync_cb++;
             goto merge2;
         }
         break;
     case 0:
         return;
     default:
-        if (gSeqTimerModeFlag != 0) {
+        if (_snd_seq_no_tick != 0) {
             return;
         }
         s1 = 0xF2000002;
-        gSeqTimerId = 6;
+        _snd_use_interrupt_id = 6;
         if (v1 < 0x46) {
             v1 = 0x204CC0 / v1;
-            gSeqTimerRateFlag++;
+            _snd_1per2++;
             s0 = v1;
         } else {
             s1 = 0xF2000000;
@@ -125,7 +125,7 @@ void _SsStart(s32 arg0)
     }
 
 merge2:
-    if (gSeqTimerStopPending != 0) {
+    if (_snd_use_vsync_cb != 0) {
         func_80024DA0(func_80033738);
         return;
     }
@@ -141,16 +141,16 @@ merge2:
 
     StartRCnt(s1);
 
-    rc90 = gSeqTimerId;
+    rc90 = _snd_use_interrupt_id;
     if (rc90 != 0) {
-        if (gSeqTimerRateFlag != 0) {
+        if (_snd_1per2 != 0) {
             cb = _SsSeqCalledTbyT_1per2;
         } else {
             cb = func_80033738;
         }
     } else {
-        gSeqTimerChainedCallback = func_80024D40(0, NULL);
-        rc90 = gSeqTimerId;
+        _snd_vsync_cb = func_80024D40(0, NULL);
+        rc90 = _snd_use_interrupt_id;
         cb = _SsTrapIntrVSync;
     }
     func_80024D40(rc90, cb);
@@ -343,7 +343,7 @@ it directly: reordered the `switch`'s `case` clauses from source order
 `2, 3, 5, 0, default` to `5, 3, 2, 0, default`, matching the physical
 address order of the case BODIES in retail's `.s` (case5's `arg0!=0`
 body at `.L80032790`, case3 at `.L800327A8`, case2 at `.L800327B8`, then
-the shared `gSeqTimerId=6` tail, then `default` at `.L800327D8`).
+the shared `_snd_use_interrupt_id=6` tail, then `default` at `.L800327D8`).
 
 **Result: regressed hard, 65/164 -> 36/164, WITH real outside-range
 drift** (function length changed). `asm-differ` showed the regression
@@ -530,10 +530,10 @@ Round 69 (delta), track 3 pass on `code_179d8_c_b`.
 | name | tier | evidence |
 | --- | --- | --- |
 | `_SsStart` (was `func_80032708`) | B | arms a PSX root counter at the rate `SsSetTickMode` selected (`SetRCnt`), tags a device value, and registers one of two ISR callbacks (`_SsTrapIntrVSync`/`_SsSeqCalledTbyT_1per2`) via `InterruptCallback` -- an "arm the sequencer's software timer" routine. `arg0` is a start/stop-ish switch (see `SsStart.md`/`SsStart2.md`) but its exact in-game trigger is not established, hence B not A. |
-| `gSeqTimerId` (was `D_8006DC90`) | B | the value threaded through `InterruptCallback` as a handle: `-1` is checked as a sentinel ("nothing armed") throughout this function and in `SsEnd`, `0` means "armed but not yet given a real id" (this function then captures one via `InterruptCallback(0, NULL)`), and any other value is passed straight back to `InterruptCallback` to re-target or deregister. |
-| `gSeqTimerRateFlag` (was `D_8006DC94`) | B | set (incremented, never explicitly reset here) only on the branch of the default case that computes the smaller of the two custom rates (`v1 < 0x46`); this function's own callback-selection tail reads it as a boolean to choose `_SsSeqCalledTbyT_1per2` over `_SsTrapIntrVSync` -- i.e. it selects the half-rate ISR variant. `SsEnd` clears it back to 0. |
-| `gSeqTimerStopPending` (was `D_8006DC8C`) | B | when set, this function's shared tail skips arming entirely and instead tears down via `VSyncCallback(SsSeqCalledTbyT)`; `SsEnd` is the other place that reads/clears it, calling `VSyncCallback(0)` first. Named for what it gates (a pending stop/teardown), not for a specific caller's intent. |
-| `gSeqTimerChainedCallback` (was `D_8006DC9C`) | B | captured from `InterruptCallback(0, NULL)`'s return value (the previously-installed handler) right before this function installs `_SsTrapIntrVSync` as the new one; `_SsTrapIntrVSync` calls it first, then always calls `SsSeqCalledTbyT` -- the classic "save old handler, chain to it" ISR-hook idiom. |
+| `_snd_use_interrupt_id` (was `D_8006DC90`) | B | the value threaded through `InterruptCallback` as a handle: `-1` is checked as a sentinel ("nothing armed") throughout this function and in `SsEnd`, `0` means "armed but not yet given a real id" (this function then captures one via `InterruptCallback(0, NULL)`), and any other value is passed straight back to `InterruptCallback` to re-target or deregister. |
+| `_snd_1per2` (was `D_8006DC94`) | B | set (incremented, never explicitly reset here) only on the branch of the default case that computes the smaller of the two custom rates (`v1 < 0x46`); this function's own callback-selection tail reads it as a boolean to choose `_SsSeqCalledTbyT_1per2` over `_SsTrapIntrVSync` -- i.e. it selects the half-rate ISR variant. `SsEnd` clears it back to 0. |
+| `_snd_use_vsync_cb` (was `D_8006DC8C`) | B | when set, this function's shared tail skips arming entirely and instead tears down via `VSyncCallback(SsSeqCalledTbyT)`; `SsEnd` is the other place that reads/clears it, calling `VSyncCallback(0)` first. Named for what it gates (a pending stop/teardown), not for a specific caller's intent. |
+| `_snd_vsync_cb` (was `D_8006DC9C`) | B | captured from `InterruptCallback(0, NULL)`'s return value (the previously-installed handler) right before this function installs `_SsTrapIntrVSync` as the new one; `_SsTrapIntrVSync` calls it first, then always calls `SsSeqCalledTbyT` -- the classic "save old handler, chain to it" ISR-hook idiom. |
 
-`gSeqTimerRateMode`/`gSeqTimerModeFlag`/`gVideoMode`/`VBLANK_MINUS` are
+`_snd_seq_tick_mode`/`_snd_seq_no_tick`/`_snd_video_mode`/`VBLANK_MINUS` are
 established in `SsSetTickMode.md`; this function only reads the first two.

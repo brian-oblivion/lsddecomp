@@ -92,11 +92,11 @@ extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
 extern s32 VBLANK_MINUS;
 extern s32 _snd_openflag;
-extern s32 gSeqTimerStopPending;
-extern s32 gSeqTimerId;
-extern s32 gSeqTimerRateFlag;
-extern void (*gSeqTimerChainedCallback)(void);
-extern s32 gVideoMode;
+extern s32 _snd_use_vsync_cb;
+extern s32 _snd_use_interrupt_id;
+extern s32 _snd_1per2;
+extern void (*_snd_vsync_cb)(void);
+extern s32 _snd_video_mode;
 extern s32 _snd_ev_flag;
 
 /* One 0x40-byte per-voice software state slot; the init below just zeroes it. */
@@ -170,11 +170,11 @@ void _SsInit(s32 arg0)
 
     VBLANK_MINUS = 0x3C;
     _snd_openflag = 0;
-    gSeqTimerStopPending = 0;
-    gSeqTimerId = -1;
-    gSeqTimerRateFlag = 0;
-    gSeqTimerChainedCallback = NULL;
-    gVideoMode = GetVideoMode();
+    _snd_use_vsync_cb = 0;
+    _snd_use_interrupt_id = -1;
+    _snd_1per2 = 0;
+    _snd_vsync_cb = NULL;
+    _snd_video_mode = GetVideoMode();
     _snd_ev_flag = 0;
 }
 

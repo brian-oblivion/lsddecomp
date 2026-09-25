@@ -14,7 +14,7 @@
 ## What it does
 
 `GetRCnt`: reads the `count` field (offset `0x0`) of root-counter block
-`gRCntRegs[idx]`, where `idx = (u16)n`. Returns `0` without touching the
+`D_8006DCB0[idx]`, where `idx = (u16)n`. Returns `0` without touching the
 table if `idx >= 3`.
 
 ## The match
@@ -28,7 +28,7 @@ s32 GetRCnt(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = gRCntRegs;
+    base = D_8006DCB0;
     return base[idx].count;
 }
 ```
@@ -81,7 +81,7 @@ Round 32 (2026-09-12), head: matched 14/14 first attempt once the
 ## Naming
 
 Round 69 (delta). `GetRCnt` (was `func_80032BB8`): a pure getter (reads
-`gRCntRegs[idx].count`, guarded by a range check) -- tier A by the
+`D_8006DCB0[idx].count`, guarded by a range check) -- tier A by the
 project's own rule ("a getter ... is tier A by definition"). Name taken
 directly from this report's own heading, which already called it `GetRCnt`
 before the symbol itself was renamed.

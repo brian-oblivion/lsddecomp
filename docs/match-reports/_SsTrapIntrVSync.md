@@ -11,7 +11,7 @@
 Calls through a global callback pointer if one is registered, then always
 calls `func_80033738` (external, lives in the still-uncarved
 `asm/code_179d8_tail.s` monolith -- declared `extern` locally per this
-unit's own-declarations convention, not shared). `gSeqTimerChainedCallback` is set
+unit's own-declarations convention, not shared). `_snd_vsync_cb` is set
 elsewhere (by `_SsStart`, not attempted this round) to either `0` or
 the address of a callback such as this very function's sibling
 `_SsSeqCalledTbyT_1per2`.
@@ -20,12 +20,12 @@ the address of a callback such as this very function's sibling
 
 ```c
 extern void func_80033738(void);
-extern void (*gSeqTimerChainedCallback)(void);
+extern void (*_snd_vsync_cb)(void);
 
 void _SsTrapIntrVSync(void)
 {
-    if (gSeqTimerChainedCallback != NULL) {
-        gSeqTimerChainedCallback();
+    if (_snd_vsync_cb != NULL) {
+        _snd_vsync_cb();
     }
     func_80033738();
 }
@@ -45,7 +45,7 @@ code, not decompiled game logic; track 2 names those functions and moves
 them out of tracks 1/1b/3.
 
 Round 69 (delta). `_SsTrapIntrVSync` (was `func_80032A9C`): calls
-`gSeqTimerChainedCallback` if one was saved, then unconditionally calls
+`_snd_vsync_cb` if one was saved, then unconditionally calls
 `SsSeqCalledTbyT`. This is the callback `_SsStart` installs via
 `InterruptCallback` on the "no id yet" path (see `_SsStart.md`) --
 i.e. it IS the root-counter/vsync interrupt handler that drives the

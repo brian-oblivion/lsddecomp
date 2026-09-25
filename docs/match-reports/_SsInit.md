@@ -29,9 +29,9 @@ into (see those reports). Calls `func_80024D10(arg0)`, then
 4. Zeroes the first `0x40` bytes of each of 32 `D_80090368` entries
    (stride `0x40`, confirmed by the pointer increment).
 5. Initializes the whole sound-system global block this unit has been
-   working all round: `VBLANK_MINUS=0x3C`, `_snd_openflag=0`, `gSeqTimerStopPending=0`,
-   `gSeqTimerId=-1`, `gSeqTimerRateFlag=0`, `gSeqTimerChainedCallback=NULL`,
-   `gVideoMode=func_8002551C()`, `_snd_ev_flag=0`. Every one of these
+   working all round: `VBLANK_MINUS=0x3C`, `_snd_openflag=0`, `_snd_use_vsync_cb=0`,
+   `_snd_use_interrupt_id=-1`, `_snd_1per2=0`, `_snd_vsync_cb=NULL`,
+   `_snd_video_mode=func_8002551C()`, `_snd_ev_flag=0`. Every one of these
    globals is already established from `_SsSeqCalledTbyT_1per2`, `_SsTrapIntrVSync`
    and `SsEnd`'s reports this round -- this function is their
    init.
@@ -49,11 +49,11 @@ extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
 extern s32 VBLANK_MINUS;
 extern s32 _snd_openflag;
-extern s32 gSeqTimerStopPending;
-extern s32 gSeqTimerId;
-extern s32 gSeqTimerRateFlag;
-extern void (*gSeqTimerChainedCallback)(void);
-extern s32 gVideoMode;
+extern s32 _snd_use_vsync_cb;
+extern s32 _snd_use_interrupt_id;
+extern s32 _snd_1per2;
+extern void (*_snd_vsync_cb)(void);
+extern s32 _snd_video_mode;
 extern s32 _snd_ev_flag;
 
 typedef struct {
@@ -108,11 +108,11 @@ void _SsInit(s32 arg0)
 
     VBLANK_MINUS = 0x3C;
     _snd_openflag = 0;
-    gSeqTimerStopPending = 0;
-    gSeqTimerId = -1;
-    gSeqTimerRateFlag = 0;
-    gSeqTimerChainedCallback = NULL;
-    gVideoMode = func_8002551C();
+    _snd_use_vsync_cb = 0;
+    _snd_use_interrupt_id = -1;
+    _snd_1per2 = 0;
+    _snd_vsync_cb = NULL;
+    _snd_video_mode = func_8002551C();
     _snd_ev_flag = 0;
 }
 #endif

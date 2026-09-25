@@ -9,8 +9,8 @@ Unit: `code_179d8_c`. Round 23, runner bravo.
 ## What it does
 
 Sets an IRQ mask bit in the shadow interrupt-controller pair pointed to by
-`gIrqRegs` (base `0x1F801070` = I_STAT; `+0x4` = I_MASK). `which` selects
-which bit out of the `gRCntIrqMasks` table (`{0x10, 0x20, 0x40, 0x1}` --
+`D_8006DCAC` (base `0x1F801070` = I_STAT; `+0x4` = I_MASK). `which` selects
+which bit out of the `D_8006DCB4` table (`{0x10, 0x20, 0x40, 0x1}` --
 Tmr0/Tmr1/Tmr2 IRQ bits for indices 0-2, VBLANK for index 3; this table is
 also the one `SetRCnt` a few functions up implicitly matches against, since
 that function manages root counters 0-2).
@@ -29,15 +29,15 @@ typedef struct {
     volatile u32 mask; /* 0x4, I_MASK */
 } IrqRegs;
 
-extern IrqRegs *gIrqRegs;
-extern u32 gRCntIrqMasks[4];
+extern IrqRegs *D_8006DCAC;
+extern u32 D_8006DCB4[4];
 
 s32 StartRCnt(u16 which)
 {
     s32 idx = which;
-    IrqRegs *reg = gIrqRegs;
+    IrqRegs *reg = D_8006DCAC;
 
-    reg->mask |= gRCntIrqMasks[idx];
+    reg->mask |= D_8006DCB4[idx];
     return idx < 3;
 }
 ```
@@ -73,8 +73,8 @@ a scheduling residue to chase with a barrier.
 ## Naming
 
 Round 69 (delta). `StartRCnt` (was `func_80032BF0`): ORs a bit into
-`gIrqRegs->mask` (I_MASK), where the bit comes from `gRCntIrqMasks[idx]`.
-Tier A -- a setter whose mechanics are its purpose. `gIrqRegs` (was
+`D_8006DCAC->mask` (I_MASK), where the bit comes from `D_8006DCB4[idx]`.
+Tier A -- a setter whose mechanics are its purpose. `D_8006DCAC` (was
 `D_8006DCAC`) and `gRCntIrqMasks` (was `D_8006DCB4`) are named from this
 function's and `StopRCnt`'s own pre-existing doc comment in
 `src/code_179d8_c_b.c`, which already identified the pair as the PSX

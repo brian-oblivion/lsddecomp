@@ -19,7 +19,9 @@ WHAT IT DOES, in order:
      (`func_800XXXXX`, `D_800XXXXX`), else from the symbols file;
   2. refuses if NEW is not a C identifier, is already a symbol or visible where
      OLD is used (an unrelated local elsewhere is only noted), or is a
-     splat placeholder spelling;
+     splat placeholder spelling other than OLD's own (renaming to OLD's own
+     placeholder UNNAMES it); refuses a game-style `gName`/`sName` for data
+     every accessor of which is Sony library code (tools/sonydata.py);
   3. rewrites the symbols file (replaces OLD's line, or appends a line for a
      placeholder that had none) and every whole-word OLD in src/, include/,
      the report files and the live docs -- NOT docs/PROGRESS.md and NOT
@@ -165,6 +167,33 @@ def is_text_symbol(name, addr):
     return None
 
 
+GAME_STYLE = re.compile(r"^[gs][A-Z]")
+
+
+def IS_OWN_PLACEHOLDER(new, old):
+    """NEW is the splat placeholder for OLD's own address: an UNNAME, which is
+    how a game name comes off a Sony static no disc names (round 86)."""
+    m = PLACEHOLDER.match(new)
+    addr, _ = symbol_address(old)
+    return bool(m) and addr is not None and int(m.group(2), 16) == addr
+
+
+def sony_only_accessors(name):
+    """Sorted accessor functions when EVERY one is library code (progress.py),
+    read from the built objects' relocations; [] when any is game code or none
+    is found. The guard for Sony objects that never placed, which therefore
+    have no psyq-objects.ld pin for sony_data_owner to see (round 86:
+    libsnd/vmanager.o's bss had taken game names)."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    import progress
+    import typeviews
+    fs = typeviews.global_accessors([name])[name]
+    syms = progress.text_symbols()
+    if fs and all(f in syms and progress.is_library(syms[f][0]) for f in fs):
+        return sorted(fs)
+    return []
+
+
 def sony_data_owner(addr):
     """(pin_name, pin_addr, size) when `addr` is a Sony variable that
     config/psyq-objects.ld pins, or lies inside one; else None. Sizes come from
@@ -211,8 +240,10 @@ def main():
     old, new = a.old, a.new
     if not IDENT.match(new):
         sys.exit(f"FATAL: {new!r} is not a C identifier")
-    if PLACEHOLDER.match(new):
-        sys.exit(f"FATAL: {new!r} is a splat placeholder spelling, not a name")
+    pm = PLACEHOLDER.match(new)
+    if pm and not (IS_OWN_PLACEHOLDER(new, old)):
+        sys.exit(f"FATAL: {new!r} is a splat placeholder spelling, not a name "
+                 f"(the one placeholder allowed is OLD's own, to UNNAME it)")
     if old == new:
         sys.exit("FATAL: old and new are the same")
 
@@ -262,6 +293,13 @@ def main():
 
     is_text = is_text_symbol(old, addr)
     kind = "func" if is_text else ("data" if is_text is False else "unknown")
+    if kind != "func" and GAME_STYLE.match(new):
+        lib = sony_only_accessors(old)
+        if lib:
+            sys.exit(f"FATAL: every function that reads {old} is Sony library code "
+                     f"({', '.join(lib[:4])}); Sony data takes no game name (FINISHING-PLAN "
+                     f"track 3). `python3 tools/sonydata.py` gives Sony's name, or says it is a "
+                     f"static, whose honest spelling is the placeholder.")
 
     print(f"rename {old} -> {new}   ({addr:#x}, {kind})")
     print(f"  symbols file: {'replace line' if symline is not None else 'append line'}")

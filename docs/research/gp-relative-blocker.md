@@ -18,10 +18,10 @@ damage; it does not link:
 
 ```
 ld: small-data section too large; lower small-data size limit (see option -G)
-src/code_179d8_c_b.c:(.text+0x29c): relocation truncated to fit: R_MIPS_GPREL16 against `gSeqTimerModeFlag'
+src/code_179d8_c_b.c:(.text+0x29c): relocation truncated to fit: R_MIPS_GPREL16 against `_snd_seq_no_tick'
 ```
 
-`gSeqTimerModeFlag` is `.data`, 0x1CB60 from `$gp`. A non-zero `-G` makes cc1 emit
+`_snd_seq_no_tick` is `.data`, 0x1CB60 from `$gp`. A non-zero `-G` makes cc1 emit
 `.extern sym, size` for EVERY extern whose declared size is under the limit,
 and gas then addresses all of them off `$gp`. This project declares
 splat-owned data with whatever scalar type the access needs, so the size hints

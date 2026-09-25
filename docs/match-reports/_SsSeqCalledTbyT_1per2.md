@@ -8,7 +8,7 @@
 
 ## What it does
 
-A toggle: flips the global flag `gSeqTimerDividerFlag` between `0` and `1`, and
+A toggle: flips the global flag `D_8006DCA0` between `0` and `1`, and
 whenever it transitions back to `0` also calls `func_80033738` (the same
 external cleanup/teardown routine `_SsTrapIntrVSync` calls unconditionally
 -- see that report). Reads naturally as a pause/mute-style toggle: "turn
@@ -17,14 +17,14 @@ on" just sets the flag, "turn off" clears it and runs the teardown.
 ## The C
 
 ```c
-extern s32 gSeqTimerDividerFlag;
+extern s32 D_8006DCA0;
 
 void _SsSeqCalledTbyT_1per2(void)
 {
-    if (gSeqTimerDividerFlag == 0) {
-        gSeqTimerDividerFlag = 1;
+    if (D_8006DCA0 == 0) {
+        D_8006DCA0 = 1;
     } else {
-        gSeqTimerDividerFlag = 0;
+        D_8006DCA0 = 0;
         func_80033738();
     }
 }
@@ -61,14 +61,14 @@ EXACT masked 1.00 vs libsnd/ssinit's internal `_SsSeqCalledTbyT_1per2`
 names those functions and moves them out of tracks 1/1b/3.
 
 Round 69 (delta). `_SsSeqCalledTbyT_1per2` (was `func_80032AD0`): flips
-`gSeqTimerDividerFlag` between 0 and 1, calling `SsSeqCalledTbyT` only on
+`D_8006DCA0` between 0 and 1, calling `SsSeqCalledTbyT` only on
 the transition back to 0. `_SsStart` installs this as the RCnt/vsync
 ISR callback (in place of `_SsTrapIntrVSync`) exactly when
-`gSeqTimerRateFlag` is set -- i.e. when the timer is running a custom
+`_snd_1per2` is set -- i.e. when the timer is running a custom
 (halved) rate, this callback only fires the sequencer tick every OTHER
 interrupt. Tier B: the divide-by-two mechanism and its selection condition
 are both directly evident from `_SsStart`'s body; the previous
 "pause/mute-style toggle" guess in this report's older section is
 superseded by this reading, which is grounded in the actual call site
-rather than the toggle shape alone. `gSeqTimerDividerFlag` (was
+rather than the toggle shape alone. `D_8006DCA0` (was
 `D_8006DCA0`) is named for the same reason.

@@ -35,5 +35,5 @@ Matched first attempt, alongside `SsStart`.
 Round 69 (delta). `SsStart2` (was `func_800329B8`): tail-call wrapper
 calling `_SsStart(0)`. Tier B, mirroring `SsStart` -- see
 `_SsStart.md`'s case-5 description: `arg0==0` increments
-`gSeqTimerStopPending` and falls straight into the teardown path
+`_snd_use_vsync_cb` and falls straight into the teardown path
 (`VSyncCallback(SsSeqCalledTbyT)`) instead of arming a new rate.

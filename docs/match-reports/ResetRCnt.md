@@ -17,7 +17,7 @@
 ## What it does
 
 `ResetRCnt`: clears the `count` field (offset `0x0`) of root-counter block
-`gRCntRegs[idx]` to `0` and returns `1`; returns `0` without touching the
+`D_8006DCB0[idx]` to `0` and returns `1`; returns `0` without touching the
 table if `idx >= 3`, where `idx = (u16)n`.
 
 ## The match
@@ -31,7 +31,7 @@ s32 ResetRCnt(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = gRCntRegs;
+    base = D_8006DCB0;
     base[idx].count = 0;
     return 1;
 }
@@ -123,7 +123,7 @@ to `INCLUDE_ASM`.**
 ## What it does
 
 Setter/clear for the `count` field (offset `0x0`) of the root-counter
-shadow table entry `gRCntRegs[idx]` (see `SetRCnt.md` for the table
+shadow table entry `D_8006DCB0[idx]` (see `SetRCnt.md` for the table
 layout), where `idx = (u16)n`. Clears the field to `0` and returns `1` if
 `idx < 3`, else returns `0` without touching the table.
 
@@ -139,7 +139,7 @@ s32 ResetRCnt(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = gRCntRegs;
+    base = D_8006DCB0;
     base[idx].count = 0;
     return 1;
 }
@@ -148,14 +148,14 @@ s32 ResetRCnt(s32 n)
 
 This gets register allocation, comparison signedness (`slti`, matching
 `GetRCnt`'s and `SetRCnt`'s pattern) and every operand exactly
-right. The `base = gRCntRegs;` split (rather than inlining
-`gRCntRegs[idx]` directly) was load-bearing: without it, GCC evaluated
+right. The `base = D_8006DCB0;` split (rather than inlining
+`D_8006DCB0[idx]` directly) was load-bearing: without it, GCC evaluated
 the shift (`idx*16`) before the pointer load instead of after, which
 ALSO scrambled register allocation the same way `GetRCnt` is stuck
 (see that report) -- so this split may be the fix `GetRCnt` itself
 is missing, except `GetRCnt` has no assignment to split the same
 way (it only reads). Worth trying on `GetRCnt` as e.g. `base =
-gRCntRegs; return base[idx].count;` -- **tried, no change there**, so
+D_8006DCB0; return base[idx].count;` -- **tried, no change there**, so
 the technique doesn't transfer; noted for whoever picks this back up.
 
 ## Residue: one instruction misplaced across a jump, register-identity NOT involved
@@ -185,7 +185,7 @@ structurally similar hoist:
 - Barrier immediately after the store, before `return 1;`: reintroduced
   the register swap AND moved the early `li $v0,1` to the very end of the
   function (past the store), a strictly worse diff.
-- Barrier immediately before the store (after `base = gRCntRegs;`):
+- Barrier immediately before the store (after `base = D_8006DCB0;`):
   produced a redundant extra instruction (`move v0,zero` AND `li v0,1`
   both present -- CSE broke), 4 bytes longer than retail.
 
@@ -214,7 +214,7 @@ s32 ResetRCnt(s32 n)
     s32 idx = (u16)n;
 
     if (idx < 3) {
-        gRCntRegs[idx].count = 0;
+        D_8006DCB0[idx].count = 0;
         return 1;
     }
     return 0;
@@ -287,7 +287,7 @@ raw-offset dump.
 
 Tried a third barrier placement not in the round-16 list: `__asm__("")`
 as the very first statement of the valid branch, before `base =
-gRCntRegs;` (rather than after it, or after the store). **Worse, not
+D_8006DCB0;` (rather than after it, or after the store). **Worse, not
 neutral**: the compiler now drops the `j` entirely and duplicates
 `move v0,zero` (both the early-return path's implicit zero AND a second
 redundant zero-move appear), a strictly worse diff than the 1-instruction
@@ -320,7 +320,7 @@ block), regressed like the other two; restored to `INCLUDE_ASM`.
 ## ROUND 20 (runner echo): re-tested with the extra-temp lever that helped `GetRCnt` -- regressed, confirmed negative
 
 Following this round's `GetRCnt` finding (splitting a combined
-`base = gRCntRegs; return gRCntRegs[idx].count;` into a THIRD,
+`base = D_8006DCB0; return D_8006DCB0[idx].count;` into a THIRD,
 independently-live `entry` pointer local closed most of that function's
 register-identity residue), tested the same lever here:
 
@@ -334,7 +334,7 @@ s32 ResetRCnt(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = gRCntRegs;
+    base = D_8006DCB0;
     entry = &base[idx];
     entry->count = 0;
     return 1;
@@ -352,7 +352,7 @@ file can absorb without changing shape, unlike `GetRCnt` where the
 same lever had slack to use. Reverted immediately; confirms this round's
 `GetRCnt.md` note that the lever is not universal and must be
 tested per-function. This function's own best body remains the
-already-documented `base = gRCntRegs; base[idx].count = 0;` (13/14
+already-documented `base = D_8006DCB0; base[idx].count = 0;` (13/14
 content-correct per `asm-differ`'s aligned view, one missing `nop`/
 hoisted-store-into-delay-slot residue) -- re-confirmed this round via
 direct rebuild (see below), unchanged from round 19.
@@ -369,7 +369,7 @@ report's long-standing characterisation is still accurate. Restored to
 ## Naming
 
 Round 69 (delta). `ResetRCnt` (was `func_80032C60`): clears
-`gRCntRegs[idx].count` to 0, guarded by the same range check as `GetRCnt`
+`D_8006DCB0[idx].count` to 0, guarded by the same range check as `GetRCnt`
 -- tier A (a clamp/reset leaf whose mechanics are its purpose). Name taken
 directly from this report's own heading.
 

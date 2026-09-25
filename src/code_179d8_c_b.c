@@ -44,13 +44,13 @@
  */
 #include "common.h"
 
-extern s32 gSeqTimerModeFlag;
-extern s32 gSeqTimerRateMode;
-extern s32 gVideoMode;
+extern s32 _snd_seq_no_tick;
+extern s32 _snd_seq_tick_mode;
+extern s32 _snd_video_mode;
 extern u32 VBLANK_MINUS;
 
 /* VBLANK_MINUS values SsSetTickMode's rate table selects between.
- * gVideoMode (Psy-Q `GetVideoMode`) is 0/1, and cases 0/4/5 pick between
+ * _snd_video_mode (Psy-Q `GetVideoMode`) is 0/1, and cases 0/4/5 pick between
  * SEQ_TICKRATE_50/SEQ_TICKRATE_60 by it -- named by value only, not by an
  * NTSC/PAL claim this file has no direct evidence for. */
 #define SEQ_TICKRATE_50  0x32
@@ -63,32 +63,32 @@ void SsSetTickMode(s32 a0)
     s32 cmd;
 
     if (a0 & 0x1000) {
-        gSeqTimerModeFlag = 1;
-        gSeqTimerRateMode = a0 & 0xFFF;
+        _snd_seq_no_tick = 1;
+        _snd_seq_tick_mode = a0 & 0xFFF;
     } else {
-        gSeqTimerModeFlag = 0;
-        gSeqTimerRateMode = a0;
+        _snd_seq_no_tick = 0;
+        _snd_seq_tick_mode = a0;
     }
 
-    cmd = gSeqTimerRateMode;
+    cmd = _snd_seq_tick_mode;
 
     if (cmd < 6) {
         if ((u32)cmd < 6) {
             switch (cmd) {
             case 4:
                 VBLANK_MINUS = SEQ_TICKRATE_50;
-                if (gVideoMode == 1) {
-                    gSeqTimerRateMode = 5;
+                if (_snd_video_mode == 1) {
+                    _snd_seq_tick_mode = 5;
                 } else {
-                    gSeqTimerRateMode = SEQ_TICKRATE_50;
+                    _snd_seq_tick_mode = SEQ_TICKRATE_50;
                 }
                 return;
             case 1:
                 VBLANK_MINUS = SEQ_TICKRATE_60;
-                if (gVideoMode == 0) {
-                    gSeqTimerRateMode = 5;
+                if (_snd_video_mode == 0) {
+                    _snd_seq_tick_mode = 5;
                 } else {
-                    gSeqTimerRateMode = SEQ_TICKRATE_60;
+                    _snd_seq_tick_mode = SEQ_TICKRATE_60;
                 }
                 return;
             case 3:
@@ -98,18 +98,18 @@ void SsSetTickMode(s32 a0)
                 VBLANK_MINUS = SEQ_TICKRATE_240;
                 return;
             case 5:
-                if (gVideoMode == 0) {
+                if (_snd_video_mode == 0) {
                     VBLANK_MINUS = SEQ_TICKRATE_60;
-                } else if (gVideoMode == 1) {
+                } else if (_snd_video_mode == 1) {
                     VBLANK_MINUS = SEQ_TICKRATE_50;
                 } else {
                     VBLANK_MINUS = SEQ_TICKRATE_60;
                 }
                 return;
             case 0:
-                if (gVideoMode == 0) {
+                if (_snd_video_mode == 0) {
                     VBLANK_MINUS = SEQ_TICKRATE_60;
-                } else if (gVideoMode == 1) {
+                } else if (_snd_video_mode == 1) {
                     VBLANK_MINUS = SEQ_TICKRATE_50;
                 } else {
                     VBLANK_MINUS = SEQ_TICKRATE_60;
@@ -142,35 +142,35 @@ extern void EnterCriticalSection(void);
 extern void VSyncCallback(void (*cb)(void));
 extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void);
 extern void ExitCriticalSection(void);
-extern s32 gSeqTimerModeFlag;
-extern s32 gSeqTimerRateFlag;
-extern s32 gSeqTimerStopPending;
-extern s32 gSeqTimerId;
-extern void (*gSeqTimerChainedCallback)(void);
+extern s32 _snd_seq_no_tick;
+extern s32 _snd_1per2;
+extern s32 _snd_use_vsync_cb;
+extern s32 _snd_use_interrupt_id;
+extern void (*_snd_vsync_cb)(void);
 
 void SsEnd(void)
 {
     s32 v;
 
-    if (gSeqTimerModeFlag != 0) {
+    if (_snd_seq_no_tick != 0) {
         return;
     }
 
-    gSeqTimerRateFlag = 0;
+    _snd_1per2 = 0;
     EnterCriticalSection();
 
-    if (gSeqTimerStopPending != 0) {
+    if (_snd_use_vsync_cb != 0) {
         VSyncCallback(0);
-        gSeqTimerStopPending = 0;
+        _snd_use_vsync_cb = 0;
     } else {
-        v = gSeqTimerId;
+        v = _snd_use_interrupt_id;
         if (v != -1) {
             if (v != 0) {
                 InterruptCallback(v, NULL);
             } else {
-                InterruptCallback(0, gSeqTimerChainedCallback);
+                InterruptCallback(0, _snd_vsync_cb);
             }
-            gSeqTimerId = -1;
+            _snd_use_interrupt_id = -1;
         }
     }
 
@@ -187,31 +187,31 @@ void SsQuit(void)
 /* Sony's `SsSeqCalledTbyT` (`libsnd/sscall`), linked from the SDK object
  * since round 34. Local view, never a shared header. */
 extern void SsSeqCalledTbyT(void);
-extern void (*gSeqTimerChainedCallback)(void);
+extern void (*_snd_vsync_cb)(void);
 
 void _SsTrapIntrVSync(void)
 {
-    if (gSeqTimerChainedCallback != NULL) {
-        gSeqTimerChainedCallback();
+    if (_snd_vsync_cb != NULL) {
+        _snd_vsync_cb();
     }
     SsSeqCalledTbyT();
 }
 
-extern s32 gSeqTimerDividerFlag;
+extern s32 D_8006DCA0;
 
 void _SsSeqCalledTbyT_1per2(void)
 {
-    if (gSeqTimerDividerFlag == 0) {
-        gSeqTimerDividerFlag = 1;
+    if (D_8006DCA0 == 0) {
+        D_8006DCA0 = 1;
     } else {
-        gSeqTimerDividerFlag = 0;
+        D_8006DCA0 = 0;
         SsSeqCalledTbyT();
     }
 }
 
 /* Shadow copy of the three PSX root-counter register blocks (COUNT/MODE/
  * TARGET, each a hardware halfword, 0x10 apart -- matches the real
- * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). gRCntRegs is a
+ * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). D_8006DCB0 is a
  * pointer to this table, not the table itself.
  *
  * The three hardware fields are `volatile` because they ARE memory-mapped
@@ -232,7 +232,7 @@ typedef struct {
     u8  padA[0x10 - 0xA];
 } RCntEntry;
 
-extern RCntEntry *gRCntRegs;
+extern RCntEntry *D_8006DCB0;
 
 s32 SetRCnt(s32 n, s16 target, u32 mode)
 {
@@ -245,8 +245,8 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
     }
 
     isLow = (u32)idx < 2;
-    gRCntRegs[idx].mode = 0;
-    gRCntRegs[idx].target = target;
+    D_8006DCB0[idx].mode = 0;
+    D_8006DCB0[idx].target = target;
 
     if (isLow) {
         if (mode & 0x10) {
@@ -265,7 +265,7 @@ s32 SetRCnt(s32 n, s16 target, u32 mode)
         md |= 0x10;
     }
 
-    gRCntRegs[idx].mode = md;
+    D_8006DCB0[idx].mode = md;
     return 1;
 }
 
@@ -277,14 +277,14 @@ s32 GetRCnt(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = gRCntRegs;
+    base = D_8006DCB0;
     return base[idx].count;
 }
 
 /* Shadow of the PSX interrupt controller pair at 0x1F801070/0x1F801074
- * (I_STAT/I_MASK). gIrqRegs is a pointer to this pair, not the pair
- * itself -- same "pointer-to-hardware-block" idiom as gRCntRegs above.
- * gRCntIrqMasks holds the per-index IRQ mask bit (root counters 0/1/2 use
+ * (I_STAT/I_MASK). D_8006DCAC is a pointer to this pair, not the pair
+ * itself -- same "pointer-to-hardware-block" idiom as D_8006DCB0 above.
+ * D_8006DCB4 holds the per-index IRQ mask bit (root counters 0/1/2 use
  * indices 0-2 -> Tmr0/Tmr1/Tmr2 IRQ bits 0x10/0x20/0x40; index 3 is the
  * 0x1 VBLANK bit). */
 typedef struct {
@@ -292,24 +292,24 @@ typedef struct {
     volatile u32 mask; /* 0x4, I_MASK */
 } IrqRegs;
 
-extern IrqRegs *gIrqRegs;
-extern u32 gRCntIrqMasks[4];
+extern IrqRegs *D_8006DCAC;
+extern u32 D_8006DCB4[4];
 
 s32 StartRCnt(u16 which)
 {
     s32 idx = which;
-    IrqRegs *reg = gIrqRegs;
+    IrqRegs *reg = D_8006DCAC;
 
-    reg->mask |= gRCntIrqMasks[idx];
+    reg->mask |= D_8006DCB4[idx];
     return idx < 3;
 }
 
 s32 StopRCnt(u16 which)
 {
     s32 idx = which;
-    IrqRegs *reg = gIrqRegs;
+    IrqRegs *reg = D_8006DCAC;
 
-    reg->mask &= ~gRCntIrqMasks[idx];
+    reg->mask &= ~D_8006DCB4[idx];
     return 1;
 }
 
@@ -321,7 +321,7 @@ s32 ResetRCnt(s32 n)
     if (idx >= 3) {
         return 0;
     }
-    base = gRCntRegs;
+    base = D_8006DCB0;
     base[idx].count = 0;
     return 1;
 }

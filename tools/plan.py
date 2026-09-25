@@ -547,6 +547,14 @@ def collect(st):
         docs[rel] = {"words": n, "budget": budget,
                      "over": n is not None and n > budget}
 
+    # Game names on Sony DATA (round 86): objects that never placed have no
+    # psyq-objects.ld pins, so rename.py's pin guard could not see their bss.
+    try:
+        sys.path.insert(0, str(ROOT / "tools"))
+        import sonydata
+        sony_named = [n for n, _, _ in sonydata.flagged()]
+    except Exception:
+        sony_named = []
     ec = subprocess.run([sys.executable, "tools/externcheck.py"], capture_output=True, text=True, cwd=ROOT).stdout
     m_ec = re.search(r"^(\d+) function\(s\) with conflicting arity", ec, re.M)
     return {
@@ -559,9 +567,9 @@ def collect(st):
                   "next_match_model": mm, "why": mm_why, "revisit": len(revisit)},
             "1b": {"status": t1b_status, "promotable": len(promotable),
                    "nm_bodies": sum(u["nm_bodies"] for u in units.values())},
-            "2": {"status": "open" if unnamed_sdk else "done",
+            "2": {"status": "open" if unnamed_sdk or sony_named else "done",
                   "named": len(named_sdk), "unnamed": len(unnamed_sdk), "parked": len(parked_sdk),
-                  "unnamed_list": unnamed_sdk},
+                  "unnamed_list": unnamed_sdk, "sony_data_game_named": sony_named},
             "3": {"status": "done" if not todo3 and not fresh_units else st["tracks"]["3"]["status"],
                   "units_total": len(units), "units_done": len(done),
                   "units_fresh": len(fresh_units - set(done)),
@@ -750,6 +758,11 @@ def jobs(d, n):
             q_sdk.append(("2", f"identify and name {t['2']['unnamed']} SDK functions game code calls "
                                f"(one runner, batch; list: plan.py --json .tracks.2.unnamed_list)",
                           MODELS["mechanical_runner"]))
+    if t["2"]["sony_data_game_named"]:
+        q_sdk.append(("2", f"give Sony's names back to {len(t['2']['sony_data_game_named'])} game-named "
+                           "Sony data symbol(s) (python3 tools/sonydata.py -v; anchor each lead, "
+                           "rename.py to Sony's name or to the placeholder; a field inside a Sony "
+                           "table is a C access, not a symbol)", MODELS["mechanical_runner"]))
     q_revisit = stall_runner_jobs(d["_revisit"], t["1"]["next_match_model"], d["_revisit_label"])
     # One job per UNIT (a runner owns one unit; round 62's slot drew one 32w
     # function while its unit had nine promotable bodies).
@@ -898,7 +911,8 @@ def print_status(d, n, st):
     print(f"  1b     {t['1b']['status']:<10} NON_MATCHING bodies: {t['1b']['nm_bodies']} in src, "
           f"{t['1b']['promotable']} stall(s) with a preserved body and none yet")
     print(f"  2      {t['2']['status']:<10} SDK call surface: {t['2']['named']} named, "
-          f"{t['2']['unnamed']} still func_, {t['2']['parked']} parked (unidentified, done for this track)")
+          f"{t['2']['unnamed']} still func_, {t['2']['parked']} parked (unidentified, done for this track); "
+          f"{len(t['2']['sony_data_game_named'])} Sony data symbol(s) with a game name (tools/sonydata.py)")
     t3 = t["3"]
     print(f"  3      {t3['status']:<10} readability: {t3['units_done']}/{t3['units_total']} units passed"
           f"{' (' + str(t3['units_fresh']) + ' wait for track 1: fresh ground)' if t3.get('units_fresh') else ''}; "

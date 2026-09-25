@@ -9,15 +9,15 @@ Unit: `code_179d8_c`. Round 23, runner bravo.
 ## What it does
 
 Clears an IRQ mask bit in the same shadow interrupt-controller pair as
-`StartRCnt` above (`gIrqRegs` -> I_STAT/I_MASK pair, `+0x4` is I_MASK;
-`gRCntIrqMasks[which]` selects the bit). Unlike its sibling, the return value is
+`StartRCnt` above (`D_8006DCAC` -> I_STAT/I_MASK pair, `+0x4` is I_MASK;
+`D_8006DCB4[which]` selects the bit). Unlike its sibling, the return value is
 an unconditional `1` (`ori $v0, $zero, 0x1` sitting in the `jr $ra` delay
 slot) -- there is no `slti` bounds check computed here at all, dead or
 otherwise.
 
 ## Final C
 
-Reuses the `IrqRegs` type and `gIrqRegs`/`gRCntIrqMasks` externs declared for
+Reuses the `IrqRegs` type and `D_8006DCAC`/`D_8006DCB4` externs declared for
 `StartRCnt` immediately above it in the unit (see that report for the
 struct and the field's `volatile` rationale).
 
@@ -25,9 +25,9 @@ struct and the field's `volatile` rationale).
 s32 StopRCnt(u16 which)
 {
     s32 idx = which;
-    IrqRegs *reg = gIrqRegs;
+    IrqRegs *reg = D_8006DCAC;
 
-    reg->mask &= ~gRCntIrqMasks[idx];
+    reg->mask &= ~D_8006DCB4[idx];
     return 1;
 }
 ```
@@ -49,7 +49,7 @@ duplicating the explanation.
 ## Naming
 
 Round 69 (delta). `StopRCnt` (was `func_80032C28`): the inverse of
-`StartRCnt` (`gIrqRegs->mask &= ~gRCntIrqMasks[idx]`). Tier A, same
+`StartRCnt` (`D_8006DCAC->mask &= ~D_8006DCB4[idx]`). Tier A, same
 reasoning as `StartRCnt.md`.
 
 ## Identification (round 69, head)
