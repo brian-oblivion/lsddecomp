@@ -48,8 +48,8 @@ using either the raw control byte or `0x7F` minus it) combine `lvl1b`/`lvl2b`
 into a final `pan1`/`pan2` pair, clamped so neither exceeds the other when a
 global flag (`D_8008E8C0 == 1`) is set. The rest is the tail this unit's
 `vmNoiseOn2` already established byte-for-byte: write `pan1`/`pan2` into
-the 16-byte-stride `D_8008D7F0`/`D_8008D7F2` tables, OR `3` into
-`D_8008D970[chan]`, compute a 32-bit voice-enable bit split across
+the 16-byte-stride `_svm_sreg_buf`/`D_8008D7F2` tables, OR `3` into
+`_svm_sreg_dirty[chan]`, compute a 32-bit voice-enable bit split across
 `lowBit`/`highBit` by `chan<16`, reset the whole `D_8008D9A3` 52-byte-stride
 table's low bit for every live voice (`D_8008E9D0` of them) then mark this
 channel's own slot `2`, OR the enable bits into `D_8008E228`/`D_8008E22C`
@@ -117,9 +117,9 @@ extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
 extern u16 *D_8006DAD4;
-extern u8 D_8008D7F0[];
+extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 extern u8 D_8008E9D0;
@@ -163,9 +163,9 @@ extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
 extern u16 *D_8006DAD4;
-extern u8 D_8008D7F0[];
+extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 extern u8 D_8008E9D0;
@@ -242,8 +242,8 @@ void vmNoiseOn(s32 a0) {
 
     off16 = chan << 4;
     *(u16 *)(D_8008D7F2 + off16) = pan2;
-    *(u16 *)(D_8008D7F0 + off16) = pan1;
-    D_8008D970[chan] |= 3;
+    *(u16 *)(_svm_sreg_buf + off16) = pan1;
+    _svm_sreg_dirty[chan] |= 3;
 
     if (chan < 16) {
         lowBit = 1 << chan;

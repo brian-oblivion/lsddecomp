@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002E138` on 2026-09-24 (tools/rename.py). Address 0x8002e138.
 
-REVISITED, round 73: MATCHED 112/112, fresh transcription, no permuter; names/types used (params `chan`/`bend`, local 0x34-stride record views, `D_8008D7F4` written as `((u16 *)D_8008D7F0)[off + 2]`)
+REVISITED, round 73: MATCHED 112/112, fresh transcription, no permuter; names/types used (params `chan`/`bend`, local 0x34-stride record views, `D_8008D7F4` written as `((u16 *)_svm_sreg_buf)[off + 2]`)
 
 ## Round 73 (delta): matched
 
@@ -40,21 +40,21 @@ one item and nothing else:
    Ablation with a `q` local: 99/112, same length. Arm 2:
    `q = (b * e->unk12) / 127;` with no `prod` local. Ablation with
    `prod`: 106/112, ins/del 1/1.
-6. **Tail order: the D7F4 store is really `D_8008D7F0[off + 2]`.** With
-   `D_8008D7F4[off]` the sched dump shows the `D_8008D970` load hoisted
+6. **Tail order: the D7F4 store is really `_svm_sreg_buf[off + 2]`.** With
+   `D_8008D7F4[off]` the sched dump shows the `_svm_sreg_dirty` load hoisted
    above the halfword store. The two addresses are `(plus reg symbol)` on
    different symbols, which 2.6.3's dependence test proves disjoint.
    Retail keeps source order and leaves an unfilled load-delay `nop`.
-   `((u16 *)D_8008D7F0)[off + 2]` puts the constant into the address as
-   `(const (plus D_8008D7F0 4))`, the test can no longer separate them, and
+   `((u16 *)_svm_sreg_buf)[off + 2]` puts the constant into the address as
+   `(const (plus _svm_sreg_buf 4))`, the test can no longer separate them, and
    the order holds (111 -> 112/112). This also explains `off = chan * 8`:
    it is a u16-element index into the 16-byte per-voice record at
-   `D_8008D7F0`, the same record `vmNoiseOn2` writes through
-   `D_8008D7F0`/`D_8008D7F2`. It is not a byte offset.
+   `_svm_sreg_buf`, the same record `vmNoiseOn2` writes through
+   `_svm_sreg_buf`/`D_8008D7F2`. It is not a byte offset.
 
 Build figures (words / raw): a (clean transcription) 119; b (+idx hoist)
 113; c (+`& 0xFF`) 111; d (+`(u32)`, EA26 via `(u8)`) 112, 34/112, ins/del
-7/7; e (+`p`) 111; h (+arm1/arm2 shapes) 111; **j (+`D_8008D7F0[off+2]`)
+7/7; e (+`p`) 111; h (+arm1/arm2 shapes) 111; **j (+`_svm_sreg_buf[off+2]`)
 112/112, SHA1 OK**. Ablations of j: no `p` 113; `q` in arm 1 99/112;
 `prod` in arm 2 106/112; `(u8)chan` everywhere 113.
 
@@ -83,7 +83,7 @@ extern Rec34B_E138 D_8008D998[];
 extern Rec34B_E138 D_8008D99C[];
 extern Rec34H_E138 D_8008D994[];
 extern s16 D_8008EA26[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 void SePitchBend(s32 chan, s32 bend) {
     s32 off;
@@ -112,8 +112,8 @@ void SePitchBend(s32 chan, s32 bend) {
             note = D_8008D994[(chan & 0xFF)].unk0 + q - 1;
             fine = q + 127;
         }
-        ((u16 *)D_8008D7F0)[off + 2] = note2pitch2((u16)note, (u16)fine);
-        D_8008D970[(chan & 0xFF)] |= 4;
+        ((u16 *)_svm_sreg_buf)[off + 2] = note2pitch2((u16)note, (u16)fine);
+        _svm_sreg_dirty[(chan & 0xFF)] |= 4;
     }
 }
 ```
@@ -241,7 +241,7 @@ extern u8 D_8008D99C[];
 extern u8 D_8008D994[];
 extern u8 D_8008D7F4[];
 extern u16 D_8008EA26;
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 void SePitchBend(s32 a0, s32 a1) {
     s32 s0;
@@ -289,9 +289,9 @@ void SePitchBend(s32 a0, s32 a1) {
         v0 = note2pitch2(arg0, (u16)arg1);
         *(u16 *)(D_8008D7F4 + (off16 << 1)) = v0;
         v1 = (u8)s0;
-        v0 = D_8008D970[v1];
+        v0 = _svm_sreg_dirty[v1];
         v0 |= 4;
-        D_8008D970[v1] = v0;
+        _svm_sreg_dirty[v1] = v0;
     }
 }
 ```
@@ -360,7 +360,7 @@ negative:**
 2. A bare `__asm__("")` between the `D_8008D7F4[...] = v0;` store and the
    trailing `v1 = (u8)s0;` mask (targeting an apparent instruction-order
    difference in the tail: retail computes the `D_8008D7F4` store address
-   before the `D_8008D970` mask, my build did the same but scheduled
+   before the `_svm_sreg_dirty` mask, my build did the same but scheduled
    slightly differently). Result: **regressed to 114/112** (2 over).
    Reverted.
 
@@ -369,7 +369,7 @@ residue this report already documents as unfixable-from-C (the extra
 `move a0,s0` — a genuine register-identity difference, HARD RULE 6
 territory, already tried three ways in this report and confirmed
 unmovable by declaration order again this round) plus one minor
-instruction-reordering in the trailing `D_8008D7F4`/`D_8008D970` sequence
+instruction-reordering in the trailing `D_8008D7F4`/`_svm_sreg_dirty` sequence
 that a barrier could not close (attempt 2 above) and that was not
 re-investigated further given the 30-attempt budget is shared across five
 queued functions this unit.
@@ -386,7 +386,7 @@ extern u8 D_8008D99C[];
 extern u8 D_8008D994[];
 extern u8 D_8008D7F4[];
 extern u16 D_8008EA26;
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 void SePitchBend(s32 a0, s32 a1) {
     s32 s0;
@@ -435,9 +435,9 @@ void SePitchBend(s32 a0, s32 a1) {
         v0 = note2pitch2(arg0, (u16)arg1);
         *(u16 *)(D_8008D7F4 + (off16 << 1)) = v0;
         v1 = (u8)s0;
-        v0 = D_8008D970[v1];
+        v0 = _svm_sreg_dirty[v1];
         v0 |= 4;
-        D_8008D970[v1] = v0;
+        _svm_sreg_dirty[v1] = v0;
     }
 }
 ```
@@ -494,7 +494,7 @@ clean against the round-33 baseline afterward):**
 3. **A bare `__asm__("")` between the `*(u16 *)(D_8008D7F4 + ...) = v0;`
    store and the `v1 = (u8)s0;` mask**, targeting the tail reordering where
    retail computes `off16<<1` and stores to `D_8008D7F4` BEFORE masking
-   `(u8)s0` and reading `D_8008D970`, while the compiled body does the
+   `(u8)s0` and reading `_svm_sreg_dirty`, while the compiled body does the
    mask+read first and the shift+store second. Result: **regressed to
    114/112** (0x1c8) — one word worse. Reverted.
 
@@ -641,3 +641,5 @@ symbol; this pass does not rename it further. Matched round 73, 112/112.
 The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
 
 `src/` now reads `(u8)_svm_voice[c].unk10`, `(u8)_svm_voice[c].unk14` and `(u16)_svm_voice[c].unk0C` (value casts at the site; the header keeps +0x0C/+0x10/+0x14 `s16`, what most accessors read). Byte-exact. Measured: the address-cast spelling `*(u8 *)&_svm_voice[c].unk10` is NOT equivalent here -- it grows the frame 0x20 -> 0x28 with every other word equal (104/112); spelling +0x0C as `*(u16 *)&...unk0C` on top of that drops to 29/110.
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). `src/` keeps the halfword-array cast `((u16 *)_svm_sreg_buf)[off + 2]` (the idx*8 split-scaled-index idiom) and `_svm_sreg_dirty`. Byte-exact.

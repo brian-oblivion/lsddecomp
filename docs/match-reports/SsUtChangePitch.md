@@ -41,7 +41,7 @@ Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `SsUtKeyOff`), then on a full match calls `func_80032148`, sets the
 "current channel" mode globals, copies a per-channel byte into
 `D_8008EA18`, stores `note2pitch2`'s return into a 16-byte-stride table,
-and ORs a flag bit into `D_8008D970`.
+and ORs a flag bit into `_svm_sreg_dirty`.
 
 ## What it is
 
@@ -110,7 +110,7 @@ s32 SsUtChangePitch(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5
     D_8008EA26 = idx;
     D_8008EA18 = *(u8 *) &D_8008D99C[idx].unk0;
     D_8008D7F4[idx].unk0 = note2pitch2(p4, p5);
-    D_8008D970[idx] |= 4;
+    _svm_sreg_dirty[idx] |= 4;
     return 0;
 }
 #endif
@@ -326,7 +326,7 @@ extern Rec34D994 D_8008D99A[];
 extern Rec34D994 D_8008D99C[];
 extern Rec34D994 D_8008D99E[];
 extern Rec16D7F0 D_8008D7F4[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern void SpuVmVSetUp(s16 p1, s16 p2);   /* was func_80032148 until round 34 */
 extern volatile u16 D_8008EA26;
 extern volatile u8 D_8008EA18;
@@ -354,7 +354,7 @@ s32 SsUtChangePitch(s16 idx, s16 p1, s16 p2, s16 p3, s32 unusedP, u16 p4, u16 p5
     D_8008EA22 = 0x21;
     D_8008EA18 = *(u8 *) &D_8008D99C[idx].unk0;
     D_8008D7F4[idx].unk0 = note2pitch2(p4, p5);
-    D_8008D970[idx] |= 4;
+    _svm_sreg_dirty[idx] |= 4;
     return 0;
 }
 ```

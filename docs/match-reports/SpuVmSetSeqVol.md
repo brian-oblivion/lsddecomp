@@ -69,9 +69,9 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
     if ((s16) p3 == 1) {
         for (i = 0; i < D_8008E9D0; i++) {
             if (D_8008D996[(u8) i].unk0 == key) {
-                D_8008D7F0[i].unk0 = t1v;
-                D_8008D7F0[i].unk2 = t0v;
-                D_8008D970[i] |= 3;
+                _svm_sreg_buf[i].unk0 = t1v;
+                _svm_sreg_buf[i].unk2 = t0v;
+                _svm_sreg_dirty[i] |= 3;
             }
         }
     }
@@ -85,7 +85,7 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
 
 Reuses `Entry90902E8` (this unit's top-of-file typedef), and the
 shared globals/typedefs `D_8008EA22`, `D_8008E9D0`, `D_8008D996`
-(`Rec34D994`), `D_8008D7F0` (`Rec16D7F0`), `D_8008D970`.
+(`Rec34D994`), `_svm_sreg_buf` (`Rec16D7F0`), `_svm_sreg_dirty`.
 
 ## One CLOSED finding
 
@@ -288,7 +288,7 @@ placement will transfer.
 
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
 body into `src/code_179d8_j.c` (local reduced-view declarations for
-`D_8008E9D0`, `D_8008D996`, `D_8008D7F0`, `D_8008D970`, reusing this file's
+`D_8008E9D0`, `D_8008D996`, `_svm_sreg_buf`, `_svm_sreg_dirty`, reusing this file's
 own already-declared `Entry90902E8`/`D_8008EA22`) and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `funcdiff.py` reproduces
 **21/96 raw word-match with the expected out-of-range drift warning**.
@@ -370,7 +370,7 @@ The whole remaining residue is a single register-identity difference.
 ### The six levers, in the order they were found (each measured on the real oracle)
 
 1. **`s16` loop counter** (above). Reproduces the guard, the loop test, the
-   0x34-stride index and the `D_8008D970` index.
+   0x34-stride index and the `_svm_sreg_dirty` index.
 2. **The dead-local frame idiom needs the ARRAY spelling here.** This
    report's round-23 section closed the empty `addiu sp,sp,-8` frame with
    `s32 dead; if (0) { dead = 1; }` and recorded that the scalar and the
@@ -397,11 +397,11 @@ The whole remaining residue is a single register-identity difference.
    round-56 body). Dropping the `tbl` local and writing
    `entry = D_800902E8[(u8) p0]; ... entry += (u32) shifted >> 24;` is worth
    a further step -- a separate `tbl` local costs a `move` and regresses.
-5. **Two `u16 *` pointer locals for `D_8008D7F0`, declared INSIDE the loop
-   body.** Retail hoists `&D_8008D7F0` into `a3` and `&D_8008D7F0 + 2` into
+5. **Two `u16 *` pointer locals for `_svm_sreg_buf`, declared INSIDE the loop
+   body.** Retail hoists `&_svm_sreg_buf` into `a3` and `&_svm_sreg_buf + 2` into
    `t2` before the loop and adds one shared byte offset to both
    (`addu v1,v0,a3` / `addu v0,v0,t2`); the struct-array spelling
-   `D_8008D7F0[i].unk0`/`.unk2` instead re-materialises `lui`/`%lo` per
+   `_svm_sreg_buf[i].unk0`/`.unk2` instead re-materialises `lui`/`%lo` per
    access with a single base and a `2(...)` displacement. Two pointers fix
    the two-base shape -- **and WHERE they are declared decides where the
    preheader ends up**: assigned before the `for`, the `lui`/`addiu` pair is
@@ -410,7 +410,7 @@ The whole remaining residue is a single register-identity difference.
    AFTER the guard, which is retail. That placement alone is worth 1085 ->
    610 permuter units. This is the same pointer-hoist lever round 56 found on
    `SpuVmSeqKeyOff`, applied to a second function in the same unit.
-6. **The `D_8008D7F0` index is a `s16`, not an `int`.** Retail's byte offset
+6. **The `_svm_sreg_buf` index is a `s16`, not an `int`.** Retail's byte offset
    is `sll v0,a1,0x13` / `sra v0,v0,0xf` -- a sign-extension from 16 bits
    FUSED with the scale, i.e. `(s16)(i * 8)` used as a `u16 *` index, not
    `(int) i * 8` (which is the single `sll v0,a1,0x4` the build emitted).
@@ -447,9 +447,9 @@ typedef struct {
     u16 unk2;
     u8 pad4[0x10 - 0x4];
 } Rec16D7F0;
-extern Rec16D7F0 D_8008D7F0[];
+extern Rec16D7F0 _svm_sreg_buf[];
 
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
 {
@@ -488,11 +488,11 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
                 s16 off;
 
                 off = i * 8;
-                slotLo = &D_8008D7F0[0].unk0;
-                slotHi = &D_8008D7F0[0].unk2;
+                slotLo = &_svm_sreg_buf[0].unk0;
+                slotHi = &_svm_sreg_buf[0].unk2;
                 slotLo[off] = t1v;
                 slotHi[off] = t0v;
-                D_8008D970[i] |= 3;
+                _svm_sreg_dirty[i] |= 3;
             }
         }
     }
@@ -571,7 +571,7 @@ discharged rather than just disobeyed.
 
 **3. The same round-56 pointer-hoist lever now has two independent
 confirmations in this unit** (`SpuVmSeqKeyOff`'s `&D_8008EA26`, this
-function's `&D_8008D7F0[0].unk0`/`.unk2`), plus a new rider: **for a global
+function's `&_svm_sreg_buf[0].unk0`/`.unk2`), plus a new rider: **for a global
 whose address must be hoisted into the PREHEADER of a `for` loop -- i.e.
 after the loop-inversion guard, not before it -- the pointer local must be
 assigned INSIDE the loop body and left to loop-invariant motion.** Assigning

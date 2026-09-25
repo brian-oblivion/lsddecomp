@@ -24,7 +24,7 @@ hardware address (confirmed by reading `asm/data/57070.data.s`), and the
 function writes to `+0x194`/`+0x196` from it — the SPU key-on-low/key-on-high
 registers. `a0` is the voice-channel number (0-31, masked to a byte), `a1`
 and `a2` are per-voice values written into two 16-byte-stride parameter
-tables (`D_8008D7F0`, `D_8008D7F2`); `D_8008D970[chan]` is a per-voice flag
+tables (`_svm_sreg_buf`, `D_8008D7F2`); `_svm_sreg_dirty[chan]` is a per-voice flag
 byte OR'd with `3`; a loop over all `D_8008E9D0` (a voice count) entries of a
 52-byte-stride array at `D_8008D9A3` masks each entry's low bit; the target
 channel's own 52-byte-stride slot gets three fields set (`D_8008D98C+2`←10
@@ -39,9 +39,9 @@ written to the two SPU key-on registers.
 ## Best-derived body (98/112 words, preserved for the next attempt)
 
 ```c
-extern u8 D_8008D7F0[];
+extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern u8 D_8008E9D0;
 
 extern u8 D_8008D98A[];
@@ -73,10 +73,10 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     off16 = a0 << 4;
     *(u16 *)(D_8008D7F2 + off16) = a2;
     __asm__("");
-    v1 = D_8008D970[a0];
-    *(u16 *)(D_8008D7F0 + off16) = a1;
+    v1 = _svm_sreg_dirty[a0];
+    *(u16 *)(_svm_sreg_buf + off16) = a1;
     v1 |= 3;
-    D_8008D970[a0] = v1;
+    _svm_sreg_dirty[a0] = v1;
     if (a0 < 16) {
         lowBit = 1 << a0;
         highBit = 0;
@@ -132,8 +132,8 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
    stall") and it is NOT the `register T v asm("$N")` situation (that
    remains banned regardless).
 2. **A scheduling reorder, already found and fixed once already.** In
-   isolation, GCC hoists the `D_8008D970[chan]` read ahead of BOTH the
-   `D_8008D7F2`/`D_8008D7F0` stores it sits between in source, defeating the
+   isolation, GCC hoists the `_svm_sreg_dirty[chan]` read ahead of BOTH the
+   `D_8008D7F2`/`_svm_sreg_buf` stores it sits between in source, defeating the
    `chan<<4` register reuse retail shows (one `sll` shared by both stride-16
    stores). A bare `__asm__("")` placed right after the first store restores
    source order and the shared shift — confirmed working in isolation and
@@ -247,9 +247,9 @@ believed entirely attributable to the pre-existing register-identity
 stall, not a new independent residue.
 
 ```c
-extern u8 D_8008D7F0[];
+extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern u8 D_8008E9D0;
 
 extern u8 D_8008D98A[];
@@ -281,10 +281,10 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     off16 = a0 << 4;
     *(u16 *)(D_8008D7F2 + off16) = a2;
     __asm__("");
-    v1 = D_8008D970[a0];
-    *(u16 *)(D_8008D7F0 + off16) = a1;
+    v1 = _svm_sreg_dirty[a0];
+    *(u16 *)(_svm_sreg_buf + off16) = a1;
     v1 |= 3;
-    D_8008D970[a0] = v1;
+    _svm_sreg_dirty[a0] = v1;
     if (a0 < 16) {
         lowBit = 1 << a0;
         highBit = 0;
@@ -587,8 +587,8 @@ spending the session's one search where it can bite.
 ### Preserved body (107/112 words, 5 short — rebuild this FIRST next time)
 
 Needs, in addition to the unit's existing declarations before
-`SpuVmKeyOnNow` and `vmNoiseOn` (`D_8008D7F0`, `D_8008D7F2`,
-`D_8008D970`, `D_8008D98C`, `D_8008D9A3`, `D_8008E228`, `D_8008E22C`,
+`SpuVmKeyOnNow` and `vmNoiseOn` (`_svm_sreg_buf`, `D_8008D7F2`,
+`_svm_sreg_dirty`, `D_8008D98C`, `D_8008D9A3`, `D_8008E228`, `D_8008E22C`,
 `D_80090C60`, `D_80090C64`, `D_8008E9D0`, `D_8006DAD4`), one extra:
 
 #if 0
@@ -610,10 +610,10 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     off16 = a0 << 4;
     *(u16 *)(D_8008D7F2 + off16) = a2;
     __asm__("");
-    v1 = D_8008D970[a0];
-    *(u16 *)(D_8008D7F0 + off16) = a1;
+    v1 = _svm_sreg_dirty[a0];
+    *(u16 *)(_svm_sreg_buf + off16) = a1;
     v1 |= 3;
-    D_8008D970[a0] = v1;
+    _svm_sreg_dirty[a0] = v1;
     if ((u32)a0 < 16) {
         lowBit = 1 << a0;
         highBit = 0;
@@ -704,3 +704,5 @@ it further. The function remains a STALL (5 words short, see above).
 The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
 
 The NON_MATCHING body drops its `idx52`/`li` byte offsets for `_svm_voice[(u8)a3].unk04/unk1B/unk02` and `_svm_voice[(u16)i].unk1B`; compiled length 107 -> 108 of 112, mnemonic ratio vs retail 0.831 -> 0.864. Still a stall.
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body now stores `_svm_sreg_buf[a0].unk2 = a2` / `.unk0 = a1` in place of `*(u16 *)(D_8008D7F2 + off16)` / `D_8008D7F0 + off16` (`off16` is gone). This moved it closer to retail again: its prologue now schedules exactly as retail's first 16 words (mnemonic ratio 0.864 -> 0.909).

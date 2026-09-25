@@ -38,7 +38,7 @@ within measurement noise).
 set `woff = idxCopy << 3;` as one of the function's FIRST statements,
 before any of the 0x34-stride record accesses, then store the two final
 results through flat `((s16 *) D_8008D7F2)[(u16) woff]` / `((s16 *)
-D_8008D7F0)[(u16) woff]` casts instead of the `Rec16D7F0`-typed
+_svm_sreg_buf)[(u16) woff]` casts instead of the `Rec16D7F0`-typed
 `array[idxCopy].unk0` form) — this is exactly the SAME "persisted `idx*8`,
 consumed once near the end for these same two arrays" shape this report's
 own "What's missing" section already named as the open mystery, and it is
@@ -135,11 +135,11 @@ obvious from context.
   of (for `D_8008D9B2`) a plain SIGNED read at a different point --
   reinterpreted through a cast (`((Rec34HalfU *) D_8008D9B2)[a0].unk0`)
   rather than redeclared, same rule as everywhere else in this file.
-- `Rec16D7F0` / `D_8008D7F0[]`, `D_8008D7F2[]`: the SAME 0x10-byte-stride
+- `Rec16D7F0` / `_svm_sreg_buf[]`, `D_8008D7F2[]`: the SAME 0x10-byte-stride
   record family `code_179d8_j.c` documents as `Rec16D7F0`.
 
   > **HEAD ADJUDICATION, round 24: this bullet's "important correction" is
-  > WITHDRAWN. `D_8008D7F0`/`D_8008D7F2` remain the two FIELDS of one
+  > WITHDRAWN. `_svm_sreg_buf`/`D_8008D7F2` remain the two FIELDS of one
   > 0x10-stride record, as `code_179d8_j.c`'s `Rec16D7F0` models them.**
   >
   > The observation was accurate and the inference from it was not. What the
@@ -168,7 +168,7 @@ obvious from context.
   > already-materialised address, which cc1 can only emit if the two are one
   > object. **Conclusive evidence in one function beats non-conclusive
   > evidence in another about the same symbols**, so the one-record model
-  > stands and this function's stores are `D_8008D7F0[a0].unk0` and
+  > stands and this function's stores are `_svm_sreg_buf[a0].unk0` and
   > `.unk2`.
   >
   > Corroborating, though not by itself decisive: this report's own analysis
@@ -177,7 +177,7 @@ obvious from context.
   > independent arrays would have to coincide in both stride and index.
   >
   > Kept rather than deleted because the OTHER half of the bullet is right
-  > and useful: `code_179d8_j.c`'s `D_8008D7F0`/`D_8008D7F4` genuinely are
+  > and useful: `code_179d8_j.c`'s `_svm_sreg_buf`/`D_8008D7F4` genuinely are
   > two independent arrays of that record shape, which is what makes this
   > family easy to misread in either direction.
 - `ObjE970` / `D_8008E970` (pointer variable, `lw`-loaded): only the byte
@@ -205,8 +205,8 @@ THREE successive "if (byte < 0x40) scale channel A by byte/64 else scale
 channel B by (127-byte)/64" passes (against `D_8008EA1A`, then
 `D_8008EA17`, then the just-clamped accumulator's own low byte), optionally
 force both channels to their shared max if `D_8008E8C0 == 1`, then store
-the two results into `D_8008D7F2`/`D_8008D7F0` and OR a flag bit into
-`D_8008D970[a0]`.
+the two results into `D_8008D7F2`/`_svm_sreg_buf` and OR a flag bit into
+`_svm_sreg_dirty[a0]`.
 
 ## What's missing: a persisted early value that doesn't reduce to anything I could name
 
@@ -216,7 +216,7 @@ keeps it alive across the ENTIRE function body (confirmed by `grep '\$t1\b'`
 against the `.s` file: exactly two occurrences, the initial computation and
 one consuming use ~200 instructions later), and consumes it at the very end
 as `(($t1 << 16) >> 15)` -- algebraically `$t1 * 2`, i.e. `a0 * 16`, used as
-the shared byte offset for BOTH the `D_8008D7F2` and `D_8008D7F0` stores.
+the shared byte offset for BOTH the `D_8008D7F2` and `_svm_sreg_buf` stores.
 
 **Reproducing this exact split (compute `a0*8` early, double it at the
 point of use) did not work as a direct transcription.** Declaring an
@@ -451,18 +451,18 @@ typedef struct {
 } Rec34HalfU;
 
 /* Same 0x10-byte-stride record family code_179d8_j.c documents as
- * Rec16D7F0 (that unit's own D_8008D7F0/D_8008D7F4 pair); local view.
- * D_8008D7F0 and D_8008D7F2 here are TWO INDEPENDENT arrays of this
+ * Rec16D7F0 (that unit's own _svm_sreg_buf/D_8008D7F4 pair); local view.
+ * _svm_sreg_buf and D_8008D7F2 here are TWO INDEPENDENT arrays of this
  * shape (each gets its own %hi/%lo pair in the disassembly), not one
  * record's two fields. */
 typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x10 - 0x2];
 } Rec16D7F0;
-extern Rec16D7F0 D_8008D7F0[];
+extern Rec16D7F0 _svm_sreg_buf[];
 extern Rec16D7F0 D_8008D7F2[];
 
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 /* Pointer to an object; only the byte field this function reads is
  * named. */
@@ -586,10 +586,10 @@ void SetAutoPan(s16 a0) {
     }
 
     D_8008D7F2[idxCopy].unk0 = val2;
-    v0 = D_8008D970[idxCopy];
-    D_8008D7F0[idxCopy].unk0 = val1;
+    v0 = _svm_sreg_dirty[idxCopy];
+    _svm_sreg_buf[idxCopy].unk0 = val1;
     v0 |= 3;
-    D_8008D970[idxCopy] = v0;
+    _svm_sreg_dirty[idxCopy] = v0;
 }
 #endif
 ```
@@ -621,7 +621,7 @@ changed) and `tools/check-nonmatching.sh code_179d8_m` green.
 
 ## Round 73 (delta): REVISIT -- 13/228 (6 short) -> 220/228 length-exact, ins 1 / del 1
 
-REVISITED, round 73: STALL improved to length-exact 220/228 (ins 1 / del 1), residue is one register copy in the pan split; names/types used (param renamed `voice`, locals `v`/`off`/`acc`/`vol`/`q2`/`p`/`val1`/`val2`; SPU shadow stores spelled through `D_8008D7F0[off + 1]`).
+REVISITED, round 73: STALL improved to length-exact 220/228 (ins 1 / del 1), residue is one register copy in the pan split; names/types used (param renamed `voice`, locals `v`/`off`/`acc`/`vol`/`q2`/`p`/`val1`/`val2`; SPU shadow stores spelled through `_svm_sreg_buf[off + 1]`).
 
 ### Ownership, read before spending more on this
 
@@ -657,11 +657,11 @@ metric, out of 228; not funcdiff words), then anchored in-tree.
    `sym(off)` through `$at` at every access, i.e. no address pseudo exists.
 2. Separate index names: `voice` for the head, `v = voice` for the tail.
    Retail recomputes `idx*0x34` from the raw copy in `$t0` for the byte
-   reload of the accumulator and for `D_8008D970` -- the tail really uses a
+   reload of the accumulator and for `_svm_sreg_dirty` -- the tail really uses a
    second variable.
-3. SPU-shadow stores as `D_8008D7F0[off + 1] = val2; D_8008D7F0[off] = val1;`
+3. SPU-shadow stores as `_svm_sreg_buf[off + 1] = val2; _svm_sreg_buf[off] = val1;`
    (the `D_8008D7F2` of the asm is the `+2` of the same record) and
-   `D_8008D970[v] |= 3` last: the `D_8008D970` load then stays AFTER the
+   `_svm_sreg_dirty[v] |= 3` last: the `_svm_sreg_dirty` load then stays AFTER the
    first store, as retail has it (this morning's const-plus-address lever).
 4. `off = voice * 8;` instead of `voice << 3`: retail's `$t1` is shifted from
    the NARROWED voice (`sll t1,v1,3`); `<< 3` let combine read raw `$a0`.
@@ -772,8 +772,8 @@ typedef struct {
     u8 masterVolume; /* +0x18 */
 } ObjE970;
 extern ObjE970 *D_8008E970;
-extern s16 D_8008D7F0[];   /* SPU voice-register shadow, 8 halfwords per voice */
-extern u8 D_8008D970[];
+extern s16 _svm_sreg_buf[];   /* SPU voice-register shadow, 8 halfwords per voice */
+extern u8 _svm_sreg_dirty[];
 extern u8 D_8008EA10;
 extern u8 D_8008EA11;
 extern u8 D_8008EA16;
@@ -861,9 +861,9 @@ void SetAutoPan(s16 voice)
         }
     }
 
-    D_8008D7F0[off + 1] = val2;
-    D_8008D7F0[off] = val1;
-    D_8008D970[v] |= 3;
+    _svm_sreg_buf[off + 1] = val2;
+    _svm_sreg_buf[off] = val1;
+    _svm_sreg_dirty[v] |= 3;
 }#endif
 ```
 
@@ -872,3 +872,5 @@ void SetAutoPan(s16 voice)
 The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
 
 The NON_MATCHING body now uses `_svm_voice[voice].unk28`..`unk32` (and `*(u8 *) &_svm_voice[v].unk30`); normalized disassembly identical to before, stall unchanged.
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body keeps `((s16 *) _svm_sreg_buf)[off]`/`[off + 1]` and `_svm_sreg_dirty`; normalized disassembly identical.

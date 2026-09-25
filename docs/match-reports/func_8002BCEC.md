@@ -75,7 +75,7 @@ own read-handle), re-reads THAT directory's sector via the already-matched
    buffer `func_8002B94C`/`func_8002BFA8` use); must return 1 or the function
    prints and returns -1.
 3. Walks the ISO9660 directory-record chain at `D_8008CFF0`, one record per
-   iteration, up to 0x40 entries or until the cursor reaches `D_8008D7F0`
+   iteration, up to 0x40 entries or until the cursor reaches `_svm_sreg_buf`
    (the same address-only sentinel `func_8002B94C` uses). Record layout
    matches the ISO9660 standard exactly (length @0, ext-attr length @1,
    LE location-of-extent @2 unaligned, LE data-length @0xA unaligned,
@@ -157,7 +157,7 @@ extern s32 D_8008B3F4[];
 
 extern u8 D_8008CFF0[]; /* PVD/dir-listing buffer -- code_179d8_g.c's own
                          * comment on this symbol */
-extern u8 D_8008D7F0[]; /* upper-bound sentinel on the scan cursor --
+extern u8 _svm_sreg_buf[]; /* upper-bound sentinel on the scan cursor --
                          * address-only use, per code_179d8_g.c's comment */
 
 /* This function's own "id -> handle" lookup, a DIFFERENT 0x2C-stride table
@@ -258,7 +258,7 @@ s32 func_8002BCEC(s32 id)
         count++;
         rec = (IsoDirRecord *)((u8 *)rec + rec->len);
         off += 0x18;
-        if (count >= 0x40 || (u8 *)rec >= D_8008D7F0) {
+        if (count >= 0x40 || (u8 *)rec >= _svm_sreg_buf) {
             break;
         }
     }

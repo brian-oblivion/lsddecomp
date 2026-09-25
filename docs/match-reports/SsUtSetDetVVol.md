@@ -28,9 +28,9 @@ s32 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2)
     s32 unused[2];
 
     if ((u16) idx < 0x18) {
-        D_8008D7F0[idx].unk2 = p2;
-        D_8008D970[idx] |= 3;
-        D_8008D7F0[idx].unk0 = p1;
+        _svm_sreg_buf[idx].unk2 = p2;
+        _svm_sreg_dirty[idx] |= 3;
+        _svm_sreg_buf[idx].unk0 = p1;
         return 0;
     }
     return -1;
@@ -38,10 +38,10 @@ s32 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2)
 ```
 
 A bounds-checked setter over the same 16-byte-stride SPU voice-parameter
-table (`D_8008D7F0`) and per-voice flag byte (`D_8008D970`) that this unit's
+table (`_svm_sreg_buf`) and per-voice flag byte (`_svm_sreg_dirty`) that this unit's
 already-matched `SsUtGetDetVVol` reads. Note the store ORDER: retail writes
 `unk2` first, then OR's the flag byte, then writes `unk0`. Writing the two
-`D_8008D7F0` fields adjacently does not reproduce it.
+`_svm_sreg_buf` fields adjacently does not reproduce it.
 
 ## The residue that mattered: an unused stack frame, and how to reserve one
 
@@ -101,3 +101,7 @@ low, so the oracle tells you immediately.
 This is directly actionable on the live queue: `UpdatePolyBBoxAndCull`
 (`code_8220_c`) is filed as *"unused-frame placement residue, 53/70 words"*
 and has never been tried against this lever.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+**_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). `src/` spelling only: `_svm_sreg_buf[idx].unk0/unk2` (was a unit-local `Rec16D7F0` view of `D_8008D7F0`) and `_svm_sreg_dirty[idx]`. Byte-exact.
