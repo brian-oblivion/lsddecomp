@@ -21,3 +21,9 @@ const char *GetIntroStreamName(s32 *typeCodeOut) {
     return sAsmkStreamPath;
 }
 ```
+
+## Naming
+
+- **Name:** `GetIntroStreamName`
+- **Tier:** A
+- **Evidence:** its one caller, Class6D3C8__LoadIntroLogoSequence, uses the returned path directly as a StreamTask's stream name; matches exactly.

@@ -34,3 +34,9 @@ Rec1C *GetRecordGroup(s32 index) {
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.
+
+## Naming
+
+- **Name:** `GetRecordGroup`
+- **Tier:** A
+- **Evidence:** pure getter: &gRecordTable[gRecordIndexTable[index]]; a getter is tier A by the leaf-mechanics rule, purpose of the group itself not established.

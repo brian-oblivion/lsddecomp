@@ -41,3 +41,9 @@ Rec1C *PickVariant(s32 index) {
    conditional operand (contrast PickWeeklyGroup, where retail keeps separate
    `sll`s per branch and needs per-branch pointers). Read which instructions
    sit after the join to choose between the two shapes.
+
+## Naming
+
+- **Name:** `PickVariant`
+- **Tier:** A
+- **Evidence:** leaf picker: 1-of-5 random-or-forced pick (gForcedVariant) from GetVariantBlock(index), with an index==9 special case.

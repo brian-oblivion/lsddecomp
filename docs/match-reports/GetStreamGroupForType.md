@@ -18,3 +18,9 @@ s32 GetStreamGroupForType(s32 index) {
     return gStreamTypeToGroupTable[index];
 }
 ```
+
+## Naming
+
+- **Name:** `GetStreamGroupForType`
+- **Tier:** A
+- **Evidence:** every one of its 4 call sites in code_1677c.c reads `typeLookup = GetStreamGroupForType(typeCode)` immediately before a StreamTask configure() call; matches exactly.

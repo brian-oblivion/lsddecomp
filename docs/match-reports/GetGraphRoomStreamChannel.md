@@ -53,3 +53,9 @@ When retail loads an address-taken local once and uses it both as a loop
 counter's start and in the bound, copy it to a named local after the last
 aliasing store, and fold the bound into the register of the variable it
 extends (`len += start`) rather than a fresh `end`.
+
+## Naming
+
+- **Name:** `GetGraphRoomStreamChannel`
+- **Tier:** A
+- **Evidence:** its one caller, Class6D3C8__StartGraphRoomStreamTask, uses the returned record and *total (divided by 15) as the StreamTask's channel and ring size; matches exactly.

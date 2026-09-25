@@ -23,3 +23,9 @@ void SetPickOverrides(s32 a, s32 b) {
     }
 }
 ```
+
+## Naming
+
+- **Name:** `SetPickOverrides`
+- **Tier:** A
+- **Evidence:** leaf: two independent guarded stores into gForcedWeeklyGroup/gForcedVariant; mechanics are the whole purpose.

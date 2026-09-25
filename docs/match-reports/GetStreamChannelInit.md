@@ -39,3 +39,9 @@ Rec1C *GetStreamChannelInit(s32 *countOut) {
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.
+
+## Naming
+
+- **Name:** `GetStreamChannelInit`
+- **Tier:** A
+- **Evidence:** its one caller, Class6D3C8__StartStreamTaskWithInit, uses the return value as the StreamTask's group id directly; matches exactly.

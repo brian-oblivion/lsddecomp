@@ -7,7 +7,7 @@ Byte-exact on the first build; whole-image SHA1 green, funcdiff 51/51.
 
 ## What it does
 
-Slot +0x078 of D_80081940. With a buffer and a non-NULL name: reset (`unk2C
+Slot +0x078 of D_80081940. With a buffer and a non-NULL name: reset (`headerReady
 = 0` when idle, else cancelRequests), enter state 9, then close / open(name,
 1, 0) / read(buffer, 0xB358) through the object's own (run-time-bound)
 Class6D430 interface slots. State 9 is completed by DataSrc39094__SetFlag (setFlag).
@@ -16,10 +16,10 @@ Class6D430 interface slots. State 9 is completed by DataSrc39094__SetFlag (setFl
 
 ```c
 /* slot +0x078 of D_80081940: start streaming a file into the buffer */
-void DataSrc39094__LoadHeader(D_80081940Obj *self, char *name) {
+void DataSrc39094__LoadHeader(DataSrc39094 *self, char *name) {
     if (self->buffer != NULL && name != NULL) {
         if (self->unk2A == 0) {
-            self->unk2C = 0;
+            self->headerReady = 0;
         } else {
             self->methods->cancelRequests(self);
         }
@@ -30,3 +30,9 @@ void DataSrc39094__LoadHeader(D_80081940Obj *self, char *name) {
     }
 }
 ```
+
+## Naming
+
+- **Name:** `DataSrc39094__LoadHeader`
+- **Tier:** A
+- **Evidence:** matches the unit's own established fact 'state 9 = header load': sets state to 9 and issues close/open/read of the header buffer.

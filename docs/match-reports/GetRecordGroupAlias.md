@@ -20,3 +20,9 @@ void *GetRecordGroupAlias(s32 index) {
     return GetRecordGroup(index);
 }
 ```
+
+## Naming
+
+- **Name:** `GetRecordGroupAlias`
+- **Tier:** A
+- **Evidence:** pure one-line tail wrapper of GetRecordGroup; no distinguishing caller found (grep across src/ and include/), so named for exactly what it does and nothing more.

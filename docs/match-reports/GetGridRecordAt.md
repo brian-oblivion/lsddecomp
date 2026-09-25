@@ -31,3 +31,9 @@ Rec1C *GetGridRecordAt(s32 index, s32 sub) {
 - Callers in other units still declare their own prototypes (`s32` returns in
   class_39e08.h / class_3bb8c.h); those are independent declarations and were
   not touched.
+
+## Naming
+
+- **Name:** `GetGridRecordAt`
+- **Tier:** A
+- **Evidence:** pure getter: &GetGridRecordBase(index)[sub].

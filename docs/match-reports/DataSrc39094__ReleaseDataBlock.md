@@ -9,20 +9,20 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Method slot +0x084 of D_80081940 (table word at 0x800819C4). Clears `unk2E`, then frees the `+0x34` buffer through BMemPMgrFree and stores the RESULT back (BMemPMgrFree returns a value; retail stores `$v0`, presumably NULL). The `sh $zero,0x2E` lands in the `beqz` delay slot with the store written FIRST in source.
+Method slot +0x084 of D_80081940 (table word at 0x800819C4). Clears `dataReady`, then frees the `+0x34` buffer through BMemPMgrFree and stores the RESULT back (BMemPMgrFree returns a value; retail stores `$v0`, presumably NULL). The `sh $zero,0x2E` lands in the `beqz` delay slot with the store written FIRST in source.
 
 ## Source
 
 ```c
-/* D_80081940Obj: the local view at the top of src/code_39094.c --
- * CLASS6D430_FIELDS, then u16 unk2C, u16 unk2E, u8 pad30[4], void *unk34, s32 unk38. */
+/* DataSrc39094: the local view at the top of src/code_39094.c --
+ * CLASS6D430_FIELDS, then u16 headerReady, u16 dataReady, u8 pad30[4], void *dataBuffer, s32 autoLoadData. */
 extern void *BMemPMgrFree(void *ptr);
 
 /* slot +0x084 of D_80081940 */
-void DataSrc39094__ReleaseDataBlock(D_80081940Obj *self) {
-    self->unk2E = 0;
-    if (self->unk34 != NULL) {
-        self->unk34 = BMemPMgrFree(self->unk34);
+void DataSrc39094__ReleaseDataBlock(DataSrc39094 *self) {
+    self->dataReady = 0;
+    if (self->dataBuffer != NULL) {
+        self->dataBuffer = BMemPMgrFree(self->dataBuffer);
     }
 }
 ```
@@ -36,3 +36,9 @@ void DataSrc39094__ReleaseDataBlock(D_80081940Obj *self) {
 - Callers in other units still declare their own prototypes (`s32` returns in
   class_39e08.h / class_3bb8c.h); those are independent declarations and were
   not touched.
+
+## Naming
+
+- **Name:** `DataSrc39094__ReleaseDataBlock`
+- **Tier:** A
+- **Evidence:** slot +0x084 (releaseAlloc); frees dataBuffer and clears dataReady -- the mirror DataSrc39094__LoadDataBlock itself calls before reallocating.

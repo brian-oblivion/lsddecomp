@@ -21,3 +21,9 @@ void *GetRecordTable(s32 *out) {
     return gRecordTable;
 }
 ```
+
+## Naming
+
+- **Name:** `GetRecordTable`
+- **Tier:** A
+- **Evidence:** table getter: returns gRecordTable and writes the record count (0x230) to *out.

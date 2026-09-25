@@ -34,3 +34,9 @@ Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.
+
+## Naming
+
+- **Name:** `GetGridRecordXY`
+- **Tier:** B
+- **Evidence:** calls GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y) -- the strongest evidence in this family that the record group is addressed as a 2-D grid over StageGrid.h's own dimensions.

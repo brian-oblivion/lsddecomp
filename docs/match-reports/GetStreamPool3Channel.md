@@ -39,3 +39,9 @@ Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.
+
+## Naming
+
+- **Name:** `GetStreamPool3Channel`
+- **Tier:** B
+- **Evidence:** pure getter: index into GetStreamPool3(); no cross-unit caller found (only reached internally via ResolveCinematicChannel's negative-group fallback).

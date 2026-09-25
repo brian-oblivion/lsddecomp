@@ -18,3 +18,9 @@ char **GetSoundEffectDirRef(void) {
     return &gSoundEffectDirPtr;
 }
 ```
+
+## Naming
+
+- **Name:** `GetSoundEffectDirRef`
+- **Tier:** B
+- **Evidence:** returns &gSoundEffectDirPtr, the sdata pointer to the confirmed string "SND\\SE" (asm/data/7B12C.sdata.s); only used by GetSoundEffectDir.

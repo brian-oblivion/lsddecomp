@@ -51,3 +51,9 @@ Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
 `sw $aN, home(sp)` then `lh $aN, home(sp)` / `lh home+2(sp)` at entry = a
 two-halfword struct passed by value. An if/else writing the same lvalue with
 the value's register swapped (v0/v1) -> one assignment of a ternary.
+
+## Naming
+
+- **Name:** `ResolveCinematicChannel`
+- **Tier:** A
+- **Evidence:** its one caller, Class6D3C8__StartCinematicStream, uses the return value as the cinematic's stream group id, resolved from the DreamSys's own bank/entry pick; matches exactly.

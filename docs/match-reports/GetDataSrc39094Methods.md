@@ -18,3 +18,9 @@ void *GetDataSrc39094Methods(void) {
     return D_80081940;
 }
 ```
+
+## Naming
+
+- **Name:** `GetDataSrc39094Methods`
+- **Tier:** A
+- **Evidence:** table getter: returns D_80081940, matches the project's 'table getter' convention exactly.

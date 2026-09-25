@@ -34,3 +34,9 @@ Rec1C *GetStreamPool3(s32 *countOut) {
 - Callers in other units still declare their own prototypes (`s32` returns in
   class_39e08.h / class_3bb8c.h); those are independent declarations and were
   not touched.
+
+## Naming
+
+- **Name:** `GetStreamPool3`
+- **Tier:** B
+- **Evidence:** pure getter: &gRecordTable[0x238], count 8; no cross-unit caller found for it or GetStreamPool3Channel, named for the mechanics it has.

@@ -30,3 +30,9 @@ char *GetSoundEffectDir(void) {
 - Callers in other units still declare their own prototypes (`s32` returns in
   class_39e08.h / class_3bb8c.h); those are independent declarations and were
   not touched.
+
+## Naming
+
+- **Name:** `GetSoundEffectDir`
+- **Tier:** A
+- **Evidence:** dereferences GetSoundEffectDirRef(); its one cross-unit caller (Obj865C8__Obj865C8 in class_39e08.c) passes the result straight into a data-source ctor's base-path argument.

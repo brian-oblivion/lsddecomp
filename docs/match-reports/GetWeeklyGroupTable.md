@@ -18,3 +18,9 @@ void *GetWeeklyGroupTable(void) {
     return gWeeklyGroupTable;
 }
 ```
+
+## Naming
+
+- **Name:** `GetWeeklyGroupTable`
+- **Tier:** A
+- **Evidence:** table getter: returns gWeeklyGroupTable.

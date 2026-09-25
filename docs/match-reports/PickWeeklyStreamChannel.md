@@ -33,3 +33,9 @@ Rec1C *PickWeeklyStreamChannel(s32 *countOut) {
 
 Retail never sets `$a1` before `jal SeedAndRandom` (whose second parameter is
 unused), so the call passes an uninitialised local: it emits no instruction.
+
+## Naming
+
+- **Name:** `PickWeeklyStreamChannel`
+- **Tier:** A
+- **Evidence:** its one caller, Class6D3C8__StartWeeklyStreamTask, uses the return value as the StreamTask's group id directly; matches exactly.

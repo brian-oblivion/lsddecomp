@@ -20,3 +20,9 @@ Rec1C *PickDailyVariant(s32 index, s32 arg1, s32 day) {
     return &GetRecordGroupAlias(index)[r];
 }
 ```
+
+## Naming
+
+- **Name:** `PickDailyVariant`
+- **Tier:** A
+- **Evidence:** leaf picker: 1-of-n random pick (n grows every ten days of a 40-day cycle, per the existing report's derivation) from GetRecordGroupAlias(index).

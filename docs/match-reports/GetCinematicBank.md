@@ -38,3 +38,9 @@ Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.
+
+## Naming
+
+- **Name:** `GetCinematicBank`
+- **Tier:** A
+- **Evidence:** used by both ResolveCinematicChannel (bank/entry resolve) and GetGraphRoomStreamChannel with a bank id `n`; base 0x23E, stride 6 records, matches both callers' own naming.

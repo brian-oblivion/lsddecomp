@@ -14,15 +14,15 @@ Method slot +0x074 of D_80081940 (cancelRequests; table word at 0x800819B4). Cal
 ## Source
 
 ```c
-/* D_80081940Obj: the local view at the top of src/code_39094.c --
- * CLASS6D430_FIELDS, then u16 unk2C, u16 unk2E, u8 pad30[4], void *unk34, s32 unk38. */
+/* DataSrc39094: the local view at the top of src/code_39094.c --
+ * CLASS6D430_FIELDS, then u16 headerReady, u16 dataReady, u8 pad30[4], void *dataBuffer, s32 autoLoadData. */
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 
 /* slot +0x074 of D_80081940 (cancelRequests) */
-void DataSrc39094__CancelRequests(D_80081940Obj *self) {
+void DataSrc39094__CancelRequests(DataSrc39094 *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
-    self->unk2C = 0;
-    self->unk2E = 0;
+    self->headerReady = 0;
+    self->dataReady = 0;
     self->unk2A = 0;
 }
 ```
@@ -36,3 +36,9 @@ void DataSrc39094__CancelRequests(D_80081940Obj *self) {
 - Callers in other units still declare their own prototypes (`s32` returns in
   class_39e08.h / class_3bb8c.h); those are independent declarations and were
   not touched.
+
+## Naming
+
+- **Name:** `DataSrc39094__CancelRequests`
+- **Tier:** A
+- **Evidence:** slot +0x074 (cancelRequests override); clears headerReady/dataReady/state before chaining the active data source's base cancelRequests.
