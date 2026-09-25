@@ -53,7 +53,9 @@ void func_8002089C(Class6C070 *self) {
         self->unk10 = 0;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800208B8);
+void func_800208B8(Class6C070 *self) {
+    GsSwapDispBuff();
+}
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800208D8);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800208F8);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020970);
