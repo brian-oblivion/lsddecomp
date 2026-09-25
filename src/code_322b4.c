@@ -285,7 +285,13 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg
 /* Sprite's reset as its ctor calls it: with all five ctor arguments (the
  * slot is Class6B5CC's, typed without them; Sprite.h, "Not settled"). */
 typedef void *(*SpriteCtorReset_322b4)(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__Sprite);
+/* gSpriteMethods slot +0x008 (ctor): the Class6B5CC ctor, install the table,
+ * and hand every argument to reset. */
+void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5) {
+    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    self->methods = GetSpriteMethods();
+    return ((SpriteCtorReset_322b4)self->methods->reset)(self, texture, abr, rect, arg4, arg5);
+}
 /* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
     self->image = (struct GsIMAGE *)((u8 *)texture + 0x2C);
