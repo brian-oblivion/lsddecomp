@@ -8,7 +8,7 @@ Verified: `./build-and-verify.sh` exit 0, `OK: build matches retail SLPS_015.56`
 
 ## What it does
 
-the allocating constructor ("new"): `BMemPMgrAlloc(0x20)`, and if non-NULL call the class's own ctor slot +0x008 through `func_80042A7C()` with the light id; returns the object or NULL.
+the allocating constructor ("new"): `BMemPMgrAlloc(0x20)`, and if non-NULL call the class's own ctor slot +0x008 through `Get_vtable_FlatLightObj()` with the light id; returns the object or NULL.
 
 ## Source
 
@@ -18,7 +18,7 @@ FlatLightObj *New_FlatLightObj(s32 lightId) {
 
     self = BMemPMgrAlloc(sizeof(FlatLightObj));
     if (self != NULL) {
-        func_80042A7C()->ctor(self, lightId);
+        Get_vtable_FlatLightObj()->ctor(self, lightId);
         return self;
     }
     return NULL;

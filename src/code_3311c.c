@@ -48,21 +48,21 @@ struct FlatLightObj {
 extern void *BMemPMgrAlloc(s32 size);
 extern int GsSetFlatLight(int id, FlatLightParams *lt);
 extern FlatLightObjMethods D_8006F06C;
-FlatLightObjMethods *func_80042A7C(void);
+FlatLightObjMethods *Get_vtable_FlatLightObj(void);
 
 FlatLightObj *New_FlatLightObj(s32 lightId) {
     FlatLightObj *self;
 
     self = BMemPMgrAlloc(sizeof(FlatLightObj));
     if (self != NULL) {
-        func_80042A7C()->ctor(self, lightId);
+        Get_vtable_FlatLightObj()->ctor(self, lightId);
         return self;
     }
     return NULL;
 }
 void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_80042A7C();
+    self->methods = Get_vtable_FlatLightObj();
     self->methods->setLightId(self, lightId);
 }
 void FlatLightObj__SetLightId(FlatLightObj *self, s32 lightId) {
@@ -82,6 +82,6 @@ void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
     }
     GsSetFlatLight(self->lightId, &self->light);
 }
-FlatLightObjMethods *func_80042A7C(void) {
+FlatLightObjMethods *Get_vtable_FlatLightObj(void) {
     return &D_8006F06C;
 }
