@@ -94,7 +94,11 @@ INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003AF8C);
 void func_8003B024(Class6E4F0 *self) {
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B02C);
+void func_8003B02C(Class6E4F0 *self, ScreenDims *dims, s32 arg) {
+    self->dims = *dims;
+    self->dimsArg = arg;
+}
+
 INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B044);
 
 void func_8003B108(Class6E4F0 *self) {
