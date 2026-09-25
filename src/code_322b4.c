@@ -162,7 +162,10 @@ void func_80042814(Class6B5CC *self) {
 /* D_8006EFAC slot +0x09C (dispatchLinkCommand): empty override. */
 void func_80042820(Class6B5CC *self, void *sender, s32 event) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042828);
+/* D_8006EFAC and D_800866E8 slot +0x0B8 (getChild). */
+void *func_80042828(ChildArrayObj_322b4 *self, s32 index) {
+    return self->children[index];
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004283C);
 /* Returns the D_8006EFAC method table. */
 void *func_800428E4(void) {
