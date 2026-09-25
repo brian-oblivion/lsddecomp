@@ -628,7 +628,50 @@ typedef struct Obj33808_50 {
 void func_800458AC(Obj33808_50 *self) {
     self->unk50 = 1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800458B8);
+/* D_8006F614 +0x044: when this is the object in D_8008A940, reset its
+ * state words, hand the object at +0x60 func_8004593C (and self) through
+ * that object's +0x07C, clear +0x64, and call its +0x058. */
+typedef struct Methods458B8 {
+    /* +0x000 */ u8 pad0[0x58];
+    /* +0x058 */ void (*slot58)();
+    /* +0x05C */ u8 pad5C[0x20];
+    /* +0x07C */ void (*slot7C)();
+} Methods458B8;
+
+typedef struct Sub458B8 {
+    /* +0x000 */ Methods458B8 *methods;
+} Sub458B8;
+
+typedef struct Obj458B8 {
+    /* +0x000 */ u8 pad0[0x3C];
+    /* +0x03C */ s32 unk3C;
+    /* +0x040 */ s32 unk40;
+    /* +0x044 */ s32 unk44;
+    /* +0x048 */ s32 unk48;
+    /* +0x04C */ s32 unk4C;
+    /* +0x050 */ s32 unk50;
+    /* +0x054 */ u8 pad54[0xC];
+    /* +0x060 */ Sub458B8 *unk60;
+    /* +0x064 */ s32 unk64;
+} Obj458B8;
+
+extern DataSrc33808 *D_8008A940;
+void func_8004593C();
+
+void func_800458B8(Obj458B8 *self) {
+    Obj458B8 *cur = (Obj458B8 *)D_8008A940;
+
+    if (cur == self) {
+        cur->unk40 = 0;
+        cur->unk3C = 0;
+        cur->unk4C = 1;
+        cur->unk48 = 0;
+        cur->unk44 = 0;
+        cur->unk60->methods->slot7C(cur->unk60, func_8004593C, cur);
+        cur->unk64 = 0;
+        cur->unk60->methods->slot58(cur->unk60);
+    }
+}
 void func_8004593C(Obj33808_50 *self) {
     self->unk50 = -1;
 }
