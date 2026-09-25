@@ -100,7 +100,16 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_800455D4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004564C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004575C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800457C0);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800458AC);
+/* A class with an s32 at +0x50, set to 1 / -1 by the two setters below;
+ * the class is not yet identified (neither setter sits in a method table). */
+typedef struct Obj33808_50 {
+    u8 pad0[0x50];
+    s32 unk50;
+} Obj33808_50;
+
+void func_800458AC(Obj33808_50 *self) {
+    self->unk50 = 1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800458B8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004593C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045948);
