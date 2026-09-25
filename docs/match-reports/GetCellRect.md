@@ -1,4 +1,6 @@
-# func_80041C4C -- MATCHED (20/20 words), round 82
+# GetCellRect -- MATCHED (20/20 words), round 82
+
+> Renamed from `func_80041C4C` on 2026-09-25 (tools/rename.py). Address 0x80041c4c.
 
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -15,7 +17,7 @@ Three builds. (1) `u8 cell` parameter: cc1 drops the `andi 0xFF` and folds `(cel
 
 ```c
 /* Cell index -> 8x8 rect in a 32-wide grid, offset from D_8006ED40. */
-void func_80041C4C(SpriteRect *dst, u32 cell) {
+void GetCellRect(SpriteRect *dst, u32 cell) {
     *dst = D_8006ED40;
     cell &= 0xFF;
     dst->u += (cell & 0x1F) * 8;

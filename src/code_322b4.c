@@ -128,7 +128,7 @@ struct SpriteMethods_322b4 {
 extern Vec3_d294 D_8006EE10;
 extern char *strcpy(char *dst, char *src);
 
-/* The cell origin func_80041C4C copies: {0, 0, 8, 8}. */
+/* The cell origin GetCellRect copies: {0, 0, 8, 8}. */
 extern SpriteRect D_8006ED40;
 
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
@@ -174,7 +174,7 @@ typedef struct CtorArg1Methods_322b4 {
     void (*ctor)(void *self, s32 arg); /* +0x008 */
 } CtorArg1Methods_322b4;
 void *func_800428E4(void);
-void func_80041C4C(SpriteRect *dst, u32 cell);
+void GetCellRect(SpriteRect *dst, u32 cell);
 
 /* Allocate and construct a D_8006EC74 object (0xAC bytes): one cell. */
 void *New_D8006EC74(void *texture, u8 cell) {
@@ -191,7 +191,7 @@ void *New_D8006EC74(void *texture, u8 cell) {
 void D8006EC74__D8006EC74(SpriteView_322b4 *self, void *texture, u8 cell) {
     SpriteRect r;
 
-    func_80041C4C(&r, 0x20);
+    GetCellRect(&r, 0x20);
     ((CtorArg3Methods_322b4 *)func_80041ED8())->ctor(self, texture, &r, NULL);
     self->methods = Get_vtable_D8006EC74();
     self->methods->reset(self, cell);
@@ -205,7 +205,7 @@ void D8006EC74__SetCell(SpriteView_322b4 *self, u8 cell) {
     SpriteRect r;
 
     self->unkA8 = cell;
-    func_80041C4C(&r, cell);
+    GetCellRect(&r, cell);
     self->u = r.u;
     self->v = r.v;
 }
@@ -220,7 +220,7 @@ void *Get_vtable_D8006EC74(void) {
     return D_8006EC74;
 }
 /* Cell index -> 8x8 rect in a 32-wide grid, offset from D_8006ED40. */
-void func_80041C4C(SpriteRect *dst, u32 cell) {
+void GetCellRect(SpriteRect *dst, u32 cell) {
     *dst = D_8006ED40;
     cell &= 0xFF;
     dst->u += (cell & 0x1F) * 8;
