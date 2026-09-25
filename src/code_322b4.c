@@ -153,7 +153,7 @@ typedef struct CellCtorMethods_322b4 {
     void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = D8006EC74__D8006EC74 */
 } CellCtorMethods_322b4;
 
-void *func_80041ED8(void);
+void *Get_vtable_D8006ED4C(void);
 typedef struct CtorArg3Methods_322b4 {
     u8 pad00[0x8];
     void *(*ctor)(void *self, void *a1, void *a2, void *a3); /* +0x008 = D8006ED4C__D8006ED4C */
@@ -192,7 +192,7 @@ void D8006EC74__D8006EC74(SpriteView_322b4 *self, void *texture, u8 cell) {
     SpriteRect r;
 
     GetCellRect(&r, 0x20);
-    ((CtorArg3Methods_322b4 *)func_80041ED8())->ctor(self, texture, &r, NULL);
+    ((CtorArg3Methods_322b4 *)Get_vtable_D8006ED4C())->ctor(self, texture, &r, NULL);
     self->methods = Get_vtable_D8006EC74();
     self->methods->reset(self, cell);
 }
@@ -231,7 +231,7 @@ void *New_D8006ED4C(void *a1, void *a2, void *a3) {
     void *obj = BMemPMgrAlloc(0xA8);
 
     if (obj != NULL) {
-        ((CtorArg3Methods_322b4 *)func_80041ED8())->ctor(obj, a1, a2, a3);
+        ((CtorArg3Methods_322b4 *)Get_vtable_D8006ED4C())->ctor(obj, a1, a2, a3);
         return obj;
     }
     return NULL;
@@ -240,7 +240,7 @@ void *New_D8006ED4C(void *a1, void *a2, void *a3) {
  * install the table, then reset. */
 void D8006ED4C__D8006ED4C(Sprite *self, void *texture, SpriteRect *rect, s32 arg3) {
     GetSpriteMethods()->ctor(self, texture, 0, rect, NULL, arg3);
-    self->methods = func_80041ED8();
+    self->methods = Get_vtable_D8006ED4C();
     self->methods->reset(self);
 }
 /* D_8006ED4C slot +0x040 (reset): empty override. */
@@ -286,7 +286,7 @@ void D8006ED4C__SetPivotAnchor(Sprite *self, u32 anchor) {
     }
 }
 /* Returns the D_8006ED4C method table. */
-void *func_80041ED8(void) {
+void *Get_vtable_D8006ED4C(void) {
     return D_8006ED4C;
 }
 /* Allocate and construct a Sprite (0xA0 bytes). */
