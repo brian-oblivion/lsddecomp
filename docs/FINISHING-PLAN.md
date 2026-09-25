@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 21 (2026-09-25, round 85, premium head: track 4b's recipe,
-Sony data out of 4b, an override with its own parameter list).
+Plan revision: 22 (2026-09-26, round 86, premium head: game names off Sony
+data, `tools/sonydata.py` and its `rename.py`/`plan.py` guards).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -192,8 +192,11 @@ leaves stays tier C with what is known written down.
 - **Do not rename a Sony symbol, and give no game name to anything Sony
   owns**: a function `progress.py` counts as library, a variable
   `psyq-objects.ld` pins or an address inside one (`rename.py` refuses both),
-  or a field of a struct only Sony functions read (round 75: 24 libsnd
-  variables). All are track 2's.
+  or data only Sony functions read, which an object that never placed leaves
+  unpinned (round 86: 29 libsnd/libapi variables; `rename.py` refuses a
+  `gName`/`sName` for it, `tools/sonydata.py` lists it with Sony's name as a
+  lead to anchor, and a static no disc names goes back to its placeholder,
+  `rename.py OLD D_<own address>`). All are track 2's.
 
 **Head at merge.** Apply the runner's proposed cross-unit field names one at
 a time by type scope (definition first, compiler lists the accessors, fix
