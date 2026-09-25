@@ -393,7 +393,7 @@ void *New_D8006EED8(s32 arg) {
 }
 /* D_8006EED8 slot +0x008 (ctor): the base ctor, install the table, clear
  * +0x2C, and pass a stack copy of the name to slot +0x06C. */
-void func_8004232C(D_8006EED8Obj *self, char *name) {
+void D8006EED8__D8006EED8(D_8006EED8Obj *self, char *name) {
     char buf[32];
 
     ((Slot08Arg0Methods_322b4 *)GetActiveDataSourceMethods())->ctor(self);
