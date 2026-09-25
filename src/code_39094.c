@@ -61,7 +61,11 @@ D_80081940Obj *func_80048894(void) {
     return NULL;
 }
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800488E4);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048960);
+/* slot +0x00C of D_80081940 (finalize) */
+void func_80048960(D_80081940Obj *self) {
+    self->methods->releaseAlloc(self);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800489B4);
 /* slot +0x074 of D_80081940 (cancelRequests) */
 void func_80048A68(D_80081940Obj *self) {
