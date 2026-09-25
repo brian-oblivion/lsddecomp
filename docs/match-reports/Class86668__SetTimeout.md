@@ -48,3 +48,7 @@ None beyond what's already documented.
 ## Naming
 
 `Class86668__SetTimeout` -- tier A. Pure setter/converter: stores its argument verbatim if negative, else multiplied by 20 (a units-to-frames conversion) into `timeoutFrames`; mechanics are its purpose.
+
+## Track 4
+
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. Slot +0x06C, `setTimeout`, the first of this class's own slots; parameter `timeout`, stored as `timeout * 20` frames or kept when negative (Class86668__CancelTimeout's -1 never fires, CheckTimeout comparing unsigned). Image byte-identical.

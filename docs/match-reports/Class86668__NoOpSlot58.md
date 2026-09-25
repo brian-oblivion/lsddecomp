@@ -17,3 +17,7 @@ An empty override, byte-exact by construction. Never had its own report before t
 ## Naming
 
 `Class86668__Noop58` -- tier A. Empty body (`{}`), occupies the class's own +0x058 override; matches the header's pre-existing `noop58` field name.
+
+## Track 4
+
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__Noop58` to the project's spelling for an empty override (`StreamTaskObj__NoOpSlot88`, `ObjM__NoOpSlot40`). It fills +0x058, IntermediateBase's `onPadEvent` slot (NULL in the parent table), so a Pad notification reaching a Class86668 does nothing. Image byte-identical.

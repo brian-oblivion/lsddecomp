@@ -36,3 +36,7 @@ None beyond what's already documented.
 ## Naming
 
 `Class86668__Deinit` -- tier B. Occupies +0x048 (the mirror of Class86668__Init): a thin wrapper forwarding to `Get_vtable_IntermediateBase()->slot48(self)`.
+
+## Track 4
+
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. `self` is `Class86668 *`; Obj865C8__Deinit and ObjM__DetachTarget call it as `GetClass86668Methods()->deinit((Class86668 *)self)`. Image byte-identical.

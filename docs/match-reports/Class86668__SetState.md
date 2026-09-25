@@ -68,3 +68,7 @@ not a real retail fact.
 ## Naming
 
 `Class86668__OnEventArg` -- tier B. Occupies +0x060 (matches the header's pre-existing `onEventArg` field name, shared verbatim with `gClass86668Methods` at the same offset). Forwards to the base, and on `arg1 == 4` (the code `CheckTimeout` raises) sets `eventCode = 1` and calls `Noop7C`.
+
+## Track 4
+
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__OnEventArg`, tier A: it occupies +0x060, IntermediateBase's `setState` slot (IntermediateBase__SetState in the parent table), and its first call is the base setState with the same argument. For state 4 it also sets `result` (was `eventCode`) = 1 and calls +0x07C, now named `onState4` (NULL in this class's own 0x80-byte table; empty Obj865C8__Noop7C and ObjM__NoOpSlot7C in the subclasses). State 4 is what Class86668__CheckTimeout raises. Signature `(Class86668 *self, s32 state)`. Image byte-identical.

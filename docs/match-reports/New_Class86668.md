@@ -57,3 +57,7 @@ updated with what survived and what did not.
 ## Naming
 
 `New_Class86668` -- tier A. Allocator (0x38 bytes) for the sibling class, dispatching `GetClass86668Methods()->ctor`: matches the `New_X` idiom.
+
+## Track 4
+
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. Signature `Class86668 *New_Class86668(char *soundBankPath, BasicClass *sound)`, the ctor's parameters; 0x38 is the object size CLASS86668_FIELDS ends at. No C caller. Image byte-identical.
