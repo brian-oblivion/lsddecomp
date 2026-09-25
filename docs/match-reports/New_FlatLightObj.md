@@ -1,4 +1,6 @@
-# func_8004291C -- MATCHED (24/24 words, round 81, alpha)
+# New_FlatLightObj -- MATCHED (24/24 words, round 81, alpha)
+
+> Renamed from `func_8004291C` on 2026-09-25 (tools/rename.py). Address 0x8004291c.
 
 **Unit:** `src/code_3311c.c` (carved from `psyq_3311c` in FINISHING-PLAN revision 18). **Class:** method table `D_8006F06C` (class id 0x6, direct BasicClass child), read here as `FlatLightObj`: a 0x20-byte BasicClass holding a Psy-Q light id at +0x00C and a `GsF_LIGHT` (LIBGS.H) at +0x010. The name is a hypothesis from the `GsSetFlatLight` calls, not evidence. Slots resolved with `python3 tools/classtable.py D_8006F06C`.
 
@@ -11,7 +13,7 @@ the allocating constructor ("new"): `BMemPMgrAlloc(0x20)`, and if non-NULL call 
 ## Source
 
 ```c
-FlatLightObj *func_8004291C(s32 lightId) {
+FlatLightObj *New_FlatLightObj(s32 lightId) {
     FlatLightObj *self;
 
     self = BMemPMgrAlloc(sizeof(FlatLightObj));

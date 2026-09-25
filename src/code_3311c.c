@@ -13,7 +13,7 @@
 
 /*
  * The class of D_8006F06C: a BasicClass that owns one Psy-Q flat light.
- * 0x20 bytes (func_8004291C's allocation). Fields past BasicClass's are a
+ * 0x20 bytes (New_FlatLightObj's allocation). Fields past BasicClass's are a
  * GsF_LIGHT (LIBGS.H) at +0x010, handed to GsSetFlatLight by address.
  * LIBGS.H is not included: its prototypes collide in shared headers, so the
  * one used here is declared locally with a local copy of the struct.
@@ -50,7 +50,7 @@ extern int GsSetFlatLight(int id, FlatLightParams *lt);
 extern FlatLightObjMethods D_8006F06C;
 FlatLightObjMethods *func_80042A7C(void);
 
-FlatLightObj *func_8004291C(s32 lightId) {
+FlatLightObj *New_FlatLightObj(s32 lightId) {
     FlatLightObj *self;
 
     self = BMemPMgrAlloc(sizeof(FlatLightObj));
