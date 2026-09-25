@@ -298,7 +298,14 @@ void func_80045BC0(void) {
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045C94);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045CFC);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045DE0);
+extern DataSrc33808 *D_8008A940;
+
+/* Slot +0x060 of the object in D_8008A940, when there is one. */
+void func_80045DE0(void) {
+    if (D_8008A940 != NULL) {
+        ((void (*)())D_8008A940->methods->slot60)(D_8008A940);
+    }
+}
 /* Hang until +0x4C is nonzero (it is read once). */
 typedef struct Obj45E18 {
     u8 pad0[0x4C];
