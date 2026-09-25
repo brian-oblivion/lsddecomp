@@ -1,4 +1,6 @@
-# func_800426E4 -- MATCHED (43/43 words), round 82
+# D8006EFAC__D8006EFAC -- MATCHED (43/43 words), round 82
+
+> Renamed from `func_800426E4` on 2026-09-25 (tools/rename.py). Address 0x800426e4.
 
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
@@ -16,7 +18,7 @@ About ten builds on the loop's source shape, all equal length. `self->lights[i]`
 ```c
 /* D_8006EFAC slot +0x008 (ctor): the Class6B5CC ctor, install the table,
  * create and add the three flat lights, then reset. */
-void func_800426E4(D_8006EFACObj *self) {
+void D8006EFAC__D8006EFAC(D_8006EFACObj *self) {
     s32 i;
     BasicClass **light;
 

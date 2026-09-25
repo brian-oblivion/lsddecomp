@@ -2652,3 +2652,4 @@ D8006EF50__ClearFlag10 = 0x80042664; // type:func
 D8006EF50__GetFlag10 = 0x8004266C; // type:func
 D8006EF50__SetFlag14 = 0x80042678; // type:func
 Get_vtable_D8006EF50 = 0x80042684; // type:func
+D8006EFAC__D8006EFAC = 0x800426E4; // type:func

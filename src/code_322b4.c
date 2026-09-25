@@ -515,7 +515,7 @@ void *New_D8006EFAC(void) {
 }
 /* D_8006EFAC slot +0x008 (ctor): the Class6B5CC ctor, install the table,
  * create and add the three flat lights, then reset. */
-void func_800426E4(D_8006EFACObj *self) {
+void D8006EFAC__D8006EFAC(D_8006EFACObj *self) {
     s32 i;
     BasicClass **light;
 

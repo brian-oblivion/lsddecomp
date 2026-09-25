@@ -23,7 +23,7 @@
  * collide in shared headers, so the one used here is declared locally with
  * a local copy of the struct.
  *
- * The unit's only outside caller (func_800426E4, asm/nonmatchings/code_322b4)
+ * The unit's only outside caller (D8006EFAC__D8006EFAC, asm/nonmatchings/code_322b4)
  * calls New_FlatLightObj three times with light ids 0, 1, 2 in a row and
  * stores each returned pointer into a 3-slot array -- consistent with a
  * fixed 3-light flat-lighting rig, but the rest of that caller is another
