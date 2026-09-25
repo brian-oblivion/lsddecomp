@@ -109,7 +109,10 @@ void func_8003B3FC(D_8006E558Obj *self, char *name) {
         self->methods->requestLoadFile(self, name);
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B470);
+/* D_8006E558 +0x00C: finalize, straight to the active driver's. */
+void func_8003B470(D_8006E558Obj *self) {
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B4A8);
 /* D_8006E558 slot (tools/classtable.py); empty body. */
 void func_8003B5AC(void) {
