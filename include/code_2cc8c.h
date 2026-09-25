@@ -592,7 +592,7 @@ struct Unk18ObjMethods {
     void (*slot94)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x094 */
     void (*slot98)(Unk18Obj *self, GenericObj *arg1, s32 arg2); /* +0x098 */
     void (*slot9C)(Unk18Obj *self); /* +0x09C, occupant Unk18Obj__Update (round 14); dispatched by Unk18Obj__OnNotifyTag5 */
-    /* +0x0A0, occupant func_80012064 (asm/psyq_2864.s, PsyQ library that no
+    /* +0x0A0, occupant Unk18Obj__DrawNode (asm/psyq_2864.s, PsyQ library that no
        SDK disc places, so it stays disassembly -- not
        decompiled) -- dispatched by Unk18Obj__Update (round 14) at three call
        sites with different arities (self alone; self+unkAC; self+another

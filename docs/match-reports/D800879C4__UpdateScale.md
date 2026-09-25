@@ -127,6 +127,6 @@ set, s16 *ratios)` with `spriteScaleX`/`spriteScaleY`, byte-identical.
 | param `set` | A | The base method's name for `$a1` (1 = assign, 0 = accumulate); this override never reads it. |
 | param `ratios` | A | Two s16 {num, den} pairs, x then y. The round-47 description "`{s16 whole; s16 frac;}`" was wrong: the body computes `num / den` in 20.12, and the caller tables hold {6,5} and {4,6}. |
 | fields `spriteScaleX` / `spriteScaleY` (`+0x80`/`+0x82`) | A | GsSPRITE.scalex/scaley. Unit-local struct: renamed in place. |
-| fields `unk58`, `unk5C`, `unk60` | C (kept) | Known: the base init `func_8004202C` zeroes `+0x58`; when `+0x58` is non-zero this method multiplies the s32s at `+0x5C`/`+0x60` by the x/y ratios (`>> 12`) instead of setting the sprite scale. The draw path `func_80012064` does not read them. Nothing found that sets `+0x58` non-zero, so no name. |
+| fields `unk58`, `unk5C`, `unk60` | C (kept) | Known: the base init `func_8004202C` zeroes `+0x58`; when `+0x58` is non-zero this method multiplies the s32s at `+0x5C`/`+0x60` by the x/y ratios (`>> 12`) instead of setting the sprite scale. The draw path `Unk18Obj__DrawNode` does not read them. Nothing found that sets `+0x58` non-zero, so no name. |
 
 Could not name: `unk58`/`unk5C`/`unk60`, above.

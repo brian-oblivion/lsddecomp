@@ -2631,3 +2631,4 @@ Class6E4F0__NoOpSlot48 = 0x8003B108; // type:func
 Class6E4F0__RunMainLoop = 0x8003B110; // type:func
 gCdInitDone = 0x8008A8DC;
 gDefaultScreenDims = 0x8008A8E0;
+Unk18Obj__DrawNode = 0x80012064; // type:func
