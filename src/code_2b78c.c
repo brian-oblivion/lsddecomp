@@ -109,7 +109,21 @@ void func_8003B02C(Class6E4F0 *self, ScreenDims *dims, s32 arg) {
     self->dimsArg = arg;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B044);
+void func_8003B044(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
+    if (self->initialized == 0) {
+        func_80020C68(source);
+        source->methods->slot44(source, &self->dims, self->dimsArg);
+        SsInit();
+        GsInit3D();
+        self->aux = BMemPMgrAlloc(0x14);
+        self->aux->source = source;
+        self->aux->arg = arg;
+        self->aux->unk08 = 0;
+        self->aux->unk0C = 0;
+        self->aux->unk10 = 0;
+        self->initialized = 1;
+    }
+}
 
 void func_8003B108(Class6E4F0 *self) {
 }
