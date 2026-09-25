@@ -9,7 +9,7 @@
 Called by `Class6D3C8__PollGraphRoomStatus` (matched earlier) when its first `PollTask`
 reports `2`. Gated by `self->arg->unk08 != 0` (the same gate
 `Class6D3C8__StartWeeklyStreamTask` uses). Builds a `StreamTask`, derives a count via
-`func_800493E4`, initializes the task with that count divided by 15 and a
+`GetGraphRoomStreamChannel`, initializes the task with that count divided by 15 and a
 fixed sub-slot, then a 5-argument `slot44` call (`a3 = -1`, unlike this
 unit's other `slot44` call sites which pass a computed lookup), then starts
 it.
@@ -29,7 +29,7 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTaskObj(0, 0, 0, 0);
-        extra = func_800493E4(&buf.count, 0, 10);
+        extra = GetGraphRoomStreamChannel(&buf.count, 0, 10);
         task->methods->slot6C(task, buf.count / 15);
         task->methods->slot12C(task, 0);
         task->methods->slot44(task, self->unk1C, extra, -1, 1);
@@ -74,9 +74,9 @@ slots, both `(void *self, s32 a1)`), retyped `slot44`'s 3rd parameter from
 site passing a computed count where `Class6D3C8__LoadIntroLogoSequence` passed a string
 pointer and `Class6D3C8__StartWeeklyStreamTask` passed another plain count; the field is a
 raw 32-bit value whose interpretation is call-site-specific, not
-uniformly a string. Declared `func_800493E4` (day/count helper,
+uniformly a string. Declared `GetGraphRoomStreamChannel` (day/count helper,
 `psyq_memset.s`, same "write to *out, return a separate value" shape as
-`func_800490F4`/`func_8004913C`).
+`GetIntroStreamName`/`PickWeeklyStreamChannel`).
 
 ## Proposed learning
 
@@ -103,7 +103,7 @@ second local is involved.
 ## Naming
 
 **`Class6D3C8__StartGraphRoomStreamTask` -- tier B.** Mechanics: gated by
-`arg->unk08`, builds a `StreamTask`, derives a count via `func_800493E4`,
+`arg->unk08`, builds a `StreamTask`, derives a count via `GetGraphRoomStreamChannel`,
 initializes the task from `count/15` and a fixed sub-slot, dispatches a
 5-argument `configure` (`a3 = -1`, unlike every other StreamTask launcher in
 this unit), then starts it. Named for its one and only caller:

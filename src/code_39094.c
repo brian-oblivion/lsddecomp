@@ -263,57 +263,57 @@ Rec1C *GetGridRecordAt(s32 index, s32 sub) {
 Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
     return GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y);
 }
-const char *func_800490F4(s32 *typeCodeOut) {
+const char *GetIntroStreamName(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
         *typeCodeOut = 0x31;
     }
     return D_800113DC;
 }
-Rec1C *func_80049110(s32 *countOut) {
+Rec1C *GetWeeklyStreamPool(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 0;
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x230];
 }
-Rec1C *func_8004913C(s32 *countOut) {
+Rec1C *PickWeeklyStreamChannel(s32 *countOut) {
     s32 unused;
     u32 r = (u32)SeedAndRandom(0, unused) % 7;
     s32 count;
-    Rec1C *rec = func_80049110(&count);
+    Rec1C *rec = GetWeeklyStreamPool(&count);
     if (countOut != NULL) {
         *countOut = r + count;
     }
     return &rec[r];
 }
-Rec1C *func_800491CC(s32 *countOut) {
+Rec1C *GetStreamPool2(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 7;
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x237];
 }
-Rec1C *func_800491FC(s32 *countOut) {
+Rec1C *GetStreamChannelInit(s32 *countOut) {
     s32 count;
-    Rec1C *rec = func_800491CC(&count);
+    Rec1C *rec = GetStreamPool2(&count);
     if (countOut != NULL) {
         *countOut = count;
     }
     return rec;
 }
-Rec1C *func_80049240(s32 *countOut) {
+Rec1C *GetStreamPool3(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 8;
     }
     return &((Rec1C *)GetRecordTable(NULL))[0x238];
 }
-Rec1C *func_80049270(s32 *countOut, s32 sub) {
+Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
     s32 count;
-    Rec1C *rec = func_80049240(&count);
+    Rec1C *rec = GetStreamPool3(&count);
     if (countOut != NULL) {
         *countOut = sub + count;
     }
     return &rec[sub];
 }
-Rec1C *func_800492D0(s32 *countOut, s32 n) {
+Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
     Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
     if (countOut != NULL) {
         *countOut = n * 2 + 0xE;
@@ -326,26 +326,26 @@ typedef struct RecPick {
     s16 sub;
 } RecPick;
 
-Rec1C *func_80049334(s32 *countOut, RecPick pick) {
+Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
     s32 count;
     Rec1C *rec;
     if (pick.group >= 0) {
-        rec = func_800492D0(&count, pick.group);
+        rec = GetCinematicBank(&count, pick.group);
         if (countOut != NULL) {
             *countOut = ((u16)pick.sub < 2) ? pick.sub + count : -1;
         }
         return &rec[pick.sub];
     }
-    return func_80049270(countOut, pick.sub);
+    return GetStreamPool3Channel(countOut, pick.sub);
 }
-s32 func_800493C8(s32 index) {
+s32 GetStreamGroupForType(s32 index) {
     return D_80086170[index];
 }
-Rec1C *func_800493E4(s32 *total, s32 n, s32 len) {
+Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
     s32 count;
     s32 i;
     s32 start;
-    Rec1C *rec = func_800492D0(&count, n);
+    Rec1C *rec = GetCinematicBank(&count, n);
     len *= 2;
     *total = 0;
     start = count;

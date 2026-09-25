@@ -1,13 +1,15 @@
-# func_800491FC -- MATCHED (17/17 words)
+# GetCinematicBank -- MATCHED (25/25 words)
+
+> Renamed from `func_800492D0` on 2026-09-25 (tools/rename.py). Address 0x800492d0.
 
 Round 82, runner echo (second echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
-retail SLPS_015.56`), funcdiff 17/17, 0 insertions / 0 deletions, no
+retail SLPS_015.56`), funcdiff 25/25, 0 insertions / 0 deletions, no
 out-of-range drift.
 
 ## What it does
 
-Record accessor: calls func_800491CC(&count) (which writes 7 and returns record 0x237 of GetRecordTable's table), forwards the count to `*countOut` when non-NULL, returns the record pointer.
+Record accessor: base is record 0x23E (byte +0x3EC8) of GetRecordTable's table, stride 6 records (0xA8 bytes, the `*21*8` shift chain); writes `n*2 + 0xE` to `*countOut` when non-NULL, returns `&base[n*6]`.
 
 ## Source
 
@@ -15,13 +17,12 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/Class6D430.h`.
 
 ```c
-Rec1C *func_800491FC(s32 *countOut) {
-    s32 count;
-    Rec1C *rec = func_800491CC(&count);
+Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
+    Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
     if (countOut != NULL) {
-        *countOut = count;
+        *countOut = n * 2 + 0xE;
     }
-    return rec;
+    return &rec[n * 6];
 }
 ```
 

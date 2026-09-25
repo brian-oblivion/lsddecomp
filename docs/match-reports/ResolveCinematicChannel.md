@@ -1,4 +1,6 @@
-# func_80049334 -- MATCHED (37/37 words)
+# ResolveCinematicChannel -- MATCHED (37/37 words)
+
+> Renamed from `func_80049334` on 2026-09-25 (tools/rename.py). Address 0x80049334.
 
 Round 82, runner echo (third echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the third build; whole-image SHA1 green, funcdiff 37/37,
@@ -8,9 +10,9 @@ Byte-exact on the third build; whole-image SHA1 green, funcdiff 37/37,
 
 Takes a 4-byte struct of two s16 BY VALUE in `$a1` (retail spills `$a1` to
 its home slot 0x24(sp) and reads the halves back with `lh 0x24` / `lh 0x26`).
-Non-negative `group`: `rec = func_800492D0(&count, group)`, writes
+Non-negative `group`: `rec = GetCinematicBank(&count, group)`, writes
 `sub + count` if `(u16)sub < 2` else -1, returns `&rec[sub]`. Negative
-`group`: tail to `func_80049270(countOut, sub)`.
+`group`: tail to `GetStreamPool3Channel(countOut, sub)`.
 
 ## Source
 
@@ -22,23 +24,23 @@ typedef struct RecPick {
     s16 sub;
 } RecPick;
 
-Rec1C *func_80049334(s32 *countOut, RecPick pick) {
+Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
     s32 count;
     Rec1C *rec;
     if (pick.group >= 0) {
-        rec = func_800492D0(&count, pick.group);
+        rec = GetCinematicBank(&count, pick.group);
         if (countOut != NULL) {
             *countOut = ((u16)pick.sub < 2) ? pick.sub + count : -1;
         }
         return &rec[pick.sub];
     }
-    return func_80049270(countOut, pick.sub);
+    return GetStreamPool3Channel(countOut, pick.sub);
 }
 ```
 
 ## Levers (3 builds)
 
-1. `if (group < 0) return func_80049270(...);` first: blocks inverted (retail
+1. `if (group < 0) return GetStreamPool3Channel(...);` first: blocks inverted (retail
    branches `bltz` to the tail call at the end), 6/37.
 2. Positive case first: 32/37, `$v0`/`$v1` swapped in the `sub + count` /
    `-1` value.

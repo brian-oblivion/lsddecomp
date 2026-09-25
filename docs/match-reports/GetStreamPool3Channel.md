@@ -1,13 +1,15 @@
-# func_800492D0 -- MATCHED (25/25 words)
+# GetStreamPool3Channel -- MATCHED (24/24 words)
+
+> Renamed from `func_80049270` on 2026-09-25 (tools/rename.py). Address 0x80049270.
 
 Round 82, runner echo (second echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
-retail SLPS_015.56`), funcdiff 25/25, 0 insertions / 0 deletions, no
+retail SLPS_015.56`), funcdiff 24/24, 0 insertions / 0 deletions, no
 out-of-range drift.
 
 ## What it does
 
-Record accessor: base is record 0x23E (byte +0x3EC8) of GetRecordTable's table, stride 6 records (0xA8 bytes, the `*21*8` shift chain); writes `n*2 + 0xE` to `*countOut` when non-NULL, returns `&base[n*6]`.
+Record accessor: calls GetStreamPool3(&count) (writes 8, returns record 0x238), writes `sub + count` to `*countOut` when non-NULL, returns `&rec[sub]`.
 
 ## Source
 
@@ -15,12 +17,13 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/Class6D430.h`.
 
 ```c
-Rec1C *func_800492D0(s32 *countOut, s32 n) {
-    Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
+Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
+    s32 count;
+    Rec1C *rec = GetStreamPool3(&count);
     if (countOut != NULL) {
-        *countOut = n * 2 + 0xE;
+        *countOut = sub + count;
     }
-    return &rec[n * 6];
+    return &rec[sub];
 }
 ```
 

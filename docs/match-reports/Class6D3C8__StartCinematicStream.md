@@ -9,7 +9,7 @@
 Called by `Class6D3C8__PollStatusObj` when its `StatusObj` slot44 result is `2` (per
 that function's still-stalled derivation). Reads `DreamSys`'s current
 cinematic slot (`GetCinematic`), packs its two 16-bit fields and resolves
-them to a channel index (`func_80049334`, which also returns a second,
+them to a channel index (`ResolveCinematicChannel`, which also returns a second,
 unrelated `s32` used later as `groupId`). If the channel is unresolved
 (`-1`), starts a `LoaderTask` on a fixed "no cinematic" path. Otherwise, if
 `self->arg->unk08` gates it, starts a `StreamTask` on the resolved channel.
@@ -31,7 +31,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
     LoaderTask *task;
 
     cc = self->dreamSys->vt->GetCinematic(self->dreamSys);
-    groupId = func_80049334(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
+    groupId = ResolveCinematicChannel(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (chanBuf.chan != -1) {
@@ -39,7 +39,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
             StreamTask *streamTask = New_StreamTaskObj(0, 0, 0, 0);
 
             streamTask->methods->slot12C(streamTask, 0);
-            lookup = func_800493C8(chanBuf.chan);
+            lookup = GetStreamGroupForType(chanBuf.chan);
             streamTask->methods->slot44(streamTask, self->unk1C, groupId, lookup, 1);
             streamTask->methods->slot4(streamTask);
         }
@@ -89,10 +89,10 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
    residue (2 words) was an instruction-order swap around
    `SetActiveDataSourceDriverMode(0,0,0)`'s call setup. Reading it closely: retail's
    `move s2,v0` sits in `SetActiveDataSourceDriverMode`'s OWN call's delay slot, using
-   whatever `v0` held immediately before -- which is `func_80049334`'s
+   whatever `v0` held immediately before -- which is `ResolveCinematicChannel`'s
    return, not `SetActiveDataSourceDriverMode`'s. My first attempt had it backwards
    (`groupId` assigned from `SetActiveDataSourceDriverMode`'s return, called after
-   discarding `func_80049334`'s) -- swapping which call's return feeds
+   discarding `ResolveCinematicChannel`'s) -- swapping which call's return feeds
    `groupId`, and discarding `SetActiveDataSourceDriverMode`'s (matching its established
    "called for side effect, return unused" role in `Class6D3C8__LoadIntroLogoSequence` and
    `Class6D3C8__StartWeeklyStreamTask`), closed the last two words.
@@ -102,7 +102,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
 `include/Class6D3C8.h`: `SetActiveDataSourceDriverMode`'s extern retyped from `void` to
 `s32` (it does return a meaningful value -- whatever its internal dispatch
 loop last produced -- confirmed here even though this call site, like
-`Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask`, discards it). Added `func_80049334`
+`Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask`, discards it). Added `ResolveCinematicChannel`
 (psyq_memset.s: resolves a packed `{bank,entry}` `CinematicCall` to a
 channel index via an out-param, **and** returns a second, separate `s32`
 kept by this function -- easy to miss since most callers of "write to
@@ -111,8 +111,8 @@ kept by this function -- easy to miss since most callers of "write to
 ## Proposed learning
 
 When a "write to `*out`, also returns a value" helper (this unit has
-several: `func_800490F4`, `func_8004913C`, `func_800493E4`, now
-`func_80049334`) is followed immediately by ANOTHER call whose own return
+several: `GetIntroStreamName`, `PickWeeklyStreamChannel`, `GetGraphRoomStreamChannel`, now
+`ResolveCinematicChannel`) is followed immediately by ANOTHER call whose own return
 is discarded, check which call's return actually lands in the next
 persistent register via the delay-slot-capture idiom before assuming it's
 the SECOND (most recently called) function's return -- it can just as

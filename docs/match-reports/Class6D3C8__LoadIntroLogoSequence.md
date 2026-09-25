@@ -24,10 +24,10 @@ jal  SetActiveDataSourceDriverMode(0, 0, 0)
 jal  Class6D3C8__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTaskObj(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
-jal  func_800490F4                          ; writes 0x31 to local, returns &D_800113DC
+jal  GetIntroStreamName                          ; writes 0x31 to local, returns &D_800113DC
  (delay: s1 = v0, i.e. the PRECEDING call's return = task)
-lw   $a0, 0x18($sp)                          ; reload the type code (0x31) func_800490F4 just wrote
-jal  func_800493C8(a0=0x31)                    ; halfword lookup in D_80086170
+lw   $a0, 0x18($sp)                          ; reload the type code (0x31) GetIntroStreamName just wrote
+jal  GetStreamGroupForType(a0=0x31)                    ; halfword lookup in D_80086170
  (delay: s0 = v0, i.e. the PRECEDING call's return = streamName, &D_800113DC)
 move $a0, $s1                                    ; a0 = task
 move $a2, $s0                                     ; a2 = streamName
@@ -37,7 +37,7 @@ sw   $v1, 0x10($sp)                                  ; 5th argument, stack-spill
 lw   $a1, 0x1C($s2)                                    ; a1 = self->unk1C
 lw   $v1, 0x44($a3)                                     ; v1 = task->methods->slot44
 jalr $v1
- (delay: a3 = v0)                                        ; a3 OVERWRITTEN with func_800493C8's
+ (delay: a3 = v0)                                        ; a3 OVERWRITTEN with GetStreamGroupForType's
                                                             ; return value -- the REAL 4th argument
 lw   $v0, 0x0($s1)                                          ; reload task->methods
 lw   $v0, 0x4($v0)                                           ; slot4
@@ -57,8 +57,8 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         Class6D3C8__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTaskObj(0, 0, 0, 0);
-        streamName = func_800490F4(&typeCode);
-        typeLookup = func_800493C8(typeCode);
+        streamName = GetIntroStreamName(&typeCode);
+        typeLookup = GetStreamGroupForType(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
         Class6D3C8__StartLoaderTask(self, sLogoPathOsd);
@@ -73,11 +73,11 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
 preceding instructions.** `lw $a3, 0x0($s1)` (task->methods) is used to
 *compute the call target* (`v1 = task->methods->slot44`), but by the time
 the `jalr` actually transfers control, its own delay slot (`move $a3, $v0`)
-has already replaced `$a3` with `func_800493C8`'s return value. A naive read
+has already replaced `$a3` with `GetStreamGroupForType`'s return value. A naive read
 sees "`a3` = task's own vtable pointer, passed as an argument" and that
 reading is wrong — the vtable pointer was only ever a scratch value for the
 indirect call computation, immediately clobbered before the callee sees it.
-The first C attempt (discarding `func_800493C8`'s return and passing
+The first C attempt (discarding `GetStreamGroupForType`'s return and passing
 `task->methods` as the 4th argument) built and even scored 44/57 — plausible
 enough to be mistaken for a near-miss — before the diff against retail's
 actual delay-slot value (`move a3,v0` where `v0` is the *call's* return, not
@@ -86,7 +86,7 @@ a memory load) exposed the real data flow. Always check what the delay slot
 
 **2. Register (s0 vs s1) assignment for two callee-saved temporaries tracked
 declaration order, not statement/liveness order.** `task` (from
-`New_StreamTaskObj`) and `streamName` (from `func_800490F4`) are both live
+`New_StreamTaskObj`) and `streamName` (from `GetIntroStreamName`) are both live
 across further calls, `task` for longer (reloaded twice more). The first
 attempt declared `task` before `streamName` and code assigned `task` first
 (chronologically first live); GCC put `task` in `s0` and `streamName` in
@@ -121,7 +121,7 @@ register, a different axis).
 **`Class6D3C8__LoadIntroLogoSequence` -- tier B.** Mechanics established
 from the body and its string constants: gated by `arg->unk0C`, registers a
 loader task for `"ETC\ASMKLOGO.TIM"`, then a stream task for whatever
-`func_800490F4` resolves (`"ETC\ASMK.STR"` per the header comment), then a
+`GetIntroStreamName` resolves (`"ETC\ASMK.STR"` per the header comment), then a
 second loader task for `"ETC\OSDLOGO.TIM"` -- three named boot-time assets
 loaded in sequence. "Intro logo sequence" describes what the function DOES
 (loads these three specific assets, gated, in this order); it does not

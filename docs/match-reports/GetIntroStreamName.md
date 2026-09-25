@@ -1,4 +1,6 @@
-# func_800490F4 -- MATCHED (7/7 words), round 81
+# GetIntroStreamName -- MATCHED (7/7 words), round 81
+
+> Renamed from `func_800490F4` on 2026-09-25 (tools/rename.py). Address 0x800490f4.
 
 Round 81, runner echo. Unit `src/code_39094.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
@@ -12,7 +14,7 @@ the first build; whole-image SHA1 green.
 ## Source
 
 ```c
-const char *func_800490F4(s32 *typeCodeOut) {
+const char *GetIntroStreamName(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
         *typeCodeOut = 0x31;
     }

@@ -1,4 +1,6 @@
-# func_800493C8 -- MATCHED (7/7 words), round 81
+# GetStreamGroupForType -- MATCHED (7/7 words), round 81
+
+> Renamed from `func_800493C8` on 2026-09-25 (tools/rename.py). Address 0x800493c8.
 
 Round 81, runner echo. Unit `src/code_39094.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
@@ -12,7 +14,7 @@ the first build; whole-image SHA1 green.
 ## Source
 
 ```c
-s32 func_800493C8(s32 index) {
+s32 GetStreamGroupForType(s32 index) {
     return D_80086170[index];
 }
 ```

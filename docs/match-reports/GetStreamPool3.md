@@ -1,4 +1,6 @@
-# func_80049240 -- MATCHED (12/12 words)
+# GetStreamPool3 -- MATCHED (12/12 words)
+
+> Renamed from `func_80049240` on 2026-09-25 (tools/rename.py). Address 0x80049240.
 
 Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
@@ -7,7 +9,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Same shape as func_80049110: `*out = 8`, returns record 0x238 (offset 0x3E20).
+Same shape as GetWeeklyStreamPool: `*out = 8`, returns record 0x238 (offset 0x3E20).
 
 ## Source
 
@@ -15,7 +17,7 @@ Same shape as func_80049110: `*out = 8`, returns record 0x238 (offset 0x3E20).
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
 void *GetRecordTable(s32 *out);   /* defined earlier in this unit */
 
-Rec1C *func_80049240(s32 *countOut) {
+Rec1C *GetStreamPool3(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 8;
     }

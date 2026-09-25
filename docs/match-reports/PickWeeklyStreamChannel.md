@@ -1,4 +1,6 @@
-# func_8004913C -- MATCHED (36/36 words)
+# PickWeeklyStreamChannel -- MATCHED (36/36 words)
+
+> Renamed from `func_8004913C` on 2026-09-25 (tools/rename.py). Address 0x8004913c.
 
 Round 82, runner echo (third echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the first build; whole-image SHA1 green, funcdiff 36/36,
@@ -7,7 +9,7 @@ Byte-exact on the first build; whole-image SHA1 green, funcdiff 36/36,
 ## What it does
 
 Random pick within the record block at 0x230: `r = (u32)SeedAndRandom(0, ?) % 7`,
-`rec = func_80049110(&count)` (the record at index 0x230, count 0); writes
+`rec = GetWeeklyStreamPool(&count)` (the record at index 0x230, count 0); writes
 `r + count` through the optional out pointer and returns `&rec[r]`.
 
 ## Source
@@ -15,11 +17,11 @@ Random pick within the record block at 0x230: `r = (u32)SeedAndRandom(0, ?) % 7`
 Declarations: the local views at the top of `src/code_39094.c` (`Rec1C`).
 
 ```c
-Rec1C *func_8004913C(s32 *countOut) {
+Rec1C *PickWeeklyStreamChannel(s32 *countOut) {
     s32 unused;
     u32 r = (u32)SeedAndRandom(0, unused) % 7;
     s32 count;
-    Rec1C *rec = func_80049110(&count);
+    Rec1C *rec = GetWeeklyStreamPool(&count);
     if (countOut != NULL) {
         *countOut = r + count;
     }

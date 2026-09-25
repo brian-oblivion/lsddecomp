@@ -1,11 +1,13 @@
-# func_800493E4 -- MATCHED (39/39 words)
+# GetGraphRoomStreamChannel -- MATCHED (39/39 words)
+
+> Renamed from `func_800493E4` on 2026-09-25 (tools/rename.py). Address 0x800493e4.
 
 Round 82, runner echo (third echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on build 12; whole-image SHA1 green, funcdiff 39/39.
 
 ## What it does
 
-`rec = func_800492D0(&count, n)`; sums `D_80086170[i] + 10` (s16 table) over
+`rec = GetCinematicBank(&count, n)`; sums `D_80086170[i] + 10` (s16 table) over
 `i` in `[count, count + len*2)` into `*total`, subtracts 10 (so: widths plus
 a 10-unit gap between entries), returns `rec`.
 
@@ -14,11 +16,11 @@ a 10-unit gap between entries), returns `rec`.
 Declarations: `Rec1C` and `extern s16 D_80086170[];` in `src/code_39094.c`.
 
 ```c
-Rec1C *func_800493E4(s32 *total, s32 n, s32 len) {
+Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
     s32 count;
     s32 i;
     s32 start;
-    Rec1C *rec = func_800492D0(&count, n);
+    Rec1C *rec = GetCinematicBank(&count, n);
     len *= 2;
     *total = 0;
     start = count;

@@ -62,7 +62,7 @@ void Class6D3C8__ForwardToBaseSlot44UnlessFlagged(Class6D3C8 *self, void *a1, vo
 
 /* Optional stream-load block, gated by self->arg->unk0C: registers a
  * "loader" task for "ETC\ASMKLOGO.TIM" (Class6D3C8__StartLoaderTask), then a separate
- * "stream" task for whatever type code func_800490F4 hands back
+ * "stream" task for whatever type code GetIntroStreamName hands back
  * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
 void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
     const char *streamName;
@@ -74,8 +74,8 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         Class6D3C8__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTaskObj(0, 0, 0, 0);
-        streamName = func_800490F4(&typeCode);
-        typeLookup = func_800493C8(typeCode);
+        streamName = GetIntroStreamName(&typeCode);
+        typeLookup = GetStreamGroupForType(typeCode);
         task->methods->configure(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->start(task);
         Class6D3C8__StartLoaderTask(self, sLogoPathOsd);
@@ -104,8 +104,8 @@ s32 Class6D3C8__LoaderTaskDoneCallback(void) {
 
 /* Optional stream-task init block, gated by self->arg->unk08 (the same
  * shape as Class6D3C8__LoadIntroLogoSequence's self->arg->unk0C gate, minus the two
- * Class6D3C8__StartLoaderTask loader-task calls, and using func_8004913C instead of
- * func_800490F4 to derive the type code). */
+ * Class6D3C8__StartLoaderTask loader-task calls, and using PickWeeklyStreamChannel instead of
+ * GetIntroStreamName to derive the type code). */
 void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
     s32 derivedValue;
     s32 typeCode;
@@ -115,8 +115,8 @@ void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTaskObj(0, 0, 0, 0);
-        derivedValue = func_8004913C(&typeCode, 0);
-        typeLookup = func_800493C8(typeCode);
+        derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
+        typeLookup = GetStreamGroupForType(typeCode);
         task->methods->configure(task, self->unk1C, derivedValue, typeLookup, 1);
         task->methods->start(task);
     }
@@ -173,7 +173,7 @@ s32 Class6D3C8__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
 
 /* Called by Class6D3C8__PollGraphRoomStatus when its first PollTask reports "2". Gated by
  * self->arg->unk08 (same gate as Class6D3C8__StartWeeklyStreamTask). Builds a StreamTask,
- * derives a count via func_800493E4, initializes the task with that
+ * derives a count via GetGraphRoomStreamChannel, initializes the task with that
  * count's quotient-by-9 and a fixed sub-slot, then a 5-argument slot44
  * call (a3 = -1, unlike the other slot44 call sites), then starts it. */
 void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
@@ -188,7 +188,7 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTaskObj(0, 0, 0, 0);
-        extra = func_800493E4(&buf.count, 0, 10);
+        extra = GetGraphRoomStreamChannel(&buf.count, 0, 10);
         task->methods->slot6C(task, buf.count / 15);
         task->methods->slot12C(task, 0);
         task->methods->configure(task, self->unk1C, extra, -1, 1);
@@ -253,7 +253,7 @@ s32 Class6D3C8__PollStatusObj(Class6D3C8 *self) {
 }
 
 /* Reads DreamSys's current cinematic slot, resolves it to a channel index
- * (func_80049334); if that fails (-1), starts a LoaderTask on the fixed
+ * (ResolveCinematicChannel); if that fails (-1), starts a LoaderTask on the fixed
  * "no cinematic" path; otherwise, if self->arg->unk08 gates it, starts a
  * StreamTask on the resolved channel. Either branch finishes by starting
  * whichever task it built; if neither branch runs, nothing happens. */
@@ -269,7 +269,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
     LoaderTask *task;
 
     cc = self->dreamSys->vt->GetCinematic(self->dreamSys);
-    groupId = func_80049334(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
+    groupId = ResolveCinematicChannel(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (chanBuf.chan != -1) {
@@ -277,7 +277,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
             StreamTask *streamTask = New_StreamTaskObj(0, 0, 0, 0);
 
             streamTask->methods->slot12C(streamTask, 0);
-            lookup = func_800493C8(chanBuf.chan);
+            lookup = GetStreamGroupForType(chanBuf.chan);
             streamTask->methods->configure(streamTask, self->unk1C, groupId, lookup, 1);
             streamTask->methods->start(streamTask);
         }
@@ -292,10 +292,10 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
 
 /* Class6D3C8Methods slot +0x064. Gated by self->arg->unk08 (same gate as
  * Class6D3C8__StartWeeklyStreamTask/Class6D3C8__StartGraphRoomStreamTask). Builds a StreamTask, runs its slot12C,
- * derives a type code via func_800491FC, looks it up via func_800493C8,
+ * derives a type code via GetStreamChannelInit, looks it up via GetStreamGroupForType,
  * initializes the task with it, then starts it -- the same shape as
- * Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartWeeklyStreamTask, but with slot12C added and func_800491FC
- * in place of func_800490F4/func_8004913C. */
+ * Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartWeeklyStreamTask, but with slot12C added and GetStreamChannelInit
+ * in place of GetIntroStreamName/PickWeeklyStreamChannel. */
 void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
     StreamTask *task;
     s32 typeCode;
@@ -306,8 +306,8 @@ void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTaskObj(0, 0, 0, 0);
         task->methods->slot12C(task, 0);
-        outerValue = func_800491FC(&typeCode, 0);
-        typeLookup = func_800493C8(typeCode);
+        outerValue = GetStreamChannelInit(&typeCode, 0);
+        typeLookup = GetStreamGroupForType(typeCode);
         task->methods->configure(task, self->unk1C, outerValue, typeLookup, 1);
         task->methods->start(task);
     }

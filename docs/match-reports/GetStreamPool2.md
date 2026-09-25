@@ -1,13 +1,15 @@
-# func_80049110 -- MATCHED (11/11 words)
+# GetStreamPool2 -- MATCHED (12/12 words)
+
+> Renamed from `func_800491CC` on 2026-09-25 (tools/rename.py). Address 0x800491cc.
 
 Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
 (`./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`), funcdiff
-11/11, 0 insertions / 0 deletions, no out-of-range drift. No levers needed.
+12/12, 0 insertions / 0 deletions, no out-of-range drift. No levers needed.
 
 ## What it does
 
-`if (out) *out = 0; return records + 0x230;` -- the end of GetRecordTable's 0x230-record table (0x3D40 = 0x230 * 0x1C). Siblings func_800491CC/func_80049240 are the same shape with counts 7 and 8 at records 0x237 and 0x238: a count plus a pointer to a sub-table that follows the main one.
+Same shape as GetWeeklyStreamPool: `*out = 7`, returns record 0x237 (offset 0x3E04). Positive constant stored through a pointer compiles as `ori $v0,$zero,7` + `sw` in the guarded block, as expected.
 
 ## Source
 
@@ -15,11 +17,11 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
 void *GetRecordTable(s32 *out);   /* defined earlier in this unit */
 
-Rec1C *func_80049110(s32 *countOut) {
+Rec1C *GetStreamPool2(s32 *countOut) {
     if (countOut != NULL) {
-        *countOut = 0;
+        *countOut = 7;
     }
-    return &((Rec1C *)GetRecordTable(NULL))[0x230];
+    return &((Rec1C *)GetRecordTable(NULL))[0x237];
 }
 ```
 
