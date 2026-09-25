@@ -60,5 +60,8 @@ void func_8003B5E4(D_8006E558Obj *self) {
     self->unk48 = 1;
 }
 INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B5F0);
-INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B614);
+/* The class's table getter (called by func_8003B39C and func_8003B3FC). */
+Class6D430Methods *func_8003B614(void) {
+    return &D_8006E558;
+}
 INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B624);
