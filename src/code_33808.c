@@ -79,7 +79,75 @@ void *func_80043008(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043068);
+/* D_8006F0B8 +0x008: constructor -- the active driver's, then this table;
+ * clear +0x2C..+0x3C and lay out the four channel entries at +0x40 (shift
+ * D_8008A92C, its mask, consecutive slots from 0x1E0); then adopt a 0x24-byte
+ * header buffer (state 9 at +0x2A), allocate the 0x800-byte sector buffer
+ * at +0x34, open `name` and read the first sector into it. */
+typedef struct Ent43068 {
+    /* +0x00 */ u16 shift;
+    /* +0x02 */ u16 mask;
+    /* +0x04 */ u16 unk4;
+    /* +0x06 */ u16 addr;
+    /* +0x08 */ u16 unk8;
+    /* +0x0A */ u16 unkA;
+    /* +0x0C */ u8 padC[4];
+} Ent43068;
+
+typedef struct Obj43068 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ s32 unk2C;
+    /* +0x030 */ s32 unk30;
+    /* +0x034 */ void *sector;
+    /* +0x038 */ s32 unk38;
+    /* +0x03C */ s32 unk3C;
+    /* +0x040 */ Ent43068 entries[4];
+    /* +0x080 */ s32 unk80;
+} Obj43068;
+
+extern s16 D_8008A92C;
+
+void func_80043068(Obj43068 *self, char *name) {
+    Ent43068 *e;
+    void *hdr;
+    s32 i;
+    u16 addr;
+    s16 shift;
+    u16 mask;
+
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_80043830();
+    self->unk2C = 0;
+    self->unk30 = 0;
+    self->unk3C = 0;
+    self->sector = NULL;
+    self->unk38 = 0;
+    addr = 0;
+    mask = 1 << D_8008A92C;
+    shift = D_8008A92C;
+    for (i = 0; i < 4; i++) {
+        e = &self->entries[i];
+        e->shift = shift;
+        e->mask = mask;
+        e->unk4 = 0;
+        e->addr = addr + 0x1E0;
+        addr += mask;
+        e->unk8 = 0x100;
+        e->unkA = 1;
+    }
+    hdr = BMemPMgrAlloc(0x24);
+    if (hdr != NULL) {
+        self->sector = BMemPMgrAlloc(0x800);
+        if (self->sector != NULL) {
+            self->bufferSize = 0x24;
+            self->buffer = hdr;
+            self->unk2A = 9;
+            self->unk80 = 0;
+            self->methods->open((DataSrc33808 *)self, name, 1, 0);
+            self->methods->read((DataSrc33808 *)self, self->sector, 0x800);
+        }
+    }
+}
 /* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
  * entries), free it, then the active driver's. */
 void func_800431A8(DataSrc33808 *self) {
