@@ -27,7 +27,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     req.path = D_800113F8;
     self->unk48 = func_80043840(&req);
     tmp = func_80048D74(0);
-    self->unk40 = func_800398E0(tmp, 0, 1);
+    self->unk40 = New_WBgm(tmp, 0, 1);
     func_8004A070(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
     self->unk0C = arg1;
