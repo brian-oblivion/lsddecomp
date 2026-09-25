@@ -439,6 +439,11 @@ MDEC_vlc_brk = 0x800465B8; // type:func  (Psy-Q libpress/vlc, from the SDK objec
 MDEC_vlc = 0x800465E8; // type:func  (Psy-Q libpress/vlc, from the SDK object)
 MDEC_vlc2 = 0x8004691C; // type:func  (Psy-Q libpress/vlc2, from the SDK object)
 ivlc_dct_dc_size = 0x80046CF8; // type:func  (Psy-Q libpress/vlc2, from the SDK object)
+// not SDK: game code (revision 18). A 4-word getter returning &D_800817E0, the
+// game method table whose 18 methods fill code_3770c; called by that class's
+// own methods. The adjacency lead (libcd/sys CdLastPos) is a stub-shape collision
+// with the placed libcd/c_002 that follows.
+func_80047900 = 0x80047900; // type:func
 StClearRing = 0x80047910; // type:func  (Psy-Q libcd/c_002, from the SDK object)
 StUnSetRing = 0x80047970; // type:func  (Psy-Q libcd/c_003, from the SDK object)
 StSetStream = 0x80047A5C; // type:func  (Psy-Q libcd/c_005, from the SDK object)

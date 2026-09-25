@@ -94,3 +94,4 @@ LEAD 0x80036AA8      8  1.00  libsnd/ssinit:SsInitHot libsnd/ssinit:SsStart libs
 LEAD 0x8003F28C      8  1.00  libgs/gs_106:GsSetProjection
 LEAD 0x8003FB0C      4  1.00  libgs/gs_101:GsSetNearClip libgs/gs_102:GsSetFarClip libgs/gs_124:GsSetWorkBase
 LEAD 0x8003FBE4      4  1.00  libgs/gs_101:GsSetNearClip libgs/gs_102:GsSetFarClip libgs/gs_124:GsSetWorkBase
+LEAD 0x80047900      4  1.00  libcd/sys:CdLastPos

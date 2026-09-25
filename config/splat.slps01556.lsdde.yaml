@@ -82,7 +82,11 @@ segments:
       # psyq_2258 owns no plain rodata at all.
       - [0xA68, o, libgte/geo, .rdata]
       - [0xA8C, rodata]   # code_8220
-      - [0xABC, rodata]   # psyq_GsLinkObject4; 0xEBC..0xF25 is libetc/intr's .rdata, SHADOWED (see the manifest)
+      - [0xABC, rodata]   # psyq_GsLinkObject4 (D_800102BC, jtbl_800102DC)
+      # jtbl_80010354 is code_fa50's switch table: `.L` labels local to its
+      # function's own `.s`, so the sub-slot is ATTACHED (Gate 2). 0x80 bytes.
+      - [0xB54, .rodata, code_fa50]
+      - [0xBD4, rodata]   # 0xEBC..0xF25 is libetc/intr's .rdata, SHADOWED (see the manifest)
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
       - [0xF54, o, libetc/vsync, .rdata]      # "VSync: timeout"
       - [0xF64, rodata]   # 16-word bit table; owner not placed yet (libetc intr?)
@@ -226,7 +230,10 @@ segments:
       # derived offset landing on the slot's existing dlabels is the
       # confirmation.
       - [0x19B4, o, libc2/sprintf, .rdata]
-      - [0x1A90, rodata]
+      # jtbl_80011290 (5 words) is code_322b4's switch table, ATTACHED for its
+      # `.L` labels; D_800112A4 onward is psyq_36654's (libpress) and stays plain.
+      - [0x1A90, .rodata, code_322b4]
+      - [0x1AA4, rodata]
       # 0x1B -> 0x1B6B; retail's next string is at 0x1B6C, which is exactly
       # where SUBALIGN(2) puts it, so no pad line is needed.
       - [0x1B50, o, libpress/vlc2, .rdata]
@@ -293,6 +300,12 @@ segments:
       # They are NOT game code: keep them out of the progress denominator
       # (tools/progress.py LIBRARY_RANGES) and off the runner queues until the
       # game's own code is done.
+      # A NAME IS A CLAIM, NOT EVIDENCE (revision 18, 2026-09-25): ten psyq_*
+      # segments, named for their position between placed Sony objects, held
+      # 299 game functions -- BasicClass-table methods and callers of the
+      # game's framework -- and were carved into code_<fileoff> units.
+      # `.venv/bin/python3 tools/gameinsdk.py --check` keeps every psyq_*
+      # segment free of game code; name a new one only after running it.
       # main: the game's own `main()` (func_800118DC) plus a two-word stub.
       # Carved round 47 (2026-09-16).
       #
@@ -317,9 +330,10 @@ segments:
       # chunk at a time; the unconverted tail keeps a smaller `asm` segment
       # named for its own start offset.
       - [0x2258, o, _obj/malloc]      # _ExpAllocArea .. calloc (the heap)
-      # 0x2864..0x2F68 is func_80012064 ALONE, and no SDK disc places it, so
-      # it stays disassembly permanently rather than as a conversion tail.
-      - [0x2864, asm, psyq_2864]
+      # 0x2864..0x2F68 is func_80012064 ALONE. It was psyq_2864 ("no SDK disc
+      # places it") until revision 18 measured it as GAME code: it calls the
+      # game's own functions and sits in a game method table. A C unit now.
+      - [0x2864, c, code_2864]
       - [0x2F68, o, libapi/c159]      # SetMem
       - [0x2F78, o, libc2/bcopy]      # bcopy, bzero, bcmp
       - [0x3038, o, libgs/matrix]     # GsInitCoordinate2 .. print_vector
@@ -453,12 +467,15 @@ segments:
       # 0xF770..0xF8C8: head of the old psyq_GsLinkObject4, no placed object.
       - [0xF770, asm, psyq_GsLinkObject4]
       - [0xF8C8, o, libgte/ratan]       # ratan2, ratan (Psy-Q 3.3). .data at 0x5BE9C
-      # 0xFA50..0x10D48: still asm.
-      - [0xFA50, asm, psyq_fa50]
+      # 0xFA50..0x10D48: game code (revision 18; was psyq_fa50). Owns
+      # jtbl_80010354 through the attached 0xB54 rodata sub-slot.
+      - [0xFA50, c, code_fa50]
       - [0x10D48, o, libgs/gs_105]      # GsMapModelingData (Psy-Q 3.3). bss via the fragment
       - [0x10DC0, o, libgte/msc01]      # SquareRoot0, SquareRoot12. .data at 0x5C6F0
-      # 0x10EE0..0x14098: still asm.
-      - [0x10EE0, asm, psyq_10ee0]
+      # 0x10EE0..0x11474: game code (revision 18; was the head of psyq_10ee0).
+      # 0x11474..0x14098: libgpu/sys from ResetGraph, Sony's, still asm.
+      - [0x10EE0, c, code_10ee0]
+      - [0x11474, asm, psyq_11474]      # libgpu/sys from ResetGraph (Dec 1995 build, never places)
       - [0x14098, o, libapi/c73]        # GPU_cw (Psy-Q 3.3)
       - [0x140A8, o, libc2/memcpy]      # memcpy
       # 0x140DC..0x14E9C, still asm. 0x140DC..0x14708 is the placed
@@ -1151,8 +1168,10 @@ segments:
       - [0x29a64, o, libspu/s_m_m]       # SpuMalloc
       - [0x29d2c, o, libspu/s_m_int]     # _spu_gcSPU
       - [0x2a02c, o, libspu/s_sav]       # _SpuSetAnyVoice
-      # Gap: 0x2A0E0..0x2A878, the game's own libspu build.
-      - [0x2a0e0, asm, psyq_2a0e0]
+      # Gap: 0x2A0E0..0x2A878. Called "the game's own libspu build" until
+      # revision 18 measured it: game code (BasicClass-table methods that
+      # call the framework), carved as a C unit.
+      - [0x2a0e0, c, code_2a0e0]
       # Chunk D: three libsnd runs, all text-only.
       - [0x2a878, o, libsnd/ssvol]       # Snd_SetVol, SsSeqSetVol, SsSepSetVol
       - [0x2a918, asm, psyq_2a918]       # 0x2A918..0x2A94C, unowned
@@ -1165,12 +1184,13 @@ segments:
       - [0x2b268, o, libsnd/ssplay]      # Snd_SetPlayMode, SsSeqPlay, SsSepPlay, SsPlayBack
       - [0x2b49c, o, libsnd/ssclose]     # seq_close, SsSeqClose, SsSepClose
       - [0x2b660, o, libsnd/sspause]     # Snd_SetPauseMode, SsSeqPause, SsSepPause
-      # Gap: 0x2B78C..0x2BA1C, the game's own libsnd build.
-      - [0x2b78c, asm, psyq_2b78c]
+      # Gap: 0x2B78C..0x2BA1C. Called "the game's own libsnd build" until
+      # revision 18: game code, carved as a C unit.
+      - [0x2b78c, c, code_2b78c]
       # Chunk E: the block's last two runs.
       - [0x2ba1c, o, libgs/gs_104]       # GsInit3D
       - [0x2ba94, o, libcd/event]        # CdInit, def_cbsync, def_cbready, def_cbread
-      - [0x2bb9c, asm, psyq_2bb9c]       # 0x2BB9C..0x2BF70, unowned
+      - [0x2bb9c, c, code_2bb9c]       # 0x2BB9C..0x2BF70, game code (revision 18)
       - [0x2bf70, o, libgs/gs_122]       # GsGetTimInfo, closing the block at 0x2C054
       - [0x2c054, c, code_2c054]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
@@ -1320,18 +1340,19 @@ segments:
       - [0x319A8, o, libc2/itoa]       # itoa
       - [0x319E8, o, libc2/sprintf]    # sprintf
       - [0x32248, o, libc2/memmove]    # memmove
-      - [0x322b4, asm, psyq_322b4]
+      - [0x322b4, c, code_322b4]       # game code (revision 18; was psyq_322b4)
       # psyq_memset chunk B: three short runs in the libgs/libcd remainder.
       - [0x330F4, o, libgs/gs_110]     # GsSetAmbient
-      - [0x3311c, asm, psyq_3311c]
+      - [0x3311c, c, code_3311c]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
-      - [0x33808, asm, psyq_33808]
+      - [0x33808, c, code_33808]       # game code (revision 18; was the head of psyq_33808)
+      - [0x36654, asm, psyq_36654]     # libpress/libpress from DecDCTReset
       - [0x36D38, o, libc2/exit]       # exit
       - [0x36d48, asm, psyq_36d48]
       # psyq_memset chunk C: libpress, the MDEC variable-length decoder.
       - [0x36DB8, o, libpress/vlc]     # MDEC_vlc_brk, MDEC_vlc
       - [0x3711C, o, libpress/vlc2]    # MDEC_vlc2, ivlc_dct_dc_size
-      - [0x3770c, asm, psyq_3770c]
+      - [0x3770c, c, code_3770c]       # game code (revision 18; was psyq_3770c)
       # psyq_memset chunk D: the libcd streaming/BIOS-command core. Eight of
       # these objects carry an identical, unreferenced 0x10-byte .data; only
       # c_003's is placeable, and the other eight are left out of the yaml on
@@ -1348,7 +1369,7 @@ segments:
       - [0x38EAC, o, libcd/c_009]      # StGetNext
       - [0x38F70, o, libcd/c_004]      # data_ready_callback
       - [0x38FD8, o, libcd/c_007]      # StFreeRing
-      - [0x39094, asm, psyq_39094]
+      - [0x39094, c, code_39094]       # game code (revision 18; was psyq_39094)
       # psyq_rand, retired whole. Its 4-byte .sbss seed is placed NOLOAD by
       # config/psyq-objects.ld at 0x8008AC68; the plain sbss slot below is
       # unchanged.
