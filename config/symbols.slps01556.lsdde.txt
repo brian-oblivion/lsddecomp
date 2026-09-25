@@ -2521,3 +2521,105 @@ FlatLightObj__SetColor = 0x800429E8; // type:func
 FlatLightObj__SetDirection = 0x80042A2C; // type:func
 Get_vtable_FlatLightObj = 0x80042A7C; // type:func
 gFlatLightObjMethods = 0x8006F06C;
+// identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),
+// header LIBGPU.H `extern int ClearImage(RECT *rect, u_char r, u_char g,
+// u_char b);`, no C call site to check arg shape against. Round 81 (bravo,
+// track 2), not yet linked from an SDK object.
+ClearImage = 0x800212A8; // type:func  (Psy-Q libgpu/sys, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),
+// unique (next candidate StoreImage, SHAPE masked 0.96, its own sibling
+// entry). Header LIBGPU.H `extern int LoadImage(RECT *rect, u_long *p);`,
+// no C call site yet. Round 81 (bravo, track 2), not yet linked from an
+// SDK object.
+LoadImage = 0x8002133C; // type:func  (Psy-Q libgpu/sys, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),
+// unique (next candidate LoadImage, SHAPE masked 0.96, its own sibling
+// entry). Header LIBGPU.H `extern int StoreImage(RECT *rect, u_long *p);`,
+// no C call site yet. Round 81 (bravo, track 2), not yet linked from an
+// SDK object.
+StoreImage = 0x800213A0; // type:func  (Psy-Q libgpu/sys, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),
+// unique (next candidate PutDrawEnv, masked 0.18). Header LIBGPU.H
+// `extern int MoveImage(RECT *rect, int x, int y);`, no C call site yet.
+// Round 81 (bravo, track 2), not yet linked from an SDK object.
+MoveImage = 0x80021404; // type:func  (Psy-Q libgpu/sys, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgs/gs_001.o (disc 3.3/3.5),
+// unique (next candidate __fixdfdi, masked 0.17). Header LIBGS.H
+// `void GsInitGraph(u_short x, u_short y, u_short intmode, u_short dith,
+// u_short vrammode);`, no C call site yet. Round 81 (bravo, track 2), not
+// yet linked from an SDK object.
+GsInitGraph = 0x800238DC; // type:func  (Psy-Q libgs/gs_001, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgpu/prim.o (discs 3.3,3.5,3.6),
+// unique (next candidate _SsContResetAll, masked 0.10). Position: same
+// bracket as GsInitGraph (after libc2/memcpy 3.3, before libgs/gs_103 3.3).
+// Header LIBGPU.H `extern u_short GetTPage(int tp, int abr, int x, int y);`,
+// no C call site yet. Round 81 (bravo, track 2), not yet linked from an
+// SDK object.
+GetTPage = 0x80023F08; // type:func  (Psy-Q libgpu/prim, fingerprint)
+// identified: fingerprint TINY (4w) EXACT tie masked 1.00 vs GsGetActiveBuff
+// (libgs/gs_002.o) and SsUtGetReverbType (libsnd/ut_rev.o), broken by
+// position (bracketed by placed libgs/gs_121 and libgs/gs_010, both 3.3)
+// and by the sibling func_80024830 reusing the same global D_80090B78 this
+// function reads -- a libgs buffer-state variable, not a sound-driver
+// setting. No C call site yet. Round 81 (bravo, track 2), not yet linked
+// from an SDK object.
+GsGetActiveBuff = 0x80024820; // type:func  (Psy-Q libgs/gs_002, fingerprint+position)
+// identified: fingerprint 1.00 (EXACT) vs libsnd/seqinit.o (discs 3.3,3.5),
+// unique (next candidate CdReadSync, masked 0.10). Position: after placed
+// libsnd/vol (3.3), before placed libsnd/ssplay (3.3), both libsnd. Header
+// LIBSND.H `extern short SsSeqOpen(unsigned long*, short);`, no C call
+// site yet. Round 81 (bravo, track 2), not yet linked from an SDK object.
+SsSeqOpen = 0x8003A99C; // type:func  (Psy-Q libsnd/seqinit, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libpress/libpress.o (discs
+// 3.3,3.5,3.6), unique (next candidate GetDrawEnv, masked 0.57). Position:
+// after placed libgs/gs_107 (3.3), before placed libc2/exit (3.3); this
+// round's DecDCTin/DecDCTout/DecDCToutCallback/DecDCTvlc fill the rest of
+// the gap. Header LIBPRESS.H `extern void DecDCTReset(int mode);`, no C
+// call site yet. Round 81 (bravo, track 2), not yet linked from an SDK
+// object.
+DecDCTReset = 0x80045E54; // type:func  (Psy-Q libpress/libpress, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libpress/libpress.o (discs
+// 3.3,3.5,3.6; the 3.0 disc's build of this function only scores 0.81 --
+// a different library build, not a competing name). Position: same
+// libpress bracket as DecDCTReset above. Header LIBPRESS.H
+// `extern void DecDCTin(u_long *buf, int mode);`, no C call site yet.
+// Round 81 (bravo, track 2), not yet linked from an SDK object.
+DecDCTin = 0x80045F84; // type:func  (Psy-Q libpress/libpress, fingerprint)
+// identified: fingerprint AMBIGUOUS (18-way tie masked 1.00, 8w); narrowed
+// to the 4 libpress/libpress candidates by position inside the confirmed
+// DecDCT run (DecDCTReset/DecDCTin below, DecDCTvlc above), then to
+// DecDCTout specifically by call-target semantics: forwards $a0/$a1
+// unchanged into helper func_80046244, which stores $a0 as a buffer
+// pointer and right-shifts $a1 by 5 (a byte-count -> 32-byte-DMA-block
+// conversion) -- the (buf, size) shape, ruling out the single-int
+// DecDCTinSync/DecDCToutSync and single-pointer DecDCTvlcSize. Header
+// LIBPRESS.H `extern void DecDCTout(u_long *buf, int size);`. No C call
+// site yet. Round 81 (bravo, track 2), not yet linked from an SDK object.
+DecDCTout = 0x80046000; // type:func  (Psy-Q libpress/libpress, fingerprint+position+semantics)
+// identified: fingerprint AMBIGUOUS (2-way tie masked 1.00, 9w: CdGetToc
+// libcd/toc vs DecDCToutCallback libpress/libpress); position (inside the
+// confirmed libpress DecDCT run) favours DecDCToutCallback; settled by
+// call-target semantics: forwards its arg into already-named
+// DMACallback(int chan, void(*func)()) (libetc/intr, pinned) with chan=1
+// (PS1 DMA channel 1 = MDEC-out), matching DecDCToutCallback exactly and
+// ruling out CdGetToc, which takes a struct pointer and never calls
+// DMACallback. Header LIBPRESS.H `extern int DecDCToutCallback(void
+// (*func)());`. No C call site yet. Round 81 (bravo, track 2), not yet
+// linked from an SDK object.
+DecDCToutCallback = 0x80046084; // type:func  (Psy-Q libpress/libpress, position+semantics)
+// identified: fingerprint 1.00 (EXACT) vs libpress/libpress.o (disc 3.3),
+// unique (next candidate GsSetFogParam, masked 0.30). Position: after
+// placed libc2/exit (3.3), before placed libpress/vlc (3.3) -- directly
+// bracketed by a libpress object. Header LIBPRESS.H `extern int
+// DecDCTvlc(u_long *bs, u_long *buf);`, no C call site yet. Round 81
+// (bravo, track 2), not yet linked from an SDK object.
+DecDCTvlc = 0x80046568; // type:func  (Psy-Q libpress/libpress, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libcd/cdread2.o (discs 3.5,3.6
+// only -- no 3.3 candidate scores at all, a reworked module between
+// builds; game mixed library builds, CLAUDE.md), unique (next unrelated
+// candidate GsMulCoord0, masked 0.16). Position: after placed libcd/c_003
+// (3.3), before placed libcd/c_005 (3.3) -- both libcd, though a different
+// disc build than its neighbours. No public LIBCD.H prototype (internal
+// libcd export). No C call site yet. Round 81 (bravo, track 2), not yet
+// linked from an SDK object.
+CdRead2 = 0x800479C8; // type:func  (Psy-Q libcd/cdread2, fingerprint)
