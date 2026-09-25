@@ -1379,7 +1379,13 @@ SsStart2 = 0x800329B8; // type:func
 // (disc 3.3). Superseded game-style name CancelSeqTimer. Round 71
 // (bravo, track 2).
 SsEnd = 0x800329D8; // type:func
-QuitSpu = 0x80032A7C; // type:func
+// identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit SsQuit (disc
+// 3.3); AMBIGUOUS alone (18-way tie), settled by position -- bracketed with
+// zero gap by SsEnd (0x800329D8) before and _SsTrapIntrVSync (0x80032A9C)
+// after, both already libsnd/ssinit@3.3. Body calls SpuQuit(), matching
+// SsQuit's documented role. Superseded game-style name QuitSpu. Round 79
+// (bravo, track 2).
+SsQuit = 0x80032A7C; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/ssinit's internal
 // _SsTrapIntrVSync (disc 3.3). Superseded game-style name SeqTimerCallback.
 // Round 71 (bravo, track 2).
@@ -1562,6 +1568,16 @@ note2pitch2 = 0x8002E038; // type:func
 // pervasive local-variable/field name elsewhere in src/, a false-positive
 // collision -- those are a different C namespace and shadow harmlessly).
 // Round 71 (bravo, track 2). Still NON_MATCHING (30/56 words); unaffected.
+// unidentified: TINY (4w), EXACT tie across unrelated libraries
+// (CD_set_test_parmnum libcd/bios, GsSetNearClip libgs/gs_101,
+// GsSetFarClip libgs/gs_102, GsSetWorkBase libgs/gs_124, srand libc2/rand,
+// ChangeClearSIO libcomb/comb) on a "store one word to a global" shape;
+// none reaches the shape bar and position (a wide gap between
+// libcd/sys@3.3 ending 0x80029478 and libcd/iso9660@3.3 starting
+// 0x8002B640, with game code -- CD_getsector, this function -- in
+// between) does not cluster on any one candidate's library. Round 79
+// (bravo, track 2).
+func_8002B3E4 = 0x8002B3E4; // type:func
 callback = 0x8002B3F4; // type:func
 // identified: fingerprint EXACT masked 1.00 vs libsnd/vmanager SpuVmSeKeyOn
 // (discs 3.3,3.5; libsnd/vm_key on 3.6). Round 71 (bravo, track 2).
@@ -1781,6 +1797,17 @@ Unk18Obj__SetUnkB4 = 0x8003F23C; // type:func
 Unk18Obj__SetUnkB8 = 0x8003F244; // type:func
 GetUnk18ObjMethods = 0x8003F24C; // type:func
 Unk18Obj__GetTail = 0x8003F25C; // type:func
+// not SDK: LEAD in config/sdk-in-game.txt (libgs/gs_106:GsSetProjection,
+// shape 1.00) does not hold up. tools/sdkname.py itself reports this 8-word
+// body AMBIGUOUS (18-way exact tie on a trivial "call one arg, return"
+// shape shared by unrelated libraries); gs_106 is never placed anywhere in
+// this image, so it cannot supply position evidence. The real neighbours
+// are game code before (Unk18Obj__GetTail, this class's own getter, ends
+// 0x8003F28C) and libgs/gs_131's GsSetRefView2 immediately after with zero
+// gap (0x8003F2AC) -- neither side is gs_106. This is an ordinary member of
+// the already-matched Unk18Obj setter/getter family (round 14), forwarding
+// self to the established Psy-Q call func_80024B90
+// (asm/psyq_GsLinkObject4.s). Round 79 (bravo, track 2).
 Unk18Obj__SetGeomScreen = 0x8003F28C; // type:func
 New_StreamTaskObj = 0x8003B854; // type:func
 StreamTaskObj__StreamTaskObj = 0x8003B8E4; // type:func

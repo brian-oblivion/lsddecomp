@@ -314,7 +314,7 @@ extern void SsInit(void);
 extern char *func_8003A068(void);
 extern s32 func_8003A05C(void);
 extern void SsEnd(void);
-extern void QuitSpu(void);
+extern void SsQuit(void);
 extern void SsSetTickMode(s32 a0);
 extern void SsStart(void);
 extern void *BMemPMgrFree(void *ptr);
@@ -381,7 +381,7 @@ s32 VabStreamObj__Close(VabStreamObj *self) {
         gVabVolumeInited = 0;
         gVabStreamInited = 0;
         SsEnd();
-        QuitSpu();
+        SsQuit();
     }
     BMemPMgrFree(self->vagAttrPool);
     BMemPMgrFree(self->progVagTable);
