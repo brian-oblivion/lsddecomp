@@ -145,7 +145,7 @@ typedef struct Slot08Methods_322b4 {
     void (*init)(void *self); /* +0x008 */
 } Slot08Methods_322b4;
 void *func_80042684(void);
-void *func_800423F0(void);
+void *Get_vtable_D8006EED8(void);
 
 void *Get_vtable_D8006EC74(void);
 typedef struct CellCtorMethods_322b4 {
@@ -386,7 +386,7 @@ void *New_D8006EED8(s32 arg) {
     void *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        ((CtorArg1Methods_322b4 *)func_800423F0())->ctor(obj, arg);
+        ((CtorArg1Methods_322b4 *)Get_vtable_D8006EED8())->ctor(obj, arg);
         return obj;
     }
     return NULL;
@@ -397,7 +397,7 @@ void D8006EED8__D8006EED8(D_8006EED8Obj *self, char *name) {
     char buf[32];
 
     ((Slot08Arg0Methods_322b4 *)GetActiveDataSourceMethods())->ctor(self);
-    self->methods = func_800423F0();
+    self->methods = Get_vtable_D8006EED8();
     self->unk2C = 0;
     if (name != NULL) {
         strcpy(buf, name);
@@ -414,7 +414,7 @@ void D8006EED8__SetFlag2C(D_8006EED8Obj *self) {
     self->unk2C = 1;
 }
 /* Returns the D_8006EED8 method table. */
-void *func_800423F0(void) {
+void *Get_vtable_D8006EED8(void) {
     return D_8006EED8;
 }
 /* Allocate and construct a D_8006EF50 object (0x1C bytes). */
