@@ -46,7 +46,9 @@ void func_80048CD8(D_80081940Obj *self, s32 value) {
 void *func_80048CE0(void) {
     return D_80081940;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048CF0);
+s32 func_80048CF0(void) {
+    return D_8008A960;
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048CFC);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048D28);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048D48);
