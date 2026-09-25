@@ -90,7 +90,15 @@ typedef struct {
 
 extern void SpuSetCommonAttr(SpuCommonAttr *attr);
 
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80046F0C);
+CdStreamObj *func_80046F0C(s32 arg1, s32 arg2, s32 arg3) {
+    CdStreamObj *obj = BMemPMgrAlloc(0x5C);
+
+    if (obj != NULL) {
+        func_80047900()->ctor(obj, arg1, arg2, arg3);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80046F88);
 void func_80047074(CdStreamObj *self) {
     self->methods->slot48(self);
