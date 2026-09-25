@@ -118,20 +118,14 @@ extern void Class876FC__DriftModelChildren(); /* arity-ok: the definition is 1-p
  * three arguments for real. */
 extern void *New_D800879C4(void *arg1, void *arg2, void *arg3);
 
-/* Three globals a class_3bb8c_o.c ctor-shaped function (Actor__func_56f5c)
- * captures once from its own three pointer-typed parameters -- D_8008ACA4 is
- * some other object (first field a methods pointer, called through a new
- * +0x080 slot below), D_8008ACA8 is forwarded opaquely to New_D800879C4 as
- * its own third argument, and D_8008ACAC's pointee has a lookup field at
- * +0x018 that Class876FC__InitByKind/Class876FC__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
-typedef struct {
-    u8 pad0[0x80];
-    s32 (*slot80)(void *self, s32 arg);
-} D_8008ACA4Methods;
-typedef struct {
-    D_8008ACA4Methods *methods;
-} D_8008ACA4Obj;
-extern D_8008ACA4Obj *D_8008ACA4;
+/* Three globals class_3bb8c_o.c's Actor__func_56f5c captures once from its
+ * parameters (declared there with the same types; track 4b, round 85):
+ * D_8008ACA4 is the Actor it ran on, called here through Class6B5CC's
+ * +0x080 getSetUnk10Flag8 as that function calls it; D_8008ACA8 is
+ * forwarded opaquely to New_D800879C4 as its third argument; D_8008ACAC's
+ * pointee has a field at +0x018 that Class876FC__InitByKind and
+ * Class876FC__UpdateByKind snapshot/diff via gTrackedYSnapshot. */
+extern Actor *D_8008ACA4; /* the Actor Actor__func_56f5c ran on */
 extern void *D_8008ACA8;
 extern void *D_8008ACAC;
 extern s32 gTrackedYSnapshot;
@@ -153,7 +147,7 @@ void Class876FC__InitByKind(Class876FC *self, void *parent, Vec3S *pos) {
 
     state = self->kind;
     if (state < 2) {
-        s32 ret = D_8008ACA4->methods->slot80(D_8008ACA4, D_8008AB98[state]);
+        s32 ret = D_8008ACA4->methods->getSetUnk10Flag8(D_8008ACA4, D_8008AB98[state]);
         Class6B5CC__LinkModel((Class6B5CC *)self, (void *)ret);
         state = self->kind;
     }

@@ -19,10 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 20 (2026-09-25, after rounds 82 and 83: the class id tree is
-corrected by the ctor chain, track 4 runs classes strictly in sequence rather
-than one per round, a behaviour name for a class is allowed with evidence,
-`--warnings` at every merge).
+Plan revision: 21 (2026-09-25, round 85, premium head: track 4b's recipe,
+Sony data out of 4b, an override with its own parameter list).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -289,7 +287,10 @@ ordinary class when track 1 matches one.
    parent's name at every accessor (Pad's `onButtonEvent` was BasicClass's
    `notifyParents`). An override is named for its slot with `rename.py`
    (`Class__Finalize`, `Class__Release`) unless its report shows the body
-   does more than the slot name says.
+   does more than the slot name says. An override whose parameter list differs
+   from the slot's keeps the inherited slot type; the caller that forwards
+   the extra arguments casts to a typedef of the override (no code), and
+   the header comment names it (round 85: Class65650 +0x04C).
 7. Write the header; delete every other view and local `extern` of the
    table, getter and methods; include the class header where needed. Fix
    what the compiler lists: accessor renames, base-table calls upcast
@@ -323,14 +324,26 @@ same offset, with both readings confirmed by their accessors, stay split
 with a comment naming both (`mark-class --park "<reason>"`).
 
 **Track 4b: one type per global.** `typeviews.py --globals` lists every
-global declared `extern` with more than one type. The largest case is one
-0x34-byte record table in the code_179d8 units, declared through thirteen
-field-address symbols (`D_8008D988`...) in five record types. The procedure
-(one struct type declared once; the field symbols removed from the symbols
-file so accesses read `table[i].field`) has not been tried: its first
-instance is a premium head's, who writes the recipe here and then runs
-`plan.py set-track --track 4b --status open`, which turns `plan.py`'s
-premium job into runner jobs.
+game global declared `extern` with more than one type. It leaves out a global
+whose every accessor (read from the built objects' relocations) is library
+code: that data is Sony's and track 2's (revision 21; the 0x34-byte table
+this section once called the largest case is libsnd's `_svm_voice`). It also
+leaves out a not-yet-unified class's own table, which is a view for that
+class's job. Recipe, one global or one family per commit (round 85:
+`include/CdDriver.h`, `gMcDevicePath0/1`, `D_8008ACA4..AC`):
+1. Read every accessor: the type is what the accessors need (walked at a
+   record stride, dereferenced for a field, passed as a pointer), never the
+   widest declaration.
+2. Home: the header that already owns the global's type, or a new
+   `include/<Subsystem>.h` for a family several units share, holding the
+   record types and value sets they need. A class is referred to there by
+   tag only (`struct Class6D4E8 *`). With no owning header both units
+   include, each declares the same type and names the other.
+3. Delete every other declaration, fix the accessors (C warns, not errs, on
+   pointer/integer mixes, so `typeviews.py --warnings` is the accessor list),
+   and run the three oracles. A report gets a dated `Track 4b` paragraph.
+A job is ready when `plan.py` lists it; runners take it with §4.6's prompt,
+"one class" read as "one global family".
 
 ### Track 5: close-out
 
