@@ -150,7 +150,7 @@ void *func_800423F0(void);
 void *func_80041C3C(void);
 typedef struct CellCtorMethods_322b4 {
     u8 pad00[0x8];
-    void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = func_80041B20 */
+    void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = D8006EC74__D8006EC74 */
 } CellCtorMethods_322b4;
 
 void *func_80041ED8(void);
@@ -188,7 +188,7 @@ void *New_D8006EC74(void *texture, u8 cell) {
 }
 /* D_8006EC74 slot +0x008 (ctor): the D_8006ED4C ctor with cell 0x20's rect,
  * install the table, then reset to the caller's cell. */
-void func_80041B20(SpriteView_322b4 *self, void *texture, u8 cell) {
+void D8006EC74__D8006EC74(SpriteView_322b4 *self, void *texture, u8 cell) {
     SpriteRect r;
 
     func_80041C4C(&r, 0x20);
