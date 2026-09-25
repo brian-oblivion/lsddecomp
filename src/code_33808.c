@@ -426,7 +426,27 @@ void *func_8004468C(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800446FC);
+/* D_8006F384 +0x008: constructor -- the active driver's, then this table,
+ * `owns` at +0x34; adopt the descriptor's buffer (size 0) and run its own
+ * +0x064, whose nonzero result fails the construction (NULL), or else
+ * request its file. */
+void *func_800446FC(DataSrc33808 *self, Src6F240 *src, s32 owns) {
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_800449FC();
+    self->unk34 = owns;
+    if (src->buffer != NULL) {
+        self->buffer = src->buffer;
+        self->bufferSize = 0;
+        if (((s32 (*)())self->methods->setFlag)(self)) {
+            goto fail;
+        }
+    } else {
+        self->methods->requestLoadFile(self, src->name);
+    }
+    return self;
+fail:
+    return NULL;
+}
 /* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
 void func_800447B4(DataSrc33808 *self) {
     self->methods->slot7C();
