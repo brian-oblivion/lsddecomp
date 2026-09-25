@@ -2627,3 +2627,4 @@ SetDrawSystem = 0x80020C68; // type:func
 D8006EC74__D8006EC74 = 0x80041B20; // type:func
 D8006EC74__Reset = 0x80041BAC; // type:func
 D8006EC74__SetCell = 0x80041BDC; // type:func
+D8006EC74__GetCell = 0x80041C28; // type:func

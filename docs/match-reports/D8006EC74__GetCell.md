@@ -1,4 +1,6 @@
-# func_80041C28 -- MATCHED (5/5 words), round 82
+# D8006EC74__GetCell -- MATCHED (5/5 words), round 82
+
+> Renamed from `func_80041C28` on 2026-09-25 (tools/rename.py). Address 0x80041c28.
 
 Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -15,7 +17,7 @@ The frame comes from an UNUSED local `u8 pad[16];`. Measured: deleting that line
 
 ```c
 /* D_8006EC74 slot +0x0C8: read the byte at +0x0A8. */
-u8 func_80041C28(D_8006EC74Obj *self) {
+u8 D8006EC74__GetCell(D_8006EC74Obj *self) {
     u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
 
     return self->unkA8;

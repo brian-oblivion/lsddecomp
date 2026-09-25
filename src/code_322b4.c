@@ -36,7 +36,7 @@ struct D_8006EF50Methods {
     void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = func_800425D8 */
 };
 
-/* Local view of a D_8006EC74 object: func_80041C28 reads the byte at +0xA8. */
+/* Local view of a D_8006EC74 object: D8006EC74__GetCell reads the byte at +0xA8. */
 typedef struct D_8006EC74Obj {
     u8 pad00[0xA8];
     u8 unkA8;
@@ -210,7 +210,7 @@ void D8006EC74__SetCell(SpriteView_322b4 *self, u8 cell) {
     self->v = r.v;
 }
 /* D_8006EC74 slot +0x0C8: read the byte at +0x0A8. */
-u8 func_80041C28(D_8006EC74Obj *self) {
+u8 D8006EC74__GetCell(D_8006EC74Obj *self) {
     u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
 
     return self->unkA8;
