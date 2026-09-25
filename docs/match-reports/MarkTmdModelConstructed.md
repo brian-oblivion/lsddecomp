@@ -25,5 +25,5 @@ dispatched. Evidence: called once, at the tail of `TmdModel__TmdModel`, and
 its whole body is `gTmdModelConstructed = 1;` with `self` ignored. The name
 describes exactly the mechanics (a global flag set once a TmdModel finishes
 construction); it stops short of claiming why the flag exists or what reads
-it besides `func_8001F3A4` (kept `func_` -- see that report), since neither
+it besides `IsTmdModelConstructed` (kept `func_` -- see that report), since neither
 is established.

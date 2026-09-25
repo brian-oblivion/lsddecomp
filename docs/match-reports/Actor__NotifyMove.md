@@ -26,7 +26,7 @@ void Actor__NotifyMove(BaseObjO *self, s32 arg1) {
         if (arg1 >= 5) {
             Buf38O buf;
 
-            if (self->unk20 != NULL && func_8001F3A4(self->unk20)) {
+            if (self->unk20 != NULL && IsTmdModelConstructed(self->unk20)) {
                 self->methods->slot8C(self, &buf);
                 if (arg1 != 5) {
                     s16 h = self->unk48;
@@ -44,7 +44,7 @@ void Actor__NotifyMove(BaseObjO *self, s32 arg1) {
                 negative:
                     adjusted = h - self->unk54;
                 joinAdjust:
-                    func_8001F66C(&buf, isSeven, nonneg, adjusted);
+                    RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted);
                 }
                 self->methods->slot90(self, &buf, arg1);
                 if (self->unk28 != NULL) {
@@ -68,7 +68,7 @@ void Actor__NotifyMove(BaseObjO *self, s32 arg1) {
    Measured retail's true buffer size from its OWN frame layout: saved
    registers start at `$sp+0x48`, the buffer starts at `$sp+0x10`, so it's
    `0x38` bytes. Declared a dedicated opaque `Buf38O { u8 raw[0x38]; }` and
-   retyped `BaseObjOMethods::slot8C`/`slot90` and `func_8001F66C`'s first
+   retyped `BaseObjOMethods::slot8C`/`slot90` and `RotateAndOffsetHullList`'s first
    parameter to it. This single fix took the function from a near-total
    mismatch to 69/74.
 2. **The range guard needs TWO nested `if`s, not one combined
@@ -139,7 +139,7 @@ void Actor__NotifyMove(BaseObjO *self, s32 arg1) {
 **`Actor__NotifyMove` -- tier C.** The most structurally involved
 function in this unit (74 words) and the existing report already
 describes its mechanics exhaustively (a range-gated dispatch through
-`slot8C`/`slot90`/`slotE8`, an "armed" check via `func_8001F3A4`, and a
+`slot8C`/`slot90`/`slotE8`, an "armed" check via `IsTmdModelConstructed`, and a
 sign-based adjustment of `unk48` by `unk54`) -- but nothing establishes
 what the `arg1` range `[5,9)` selects between, what "armed" means in the
 game, or what `unk20`/`unk28`/`unk48`/`unk54` actually represent. Kept the
@@ -148,4 +148,4 @@ most consequential unknown in the unit.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_571f8`. Override of +0x088 (notifyIfUnk20Active). Not named for the slot because the body does more: it chains the base, then for events 5..8 with an active model reads the model data (readUnk20Data, +0x08C), for events other than 5 adjusts it by lastOffsetValue +- pendingExtra (func_8001F66C), hands it to transformAndNotifyParents (+0x090), and calls slotE8 on an Actor linkTarget. Events 6, 7 and 8 are exactly the ones Actor__MoveLocalZ/X/Y pass (through Actor__MoveAlongLocalAxis); tier B. The fields read here: unk20 = Class6B5CC.model, unk28 = linkTarget, unk48 = lastOffsetValue, unk54 = pendingExtra (s32: this function's addu/subu settle the merge CONFLICT with DreamSys's void *). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_571f8`. Override of +0x088 (notifyIfUnk20Active). Not named for the slot because the body does more: it chains the base, then for events 5..8 with an active model reads the model data (readUnk20Data, +0x08C), for events other than 5 adjusts it by lastOffsetValue +- pendingExtra (RotateAndOffsetHullList), hands it to transformAndNotifyParents (+0x090), and calls slotE8 on an Actor linkTarget. Events 6, 7 and 8 are exactly the ones Actor__MoveLocalZ/X/Y pass (through Actor__MoveAlongLocalAxis); tier B. The fields read here: unk20 = Class6B5CC.model, unk28 = linkTarget, unk48 = lastOffsetValue, unk54 = pendingExtra (s32: this function's addu/subu settle the merge CONFLICT with DreamSys's void *). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

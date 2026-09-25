@@ -104,7 +104,7 @@ void LinkOwnerObj__ReleaseLinksB(LinkOwnerObj *this) {
  * ------------------------------------------------------------------ */
 
 /* Actor__NotifyMove's model-data buffer, filled by readUnk20Data and handed
- * to func_8001F66C and transformAndNotifyParents. Retail's frame needs it to
+ * to RotateAndOffsetHullList and transformAndNotifyParents. Retail's frame needs it to
  * be 0x38 bytes (sp+0x10 .. sp+0x47, the saved registers from sp+0x48); a
  * smaller buffer shifts everything after the function. Its layout is not
  * established here. */
@@ -125,7 +125,7 @@ extern s32 D_8008ACAC;
 extern s32 D_8008AB98[3];
 extern s32 D_8008AB94;
 
-extern void func_80020510(void *arg0, void *arg1);
+extern void SetTargetOffset(void *arg0, void *arg1);
 
 void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     s32 i;
@@ -137,7 +137,7 @@ void Actor__func_56f5c(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     i = 0;
     do {
         ret = (void *) self->methods->getSetUnk10Flag8(self, D_8008AB98[i]);
-        func_80020510(ret, &D_8008AB94);
+        SetTargetOffset(ret, &D_8008AB94);
         i++;
     } while (i < 2);
 }
@@ -206,8 +206,8 @@ void Actor__Reset(Actor *self) {
     self->pendingExtra = 0;
 }
 
-extern s32 func_8001F3A4(void *arg0);
-extern void func_8001F66C(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
+extern s32 IsTmdModelConstructed(void *arg0);
+extern void RotateAndOffsetHullList(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
 
 void Actor__NotifyMove(Actor *self, s32 event) {
     GetClass6B5CCMethods()->notifyIfUnk20Active((Class6B5CC *)self, event);
@@ -219,7 +219,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
         if (event >= 5) {
             Buf38O buf;
 
-            if (self->model != NULL && func_8001F3A4(self->model)) {
+            if (self->model != NULL && IsTmdModelConstructed(self->model)) {
                 self->methods->readUnk20Data(self, &buf);
                 if (event != 5) {
                     s16 h = self->lastOffsetValue;
@@ -237,7 +237,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                 negative:
                     adjusted = h - self->pendingExtra;
                 joinAdjust:
-                    func_8001F66C(&buf, isSeven, nonneg, adjusted);
+                    RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted);
                 }
                 self->methods->transformAndNotifyParents(self, (GenericCountList_d294 *)&buf, event);
                 /* The link target's class byte: an Actor gets slotE8. */

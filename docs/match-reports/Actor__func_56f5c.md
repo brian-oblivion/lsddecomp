@@ -13,7 +13,7 @@ Stashes `self` (arg1) and two more scalar args (arg2, arg3) into `.sbss`
 globals `D_8008ACA4`/`D_8008ACA8`/`D_8008ACAC`, then runs a fixed 2-iteration
 loop calling `self->methods->slot80(self, D_8008AB98[i])` and feeding the
 result plus `&D_8008AB94` (a 1-word `.sdata` constant, address-only, never
-loaded) to library function `func_80020510` (still `psyq_fa50.s`, unrenamed
+loaded) to library function `SetTargetOffset` (still `psyq_fa50.s`, unrenamed
 Psy-Q object; called with an unused return value). `arg0` (the function's
 first parameter) is never read anywhere in the body -- it is discarded, the
 same as its caller (`StyleBuildEffectSlots`, unaddressed `class_3bb8c_n.s`) passes
@@ -26,7 +26,7 @@ extern s32 D_8008ACAC;
 extern s32 D_8008AB98[3];
 extern s32 D_8008AB94;
 
-extern void func_80020510(void *arg0, void *arg1);
+extern void SetTargetOffset(void *arg0, void *arg1);
 
 void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     s32 i;
@@ -38,7 +38,7 @@ void Actor__func_56f5c(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     i = 0;
     do {
         ret = self->methods->slot80(self, D_8008AB98[i]);
-        func_80020510(ret, &D_8008AB94);
+        SetTargetOffset(ret, &D_8008AB94);
         i++;
     } while (i < 2);
 }
@@ -71,11 +71,11 @@ slot (return/argument shape) without derivation risk.
 confirmed by the `self->methods->slot80` dispatch), and the mechanics are
 fully described in this report (stash `self`/two scalars into three
 globals, then loop twice through the still-unresolved `slot80` occupant
-and an unrenamed Psy-Q object, `func_80020510`), but nothing establishes
+and an unrenamed Psy-Q object, `SetTargetOffset`), but nothing establishes
 WHAT this accomplishes -- `arg0` is discarded by every known caller, and
 `class_3bb8c_s.c`'s own comment calls it merely "ctor-shaped" as a guess,
 not a finding. Kept the tier-C `Class__func_xxxxx` form.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Actor (it calls getSetUnk10Flag8, +0x080, through its table; the s32 result is cast to the void * func_80020510 takes). Still tier C. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Actor (it calls getSetUnk10Flag8, +0x080, through its table; the s32 result is cast to the void * SetTargetOffset takes). Still tier C. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -133,7 +133,7 @@ extern u8 SCALE_ONE[0xC];
 extern void GsInitCoordinate2(s32 arg0, void *dest);
 
 
-/* TmdModel__GetHull (asm/psyq_fa50.s, Psy-Q library, not game code):
+/* TmdModel__GetHull (code_fa50: GAME code since plan revision 18, matched round 82):
  * fills a caller-supplied struct (its own arg1) from a small on-stack
  * buffer via TmdModel__ComputeBounds (its own arg0 forwarded straight through). Its
  * own last write to $v0 is leftover from an unrelated `lhu` a few
@@ -143,15 +143,15 @@ extern void GsInitCoordinate2(s32 arg0, void *dest);
  * needs. */
 extern void TmdModel__GetHull(void *arg0, void *dest);
 
-/* func_8001F3A4 (asm/psyq_fa50.s, Psy-Q library, not game code): a
+/* IsTmdModelConstructed (code_fa50: GAME code since plan revision 18, matched round 82): a
  * predicate over the same opaque `self->unk20` pointer Class6B5CC__ReadUnk20Data and
  * TmdModel__GetHull above already treat as `void *` -- Class6B5CC__NotifyIfUnk20Active (round 13,
  * this unit) tests its `$v0` result for non-zero, so declared `s32`
  * (boolean-ish) here. Not decompiled in this project. */
-extern s32 func_8001F3A4(void *arg0);
+extern s32 IsTmdModelConstructed(void *arg0);
 
-/* UpdateTmdModelBoundsBuffer/GetTmdModelBoundsBuffer (asm/psyq_fa50.s, PsyQ library, not
- * game code): UpdateTmdModelBoundsBuffer fills a PsyQ-internal global
+/* UpdateTmdModelBoundsBuffer/GetTmdModelBoundsBuffer (code_fa50: GAME code since plan revision 18,
+ * matched round 82): UpdateTmdModelBoundsBuffer fills a game global
  * (gTmdModelBoundsBuf, via TmdModel__ComputeBounds) from its own argument; GetTmdModelBoundsBuffer
  * IGNORES both its arguments and just returns `&gTmdModelBoundsBuf` -- MEASURED,
  * its whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`. Class6B5CC__CheckBoundsOverlap

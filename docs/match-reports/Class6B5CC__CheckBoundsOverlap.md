@@ -61,14 +61,14 @@ idiom from DECOMPILATION_LEARNINGS, applied six times per iteration.
 ```c
 UpdateTmdModelBoundsBuffer(self->unk20);              /* fills PsyQ global gTmdModelBoundsBuf */
 arr = GetTmdModelBoundsBuffer(self->unk20, 0);     /* IGNORES both args, returns &gTmdModelBoundsBuf */
-cnt2 = func_8001F3A4(self->unk20);       /* returns a count */
+cnt2 = IsTmdModelConstructed(self->unk20);       /* returns a count */
 ```
 **`GetTmdModelBoundsBuffer`'s whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`** —
 MEASURED (`asm/psyq_GsLinkObject4.s`), it is a plain getter for a PsyQ-
 internal global that `UpdateTmdModelBoundsBuffer` fills one instruction earlier via
 `TmdModel__ComputeBounds`. This resolved what looked at first like a confusing
 "return value used as both a pointer and a scalar simultaneously" — it
-isn't; `GetTmdModelBoundsBuffer`'s return (a pointer) and `func_8001F3A4`'s return (a
+isn't; `GetTmdModelBoundsBuffer`'s return (a pointer) and `IsTmdModelConstructed`'s return (a
 count) are two DIFFERENT values that happen to both be freshly in `$v0` at
 adjacent points, and a delay-slot register copy that looked like "assign
 the NEW call's return" is actually copying the OLD (pre-call) `$v0` — read
@@ -160,7 +160,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
 
     UpdateTmdModelBoundsBuffer(self->unk20);
     arr = GetTmdModelBoundsBuffer(self->unk20, 0);
-    cnt2 = func_8001F3A4(self->unk20);
+    cnt2 = IsTmdModelConstructed(self->unk20);
 
     track = *arr;
 
@@ -429,7 +429,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
 
     UpdateTmdModelBoundsBuffer(self->unk20);
     arr = GetTmdModelBoundsBuffer(self->unk20, 0);
-    cnt2 = func_8001F3A4(self->unk20);
+    cnt2 = IsTmdModelConstructed(self->unk20);
 
     track = *arr;
 
@@ -797,7 +797,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
 
     UpdateTmdModelBoundsBuffer(self->unk20);
     p = (BoundsBox_d294 *)GetTmdModelBoundsBuffer(self->unk20, 0);
-    n = func_8001F3A4(self->unk20);
+    n = IsTmdModelConstructed(self->unk20);
     box = *p;
     end2 = p + n;
     for (p++; p < end2; p++) {

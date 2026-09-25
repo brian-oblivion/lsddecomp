@@ -92,7 +92,7 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     if (self->unk20 == NULL) {
         return;
     }
-    if (!func_8001F3A4(self->unk20)) {
+    if (!IsTmdModelConstructed(self->unk20)) {
         return;
     }
 
@@ -424,7 +424,7 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     if (self->unk20 == NULL) {
         return;
     }
-    if (!func_8001F3A4(self->unk20)) {
+    if (!IsTmdModelConstructed(self->unk20)) {
         return;
     }
 
@@ -902,7 +902,7 @@ void Class6B5CC__TryAttachNearby(Class6B5CCObj *self, GenericObj_d294 *other) {
     if (self->unk20 == NULL) {
         return;
     }
-    if (!func_8001F3A4(self->unk20)) {
+    if (!IsTmdModelConstructed(self->unk20)) {
         return;
     }
 

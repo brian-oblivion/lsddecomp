@@ -14,7 +14,7 @@ a same-length swap. There was real structure to find.
 Twelve builds took it to the match, in this order (`funcdiff` / ins-del):
 
 1. **Argument type, one loop variable for both plane loops, and
-   `self->unk2C = 0` before the `func_8001F3A4` call.** `list` is the same
+   `self->unk2C = 0` before the `IsTmdModelConstructed` call.** `list` is the same
    `{s32 count; Vec3S16_d294 v[8];}` local that TryAttachNearby passes (same
    round). Retail keeps the plane index for Part 2 AND Part 3 in `$s4`, so
    the source uses ONE variable `i` where the old body had `i` and `j`. And
@@ -266,7 +266,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
         hiPtr = (s16 *)((u8 *)hiPtr + 0x18);
     }
 
-    count1 = func_8001F3A4(self->unk20);
+    count1 = IsTmdModelConstructed(self->unk20);
     self->unk2C = 0;
     flag2 = 0;
     for (i = 0; i < count1; i++) {
@@ -454,9 +454,9 @@ candidate was read and, where safe, translated to real source and verified
 against `nm -S`/`funcdiff.py` -- not adopted on the permuter's own score:**
 
 - **output-2661 (safest, most plausible):** reorders `self->unk2C = 0;`
-  to BEFORE `count1 = func_8001F3A4(self->unk20);` (matching retail's own
+  to BEFORE `count1 = IsTmdModelConstructed(self->unk20);` (matching retail's own
   disassembly, which places the `self->unk2C` store in the delay slot of
-  the `jal func_8001F3A4`) plus a benign `new_var` split of the `hiPtr`
+  the `jal IsTmdModelConstructed`) plus a benign `new_var` split of the `hiPtr`
   initialization (same "aliased local" shape as `TryAttachNearby`'s own
   successful `countList` lever). Applied both pieces to the real tree:
   **zero effect, still 29/199, length still exactly 199 (`0x31c`).**
@@ -503,7 +503,7 @@ does not have to re-derive which are safe.
 new shape here either**, for the same reason as `NotifyTaggedParents` --
 this function's own symbols (`TmdModel__RaycastFaces`, `D_8008A838`,
 `self->unk2C`/`unk20`, `ClipSegmentToBox`, `GetTmdModelBoundsBuffer`,
-`func_8001F3A4`) were untouched by round 54's `Class6B5CCMethods` slot
+`IsTmdModelConstructed`) were untouched by round 54's `Class6B5CCMethods` slot
 renames. What DID move the investigation forward was reading the
 disassembly's own pointer arithmetic directly rather than trusting the
 round-46 title's "self register identity" summary -- the real structural

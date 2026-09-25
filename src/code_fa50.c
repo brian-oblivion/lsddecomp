@@ -16,14 +16,14 @@
  * (TmdModel__RaycastFaces) for Class6B5CC's own collision helpers in
  * code_d294_b.c/code_d294_c.c.
  *
- * func_8001F3A4 and func_8001F66C are kept unrenamed: both are called from
+ * IsTmdModelConstructed and RotateAndOffsetHullList are kept unrenamed: both are called from
  * src/class_3bb8c_o.c, a live types-runner unit as of this pass, so
  * renaming them would rewrite that unit's own file out from under it.
  * Proposed names and evidence are in their own match reports.
  *
- * The tail of the file (AccumulateTargetOffset, func_80020510) is NOT
+ * The tail of the file (AccumulateTargetOffset, SetTargetOffset) is NOT
  * TmdModel: a separate Outer_fa50/Inner_fa50/Target_fa50 pointer chain with
- * no confirmed owning class and, for func_80020510, a live caller in
+ * no confirmed owning class and, for SetTargetOffset, a live caller in
  * class_3bb8c_o.c -- kept unrenamed for the same reason.
  *
  * All 18 functions matched, round 82 (runner charlie); tiers and evidence
@@ -193,7 +193,7 @@ TmdModelMethods *Get_vtable_TmdModel(void) {
 void MarkTmdModelConstructed(TmdModel *self) {
     gTmdModelConstructed = 1;
 }
-s32 func_8001F3A4(void *self) {
+s32 IsTmdModelConstructed(void *self) {
     return gTmdModelConstructed;
 }
 void TmdModel__ComputeBounds(TmdModel *self, Box_fa50 *box) {
@@ -259,7 +259,7 @@ void TmdModel__GetHull(TmdModel *self, Hull_fa50 *out) {
     out->v[7].z = b.box.max.z;
     out->type = 1;
 }
-void func_8001F66C(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
+void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
     Corners_fa50 tmp;
     Corners_fa50 *c;
     s32 i;
@@ -653,7 +653,7 @@ void AccumulateTargetOffset(Outer_fa50 *self, s32 *xy) {
     t->unk6 += xy[0] / 16;
     t->unk6 += xy[1] * 64;
 }
-void func_80020510(Outer_fa50 *self, s16 *xy) {
+void SetTargetOffset(Outer_fa50 *self, s16 *xy) {
     Target_fa50 *t = self->unk10->unk10;
     s32 v;
 

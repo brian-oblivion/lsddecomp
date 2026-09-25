@@ -12,7 +12,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1);
 
 ## What it does
 
-Gated on `2 <= a1 < 4`, `self->unk20 != NULL`, and `func_8001F3A4(self->unk20)`
+Gated on `2 <= a1 < 4`, `self->unk20 != NULL`, and `IsTmdModelConstructed(self->unk20)`
 being true: fills a local stack buffer via this class's own `+0x8C` vtable
 slot (`Class6B5CC__ReadUnk20Data`, already matched in this unit — forwards to
 `TmdModel__GetHull(self->unk20, dest)`), then forwards that same buffer into
@@ -32,7 +32,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
     if (self->unk20 == NULL) {
         return;
     }
-    if (!func_8001F3A4(self->unk20)) {
+    if (!IsTmdModelConstructed(self->unk20)) {
         return;
     }
     self->methods->slot8C(self, buf);
@@ -80,7 +80,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1) {
   `tools/classtable.py gClass6B5CCMethods`. Split out of the `pad060[0x0A0-0x060]`
   span that previously covered them (that pad's own comment claimed nothing
   dispatched through it — no longer true once this call site was written).
-- New extern `func_8001F3A4(void *arg0)` returning `s32`, PsyQ library
+- New extern `IsTmdModelConstructed(void *arg0)` returning `s32`, PsyQ library
   (`asm/psyq_GsLinkObject4.s`), same opaque `self->unk20` shape as
   `TmdModel__GetHull`/`Class6B5CC__ReadUnk20Data`'s own declarations.
 
@@ -112,7 +112,7 @@ complete.
 ## Naming (round 54, bravo, track 3)
 
 Renamed from `func_8001D568` via `tools/rename.py`. **Tier B** -- gates
-on `2 <= a1 < 4` and `self->unk20 != NULL && func_8001F3A4(self->unk20)`,
+on `2 <= a1 < 4` and `self->unk20 != NULL && IsTmdModelConstructed(self->unk20)`,
 then chains `Class6B5CC__ReadUnk20Data` (slot `+0x08C`) into
 `Class6B5CC__TransformAndNotifyParents` (slot `+0x090`). Name describes
 the gate-then-forward mechanics; purpose of the `a1` range or the

@@ -87,7 +87,7 @@ void Class6B5CC__GetRotMatrix(Class6B5CC *self, s32 a1, s32 a2) {
 }
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
- * func_8001F3A4(self->model) reports true, fills a stack buffer through
+ * IsTmdModelConstructed(self->model) reports true, fills a stack buffer through
  * this class's own +0x8C slot (Class6B5CC__ReadUnk20Data, already matched in this
  * unit -- fills it via TmdModel__GetHull(self->model, dest)) then forwards
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
@@ -112,7 +112,7 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CC *self, s32 a1) {
     if (self->model == NULL) {
         return;
     }
-    if (!func_8001F3A4(self->model)) {
+    if (!IsTmdModelConstructed(self->model)) {
         return;
     }
     self->methods->readUnk20Data(self, buf);
@@ -187,7 +187,7 @@ void Class6B5CC__TryAttachNearby(Class6B5CC *self, Class6B5CC *other) {
     if (self->model == NULL) {
         return;
     }
-    if (!func_8001F3A4(self->model)) {
+    if (!IsTmdModelConstructed(self->model)) {
         return;
     }
 
@@ -328,7 +328,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
 
     UpdateTmdModelBoundsBuffer(self->model);
     p = (BoundsBox_d294 *)GetTmdModelBoundsBuffer(self->model, 0);
-    n = func_8001F3A4(self->model);
+    n = IsTmdModelConstructed(self->model);
     box = *p;
     end2 = p + n;
     for (p++; p < end2; p++) {
@@ -391,7 +391,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
     }
 
     self->hitMask = 0;
-    count1 = func_8001F3A4(self->model);
+    count1 = IsTmdModelConstructed(self->model);
     hit = 0;
     for (i = 0; i < count1; i++) {
         plane = GetTmdModelBoundsBuffer(self->model, i);

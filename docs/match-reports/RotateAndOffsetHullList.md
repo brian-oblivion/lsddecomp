@@ -1,8 +1,10 @@
-# func_8001F66C -- MATCHED (147/147 words), round 82
+# RotateAndOffsetHullList -- MATCHED (147/147 words), round 82
+
+> Renamed from `func_8001F66C` on 2026-09-25 (tools/rename.py). Address 0x8001f66c.
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
-- **What:** walks a counted list of box-corner sets (`HullList_fa50`: `s32 n` then `n` x 48-byte `Corners_fa50`, eight `{s16 x,y,z}` as two faces of four; `TmdModel__GetHull` writes a list of one). For each: if `turn`, copy the 48 bytes to a stack temp and permute the corners back in (a quarter turn of the box), then add `d` to `.x` of face `back`; otherwise add `d` to `.z` of face `back`. Caller: `class_3bb8c_o.c` (`func_8001F66C(&buf, isSeven, nonneg, adjusted)`).
+- **What:** walks a counted list of box-corner sets (`HullList_fa50`: `s32 n` then `n` x 48-byte `Corners_fa50`, eight `{s16 x,y,z}` as two faces of four; `TmdModel__GetHull` writes a list of one). For each: if `turn`, copy the 48 bytes to a stack temp and permute the corners back in (a quarter turn of the box), then add `d` to `.x` of face `back`; otherwise add `d` to `.z` of face `back`. Caller: `class_3bb8c_o.c` (`RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted)`).
 - **Result:** byte-exact; 147/147 words, whole-image SHA1 green. Build 5.
 - **Builds / levers, measured:**
   1. flat `Vec3 v[8]`, face loops as `v[k]` / `v[k + 4]`: 106/147, 1 word long per `+4` loop (`li a1,0x18; addu v0,t1,a1` instead of retail's `move v1,t1` + `0x18(v1)`).
@@ -19,7 +21,7 @@ typedef struct Vec3_fa50 { s16 x, y, z; } Vec3_fa50;
 typedef struct Corners_fa50 { Vec3_fa50 f[2][4]; } Corners_fa50;
 typedef struct HullList_fa50 { s32 n; Corners_fa50 c[1]; } HullList_fa50;
 
-void func_8001F66C(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
+void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
     Corners_fa50 tmp;
     Corners_fa50 *c;
     s32 i;
@@ -70,7 +72,7 @@ Several sibling counted loops whose counter and strength-reduced pointer come ou
 
 ## Naming
 
-`func_8001F66C` -- KEPT (not renamed this round). Tier C: mechanics fully
+`RotateAndOffsetHullList` -- KEPT (not renamed this round). Tier C: mechanics fully
 known (rotates a counted list of box-corner sets a quarter turn and offsets
 one face), but its only caller is `src/class_3bb8c_o.c`, a live types-runner
 unit this round; renaming would rewrite that unit's extern declaration and
