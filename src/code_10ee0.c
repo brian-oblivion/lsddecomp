@@ -48,7 +48,11 @@ INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020730);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020784);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800207DC);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_8002085C);
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_8002089C);
+void func_8002089C(Class6C070 *self) {
+    if (self->unk10 != 0) {
+        self->unk10 = 0;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800208B8);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800208D8);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800208F8);
