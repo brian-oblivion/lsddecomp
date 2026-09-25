@@ -1,4 +1,6 @@
-# Class6D430__Destroy
+# Class6D430__Finalize
+
+> Renamed from `Class6D430__Destroy` on 2026-09-25 (tools/rename.py). Address 0x80026ab4.
 
 > Renamed from `func_80026AB4` on 2026-09-18 (tools/rename.py). Address 0x80026ab4.
 
@@ -7,7 +9,7 @@
 ## What it does
 
 This class's own destructor — `D_8006D430`'s vtable slot `+0x00C`, called
-`DestroyChained` and `Pad__Finalize` (in `class_16334`, a different class'
+`Class6D430__Release` and `Pad__Finalize` (in `class_16334`, a different class'
 `dtor`, same convention) alike. It calls two more of its own slots in turn:
 `+0x048` (unimplemented/null at this level — a subclass-provided hook,
 `slot48`) and then `+0x05C`, which happens to resolve to `Class6D430__FreeBuffer` *at
@@ -34,7 +36,7 @@ bare call-then-return-something-else.
 ## Final C
 
 ```c
-void *Class6D430__Destroy(Class6D430 *this) {
+void *Class6D430__Finalize(Class6D430 *this) {
     this->methods->slot48(this);
     return this->methods->slot5C(this);
 }
@@ -52,7 +54,7 @@ immediately after `dtor` with no padding, so the C struct actually placed
 comments were fiction the compiler never saw. Adding explicit `u8 padN[...]`
 members to close the gaps (`+0x10`..`+0x44`, `+0x50`..`+0x54`, `+0x58`..`+0x5C`)
 fixed every affected function in the unit at once (this one, and
-`Class6D430__AllocBuffer` below) on the next build. This is a sharper restatement of
+`Class6D430__LoadFile` below) on the next build. This is a sharper restatement of
 CLAUDE.md's "name the field, don't do raw pointer arithmetic" — the risk runs
 the other way too: naming fields with offset *comments* that aren't backed by
 real padding is silently worse than pointer arithmetic, because the mistake
@@ -83,7 +85,9 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80026AB4` | `Class6D430__Destroy` | B |
+| `func_80026AB4` | `Class6D430__Finalize` | B |
+
+**Track 4 (2026-09-25, Class6D430 unification): renamed from `Class6D430__Destroy`, tier A.** Occupies BasicClass's `finalize` slot (+0x00C): `close` then `freeBuffer`. Now `void`, like the base slot; the old `void *` returned `freeBuffer`'s (void) result and was byte-identical either way.
 
 **Evidence.** The class's own destructor, `+0x00C` slot (the `dtor` field
 already named in `Class6D430Methods`). Calls the subclass-overridable
@@ -99,5 +103,5 @@ not established.
 | --- | --- | --- | --- |
 | `+0x05C` (`slot5C`) | `freeBuffer` | B | Resolves to `Class6D430__FreeBuffer` at this class's own level (confirmed by dumping `D_8006D430`'s raw words), dispatched indirectly. Per the project's "vtable slots named like the method they dispatch to" convention. Proposed rather than renamed only because the slot's declaration lives in the shared, cross-unit-exposed `Class6D430Methods`. |
 
-See `Class6D430__AllocBuffer.md` for `+0x048`'s proposal (`onBufferChanged`),
+See `Class6D430__LoadFile.md` for `+0x048`'s proposal (`onBufferChanged`),
 also dispatched from this function. Posted to the broadcast.

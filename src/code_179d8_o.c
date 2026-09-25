@@ -15,13 +15,14 @@
  * views below are local to this unit and cover only what it touches.
  */
 #include "common.h"
+#include "Class6D430.h"
 
 #define CLASS6D4E8_SIZE 0x2C /* New_Class6D4E8's BMemPMgrAlloc request */
 
 typedef struct Class6D4E8Methods Class6D4E8Methods;
 struct Class6D4E8Methods {
     s32 header;                    /* +0x000, not a pointer -- 0x13 (DATASOURCE_CD in code_171e0.c) for D_8006D4E8 */
-    void *ownDtorChain;            /* +0x004, DestroyChained -- unused by this unit's own functions */
+    void *ownDtorChain;            /* +0x004, Class6D430__Release -- unused by this unit's own functions */
     void (*ctor)(void *self);      /* +0x008, Class6D4E8__Class6D4E8 (classtable.py; BasicClass__BasicClass
                                      * and Class6D430__Class6D430 sit at this slot in the base tables) */
     u8 pad00C[0x05C - 0x00C];
@@ -32,7 +33,7 @@ struct Class6D4E8Methods {
                                            * `void (*)(void)` on the strength of the nop delay slot, but $a0
                                            * still holds Class6D4E8__Destroy's own `self` there (the entry
                                            * `move s0,a0` leaves it intact), so passing `self` is
-                                           * byte-identical -- the same shape as Class6D430__Destroy's
+                                           * byte-identical -- the same shape as Class6D430__Finalize's
                                            * `close(this)` in code_171e0.c. */
 };
 
@@ -46,24 +47,8 @@ typedef struct {
                                      * in this unit, so no name. */
 } Class6D4E8;
 
-/* The parent class's table (D_8006D430, Class6D430Methods in
- * include/code_171e0.h), viewed only down to the one slot this unit's
- * constructor uses: +0x008 is Class6D430__Class6D430. */
-typedef struct {
-    u8 pad0[0x008];
-    void (*ctor)(void *self);      /* +0x008 */
-} Class6D430CtorView;
 
 extern void *BMemPMgrAlloc(s32 size);              /* Psy-Q allocator, matched signature used project-wide */
-/* ROUND 59 (extern review): parameter list only, return type untouched. This
- * is NOT still INCLUDE_ASM -- it is defined in src/code_171e0.c as
- * `void *GetClass6D430Methods(void)`, and the callee at 0x80026C9C is
- * lui/addiu/jr reading no argument register. Measured before changing it:
- * Class6D4E8__Class6D4E8's `jal 80026c9c` (0x80027234) carries `move s0,a0` in the
- * delay slot -- a callee-save spill, not argument setup -- so the `self`
- * passed below costs zero bytes and the one-parameter prototype was simply
- * false. Unspecified parameters keep Class6D4E8__Class6D4E8's call site untouched. */
-extern Class6D430CtorView *GetClass6D430Methods();
 extern Class6D4E8Methods *GetClass6D4E8Methods(void); /* code_179d8_q: returns &D_8006D4E8, this class's table */
 extern void InitCdDrive(void);                        /* code_179d8_q: one-shot CdSetDebug(0) + CdlSetmode double speed */
 
@@ -81,7 +66,7 @@ Class6D4E8 *New_Class6D4E8(void)
 
 void Class6D4E8__Class6D4E8(Class6D4E8 *self)
 {
-    GetClass6D430Methods(self)->ctor(self);
+    GetClass6D430Methods()->ctor((Class6D430 *)self);
     self->methods = GetClass6D4E8Methods();
     self->inQueueDispatch = 0;
     InitCdDrive();

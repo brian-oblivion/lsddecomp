@@ -10,16 +10,16 @@ unit's own Class6D430 methods, calls only game functions, and reads no strings.
 Game code.
 
 **Baseline.** The preserved body below, rebuilt live (with the
-`Class6D430__CopyFields` prototype it needs, since the definition follows it):
+`CopyDataSourceSlots` prototype it needs, since the definition follows it):
 `insertions 15 / deletions 15`, 1/35 raw, 38 words (3 long; out-of-range
 drift 316350 bytes). asm-differ showed the three extra words were `$s2` for
 `val` and `move a0,s0` before the `jalr` -- i.e. the built code PASSED `val`
 to each table entry.
 
 **Lever 1 -- the table entries take no argument.** Retail's `jalr $v0` has no
-`$a0` set up before it (`$a0` is whatever `Class6D430__CopyFields` left). The
-14 entries of `D_8006D4AC` are `Get*Methods` getters (`GetVabStreamObjMethods`
-is one of them by name). Typing the table `void *(*D_8006D4AC[])(void)` and
+`$a0` set up before it (`$a0` is whatever `CopyDataSourceSlots` left). The
+14 entries of `gDataSourceClientGetters` are `Get*Methods` getters (`GetVabStreamObjMethods`
+is one of them by name). Typing the table `void *(*gDataSourceClientGetters[])(void)` and
 calling `fn()` removed `$s2` and both moves: every register then matched and
 the length became 35 (24/35 raw, insertions 4 / deletions 4). So the
 round-43 REGISTER-ALLOCATION class was an arity error: `val` needed its own
@@ -98,7 +98,7 @@ class REGISTER-ALLOCATION (round 43, 2026-09-15, runner bravo) -- that class is 
 Never attempted before round 43 (round-2026-08-29-a/30-a filed only a
 `gp_rel`-blocked stub, no derivation). Round 42 resolved `gp_rel`
 project-wide. Round 43 derived the control flow correctly on the first try
-(confirmed by the `D_8006D4AC` array in `asm/data/5DB70.data.s` ending in a
+(confirmed by the `gDataSourceClientGetters` array in `asm/data/5DB70.data.s` ending in a
 `0x00000000` sentinel, exactly matching a "call through the table until a
 NULL entry" loop) but could not reproduce retail's REGISTER ALLOCATION
 across roughly a dozen structurally-equivalent rewrites plus a 150582-iteration
@@ -112,9 +112,9 @@ assignment (undefined behavior), not a legitimate reshape.
 
 Dispatches on `gActiveDataSource` to pick one of two "ret" objects
 (`GetClass6D4E8Methods()` if `arg0 == 0x13`, else `GetVabDriverMethods()`), stores `arg0`
-into `gActiveDataSource`, then walks the function-pointer table `D_8006D4AC`
+into `gActiveDataSource`, then walks the function-pointer table `gDataSourceClientGetters`
 (14 entries + a NULL sentinel, confirmed in `asm/data/5DB70.data.s`),
-calling `Class6D430__CopyFields(val, ret)` before EVERY table read (including the
+calling `CopyDataSourceSlots(val, ret)` before EVERY table read (including the
 first, before any table entry is even inspected), and — for every NON-NULL
 entry — calling that entry as `val = entry(val)` before advancing to the
 next slot and repeating. All 4 callees are cross-unit: `GetClass6D4E8Methods` /
@@ -124,7 +124,7 @@ next slot and repeating. All 4 callees are cross-unit: `GetClass6D4E8Methods` /
 ## Residue -- this is a genuine register-allocation puzzle, not a control-flow miss
 
 Retail's compiled loop uses exactly **2** callee-saved registers (`$s0` =
-the `D_8006D4AC` walk pointer, `$s1` = `ret`) plus `$ra`. The loop-carried
+the `gDataSourceClientGetters` walk pointer, `$s1` = `ret`) plus `$ra`. The loop-carried
 "call argument" value (`val`, first produced by `GetClass6D430Methods()`, then by
 each table-entry call) flows **directly through `$a0`/`$v0`**, with no
 callee-saved register of its own, EVEN THOUGH it is read and written at a
@@ -142,8 +142,8 @@ back-edge):
   jalr  $v0
    addiu $s0, $s0, 0x4       ; entry++ (delay slot)
   addu  $a0, $v0, $zero      ; a0 = the just-called entry's return (val, new)
-.L80026D58:                  ; JOIN -- Class6D430__CopyFields call site, 2 predecessors
-  jal   Class6D430__CopyFields
+.L80026D58:                  ; JOIN -- CopyDataSourceSlots call site, 2 predecessors
+  jal   CopyDataSourceSlots
    addu $a1, $s1, $zero
   lw    $v0, 0x0($s0)
   bnez  $v0, .L80026D4C
@@ -167,8 +167,8 @@ point in the schedule -- still not zero.
 **The permuter search (150582 iterations, 600s wall-clock, 8 workers) did not
 close this and did not find any candidate near zero.** Its best-scoring
 candidates (900 and below) all shared the same defect: they moved
-`entry = D_8006D4AC;` inside the loop body and called `fn(val)` as the
-ARGUMENT expression to `Class6D430__CopyFields` before `fn` is ever assigned on the
+`entry = gDataSourceClientGetters;` inside the loop body and called `fn(val)` as the
+ARGUMENT expression to `CopyDataSourceSlots` before `fn` is ever assigned on the
 first iteration -- reading an uninitialized function pointer. That is
 undefined behavior, not a legitimate source reshape, and it does not
 qualify as a permuter zero (it never reached zero at all). Per
@@ -194,9 +194,9 @@ covers and a longer or differently-seeded run might still find something.
 ## Preserved best-effort body (38/35 words, 3 words long)
 
 ```c
-extern void *D_8006D4AC[];
+extern void *gDataSourceClientGetters[];
 
-void Class6D430__CopyFields(Class6D430 *dst, Class6D430 *src);
+void CopyDataSourceSlots(Class6D430 *dst, Class6D430 *src);
 
 void SetActiveDataSource(s32 arg0) {
     void *ret;
@@ -210,9 +210,9 @@ void SetActiveDataSource(s32 arg0) {
     } else {
         ret = GetVabDriverMethods();
     }
-    entry = D_8006D4AC;
+    entry = gDataSourceClientGetters;
     for (val = GetClass6D430Methods(); ; val = fn(val)) {
-        Class6D430__CopyFields(val, ret);
+        CopyDataSourceSlots(val, ret);
         fn = *entry;
         if (fn == NULL) {
             break;
@@ -260,7 +260,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 **Evidence.** Stores the new mode into `gActiveDataSource`, resolves the
 newly-active source's vtable (the same `GetClass6D4E8Methods`/`GetVabDriverMethods`
 pair `GetActiveDataSourceMethods` uses), then walks a table of 14 callbacks,
-calling `Class6D430__CopyFields(val, ret)` before each and threading each
+calling `CopyDataSourceSlots(val, ret)` before each and threading each
 non-NULL entry's return value into the next call. The control flow and every
 callee are fully confirmed (only the register allocation in the walk loop is
 unmatched, per the report's own REGISTER-ALLOCATION class) -- solid enough

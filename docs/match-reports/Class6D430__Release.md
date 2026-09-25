@@ -1,4 +1,6 @@
-# DestroyChained
+# Class6D430__Release
+
+> Renamed from `DestroyChained` on 2026-09-25 (tools/rename.py). Address 0x800269f0.
 
 > Renamed from `func_800269F0` on 2026-09-18 (tools/rename.py). Address 0x800269f0.
 
@@ -9,7 +11,7 @@
 Slot `+0x004` of the `D_8006D430` method table (see `include/code_171e0.h`'s
 `Class6D430Methods`). It clears one flag, then explicitly chains
 **both** destructors available to it: the class's own (`this->methods->dtor`,
-itself `Class6D430__Destroy`, resolved through the vtable rather than by name) and
+itself `Class6D430__Finalize`, resolved through the vtable rather than by name) and
 the base class's (`Get_vtable_BasicClass()->dtor`, `BasicClassMethods.dtor`), then
 calls `BMemPMgrFree(this)` (a still-uncarved release/free routine, address
 only) before returning `NULL` unconditionally.
@@ -48,7 +50,7 @@ disassembly.
 ## Final C
 
 ```c
-void *DestroyChained(Class6D430 *this) {
+void *Class6D430__Release(Class6D430 *this) {
     this->unk20 = 0;
     this->methods->dtor(this);
     Get_vtable_BasicClass()->dtor(this);
@@ -83,7 +85,9 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800269F0` | `DestroyChained` | B |
+| `func_800269F0` | `Class6D430__Release` | B |
+
+**Track 4 (2026-09-25, Class6D430 unification): renamed from `DestroyChained`, tier A.** Occupies BasicClass's `release` slot (+0x004), inherited by all sixteen Class6D430 subclasses; like `BasicClass__Release` it finalizes (its own `finalize` slot, then BasicClass's) and frees the object, returning NULL. An override is named for the slot it occupies (FINISHING-PLAN track 4).
 
 **Evidence.** `D_8006D430`'s `+0x004` own-class slot -- but verbatim-shared
 with `D_8006D4E8` at the identical offset (`docs/match-reports/GetClass6D4E8Methods.md`),

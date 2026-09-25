@@ -2,14 +2,11 @@
  * code_171e0 -- Class6D430's own module, plus an active-data-source
  * dispatch layer built on top of it.
  *
- * Class6D430 (Class6D430/Class6D430Methods) is a small
- * BasicClass subclass holding one lazily-(re)allocated buffer (buffer/bufferSize,
- * managed by Class6D430__AllocBuffer/FreeBuffer) plus a flags word.
- * D_8006D4E8 (the CD-ROM read driver, code_179d8_q.c) shares its own
- * +0x004/+0x05C/+0x060/+0x064 slots with it verbatim (DestroyChained/
- * Class6D430__FreeBuffer/NoOp/Class6D430__SetFlag), so this is a real shared
- * base for at least that sibling, and plausibly for gVabDriverMethods too (the
- * SPU/VAB streamer, code_179d8_e.c).
+ * Class6D430 (include/Class6D430.h) is the data-source base class: a
+ * BasicClass subclass holding one file buffer (buffer/bufferSize, managed by
+ * Class6D430__LoadFile/FreeBuffer) plus a flags word, and declaring the file-
+ * I/O interface the CD driver (D_8006D4E8) and the SPU/VAB driver
+ * (gVabDriverMethods) implement; sixteen classes derive from it.
  *
  * Most of this unit's remaining functions dispatch between those same two
  * sibling classes by `gActiveDataSource` (DATASOURCE_CD/DATASOURCE_SPU,
@@ -37,9 +34,9 @@ void *GetClass6D3C8Methods(void) {
     return D_8006D3C8;
 }
 
-void *DestroyChained(Class6D430 *this) {
+void *Class6D430__Release(Class6D430 *this) {
     this->freeGuard = 0;
-    this->methods->dtor(this);
+    this->methods->finalize(this);
     Get_vtable_BasicClass()->finalize((BasicClass *)this);
     BMemPMgrFree(this);
     return NULL;
@@ -47,7 +44,7 @@ void *DestroyChained(Class6D430 *this) {
 
 void Class6D430__Class6D430(Class6D430 *this) {
     Get_vtable_BasicClass()->ctor((BasicClass *)this);
-    this->methods = (Class6D430Methods *) GetClass6D430Methods();
+    this->methods = GetClass6D430Methods();
     this->isOpen = 0;
     this->buffer = NULL;
     this->bufferSize = 0;
@@ -58,12 +55,12 @@ void Class6D430__Class6D430(Class6D430 *this) {
     this->unk2A = 0;
 }
 
-void *Class6D430__Destroy(Class6D430 *this) {
+void Class6D430__Finalize(Class6D430 *this) {
     this->methods->close(this);
-    return this->methods->freeBuffer(this);
+    this->methods->freeBuffer(this);
 }
 
-void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
+void Class6D430__LoadFile(Class6D430 *this, char *name) {
     s32 savedPendingGeneration;
     s32 size;
     void *newRes;
@@ -73,7 +70,7 @@ void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
     }
     savedPendingGeneration = this->isOpen;
     this->isOpen = 0;
-    this->methods->open(this, arg1, 1, 0);
+    this->methods->open(this, name, 1, 0);
     size = this->methods->seek(this, 0, 2);
     newRes = BMemPMgrAlloc(size);
     if (newRes != NULL) {
@@ -110,8 +107,8 @@ void Class6D430__SetFlag(Class6D430 *this) {
     this->flags |= 1;
 }
 
-void *GetClass6D430Methods(void) {
-    return D_8006D430;
+Class6D430Methods *GetClass6D430Methods(void) {
+    return &D_8006D430;
 }
 
 extern s32 gActiveDataSource;
@@ -133,23 +130,17 @@ Vec3_171e0 *SetVec3(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
     return this;
 }
 
-/* D_8006D4AC: the class-method-table getters of every Class6D430-derived
- * client, NULL-terminated (asm/data/5DB70.data.s). */
-extern void *(*D_8006D4AC[])(void);
-
-void Class6D430__CopyFields(Class6D430 *dst, Class6D430 *src);
-
 /* Install a new active data source, then copy its method block
- * (Class6D430__CopyFields) into Class6D430's own table and into the table of
+ * (CopyDataSourceSlots) into Class6D430's own table and into the table of
  * every registered client. The label+goto loop is retail's layout (jump into a
  * bottom test); every while/for spelling tried came out top-tested. */
 void SetActiveDataSource(s32 arg0) {
-    void *src;
-    void *methods;
+    Class6D430Methods *src;
+    Class6D430Methods *methods;
     void *(*getMethods)(void);
     void *(**entry)(void);
 
-    entry = D_8006D4AC;
+    entry = gDataSourceClientGetters;
     gActiveDataSource = arg0;
     if (arg0 == DATASOURCE_CD) {
         src = GetClass6D4E8Methods();
@@ -162,25 +153,28 @@ next:
     entry++;
     methods = getMethods();
 copy:
-    Class6D430__CopyFields(methods, src);
+    CopyDataSourceSlots(methods, src);
     getMethods = *entry;
     if (getMethods != NULL) {
         goto next;
     }
 }
 
-void Class6D430__CopyFields(Class6D430 *dst, Class6D430 *src) {
-    dst->unk40 = src->unk40;
-    dst->unk44 = src->unk44;
-    dst->unk48 = src->unk48;
-    dst->unk4C = src->unk4C;
-    dst->unk50 = src->unk50;
-    dst->unk54 = src->unk54;
-    dst->unk58 = src->unk58;
-    dst->unk68 = src->unk68;
-    dst->unk6C = src->unk6C;
-    dst->unk70 = src->unk70;
-    dst->unk74 = src->unk74;
+/* Copy the eleven data-source interface slots of one method table into
+ * another: SetActiveDataSource's rebinding step. +0x05C..+0x064 are the
+ * base's own and are not copied. */
+void CopyDataSourceSlots(Class6D430Methods *dst, Class6D430Methods *src) {
+    dst->slot40 = src->slot40;
+    dst->open = src->open;
+    dst->close = src->close;
+    dst->seek = src->seek;
+    dst->slot50 = src->slot50;
+    dst->read = src->read;
+    dst->loadFile = src->loadFile;
+    dst->runRequestQueue = src->runRequestQueue;
+    dst->requestLoadFile = src->requestLoadFile;
+    dst->stopService = src->stopService;
+    dst->cancelRequests = src->cancelRequests;
 }
 
 extern s32 gActiveDataSource;

@@ -123,7 +123,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 otherwise it enqueues op 5 with `buf`/`size`, or inside a queue dispatch on
 an open file reads `size >> 11` sectors into `buf` (CdRead + CdReadSync
 retry loop, or hands `gCdReadSectorCount`/`gCdReadBuffer` to the state
-machine). `Class6D430__AllocBuffer` calls this slot with the buffer it just
+machine). `Class6D430__LoadFile` calls this slot with the buffer it just
 allocated and its size, between the rewind and the close.
 
 **Class prefix.** `Class6D4E8` is the placeholder token for the method

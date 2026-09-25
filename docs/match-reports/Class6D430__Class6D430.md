@@ -57,7 +57,7 @@ void Class6D430__Class6D430(Class6D430 *this) {
 
 Matched on the second attempt in isolation — the first showed 24/25 in-range
 with one call-target (`jal GetClass6D430Methods`) word differing purely from
-address drift caused by `Class6D430__AllocBuffer` (below) still being the wrong size
+address drift caused by `Class6D430__LoadFile` (below) still being the wrong size
 at that point. No change to this function was needed; fixing the drift
 source elsewhere resolved it to 25/25.
 
@@ -70,7 +70,7 @@ source elsewhere resolved it to 25/25.
 
 ## Proposed learning
 
-See `Class6D430__AllocBuffer.md` for the real finding from this round: `BMemPMgrAlloc`
+See `Class6D430__LoadFile.md` for the real finding from this round: `BMemPMgrAlloc`
 (the allocator) takes **one** argument (`size`), not two. This function's own
 "one word off, call-target only" symptom while a sibling function in the same
 unit had a genuine size bug is a useful diagnostic pattern worth naming: a
@@ -105,7 +105,7 @@ The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
 `Class6D430` is shared with `code_179d8_h.c`/`code_179d8_q.c`
-(see `Class6D430__AllocBuffer.md`); every field this constructor zeroes is
+(see `Class6D430__LoadFile.md`); every field this constructor zeroes is
 therefore checked, and only `flags` (this round's own rename, zero
 cross-unit hits) renamed outright. The rest:
 

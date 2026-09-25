@@ -81,11 +81,7 @@
  * rather than inheriting any verdict here.
  */
 #include "common.h"
-/* code_171e0.h's Class6D430/Class6D430Methods already
- * describe D_8006D430's class exactly -- Class6D430__InstallCdReadDriver dispatches
- * GetClass6D430Methods()->ctor(self) (offset +0x008), matching that header's own
- * ctor slot. Reused UNCHANGED per CLAUDE.md's header discipline (a sibling
- * would use it unchanged), not redefined locally. */
+/* Class6D430 and its table come from include/Class6D430.h, through code_171e0.h. */
 #include "code_171e0.h"
 
 /* GetClass6D4E8Methods is still uncarved (asm/code_179d8.s) -- returns &D_8006D4E8,
@@ -121,7 +117,7 @@ typedef struct ObjA34_179D8H ObjA34_179D8H;
  * after adding it. Named `onError` in round 64 from two give-up call sites
  * at +0x48; renamed `close` in round 79 (charlie's code_179d8_s pass):
  * `tools/classtable.py D_8006D4E8` resolves +0x48 to Class6D4E8__Close,
- * and Class6D430__AllocBuffer also calls it on its SUCCESS path, so the
+ * and Class6D430__LoadFile also calls it on its SUCCESS path, so the
  * give-up paths were closing the file, not reporting an error. */
 typedef struct MethodsA34_179D8H {
     u8 pad000[0x48];
@@ -190,13 +186,13 @@ extern char *strcat(char *dest, char *src);
 extern char gCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */
 
 void Class6D430__InstallCdReadDriver(Class6D430 *self) {
-    ((Class6D430Methods *)GetClass6D430Methods())->ctor(self);
+    GetClass6D430Methods()->ctor(self);
     self->methods = GetClass6D4E8Methods();
     self->isOpen = 0;
 }
 
-void *Class6D430__DestroyCdReadDriver(Class6D430 *self) {
-    return ((Class6D430Methods *)GetClass6D430Methods())->dtor(self);
+void Class6D430__DestroyCdReadDriver(Class6D430 *self) {
+    GetClass6D430Methods()->finalize(self);
 }
 
 void NoOp2(void) {

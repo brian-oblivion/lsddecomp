@@ -105,7 +105,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 **Evidence.** Sync mode forwards to `CloseCdFile`; otherwise it enqueues
 op 3, or inside a queue dispatch clears `self->isOpen` and resets the state
 machine (`StartCdOperation(0, 0)` then `ResetCdStateMachine`). It is the
-inverse of `Class6D4E8__Open` on the same field. `Class6D430__AllocBuffer`
+inverse of `Class6D4E8__Open` on the same field. `Class6D430__LoadFile`
 calls this slot last, after the read, and also on allocation failure, and
 `Class6D4E8__LoadFile` calls it when its own allocation fails.
 
@@ -128,4 +128,4 @@ For the head to apply by type scope (out of unit):
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
 | code_179d8_h | `MethodsA34_179D8H` | `onError` | `close` | A | `+0x048` of `D_8006D4E8` is `Class6D4E8__Close`; `ReadCdFile` calls it when the file is not open, which is a close of an unopened file, not an error report |
-| include/code_171e0.h | `Class6D430Methods` | `onBufferChanged` | `close` | A | `+0x048`; `Class6D430__AllocBuffer` calls it after the read and on allocation failure, `Class6D430__Destroy` before freeing the buffer; the one populated override is `Class6D4E8__Close` |
+| include/code_171e0.h | `Class6D430Methods` | `onBufferChanged` | `close` | A | `+0x048`; `Class6D430__LoadFile` calls it after the read and on allocation failure, `Class6D430__Finalize` before freeing the buffer; the one populated override is `Class6D4E8__Close` |

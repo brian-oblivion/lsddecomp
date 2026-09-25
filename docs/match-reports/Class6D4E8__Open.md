@@ -194,7 +194,7 @@ object is not already open, it looks the name up (`FindCdFileEntry` on the
 async path, `BuildCdFilePath` + `CdSearchFile` on the blocking path), copies
 the entry's disc position and byte size into `self->pos`/`self->size`, seeks
 there (CdlSetloc) and sets `self->isOpen = 1`. The base-class caller
-`Class6D430__AllocBuffer` calls this slot first, with the file name, before
+`Class6D430__LoadFile` calls this slot first, with the file name, before
 sizing and reading. Every path is "resolve a file by name and make it the
 open one", hence tier A. `arg2`/`arg3` are only passed through to the
 queued request and are not read otherwise, so they stay unnamed.

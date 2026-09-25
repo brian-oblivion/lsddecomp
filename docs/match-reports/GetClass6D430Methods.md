@@ -28,12 +28,12 @@ void *GetClass6D430Methods(void) {
 ```
 
 Confirmed via `tools/classtable.py 0x8006D430`: slots `+0x004`/`+0x008`/`+0x00C`
-are this unit's own `DestroyChained`/`Class6D430__Class6D430`/`Class6D430__Destroy` (dtor /
+are this unit's own `Class6D430__Release`/`Class6D430__Class6D430`/`Class6D430__Finalize` (dtor /
 ctor-by-the-`+0x008`-convention / a third override), and `+0x058`.`+0x064`
-are `Class6D430__AllocBuffer`..`Class6D430__SetFlag`, also this unit. So this function is the
+are `Class6D430__LoadFile`..`Class6D430__SetFlag`, also this unit. So this function is the
 "get my own class's methods" accessor for the class that owns roughly a third
 of `code_171e0`'s remaining queue — worth knowing for whoever picks up
-`DestroyChained`, `Class6D430__Class6D430`, `Class6D430__Destroy`, `Class6D430__AllocBuffer`, or
+`Class6D430__Release`, `Class6D430__Class6D430`, `Class6D430__Finalize`, `Class6D430__LoadFile`, or
 `Class6D430__FreeBuffer` next: they all dispatch through this same table (see
 `include/code_171e0.h` for the full slot map, and the constructor-called-via
 BasicClass base (`D_8006B58C`, resolved with `--vs`) for the inherited slots).

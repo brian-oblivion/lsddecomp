@@ -40,11 +40,11 @@ Matched on the first attempt.
 Round 79 (delta).
 
 - **`Class6D4E8__Destroy`** (was `func_80027274`) -- **tier A**. Table slot
-  +0x00C of D_8006D4E8, overriding `Class6D430__Destroy` in the parent
+  +0x00C of D_8006D4E8, overriding `Class6D430__Finalize` in the parent
   table (and `BasicClass__Finalize` in the root). The body cancels this
   object's queued CD requests (+0x074, `Class6D4E8__CancelRequests`) and
   then frees its buffer (+0x05C, inherited `Class6D430__FreeBuffer`) -- the
-  same two-dispatch shape as `Class6D430__Destroy` (`onBufferChanged` then
+  same two-dispatch shape as `Class6D430__Finalize` (`onBufferChanged` then
   `freeBuffer`). Named after the slot it overrides, following the parent.
 - Slots, in the unit's local `Class6D4E8Methods` view (only this unit
   accesses it, so renamed directly; both oracles green): `slot74` ->
@@ -61,7 +61,7 @@ copies it and leaves `$a0` intact), and `Class6D4E8__CancelRequests`
 (code_179d8_q.c) reads `self` from `$a0`. So the call does pass `self`.
 Retyped to `void (*cancelRequests)(void *self)` and called as
 `self->methods->cancelRequests(self)`: **byte-identical** (build exit 0,
-SHA1 OK, check-nonmatching green). `Class6D430__Destroy` in code_171e0.c
+SHA1 OK, check-nonmatching green). `Class6D430__Finalize` in code_171e0.c
 has the identical compiled shape with `this` passed explicitly, which is
 the precedent. The nop delay slot said only that no argument register
 needed LOADING, not that none was read.

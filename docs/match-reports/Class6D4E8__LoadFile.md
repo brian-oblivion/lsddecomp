@@ -13,7 +13,7 @@ the six assigned before `Class6D4E8__RunRequestQueue`.
  * Obj80027480/Methods80027480 view; re-verified the four sibling functions
  * that already matched against the earlier, narrower Obj80027480 still
  * match after this extension. */
-extern void Class6D430__AllocBuffer(void);
+extern void Class6D430__LoadFile(void);
 extern void *gCdSavedSeekParam;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/code_179d8_r.c's own
@@ -34,7 +34,7 @@ void Class6D4E8__LoadFile(Obj80027480 *self, char *arg1) {
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
-        Class6D430__AllocBuffer();
+        Class6D430__LoadFile();
         self->unk24 |= 0x200;
         self->methods->slot64(self);
         return;
@@ -209,7 +209,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80027800` | `Class6D4E8__LoadFile` | A |
 
-**Evidence.** Overrides the base class's `+0x058` (`Class6D430__AllocBuffer`,
+**Evidence.** Overrides the base class's `+0x058` (`Class6D430__LoadFile`,
 which does open/size/alloc/rewind/read/close through the slots above). Sync
 mode calls that base method, then ORs `CD_FLAG_LOAD_FILE_DONE` (0x200) and
 calls `setFlag`. Otherwise it enqueues op 7 (`CD_OP_LOAD_FILE`, the name
@@ -227,7 +227,7 @@ at slot `+0x058`. The prefix names the table, not the developers' class.
 
 ## Proposed field names
 
-For the head to apply by type scope (out of unit). `Class6D430__AllocBuffer`
+For the head to apply by type scope (out of unit). `Class6D430__LoadFile`
 (code_171e0), the base method this function overrides and calls in sync
 mode, drives these slots in the order open, size query, alloc, rewind, read,
 close; the one class that fills them (`D_8006D4E8`) fills them with the
@@ -240,6 +240,6 @@ methods named here.
 | include/code_171e0.h | `Class6D430Methods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `Class6D4E8__Read` |
 | include/code_171e0.h | `Class6D430` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
 
-Also noted for whoever names code_171e0 again: `Class6D430__AllocBuffer`
+Also noted for whoever names code_171e0 again: `Class6D430__LoadFile`
 opens, sizes, allocates for, reads and closes a named file, i.e. it is the
 base-class LoadFile. Not renamed here (out of unit).

@@ -1,4 +1,6 @@
-# Class6D430__CopyFields
+# CopyDataSourceSlots
+
+> Renamed from `Class6D430__CopyFields` on 2026-09-25 (tools/rename.py). Address 0x80026d88.
 
 > Renamed from `func_80026D88` on 2026-09-18 (tools/rename.py). Address 0x80026d88.
 
@@ -39,7 +41,7 @@ them.
 ## Final C
 
 ```c
-void Class6D430__CopyFields(Class6D430 *dst, Class6D430 *src) {
+void CopyDataSourceSlots(Class6D430 *dst, Class6D430 *src) {
     dst->unk40 = src->unk40;
     dst->unk44 = src->unk44;
     dst->unk48 = src->unk48;
@@ -84,7 +86,9 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80026D88` | `Class6D430__CopyFields` | B |
+| `func_80026D88` | `CopyDataSourceSlots` | B |
+
+**Track 4 (2026-09-25, Class6D430 unification): renamed from `Class6D430__CopyFields`, tier A.** Its callers pass METHOD TABLES, not objects (`SetActiveDataSource`: `GetClass6D430Methods()` and each `gDataSourceClientGetters` entry, from the CD or SPU driver's table), so the "fields" +0x40..+0x58 and +0x68..+0x74 are the eleven data-source interface slots of `Class6D430Methods`, and the "gap" +0x5C..+0x64 is the base's own freeBuffer/slot60/setFlag. Retyped `(Class6D430Methods *dst, Class6D430Methods *src)`, byte-identical; the Class6D430 object never had fields there (it is 0x2C bytes).
 
 **Evidence.** A field-by-field copy of a fixed subset of one
 `Class6D430` instance's fields into another (`+0x40..+0x58`,

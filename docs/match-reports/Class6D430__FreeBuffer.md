@@ -7,7 +7,7 @@
 ## What it does
 
 `D_8006D430`'s vtable slot `+0x05C` (also reachable indirectly through
-`Class6D430__Destroy`, the class's own dtor). Frees `this->unk10` via
+`Class6D430__Finalize`, the class's own dtor). Frees `this->unk10` via
 `BMemPMgrFree` and clears it, but only when three conditions all hold:
 the pointer is non-NULL, `this->unk14` (its recorded size) is non-zero, and
 `this->unk20` (a flag cleared in the constructor) is zero.
@@ -54,7 +54,7 @@ void Class6D430__FreeBuffer(Class6D430 *this) {
 Matched on the first real attempt (once written against the corrected
 `Class6D430` struct). An earlier diff run against this function showed
 0/24 and a pure 1-word shift for its entire body — that was **not** a bug in
-this function; it was downstream drift from `Class6D430__AllocBuffer`'s wrong-sized
+this function; it was downstream drift from `Class6D430__LoadFile`'s wrong-sized
 allocator call (see that report) shifting every address after it in the
 unit. Re-diffed clean after the sibling fix, with zero changes to this
 function's own source.
@@ -86,8 +86,8 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 **Evidence.** `+0x05C` slot: frees `this->unk10` via `BMemPMgrFree` and
 clears it, guarded by three conditions (non-NULL, sized, not busy per
-`unk20`). Also reachable indirectly through `Class6D430__Destroy`. Mirrors
-`Class6D430__AllocBuffer`'s naming; mechanics known, why the buffer needs
+`unk20`). Also reachable indirectly through `Class6D430__Finalize`. Mirrors
+`Class6D430__LoadFile`'s naming; mechanics known, why the buffer needs
 this specific guard is not.
 
 ## Proposed field names
@@ -101,7 +101,7 @@ lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-Same cross-unit exposure as `Class6D430__AllocBuffer.md` (`Class6D430`
+Same cross-unit exposure as `Class6D430__LoadFile.md` (`Class6D430`
 is shared with `code_179d8_h.c`/`code_179d8_q.c`), so PROPOSED, not renamed:
 
 | field | proposed name | tier | evidence |

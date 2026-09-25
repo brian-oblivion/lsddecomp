@@ -17,9 +17,9 @@ Byte-exact, 14/14 words.
 ## Notes
 
 Chains directly to `D_8006D430`'s own dtor slot (`GetClass6D430Methods()->dtor`,
-i.e. `Class6D430__Destroy`, matched in `code_171e0.c`) rather than through
+i.e. `Class6D430__Finalize`, matched in `code_171e0.c`) rather than through
 `self->methods` -- same "call the base class's own copy of a slot, not the
-possibly-overridden one on `self`" idiom `DestroyChained` in that same file
+possibly-overridden one on `self`" idiom `Class6D430__Release` in that same file
 uses for `Get_vtable_BasicClass()->dtor(this)`. Presumably this unit's own
 subclass's chain-up dtor, mirroring `Class6D430__InstallCdReadDriver`'s chain-up ctor.
 
@@ -29,7 +29,7 @@ subclass's chain-up dtor, mirroring `Class6D430__InstallCdReadDriver`'s chain-up
 paired teardown for `Class6D430__InstallCdReadDriver` (adjacent in ROM
 order, same `Class6D430*` parameter, the established "ctor chains base then
 installs a derived vtable / dtor chains directly to the base's own dtor"
-idiom this codebase already uses at the `DestroyChained` level for
+idiom this codebase already uses at the `Class6D430__Release` level for
 `BasicClass`). The function's OWN body only chains to `Class6D430`'s real
 dtor slot -- it does not itself reference `D_8006D4E8` or
 `GetClass6D4E8Methods` -- so the "CdReadDriver" half of the name is

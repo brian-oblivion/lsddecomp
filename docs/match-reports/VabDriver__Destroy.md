@@ -25,6 +25,6 @@ Confirmed as this exact slot by `python3 tools/classtable.py 0x8006D9BC`
 Renamed `func_8002C3C8 -> VabDriver__Destroy`, tier A, same evidence and
 same cross-unit-ownership note as `VabDriver__VabDriver`'s report
 (code_179d8_e.c's own comments already identified this slot by its old
-placeholder name; matches the `Class6D430__Destroy` naming precedent at the
+placeholder name; matches the `Class6D430__Finalize` naming precedent at the
 same `+0x00C` slot position in the base class and in `D_8006D940`'s own
 `Class6D940__Destroy`, this unit, this round).

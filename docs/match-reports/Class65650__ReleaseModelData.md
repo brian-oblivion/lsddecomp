@@ -60,4 +60,4 @@ than a function return.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__ReleaseModelData` (was `func_80065CEC`), tier A. teardownParts (+0x104), then if ownsModelData stores modelData->release() (D_8006F384 +0x004, DestroyChained) back into modelData, else NULL.
+- `Class65650__ReleaseModelData` (was `func_80065CEC`), tier A. teardownParts (+0x104), then if ownsModelData stores modelData->release() (D_8006F384 +0x004, Class6D430__Release) back into modelData, else NULL.

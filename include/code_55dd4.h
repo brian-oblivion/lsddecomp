@@ -152,7 +152,7 @@ typedef struct Unk70ElemObj {
 typedef struct Unk5CObj Unk5CObj;
 typedef struct Unk5CMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
-    Unk5CObj *(*release)(Unk5CObj *self);       /* +0x004 DestroyChained; returns the value to store back */
+    Unk5CObj *(*release)(Unk5CObj *self);       /* +0x004 Class6D430__Release; returns the value to store back */
     u8 pad08[0x78];                            /* +0x008 .. +0x07C, unknown */
     s32 (*getObjectIds)(Unk5CObj *self, void *arg1, s32 *outBuf); /* +0x080 func_8004497C; Class65650__CreateParts calls it with arg1 NULL for the count (low byte of the return), then with self->partIds to fill one id byte per part; outBuf[0] is the mainPart index */
     void *(*decodeTodPacket)(Unk5CObj *self, void *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3); /* +0x084 func_800449B8; writes the packet's object id, type, flag and length, returns its data pointer. out2/out3 go on the stack (o32 5th/6th arguments) */

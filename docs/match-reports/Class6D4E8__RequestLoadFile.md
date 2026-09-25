@@ -150,7 +150,7 @@ allows.
   prototypes are identical types and nothing conflicts.
 - `self`'s own `+0x58` method-table slot is the identical offset the sibling
   class `D_8006D430` leaves as an unnamed pad in
-  `include/code_171e0.h`'s `Class6D430Methods` ("Class6D430__AllocBuffer's own
+  `include/code_171e0.h`'s `Class6D430Methods` ("Class6D430__LoadFile's own
   slot, unused here"). Rather than editing that shared header — which
   `code_179d8_h.c` and `code_171e0.c` also include —
   this unit keeps its own local view (`Methods6D4E8_C80`/`Obj6D4E8_C80`), per the

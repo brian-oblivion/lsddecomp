@@ -10,7 +10,7 @@ This function is the "get my own method table" accessor for the class whose
 vtable is `D_8006D4E8` (29 slots, header word `0x13`, resolved with
 `tools/classtable.py D_8006D4E8`). Slot map:
 
-- `+0x004` `DestroyChained` (own-class slot, shared with `D_8006D430` at the
+- `+0x004` `Class6D430__Release` (own-class slot, shared with `D_8006D430` at the
   identical offset)
 - `+0x008` `Class6D4E8__Class6D4E8` (ctor, by the project's `+0x008` convention)
 - `+0x00C` `Class6D4E8__Destroy` (dtor)
@@ -21,7 +21,7 @@ vtable is `D_8006D4E8` (29 slots, header word `0x13`, resolved with
 
 Compared against `D_8006D430` (`include/code_171e0.h`'s
 `Class6D430Methods`) with `classtable.py D_8006D4E8 --vs D_8006D430`:
-`DestroyChained` at `+0x004` and `Class6D430__FreeBuffer`/`NoOp`/
+`Class6D430__Release` at `+0x004` and `Class6D430__FreeBuffer`/`NoOp`/
 `Class6D430__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
 between the two tables, strongly suggesting `D_8006D4E8`'s class is a
 subclass or close sibling of `D_8006D430`'s, inheriting the same BasicClass

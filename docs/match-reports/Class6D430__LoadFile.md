@@ -1,4 +1,6 @@
-# Class6D430__AllocBuffer
+# Class6D430__LoadFile
+
+> Renamed from `Class6D430__AllocBuffer` on 2026-09-25 (tools/rename.py). Address 0x80026b08.
 
 > Renamed from `func_80026B08` on 2026-09-18 (tools/rename.py). Address 0x80026b08.
 
@@ -54,7 +56,7 @@ END: epilogue
 ## Final C
 
 ```c
-void Class6D430__AllocBuffer(Class6D430 *this, s32 arg1) {
+void Class6D430__LoadFile(Class6D430 *this, s32 arg1) {
     s32 savedUnk0C;
     s32 size;
     void *newRes;
@@ -140,7 +142,9 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80026B08` | `Class6D430__AllocBuffer` | B |
+| `func_80026B08` | `Class6D430__LoadFile` | B |
+
+**Track 4 (2026-09-25, Class6D430 unification): renamed from `Class6D430__AllocBuffer`, tier A.** The body opens the file named by its argument (`open(this, name, 1, 0)`), seeks to the end for the size (`seek(this, 0, 2)`), allocates that much, rewinds, reads the whole file into `buffer` and closes: it loads a file. It also occupies +0x058, the slot the CD driver fills with `Class6D4E8__LoadFile`. The argument is `char *name`, matching `open`'s.
 
 **Evidence.** `+0x058` slot: a lazy (re)allocation routine. No-ops if
 `this->unk10` is already set; otherwise sizes and commits a new buffer
@@ -187,7 +191,7 @@ table too). Proposed, not renamed:
 | `+0x044` (`slot44`) | `configureBuffer` | C | Called as `(this, arg1, 1, 0)` before sizing; `arg1` is caller-supplied (an identifier or key), the two constants look like a mode/flag pair. Mechanics of the call site known, the callee's behaviour (null here) is not. |
 | `+0x04C` (`slot4C`) | `bufferControl` | C | Called twice with different second/third args -- `(0, 2)` to obtain `size`, `(0, 0)` after a successful alloc -- reading like a generic opcode-style control method rather than a plain getter. |
 | `+0x054` (`slot54`) | `installBuffer` | C | Called as `(this, newRes, size)` right after a successful allocation -- installs/commits the new buffer into whatever subclass-specific bookkeeping exists. |
-| `+0x048` (`slot48`) | `onBufferChanged` | C | Called on both the success and failure paths of this function, and also from `Class6D430__Destroy` -- a notification/finalize hook rather than part of the alloc logic itself. |
+| `+0x048` (`slot48`) | `onBufferChanged` | C | Called on both the success and failure paths of this function, and also from `Class6D430__Finalize` -- a notification/finalize hook rather than part of the alloc logic itself. |
 
 All four are tier C: the CALL SITES are fully derived, but every one of
 these slots is null at `D_8006D430`'s own level, so nothing here confirms
@@ -211,7 +215,7 @@ real arguments.
 ```
 8002780c:  move  s0,a0          <- its own self, only spilled
 80027814:  move  s1,a1          <- its own arg1, only spilled
-80027834:  jal   80026b08 <Class6D430__AllocBuffer>
+80027834:  jal   80026b08 <Class6D430__LoadFile>
 80027838:  nop                  <- no argument setup, in retail
 ```
 

@@ -149,7 +149,7 @@ file it converts `self->pos` to a sector number (`CdPosToInt`), adds
 (CdlSetloc, or queues the seek on the state machine) and returns 0; with
 `mode != 0` it instead returns `self->size` rounded up to a whole sector.
 Outside a dispatch it enqueues op 4 with both arguments. The base-class
-caller agrees with that reading: `Class6D430__AllocBuffer` calls this slot
+caller agrees with that reading: `Class6D430__LoadFile` calls this slot
 as `(0, 2)` to get the size it allocates and `(0, 0)` to rewind before
 reading, the shape of `lseek(fd, 0, SEEK_END)` / `lseek(fd, 0, SEEK_SET)`.
 

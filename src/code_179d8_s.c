@@ -7,7 +7,7 @@
  * Open/Close/Seek/Read/LoadFile share one shape. With the driver in plain
  * synchronous mode (gCdAsyncEnabled and D_8008A860 both 0) each forwards to
  * code_179d8_h.c's blocking OpenCdFile/CloseCdFile/GetCdFileSize/ReadCdFile
- * (LoadFile to the base class's Class6D430__AllocBuffer). Otherwise a call
+ * (LoadFile to the base class's Class6D430__LoadFile). Otherwise a call
  * from outside the queue only enqueues a CD_OP_* request; when
  * RunRequestQueue (slot +0x68, ticked by ServiceCdDriver) dispatches that
  * request back through the same slot with inQueueDispatch set, the method
@@ -320,7 +320,7 @@ s32 Class6D4E8__Read(Class6D4E8 *self, void *buf, u32 size) {
     return 0;
 }
 
-extern void Class6D430__AllocBuffer(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but Class6D4E8__LoadFile passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
+extern void Class6D430__LoadFile(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but Class6D4E8__LoadFile passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
 extern void *gCdSavedSeekParam;
 
 /* A gCdRequestQueue node, 0x24 bytes: this unit's own local view of
@@ -348,7 +348,7 @@ void Class6D4E8__LoadFile(Class6D4E8 *self, char *name) {
     s32 v1;
 
     if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
-        Class6D430__AllocBuffer();
+        Class6D430__LoadFile();
         self->flags |= CD_FLAG_LOAD_FILE_DONE;
         self->methods->setFlag(self);
         return;
