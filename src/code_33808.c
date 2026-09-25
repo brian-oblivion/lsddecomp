@@ -470,7 +470,31 @@ void *func_80044F30(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044F90);
+/* The D_8006F514 object. */
+typedef struct Obj6F514 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ u8 pad2C[4];
+    /* +0x030 */ u16 unk30;
+    /* +0x032 */ u16 unk32;
+    /* +0x034 */ s32 unk34;
+} Obj6F514;
+
+/* D_8006F514 +0x008: constructor -- the active driver's, then this table;
+ * clear +0x34/+0x32, and with no `arg` set +0x30, clear +0x2A and run its
+ * own +0x064. */
+void func_80044F90(Obj6F514 *self, s32 arg) {
+    s32 unused[8];
+
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_800451A8();
+    self->unk34 = 0;
+    self->unk32 = 0;
+    if (arg == 0) {
+        self->unk30 = 1;
+        self->unk2A = 0;
+        self->methods->setFlag((DataSrc33808 *)self);
+    }
+}
 /* D_8006F514 +0x00C: finalize -- free +0x34 and +0x2C, then the active
  * driver's. */
 void func_8004500C(DataSrc33808 *self) {
@@ -479,11 +503,6 @@ void func_8004500C(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F514 +0x064: unless +0x2A is set, slot +0x078 and mark +0x32. */
-typedef struct Obj6F514 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ u8 pad2C[6];
-    /* +0x032 */ u16 unk32;
-} Obj6F514;
 
 void func_80045060(Obj6F514 *self) {
     s32 unused[8];
