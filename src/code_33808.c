@@ -37,7 +37,16 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043954);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800439EC);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B18);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B3C);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B58);
+/* D_8006F13C +0x080: returns entry `index` of the word array at +0x2C
+ * (the first field past the 0x2C-byte Class6D430 base). */
+typedef struct Obj6F13C {
+    /* +0x000 */ u8 pad0[0x2C];
+    /* +0x02C */ s32 *entries;
+} Obj6F13C;
+
+s32 func_80043B58(Obj6F13C *self, s32 index) {
+    return self->entries[index];
+}
 void func_80043B70(void) {
 }
 extern s32 D_8006F13C[];
