@@ -892,6 +892,11 @@
           "class": "TaskCore",
           "date": "2026-09-25",
           "header": "include/TaskCore.h"
+        },
+        "gViewportMethods": {
+          "class": "Viewport",
+          "date": "2026-09-25",
+          "header": "include/Viewport.h"
         }
       },
       "reason": "",
