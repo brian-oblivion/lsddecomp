@@ -152,9 +152,9 @@ extern s32 func_8001F3A4(void *arg0);
 
 /* func_8001F4E4/func_8001F50C (asm/psyq_fa50.s, PsyQ library, not
  * game code): func_8001F4E4 fills a PsyQ-internal global
- * (D_8008B21C, via TmdModel__ComputeBounds) from its own argument; func_8001F50C
- * IGNORES both its arguments and just returns `&D_8008B21C` -- MEASURED,
- * its whole body is `lui/addiu %hi/%lo(D_8008B21C); jr $ra`. Class6B5CC__CheckBoundsOverlap
+ * (gTmdModelBoundsBuf, via TmdModel__ComputeBounds) from its own argument; func_8001F50C
+ * IGNORES both its arguments and just returns `&gTmdModelBoundsBuf` -- MEASURED,
+ * its whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`. Class6B5CC__CheckBoundsOverlap
  * (round 13, code_d294_b) calls the pair as `func_8001F4E4(self->unk20);
  * arr = func_8001F50C(self->unk20, 0);` -- declared here typed to that
  * call site's own use of the result (an array of Sixteen6_d294). */

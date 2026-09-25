@@ -135,7 +135,7 @@ extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
 extern s32 SquareRoot0(s32 a);
 TmdPrim_fa50 *func_80020050(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count);
 extern s32 D_8008AC4C;
-extern s32 D_8008B21C[];
+extern s32 gTmdModelBoundsBuf[];
 extern s32 D_8006BEA0[];
 extern void *BMemPMgrAlloc(s32 size);
 void MarkTmdModelConstructed(Class6BEA0 *self);
@@ -204,10 +204,10 @@ void TmdModel__ComputeBounds(Class6BEA0 *self, Box_fa50 *box) {
     }
 }
 void func_8001F4E4(Class6BEA0 *self) {
-    TmdModel__ComputeBounds(self, (Box_fa50 *)D_8008B21C);
+    TmdModel__ComputeBounds(self, (Box_fa50 *)gTmdModelBoundsBuf);
 }
 void *func_8001F50C(void *self, s32 i) {
-    return D_8008B21C;
+    return gTmdModelBoundsBuf;
 }
 void func_8001F51C(Class6BEA0 *self, Hull_fa50 *out) {
     TypedBox_fa50 b;
