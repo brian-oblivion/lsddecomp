@@ -115,7 +115,18 @@ s32 func_80047240(CdStreamObj *self) {
     SpuSetCommonAttr(&attr);
     return 1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_8004728C);
+void func_8004728C(CdStreamObj *self) {
+    CdStreamObj *cur;
+
+    if (self->unk2C != 0) {
+        cur = D_8008A950;
+        if (cur == self) {
+            cur->methods->slot54(cur);
+            cur->unk2C = 0;
+            D_8008A950 = NULL;
+        }
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800472EC);
 void func_80047388(u8 status, u8 *result) {
     if (D_8008A950 != NULL && status == 2) {
