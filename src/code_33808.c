@@ -57,7 +57,24 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043068);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800431A8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043200);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800434DC);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043538);
+/* D_8006F0B8 +0x078: set entry `index`'s shift, and its mask from it. */
+typedef struct Ent6F0B8 {
+    /* +0x00 */ u16 shift;
+    /* +0x02 */ u16 mask;
+    /* +0x04 */ u8 pad4[0xC];
+} Ent6F0B8;
+
+typedef struct Obj6F0B8 {
+    /* +0x000 */ u8 pad0[0x40];
+    /* +0x040 */ Ent6F0B8 entries[1];
+} Obj6F0B8;
+
+void func_80043538(Obj6F0B8 *self, s32 index, s32 shift) {
+    Ent6F0B8 *e = &self->entries[index];
+
+    e->shift = shift;
+    e->mask = 1 << e->shift;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004355C);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800435D0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043648);
