@@ -436,7 +436,20 @@ void func_80042820(Class6B5CC *self, void *sender, s32 event) {
 void *func_80042828(ChildArrayObj_322b4 *self, s32 index) {
     return self->children[index];
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004283C);
+/* D_8006EFAC slot +0x0BC: set the ambient colour (swapping the old one out
+ * into *rgb when asked) and hand it to GsSetAmbient. */
+void func_8004283C(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
+    SpriteRgb old;
+
+    if (swap) {
+        old = self->ambient;
+        self->ambient = *rgb;
+        *rgb = old;
+    } else {
+        self->ambient = *rgb;
+    }
+    GsSetAmbient((u8)self->ambient.r << 4, (u8)self->ambient.g << 4, (u8)self->ambient.b << 4);
+}
 /* Returns the D_8006EFAC method table. */
 void *func_800428E4(void) {
     return D_8006EFAC;
