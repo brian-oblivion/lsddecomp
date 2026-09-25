@@ -244,7 +244,7 @@ void Entity__MoodCue91(Entity *this, EntityMoodHandlerArg *out) {
     } else {
         if (this->unk84 == 0) {
             do {
-                this->unk88 = this->methods->slot134(this, this->unk88, 0);
+                this->todFramePtr = this->methods->applyTodFrame(this, this->todFramePtr, 0);
                 this->unk84 += 1;
             } while (this->unk84 < 0x18);
         }
@@ -270,7 +270,7 @@ void Entity__MoodCue92(Entity *this, EntityMoodHandlerArg *out) {
             this->target->methods->slot130(this->target, 1);
         } else if (this->unk84 == 0) {
             do {
-                this->unk88 = this->methods->slot134(this, this->unk88, 0);
+                this->todFramePtr = this->methods->applyTodFrame(this, this->todFramePtr, 0);
                 this->unk84 += 1;
             } while (this->unk84 < 0x18);
         }
