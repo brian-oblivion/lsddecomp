@@ -7,7 +7,7 @@
 ## Source
 
 ```c
-extern u8 D_8006D574[8];
+extern u8 gCdSeekLoc[8];
 extern void *gCdSeekParam;
 extern s32 gCdTickStep;
 
@@ -33,14 +33,14 @@ s32 Class6D4E8__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
                 s0tmp = s0tmp + 1;
             }
             v0 = CdPosToInt(self->unk18);
-            CdIntToPos(v0 + s0tmp, D_8006D574);
+            CdIntToPos(v0 + s0tmp, gCdSeekLoc);
             if (arg2 == 0) {
                 if (gCdAsyncEnabled != 0) {
-                    gCdSeekParam = D_8006D574 - 0x14;
+                    gCdSeekParam = gCdSeekLoc - 0x14;
                     gCdTickStep = 1;
                 } else {
                     do {
-                        CdControl(2, D_8006D574, 0);
+                        CdControl(2, gCdSeekLoc, 0);
                         do {
                             v0 = CdSync(0, 0);
                         } while (v0 == 0);
@@ -115,10 +115,10 @@ passed to `CdPosToInt`) and `self->unk1C` is a `u32` byte-length field
 (rounded up to a 0x800-byte sector boundary, same formula as
 `GetCdFileSize`'s own `((self->unk1C >> 11) + 1) << 11`, code_179d8_h.c) --
 this is the SAME struct as `ObjA34_179D8H` there, and that unit already
-names offset 0x1C the same way, independently. `D_8006D574` is an 8-byte
+names offset 0x1C the same way, independently. `gCdSeekLoc` is an 8-byte
 zero-initialized buffer (`asm/data/5DB70.data.s`); this function only ever
 takes its address, so it's declared as a plain byte array locally.
-`gCdSeekParam = D_8006D574 - 0x14` matches `code_179d8_r.c`'s existing reads of
+`gCdSeekParam = gCdSeekLoc - 0x14` matches `code_179d8_r.c`'s existing reads of
 that global (`(u8 *)gCdSeekParam + 0x14`) -- the same pointer, offset the other
 direction.
 

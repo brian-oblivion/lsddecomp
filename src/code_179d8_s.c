@@ -168,7 +168,7 @@ void Class6D4E8__Close(Obj80027480 *self) {
     UnlockCd();
 }
 
-extern u8 D_8006D574[8];
+extern u8 gCdSeekLoc[8];
 extern void *gCdSeekParam;
 extern s32 gCdTickStep;
 
@@ -194,14 +194,14 @@ s32 Class6D4E8__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
                 s0tmp = s0tmp + 1;
             }
             v0 = CdPosToInt(&self->unk18);
-            CdIntToPos(v0 + s0tmp, D_8006D574);
+            CdIntToPos(v0 + s0tmp, gCdSeekLoc);
             if (arg2 == 0) {
                 if (gCdAsyncEnabled != 0) {
-                    gCdSeekParam = D_8006D574 - 0x14;
+                    gCdSeekParam = gCdSeekLoc - 0x14;
                     gCdTickStep = 1;
                 } else {
                     do {
-                        CdControl(2, D_8006D574, 0);
+                        CdControl(2, gCdSeekLoc, 0);
                         do {
                             v0 = CdSync(0, 0);
                         } while (v0 == 0);

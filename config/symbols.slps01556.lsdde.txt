@@ -2434,3 +2434,4 @@ Class6D4E8__NoOpSlot50 = 0x800276C8; // type:func
 Class6D4E8__Read = 0x800276D0; // type:func
 Class6D4E8__LoadFile = 0x80027800; // type:func
 Class6D4E8__RunRequestQueue = 0x80027A24; // type:func
+gCdSeekLoc = 0x8006D574;
