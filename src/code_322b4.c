@@ -189,7 +189,10 @@ void *func_800423F0(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042400);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042450);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800424A8);
+/* D_8006EF50 slot +0x00C (finalize): the BasicClass finalize. */
+void func_800424A8(BasicClass *self) {
+    Get_vtable_BasicClass()->finalize(self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800424E0);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042550);
 /* D_8006EF50 slot +0x040 (reset). */
