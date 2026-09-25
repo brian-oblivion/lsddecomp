@@ -219,7 +219,13 @@ void *func_80041C9C(void *a1, void *a2, void *a3) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041D18);
+/* D_8006ED4C slot +0x008 (ctor): the Sprite ctor with abr 0 and arg4 NULL,
+ * install the table, then reset. */
+void func_80041D18(Sprite *self, void *texture, SpriteRect *rect, s32 arg3) {
+    GetSpriteMethods()->ctor(self, texture, 0, rect, NULL, arg3);
+    self->methods = func_80041ED8();
+    self->methods->reset(self);
+}
 /* D_8006ED4C slot +0x040 (reset): empty override. */
 void func_80041DA4(Class6B5CC *self) {
 }
