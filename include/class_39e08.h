@@ -2,6 +2,7 @@
 #define CLASS_39E08_H
 
 #include "common.h"
+#include "IntermediateBase.h"
 
 /* Round 73 head correction: slots +0x058..+0x06C (Noop58, CheckTimeout,
  * OnEventArg, SetTimeout) sit at the same offsets in BOTH gClass86668Methods
@@ -19,7 +20,7 @@
  * to see the override set), plus a sibling table gClass86668Methods
  * (`Class86668`, 28 slots, named by class_3ac78.c which reached it first)
  * whose instances share `Obj865C8`'s own layout. Both extend the shared
- * `IntermediateBase`/`Obj86B60` base (code_2cc8c_c.c / code_2cc8c.h). No
+ * `IntermediateBase` base (include/IntermediateBase.h). No
  * FirecatFG name survives for either class, so fields are named by offset
  * until real names are known.
  *
@@ -296,7 +297,7 @@ struct Obj865C8 {
     u8 pad04[0x0C - 0x04];
     Obj0C *unk0C;                 /* +0x00C, Obj865C8__Deinit dereferences (->unk4); passed
                                       through as a plain register value to
-                                      Get_vtable_IntermediateBase()->slot44's 2nd arg by Obj865C8__EnterState2 */
+                                      unk4C->methods->slot44's 2nd arg (IntermediateBase's init slot) by Obj865C8__EnterState2 */
     s32 unk10;                    /* +0x010, Obj865C8__Deinit (2nd arg to a slot14 call) */
     u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, Obj865C8__RunSubUpdates */
@@ -321,7 +322,7 @@ struct Obj865C8 {
     SubObjB *subB;                /* +0x034, Class86668__Dtor */
     SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
                                        through as a plain register value to
-                                       Get_vtable_IntermediateBase()->slot44's 3rd arg by Obj865C8__EnterState2 */
+                                       unk4C->methods->slot44's 3rd arg (IntermediateBase's init slot) by Obj865C8__EnterState2 */
     /* +0x03C. Renamed from `unk3C`: the class's own small state machine
      * (0/1/2/3), reset by Obj865C8__ResetState and advanced by
      * Obj865C8__AdvanceState/Obj865C8__OnTag2Notify. */
@@ -337,32 +338,8 @@ struct Obj865C8 {
     Obj4C *unk4C;                 /* +0x04C, Obj865C8__EnterState2 -- result of New_ObjM */
 };
 
-/* Base class table shared by D_800865C8 and gClass86668Methods (resolved with
- * tools/classtable.py 0x800865C8 --vs 0x8006E878). Only the slots this
- * unit's functions dispatch through when explicitly calling the BASE
- * implementation are typed. */
-typedef struct IntermediateBaseMethods {
-    u8 pad00[0x008];
-    void *(*ctor)(void *self);             /* +0x008, called by Class86668__Class86668 with only `self` set up */
-    void (*dtor)(void *self);              /* +0x00C */
-    u8 pad10[0x44 - 0x10];
-    /* Same accessor/slot combination code_2c054.h calls
-     * `TaskUtilMethods::slot44` on -- there it forwards to
-     * `self->unk38 = <base result>` (TaskCoreObj__func_8003C1DC). Here the caller
-     * (Class86668__Init, gClass86668Methods's own +0x044 override) zeroes
-     * `self->eventCode` immediately before the call and reads it back
-     * immediately after: same "default, then base may overwrite" shape. */
-    void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
-    void (*slot48)(void *self);            /* +0x048 */
-    u8 pad4C[0x5C - 0x4C];
-    void (*slot5C)(void *self, s32 arg1, s32 arg2); /* +0x05C, called by Class86668__CheckTimeout */
-    void (*slot60)(void *self, s32 arg1);  /* +0x060 */
-} IntermediateBaseMethods;
-
-/* Uncarved (asm/code_2cc8c.s, not this unit's to write): a plain accessor
- * with no parameters, returning &gIntermediateBaseMethods. Same shape as
- * Get_vtable_DreamSys / GetClass6D3C8Methods (docs/research/class-framework.md). */
-extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);
+/* The base class of D_800865C8 and gClass86668Methods is IntermediateBase
+ * (gIntermediateBaseMethods): include/IntermediateBase.h (track 4). */
 
 /* Allocator in the still-uncarved unit class_3bb8c (asm/class_3bb8c.s):
  * allocates an 0x88-byte instance, ctors it, and dispatches its own slot
