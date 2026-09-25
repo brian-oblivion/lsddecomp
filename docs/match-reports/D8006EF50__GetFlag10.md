@@ -1,4 +1,6 @@
-# func_8004266C -- MATCHED (3/3 words), round 82
+# D8006EF50__GetFlag10 -- MATCHED (3/3 words), round 82
+
+> Renamed from `func_8004266C` on 2026-09-25 (tools/rename.py). Address 0x8004266c.
 
 Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
@@ -16,7 +18,7 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 ```c
 /* D_8006EF50 slot +0x054. */
-s32 func_8004266C(D_8006EF50Obj *self) {
+s32 D8006EF50__GetFlag10(D_8006EF50Obj *self) {
     return self->unk10;
 }
 ```
