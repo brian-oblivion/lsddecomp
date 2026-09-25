@@ -213,7 +213,25 @@ void func_80039E7C(SeqObj *self, s32 arg) {
         }
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_80039F64);
+void func_80039F64(SeqObj *self, s32 arg) {
+    if (self->playing != 0) {
+        self->methods->stop(self);
+    }
+    if (self->unkC != NULL) {
+        self->unkC->methods->release((BasicClass *)self->unkC);
+        self->unkC = NULL;
+    }
+    if (arg != 0) {
+        self->unkC = New_VabStreamObj(arg);
+        if (func_80039C04(self)) {
+            if (self->unk20 != 0) {
+                self->methods->play(self);
+            }
+        } else if (self->state == 0) {
+            self->state = 1;
+        }
+    }
+}
 SeqObjMethods *func_8003A04C(void) {
     return &D_8006E48C;
 }
