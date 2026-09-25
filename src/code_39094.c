@@ -7,9 +7,10 @@
  * and helpers called only from Class6D3C8, Obj865C8 and ObjM code (stream
  * tasks, the intro logo sequence).
  *
- * Round 82 matched twenty: the allocator, ctor/finalize and small methods of
- * D_80081940, and the record accessors. The eight larger bodies left are
- * still INCLUDE_ASM.
+ * Round 82 matched all 28: the allocator, ctor/finalize and methods of
+ * D_80081940 (a file-streaming state machine: state 9 = header load, state
+ * 10 = data block load, both completed in the setFlag override), and the
+ * record accessors and random pickers over func_80048D48's table.
  */
 #include "common.h"
 #include "Class6D430.h"
@@ -22,8 +23,8 @@ typedef struct D_80081940Obj D_80081940Obj;
 typedef struct D_80081940Methods {
     CLASS6D430_SLOTS(D_80081940Obj, (D_80081940Obj *self));
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ void *slot80;
-    /* +0x084 */ void (*releaseAlloc)(D_80081940Obj *self);  /* func_80048C98 */
+    /* +0x080 */ s32 (*slot80)();  /* func_80048BC0(self); unprototyped: func_800489B4 calls it with no argument */
+    /* +0x084 */ void (*releaseAlloc)();  /* func_80048C98(self); unprototyped: func_80048BC0 calls it with no argument */
 } D_80081940Methods;
 
 /* The D_80081940 object: a Class6D430 data source with its own fields from
@@ -80,7 +81,24 @@ void func_80048960(D_80081940Obj *self) {
     self->methods->releaseAlloc(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800489B4);
+/* slot +0x064 of D_80081940 (setFlag) */
+void func_800489B4(D_80081940Obj *self) {
+    if (self->unk2A == 9) {
+        if (self->flags & 0x80) {
+            self->unk2A = 0;
+            self->unk2C = 1;
+            if (self->unk38 != 0) {
+                self->methods->slot80();
+            }
+        }
+    } else if (self->unk2A == 10) {
+        if (self->flags & 0x80) {
+            self->unk2E = 1;
+            self->unk2A = 0;
+        }
+    }
+    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+}
 /* slot +0x074 of D_80081940 (cancelRequests) */
 void func_80048A68(D_80081940Obj *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
@@ -88,13 +106,54 @@ void func_80048A68(D_80081940Obj *self) {
     self->unk2E = 0;
     self->unk2A = 0;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048AAC);
+/* slot +0x078 of D_80081940: start streaming a file into the buffer */
+void func_80048AAC(D_80081940Obj *self, char *name) {
+    if (self->buffer != NULL && name != NULL) {
+        if (self->unk2A == 0) {
+            self->unk2C = 0;
+        } else {
+            self->methods->cancelRequests(self);
+        }
+        self->unk2A = 9;
+        self->methods->close(self);
+        self->methods->open(self, name, 1, 0);
+        self->methods->read(self, self->buffer, 0xB358);
+    }
+}
 void func_80048B78(D_80081940Obj *self) {
     self->methods->freeBuffer(self);
     self->unk2C = 0;
     self->unk30 = -1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048BC0);
+/* The header at the start of D_80081940's 0xB358 buffer (local view). */
+typedef struct StreamHdr {
+    /* +0x00 */ u16 unk0;
+    /* +0x02 */ u16 hasData;
+    /* +0x04 */ u8 pad4[0xC];
+    /* +0x10 */ u32 dataOffset;
+    /* +0x14 */ s32 dataSize;
+} StreamHdr;
+
+/* slot +0x080 of D_80081940: load the data block the header describes */
+s32 func_80048BC0(D_80081940Obj *self) {
+    s32 size;
+    if (((StreamHdr *)self->buffer)->hasData == 0) {
+        return 0;
+    }
+    if (self->unk2A != 0) {
+        return 0;
+    }
+    self->methods->releaseAlloc();
+    size = ((StreamHdr *)self->buffer)->dataSize;
+    self->unk34 = BMemPMgrAlloc(size);
+    if (self->unk34 == NULL) {
+        return 0;
+    }
+    self->unk2A = 10;
+    self->methods->seek(self, ((StreamHdr *)self->buffer)->dataOffset, 0);
+    self->methods->read(self, self->unk34, size);
+    return 1;
+}
 /* slot +0x084 of D_80081940 */
 void func_80048C98(D_80081940Obj *self) {
     self->unk2E = 0;
@@ -172,11 +231,29 @@ Rec1C *func_80048E2C(s32 index) {
 Rec1C *func_80048E80(s32 index) {
     return func_80048E2C(index);
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048EA0);
+Rec1C *func_80048EA0(s32 index, s32 arg1, s32 day) {
+    s32 n = ((day - 1) % 40) / 10 + 1;
+    s32 r = func_80048CFC(0, arg1) % n;
+    return &func_80048E80(index)[r];
+}
 Rec1C *func_80048F60(s32 index) {
     return &func_80048E2C(index)[4];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048F84);
+Rec1C *func_80048F84(s32 index) {
+    s32 unused;
+    u32 r = (u32)func_80048CFC(0, unused) % 5;
+    Rec1C *rec;
+    if (index == 9) {
+        if (r == 2) {
+            r = 3;
+        }
+        if (D_8008A968 == 3) {
+            D_8008A968 = 4;
+        }
+    }
+    rec = func_80048F60(index);
+    return &rec[D_8008A968 != 0 ? D_8008A968 - 1 : r];
+}
 Rec1C *func_8004903C(s32 index) {
     return &func_80048E2C(index)[9];
 }
@@ -198,7 +275,16 @@ Rec1C *func_80049110(s32 *countOut) {
     }
     return &((Rec1C *)func_80048D48(NULL))[0x230];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_8004913C);
+Rec1C *func_8004913C(s32 *countOut) {
+    s32 unused;
+    u32 r = (u32)func_80048CFC(0, unused) % 7;
+    s32 count;
+    Rec1C *rec = func_80049110(&count);
+    if (countOut != NULL) {
+        *countOut = r + count;
+    }
+    return &rec[r];
+}
 Rec1C *func_800491CC(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 7;
@@ -234,8 +320,39 @@ Rec1C *func_800492D0(s32 *countOut, s32 n) {
     }
     return &rec[n * 6];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049334);
+/* two s16 halves passed by value in one register */
+typedef struct RecPick {
+    s16 group;
+    s16 sub;
+} RecPick;
+
+Rec1C *func_80049334(s32 *countOut, RecPick pick) {
+    s32 count;
+    Rec1C *rec;
+    if (pick.group >= 0) {
+        rec = func_800492D0(&count, pick.group);
+        if (countOut != NULL) {
+            *countOut = ((u16)pick.sub < 2) ? pick.sub + count : -1;
+        }
+        return &rec[pick.sub];
+    }
+    return func_80049270(countOut, pick.sub);
+}
 s32 func_800493C8(s32 index) {
     return D_80086170[index];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800493E4);
+Rec1C *func_800493E4(s32 *total, s32 n, s32 len) {
+    s32 count;
+    s32 i;
+    s32 start;
+    Rec1C *rec = func_800492D0(&count, n);
+    len *= 2;
+    *total = 0;
+    start = count;
+    len += start;
+    for (i = start; i < len; i++) {
+        *total += D_80086170[i] + 10;
+    }
+    *total -= 10;
+    return rec;
+}
