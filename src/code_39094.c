@@ -3,14 +3,26 @@
  * revision 18). 0x39094..0x39C80 (vram 0x80048894..0x80049480). It was counted
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: the methods of D_80081940
- * and helpers called only from Class6D3C8, Obj865C8 and ObjM code (stream
- * tasks, the intro logo sequence).
+ * those, and no Sony fingerprint). All 38 functions matched round 82 (three
+ * echo sessions); named round 82 (bravo). Two independent groups of code:
  *
- * Round 82 matched all 28: the allocator, ctor/finalize and methods of
- * D_80081940 (a file-streaming state machine: state 9 = header load, state
- * 10 = data block load, both completed in the setFlag override), and the
- * record accessors and random pickers over GetRecordTable's table.
+ * 1. DataSrc39094 (method table D_80081940, unrenamed -- only the getter is
+ *    named, per this project's convention for a Class6D430 subclass with no
+ *    established in-game role): a file-streaming state machine that loads a
+ *    header block into its own 0xB358 buffer (state 9, DataSrc39094__LoadHeader),
+ *    then, once flagged complete (DataSrc39094__SetFlag), an optional data
+ *    block the header describes into a second allocation (state 10,
+ *    DataSrc39094__LoadDataBlock/dataBuffer), auto-triggered unless disabled
+ *    via DataSrc39094__SetAutoLoadData.
+ * 2. Free functions over gRecordTable, a table of 0x230+ fixed 0x1C-byte
+ *    records (Rec1C): random-or-forced pickers (SeedAndRandom,
+ *    SetPickOverrides/gForcedWeeklyGroup/gForcedVariant), record-group
+ *    accessors indexed by gRecordIndexTable and, for GetGridRecordXY, by
+ *    StageGrid.h's cell columns, and a family of "stream channel" lookups
+ *    (GetIntroStreamName, PickWeeklyStreamChannel, GetStreamChannelInit,
+ *    ResolveCinematicChannel, GetGraphRoomStreamChannel) whose shapes match
+ *    their exact call sites in code_1677c.c one for one. The records' own
+ *    fields and the channels' in-game meaning are not established.
  */
 #include "common.h"
 #include "Class6D430.h"
