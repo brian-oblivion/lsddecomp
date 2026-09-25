@@ -107,11 +107,20 @@ u32 func_800434DC(Class6D430 *self) {
     }
     return max;
 }
+/* A three-byte vector. */
+typedef struct Vec3S8 {
+    s8 x;
+    s8 y;
+    s8 z;
+} Vec3S8;
+
 /* D_8006F0B8 +0x078: set entry `index`'s shift, and its mask from it. */
 typedef struct Ent6F0B8 {
     /* +0x00 */ u16 shift;
     /* +0x02 */ u16 mask;
-    /* +0x04 */ u8 pad4[0xC];
+    /* +0x04 */ u8 pad4[8];
+    /* +0x0C */ Vec3S8 vec;
+    /* +0x0F */ u8 padF;
 } Ent6F0B8;
 
 typedef struct Obj6F0B8 {
@@ -139,7 +148,19 @@ void func_8004355C(DataSrc33808 *self, s32 arg) {
     }
     UnlockActiveDataSource();
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800435D0);
+/* D_8006F0B8 +0x080: under the data-source lock, set entry `index`'s
+ * three-byte vector and hand the entry to func_80043648. */
+void func_80043648(Ent6F0B8 *entry, s32 index);
+
+void func_800435D0(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
+    Ent6F0B8 *e;
+
+    LockActiveDataSource();
+    e = &self->entries[index];
+    e->vec = *src;
+    func_80043648(e, index);
+    UnlockActiveDataSource();
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043648);
 extern s32 D_8006F0B8[];
 
@@ -158,8 +179,46 @@ void *func_80043840(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800438B0);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043954);
+/* A data source's construction descriptor: an existing buffer to adopt, or
+ * a file name to request. */
+typedef struct Src6F240 {
+    /* +0x00 */ void *buffer;
+    /* +0x04 */ char *name;
+} Src6F240;
+
+/* D_8006F13C +0x008: constructor -- the active driver's, then this table;
+ * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
+ * nonzero result fails the construction (NULL), or else request its file. */
+void *func_800438B0(DataSrc33808 *self, Src6F240 *src) {
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_80043B78();
+    if (src != NULL) {
+        if (src->buffer != NULL) {
+            self->buffer = src->buffer;
+            self->bufferSize = 0;
+            if (((s32 (*)())self->methods->setFlag)(self)) {
+                goto fail;
+            }
+        } else {
+            self->methods->requestLoadFile(self, src->name);
+        }
+    }
+    return self;
+fail:
+    return NULL;
+}
+/* D_8006F13C +0x00C: finalize -- release every object in the NULL-ended
+ * array at +0x2C, free the array, then the active driver's. */
+void func_80043954(DataSrc33808 *self) {
+    DataSrc33808 **objs = (DataSrc33808 **)self->unk2C;
+
+    while (*objs != NULL) {
+        (*objs)->methods->release(*objs);
+        objs++;
+    }
+    BMemPMgrFree((void *)self->unk2C);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800439EC);
 /* LIBGS.H: void GsMapModelingData(unsigned long *p); */
 void GsMapModelingData(u32 *p);
@@ -209,7 +268,18 @@ void *func_80043B88(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043BE8);
+/* D_8006F1C4 +0x008: constructor -- the active driver's, then this table,
+ * clear +0x2C/+0x30/+0x38, and request `name` when there is one. */
+void func_80043BE8(DataSrc33808 *self, char *name) {
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_80043E74();
+    self->unk2C = 0;
+    self->unk30 = NULL;
+    self->unk38 = 0;
+    if (name != NULL) {
+        self->methods->requestLoadFile(self, name);
+    }
+}
 /* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
 void func_80043C60(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
@@ -217,7 +287,17 @@ void func_80043C60(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043CB8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043DFC);
+/* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
+ * (+0x2C entries). */
+void func_80043DFC(DataSrc33808 *self) {
+    DataSrc33808 **objs = (DataSrc33808 **)self->unk30;
+    s32 i;
+
+    for (i = 0; i < self->unk2C; i++) {
+        ((void (*)())(*objs)->methods->slot78)(*objs);
+        objs++;
+    }
+}
 extern s32 D_8006F1C4[];
 
 void *func_80043E74(void) {
@@ -233,7 +313,20 @@ void *func_80043E84(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043EE4);
+/* D_8006F240 +0x008: constructor -- the active driver's, then this table;
+ * adopt a buffer handed in (size 0) and run its own +0x064, or else request
+ * the named file. */
+void func_80043EE4(DataSrc33808 *self, Src6F240 *src) {
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_800441A4();
+    if (src->buffer != NULL) {
+        self->buffer = src->buffer;
+        self->bufferSize = 0;
+        self->methods->setFlag(self);
+    } else {
+        self->methods->requestLoadFile(self, src->name);
+    }
+}
 /* D_8006F240 +0x00C: finalize, straight to the active driver's. */
 void func_80043F78(Class6D430 *self) {
     GetActiveDataSourceMethods()->finalize(self);
@@ -270,17 +363,13 @@ void *func_800441B4(s32 arg0, s32 arg1) {
     }
     return NULL;
 }
-/* A three-byte vector, and the D_8006F2C4 object (a Class6B5CC subclass). */
-typedef struct Vec3S8 {
-    s8 x;
-    s8 y;
-    s8 z;
-} Vec3S8;
-
+/* The D_8006F2C4 object (a Class6B5CC subclass). */
 typedef struct Obj6F2C4 {
     CLASS6B5CC_FIELDS(Class6B5CCMethods);
     /* +0x044 */ u8 pad44[0x10];
     /* +0x054 */ Vec3S8 unk54;
+    /* +0x057 */ u8 pad57[0xD];
+    /* +0x064 */ s32 unk64;   /* 20.12 fixed point */
 } Obj6F2C4;
 
 /* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
@@ -291,7 +380,25 @@ void func_80044220(Obj6F2C4 *self, s32 arg1, s32 arg2) {
     ((void (*)())self->methods->reset)(self, arg1, arg2);
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044380);
+/* D_8006F2C4 +0x044: the ratio of two halfwords of `src` (+0x08 over
+ * +0x0A) in 20.12 fixed point, stored at +0x64 when `set`, else added. */
+typedef struct Ratio44380 {
+    /* +0x00 */ u8 pad0[8];
+    /* +0x08 */ s16 num;
+    /* +0x0A */ s16 den;
+} Ratio44380;
+
+void func_80044380(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
+    s32 num = src->num;
+    s32 den = src->den;
+    s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
+
+    if (set) {
+        self->unk64 = v;
+    } else {
+        self->unk64 += v;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004441C);
 /* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
  * three-byte vector to +0x54. */
@@ -319,7 +426,27 @@ void *func_8004468C(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800446FC);
+/* D_8006F384 +0x008: constructor -- the active driver's, then this table,
+ * `owns` at +0x34; adopt the descriptor's buffer (size 0) and run its own
+ * +0x064, whose nonzero result fails the construction (NULL), or else
+ * request its file. */
+void *func_800446FC(DataSrc33808 *self, Src6F240 *src, s32 owns) {
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_800449FC();
+    self->unk34 = owns;
+    if (src->buffer != NULL) {
+        self->buffer = src->buffer;
+        self->bufferSize = 0;
+        if (((s32 (*)())self->methods->setFlag)(self)) {
+            goto fail;
+        }
+    } else {
+        self->methods->requestLoadFile(self, src->name);
+    }
+    return self;
+fail:
+    return NULL;
+}
 /* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
 void func_800447B4(DataSrc33808 *self) {
     self->methods->slot7C();
@@ -330,8 +457,54 @@ void func_80044808(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
     ((s32 (*)())self->methods->slot78)(self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044858);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800448F8);
+/* D_8006F384 +0x078: when +0x34 is set, build a D_8006F13C source over the
+ * buffer's sub-block (at the offset in its third word) and a D_8006F590 one
+ * over the buffer past +0x0C, into +0x2C and +0x30; 0 when both exist,
+ * otherwise slot +0x07C (release) and 1. */
+typedef struct Req44858 {
+    /* +0x00 */ void *buffer;
+    /* +0x04 */ s32 unk4;
+    /* +0x08 */ s32 unk8;
+} Req44858;
+
+typedef struct Buf44858 {
+    /* +0x00 */ u8 pad0[8];
+    /* +0x08 */ s32 offset;
+} Buf44858;
+
+extern void *SetVec3();
+
+s32 func_80044858(DataSrc33808 *self) {
+    Req44858 req;
+
+    if (self->unk34 != 0) {
+        SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
+        self->unk2C = (s32)func_80043840((s32)&req);
+        if ((void *)self->unk2C != NULL) {
+            req.buffer = (u8 *)self->buffer + 0xC;
+            self->unk30 = func_800451B8((s32)&req);
+            if (self->unk30 != NULL) {
+                return 0;
+            }
+            self->unk30 = NULL;
+        }
+        self->methods->slot7C(self);
+        return 1;
+    }
+    return 0;
+}
+/* D_8006F384 +0x07C: when +0x34 is set, release the objects at +0x30 and
+ * +0x2C (each when there is one). */
+void func_800448F8(DataSrc33808 *self) {
+    if (self->unk34 != 0) {
+        if (self->unk30 != NULL) {
+            self->unk30->methods->release(self->unk30);
+        }
+        if ((DataSrc33808 *)self->unk2C != NULL) {
+            ((DataSrc33808 *)self->unk2C)->methods->release((DataSrc33808 *)self->unk2C);
+        }
+    }
+}
 /* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
 u8 func_8004497C(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return ((s32 (*)())self->unk30->methods->slot78)(self->unk30, arg1, arg2);
@@ -357,7 +530,19 @@ void *func_80044A0C(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A7C);
+/* D_8006F40C +0x008: constructor -- the parent D_8006F384's (third argument
+ * 0), then this table; when the argument's first word is set, its own
+ * +0x064 runs, and a nonzero result fails the construction (NULL). */
+void *func_80044A7C(DataSrc33808 *self, s32 *arg) {
+    ((Ctor33808 *)func_800449FC())->ctor(self, arg, 0);
+    self->methods = func_80044CC4();
+    if (*arg != 0) {
+        if (((s32 (*)())self->methods->setFlag)(self)) {
+            return NULL;
+        }
+    }
+    return self;
+}
 /* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
 void func_80044B04(DataSrc33808 *self) {
     self->methods->slot7C();
@@ -399,18 +584,43 @@ void *func_80044CD4(s32 arg0, s32 arg1) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044D40);
+/* The D_8006F498 object. */
+typedef struct Obj6F498 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ u8 unk2C;
+    /* +0x02D */ u8 unk2D;
+    /* +0x02E */ u16 unk2E;
+    /* +0x030 */ u16 unk30;
+    /* +0x032 */ u8 pad32[2];
+    /* +0x034 */ s32 unk34;
+    /* +0x038 */ u16 *unk38;
+    /* +0x03C */ s32 unk3C;       /* an object: its +0x2C is read */
+    /* +0x040 */ u16 unk40;
+    /* +0x042 */ u16 unk42;
+} Obj6F498;
+
+/* D_8006F498 +0x008: constructor -- the active driver's, then this table;
+ * store `arg2` at +0x3C, clear +0x42, and with no `arg1` set +0x40, clear
+ * +0x2A and run its own +0x064. */
+void func_80044D40(Obj6F498 *self, s32 arg1, s32 arg2) {
+    s32 unused[8];
+
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_80044F20();
+    self->unk3C = arg2;
+    self->unk42 = 0;
+    if (arg1 == 0) {
+        self->unk40 = 1;
+        self->unk2A = 0;
+        self->methods->setFlag((DataSrc33808 *)self);
+    }
+}
 /* D_8006F498 +0x00C: finalize -- free +0x38, then the active driver's. */
 void func_80044DC8(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk38);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
-typedef struct Obj6F498 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ u8 pad2C[0x16];
-    /* +0x042 */ u16 unk42;
-} Obj6F498;
 
 void func_80044E10(Obj6F498 *self) {
     if (self->unk2A == 0) {
@@ -418,7 +628,33 @@ void func_80044E10(Obj6F498 *self) {
         self->unk42 = 1;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044E64);
+/* D_8006F498 +0x078: copy +0x2C of the object at +0x3C to +0x34; when +0x40
+ * is set, lay out a 20 x 15 grid (16 x 16 cells) and fill an allocated
+ * index table 0..n-1 at +0x38; otherwise, or when the allocation fails,
+ * free the buffer (own +0x05C). */
+void func_80044E64(Obj6F498 *self) {
+    s32 n;
+    s32 i;
+    u16 *p;
+
+    self->unk34 = ((DataSrc33808 *)self->unk3C)->unk2C;
+    if (self->unk40 != 0) {
+        self->unk2E = 20;
+        self->unk2C = 16;
+        self->unk2D = 16;
+        self->unk30 = 15;
+        n = self->unk2E * self->unk30;
+        self->unk38 = BMemPMgrAlloc(n * 2);
+        if (self->unk38 != NULL) {
+            p = self->unk38;
+            for (i = 0; i < n; i++) {
+                *p++ = i;
+            }
+            return;
+        }
+    }
+    self->methods->freeBuffer((DataSrc33808 *)self);
+}
 extern s32 D_8006F498[];
 
 void *func_80044F20(void) {
@@ -434,7 +670,31 @@ void *func_80044F30(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044F90);
+/* The D_8006F514 object. */
+typedef struct Obj6F514 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ u8 pad2C[4];
+    /* +0x030 */ u16 unk30;
+    /* +0x032 */ u16 unk32;
+    /* +0x034 */ s32 unk34;
+} Obj6F514;
+
+/* D_8006F514 +0x008: constructor -- the active driver's, then this table;
+ * clear +0x34/+0x32, and with no `arg` set +0x30, clear +0x2A and run its
+ * own +0x064. */
+void func_80044F90(Obj6F514 *self, s32 arg) {
+    s32 unused[8];
+
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_800451A8();
+    self->unk34 = 0;
+    self->unk32 = 0;
+    if (arg == 0) {
+        self->unk30 = 1;
+        self->unk2A = 0;
+        self->methods->setFlag((DataSrc33808 *)self);
+    }
+}
 /* D_8006F514 +0x00C: finalize -- free +0x34 and +0x2C, then the active
  * driver's. */
 void func_8004500C(DataSrc33808 *self) {
@@ -443,11 +703,6 @@ void func_8004500C(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F514 +0x064: unless +0x2A is set, slot +0x078 and mark +0x32. */
-typedef struct Obj6F514 {
-    CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ u8 pad2C[6];
-    /* +0x032 */ u16 unk32;
-} Obj6F514;
 
 void func_80045060(Obj6F514 *self) {
     s32 unused[8];
@@ -475,7 +730,19 @@ void *func_800451B8(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045228);
+/* D_8006F590 +0x008: constructor -- the parent D_8006F240's, then this
+ * table; when the argument's first word is set, its own +0x064 runs, and a
+ * nonzero result fails the construction (NULL). */
+void *func_80045228(DataSrc33808 *self, s32 *arg) {
+    ((Ctor33808 *)func_800441A4())->ctor(self, arg);
+    self->methods = func_80045428();
+    if (*arg != 0) {
+        if (((s32 (*)())self->methods->setFlag)(self)) {
+            return NULL;
+        }
+    }
+    return self;
+}
 /* D_8006F590 +0x00C: finalize -- release the buffer's counted object array,
  * then the parent D_8006F240's. */
 void func_800452AC(DataSrc33808 *self) {
@@ -497,9 +764,42 @@ extern s32 D_8006F590[];
 void *func_80045428(void) {
     return D_8006F590;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045438);
+/* Allocate and construct a D_8006F614 object; freed and NULL when the
+ * constructor returns nonzero (this ctor reports failure, not self). */
+void *func_80045E44(void);
+
+void *func_80045438(s32 arg0, s32 arg1, s32 arg2) {
+    void *obj = BMemPMgrAlloc(0x6C);
+
+    if (obj != NULL) {
+        if (((Ctor33808 *)func_80045E44())->ctor(obj, arg0, arg1, arg2) == 0) {
+            return obj;
+        }
+        BMemPMgrFree(obj);
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800454C4);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800455D4);
+/* D_8006F614 +0x00C: finalize -- release the object at +0x60, detach and
+ * reset the MDEC decoder, free the four buffers (func_8004575C), then
+ * BasicClass's finalize. */
+typedef struct Obj455D4 {
+    /* +0x000 */ u8 pad0[0x60];
+    /* +0x060 */ BasicClass *unk60;
+} Obj455D4;
+
+/* LIBPRESS.H */
+extern void DecDCTReset(int mode);
+extern int DecDCToutCallback(void (*func)());
+void func_8004575C();
+
+void func_800455D4(Obj455D4 *self) {
+    self->unk60 = self->unk60->methods->release(self->unk60);
+    DecDCToutCallback(NULL);
+    DecDCTReset(0);
+    func_8004575C(self);
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004564C);
 /* Unless +0x0C is set, free the four allocations at +0x14, +0x18, +0x10,
  * +0x1C. Not referenced by any data word. */
@@ -531,12 +831,75 @@ typedef struct Obj33808_50 {
 void func_800458AC(Obj33808_50 *self) {
     self->unk50 = 1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800458B8);
+/* D_8006F614 +0x044: when this is the object in D_8008A940, reset its
+ * state words, hand the object at +0x60 func_8004593C (and self) through
+ * that object's +0x07C, clear +0x64, and call its +0x058. */
+typedef struct Methods458B8 {
+    /* +0x000 */ u8 pad0[0x48];
+    /* +0x048 */ void (*slot48)();
+    /* +0x04C */ u8 pad4C[0xC];
+    /* +0x058 */ void (*slot58)();
+    /* +0x05C */ u8 pad5C[0x20];
+    /* +0x07C */ void (*slot7C)();
+} Methods458B8;
+
+typedef struct Sub458B8 {
+    /* +0x000 */ Methods458B8 *methods;
+} Sub458B8;
+
+typedef struct Obj458B8 {
+    /* +0x000 */ u8 pad0[0x3C];
+    /* +0x03C */ s32 unk3C;
+    /* +0x040 */ s32 unk40;
+    /* +0x044 */ s32 unk44;
+    /* +0x048 */ s32 unk48;
+    /* +0x04C */ s32 unk4C;
+    /* +0x050 */ s32 unk50;
+    /* +0x054 */ s32 unk54;
+    /* +0x058 */ u8 pad58[8];
+    /* +0x060 */ Sub458B8 *unk60;
+    /* +0x064 */ s32 unk64;
+} Obj458B8;
+
+extern DataSrc33808 *D_8008A940;
+void func_8004593C();
+
+void func_800458B8(Obj458B8 *self) {
+    Obj458B8 *cur = (Obj458B8 *)D_8008A940;
+
+    if (cur == self) {
+        cur->unk40 = 0;
+        cur->unk3C = 0;
+        cur->unk4C = 1;
+        cur->unk48 = 0;
+        cur->unk44 = 0;
+        cur->unk60->methods->slot7C(cur->unk60, func_8004593C, cur);
+        cur->unk64 = 0;
+        cur->unk60->methods->slot58(cur->unk60);
+    }
+}
 void func_8004593C(Obj33808_50 *self) {
     self->unk50 = -1;
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045948);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045A38);
+/* D_8006F614 +0x04C: when this is the object in D_8008A940, set +0x48,
+ * clear +0x54, call the +0x60 object's +0x048, set +0x44, and the first
+ * time (+0x64 clear) clear that object's +0x07C callback and set +0x64. */
+void func_80045A38(Obj458B8 *self) {
+    Obj458B8 *cur = (Obj458B8 *)D_8008A940;
+
+    if (cur == self) {
+        cur->unk48 = 1;
+        cur->unk54 = 0;
+        cur->unk60->methods->slot48(cur->unk60);
+        cur->unk44 = 1;
+        if (cur->unk64 == 0) {
+            cur->unk60->methods->slot7C(cur->unk60, 0, 0);
+            cur->unk64 = 1;
+            cur->unk44 = 1;
+        }
+    }
+}
 void func_80045AC8(void) {
 }
 void func_80045AD0(void) {
@@ -544,7 +907,67 @@ void func_80045AD0(void) {
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045AD8);
 void func_80045BC0(void) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC8);
+/* D_8006F614 +0x060: upload the decoded strip at +0x1C into the rectangle
+ * at +0x2C (DrawSystem +0x058), step the rectangle right by its width, and
+ * while it is still inside the frame (+0x20 + +0x24) decode the next strip
+ * (DecDCTout, after a DrawSync when +0x34 is under 0x80); at the end,
+ * rewind the rectangle to +0x20/+0x22 and flag the frame done. */
+typedef struct DrawSysMethods45BC8 {
+    /* +0x000 */ u8 pad0[0x58];
+    /* +0x058 */ void (*loadImage)();
+} DrawSysMethods45BC8;
+
+typedef struct DrawSys45BC8 {
+    /* +0x000 */ DrawSysMethods45BC8 *methods;
+} DrawSys45BC8;
+
+typedef struct Rect45BC8 {
+    s16 x;
+    s16 y;
+    s16 w;
+    s16 h;
+} Rect45BC8;
+
+typedef struct Obj45BC8 {
+    /* +0x000 */ u8 pad0[0x1C];
+    /* +0x01C */ u32 *strip;
+    /* +0x020 */ s16 x0;
+    /* +0x022 */ s16 y0;
+    /* +0x024 */ s32 width;
+    /* +0x028 */ u8 pad28[4];
+    /* +0x02C */ Rect45BC8 rect;
+    /* +0x034 */ s32 unk34;
+    /* +0x038 */ s32 stripSize;
+    /* +0x03C */ u8 pad3C[8];
+    /* +0x044 */ s32 unk44;
+    /* +0x048 */ s32 unk48;
+    /* +0x04C */ s32 unk4C;
+} Obj45BC8;
+
+extern DrawSys45BC8 *GetDrawSystem(void);
+/* LIBGPU.H / LIBPRESS.H */
+extern int DrawSync(int mode);
+extern void DecDCTout(u32 *buf, int size);
+
+void func_80045BC8(Obj45BC8 *self) {
+    DrawSys45BC8 *ds = GetDrawSystem();
+
+    ds->methods->loadImage(ds, &self->rect, self->strip);
+    self->rect.x += self->rect.w;
+    if (self->rect.x < self->x0 + self->width) {
+        if (self->unk34 < 0x80) {
+            DrawSync(0);
+        }
+        DecDCTout(self->strip, self->stripSize);
+    } else {
+        self->unk4C = 1;
+        self->rect.x = self->x0;
+        self->rect.y = self->y0;
+        if (self->unk48 != 0) {
+            self->unk44 = 1;
+        }
+    }
+}
 /* D_8006F614 +0x064: while +0x54 is set, count calls in D_8008A948 and
  * once the count before the increment passes 100, resets it to 1 and calls
  * slot +0x044; returns 0. Otherwise
