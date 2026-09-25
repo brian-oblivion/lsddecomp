@@ -107,7 +107,9 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048F84);
 Rec1C *func_8004903C(s32 index) {
     return &func_80048E2C(index)[9];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049060);
+Rec1C *func_80049060(s32 index, s32 sub) {
+    return &func_8004903C(index)[sub];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049098);
 const char *func_800490F4(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
