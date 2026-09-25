@@ -7,7 +7,7 @@
 ## What it does
 
 On `this->unkFC == 0`: calls `Entity__GetOrCreateUnk100(this, NULL, NULL, (void*)5,
-0)` and, on a non-NULL result, conditionally `slotBC(this, D_80089D90)`
+0)` and, on a non-NULL result, conditionally `slotBC(this, TRANSLATE_Y_MINUS256)`
 and unconditionally `this->unk100->methods->slotD4(this->unk100,
 this->unk50, 0, 0)`. On `this->unkFC != 0`: if `this->unk84 == 0`, runs a
 `do { this->unk88 = this->methods->slot134(this, this->unk88, 0);

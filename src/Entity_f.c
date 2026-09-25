@@ -7,9 +7,9 @@
  * shared via the header). */
 extern u8 ROTATION_YAW_PLUS9[];
 extern u8 ROTATION_YAW_PLUS180[];
-extern u8 D_80089CD0[];
-extern u8 D_80089CDC[];
-extern u8 D_80089D90[];
+extern u8 ROTATION_ZPLUS1[];
+extern u8 ROTATION_ZMINUS9[];
+extern u8 TRANSLATE_Y_MINUS256[];
 extern u8 D_80089DE4[];
 extern u8 SCALE_SIX[];
 
@@ -139,7 +139,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
                     this->unk100->methods->slotD8(this->unk100, this->unk50, 0, 0);
                 }
             }
-            this->target->methods->slot44(this->target, 0, D_80089CD0);
+            this->target->methods->slot44(this->target, 0, ROTATION_ZPLUS1);
         } else {
             SetCueTones18_3_3(out);
             this->target->methods->slot44(this->target, 1, ROTATION_YAW_PLUS180);
@@ -148,7 +148,7 @@ void Entity__MoodCue85(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->moodState == 0xC) {
         if (this->moodTimer < 0xA) {
-            this->methods->updateRotation(this, 0, D_80089CDC);
+            this->methods->updateRotation(this, 0, ROTATION_ZMINUS9);
         } else {
             SetCueTones18_3_3(out);
             this->methods->stopSoundCue(this);
@@ -237,7 +237,7 @@ void Entity__MoodCue91(Entity *this, EntityMoodHandlerArg *out) {
     if (this->moodTimer == 0) {
         if (Entity__GetOrCreateUnk100(this, NULL, NULL, (void *)5, 0) != NULL) {
             if (rand() & 1) {
-                this->methods->addVec14(this, D_80089D90);
+                this->methods->addVec14(this, TRANSLATE_Y_MINUS256);
             }
             this->unk100->methods->slotD4(this->unk100, this->unk50, 0, 0);
         }
