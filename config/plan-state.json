@@ -823,6 +823,11 @@
           "date": "2026-09-25",
           "header": "include/Class6D430.h"
         },
+        "D_8006F0B8": {
+          "class": "TimBlockSrc",
+          "date": "2026-09-25",
+          "header": "include/TimBlockSrc.h"
+        },
         "gActorMethods": {
           "class": "Actor",
           "date": "2026-09-25",
