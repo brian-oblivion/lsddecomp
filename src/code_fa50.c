@@ -63,6 +63,7 @@ extern s32 D_8008AC4C;
 extern s32 D_8008B21C[];
 extern s32 D_8006BEA0[];
 extern void *BMemPMgrAlloc(s32 size);
+void func_8001F394(Class6BEA0 *self);
 Class6BEA0Methods *func_8001F384(void);
 
 Class6BEA0 *new_class_6bea0(void *arg) {
@@ -74,7 +75,13 @@ Class6BEA0 *new_class_6bea0(void *arg) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F2B0);
+void func_8001F2B0(Class6BEA0 *self, void *arg) {
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = func_8001F384();
+    self->unk10 = arg;
+    self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
+    func_8001F394(self);
+}
 void func_8001F314(Class6BEA0 *self, Quad_fa50 *src) {
     self->quad = *src;
 }
@@ -89,7 +96,7 @@ void func_8001F37C(void) {
 Class6BEA0Methods *func_8001F384(void) {
     return (Class6BEA0Methods *)D_8006BEA0;
 }
-void func_8001F394(void) {
+void func_8001F394(Class6BEA0 *self) {
     D_8008AC4C = 1;
 }
 s32 func_8001F3A4(void *self) {
