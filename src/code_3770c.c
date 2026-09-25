@@ -65,7 +65,12 @@ extern void SpuSetCommonAttr(SpuCommonAttr *attr);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80046F0C);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80046F88);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047074);
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800470C8);
+void func_800470C8(CdStreamObj *self, u32 *ring, u32 size) {
+    if (self->unk2C == 0) {
+        StSetRing(ring, size >> 11);
+        self->ring = ring;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047114);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047240);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_8004728C);
