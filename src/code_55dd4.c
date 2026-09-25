@@ -1,5 +1,5 @@
 /*
- * Class65650 (include/code_55dd4.h): a Actor subclass that owns one
+ * Class65650 (include/Class65650.h): an Actor subclass that owns one
  * Actor "part" per object of a TOD animation and plays TODs over them.
  * Method table gClass65650Methods; Entity derives from it.
  *
@@ -8,7 +8,7 @@
  *   object ids from it; Destructor/ReleaseModelData undo both.
  * - base-slot overrides: OnNotify, InitDefaults, AttachToParent,
  *   DetachFromParent, SetDisplay/SetLightMode (forwarded to every part), and
- *   OnClass6EF50Notify (+0x098: code 2 -> Tick, 4 -> Release).
+ *   Update (+0x098: code 2 -> Tick, 4 -> Release).
  * - Tick: once per call, runs the selected tick callback (A/B/C) and, while
  *   a TOD is playing, applies its next frame and wraps at the frame count.
  * - ApplyTodFrame/ApplyTodPacket: walk a TOD frame's packets and apply the
@@ -17,7 +17,6 @@
  */
 #include "common.h"
 #include "code_55dd4.h"
-#include "ModelData.h"
 
 void *New_Class65650(void *arg1, void *arg2)
 {
@@ -55,8 +54,8 @@ Class65650 *Class65650__Class65650(Class65650 *self, void *arg1, void *arg2)
         base->finalize((Actor *)self);
         return NULL;
     }
-    self->methods->linkCompanion(self, self->modelData);
-    self->methods->initDefaults(self);
+    self->methods->addChild(self, (BasicClass *)self->modelData);
+    self->methods->reset(self);
     return self;
 }
 
@@ -90,7 +89,7 @@ void Class65650__Reset(Class65650 *self)
     self->methods->stopTod(self);
     self->methods->setTod(self, 0);
     if (self->mainPart != NULL) {
-        Class6B5CC__LinkModel((Class6B5CC *)self, (void *)self->mainPart->unk20);
+        Class6B5CC__LinkModel((Class6B5CC *)self, self->mainPart->model);
     }
 }
 
@@ -101,8 +100,8 @@ void Class65650__AttachToParent(Class65650 *self, Class65650 *other, void *arg2,
     if (self->parent == 0) {
         base = GetActorMethods();
         base->attachToParent((Actor *)self, arg3, arg4);
-        if (arg2 != NULL && self->companion2 == NULL) {
-            self->methods->linkCompanion(self, arg2);
+        if (arg2 != NULL && self->ticker == NULL) {
+            self->methods->addChild(self, arg2);
         }
         self->methods->linkPeer(self, other);
     }
@@ -112,8 +111,8 @@ void Class65650__DetachFromParent(Class65650 *self)
 {
     if (self->parent != 0) {
         self->methods->unlinkPeer(self);
-        if (self->companion2 != NULL) {
-            self->methods->unlinkCompanion(self, self->companion2);
+        if (self->ticker != NULL) {
+            self->methods->removeChild(self, self->ticker);
         }
         GetActorMethods()->detachFromParent((Actor *)self);
     }
@@ -121,24 +120,24 @@ void Class65650__DetachFromParent(Class65650 *self)
 
 void Class65650__SetDisplay(Class65650 *self, void *arg)
 {
-    Unk70ElemObj **p;
+    Actor **p;
     s32 i;
 
     p = self->parts;
     for (i = 0; i < self->partCount; p++) {
         i++;
-        (*p)->methods->setDisplay(*p, arg);
+        (*p)->methods->setDisplay(*p, (s32)arg);
     }
 }
 
 void Class65650__SetLightMode(Class65650 *self, void *arg)
 {
-    Unk70ElemObj **p;
+    Actor **p;
     s32 i;
 
     p = self->parts;
     for (i = 0; i < self->partCount; i++, p++) {
-        (*p)->methods->setLightMode(*p, arg);
+        (*p)->methods->setLightMode(*p, (u32)arg);
     }
     GetActorMethods()->setLightMode((Actor *)self, (u32)arg);
 }
@@ -179,7 +178,7 @@ s32 Class65650__AcquireModelData(Class65650 *self, UnkArg1Obj *other)
         self->modelData = other->modelData;
         self->ownsModelData = 0;
     } else {
-        self->modelData = (Unk5CObj *)New_ModelData((struct Src6F240 *)other);
+        self->modelData = New_ModelData((struct Src6F240 *)other);
         self->ownsModelData = 1;
     }
     if (self->modelData == NULL) {
@@ -193,7 +192,7 @@ fail:
 
 void Class65650__ReleaseModelData(Class65650 *self)
 {
-    Unk5CObj *result;
+    ModelData *result;
 
     self->methods->teardownParts(self);
     if (self->ownsModelData != 0) {
@@ -253,9 +252,9 @@ s32 Class65650__CreateParts(Class65650 *self)
     s32 buf[4];
     s32 count;
     s32 i;
-    Unk70ElemObj **p;
+    Actor **p;
 
-    count = self->modelData->methods->getObjectIds(self->modelData, NULL, buf) & 0xFF;
+    count = self->modelData->methods->scanPackets(self->modelData, 0, (s32)buf) & 0xFF;
     self->parts = BMemPMgrAlloc(count * 4);
     if (self->parts == NULL) {
         goto alloc_fail;
@@ -264,7 +263,7 @@ s32 Class65650__CreateParts(Class65650 *self)
     if (self->partIds == NULL) {
         goto alloc_fail;
     }
-    self->modelData->methods->getObjectIds(self->modelData, self->partIds, buf);
+    self->modelData->methods->scanPackets(self->modelData, (s32)self->partIds, (s32)buf);
 
     p = self->parts;
     i = 0;
@@ -290,7 +289,7 @@ fail:
 
 void Class65650__DestroyParts(Class65650 *self)
 {
-    Unk70ElemObj **p;
+    Actor **p;
 
     if (self->parts != NULL && self->partIds != NULL) {
         p = self->parts;
@@ -315,10 +314,10 @@ void Class65650__Tick(Class65650 *self)
         self->todFrame = self->todFrame + 1;
         if (self->todFrame >= self->todFrameCount) {
             self->todFrame = 0;
-            self->todFramePtr = (u8 *)(*(GroupObj **)(self->modelData->tods->arr + 8 + self->todIndex * 4))->tod + 8;
+            self->todFramePtr = (u8 *)(*(GroupObj **)((u8 *)self->modelData->todSet->buffer + 8 + self->todIndex * 4))->tod + 8;
         }
     }
-    *self->coord2 = 0;
+    self->coord2->flg = 0;
 }
 
 void Class65650__SelectTickCallback(Class65650 *self, s32 value)
@@ -348,9 +347,9 @@ void Class65650__DisableTickCallback(Class65650 *self)
 
 void Class65650__TickCallbackA(Class65650 *self)
 {
-    self->methods->slotC4(self, -0x1E, 0);
+    self->methods->moveLocalZ(self, -0x1E, 0);
     if (self->unk64 == 1 && self->mainPart != NULL) {
-        self->mainPart->methods->slot88(self->mainPart, 6);
+        self->mainPart->methods->notifyIfUnk20Active(self->mainPart, 6);
     }
 }
 
@@ -373,8 +372,8 @@ void Class65650__func_800661D4(Class65650 *self, void *arg1)
 void Class65650__SetTod(Class65650 *self, s32 index)
 {
     self->todIndex = index;
-    self->todFrameCount = (*(GroupObj **)(self->modelData->tods->arr + 8 + index * 4))->tod->frameCount;
-    self->todFramePtr = (u8 *)(*(GroupObj **)(self->modelData->tods->arr + 8 + self->todIndex * 4))->tod + 8;
+    self->todFrameCount = (*(GroupObj **)((u8 *)self->modelData->todSet->buffer + 8 + index * 4))->tod->frameCount;
+    self->todFramePtr = (u8 *)(*(GroupObj **)((u8 *)self->modelData->todSet->buffer + 8 + self->todIndex * 4))->tod + 8;
     self->todFrame = 0;
     self->methods->applyTodFrame(self, self->todFramePtr, 0);
 }
@@ -408,12 +407,13 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
     u8 outbuf[4];
     void *data;
     s32 idx;
-    Unk70ElemObj *elem;
-    Elem14Obj *coord;
+    Actor *elem;
+    Class6B5CCSub14 *coord;
     TimeTargetObj *param;
     s32 i;
 
-    data = self->modelData->methods->decodeTodPacket(self->modelData, acc, &outbuf[0], &outbuf[1], &outbuf[2], &outbuf[3]);
+    data = self->modelData->methods->decodePacketWord(self->modelData, (s32)acc, (s32)&outbuf[0], (s32)&outbuf[1],
+                                                      (s32)&outbuf[2], (s32)&outbuf[3]);
     idx = Class65650__FindPartIndex(self, outbuf[0]);
     if (idx < 0) {
         goto end;
@@ -421,7 +421,7 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
     elem = self->parts[idx];
     coord = elem->coord2;
     coord->flg = 0;
-    param = coord->param;
+    param = (TimeTargetObj *)coord->param;
 
     switch (outbuf[1]) {
     case TOD_PACKET_ATTRIBUTE:
@@ -488,7 +488,7 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
             }
         }
         {
-            Elem14Obj *coordB;
+            Class6B5CCSub14 *coordB;
             s32 v1, v2, v3;
 
             coordB = elem->coord2;
@@ -506,10 +506,10 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
         u16 count;
 
         count = *(u16 *)data;
-        if (count != 0 && elem->unk20 == 0) {
+        if (count != 0 && elem->model == NULL) {
             s32 v;
 
-            v = self->modelData->tmd->methods->getModel(self->modelData->tmd, count - 1);
+            v = ((Unk2CObj *)self->modelData->linkResource)->methods->getModel(self->modelData->linkResource, count - 1);
             Class6B5CC__LinkModel((Class6B5CC *)elem, (void *)v);
         }
         break;
@@ -519,12 +519,12 @@ void *Class65650__ApplyTodPacket(Class65650 *self, void *acc, void *extra)
 
         v1 = *(s32 *)data;
         if (v1 == 0 || v1 == 0xFFFF) {
-            elem->methods->attachToParent(elem, self, 0);
+            elem->methods->attachToParent(elem, (Class6B5CC *)self, NULL);
         } else {
             s32 idx2;
 
             idx2 = Class65650__FindPartIndex(self, *(u8 *)data);
-            elem->methods->attachToParent(elem, self->parts[idx2], 0);
+            elem->methods->attachToParent(elem, (Class6B5CC *)self->parts[idx2], NULL);
         }
         break;
     }
@@ -537,8 +537,8 @@ end:
 void Class65650__LinkPeer(Class65650 *self, Class65650 *other)
 {
     if (other != NULL) {
-        other->methods->linkCompanion(other, self);
-        self->methods->linkCompanion(self, other);
+        other->methods->addChild(other, (BasicClass *)self);
+        self->methods->addChild(self, (BasicClass *)other);
         self->peer = other;
     }
 }
@@ -549,8 +549,8 @@ void Class65650__UnlinkPeer(Class65650 *self)
 
     other = self->peer;
     if (other != NULL) {
-        other->methods->unlinkCompanion(other, self);
-        self->methods->unlinkCompanion(self, self->peer);
+        other->methods->removeChild(other, (BasicClass *)self);
+        self->methods->removeChild(self, (BasicClass *)self->peer);
         self->peer = NULL;
     }
 }
