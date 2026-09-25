@@ -544,7 +544,7 @@ void D8006EFAC__Reset(Class6B5CC *self) {
     self->coord2->flg = 0;
 }
 /* D_8006EFAC slot +0x09C (dispatchLinkCommand): empty override. */
-void func_80042820(Class6B5CC *self, void *sender, s32 event) {
+void D8006EFAC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
 }
 /* D_8006EFAC and D_800866E8 slot +0x0B8 (getChild). */
 void *func_80042828(ChildArrayObj_322b4 *self, s32 index) {

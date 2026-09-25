@@ -1,4 +1,6 @@
-# func_80042820 -- MATCHED (2/2 words), round 82
+# D8006EFAC__DispatchLinkCommand -- MATCHED (2/2 words), round 82
+
+> Renamed from `func_80042820` on 2026-09-25 (tools/rename.py). Address 0x80042820.
 
 Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
@@ -16,6 +18,6 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 ```c
 /* D_8006EFAC slot +0x09C (dispatchLinkCommand): empty override. */
-void func_80042820(Class6B5CC *self, void *sender, s32 event) {
+void D8006EFAC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
 }
 ```
