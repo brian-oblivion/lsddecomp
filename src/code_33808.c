@@ -186,7 +186,8 @@ typedef struct Vec3S8 {
 typedef struct Ent6F0B8 {
     /* +0x00 */ u16 shift;
     /* +0x02 */ u16 mask;
-    /* +0x04 */ u8 pad4[8];
+    /* +0x04 */ u8 pad4[6];
+    /* +0x0A */ u16 unkA;         /* set to the mask by func_80043648 */
     /* +0x0C */ Vec3S8 vec;
     /* +0x0F */ u8 padF;
 } Ent6F0B8;
@@ -229,7 +230,82 @@ void func_800435D0(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
     func_80043648(e, index);
     UnlockActiveDataSource();
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043648);
+/* Fade one 256-colour CLUT row (the entry's `index`, from VRAM y 0x1E0)
+ * toward the entry's colour: read the row back, then for each of
+ * mask - 1 steps blend every non-zero colour (step << (12 - shift)) / 0x1000
+ * of the way to the colour and upload the result to the next row down. */
+typedef struct Rect43648 {       /* LIBGPU.H RECT */
+    s16 x;
+    s16 y;
+    s16 w;
+    s16 h;
+} Rect43648;
+
+/* LIBGPU.H */
+extern int StoreImage(Rect43648 *rect, u32 *p);
+extern int LoadImage(Rect43648 *rect, u32 *p);
+extern int DrawSync(int mode);
+
+void func_80043648(Ent6F0B8 *e, s32 index) {
+    Rect43648 dst;
+    Rect43648 src;
+    u16 out[256];
+    u16 in[256];
+    s32 i;
+    s32 j;
+    s32 shift;
+    s32 r;
+    s32 g;
+    s32 b;
+    s32 f;
+    s32 rr;
+    s32 gg;
+    s32 bb;
+    u32 c;
+    s32 cr;
+    s32 cg;
+    s32 cb;
+
+    src.x = 0;
+    src.w = 0x100;
+    src.h = 1;
+    src.y = (index << D_8008A92C) + 0x1E0;
+    StoreImage(&src, (u32 *)in);
+    DrawSync(0);
+    dst.h = 1;
+    dst.x = 0;
+    dst.y = 0;
+    dst.w = 0x100;
+    r = (u8)e->vec.x;
+    g = (u8)e->vec.y;
+    b = (u8)e->vec.z;
+    shift = 12 - e->shift;
+    e->unkA = e->mask;
+    for (i = 0; i < e->mask - 1; i++) {
+        f = (i + 1) << shift;
+        rr = r * f;
+        gg = g * f;
+        bb = b * f;
+        f = 0x1000 - f;
+        for (j = 0; j < src.w; j++) {
+            c = in[j];
+            if (c == 0) {
+                out[j] = in[j];
+            } else {
+                cr = (in[j] & 0x1F) << 3;
+                cg = (c >> 2) & 0xF8;
+                cb = (c >> 7) & 0xF8;
+                cr = (cr * f + rr) >> 15;
+                cg = (cg * f + gg) >> 15;
+                cb = (cb * f + bb) >> 15;
+                out[j] = (in[j] & 0x8000) | cr | (cg << 5) | (cb << 10);
+            }
+        }
+        dst.y = src.y + i + src.h;
+        DrawSync(0);
+        LoadImage(&dst, (u32 *)out);
+    }
+}
 extern s32 D_8006F0B8[];
 
 void *func_80043830(void) {
