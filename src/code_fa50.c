@@ -39,11 +39,21 @@ typedef struct TypedBox_fa50 {
     Box_fa50 box;           /* +0x004 */
 } TypedBox_fa50;
 
-/* The eight corners of a box. */
+/* The eight corners of a box: v[0..3] one face, v[4..7] the other. */
+typedef struct Corners_fa50 {
+    Vec3_fa50 f[2][4];
+} Corners_fa50;
+
+/* A counted list of boxes' corners; func_8001F51C writes a list of one. */
 typedef struct Hull_fa50 {
-    s32 type;               /* +0x000 */
+    s32 type;               /* +0x000, the count */
     Vec3_fa50 v[8];         /* +0x004 */
 } Hull_fa50;
+
+typedef struct HullList_fa50 {
+    s32 n;                  /* +0x000 */
+    Corners_fa50 c[1];      /* +0x004 */
+} HullList_fa50;
 
 typedef struct Rec28_fa50 {
     SVec_fa50 *verts;       /* +0x000 */
@@ -192,7 +202,49 @@ void func_8001F51C(Class6BEA0 *self, Hull_fa50 *out) {
     out->v[7].z = b.box.max.z;
     out->type = 1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F66C);
+void func_8001F66C(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
+    Corners_fa50 tmp;
+    Corners_fa50 *c;
+    s32 i;
+
+    for (i = 0; i < h->n; i++) {
+        c = &h->c[i];
+        if (turn != 0) {
+            tmp = *c;
+            c->f[0][3] = tmp.f[0][0];
+            c->f[0][2] = tmp.f[0][1];
+            c->f[1][2] = tmp.f[0][2];
+            c->f[1][3] = tmp.f[0][3];
+            c->f[0][0] = tmp.f[1][0];
+            c->f[0][1] = tmp.f[1][1];
+            c->f[1][1] = tmp.f[1][2];
+            c->f[1][0] = tmp.f[1][3];
+            if (back == 0) {
+                s32 k;
+                for (k = 0; k < 4; k++) {
+                    c->f[0][k].x += d;
+                }
+            } else {
+                s32 k;
+                for (k = 0; k < 4; k++) {
+                    c->f[1][k].x += d;
+                }
+            }
+        } else {
+            if (back == 0) {
+                s32 k;
+                for (k = 0; k < 4; k++) {
+                    c->f[0][k].z += d;
+                }
+            } else {
+                s32 k;
+                for (k = 0; k < 4; k++) {
+                    c->f[1][k].z += d;
+                }
+            }
+        }
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F8B8);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_80020050);
 void func_800204D0(Outer_fa50 *self, s32 *xy) {
