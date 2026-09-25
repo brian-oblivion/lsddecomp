@@ -84,7 +84,7 @@ struct Class6C070 {
     /* +0x024 */ s32 unk24;           /* 80020AF4 counts up to unk20 */
     /* +0x028 */ u8 pad28[0x2C - 0x28];
     /* +0x02C */ s32 unk2C;           /* 80020C3C sets */
-    /* +0x030 */ s32 unk30;           /* 80020C44 sets */
+    /* +0x030 */ void (*callback)(void); /* 80020C44 sets, 80020A74 calls each VSync */
 };
 
 extern Class6C070Methods D_8006C070;  /* the class's method table */
@@ -100,6 +100,7 @@ extern int GsGetActiveBuff(void);     /* LIBGS.H */
 extern int LoadImage(RECT *rect, u_long *p);        /* LIBGPU.H */
 extern int MoveImage(RECT *rect, int x, int y);     /* LIBGPU.H */
 extern int DrawSync(int mode);                      /* LIBGPU.H */
+extern int VSync(int mode);                         /* LIBETC.H */
 extern int StoreImage(RECT *rect, u_long *p);       /* LIBGPU.H */
 extern void *BMemPMgrAlloc(s32 size);
 
@@ -125,7 +126,7 @@ void func_80020784(Class6C070 *self) {
     self->unk10 = 0;
     self->methods->slot70(self, 3);
     self->methods->slot80(self, 1);
-    self->unk30 = 0;
+    self->callback = NULL;
 }
 void func_800207DC(Class6C070 *self, Class6C070Size *size, s32 vramMode) {
     GsInitGraph(size->w, size->h, 0, 1, vramMode);
@@ -187,7 +188,15 @@ void func_80020A24(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) {
     func_80020970(&rect, src);
     MoveImage(&rect, x, y);
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020A74);
+void func_80020A74(Class6C070 *self) {
+    while (self->unk10 != 0) {
+        VSync(self->unk20);
+        if (self->callback != NULL) {
+            self->callback();
+        }
+        self->methods->notifyParents(self, 2);
+    }
+}
 void func_80020AF4(Class6C070 *self) {
     Class6C070 *obj = func_80020C5C();
 
@@ -218,8 +227,8 @@ Class6C070Size *func_80020C08(Class6C070 *self, Class6C070Dims *out) {
 void func_80020C3C(Class6C070 *self, s32 value) {
     self->unk2C = value;
 }
-void func_80020C44(Class6C070 *self, s32 value) {
-    self->unk30 = value;
+void func_80020C44(Class6C070 *self, void (*callback)(void)) {
+    self->callback = callback;
 }
 Class6C070Methods *func_80020C4C(void) {
     return &D_8006C070;
