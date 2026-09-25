@@ -41,3 +41,11 @@ Closed on the first attempt.
 matching record's index (`-1` if none), consumed as `fileIndex` by
 code_179d8_q.c's `EnqueueCdRequest` and as `func_800284C4`'s own
 pre-existing comment there put it: "code_179d8_r: name -> table index".
+
+## Track 4b (2026-09-25, round 85)
+
+The CD driver's shared globals and records are now declared once, in
+`include/CdDriver.h`, and this body uses that one reading: the walk is `CdFileEntry *cur; cur++` over `cur->name` (was `char *` stepped by 0x1C). The
+global's type comes from its accessors (`gFileTable` is walked at the 0x1C
+`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+`+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
