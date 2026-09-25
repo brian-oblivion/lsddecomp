@@ -57,4 +57,6 @@ void func_800429E0(FlatLightObj *self, s32 lightId) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_3311c", func_800429E8);
 INCLUDE_ASM("asm/nonmatchings/code_3311c", func_80042A2C);
-INCLUDE_ASM("asm/nonmatchings/code_3311c", func_80042A7C);
+FlatLightObjMethods *func_80042A7C(void) {
+    return &D_8006F06C;
+}
