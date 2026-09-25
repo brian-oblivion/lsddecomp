@@ -366,10 +366,21 @@ void *func_800441B4(s32 arg0, s32 arg1) {
 /* The D_8006F2C4 object (a Class6B5CC subclass). */
 typedef struct Obj6F2C4 {
     CLASS6B5CC_FIELDS(Class6B5CCMethods);
-    /* +0x044 */ u8 pad44[0x10];
-    /* +0x054 */ Vec3S8 unk54;
-    /* +0x057 */ u8 pad57[0xD];
-    /* +0x064 */ s32 unk64;   /* 20.12 fixed point */
+    /* +0x044 */ u32 bgAttribute; /* +0x044..+0x067 has GsBG's layout */
+    /* +0x048 */ s16 x;
+    /* +0x04A */ s16 y;
+    /* +0x04C */ s16 w;
+    /* +0x04E */ s16 h;
+    /* +0x050 */ s16 scrollx;
+    /* +0x052 */ s16 scrolly;
+    /* +0x054 */ Vec3S8 unk54;    /* GsBG r, g, b */
+    /* +0x057 */ u8 pad57;
+    /* +0x058 */ void *map;
+    /* +0x05C */ s16 mx;
+    /* +0x05E */ s16 my;
+    /* +0x060 */ s16 scalex;
+    /* +0x062 */ s16 scaley;
+    /* +0x064 */ s32 unk64;       /* GsBG rotate, 20.12 fixed point */
 } Obj6F2C4;
 
 /* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
@@ -379,7 +390,43 @@ void func_80044220(Obj6F2C4 *self, s32 arg1, s32 arg2) {
     self->methods = func_8004467C();
     ((void (*)())self->methods->reset)(self, arg1, arg2);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
+/* D_8006F2C4 +0x040: reset -- lay out the GsBG at +0x044 over a map
+ * source: mode 0 sizes it to the map (cell size x cell count), mode 1 to a
+ * 320 x 240 screen (with its own attribute); then zero position and
+ * scroll, take the colour in D_8008A938, point it at the source's GsMAP
+ * (+0x2C), unit scale, no rotation, and centre the pivot. */
+typedef struct Map44294 {
+    /* +0x00 */ u8 pad0[0x2C];
+    /* +0x2C */ u8 cellw;         /* a GsMAP from here */
+    /* +0x2D */ u8 cellh;
+    /* +0x2E */ u16 ncellw;
+    /* +0x30 */ u16 ncellh;
+} Map44294;
+
+extern Vec3S8 D_8008A938;
+
+void func_80044294(Obj6F2C4 *self, Map44294 *src, s32 mode) {
+    if (mode == 0) {
+        self->bgAttribute = 0x1000000;
+        self->w = src->cellw * src->ncellw;
+        self->h = src->cellh * src->ncellh;
+    } else if (mode == 1) {
+        self->bgAttribute = 0x2000000;
+        self->w = 320;
+        self->h = 240;
+    }
+    self->x = 0;
+    self->y = 0;
+    self->scrollx = 0;
+    self->scrolly = 0;
+    self->unk54 = D_8008A938;
+    self->map = &src->cellw;
+    self->scalex = 0x1000;
+    self->scaley = 0x1000;
+    self->unk64 = 0;
+    self->mx = self->w / 2;
+    self->my = self->h / 2;
+}
 /* D_8006F2C4 +0x044: the ratio of two halfwords of `src` (+0x08 over
  * +0x0A) in 20.12 fixed point, stored at +0x64 when `set`, else added. */
 typedef struct Ratio44380 {
