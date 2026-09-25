@@ -2589,3 +2589,14 @@ DecDCTin = 0x80045F84; // type:func  (Psy-Q libpress/libpress, fingerprint)
 // LIBPRESS.H `extern void DecDCTout(u_long *buf, int size);`. No C call
 // site yet. Round 81 (bravo, track 2), not yet linked from an SDK object.
 DecDCTout = 0x80046000; // type:func  (Psy-Q libpress/libpress, fingerprint+position+semantics)
+// identified: fingerprint AMBIGUOUS (2-way tie masked 1.00, 9w: CdGetToc
+// libcd/toc vs DecDCToutCallback libpress/libpress); position (inside the
+// confirmed libpress DecDCT run) favours DecDCToutCallback; settled by
+// call-target semantics: forwards its arg into already-named
+// DMACallback(int chan, void(*func)()) (libetc/intr, pinned) with chan=1
+// (PS1 DMA channel 1 = MDEC-out), matching DecDCToutCallback exactly and
+// ruling out CdGetToc, which takes a struct pointer and never calls
+// DMACallback. Header LIBPRESS.H `extern int DecDCToutCallback(void
+// (*func)());`. No C call site yet. Round 81 (bravo, track 2), not yet
+// linked from an SDK object.
+DecDCToutCallback = 0x80046084; // type:func  (Psy-Q libpress/libpress, position+semantics)
