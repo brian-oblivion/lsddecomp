@@ -186,4 +186,8 @@ typedef struct Obj6F614 {
 void func_80045E3C(Obj6F614 *self, s32 value) {
     self->unk68 = value;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045E44);
+extern s32 D_8006F614[];
+
+void *func_80045E44(void) {
+    return D_8006F614;
+}
