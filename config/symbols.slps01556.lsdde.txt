@@ -2607,3 +2607,12 @@ DecDCToutCallback = 0x80046084; // type:func  (Psy-Q libpress/libpress, position
 // DecDCTvlc(u_long *bs, u_long *buf);`, no C call site yet. Round 81
 // (bravo, track 2), not yet linked from an SDK object.
 DecDCTvlc = 0x80046568; // type:func  (Psy-Q libpress/libpress, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libcd/cdread2.o (discs 3.5,3.6
+// only -- no 3.3 candidate scores at all, a reworked module between
+// builds; game mixed library builds, CLAUDE.md), unique (next unrelated
+// candidate GsMulCoord0, masked 0.16). Position: after placed libcd/c_003
+// (3.3), before placed libcd/c_005 (3.3) -- both libcd, though a different
+// disc build than its neighbours. No public LIBCD.H prototype (internal
+// libcd export). No C call site yet. Round 81 (bravo, track 2), not yet
+// linked from an SDK object.
+CdRead2 = 0x800479C8; // type:func  (Psy-Q libcd/cdread2, fingerprint)
