@@ -19,9 +19,10 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 18 (2026-09-25, premium session: ten `psyq_*` segments were
-game code; 299 functions carved into eleven units, `tools/gameinsdk.py`,
-tracks 1 and 2 reopened).
+Plan revision: 19 (2026-09-25, after round 81: `rename.py` handles
+placeholders with their own symbols line, 2-word Sony stubs are caught when
+sandwiched, track 2's position rule reads the neighbours, no second naming
+pass: track 4 names what track 3 left).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -103,7 +104,11 @@ rules, stop rules and runner prompts are
 `docs/archive/FINISHING-PLAN-tracks-1-2-2026-09-25.md`, verbatim. Two of them
 are restated where they also apply: a function `progress.py` counts as
 library is never renamed or retyped as game code (track 3), and a preserved
-near-miss body lives only in an `#ifdef NON_MATCHING` block (CLAUDE.md).
+near-miss body lives only in an `#ifdef NON_MATCHING` block (CLAUDE.md). A
+third is sharpened (revision 19; round 79 read it backwards): POSITION
+evidence is the placed objects on either SIDE of the function; the candidate's
+own object need not be placed, since an unplaced build is why it is a
+candidate at all.
 
 ### Track 3: readability, one unit at a time
 
@@ -113,7 +118,10 @@ unit does without opening the disassembly.
 **Eligibility.** Every unit is eligible now; remaining `INCLUDE_ASM`s are
 documented stalls. **Order:** `plan.py`'s centrality ranking (units whose
 definitions other units reference most), because a name in a base class
-propagates everywhere.
+propagates everywhere. **One pass per unit, no second pass** (revision 19):
+the `func_`, `unk` and `slotNN` a marked unit still holds are named class by
+class in track 4 (step 6 names slots and their occupants), and what track 4
+leaves stays tier C with what is known written down.
 
 **The pass, per unit.**
 1. Read every function in the unit, its callers (`grep -rn` over `src/`),

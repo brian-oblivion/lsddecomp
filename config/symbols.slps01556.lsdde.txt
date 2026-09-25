@@ -780,149 +780,52 @@ DrawSync = 0x80021114; // type:func  (Psy-Q libgpu/sys, fingerprint)
 // SDK object.
 GsSortClear = 0x80023DA0; // type:func  (Psy-Q libgs/gs_001, fingerprint)
 
-// Round 53 (charlie, track 2 park rule): below the evidence bar, best
-// candidate(s) named per function. All 44 screened via tools/sdkname.py;
-// none reaches EXACT-or-masked>=0.6, or the tie is unresolved by position
-// or header prototype. See docs/PROGRESS.md round 53 / the broadcast for
-// the full run.
-// libgte/reg, unidentified: 5-way tie masked 0.67 (SetRGBcd/SetIR0/SetData32/
-// SetGeomScreen/SetDQA), 3w. Position confirms libgte (after libgte/ratan).
 func_8001F3A4 = 0x8001F3A4; // type:func
-// libcomb, unidentified: masked 0.80 shape 0.80 AddCOMB (libcomb/comb,
-// 10w), also masked 0.70 StartPAD (libapi/pad)/def_cbsync/def_cbready/
-// def_cbread (libcd/event); none reaches the shape bar and position (after
-// libgte/ratan, before libgs/gs_105) matches none of them. Round 74 (bravo,
-// track 2).
 func_8001F4E4 = 0x8001F4E4; // type:func
-// unidentified: TINY (4w), EXACT tie PadVersion (_obj/mouse) / CdLastPos
-// (libcd/sys); position (after libgte/ratan, before libgs/gs_105) matches
-// neither candidate's library, unresolved. Round 74 (bravo, track 2).
 func_8001F50C = 0x8001F50C; // type:func
-// unidentified: masked 0.10 strtoul (libc2), too weak; no position/header support.
 func_8001F51C = 0x8001F51C; // type:func
-// unidentified: masked 0.00, no viable candidate.
 func_8001F66C = 0x8001F66C; // type:func
-// unidentified: masked 0.00, no viable candidate.
 func_8001F8B8 = 0x8001F8B8; // type:func
-// unidentified: masked 0.14 free2/index/StUnSetRing/StartCARD/SpuGetVoiceVolumeX, too weak.
 func_80020510 = 0x80020510; // type:func
-// libgte/reg, unidentified: 5-way tie masked 0.67 (SetRGBcd/SetIR0/SetData32/
-// SetGeomScreen/SetDQA), 3w. Position confirms libgte (after libgte/msc01).
 func_80020C5C = 0x80020C5C; // type:func
 // unidentified: masked 0.17 SsEnd (libsnd), too weak.
 func_80038E44 = 0x80038E44; // type:func
-// unidentified: masked 0.19 qsort (libc2), too weak.
 func_800398E0 = 0x800398E0; // type:func
-// unidentified: masked 0.67 5-way tie SetRGBcd/etc (libgte/reg, 3w) -- SAME
-// candidate set as func_8001F3A4/func_80020C5C/func_80048CF0, but here
-// position CONTRADICTS (neighbors are libspu/s_sav and libsnd/ssvol, not
-// libgte), so this is likely a coincidental word-shape collision, not libgte.
 func_8003A05C = 0x8003A05C; // type:func
-// unidentified: TINY (4w), EXACT tie PadVersion (_obj/mouse) / CdLastPos
-// (libcd/sys); position (after libspu/s_sav, before libsnd/ssvol) matches
-// neither candidate's library, so the tie is unresolved.
 func_8003A068 = 0x8003A068; // type:func
-// unidentified: TINY (4w), same EXACT tie as func_8003A068 (PadVersion/
-// CdLastPos); position (after libsnd/sspause, before libgs/gs_104) matches
-// neither, unresolved.
 func_8003B20C = 0x8003B20C; // type:func
-// unidentified: masked 0.29 DrawPrim (libgpu/sys, tied across 2 discs) /
-// SpuRead / SpuWrite, too weak and ambiguous.
 func_8003B39C = 0x8003B39C; // type:func
-// unidentified: masked 0.06 outline (5-way tie across libgs/daf3_00..03,
-// daft3_00), too weak.
 func_8003B624 = 0x8003B624; // type:func
-// unidentified: masked 0.26 cln (libgte/cor_04, undocumented -- no LIBGTE.H
-// prototype); call site returns a ChildObj86ED0* from an object-handle arg,
-// semantically unlike a GTE cordic helper. Too weak, no header to check.
 func_80041AB4 = 0x80041AB4; // type:func
-// unidentified: TINY (4w), same EXACT tie as func_8003A068 (PadVersion/
-// CdLastPos); position (after libc2/memmove, before libgs/gs_110) matches
-// neither, unresolved.
 func_80041C3C = 0x80041C3C; // type:func
-// unidentified: masked 0.19 qsort (libc2), same weak candidate as func_800398E0.
 func_80041C9C = 0x80041C9C; // type:func
-// unidentified: TINY (4w), same EXACT tie as func_8003A068 (PadVersion/
-// CdLastPos); position (after libc2/memmove, before libgs/gs_110) matches
-// neither, unresolved.
 func_800422BC = 0x800422BC; // type:func
-// unidentified: masked 0.40 5-way tie GsSetFogParam/puts/dmyGsTMDdivF3NL/
-// dmyGsTMDdivF3LFG/dmyGsTMDdivF3L, too weak and ambiguous.
 func_80042400 = 0x80042400; // type:func
-// unidentified: masked 0.40, identical candidate tie to func_80042400
-// (likely a coincidentally identical trivial-stub shape), too weak.
 func_80042694 = 0x80042694; // type:func
-// unidentified: TINY (4w), same EXACT tie as func_8003A068 (PadVersion/
-// CdLastPos); position (after libc2/memmove, before libgs/gs_110) matches
-// neither, unresolved.
 func_800428E4 = 0x800428E4; // type:func
-// unidentified: masked 0.29 DrawPrim/SpuRead/SpuWrite, same weak tie as func_8003B39C.
 func_80043008 = 0x80043008; // type:func
-// unidentified: masked 0.32 cosh (libmath/sinh) top, too weak.
 func_80043840 = 0x80043840; // type:func
-// unidentified: masked 0.26 cln (libgte/cor_04, undocumented), same weak
-// candidate and reasoning as func_80041AB4.
 func_800441B4 = 0x800441B4; // type:func
-// unidentified: masked 0.32 cosh (libmath/sinh) top, same weak candidate as func_80043840.
 func_8004468C = 0x8004468C; // type:func
-// unidentified: masked 0.32 cosh (libmath/sinh) top, same weak candidate as func_80043840.
 func_80044A0C = 0x80044A0C; // type:func
-// unidentified: masked 0.26 cln (libgte/cor_04, undocumented), same weak
-// candidate and reasoning as func_80041AB4.
 func_80044CD4 = 0x80044CD4; // type:func
-// unidentified: masked 0.29 DrawPrim/SpuRead/SpuWrite, same weak tie as func_8003B39C.
 func_80044F30 = 0x80044F30; // type:func
-// unidentified: masked 0.14 SpuWritePartly (libspu/s_wp, tied across 2 discs), too weak.
 func_80045438 = 0x80045438; // type:func
-// unidentified: masked 0.40 5-way tie GsSetFogParam/etc, same weak candidate set as func_80042400.
 func_80048894 = 0x80048894; // type:func
-// unidentified: masked 0.67 5-way tie SetRGBcd/etc (libgte/reg, 3w) -- same
-// candidate set as func_8001F3A4/func_80020C5C, but position CONTRADICTS
-// (neighbors are libcd/c_007 and libc2/rand, not libgte).
 func_80048CF0 = 0x80048CF0; // type:func
-// libcomb, unidentified: masked 0.73 AddCOMB (libcomb/comb) top, but
-// SIGNATURE CONFLICT: LIBCOMB.H declares `extern AddCOMB(void);` (no args)
-// while this call site passes 2 args (day, unused) -- header evidence
-// CONTRADICTS this candidate, not confirms it.
 func_80048CFC = 0x80048CFC; // type:func
-// unidentified: masked 0.29 weak 5-way tie (__negsf2/SsUtAutoVol/
-// SsUtAutoPan/SysSpu_getRegister/len_param), too weak.
 func_80048D48 = 0x80048D48; // type:func
-// unidentified: masked 0.24 SsVabClose (libsnd/vs_vab) top, too weak.
 func_80048D74 = 0x80048D74; // type:func
-// unidentified: masked 0.89 4-way tie CdMix/CdGetSector (libcd/sys) vs
-// SsGetMute x2 (libsnd/scgmute, libsnd/ssgm); no header prototype available
-// for any candidate, and position spans a broad libcd..libc2 region shared
-// by many of this batch's functions, so it does not disambiguate.
 func_80048E08 = 0x80048E08; // type:func
-// unidentified: masked 0.12, too weak.
 func_80048EA0 = 0x80048EA0; // type:func
-// unidentified: masked 0.13, too weak.
 func_80048F84 = 0x80048F84; // type:func
-// libcard, unidentified: masked 0.64 _card_clear (libcard/card) top; no
-// header prototype available, and position (libcd/c_007 before, libc2/rand
-// after, a broad shared region) does not confirm libcard.
 func_80049060 = 0x80049060; // type:func
-// unidentified: masked 0.13, too weak.
 func_80049098 = 0x80049098; // type:func
-// unidentified: masked 0.29 weak 5-way tie, same candidate set as func_80048D48.
 func_800490F4 = 0x800490F4; // type:func
-// unidentified: masked 0.17 SsUtPitchBend (libsnd, tied across 3 discs/2
-// module spellings), too weak.
 func_8004913C = 0x8004913C; // type:func
-// unidentified: masked 0.24 SetDrawOffset (libgpu/sys, tied across 3
-// discs), too weak.
 func_800491FC = 0x800491FC; // type:func
-// unidentified: masked 0.27 CdRead2 (libcd/cdread2) top, uniquely ranked but
-// too weak; no header prototype available, position only broadly consistent
-// with libcd (shared region, not adjacent).
 func_80049334 = 0x80049334; // type:func
-// unidentified: masked 0.71 2-way tie GsSetTodUserFunc (libgs/anim) /
-// GsSetTodUserFunc2 (libgs/anim2); no header prototype found for either, and
-// call site semantics (a table lookup returning a value used 4x, not a
-// callback setter) argue against both -- position does not confirm libgs.
 func_800493C8 = 0x800493C8; // type:func
-// unidentified: masked 0.10, too weak.
 func_800493E4 = 0x800493E4; // type:func
 DecodeFullWidthSjis = 0x80040FC0; // type:func
 EncodeFullWidthSjis = 0x80041020; // type:func

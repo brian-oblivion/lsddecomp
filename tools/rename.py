@@ -83,13 +83,16 @@ RULE_DOCS = {"CLAUDE.md", "docs/FINISHING-PLAN.md", "docs/PARALLEL-RUNS.md",
 
 
 def symbol_address(name):
-    m = PLACEHOLDER.match(name)
-    if m:
-        return int(m.group(2), 16), None
+    # The symbols file FIRST, placeholder or not: a func_ with its own line
+    # (round 81: ~48 stale track-2 records on code revision 18 moved to game
+    # units) otherwise got a second line appended and splat refused the file.
     for i, line in enumerate(SYMBOLS.read_text().splitlines()):
         sm = SYMLINE.match(line.strip())
         if sm and sm.group(1) == name:
             return int(sm.group(2), 16), i
+    m = PLACEHOLDER.match(name)
+    if m:
+        return int(m.group(2), 16), None
     return None, None
 
 

@@ -370,8 +370,29 @@ def game_leads(corp, exclude):
     return out
 
 
+def game_method_tables():
+    """Addresses of the method tables classtable.py finds in .data."""
+    import subprocess
+    out = subprocess.run([sys.executable, str(ROOT / "tools/classtable.py"), "--scan"],
+                         capture_output=True, text=True, cwd=ROOT).stdout
+    return {int(a, 16) for a in re.findall(r"^\s+(0x[0-9A-Fa-f]{8})\s+\d+ slots", out, re.M)}
+
+
+def builds_address(words):
+    """Addresses a body forms with lui rX,hi then addiu/ori/lw..(rX) lo."""
+    out, hi = set(), {}
+    for w in words:
+        op, rs, rt, imm = w >> 26, (w >> 21) & 31, (w >> 16) & 31, w & 0xFFFF
+        if op == 0x0F:                                   # lui
+            hi[rt] = imm << 16
+        elif rs in hi and op in (0x09, 0x0D, 0x23, 0x21, 0x25, 0x20, 0x24):
+            lo = imm - 0x10000 if (imm & 0x8000 and op != 0x0D) else imm
+            out.add((hi[rs] + lo) & 0xFFFFFFFF)
+    return out
+
+
 def adjacency_leads(corp, library):
-    """Revision 16: a SMALL body (4 words or more) with an exact fingerprint too
+    """Revision 16: a SMALL body (4 words or more; 2-3 only when Sony on both sides, revision 19) with an exact fingerprint too
     common to identify alone (round 78's GsSetNearClip, SsInit, SpuInitHot, all
     TINY or AMBIGUOUS) is a lead when it TOUCHES Sony code: the function or
     placed object right before or after it is already library, and one of its
@@ -383,10 +404,13 @@ def adjacency_leads(corp, library):
     info = {v: (nm, w) for nm, (v, w) in funcs.items()}
     starts = sorted(set(info) | {pl[0] for pl in placed})
     ends = {pl[1] for pl in placed}
+    tables = game_method_tables()
     cand = {}
     for vram, (nm, w) in info.items():
-        if w < 4 or vram in library:
+        if w < 2 or vram in library:
             continue
+        if builds_address(retail_words_at(vram, w)) & tables:
+            continue     # a Get*Methods getter: CdLastPos's shape, the game's table (func_80047900)
         rows = [r for r in rank(retail_words_at(vram, w), corp, top=10 ** 6) if r[0]]
         if rows:
             cand[vram] = rows
@@ -402,9 +426,16 @@ def adjacency_leads(corp, library):
             prev = starts[i - 1] if i else None
             nxt = starts[i + 1] if i + 1 < len(starts) else None
             side = set()
-            if b and (vram in ends or prev in library or prev in found):
+            before = b and (vram in ends or prev in library or prev in found)
+            after = a and (a[0] == vram + 4 * w or nxt in library or nxt in found)
+            # Revision 19: a 2-3 word stub (jr ra; nop) matches dozens of
+            # bodies, so it qualifies only SANDWICHED, Sony on both sides
+            # (round 79's KeyOnCheck, between two identified vmanager functions).
+            if w < 4 and not (before and after):
+                continue
+            if before:
                 side.add(b[2].split("/")[0])
-            if a and (a[0] == vram + 4 * w or nxt in library or nxt in found):
+            if after:
                 side.add(a[2].split("/")[0])
             hit = sorted({(r[3], r[4]) for r in rows if r[3].split("/")[0] in side})
             if hit:

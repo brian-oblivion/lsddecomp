@@ -6,6 +6,46 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — premium session: plan revision 19 (round 81's escalations, round 79-80's open items)
+
+The operator handed over every open item. Each was decided, measured where it
+could be.
+
+- **`rename.py` duplicate lines (round 81).** Confirmed. `symbol_address()`
+  now reads the symbols file before falling back to the placeholder's own
+  address, so `func_8003B20C` gets "replace line" instead of a second entry.
+  The 45 stale track-2 `unidentified` comment blocks (97 lines) on functions
+  revision 18 moved to game units are deleted, and their entries stay. Track
+  2's parked count drops from 44 to 1: those records were counting game code
+  as parked SDK functions. Image byte-exact. The three blocked renames
+  (`func_8003B20C`, `func_8003B39C`, `func_8003B624`, names in their reports)
+  can now run in the next naming pass on code_39094.
+- **2-word Sony stubs (round 79).** An adjacency lead may now be 2-3 words
+  when Sony code sits on BOTH sides. That catches `KeyOnCheck` and flags no
+  game stub. `__main` stays a one-off, since it is the entry-point stub and is
+  already identified. The rule also turned up a false positive older than it:
+  `func_80047900`, code_3770c's `CdStreamObjMethods` getter, had been a LEAD
+  (CdLastPos's 4-word shape) in the committed `sdk-in-game.txt` since revision
+  18, so it was counted as Sony. A candidate whose body builds the address of
+  a game method table is now excluded, and the getter is game code again.
+  Because the tool catches these, §4.2 is not lengthened.
+- **Track 2's position rule (round 79).** It is now stated where tracks 1-2
+  live: position evidence is the placed objects on either side, and the
+  candidate's own object need not be placed.
+- **Second naming pass (round 79).** None. Track 4's step 6 names slots and
+  their occupants class by class, so a second track-3 pass would duplicate it.
+  What track 4 leaves stays tier C.
+- **Finalize-slot naming (round 80).** Kept. An override is named for the
+  slot it fills, since the tree had no convention (8 Finalize, 7 Destroy,
+  4 Dtor). Stragglers are renamed as their classes unify.
+- **`BASICCLASS_SLOTS_R` and its banner sentence (round 81).** Confirmed.
+  +0x008 is already the one slot every class redefines, and its return type
+  is part of that same per-class signature. It extends the model, and the
+  banner states it correctly.
+- **Matching model (round 81).** The stale head override was cleared with
+  `set-model --model auto`. Calibration still picks Opus, and the 86/86
+  fresh round was Opus.
+
 ## 2026-09-25 — round 81: 86/86 fresh matches, track 2 done, Class6B5CC unified, four units named
 
 **Opus head (not premium), five slots, three waves, 16 runner sessions** (11 Opus
