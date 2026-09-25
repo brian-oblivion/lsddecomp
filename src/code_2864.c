@@ -8,13 +8,15 @@
  * GetNextBasicClass and ApplyMatrixToLVArray.
  *
  * MATCHED round 81 (alpha; docs/match-reports/Viewport__DrawNode.md). It is slot
- * +0x0A0 of Unk18Obj's table (tools/classtable.py gViewportMethods): the view
- * draws one scene node and recurses into the node's children. Every type
- * below is a LOCAL view (DrawView is this function's reading of Unk18Obj,
- * whose shared view lives in include/code_2cc8c.h and is not touched here).
+ * +0x0A0 (drawNode) of Viewport's table (include/Viewport.h, gViewportMethods):
+ * the viewport draws one scene node into its current ordering table and
+ * recurses into the node's children. `self` is the Viewport (its local view,
+ * DrawView, was merged into include/Viewport.h in round 85); every other
+ * type below is still a LOCAL view.
  */
 #include "common.h"
 #include "BasicClass.h"
+#include "Viewport.h"
 
 /* Psy-Q LIBGTE.H / LIBGS.H shapes, declared locally. */
 typedef struct { s16 m[3][3]; s32 t[3]; } MATRIX_2864;
@@ -95,21 +97,6 @@ struct DrawNode {
     } u;
 };
 
-/* Viewport__DrawNode's reading of its `self` (Unk18Obj). */
-typedef struct {
-    u8 pad0[0x34];
-    s32 width;                  /* +0x34 */
-    s32 height;                 /* +0x38 */
-    s32 otLen;                  /* +0x3C */
-    s32 projH;                  /* +0x40 */
-    u8 pad44[0x4C - 0x44];
-    s32 nearZ;                  /* +0x4C */
-    u8 pad50[0x74 - 0x50];
-    s32 buf;                    /* +0x74 */
-    void *ot[2];                /* +0x78 */
-    u8 pad80[0x98 - 0x80];
-    s32 zDiv;                   /* +0x98 */
-} DrawView;
 
 extern void RotMatrix(SVECTOR_2864 *r, MATRIX_2864 *m);
 extern void GsGetLs(GsCOORDINATE2_2864 *m, MATRIX_2864 *out);
@@ -136,7 +123,7 @@ extern void func_80018464(void *objIn, void *otSrc, s32 otShift, void *ctxIn);
  *    the ratio ternaries are one store each (the second copy of the store
  *    is the delay-slot filler's); `~v + 1` is retail's nor/addiu negate.
  */
-void Viewport__DrawNode(DrawView *self, DrawNode *node)
+void Viewport__DrawNode(Viewport *self, DrawNode *node)
 {
     MATRIX_2864 lsBuf;
     MATRIX_2864 lwBuf;
@@ -201,33 +188,33 @@ void Viewport__DrawNode(DrawView *self, DrawNode *node)
 
     tag = node->methods->header;
     if ((tag & 0xFF) == 0x54) {
-        GsSortBg(node->u.bg, self->ot[self->buf], (1 << self->otLen) - 1);
+        GsSortBg(node->u.bg, self->ot[self->otIndex], (1 << self->otLength) - 1);
     } else if ((tag & 0xFF) == 0x64) {
         DrawNode *b = node;
         if (b->u.boxf.relative) {
-            b->u.boxf.box.x = ((self->width >> 1) * b->u.boxf.x) / 100;
-            b->u.boxf.box.y = ((self->height >> 1) * b->u.boxf.y) / 100;
+            b->u.boxf.box.x = ((self->screenSize.width >> 1) * b->u.boxf.x) / 100;
+            b->u.boxf.box.y = ((self->screenSize.height >> 1) * b->u.boxf.y) / 100;
         } else {
             b->u.boxf.box.x = b->u.boxf.x;
             b->u.boxf.box.y = b->u.boxf.y;
         }
-        GsSortBoxFill(&b->u.boxf.box, self->ot[self->buf], b->u.boxf.pri);
+        GsSortBoxFill(&b->u.boxf.box, self->ot[self->otIndex], b->u.boxf.pri);
     } else if ((tag & 0xFF) != 0x44) {
         GsGetLws(node->obj.coord2, lw, ls);
         GsSetLightMatrix(lw);
         GsSetLsMatrix(ls);
         if (node->obj.tmd != NULL) {
-            func_80018464(&node->obj, self->ot[self->buf], 14 - self->otLen, (void *)0x1F800000);
+            func_80018464(&node->obj, self->ot[self->otIndex], 14 - self->otLength, (void *)0x1F800000);
         }
     } else if ((tag & 0xFFF) == 0x144) {
         DrawNode *n = node;
         GsSPRITE_2864 *sp = &n->u.spr.sprite;
-        s32 *size = &self->width;
+        s32 *size = &self->screenSize.width;
         sp->x = (n->u.spr.ratioX != 0) ? ((size[0] >> 1) * 100) / (10000 / n->u.spr.ratioX) : 0;
         sp->y = (n->u.spr.ratioY != 0) ? ((size[1] >> 1) * 100) / (10000 / n->u.spr.ratioY) : 0;
         sp->x += sp->mx;
         sp->y += sp->my;
-        GsSortSprite(sp, self->ot[self->buf], 0);
+        GsSortSprite(sp, self->ot[self->otIndex], 0);
     } else {
         VECTOR_2864 pos;
         SVECTOR_2864 scr; /* never used; reserves retail's 8 unused frame bytes */
@@ -262,7 +249,7 @@ void Viewport__DrawNode(DrawView *self, DrawNode *node)
             } else {
                 n->u.spr.sprite.y = 0x200;
             }
-            GsSortSprite(&n->u.spr.sprite, self->ot[self->buf], pos.vz);
+            GsSortSprite(&n->u.spr.sprite, self->ot[self->otIndex], pos.vz);
         }
     }
 }
