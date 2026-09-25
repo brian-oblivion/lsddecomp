@@ -83,7 +83,9 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042694);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800426E4);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042790);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042814);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042820);
+/* D_8006EFAC slot +0x09C (dispatchLinkCommand): empty override. */
+void func_80042820(Class6B5CC *self, void *sender, s32 event) {
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042828);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004283C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800428E4);
