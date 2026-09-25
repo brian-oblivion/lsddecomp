@@ -1,37 +1,39 @@
 /*
- * class_3bb8c_q -- functions 94..95 of the class_3bb8c remainder,
- * 0x485BC..0x48738 (95 words).  Carved round 47 (2026-09-16).
+ * class_3bb8c_q -- 0x485BC..0x48738, two methods of class D800879C4 (table
+ * D_800879C4, 49 slots; tools/classtable.py). D800879C4 is a 0xA8-byte
+ * sprite object: a subclass of the sprite class whose table is D_8006EE1C
+ * (tag 0x44; GsSPRITE embedded at +0x64, drawn by func_80012064 through
+ * GsSortSprite), which is itself a Class6B5CC subclass. Its ctor and
+ * allocator (D800879C4__D800879C4, New_D800879C4) are in class_3bb8c_p.c,
+ * its empty leaves and table getter in class_3bb8c_t.c; Class876FC
+ * (class_3bb8c_s.c) builds five of them per instance.
  *
- * THE CARVE NOTE THAT STOOD HERE FOR 26 ROUNDS WAS STALE AND SAID "nothing to
- * staff here": D800879C4__SetVariantClut was filed as addiu-$at blocked (resolved round
- * 21) and D800879C4__UpdateScale as nop_mflo_mfhi blocked (resolved round 42).
- * `tools/uncarved.py` measures both blocker-clean.  Both are frameless leaves
- * (zero `addiu $sp, $sp, -N`), so neither is expected to have a stack frame.
+ * - D800879C4__SetVariantClut (slot +0x040, tail-called by the ctor with its
+ *   arg1): records the variant and points the sprite's CLUT at that
+ *   variant's palette row, overriding the one the base init took from the
+ *   texture.
+ * - D800879C4__UpdateScale (slot +0x048, overrides Class6B5CC__UpdateScale):
+ *   the 2-D version, two num/den ratios into GsSPRITE scalex/scaley.
  *
- * Owns no jump table, so no rodata attach.  Expect this slice to span more
- * than one class; identify each with `tools/classtable.py`.
+ * Named round 79; tiers in the reports. Game-level role of the sprites is
+ * not established.
  */
 
 #include "common.h"
 
 /*
- * Table D_800879C4 (49 slots, resolved with `tools/classtable.py
- * 0x800879C4`): D800879C4__SetVariantClut is slot40, D800879C4__UpdateScale is slot48.  The
- * neighbouring class_3bb8c_p unit already carries its OWN local view of
- * this same table/object (`D_800879C4Methods`/`D_800879C4Obj` in that
- * file, only exposing the ctor slot and `+0xA4`) -- per the project's
- * multiple-independent-local-views convention this unit does not touch
- * that file, it defines its own view sized for what THESE two functions
- * read/write. The allocator (class_3bb8c_p's New_D800879C4) sizes the
- * object at 0xA8 bytes, which every offset below stays inside.
+ * This unit's own local view of the object (class_3bb8c_p.c and
+ * class_3bb8c_t.c carry theirs, per the multiple-independent-local-views
+ * convention). New_D800879C4 allocates 0xA8 bytes; every offset here stays
+ * inside.
  */
 typedef struct D800879C4Obj D800879C4Obj;
 struct D800879C4Obj {
     u8 pad00[0x58];
     /* +0x058..+0x063: written by the base class's slot +0x040 init
-     * (func_8004202C, asm/psyq_322b4.s: unk58 = 0) and read only by
-     * D800879C4__UpdateScale below; func_80012064's sprite draw path never
-     * reads them. What sets unk58 non-zero is not established. */
+     * (func_8004202C, asm/psyq_322b4.s: unk58 = 0) and read by
+     * D800879C4__UpdateScale below; func_80012064's sprite draw path does
+     * not read them. What sets unk58 non-zero is not established. */
     s32 unk58;                  /* +0x058, UpdateScale: non-zero selects the scale-in-place path */
     s32 unk5C;                  /* +0x05C, UpdateScale: multiplied by the x ratio when unk58 != 0 */
     s32 unk60;                  /* +0x060, UpdateScale: multiplied by the y ratio when unk58 != 0 */
