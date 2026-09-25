@@ -53,7 +53,7 @@ typedef struct MiddleClassMethods {
     s32 header;                                             /* +0x000 */
     void *unk04;                                             /* +0x004 */
     void (*ctor)(void *self, s32 a1);                         /* +0x008 Class6E4F0__Class6E4F0 */
-    void *unk0C;                                               /* +0x00C func_8003B024 (dtor override, shared with Class6D3C8) */
+    void *unk0C;                                               /* +0x00C Class6E4F0__Finalize (dtor override, shared with Class6D3C8) */
     void *unk10, *unk14, *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* BasicClass, inherited */
     void *unk3C;                                                /* +0x03C null slot */
     void *unk40;                                                 /* +0x040 func_8003B02C */
@@ -83,7 +83,7 @@ typedef struct Class6D3C8Methods {
     s32 header;                                            /* +0x000 */
     void *unk04;                                            /* +0x004 BasicClass__Release */
     void (*ctor)(Class6D3C8 *self, Class6D3C8CtorArgs *arg); /* +0x008 Class6D3C8__Class6D3C8 */
-    void *unk0C;                                            /* +0x00C func_8003B024 (dtor override) */
+    void *unk0C;                                            /* +0x00C Class6E4F0__Finalize (dtor override) */
     void *unk10;                                            /* +0x010 BasicClass__AddChild */
     void *unk14;                                            /* +0x014 BasicClass__RemoveChild */
     void *unk18;                                            /* +0x018 BasicClass__RemoveAllChildren */

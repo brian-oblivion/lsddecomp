@@ -101,7 +101,7 @@ void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 source) {
     self->methods->setDims(self, &D_8008A8E0, 0);
 }
 
-void func_8003B024(Class6E4F0 *self) {
+void Class6E4F0__Finalize(Class6E4F0 *self) {
 }
 
 void func_8003B02C(Class6E4F0 *self, ScreenDims *dims, s32 arg) {

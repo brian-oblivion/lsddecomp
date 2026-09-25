@@ -2515,3 +2515,4 @@ gClass6D3C8CtorArgs = 0x80066828;
 __main = 0x80011994; // type:func
 gDataSourceClientGetters = 0x8006D4AC;
 Class6E4F0__Class6E4F0 = 0x8003AF8C; // type:func
+Class6E4F0__Finalize = 0x8003B024; // type:func
