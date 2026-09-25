@@ -180,6 +180,17 @@ def main():
     args = ap.parse_args()
 
     segs = uncarved_segments()
+    # psyq_* segments are skipped by NAME, and revision 18 measured that the
+    # names lied: game code sat in ten of them. config/game-in-sdk.txt is the
+    # measured list; anything in it is uncarved game ground this table omits.
+    gis = os.path.join(ROOT, 'config', 'game-in-sdk.txt')
+    if os.path.exists(gis):
+        n = sum(1 for l in open(gis) if re.match(r'^0x[0-9A-Fa-f]{8}\s', l))
+        if n:
+            print('WARNING: %d game function(s) sit inside psyq_* segments '
+                  '(config/game-in-sdk.txt) and are NOT in the table below. '
+                  '`.venv/bin/python3 tools/gameinsdk.py` prints them as runs '
+                  'to carve.\n' % n)
     if args.segment:
         if args.segment not in segs:
             print('not an uncarved segment: %s\nuncarved: %s'
