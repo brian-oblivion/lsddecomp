@@ -101,4 +101,7 @@ void func_8003B108(Class6E4F0 *self) {
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B110);
-INCLUDE_ASM("asm/nonmatchings/code_2b78c", func_8003B20C);
+
+Class6E4F0Methods *func_8003B20C(void) {
+    return &D_8006E4F0;
+}
