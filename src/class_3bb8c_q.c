@@ -25,25 +25,36 @@
  * read/write. The allocator (class_3bb8c_p's New_D800879C4) sizes the
  * object at 0xA8 bytes, which every offset below stays inside.
  */
-typedef struct D_800879C4Obj_q D_800879C4Obj_q;
-struct D_800879C4Obj_q {
+typedef struct D800879C4Obj D800879C4Obj;
+struct D800879C4Obj {
     u8 pad00[0x58];
-    s32 unk58;                  /* +0x058, D800879C4__UpdateScale: non-zero selects the scale-in-place path */
-    s32 unk5C;                  /* +0x05C, D800879C4__UpdateScale: scaled in place by the first ratio when unk58 != 0 */
-    s32 unk60;                  /* +0x060, D800879C4__UpdateScale: scaled in place by the second ratio when unk58 != 0 */
+    /* +0x058..+0x063: written by the base class's slot +0x040 init
+     * (func_8004202C, asm/psyq_322b4.s: unk58 = 0) and read only by
+     * D800879C4__UpdateScale below; func_80012064's sprite draw path never
+     * reads them. What sets unk58 non-zero is not established. */
+    s32 unk58;                  /* +0x058, UpdateScale: non-zero selects the scale-in-place path */
+    s32 unk5C;                  /* +0x05C, UpdateScale: multiplied by the x ratio when unk58 != 0 */
+    s32 unk60;                  /* +0x060, UpdateScale: multiplied by the y ratio when unk58 != 0 */
+    /* +0x064: an embedded GsSPRITE (layout confirmed by the base init
+     * func_8004208C, which fills attribute/w/h/tpage/u/v/cx/cy/rgb/mx/my/
+     * scalex/scaley/rotate at their GsSPRITE offsets, and by
+     * func_80012064, which hands self+0x64 to GsSortSprite). Only the
+     * members this unit touches are spelled out. */
     u8 pad64[0x74 - 0x64];
-    s16 unk74;                  /* +0x074, D800879C4__SetVariantClut: gD800879C4ClutX[arg1] */
-    s16 unk76;                  /* +0x076, D800879C4__SetVariantClut: gD800879C4ClutY[arg1] */
+    s16 spriteClutX;            /* +0x074, GsSPRITE.cx */
+    s16 spriteClutY;            /* +0x076, GsSPRITE.cy */
     u8 pad78[0x80 - 0x78];
-    s16 unk80;                  /* +0x080, D800879C4__UpdateScale: raw first ratio (truncated) when unk58 == 0 */
-    s16 unk82;                  /* +0x082, D800879C4__UpdateScale: raw second ratio (truncated) when unk58 == 0 */
+    s16 spriteScaleX;           /* +0x080, GsSPRITE.scalex (20.12) */
+    s16 spriteScaleY;           /* +0x082, GsSPRITE.scaley (20.12) */
     u8 pad84[0xA0 - 0x84];
-    s32 unkA0;                  /* +0x0A0, D800879C4__SetVariantClut: the raw index argument, stored verbatim */
+    /* +0x0A0: the ctor's arg1, which also picks this object's texture cell
+     * (&D_80087A8C[arg1], passed to the base ctor by D800879C4__D800879C4). */
+    s32 variant;
 };
 
 /*
  * Two parallel lookup tables, 2 entries each, stride 4 bytes (indexed as
- * `arg1 * 2` of `s16`, i.e. `arg1 * 4` bytes) even though each holds only
+ * `variant * 2` of `s16`, i.e. `variant * 4` bytes) even though each holds only
  * a 2-byte element at that stride -- retail takes two SEPARATE %hi/%lo
  * bases (gD800879C4ClutX, gD800879C4ClutY) rather than one struct array, so this is
  * the only spelling that reproduces the two relocations. Values:
@@ -53,39 +64,36 @@ struct D_800879C4Obj_q {
 extern const s16 gD800879C4ClutX[];
 extern const s16 gD800879C4ClutY[];
 
-void D800879C4__SetVariantClut(D_800879C4Obj_q *self, s32 arg1) {
-    self->unkA0 = arg1;
-    self->unk74 = gD800879C4ClutX[arg1 * 2];
-    self->unk76 = gD800879C4ClutY[arg1 * 2];
+void D800879C4__SetVariantClut(D800879C4Obj *self, s32 variant) {
+    self->variant = variant;
+    self->spriteClutX = gD800879C4ClutX[variant * 2];
+    self->spriteClutY = gD800879C4ClutY[variant * 2];
 }
 
 /*
- * `pair` is a caller-supplied `{s16 whole; s16 frac;}` pair, twice over
- * (axis 0 at +0x0/+0x2, axis 1 at +0x4/+0x6) -- same 20.12 fixed-point
- * split-division idiom as code_2cc8c_d.c's Unk18Obj__SetRatio12 and
- * code_d294_c.c's RatioToFixed12 (divide once for quotient+remainder, then
- * divide the shifted remainder again for the fractional part), read as a
- * raw `s16 *` rather than a named struct per those units' own precedent
- * for this exact shape (code_2cc8c.h's note on WholeFrac_d294: "a
- * different unit's own local view of the same shape, not a shared
- * type"). `arg1` is read by nothing in the whole function body (retail
- * never touches it after entry) -- kept as an unused parameter to match
- * the real arity.
+ * Slot +0x048, overriding Class6B5CC__UpdateScale (tools/classtable.py
+ * D_800879C4 --vs gClass6B5CCMethods). `ratios` is two s16 num/den pairs
+ * (x at +0x0/+0x2, y at +0x4/+0x6) -- every caller passes one of
+ * gSpriteScaleLarge/gSpriteScaleSmall ({6,5}, {4,6}) or a table forwarded
+ * from Class876FC__SpawnSprites -- each turned into a 20.12 fixed-point
+ * ratio by the split-division idiom RatioToFixed12 uses (code_d294_c.c).
+ * Unlike the base method, `set` is never read: every path assigns. Read as
+ * a raw `s16 *` per the RatioToFixed12 precedent for this shape.
  */
-void D800879C4__UpdateScale(D_800879C4Obj_q *self, s32 arg1, s16 *pair) {
+void D800879C4__UpdateScale(D800879C4Obj *self, s32 set, s16 *ratios) {
     s32 q1, r1, q2, ratio1;
     s32 q3, r3, q4, ratio2;
     s16 short1, short2;
 
-    q1 = pair[0] / pair[1];
-    r1 = pair[0] % pair[1];
-    q2 = (r1 << 12) / pair[1];
+    q1 = ratios[0] / ratios[1];
+    r1 = ratios[0] % ratios[1];
+    q2 = (r1 << 12) / ratios[1];
     ratio1 = (q1 << 12) + q2;
     short1 = (s16)ratio1;
 
-    q3 = pair[2] / pair[3];
-    r3 = pair[2] % pair[3];
-    q4 = (r3 << 12) / pair[3];
+    q3 = ratios[2] / ratios[3];
+    r3 = ratios[2] % ratios[3];
+    q4 = (r3 << 12) / ratios[3];
     ratio2 = (q3 << 12) + q4;
     short2 = (s16)ratio2;
 
@@ -93,7 +101,7 @@ void D800879C4__UpdateScale(D_800879C4Obj_q *self, s32 arg1, s16 *pair) {
         self->unk5C = ((s16)ratio1 * self->unk5C) >> 12;
         self->unk60 = ((s16)ratio2 * self->unk60) >> 12;
     } else {
-        self->unk80 = short1;
-        self->unk82 = short2;
+        self->spriteScaleX = short1;
+        self->spriteScaleY = short2;
     }
 }
