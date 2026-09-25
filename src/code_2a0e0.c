@@ -124,7 +124,12 @@ void func_80039A34(SeqObj *self) {
     self->methods->removeChild(self, func_80020C5C());
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_80039B04);
+void func_80039B04(SeqObj *self, void *sender, s32 event) {
+    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    if ((((BasicClass *)sender)->methods->header & 0xF) == 1) {
+        self->methods->update(self, (s32)sender, event);
+    }
+}
 void func_80039B90(SeqObj *self, s32 arg1, s32 arg2) {
     if (arg2 == 2 && self->state == 1 && func_80039C04(self) && self->unk20 != 0) {
         self->methods->play(self);
