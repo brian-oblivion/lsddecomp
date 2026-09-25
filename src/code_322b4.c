@@ -65,7 +65,12 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041AB4);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041B20);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041BAC);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041BDC);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C28);
+/* D_8006EC74 slot +0x0C8: read the byte at +0x0A8. */
+u8 func_80041C28(D_8006EC74Obj *self) {
+    u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
+
+    return self->unkA8;
+}
 /* Returns the D_8006EC74 method table. */
 void *func_80041C3C(void) {
     return D_8006EC74;
