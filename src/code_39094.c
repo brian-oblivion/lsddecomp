@@ -22,8 +22,8 @@ typedef struct D_80081940Obj D_80081940Obj;
 typedef struct D_80081940Methods {
     CLASS6D430_SLOTS(D_80081940Obj, (D_80081940Obj *self));
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ void (*slot80)(void);
-    /* +0x084 */ void (*releaseAlloc)(D_80081940Obj *self);  /* func_80048C98 */
+    /* +0x080 */ s32 (*slot80)();  /* func_80048BC0(self); unprototyped: func_800489B4 calls it with no argument */
+    /* +0x084 */ void (*releaseAlloc)();  /* func_80048C98(self); unprototyped: func_80048BC0 calls it with no argument */
 } D_80081940Methods;
 
 /* The D_80081940 object: a Class6D430 data source with its own fields from
@@ -124,7 +124,35 @@ void func_80048B78(D_80081940Obj *self) {
     self->unk2C = 0;
     self->unk30 = -1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048BC0);
+/* The header at the start of D_80081940's 0xB358 buffer (local view). */
+typedef struct StreamHdr {
+    /* +0x00 */ u16 unk0;
+    /* +0x02 */ u16 hasData;
+    /* +0x04 */ u8 pad4[0xC];
+    /* +0x10 */ u32 dataOffset;
+    /* +0x14 */ s32 dataSize;
+} StreamHdr;
+
+/* slot +0x080 of D_80081940: load the data block the header describes */
+s32 func_80048BC0(D_80081940Obj *self) {
+    s32 size;
+    if (((StreamHdr *)self->buffer)->hasData == 0) {
+        return 0;
+    }
+    if (self->unk2A != 0) {
+        return 0;
+    }
+    self->methods->releaseAlloc();
+    size = ((StreamHdr *)self->buffer)->dataSize;
+    self->unk34 = BMemPMgrAlloc(size);
+    if (self->unk34 == NULL) {
+        return 0;
+    }
+    self->unk2A = 10;
+    self->methods->seek(self, ((StreamHdr *)self->buffer)->dataOffset, 0);
+    self->methods->read(self, self->unk34, size);
+    return 1;
+}
 /* slot +0x084 of D_80081940 */
 void func_80048C98(D_80081940Obj *self) {
     self->unk2E = 0;
