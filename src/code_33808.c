@@ -125,7 +125,20 @@ void func_80043538(Obj6F0B8 *self, s32 index, s32 shift) {
     e->shift = shift;
     e->mask = 1 << e->shift;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004355C);
+/* D_8006F0B8 +0x07C: slot +0x080 for entries 0..3, under the data-source
+ * lock. */
+extern void LockActiveDataSource(void);
+extern void UnlockActiveDataSource(void);
+
+void func_8004355C(DataSrc33808 *self, s32 arg) {
+    s32 i;
+
+    LockActiveDataSource();
+    for (i = 0; i < 4; i++) {
+        self->methods->slot80(self, i, arg);
+    }
+    UnlockActiveDataSource();
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800435D0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043648);
 extern s32 D_8006F0B8[];
