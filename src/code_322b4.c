@@ -26,14 +26,14 @@ typedef struct D_8006EF50Obj {
     BasicClassListNode *parentRefs; /* +0x008, BasicClass's */
     s32 unkC;  /* +0x00C, read by func_8004264C */
     s32 unk10; /* +0x010, set to 1 by func_80042658, cleared by func_80042664, read by func_8004266C */
-    s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by func_800425D8 */
-    BasicClassListNode *unk18; /* +0x018, cleared by func_800425D8; a parentRefs cursor D8006EF50__RemoveParentRef steps past a removed parent */
+    s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by D8006EF50__Reset */
+    BasicClassListNode *unk18; /* +0x018, cleared by D8006EF50__Reset; a parentRefs cursor D8006EF50__RemoveParentRef steps past a removed parent */
 } D_8006EF50Obj;
 struct D_8006EF50Methods {
     u8 pad00[0x30];
     void (*notifyParents)(D_8006EF50Obj *self, s32 event); /* +0x030 = D8006EF50__NotifyParents */
     u8 pad34[0x40 - 0x34];
-    void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = func_800425D8 */
+    void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = D8006EF50__Reset */
 };
 
 /* Local view of a D_8006EC74 object: D8006EC74__GetCell reads the byte at +0xA8. */
@@ -458,7 +458,7 @@ void D8006EF50__NotifyParents(D_8006EF50Obj *self, s32 event) {
     self->unk18 = NULL;
 }
 /* D_8006EF50 slot +0x040 (reset). */
-void func_800425D8(D_8006EF50Obj *self, s32 a1) {
+void D8006EF50__Reset(D_8006EF50Obj *self, s32 a1) {
     self->unkC = a1;
     self->unk14 = 0;
     self->unk10 = 0;

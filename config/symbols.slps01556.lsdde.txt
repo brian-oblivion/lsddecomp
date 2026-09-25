@@ -2644,3 +2644,4 @@ D8006EF50__D8006EF50 = 0x80042450; // type:func
 D8006EF50__Finalize = 0x800424A8; // type:func
 D8006EF50__RemoveParentRef = 0x800424E0; // type:func
 D8006EF50__NotifyParents = 0x80042550; // type:func
+D8006EF50__Reset = 0x800425D8; // type:func

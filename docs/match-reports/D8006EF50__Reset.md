@@ -1,4 +1,6 @@
-# func_800425D8 -- MATCHED (5/5 words), round 82
+# D8006EF50__Reset -- MATCHED (5/5 words), round 82
+
+> Renamed from `func_800425D8` on 2026-09-25 (tools/rename.py). Address 0x800425d8.
 
 Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322
 
 ```c
 /* D_8006EF50 slot +0x040 (reset). */
-void func_800425D8(D_8006EF50Obj *self, s32 a1) {
+void D8006EF50__Reset(D_8006EF50Obj *self, s32 a1) {
     self->unkC = a1;
     self->unk14 = 0;
     self->unk10 = 0;
