@@ -1,4 +1,6 @@
-# func_800272C8 -- MATCHED (2/2 words)
+# Class6D4E8__NoOpSlot40 -- MATCHED (2/2 words)
+
+> Renamed from `func_800272C8` on 2026-09-25 (tools/rename.py). Address 0x800272c8.
 
 Unit `code_179d8_o`, round 26 (2026-09-09). A bare `jr $ra; nop` leaf --
 retail's own compiled body for this vtable slot is genuinely empty.
@@ -6,7 +8,7 @@ retail's own compiled body for this vtable slot is genuinely empty.
 ## What it is
 
 ```c
-void func_800272C8(void)
+void Class6D4E8__NoOpSlot40(void)
 {
 }
 ```

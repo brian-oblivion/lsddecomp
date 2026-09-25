@@ -2429,3 +2429,4 @@ Obj86B60__func_8003CCDC = 0x8003CCDC; // type:func
 SpuVmSetVol = 0x80030980; // type:func
 Class6D4E8__Class6D4E8 = 0x80027228; // type:func
 Class6D4E8__Destroy = 0x80027274; // type:func
+Class6D4E8__NoOpSlot40 = 0x800272C8; // type:func

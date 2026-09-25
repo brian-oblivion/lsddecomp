@@ -18,7 +18,7 @@ hierarchy, whose constructor `BasicClass__BasicClass` sits at `+0x008`).
 `Class6D4E8__Destroy`), inherits `+0x010..+0x038` verbatim (identical
 `BasicClass__func_*` addresses in both tables), and adds new slots from
 `+0x040` up that `D_8006B58C` doesn't have at all (including this unit's own
-`func_800272C8`). Since `+0x008` is confirmed as the constructor slot in the
+`Class6D4E8__NoOpSlot40`). Since `+0x008` is confirmed as the constructor slot in the
 BASE table, `New_Class6D4E8` allocating and then calling through that same
 slot on ITS OWN table (which resolves to `Class6D4E8__Class6D4E8`, this unit's next
 function) is a genuine "allocate + construct" pair -- confirmed by the table

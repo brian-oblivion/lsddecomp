@@ -20,7 +20,7 @@
  *   New_Class6D4E8 (20w)  CLEAN
  *   Class6D4E8__Class6D4E8   (19w)  CLEAN
  *   Class6D4E8__Destroy   (21w)  CLEAN
- *   func_800272C8    (2w)  CLEAN  -- a bare `jr $ra; nop` leaf
+ *   Class6D4E8__NoOpSlot40    (2w)  CLEAN  -- a bare `jr $ra; nop` leaf
  * 4 of 4 clean, and the window references NO rodata or data symbol at all
  * (zero `%hi`/`%lo` in the whole slice), so no rodata sub-slot is attached.
  *
@@ -45,7 +45,7 @@
  * (DestroyChained), +0x008 (Class6D4E8__Class6D4E8) and +0x00C (Class6D4E8__Destroy);
  * slots +0x010..+0x038 are inherited verbatim (same BasicClass__func_*
  * addresses in both tables) and the rest (+0x040 upward, including
- * func_800272C8) are new slots BasicClass's own table does not have at
+ * Class6D4E8__NoOpSlot40) are new slots BasicClass's own table does not have at
  * all. +0x008 is BasicClass's own constructor slot in D_8006B58C
  * (BasicClass__BasicClass sits there) -- CONFIRMED by that lookup, not
  * assumed from the FirecatFG name.  So: `New_Class6D4E8` is a genuine
@@ -136,6 +136,6 @@ void Class6D4E8__Destroy(Obj6D4E8 *self)
     self->methods->slot5C(self);
 }
 
-void func_800272C8(void)
+void Class6D4E8__NoOpSlot40(void)
 {
 }
