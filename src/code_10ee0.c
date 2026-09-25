@@ -64,7 +64,11 @@ s32 func_80020A1C(Class6C070 *self) {
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020A24);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020A74);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020AF4);
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020B4C);
+void func_80020B4C(Class6C070 *self, s32 value) {
+    if (self->unk10 == 0) {
+        self->unk20 = value;
+    }
+}
 s32 func_80020B68(Class6C070 *self) {
     return self->unk20;
 }
