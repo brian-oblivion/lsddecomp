@@ -47,6 +47,7 @@
  */
 
 #include "common.h"
+#include "Actor.h"
 
 /* Local view only, not the shared header: `gStyleDecorObj` is already established
  * as a `LocalM4D0Obj *` in `src/class_3bb8c_m.c` (round 15, own local type),
@@ -296,7 +297,6 @@ void StyleReleaseDecorSet(void) {
 
 extern s32 gStyleVariant;
 extern s32 gStyleTargetObj;
-extern void Actor__func_56f5c(s32 arg0, void *arg1, s32 arg2, s32 arg3);
 extern s32 rand(void);
 extern s8 D_80087324[];
 extern s32 gStyleEffectSlotCount;

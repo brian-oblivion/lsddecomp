@@ -3,7 +3,7 @@
  * table is gClass876FCMethods (called Class876FC here; class_3bb8c_r.c's Obj876FC).
  * A 0x98-byte scene object built by New_Class876FC with a `kind` 0..3: it
  * attaches itself under a parent at pos + offset, links a model for kinds
- * 0-1, and owns up to two child arrays -- two BaseObjO model children laid
+ * 0-1, and owns up to two child arrays -- two Actor model children laid
  * out in a row that spin and drift along z after frame 500 (kind 0), or
  * five D800879C4 sprites (a GsSPRITE at +0x64) that are randomised at build
  * time (kind 2) or every frame (kind 3, class_3bb8c_o.c). Entry points are
@@ -14,13 +14,13 @@
  * Named round 70; tiers in the reports. Game-level role unknown.
  */
 #include "common.h"
-#include "Class6B5CC.h"
+#include "Actor.h"
 
 /* ------------------------------------------------------------------ *
  * LinkNode is this unit's ONE local view of every object it touches: the
  * owner (a gClass876FCMethods instance, 0x98 bytes -- the size New_Class876FC
  * allocates, which is exactly where `sprites` ends) and, for vtable
- * calls only, its children (`modelChildren`: BaseObjO, table gActorMethods;
+ * calls only, its children (`modelChildren`: Actor, table gActorMethods;
  * `sprites`: D800879C4 objects). Class876FC is the same struct under the
  * owner's name, used in the owner's method signatures. Fields +0x058..
  * +0x07B are the 0x24-byte parameter block the class's slot +0x040
@@ -77,14 +77,13 @@ struct LinkNode {
     s32 tableIndex;             /* +0x070, index into gModelChildDriftZ and gSpriteShiftX */
     void *color;                /* +0x074, passed to every sprite's slotB8 (RGB) */
     void *altColor;             /* +0x078, sprites[1]'s colour instead, when non-NULL */
-    LinkNode *modelChildren[2]; /* +0x07C..+0x083, BaseObjO children */
+    LinkNode *modelChildren[2]; /* +0x07C..+0x083, Actor children (New_Actor) */
     LinkNode *sprites[5];       /* +0x084..+0x097, D800879C4 children; class_3bb8c_o.c's
                                    LinkOwnerObj::links is the same array */
 };
 
 extern void LinkOwnerObj__ReleaseLinks(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
 extern void LinkOwnerObj__ReleaseLinksB(void *self);   /* class_3bb8c_o.c, LinkOwnerObj* */
-extern void Actor__AddTranslation(void *self, Vec3S *v);   /* class_3bb8c_o.c */
 extern void Class876FC__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl); /* below */
 extern s32 gSpriteShiftX[];
 extern s32 gSpriteScaleLarge[];
@@ -241,7 +240,6 @@ void AttachWithRotScale(LinkNode *node, void *parent, void *trans, s32 rotation,
  * (New_Actor, sharing the owner's model, attached to the owner);
  * reuse = 1 only resets their translation (their slotB8 is
  * Actor__SetTranslation). */
-extern void *New_Actor(void);        /* class_3bb8c_o.c, New_X allocator */
 extern Vec3S gModelChildOffsetInit;
 extern s32 gModelChildSpacing[];
 
@@ -361,7 +359,10 @@ void Class876FC__BuildRandomSprites(Class876FC *self) {
 
         child = self->sprites[1];
         gSpriteShiftScratch.x = gSpriteShiftX[self->tableIndex];
-        Actor__AddTranslation(child, &gSpriteShiftScratch);
+        /* Called directly, not through the child's table: the child is a
+         * sprite (D800879C4, a Sprite), not an Actor, and the function only
+         * touches the Class6B5CC coord2 both share. */
+        Actor__AddTranslation((Actor *)child, (Vec3_d294 *)&gSpriteShiftScratch);
         m = child->methods;
         arg = (self->altColor != NULL) ? self->altColor : self->color;
         m->slotB8(child, arg);
