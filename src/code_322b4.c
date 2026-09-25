@@ -19,13 +19,19 @@
 
 /* Local view of a D_8006EF50 (class id 0x5) object: only the three words its
  * +0x048..+0x058 accessors touch. */
+typedef struct D_8006EF50Methods D_8006EF50Methods;
 typedef struct D_8006EF50Obj {
-    u8 pad00[0xC];
+    D_8006EF50Methods *methods; /* +0x000 */
+    u8 pad04[0xC - 0x4];
     s32 unkC;  /* +0x00C, read by func_8004264C */
     s32 unk10; /* +0x010, set to 1 by func_80042658, cleared by func_80042664, read by func_8004266C */
     s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by func_800425D8 */
     s32 unk18; /* +0x018, cleared by func_800425D8 */
 } D_8006EF50Obj;
+struct D_8006EF50Methods {
+    u8 pad00[0x40];
+    void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = func_800425D8 */
+};
 
 /* Local view of a D_8006EC74 object: func_80041C28 reads the byte at +0xA8. */
 typedef struct D_8006EC74Obj {
@@ -200,7 +206,12 @@ void *func_80042400(void) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042450);
+/* D_8006EF50 slot +0x008 (ctor): the BasicClass ctor, install the table, reset(0). */
+void func_80042450(D_8006EF50Obj *self) {
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = func_80042684();
+    self->methods->reset(self, 0);
+}
 /* D_8006EF50 slot +0x00C (finalize): the BasicClass finalize. */
 void func_800424A8(BasicClass *self) {
     Get_vtable_BasicClass()->finalize(self);
