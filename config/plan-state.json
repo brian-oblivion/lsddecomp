@@ -929,6 +929,10 @@
       ],
       "status": "auto"
     },
+    "4b": {
+      "reason": "round 85 premium head: recipe written (FINISHING-PLAN track 4b, revision 21); first instances CdDriver.h, gMcDevicePath0/1, D_8008ACA4..AC; 0 game globals left (2026-09-25)",
+      "status": "open"
+    },
     "5": {
       "checklist": {},
       "reason": "",

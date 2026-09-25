@@ -657,6 +657,12 @@ def track4_classes(st):
         out.append(dict(c, state=state, stray=stray, below=below(c["table"]),
                         nviews=len(c["objects"]) + len(c["tables"]), files=files, units=units_,
                         name=(led or {}).get("class")))
+    # A class's own method table declared with another type somewhere is a
+    # VIEW of that class (track 4 step 1), so its class job removes it; 4b
+    # lists it only once the class is unified, as the regression it then is
+    # (round 85: D_8006D3C8 in code_171e0.h).
+    pending = {c["table"] for c in out if c["state"] not in ("unified", "parked")}
+    shared = {k: v for k, v in shared.items() if k not in pending}
     return out, shared
 
 
