@@ -23,7 +23,7 @@ extern Rec34S16 D_8008D994[];
 extern Rec34S16 D_8008D996[];
 extern Rec34S16 D_8008D99A[];
 extern Rec34S16 D_8008D99E[];
-extern Rec34S16 D_8008D988[];
+extern Rec34S16 _svm_voice[];
 
 extern u16 D_80090C60;
 extern u16 D_80090C64;
@@ -48,7 +48,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
         if (D_8008D99E[i].unk0 != a1) {
             continue;
         }
-        if (D_8008D988[i].unk0 == 0xFF) {
+        if (_svm_voice[i].unk0 == 0xFF) {
             D_8008D9A3[i].unk0 = 0;
             D_8008D98C[i].unk0 = 0;
             D_8006DAD4->unk194 = 0;
@@ -69,7 +69,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
             }
             D_8008D9A3[chan].unk0 = 0;
             D_8008D98C[chan].unk0 = 0;
-            D_8008D988[chan].unk0 = 0;
+            _svm_voice[chan].unk0 = 0;
             D_80090C60 |= lowMask;
             D_80090C64 |= highMask;
             D_8008E228 &= ~D_80090C60;
@@ -88,7 +88,7 @@ Scan every record `i` in `[0, D_8008E9D0)` for one whose four key fields
 same 0x34-stride record family `code_179d8_j.c` documents as
 `Rec34D994`, redeclared here as a local `Rec34S16`) match the caller's
 `(a3, a2, a0, a1)`. For every match, do one of two cleanups depending on
-`D_8008D988[i]`:
+`_svm_voice[i]`:
 
 - **`== 0xFF`:** the same "type A" reset `SpuVmKeyOff`'s neighbours use
   -- clear `D_8008D9A3[i]`, `D_8008D98C[i]`, and the current object's
@@ -96,7 +96,7 @@ same 0x34-stride record family `code_179d8_j.c` documents as
   `SpuVmNoiseOff`).
 - **otherwise:** a "channel" reset: stash `i` into the "currently selected
   channel" scratch global `D_8008EA26`, re-read it, clear `D_8008D9A3`/
-  `D_8008D98C`/`D_8008D988` at the CHANNEL index (not `i` -- same value in
+  `D_8008D98C`/`_svm_voice` at the CHANNEL index (not `i` -- same value in
   practice, but a fresh read, matching the project's documented idiom),
   then update the two 16-channel bitmask pairs `code_179d8_j.c` already
   documents (`D_80090C60`/`D_8008E228` for channels 0-15,
@@ -210,5 +210,11 @@ with the same fixed leading identity constant `code_179d8_j.c`'s
 `SpuVmSeKeyOn` uses to wrap SpuVmKeyOn. Scans every voice for one whose
 four identity fields match the caller's, and releases it (a no-op
 bookkeeping clear if it was never actually keyed on, per the
-`D_8008D988[i].unk0 == 0xFF` branch; otherwise the real SPU-mask
+`_svm_voice[i].unk0 == 0xFF` branch; otherwise the real SPU-mask
 deallocation), returning the count released.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmVoice.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (`D_8008D988` itself now reads `_svm_voice` above) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+`src/` now reads `_svm_voice[i].unk0C/unk12/unk0E/unk16/unk00` (signed, as the old `Rec34S16` view did) and clears `unk1B/unk04/unk00`. Byte-exact.

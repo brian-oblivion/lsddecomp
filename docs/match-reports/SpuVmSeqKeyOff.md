@@ -50,7 +50,7 @@ void SpuVmSeqKeyOff(s32 p0)
             }
             D_8008D9A3[bankIdx].unk0 = 0;
             D_8008D98C[bankIdx].unk0 = 0;
-            D_8008D988[bankIdx].unk0 = 0;
+            _svm_voice[bankIdx].unk0 = 0;
             old60 = D_80090C60;
             old64 = D_80090C64;
             old60 = loBit | old60;
@@ -68,7 +68,7 @@ void SpuVmSeqKeyOff(s32 p0)
 
 Needs this unit's shared `_snd_ev_flag`-adjacent globals declared near the
 top of `code_179d8_j.c` (`D_8008EA26`, `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/
-`D_8008D988`/`D_8008D98C`, `D_80090C60`/`D_80090C64`, `D_8008E228`/`D_8008E22C`).
+`_svm_voice`/`D_8008D98C`, `D_80090C60`/`D_80090C64`, `D_8008E228`/`D_8008E22C`).
 
 ## One CLOSED finding: masking the induction variable is what enables strength reduction to match
 
@@ -236,7 +236,7 @@ round 23 already showed backfires.
 
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
 body into `src/code_179d8_j.c` (with this unit's own local reduced-view
-declarations for `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/`D_8008D988`/
+declarations for `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/`_svm_voice`/
 `D_8008D98C`, `D_8008EA26`, `D_80090C60`/`D_80090C64`, `D_8008E228`/
 `D_8008E22C`, copied from `code_179d8_j_b.c`'s equivalents per this
 project's per-unit reduced-local-view convention) and ran the real oracle:
@@ -383,7 +383,7 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
 extern Rec34Half D_8008D996[];
-extern Rec34Half D_8008D988[];
+extern Rec34Half _svm_voice[];
 extern Rec34Half D_8008D98C[];
 
 typedef struct {
@@ -422,7 +422,7 @@ void SpuVmSeqKeyOff(s32 p0)
             }
             D_8008D9A3[bankIdx].unk0 = 0;
             D_8008D98C[bankIdx].unk0 = 0;
-            D_8008D988[bankIdx].unk0 = 0;
+            _svm_voice[bankIdx].unk0 = 0;
             old60 = D_80090C60;
             old64 = D_80090C64;
             old60 = loBit | old60;
@@ -659,7 +659,7 @@ void SpuVmSeqKeyOff(s32 p0)
             }
             D_8008D9A3[bankIdx].unk0 = 0;
             D_8008D98C[bankIdx].unk0 = 0;
-            D_8008D988[bankIdx].unk0 = 0;
+            _svm_voice[bankIdx].unk0 = 0;
             old60 = D_80090C60;
             old64 = D_80090C64;
             old60 = loBit | old60;
@@ -826,7 +826,7 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
 extern Rec34Half D_8008D996[];
-extern Rec34Half D_8008D988[];
+extern Rec34Half _svm_voice[];
 extern Rec34Half D_8008D98C[];
 
 typedef struct {
@@ -866,7 +866,7 @@ void SpuVmSeqKeyOff(s32 p0)
             }
             D_8008D9A3[bankIdx].unk0 = 0;
             D_8008D98C[bankIdx].unk0 = 0;
-            D_8008D988[bankIdx].unk0 = 0;
+            _svm_voice[bankIdx].unk0 = 0;
             D_80090C60 = loBit | D_80090C60;
             old60 = ~D_80090C60;
             D_8008E228 = D_8008E228 & old60;
@@ -895,7 +895,7 @@ streams one-for-one from 0x20EB4 to the end.
    (`sll` -> `sra t1`) where the `move` heads none.
 2. **WHICH of `D_80090C64` and `D_8008E228` is hoisted into the second early
    load slot -- 2 words directly, 8 more downstream, 10 words in total.**
-   Both streams hoist exactly two loads above the `D_8008D98C`/`D_8008D988`
+   Both streams hoist exactly two loads above the `D_8008D98C`/`_svm_voice`
    zero-stores. Retail hoists `D_80090C60` and `D_80090C64` and loads
    `D_8008E228` late at 0x20F88; the build hoists `D_80090C60` and
    `D_8008E228` and loads `D_80090C64` late at the same 0x20F88. The eight
@@ -973,3 +973,7 @@ is genuinely byte-identical (round 56 measured this correctly). But
 `local = global; local = x | local` emits `or rd,local,x` -- same values, same
 instruction, operands the other way round. When the residue is one commutative
 instruction's operand order, the lever is the destination, not the operands.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/SvmVoice.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (code_179d8_j_b/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols); `D_8008D988` itself now reads `_svm_voice` above, since that address is the table's own symbol.

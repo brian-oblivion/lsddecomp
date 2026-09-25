@@ -130,10 +130,10 @@ obvious from context.
 ## Struct/global knowledge derived this round
 
 - `Rec34HalfU`: the SAME 0x34-stride record family already declared
-  (`Rec34Half`, `s16 unk0`), but `gVoiceFadeStep`, `gVoiceFadeCountdown` and `gVoiceFadeAccum`
+  (`Rec34Half`, `s16 unk0`), but `D_8008D9B2`, `D_8008D9B6` and `D_8008D9B8`
   each need an UNSIGNED (`lhu`) read at least once in this function, on top
-  of (for `gVoiceFadeStep`) a plain SIGNED read at a different point --
-  reinterpreted through a cast (`((Rec34HalfU *) gVoiceFadeStep)[a0].unk0`)
+  of (for `D_8008D9B2`) a plain SIGNED read at a different point --
+  reinterpreted through a cast (`((Rec34HalfU *) D_8008D9B2)[a0].unk0`)
   rather than redeclared, same rule as everywhere else in this file.
 - `Rec16D7F0` / `D_8008D7F0[]`, `D_8008D7F2[]`: the SAME 0x10-byte-stride
   record family `code_179d8_j.c` documents as `Rec16D7F0`.
@@ -191,11 +191,11 @@ obvious from context.
 ## Shape (believed correct)
 
 Given a record index `a0` (this function's only parameter): a
-countdown/reset gate (`gVoiceFadeInterval[a0]` step, `gVoiceFadeCountdown[a0]` countdown,
+countdown/reset gate (`D_8008D9B4[a0]` step, `D_8008D9B6[a0]` countdown,
 same "unsigned re-read after unsigned decrement, early-return if still
-positive, else reset from `gVoiceFadeInterval`" shape as the OTHER interpolation
+positive, else reset from `D_8008D9B4`" shape as the OTHER interpolation
 functions in this unit), then an accumulator update against a clamped limit
-(`gVoiceFadeStep`/`gVoiceFadeAccum`/`gVoiceFadeLimit`, the SAME "increment, clamp against
+(`D_8008D9B2`/`D_8008D9B8`/`D_8008D9BA`, the SAME "increment, clamp against
 a limit whose comparison direction depends on the increment's sign" shape
 already documented for `SeAutoPan`'s and `SpuVmKeyOff`'s siblings in
 this record family). Then a four-stage 7-bit-percentage blend chain:
@@ -211,7 +211,7 @@ the two results into `D_8008D7F2`/`D_8008D7F0` and OR a flag bit into
 ## What's missing: a persisted early value that doesn't reduce to anything I could name
 
 Retail computes `$t1 = (s16) a0 << 3` as its SECOND instruction (right
-after sign-extending the parameter, BEFORE even reading `gVoiceFadeInterval[a0]`),
+after sign-extending the parameter, BEFORE even reading `D_8008D9B4[a0]`),
 keeps it alive across the ENTIRE function body (confirmed by `grep '\$t1\b'`
 against the `.s` file: exactly two occurrences, the initial computation and
 one consuming use ~200 instructions later), and consumes it at the very end
@@ -280,7 +280,7 @@ working value the 0x34-stride record-index chain also uses, rather than
 from a fresh copy — i.e. compute `idx8 = a0 << 3;` using bare `a0` directly,
 placed as the FIRST statement (before `idxCopy = a0;`), so the compiler
 shares the sign-extension between `idx8`'s computation and the record-index
-multiply chain the very next statement (`gVoiceFadeInterval[a0]`) also needs.
+multiply chain the very next statement (`D_8008D9B4[a0]`) also needs.
 Confirmed directly against the raw `.s` first (not just the report's prose)
 that this IS retail's actual dependency shape: `sll v1,a0,16 / sra
 v1,v1,16 / sll t1,v1,3 / sll v0,v1,1 / ...` — `v1` (the sign-extended `a0`)
@@ -370,9 +370,9 @@ Real search: `timeout 900 permuter.py -j 6 --stop-on-zero --best-only
 `permuter-work/SetAutoPan/output-2430-1/`; no zero reached.
 
 The 2430 candidate's only content change from the scaffold is dropping the
-intermediate `limit = gVoiceFadeLimit[a0].unk0;` assignment in the
+intermediate `limit = D_8008D9BA[a0].unk0;` assignment in the
 `incrementS < 0` branch and inlining the array read directly into the
-comparison (`if (gVoiceFadeLimit[a0].unk0 >= (s16) accum)`), leaving a stray
+comparison (`if (D_8008D9BA[a0].unk0 >= (s16) accum)`), leaving a stray
 empty statement (`;`) where the assignment was removed -- a permuter
 scope/statement-elision artifact, not a naming of the actual missing
 early-persisted value this report's own "What's missing" section
@@ -438,8 +438,8 @@ which has to be checked separately, not assumed from the frame gap itself.
 
 ```c
 #if 0
-/* Same 0x34-stride record family, UNSIGNED 16-bit view -- gVoiceFadeStep,
- * gVoiceFadeCountdown and gVoiceFadeAccum each need this width (`lhu`) at least once
+/* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D9B2,
+ * D_8008D9B6 and D_8008D9B8 each need this width (`lhu`) at least once
  * in this function, on top of the plain signed Rec34Half view
  * declared above (which some of these same symbols also need, at a
  * DIFFERENT read site in this same function). Reinterpreted through a
@@ -508,40 +508,40 @@ void SetAutoPan(s16 a0) {
     u8 v0;
 
     idxCopy = a0;
-    step = gVoiceFadeInterval[a0].unk0;
+    step = D_8008D9B4[a0].unk0;
     if (step != 0) {
-        u16 current = ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0;
+        u16 current = ((Rec34HalfU *) D_8008D9B6)[a0].unk0;
 
-        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = current - 1;
+        ((Rec34HalfU *) D_8008D9B6)[a0].unk0 = current - 1;
         if ((s16) current > 0) {
             return;
         }
-        ((Rec34HalfU *) gVoiceFadeCountdown)[a0].unk0 = gVoiceFadeInterval[a0].unk0;
+        ((Rec34HalfU *) D_8008D9B6)[a0].unk0 = D_8008D9B4[a0].unk0;
     }
 
-    increment = ((Rec34HalfU *) gVoiceFadeStep)[a0].unk0;
-    accum = ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0;
-    incrementS = gVoiceFadeStep[a0].unk0;
+    increment = ((Rec34HalfU *) D_8008D9B2)[a0].unk0;
+    accum = ((Rec34HalfU *) D_8008D9B8)[a0].unk0;
+    incrementS = D_8008D9B2[a0].unk0;
     accum = accum + increment;
-    ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
+    ((Rec34HalfU *) D_8008D9B8)[a0].unk0 = accum;
 
     if (incrementS > 0) {
-        limit = gVoiceFadeLimit[a0].unk0;
+        limit = D_8008D9BA[a0].unk0;
         if ((s16) accum >= limit) {
             accum = limit;
-            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
-            gVoiceFadeActive[a0].unk0 = 0;
+            ((Rec34HalfU *) D_8008D9B8)[a0].unk0 = accum;
+            D_8008D9B0[a0].unk0 = 0;
         }
     } else if (incrementS < 0) {
-        limit = gVoiceFadeLimit[a0].unk0;
+        limit = D_8008D9BA[a0].unk0;
         if (limit >= (s16) accum) {
             accum = limit;
-            ((Rec34HalfU *) gVoiceFadeAccum)[a0].unk0 = accum;
-            gVoiceFadeActive[a0].unk0 = 0;
+            ((Rec34HalfU *) D_8008D9B8)[a0].unk0 = accum;
+            D_8008D9B0[a0].unk0 = 0;
         }
     }
 
-    accumByte = *(u8 *) &gVoiceFadeAccum[a0].unk0;
+    accumByte = *(u8 *) &D_8008D9B8[a0].unk0;
     D_8008EA11 = accumByte;
     tableval = D_8008E970->unk18;
 
@@ -597,9 +597,9 @@ void SetAutoPan(s16 a0) {
 ## Naming
 
 **SetAutoPan** (was `func_8002EA44`) -- Tier B. Companion to
-SeAutoPan: advances `gVoiceFadeAccum` toward `gVoiceFadeLimit` by
-`gVoiceFadeStep`, throttled by `gVoiceFadeInterval`/`gVoiceFadeCountdown`,
-clears `gVoiceFadeActive` on reaching the limit, then computes and writes
+SeAutoPan: advances `D_8008D9B8` toward `D_8008D9BA` by
+`D_8008D9B2`, throttled by `D_8008D9B4`/`D_8008D9B6`,
+clears `D_8008D9B0` on reaching the limit, then computes and writes
 this voice's stereo output level from the resulting percentage (same
 final block as SetAutoVol, confirmed near-identical between the
 two reports). "Fade" rather than a more specific name for the same reason
@@ -648,8 +648,8 @@ line-level diff against the retail `.s` ("lines" below is that scaffold
 metric, out of 228; not funcdiff words), then anchored in-tree.
 
 1. Every record access written as a plain field op, no cached u16 locals:
-   `if (gVoiceFadeCountdown[voice].unk0-- > 0) return;`,
-   `gVoiceFadeAccum[voice].unk0 += gVoiceFadeStep[voice].unk0;`,
+   `if (D_8008D9B6[voice].unk0-- > 0) return;`,
+   `D_8008D9B8[voice].unk0 += D_8008D9B2[voice].unk0;`,
    `if (accum[voice] >= limit[voice]) { accum[voice] = limit[voice]; ... }`.
    **222 -> 228 words, length exact.** Cause, checked in the `-ds` dump: the
    old body's `current`/`accum` locals made CSE share the element ADDRESS
@@ -674,7 +674,7 @@ metric, out of 228; not funcdiff words), then anchored in-tree.
    byte through `p` is what produces retail's `move a0,a3` join copy, and
    `(u32)` keeps `sltiu`. `u8` p gave `andi a0,a3,0xff`, u16 `andi 0xffff`,
    u32 lost the signed rounding of the `/ 64`s (216 words).
-6. `acc = *(u8 *) &gVoiceFadeAccum[v].unk0` into an `s32` (plain `lbu`);
+6. `acc = *(u8 *) &D_8008D9B8[v].unk0` into an `s32` (plain `lbu`);
    using the global `D_8008EA11` for the third test reloads it (230 words).
 7. Volume chain `vol = D_8008E970->masterVolume * 0x3FFF;
    q2 = (D_8008EA10 * vol) / 16129; q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;`
@@ -781,12 +781,12 @@ extern u8 D_8008EA17;
 extern u8 D_8008EA19;
 extern u8 D_8008EA1A;
 extern s16 D_8008E8C0;
-extern Rec34Half gVoiceFadeActive[];
-extern Rec34Half gVoiceFadeStep[];
-extern Rec34Half gVoiceFadeInterval[];
-extern Rec34Half gVoiceFadeCountdown[];
-extern Rec34Half gVoiceFadeAccum[];
-extern Rec34Half gVoiceFadeLimit[];
+extern Rec34Half D_8008D9B0[];
+extern Rec34Half D_8008D9B2[];
+extern Rec34Half D_8008D9B4[];
+extern Rec34Half D_8008D9B6[];
+extern Rec34Half D_8008D9B8[];
+extern Rec34Half D_8008D9BA[];
 
 void SetAutoPan(s16 voice)
 {
@@ -803,26 +803,26 @@ void SetAutoPan(s16 voice)
 
     v = voice;
     off = voice * 8;
-    if (gVoiceFadeInterval[voice].unk0 != 0) {
-        if (gVoiceFadeCountdown[voice].unk0-- > 0) {
+    if (D_8008D9B4[voice].unk0 != 0) {
+        if (D_8008D9B6[voice].unk0-- > 0) {
             return;
         }
-        gVoiceFadeCountdown[voice].unk0 = gVoiceFadeInterval[voice].unk0;
+        D_8008D9B6[voice].unk0 = D_8008D9B4[voice].unk0;
     }
-    gVoiceFadeAccum[voice].unk0 += gVoiceFadeStep[voice].unk0;
-    if (gVoiceFadeStep[voice].unk0 > 0) {
-        if (gVoiceFadeAccum[voice].unk0 >= gVoiceFadeLimit[voice].unk0) {
-            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
-            gVoiceFadeActive[voice].unk0 = 0;
+    D_8008D9B8[voice].unk0 += D_8008D9B2[voice].unk0;
+    if (D_8008D9B2[voice].unk0 > 0) {
+        if (D_8008D9B8[voice].unk0 >= D_8008D9BA[voice].unk0) {
+            D_8008D9B8[voice].unk0 = D_8008D9BA[voice].unk0;
+            D_8008D9B0[voice].unk0 = 0;
         }
-    } else if (gVoiceFadeStep[voice].unk0 < 0) {
-        if (gVoiceFadeAccum[voice].unk0 <= gVoiceFadeLimit[voice].unk0) {
-            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
-            gVoiceFadeActive[voice].unk0 = 0;
+    } else if (D_8008D9B2[voice].unk0 < 0) {
+        if (D_8008D9B8[voice].unk0 <= D_8008D9BA[voice].unk0) {
+            D_8008D9B8[voice].unk0 = D_8008D9BA[voice].unk0;
+            D_8008D9B0[voice].unk0 = 0;
         }
     }
 
-    acc = *(u8 *) &gVoiceFadeAccum[v].unk0;
+    acc = *(u8 *) &D_8008D9B8[v].unk0;
     D_8008EA11 = acc;
 
     vol = D_8008E970->masterVolume * 0x3FFF;
@@ -866,3 +866,9 @@ void SetAutoPan(s16 voice)
     D_8008D970[v] |= 3;
 }#endif
 ```
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmVoice.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+The NON_MATCHING body now uses `_svm_voice[voice].unk28`..`unk32` (and `*(u8 *) &_svm_voice[v].unk30`); normalized disassembly identical to before, stall unchanged.

@@ -20,10 +20,13 @@
  * describing a field's MECHANICS is fine and is kept below.
  *
  * Field types are what the accessors need (track 4b step 1): the width
- * every accessor agrees on, and the signedness most of them read. An
- * accessor that needs the other signedness casts at the site, or keeps a
- * unit-local view where a cast changes bytes (each such view names the
- * accessor whose bytes need it).
+ * every accessor agrees on, and the signedness most of them read. The one
+ * accessor that reads otherwise, SePitchBend (+0x0C unsigned, +0x10 and
+ * +0x14 as bytes), uses VALUE casts at the site -- (u16)v.unk0C,
+ * (u8)v.unk10 -- which are byte-exact; the address-cast spelling
+ * *(u8 *)&v.unk10 is not (it grows that function's frame by 8 bytes).
+ * No unit keeps a signedness view. SpuVmFlush keeps a u16 walk type over
+ * +0x06, for its pointer stride, not for signedness.
  *
  * Earlier rounds split this table into one splat symbol per field
  * (D_8008D98A, D_8008D98C, ... at a 0x34 stride) and gave twelve of them
@@ -34,14 +37,14 @@
  * the same bytes.
  */
 typedef struct SvmVoice {
-    s16 unk00; /* +0x00 -- 0xFF when free; SsUtKeyOff/SsUtKeyOffV compare and clear it */
-    u16 unk02; /* +0x02 -- SsUtAllKeyOff/SpuVmInit set it to 0x18; key-on clears it; SpuVmAlloc ages it */
-    s16 unk04; /* +0x04 -- cleared on every key-off path */
-    u16 unk06; /* +0x06 -- SpuVmAlloc's secondary allocation key */
+    s16 unk00; /* +0x00 -- 0xFF after SpuVmInit/SsUtAllKeyOff; key-on stores D_8008EA24; SsUtKeyOff tests == 0xFF; key-off paths clear it */
+    u16 unk02; /* +0x02 -- 0x18 at init; key-on clears it; SpuVmAlloc adds 1 to every voice's and uses it as the tie-break key */
+    s16 unk04; /* +0x04 -- SpuVmKeyOnNow stores its a1, vmNoiseOn2 stores 10; every key-off path clears it */
+    u16 unk06; /* +0x06 -- SpuVmFlush copies an SPU voice register into it each tick (0 = idle); SpuVmAlloc's secondary key */
     s16 unk08; /* +0x08 -- level scaled by SpuVmSetVol (x vol / 127) */
     u8 unk0A;  /* +0x0A -- byte, 0x40 at init; SpuVmKeyOn stores its 6th argument */
     u8 pad0B;
-    s16 unk0C; /* +0x0C -- note; SePitchBend adds the bend to it */
+    s16 unk0C; /* +0x0C -- key-on argument; SePitchBend adds the bend to it and passes it to note2pitch2 */
     s16 unk0E; /* +0x0E -- 0x21 after SsUtKeyOn/SsUtKeyOnV, 0xFF when free */
     s16 unk10; /* +0x10 -- index into D_8008E968 (read as a byte by SePitchBend) */
     s16 unk12; /* +0x12 -- compared against a key-off argument */

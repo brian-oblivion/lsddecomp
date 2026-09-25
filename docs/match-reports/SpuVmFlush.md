@@ -85,8 +85,8 @@ window:
 4. Two unconditional bitmask updates:
    `D_8008E228 &= ~D_80090C60; D_8008E22C &= ~D_80090C64;`
 5. **Per-channel interpolation dispatch**, unconditional 0..0x17 loop:
-   `SetAutoVol(i)` if `gVoiceEnvActive[i] != 0`, `SetAutoPan(i)` if
-   `gVoiceFadeActive[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
+   `SetAutoVol(i)` if `D_8008D9A4[i] != 0`, `SetAutoPan(i)` if
+   `D_8008D9B0[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
    match reports).
 6. **Flag-driven per-channel field copy**, another unconditional 0..0x17
    loop, testing four independent bits of `D_8008D970[i]` (1, 4, 8, 0x10)
@@ -542,10 +542,10 @@ void SpuVmFlush(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (gVoiceEnvActive[i].unk0 != 0) {
+        if (D_8008D9A4[i].unk0 != 0) {
             SetAutoVol(i);
         }
-        if (gVoiceFadeActive[i].unk0 != 0) {
+        if (D_8008D9B0[i].unk0 != 0) {
             SetAutoPan(i);
         }
     }
@@ -616,7 +616,7 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34HalfU2;
 extern Rec34HalfU2 D_8008D98E[];
-extern Rec34Half gVoiceEnvActive[];
+extern Rec34Half D_8008D9A4[];
 
 /* Flag byte: when set, skip the "channel starved for N frames -> force
  * release" scan below. */
@@ -717,10 +717,10 @@ void SpuVmFlush(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (gVoiceEnvActive[i].unk0 != 0) {
+        if (D_8008D9A4[i].unk0 != 0) {
             SetAutoVol(i);
         }
-        if (gVoiceFadeActive[i].unk0 != 0) {
+        if (D_8008D9B0[i].unk0 != 0) {
             SetAutoPan(i);
         }
     }
@@ -841,7 +841,13 @@ local to this function's `#ifdef` block, per CLAUDE.md's rule against
 adding to a shared header; everything else it touches (`D_8008D9A3`,
 `D_8006DAD4`, `D_8008D970`, `D_80090C60`/`64`, `D_8008E228`/`22C`,
 `D_8008E230`/`234`, `D_8008D7F0`, `D_8008D7F4`, `D_8008E9D0`,
-`gDisableVoiceStarveScan`, `gVoiceEnvActive`, `gVoiceFadeActive`) was
+`gDisableVoiceStarveScan`, `D_8008D9A4`, `D_8008D9B0`) was
 already declared earlier in the unit and needed no change.
 `./build-and-verify.sh` green (zero bytes changed) and
 `tools/check-nonmatching.sh code_179d8_m` green.
+
+## Track 2 (round 86, 2026-09-26, alpha)
+
+The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmVoice.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (except `D_8008D988`, which is now `_svm_voice` itself) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
+
+The NON_MATCHING body reads `_svm_voice[i].unk1C/unk28/unk1B` and walks +0x06 with its u16 0x34-stride pointer, now started at `&_svm_voice[0].unk06`; normalized disassembly identical. Tried and rejected: walking a `SvmVoice *` and reading `->unk06` (one instruction longer, mnemonic ratio vs retail 0.876 -> 0.874).
