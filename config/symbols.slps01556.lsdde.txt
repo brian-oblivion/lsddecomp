@@ -2600,3 +2600,10 @@ DecDCTout = 0x80046000; // type:func  (Psy-Q libpress/libpress, fingerprint+posi
 // (*func)());`. No C call site yet. Round 81 (bravo, track 2), not yet
 // linked from an SDK object.
 DecDCToutCallback = 0x80046084; // type:func  (Psy-Q libpress/libpress, position+semantics)
+// identified: fingerprint 1.00 (EXACT) vs libpress/libpress.o (disc 3.3),
+// unique (next candidate GsSetFogParam, masked 0.30). Position: after
+// placed libc2/exit (3.3), before placed libpress/vlc (3.3) -- directly
+// bracketed by a libpress object. Header LIBPRESS.H `extern int
+// DecDCTvlc(u_long *bs, u_long *buf);`, no C call site yet. Round 81
+// (bravo, track 2), not yet linked from an SDK object.
+DecDCTvlc = 0x80046568; // type:func  (Psy-Q libpress/libpress, fingerprint)
