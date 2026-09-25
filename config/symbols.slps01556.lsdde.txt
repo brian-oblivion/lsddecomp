@@ -782,7 +782,7 @@ GsSortClear = 0x80023DA0; // type:func  (Psy-Q libgs/gs_001, fingerprint)
 
 func_8001F3A4 = 0x8001F3A4; // type:func
 UpdateTmdModelBoundsBuffer = 0x8001F4E4; // type:func
-func_8001F50C = 0x8001F50C; // type:func
+GetTmdModelBoundsBuffer = 0x8001F50C; // type:func
 func_8001F51C = 0x8001F51C; // type:func
 func_8001F66C = 0x8001F66C; // type:func
 func_8001F8B8 = 0x8001F8B8; // type:func

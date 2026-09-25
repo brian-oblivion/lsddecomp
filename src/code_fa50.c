@@ -206,7 +206,7 @@ void TmdModel__ComputeBounds(Class6BEA0 *self, Box_fa50 *box) {
 void UpdateTmdModelBoundsBuffer(Class6BEA0 *self) {
     TmdModel__ComputeBounds(self, (Box_fa50 *)gTmdModelBoundsBuf);
 }
-void *func_8001F50C(void *self, s32 i) {
+void *GetTmdModelBoundsBuffer(void *self, s32 i) {
     return gTmdModelBoundsBuf;
 }
 void func_8001F51C(Class6BEA0 *self, Hull_fa50 *out) {

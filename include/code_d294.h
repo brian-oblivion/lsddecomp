@@ -74,9 +74,9 @@ typedef struct BoundsBox_d294 {
 
 /* Round 13 (Class6B5CC__CheckBoundsOverlap): a 12-byte, all-s16, 6-field record -- MEASURED,
  * same all-s16-struct-copy idiom as Vec3S16_d294 (whole-value assignment
- * compiles to unaligned lwl/lwr). Used as func_8001F50C's own return-array
+ * compiles to unaligned lwl/lwr). Used as GetTmdModelBoundsBuffer's own return-array
  * element type and as this function's own second running-tracker. Round 73
- * (the match): the pairing is NOT scrambled -- func_8001F50C's records are
+ * (the match): the pairing is NOT scrambled -- GetTmdModelBoundsBuffer's records are
  * BoundsBox_d294 boxes (f0..f2 = lo, f3..f5 = hi), the matched body reads
  * them through that type, and its tail is an ordinary per-axis AABB overlap
  * (docs/match-reports/Class6B5CC__CheckBoundsOverlap.md). This view is kept
@@ -150,16 +150,16 @@ extern void func_8001F51C(void *arg0, void *dest);
  * (boolean-ish) here. Not decompiled in this project. */
 extern s32 func_8001F3A4(void *arg0);
 
-/* UpdateTmdModelBoundsBuffer/func_8001F50C (asm/psyq_fa50.s, PsyQ library, not
+/* UpdateTmdModelBoundsBuffer/GetTmdModelBoundsBuffer (asm/psyq_fa50.s, PsyQ library, not
  * game code): UpdateTmdModelBoundsBuffer fills a PsyQ-internal global
- * (gTmdModelBoundsBuf, via TmdModel__ComputeBounds) from its own argument; func_8001F50C
+ * (gTmdModelBoundsBuf, via TmdModel__ComputeBounds) from its own argument; GetTmdModelBoundsBuffer
  * IGNORES both its arguments and just returns `&gTmdModelBoundsBuf` -- MEASURED,
  * its whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`. Class6B5CC__CheckBoundsOverlap
  * (round 13, code_d294_b) calls the pair as `UpdateTmdModelBoundsBuffer(self->unk20);
- * arr = func_8001F50C(self->unk20, 0);` -- declared here typed to that
+ * arr = GetTmdModelBoundsBuffer(self->unk20, 0);` -- declared here typed to that
  * call site's own use of the result (an array of Sixteen6_d294). */
 extern void UpdateTmdModelBoundsBuffer(void *arg0);
-extern Sixteen6_d294 *func_8001F50C(void *arg0, s32 arg1);
+extern Sixteen6_d294 *GetTmdModelBoundsBuffer(void *arg0, s32 arg1);
 
 /* GsLinkObject4 (psyq_GsLinkObject4.s, Psy-Q library, not game code; symbol
  * address per config/symbols.slps01556.lsdde.txt, 0x8001EF70 -- the first

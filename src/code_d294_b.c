@@ -289,7 +289,7 @@ void Class6B5CC__ComposeAndApplyRotation(Class6B5CC *self, void *arg1, void *arg
 
 /* Offsets arg1's corner list by `d` and grows a box `mm` over the moved
  * corners, grows a second box `box` over the model's own bounds records
- * (func_8001F50C's array), and returns 1 if the two boxes overlap on all
+ * (GetTmdModelBoundsBuffer's array), and returns 1 if the two boxes overlap on all
  * three axes. Each running min/max is a ternary stored back unconditionally
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
@@ -327,7 +327,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
     }
 
     UpdateTmdModelBoundsBuffer(self->model);
-    p = (BoundsBox_d294 *)func_8001F50C(self->model, 0);
+    p = (BoundsBox_d294 *)GetTmdModelBoundsBuffer(self->model, 0);
     n = func_8001F3A4(self->model);
     box = *p;
     end2 = p + n;
@@ -394,7 +394,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
     count1 = func_8001F3A4(self->model);
     hit = 0;
     for (i = 0; i < count1; i++) {
-        plane = func_8001F50C(self->model, i);
+        plane = GetTmdModelBoundsBuffer(self->model, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (func_8001F8B8(self->model, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0) {
@@ -417,7 +417,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
     *outFlag = 0;
     cnt2 = list->count;
     for (i = 0; i < count1; i++) {
-        plane = func_8001F50C(self->model, i);
+        plane = GetTmdModelBoundsBuffer(self->model, i);
         v = list->v;
         for (k = 0; k < cnt2; k++) {
             for (m = 0; m < 4; m++) {

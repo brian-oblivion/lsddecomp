@@ -98,7 +98,7 @@ resolved below.
 Signature `s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16_d294
 *diff, void *list)`, with Part 1 (a fixed 2-row box-midpoint average into a
 local `Vec3S16_d294 mid[2]`) and Part 2 (a `count1`-driven loop over
-`func_8001F50C` planes, gated by `ClipSegmentToBox`/`func_8001F8B8`, setting
+`GetTmdModelBoundsBuffer` planes, gated by `ClipSegmentToBox`/`func_8001F8B8`, setting
 bits in `self->unk2C`) both fully derived and high-confidence. Part 3 (a
 second, `list`-driven double loop) was flagged NOT fully decoded: "the
 precise relationship between the middle `k` loop ... and the inner fixed-4
@@ -270,7 +270,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
     self->unk2C = 0;
     flag2 = 0;
     for (i = 0; i < count1; i++) {
-        plane = func_8001F50C(self->unk20, i);
+        plane = GetTmdModelBoundsBuffer(self->unk20, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (func_8001F8B8(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0 || outWord >= 0x201) {
@@ -291,7 +291,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CCObj *self, s32 *outFlag, Vec3S16
     *outFlag = 0;
     cnt2 = *(s32 *)list;
     for (j = 0; j < count1; j++) {
-        plane = func_8001F50C(self->unk20, j);
+        plane = GetTmdModelBoundsBuffer(self->unk20, j);
         bitJ = 1 << j;
         rowBase = (u8 *)list + 4;
         for (k = 0; k < cnt2; k++) {
@@ -502,7 +502,7 @@ does not have to re-derive which are safe.
 **Explicit answer to the revisit's own question: the round-54 naming gave NO
 new shape here either**, for the same reason as `NotifyTaggedParents` --
 this function's own symbols (`func_8001F8B8`, `D_8008A838`,
-`self->unk2C`/`unk20`, `ClipSegmentToBox`, `func_8001F50C`,
+`self->unk2C`/`unk20`, `ClipSegmentToBox`, `GetTmdModelBoundsBuffer`,
 `func_8001F3A4`) were untouched by round 54's `Class6B5CCMethods` slot
 renames. What DID move the investigation forward was reading the
 disassembly's own pointer arithmetic directly rather than trusting the
