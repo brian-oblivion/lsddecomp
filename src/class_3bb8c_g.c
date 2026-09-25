@@ -24,6 +24,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "ScreenSprite.h"
 
 void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
 {
@@ -89,9 +90,6 @@ void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
  * `class_3bb8c_j.c`, `class_39e08.h`, `code_2cc8c.h`), each with its own
  * local view per this project's established convention. */
 extern ChildObj86ED0 *func_8003B39C(char *path);
-/* Not this round's function -- consumes the short-lived handle above and
- * produces the object stored into `self->cardIcon`. */
-extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
 /* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
  * mostly `char *` string pointers into rodata, a few raw literal words at
@@ -99,7 +97,7 @@ extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2
 extern char *gCardIconNames[];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
-/* 3-word opaque block, `New_ScreenSprite`'s arg1, address-only here. */
+/* 3 words, `New_ScreenSprite`'s rect: a SpriteRect {0, 0, 160, 120}. */
 extern s32 D_80086EC4;
 /* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
 extern s32 D_8008AA94;
@@ -131,7 +129,7 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
 
     handle = func_8003B39C(buf);
     handle->methods->slot78(handle);
-    newVal = New_ScreenSprite(handle, (void *)&D_80086EC4, 0);
+    newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&D_80086EC4, 0);
     self->cardIcon = newVal;
     handle->methods->release(handle);
     newVal->methods->slot4C(newVal, self->childReady, (void *)&D_8008AA94);
