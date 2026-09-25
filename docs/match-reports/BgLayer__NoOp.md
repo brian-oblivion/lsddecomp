@@ -1,4 +1,6 @@
-# func_80044674 -- MATCHED (2/2 words)
+# BgLayer__NoOp -- MATCHED (2/2 words)
+
+> Renamed from `func_80044674` on 2026-09-25 (tools/rename.py). Address 0x80044674.
 
 Round 82, runner echo (code_33808 session), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -14,7 +16,7 @@ Table slot (`tools/classtable.py`): `D_8006F2C4` +0x0BC.
 ## Source
 
 ```c
-void func_80044674(void) {
+void BgLayer__NoOp(void) {
 }
 ```
 

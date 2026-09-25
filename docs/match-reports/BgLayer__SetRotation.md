@@ -1,4 +1,6 @@
-# func_80044380 -- MATCHED (39/39 words)
+# BgLayer__SetRotation -- MATCHED (39/39 words)
+
+> Renamed from `func_80044380` on 2026-09-25 (tools/rename.py). Address 0x80044380.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -33,7 +35,7 @@ typedef struct Ratio44380 {
     /* +0x0A */ s16 den;
 } Ratio44380;
 
-void func_80044380(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
+void BgLayer__SetRotation(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
     s32 num = src->num;
     s32 den = src->den;
     s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
@@ -48,4 +50,4 @@ void func_80044380(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
 
 ## Notes
 
-First build. `/` and `%` of the same operands share one div (mflo then mfhi). The unit-local `Obj6F2C4` gained +0x64 (s32) after a pad, additively; its size is now 0x68, the allocator's (func_800441B4) BMemPMgrAlloc size.
+First build. `/` and `%` of the same operands share one div (mflo then mfhi). The unit-local `Obj6F2C4` gained +0x64 (s32) after a pad, additively; its size is now 0x68, the allocator's (New_BgLayer) BMemPMgrAlloc size.

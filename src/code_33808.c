@@ -54,7 +54,7 @@ void *GetTimBlockSrcMethods(void);
 void *GetLinkResourceMethods(void);
 void *GetTimArraySrcMethods(void);
 void *GetTodMethods(void);
-void *func_8004467C(void);
+void *GetBgLayerMethods(void);
 void *func_800449FC(void);
 void *func_80044CC4(void);
 void *func_80044F20(void);
@@ -738,11 +738,11 @@ void *GetTodMethods(void) {
     return D_8006F240;
 }
 /* Allocate and construct a D_8006F2C4 object. */
-void *func_800441B4(s32 arg0, s32 arg1) {
+void *New_BgLayer(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x68);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_8004467C())->ctor(obj, arg0, arg1);
+        ((Ctor33808 *)GetBgLayerMethods())->ctor(obj, arg0, arg1);
         return obj;
     }
     return NULL;
@@ -769,9 +769,9 @@ typedef struct Obj6F2C4 {
 
 /* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
  * slot +0x040 with the two arguments. */
-void func_80044220(Obj6F2C4 *self, s32 arg1, s32 arg2) {
+void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
-    self->methods = func_8004467C();
+    self->methods = GetBgLayerMethods();
     ((void (*)())self->methods->reset)(self, arg1, arg2);
 }
 /* D_8006F2C4 +0x040: reset -- lay out the GsBG at +0x044 over a map
@@ -789,7 +789,7 @@ typedef struct Map44294 {
 
 extern Vec3S8 D_8008A938;
 
-void func_80044294(Obj6F2C4 *self, Map44294 *src, s32 mode) {
+void BgLayer__Reset(Obj6F2C4 *self, Map44294 *src, s32 mode) {
     if (mode == 0) {
         self->bgAttribute = 0x1000000;
         self->w = src->cellw * src->ncellw;
@@ -819,7 +819,7 @@ typedef struct Ratio44380 {
     /* +0x0A */ s16 den;
 } Ratio44380;
 
-void func_80044380(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
+void BgLayer__SetRotation(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
     s32 num = src->num;
     s32 den = src->den;
     s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
@@ -841,7 +841,7 @@ typedef struct Scale4441C {
     /* +0x06 */ s16 yden;
 } Scale4441C;
 
-void func_8004441C(Obj6F2C4 *self, s32 set, Scale4441C *src) {
+void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
     s32 negX;
     s32 negY;
     s32 den;
@@ -906,16 +906,16 @@ void func_8004441C(Obj6F2C4 *self, s32 set, Scale4441C *src) {
 }
 /* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
  * three-byte vector to +0x54. */
-void func_8004464C(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
+void BgLayer__SetColor(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
     if (enable) {
         self->unk54 = *src;
     }
 }
-void func_80044674(void) {
+void BgLayer__NoOp(void) {
 }
 extern s32 D_8006F2C4[];
 
-void *func_8004467C(void) {
+void *GetBgLayerMethods(void) {
     return D_8006F2C4;
 }
 /* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */

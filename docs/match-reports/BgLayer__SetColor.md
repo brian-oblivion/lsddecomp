@@ -1,4 +1,6 @@
-# func_8004464C -- MATCHED (10/10 words)
+# BgLayer__SetColor -- MATCHED (10/10 words)
+
+> Renamed from `func_8004464C` on 2026-09-25 (tools/rename.py). Address 0x8004464c.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the SECOND build (first-build miss described below); whole-image SHA1 green (`./build-and-verify.sh`:
@@ -33,7 +35,7 @@ typedef struct Obj6F2C4 {
     /* +0x054 */ Vec3S8 unk54;
 } Obj6F2C4;
 
-void func_8004464C(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
+void BgLayer__SetColor(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
     if (enable) {
         self->unk54 = *src;
     }

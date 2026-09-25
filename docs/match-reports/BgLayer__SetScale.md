@@ -1,4 +1,6 @@
-# func_8004441C -- MATCHED (140/140 words)
+# BgLayer__SetScale -- MATCHED (140/140 words)
+
+> Renamed from `func_8004441C` on 2026-09-25 (tools/rename.py). Address 0x8004441c.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Scale of the GsBG at +0x044: with src = four halfwords {xnum, xden, ynum, yden}, sx/sy are xnum/xden and ynum/yden in 20.12 fixed point (integer part << 12 plus (remainder << 12) / den, the same formula func_80044380 uses for the rotation). With `set`: scalex (+0x60) = 0x1000 for a zero divisor, else min((s16)sx, 30000); likewise scaley (+0x62). Otherwise each is added, except that a sum over 30000 yields 30000 -- or 1 when either term of that ratio was negative.
+Scale of the GsBG at +0x044: with src = four halfwords {xnum, xden, ynum, yden}, sx/sy are xnum/xden and ynum/yden in 20.12 fixed point (integer part << 12 plus (remainder << 12) / den, the same formula BgLayer__SetRotation uses for the rotation). With `set`: scalex (+0x60) = 0x1000 for a zero divisor, else min((s16)sx, 30000); likewise scaley (+0x62). Otherwise each is added, except that a sum over 30000 yields 30000 -- or 1 when either term of that ratio was negative.
 
 Table slot (`tools/classtable.py`): D_8006F2C4 +0x048.
 
@@ -30,7 +32,7 @@ typedef struct Scale4441C {
     /* +0x06 */ s16 yden;
 } Scale4441C;
 
-void func_8004441C(Obj6F2C4 *self, s32 set, Scale4441C *src) {
+void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
     s32 negX;
     s32 negY;
     s32 den;
@@ -97,4 +99,4 @@ void func_8004441C(Obj6F2C4 *self, s32 set, Scale4441C *src) {
 
 ## Notes
 
-Second build. The first build matched everything but the clamp in the `set` arm (89/140): with an `s16 v` temporary the extension moved to the compare and the store took the raw value; retail extends once, before the compare, so the temporary is `s32 v = sx;` (sx/sy themselves are `s16` locals, which gives retail's use-site `sll/sra` in the add arm). The first divisor is held in a local (`den`, retail keeps it in a3 for the `set` arm's zero test) while the second is re-read from `src` (retail reloads +6). sx/sy are left unset on a zero divisor, as in retail. The 0x10 leaf frame came for free. Local view `Scale4441C` just above; the GsBG scale fields are the `Obj6F2C4` fields named by func_80044294.
+Second build. The first build matched everything but the clamp in the `set` arm (89/140): with an `s16 v` temporary the extension moved to the compare and the store took the raw value; retail extends once, before the compare, so the temporary is `s32 v = sx;` (sx/sy themselves are `s16` locals, which gives retail's use-site `sll/sra` in the add arm). The first divisor is held in a local (`den`, retail keeps it in a3 for the `set` arm's zero test) while the second is re-read from `src` (retail reloads +6). sx/sy are left unset on a zero divisor, as in retail. The 0x10 leaf frame came for free. Local view `Scale4441C` just above; the GsBG scale fields are the `Obj6F2C4` fields named by BgLayer__Reset.

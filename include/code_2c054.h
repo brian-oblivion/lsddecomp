@@ -438,7 +438,7 @@ extern StreamTaskUnkB4Obj *func_80045438(StreamTaskInitData *a0, s32 a1, s32 a2)
 extern StreamTaskUnkB4Obj *New_VabStreamObj(s32 a0);
 extern StreamTaskUnkB4Obj *func_80044F30(s32 a0);
 extern StreamTaskUnkB4Obj *func_80044CD4(s32 a0, StreamTaskUnkB4Obj *a1);
-extern StreamTaskUnk78Obj *func_800441B4(StreamTaskUnkB4Obj *a0, s32 a1); /* return type
+extern StreamTaskUnk78Obj *New_BgLayer(StreamTaskUnkB4Obj *a0, s32 a1); /* return type
                                         StreamTaskUnk78Obj* (feeds self->unk78, un-unified
                                         from StreamTaskUnkB4Obj this round -- see that
                                         struct's comment) */

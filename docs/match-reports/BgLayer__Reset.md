@@ -1,4 +1,6 @@
-# func_80044294 -- MATCHED (59/59 words)
+# BgLayer__Reset -- MATCHED (59/59 words)
+
+> Renamed from `func_80044294` on 2026-09-25 (tools/rename.py). Address 0x80044294.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -9,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Reset a GsBG embedded at +0x044 of the D_8006F2C4 object over a map source whose +0x2C is a GsMAP (the D_8006F498 object lays one out: cellw/cellh 16, ncellw 20, ncellh 15). Mode 0: attribute 0x1000000, w/h = cell size x cell count; mode 1: attribute 0x2000000, 320 x 240. Then x/y/scroll 0, r,g,b from D_8008A938, map = &src->cellw, scale 0x1000/0x1000, rotate 0, mx/my = w/2, h/2.
 
-Table slot (`tools/classtable.py`): D_8006F2C4 +0x040 (the Class6B5CC `reset` slot, called by func_80044220 with its two arguments).
+Table slot (`tools/classtable.py`): D_8006F2C4 +0x040 (the Class6B5CC `reset` slot, called by BgLayer__BgLayer with its two arguments).
 
 ## Source
 
@@ -34,7 +36,7 @@ typedef struct Map44294 {
 
 extern Vec3S8 D_8008A938;
 
-void func_80044294(Obj6F2C4 *self, Map44294 *src, s32 mode) {
+void BgLayer__Reset(Obj6F2C4 *self, Map44294 *src, s32 mode) {
     if (mode == 0) {
         self->bgAttribute = 0x1000000;
         self->w = src->cellw * src->ncellw;
@@ -60,7 +62,7 @@ void func_80044294(Obj6F2C4 *self, Map44294 *src, s32 mode) {
 
 ## Notes
 
-First build that compiled (the first attempt named the field `attribute`, which Class6B5CC's own fields already use at +0x00?: `duplicate member`, caught by the `*** [...o]` grep -- the funcdiff 59/59 printed alongside it was stale). The layout +0x044..+0x067 is exactly LIBGS.H's GsBG (attribute, x, y, w, h, scrollx, scrolly, r, g, b, map, mx, my, scalex, scaley, rotate), which also explains the `20.12 fixed point` +0x064 that func_80044380 accumulates: it is GsBG.rotate. The unit-local `Obj6F2C4` view was extended in place (pad44[0x10] / pad57[0xD] replaced by the named GsBG fields; +0x054 stays `Vec3S8 unk54` because retail copies r,g,b as a signed three-byte struct -- lb/lb/lb, sb/sb/sb -- which GsBG's three u8 fields would not give, and func_8004464C already matched on it). The fields are named `bgAttribute`, x, y, w, h, scrollx, scrolly, map, mx, my, scalex, scaley. Whole image green after the struct edit (func_80044380/func_8004464C still byte-exact). No shared header touched.
+First build that compiled (the first attempt named the field `attribute`, which Class6B5CC's own fields already use at +0x00?: `duplicate member`, caught by the `*** [...o]` grep -- the funcdiff 59/59 printed alongside it was stale). The layout +0x044..+0x067 is exactly LIBGS.H's GsBG (attribute, x, y, w, h, scrollx, scrolly, r, g, b, map, mx, my, scalex, scaley, rotate), which also explains the `20.12 fixed point` +0x064 that BgLayer__SetRotation accumulates: it is GsBG.rotate. The unit-local `Obj6F2C4` view was extended in place (pad44[0x10] / pad57[0xD] replaced by the named GsBG fields; +0x054 stays `Vec3S8 unk54` because retail copies r,g,b as a signed three-byte struct -- lb/lb/lb, sb/sb/sb -- which GsBG's three u8 fields would not give, and BgLayer__SetColor already matched on it). The fields are named `bgAttribute`, x, y, w, h, scrollx, scrolly, map, mx, my, scalex, scaley. Whole image green after the struct edit (BgLayer__SetRotation/BgLayer__SetColor still byte-exact). No shared header touched.
 
 ### Proposed learning
 

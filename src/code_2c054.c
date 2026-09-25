@@ -185,7 +185,7 @@ void TaskCoreObj__TaskCoreObj(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnk
     self->unk80 = tmp;
     tmp = func_80044CD4(0, tmp);
     self->unk7C = tmp;
-    self->unk78 = func_800441B4(tmp, 1);
+    self->unk78 = New_BgLayer(tmp, 1);
     self->methods->slot40(self);
 }
 

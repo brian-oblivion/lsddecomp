@@ -1,4 +1,6 @@
-# func_8004467C -- MATCHED (4/4 words)
+# GetBgLayerMethods -- MATCHED (4/4 words)
+
+> Renamed from `func_8004467C` on 2026-09-25 (tools/rename.py). Address 0x8004467c.
 
 Round 82, runner echo (code_33808 session, echo #5), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -16,7 +18,7 @@ Table slot (`tools/classtable.py`): none: no data word references it (reached so
 ```c
 extern s32 D_8006F2C4[];
 
-void *func_8004467C(void) {
+void *GetBgLayerMethods(void) {
     return D_8006F2C4;
 }
 ```

@@ -1,4 +1,6 @@
-# func_80044220 -- MATCHED (29/29 words)
+# BgLayer__BgLayer -- MATCHED (29/29 words)
+
+> Renamed from `func_80044220` on 2026-09-25 (tools/rename.py). Address 0x80044220.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Class6B5CC's constructor through GetClass6B5CCMethods(), then installs this class's table (func_8004467C) and calls slot +0x040 with (self, arg1, arg2). GCC forwards the stored table pointer, so `self->methods->reset` compiles to a use of the getter's return value, as retail has it. Slot +0x040 is Class6B5CC's `reset(self)` in the unified macro; this class's occupant takes two more arguments, so the call casts rather than retyping the shared slot.
+Class6B5CC's constructor through GetClass6B5CCMethods(), then installs this class's table (GetBgLayerMethods) and calls slot +0x040 with (self, arg1, arg2). GCC forwards the stored table pointer, so `self->methods->reset` compiles to a use of the getter's return value, as retail has it. Slot +0x040 is Class6B5CC's `reset(self)` in the unified macro; this class's occupant takes two more arguments, so the call casts rather than retyping the shared slot.
 
 Table slot (`tools/classtable.py`): D_8006F2C4 +0x008 (constructor).
 
@@ -33,9 +35,9 @@ typedef struct Obj6F2C4 {
 
 /* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
  * slot +0x040 with the two arguments. */
-void func_80044220(Obj6F2C4 *self, s32 arg1, s32 arg2) {
+void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
-    self->methods = func_8004467C();
+    self->methods = GetBgLayerMethods();
     ((void (*)())self->methods->reset)(self, arg1, arg2);
 }
 ```
@@ -43,7 +45,7 @@ void func_80044220(Obj6F2C4 *self, s32 arg1, s32 arg2) {
 ## Notes
 
 - Byte-exact on the first build.
-- The Vec3S8/Obj6F2C4 typedefs (first written for func_8004464C) were moved up to sit before this function, which uses Obj6F2C4 and comes earlier in ROM; typedef position emits no code.
+- The Vec3S8/Obj6F2C4 typedefs (first written for BgLayer__SetColor) were moved up to sit before this function, which uses Obj6F2C4 and comes earlier in ROM; typedef position emits no code.
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.

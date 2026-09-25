@@ -1,4 +1,6 @@
-# func_800441B4 -- MATCHED (27/27 words)
+# New_BgLayer -- MATCHED (27/27 words)
+
+> Renamed from `func_800441B4` on 2026-09-25 (tools/rename.py). Address 0x800441b4.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,11 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a D_8006F2C4 object. */
-void *func_800441B4(s32 arg0, s32 arg1) {
+void *New_BgLayer(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x68);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_8004467C())->ctor(obj, arg0, arg1);
+        ((Ctor33808 *)GetBgLayerMethods())->ctor(obj, arg0, arg1);
         return obj;
     }
     return NULL;
