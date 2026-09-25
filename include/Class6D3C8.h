@@ -52,7 +52,7 @@
 typedef struct MiddleClassMethods {
     s32 header;                                             /* +0x000 */
     void *unk04;                                             /* +0x004 */
-    void (*ctor)(void *self, s32 a1);                         /* +0x008 func_8003AF8C */
+    void (*ctor)(void *self, s32 a1);                         /* +0x008 Class6E4F0__Class6E4F0 */
     void *unk0C;                                               /* +0x00C func_8003B024 (dtor override, shared with Class6D3C8) */
     void *unk10, *unk14, *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* BasicClass, inherited */
     void *unk3C;                                                /* +0x03C null slot */

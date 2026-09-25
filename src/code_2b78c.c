@@ -89,7 +89,7 @@ extern void SetActiveDataSource(s32 arg0); /* code_171e0 */
 extern void func_80020C68(void *arg);      /* code_10ee0, stores its arg to a gp global */
 extern void *BMemPMgrAlloc(s32 size);
 
-void func_8003AF8C(Class6E4F0 *self, s32 source) {
+void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 source) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = func_8003B20C();
     if (D_8008A8DC == 0) {

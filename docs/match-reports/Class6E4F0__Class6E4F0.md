@@ -1,4 +1,6 @@
-# func_8003AF8C
+# Class6E4F0__Class6E4F0
+
+> Renamed from `func_8003AF8C` on 2026-09-25 (tools/rename.py). Address 0x8003af8c.
 
 **Round 81 (delta)** · **Unit:** code_2b78c · **Size:** 38 words · **Status:** MATCHED (38/38 words, whole-image SHA1 green, first build)
 
@@ -14,7 +16,7 @@ The D_8006E4F0 constructor (slot `+0x008`). Class6D3C8__Class6D3C8
 5. calls its own `+0x040` slot with the {320, 240} default (D_8008A8E0).
 
 ```c
-void func_8003AF8C(Class6E4F0 *self, s32 source) {
+void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 source) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = func_8003B20C();
     if (D_8008A8DC == 0) {
