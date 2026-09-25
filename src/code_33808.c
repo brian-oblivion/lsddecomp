@@ -87,7 +87,13 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043840);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800438B0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043954);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800439EC);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B18);
+/* LIBGS.H: void GsMapModelingData(unsigned long *p); */
+void GsMapModelingData(u32 *p);
+
+/* D_8006F13C +0x078: map the TMD in the buffer (past its id word). */
+void func_80043B18(Class6D430 *self) {
+    GsMapModelingData((u32 *)self->buffer + 1);
+}
 /* D_8006F13C +0x07C: the address of record `index`, 0x1C bytes each,
  * from +0x0C of the buffer. */
 typedef struct Rec6F13C {
