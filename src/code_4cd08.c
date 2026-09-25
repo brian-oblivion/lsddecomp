@@ -20,7 +20,7 @@ void InitDreamAux(void)
     SetVec3(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = func_8004468C(&req);
+        gDreamAuxSlots[i].obj = New_ModelData(&req);
         req.name = gMomPathSymDog;
     }
 }
@@ -189,7 +189,7 @@ bool CheckTriggerParity(s32 coordParity, s8 *entry)
     return result;
 }
 
-extern TriggerWorld *func_80044A0C(s32 *ctx);
+extern TriggerWorld *New_TriggerWorld(s32 *ctx);
 bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
 
 s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
@@ -198,7 +198,7 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
     TriggerWorld *world;
 
     ctxArg[0] = a2;
-    world = func_80044A0C(ctxArg);
+    world = New_TriggerWorld(ctxArg);
 
     if (world != NULL) {
         DreamAuxGroupRecord *base = gDreamAuxGroupRecords[gDreamAuxStage];

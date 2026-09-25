@@ -1,0 +1,62 @@
+# TodSet__BuildTods -- MATCHED (56/56 words)
+
+> Renamed from `func_800452FC` on 2026-09-25 (tools/rename.py). Address 0x800452fc.
+
+Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
+Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
+`OK: build matches retail SLPS_015.56`), funcdiff 56/56 words, no out-of-range
+drift. Fresh ground (carved revision 18, no prior report).
+
+## What it does
+
+Build step (D_8006F590's setFlag override): SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset and allocate a D_8006F240 source (New_Tod) over it, storing the object over the offset word. On a NULL, walk back releasing (slot +0x004) every one already built and return 1; otherwise 0.
+
+Table slot (`tools/classtable.py`): D_8006F590 +0x064.
+
+## Source
+
+The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
+`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
+top of / earlier in `src/code_33808.c`.
+
+```c
+/* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
+ * buffer's counted offset table, into the table's own words; 0 when all
+ * exist, otherwise release the ones already built and 1. */
+s32 TodSet__BuildTods(DataSrc33808 *self) {
+    Req44858 req;
+    CountedBuf33808 *buf;
+    DataSrc33808 **p;
+    s32 i;
+    s32 n;
+
+    SetVec3(&req, 0, 0, 1);
+    buf = self->buffer;
+    i = 0;
+    n = buf->count;
+    p = (DataSrc33808 **)buf->entries;
+    for (; i < n; i++) {
+        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
+        *p = New_Tod((s32)&req);
+        if (*p == NULL) {
+while (i != 0) {
+ i--;
+ p--;
+ (*p)->methods->release(*p);
+ }
+            return 1;
+        }
+        p++;
+    }
+    return 0;
+}
+```
+
+## Notes
+
+Fourth build. The first shape, `for (p--; i != 0; i--, p--) release(*p);`, measured 22/56 with i/p swapped between s0/s1 and the decrements scheduled differently. Three while/for forms with the decrement of p at the TOP of the body all match: `while (i != 0) { p--; release(*p); i--; }`, `for (; i != 0; i--) { p--; release(*p); }`, and `while (i != 0) { i--; p--; release(*p); }` (kept). `while (i-- != 0) { p--; ... }` differs. An index form (`buf->entries[i] = ...`, release `buf->entries[--i]`) was far worse (5/56, 0x48 frame, two extra saved registers).
+
+## Naming
+
+- **TodSet__BuildTods**, tier A. Slot +0x064: builds a Tod over each sub-block of the buffer's counted offset table; releases what was built so far on an allocation failure.

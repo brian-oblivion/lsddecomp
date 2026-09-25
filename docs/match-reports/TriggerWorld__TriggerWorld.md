@@ -1,0 +1,45 @@
+# TriggerWorld__TriggerWorld -- MATCHED (34/34 words)
+
+> Renamed from `func_80044A7C` on 2026-09-25 (tools/rename.py). Address 0x80044a7c.
+
+Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
+Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
+`OK: build matches retail SLPS_015.56`), funcdiff 34/34 words, no out-of-range
+drift. Fresh ground (carved revision 18, no prior report).
+
+## What it does
+
+Constructor: the parent D_8006F384's ctor (through GetModelDataMethods's table, with (self, arg, 0)), install D_8006F40C; if the argument's first word is nonzero, call its own +0x064 (TriggerWorld__Load) and return NULL on a nonzero result; otherwise return self.
+
+Table slot (`tools/classtable.py`): D_8006F40C +0x008.
+
+## Source
+
+The unit-local views `DataSrc33808` (Class6D430 subclass via the unified
+`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros plus `slot7C`/`slot80` and own
+fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
+`src/code_33808.c`.
+
+```c
+/* D_8006F40C +0x008: constructor -- the parent D_8006F384's (third argument
+ * 0), then this table; when the argument's first word is set, its own
+ * +0x064 runs, and a nonzero result fails the construction (NULL). */
+void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
+    ((Ctor33808 *)GetModelDataMethods())->ctor(self, arg, 0);
+    self->methods = GetTriggerWorldMethods();
+    if (*arg != 0) {
+        if (((s32 (*)())self->methods->setFlag)(self)) {
+            return NULL;
+        }
+    }
+    return self;
+}
+```
+
+## Notes
+
+First build; the same shape as TodSet__TodSet (D_8006F590's ctor). The allocator New_ModelData passes 1 as the parent's third argument; this subclass passes 0. setFlag is cast at the call site to return s32.
+
+## Naming
+
+- **TriggerWorld__TriggerWorld**, tier A. Constructor: the parent ModelData's ctor (owns=0), then this table; runs its own Load when the argument's first word is set.

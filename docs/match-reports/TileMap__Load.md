@@ -1,0 +1,50 @@
+# TileMap__Load -- MATCHED (21/21 words)
+
+> Renamed from `GridIndexSrc__Load` on 2026-09-25 (tools/rename.py). Address 0x80044e10.
+
+> Renamed from `func_80044E10` on 2026-09-25 (tools/rename.py). Address 0x80044e10.
+
+Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
+Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
+`OK: build matches retail SLPS_015.56`), funcdiff 21/21 words, no out-of-range
+drift. Fresh ground (carved revision 18, no prior report).
+
+## What it does
+
+When the base field +0x2A is zero, calls slot +0x078 with no arguments ($a0 is never set up for the call) and stores 1 to the u16 at +0x42.
+
+Table slot (`tools/classtable.py`): D_8006F498 +0x064 (setFlag).
+
+## Source
+
+The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
+`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
+
+```c
+/* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
+typedef struct Obj6F498 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ u8 pad2C[0x16];
+    /* +0x042 */ u16 unk42;
+} Obj6F498;
+
+void TileMap__Load(Obj6F498 *self) {
+    if (self->unk2A == 0) {
+        ((void (*)())self->methods->slot78)();
+        self->unk42 = 1;
+    }
+}
+```
+
+## Notes
+
+- Byte-exact on the first build.
+- Unit-local view Obj6F498 (CLASS6D430_FIELDS(DataSrc33808Methods) + u16 at +0x42).
+- No shared header was edited; prototypes for other units' functions are local
+  to the unit.
+- Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **TileMap__Load**, tier A. Slot +0x064: unless +0x2A is set, BuildMap and mark +0x42.

@@ -19,13 +19,6 @@ D_8008A900
 D_8008A904
 D_8008A90C
 D_8008A924
-D_8008A92C
-D_8008A934
-D_8008A938
-D_8008A93C
-D_8008A940
-D_8008A944
-D_8008A948
 D_8008A94C
 D_8008A954
 D_8008A958
@@ -128,7 +121,9 @@ STAIRCASE_OFFSET_3
 Small__rand
 gActiveCdStreamObj
 gActiveDataSource
+gActiveMoviePlayer
 gBMemPMgrBusy
+gBgLayerDefaultColor
 gCardPathPrefix
 gCardPathSuffix
 gCdAsyncEnabled
@@ -172,7 +167,10 @@ gLinkSrcStage
 gLinkTriggerIndex
 gMcDevicePath0
 gMcDevicePath1
+gMdecInitialized
 gMemcardIconTemplate
+gMovieFrameRect
+gMoviePollCounter
 gNameCharTable
 gOpenVabCount
 gPendingVabBuffer
@@ -198,6 +196,8 @@ gStyleKind
 gStyleTargetObj
 gStyleTickCount
 gStyleVariant
+gTimBlockClutShift
+gTimClutRowShift
 gTmdModelConstructed
 gTrackedYSnapshot
 gVabBodySuffix

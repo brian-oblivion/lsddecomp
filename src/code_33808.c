@@ -4,16 +4,42 @@
  * 0x80043008..0x80045E54). It was counted as Psy-Q SDK by segment name;
  * tools/gameinsdk.py measured it as game (a call into game code, a method-
  * table entry beside game methods, or contiguity with those, and no Sony
- * fingerprint). What it holds: the methods of eleven tables (D_8006F0B8,
- * D_8006F13C, D_8006F1C4, D_8006F240, D_8006F2C4, D_8006F384, D_8006F40C,
- * D_8006F498, D_8006F514, D_8006F590, D_8006F614) and nine slots of
- * D_8006D430 (Class6D430, the data-source interface): from +0x07C that table
- * lists `Get...Methods` getters (4-word `return &table` stubs) and nine of
- * them are here, one per class. The methods call Lock/UnlockActiveDataSource
- * and GetClass6B5CCMethods. libpress starts right after, at DecDCTReset
- * (now psyq_36654).
+ * fingerprint). All 97 functions matched in round 82; named in round 83
+ * (track 3 naming pass).
  *
- * Matching began in round 82: `grep -c INCLUDE_ASM` gives what is left.
+ * Eleven method tables, nine of them Class6D430 (data-source) subclasses
+ * reached through nine of D_8006D430's own `Get...Methods` getter slots
+ * (from +0x07C):
+ *
+ *   - TimBlockSrc  (D_8006F0B8): a sector-header + block loader with four
+ *     CLUT palette-fade channels (FadeClutRow).
+ *   - LinkResource (D_8006F13C): a NULL-ended array of TMD models
+ *     (New_TmdModel); named from external call sites (class_3bb8c.c,
+ *     code_55dd4.h) that already declare it `LinkResource *`.
+ *   - TimArraySrc  (D_8006F1C4): an array of TimImage objects
+ *     (code_2bb9c.c's func_8003B39C).
+ *   - Tod / TodSet (D_8006F240 / D_8006F590, TodSet a Tod subclass): one
+ *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
+ *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
+ *   - ModelData / TriggerWorld (D_8006F384 / D_8006F40C, TriggerWorld a
+ *     ModelData subclass): a LinkResource+TodSet pair, and an array of
+ *     those pairs; ModelData named from code_55dd4.h/.c's own "tmd"/"tods"/
+ *     "modelData" fields, TriggerWorld from code_4cd08.c's own declared
+ *     return type.
+ *   - TileMap / TileAtlas (D_8006F498 / D_8006F514): a 20x15 grid of
+ *     16x16-cell map data (a GsMAP, consumed by BgLayer as its map source)
+ *     and the 300-GsCELL texture atlas it indexes; built together and used
+ *     together in src/code_2c054.c's TaskCoreObj__TaskCoreObj.
+ *
+ * Two more classes, not Class6D430 subclasses:
+ *
+ *   - BgLayer (D_8006F2C4): a Class6B5CC subclass wrapping one GsBG
+ *     scrolling background layer (its own fields are GsBG's own layout).
+ *   - MoviePlayer (D_8006F614): a BasicClass subclass driving CD-streamed,
+ *     MDEC-decoded FMV playback (open a CD stream, decode/upload strips,
+ *     play/stop/tick controls); called from code_2c054.c.
+ *
+ * libpress starts right after, at DecDCTReset (now psyq_36654).
  */
 #include "common.h"
 #include "BasicClass.h"
@@ -50,16 +76,16 @@ extern Class6D430Methods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
-void *func_80043830(void);
-void *func_80043B78(void);
-void *func_80043E74(void);
-void *func_800441A4(void);
-void *func_8004467C(void);
-void *func_800449FC(void);
-void *func_80044CC4(void);
-void *func_80044F20(void);
-void *func_800451A8(void);
-void *func_80045428(void);
+void *GetTimBlockSrcMethods(void);
+void *GetLinkResourceMethods(void);
+void *GetTimArraySrcMethods(void);
+void *GetTodMethods(void);
+void *GetBgLayerMethods(void);
+void *GetModelDataMethods(void);
+void *GetTriggerWorldMethods(void);
+void *GetTileMapMethods(void);
+void *GetTileAtlasMethods(void);
+void *GetTodSetMethods(void);
 
 /* The allocators below reach a class's constructor through its table
  * getter; the constructor's parameters vary, so the slot is unprototyped. */
@@ -70,18 +96,18 @@ typedef struct Ctor33808 {
 } Ctor33808;
 
 /* Allocate and construct a D_8006F0B8 object. */
-void *func_80043008(s32 arg0) {
+void *New_TimBlockSrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x84);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_80043830())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTimBlockSrcMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
 }
 /* D_8006F0B8 +0x008: constructor -- the active driver's, then this table;
  * clear +0x2C..+0x3C and lay out the four channel entries at +0x40 (shift
- * D_8008A92C, its mask, consecutive slots from 0x1E0); then adopt a 0x24-byte
+ * gTimBlockClutShift, its mask, consecutive slots from 0x1E0); then adopt a 0x24-byte
  * header buffer (state 9 at +0x2A), allocate the 0x800-byte sector buffer
  * at +0x34, open `name` and read the first sector into it. */
 typedef struct Ent43068 {
@@ -105,9 +131,9 @@ typedef struct Obj43068 {
     /* +0x080 */ s32 unk80;
 } Obj43068;
 
-extern s16 D_8008A92C;
+extern s16 gTimBlockClutShift;
 
-void func_80043068(Obj43068 *self, char *name) {
+void TimBlockSrc__TimBlockSrc(Obj43068 *self, char *name) {
     Ent43068 *e;
     void *hdr;
     s32 i;
@@ -116,15 +142,15 @@ void func_80043068(Obj43068 *self, char *name) {
     u16 mask;
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80043830();
+    self->methods = GetTimBlockSrcMethods();
     self->unk2C = 0;
     self->unk30 = 0;
     self->unk3C = 0;
     self->sector = NULL;
     self->unk38 = 0;
     addr = 0;
-    mask = 1 << D_8008A92C;
-    shift = D_8008A92C;
+    mask = 1 << gTimBlockClutShift;
+    shift = gTimBlockClutShift;
     for (i = 0; i < 4; i++) {
         e = &self->entries[i];
         e->shift = shift;
@@ -150,7 +176,7 @@ void func_80043068(Obj43068 *self, char *name) {
 }
 /* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
  * entries), free it, then the active driver's. */
-void func_800431A8(DataSrc33808 *self) {
+void TimBlockSrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
     BMemPMgrFree(self->unk30);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
@@ -171,10 +197,10 @@ typedef struct Hdr43200 {
 
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
-u32 func_800434DC(Class6D430 *self);
-void *func_80043B88(s32 arg0);
+u32 MaxOfBufferWords(Class6D430 *self);
+void *New_TimArraySrc(s32 arg0);
 
-void func_80043200(Obj43068 *self) {
+void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
     DataSrc33808 **p;
     s32 max;
     s32 n;
@@ -185,7 +211,7 @@ void func_80043200(Obj43068 *self) {
             if (self->flags & 0x80) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
                 BMemPMgrFree(self->sector);
-                max = func_800434DC((Class6D430 *)self);
+                max = MaxOfBufferWords((Class6D430 *)self);
                 self->unk30 = (s32)BMemPMgrAlloc(*(u32 *)self->buffer * 4);
                 if (self->unk30 == 0) {
                     goto fail;
@@ -204,7 +230,7 @@ void func_80043200(Obj43068 *self) {
             if (self->flags & 0x80) {
                 n = self->unk2C;
                 p = (DataSrc33808 **)self->unk30 + n;
-                *p = func_80043B88(0);
+                *p = New_TimArraySrc(0);
                 (*p)->buffer = self->sector;
                 (*p)->bufferSize = 0;
                 (*p)->unk34 = (s32)self->entries;
@@ -240,7 +266,7 @@ typedef struct Buf434DC {
     /* +0x14 */ u32 vals[1];
 } Buf434DC;
 
-u32 func_800434DC(Class6D430 *self) {
+u32 MaxOfBufferWords(Class6D430 *self) {
     Buf434DC *buf = self->buffer;
     u32 i;
     u32 max = 0;
@@ -264,7 +290,7 @@ typedef struct Ent6F0B8 {
     /* +0x00 */ u16 shift;
     /* +0x02 */ u16 mask;
     /* +0x04 */ u8 pad4[6];
-    /* +0x0A */ u16 unkA;         /* set to the mask by func_80043648 */
+    /* +0x0A */ u16 unkA;         /* set to the mask by FadeClutRow */
     /* +0x0C */ Vec3S8 vec;
     /* +0x0F */ u8 padF;
 } Ent6F0B8;
@@ -274,7 +300,7 @@ typedef struct Obj6F0B8 {
     /* +0x040 */ Ent6F0B8 entries[1];
 } Obj6F0B8;
 
-void func_80043538(Obj6F0B8 *self, s32 index, s32 shift) {
+void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
     Ent6F0B8 *e = &self->entries[index];
 
     e->shift = shift;
@@ -285,7 +311,7 @@ void func_80043538(Obj6F0B8 *self, s32 index, s32 shift) {
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
 
-void func_8004355C(DataSrc33808 *self, s32 arg) {
+void TimBlockSrc__FadeAllEntries(DataSrc33808 *self, s32 arg) {
     s32 i;
 
     LockActiveDataSource();
@@ -295,16 +321,16 @@ void func_8004355C(DataSrc33808 *self, s32 arg) {
     UnlockActiveDataSource();
 }
 /* D_8006F0B8 +0x080: under the data-source lock, set entry `index`'s
- * three-byte vector and hand the entry to func_80043648. */
-void func_80043648(Ent6F0B8 *entry, s32 index);
+ * three-byte vector and hand the entry to FadeClutRow. */
+void FadeClutRow(Ent6F0B8 *entry, s32 index);
 
-void func_800435D0(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
+void TimBlockSrc__FadeEntry(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
     Ent6F0B8 *e;
 
     LockActiveDataSource();
     e = &self->entries[index];
     e->vec = *src;
-    func_80043648(e, index);
+    FadeClutRow(e, index);
     UnlockActiveDataSource();
 }
 /* Fade one 256-colour CLUT row (the entry's `index`, from VRAM y 0x1E0)
@@ -323,7 +349,7 @@ extern int StoreImage(Rect43648 *rect, u32 *p);
 extern int LoadImage(Rect43648 *rect, u32 *p);
 extern int DrawSync(int mode);
 
-void func_80043648(Ent6F0B8 *e, s32 index) {
+void FadeClutRow(Ent6F0B8 *e, s32 index) {
     Rect43648 dst;
     Rect43648 src;
     u16 out[256];
@@ -346,7 +372,7 @@ void func_80043648(Ent6F0B8 *e, s32 index) {
     src.x = 0;
     src.w = 0x100;
     src.h = 1;
-    src.y = (index << D_8008A92C) + 0x1E0;
+    src.y = (index << gTimBlockClutShift) + 0x1E0;
     StoreImage(&src, (u32 *)in);
     DrawSync(0);
     dst.h = 1;
@@ -385,15 +411,15 @@ void func_80043648(Ent6F0B8 *e, s32 index) {
 }
 extern s32 D_8006F0B8[];
 
-void *func_80043830(void) {
+void *GetTimBlockSrcMethods(void) {
     return D_8006F0B8;
 }
 /* Allocate and construct a D_8006F13C object; freed and NULL when the constructor fails. */
-void *func_80043840(s32 arg0) {
+void *New_LinkResource(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80043B78())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetLinkResourceMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -410,9 +436,9 @@ typedef struct Src6F240 {
 /* D_8006F13C +0x008: constructor -- the active driver's, then this table;
  * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
  * nonzero result fails the construction (NULL), or else request its file. */
-void *func_800438B0(DataSrc33808 *self, Src6F240 *src) {
+void *LinkResource__LinkResource(DataSrc33808 *self, Src6F240 *src) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80043B78();
+    self->methods = GetLinkResourceMethods();
     if (src != NULL) {
         if (src->buffer != NULL) {
             self->buffer = src->buffer;
@@ -430,7 +456,7 @@ fail:
 }
 /* D_8006F13C +0x00C: finalize -- release every object in the NULL-ended
  * array at +0x2C, free the array, then the active driver's. */
-void func_80043954(DataSrc33808 *self) {
+void LinkResource__Finalize(DataSrc33808 *self) {
     DataSrc33808 **objs = (DataSrc33808 **)self->unk2C;
 
     while (*objs != NULL) {
@@ -453,7 +479,7 @@ typedef struct Buf439EC {
 
 extern void *New_TmdModel(void *arg);
 
-s32 func_800439EC(DataSrc33808 *self) {
+s32 LinkResource__BuildModels(DataSrc33808 *self) {
     DataSrc33808 **objs;
     u32 i;
 
@@ -484,7 +510,7 @@ s32 func_800439EC(DataSrc33808 *self) {
 void GsMapModelingData(u32 *p);
 
 /* D_8006F13C +0x078: map the TMD in the buffer (past its id word). */
-void func_80043B18(Class6D430 *self) {
+void LinkResource__MapModel(Class6D430 *self) {
     GsMapModelingData((u32 *)self->buffer + 1);
 }
 /* D_8006F13C +0x07C: the address of record `index`, 0x1C bytes each,
@@ -498,7 +524,7 @@ typedef struct Buf6F13C {
     /* +0x0C */ Rec6F13C recs[1];
 } Buf6F13C;
 
-Rec6F13C *func_80043B3C(Class6D430 *self, s32 index) {
+Rec6F13C *LinkResource__GetRecord(Class6D430 *self, s32 index) {
     return &((Buf6F13C *)self->buffer)->recs[index];
 }
 /* D_8006F13C +0x080: returns entry `index` of the word array at +0x2C
@@ -508,31 +534,31 @@ typedef struct Obj6F13C {
     /* +0x02C */ s32 *entries;
 } Obj6F13C;
 
-s32 func_80043B58(Obj6F13C *self, s32 index) {
+s32 LinkResource__GetEntry(Obj6F13C *self, s32 index) {
     return self->entries[index];
 }
-void func_80043B70(void) {
+void LinkResource__NoOp(void) {
 }
 extern s32 D_8006F13C[];
 
-void *func_80043B78(void) {
+void *GetLinkResourceMethods(void) {
     return D_8006F13C;
 }
 /* Allocate and construct a D_8006F1C4 object. */
-void *func_80043B88(s32 arg0) {
+void *New_TimArraySrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x3C);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_80043E74())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTimArraySrcMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
 }
 /* D_8006F1C4 +0x008: constructor -- the active driver's, then this table,
  * clear +0x2C/+0x30/+0x38, and request `name` when there is one. */
-void func_80043BE8(DataSrc33808 *self, char *name) {
+void TimArraySrc__TimArraySrc(DataSrc33808 *self, char *name) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80043E74();
+    self->methods = GetTimArraySrcMethods();
     self->unk2C = 0;
     self->unk30 = NULL;
     self->unk38 = 0;
@@ -541,7 +567,7 @@ void func_80043BE8(DataSrc33808 *self, char *name) {
     }
 }
 /* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
-void func_80043C60(DataSrc33808 *self) {
+void TimArraySrc__Finalize(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
     BMemPMgrFree(self->unk30);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
@@ -550,7 +576,7 @@ void func_80043C60(DataSrc33808 *self) {
  * build one TimImage (func_8003B39C(NULL)) per image of the buffer -- a
  * count, then that many offsets -- into an array at +0x30 (+0x2C entries),
  * each adopting its image in place (size 0), and set each one's +0x4C from
- * the CLUT row its GsGetTimInfo reports (from y 0x1E0, >> D_8008A934, 16
+ * the CLUT row its GsGetTimInfo reports (from y 0x1E0, >> gTimClutRowShift, 16
  * bytes a step past +0x34); then mark +0x38 and the active driver's
  * setFlag. */
 typedef struct Image43CB8 {      /* LIBGS.H GsIMAGE */
@@ -590,9 +616,9 @@ typedef struct Obj43CB8 {
 } Obj43CB8;
 
 extern Tim43CB8 *func_8003B39C(char *name);
-extern s16 D_8008A934;
+extern s16 gTimClutRowShift;
 
-void func_80043CB8(Obj43CB8 *self) {
+void TimArraySrc__BuildImages(Obj43CB8 *self) {
     Image43CB8 info;
     Tim43CB8 **objs;
     s32 i;
@@ -609,7 +635,7 @@ void func_80043CB8(Obj43CB8 *self) {
                 (*objs)->buffer = (u8 *)self->buffer + *offs;
                 (*objs)->bufferSize = 0;
                 (*objs)->methods->getTimInfo(*objs, &info);
-                (*objs)->clutBase = ((info.cy - 0x1E0) >> D_8008A934) * 16 + self->base;
+                (*objs)->clutBase = ((info.cy - 0x1E0) >> gTimClutRowShift) * 16 + self->base;
                 offs++;
                 objs++;
             }
@@ -620,7 +646,7 @@ void func_80043CB8(Obj43CB8 *self) {
 }
 /* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
  * (+0x2C entries). */
-void func_80043DFC(DataSrc33808 *self) {
+void TimArraySrc__NotifyImages(DataSrc33808 *self) {
     DataSrc33808 **objs = (DataSrc33808 **)self->unk30;
     s32 i;
 
@@ -631,15 +657,15 @@ void func_80043DFC(DataSrc33808 *self) {
 }
 extern s32 D_8006F1C4[];
 
-void *func_80043E74(void) {
+void *GetTimArraySrcMethods(void) {
     return D_8006F1C4;
 }
 /* Allocate and construct a D_8006F240 object. */
-void *func_80043E84(s32 arg0) {
+void *New_Tod(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x2C);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_800441A4())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTodMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
@@ -647,9 +673,9 @@ void *func_80043E84(s32 arg0) {
 /* D_8006F240 +0x008: constructor -- the active driver's, then this table;
  * adopt a buffer handed in (size 0) and run its own +0x064, or else request
  * the named file. */
-void func_80043EE4(DataSrc33808 *self, Src6F240 *src) {
+void Tod__Tod(DataSrc33808 *self, Src6F240 *src) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_800441A4();
+    self->methods = GetTodMethods();
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
         self->bufferSize = 0;
@@ -659,15 +685,15 @@ void func_80043EE4(DataSrc33808 *self, Src6F240 *src) {
     }
 }
 /* D_8006F240 +0x00C: finalize, straight to the active driver's. */
-void func_80043F78(Class6D430 *self) {
+void Tod__Finalize(Class6D430 *self) {
     GetActiveDataSourceMethods()->finalize(self);
 }
 /* D_8006F240 +0x078: slot +0x07C over the buffer past its first two words. */
-u8 func_80043FB0(DataSrc33808 *self, s32 arg1, s32 arg2) {
+u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
 }
 /* Defined below (ROM order); called directly here, not through slot +0x080. */
-u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3);
+u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3);
 
 /* D_8006F240/D_8006F590 +0x07C: walk the packet words after the u16 count
  * at data +2 (from data +8), each decoded by +0x080 into a value, a type, a
@@ -676,7 +702,7 @@ u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u
  * value up among the ones appended so far when its halfword at +4 matches
  * `*sel` -- keeping its index -- or, without `out`, counts it. The index /
  * count goes back through `sel`; returns the number appended. */
-u8 func_80043FE4(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
+u8 ScanTodPackets(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
     u8 value;
     u8 type;
     u8 sub;
@@ -693,7 +719,7 @@ u8 func_80043FE4(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
     cnt = 0;
     found = 0;
     for (; i < n; i++) {
-        func_8004416C(self, data, &value, &type, &sub, &len);
+        DecodeTodPacketWord(self, data, &value, &type, &sub, &len);
         if (type == 8 && sub == 0) {
             cnt++;
             if (out != NULL) {
@@ -723,7 +749,7 @@ u8 func_80043FE4(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
 /* D_8006F240/D_8006F590 +0x080: decode one packet word -- the low byte, then
  * the two nibbles at bits 16 and 20, then the top byte -- and return the
  * pointer past it. */
-u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
+u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
     u32 v = *acc;
 
     *out0 = v;
@@ -734,15 +760,15 @@ u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u
 }
 extern s32 D_8006F240[];
 
-void *func_800441A4(void) {
+void *GetTodMethods(void) {
     return D_8006F240;
 }
 /* Allocate and construct a D_8006F2C4 object. */
-void *func_800441B4(s32 arg0, s32 arg1) {
+void *New_BgLayer(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x68);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_8004467C())->ctor(obj, arg0, arg1);
+        ((Ctor33808 *)GetBgLayerMethods())->ctor(obj, arg0, arg1);
         return obj;
     }
     return NULL;
@@ -769,15 +795,15 @@ typedef struct Obj6F2C4 {
 
 /* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
  * slot +0x040 with the two arguments. */
-void func_80044220(Obj6F2C4 *self, s32 arg1, s32 arg2) {
+void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
-    self->methods = func_8004467C();
+    self->methods = GetBgLayerMethods();
     ((void (*)())self->methods->reset)(self, arg1, arg2);
 }
 /* D_8006F2C4 +0x040: reset -- lay out the GsBG at +0x044 over a map
  * source: mode 0 sizes it to the map (cell size x cell count), mode 1 to a
  * 320 x 240 screen (with its own attribute); then zero position and
- * scroll, take the colour in D_8008A938, point it at the source's GsMAP
+ * scroll, take the colour in gBgLayerDefaultColor, point it at the source's GsMAP
  * (+0x2C), unit scale, no rotation, and centre the pivot. */
 typedef struct Map44294 {
     /* +0x00 */ u8 pad0[0x2C];
@@ -787,9 +813,9 @@ typedef struct Map44294 {
     /* +0x30 */ u16 ncellh;
 } Map44294;
 
-extern Vec3S8 D_8008A938;
+extern Vec3S8 gBgLayerDefaultColor;
 
-void func_80044294(Obj6F2C4 *self, Map44294 *src, s32 mode) {
+void BgLayer__Reset(Obj6F2C4 *self, Map44294 *src, s32 mode) {
     if (mode == 0) {
         self->bgAttribute = 0x1000000;
         self->w = src->cellw * src->ncellw;
@@ -803,7 +829,7 @@ void func_80044294(Obj6F2C4 *self, Map44294 *src, s32 mode) {
     self->y = 0;
     self->scrollx = 0;
     self->scrolly = 0;
-    self->unk54 = D_8008A938;
+    self->unk54 = gBgLayerDefaultColor;
     self->map = &src->cellw;
     self->scalex = 0x1000;
     self->scaley = 0x1000;
@@ -819,7 +845,7 @@ typedef struct Ratio44380 {
     /* +0x0A */ s16 den;
 } Ratio44380;
 
-void func_80044380(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
+void BgLayer__SetRotation(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
     s32 num = src->num;
     s32 den = src->den;
     s32 v = ((num / den) << 12) + (((num % den) << 12) / den);
@@ -841,7 +867,7 @@ typedef struct Scale4441C {
     /* +0x06 */ s16 yden;
 } Scale4441C;
 
-void func_8004441C(Obj6F2C4 *self, s32 set, Scale4441C *src) {
+void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
     s32 negX;
     s32 negY;
     s32 den;
@@ -906,24 +932,24 @@ void func_8004441C(Obj6F2C4 *self, s32 set, Scale4441C *src) {
 }
 /* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
  * three-byte vector to +0x54. */
-void func_8004464C(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
+void BgLayer__SetColor(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
     if (enable) {
         self->unk54 = *src;
     }
 }
-void func_80044674(void) {
+void BgLayer__NoOp(void) {
 }
 extern s32 D_8006F2C4[];
 
-void *func_8004467C(void) {
+void *GetBgLayerMethods(void) {
     return D_8006F2C4;
 }
 /* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
-void *func_8004468C(s32 arg0) {
+void *New_ModelData(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_800449FC())->ctor(obj, arg0, 1)) {
+        if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, arg0, 1)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -934,9 +960,9 @@ void *func_8004468C(s32 arg0) {
  * `owns` at +0x34; adopt the descriptor's buffer (size 0) and run its own
  * +0x064, whose nonzero result fails the construction (NULL), or else
  * request its file. */
-void *func_800446FC(DataSrc33808 *self, Src6F240 *src, s32 owns) {
+void *ModelData__ModelData(DataSrc33808 *self, Src6F240 *src, s32 owns) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_800449FC();
+    self->methods = GetModelDataMethods();
     self->unk34 = owns;
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
@@ -952,12 +978,12 @@ fail:
     return NULL;
 }
 /* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
-void func_800447B4(DataSrc33808 *self) {
+void ModelData__Finalize(DataSrc33808 *self) {
     self->methods->slot7C();
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F384 +0x064: the active driver's setFlag, then slot +0x078. */
-void func_80044808(DataSrc33808 *self) {
+void ModelData__Load(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
     ((s32 (*)())self->methods->slot78)(self);
 }
@@ -977,17 +1003,17 @@ typedef struct Buf44858 {
 } Buf44858;
 
 extern Req44858 *SetVec3(Req44858 *req, void *buffer, s32 unk4, s32 unk8);  /* code_171e0.c: stores its three words into *req, returns req */
-void *func_800451B8(s32 arg0);  /* defined below (ROM order) */
+void *New_TodSet(s32 arg0);  /* defined below (ROM order) */
 
-s32 func_80044858(DataSrc33808 *self) {
+s32 ModelData__BuildResources(DataSrc33808 *self) {
     Req44858 req;
 
     if (self->unk34 != 0) {
         SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
-        self->unk2C = (s32)func_80043840((s32)&req);
+        self->unk2C = (s32)New_LinkResource((s32)&req);
         if ((void *)self->unk2C != NULL) {
             req.buffer = (u8 *)self->buffer + 0xC;
-            self->unk30 = func_800451B8((s32)&req);
+            self->unk30 = New_TodSet((s32)&req);
             if (self->unk30 != NULL) {
                 return 0;
             }
@@ -1000,7 +1026,7 @@ s32 func_80044858(DataSrc33808 *self) {
 }
 /* D_8006F384 +0x07C: when +0x34 is set, release the objects at +0x30 and
  * +0x2C (each when there is one). */
-void func_800448F8(DataSrc33808 *self) {
+void ModelData__ReleaseResources(DataSrc33808 *self) {
     if (self->unk34 != 0) {
         if (self->unk30 != NULL) {
             self->unk30->methods->release(self->unk30);
@@ -1011,24 +1037,24 @@ void func_800448F8(DataSrc33808 *self) {
     }
 }
 /* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
-u8 func_8004497C(DataSrc33808 *self, s32 arg1, s32 arg2) {
+u8 ModelData__ForwardScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return ((s32 (*)())self->unk30->methods->slot78)(self->unk30, arg1, arg2);
 }
 /* D_8006F384/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
-void *func_800449B8(DataSrc33808 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+void *ModelData__ForwardDecodePacketWord(DataSrc33808 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     return self->unk30->methods->slot80(self->unk30, arg1, arg2, arg3, arg4, arg5);
 }
 extern s32 D_8006F384[];
 
-void *func_800449FC(void) {
+void *GetModelDataMethods(void) {
     return D_8006F384;
 }
 /* Allocate and construct a D_8006F40C object; freed and NULL when the constructor fails. */
-void *func_80044A0C(s32 arg0) {
+void *New_TriggerWorld(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x3C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80044CC4())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetTriggerWorldMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -1038,9 +1064,9 @@ void *func_80044A0C(s32 arg0) {
 /* D_8006F40C +0x008: constructor -- the parent D_8006F384's (third argument
  * 0), then this table; when the argument's first word is set, its own
  * +0x064 runs, and a nonzero result fails the construction (NULL). */
-void *func_80044A7C(DataSrc33808 *self, s32 *arg) {
-    ((Ctor33808 *)func_800449FC())->ctor(self, arg, 0);
-    self->methods = func_80044CC4();
+void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
+    ((Ctor33808 *)GetModelDataMethods())->ctor(self, arg, 0);
+    self->methods = GetTriggerWorldMethods();
     if (*arg != 0) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
             return NULL;
@@ -1049,19 +1075,19 @@ void *func_80044A7C(DataSrc33808 *self, s32 *arg) {
     return self;
 }
 /* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
-void func_80044B04(DataSrc33808 *self) {
+void TriggerWorld__Finalize(DataSrc33808 *self) {
     self->methods->slot7C();
-    ((DataSrc33808Methods *)func_800449FC())->finalize(self);
+    ((DataSrc33808Methods *)GetModelDataMethods())->finalize(self);
 }
 /* D_8006F40C +0x064: slot +0x078. */
-void func_80044B58(DataSrc33808 *self) {
+void TriggerWorld__Load(DataSrc33808 *self) {
     ((s32 (*)())self->methods->slot78)(self);
 }
 /* D_8006F40C +0x078: build a D_8006F384 source (not owning) over each
  * sub-block of the buffer's counted offset table, into the table's own
  * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
  * (release) and 1. */
-s32 func_80044B88(DataSrc33808 *self) {
+s32 TriggerWorld__BuildParts(DataSrc33808 *self) {
     Req44858 req;
     CountedBuf33808 *buf;
     s32 *p;
@@ -1076,7 +1102,7 @@ s32 func_80044B88(DataSrc33808 *self) {
     self->unk38 = 0;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = (s32)func_8004468C((s32)&req);
+        *p = (s32)New_ModelData((s32)&req);
         if (*p == 0) {
             goto fail;
         }
@@ -1090,13 +1116,13 @@ fail:
 }
 /* D_8006F40C +0x07C: release the object array in the buffer (past its first
  * two words), +0x38 entries long, and zero the count. */
-void func_80044C58(DataSrc33808 *self) {
+void TriggerWorld__ReleaseParts(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->unk38);
     self->unk38 = 0;
 }
 /* D_8006F40C +0x088: entry `index` of the buffer's counted word array, 0 when
  * out of range. */
-s32 func_80044C90(DataSrc33808 *self, u32 index) {
+s32 TriggerWorld__GetOffset(DataSrc33808 *self, u32 index) {
     CountedBuf33808 *buf = self->buffer;
 
     if (index < buf->count) {
@@ -1106,15 +1132,15 @@ s32 func_80044C90(DataSrc33808 *self, u32 index) {
 }
 extern s32 D_8006F40C[];
 
-void *func_80044CC4(void) {
+void *GetTriggerWorldMethods(void) {
     return D_8006F40C;
 }
 /* Allocate and construct a D_8006F498 object. */
-void *func_80044CD4(s32 arg0, s32 arg1) {
+void *New_TileMap(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x44);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_80044F20())->ctor(obj, arg0, arg1);
+        ((Ctor33808 *)GetTileMapMethods())->ctor(obj, arg0, arg1);
         return obj;
     }
     return NULL;
@@ -1137,11 +1163,11 @@ typedef struct Obj6F498 {
 /* D_8006F498 +0x008: constructor -- the active driver's, then this table;
  * store `arg2` at +0x3C, clear +0x42, and with no `arg1` set +0x40, clear
  * +0x2A and run its own +0x064. */
-void func_80044D40(Obj6F498 *self, s32 arg1, s32 arg2) {
+void TileMap__TileMap(Obj6F498 *self, s32 arg1, s32 arg2) {
     s32 unused[8];
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80044F20();
+    self->methods = GetTileMapMethods();
     self->unk3C = arg2;
     self->unk42 = 0;
     if (arg1 == 0) {
@@ -1151,13 +1177,13 @@ void func_80044D40(Obj6F498 *self, s32 arg1, s32 arg2) {
     }
 }
 /* D_8006F498 +0x00C: finalize -- free +0x38, then the active driver's. */
-void func_80044DC8(DataSrc33808 *self) {
+void TileMap__Finalize(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk38);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
 
-void func_80044E10(Obj6F498 *self) {
+void TileMap__Load(Obj6F498 *self) {
     if (self->unk2A == 0) {
         ((void (*)())self->methods->slot78)();
         self->unk42 = 1;
@@ -1167,7 +1193,7 @@ void func_80044E10(Obj6F498 *self) {
  * is set, lay out a 20 x 15 grid (16 x 16 cells) and fill an allocated
  * index table 0..n-1 at +0x38; otherwise, or when the allocation fails,
  * free the buffer (own +0x05C). */
-void func_80044E64(Obj6F498 *self) {
+void TileMap__BuildMap(Obj6F498 *self) {
     s32 n;
     s32 i;
     u16 *p;
@@ -1192,15 +1218,15 @@ void func_80044E64(Obj6F498 *self) {
 }
 extern s32 D_8006F498[];
 
-void *func_80044F20(void) {
+void *GetTileMapMethods(void) {
     return D_8006F498;
 }
 /* Allocate and construct a D_8006F514 object. */
-void *func_80044F30(s32 arg0) {
+void *New_TileAtlas(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_800451A8())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTileAtlasMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
@@ -1208,7 +1234,7 @@ void *func_80044F30(s32 arg0) {
 /* The D_8006F514 object. */
 typedef struct Obj6F514 {
     CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ struct Cell450B4 *cells;  /* 300 GsCELLs, built by func_800450B4 */
+    /* +0x02C */ struct Cell450B4 *cells;  /* 300 GsCELLs, built by TileAtlas__BuildCells */
     /* +0x030 */ u16 unk30;
     /* +0x032 */ u16 unk32;
     /* +0x034 */ s32 unk34;
@@ -1217,11 +1243,11 @@ typedef struct Obj6F514 {
 /* D_8006F514 +0x008: constructor -- the active driver's, then this table;
  * clear +0x34/+0x32, and with no `arg` set +0x30, clear +0x2A and run its
  * own +0x064. */
-void func_80044F90(Obj6F514 *self, s32 arg) {
+void TileAtlas__TileAtlas(Obj6F514 *self, s32 arg) {
     s32 unused[8];
 
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_800451A8();
+    self->methods = GetTileAtlasMethods();
     self->unk34 = 0;
     self->unk32 = 0;
     if (arg == 0) {
@@ -1232,14 +1258,14 @@ void func_80044F90(Obj6F514 *self, s32 arg) {
 }
 /* D_8006F514 +0x00C: finalize -- free +0x34 and +0x2C, then the active
  * driver's. */
-void func_8004500C(DataSrc33808 *self) {
+void TileAtlas__Finalize(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk34);
     BMemPMgrFree((void *)self->unk2C);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F514 +0x064: unless +0x2A is set, slot +0x078 and mark +0x32. */
 
-void func_80045060(Obj6F514 *self) {
+void TileAtlas__Load(Obj6F514 *self) {
     s32 unused[8];
 
     if (self->unk2A == 0) {
@@ -1262,7 +1288,7 @@ typedef struct Cell450B4 {       /* LIBGS.H GsCELL */
 /* LIBGPU.H */
 extern u16 GetTPage(int tp, int abr, int x, int y);
 
-void func_800450B4(Obj6F514 *self) {
+void TileAtlas__BuildCells(Obj6F514 *self) {
     Cell450B4 *c;
     s32 x = 0x280;
     s32 u;
@@ -1306,15 +1332,15 @@ void func_800450B4(Obj6F514 *self) {
 }
 extern s32 D_8006F514[];
 
-void *func_800451A8(void) {
+void *GetTileAtlasMethods(void) {
     return D_8006F514;
 }
 /* Allocate and construct a D_8006F590 object; freed and NULL when the constructor fails. */
-void *func_800451B8(s32 arg0) {
+void *New_TodSet(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x2C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80045428())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetTodSetMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -1324,9 +1350,9 @@ void *func_800451B8(s32 arg0) {
 /* D_8006F590 +0x008: constructor -- the parent D_8006F240's, then this
  * table; when the argument's first word is set, its own +0x064 runs, and a
  * nonzero result fails the construction (NULL). */
-void *func_80045228(DataSrc33808 *self, s32 *arg) {
-    ((Ctor33808 *)func_800441A4())->ctor(self, arg);
-    self->methods = func_80045428();
+void *TodSet__TodSet(DataSrc33808 *self, s32 *arg) {
+    ((Ctor33808 *)GetTodMethods())->ctor(self, arg);
+    self->methods = GetTodSetMethods();
     if (*arg != 0) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
             return NULL;
@@ -1336,11 +1362,11 @@ void *func_80045228(DataSrc33808 *self, s32 *arg) {
 }
 /* D_8006F590 +0x00C: finalize -- release the buffer's counted object array,
  * then the parent D_8006F240's. */
-void func_800452AC(DataSrc33808 *self) {
+void TodSet__Finalize(DataSrc33808 *self) {
     CountedBuf33808 *buf = self->buffer;
 
     ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
-    ((DataSrc33808Methods *)func_800441A4())->finalize(self);
+    ((DataSrc33808Methods *)GetTodMethods())->finalize(self);
 }
 /* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
  * buffer's counted offset table, into the table's own words; 0 when all
@@ -1360,7 +1386,7 @@ void func_800452AC(DataSrc33808 *self) {
 /* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
  * buffer's counted offset table, into the table's own words; 0 when all
  * exist, otherwise release the ones already built and 1. */
-s32 func_800452FC(DataSrc33808 *self) {
+s32 TodSet__BuildTods(DataSrc33808 *self) {
     Req44858 req;
     CountedBuf33808 *buf;
     DataSrc33808 **p;
@@ -1374,7 +1400,7 @@ s32 func_800452FC(DataSrc33808 *self) {
     p = (DataSrc33808 **)buf->entries;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = func_80043E84((s32)&req);
+        *p = New_Tod((s32)&req);
         if (*p == NULL) {
 while (i != 0) {
  i--;
@@ -1389,25 +1415,25 @@ while (i != 0) {
 }
 /* D_8006F590 +0x078: slot +0x07C over the data past the buffer's counted
  * array. */
-u8 func_800453DC(DataSrc33808 *self, s32 arg1, s32 arg2) {
+u8 TodSet__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
     CountedBuf33808 *buf = self->buffer;
 
     return self->methods->slot7C(self, arg1, arg2, &buf->entries[buf->count] + 2);
 }
 extern s32 D_8006F590[];
 
-void *func_80045428(void) {
+void *GetTodSetMethods(void) {
     return D_8006F590;
 }
 /* Allocate and construct a D_8006F614 object; freed and NULL when the
  * constructor returns nonzero (this ctor reports failure, not self). */
-void *func_80045E44(void);
+void *GetMoviePlayerMethods(void);
 
-void *func_80045438(s32 arg0, s32 arg1, s32 arg2) {
+void *New_MoviePlayer(s32 arg0, s32 arg1, s32 arg2) {
     void *obj = BMemPMgrAlloc(0x6C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80045E44())->ctor(obj, arg0, arg1, arg2) == 0) {
+        if (((Ctor33808 *)GetMoviePlayerMethods())->ctor(obj, arg0, arg1, arg2) == 0) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -1416,9 +1442,9 @@ void *func_80045438(s32 arg0, s32 arg1, s32 arg2) {
 }
 /* D_8006F614 +0x008: constructor -- BasicClass's, then this table; open a
  * CD stream object (New_CdStreamObj(arg2, 15, 0)) at +0x60 and set up the
- * decode buffers (func_8004564C); 1 when either fails. Then reset the MDEC
- * the first time any player is built (D_8008A93C), route its output
- * callback to func_80045DE0, hand the stream the ring buffer at +0x10
+ * decode buffers (MoviePlayer__InitFrame); 1 when either fails. Then reset the MDEC
+ * the first time any player is built (gMdecInitialized), route its output
+ * callback to OnMdecFrameReady, hand the stream the ring buffer at +0x10
  * (0x12000), clear +0x50 and store 1 through its own +0x06C. 0. */
 typedef struct StreamMethods454C4 {
     /* +0x000 */ u8 pad0[0x40];
@@ -1445,23 +1471,23 @@ typedef struct Obj454C4 {
 } Obj454C4;
 
 extern void *New_CdStreamObj(s32 arg1, s32 arg2, s32 arg3);
-s32 func_8004564C();
-extern s32 D_8008A93C;
+s32 MoviePlayer__InitFrame();
+extern s32 gMdecInitialized;
 extern void DecDCTReset(int mode);
 extern int DecDCToutCallback(void (*func)());
-void func_80045DE0(void);
+void OnMdecFrameReady(void);
 
-s32 func_800454C4(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
+s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_80045E44();
+    self->methods = GetMoviePlayerMethods();
     self->stream = New_CdStreamObj(arg2, 15, 0);
     if (self->stream != NULL) {
-        if (func_8004564C(self, arg1, arg3) == 0) {
-            if (D_8008A93C == 0) {
+        if (MoviePlayer__InitFrame(self, arg1, arg3) == 0) {
+            if (gMdecInitialized == 0) {
                 DecDCTReset(0);
             }
-            D_8008A93C = 1;
-            DecDCToutCallback(func_80045DE0);
+            gMdecInitialized = 1;
+            DecDCToutCallback(OnMdecFrameReady);
             self->stream->methods->slot40(self->stream, self->ring, 0x12000);
             self->unk50 = 0;
             self->methods->slot6C(self, 1);
@@ -1471,7 +1497,7 @@ s32 func_800454C4(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
     return 1;
 }
 /* D_8006F614 +0x00C: finalize -- release the object at +0x60, detach and
- * reset the MDEC decoder, free the four buffers (func_8004575C), then
+ * reset the MDEC decoder, free the four buffers (MoviePlayer__FreeFrameBuffers), then
  * BasicClass's finalize. */
 typedef struct Obj455D4 {
     /* +0x000 */ u8 pad0[0x60];
@@ -1481,19 +1507,19 @@ typedef struct Obj455D4 {
 /* LIBPRESS.H */
 extern void DecDCTReset(int mode);
 extern int DecDCToutCallback(void (*func)());
-void func_8004575C();
+void MoviePlayer__FreeFrameBuffers();
 
-void func_800455D4(Obj455D4 *self) {
+void MoviePlayer__Finalize(Obj455D4 *self) {
     self->unk60 = self->unk60->methods->release(self->unk60);
     DecDCToutCallback(NULL);
     DecDCTReset(0);
-    func_8004575C(self);
+    MoviePlayer__FreeFrameBuffers(self);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 /* Set up the MDEC player's frame: keep `external` at +0x0C and, unless the
  * caller provides the buffers, allocate the two decode buffers (w * h * 2 +
  * 0x1000 each), the 0x12000 ring and the h * 32 strip buffer -- on a failure
- * free what was allocated (func_8004575C) and return 1. Then the frame
+ * free what was allocated (MoviePlayer__FreeFrameBuffers) and return 1. Then the frame
  * descriptor goes to +0x2C and +0x20, the strip at +0x2C is 16 wide and
  * +0x38 is its size in words. 0. */
 typedef struct Frame4564C {
@@ -1514,7 +1540,7 @@ typedef struct Obj4564C {
     /* +0x038 */ s32 stripSize;
 } Obj4564C;
 
-s32 func_8004564C(Obj4564C *self, Frame4564C *desc, s32 external) {
+s32 MoviePlayer__InitFrame(Obj4564C *self, Frame4564C *desc, s32 external) {
     s32 size;
     s32 unused[2];
 
@@ -1544,7 +1570,7 @@ s32 func_8004564C(Obj4564C *self, Frame4564C *desc, s32 external) {
     self->stripSize = (self->cur.h << 4) >> 1;
     return 0;
 fail:
-    func_8004575C(self);
+    MoviePlayer__FreeFrameBuffers(self);
     return 1;
 }
 /* Unless +0x0C is set, free the four allocations at +0x14, +0x18, +0x10,
@@ -1558,7 +1584,7 @@ typedef struct Obj4575C {
     /* +0x01C */ void *unk1C;
 } Obj4575C;
 
-void func_8004575C(Obj4575C *self) {
+void MoviePlayer__FreeFrameBuffers(Obj4575C *self) {
     if (self->unkC == 0) {
         BMemPMgrFree(self->unk14);
         BMemPMgrFree(self->unk18);
@@ -1567,10 +1593,10 @@ void func_8004575C(Obj4575C *self) {
     }
 }
 /* D_8006F614 +0x040: start playing -- only when no movie is active
- * (D_8008A940): optionally func_800458AC first (+0x68), keep `arg2` at
+ * (gActiveMoviePlayer): optionally MoviePlayer__MarkPlaying first (+0x68), keep `arg2` at
  * +0x5C, open `name` on the stream object at +0x60 (its +0x044, 100); 1 when
  * that fails. Otherwise become the active movie, reset the state words, keep
- * `arg3`/`arg4` at +0x54/+0x58 and register D_8008A944 with the frame
+ * `arg3`/`arg4` at +0x54/+0x58 and register gMovieFrameRect with the frame
  * rectangle (+0x20) through DrawSystem +0x078. 0. */
 typedef struct StreamMethods457C0 {
     /* +0x000 */ u8 pad0[0x44];
@@ -1608,21 +1634,21 @@ typedef struct DrawSys457C0 {
     /* +0x000 */ DrawSysMethods457C0 *methods;
 } DrawSys457C0;
 
-extern DataSrc33808 *D_8008A940;
-extern s32 D_8008A944;
+extern DataSrc33808 *gActiveMoviePlayer;
+extern s32 gMovieFrameRect;
 extern void *GetDrawSystem(void);
-void func_800458AC();
+void MoviePlayer__MarkPlaying();
 
-s32 func_800457C0(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
+s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
     DrawSys457C0 *ds;
 
-    if (D_8008A940 == NULL) {
+    if (gActiveMoviePlayer == NULL) {
         if (self->unk68 != 0) {
-            func_800458AC(self);
+            MoviePlayer__MarkPlaying(self);
         }
         self->unk5C = arg2;
         if (self->unk60->methods->open(self->unk60, name, 100) == 0) {
-            D_8008A940 = (DataSrc33808 *)self;
+            gActiveMoviePlayer = (DataSrc33808 *)self;
             self->unk40 = 0;
             self->unk3C = 0;
             self->unk4C = 1;
@@ -1631,7 +1657,7 @@ s32 func_800457C0(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
             self->unk54 = arg3;
             self->unk58 = arg4;
             ds = GetDrawSystem();
-            ds->methods->slot78(ds, &D_8008A944, self->rect);
+            ds->methods->slot78(ds, &gMovieFrameRect, self->rect);
             return 0;
         }
         return 1;
@@ -1645,11 +1671,11 @@ typedef struct Obj33808_50 {
     s32 unk50;
 } Obj33808_50;
 
-void func_800458AC(Obj33808_50 *self) {
+void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
     self->unk50 = 1;
 }
-/* D_8006F614 +0x044: when this is the object in D_8008A940, reset its
- * state words, hand the object at +0x60 func_8004593C (and self) through
+/* D_8006F614 +0x044: when this is the object in gActiveMoviePlayer, reset its
+ * state words, hand the object at +0x60 MoviePlayer__MarkStopped (and self) through
  * that object's +0x07C, clear +0x64, and call its +0x058. */
 typedef struct Methods458B8 {
     /* +0x000 */ u8 pad0[0x48];
@@ -1678,11 +1704,11 @@ typedef struct Obj458B8 {
     /* +0x064 */ s32 unk64;
 } Obj458B8;
 
-extern DataSrc33808 *D_8008A940;
-void func_8004593C();
+extern DataSrc33808 *gActiveMoviePlayer;
+void MoviePlayer__MarkStopped();
 
-void func_800458B8(Obj458B8 *self) {
-    Obj458B8 *cur = (Obj458B8 *)D_8008A940;
+void MoviePlayer__Stop(Obj458B8 *self) {
+    Obj458B8 *cur = (Obj458B8 *)gActiveMoviePlayer;
 
     if (cur == self) {
         cur->unk40 = 0;
@@ -1690,15 +1716,15 @@ void func_800458B8(Obj458B8 *self) {
         cur->unk4C = 1;
         cur->unk48 = 0;
         cur->unk44 = 0;
-        cur->unk60->methods->slot7C(cur->unk60, func_8004593C, cur);
+        cur->unk60->methods->slot7C(cur->unk60, MoviePlayer__MarkStopped, cur);
         cur->unk64 = 0;
         cur->unk60->methods->slot58(cur->unk60);
     }
 }
-void func_8004593C(Obj33808_50 *self) {
+void MoviePlayer__MarkStopped(Obj33808_50 *self) {
     self->unk50 = -1;
 }
-/* D_8006F614 +0x048: when this is the object in D_8008A940 -- with the
+/* D_8006F614 +0x048: when this is the object in gActiveMoviePlayer -- with the
  * stream running (+0x50), call the stream object's +0x050 (1, +0x5C); if
  * +0x50 then went negative, count down the loops left at +0x58 and at the
  * last one (or with none) call the stream's +0x064; clear +0x50, set +0x64,
@@ -1730,8 +1756,8 @@ typedef struct Obj45948 {
     /* +0x064 */ s32 unk64;
 } Obj45948;
 
-s32 func_80045948(Obj45948 *self) {
-    Obj45948 *cur = (Obj45948 *)D_8008A940;
+s32 MoviePlayer__Advance(Obj45948 *self) {
+    Obj45948 *cur = (Obj45948 *)gActiveMoviePlayer;
 
     if (cur == self) {
         if (cur->unk50 == 0) {
@@ -1754,11 +1780,11 @@ s32 func_80045948(Obj45948 *self) {
 out:
     ;
 }
-/* D_8006F614 +0x04C: when this is the object in D_8008A940, set +0x48,
+/* D_8006F614 +0x04C: when this is the object in gActiveMoviePlayer, set +0x48,
  * clear +0x54, call the +0x60 object's +0x048, set +0x44, and the first
  * time (+0x64 clear) clear that object's +0x07C callback and set +0x64. */
-void func_80045A38(Obj458B8 *self) {
-    Obj458B8 *cur = (Obj458B8 *)D_8008A940;
+void MoviePlayer__Abort(Obj458B8 *self) {
+    Obj458B8 *cur = (Obj458B8 *)gActiveMoviePlayer;
 
     if (cur == self) {
         cur->unk48 = 1;
@@ -1772,9 +1798,9 @@ void func_80045A38(Obj458B8 *self) {
         }
     }
 }
-void func_80045AC8(void) {
+void MoviePlayer__NoOpSlot50(void) {
 }
-void func_80045AD0(void) {
+void MoviePlayer__NoOpSlot54(void) {
 }
 /* D_8006F614 +0x058: unless the stream has ended (+0x48), pull the next
  * frame from the object at +0x60 (its +0x06C); 1 when there is none. With
@@ -1807,7 +1833,7 @@ typedef struct Obj45AD8 {
 /* LIBPRESS.H */
 extern int DecDCTvlc(u32 *bs, u32 *buf);
 
-s32 func_80045AD8(Obj45AD8 *self) {
+s32 MoviePlayer__PullFrame(Obj45AD8 *self) {
     u32 *data;
     s32 size;
     s32 r;
@@ -1829,7 +1855,7 @@ s32 func_80045AD8(Obj45AD8 *self) {
     }
     return 1;
 }
-void func_80045BC0(void) {
+void MoviePlayer__NoOpFreeBuffer(void) {
 }
 /* D_8006F614 +0x060: upload the decoded strip at +0x1C into the rectangle
  * at +0x2C (DrawSystem +0x058), step the rectangle right by its width, and
@@ -1872,7 +1898,7 @@ typedef struct Obj45BC8 {
 extern int DrawSync(int mode);
 extern void DecDCTout(u32 *buf, int size);
 
-void func_80045BC8(Obj45BC8 *self) {
+void MoviePlayer__DrawStrip(Obj45BC8 *self) {
     DrawSys45BC8 *ds = (DrawSys45BC8 *)GetDrawSystem();
 
     ds->methods->loadImage(ds, &self->rect, self->strip);
@@ -1891,10 +1917,10 @@ void func_80045BC8(Obj45BC8 *self) {
         }
     }
 }
-/* D_8006F614 +0x064: while +0x54 is set, count calls in D_8008A948 and
+/* D_8006F614 +0x064: while +0x54 is set, count calls in gMoviePollCounter and
  * once the count before the increment passes 100, resets it to 1 and calls
  * slot +0x044; returns 0. Otherwise
- * clears D_8008A940 and returns 1. */
+ * clears gActiveMoviePlayer and returns 1. */
 typedef struct Methods45C94 {
     /* +0x000 */ u8 pad0[0x44];
     /* +0x044 */ void (*slot44)();
@@ -1906,21 +1932,21 @@ typedef struct Obj45C94 {
     /* +0x054 */ s32 unk54;
 } Obj45C94;
 
-extern s32 D_8008A948;
-extern DataSrc33808 *D_8008A940;
+extern s32 gMoviePollCounter;
+extern DataSrc33808 *gActiveMoviePlayer;
 
-s32 func_80045C94(Obj45C94 *self) {
+s32 MoviePlayer__PollActive(Obj45C94 *self) {
     if (self->unk54 != 0) {
-        if (D_8008A948++ > 100) {
-            D_8008A948 = 1;
+        if (gMoviePollCounter++ > 100) {
+            gMoviePollCounter = 1;
             self->methods->slot44(self);
         }
         return 0;
     }
-    D_8008A940 = NULL;
+    gActiveMoviePlayer = NULL;
     return 1;
 }
-/* D_8006F614 +0x068: when this is the object in D_8008A940 -- with a
+/* D_8006F614 +0x068: when this is the object in gActiveMoviePlayer -- with a
  * finished frame pending (+0x44) run its own +0x064 and return that;
  * otherwise, when a frame is going (+0x40), wait for its last strip (+0x4C),
  * clear the flag, DrawSync when +0x34 is under 0x80, and feed the next
@@ -1951,15 +1977,15 @@ typedef struct Obj45CFC {
 /* LIBPRESS.H */
 extern void DecDCTin(u32 *buf, int mode);
 
-void func_80045E18(Obj45CFC *self);  /* defined below (ROM order) */
+void MoviePlayer__WaitFrameReady(Obj45CFC *self);  /* defined below (ROM order) */
 
-s32 func_80045CFC(Obj45CFC *self) {
-    Obj45CFC *cur = (Obj45CFC *)D_8008A940;
+s32 MoviePlayer__DecodeFrame(Obj45CFC *self) {
+    Obj45CFC *cur = (Obj45CFC *)gActiveMoviePlayer;
 
     if (cur == self) {
         if (cur->unk44 == 0) {
             if (cur->unk40 != 0) {
-                func_80045E18(cur);
+                MoviePlayer__WaitFrameReady(cur);
                 cur->unk4C = 0;
                 if (cur->unk34 < 0x80) {
                     DrawSync(0);
@@ -1973,17 +1999,17 @@ s32 func_80045CFC(Obj45CFC *self) {
         return cur->methods->slot64(cur);
     }
 }
-extern DataSrc33808 *D_8008A940;
+extern DataSrc33808 *gActiveMoviePlayer;
 
-/* Slot +0x060 of the object in D_8008A940, when there is one. */
-void func_80045DE0(void) {
-    if (D_8008A940 != NULL) {
-        ((void (*)())D_8008A940->methods->slot60)(D_8008A940);
+/* Slot +0x060 of the object in gActiveMoviePlayer, when there is one. */
+void OnMdecFrameReady(void) {
+    if (gActiveMoviePlayer != NULL) {
+        ((void (*)())gActiveMoviePlayer->methods->slot60)(gActiveMoviePlayer);
     }
 }
-/* Hang until +0x4C is nonzero (it is read once). func_80045CFC's only call
- * passes its D_8008A940 object, so the parameter is that Obj45CFC view. */
-void func_80045E18(Obj45CFC *self) {
+/* Hang until +0x4C is nonzero (it is read once). MoviePlayer__DecodeFrame's only call
+ * passes its gActiveMoviePlayer object, so the parameter is that Obj45CFC view. */
+void MoviePlayer__WaitFrameReady(Obj45CFC *self) {
     while (self->unk4C == 0) {
     }
 }
@@ -1993,11 +2019,11 @@ typedef struct Obj6F614 {
     s32 unk68;
 } Obj6F614;
 
-void func_80045E3C(Obj6F614 *self, s32 value) {
+void MoviePlayer__SetResult(Obj6F614 *self, s32 value) {
     self->unk68 = value;
 }
 extern s32 D_8006F614[];
 
-void *func_80045E44(void) {
+void *GetMoviePlayerMethods(void) {
     return D_8006F614;
 }

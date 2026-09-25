@@ -1,0 +1,62 @@
+# BgLayer__SetColor -- MATCHED (10/10 words)
+
+> Renamed from `func_8004464C` on 2026-09-25 (tools/rename.py). Address 0x8004464c.
+
+Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
+Byte-exact on the SECOND build (first-build miss described below); whole-image SHA1 green (`./build-and-verify.sh`:
+`OK: build matches retail SLPS_015.56`), funcdiff 10/10 words, no out-of-range
+drift. Fresh ground (carved revision 18, no prior report).
+
+## What it does
+
+`if (enable) self->unk54 = *src;` with a 3 x s8 struct. All three `lb` issue before any `sb`, and the three loads need v0/v1/a0, which is why self is moved to a3 in the branch delay slot. FIRST build used three explicit s8 field copies: `lbu`/nop/`sb` interleaved, 3 words LONGER (13 vs 10); the whole-struct assignment matched on the second build.
+
+Table slot (`tools/classtable.py`): D_8006F2C4 +0x0B8 (a Class6B5CC subclass, not a data source).
+
+## Source
+
+The unit-local view `DataSrc33808` (a Class6D430 subclass built with the unified
+`CLASS6D430_SLOTS`/`CLASS6D430_FIELDS` macros, plus `slot7C`/`slot80`, and own
+fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
+Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
+
+```c
+/* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
+ * three-byte vector to +0x54. */
+typedef struct Vec3S8 {
+    s8 x;
+    s8 y;
+    s8 z;
+} Vec3S8;
+
+typedef struct Obj6F2C4 {
+    CLASS6B5CC_FIELDS(Class6B5CCMethods);
+    /* +0x044 */ u8 pad44[0x10];
+    /* +0x054 */ Vec3S8 unk54;
+} Obj6F2C4;
+
+void BgLayer__SetColor(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
+    if (enable) {
+        self->unk54 = *src;
+    }
+}
+```
+
+## Notes
+
+- No shared header was edited. `Class6D430.h`, `Class6B5CC.h`, `BasicClass.h` are
+  included; prototypes for other units' functions (GetActiveDataSourceMethods,
+  ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
+- Types of arguments and returns are readings of the registers used, not proven.
+
+### Proposed learning
+
+A 3-byte copy whose three `lb` all issue before the three `sb` (and which
+evicts a0 to make room) is a whole-struct assignment of a `{ s8 x, y, z; }`
+struct; three field-by-field copies compile to `lbu`/nop/`sb` triples, three
+words longer. Extends the "four lw then four sw" struct-copy idiom to byte
+structs, where the signed load is the tell.
+
+## Naming
+
+- **BgLayer__SetColor**, tier B. Slot +0x0B8: conditionally copies a 3-byte vector into the GsBG's colour field.

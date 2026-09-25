@@ -459,7 +459,7 @@ typedef struct BE54LoadReq {
     u8 pad4[0xC];
 } BE54LoadReq;
 
-extern LinkResource *func_80043840(BE54LoadReq *req);
+extern LinkResource *New_LinkResource(BE54LoadReq *req);
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
 void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
@@ -495,7 +495,7 @@ void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
     }
     info2 = hdr->field10;
     req.field0 = (s32)info2 + info2->unk4 + info2->unk8;
-    target->unk2C = func_80043840(&req);
+    target->unk2C = New_LinkResource(&req);
     outBuf.found = 0;
 
     i = 0;
