@@ -117,7 +117,7 @@ typedef struct SpriteView_322b4 {
 } SpriteView_322b4;
 struct SpriteMethods_322b4 {
     u8 pad00[0x40];
-    void (*reset)(SpriteView_322b4 *self, u8 cell);            /* +0x040 = func_80041BAC (D_8006EC74) */
+    void (*reset)(SpriteView_322b4 *self, u8 cell);            /* +0x040 = D8006EC74__Reset (D_8006EC74) */
     u8 pad44[0xBC - 0x44];
     void (*slotBC)(SpriteView_322b4 *self, Pair_322b4 *src);   /* +0x0BC = func_80041E2C */
     u8 padC0[0xC4 - 0xC0];
@@ -197,7 +197,7 @@ void D8006EC74__D8006EC74(SpriteView_322b4 *self, void *texture, u8 cell) {
     self->methods->reset(self, cell);
 }
 /* D_8006EC74 slot +0x040 (reset): re-select the cell through slot +0x0C4. */
-void func_80041BAC(SpriteView_322b4 *self, u8 cell) {
+void D8006EC74__Reset(SpriteView_322b4 *self, u8 cell) {
     self->methods->setCell(self, cell);
 }
 /* D_8006EC74 slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */

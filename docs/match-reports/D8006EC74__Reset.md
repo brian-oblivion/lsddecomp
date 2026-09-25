@@ -1,4 +1,6 @@
-# func_80041BAC -- MATCHED (12/12 words), round 82
+# D8006EC74__Reset -- MATCHED (12/12 words), round 82
+
+> Renamed from `func_80041BAC` on 2026-09-25 (tools/rename.py). Address 0x80041bac.
 
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b
 
 ```c
 /* D_8006EC74 slot +0x040 (reset): re-select the cell through slot +0x0C4. */
-void func_80041BAC(SpriteView_322b4 *self, u8 cell) {
+void D8006EC74__Reset(SpriteView_322b4 *self, u8 cell) {
     self->methods->setCell(self, cell);
 }
 ```
