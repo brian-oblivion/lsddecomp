@@ -22,7 +22,7 @@ typedef struct D_80081940Obj D_80081940Obj;
 typedef struct D_80081940Methods {
     CLASS6D430_SLOTS(D_80081940Obj, (D_80081940Obj *self));
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ void *slot80;
+    /* +0x080 */ void (*slot80)(void);
     /* +0x084 */ void (*releaseAlloc)(D_80081940Obj *self);  /* func_80048C98 */
 } D_80081940Methods;
 
@@ -80,7 +80,24 @@ void func_80048960(D_80081940Obj *self) {
     self->methods->releaseAlloc(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800489B4);
+/* slot +0x064 of D_80081940 (setFlag) */
+void func_800489B4(D_80081940Obj *self) {
+    if (self->unk2A == 9) {
+        if (self->flags & 0x80) {
+            self->unk2A = 0;
+            self->unk2C = 1;
+            if (self->unk38 != 0) {
+                self->methods->slot80();
+            }
+        }
+    } else if (self->unk2A == 10) {
+        if (self->flags & 0x80) {
+            self->unk2E = 1;
+            self->unk2A = 0;
+        }
+    }
+    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+}
 /* slot +0x074 of D_80081940 (cancelRequests) */
 void func_80048A68(D_80081940Obj *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
