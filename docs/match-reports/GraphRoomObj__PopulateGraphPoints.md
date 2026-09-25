@@ -204,3 +204,7 @@ the day ring backwards computing each `{x, y}` point and dispatching it to
 the matching `points[i]`'s `setPosition` slot -- the function that
 actually lays the graph's dots out on screen, matching the class's own
 identity evidence.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

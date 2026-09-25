@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "BasicClass.h"
+#include "TaskCore.h"
 
 /*
  * The class whose method table is D_800866E8 (80 slots, resolved with
@@ -1247,7 +1248,7 @@ struct Class86B60 {
      * zeroes it instead. No setter in this unit. */
     s32 unk3C;
     u8 pad040[0x048 - 0x040];
-    /* Set up by the base ctor chain (Get_vtable_TaskCore()->slot08 below), read
+    /* Set up by the base ctor chain (Get_vtable_TaskCore()->ctor), read
      * (never written) by Class86B60__Class86B60 right after. Same offset/shape as
      * `StreamTaskObj::unk48` in include/code_2c054.h (also a base-ctor-
      * chain output), but kept as its own local type since nothing ties
@@ -1373,60 +1374,10 @@ struct DreamSysView_3bb8c_c {
     DreamSysViewMethods_3bb8c_c *methods;   /* +0x000 */
 };
 
-/*
- * Class86B60__Class86B60's own local view of `Get_vtable_TaskCore`'s return type -- ALSO
- * independently declared, with a DIFFERENT 4-argument signature, as
- * `TaskCoreMethods` in include/code_2c054.h (`slot08`, confirmed 3-argument-
- * plus-self there from StreamTaskObj__StreamTaskObj's own byte-exact call). Same real
- * global (`gTaskCoreMethods`) two units deep, two independent arities recorded
- * from two real call sites -- the identical situation already documented
- * for GetClass6B5CCMethods above and for Class86AA0__Class86AA0's report. Kept local
- * rather than including code_2c054.h, since this unit does not otherwise
- * need that header and each translation unit gets its own extern
- * prototype for a symbol in this project.
- */
-typedef struct BaseTaskCtorTable_3bb8c_c BaseTaskCtorTable_3bb8c_c;
-struct BaseTaskCtorTable_3bb8c_c {
-    u8 pad000[0x008];
-    /* Class86B60__Class86B60's own unconditional first statement:
-     * Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0). */
-    void (*slot08)(void *self, void *arg1, void *arg2, s32 arg3); /* +0x008 */
-    /* +0x00C, Class86B60__Dtor's own unconditional last call, `self` only.
-     * Same offset AND arity as `TaskCoreMethods::slot0C` in
-     * include/code_2c054.h (also derived from `gTaskCoreMethods`, the same real
-     * global this getter returns) -- independent confirmation, not a
-     * coincidence: this is the shared base class's destructor forward,
-     * called after `self`'s own two owned sub-objects (`unkA8`/`unkAC`)
-     * are released. */
-    void (*slot0C)(void *self);
-    u8 pad010[0x038 - 0x010];
-    /* +0x038, Class86B60__ForwardIfTagB's own unconditional first call, forwarding
-     * all three of its own parameters verbatim. */
-    void (*slot38)(void *self, void *arg1, s32 arg2);
-    u8 pad03C[0x060 - 0x03C];
-    /* +0x060, Class86B60__SetState's own first call, `(self, arg1)` where arg1 is
-     * that function's own forwarded 2nd parameter. */
-    void (*slot60)(void *self, s32 arg1);
-    u8 pad064[0x090 - 0x064];
-    /* +0x090, Class86B60__Tick's own first, unconditional call, `self` only. */
-    void (*slot90)(void *self);
-    /* +0x094, Class86B60__RefreshViewValue's own first, unconditional call, `self`
-     * only. Distinct from `Class86B60Methods::slot94` (see
-     * Class86B60__Tick's report) -- same offset number, unrelated table. */
-    void (*slot94)(void *self);
-    u8 pad098[0x0DC - 0x098];
-    /* +0x0DC, Class86B60__DestroyNameField's own last call, `self` only, right after
-     * releasing `Class86B60::unkB0`. */
-    void (*slotDC)(void *self);
-    /* +0x0E0, Class86B60__ForwardToNameField's own first call: `(self, arg1)`, arg1 its
-     * own forwarded 2nd parameter. */
-    void (*slotE0)(void *self, s32 arg1);
-    /* +0x0E4, Class86B60__TickNameFieldCursor's own first, unconditional call: `(self,
-     * arg1)`, arg1 its own forwarded 2nd parameter (opaque here). */
-    void (*slotE4)(void *self, void *arg1);
-};
-
-extern BaseTaskCtorTable_3bb8c_c *Get_vtable_TaskCore(void);
+/* Class86B60's parent is TaskCore (include/TaskCore.h, track 4 round 84):
+ * its methods reach the base implementations through Get_vtable_TaskCore()
+ * and upcast `self`. The local view that stood here
+ * (BaseTaskCtorTable_3bb8c_c) is gone. */
 
 /* Address-of only in this unit (Class86B60__Class86B60 passes &D_80086D44 both as
  * the base ctor's arg1 and, again, as slotD8's own arg1). Placeholder s32
@@ -1562,7 +1513,7 @@ typedef struct Result678_3bb8c_c {
 typedef struct GenericCtorTable_3bb8c_d GenericCtorTable_3bb8c_d;
 struct GenericCtorTable_3bb8c_d {
     u8 pad000[0x008];
-    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, New_TaskObjF's own call; IS TaskObjF__TaskObjF -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention (BaseTaskCtorTable_3bb8c_c/Get_vtable_TaskCore) since nothing here type-checks the two against each other */
+    void (*ctor)(void *self, void *arg1, void *arg2); /* +0x008, New_TaskObjF's own call; IS TaskObjF__TaskObjF -- see that function's own, more precise (s32, s32) local declaration in class_3bb8c_d.c, kept separate per the project's independent-arities convention since nothing here type-checks the two against each other */
     u8 pad00C[0x040 - 0x00C];
     /* +0x040, TaskObjF__TaskObjF's own last call, forwarding its own 3rd
      * parameter verbatim; class_3bb8c_e's independent view (round 14,

@@ -45,3 +45,7 @@ state-7 transition, gated by `unkD4` -- the same `unkB4->methods->slot4C`
 call `StreamTaskObj__func_8003BC14`'s `case 8` makes under the inverse
 condition. Neither `unkD4`'s nor "state 7"'s game meaning is confirmed, so
 left `Class__func_xxxxx`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+StreamTaskObj now expands TASKCORE_SLOTS (include/TaskCore.h, round 84): its `slot60` call is `setState`. Byte-identical.

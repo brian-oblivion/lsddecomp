@@ -28,7 +28,7 @@ void StreamTaskObj__func_8003BB5C(StreamTaskObj *self, s32 a1, s32 a2) {
 ## Evidence
 
 - `Get_vtable_TaskCore()->slot5C`: `TaskCoreMethods` slot `+0x05C`, occupied by
-  `Obj86B60__OnTag5Notify` (a different unit, not touched here). Takes `(self, a1,
+  `TaskCore__Update` (a different unit, not touched here). Takes `(self, a1,
   a2)` matching this function's own two forwarded parameters; result
   discarded, typed `void`.
 - `self->unkA4`: established this round (`StreamTaskObj__func_8003BAB4`'s report). Here it
@@ -57,3 +57,7 @@ slot `+0x05C`; three sequential early-return guards around a cached status
 field (`unkA4`) and a completion flag (`unkD8`). Mechanics are fully
 described in the report above; nothing pins down what the guarded operation
 actually represents in the game, so left `Class__func_xxxxx`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

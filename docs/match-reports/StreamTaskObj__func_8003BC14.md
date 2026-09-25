@@ -37,7 +37,7 @@ void StreamTaskObj__func_8003BC14(StreamTaskObj *self, s32 a1) {
 ## Evidence
 
 - `Get_vtable_TaskCore()->slot60(self, a1)`: new `TaskCoreMethods` slot `+0x060`.
-  `classtable.py gTaskCoreMethods` confirms it's occupied (`Obj86B60__SetState`, a
+  `classtable.py gTaskCoreMethods` confirms it's occupied (`TaskCore__SetState`, a
   different unit) — result discarded, typed `void`.
 - `self->methods->slot94(self)`: new `StreamTaskObjMethods` slot `+0x094`.
   `classtable.py gStreamTaskObjMethods` shows it occupied by **this unit's own,
@@ -75,3 +75,7 @@ themselves mean in the game (no caller was found), so a name like
 `SetState` would assert more than the body supports -- kept
 `Class__func_xxxxx` per round 72's tier-B ceiling for unconfirmed data
 meaning.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

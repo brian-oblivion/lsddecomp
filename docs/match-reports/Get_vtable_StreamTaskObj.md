@@ -49,7 +49,7 @@ this unit's queue) and `extern StreamTaskObjMethods gStreamTaskObjMethods;`.
 
 `gStreamTaskObjMethods` sits right next to a second class's table, `gTaskCoreMethods`
 (`Class6D3C8.h`'s `LoaderTaskMethods`, established from a completely
-different allocator/unit, `New_TaskCoreObj`). `StreamTaskObj`'s own slots
+different allocator/unit, `New_TaskCore`). `StreamTaskObj`'s own slots
 `+0x00C`/`+0x080`/`+0x084` (`StreamTaskObj__Destroy`/`StreamTaskObj__func_8003BD74`/`StreamTaskObj__func_8003BDAC`)
 forward straight through to `gTaskCoreMethods`'s implementations of the *same*
 offsets, passing `self` on unchanged -- a delegation pattern between two

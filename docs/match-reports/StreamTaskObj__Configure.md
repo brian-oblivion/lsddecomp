@@ -57,7 +57,7 @@ the following `jal`'s delay slot on its own, no manual reshaping needed.
 Named `StreamTaskObj::unkB8`/`unkBC`/`unkC0` in `include/code_2c054.h`, and
 `TaskCoreMethods::slot44` (`s32 (*)(StreamTaskObj *self, s32 a1, s32 a2)` --
 see the note below on why this unit's local typing differs from
-`Class6D3C8.h`'s for the FUNCTION `TaskCoreObj__func_8003C1DC` that occupies this same
+`Class6D3C8.h`'s for the FUNCTION `TaskCore__Init` that occupies this same
 `gTaskCoreMethods` slot, as opposed to this function's OWN slot `+0x044` of
 `gStreamTaskObjMethods`, which is void and confirmed by the cross-check above).
 
@@ -67,7 +67,7 @@ see the note below on why this unit's local typing differs from
 signature across TWO DIFFERENT tables**, even when one calls straight into
 the other at the identical offset: `gStreamTaskObjMethods::slot44` (this function,
 void, 5 args including a stack-spilled 5th) forwards to `gTaskCoreMethods::slot44`
-(`TaskCoreObj__func_8003C1DC`, this unit's own local typing says it returns `s32`, only 3
+(`TaskCore__Init`, this unit's own local typing says it returns `s32`, only 3
 args) -- the offset coincidence is a delegation convenience, not evidence of
 identical calling convention. Cross-checking an unfamiliar function's
 signature against an already-established header (here, `Class6D3C8.h`) before
@@ -86,3 +86,7 @@ slot -- the mechanics (store configuration words, then delegate) are clear,
 but the game meaning of the second argument varies by caller (a filename in
 one call, a plain derived count in another), so no more specific verb is
 supported yet.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). This function occupies +0x044 with five parameters where TASKCORE_SLOTS (IntermediateBase) types the slot init(args, mode): a contradiction left for StreamTaskObj's own job.

@@ -18,7 +18,7 @@ for header values 1/2/5 respectively; any other value is a no-op.
 `gClass86B60Methods`'s own `+0x038` is this same function (verbatim inherit, no
 override) -- confirmed with `tools/classtable.py gClass86B60Methods`, which is also
 how `slot54`/`slot58`/`slot5C`'s occupants (`IntermediateBase__OnTag1Notify`,
-`Obj86B60__OnTag2Notify`, `Obj86B60__OnTag5Notify`) were identified.
+`TaskCore__OnPadEvent`, `TaskCore__Update`) were identified.
 
 ## The C
 
@@ -46,12 +46,12 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
   Only the one field each touches is modelled.
 - `Obj86B60Methods`: added `slot10` (BasicClass addChild, inherited,
   `IntermediateBase__Init`), `slot40` (`IntermediateBase__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
-  (`IntermediateBase__Deinit`, `IntermediateBase__Init`), `slot4C` (external `TaskCoreObj__func_8003C238`,
+  (`IntermediateBase__Deinit`, `IntermediateBase__Init`), `slot4C` (external `TaskCore__OnInit`,
   `IntermediateBase__Init`), `slot54` (`IntermediateBase__OnTag1Notify`), `slot58` (external
-  `Obj86B60__OnTag2Notify`, STALL in unit `code_2cc8c` -- its own report confirms
+  `TaskCore__OnPadEvent`, STALL in unit `code_2cc8c` -- its own report confirms
   signature `(Obj86B60 *, s32 a1, s32 a2)`; this call site's `a1` is
   genuinely `EventArg *`, an independent local view of the same shared
-  slot, not a conflict), `slot5C` (`Obj86B60__OnTag5Notify`, already matched
+  slot, not a conflict), `slot5C` (`TaskCore__Update`, already matched
   elsewhere in this unit with `a1` typed `s32` -- same slot, same "each
   call site keeps its own local view" convention).
 - `BasicClassMethodsCC8C`: added `slot38` (`BasicClass__OnNotify`).

@@ -29,7 +29,7 @@ void StreamTaskObj__StreamTaskObj(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, S
 ## New structure discovered
 
 - `Get_vtable_TaskCore()->slot08(...)`: new `TaskCoreMethods` slot `+0x008`.
-  `classtable.py gTaskCoreMethods` shows it occupied by `TaskCoreObj__TaskCoreObj` — **this
+  `classtable.py gTaskCoreMethods` shows it occupied by `TaskCore__TaskCore` — **this
   unit's own next queued function**, confirming the 4-argument
   `(self, a1, a2, a3)` signature ahead of writing that function.
 - `self->methods->slot40(self)`: new `StreamTaskObjMethods` slot `+0x040`,
@@ -79,7 +79,7 @@ and read again at the very end after two more calls
 (`GetDefaultStreamTaskInitData`/`New_MoviePlayer`) for `self->methods->slot40(self)`, but that
 final read is a **plain, single, natural field dereference** with no earlier
 same-expression read to conflict with — nothing needed caching because
-nothing was read twice. The lever from `TaskCoreObj__func_8003C3D0`/`TaskCoreObj__Reset` is
+nothing was read twice. The lever from `TaskCore__OnDeinit`/`TaskCore__Reset` is
 specifically about *reusing an already-loaded value* across a call; here the
 value is simply read once, fresh, at its point of use, which needs no local.
 The residue this function actually had was the sibling lesson from the same
@@ -104,3 +104,7 @@ all sources before storing any of them.
 own ctor slot `+0x008` (`classtable.py`), matching the established
 `Class__Class` constructor convention already used elsewhere in this
 codebase (`IntermediateBase__IntermediateBase`, `Class866E8__Class866E8`).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

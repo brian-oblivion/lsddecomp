@@ -77,7 +77,7 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
         streamName = GetIntroStreamName(&typeCode);
         typeLookup = GetStreamGroupForType(typeCode);
         task->methods->configure(task, self->unk1C, streamName, typeLookup, 1);
-        task->methods->start(task);
+        task->methods->release(task);
         Class6D3C8__StartLoaderTask(self, sLogoPathOsd);
     }
 }
@@ -87,13 +87,16 @@ void Class6D3C8__LoadIntroLogoSequence(Class6D3C8 *self) {
  * (self), then sets its remaining parameters (path, self->unk1C) and
  * starts it. */
 void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
-    LoaderTask *task = New_TaskCoreObj(0, 0, 0);
+    TaskCore *task = New_TaskCore(0, 0, 0);
 
-    task->methods->slot98(task, Class6D3C8__LoaderTaskDoneCallback, self);
-    task->methods->slot6C(task, 0);
-    task->methods->slotD4(task, path, 0);
-    task->methods->slot44(task, self->unk1C, 0);
-    task->methods->start(task);
+    /* setCallback's occupant stores a void (*)(void *ctx); this callback
+     * takes nothing and returns func_8004A070's value, which
+     * TaskCore__RefreshViewValue ignores. */
+    task->methods->setCallback(task, (void (*)(void *))Class6D3C8__LoaderTaskDoneCallback, self);
+    task->methods->setFrameBound(task, 0);
+    task->methods->setSubHandle(task, path, 0);
+    task->methods->init(task, (IntermediateBaseInitArgs *)self->unk1C, 0);
+    task->methods->release(task);
 }
 
 extern s32 func_8004A070(s32 a0);
@@ -118,7 +121,7 @@ void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
         derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);
         task->methods->configure(task, self->unk1C, derivedValue, typeLookup, 1);
-        task->methods->start(task);
+        task->methods->release(task);
     }
 }
 
@@ -192,7 +195,7 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self) {
         task->methods->slot6C(task, buf.count / 15);
         task->methods->slot12C(task, 0);
         task->methods->configure(task, self->unk1C, extra, -1, 1);
-        task->methods->start(task);
+        task->methods->release(task);
     }
 }
 
@@ -266,7 +269,7 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
     } chanBuf;
     s32 groupId;
     s32 lookup;
-    LoaderTask *task;
+    TaskCore *task;
 
     cc = self->dreamSys->vt->GetCinematic(self->dreamSys);
     groupId = ResolveCinematicChannel(&chanBuf.chan, (u16) cc.bank | ((u32) (u16) cc.entry << 16));
@@ -279,14 +282,14 @@ void Class6D3C8__StartCinematicStream(Class6D3C8 *self) {
             streamTask->methods->slot12C(streamTask, 0);
             lookup = GetStreamGroupForType(chanBuf.chan);
             streamTask->methods->configure(streamTask, self->unk1C, groupId, lookup, 1);
-            streamTask->methods->start(streamTask);
+            streamTask->methods->release(streamTask);
         }
     } else {
-        task = New_TaskCoreObj(0, 0, 0);
-        task->methods->slot6C(task, 10);
-        task->methods->slotD4(task, groupId, 0);
-        task->methods->slot44(task, self->unk1C, 0);
-        task->methods->start(task);
+        task = New_TaskCore(0, 0, 0);
+        task->methods->setFrameBound(task, 10);
+        task->methods->setSubHandle(task, groupId, 0);
+        task->methods->init(task, (IntermediateBaseInitArgs *)self->unk1C, 0);
+        task->methods->release(task);
     }
 }
 
@@ -309,6 +312,6 @@ void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
         outerValue = GetStreamChannelInit(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);
         task->methods->configure(task, self->unk1C, outerValue, typeLookup, 1);
-        task->methods->start(task);
+        task->methods->release(task);
     }
 }

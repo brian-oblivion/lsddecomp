@@ -51,3 +51,7 @@ the identical offset in `include/code_8220.h`). Named for the whole visible
 effect (clear the object's own cached pointers, then remove every child)
 rather than asserting it is specifically a "finalize" override, since its
 own occupant slot on `Obj86B60Methods` is not otherwise identified.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+NOT TaskCore's: it occupies +0x018 (removeAllChildren) of D_8006E8E4 (Unk18Obj) and of gClass869D8Methods, and never of gTaskCoreMethods, and its three fields are Unk18Obj's child caches (unkC/unk10/unk30, set by Unk18Obj__AddChild). `self` is now `Unk18Obj *` (the Obj86B60 view is gone); byte-identical. The name is left for Unk18Obj's own track-4 job.

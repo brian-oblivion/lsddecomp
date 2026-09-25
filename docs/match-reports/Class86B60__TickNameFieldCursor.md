@@ -294,3 +294,7 @@ project-wide from a runner worktree.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004DCD0` -> `Class86B60__TickNameFieldCursor`. **Tier B**: Guarded by `self->unk3C`, cycles a 3-byte colour-like buffer through a rolling index (`D_8008AA28`, 0-2) and a counter (`D_8008AA2C`, wraps at 0x101), then forwards the buffer to `self->nameField`'s `slotB8`. Read as a counter-driven colour/blink update on the name field's cursor; the exact visual effect is not established.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

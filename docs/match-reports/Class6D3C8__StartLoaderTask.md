@@ -7,7 +7,7 @@
 ## What it does
 
 Registers a "loader" task for a named resource: allocates a `LoaderTask`
-(`New_TaskCoreObj`, a `New_X`-shaped allocator in uncarved `code_2c054`, 0xA4
+(`New_TaskCore`, a `New_X`-shaped allocator in uncarved `code_2c054`, 0xA4
 bytes), gives it a completion callback (`Class6D3C8__LoaderTaskDoneCallback`, already matched in
 this unit) and a context pointer (`self`), then sets its remaining
 parameters (`path`, `self->unk1C`) and starts it. Called twice by
@@ -17,7 +17,7 @@ parameters (`path`, `self->unk1C`) and starts it. Called twice by
 ## Derivation
 
 ```
-jal  New_TaskCoreObj(0, 0, 0)             ; -> s0 = task
+jal  New_TaskCore(0, 0, 0)             ; -> s0 = task
 lui  $a1, %hi(Class6D3C8__LoaderTaskDoneCallback)
 addiu $a1, $a1, %lo(Class6D3C8__LoaderTaskDoneCallback)
 lw   $v0, 0x0($s0)                       ; task->methods
@@ -46,7 +46,7 @@ jalr $v0                                                    ; task->methods->slo
 
 ```c
 void Class6D3C8__StartLoaderTask(Class6D3C8 *self, const char *path) {
-    LoaderTask *task = New_TaskCoreObj(0, 0, 0);
+    LoaderTask *task = New_TaskCore(0, 0, 0);
 
     task->methods->slot98(task, Class6D3C8__LoaderTaskDoneCallback, self);
     task->methods->slot6C(task, 0);
@@ -65,15 +65,15 @@ cast was required.
 ## New struct/header knowledge
 
 `include/Class6D3C8.h`: added `LoaderTaskMethods`/`LoaderTask` (the class
-behind `New_TaskCoreObj`, distinct from `StreamTaskMethods` used by
+behind `New_TaskCore`, distinct from `StreamTaskMethods` used by
 `Class6D3C8__LoadIntroLogoSequence` -- different allocator, different signatures at the same
-slot offsets) and the `New_TaskCoreObj` extern. Forward-declared
+slot offsets) and the `New_TaskCore` extern. Forward-declared
 `Class6D3C8__LoaderTaskDoneCallback` (defined later in this same file/ROM order) so it can be
 passed as `slot98`'s callback argument.
 
 ## Proposed learning
 
-Two different "task" classes in this game (`New_TaskCoreObj`'s and
+Two different "task" classes in this game (`New_TaskCore`'s and
 `New_StreamTaskObj`'s allocators) share several slot offsets (`+0x004`,
 `+0x044`) with *different* signatures -- confirms these are separate
 vtables, not the same class called two ways, and is a reminder not to
@@ -91,7 +91,7 @@ offset against an already-typed sibling class.
 ## Naming
 
 **`Class6D3C8__StartLoaderTask` -- tier A.** Pure leaf helper, mechanics ARE
-the purpose: allocates a `LoaderTask` (`New_TaskCoreObj`), registers a
+the purpose: allocates a `LoaderTask` (`New_TaskCore`), registers a
 completion callback and context (`slot98`, `Class6D3C8__LoaderTaskDoneCallback`,
 `self`), sets its remaining parameters (path, `self->unk1C`) via `slot6C`/
 `slotD4`/`slot44`, and starts it (`start`, this unit's renamed
@@ -99,3 +99,7 @@ completion callback and context (`slot98`, `Class6D3C8__LoaderTaskDoneCallback`,
 `Class6D3C8__LoadIntroLogoSequence` with two different fixed paths, so the
 name is generic to the mechanic (registering and starting a LoaderTask for
 a given resource path) rather than either specific asset.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); Class6D3C8.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.

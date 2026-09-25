@@ -15,7 +15,7 @@
  * children) and `Unk18Obj__Flip` (drains the current OT half via
  * `GsSortClear`+`GsDrawOt` and toggles the double-buffer index for next
  * frame). In short: `Unk18Obj` is the scene's GPU-facing viewport/renderer
- * object -- `Obj86B60::viewport`'s pointee (`code_2cc8c_c.c`) -- and this
+ * object -- IntermediateBase::viewport's pointee (TaskCore's, `code_2c054.c`) -- and this
  * unit is its rendering half. NAMING PARKED: the `Unk18Obj` type name itself,
  * several fields shared with `code_2cc8c_c.c` (unkC/unk10/unk30/unkAC/unkB0),
  * and the OT-internals field cluster (unk3C/unk44/unk48/unk78/unk7C/unk80/

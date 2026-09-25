@@ -67,3 +67,7 @@ tools/funcdiff.py GraphRoomObj__GraphRoomObj   # 44/44
 convention; this IS `GraphRoomObj`'s own vtable slot +0x008
 (`tools/classtable.py gGraphRoomMethods`). Class identity: see
 `src/class_3bb8c_t.c`'s header comment.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

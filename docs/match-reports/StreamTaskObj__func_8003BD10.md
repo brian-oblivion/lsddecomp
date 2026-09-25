@@ -24,7 +24,7 @@ void StreamTaskObj__func_8003BD10(StreamTaskObj *self) {
 
 - `Get_vtable_TaskCore()` returns `&gTaskCoreMethods` (`TaskCoreMethods`, established
   elsewhere in `code_2c054.h`). `tools/classtable.py gTaskCoreMethods` shows slot
-  `+0x078 = Obj86B60__func_8003C858` (a different unit, not touched here — only the
+  `+0x078 = TaskCore__OnPadConfirm` (a different unit, not touched here — only the
   slot's existence and signature matter for this call site).
 - `self->methods` is `StreamTaskObjMethods*` (`gStreamTaskObjMethods`).
   `tools/classtable.py gStreamTaskObjMethods` shows slot `+0x060 = StreamTaskObj__func_8003BC14`, which
@@ -49,5 +49,9 @@ setup.
 slot `+0x078`; up-calls the base slot, then if `unkCC` is set, marks
 `unk38 = 2` and re-enters this class's own state-transition slot with code
 `0x12`. Neither `unk38` nor "state `0x12`" has a confirmed game meaning
-(see `TaskCoreObj__func_8003C1DC`'s report for the same `unk38` field from
+(see `TaskCore__Init`'s report for the same `unk38` field from
 the other side), so left `Class__func_xxxxx`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). StreamTaskObj now expands TASKCORE_FIELDS: +0x038 is `result`.

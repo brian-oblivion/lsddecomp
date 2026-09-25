@@ -142,7 +142,7 @@ void Class86B60__Class86B60(Class86B60 *self, void *dreamSys)
     DreamSysView_3bb8c_c *dream;
     Class86B60Unk48Obj *obj;
 
-    Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0);
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, (TaskCoreTarget *)&D_80086D44, (char *)&D_800114DC, 0);
     self->methods = GetClass86B60Methods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);

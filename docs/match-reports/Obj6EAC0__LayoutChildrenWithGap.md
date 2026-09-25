@@ -39,7 +39,7 @@ genuinely whole-image byte-exact.
 ## Round 19: three levers stacked, in order
 
 1. **Whole-struct assignment for the `a2`-copy buffer** (this round's
-   recurring lever -- see `Class6E99C__PushPosition`/`Obj6EAC0__SetPosition`/`Obj86B60__SetColors`/
+   recurring lever -- see `Class6E99C__PushPosition`/`Obj6EAC0__SetPosition`/`TaskCore__SetColors`/
    `Obj6EAC0__ApplyColor`/`Obj6EAC0__LayoutChildren`): retyped the local `s32 buf[2]` to
    the existing `Pair32E99C` and `a2` to `Pair32E99C *`, replaced
    `buf[0]=a2[0]; buf[1]=a2[1];` with `buf = *a2;`. This alone closed

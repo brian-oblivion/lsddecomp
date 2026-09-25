@@ -31,12 +31,12 @@ void Class86B60__Dtor(Class86B60 *self)
         self->saveCtrl->methods->release(self->saveCtrl);
         self->iconHandle->methods->release(self->iconHandle);
     }
-    Get_vtable_TaskCore()->slot0C(self);
+    Get_vtable_TaskCore()->finalize((TaskCore *)self);
 }
 
 void Class86B60__ForwardIfTagB(Class86B60 *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
 {
-    Get_vtable_TaskCore()->slot38(self, arg1, arg2);
+    Get_vtable_TaskCore()->onNotify((TaskCore *)self, arg1, arg2);
     if ((arg1->methods->header & 0xF) == 0xB) {
         self->methods->slot138(self, arg1, arg2);
     }
@@ -66,7 +66,7 @@ void Class86B60__RegisterHandlers(Class86B60 *self)
 
 void Class86B60__SetState(Class86B60 *self, s32 arg1)
 {
-    Get_vtable_TaskCore()->slot60(self, arg1);
+    Get_vtable_TaskCore()->setState((TaskCore *)self, arg1);
     if (arg1 == 5) {
         self->methods->slot124(self, 0);
     }
@@ -81,7 +81,7 @@ void Class86B60__Tick(Class86B60 *self)
 {
     void (*fn)(Class86B60 *);
 
-    Get_vtable_TaskCore()->slot90(self);
+    Get_vtable_TaskCore()->tick((TaskCore *)self);
     switch (self->state) {
     case 1:
         self->unk38 = 0;
@@ -108,7 +108,7 @@ void Class86B60__RefreshViewValue(Class86B60 *self)
 {
     s32 buf;
 
-    Get_vtable_TaskCore()->slot94(self);
+    Get_vtable_TaskCore()->refreshViewValue((TaskCore *)self);
     buf = self->unk60->unk14;
     self->dreamSysView->methods->slot19C(self->dreamSysView, &buf);
 }
@@ -160,12 +160,12 @@ void Class86B60__CreateNameField(Class86B60 *self, Arg1DB18_3bb8c_d *arg1)
 void Class86B60__DestroyNameField(Class86B60 *self)
 {
     self->nameField->methods->release(self->nameField);
-    Get_vtable_TaskCore()->slotDC(self);
+    Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
 }
 
 void Class86B60__ForwardToNameField(Class86B60 *self, s32 arg1)
 {
-    Get_vtable_TaskCore()->slotE0(self, arg1);
+    Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, (void *)arg1);
     self->nameField->methods->slot4C(self->nameField, arg1, &D_8008A9B4);
 }
 
@@ -191,7 +191,7 @@ void Class86B60__TickNameFieldCursor(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
     u8 *base;
 
     base = (u8 *)&buf;
-    Get_vtable_TaskCore()->slotE4(self, arg1);
+    Get_vtable_TaskCore()->broadcastToSlots((TaskCore *)self, (u8 *)arg1);
     if (self->unk3C != 0) {
         base[0] = 0;
         base[1] = 0;
@@ -219,7 +219,7 @@ void Class86B60__TickNameFieldCursor(Class86B60 *self, Arg1DCD0_3bb8c_d *arg1)
  * 2-argument function -- but THIS call site sets up a 3rd argument
  * (self->unkA4, in $a2) that the other unit's own 2-parameter view never
  * receives. Same independent-arities situation already documented for
- * Get_vtable_TaskCore/BaseTaskCtorTable_3bb8c_c: this unit's own local view
+ * Get_vtable_TaskCore until round 84: this unit's own local view
  * matches what THIS call site needs. */
 extern void CheckObj866E8CountFlag(void *arg0, void *arg1, void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
 

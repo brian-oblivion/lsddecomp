@@ -94,10 +94,10 @@ unchanged.
   functions return to `fresh` (0 -> 62). One report rewritten to cite only its
   remaining `gp_rel` hit. Five substantive reports KEPT — their structural
   analysis is still good — with a banner saying the verdict is stale and the
-  function is assignable: `func_80018464`, `Obj86B60__OnTag2Notify`, `Obj86B60__SetState`,
+  function is assignable: `func_80018464`, `TaskCore__OnPadEvent`, `TaskCore__SetState`,
   `FormatFullWidthNumber`, `Obj865C8__OnTag2Notify`.
 
-  `Obj86B60__SetState` is worth singling out: CLAUDE.md cites it as the case where
+  `TaskCore__SetState` is worth singling out: CLAUDE.md cites it as the case where
   **seven attempts went into the wrong half** of a two-word residue because an
   `addiu $at` sat unexamined at line 66 of its own `.s`. That half is now
   matchable.

@@ -46,3 +46,7 @@ via `tools/classtable.py gGraphRoomMethods` as the class's dtor slot, and
 its body's final act is chaining to the base class's own dtor
 (`Get_vtable_TaskCore()->slotDC(self)`) after tearing down every `points`
 entry -- the standard dtor shape.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

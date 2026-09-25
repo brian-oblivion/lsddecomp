@@ -20,7 +20,7 @@ void StreamTaskObj__func_8003BAB4(StreamTaskObj *self) {
 ## Evidence
 
 - `Get_vtable_TaskCore()->slot4C`: `TaskCoreMethods` slot `+0x04C`. `classtable.py
-  gTaskCoreMethods` shows it occupied by `TaskCoreObj__func_8003C238`, this unit's own (still
+  gTaskCoreMethods` shows it occupied by `TaskCore__OnInit`, this unit's own (still
   queued, larger) function — confirms existence/arity, result discarded here
   so typed `void`.
 - `self->unkB4->methods->slot6C(self->unkB4, self->unkC0)`: two-argument
@@ -66,9 +66,13 @@ directly.
 
 **StreamTaskObj__func_8003BAB4** -- tier C (class known, purpose not
 established). Occupies `gStreamTaskObjMethods` slot `+0x04C`; up-calls
-`TaskCoreObj__func_8003C238` at the same slot, then forwards the fields
+`TaskCore__OnInit` at the same slot, then forwards the fields
 `StreamTaskObj__Configure` set into the private `unkB4` sub-object and
 conditionally resets a value. No external caller was found (dispatched only
 through the vtable), and no single verb for the combined effect is
 confidently supported by the body alone -- kept `Class__func_xxxxx` rather
 than guess.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). The onInit up-call casts the slot to `void (*)(TaskCore *)`: IntermediateBase types onInit (self, s32, s32, s32) from init's call, and this call passes self alone.

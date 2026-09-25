@@ -1,7 +1,7 @@
 /* code_2cc8c_c -- third slice of the 0x2CC8C block (0x8003DFA0..0x8003E874,
  * 19 functions plus one stall), continuing directly from code_2cc8c_b.
  *
- * After TaskCore's Obj86B60__GetActiveSlotCount and the two getters come
+ * After TaskCore's TaskCore__GetActiveSlotCount and the two getters come
  * IntermediateBase's own methods, the ctor through OnState3 and its getter
  * Get_vtable_IntermediateBase (class id 0x30, gIntermediateBaseMethods, the
  * parent of TaskCore and Class86668). The class is declared once, in
@@ -20,7 +20,8 @@
  *
  * Round 55 (runner alpha): full track-3 naming pass. Every definition named;
  * see each function's own match report for the `## Naming` evidence.
- * Obj86B60/Obj86B60Methods/Unk18Obj/Unk18ObjMethods/GenericObjMethods are
+ * Unk18Obj/Unk18ObjMethods/GenericObjMethods (and until round 84 the
+ * TaskCore view Obj86B60, now include/TaskCore.h) are
  * SHARED with one or more of code_2cc8c.c, code_2cc8c_b.c and
  * code_2cc8c_d.c (same classes, split by address range across sibling
  * units), so most field/slot renames on those particular structs are
@@ -32,18 +33,14 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-s32 Obj86B60__GetActiveSlotCount(Obj86B60 *self)
+s32 TaskCore__GetActiveSlotCount(TaskCore *self)
 {
     return self->slotCounts[self->activeSlot];
 }
 
-/* TaskCoreMethods table (see code_2c054.h's own richer local view); opaque
- * here since this unit never dereferences it, only returns its address. */
-extern u8 gTaskCoreMethods[];
-
-void *Get_vtable_TaskCore(void)
+TaskCoreMethods *Get_vtable_TaskCore(void)
 {
-    return gTaskCoreMethods;
+    return &gTaskCoreMethods;
 }
 
 /* A 3-word struct (see code_2c054.h's own StreamTaskInitData local view);
@@ -291,10 +288,13 @@ void Unk18Obj__RemoveChild(Unk18Obj *self, GenericObj *arg1)
     Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)arg1);
 }
 
-void Obj86B60__ResetAndRemoveAllChildren(Obj86B60 *self)
+/* Unk18Obj's removeAllChildren override (+0x018 of D_8006E8E4 and of
+ * gClass869D8Methods), not TaskCore's: the name predates that reading. The
+ * three fields are Unk18Obj's child caches (see Unk18Obj__AddChild above). */
+void Obj86B60__ResetAndRemoveAllChildren(Unk18Obj *self)
 {
     self->unk30 = 0;
     self->unk10 = 0;
-    self->initArgs = NULL;
+    self->unkC = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }

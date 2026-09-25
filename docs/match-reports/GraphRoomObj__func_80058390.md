@@ -60,3 +60,7 @@ applies now that the class is named. Body: chains through the base
 class's own +0x044 slot, then returns `unk_0x38` if `scored == 0`, else
 the literal `2`. No caller in this unit and no field/return semantics
 strong enough to name past that -- kept `func_`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -12,7 +12,7 @@
  * below it). It is abstract: +0x04C, +0x050 and +0x058 are NULL in its own
  * table, and init/deinit call the first two. It has no allocator; the object
  * is 0x28 bytes because both subclasses' own fields start at +0x028
- * (Class86668's eventCode, the +0x028 TaskCoreObj__Reset sets).
+ * (Class86668's eventCode, the +0x028 TaskCore__Reset sets).
  *
  * init(args, mode) keeps `args`, adds args->unk0, args->unk4 and the +0x010
  * helper as children, runs onInit and records `mode`. With mode 0 it also
@@ -21,7 +21,7 @@
  * and releases whatever init created itself. Callers construct an object,
  * call init and use what it RETURNS (Class6D3C8__RunPollTask,
  * Class6D3C8__PollStatusObj); the subclass overrides return a result field
- * (Class86668__Init: eventCode; TaskCoreObj__func_8003C1DC: +0x038).
+ * (Class86668__Init: eventCode; TaskCore__Init: +0x038).
  *
  * onNotify splits by the SENDER's root class nibble, as Class6B5CC's does:
  * a D_8006C070 (1) goes to onTag1Notify, a Pad (2) to onPadEvent, a
@@ -55,7 +55,7 @@ struct IntermediateBaseInitArgs {
     /* +0x054 */ void (*onTag1Notify)(Self *self, BasicClass *sender, s32 event); /* IntermediateBase__OnTag1Notify: onNotify's D_8006C070 (1) case */ \
     /* +0x058 */ void (*onPadEvent)(Self *self, BasicClass *sender, s32 event);   /* NULL; onNotify's Pad (2) case */ \
     /* +0x05C */ void (*update)(Self *self, BasicClass *sender, s32 event);       /* IntermediateBase__IncrementFrameCounter: onNotify's D_8006EF50 (5) case */ \
-    /* +0x060 */ void (*setState)(Self *self, s32 state);    /* IntermediateBase__SetState; Obj86B60__SetState, Class86B60__SetState */ \
+    /* +0x060 */ void (*setState)(Self *self, s32 state);    /* IntermediateBase__SetState; TaskCore__SetState, Class86B60__SetState */ \
     /* +0x064 */ void (*onState2)(Self *self);               /* IntermediateBase__OnState2 */    \
     /* +0x068 */ void (*onState3)(Self *self)                /* IntermediateBase__OnState3 */
 

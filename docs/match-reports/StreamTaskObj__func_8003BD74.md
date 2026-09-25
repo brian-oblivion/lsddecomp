@@ -62,3 +62,7 @@ slot `+0x080`; a pure one-line up-call to the base slot with no
 StreamTaskObj-specific logic at all (see the report's own return-type
 discussion). There is nothing here to name beyond "this class's own
 override of that slot," so left `Class__func_xxxxx`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

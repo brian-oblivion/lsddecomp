@@ -7,7 +7,7 @@
 This is the **canonical account of how the `New_X` epilogue-merge residue
 class was closed.** Four other reports point here:
 `New_Obj865C8`, `New_Class86668` (class_39e08), `New_StreamTaskObj`,
-`New_TaskCoreObj` (code_2c054).
+`New_TaskCore` (code_2c054).
 
 ## What it does
 
@@ -74,7 +74,7 @@ Five instances closed in one pass, all byte-exact:
 | `New_Class86668` | class_39e08 | 27/27 |
 | `New_Obj865C8` | class_39e08 | 31/31 |
 | `New_StreamTaskObj` | code_2c054 | 36/36 |
-| `New_TaskCoreObj` | code_2c054 | 31/31 |
+| `New_TaskCore` | code_2c054 | 31/31 |
 
 **It does NOT close `New_Class6D3C8`** (code_1677c, 23/24), and that negative
 matters: the class has **two sub-shapes**, distinguished by what retail puts
