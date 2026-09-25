@@ -2437,28 +2437,11 @@ struct Obj87034_3bb8c_l {
     s32 unk80;                                    /* +0x080, ObjM__TransferToOther (on `other`)/ObjM__TickTarget/ObjM__DispatchActiveState: zero-checked gate */
 };
 
-/* Global BasicClass-family accessor shared across many classes (see
- * include/class_39e08.h's own fuller `Class86668Methods` view of the SAME
- * table, gClass86668Methods) -- declared here as this unit's own minimal,
- * independent local view rather than including that header, per this
- * project's multiple-independent-local-views convention. Only the one
- * slot ObjM__AttachTarget dispatches through is named. */
-/* HEAD NOTE round 15: `BaseMethods87034_3bb8c_l` and its
- * `extern ... *GetClass86668Methods(void);` prototype were moved into
- * src/class_3bb8c_l.c. THIRD instance this merge of one rule: a cross-unit
- * prototype in a unit-local type must not live in a shared header. This one
- * was the nastiest, because it did not collide with another RUNNER -- it
- * collided with the pre-existing canonical
- * `extern Class86668Methods *GetClass86668Methods(void);` in include/class_39e08.h,
- * and it only surfaced when class_3bb8c_k (which includes BOTH headers) was
- * merged two merges later. class_3bb8c_l includes only class_3bb8c.h, so
- * nothing showed up when delta's own work was verified.
- *
- * Worth unifying deliberately: class_39e08.h's Class86668Methods ALREADY
- * declares slot44 and slot48 at the same offsets with ABI-identical shapes,
- * so delta's local view is a duplicate of a type the project already had.
- * Not done here -- it changes a byte-exact unit's types inside a merge
- * resolution, which is the round-13 hazard. */
+/* ObjM's parent class, Class86668 (gClass86668Methods), is declared in
+ * include/Class86668.h (track 4, round 84); class_3bb8c_k and class_3bb8c_l
+ * include it for their base-table calls. The unit-local
+ * `BaseMethods87034_3bb8c_l` view the round-15 head note here described is
+ * gone. */
 
 /* ObjM__AttachTarget's own registered callback -- forward-declared here since
  * ObjM__AttachTarget (ROM order earlier) takes its address before its own

@@ -27,25 +27,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
-
-/* This unit's local view of GetClass86668Methods's table, and the prototype for
- * that getter. Declared HERE, not in include/class_3bb8c.h: the canonical
- * `extern Class86668Methods *GetClass86668Methods(void);` lives in
- * include/class_39e08.h, and any unit including BOTH headers gets
- * `conflicting types for 'GetClass86668Methods'` -- which is exactly how this was
- * found, when class_3bb8c_k was merged. class_3bb8c_l does not include
- * class_39e08.h, so a unit-local declaration is safe here.
- *
- * class_39e08.h's Class86668Methods already declares slot44 and slot48 at
- * these same offsets with ABI-identical shapes. Prefer unifying onto that
- * type when someone next touches this unit, as its own change with the
- * whole-image SHA1 re-verified after. */
-typedef struct BaseMethods87034_3bb8c_l {
-    u8 pad00[0x044];
-    s32 (*slot44)(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2); /* +0x044, ObjM__AttachTarget */
-    void (*slot48)(Obj87034_3bb8c_l *self); /* +0x048, ObjM__DetachTarget */
-} BaseMethods87034_3bb8c_l;
-extern BaseMethods87034_3bb8c_l *GetClass86668Methods(void);
+#include "Class86668.h"
 
 void ObjM__NoOpSlot40(void) {
 }
@@ -53,7 +35,7 @@ void ObjM__NoOpSlot40(void) {
 void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
     arg1->unkC->methods->slotC8(arg1->unkC, ObjM__OnRegistrantEvent, self);
     self->target = (DreamSysObj_3bb8c_l *)arg2;
-    GetClass86668Methods()->slot44(self, arg1, 1);
+    GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)arg1, 1);
     self->methods->slot10(self, arg2);
 }
 
@@ -67,7 +49,7 @@ void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg
 
 void ObjM__DetachTarget(Obj87034_3bb8c_l *self) {
     self->methods->slot14(self, self->target);
-    GetClass86668Methods()->slot48(self);
+    GetClass86668Methods()->deinit((Class86668 *)self);
 }
 
 /* Cross-unit helpers with no established prototype elsewhere; declared
