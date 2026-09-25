@@ -272,7 +272,14 @@ void *func_800451A8(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800451B8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045228);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800452AC);
+/* D_8006F590 +0x00C: finalize -- release the buffer's counted object array,
+ * then the parent D_8006F240's. */
+void func_800452AC(DataSrc33808 *self) {
+    CountedBuf33808 *buf = self->buffer;
+
+    ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
+    ((DataSrc33808Methods *)func_800441A4())->finalize(self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800452FC);
 /* D_8006F590 +0x078: slot +0x07C over the data past the buffer's counted
  * array. */
