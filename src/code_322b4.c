@@ -466,7 +466,7 @@ void D8006EF50__Reset(D_8006EF50Obj *self, s32 a1) {
 }
 /* D_8006EF50 slot +0x044: notify event 4 if unk14, else 3 if unk10, else
  * count unkC up and notify 2. */
-void func_800425EC(D_8006EF50Obj *self) {
+void D8006EF50__Tick(D_8006EF50Obj *self) {
     s32 event;
 
     if (self->unk14 != 0) {

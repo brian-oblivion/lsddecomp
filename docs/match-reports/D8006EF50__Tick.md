@@ -1,4 +1,6 @@
-# func_800425EC -- MATCHED (24/24 words), round 82
+# D8006EF50__Tick -- MATCHED (24/24 words), round 82
+
+> Renamed from `func_800425EC` on 2026-09-25 (tools/rename.py). Address 0x800425ec.
 
 Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior attempt.
 
@@ -17,7 +19,7 @@ struct D_8006EF50Methods {
     void (*reset)(D_8006EF50Obj *self, s32 a1);            /* +0x040 = D8006EF50__Reset */
 };
 
-void func_800425EC(D_8006EF50Obj *self) {
+void D8006EF50__Tick(D_8006EF50Obj *self) {
     s32 event;
 
     if (self->unk14 != 0) {
