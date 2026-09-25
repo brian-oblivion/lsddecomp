@@ -99,7 +99,11 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042268);
 /* D_8006EB90 and D_8006EC74 slot +0x098 (update): empty override. */
 void func_80042294(Class6B5CC *self, void *sender, s32 event) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004229C);
+/* Slot +0x0B8 of D_8006EC74, D_8006ED4C, D_8006EE1C and D_800879C4 (the
+ * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
+void func_8004229C(SpriteObj_322b4 *self, Rgb_322b4 *rgb) {
+    self->rgb = *rgb;
+}
 /* Returns the D_8006EE1C method table. */
 void *func_800422BC(void) {
     return D_8006EE1C;
