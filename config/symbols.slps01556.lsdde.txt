@@ -2514,3 +2514,8 @@ gClass6D3C8CtorArgs = 0x80066828;
 // lead in the main naming pass; head measured and applied).
 __main = 0x80011994; // type:func
 gDataSourceClientGetters = 0x8006D4AC;
+// identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),
+// header LIBGPU.H `extern int ClearImage(RECT *rect, u_char r, u_char g,
+// u_char b);`, no C call site to check arg shape against. Round 81 (bravo,
+// track 2), not yet linked from an SDK object.
+ClearImage = 0x800212A8; // type:func  (Psy-Q libgpu/sys, fingerprint)
