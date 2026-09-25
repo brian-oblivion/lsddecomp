@@ -774,3 +774,7 @@ Renamed `func_` -> `Obj86B60__RefreshSlotView`. **Tier B**: Pings every element 
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__RefreshSlotView (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+listView is a BoxFill (include/BoxFill.h); the deleted `Unk68Obj` view's slots are BoxFill's: slot4C = attachToParent (cast to BoxFillAttachToParentFn, arguments cast), slotC0 = setSize({0x28, count * 12}), slot50 = detachFromParent. Zero bytes.

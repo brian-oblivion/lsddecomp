@@ -1,9 +1,11 @@
-# func_800406E4 — MATCHED (12/12 words)
+# BoxFill__SetDisplay — MATCHED (12/12 words)
+
+> Renamed from `func_800406E4` on 2026-09-25 (tools/rename.py). Address 0x800406e4.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-s32 func_800406E4(Obj6EAC0 *self, s32 a1) {
+s32 BoxFill__SetDisplay(Obj6EAC0 *self, s32 a1) {
     return GetSetBitField(&self->unk58, 0x1F, 1, a1 == 0) == 0;
 }
 ```
@@ -29,7 +31,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800406E4` | (kept `func_800406E4`) | C |
+| `func_800406E4` | (kept `func_800406E4` at track 3; `BoxFill__SetDisplay` since round 85, see Track 4) | C |
 
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
 shift, width, value)` (see `include/code_2cc8c.h`'s own comment on
@@ -43,3 +45,7 @@ only restate the mechanics (shift/width/negation), which the existing
 header/report prose already documents precisely. Kept `func_` rather
 than invent a `Get`/`SetFlagNN`-shaped name for an unidentified bit,
 consistent with this project's own precedent on the sibling group.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_800406E4`: the +0x060 occupant (Class6B5CC's setDisplay), and the body is Class6B5CC__SetDisplay's own (GetSetBitField shift 31, width 1, `on == 0`, result `== 0`) over the GsBOXF attribute at +0x058 instead of the GsDOBJ2 one (tier A). GraphRoomObj__UpdateFromLog calls it on points[0] with the hour's low bit (a blink).

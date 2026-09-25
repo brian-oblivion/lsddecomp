@@ -282,13 +282,13 @@ explains both.
 
 Re-examined per this round's brief (register-shaped verdicts are the
 least reliable class). Tried wrapping the whole body in a
-`do { ... } while (0)` (the lever that closed `Obj6EAC0__SetChar` this round
+`do { ... } while (0)` (the lever that closed `BoxFill__AttachAbsolute` this round
 for a similar-looking symptom): this REGRESSED to 0/32 with the function
 one word LONGER (33 vs retail's 32) and full whole-image drift. Reverted
 immediately.
 
 This is now the SECOND confirmed instance this round where the
-`do/while(0)` lever (see `Obj6EAC0__SetChar.md`) does not generalise --
+`do/while(0)` lever (see `BoxFill__AttachAbsolute.md`) does not generalise --
 `TaskCore__CommitElementScroll.md` also tried it this round and got the same kind of
 regression. The lever appears specific to a narrow shape (a single
 unconditional call-plus-field-writes block with no branches of its own

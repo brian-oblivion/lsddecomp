@@ -122,7 +122,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 | `func_80040D74` | `Obj6EAC0__PropagateColor` | B |
 
 **Evidence.** Derived occupant of `slotB8` (the same slot
-`Obj6EAC0__SetColor`, this unit's base occupant, fills with the real
+`BoxFill__SetColor`, this unit's base occupant, fills with the real
 colour-set/blend call): loops over `self->children[self->childStart ..
 self->childStart+self->childCount)` calling `elem->methods->slotB8(elem,
 a1)` on each -- i.e. forwards the same slot's own call down to every

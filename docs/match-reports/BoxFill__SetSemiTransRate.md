@@ -1,20 +1,22 @@
-# func_80040740 — MATCHED (11/11 words)
+# BoxFill__SetSemiTransRate — MATCHED (11/11 words)
+
+> Renamed from `func_80040740` on 2026-09-25 (tools/rename.py). Address 0x80040740.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-s32 func_80040740(Obj6EAC0 *self, s32 a1) {
+s32 BoxFill__SetSemiTransRate(Obj6EAC0 *self, s32 a1) {
     return GetSetBitField(&self->unk58, 0x1C, 2, a1);
 }
 ```
 
-Sibling of `func_800406E4`/`func_80040714`; base-table occupant of
+Sibling of `BoxFill__SetDisplay`/`BoxFill__SetSemiTrans`; base-table occupant of
 `Obj6EAC0Methods::slot0x68`. Shift 0x1C, width 2, raw `a1` passed
 through unchanged -- matches `code_d294.c`'s `Class6B5CC__SetSemiTransRate` shape.
 
 ### Proposed learning
 
-None beyond `func_800406E4`'s entry.
+None beyond `BoxFill__SetDisplay`'s entry.
 
 ## Naming
 
@@ -22,7 +24,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040740` | (kept `func_80040740`) | C |
+| `func_80040740` | (kept `func_80040740` at track 3; `BoxFill__SetSemiTransRate` since round 85, see Track 4) | C |
 
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
 shift, width, value)` (see `include/code_2cc8c.h`'s own comment on
@@ -36,3 +38,7 @@ only restate the mechanics (shift/width/negation), which the existing
 header/report prose already documents precisely. Kept `func_` rather
 than invent a `Get`/`SetFlagNN`-shaped name for an unidentified bit,
 consistent with this project's own precedent on the sibling group.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_80040740`: the +0x068 occupant (Class6B5CC's setSemiTransRate), the same call as Class6B5CC__SetSemiTransRate (shift 28, width 2) over the GsBOXF attribute (tier A). ApplyStyleDecorationIfSet calls it with 0.

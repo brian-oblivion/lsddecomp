@@ -377,7 +377,7 @@ permuter-exhausted (no PERM macros were written to guide the search, and
 search of this space) -- phrasing precisely: **not closed in ~45,000
 iterations under load.**
 
-**Why the `Class6E99C__PushPosition`/`Obj6EAC0__SetPosition` whole-struct-assignment lever
+**Why the `Class6E99C__PushPosition`/`BoxFill__SetPosition` whole-struct-assignment lever
 does not transfer here, checked explicitly rather than assumed:** both of
 those functions' residues were a two-SEPARATE-SCALAR-ASSIGNMENT shape
 copying one struct's fields into another struct's fields, where GCC 2.6.3

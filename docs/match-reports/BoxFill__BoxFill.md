@@ -1,4 +1,6 @@
-# ClassEAC0__ClassEAC0 -- MATCH (33/33 words, first attempt)
+# BoxFill__BoxFill -- MATCH (33/33 words, first attempt)
+
+> Renamed from `ClassEAC0__ClassEAC0` on 2026-09-25 (tools/rename.py). Address 0x8004054c.
 
 > Renamed from `func_8004054C` on 2026-09-20 (tools/rename.py). Address 0x8004054c.
 
@@ -8,9 +10,9 @@ same "call the further-base ctor first, reset methods, redispatch finishConstruc
 chain `Class6E99C__Class6E99C` uses one level up:
 
 ```c
-void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void BoxFill__BoxFill(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     GetClass6B5CCMethods()->ctor(self);
-    self->methods = Obj6EAC0__GetBaseMethods();
+    self->methods = GetBoxFillMethods();
     self->methods->finishConstruct(self, a1, a2, a3);
 }
 ```
@@ -23,8 +25,12 @@ this call site's own single-argument setup.
 
 ## Naming (round 61, track 3)
 
-**`ClassEAC0__ClassEAC0`** -- tier A. `ClassEAC0Methods::ctor` (`+0x008`),
+**`BoxFill__BoxFill`** -- tier A. `ClassEAC0Methods::ctor` (`+0x008`),
 one level further down the same "call the further-base ctor first, reset
 `self->methods`, redispatch `finishConstruct`" chain
 `Class6E99C__Class6E99C` uses one level up. Named per the same
 `Class__Class` constructor convention.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `ClassEAC0__ClassEAC0`: gBoxFillMethods's +0x008 occupant (tier A). Ctor chain: it calls GetClass6B5CCMethods()->ctor first, so the id parent (0x4) is the ctor-chain parent; Class6E99C__Class6E99C calls this one first. The +0x040 dispatch now goes through the inherited `reset` slot, cast to BoxFillResetFn (Reset takes the ctor's arguments).

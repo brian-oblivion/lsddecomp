@@ -1,4 +1,6 @@
-# New_ClassEAC0 -- MATCHED (31/31 words)
+# New_BoxFill -- MATCHED (31/31 words)
+
+> Renamed from `New_ClassEAC0` on 2026-09-25 (tools/rename.py). Address 0x800404d0.
 
 > Renamed from `func_800404D0` on 2026-09-20 (tools/rename.py). Address 0x800404d0.
 
@@ -11,12 +13,12 @@ Unit `code_2cc8c_e`, carved round 14.
 > the first try once the preserved single-merged-return body was split:
 >
 > ```c
-> ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
+> ClassEAC0Obj *New_BoxFill(void *a0, void *a1, s32 a2) {
 >     ClassEAC0Obj *self;
 >
 >     self = BMemPMgrAlloc(0x6C);
 >     if (self != NULL) {
->         ((ClassEAC0Methods *)Obj6EAC0__GetBaseMethods())->ctor(self, a0, a1, a2);
+>         ((ClassEAC0Methods *)GetBoxFillMethods())->ctor(self, a0, a1, a2);
 >         return self;
 >     }
 >     return NULL;
@@ -24,18 +26,18 @@ Unit `code_2cc8c_e`, carved round 14.
 > ```
 >
 > **One incidental fix needed along the way**: the preserved body's
-> `Obj6EAC0__GetBaseMethods()->ctor(...)` no longer compiles as written --
-> `Obj6EAC0__GetBaseMethods`'s declared return type is `Obj6EAC0Methods *` (per
+> `GetBoxFillMethods()->ctor(...)` no longer compiles as written --
+> `GetBoxFillMethods`'s declared return type is `Obj6EAC0Methods *` (per
 > `include/code_2cc8c.h`), which has no field literally named `ctor` (its
 > ctor-shaped slot is `slot08`, still unidentified as this unit's own). The
 > header's own `ClassEAC0Methods` type (used identically by
 > `Class6E99C__Class6E99C`, a few lines above this function in the same file) DOES
 > have a `ctor` field at `+0x008`, and its own doc comment explicitly lists
-> `New_ClassEAC0` as one of the vtable's callers through that slot -- so the
+> `New_BoxFill` as one of the vtable's callers through that slot -- so the
 > correct call is an explicit cast, `((ClassEAC0Methods *)
-> Obj6EAC0__GetBaseMethods())->ctor(...)`, matching the pattern `Class6E99C__Class6E99C` already
+> GetBoxFillMethods())->ctor(...)`, matching the pattern `Class6E99C__Class6E99C` already
 > uses one statement earlier in this same unit (`base = (ClassEAC0Methods
-> *)Obj6EAC0__GetBaseMethods();`). No header change was needed; this is purely a
+> *)GetBoxFillMethods();`). No header change was needed; this is purely a
 > call-site cast that the preserved body's snapshot predates.
 >
 > Verified: `./build-and-verify.sh` exit 0 (full-image SHA1 match),
@@ -70,7 +72,11 @@ the correct cast one statement earlier in the file.
 
 ## Naming (round 61, track 3)
 
-**`New_ClassEAC0`** -- tier A. `New_X`-shaped allocator, mirroring
+**`New_BoxFill`** -- tier A. `New_X`-shaped allocator, mirroring
 `New_Class6E99C` one level down the chain: allocates 0x6C bytes
 (`ClassEAC0Obj`'s own, smaller size) and dispatches
-`((ClassEAC0Methods *)Obj6EAC0__GetBaseMethods())->ctor(...)` on success.
+`((ClassEAC0Methods *)GetBoxFillMethods())->ctor(...)` on success.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `New_ClassEAC0`: BMemPMgrAlloc(0x6C) then GetBoxFillMethods()->ctor (tier A). Callers: TaskCore__SetTarget (listView), GraphRoomObj__BuildGraphPoints (100 dots), StyleBuildDecorSet (18 decor slots), ApplyStyleDecorationIfSet (gStyleDecorObj). The first argument is a {w, h} pair of words (read by halfword in Reset), the second the r,g,b bytes, the third the priority, so the parameters are (void *size, void *color, s32 pri).

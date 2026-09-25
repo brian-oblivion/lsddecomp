@@ -43,7 +43,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 | `func_80040F28` | `Obj6EAC0__SetText` | B |
 
 **Evidence.** Derived occupant of `slotCC` (base occupant is
-`Obj6EAC0__SetMask`, an unrelated bitmask setter -- this slot means
+`BoxFill__SetMask`, an unrelated bitmask setter -- this slot means
 different things on the two tables, per this project's per-call-site
 convention): walks a NUL-terminated byte string in lockstep with
 `self->children`, dispatching `elem->methods->slotC4(elem, *p)` for each

@@ -24,7 +24,7 @@
  * MECHANICS below are certain, the in-game name is a strong but unconfirmed
  * read): `GraphRoomObj__InitDisplay` loads the literal texture string
  * `"ETC\HGRAPH.TIM"`. The class owns a 100-entry array of small coloured
- * `New_ClassEAC0` point objects (`points`) built by `BuildGraphPoints` and
+ * `New_BoxFill` point objects (`points`) built by `BuildGraphPoints` and
  * positioned by `PopulateGraphPoints` from a backwards walk of a 365-entry
  * day-type ring (`DayLog::days`, reached through `dayLog`) -- each day's
  * two signed bytes become a `{x, y}` point handed to a point's own
@@ -42,6 +42,7 @@
  */
 #include "common.h"
 #include "TaskCore.h"
+#include "BoxFill.h"
 
 /* The class allocated by this unit's own New_GraphRoomObj, table D_800879C4
  * (49 slots, resolved via tools/classtable.py). Its ctor (D800879C4__D800879C4)
@@ -134,34 +135,8 @@ typedef struct GraphRoomMethods {
 } GraphRoomMethods;
 extern GraphRoomMethods *GetGraphRoomMethods(void);
 
-/* This unit's own view of one entry of GraphRoomObj::points -- one of the
- * 100 small coloured `New_ClassEAC0`-allocated dots the graph plots. Only
- * the slots this unit's own functions dispatch through are typed. */
-typedef struct GraphRoomPoint GraphRoomPoint;
-typedef struct GraphRoomPointMethods {
-    u8 pad00[0x4];
-    /* +0x004, called by this unit's own GraphRoomObj__Destroy as (self) -- a
-     * per-entry destructor, in a 100-iteration loop over `points`. */
-    void (*destroy)(GraphRoomPoint *self);
-    u8 pad08[0x60 - 0x8];
-    /* +0x060, called by this unit's own GraphRoomObj__UpdateFromLog as
-     * (self, self->elapsedHours & 1) -- an odd/even flag, purpose past
-     * that not established. */
-    void (*slot60)(GraphRoomPoint *self, s32 arg1);
-    u8 pad64[0xB8 - 0x64];
-    /* +0x0B8, called by this unit's own GraphRoomObj__TickHighlight as
-     * (self, 1, &D_8008ABBC) -- fires the "this day matched"
-     * visual highlight. */
-    void (*highlight)(GraphRoomPoint *self, s32 arg1, void *arg2);
-    u8 padBC[0xC4 - 0xBC];
-    /* +0x0C4, called by this unit's own GraphRoomObj__PopulateGraphPoints as
-     * (self, arg1, &point, 0), where `point` is a 2-word {x, y}-shaped
-     * local (round 19) -- places this dot on the graph. */
-    void (*setPosition)(GraphRoomPoint *self, void *arg1, s32 *point, s32 arg3);
-} GraphRoomPointMethods;
-struct GraphRoomPoint {
-    GraphRoomPointMethods *methods;
-};
+/* GraphRoomObj::points[] are the 100 small coloured dots the graph plots:
+ * BoxFill objects (include/BoxFill.h, New_BoxFill). */
 
 /* Object pointed to by GraphRoomObj::unk48 -- only the one slot this
  * unit's own GraphRoomObj__GraphRoomObj dispatches through is typed.
@@ -250,12 +225,12 @@ struct GraphRoomObj {
     /* +0x0A4, set by this unit's own ctor (GraphRoomObj__GraphRoomObj) to its own
      * `arg1`; dispatched through by GraphRoomObj__UpdateFromLog/GraphRoomObj__PopulateGraphPoints. */
     DayLogObj *dayLog;
-    /* +0x0A8, a 100-entry array of `GraphRoomPoint *` -- the graph's own
+    /* +0x0A8, a 100-entry array of `BoxFill *` -- the graph's own
      * coloured dots, built by this unit's own
      * GraphRoomObj__BuildGraphPoints, destroyed by GraphRoomObj__Destroy,
      * positioned by GraphRoomObj__PopulateGraphPoints and indexed by
      * GraphRoomObj__TickHighlight. */
-    GraphRoomPoint *points[100];
+    BoxFill *points[100];
     /* +0x238, GraphRoomObj__ScoreDayLog's own success/fail return, stashed
      * here by GraphRoomObj__PopulateGraphPoints; read by
      * GraphRoomObj__HandleUnscored/GraphRoomObj__func_80058390 and
@@ -306,7 +281,7 @@ void GraphRoomObj__UpdateFromLog(GraphRoomObj *self, void *arg1, void *arg2) {
     if (self->unk_0x3C == 1) {
         DayLog *result = self->dayLog->methods->getData(self->dayLog, 0);
         if (result->fullScan != 0 || result->dayCount != 0) {
-            self->points[0]->methods->slot60(self->points[0], self->elapsedHours & 1);
+            self->points[0]->methods->setDisplay(self->points[0], self->elapsedHours & 1);
         }
     }
     self->methods->tick(self);
@@ -332,18 +307,17 @@ typedef struct D_8008ABB8Color {
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
 extern D_8008ABB8Color D_8008ABB8;
-extern GraphRoomPoint *New_ClassEAC0(void *a0, void *a1, s32 a2);
 
 void GraphRoomObj__BuildGraphPoints(GraphRoomObj *self) {
     D_8008ABB8Color rgb;
     s32 i;
 
-    self->points[0] = New_ClassEAC0(&D_8008ABAC, &D_8008ABB4, 0);
+    self->points[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
     rgb = D_8008ABB8;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->points[i] = New_ClassEAC0(&D_8008ABAC, &rgb, 0);
+        self->points[i] = New_BoxFill(&D_8008ABAC, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
@@ -362,7 +336,7 @@ void GraphRoomObj__Destroy(GraphRoomObj *self) {
 
     BMemPMgrFree(self->matchedDayIndices);
     for (i = 0; i < 100; i++) {
-        self->points[i]->methods->destroy(self->points[i]);
+        self->points[i]->methods->release(self->points[i]);
     }
     Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
 }
@@ -380,7 +354,7 @@ s32 GraphRoomObj__func_80058390(GraphRoomObj *self, void *arg1, void *arg2) {
 extern s32 GraphRoomObj__ScoreDayLog(GraphRoomObj *self, DayLog *arg1);
 
 /* A 2-word {x, y}-shaped point, matching what this unit's own GraphRoomObj__PopulateGraphPoints
- * passes to GraphRoomPointMethods::setPosition (round 19). */
+ * passes to BoxFill's attachAbsolute (round 19). */
 typedef struct Point2 {
     s32 x, y;
 } Point2;
@@ -428,12 +402,12 @@ void GraphRoomObj__PopulateGraphPoints(GraphRoomObj *self, void *arg1) {
             firstPoint = point;
             flag = 1;
         } else {
-            self->points[i]->methods->setPosition(self->points[i], arg1, (s32 *)&point, 0);
+            self->points[i]->methods->attachAbsolute(self->points[i], arg1, (Pair32E99C *)&point, 0);
         }
     }
 
     if (flag) {
-        self->points[0]->methods->setPosition(self->points[0], arg1, (s32 *)&firstPoint, 0);
+        self->points[0]->methods->attachAbsolute(self->points[0], arg1, (Pair32E99C *)&firstPoint, 0);
     }
 }
 
@@ -516,7 +490,7 @@ void GraphRoomObj__TickHighlight(GraphRoomObj *self) {
             if (self->highlightCount < 4) {
                 if ((self->elapsedHours % 24) == 0) {
                     s8 idx = self->matchedDayIndices[self->highlightCount];
-                    self->points[idx]->methods->highlight(self->points[idx], 1, &D_8008ABBC);
+                    self->points[idx]->methods->setColor(self->points[idx], 1, &D_8008ABBC);
                     self->highlightCount += 1;
                 }
             }

@@ -92,4 +92,4 @@ Dispatches on `gStyleVariant` (`PickStyleFallbackConfig`'s "kind") to
 The build/update/release triad naming mirrors `StyleBuildDecorSet` above,
 for the SEPARATE `gStyleEffectSlots` array (a different object class --
 `Obj876FC`, allocated through `class_3bb8c_r.c`'s `New_Class876FC`, not
-`New_ClassEAC0`). MATCHED, 60/60, first build.
+`New_BoxFill`). MATCHED, 60/60, first build.

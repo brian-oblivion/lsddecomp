@@ -160,7 +160,7 @@ struct TaskCoreTarget {
     /* +0x05C */ s32 *itemCounts;       /* per slot: its item list's length */                     \
     /* +0x060 */ s32 *slotCounts;       /* per slot: the item cursor, a ring over itemCounts */    \
     /* +0x064 */ void **itemLists;      /* per slot: its item widgets (createSlotElements) */      \
-    /* +0x068 */ BasicClass *listView;  /* New_ClassEAC0: the frame around the scrolled list */    \
+    /* +0x068 */ BasicClass *listView;  /* New_BoxFill: the frame around the scrolled list */    \
     /* +0x06C */ u8 pad06C[4];                                                                     \
     /* +0x070 */ const char *subHandlePath; /* setSubHandle's path; nonzero: the handle is owned */ \
     /* +0x074 */ BasicClass *subHandle; /* func_8003B39C(subHandlePath), or the caller's; NULL: onInit also passes baseColor with gDefaultStreamTaskInitData */ \

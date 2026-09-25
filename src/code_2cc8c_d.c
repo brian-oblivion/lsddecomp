@@ -403,7 +403,7 @@ tail_check:
 
 /* Only while no view node is set: releases the current subHandle, installs
  * `handle`, and attaches it under sceneRoot at D_8008A904 (-100, -100). The
- * occupant of handle's +0x04C (Obj6EAC0__Layout, a Class6E99C's) takes a
+ * occupant of handle's +0x04C (BoxFill__AttachToParent, a Class6E99C's) takes a
  * screen position where Class6B5CC's attachToParent slot types a Vec3_d294
  * offset, hence the cast (include/Viewport.h, "Not settled here"). */
 void Viewport__SetSubHandle(Viewport *self, Class6B5CC *handle) {

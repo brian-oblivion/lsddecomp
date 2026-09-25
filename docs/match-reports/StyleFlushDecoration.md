@@ -89,3 +89,7 @@ naming for the identical mechanical shape (consume pending state, dispatch,
 clear). The target's own purpose (what `slot4` does) is not established
 beyond "dispatch", so the verb describes the CALLER's mechanics, not the
 callee's.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+gStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `ObjAB54` view's +0x004 is release. Zero bytes.
