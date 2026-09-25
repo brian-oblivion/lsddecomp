@@ -2,6 +2,7 @@
 #define CODE_D294_H
 
 #include "common.h"
+#include "BasicClass.h"
 
 /* code_d294: a FRESH CARVE (round 10), the first 20-function slice of a
  * 55-function segment never carved before. `tools/classtable.py gClass6B5CCMethods`
@@ -269,37 +270,6 @@ struct CornerList_d294 {
     Vec3S16_d294 hdr;  /* +0x004, corner[0]; corner[1..] follow at +0x00A */
 };
 
-/* This unit's own minimal, local view of the shared BasicClass ancestor
- * table (D_8006B58C, returned by Get_vtable_BasicClass, which lives in the
- * still-uncarved code_8220 segment) -- same shape and same "ctor at +0x008,
- * dtor at +0x00C universally" convention already established independently
- * in include/class_16334.h and include/code_171e0.h. Declared again here,
- * under a unit-local name, per this project's policy of NOT unifying
- * independent local views of the same table into one shared header. */
-typedef struct BasicClassMethodsD294 BasicClassMethodsD294;
-struct BasicClassMethodsD294 {
-    s32 header;               /* +0x000 */
-    void *unk04;               /* +0x004 */
-    void *(*ctor)(void *self); /* +0x008 */
-    void *(*finalize)(void *self); /* +0x00C */
-    /* +0x010/+0x014, both round-2 finds (Class6B5CC__AddChild/Class6B5CC__RemoveChild):
-     * a `(self, other)` pair this class's own +0x010/+0x014 overrides
-     * (Class6B5CC__AddChild/Class6B5CC__RemoveChild) forward to unconditionally, after/before
-     * their own extra work. Real BasicClass-level meaning unknown from
-     * this unit alone. */
-    void (*addChild)(void *self, void *other); /* +0x010 */
-    void (*removeChild)(void *self, void *other); /* +0x014 */
-    void (*removeAllChildren)(void *self);              /* +0x018, Class6B5CC__RemoveAllChildren's forward target */
-    u8 pad01C[0x038 - 0x01C];
-    /* +0x038, Class6B5CC__OnNotify's (this unit) own forward target -- called
-     * unconditionally as its very first action, `(self, other, arg2)`,
-     * same three-argument shape as Class6B5CC__OnNotify itself. Real BasicClass-
-     * level meaning unknown from this unit alone, same caveat as
-     * slot10/slot14 above. */
-    void (*onNotify)(void *self, void *other, s32 arg2);
-};
-
-extern BasicClassMethodsD294 *Get_vtable_BasicClass(void);
 extern void *BMemPMgrAlloc(s32 size);
 extern void BMemPMgrFree(void *arg);
 
@@ -620,18 +590,6 @@ extern void Class6B5CC__UnlinkModel(Class6B5CCObj *self);
 extern void Class6B5CC__LinkModel(Class6B5CCObj *self, GenericObj_d294 *other);
 extern void GsInitCoordinate2(s32 arg0, void *dest);
 
-/* GetNextBasicClass (round 54 correction: this banner was STALE -- it is
- * now carved and MATCHED, in src/code_8220_b.c, a DIFFERENT unit; that
- * unit still has one unrelated stall of its own, func_80018464, per its
- * own file banner): a
- * generic intrusive-list "pop next" step. Given `out` and `cursor`
- * (both `T **`), if `*cursor` is non-NULL: `*out = (*cursor)->unk4`
- * (the node's own "next" field) and `*cursor = (*cursor)->unk0` (some
- * other per-node link -- NOT necessarily the same "next" field, going by
- * its own disassembly). If `*cursor` is NULL, `*out = NULL`. Declared
- * here typed to Class6B5CC__GetNextAttachedChild's own call site (the only caller reachable
- * from this unit) rather than generically. */
-extern void GetNextBasicClass(GenericObj_d294 **out, GenericObj_d294 **cursor);
 
 /* func_8001F51C (asm/psyq_fa50.s, Psy-Q library, not game code):
  * fills a caller-supplied struct (its own arg1) from a small on-stack
@@ -783,16 +741,6 @@ extern void RotMatrix(S16Quad_d294 *vec, s32 a1);
  * local buffers; declared only with that shape. */
 extern void MulMatrix2(void *arg0, void *arg1);
 
-/* BasicClass__GetNextParentRef (src/code_8220.c, code_8220 unit, already matched
- * there as `void BasicClass__GetNextParentRef(BasicClass *self, BasicClass
- * **outParent, BasicClassListNode **cursor)` -- "getNextParentRef": on the
- * first call for a given walk (`*outParent == NULL`), seeds `*cursor` from
- * `self->parentRefs`; every call pops one entry via `GetNextBasicClass`.
- * Redeclared here with this unit's own opaque/local types rather than
- * `#include "code_8220.h"`, per this project's per-unit-local-view
- * convention (same precedent as BasicClassMethodsD294 above) -- pointer
- * shapes are ABI-identical across translation units, so this is safe. */
-extern void BasicClass__GetNextParentRef(void *self, GenericObj_d294 **outParent, void **cursor);
 
 void Class6B5CC__GetRotMatrix(Class6B5CCObj *self, s32 a1, s32 a2);
 void Class6B5CC__NotifyIfUnk20Active(Class6B5CCObj *self, s32 a1);

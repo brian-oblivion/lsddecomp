@@ -242,14 +242,8 @@ Obj86ED0Methods *Get_vtable_Obj86ED0(void)
  * Obj866E8 group above are the same generic pool allocator/free pair --
  * not redeclared here.
  *
- * BasicClass's own method table getter is ALREADY declared in the shared
- * class_3bb8c.h (`Get_vtable_BasicClass`/`BasicMethods866E8F`, class_3bb8c_f's
- * local view -- reused here rather than redeclared, since a second
- * incompatible extern for the same function in one translation unit is a
- * conflicting-types error). This round additively named its own
- * ctor/finalize/addChild/removeChild/removeAllChildren slots (+0x008/
- * +0x00C/+0x010/+0x014/+0x018) in that header, matching
- * include/code_8220.h's canonical BasicClassMethods layout exactly.
+ * BasicClass's method table and its getter are include/BasicClass.h's
+ * (through class_3bb8c.h); the base-class calls below upcast `self`.
  */
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
@@ -298,7 +292,7 @@ void Class86F88__Class86F88(Class86F88_3bb8c_j *self, void **arg1, s32 arg2)
 
     i = 0;
     p = arg1;
-    Get_vtable_BasicClass()->ctor(self);
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetClass86F88Methods();
 
     while (*p++ != NULL) {
@@ -348,7 +342,7 @@ void Class86F88__Finalize(Class86F88_3bb8c_j *self)
     }
     BMemPMgrFree(self->unk1C);
     BMemPMgrFree(self->unk18);
-    Get_vtable_BasicClass()->finalize(self);
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
 void Class86F88__AddChild(Class86F88_3bb8c_j *self, void *arg1)
@@ -356,7 +350,7 @@ void Class86F88__AddChild(Class86F88_3bb8c_j *self, void *arg1)
     s32 tag;
 
     if (arg1) {
-        Get_vtable_BasicClass()->addChild(self, arg1);
+        Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)arg1);
         tag = **(s32 **)arg1 & 0xF;
         if (tag == 2) {
             self->unk34 = arg1;
@@ -377,7 +371,7 @@ void Class86F88__RemoveChild(Class86F88_3bb8c_j *self, void *arg1)
         } else if (tag == 5) {
             self->unk38 = NULL;
         }
-        Get_vtable_BasicClass()->removeChild(self, arg1);
+        Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)arg1);
     }
 }
 
@@ -386,14 +380,14 @@ void Class86F88__RemoveAllChildren(Class86F88_3bb8c_j *self)
     self->unk34 = NULL;
     self->unk38 = NULL;
     self->unk50 = NULL;
-    Get_vtable_BasicClass()->removeAllChildren(self);
+    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
 void Class86F88__NotifyChild(Class86F88_3bb8c_j *self, void *arg1, s32 arg2)
 {
     s32 tag;
 
-    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
+    Get_vtable_BasicClass()->onNotify((BasicClass *)self, arg1, arg2);
     tag = **(s32 **)arg1 & 0xF;
     if (tag == 2) {
         self->methods->slot5C(self, arg1, arg2);

@@ -30,7 +30,7 @@
 void Unk18Obj__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     s32 tag;
 
-    Get_vtable_BasicClass()->onNotify(self, arg1, arg2);
+    Get_vtable_BasicClass()->onNotify((BasicClass *)self, arg1, arg2);
 
     tag = arg1->methods->header & 0xF;
     if (tag == 5) {

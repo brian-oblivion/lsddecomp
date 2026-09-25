@@ -346,7 +346,7 @@ void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
 {
     s32 count;
 
-    Get_vtable_BasicClass()->ctor(self);
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetTaskObjFMethods();
     count = D_8008AA30;
     D_8008AA30 = count + 1;

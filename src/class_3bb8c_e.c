@@ -1,4 +1,5 @@
 #include "common.h"
+#include "BasicClass.h"
 
 /*
  * class_3bb8c_e (round 14; named round 78, track 3): 19 functions carved
@@ -16,8 +17,8 @@
  * cross-checked it against `gTaskObjFMethods` itself
  * (asm/data/76DC8.data.s): 9 of this unit's 19 functions are LITERAL
  * entries of that table, at the exact offsets this unit had already
- * derived independently for its own `BaseMethods3bb8cE`/`SelfMethods3bb8cE`
- * views --
+ * derived independently for its own `SelfMethods3bb8cE` view (and a base-table
+ * view since replaced by include/BasicClass.h) --
  *   +0x00C finalize          = TaskObjF__Finalize
  *   +0x010 addChild          = TaskObjF__AddChild
  *   +0x014 removeChild       = TaskObjF__RemoveChild
@@ -48,20 +49,7 @@
  * (`_card_info`/`_card_load`/`_card_clear`, `open`/`read`/`close`/`delete`,
  * `format`) behind this class's own retry idiom.
  *
- * The object derives from the same BasicClass framework documented in
- * include/code_8220.h (base vtable fetched via a no-argument getter,
- * Get_vtable_BasicClass()) -- this unit's own independent local view of
- * that same getter.
  */
-typedef struct BaseMethods3bb8cE BaseMethods3bb8cE;
-struct BaseMethods3bb8cE {
-    u8 pad000[0x00C];
-    void (*finalize)(void *self);                 /* +0x00C, TaskObjF__Finalize */
-    void (*addChild)(void *self, void *child);    /* +0x010, TaskObjF__AddChild */
-    void (*removeChild)(void *self, void *child); /* +0x014, TaskObjF__RemoveChild */
-    void (*removeAllChildren)(void *self);        /* +0x018, TaskObjF__RemoveAllChildren */
-};
-extern BaseMethods3bb8cE *Get_vtable_BasicClass(void);
 
 /*
  * A typed child resource attached to a Node3bb8cE. Only the resource's own
@@ -88,7 +76,7 @@ struct Res3bb8cE {
 typedef struct Node3bb8cE Node3bb8cE;
 
 /* The object's OWN vtable, at offset 0 -- distinct from the separately
- * fetched base-class table (`Get_vtable_BasicClass()`, `BaseMethods3bb8cE` above).
+ * fetched base-class table (`Get_vtable_BasicClass()`, include/BasicClass.h).
  * Only the one slot this unit's functions reach is typed. */
 typedef struct SelfMethods3bb8cE SelfMethods3bb8cE;
 struct SelfMethods3bb8cE {
@@ -162,7 +150,7 @@ void TaskObjF__ClearResourceSlots(Node3bb8cE *self)
 
 void TaskObjF__Finalize(Node3bb8cE *self)
 {
-    Get_vtable_BasicClass()->finalize(self);
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
 void TaskObjF__AddChild(Node3bb8cE *self, Res3bb8cE *res)
@@ -172,7 +160,7 @@ void TaskObjF__AddChild(Node3bb8cE *self, Res3bb8cE *res)
     if (res == NULL) {
         return;
     }
-    Get_vtable_BasicClass()->addChild(self, res);
+    Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)res);
     tag = res->methods->header;
     if ((tag & 0xF) == 2) {
         self->res02 = res;
@@ -208,7 +196,7 @@ void TaskObjF__RemoveChild(Node3bb8cE *self, Res3bb8cE *res)
     } else if ((tag & 0xFF) == 0x20) {
         self->res20 = NULL;
     }
-    Get_vtable_BasicClass()->removeChild(self, res);
+    Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)res);
 }
 
 void TaskObjF__RemoveAllChildren(Node3bb8cE *self)
@@ -218,7 +206,7 @@ void TaskObjF__RemoveAllChildren(Node3bb8cE *self)
     self->unk68 = NULL;
     self->res10 = NULL;
     self->res20 = NULL;
-    Get_vtable_BasicClass()->removeAllChildren(self);
+    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
 void TaskObjF__SetCardSlot(Node3bb8cE *self, s32 val)

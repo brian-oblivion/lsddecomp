@@ -483,13 +483,13 @@ dispatch:
 
 void TaskObjF__Notify(TaskObjF *self, void *arg1, s32 arg2) {
     TaskObjFMethods *methods;
-    BasicMethods866E8F *bm;
+    BasicClassMethods *bm;
     s32 tag;
     s32 mask;
 
     methods = self->methods;
     bm = Get_vtable_BasicClass();
-    bm->slot38(self, arg1, arg2);
+    bm->onNotify((BasicClass *)self, arg1, arg2);
 
     tag = **(s32 **)arg1;
     mask = tag & 0xF;

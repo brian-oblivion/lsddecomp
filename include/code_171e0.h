@@ -2,6 +2,7 @@
 #define CODE_171E0_H
 
 #include "common.h"
+#include "BasicClass.h"
 
 /* Method table (25 slots per tools/classtable.py) for the class whose
  * constructor caller is New_Class6D3C8 (src unit code_1677c). Not yet named
@@ -36,20 +37,6 @@ typedef struct Vec3_171e0 {
     s32 z;
 } Vec3_171e0;
 
-/* BasicClass's own table (D_8006B58C-equivalent, returned by Get_vtable_BasicClass,
- * which lives in the still-uncarved code_8220 segment -- see also
- * include/class_16334.h, which independently derived the same two slots
- * from a different unit). Declared again here, under a unit-local name, so
- * this header does not need to include class_16334.h. Only the two slots
- * this unit calls are typed. */
-typedef struct BasicClassMethods171e0 BasicClassMethods171e0;
-struct BasicClassMethods171e0 {
-    /* +0x00 */ s32 header;
-    /* +0x04 */ void *unk04;
-    /* +0x08 */ void *(*ctor)(void *self);
-    /* +0x0C */ void *(*dtor)(void *self);
-};
-extern BasicClassMethods171e0 *Get_vtable_BasicClass(void);
 extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by New_Class6D3C8.md (code_1677c) */
 extern void BMemPMgrFree(void *arg);
 extern s32 strlen(char *s);

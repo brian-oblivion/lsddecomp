@@ -31,7 +31,7 @@
  * a `Get_vtable_Class65650()->slotNN(...)` call from Entity's own functions is a
  * call into a function inherited from the same base as Class65650, not a
  * Class65650-specific call, even though the accessor's name and declared
- * return type come from that unit. `BasicClassMethods` below is Entity's
+ * return type come from that unit. `Class65650MethodsView` below is Entity's
  * OWN minimal, local view of exactly that shared table -- only the slots
  * this unit's functions actually reach through it, independent of (and not
  * editing) `code_55dd4.h`'s own `Class65650Methods` view of the same table.
@@ -49,7 +49,7 @@ typedef struct Unk4CMethods Unk4CMethods;
 typedef struct Unk70Obj Unk70Obj;
 typedef struct Unk70Sub Unk70Sub;
 typedef struct Unk70SubMethods Unk70SubMethods;
-typedef struct BasicClassMethods BasicClassMethods;
+typedef struct Class65650MethodsView Class65650MethodsView;
 typedef struct EntityPos EntityPos;
 typedef struct EntityMoodRow EntityMoodRow;
 typedef struct EntityRegionSlot EntityRegionSlot;
@@ -102,13 +102,15 @@ struct EntityMethods {
     /* +0x180 */ void (*updateSoundCueStop)(Entity *self);                     /* called by Entity__Update */
 };
 
-/* Entity's own local view of the shared "BasicClass" ancestor vtable
- * returned by `Get_vtable_Class65650()` (matched in code_55dd4.c/code_55dd4.h,
- * which owns the canonical `Class65650Methods` view of this SAME table --
- * see the big comment above). Only the offsets this unit's functions reach
- * through it are named; everything else is inherited/not-yet-needed
- * padding, same convention as `Class65650Methods`. */
-struct BasicClassMethods {
+/* Entity's local view of its PARENT's method table, gClass65650Methods,
+ * returned by `Get_vtable_Class65650()` (Entity is class 0x1F234, a
+ * Class65650 [0x234] subclass: `tools/typeviews.py --tree`). The canonical
+ * type is code_55dd4.h's `Class65650Methods`; this view merges into it when
+ * Class65650 is unified (FINISHING-PLAN track 4). It was tagged
+ * `BasicClassMethods` until then, which is BasicClass's table
+ * (include/BasicClass.h), not this one. Only the offsets Entity's functions
+ * reach are named. */
+struct Class65650MethodsView {
     /* +0x000 */ u8 pad00[0x08];
     /* +0x008 */ void *(*ctor)(void *self, s32 arg1, s32 arg2); /* Entity__Entity's base-class construction call */
     /* +0x00C */ void (*dtor)(void *self);                       /* called by Entity__Destructor */
@@ -122,7 +124,7 @@ struct BasicClassMethods {
     /* +0x0E0 */ void (*slotE0)(void *self, s32 arg1, s32 arg2);        /* called by Entity__NotifyReset */
 };
 
-extern BasicClassMethods *Get_vtable_Class65650(void);
+extern Class65650MethodsView *Get_vtable_Class65650(void);
 
 /* An object cached in `Entity::unk100`/`unk104`, unrelated to `EntityMethods`
  * -- its own method table, dispatched through in Entity__Destructor/Entity__GetOrCreateUnk100.

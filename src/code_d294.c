@@ -58,7 +58,7 @@ void *Class6B5CC__Class6B5CC(Class6B5CCObj *self) {
         BMemPMgrFree(self->coord2);
         return NULL;
     }
-    Get_vtable_BasicClass()->ctor(self);
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetClass6B5CCMethods();
     self->unk20 = 0;
     self->unk18 = 0;
@@ -77,11 +77,11 @@ void Class6B5CC__Finalize(Class6B5CCObj *self) {
     sub = self->coord2;
     BMemPMgrFree(sub->param);
     BMemPMgrFree(self->coord2);
-    Get_vtable_BasicClass()->finalize(self);
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
 void Class6B5CC__AddChild(Class6B5CCObj *self, GenericObj_d294 *other) {
-    Get_vtable_BasicClass()->addChild(self, other);
+    Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)other);
     if ((other->methods->header & CLASS_TAG_MASK) == TAG_CLASS6BEA0) {
         Class6B5CC__LinkModel(self, other);
     }
@@ -91,18 +91,18 @@ void Class6B5CC__RemoveChild(Class6B5CCObj *self, GenericObj_d294 *other) {
     if ((other->methods->header & CLASS_TAG_MASK) == TAG_CLASS6BEA0) {
         Class6B5CC__UnlinkModel(self);
     }
-    Get_vtable_BasicClass()->removeChild(self, other);
+    Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)other);
 }
 
 void Class6B5CC__RemoveAllChildren(Class6B5CCObj *self) {
     Class6B5CC__UnlinkModel(self);
-    Get_vtable_BasicClass()->removeAllChildren(self);
+    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
 void Class6B5CC__OnNotify(Class6B5CCObj *self, GenericObj_d294 *other, s32 arg2) {
     s32 tag;
 
-    Get_vtable_BasicClass()->onNotify(self, other, arg2);
+    Get_vtable_BasicClass()->onNotify((BasicClass *)self, other, arg2);
     tag = other->methods->header & CLASS_TAG_MASK;
     if (tag == TAG_PAD) {
         self->methods->slot94(self, other, arg2);
@@ -227,7 +227,7 @@ void Class6B5CC__GetNextAttachedChild(Class6B5CCObj *self, GenericObj_d294 **ent
         if (*entry == NULL) {
             *cursor = self->children;
         }
-        GetNextBasicClass(entry, cursor);
+        GetNextBasicClass((BasicClass **)entry, (BasicClassListNode **)cursor);
         if (*entry != NULL) {
             if ((((*entry)->methods->header) & CLASS_TAG_MASK) == tag) {
                 if ((*entry)->parent == self) {

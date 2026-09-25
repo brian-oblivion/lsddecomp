@@ -87,7 +87,7 @@ void Obj86ED0__Obj86ED0(Obj86ED0 *self, char *arg1, s32 arg2)
     u8 *p;
     s32 count;
 
-    Get_vtable_BasicClass()->ctor(self);
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_Obj86ED0();
     self->nameLen = strlen(arg1);
     self->unk28 = BMemPMgrAlloc(self->nameLen + 4);
@@ -114,7 +114,7 @@ void Obj86ED0__ClearChildRefs(Obj86ED0 *self)
 void Obj86ED0__Finalize(Obj86ED0 *self)
 {
     BMemPMgrFree(self->unk28);
-    Get_vtable_BasicClass()->finalize(self);
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
 void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
@@ -123,7 +123,7 @@ void Obj86ED0__AddChild(Obj86ED0 *self, void *arg1)
     s32 mask;
 
     if (arg1 != NULL) {
-        Get_vtable_BasicClass()->addChild(self, arg1);
+        Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)arg1);
         tag = **(s32 **)arg1;
         mask = tag & 0xF;
         if (mask == 2) {
@@ -147,7 +147,7 @@ void Obj86ED0__RemoveChild(Obj86ED0 *self, void *arg1)
         } else if (mask == 5) {
             self->childType5 = NULL;
         }
-        Get_vtable_BasicClass()->removeChild(self, arg1);
+        Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)arg1);
     }
 }
 
@@ -156,7 +156,7 @@ void Obj86ED0__RemoveAllChildren(Obj86ED0 *self)
     self->childType2 = NULL;
     self->childType5 = NULL;
     self->unk48 = NULL;
-    Get_vtable_BasicClass()->removeAllChildren(self);
+    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
 void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
@@ -164,7 +164,7 @@ void Obj86ED0__Notify(Obj86ED0 *self, void *arg1, s32 arg2)
     s32 tag;
     s32 mask;
 
-    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
+    Get_vtable_BasicClass()->onNotify((BasicClass *)self, arg1, arg2);
 
     tag = **(s32 **)arg1;
     mask = tag & 0xF;

@@ -40,13 +40,13 @@ void *GetClass6D3C8Methods(void) {
 void *DestroyChained(Class6D430 *this) {
     this->freeGuard = 0;
     this->methods->dtor(this);
-    Get_vtable_BasicClass()->dtor(this);
+    Get_vtable_BasicClass()->finalize((BasicClass *)this);
     BMemPMgrFree(this);
     return NULL;
 }
 
 void Class6D430__Class6D430(Class6D430 *this) {
-    Get_vtable_BasicClass()->ctor(this);
+    Get_vtable_BasicClass()->ctor((BasicClass *)this);
     this->methods = (Class6D430Methods *) GetClass6D430Methods();
     this->isOpen = 0;
     this->buffer = NULL;

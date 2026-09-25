@@ -3,71 +3,11 @@
 
 #include "common.h"
 
-/*
- * BasicClass -- the game's hand-rolled base class, root of the class
- * framework (docs/research/class-framework.md). Vtable is D_8006B58C,
- * 14 slots, resolved with `tools/classtable.py D_8006B58C`. Constructed
- * with no arguments beyond `self`; every other class's own constructor
- * dispatches its BASE construction through BasicClass's own ctor slot,
- * per the class-framework doc ("constructors are called through the
- * method table, base-class constructors included").
- *
- * BasicClass maintains two singly-linked lists of OTHER BasicClass
- * objects, built from pool-allocated 8-byte nodes (BasicClassListNode):
- *  - `children` (+0x004): objects added via `addChild`/`removeChild`.
- *    Adding one also registers `self` in the CHILD's own `parentRefs`
- *    list (child->methods->addParentRef(child, self)), so the
- *    relationship is bidirectional -- a child can look back at every
- *    parent holding a reference to it. Confirmed from BasicClass__func_
- *    17f98/17ff0 (addChild/removeChild), which dispatch through the
- *    CHILD's own vtable slots +0x020/+0x024 -- the same slots this
- *    class's own `addParentRef`/`removeParentRef` occupy -- so any
- *    BasicClass-family object can play "child" here.
- *  - `parentRefs` (+0x008): the back-reference list described above,
- *    plain push/remove/clear with no notification callback (unlike
- *    `children`, which fires the child's own vtable slot).
- *
- * List nodes come from the pool allocator (BMemPMgrInit/BMemPMgrAlloc/
- * BMemPMgrFree family; BMemPMgrAlloc and BMemPMgrFree's second
- * "pool" parameter is a fallback used only when a global default pool
- * pointer, gDefaultBMemPMgr, is unset -- established already by
- * include/class_3ac78.h, include/DreamSys.h etc., which all declare
- * both as single-argument).
- */
-typedef struct BasicClass BasicClass;
-typedef struct BasicClassMethods BasicClassMethods;
-typedef struct BasicClassListNode BasicClassListNode;
-
-/* One node of either of BasicClass's two lists. 8 bytes -- the literal
- * allocation size PushBasicClassListNode passes to the pool allocator. */
-struct BasicClassListNode {
-    BasicClassListNode *next;  /* +0x000 */
-    BasicClass *value;          /* +0x004 */
-};
-
-struct BasicClassMethods {
-    /* +0x000 */ s32 header;
-    /* +0x004 */ void *(*release)(BasicClass *self);                              /* BasicClass__Release: virtual finalize, then free self */
-    /* +0x008 */ void (*ctor)(BasicClass *self);                                  /* BasicClass__BasicClass */
-    /* +0x00C */ void (*finalize)(BasicClass *self);                              /* BasicClass__Finalize: notifyParents(1), removeAllChildren(), clearParentRefs() */
-    /* +0x010 */ void (*addChild)(BasicClass *self, BasicClass *child);           /* BasicClass__AddChild */
-    /* +0x014 */ void (*removeChild)(BasicClass *self, BasicClass *child);        /* BasicClass__RemoveChild */
-    /* +0x018 */ void (*removeAllChildren)(BasicClass *self);                     /* BasicClass__RemoveAllChildren */
-    /* +0x01C */ void (*getNextChild)(BasicClass *self, BasicClass **outChild, BasicClassListNode **cursor); /* BasicClass__GetNextChild */
-    /* +0x020 */ s32 (*addParentRef)(BasicClass *self, BasicClass *parent);       /* BasicClass__AddParentRef; tail-calls PushBasicClassListNode, so typed non-void per the one-line-wrapper rule */
-    /* +0x024 */ void (*removeParentRef)(BasicClass *self, BasicClass *parent);   /* BasicClass__RemoveParentRef; tail-calls RemoveBasicClassListNode, which is void (see below) */
-    /* +0x028 */ void (*clearParentRefs)(BasicClass *self);                       /* BasicClass__ClearParentRefs */
-    /* +0x02C */ void (*getNextParentRef)(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__GetNextParentRef */
-    /* +0x030 */ void (*notifyParents)(BasicClass *self, s32 arg1);                  /* BasicClass__NotifyParents; code_8220_b. Walks parentRefs, calling each parent's slot38(parent, self, event). Named round 51, tier A: the EMITTER, not a handler, and not finalize-specific -- `arg1` is a general event code the base only ever sees as 1. */
-    /* +0x034 */ void (*slot34)(void);                                            /* BasicClass__func_18350; empty (`jr $ra; nop`) for the base class, code_8220_b. No name: measured round 51 across all 60 method tables, 58 carry this exact address here and the 2 that differ are not BasicClass-derived, so nothing in the game overrides it and nothing establishes its purpose OR its real signature -- `void (*)(void)` is what the empty base body permits, not what a caller was seen to pass. No accessor anywhere in src/. */
-    /* +0x038 */ void (*slot38)(BasicClass *self, void *arg1, s32 arg2);          /* BasicClass__OnNotify; code_8220_b. Receiving half of +0x030: arg1 is the SENDER, arg2 an event code (base acts only on 1; Class6B5CC__OnNotify/code_d294 and Class65650__OnNotify/code_55dd4 forward to the base then branch on the sender's class tag). PROPOSED RENAME (round 51, tier B): slot38 -> onNotify, arg1 -> sender, arg2 -> event. Cross-unit field, 13 units access it, so the head applies it. */
-};
-
-struct BasicClass {
-    /* +0x000 */ BasicClassMethods *methods;
-    /* +0x004 */ BasicClassListNode *children;
-    /* +0x008 */ BasicClassListNode *parentRefs;
-};
+/* The BasicClass type, its method table and its list primitives are
+ * include/BasicClass.h (FINISHING-PLAN track 4: one header per class).
+ * This header keeps the rest of the code_8220 units' declarations: the
+ * pool allocator, the prim-setup and GTE helpers. */
+#include "BasicClass.h"
 
 /*
  * BMemBlockHdr -- a single free-list node inside a BMemPMgr's pool area.
@@ -160,27 +100,6 @@ extern s32 GetBMemPMgrBusy(void);
  * copy in this header would collide with <malloc.h> in whichever sibling
  * unit includes the SDK header first. See CLAUDE.md, "To include/ has one
  * exception". */
-
-/* BasicClass list primitives, this unit. PushBasicClassListNode/RemoveBasicClassListNode
- * stay INCLUDE_ASM this round; calling into a still-INCLUDE_ASM function
- * in the same or another unit is fine (docs/DECOMPILATION_LEARNINGS.md). */
-extern s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value);  /* push: allocate a node, prepend to *head */
-extern void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value); /* find node by ->value == value, unlink, free; void -- see .md */
-
-/* Matched in code_8220_b, round 13. */
-extern void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor); /* pop *cursor into *outValue (or NULL), advance *cursor */
-extern void FreeBasicClassList(BasicClassListNode **head);                          /* free every node in the list, does not clear *head itself */
-
-/* BasicClass's own method table (BASICCLASS_METHODS), asm/data/57070.data.s.
- * 14 slots per BasicClassMethods, matching Get_vtable_BasicClass (code_8220_b, round
- * 12) which returns its address. */
-/* PROPOSED RENAME (round 51, tier A): BASICCLASS_METHODS, the name
- * docs/research/class-framework.md already uses for it and the same shape as
- * DREAMSYS_METHODS. tools/rename.py refuses it -- its "NEW already appears"
- * guard fires on the six files whose PROSE already calls this symbol
- * BASICCLASS_METHODS -- so the head applies it. */
-extern BasicClassMethods D_8006B58C;
-extern BasicClassMethods *Get_vtable_BasicClass(void);                                 /* returns &D_8006B58C */
 
 /* The "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n" format string,
  * asm/data/A8C.rodata.s. */

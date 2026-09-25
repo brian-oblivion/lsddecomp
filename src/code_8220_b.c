@@ -48,7 +48,7 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event)
     BasicClass *parent;
 
     for (GetNextBasicClass(&parent, &cursor); parent != NULL; GetNextBasicClass(&parent, &cursor)) {
-        parent->methods->slot38(parent, self, event);
+        parent->methods->onNotify(parent, self, event);
     }
 }
 

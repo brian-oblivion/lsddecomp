@@ -2,6 +2,7 @@
 #define CLASS_16334_H
 
 #include "common.h"
+#include "BasicClass.h"
 
 /* Class table at gPadMethods (see tools/classtable.py gPadMethods). 21 slots:
  * header + 14 slots inherited verbatim from BASICCLASS_METHODS (D_8006B58C,
@@ -33,7 +34,7 @@ struct PadMethods {
     /* +0x00 */ s32 header;   /* class-id/flags word; meaning open project-wide (see DECOMPILATION_LEARNINGS.md) */
     /* +0x04 */ void *unk04;  /* == BasicClass__Release, inherited, unused by this unit */
     /* +0x08 */ void (*ctor)(Pad *self, void *arg1, s32 port);
-    /* +0x0C */ void *(*dtor)(Pad *self);
+    /* +0x0C */ void (*dtor)(Pad *self);
     /* +0x10 */ void *unk10;
     /* +0x14 */ void *unk14;
     /* +0x18 */ void *unk18;
@@ -65,17 +66,6 @@ struct Pad {
     /* +0x1C */ u8 unk1C[4];
 };
 
-/* BasicClass's own table (D_8006B58C) -- returned by Get_vtable_BasicClass, which
- * lives in the still-uncarved code_8220 segment. Only the two slots this
- * unit calls are typed here. */
-typedef struct BasicClassMethods {
-    /* +0x00 */ s32 header;
-    /* +0x04 */ void *unk04;
-    /* +0x08 */ void *(*ctor)(void *self);
-    /* +0x0C */ void *(*dtor)(void *self);
-} BasicClassMethods;
-
-extern BasicClassMethods *Get_vtable_BasicClass(void);
 extern void *BMemPMgrAlloc(s32 size);
 
 /* Psy-Q Pad library helpers (asm/psyq_PadInit.s, uncarved). */
@@ -95,7 +85,7 @@ extern Block64 D_80010764;      /* Psy-Q's own default button-mask table (psyq_1
 PadMethods *Get_vtable_Pad(void);
 Pad *New_Pad(void *arg1, s32 port);
 void Pad__Pad(Pad *self, void *arg1, s32 port);
-void *Pad__Destroy(Pad *self);
+void Pad__Destroy(Pad *self);
 void Pad__Init(Pad *self, s32 port);
 u32 Pad__UpdateMasks(Pad *self);
 void Pad__DispatchEvents(Pad *self);

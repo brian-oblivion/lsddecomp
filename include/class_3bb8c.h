@@ -2,6 +2,7 @@
 #define CLASS_3BB8C_H
 
 #include "common.h"
+#include "BasicClass.h"
 
 /*
  * The class whose method table is D_800866E8 (80 slots, resolved with
@@ -2036,41 +2037,6 @@ extern DeviceName866E8 gMcDevicePath0;   /* "bu00:" */
  * BuildMemcardPath is this unit's only caller. */
 extern char *strcat(char *dest, char *src);
 
-/* BasicClass's own method table getter (include/code_8220.h's
- * `Get_vtable_BasicClass`/`BasicClassMethods`, established there from
- * BASICCLASS_METHODS/D_8006B58C -- see that header for slot38's exact
- * signature, `void (*)(BasicClass *self, void *arg1, s32 arg2)`, which
- * this local view matches). Kept as this unit's own independent local
- * view (same policy as Obj866E8Methods vs. class_3ac78's Class866E8Methods
- * above) rather than including code_8220.h, since nothing here needs any
- * OTHER field of BasicClass.
- *
- * Extended round 14 (class_3bb8c_i) to name the ctor/finalize/addChild/
- * removeChild/removeAllChildren slots -- previously opaque pad, now named
- * from that unit's own functions dispatching through them (Obj86ED0__Obj86ED0's
- * base-ctor call, Obj86ED0__Finalize/Obj86ED0__AddChild/Obj86ED0__RemoveChild/Obj86ED0__RemoveAllChildren's
- * explicit `Get_vtable_BasicClass()->slotN(...)` base-class calls). Pure pad-to-
- * field split, same total size, offset of the pre-existing `slot38` is
- * unchanged. `void *self` throughout, matching `slot38`'s existing style. */
-typedef struct BasicMethods866E8F BasicMethods866E8F;
-struct BasicMethods866E8F {
-    u8 pad000[0x008];
-    /* Named round 14 by class_3bb8c_i and round 15 by class_3bb8c_j, from
-     * disjoint call sites that AGREE on every offset and signature -- the
-     * complementary-views case in PARALLEL-RUNS collision rule 1, unioned
-     * here. These are BasicClassMethods' canonical slots
-     * (include/code_8220.h), reached through each unit's own local view of
-     * the same real getter/table. Pure pad-to-field split: same total
-     * size, `slot38`'s offset unchanged. */
-    void (*ctor)(void *self);                    /* +0x008, Obj86ED0__Obj86ED0 (_i) / Class86F88__Class86F88 (_j, STALLED) */
-    void (*finalize)(void *self);                /* +0x00C, Obj86ED0__Finalize (_i) / Class86F88__Finalize (_j) */
-    void (*addChild)(void *self, void *child);   /* +0x010, Obj86ED0__AddChild (_i) / Class86F88__AddChild (_j) */
-    void (*removeChild)(void *self, void *child);/* +0x014, Obj86ED0__RemoveChild (_i) / Class86F88__RemoveChild (_j) */
-    void (*removeAllChildren)(void *self);       /* +0x018, Obj86ED0__RemoveAllChildren (_i) / Class86F88__RemoveAllChildren (_j) */
-    u8 pad01C[0x038 - 0x01C];
-    void (*slot38)(void *self, void *arg1, s32 arg2); /* +0x038, TaskObjF__Notify's first dispatch */
-};
-extern BasicMethods866E8F *Get_vtable_BasicClass(void);
 
 /* ROUND 34: five of the six prototypes that used to sit here were the PSX
  * BIOS file trampolines, and they are Sony's -- `open`/`read`/`lseek`/
@@ -2671,7 +2637,7 @@ extern void StyleTeardown(void);
  * functions. Only the slots this unit's own functions dispatch through
  * SELF (`self->methods->slotN`, as opposed to the explicit
  * `Get_vtable_BasicClass()->slotN` base-table calls, which go through
- * `BasicMethods866E8F` above) are named below; the rest stays opaque
+ * include/BasicClass.h's BasicClassMethods) are named below; the rest stays opaque
  * padding, same policy as `Obj866E8Methods` elsewhere in this header.
  */
 typedef struct Obj86ED0 Obj86ED0;

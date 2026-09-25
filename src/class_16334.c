@@ -15,7 +15,7 @@ fail:
 }
 
 void Pad__Pad(Pad *self, void *arg1, s32 port) {
-    Get_vtable_BasicClass()->ctor(self);
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_Pad();
     if (sPadRefCount++ == 0) {
         PadInit(arg1);
@@ -23,11 +23,11 @@ void Pad__Pad(Pad *self, void *arg1, s32 port) {
     self->methods->init(self, port);
 }
 
-void *Pad__Destroy(Pad *self) {
+void Pad__Destroy(Pad *self) {
     if (--sPadRefCount == 0) {
         PadStop();
     }
-    return Get_vtable_BasicClass()->dtor(self);
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
 void Pad__Init(Pad *self, s32 port) {

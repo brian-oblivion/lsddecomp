@@ -2,6 +2,7 @@
 #define CODE_2CC8C_H
 
 #include "common.h"
+#include "BasicClass.h"
 
 /* Forward typedefs, used by `extern` declarations further up this file
  * than their own struct bodies (round 14, code_2cc8c_e's own local views,
@@ -1572,59 +1573,6 @@ extern IntermediateBaseMethods gIntermediateBaseMethods; /* the table itself, so
                                                 definition (code_2cc8c_c.c)
                                                 can return &gIntermediateBaseMethods */
 
-/*
- * This unit's own local view of the shared BasicClass ancestor table
- * (returned by Get_vtable_BasicClass, a no-argument getter -- same "ctor at
- * +0x008, dtor at +0x00C, self typed void* universally" idiom already
- * established independently in include/class_16334.h, include/code_171e0.h
- * and include/code_d294.h. Declared again here, under a unit-local name,
- * per this project's policy of NOT unifying independent local views of the
- * same table into one shared header. Only the slots this unit's queued
- * functions actually dispatch through are modelled.
- */
-typedef struct BasicClassMethodsCC8C BasicClassMethodsCC8C;
-struct BasicClassMethodsCC8C {
-    u8 pad000[0x008];
-    void (*ctor)(void *self); /* +0x008, IS BasicClass__BasicClass
-                                  (code_8220.c); OBSERVED: IntermediateBase__IntermediateBase */
-    void (*finalize)(void *self); /* +0x00C, IS BasicClass__Finalize
-                                  (code_8220.c, "finalize"); OBSERVED:
-                                  Unk18Obj__Finalize (round 13). Renamed from
-                                  slot0C, round 55 -- exclusive to this unit
-                                  (only code_2cc8c_c.c calls
-                                  Get_vtable_BasicClass() in the code_2cc8c
-                                  family). */
-    void (*addChild)(void *self, void *child); /* +0x010, IS
-                                  BasicClass__AddChild (code_8220.c,
-                                  "addChild"); OBSERVED: Unk18Obj__AddChild
-                                  (round 13). Renamed from slot10, round 55,
-                                  same exclusivity as finalize above. */
-    void (*removeChild)(void *self, void *child); /* +0x014, IS
-                                  BasicClass__RemoveChild (code_8220.c,
-                                  "removeChild"); OBSERVED: Unk18Obj__RemoveChild
-                                  (round 13). Renamed from slot14, round 55,
-                                  same exclusivity as finalize above. */
-    void (*removeAllChildren)(void *self); /* +0x018, Obj86B60__ResetAndRemoveAllChildren's
-                                  forward target. Renamed from slot18, round 55,
-                                  matches the canonical BasicClassMethods'
-                                  own name at this exact offset
-                                  (include/code_8220.h). Same exclusivity as
-                                  finalize above. */
-    u8 pad01C[0x038 - 0x01C];
-    void (*onNotify)(void *self, void *arg1, s32 arg2); /* +0x038, IS
-                                  BasicClass__OnNotify (code_8220_b);
-                                  OBSERVED: Obj86B60__OnNotify. NOT renamed:
-                                  code_2cc8c_d.c's Unk18Obj__OnNotify also
-                                  dispatches through this exact slot (its
-                                  own Get_vtable_BasicClass() call), so this
-                                  field is shared -- PROPOSED (round 55,
-                                  tier A): slot38 -> onNotify, matching
-                                  BasicClassMethods' own canonical name at
-                                  this offset (include/code_8220.h). Head
-                                  applies by type scope. */
-};
-
-extern BasicClassMethodsCC8C *Get_vtable_BasicClass(void);
 
 /*
 /*

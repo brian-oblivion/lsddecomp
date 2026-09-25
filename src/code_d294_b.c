@@ -595,7 +595,7 @@ void Class6B5CC__NotifyTaggedParents(Class6B5CCObj *self, void *node) {
     entry = NULL;
     do {
         do {
-            BasicClass__GetNextParentRef(node, &entry, &cursor);
+            BasicClass__GetNextParentRef(node, (BasicClass **)&entry, (BasicClassListNode **)&cursor);
             if (entry != NULL && (entry->methods->header & 0xF) == 4) {
                 goto found;
             }

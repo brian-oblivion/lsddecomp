@@ -65,7 +65,7 @@ void *GetDefaultStreamTaskInitData(void)
 
 void IntermediateBase__IntermediateBase(Obj86B60 *self)
 {
-    Get_vtable_BasicClass()->ctor(self);
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = (Obj86B60Methods *)Get_vtable_IntermediateBase();
     self->methods->resetCounters(self);
 }
@@ -74,7 +74,7 @@ void Obj86B60__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     s32 header;
 
-    Get_vtable_BasicClass()->onNotify(self, arg1, arg2);
+    Get_vtable_BasicClass()->onNotify((BasicClass *)self, arg1, arg2);
     header = arg1->target->header & 0xF;
     if (header == 1) {
         self->methods->onTag1Notify(self, arg1, arg2);
@@ -234,7 +234,7 @@ void Unk18Obj__Unk18Obj(Unk18Obj *self)
 {
     SubHandleObj *obj;
 
-    Get_vtable_BasicClass()->ctor(self);
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetUnk18ObjMethods();
     self->unkC = 0;
     self->unk10 = 0;
@@ -251,14 +251,14 @@ void Unk18Obj__Finalize(Unk18Obj *self)
     self->methods->slot74(self);
     self->unkAC->methods->release(self->unkAC);
     self->methods->slotA8(self, 0);
-    Get_vtable_BasicClass()->finalize(self);
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
 void Unk18Obj__AddChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
-    Get_vtable_BasicClass()->addChild(self, arg1);
+    Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)arg1);
     header = arg1->methods->header & 0xF;
     if (header == 4) {
         self->unk10 = arg1;
@@ -279,7 +279,7 @@ void Unk18Obj__RemoveChild(Unk18Obj *self, GenericObj *arg1)
     } else if (header == 1) {
         self->unkC = NULL;
     }
-    Get_vtable_BasicClass()->removeChild(self, arg1);
+    Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)arg1);
 }
 
 void Obj86B60__ResetAndRemoveAllChildren(Obj86B60 *self)
@@ -287,5 +287,5 @@ void Obj86B60__ResetAndRemoveAllChildren(Obj86B60 *self)
     self->unk30 = 0;
     self->unk10 = 0;
     self->initArgs = NULL;
-    Get_vtable_BasicClass()->removeAllChildren(self);
+    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }

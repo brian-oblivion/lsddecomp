@@ -19,11 +19,8 @@
 #include "Class6D3C8.h"
 #include "class_16334.h"
 
-/* Local, opaque: code_8220.h can't be included alongside class_16334.h
- * (both define `struct BasicClassMethods`, per this project's
- * multiple-independent-local-views convention -- headercontention.py
- * confirms the two units' local views collide), and nothing here
- * dereferences a BMemPMgr, only passes the pointer through. */
+/* Local, opaque: nothing here dereferences a BMemPMgr (code_8220.h), it
+ * only passes the pointer through. */
 typedef struct BMemPMgr BMemPMgr;
 
 /* Psy-Q libapi (`SetMem`, linked from `libapi/c159`, splat `o` segment).
