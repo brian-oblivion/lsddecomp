@@ -76,4 +76,6 @@ INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020C4C);
 Class6C070 *func_80020C5C(void) {
     return D_8008A83C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020C68);
+void func_80020C68(Class6C070 *obj) {
+    D_8008A83C = obj;
+}
