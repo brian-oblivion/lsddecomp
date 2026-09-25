@@ -247,7 +247,16 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045C94);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045CFC);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045DE0);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045E18);
+/* Hang until +0x4C is nonzero (it is read once). */
+typedef struct Obj45E18 {
+    u8 pad0[0x4C];
+    s32 unk4C;
+} Obj45E18;
+
+void func_80045E18(Obj45E18 *self) {
+    while (self->unk4C == 0) {
+    }
+}
 /* D_8006F614 +0x06C: stores its argument at +0x68. */
 typedef struct Obj6F614 {
     u8 pad0[0x68];
