@@ -22,7 +22,8 @@
 typedef struct D_8006EF50Methods D_8006EF50Methods;
 typedef struct D_8006EF50Obj {
     D_8006EF50Methods *methods; /* +0x000 */
-    u8 pad04[0xC - 0x4];
+    u8 pad04[0x8 - 0x4];
+    BasicClassListNode *parentRefs; /* +0x008, BasicClass's */
     s32 unkC;  /* +0x00C, read by func_8004264C */
     s32 unk10; /* +0x010, set to 1 by func_80042658, cleared by func_80042664, read by func_8004266C */
     s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by func_800425D8 */
@@ -46,6 +47,21 @@ typedef struct ChildArrayObj_322b4 {
     u8 pad00[0x44];
     void *children[1];
 } ChildArrayObj_322b4;
+
+/* Local view of a D_8006EFAC (class id 0x14) object: a Class6B5CC with
+ * three FlatLightObj children at +0x44 and an ambient colour at +0x50. */
+typedef struct D_8006EFACMethods D_8006EFACMethods;
+typedef struct D_8006EFACObj {
+    CLASS6B5CC_FIELDS(D_8006EFACMethods);
+    BasicClass *lights[3]; /* +0x044, New_FlatLightObj(0..2) */
+    SpriteRgb ambient;     /* +0x050, GsSetAmbient's colour >> 4 */
+} D_8006EFACObj;
+struct D_8006EFACMethods {
+    CLASS6B5CC_SLOTS(D_8006EFACObj, (D_8006EFACObj *self));
+    /* +0x0B8 */ BasicClass *(*getChild)(D_8006EFACObj *self, s32 index); /* func_80042828 */
+};
+extern BasicClass *New_FlatLightObj(s32 lightId);
+extern void GsSetAmbient(long r, long g, long b);
 
 /* The method tables the getters below return. */
 extern s32 D_8006EC74[];
@@ -315,7 +331,18 @@ void func_800424E0(D_8006EF50Obj *self, BasicClass *parent) {
     }
     Get_vtable_BasicClass()->removeParentRef((BasicClass *)self, parent);
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042550);
+/* D_8006EF50 slot +0x030 (notifyParents): walk the parent refs with the
+ * cursor at +0x018 (which removeParentRef keeps valid) and pass each the
+ * event through its onNotify. */
+void func_80042550(D_8006EF50Obj *self, s32 event) {
+    BasicClass *parent;
+
+    self->unk18 = self->parentRefs;
+    for (GetNextBasicClass(&parent, &self->unk18); parent != NULL; GetNextBasicClass(&parent, &self->unk18)) {
+        parent->methods->onNotify(parent, self, event);
+    }
+    self->unk18 = NULL;
+}
 /* D_8006EF50 slot +0x040 (reset). */
 void func_800425D8(D_8006EF50Obj *self, s32 a1) {
     self->unkC = a1;
