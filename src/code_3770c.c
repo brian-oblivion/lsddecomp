@@ -120,7 +120,17 @@ INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800472EC);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047388);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800473E4);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800474C8);
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047574);
+void func_80047574(CdStreamObj *self) {
+    CdStreamObj *cur;
+
+    if (self->unk2C == 4) {
+        cur = D_8008A950;
+        if (cur == self) {
+            cur->unk2C = 0;
+            cur->methods->seek(cur, cur->loc);
+        }
+    }
+}
 void func_800475C8(CdStreamObj *self) {
 }
 void func_800475D0(CdStreamObj *self) {
