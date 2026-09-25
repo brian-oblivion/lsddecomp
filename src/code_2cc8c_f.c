@@ -6,9 +6,9 @@
  * screen rectangle's attach, attribute bits, colour, position, size,
  * priority and mask (its allocator, ctor and Reset close code_2cc8c_e).
  *
- * D_8006EB90's class (id 0x11144, below D_8006EC74 and ScreenSprite, NOT
+ * D_8006EB90's class (id 0x11144, below gCharSpriteMethods and ScreenSprite, NOT
  * below BoxFill), from New_Obj6EAC0 to Obj6EAC0__GetDerivedMethods, through
- * include/code_2cc8c.h's `Obj6EAC0` view: a row of D_8006EC74 character
+ * include/code_2cc8c.h's `Obj6EAC0` view: a row of gCharSpriteMethods character
  * cells (tier B; that view's banner).
  *
  * Then `DecodeFullWidthSjis`/`EncodeFullWidthSjis`/`FormatFullWidthNumber`,
@@ -118,7 +118,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
-    ((void (*)(Obj6EAC0 *, s32, s32))Get_vtable_D8006EC74()->slot08)(self, a1, 0x20);
+    ((void (*)(Obj6EAC0 *, s32, s32))GetCharSpriteMethods()->slot08)(self, a1, 0x20);
     self->methods = Obj6EAC0__GetDerivedMethods();
     self->totalChildCount = a2;
     self->childCount = a2;
@@ -130,7 +130,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
         i = 0;
         if (i < a2) {
             do {
-                *cursor = New_D8006EC74(a1, 0x20);
+                *cursor = New_CharSprite(a1, 0x20);
                 i++;
                 cursor++;
             } while (i < a2);
@@ -142,7 +142,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
 void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->children, self->totalChildCount);
     self->children = BMemPMgrFree(self->children);
-    Get_vtable_D8006EC74()->slot0C(self);
+    GetCharSpriteMethods()->slot0C(self);
 }
 
 void Obj6EAC0__FinishConstruct(Obj6EAC0 *self, s32 a1) {
@@ -158,7 +158,7 @@ void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     if (self->hasChildren != 0) {
         return;
     }
-    Get_vtable_D8006EC74()->slot4C(self, a1, a2);
+    GetCharSpriteMethods()->slot4C(self, a1, a2);
     buf = *a2;
     elemp = self->children + self->childStart;
     i = self->childStart;
@@ -195,7 +195,7 @@ void func_80040C00(Obj6EAC0 *self) {
                 } while (i < bound + self->childCount);
             }
         }
-        Get_vtable_D8006EC74()->slot50(self);
+        GetCharSpriteMethods()->slot50(self);
     }
 }
 
@@ -242,7 +242,7 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
         s32 bound;
         Obj6EAC0 **elemp;
 
-        Get_vtable_D8006EC74()->slotBC(self, a1);
+        GetCharSpriteMethods()->slotBC(self, a1);
         buf = *a1;
         i = 0;
         elemp = self->children;

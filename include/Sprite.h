@@ -11,7 +11,7 @@
  * screen-space for 0x144 (ScreenSprite and below), otherwise world-space,
  * projected from the inherited coordinate. Methods in src/code_322b4.c; four
  * classes derive from it (`typeviews.py --tree`): ScreenSprite (0x144, the
- * screen-space sprite, include/ScreenSprite.h), D_8006EC74 (0x1144, one 8x8
+ * screen-space sprite, include/ScreenSprite.h), CharSprite (0x1144, one 8x8
  * cell of a 32-wide grid), D_8006EB90 (0x11144) and D_800879C4 (0x1F44,
  * class_3bb8c_p/q/t).
  *
@@ -55,7 +55,7 @@ struct SpriteRgb {
 
 /* A texture cell: 16-bit origin in the texture page, 32-bit extent. The
  * ctor's `rect`, copied to `rect` by reset; D_80087A8C (D800879C4's two
- * cells) and D_8006ED40 (D_8006EC74's 8x8 cell origin) are these. */
+ * cells) and D_8006ED40 (CharSprite's 8x8 cell origin) are these. */
 struct SpriteRect {
     /* +0x000 */ u16 u;
     /* +0x002 */ u16 v;

@@ -6,7 +6,7 @@
 
 Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006EC74 and gScreenSpriteMethods slot +0x04C (attachToParent override).
+- **Where:** gCharSpriteMethods and gScreenSpriteMethods slot +0x04C (attachToParent override).
 - **What:** if `parent` (+0x00C) is still NULL, calls Sprite's attachToParent (`GetSpriteMethods()->attachToParent`, i.e. the inherited Class6B5CC one) with the zero offset `gVec3Zero` (three zero words in .data), then calls the object's own slot +0x0BC (ScreenSprite__SetPosition) with the caller's third argument. No return value is produced on the skip path (`$v0` holds the loaded parent), so it is written `void` although the Class6B5CC slot type returns a pointer.
 - **Result:** byte-exact, 32/32 words, 0 ins / 0 del, whole-image SHA1 green. First build.
 - **Types:** self is the unit-local `SpriteView_322b4` (it gained `setPosition` at +0x0BC in its local method view, and `parent` at +0x00C typed `Class6B5CC *`, the field Class6B5CC.h documents at that offset); the base call casts to `Sprite *`. `extern Vec3_d294 gVec3Zero;` in the unit. No shared header touched.
@@ -16,7 +16,7 @@ Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fre
 ```c
 #include "ScreenSprite.h"
 
-/* D_8006EC74 and gScreenSpriteMethods slot +0x04C (attachToParent): when not yet
+/* gCharSpriteMethods and gScreenSpriteMethods slot +0x04C (attachToParent): when not yet
  * attached, attach through Sprite's with a zero offset, then hand the
  * caller's third argument to slot +0x0BC. */
 void ScreenSprite__AttachToParent(ScreenSprite *self, Class6B5CC *parent, ScreenSpritePos *pos) {

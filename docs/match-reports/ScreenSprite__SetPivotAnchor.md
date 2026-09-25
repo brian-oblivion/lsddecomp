@@ -6,7 +6,7 @@
 
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
-- **Where:** D_8006EC74 and gScreenSpriteMethods slot +0x0C0 (`tools/classtable.py`).
+- **Where:** gCharSpriteMethods and gScreenSpriteMethods slot +0x0C0 (`tools/classtable.py`).
 - **What:** When `parent` (+0x00C) is set, a five-case switch (owns jtbl_80011290) moves the GsSPRITE pivot: 0 = (w/2, h/2), 1 = mx 0, 2 = mx w, 3 = my 0, 4 = my h. Unsigned anchor (`sltiu`).
 - **Result:** byte-exact; 32/32 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** typed through the UNIFIED `Sprite` (sprite.w/h/mx/my), unchanged.
@@ -16,7 +16,7 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 ```c
 #include "ScreenSprite.h"
 
-/* D_8006EC74 and gScreenSpriteMethods slot +0x0C0: when attached, move the sprite's
+/* gCharSpriteMethods and gScreenSpriteMethods slot +0x0C0: when attached, move the sprite's
  * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
 void ScreenSprite__SetPivotAnchor(ScreenSprite *self, u32 anchor) {
     if (self->parent != NULL) {

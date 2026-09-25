@@ -12,7 +12,7 @@ object stashed on `self` (`unk48`, `unk44`, `unk40`).
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern ChildObj86ED0 *func_8003B39C(char *path);
 extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
-extern ChildObj86ED0 *New_D8006EC74(ChildObj86ED0 *arg0, s32 arg1);
+extern ChildObj86ED0 *New_CharSprite(ChildObj86ED0 *arg0, s32 arg1);
 
 extern const char sStrComInput[]; /* "COMINPUT" */
 extern const char sStrFontIcon[]; /* "FONTICON" */
@@ -51,7 +51,7 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
     handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = New_Obj6EAC0(handle2, self->unk10, self->unk28);
-    self->unk40 = New_D8006EC74(handle2, 0x5F);
+    self->unk40 = New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
     self->unk44->methods->slotB8(self->unk44, (void *)&D_8008AAC8);
@@ -98,11 +98,11 @@ what may well be the same underlying vtable.
 `self->unk44 = New_Obj6EAC0(...)` is an implicit-conversion assignment
 (`FieldM7C *` into `ChildObj86ED0 *`) -- a harmless warning under this
 project's `-Wall`-without-`-Werror` build, not a compile error, and zero
-bytes of cost (pointer reinterpretation is free). `New_D8006EC74` and
+bytes of cost (pointer reinterpretation is free). `New_CharSprite` and
 `New_ScreenSprite` are NOT reachable from any header this unit includes, so
 they got fresh local `extern` declarations here, typed purely from this
 call site's own register usage (same convention as `DecodeFullWidthSjis` above
-in this file) -- and diverge from `New_D8006EC74`'s OTHER call-site typing
+in this file) -- and diverge from `New_CharSprite`'s OTHER call-site typing
 in `code_2cc8c.h` (`(s32, s32)`), which is expected and fine.
 
 ## The one real residue: register identity from live-range shape, not code shape

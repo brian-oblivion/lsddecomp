@@ -20,11 +20,11 @@
  *    (-70, -60) and (-100, -60) (D_8008AA94, D_8008AAF8), percentages.
  *
  * The ctor chains to Sprite's first (GetSpriteMethods()->ctor with abr 0 and
- * a NULL fourth argument), and D_8006EC74's ctor chains to this one, so the
+ * a NULL fourth argument), and CharSprite's ctor chains to this one, so the
  * id tree (0x44 -> 0x144 -> 0x1144) is the ctor chain. Two classes derive
- * from it (`typeviews.py --tree`): D_8006EC74 (0x1144, one 8x8 cell of a
+ * from it (`typeviews.py --tree`): CharSprite (0x1144, one 8x8 cell of a
  * 32-wide grid, own fields from +0x0A8) and D_8006EB90 (0x11144, below
- * D_8006EC74). Their views are their own (src/code_322b4.c,
+ * CharSprite). Their views are their own (src/code_322b4.c,
  * include/code_2cc8c.h); they do not expand these macros yet.
  *
  * Not settled here: the ctor occupant returns nothing where the slot, from
@@ -58,7 +58,7 @@ struct ScreenSpritePos {
 
 #define SCREENSPRITE_FIELDS(Methods)                                                               \
     SPRITE_FIELDS(Methods);                                                                        \
-    /* +0x0A0 */ ScreenSpritePos screenPos /* setPosition; Viewport__DrawNode places the sprite from it. The object is 0xA8 bytes (New_ScreenSprite): D_8006EC74's own fields start at +0x0A8 */
+    /* +0x0A0 */ ScreenSpritePos screenPos /* setPosition; Viewport__DrawNode places the sprite from it. The object is 0xA8 bytes (New_ScreenSprite): CharSprite's own fields start at +0x0A8 */
 
 struct ScreenSpriteMethods {
     SCREENSPRITE_SLOTS(ScreenSprite, (ScreenSprite *self, void *texture, SpriteRect *rect, s32 arg3));

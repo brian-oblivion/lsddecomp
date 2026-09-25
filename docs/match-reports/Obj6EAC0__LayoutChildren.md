@@ -15,7 +15,7 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
         s32 bound;
         Obj6EAC0 **elemp;
 
-        Get_vtable_D8006EC74()->slotBC(self, a1);
+        GetCharSpriteMethods()->slotBC(self, a1);
         buf = *a1;
         i = 0;
         elemp = self->unkB4;

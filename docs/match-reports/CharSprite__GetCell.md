@@ -1,10 +1,12 @@
-# D8006EC74__GetCell -- MATCHED (5/5 words), round 82
+# CharSprite__GetCell -- MATCHED (5/5 words), round 82
+
+> Renamed from `D8006EC74__GetCell` on 2026-09-26 (tools/rename.py). Address 0x80041c28.
 
 > Renamed from `func_80041C28` on 2026-09-25 (tools/rename.py). Address 0x80041c28.
 
 Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** D_8006EC74 slot +0x0C8 (`tools/classtable.py`).
+- **Where:** gCharSpriteMethods slot +0x0C8 (`tools/classtable.py`).
 - **What:** Returns the byte at +0x0A8. Retail opens and closes a 0x10-byte frame around a single `lbu`.
 - **Result:** byte-exact; 5/5 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK).
 - **Types:** local views and `extern s32 D_XXXXXXXX[];` table declarations live in the unit; no shared header was touched.
@@ -16,8 +18,8 @@ The frame comes from an UNUSED local `u8 pad[16];`. Measured: deleting that line
 ## Source
 
 ```c
-/* D_8006EC74 slot +0x0C8: read the byte at +0x0A8. */
-u8 D8006EC74__GetCell(D_8006EC74Obj *self) {
+/* gCharSpriteMethods slot +0x0C8: read the byte at +0x0A8. */
+u8 CharSprite__GetCell(D_8006EC74Obj *self) {
     u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
 
     return self->cellIndex;

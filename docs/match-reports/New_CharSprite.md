@@ -1,31 +1,33 @@
-# New_D8006EC74 -- MATCHED (27/27 words), round 82
+# New_CharSprite -- MATCHED (27/27 words), round 82
+
+> Renamed from `New_D8006EC74` on 2026-09-26 (tools/rename.py). Address 0x80041ab4.
 
 > Renamed from `func_80041AB4` on 2026-09-25 (tools/rename.py). Address 0x80041ab4.
 
 Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior attempt.
 
-- **Where:** not in any method table (allocator for D_8006EC74, the 8x8-cell sprite). Called from class_3bb8c_i.c (`New_D8006EC74(handle2, 0x5F)`) and code_2cc8c_f.c (`New_D8006EC74(a1, 0x20)`).
-- **What:** `BMemPMgrAlloc(0xAC)`; if non-NULL, calls slot +0x008 (ctor, D8006EC74__D8006EC74) of `Get_vtable_D8006EC74()` (the D_8006EC74 table) with `(obj, texture, cell)` and returns obj, else NULL.
+- **Where:** not in any method table (allocator for CharSprite, the 8x8-cell sprite). Called from class_3bb8c_i.c (`New_CharSprite(handle2, 0x5F)`) and code_2cc8c_f.c (`New_CharSprite(a1, 0x20)`).
+- **What:** `BMemPMgrAlloc(0xAC)`; if non-NULL, calls slot +0x008 (ctor, CharSprite__CharSprite) of `GetCharSpriteMethods()` (the gCharSpriteMethods table) with `(obj, texture, cell)` and returns obj, else NULL.
 - **Result:** byte-exact, 27/27 words, 0 ins / 0 del, whole-image SHA1 green. Third build.
 - **Levers, measured:**
   - `s32 cell` param: 24/27, equal length; the prologue's `li a0,0xAC` moved from before `sw s2 / move s2,a1` to after them (3 positional diffs, words 3-5). Same with `u32 cell`.
   - `u8 cell` param: 27/27. The `andi a2,s2,0xFF` in the jalr delay slot is the u8 PARAMETER being narrowed at its use, not a conversion into the callee's prototype; the declared parameter type is what reorders the prologue.
-- **Types:** unit-local `CellCtorMethods_322b4` (ctor at +0x008 taking `(self, texture, u8 cell)`) and a prototype for `Get_vtable_D8006EC74`; no shared header touched. Callers elsewhere declare it `(s32, s32)` / `(ChildObj86ED0 *, s32)` locally; both are call-compatible and untouched.
+- **Types:** unit-local `CellCtorMethods_322b4` (ctor at +0x008 taking `(self, texture, u8 cell)`) and a prototype for `GetCharSpriteMethods`; no shared header touched. Callers elsewhere declare it `(s32, s32)` / `(ChildObj86ED0 *, s32)` locally; both are call-compatible and untouched.
 
 ## Source
 
 ```c
-void *Get_vtable_D8006EC74(void);
+void *GetCharSpriteMethods(void);
 typedef struct CellCtorMethods_322b4 {
     u8 pad00[0x8];
-    void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = D8006EC74__D8006EC74 */
+    void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = CharSprite__CharSprite */
 } CellCtorMethods_322b4;
 
-void *New_D8006EC74(void *texture, u8 cell) {
+void *New_CharSprite(void *texture, u8 cell) {
     void *obj = BMemPMgrAlloc(0xAC);
 
     if (obj != NULL) {
-        ((CellCtorMethods_322b4 *)Get_vtable_D8006EC74())->ctor(obj, texture, cell);
+        ((CellCtorMethods_322b4 *)GetCharSpriteMethods())->ctor(obj, texture, cell);
         return obj;
     }
     return NULL;
