@@ -71,3 +71,7 @@ between `DispatchObjO` (this function's `self`) and `BaseObjO`, since
 nothing in this unit calls `func_80057320` to test that relationship.
 Kept `DispatchObjO` (this unit's own type for this unresolved class) as
 the prefix rather than guessing `BaseObjO`.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `DispatchObjO__func_57320`. Override of +0x09C (Class6B5CC's dispatchLinkCommand), named for its slot: routes by the sender's class byte, 0x34 (an Actor) to onActorLinkCommand (+0x0DC), 0x24 (Class86AA0) to onClass86AA0LinkCommand (+0x0E0). The C now passes (self, sender, event) to both explicitly; the old view passed self alone and relied on $a1/$a2 being untouched, which they are (same bytes). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

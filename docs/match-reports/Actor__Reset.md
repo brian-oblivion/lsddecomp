@@ -38,3 +38,7 @@ game -- `unk48`/`unk54` are left unrenamed. `Actor__NotifyMove` reads
 both fields together (adding/subtracting `unk54` from `unk48` depending on
 sign) which is suggestive of a paired value/adjustment relationship, but
 not strong enough evidence for a purpose-asserting name like "heading".
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `BaseObjO__InitDefaults`. Override of +0x040 (Class6B5CC's reset, which the ctor calls last), named for its slot: lastOffsetValue = 300, pendingExtra = 0. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

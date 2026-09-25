@@ -58,3 +58,7 @@ buffer to `self`'s own `addVec14` slot (`Actor__AddTranslation`, a
 self-referential virtual dispatch to a function this same unit defines).
 "Apply a rotated vector" is exactly the composition of "rotate" then
 "add".
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `BaseObjO__ApplyRotatedVec14`. Occupant of +0x0C0: Class6B5CC__RotateLocalVector rotates the s16 local vector by the object's orientation, then addTranslation (+0x0BC) adds the result. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

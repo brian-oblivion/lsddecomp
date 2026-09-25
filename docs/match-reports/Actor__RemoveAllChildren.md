@@ -41,3 +41,7 @@ unconditionally clears BOTH companion fields (no tag check, unlike
 `slot18`. `slot18` has no other established occupant name in any sibling
 header (`code_55dd4.h` still calls the field `unk18`), so this name is
 this unit's own contribution.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `BaseObjO__ClearCompanions`. Override of +0x018 (removeAllChildren), named for its slot: clears both companions, then chains Class6B5CC's. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

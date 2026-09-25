@@ -36,3 +36,7 @@ None -- see `Actor__UpdateTranslation`'s report for the real work.
 `Actor__UpdateTranslation(self, 0, arg1)` -- the flag literal `0` selects the
 accumulate (`vec18.x += v->x` etc.) branch, so "Add" is exactly what this
 wrapper causes to happen; mirrors `Actor__SetTranslation`'s naming logic.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `BaseObjO__AddVec14`. Occupant of +0x0BC: Actor__UpdateTranslation(self, 0, v), i.e. coord2->coord.t += v. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -44,3 +44,7 @@ conditional second dispatch.
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py Actor__OnClass86AA0LinkCommand   # 22/22
 ```
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `DreamSys__DispatchLinkCommand`. Occupant of +0x0E0, which Actor__DispatchLinkCommand calls for a 0x24 (Class86AA0) sender; DreamSys overrides it as DreamSys__WallLink, Entity as Entity__NotifyReset. Body: chain Class6B5CC's dispatchLinkCommand. The old name also collided with the +0x09C slot's. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -65,3 +65,7 @@ and a literal mode value `6`, and no occupant of `slotC4` anywhere in the
 codebase has an established purpose either (`Entity.h`'s own comment on
 this exact slot only documents a MUST-STAY-`void` return-type constraint,
 not what the slot means). Kept the tier-C `Class__func_xxxxx` form.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `BaseObjO__func_5748c`. Occupant of +0x0C4: Actor__MoveAlongLocalAxis(self, &D_8008ABA8, val, notify, 6). D_8008ABA4 is an s16 vector passed whole to addLocalTranslation (RotateLocalVector reads src[0..2]), so ABA4/ABA6/ABA8 are x/y/z and this is the z move. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

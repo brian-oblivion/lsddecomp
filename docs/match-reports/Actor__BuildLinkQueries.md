@@ -371,3 +371,7 @@ by whoever owns that header: both calls take `(this, pos)`.
 tools/funcdiff.py Actor__BuildLinkQueries   # 116/116, insertions 0 / deletions 0
 tools/check-nonmatching.sh # OK: 45 NON_MATCHING bodies in 15 units
 ```
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `DreamSys__BuildLinkQueries`. Helper of Actor__FindNearbyLink; `self->linkMgr` is now `self->grid` (cast to the DreamSysUnk4CObj view). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

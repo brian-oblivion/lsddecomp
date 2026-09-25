@@ -75,3 +75,7 @@ and an unrenamed Psy-Q object, `func_80020510`), but nothing establishes
 WHAT this accomplishes -- `arg0` is discarded by every known caller, and
 `class_3bb8c_s.c`'s own comment calls it merely "ctor-shaped" as a guess,
 not a finding. Kept the tier-C `Class__func_xxxxx` form.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Actor (it calls getSetUnk10Flag8, +0x080, through its table; the s32 result is cast to the void * func_80020510 takes). Still tier C. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

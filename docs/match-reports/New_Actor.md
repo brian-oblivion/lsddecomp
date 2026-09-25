@@ -67,3 +67,7 @@ argument, which only makes sense if that slot resolves to
 `GetActorMethods`'s declared return type, `BaseObjOMethods *` here (this
 unit's own reading of the SAME table `code_55dd4.h` calls
 `D800878D4Methods`).
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `New_BaseObjO`. BMemPMgrAlloc(0x58) then the table's ctor: the allocator, and the source of the class size 0x58. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -112,3 +112,7 @@ list -- one may go through a shared/base table fetched via a getter
 function, and a superficially identical sibling call may instead go
 through the object's OWN `self->vt`. They can resolve to the same function
 today (inherited, unoverridden) while being byte-different call shapes.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `DreamSys__DispatchLinkCommandAndTryAttach`. Occupant of +0x0DC, which Actor__DispatchLinkCommand (+0x09C) calls when the SENDER's class byte is 0x34 (an Actor); DreamSys overrides it as DreamSys__DispatchInstanceEffect (testing for an Entity, 0x1F234) and Entity as Entity__NotifyLinkStage. Body: chain Class6B5CC's dispatchLinkCommand, then tryAttachNearby for events 5..8 -- called through a function-pointer cast with (self, sender, event), since Class6B5CC's slot declares self alone and both arguments are reloaded after the base call. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

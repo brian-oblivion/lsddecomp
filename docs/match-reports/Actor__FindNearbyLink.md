@@ -146,3 +146,7 @@ satisfies the addresses immediately adjacent to it, then look for a
 second, separately-declared gap to satisfy what remains. Guessing a
 single combined size change to satisfy both trades one correct offset
 for another.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `DreamSys__FindNearbyLink`. Reached only from Actor__MoveOrFindNearbyLink (base slots +0x0D0/+0x0D4), so the method is Actor's. Accessors now: grid (+0x04C, the Class866E8 child; cast to DreamSys.h's DreamSysUnk4CObj view for queryLinkAtPos), &coord2->tx, linkTarget, addTranslation, notifyIfUnk20Active (-1 found, -2 not). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

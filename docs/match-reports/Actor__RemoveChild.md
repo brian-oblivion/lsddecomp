@@ -58,3 +58,7 @@ site, not just the ones where `self` happens to still be resident.
 tag rule and CLEARS the matching companion field instead of setting it --
 the "unlink" half of the pair, matched in ROM order right after `slot10`'s
 occupant.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `BaseObjO__UnlinkCompanion`. Override of +0x014 (removeChild), named for its slot: clears `grid`/`ticker` by the same class-id tests, then chains Class6B5CC's removeChild. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

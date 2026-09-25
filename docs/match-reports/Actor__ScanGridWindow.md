@@ -103,3 +103,7 @@ VALUE in a register, even with nothing between the uses that could
 invalidate the cache. When a residue looks like a spurious extra
 register tied to a value used more than once, try the un-cached,
 re-dereferenced form before assuming a call is required to trigger it.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `DreamSys__ScanGridWindow`. Helper of Actor__ScanLinkCandidates (self unused). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -109,3 +109,7 @@ own local views (`DreamSys.h`, `code_55dd4.h`), (3) `code_55dd4.c`'s real
 through `base->ctor(self)` to chain to it first, then immediately
 overwrites `self->methods` with `Class65650`'s own, more specific table --
 i.e. `Class65650` derives from this class, it is not this class.
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `BaseObjO__BaseObjO`. Occupant of +0x008 in gActorMethods: the ctor, named for its slot. Chains Class6B5CC's ctor, zeroes state/grid/ticker, calls reset. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -34,3 +34,7 @@ this setter's own mechanics are unambiguous.
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 tools/funcdiff.py Actor__SetPendingExtra   # 2/2
 ```
+
+## Track 4 (2026-09-25, round 82, delta)
+
+Renamed from `DreamSys__SetPendingExtra`. Occupant of +0x0EC: pendingExtra (+0x054) = extra. The parameter is s32 now: Actor__NotifyMove adds the field to an s16 (Class876FC overrides the slot with Class876FC__Update). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a Class6B5CC subclass and the base of Class65650/Entity, DreamSys and Class876FC. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
