@@ -9,7 +9,7 @@ Byte-exact on the second build; whole-image SHA1 green, funcdiff 46/46.
 
 Random pick of one of five records in the block `GetVariantBlock(index)`
 (record 4 of the group): `r = rand % 5`; for group 9, r 2 becomes 3 and an
-override D_8008A968 of 3 becomes 4. Returns `&rec[D_8008A968 - 1]` when the
+override gForcedVariant of 3 becomes 4. Returns `&rec[gForcedVariant - 1]` when the
 override is set, else `&rec[r]`.
 
 ## Source
@@ -23,12 +23,12 @@ Rec1C *PickVariant(s32 index) {
         if (r == 2) {
             r = 3;
         }
-        if (D_8008A968 == 3) {
-            D_8008A968 = 4;
+        if (gForcedVariant == 3) {
+            gForcedVariant = 4;
         }
     }
     rec = GetVariantBlock(index);
-    return &rec[D_8008A968 != 0 ? D_8008A968 - 1 : r];
+    return &rec[gForcedVariant != 0 ? gForcedVariant - 1 : r];
 }
 ```
 

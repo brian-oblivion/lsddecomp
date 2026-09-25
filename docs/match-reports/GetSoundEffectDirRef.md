@@ -7,7 +7,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot.
-- **What:** returns the ADDRESS of sdata word `D_8008A96C` (which holds a pointer to the string "SND\\SE" at D_8008A970). An address-take of an sdata symbol stays absolute lui/addiu, per the gp_rel rule.
+- **What:** returns the ADDRESS of sdata word `gSoundEffectDirPtr` (which holds a pointer to the string "SND\\SE" at D_8008A970). An address-take of an sdata symbol stays absolute lui/addiu, per the gp_rel rule.
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -15,6 +15,6 @@ the first build; whole-image SHA1 green.
 
 ```c
 char **GetSoundEffectDirRef(void) {
-    return &D_8008A96C;
+    return &gSoundEffectDirPtr;
 }
 ```

@@ -39,7 +39,7 @@ struct D_80081940Obj {
     /* +0x038 */ s32 unk38;
 };
 
-/* One 0x1C-byte record of the table GetRecordTable returns (D_80081A04,
+/* One 0x1C-byte record of the table GetRecordTable returns (gRecordTable,
  * 0x230 records); only its size is known here. */
 typedef struct Rec1C {
     u8 data[0x1C];
@@ -163,14 +163,14 @@ void DataSrc39094__ReleaseDataBlock(D_80081940Obj *self) {
 }
 extern u8 D_80081940[];   /* method table, 34 slots */
 extern s32 D_8008A960;
-extern s32 D_8008A964;
-extern s32 D_8008A968;
-extern u8 D_800819CC[];
-extern u8 D_80081A04[];
-extern char *D_8008A96C;  /* -> "SND\\SE" */
-extern const char D_800113DC[];
-extern s16 D_80086170[];
-extern s16 D_800819E8[];
+extern s32 gForcedWeeklyGroup;
+extern s32 gForcedVariant;
+extern u8 gWeeklyGroupTable[];
+extern u8 gRecordTable[];
+extern char *gSoundEffectDirPtr;  /* -> "SND\\SE" */
+extern const char sAsmkStreamPath[];
+extern s16 gStreamTypeToGroupTable[];
+extern s16 gRecordIndexTable[];
 
 /* slot +0x088 of D_80081940 */
 void DataSrc39094__SetAutoLoadData(D_80081940Obj *self, s32 value) {
@@ -190,28 +190,28 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
 }
 void SetPickOverrides(s32 a, s32 b) {
     if (a >= 0) {
-        D_8008A964 = a;
+        gForcedWeeklyGroup = a;
     }
     if (b >= 0) {
-        D_8008A968 = b;
+        gForcedVariant = b;
     }
 }
 void *GetRecordTable(s32 *out) {
     if (out != NULL) {
         *out = 0x230;
     }
-    return D_80081A04;
+    return gRecordTable;
 }
 void *GetWeeklyGroupTable(void) {
-    return D_800819CC;
+    return gWeeklyGroupTable;
 }
 s32 PickWeeklyGroup(s32 arg) {
     u32 r = (u32)SeedAndRandom(0, arg) % 7;
     s32 *table = GetWeeklyGroupTable();
     s32 *entry;
     s32 index;
-    if (D_8008A964 != 0) {
-        index = D_8008A964 - 1;
+    if (gForcedWeeklyGroup != 0) {
+        index = gForcedWeeklyGroup - 1;
         entry = &table[index];
     } else {
         entry = &table[r];
@@ -219,13 +219,13 @@ s32 PickWeeklyGroup(s32 arg) {
     return *entry;
 }
 char **GetSoundEffectDirRef(void) {
-    return &D_8008A96C;
+    return &gSoundEffectDirPtr;
 }
 char *GetSoundEffectDir(void) {
     return *GetSoundEffectDirRef();
 }
 Rec1C *GetRecordGroup(s32 index) {
-    return &((Rec1C *)GetRecordTable(NULL))[D_800819E8[index]];
+    return &((Rec1C *)GetRecordTable(NULL))[gRecordIndexTable[index]];
 }
 
 Rec1C *GetRecordGroupAlias(s32 index) {
@@ -247,12 +247,12 @@ Rec1C *PickVariant(s32 index) {
         if (r == 2) {
             r = 3;
         }
-        if (D_8008A968 == 3) {
-            D_8008A968 = 4;
+        if (gForcedVariant == 3) {
+            gForcedVariant = 4;
         }
     }
     rec = GetVariantBlock(index);
-    return &rec[D_8008A968 != 0 ? D_8008A968 - 1 : r];
+    return &rec[gForcedVariant != 0 ? gForcedVariant - 1 : r];
 }
 Rec1C *GetGridRecordBase(s32 index) {
     return &GetRecordGroup(index)[9];
@@ -267,7 +267,7 @@ const char *GetIntroStreamName(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
         *typeCodeOut = 0x31;
     }
-    return D_800113DC;
+    return sAsmkStreamPath;
 }
 Rec1C *GetWeeklyStreamPool(s32 *countOut) {
     if (countOut != NULL) {
@@ -339,7 +339,7 @@ Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
     return GetStreamPool3Channel(countOut, pick.sub);
 }
 s32 GetStreamGroupForType(s32 index) {
-    return D_80086170[index];
+    return gStreamTypeToGroupTable[index];
 }
 Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
     s32 count;
@@ -351,7 +351,7 @@ Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
     start = count;
     len += start;
     for (i = start; i < len; i++) {
-        *total += D_80086170[i] + 10;
+        *total += gStreamTypeToGroupTable[i] + 10;
     }
     *total -= 10;
     return rec;

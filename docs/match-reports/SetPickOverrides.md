@@ -7,7 +7,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot.
-- **What:** two independent guarded stores: `if (a >= 0) D_8008A964 = a; if (b >= 0) D_8008A968 = b;` (the `bltz` pair; both globals are sdata, stored via `%gp_rel`).
+- **What:** two independent guarded stores: `if (a >= 0) gForcedWeeklyGroup = a; if (b >= 0) gForcedVariant = b;` (the `bltz` pair; both globals are sdata, stored via `%gp_rel`).
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -16,10 +16,10 @@ the first build; whole-image SHA1 green.
 ```c
 void SetPickOverrides(s32 a, s32 b) {
     if (a >= 0) {
-        D_8008A964 = a;
+        gForcedWeeklyGroup = a;
     }
     if (b >= 0) {
-        D_8008A968 = b;
+        gForcedVariant = b;
     }
 }
 ```

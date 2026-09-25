@@ -7,7 +7,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot.
-- **What:** `return D_80086170[index];` over `extern s16 D_80086170[]` (sll/addu/lh through `$at`, the resolved addiu_at construct).
+- **What:** `return gStreamTypeToGroupTable[index];` over `extern s16 gStreamTypeToGroupTable[]` (sll/addu/lh through `$at`, the resolved addiu_at construct).
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -15,6 +15,6 @@ the first build; whole-image SHA1 green.
 
 ```c
 s32 GetStreamGroupForType(s32 index) {
-    return D_80086170[index];
+    return gStreamTypeToGroupTable[index];
 }
 ```

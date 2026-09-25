@@ -9,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's multu/mfhi magic 0x24924925), `table = GetWeeklyGroupTable()` (D_800819CC, words); returns `table[D_8008A964 - 1]` when the override global D_8008A964 is set, else `table[r]`.
+Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's multu/mfhi magic 0x24924925), `table = GetWeeklyGroupTable()` (gWeeklyGroupTable, words); returns `table[gForcedWeeklyGroup - 1]` when the override global gForcedWeeklyGroup is set, else `table[r]`.
 
 ## Source
 
@@ -22,8 +22,8 @@ s32 PickWeeklyGroup(s32 arg) {
     s32 *table = GetWeeklyGroupTable();
     s32 *entry;
     s32 index;
-    if (D_8008A964 != 0) {
-        index = D_8008A964 - 1;
+    if (gForcedWeeklyGroup != 0) {
+        index = gForcedWeeklyGroup - 1;
         entry = &table[index];
     } else {
         entry = &table[r];

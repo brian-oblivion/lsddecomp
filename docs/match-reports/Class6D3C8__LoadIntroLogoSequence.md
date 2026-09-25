@@ -24,11 +24,11 @@ jal  SetActiveDataSourceDriverMode(0, 0, 0)
 jal  Class6D3C8__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTaskObj(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
-jal  GetIntroStreamName                          ; writes 0x31 to local, returns &D_800113DC
+jal  GetIntroStreamName                          ; writes 0x31 to local, returns &sAsmkStreamPath
  (delay: s1 = v0, i.e. the PRECEDING call's return = task)
 lw   $a0, 0x18($sp)                          ; reload the type code (0x31) GetIntroStreamName just wrote
-jal  GetStreamGroupForType(a0=0x31)                    ; halfword lookup in D_80086170
- (delay: s0 = v0, i.e. the PRECEDING call's return = streamName, &D_800113DC)
+jal  GetStreamGroupForType(a0=0x31)                    ; halfword lookup in gStreamTypeToGroupTable
+ (delay: s0 = v0, i.e. the PRECEDING call's return = streamName, &sAsmkStreamPath)
 move $a0, $s1                                    ; a0 = task
 move $a2, $s0                                     ; a2 = streamName
 lw   $a3, 0x0($s1)                                 ; a3 = task->methods (scratch, to fetch the slot)

@@ -9,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Record lookup: `D_800819E8` is an s16 table of record indices; returns `&table[D_800819E8[index]]` where `table` is GetRecordTable(NULL). The call precedes the index load in retail, which is the natural evaluation order.
+Record lookup: `gRecordIndexTable` is an s16 table of record indices; returns `&table[gRecordIndexTable[index]]` where `table` is GetRecordTable(NULL). The call precedes the index load in retail, which is the natural evaluation order.
 
 ## Source
 
@@ -18,7 +18,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 
 ```c
 Rec1C *GetRecordGroup(s32 index) {
-    return &((Rec1C *)GetRecordTable(NULL))[D_800819E8[index]];
+    return &((Rec1C *)GetRecordTable(NULL))[gRecordIndexTable[index]];
 }
 ```
 

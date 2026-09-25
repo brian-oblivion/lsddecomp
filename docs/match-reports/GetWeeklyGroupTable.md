@@ -7,7 +7,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot.
-- **What:** table getter: returns `D_800819CC`.
+- **What:** table getter: returns `gWeeklyGroupTable`.
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -15,6 +15,6 @@ the first build; whole-image SHA1 green.
 
 ```c
 void *GetWeeklyGroupTable(void) {
-    return D_800819CC;
+    return gWeeklyGroupTable;
 }
 ```

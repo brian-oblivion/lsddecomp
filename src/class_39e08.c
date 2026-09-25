@@ -214,7 +214,7 @@ Class865C8Methods *GetObj865C8Methods(void) {
 }
 
 /* Sony's, from the still-uncarved psyq_39094 SDK segment
- * (asm/psyq_39094.s): `if (out != NULL) *out = 0x230; return &D_80081A04;`
+ * (asm/psyq_39094.s): `if (out != NULL) *out = 0x230; return &gRecordTable;`
  * -- an unconditional out-param write (the address passed here is always a
  * stack address, never NULL) plus a fixed .data address, unrelated to the
  * write. Declared locally per CLAUDE.md's rule against writing C for

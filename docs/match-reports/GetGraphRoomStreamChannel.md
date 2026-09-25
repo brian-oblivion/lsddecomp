@@ -7,13 +7,13 @@ Byte-exact on build 12; whole-image SHA1 green, funcdiff 39/39.
 
 ## What it does
 
-`rec = GetCinematicBank(&count, n)`; sums `D_80086170[i] + 10` (s16 table) over
+`rec = GetCinematicBank(&count, n)`; sums `gStreamTypeToGroupTable[i] + 10` (s16 table) over
 `i` in `[count, count + len*2)` into `*total`, subtracts 10 (so: widths plus
 a 10-unit gap between entries), returns `rec`.
 
 ## Source
 
-Declarations: `Rec1C` and `extern s16 D_80086170[];` in `src/code_39094.c`.
+Declarations: `Rec1C` and `extern s16 gStreamTypeToGroupTable[];` in `src/code_39094.c`.
 
 ```c
 Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
@@ -26,7 +26,7 @@ Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
     start = count;
     len += start;
     for (i = start; i < len; i++) {
-        *total += D_80086170[i] + 10;
+        *total += gStreamTypeToGroupTable[i] + 10;
     }
     *total -= 10;
     return rec;

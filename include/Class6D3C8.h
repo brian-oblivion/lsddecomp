@@ -215,8 +215,8 @@ extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0,
                                                        the last value its internal dispatch loop got --
                                                        Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartWeeklyStreamTask discard it, but
                                                        Class6D3C8__StartCinematicStream keeps it */
-extern const char *GetIntroStreamName(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &D_800113DC */
-extern s32 GetStreamGroupForType(s32 index);                   /* psyq_memset.s: signed-halfword lookup into D_80086170[index] */
+extern const char *GetIntroStreamName(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkStreamPath */
+extern s32 GetStreamGroupForType(s32 index);                   /* psyq_memset.s: signed-halfword lookup into gStreamTypeToGroupTable[index] */
 extern s32 PickWeeklyStreamChannel(s32 *out, s32 param2);          /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */

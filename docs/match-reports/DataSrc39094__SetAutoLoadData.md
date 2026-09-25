@@ -24,13 +24,13 @@ typedef struct D_80081940Obj {
 
 extern u8 D_80081940[];   /* method table, 34 slots */
 extern s32 D_8008A960;
-extern s32 D_8008A964;
-extern s32 D_8008A968;
-extern u8 D_800819CC[];
-extern u8 D_80081A04[];
-extern char *D_8008A96C;  /* -> "SND\\SE" */
-extern const char D_800113DC[];
-extern s16 D_80086170[];
+extern s32 gForcedWeeklyGroup;
+extern s32 gForcedVariant;
+extern u8 gWeeklyGroupTable[];
+extern u8 gRecordTable[];
+extern char *gSoundEffectDirPtr;  /* -> "SND\\SE" */
+extern const char sAsmkStreamPath[];
+extern s16 gStreamTypeToGroupTable[];
 
 /* slot +0x088 of D_80081940 */
 void DataSrc39094__SetAutoLoadData(D_80081940Obj *self, s32 value) {
