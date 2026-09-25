@@ -907,7 +907,67 @@ void func_80045AD0(void) {
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045AD8);
 void func_80045BC0(void) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC8);
+/* D_8006F614 +0x060: upload the decoded strip at +0x1C into the rectangle
+ * at +0x2C (DrawSystem +0x058), step the rectangle right by its width, and
+ * while it is still inside the frame (+0x20 + +0x24) decode the next strip
+ * (DecDCTout, after a DrawSync when +0x34 is under 0x80); at the end,
+ * rewind the rectangle to +0x20/+0x22 and flag the frame done. */
+typedef struct DrawSysMethods45BC8 {
+    /* +0x000 */ u8 pad0[0x58];
+    /* +0x058 */ void (*loadImage)();
+} DrawSysMethods45BC8;
+
+typedef struct DrawSys45BC8 {
+    /* +0x000 */ DrawSysMethods45BC8 *methods;
+} DrawSys45BC8;
+
+typedef struct Rect45BC8 {
+    s16 x;
+    s16 y;
+    s16 w;
+    s16 h;
+} Rect45BC8;
+
+typedef struct Obj45BC8 {
+    /* +0x000 */ u8 pad0[0x1C];
+    /* +0x01C */ u32 *strip;
+    /* +0x020 */ s16 x0;
+    /* +0x022 */ s16 y0;
+    /* +0x024 */ s32 width;
+    /* +0x028 */ u8 pad28[4];
+    /* +0x02C */ Rect45BC8 rect;
+    /* +0x034 */ s32 unk34;
+    /* +0x038 */ s32 stripSize;
+    /* +0x03C */ u8 pad3C[8];
+    /* +0x044 */ s32 unk44;
+    /* +0x048 */ s32 unk48;
+    /* +0x04C */ s32 unk4C;
+} Obj45BC8;
+
+extern DrawSys45BC8 *GetDrawSystem(void);
+/* LIBGPU.H / LIBPRESS.H */
+extern int DrawSync(int mode);
+extern void DecDCTout(u32 *buf, int size);
+
+void func_80045BC8(Obj45BC8 *self) {
+    DrawSys45BC8 *ds = GetDrawSystem();
+
+    ds->methods->loadImage(ds, &self->rect, self->strip);
+    self->rect.x += self->rect.w;
+    if (self->rect.x < self->x0 + self->width) {
+        if (self->unk34 < 0x80) {
+            DrawSync(0);
+        }
+        DecDCTout(self->strip, self->stripSize);
+    } else {
+        self->unk4C = 1;
+        self->rect.x = self->x0;
+        self->rect.y = self->y0;
+        if (self->unk48 != 0) {
+            self->unk44 = 1;
+        }
+    }
+}
 /* D_8006F614 +0x064: while +0x54 is set, count calls in D_8008A948 and
  * once the count before the increment passes 100, resets it to 1 and calls
  * slot +0x044; returns 0. Otherwise
