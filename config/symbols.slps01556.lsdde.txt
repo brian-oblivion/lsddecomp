@@ -2624,3 +2624,4 @@ DrawSystem__SetSyncMode = 0x80020C3C; // type:func
 DrawSystem__SetCallback = 0x80020C44; // type:func
 Get_vtable_DrawSystem = 0x80020C4C; // type:func
 SetDrawSystem = 0x80020C68; // type:func
+Get_vtable_TmdModel = 0x8001F384; // type:func

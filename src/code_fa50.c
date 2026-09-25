@@ -139,20 +139,20 @@ extern s32 D_8008B21C[];
 extern s32 D_8006BEA0[];
 extern void *BMemPMgrAlloc(s32 size);
 void func_8001F394(Class6BEA0 *self);
-Class6BEA0Methods *func_8001F384(void);
+Class6BEA0Methods *Get_vtable_TmdModel(void);
 
 Class6BEA0 *New_TmdModel(void *arg) {
     Class6BEA0 *p = BMemPMgrAlloc(0x24);
 
     if (p != NULL) {
-        func_8001F384()->ctor(p, arg);
+        Get_vtable_TmdModel()->ctor(p, arg);
         return p;
     }
     return NULL;
 }
 void func_8001F2B0(Class6BEA0 *self, void *arg) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_8001F384();
+    self->methods = Get_vtable_TmdModel();
     self->unk10 = arg;
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
     func_8001F394(self);
@@ -168,7 +168,7 @@ Rec28_fa50 *func_8001F360(Class6BEA0 *self, s32 i) {
 }
 void func_8001F37C(void) {
 }
-Class6BEA0Methods *func_8001F384(void) {
+Class6BEA0Methods *Get_vtable_TmdModel(void) {
     return (Class6BEA0Methods *)D_8006BEA0;
 }
 void func_8001F394(Class6BEA0 *self) {

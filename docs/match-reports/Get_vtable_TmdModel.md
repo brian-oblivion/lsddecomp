@@ -1,4 +1,6 @@
-# func_8001F384 -- MATCHED (4/4 words), round 82
+# Get_vtable_TmdModel -- MATCHED (4/4 words), round 82
+
+> Renamed from `func_8001F384` on 2026-09-25 (tools/rename.py). Address 0x8001f384.
 
 Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (
 ## Source
 
 ```c
-void *func_8001F384(void) {
+void *Get_vtable_TmdModel(void) {
     return D_8006BEA0;
 }
 ```
