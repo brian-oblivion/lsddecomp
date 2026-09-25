@@ -48,3 +48,11 @@ this same unit share the shape).
 ## Naming (round 78, track 3)
 
 `func_8004E940` -> `TaskObjF__FormatCard`. **Tier A.** Sits at `gTaskObjFMethods` +0x050. Retries up to 10 times: pick `gMcDevicePath1`/`gMcDevicePath0` (BIOS device names "bu10:"/"bu00:", asm/data/7B12C.sdata.s) by `self->cardSlot`, and call the linked BIOS `format()` on it. Direct call to a BIOS function named `format` -- tier A.
+
+## Track 4b (2026-09-25, round 85)
+
+`gMcDevicePath0`/`gMcDevicePath1` were declared `s32` here and
+`DeviceName866E8` in `include/class_3bb8c.h`. This unit now includes that
+header, `path` is a `DeviceName866E8 *`, and `format()` is declared with the
+BIOS's device-name parameter (`char *`). Byte-identical; no new `-Wall`
+warning.

@@ -27,6 +27,7 @@
  * are interchangeable data sources behind one small dispatch layer.
  */
 #include "common.h"
+#include "CdDriver.h"
 
 /* --- local views of the D_8006D4E8 class ---------------------------------
  * This unit defines three of that class's own method slots (+0x06C, +0x070,
@@ -70,16 +71,10 @@ struct UnkC80 {
     /* +0x04 */ s32 unk04;
 };
 
-/* The request op codes are a small enumeration shared with code_179d8_s,
- * which enqueues 2 (open by name), 3 (close), 4 (seek) and 5 (read) from the
- * class's other slots. Only the one this unit itself uses is named. */
-#define CD_OP_LOAD_FILE 7
-
 struct Obj6D4E8_282AC;
 extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
                              s32 op, s32 param0, s32 param1);
 extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
-extern s32 gCdAsyncEnabled;
 
 void Class6D4E8__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
 {
@@ -117,20 +112,6 @@ void Class6D4E8__StopCdService(void)
     UnlockCd();
 }
 
-/* The queued-request node AllocCdRequestNode (code_179d8_r) allocates and
- * FreeCdRequestNode (code_179d8_r) unlinks and frees -- only the fields this
- * call site itself reads are typed here. `active` is the flag StartCdOperation
- * (code_179d8_r) sets on the head node when it starts an operation on it;
- * AllocCdRequestNode clears it at allocation. The list head is gCdRequestQueue. */
-typedef struct CdRequest_D70 CdRequest_D70;
-struct CdRequest_D70 {
-    /* +0x00 */ s32 active;
-    u8 pad04[0x0C - 0x04];
-    /* +0x0C */ s32 owner;
-    u8 pad10[0x20 - 0x10];
-    /* +0x20 */ CdRequest_D70 *next;
-};
-
 typedef struct Obj6D4E8_D70 Obj6D4E8_D70;
 struct Obj6D4E8_D70 {
     u8 pad00[0x22];
@@ -138,39 +119,35 @@ struct Obj6D4E8_D70 {
     /* +0x24 */ s32 flags;
 };
 
-extern s32 gCdRequestQueue;
-extern s32 gCdIdle;
-extern s32 gCdSavedSeekParam;
-extern s32 gCdSeekParam;
 extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* code_179d8_r: reset the state machine */
-extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_r: unlink+free */
+extern void FreeCdRequestNode(CdRequestNode *req); /* code_179d8_r: unlink+free */
 
 void Class6D4E8__CancelRequests(Obj6D4E8_D70 *self)
 {
-    CdRequest_D70 *entry;
-    CdRequest_D70 *node;
-    CdRequest_D70 *next;
-    s32 saved;
+    CdRequestNode *entry;
+    CdRequestNode *node;
+    CdRequestNode *next;
+    CdFileEntry *saved;
 
     LockCd();
 
-    entry = (CdRequest_D70 *)gCdRequestQueue;
+    entry = gCdRequestQueue;
 
     if (entry != NULL && self->pendingRequests != 0) {
         self->flags = 0;
 
-        if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
+        if (entry->owner == (struct Class6D4E8 *)self && entry->active != 0 && gCdIdle == 0) {
             CdFlush();
             ResetCdStateMachine();
             saved = gCdSavedSeekParam;
-            gCdSavedSeekParam = 0;
+            gCdSavedSeekParam = NULL;
             gCdSeekParam = saved;
         }
 
-        for (node = (CdRequest_D70 *)gCdRequestQueue; node != NULL; node = next) {
+        for (node = gCdRequestQueue; node != NULL; node = next) {
             next = node->next;
-            if (node->owner == (s32)self) {
+            if (node->owner == (struct Class6D4E8 *)self) {
                 FreeCdRequestNode(node);
                 self->pendingRequests--;
             }
@@ -226,28 +203,24 @@ void InitCdDrive(void)
     sCdDriveInited = 1;
 }
 
-extern s32 gCdBusy;
 
 s32 IsCdBusy(void)
 {
     return gCdBusy;
 }
 
-extern s32 gCdIdle;
 
 s32 IsCdIdle(void)
 {
     return gCdIdle;
 }
 
-extern s32 gCdOperation;
 
 s32 GetCdOperation(void)
 {
     return gCdOperation;
 }
 
-extern s32 gCdState;
 
 s32 GetCdState(void)
 {
@@ -259,8 +232,6 @@ s32 GetCdState(void)
  * code_179d8_s, where every read is `gCdAsyncEnabled == 0 && D_8008A860 == 0`
  * -- i.e. "neither mode is on, take the plain synchronous path". Nothing
  * establishes what the second mode IS, so nothing here names it. */
-extern s32 D_8008A860;
-extern s32 gCdAsyncEnabled;
 
 s32 GetCdDriverMode(s32 *outMode2)
 {
@@ -272,10 +243,6 @@ s32 GetCdDriverMode(s32 *outMode2)
 
 extern s32 GetDrawSystem(void); /* returns D_8008A83C, a singleton object */
 extern s32 ServiceCdDriver(void);
-extern s32 gCdBusy;
-extern s32 gCdAsyncEnabled;
-extern s32 D_8008A860;
-extern s32 gCdUseVSyncCallback;
 
 /* The singleton GetDrawSystem returns; only the slot this call site
  * dispatches (+0x84 of its method table) is typed here. That slot is handed
@@ -322,39 +289,23 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
     return 0;
 }
 
-extern s32 gFileTable;
 
-void SetFileTable(s32 table)
+void SetFileTable(CdFileEntry *table)
 {
     gFileTable = table;
 }
 
-extern s32 gFileTableCount;
 
 void SetFileTableCount(s32 count)
 {
     gFileTableCount = count;
 }
 
-extern s32 gFileTableCount;
 
 s32 GetFileTableCount(void)
 {
     return gFileTableCount;
 }
-
-/* A disc position in the shape Psy-Q's CdlLOC has (minute/second/sector/
- * track), but declared as two s16 rather than four u8: the game's own struct
- * is 2-aligned, which is why a whole-struct assignment of it compiles to
- * lwl/lwr + swl/swr instead of a plain lw/sw (the idiom CLAUDE.md and
- * code_179d8_h.c document). The two halves are never read apart here, so
- * they keep placeholder names. Kept as this unit's own local view, the same
- * shape as code_179d8_h.c's Pair16_179D8H under a different name. */
-typedef struct CdLoc16 CdLoc16;
-struct CdLoc16 {
-    s16 unk0;
-    s16 unk2;
-};
 
 /* CdSearchFile's output buffer, which is Sony's CdlFILE: pos, size, name[16]
  * = 0x18 bytes (include/psyq/LIBCD.H). The 0x18 was derived here
@@ -367,22 +318,6 @@ struct CdFileInfo {
     CdLoc16 pos;
     u32 size;
     u8 pad8[0x18 - 0x8];
-};
-
-/* One element of the file table: 0x1C bytes of {name, disc position, size}.
- * `name` is passed by its own address (offset 0) to BuildCdFilePath, which
- * builds the full path from it; `pos` and `size` are then filled in from a
- * CdSearchFile lookup on that path, so an entry is a name resolved once and
- * reused as a seek target. gFileTable and gFileTableCount (this unit's
- * SetFileTable / SetFileTableCount) are the array's base and length --
- * FindCdFileIndex (code_179d8_r) walks the identical 0x1C stride over
- * gFileTable doing strstr() against `name`, confirming the layout
- * independently. */
-typedef struct CdFileEntry CdFileEntry;
-struct CdFileEntry {
-    /* +0x00 */ char name[0x14];
-    /* +0x14 */ CdLoc16 pos;
-    /* +0x18 */ u32 size;
 };
 
 extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
@@ -443,8 +378,6 @@ void UnlockCd(void)
 }
 
 extern s32 GetBMemPMgrBusy(void); /* code_8220_b */
-extern s32 gCdUseVSyncCallback;
-extern s32 gCdTickStep;
 extern void TickCdStateMachine(void); /* code_179d8_r: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
@@ -511,9 +444,7 @@ void StartCdService(void)
     UnlockCd();
 }
 
-extern s32 gCdTickStep;
 extern s32 gCdCallbackInstalled;
-extern s32 gCdUseVSyncCallback;
 extern s32 gCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
@@ -541,7 +472,7 @@ void DisableCdQueue(void)
     UnlockCd();
 }
 
-/* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
+/* The same 0x24-byte queue node CdRequestNode above is a view of, from the
  * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
  * gCdRequestQueue, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the

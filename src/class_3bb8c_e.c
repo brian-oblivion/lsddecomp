@@ -1,5 +1,6 @@
 #include "common.h"
 #include "BasicClass.h"
+#include "class_3bb8c.h"
 
 /*
  * class_3bb8c_e (round 14; named round 78, track 3): 19 functions carved
@@ -122,13 +123,6 @@ extern s32 TaskObjF__WaitForReadyEvent(void *self);
 extern s32 D_80086E78[4];
 extern s32 OpenEvent(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 
-/* PS-X BIOS memcard device-name templates (asm/data/7B12C.sdata.s: literal
- * "bu10:"/"bu00:", include/class_3bb8c.h's DeviceName866E8), selected by
- * TaskObjF__FormatCard on self->cardSlot's truth value and passed opaquely
- * to `format()` -- never dereferenced in THIS unit, so declared `s32` here
- * rather than pulling in the shared struct type for an address-only use. */
-extern s32 gMcDevicePath1;
-extern s32 gMcDevicePath0;
 /* Literal "TEMP" (asm/data/7B12C.sdata.s) -- the throwaway suffix
  * TaskObjF__ProbeCardFreeSpace passes as BuildMemcardPath's 3rd argument to
  * build a placeholder file name when probing free space. */
@@ -326,18 +320,21 @@ s32 TaskObjF__CardLoadStatus(Node3bb8cE *self, s32 *p1, s32 *p2)
     return status;
 }
 
-extern s32 format(s32 *arg0);
+/* The PS-X BIOS format(), which takes a device name. gMcDevicePath0/1 are
+ * the "bu00:"/"bu10:" templates include/class_3bb8c.h declares (track 4b,
+ * round 85: this unit had its own `s32` view for this address-only use). */
+extern s32 format(char *fs);
 
 s32 TaskObjF__FormatCard(Node3bb8cE *self)
 {
     s32 retries;
     s32 result;
-    s32 *path;
+    DeviceName866E8 *path;
 
     retries = 10;
     do {
         path = self->cardSlot != 0 ? &gMcDevicePath1 : &gMcDevicePath0;
-        result = format(path);
+        result = format((char *)path);
     } while (result == 0 && retries-- != 0);
     return result;
 }

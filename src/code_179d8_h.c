@@ -81,6 +81,7 @@
  * rather than inheriting any verdict here.
  */
 #include "common.h"
+#include "CdDriver.h"
 /* Class6D430 and its table come from include/Class6D430.h, through code_171e0.h. */
 #include "code_171e0.h"
 
@@ -304,7 +305,6 @@ s32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32 arg2) {
 void NoOp4(void) {
 }
 
-extern s32 gCdUseVSyncCallback;
 
 s32 GetCdUseVSyncCallback(void) {
     return gCdUseVSyncCallback;

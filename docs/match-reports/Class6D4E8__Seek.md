@@ -163,3 +163,11 @@ async body and the rewind use; the size query is the other half of it.
 table `D_8006D4E8` (the convention `Class6D4E8__RequestLoadFile` and its two
 siblings already use); `tools/classtable.py D_8006D4E8` lists this function
 at slot `+0x04C`. The prefix names the table, not the developers' class.
+
+## Track 4b (2026-09-25, round 85)
+
+The CD driver's shared globals and records are now declared once, in
+`include/CdDriver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(gCdSeekLoc - 0x14)`, so the state machine's `&gCdSeekParam->pos` lands on the loc. The
+global's type comes from its accessors (`gFileTable` is walked at the 0x1C
+`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+`+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.

@@ -181,3 +181,11 @@ which is the procedure working in the direction where it can work.
 | --- | --- | --- | --- | --- | --- |
 | code_179d8_r | `Node8008A894` | `unk0` | `active` | B | set by `StartCdOperation` on the head node at operation start, cleared at allocation |
 | code_179d8_s | `Node8008A894` | `unkC` | `owner` | A | written by `EnqueueCdRequest` with the requesting object |
+
+## Track 4b (2026-09-25, round 85)
+
+The CD driver's shared globals and records are now declared once, in
+`include/CdDriver.h`, and this body uses that one reading: the node is `CdRequestNode` (was the local `CdRequest_D70` view), `owner` is compared as a `struct Class6D4E8 *`, and the saved seek target is a `CdFileEntry *`. The
+global's type comes from its accessors (`gFileTable` is walked at the 0x1C
+`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+`+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.

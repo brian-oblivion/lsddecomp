@@ -1,4 +1,5 @@
 #include "common.h"
+#include "CdDriver.h"
 
 /*
  * code_179d8_r -- tail slice of the code_179d8 monolith, carved round 45.
@@ -35,9 +36,10 @@
  *     gCdRequestQueue -- the queue code_179d8_q.c's EnqueueCdRequest and
  *     Class6D4E8__CancelRequests drive from the other end.
  *   - FindCdFileEntry / FindCdFileIndex / GetCdFileEntry are linear-scan /
- *     index helpers over a flat table of 0x1C-byte string records based at
- *     gFileTable, count gFileTableCount (code_179d8_q.c's CdFileEntry, its
- *     own local view of the same records).
+ *     index helpers over the file table (CdFileEntry, 0x1C bytes each) based
+ *     at gFileTable, count gFileTableCount. That type, CdRequestNode and the
+ *     module globals the three CD units share are declared once in
+ *     include/CdDriver.h (track 4b, round 85).
  */
 
 /* lock/unlock, defined in code_179d8_q.c (runner echo's unit). */
@@ -73,35 +75,6 @@ extern void *BMemPMgrFree(void *ptr);
 /* libc2/strstr.o, linked (see code_179d8_h.c's carve notes). */
 extern char *strstr(char *s1, char *s2);
 
-/* the CD request-queue node, 0x24 bytes; offsets 0x0/0x4/0x1C/0x20 are the
- * only ones this unit's two list functions touch. `active` matches the name
- * the sibling unit code_179d8_q.c's own independent view of this same
- * struct (CdRequest_D70) already gives this field: StartCdOperation sets it
- * on the head node when it starts an operation on it, AllocCdRequestNode
- * clears it at allocation. This is a unit-local typedef, so the rename is
- * local to this file (CLAUDE.md, multiple-independent-local-views); `unk4`
- * has no evidence anywhere and keeps its placeholder name. */
-typedef struct CdRequestNode {
-    /* 0x00 */ s32 active;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ u8 pad8[0x14];
-    /* 0x1C */ struct CdRequestNode *prev;
-    /* 0x20 */ struct CdRequestNode *next;
-} CdRequestNode; /* size 0x24 */
-
-extern CdRequestNode *gCdRequestQueue; /* list head */
-
-extern s32 gCdBusy; /* "busy" flag, 0/1 */
-extern char *gFileTable; /* base of a table of 0x1C-byte string records */
-extern s32 gFileTableCount;   /* record count */
-extern s32 gCdIdle;   /* "idle"/"ready" flag, 0/1 */
-extern s32 gCdOperation;   /* context value stashed by StartCdOperation */
-extern s32 gCdState;   /* CD state-machine phase */
-extern void *gCdSeekParam; /* CdControlF param pointer */
-extern s32 gCdReadSectorCount;   /* CdRead sector count */
-extern void *gCdReadBuffer; /* CdRead target buffer */
-extern void *gCdSavedSeekParam; /* secondary pointer, used only by TickCdLoadFileStateMachine */
-extern s32 gCdTickStep;   /* which state-machine step to tick, 1 or 2 */
 extern s32 gCdTimeoutCounter;   /* timeout counter */
 
 CdRequestNode *AllocCdRequestNode(void)
@@ -159,33 +132,33 @@ void FreeCdRequestNode(CdRequestNode *node)
 
 void *FindCdFileEntry(char *name)
 {
-    char *cur = gFileTable;
+    CdFileEntry *cur = gFileTable;
     s32 i = 0;
 
     LockCd();
     do {
-        if (strstr(cur, name) != NULL) {
+        if (strstr(cur->name, name) != NULL) {
             UnlockCd();
             return cur;
         }
         i++;
-        cur += 0x1C;
+        cur++;
     } while (i < gFileTableCount);
     return NULL;
 }
 
 s32 FindCdFileIndex(char *name)
 {
-    char *cur = gFileTable;
+    CdFileEntry *cur = gFileTable;
     s32 i = 0;
 
     LockCd();
-    while (strstr(cur, name) == NULL) {
+    while (strstr(cur->name, name) == NULL) {
         i++;
         if (i >= gFileTableCount) {
             return -1;
         }
-        cur += 0x1C;
+        cur++;
     }
     UnlockCd();
     return i;
@@ -194,11 +167,11 @@ s32 FindCdFileIndex(char *name)
 void *GetCdFileEntry(s32 index)
 {
     void *result;
-    char *base;
+    CdFileEntry *base;
 
     base = gFileTable;
     LockCd();
-    result = base + index * 0x1C;
+    result = &base[index];
     UnlockCd();
     return result;
 }

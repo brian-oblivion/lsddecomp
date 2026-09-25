@@ -18,15 +18,7 @@
  * unit's only jump tables, jtbl_80010810/jtbl_80010828 (carved round 47).
  */
 #include "common.h"
-
-/* A disc position in the shape of Psy-Q's CdlLOC, declared as two s16 so the
- * struct is 2-aligned and a whole-struct copy compiles to lwl/lwr + swl/swr
- * (the idiom CLAUDE.md documents). The halves are never read apart here.
- * Same shape and name as code_179d8_q.c's own local CdLoc16. */
-typedef struct CdLoc16 {
-    s16 unk0;
-    s16 unk2;
-} CdLoc16;
+#include "CdDriver.h"
 
 typedef struct Class6D4E8 Class6D4E8;
 
@@ -68,15 +60,6 @@ struct Class6D4E8 {
     /* +0x28 */ u16 inQueueDispatch; /* 1 only while RunRequestQueue calls a slot */
 };
 
-/* Request op codes, carried in a queue node's `op` (EnqueueCdRequest's third
- * argument) and dispatched back by Class6D4E8__RunRequestQueue to the slot of
- * the same name. CD_OP_LOAD_FILE has the same spelling in code_179d8_q.c. */
-#define CD_OP_OPEN      2
-#define CD_OP_CLOSE     3
-#define CD_OP_SEEK      4
-#define CD_OP_READ      5
-#define CD_OP_LOAD_FILE 7
-
 /* Bits Class6D4E8__RunRequestQueue ORs into `flags` when a request completes.
  * Bit 0 (1) is left a literal: it is also Class6D430__SetFlag's bit, and the
  * queue node field that sets it here (`unk4`) has no established meaning. */
@@ -94,11 +77,6 @@ struct Class6D4E8 {
 #define CD_STATE_SETLOC 1
 #define CD_STATE_READ   7
 
-/* gCdTickStep values: which of code_179d8_r.c's two state machines
- * ServiceCdDriver ticks. */
-#define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
-#define CD_TICK_LOAD_FILE     2 /* TickCdLoadFileStateMachine */
-
 /* Psy-Q libcd values, spelled locally as code_179d8_q.c/_r.c do: CdlSetloc
  * (command 2), CdlModeSpeed (0x80, double speed) and CdSync's CdlDiskError
  * (5). */
@@ -106,9 +84,6 @@ struct Class6D4E8 {
 #define CD_MODE_DOUBLE_SPEED 0x80
 #define CD_SYNC_DISK_ERROR   5
 
-extern s32 gCdAsyncEnabled;
-extern s32 D_8008A860;
-extern s32 gCdBusy;
 
 extern void CloseCdFile(Class6D4E8 *self);
 extern void LockCd(void);
@@ -121,19 +96,8 @@ extern void EnqueueCdRequest(Class6D4E8 *arg0, s32 arg1, s32 arg2, s32 arg3,
                            s32 arg4);
 extern void UnlockCd(void);
 
-/* One 0x1C-byte record of the file table at gFileTable, which
- * FindCdFileEntry/GetCdFileEntry (code_179d8_r.c) return: the same layout
- * and name as code_179d8_q.c's own local CdFileEntry. */
-typedef struct CdFileEntry {
-    /* +0x00 */ char name[0x14];
-    /* +0x14 */ CdLoc16 pos;
-    /* +0x18 */ u32 size;
-} CdFileEntry;
-
 extern void *FindCdFileEntry(char *arg0);
 extern s32 FindCdFileIndex(char *arg0);
-extern void *gCdSeekParam;
-extern s32 gCdTickStep;
 
 extern void OpenCdFile(Class6D4E8 *self, char *suffix);
 extern char *BuildCdFilePath(char *dest, char *suffix);
@@ -217,8 +181,6 @@ void Class6D4E8__Close(Class6D4E8 *self) {
 }
 
 extern u8 gCdSeekLoc[8];
-extern void *gCdSeekParam;
-extern s32 gCdTickStep;
 
 extern s32 GetCdFileSize(Class6D4E8 *self);
 extern s32 CdPosToInt(void *pos);
@@ -247,7 +209,7 @@ s32 Class6D4E8__Seek(Class6D4E8 *self, u32 offset, s32 mode) {
                 if (gCdAsyncEnabled != 0) {
                     /* the state machine seeks to gCdSeekParam + 0x14 (a
                      * CdFileEntry's pos), so point it 0x14 before the loc */
-                    gCdSeekParam = gCdSeekLoc - 0x14;
+                    gCdSeekParam = (CdFileEntry *)(gCdSeekLoc - 0x14);
                     gCdTickStep = CD_TICK_STATE_MACHINE;
                 } else {
                     do {
@@ -277,9 +239,6 @@ s32 Class6D4E8__Seek(Class6D4E8 *self, u32 offset, s32 mode) {
 void Class6D4E8__NoOpSlot50(void) {
 }
 
-extern s32 gCdReadSectorCount; /* CdRead sector count */
-extern void *gCdReadBuffer; /* CdRead target buffer */
-extern s32 gCdTickStep;
 
 extern void ReadCdFile(Class6D4E8 *self, void *arg1, s32 arg2);
 extern s32 CdRead(s32 sectors, void *buf, s32 mode);
@@ -321,23 +280,7 @@ s32 Class6D4E8__Read(Class6D4E8 *self, void *buf, u32 size) {
 }
 
 extern void Class6D430__LoadFile(void); /* arity-ok: the definition takes (Class6D430 *this, s32 arg1) and reads both, but Class6D4E8__LoadFile passes NEITHER -- retail's jal at 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in place */
-extern void *gCdSavedSeekParam;
 
-/* A gCdRequestQueue node, 0x24 bytes: this unit's own local view of
- * code_179d8_r.c's CdRequestNode, down to the last field read here (the
- * list links sit past it). Field names are the ones code_179d8_q.c's
- * EnqueueCdRequest writes and code_179d8_r.c's StartCdOperation sets. */
-typedef struct CdRequestNode {
-    /* +0x00 */ s32 active;         /* set by StartCdOperation when the op starts */
-    /* +0x04 */ s32 unk4;           /* zeroed at allocation; nonzero ORs flags bit 0 */
-    /* +0x08 */ s32 op;             /* CD_OP_* */
-    /* +0x0C */ Class6D4E8 *owner;  /* the requesting object */
-    /* +0x10 */ s32 fileIndex;      /* FindCdFileIndex's index, 0 if none */
-    /* +0x14 */ s32 param0;
-    /* +0x18 */ s32 param1;
-} CdRequestNode;
-
-extern CdRequestNode *gCdRequestQueue;
 extern void *BMemPMgrAlloc(s32 size);
 
 void Class6D4E8__LoadFile(Class6D4E8 *self, char *name) {
@@ -411,7 +354,6 @@ void Class6D4E8__LoadFile(Class6D4E8 *self, char *name) {
     UnlockCd();
 }
 
-extern s32 gCdIdle; /* "idle"/"ready" flag, 0/1 */
 extern void FreeCdRequestNode(CdRequestNode *node);
 extern void *GetCdFileEntry(s32 index);
 
