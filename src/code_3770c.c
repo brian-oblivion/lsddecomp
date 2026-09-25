@@ -6,7 +6,8 @@
  * those, and no Sony fingerprint). What it holds: the 18 methods of
  * D_800817E0.
  *
- * Nothing here is matched yet: every function is fresh track-1 ground.
+ * Round 81 matched the ten smallest methods (empty slots, the table getter,
+ * the libcd/libspu wrappers); the rest are still INCLUDE_ASM.
  */
 #include "common.h"
 #include "BasicClass.h"
