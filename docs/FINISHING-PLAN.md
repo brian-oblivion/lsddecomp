@@ -19,10 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 16 (2026-09-24, after rounds 76 to 78: `func_80030980` is
-libsnd's SpuVmSetVol, so every game function matches and tracks 1, 1b and 2
-are done; adjacency leads; naming debt counted in game bodies only; an
-over-claimed name at any tier is a send-back).
+Plan revision: 17 (2026-09-25, round 80: track 4's recipe, measured on
+BasicClass, Pad and Class6D430; the class tree and `tools/typeviews.py`;
+track 4b opened for its first global; tracks 1, 1b and 2 archived).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -57,7 +56,7 @@ the SDK" is a goal. Done is all five of:
 | **matching runner** (tracks 1, revisit) | decided by calibration: `plan.py` says which | round A Sonnet, round B Opus, on comparably ranked stalls; thereafter whichever produced more matches per runner-session. The head may override with `plan.py set-model`, with a reason in PROGRESS.md. |
 | **naming runner** (track 3) | Opus | **Sonnet** once the head has reviewed two Opus-named units and found no wrong tier-A name. Back to Opus if a Sonnet unit fails review. |
 | **mechanical runner** (track 2 identification, track 1b promotion, report hygiene) | Sonnet | never higher |
-| **types runner** (track 4) | Opus | a premium head does the first class itself |
+| **types runner** (track 4) | Opus | a premium head did the first classes (round 80: BasicClass, Pad, Class6D430) and does 4b's first global |
 
 **Premium is a role, not a model name: head agent (Opus 5.5)** today, the
 strongest model the operator has (it replaced Fable 5.1 in revision 14; the
@@ -85,201 +84,17 @@ DEFERRED instead, with the reason; staff it once that job merges. Every
 track has a stop or park rule so that "hard" becomes "parked with a written
 reason" rather than another round.
 
-### Track 1: stall matching, calibrated, with a stop rule
+### Tracks 1, 1b and 2: done
 
-**Goal.** Take the matches that are still cheap; measure the rate; stop when
-it is not worth the tokens.
-
-**Order.** `fresh` functions first (however large). Then stalls by ATTEMPT
-COST as `plan.py` reads it off each report: no spent-levers verdict first,
-never permuter-searched next, length-exact next, smallest last. Each job line
-carries the tags (`unspent,never-searched,len-exact`). `nearmiss.py` ranks by
-size alone and is the wrong list to assign from; a head that finds itself
-skipping the top job for a documented reason reports it, per §6, rather than
-re-ranking by hand.
-
-**Runner budget** (in the runner prompt, PARALLEL-RUNS.md §5): at most three
-functions per session; stop a function after 30 consecutive builds without a
-better funcdiff score or when its one bounded search ends; never re-attempt a
-function whose report marks its levers spent unless the brief names a changed
-state.
-
-**Calibration and stop rule.** Measured in stall ATTEMPTS per model, not in
-rounds: Sonnet runners take stall jobs until Sonnet has six attempts from the
-ranked band, then Opus runners until Opus has six, then whichever produced
-more matches per attempt keeps the track. `plan.py` says which model is next
-and groups the ranked stalls into one-unit runner jobs of three, so a single
-runner slot per round accumulates toward it. Fresh giants and revisits are
-jobs too, but a round that worked only those is recorded with
-`--not-calibration` and does not count (round 50 measured two runners on a
-324w and a 954w fresh body and was re-flagged this way). After each round
-the head records:
-
-```sh
-python3 tools/plan.py record-round --track 1 --round <N> --model <sonnet|opus> \
-    --runners <R> --attempts <functions attempted> --matches <byte-exact matches> --note "..." \
-    [--not-calibration]
-```
-
-When both models have their six attempts and the twelve together produced
-fewer than 3 matches, `plan.py` parks the track by itself and says so. The
-head does not argue with it in the same round. Parked means: no runner is
-staffed onto a stall for matching. It does not delete anything.
-
-**Spent markers are retired by whoever spends them.** A report carrying
-`REOPENED -- ASSIGNABLE` or `DERIVATION ONLY -- ASSIGNABLE` counts as fresh
-until that line is gone. The runner who attempts such a function replaces the
-marker line with the outcome (a stall title with its three figures, or
-MATCHED), in the same commit as the attempt. The head checks it at merge:
-every attempted function's report must no longer carry a marker. Rounds 49
-to 52 re-ranked the queue on markers nobody had retired.
-
-**Revisit rule.** Every stall gets ONE revisit, and a second once every stall
-has had its first (revision 14: revisits paid 40/60 against the band's 1/13,
-so the re-read, not the band, is what track 1 now is; `plan.py` labels those
-jobs `REVISIT-2`). REVISIT-2 is the LAST pass: with neither pass left and no
-fresh ground, `plan.py` marks track 1 done (revision 15). A revisit is a fresh Opus re-read
-in cost order, with the preserved body rebuilt first so `funcdiff.py`'s
-`insertions / deletions` line is recorded before anything else. Read it as
-a pointer, not a verdict: a title claiming register identity with a nonzero
-ins/del deserves a re-read, but at equal length an N/N figure can be a false
-alignment on a loop nest's repeating instruction skeleton (round 63 measured
-26/26 on a zero-insertion input), so funcdiff also prints positional skeleton
-diffs and reports 0/0 when those are zero. `plan.py` lists every stall whose report has no
-`REVISITED` line; the runner writes `REVISITED, round N: <outcome>;
-names/types <used | not relevant>` and that retires it. This is what remains
-of track 1 after the stop rule parks the band: revisit jobs in the
-round-robin until every stall has had its two. The rule was first written to test whether
-a unit's new names unlock old stalls, then gated on stale titles; three
-consecutive revisits recorded names as not relevant while the revisits paid
-3 matches in 7 attempts against the band's 1 in 13, so the trigger is gone and
-the re-read stays. `plan.py` prints the running revisit yield; if it falls to
-the band's rate over ten or more attempts, the operator decides whether the
-remaining revisits are worth their tokens.
-
-**Head at merge.** Verify per PARALLEL-RUNS.md §3.9, record the round, and
-correct any report whose cause the round falsified.
-
-### Track 1b: NON_MATCHING bodies
-
-**Opens** when track 1 is parked or done.
-
-**Goal.** Every stall with a hand-derived preserved body has that body in
-`src/`, readable and compiled by `tools/check-nonmatching.sh`, while the
-verified build keeps the `INCLUDE_ASM`. This is what sm64, oot, mm and most
-matching projects do; the default build never sees the body.
-
-**Shape**, and it is the only accepted shape:
-
-```c
-#ifdef NON_MATCHING
-/* NON_MATCHING: 252/258 words, length exact. Residue: register identity in
- * the second loop (docs/match-reports/Foo__Example.md). Hand-derived. */
-void Foo__Example(Foo *this, s32 arg1)
-{
-    ...
-}
-#else
-INCLUDE_ASM("asm/nonmatchings/<unit>", Foo__Example);
-#endif
-```
-
-splat still emits the `.s` because the `INCLUDE_ASM(..., name)` text is in
-the file; `progress.py` strips the `#ifdef` half so the function counts as
-queued, not matched.
-
-**Rules.**
-- Hand-derived only. A permuter candidate is promoted only after a human-style
-  review that its semantics are what the disassembly does; the report says
-  which it was. A body that scored well by exploiting the scorer (UB, dead
-  branches) is never promoted.
-- Written for the reader. The verified build never compiles this body, so a
-  construct whose only purpose was bytes (`do { return; } while (0);`, a
-  redundant copy, an inverted arm) buys nothing here: write the plain form and
-  leave the byte-shaped one in the report (round 66).
-- The comment names the score, the residue class and the report.
-- `./build-and-verify.sh` green (nothing changed) AND `tools/check-nonmatching.sh`
-  green (the body compiles and references only linked symbols).
-- The report gets a line `NON_MATCHING body promoted, round N`.
-- Track 3 naming applies to these bodies exactly as to matched ones.
-
-**Runner** (Sonnet), prompt in §4.3. **Park rule:** a stall whose preserved
-body does not compile after one session of repair gets a `NO NON_MATCHING
-BODY: <reason>` line in its report title region and is done.
-
-### Track 2: the SDK call surface
-
-**Goal.** Every function game code calls whose address lies in a Psy-Q
-segment, and every Sony function inside a game segment, carries Sony's name.
-`plan.py --json` lists the unnamed ones under `tracks.2.unnamed_list`. Nothing
-else in the SDK is a goal.
-
-**Sony code in game segments.** A segment's name is not evidence at function
-grain: an object whose build differs in one function never places, and its
-other functions sit in game units as C or as stalls (round 69 found
-`code_179d8_*` holding libsnd, libcd and libapi). `progress.py` counts a
-game-segment function as library when any of three records says so: an exact
-fingerprint in `config/sdk-in-game.txt` (generated: `sdkname.py --game
---write`, rerun when `sdk/` changes; `--check` says whether it is current), a
-`config/psyq-objects.ld` pin (a linked Sony object calls that address by
-name), or an `identified` comment on its symbols entry (position plus header
-or strings, recorded by the evidence rule below). Such a function leaves the
-game counts and every track 1, 1b and 3 queue, and a game-style name on one
-(a game-worded name for Sony's) counts as unnamed here. Renaming onto
-a pinned name is byte-identical and keeps the ld fragment current (measured).
-The generated file also carries LEAD lines: no exact fingerprint, but shape
->= 0.90 at >= 40 words, the cliff below which only unrelated stubs score
-(revision 14; every lead above it was libsnd), and ADJACENCY leads: a body of
-4+ words with a too-common exact fingerprint that touches Sony code, with a
-candidate from that side's library (revision 16; it finds round 78's five
-hand-found wrappers and no game stub). A lead counts as library until
-the runner either identifies it (comment line with `identified`, rename; any
-Sony name the evidence settles on closes it; `Rename pending` in that comment
-lists it for track 2 until the rename drops the words) or rejects it with a
-`// not SDK: <reason>` comment line above its symbols entry.
-
-**The tool:** `.venv/bin/python3 tools/sdkname.py <func>...` (or `--all`)
-scores each unnamed SDK function against every function in every object on
-every disc in `sdk/` by relocation-masked comparison and a shape ratio, and
-prints ranked candidates with disc and module, plus the placed objects on
-either side of the function as position evidence. `--selfcheck 10` recovers
-placed functions exactly (9 of 9 at revision 2); rerun it whenever the corpus
-changes. Read its three flags: `EXACT` is the same build; `TINY` means a body
-of six words or fewer matched a stub shape that many functions share, which is
-not identification without position evidence; `AMBIGUOUS` means several names
-match exactly and position decides. A top candidate with `masked` under about
-0.6 and no `EXACT` is a function from a library build the discs do not carry,
-and only position plus header prototype can name it.
-
-**Evidence, strongest first**, and a name needs two independent kinds or one
-fingerprint above the threshold the tool's self-check established:
-1. fingerprint against a library object (disc and module recorded);
-2. position: SDK archives link modules in a fixed order, so a function
-   between two placed objects of one library is that library's module between
-   them, and the `.LIB` listing says which functions the module exports;
-3. the Psy-Q header prototype agreeing with every call site's argument
-   shape (the byte oracle cannot see a wrong signature, so this is the check
-   that catches one);
-4. strings, BIOS call numbers, or hardware register addresses in the body.
-
-**Recording.** The name goes in the symbols file via `tools/rename.py` with a
-comment LINE above the entry (splat rejects `key: value` in a trailing
-comment, round 69): `// identified: fingerprint 0.96 vs libsnd/ss_xxx.o (3.3), header LIBSND.H`.
-Declare it where the game calls it as a local `extern` copied from the Psy-Q
-header's prototype, citing the header in a comment. Game units do NOT include
-`psyq/*.H` and shared project headers do NOT carry Sony prototypes: that is
-the `conflicting types` collision CLAUDE.md warns about, and
-`include/code_2cc8c.h`'s "NO LONGER DECLARED HERE" notes are the precedent.
-A call site whose argument shape disagrees with the prototype is a finding,
-not a nuisance. Byte-exact after every rename. A function with no evidence
-keeps `func_` and gets a `// <library>, unidentified:` comment on the line
-above its symbols-file entry; `plan.py` reads that comment and stops offering
-the function.
-
-**Runner** (Sonnet), prompt in §4.4. **Done** when `plan.py` reports zero
-unnamed. **Park rule:** a function whose best candidate is below the bar and
-whose position is ambiguous keeps `func_` with a `// <library>, unidentified:`
-comment naming the best candidate and score; it is done for this track.
+Stall matching (1), `NON_MATCHING` bodies (1b) and the SDK call surface (2)
+are done: every game function matches, no stall is left, and every SDK
+function game code calls carries Sony's name or a parked
+`// <library>, unidentified:` comment. Their rules, stop rules and runner
+prompts are `docs/archive/FINISHING-PLAN-tracks-1-2-2026-09-25.md`, verbatim;
+follow them if `plan.py` ever reopens one of these tracks. Two rules outlive
+them and are restated where they apply: a function `progress.py` counts as
+library is never renamed or retyped as game code (track 3), and a preserved
+near-miss body lives only in an `#ifdef NON_MATCHING` block (CLAUDE.md).
 
 ### Track 3: readability, one unit at a time
 
@@ -391,23 +206,100 @@ so the plan moves on, and track 4 picks it up with the class.
 
 **Opens** when 80% of units have passed track 3 (`plan.py` says).
 
-**Goal.** One definition per class in `include/`, all unit-local struct views
-merged into it; every global named; state values as enums.
+**Goal.** 4a: one definition per class, in a header named for it, with every
+unit-local view of the class merged into it. 4b: one type per global. Then
+state values as enums, once their meanings are named.
 
-**Procedure, one class at a time.** `tools/classtable.py --scan` lists the
-method tables. For each class: collect every local view (`grep -n 'typedef
-struct' src/*.c`), union the fields, check every offset against every
-accessor in every unit, write the shared definition next to the existing
-header's related declarations, delete the local views, build. This edit is
-non-local by construction: the oracle is the only check, so one class per
-commit and the whole oracle after each.
+**Measure, never grep.** `python3 tools/plan.py classes` prints every class in
+tree order with its state (UNIFIED, PARKED, ready, waiting, `no C`), how many
+of its own methods are C, and where its views live. `tools/typeviews.py`
+compiles every unit through the pinned cpp and cc1 with `-gstabs` and reads
+the layouts cc1 itself computed: `--census` (per class: own methods, object
+views, table views, with files), `--merge V...` (the union of named layouts,
+`CONFLICT` where two disagree in size, signedness or a slot's return type),
+`--tree`, `--globals`, `--warnings` (every unit's `-Wall` output against
+`config/typeviews-warnings.txt`: a slot's PARAMETER types are not in stabs,
+and a disagreeing call site is a new warning), `--upcast`.
 
-**Staffing.** The head does the first class itself (premium, new procedure)
-and writes the recipe here. Then Opus runners, one class each, but a class
-merge touches several units, so classes are merged SEQUENTIALLY, never two
-runners at once. **Park rule:** two views that disagree on a field's type at
-the same offset, with both readings confirmed by their accessors, stay split
-with a comment naming both; do not force a union.
+**The class model.** `include/BasicClass.h`'s banner is the worked example;
+`include/Class6D430.h` is the first class with subclasses. One header per
+class at `include/<Class>.h` (top level: the Makefile's header list and
+`rename.py` read `include/*.h` only) holding the object struct, the method
+table struct, the table's extern and getter, and the class's own method
+prototypes. A class WITH subclasses also defines `<CLASS>_FIELDS(Methods)` and
+`<CLASS>_SLOTS(Self, CtorParams)`; each class expands its parent's macro
+first, so accessors stay flat at any depth and nothing is re-pathed (GCC
+2.6.3 has no anonymous struct members, and embedding the base would turn
+Entity's accessors into `this->base.base.base.x`). The table word +0x000 is a
+nibble-path class id (the parent of 0x1F234 is 0xF234, 0x234, 0x34, 0x4, 0x0),
+so the tree is mechanical and classes are unified root first: `plan.py`
+offers a class only when its ancestors are unified, parked or `no C`. A `no C`
+class (every own method asm, no view anywhere) is not a job; its subclasses
+expand the nearest unified ancestor's macros and list its slots flat.
+
+**Procedure, one class per commit.**
+1. `typeviews.py --census`: the class's own methods and every object and
+   table view. Grep the table symbol, its getter and its method names too: a
+   unit's local `extern` of any of them is a view.
+2. Names: `<Class>` from the existing object view (drop an `Obj`/unit
+   suffix) or the table's stem, `<Class>Methods`, `include/<Class>.h`.
+3. Union: `--merge` the object views, then the table views. Every CONFLICT
+   is settled by the accessors' bytes; a slot's return type is its
+   occupant's unless a caller's bytes need otherwise (a void call cannot
+   cross-jump with a value-returning one: `include/Entity.h` slotC4).
+4. Boundary: the class's own fields run from its parent's size to its own,
+   the size from an allocation (`New_<Class>`) or, with none, from any
+   subclass's first own field. A field a subclass view names inside that
+   range is this class's. Pad what is unknown; never move an offset.
+5. **Check who calls a function before you trust the fields it touches.**
+   Layout is measured; meaning is not. Class6D430's `unk40..unk74` were
+   method-table SLOTS: the function copying them is passed tables (round 80).
+6. Slots: expand the parent's SLOTS with this class's type and ctor
+   parameter list, then its own slots named for their occupants
+   (`classtable.py <table> --vs <parent>`). An inherited slot keeps the
+   parent's name at every accessor (Pad's `onButtonEvent` was BasicClass's
+   `notifyParents`). An override is named for its slot with `rename.py`
+   (`Class__Finalize`, `Class__Release`) unless its report shows the body
+   does more than the slot name says.
+7. Write the header; delete every other view and local `extern` of the
+   table, getter and methods; include the class header where needed. Fix
+   what the compiler lists: accessor renames, base-table calls upcast
+   (`typeviews.py --upcast <getter> <Base> <files>`; a pointer cast emits no
+   code), slot renames.
+8. After every step: `./build-and-verify.sh` byte-identical,
+   `typeviews.py --warnings` 0 new (a GONE warning is progress: rewrite the
+   baseline with `--baseline` in that commit and say so),
+   `tools/check-nonmatching.sh` green.
+9. A renamed function's report gets a dated `Track 4` paragraph with the
+   evidence. `rename.py` rewrites the old name in prose too, including
+   sentences it turns into nonsense: read the diff.
+
+**Rules.** A type change to a field or slot is allowed when the oracle stays
+green and the commit names the accessors that settle it. A subclass's own
+views are the subclass's job: leave them compiling and report any
+contradiction with the parent. Once a class is unified, CLAUDE.md's
+independent-local-views convention ends for it: no unit declares its own
+view again, and `plan.py classes` lists any that appears as a STRAY VIEW.
+
+**Staffing.** Opus runners, one class per round: a class merge touches every
+unit that sees the class, so classes merge SEQUENTIALLY and `plan.py` lists
+only the top ready class (most classes below it first). Prompt §4.6. Head
+review before `python3 tools/plan.py mark-class --table <sym> --class
+<Class>`: `plan.py classes` shows no stray view, the three oracles are green,
+and three sampled slot or field names agree with their occupants or
+accessors. **Park rule:** two views that disagree on a field's type at the
+same offset, with both readings confirmed by their accessors, stay split
+with a comment naming both (`mark-class --park "<reason>"`).
+
+**Track 4b: one type per global.** `typeviews.py --globals` lists every
+global declared `extern` with more than one type. The largest case is one
+0x34-byte record table in the code_179d8 units, declared through thirteen
+field-address symbols (`D_8008D988`...) in five record types. The procedure
+(one struct type declared once; the field symbols removed from the symbols
+file so accesses read `table[i].field`) has not been tried: its first
+instance is a premium head's, who writes the recipe here and then runs
+`plan.py set-track --track 4b --status open`, which turns `plan.py`'s
+premium job into runner jobs.
 
 ### Track 5: close-out
 
@@ -484,38 +376,9 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 > you made and every field name you PROPOSED for the head to apply; anything
 > you could not name and why.
 
-### 4.3 NON_MATCHING promotion prompt (track 1b; Sonnet)
+### 4.3, 4.4 (tracks 1b and 2)
 
-> You are a mechanical runner for the LSD: Dream Emulator decomp, round `<N>`,
-> worktree `<path>`, branch `runner/<name>`, unit `src/<unit>.c` ONLY. Read
-> CLAUDE.md and `docs/FINISHING-PLAN.md` §3 track 1b. For each of `<functions>`:
-> take the preserved `#if 0` body from `docs/match-reports/<func>.md`, confirm
-> from the report that it is hand-derived (a permuter candidate needs the
-> review the track describes; say so if you cannot do it), place it in the
-> unit in ROM order in the exact `#ifdef NON_MATCHING ... #else INCLUDE_ASM
-> #endif` shape with the required comment, then run `./build-and-verify.sh`
-> (must stay green: you changed no bytes) and `tools/check-nonmatching.sh`
-> (must be green). Fix declarations the body needs inside the `#ifdef` block
-> or in the unit; never in a shared header. Add `NON_MATCHING body promoted,
-> round <N>` to the report. One commit per function. A body you cannot make
-> compile in one session gets `NO NON_MATCHING BODY: <reason>` in the report's
-> title region instead. Report per function: promoted / not, and why.
-
-### 4.4 SDK identification prompt (track 2; Sonnet, once `tools/sdkname.py` exists)
-
-> You are a mechanical runner for the LSD: Dream Emulator decomp, round `<N>`,
-> worktree `<path>`, branch `runner/<name>`. Read CLAUDE.md and
-> `docs/FINISHING-PLAN.md` §3 track 2. For each function in `<list from
-> plan.py>`: run `python3 tools/sdkname.py <func>`, gather the evidence kinds
-> the track lists, and name it ONLY if the evidence rule is met, with
-> `python3 tools/rename.py <func> <SonyName>` and the identification comment
-> in the symbols file. Declare it at the call site as a local `extern` copied
-> from the Psy-Q header prototype (never include `psyq/*.H` in a game unit,
-> never put a Sony prototype in a shared header); a call site that disagrees
-> with the prototype is a FINDING to report, not to paper over. `./build-and-verify.sh` green after each. A function below the
-> evidence bar keeps `func_` and gets a `// <library>, unidentified: <best
-> candidate and score>` comment. One commit per function. Report a table:
-> function, name or unidentified, evidence, disc and module.
+Archived with their tracks: `docs/archive/FINISHING-PLAN-tracks-1-2-2026-09-25.md`.
 
 ### 4.5 Extern review prompt (track 3; Opus)
 
@@ -533,6 +396,42 @@ Opens when tracks 3 and 4 are done. Items, ticked with `plan.py check --item`:
 > `python3 tools/externcheck.py` clean when you finish. One commit per
 > function. This touches many units: it runs ALONE in its round or the head
 > merges it last. Report a table: function, what was wrong, what you did.
+
+### 4.6 Types runner prompt (track 4; Opus; head fills in `<>`)
+
+> You are a types runner for the LSD: Dream Emulator (PSX) decomp, round
+> `<N>`. Work ONLY in worktree `<path>` on branch `runner/<name>`. Your job is
+> ONE class: `<table symbol>`, as `plan.py`'s job line names it. Read CLAUDE.md,
+> `docs/FINISHING-PLAN.md` §3 track 4, `include/BasicClass.h`'s banner and
+> `include/Class6D430.h` (the worked example of a class with subclasses), then
+> do track 4's procedure for your class, in order. The edit is non-local: you
+> may edit every file `python3 tools/typeviews.py --census` lists for your
+> class, the units whose accessors the compiler then flags, and their match
+> reports; you may not unify, rename or retype any other class. After every
+> edit:
+>
+> ```sh
+> ./build-and-verify.sh > /tmp/<name>_b.log 2>&1; echo "build exit=$?"; \
+> grep -nE 'error:|parse error|undefined reference|has no member|conflicting|\*\*\* \[[^]]*\.o\]' /tmp/<name>_b.log | head -8
+> python3 tools/typeviews.py --warnings | tail -3
+> tools/check-nonmatching.sh
+> ```
+>
+> `OK: build matches retail`, 0 new warnings and nonmatching green, or undo
+> the last edit. Functions and globals are renamed only with
+> `python3 tools/rename.py OLD NEW`; types, fields and slots by hand, the
+> compiler listing the accessors. Before you name or retype a field, read the
+> CALLERS of the functions that touch it (step 5). Commit per step (renames,
+> the new header, each view replaced), with the message in a file
+> (`git commit -F`): backticks in a double-quoted `-m` run as commands.
+> `git status --porcelain` empty when you report; never push; never edit
+> shared docs, the ledger, or the symbols file except through `rename.py`.
+>
+> Final summary: the header you wrote; every slot and field you named or
+> renamed with the occupant or accessor that shows it; every view and local
+> `extern` you deleted; every function you renamed and why; every `--merge`
+> CONFLICT and how the bytes settled it; anything parked or unsettled; any
+> contradiction you saw in a subclass's views.
 
 ## 5. Doc hygiene
 

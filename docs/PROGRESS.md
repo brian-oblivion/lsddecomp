@@ -6,6 +6,101 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — round 80 (premium head): track 4 begins; BasicClass, Pad and Class6D430 unified; plan revision 17
+
+**One premium session, no runners.** The head ran on Opus 5.5 as the premium
+role, started by the operator for plan.py's only ready job: track 4's first
+class. Gate 0 was clean. The session built the measurement first, then unified
+three classes (the root, a leaf and a class with subclasses) so the recipe was
+proven on each shape before it went into the plan. Every commit is
+byte-identical, with 19 NON_MATCHING bodies compiling and 0 new `-Wall` warnings.
+
+| class | id | header | what one definition corrected |
+| --- | --- | --- | --- |
+| BasicClass | 0x0 | `include/BasicClass.h` | six local views of its table deleted; +0x038 is `onNotify` (round 51's proposal); its table is 15 slots (+0x03C NULL everywhere) |
+| Pad | 0x2 | `include/Pad.h` | `onButtonEvent` was the inherited `notifyParents`: a Pad sends button events to its parents; `Pad__Destroy` -> `Pad__Finalize` |
+| Class6D430 | 0x3 | `include/Class6D430.h` | `Class6D430__CopyFields` was passed METHOD TABLES: its "fields" are the data-source interface slots `SetActiveDataSource` rebinds (now `CopyDataSourceSlots`); the object is 0x2C bytes; `AllocBuffer` is `LoadFile` |
+
+### The measurement: tools/typeviews.py
+
+- **Layouts from cc1, not grep.** Each unit goes through the pinned cpp and cc1
+  with `-gstabs -O0` (the object is discarded) and the stabs give every
+  struct's offsets, sizes and signedness as cc1 computed them. `--merge`
+  unions views and flags CONFLICT where two disagree in size, signedness or a
+  slot's return type. Parameter types are not in stabs, so `--warnings`
+  compares every unit's `-Wall` output with `config/typeviews-warnings.txt`.
+  The baseline is 179: make's log shows only the units it rebuilt, and the
+  4 it had shown were misleading.
+- **The class tree is mechanical.** Word +0x000 of a table is a nibble-path
+  class id (0x1F234 -> 0xF234 -> 0x234 -> 0x34 -> 0x4 -> 0x0). Slot sharing and
+  the game's own masked is-kind-of tests agree, and all 57 derived tables have
+  NULL at +0x03C. That settles the "what is the header word" question left
+  open since round 0 (`docs/research/class-framework.md`). There are 58
+  classes, not 60: `gStyleCueCallbacks` is a callback array, and D_8006C0F8's
+  first word is a code pointer.
+- `--census` gives each class's own methods and every object and table view
+  (this-types, +0x000 pointees, table externs, getter return types). The last
+  source is how `code_179d8_o.c`'s `Class6D430CtorView` was found.
+
+### The recipe, now FINISHING-PLAN track 4
+
+- One header per class at `include/<Class>.h`, top level because Makefile
+  `HEADERS`, `rename.py` and `externcheck.py` read `include/*.h` only.
+- A class with subclasses defines `<CLASS>_FIELDS(Methods)` and
+  `<CLASS>_SLOTS(Self, CtorParams)`, and each class expands its parent's
+  first. That keeps every accessor flat at any depth; embedding the base
+  would make Entity's `this->base.base.base.x`. GCC 2.6.3 has no anonymous
+  struct members (measured: "unnamed struct/union that defines no instances").
+  `self` is typed per class; the ctor's parameter list is a macro argument
+  because +0x008 is the one slot every class redefines. A base-table call
+  upcasts (`(BasicClass *)self`), and a pointer cast emits no code.
+- An override is named for its slot. There was no convention to follow
+  instead: of the 23 named functions occupying +0x00C before this round, 8
+  said `Finalize`, 7 `Destroy`, 4 `Dtor`, 2 `Destructor`, 1 `Destruct` and 1
+  `Close` (round 77 had cited `Destroy` as the convention; the Pad commit's
+  "24 of its peers" counted tables, not functions). The rest are renamed as
+  their classes are unified.
+- **Check a function's callers before trusting the fields it touches**
+  (Class6D430's slots-as-fields). The census measures layout, not meaning.
+
+### plan.py
+
+`plan.py classes` lists every class in tree order as UNIFIED (ledger, via the
+new `mark-class`), ready, waiting, PARKED or `no C`. A unified class with a
+view outside its header is flagged STRAY on every run. The ready-jobs list
+carries one class job per round (classes merge sequentially), ranked by how
+many classes sit below it. It also carries 4b's premium job: `--globals`
+counts 45 globals declared with more than one type, the worst being one
+0x34-byte table in the code_179d8 units declared through thirteen
+field-address symbols in five record types.
+
+### Docs
+
+FINISHING-PLAN revision 17: track 4 rewritten as the recipe (4a classes, 4b
+globals), and prompt §4.6 (types runner) added. Tracks 1, 1b and 2 and prompts
+4.3/4.4 moved verbatim to `docs/archive/FINISHING-PLAN-tracks-1-2-2026-09-25.md`
+(all three are done), which brings the plan from 5563 to about 4600 words.
+CLAUDE.md now says the local-views convention ends per class once it is
+unified, gives the class-id fact, and lists the new commands.
+
+### For the operator
+
+1. **Game code in `psyq_*` segments, with new evidence.** 26 classes keep own
+   methods in `psyq_*` segments (`psyq_33808` 76, `psyq_322b4` 38,
+   `psyq_10ee0` 19, and others). Their tables derive from BasicClass through
+   the id tree and keep its inherited slots, which no Psy-Q library does.
+   Round 70 left these same segments to the operator on weaker evidence.
+   Nothing was re-segmented. If they are game code, "100% of game code
+   matched" is not yet true. `plan.py classes` marks such classes `no C`, and
+   they do not block their subclasses.
+2. Track 4b's first global needs a premium session, as its first class did.
+
+**Next.** `plan.py` offers `gClass6B5CCMethods` (Class6B5CC, id 0x4, 16
+classes below it) to an Opus types runner with prompt §4.6, one class per
+round.
+
+---
+
 ## 2026-09-25 — round 79: track 3 done; GsSetProjection, KeyOnCheck and __main were Sony's
 
 **Seven sessions in two waves, all merged green.** The head ran on Opus 5.5 as an

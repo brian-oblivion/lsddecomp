@@ -799,6 +799,18 @@
         }
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-25",
+          "matches": 3,
+          "model": "premium",
+          "note": "premium head: first classes of track 4 (BasicClass, Pad, Class6D430); attempts/matches = classes attempted/unified",
+          "round": 80,
+          "runners": 0
+        }
+      ],
       "status": "auto"
     },
     "5": {

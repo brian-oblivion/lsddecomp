@@ -54,7 +54,8 @@ right but the specific callee name (`func_80025F2C` vs. the already-known
 `BasicClass__Finalize` after stopping the pad library on the last instance.
 Named `Pad__Destroy` in round 77 after `VabDriver__Destroy`; renamed
 2026-09-25 (track 4, BasicClass unification) to `Pad__Finalize`, because an
-override is named for the slot it occupies and 24 of the finalize-slot
-occupants already say `Finalize` against 7 `Destroy` (FINISHING-PLAN track 4
-recipe). Return type `void`, like the base it forwards to: the old `void *`
+override is named for the slot it occupies (FINISHING-PLAN track 4 recipe).
+There was no convention to follow instead: of the 23 NAMED occupants of +0x00C
+before this round, 8 said `Finalize`, 7 `Destroy`, 4 `Dtor`, 2 `Destructor`,
+1 `Destruct`, 1 `Close`. Return type `void`, like the base it forwards to: the old `void *`
 returned `finalize`'s result and was byte-identical either way.

@@ -284,6 +284,9 @@ Gate 2.
   Do not reach for `cc1plus`. Methods are ordinary C functions with an explicit
   `this` first parameter, the table pointer sits at object offset 0, and the
   tables are data. Resolve a slot with `tools/classtable.py`, never by counting.
+  Word +0x000 of a table is a nibble-path class id (the parent of 0x1F234 is
+  0xF234, then 0x234, 0x34, 0x4, 0x0), so the whole hierarchy is mechanical:
+  `python3 tools/typeviews.py --tree`.
   **The suggestive symbol names are FirecatFG's hypotheses, not evidence** —
   they look like C++ because someone who suspected C++ chose them.
 - **The Psy-Q SDK is LINKED, not decompiled.** The libraries shipped on the
@@ -488,7 +491,10 @@ Gate 2.
    would use UNCHANGED, and keep next to your code anything that encodes
    *your* reading of a class. The project's multiple-independent-local-views
    convention is what makes two readings legitimate — it is placing them in
-   one shared header that breaks. `python3 tools/headercontention.py` shows
+   one shared header that breaks. **The convention ends, class by class, in
+   track 4:** a class `plan.py classes` lists as UNIFIED has exactly one
+   definition, `include/<Class>.h`, and no unit declares its own view of it
+   again (FINISHING-PLAN track 4; `include/BasicClass.h` is the model). `python3 tools/headercontention.py` shows
    which units share a header and would therefore see each other's
    declarations.
 
@@ -723,6 +729,8 @@ python3 tools/nearmiss.py          # the near-miss queue, screened (Gate 1b)
 python3 tools/classtable.py --scan # the 60 class method tables
 python3 tools/classtable.py <t> --vs <base>   # what a subclass overrides
 python3 tools/headercontention.py  # which units would fight over a header
+python3 tools/plan.py classes      # track 4: every class, unified or not, and where its views live
+python3 tools/typeviews.py --census   # struct layouts from cc1's own stabs: per-class views (also --merge, --warnings, --tree)
 tools/setup-worktree.sh <name>     # provision a parallel runner
 .venv/bin/python3 tools/psyq_sdk.py install    # sdk/ discs -> lib/ objects (setup.sh runs it)
 .venv/bin/python3 tools/psyq_sdk.py match      # place every SDK object in retail
