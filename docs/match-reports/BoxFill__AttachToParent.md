@@ -1,10 +1,12 @@
-# Obj6EAC0__Layout -- MATCH (32/32 words, 1 attempt)
+# BoxFill__AttachToParent -- MATCH (32/32 words, 1 attempt)
+
+> Renamed from `Obj6EAC0__Layout` on 2026-09-25 (tools/rename.py). Address 0x80040664.
 
 > Renamed from `func_80040664` on 2026-09-18 (tools/rename.py). Address 0x80040664.
 
 Unit `code_2cc8c_f`. `Obj6EAC0Methods::slot4C`'s own occupant (this is the
 FUNCTION the vtable slot points to, not a caller of it -- the header's
-existing "IS Obj6EAC0__Layout" note on that slot already said as much before
+existing "IS BoxFill__AttachToParent" note on that slot already said as much before
 this round). Body: when `self->unkC == 0`, forwards to the shared
 "default handler" table's own `slot4C` (`GetClass6B5CCMethods()`, already typed
 in `include/code_2cc8c.h` as `D6B5CCGetterMethodsCC8C`, with a `slot4C`
@@ -14,7 +16,7 @@ were necessary), then dispatches `self->methods->slotBC(self, a2)` --
 pointer").
 
 ```c
-void Obj6EAC0__Layout(Obj6EAC0 *self, s32 a1, void *a2) {
+void BoxFill__AttachToParent(Obj6EAC0 *self, s32 a1, void *a2) {
     if (self->unkC == 0) {
         GetClass6B5CCMethods()->slot4C(self, a1, 0);
         self->methods->slotBC(self, a2);
@@ -27,7 +29,7 @@ under the 7+ saturation band this project's `MATCHING-GUIDE.md` flags as
 low-yield. Matched on the first attempt with a direct transliteration of
 the disassembly -- both vtable slot types needed were already established
 by earlier rounds' work on sibling functions in this same unit
-(`Obj6EAC0__SetPosition`/`Obj6EAC0__LayoutChildren` for `slotBC`'s struct shape;
+(`BoxFill__SetPosition`/`Obj6EAC0__LayoutChildren` for `slotBC`'s struct shape;
 `code_2cc8c_e`'s ctor call for `D6B5CCGetterMethodsCC8C::slot4C`), so
 there was no struct derivation left to do here -- just reading the
 existing header carefully enough to recognize both slots were already on
@@ -41,12 +43,12 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040664` | `Obj6EAC0__Layout` | B |
+| `func_80040664` | `BoxFill__AttachToParent` | B |
 
 **Evidence.** Base occupant of `slot4C`: when `self->hasChildren == 0`
 (the leaf case), forwards to the shared default handler's own `slot4C`
 then dispatches `self->methods->slotBC(self, a2)`
-(`Obj6EAC0__SetPosition`, this unit) -- i.e. for a leaf instance, "lay
+(`BoxFill__SetPosition`, this unit) -- i.e. for a leaf instance, "lay
 out" reduces to "apply the default handler, then set my own position".
 The derived occupant of the SAME slot
 (`Obj6EAC0__LayoutChildrenWithGap`) does the container-side equivalent

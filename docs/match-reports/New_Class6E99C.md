@@ -86,7 +86,7 @@ and funcdiff's own guards say nothing.
 **Superseded by this round's fix:** the class is not "unfixable, retail
 merges what GCC won't" -- it is a textual-order-of-returns sensitivity, and
 once the research doc identified that, this function (and its sibling
-`New_ClassEAC0`) matched on the very first correctly-shaped attempt.
+`New_BoxFill`) matched on the very first correctly-shaped attempt.
 
 ## Naming (round 61, track 3)
 

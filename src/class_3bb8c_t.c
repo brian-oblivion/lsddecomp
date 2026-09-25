@@ -24,7 +24,7 @@
  * MECHANICS below are certain, the in-game name is a strong but unconfirmed
  * read): `GraphRoomObj__InitDisplay` loads the literal texture string
  * `"ETC\HGRAPH.TIM"`. The class owns a 100-entry array of small coloured
- * `New_ClassEAC0` point objects (`points`) built by `BuildGraphPoints` and
+ * `New_BoxFill` point objects (`points`) built by `BuildGraphPoints` and
  * positioned by `PopulateGraphPoints` from a backwards walk of a 365-entry
  * day-type ring (`DayLog::days`, reached through `dayLog`) -- each day's
  * two signed bytes become a `{x, y}` point handed to a point's own
@@ -135,7 +135,7 @@ typedef struct GraphRoomMethods {
 extern GraphRoomMethods *GetGraphRoomMethods(void);
 
 /* This unit's own view of one entry of GraphRoomObj::points -- one of the
- * 100 small coloured `New_ClassEAC0`-allocated dots the graph plots. Only
+ * 100 small coloured `New_BoxFill`-allocated dots the graph plots. Only
  * the slots this unit's own functions dispatch through are typed. */
 typedef struct GraphRoomPoint GraphRoomPoint;
 typedef struct GraphRoomPointMethods {
@@ -332,18 +332,18 @@ typedef struct D_8008ABB8Color {
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
 extern D_8008ABB8Color D_8008ABB8;
-extern GraphRoomPoint *New_ClassEAC0(void *a0, void *a1, s32 a2);
+extern GraphRoomPoint *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void GraphRoomObj__BuildGraphPoints(GraphRoomObj *self) {
     D_8008ABB8Color rgb;
     s32 i;
 
-    self->points[0] = New_ClassEAC0(&D_8008ABAC, &D_8008ABB4, 0);
+    self->points[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
     rgb = D_8008ABB8;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->points[i] = New_ClassEAC0(&D_8008ABAC, &rgb, 0);
+        self->points[i] = New_BoxFill(&D_8008ABAC, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;

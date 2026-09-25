@@ -9,7 +9,7 @@ before this round.
 
 Takes no arguments; gated entirely on the global `gStyleDecorColor` (set by
 `ApplyStyleConfig`, matched earlier this round). If it's non-NULL: builds an
-object via `New_ClassEAC0(&D_8008AB60, gStyleDecorColor, 0)` (already known
+object via `New_BoxFill(&D_8008AB60, gStyleDecorColor, 0)` (already known
 elsewhere as returning `ClassEAC0Obj *` from `include/code_2cc8c.h`, a header
 this unit doesn't own -- see below), stashes it in `gStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
@@ -18,7 +18,7 @@ object reached through `gStyleTargetObj->unkC` (`slotAC(sub)`, whose return
 feeds the `slot4C` call's middle argument).
 
 ```c
-/* Local view only -- New_ClassEAC0 already returns `ClassEAC0Obj *` per
+/* Local view only -- New_BoxFill already returns `ClassEAC0Obj *` per
  * include/code_2cc8c.h, a header owned by a different unit. This function
  * only ever reaches slots 0x4C/0x64/0x68, so it gets its own minimal local
  * type instead of pulling that header in. */
@@ -52,13 +52,13 @@ typedef struct FieldAC7CHolder {
 extern s32 gStyleDecorObj;
 extern s32 D_8008AB60;
 extern s32 D_8008AB58;
-extern LocalM4D0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
+extern LocalM4D0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
     if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32) New_ClassEAC0(&D_8008AB60, (void *) gStyleDecorColor, 0);
+        gStyleDecorObj = (s32) New_BoxFill(&D_8008AB60, (void *) gStyleDecorColor, 0);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
 
@@ -75,7 +75,7 @@ void ApplyStyleDecorationIfSet(void) {
 First attempt used the obvious local-variable idiom:
 
 ```c
-LocalM4D0Obj *obj = New_ClassEAC0(...);
+LocalM4D0Obj *obj = New_BoxFill(...);
 gStyleDecorObj = (s32) obj;
 obj->methods->slot64(obj, 1);
 ```
@@ -96,7 +96,7 @@ GCC 2.6.3's allocator had already picked `a0` as `obj`'s home the moment a
 named local variable existed for it, independent of source statement order.
 
 **The fix was to never name it.** Storing the call's return value straight
-into the global (`gStyleDecorObj = (s32) New_ClassEAC0(...);`) and then
+into the global (`gStyleDecorObj = (s32) New_BoxFill(...);`) and then
 re-deriving the pointer from `gStyleDecorObj` at every subsequent use point
 (`((LocalM4D0Obj *) gStyleDecorObj)->methods->...`) let the compiler's local
 value-numbering recognize that the gp-relative load it would otherwise need
@@ -126,4 +126,4 @@ logic, only a different way of naming the same values.
 
 ## Naming
 
-**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `gStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_ClassEAC0`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleTargetObj`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
+**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `gStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleTargetObj`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.

@@ -1,4 +1,6 @@
-# Obj6EAC0__SetChar — MATCHED (19/19), round 19
+# BoxFill__AttachAbsolute — MATCHED (19/19), round 19
+
+> Renamed from `Obj6EAC0__SetChar` on 2026-09-25 (tools/rename.py). Address 0x80040854.
 
 > Renamed from `func_80040854` on 2026-09-18 (tools/rename.py). Address 0x80040854.
 
@@ -8,7 +10,7 @@
 0):**
 
 ```c
-void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
+void BoxFill__AttachAbsolute(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
 {
     void (*fn)();
     Obj6EAC0 *q;
@@ -84,10 +86,10 @@ STALL (prologue store-order residue, 17/19 words)
 
 Unit: `src/code_2cc8c_f.c`. Blocker screen clean. Correct length (19/19
 words at the right total size, confirmed via the funcdiff word count
-matching the `.s` file's own `nonmatching Obj6EAC0__SetChar, 0x4C`).
+matching the `.s` file's own `nonmatching BoxFill__AttachAbsolute, 0x4C`).
 
 ```c
-void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
+void BoxFill__AttachAbsolute(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     self->methods->slot4C(self, a1, a2, a3);
     self->unk48 = 0;
     self->unk4C = a3;
@@ -188,10 +190,10 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040854` | `Obj6EAC0__SetChar` | B |
+| `func_80040854` | `BoxFill__AttachAbsolute` | B |
 
 **Evidence.** Base occupant of `slotC4`: forwards `(a1, a2, a3)` to
-`self->methods->slot4C` (the "layout" slot -- see `Obj6EAC0__Layout`),
+`self->methods->slot4C` (the "layout" slot -- see `BoxFill__AttachToParent`),
 then `self->unk48 = 0; self->unk4C = a3;`. `slotC4`'s DERIVED occupant
 (`Obj6EAC0__SetChildChar`, this unit) indexes into `self->children[a2]`
 and dispatches THAT child's own `slotC4` with `a1 & 0xFF` -- an 8-bit

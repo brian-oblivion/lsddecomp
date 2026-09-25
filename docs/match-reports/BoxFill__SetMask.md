@@ -1,11 +1,13 @@
-# Obj6EAC0__SetMask — MATCHED (5/5 words)
+# BoxFill__SetMask — MATCHED (5/5 words)
+
+> Renamed from `Obj6EAC0__SetMask` on 2026-09-25 (tools/rename.py). Address 0x800408a8.
 
 > Renamed from `func_800408A8` on 2026-09-18 (tools/rename.py). Address 0x800408a8.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-s32 Obj6EAC0__SetMask(Obj6EAC0 *self, s32 a1) {
+s32 BoxFill__SetMask(Obj6EAC0 *self, s32 a1) {
     return self->unk68 = (1 << a1) - 1;
 }
 ```
@@ -28,7 +30,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800408A8` | `Obj6EAC0__SetMask` | A |
+| `func_800408A8` | `BoxFill__SetMask` | A |
 
 **Evidence.** A pure leaf whose mechanics ARE its purpose (tier A):
 `self->mask = (1 << a1) - 1`, a bitmask-of-the-low-`a1`-bits computation

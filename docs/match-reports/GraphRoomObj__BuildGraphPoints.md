@@ -23,7 +23,7 @@ round's final summary for the disposition of `GraphRoomObj__PopulateGraphPoints`
 ## What it does
 
 Builds a 100-entry array of allocated `D_80087AACEntry` objects
-(`self->unk_0xA8[0..99]`), each constructed via `New_ClassEAC0` (already
+(`self->unk_0xA8[0..99]`), each constructed via `New_BoxFill` (already
 matched, `code_2cc8c_e.c`) with a colour-like 3-byte argument: entry 0
 gets the constant `D_8008ABB4` directly; entries 1-99 get successive
 values of a mutable local copy of `D_8008ABB8` (also 3 bytes), decremented
@@ -46,18 +46,18 @@ typedef struct D_8008ABB8Color {
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
 extern D_8008ABB8Color D_8008ABB8;
-extern D_80087AACEntry *New_ClassEAC0(void *a0, void *a1, s32 a2);
+extern D_80087AACEntry *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void GraphRoomObj__BuildGraphPoints(D_80087AACObj *self) {
     D_8008ABB8Color rgb;
     s32 i;
 
-    self->unk_0xA8[0] = New_ClassEAC0(&D_8008ABAC, &D_8008ABB4, 0);
+    self->unk_0xA8[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
     rgb = D_8008ABB8;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->unk_0xA8[i] = New_ClassEAC0(&D_8008ABAC, &rgb, 0);
+        self->unk_0xA8[i] = New_BoxFill(&D_8008ABAC, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
@@ -70,7 +70,7 @@ void GraphRoomObj__BuildGraphPoints(D_80087AACObj *self) {
 }
 ```
 
-`New_ClassEAC0` is called with `&D_8008ABAC` (its own address, opaque,
+`New_BoxFill` is called with `&D_8008ABAC` (its own address, opaque,
 never dereferenced by this function) as the first argument -- the
 salvaged snapshot below passed `D_8008ABAC` bare (without `&`), which
 would only compile/link correctly if `D_8008ABAC` were itself already a
@@ -81,7 +81,7 @@ here.
 ## What closed it: alpha's near-miss had the field DECREMENT order wrong, not the STRUCT'S field order
 
 Alpha's snapshot (52/56, preserved below for provenance) already had the
-entire control flow, both `New_ClassEAC0` calls, the loop bound, and the
+entire control flow, both `New_BoxFill` calls, the loop bound, and the
 6-vs-1 decrement-size branch byte-exact -- the ONLY residue was two
 swapped store offsets (`+0x11`/`+0x12`), confined to the tail of the
 loop's decrement sequence. Alpha's own body decremented in the order
@@ -163,12 +163,12 @@ void GraphRoomObj__BuildGraphPoints(D_80087AACObj *self) {
     D_8008ABB8Color rgb;
     s32 i;
 
-    self->unk_0xA8[0] = New_ClassEAC0(D_8008ABAC, &D_8008ABB4, 0);
+    self->unk_0xA8[0] = New_BoxFill(D_8008ABAC, &D_8008ABB4, 0);
     rgb = D_8008ABB8;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->unk_0xA8[i] = New_ClassEAC0(D_8008ABAC, &rgb, 0);
+        self->unk_0xA8[i] = New_BoxFill(D_8008ABAC, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
@@ -191,7 +191,7 @@ staffing mislabeling, fixed the decrement-order bug, MATCHED 56/56.
 ## Naming (round 75, track 3)
 
 **`GraphRoomObj__BuildGraphPoints`** -- tier B. Own vtable slot +0x0D8.
-Builds the 100-entry `points` array of small coloured `New_ClassEAC0`
+Builds the 100-entry `points` array of small coloured `New_BoxFill`
 objects that the graph plots dream-history onto (see class header
 comment); also allocates the 4-byte `matchedDayIndices` scratch buffer
 `GraphRoomObj__ScoreDayLog` later fills in.

@@ -1,9 +1,11 @@
-# func_800408A0 — MATCHED (2/2 words)
+# BoxFill__SetPri — MATCHED (2/2 words)
+
+> Renamed from `func_800408A0` on 2026-09-25 (tools/rename.py). Address 0x800408a0.
 
 Unit: `src/code_2cc8c_f.c`. Trivial setter, first attempt.
 
 ```c
-void func_800408A0(Obj6EAC0 *self, s32 a1) {
+void BoxFill__SetPri(Obj6EAC0 *self, s32 a1) {
     self->unk44 = a1;
 }
 ```
@@ -23,7 +25,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800408A0` | (kept `func_800408A0`) | C |
+| `BoxFill__SetPri` | (kept `BoxFill__SetPri`) | C |
 
 **What is known.** Base-table occupant of `slotC8`: a plain one-field
 setter, `self->unk44 = a1`. The derived table's own `slotC8` occupant

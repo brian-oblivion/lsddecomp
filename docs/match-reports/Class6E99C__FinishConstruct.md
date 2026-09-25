@@ -19,7 +19,7 @@ void Class6E99C__FinishConstruct(Class6E99CObj *self, s32 a1) {
 }
 ```
 
-`slot60`/`slot64` resolve to `func_800406E4`/`func_80040714`
+`slot60`/`slot64` resolve to `BoxFill__SetDisplay`/`BoxFill__SetSemiTrans`
 (code_2cc8c_f, bravo's own functions), dispatched purely through the
 vtable -- no extern needed.
 
@@ -27,7 +27,7 @@ vtable -- no extern needed.
 
 The ctor's call site only sets up `a1` before dispatching `self->methods->
 finishConstruct(self, a2)`; `a2`/`a3` registers still hold leftover values from the
-PRECEDING `Obj6EAC0__GetBaseMethods()->ctor(...)` call and are never intentionally set.
+PRECEDING `GetBoxFillMethods()->ctor(...)` call and are never intentionally set.
 Since this occupant's own body never reads a 3rd/4th argument, the slot's
 type is `(Class6E99CObj *self, s32 a1)` -- two args, matching CLAUDE.md's
 "the converse does NOT hold" caution (a `jalr` with no visible extra setup
@@ -42,7 +42,7 @@ installing `self->methods`. Named to match the architecturally identical
 slot in the same class hierarchy: `Obj6EAC0Methods::slot40` (bravo's own
 unrenamed slot name, `code_2cc8c_f`) is already
 named `Obj6EAC0__FinishConstruct` (round 54, `code_2cc8c_f`/this header),
-and `ClassEAC0Methods::finishConstruct` (this unit, `ClassEAC0__FinishConstruct`)
+and `ClassEAC0Methods::finishConstruct` (this unit, `BoxFill__Reset`)
 occupies the SAME offset one level up the same chain, dispatched the same
 way (right after a ctor installs the vtable). Three independent occupants
 at the identical offset, all doing "one-time post-construction setup",

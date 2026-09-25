@@ -39,8 +39,8 @@ genuinely whole-image byte-exact.
 ## Round 19: three levers stacked, in order
 
 1. **Whole-struct assignment for the `a2`-copy buffer** (this round's
-   recurring lever -- see `Class6E99C__PushPosition`/`Obj6EAC0__SetPosition`/`TaskCore__SetColors`/
-   `Obj6EAC0__ApplyColor`/`Obj6EAC0__LayoutChildren`): retyped the local `s32 buf[2]` to
+   recurring lever -- see `Class6E99C__PushPosition`/`BoxFill__SetPosition`/`TaskCore__SetColors`/
+   `BoxFill__ApplyColor`/`Obj6EAC0__LayoutChildren`): retyped the local `s32 buf[2]` to
    the existing `Pair32E99C` and `a2` to `Pair32E99C *`, replaced
    `buf[0]=a2[0]; buf[1]=a2[1];` with `buf = *a2;`. This alone closed
    the ORIGINAL report's +2-word length gap outright and jumped the
@@ -203,7 +203,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80040AE8` | `Obj6EAC0__LayoutChildrenWithGap` | B |
 
-**Evidence.** Derived occupant of `slot4C` (same slot `Obj6EAC0__Layout`
+**Evidence.** Derived occupant of `slot4C` (same slot `BoxFill__AttachToParent`
 fills for the leaf case): the SAME "walk children, advance a position
 cursor by `childPitch` per child" shape as `Obj6EAC0__LayoutChildren`
 (this unit, `slotBC`'s derived occupant), but with one extra difference:

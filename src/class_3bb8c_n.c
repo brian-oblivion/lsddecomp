@@ -17,7 +17,7 @@
  * None of this unit's functions are themselves class methods (no vtable
  * self-dispatch on their OWN symbol); they are free functions dispatching
  * into THREE separate object families through local method-table views: a
- * decoration object (`gStyleDecorObj`, `New_ClassEAC0`-allocated), an
+ * decoration object (`gStyleDecorObj`, `New_BoxFill`-allocated), an
  * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
  * `Obj876FC`-class "effect slots" array (`gStyleEffectSlots`,
  * `class_3bb8c_r.c`'s `New_Class876FC` allocator, kind-tagged 0..3 by
@@ -128,7 +128,7 @@ extern s32 gStyleDecorPosAX;
 extern s32 gStyleDecorPosAY;
 extern s32 gStyleDecorPosBX;
 extern s32 gStyleDecorPosBY;
-extern void *New_ClassEAC0(void *a0, void *a1, s32 a2);
+extern void *New_BoxFill(void *a0, void *a1, s32 a2);
 extern void *gStyleDecorSlots[];
 extern s32 gStyleTargetObj;
 
@@ -190,9 +190,9 @@ void StyleBuildDecorSet(void) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *) &gStyleDecorPosBX;
-    gStyleDecorSlots[0] = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
+    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) gStyleColorTable, 0x1FFF);
     for (i = 1; i < 0x12; i++) {
-        obj = New_ClassEAC0(&paramB, (void *) (gStyleColorTable + i * 3), 0x1FFF);
+        obj = New_BoxFill(&paramB, (void *) (gStyleColorTable + i * 3), 0x1FFF);
         gStyleDecorSlots[i] = obj;
         ((ObjSlot4C *) obj)->methods->slot4C(obj, gStyleDecorSlots[0], &paramA);
         paramA.y += 3;

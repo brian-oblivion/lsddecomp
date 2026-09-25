@@ -42,7 +42,7 @@ differences from the byte-by-byte shape.
 
 ### Proposed learning
 
-A third confirmation, after `Class6E99C__PushPosition` and `Obj6EAC0__SetPosition`, that
+A third confirmation, after `Class6E99C__PushPosition` and `BoxFill__SetPosition`, that
 **a scalar-field-by-scalar-field copy and a whole-aggregate copy of the
 same bytes are not interchangeable to this compiler even when they are
 semantically identical** -- and this instance sharpens the class further:
@@ -75,9 +75,9 @@ Within that scope, though, the evidence is broader than "one struct's
 idiom" and worth stating precisely:
 
 - **Two genuinely independent struct SHAPES.** A 2x`s32`, 4-byte-aligned
-  pair (`Pair32E99C`: `Class6E99C__PushPosition`, `Obj6EAC0__SetPosition`, `Obj6EAC0__LayoutChildren`,
+  pair (`Pair32E99C`: `Class6E99C__PushPosition`, `BoxFill__SetPosition`, `Obj6EAC0__LayoutChildren`,
   `Obj6EAC0__LayoutChildrenWithGap`) and a 3x`s8`, 1-byte-aligned, non-power-of-two triple
-  (this function's own RGB-shaped struct, and `Obj6EAC0__ApplyColor`'s copy arm
+  (this function's own RGB-shaped struct, and `BoxFill__ApplyColor`'s copy arm
   in the SAME unit). These have nothing in common at the ABI level
   (alignment, size, natural load/store width) -- if the lever only worked
   because of some accident specific to a 2-word-aligned pair, the 3-byte
@@ -87,7 +87,7 @@ idiom" and worth stating precisely:
   live in `Obj6EAC0`/`Class6E99CObj` (units `code_2cc8c_e`/`_f`); THIS
   function's 3-byte struct lives in `Obj86B60` (unit `code_2cc8c`,
   matched by a DIFFERENT runner in an EARLIER round before this round's
-  fix) while `Obj6EAC0__ApplyColor`'s matching 3-byte case lives in `Obj6EAC0`
+  fix) while `BoxFill__ApplyColor`'s matching 3-byte case lives in `Obj6EAC0`
   (unit `code_2cc8c_f`) -- so the SAME struct shape closed in two
   unrelated classes, and two DIFFERENT struct shapes closed within the
   same class family. The lever's success does not track any one

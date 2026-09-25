@@ -33,7 +33,7 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
 ```
 
 `Pair32E99C` is the existing two-`s32` record from `Class6E99C__PushPosition`; this
-is the same type `Obj6EAC0__SetPosition` (this unit's `slotBC` base occupant, also
+is the same type `BoxFill__SetPosition` (this unit's `slotBC` base occupant, also
 matched this round) uses for its own `a1`. `Obj6EAC0Methods::slotBC` was
 already retyped to `Pair32E99C *a1` for that function, so this derived
 occupant picks up the same prototype for free.
@@ -48,7 +48,7 @@ retail's 50) with a `s32 buf[2]` stack array copied field-by-field
 (`buf[0]=a1[0]; buf[1]=a1[1];`). Two things closed the gap:
 
 1. **The whole-struct-assignment axis** (same lever as `Class6E99C__PushPosition`/
-   `Obj6EAC0__SetPosition`/`TaskCore__SetColors`/`Obj6EAC0__ApplyColor` this round and last):
+   `BoxFill__SetPosition`/`TaskCore__SetColors`/`BoxFill__ApplyColor` this round and last):
    replacing the two scalar array-element copies with one `buf = *a1;`
    struct assignment (after retyping the buffer from a raw `s32[2]` to
    the existing `Pair32E99C` type) closed the length gap outright,
@@ -100,7 +100,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 | `func_80040E14` | `Obj6EAC0__LayoutChildren` | B |
 
 **Evidence.** Derived occupant of `slotBC` (same slot
-`Obj6EAC0__SetPosition` fills for the base/leaf case): when
+`BoxFill__SetPosition` fills for the base/leaf case): when
 `self->hasChildren != 0`, walks `self->children[0..self->totalChildCount)`
 dispatching `(*elemp)->methods->slotBC(*elemp, &buf)` on each, with
 `buf.a` (posX) incremented by `self->childPitch` every iteration -- a

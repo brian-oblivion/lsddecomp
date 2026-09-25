@@ -1,5 +1,5 @@
 /*
- * code_2cc8c_f -- the `Obj6EAC0` class (base table `D_8006EAC0`, override
+ * code_2cc8c_f -- the `Obj6EAC0` class (base table `gBoxFillMethods`, override
  * table `D_8006EB90`; see include/code_2cc8c.h for the full derivation)
  * plus three unrelated free functions that happen to live in this file
  * (`DecodeFullWidthSjis`/`EncodeFullWidthSjis`/`FormatFullWidthNumber`,
@@ -25,34 +25,34 @@
 #include "common.h"
 #include "code_2cc8c.h"
 
-void Obj6EAC0__Layout(Obj6EAC0 *self, s32 a1, void *a2) {
+void BoxFill__AttachToParent(Obj6EAC0 *self, s32 a1, void *a2) {
     if (self->hasChildren == 0) {
         GetClass6B5CCMethods()->attachToParent((Class6B5CC *)self, (Class6B5CC *)a1, 0);
         self->methods->slotBC(self, a2);
     }
 }
 
-s32 func_800406E4(Obj6EAC0 *self, s32 a1) {
+s32 BoxFill__SetDisplay(Obj6EAC0 *self, s32 a1) {
     return GetSetBitField(&self->flags, 0x1F, 1, a1 == 0) == 0;
 }
 
-s32 func_80040714(Obj6EAC0 *self, s32 a1) {
+s32 BoxFill__SetSemiTrans(Obj6EAC0 *self, s32 a1) {
     return GetSetBitField(&self->flags, 0x1E, 1, a1 != 0);
 }
 
-s32 func_80040740(Obj6EAC0 *self, s32 a1) {
+s32 BoxFill__SetSemiTransRate(Obj6EAC0 *self, s32 a1) {
     return GetSetBitField(&self->flags, 0x1C, 2, a1);
 }
 
-void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);
+void BoxFill__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite);
 
-void Obj6EAC0__SetColor(Obj6EAC0 *self, s32 overwrite, u8 *src) {
-    Obj6EAC0__ApplyColor(self, self->color, src, overwrite);
+void BoxFill__SetColor(Obj6EAC0 *self, s32 overwrite, u8 *src) {
+    BoxFill__ApplyColor(self, self->color, src, overwrite);
 }
 
 typedef struct { s8 r, g, b; } RGB80040790;
 
-void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
+void BoxFill__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     u8 *d;
     d = dst;
     if (overwrite) {
@@ -64,20 +64,20 @@ void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     }
 }
 
-void Obj6EAC0__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
+void BoxFill__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
     if (self->hasChildren != 0) {
         *(Pair32E99C *)&self->posX = *a1;
     }
 }
 
-void func_80040824(Obj6EAC0 *self, s32 *a1) {
+void BoxFill__SetSize(Obj6EAC0 *self, s32 *a1) {
     if (self->hasChildren != 0) {
         self->unk60 = ((u16 *)a1)[0];
         self->unk62 = ((u16 *)&a1[1])[0];
     }
 }
 
-void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
+void BoxFill__AttachAbsolute(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
 {
     void (*fn)();
     Obj6EAC0 *q;
@@ -94,16 +94,16 @@ void Obj6EAC0__SetChar(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3)
     } while (0);
 }
 
-void func_800408A0(Obj6EAC0 *self, s32 a1) {
+void BoxFill__SetPri(Obj6EAC0 *self, s32 a1) {
     self->unk44 = a1;
 }
 
-s32 Obj6EAC0__SetMask(Obj6EAC0 *self, s32 a1) {
+s32 BoxFill__SetMask(Obj6EAC0 *self, s32 a1) {
     return self->mask = (1 << a1) - 1;
 }
 
-Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void) {
-    return &D_8006EAC0;
+Obj6EAC0Methods *GetBoxFillMethods(void) {
+    return &gBoxFillMethods;
 }
 
 Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void);

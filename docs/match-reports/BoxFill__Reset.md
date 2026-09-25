@@ -1,12 +1,14 @@
-# ClassEAC0__FinishConstruct -- MATCH (37/37 words, first attempt)
+# BoxFill__Reset -- MATCH (37/37 words, first attempt)
+
+> Renamed from `ClassEAC0__FinishConstruct` on 2026-09-25 (tools/rename.py). Address 0x800405d0.
 
 > Renamed from `func_800405D0` on 2026-09-20 (tools/rename.py). Address 0x800405d0.
 
 Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Methods::finishConstruct` (`+0x040`),
-dispatched by the class's own ctor (`ClassEAC0__ClassEAC0`).
+dispatched by the class's own ctor (`BoxFill__BoxFill`).
 
 ```c
-void ClassEAC0__FinishConstruct(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void BoxFill__Reset(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     ClassEAC0Methods *methods;
 
     self->unk44 = a3;
@@ -56,8 +58,8 @@ type" caution, just for a parameter rather than a return.
 
 ## Naming (round 61, track 3)
 
-**`ClassEAC0__FinishConstruct`** -- tier A. `ClassEAC0Methods::finishConstruct`
-(`+0x040`), dispatched by `ClassEAC0__ClassEAC0` immediately after
+**`BoxFill__Reset`** -- tier A. `ClassEAC0Methods::finishConstruct`
+(`+0x040`), dispatched by `BoxFill__BoxFill` immediately after
 installing `self->methods` -- the identical architectural role, at the
 identical offset, as `Class6E99C__FinishConstruct` one level up and
 `Obj6EAC0__FinishConstruct` (round 54, this same table family) one level

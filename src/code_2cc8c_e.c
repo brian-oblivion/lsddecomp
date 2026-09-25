@@ -42,8 +42,8 @@
  * `struct ClassEAC0Obj` for the full derivation). Critically, `ClassEAC0Obj`
  * is THIS unit's own local view of the SAME table family that
  * `code_2cc8c_f` (bravo's unit) views as `Obj6EAC0` -- `ClassEAC0Methods`'s
- * `slotB8`/`slotCC` dispatch to bravo's own `Obj6EAC0__SetColor`/
- * `Obj6EAC0__SetMask` -- so `Class6E99CObj` is a further-derived subclass
+ * `slotB8`/`slotCC` dispatch to bravo's own `BoxFill__SetColor`/
+ * `BoxFill__SetMask` -- so `Class6E99CObj` is a further-derived subclass
  * of bravo's "on-screen text/digit display" class (round 54's own
  * working hypothesis for `Obj6EAC0`).
  *
@@ -59,7 +59,7 @@
  * this unit's own working hypothesis (tier B throughout), not confirmed
  * against any caller outside this file: nothing else in `src/*.c`
  * constructs or touches a `Class6E99CObj`/`ClassEAC0Obj` (only
- * `New_Class6E99C`/`New_ClassEAC0` themselves are called elsewhere, always
+ * `New_Class6E99C`/`New_BoxFill` themselves are called elsewhere, always
  * through a caller's own differently-typed local view -- see each
  * function's own match report). See each function's own `## Naming`
  * section for the specific evidence behind its name.
@@ -80,7 +80,7 @@ void Class6E99C__Class6E99C(Class6E99CObj *self, void *a1, s32 a2, s32 a3) {
     ClassEAC0Methods *base;
     void *tableEntry;
 
-    base = (ClassEAC0Methods *)Obj6EAC0__GetBaseMethods();
+    base = (ClassEAC0Methods *)GetBoxFillMethods();
     if (a2 != 0) {
         tableEntry = &D_8006EA90[a2 * 3];
     } else {
@@ -279,24 +279,24 @@ Class6E99CMethods *GetClass6E99CMethods(void) {
     return &D_8006E99C;
 }
 
-ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2) {
+ClassEAC0Obj *New_BoxFill(void *a0, void *a1, s32 a2) {
     ClassEAC0Obj *self;
 
     self = BMemPMgrAlloc(0x6C);
     if (self != NULL) {
-        ((ClassEAC0Methods *)Obj6EAC0__GetBaseMethods())->ctor(self, a0, a1, a2);
+        ((ClassEAC0Methods *)GetBoxFillMethods())->ctor(self, a0, a1, a2);
         return self;
     }
     return NULL;
 }
 
-void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void BoxFill__BoxFill(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
-    self->methods = (ClassEAC0Methods *)Obj6EAC0__GetBaseMethods();
+    self->methods = (ClassEAC0Methods *)GetBoxFillMethods();
     self->methods->finishConstruct(self, a1, a2, a3);
 }
 
-void ClassEAC0__FinishConstruct(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void BoxFill__Reset(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     ClassEAC0Methods *methods;
 
     self->unk44 = a3;

@@ -1,4 +1,6 @@
-# Obj6EAC0__ApplyColor — MATCHED (26/26), round 19
+# BoxFill__ApplyColor — MATCHED (26/26), round 19
+
+> Renamed from `Obj6EAC0__ApplyColor` on 2026-09-25 (tools/rename.py). Address 0x80040790.
 
 > Renamed from `func_80040790` on 2026-09-18 (tools/rename.py). Address 0x80040790.
 
@@ -8,7 +10,7 @@ Unit: `src/code_2cc8c_f.c`. Blocker screen clean (no `gp_rel`, no
 ## Round 19: closed with the whole-struct-assignment axis
 
 Same lever that closed `TaskCore__SetColors` (this round) and `Class6E99C__PushPosition`/
-`Obj6EAC0__SetPosition` (round 18/19): the "copy arm" of this function was a
+`BoxFill__SetPosition` (round 18/19): the "copy arm" of this function was a
 3-byte scalar-by-scalar assignment (`d[0]=r; d[1]=g; d[2]=b;`), and
 rewriting it as one whole-struct assignment through a local 3-byte
 struct type removed the residue -- both the redundant-move class
@@ -17,7 +19,7 @@ described below AND the register choice for the loads.
 ```c
 typedef struct { s8 r, g, b; } RGB80040790;
 
-void Obj6EAC0__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
+void BoxFill__ApplyColor(Obj6EAC0 *self, u8 *dst, u8 *src, s32 overwrite) {
     u8 *d;
     d = dst;
     if (overwrite) {
@@ -59,7 +61,7 @@ sX[1]=aY[1]; sX[2]=aY[2];` byte triple) and the same fix applies.
 ### Proposed learning
 
 A fourth confirmation of the whole-struct-assignment lever (after
-`Class6E99C__PushPosition`, `Obj6EAC0__SetPosition`, `TaskCore__SetColors`), and the first
+`Class6E99C__PushPosition`, `BoxFill__SetPosition`, `TaskCore__SetColors`), and the first
 instance paired with a "redundant move" framing rather than an
 insertion/deletion framing: **the "retail caches an argument into an
 extra unconditional register" residue and the "scalar-vs-aggregate
@@ -78,10 +80,10 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040790` | `Obj6EAC0__ApplyColor` | A |
+| `func_80040790` | `BoxFill__ApplyColor` | A |
 
 **Evidence.** Mechanics are the whole purpose (tier A): given `overwrite`,
 either copies a 3-byte RGB buffer wholesale (`*(RGB *)d = *(RGB *)src`) or
 adds each of the 3 bytes into the destination in place -- a "set or blend
 a colour" operation, with `dst` always `self->color` at its one call site
-(`Obj6EAC0__SetColor`, this unit).
+(`BoxFill__SetColor`, this unit).

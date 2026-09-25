@@ -54,9 +54,9 @@ void StyleBuildDecorSet(void) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *) &gStyleDecorPosBX;
-    gStyleDecorSlots[0] = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
+    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) gStyleColorTable, 0x1FFF);
     for (i = 1; i < 0x12; i++) {
-        obj = New_ClassEAC0(&paramB, (void *) (gStyleColorTable + i * 3), 0x1FFF);
+        obj = New_BoxFill(&paramB, (void *) (gStyleColorTable + i * 3), 0x1FFF);
         gStyleDecorSlots[i] = obj;
         ((ObjSlot4C *) obj)->methods->slot4C(obj, gStyleDecorSlots[0], &paramA);
         paramA.y += 3;
@@ -223,7 +223,7 @@ side effect of the image moving. The honest figures are the two in the title:
 Needs, already present earlier in the unit in strict ROM order:
 `extern s32 gStyleDecorVariant, gStyleDecorPosAX, gStyleDecorPosAY, gStyleDecorPosBX, gStyleDecorPosBY,
 gStyleTargetObj, gStyleColorTable;`, `extern void *gStyleDecorSlots[];`,
-`extern void *New_ClassEAC0(void *a0, void *a1, s32 a2);`, and the
+`extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
 the function in the unit.
 
@@ -255,13 +255,13 @@ void StyleBuildDecorSet(void) {
     paramB = *(PairXY *) &gStyleDecorPosBX;
     i = 1;
     s1 = 3;
-    obj = New_ClassEAC0(&paramB, (void *) gStyleColorTable, 0x1FFF);
+    obj = New_BoxFill(&paramB, (void *) gStyleColorTable, 0x1FFF);
     __asm__("");
     arr = gStyleDecorSlots;
     wp = arr + 1;
     *arr = obj;
     do {
-        obj = New_ClassEAC0(&paramB, (void *) (s1 + gStyleColorTable), 0x1FFF);
+        obj = New_BoxFill(&paramB, (void *) (s1 + gStyleColorTable), 0x1FFF);
         *wp = obj;
         wp++;
         ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], &paramA);
@@ -313,7 +313,7 @@ stopped on it. The discriminator here costs one build.
 **`StyleBuildDecorSet`, tier B.**
 
 Guarded by `gStyleDecorVariant` (set only for `gStyleVariant == 0` by
-`PickStyleFallbackConfig`). Allocates 18 `New_ClassEAC0` instances into
+`PickStyleFallbackConfig`). Allocates 18 `New_BoxFill` instances into
 `gStyleDecorSlots`, walking two position pairs (`paramA`/`paramB`) that step
 by a fixed per-iteration delta. Released by `StyleReleaseDecorSet`,
 per-frame-updated by `StyleUpdateDecorSet` (sibling report; same guard, same

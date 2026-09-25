@@ -293,7 +293,7 @@ void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
     style->unk14 = cfg[0];
 }
 
-/* Local view only -- New_ClassEAC0 is already declared elsewhere
+/* Local view only -- New_BoxFill is already declared elsewhere
  * (include/code_2cc8c.h) returning `ClassEAC0Obj *`, a header this unit
  * does not own. This unit only ever reaches slots 0x4C/0x64/0x68 on the
  * returned object, so it gets its own minimal local type rather than
@@ -331,13 +331,13 @@ typedef struct FieldAC7CHolder {
 extern s32 gStyleDecorObj;
 extern s32 D_8008AB60;
 extern s32 D_8008AB58;
-extern LocalM4D0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
+extern LocalM4D0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
     if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32) New_ClassEAC0(&D_8008AB60, (void *) gStyleDecorColor, 0);
+        gStyleDecorObj = (s32) New_BoxFill(&D_8008AB60, (void *) gStyleDecorColor, 0);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
 

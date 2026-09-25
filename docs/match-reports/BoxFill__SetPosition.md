@@ -1,4 +1,6 @@
-# Obj6EAC0__SetPosition — MATCHED (11/11), round 19
+# BoxFill__SetPosition — MATCHED (11/11), round 19
+
+> Renamed from `Obj6EAC0__SetPosition` on 2026-09-25 (tools/rename.py). Address 0x800407f8.
 
 > Renamed from `func_800407F8` on 2026-09-18 (tools/rename.py). Address 0x800407f8.
 
@@ -18,7 +20,7 @@ instead of two scalar assignments, exactly as `Class6E99C__PushPosition` documen
 ## Final body (byte-exact, 11/11, no drift)
 
 ```c
-void Obj6EAC0__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
+void BoxFill__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
     if (self->unkC != 0) {
         *(Pair32E99C *)&self->unk50 = *a1;
     }
@@ -31,7 +33,7 @@ type introduced for `Class6E99C__PushPosition`'s own `a2` argument; `self->unk50
 struct copied from their own `a1` argument", so this is the same shape,
 not a new one. `Obj6EAC0Methods::slotBC`'s prototype was retyped from
 `void *a1` to `Pair32E99C *a1` to match (the only call site,
-`Obj6EAC0__Layout`'s `self->methods->slotBC(self, a2)` in this same unit,
+`BoxFill__AttachToParent`'s `self->methods->slotBC(self, a2)` in this same unit,
 compiles unchanged since `a2` there is still `void *` and C89 converts
 either direction implicitly).
 
@@ -51,10 +53,10 @@ written, never whether they should be one aggregate store instead. That is
 exactly `docs/MATCHING-GUIDE.md`'s "a long attempt list is not a broad
 one" pattern: four attempts, one untested axis.
 
-The round-18 report reasoned by analogy to `Obj6EAC0__ApplyColor` (a genuinely
+The round-18 report reasoned by analogy to `BoxFill__ApplyColor` (a genuinely
 different function, still stalled, see that report) and declined to run
 the permuter because that sibling's permuter run "made no real progress."
-That comparison doesn't hold up: `Obj6EAC0__ApplyColor`'s residue is a plain
+That comparison doesn't hold up: `BoxFill__ApplyColor`'s residue is a plain
 caller-saved temp-register CHOICE with no adjacent struct-shaped field
 pair to fold into an aggregate copy, so the same lever doesn't apply
 there -- their surface symptoms (unconditional cache into a fresh
@@ -83,7 +85,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800407F8` | `Obj6EAC0__SetPosition` | B |
+| `func_800407F8` | `BoxFill__SetPosition` | B |
 
 **Evidence.** Base occupant of `slotBC`: `if (self->hasChildren != 0) {
 *(Pair32E99C *)&self->posX = *a1; }` -- stores an incoming 2-word pair

@@ -1,20 +1,23 @@
-# func_80040740 — MATCHED (11/11 words)
+# BoxFill__SetSemiTrans — MATCHED (11/11 words)
+
+> Renamed from `func_80040714` on 2026-09-25 (tools/rename.py). Address 0x80040714.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-s32 func_80040740(Obj6EAC0 *self, s32 a1) {
-    return GetSetBitField(&self->unk58, 0x1C, 2, a1);
+s32 BoxFill__SetSemiTrans(Obj6EAC0 *self, s32 a1) {
+    return GetSetBitField(&self->unk58, 0x1E, 1, a1 != 0);
 }
 ```
 
-Sibling of `func_800406E4`/`func_80040714`; base-table occupant of
-`Obj6EAC0Methods::slot0x68`. Shift 0x1C, width 2, raw `a1` passed
-through unchanged -- matches `code_d294.c`'s `Class6B5CC__SetSemiTransRate` shape.
+Sibling of `BoxFill__SetDisplay`/`BoxFill__SetSemiTransRate`; base-table occupant of
+`Obj6EAC0Methods::slot0x64`. Shift 0x1E, width 1, no negation on the
+result -- matches `code_d294.c`'s `Class6B5CC__SetSemiTrans` shape exactly modulo
+field name.
 
 ### Proposed learning
 
-None beyond `func_800406E4`'s entry.
+None beyond `BoxFill__SetDisplay`'s entry.
 
 ## Naming
 
@@ -22,7 +25,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80040740` | (kept `func_80040740`) | C |
+| `BoxFill__SetSemiTrans` | (kept `BoxFill__SetSemiTrans`) | C |
 
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
 shift, width, value)` (see `include/code_2cc8c.h`'s own comment on

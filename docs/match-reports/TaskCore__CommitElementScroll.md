@@ -404,25 +404,25 @@ a separate `$a1`.
    delay-slot choice): byte-identical output to the `for` version, no
    change at all (114/118, same two residues).
 2. **Wrapped the `arr`/`count`/loop block in its own
-   `do { ... } while (0)`** (the lever that closed `Obj6EAC0__SetChar` this
+   `do { ... } while (0)`** (the lever that closed `BoxFill__AttachAbsolute` this
    round for an almost identical symptom -- a delay-slot filler placed
    in the wrong of two available slots): this REGRESSED badly, to
    18/118 with a whole-function length change (the "differs outside
-   range" warning fired). Unlike `Obj6EAC0__SetChar`'s case, the `do/while`
+   range" warning fired). Unlike `BoxFill__AttachAbsolute`'s case, the `do/while`
    wrapper here doesn't just re-route one delay-slot filler; it changes
    the compiled length of the loop-adjacent code entirely. Reverted
    immediately.
 
 Both closed as firm negatives for this instance. The `do/while(0)`
 lever is confirmed NOT a general delay-slot-residue fix -- it worked for
-`Obj6EAC0__SetChar`'s specific shape (a single unconditional call-plus-two-
+`BoxFill__AttachAbsolute`'s specific shape (a single unconditional call-plus-two-
 stores block) and actively hurts this considerably larger, branch-and-
 loop-containing function. Restored to `INCLUDE_ASM`, build re-confirmed
 clean (`build exit=0`) before moving on.
 
 ### Proposed learning (round 19 addition)
 
-Narrows `Obj6EAC0__SetChar`'s new `do/while(0)`-wrapper learning: it is a
+Narrows `BoxFill__AttachAbsolute`'s new `do/while(0)`-wrapper learning: it is a
 lever to TRY on a delay-slot-filler-placement residue, not a lever that
 generalises to every such residue regardless of the surrounding
 function's size or control-flow complexity. Confirmed here as an active

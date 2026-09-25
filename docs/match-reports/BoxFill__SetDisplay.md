@@ -1,9 +1,11 @@
-# func_800406E4 — MATCHED (12/12 words)
+# BoxFill__SetDisplay — MATCHED (12/12 words)
+
+> Renamed from `func_800406E4` on 2026-09-25 (tools/rename.py). Address 0x800406e4.
 
 Unit: `src/code_2cc8c_f.c`. First attempt.
 
 ```c
-s32 func_800406E4(Obj6EAC0 *self, s32 a1) {
+s32 BoxFill__SetDisplay(Obj6EAC0 *self, s32 a1) {
     return GetSetBitField(&self->unk58, 0x1F, 1, a1 == 0) == 0;
 }
 ```
@@ -29,7 +31,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_800406E4` | (kept `func_800406E4`) | C |
+| `BoxFill__SetDisplay` | (kept `BoxFill__SetDisplay`) | C |
 
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
 shift, width, value)` (see `include/code_2cc8c.h`'s own comment on

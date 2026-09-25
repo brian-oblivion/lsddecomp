@@ -14,7 +14,7 @@ void Obj6EAC0__SetChildChar(Obj6EAC0 *self, s32 a1, s32 a2) {
 Derived-table occupant of `Obj6EAC0Methods::slotC4`, dispatching a
 CHILD's own `slotC4` at 2 explicit arguments. This is exactly why
 `slotC4` was made unprototyped (K&R style, no parameter list) in the
-previous commit -- the base occupant `Obj6EAC0__SetChar` forwards 4 raw
+previous commit -- the base occupant `BoxFill__AttachAbsolute` forwards 4 raw
 args through the same named slot, and calling through an unprototyped
 function pointer needs no cast for either arity.
 
@@ -35,5 +35,5 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 elem->methods->slotC4(elem, a1 & 0xFF);` -- dispatches a single 8-bit
 value to ONE child selected by index, through the same slot
 `Obj6EAC0__SetText` (this unit) drives across ALL children one string
-byte at a time. See `Obj6EAC0__SetChar`'s own report for the full
+byte at a time. See `BoxFill__AttachAbsolute`'s own report for the full
 cross-reference; same tier B.

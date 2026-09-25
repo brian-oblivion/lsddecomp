@@ -1,4 +1,6 @@
-# ClassEAC0__ClassEAC0 -- MATCH (33/33 words, first attempt)
+# BoxFill__BoxFill -- MATCH (33/33 words, first attempt)
+
+> Renamed from `ClassEAC0__ClassEAC0` on 2026-09-25 (tools/rename.py). Address 0x8004054c.
 
 > Renamed from `func_8004054C` on 2026-09-20 (tools/rename.py). Address 0x8004054c.
 
@@ -8,9 +10,9 @@ same "call the further-base ctor first, reset methods, redispatch finishConstruc
 chain `Class6E99C__Class6E99C` uses one level up:
 
 ```c
-void ClassEAC0__ClassEAC0(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void BoxFill__BoxFill(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
     GetClass6B5CCMethods()->ctor(self);
-    self->methods = Obj6EAC0__GetBaseMethods();
+    self->methods = GetBoxFillMethods();
     self->methods->finishConstruct(self, a1, a2, a3);
 }
 ```
@@ -23,7 +25,7 @@ this call site's own single-argument setup.
 
 ## Naming (round 61, track 3)
 
-**`ClassEAC0__ClassEAC0`** -- tier A. `ClassEAC0Methods::ctor` (`+0x008`),
+**`BoxFill__BoxFill`** -- tier A. `ClassEAC0Methods::ctor` (`+0x008`),
 one level further down the same "call the further-base ctor first, reset
 `self->methods`, redispatch `finishConstruct`" chain
 `Class6E99C__Class6E99C` uses one level up. Named per the same

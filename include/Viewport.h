@@ -39,8 +39,8 @@
  * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. Class869D8's own
  * views are its own and do not expand these macros yet.
  *
- * Not settled here: subHandle is a Class6E99C (0x164, below D_8006EAC0,
- * 0x64), whose +0x04C override (Obj6EAC0__Layout) takes a two-word screen
+ * Not settled here: subHandle is a Class6E99C (0x164, below gBoxFillMethods,
+ * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
  * position where Class6B5CC's attachToParent slot takes a Vec3_d294 offset;
  * the ctor and SetSubHandle pass D_8008A904 (-100, -100) through the
  * inherited slot with a pointer cast. unk44 and unk48 multiply to each

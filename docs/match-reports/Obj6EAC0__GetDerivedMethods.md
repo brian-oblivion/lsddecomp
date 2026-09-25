@@ -10,7 +10,7 @@ Obj6EAC0Methods *Obj6EAC0__GetDerivedMethods(void) {
 }
 ```
 
-The override-table twin of `Obj6EAC0__GetBaseMethods` (returns `&D_8006EAC0`).
+The override-table twin of `GetBoxFillMethods` (returns `&gBoxFillMethods`).
 Called by `New_Obj6EAC0` (this unit, the class's `New_X`-shaped
 allocator) to fetch the constructor at `slot0x08`.
 
@@ -28,4 +28,4 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 **Evidence.** A pure leaf getter (tier A by definition): returns
 `&D_8006EB90`, the override method table. Twin of
-`Obj6EAC0__GetBaseMethods` (returns `&D_8006EAC0`, the base table).
+`GetBoxFillMethods` (returns `&gBoxFillMethods`, the base table).

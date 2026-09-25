@@ -27,7 +27,7 @@ typedef struct Pair32E99C Pair32E99C;
  * `BasicClass *` and the accessors here cast to the view (`Unk48Obj`:
  * `sound`, a VabStreamObj; `Unk78Obj`: `bgLayer`; `Unk74Obj`: `subHandle`
  * and TaskCoreTarget's `handle`; `Unk64Elem`: the slot and item widgets,
- * New_Obj6EAC0; `Unk68Obj`: `listView`, New_ClassEAC0). `SlotEntry` and
+ * New_Obj6EAC0; `Unk68Obj`: `listView`, New_BoxFill). `SlotEntry` and
  * `SrcDesc` are two readings of one TaskCoreTarget::unk24[] record.
  */
 typedef struct Unk48Obj Unk48Obj;
@@ -273,8 +273,8 @@ struct Unk64Elem {
 
 /*
  * self->unk68's pointee (round 12, from TaskCore__ReleaseTarget/TaskCore__CommitElementScroll/
- * TaskCore__RefreshSlotView). Built by `New_ClassEAC0(&D_8008A8E8, &D_8008A8F0, 0)` in
- * TaskCore__SetTarget -- New_ClassEAC0 itself lives in the still-uncarved
+ * TaskCore__RefreshSlotView). Built by `New_BoxFill(&D_8008A8E8, &D_8008A8F0, 0)` in
+ * TaskCore__SetTarget -- New_BoxFill itself lives in the still-uncarved
  * code_2cc8c_d segment (not this unit's function to attempt), so it is
  * declared here only as an external returning this unit's own local view
  * of the type it constructs. D_8008A8E8/D_8008A8F0 are likewise only ever
@@ -306,12 +306,12 @@ struct Unk68Obj {
 /* Retyped round 14 once code_2cc8c_e's own body was matched: this is the
    New_X allocator for `ClassEAC0Obj` (see the Class6E99CObj/ClassEAC0Obj
    section far below) -- `BMemPMgrAlloc(0x6C)` then
-   `Obj6EAC0__GetBaseMethods()->ctor(self, a0, a1, a2)`. Parameter types are UNCHANGED
+   `GetBoxFillMethods()->ctor(self, a0, a1, a2)`. Parameter types are UNCHANGED
    from the existing declaration (both already pointer/pointer/s32, matching
    this call site's own real arguments exactly); only the RETURN type
    differs from `code_2cc8c_b.c`'s own `Unk68Obj *` view -- ABI-identical
    (a plain pointer either way), verified with a full rebuild. */
-extern ClassEAC0Obj *New_ClassEAC0(void *a0, void *a1, s32 a2);
+extern ClassEAC0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
 extern s32 D_8008A8E8[2];   /* address-taken only by this unit */
 extern char D_8008A8F0[4];  /* address-taken only by this unit */
 
@@ -453,7 +453,7 @@ extern void *New_D8006EFAC(void); /* external, no args; not yet seen
  * family, from two units, and both are kept deliberately.
  *
  * `Obj6EAC0` (runner bravo, code_2cc8c_f) and `ClassEAC0Obj` (runner alpha,
- * code_2cc8c_e) are independent local views of D_8006EAC0 and its siblings.
+ * code_2cc8c_e) are independent local views of gBoxFillMethods and its siblings.
  * They were derived in parallel, from different call sites, and each is
  * depended on by its own unit's ALREADY-MATCHED code -- so neither can be
  * dropped without re-verifying the other unit's byte-exact functions.
@@ -471,8 +471,8 @@ extern void *New_D8006EFAC(void); /* external, no args; not yet seen
 
 /*
  * A previously-unnamed BasicClass-derived class family, round 14
- * (code_2cc8c_f): base table D_8006EAC0 ("d") and its override table
- * D_8006EB90, resolved with `tools/classtable.py D_8006EAC0 --vs
+ * (code_2cc8c_f): base table gBoxFillMethods ("d") and its override table
+ * D_8006EB90, resolved with `tools/classtable.py gBoxFillMethods --vs
  * D_8006EB90`. A third sibling table, D_8006EC74 (returned by the
  * external getter Get_vtable_D8006EC74), shares the identical slot layout and
  * is reached only through that getter, never dereferenced by address
@@ -540,13 +540,13 @@ struct Obj6EAC0Methods {
     void (*slot4C)(); /* +0x04C, DELIBERATELY UNPROTOTYPED (K&R style):
                                   call sites in this unit need it at BOTH
                                   3 and 4 explicit arguments
-                                  (Obj6EAC0__SetChar forwards 4;
+                                  (BoxFill__AttachAbsolute forwards 4;
                                   Obj6EAC0__LayoutChildrenWithGap calls it at 3, twice, with
                                   different argument MEANINGS each time)
                                   and C requires an exact arg-count match
                                   through a prototyped function-pointer
                                   type, which no single prototype here
-                                  could satisfy. IS Obj6EAC0__Layout (base,
+                                  could satisfy. IS BoxFill__AttachToParent (base,
                                   this unit, reads 3) and Obj6EAC0__LayoutChildrenWithGap
                                   (derived, this unit, reads 3) */
     void (*slot50)(Obj6EAC0 *self); /* +0x050, IS func_80040C00 (derived,
@@ -557,43 +557,43 @@ struct Obj6EAC0Methods {
                                   into a child's own slot60 with the same
                                   a1 and threads the return value through
                                   as its own return (last-iteration wins) */
-    s32 (*slot64)(Obj6EAC0 *self, s32 a1); /* +0x064, IS func_80040714
+    s32 (*slot64)(Obj6EAC0 *self, s32 a1); /* +0x064, IS BoxFill__SetSemiTrans
                                   (base, this unit) -- tail-returns a
                                   packed-bitfield accessor */
-    s32 (*slot68)(Obj6EAC0 *self, s32 a1); /* +0x068, IS func_80040740
+    s32 (*slot68)(Obj6EAC0 *self, s32 a1); /* +0x068, IS BoxFill__SetSemiTransRate
                                   (base, this unit), same shape as
                                   slot64 */
     u8 pad06C[0x0B8 - 0x06C];
     void (*slotB8)(Obj6EAC0 *self, s32 a1); /* +0x0B8, the only OBSERVED
                                   CALL through this slot is
                                   Obj6EAC0__PropagateColor's own child dispatch, at
-                                  2 args. Obj6EAC0__SetColor (base occupant)
+                                  2 args. BoxFill__SetColor (base occupant)
                                   takes a 3rd (`u8 *src`) in its own
                                   definition, which is fine -- an
                                   occupant's own arity need not match a
                                   narrower call site (nothing in this
                                   unit calls slotB8 at 3 args) */
-    void (*slotBC)(Obj6EAC0 *self, Pair32E99C *a1); /* +0x0BC, IS Obj6EAC0__SetPosition
+    void (*slotBC)(Obj6EAC0 *self, Pair32E99C *a1); /* +0x0BC, IS BoxFill__SetPosition
                                   (base, this unit) and Obj6EAC0__LayoutChildren
                                   (derived, this unit); a1 a 2-word
                                   struct pointer in both -- same shape as
                                   Class6E99CObj's own Pair32E99C (see
                                   Class6E99C__PushPosition) */
-    void (*slotC0)(Obj6EAC0 *self, void *a1); /* +0x0C0, IS func_80040824
+    void (*slotC0)(Obj6EAC0 *self, void *a1); /* +0x0C0, IS BoxFill__SetSize
                                   (base, this unit); a1 a 2-halfword
                                   struct pointer */
     void (*slotC4)(); /* +0x0C4, DELIBERATELY UNPROTOTYPED, same reason as
-                                  slot4C above: Obj6EAC0__SetChar forwards 4
+                                  slot4C above: BoxFill__AttachAbsolute forwards 4
                                   args, Obj6EAC0__SetText dispatches a CHILD's
-                                  slotC4 at only 2. IS Obj6EAC0__SetChar
+                                  slotC4 at only 2. IS BoxFill__AttachAbsolute
                                   (base, this unit, reads 3) and
                                   Obj6EAC0__SetChildChar (derived, this unit,
                                   reads 2) */
-    void (*slotC8)(Obj6EAC0 *self, s32 a1); /* +0x0C8, IS func_800408A0
+    void (*slotC8)(Obj6EAC0 *self, s32 a1); /* +0x0C8, IS BoxFill__SetPri
                                   (base, this unit, setter) and
                                   Obj6EAC0__NoOpSetter (derived, this unit,
                                   splat-generated trivial jr $ra; nop) */
-    s32 (*slotCC)(Obj6EAC0 *self, s32 a1); /* +0x0CC, IS Obj6EAC0__SetMask
+    s32 (*slotCC)(Obj6EAC0 *self, s32 a1); /* +0x0CC, IS BoxFill__SetMask
                                   (base, this unit) and Obj6EAC0__SetText
                                   (derived, this unit) */
     void (*slotD0)(Obj6EAC0 *self); /* +0x0D0, derived-only, IS
@@ -607,15 +607,15 @@ struct Obj6EAC0 {
     Obj6EAC0Methods *methods; /* +0x000 */
     u8 pad004[0x00C - 0x004];
     s32 hasChildren;           /* +0x00C, OBSERVED: an enable/child-count
-                                  gate tested by Obj6EAC0__Layout,
+                                  gate tested by BoxFill__AttachToParent,
                                   Obj6EAC0__LayoutChildrenWithGap, func_80040C00,
                                   Obj6EAC0__LayoutChildren */
     u8 pad010[0x044 - 0x010];
-    s32 unk44;                 /* +0x044, OBSERVED: func_800408A0 (setter) */
-    s32 unk48;                 /* +0x048, OBSERVED: zeroed by Obj6EAC0__SetChar */
-    s32 unk4C;                 /* +0x04C, OBSERVED: Obj6EAC0__SetChar (setter,
+    s32 unk44;                 /* +0x044, OBSERVED: BoxFill__SetPri (setter) */
+    s32 unk48;                 /* +0x048, OBSERVED: zeroed by BoxFill__AttachAbsolute */
+    s32 unk4C;                 /* +0x04C, OBSERVED: BoxFill__AttachAbsolute (setter,
                                   from its own a3) */
-    s32 posX;                  /* +0x050, OBSERVED: Obj6EAC0__SetPosition/
+    s32 posX;                  /* +0x050, OBSERVED: BoxFill__SetPosition/
                                   Obj6EAC0__LayoutChildren (slotBC occupants) --
                                   first word of a 2-word struct copied
                                   from their own `a1` argument */
@@ -625,15 +625,15 @@ struct Obj6EAC0 {
                                   -- same generic accessor as
                                   include/code_d294.h's `unk10` */
     u8 pad05C[0x060 - 0x05C];
-    s16 unk60;                 /* +0x060, OBSERVED: func_80040824 (slotC0
+    s16 unk60;                 /* +0x060, OBSERVED: BoxFill__SetSize (slotC0
                                   occupant) -- first halfword of a
                                   2-halfword struct copied from its own
                                   `a1` argument */
     s16 unk62;                 /* +0x062, OBSERVED: ditto, second halfword */
-    u8 color[3];                /* +0x064, OBSERVED: Obj6EAC0__SetColor -- a
+    u8 color[3];                /* +0x064, OBSERVED: BoxFill__SetColor -- a
                                   3-byte colour buffer, overwritten or
-                                  added-into via Obj6EAC0__ApplyColor */
-    s32 mask;                  /* +0x068, OBSERVED: Obj6EAC0__SetMask (setter,
+                                  added-into via BoxFill__ApplyColor */
+    s32 mask;                  /* +0x068, OBSERVED: BoxFill__SetMask (setter,
                                   a `(1 << a1) - 1` bitmask) */
     u8 pad06C[0x0A9 - 0x06C];
     u8 totalChildCount;         /* +0x0A9, OBSERVED: Obj6EAC0__Destruct (passed
@@ -666,9 +666,9 @@ struct Obj6EAC0 {
  * per the established multiple-independent-local-views convention. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
-extern Obj6EAC0Methods D_8006EAC0; /* the base table itself, so
-                                       Obj6EAC0__GetBaseMethods's own definition
-                                       (this unit) can return &D_8006EAC0 */
+extern Obj6EAC0Methods gBoxFillMethods; /* the base table itself, so
+                                       GetBoxFillMethods's own definition
+                                       (this unit) can return &gBoxFillMethods */
 extern Obj6EAC0Methods D_8006EB90; /* the override table itself, so
                                        Obj6EAC0__GetDerivedMethods's own definition
                                        (this unit) can return &D_8006EB90 */
@@ -717,20 +717,20 @@ extern Obj6EAC0 *New_D8006EC74(s32 a1, s32 a2); /* another New_X-shaped
  * `Class6B5CCMethods`) -- the same base-class fingerprint code_d294.h
  * already established, so D_8006E99C is a Class6B5CC descendant. It is
  * NOT a direct child, though: its own ctor (Class6E99C__Class6E99C, this unit)
- * calls `Obj6EAC0__GetBaseMethods()->ctor(self, a1, a2, a3)` before overwriting
+ * calls `GetBoxFillMethods()->ctor(self, a1, a2, a3)` before overwriting
  * `self->methods` with `&D_8006E99C` and re-dispatching through it --
  * exactly the established "base ctor first, then set own vtable pointer,
  * then dispatch through it" idiom (see e.g. Class86B60__Class86B60's entry in
- * DECOMPILATION_LEARNINGS). `Obj6EAC0__GetBaseMethods` (code_2cc8c_f, bravo's own
- * function) is a bare no-argument getter for a SECOND table, D_8006EAC0
+ * DECOMPILATION_LEARNINGS). `GetBoxFillMethods` (code_2cc8c_f, bravo's own
+ * function) is a bare no-argument getter for a SECOND table, gBoxFillMethods
  * -- itself sharing the identical fingerprint with gClass6B5CCMethods, so the
  * real chain is Class6B5CC -> "ClassEAC0" -> "Class6E99C". Two
  * `New_X`-shaped allocators confirm the two concrete sizes: New_Class6E99C
  * allocates 0xA0 bytes for a Class6E99C instance (getting its own table
  * via GetClass6E99CMethods, a bare getter this unit also implements) and
- * New_ClassEAC0 allocates a SMALLER 0x6C bytes for a bare ClassEAC0
- * instance (getting D_8006EAC0 via Obj6EAC0__GetBaseMethods) -- consistent with
- * ClassEAC0 being the smaller, less-derived class. ClassEAC0__ClassEAC0 is
+ * New_BoxFill allocates a SMALLER 0x6C bytes for a bare ClassEAC0
+ * instance (getting gBoxFillMethods via GetBoxFillMethods) -- consistent with
+ * ClassEAC0 being the smaller, less-derived class. BoxFill__BoxFill is
  * ClassEAC0's OWN ctor, sharing the identical "call a further-base ctor,
  * reset methods, redispatch slot40" shape one level up: it calls
  * `GetClass6B5CCMethods()->ctor(self)` (GetClass6B5CCMethods, code_d294.h's own getter
@@ -786,29 +786,29 @@ struct ClassEAC0Methods {
     s32 header;                                        /* +0x000 */
     void *unk04;                                        /* +0x004, BasicClass__Release, inherited, unused here */
     void (*ctor)(ClassEAC0Obj *self, void *a1, void *a2, s32 a3); /* +0x008,
-                                ClassEAC0__ClassEAC0 (this unit). `a1`/`a2` kept as
+                                BoxFill__BoxFill (this unit). `a1`/`a2` kept as
                                 plain `void *` here (not `SkipShort2 *`) --
                                 this is the SLOT's own type, used by every
                                 CALLER of the ctor through the vtable
-                                (New_Class6E99C/Class6E99C__Class6E99C/New_ClassEAC0,
+                                (New_Class6E99C/Class6E99C__Class6E99C/New_BoxFill,
                                 none of which know about `SkipShort2`); the
                                 occupant's own definition is free to use a
                                 more specific parameter type internally. */
     void (*dtor)(ClassEAC0Obj *self);                   /* +0x00C, Class6B5CC__Finalize, shared with Class6B5CCMethods */
     u8 pad010[0x040 - 0x010];
-    void (*finishConstruct)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, ClassEAC0__FinishConstruct (this unit).
+    void (*finishConstruct)(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3); /* +0x040, BoxFill__Reset (this unit).
                                 RENAMED round 61 (was slot40). */
     u8 pad044[0x0B8 - 0x044];
-    /* +0x0B8, OBSERVED (this unit, ClassEAC0__FinishConstruct/Class6E99C__StartFadeToIndex/
+    /* +0x0B8, OBSERVED (this unit, BoxFill__Reset/Class6E99C__StartFadeToIndex/
        Class6E99C__StartFadeDefault): dispatched as `(self, 1, tableEntry)` where
        `tableEntry` is a computed address into D_8006EA90 (indexed) or the
-       fixed D_8006EAA8/D_8008A924. Occupant `Obj6EAC0__SetColor`
+       fixed D_8006EAA8/D_8008A924. Occupant `BoxFill__SetColor`
        (code_2cc8c_f, bravo's own function) -- not this unit's to type
        further. */
     void (*slotB8)(ClassEAC0Obj *self, s32 a1, void *tableEntry);
     u8 pad0BC[0x0CC - 0x0BC];
-    /* +0x0CC, OBSERVED (ClassEAC0__FinishConstruct): dispatched as `(self, 0xD)`.
-       Occupant `Obj6EAC0__SetMask` (code_2cc8c_f). */
+    /* +0x0CC, OBSERVED (BoxFill__Reset): dispatched as `(self, 0xD)`.
+       Occupant `BoxFill__SetMask` (code_2cc8c_f). */
     void (*slotCC)(ClassEAC0Obj *self, s32 a1);
     u8 pad0D0[0x0DC - 0x0D0];
     /* +0x0DC, OBSERVED (Class6E99C__StartFadeToIndex/Class6E99C__StartFadeDefault): dispatched with only
@@ -822,15 +822,15 @@ struct ClassEAC0Methods {
 struct ClassEAC0Obj {
     ClassEAC0Methods *methods; /* +0x000 */
     u8 pad004[0x044 - 0x004];
-    s32 unk44;                 /* +0x044, OBSERVED: ClassEAC0__FinishConstruct (ctor's own a3) */
-    s32 unk48;                 /* +0x048, OBSERVED: ClassEAC0__FinishConstruct, set to 1 */
-    s32 unk4C;                 /* +0x04C, OBSERVED: ClassEAC0__FinishConstruct, zeroed */
+    s32 unk44;                 /* +0x044, OBSERVED: BoxFill__Reset (ctor's own a3) */
+    s32 unk48;                 /* +0x048, OBSERVED: BoxFill__Reset, set to 1 */
+    s32 unk4C;                 /* +0x04C, OBSERVED: BoxFill__Reset, zeroed */
     u8 pad050[0x058 - 0x050];
-    s32 unk58;                 /* +0x058, OBSERVED: ClassEAC0__FinishConstruct, zeroed */
-    s16 unk5C;                 /* +0x05C, OBSERVED: ClassEAC0__FinishConstruct, zeroed */
-    s16 unk5E;                 /* +0x05E, OBSERVED: ClassEAC0__FinishConstruct, zeroed */
-    s16 unk60;                 /* +0x060, OBSERVED: ClassEAC0__FinishConstruct, from a1->0x0 */
-    s16 unk62;                 /* +0x062, OBSERVED: ClassEAC0__FinishConstruct, from a1->0x4 */
+    s32 unk58;                 /* +0x058, OBSERVED: BoxFill__Reset, zeroed */
+    s16 unk5C;                 /* +0x05C, OBSERVED: BoxFill__Reset, zeroed */
+    s16 unk5E;                 /* +0x05E, OBSERVED: BoxFill__Reset, zeroed */
+    s16 unk60;                 /* +0x060, OBSERVED: BoxFill__Reset, from a1->0x0 */
+    s16 unk62;                 /* +0x062, OBSERVED: BoxFill__Reset, from a1->0x4 */
     u8 pad064[0x06C - 0x064];
     s32 state;                 /* +0x06C, OBSERVED: Class6E99C__Stop/Class6E99C__StartFadeToIndex/
                                    Class6E99C__StartFadeDefault, a small dispatch-state tag
@@ -883,7 +883,7 @@ struct Class6E99CMethods {
     u8 pad044[0x060 - 0x044];
     /* +0x060/+0x064, OBSERVED: Class6E99C__FinishConstruct/Class6E99C__Stop, both dispatched
        as `(self, s32 a1)`. Occupants (code_2cc8c_f, bravo's own functions):
-       func_800406E4 (+0x060), func_80040714 (+0x064). */
+       BoxFill__SetDisplay (+0x060), BoxFill__SetSemiTrans (+0x064). */
     void (*slot60)(Class6E99CObj *self, s32 a1);
     void (*slot64)(Class6E99CObj *self, s32 a1);
     /* +0x068, OBSERVED: Class6E99C__Configure, dispatched as `(self, s32 flag)`
@@ -897,7 +897,7 @@ struct Class6E99CMethods {
                                 RENAMED round 61 (was slot98). */
     u8 pad09C[0x0B8 - 0x09C];
     /* +0x0B8/+0x0CC, IS ClassEAC0Methods's own +0x0B8/+0x0CC
-       (Obj6EAC0__SetColor/Obj6EAC0__SetMask, both code_2cc8c_f) -- identical
+       (BoxFill__SetColor/BoxFill__SetMask, both code_2cc8c_f) -- identical
        addresses in both tables (this class does not override them), same
        fingerprint as the other shared slots above. OBSERVED:
        Class6E99C__StartFadeToIndex/Class6E99C__StartFadeDefault (both this unit). */
@@ -1036,7 +1036,7 @@ extern u8 D_8006EAA8[];
 extern u8 D_8008A924[3];
 
 extern Class6E99CMethods D_8006E99C;
-/* D_8006EAC0 is declared once, above, as `Obj6EAC0Methods` -- bravo's
+/* gBoxFillMethods is declared once, above, as `Obj6EAC0Methods` -- bravo's
  * matched src/code_2cc8c_f.c returns its address. code_2cc8c_e declared
  * it too but never references it, so the duplicate is dropped. */
 extern Class6E99CMethods *GetClass6E99CMethods(void); /* this unit's own bare getter
@@ -1044,13 +1044,13 @@ extern Class6E99CMethods *GetClass6E99CMethods(void); /* this unit's own bare ge
                                                     idiom as GetClass6B5CCMethods
                                                     (code_d294.h) */
 /* Declared ONCE, matching its definition in src/code_2cc8c_f.c
- * (`Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void)`). code_2cc8c_e declared it
+ * (`Obj6EAC0Methods *GetBoxFillMethods(void)`). code_2cc8c_e declared it
  * returning its own `ClassEAC0Methods *` view of the same table, which
  * collided as `conflicting types`; that unit casts at its two call
  * sites instead. */
-extern Obj6EAC0Methods *Obj6EAC0__GetBaseMethods(void);  /* code_2cc8c_f (bravo's own
+extern Obj6EAC0Methods *GetBoxFillMethods(void);  /* code_2cc8c_f (bravo's own
                                                     function): bare getter
-                                                    for &D_8006EAC0 */
+                                                    for &gBoxFillMethods */
 
 /* ClassEAC0's base is Class6B5CC: include/Class6B5CC.h. */
 
