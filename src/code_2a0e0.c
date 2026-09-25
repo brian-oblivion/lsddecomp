@@ -135,7 +135,32 @@ void func_80039B90(SeqObj *self, s32 arg1, s32 arg2) {
         self->methods->play(self);
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_80039C04);
+s32 func_80039C04(SeqObj *self) {
+    SeqVab *vab;
+    SeqData *seq;
+
+    vab = self->unkC;
+    if (vab == NULL) {
+        return 0;
+    }
+    seq = self->unk10;
+    if (seq == NULL) {
+        return 0;
+    }
+    if (vab->ready == 0) {
+        return 0;
+    }
+    if (seq->loaded == 0) {
+        return 0;
+    }
+    self->seqId = SsSeqOpen(seq->addr, vab->vabId);
+    if (self->seqId == -1) {
+        printf(D_80010FEC);
+    }
+    SsSeqSetVol(self->seqId, 0x34, 0x34);
+    self->state = 2;
+    return 1;
+}
 void func_80039CBC(SeqObj *self) {
     if (self->playing == 0) {
         SsSeqSetVol(self->seqId, 0x34, 0x34);
