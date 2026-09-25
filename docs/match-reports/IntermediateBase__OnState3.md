@@ -72,3 +72,7 @@ shape exactly but forwarding to `self->initArgs->unk0` instead --
 via `addChild` (see `Obj86B60InitArgs`'s own header comment), which is why
 "Child" rather than "Target" here; the notification's game-level meaning
 remains unestablished (tier B).
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyChildReset. It occupies +0x068, which IntermediateBase__SetState runs on state 3: slot `onState3`, occupant named for it. It calls initArgs->unk0 at +0x04C and clears frameCounter; IntermediateBase__OnState2 does the same with +0x048 on the same object. Tier B.

@@ -37,3 +37,7 @@ independently established elsewhere (`Obj86B60__TickColorFade`, code_2cc8c.c) as
 running count/frame value", supporting "counters" as the mechanic; the
 in-game PURPOSE of that counter (what visual/timing effect it drives) is
 not established, hence tier B rather than A.
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__ResetCounters (class prefix). Occupies +0x040 (slot `resetCounters`); the ctor's last call. Clears frameCounter (+0x01C) and state (+0x020, was unk20: IntermediateBase__SetState stores its argument there). Overrides: TaskCoreObj__Reset, Class86668__CancelTimeout, Obj865C8__ResetState, StreamTaskObj__Reset.

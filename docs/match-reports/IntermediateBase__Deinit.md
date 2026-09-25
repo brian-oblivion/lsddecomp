@@ -123,3 +123,7 @@ i.e. only the ones this object actually owns. `Obj86B60Methods::deinit`
 confirmed by `tools/classtable.py`/direct table read (see the header's own
 "IS" attribution) and independently by `IntermediateBase__Init` calling
 `methods->deinit(self)` on its own mode-0 path.
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Deinit (class prefix). Occupies +0x048, slot `deinit`. Its first call, +0x050, is `onDeinit` (NULL here; Obj865C8__RunSubUpdates, ObjM__TeardownStyle, TaskCoreObj__func_8003C3D0 override it). The three releases go through BasicClass's release on `BasicClass *` fields (the Unk10Obj/Unk14Obj local views are gone).

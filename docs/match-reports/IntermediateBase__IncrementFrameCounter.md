@@ -56,3 +56,7 @@ itself is PROPOSED for rename to `frameCounter` in this unit's
   `code_2cc8c.c` (`Obj86B60__SetState`, `Obj86B60__TickColorFade`, and likely
   `Obj86B60__SetFadeRate`/`Obj86B60__TickFadeCallback`'s own callers of `self->unk1C`). Head
   applies by type scope.
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__IncrementFrameCounter (class prefix; tier A, the body is the name). Occupies +0x05C, slot `update`: OnNotify's case for a sender of root class 5 (D_8006EF50), as Class6B5CC names that slot. Overrides: Obj86B60__OnTag5Notify, Class86668__CheckTimeout, ObjM__TickTarget, GraphRoomObj__UpdateFromLog; the first two call this base first.

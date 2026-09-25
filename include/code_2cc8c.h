@@ -45,10 +45,12 @@ typedef struct Pair32E99C Pair32E99C;
  * TaskCoreObj__TaskCoreObj/TaskCoreObj__Reset et al, already established in
  * this same gTaskCoreMethods table, for why "Obj86B60" and not "TaskCoreObj"
  * is still the right prefix for the non-identity-defining methods: this
- * unit's own struct is typed `Obj86B60 *self` throughout, matching the
- * project's `IntermediateBase__IntermediateBase(Obj86B60 *self)` precedent
- * of naming by which table a function anchors rather than by its C
- * parameter type).
+ * unit's own struct is typed `Obj86B60 *self` throughout). Until round 82
+ * the parent class's own methods were typed on this view too; they are
+ * IntermediateBase's (gIntermediateBaseMethods) and take `IntermediateBase
+ * *self` from include/IntermediateBase.h, which also names this view's
+ * +0x00C..+0x024 (initArgs, unk10, unk14, viewport, frameCounter, state,
+ * initMode). This view is TaskCore's.
  *
  * Only the slots/fields this unit's functions actually touch are given
  * concrete types; everything else stays opaque padding.
@@ -1196,7 +1198,7 @@ struct Obj86B60 {
     Obj86B60UnkC *initArgs;      /* +0x00C, renamed from unkC round 55 --
                                     IntermediateBase__Init sets it to `(Obj86B60UnkC *)arg1`,
                                     i.e. it is literally the retained
-                                    Obj86B60InitArgs pointer the object was
+                                    init-args pointer (IntermediateBaseInitArgs) the object was
                                     constructed with, re-viewed through the
                                     Obj86B60UnkC local type wherever only its
                                     `target` field is needed (tier A: exclusive
@@ -1227,8 +1229,10 @@ struct Obj86B60 {
                                     locally) as Unk14Obj::slot10's 2nd arg --
                                     kept `s32` (the more general reading) per
                                     this header's "keep the general field,
-                                    cast locally" convention; see Unk14Obj's
-                                    own comment above. */
+                                    cast locally" convention. Unk14Obj was
+                                    IntermediateBase__Init's reading; it is
+                                    gone (round 82): IntermediateBase.h types
+                                    +0x010/+0x014 BasicClass *. */
     s32 unk14;                  /* +0x014, Obj86B60__BeginElementScroll: forwarded as
                                     slot100's 2nd arg -- generic word.
                                     ALSO OBSERVED (round 13) by IntermediateBase__Init,
@@ -1236,8 +1240,8 @@ struct Obj86B60 {
                                     field or a helper call) and, on one path,
                                     dispatches through it as a pointer to an
                                     object with its own vtable (cast locally
-                                    to `Unk14Obj *`, see that type's own
-                                    comment) -- kept `s32` here since that is
+                                    to the old `Unk14Obj *`; BasicClass * in
+                                    IntermediateBase.h) -- kept `s32` here since that is
                                     still the more general of the two
                                     observed readings. */
     Unk18Obj *viewport;          /* +0x018, renamed from unk18 round 55 --

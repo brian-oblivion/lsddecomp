@@ -467,3 +467,7 @@ SLPS_015.56` -- no bytes changed, the verified build never compiles the
 linked symbols`). The report's recorded 23/32 figure and residue class
 (pure register identity, self/arg1 swapped `$s0`/`$s1` vs retail's
 `$s1`/`$s0`) matched the body exactly; no discrepancy to flag.
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyParents. The round-55 name rested on the header's claim that this function is `slot30`'s occupant; it occupies +0x060 (`classtable.py gIntermediateBaseMethods`), and +0x030 is BasicClass__NotifyParents, which it CALLS. It stores its argument in +0x020 (now `state`), passes it to notifyParents, and runs +0x064 (`onState2`) on 2 and +0x068 (`onState3`) on 3. The overrides of +0x060 are named SetState (Obj86B60__SetState, Class86B60__SetState) and forward to this base, so the slot is `setState` and so is this occupant. Tier B. The base call is now the inherited `methods->notifyParents(self, state)` rather than a one-argument `slot30(self)`: byte-identical, the state is already in $a1.

@@ -69,3 +69,7 @@ only because its address (0x8003DFDC) falls in this unit's window; the
 function itself is the shared ancestor's own ctor, called from at least
 three unrelated class hierarchies (`code_2c054.c`, `class_39e08.c`, and this
 unit).
+
+## Track 4 (2026-09-25, round 82, charlie)
+
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The ctor (+0x008). `self->methods = Get_vtable_IntermediateBase()` needs no cast now.
