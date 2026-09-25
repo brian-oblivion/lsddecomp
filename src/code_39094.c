@@ -243,7 +243,24 @@ Rec1C *func_800492D0(s32 *countOut, s32 n) {
     }
     return &rec[n * 6];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049334);
+/* two s16 halves passed by value in one register */
+typedef struct RecPick {
+    s16 group;
+    s16 sub;
+} RecPick;
+
+Rec1C *func_80049334(s32 *countOut, RecPick pick) {
+    s32 count;
+    Rec1C *rec;
+    if (pick.group >= 0) {
+        rec = func_800492D0(&count, pick.group);
+        if (countOut != NULL) {
+            *countOut = ((u16)pick.sub < 2) ? pick.sub + count : -1;
+        }
+        return &rec[pick.sub];
+    }
+    return func_80049270(countOut, pick.sub);
+}
 s32 func_800493C8(s32 index) {
     return D_80086170[index];
 }
