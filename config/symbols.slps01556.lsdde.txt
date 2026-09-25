@@ -2549,3 +2549,11 @@ GsInitGraph = 0x800238DC; // type:func  (Psy-Q libgs/gs_001, fingerprint)
 // no C call site yet. Round 81 (bravo, track 2), not yet linked from an
 // SDK object.
 GetTPage = 0x80023F08; // type:func  (Psy-Q libgpu/prim, fingerprint)
+// identified: fingerprint TINY (4w) EXACT tie masked 1.00 vs GsGetActiveBuff
+// (libgs/gs_002.o) and SsUtGetReverbType (libsnd/ut_rev.o), broken by
+// position (bracketed by placed libgs/gs_121 and libgs/gs_010, both 3.3)
+// and by the sibling func_80024830 reusing the same global D_80090B78 this
+// function reads -- a libgs buffer-state variable, not a sound-driver
+// setting. No C call site yet. Round 81 (bravo, track 2), not yet linked
+// from an SDK object.
+GsGetActiveBuff = 0x80024820; // type:func  (Psy-Q libgs/gs_002, fingerprint+position)
