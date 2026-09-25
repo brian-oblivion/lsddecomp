@@ -501,7 +501,25 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045438);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800454C4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800455D4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004564C);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004575C);
+/* Unless +0x0C is set, free the four allocations at +0x14, +0x18, +0x10,
+ * +0x1C. Not referenced by any data word. */
+typedef struct Obj4575C {
+    /* +0x000 */ u8 pad0[0xC];
+    /* +0x00C */ s32 unkC;
+    /* +0x010 */ void *unk10;
+    /* +0x014 */ void *unk14;
+    /* +0x018 */ void *unk18;
+    /* +0x01C */ void *unk1C;
+} Obj4575C;
+
+void func_8004575C(Obj4575C *self) {
+    if (self->unkC == 0) {
+        BMemPMgrFree(self->unk14);
+        BMemPMgrFree(self->unk18);
+        BMemPMgrFree(self->unk10);
+        BMemPMgrFree(self->unk1C);
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800457C0);
 /* A class with an s32 at +0x50, set to 1 / -1 by the two setters below;
  * the class is not yet identified (neither setter sits in a method table). */
