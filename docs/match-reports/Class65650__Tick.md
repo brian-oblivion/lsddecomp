@@ -8,7 +8,7 @@
 ## What it does
 
 `Class65650Methods` slot `+0x108` (already known from the header comment:
-"Class65650__Tick -- used by Class65650__OnClass6EF50Notify when its `val` == 2"). A per-tick
+"Class65650__Tick -- used by Class65650__Update when its `val` == 2"). A per-tick
 bookkeeping function: bumps a counter, optionally fires a no-argument
 callback, and optionally advances an iterator that wraps back to the start
 of the same array `Class65650__SetTod` sets up — then unconditionally zeroes
@@ -83,4 +83,8 @@ found.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__Tick` (was `func_80065FD8`), tier B. Occupies +0x108; reached from OnClass6EF50Notify code 2. Increments Class6B5CC's tick (+0x24), calls tickCallback while tickCallbackEnabled, and while todPlaying with todFrameCount >= 2 applies the next frame (applyTodFrame), advances todFrame and wraps to the TOD's first frame at todFrameCount; finally clears coord2->flg. Mechanics are all in the body; B because the per-call driver is known only as 'code 2 from the tag-5 companion'.
+- `Class65650__Tick` (was `func_80065FD8`), tier B. Occupies +0x108; reached from Class65650__Update (formerly OnClass6EF50Notify) code 2. Increments Class6B5CC's tick (+0x24), calls tickCallback while tickCallbackEnabled, and while todPlaying with todFrameCount >= 2 applies the next frame (applyTodFrame), advances todFrame and wraps to the TOD's first frame at todFrameCount; finally clears coord2->flg. Mechanics are all in the body; B because the per-call driver is known only as 'code 2 from the tag-5 companion'.
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

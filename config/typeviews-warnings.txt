@@ -140,7 +140,6 @@ code_33808: warning: unused variable `unused'
 code_33808: warning: unused variable `unused'
 code_33808: warning: unused variable `unused'
 code_33808: warning: unused variable `unused'
-code_55dd4: warning: assignment from incompatible pointer type
 code_55dd4: warning: unused variable `unused'
 code_8220_c: warning: `/*' within comment
 code_8220_c: warning: `/*' within comment

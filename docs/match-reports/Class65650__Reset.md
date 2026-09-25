@@ -1,4 +1,6 @@
-# Class65650__InitDefaults
+# Class65650__Reset
+
+> Renamed from `Class65650__InitDefaults` on 2026-09-25 (tools/rename.py). Address 0x80065830.
 
 > Renamed from `func_80065830` on 2026-09-24 (tools/rename.py). Address 0x80065830.
 
@@ -8,13 +10,13 @@
 ## What it does
 
 `Class65650Methods` slot `+0x040` (already known from the header's own
-comment: "Class65650__InitDefaults, this class's own"). A pure dispatch sequence —
+comment: "Class65650__Reset, this class's own"). A pure dispatch sequence —
 one call through the shared intermediate base class, six calls through
 `self`'s own vtable with assorted literal arguments, then a conditional
 call to a fixed function if `self->unk68` is set:
 
 ```c
-void Class65650__InitDefaults(Class65650 *self)
+void Class65650__Reset(Class65650 *self)
 {
     D800878D4Methods *base;
 
@@ -66,4 +68,8 @@ slots were named from the call sites' own argument registers.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__InitDefaults` (was `func_80065830`), tier A. Occupies +0x040, overriding Actor__Reset. Body sets defaults through its own slots: base SetDisplay(0), setUnk64(1), setLastOffsetValue(0x12C) (the 0x12C Actor__Reset writes too), disableTickCallback, selectTickCallback('A'), stopTod, setTod(0), then links mainPart's model to itself.
+- `Class65650__Reset` (was `func_80065830`), tier A. Occupies +0x040, overriding Actor__Reset. Body sets defaults through its own slots: base SetDisplay(0), setUnk64(1), setLastOffsetValue(0x12C) (the 0x12C Actor__Reset writes too), disableTickCallback, selectTickCallback('A'), stopTod, setTod(0), then links mainPart's model to itself.
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+Renamed from `Class65650__InitDefaults`. Override of +0x040, Class6B5CC's `reset` (Actor's occupant is Actor__Reset, renamed from InitDefaults the same way in round 82), named for its slot: it sets the object's defaults through its own and inherited slots, which is what the slot does in both parents. The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.

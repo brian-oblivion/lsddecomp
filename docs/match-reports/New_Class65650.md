@@ -88,3 +88,7 @@ required.
 Round 75 (charlie), track 3.
 
 - `New_Class65650` (was `New_class_65650`), tier A. Allocates 0x98 bytes with BMemPMgrAlloc, runs `Get_vtable_Class65650()->ctor`, frees on failure: the project's `New_Class` allocator shape. Replaces FirecatFG's `New_class_65650` (same meaning, convention spelling).
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

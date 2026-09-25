@@ -1,4 +1,6 @@
-# Class65650__OnClass6EF50Notify
+# Class65650__Update
+
+> Renamed from `Class65650__OnClass6EF50Notify` on 2026-09-25 (tools/rename.py). Address 0x80065b80.
 
 > Renamed from `func_80065B80` on 2026-09-24 (tools/rename.py). Address 0x80065b80.
 
@@ -14,7 +16,7 @@ separate `if`s, not `if/else if`), matching the two independent `bne`
 guards in the disassembly.
 
 ```c
-void Class65650__OnClass6EF50Notify(Class65650 *self, void *arg1, s32 val)
+void Class65650__Update(Class65650 *self, void *arg1, s32 val)
 {
     if (val == 2) {
         self->methods->slot108(self);
@@ -49,7 +51,7 @@ and `$a1` is left holding whatever it already had — which, from the
 *outside*, looks like "forwarded", but which the source never actually
 says.
 
-`arg1` is kept in `Class65650__OnClass6EF50Notify`'s own signature (unused) purely because
+`arg1` is kept in `Class65650__Update`'s own signature (unused) purely because
 retail's caller-side convention still passes something in `$a1` here and a
 future caller in this same slot family may turn out to need it — but this
 function's *body* must not reference it.
@@ -72,4 +74,8 @@ never being asked to preserve it.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__OnClass6EF50Notify` (was `func_80065B80`), tier B. Occupies +0x098, which Class6B5CC__OnNotify (code_d294.c) dispatches to when the sender's header tag is 5 (TAG_CLASS6EF50, D_8006EF50). Code 2 calls tick (+0x108), code 4 calls release. Mechanics known; what Class6EF50 is (the tag-5 companion held in BaseObjO companion2) is not, hence B. Entity overrides this slot as Entity__Update.
+- `Class65650__Update` (was `func_80065B80`), tier B. Occupies +0x098, which Class6B5CC__OnNotify (code_d294.c) dispatches to when the sender's header tag is 5 (TAG_CLASS6EF50, D_8006EF50). Code 2 calls tick (+0x108), code 4 calls release. Mechanics known; what Class6EF50 is (the tag-5 companion held in BaseObjO companion2) is not, hence B. Entity overrides this slot as Entity__Update.
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+Renamed from `Class65650__OnClass6EF50Notify`. Override of +0x098, Class6B5CC's `update` (the slot Class6B5CC__OnNotify routes a class-5 D_8006EF50 sender's events to), named for its slot as Entity's override of the same slot (Entity__Update) already is: code 2 runs tick (+0x108), code 4 release. The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.

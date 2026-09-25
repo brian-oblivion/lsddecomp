@@ -16,7 +16,7 @@
  * class_3ac78.h), kept in `grid`; `(id & 0xF) == 5` is a D_8006EF50 object,
  * kept in `ticker` (Class6B5CC's onNotify routes that class's events to
  * `update`, +0x098, which the subclasses override as Class65650's
- * OnClass6EF50Notify, Entity__Update and DreamSys__TimerTick).
+ * Update (formerly OnClass6EF50Notify), Entity__Update and DreamSys__TimerTick).
  *
  * Movement. setTranslation/addTranslation (+0x0B8/+0x0BC) set or add
  * coord2->coord.t and mark the coordinate for recompute; addLocalTranslation

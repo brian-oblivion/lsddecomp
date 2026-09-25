@@ -158,7 +158,7 @@ if (*(u16 *)s0 != 0 && elem->unk20 == 0) {
 ```
 New field `Unk5CObj+0x2C` (`Unk2CObj *`, an unidentified class whose only
 known member is vtable slot `+0x080`). **Corrects `Class6B5CC__LinkModel`'s
-signature**: previously typed `(Class65650 *, s32)` from `Class65650__InitDefaults`'s
+signature**: previously typed `(Class65650 *, s32)` from `Class65650__Reset`'s
 usage; this call site passes `elem` (`Unk70ElemObj *`), so the first
 parameter is generically `void *` — a real, useful correction, not a
 guess (confirmed: this function's OWN types are solid, both call sites
@@ -1089,3 +1089,7 @@ Fix: write `base[i]` and drop the pointer variable. Six hand reshapes and
 Round 75 (charlie), track 3.
 
 - `Class65650__ApplyTodPacket` (was `func_80066340`), tier A. Occupies +0x138. modelData->decodeTodPacket gives {object id, type, flag, length}; object id -> part via FindPartIndex; clears the part's coord2->flg. Type 0: attribute = (attribute & w0) | w1. Type 1: rotate (/360, %4096 when differential), scale (x/4096 when differential), trans into the part's GsCOORD2PARAM, flag bit 0 = differential, bits 1/2/3 = rotate/scale/translate, trans copied to coord.t. Type 2: link model tmd->getModel(id-1) if the part has none. Type 3: attach to self (id 0 or 0xFFFF) or to another part. Returns packet + length*4. Every packet type and flag bit matches the TOD packet format.
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -710,3 +710,7 @@ NON_MATCHING body promoted, round 61.
 Round 75 (charlie), track 3.
 
 - `Class65650__ApplyTodFrame` (was `func_800662BC`), tier A. Occupies +0x134. Reads the u16 packet count at frame +2, starts at frame +8, calls applyTodPacket (+0x138) once per packet threading the returned pointer, and returns the pointer past the frame. Frame header {u16 size, u16 packet count, u32 frame number} is the TOD frame layout; Tick stores the return as the next frame.
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
