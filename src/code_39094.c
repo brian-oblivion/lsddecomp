@@ -16,27 +16,27 @@
 #include "Class6D430.h"
 #include "StageGrid.h"
 
-typedef struct D_80081940Obj D_80081940Obj;
+typedef struct DataSrc39094 DataSrc39094;
 
 /* D_80081940's own method table (local view): the Class6D430 interface plus
  * this class's extra slots. */
-typedef struct D_80081940Methods {
-    CLASS6D430_SLOTS(D_80081940Obj, (D_80081940Obj *self));
+typedef struct DataSrc39094Methods {
+    CLASS6D430_SLOTS(DataSrc39094, (DataSrc39094 *self));
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ s32 (*slot80)();  /* DataSrc39094__LoadDataBlock(self); unprototyped: DataSrc39094__SetFlag calls it with no argument */
+    /* +0x080 */ s32 (*loadDataBlock)();  /* DataSrc39094__LoadDataBlock(self); unprototyped: DataSrc39094__SetFlag calls it with no argument */
     /* +0x084 */ void (*releaseAlloc)();  /* DataSrc39094__ReleaseDataBlock(self); unprototyped: DataSrc39094__LoadDataBlock calls it with no argument */
-} D_80081940Methods;
+} DataSrc39094Methods;
 
 /* The D_80081940 object: a Class6D430 data source with its own fields from
  * +0x2C (local view; only this unit's methods read them). */
-struct D_80081940Obj {
-    CLASS6D430_FIELDS(D_80081940Methods);
-    /* +0x02C */ u16 unk2C;
-    /* +0x02E */ u16 unk2E;
+struct DataSrc39094 {
+    CLASS6D430_FIELDS(DataSrc39094Methods);
+    /* +0x02C */ u16 headerReady;
+    /* +0x02E */ u16 dataReady;
     /* +0x030 */ s16 unk30;
     /* +0x032 */ u16 unk32;
-    /* +0x034 */ void *unk34;   /* BMemPMgr allocation, released by slot +0x084 */
-    /* +0x038 */ s32 unk38;
+    /* +0x034 */ void *dataBuffer;   /* BMemPMgr allocation, released by slot +0x084 */
+    /* +0x038 */ s32 autoLoadData;
 };
 
 /* One 0x1C-byte record of the table GetRecordTable returns (gRecordTable,
@@ -53,8 +53,8 @@ extern void *BMemPMgrAlloc(s32 size);
 void *GetDataSrc39094Methods(void);
 
 /* allocator: new D_80081940 object */
-D_80081940Obj *New_DataSrc39094(void) {
-    D_80081940Obj *obj = BMemPMgrAlloc(0x3C);
+DataSrc39094 *New_DataSrc39094(void) {
+    DataSrc39094 *obj = BMemPMgrAlloc(0x3C);
     if (obj != NULL) {
         ((Class6D430Methods *)GetDataSrc39094Methods())->ctor((Class6D430 *)obj);
         return obj;
@@ -62,55 +62,55 @@ D_80081940Obj *New_DataSrc39094(void) {
     return NULL;
 }
 /* slot +0x008 of D_80081940 (ctor) */
-void DataSrc39094__DataSrc39094(D_80081940Obj *self) {
+void DataSrc39094__DataSrc39094(DataSrc39094 *self) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = GetDataSrc39094Methods();
     self->unk30 = -1;
-    self->unk2C = 0;
-    self->unk2E = 0;
+    self->headerReady = 0;
+    self->dataReady = 0;
     self->unk32 = 0;
-    self->unk34 = NULL;
-    self->unk38 = 1;
+    self->dataBuffer = NULL;
+    self->autoLoadData = 1;
     self->buffer = BMemPMgrAlloc(0xB358);
     if (self->buffer != NULL) {
         self->bufferSize = 0xB358;
     }
 }
 /* slot +0x00C of D_80081940 (finalize) */
-void DataSrc39094__Finalize(D_80081940Obj *self) {
+void DataSrc39094__Finalize(DataSrc39094 *self) {
     self->methods->releaseAlloc(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* slot +0x064 of D_80081940 (setFlag) */
-void DataSrc39094__SetFlag(D_80081940Obj *self) {
+void DataSrc39094__SetFlag(DataSrc39094 *self) {
     if (self->unk2A == 9) {
         if (self->flags & 0x80) {
             self->unk2A = 0;
-            self->unk2C = 1;
-            if (self->unk38 != 0) {
-                self->methods->slot80();
+            self->headerReady = 1;
+            if (self->autoLoadData != 0) {
+                self->methods->loadDataBlock();
             }
         }
     } else if (self->unk2A == 10) {
         if (self->flags & 0x80) {
-            self->unk2E = 1;
+            self->dataReady = 1;
             self->unk2A = 0;
         }
     }
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
 }
 /* slot +0x074 of D_80081940 (cancelRequests) */
-void DataSrc39094__CancelRequests(D_80081940Obj *self) {
+void DataSrc39094__CancelRequests(DataSrc39094 *self) {
     GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
-    self->unk2C = 0;
-    self->unk2E = 0;
+    self->headerReady = 0;
+    self->dataReady = 0;
     self->unk2A = 0;
 }
 /* slot +0x078 of D_80081940: start streaming a file into the buffer */
-void DataSrc39094__LoadHeader(D_80081940Obj *self, char *name) {
+void DataSrc39094__LoadHeader(DataSrc39094 *self, char *name) {
     if (self->buffer != NULL && name != NULL) {
         if (self->unk2A == 0) {
-            self->unk2C = 0;
+            self->headerReady = 0;
         } else {
             self->methods->cancelRequests(self);
         }
@@ -120,9 +120,9 @@ void DataSrc39094__LoadHeader(D_80081940Obj *self, char *name) {
         self->methods->read(self, self->buffer, 0xB358);
     }
 }
-void DataSrc39094__ReleaseHeader(D_80081940Obj *self) {
+void DataSrc39094__ReleaseHeader(DataSrc39094 *self) {
     self->methods->freeBuffer(self);
-    self->unk2C = 0;
+    self->headerReady = 0;
     self->unk30 = -1;
 }
 /* The header at the start of D_80081940's 0xB358 buffer (local view). */
@@ -135,7 +135,7 @@ typedef struct StreamHdr {
 } StreamHdr;
 
 /* slot +0x080 of D_80081940: load the data block the header describes */
-s32 DataSrc39094__LoadDataBlock(D_80081940Obj *self) {
+s32 DataSrc39094__LoadDataBlock(DataSrc39094 *self) {
     s32 size;
     if (((StreamHdr *)self->buffer)->hasData == 0) {
         return 0;
@@ -145,20 +145,20 @@ s32 DataSrc39094__LoadDataBlock(D_80081940Obj *self) {
     }
     self->methods->releaseAlloc();
     size = ((StreamHdr *)self->buffer)->dataSize;
-    self->unk34 = BMemPMgrAlloc(size);
-    if (self->unk34 == NULL) {
+    self->dataBuffer = BMemPMgrAlloc(size);
+    if (self->dataBuffer == NULL) {
         return 0;
     }
     self->unk2A = 10;
     self->methods->seek(self, ((StreamHdr *)self->buffer)->dataOffset, 0);
-    self->methods->read(self, self->unk34, size);
+    self->methods->read(self, self->dataBuffer, size);
     return 1;
 }
 /* slot +0x084 of D_80081940 */
-void DataSrc39094__ReleaseDataBlock(D_80081940Obj *self) {
-    self->unk2E = 0;
-    if (self->unk34 != NULL) {
-        self->unk34 = BMemPMgrFree(self->unk34);
+void DataSrc39094__ReleaseDataBlock(DataSrc39094 *self) {
+    self->dataReady = 0;
+    if (self->dataBuffer != NULL) {
+        self->dataBuffer = BMemPMgrFree(self->dataBuffer);
     }
 }
 extern u8 D_80081940[];   /* method table, 34 slots */
@@ -173,8 +173,8 @@ extern s16 gStreamTypeToGroupTable[];
 extern s16 gRecordIndexTable[];
 
 /* slot +0x088 of D_80081940 */
-void DataSrc39094__SetAutoLoadData(D_80081940Obj *self, s32 value) {
-    self->unk38 = value;
+void DataSrc39094__SetAutoLoadData(DataSrc39094 *self, s32 value) {
+    self->autoLoadData = value;
 }
 void *GetDataSrc39094Methods(void) {
     return D_80081940;
