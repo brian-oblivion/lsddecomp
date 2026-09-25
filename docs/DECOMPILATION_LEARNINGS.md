@@ -264,7 +264,8 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 - **A struct-layout claim must be settled CORPUS-WIDE: a shared base with a small compile-time fold
   is conclusive, separate `lui`/`addiu` pairs prove nothing.** `addiu $t2, $a3, 0x2` is only
   emittable if the compiler knows they are ONE object. Read the STRIDE too (two globals a few bytes
-  apart with a common non-power-of-two stride are one array, split by USE). (a §"A struct-layout
+  apart with a common non-power-of-two stride are one array, split by USE; two relocations off
+  one strided index are two parallel arrays, round 79). (a §"A struct-layout
   claim must be settled CORPUS-WIDE")
 - **A mask on the PRODUCT means a HALFWORD array, not a struct array.** Early `sll 3`, mid-block
   `andi 0xffff`, LATE base load, `sll 1` is `u16 woff = (u16)i * 8;` indexing an `(s16 *)` — eager
