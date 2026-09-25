@@ -38,7 +38,13 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048894);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800488E4);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048960);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800489B4);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048A68);
+/* slot +0x074 of D_80081940 (cancelRequests) */
+void func_80048A68(D_80081940Obj *self) {
+    GetActiveDataSourceMethods()->cancelRequests((Class6D430 *)self);
+    self->unk2C = 0;
+    self->unk2E = 0;
+    self->unk2A = 0;
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048AAC);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048B78);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048BC0);
