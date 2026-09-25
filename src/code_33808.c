@@ -1951,6 +1951,8 @@ typedef struct Obj45CFC {
 /* LIBPRESS.H */
 extern void DecDCTin(u32 *buf, int mode);
 
+void func_80045E18(Obj45CFC *self);  /* defined below (ROM order) */
+
 s32 func_80045CFC(Obj45CFC *self) {
     Obj45CFC *cur = (Obj45CFC *)D_8008A940;
 
@@ -1979,13 +1981,9 @@ void func_80045DE0(void) {
         ((void (*)())D_8008A940->methods->slot60)(D_8008A940);
     }
 }
-/* Hang until +0x4C is nonzero (it is read once). */
-typedef struct Obj45E18 {
-    u8 pad0[0x4C];
-    s32 unk4C;
-} Obj45E18;
-
-void func_80045E18(Obj45E18 *self) {
+/* Hang until +0x4C is nonzero (it is read once). func_80045CFC's only call
+ * passes its D_8008A940 object, so the parameter is that Obj45CFC view. */
+void func_80045E18(Obj45CFC *self) {
     while (self->unk4C == 0) {
     }
 }
