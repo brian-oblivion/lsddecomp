@@ -399,7 +399,20 @@ void *func_80042694(void) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800426E4);
+/* D_8006EFAC slot +0x008 (ctor): the Class6B5CC ctor, install the table,
+ * create and add the three flat lights, then reset. */
+void func_800426E4(D_8006EFACObj *self) {
+    s32 i;
+    BasicClass **light;
+
+    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    self->methods = func_800428E4();
+    for (i = 0, light = self->lights; i < 3; i++, light++) {
+        *light = New_FlatLightObj(i);
+        self->methods->addChild(self, *light);
+    }
+    self->methods->reset(self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042790);
 /* D_8006EFAC slot +0x040 (reset): mark the coordinate for recompute. */
 void func_80042814(Class6B5CC *self) {
