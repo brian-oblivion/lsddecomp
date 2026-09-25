@@ -179,7 +179,34 @@ void *func_80043840(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800438B0);
+/* A data source's construction descriptor: an existing buffer to adopt, or
+ * a file name to request. */
+typedef struct Src6F240 {
+    /* +0x00 */ void *buffer;
+    /* +0x04 */ char *name;
+} Src6F240;
+
+/* D_8006F13C +0x008: constructor -- the active driver's, then this table;
+ * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
+ * nonzero result fails the construction (NULL), or else request its file. */
+void *func_800438B0(DataSrc33808 *self, Src6F240 *src) {
+    GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
+    self->methods = func_80043B78();
+    if (src != NULL) {
+        if (src->buffer != NULL) {
+            self->buffer = src->buffer;
+            self->bufferSize = 0;
+            if (((s32 (*)())self->methods->setFlag)(self)) {
+                goto fail;
+            }
+        } else {
+            self->methods->requestLoadFile(self, src->name);
+        }
+    }
+    return self;
+fail:
+    return NULL;
+}
 /* D_8006F13C +0x00C: finalize -- release every object in the NULL-ended
  * array at +0x2C, free the array, then the active driver's. */
 void func_80043954(DataSrc33808 *self) {
@@ -289,11 +316,6 @@ void *func_80043E84(s32 arg0) {
 /* D_8006F240 +0x008: constructor -- the active driver's, then this table;
  * adopt a buffer handed in (size 0) and run its own +0x064, or else request
  * the named file. */
-typedef struct Src6F240 {
-    /* +0x00 */ void *buffer;
-    /* +0x04 */ char *name;
-} Src6F240;
-
 void func_80043EE4(DataSrc33808 *self, Src6F240 *src) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
     self->methods = func_800441A4();
