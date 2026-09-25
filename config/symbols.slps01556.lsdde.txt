@@ -2525,3 +2525,9 @@ ClearImage = 0x800212A8; // type:func  (Psy-Q libgpu/sys, fingerprint)
 // no C call site yet. Round 81 (bravo, track 2), not yet linked from an
 // SDK object.
 LoadImage = 0x8002133C; // type:func  (Psy-Q libgpu/sys, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),
+// unique (next candidate LoadImage, SHAPE masked 0.96, its own sibling
+// entry). Header LIBGPU.H `extern int StoreImage(RECT *rect, u_long *p);`,
+// no C call site yet. Round 81 (bravo, track 2), not yet linked from an
+// SDK object.
+StoreImage = 0x800213A0; // type:func  (Psy-Q libgpu/sys, fingerprint)
