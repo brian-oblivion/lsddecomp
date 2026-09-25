@@ -33,6 +33,18 @@ typedef struct Box_fa50 {
     Vec3_fa50 max;          /* +0x006 */
 } Box_fa50;
 
+/* A box with a leading word: func_8001F51C's local. */
+typedef struct TypedBox_fa50 {
+    s32 type;               /* +0x000 */
+    Box_fa50 box;           /* +0x004 */
+} TypedBox_fa50;
+
+/* The eight corners of a box. */
+typedef struct Hull_fa50 {
+    s32 type;               /* +0x000 */
+    Vec3_fa50 v[8];         /* +0x004 */
+} Hull_fa50;
+
 typedef struct Rec28_fa50 {
     SVec_fa50 *verts;       /* +0x000 */
     s32 nverts;             /* +0x004 */
@@ -149,7 +161,37 @@ void func_8001F4E4(Class6BEA0 *self) {
 void *func_8001F50C(void *self, s32 i) {
     return D_8008B21C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F51C);
+void func_8001F51C(Class6BEA0 *self, Hull_fa50 *out) {
+    TypedBox_fa50 b;
+
+    func_8001F3B0(self, &b.box);
+    b.type = 1;
+    out->v[0].x = b.box.min.x;
+    out->v[0].y = b.box.min.y;
+    out->v[0].z = b.box.min.z;
+    out->v[1].x = b.box.min.x;
+    out->v[1].y = b.box.max.y;
+    out->v[1].z = b.box.min.z;
+    out->v[2].x = b.box.max.x;
+    out->v[2].y = b.box.max.y;
+    out->v[2].z = b.box.min.z;
+    out->v[3].x = b.box.max.x;
+    out->v[3].y = b.box.min.y;
+    out->v[3].z = b.box.min.z;
+    out->v[4].x = b.box.min.x;
+    out->v[4].y = b.box.min.y;
+    out->v[4].z = b.box.max.z;
+    out->v[5].x = b.box.min.x;
+    out->v[5].y = b.box.max.y;
+    out->v[5].z = b.box.max.z;
+    out->v[6].x = b.box.max.x;
+    out->v[6].y = b.box.max.y;
+    out->v[6].z = b.box.max.z;
+    out->v[7].x = b.box.max.x;
+    out->v[7].y = b.box.min.y;
+    out->v[7].z = b.box.max.z;
+    out->type = 1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F66C);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F8B8);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_80020050);
