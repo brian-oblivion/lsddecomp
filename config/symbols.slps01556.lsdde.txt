@@ -2657,3 +2657,4 @@ D8006EFAC__Finalize = 0x80042790; // type:func
 D8006EFAC__Reset = 0x80042814; // type:func
 D8006EFAC__DispatchLinkCommand = 0x80042820; // type:func
 D8006EFAC__GetChild = 0x80042828; // type:func
+D8006EFAC__SetAmbientColor = 0x8004283C; // type:func

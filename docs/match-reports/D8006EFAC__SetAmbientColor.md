@@ -1,4 +1,6 @@
-# func_8004283C -- MATCHED (42/42 words), round 82
+# D8006EFAC__SetAmbientColor -- MATCHED (42/42 words), round 82
+
+> Renamed from `func_8004283C` on 2026-09-25 (tools/rename.py). Address 0x8004283c.
 
 Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
 
@@ -12,7 +14,7 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 ```c
 /* D_8006EFAC slot +0x0BC: set the ambient colour (swapping the old one out
  * into *rgb when asked) and hand it to GsSetAmbient. */
-void func_8004283C(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
+void D8006EFAC__SetAmbientColor(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
     SpriteRgb old;
 
     if (swap) {

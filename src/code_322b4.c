@@ -552,7 +552,7 @@ void *D8006EFAC__GetChild(ChildArrayObj_322b4 *self, s32 index) {
 }
 /* D_8006EFAC slot +0x0BC: set the ambient colour (swapping the old one out
  * into *rgb when asked) and hand it to GsSetAmbient. */
-void func_8004283C(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
+void D8006EFAC__SetAmbientColor(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
     SpriteRgb old;
 
     if (swap) {
