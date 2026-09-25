@@ -10,8 +10,8 @@
  *
  * Round 81 (bravo) matched the ten small methods/accessors; round 81
  * (alpha) matched ten more (the allocator, ctor, init and the RECT/VRAM
- * helpers). func_800207DC, func_800209A0, func_80020A74 and func_80020B74
- * are still fresh track-1 ground.
+ * helpers). Round 82 (alpha) matched the last four (func_800207DC,
+ * func_800209A0, func_80020A74, func_80020B74); the unit is complete.
  */
 #include "common.h"
 #include "BasicClass.h"
@@ -69,8 +69,8 @@ struct Class6C070Methods {
     /* +0x06C */ void *slot6C;
     /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* func_80020B4C */
     /* +0x074 */ void *slot74;
-    /* +0x078 */ void *slot78;
-    /* +0x07C */ void *slot7C;
+    /* +0x078 */ void (*slot78)(Class6C070 *self, u8 *color, Class6C070Rect *src); /* func_80020B74 */
+    /* +0x07C */ Class6C070Size *(*slot7C)(Class6C070 *self, Class6C070Dims *out); /* func_80020C08 */
     /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* func_80020C3C */
 };
 
@@ -100,6 +100,7 @@ extern int GsGetActiveBuff(void);     /* LIBGS.H */
 extern int LoadImage(RECT *rect, u_long *p);        /* LIBGPU.H */
 extern int MoveImage(RECT *rect, int x, int y);     /* LIBGPU.H */
 extern int DrawSync(int mode);                      /* LIBGPU.H */
+extern int ClearImage(RECT *rect, u_char r, u_char g, u_char b); /* LIBGPU.H */
 extern int VSync(int mode);                         /* LIBETC.H */
 extern int StoreImage(RECT *rect, u_long *p);       /* LIBGPU.H */
 extern void *BMemPMgrAlloc(s32 size);
@@ -214,7 +215,18 @@ void func_80020B4C(Class6C070 *self, s32 value) {
 s32 func_80020B68(Class6C070 *self) {
     return self->unk20;
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020B74);
+void func_80020B74(Class6C070 *self, u8 *color, Class6C070Rect *src) {
+    Class6C070Dims dims;
+    RECT rect;
+
+    if (src == NULL) {
+        self->methods->slot7C(self, &dims);
+        self->methods->slot78(self, color, (Class6C070Rect *)&dims);
+    } else {
+        func_80020970(&rect, src);
+        ClearImage(&rect, color[0], color[1], color[2]);
+    }
+}
 Class6C070Size *func_80020C08(Class6C070 *self, Class6C070Dims *out) {
     if (out != NULL) {
         out->x = 0;
