@@ -19,8 +19,24 @@ typedef struct Quad_fa50 {
 } Quad_fa50;
 
 /* One 28-byte record of the model data slot +0x048 indexes. */
+typedef struct SVec_fa50 {
+    s16 x, y, z, pad;
+} SVec_fa50;
+
+typedef struct Vec3_fa50 {
+    s16 x, y, z;
+} Vec3_fa50;
+
+/* An axis-aligned bounding box over a vertex list. */
+typedef struct Box_fa50 {
+    Vec3_fa50 min;          /* +0x000 */
+    Vec3_fa50 max;          /* +0x006 */
+} Box_fa50;
+
 typedef struct Rec28_fa50 {
-    u8 pad[0x1C];
+    SVec_fa50 *verts;       /* +0x000 */
+    s32 nverts;             /* +0x004 */
+    u8 pad8[0x14];
 } Rec28_fa50;
 
 typedef struct ModelData_fa50 {
@@ -38,7 +54,7 @@ struct Class6BEA0Methods {
 struct Class6BEA0 {
     BASICCLASS_FIELDS(Class6BEA0Methods);
     ModelData_fa50 *data;   /* +0x00C */
-    void *unk10;            /* +0x010 */
+    Rec28_fa50 *unk10;      /* +0x010 */
     Quad_fa50 quad;         /* +0x014 */
 };
 
@@ -58,7 +74,6 @@ typedef struct Outer_fa50 {
 } Outer_fa50;
 
 extern void GsMapModelingData(unsigned long *p);
-extern s32 func_8001F3B0(void *self, void *buf);
 extern s32 D_8008AC4C;
 extern s32 D_8008B21C[];
 extern s32 D_8006BEA0[];
@@ -102,9 +117,34 @@ void func_8001F394(Class6BEA0 *self) {
 s32 func_8001F3A4(void *self) {
     return D_8008AC4C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F3B0);
-void func_8001F4E4(void *self) {
-    func_8001F3B0(self, D_8008B21C);
+void func_8001F3B0(Class6BEA0 *self, Box_fa50 *box) {
+    s32 i;
+    s32 n;
+    SVec_fa50 *v;
+    s16 *miny = &box->min.y;
+    s16 *minz = &box->min.z;
+    s16 *maxx = &box->max.x;
+    s16 *maxy = &box->max.y;
+    s16 *maxz = &box->max.z;
+
+    v = self->unk10->verts;
+    n = self->unk10->nverts - 1;
+    box->min.x = v->x;
+    box->min.y = v->y;
+    box->min.z = v->z;
+    box->max = box->min;
+    for (i = 0; i < n; i++) {
+        v++;
+        if (v->x < box->min.x) box->min.x = v->x;
+        if (v->y < *miny) *miny = v->y;
+        if (v->z < *minz) *minz = v->z;
+        if (*maxx < v->x) *maxx = v->x;
+        if (*maxy < v->y) *maxy = v->y;
+        if (*maxz < v->z) *maxz = v->z;
+    }
+}
+void func_8001F4E4(Class6BEA0 *self) {
+    func_8001F3B0(self, (Box_fa50 *)D_8008B21C);
 }
 void *func_8001F50C(void *self, s32 i) {
     return D_8008B21C;
