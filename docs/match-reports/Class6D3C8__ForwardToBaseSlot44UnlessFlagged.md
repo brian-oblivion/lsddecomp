@@ -26,7 +26,7 @@ lw    $v0, 0x18($s0)        ; v0 = self->unk18
 nop
 bnez  $v0, .L80026154        ; skip if unk18 != 0
  addu $s2, $a2, $zero          ; s2 = a2
-jal   func_8003B20C            ; -> &D_8006E4F0 (base class table)
+jal   GetClass6E4F0Methods            ; -> &D_8006E4F0 (base class table)
  nop
 lw    $v0, 0x44($v0)             ; base table slot +0x044
 addu  $a0, $s0, $zero
@@ -39,7 +39,7 @@ jalr  $v0
 ```
 
 **This is the class-hierarchy evidence for this whole unit.** Resolving
-`func_8003B20C` (`tools/classtable.py 0x8006E4F0`) shows a 19-slot table
+`GetClass6E4F0Methods` (`tools/classtable.py 0x8006E4F0`) shows a 19-slot table
 that is itself derived from BasicClass, and `classtable.py 0x8006D3C8 --vs
 0x8006E4F0` shows this unit's class shares +0x00C/+0x048/+0x04C *exactly*
 with that intermediate table — evidence this class's real parent is that
@@ -54,7 +54,7 @@ treated as `void` here since nothing in this unit consumes it.
 ```c
 void Class6D3C8__ForwardToBaseSlot44UnlessFlagged(Class6D3C8 *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
-        func_8003B20C()->slot44(self, a1, a2, 0);
+        GetClass6E4F0Methods()->slot44(self, a1, a2, 0);
     }
 }
 ```
@@ -73,7 +73,7 @@ BasicClass and this class) was only found this way.
 
 **`Class6D3C8__ForwardToBaseSlot44UnlessFlagged` -- tier B.** Mechanics are
 clear from the body: when `self->unk18 == 0` it forwards straight to the
-intermediate base class's own `slot44` occupant (`func_8003B20C()->slot44`,
+intermediate base class's own `slot44` occupant (`GetClass6E4F0Methods()->slot44`,
 same slot number as the one this function itself occupies, `+0x044`), and
 does nothing otherwise. What `unk18 != 0` actually MEANS in game terms (an
 override flag set by some other, uncarved code path) is not established, so
@@ -106,3 +106,12 @@ runner's ownership. See `## Proposed field names` below.
   Left as `slot4C` for whoever carves `Class6E4F0__RunMainLoop`'s own unit.
 
 Posted to `tools/broadcast.sh post --from echo`.
+
+## Track 4
+
+**2026-09-25, round 84 (echo).** The parent class is declared once, in
+`include/Class6E4F0.h`, and `MiddleClassMethods` is gone. The base call is
+now `GetClass6E4F0Methods()->initSystems((Class6E4F0 *)self, a1, a2, 0)`: the
+slot is named for its occupant, Class6E4F0__InitSystems, typed `void` (the
+occupant's; nothing here reads $v0), and keeps the fourth argument this
+body's `move a3,zero` shows. The upcast emits no code. Bytes unchanged.

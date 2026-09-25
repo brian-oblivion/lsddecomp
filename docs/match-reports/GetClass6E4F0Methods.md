@@ -1,4 +1,6 @@
-# func_8003B20C
+# GetClass6E4F0Methods
+
+> Renamed from `func_8003B20C` on 2026-09-25 (tools/rename.py). Address 0x8003b20c.
 
 **Round 81 (delta)** · **Unit:** code_2b78c · **Size:** 4 words · **Status:** MATCHED (4/4 words, whole-image SHA1 green)
 
@@ -7,7 +9,7 @@
 The class-table getter: returns `&D_8006E4F0`.
 
 ```c
-Class6E4F0Methods *func_8003B20C(void) {
+Class6E4F0Methods *GetClass6E4F0Methods(void) {
     return &D_8006E4F0;
 }
 ```
@@ -54,3 +56,15 @@ ordinary game C (`return &D_8006E4F0;`, called directly by
 track-2 ambiguity note -- it is not Sony's `DrawPrim`/`SpuRead`/`SpuWrite`,
 it is this class's table getter. The note should be dropped when the head
 applies the rename.
+
+## Track 4
+
+**2026-09-25, round 84 (echo).** Renamed `func_8003B20C` ->
+`GetClass6E4F0Methods` with `tools/rename.py`, which now replaces the
+address's existing symbols-file line (the blocker above no longer
+reproduces; the symbols line carried no stale `unidentified` note by this
+round). Evidence unchanged: the body is `return &D_8006E4F0;`, Class6E4F0's
+own table, and both callers use it as the table getter
+(`Class6E4F0__Class6E4F0` installs it; `Class6D3C8__Class6D3C8` and
+`Class6D3C8__ForwardToBaseSlot44UnlessFlagged` call the base class's ctor and
++0x044 slot through it). The name follows `GetClass6D3C8Methods`/`GetClass6D430Methods`.

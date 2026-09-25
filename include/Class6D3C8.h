@@ -4,6 +4,7 @@
 #include "common.h"
 #include "DreamSys.h"
 #include "TaskCore.h"
+#include "Class6E4F0.h"
 
 /*
  * The class allocated by New_Class6D3C8 / constructed by Class6D3C8__Class6D3C8.
@@ -20,7 +21,7 @@
  * six more of its own from +0x050). Confirmed by `classtable.py 0x8006D3C8
  * --vs 0x8006E4F0` sharing +0x00C/+0x048/+0x04C exactly where the earlier
  * `--vs 0x8006B58C` comparison did not, and by Class6D3C8__Class6D3C8 itself calling
- * the intermediate class's ctor slot (via func_8003B20C -> &D_8006E4F0)
+ * the intermediate class's ctor slot (via GetClass6E4F0Methods -> &D_8006E4F0)
  * before installing its own vtable — the base-constructor-through-slot+8
  * shape from docs/research/class-framework.md.
  *
@@ -48,22 +49,10 @@
  * instance's role) -- `Class6D3C8` is kept as the table-address identity.
  */
 
-/* The intermediate base class at D_8006E4F0. Same policy: only slots this
- * unit actually dispatches through (+0x044, from Class6D3C8__ForwardToBaseSlot44UnlessFlagged) are typed. */
-typedef struct MiddleClassMethods {
-    s32 header;                                             /* +0x000 */
-    void *unk04;                                             /* +0x004 */
-    void (*ctor)(void *self, s32 a1);                         /* +0x008 Class6E4F0__Class6E4F0 */
-    void *unk0C;                                               /* +0x00C Class6E4F0__Finalize (dtor override, shared with Class6D3C8) */
-    void *unk10, *unk14, *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* BasicClass, inherited */
-    void *unk3C;                                                /* +0x03C null slot */
-    void *unk40;                                                 /* +0x040 Class6E4F0__SetScreenDims */
-    s32 (*slot44)(void *self, void *a1, void *a2, s32 a3);         /* +0x044 Class6E4F0__InitSystems */
-    void *unk48;                                                    /* +0x048 Class6E4F0__NoOpSlot48, shared with Class6D3C8 */
-    void *unk4C;                                                     /* +0x04C Class6E4F0__RunMainLoop, shared with Class6D3C8 */
-} MiddleClassMethods;
-
-extern MiddleClassMethods *func_8003B20C(void);
+/* The parent class, D_8006E4F0, is declared once in include/Class6E4F0.h
+ * (track 4, round 84). This header's own views of it (MiddleClassMethods and
+ * the table getter's extern) are gone; the parent's ctor and +0x044 slot are
+ * reached through GetClass6E4F0Methods() with an upcast. */
 
 /* The constructor argument block for Class6D3C8 (Class6D3C8__Class6D3C8). Observed
  * from its one call site (asm/main.s, gClass6D3C8CtorArgs: {0x13, 0, 1, 1, 1, 1}) --
