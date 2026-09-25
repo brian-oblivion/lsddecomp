@@ -260,7 +260,16 @@ extern s32 D_8006F240[];
 void *func_800441A4(void) {
     return D_8006F240;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800441B4);
+/* Allocate and construct a D_8006F2C4 object. */
+void *func_800441B4(s32 arg0, s32 arg1) {
+    void *obj = BMemPMgrAlloc(0x68);
+
+    if (obj != NULL) {
+        ((Ctor33808 *)func_8004467C())->ctor(obj, arg0, arg1);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044220);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044380);
