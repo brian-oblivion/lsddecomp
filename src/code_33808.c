@@ -677,7 +677,9 @@ void func_800458AC(Obj33808_50 *self) {
  * state words, hand the object at +0x60 func_8004593C (and self) through
  * that object's +0x07C, clear +0x64, and call its +0x058. */
 typedef struct Methods458B8 {
-    /* +0x000 */ u8 pad0[0x58];
+    /* +0x000 */ u8 pad0[0x48];
+    /* +0x048 */ void (*slot48)();
+    /* +0x04C */ u8 pad4C[0xC];
     /* +0x058 */ void (*slot58)();
     /* +0x05C */ u8 pad5C[0x20];
     /* +0x07C */ void (*slot7C)();
@@ -695,7 +697,8 @@ typedef struct Obj458B8 {
     /* +0x048 */ s32 unk48;
     /* +0x04C */ s32 unk4C;
     /* +0x050 */ s32 unk50;
-    /* +0x054 */ u8 pad54[0xC];
+    /* +0x054 */ s32 unk54;
+    /* +0x058 */ u8 pad58[8];
     /* +0x060 */ Sub458B8 *unk60;
     /* +0x064 */ s32 unk64;
 } Obj458B8;
@@ -721,7 +724,24 @@ void func_8004593C(Obj33808_50 *self) {
     self->unk50 = -1;
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045948);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045A38);
+/* D_8006F614 +0x04C: when this is the object in D_8008A940, set +0x48,
+ * clear +0x54, call the +0x60 object's +0x048, set +0x44, and the first
+ * time (+0x64 clear) clear that object's +0x07C callback and set +0x64. */
+void func_80045A38(Obj458B8 *self) {
+    Obj458B8 *cur = (Obj458B8 *)D_8008A940;
+
+    if (cur == self) {
+        cur->unk48 = 1;
+        cur->unk54 = 0;
+        cur->unk60->methods->slot48(cur->unk60);
+        cur->unk44 = 1;
+        if (cur->unk64 == 0) {
+            cur->unk60->methods->slot7C(cur->unk60, 0, 0);
+            cur->unk64 = 1;
+            cur->unk44 = 1;
+        }
+    }
+}
 void func_80045AC8(void) {
 }
 void func_80045AD0(void) {
