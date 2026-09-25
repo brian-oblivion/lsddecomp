@@ -1,4 +1,6 @@
-# func_8001F33C -- MATCHED (9/9 words), round 82
+# TmdModel__MapModelingData -- MATCHED (9/9 words), round 82
+
+> Renamed from `func_8001F33C` on 2026-09-25 (tools/rename.py). Address 0x8001f33c.
 
 Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (
 ## Source
 
 ```c
-void func_8001F33C(Class6BEA0 *self) {
+void TmdModel__MapModelingData(Class6BEA0 *self) {
     GsMapModelingData((unsigned long *)&self->data->head[1]);
 }
 ```
