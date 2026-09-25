@@ -249,7 +249,17 @@ void func_80043C60(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043CB8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043DFC);
+/* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
+ * (+0x2C entries). */
+void func_80043DFC(DataSrc33808 *self) {
+    DataSrc33808 **objs = (DataSrc33808 **)self->unk30;
+    s32 i;
+
+    for (i = 0; i < self->unk2C; i++) {
+        ((void (*)())(*objs)->methods->slot78)(*objs);
+        objs++;
+    }
+}
 extern s32 D_8006F1C4[];
 
 void *func_80043E74(void) {
