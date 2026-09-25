@@ -31,3 +31,25 @@ library, `asm/psyq_GsLinkObject4.s`, not decompiled in this project).
 ## Naming
 
 `Unk18Obj__SetGeomScreen` -- tier A. Trivial one-line forwarding wrapper to Sony's `SetGeomScreen(self)`; mechanics are the entire function.
+
+## Track 2 screen, round 79
+
+`plan.py` lists this as unnamed for track 2: a game-worded name can shadow
+Sony's own function, so every game-style name on an SDK-shaped body is
+checked. `config/sdk-in-game.txt` carries a LEAD here (`libgs/gs_106:
+GsSetProjection`, shape 1.00), but it does not hold up as identification.
+`tools/sdkname.py Unk18Obj__SetGeomScreen` reports the 8-word body
+AMBIGUOUS: 18 different Sony functions across unrelated libraries (libgs,
+libc2, libcd, libetc, libpress, libsn, libsnd) share this exact
+relocation-masked fingerprint, because "call one function with one argument,
+return" is a common trivial shape. `libgs/gs_106` (`GsSetProjection`) is
+never placed as an object anywhere in this executable, so it supplies no
+position evidence either. The function's real neighbours are game code
+immediately before (`Unk18Obj__GetTail`, this class's own getter, at
+0x8003F25C) and Sony's `libgs/gs_131` (`GsSetRefView2`) immediately after
+with zero gap (0x8003F2AC == 0x8003F28C + 8 words) -- neither side is
+`gs_106`. This is an ordinary, already-matched (round 14) member of the
+`Unk18Obj` setter/getter family, forwarding `self` to the established Psy-Q
+call `func_80024B90` (`asm/psyq_GsLinkObject4.s`). No evidence kind reaches
+the track 2 bar for `GsSetProjection`; rejected with a `// not SDK:` comment
+above the symbols-file entry. Name and body unchanged.

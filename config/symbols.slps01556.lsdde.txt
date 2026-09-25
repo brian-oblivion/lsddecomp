@@ -1787,6 +1787,17 @@ Unk18Obj__SetUnkB4 = 0x8003F23C; // type:func
 Unk18Obj__SetUnkB8 = 0x8003F244; // type:func
 GetUnk18ObjMethods = 0x8003F24C; // type:func
 Unk18Obj__GetTail = 0x8003F25C; // type:func
+// not SDK: LEAD in config/sdk-in-game.txt (libgs/gs_106:GsSetProjection,
+// shape 1.00) does not hold up. tools/sdkname.py itself reports this 8-word
+// body AMBIGUOUS (18-way exact tie on a trivial "call one arg, return"
+// shape shared by unrelated libraries); gs_106 is never placed anywhere in
+// this image, so it cannot supply position evidence. The real neighbours
+// are game code before (Unk18Obj__GetTail, this class's own getter, ends
+// 0x8003F28C) and libgs/gs_131's GsSetRefView2 immediately after with zero
+// gap (0x8003F2AC) -- neither side is gs_106. This is an ordinary member of
+// the already-matched Unk18Obj setter/getter family (round 14), forwarding
+// self to the established Psy-Q call func_80024B90
+// (asm/psyq_GsLinkObject4.s). Round 79 (bravo, track 2).
 Unk18Obj__SetGeomScreen = 0x8003F28C; // type:func
 New_StreamTaskObj = 0x8003B854; // type:func
 StreamTaskObj__StreamTaskObj = 0x8003B8E4; // type:func
