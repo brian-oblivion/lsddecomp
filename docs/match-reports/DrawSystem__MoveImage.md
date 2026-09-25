@@ -1,9 +1,11 @@
-# func_80020A24 -- MATCHED (20/20 words), round 81
+# DrawSystem__MoveImage -- MATCHED (20/20 words), round 81
+
+> Renamed from `func_80020A24` on 2026-09-25 (tools/rename.py). Address 0x80020a24.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
 - **Where:** D_8006C070 slot +0x064 (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** RECT from func_80020970, then MoveImage(&rect, x, y). Declaring x/y as `s16` parameters gives retail exactly: the raw args are held in s0/s1 across the call and sign-extended (sll/sra 16) only at the MoveImage call.
+- **What:** RECT from ConvertRect, then MoveImage(&rect, x, y). Declaring x/y as `s16` parameters gives retail exactly: the raw args are held in s0/s1 across the call and sign-extended (sll/sra 16) only at the MoveImage call.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   20/20 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
@@ -11,10 +13,10 @@ Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020A24(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) {
+void DrawSystem__MoveImage(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) {
     RECT rect;
 
-    func_80020970(&rect, src);
+    ConvertRect(&rect, src);
     MoveImage(&rect, x, y);
 }
 ```
@@ -61,4 +63,8 @@ struct Class6C070 {
 
 ## Naming
 
-Proposed `Class6C070__MoveImage` (tier B).
+`DrawSystem__MoveImage`, tier A. Wraps LIBGPU.H's `MoveImage`; confirmed by
+convergent naming -- `code_179d8_q.c`'s own independent local view of this
+class's method table names this exact slot (+0x064) `moveImage`, and
+`code_2bb9c.c`'s `func_8003B624` calls it through a local `moveImage`
+function-pointer variable read from the same slot.

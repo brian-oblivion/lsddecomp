@@ -1,24 +1,28 @@
-# func_80020C08 -- MATCHED (13/13 words), round 81
+# DrawSystem__LoadImage -- MATCHED (30/30 words), round 81
+
+> Renamed from `func_800208F8` on 2026-09-25 (tools/rename.py). Address 0x800208f8.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x07C (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** if out is non-NULL writes {0, 0, size.w, size.h * 2}; returns &self->size (+0x14).
+- **Where:** D_8006C070 slot +0x058 (slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** if +0x10 is clear or +0x2C set: builds a RECT on the stack via ConvertRect, LoadImage(&rect, pixels), and DrawSync(0) when +0x2C is set. The `||` in the guard gives the retail two-branch shape directly.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
-  13/13 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
+  30/30 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
 
 ## Source
 
 ```c
-Class6C070Size *func_80020C08(Class6C070 *self, Class6C070Dims *out) {
-    if (out != NULL) {
-        out->x = 0;
-        out->y = 0;
-        out->w = self->size.w;
-        out->h = self->size.h * 2;
+void DrawSystem__LoadImage(Class6C070 *self, Class6C070Rect *src, u_long *pixels) {
+    RECT rect;
+
+    if (self->unk10 == 0 || self->unk2C != 0) {
+        ConvertRect(&rect, src);
+        LoadImage(&rect, pixels);
+        if (self->unk2C != 0) {
+            DrawSync(0);
+        }
     }
-    return &self->size;
 }
 ```
 
@@ -31,11 +35,17 @@ LIBGPU.H/LIBGS.H prototypes):
 typedef struct Class6C070 Class6C070;
 typedef struct Class6C070Methods Class6C070Methods;
 typedef struct {
+    short x, y;
+    short w, h;
+} RECT;
+
+typedef struct {
     /* +0x0 */ s16 x;
     /* +0x2 */ s16 y;
-    /* +0x4 */ s32 w;
-    /* +0x8 */ s32 h;
-} Class6C070Dims;
+    /* +0x4 */ s16 w;
+    /* +0x6 */ s16 unk6;
+    /* +0x8 */ s16 h;
+} Class6C070Rect;
 
 typedef struct {
     /* +0x0 */ s32 w;
@@ -58,4 +68,8 @@ struct Class6C070 {
 
 ## Naming
 
-Kept func_.
+`DrawSystem__LoadImage`, tier A. Wraps LIBGPU.H's `LoadImage`; confirmed by
+CONVERGENT naming from two other units that never saw each other's code --
+`code_2bb9c.c` and `code_179d8_q.c` each carry their own independent local
+view of this class's method table and both independently named this exact
+slot (+0x058) `loadImage`.

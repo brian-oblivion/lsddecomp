@@ -101,7 +101,7 @@ extern void SsSeqClose(short);
 extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
-extern BasicClass *func_80020C5C(void);
+extern BasicClass *GetDrawSystem(void);
 extern SeqData *func_800422CC(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);

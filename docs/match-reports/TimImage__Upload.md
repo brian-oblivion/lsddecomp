@@ -6,7 +6,7 @@ Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
 Three builds.
 
 - **Where:** TimImage's table (`gTimImageMethods`) slot +0x078 (`tools/classtable.py D_8006E558`).
-- **What:** fetches the draw singleton (`func_80020C5C()`), and when the
+- **What:** fetches the draw singleton (`GetDrawSystem()`), and when the
   buffer is loaded has slot +0x09C describe the TIM into `self->tim`
   (+0x02C, a full `GsIMAGE`), then passes `{px, py, pw, ph}` and the pixel
   pointer to the singleton's slot +0x058; when `pmode` bit 3 (TIM has a CLUT)
@@ -19,7 +19,7 @@ Three builds.
   computes `a1 = self + 0x2C` in the branch delay slot. Hoisting the address
   into a local set BEFORE the buffer test (`tim = &self->tim;`, used only as
   the call argument) is byte-exact. Rewriting the test as an early
-  `return` changed nothing; retyping `func_80020C5C` as `void *` changed
+  `return` changed nothing; retyping `GetDrawSystem` as `void *` changed
   nothing.
 - **Result:** byte-exact, whole-image SHA1 green.
 - **Name:** `TimImage__Upload`, tier A (round 81 naming pass, runner bravo).
@@ -37,14 +37,14 @@ typedef struct DrawRect {
 /* Class6C070 (the draw singleton, code_10ee0.c): methods at +0; slot +0x058
  * loadImage(self, DrawRect *, u32 *) -- confirmed against LIBGPU.H's
  * LoadImage(RECT *rect, u_long *p), see ## Naming below. */
-extern Class6C070 *func_80020C5C(void);
+extern Class6C070 *GetDrawSystem(void);
 
 void TimImage__Upload(TimImage *self) {
     Class6C070 *draw;
     DrawRect rect;
     GsIMAGE *tim;
 
-    draw = func_80020C5C();
+    draw = GetDrawSystem();
     tim = &self->tim;
     if (self->buffer != NULL) {
         self->methods->getTimInfo(self, tim);
@@ -88,7 +88,7 @@ instead.
   in shape.
 - **`Class6C070`/`Class6C070Methods`** (was the local placeholder
   `DrawObj`/`DrawObjMethods`), tier B: confirmed as the real class the draw
-  singleton (`func_80020C5C`) returns -- `code_10ee0.c`'s own header comment
+  singleton (`GetDrawSystem`) returns -- `code_10ee0.c`'s own header comment
   identifies `D_8008A83C`'s class as `Class6C070` -- replacing the
   placeholder name per the round's instruction to confirm or replace it.
   `code_10ee0.c` itself is still mostly `INCLUDE_ASM`, so this unit's struct

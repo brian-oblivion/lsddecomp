@@ -1,10 +1,12 @@
-# func_80020C3C -- MATCHED (2/2 words), round 81
+# SetDrawSystem -- MATCHED (3/3 words), round 81
+
+> Renamed from `func_80020C68` on 2026-09-25 (tools/rename.py). Address 0x80020c68.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x080 (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** setter of the s32 at +0x2C, store in the delay slot.
+- **Where:** not a method: the singleton setter (method-table slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** stores its argument to D_8008A83C (`sw %gp_rel`).
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -14,8 +16,8 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020C3C(Class6C070 *self, s32 value) {
-    self->unk2C = value;
+void SetDrawSystem(Class6C070 *obj) {
+    D_8008A83C = obj;
 }
 ```
 
@@ -43,3 +45,11 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`SetDrawSystem`, tier A. The singleton setter paired with `GetDrawSystem`;
+called exactly once, from `code_2b78c.c`'s `Class6E4F0__InitSystems`, with
+the object `main.c` constructs (`New_DrawSystem`) -- the startup wiring that
+also confirms the class's identity (see `src/code_10ee0.c`'s header
+comment).

@@ -1,9 +1,11 @@
-# func_8002085C -- MATCHED (16/16 words), round 81
+# DrawSystem__Start -- MATCHED (16/16 words), round 81
+
+> Renamed from `func_8002085C` on 2026-09-25 (tools/rename.py). Address 0x8002085c.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
 - **Where:** D_8006C070 slot +0x048 (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** if +0x10 is clear, sets it to 1 and calls slot +0x068 (func_80020A74).
+- **What:** if +0x10 is clear, sets it to 1 and calls slot +0x068 (DrawSystem__RunLoop).
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   16/16 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
@@ -11,7 +13,7 @@ Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_8002085C(Class6C070 *self) {
+void DrawSystem__Start(Class6C070 *self) {
     if (self->unk10 == 0) {
         self->unk10 = 1;
         self->methods->slot68(self);
@@ -47,7 +49,7 @@ struct Class6C070 {
 
 struct Class6C070Methods {
     BASICCLASS_SLOTS(Class6C070, (Class6C070 *self));
-    /* +0x040 */ void (*init)(Class6C070 *self);                 /* func_80020784 */
+    /* +0x040 */ void (*init)(Class6C070 *self);                 /* DrawSystem__Init */
     /* +0x044 */ void *slot44;
     /* +0x048 */ void *slot48;
     /* +0x04C */ void *slot4C;
@@ -57,16 +59,19 @@ struct Class6C070Methods {
     /* +0x05C */ void *slot5C;
     /* +0x060 */ void *slot60;
     /* +0x064 */ void *slot64;
-    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* func_80020A74 */
+    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* DrawSystem__RunLoop */
     /* +0x06C */ void *slot6C;
-    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* func_80020B4C */
+    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* DrawSystem__SetVSyncCount */
     /* +0x074 */ void *slot74;
     /* +0x078 */ void *slot78;
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* func_80020C3C */
+    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* DrawSystem__SetSyncMode */
 };
 ```
 
 ## Naming
 
-Kept func_.
+`DrawSystem__Start`, tier B. Sets the `running` flag and enters the frame
+loop (+0x068, `runLoop`) if not already running; pairs with `DrawSystem__Stop`,
+which clears the same flag. Mechanics are clear; what triggers a Start/Stop
+call in the game isn't established from this unit alone.

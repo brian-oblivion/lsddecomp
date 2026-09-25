@@ -4,26 +4,42 @@
  * 0x800206E0..0x80020C74). It was counted as Psy-Q SDK by segment name;
  * tools/gameinsdk.py measured it as game (a call into game code, a method-
  * table entry beside game methods, or contiguity with those, and no Sony
- * fingerprint). What it holds: the 19 methods of D_8006C070 (new_class_6c078
- * allocates it) and a getter/setter pair for the game gp variable D_8008A83C.
- * libgpu/sys starts right after, at ResetGraph (now psyq_11474).
+ * fingerprint). What it holds: the 19 methods of D_8006C070, the game's
+ * screen/graphics singleton, matched as DrawSystem this round. `main.c`
+ * builds the one instance (`New_DrawSystem`) and hands it into the game's
+ * startup chain, which lands it in `code_2b78c.c`'s `Class6E4F0__InitSystems`
+ * as its `source` argument -- that unit dispatches `source`'s own +0x044
+ * slot, the address this unit's table lists as `initGraph`
+ * (`DrawSystem__InitGraph`, GsInitGraph setup), confirming the two units see
+ * the same object. Three OTHER units independently called
+ * `GetDrawSystem()`'s return "the draw singleton" in their own comments
+ * before this rename, and two of them (`code_2bb9c.c`, `code_179d8_q.c`)
+ * independently chose the names `loadImage`/`moveImage` for the exact same
+ * slots this unit matched as LoadImage/MoveImage -- three-way convergent
+ * naming evidence, not a guess. libgpu/sys starts right after, at
+ * ResetGraph (now psyq_11474).
  *
  * Round 81 (bravo) matched the ten small methods/accessors; round 81
  * (alpha) matched ten more (the allocator, ctor, init and the RECT/VRAM
- * helpers). Round 82 (alpha) matched the last four (func_800207DC,
- * func_800209A0, func_80020A74, func_80020B74); the unit is complete.
+ * helpers). Round 82 (alpha) matched the last four (DrawSystem__InitGraph,
+ * DrawSystem__StoreImage, DrawSystem__RunLoop, DrawSystem__ClearImage); the
+ * unit is complete. Round 82 (bravo): naming pass -- class named DrawSystem,
+ * every function and both gp-variable accessors renamed via
+ * tools/rename.py, method-table slots named for the methods they hold. See
+ * each function's report `## Naming` for tier and evidence.
  */
 #include "common.h"
 #include "BasicClass.h"
 
 /*
- * Local view of the D_8006C070 object (a BasicClass subclass). Only the
- * fields this unit's matched methods touch are named; the draw singleton
- * other units reach through func_80020C5C() is (per its callers) an object
- * of this class.
+ * Local view of the D_8006C070 object (a BasicClass subclass): the game's
+ * screen/graphics singleton (see the header comment above for the
+ * cross-unit evidence). Only the fields this unit's matched methods touch
+ * are named; the singleton other units reach through GetDrawSystem() is an
+ * object of this class.
  */
-typedef struct Class6C070 Class6C070;
-typedef struct Class6C070Methods Class6C070Methods;
+typedef struct DrawSystem DrawSystem;
+typedef struct DrawSystemMethods DrawSystemMethods;
 
 /* LIBGPU.H's RECT, declared locally (never #include a psyq header). */
 typedef struct {
@@ -31,64 +47,64 @@ typedef struct {
     short w, h;
 } RECT;
 
-/* A 4-short RECT source: x/y/w at +0/+2/+4, h at +8 (func_80020970). */
+/* A 4-short RECT source: x/y/w at +0/+2/+4, h at +8 (ConvertRect). */
 typedef struct {
     /* +0x0 */ s16 x;
     /* +0x2 */ s16 y;
     /* +0x4 */ s16 w;
     /* +0x6 */ s16 unk6;
     /* +0x8 */ s16 h;
-} Class6C070Rect;
+} DrawSystemRect;
 
-/* What func_80020C08 fills in: two zero shorts then the +0x14 pair. */
+/* What DrawSystem__GetDims fills in: two zero shorts then the +0x14 pair. */
 typedef struct {
     /* +0x0 */ s16 x;
     /* +0x2 */ s16 y;
     /* +0x4 */ s32 w;
     /* +0x8 */ s32 h;
-} Class6C070Dims;
+} DrawSystemDims;
 
 typedef struct {
     /* +0x0 */ s32 w;
     /* +0x4 */ s32 h;
-} Class6C070Size;
+} DrawSystemSize;
 
-struct Class6C070Methods {
-    BASICCLASS_SLOTS(Class6C070, (Class6C070 *self));
-    /* +0x040 */ void (*init)(Class6C070 *self);                 /* func_80020784 */
-    /* +0x044 */ void *slot44;
-    /* +0x048 */ void *slot48;
-    /* +0x04C */ void *slot4C;
-    /* +0x050 */ void *slot50;
-    /* +0x054 */ void *slot54;
-    /* +0x058 */ void *slot58;
-    /* +0x05C */ void *slot5C;
-    /* +0x060 */ void *slot60;
-    /* +0x064 */ void *slot64;
-    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* func_80020A74 */
-    /* +0x06C */ void *slot6C;
-    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* func_80020B4C */
-    /* +0x074 */ void *slot74;
-    /* +0x078 */ void (*slot78)(Class6C070 *self, u8 *color, Class6C070Rect *src); /* func_80020B74 */
-    /* +0x07C */ Class6C070Size *(*slot7C)(Class6C070 *self, Class6C070Dims *out); /* func_80020C08 */
-    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* func_80020C3C */
+struct DrawSystemMethods {
+    BASICCLASS_SLOTS(DrawSystem, (DrawSystem *self));
+    /* +0x040 */ void (*init)(DrawSystem *self);                  /* DrawSystem__Init */
+    /* +0x044 */ void *initGraph;                                 /* DrawSystem__InitGraph */
+    /* +0x048 */ void *start;                                     /* DrawSystem__Start */
+    /* +0x04C */ void *stop;                                      /* DrawSystem__Stop */
+    /* +0x050 */ void *swapBuffers;                               /* DrawSystem__SwapBuffers */
+    /* +0x054 */ void *getActiveBuffer;                           /* DrawSystem__GetActiveBuffer */
+    /* +0x058 */ void *loadImage;                                 /* DrawSystem__LoadImage */
+    /* +0x05C */ void *storeImage;                                /* DrawSystem__StoreImage */
+    /* +0x060 */ void *slot60;                                    /* DrawSystem__func_80020A1C, always returns 0 */
+    /* +0x064 */ void *moveImage;                                 /* DrawSystem__MoveImage */
+    /* +0x068 */ void (*runLoop)(DrawSystem *self);               /* DrawSystem__RunLoop */
+    /* +0x06C */ void *countFrames;                               /* DrawSystem__CountFrames */
+    /* +0x070 */ void (*setVSyncCount)(DrawSystem *self, s32 value); /* DrawSystem__SetVSyncCount */
+    /* +0x074 */ void *getVSyncCount;                             /* DrawSystem__GetVSyncCount */
+    /* +0x078 */ void (*clearImage)(DrawSystem *self, u8 *color, DrawSystemRect *src); /* DrawSystem__ClearImage */
+    /* +0x07C */ DrawSystemSize *(*getDims)(DrawSystem *self, DrawSystemDims *out); /* DrawSystem__GetDims */
+    /* +0x080 */ void (*setSyncMode)(DrawSystem *self, s32 value); /* DrawSystem__SetSyncMode */
 };
 
-struct Class6C070 {
-    BASICCLASS_FIELDS(Class6C070Methods);
-    /* +0x00C */ s32 unkC;            /* 80020AF4 sets to 1 once unk24 reaches unk20 */
-    /* +0x010 */ s32 unk10;           /* cleared by 8002089C; 80020B4C stores unk20 only while 0 */
-    /* +0x014 */ Class6C070Size size; /* 80020C08 returns its address */
-    /* +0x01C */ s32 unk1C;           /* 800207DC: GsInitGraph vram mode */
-    /* +0x020 */ s32 unk20;           /* 80020B4C sets, 80020B68 gets */
-    /* +0x024 */ s32 unk24;           /* 80020AF4 counts up to unk20 */
+struct DrawSystem {
+    BASICCLASS_FIELDS(DrawSystemMethods);
+    /* +0x00C */ s32 unkC;            /* DrawSystem__CountFrames sets to 1 once unk24 reaches unk20 */
+    /* +0x010 */ s32 running;         /* cleared by Stop; SetVSyncCount stores unk20 only while 0; RunLoop's while condition */
+    /* +0x014 */ DrawSystemSize size; /* GetDims returns its address */
+    /* +0x01C */ s32 vramMode;        /* InitGraph: GsInitGraph vram mode */
+    /* +0x020 */ s32 unk20;           /* SetVSyncCount sets, GetVSyncCount gets; also RunLoop's VSync() argument and CountFrames's threshold -- one field, two uses, neither fully pinned down */
+    /* +0x024 */ s32 unk24;           /* CountFrames counts up to unk20 */
     /* +0x028 */ u8 pad28[0x2C - 0x28];
-    /* +0x02C */ s32 unk2C;           /* 80020C3C sets */
-    /* +0x030 */ void (*callback)(void); /* 80020C44 sets, 80020A74 calls each VSync */
+    /* +0x02C */ s32 syncMode;        /* SetSyncMode sets; gates the post-transfer DrawSync(0) in LoadImage/StoreImage and the running-bypass there and in ClearImage's dispatch */
+    /* +0x030 */ void (*callback)(void); /* SetCallback sets, RunLoop calls each VSync */
 };
 
-extern Class6C070Methods D_8006C070;  /* the class's method table */
-extern Class6C070 *D_8008A83C;        /* sdata: the singleton func_80020C5C returns */
+extern DrawSystemMethods D_8006C070;  /* the class's method table */
+extern DrawSystem *D_8008A83C;        /* sdata: the singleton GetDrawSystem returns */
 
 extern void GsSwapDispBuff(void);     /* LIBGS.H */
 extern void GsInitGraph(unsigned short x_res, unsigned short y_res,
@@ -105,92 +121,92 @@ extern int VSync(int mode);                         /* LIBETC.H */
 extern int StoreImage(RECT *rect, u_long *p);       /* LIBGPU.H */
 extern void *BMemPMgrAlloc(s32 size);
 
-Class6C070Methods *func_80020C4C(void);
-Class6C070 *func_80020C5C(void);
-void func_80020970(RECT *dst, Class6C070Rect *src);
+DrawSystemMethods *Get_vtable_DrawSystem(void);
+DrawSystem *GetDrawSystem(void);
+void ConvertRect(RECT *dst, DrawSystemRect *src);
 
-Class6C070 *new_class_6c078(void) {
-    Class6C070 *p = BMemPMgrAlloc(0x34);
+DrawSystem *New_DrawSystem(void) {
+    DrawSystem *p = BMemPMgrAlloc(0x34);
 
     if (p != NULL) {
-        func_80020C4C()->ctor(p);
+        Get_vtable_DrawSystem()->ctor(p);
         return p;
     }
     return NULL;
 }
-void func_80020730(Class6C070 *self) {
+void DrawSystem__DrawSystem(DrawSystem *self) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_80020C4C();
+    self->methods = Get_vtable_DrawSystem();
     self->methods->init(self);
 }
-void func_80020784(Class6C070 *self) {
-    self->unk10 = 0;
-    self->methods->slot70(self, 3);
-    self->methods->slot80(self, 1);
+void DrawSystem__Init(DrawSystem *self) {
+    self->running = 0;
+    self->methods->setVSyncCount(self, 3);
+    self->methods->setSyncMode(self, 1);
     self->callback = NULL;
 }
-void func_800207DC(Class6C070 *self, Class6C070Size *size, s32 vramMode) {
+void DrawSystem__InitGraph(DrawSystem *self, DrawSystemSize *size, s32 vramMode) {
     GsInitGraph(size->w, size->h, 0, 1, vramMode);
     GsDefDispBuff(0, 0, 0, size->h);
     self->size = *size;
-    self->unk1C = vramMode;
+    self->vramMode = vramMode;
 }
-void func_8002085C(Class6C070 *self) {
-    if (self->unk10 == 0) {
-        self->unk10 = 1;
-        self->methods->slot68(self);
+void DrawSystem__Start(DrawSystem *self) {
+    if (self->running == 0) {
+        self->running = 1;
+        self->methods->runLoop(self);
     }
 }
-void func_8002089C(Class6C070 *self) {
-    if (self->unk10 != 0) {
-        self->unk10 = 0;
+void DrawSystem__Stop(DrawSystem *self) {
+    if (self->running != 0) {
+        self->running = 0;
     }
 }
-void func_800208B8(Class6C070 *self) {
+void DrawSystem__SwapBuffers(DrawSystem *self) {
     GsSwapDispBuff();
 }
-s32 func_800208D8(Class6C070 *self) {
+s32 DrawSystem__GetActiveBuffer(DrawSystem *self) {
     return GsGetActiveBuff();
 }
-void func_800208F8(Class6C070 *self, Class6C070Rect *src, u_long *pixels) {
+void DrawSystem__LoadImage(DrawSystem *self, DrawSystemRect *src, u_long *pixels) {
     RECT rect;
 
-    if (self->unk10 == 0 || self->unk2C != 0) {
-        func_80020970(&rect, src);
+    if (self->running == 0 || self->syncMode != 0) {
+        ConvertRect(&rect, src);
         LoadImage(&rect, pixels);
-        if (self->unk2C != 0) {
+        if (self->syncMode != 0) {
             DrawSync(0);
         }
     }
 }
-void func_80020970(RECT *dst, Class6C070Rect *src) {
+void ConvertRect(RECT *dst, DrawSystemRect *src) {
     dst->x = src->x;
     dst->y = src->y;
     dst->w = src->w;
     dst->h = src->h;
 }
-void func_800209A0(Class6C070 *self, u_long *pixels, Class6C070Rect *src) {
+void DrawSystem__StoreImage(DrawSystem *self, u_long *pixels, DrawSystemRect *src) {
     RECT rect;
 
-    if (self->unk10 == 0 || self->unk2C != 0) {
-        func_80020970(&rect, src);
+    if (self->running == 0 || self->syncMode != 0) {
+        ConvertRect(&rect, src);
         StoreImage(&rect, pixels);
-        if (self->unk2C != 0) {
+        if (self->syncMode != 0) {
             DrawSync(0);
         }
     }
 }
-s32 func_80020A1C(Class6C070 *self) {
+s32 DrawSystem__func_80020A1C(DrawSystem *self) {
     return 0;
 }
-void func_80020A24(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) {
+void DrawSystem__MoveImage(DrawSystem *self, DrawSystemRect *src, s16 x, s16 y) {
     RECT rect;
 
-    func_80020970(&rect, src);
+    ConvertRect(&rect, src);
     MoveImage(&rect, x, y);
 }
-void func_80020A74(Class6C070 *self) {
-    while (self->unk10 != 0) {
+void DrawSystem__RunLoop(DrawSystem *self) {
+    while (self->running != 0) {
         VSync(self->unk20);
         if (self->callback != NULL) {
             self->callback();
@@ -198,8 +214,8 @@ void func_80020A74(Class6C070 *self) {
         self->methods->notifyParents(self, 2);
     }
 }
-void func_80020AF4(Class6C070 *self) {
-    Class6C070 *obj = func_80020C5C();
+void DrawSystem__CountFrames(DrawSystem *self) {
+    DrawSystem *obj = GetDrawSystem();
 
     obj->unk24++;
     if (obj->unk24 >= obj->unk20 && obj->unkC == 0) {
@@ -207,27 +223,27 @@ void func_80020AF4(Class6C070 *self) {
         obj->unk24 = 0;
     }
 }
-void func_80020B4C(Class6C070 *self, s32 value) {
-    if (self->unk10 == 0) {
+void DrawSystem__SetVSyncCount(DrawSystem *self, s32 value) {
+    if (self->running == 0) {
         self->unk20 = value;
     }
 }
-s32 func_80020B68(Class6C070 *self) {
+s32 DrawSystem__GetVSyncCount(DrawSystem *self) {
     return self->unk20;
 }
-void func_80020B74(Class6C070 *self, u8 *color, Class6C070Rect *src) {
-    Class6C070Dims dims;
+void DrawSystem__ClearImage(DrawSystem *self, u8 *color, DrawSystemRect *src) {
+    DrawSystemDims dims;
     RECT rect;
 
     if (src == NULL) {
-        self->methods->slot7C(self, &dims);
-        self->methods->slot78(self, color, (Class6C070Rect *)&dims);
+        self->methods->getDims(self, &dims);
+        self->methods->clearImage(self, color, (DrawSystemRect *)&dims);
     } else {
-        func_80020970(&rect, src);
+        ConvertRect(&rect, src);
         ClearImage(&rect, color[0], color[1], color[2]);
     }
 }
-Class6C070Size *func_80020C08(Class6C070 *self, Class6C070Dims *out) {
+DrawSystemSize *DrawSystem__GetDims(DrawSystem *self, DrawSystemDims *out) {
     if (out != NULL) {
         out->x = 0;
         out->y = 0;
@@ -236,18 +252,18 @@ Class6C070Size *func_80020C08(Class6C070 *self, Class6C070Dims *out) {
     }
     return &self->size;
 }
-void func_80020C3C(Class6C070 *self, s32 value) {
-    self->unk2C = value;
+void DrawSystem__SetSyncMode(DrawSystem *self, s32 value) {
+    self->syncMode = value;
 }
-void func_80020C44(Class6C070 *self, void (*callback)(void)) {
+void DrawSystem__SetCallback(DrawSystem *self, void (*callback)(void)) {
     self->callback = callback;
 }
-Class6C070Methods *func_80020C4C(void) {
+DrawSystemMethods *Get_vtable_DrawSystem(void) {
     return &D_8006C070;
 }
-Class6C070 *func_80020C5C(void) {
+DrawSystem *GetDrawSystem(void) {
     return D_8008A83C;
 }
-void func_80020C68(Class6C070 *obj) {
+void SetDrawSystem(DrawSystem *obj) {
     D_8008A83C = obj;
 }

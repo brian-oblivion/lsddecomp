@@ -100,7 +100,7 @@ extern void SsInit(void);
 extern void GsInit3D(void);
 
 extern void SetActiveDataSource(s32 arg0); /* code_171e0 */
-extern void func_80020C68(void *arg);      /* code_10ee0, stores its arg to a gp global */
+extern void SetDrawSystem(void *arg);      /* code_10ee0, stores its arg to a gp global */
 extern void *BMemPMgrAlloc(s32 size);
 
 void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 source) {
@@ -125,7 +125,7 @@ void Class6E4F0__SetScreenDims(Class6E4F0 *self, ScreenDims *dims, s32 arg) {
 
 void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
     if (self->initialized == 0) {
-        func_80020C68(source);
+        SetDrawSystem(source);
         source->methods->slot44(source, &self->dims, self->dimsArg);
         SsInit();
         GsInit3D();

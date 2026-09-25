@@ -1,10 +1,12 @@
-# func_8002089C -- MATCHED (7/7 words), round 81
+# DrawSystem__func_80020A1C -- MATCHED (2/2 words), round 81
+
+> Renamed from `func_80020A1C` on 2026-09-25 (tools/rename.py). Address 0x80020a1c.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x04C (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** clears the s32 at +0x10 when it is non-zero (`beqz` around the store).
+- **Where:** D_8006C070 slot +0x060 (method-table slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** returns 0 (`jr $ra; addu $v0,$zero,$zero`).
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -14,10 +16,8 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_8002089C(Class6C070 *self) {
-    if (self->unk10 != 0) {
-        self->unk10 = 0;
-    }
+s32 DrawSystem__func_80020A1C(Class6C070 *self) {
+    return 0;
 }
 ```
 
@@ -45,3 +45,10 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+Kept the tier-C `DrawSystem__func_80020A1C` form (class known, function
+purpose not): the body is `return 0;` with no caller in this unit and no
+other evidence of what the constant answers. A guessed name (e.g. "CanX")
+would be worse than the placeholder.

@@ -1,10 +1,12 @@
-# func_80020B68 -- MATCHED (3/3 words), round 81
+# Get_vtable_DrawSystem -- MATCHED (4/4 words), round 81
+
+> Renamed from `func_80020C4C` on 2026-09-25 (tools/rename.py). Address 0x80020c4c.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x074 (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** getter of the s32 at +0x20.
+- **Where:** not a method: the table getter (method-table slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** returns &D_8006C070 (`lui/addiu`).
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -14,8 +16,8 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-s32 func_80020B68(Class6C070 *self) {
-    return self->unk20;
+Class6C070Methods *Get_vtable_DrawSystem(void) {
+    return &D_8006C070;
 }
 ```
 
@@ -43,3 +45,10 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`Get_vtable_DrawSystem`, tier A. The class's own method-table getter
+(returns `&D_8006C070`); matches the project's `Get_vtable_<Class>`
+convention for this exact role (`BasicClass.h`'s `Get_vtable_BasicClass`,
+round 81's `Get_vtable_WBgm`).

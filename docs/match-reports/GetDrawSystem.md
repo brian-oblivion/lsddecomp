@@ -1,4 +1,6 @@
-# func_80020C5C -- MATCHED (3/3 words), round 81
+# GetDrawSystem -- MATCHED (3/3 words), round 81
+
+> Renamed from `func_80020C5C` on 2026-09-25 (tools/rename.py). Address 0x80020c5c.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
@@ -14,7 +16,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-Class6C070 *func_80020C5C(void) {
+Class6C070 *GetDrawSystem(void) {
     return D_8008A83C;
 }
 ```
@@ -43,3 +45,11 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`GetDrawSystem`, tier A. The singleton getter for `D_8008A83C`; three other
+units (`code_2bb9c.c`, `code_179d8_q.c`, `code_2a0e0.c`) independently
+called this function's return "the draw singleton" in their own comments
+before this rename -- convergent naming from callers that never saw each
+other's code.

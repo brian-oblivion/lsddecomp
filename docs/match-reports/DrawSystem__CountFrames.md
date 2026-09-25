@@ -1,9 +1,11 @@
-# func_80020AF4 -- MATCHED (22/22 words), round 81
+# DrawSystem__CountFrames -- MATCHED (22/22 words), round 81
+
+> Renamed from `func_80020AF4` on 2026-09-25 (tools/rename.py). Address 0x80020af4.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
 - **Where:** D_8006C070 slot +0x06C (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** ignores self; on the singleton func_80020C5C() increments +0x24, and once it reaches +0x20 and +0xC is clear, sets +0xC = 1 and resets +0x24.
+- **What:** ignores self; on the singleton GetDrawSystem() increments +0x24, and once it reaches +0x20 and +0xC is clear, sets +0xC = 1 and resets +0x24.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   22/22 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
@@ -11,8 +13,8 @@ Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020AF4(Class6C070 *self) {
-    Class6C070 *obj = func_80020C5C();
+void DrawSystem__CountFrames(Class6C070 *self) {
+    Class6C070 *obj = GetDrawSystem();
 
     obj->unk24++;
     if (obj->unk24 >= obj->unk20 && obj->unkC == 0) {
@@ -51,4 +53,9 @@ struct Class6C070 {
 
 ## Naming
 
-Kept func_.
+`DrawSystem__CountFrames`, tier B. Ignores its own `self` and instead
+increments the SINGLETON's frame counter (+0x24) toward a threshold (+0x20,
+shared with `DrawSystem__SetVSyncCount`'s field), setting a "done" flag
+(+0xC) once. It occupies a real vtable slot (+0x06C) but is never dispatched
+through `->methods->` from within this unit; what calls it, and what the
++0xC flag then gates, isn't established here.

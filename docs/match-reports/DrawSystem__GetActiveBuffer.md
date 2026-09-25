@@ -1,4 +1,6 @@
-# func_800208D8 -- MATCHED (8/8 words), round 81
+# DrawSystem__GetActiveBuffer -- MATCHED (8/8 words), round 81
+
+> Renamed from `func_800208D8` on 2026-09-25 (tools/rename.py). Address 0x800208d8.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
@@ -11,7 +13,7 @@ Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-s32 func_800208D8(Class6C070 *self) {
+s32 DrawSystem__GetActiveBuffer(Class6C070 *self) {
     return GsGetActiveBuff();
 }
 ```
@@ -45,4 +47,7 @@ struct Class6C070 {
 
 ## Naming
 
-Proposed `Class6C070__GetActiveBuff` (tier B).
+`DrawSystem__GetActiveBuffer`, tier B. A tail-call wrapper of LIBGS.H's
+`GsGetActiveBuff`; the bytes cannot distinguish `void` from `int` for a
+tail call (CLAUDE.md), so the `s32` return is carried from the SDK
+prototype, not confirmed as used by any caller.

@@ -1,4 +1,6 @@
-# func_80020970 -- MATCHED (12/12 words), round 81
+# ConvertRect -- MATCHED (12/12 words), round 81
+
+> Renamed from `func_80020970` on 2026-09-25 (tools/rename.py). Address 0x80020970.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
@@ -11,7 +13,7 @@ Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020970(RECT *dst, Class6C070Rect *src) {
+void ConvertRect(RECT *dst, Class6C070Rect *src) {
     dst->x = src->x;
     dst->y = src->y;
     dst->w = src->w;
@@ -43,4 +45,7 @@ typedef struct {
 
 ## Naming
 
-Kept func_. The source struct (h at +8, unknown s16 at +6) is unidentified.
+`ConvertRect`, tier A. A pure field-by-field copy from the class's own
+odd-shaped rect record (`DrawSystemRect`) into LIBGPU.H's `RECT`; mechanics
+ARE the purpose. Not a method (no table slot); the source struct's unknown
+`+0x6` short is still unidentified.

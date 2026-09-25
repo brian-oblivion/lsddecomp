@@ -1,10 +1,12 @@
-# func_800208B8 -- MATCHED (8/8 words), round 81
+# DrawSystem__SetVSyncCount -- MATCHED (7/7 words), round 81
+
+> Renamed from `func_80020B4C` on 2026-09-25 (tools/rename.py). Address 0x80020b4c.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x050 (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** calls GsSwapDispBuff() (libgs) in a frame of 0x18 and returns.
+- **Where:** D_8006C070 slot +0x070 (method-table slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** stores its argument to +0x20 only while +0x10 is zero (`bnez` around the store).
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -14,8 +16,10 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_800208B8(Class6C070 *self) {
-    GsSwapDispBuff();
+void DrawSystem__SetVSyncCount(Class6C070 *self, s32 value) {
+    if (self->unk10 == 0) {
+        self->unk20 = value;
+    }
 }
 ```
 
@@ -43,3 +47,12 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`DrawSystem__SetVSyncCount`, tier B. A guarded setter (only stores while not
+`running`) of the field `DrawSystem__RunLoop` passes to `VSync()` and
+`DrawSystem__CountFrames` compares a counter against; the field's exact
+in-game meaning (a VSync wait mode vs. a frame-count threshold -- see
+`src/code_10ee0.c`'s `unk20` comment) isn't pinned down, so the setter's
+name follows the field's more literal reading rather than asserting one.

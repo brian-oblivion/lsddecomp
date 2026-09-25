@@ -1,21 +1,22 @@
-# func_80020784 -- MATCHED (22/22 words), round 81
+# DrawSystem__DrawSystem -- MATCHED (21/21 words), round 81
+
+> Renamed from `func_80020730` on 2026-09-25 (tools/rename.py). Address 0x80020730.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
-- **Where:** D_8006C070 slot +0x040 (init) (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** clears +0x10, calls slot +0x070 (func_80020B4C) with 3 and slot +0x080 (func_80020C3C) with 1, clears +0x30.
+- **Where:** D_8006C070 slot +0x008 (ctor) (slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** base ctor through Get_vtable_BasicClass()->ctor, then installs the table from Get_vtable_DrawSystem() and calls slot +0x040 (DrawSystem__Init). The `sw v0,0(s0); lw v0,0x40(v0)` reuse falls out of plain sequential C.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
-  22/22 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
+  21/21 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
 
 ## Source
 
 ```c
-void func_80020784(Class6C070 *self) {
-    self->unk10 = 0;
-    self->methods->slot70(self, 3);
-    self->methods->slot80(self, 1);
-    self->unk30 = 0;
+void DrawSystem__DrawSystem(Class6C070 *self) {
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = Get_vtable_DrawSystem();
+    self->methods->init(self);
 }
 ```
 
@@ -47,7 +48,7 @@ struct Class6C070 {
 
 struct Class6C070Methods {
     BASICCLASS_SLOTS(Class6C070, (Class6C070 *self));
-    /* +0x040 */ void (*init)(Class6C070 *self);                 /* func_80020784 */
+    /* +0x040 */ void (*init)(Class6C070 *self);                 /* DrawSystem__Init */
     /* +0x044 */ void *slot44;
     /* +0x048 */ void *slot48;
     /* +0x04C */ void *slot4C;
@@ -57,20 +58,19 @@ struct Class6C070Methods {
     /* +0x05C */ void *slot5C;
     /* +0x060 */ void *slot60;
     /* +0x064 */ void *slot64;
-    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* func_80020A74 */
+    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* DrawSystem__RunLoop */
     /* +0x06C */ void *slot6C;
-    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* func_80020B4C */
+    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* DrawSystem__SetVSyncCount */
     /* +0x074 */ void *slot74;
     /* +0x078 */ void *slot78;
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* func_80020C3C */
+    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* DrawSystem__SetSyncMode */
 };
 ```
 
 ## Naming
 
-Kept func_.
-
-## Round 82 note
-
-Round 82 (alpha) retyped +0x030 from `s32 unk30` to `void (*callback)(void)`: func_80020A74 calls it (`jalr`) once per VSync. The live source now reads `self->callback = ...`; func_80020C44 takes `void (*callback)(void)`. Still byte-exact (whole-image SHA1 green).
+`DrawSystem__DrawSystem`, tier A. The class is named `DrawSystem` this round
+(see `src/code_10ee0.c`'s header comment); this function occupies the +0x008
+ctor slot, and `Class__Class` is the project's ctor-naming convention
+(`BasicClass.h`).

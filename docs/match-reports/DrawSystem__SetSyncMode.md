@@ -1,10 +1,12 @@
-# func_80020C68 -- MATCHED (3/3 words), round 81
+# DrawSystem__SetSyncMode -- MATCHED (2/2 words), round 81
+
+> Renamed from `func_80020C3C` on 2026-09-25 (tools/rename.py). Address 0x80020c3c.
 
 Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
-- **Where:** not a method: the singleton setter (method-table slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** stores its argument to D_8008A83C (`sw %gp_rel`).
+- **Where:** D_8006C070 slot +0x080 (method-table slots resolved with `tools/classtable.py D_8006C070`).
+- **What:** setter of the s32 at +0x2C, store in the delay slot.
 - **Result:** byte-exact on the first build; `funcdiff.py` reports 0
   insertions / 0 deletions and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -14,8 +16,8 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-void func_80020C68(Class6C070 *obj) {
-    D_8008A83C = obj;
+void DrawSystem__SetSyncMode(Class6C070 *self, s32 value) {
+    self->unk2C = value;
 }
 ```
 
@@ -43,3 +45,10 @@ extern Class6C070Methods D_8006C070;
 extern Class6C070 *D_8008A83C;
 extern void GsSwapDispBuff(void);
 ```
+
+## Naming
+
+`DrawSystem__SetSyncMode`, tier B. Sets the field that gates the
+post-transfer `DrawSync(0)` in LoadImage/StoreImage and the running-bypass
+there and in ClearImage's dispatch (`src/code_10ee0.c`'s `syncMode`
+comment); "sync mode" describes the mechanic, not a confirmed in-game name.

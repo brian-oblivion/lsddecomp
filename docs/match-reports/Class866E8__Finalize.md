@@ -15,7 +15,7 @@ words, WITH address drift (not a trustworthy score — see below)
 ## What it does
 
 The destructor (`Class866E8Methods::dtor`, per the header comment already
-on that field). Calls `self->methods->slot14(self, func_80020C5C(self))`
+on that field). Calls `self->methods->slot14(self, GetDrawSystem(self))`
 once, then walks the SAME 7-element `unkEC[]` slot array `Class866E8__ResetAllElements`
 walks, tearing each entry down: calls `self->methods->slot88(self, 6,
 entry, i)` (same call shape as `Class866E8__ResetAllElements`); refreshes-and-discards
@@ -50,7 +50,7 @@ needs a complete type).
 
 ```c
 #if 0
-extern void *func_80020C5C(Class866E8 *self);
+extern void *GetDrawSystem(Class866E8 *self);
 extern void BMemPMgrFree(void *arg1);
 extern void *func_800428E4(Class866E8 *self);
 
@@ -65,7 +65,7 @@ void Class866E8__Finalize(Class866E8 *self)
     GenericObject *obj;
     void (*fn)(Class866E8 *self);
 
-    tmp = func_80020C5C(self);
+    tmp = GetDrawSystem(self);
     self->methods->slot14(self, tmp);
 
     offset = 0xEC;
@@ -190,10 +190,10 @@ Restored to `INCLUDE_ASM`.
 ## Round 19 (echo): MATCHED, 113/113, whole-image green
 
 Re-verified the "62/113, drifted" claim first: the preserved body above
-does NOT compile as-is against the CURRENT header (`func_80020C5C` and
+does NOT compile as-is against the CURRENT header (`GetDrawSystem` and
 `func_800428E4` have both since been given real, no-argument signatures
 by the sibling ctor `Class866E8__Class866E8`'s own successful match -- see
-`src/class_3ac78.c`'s own declarations, `extern s32 func_80020C5C(void);`
+`src/class_3ac78.c`'s own declarations, `extern s32 GetDrawSystem(void);`
 and `extern BaseCtorTable_3ac78 *func_800428E4(void);` -- rather than the
 `(self)`-taking guesses this report's preserved body used). This alone
 means the round-13 62/113 score was measuring a body that would not even
@@ -205,14 +205,14 @@ build against today's header; it was not re-derivable verbatim.
 0x668-byte array this function tears down.** Its own byte-exact source
 was read directly rather than re-guessing the idiom from scratch:
 
-1. **`self->methods->slot14(self, (void *)func_80020C5C())`** and
+1. **`self->methods->slot14(self, (void *)GetDrawSystem())`** and
    **`func_800428E4()->dtor(self)`** (a new `dtor` slot added to the
    locally-declared `BaseCtorTable_3ac78`, at `+0x00C`, immediately after
    the already-established `ctor` slot at `+0x008` -- purely additive,
    mirrors the "further-base ctor/dtor" pattern already documented on
    `ctor`) -- both call shapes copied directly from the ctor's own
    `func_800428E4()->ctor(self)` / `self->methods->slot10(self,
-   func_80020C5C())` pattern, just the destructor's own slots.
+   GetDrawSystem())` pattern, just the destructor's own slots.
 2. **The array-scan loop's pointer idiom, copied verbatim from the
    ctor's own matched body**: a THREE-variable chain --
    `cellp = entry->unk10; end = (u8 *)cellp + 0x668; p = (u8 *)cellp;`
@@ -267,7 +267,7 @@ void Class866E8__Finalize(Class866E8 *self)
     u8 *p;
     u8 *end;
 
-    self->methods->slot14(self, (void *)func_80020C5C());
+    self->methods->slot14(self, (void *)GetDrawSystem());
 
     for (i = 0; i < 7; i++) {
         entry = &self->unkEC[i];

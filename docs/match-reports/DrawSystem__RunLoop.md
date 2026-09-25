@@ -1,15 +1,17 @@
-# func_80020A74 -- MATCHED (32/32 words), round 82
+# DrawSystem__RunLoop -- MATCHED (32/32 words), round 82
+
+> Renamed from `func_80020A74` on 2026-09-25 (tools/rename.py). Address 0x80020a74.
 
 Round 82, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
 - **Where:** D_8006C070 slot +0x068 (`tools/classtable.py D_8006C070`);
-  func_8002085C calls it through `methods->slot68` after setting +0x10.
+  DrawSystem__Start calls it through `methods->slot68` after setting +0x10.
 - **What:** the frame loop. While +0x10 is set: `VSync(self->unk20)`, call the
   optional callback at +0x30, then `notifyParents(self, 2)` (BasicClass slot
   +0x030).
 - **Struct change:** +0x030 retyped from `s32 unk30` to
   `void (*callback)(void)` (the `jalr $v0` on it is the evidence).
-  func_80020C44's parameter and func_80020784's `= 0` store follow; both stay
+  DrawSystem__SetCallback's parameter and DrawSystem__Init's `= 0` store follow; both stay
   byte-exact. Local view only.
 - **Result:** byte-exact on the FIRST build; 32/32 words, 0 insertions /
   0 deletions, whole-image SHA1 green. A plain `while` gives the retail
@@ -20,7 +22,7 @@ Round 82, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 ```c
 extern int VSync(int mode);                         /* LIBETC.H */
 
-void func_80020A74(Class6C070 *self) {
+void DrawSystem__RunLoop(Class6C070 *self) {
     while (self->unk10 != 0) {
         VSync(self->unk20);
         if (self->callback != NULL) {
@@ -37,5 +39,10 @@ Needs the unit-local `Class6C070` view at the top of `src/code_10ee0.c`, with
 
 ## Naming
 
-Proposed `Class6C070__RunLoop` (tier B); +0x10 reads as a "running" flag
-(func_8002085C sets it and enters this loop, func_8002089C clears it).
+`DrawSystem__RunLoop`, tier B. The VSync-synced frame loop: while `running`,
+`VSync(unk20)`, an optional per-frame callback, then `notifyParents(self, 2)`
+(BasicClass's own tick-broadcast slot) -- so every BasicClass object that
+`addChild`s this singleton gets event 2 once per VSync (`code_2a0e0.c`'s
+`WBgm__WBgm`, `class_3ac78.c`'s `Class866E8__Class866E8`, both do). +0x10 is
+named `running`: `DrawSystem__Start` sets it and enters this loop,
+`DrawSystem__Stop` clears it.

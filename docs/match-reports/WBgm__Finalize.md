@@ -6,7 +6,7 @@ Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** D_8006E48C slot +0x00C (finalize) (slots resolved with `tools/classtable.py D_8006E48C`).
-- **What:** finalize: `gWBgmActive = 0`, own `stop` (+0x048), `SsSeqClose(seqId)`, `release` (+0x004) on the +0x0C and +0x10 objects when non-NULL, `removeChild(self, func_80020C5C())`, then the base finalize.
+- **What:** finalize: `gWBgmActive = 0`, own `stop` (+0x048), `SsSeqClose(seqId)`, `release` (+0x004) on the +0x0C and +0x10 objects when non-NULL, `removeChild(self, GetDrawSystem())`, then the base finalize.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 52/52
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -39,7 +39,7 @@ void WBgm__Finalize(WBgm *self) {
     if (self->seqData != NULL) {
         self->seqData->methods->release((BasicClass *)self->seqData);
     }
-    self->methods->removeChild(self, func_80020C5C());
+    self->methods->removeChild(self, GetDrawSystem());
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 ```
@@ -108,7 +108,7 @@ extern void SsSeqClose(short);
 extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
-extern BasicClass *func_80020C5C(void);
+extern BasicClass *GetDrawSystem(void);
 extern SeqData *func_800422CC(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);

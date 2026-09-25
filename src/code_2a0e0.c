@@ -76,7 +76,7 @@ extern void SsSeqClose(short);
 extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
-extern BasicClass *func_80020C5C(void);
+extern BasicClass *GetDrawSystem(void);
 extern SeqData *func_800422CC(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
@@ -113,7 +113,7 @@ void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
     gWBgmActive = 1;
     self->methods->setSeq(self, seqArg);
     self->methods->setVab(self, vabArg);
-    self->methods->addChild(self, func_80020C5C());
+    self->methods->addChild(self, GetDrawSystem());
 }
 void WBgm__Finalize(WBgm *self) {
     gWBgmActive = 0;
@@ -125,7 +125,7 @@ void WBgm__Finalize(WBgm *self) {
     if (self->seqData != NULL) {
         self->seqData->methods->release((BasicClass *)self->seqData);
     }
-    self->methods->removeChild(self, func_80020C5C());
+    self->methods->removeChild(self, GetDrawSystem());
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {

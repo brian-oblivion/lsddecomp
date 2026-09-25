@@ -1,9 +1,11 @@
-# new_class_6c078 -- MATCHED (20/20 words), round 81
+# New_DrawSystem -- MATCHED (20/20 words), round 81
+
+> Renamed from `new_class_6c078` on 2026-09-25 (tools/rename.py). Address 0x800206e0.
 
 Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 
 - **Where:** allocator (slots resolved with `tools/classtable.py D_8006C070`).
-- **What:** allocates 0x34 bytes with BMemPMgrAlloc and runs the ctor through the class table (func_80020C4C()->ctor); the broadcast alloc-then-ctor shape `if (p != NULL) { ctor; return p; } return NULL;`.
+- **What:** allocates 0x34 bytes with BMemPMgrAlloc and runs the ctor through the class table (Get_vtable_DrawSystem()->ctor); the broadcast alloc-then-ctor shape `if (p != NULL) { ctor; return p; } return NULL;`.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   20/20 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
@@ -11,11 +13,11 @@ Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
 ## Source
 
 ```c
-Class6C070 *new_class_6c078(void) {
+Class6C070 *New_DrawSystem(void) {
     Class6C070 *p = BMemPMgrAlloc(0x34);
 
     if (p != NULL) {
-        func_80020C4C()->ctor(p);
+        Get_vtable_DrawSystem()->ctor(p);
         return p;
     }
     return NULL;
@@ -50,7 +52,7 @@ struct Class6C070 {
 
 struct Class6C070Methods {
     BASICCLASS_SLOTS(Class6C070, (Class6C070 *self));
-    /* +0x040 */ void (*init)(Class6C070 *self);                 /* func_80020784 */
+    /* +0x040 */ void (*init)(Class6C070 *self);                 /* DrawSystem__Init */
     /* +0x044 */ void *slot44;
     /* +0x048 */ void *slot48;
     /* +0x04C */ void *slot4C;
@@ -60,16 +62,20 @@ struct Class6C070Methods {
     /* +0x05C */ void *slot5C;
     /* +0x060 */ void *slot60;
     /* +0x064 */ void *slot64;
-    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* func_80020A74 */
+    /* +0x068 */ void (*slot68)(Class6C070 *self);               /* DrawSystem__RunLoop */
     /* +0x06C */ void *slot6C;
-    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* func_80020B4C */
+    /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* DrawSystem__SetVSyncCount */
     /* +0x074 */ void *slot74;
     /* +0x078 */ void *slot78;
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* func_80020C3C */
+    /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* DrawSystem__SetSyncMode */
 };
 ```
 
 ## Naming
 
-Proposed name `New_Class6C070` (tier B: shape of every other New_* allocator); not applied, class unnamed.
+`New_DrawSystem`, tier A. The class is named `DrawSystem` this round (see
+`src/code_10ee0.c`'s header comment for the cross-unit evidence); the
+`New_<Class>` allocator shape (alloc + call the ctor slot) is a pure
+mechanic, so once the class has a name the allocator's name follows by the
+project's own convention (`BasicClass.h`; matches `New_WBgm`, round 81).
