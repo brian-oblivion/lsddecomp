@@ -264,4 +264,18 @@ Rec1C *func_80049334(s32 *countOut, RecPick pick) {
 s32 func_800493C8(s32 index) {
     return D_80086170[index];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800493E4);
+Rec1C *func_800493E4(s32 *total, s32 n, s32 len) {
+    s32 count;
+    s32 i;
+    s32 start;
+    Rec1C *rec = func_800492D0(&count, n);
+    len *= 2;
+    *total = 0;
+    start = count;
+    len += start;
+    for (i = start; i < len; i++) {
+        *total += D_80086170[i] + 10;
+    }
+    *total -= 10;
+    return rec;
+}
