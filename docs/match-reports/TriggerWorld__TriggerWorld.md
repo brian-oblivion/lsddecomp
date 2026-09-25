@@ -1,4 +1,6 @@
-# func_80044A7C -- MATCHED (34/34 words)
+# TriggerWorld__TriggerWorld -- MATCHED (34/34 words)
+
+> Renamed from `func_80044A7C` on 2026-09-25 (tools/rename.py). Address 0x80044a7c.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: the parent D_8006F384's ctor (through GetModelDataMethods's table, with (self, arg, 0)), install D_8006F40C; if the argument's first word is nonzero, call its own +0x064 (func_80044B58) and return NULL on a nonzero result; otherwise return self.
+Constructor: the parent D_8006F384's ctor (through GetModelDataMethods's table, with (self, arg, 0)), install D_8006F40C; if the argument's first word is nonzero, call its own +0x064 (TriggerWorld__Load) and return NULL on a nonzero result; otherwise return self.
 
 Table slot (`tools/classtable.py`): D_8006F40C +0x008.
 
@@ -22,9 +24,9 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 /* D_8006F40C +0x008: constructor -- the parent D_8006F384's (third argument
  * 0), then this table; when the argument's first word is set, its own
  * +0x064 runs, and a nonzero result fails the construction (NULL). */
-void *func_80044A7C(DataSrc33808 *self, s32 *arg) {
+void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
     ((Ctor33808 *)GetModelDataMethods())->ctor(self, arg, 0);
-    self->methods = func_80044CC4();
+    self->methods = GetTriggerWorldMethods();
     if (*arg != 0) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
             return NULL;

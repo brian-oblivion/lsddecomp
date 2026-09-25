@@ -56,7 +56,7 @@ void *GetTimArraySrcMethods(void);
 void *GetTodMethods(void);
 void *GetBgLayerMethods(void);
 void *GetModelDataMethods(void);
-void *func_80044CC4(void);
+void *GetTriggerWorldMethods(void);
 void *func_80044F20(void);
 void *func_800451A8(void);
 void *func_80045428(void);
@@ -1024,11 +1024,11 @@ void *GetModelDataMethods(void) {
     return D_8006F384;
 }
 /* Allocate and construct a D_8006F40C object; freed and NULL when the constructor fails. */
-void *func_80044A0C(s32 arg0) {
+void *New_TriggerWorld(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x3C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80044CC4())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetTriggerWorldMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -1038,9 +1038,9 @@ void *func_80044A0C(s32 arg0) {
 /* D_8006F40C +0x008: constructor -- the parent D_8006F384's (third argument
  * 0), then this table; when the argument's first word is set, its own
  * +0x064 runs, and a nonzero result fails the construction (NULL). */
-void *func_80044A7C(DataSrc33808 *self, s32 *arg) {
+void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
     ((Ctor33808 *)GetModelDataMethods())->ctor(self, arg, 0);
-    self->methods = func_80044CC4();
+    self->methods = GetTriggerWorldMethods();
     if (*arg != 0) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
             return NULL;
@@ -1049,19 +1049,19 @@ void *func_80044A7C(DataSrc33808 *self, s32 *arg) {
     return self;
 }
 /* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
-void func_80044B04(DataSrc33808 *self) {
+void TriggerWorld__Finalize(DataSrc33808 *self) {
     self->methods->slot7C();
     ((DataSrc33808Methods *)GetModelDataMethods())->finalize(self);
 }
 /* D_8006F40C +0x064: slot +0x078. */
-void func_80044B58(DataSrc33808 *self) {
+void TriggerWorld__Load(DataSrc33808 *self) {
     ((s32 (*)())self->methods->slot78)(self);
 }
 /* D_8006F40C +0x078: build a D_8006F384 source (not owning) over each
  * sub-block of the buffer's counted offset table, into the table's own
  * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
  * (release) and 1. */
-s32 func_80044B88(DataSrc33808 *self) {
+s32 TriggerWorld__BuildParts(DataSrc33808 *self) {
     Req44858 req;
     CountedBuf33808 *buf;
     s32 *p;
@@ -1090,13 +1090,13 @@ fail:
 }
 /* D_8006F40C +0x07C: release the object array in the buffer (past its first
  * two words), +0x38 entries long, and zero the count. */
-void func_80044C58(DataSrc33808 *self) {
+void TriggerWorld__ReleaseParts(DataSrc33808 *self) {
     ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->unk38);
     self->unk38 = 0;
 }
 /* D_8006F40C +0x088: entry `index` of the buffer's counted word array, 0 when
  * out of range. */
-s32 func_80044C90(DataSrc33808 *self, u32 index) {
+s32 TriggerWorld__GetOffset(DataSrc33808 *self, u32 index) {
     CountedBuf33808 *buf = self->buffer;
 
     if (index < buf->count) {
@@ -1106,7 +1106,7 @@ s32 func_80044C90(DataSrc33808 *self, u32 index) {
 }
 extern s32 D_8006F40C[];
 
-void *func_80044CC4(void) {
+void *GetTriggerWorldMethods(void) {
     return D_8006F40C;
 }
 /* Allocate and construct a D_8006F498 object. */

@@ -1,4 +1,6 @@
-# func_80044A0C -- MATCHED (28/28 words)
+# New_TriggerWorld -- MATCHED (28/28 words)
+
+> Renamed from `func_80044A0C` on 2026-09-25 (tools/rename.py). Address 0x80044a0c.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,11 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a D_8006F40C object; freed and NULL when the constructor fails. */
-void *func_80044A0C(s32 arg0) {
+void *New_TriggerWorld(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x3C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80044CC4())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetTriggerWorldMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);

@@ -14,7 +14,7 @@ and matched it.
 
 ## What it does
 
-Construct a `TriggerWorld` via `func_80044A0C`; if construction succeeds,
+Construct a `TriggerWorld` via `New_TriggerWorld`; if construction succeeds,
 walk 3 candidate bytes (`a1[3..5]`, terminated early by a `-1` sentinel) and
 fire `ProcessDreamAuxTriggerRecord` once per non-sentinel byte against the SAME
 `gDreamAuxGroupRecords`/`gDreamAuxStage` parallel-group table `InitDreamAux` clears
@@ -23,7 +23,7 @@ fire `ProcessDreamAuxTriggerRecord` once per non-sentinel byte against the SAME
 return value is just whether construction succeeded:
 
 ```c
-extern TriggerWorld *func_80044A0C(s32 *ctx);
+extern TriggerWorld *New_TriggerWorld(s32 *ctx);
 bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
 
 s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
@@ -32,7 +32,7 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
     TriggerWorld *world;
 
     ctxArg[0] = a2;
-    world = func_80044A0C(ctxArg);
+    world = New_TriggerWorld(ctxArg);
 
     if (world != NULL) {
         DreamAuxGroupRecord *base = gDreamAuxGroupRecords[gDreamAuxStage];
@@ -67,9 +67,9 @@ same kind of cross-type reinterpretation CLAUDE.md documents for
 `CheckDreamAuxWorldState`/`AdjustDreamAuxTriggerOffset`'s shared `gDreamAuxWorld` global, just at a
 struct-pointer level instead of a scalar.
 
-`func_80044A0C` is a new symbol, not owned by this unit and not previously
+`New_TriggerWorld` is a new symbol, not owned by this unit and not previously
 declared anywhere in the tree; declared here with a minimal local prototype
-(`TriggerWorld *func_80044A0C(s32 *ctx)`).
+(`TriggerWorld *New_TriggerWorld(s32 *ctx)`).
 
 ## Derivation notes
 
@@ -89,7 +89,7 @@ first build, but the STACK FRAME size was wrong twice:
    while (p < end) { ...; p++; }` reproduced the guard (36/54, no more
    out-of-range drift).
 2. **Second pass (36/54, frame still 8 bytes/2 words short):** with
-   `s32 ctxArg = a2;` passed as `&ctxArg` to `func_80044A0C`, every
+   `s32 ctxArg = a2;` passed as `&ctxArg` to `New_TriggerWorld`, every
    instruction inside the function matched except the FRAME SIZE itself
    (`addiu $sp,$sp,-0x38` vs retail's `-0x40`) and the consequent save-slot
    offsets. Retail reserves 0x10 bytes (4 words) at the bottom of its frame
@@ -122,7 +122,7 @@ mechanisms:
 ## Naming
 
 **FireDreamAuxTriggerEntries** — tier B. Constructs a `TriggerWorld` via
-`func_80044A0C`; on success, walks up to 3 candidate bytes
+`New_TriggerWorld`; on success, walks up to 3 candidate bytes
 (`a1[3..5]`, `-1`-terminated) and calls `ProcessDreamAuxTriggerRecord` once
 per byte purely for side effects (its per-byte return values are discarded);
 returns whether construction succeeded. "Fire" reflects the discard-the-

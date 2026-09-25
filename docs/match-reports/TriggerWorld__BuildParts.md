@@ -1,4 +1,6 @@
-# func_80044B88 -- MATCHED (52/52 words)
+# TriggerWorld__BuildParts -- MATCHED (52/52 words)
+
+> Renamed from `func_80044B88` on 2026-09-25 (tools/rename.py). Address 0x80044b88.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Build step: SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset, allocate a D_8006F384 source through New_ModelData and store it over the offset word itself (entries[i]), counting successes at +0x38. On an allocation failure call its own +0x07C (func_80044C58, which releases the ones built and zeroes the count) and return 1; otherwise 0. The sibling of D_8006F384's ModelData__BuildResources.
+Build step: SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset, allocate a D_8006F384 source through New_ModelData and store it over the offset word itself (entries[i]), counting successes at +0x38. On an allocation failure call its own +0x07C (TriggerWorld__ReleaseParts, which releases the ones built and zeroes the count) and return 1; otherwise 0. The sibling of D_8006F384's ModelData__BuildResources.
 
 Table slot (`tools/classtable.py`): D_8006F40C +0x078.
 
@@ -23,7 +25,7 @@ top of / earlier in `src/code_33808.c`.
  * sub-block of the buffer's counted offset table, into the table's own
  * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
  * (release) and 1. */
-s32 func_80044B88(DataSrc33808 *self) {
+s32 TriggerWorld__BuildParts(DataSrc33808 *self) {
     Req44858 req;
     CountedBuf33808 *buf;
     s32 *p;

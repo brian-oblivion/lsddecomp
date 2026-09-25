@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Constructor: active driver's ctor, install D_8006F384 (GetModelDataMethods), store the third argument at +0x34 (the flag that ModelData__BuildResources tests before building the two sub-sources and ModelData__ReleaseResources before releasing them; named `owns` as a reading, not evidence); then adopt the descriptor's buffer (size 0) and call its own +0x064 (ModelData__Load), returning NULL on a nonzero result, or request the descriptor's file.
 
-Table slot (`tools/classtable.py`): D_8006F384 +0x008 (the allocator New_ModelData passes 1 as the third argument; the subclass D_8006F40C's ctor func_80044A7C passes 0).
+Table slot (`tools/classtable.py`): D_8006F384 +0x008 (the allocator New_ModelData passes 1 as the third argument; the subclass D_8006F40C's ctor TriggerWorld__TriggerWorld passes 0).
 
 ## Source
 

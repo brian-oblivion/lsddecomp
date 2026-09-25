@@ -1,15 +1,17 @@
-# func_80044C90 -- MATCHED (13/13 words)
+# TriggerWorld__ReleaseParts -- MATCHED (14/14 words)
+
+> Renamed from `func_80044C58` on 2026-09-25 (tools/rename.py). Address 0x80044c58.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
-`OK: build matches retail SLPS_015.56`), funcdiff 13/13 words, no out-of-range
+`OK: build matches retail SLPS_015.56`), funcdiff 14/14 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-`buf = self->buffer; if (index < buf->count) return buf->entries[index]; return 0;` with an unsigned index (`sltu`). The `j` + `addu v0,zero,zero` delay slot is GCC's layout for the out-of-range return; matched on the first build as written.
+`ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->unk38); self->unk38 = 0;`
 
-Table slot (`tools/classtable.py`): D_8006F40C +0x088.
+Table slot (`tools/classtable.py`): D_8006F40C +0x07C.
 
 ## Source
 
@@ -19,15 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F40C +0x088: entry `index` of the buffer's counted word array, 0 when
- * out of range. */
-s32 func_80044C90(DataSrc33808 *self, u32 index) {
-    CountedBuf33808 *buf = self->buffer;
-
-    if (index < buf->count) {
-        return buf->entries[index];
-    }
-    return 0;
+/* D_8006F40C +0x07C: release the object array in the buffer (past its first
+ * two words), +0x38 entries long, and zero the count. */
+void TriggerWorld__ReleaseParts(DataSrc33808 *self) {
+    ReleaseBasicClassArray((BasicClass **)((u8 *)self->buffer + 8), self->unk38);
+    self->unk38 = 0;
 }
 ```
 
