@@ -45,7 +45,8 @@ struct CdStreamObj {
     /* +0x02C */ s32 unk2C;           /* state: 0 idle, 1 seeking, 2, 4 */
     /* +0x030 */ s32 muted;           /* func_800475D8 / func_80047638 */
     /* +0x034 */ s32 unk34;           /* < 4 selects read mode 0x1C0, else 0x140 */
-    /* +0x038 */ u8 pad38[0x40 - 0x38];
+    /* +0x038 */ s32 unk38;           /* ctor: (speed / arg2 / 2) * 2054 */
+    /* +0x03C */ s32 unk3C;
     /* +0x040 */ s32 unk40;
     /* +0x044 */ void *cbArg;
     /* +0x048 */ void (*cb48)(void *arg);
@@ -106,7 +107,19 @@ CdStreamObj *func_80046F0C(s32 arg1, s32 arg2, s32 arg3) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80046F88);
+void func_80046F88(CdStreamObj *self, u32 arg1, s32 arg2, s32 arg3) {
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = func_80047900();
+    self->unk34 = arg1;
+    self->muted = 0;
+    self->unk38 = (((arg1 < 4) ? 300 : 150) / arg2 / 2) * 2054;
+    self->unk3C = arg3;
+    self->ring = NULL;
+    self->cb4C = NULL;
+    self->cb48 = NULL;
+    self->cb54 = NULL;
+    self->unk2C = 0;
+}
 void func_80047074(CdStreamObj *self) {
     self->methods->slot48(self);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
