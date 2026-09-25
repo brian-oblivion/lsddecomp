@@ -2542,3 +2542,10 @@ MoveImage = 0x80021404; // type:func  (Psy-Q libgpu/sys, fingerprint)
 // u_short vrammode);`, no C call site yet. Round 81 (bravo, track 2), not
 // yet linked from an SDK object.
 GsInitGraph = 0x800238DC; // type:func  (Psy-Q libgs/gs_001, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgpu/prim.o (discs 3.3,3.5,3.6),
+// unique (next candidate _SsContResetAll, masked 0.10). Position: same
+// bracket as GsInitGraph (after libc2/memcpy 3.3, before libgs/gs_103 3.3).
+// Header LIBGPU.H `extern u_short GetTPage(int tp, int abr, int x, int y);`,
+// no C call site yet. Round 81 (bravo, track 2), not yet linked from an
+// SDK object.
+GetTPage = 0x80023F08; // type:func  (Psy-Q libgpu/prim, fingerprint)
