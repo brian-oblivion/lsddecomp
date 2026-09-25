@@ -117,5 +117,13 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045C94);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045CFC);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045DE0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045E18);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045E3C);
+/* D_8006F614 +0x06C: stores its argument at +0x68. */
+typedef struct Obj6F614 {
+    u8 pad0[0x68];
+    s32 unk68;
+} Obj6F614;
+
+void func_80045E3C(Obj6F614 *self, s32 value) {
+    self->unk68 = value;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045E44);
