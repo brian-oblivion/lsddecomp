@@ -2557,3 +2557,9 @@ GetTPage = 0x80023F08; // type:func  (Psy-Q libgpu/prim, fingerprint)
 // setting. No C call site yet. Round 81 (bravo, track 2), not yet linked
 // from an SDK object.
 GsGetActiveBuff = 0x80024820; // type:func  (Psy-Q libgs/gs_002, fingerprint+position)
+// identified: fingerprint 1.00 (EXACT) vs libsnd/seqinit.o (discs 3.3,3.5),
+// unique (next candidate CdReadSync, masked 0.10). Position: after placed
+// libsnd/vol (3.3), before placed libsnd/ssplay (3.3), both libsnd. Header
+// LIBSND.H `extern short SsSeqOpen(unsigned long*, short);`, no C call
+// site yet. Round 81 (bravo, track 2), not yet linked from an SDK object.
+SsSeqOpen = 0x8003A99C; // type:func  (Psy-Q libsnd/seqinit, fingerprint)
