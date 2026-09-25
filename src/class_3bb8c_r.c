@@ -14,7 +14,8 @@
  *    view `StyleCueParam`/`StyleCueParamMethods`; tier B throughout --
  *    the callback mechanism is established, which specific numeric fields
  *    mean in the running game is not.
- *  - `Class876FCMethods` (`gClass876FCMethods`), a `DreamSys`-derived
+ *  - `Class876FCMethods` (`gClass876FCMethods`), an `Actor`-derived
+ *    (include/Actor.h; id 0xEF34, parent 0x34 -- not DreamSys, 0x1F34)
  *    concrete class whose PRIVATE methods live in class_3bb8c_s.c (round
  *    70/round 17, `Class876FC` there is the same struct under the owner's
  *    name). This unit supplies its ctor/dtor/setParams/update
@@ -26,6 +27,7 @@
  * report.
  */
 #include "common.h"
+#include "Actor.h"
 
 /* ------------------------------------------------------------------ *
  * gStyleCueCallbacks's 14 slots (StyleCue00..StyleCue13) plus the shared
@@ -350,17 +352,7 @@ struct Class876FC {
     Block24 params;                          /* +0x058, Class876FC__SetParams's own 0x24-byte block-copy target */
 };
 
-/* The shared base-class table getter, SAME symbol `class_3bb8c_o.c`
- * already established as `GetActorMethods` there (also MEASURED to take no
- * real arguments). Fresh local reading here: this unit needs both `ctor`
- * (+0x008, checked against NULL) and `dtor` (+0x00C, its return value
- * forwarded by Class876FC__Finalize). */
-typedef struct FixedBaseTableR {
-    u8 pad0[0x8];
-    void *(*ctor)(void *self); /* +0x008 */
-    void *(*dtor)(void *self);   /* +0x00C */
-} FixedBaseTableR;
-extern FixedBaseTableR *GetActorMethods(void);
+/* The base class's table: include/Actor.h (GetActorMethods). */
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
@@ -382,7 +374,7 @@ void *New_Class876FC(void *arg0, void *arg1, void *arg2, void *arg3) {
 }
 
 void *Class876FC__Class876FC(Class876FC *self, void *arg1, void *arg2, void *arg3, void *arg4) {
-    if (GetActorMethods()->ctor(self) == NULL) {
+    if (GetActorMethods()->ctor((Actor *)self) == NULL) {
         goto fail;
     }
     self->methods = GetClass876FCMethods();
@@ -395,9 +387,11 @@ fail:
     return NULL;
 }
 
-void *Class876FC__Finalize(Class876FC *self) {
+/* The base finalize is Class6B5CC__Finalize, which returns nothing: the old
+ * view's `return base->dtor(self)` forwarded a $v0 no one sets. */
+void Class876FC__Finalize(Class876FC *self) {
     Class876FC__ReleaseByKind(self);
-    return GetActorMethods()->dtor(self);
+    GetActorMethods()->finalize((Actor *)self);
 }
 
 void Class876FC__SetParams(Class876FC *self, Block24 *src) {
