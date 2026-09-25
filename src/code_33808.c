@@ -541,7 +541,19 @@ void *func_800451B8(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045228);
+/* D_8006F590 +0x008: constructor -- the parent D_8006F240's, then this
+ * table; when the argument's first word is set, its own +0x064 runs, and a
+ * nonzero result fails the construction (NULL). */
+void *func_80045228(DataSrc33808 *self, s32 *arg) {
+    ((Ctor33808 *)func_800441A4())->ctor(self, arg);
+    self->methods = func_80045428();
+    if (*arg != 0) {
+        if (((s32 (*)())self->methods->setFlag)(self)) {
+            return NULL;
+        }
+    }
+    return self;
+}
 /* D_8006F590 +0x00C: finalize -- release the buffer's counted object array,
  * then the parent D_8006F240's. */
 void func_800452AC(DataSrc33808 *self) {
