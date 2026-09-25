@@ -18,11 +18,15 @@ Three builds. (1) three `self->r = rgb[0];` statements over `s8` fields: `lbu`/`
 ```c
 /* Slot +0x0B8 of D_8006EC74, D_8006ED4C, gSpriteMethods and D_800879C4 (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
-void Sprite__SetColor(SpriteObj_322b4 *self, Rgb_322b4 *rgb) {
-    self->rgb = *rgb;
+void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
+    self->sprite.rgb = *rgb;
 }
 ```
 
 ### Proposed learning
 
 A leaf that loads three signed bytes into three registers with `lb` and only then stores them with `sb`, ending `jr $ra; nop` with the delay slot UNFILLED, is a whole-struct assignment of a 3-byte all-`s8` struct (alignment 1: cc1 moves it by pieces, loads first). Separate field assignments give `lbu` interleaved with stores; `s8` locals give `lbu` and a filled delay slot. Sibling of the alignment-2 `lwl/lwr` whole-struct idiom already in DECOMPILATION_LEARNINGS.
+
+## Track 4 (2026-09-25, round 82, alpha)
+
+Renamed from `func_8004229C`: +0x0B8 is Sprite's first own slot (the Class6B5CC table ends at +0x0B4), named `setColor` for this occupant, which writes GsSPRITE r,g,b. D_8006EB90 overrides it with Obj6EAC0__PropagateColor; Class876FC__SpawnSprites passes it its colour triples. `Rgb_322b4` became `SpriteRgb` (same all-s8 3-byte struct; the lever above still holds). And the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).

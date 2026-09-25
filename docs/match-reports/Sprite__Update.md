@@ -18,6 +18,10 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 ```c
 /* D_8006EB90 and D_8006EC74 slot +0x098 (update): empty override. */
-void Sprite__Update(Class6B5CC *self, void *sender, s32 event) {
+void Sprite__Update(Sprite *self, void *sender, s32 event) {
 }
 ```
+
+## Track 4 (2026-09-25, round 82, alpha)
+
+Renamed from `func_80042294` for its slot (+0x098 `update`, empty). It is first listed in gSpriteMethods itself (not only D_8006EB90/D_8006EC74 as the Where line says), so it is Sprite's own method. And the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).

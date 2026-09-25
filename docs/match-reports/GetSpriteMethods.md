@@ -13,7 +13,11 @@ Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322
 
 ```c
 /* Returns the gSpriteMethods method table. */
-void *GetSpriteMethods(void) {
-    return gSpriteMethods;
+SpriteMethods *GetSpriteMethods(void) {
+    return &gSpriteMethods;
 }
 ```
+
+## Track 4 (2026-09-25, round 82, alpha)
+
+Renamed from `func_800422BC`: it returns the class's table, the getter every Sprite ctor and subclass ctor calls (Sprite__Sprite, New_Sprite, D_8006ED4C's ctor, D800879C4__D800879C4). Now typed `SpriteMethods *` and returns `&gSpriteMethods`: the same `lui/addiu` pair as the array-decay spelling. And the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
