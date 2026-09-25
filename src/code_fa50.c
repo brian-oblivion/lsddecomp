@@ -58,7 +58,9 @@ extern s32 D_8006BEA0[];
 
 INCLUDE_ASM("asm/nonmatchings/code_fa50", new_class_6bea0);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F2B0);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F314);
+void func_8001F314(Class6BEA0 *self, Quad_fa50 *src) {
+    self->quad = *src;
+}
 void func_8001F33C(Class6BEA0 *self) {
     GsMapModelingData((unsigned long *)&self->data->head[1]);
 }
