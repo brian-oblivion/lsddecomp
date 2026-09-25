@@ -35,9 +35,9 @@
  */
 typedef struct SvmVoice {
     s16 unk00; /* +0x00 -- 0xFF when free; SsUtKeyOff/SsUtKeyOffV compare and clear it */
-    s16 unk02; /* +0x02 -- SsUtAllKeyOff/SpuVmInit set it to 0x18; key-on clears it; SpuVmAlloc ages it */
+    u16 unk02; /* +0x02 -- SsUtAllKeyOff/SpuVmInit set it to 0x18; key-on clears it; SpuVmAlloc ages it */
     s16 unk04; /* +0x04 -- cleared on every key-off path */
-    s16 unk06; /* +0x06 -- SpuVmAlloc's secondary allocation key */
+    u16 unk06; /* +0x06 -- SpuVmAlloc's secondary allocation key */
     s16 unk08; /* +0x08 -- level scaled by SpuVmSetVol (x vol / 127) */
     u8 unk0A;  /* +0x0A -- byte, 0x40 at init; SpuVmKeyOn stores its 6th argument */
     u8 pad0B;

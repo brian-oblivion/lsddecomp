@@ -24,6 +24,7 @@
  * screened against are RESOLVED project-wide (CLAUDE.md).
  */
 #include "common.h"
+#include "SvmVoice.h"
 
 /* Matched round 73 -- docs/match-reports/ServiceSoundCueSet.md.
  * Round 75 (naming): `self`/`set` confirmed the same objects
@@ -127,11 +128,6 @@ void ServiceSoundCueSet(VabStreamObj *a0, SoundCueSet *a1) {
  * (t3/t0/a2/a3 family) running through nearly the whole function, visible
  * from the very first instruction (docs/match-reports/SpuVmAlloc.md).
  * Hand-derived. */
-extern u8 D_8008D9A3[];
-extern u8 D_8008D98E[];
-extern u8 D_8008D98A[];
-extern u8 D_8008D9A0[];
-extern u8 _svm_voice[];
 extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
@@ -148,7 +144,6 @@ s32 SpuVmAlloc(void)
     s32 pri;
     u32 newSec;
     u32 count;
-    u8 *p988;
 
     chosen = 0x63;
     bestSec = 0xFFFF;
@@ -158,25 +153,25 @@ s32 SpuVmAlloc(void)
     threshold = D_8008EA1B;
 
     for (idx = 0; (u8) idx < D_8008E9D0; idx++) {
-        if (D_8008D9A3[(u8) idx * 0x34] != 0
-            || *(u16 *)(D_8008D98E + (u8) idx * 0x34) != 0) {
-            pri = *(s16 *)(D_8008D9A0 + (u8) idx * 0x34);
+        if (_svm_voice[(u8) idx].unk1B != 0
+            || _svm_voice[(u8) idx].unk06 != 0) {
+            pri = _svm_voice[(u8) idx].unk18;
             if (pri < (s32)(u16) threshold) {
                 threshold = pri;
                 bestIdx = idx;
-                bestSec = *(u16 *)(D_8008D98E + (u8) idx * 0x34);
-                bestTer = *(u16 *)(D_8008D98A + (u8) idx * 0x34);
+                bestSec = _svm_voice[(u8) idx].unk06;
+                bestTer = _svm_voice[(u8) idx].unk02;
                 found = 1;
             } else if (pri == (s32)(u16) threshold) {
                 found++;
-                newSec = *(u16 *)(D_8008D98E + (u8) idx * 0x34);
+                newSec = _svm_voice[(u8) idx].unk06;
                 if (newSec < bestSec) {
-                    bestTer = *(u16 *)(D_8008D98A + (u8) idx * 0x34);
+                    bestTer = _svm_voice[(u8) idx].unk02;
                     bestSec = newSec;
                     bestIdx = idx;
                 } else if (newSec == bestSec) {
-                    if (bestTer < (s16) *(u16 *)(D_8008D98A + (u8) idx * 0x34)) {
-                        bestTer = (s16) *(u16 *)(D_8008D98A + (u8) idx * 0x34);
+                    if (bestTer < (s16) _svm_voice[(u8) idx].unk02) {
+                        bestTer = (s16) _svm_voice[(u8) idx].unk02;
                         bestIdx = idx;
                     }
                 }
@@ -197,15 +192,13 @@ s32 SpuVmAlloc(void)
     count = D_8008E9D0;
     if ((u8) chosen < count) {
         if (count != 0) {
-            p988 = _svm_voice;
             for (idx = 0; (u8) idx < count; idx++) {
-                *(u16 *)(p988 + (u8) idx * 0x34 + 2) =
-                    *(u16 *)(D_8008D98A + (u8) idx * 0x34) + 1;
+                _svm_voice[(u8) idx].unk02 = _svm_voice[(u8) idx].unk02 + 1;
             }
         }
-        *(u16 *)(D_8008D98A + (u8) chosen * 0x34) = 0;
-        *(s16 *)(D_8008D9A0 + (u8) chosen * 0x34) = D_8008EA1B;
-        if (D_8008D9A3[(u8) chosen * 0x34] == 2) {
+        _svm_voice[(u8) chosen].unk02 = 0;
+        _svm_voice[(u8) chosen].unk18 = D_8008EA1B;
+        if (_svm_voice[(u8) chosen].unk1B == 2) {
             SpuSetNoiseVoice(0, 0xFFFFFF);
         }
     }
@@ -235,8 +228,6 @@ extern s16 D_8008E8C0;
 extern u16 D_8008EA22;
 extern u8 D_8008EA20;
 extern u8 D_8008D970[];
-extern u8 D_8008D98C[];
-extern u8 D_8008D9A3[];
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 extern u16 D_80090C60;
@@ -334,8 +325,8 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D_8008D7F4[(u16)chanIdx - 1] = (s16)(pan2sq / 16383);
 
     D_8008D970[D_8008EA26[0]] |= 7;
-    *(u16 *)(D_8008D98C + D_8008EA26[0] * 0x34) = (s16)a1;
-    *(u8 *)(D_8008D9A3 + D_8008EA26[0] * 0x34) = 1;
+    _svm_voice[D_8008EA26[0]].unk04 = (s16)a1;
+    _svm_voice[D_8008EA26[0]].unk1B = 1;
 
     if (D_8008EA26[0] < 0x10) {
         lowBit = 1 << D_8008EA26[0];
@@ -406,7 +397,6 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn);
  * frame retail allocates that this shape doesn't reach
  * (docs/match-reports/vmNoiseOn2.md). Hand-derived. The byte-shaped
  * body's order-only __asm__("") barrier is omitted here; it is in the report. */
-extern u8 D_8008D98A[];
 
 void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
@@ -414,8 +404,6 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 v1;
     s32 lowBit;
     s32 highBit;
-    s32 idx52;
-    s32 li;
     s32 i;
     s32 n;
 
@@ -435,21 +423,18 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
         highBit = 1 << (a0 - 16);
     }
 
-    idx52 = (u8)a3 * 52;
     n = D_8008E9D0;
-    *(u16 *)(D_8008D98C + idx52) = 10;
+    _svm_voice[(u8)a3].unk04 = 10;
     if (n != 0) {
         i = 0;
         do {
-            li = (u16)i * 52;
-            *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
+            _svm_voice[(u16)i].unk1B = _svm_voice[(u16)i].unk1B & 1;
             i++;
         } while ((u16)i < D_8008E9D0);
     }
-    idx52 = (u8)a3 * 52;
-    *(u8 *)(D_8008D9A3 + idx52) = 2;
+    _svm_voice[(u8)a3].unk1B = 2;
 
-    *(u16 *)(D_8008D98A + idx52) = 0;
+    _svm_voice[(u8)a3].unk02 = 0;
     D_8008E228 = lowBit | D_8008E228;
     D_8008E22C = highBit | D_8008E22C;
     D_80090C60 = D_80090C60 & ~D_8008E228;
@@ -532,17 +517,6 @@ s32 note2pitch2(s32 a0, s32 a1) {
 }
 
 /* Matched round 73 -- docs/match-reports/SePitchBend.md. */
-typedef struct {
-    u8 unk0;
-    u8 pad1[0x34 - 0x1];
-} Rec34B_E138;
-typedef struct {
-    u16 unk0;
-    u8 pad2[0x34 - 0x2];
-} Rec34H_E138;
-extern Rec34B_E138 D_8008D998[];
-extern Rec34B_E138 D_8008D99C[];
-extern Rec34H_E138 D_8008D994[];
 extern s16 D_8008EA26[];
 extern u8 D_8008D970[];
 
@@ -559,18 +533,18 @@ void SePitchBend(s32 chan, s32 bend) {
     off = (chan & 0xFF) * 8;
     if ((u32)(chan & 0xFF) < 24) {
         p = &D_8008EA13;
-        *p = D_8008D998[(chan & 0xFF)].unk0;
-        D_8008EA18 = D_8008D99C[(chan & 0xFF)].unk0;
+        *p = (u8)_svm_voice[(chan & 0xFF)].unk10;
+        D_8008EA18 = (u8)_svm_voice[(chan & 0xFF)].unk14;
         D_8008EA26[0] = (u8)chan;
         idx = D_8008EA18 + (*p << 4);
         b = bend;
         if (b >= 0) {
             prod = b * D_8008E978[idx].unk13;
-            note = D_8008D994[(chan & 0xFF)].unk0 + prod / 127;
+            note = (u16)_svm_voice[(chan & 0xFF)].unk0C + prod / 127;
             fine = prod % 127;
         } else {
             q = (b * D_8008E978[idx].unk12) / 127;
-            note = D_8008D994[(chan & 0xFF)].unk0 + q - 1;
+            note = (u16)_svm_voice[(chan & 0xFF)].unk0C + q - 1;
             fine = q + 127;
         }
         ((u16 *)D_8008D7F0)[off + 2] = note2pitch2((u16)note, (u16)fine);
@@ -586,17 +560,8 @@ void func_8002E300(void) {
 }
 
 /* Matched round 73 -- docs/match-reports/SeAutoVol.md. Same body as
- * SeAutoPan (code_179d8_m) over the gVoiceEnv* family. */
-typedef struct {
-    s16 unk0;
-    u8 pad2[0x34 - 0x2];
-} Rec34Half_E308;
-extern Rec34Half_E308 D_8008D9A4[];
-extern Rec34Half_E308 D_8008D9A6[];
-extern Rec34Half_E308 D_8008D9A8[];
-extern Rec34Half_E308 D_8008D9AA[];
-extern Rec34Half_E308 D_8008D9AC[];
-extern Rec34Half_E308 D_8008D9AE[];
+ * SeAutoPan (code_179d8_m), over _svm_voice +0x1C..+0x26 instead of
+ * +0x28..+0x32. */
 
 void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
@@ -604,18 +569,18 @@ void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     if (from == to) {
         return;
     }
-    D_8008D9A4[voice].unk0 = 1;
-    D_8008D9AC[voice].unk0 = from;
-    D_8008D9AE[voice].unk0 = to;
+    _svm_voice[voice].unk1C = 1;
+    _svm_voice[voice].unk24 = from;
+    _svm_voice[voice].unk26 = to;
     if ((from - to < 0 ? to - from : from - to) < duration) {
         q = duration / (from - to);
-        D_8008D9A6[voice].unk0 = 1;
-        D_8008D9A8[voice].unk0 = q;
-        D_8008D9AA[voice].unk0 = q;
+        _svm_voice[voice].unk1E = 1;
+        _svm_voice[voice].unk20 = q;
+        _svm_voice[voice].unk22 = q;
     } else {
         q = (from - to) / duration;
-        D_8008D9A8[voice].unk0 = 0;
-        D_8008D9A6[voice].unk0 = q;
+        _svm_voice[voice].unk20 = 0;
+        _svm_voice[voice].unk1E = q;
     }
 }
 
