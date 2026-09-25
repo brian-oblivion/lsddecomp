@@ -1,4 +1,6 @@
-# func_800451B8 -- MATCHED (28/28 words)
+# New_TodSet -- MATCHED (28/28 words)
+
+> Renamed from `func_800451B8` on 2026-09-25 (tools/rename.py). Address 0x800451b8.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,11 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a D_8006F590 object; freed and NULL when the constructor fails. */
-void *func_800451B8(s32 arg0) {
+void *New_TodSet(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x2C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80045428())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetTodSetMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);

@@ -1,4 +1,6 @@
-# func_800453DC -- MATCHED (19/19 words)
+# TodSet__ScanPackets -- MATCHED (19/19 words)
+
+> Renamed from `func_800453DC` on 2026-09-25 (tools/rename.py). Address 0x800453dc.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the SECOND build (first-build miss described below); whole-image SHA1 green (`./build-and-verify.sh`:
@@ -21,7 +23,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 ```c
 /* D_8006F590 +0x078: slot +0x07C over the data past the buffer's counted
  * array. */
-u8 func_800453DC(DataSrc33808 *self, s32 arg1, s32 arg2) {
+u8 TodSet__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
     CountedBuf33808 *buf = self->buffer;
 
     return self->methods->slot7C(self, arg1, arg2, &buf->entries[buf->count] + 2);

@@ -1,4 +1,6 @@
-# func_800452FC -- MATCHED (56/56 words)
+# TodSet__BuildTods -- MATCHED (56/56 words)
+
+> Renamed from `func_800452FC` on 2026-09-25 (tools/rename.py). Address 0x800452fc.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -22,7 +24,7 @@ top of / earlier in `src/code_33808.c`.
 /* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
  * buffer's counted offset table, into the table's own words; 0 when all
  * exist, otherwise release the ones already built and 1. */
-s32 func_800452FC(DataSrc33808 *self) {
+s32 TodSet__BuildTods(DataSrc33808 *self) {
     Req44858 req;
     CountedBuf33808 *buf;
     DataSrc33808 **p;

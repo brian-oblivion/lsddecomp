@@ -1,4 +1,6 @@
-# func_800452AC -- MATCHED (20/20 words)
+# TodSet__Finalize -- MATCHED (20/20 words)
+
+> Renamed from `func_800452AC` on 2026-09-25 (tools/rename.py). Address 0x800452ac.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -21,7 +23,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 ```c
 /* D_8006F590 +0x00C: finalize -- release the buffer's counted object array,
  * then the parent D_8006F240's. */
-void func_800452AC(DataSrc33808 *self) {
+void TodSet__Finalize(DataSrc33808 *self) {
     CountedBuf33808 *buf = self->buffer;
 
     ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);

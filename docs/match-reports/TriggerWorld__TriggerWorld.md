@@ -38,4 +38,4 @@ void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
 
 ## Notes
 
-First build; the same shape as func_80045228 (D_8006F590's ctor). The allocator New_ModelData passes 1 as the parent's third argument; this subclass passes 0. setFlag is cast at the call site to return s32.
+First build; the same shape as TodSet__TodSet (D_8006F590's ctor). The allocator New_ModelData passes 1 as the parent's third argument; this subclass passes 0. setFlag is cast at the call site to return s32.

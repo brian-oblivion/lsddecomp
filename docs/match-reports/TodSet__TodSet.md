@@ -1,4 +1,6 @@
-# func_80045228 -- MATCHED (33/33 words)
+# TodSet__TodSet -- MATCHED (33/33 words)
+
+> Renamed from `func_80045228` on 2026-09-25 (tools/rename.py). Address 0x80045228.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: the parent D_8006F240's ctor (through GetTodMethods's table, same argument), install D_8006F590; if the argument's first word is nonzero, call its own +0x064 (func_800452FC) and return NULL on a nonzero result; otherwise return self.
+Constructor: the parent D_8006F240's ctor (through GetTodMethods's table, same argument), install D_8006F590; if the argument's first word is nonzero, call its own +0x064 (TodSet__BuildTods) and return NULL on a nonzero result; otherwise return self.
 
 Table slot (`tools/classtable.py`): D_8006F590 +0x008.
 
@@ -22,9 +24,9 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 /* D_8006F590 +0x008: constructor -- the parent D_8006F240's, then this
  * table; when the argument's first word is set, its own +0x064 runs, and a
  * nonzero result fails the construction (NULL). */
-void *func_80045228(DataSrc33808 *self, s32 *arg) {
+void *TodSet__TodSet(DataSrc33808 *self, s32 *arg) {
     ((Ctor33808 *)GetTodMethods())->ctor(self, arg);
-    self->methods = func_80045428();
+    self->methods = GetTodSetMethods();
     if (*arg != 0) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
             return NULL;

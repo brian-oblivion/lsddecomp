@@ -173,7 +173,7 @@ struct Unk5CObj {
     Unk5CMethods *methods;   /* +0x00 */
     u8 pad04[0x28];            /* +0x04 .. +0x2B, not this unit's to name */
     Unk2CObj *tmd;             /* +0x2C from New_LinkResource; supplies models for TOD model-id packets */
-    Unk30Obj *tods;            /* +0x30 from func_800451B8; the TOD set, see Unk30Obj */
+    Unk30Obj *tods;            /* +0x30 from New_TodSet; the TOD set, see Unk30Obj */
 };
 
 /* The constructor's `arg1`, forwarded through setupModelData into

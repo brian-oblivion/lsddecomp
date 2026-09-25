@@ -41,4 +41,4 @@ void Tod__Tod(DataSrc33808 *self, Src6F240 *src) {
 
 ## Notes
 
-First build. The else branch reuses the just-stored table pointer (GCC CSE of `self->methods = getter()`), which the ordinary `self->methods->requestLoadFile` spelling reproduces. The same descriptor is what D_8006F590's ctor (func_80045228, the subclass) tests with `*arg`.
+First build. The else branch reuses the just-stored table pointer (GCC CSE of `self->methods = getter()`), which the ordinary `self->methods->requestLoadFile` spelling reproduces. The same descriptor is what D_8006F590's ctor (TodSet__TodSet, the subclass) tests with `*arg`.
