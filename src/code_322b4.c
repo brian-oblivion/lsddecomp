@@ -261,7 +261,19 @@ void *func_800422CC(s32 arg) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004232C);
+/* D_8006EED8 slot +0x008 (ctor): the base ctor, install the table, clear
+ * +0x2C, and pass a stack copy of the name to slot +0x06C. */
+void func_8004232C(D_8006EED8Obj *self, char *name) {
+    char buf[32];
+
+    ((Slot08Arg0Methods_322b4 *)GetActiveDataSourceMethods())->ctor(self);
+    self->methods = func_800423F0();
+    self->unk2C = 0;
+    if (name != NULL) {
+        strcpy(buf, name);
+        self->methods->slot6C(self, buf);
+    }
+}
 /* D_8006EED8 slot +0x00C (finalize): clear +0x2C, then the base finalize. */
 void func_800423A8(D_8006EED8Obj *self) {
     self->unk2C = 0;
