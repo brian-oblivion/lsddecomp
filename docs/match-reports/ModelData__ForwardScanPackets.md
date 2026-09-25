@@ -1,15 +1,17 @@
-# func_800449B8 -- MATCHED (17/17 words)
+# ModelData__ForwardScanPackets -- MATCHED (15/15 words)
+
+> Renamed from `func_8004497C` on 2026-09-25 (tools/rename.py). Address 0x8004497c.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
-`OK: build matches retail SLPS_015.56`), funcdiff 17/17 words, no out-of-range
+`OK: build matches retail SLPS_015.56`), funcdiff 15/15 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Forwarder with six arguments: `return self->unk30->methods->slot80(self->unk30, arg1..arg5);` -- the incoming stack args 5/6 are copied to the outgoing frame's +0x10/+0x14 and +0x30 is loaded twice (once for the table, once for a0).
+Forwarder: `return self->unk30->methods->slot78(self->unk30, arg1, arg2);` returning u8 (`andi 0xFF`).
 
-Table slot (`tools/classtable.py`): D_8006F384 +0x084 and D_8006F40C +0x084 (`decodeTodPacket` in include/code_55dd4.h).
+Table slot (`tools/classtable.py`): D_8006F384 +0x080 and D_8006F40C +0x080 (include/code_55dd4.h names this slot `getObjectIds` in its Unk5CObj view).
 
 ## Source
 
@@ -19,9 +21,9 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F384/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
-void *func_800449B8(DataSrc33808 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    return self->unk30->methods->slot80(self->unk30, arg1, arg2, arg3, arg4, arg5);
+/* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
+u8 ModelData__ForwardScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
+    return ((s32 (*)())self->unk30->methods->slot78)(self->unk30, arg1, arg2);
 }
 ```
 

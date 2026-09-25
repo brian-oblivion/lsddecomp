@@ -1,4 +1,6 @@
-# func_8004468C -- MATCHED (28/28 words)
+# New_ModelData -- MATCHED (28/28 words)
+
+> Renamed from `func_8004468C` on 2026-09-25 (tools/rename.py). Address 0x8004468c.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,11 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
-void *func_8004468C(s32 arg0) {
+void *New_ModelData(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_800449FC())->ctor(obj, arg0, 1)) {
+        if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, arg0, 1)) {
             return obj;
         }
         BMemPMgrFree(obj);

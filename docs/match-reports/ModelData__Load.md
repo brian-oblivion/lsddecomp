@@ -1,15 +1,17 @@
-# func_800447B4 -- MATCHED (21/21 words)
+# ModelData__Load -- MATCHED (20/20 words)
+
+> Renamed from `func_80044808` on 2026-09-25 (tools/rename.py). Address 0x80044808.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
-`OK: build matches retail SLPS_015.56`), funcdiff 21/21 words, no out-of-range
+`OK: build matches retail SLPS_015.56`), funcdiff 20/20 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-`self->methods->slot7C(); GetActiveDataSourceMethods()->finalize(self);` The first `jalr` never sets a0 (it only still holds self by accident): a ZERO-argument call through the unprototyped slot, the round-82 broadcast lever. Writing `slot7C(self)` would add a `move a0,s0`.
+`GetActiveDataSourceMethods()->setFlag(self); self->methods->slot78(self);`
 
-Table slot (`tools/classtable.py`): D_8006F384 +0x00C (finalize).
+Table slot (`tools/classtable.py`): D_8006F384 +0x064.
 
 ## Source
 
@@ -19,10 +21,10 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
-void func_800447B4(DataSrc33808 *self) {
-    self->methods->slot7C();
-    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+/* D_8006F384 +0x064: the active driver's setFlag, then slot +0x078. */
+void ModelData__Load(DataSrc33808 *self) {
+    GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+    ((s32 (*)())self->methods->slot78)(self);
 }
 ```
 

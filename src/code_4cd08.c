@@ -20,7 +20,7 @@ void InitDreamAux(void)
     SetVec3(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = func_8004468C(&req);
+        gDreamAuxSlots[i].obj = New_ModelData(&req);
         req.name = gMomPathSymDog;
     }
 }

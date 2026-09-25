@@ -1,4 +1,6 @@
-# func_800449FC -- MATCHED (4/4 words)
+# GetModelDataMethods -- MATCHED (4/4 words)
+
+> Renamed from `func_800449FC` on 2026-09-25 (tools/rename.py). Address 0x800449fc.
 
 Round 82, runner echo (code_33808 session, echo #5), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -16,7 +18,7 @@ Table slot (`tools/classtable.py`): `D_8006D430` +0x0AC.
 ```c
 extern s32 D_8006F384[];
 
-void *func_800449FC(void) {
+void *GetModelDataMethods(void) {
     return D_8006F384;
 }
 ```

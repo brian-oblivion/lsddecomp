@@ -4,7 +4,7 @@
  * Method table gClass65650Methods; Entity derives from it.
  *
  * - construction: modelData (+0x5C) is borrowed from the ctor's arg1 or made
- *   by func_8004468C; CreateParts allocates partCount parts and their TOD
+ *   by New_ModelData; CreateParts allocates partCount parts and their TOD
  *   object ids from it; Destructor/ReleaseModelData undo both.
  * - base-slot overrides: OnNotify, InitDefaults, AttachToParent,
  *   DetachFromParent, SetDisplay/SetLightMode (forwarded to every part), and
@@ -178,7 +178,7 @@ s32 Class65650__AcquireModelData(Class65650 *self, UnkArg1Obj *other)
         self->modelData = other->modelData;
         self->ownsModelData = 0;
     } else {
-        self->modelData = func_8004468C(other);
+        self->modelData = New_ModelData(other);
         self->ownsModelData = 1;
     }
     if (self->modelData == NULL) {

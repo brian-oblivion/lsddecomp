@@ -1,15 +1,17 @@
-# func_8004497C -- MATCHED (15/15 words)
+# ModelData__Finalize -- MATCHED (21/21 words)
+
+> Renamed from `func_800447B4` on 2026-09-25 (tools/rename.py). Address 0x800447b4.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
-`OK: build matches retail SLPS_015.56`), funcdiff 15/15 words, no out-of-range
+`OK: build matches retail SLPS_015.56`), funcdiff 21/21 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Forwarder: `return self->unk30->methods->slot78(self->unk30, arg1, arg2);` returning u8 (`andi 0xFF`).
+`self->methods->slot7C(); GetActiveDataSourceMethods()->finalize(self);` The first `jalr` never sets a0 (it only still holds self by accident): a ZERO-argument call through the unprototyped slot, the round-82 broadcast lever. Writing `slot7C(self)` would add a `move a0,s0`.
 
-Table slot (`tools/classtable.py`): D_8006F384 +0x080 and D_8006F40C +0x080 (include/code_55dd4.h names this slot `getObjectIds` in its Unk5CObj view).
+Table slot (`tools/classtable.py`): D_8006F384 +0x00C (finalize).
 
 ## Source
 
@@ -19,9 +21,10 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
-u8 func_8004497C(DataSrc33808 *self, s32 arg1, s32 arg2) {
-    return ((s32 (*)())self->unk30->methods->slot78)(self->unk30, arg1, arg2);
+/* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
+void ModelData__Finalize(DataSrc33808 *self) {
+    self->methods->slot7C();
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 ```
 

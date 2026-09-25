@@ -72,7 +72,7 @@ audio-stream-request object:
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
    in `TickDreamAuxSlots`'s report -- same confirmed idiom) that calls
-   `func_8004468C(&req)` and stores the result into `gDreamAuxSlots[0].obj`,
+   `New_ModelData(&req)` and stores the result into `gDreamAuxSlots[0].obj`,
    then overwrites `req.name` with `"ETC\\SYMDOG.MOM"`. Because the loop
    only runs once, that second name write is dead in THIS retail build --
    likely a leftover of an original 2-iteration loop (SYMSPY then SYMDOG)
@@ -105,7 +105,7 @@ void InitDreamAux(void)
     SetVec3(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = func_8004468C(&req);
+        gDreamAuxSlots[i].obj = New_ModelData(&req);
         req.name = gMomPathSymDog;
     }
 }
@@ -113,7 +113,7 @@ void InitDreamAux(void)
 
 Needs (from `include/code_4cd08.h`, added this round):
 `DreamAuxLoadReq`, `DreamAuxGroupRecord`, `gDreamAuxGroupCounts`, `gDreamAuxGroupRecords`,
-`DreamAuxSlot`, `gDreamAuxSlots`, `SetVec3`, `func_8004468C`.
+`DreamAuxSlot`, `gDreamAuxSlots`, `SetVec3`, `New_ModelData`.
 
 ## The residue, precisely
 

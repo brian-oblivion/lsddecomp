@@ -10,7 +10,7 @@
 `Class65650Methods` slot `+0x0F4`'s implementation, dispatched from
 `Class65650__SetupModelData` (`slot_setup5C`). Sets up `self->unk5C`, borrowing an
 existing sub-object from the constructor's `arg1` if it already has one at
-its own `+0x00C` field, or allocating a fresh one via `func_8004468C`
+its own `+0x00C` field, or allocating a fresh one via `New_ModelData`
 otherwise — recording which case happened in `self->unk60` (the guard flag
 `Class65650__ReleaseModelData`'s teardown already reads). If the result is still `NULL`
 (allocation failed), tears itself back down via `Class65650__ReleaseModelData` and
@@ -24,7 +24,7 @@ s32 Class65650__AcquireModelData(Class65650 *self, UnkArg1Obj *other)
         self->unk5C = other->unk0C;
         self->unk60 = 0;
     } else {
-        self->unk5C = func_8004468C(other);
+        self->unk5C = New_ModelData(other);
         self->unk60 = 1;
     }
     if (self->unk5C == NULL) {
@@ -43,7 +43,7 @@ allocated), and retypes the `arg1` parameter all the way from
 `Class65650__Class65650` through `slot_setup5C`/`Class65650__SetupModelData` to here as
 `UnkArg1Obj *` instead of the generic `void *` the first pass used
 (implicit `void *` -> `UnkArg1Obj *` conversions at the two call sites
-needed no changes). Also adds `func_8004468C`'s prototype (from
+needed no changes). Also adds `New_ModelData`'s prototype (from
 `asm/psyq_memset.s`, itself an allocator wrapping `BMemPMgrAlloc`) and
 `slot100` (`+0x100`, called on success, its own return value threaded
 straight through).
@@ -98,4 +98,4 @@ one of the two possible label placements.
 
 Round 75 (charlie), track 3.
 
-- `Class65650__AcquireModelData` (was `func_80065C5C`), tier A. Borrows arg1->modelData (+0x0C) with ownsModelData = 0, or makes one with func_8004468C(arg1) with ownsModelData = 1. On success returns setupParts (+0x100); on NULL calls ReleaseModelData and returns 1.
+- `Class65650__AcquireModelData` (was `func_80065C5C`), tier A. Borrows arg1->modelData (+0x0C) with ownsModelData = 0, or makes one with New_ModelData(arg1) with ownsModelData = 1. On success returns setupParts (+0x100); on NULL calls ReleaseModelData and returns 1.

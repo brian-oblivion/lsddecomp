@@ -40,7 +40,7 @@ typedef struct TagCheckArg {
     TaggedObj *methods;   /* +0x000 */
 } TagCheckArg;
 
-/* Header word of D_8006F384 (tools/classtable.py), the class func_8004468C
+/* Header word of D_8006F384 (tools/classtable.py), the class New_ModelData
  * allocates and Class65650.modelData points at. */
 #define MODEL_DATA_CLASS_HEADER 0x5F03
 
@@ -129,15 +129,15 @@ typedef struct Unk70ElemObj {
 #define TOD_COORD_TRANSLATE    8
 
 /* self->modelData: an instance of D_8006F384 (header MODEL_DATA_CLASS_HEADER),
- * made by func_8004468C from a load request or borrowed from the ctor's
+ * made by New_ModelData from a load request or borrowed from the ctor's
  * arg1. It holds a model source (tmd) and a TOD set (tods). */
 typedef struct Unk5CObj Unk5CObj;
 typedef struct Unk5CMethods {
     u8 pad00[0x04];                          /* +0x000, unknown */
     Unk5CObj *(*release)(Unk5CObj *self);       /* +0x004 Class6D430__Release; returns the value to store back */
     u8 pad08[0x78];                            /* +0x008 .. +0x07C, unknown */
-    s32 (*getObjectIds)(Unk5CObj *self, void *arg1, s32 *outBuf); /* +0x080 func_8004497C; Class65650__CreateParts calls it with arg1 NULL for the count (low byte of the return), then with self->partIds to fill one id byte per part; outBuf[0] is the mainPart index */
-    void *(*decodeTodPacket)(Unk5CObj *self, void *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3); /* +0x084 func_800449B8; writes the packet's object id, type, flag and length, returns its data pointer. out2/out3 go on the stack (o32 5th/6th arguments) */
+    s32 (*getObjectIds)(Unk5CObj *self, void *arg1, s32 *outBuf); /* +0x080 ModelData__ForwardScanPackets; Class65650__CreateParts calls it with arg1 NULL for the count (low byte of the return), then with self->partIds to fill one id byte per part; outBuf[0] is the mainPart index */
+    void *(*decodeTodPacket)(Unk5CObj *self, void *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3); /* +0x084 ModelData__ForwardDecodePacketWord; writes the packet's object id, type, flag and length, returns its data pointer. out2/out3 go on the stack (o32 5th/6th arguments) */
 } Unk5CMethods;
 
 /* self->modelData->tmd: only its slot +0x080 is needed, by
@@ -178,14 +178,14 @@ struct Unk5CObj {
 
 /* The constructor's `arg1`, forwarded through setupModelData into
  * Class65650__AcquireModelData: if its +0x0C already holds a model-data
- * object it is borrowed, otherwise func_8004468C(arg1) makes one that this
+ * object it is borrowed, otherwise New_ModelData(arg1) makes one that this
  * instance owns. */
 typedef struct UnkArg1Obj {
     u8 pad00[0x0C];
     Unk5CObj *modelData;
 } UnkArg1Obj;
 
-extern Unk5CObj *func_8004468C(UnkArg1Obj *arg);
+extern Unk5CObj *New_ModelData(UnkArg1Obj *arg);
 
 typedef struct Class65650Methods {
     s32 header;                                                    /* +0x000 */
@@ -245,7 +245,7 @@ struct Class65650 {
 
     UnkArg2Obj *arg2;               /* +0x58 the constructor's third parameter, stashed verbatim; Class65650__func_800661D4 calls arg2->methods->slot80(arg2, arg, 0x6E, 0x6E) when non-NULL */
     Unk5CObj *modelData;                /* +0x5C see Unk5CObj; set by Class65650__AcquireModelData, cleared by Class65650__ReleaseModelData */
-    s32 ownsModelData;                     /* +0x60 1 if func_8004468C made modelData for this instance, 0 if borrowed from the ctor's arg1; only an owned one is released */
+    s32 ownsModelData;                     /* +0x60 1 if New_ModelData made modelData for this instance, 0 if borrowed from the ctor's arg1; only an owned one is released */
     s32 unk64;                     /* +0x64 set by Class65650__SetUnk64 (1 in InitDefaults); Class65650__TickCallbackA acts only while it is 1 */
     Unk68Obj *mainPart;                /* +0x68 parts[buf[0]] after Class65650__CreateParts; NULL after DestroyParts */
     s32 partCount;                     /* +0x6C number of entries in parts/partIds */

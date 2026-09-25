@@ -1,4 +1,6 @@
-# func_800448F8 -- MATCHED (33/33 words)
+# ModelData__ReleaseResources -- MATCHED (33/33 words)
+
+> Renamed from `func_800448F8` on 2026-09-25 (tools/rename.py). Address 0x800448f8.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -21,7 +23,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 ```c
 /* D_8006F384 +0x07C: when +0x34 is set, release the objects at +0x30 and
  * +0x2C (each when there is one). */
-void func_800448F8(DataSrc33808 *self) {
+void ModelData__ReleaseResources(DataSrc33808 *self) {
     if (self->unk34 != 0) {
         if (self->unk30 != NULL) {
             self->unk30->methods->release(self->unk30);

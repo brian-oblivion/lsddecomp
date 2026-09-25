@@ -55,7 +55,7 @@ void *GetLinkResourceMethods(void);
 void *GetTimArraySrcMethods(void);
 void *GetTodMethods(void);
 void *GetBgLayerMethods(void);
-void *func_800449FC(void);
+void *GetModelDataMethods(void);
 void *func_80044CC4(void);
 void *func_80044F20(void);
 void *func_800451A8(void);
@@ -919,11 +919,11 @@ void *GetBgLayerMethods(void) {
     return D_8006F2C4;
 }
 /* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
-void *func_8004468C(s32 arg0) {
+void *New_ModelData(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_800449FC())->ctor(obj, arg0, 1)) {
+        if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, arg0, 1)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -934,9 +934,9 @@ void *func_8004468C(s32 arg0) {
  * `owns` at +0x34; adopt the descriptor's buffer (size 0) and run its own
  * +0x064, whose nonzero result fails the construction (NULL), or else
  * request its file. */
-void *func_800446FC(DataSrc33808 *self, Src6F240 *src, s32 owns) {
+void *ModelData__ModelData(DataSrc33808 *self, Src6F240 *src, s32 owns) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_800449FC();
+    self->methods = GetModelDataMethods();
     self->unk34 = owns;
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
@@ -952,12 +952,12 @@ fail:
     return NULL;
 }
 /* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
-void func_800447B4(DataSrc33808 *self) {
+void ModelData__Finalize(DataSrc33808 *self) {
     self->methods->slot7C();
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 /* D_8006F384 +0x064: the active driver's setFlag, then slot +0x078. */
-void func_80044808(DataSrc33808 *self) {
+void ModelData__Load(DataSrc33808 *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
     ((s32 (*)())self->methods->slot78)(self);
 }
@@ -979,7 +979,7 @@ typedef struct Buf44858 {
 extern Req44858 *SetVec3(Req44858 *req, void *buffer, s32 unk4, s32 unk8);  /* code_171e0.c: stores its three words into *req, returns req */
 void *func_800451B8(s32 arg0);  /* defined below (ROM order) */
 
-s32 func_80044858(DataSrc33808 *self) {
+s32 ModelData__BuildResources(DataSrc33808 *self) {
     Req44858 req;
 
     if (self->unk34 != 0) {
@@ -1000,7 +1000,7 @@ s32 func_80044858(DataSrc33808 *self) {
 }
 /* D_8006F384 +0x07C: when +0x34 is set, release the objects at +0x30 and
  * +0x2C (each when there is one). */
-void func_800448F8(DataSrc33808 *self) {
+void ModelData__ReleaseResources(DataSrc33808 *self) {
     if (self->unk34 != 0) {
         if (self->unk30 != NULL) {
             self->unk30->methods->release(self->unk30);
@@ -1011,16 +1011,16 @@ void func_800448F8(DataSrc33808 *self) {
     }
 }
 /* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
-u8 func_8004497C(DataSrc33808 *self, s32 arg1, s32 arg2) {
+u8 ModelData__ForwardScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return ((s32 (*)())self->unk30->methods->slot78)(self->unk30, arg1, arg2);
 }
 /* D_8006F384/D_8006F40C +0x084: forwarded to slot +0x080 of the object at +0x30. */
-void *func_800449B8(DataSrc33808 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+void *ModelData__ForwardDecodePacketWord(DataSrc33808 *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     return self->unk30->methods->slot80(self->unk30, arg1, arg2, arg3, arg4, arg5);
 }
 extern s32 D_8006F384[];
 
-void *func_800449FC(void) {
+void *GetModelDataMethods(void) {
     return D_8006F384;
 }
 /* Allocate and construct a D_8006F40C object; freed and NULL when the constructor fails. */
@@ -1039,7 +1039,7 @@ void *func_80044A0C(s32 arg0) {
  * 0), then this table; when the argument's first word is set, its own
  * +0x064 runs, and a nonzero result fails the construction (NULL). */
 void *func_80044A7C(DataSrc33808 *self, s32 *arg) {
-    ((Ctor33808 *)func_800449FC())->ctor(self, arg, 0);
+    ((Ctor33808 *)GetModelDataMethods())->ctor(self, arg, 0);
     self->methods = func_80044CC4();
     if (*arg != 0) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
@@ -1051,7 +1051,7 @@ void *func_80044A7C(DataSrc33808 *self, s32 *arg) {
 /* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
 void func_80044B04(DataSrc33808 *self) {
     self->methods->slot7C();
-    ((DataSrc33808Methods *)func_800449FC())->finalize(self);
+    ((DataSrc33808Methods *)GetModelDataMethods())->finalize(self);
 }
 /* D_8006F40C +0x064: slot +0x078. */
 void func_80044B58(DataSrc33808 *self) {
@@ -1076,7 +1076,7 @@ s32 func_80044B88(DataSrc33808 *self) {
     self->unk38 = 0;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = (s32)func_8004468C((s32)&req);
+        *p = (s32)New_ModelData((s32)&req);
         if (*p == 0) {
             goto fail;
         }
