@@ -170,7 +170,7 @@ void TaskCoreObj__TaskCoreObj(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnk
     StreamTaskUnkB4Obj *tmp;
     TaskCoreMethods *core;
 
-    Get_vtable_IntermediateBase()->slot08(self);
+    Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
     core = Get_vtable_TaskCore();
     self->methods = (StreamTaskObjMethods *)core;
     core->slotD8(self, a1);
@@ -200,7 +200,7 @@ void TaskCoreObj__Destroy(StreamTaskObj *self) {
         self->unk74->methods->slot04(self->unk74);
     }
     self->methods->slotDC(self);
-    Get_vtable_IntermediateBase()->slot0C(self);
+    Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
 }
 
 void TaskCoreObj__Reset(StreamTaskObj *self) {
@@ -220,7 +220,7 @@ void TaskCoreObj__Reset(StreamTaskObj *self) {
 }
 
 s32 TaskCoreObj__func_8003C1DC(StreamTaskObj *self, s32 a1, s32 a2) {
-    Get_vtable_IntermediateBase()->slot44(self, a1, a2);
+    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, (IntermediateBaseInitArgs *)a1, a2);
     return self->unk38;
 }
 

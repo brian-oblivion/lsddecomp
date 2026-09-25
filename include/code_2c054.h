@@ -2,6 +2,7 @@
 #define CODE_2C054_H
 
 #include "common.h"
+#include "IntermediateBase.h"
 
 /*
  * code_2c054: StreamTaskObj, the streaming-task class (`New_StreamTaskObj`,
@@ -20,8 +21,8 @@
  * `Get_vtable_TaskCore()->slotXX(self)` calls throughout this unit) -- an
  * ordinary override-and-call-super pattern, not delegation between unrelated
  * siblings as an earlier round's comments described it. TaskCoreObj is in
- * turn built the same way over `IntermediateBase`/`Obj86B60` (a further
- * base class, `code_2cc8c`'s own unit, reached via `Get_vtable_IntermediateBase()`).
+ * turn built the same way over `IntermediateBase` (its parent class,
+ * include/IntermediateBase.h, reached via `Get_vtable_IntermediateBase()`).
  *
  * `include/Class6D3C8.h` independently names the SAME StreamTaskObj/TaskCoreObj
  * tables `StreamTask`/`LoaderTask` from a different unit's call sites
@@ -414,23 +415,8 @@ struct StreamTaskUnk18Obj {
  * *methods; }` body would just restate that cast, so it is left as a
  * pointer-only type instead of asserting a body nothing here checks. */
 
-/* A second sibling table (gIntermediateBaseMethods, `tools/classtable.py gIntermediateBaseMethods`),
- * used by TaskCoreObj__func_8003C1DC to forward its own work one level further down the
- * same delegation chain. Only the one slot reached here is typed; its
- * return value is discarded at this call site either way. */
-typedef struct TaskUtilMethods TaskUtilMethods;
-
-struct TaskUtilMethods {
-    u8 pad00[0x008];
-    void (*slot08)(StreamTaskObj *self); /* +0x008, TaskCoreObj__TaskCoreObj's forward target
-                                              (gIntermediateBaseMethods+0x008 = IntermediateBase__IntermediateBase) */
-    void (*slot0C)(StreamTaskObj *self); /* +0x00C, TaskCoreObj__Destroy's forward target
-                                              (gIntermediateBaseMethods+0x00C = BasicClass__Finalize) */
-    u8 pad10[0x044 - 0x010];
-    void (*slot44)(StreamTaskObj *self, s32 a1, s32 a2); /* +0x044 */
-};
-
-extern TaskUtilMethods *Get_vtable_IntermediateBase(void); /* returns &gIntermediateBaseMethods */
+/* TaskCore's parent, IntermediateBase (gIntermediateBaseMethods):
+ * include/IntermediateBase.h (track 4). */
 
 /* Allocates/initializes self->unkB4 (a StreamTaskUnkB4Obj); called by
  * StreamTaskObj__StreamTaskObj as `func_80045438(GetDefaultStreamTaskInitData(), 0, 0)`. Not this unit's
