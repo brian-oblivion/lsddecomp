@@ -54,7 +54,13 @@ void *func_800449FC(void);
 
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043008);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043068);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800431A8);
+/* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
+ * entries), free it, then the active driver's. */
+void func_800431A8(DataSrc33808 *self) {
+    ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
+    BMemPMgrFree(self->unk30);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043200);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800434DC);
 /* D_8006F0B8 +0x078: set entry `index`'s shift, and its mask from it. */
