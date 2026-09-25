@@ -8,8 +8,22 @@
  * game's own libsnd build".
  *
  * Round 81 (delta): all seven functions matched. They are the whole of one
- * class, D_8006E4F0 (local view Class6E4F0 below): its ctor, empty dtor,
- * four own slots and the table getter.
+ * class, D_8006E4F0 (local view Class6E4F0 below, class id 0x60): its ctor
+ * (`Class6E4F0__Class6E4F0`), empty finalize override, four own slots
+ * (`SetScreenDims`, `InitSystems`, a no-op, and `RunMainLoop` -- the
+ * subclass Class6D3C8's per-frame dispatcher, first run from `src/main.c`)
+ * and the table getter.
+ *
+ * Round 81 (delta), track 3 naming pass: all seven functions and both
+ * unit-local globals (`gCdInitDone`, `gDefaultScreenDims`) named -- tiers
+ * and evidence in each function's own match report's `## Naming` section.
+ * One exception: `func_8003B20C` (the table getter, proposed
+ * `GetClass6E4F0Methods`) is NOT renamed -- `tools/rename.py` cannot apply
+ * it because this address already carried an explicit, now-stale, track-2
+ * "unidentified" line in the symbols file and the tool's placeholder-name
+ * address resolution never finds it to replace; see
+ * docs/match-reports/func_8003B20C.md and the round-81 broadcast for the
+ * head to apply by hand.
  */
 #include "common.h"
 #include "BasicClass.h"
@@ -26,22 +40,22 @@
 typedef struct Class6E4F0 Class6E4F0;
 typedef struct Class6E4F0Methods Class6E4F0Methods;
 
-/* A {width, height} pair: the ctor's default is D_8008A8E0 = {320, 240}. */
+/* A {width, height} pair: the ctor's default is gDefaultScreenDims = {320, 240}. */
 typedef struct ScreenDims {
     s32 w;
     s32 h;
 } ScreenDims;
 
-/* The 0x14-byte block func_8003B044 allocates. */
+/* The 0x14-byte block Class6E4F0__InitSystems allocates. */
 typedef struct Class6E4F0Aux {
-    void *source; /* +0x00 func_8003B044's a1 */
-    s32 arg;      /* +0x04 func_8003B044's a2 */
+    void *source; /* +0x00 Class6E4F0__InitSystems's a1 */
+    s32 arg;      /* +0x04 Class6E4F0__InitSystems's a2 */
     s32 unk08;
     s32 unk0C;
     s32 unk10;
 } Class6E4F0Aux;
 
-/* func_8003B044's a1: an object dispatched through its own +0x044 slot. */
+/* Class6E4F0__InitSystems's a1: an object dispatched through its own +0x044 slot. */
 typedef struct Class6E4F0SourceMethods {
     u8 pad00[0x44];
     void (*slot44)(void *self, ScreenDims *dims, s32 arg); /* +0x044 */
@@ -53,11 +67,11 @@ typedef struct Class6E4F0Source {
 
 struct Class6E4F0Methods {
     BASICCLASS_SLOTS(Class6E4F0, (Class6E4F0 *self, s32 source));
-    /* +0x040 */ void (*setDims)(Class6E4F0 *self, ScreenDims *dims, s32 arg); /* func_8003B02C */
-    /* +0x044 */ void (*init)(Class6E4F0 *self, Class6E4F0Source *source, s32 arg); /* func_8003B044 */
-    /* +0x048 */ void (*slot48)(Class6E4F0 *self);                             /* func_8003B108, empty */
-    /* +0x04C */ void (*run)(Class6E4F0 *self);                                /* func_8003B110 */
-    /* +0x050.. the subclass's slots, called by func_8003B110 */
+    /* +0x040 */ void (*setScreenDims)(Class6E4F0 *self, ScreenDims *dims, s32 arg); /* Class6E4F0__SetScreenDims */
+    /* +0x044 */ void (*initSystems)(Class6E4F0 *self, Class6E4F0Source *source, s32 arg); /* Class6E4F0__InitSystems */
+    /* +0x048 */ void (*slot48)(Class6E4F0 *self);                             /* Class6E4F0__NoOpSlot48, empty */
+    /* +0x04C */ void (*runMainLoop)(Class6E4F0 *self);                                /* Class6E4F0__RunMainLoop */
+    /* +0x050.. the subclass's slots, called by Class6E4F0__RunMainLoop */
     /* +0x050 */ void (*slot50)(Class6E4F0 *self);
     /* +0x054 */ void (*slot54)(Class6E4F0 *self);
     /* +0x058 */ s32 (*slot58)(Class6E4F0 *self);
@@ -75,8 +89,8 @@ struct Class6E4F0 {
 };
 
 extern Class6E4F0Methods D_8006E4F0;
-extern s32 D_8008A8DC;           /* CdInit has been called */
-extern ScreenDims D_8008A8E0;    /* {320, 240} */
+extern s32 gCdInitDone;           /* CdInit has been called */
+extern ScreenDims gDefaultScreenDims;    /* {320, 240} */
 
 Class6E4F0Methods *func_8003B20C(void);
 
@@ -89,27 +103,27 @@ extern void SetActiveDataSource(s32 arg0); /* code_171e0 */
 extern void func_80020C68(void *arg);      /* code_10ee0, stores its arg to a gp global */
 extern void *BMemPMgrAlloc(s32 size);
 
-void func_8003AF8C(Class6E4F0 *self, s32 source) {
+void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 source) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = func_8003B20C();
-    if (D_8008A8DC == 0) {
+    if (gCdInitDone == 0) {
         CdInit();
-        D_8008A8DC = 1;
+        gCdInitDone = 1;
     }
     self->initialized = 0;
     SetActiveDataSource(source);
-    self->methods->setDims(self, &D_8008A8E0, 0);
+    self->methods->setScreenDims(self, &gDefaultScreenDims, 0);
 }
 
-void func_8003B024(Class6E4F0 *self) {
+void Class6E4F0__Finalize(Class6E4F0 *self) {
 }
 
-void func_8003B02C(Class6E4F0 *self, ScreenDims *dims, s32 arg) {
+void Class6E4F0__SetScreenDims(Class6E4F0 *self, ScreenDims *dims, s32 arg) {
     self->dims = *dims;
     self->dimsArg = arg;
 }
 
-void func_8003B044(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
+void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
     if (self->initialized == 0) {
         func_80020C68(source);
         source->methods->slot44(source, &self->dims, self->dimsArg);
@@ -125,10 +139,10 @@ void func_8003B044(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
     }
 }
 
-void func_8003B108(Class6E4F0 *self) {
+void Class6E4F0__NoOpSlot48(Class6E4F0 *self) {
 }
 
-void func_8003B110(Class6E4F0 *self) {
+void Class6E4F0__RunMainLoop(Class6E4F0 *self) {
     s32 status;
 
     if (self->initialized) {

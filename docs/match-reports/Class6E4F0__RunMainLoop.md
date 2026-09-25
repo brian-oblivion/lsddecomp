@@ -1,4 +1,6 @@
-# func_8003B110
+# Class6E4F0__RunMainLoop
+
+> Renamed from `func_8003B110` on 2026-09-25 (tools/rename.py). Address 0x8003b110.
 
 **Round 81 (delta)** · **Unit:** code_2b78c · **Size:** 63 words · **Status:** MATCHED (63/63 words, whole-image SHA1 green, second build)
 
@@ -14,7 +16,7 @@ NoOpSlot5C, PollStatusObj, StartStreamTaskWithInit). It never returns
 while initialized: the game's main loop.
 
 ```c
-void func_8003B110(Class6E4F0 *self) {
+void Class6E4F0__RunMainLoop(Class6E4F0 *self) {
     s32 status;
 
     if (self->initialized) {
@@ -66,4 +68,9 @@ usual switch.
 
 ## Naming
 
-Kept. Suggested `Class6E4F0__RunMainLoop` (tier B).
+**Round 81 (delta), track 3.** Renamed `func_8003B110` -> `Class6E4F0__RunMainLoop`.
+**Tier B**: "runs forever while initialized, dispatching the subclass's own
+state-machine slots" is evident from the body alone; "main loop" is
+corroborated by `include/Class6D3C8.h`'s own note that this is the slot
+"first dispatched by main" (`src/main.c`), but that is one caller, not two
+agreeing ones, so it stays B rather than A.

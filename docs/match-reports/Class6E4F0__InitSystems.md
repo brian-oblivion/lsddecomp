@@ -1,4 +1,6 @@
-# func_8003B044
+# Class6E4F0__InitSystems
+
+> Renamed from `func_8003B044` on 2026-09-25 (tools/rename.py). Address 0x8003b044.
 
 **Round 81 (delta)** · **Unit:** code_2b78c · **Size:** 49 words · **Status:** MATCHED (49/49 words, whole-image SHA1 green, first build)
 
@@ -16,7 +18,7 @@ guarded by `self->initialized` (+0x18):
 - sets `initialized = 1`.
 
 ```c
-void func_8003B044(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
+void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *source, s32 arg) {
     if (self->initialized == 0) {
         func_80020C68(source);
         source->methods->slot44(source, &self->dims, self->dimsArg);
@@ -44,4 +46,11 @@ reads.
 
 ## Naming
 
-Kept. Suggested `Class6E4F0__InitSystems` (tier B).
+**Round 81 (delta), track 3.** Renamed `func_8003B044` -> `Class6E4F0__InitSystems`.
+**Tier B**: the body does one-time init of multiple genuine Psy-Q subsystems
+(`SsInit` sound, `GsInit3D` graphics, plus forwarding to the source object's
+own display-setup slot and allocating the aux block) guarded by
+`self->initialized`, so "init" and "systems" (plural) are both evident from
+the body. It stops short of A because the overall GAME purpose of this
+one-time setup -- what it is initializing the game system FOR -- is not
+established, only which SDK calls it makes.

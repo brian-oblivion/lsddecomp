@@ -52,14 +52,14 @@
 typedef struct MiddleClassMethods {
     s32 header;                                             /* +0x000 */
     void *unk04;                                             /* +0x004 */
-    void (*ctor)(void *self, s32 a1);                         /* +0x008 func_8003AF8C */
-    void *unk0C;                                               /* +0x00C func_8003B024 (dtor override, shared with Class6D3C8) */
+    void (*ctor)(void *self, s32 a1);                         /* +0x008 Class6E4F0__Class6E4F0 */
+    void *unk0C;                                               /* +0x00C Class6E4F0__Finalize (dtor override, shared with Class6D3C8) */
     void *unk10, *unk14, *unk18, *unk1C, *unk20, *unk24, *unk28, *unk2C, *unk30, *unk34, *unk38; /* BasicClass, inherited */
     void *unk3C;                                                /* +0x03C null slot */
-    void *unk40;                                                 /* +0x040 func_8003B02C */
-    s32 (*slot44)(void *self, void *a1, void *a2, s32 a3);         /* +0x044 func_8003B044 */
-    void *unk48;                                                    /* +0x048 func_8003B108, shared with Class6D3C8 */
-    void *unk4C;                                                     /* +0x04C func_8003B110, shared with Class6D3C8 */
+    void *unk40;                                                 /* +0x040 Class6E4F0__SetScreenDims */
+    s32 (*slot44)(void *self, void *a1, void *a2, s32 a3);         /* +0x044 Class6E4F0__InitSystems */
+    void *unk48;                                                    /* +0x048 Class6E4F0__NoOpSlot48, shared with Class6D3C8 */
+    void *unk4C;                                                     /* +0x04C Class6E4F0__RunMainLoop, shared with Class6D3C8 */
 } MiddleClassMethods;
 
 extern MiddleClassMethods *func_8003B20C(void);
@@ -83,7 +83,7 @@ typedef struct Class6D3C8Methods {
     s32 header;                                            /* +0x000 */
     void *unk04;                                            /* +0x004 BasicClass__Release */
     void (*ctor)(Class6D3C8 *self, Class6D3C8CtorArgs *arg); /* +0x008 Class6D3C8__Class6D3C8 */
-    void *unk0C;                                            /* +0x00C func_8003B024 (dtor override) */
+    void *unk0C;                                            /* +0x00C Class6E4F0__Finalize (dtor override) */
     void *unk10;                                            /* +0x010 BasicClass__AddChild */
     void *unk14;                                            /* +0x014 BasicClass__RemoveChild */
     void *unk18;                                            /* +0x018 BasicClass__RemoveAllChildren */
@@ -103,8 +103,8 @@ typedef struct Class6D3C8Methods {
                                                              * (gClass6D3C8->methods->slot44(...)), outside this
                                                              * unit's ownership -- see the header's top comment
                                                              * and the round 77 proposed-field-names note. */
-    void *unk48;                                            /* +0x048 func_8003B108 */
-    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C func_8003B110, first dispatched by main
+    void *unk48;                                            /* +0x048 Class6E4F0__NoOpSlot48 */
+    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C Class6E4F0__RunMainLoop, first dispatched by main
                                                              * (src/main.c) -- same cross-unit-slot44 reason, not renamed. */
     void (*loadIntroLogoSequence)(Class6D3C8 *self);        /* +0x050 Class6D3C8__LoadIntroLogoSequence */
     void (*startWeeklyStreamTask)(Class6D3C8 *self);        /* +0x054 Class6D3C8__StartWeeklyStreamTask */

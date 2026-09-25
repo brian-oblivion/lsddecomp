@@ -1,4 +1,6 @@
-# func_8003B024
+# Class6E4F0__Finalize
+
+> Renamed from `func_8003B024` on 2026-09-25 (tools/rename.py). Address 0x8003b024.
 
 **Round 81 (delta)** · **Unit:** code_2b78c · **Size:** 2 words · **Status:** MATCHED (2/2 words, whole-image SHA1 green)
 
@@ -10,7 +12,7 @@ Class6D3C8 (D_8006D3C8). So this class's finalize does NOT chain to
 BasicClass__Finalize.
 
 ```c
-void func_8003B024(Class6E4F0 *self) {
+void Class6E4F0__Finalize(Class6E4F0 *self) {
 }
 ```
 
@@ -19,5 +21,8 @@ void func_8003B024(Class6E4F0 *self) {
 
 ## Naming
 
-Kept as `func_8003B024`: renaming is head work (symbols file). Suggested
-tier-B name `Class6E4F0__Finalize` (slot identity, from the table).
+**Round 81 (delta), track 3.** Renamed `func_8003B024` -> `Class6E4F0__Finalize`
+(slot named like the method it dispatches: it is the +0x00C dtor/finalize
+override the `BASICCLASS_SLOTS` macro types). **Tier A**: a pure empty leaf
+whose mechanics ARE its purpose -- it is the finalize slot and it does
+nothing, full stop; nothing about "why" is claimed.
