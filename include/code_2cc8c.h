@@ -903,7 +903,11 @@ void Unk18Obj__SetUnkB4(Unk18Obj *self, s32 a1);
 void Unk18Obj__SetUnkB8(Unk18Obj *self, s32 a1);
 Unk18Obj *Unk18Obj__GetTail(Unk18Obj *self);
 
-void Unk18Obj__SetGeomScreen(Unk18Obj *self);
+/* GsSetProjection is NO LONGER DECLARED HERE, round 79. It was
+   `Unk18Obj__SetGeomScreen`, typed as a method; it is Sony's (libgs/gs_106,
+   identified at merge from position and LIBGS.H's prototype) and its one
+   caller, Unk18Obj__Update in src/code_2cc8c_d.c, declares it
+   locally with LIBGS.H's own shape. */
 
 extern void *func_80042400(void); /* external, no args; local view returns
                                     void* (used as a generic word/child

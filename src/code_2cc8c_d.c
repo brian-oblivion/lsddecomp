@@ -201,9 +201,14 @@ extern void GsClearOt(s32 a0, s32 a1, s32 a2);
  * from include/code_2cc8c.h. Both prototypes are LIBGS.H's own; PACKET is
  * LIBGS.H's `typedef unsigned char PACKET`.
  *   GsSetNearClip   libgs/gs_101   was func_8003FB0C
- *   GsSetWorkBase   libgs/gs_124   was func_8003FBE4 */
+ *   GsSetWorkBase   libgs/gs_124   was func_8003FBE4
+ * And one identified in round 79, also LIBGS.H's own prototype:
+ *   GsSetProjection libgs/gs_106   was Unk18Obj__SetGeomScreen (its argument
+ *                                  is the projection distance h, which this
+ *                                  unit also passes as SetFogNear's h) */
 extern void GsSetNearClip(long clip_near);
 extern void GsSetWorkBase(unsigned char *outpacketp);
+extern void GsSetProjection(long h);
 extern void *BMemPMgrAlloc(s32 size);
 
 void Unk18Obj__InitOt(Unk18Obj *self) {
@@ -321,7 +326,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
         ((void (*)(Unk18Obj *, GenericObj *))self->methods->slotA0)(self, self->unk10);
     }
 
-    Unk18Obj__SetGeomScreen((Unk18Obj *)self->unk40);
+    GsSetProjection(self->unk40);
     GsSetNearClip(self->unk4C);
     GsSetLightMode(self->lightMode);
 
@@ -461,11 +466,16 @@ Unk18Obj *Unk18Obj__GetTail(Unk18Obj *self) {
  * (libgte/reg03, linked from Sony's own SDK object). Declared LOCAL to this
  * unit rather than in code_2cc8c.h, which nine units include, since they
  * belong to another translation unit (CLAUDE.md's header-contention rule).
- * Sony types SetGeomScreen's argument `long`; Unk18Obj__SetGeomScreen forwards `self`
- * unexamined and ignores the return, so the local view keeps that call
- * site's own shape -- ABI-identical either way. */
-extern void SetGeomScreen(Unk18Obj *self);
+ * Both take `long` as LIBGTE.H declares them.
+ *
+ * GsSetProjection below is Sony's libgs/gs_106 (round 79, FINISHING-PLAN
+ * track 2: an 18-way EXACT tie that position settles -- it is the last word
+ * before the placed libgs run, zero gap to gs_131, and gs_106 is the only
+ * libgs module among the ties -- and LIBGS.H's `GsSetProjection(long h)`
+ * agrees with its call site). It is kept here as matched C because no object
+ * places it; progress.py counts it as library via its `identified` line. */
+extern void SetGeomScreen(long h);
 
-void Unk18Obj__SetGeomScreen(Unk18Obj *self) {
-    SetGeomScreen(self);
+void GsSetProjection(long h) {
+    SetGeomScreen(h);
 }

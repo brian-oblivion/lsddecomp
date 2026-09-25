@@ -1,4 +1,6 @@
-# Unk18Obj__SetGeomScreen — MATCHED
+# GsSetProjection — MATCHED
+
+> Renamed from `Unk18Obj__SetGeomScreen` on 2026-09-25 (tools/rename.py). Address 0x8003f28c.
 
 > Renamed from `func_8003F28C` on 2026-09-23 (tools/rename.py). Address 0x8003f28c.
 
@@ -7,7 +9,7 @@ Unit: `code_2cc8c_d`. Round 14, runner delta. 8/8 words, full match.
 ## Signature
 
 ```c
-void Unk18Obj__SetGeomScreen(Unk18Obj *self);
+void GsSetProjection(Unk18Obj *self);
 ```
 
 Not a `D_8006E8E4` vtable slot — called directly by symbol.
@@ -18,7 +20,7 @@ A thin wrapper forwarding `self` unexamined to a PsyQ library call, return
 ignored.
 
 ```c
-void Unk18Obj__SetGeomScreen(Unk18Obj *self) {
+void GsSetProjection(Unk18Obj *self) {
     func_80024B90(self);
 }
 ```
@@ -30,7 +32,7 @@ library, `asm/psyq_GsLinkObject4.s`, not decompiled in this project).
 
 ## Naming
 
-`Unk18Obj__SetGeomScreen` -- tier A. Trivial one-line forwarding wrapper to Sony's `SetGeomScreen(self)`; mechanics are the entire function.
+`GsSetProjection` -- tier A. Trivial one-line forwarding wrapper to Sony's `SetGeomScreen(self)`; mechanics are the entire function.
 
 ## Track 2 screen, round 79
 
@@ -38,7 +40,7 @@ library, `asm/psyq_GsLinkObject4.s`, not decompiled in this project).
 Sony's own function, so every game-style name on an SDK-shaped body is
 checked. `config/sdk-in-game.txt` carries a LEAD here (`libgs/gs_106:
 GsSetProjection`, shape 1.00), but it does not hold up as identification.
-`tools/sdkname.py Unk18Obj__SetGeomScreen` reports the 8-word body
+`tools/sdkname.py GsSetProjection` reports the 8-word body
 AMBIGUOUS: 18 different Sony functions across unrelated libraries (libgs,
 libc2, libcd, libetc, libpress, libsn, libsnd) share this exact
 relocation-masked fingerprint, because "call one function with one argument,
@@ -53,3 +55,23 @@ with zero gap (0x8003F2AC == 0x8003F28C + 8 words) -- neither side is
 call `func_80024B90` (`asm/psyq_GsLinkObject4.s`). No evidence kind reaches
 the track 2 bar for `GsSetProjection`; rejected with a `// not SDK:` comment
 above the symbols-file entry. Name and body unchanged.
+
+## Head note, round 79: identified as Sony's GsSetProjection (libgs/gs_106)
+
+Bravo's track 2 pass rejected the `GsSetProjection` lead as `not SDK`; the head
+overturned it at merge. The rejection argued that gs_106 is never placed, so it
+cannot supply position evidence. But position evidence comes from the
+NEIGHBOURS, not from the candidate object: this function is the last word
+before the placed libgs run (zero gap to gs_131's `GsSetRefView2` at
+0x8003F2AC), and of `sdkname.py`'s 18 exact ties `GsSetProjection` is the only
+libgs one. The header prototype agrees: LIBGS.H's `GsSetProjection(long h)`.
+The one caller, `Unk18Obj__Update`, passed `self->unk40` through a cast to
+`Unk18Obj *`, and hands the same field to `SetFogNear(a, h)` as `h` a few
+lines later, so the argument is the projection distance and the method typing
+was the misread. No class table holds 0x8003F28C, unlike every other
+`Unk18Obj__*` function around it. Bravo's comment also cited `func_80024B90`
+as the callee; the body calls libgte's `SetGeomScreen`.
+
+Renamed with `tools/rename.py`, retyped to LIBGS.H's shape (`long h`), and its
+prototype moved out of `include/code_2cc8c.h` into `src/code_2cc8c_d.c`,
+following round 78's `GsSetNearClip` precedent. Byte-identical.

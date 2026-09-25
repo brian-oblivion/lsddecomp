@@ -42,7 +42,7 @@ void Unk18Obj__Update(Unk18Obj *self) {
         ((void (*)(Unk18Obj *, GenericObj *))self->methods->slotA0)(self, self->unk10);
     }
 
-    Unk18Obj__SetGeomScreen((Unk18Obj *)self->unk40);
+    GsSetProjection((Unk18Obj *)self->unk40);
     GsSetNearClip(self->unk4C);
     func_8003FC70(self->unk54);
 
@@ -176,7 +176,7 @@ a future pass (or track 4) with more time to cross-check every call site.
   proven.
 - `unk40` -> not proposed. Overloaded: `Unk18Obj__Update` both passes it as
   a plain value to `SetFogNear`'s 2nd argument AND casts it to
-  `(Unk18Obj *)` for `Unk18Obj__SetGeomScreen`. Either it is genuinely two
+  `(Unk18Obj *)` for `GsSetProjection`. Either it is genuinely two
   different things depending on caller-supplied contents (a raw word the
   caller sometimes puts a pointer in), or one of the two call sites is
   itself worth a second look before naming the field.
