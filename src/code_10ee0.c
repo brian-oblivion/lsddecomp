@@ -10,8 +10,8 @@
  *
  * Round 81 (bravo) matched the ten small methods/accessors; round 81
  * (alpha) matched ten more (the allocator, ctor, init and the RECT/VRAM
- * helpers). func_800207DC, func_800209A0, func_80020A74 and func_80020B74
- * are still fresh track-1 ground.
+ * helpers). Round 82 (alpha) matched the last four (func_800207DC,
+ * func_800209A0, func_80020A74, func_80020B74); the unit is complete.
  */
 #include "common.h"
 #include "BasicClass.h"
@@ -69,8 +69,8 @@ struct Class6C070Methods {
     /* +0x06C */ void *slot6C;
     /* +0x070 */ void (*slot70)(Class6C070 *self, s32 value);    /* func_80020B4C */
     /* +0x074 */ void *slot74;
-    /* +0x078 */ void *slot78;
-    /* +0x07C */ void *slot7C;
+    /* +0x078 */ void (*slot78)(Class6C070 *self, u8 *color, Class6C070Rect *src); /* func_80020B74 */
+    /* +0x07C */ Class6C070Size *(*slot7C)(Class6C070 *self, Class6C070Dims *out); /* func_80020C08 */
     /* +0x080 */ void (*slot80)(Class6C070 *self, s32 value);    /* func_80020C3C */
 };
 
@@ -79,22 +79,30 @@ struct Class6C070 {
     /* +0x00C */ s32 unkC;            /* 80020AF4 sets to 1 once unk24 reaches unk20 */
     /* +0x010 */ s32 unk10;           /* cleared by 8002089C; 80020B4C stores unk20 only while 0 */
     /* +0x014 */ Class6C070Size size; /* 80020C08 returns its address */
-    /* +0x01C */ u8 pad1C[0x20 - 0x1C];
+    /* +0x01C */ s32 unk1C;           /* 800207DC: GsInitGraph vram mode */
     /* +0x020 */ s32 unk20;           /* 80020B4C sets, 80020B68 gets */
     /* +0x024 */ s32 unk24;           /* 80020AF4 counts up to unk20 */
     /* +0x028 */ u8 pad28[0x2C - 0x28];
     /* +0x02C */ s32 unk2C;           /* 80020C3C sets */
-    /* +0x030 */ s32 unk30;           /* 80020C44 sets */
+    /* +0x030 */ void (*callback)(void); /* 80020C44 sets, 80020A74 calls each VSync */
 };
 
 extern Class6C070Methods D_8006C070;  /* the class's method table */
 extern Class6C070 *D_8008A83C;        /* sdata: the singleton func_80020C5C returns */
 
 extern void GsSwapDispBuff(void);     /* LIBGS.H */
+extern void GsInitGraph(unsigned short x_res, unsigned short y_res,
+                        unsigned short intmode, unsigned short dith,
+                        unsigned short varmmode);   /* LIBGS.H */
+extern void GsDefDispBuff(unsigned short x0, unsigned short y0,
+                          unsigned short x1, unsigned short y1); /* LIBGS.H */
 extern int GsGetActiveBuff(void);     /* LIBGS.H */
 extern int LoadImage(RECT *rect, u_long *p);        /* LIBGPU.H */
 extern int MoveImage(RECT *rect, int x, int y);     /* LIBGPU.H */
 extern int DrawSync(int mode);                      /* LIBGPU.H */
+extern int ClearImage(RECT *rect, u_char r, u_char g, u_char b); /* LIBGPU.H */
+extern int VSync(int mode);                         /* LIBETC.H */
+extern int StoreImage(RECT *rect, u_long *p);       /* LIBGPU.H */
 extern void *BMemPMgrAlloc(s32 size);
 
 Class6C070Methods *func_80020C4C(void);
@@ -119,9 +127,14 @@ void func_80020784(Class6C070 *self) {
     self->unk10 = 0;
     self->methods->slot70(self, 3);
     self->methods->slot80(self, 1);
-    self->unk30 = 0;
+    self->callback = NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800207DC);
+void func_800207DC(Class6C070 *self, Class6C070Size *size, s32 vramMode) {
+    GsInitGraph(size->w, size->h, 0, 1, vramMode);
+    GsDefDispBuff(0, 0, 0, size->h);
+    self->size = *size;
+    self->unk1C = vramMode;
+}
 void func_8002085C(Class6C070 *self) {
     if (self->unk10 == 0) {
         self->unk10 = 1;
@@ -156,7 +169,17 @@ void func_80020970(RECT *dst, Class6C070Rect *src) {
     dst->w = src->w;
     dst->h = src->h;
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800209A0);
+void func_800209A0(Class6C070 *self, u_long *pixels, Class6C070Rect *src) {
+    RECT rect;
+
+    if (self->unk10 == 0 || self->unk2C != 0) {
+        func_80020970(&rect, src);
+        StoreImage(&rect, pixels);
+        if (self->unk2C != 0) {
+            DrawSync(0);
+        }
+    }
+}
 s32 func_80020A1C(Class6C070 *self) {
     return 0;
 }
@@ -166,7 +189,15 @@ void func_80020A24(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) {
     func_80020970(&rect, src);
     MoveImage(&rect, x, y);
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020A74);
+void func_80020A74(Class6C070 *self) {
+    while (self->unk10 != 0) {
+        VSync(self->unk20);
+        if (self->callback != NULL) {
+            self->callback();
+        }
+        self->methods->notifyParents(self, 2);
+    }
+}
 void func_80020AF4(Class6C070 *self) {
     Class6C070 *obj = func_80020C5C();
 
@@ -184,7 +215,18 @@ void func_80020B4C(Class6C070 *self, s32 value) {
 s32 func_80020B68(Class6C070 *self) {
     return self->unk20;
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020B74);
+void func_80020B74(Class6C070 *self, u8 *color, Class6C070Rect *src) {
+    Class6C070Dims dims;
+    RECT rect;
+
+    if (src == NULL) {
+        self->methods->slot7C(self, &dims);
+        self->methods->slot78(self, color, (Class6C070Rect *)&dims);
+    } else {
+        func_80020970(&rect, src);
+        ClearImage(&rect, color[0], color[1], color[2]);
+    }
+}
 Class6C070Size *func_80020C08(Class6C070 *self, Class6C070Dims *out) {
     if (out != NULL) {
         out->x = 0;
@@ -197,8 +239,8 @@ Class6C070Size *func_80020C08(Class6C070 *self, Class6C070Dims *out) {
 void func_80020C3C(Class6C070 *self, s32 value) {
     self->unk2C = value;
 }
-void func_80020C44(Class6C070 *self, s32 value) {
-    self->unk30 = value;
+void func_80020C44(Class6C070 *self, void (*callback)(void)) {
+    self->callback = callback;
 }
 Class6C070Methods *func_80020C4C(void) {
     return &D_8006C070;
