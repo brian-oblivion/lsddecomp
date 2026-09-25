@@ -3,16 +3,38 @@
  * revision 18). 0x322B4..0x330F4 (vram 0x80041AB4..0x800428F4). It was counted
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: methods of D_8006EC74,
- * D_8006ED4C, gSpriteMethods, D_8006EF50, D_8006EFAC, D_8006EB90, D_8006EED8,
- * D_800879C4 and D_800866E8, calling GetClass6B5CCMethods, GetSetBitField and
- * the BasicClass framework. Owns jtbl_80011290 (attached rodata sub-slot
- * 0x1A90).
+ * those, and no Sony fingerprint). Owns jtbl_80011290 (attached rodata
+ * sub-slot 0x1A90).
  *
- * Round 82 matched the one- to eight-word bodies (getters, accessors, empty
- * overrides), then a third batch of 11- to 20-word bodies (the sprite
- * attribute-bit setters, cell selection, finalize chains, the D_8006EF50
- * allocator), and then the rest: every function in the unit is C.
+ * Round 82 matched every function in the unit (getters, accessors, empty
+ * overrides, then the 11- to 20-word bodies: the sprite attribute-bit
+ * setters, cell selection, finalize chains, the D_8006EF50 allocator), then
+ * named it (track 3): every function is real C, not `func_`.
+ *
+ * Sprite (include/Sprite.h, gSpriteMethods) is already unified; its own
+ * methods (New_Sprite, Sprite__*, InitGsSprite, GetSpriteMethods) live here
+ * and keep their names. Its four subclasses are still pending track 4's
+ * unification, so their tables stay `D_<addr>` and their own methods use the
+ * project's address-derived pseudo-class-name convention (`D8006EC74__X`,
+ * matching the existing `D800879C4__X` precedent in class_3bb8c_p.c) rather
+ * than inventing a real name ahead of the types pass:
+ *   - D_8006ED4C (0x144): the screen-space sprite -- Sprite's direct
+ *     subclass, adding setPosition (+0x0BC, screenPos) and a pivot-anchor
+ *     setter (+0x0C0, centre/left/right/top/bottom).
+ *   - D_8006EC74 (0x1144): one 8x8 cell of a 32-wide grid -- D_8006ED4C's
+ *     subclass, adding setCell (+0x0C4); GetCellRect is the free helper both
+ *     its ctor and setCell use to turn a cell index into a rect.
+ *   - D_8006EB90 (0x11144) and D_800879C4 (0x1F44, class_3bb8c_p/q/t) are
+ *     Sprite subclasses too but own no methods in this unit.
+ * D_8006EF50 (class id 0x5) is a BasicClass subclass holding a parentRefs
+ * cursor; NotifyParents walks it, picking event 4/3/2 from two flags and a
+ * counter. D_8006EED8 (class id 0xB03) is a GetActiveDataSourceMethods
+ * subclass that copies a name string to slot +0x06C. D_8006EFAC (class id
+ * 0x14, "the base of Class866E8" per include/Class6B5CC.h) is a Class6B5CC
+ * subclass owning three FlatLightObj children and an ambient colour
+ * (SetAmbientColor -> GsSetAmbient); its GetChild (+0x0B8) is inherited
+ * unchanged by Class866E8's own table (D_800866E8), which is why one
+ * function occupies the same slot in both.
  */
 #include "common.h"
 #include "Sprite.h"
@@ -316,9 +338,6 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
     InitGsSprite(&self->sprite, abr, rect, self->image);
     self->unk58 = 0;
 }
-/* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage
- * from the image, size and u,v from the cell, the pivot at its centre,
- * neutral colour, scale 1.0 and no rotation. */
 /* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage
  * from the image, size and u,v from the cell, the pivot at its centre,
  * neutral colour, scale 1.0 and no rotation. */
