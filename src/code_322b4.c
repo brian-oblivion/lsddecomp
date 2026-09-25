@@ -63,6 +63,23 @@ struct D_8006EFACMethods {
 extern BasicClass *New_FlatLightObj(s32 lightId);
 extern void GsSetAmbient(long r, long g, long b);
 
+/* libgs GsIMAGE (LIBGS.H), as code_2bb9c.c defines it; Sprite.h keeps only
+ * the tag. InitGsSprite reads pmode, px/py and cx/cy. */
+struct GsIMAGE {
+    /* +0x00 */ u32 pmode;
+    /* +0x04 */ s16 px;
+    /* +0x06 */ s16 py;
+    /* +0x08 */ u16 pw;
+    /* +0x0A */ u16 ph;
+    /* +0x0C */ u32 *pixel;
+    /* +0x10 */ s16 cx;
+    /* +0x12 */ s16 cy;
+    /* +0x14 */ u16 cw;
+    /* +0x16 */ u16 ch;
+    /* +0x18 */ u32 *clut;
+};
+extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
+
 /* The method tables the getters below return. */
 extern s32 D_8006EC74[];
 extern s32 D_8006ED4C[];
@@ -299,7 +316,35 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
     InitGsSprite(&self->sprite, abr, rect, self->image);
     self->unk58 = 0;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", InitGsSprite);
+/* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage
+ * from the image, size and u,v from the cell, the pivot at its centre,
+ * neutral colour, scale 1.0 and no rotation. */
+/* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage
+ * from the image, size and u,v from the cell, the pivot at its centre,
+ * neutral colour, scale 1.0 and no rotation. */
+void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *image) {
+    s32 mode = image->pmode & 3;
+    s32 grey = 0x80;
+
+    sprite->attribute = mode << 24;
+    sprite->x = 0;
+    sprite->y = 0;
+    sprite->w = rect->w;
+    sprite->h = rect->h;
+    sprite->mx = sprite->w >> 1;
+    sprite->my = sprite->h >> 1;
+    sprite->tpage = GetTPage(mode, abr, image->px, image->py);
+    sprite->u = rect->u;
+    sprite->v = rect->v;
+    sprite->cx = image->cx;
+    sprite->cy = image->cy;
+    sprite->rgb.b = grey;
+    sprite->rgb.g = grey;
+    sprite->rgb.r = grey;
+    sprite->rotate = 0;
+    sprite->scalex = 0x1000;
+    sprite->scaley = 0x1000;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__UpdateRotation);
 /* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
 s32 Sprite__SetDisplay(Sprite *self, s32 a1) {
