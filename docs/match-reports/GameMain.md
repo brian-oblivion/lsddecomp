@@ -82,13 +82,101 @@ void GameMain(void)
     D_8008AC20 = New_Class6D3C8(&D_80066828);
     obj = new_class_6c078();
     pad = New_Pad(0, 0);
-    D_8008AC20->methods->slot44(D_8008AC20, obj, pad);
+    D_8008AC20->methods->forwardToBaseSlot44UnlessFlagged(D_8008AC20, obj, pad);
     D_8008AC20->methods->slot4C(D_8008AC20);
 }
 
 void func_80011994(void) {
 }
 ```
+
+(Code block above updated round 79 to match `src/main.c` as it stands: the
+`+0x044` slot is `forwardToBaseSlot44UnlessFlagged` in the live source, not
+the `slot44` name this report's code block still carried from round 47 --
+`Class6D3C8Methods.forwardToBaseSlot44UnlessFlagged` was renamed by a later
+round without this report's inline C being refreshed. No behavior changed;
+this is a documentation sync only.)
+
+## Naming (round 79)
+
+- **`func_800118DC` -> `GameMain`, tier A.** Evidence: `crt0` (Sony's,
+  `config/splat.slps01556.lsdde.yaml`'s `main` c-segment comment: "main: the
+  game's own `main()` (func_800118DC) plus a two-word stub") calls this
+  function directly as the game's entry point; its body stands up the heap,
+  constructs the root `Class6D3C8` object, and dispatches into its vtable --
+  the shape of a C program's `main`. **Not named literally `main`**: doing
+  so trips GCC 2.6.3's own special-case for a function spelled exactly
+  `main` -- it silently inserts an extra `jal __main` as the function's
+  first statement (`expand_main_function`, unconditional unless
+  `-ffreestanding`, which this project's pinned flags do not pass). Verified
+  directly: renaming to `main` compiled clean but failed to LINK
+  (`undefined reference to '__main'`), because our C's own explicit
+  `func_80011994()` call sits ALONGSIDE the compiler's now-auto-inserted
+  one, not in place of it. Reverted before committing; picked `GameMain`
+  instead, which is not special-cased. Image byte-identical either way for
+  the body itself, since the byte match here has always come from the
+  explicit call, not from a live `main`-triggered auto-insertion.
+
+  **This is also new evidence for `func_80011994`'s own identity, below.**
+
+- **`func_80011994` -- NOT renamed. Likely Sony's/the toolchain's own
+  `__main`, not authored game code; flagged to the head, not renamed.**
+  `tools/sdkname.py func_80011994` returns only a TINY (2-word) EXACT
+  fingerprint shared by a dozen unrelated library functions (`ClearOTag`,
+  several `gte_*` macros, `SeVibOn`/`SetVib`, `KeyOnCheck`, `__nulldev`,
+  and, notably, `__main _obj/none`) with no disambiguating position (both
+  functions in this unit get the same generic "before `_obj/malloc`" note,
+  which is not the "between two placed modules of one library" pattern
+  `sdkname.py`'s own methodology needs for identification) -- exactly the
+  shape `docs/PROGRESS.md` round 78 already swept for project-wide
+  ("Adjacency leads ... find all five of round 78's hand finds plus
+  SsStart/SsStart2, and no 2-word stub") and found nothing among 2-word
+  stubs. So the corpus fingerprint ALONE is not enough, and the runner brief's
+  screen (round 78's five TINY/AMBIGUOUS misses) says not to act on it alone.
+
+  But the `GameMain` rename experiment above produces a SECOND, independent,
+  build-level signal that points the same way: `func_80011994` is called as
+  literally the FIRST statement inside `GameMain`, at the exact position
+  GCC 2.6.3 auto-inserts a call to a symbol named `__main` when the
+  enclosing function is itself named `main` (unconditional under this
+  project's flags, confirmed by reproducing the undefined-reference error
+  above). The parsimonious reading is that retail's own source named this
+  function `main` and let the compiler insert the call implicitly; our
+  explicit `func_80011994()` call is a source-level workaround that happens
+  to reproduce the exact same bytes GCC would have emitted on its own,
+  which is consistent with -- not proof against -- `func_80011994` being
+  the linked definition of `__main` that made that original build succeed
+  (Sony's crt/libgcc-provided stub, the standard ritual symbol GCC's `main`
+  special-case expects, not a Psy-Q library function with its own SDK
+  module identity).
+
+  **Not renamed, and no game name given, per the runner brief and
+  CLAUDE.md's Sony-ownership rule** ("Never write C for a function a Sony
+  object owns" / "give no game name to anything Sony owns") -- reclassifying
+  it into `config/sdk-in-game.txt` or attempting to actually spell it
+  `__main` (which would also mean pulling it out of this unit and
+  potentially restructuring the call as an auto-inserted one) is a bigger,
+  riskier structural change than a naming pass should make unilaterally,
+  and is left for the head/operator to decide. Posted to
+  `tools/broadcast.sh`.
+
+### Proposed learning
+
+**A function named exactly `main` is not a safe rename target under this
+project's pinned GCC 2.6.3 flags, even when the source shape is otherwise
+exactly a C program's entry point.** GCC's `main`-special-case
+unconditionally inserts a `jal __main` as that function's first compiled
+statement (unless `-ffreestanding`, which this project does not pass), so
+renaming a matched, byte-exact function to literally `main` adds an
+UNDEFINED reference at link time regardless of what the function's own C
+body already does -- the failure is a link error, not a compile error, and
+it says nothing about whether the rename is otherwise correct. This is also
+a positive identification tool: a function that a `main`-rename experiment
+demands a `__main` definition for, at the exact call site an existing
+matched callee already occupies, is independent (build-level, not corpus-
+fingerprint) evidence that the callee IS that toolchain-standard symbol.
+Use a non-colliding name (`GameMain`, `EntryMain`, etc.) for the game's
+real entry point instead.
 
 Also in `include/Class6D3C8.h`: `Class6D3C8Methods.unk4C` (never dispatched
 by any carved C before this) is retyped from `void *` to `void
