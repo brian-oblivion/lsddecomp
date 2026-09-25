@@ -13,7 +13,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__Seek` -- slot +0x04C (the struct's own pre-existing field name, confirmed by the body: installs the async seek callback or busy-waits `CdControl(CdlSeekL, ...)`, then sets state = seeking).
 
 ## Source
 

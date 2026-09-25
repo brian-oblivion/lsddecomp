@@ -13,7 +13,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `New_CdStreamObj` -- the class allocator (`New_Class` convention): `BMemPMgrAlloc(0x5C)` then runs the ctor slot, returning the object or NULL. Evidence: the body itself (allocate, ctor, return-or-NULL), the `New_Pad`/`New_Class6B5CC` precedent in include/Pad.h and include/Class6B5CC.h.
 
 ## Source
 

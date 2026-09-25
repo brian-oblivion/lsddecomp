@@ -13,7 +13,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `OnCdSeekComplete` -- free function, the `CdSyncCallback` handler installed by `CdStreamObj__Seek`. Evidence: matches the libcd callback signature `(u8 status, u8 *result)`; on status 2 (CdlComplete) uninstalls itself and invokes the active object's `onSeekDone`.
 
 ## Source
 

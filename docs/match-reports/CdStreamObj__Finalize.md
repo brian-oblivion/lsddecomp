@@ -13,7 +13,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__Finalize` -- slot +0x00C, overrides BasicClass's finalize (`Class__Finalize` convention, BasicClass.h's model). Evidence: calls `close(self)` then chains to `Get_vtable_BasicClass()->finalize`.
 
 ## Source
 

@@ -13,7 +13,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__Close` -- slot +0x048. Evidence: if a stream is active on this object, calls `stop` (its own +0x054 slot) then clears state and `gActiveCdStreamObj`; called by Finalize before tearing the object down.
 
 ## Source
 

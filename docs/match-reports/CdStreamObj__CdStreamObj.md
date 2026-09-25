@@ -34,7 +34,36 @@ ground, no prior attempt. Byte-exact on build 8; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__CdStreamObj` -- slot +0x008, the ctor (`Class__Class` convention, BasicClass.h's model). Evidence: installs the method table, initializes every field the rest of the unit reads (state, muted, speed, bytesPerFrame, ring, the three callbacks).
+
+### Field, slot and global names (round 82 naming pass)
+
+`struct CdStreamObj`/`CdStreamObjMethods` are unit-local (no other unit
+references them, `gCdStreamObjMethods` or `gActiveCdStreamObj` -- confirmed
+by `grep -rn` over `src/`, `include/`), so these were renamed directly
+(CLAUDE.md/FINISHING-PLAN track 3 step 3's ownership rule), not proposed:
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_800817E0` (table) | `gCdStreamObjMethods` | A | `Get_vtable_<Class>` / `g<Class>Methods` convention (`include/Pad.h`) |
+| `D_8008A950` (global) | `gActiveCdStreamObj` | A | the single active-stream pointer every state-changing method compares `self` against |
+| slot +0x044 | `open` | A | dispatches to `CdStreamObj__Open` |
+| slot +0x048 | `close` | A | dispatches to `CdStreamObj__Close` |
+| slot +0x050 | `startRead` | A | dispatches to `CdStreamObj__StartRead` |
+| slot +0x054 | `stop` | A | dispatches to `CdStreamObj__Stop` |
+| slot +0x058 | `restart` | A | dispatches to `CdStreamObj__Restart` |
+| slot +0x06C | `getNextFrame` | A | dispatches to `CdStreamObj__GetNextFrame` |
+| slot +0x05C/+0x060/+0x07C | left `slot5C`/`slot60`/`slot7C` | C | empty overrides, no evidence of intended purpose |
+| `loc` (+0x00C) | `seekLoc` | B | the buffer passed to `seek`/`CdControl`'s `CdlLOC` argument |
+| `unk2C` | `state` | A | the 0/1/2/4 state machine every method gates on |
+| `unk34` | `speed` | B | selects both the ctor's rate divisor and StartRead's read mode |
+| `unk38` | `bytesPerFrame` | A | divides the file size into `totalFrames` in `CdStreamObj__Open` |
+| `unk3C` | left `unk3C` | C | ctor stores `arg3` there; no further read is visible in this unit |
+| `unk40` | `totalFrames` | A | compared against the running frame index in `GetNextFrame` |
+| `unk58` | `lastFrame` | A | the last frame index `GetNextFrame` recorded |
+| `cb48` | `onFrameReady` | B | called in `CdStreamObj__ReleaseFrame` when a frame's buffer is ready to release |
+| `cb4C` | `onStreamEnd` | B | tested (never itself invoked) to gate `CdStreamObj__OnStreamEnd`'s notify-on-end path |
+| `cb54` | `onSeekDone` | A | the callback `OnCdSeekComplete` invokes when an async seek completes |
 
 ## Source
 

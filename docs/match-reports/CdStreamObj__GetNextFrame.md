@@ -26,7 +26,7 @@ green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__GetNextFrame` -- slot +0x06C. Evidence: retries `StGetNext` for the next decoded sector, reads its frame count, ends the stream past `totalFrames` or on a backwards jump, otherwise records `lastFrame` and returns the frame -- exactly "get the next stream frame".
 
 ## Source
 

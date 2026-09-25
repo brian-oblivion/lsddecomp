@@ -13,7 +13,7 @@ the first build; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. The class gCdStreamObjMethods is a CD streaming (StSetRing/CdSync) object; a naming pass can call it e.g. `CdStreamObj` (tier B: from the libcd calls only).
+Tier C. Kept the tier-C `Class__func_xxxxx` form: slot +0x060, an empty override with no evidence of what it would do if implemented.
 
 ## Source
 

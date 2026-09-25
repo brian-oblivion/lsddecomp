@@ -13,7 +13,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier B. `CdStreamObj__OnStreamEnd` -- free function (not a slot), called only from GetNextFrame's end-of-stream branch. Evidence: retail tests `onStreamEnd` but calls `onFrameReady` (an asymmetry the report already flagged as retail's own behaviour, not a bug to fix), then closes the stream via the `close` slot. Tier B: the test/call asymmetry means the exact caller contract isn't fully pinned down, but "this runs when the stream ends" is solid.
 
 ## Source
 

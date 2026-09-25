@@ -13,7 +13,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier B. `CdStreamObj__ReleaseFrame` -- free function (not a slot), called from both the normal and the end-of-stream paths of GetNextFrame. Evidence: if `onFrameReady` is set, calls it, then frees the ring buffer via the `freeRing` slot -- releasing a consumed frame's buffer back to the ring. Tier B: mechanics are clear, the caller-facing purpose of `onFrameReady` itself is not established from this unit alone.
 
 ## Source
 

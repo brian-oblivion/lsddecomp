@@ -13,7 +13,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__Restart` -- slot +0x058. Evidence: only fires from the stopped state; resets to idle and re-issues `seek` on the same saved location -- restarting the stream from its start point.
 
 ## Source
 

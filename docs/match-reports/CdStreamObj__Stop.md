@@ -18,7 +18,7 @@ green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__Stop` -- slot +0x054. Evidence: only fires from the reading state; mutes, clears and unsets the ring, busy-waits `CdControl(CdlPause)`, transitions to the stopped state.
 
 ## Source
 

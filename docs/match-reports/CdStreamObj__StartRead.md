@@ -24,7 +24,7 @@ green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__StartRead` -- slot +0x050. Evidence: only fires from the seeking state; selects a read mode, calls `StSetStream`, mutes, retries `CdControl(CdlSetloc)`/`CdRead2` until both succeed, demutes, and transitions to the reading state -- the point where actual streamed reads begin.
 
 ## Source
 

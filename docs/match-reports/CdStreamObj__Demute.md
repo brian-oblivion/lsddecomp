@@ -13,7 +13,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__Demute` -- slot +0x068. Evidence: busy-waits `CdControl(CdlDemute)` and clears the `muted` flag, only when active and currently muted.
 
 ## Source
 

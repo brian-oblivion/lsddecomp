@@ -36,7 +36,7 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. Not renamed this round (brief: no renames).
+Tier A. `CdStreamObj__Open` -- slot +0x044. Evidence: searches the disc for the named file (`CdSearchFile`), computes the frame count from its size, activates the object as the single active stream (`gActiveCdStreamObj`), and seeks to it -- the standard "open a file for streaming" sequence.
 
 ## Source
 

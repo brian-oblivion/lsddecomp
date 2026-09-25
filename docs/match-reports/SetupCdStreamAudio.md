@@ -13,7 +13,7 @@ the first build; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. The class gCdStreamObjMethods is a CD streaming (StSetRing/CdSync) object; a naming pass can call it e.g. `CdStreamObj` (tier B: from the libcd calls only).
+Tier B. `SetupCdStreamAudio` -- free function (not a table slot), called only from `CdStreamObj__Open`. Evidence: fills a stack `SpuCommonAttr` (master volume near-max, CD channel volume near-max, CD mix enabled) and calls `SpuSetCommonAttr`. Mechanics are clear (SPU mix setup for CD-XA audio); exactly why it lives here rather than in Open itself is not established, so tier B.
 
 ## Source
 

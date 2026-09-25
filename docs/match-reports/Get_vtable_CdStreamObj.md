@@ -13,7 +13,7 @@ the first build; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. The class gCdStreamObjMethods is a CD streaming (StSetRing/CdSync) object; a naming pass can call it e.g. `CdStreamObj` (tier B: from the libcd calls only).
+Tier A. `Get_vtable_CdStreamObj` -- returns `&gCdStreamObjMethods`. Evidence: matches the established `Get_vtable_<Class>` convention used by `Get_vtable_BasicClass`, `Get_vtable_Pad`, `Get_vtable_Entity`, etc.
 
 ## Source
 

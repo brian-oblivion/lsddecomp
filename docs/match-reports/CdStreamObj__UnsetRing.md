@@ -13,7 +13,7 @@ the first build; whole-image SHA1 green.
 
 ## Naming
 
-Kept `func_`. The class gCdStreamObjMethods is a CD streaming (StSetRing/CdSync) object; a naming pass can call it e.g. `CdStreamObj` (tier B: from the libcd calls only).
+Tier A. `CdStreamObj__UnsetRing` -- slot +0x074. Evidence: tail-wraps `StUnSetRing()`.
 
 ## Source
 
