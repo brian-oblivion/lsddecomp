@@ -25,7 +25,7 @@ typedef struct D_8006EF50Obj {
     u8 pad04[0x8 - 0x4];
     BasicClassListNode *parentRefs; /* +0x008, BasicClass's */
     s32 unkC;  /* +0x00C, read by D8006EF50__GetCount */
-    s32 unk10; /* +0x010, set to 1 by D8006EF50__SetFlag10, cleared by func_80042664, read by func_8004266C */
+    s32 unk10; /* +0x010, set to 1 by D8006EF50__SetFlag10, cleared by D8006EF50__ClearFlag10, read by func_8004266C */
     s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by D8006EF50__Reset */
     BasicClassListNode *unk18; /* +0x018, cleared by D8006EF50__Reset; a parentRefs cursor D8006EF50__RemoveParentRef steps past a removed parent */
 } D_8006EF50Obj;
@@ -488,7 +488,7 @@ void D8006EF50__SetFlag10(D_8006EF50Obj *self) {
     self->unk10 = 1;
 }
 /* D_8006EF50 slot +0x050. */
-void func_80042664(D_8006EF50Obj *self) {
+void D8006EF50__ClearFlag10(D_8006EF50Obj *self) {
     self->unk10 = 0;
 }
 /* D_8006EF50 slot +0x054. */

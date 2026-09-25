@@ -2648,3 +2648,4 @@ D8006EF50__Reset = 0x800425D8; // type:func
 D8006EF50__Tick = 0x800425EC; // type:func
 D8006EF50__GetCount = 0x8004264C; // type:func
 D8006EF50__SetFlag10 = 0x80042658; // type:func
+D8006EF50__ClearFlag10 = 0x80042664; // type:func
