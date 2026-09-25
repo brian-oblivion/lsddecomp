@@ -735,3 +735,7 @@ shape is wrong, not that the remainder is register allocation.
 Round 75 (charlie), track 3.
 
 - `Class65650__CreateParts` (was `func_80065E1C`), tier A. Asks modelData->getObjectIds (D_8006F384 +0x080) for the count, allocates parts (count pointers) and partIds (count bytes), fills partIds, creates one New_Actor per entry counting partCount up, sets mainPart = parts[buf[0]]; on any failure DestroyParts and return 1.
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

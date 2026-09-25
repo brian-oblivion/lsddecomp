@@ -103,3 +103,7 @@ Round 75 (charlie), track 3.
 ## Track 4
 
 2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`. code_55dd4.c includes it, and include/code_55dd4.h's local `extern Unk5CObj *New_ModelData(UnkArg1Obj *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct Src6F240 *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to Class65650 and is left for that class's unification. Image byte-identical.
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

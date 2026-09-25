@@ -646,3 +646,7 @@ NON_MATCHING body promoted, round 61.
 Round 75 (charlie), track 3.
 
 - `Class65650__SetDisplay` (was `func_80065A5C`), tier A. Occupies +0x060, overriding Class6B5CC__SetDisplay; forwards its argument to every part's SetDisplay (Unk70ElemMethods +0x060 = Class6B5CC__SetDisplay, the parts being BaseObjO from New_Actor).
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

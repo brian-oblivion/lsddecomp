@@ -263,3 +263,7 @@ if that specific pairwise swap is not in the table.
 Round 75 (charlie), track 3.
 
 - `Class65650__SetTod` (was `func_80066214`), tier A. Occupies +0x128. Selects TOD `index` from modelData->tods (arr + 8 + index*4 -> holder -> +0x10 TOD data), stores todIndex, todFrameCount = TOD +0x4 (frame count), todFramePtr = TOD + 8 (first frame), todFrame = 0, and applies that first frame. InitDefaults calls setTod(0); Entity_e calls setTod(1).
+
+## Track 4 (2026-09-25, round 85, alpha)
+
+The class (id 0x234, table `gClass65650Methods`) is unified as `Class65650` in `include/Class65650.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `Class65650Methods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
