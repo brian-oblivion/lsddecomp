@@ -104,6 +104,7 @@ code_179d8_q: warning: type mismatch with previous external decl
 code_179d8_q: warning: type mismatch with previous external decl
 code_179d8_q: warning: type mismatch with previous implicit declaration
 code_179d8_q: warning: type mismatch with previous implicit declaration
+code_2864: warning: unused variable `scr'
 code_2c054: warning: assignment makes pointer from integer without a cast
 code_2c054: warning: assignment makes pointer from integer without a cast
 code_2c054: warning: implicit declaration of function `BMemPMgrAlloc'
