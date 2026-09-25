@@ -563,7 +563,7 @@ def collect(st):
         "_todo3": todo3, "_revisit": revisit, "_revisit_label": revisit_label,
         "_t4_rounds": st["tracks"]["4"].get("rounds", []),
         "_classes": classes, "_shared_globals": shared,
-        "_globals_recipe": st["tracks"]["4"].get("globals_recipe"),
+        "_globals_recipe": st["tracks"].get("4b", {}).get("status") in ("open", "done"),
     }
 
 
@@ -729,6 +729,14 @@ def jobs(d, n):
                                      f"and write its recipe; {t['4']['shared_globals']} global(s) declared with more "
                                      "than one type (typeviews.py --globals)",
                                 MODELS["head_when_new_procedure"]))
+            elif d["_shared_globals"]:
+                # 4b jobs, once its recipe exists: the global declared in the most files first
+                g = max(d["_shared_globals"].items(),
+                        key=lambda kv: (len({f for fs in kv[1].values() for f in fs}), kv[0]))
+                files = sorted({f for fs in g[1].values() for f in fs})
+                q_types.append(("4", f"unify global {g[0]} ({len(g[1])} types in {len(files)} files, FINISHING-PLAN "
+                                     f"track 4b) (units: {','.join(Path(f).stem for f in files if f.startswith('src/'))})",
+                                "opus"))
     q_close = [("5", f"{k}: {TRACK5_ITEMS[k]}", "opus")
                for k, done in t["5"]["checklist"].items() if not done] if t["5"]["status"] == "open" else []
     queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close]
@@ -742,7 +750,7 @@ def jobs(d, n):
 
 RENAMES = ("naming pass on", "identify and name", "extern review")
 JOB_UNIT_RES = (r"naming pass on (\w+)", r"runner on (\w+):", r"in (\w+) to #ifdef", r"match \w+ \((\w+),")
-RENAMES = RENAMES + ("unify class",)   # a class job rewrites accessors in every unit that sees the class
+RENAMES = RENAMES + ("unify class", "unify global")   # rewrites accessors in every unit that sees the type
 
 
 def job_units(d, desc):

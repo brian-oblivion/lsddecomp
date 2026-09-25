@@ -28,8 +28,9 @@ question, never a layout one.
 THE CLASS TREE. Word +0x000 of every method table is a hierarchical class id:
 each nibble above the lowest non-zero one is one more level of derivation, so
 the parent of id 0x1F234 is 0xF234, then 0x234, 0x34, 0x4. Checked against the
-tables themselves (the child is a copy of the parent with slots replaced and
-appended: `classtable.py <child> --vs <parent>`), and it is what the
+tables themselves (the child is the parent's table with slots replaced, and
+usually appended: `classtable.py <child> --vs <parent>`;
+docs/research/class-framework.md has the measurement), and it is what the
 `(hdr & 0xFFF) == id` / `(hdr & 0xFFFFF) == 0x1F234` tests in game code read:
 an is-kind-of test is a prefix match on this id. An id with no table in
 `classtable.py --scan` is an intermediate class with no methods of its own
