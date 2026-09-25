@@ -22,10 +22,10 @@
  * The ctor chains to Sprite's first (GetSpriteMethods()->ctor with abr 0 and
  * a NULL fourth argument), and CharSprite's ctor chains to this one, so the
  * id tree (0x44 -> 0x144 -> 0x1144) is the ctor chain. Two classes derive
- * from it (`typeviews.py --tree`): CharSprite (0x1144, one 8x8 cell of a
- * 32-wide grid, own fields from +0x0A8) and D_8006EB90 (0x11144, below
- * CharSprite). Their views are their own (src/code_322b4.c,
- * include/code_2cc8c.h); they do not expand these macros yet.
+ * from it (`typeviews.py --tree`): CharSprite (0x1144, one 8x8 font
+ * character, include/CharSprite.h, own fields from +0x0A8), which expands
+ * these macros, and D_8006EB90 (0x11144, below CharSprite), whose view is
+ * its own (include/code_2cc8c.h) and does not expand them yet.
  *
  * Not settled here: the ctor occupant returns nothing where the slot, from
  * Class6B5CC, returns `void *`; and the attachToParent override's third

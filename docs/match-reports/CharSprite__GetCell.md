@@ -18,8 +18,8 @@ The frame comes from an UNUSED local `u8 pad[16];`. Measured: deleting that line
 ## Source
 
 ```c
-/* gCharSpriteMethods slot +0x0C8: read the byte at +0x0A8. */
-u8 CharSprite__GetCell(D_8006EC74Obj *self) {
+/* CharSprite slot +0x0C8: read the byte at +0x0A8. */
+u8 CharSprite__GetCell(CharSprite *self) {
     u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
 
     return self->cellIndex;
@@ -33,3 +33,7 @@ u8 CharSprite__GetCell(D_8006EC74Obj *self) {
 ## Naming
 
 - `D8006EC74__GetCell` -- tier A. Slot +0x0C8: returns the stored cell index (self->cellIndex). Pure getter.
+
+## Track 4
+
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `D8006EC74__GetCell`, tier A: slot +0x0C8, named `getCell` in the header (returns `u8`: this occupant's type; no C call through the slot exists). `self` is `CharSprite *` (was `D_8006EC74Obj`). D_8006EB90 overrides the slot with an empty `Obj6EAC0__NoOpSetter` that its own view types as a void setter; that is the subclass's to settle. The Source block above is the unified spelling. Image byte-identical.

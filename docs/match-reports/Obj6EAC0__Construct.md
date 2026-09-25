@@ -15,7 +15,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
-    ((void (*)(Obj6EAC0 *, s32, s32))GetCharSpriteMethods()->slot08)(self, a1, 0x20);
+    GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20);
     self->methods = Obj6EAC0__GetDerivedMethods();
     self->unkA9 = a2;
     self->unkAB = a2;
@@ -27,7 +27,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
         i = 0;
         if (i < a2) {
             do {
-                *cursor = New_CharSprite(a1, 0x20);
+                *cursor = (Obj6EAC0 *)New_CharSprite((void *)a1, 0x20);
                 i++;
                 cursor++;
             } while (i < a2);
@@ -159,3 +159,7 @@ the object this class needs); named `Construct` per the project's
 literally, since `Obj6EAC0` is a placeholder table-address name, not a
 real class identity -- tier B (the CTOR role is certain, the class's own
 purpose is the unit's working hypothesis only).
+
+## Track 4
+
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74; this class, 0x11144, is still its own job). The chain to the parent ctor is now `GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20)`, still a genuine 3-argument prototyped call, which this report's lever needs; the old spelling cast `slot08` to a local function type. New_CharSprite's result is cast back to the view's `Obj6EAC0 *`: the children are CharSprites, not objects of this class, which the view's `children` comment does not say. Both casts emit no code. Image byte-identical.

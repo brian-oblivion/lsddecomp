@@ -36,3 +36,7 @@ Retail `andi a1,a1,0xFF` emitted mid-body (after unrelated work), followed by `s
 ## Naming
 
 - `GetCellRect` -- tier A. Free function: cell index -> 8x8 rect in a 32-wide grid, offset from the D_8006ED40 origin table. Pure computation, called by both CharSprite__CharSprite (fixed cell) and CharSprite__SetCell (caller's cell); not a method of one class.
+
+## Track 4
+
+2026-09-26, round 86 (bravo): the class whose methods call it is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74); its prototype moved there from the unit, beside the ctor and setCell that share it. The function is unchanged. Image byte-identical.

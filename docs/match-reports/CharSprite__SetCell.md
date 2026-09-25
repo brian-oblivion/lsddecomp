@@ -14,14 +14,14 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b
 ## Source
 
 ```c
-/* gCharSpriteMethods slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
-void CharSprite__SetCell(SpriteView_322b4 *self, u8 cell) {
+/* CharSprite slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
+void CharSprite__SetCell(CharSprite *self, u8 cell) {
     SpriteRect r;
 
     self->cellIndex = cell;
     GetCellRect(&r, cell);
-    self->u = r.u;
-    self->v = r.v;
+    self->sprite.u = r.u;
+    self->sprite.v = r.v;
 }
 ```
 
@@ -32,3 +32,7 @@ void CharSprite__SetCell(SpriteView_322b4 *self, u8 cell) {
 ## Naming
 
 - `D8006EC74__SetCell` -- tier A. Slot +0x0C4: stores the cell index and derives u,v from GetCellRect. Pure setter, mechanics is the purpose.
+
+## Track 4
+
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `D8006EC74__SetCell`, tier A: slot +0x0C4, which the header names `setCell` for it. `self` is `CharSprite *`; `cellIndex` (+0x0A8) is the class's one own field, and u,v are Sprite's `sprite.u`/`sprite.v` (+0x072/+0x073, the offsets `SpriteView_322b4` gave them). The Source block above is the unified spelling. Image byte-identical.

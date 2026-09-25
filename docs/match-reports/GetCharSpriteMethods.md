@@ -14,12 +14,16 @@ Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322
 ## Source
 
 ```c
-/* Returns the gCharSpriteMethods method table. */
-void *GetCharSpriteMethods(void) {
-    return gCharSpriteMethods;
+/* Returns the CharSprite method table. */
+CharSpriteMethods *GetCharSpriteMethods(void) {
+    return &gCharSpriteMethods;
 }
 ```
 
 ## Naming
 
 - `Get_vtable_D8006EC74` -- tier A. Table getter ("return D_8006EC74;"), the Get_vtable_<Class> convention already used for anonymous classes (Get_vtable_BasicClass, Get_vtable_Pad, Get_vtable_Entity).
+
+## Track 4
+
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `Get_vtable_D8006EC74`, tier A: it returns the class's table, and the name is the class's getter convention (GetScreenSpriteMethods, GetSpriteMethods). Declared once, in the header, returning `CharSpriteMethods *` and `&gCharSpriteMethods` (formerly `D_8006EC74`): the same lui/addiu as the array-decay spelling. The two other declarations are gone: this unit's `void *` and include/code_2cc8c.h's `Obj6EAC0Methods *`. The Source block above is the unified spelling. Image byte-identical.

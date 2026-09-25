@@ -14,15 +14,15 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 ## Source
 
 ```c
-/* gCharSpriteMethods slot +0x008 (ctor): the ScreenSprite ctor with cell 0x20's rect,
+/* CharSprite slot +0x008 (ctor): the ScreenSprite ctor with cell 0x20's rect,
  * install the table, then reset to the caller's cell. */
-void CharSprite__CharSprite(SpriteView_322b4 *self, void *texture, u8 cell) {
+void CharSprite__CharSprite(CharSprite *self, void *texture, u8 cell) {
     SpriteRect r;
 
     GetCellRect(&r, 0x20);
-    ((CtorArg3Methods_322b4 *)GetScreenSpriteMethods())->ctor(self, texture, &r, NULL);
+    GetScreenSpriteMethods()->ctor((ScreenSprite *)self, texture, &r, 0);
     self->methods = GetCharSpriteMethods();
-    self->methods->reset(self, cell);
+    ((CharSpriteResetFn)self->methods->reset)(self, cell);
 }
 ```
 
@@ -33,3 +33,5 @@ void CharSprite__CharSprite(SpriteView_322b4 *self, void *texture, u8 cell) {
 ## Track 4
 
 2026-09-25, round 84 (charlie): D_8006EC74's parent class is unified in `include/ScreenSprite.h` (this class is still its own job). Its call of the parent ctor now goes through the unified table, `GetScreenSpriteMethods()->ctor((ScreenSprite *)self, texture, &r, 0)`: an upcast (no code) and `0` for the ctor's `s32 arg3`, where the deleted `CtorArg3Methods_322b4` view typed it `void *` and took NULL. It is the call that confirms this class's ctor chains to ScreenSprite's. Image byte-identical.
+
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `D8006EC74__D8006EC74`, tier A: the ctor slot (+0x008), `Class__Class`. `self` is `CharSprite *` (was the unit-local `SpriteView_322b4`). The reset call passes the cell, which Class6B5CC's +0x040 slot type does not take, so it casts to `CharSpriteResetFn` (no code), the round-85 Class65650 +0x04C convention. The class name rests on this function: the default cell 0x20 is ASCII space (the header banner has the rest of the evidence). The Source block above is the unified spelling. Image byte-identical.

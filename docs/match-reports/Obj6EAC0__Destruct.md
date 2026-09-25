@@ -8,7 +8,7 @@ Unit: `src/code_2cc8c_f.c`. First attempt.
 void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->unkB4, self->unkA9);
     self->unkB4 = BMemPMgrFree(self->unkB4);
-    GetCharSpriteMethods()->slot0C(self);
+    GetCharSpriteMethods()->finalize((CharSprite *)self);
 }
 ```
 
@@ -56,3 +56,7 @@ self->totalChildCount)`), frees the array pointer itself
 for the same reason as `Construct`: the destructor role is certain from
 the mechanics, the class's broader purpose is not independently
 confirmed.
+
+## Track 4
+
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->finalize((CharSprite *)self)` (was `->slot0C(self)`): an upcast, no code. Image byte-identical.

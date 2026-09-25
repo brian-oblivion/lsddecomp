@@ -17,17 +17,12 @@ Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fre
 ## Source
 
 ```c
-void *GetCharSpriteMethods(void);
-typedef struct CellCtorMethods_322b4 {
-    u8 pad00[0x8];
-    void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = CharSprite__CharSprite */
-} CellCtorMethods_322b4;
-
-void *New_CharSprite(void *texture, u8 cell) {
-    void *obj = BMemPMgrAlloc(0xAC);
+/* Allocate and construct a CharSprite (0xAC bytes): one character cell. */
+CharSprite *New_CharSprite(void *texture, u8 cell) {
+    CharSprite *obj = BMemPMgrAlloc(0xAC);
 
     if (obj != NULL) {
-        ((CellCtorMethods_322b4 *)GetCharSpriteMethods())->ctor(obj, texture, cell);
+        GetCharSpriteMethods()->ctor(obj, texture, cell);
         return obj;
     }
     return NULL;
@@ -41,3 +36,7 @@ Allocator/wrapper whose prologue has the constant arg set (`li a0,K`) BEFORE a c
 ## Naming
 
 - `New_D8006EC74` -- tier A. Allocator: BMemPMgrAlloc(0xAC) then calls the ctor slot -- the "New_<Class>" allocator convention already used throughout the project (New_Sprite, New_Class866E8); mechanics are the whole purpose.
+
+## Track 4
+
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `New_D8006EC74`, tier A: the allocator, `New_<Class>`. Returns `CharSprite *` and calls the ctor through the unified table; the unit-local `CellCtorMethods_322b4` is gone, as are the callers' local declarations (include/code_2cc8c.h's `Obj6EAC0 *(s32, s32)`, class_3bb8c_i's `ChildObj86ED0 *(ChildObj86ED0 *, s32)`); both callers now cast the result to their own field types. The Source block above is the unified spelling. Image byte-identical.
