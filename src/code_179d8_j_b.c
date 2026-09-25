@@ -200,16 +200,16 @@ typedef struct {
 extern Rec34Byte D_8008D9A3[];
 
 /* Same 0x34 stride, halfword field at offset 0 (retail always clears it
- * with `sh`). Three independent arrays share this shape (D_8008D988,
+ * with `sh`). Three independent arrays share this shape (_svm_voice,
  * D_8008D98A and D_8008D98C, each 2 bytes apart in the data section --
  * same "several unrelated top-level symbols" convention as the
- * Rec34D994 group above). D_8008D988's field is read signed
+ * Rec34D994 group above). _svm_voice's field is read signed
  * (SsUtKeyOff compares it against 0xFF with `lh`, not `lhu`). */
 typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half D_8008D988[];
+extern Rec34Half _svm_voice[];
 extern Rec34Half D_8008D98A[];
 extern Rec34Half D_8008D98C[];
 
@@ -409,7 +409,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
     __asm__("");
     D_8008D998[(u8) result].unk0 = D_8008EA13;
     __asm__("");
-    D_8008D988[(u8) result].unk0 = D_8008EA24;
+    _svm_voice[(u8) result].unk0 = D_8008EA24;
     __asm__("");
     pending18 = D_8008EA18;
     D_8008D994[(u8) result].unk0 = p3;
@@ -457,7 +457,7 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
      || D_8008D994[idx].unk0 != p4) {
         goto fail;
     }
-    if (D_8008D988[idx].unk0 == 0xFF) {
+    if (_svm_voice[idx].unk0 == 0xFF) {
         D_8008D9A3[(u8) idx].unk0 = 0;
         D_8008D98C[(u8) idx].unk0 = 0;
         D_8006DAD4[25].unk4 = 0;
@@ -474,7 +474,7 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
         }
         D_8008D9A3[chan].unk0 = 0;
         D_8008D98C[chan].unk0 = 0;
-        D_8008D988[chan].unk0 = 0;
+        _svm_voice[chan].unk0 = 0;
         D_80090C60 = mask0 | D_80090C60;
         D_80090C64 |= mask1;
         D_8008E228 &= ~D_80090C60;
@@ -556,7 +556,7 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
     __asm__("");
     D_8008D998[idx].unk0 = D_8008EA13;
     __asm__("");
-    D_8008D988[idx].unk0 = D_8008EA24;
+    _svm_voice[idx].unk0 = D_8008EA24;
     __asm__("");
     pending18 = D_8008EA18;
     D_8008D994[idx].unk0 = p3;
@@ -618,7 +618,7 @@ s32 SsUtKeyOffV(s16 idx)
     }
     D_8008D9A3[chan].unk0 = 0;
     D_8008D98C[chan].unk0 = 0;
-    D_8008D988[chan].unk0 = 0;
+    _svm_voice[chan].unk0 = 0;
     _snd_ev_flag = 0;
     D_80090C60 = mask0 | D_80090C60;
     D_80090C64 |= mask1;

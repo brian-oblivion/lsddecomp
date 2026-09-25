@@ -29,7 +29,7 @@
  * second copy and shifts the whole image).
  *
  * READ THIS BEFORE STARTING: SsUtAllKeyOff touches the same global family as
- * `code_179d8_m` -- D_8008D988/98A/98C/98E/996/998/99A/99C/9A3 and
+ * `code_179d8_m` -- _svm_voice/98A/98C/98E/996/998/99A/99C/9A3 and
  * D_8006DAD4.  The "split scaled index" entry in
  * docs/DECOMPILATION_LEARNINGS.md (a mask on the PRODUCT means a halfword
  * array indexed by a truncated `idx*8`, NOT a struct array indexed by a cast
@@ -53,7 +53,7 @@ typedef struct {
     u16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34U16;
-extern Rec34U16 D_8008D988[];
+extern Rec34U16 _svm_voice[];
 extern Rec34U16 D_8008D98A[];
 extern Rec34U16 D_8008D98C[];
 extern Rec34U16 D_8008D98E[];
@@ -133,7 +133,7 @@ void SsUtAllKeyOff(void)
     for (i = 0; i < D_8008E9D0; i++) {
         woff = i * 8;
         D_8008D98A[i].unk0 = 0x18;
-        D_8008D988[i].unk0 = 0xFF;
+        _svm_voice[i].unk0 = 0xFF;
         D_8008D9A3[i].unk0 = 0;
         D_8008D98C[i].unk0 = 0;
         D_8008D98E[i].unk0 = 0;
@@ -161,7 +161,7 @@ void SsUtAllKeyOff(void)
 
         D_8008D9A3[bitpos & 0xFFFF].unk0 = 0;
         D_8008D98C[bitpos & 0xFFFF].unk0 = 0;
-        D_8008D988[bitpos & 0xFFFF].unk0 = 0;
+        _svm_voice[bitpos & 0xFFFF].unk0 = 0;
 
         hw0 = D_80090C60;
         hw1 = D_80090C64;

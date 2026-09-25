@@ -131,7 +131,7 @@ extern u8 D_8008D9A3[];
 extern u8 D_8008D98E[];
 extern u8 D_8008D98A[];
 extern u8 D_8008D9A0[];
-extern u8 D_8008D988[];
+extern u8 _svm_voice[];
 extern u8 D_8008E9D0;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
@@ -197,7 +197,7 @@ s32 SpuVmAlloc(void)
     count = D_8008E9D0;
     if ((u8) chosen < count) {
         if (count != 0) {
-            p988 = D_8008D988;
+            p988 = _svm_voice;
             for (idx = 0; (u8) idx < count; idx++) {
                 *(u16 *)(p988 + (u8) idx * 0x34 + 2) =
                     *(u16 *)(D_8008D98A + (u8) idx * 0x34) + 1;
@@ -591,12 +591,12 @@ typedef struct {
     s16 unk0;
     u8 pad2[0x34 - 0x2];
 } Rec34Half_E308;
-extern Rec34Half_E308 gVoiceEnvActive[];
-extern Rec34Half_E308 gVoiceEnvStep[];
-extern Rec34Half_E308 gVoiceEnvInterval[];
-extern Rec34Half_E308 gVoiceEnvCountdown[];
-extern Rec34Half_E308 gVoiceEnvAccum[];
-extern Rec34Half_E308 gVoiceEnvLimit[];
+extern Rec34Half_E308 D_8008D9A4[];
+extern Rec34Half_E308 D_8008D9A6[];
+extern Rec34Half_E308 D_8008D9A8[];
+extern Rec34Half_E308 D_8008D9AA[];
+extern Rec34Half_E308 D_8008D9AC[];
+extern Rec34Half_E308 D_8008D9AE[];
 
 void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
@@ -604,18 +604,18 @@ void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     if (from == to) {
         return;
     }
-    gVoiceEnvActive[voice].unk0 = 1;
-    gVoiceEnvAccum[voice].unk0 = from;
-    gVoiceEnvLimit[voice].unk0 = to;
+    D_8008D9A4[voice].unk0 = 1;
+    D_8008D9AC[voice].unk0 = from;
+    D_8008D9AE[voice].unk0 = to;
     if ((from - to < 0 ? to - from : from - to) < duration) {
         q = duration / (from - to);
-        gVoiceEnvStep[voice].unk0 = 1;
-        gVoiceEnvInterval[voice].unk0 = q;
-        gVoiceEnvCountdown[voice].unk0 = q;
+        D_8008D9A6[voice].unk0 = 1;
+        D_8008D9A8[voice].unk0 = q;
+        D_8008D9AA[voice].unk0 = q;
     } else {
         q = (from - to) / duration;
-        gVoiceEnvInterval[voice].unk0 = 0;
-        gVoiceEnvStep[voice].unk0 = q;
+        D_8008D9A8[voice].unk0 = 0;
+        D_8008D9A6[voice].unk0 = q;
     }
 }
 

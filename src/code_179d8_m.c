@@ -34,7 +34,7 @@
  *     level.
  *   - SetAutoVol: the same accumulate-until-limit shape over its
  *     own gVoiceEnv* family, but with no "Begin" counterpart in this
- *     unit -- whatever sets gVoiceEnvActive/gVoiceEnvStep/gVoiceEnvLimit
+ *     unit -- whatever sets D_8008D9A4/D_8008D9A6/D_8008D9AE
  *     is still undecompiled elsewhere. SeAutoVol in code_179d8_l opens
  *     with the identical prologue/argument-narrowing shape and is worth
  *     checking as that counterpart.
@@ -87,12 +87,12 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34Half;
-extern Rec34Half gVoiceEnvActive[]; /* nonzero while this voice's envelope is still ramping; cleared by SetAutoVol when it reaches gVoiceEnvLimit */
-extern Rec34Half gVoiceEnvStep[]; /* per-tick increment/decrement applied to gVoiceEnvAccum */
-extern Rec34Half gVoiceEnvInterval[]; /* ticks between steps (0 = every tick), same throttle idiom as gVoiceFadeInterval below */
-extern Rec34Half gVoiceEnvCountdown[]; /* countdown to the next step, reloaded from gVoiceEnvInterval */
-extern Rec34Half gVoiceEnvAccum[]; /* running envelope value */
-extern Rec34Half gVoiceEnvLimit[]; /* value the envelope clamps to once reached */
+extern Rec34Half D_8008D9A4[]; /* nonzero while this voice's envelope is still ramping; cleared by SetAutoVol when it reaches D_8008D9AE */
+extern Rec34Half D_8008D9A6[]; /* per-tick increment/decrement applied to D_8008D9AC */
+extern Rec34Half D_8008D9A8[]; /* ticks between steps (0 = every tick), same throttle idiom as D_8008D9B4 below */
+extern Rec34Half D_8008D9AA[]; /* countdown to the next step, reloaded from D_8008D9A8 */
+extern Rec34Half D_8008D9AC[]; /* running envelope value */
+extern Rec34Half D_8008D9AE[]; /* value the envelope clamps to once reached */
 
 typedef struct {
     u16 unk0; /* +0x0 */
@@ -148,26 +148,26 @@ void SetAutoVol(s16 voice)
 
     v = voice;
     off = voice * 8;
-    if (gVoiceEnvInterval[voice].unk0 != 0) {
-        if (gVoiceEnvCountdown[voice].unk0-- > 0) {
+    if (D_8008D9A8[voice].unk0 != 0) {
+        if (D_8008D9AA[voice].unk0-- > 0) {
             return;
         }
-        gVoiceEnvCountdown[voice].unk0 = gVoiceEnvInterval[voice].unk0;
+        D_8008D9AA[voice].unk0 = D_8008D9A8[voice].unk0;
     }
-    gVoiceEnvAccum[voice].unk0 += gVoiceEnvStep[voice].unk0;
-    if (gVoiceEnvStep[voice].unk0 > 0) {
-        if (gVoiceEnvAccum[voice].unk0 >= gVoiceEnvLimit[voice].unk0) {
-            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
-            gVoiceEnvActive[voice].unk0 = 0;
+    D_8008D9AC[voice].unk0 += D_8008D9A6[voice].unk0;
+    if (D_8008D9A6[voice].unk0 > 0) {
+        if (D_8008D9AC[voice].unk0 >= D_8008D9AE[voice].unk0) {
+            D_8008D9AC[voice].unk0 = D_8008D9AE[voice].unk0;
+            D_8008D9A4[voice].unk0 = 0;
         }
-    } else if (gVoiceEnvStep[voice].unk0 < 0) {
-        if (gVoiceEnvAccum[voice].unk0 <= gVoiceEnvLimit[voice].unk0) {
-            gVoiceEnvAccum[voice].unk0 = gVoiceEnvLimit[voice].unk0;
-            gVoiceEnvActive[voice].unk0 = 0;
+    } else if (D_8008D9A6[voice].unk0 < 0) {
+        if (D_8008D9AC[voice].unk0 <= D_8008D9AE[voice].unk0) {
+            D_8008D9AC[voice].unk0 = D_8008D9AE[voice].unk0;
+            D_8008D9A4[voice].unk0 = 0;
         }
     }
 
-    acc = gVoiceEnvAccum[v].unk0;
+    acc = D_8008D9AC[v].unk0;
     D_8008EA10 = acc;
 
     vol = D_8008E970->masterVolume * 0x3FFF;
@@ -219,12 +219,12 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoVol);
  * own local view rather than sharing that file's header-less types.
  * Six independent 2-bytes-apart symbols share this one shape, same
  * idiom as code_179d8_j.c's own D_8008D994/D_8008D996/... family. */
-extern Rec34Half gVoiceFadeActive[]; /* fade-in-progress flag; set by SeAutoPan, cleared by SetAutoPan when gVoiceFadeAccum reaches gVoiceFadeLimit */
-extern Rec34Half gVoiceFadeStep[]; /* per-tick increment/decrement applied to gVoiceFadeAccum */
-extern Rec34Half gVoiceFadeInterval[]; /* ticks between steps (0 = every tick); same throttle idiom as gVoiceEnvInterval above */
-extern Rec34Half gVoiceFadeCountdown[]; /* countdown to the next step, reloaded from gVoiceFadeInterval */
-extern Rec34Half gVoiceFadeAccum[]; /* running interpolated value, initialized to SeAutoPan's "from" argument */
-extern Rec34Half gVoiceFadeLimit[]; /* target value the fade is moving toward, SeAutoPan's "to" argument */
+extern Rec34Half D_8008D9B0[]; /* fade-in-progress flag; set by SeAutoPan, cleared by SetAutoPan when D_8008D9B8 reaches D_8008D9BA */
+extern Rec34Half D_8008D9B2[]; /* per-tick increment/decrement applied to D_8008D9B8 */
+extern Rec34Half D_8008D9B4[]; /* ticks between steps (0 = every tick); same throttle idiom as D_8008D9A8 above */
+extern Rec34Half D_8008D9B6[]; /* countdown to the next step, reloaded from D_8008D9B4 */
+extern Rec34Half D_8008D9B8[]; /* running interpolated value, initialized to SeAutoPan's "from" argument */
+extern Rec34Half D_8008D9BA[]; /* target value the fade is moving toward, SeAutoPan's "to" argument */
 
 void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
     s16 q;
@@ -232,18 +232,18 @@ void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
     if (a1 == a2) {
         return;
     }
-    gVoiceFadeActive[a0].unk0 = 1;
-    gVoiceFadeAccum[a0].unk0 = a1;
-    gVoiceFadeLimit[a0].unk0 = a2;
+    D_8008D9B0[a0].unk0 = 1;
+    D_8008D9B8[a0].unk0 = a1;
+    D_8008D9BA[a0].unk0 = a2;
     if ((a1 - a2 < 0 ? a2 - a1 : a1 - a2) < a3) {
         q = a3 / (a1 - a2);
-        gVoiceFadeStep[a0].unk0 = 1;
-        gVoiceFadeInterval[a0].unk0 = q;
-        gVoiceFadeCountdown[a0].unk0 = q;
+        D_8008D9B2[a0].unk0 = 1;
+        D_8008D9B4[a0].unk0 = q;
+        D_8008D9B6[a0].unk0 = q;
     } else {
         q = (a1 - a2) / a3;
-        gVoiceFadeInterval[a0].unk0 = 0;
-        gVoiceFadeStep[a0].unk0 = q;
+        D_8008D9B4[a0].unk0 = 0;
+        D_8008D9B2[a0].unk0 = q;
     }
 }
 
@@ -269,26 +269,26 @@ void SetAutoPan(s16 voice)
 
     v = voice;
     off = voice * 8;
-    if (gVoiceFadeInterval[voice].unk0 != 0) {
-        if (gVoiceFadeCountdown[voice].unk0-- > 0) {
+    if (D_8008D9B4[voice].unk0 != 0) {
+        if (D_8008D9B6[voice].unk0-- > 0) {
             return;
         }
-        gVoiceFadeCountdown[voice].unk0 = gVoiceFadeInterval[voice].unk0;
+        D_8008D9B6[voice].unk0 = D_8008D9B4[voice].unk0;
     }
-    gVoiceFadeAccum[voice].unk0 += gVoiceFadeStep[voice].unk0;
-    if (gVoiceFadeStep[voice].unk0 > 0) {
-        if (gVoiceFadeAccum[voice].unk0 >= gVoiceFadeLimit[voice].unk0) {
-            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
-            gVoiceFadeActive[voice].unk0 = 0;
+    D_8008D9B8[voice].unk0 += D_8008D9B2[voice].unk0;
+    if (D_8008D9B2[voice].unk0 > 0) {
+        if (D_8008D9B8[voice].unk0 >= D_8008D9BA[voice].unk0) {
+            D_8008D9B8[voice].unk0 = D_8008D9BA[voice].unk0;
+            D_8008D9B0[voice].unk0 = 0;
         }
-    } else if (gVoiceFadeStep[voice].unk0 < 0) {
-        if (gVoiceFadeAccum[voice].unk0 <= gVoiceFadeLimit[voice].unk0) {
-            gVoiceFadeAccum[voice].unk0 = gVoiceFadeLimit[voice].unk0;
-            gVoiceFadeActive[voice].unk0 = 0;
+    } else if (D_8008D9B2[voice].unk0 < 0) {
+        if (D_8008D9B8[voice].unk0 <= D_8008D9BA[voice].unk0) {
+            D_8008D9B8[voice].unk0 = D_8008D9BA[voice].unk0;
+            D_8008D9B0[voice].unk0 = 0;
         }
     }
 
-    acc = *(u8 *) &gVoiceFadeAccum[v].unk0;
+    acc = *(u8 *) &D_8008D9B8[v].unk0;
     D_8008EA11 = acc;
 
     vol = D_8008E970->masterVolume * 0x3FFF;
@@ -357,7 +357,7 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } Rec34S16Edd4;
-extern Rec34S16Edd4 D_8008D988Edd4[] __asm__("D_8008D988");
+extern Rec34S16Edd4 D_8008D988Edd4[] __asm__("_svm_voice");
 extern Rec34S16Edd4 D_8008D996Edd4[] __asm__("D_8008D996");
 extern Rec34S16Edd4 D_8008D99AEdd4[] __asm__("D_8008D99A");
 
@@ -365,10 +365,10 @@ extern Rec34Half D_8008D990[];
 extern Rec34Half D_8008D98C[];
 extern Rec34Half D_8008D98E[];
 extern Rec34Half D_8008D998[];
-extern Rec34Half gVoiceEnvStep[];
-extern Rec34Half gVoiceEnvInterval[];
-extern Rec34Half gVoiceEnvCountdown[];
-extern Rec34Half gVoiceEnvAccum[];
+extern Rec34Half D_8008D9A6[];
+extern Rec34Half D_8008D9A8[];
+extern Rec34Half D_8008D9AA[];
+extern Rec34Half D_8008D9AC[];
 
 typedef struct {
     u16 unk0; /* +0x0 */
@@ -382,7 +382,7 @@ typedef struct {
 } Rec34ByteEdd4;
 extern Rec34ByteEdd4 D_8008D992[]; /* byte field, forced to 0x40 at init */
 extern Rec34ByteEdd4 D_8008D9A3Edd4[] __asm__("D_8008D9A3");
-extern Rec34Half gVoiceEnvActive[];
+extern Rec34Half D_8008D9A4[];
 
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
@@ -463,16 +463,16 @@ void SpuVmInit(s32 a0) {
         D_8008D99CEdd4[(u16) i].unk0 = 0xFF;
         D_8008D990[(u16) i].unk0 = 0;
         D_8008D992[(u16) i].unk0 = 0x40;
-        gVoiceEnvActive[(u16) i].unk0 = 0;
-        gVoiceEnvStep[(u16) i].unk0 = 0;
-        gVoiceEnvInterval[(u16) i].unk0 = 0;
-        gVoiceEnvCountdown[(u16) i].unk0 = 0;
-        gVoiceFadeActive[(u16) i].unk0 = 0;
-        gVoiceFadeStep[(u16) i].unk0 = 0;
-        gVoiceFadeInterval[(u16) i].unk0 = 0;
-        gVoiceFadeCountdown[(u16) i].unk0 = 0;
-        gVoiceFadeAccum[(u16) i].unk0 = 0;
-        gVoiceEnvAccum[(u16) i].unk0 = 0;
+        D_8008D9A4[(u16) i].unk0 = 0;
+        D_8008D9A6[(u16) i].unk0 = 0;
+        D_8008D9A8[(u16) i].unk0 = 0;
+        D_8008D9AA[(u16) i].unk0 = 0;
+        D_8008D9B0[(u16) i].unk0 = 0;
+        D_8008D9B2[(u16) i].unk0 = 0;
+        D_8008D9B4[(u16) i].unk0 = 0;
+        D_8008D9B6[(u16) i].unk0 = 0;
+        D_8008D9B8[(u16) i].unk0 = 0;
+        D_8008D9AC[(u16) i].unk0 = 0;
 
         ((s16 *) D_8006DAD4Edd4)[woff + 3] = 0x200;   /* +0x6 */
         scratch = woff;
@@ -605,7 +605,7 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
  * view -- matches code_179d8_j.c's own Rec34D994 shape (that unit's
  * D_8008D994/D_8008D996/D_8008D99A/D_8008D99C/D_8008D99E family); this
  * unit keeps its own independent view rather than sharing the header-
- * less type. D_8008D988 shares the shape too (read here with `lh`, a
+ * less type. _svm_voice shares the shape too (read here with `lh`, a
  * signed load, unlike D_8008D98C's `lhu`-driven Rec34Half above). */
 typedef struct {
     s16 unk0; /* +0x0 */
@@ -615,7 +615,7 @@ extern Rec34S16 D_8008D994[];
 extern Rec34S16 D_8008D996[];
 extern Rec34S16 D_8008D99A[];
 extern Rec34S16 D_8008D99E[];
-extern Rec34S16 D_8008D988[];
+extern Rec34S16 _svm_voice[];
 
 /* Same 0x34-stride record family, UNSIGNED 16-bit view -- D_8008D99C
  * needs this width (`lhu`) here, and BOTH this width and a plain byte
@@ -879,10 +879,10 @@ void SpuVmFlush(void) {
     D_8008E22C &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
-        if (gVoiceEnvActive[i].unk0 != 0) {
+        if (D_8008D9A4[i].unk0 != 0) {
             SetAutoVol(i);
         }
-        if (gVoiceFadeActive[i].unk0 != 0) {
+        if (D_8008D9B0[i].unk0 != 0) {
             SetAutoPan(i);
         }
     }
@@ -1082,7 +1082,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
                     D_8008D99C[D_8008EA26].unk0 = D_8008EA18;
                     D_8008D994[D_8008EA26].unk0 = a3;
                     D_8008D9A0[D_8008EA26].unk0 = D_8008EA1B;
-                    D_8008D988[D_8008EA26].unk0 = D_8008EA24;
+                    _svm_voice[D_8008EA26].unk0 = D_8008EA24;
 
                     SpuVmDoAllocate();
                     if (D_8008EA24 == 0xFF) {
@@ -1131,7 +1131,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
         if (D_8008D99E[i].unk0 != a1) {
             continue;
         }
-        if (D_8008D988[i].unk0 == 0xFF) {
+        if (_svm_voice[i].unk0 == 0xFF) {
             D_8008D9A3[i].unk0 = 0;
             D_8008D98C[i].unk0 = 0;
             D_8006DAD4->unk194 = 0;
@@ -1152,7 +1152,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
             }
             D_8008D9A3[chan].unk0 = 0;
             D_8008D98C[chan].unk0 = 0;
-            D_8008D988[chan].unk0 = 0;
+            _svm_voice[chan].unk0 = 0;
             D_80090C60 |= lowMask;
             D_80090C64 |= highMask;
             D_8008E228 &= ~D_80090C60;
