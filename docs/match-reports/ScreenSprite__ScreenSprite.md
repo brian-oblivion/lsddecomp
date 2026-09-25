@@ -14,10 +14,12 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 ## Source
 
 ```c
+#include "ScreenSprite.h"
+
 /* gScreenSpriteMethods slot +0x008 (ctor): the Sprite ctor with abr 0 and arg4 NULL,
  * install the table, then reset. */
-void ScreenSprite__ScreenSprite(Sprite *self, void *texture, SpriteRect *rect, s32 arg3) {
-    GetSpriteMethods()->ctor(self, texture, 0, rect, NULL, arg3);
+void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *rect, s32 arg3) {
+    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, rect, NULL, arg3);
     self->methods = GetScreenSpriteMethods();
     self->methods->reset(self);
 }
@@ -26,3 +28,7 @@ void ScreenSprite__ScreenSprite(Sprite *self, void *texture, SpriteRect *rect, s
 ## Naming
 
 - `D8006ED4C__D8006ED4C` -- tier A. Ctor (slot +0x008): the Sprite ctor with abr 0 and a NULL fourth argument, installs the D_8006ED4C table, then resets.
+
+## Track 4
+
+2026-09-25, round 84 (charlie): class unified in `include/ScreenSprite.h`. Renamed from `D8006ED4C__D8006ED4C`, tier A: the ctor slot (+0x008), `Class__Class`. `self` is `ScreenSprite *`; the base call upcasts, `GetSpriteMethods()->ctor((Sprite *)self, texture, 0, rect, NULL, arg3)`. This is the ctor chain that confirms the id tree: Sprite's ctor first, and D8006EC74__D8006EC74 calls this one first. The Source block above is the unified spelling. Image byte-identical.

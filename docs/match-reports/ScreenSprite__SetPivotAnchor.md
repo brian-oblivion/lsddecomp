@@ -14,9 +14,11 @@ Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fres
 ## Source
 
 ```c
+#include "ScreenSprite.h"
+
 /* D_8006EC74 and gScreenSpriteMethods slot +0x0C0: when attached, move the sprite's
  * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
-void ScreenSprite__SetPivotAnchor(Sprite *self, u32 anchor) {
+void ScreenSprite__SetPivotAnchor(ScreenSprite *self, u32 anchor) {
     if (self->parent != NULL) {
         switch (anchor) {
         case 0:
@@ -43,3 +45,7 @@ void ScreenSprite__SetPivotAnchor(Sprite *self, u32 anchor) {
 ## Naming
 
 - `D8006ED4C__SetPivotAnchor` -- tier A. New slot +0x0C0: when attached, moves the embedded GsSPRITE's pivot (mx/my) per a 0..4 anchor code (centre/left/right/top/bottom) -- matches the round-82 broadcast note "pivot setter at +0x0C0" and the round-82 header comment. A plain switch whose mechanics are its purpose.
+
+## Track 4
+
+2026-09-25, round 84 (charlie): class unified in `include/ScreenSprite.h`. Renamed from `D8006ED4C__SetPivotAnchor`, tier A: the +0x0C0 slot's occupant, named `setPivotAnchor` in include/ScreenSprite.h. `self` is `ScreenSprite *` (was `Sprite *`); the accessors are unchanged, `parent` and `sprite.mx/my/w/h`. The Source block above is the unified spelling. Image byte-identical.

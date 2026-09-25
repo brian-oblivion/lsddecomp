@@ -149,3 +149,7 @@ whole body is the load itself (three early-return guards, then build
 stash the result in `self->unk70` if not already loaded) -- a load-if-
 absent action whose mechanics ARE its purpose, same standard as a getter
 or cache-fill.
+
+## Track 4
+
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern (which typed the return `ChildObj86ED0 *`) is gone. The call reads `newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&D_80086EC4, 0)`: D_80086EC4 is the rect (words 0, 160, 120). The unit's baseline "assignment from incompatible pointer type" was this line and is gone. `cardIcon`'s type, Class86E00Unk70Obj_3bb8c_g, is Class86E00's view of a ScreenSprite (release at +0x004, attachToParent at +0x04C with the screen position D_8008AA94 = (-70, -60)); it is Class86E00's field and is left as it is. Image byte-identical.

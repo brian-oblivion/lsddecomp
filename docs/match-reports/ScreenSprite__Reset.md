@@ -19,11 +19,17 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 ## Source
 
 ```c
+#include "ScreenSprite.h"
+
 /* gScreenSpriteMethods slot +0x040 (reset): empty override. */
-void ScreenSprite__Reset(Class6B5CC *self) {
+void ScreenSprite__Reset(ScreenSprite *self) {
 }
 ```
 
 ## Naming
 
 - `D8006ED4C__Reset` -- tier A. Reset override (slot +0x040): empty body. A pure leaf whose mechanics (do nothing) ARE its purpose.
+
+## Track 4
+
+2026-09-25, round 84 (charlie): class unified in `include/ScreenSprite.h`. Renamed from `D8006ED4C__Reset`, tier A: the reset slot (+0x040), empty. `self` is `ScreenSprite *`. The Source block above is the unified spelling. Image byte-identical.

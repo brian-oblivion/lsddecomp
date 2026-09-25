@@ -149,3 +149,7 @@ three-value swap was resolved by touching only the non-persistent one.
 ## Naming
 
 - `Obj86ED0__LoadCardResources` -- tier A. gObj86ED0Methods +0x044 (classtable.py). Resolves 'CARD\\COMINPUT.TIM'/'CARD\\FONTICON.TIM' memory-card paths (sCardPathPrefix/sStrComInput/sStrFontIcon/sTimExt, all this unit's own strings) and loads/wraps them into the three resource handles (unk48/unk44/unk40). String evidence is direct, not inferred.
+
+## Track 4
+
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0)`: D_80086F7C is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position D_8008AACC = (-70, -60). Image byte-identical.

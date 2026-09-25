@@ -299,3 +299,7 @@ cross-unit sibling with the same call skeleton first.
 ## Naming
 
 - `Class86F88__LoadResources` -- tier B. The slot44 occupant (classtable.py gClass86F88Methods +0x044): builds two "CARD\\<name>.TIM" paths, loads them through func_8003B39C/New_D8006ED4C, and dispatches the second through self->methods->slot8C. Mechanics (load a pair of card-icon-shaped resources) are clear from the BuildFileName/CARD path evidence; what the two resources are FOR is not.
+
+## Track 4
+
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (Class86F88Handle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0)`: D_80087028 is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position D_8008AAF8 = (-100, -60). Image byte-identical.
