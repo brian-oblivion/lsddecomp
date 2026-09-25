@@ -405,7 +405,7 @@ void D8006EED8__D8006EED8(D_8006EED8Obj *self, char *name) {
     }
 }
 /* D_8006EED8 slot +0x00C (finalize): clear +0x2C, then the base finalize. */
-void func_800423A8(D_8006EED8Obj *self) {
+void D8006EED8__Finalize(D_8006EED8Obj *self) {
     self->unk2C = 0;
     GetActiveDataSourceMethods()->slot0C(self);
 }

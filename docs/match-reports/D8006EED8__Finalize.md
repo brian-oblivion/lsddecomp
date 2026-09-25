@@ -1,4 +1,6 @@
-# func_800423A8 -- MATCHED (15/15 words), round 82
+# D8006EED8__Finalize -- MATCHED (15/15 words), round 82
+
+> Renamed from `func_800423A8` on 2026-09-25 (tools/rename.py). Address 0x800423a8.
 
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b
 
 ```c
 /* D_8006EED8 slot +0x00C (finalize): clear +0x2C, then the base finalize. */
-void func_800423A8(D_8006EED8Obj *self) {
+void D8006EED8__Finalize(D_8006EED8Obj *self) {
     self->unk2C = 0;
     GetActiveDataSourceMethods()->slot0C(self);
 }
