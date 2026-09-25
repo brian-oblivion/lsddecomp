@@ -10,6 +10,7 @@
  * Nothing here is matched yet: every function is fresh track-1 ground.
  */
 #include "common.h"
+#include "Class6D430.h"
 
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048894);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800488E4);
@@ -20,7 +21,28 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048AAC);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048B78);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048BC0);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048C98);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048CD8);
+/* The D_80081940 object: a Class6D430 data source with its own fields from
+ * +0x2C (local view; only this unit's methods read them). */
+typedef struct D_80081940Obj {
+    CLASS6D430_FIELDS(Class6D430Methods);
+    /* +0x02C */ u8 pad2C[0xC];
+    /* +0x038 */ s32 unk38;
+} D_80081940Obj;
+
+extern u8 D_80081940[];   /* method table, 34 slots */
+extern s32 D_8008A960;
+extern s32 D_8008A964;
+extern s32 D_8008A968;
+extern u8 D_800819CC[];
+extern u8 D_80081A04[];
+extern char *D_8008A96C;  /* -> "SND\\SE" */
+extern const char D_800113DC[];
+extern s16 D_80086170[];
+
+/* slot +0x088 of D_80081940 */
+void func_80048CD8(D_80081940Obj *self, s32 value) {
+    self->unk38 = value;
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048CE0);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048CF0);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048CFC);
