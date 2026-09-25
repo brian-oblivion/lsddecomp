@@ -4,7 +4,7 @@
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint). What it holds: the four methods of
- * D_8006F06C.
+ * gFlatLightObjMethods.
  *
  * All six functions matched in round 81 (alpha).
  */
@@ -12,7 +12,7 @@
 #include "BasicClass.h"
 
 /*
- * The class of D_8006F06C: a BasicClass that owns one Psy-Q flat light.
+ * The class of gFlatLightObjMethods: a BasicClass that owns one Psy-Q flat light.
  * 0x20 bytes (New_FlatLightObj's allocation). Fields past BasicClass's are a
  * GsF_LIGHT (LIBGS.H) at +0x010, handed to GsSetFlatLight by address.
  * LIBGS.H is not included: its prototypes collide in shared headers, so the
@@ -47,7 +47,7 @@ struct FlatLightObj {
 
 extern void *BMemPMgrAlloc(s32 size);
 extern int GsSetFlatLight(int id, FlatLightParams *lt);
-extern FlatLightObjMethods D_8006F06C;
+extern FlatLightObjMethods gFlatLightObjMethods;
 FlatLightObjMethods *Get_vtable_FlatLightObj(void);
 
 FlatLightObj *New_FlatLightObj(s32 lightId) {
@@ -83,5 +83,5 @@ void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
     GsSetFlatLight(self->lightId, &self->light);
 }
 FlatLightObjMethods *Get_vtable_FlatLightObj(void) {
-    return &D_8006F06C;
+    return &gFlatLightObjMethods;
 }

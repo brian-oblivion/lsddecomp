@@ -2520,3 +2520,4 @@ FlatLightObj__SetLightId = 0x800429E0; // type:func
 FlatLightObj__SetColor = 0x800429E8; // type:func
 FlatLightObj__SetDirection = 0x80042A2C; // type:func
 Get_vtable_FlatLightObj = 0x80042A7C; // type:func
+gFlatLightObjMethods = 0x8006F06C;

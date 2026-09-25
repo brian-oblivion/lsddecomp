@@ -2,19 +2,19 @@
 
 > Renamed from `func_80042A7C` on 2026-09-25 (tools/rename.py). Address 0x80042a7c.
 
-**Unit:** `src/code_3311c.c` (carved from `psyq_3311c` in FINISHING-PLAN revision 18). **Class:** method table `D_8006F06C` (class id 0x6, direct BasicClass child), read here as `FlatLightObj`: a 0x20-byte BasicClass holding a Psy-Q light id at +0x00C and a `GsF_LIGHT` (LIBGS.H) at +0x010. The name is a hypothesis from the `GsSetFlatLight` calls, not evidence. Slots resolved with `python3 tools/classtable.py D_8006F06C`.
+**Unit:** `src/code_3311c.c` (carved from `psyq_3311c` in FINISHING-PLAN revision 18). **Class:** method table `gFlatLightObjMethods` (class id 0x6, direct BasicClass child), read here as `FlatLightObj`: a 0x20-byte BasicClass holding a Psy-Q light id at +0x00C and a `GsF_LIGHT` (LIBGS.H) at +0x010. The name is a hypothesis from the `GsSetFlatLight` calls, not evidence. Slots resolved with `python3 tools/classtable.py gFlatLightObjMethods`.
 
 Verified: `./build-and-verify.sh` exit 0, `OK: build matches retail SLPS_015.56`; `tools/funcdiff.py` full match, 0 insertions / 0 deletions.
 
 ## What it does
 
-the class's table getter (`return &D_8006F06C;`), the `Get_vtable_*` shape. Matched first build.
+the class's table getter (`return &gFlatLightObjMethods;`), the `Get_vtable_*` shape. Matched first build.
 
 ## Source
 
 ```c
 FlatLightObjMethods *Get_vtable_FlatLightObj(void) {
-    return &D_8006F06C;
+    return &gFlatLightObjMethods;
 }
 ```
 
