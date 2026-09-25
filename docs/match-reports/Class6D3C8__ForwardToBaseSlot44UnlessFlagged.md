@@ -97,12 +97,12 @@ runner's ownership. See `## Proposed field names` below.
   so the rename needs that call site updated in the same commit as the
   struct definition.
 - **`Class6D3C8Methods.slot4C`** -- NOT proposing a name. Its occupant
-  (`func_8003B110`) is not in this unit and was not derived this round; all
+  (`Class6E4F0__RunMainLoop`) is not in this unit and was not derived this round; all
   that's observable locally is the call shape at `src/main.c:61`
   (`gClass6D3C8->methods->slot4C(gClass6D3C8)`, no extra arguments, dispatched
   once right after `slot44` during startup). That's a call-site pattern, not
   a mechanics derivation of what the function itself does -- naming it from
   that alone would be the "guess at purpose" the naming rules warn against.
-  Left as `slot4C` for whoever carves `func_8003B110`'s own unit.
+  Left as `slot4C` for whoever carves `Class6E4F0__RunMainLoop`'s own unit.
 
 Posted to `tools/broadcast.sh post --from echo`.

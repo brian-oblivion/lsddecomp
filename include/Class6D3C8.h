@@ -59,7 +59,7 @@ typedef struct MiddleClassMethods {
     void *unk40;                                                 /* +0x040 Class6E4F0__SetScreenDims */
     s32 (*slot44)(void *self, void *a1, void *a2, s32 a3);         /* +0x044 Class6E4F0__InitSystems */
     void *unk48;                                                    /* +0x048 Class6E4F0__NoOpSlot48, shared with Class6D3C8 */
-    void *unk4C;                                                     /* +0x04C func_8003B110, shared with Class6D3C8 */
+    void *unk4C;                                                     /* +0x04C Class6E4F0__RunMainLoop, shared with Class6D3C8 */
 } MiddleClassMethods;
 
 extern MiddleClassMethods *func_8003B20C(void);
@@ -104,7 +104,7 @@ typedef struct Class6D3C8Methods {
                                                              * unit's ownership -- see the header's top comment
                                                              * and the round 77 proposed-field-names note. */
     void *unk48;                                            /* +0x048 Class6E4F0__NoOpSlot48 */
-    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C func_8003B110, first dispatched by main
+    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C Class6E4F0__RunMainLoop, first dispatched by main
                                                              * (src/main.c) -- same cross-unit-slot44 reason, not renamed. */
     void (*loadIntroLogoSequence)(Class6D3C8 *self);        /* +0x050 Class6D3C8__LoadIntroLogoSequence */
     void (*startWeeklyStreamTask)(Class6D3C8 *self);        /* +0x054 Class6D3C8__StartWeeklyStreamTask */

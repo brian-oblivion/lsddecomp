@@ -56,8 +56,8 @@ struct Class6E4F0Methods {
     /* +0x040 */ void (*setDims)(Class6E4F0 *self, ScreenDims *dims, s32 arg); /* Class6E4F0__SetScreenDims */
     /* +0x044 */ void (*init)(Class6E4F0 *self, Class6E4F0Source *source, s32 arg); /* Class6E4F0__InitSystems */
     /* +0x048 */ void (*slot48)(Class6E4F0 *self);                             /* Class6E4F0__NoOpSlot48, empty */
-    /* +0x04C */ void (*run)(Class6E4F0 *self);                                /* func_8003B110 */
-    /* +0x050.. the subclass's slots, called by func_8003B110 */
+    /* +0x04C */ void (*run)(Class6E4F0 *self);                                /* Class6E4F0__RunMainLoop */
+    /* +0x050.. the subclass's slots, called by Class6E4F0__RunMainLoop */
     /* +0x050 */ void (*slot50)(Class6E4F0 *self);
     /* +0x054 */ void (*slot54)(Class6E4F0 *self);
     /* +0x058 */ s32 (*slot58)(Class6E4F0 *self);
@@ -128,7 +128,7 @@ void Class6E4F0__InitSystems(Class6E4F0 *self, Class6E4F0Source *source, s32 arg
 void Class6E4F0__NoOpSlot48(Class6E4F0 *self) {
 }
 
-void func_8003B110(Class6E4F0 *self) {
+void Class6E4F0__RunMainLoop(Class6E4F0 *self) {
     s32 status;
 
     if (self->initialized) {
