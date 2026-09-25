@@ -1,4 +1,6 @@
-# new_class_6d4e8 -- MATCHED (20/20 words)
+# New_Class6D4E8 -- MATCHED (20/20 words)
+
+> Renamed from `new_class_6d4e8` on 2026-09-25 (tools/rename.py). Address 0x800271d8.
 
 Unit `code_179d8_o`, round 26 (2026-09-09). The unit's "new" function: allocate
 an instance and dispatch to its constructor through the class's own method
@@ -12,20 +14,20 @@ instead with `tools/classtable.py 0x8006D4E8 --vs 0x8006B58C` (comparing
 against `D_8006B58C`, the 14-slot table for the project's "BasicClass"
 hierarchy, whose constructor `BasicClass__BasicClass` sits at `+0x008`).
 `D_8006D4E8` overrides exactly three slots relative to `D_8006B58C`
-(`+0x004`, `+0x008`, `+0x00C` -- `DestroyChained`, `func_80027228`,
-`func_80027274`), inherits `+0x010..+0x038` verbatim (identical
+(`+0x004`, `+0x008`, `+0x00C` -- `DestroyChained`, `Class6D4E8__Class6D4E8`,
+`Class6D4E8__Destroy`), inherits `+0x010..+0x038` verbatim (identical
 `BasicClass__func_*` addresses in both tables), and adds new slots from
 `+0x040` up that `D_8006B58C` doesn't have at all (including this unit's own
-`func_800272C8`). Since `+0x008` is confirmed as the constructor slot in the
-BASE table, `new_class_6d4e8` allocating and then calling through that same
-slot on ITS OWN table (which resolves to `func_80027228`, this unit's next
+`Class6D4E8__NoOpSlot40`). Since `+0x008` is confirmed as the constructor slot in the
+BASE table, `New_Class6D4E8` allocating and then calling through that same
+slot on ITS OWN table (which resolves to `Class6D4E8__Class6D4E8`, this unit's next
 function) is a genuine "allocate + construct" pair -- confirmed by the table
 lookup, not assumed from the name.
 
 ## What it is
 
 ```c
-Obj6D4E8 *new_class_6d4e8(void)
+Obj6D4E8 *New_Class6D4E8(void)
 {
     Obj6D4E8 *self;
 
@@ -43,7 +45,7 @@ Obj6D4E8 *new_class_6d4e8(void)
 codebase). `GetClass6D4E8Methods` (still `INCLUDE_ASM` in the `code_179d8`
 remainder) returns this class's own table, `&D_8006D4E8`, typed here as
 `Obj6D4E8Methods *` (a local view -- see the unit header comment and the
-sibling reports for `func_80027228`/`func_80027274`, which establish the
+sibling reports for `Class6D4E8__Class6D4E8`/`Class6D4E8__Destroy`, which establish the
 struct's other slots).
 
 ## A residue worth recording: return-statement PLACEMENT, not phrasing
@@ -76,3 +78,22 @@ a function.
   which of the two logical outcomes is written as the trailing statement
   before concluding the residue is unfixable -- cheap to test on a 20-word
   function, and it closed this one on the very next attempt.
+
+## Naming
+
+Round 79 (delta).
+
+- **`New_Class6D4E8`** (was FirecatFG's `new_class_6d4e8`) -- **tier A**.
+  Body alone: `BMemPMgrAlloc(0x2C)`, and on success dispatches
+  `GetClass6D4E8Methods()->ctor` (table +0x008, which classtable.py
+  resolves to `Class6D4E8__Class6D4E8`) on the new block, returning it, or
+  NULL. The inherited hypothesis is confirmed; only the spelling changes to
+  the project's `New_Class` convention. No direct caller in `asm/` or `src/`
+  (grep for the name and for `800271D8`), so the caller is not known; the
+  name rests on the body.
+- `0x2C` is now `CLASS6D4E8_SIZE`, the allocation size. The unit's
+  `Class6D4E8` struct is a partial view and is NOT claimed to be complete,
+  which is why this is a constant and not `sizeof`.
+- Local types renamed to the tree's class prefix: `Obj6D4E8` ->
+  `Class6D4E8`, `Obj6D4E8Methods` -> `Class6D4E8Methods` (the prefix every
+  other method of this class already carries in code_179d8_q.c).

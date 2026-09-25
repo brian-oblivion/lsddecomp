@@ -244,7 +244,7 @@ setjmp = 0x80025484; // type:func  (Psy-Q libc2/setjmp, from the SDK object)
 longjmp = 0x800254C0; // type:func  (Psy-Q libc2/setjmp, from the SDK object)
 New_Class6D3C8 = 0x80025F7C;
 strcat = 0x80027130;
-new_class_6d4e8 = 0x800271D8;
+New_Class6D4E8 = 0x800271D8;
 strcpy = 0x80028B78; // type:func  (Psy-Q libc2/strcpy, from the SDK object, FirecatFG had the name)
 strstr = 0x80028BBC; // type:func  (Psy-Q libc2/strstr, from the SDK object, FirecatFG had the name)
 CdStatus = 0x80028C34; // type:func  (Psy-Q libcd/sys, from the SDK object, FirecatFG had the name)
@@ -2427,3 +2427,6 @@ Obj86B60__func_8003CCDC = 0x8003CCDC; // type:func
 // position right after placed libsnd/vm_prog in the SsUt*/SpuVm* run; best
 // shape SpuVmSetVol (0.51, 3.5). No disc carries this build.
 SpuVmSetVol = 0x80030980; // type:func
+Class6D4E8__Class6D4E8 = 0x80027228; // type:func
+Class6D4E8__Destroy = 0x80027274; // type:func
+Class6D4E8__NoOpSlot40 = 0x800272C8; // type:func

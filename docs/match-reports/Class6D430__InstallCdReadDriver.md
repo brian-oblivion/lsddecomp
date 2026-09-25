@@ -68,7 +68,7 @@ elsewhere in the tree (`src/code_179d8_q.c`'s own header comment) as "the
 CD-ROM read driver", not a guess coined here. WHICH broader class or game
 subsystem this function itself belongs to (why a `Class6D430` instance gets
 reclassified this way here, distinct from `src/code_179d8_o.c`'s own
-confirmed ctor `func_80027228` for the same `D_8006D4E8` class) is NOT
+confirmed ctor `Class6D4E8__Class6D4E8` for the same `D_8006D4E8` class) is NOT
 established -- no caller is visible yet (only referenced from the
 still-uncarved `code_179d8` remainder) and this is flagged as such rather
 than guessed at. See `Class6D430__DestroyCdReadDriver.md` for the paired

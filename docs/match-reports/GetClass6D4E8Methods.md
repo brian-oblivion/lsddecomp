@@ -12,8 +12,8 @@ vtable is `D_8006D4E8` (29 slots, header word `0x13`, resolved with
 
 - `+0x004` `DestroyChained` (own-class slot, shared with `D_8006D430` at the
   identical offset)
-- `+0x008` `func_80027228` (ctor, by the project's `+0x008` convention)
-- `+0x00C` `func_80027274` (dtor)
+- `+0x008` `Class6D4E8__Class6D4E8` (ctor, by the project's `+0x008` convention)
+- `+0x00C` `Class6D4E8__Destroy` (dtor)
 - `+0x010`..`+0x038` the 13 inherited `BasicClass__func_*` slots, verbatim
 - `+0x040`..`+0x074` own slots, including `Class6D4E8__RequestLoadFile`/`Class6D4E8__StopCdService`/
   `Class6D4E8__CancelRequests` (this unit's next three queued functions, at `+0x06C`/
