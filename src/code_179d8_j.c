@@ -48,8 +48,11 @@
  * func_800308B8 and func_8003092C were all on that WORKABLE list, all four
  * screened clean on every blocker, and all four were Sony's.
  *
- * func_800303FC is a two-instruction `jr $ra; nop` leaf that splat emitted as
- * C itself.  It was never work; do not count it as one.
+ * KeyOnCheck is a two-instruction `jr $ra; nop` leaf that splat emitted as
+ * C itself.  It was never work; do not count it as one.  It is Sony's too:
+ * libsnd/vmanager's internal KeyOnCheck (round 79, position inside the
+ * object; see its symbols entry).  ROUND 79: this unit now holds NO game
+ * code -- all eight functions are libsnd/vmanager's.
  *
  * Expect this slice to span more than one class; identify each with
  * tools/classtable.py rather than assuming the unit has one.  Keep every
@@ -119,7 +122,7 @@ s32 SpuVmSeKeyOff(s16 p0, s16 p1, u16 p2)
     return SpuVmKeyOff(0x21, p0, p1, p2);
 }
 
-void func_800303FC(void) {
+void KeyOnCheck(void) {
 }
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j", SpuVmSetSeqVol);

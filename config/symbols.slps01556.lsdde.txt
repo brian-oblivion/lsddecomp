@@ -2487,3 +2487,11 @@ SetCueTones18_3_3 = 0x80063CAC; // type:func
 ROTATION_ZPLUS1 = 0x80089CD0;
 ROTATION_ZMINUS9 = 0x80089CDC;
 TRANSLATE_Y_MINUS256 = 0x80089D90;
+// identified: libsnd/vmanager KeyOnCheck (disc 3.3), internal (not in
+// LIBSND.H). Fingerprint EXACT masked 1.00 but TINY (2 words, `jr ra; nop`);
+// position settles it: vmanager.o's own layout SpuVmSeKeyOn 0x314C,
+// SpuVmSeKeyOff 0x3238, KeyOnCheck 0x326C, SpuVmSetSeqVol 0x3274 reproduces
+// retail's gaps (0xEC, 0x34, 0x8) exactly around this address, both
+// neighbours already identified as that object. Round 79 (bravo's finding
+// as a naming runner, applied by the head).
+KeyOnCheck = 0x800303FC; // type:func
