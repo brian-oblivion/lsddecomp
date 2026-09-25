@@ -1,4 +1,6 @@
-# Class86668__SetChildFlag8
+# Class86668__PlaySound
+
+> Renamed from `Class86668__SetChildFlag8` on 2026-09-25 (tools/rename.py). Address 0x8004a478.
 
 > Renamed from `func_8004A478` on 2026-09-22 (tools/rename.py). Address 0x8004a478.
 
@@ -37,7 +39,7 @@ convention fills `$a0..$a3` in order with no gaps: if the call had only three
 real arguments (self + two literals), the literals would occupy `$a1`/`$a2`,
 not `$a2`/`$a3`. Since they demonstrably occupy the *third* and *fourth*
 argument slots, `$a1` must be a real (fourth total, second real) argument —
-which can only be `Class86668__SetChildFlag8`'s own second parameter, forwarded unchanged
+which can only be `Class86668__PlaySound`'s own second parameter, forwarded unchanged
 (no `move` needed since it's already resident in the right register).
 
 Named the two classes by vtable address per project convention (see

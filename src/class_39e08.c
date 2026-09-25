@@ -282,7 +282,7 @@ void Class86668__Class86668(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
     self->methods->resetState(self);
 }
 
-void Class86668__Dtor(Obj865C8 *self) {
+void Class86668__Finalize(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }
@@ -303,7 +303,7 @@ void Class86668__Deinit(Obj865C8 *self) {
     Get_vtable_IntermediateBase()->deinit((IntermediateBase *)self);
 }
 
-void Class86668__Noop58(void) {
+void Class86668__NoOpSlot58(void) {
 }
 
 void Class86668__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
@@ -313,7 +313,7 @@ void Class86668__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
     }
 }
 
-void Class86668__OnEventArg(Obj865C8 *self, s32 arg1) {
+void Class86668__SetState(Obj865C8 *self, s32 arg1) {
     Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, arg1);
     if (arg1 == 4) {
         self->eventCode = 1;

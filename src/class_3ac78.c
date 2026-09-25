@@ -33,7 +33,7 @@
 #include "class_3ac78.h"
 #include "Class6B5CC.h"
 
-void Class86668__SetChildFlag8(Class86668 *self, s32 value)
+void Class86668__PlaySound(Class86668 *self, s32 value)
 {
     Class866E8 *sub = self->unk34;
 

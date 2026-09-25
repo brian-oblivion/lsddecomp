@@ -110,7 +110,7 @@ only ever reads the struct field once per step. 74/74 on the rebuild.
 - `Class865C8Methods::dtor` (+0x00C) and `::slot14` (+0x014) typed (were
   untyped placeholders / grouped `void *` padding).
 - `Class86668Methods::dtor` added at +0x00C, typed from this function's own
-  `GetClass86668Methods()->dtor(self)` call — occupied by `Class86668__Dtor`
+  `GetClass86668Methods()->dtor(self)` call — occupied by `Class86668__Finalize`
   (already matched), the sibling class's own dtor override.
 - New opaque type `SubObjG`/`SubObjGMethods` — a self-consuming "step"
   object: `slot4` takes and returns the same type. Confirmed at SIX

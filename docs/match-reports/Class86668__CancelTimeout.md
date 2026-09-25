@@ -7,7 +7,7 @@
 ## What it does
 
 Method-table slot +0x040 of `gClass86668Methods` (the sibling class, see
-`Class86668__Dtor.md` for how the sibling relationship was established). A
+`Class86668__Finalize.md` for how the sibling relationship was established). A
 one-line wrapper: dispatches through `self->methods` at +0x06C with a
 sentinel argument of -1.
 

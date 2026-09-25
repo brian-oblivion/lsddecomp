@@ -8,7 +8,7 @@
  * OnEventArg, SetTimeout) sit at the same offsets in BOTH gClass86668Methods
  * (0x80086668, 28 slots, the base) and Obj865C8's table (0x800865C8, 33
  * slots), and lie in ROM between Class86668's dtor and
- * Class86668__SetChildFlag8: they are Class86668 methods that Obj865C8
+ * Class86668__PlaySound: they are Class86668 methods that Obj865C8
  * inherits, so they carry the Class86668__ prefix. */
 /*
  * round 73 (alpha), track-3 naming pass: 25 of this unit's 26 functions
@@ -101,15 +101,15 @@ typedef struct Class865C8Methods {
     void *slot4C;                                  /* +0x04C Obj865C8__StartSubA */
     void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 Obj865C8__RunSubUpdates */
     void *slot54;                                  /* +0x054 Obj865C8__AdvanceState */
-    void (*noop58)(void);                          /* +0x058 Class86668__Noop58 (no-op, matched) */
+    void (*noop58)(void);                          /* +0x058 Class86668__NoOpSlot58 (no-op, matched) */
     void *slot5C;                                  /* +0x05C Class86668__CheckTimeout */
     /* Shared with gClass86668Methods (see Class86668Methods below) -- literally the
      * same function address at the same offset in both tables. */
-    void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 Class86668__OnEventArg */
+    void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 Class86668__SetState */
     void *unk64, *unk68;                           /* shared base slots (IntermediateBase__OnState2 / IntermediateBase__OnState3) */
     /* Also shared with gClass86668Methods at the same offset. */
     void (*setTimeout)(Obj865C8 *self, s32 arg1);    /* +0x06C Class86668__SetTimeout */
-    void *unk70;                                   /* Class86668__SetChildFlag8 */
+    void *unk70;                                   /* Class86668__PlaySound */
     void *unk74, *unk78;                           /* null slots */
     void (*noop7C)(Obj865C8 *self);                /* +0x07C Obj865C8__Noop7C (no-op, matched) */
     /* Retyped from `void (*noop80)(void)`: Obj865C8__OnNotify dispatches this
@@ -168,7 +168,7 @@ struct SubObjF {
 };
 
 /* Opaque view of whatever object Obj865C8::subB points to (used only by
- * Class86668__Dtor, guarded by Obj865C8::unk30): same "vtable at offset 0,
+ * Class86668__Finalize, guarded by Obj865C8::unk30): same "vtable at offset 0,
  * only slot +0x004 named" policy. */
 typedef struct SubObjBMethods {
     u8 pad00[0x04];
@@ -309,17 +309,17 @@ struct Obj865C8 {
     s32 frameCounter;              /* +0x01C, Class86668__CheckTimeout */
     u8 pad20[0x28 - 0x20];
     /* +0x028. Renamed from `unk28`: carries a small code (1/2/3) that
-     * Obj865C8__OnTag2Notify and Class86668__OnEventArg set before dispatching
+     * Obj865C8__OnTag2Notify and Class86668__SetState set before dispatching
      * `self->methods->onEventArg(self, 3)` -- an event/result code, not a
      * state (see `state` below, a separate field). */
-    s32 eventCode;                 /* +0x028, Class86668__OnEventArg */
+    s32 eventCode;                 /* +0x028, Class86668__SetState */
     /* +0x02C. Renamed from `unk2C`: set only by Class86668__SetTimeout, which
      * stores its argument verbatim if negative (disabled) or multiplied by
      * 20 otherwise (a units-to-frames conversion); compared against
      * `frameCounter` by Class86668__CheckTimeout. */
     s32 timeoutFrames;             /* +0x02C, Class86668__SetTimeout */
-    s32 unk30;                    /* +0x030, Class86668__Dtor (guard) */
-    SubObjB *subB;                /* +0x034, Class86668__Dtor */
+    s32 unk30;                    /* +0x030, Class86668__Finalize (guard) */
+    SubObjB *subB;                /* +0x034, Class86668__Finalize */
     SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
                                        through as a plain register value to
                                        unk4C->methods->slot44's 3rd arg (IntermediateBase's init slot) by Obj865C8__EnterState2 */
@@ -369,12 +369,12 @@ extern Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 typedef struct Class86668Methods {
     u8 pad00[0x08];
     void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 Class86668__Class86668 */
-    /* Class86668__Dtor (this unit, matched): the sibling class's own dtor
+    /* Class86668__Finalize (this unit, matched): the sibling class's own dtor
      * override. Called by Obj865C8__Dtor (D_800865C8's own dtor) as
      * GetClass86668Methods()->dtor(self) -- a base-class dtor forwarding to a
      * DIFFERENT sibling's override, same shape as slot38/slot44/slot48
      * below. */
-    void (*dtor)(Obj865C8 *self);                          /* +0x00C Class86668__Dtor */
+    void (*dtor)(Obj865C8 *self);                          /* +0x00C Class86668__Finalize */
     u8 pad10[0x38 - 0x10];
     /* Inherited, shared verbatim with D_800865C8's own occupant of this
      * offset (Obj865C8__OnNotify, this unit): gClass86668Methods's own +0x038 is

@@ -1,4 +1,6 @@
-# Class86668__Dtor
+# Class86668__Finalize
+
+> Renamed from `Class86668__Dtor` on 2026-09-25 (tools/rename.py). Address 0x8004a228.
 
 > Renamed from `func_8004A228` on 2026-09-23 (tools/rename.py). Address 0x8004a228.
 
@@ -39,7 +41,7 @@ jalr  $v0
 Written as:
 
 ```c
-void Class86668__Dtor(Obj865C8 *self) {
+void Class86668__Finalize(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }

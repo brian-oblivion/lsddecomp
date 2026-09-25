@@ -197,7 +197,7 @@ struct Class866E8Methods {
     /* +0x03C */ u8 pad03C[0x040 - 0x03C];
     /* +0x040 */ void (*reset)(Class866E8 *self);                              /* Class866E8__Reset; called by Class866E8__SetConfig */
     /* +0x044 */ u8 pad044[0x080 - 0x044];
-    /* +0x080 */ void (*setFlag8)(Class866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* Class6B5CC__GetSetUnk10Flag8; called by Class86668__SetChildFlag8 through Class86668::unk34 */
+    /* +0x080 */ void (*setFlag8)(Class866E8 *self, s32 arg1, s32 arg2, s32 arg3); /* Class6B5CC__GetSetUnk10Flag8; called by Class86668__PlaySound through Class86668::unk34 */
     /* +0x084 */ u8 pad084[0x088 - 0x084];
     /* +0x088 */ void (*onElementEvent)(Class866E8 *self, s32 command, void *elem, s32 index); /* Class866E8__OnElementEvent; called by Class866E8__ResetAllElements with a 4th arg AA6C's own body never reads */
     /* +0x08C */ u8 pad08C[0x0B8 - 0x08C];
@@ -286,8 +286,8 @@ extern void *BMemPMgrAlloc(s32 size);
 /*
  * Class86668 -- vtable gClass86668Methods (28 slots, header 0x230), resolved with
  * tools/classtable.py gClass86668Methods. Its own last slot (+0x070) is
- * Class86668__SetChildFlag8, which is the only reason this class is visible from this
- * unit at all: Class86668__SetChildFlag8 dispatches through a Class866E8 instance held
+ * Class86668__PlaySound, which is the only reason this class is visible from this
+ * unit at all: Class86668__PlaySound dispatches through a Class866E8 instance held
  * at Class86668::unk34. Everything else about Class86668 is unknown.
  */
 struct Class86668Methods {
@@ -298,7 +298,7 @@ struct Class86668Methods {
 struct Class86668 {
     /* +0x000 */ Class86668Methods *methods;
     /* +0x004 */ u8 pad004[0x034 - 0x004];
-    /* +0x034 */ Class866E8 *unk34;          /* Class86668__SetChildFlag8 dispatches through this, guarded by a NULL check */
+    /* +0x034 */ Class866E8 *unk34;          /* Class86668__PlaySound dispatches through this, guarded by a NULL check */
 };
 
 extern Class86668Methods gClass86668Methods;

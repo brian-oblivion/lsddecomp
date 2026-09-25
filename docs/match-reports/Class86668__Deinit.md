@@ -7,7 +7,7 @@
 ## What it does
 
 Method-table slot +0x048 of `gClass86668Methods` (the sibling class; see
-`Class86668__Dtor.md`). Calls the BASE class's own +0x048 slot (fetched through
+`Class86668__Finalize.md`). Calls the BASE class's own +0x048 slot (fetched through
 `Get_vtable_IntermediateBase()`) directly on `self` -- an explicit "call the base
 implementation" pattern, not a self-vtable dispatch.
 

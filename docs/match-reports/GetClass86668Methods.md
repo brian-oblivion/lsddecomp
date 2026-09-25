@@ -30,7 +30,7 @@ this function only takes its address).
 ## Proposed learning
 
 None beyond what's already documented for `Class86668`/`Class866E8` in
-`Class86668__SetChildFlag8.md` and `New_Class866E8.md`.
+`Class86668__PlaySound.md` and `New_Class866E8.md`.
 
 ## Naming
 
