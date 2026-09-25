@@ -1,4 +1,6 @@
-# Class86668__Dtor
+# Class86668__Finalize
+
+> Renamed from `Class86668__Dtor` on 2026-09-25 (tools/rename.py). Address 0x8004a228.
 
 > Renamed from `func_8004A228` on 2026-09-23 (tools/rename.py). Address 0x8004a228.
 
@@ -39,7 +41,7 @@ jalr  $v0
 Written as:
 
 ```c
-void Class86668__Dtor(Obj865C8 *self) {
+void Class86668__Finalize(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }
@@ -66,3 +68,7 @@ inherited/override code as a subclass relationship.
 ## Naming
 
 `Class86668__Dtor` -- tier A. The sibling class's own dtor override (+0x00C), releasing `subB` when owned and forwarding to the base dtor.
+
+## Track 4
+
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `Get_vtable_IntermediateBase()->finalize`. `self` is `Class86668 *`; `unk30`/`subB` are `soundBankPath`/`sound`. Obj865C8__Dtor and ObjM__Dtor reach it as `GetClass86668Methods()->finalize((Class86668 *)self)`. Image byte-identical.

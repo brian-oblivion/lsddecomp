@@ -2,13 +2,13 @@
 #define CLASS_39E08_H
 
 #include "common.h"
-#include "IntermediateBase.h"
+#include "Class86668.h"
 
 /* Round 73 head correction: slots +0x058..+0x06C (Noop58, CheckTimeout,
  * OnEventArg, SetTimeout) sit at the same offsets in BOTH gClass86668Methods
  * (0x80086668, 28 slots, the base) and Obj865C8's table (0x800865C8, 33
  * slots), and lie in ROM between Class86668's dtor and
- * Class86668__SetChildFlag8: they are Class86668 methods that Obj865C8
+ * Class86668__PlaySound: they are Class86668 methods that Obj865C8
  * inherits, so they carry the Class86668__ prefix. */
 /*
  * round 73 (alpha), track-3 naming pass: 25 of this unit's 26 functions
@@ -17,12 +17,12 @@
  *
  * The class whose method table is D_800865C8 (33 slots, `Obj865C8` --
  * resolved with tools/classtable.py 0x800865C8 -- diff against 0x8006E878
- * to see the override set), plus a sibling table gClass86668Methods
- * (`Class86668`, 28 slots, named by class_3ac78.c which reached it first)
- * whose instances share `Obj865C8`'s own layout. Both extend the shared
- * `IntermediateBase` base (include/IntermediateBase.h). No
- * FirecatFG name survives for either class, so fields are named by offset
- * until real names are known.
+ * to see the override set), plus the methods of its parent, Class86668
+ * (gClass86668Methods, 0x230, whose header is include/Class86668.h; track 4,
+ * round 84), from New_Class86668 on. Obj865C8 and Class865C8Methods below are
+ * D_800865C8's own views and still spell out the parent's fields and slots
+ * (a later track-4 job). No FirecatFG name survives for either class, so
+ * fields are named by offset until real names are known.
  *
  * `Obj865C8__Obj865C8` (the ctor) constructs one `SubObjD` handed in by the
  * caller, one `SubObjB` VAB sound stream (`New_VabStreamObj`), and loads two
@@ -90,8 +90,8 @@ typedef struct Class865C8Methods {
     void *unk20, *unk24, *unk28, *unk2C;           /* BasicClass, inherited */
     void *unk30, *unk34;                           /* BasicClass, inherited */
     /* Occupied here by Obj865C8__OnNotify itself; only reachable from THIS
-     * struct via GetClass86668Methods()'s own gClass86668Methods view of the same offset
-     * (Class86668Methods::slot38 below), where it forwards to the inherited
+     * struct via GetClass86668Methods() (Class86668Methods::onNotify,
+     * include/Class86668.h), where it forwards to the inherited
      * IntermediateBase__OnNotify. */
     void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 Obj865C8__OnNotify */
     void *unk3C;                                   /* +0x03C null slot */
@@ -101,15 +101,15 @@ typedef struct Class865C8Methods {
     void *slot4C;                                  /* +0x04C Obj865C8__StartSubA */
     void (*runSubUpdates)(Obj865C8 *self);         /* +0x050 Obj865C8__RunSubUpdates */
     void *slot54;                                  /* +0x054 Obj865C8__AdvanceState */
-    void (*noop58)(void);                          /* +0x058 Class86668__Noop58 (no-op, matched) */
+    void (*noop58)(void);                          /* +0x058 Class86668__NoOpSlot58 (no-op, matched) */
     void *slot5C;                                  /* +0x05C Class86668__CheckTimeout */
-    /* Shared with gClass86668Methods (see Class86668Methods below) -- literally the
+    /* Shared with gClass86668Methods (include/Class86668.h) -- literally the
      * same function address at the same offset in both tables. */
-    void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 Class86668__OnEventArg */
+    void (*onEventArg)(Obj865C8 *self, s32 arg1);  /* +0x060 Class86668__SetState */
     void *unk64, *unk68;                           /* shared base slots (IntermediateBase__OnState2 / IntermediateBase__OnState3) */
     /* Also shared with gClass86668Methods at the same offset. */
     void (*setTimeout)(Obj865C8 *self, s32 arg1);    /* +0x06C Class86668__SetTimeout */
-    void *unk70;                                   /* Class86668__SetChildFlag8 */
+    void *unk70;                                   /* Class86668__PlaySound */
     void *unk74, *unk78;                           /* null slots */
     void (*noop7C)(Obj865C8 *self);                /* +0x07C Obj865C8__Noop7C (no-op, matched) */
     /* Retyped from `void (*noop80)(void)`: Obj865C8__OnNotify dispatches this
@@ -168,7 +168,7 @@ struct SubObjF {
 };
 
 /* Opaque view of whatever object Obj865C8::subB points to (used only by
- * Class86668__Dtor, guarded by Obj865C8::unk30): same "vtable at offset 0,
+ * Class86668__Finalize, guarded by Obj865C8::unk30): same "vtable at offset 0,
  * only slot +0x004 named" policy. */
 typedef struct SubObjBMethods {
     u8 pad00[0x04];
@@ -289,9 +289,10 @@ struct SubObjD {
     SubObjDMethods *methods;
 };
 
-/* Object size unconfirmed (this unit never allocates one of these itself --
- * New_Class86668 allocates the SIBLING class below instead). Field offsets
- * are only the ones this round's functions touch. */
+/* 0x50 bytes (New_Obj865C8). Offsets +0x000..+0x037 are Class86668's
+ * (include/Class86668.h: result, timeoutFrames, soundBankPath and sound are
+ * this view's eventCode, timeoutFrames, unk30 and subB). Field offsets are
+ * only the ones this unit's functions touch. */
 struct Obj865C8 {
     Class865C8Methods *methods;   /* +0x000 */
     u8 pad04[0x0C - 0x04];
@@ -309,17 +310,17 @@ struct Obj865C8 {
     s32 frameCounter;              /* +0x01C, Class86668__CheckTimeout */
     u8 pad20[0x28 - 0x20];
     /* +0x028. Renamed from `unk28`: carries a small code (1/2/3) that
-     * Obj865C8__OnTag2Notify and Class86668__OnEventArg set before dispatching
+     * Obj865C8__OnTag2Notify and Class86668__SetState set before dispatching
      * `self->methods->onEventArg(self, 3)` -- an event/result code, not a
      * state (see `state` below, a separate field). */
-    s32 eventCode;                 /* +0x028, Class86668__OnEventArg */
+    s32 eventCode;                 /* +0x028, Class86668__SetState */
     /* +0x02C. Renamed from `unk2C`: set only by Class86668__SetTimeout, which
      * stores its argument verbatim if negative (disabled) or multiplied by
      * 20 otherwise (a units-to-frames conversion); compared against
      * `frameCounter` by Class86668__CheckTimeout. */
     s32 timeoutFrames;             /* +0x02C, Class86668__SetTimeout */
-    s32 unk30;                    /* +0x030, Class86668__Dtor (guard) */
-    SubObjB *subB;                /* +0x034, Class86668__Dtor */
+    s32 unk30;                    /* +0x030, Class86668__Finalize (guard) */
+    SubObjB *subB;                /* +0x034, Class86668__Finalize */
     SubObjD *unk38;                /* +0x038, Obj865C8__Deinit dereferences (->methods); passed
                                        through as a plain register value to
                                        unk4C->methods->slot44's 3rd arg (IntermediateBase's init slot) by Obj865C8__EnterState2 */
@@ -338,8 +339,9 @@ struct Obj865C8 {
     Obj4C *unk4C;                 /* +0x04C, Obj865C8__EnterState2 -- result of New_ObjM */
 };
 
-/* The base class of D_800865C8 and gClass86668Methods is IntermediateBase
- * (gIntermediateBaseMethods): include/IntermediateBase.h (track 4). */
+/* The parent class of D_800865C8 (and of D_80087034) is Class86668
+ * (gClass86668Methods): include/Class86668.h (track 4). Obj865C8's fields up
+ * to +0x038 and its table's slots up to +0x07C are that class's. */
 
 /* Allocator in the still-uncarved unit class_3bb8c (asm/class_3bb8c.s):
  * allocates an 0x88-byte instance, ctors it, and dispatches its own slot
@@ -350,74 +352,18 @@ struct Obj865C8 {
  * scalar args are untyped beyond their register width. */
 extern Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
-/* A sibling class (gClass86668Methods, 28 slots) that overrides several of
- * D_800865C8's slots (+0x008, +0x00C, +0x040, +0x044, +0x048) while sharing
- * the rest verbatim (+0x058..+0x070, confirmed identical function
- * addresses in both tables by tools/classtable.py). Constructed by
- * New_Class86668, a New_X allocator (0x38-byte instance). Instances share
- * `Obj865C8`'s own layout (Class86668__Class86668 writes `unk30`/`subB` at the exact
- * same offsets `Obj865C8`'s other functions already use), so this class's
- * own instances are typed `Obj865C8 *` too rather than inventing a second,
- * parallel struct.
- *
- * `ctor` (+0x008, Class86668__Class86668) never uses its own return value at either
- * of its two call sites (its own body sets no explicit `$v0` before
- * returning either -- CLAUDE.md's "discarded return is never evidence of
- * void" rule is about NOT assuming void from a discarding caller alone, but
- * here the callee's OWN body never materializes a return value at all, so
- * `void` is the callee-side reading, not an inference from the caller). */
-typedef struct Class86668Methods {
-    u8 pad00[0x08];
-    void (*ctor)(Obj865C8 *self, s32 arg1, SubObjB *arg2); /* +0x008 Class86668__Class86668 */
-    /* Class86668__Dtor (this unit, matched): the sibling class's own dtor
-     * override. Called by Obj865C8__Dtor (D_800865C8's own dtor) as
-     * GetClass86668Methods()->dtor(self) -- a base-class dtor forwarding to a
-     * DIFFERENT sibling's override, same shape as slot38/slot44/slot48
-     * below. */
-    void (*dtor)(Obj865C8 *self);                          /* +0x00C Class86668__Dtor */
-    u8 pad10[0x38 - 0x10];
-    /* Inherited, shared verbatim with D_800865C8's own occupant of this
-     * offset (Obj865C8__OnNotify, this unit): gClass86668Methods's own +0x038 is
-     * IntermediateBase__OnNotify (a base/inherited slot, out of this unit's scope).
-     * Called by Obj865C8__OnNotify as GetClass86668Methods()->slot38(self, arg1, arg2). */
-    void (*slot38)(Obj865C8 *self, EventArg *arg1, s32 arg2); /* +0x038 IntermediateBase__OnNotify */
-    u8 pad3C[0x44 - 0x3C];
-    /* Class86668__Init (this unit, matched): zeroes self->eventCode, forwards to
-     * the base's own slot44, returns self->eventCode. Called by Obj865C8__Init
-     * as GetClass86668Methods()->slot44(self, self->unk0C, 0), return discarded. */
-    s32 (*slot44)(Obj865C8 *self, s32 arg1, s32 arg2);      /* +0x044 Class86668__Init */
-    /* Class86668__Deinit (this unit, matched): a thin wrapper forwarding to
-     * Get_vtable_IntermediateBase()->slot48(self). Called by Obj865C8__Deinit as
-     * GetClass86668Methods()->slot48(self). */
-    void (*slot48)(Obj865C8 *self);                        /* +0x048 Class86668__Deinit */
-    u8 pad4C[0x54 - 0x4C];
-    /* Inherited, shared verbatim with D_800865C8's own occupant of this
-     * offset (Obj865C8__AdvanceState, this unit): gClass86668Methods's own +0x054 is
-     * IntermediateBase__OnTag1Notify (a base/inherited slot, out of this unit's scope).
-     * Called by Obj865C8__AdvanceState as GetClass86668Methods()->slot54(self, arg1,
-     * arg2), return discarded. */
-    void (*slot54)(Obj865C8 *self, s32 arg1, s32 arg2);    /* +0x054 IntermediateBase__OnTag1Notify */
-} Class86668Methods;
-
-/* A plain accessor with no parameters, returning &gClass86668Methods. Defined in the
- * class_3ac78 unit, not this one -- matched there as C in round 2026-09-02,
- * so it is no longer INCLUDE_ASM. Declared here only because this unit
- * dispatches through it; class_3ac78.h holds its owning view. */
 /* Defined in this unit at ROM order 0x3A860, i.e. AFTER New_Obj865C8,
  * which dispatches through it -- so it needs a prototype here. */
 extern Class865C8Methods *GetObj865C8Methods(void);
-
-extern Class86668Methods *GetClass86668Methods(void);
 
 /* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
  * class_16334.h for the other units that also declare it locally. */
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Allocator in the still-uncarved unit code_179d8 (asm/code_179d8.s):
- * allocates a 0x64-byte instance and, on success, ctors it with the single
- * forwarded argument. Only call site here is Class86668__Class86668, which stores
- * the result straight into `Obj865C8::subB` (`SubObjB *`). */
-extern SubObjB *New_VabStreamObj(s32 arg1);
+/* VabStreamObj's allocator (src/code_179d8_e.c): a 0x64-byte instance ctored
+ * with the one forwarded path. Only call site here is Class86668__Class86668,
+ * which stores the result in Class86668::sound. */
+extern BasicClass *New_VabStreamObj(char *path);
 
 /* Rodata symbols right next to this unit's own gClass86668Methods/D_800865C8
  * vtables (0x80086650, 0x8008665C -- 0x18 and 0xC bytes before gClass86668Methods

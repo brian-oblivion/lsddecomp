@@ -25,6 +25,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "class_39e08.h"
+#include "Class86668.h"
 
 /*
  * class_3bb8c_k's own view of ObjM (method table D_80087034, returned by
@@ -443,7 +444,7 @@ Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4)
 
 void ObjM__ObjM(ObjM_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
-    GetClass86668Methods()->ctor((Obj865C8 *)self, 0, arg1);
+    GetClass86668Methods()->ctor((Class86668 *)self, 0, (BasicClass *)arg1);
     self->methods = GetObjMMethods();
     self->unk64 = 0;
     self->unk68 = 0;
@@ -460,14 +461,14 @@ void ObjM__ObjM(ObjM_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 arg4,
 
 void ObjM__Dtor(Obj865C8 *self)
 {
-    GetClass86668Methods()->dtor(self);
+    GetClass86668Methods()->finalize((Class86668 *)self);
 }
 
 void ObjM__OnNotify(ObjM_3bb8c_k *self, EventArg *arg1, s32 arg2)
 {
     s32 tag;
 
-    GetClass86668Methods()->slot38((Obj865C8 *)self, arg1, arg2);
+    GetClass86668Methods()->onNotify((Class86668 *)self, arg1, arg2);
     tag = arg1->target->header;
     if ((tag & 0xFFF) == 0x114) {
         self->methods->handleEvent7(self, arg1, arg2);

@@ -19,7 +19,7 @@ A one-field `s32` setter, leaf, tail instruction in the delay slot of `jr`.
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `Class86668__SetChildFlag8.md`.
+None beyond what's already documented for `Class866E8` in `Class86668__PlaySound.md`.
 
 ## Naming
 

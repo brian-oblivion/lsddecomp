@@ -7,7 +7,7 @@
 ## What it does
 
 Method-table slot +0x040 of `gClass86668Methods` (the sibling class, see
-`Class86668__Dtor.md` for how the sibling relationship was established). A
+`Class86668__Finalize.md` for how the sibling relationship was established). A
 one-line wrapper: dispatches through `self->methods` at +0x06C with a
 sentinel argument of -1.
 
@@ -48,3 +48,7 @@ None beyond what's already documented.
 ## Naming
 
 `Class86668__CancelTimeout` -- tier A. Occupies `gClass86668Methods` +0x040; one-line wrapper calling `self->methods->setTimeout(self, -1)` (the sentinel `SetTimeout` itself documents as 'disabled'). Mechanics are its purpose.
+
+## Track 4
+
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Not renamed. It fills IntermediateBase's `resetCounters` slot (+0x040) but does not chain to IntermediateBase__ResetCounters: its whole body is `setTimeout(-1)`, so the name says what it does rather than what the slot is. `self` is `Class86668 *`. Image byte-identical.

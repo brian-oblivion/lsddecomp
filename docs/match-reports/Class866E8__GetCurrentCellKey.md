@@ -25,7 +25,7 @@ asserting anything about the field's internal structure.
 
 ## Proposed learning
 
-None beyond what's already documented for `Class866E8` in `Class86668__SetChildFlag8.md`.
+None beyond what's already documented for `Class866E8` in `Class86668__PlaySound.md`.
 
 ## Naming
 

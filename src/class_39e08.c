@@ -17,7 +17,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
-    GetClass86668Methods()->ctor(self, GetSoundEffectDir(0), 0);
+    GetClass86668Methods()->ctor((Class86668 *)self, (char *)GetSoundEffectDir(0), 0);
     self->methods = GetObj865C8Methods();
     InitDreamAux();
     self->unk44 = func_8003B39C(D_800113EC);
@@ -56,13 +56,13 @@ void Obj865C8__Dtor(Obj865C8 *self) {
     self->unk48->methods->slot4(self->unk48);
     self->unk44->methods->slot4(self->unk44);
     TickDreamAuxSlots();
-    GetClass86668Methods()->dtor(self);
+    GetClass86668Methods()->finalize((Class86668 *)self);
 }
 
 void Obj865C8__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
     s32 tag;
 
-    GetClass86668Methods()->slot38(self, arg1, arg2);
+    GetClass86668Methods()->onNotify((Class86668 *)self, arg1, arg2);
     tag = arg1->target->header;
     if ((tag & 0xFFFF) == 0x1F34) {
         self->methods->slot80(self, arg1, arg2);
@@ -81,13 +81,13 @@ void Obj865C8__Init(Obj865C8 *self) {
     sub->methods->slot10(sub, self->unk0C->unk4);
     sub->methods->slot10(sub, (s32)self->unk0C->unk8);
     sub->methods->slot110(sub, (s32)self->unk0C->unk10);
-    GetClass86668Methods()->slot44(self, (s32)self->unk0C, 0);
+    GetClass86668Methods()->init((Class86668 *)self, (IntermediateBaseInitArgs *)self->unk0C, 0);
 }
 
 void Obj865C8__Deinit(Obj865C8 *self) {
     SubObjD *sub = self->unk38;
 
-    GetClass86668Methods()->slot48(self);
+    GetClass86668Methods()->deinit((Class86668 *)self);
     sub->methods->slot110(sub, 0);
     sub->methods->slot14(sub, self->unk0C->unk4);
     sub->methods->slot14(sub, self->unk10);
@@ -125,7 +125,7 @@ extern void Obj865C8__EnterState2(Obj865C8 *self, s32 arg1);
 void Obj865C8__AdvanceState(Obj865C8 *self, s32 arg1, s32 arg2) {
     s32 result;
 
-    GetClass86668Methods()->slot54(self, arg1, arg2);
+    GetClass86668Methods()->onTag1Notify((Class86668 *)self, (BasicClass *)arg1, arg2);
     if (arg2 == 2 && self->state != arg2) {
         switch (self->state) {
         case 1:
@@ -258,69 +258,69 @@ s32 func_8004A070(s32 arg0)
     return result;
 }
 
-Obj865C8 *New_Class86668(s32 arg1, SubObjB *arg2)
+Class86668 *New_Class86668(char *soundBankPath, BasicClass *sound)
 {
-    Obj865C8 *self;
+    Class86668 *self;
 
     self = BMemPMgrAlloc(0x38);
     if (self != NULL) {
-        GetClass86668Methods()->ctor(self, arg1, arg2);
+        GetClass86668Methods()->ctor(self, soundBankPath, sound);
         return self;
     }
     return NULL;
 }
 
-void Class86668__Class86668(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
+void Class86668__Class86668(Class86668 *self, char *soundBankPath, BasicClass *sound) {
     Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
-    self->methods = (Class865C8Methods *)GetClass86668Methods();
-    if (arg1 != 0) {
-        self->subB = New_VabStreamObj(arg1);
+    self->methods = GetClass86668Methods();
+    if (soundBankPath != NULL) {
+        self->sound = New_VabStreamObj(soundBankPath);
     } else {
-        self->subB = arg2;
+        self->sound = sound;
     }
-    self->unk30 = arg1;
-    self->methods->resetState(self);
+    self->soundBankPath = soundBankPath;
+    self->methods->resetCounters(self);
 }
 
-void Class86668__Dtor(Obj865C8 *self) {
-    if (self->unk30 != 0) {
-        self->subB->methods->slot4(self->subB);
+void Class86668__Finalize(Class86668 *self) {
+    if (self->soundBankPath != NULL) {
+        self->sound->methods->release(self->sound);
     }
     Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
 }
 
-void Class86668__CancelTimeout(Obj865C8 *self) {
+void Class86668__CancelTimeout(Class86668 *self) {
     self->methods->setTimeout(self, -1);
 }
 
-s32 Class86668__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
-    self->eventCode = 0;
-    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, (IntermediateBaseInitArgs *)arg1, arg2);
-    return self->eventCode;
+s32 Class86668__Init(Class86668 *self, IntermediateBaseInitArgs *args, s32 mode) {
+    self->result = 0;
+    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, args, mode);
+    return self->result;
 }
 
-void Class86668__Deinit(Obj865C8 *self) {
+void Class86668__Deinit(Class86668 *self) {
     Get_vtable_IntermediateBase()->deinit((IntermediateBase *)self);
 }
 
-void Class86668__Noop58(void) {
+void Class86668__NoOpSlot58(void) {
 }
 
-void Class86668__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
-    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, (BasicClass *)arg1, arg2);
+void Class86668__CheckTimeout(Class86668 *self, BasicClass *sender, s32 event) {
+    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
     if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
-        self->methods->onEventArg(self, 4);
+        self->methods->setState(self, 4);
     }
 }
 
-void Class86668__OnEventArg(Obj865C8 *self, s32 arg1) {
-    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, arg1);
-    if (arg1 == 4) {
-        self->eventCode = 1;
-        self->methods->noop7C(self);
+void Class86668__SetState(Class86668 *self, s32 state) {
+    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
+    if (state == 4) {
+        self->result = 1;
+        self->methods->onState4(self);
     }
 }
 
-void Class86668__SetTimeout(Obj865C8 *self, s32 arg1) {
-    self->timeoutFrames = (arg1 < 0) ? arg1 : arg1 * 20;
+void Class86668__SetTimeout(Class86668 *self, s32 timeout) {
+    self->timeoutFrames = (timeout < 0) ? timeout : timeout * 20;
 }

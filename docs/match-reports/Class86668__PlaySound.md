@@ -1,4 +1,6 @@
-# Class86668__SetChildFlag8
+# Class86668__PlaySound
+
+> Renamed from `Class86668__SetChildFlag8` on 2026-09-25 (tools/rename.py). Address 0x8004a478.
 
 > Renamed from `func_8004A478` on 2026-09-22 (tools/rename.py). Address 0x8004a478.
 
@@ -37,7 +39,7 @@ convention fills `$a0..$a3` in order with no gaps: if the call had only three
 real arguments (self + two literals), the literals would occupy `$a1`/`$a2`,
 not `$a2`/`$a3`. Since they demonstrably occupy the *third* and *fourth*
 argument slots, `$a1` must be a real (fourth total, second real) argument —
-which can only be `Class86668__SetChildFlag8`'s own second parameter, forwarded unchanged
+which can only be `Class86668__PlaySound`'s own second parameter, forwarded unchanged
 (no `move` needed since it's already resident in the right register).
 
 Named the two classes by vtable address per project convention (see
@@ -70,3 +72,7 @@ depending on it.
 The two `0x7F` arguments are left in the call: they cost nothing, they are
 what retail's caller sets up, and other occupants of slot `+0x070` in this
 table family may read them.
+
+## Track 4
+
+2026-09-25, round 84 (bravo): class unified in `include/Class86668.h`. Renamed from `Class86668__SetChildFlag8`, tier A. The ctor settles what +0x034 is: `New_VabStreamObj(soundBankPath)` when the first ctor argument is non-NULL (Obj865C8 passes GetSoundEffectDir()), the caller's object otherwise (ObjM passes Obj865C8's, itself a VabStreamObj); ObjM calls the same field's +0x088/+0x08C, VabStreamObj's Mute/Unmute. gVabStreamObjMethods' +0x080 is VabStreamObj__PlayTone, so this is `sound->PlayTone(tone, 0x7F, 0x7F)`, the shape of TaskCore__PlaySound (which passes 0x60, 0x60). The Class866E8 reading above is withdrawn: the field is `Class86668::sound` (`BasicClass *`), cast in class_3ac78.c to a local SoundObj_3ac78 view with +0x080 `playTone`. Slot +0x070 is named `playSound`. Image byte-identical.

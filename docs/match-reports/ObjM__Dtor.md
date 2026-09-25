@@ -25,7 +25,7 @@ void ObjM__Dtor(Obj865C8 *self)
 This class's `dtor` override forwards straight to the shared base class
 dtor (`GetClass86668Methods()->dtor(self)`, `Class86668Methods::dtor`,
 `include/class_39e08.h`), the same pattern already documented there for
-`Class86668__Dtor` (`class_39e08`'s own sibling override). `Obj865C8` and
+`Class86668__Finalize` (`class_39e08`'s own sibling override). `Obj865C8` and
 `GetClass86668Methods` are both already declared in `include/class_39e08.h`, so
 this function needed no new struct at all -- `self` is typed directly as
 the base class's own object type rather than inventing a `Class87034`
@@ -38,4 +38,4 @@ unit). Matched first attempt.
 
 Round 75 (bravo, track 3). `func_80052CD8` -> `ObjM__Dtor`, **tier A**.
 
-Slot +0x00C of D_80087034 (`tools/classtable.py 0x80087034`). Forwards to the base's dtor (GetClass86668Methods()->dtor). Named after the base family's own +0x00C names (Class86668__Dtor, Obj865C8__Dtor).
+Slot +0x00C of D_80087034 (`tools/classtable.py 0x80087034`). Forwards to the base's dtor (GetClass86668Methods()->dtor). Named after the base family's own +0x00C names (Class86668__Dtor, Obj865C8__Dtor; the first renamed `Class86668__Finalize` in round 84).

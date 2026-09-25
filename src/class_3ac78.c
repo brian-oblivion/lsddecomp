@@ -32,13 +32,25 @@
 #include "common.h"
 #include "class_3ac78.h"
 #include "Class6B5CC.h"
+#include "Class86668.h"
 
-void Class86668__SetChildFlag8(Class86668 *self, s32 value)
+/* Class86668::sound's pointee, a VabStreamObj (New_VabStreamObj): its +0x080 is
+ * VabStreamObj__PlayTone. Only Class86668__PlaySound calls through it here. */
+typedef struct SoundObj_3ac78 SoundObj_3ac78;
+typedef struct SoundObjMethods_3ac78 {
+    u8 pad000[0x080];
+    s32 (*playTone)(SoundObj_3ac78 *self, s32 tone, s32 arg2, s32 arg3); /* +0x080 */
+} SoundObjMethods_3ac78;
+struct SoundObj_3ac78 {
+    SoundObjMethods_3ac78 *methods;
+};
+
+void Class86668__PlaySound(Class86668 *self, s32 tone)
 {
-    Class866E8 *sub = self->unk34;
+    SoundObj_3ac78 *sound = (SoundObj_3ac78 *)self->sound;
 
-    if (sub != NULL) {
-        sub->methods->setFlag8(sub, value, 0x7F, 0x7F);
+    if (sound != NULL) {
+        sound->methods->playTone(sound, tone, 0x7F, 0x7F);
     }
 }
 
