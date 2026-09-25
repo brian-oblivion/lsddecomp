@@ -106,7 +106,10 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800423A8);
 void func_800423E4(D_8006EED8Obj *self) {
     self->unk2C = 1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800423F0);
+/* Returns the D_8006EED8 method table. */
+void *func_800423F0(void) {
+    return D_8006EED8;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042400);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042450);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800424A8);
