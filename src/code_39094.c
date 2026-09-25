@@ -63,7 +63,12 @@ void *func_80048CE0(void) {
 s32 func_80048CF0(void) {
     return D_8008A960;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048CFC);
+s32 func_80048CFC(s32 seed) {
+    if (seed != 0) {
+        srand(seed);
+    }
+    return rand();
+}
 void func_80048D28(s32 a, s32 b) {
     if (a >= 0) {
         D_8008A964 = a;
