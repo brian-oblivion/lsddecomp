@@ -244,7 +244,11 @@ void *func_80044CC4(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044CD4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044D40);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044DC8);
+/* D_8006F498 +0x00C: finalize -- free +0x38, then the active driver's. */
+void func_80044DC8(DataSrc33808 *self) {
+    BMemPMgrFree((void *)self->unk38);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044E10);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044E64);
 extern s32 D_8006F498[];
