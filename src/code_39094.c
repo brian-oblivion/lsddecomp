@@ -84,7 +84,12 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048F84);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_8004903C);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049060);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049098);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800490F4);
+const char *func_800490F4(s32 *typeCodeOut) {
+    if (typeCodeOut != NULL) {
+        *typeCodeOut = 0x31;
+    }
+    return D_800113DC;
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049110);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_8004913C);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800491CC);
