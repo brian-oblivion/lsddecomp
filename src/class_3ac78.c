@@ -71,7 +71,7 @@ struct BaseCtorTable_3ac78 {
 };
 
 extern BaseCtorTable_3ac78 *func_800428E4(void);
-extern UnkSlotChildObj_3ac78 *func_80048894(void);
+extern UnkSlotChildObj_3ac78 *New_DataSrc39094(void);
 extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
 extern s32 GetDrawSystem(void);
@@ -108,7 +108,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     for (i = 0; i < 7; i++) {
         entry = &self->elems[i];
 
-        entry->target = func_80048894();
+        entry->target = New_DataSrc39094();
         entry->target->unk20 = (entry->target->unk10 != 0);
         entry->target->key = i;
         entry->target->methods->slot88(entry->target, arg2);

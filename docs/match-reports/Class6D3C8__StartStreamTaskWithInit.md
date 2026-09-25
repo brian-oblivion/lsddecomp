@@ -9,10 +9,10 @@
 `Class6D3C8Methods` slot `+0x064`, the last function in this unit's queue.
 Gated by `self->arg->unk08` (the same gate `Class6D3C8__StartWeeklyStreamTask` and
 `Class6D3C8__StartGraphRoomStreamTask` use). Builds a `StreamTask`, runs its `slot12C`, derives a
-type code via `func_800491FC` (a new library helper with the same
+type code via `GetStreamChannelInit` (a new library helper with the same
 "write-to-`*out`, return-a-separate-value" shape as
-`func_800490F4`/`func_8004913C`/`func_800493E4`), looks it up via
-`func_800493C8`, initializes the task with it, then starts it -- the same
+`GetIntroStreamName`/`PickWeeklyStreamChannel`/`GetGraphRoomStreamChannel`), looks it up via
+`GetStreamGroupForType`, initializes the task with it, then starts it -- the same
 overall shape as `Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask`, with a `slot12C` call
 added (matching `Class6D3C8__StartGraphRoomStreamTask`'s use of that slot).
 
@@ -29,8 +29,8 @@ void Class6D3C8__StartStreamTaskWithInit(Class6D3C8 *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTaskObj(0, 0, 0, 0);
         task->methods->slot12C(task, 0);
-        outerValue = func_800491FC(&typeCode, 0);
-        typeLookup = func_800493C8(typeCode);
+        outerValue = GetStreamChannelInit(&typeCode, 0);
+        typeLookup = GetStreamGroupForType(typeCode);
         task->methods->slot44(task, self->unk1C, outerValue, typeLookup, 1);
         task->methods->slot4(task);
     }
@@ -41,8 +41,8 @@ Matched first attempt: this unit's own established idioms carried straight
 across --
 
 - the `task->methods->slot44(..., outerValue, typeLookup, 1)` shape, where
-  `outerValue` is a PRECEDING call's return (`func_800491FC`, captured via
-  the delay slot of the `func_800493C8` `jal` right after it) and
+  `outerValue` is a PRECEDING call's return (`GetStreamChannelInit`, captured via
+  the delay slot of the `GetStreamGroupForType` `jal` right after it) and
   `typeLookup` is the REAL 4th argument (the delay slot of `slot44`'s own
   `jalr`, per the idiom `Class6D3C8__LoadIntroLogoSequence`'s report first documented);
 - declaring `typeCode`/`outerValue`/`typeLookup` before `task` (the
@@ -72,8 +72,8 @@ which library helper derives the type code and whether extra slots
 `arg->unk08` (same gate as `Class6D3C8__StartWeeklyStreamTask`), builds a
 `StreamTask`, runs its `slot12C` (a step none of the other three
 StreamTask-launcher siblings besides `Class6D3C8__StartCinematicStream`
-perform), derives a type code via `func_800491FC`, looks it up, configures
+perform), derives a type code via `GetStreamChannelInit`, looks it up, configures
 and starts the task. "WithInit" names the one mechanical difference from
 its closest sibling `Class6D3C8__StartWeeklyStreamTask` (the extra
-`slot12C` call); `func_800491FC`'s own meaning is not established, so no
+`slot12C` call); `GetStreamChannelInit`'s own meaning is not established, so no
 stronger, purpose-based name is supported yet.

@@ -444,7 +444,7 @@ extern void TickDreamAuxSlots(void);
  * forwarded, unread by its own body, as the sibling ctor's arg1 (which
  * that ctor stores directly into `Obj865C8::unk30`, an `s32`). Uncarved,
  * asm/psyq_memset.s. */
-extern s32 func_80048E08(s32 arg1);
+extern s32 GetSoundEffectDir(s32 arg1);
 
 /* Matched in code_4cd08.c (still called `InitDreamAux` there, STALLED at
  * 40/56 -- see docs/match-reports/InitDreamAux.md). Takes no arguments,
@@ -486,7 +486,7 @@ extern SubObjG *func_80043840(LoadRequest *req);
 /* Uncarved, asm/psyq_memset.s: a magic-multiply division idiom over its one
  * argument (not an allocator -- no `BMemPMgrAlloc` call in its own body).
  * Its return value is forwarded as `New_WBgm`'s own 1st argument. */
-extern s32 func_80048D74(s32 arg1);
+extern s32 PickWeeklyGroup(s32 arg1);
 
 /* "New_X"-shaped allocator (uncarved, in the Psy-Q SPU/SND block at
  * 0x272C8..0x2C054), 3 forwarded

@@ -19,7 +19,7 @@ struct BaseCtorTable_3ac78 {
 };
 
 extern BaseCtorTable_3ac78 *func_800428E4(void);
-extern UnkSlotChildObj_3ac78 *func_80048894(void);
+extern UnkSlotChildObj_3ac78 *New_DataSrc39094(void);
 extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
 extern s32 GetDrawSystem(void);
@@ -55,7 +55,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     for (i = 0; i < 7; i++) {
         entry = &self->unkEC[i];
 
-        entry->unk4 = func_80048894();
+        entry->unk4 = New_DataSrc39094();
         entry->unk4->unk20 = (entry->unk4->unk10 != 0);
         entry->unk4->unk32 = i;
         entry->unk4->methods->slot88(entry->unk4, arg2);
@@ -112,7 +112,7 @@ the standard "base ctor first, then set own vtable pointer" idiom already
 established elsewhere in this project), sets `self->methods`, copies a
 3-word block into `self->unk54` (from `arg1` if given, else a default
 global), zeroes several scalar fields, then fills `self->unkEC[0..6]`
-(7 slot entries): each gets a child object (`func_80048894`), a list object
+(7 slot entries): each gets a child object (`New_DataSrc39094`), a list object
 (`New_Class6D940`), a generic object (`New_Class86AA0`) dispatched with the
 just-copied `self->unk54` block, and a freshly-allocated 0x668-byte buffer
 of pointers -- each pointer itself a `New_Class86AA0()`-created object,

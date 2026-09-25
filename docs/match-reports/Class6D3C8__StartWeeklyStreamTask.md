@@ -9,16 +9,16 @@
 `Class6D3C8Methods` slot `+0x054`. Gated by `self->arg->unk08 != 0` (a
 second boolean/pointer gate on the ctor argument, sibling to
 `Class6D3C8__LoadIntroLogoSequence`'s `unk0C` gate): builds a `StreamTask`, derives a type code
-via `func_8004913C` (a day/week-style calculation, unrelated unit,
-`psyq_memset.s`), looks it up via `func_800493C8`, and initializes+starts
+via `PickWeeklyStreamChannel` (a day/week-style calculation, unrelated unit,
+`psyq_memset.s`), looks it up via `GetStreamGroupForType`, and initializes+starts
 the task the same way `Class6D3C8__LoadIntroLogoSequence` does -- minus that function's two
 `Class6D3C8__StartLoaderTask` loader-task registrations.
 
 ## Derivation
 
 Structurally identical to the second half of `Class6D3C8__LoadIntroLogoSequence` (already
-matched), with `func_8004913C(&typeCode, 0)` in place of
-`func_800490F4(&typeCode)`:
+matched), with `PickWeeklyStreamChannel(&typeCode, 0)` in place of
+`GetIntroStreamName(&typeCode)`:
 
 ```c
 void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
@@ -30,8 +30,8 @@ void Class6D3C8__StartWeeklyStreamTask(Class6D3C8 *self) {
     if (self->arg->unk08 != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTaskObj(0, 0, 0, 0);
-        derivedValue = func_8004913C(&typeCode, 0);
-        typeLookup = func_800493C8(typeCode);
+        derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
+        typeLookup = GetStreamGroupForType(typeCode);
         task->methods->slot44(task, self->unk1C, derivedValue, typeLookup, 1);
         task->methods->slot4(task);
     }
@@ -50,9 +50,9 @@ argument from the start).
 `include/Class6D3C8.h`: split `Class6D3C8CtorArgs`'s `+0x04..+0x0B` padding
 to expose `+0x08` (`unk08`, this function's gate) as its own field,
 matching the existing `+0x0C` (`unk0C`, `Class6D3C8__LoadIntroLogoSequence`'s gate). Declared
-`func_8004913C` (day/week-style helper, `psyq_memset.s`, same "write an
+`PickWeeklyStreamChannel` (day/week-style helper, `psyq_memset.s`, same "write an
 index to *out, return a related but different value" shape as
-`func_800490F4`).
+`GetIntroStreamName`).
 
 ## Proposed learning
 
@@ -75,9 +75,9 @@ for the same shape before re-deriving from scratch.
 
 **`Class6D3C8__StartWeeklyStreamTask` -- tier B.** Mechanics: gated by
 `arg->unk08`, builds a `StreamTask`, derives its type code via
-`func_8004913C` -- documented in this unit's header as "day/week-style
-calculation (divides func_80048CFC's result by 7)" -- looks it up, then
+`PickWeeklyStreamChannel` -- documented in this unit's header as "day/week-style
+calculation (divides SeedAndRandom's result by 7)" -- looks it up, then
 configures and starts the task. "Weekly" is grounded in that documented
-`/7` derivation inside `func_8004913C` (real evidence, not a guess from the
+`/7` derivation inside `PickWeeklyStreamChannel` (real evidence, not a guess from the
 function's own body, which is otherwise the same generic StreamTask-launch
 shape as its three siblings in this unit).

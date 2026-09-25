@@ -177,7 +177,7 @@ typedef struct StreamTaskMethods {
     /* +0x044, named `configure`: called with (self, a fixed word from the
      * caller's own object, a second word whose meaning varies by call site --
      * a filename string in Class6D3C8__LoadIntroLogoSequence, a plain derived
-     * count in Class6D3C8__StartWeeklyStreamTask, func_800493E4's return
+     * count in Class6D3C8__StartWeeklyStreamTask, GetGraphRoomStreamChannel's return
      * value in Class6D3C8__StartGraphRoomStreamTask -- a type/format code,
      * and a literal 1 spilled onto the stack as a 5th argument -- confirmed a
      * real 5th argument, not a scheduling artifact, because MIPS o32 only
@@ -215,9 +215,9 @@ extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0,
                                                        the last value its internal dispatch loop got --
                                                        Class6D3C8__LoadIntroLogoSequence/Class6D3C8__StartWeeklyStreamTask discard it, but
                                                        Class6D3C8__StartCinematicStream keeps it */
-extern const char *func_800490F4(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &D_800113DC */
-extern s32 func_800493C8(s32 index);                   /* psyq_memset.s: signed-halfword lookup into D_80086170[index] */
-extern s32 func_8004913C(s32 *out, s32 param2);          /* psyq_memset.s: day/week-style calculation (divides func_80048CFC's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
+extern const char *GetIntroStreamName(s32 *typeCodeOut);  /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkStreamPath */
+extern s32 GetStreamGroupForType(s32 index);                   /* psyq_memset.s: signed-halfword lookup into gStreamTypeToGroupTable[index] */
+extern s32 PickWeeklyStreamChannel(s32 *out, s32 param2);          /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[]; /* "ETC\OSDLOGO.TIM" */
@@ -306,10 +306,10 @@ void Class6D3C8__StartGraphRoomStreamTask(Class6D3C8 *self);
 extern PollTask *New_GraphRoomObj(void *dreamSys);
 extern PollTask *New_Class86B60(void *dreamSys);
 
-extern s32 func_800493E4(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
-extern s32 func_800491FC(s32 *out, s32 unused); /* psyq_memset.s: same "write to *out, return a
-    separate value" shape as func_800490F4/func_8004913C/func_800493E4 */
-extern s32 func_80049334(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
+extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
+extern s32 GetStreamChannelInit(s32 *out, s32 unused); /* psyq_memset.s: same "write to *out, return a
+    separate value" shape as GetIntroStreamName/PickWeeklyStreamChannel/GetGraphRoomStreamChannel */
+extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
     {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
     to *out (-1 if unresolved); the packing must zero-extend both halves before combining
     (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
