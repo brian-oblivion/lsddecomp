@@ -98,5 +98,7 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049240);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049270);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800492D0);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049334);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800493C8);
+s32 func_800493C8(s32 index) {
+    return D_80086170[index];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800493E4);
