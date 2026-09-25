@@ -1,4 +1,6 @@
-# func_8001F4E4 -- MATCHED (10/10 words), round 82
+# UpdateTmdModelBoundsBuffer -- MATCHED (10/10 words), round 82
+
+> Renamed from `func_8001F4E4` on 2026-09-25 (tools/rename.py). Address 0x8001f4e4.
 
 Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (
 ## Source
 
 ```c
-void func_8001F4E4(void *self) {
+void UpdateTmdModelBoundsBuffer(void *self) {
     TmdModel__ComputeBounds(self, gTmdModelBoundsBuf);
 }
 ```

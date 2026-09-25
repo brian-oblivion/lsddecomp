@@ -59,13 +59,13 @@ idiom from DECOMPILATION_LEARNINGS, applied six times per iteration.
 
 **Pass 2** — after the corner loop, three PsyQ calls:
 ```c
-func_8001F4E4(self->unk20);              /* fills PsyQ global gTmdModelBoundsBuf */
+UpdateTmdModelBoundsBuffer(self->unk20);              /* fills PsyQ global gTmdModelBoundsBuf */
 arr = func_8001F50C(self->unk20, 0);     /* IGNORES both args, returns &gTmdModelBoundsBuf */
 cnt2 = func_8001F3A4(self->unk20);       /* returns a count */
 ```
 **`func_8001F50C`'s whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`** —
 MEASURED (`asm/psyq_GsLinkObject4.s`), it is a plain getter for a PsyQ-
-internal global that `func_8001F4E4` fills one instruction earlier via
+internal global that `UpdateTmdModelBoundsBuffer` fills one instruction earlier via
 `TmdModel__ComputeBounds`. This resolved what looked at first like a confusing
 "return value used as both a pointer and a scalar simultaneously" — it
 isn't; `func_8001F50C`'s return (a pointer) and `func_8001F3A4`'s return (a
@@ -158,7 +158,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
         } while ((u8 *)cur < end);
     }
 
-    func_8001F4E4(self->unk20);
+    UpdateTmdModelBoundsBuffer(self->unk20);
     arr = func_8001F50C(self->unk20, 0);
     cnt2 = func_8001F3A4(self->unk20);
 
@@ -252,7 +252,7 @@ concrete, measured leads for the next attempt:
 `include/code_d294.h`:
 - New `Sixteen6_d294` (12 bytes, 6×`s16`, all-s16-struct-copy idiom) and
   `CornerList_d294` (`{ s32 count; Vec3S16_d294 hdr; }`) types.
-- New externs `func_8001F4E4(void *arg0)` and `func_8001F50C(void *arg0,
+- New externs `UpdateTmdModelBoundsBuffer(void *arg0)` and `func_8001F50C(void *arg0,
   s32 arg1)` returning `Sixteen6_d294 *` (PsyQ library,
   `asm/psyq_GsLinkObject4.s`) — see the `gTmdModelBoundsBuf` finding above.
 - Prototype for `Class6B5CC__CheckBoundsOverlap` itself.
@@ -323,7 +323,7 @@ via `build/lsdde.map`, not just assumed), showing `self` deferred into
 the MIDDLE of the corner-loop setup instead of materializing into `$s0`
 in the prologue like retail -- the same "deferred parameter copy" shape
 this project's OTHER unit (`code_55dd4`) has repeatedly hit. `self` is
-not referenced in this function's source until `func_8001F4E4(self->unk20)`,
+not referenced in this function's source until `UpdateTmdModelBoundsBuffer(self->unk20)`,
 deep in pass 2, so GCC defers it. A bare `__asm__("")` as the very first
 statement forced early materialization, matching retail's prologue
 exactly (`sw s0`/`move s0,a0`/`move a3,a1` all now byte-identical from
@@ -427,7 +427,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
         } while ((u8 *)cur < end);
     }
 
-    func_8001F4E4(self->unk20);
+    UpdateTmdModelBoundsBuffer(self->unk20);
     arr = func_8001F50C(self->unk20, 0);
     cnt2 = func_8001F3A4(self->unk20);
 
@@ -795,7 +795,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CCObj *self, void *arg1, Vec3S16_d294
         b->hi.z = (b->hi.z < v->z) ? v->z : b->hi.z;
     }
 
-    func_8001F4E4(self->unk20);
+    UpdateTmdModelBoundsBuffer(self->unk20);
     p = (BoundsBox_d294 *)func_8001F50C(self->unk20, 0);
     n = func_8001F3A4(self->unk20);
     box = *p;

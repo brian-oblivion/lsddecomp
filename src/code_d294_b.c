@@ -326,7 +326,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
         b->hi.z = (b->hi.z < v->z) ? v->z : b->hi.z;
     }
 
-    func_8001F4E4(self->model);
+    UpdateTmdModelBoundsBuffer(self->model);
     p = (BoundsBox_d294 *)func_8001F50C(self->model, 0);
     n = func_8001F3A4(self->model);
     box = *p;

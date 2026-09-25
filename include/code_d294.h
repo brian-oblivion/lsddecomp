@@ -150,15 +150,15 @@ extern void func_8001F51C(void *arg0, void *dest);
  * (boolean-ish) here. Not decompiled in this project. */
 extern s32 func_8001F3A4(void *arg0);
 
-/* func_8001F4E4/func_8001F50C (asm/psyq_fa50.s, PsyQ library, not
- * game code): func_8001F4E4 fills a PsyQ-internal global
+/* UpdateTmdModelBoundsBuffer/func_8001F50C (asm/psyq_fa50.s, PsyQ library, not
+ * game code): UpdateTmdModelBoundsBuffer fills a PsyQ-internal global
  * (gTmdModelBoundsBuf, via TmdModel__ComputeBounds) from its own argument; func_8001F50C
  * IGNORES both its arguments and just returns `&gTmdModelBoundsBuf` -- MEASURED,
  * its whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`. Class6B5CC__CheckBoundsOverlap
- * (round 13, code_d294_b) calls the pair as `func_8001F4E4(self->unk20);
+ * (round 13, code_d294_b) calls the pair as `UpdateTmdModelBoundsBuffer(self->unk20);
  * arr = func_8001F50C(self->unk20, 0);` -- declared here typed to that
  * call site's own use of the result (an array of Sixteen6_d294). */
-extern void func_8001F4E4(void *arg0);
+extern void UpdateTmdModelBoundsBuffer(void *arg0);
 extern Sixteen6_d294 *func_8001F50C(void *arg0, s32 arg1);
 
 /* GsLinkObject4 (psyq_GsLinkObject4.s, Psy-Q library, not game code; symbol

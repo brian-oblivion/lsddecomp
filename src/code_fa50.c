@@ -203,7 +203,7 @@ void TmdModel__ComputeBounds(Class6BEA0 *self, Box_fa50 *box) {
         if (*maxz < v->z) *maxz = v->z;
     }
 }
-void func_8001F4E4(Class6BEA0 *self) {
+void UpdateTmdModelBoundsBuffer(Class6BEA0 *self) {
     TmdModel__ComputeBounds(self, (Box_fa50 *)gTmdModelBoundsBuf);
 }
 void *func_8001F50C(void *self, s32 i) {
