@@ -583,17 +583,61 @@ def census(views, funcs):
     return out
 
 
-def shared_globals():
+def shared_globals(sony=False):
     """Globals `extern`-declared with more than one type across src/ and
     include/ (track 4b): the same data described by several local types, or a
-    field of one table declared as a symbol of its own. Comments stripped."""
+    field of one table declared as a symbol of its own. Comments stripped.
+
+    Globals only Sony code reads are left out (sony=True returns them
+    instead): they are track 2's, never 4b's, for the reason progress.py
+    leaves library functions out of the game counts (round 85: 35 of the 45
+    this listed were libsnd's and libcd's, the plan's "largest case" among
+    them, `_svm_voice` from libsnd/vmanager.o)."""
     ext = {}
     for f in list(SRC.glob("*.c")) + list((ROOT / "include").glob("*.h")):
         t = re.sub(r"/\*.*?\*/", "", f.read_text(errors="replace"), flags=re.S)
         for m in re.finditer(r"^\s*extern\s+(?:const\s+)?((?:struct\s+)?\w+)\s*(\**)\s*(\w+)\s*(\[[^\]]*\])?\s*;", t, re.M):
             ty = m.group(1) + m.group(2) + ("[]" if m.group(4) else "")
             ext.setdefault(m.group(3), {}).setdefault(ty, set()).add(str(f.relative_to(ROOT)))
-    return {k: {t: sorted(fs) for t, fs in v.items()} for k, v in ext.items() if len(v) > 1}
+    multi = {k: {t: sorted(fs) for t, fs in v.items()} for k, v in ext.items() if len(v) > 1}
+    lib = sony_only_globals(multi)
+    return {k: v for k, v in multi.items() if (k in lib) == sony}
+
+
+def global_accessors(names):
+    """name -> set of functions whose code references it, from the relocations
+    in the BUILT objects (build/src/*.c.o), so an `__asm__("D_...")` alias or
+    a macro counts and a comment does not. Empty when the build is absent."""
+    objdump = ROOT / "tools/binutils/bin/mipsel-linux-gnu-objdump"
+    acc = {n: set() for n in names}
+    if not objdump.exists():
+        return acc
+    for o in sorted((ROOT / "build/src").glob("*.c.o")):
+        out = subprocess.run([str(objdump), "-dr", str(o)], capture_output=True, text=True).stdout
+        fn = None
+        for line in out.splitlines():
+            m = re.match(r"^[0-9a-f]+ <(\S+)>:", line)
+            if m:
+                fn = m.group(1)
+                continue
+            m = re.search(r"R_MIPS_\w+\s+([A-Za-z_]\w*)", line)
+            if m and fn and m.group(1) in acc:
+                acc[m.group(1)].add(fn)
+    return acc
+
+
+def sony_only_globals(names):
+    """The names every one of whose accessors progress.py counts as library.
+    A global with no accessor found (no build, or never referenced) is NOT
+    Sony's: unknown stays listed."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    import progress
+    syms = progress.text_symbols()
+    out = set()
+    for n, fs in global_accessors(names).items():
+        if fs and all(f in syms and progress.is_library(syms[f][0]) for f in fs):
+            out.add(n)
+    return out
 
 
 # --------------------------------------------------------------------------
@@ -677,6 +721,9 @@ def main():
         for k in sorted(g):
             print(f"{k:24s} " + "; ".join(f"{t} in {', '.join(Path(x).name for x in fs)}" for t, fs in sorted(g[k].items())))
         print(f"\n{len(g)} global(s) declared with more than one type")
+        s = shared_globals(sony=True)
+        print(f"{len(s)} more read only by Sony library code (track 2's, not 4b's): "
+              + " ".join(sorted(s)))
         return
 
     if a.tree:
