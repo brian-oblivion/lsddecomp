@@ -59,7 +59,10 @@ void func_8003B5DC(void) {
 void func_8003B5E4(D_8006E558Obj *self) {
     self->unk48 = 1;
 }
-INCLUDE_ASM("asm/nonmatchings/code_2bb9c", func_8003B5F0);
+/* D_8006E558 +0x09C: describe the TIM held in the buffer. */
+void func_8003B5F0(D_8006E558Obj *self, GsIMAGE *tim) {
+    GsGetTimInfo((u32 *)self->buffer + 1, tim);
+}
 /* The class's table getter (called by func_8003B39C and func_8003B3FC). */
 Class6D430Methods *func_8003B614(void) {
     return &D_8006E558;
