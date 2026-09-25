@@ -21,8 +21,10 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
+#include "ModelData.h"
+
 /* D_8006F384 +0x064: the active driver's setFlag, then slot +0x078. */
-void ModelData__Load(DataSrc33808 *self) {
+void ModelData__Load(ModelData *self) {
     GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
     ((s32 (*)())self->methods->slot78)(self);
 }
@@ -38,3 +40,7 @@ void ModelData__Load(DataSrc33808 *self) {
 ## Naming
 
 - **ModelData__Load**, tier A. Slot +0x064: the active driver's setFlag, then BuildResources (slot78).
+
+## Track 4
+
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x078 keeps Class6D430's name `slot78`: an inherited slot keeps the parent's name. Its occupant here is ModelData__BuildResources, so the call still casts it. Image byte-identical.

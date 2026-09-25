@@ -21,9 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
+#include "ModelData.h"
+
 /* D_8006F384/D_8006F40C +0x080: forwarded to slot +0x078 of the object at +0x30. */
-u8 ModelData__ForwardScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
-    return ((s32 (*)())self->unk30->methods->slot78)(self->unk30, arg1, arg2);
+u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
+    return ((s32 (*)())self->todSet->methods->slot78)(self->todSet, arg1, arg2);
 }
 ```
 
@@ -37,3 +39,7 @@ u8 ModelData__ForwardScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
 ## Naming
 
 - **ModelData__ForwardScanPackets**, tier A. Slot +0x080, shared with TriggerWorld: forwards to slot78 of the tods object at +0x30.
+
+## Track 4
+
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x080 is `scanPackets`, `u8 (*)(ModelData *self, s32 arg1, s32 arg2)`. The forwarded call reads `todSet->methods->slot78` through Class6D430's table, still cast, because the TodSet class (D_8006F590) is not unified. Image byte-identical.

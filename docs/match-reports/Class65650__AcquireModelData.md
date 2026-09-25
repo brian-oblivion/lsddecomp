@@ -99,3 +99,7 @@ one of the two possible label placements.
 Round 75 (charlie), track 3.
 
 - `Class65650__AcquireModelData` (was `func_80065C5C`), tier A. Borrows arg1->modelData (+0x0C) with ownsModelData = 0, or makes one with New_ModelData(arg1) with ownsModelData = 1. On success returns setupParts (+0x100); on NULL calls ReleaseModelData and returns 1.
+
+## Track 4
+
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`. code_55dd4.c includes it, and include/code_55dd4.h's local `extern Unk5CObj *New_ModelData(UnkArg1Obj *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct Src6F240 *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to Class65650 and is left for that class's unification. Image byte-identical.

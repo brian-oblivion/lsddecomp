@@ -21,9 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
+#include "ModelData.h"
+
 /* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
-void ModelData__Finalize(DataSrc33808 *self) {
-    self->methods->slot7C();
+void ModelData__Finalize(ModelData *self) {
+    self->methods->releaseResources(self);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
 ```
@@ -38,3 +40,7 @@ void ModelData__Finalize(DataSrc33808 *self) {
 ## Naming
 
 - **ModelData__Finalize**, tier A. Slot +0x00C: releases resources (slot7C) then the active driver's finalize.
+
+## Track 4
+
+2026-09-25, round 84 (delta): ModelData (D_8006F384) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x07C is `releaseResources` (occupant ModelData__ReleaseResources), prototyped `void (*)(ModelData *self)`. The call is now `releaseResources(self)`; before, it was the unprototyped `slot7C()` with no argument. The bytes are the same because self is already in $a0 at the jalr. Image byte-identical.
