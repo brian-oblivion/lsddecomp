@@ -63,7 +63,9 @@ INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F33C);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F360);
 void func_8001F37C(void) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F384);
+void *func_8001F384(void) {
+    return D_8006BEA0;
+}
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F394);
 s32 func_8001F3A4(void *self) {
     return D_8008AC4C;
