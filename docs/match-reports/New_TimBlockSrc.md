@@ -39,3 +39,7 @@ void *New_TimBlockSrc(s32 arg0) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **New_TimBlockSrc**, tier B. Allocator for D_8006F0B8; class named for its own mechanics (see TimBlockSrc__TimBlockSrc).

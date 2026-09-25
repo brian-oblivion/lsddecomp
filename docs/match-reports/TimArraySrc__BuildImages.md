@@ -98,3 +98,7 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
 ## Notes
 
 First build. The GsIMAGE local (0x1C bytes) is what gives retail's 0x50 frame. Local views: `Image43CB8` (LIBGS.H GsIMAGE, same layout as code_2bb9c.c's local GsIMAGE), `Tim43CB8`/`TimMethods43CB8` (TimImage as this function sees it: Class6D430 plus +0x09C getTimInfo and +0x04C), `Obj43CB8` (D_8006F1C4's +0x2C..+0x38). func_8003B39C is prototyped locally returning the local view, as class_3bb8c_d.c does.
+
+## Naming
+
+- **TimArraySrc__BuildImages**, tier A. Slot +0x064: builds one TimImage (func_8003B39C(NULL)) per image record in the buffer, each adopting its sub-buffer and computing its CLUT base from GsGetTimInfo-style fields.

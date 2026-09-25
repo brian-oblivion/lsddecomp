@@ -38,3 +38,7 @@ void MoviePlayer__Finalize(Obj455D4 *self) {
 ## Notes
 
 First build. DecDCT* declared locally with LIBPRESS.H's prototypes; MoviePlayer__FreeFrameBuffers forward-declared unprototyped (its definition later in the file takes the unit-local Obj4575C *).
+
+## Naming
+
+- **MoviePlayer__Finalize**, tier A. Releases the CD stream object, detaches and resets the MDEC decoder, frees the frame buffers, then BasicClass's finalize.

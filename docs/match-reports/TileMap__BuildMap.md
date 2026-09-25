@@ -69,3 +69,7 @@ void TileMap__BuildMap(Obj6F498 *self) {
 ## Notes
 
 Matched on build 2. **Lever: `mult` by a register holding a constant the function just stored = multiply by the FIELD, not the literal.** `n = self->unk2E * 15` compiled to sll/subu (GCC expands a literal multiply to shifts) and 1 word short; `n = self->unk2E * self->unk30` right after `self->unk30 = 15` lets CSE substitute the stored constant into a register and keeps the real `mult`. The +0x2E operand is reloaded (`lhu` after its own `sh`) because the two byte stores in between invalidate it, while +0x30 was stored after them. Also: the 0x28 frame (8 bytes above the outgoing-args area) came for free -- an `s32 unused[2]` on top of it overshot to 0x30; do not pad it. The loop guard is `beqz` (not `blez`) with a signed `slt` in the body from a plain `for (i = 0; i < n; i++) *p++ = i;`. Unit-local `Obj6F498` gained +0x2C..+0x38 fields in place of its pad (additive; TileMap__TileMap/TileMap__Load re-verified by the whole-image oracle).
+
+## Naming
+
+- **TileMap__BuildMap**, tier A. Slot +0x078: copies the TileAtlas's cell array pointer, then lays out a 20x15 grid of 16x16 cells (320x240, a full-screen tile map) and fills an index table 0..n-1.

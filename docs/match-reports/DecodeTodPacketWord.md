@@ -41,3 +41,7 @@ u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *o
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **DecodeTodPacketWord**, tier A. Free function occupying slot80, shared between Tod and TodSet: decodes one packet word into value/type/sub-type/length fields.

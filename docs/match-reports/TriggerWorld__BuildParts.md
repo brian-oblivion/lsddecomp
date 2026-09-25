@@ -57,3 +57,7 @@ fail:
 ## Notes
 
 First build. The loop pointer walks `buf->entries` while the offset is re-read through `self->buffer` each pass (retail reloads 0x10(s1) in the loop body); the count is held as s32 (blez/slt). The failure path is `goto fail` with the label after `return 0`.
+
+## Naming
+
+- **TriggerWorld__BuildParts**, tier A. Slot +0x078: builds a ModelData (not owning) over each sub-block of the buffer's counted offset table, counting them at +0x38.

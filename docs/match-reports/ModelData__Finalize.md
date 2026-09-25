@@ -34,3 +34,7 @@ void ModelData__Finalize(DataSrc33808 *self) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **ModelData__Finalize**, tier A. Slot +0x00C: releases resources (slot7C) then the active driver's finalize.

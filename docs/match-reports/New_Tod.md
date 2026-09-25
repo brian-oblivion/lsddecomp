@@ -39,3 +39,7 @@ void *New_Tod(s32 arg0) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **New_Tod**, tier A. Allocator for D_8006F240; the packet fields it decodes (byte value, 4-bit type/sub-type nibbles, byte length) match include/code_55dd4.h's own description of TOD packets (attribute, coordinate, model-id, parent), and its array-of-these subclass is externally named TodSet.

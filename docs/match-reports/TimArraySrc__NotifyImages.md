@@ -37,3 +37,7 @@ void TimArraySrc__NotifyImages(DataSrc33808 *self) {
 ## Notes
 
 First build. Pointer walk with the increment after the call (the addiu lands in the jalr delay slot). slot78 is `void *` in the unified macro; cast at the call site.
+
+## Naming
+
+- **TimArraySrc__NotifyImages**, tier A. Slot +0x078: forwards slot78 to every image in the array.

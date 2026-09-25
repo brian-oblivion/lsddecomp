@@ -49,3 +49,7 @@ void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **BgLayer__BgLayer**, tier B. Constructor: Class6B5CC's ctor, then this table, then Reset with the two arguments.

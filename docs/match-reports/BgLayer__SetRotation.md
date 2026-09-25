@@ -51,3 +51,7 @@ void BgLayer__SetRotation(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
 ## Notes
 
 First build. `/` and `%` of the same operands share one div (mflo then mfhi). The unit-local `Obj6F2C4` gained +0x64 (s32) after a pad, additively; its size is now 0x68, the allocator's (New_BgLayer) BMemPMgrAlloc size.
+
+## Naming
+
+- **BgLayer__SetRotation**, tier B. Slot +0x044: a ratio converted to 20.12 fixed point, stored or added into the rotate field.

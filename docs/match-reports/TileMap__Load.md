@@ -44,3 +44,7 @@ void TileMap__Load(Obj6F498 *self) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **TileMap__Load**, tier A. Slot +0x064: unless +0x2A is set, BuildMap and mark +0x42.

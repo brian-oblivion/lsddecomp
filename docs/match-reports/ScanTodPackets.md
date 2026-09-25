@@ -81,3 +81,7 @@ About twenty builds plus one bounded permuter search (Gate 3: check 1 scaffold c
 ### Proposed learning
 
 A loop pre-test that retail does as a SIGNED compare (`blez`) on a value cc1 can prove non-negative (a u8 variable) while cc1 emits `beqz`: put a side-effecting statement into the for-init as a comma expression (`for (j = 0, out -= cnt; j < cnt; j++)`); with the statement before the loop cc1 simplifies the test.
+
+## Naming
+
+- **ScanTodPackets**, tier A. Free function occupying slot7C, shared between Tod and TodSet: walks the TOD packet stream counting/looking up type-8/type-2 packets; the packet shape matches include/code_55dd4.h's TOD-packet description exactly.

@@ -27,3 +27,7 @@ void *GetModelDataMethods(void) {
 
 - Only `common.h` is included; no shared header was edited. Local declarations
   sit directly above the function in `src/code_33808.c`.
+
+## Naming
+
+- **GetModelDataMethods**, tier A. Table getter.

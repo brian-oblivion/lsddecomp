@@ -95,3 +95,7 @@ void TimBlockSrc__TimBlockSrc(Obj43068 *self, char *name) {
 ## Notes
 
 Twenty-ninth build (four families of levers, all needed together): (1) an `s16 shift` local holding D_8008A92C -- with s32 the frame was 0x20 against retail's 0x28 and `s32 unused[2]` fixed only the frame; the s16 local gives the 0x28 frame by itself (no unused array); (2) `u16 addr` AND `u16 mask` locals: with s32 (or u32) either one the running sum lost retail's `addu v0,a3,a0; move a3,v0` pair (one word short); s16/u16 for both is what matches; (3) the invariant order: `mask = 1 << D_8008A92C; shift = D_8008A92C;` puts the `sllv` ahead of the `move t0,v1` copy -- `shift = ...; mask = 1 << shift;`, `mask = 1 << (shift = ...)` and `mask = 1 << D_8008A92C` after the shift all leave them swapped (78/80); (4) the loop as an index (`e = &self->entries[i]`) -- a walking `e++` pointer was 51/80; `addr` as a strength-reduced `i * mask`/`i << shift` was worse (13-21/80), as was re-reading `e->mask`. Local views `Ent43068`/`Obj43068` just above (Obj6F0B8/Ent6F0B8 further down are untouched).
+
+## Naming
+
+- **TimBlockSrc__TimBlockSrc**, tier B. Constructs a sector-header + block loader with 4 CLUT palette-fade channel entries at +0x40; mechanics described, no external caller names this class (class_3bb8c_l.c's own caller comment calls its return type opaque).

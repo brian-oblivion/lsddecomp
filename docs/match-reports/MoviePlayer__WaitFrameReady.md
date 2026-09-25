@@ -43,3 +43,7 @@ caller. Byte-identical.
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **MoviePlayer__WaitFrameReady**, tier A. Busy-waits until the frame-ready flag is set; called only from DecodeFrame with the active movie.

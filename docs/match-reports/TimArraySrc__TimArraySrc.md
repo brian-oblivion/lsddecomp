@@ -38,3 +38,7 @@ void TimArraySrc__TimArraySrc(DataSrc33808 *self, char *name) {
 ## Notes
 
 First build. No lever needed.
+
+## Naming
+
+- **TimArraySrc__TimArraySrc**, tier A. Constructor; requests or adopts a buffer describing the image array.

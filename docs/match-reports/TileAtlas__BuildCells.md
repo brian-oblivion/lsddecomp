@@ -83,3 +83,7 @@ void TileAtlas__BuildCells(Obj6F514 *self) {
 ## Notes
 
 Eleventh build. The cell is LIBGS.H's GsCELL (u, v, cba, flag, tpage), unit-local as `Cell450B4`; the unit-local `Obj6F514` view's `pad2C[4]` became `struct Cell450B4 *cells` (no other function reads it through that view; whole image green). Three separate levers, each measured: (1) store order `u, tpage, v, cba, flag` -- written in field order the second loop pointer (retail `addiu v1,a0,4`) came out at +6 and the stores reordered (21/61); (2) the loop bound in a register (`li a2,0x12c` + `slt`) = a local `n = 300` assigned just before the loop -- the literal gives `slti`, and assigning n before the allocation kept it in s4 across the call; (3) `self->cells = BMemPMgrAlloc(...); if (self->cells != NULL) { i = 0; c = self->cells; n = 300; for (; i < n; ...)` -- that exact statement order i, c, n (the other three orders tried each moved one `move`/`li`, 58-59/61), and `self->cells = c = ...; if (c)` added a `move a0,v0` ahead of the test.
+
+## Naming
+
+- **TileAtlas__BuildCells**, tier A. Slot +0x078: builds 300 GsCELLs (16x16 texels each) tiling the texture pages from x 0x280, wrapping rows and switching texture pages every 64 texels.

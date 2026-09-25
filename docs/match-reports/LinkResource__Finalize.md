@@ -38,3 +38,7 @@ void LinkResource__Finalize(DataSrc33808 *self) {
 ## Notes
 
 First build. A plain `while (*objs != NULL)` is rotated by GCC into the top-test + bottom-test shape retail has.
+
+## Naming
+
+- **LinkResource__Finalize**, tier A. Class6D430 finalize override: releases every object in the NULL-ended array at +0x2C.

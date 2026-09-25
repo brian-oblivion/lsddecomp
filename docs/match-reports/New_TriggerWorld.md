@@ -41,3 +41,7 @@ void *New_TriggerWorld(s32 arg0) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **New_TriggerWorld**, tier A. code_4cd08.c already declares `extern TriggerWorld *func_80044A0C(s32 *ctx)`, and docs/match-reports/FireDreamAuxTriggerEntries.md (a caller in that same unit) already ties this object into the dream-aux trigger system.

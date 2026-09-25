@@ -41,3 +41,7 @@ void *New_ModelData(s32 arg0) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **New_ModelData**, tier A. include/code_55dd4.h's Unk5CObj already names this object's own +0x2C/+0x30 fields "tmd"/"tods" (populated by New_LinkResource/New_TodSet), and src/code_55dd4.c's own header comment calls this allocator's result "modelData".

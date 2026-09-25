@@ -71,3 +71,7 @@ void MoviePlayer__Abort(Obj458B8 *self) {
 ## Notes
 
 First build. The same through-the-global shape as MoviePlayer__Stop (a local `cur` copy of D_8008A940). The duplicated `unk44 = 1` is real source: retail stores it in the bnez delay slot (both paths) and again inside the if. Views Methods458B8/Obj458B8 (defined at MoviePlayer__Stop) gained slot48 and unk54 additively.
+
+## Naming
+
+- **MoviePlayer__Abort**, tier A. Slot +0x04C: hard-stops the active movie and clears its frame-ready callback the first time.

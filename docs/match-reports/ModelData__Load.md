@@ -34,3 +34,7 @@ void ModelData__Load(DataSrc33808 *self) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **ModelData__Load**, tier A. Slot +0x064: the active driver's setFlag, then BuildResources (slot78).

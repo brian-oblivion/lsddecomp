@@ -25,3 +25,7 @@ void BgLayer__NoOp(void) {
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
   directly above the function in `src/code_33808.c`.
+
+## Naming
+
+- **BgLayer__NoOp**, tier C. Empty body filling BgLayer's own extra slot +0x0BC; no call site found for it in this unit, mechanics-only name.

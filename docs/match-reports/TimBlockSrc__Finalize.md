@@ -36,3 +36,7 @@ void TimBlockSrc__Finalize(DataSrc33808 *self) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **TimBlockSrc__Finalize**, tier B. Class6D430 finalize override for TimBlockSrc: releases the block array and the active driver's finalize.

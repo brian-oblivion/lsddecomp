@@ -28,3 +28,7 @@ void *GetLinkResourceMethods(void) {
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
   directly above the function in `src/code_33808.c`.
+
+## Naming
+
+- **GetLinkResourceMethods**, tier A. Table getter.

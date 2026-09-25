@@ -98,3 +98,7 @@ s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) 
 ## Notes
 
 Ninth build. Every shape with the failing open as an early `if (open(...) != 0) return 1;` measured 41/59, 2 words short: retail keeps TWO separate `move v0,zero` returns (the body's tail `j <epi>; move v0,zero` and the `D_8008A940 != NULL` target right before the epilogue), mine merged them. Tried and unchanged (41/59): no return at the end of the body; a `ret` variable for either or both returns; `goto done` to a label at the end; an explicit `else { return 0; }`. The early `if (D_8008A940 != NULL) return 0;` first is far worse (25/59, it inlines the return). What matches is the SUCCESS path nested under `if (open(...) == 0) { ...; return 0; } return 1;`: the `return 1` block then sits between the two `return 0`s when jump optimisation runs, so they cannot be merged, and reorg afterwards steals its `li v0,1` into the `bnez` delay slot and deletes the block -- leaving exactly retail's layout. The matched-already MoviePlayer__DrawStrip lost its unit-local `extern DrawSys45BC8 *GetDrawSystem(void);` in favour of one `extern void *GetDrawSystem(void);` declared here (first use), with a cast at its call; its bytes are unchanged (whole image green).
+
+## Naming
+
+- **MoviePlayer__Play**, tier A. Slot +0x040: starts playing a named movie file when none is already active, registers the frame rectangle with the draw system.

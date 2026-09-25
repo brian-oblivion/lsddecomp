@@ -38,3 +38,7 @@ void ModelData__ReleaseResources(DataSrc33808 *self) {
 ## Notes
 
 First build. +0x2C is `s32` in the unit-local DataSrc33808 view (other classes store a count there), so it is cast at the use rather than retyped.
+
+## Naming
+
+- **ModelData__ReleaseResources**, tier A. Slot +0x07C: releases the tmd/tods sub-objects when owned.

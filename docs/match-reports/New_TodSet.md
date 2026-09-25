@@ -41,3 +41,7 @@ void *New_TodSet(s32 arg0) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **New_TodSet**, tier A. include/code_55dd4.h's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.

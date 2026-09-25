@@ -82,3 +82,7 @@ out:
 ## Notes
 
 Third build. Body-first (`if (unk50 != 0) {...} if (unk64) return slot68(cur);`) was 13/60: retail tests the stopped case first and places the slot68 call LAST behind a `j`. `if (unk50 == 0) { if (unk64 == 0) return 0; } else {...; return 0;} return slot68(cur);` gave that layout at 57/60, with one extra `move v0,zero` (retail's `beqz` has a nop delay slot: no return value on that path); `return cur->unk64;` there is identical. `goto out;` to a label at the very end (fall off, no value) matches; so does the mirror `if (unk64 != 0) goto call;` with the call behind a label at the bottom. Local views `Methods45948`/`StreamMethods45948`/`Stream45948`/`Obj45948` just above.
+
+## Naming
+
+- **MoviePlayer__Advance**, tier A. Slot +0x048: while the stream is running, advances the CD stream and, once negative (finishing), decrements the loop counter and stops the stream at zero.

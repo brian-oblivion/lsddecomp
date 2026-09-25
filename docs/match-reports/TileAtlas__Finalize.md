@@ -35,3 +35,7 @@ void TileAtlas__Finalize(DataSrc33808 *self) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **TileAtlas__Finalize**, tier A. Slot +0x00C: frees the cell array, then the active driver's finalize.

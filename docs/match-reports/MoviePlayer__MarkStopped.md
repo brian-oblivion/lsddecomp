@@ -26,3 +26,7 @@ void MoviePlayer__MarkStopped(Obj33808_50 *self) {
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
   directly above the function in `src/code_33808.c`.
+
+## Naming
+
+- **MoviePlayer__MarkStopped**, tier A. Sets the tri-state play flag to -1; called from Stop.

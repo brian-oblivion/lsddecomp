@@ -56,3 +56,7 @@ evicts a0 to make room) is a whole-struct assignment of a `{ s8 x, y, z; }`
 struct; three field-by-field copies compile to `lbu`/nop/`sb` triples, three
 words longer. Extends the "four lw then four sw" struct-copy idiom to byte
 structs, where the signed load is the tell.
+
+## Naming
+
+- **BgLayer__SetColor**, tier B. Slot +0x0B8: conditionally copies a 3-byte vector into the GsBG's colour field.

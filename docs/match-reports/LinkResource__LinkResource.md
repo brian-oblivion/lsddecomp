@@ -63,3 +63,7 @@ Matched on build 7. **Lever: a `goto fail` to a `return NULL` placed AFTER the f
 | `if (r) goto fail;` ... `return self; fail: return NULL;` | **41/41** |
 
 Src6F240 moved up the file to precede this function (no layout change); Tod__Tod uses it unchanged.
+
+## Naming
+
+- **LinkResource__LinkResource**, tier A. Constructor of the class external code already names LinkResource.

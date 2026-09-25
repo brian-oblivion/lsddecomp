@@ -50,3 +50,7 @@ void TileAtlas__TileAtlas(Obj6F514 *self, s32 arg) {
 ## Notes
 
 First build. The 0x40 frame with nothing on the stack past ra/s0/s1 is the unused-local-array lever (`s32 unused[8];`, same as TileAtlas__Load in this class). The unit-local `Obj6F514` moved up the file to precede this function and gained +0x30 (u16) and +0x34 (s32); TileAtlas__Load still uses it unchanged (re-verified by the whole-image oracle).
+
+## Naming
+
+- **TileAtlas__TileAtlas**, tier A. Constructor: clears state and, unowned, runs Load.

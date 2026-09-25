@@ -79,3 +79,7 @@ s32 MoviePlayer__PullFrame(Obj45AD8 *self) {
 ## Notes
 
 Fifth build. Early-return shape (`if (self->unk48 != 0) return 1; ... if (r == 0) return 1; ...`) measured 39/58, one word long: the final `if (r < 0)` branch stole `move v0,zero` from its target where retail fills the delay slot with the store's `li v0,1` from the fall-through. `r <= -1` and the inverted `if (r >= 0) return 0;` changed nothing; `r == -1` is wrong (40/58). Nesting the whole body under `if (unk48 == 0) { ...; if (r != 0) { ...; return 0; } } return 1;` -- one shared `return 1` at the bottom -- matches. Local views `StreamMethods45AD8`/`Stream45AD8`/`Obj45AD8` just above; DecDCTvlc is Sony's (LIBPRESS), extern only.
+
+## Naming
+
+- **MoviePlayer__PullFrame**, tier A. Slot +0x058: unless the stream has ended, pulls the next compressed frame from the CD stream and VLC-decodes it into the flipped frame buffer.

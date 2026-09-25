@@ -25,3 +25,7 @@ void MoviePlayer__NoOpFreeBuffer(void) {
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
   directly above the function in `src/code_33808.c`.
+
+## Naming
+
+- **MoviePlayer__NoOpFreeBuffer**, tier B. Empty freeBuffer-shaped override (matches the Class6D430 slot MoviePlayer otherwise repurposes); MoviePlayer needs no buffer freed at this slot.

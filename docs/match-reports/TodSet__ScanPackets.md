@@ -41,3 +41,7 @@ u8 TodSet__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
 
 `lw n; sll 2; addu base; ...; addiu K` (base added before the constant) is
 `&p->arr[n] + K/4`; `&p->arr[n + K/4]` puts the `addiu K` before the `addu`.
+
+## Naming
+
+- **TodSet__ScanPackets**, tier A. Slot +0x078: forwards to slot7C over the data past the buffer's counted array (shared mechanism with Tod__ScanPackets/ScanTodPackets).

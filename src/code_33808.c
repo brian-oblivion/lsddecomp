@@ -4,16 +4,42 @@
  * 0x80043008..0x80045E54). It was counted as Psy-Q SDK by segment name;
  * tools/gameinsdk.py measured it as game (a call into game code, a method-
  * table entry beside game methods, or contiguity with those, and no Sony
- * fingerprint). What it holds: the methods of eleven tables (D_8006F0B8,
- * D_8006F13C, D_8006F1C4, D_8006F240, D_8006F2C4, D_8006F384, D_8006F40C,
- * D_8006F498, D_8006F514, D_8006F590, D_8006F614) and nine slots of
- * D_8006D430 (Class6D430, the data-source interface): from +0x07C that table
- * lists `Get...Methods` getters (4-word `return &table` stubs) and nine of
- * them are here, one per class. The methods call Lock/UnlockActiveDataSource
- * and GetClass6B5CCMethods. libpress starts right after, at DecDCTReset
- * (now psyq_36654).
+ * fingerprint). All 97 functions matched in round 82; named in round 83
+ * (track 3 naming pass).
  *
- * Matching began in round 82: `grep -c INCLUDE_ASM` gives what is left.
+ * Eleven method tables, nine of them Class6D430 (data-source) subclasses
+ * reached through nine of D_8006D430's own `Get...Methods` getter slots
+ * (from +0x07C):
+ *
+ *   - TimBlockSrc  (D_8006F0B8): a sector-header + block loader with four
+ *     CLUT palette-fade channels (FadeClutRow).
+ *   - LinkResource (D_8006F13C): a NULL-ended array of TMD models
+ *     (New_TmdModel); named from external call sites (class_3bb8c.c,
+ *     code_55dd4.h) that already declare it `LinkResource *`.
+ *   - TimArraySrc  (D_8006F1C4): an array of TimImage objects
+ *     (code_2bb9c.c's func_8003B39C).
+ *   - Tod / TodSet (D_8006F240 / D_8006F590, TodSet a Tod subclass): one
+ *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
+ *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
+ *   - ModelData / TriggerWorld (D_8006F384 / D_8006F40C, TriggerWorld a
+ *     ModelData subclass): a LinkResource+TodSet pair, and an array of
+ *     those pairs; ModelData named from code_55dd4.h/.c's own "tmd"/"tods"/
+ *     "modelData" fields, TriggerWorld from code_4cd08.c's own declared
+ *     return type.
+ *   - TileMap / TileAtlas (D_8006F498 / D_8006F514): a 20x15 grid of
+ *     16x16-cell map data (a GsMAP, consumed by BgLayer as its map source)
+ *     and the 300-GsCELL texture atlas it indexes; built together and used
+ *     together in src/code_2c054.c's TaskCoreObj__TaskCoreObj.
+ *
+ * Two more classes, not Class6D430 subclasses:
+ *
+ *   - BgLayer (D_8006F2C4): a Class6B5CC subclass wrapping one GsBG
+ *     scrolling background layer (its own fields are GsBG's own layout).
+ *   - MoviePlayer (D_8006F614): a BasicClass subclass driving CD-streamed,
+ *     MDEC-decoded FMV playback (open a CD stream, decode/upload strips,
+ *     play/stop/tick controls); called from code_2c054.c.
+ *
+ * libpress starts right after, at DecDCTReset (now psyq_36654).
  */
 #include "common.h"
 #include "BasicClass.h"

@@ -34,3 +34,7 @@ void TriggerWorld__Finalize(DataSrc33808 *self) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **TriggerWorld__Finalize**, tier A. Slot +0x00C: releases parts (slot7C) then the parent ModelData's finalize.

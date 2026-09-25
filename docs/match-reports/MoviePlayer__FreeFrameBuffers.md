@@ -48,3 +48,7 @@ void MoviePlayer__FreeFrameBuffers(Obj4575C *self) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **MoviePlayer__FreeFrameBuffers**, tier A. Frees the four buffers InitFrame allocated, unless they were caller-supplied (+0x0C set).

@@ -83,3 +83,7 @@ fail:
 ## Notes
 
 Second build. The first build was byte-identical except the frame (0x20 against retail's 0x28; 58/68 because every save offset moved). Retail touches no stack slot besides the four saves, so the extra 8 bytes are an unused local: `s32 unused[2];` matches (the -Wall baseline gains one unused-variable warning). The `>> 1` is literal: retail has `sll 4; sra 1` with no rounding fix-up, which `/ 2` would add. `goto fail` with the label after `return 0` gives retail's layout directly. Local views `Frame4564C`/`Obj4564C` just above.
+
+## Naming
+
+- **MoviePlayer__InitFrame**, tier A. Sets up the frame descriptor and, unless the caller supplies its own buffers, allocates the two decode buffers, the ring buffer and the strip buffer.

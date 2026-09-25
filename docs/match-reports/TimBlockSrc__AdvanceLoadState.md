@@ -104,3 +104,7 @@ out:
 ## Notes
 
 Second build (the first was already 183/183; the second only added local Lock/UnlockActiveDataSource prototypes, which the unit declares further down, to avoid implicit declarations). The shape: a two-case `switch (self->unk2A)` (retail `beq 9; beq 10; j <out>`), `goto fail` for both allocation failures with the `fail:` block (`unk80 = 1`) after the switch and a `goto out` over it; cc1 cross-jumps the two identical `read(...); unk2A = 10;` tails into retail's shared `L80043460`. The header copy is a struct assignment through a `u8 bytes[0x24]` view (`Hdr43200`, alignment 1), which is what produces retail's runtime-aligned block move (`or; andi 3; beqz` choosing a lw/sw loop or a lwl/lwr loop, 0x20 bytes, then one 4-byte tail). Uses the `Obj43068` view TimBlockSrc__TimBlockSrc introduced.
+
+## Naming
+
+- **TimBlockSrc__AdvanceLoadState**, tier B. setFlag override implementing the two-state (9 header-read, 10 block-read) loader state machine described in the function's own header comment.

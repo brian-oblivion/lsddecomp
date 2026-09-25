@@ -49,3 +49,7 @@ void TimBlockSrc__FadeEntry(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
 ## Notes
 
 First build. The three lb then three sb is whole-struct assignment of the 3 x s8 `Vec3S8` (the lever from BgLayer__SetColor). Vec3S8's typedef moved up the file (no code change) and the local `Ent6F0B8` gained `vec` at +0x0C (size unchanged, 16). FadeClutRow is prototyped locally from its asm (a0 = entry pointer, a1 = index used in sllv).
+
+## Naming
+
+- **TimBlockSrc__FadeEntry**, tier B. Slot +0x080: sets one entry's 3-byte target colour and hands it to FadeClutRow.

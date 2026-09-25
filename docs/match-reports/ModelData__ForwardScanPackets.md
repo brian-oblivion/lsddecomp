@@ -33,3 +33,7 @@ u8 ModelData__ForwardScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **ModelData__ForwardScanPackets**, tier A. Slot +0x080, shared with TriggerWorld: forwards to slot78 of the tods object at +0x30.

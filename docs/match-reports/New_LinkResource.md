@@ -41,3 +41,7 @@ void *New_LinkResource(s32 arg0) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **New_LinkResource**, tier A. src/class_3bb8c.c and include/code_55dd4.h already declare this allocator's return type as `LinkResource *` at their own call sites.

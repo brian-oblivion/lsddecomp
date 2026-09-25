@@ -25,3 +25,7 @@ void LinkResource__NoOp(void) {
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
   directly above the function in `src/code_33808.c`.
+
+## Naming
+
+- **LinkResource__NoOp**, tier B. Empty body filling LinkResource's own slot78 (called by LinkResource__BuildModels itself); mechanics-only name, no further evidence of purpose.

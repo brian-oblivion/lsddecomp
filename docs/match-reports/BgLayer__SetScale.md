@@ -100,3 +100,7 @@ void BgLayer__SetScale(Obj6F2C4 *self, s32 set, Scale4441C *src) {
 ## Notes
 
 Second build. The first build matched everything but the clamp in the `set` arm (89/140): with an `s16 v` temporary the extension moved to the compare and the store took the raw value; retail extends once, before the compare, so the temporary is `s32 v = sx;` (sx/sy themselves are `s16` locals, which gives retail's use-site `sll/sra` in the add arm). The first divisor is held in a local (`den`, retail keeps it in a3 for the `set` arm's zero test) while the second is re-read from `src` (retail reloads +6). sx/sy are left unset on a zero divisor, as in retail. The 0x10 leaf frame came for free. Local view `Scale4441C` just above; the GsBG scale fields are the `Obj6F2C4` fields named by BgLayer__Reset.
+
+## Naming
+
+- **BgLayer__SetScale**, tier B. Slot +0x048: two ratios become the GsBG's x/y scale, clamped to 30000, stored or added.

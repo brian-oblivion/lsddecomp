@@ -39,3 +39,7 @@ void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
 ## Notes
 
 First build; the same shape as TodSet__TodSet (D_8006F590's ctor). The allocator New_ModelData passes 1 as the parent's third argument; this subclass passes 0. setFlag is cast at the call site to return s32.
+
+## Naming
+
+- **TriggerWorld__TriggerWorld**, tier A. Constructor: the parent ModelData's ctor (owns=0), then this table; runs its own Load when the argument's first word is set.

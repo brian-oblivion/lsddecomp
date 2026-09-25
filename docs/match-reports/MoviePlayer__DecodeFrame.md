@@ -77,3 +77,7 @@ s32 MoviePlayer__DecodeFrame(Obj45CFC *self) {
 ## Notes
 
 Second build. The first shape, `if (cur->unk44 != 0) return slot64(cur);` ahead of the rest, measured 1/57: the early return put the slot64 call inline, AND cc1 merged `cur` and `self` into one register (the compare's equivalence). Nesting the body under `if (cur->unk44 == 0) { ...; return 0; } return cur->methods->slot64(cur);` fixed both at once -- the global then stays in s0 and self in s1, exactly retail. The function has no return on the `cur != self` path (retail leaves v0 unset). Local views `Methods45CFC`/`Obj45CFC` are unit-local and declared just above it; DecDCTin is Sony's (LIBPRESS), extern only.
+
+## Naming
+
+- **MoviePlayer__DecodeFrame**, tier A. Slot +0x068: when a frame finished pending, runs PollActive's own result; otherwise waits for the last strip, decodes the next frame's bitstream and its first strip.

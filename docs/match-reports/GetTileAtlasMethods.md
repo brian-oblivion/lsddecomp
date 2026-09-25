@@ -27,3 +27,7 @@ void *GetTileAtlasMethods(void) {
 
 - Only `common.h` is included; no shared header was edited. Local declarations
   sit directly above the function in `src/code_33808.c`.
+
+## Naming
+
+- **GetTileAtlasMethods**, tier A. Table getter.

@@ -33,3 +33,7 @@ void Tod__Finalize(Class6D430 *self) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **Tod__Finalize**, tier A. Class6D430 finalize override, straight to the active driver's.

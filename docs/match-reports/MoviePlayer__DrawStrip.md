@@ -77,3 +77,7 @@ void MoviePlayer__DrawStrip(Obj45BC8 *self) {
 ## Notes
 
 First build. DrawSystem is reached through a per-function methods view (the type lives in code_10ee0.c, not a header); DrawSync/DecDCTout declared locally with the Psy-Q prototypes. Field names (strip, x0, y0, width, stripSize) are readings of this one function.
+
+## Naming
+
+- **MoviePlayer__DrawStrip**, tier A. Slot +0x060: uploads the decoded strip, steps the draw rectangle, and decodes the next strip while still inside the frame; marks the frame done at the end.

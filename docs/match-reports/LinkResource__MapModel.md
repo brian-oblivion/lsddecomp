@@ -36,3 +36,7 @@ void LinkResource__MapModel(Class6D430 *self) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **LinkResource__MapModel**, tier A. Slot +0x078: GsMapModelingData wrapper over the buffer's TMD.

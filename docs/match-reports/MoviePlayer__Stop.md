@@ -67,3 +67,7 @@ void MoviePlayer__Stop(Obj458B8 *self) {
 ## Notes
 
 First build. Written through a local copy of the global (`cur`) -- retail keeps the global in s0 and reads every field through it, not through self. Stores written in retail's order (0x40, 0x3C, 0x4C, 0x48, 0x44). The +0x60 object's class is not identified; a per-function methods view with unprototyped slots. (The views gained slot48/unk54 additively for MoviePlayer__Abort; this report's inlined copy is the current one.)
+
+## Naming
+
+- **MoviePlayer__Stop**, tier A. Slot +0x044: when this is the active movie, resets its state words and marks it stopped (callback cleared, MarkStopped).

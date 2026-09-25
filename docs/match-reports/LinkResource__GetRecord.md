@@ -43,3 +43,7 @@ Rec6F13C *LinkResource__GetRecord(Class6D430 *self, s32 index) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **LinkResource__GetRecord**, tier A. Slot +0x07C: address of record `index`, 0x1C bytes each.

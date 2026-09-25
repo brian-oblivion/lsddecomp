@@ -42,3 +42,7 @@ void TimBlockSrc__FadeAllEntries(DataSrc33808 *self, s32 arg) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **TimBlockSrc__FadeAllEntries**, tier B. Slot +0x07C: loops the 4 CLUT-fade entries under the data-source lock, calling slot80 (TimBlockSrc__FadeEntry) on each.

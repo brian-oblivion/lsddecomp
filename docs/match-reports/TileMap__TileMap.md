@@ -52,3 +52,7 @@ void TileMap__TileMap(Obj6F498 *self, s32 arg1, s32 arg2) {
 ## Notes
 
 First build; the D_8006F514 ctor (TileAtlas__TileAtlas) shape with one more stored argument. The 0x40 frame with no stack use is the unused-local-array lever (`s32 unused[8];`). Unit-local `Obj6F498` moved up to precede this function and gained +0x3C (s32) and +0x40 (u16); TileMap__Load uses it unchanged (whole-image oracle green).
+
+## Naming
+
+- **TileMap__TileMap**, tier A. Constructor: stores the companion TileAtlas object at +0x3C and, unowned, runs Load.

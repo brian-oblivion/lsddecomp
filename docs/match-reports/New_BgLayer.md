@@ -39,3 +39,7 @@ void *New_BgLayer(s32 arg0, s32 arg1) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **New_BgLayer**, tier B. Allocator for D_8006F2C4, a Class6B5CC subclass whose own fields (bgAttribute, x/y/w/h, scrollx/scrolly, scalex/scaley, a 20.12 fixed-point rotate word) are GsBG's own layout.

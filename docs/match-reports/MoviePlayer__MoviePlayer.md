@@ -82,3 +82,7 @@ s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
 ## Notes
 
 First build, written straight away in the nested success-path shape (`if (stream != NULL) { if (MoviePlayer__InitFrame(...) == 0) { ...; return 0; } } return 1;`) that this session's MoviePlayer__Play/MoviePlayer__PullFrame established: retail's two failure exits share one `return 1` block, whose `li v0,1` reorg stole into the second branch's delay slot. Local views `Obj454C4`/`Methods454C4`/`Stream454C4` just above; New_CdStreamObj (code_3770c.c) is prototyped locally with void * return. DecDCTReset/DecDCToutCallback are Sony's (LIBPRESS), extern only.
+
+## Naming
+
+- **MoviePlayer__MoviePlayer**, tier A. Constructor: BasicClass's ctor, opens a CD stream object, sets up decode buffers, resets the MDEC decoder the first time any player is built, and routes the MDEC output callback to OnMdecFrameReady.

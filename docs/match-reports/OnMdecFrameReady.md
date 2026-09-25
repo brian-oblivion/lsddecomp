@@ -37,3 +37,7 @@ void OnMdecFrameReady(void) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **OnMdecFrameReady**, tier A. The DecDCToutCallback target: forwards to the active movie's own slot60 when there is one.

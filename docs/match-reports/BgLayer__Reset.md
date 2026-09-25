@@ -67,3 +67,7 @@ First build that compiled (the first attempt named the field `attribute`, which 
 ### Proposed learning
 
 A Class6B5CC subclass whose fields past +0x044 read (u32, s16 x6, three bytes, a pointer, s16 x4, s32) is a GsBG, and one with a (u8, u8, u16, u16, ptr, ptr) block is a GsMAP; check LIBGS.H's GsBG/GsMAP/GsCELL before inventing field names.
+
+## Naming
+
+- **BgLayer__Reset**, tier B. Slot +0x040: lays out the GsBG over a map source, sized either to the map's cell grid or to a 320x240 screen.

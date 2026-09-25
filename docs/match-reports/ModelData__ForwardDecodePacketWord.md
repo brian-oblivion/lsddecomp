@@ -33,3 +33,7 @@ void *ModelData__ForwardDecodePacketWord(DataSrc33808 *self, s32 arg1, s32 arg2,
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **ModelData__ForwardDecodePacketWord**, tier A. Slot +0x084, shared with TriggerWorld: forwards to slot80 of the tods object at +0x30.

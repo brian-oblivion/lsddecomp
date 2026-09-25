@@ -56,3 +56,7 @@ while (i != 0) {
 ## Notes
 
 Fourth build. The first shape, `for (p--; i != 0; i--, p--) release(*p);`, measured 22/56 with i/p swapped between s0/s1 and the decrements scheduled differently. Three while/for forms with the decrement of p at the TOP of the body all match: `while (i != 0) { p--; release(*p); i--; }`, `for (; i != 0; i--) { p--; release(*p); }`, and `while (i != 0) { i--; p--; release(*p); }` (kept). `while (i-- != 0) { p--; ... }` differs. An index form (`buf->entries[i] = ...`, release `buf->entries[--i]`) was far worse (5/56, 0x48 frame, two extra saved registers).
+
+## Naming
+
+- **TodSet__BuildTods**, tier A. Slot +0x064: builds a Tod over each sub-block of the buffer's counted offset table; releases what was built so far on an allocation failure.

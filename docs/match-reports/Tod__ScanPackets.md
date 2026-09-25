@@ -33,3 +33,7 @@ u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **Tod__ScanPackets**, tier A. Slot +0x078: forwards to slot7C (ScanTodPackets) over the buffer's packet data (past its first two words).

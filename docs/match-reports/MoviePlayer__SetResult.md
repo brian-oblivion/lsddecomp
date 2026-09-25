@@ -32,3 +32,7 @@ void MoviePlayer__SetResult(Obj6F614 *self, s32 value) {
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
   directly above the function in `src/code_33808.c`.
+
+## Naming
+
+- **MoviePlayer__SetResult**, tier A. Slot +0x06C: stores its argument into the result field DecodeFrame reads.

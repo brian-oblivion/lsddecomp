@@ -41,3 +41,7 @@ void *New_TileMap(s32 arg0, s32 arg1) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **New_TileMap**, tier A. src/code_2c054.c's TaskCoreObj__TaskCoreObj hands this object to New_BgLayer as its map source; this object's own fields (+0x2C..+0x30) are byte-for-byte Map44294/GsMAP's own layout (cellw/cellh/ncellw/ncellh).

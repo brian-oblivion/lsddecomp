@@ -36,3 +36,7 @@ s32 LinkResource__GetEntry(Obj6F13C *self, s32 index) {
 
 - Only `common.h` is included; no shared header was edited. Local declarations
   sit directly above the function in `src/code_33808.c`.
+
+## Naming
+
+- **LinkResource__GetEntry**, tier A. Slot +0x080: entry `index` of the word array LinkResource__BuildModels filled.

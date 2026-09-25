@@ -67,3 +67,7 @@ either: the argument's liveness changes the scheduling of the surrounding
 block (here a constant left the branch delay slot and an extra word appeared).
 TileMap__Load matched with `f()` in the same situation and MoviePlayer__PollActive only
 with `f(self)`, so when one form misses, flip it before anything else.
+
+## Naming
+
+- **MoviePlayer__PollActive**, tier A. Slot +0x064: while the stream is still running, throttles a periodic callback (slot44) every 100 ticks; otherwise clears the active-movie global and reports done.

@@ -39,3 +39,7 @@ void *TodSet__TodSet(DataSrc33808 *self, s32 *arg) {
 ## Notes
 
 First build. Slot +0x064 is `void setFlag(Self *)` in the unified macro, but this class's override returns a status: cast at the call site (`((s32 (*)())self->methods->setFlag)(self)`), shared slot not retyped. The parent ctor goes through the unprototyped Ctor33808 view.
+
+## Naming
+
+- **TodSet__TodSet**, tier A. Constructor: the parent Tod's ctor, then this table; runs Load when the argument's first word is set.

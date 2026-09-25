@@ -48,3 +48,7 @@ u32 MaxOfBufferWords(Class6D430 *self) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **MaxOfBufferWords**, tier B. Free helper: the largest of the buffer's counted words from +0x14; used only by TimBlockSrc__AdvanceLoadState to size the block sector buffer.

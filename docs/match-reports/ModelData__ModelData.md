@@ -47,3 +47,7 @@ fail:
 ## Notes
 
 First build, using the `goto fail` lever just found on LinkResource__LinkResource (fail label after the final `return self`). Unlike LinkResource__LinkResource the descriptor is not NULL-tested.
+
+## Naming
+
+- **ModelData__ModelData**, tier A. Constructor: adopts a buffer or requests a file, `owns` stored at +0x34.

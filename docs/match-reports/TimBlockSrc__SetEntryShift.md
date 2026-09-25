@@ -47,3 +47,7 @@ void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **TimBlockSrc__SetEntryShift**, tier B. Occupies slot +0x078: sets one CLUT-fade entry's shift and derives its mask.

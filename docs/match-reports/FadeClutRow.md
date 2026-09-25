@@ -102,3 +102,7 @@ void FadeClutRow(Ent6F0B8 *e, s32 index) {
 ## Notes
 
 Seventh build. Levers, each measured: (1) the colour held in a `u32 c` read ONCE for the zero test and the g/b channels, while the r channel and the STP bit re-read `in[j]` -- retail reloads in[j] in both arms; a `u16 c` let cc1 merge every read, add an `andi 0xffff` and cross-jump the copy arm into the blend's store (49/122); `s32 c` got the reload shape but `sra` for `c >> 2` (90/122); (2) per-channel `s32 cr/cg/cb` temporaries so the unsigned `c` does not make the products unsigned (`srl` where retail has `sra` for `>> 15`), and each channel's blend assigned back to its temporary before one final OR -- retail computes all three then ORs (92 -> 110/122); (3) the blend factor reused in place, `f = 0x1000 - f;` rather than a separate `inv` -- the last register difference (t0 for both, t1 for j) (110 -> 122/122). The frame (0x450: two RECTs and two 256-entry buffers) matched from the first build. The unit-local `Ent6F0B8` view gained `u16 unkA` at +0x0A (its `pad4[8]` became `pad4[6]` + unkA; TimBlockSrc__SetEntryShift/TimBlockSrc__FadeEntry still byte-exact, whole image green). StoreImage/LoadImage/DrawSync are Sony's (LIBGPU), extern only, with a unit-local RECT view `Rect43648`.
+
+## Naming
+
+- **FadeClutRow**, tier B. Free function: blends one 256-colour CLUT row toward a target colour over `mask-1` steps and uploads each step via LIBGPU StoreImage/LoadImage; a pure mechanics leaf (tier B since 'fade' is a purpose word, but the blend math itself is the whole body).

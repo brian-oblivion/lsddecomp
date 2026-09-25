@@ -39,3 +39,7 @@ s32 TriggerWorld__GetOffset(DataSrc33808 *self, u32 index) {
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **TriggerWorld__GetOffset**, tier A. Slot +0x088: entry `index` of the buffer's counted word array, 0 out of range.

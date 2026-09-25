@@ -39,3 +39,7 @@ void *New_TimArraySrc(s32 arg0) {
 - No shared header was edited; prototypes for other units' functions are local
   to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
+
+## Naming
+
+- **New_TimArraySrc**, tier A. Allocator for D_8006F1C4, which builds arrays of TimImage objects (func_8003B39C, confirmed elsewhere as "new TimImage(name)", src/code_2bb9c.c).
