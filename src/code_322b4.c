@@ -99,7 +99,9 @@ typedef struct SpriteView_322b4 {
     u8 unkA8;                     /* +0x0A8, the cell index func_80041BDC stores */
 } SpriteView_322b4;
 struct SpriteMethods_322b4 {
-    u8 pad00[0xBC];
+    u8 pad00[0x40];
+    void (*reset)(SpriteView_322b4 *self, u8 cell);            /* +0x040 = func_80041BAC (D_8006EC74) */
+    u8 pad44[0xBC - 0x44];
     void (*slotBC)(SpriteView_322b4 *self, Pair_322b4 *src);   /* +0x0BC = func_80041E2C */
     u8 padC0[0xC4 - 0xC0];
     void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = func_80041BDC */
@@ -167,7 +169,16 @@ void *func_80041AB4(void *texture, u8 cell) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041B20);
+/* D_8006EC74 slot +0x008 (ctor): the D_8006ED4C ctor with cell 0x20's rect,
+ * install the table, then reset to the caller's cell. */
+void func_80041B20(SpriteView_322b4 *self, void *texture, u8 cell) {
+    SpriteRect r;
+
+    func_80041C4C(&r, 0x20);
+    ((CtorArg3Methods_322b4 *)func_80041ED8())->ctor(self, texture, &r, NULL);
+    self->methods = func_80041C3C();
+    self->methods->reset(self, cell);
+}
 /* D_8006EC74 slot +0x040 (reset): re-select the cell through slot +0x0C4. */
 void func_80041BAC(SpriteView_322b4 *self, u8 cell) {
     self->methods->setCell(self, cell);
@@ -233,6 +244,9 @@ void *func_80041ED8(void) {
     return D_8006ED4C;
 }
 INCLUDE_ASM("asm/nonmatchings/code_322b4", New_Sprite);
+/* Sprite's reset as its ctor calls it: with all five ctor arguments (the
+ * slot is Class6B5CC's, typed without them; Sprite.h, "Not settled"). */
+typedef void *(*SpriteCtorReset_322b4)(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__Sprite);
 /* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
