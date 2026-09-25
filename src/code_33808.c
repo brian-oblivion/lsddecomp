@@ -750,7 +750,7 @@ void *func_80044F30(s32 arg0) {
 /* The D_8006F514 object. */
 typedef struct Obj6F514 {
     CLASS6D430_FIELDS(DataSrc33808Methods);
-    /* +0x02C */ u8 pad2C[4];
+    /* +0x02C */ struct Cell450B4 *cells;  /* 300 GsCELLs, built by func_800450B4 */
     /* +0x030 */ u16 unk30;
     /* +0x032 */ u16 unk32;
     /* +0x034 */ s32 unk34;
@@ -789,7 +789,63 @@ void func_80045060(Obj6F514 *self) {
         self->unk32 = 1;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800450B4);
+/* D_8006F514 +0x078: when +0x30 is set, build 300 GsCELLs (16 x 16 texels
+ * each) at +0x2C over the texture pages from x 0x280: u,v step by 16, a new
+ * row at x 0x3C0, a new texture page every 64 x (the lower half from v
+ * 0x100). */
+typedef struct Cell450B4 {       /* LIBGS.H GsCELL */
+    /* +0x00 */ u8 u;
+    /* +0x01 */ u8 v;
+    /* +0x02 */ u16 cba;
+    /* +0x04 */ u16 flag;
+    /* +0x06 */ u16 tpage;
+} Cell450B4;
+
+/* LIBGPU.H */
+extern u16 GetTPage(int tp, int abr, int x, int y);
+
+void func_800450B4(Obj6F514 *self) {
+    Cell450B4 *c;
+    s32 x = 0x280;
+    s32 u;
+    s32 v;
+    s32 tpage;
+    s32 i;
+    s32 n;
+
+    if (self->unk30 != 0) {
+        v = 0;
+        u = 0;
+        tpage = GetTPage(2, 0, 0x280, 0);
+        self->cells = BMemPMgrAlloc(300 * sizeof(Cell450B4));
+        if (self->cells != NULL) {
+            i = 0;
+            c = self->cells;
+            n = 300;
+            for (; i < n; i++, c++) {
+                c->u = u;
+                c->tpage = tpage;
+                c->v = v;
+                c->cba = 0;
+                c->flag = 0;
+                u += 16;
+                x += 16;
+                if (x >= 0x3C0) {
+                    u = 0;
+                    x = 0x280;
+                    v += 16;
+                }
+                if ((x & 0x3F) == 0) {
+                    tpage = x >> 6;
+                    if (v >= 0x100) {
+                        tpage += 16;
+                    }
+                    u = 0;
+                }
+            }
+        }
+    }
+}
 extern s32 D_8006F514[];
 
 void *func_800451A8(void) {
