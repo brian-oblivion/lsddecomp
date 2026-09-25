@@ -552,7 +552,37 @@ void func_80044B04(DataSrc33808 *self) {
 void func_80044B58(DataSrc33808 *self) {
     ((s32 (*)())self->methods->slot78)(self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044B88);
+/* D_8006F40C +0x078: build a D_8006F384 source (not owning) over each
+ * sub-block of the buffer's counted offset table, into the table's own
+ * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
+ * (release) and 1. */
+s32 func_80044B88(DataSrc33808 *self) {
+    Req44858 req;
+    CountedBuf33808 *buf;
+    s32 *p;
+    s32 i;
+    s32 n;
+
+    SetVec3(&req, 0, 0, 1);
+    buf = self->buffer;
+    i = 0;
+    n = buf->count;
+    p = buf->entries;
+    self->unk38 = 0;
+    for (; i < n; i++) {
+        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
+        *p = (s32)func_8004468C((s32)&req);
+        if (*p == 0) {
+            goto fail;
+        }
+        self->unk38++;
+        p++;
+    }
+    return 0;
+fail:
+    self->methods->slot7C(self);
+    return 1;
+}
 /* D_8006F40C +0x07C: release the object array in the buffer (past its first
  * two words), +0x38 entries long, and zero the count. */
 void func_80044C58(DataSrc33808 *self) {
