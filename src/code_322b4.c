@@ -24,7 +24,7 @@ typedef struct D_8006EF50Obj {
     D_8006EF50Methods *methods; /* +0x000 */
     u8 pad04[0x8 - 0x4];
     BasicClassListNode *parentRefs; /* +0x008, BasicClass's */
-    s32 unkC;  /* +0x00C, read by func_8004264C */
+    s32 unkC;  /* +0x00C, read by D8006EF50__GetCount */
     s32 unk10; /* +0x010, set to 1 by func_80042658, cleared by func_80042664, read by func_8004266C */
     s32 unk14; /* +0x014, set to 1 by func_80042678, cleared by D8006EF50__Reset */
     BasicClassListNode *unk18; /* +0x018, cleared by D8006EF50__Reset; a parentRefs cursor D8006EF50__RemoveParentRef steps past a removed parent */
@@ -480,7 +480,7 @@ void D8006EF50__Tick(D_8006EF50Obj *self) {
     self->methods->notifyParents(self, event);
 }
 /* D_8006EF50 slot +0x048. */
-s32 func_8004264C(D_8006EF50Obj *self) {
+s32 D8006EF50__GetCount(D_8006EF50Obj *self) {
     return self->unkC;
 }
 /* D_8006EF50 slot +0x04C. */
