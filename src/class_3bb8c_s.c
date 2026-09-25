@@ -40,7 +40,7 @@ typedef struct Vec3S {
  * (RatioToFixed12). */
 typedef struct LinkNodeMethods {
     u8 pad0[0x44];
-    void (*updateRotation)(LinkNode *self, s32 set, s32 data);  /* +0x044, Class6B5CC__UpdateRotation (degrees; sprites: func_80042170, rotate) */
+    void (*updateRotation)(LinkNode *self, s32 set, s32 data);  /* +0x044, Class6B5CC__UpdateRotation (degrees; sprites: Sprite__UpdateRotation, rotate) */
     void (*updateScale)(LinkNode *self, s32 set, void *data);   /* +0x048, Class6B5CC__UpdateScale (GsCOORD2PARAM.scale; sprites: D800879C4__UpdateScale) */
     void (*attachToParent)(LinkNode *self, void *parent, void *trans); /* +0x04C, Class6B5CC__AttachToParent (coord2 super = parent's, coord.t = trans) */
     u8 pad50[0x60 - 0x50];
@@ -50,7 +50,7 @@ typedef struct LinkNodeMethods {
     u8 pad6C[0xB8 - 0x6C];
     /* +0x0B8 is CLASS-DEPENDENT, so it keeps its placeholder: on the owner
      * and on modelChildren it is BaseObjO__SetVec14 (set translation); on
-     * sprites it is func_8004229C, which copies three bytes into the
+     * sprites it is Sprite__SetColor, which copies three bytes into the
      * embedded GsSPRITE's r,g,b. */
     void (*slotB8)(LinkNode *self, void *arg1);                 /* +0x0B8 */
     void (*addTranslation)(LinkNode *self, void *delta);        /* +0x0BC, BaseObjO__AddVec14; only called on modelChildren */

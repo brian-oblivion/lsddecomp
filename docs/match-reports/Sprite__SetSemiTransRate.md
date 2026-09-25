@@ -1,8 +1,10 @@
-# func_80042268 -- MATCHED (11/11 words), round 82
+# Sprite__SetSemiTransRate -- MATCHED (11/11 words), round 82
+
+> Renamed from `func_80042268` on 2026-09-25 (tools/rename.py). Address 0x80042268.
 
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** slot +0x068 of D_8006EC74, D_8006ED4C, D_8006EE1C, D_8006EB90 and D_800879C4 (`tools/classtable.py`).
+- **Where:** slot +0x068 of D_8006EC74, D_8006ED4C, gSpriteMethods, D_8006EB90 and D_800879C4 (`tools/classtable.py`).
 - **What:** `GetSetBitField(&self->attribute, 0x1C, 2, a1)` (bits 28..29 of the GsSPRITE attribute).
 - **Result:** byte-exact; 11/11 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views and prototypes live in the unit; no shared header was touched.
@@ -11,7 +13,7 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b
 
 ```c
 /* Sprite classes slot +0x068: attribute bits 28..29. */
-s32 func_80042268(SpriteView_322b4 *self, s32 a1) {
+s32 Sprite__SetSemiTransRate(SpriteView_322b4 *self, s32 a1) {
     return GetSetBitField(&self->attribute, 0x1C, 2, a1);
 }
 ```

@@ -109,7 +109,7 @@ no offset), slotB8(self->color), and updateScale(1, tbl) when tbl != NULL.
 
 Why "sprites": in D800879C4's table (tools/classtable.py D_800879C4) slots
 +0x060/+0x064/+0x068 set bits 31/30/28-29 of a word at +0x064 (GsDOFF,
-GsALON, semitrans rate: LIBGS.H:303-308), slot +0x0B8 (func_8004229C)
+GsALON, semitrans rate: LIBGS.H:303-308), slot +0x0B8 (Sprite__SetColor)
 copies three bytes to +0x078..+0x07A and slot +0x044 writes +0x084. Those
 are GsSPRITE's attribute, r/g/b and rotate offsets (LIBGS.H:111-122) for a
 GsSPRITE embedded at +0x064; LinkOwnerObj__RandomizeLinks' `angle` at +0x084

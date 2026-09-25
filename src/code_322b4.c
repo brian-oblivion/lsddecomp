@@ -4,7 +4,7 @@
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint). What it holds: methods of D_8006EC74,
- * D_8006ED4C, D_8006EE1C, D_8006EF50, D_8006EFAC, D_8006EB90, D_8006EED8,
+ * D_8006ED4C, gSpriteMethods, D_8006EF50, D_8006EFAC, D_8006EB90, D_8006EED8,
  * D_800879C4 and D_800866E8, calling GetClass6B5CCMethods, GetSetBitField and
  * the BasicClass framework. Owns jtbl_80011290 (attached rodata sub-slot
  * 0x1A90).
@@ -52,7 +52,7 @@ typedef struct ChildArrayObj_322b4 {
 /* The method tables the getters below return. */
 extern s32 D_8006EC74[];
 extern s32 D_8006ED4C[];
-extern s32 D_8006EE1C[];
+extern s32 gSpriteMethods[];
 extern s32 D_8006EED8[];
 extern s32 D_8006EF50[];
 extern s32 D_8006EFAC[];
@@ -161,34 +161,34 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041E58);
 void *func_80041ED8(void) {
     return D_8006ED4C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041EE8);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041F88);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004202C);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004208C);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042170);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", New_Sprite);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__Sprite);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__Reset);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", InitGsSprite);
+INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__UpdateRotation);
 /* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
-s32 func_8004220C(SpriteView_322b4 *self, s32 a1) {
+s32 Sprite__SetDisplay(SpriteView_322b4 *self, s32 a1) {
     return GetSetBitField(&self->attribute, 0x1F, 1, a1 == 0) == 0;
 }
 /* Sprite classes slot +0x064: attribute bit 30. */
-s32 func_8004223C(SpriteView_322b4 *self, s32 a1) {
+s32 Sprite__SetSemiTrans(SpriteView_322b4 *self, s32 a1) {
     return GetSetBitField(&self->attribute, 0x1E, 1, a1 != 0);
 }
 /* Sprite classes slot +0x068: attribute bits 28..29. */
-s32 func_80042268(SpriteView_322b4 *self, s32 a1) {
+s32 Sprite__SetSemiTransRate(SpriteView_322b4 *self, s32 a1) {
     return GetSetBitField(&self->attribute, 0x1C, 2, a1);
 }
 /* D_8006EB90 and D_8006EC74 slot +0x098 (update): empty override. */
-void func_80042294(Class6B5CC *self, void *sender, s32 event) {
+void Sprite__Update(Class6B5CC *self, void *sender, s32 event) {
 }
-/* Slot +0x0B8 of D_8006EC74, D_8006ED4C, D_8006EE1C and D_800879C4 (the
+/* Slot +0x0B8 of D_8006EC74, D_8006ED4C, gSpriteMethods and D_800879C4 (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
-void func_8004229C(SpriteObj_322b4 *self, Rgb_322b4 *rgb) {
+void Sprite__SetColor(SpriteObj_322b4 *self, Rgb_322b4 *rgb) {
     self->rgb = *rgb;
 }
-/* Returns the D_8006EE1C method table. */
-void *func_800422BC(void) {
-    return D_8006EE1C;
+/* Returns the gSpriteMethods method table. */
+void *GetSpriteMethods(void) {
+    return gSpriteMethods;
 }
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800422CC);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004232C);

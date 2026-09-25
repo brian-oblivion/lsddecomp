@@ -171,16 +171,16 @@ method signatures; zero bytes changed.
 | +0x068 | unk68 | scale | B | passed as updateScale's data |
 | +0x06C | unk6C | modelChildLayout | B | 0 = no model children; index into gModelChildSpacing |
 | +0x070 | unk70 | tableIndex | C-ish | only ever an index (gModelChildDriftZ, gSpriteShiftX) |
-| +0x074 | unk74 | color | B | every sprite's slotB8 (func_8004229C copies 3 bytes to GsSPRITE r,g,b) |
+| +0x074 | unk74 | color | B | every sprite's slotB8 (Sprite__SetColor copies 3 bytes to GsSPRITE r,g,b) |
 | +0x078 | unk78 | altColor | B | sprites[1]'s slotB8 argument instead of color when non-NULL |
 | +0x07C | arr7C | modelChildren | B | New_BaseObjO objects, linked to the owner's model |
 | +0x084 | arr84 | sprites | B | New_D800879C4 objects (GsSPRITE at +0x64, see Class876FC__SpawnSprites) |
 | slot +0x044 | slot44 | updateRotation | B | Class6B5CC__UpdateRotation (set/add GsCOORD2PARAM.rotate, degrees) |
 | slot +0x048 | slot48 | updateScale | B | Class6B5CC__UpdateScale (set/add .scale); sprite override D800879C4__UpdateScale also a scale |
 | slot +0x04C | slot4C | attachToParent | B | Class6B5CC__AttachToParent (parent link, coord2 super, coord.t) |
-| slot +0x060 | slot60 | setDisplay | B | Class6B5CC__SetDisplay / func_8004220C: attribute bit 31 = !on (GsDOFF) |
-| slot +0x064 | slot64 | setSemiTrans | B | Class6B5CC__SetSemiTrans / func_8004223C: bit 30 (GsALON) |
-| slot +0x068 | slot68 | setSemiTransRate | B | Class6B5CC__SetSemiTransRate / func_80042268: bits 28-29 (GsAZERO..GsATHREE) |
+| slot +0x060 | slot60 | setDisplay | B | Class6B5CC__SetDisplay / Sprite__SetDisplay: attribute bit 31 = !on (GsDOFF) |
+| slot +0x064 | slot64 | setSemiTrans | B | Class6B5CC__SetSemiTrans / Sprite__SetSemiTrans: bit 30 (GsALON) |
+| slot +0x068 | slot68 | setSemiTransRate | B | Class6B5CC__SetSemiTransRate / Sprite__SetSemiTransRate: bits 28-29 (GsAZERO..GsATHREE) |
 | slot +0x0B8 | slotB8 | kept | C | class-dependent: BaseObjO__SetVec14 (translation) on the owner and model children, RGB on sprites |
 | slot +0x0BC | slotBC | addTranslation | B | BaseObjO__AddVec14; only called on model children (sprite override is a no-op) |
 
