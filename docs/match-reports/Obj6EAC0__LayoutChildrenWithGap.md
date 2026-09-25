@@ -13,7 +13,7 @@ void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
     if (self->unkC != 0) {
         return;
     }
-    Get_vtable_D8006EC74()->slot4C(self, a1, a2);
+    GetCharSpriteMethods()->attachToParent((CharSprite *)self, (Class6B5CC *)a1, (Vec3_d294 *)a2);
     buf = *a2;
     elemp = self->unkB4 + self->unkAC;
     i = self->unkAC;
@@ -95,7 +95,7 @@ void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, s32 *a2) {
     if (self->unkC != 0) {
         return;
     }
-    Get_vtable_D8006EC74()->slot4C(self, a1, a2);
+    GetCharSpriteMethods()->slot4C(self, a1, a2);
     buf[0] = a2[0];
     buf[1] = a2[1];
     elemp = self->unkB4 + self->unkAC;
@@ -120,7 +120,7 @@ void Obj6EAC0__LayoutChildrenWithGap(Obj6EAC0 *self, s32 a1, s32 *a2) {
 ## The shape, derived from the disassembly
 
 - Early exit when `self->unkC != 0` (whole function is a no-op then).
-- One call BEFORE the loop: `Get_vtable_D8006EC74()->slot4C(self, a1, a2)`,
+- One call BEFORE the loop: `GetCharSpriteMethods()->slot4C(self, a1, a2)`,
   where `a2` is a pointer to a 2-word struct.
 - Copy `a2[0]`/`a2[1]` into a 2-word LOCAL stack buffer (this local
   buffer is later passed BY ADDRESS to each child, and mutated between
@@ -215,3 +215,7 @@ decimal-point or separator gap in a digit string, but that is not
 independently confirmed -- tier B, and `gapIndex`/`childPitch` are named
 for their mechanics (which index gets the gap; how far each child
 advances), not for that specific guess.
+
+## Track 4
+
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->attachToParent((CharSprite *)self, (Class6B5CC *)a1, (Vec3_d294 *)a2)`, through the prototyped inherited slot (was the unprototyped `slot4C`); the argument casts are to Class6B5CC's slot types, and its occupant, ScreenSprite__AttachToParent, reads the third as a ScreenSpritePos (ScreenSprite.h, "Not settled"). No code. Image byte-identical.

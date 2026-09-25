@@ -1,10 +1,12 @@
-# D8006EC74__GetCell -- MATCHED (5/5 words), round 82
+# CharSprite__GetCell -- MATCHED (5/5 words), round 82
+
+> Renamed from `D8006EC74__GetCell` on 2026-09-26 (tools/rename.py). Address 0x80041c28.
 
 > Renamed from `func_80041C28` on 2026-09-25 (tools/rename.py). Address 0x80041c28.
 
 Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** D_8006EC74 slot +0x0C8 (`tools/classtable.py`).
+- **Where:** gCharSpriteMethods slot +0x0C8 (`tools/classtable.py`).
 - **What:** Returns the byte at +0x0A8. Retail opens and closes a 0x10-byte frame around a single `lbu`.
 - **Result:** byte-exact; 5/5 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK).
 - **Types:** local views and `extern s32 D_XXXXXXXX[];` table declarations live in the unit; no shared header was touched.
@@ -16,8 +18,8 @@ The frame comes from an UNUSED local `u8 pad[16];`. Measured: deleting that line
 ## Source
 
 ```c
-/* D_8006EC74 slot +0x0C8: read the byte at +0x0A8. */
-u8 D8006EC74__GetCell(D_8006EC74Obj *self) {
+/* CharSprite slot +0x0C8: read the byte at +0x0A8. */
+u8 CharSprite__GetCell(CharSprite *self) {
     u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
 
     return self->cellIndex;
@@ -31,3 +33,7 @@ u8 D8006EC74__GetCell(D_8006EC74Obj *self) {
 ## Naming
 
 - `D8006EC74__GetCell` -- tier A. Slot +0x0C8: returns the stored cell index (self->cellIndex). Pure getter.
+
+## Track 4
+
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `D8006EC74__GetCell`, tier A: slot +0x0C8, named `getCell` in the header (returns `u8`: this occupant's type; no C call through the slot exists). `self` is `CharSprite *` (was `D_8006EC74Obj`). D_8006EB90 overrides the slot with an empty `Obj6EAC0__NoOpSetter` that its own view types as a void setter; that is the subclass's to settle. The Source block above is the unified spelling. Image byte-identical.

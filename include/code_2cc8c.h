@@ -420,7 +420,7 @@ extern void *New_D8006EFAC(void); /* external, no args; not yet seen
  * methods from New_Obj6EAC0 to Obj6EAC0__GetDerivedMethods. Round 14 read
  * D_8006EB90 as an override table of D_8006EAC0 and named this view after
  * the latter; the class ids say otherwise, and so do the ctors:
- * Obj6EAC0__Construct chains to Get_vtable_D8006EC74()->ctor, and D_8006EC74
+ * Obj6EAC0__Construct chains to GetCharSpriteMethods()->ctor, and CharSprite
  * (0x1144) is a ScreenSprite (0x144, include/ScreenSprite.h) subclass. So
  * 0x11144 is NOT below BoxFill (0x64, gBoxFillMethods, include/BoxFill.h):
  * the thirteen 0x64 methods that used this view now use BoxFill, and the
@@ -430,8 +430,8 @@ extern void *New_D8006EFAC(void); /* external, no args; not yet seen
  * 0x11144's job (FINISHING-PLAN track 4) and is otherwise left as it was.
  *
  * Its reading (round 54, tier B, this unit's evidence only): an N-child
- * text row. `New_Obj6EAC0(ctx, count, text)` makes `count` D_8006EC74 cells
- * (New_D8006EC74) in `children`; Obj6EAC0__SetText hands one byte of a
+ * text row. `New_Obj6EAC0(ctx, count, text)` makes `count` CharSprite cells
+ * (New_CharSprite) in `children`; Obj6EAC0__SetText hands one byte of a
  * NUL-terminated string to each child's +0x0C4; the layout slots walk
  * `children[childStart .. childStart + childCount)`, advancing a running
  * position by `childPitch`, with one extra +0x10 gap at `gapIndex`. The
@@ -560,24 +560,9 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 extern Obj6EAC0Methods D_8006EB90; /* the override table itself, so
                                        Obj6EAC0__GetDerivedMethods's own definition
                                        (this unit) can return &D_8006EB90 */
-extern Obj6EAC0Methods *Get_vtable_D8006EC74(void); /* returns &D_8006EC74, a
-                                       third sibling table sharing this
-                                       layout; external to this unit
-                                       (asm/psyq_memset.s @ 0x80041C3C,
-                                       almost certainly misclassified
-                                       game code rather than real SDK --
-                                       see the open question in
-                                       DECOMPILATION_LEARNINGS about the
-                                       psyq_memset boundary) */
-
-extern Obj6EAC0 *New_D8006EC74(s32 a1, s32 a2); /* another New_X-shaped
-                                       allocator over this same class
-                                       family (0xAC bytes, ctor via
-                                       Get_vtable_D8006EC74()->slot08, "return-
-                                       regardless" variant); external to
-                                       this unit (asm/psyq_memset.s @
-                                       0x80041AB4); OBSERVED:
-                                       Obj6EAC0__Construct */
+/* GetCharSpriteMethods, New_CharSprite and their table: include/CharSprite.h
+ * (track 4, round 86), included by code_2cc8c_f, the one unit that calls
+ * them. */
 
 /*
  * MEASURED elsewhere (round 9, include/class_3bb8c.h / src/class_3ac78.c):

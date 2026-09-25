@@ -1,0 +1,42 @@
+# New_CharSprite -- MATCHED (27/27 words), round 82
+
+> Renamed from `New_D8006EC74` on 2026-09-26 (tools/rename.py). Address 0x80041ab4.
+
+> Renamed from `func_80041AB4` on 2026-09-25 (tools/rename.py). Address 0x80041ab4.
+
+Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior attempt.
+
+- **Where:** not in any method table (allocator for CharSprite, the 8x8-cell sprite). Called from class_3bb8c_i.c (`New_CharSprite(handle2, 0x5F)`) and code_2cc8c_f.c (`New_CharSprite(a1, 0x20)`).
+- **What:** `BMemPMgrAlloc(0xAC)`; if non-NULL, calls slot +0x008 (ctor, CharSprite__CharSprite) of `GetCharSpriteMethods()` (the gCharSpriteMethods table) with `(obj, texture, cell)` and returns obj, else NULL.
+- **Result:** byte-exact, 27/27 words, 0 ins / 0 del, whole-image SHA1 green. Third build.
+- **Levers, measured:**
+  - `s32 cell` param: 24/27, equal length; the prologue's `li a0,0xAC` moved from before `sw s2 / move s2,a1` to after them (3 positional diffs, words 3-5). Same with `u32 cell`.
+  - `u8 cell` param: 27/27. The `andi a2,s2,0xFF` in the jalr delay slot is the u8 PARAMETER being narrowed at its use, not a conversion into the callee's prototype; the declared parameter type is what reorders the prologue.
+- **Types:** unit-local `CellCtorMethods_322b4` (ctor at +0x008 taking `(self, texture, u8 cell)`) and a prototype for `GetCharSpriteMethods`; no shared header touched. Callers elsewhere declare it `(s32, s32)` / `(ChildObj86ED0 *, s32)` locally; both are call-compatible and untouched.
+
+## Source
+
+```c
+/* Allocate and construct a CharSprite (0xAC bytes): one character cell. */
+CharSprite *New_CharSprite(void *texture, u8 cell) {
+    CharSprite *obj = BMemPMgrAlloc(0xAC);
+
+    if (obj != NULL) {
+        GetCharSpriteMethods()->ctor(obj, texture, cell);
+        return obj;
+    }
+    return NULL;
+}
+```
+
+### Proposed learning
+
+Allocator/wrapper whose prologue has the constant arg set (`li a0,K`) BEFORE a callee-saved copy of a later param, with an `andi 0xFF` on that copy at the call: declare the param `u8`. `s32`/`u32` params put the `li` after the save (equal length, 3 positional diffs).
+
+## Naming
+
+- `New_D8006EC74` -- tier A. Allocator: BMemPMgrAlloc(0xAC) then calls the ctor slot -- the "New_<Class>" allocator convention already used throughout the project (New_Sprite, New_Class866E8); mechanics are the whole purpose.
+
+## Track 4
+
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `New_D8006EC74`, tier A: the allocator, `New_<Class>`. Returns `CharSprite *` and calls the ctor through the unified table; the unit-local `CellCtorMethods_322b4` is gone, as are the callers' local declarations (include/code_2cc8c.h's `Obj6EAC0 *(s32, s32)`, class_3bb8c_i's `ChildObj86ED0 *(ChildObj86ED0 *, s32)`); both callers now cast the result to their own field types. The Source block above is the unified spelling. Image byte-identical.

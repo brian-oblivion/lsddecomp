@@ -8,13 +8,13 @@ Unit: `src/code_2cc8c_f.c`. First attempt.
 void Obj6EAC0__Destruct(Obj6EAC0 *self) {
     ReleaseBasicClassArray(self->unkB4, self->unkA9);
     self->unkB4 = BMemPMgrFree(self->unkB4);
-    Get_vtable_D8006EC74()->slot0C(self);
+    GetCharSpriteMethods()->finalize((CharSprite *)self);
 }
 ```
 
 Derived-table occupant of `Obj6EAC0Methods::slot0C`. Retail's own
-delay slot after the `Get_vtable_D8006EC74()` call stores the PRECEDING
-call's return (`BMemPMgrFree`'s), not `Get_vtable_D8006EC74`'s own -- read
+delay slot after the `GetCharSpriteMethods()` call stores the PRECEDING
+call's return (`BMemPMgrFree`'s), not `GetCharSpriteMethods`'s own -- read
 per the established "a delay slot after a `jal` carries the value from
 the PRECEDING call's return" idiom, and it is what motivated retyping
 `BMemPMgrFree`'s shared declaration (see below).
@@ -56,3 +56,7 @@ self->totalChildCount)`), frees the array pointer itself
 for the same reason as `Construct`: the destructor role is certain from
 the mechanics, the class's broader purpose is not independently
 confirmed.
+
+## Track 4
+
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->finalize((CharSprite *)self)` (was `->slot0C(self)`): an upcast, no code. Image byte-identical.

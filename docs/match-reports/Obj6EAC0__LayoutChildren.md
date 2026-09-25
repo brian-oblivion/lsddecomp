@@ -15,7 +15,7 @@ void Obj6EAC0__LayoutChildren(Obj6EAC0 *self, Pair32E99C *a1) {
         s32 bound;
         Obj6EAC0 **elemp;
 
-        Get_vtable_D8006EC74()->slotBC(self, a1);
+        GetCharSpriteMethods()->setPosition((CharSprite *)self, (ScreenSpritePos *)a1);
         buf = *a1;
         i = 0;
         elemp = self->unkB4;
@@ -110,3 +110,7 @@ in-game purpose (text layout, per this unit's own header-comment
 hypothesis) is not independently confirmed, hence tier B. Sibling of
 `Obj6EAC0__LayoutChildrenWithGap` (same shape, plus one extra offset at
 `gapIndex`).
+
+## Track 4
+
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->setPosition((CharSprite *)self, (ScreenSpritePos *)a1)` (was `->slotBC(self, a1)`): an upcast and a cast of the view's Pair32E99C to ScreenSprite's pair, no code. Image byte-identical.

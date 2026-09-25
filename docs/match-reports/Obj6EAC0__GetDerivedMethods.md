@@ -32,4 +32,4 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Not a twin of GetBoxFillMethods in the class tree: D_8006EB90 is class 0x11144, below D_8006EC74 (0x1144) and ScreenSprite (0x144), and gBoxFillMethods is class 0x64 (include/BoxFill.h). Round 14's "base/override" pairing of the two tables does not hold.
+Not a twin of GetBoxFillMethods in the class tree: D_8006EB90 is class 0x11144, below CharSprite (0x1144) and ScreenSprite (0x144), and gBoxFillMethods is class 0x64 (include/BoxFill.h). Round 14's "base/override" pairing of the two tables does not hold.

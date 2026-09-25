@@ -24,7 +24,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
-#include "ScreenSprite.h"
+#include "CharSprite.h"
 
 /* This project's own strcpy (matched elsewhere) -- Obj86ED0__SetName's own
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */
@@ -195,13 +195,13 @@ void Obj86ED0__SetName(Obj86ED0 *self, char *arg1, s32 mode)
  * memory-card icon/font resource paths (BuildFileName, already matched in
  * code_171e0.c) and loads each through func_8003B39C, then converts/wraps
  * the loaded handle into a ChildObj86ED0-shaped resource object (unk48 via
- * New_ScreenSprite, unk44/unk40 via New_Obj6EAC0/New_D8006EC74 -- both still
- * uncarved elsewhere, typed purely from this call site's own register
- * usage, same convention as DecodeFullWidthSjis above).
+ * New_ScreenSprite (include/ScreenSprite.h), unk40 via New_CharSprite
+ * (include/CharSprite.h, which includes ScreenSprite.h), unk44 via
+ * New_Obj6EAC0 (include/class_3bb8c.h's declaration, typed from a call
+ * site's own register usage, same convention as DecodeFullWidthSjis above).
  */
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern ChildObj86ED0 *func_8003B39C(char *path);
-extern ChildObj86ED0 *New_D8006EC74(ChildObj86ED0 *arg0, s32 arg1);
 
 extern const char sStrComInput[]; /* "COMINPUT" */
 extern const char sStrFontIcon[]; /* "FONTICON" */
@@ -240,7 +240,7 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
     handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = New_Obj6EAC0(handle2, self->nameLen, self->unk28);
-    self->unk40 = New_D8006EC74(handle2, 0x5F);
+    self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
     self->unk44->methods->slotB8(self->unk44, (void *)&D_8008AAC8);

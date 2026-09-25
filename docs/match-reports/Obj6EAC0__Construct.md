@@ -15,7 +15,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
     s32 i;
     Obj6EAC0 **cursor;
 
-    ((void (*)(Obj6EAC0 *, s32, s32))Get_vtable_D8006EC74()->slot08)(self, a1, 0x20);
+    GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20);
     self->methods = Obj6EAC0__GetDerivedMethods();
     self->unkA9 = a2;
     self->unkAB = a2;
@@ -27,7 +27,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
         i = 0;
         if (i < a2) {
             do {
-                *cursor = New_D8006EC74(a1, 0x20);
+                *cursor = (Obj6EAC0 *)New_CharSprite((void *)a1, 0x20);
                 i++;
                 cursor++;
             } while (i < a2);
@@ -41,11 +41,11 @@ The derived table's constructor (`Obj6EAC0Methods::slot08`), called by
 this unit's own `New_Obj6EAC0` via
 `Obj6EAC0__GetDerivedMethods()->slot08(self, ctx, len, name)`. Chains to the THIRD
 sibling table's own `slot08` (a base-class-style constructor call
-through `Get_vtable_D8006EC74()`, same shape as `New_Obj6EAC0` calling
+through `GetCharSpriteMethods()`, same shape as `New_Obj6EAC0` calling
 `Obj6EAC0__GetDerivedMethods()->slot08`), then sets up `self->methods` to the
 DERIVED table, zeroes/initialises the slice-index fields, allocates an
 `a2`-element child array via `BMemPMgrAlloc`, fills each slot by
-calling the external New_X-shaped allocator `New_D8006EC74(a1, 0x20)`
+calling the external New_X-shaped allocator `New_CharSprite(a1, 0x20)`
 (itself a "return-regardless" New_X variant, not this unit's function
 to attempt), and — only if the array allocation succeeded — dispatches
 `self->methods->slot40(self, a3)`.
@@ -54,7 +54,7 @@ to attempt), and — only if the array allocation succeeded — dispatches
 
 The residue, once the loop and allocation shape were right, was ONE
 extra instruction: `move $a3, $s5` immediately before the
-`Get_vtable_D8006EC74()->slot08` call, which retail does not have. Every
+`GetCharSpriteMethods()->slot08` call, which retail does not have. Every
 straightforward call written as `slot08(self, a1, 0x20, a3)` (passing
 `a3` explicitly, matching the struct's WIDEST declared arity) forces
 GCC to reload `a3` from its callee-saved cache back into the argument
@@ -71,7 +71,7 @@ exactly the "leftover register implicit argument" shape already
 documented for other functions in this project. Casting the slot
 pointer down to a narrower, 3-parameter function-pointer type for
 THIS call site only —
-`((void (*)(Obj6EAC0 *, s32, s32))Get_vtable_D8006EC74()->slot08)(self, a1, 0x20)`
+`((void (*)(Obj6EAC0 *, s32, s32))GetCharSpriteMethods()->slot08)(self, a1, 0x20)`
 — removes the compiler's obligation to materialise `a3` into the
 argument register at all, and the leftover value in `$a3` (never
 touched since function entry) does the rest for free. Zero-attempt
@@ -126,7 +126,7 @@ still goes through the struct's own canonical 4-arg field, untouched.
 - **The "leftover register implicit argument" idiom generalises to
   chained/inherited constructor calls, not just ordinary method
   calls.** When a constructor forwards to a "base class" constructor
-  through a SIBLING vtable (here, `Get_vtable_D8006EC74()`'s third table)
+  through a SIBLING vtable (here, `GetCharSpriteMethods()`'s third table)
   using fewer arguments than the slot's own widest declared arity, the
   fix is a per-call-site cast to a NARROWER function-pointer type
   (leaving the struct's canonical field type at its widest use) —
@@ -152,10 +152,14 @@ table's own `slot08` first (base-class-style construction), sets
 `self->methods` to the derived table, initialises the child-slice fields
 (`totalChildCount`, `childCount`, `childStart`, `gapIndex`), allocates an
 `a2`-element `children` array and fills each slot via the external
-New_X-shaped `New_D8006EC74`, then dispatches `self->methods->slot40`.
+New_X-shaped `New_CharSprite`, then dispatches `self->methods->slot40`.
 This is unambiguously a constructor by mechanics (allocates + wires up
 the object this class needs); named `Construct` per the project's
 `Class__Class`-shaped constructor convention rather than `Class__Class`
 literally, since `Obj6EAC0` is a placeholder table-address name, not a
 real class identity -- tier B (the CTOR role is certain, the class's own
 purpose is the unit's working hypothesis only).
+
+## Track 4
+
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74; this class, 0x11144, is still its own job). The chain to the parent ctor is now `GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20)`, still a genuine 3-argument prototyped call, which this report's lever needs; the old spelling cast `slot08` to a local function type. New_CharSprite's result is cast back to the view's `Obj6EAC0 *`: the children are CharSprites, not objects of this class, which the view's `children` comment does not say. Both casts emit no code. Image byte-identical.

@@ -12,7 +12,6 @@ object stashed on `self` (`unk48`, `unk44`, `unk40`).
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern ChildObj86ED0 *func_8003B39C(char *path);
 extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
-extern ChildObj86ED0 *New_D8006EC74(ChildObj86ED0 *arg0, s32 arg1);
 
 extern const char sStrComInput[]; /* "COMINPUT" */
 extern const char sStrFontIcon[]; /* "FONTICON" */
@@ -51,7 +50,7 @@ void Obj86ED0__LoadCardResources(Obj86ED0 *self, void *arg1)
     handle2 = func_8003B39C(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = New_Obj6EAC0(handle2, self->unk10, self->unk28);
-    self->unk40 = New_D8006EC74(handle2, 0x5F);
+    self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
     self->unk44->methods->slotB8(self->unk44, (void *)&D_8008AAC8);
@@ -98,11 +97,11 @@ what may well be the same underlying vtable.
 `self->unk44 = New_Obj6EAC0(...)` is an implicit-conversion assignment
 (`FieldM7C *` into `ChildObj86ED0 *`) -- a harmless warning under this
 project's `-Wall`-without-`-Werror` build, not a compile error, and zero
-bytes of cost (pointer reinterpretation is free). `New_D8006EC74` and
+bytes of cost (pointer reinterpretation is free). `New_CharSprite` and
 `New_ScreenSprite` are NOT reachable from any header this unit includes, so
 they got fresh local `extern` declarations here, typed purely from this
 call site's own register usage (same convention as `DecodeFullWidthSjis` above
-in this file) -- and diverge from `New_D8006EC74`'s OTHER call-site typing
+in this file) -- and diverge from `New_CharSprite`'s OTHER call-site typing
 in `code_2cc8c.h` (`(s32, s32)`), which is expected and fine.
 
 ## The one real residue: register identity from live-range shape, not code shape
@@ -153,3 +152,5 @@ three-value swap was resolved by touching only the non-persistent one.
 ## Track 4
 
 2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0)`: D_80086F7C is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position D_8008AACC = (-70, -60). Image byte-identical.
+
+2026-09-26, round 86 (bravo): CharSprite (class 0x1144, formerly D_8006EC74) is unified in `include/CharSprite.h`. The local `extern ChildObj86ED0 *New_CharSprite(ChildObj86ED0 *, s32)` is gone; the unit includes the header and casts the result to `unk40`'s `ChildObj86ED0 *`, as it does for New_ScreenSprite. The 0x5F cell it asks for on FONTICON.TIM is '_', one of the facts behind the class name. Image byte-identical.
