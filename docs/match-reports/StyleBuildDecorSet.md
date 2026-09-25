@@ -321,3 +321,7 @@ array). "DecorSet" names the mechanics (a released/updated SET of objects
 gated by the decor variant flag) without asserting what the 18 objects
 represent visually -- no string or other-unit evidence establishes that.
 STALL, 1 word short; naming is unaffected by match state per track 3.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` view's +0x04C is attachToParent, cast to BoxFillAttachToParentFn with the PairXY position cast to Pair32E99C *. Zero bytes.

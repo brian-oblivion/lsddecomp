@@ -71,3 +71,7 @@ past the inherited range). Four nested guards gate a single call through
 per `elapsedHours % 24 == 0` tick once `elapsedHours >= 0x1F` -- reads as
 "once a day, once the room has been open long enough, highlight the next
 ScoreDayLog match" (in-game trigger cadence not independently confirmed).
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `highlight` (+0x0B8) is setColor(1, &D_8008ABBC): the highlight is a colour overwrite. Zero bytes.

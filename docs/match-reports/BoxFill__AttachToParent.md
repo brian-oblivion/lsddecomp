@@ -55,3 +55,7 @@ The derived occupant of the SAME slot
 (recursively position every child). Named for the slot's own common
 mechanic across both occupants (position/layout), not for `a1`'s specific
 meaning here, which is not established -- tier B.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__Layout`: the +0x04C occupant (Class6B5CC's attachToParent), named for its slot as Class65650__AttachToParent and ScreenSprite__AttachToParent are (tier A). While `parent` (+0x00C, the word the old view called `hasChildren`) is NULL it attaches through Class6B5CC's own slot with a NULL offset, then setPosition(pos). Its third parameter is a two-word screen position where the slot types a Vec3_d294 offset: the slot keeps Class6B5CC's type and callers cast to BoxFillAttachToParentFn (TaskCore__RefreshSlotView, ApplyStyleDecorationIfSet, StyleBuildDecorSet); Viewport__SetSubHandle, through a Class6B5CC pointer, casts the argument.

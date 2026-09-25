@@ -195,3 +195,7 @@ Builds the 100-entry `points` array of small coloured `New_BoxFill`
 objects that the graph plots dream-history onto (see class header
 comment); also allocates the 4-byte `matchedDayIndices` scratch buffer
 `GraphRoomObj__ScoreDayLog` later fills in.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+The points are New_BoxFill boxes (include/BoxFill.h): size &D_8008ABAC, colour &D_8008ABB4 then the fading `rgb`, priority 0. Zero bytes.

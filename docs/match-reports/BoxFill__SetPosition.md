@@ -96,3 +96,7 @@ running CURSOR it advances per child by `childPitch`, which is the
 evidence `posX`/`posY` really is a position rather than an arbitrary
 2-word pair -- but nothing independently confirms which axis is X vs Y
 (or that these are screen coordinates at all), hence tier B.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetPosition`: the +0x0BC occupant, BoxFill's own `setPosition` (tier A): while attached (`parent`, +0x00C, non-NULL) it copies the pair into posX/posY, which DrawNode turns into the GsBOXF x/y.

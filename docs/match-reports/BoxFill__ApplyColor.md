@@ -87,3 +87,7 @@ either copies a 3-byte RGB buffer wholesale (`*(RGB *)d = *(RGB *)src`) or
 adds each of the 3 bytes into the destination in place -- a "set or blend
 a colour" operation, with `dst` always `self->color` at its one call site
 (`BoxFill__SetColor`, this unit).
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__ApplyColor`: BoxFill__SetColor's only callee, not a slot (tier A: copy or add three bytes).

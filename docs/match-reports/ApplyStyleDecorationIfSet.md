@@ -127,3 +127,7 @@ logic, only a different way of naming the same values.
 ## Naming
 
 **ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `gStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleTargetObj`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+gStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `LocalM4D0Obj` view's slots are setSemiTrans (+0x064, 1), setSemiTransRate (+0x068, 0) and attachToParent (+0x04C, cast to BoxFillAttachToParentFn). Zero bytes.

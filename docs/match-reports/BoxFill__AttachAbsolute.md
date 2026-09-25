@@ -204,3 +204,7 @@ string bytes, which is the evidence this slot sets a per-glyph character
 code rather than an arbitrary value. Tier B (mechanics + one clean
 cross-reference; not independently confirmed against gameplay/rendering
 code outside this unit).
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetChar`. That name came from D_8006EB90's class, whose SetText/SetChildChar hand a character to each CHILD's +0x0C4, but those children are D_8006EC74 cells, not BoxFills, so it described another class's slot. The body: attachToParent(self, parent, pos) through the inherited +0x04C slot (with a fourth argument, through an unprototyped pointer, kept for the bytes), then `relative` = 0 (DrawNode then reads posX/posY as pixels, not percent of half the screen) and unk4C = the fourth argument. GraphRoomObj__PopulateGraphPoints is its caller, with (parent, &point, 0). Tier B: the mechanics are that; what unk4C is for is not shown (no reader).

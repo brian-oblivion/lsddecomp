@@ -56,3 +56,7 @@ body alone).
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `slot60` is setDisplay: points[0] blinks with the hour's low bit. Zero bytes.

@@ -65,3 +65,7 @@ identical offset, as `Class6E99C__FinishConstruct` one level up and
 `Obj6EAC0__FinishConstruct` (round 54, this same table family) one level
 further down. See `Class6E99C__FinishConstruct.md`'s naming note for the
 full three-occupant cross-check.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `ClassEAC0__FinishConstruct`: the +0x040 occupant, Class6B5CC's `reset` slot, named for its slot (FINISHING-PLAN track 4 step 6; tier A for the slot, the body initialises every BoxFill field: pri from the ctor's third argument, relative = 1, GsBOXF attribute/x/y = 0, w/h from the size pair, colour (default D_8008A924) through setColor, mask through setMask(13)). Its parameter list differs from the slot's (self only); the slot keeps Class6B5CC's type and the ctor casts to BoxFillResetFn. Unlike Class6B5CC__Reset it does not reset the coordinate; it never calls the base.

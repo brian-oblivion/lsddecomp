@@ -30,3 +30,7 @@ one level further down the same "call the further-base ctor first, reset
 `self->methods`, redispatch `finishConstruct`" chain
 `Class6E99C__Class6E99C` uses one level up. Named per the same
 `Class__Class` constructor convention.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `ClassEAC0__ClassEAC0`: gBoxFillMethods's +0x008 occupant (tier A). Ctor chain: it calls GetClass6B5CCMethods()->ctor first, so the id parent (0x4) is the ctor-chain parent; Class6E99C__Class6E99C calls this one first. The +0x040 dispatch now goes through the inherited `reset` slot, cast to BoxFillResetFn (Reset takes the ctor's arguments).

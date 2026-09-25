@@ -24,7 +24,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `BoxFill__SetSemiTransRate` | (kept `BoxFill__SetSemiTransRate`) | C |
+| `func_80040740` | (kept `func_80040740` at track 3; `BoxFill__SetSemiTransRate` since round 85, see Track 4) | C |
 
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
 shift, width, value)` (see `include/code_2cc8c.h`'s own comment on
@@ -38,3 +38,7 @@ only restate the mechanics (shift/width/negation), which the existing
 header/report prose already documents precisely. Kept `func_` rather
 than invent a `Get`/`SetFlagNN`-shaped name for an unidentified bit,
 consistent with this project's own precedent on the sibling group.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_80040740`: the +0x068 occupant (Class6B5CC's setSemiTransRate), the same call as Class6B5CC__SetSemiTransRate (shift 28, width 2) over the GsBOXF attribute (tier A). ApplyStyleDecorationIfSet calls it with 0.

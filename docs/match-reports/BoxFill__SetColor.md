@@ -26,3 +26,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 is a single call into `BoxFill__ApplyColor` with `self->color` as the
 fixed destination -- "set (or blend) this object's colour" is exactly
 what the code does, nothing more to guess at.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetColor`: the +0x0B8 occupant, BoxFill's own slot `setColor`. It copies (or, with `overwrite` 0, adds) three bytes into +0x064, the GsBOXF r,g,b DrawNode sorts (tier A). Callers: Reset (the ctor's colour), GraphRoomObj__TickHighlight (1, &D_8008ABBC), Class6E99C's fades (1, a table entry).

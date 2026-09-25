@@ -36,3 +36,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 `self->mask = (1 << a1) - 1`, a bitmask-of-the-low-`a1`-bits computation
 and store, with no other logic. Renamed the field too (`unk68` -> `mask`,
 this unit's own exclusive field -- see the struct-field rename commit).
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetMask`: the +0x0CC occupant, BoxFill's own `setMask`; mask = (1 << bits) - 1, and Reset passes 13. Nothing in BoxFill reads +0x068; Class6E99C__Configure divides it (as `unk68`). Tier B: the mechanics only. The slot returns s32, the occupant's; Reset ignores it.

@@ -60,3 +60,7 @@ own `&D_8006E99C` table, then redispatches through `finishConstruct` --
 the textbook "base ctor first, then own vtable, then dispatch" idiom
 already documented elsewhere in this project. Mechanics (construct an
 instance of this class) fully determine the name.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+The base call is now typed through BoxFill's header: `BoxFillMethods *base = GetBoxFillMethods(); base->ctor((BoxFill *)self, ...)` (was a cast to the deleted `ClassEAC0Methods`). BoxFill (0x64, include/BoxFill.h) is this class's ctor-chain parent. Zero bytes.

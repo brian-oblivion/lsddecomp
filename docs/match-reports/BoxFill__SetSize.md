@@ -47,7 +47,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `BoxFill__SetSize` | (kept `BoxFill__SetSize`) | C |
+| `func_80040824` | (kept `func_80040824` at track 3; `BoxFill__SetSize` since round 85, see Track 4) | C |
 
 **What is known.** Base occupant of `slotC0`: `self->unk60 =
 ((u16*)a1)[0]; self->unk62 = ((u16*)&a1[1])[0];` -- copies two `u16`
@@ -57,3 +57,7 @@ makes that a live guess), but nothing in this unit ever READS `unk60`/
 `unk62` back, so there is no mechanical evidence to anchor a name on --
 kept `func_`/`unk60`/`unk62` unrenamed rather than assert "size" or
 "offset" from a single write-only call site.
+
+## Track 4 (2026-09-25, round 85, charlie)
+
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_80040824`: the +0x0C0 occupant, BoxFill's own `setSize` (tier A): while attached it stores the low halves of a {w, h} word pair into +0x060/+0x062, the GsBOXF w/h. TaskCore__RefreshSlotView calls it on listView with {0x28, count * 12}.
