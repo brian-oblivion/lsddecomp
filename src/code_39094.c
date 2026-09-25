@@ -139,8 +139,9 @@ char **func_80048DF8(void) {
 char *func_80048E08(void) {
     return *func_80048DF8();
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048E2C);
-Rec1C *func_80048E2C(s32 index);
+Rec1C *func_80048E2C(s32 index) {
+    return &((Rec1C *)func_80048D48(NULL))[D_800819E8[index]];
+}
 
 Rec1C *func_80048E80(s32 index) {
     return func_80048E2C(index);
