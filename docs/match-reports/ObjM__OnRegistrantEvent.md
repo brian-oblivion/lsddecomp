@@ -14,7 +14,7 @@ the filename these are not Psy-Q library code).
 ```c
 void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
-        GetGridRecordAt(self->unk38);
+        GetGridRecordAt(self->unk38, code);
     } else {
         GetGridRecordXY(self->unk38, arg2, arg3);
     }
@@ -35,12 +35,15 @@ void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg
   the branch TARGET. To match a specific target/fallthrough placement,
   solve for the written `C` that makes `NOT(C)` equal the actual machine
   test, don't guess from the semantics alone.
-- `GetGridRecordAt` is genuinely called at two different arities across the
-  executable (2 real args from `GetGridRecordXY`'s own forwarding call, only
-  1 here — the second register is `code`, a leftover value from this
-  function's own parameter, never actually intended as an argument).
-  Declared K&R/unprototyped (`extern s32 GetGridRecordAt();`) in
-  `include/class_3bb8c.h`, the documented escape hatch for this pattern.
+- `GetGridRecordAt(index, sub)` (now matched, code_39094.c) reads both `$a0`
+  and `$a1`, and this function writes nothing to `$a1` before the jal, so
+  the value the callee uses as `sub` is `code`. Until round 82 this call was
+  written with one argument against a K&R declaration, reading `code` as a
+  leftover register. Round 82's externcheck pass (alpha) made the forwarding
+  explicit -- `GetGridRecordAt(self->unk38, code)` against a full prototype
+  in `include/class_3bb8c.h` -- byte-identical, and it reads as what the
+  dispatch means: a non-negative code is a linear cell index, a negative one
+  hands x/y to GetGridRecordXY.
 
 ### Proposed learning
 
