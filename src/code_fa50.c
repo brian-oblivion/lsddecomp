@@ -59,7 +59,9 @@ extern s32 D_8006BEA0[];
 INCLUDE_ASM("asm/nonmatchings/code_fa50", new_class_6bea0);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F2B0);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F314);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F33C);
+void func_8001F33C(Class6BEA0 *self) {
+    GsMapModelingData((unsigned long *)&self->data->head[1]);
+}
 Rec28_fa50 *func_8001F360(Class6BEA0 *self, s32 i) {
     return &self->data->recs[i];
 }
