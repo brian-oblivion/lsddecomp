@@ -17,7 +17,7 @@
  *
  * Blocker census at carve time, four screens per function (gp_rel, forward
  * nop_mflo_mfhi, `jr $t2` trampoline, jtbl):
- *   new_class_6d4e8 (20w)  CLEAN
+ *   New_Class6D4E8 (20w)  CLEAN
  *   func_80027228   (19w)  CLEAN
  *   func_80027274   (21w)  CLEAN
  *   func_800272C8    (2w)  CLEAN  -- a bare `jr $ra; nop` leaf
@@ -33,7 +33,7 @@
  * INCLUDE_ASM in that remainder -- their prototypes belong in THIS file, not
  * in a shared header (this unit has none and should not acquire one).
  *
- * `new_class_6d4e8` carries a name inherited from FirecatFG. Treat it as a
+ * `New_Class6D4E8` carries a name inherited from FirecatFG. Treat it as a
  * HYPOTHESIS, not evidence: see CLAUDE.md on the hand-rolled class framework
  * and resolve any method-table slot with tools/classtable.py rather than by
  * counting.
@@ -48,7 +48,7 @@
  * func_800272C8) are new slots BasicClass's own table does not have at
  * all. +0x008 is BasicClass's own constructor slot in D_8006B58C
  * (BasicClass__BasicClass sits there) -- CONFIRMED by that lookup, not
- * assumed from the FirecatFG name.  So: `new_class_6d4e8` is a genuine
+ * assumed from the FirecatFG name.  So: `New_Class6D4E8` is a genuine
  * "allocate + construct" pair, and its constructor IS this same unit's
  * `func_80027228`, dispatched back through the class's own table (the
  * generic `new` doesn't call func_80027228 by name -- it fetches
@@ -110,7 +110,7 @@ extern Obj6D4E8Methods *GetClass6D4E8Methods(void);        /* still INCLUDE_ASM 
 extern void InitCdDrive(void);                    /* still INCLUDE_ASM in the code_179d8 remainder;
                                                        confirmed zero-argument the same way slot74 is above */
 
-Obj6D4E8 *new_class_6d4e8(void)
+Obj6D4E8 *New_Class6D4E8(void)
 {
     Obj6D4E8 *self;
 

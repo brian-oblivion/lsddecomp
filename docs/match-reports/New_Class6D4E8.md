@@ -1,4 +1,6 @@
-# new_class_6d4e8 -- MATCHED (20/20 words)
+# New_Class6D4E8 -- MATCHED (20/20 words)
+
+> Renamed from `new_class_6d4e8` on 2026-09-25 (tools/rename.py). Address 0x800271d8.
 
 Unit `code_179d8_o`, round 26 (2026-09-09). The unit's "new" function: allocate
 an instance and dispatch to its constructor through the class's own method
@@ -17,7 +19,7 @@ hierarchy, whose constructor `BasicClass__BasicClass` sits at `+0x008`).
 `BasicClass__func_*` addresses in both tables), and adds new slots from
 `+0x040` up that `D_8006B58C` doesn't have at all (including this unit's own
 `func_800272C8`). Since `+0x008` is confirmed as the constructor slot in the
-BASE table, `new_class_6d4e8` allocating and then calling through that same
+BASE table, `New_Class6D4E8` allocating and then calling through that same
 slot on ITS OWN table (which resolves to `func_80027228`, this unit's next
 function) is a genuine "allocate + construct" pair -- confirmed by the table
 lookup, not assumed from the name.
@@ -25,7 +27,7 @@ lookup, not assumed from the name.
 ## What it is
 
 ```c
-Obj6D4E8 *new_class_6d4e8(void)
+Obj6D4E8 *New_Class6D4E8(void)
 {
     Obj6D4E8 *self;
 
