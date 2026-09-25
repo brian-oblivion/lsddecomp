@@ -55,6 +55,25 @@ typedef struct HullList_fa50 {
     Corners_fa50 c[1];      /* +0x004 */
 } HullList_fa50;
 
+/* A segment: start and direction (end - start). */
+typedef struct Ray_fa50 {
+    Vec3_fa50 org;          /* +0x000 */
+    Vec3_fa50 dir;          /* +0x006 */
+} Ray_fa50;
+
+/* LIBGTE's VECTOR, declared locally. */
+typedef struct Vec4_fa50 {
+    s32 vx, vy, vz, pad;
+} Vec4_fa50;
+
+#define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
+
+/* The scratch VECTOR that also holds the candidate triangle's box. */
+typedef union VecBox_fa50 {
+    Vec4_fa50 v;
+    Box_fa50 b;
+} VecBox_fa50;
+
 /* One TMD primitive: a 4-byte header, then u16 words (vertex indices among
  * them, at mode-dependent positions). */
 typedef struct TmdPrim_fa50 {
@@ -111,6 +130,10 @@ typedef struct Outer_fa50 {
 } Outer_fa50;
 
 extern void GsMapModelingData(unsigned long *p);
+extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
+extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
+extern s32 SquareRoot0(s32 a);
+TmdPrim_fa50 *func_80020050(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count);
 extern s32 D_8008AC4C;
 extern s32 D_8008B21C[];
 extern s32 D_8006BEA0[];
@@ -260,7 +283,169 @@ void func_8001F66C(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
         }
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F8B8);
+/* Casts the segment origin..end against every triangle/quad of the model and
+ * keeps the nearest hit: *best = its distance, *hitOut = the point, *height =
+ * the point's y above the face's box. Returns whether anything was hit. The
+ * VECTOR locals are scratch named by their frame slot; v60 is never used but
+ * holds retail's slot, and dist is an 8-byte array because retail keeps it in
+ * memory at the slot after uF0. */
+s32 func_8001F8B8(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
+    Vec3_fa50 tri[4];
+    Vec4_fa50 plane;
+    Ray_fa50 ray;
+    Vec3_fa50 hit;
+    s32 nverts;
+    u32 count;
+    TmdPrim_fa50 *p;
+    s32 found;
+
+    count = 0;
+    *best = 0x7FFFFFFF;
+    ray.org.x = origin->x;
+    ray.org.y = origin->y;
+    ray.org.z = origin->z;
+    ray.dir.x = end->x - origin->x;
+    ray.dir.y = end->y - origin->y;
+    ray.dir.z = end->z - origin->z;
+    found = 0;
+    while ((p = func_80020050(self, p, &nverts, tri, &count)) != NULL) {
+        Vec4_fa50 v60;
+        SVec_fa50 e1;
+        SVec_fa50 e2;
+        Vec4_fa50 v80;
+        Vec4_fa50 v90;
+        Vec4_fa50 vA0;
+        Vec4_fa50 vB0;
+        Vec4_fa50 vC0;
+        Vec4_fa50 vD0;
+        Vec4_fa50 vE0;
+        VecBox_fa50 uF0;
+        s32 dist[2];
+        s32 frac;
+        s32 q;
+        s32 hi;
+        s32 t;
+        s16 *minx;
+        s16 *miny;
+        s16 *minz;
+        s16 *maxx;
+        s16 *maxy;
+        s16 *maxz;
+        Vec3_fa50 *v;
+        s32 i;
+
+        e1.x = tri[1].x - tri[0].x;
+        e1.y = tri[1].y - tri[0].y;
+        e1.z = tri[1].z - tri[0].z;
+        e2.x = tri[2].x - tri[0].x;
+        e2.y = tri[2].y - tri[0].y;
+        e2.z = tri[2].z - tri[0].z;
+        v90.vx = e1.x;
+        v90.vy = e1.y;
+        v90.vz = e1.z;
+        vA0.vx = e2.x;
+        vA0.vy = e2.y;
+        vA0.vz = e2.z;
+        OuterProduct0(&v90, &vA0, &v80);
+        plane.vx = v80.vx;
+        plane.vy = v80.vy;
+        plane.vz = v80.vz;
+        plane.vx /= 4096;
+        plane.vy /= 4096;
+        plane.vz /= 4096;
+        plane.pad = -(tri[0].x * plane.vx + tri[0].y * plane.vy + tri[0].z * plane.vz);
+        vC0.vx = ray.dir.x * plane.vx + ray.dir.y * plane.vy + ray.dir.z * plane.vz;
+        if (ABS_fa50(vC0.vx) <= 0) {
+            vC0.vy = 2;
+        } else {
+            vC0.vz = ray.org.x * plane.vx + ray.org.y * plane.vy + ray.org.z * plane.vz;
+            vC0.vz += plane.pad;
+            v80.vx = vC0.vx;
+            v80.vy = 1;
+            vB0.vx = -vC0.vz;
+            vB0.vy = 1;
+            vB0.vz = vB0.vx * v80.vy;
+            vB0.pad = vB0.vy * v80.vx;
+            if (ABS_fa50(vB0.pad) >= 0x1000) {
+                vB0.vz /= 4096;
+                vB0.pad /= 4096;
+            }
+            frac = ABS_fa50(vB0.vz % vB0.pad) << 16;
+            q = vB0.vz / vB0.pad;
+            if (q != 0) {
+                hi = q << 16;
+            } else {
+                hi = (vB0.vz * vB0.pad) & 0x80000000;
+            }
+            t = hi | (frac / ABS_fa50(vB0.pad));
+            if (t < 0) {
+                vC0.vy = 0;
+            } else {
+                vD0.vx = ray.dir.x;
+                vD0.vy = ray.dir.y;
+                vD0.vz = ray.dir.z;
+                vA0.vx = (ray.dir.x * t) >> 16;
+                v90.vx = ray.org.x + vA0.vx;
+                vA0.vx = v90.vx - ray.org.x;
+                vA0.vy = (ray.dir.y * t) >> 16;
+                v90.vy = ray.org.y + vA0.vy;
+                vA0.vy = v90.vy - ray.org.y;
+                vA0.vz = (ray.dir.z * t) >> 16;
+                v90.vz = ray.org.z + vA0.vz;
+                vA0.vz = v90.vz - ray.org.z;
+                Square0(&vD0, &vE0);
+                vC0.vx = vE0.vx + vE0.vy + vE0.vz;
+                vC0.vx = SquareRoot0(vC0.vx);
+                Square0(&vA0, &uF0.v);
+                vC0.vz = uF0.v.vx + uF0.v.vy + uF0.v.vz;
+                vC0.vz = SquareRoot0(vC0.vz);
+                if (vC0.vx >= vC0.vz) {
+                    dist[0] = vC0.vz;
+                    vC0.vy = 1;
+                    hit.x = v90.vx;
+                    hit.y = v90.vy;
+                    hit.z = v90.vz;
+                } else {
+                    vC0.vy = 0;
+                }
+            }
+        }
+        if (vC0.vy != 1) {
+            continue;
+        }
+        minx = &uF0.b.min.x;
+        miny = &uF0.b.min.y;
+        minz = &uF0.b.min.z;
+        maxx = &uF0.b.max.x;
+        maxy = &uF0.b.max.y;
+        maxz = &uF0.b.max.z;
+        v = tri;
+        uF0.b.min = *v;
+        uF0.b.max = uF0.b.min;
+        for (i = 0; i < nverts - 1; i++) {
+            v++;
+            if (v->x < *minx) *minx = v->x;
+            if (v->y < *miny) *miny = v->y;
+            if (v->z < *minz) *minz = v->z;
+            if (*maxx < v->x) *maxx = v->x;
+            if (*maxy < v->y) *maxy = v->y;
+            if (*maxz < v->z) *maxz = v->z;
+        }
+        if (hit.x < uF0.b.min.x - 24 || hit.y < uF0.b.min.y - 24 || hit.z < uF0.b.min.z - 24 ||
+            uF0.b.max.x + 24 < hit.x || uF0.b.max.y + 24 < hit.y || uF0.b.max.z + 24 < hit.z) {
+            continue;
+        }
+        found = 1;
+        if (dist[0] < *best) {
+            *best = dist[0];
+            *hitOut = hit;
+            if (height != NULL) {
+                *height = hit.y - uF0.b.min.y;
+            }
+        }
+    }
+    return found;
+}
 TmdPrim_fa50 *func_80020050(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
     s32 idx[4];
     Rec28_fa50 *rec = self->unk10;
