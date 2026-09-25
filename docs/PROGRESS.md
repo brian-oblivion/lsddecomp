@@ -9,7 +9,7 @@ stale, prose elsewhere is not.
 ## 2026-09-25 — round 82: game code 100% matched (213/213), six units named, three classes unified
 
 Opus head, operator cap 5, slots re-staffed as they emptied: 29 runner
-sessions (19 Opus matching, 6 Sonnet naming, 4 Opus track-4 and review).
+sessions (19 Opus matching, 6 Sonnet naming, 3 Opus track 4, 1 Opus extern review).
 Every merge was followed by `build-and-verify.sh`; the image matched retail
 after each one.
 
@@ -54,15 +54,25 @@ after each one.
   (§2.1 call-graph contention). code_fa50 and code_322b4 naming ran while
   delta's Actor was live, with the three code_fa50 symbols class_3bb8c_o
   calls fenced off in the prompt.
-- **`-Wall` baseline rewritten** for eight warnings that come from this
-  round's byte-exact bodies: five deliberate frame-reserving unused locals
-  (code_322b4 `pad`, code_33808 `unused` ×3, code_fa50 `v60`) and four
-  "might be used uninitialized" (code_39094 ×2, code_fa50 `p`, `size`).
-  The code_39094 pair is func_8004913C passing an uninitialised local to
-  fill `$a1` for `SeedAndRandom`, whose other caller passes two arguments:
-  mixed arity in retail usually means an unprototyped original declaration.
-  It is byte-exact and legal C89 but not readable C; left for track 3 or the
-  extern review below to express honestly.
+- **Extern review and `-Wall` (alpha, run alone, merged last).** externcheck
+  is clean. PickVariant and PickWeeklyStreamChannel had been passing an
+  uninitialised local to fill `SeedAndRandom`'s `$a1`; both callers load it
+  (`move a1,zero`), so each now takes and forwards a real second parameter,
+  byte-identical. GetGridRecordAt and SetVec3 got full prototypes;
+  GetSoundEffectDir and GetStreamChannelInit keep an extra argument retail
+  loads, annotated `arity-ok`. The head's merges had let 36 new warnings
+  through, 27 of them in code_33808's last batch: three functions called
+  before any declaration (implicit `int`, then type mismatch). The head
+  missed this at echo's merge because it reads build exit and funcdiff, not
+  `--warnings`; alpha fixed 24, all byte-identical. The baseline was rewritten
+  for the 12 left, each forced by the bytes: five deliberate frame-reserving
+  unused locals (code_322b4 `pad`, code_33808 `unused` ×4, code_fa50 `v60`),
+  two paths retail returns from without setting `$v0` (func_80045948,
+  func_80045CFC: neither `void` nor an added return keeps the bytes), and
+  four maybe-uninitialised reads (func_8004441C `sx`/`sy`, initialising them
+  changed the length; code_fa50 `p`/`size`). **Process lesson for the head:
+  run `typeviews.py --warnings` at every matching merge, not only after
+  types merges.**
 - **Learnings promoted**: the zero-argument slot call through an
   unprototyped slot when `$a0` still holds self (with the counter-case: the
   same situation matched as `slot(self)` elsewhere); the bottom-only loop
