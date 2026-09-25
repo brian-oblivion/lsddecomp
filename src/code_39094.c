@@ -122,7 +122,12 @@ Rec1C *func_80049110(s32 *countOut) {
     return &((Rec1C *)func_80048D48(NULL))[0x230];
 }
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_8004913C);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_800491CC);
+Rec1C *func_800491CC(s32 *countOut) {
+    if (countOut != NULL) {
+        *countOut = 7;
+    }
+    return &((Rec1C *)func_80048D48(NULL))[0x237];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800491FC);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049240);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049270);
