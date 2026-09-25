@@ -6,7 +6,7 @@
  * those, and no Sony fingerprint). What it holds: the four methods of
  * D_8006F06C.
  *
- * Nothing here is matched yet: every function is fresh track-1 ground.
+ * All six functions matched in round 81 (alpha).
  */
 #include "common.h"
 #include "BasicClass.h"
