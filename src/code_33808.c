@@ -1032,7 +1032,63 @@ void func_800455D4(Obj455D4 *self) {
     func_8004575C(self);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004564C);
+/* Set up the MDEC player's frame: keep `external` at +0x0C and, unless the
+ * caller provides the buffers, allocate the two decode buffers (w * h * 2 +
+ * 0x1000 each), the 0x12000 ring and the h * 32 strip buffer -- on a failure
+ * free what was allocated (func_8004575C) and return 1. Then the frame
+ * descriptor goes to +0x2C and +0x20, the strip at +0x2C is 16 wide and
+ * +0x38 is its size in words. 0. */
+typedef struct Frame4564C {
+    /* +0x00 */ s16 x;
+    /* +0x02 */ s16 y;
+    /* +0x04 */ s32 w;
+    /* +0x08 */ s32 h;
+} Frame4564C;
+
+typedef struct Obj4564C {
+    /* +0x000 */ u8 pad0[0xC];
+    /* +0x00C */ s32 external;
+    /* +0x010 */ void *ring;
+    /* +0x014 */ void *frames[2];
+    /* +0x01C */ void *strip;
+    /* +0x020 */ Frame4564C frame;
+    /* +0x02C */ Frame4564C cur;
+    /* +0x038 */ s32 stripSize;
+} Obj4564C;
+
+s32 func_8004564C(Obj4564C *self, Frame4564C *desc, s32 external) {
+    s32 size;
+    s32 unused[2];
+
+    self->external = external;
+    if (external == 0) {
+        self->strip = NULL;
+        self->frames[1] = NULL;
+        self->frames[0] = NULL;
+        self->ring = NULL;
+        size = desc->w * desc->h * 2 + 0x1000;
+        if ((self->frames[0] = BMemPMgrAlloc(size)) == NULL) {
+            goto fail;
+        }
+        if ((self->frames[1] = BMemPMgrAlloc(size)) == NULL) {
+            goto fail;
+        }
+        if ((self->ring = BMemPMgrAlloc(0x12000)) == NULL) {
+            goto fail;
+        }
+        if ((self->strip = BMemPMgrAlloc(desc->h << 5)) == NULL) {
+            goto fail;
+        }
+    }
+    self->cur = *desc;
+    self->frame = self->cur;
+    self->cur.w = 16;
+    self->stripSize = (self->cur.h << 4) >> 1;
+    return 0;
+fail:
+    func_8004575C(self);
+    return 1;
+}
 /* Unless +0x0C is set, free the four allocations at +0x14, +0x18, +0x10,
  * +0x1C. Not referenced by any data word. */
 typedef struct Obj4575C {
