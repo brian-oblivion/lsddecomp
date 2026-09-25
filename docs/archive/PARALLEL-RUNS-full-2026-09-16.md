@@ -1870,6 +1870,19 @@ for f in asm/*.s; do b=$(basename "$f" .s); case "$b" in psyq_*|header) continue
      delete `src/<unit>.c` when a segment goes back to `asm`, so the stale unit
      keeps its `INCLUDE_ASM`s while the monolithic `.s` returns. **Reverting a
      carve means deleting the generated `.c` in the same step.**
+   - **Functions missing after you MOVE a boundary (added 2026-09-25,
+     revision 18).** When `src/<unit>.c` already exists, splat writes
+     `asm/nonmatchings/<unit>/*.s` ONLY for the functions its `INCLUDE_ASM`s
+     name. A unit generated at a wrong boundary and then re-extracted at the
+     right one keeps its old list: `code_33808` came back with 59 of 97
+     functions and the link failed on the rest. Delete the `.c`, extract,
+     regenerate it.
+   - **Wrong function order when a function owns attached rodata (same
+     round).** With `migrate_rodata_to_functions` the owning function's `.s`
+     STARTS with the table, whose `/* ofs vram word */` comments carry a
+     rodata address. A generator that orders `INCLUDE_ASM`s by the first such
+     comment puts that function first; the link succeeds and the image
+     misses. Order by the address on the line after `glabel`.
 5. Commit the carve on main as its own commit, THEN provision worktrees, so
    runners inherit it and never touch the yaml.
 

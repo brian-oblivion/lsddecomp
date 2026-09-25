@@ -19,9 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 17 (2026-09-25, round 80: track 4's recipe, measured on
-BasicClass, Pad and Class6D430; the class tree and `tools/typeviews.py`;
-track 4b opened for its first global; tracks 1, 1b and 2 archived).
+Plan revision: 18 (2026-09-25, premium session: ten `psyq_*` segments were
+game code; 299 functions carved into eleven units, `tools/gameinsdk.py`,
+tracks 1 and 2 reopened).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -84,15 +84,22 @@ DEFERRED instead, with the reason; staff it once that job merges. Every
 track has a stop or park rule so that "hard" becomes "parked with a written
 reason" rather than another round.
 
-### Tracks 1, 1b and 2: done
+### Tracks 1, 1b and 2
 
-Stall matching (1), `NON_MATCHING` bodies (1b) and the SDK call surface (2)
-are done: every game function matches, no stall is left, and every SDK
-function game code calls carries Sony's name or a parked
-`// <library>, unidentified:` comment. Their rules, stop rules and runner
-prompts are `docs/archive/FINISHING-PLAN-tracks-1-2-2026-09-25.md`, verbatim;
-follow them if `plan.py` ever reopens one of these tracks. Two rules outlive
-them and are restated where they apply: a function `progress.py` counts as
+Tracks 1 and 2 are OPEN again (revision 18): the "every game function
+matches" track 1 closed on was measured over segment names, and ten `psyq_*`
+segments held game code, now fresh ground in `code_<fileoff>` units. Their
+`jal`s reach Sony functions still named `func_`, and `plan.py` now counts
+calls from INCLUDE_ASM game code, so track 2 lists them at once.
+
+Fresh ground is never parked by the stall stop rule. `plan.py` lists one job
+per unit, up to ten functions cheapest first; staff it with the matching
+prompt (PARALLEL-RUNS §5) with K set to the job's list. A unit with fresh
+ground waits for track 1 before its naming pass and is left out of track 3's
+80% gate. Track 1b reopens by itself if stalls appear. The three tracks'
+rules, stop rules and runner prompts are
+`docs/archive/FINISHING-PLAN-tracks-1-2-2026-09-25.md`, verbatim. Two of them
+are restated where they also apply: a function `progress.py` counts as
 library is never renamed or retyped as game code (track 3), and a preserved
 near-miss body lives only in an `#ifdef NON_MATCHING` block (CLAUDE.md).
 
@@ -233,9 +240,12 @@ first, so accessors stay flat at any depth and nothing is re-pathed (GCC
 Entity's accessors into `this->base.base.base.x`). The table word +0x000 is a
 nibble-path class id (the parent of 0x1F234 is 0xF234, 0x234, 0x34, 0x4, 0x0),
 so the tree is mechanical and classes are unified root first: `plan.py`
-offers a class only when its ancestors are unified, parked or `no C`. A `no C`
-class (every own method asm, no view anywhere) is not a job; its subclasses
-expand the nearest unified ancestor's macros and list its slots flat.
+offers a class only when its ancestors are unified, parked, `no C` or `no C
+yet`. A `no C` class (no own method C, no view anywhere) is not a job; its
+subclasses expand the nearest unified ancestor's macros and list its slots
+flat. `no C yet` is the same while its methods are carved INCLUDE_ASM game
+code (revision 18: every round-80 `no C` class was one); it becomes an
+ordinary class when track 1 matches one.
 
 **Procedure, one class per commit.**
 1. `typeviews.py --census`: the class's own methods and every object and

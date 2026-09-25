@@ -232,12 +232,13 @@ still obeyed for rounds after the condition is met.
 
 ### 3.4 Gate 2: carving
 
-Closed. `python3 tools/uncarved.py` reports zero uncarved game functions since
-round 47. Re-run the tool rather than believing this line. If it ever reports
-ground again, the recipe and its five routine failures (orphaned rodata
-jump-table slot, shared rodata slot, data tail, `dlabel` in a text segment,
-reverting a carve leaves the `.c`) are archive §Gate 2, and the rule is: one
-segment at a time, byte-neutral with `INCLUDE_ASM` in place, extract TWICE.
+Ground exists when `python3 tools/uncarved.py` reports it or
+`.venv/bin/python3 tools/gameinsdk.py --check` fails: a `psyq_*` NAME is not
+evidence (revision 18 carved 299 game functions out of ten of them). The
+recipe and its routine failures (orphaned or shared rodata slot, data tail,
+`dlabel` in text, a reverted or re-bounded carve's stale `.c`, attached-rodata
+ordering) are archive §Gate 2. One segment at a time, byte-neutral with
+`INCLUDE_ASM` in place, extract TWICE.
 
 ### 3.5 Gate 3: permuter
 

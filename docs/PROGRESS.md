@@ -6,6 +6,78 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — premium session: ten psyq_* segments were game code; 299 functions carved; plan revision 18
+
+**One premium session, no runners**, from an operator handover: game code sat
+in segments named `psyq_*`, which `progress.py` counts as library BY NAME, so
+"100% of game code matched" was false. It is the mirror of revision 13 (Sony
+code in game-named segments). Measured, it holds, and it is larger than the
+handover's ~210.
+
+**The classifier: `tools/gameinsdk.py`** (`--write`/`--check`,
+`config/game-in-sdk.txt`). Evidence, iterated: a `jal`/`j` into game code
+(Sony never calls the game by name; pinned targets are library), a slot in a
+data pointer run beside a game method, then contiguity: a run bracketed by
+game on both sides, or touching game on one side with every outside referrer
+game. Guard: a Sony name the corpus knows, an ld pin, an exact fingerprint of
+12+ words agreeing on one name or module, or a shape lead (0.90, 40+ words).
+The handover's "all callers are game" rule was NOT adopted on its own: it
+describes every Sony API the game calls (ClearImage's only caller is game
+code). Of the 299, 229 had direct evidence (91 calls, the rest table slots)
+and 70 came by contiguity. 0 conflicts. 47 unclassified are Sony stubs inside
+Sony runs.
+
+| was | now | functions |
+| --- | --- | --- |
+| psyq_2864 | code_2864 | 1 |
+| psyq_fa50 | code_fa50 (+ rodata 0xB54, jtbl_80010354) | 18 |
+| psyq_10ee0 head | code_10ee0; libgpu/sys from ResetGraph is psyq_11474 | 24 |
+| psyq_2a0e0 ("the game's own libspu build") | code_2a0e0 | 17 |
+| psyq_2b78c ("the game's own libsnd build") | code_2b78c | 7 |
+| psyq_2bb9c | code_2bb9c | 15 |
+| psyq_322b4 | code_322b4 (+ rodata 0x1A90, jtbl_80011290) | 51 |
+| psyq_3311c | code_3311c | 6 |
+| psyq_33808 head | code_33808; libpress from DecDCTReset is psyq_36654 | 97 |
+| psyq_3770c | code_3770c | 25 |
+| psyq_39094 | code_39094 | 38 |
+
+Every carve built byte-exact on its own, and the whole set survived a second
+extract. After it, `progress.py` reads 1149/1448 game functions matched
+(79.35%; 84.09% of game bytes), 299 fresh, and `gameinsdk.py` finds no game
+function left in any `psyq_*` segment.
+
+**Two carve hazards, now in archive §Gate 2.** (1) With `src/<unit>.c`
+present, splat writes `.s` only for the `INCLUDE_ASM`s it names: a unit first
+generated at a wrong boundary (0x35654, a vram-to-file slip, for 0x36654)
+kept 59 of 97 functions after the boundary was fixed. (2) A function owning
+attached rodata starts its `.s` with the table, so ordering `INCLUDE_ASM`s by
+the first address comment put `func_80020050` first; the link was green and
+the image missed. Order by the address after `glabel`.
+
+**One new sdk-in-game LEAD, rejected.** `func_80047900` (code_3770c) is a
+4-word getter returning `&D_800817E0`, its own class's table; it matched
+libcd/sys `CdLastPos` by stub shape next to the placed libcd/c_002. It now
+has a `// not SDK:` symbols comment.
+
+**plan.py.** Track 1 is open for fresh ground, which the stall stop rule no
+longer parks. Fresh jobs are one per unit, ten functions cheapest first
+(`FRESH_PER_RUNNER`), with collision detection taught the new job text. A
+unit with fresh ground waits for track 1 before track 3 and is out of the
+80% gate. The DEFERRED "same unit as #N" numbers were off by one after a
+premium job, now fixed. Track 2 counts the `jal`s of INCLUDE_ASM game code,
+not only C call sites: the carved units call 14 Sony functions still named
+`func_` (libgpu's image transfers, GsInitGraph, libpress, SsSeqOpen, CdRead2,
+all exact fingerprints), so track 2 reopens with one Sonnet batch. Track 4: all
+26 classes round 80 marked `no C` are `no C yet`: their methods are these
+carved units.
+
+**Next.** `plan.py`'s top jobs are fresh matching in the eleven units,
+interleaved with track 4's class job. `progress.py` and `uncarved.py` read
+`game-in-sdk.txt`, and CLAUDE.md, PARALLEL-RUNS §3.4 and the yaml say a
+`psyq_*` name is a claim.
+
+---
+
 ## 2026-09-25 — round 80 (premium head): track 4 begins; BasicClass, Pad and Class6D430 unified; plan revision 17
 
 **One premium session, no runners.** The head ran on Opus 5.5 as the premium

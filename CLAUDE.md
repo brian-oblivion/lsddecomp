@@ -143,7 +143,10 @@ How to read `progress.py` correctly:
   from the game-code percentage. So does every subsegment of type `o`: those
   are Sony's own objects linked from the SDK, they have no asm and no C, and
   `progress.py` reports them on a separate "linked from SDK objects" line
-  rather than in any function count.
+  rather than in any function count. **A `psyq_*` name is a claim, not
+  evidence**: ten such segments held game code until revision 18 carved it
+  out. `.venv/bin/python3 tools/gameinsdk.py --check` keeps them honest
+  (`config/game-in-sdk.txt`, the inverse of `sdk-in-game.txt`).
 - **Not every matched function was work.** Some bodies are just `jr $ra; nop`
   and splat generated them itself.
 - **The `fresh` column cannot see toolchain blockers** — screen candidates
@@ -736,6 +739,7 @@ tools/setup-worktree.sh <name>     # provision a parallel runner
 .venv/bin/python3 tools/psyq_sdk.py match      # place every SDK object in retail
 .venv/bin/python3 tools/psyq_sdk.py coverage   # which SDK functions are already owned by an object
 python3 tools/sdkstalls.py         # stalled functions that are really Sony library code
+.venv/bin/python3 tools/gameinsdk.py --check   # no game code left inside psyq_* segments
 python3 tools/stalesyms.py         # preserved bodies calling symbols since renamed
 .venv/bin/python3 tools/psyq_sdk.py check      # manifest, yaml `o` segments and lib/ agree
 ```
