@@ -49,14 +49,64 @@ typedef struct CountedBuf33808 {
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 extern void BMemPMgrFree(void *arg);
+extern void *BMemPMgrAlloc(s32 size);
+void *func_80043830(void);
+void *func_80043B78(void);
+void *func_80043E74(void);
 void *func_800441A4(void);
+void *func_8004467C(void);
 void *func_800449FC(void);
+void *func_80044CC4(void);
+void *func_80044F20(void);
+void *func_800451A8(void);
+void *func_80045428(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043008);
+/* The allocators below reach a class's constructor through its table
+ * getter; the constructor's parameters vary, so the slot is unprototyped. */
+typedef struct Ctor33808 {
+    /* +0x000 */ s32 header;
+    /* +0x004 */ void *release;
+    /* +0x008 */ s32 (*ctor)();
+} Ctor33808;
+
+/* Allocate and construct a D_8006F0B8 object. */
+void *func_80043008(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x84);
+
+    if (obj != NULL) {
+        ((Ctor33808 *)func_80043830())->ctor(obj, arg0);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043068);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800431A8);
+/* D_8006F0B8 +0x00C: finalize -- release the object array at +0x30 (+0x2C
+ * entries), free it, then the active driver's. */
+void func_800431A8(DataSrc33808 *self) {
+    ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
+    BMemPMgrFree(self->unk30);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043200);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800434DC);
+/* The largest of the buffer's `count` words from +0x14. */
+typedef struct Buf434DC {
+    /* +0x00 */ u32 count;
+    /* +0x04 */ u8 pad4[0x10];
+    /* +0x14 */ u32 vals[1];
+} Buf434DC;
+
+u32 func_800434DC(Class6D430 *self) {
+    Buf434DC *buf = self->buffer;
+    u32 i;
+    u32 max = 0;
+
+    for (i = 0; i < buf->count; i++) {
+        if (max < buf->vals[i]) {
+            max = buf->vals[i];
+        }
+    }
+    return max;
+}
 /* D_8006F0B8 +0x078: set entry `index`'s shift, and its mask from it. */
 typedef struct Ent6F0B8 {
     /* +0x00 */ u16 shift;
@@ -75,7 +125,20 @@ void func_80043538(Obj6F0B8 *self, s32 index, s32 shift) {
     e->shift = shift;
     e->mask = 1 << e->shift;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004355C);
+/* D_8006F0B8 +0x07C: slot +0x080 for entries 0..3, under the data-source
+ * lock. */
+extern void LockActiveDataSource(void);
+extern void UnlockActiveDataSource(void);
+
+void func_8004355C(DataSrc33808 *self, s32 arg) {
+    s32 i;
+
+    LockActiveDataSource();
+    for (i = 0; i < 4; i++) {
+        self->methods->slot80(self, i, arg);
+    }
+    UnlockActiveDataSource();
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800435D0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043648);
 extern s32 D_8006F0B8[];
@@ -83,7 +146,18 @@ extern s32 D_8006F0B8[];
 void *func_80043830(void) {
     return D_8006F0B8;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043840);
+/* Allocate and construct a D_8006F13C object; freed and NULL when the constructor fails. */
+void *func_80043840(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x30);
+
+    if (obj != NULL) {
+        if (((Ctor33808 *)func_80043B78())->ctor(obj, arg0)) {
+            return obj;
+        }
+        BMemPMgrFree(obj);
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800438B0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043954);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800439EC);
@@ -125,9 +199,23 @@ extern s32 D_8006F13C[];
 void *func_80043B78(void) {
     return D_8006F13C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B88);
+/* Allocate and construct a D_8006F1C4 object. */
+void *func_80043B88(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x3C);
+
+    if (obj != NULL) {
+        ((Ctor33808 *)func_80043E74())->ctor(obj, arg0);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043BE8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043C60);
+/* D_8006F1C4 +0x00C: finalize -- same shape as D_8006F0B8's. */
+void func_80043C60(DataSrc33808 *self) {
+    ReleaseBasicClassArray((BasicClass **)self->unk30, self->unk2C);
+    BMemPMgrFree(self->unk30);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043CB8);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043DFC);
 extern s32 D_8006F1C4[];
@@ -135,7 +223,16 @@ extern s32 D_8006F1C4[];
 void *func_80043E74(void) {
     return D_8006F1C4;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043E84);
+/* Allocate and construct a D_8006F240 object. */
+void *func_80043E84(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x2C);
+
+    if (obj != NULL) {
+        ((Ctor33808 *)func_800441A4())->ctor(obj, arg0);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043EE4);
 /* D_8006F240 +0x00C: finalize, straight to the active driver's. */
 void func_80043F78(Class6D430 *self) {
@@ -163,13 +260,17 @@ extern s32 D_8006F240[];
 void *func_800441A4(void) {
     return D_8006F240;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800441B4);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044220);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044380);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004441C);
-/* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
- * three-byte vector to +0x54. */
+/* Allocate and construct a D_8006F2C4 object. */
+void *func_800441B4(s32 arg0, s32 arg1) {
+    void *obj = BMemPMgrAlloc(0x68);
+
+    if (obj != NULL) {
+        ((Ctor33808 *)func_8004467C())->ctor(obj, arg0, arg1);
+        return obj;
+    }
+    return NULL;
+}
+/* A three-byte vector, and the D_8006F2C4 object (a Class6B5CC subclass). */
 typedef struct Vec3S8 {
     s8 x;
     s8 y;
@@ -182,6 +283,18 @@ typedef struct Obj6F2C4 {
     /* +0x054 */ Vec3S8 unk54;
 } Obj6F2C4;
 
+/* D_8006F2C4 +0x008: constructor -- Class6B5CC's, then this table, then
+ * slot +0x040 with the two arguments. */
+void func_80044220(Obj6F2C4 *self, s32 arg1, s32 arg2) {
+    GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
+    self->methods = func_8004467C();
+    ((void (*)())self->methods->reset)(self, arg1, arg2);
+}
+INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044294);
+INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044380);
+INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004441C);
+/* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
+ * three-byte vector to +0x54. */
 void func_8004464C(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
     if (enable) {
         self->unk54 = *src;
@@ -194,7 +307,18 @@ extern s32 D_8006F2C4[];
 void *func_8004467C(void) {
     return D_8006F2C4;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004468C);
+/* Allocate and construct a D_8006F384 object (second constructor argument 1); freed and NULL when the constructor fails. */
+void *func_8004468C(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x38);
+
+    if (obj != NULL) {
+        if (((Ctor33808 *)func_800449FC())->ctor(obj, arg0, 1)) {
+            return obj;
+        }
+        BMemPMgrFree(obj);
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800446FC);
 /* D_8006F384 +0x00C: finalize -- slot +0x07C, then the active driver's. */
 void func_800447B4(DataSrc33808 *self) {
@@ -221,7 +345,18 @@ extern s32 D_8006F384[];
 void *func_800449FC(void) {
     return D_8006F384;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A0C);
+/* Allocate and construct a D_8006F40C object; freed and NULL when the constructor fails. */
+void *func_80044A0C(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x3C);
+
+    if (obj != NULL) {
+        if (((Ctor33808 *)func_80044CC4())->ctor(obj, arg0)) {
+            return obj;
+        }
+        BMemPMgrFree(obj);
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A7C);
 /* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
 void func_80044B04(DataSrc33808 *self) {
@@ -254,31 +389,92 @@ extern s32 D_8006F40C[];
 void *func_80044CC4(void) {
     return D_8006F40C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044CD4);
+/* Allocate and construct a D_8006F498 object. */
+void *func_80044CD4(s32 arg0, s32 arg1) {
+    void *obj = BMemPMgrAlloc(0x44);
+
+    if (obj != NULL) {
+        ((Ctor33808 *)func_80044F20())->ctor(obj, arg0, arg1);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044D40);
 /* D_8006F498 +0x00C: finalize -- free +0x38, then the active driver's. */
 void func_80044DC8(DataSrc33808 *self) {
     BMemPMgrFree((void *)self->unk38);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044E10);
+/* D_8006F498 +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
+typedef struct Obj6F498 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ u8 pad2C[0x16];
+    /* +0x042 */ u16 unk42;
+} Obj6F498;
+
+void func_80044E10(Obj6F498 *self) {
+    if (self->unk2A == 0) {
+        ((void (*)())self->methods->slot78)();
+        self->unk42 = 1;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044E64);
 extern s32 D_8006F498[];
 
 void *func_80044F20(void) {
     return D_8006F498;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044F30);
+/* Allocate and construct a D_8006F514 object. */
+void *func_80044F30(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x38);
+
+    if (obj != NULL) {
+        ((Ctor33808 *)func_800451A8())->ctor(obj, arg0);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044F90);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004500C);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045060);
+/* D_8006F514 +0x00C: finalize -- free +0x34 and +0x2C, then the active
+ * driver's. */
+void func_8004500C(DataSrc33808 *self) {
+    BMemPMgrFree((void *)self->unk34);
+    BMemPMgrFree((void *)self->unk2C);
+    GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
+}
+/* D_8006F514 +0x064: unless +0x2A is set, slot +0x078 and mark +0x32. */
+typedef struct Obj6F514 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ u8 pad2C[6];
+    /* +0x032 */ u16 unk32;
+} Obj6F514;
+
+void func_80045060(Obj6F514 *self) {
+    s32 unused[8];
+
+    if (self->unk2A == 0) {
+        ((void (*)())self->methods->slot78)();
+        self->unk32 = 1;
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800450B4);
 extern s32 D_8006F514[];
 
 void *func_800451A8(void) {
     return D_8006F514;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800451B8);
+/* Allocate and construct a D_8006F590 object; freed and NULL when the constructor fails. */
+void *func_800451B8(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x2C);
+
+    if (obj != NULL) {
+        if (((Ctor33808 *)func_80045428())->ctor(obj, arg0)) {
+            return obj;
+        }
+        BMemPMgrFree(obj);
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045228);
 /* D_8006F590 +0x00C: finalize -- release the buffer's counted object array,
  * then the parent D_8006F240's. */
@@ -305,7 +501,25 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045438);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800454C4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800455D4);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004564C);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004575C);
+/* Unless +0x0C is set, free the four allocations at +0x14, +0x18, +0x10,
+ * +0x1C. Not referenced by any data word. */
+typedef struct Obj4575C {
+    /* +0x000 */ u8 pad0[0xC];
+    /* +0x00C */ s32 unkC;
+    /* +0x010 */ void *unk10;
+    /* +0x014 */ void *unk14;
+    /* +0x018 */ void *unk18;
+    /* +0x01C */ void *unk1C;
+} Obj4575C;
+
+void func_8004575C(Obj4575C *self) {
+    if (self->unkC == 0) {
+        BMemPMgrFree(self->unk14);
+        BMemPMgrFree(self->unk18);
+        BMemPMgrFree(self->unk10);
+        BMemPMgrFree(self->unk1C);
+    }
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800457C0);
 /* A class with an s32 at +0x50, set to 1 / -1 by the two setters below;
  * the class is not yet identified (neither setter sits in a method table). */
@@ -331,7 +545,35 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045AD8);
 void func_80045BC0(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045C94);
+/* D_8006F614 +0x064: while +0x54 is set, count calls in D_8008A948 and
+ * once the count before the increment passes 100, resets it to 1 and calls
+ * slot +0x044; returns 0. Otherwise
+ * clears D_8008A940 and returns 1. */
+typedef struct Methods45C94 {
+    /* +0x000 */ u8 pad0[0x44];
+    /* +0x044 */ void (*slot44)();
+} Methods45C94;
+
+typedef struct Obj45C94 {
+    /* +0x000 */ Methods45C94 *methods;
+    /* +0x004 */ u8 pad4[0x50];
+    /* +0x054 */ s32 unk54;
+} Obj45C94;
+
+extern s32 D_8008A948;
+extern DataSrc33808 *D_8008A940;
+
+s32 func_80045C94(Obj45C94 *self) {
+    if (self->unk54 != 0) {
+        if (D_8008A948++ > 100) {
+            D_8008A948 = 1;
+            self->methods->slot44(self);
+        }
+        return 0;
+    }
+    D_8008A940 = NULL;
+    return 1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045CFC);
 extern DataSrc33808 *D_8008A940;
 
