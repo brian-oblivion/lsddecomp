@@ -6,7 +6,7 @@ stale, prose elsewhere is not.
 
 ---
 
-## 2026-09-25 — round 79: track 3 done, and four more "game" functions were Sony's
+## 2026-09-25 — round 79: track 3 done; GsSetProjection, KeyOnCheck and __main were Sony's
 
 **Seven sessions in two waves, all merged green.** The head ran on Opus 5.5 as an
 ordinary head (not premium). Gate 0 was clean. Wave 1 filled five slots from the
@@ -29,7 +29,7 @@ is track 4's first class, which is a premium session's. The game count fell
 from 1151 to 1149 as functions moved to library. The naming runner went to
 Sonnet by the two-clean-Opus-units rule: four Opus units reviewed, none sent back.
 
-### Sony code the queues still counted as game
+### Sony code hiding under game names
 
 - **`GsSetProjection` (libgs/gs_106)**, was `Unk18Obj__SetGeomScreen`. Bravo
   rejected the LEAD because gs_106 is never placed, reading position evidence
