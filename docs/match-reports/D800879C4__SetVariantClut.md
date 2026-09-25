@@ -49,21 +49,21 @@ struct D_800879C4Obj_q {
     s32 unkA0;                  /* +0x0A0 */
 };
 
-extern const s16 D_80087AA4[];
-extern const s16 D_80087AA6[];
+extern const s16 gD800879C4ClutX[];
+extern const s16 gD800879C4ClutY[];
 
 void D800879C4__SetVariantClut(D_800879C4Obj_q *self, s32 arg1) {
     self->unkA0 = arg1;
-    self->unk74 = D_80087AA4[arg1 * 2];
-    self->unk76 = D_80087AA6[arg1 * 2];
+    self->unk74 = gD800879C4ClutX[arg1 * 2];
+    self->unk76 = gD800879C4ClutY[arg1 * 2];
 }
 ```
 
 ## The rodata shape
 
-`D_80087AA4` and `D_80087AA6` are splat's own dlabels in
+`gD800879C4ClutX` and `gD800879C4ClutY` are splat's own dlabels in
 `asm/data/76DC8.data.s`, 2 bytes and 6 bytes long respectively, sitting
-back to back (`D_80087AA4` at `0x80087AA4`, `D_80087AA6` immediately
+back to back (`gD800879C4ClutX` at `0x80087AA4`, `gD800879C4ClutY` immediately
 after at `0x80087AA6`) -- conceptually one 8-byte array of two
 `{s16 a; s16 b;}` entries, but retail takes TWO SEPARATE `%hi`/`%lo`
 bases (one lui/addiu pair per table) rather than a single struct-array
@@ -73,7 +73,7 @@ parallel `s16[]` externs, each indexed at `arg1 * 2` (i.e. `arg1 * 4`
 bytes -- retail computes the shift once, `sll $a1, $a1, 2`, and reuses it
 for both address calculations, which the two-array C form reproduces
 without any extra hoisting). Values, read at the real stride:
-`D_80087AA4 = {0x03D0, 0x03E0}`, `D_80087AA6 = {0x01FF, 0x01FF}`.
+`gD800879C4ClutX = {0x03D0, 0x03E0}`, `gD800879C4ClutY = {0x01FF, 0x01FF}`.
 
 ## Verification
 
@@ -84,7 +84,7 @@ preserved).
 ### Proposed learning
 
 Two splat dlabels that are contiguous in memory and individually shorter
-than the addressing stride the code actually uses (`D_80087AA4` is 2
+than the addressing stride the code actually uses (`gD800879C4ClutX` is 2
 bytes but addressed at a 4-byte stride) are not necessarily one struct
 array that a single C declaration should unify -- check whether the
 disassembly takes ONE relocation or TWO before merging them. Here it's

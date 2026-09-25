@@ -91,7 +91,7 @@ executable by 4 (found because `build-and-verify.sh` still went green
 with `INCLUDE_ASM` at this point in the debugging session, but a manual
 per-function `funcdiff.py` run on the wrong intermediate C showed a
 145-KB "outside range" drift and a `build/lsdde.map` symbol,
-`D_80087AA4`, landing 4 bytes off its documented address). Hoisting the
+`gD800879C4ClutX`, landing 4 bytes off its documented address). Hoisting the
 truncation to right after each ratio's computation reproduces the extra
 `move` and closes the drift to zero.
 

@@ -32,8 +32,8 @@ struct D_800879C4Obj_q {
     s32 unk5C;                  /* +0x05C, D800879C4__UpdateScale: scaled in place by the first ratio when unk58 != 0 */
     s32 unk60;                  /* +0x060, D800879C4__UpdateScale: scaled in place by the second ratio when unk58 != 0 */
     u8 pad64[0x74 - 0x64];
-    s16 unk74;                  /* +0x074, D800879C4__SetVariantClut: D_80087AA4[arg1] */
-    s16 unk76;                  /* +0x076, D800879C4__SetVariantClut: D_80087AA6[arg1] */
+    s16 unk74;                  /* +0x074, D800879C4__SetVariantClut: gD800879C4ClutX[arg1] */
+    s16 unk76;                  /* +0x076, D800879C4__SetVariantClut: gD800879C4ClutY[arg1] */
     u8 pad78[0x80 - 0x78];
     s16 unk80;                  /* +0x080, D800879C4__UpdateScale: raw first ratio (truncated) when unk58 == 0 */
     s16 unk82;                  /* +0x082, D800879C4__UpdateScale: raw second ratio (truncated) when unk58 == 0 */
@@ -45,18 +45,18 @@ struct D_800879C4Obj_q {
  * Two parallel lookup tables, 2 entries each, stride 4 bytes (indexed as
  * `arg1 * 2` of `s16`, i.e. `arg1 * 4` bytes) even though each holds only
  * a 2-byte element at that stride -- retail takes two SEPARATE %hi/%lo
- * bases (D_80087AA4, D_80087AA6) rather than one struct array, so this is
+ * bases (gD800879C4ClutX, gD800879C4ClutY) rather than one struct array, so this is
  * the only spelling that reproduces the two relocations. Values:
- * D_80087AA4 = {0x03D0, 0x03E0}, D_80087AA6 = {0x01FF, 0x01FF} once read
+ * gD800879C4ClutX = {0x03D0, 0x03E0}, gD800879C4ClutY = {0x01FF, 0x01FF} once read
  * at the real stride (confirmed against asm/data/76DC8.data.s).
  */
-extern const s16 D_80087AA4[];
-extern const s16 D_80087AA6[];
+extern const s16 gD800879C4ClutX[];
+extern const s16 gD800879C4ClutY[];
 
 void D800879C4__SetVariantClut(D_800879C4Obj_q *self, s32 arg1) {
     self->unkA0 = arg1;
-    self->unk74 = D_80087AA4[arg1 * 2];
-    self->unk76 = D_80087AA6[arg1 * 2];
+    self->unk74 = gD800879C4ClutX[arg1 * 2];
+    self->unk76 = gD800879C4ClutY[arg1 * 2];
 }
 
 /*
