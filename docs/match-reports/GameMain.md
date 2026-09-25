@@ -10,10 +10,10 @@ This is the game's own `main()`. It runs an empty startup stub
 (`func_80011994`, already matched, a no-op), sets a Psy-Q memory mode via
 `SetMem(2)`, stands up the game's `BMemPMgr` heap (`BMemPMgrInit`), installs
 it as the default pool (`SetDefaultBMemPMgr`), constructs the `Class6D3C8`
-instance at `D_8008AC20` (`New_Class6D3C8`, seeded from the constant block
-`D_80066828 = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
+instance at `gClass6D3C8` (`New_Class6D3C8`, seeded from the constant block
+`gClass6D3C8CtorArgs = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
 still-uncarved `new_class_6c078`, opens a `Pad` (`New_Pad(NULL, 0)`),
-and dispatches two methods through `D_8008AC20`'s own vtable (`+0x044` and
+and dispatches two methods through `gClass6D3C8`'s own vtable (`+0x044` and
 `+0x04C`) before returning. It never loops -- the real game loop presumably
 lives inside whatever `slot4C` (`func_8003B110`) or a callee reached from it
 does; this function is just game-code setup, past which retail's own crt0
@@ -62,9 +62,9 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
  * of THIS call, not of the one whose delay slot it sits in. */
 extern void *new_class_6c078(void);
 
-extern BMemPMgr *D_8008A808;
-extern Class6D3C8 *D_8008AC20;
-extern Class6D3C8CtorArgs D_80066828;
+extern BMemPMgr *gStartupBMemPMgr;
+extern Class6D3C8 *gClass6D3C8;
+extern Class6D3C8CtorArgs gClass6D3C8CtorArgs;
 
 /* Matched in code_1677c.c; not yet declared in any header (no other carved
  * caller existed until now). */
@@ -77,13 +77,13 @@ void GameMain(void)
 
     func_80011994();
     SetMem(2);
-    D_8008A808 = BMemPMgrInit(0x166C00, 0);
-    SetDefaultBMemPMgr(D_8008A808);
-    D_8008AC20 = New_Class6D3C8(&D_80066828);
+    gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
+    SetDefaultBMemPMgr(gStartupBMemPMgr);
+    gClass6D3C8 = New_Class6D3C8(&gClass6D3C8CtorArgs);
     obj = new_class_6c078();
     pad = New_Pad(0, 0);
-    D_8008AC20->methods->forwardToBaseSlot44UnlessFlagged(D_8008AC20, obj, pad);
-    D_8008AC20->methods->slot4C(D_8008AC20);
+    gClass6D3C8->methods->forwardToBaseSlot44UnlessFlagged(gClass6D3C8, obj, pad);
+    gClass6D3C8->methods->slot4C(gClass6D3C8);
 }
 
 void func_80011994(void) {
@@ -159,6 +159,28 @@ this is a documentation sync only.)
   riskier structural change than a naming pass should make unilaterally,
   and is left for the head/operator to decide. Posted to
   `tools/broadcast.sh`.
+
+- **Globals, all three named (this unit is their only C reference site):**
+  - `D_8008A808` -> `gStartupBMemPMgr`, tier B. Holds `BMemPMgrInit`'s
+    return value between that call and the immediately following
+    `SetDefaultBMemPMgr(...)` call -- set once, read once, both in
+    `GameMain`. Mechanics are clear (it stages the newly created heap
+    pointer); whether any still-uncarved code elsewhere also reads this
+    exact global (as opposed to `gDefaultBMemPMgr`, a different address,
+    `code_8220.c`) is not established, hence tier B rather than A.
+  - `D_8008AC20` -> `gClass6D3C8`, tier B. The one instance of `Class6D3C8`
+    the game constructs, matching this header's own stated convention of
+    keeping the class's identity tied to its vtable address until a
+    game-purpose name is established (track 4). Read and written only here
+    and in the shared header's comments (updated by this rename).
+  - `D_80066828` -> `gClass6D3C8CtorArgs`, tier A: purely mechanical, it
+    IS the one `Class6D3C8CtorArgs` block in the image, passed to
+    `New_Class6D3C8` at its only call site. `{0x13, 0, 1, 1, 1, 1}`, per
+    `include/Class6D3C8.h`'s existing documentation of which two fields
+    (`+0x00`, `+0x14`) `Class6D3C8__Class6D3C8` actually reads.
+
+  All three: `./build-and-verify.sh` byte-identical, `tools/check-nonmatching.sh`
+  green, after each individual `rename.py` run.
 
 ### Proposed learning
 

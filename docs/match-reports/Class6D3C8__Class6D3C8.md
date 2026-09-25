@@ -114,7 +114,7 @@ another caller is found that writes them.
 
 - `include/Class6D3C8.h`: added `Class6D3C8CtorArgs` (the ctor's `arg`
   parameter type — only `+0x00` and `+0x14` are read here, observed against
-  the one call site's data, `asm/main.s`'s `D_80066828` global:
+  the one call site's data, `asm/main.s`'s `gClass6D3C8CtorArgs` global:
   `{0x13, 0, 1, 1, 1, 1}`), added `LoadModelRequest`, retyped
   `MiddleClassMethods.ctor` and `Class6D3C8Methods.ctor`/`.slot40` from
   opaque `void *` to real callable signatures now that this function

@@ -56,9 +56,9 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
  * of THIS call, not of the one whose delay slot it sits in. */
 extern void *new_class_6c078(void);
 
-extern BMemPMgr *D_8008A808;
-extern Class6D3C8 *D_8008AC20;
-extern Class6D3C8CtorArgs D_80066828;
+extern BMemPMgr *gStartupBMemPMgr;
+extern Class6D3C8 *gClass6D3C8;
+extern Class6D3C8CtorArgs gClass6D3C8CtorArgs;
 
 /* Matched in code_1677c.c; not yet declared in any header (no other carved
  * caller existed until now). */
@@ -71,13 +71,13 @@ void GameMain(void)
 
     func_80011994();
     SetMem(2);
-    D_8008A808 = BMemPMgrInit(0x166C00, 0);
-    SetDefaultBMemPMgr(D_8008A808);
-    D_8008AC20 = New_Class6D3C8(&D_80066828);
+    gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
+    SetDefaultBMemPMgr(gStartupBMemPMgr);
+    gClass6D3C8 = New_Class6D3C8(&gClass6D3C8CtorArgs);
     obj = new_class_6c078();
     pad = New_Pad(0, 0);
-    D_8008AC20->methods->forwardToBaseSlot44UnlessFlagged(D_8008AC20, obj, pad);
-    D_8008AC20->methods->slot4C(D_8008AC20);
+    gClass6D3C8->methods->forwardToBaseSlot44UnlessFlagged(gClass6D3C8, obj, pad);
+    gClass6D3C8->methods->slot4C(gClass6D3C8);
 }
 
 void func_80011994(void) {

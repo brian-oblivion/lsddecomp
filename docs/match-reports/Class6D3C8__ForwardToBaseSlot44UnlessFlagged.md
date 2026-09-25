@@ -83,7 +83,7 @@ set the flag.
 **Field `Class6D3C8Methods.slot44` was NOT renamed** despite this
 function's clear mechanics, because `src/main.c` (`GameMain`, another
 unit) dispatches it by field name directly
-(`D_8008AC20->methods->slot44(D_8008AC20, obj, pad)`) -- renaming the
+(`gClass6D3C8->methods->slot44(gClass6D3C8, obj, pad)`) -- renaming the
 struct definition here would break that unit's build, which is outside this
 runner's ownership. See `## Proposed field names` below.
 
@@ -93,13 +93,13 @@ runner's ownership. See `## Proposed field names` below.
 
 - **`Class6D3C8Methods.slot44` -> `forwardToBaseUnlessOverridden`**, tier B,
   same evidence as the function name above. Only accessor outside this unit
-  is `src/main.c:60-61` (`D_8008AC20->methods->slot44(D_8008AC20, obj, pad)`),
+  is `src/main.c:60-61` (`gClass6D3C8->methods->slot44(gClass6D3C8, obj, pad)`),
   so the rename needs that call site updated in the same commit as the
   struct definition.
 - **`Class6D3C8Methods.slot4C`** -- NOT proposing a name. Its occupant
   (`func_8003B110`) is not in this unit and was not derived this round; all
   that's observable locally is the call shape at `src/main.c:61`
-  (`D_8008AC20->methods->slot4C(D_8008AC20)`, no extra arguments, dispatched
+  (`gClass6D3C8->methods->slot4C(gClass6D3C8)`, no extra arguments, dispatched
   once right after `slot44` during startup). That's a call-site pattern, not
   a mechanics derivation of what the function itself does -- naming it from
   that alone would be the "guess at purpose" the naming rules warn against.
