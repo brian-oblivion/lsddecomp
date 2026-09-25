@@ -104,6 +104,12 @@ typedef struct Slot08Methods_322b4 {
 void *func_80042684(void);
 void *func_800423F0(void);
 
+void *func_80041C3C(void);
+typedef struct CellCtorMethods_322b4 {
+    u8 pad00[0x8];
+    void *(*ctor)(void *self, void *texture, u8 cell); /* +0x008 = func_80041B20 */
+} CellCtorMethods_322b4;
+
 typedef struct CtorArg1Methods_322b4 {
     u8 pad00[0x8];
     void (*ctor)(void *self, s32 arg); /* +0x008 */
@@ -111,7 +117,16 @@ typedef struct CtorArg1Methods_322b4 {
 void *func_800428E4(void);
 void func_80041C4C(SpriteRect *dst, u32 cell);
 
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041AB4);
+/* Allocate and construct a D_8006EC74 object (0xAC bytes): one cell. */
+void *func_80041AB4(void *texture, u8 cell) {
+    void *obj = BMemPMgrAlloc(0xAC);
+
+    if (obj != NULL) {
+        ((CellCtorMethods_322b4 *)func_80041C3C())->ctor(obj, texture, cell);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041B20);
 /* D_8006EC74 slot +0x040 (reset): re-select the cell through slot +0x0C4. */
 void func_80041BAC(SpriteView_322b4 *self, u8 cell) {
