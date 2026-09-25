@@ -114,7 +114,10 @@ void func_80041C4C(CellRect_322b4 *dst, u32 cell);
 
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041AB4);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041B20);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041BAC);
+/* D_8006EC74 slot +0x040 (reset): re-select the cell through slot +0x0C4. */
+void func_80041BAC(SpriteView_322b4 *self, u8 cell) {
+    self->methods->setCell(self, cell);
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041BDC);
 /* D_8006EC74 slot +0x0C8: read the byte at +0x0A8. */
 u8 func_80041C28(D_8006EC74Obj *self) {
