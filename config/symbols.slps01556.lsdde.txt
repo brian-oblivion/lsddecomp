@@ -2519,3 +2519,9 @@ gDataSourceClientGetters = 0x8006D4AC;
 // u_char b);`, no C call site to check arg shape against. Round 81 (bravo,
 // track 2), not yet linked from an SDK object.
 ClearImage = 0x800212A8; // type:func  (Psy-Q libgpu/sys, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),
+// unique (next candidate StoreImage, SHAPE masked 0.96, its own sibling
+// entry). Header LIBGPU.H `extern int LoadImage(RECT *rect, u_long *p);`,
+// no C call site yet. Round 81 (bravo, track 2), not yet linked from an
+// SDK object.
+LoadImage = 0x8002133C; // type:func  (Psy-Q libgpu/sys, fingerprint)
