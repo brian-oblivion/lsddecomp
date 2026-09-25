@@ -267,6 +267,16 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `sll 16`/`sra 16` with the scale), while the `(u16)` spelling above is a mask and stays
   `andi`+`sll 3`. Round 31 spent three attempts on the unsigned spelling alone.
   (a §"The \"split scaled index\"", round 66 bravo)
+- **A table split into one `D_` symbol per FIELD merges back into one struct at zero bytes.** At
+  `-G0` cc1 still emits `lui`/`addu`/`%lo(tbl+N)` per access and never CSEs the record address:
+  libsnd's `_svm_voice` across five units, three NON_MATCHING bodies closer. A read of the other signedness
+  or a narrower width is a VALUE cast at the site (`(u8)v.unk10`); the address cast
+  `*(u8 *)&v.unk10` grew SePitchBend's frame by 8. (round 86, alpha; `include/SvmData.h`)
+- **splat names a bss address only if some asm references it EXACTLY, and `size:` does nothing
+  past the last segment's vram** (no bss segment here). A merged table still shows its old `D_`
+  per-field labels in `asm/`, which link beside the C spelling; a base no asm touches cannot be
+  named, so an access at `base+8` keeps its placeholder with an `identified` comment (`D_8008DEB0` = `_ss_spu_vm_rec + 8`). (round 86)
+
 ### 3d. Locals, naming and register identity
 
 - **A named C variable gets ONE storage location for its whole scope, so any new name is a new
@@ -658,19 +668,6 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   filed as one class; two were ordinary source-shape differences elsewhere in the body. When a stall
   carries SEVERAL same-class residues, fix the STRUCTURE first and re-measure. (a
   docs/match-reports/func_8001E7BC.md, round 57)
-- **"Register identity" is the LEAST reliable verdict class in this corpus** — self-sealing and 26%
-  of everything queued. Contaminants found, all ordinary C: a masked byte parameter mistyped `s32`,
-  a missing field-offset term, a stale helper signature, a field-copy pair wanting whole-struct
-  assignment. Round 19 closed 17 in one round. (a §"A \"register-identity\" verdict is the least
-  reliable class", §"Round 19 confirmed the class") Round 75 revisited 31 stalls, most filed as
-  register identity, scheduling or delay slots: 30 matched as ordinary source shape (arity, loop
-  kind, struct copy, CSE), none by permuter, and the 31st was Sony code. (PROGRESS round 75)
-- **It is a HYPOTHESIS about a mechanism; "the registers differ" does not establish it.** Differing
-  registers fits both GCC wanting a different ALLOCATION (terminal) and GCC scheduling freely with
-  allocation falling out (source-fixable); a sibling filed terminal for three rounds closed 14/14 on
-  a type change. Screen with `--debug`: a differing register COUNT is not identity at all. (a §"A
-  register-identity verdict is a HYPOTHESIS", §"Round 27: the register COUNT and the addressing-mode
-  IMMEDIATE")
 - **A lever's NEGATIVE is scoped to the (function, lever, STATE) triple, and so is a POSITIVE.** A
   guard polarity inert in round 19 closed three words in round 33; a fix rejected in rounds 19 and
   20 closed the function in round 49. **If you have changed anything else since a lever was
@@ -732,4 +729,4 @@ is a lone scheduling difference, sweep one statement's PLACEMENT", §"Inherited 
 statements must be tested in BOTH directions". Distilled out rounds 71-72: §"A narrow signed field may need an `s32` LOCAL", §"A missing `andi 0xff`" (getintr). Distilled out round 73: §"An INCOMPLETE-ARRAY global declaration" (contextual, single
 instance), §"A same-size pointer cast in a FUNCTION-SCOPE local", §"A permuter run that plateaus
 with NO MOVEMENT AT ALL", §"The frame size bounds how many spilled locals"; the 3j local-count entry
-folded into 3d's. Distilled out round 77: §"`volatile` is the WRONG tool for an ADDRESS CSE" (the asm-label alias lever). Distilled out round 81 (process, carried by FINISHING-PLAN track 3 step 3 and `check-nonmatching.sh`): §"A type-scoped field rename is enumerated by the COMPILER", §"A preserved `#if 0` body carries the declarations of the round that WROTE it".
+folded into 3d's. Distilled out round 77: §"`volatile` is the WRONG tool for an ADDRESS CSE" (the asm-label alias lever). Distilled out round 81 (process, carried by FINISHING-PLAN track 3 step 3 and `check-nonmatching.sh`): §"A type-scoped field rename is enumerated by the COMPILER", §"A preserved `#if 0` body carries the declarations of the round that WROTE it". Distilled out round 86 (track 1 closed; round 75's 30/31 is in PROGRESS): §"A \"register-identity\" verdict is the least reliable class", §"A register-identity verdict is a HYPOTHESIS".
