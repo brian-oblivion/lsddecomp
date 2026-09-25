@@ -90,4 +90,11 @@ INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F66C);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F8B8);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_80020050);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_800204D0);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_80020510);
+void func_80020510(Outer_fa50 *self, s16 *xy) {
+    Target_fa50 *t = self->unk10->unk10;
+    s32 v;
+
+    v = xy[0] / 16;
+    t->unk6 = v;
+    t->unk6 = v + xy[1] * 64;
+}
