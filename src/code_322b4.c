@@ -154,7 +154,13 @@ void *func_80041ED8(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_322b4", New_Sprite);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__Sprite);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__Reset);
+/* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
+void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
+    self->image = (struct GsIMAGE *)((u8 *)texture + 0x2C);
+    self->rect = *rect;
+    InitGsSprite(&self->sprite, abr, rect, self->image);
+    self->unk58 = 0;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", InitGsSprite);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", Sprite__UpdateRotation);
 /* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
