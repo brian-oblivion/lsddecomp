@@ -127,7 +127,7 @@ Two generalizable points from this one:
 
 **Tier B.** Renamed from `func_8005D108` this round (tools/rename.py). The
 MECHANIC is fully established by the body and by its cross-unit callers
-(`Entity__MoodCue57`/`func_80063874` in Entity_d/Entity_f, per this report and
+(`Entity__MoodCue57`/`Entity__MoodCue85` in Entity_d/Entity_f, per this report and
 `Entity.h`): lazily get-or-create `this->unk100`, then dispatch three init
 calls through its own vtable, defaulting `name`/`arg2` to two 2-word screen-
 coordinate-shaped buffers when NULL. The PURPOSE of the cached `Unk100Obj` is

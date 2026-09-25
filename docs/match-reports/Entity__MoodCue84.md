@@ -1,4 +1,6 @@
-# func_80063784
+# Entity__MoodCue84
+
+> Renamed from `func_80063784` on 2026-09-25 (tools/rename.py). Address 0x80063784.
 
 **Unit:** Entity_f · **Size:** 60 words · **Status:** MATCHED (60/60 words)
 
@@ -49,10 +51,34 @@ unconditional, sets up the comparison value for wherever control goes
 next); the constant this link actually tests against was set in the
 PREVIOUS link's delay slot. Getting this backwards doesn't just mis-time a
 value, it silently relabels which literal belongs to which branch —
-confirmed on a real function this round (`func_80063784`) and again, more
-severely, in `func_80063874` in this same unit (see that report, where it
+confirmed on a real function this round (`Entity__MoodCue84`) and again, more
+severely, in `Entity__MoodCue85` in this same unit (see that report, where it
 swapped which of two ENTIRE CODE BLOCKS belonged to which `this->unk44`
 value). When a function has 3+ chained equality checks on one field, write
 out the delay-slot-carried value at each link explicitly before writing
 any C, and verify the reconstructed chain against `asm-differ` rather than
 trusting a single read-through.
+
+## Naming
+
+Round 79, runner alpha.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `Entity__MoodCue84` | B | `gEntityMoodHandlerTable` row 84 |
+
+Why `MoodCue84`: the function's address is the `handler` word of
+`gEntityMoodHandlerTable` row 84 (base 0x80089EB0, stride 0x10; the row's
+first word), read from `disk/SLPS_015.56` directly rather than inferred from
+address order (rounds 76-77 measured that row order does not track code
+address). Nothing else references it. `Entity__StartSoundCue` hands the row's
+handler to `InitSoundCueSet`, and `ServiceSoundCueSet` calls it once per tick
+as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
+is Entity.h's local view; field readings in `Entity__MoodCue07.md`
+`## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
+voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
+Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
+row mapping is a fact of the binary, which dream object or state a row is
+for is not established. Row kept decimal so names sort in table order.
+
+What it does, in the unit's current field names: Attenuation from `getProximityRatio`; a fixed timeline on `unk84`: voices 0 and 2 before frame 40, stop both at 40, voice 1 tone 18 at 45, voice 0 tone 7 at 64, stop the cue and `moodState = 1` at 89.

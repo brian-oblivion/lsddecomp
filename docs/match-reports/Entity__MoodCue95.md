@@ -1,0 +1,39 @@
+# Entity__MoodCue95
+
+> Renamed from `func_80064450` on 2026-09-25 (tools/rename.py). Address 0x80064450.
+
+**Unit:** Entity_f · **Size:** 38 words · **Status:** MATCHED (38/38 words)
+
+## What it does
+
+`if (this->unkFC == 0) { slot128(this,3); } else if (this->unkFC ==
+this->unk80) { slot128(this,1); } if (this->unk7C == 1) {
+slotC4(this,-0x80,0); }`.
+
+## Derivation
+
+Direct transcription. No residue.
+
+## Naming
+
+Round 79, runner alpha.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `Entity__MoodCue95` | B | `gEntityMoodHandlerTable` row 95 |
+
+Why `MoodCue95`: the function's address is the `handler` word of
+`gEntityMoodHandlerTable` row 95 (base 0x80089EB0, stride 0x10; the row's
+first word), read from `disk/SLPS_015.56` directly rather than inferred from
+address order (rounds 76-77 measured that row order does not track code
+address). Nothing else references it. `Entity__StartSoundCue` hands the row's
+handler to `InitSoundCueSet`, and `ServiceSoundCueSet` calls it once per tick
+as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
+is Entity.h's local view; field readings in `Entity__MoodCue07.md`
+`## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
+voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
+Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
+row mapping is a fact of the binary, which dream object or state a row is
+for is not established. Row kept decimal so names sort in table order.
+
+What it does, in the unit's current field names: `slot128(3)` at tick 0, `slot128(1)` at `moodDuration`, `slotC4(-0x80, 0)` while `unk7C == 1`.

@@ -85,7 +85,7 @@ struct EntityMethods {
     /* +0x128 */ void (*slot128)(Entity *self, s32 arg1); /* called by Entity__MoodCue77 (Entity_e) as slot128(this, 1); return value unused at this, its only known call site, so void is a safe read regardless of the real return type (same caveat as this table's other such wrappers) */
     /* +0x12C */ void (*slot12C)(Entity *self);           /* called by Entity__MoodCue42 */
     /* +0x130 */ void (*slot130)(Entity *self);           /* called by Entity__StopSoundCue, Entity__MoodCue42 */
-    /* +0x134 */ s32 (*slot134)(Entity *self, s32 arg1, s32 arg2); /* called by func_80063ED4 and func_80064078 (both Entity_f) in an identical loop, `this->unk88 = slot134(this, this->unk88, 0)` while `this->unk84++ < 0x18` -- value-returning, not void */
+    /* +0x134 */ s32 (*applyTodFrame)(Entity *self, s32 arg1, s32 arg2); /* round 79 (alpha): renamed from slot134 -- ENTITY_METHODS +0x134 is Class65650__ApplyTodFrame (`tools/classtable.py ENTITY_METHODS`), which code_55dd4.h types `u8 *(*applyTodFrame)(Class65650 *, void *, s32)` and which returns the next TOD frame. Only accessor: Entity__MoodCue91/Entity__MoodCue92 (Entity_f), in an identical loop `this->todFramePtr = applyTodFrame(this, this->todFramePtr, 0)` while `this->unk84++ < 0x18` -- value-returning, not void. Types left as they were (s32), no offset or size change. */
     /* +0x138 */ u8 pad138[0x144 - 0x138];
     /* +0x144 */ s32 (*distanceToRegion)(Entity *self, Unk94Obj *arg1); /* called by Entity__IsTargetInRange, as slot144(this, this->target) -- arg1 stays live in $a1 from its own first use all the way to this call, which is WHY retail keeps this->target in $a1 rather than a scratch register (see the match report's now-superseded "register identity" stall write-up); compared with slt -- value-returning, not void */
     /* +0x148 */ s32 (*getProximityRatio)(Entity *self);            /* called by Entity__MoodCue05; holds Entity__GetProximityRatio (this unit, MATCHED round 44) */
@@ -135,8 +135,8 @@ struct Unk100Methods {
     /* +0x50 */ void (*slot50)(Unk100Obj *self);                           /* called by Entity__GetOrCreateUnk100 */
     /* +0x54 */ u8 pad54[0xD0 - 0x54];
     /* +0xD0 */ void (*slotD0)(Unk100Obj *self, void *arg1);                /* called by Entity__GetOrCreateUnk100 */
-    /* +0xD4 */ void (*slotD4)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by Entity__MoodCue57 (Entity_d) as slotD4(this->unk100, this->unk50, 4, 0), and by func_80063874 (Entity_f) as slotD4(this->unk100, this->unk50, 7, 0) */
-    /* +0xD8 */ void (*slotD8)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by func_80063874 (Entity_f) as slotD8(this->unk100, this->unk50, 0, 0); return value unused at this, its only known call site */
+    /* +0xD4 */ void (*slotD4)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by Entity__MoodCue57 (Entity_d) as slotD4(this->unk100, this->unk50, 4, 0), and by Entity__MoodCue85 (Entity_f) as slotD4(this->unk100, this->unk50, 7, 0) */
+    /* +0xD8 */ void (*slotD8)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3); /* called by Entity__MoodCue85 (Entity_f) as slotD8(this->unk100, this->unk50, 0, 0); return value unused at this, its only known call site */
 };
 
 struct Unk100Obj {
@@ -311,8 +311,8 @@ struct Entity {
     /* +0x74 */ u8 pad74[0x7C - 0x74];
     /* +0x7C */ s32 unk7C;             /* gate flag read by Entity__MoodCue77 (Entity_e); when 0, that function returns immediately after its unkFC==unk80/slot128/rand() dice-roll block */
     /* +0x80 */ s32 moodDuration;           /* read by Entity__MoodCue09/Entity__MoodCue11 (halved via the signed-divide-by-2 idiom, `(x + (unsigned)x>>31) >> 1`) and Entity__MoodCue13 (compared to `out->unk4` as `this->moodDuration - 1`) ; round 78 head: renamed from unk80 by type scope (echo, Entity__MoodCue21.md) */
-    /* +0x84 */ s32 unk84;             /* compared against a literal (Entity__MoodCue14: `== 0xA`) or against `this->unk80 / 2` (Entity__MoodCue07); also a loop counter in func_80063ED4/func_80064078 (Entity_f), incremented past `< 0x18` while `slot134` is called each iteration */
-    /* +0x88 */ s32 unk88;             /* func_80063ED4/func_80064078 (Entity_f): threaded through the slot134 loop as its own running arg1/return value */
+    /* +0x84 */ s32 unk84;             /* compared against a literal (Entity__MoodCue14: `== 0xA`) or against `this->unk80 / 2` (Entity__MoodCue07); also a loop counter in Entity__MoodCue91/Entity__MoodCue92 (Entity_f), incremented past `< 0x18` while `slot134` is called each iteration */
+    /* +0x88 */ s32 todFramePtr;             /* round 79 (alpha): renamed from unk88 -- Class65650's own +0x88 `todFramePtr` (code_55dd4.h: the next TOD frame to apply; ENTITY_METHODS inherits Class65650's TOD slots +0x128..+0x138). Only accessor: Entity__MoodCue91/Entity__MoodCue92 (Entity_f), threaded through the applyTodFrame loop as its running arg1/return value. Type left s32. */
     /* +0x8C */ u8 pad8C[0x90 - 0x8C];
     /* +0x90 */ s32 unk90;             /* Entity__MoodCue78 (Entity_e): nonzero gates `out->unk1C = 0x1C` when `out->unk4 & 3` is also 0 */
     /* +0x94 */ Unk94Obj *target;         /* passed as Class6B5CC__FaceTarget's (still INCLUDE_ASM, code_d294.s) second argument by Entity__UpdateTargetProximity/Entity__MoodCue01; see Unk94Obj's own comment for why it is NOT another Entity despite sharing the +0x14 EntityPos* convention */
