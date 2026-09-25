@@ -1,4 +1,6 @@
-# func_80043EE4 -- MATCHED (37/37 words)
+# Tod__Tod -- MATCHED (37/37 words)
+
+> Renamed from `func_80043EE4` on 2026-09-25 (tools/rename.py). Address 0x80043ee4.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: active driver's ctor, install D_8006F240 (func_800441A4); the argument is a two-word source descriptor { buffer, name }: with a buffer, adopt it (+0x10 = buffer, +0x14 size = 0) and call its own +0x064 (setFlag override); without one, call its own requestLoadFile (+0x06C) with the name.
+Constructor: active driver's ctor, install D_8006F240 (GetTodMethods); the argument is a two-word source descriptor { buffer, name }: with a buffer, adopt it (+0x10 = buffer, +0x14 size = 0) and call its own +0x064 (setFlag override); without one, call its own requestLoadFile (+0x06C) with the name.
 
 Table slot (`tools/classtable.py`): D_8006F240 +0x008.
 
@@ -24,9 +26,9 @@ typedef struct Src6F240 {
     /* +0x04 */ char *name;
 } Src6F240;
 
-void func_80043EE4(DataSrc33808 *self, Src6F240 *src) {
+void Tod__Tod(DataSrc33808 *self, Src6F240 *src) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_800441A4();
+    self->methods = GetTodMethods();
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
         self->bufferSize = 0;

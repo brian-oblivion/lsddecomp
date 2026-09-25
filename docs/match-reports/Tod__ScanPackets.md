@@ -1,15 +1,17 @@
-# func_8004416C -- MATCHED (14/14 words)
+# Tod__ScanPackets -- MATCHED (13/13 words)
+
+> Renamed from `func_80043FB0` on 2026-09-25 (tools/rename.py). Address 0x80043fb0.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
-`OK: build matches retail SLPS_015.56`), funcdiff 14/14 words, no out-of-range
+`OK: build matches retail SLPS_015.56`), funcdiff 13/13 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Decodes one packet word: `*out0 = v; *out1 = (v >> 16) & 0xF; *out2 = (v >> 20) & 0xF; *out3 = v >> 24; return acc + 1;` out2/out3 are the o32 5th/6th arguments (stack +0x10/+0x14), and self's a0 is reused for out2. Same signature as the `decodeTodPacket` slot in include/code_55dd4.h.
+Returns `(u8)self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8)`: a0..a2 pass through, a3 is buffer+8, and the trailing `andi 0xFF` is the u8 return truncating an s32 slot result.
 
-Table slot (`tools/classtable.py`): D_8006F240 +0x080 and D_8006F590 +0x080.
+Table slot (`tools/classtable.py`): D_8006F240 +0x078.
 
 ## Source
 
@@ -19,17 +21,9 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F240/D_8006F590 +0x080: decode one packet word -- the low byte, then
- * the two nibbles at bits 16 and 20, then the top byte -- and return the
- * pointer past it. */
-u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
-    u32 v = *acc;
-
-    *out0 = v;
-    *out1 = (v >> 16) & 0xF;
-    *out2 = (v >> 20) & 0xF;
-    *out3 = v >> 24;
-    return acc + 1;
+/* D_8006F240 +0x078: slot +0x07C over the buffer past its first two words. */
+u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
+    return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
 }
 ```
 

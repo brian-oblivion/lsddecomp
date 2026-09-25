@@ -1,4 +1,6 @@
-# func_80043FE4 -- MATCHED (98/98 words)
+# ScanTodPackets -- MATCHED (98/98 words)
+
+> Renamed from `func_80043FE4` on 2026-09-25 (tools/rename.py). Address 0x80043fe4.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,9 +9,9 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Walk a packet stream: the u16 at data +2 is the packet count, packets start at data +8. Each packet is decoded by func_8004416C (the tables' +0x080) into value / type / sub-type / length-in-words. Type 8 sub-type 0: count it and append the value to `out` when given. Type 2: with `out` and `sel`, when the packet's halfword at +4 equals `*sel`, search the values appended so far (rewinding `out` by the count) for this packet's value and keep its index; without `out`, count it. The index / count is stored through `sel` when given; returns the number appended (u8).
+Walk a packet stream: the u16 at data +2 is the packet count, packets start at data +8. Each packet is decoded by DecodeTodPacketWord (the tables' +0x080) into value / type / sub-type / length-in-words. Type 8 sub-type 0: count it and append the value to `out` when given. Type 2: with `out` and `sel`, when the packet's halfword at +4 equals `*sel`, search the values appended so far (rewinding `out` by the count) for this packet's value and keep its index; without `out`, count it. The index / count is stored through `sel` when given; returns the number appended (u8).
 
-Table slot (`tools/classtable.py`): D_8006F240 +0x07C and D_8006F590 +0x07C (both tables share it; func_80043FB0 / func_800453DC call it through slot +0x07C with the data past the buffer header).
+Table slot (`tools/classtable.py`): D_8006F240 +0x07C and D_8006F590 +0x07C (both tables share it; Tod__ScanPackets / func_800453DC call it through slot +0x07C with the data past the buffer header).
 
 ## Source
 
@@ -26,7 +28,7 @@ top of / earlier in `src/code_33808.c`.
  * value up among the ones appended so far when its halfword at +4 matches
  * `*sel` -- keeping its index -- or, without `out`, counts it. The index /
  * count goes back through `sel`; returns the number appended. */
-u8 func_80043FE4(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
+u8 ScanTodPackets(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
     u8 value;
     u8 type;
     u8 sub;
@@ -43,7 +45,7 @@ u8 func_80043FE4(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
     cnt = 0;
     found = 0;
     for (; i < n; i++) {
-        func_8004416C(self, data, &value, &type, &sub, &len);
+        DecodeTodPacketWord(self, data, &value, &type, &sub, &len);
         if (type == 8 && sub == 0) {
             cnt++;
             if (out != NULL) {

@@ -1,4 +1,6 @@
-# func_80043F78 -- MATCHED (14/14 words)
+# Tod__Finalize -- MATCHED (14/14 words)
+
+> Renamed from `func_80043F78` on 2026-09-25 (tools/rename.py). Address 0x80043f78.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -20,7 +22,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
 /* D_8006F240 +0x00C: finalize, straight to the active driver's. */
-void func_80043F78(Class6D430 *self) {
+void Tod__Finalize(Class6D430 *self) {
     GetActiveDataSourceMethods()->finalize(self);
 }
 ```

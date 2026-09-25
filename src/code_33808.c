@@ -53,7 +53,7 @@ extern void *BMemPMgrAlloc(s32 size);
 void *GetTimBlockSrcMethods(void);
 void *GetLinkResourceMethods(void);
 void *GetTimArraySrcMethods(void);
-void *func_800441A4(void);
+void *GetTodMethods(void);
 void *func_8004467C(void);
 void *func_800449FC(void);
 void *func_80044CC4(void);
@@ -635,11 +635,11 @@ void *GetTimArraySrcMethods(void) {
     return D_8006F1C4;
 }
 /* Allocate and construct a D_8006F240 object. */
-void *func_80043E84(s32 arg0) {
+void *New_Tod(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x2C);
 
     if (obj != NULL) {
-        ((Ctor33808 *)func_800441A4())->ctor(obj, arg0);
+        ((Ctor33808 *)GetTodMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
@@ -647,9 +647,9 @@ void *func_80043E84(s32 arg0) {
 /* D_8006F240 +0x008: constructor -- the active driver's, then this table;
  * adopt a buffer handed in (size 0) and run its own +0x064, or else request
  * the named file. */
-void func_80043EE4(DataSrc33808 *self, Src6F240 *src) {
+void Tod__Tod(DataSrc33808 *self, Src6F240 *src) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_800441A4();
+    self->methods = GetTodMethods();
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
         self->bufferSize = 0;
@@ -659,15 +659,15 @@ void func_80043EE4(DataSrc33808 *self, Src6F240 *src) {
     }
 }
 /* D_8006F240 +0x00C: finalize, straight to the active driver's. */
-void func_80043F78(Class6D430 *self) {
+void Tod__Finalize(Class6D430 *self) {
     GetActiveDataSourceMethods()->finalize(self);
 }
 /* D_8006F240 +0x078: slot +0x07C over the buffer past its first two words. */
-u8 func_80043FB0(DataSrc33808 *self, s32 arg1, s32 arg2) {
+u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
 }
 /* Defined below (ROM order); called directly here, not through slot +0x080. */
-u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3);
+u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3);
 
 /* D_8006F240/D_8006F590 +0x07C: walk the packet words after the u16 count
  * at data +2 (from data +8), each decoded by +0x080 into a value, a type, a
@@ -676,7 +676,7 @@ u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u
  * value up among the ones appended so far when its halfword at +4 matches
  * `*sel` -- keeping its index -- or, without `out`, counts it. The index /
  * count goes back through `sel`; returns the number appended. */
-u8 func_80043FE4(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
+u8 ScanTodPackets(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
     u8 value;
     u8 type;
     u8 sub;
@@ -693,7 +693,7 @@ u8 func_80043FE4(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
     cnt = 0;
     found = 0;
     for (; i < n; i++) {
-        func_8004416C(self, data, &value, &type, &sub, &len);
+        DecodeTodPacketWord(self, data, &value, &type, &sub, &len);
         if (type == 8 && sub == 0) {
             cnt++;
             if (out != NULL) {
@@ -723,7 +723,7 @@ u8 func_80043FE4(DataSrc33808 *self, u8 *out, u32 *sel, u32 *data) {
 /* D_8006F240/D_8006F590 +0x080: decode one packet word -- the low byte, then
  * the two nibbles at bits 16 and 20, then the top byte -- and return the
  * pointer past it. */
-u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
+u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
     u32 v = *acc;
 
     *out0 = v;
@@ -734,7 +734,7 @@ u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u
 }
 extern s32 D_8006F240[];
 
-void *func_800441A4(void) {
+void *GetTodMethods(void) {
     return D_8006F240;
 }
 /* Allocate and construct a D_8006F2C4 object. */
@@ -1325,7 +1325,7 @@ void *func_800451B8(s32 arg0) {
  * table; when the argument's first word is set, its own +0x064 runs, and a
  * nonzero result fails the construction (NULL). */
 void *func_80045228(DataSrc33808 *self, s32 *arg) {
-    ((Ctor33808 *)func_800441A4())->ctor(self, arg);
+    ((Ctor33808 *)GetTodMethods())->ctor(self, arg);
     self->methods = func_80045428();
     if (*arg != 0) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
@@ -1340,7 +1340,7 @@ void func_800452AC(DataSrc33808 *self) {
     CountedBuf33808 *buf = self->buffer;
 
     ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
-    ((DataSrc33808Methods *)func_800441A4())->finalize(self);
+    ((DataSrc33808Methods *)GetTodMethods())->finalize(self);
 }
 /* D_8006F590 +0x064: build a D_8006F240 source over each sub-block of the
  * buffer's counted offset table, into the table's own words; 0 when all
@@ -1374,7 +1374,7 @@ s32 func_800452FC(DataSrc33808 *self) {
     p = (DataSrc33808 **)buf->entries;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = func_80043E84((s32)&req);
+        *p = New_Tod((s32)&req);
         if (*p == NULL) {
 while (i != 0) {
  i--;
