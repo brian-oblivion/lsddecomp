@@ -146,7 +146,18 @@ u8 func_80043FB0(DataSrc33808 *self, s32 arg1, s32 arg2) {
     return self->methods->slot7C(self, arg1, arg2, (u8 *)self->buffer + 8);
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043FE4);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004416C);
+/* D_8006F240/D_8006F590 +0x080: decode one packet word -- the low byte, then
+ * the two nibbles at bits 16 and 20, then the top byte -- and return the
+ * pointer past it. */
+u32 *func_8004416C(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) {
+    u32 v = *acc;
+
+    *out0 = v;
+    *out1 = (v >> 16) & 0xF;
+    *out2 = (v >> 20) & 0xF;
+    *out3 = v >> 24;
+    return acc + 1;
+}
 extern s32 D_8006F240[];
 
 void *func_800441A4(void) {
