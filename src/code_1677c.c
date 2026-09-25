@@ -44,12 +44,12 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     self->methods->setDayFromTickCount(self);
 }
 
-extern void func_80048CFC(s32 day, s32 unused);
+extern void SeedAndRandom(s32 day, s32 unused);
 
 /* Advances the day cursor: reads the running tick count kept in scratchpad
  * (0x1F800000, the PS-X data-cache-as-RAM region) and reduces it mod 365. */
 void Class6D3C8__SetDayFromTickCount(void) {
-    func_80048CFC(*(s32 *)0x1F800000 % 365, 0);
+    SeedAndRandom(*(s32 *)0x1F800000 % 365, 0);
 }
 
 /* Defers to the base class's own implementation of this slot when this

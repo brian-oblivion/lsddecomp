@@ -14,9 +14,9 @@ the filename these are not Psy-Q library code).
 ```c
 void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
-        func_80049060(self->unk38);
+        GetGridRecordAt(self->unk38);
     } else {
-        func_80049098(self->unk38, arg2, arg3);
+        GetGridRecordXY(self->unk38, arg2, arg3);
     }
 }
 ```
@@ -35,11 +35,11 @@ void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg
   the branch TARGET. To match a specific target/fallthrough placement,
   solve for the written `C` that makes `NOT(C)` equal the actual machine
   test, don't guess from the semantics alone.
-- `func_80049060` is genuinely called at two different arities across the
-  executable (2 real args from `func_80049098`'s own forwarding call, only
+- `GetGridRecordAt` is genuinely called at two different arities across the
+  executable (2 real args from `GetGridRecordXY`'s own forwarding call, only
   1 here — the second register is `code`, a leftover value from this
   function's own parameter, never actually intended as an argument).
-  Declared K&R/unprototyped (`extern s32 func_80049060();`) in
+  Declared K&R/unprototyped (`extern s32 GetGridRecordAt();`) in
   `include/class_3bb8c.h`, the documented escape hatch for this pattern.
 
 ### Proposed learning

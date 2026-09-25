@@ -31,8 +31,8 @@ void DataSrc39094__Finalize(D_80081940Obj *self) {
   slots +0x07C..+0x084, +0x084 = DataSrc39094__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
-- `func_80048CFC`'s local definition gained an unused second parameter
-  (`s32 unused`): func_80048D74 passes one in `$a1`, as code_1677c's own
-  prototype already says. Byte-neutral for func_80048CFC.
+- `SeedAndRandom`'s local definition gained an unused second parameter
+  (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
+  prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.

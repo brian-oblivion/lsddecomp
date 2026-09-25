@@ -1,4 +1,6 @@
-# func_8004903C -- MATCHED (9/9 words)
+# GetSoundEffectDir -- MATCHED (9/9 words)
+
+> Renamed from `func_80048E08` on 2026-09-25 (tools/rename.py). Address 0x80048e08.
 
 Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
@@ -7,22 +9,21 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-`func_80048E2C(index) + 0xFC`, nine 0x1C-byte records past it.
+Returns the string `*GetSoundEffectDirRef()` (the "SND\\SE" pointer D_8008A96C). Callers pass one ignored argument (class_39e08.c declares it `s32 GetSoundEffectDir(s32)`); the body never reads `a0`, so it is written `(void)` here.
 
 ## Source
 
 ```c
-typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
-Rec1C *func_80048E2C(s32 index);   /* INCLUDE_ASM in this unit */
+char **GetSoundEffectDirRef(void);   /* defined earlier in this unit */
 
-Rec1C *func_8004903C(s32 index) {
-    return &func_80048E2C(index)[9];
+char *GetSoundEffectDir(void) {
+    return *GetSoundEffectDirRef();
 }
 ```
 
 ## Notes
 
-- func_80048D48 (already matched) returns D_80081A04 and writes 0x230 to
+- GetRecordTable (already matched) returns D_80081A04 and writes 0x230 to
   `*out`; every `+0x70`/`+0xFC`/`+0x3D40`/`+0x3E04`/`+0x3E20` offset in this
   unit is a whole number of 0x1C-byte records into that table, so the unit
   types the table as `Rec1C` (size only). The record's fields are unknown.

@@ -1,4 +1,6 @@
-# func_80048DF8 -- MATCHED (4/4 words), round 81
+# GetSoundEffectDirRef -- MATCHED (4/4 words), round 81
+
+> Renamed from `func_80048DF8` on 2026-09-25 (tools/rename.py). Address 0x80048df8.
 
 Round 81, runner echo. Unit `src/code_39094.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
@@ -12,7 +14,7 @@ the first build; whole-image SHA1 green.
 ## Source
 
 ```c
-char **func_80048DF8(void) {
+char **GetSoundEffectDirRef(void) {
     return &D_8008A96C;
 }
 ```

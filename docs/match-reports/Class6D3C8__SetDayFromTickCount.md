@@ -7,7 +7,7 @@
 ## What it does
 
 Reduces a running tick/day counter mod 365 and forwards it to
-`func_80048CFC(day, 0)`.
+`SeedAndRandom(day, 0)`.
 
 ## Derivation
 
@@ -31,7 +31,7 @@ addu  $a0, $a0, $v0          ; *73
 sll   $v0, $a0, 2
 addu  $a0, $a0, $v0           ; *365
 subu  $a0, $a1, $a0            ; a1 - 365*(a1/365) = a1 % 365
-jal   func_80048CFC
+jal   SeedAndRandom
  addu $a1, $zero, $zero
 ```
 
@@ -44,11 +44,11 @@ constant without any hand-tuning needed:
 
 ```c
 void Class6D3C8__SetDayFromTickCount(void) {
-    func_80048CFC(*(s32 *)0x1F800000 % 365, 0);
+    SeedAndRandom(*(s32 *)0x1F800000 % 365, 0);
 }
 ```
 
-`func_80048CFC` (in `psyq_memset.s`, still `asm`) is called with `(day, 0)`
+`SeedAndRandom` (in `psyq_memset.s`, still `asm`) is called with `(day, 0)`
 — second argument's purpose unknown, always a literal 0 at every call in
 this unit's family (see `Class6D3C8__LoadIntroLogoSequence`/`Class6D3C8__StartWeeklyStreamTask` etc., all of which
 pass 0/0/0 into the sibling helper `SetActiveDataSourceDriverMode`, a related pattern this
@@ -70,8 +70,8 @@ assuming it needs special handling.
 **`Class6D3C8__SetDayFromTickCount` -- tier B.** Mechanics: reads the
 running tick count kept at the PS-X scratchpad address `0x1F800000`, reduces
 it mod 365 (a `%` on the day-count range), and forwards the result to
-`func_80048CFC(day, 0)`. "Set day" describes the mechanical destination
+`SeedAndRandom(day, 0)`. "Set day" describes the mechanical destination
 (the second call takes what looks like a day index) rather than asserting
 why the game does this at this vtable slot (`+0x040`, dispatched once from
-the ctor); `func_80048CFC` itself is uncarved, so its own purpose (and
+the ctor); `SeedAndRandom` itself is uncarved, so its own purpose (and
 therefore this function's ultimate game role) is not confirmed here.

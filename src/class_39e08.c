@@ -17,7 +17,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 
-    GetClass86668Methods()->ctor(self, func_80048E08(0), 0);
+    GetClass86668Methods()->ctor(self, GetSoundEffectDir(0), 0);
     self->methods = GetObj865C8Methods();
     InitDreamAux();
     self->unk44 = func_8003B39C(D_800113EC);
@@ -26,7 +26,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     req.type = 0;
     req.path = D_800113F8;
     self->unk48 = func_80043840(&req);
-    tmp = func_80048D74(0);
+    tmp = PickWeeklyGroup(0);
     self->unk40 = New_WBgm(tmp, 0, 1);
     func_8004A070(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
@@ -219,7 +219,7 @@ Class865C8Methods *GetObj865C8Methods(void) {
  * stack address, never NULL) plus a fixed .data address, unrelated to the
  * write. Declared locally per CLAUDE.md's rule against writing C for
  * SDK-owned code. */
-extern void *func_80048D48(s32 *out);
+extern void *GetRecordTable(s32 *out);
 extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 
 extern s32 D_8008A978;
@@ -232,7 +232,7 @@ s32 func_8004A070(s32 arg0)
     s32 prev;
     s32 result;
 
-    obj = func_80048D48(&local);
+    obj = GetRecordTable(&local);
     prev = D_8008A978;
     D_8008A978 = prev + 1;
 

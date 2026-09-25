@@ -2429,7 +2429,7 @@ typedef struct Obj87034Methods_3bb8c_l {
     u8 pad34[0x048 - 0x034];
     void (*slot48)(Obj87034_3bb8c_l *self);                        /* +0x048, ObjM__DetachTarget/ObjM__TeardownStyle (via self->unk54) */
     u8 pad4C[0x05C - 0x04C];
-    void (*slot5C)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x05C, ObjM__InitStyleAndWorld (arg1 is func_80048F84's return value, forwarded opaquely) */
+    void (*slot5C)(Obj87034_3bb8c_l *self, s32 arg1);              /* +0x05C, ObjM__InitStyleAndWorld (arg1 is PickVariant's return value, forwarded opaquely) */
     u8 pad60[0x074 - 0x060];
     void (*slot74)(Obj87034_3bb8c_l *self);                        /* +0x074, ObjM__DispatchEvent (event 0x21) */
     u8 pad78[0x07C - 0x078];
@@ -2466,7 +2466,7 @@ struct Obj87034_3bb8c_l {
     s32 phase;                            /* +0x020, ObjM__EnterState6: written 6 (a state/phase tag; also written 4 by ObjM__EnterState4 and 5 by ObjM__EnterState5; read by ObjM__HandleStateCode, which is 0-gated) */
     u8 pad24[0x034 - 0x024];
     s32 unk34;                            /* +0x034, round 45's ObjM__SetupSceneStyle: forwarded opaquely to SetDreamAuxWorld's own arg3 */
-    void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to func_80049060/func_80049098 */
+    void *unk38;                          /* +0x038, ObjM__OnRegistrantEvent: forwarded opaquely to GetGridRecordAt/GetGridRecordXY */
     DreamSysObj_3bb8c_l *target;            /* +0x03C, many functions in this unit */
     s32 unk40;                             /* +0x040, ObjM__EnterStyleSession */
     s32 unk44;                              /* +0x044, ObjM__EnterStyleSession */
@@ -2519,16 +2519,16 @@ extern void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, 
 extern void ObjM__TransferToOther(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other);
 
 /* ObjM__OnRegistrantEvent's own two helpers -- still-uncarved ground
- * (asm/psyq_memset.s). func_80049060 is genuinely called at two different
- * arities across the executable (func_80049098 forwards to it with 2 real
+ * (asm/psyq_memset.s). GetGridRecordAt is genuinely called at two different
+ * arities across the executable (GetGridRecordXY forwards to it with 2 real
  * arguments; ObjM__OnRegistrantEvent's own `code < 0` branch calls it with only 1,
  * the second register being whatever the caller's own incoming `code`
  * argument left behind -- a "leftover register", not a real second
  * argument), so it is declared K&R/unprototyped here, the documented
  * escape hatch for a genuinely multi-arity call (see
  * DECOMPILATION_LEARNINGS round 14). */
-extern s32 func_80049060();
-extern void func_80049098(void *arg0, s32 arg1, s32 arg2);
+extern s32 GetGridRecordAt();
+extern void GetGridRecordXY(void *arg0, s32 arg1, s32 arg2);
 
 /* ObjM__TickStyle's own helper -- MATCHED, src/class_3bb8c_n.c. Typed purely
  * from this call site's own register usage. */

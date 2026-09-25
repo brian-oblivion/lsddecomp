@@ -76,7 +76,7 @@ for the same shape before re-deriving from scratch.
 **`Class6D3C8__StartWeeklyStreamTask` -- tier B.** Mechanics: gated by
 `arg->unk08`, builds a `StreamTask`, derives its type code via
 `func_8004913C` -- documented in this unit's header as "day/week-style
-calculation (divides func_80048CFC's result by 7)" -- looks it up, then
+calculation (divides SeedAndRandom's result by 7)" -- looks it up, then
 configures and starts the task. "Weekly" is grounded in that documented
 `/7` derivation inside `func_8004913C` (real evidence, not a guess from the
 function's own body, which is otherwise the same generic StreamTask-launch

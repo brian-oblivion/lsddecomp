@@ -1,4 +1,6 @@
-# func_80048D28 -- MATCHED (8/8 words), round 81
+# SetPickOverrides -- MATCHED (8/8 words), round 81
+
+> Renamed from `func_80048D28` on 2026-09-25 (tools/rename.py). Address 0x80048d28.
 
 Round 81, runner echo. Unit `src/code_39094.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
@@ -12,7 +14,7 @@ the first build; whole-image SHA1 green.
 ## Source
 
 ```c
-void func_80048D28(s32 a, s32 b) {
+void SetPickOverrides(s32 a, s32 b) {
     if (a >= 0) {
         D_8008A964 = a;
     }

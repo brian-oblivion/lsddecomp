@@ -1,4 +1,6 @@
-# func_80049098 -- MATCHED (23/23 words)
+# GetGridRecordXY -- MATCHED (23/23 words)
+
+> Renamed from `func_80049098` on 2026-09-25 (tools/rename.py). Address 0x80049098.
 
 Round 82, runner echo (second echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
@@ -7,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Grid-cell record: `func_80049060(index, x + GetStageGridDimensions(index)->columns * y)`. Uses `StageGrid.h`'s `StageGridDimensions` (first field `s16 columns`); the header is now included by this unit (additive).
+Grid-cell record: `GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y)`. Uses `StageGrid.h`'s `StageGridDimensions` (first field `s16 columns`); the header is now included by this unit (additive).
 
 ## Source
 
@@ -15,8 +17,8 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/Class6D430.h`.
 
 ```c
-Rec1C *func_80049098(s32 index, s32 x, s32 y) {
-    return func_80049060(index, x + GetStageGridDimensions(index)->columns * y);
+Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
+    return GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y);
 }
 ```
 
@@ -27,8 +29,8 @@ Rec1C *func_80049098(s32 index, s32 x, s32 y) {
   slots +0x07C..+0x084, +0x084 = DataSrc39094__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
-- `func_80048CFC`'s local definition gained an unused second parameter
-  (`s32 unused`): func_80048D74 passes one in `$a1`, as code_1677c's own
-  prototype already says. Byte-neutral for func_80048CFC.
+- `SeedAndRandom`'s local definition gained an unused second parameter
+  (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
+  prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.

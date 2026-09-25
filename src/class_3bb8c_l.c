@@ -59,9 +59,9 @@ void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2
 
 void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
-        func_80049060(self->unk38);
+        GetGridRecordAt(self->unk38);
     } else {
-        func_80049098(self->unk38, arg2, arg3);
+        GetGridRecordXY(self->unk38, arg2, arg3);
     }
 }
 
@@ -74,8 +74,8 @@ void ObjM__DetachTarget(Obj87034_3bb8c_l *self) {
  * K&R-free with the argument widths this call site's registers show.
  * Return types are opaque (register-width values forwarded to further
  * calls, never dereferenced here). */
-extern s32 func_80048F84(void *arg0, s32 arg1);
-extern s32 func_80048EA0(void *arg0, s32 arg1, s32 arg2);
+extern s32 PickVariant(void *arg0, s32 arg1);
+extern s32 PickDailyVariant(void *arg0, s32 arg1, s32 arg2);
 extern s32 func_80043008(s32 arg0);
 extern void func_8001EF60(s32 arg0);
 extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
@@ -94,11 +94,11 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, Unk50Struct_3bb8c
 
     unk18->methods->slot74(unk18);
     self->hasTarget = 1;
-    ret1 = func_80048F84(self->unk38, 0);
+    ret1 = PickVariant(self->unk38, 0);
     self->unk54->methods->slot5C(self->unk54, ret1);
 
     ret1 = self->target->methods->slot1A0(self->target, 0);
-    ret1 = func_80048EA0(self->unk38, 0, ret1);
+    ret1 = PickDailyVariant(self->unk38, 0, ret1);
     self->pendingOther = (Obj87034_3bb8c_l *) func_80043008(ret1);
 
     unk18->methods->slot70(unk18, self->target, &D_8008715C, &D_80087168, 0);

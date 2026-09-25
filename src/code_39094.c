@@ -10,7 +10,7 @@
  * Round 82 matched all 28: the allocator, ctor/finalize and methods of
  * D_80081940 (a file-streaming state machine: state 9 = header load, state
  * 10 = data block load, both completed in the setFlag override), and the
- * record accessors and random pickers over func_80048D48's table.
+ * record accessors and random pickers over GetRecordTable's table.
  */
 #include "common.h"
 #include "Class6D430.h"
@@ -39,7 +39,7 @@ struct D_80081940Obj {
     /* +0x038 */ s32 unk38;
 };
 
-/* One 0x1C-byte record of the table func_80048D48 returns (D_80081A04,
+/* One 0x1C-byte record of the table GetRecordTable returns (D_80081A04,
  * 0x230 records); only its size is known here. */
 typedef struct Rec1C {
     u8 data[0x1C];
@@ -182,13 +182,13 @@ void *GetDataSrc39094Methods(void) {
 s32 func_80048CF0(void) {
     return D_8008A960;
 }
-s32 func_80048CFC(s32 seed, s32 unused) {
+s32 SeedAndRandom(s32 seed, s32 unused) {
     if (seed != 0) {
         srand(seed);
     }
     return rand();
 }
-void func_80048D28(s32 a, s32 b) {
+void SetPickOverrides(s32 a, s32 b) {
     if (a >= 0) {
         D_8008A964 = a;
     }
@@ -196,18 +196,18 @@ void func_80048D28(s32 a, s32 b) {
         D_8008A968 = b;
     }
 }
-void *func_80048D48(s32 *out) {
+void *GetRecordTable(s32 *out) {
     if (out != NULL) {
         *out = 0x230;
     }
     return D_80081A04;
 }
-void *func_80048D64(void) {
+void *GetWeeklyGroupTable(void) {
     return D_800819CC;
 }
-s32 func_80048D74(s32 arg) {
-    u32 r = (u32)func_80048CFC(0, arg) % 7;
-    s32 *table = func_80048D64();
+s32 PickWeeklyGroup(s32 arg) {
+    u32 r = (u32)SeedAndRandom(0, arg) % 7;
+    s32 *table = GetWeeklyGroupTable();
     s32 *entry;
     s32 index;
     if (D_8008A964 != 0) {
@@ -218,30 +218,30 @@ s32 func_80048D74(s32 arg) {
     }
     return *entry;
 }
-char **func_80048DF8(void) {
+char **GetSoundEffectDirRef(void) {
     return &D_8008A96C;
 }
-char *func_80048E08(void) {
-    return *func_80048DF8();
+char *GetSoundEffectDir(void) {
+    return *GetSoundEffectDirRef();
 }
-Rec1C *func_80048E2C(s32 index) {
-    return &((Rec1C *)func_80048D48(NULL))[D_800819E8[index]];
+Rec1C *GetRecordGroup(s32 index) {
+    return &((Rec1C *)GetRecordTable(NULL))[D_800819E8[index]];
 }
 
-Rec1C *func_80048E80(s32 index) {
-    return func_80048E2C(index);
+Rec1C *GetRecordGroupAlias(s32 index) {
+    return GetRecordGroup(index);
 }
-Rec1C *func_80048EA0(s32 index, s32 arg1, s32 day) {
+Rec1C *PickDailyVariant(s32 index, s32 arg1, s32 day) {
     s32 n = ((day - 1) % 40) / 10 + 1;
-    s32 r = func_80048CFC(0, arg1) % n;
-    return &func_80048E80(index)[r];
+    s32 r = SeedAndRandom(0, arg1) % n;
+    return &GetRecordGroupAlias(index)[r];
 }
-Rec1C *func_80048F60(s32 index) {
-    return &func_80048E2C(index)[4];
+Rec1C *GetVariantBlock(s32 index) {
+    return &GetRecordGroup(index)[4];
 }
-Rec1C *func_80048F84(s32 index) {
+Rec1C *PickVariant(s32 index) {
     s32 unused;
-    u32 r = (u32)func_80048CFC(0, unused) % 5;
+    u32 r = (u32)SeedAndRandom(0, unused) % 5;
     Rec1C *rec;
     if (index == 9) {
         if (r == 2) {
@@ -251,17 +251,17 @@ Rec1C *func_80048F84(s32 index) {
             D_8008A968 = 4;
         }
     }
-    rec = func_80048F60(index);
+    rec = GetVariantBlock(index);
     return &rec[D_8008A968 != 0 ? D_8008A968 - 1 : r];
 }
-Rec1C *func_8004903C(s32 index) {
-    return &func_80048E2C(index)[9];
+Rec1C *GetGridRecordBase(s32 index) {
+    return &GetRecordGroup(index)[9];
 }
-Rec1C *func_80049060(s32 index, s32 sub) {
-    return &func_8004903C(index)[sub];
+Rec1C *GetGridRecordAt(s32 index, s32 sub) {
+    return &GetGridRecordBase(index)[sub];
 }
-Rec1C *func_80049098(s32 index, s32 x, s32 y) {
-    return func_80049060(index, x + GetStageGridDimensions(index)->columns * y);
+Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
+    return GetGridRecordAt(index, x + GetStageGridDimensions(index)->columns * y);
 }
 const char *func_800490F4(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
@@ -273,11 +273,11 @@ Rec1C *func_80049110(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 0;
     }
-    return &((Rec1C *)func_80048D48(NULL))[0x230];
+    return &((Rec1C *)GetRecordTable(NULL))[0x230];
 }
 Rec1C *func_8004913C(s32 *countOut) {
     s32 unused;
-    u32 r = (u32)func_80048CFC(0, unused) % 7;
+    u32 r = (u32)SeedAndRandom(0, unused) % 7;
     s32 count;
     Rec1C *rec = func_80049110(&count);
     if (countOut != NULL) {
@@ -289,7 +289,7 @@ Rec1C *func_800491CC(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 7;
     }
-    return &((Rec1C *)func_80048D48(NULL))[0x237];
+    return &((Rec1C *)GetRecordTable(NULL))[0x237];
 }
 Rec1C *func_800491FC(s32 *countOut) {
     s32 count;
@@ -303,7 +303,7 @@ Rec1C *func_80049240(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 8;
     }
-    return &((Rec1C *)func_80048D48(NULL))[0x238];
+    return &((Rec1C *)GetRecordTable(NULL))[0x238];
 }
 Rec1C *func_80049270(s32 *countOut, s32 sub) {
     s32 count;
@@ -314,7 +314,7 @@ Rec1C *func_80049270(s32 *countOut, s32 sub) {
     return &rec[sub];
 }
 Rec1C *func_800492D0(s32 *countOut, s32 n) {
-    Rec1C *rec = &((Rec1C *)func_80048D48(NULL))[0x23E];
+    Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
     if (countOut != NULL) {
         *countOut = n * 2 + 0xE;
     }
