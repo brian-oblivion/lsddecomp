@@ -23,6 +23,7 @@
 #include "common.h"
 #include "class_3bb8c.h"
 #include "Class6B5CC.h"
+#include "Viewport.h"
 
 Class869D8 *New_Class869D8(void)
 {
@@ -38,7 +39,7 @@ Class869D8 *New_Class869D8(void)
 
 void Class869D8__Class869D8(Class869D8 *self)
 {
-    GetViewportMethods()->ctor(self);
+    GetViewportMethods()->ctor((Viewport *)self);
     self->methods = GetClass869D8Methods();
     self->methods->onConstruct(self);
 }
@@ -49,7 +50,7 @@ void func_8004D2F8(void) {
 void Class869D8__ForwardIfUnk10AndUnk70(Class869D8 *self)
 {
     if (self->unk10 != 0 && self->unk70 != 0) {
-        GetViewportMethods()->slot9C(self);
+        GetViewportMethods()->update((Viewport *)self);
     }
 }
 
