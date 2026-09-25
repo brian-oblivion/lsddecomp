@@ -606,7 +606,21 @@ extern s32 D_8006F590[];
 void *func_80045428(void) {
     return D_8006F590;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045438);
+/* Allocate and construct a D_8006F614 object; freed and NULL when the
+ * constructor returns nonzero (this ctor reports failure, not self). */
+void *func_80045E44(void);
+
+void *func_80045438(s32 arg0, s32 arg1, s32 arg2) {
+    void *obj = BMemPMgrAlloc(0x6C);
+
+    if (obj != NULL) {
+        if (((Ctor33808 *)func_80045E44())->ctor(obj, arg0, arg1, arg2) == 0) {
+            return obj;
+        }
+        BMemPMgrFree(obj);
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800454C4);
 /* D_8006F614 +0x00C: finalize -- release the object at +0x60, detach and
  * reset the MDEC decoder, free the four buffers (func_8004575C), then
