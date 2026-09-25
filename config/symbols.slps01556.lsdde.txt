@@ -2531,3 +2531,8 @@ LoadImage = 0x8002133C; // type:func  (Psy-Q libgpu/sys, fingerprint)
 // no C call site yet. Round 81 (bravo, track 2), not yet linked from an
 // SDK object.
 StoreImage = 0x800213A0; // type:func  (Psy-Q libgpu/sys, fingerprint)
+// identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),
+// unique (next candidate PutDrawEnv, masked 0.18). Header LIBGPU.H
+// `extern int MoveImage(RECT *rect, int x, int y);`, no C call site yet.
+// Round 81 (bravo, track 2), not yet linked from an SDK object.
+MoveImage = 0x80021404; // type:func  (Psy-Q libgpu/sys, fingerprint)
