@@ -1,4 +1,6 @@
-# func_80043840 -- MATCHED (28/28 words)
+# New_LinkResource -- MATCHED (28/28 words)
+
+> Renamed from `func_80043840` on 2026-09-25 (tools/rename.py). Address 0x80043840.
 
 Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -19,11 +21,11 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a D_8006F13C object; freed and NULL when the constructor fails. */
-void *func_80043840(s32 arg0) {
+void *New_LinkResource(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80043B78())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetLinkResourceMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);

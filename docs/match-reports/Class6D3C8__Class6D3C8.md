@@ -41,7 +41,7 @@ addiu $a0, $sp, 0x10                     ; &local request buffer
 lui   $v0, %hi(sModelPathDreamE5)
 addiu $v0, $v0, %lo(sModelPathDreamE5)            ; &"ETC\DREAME5.TMD"
 sw    $zero, 0x10($sp)                      ; req.type = 0
-jal   func_80043840                           ; loads the model, returns a handle
+jal   New_LinkResource                           ; loads the model, returns a handle
  sw   $v0, 0x14($sp)                            ; req.path = &sModelPathDreamE5
 addu  $a0, $v0, $zero
 addu  $a1, $zero, $zero
@@ -77,7 +77,7 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     func_800270AC(func_80048CF0());
     req.type = 0;
     req.path = sModelPathDreamE5;
-    self->dreamSys = New_DreamSys(func_80043840(&req), 0, 0);
+    self->dreamSys = New_DreamSys(New_LinkResource(&req), 0, 0);
     self->unk24 = 0;
     self->dreamSys->vt->func_228(self->dreamSys, arg->unk14);
     self->methods->slot40(self);
@@ -121,7 +121,7 @@ another caller is found that writes them.
   exercises them, retyped `Class6D3C8::arg` and `::dreamSys` from `void *`
   to their real pointer types, and declared the small externs this function
   needed (`GetClass6D3C8Methods`, `sModelPathDreamE5`, `func_80048CF0`, `func_800270AC`,
-  `func_80043840`).
+  `New_LinkResource`).
 - `include/DreamSys.h`: extended `struct vtable_DreamSys` past its
   previously-documented end (`0x21c`) with 3 padding words and a new named
   slot at `+0x228` (`func_228`), discovered purely from this call site —

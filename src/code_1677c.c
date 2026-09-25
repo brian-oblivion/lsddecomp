@@ -38,7 +38,7 @@ void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     func_800270AC(func_80048CF0());
     req.type = 0;
     req.path = sModelPathDreamE5;
-    self->dreamSys = New_DreamSys(func_80043840(&req), 0, 0);
+    self->dreamSys = New_DreamSys(New_LinkResource(&req), 0, 0);
     self->unk24 = 0;
     self->dreamSys->vt->func_228(self->dreamSys, arg->unk14);
     self->methods->setDayFromTickCount(self);

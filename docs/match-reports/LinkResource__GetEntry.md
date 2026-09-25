@@ -1,4 +1,6 @@
-# func_80043B58 -- MATCHED (6/6 words)
+# LinkResource__GetEntry -- MATCHED (6/6 words)
+
+> Renamed from `func_80043B58` on 2026-09-25 (tools/rename.py). Address 0x80043b58.
 
 Round 82, runner echo (code_33808 session, echo #5), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -25,7 +27,7 @@ typedef struct Obj6F13C {
     /* +0x02C */ s32 *entries;
 } Obj6F13C;
 
-s32 func_80043B58(Obj6F13C *self, s32 index) {
+s32 LinkResource__GetEntry(Obj6F13C *self, s32 index) {
     return self->entries[index];
 }
 ```

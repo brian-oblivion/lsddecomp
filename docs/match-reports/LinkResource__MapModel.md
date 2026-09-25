@@ -1,15 +1,17 @@
-# func_80043B3C -- MATCHED (7/7 words)
+# LinkResource__MapModel -- MATCHED (9/9 words)
+
+> Renamed from `func_80043B18` on 2026-09-25 (tools/rename.py). Address 0x80043b18.
 
 Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
-`OK: build matches retail SLPS_015.56`), funcdiff 7/7 words, no out-of-range
+`OK: build matches retail SLPS_015.56`), funcdiff 9/9 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-`sll 3; subu; sll 2` (index*28), `lw 0x10(a0)` (Class6D430 `buffer`), `addiu 0xC`, `addu` = `&((Buf6F13C *)self->buffer)->recs[index]` with 0x1C-byte records from +0x0C of the buffer. Same shape as charlie's round-82 lever in code_fa50.
+Tail of `GsMapModelingData((u32 *)self->buffer + 1)`: the buffer holds a TMD, and +4 skips its id word (the TMD `flags` word is what GsMapModelingData expects to start from). Prototype declared locally (LIBGS.H spelling in a comment).
 
-Table slot (`tools/classtable.py`): D_8006F13C +0x07C.
+Table slot (`tools/classtable.py`): D_8006F13C +0x078.
 
 ## Source
 
@@ -19,19 +21,12 @@ fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-/* D_8006F13C +0x07C: the address of record `index`, 0x1C bytes each,
- * from +0x0C of the buffer. */
-typedef struct Rec6F13C {
-    u8 data[0x1C];
-} Rec6F13C;
+/* LIBGS.H: void GsMapModelingData(unsigned long *p); */
+void GsMapModelingData(u32 *p);
 
-typedef struct Buf6F13C {
-    /* +0x00 */ u8 pad0[0xC];
-    /* +0x0C */ Rec6F13C recs[1];
-} Buf6F13C;
-
-Rec6F13C *func_80043B3C(Class6D430 *self, s32 index) {
-    return &((Buf6F13C *)self->buffer)->recs[index];
+/* D_8006F13C +0x078: map the TMD in the buffer (past its id word). */
+void LinkResource__MapModel(Class6D430 *self) {
+    GsMapModelingData((u32 *)self->buffer + 1);
 }
 ```
 

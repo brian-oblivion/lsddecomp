@@ -51,7 +51,7 @@ extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 extern void BMemPMgrFree(void *arg);
 extern void *BMemPMgrAlloc(s32 size);
 void *GetTimBlockSrcMethods(void);
-void *func_80043B78(void);
+void *GetLinkResourceMethods(void);
 void *func_80043E74(void);
 void *func_800441A4(void);
 void *func_8004467C(void);
@@ -389,11 +389,11 @@ void *GetTimBlockSrcMethods(void) {
     return D_8006F0B8;
 }
 /* Allocate and construct a D_8006F13C object; freed and NULL when the constructor fails. */
-void *func_80043840(s32 arg0) {
+void *New_LinkResource(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)func_80043B78())->ctor(obj, arg0)) {
+        if (((Ctor33808 *)GetLinkResourceMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -410,9 +410,9 @@ typedef struct Src6F240 {
 /* D_8006F13C +0x008: constructor -- the active driver's, then this table;
  * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
  * nonzero result fails the construction (NULL), or else request its file. */
-void *func_800438B0(DataSrc33808 *self, Src6F240 *src) {
+void *LinkResource__LinkResource(DataSrc33808 *self, Src6F240 *src) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80043B78();
+    self->methods = GetLinkResourceMethods();
     if (src != NULL) {
         if (src->buffer != NULL) {
             self->buffer = src->buffer;
@@ -430,7 +430,7 @@ fail:
 }
 /* D_8006F13C +0x00C: finalize -- release every object in the NULL-ended
  * array at +0x2C, free the array, then the active driver's. */
-void func_80043954(DataSrc33808 *self) {
+void LinkResource__Finalize(DataSrc33808 *self) {
     DataSrc33808 **objs = (DataSrc33808 **)self->unk2C;
 
     while (*objs != NULL) {
@@ -453,7 +453,7 @@ typedef struct Buf439EC {
 
 extern void *New_TmdModel(void *arg);
 
-s32 func_800439EC(DataSrc33808 *self) {
+s32 LinkResource__BuildModels(DataSrc33808 *self) {
     DataSrc33808 **objs;
     u32 i;
 
@@ -484,7 +484,7 @@ s32 func_800439EC(DataSrc33808 *self) {
 void GsMapModelingData(u32 *p);
 
 /* D_8006F13C +0x078: map the TMD in the buffer (past its id word). */
-void func_80043B18(Class6D430 *self) {
+void LinkResource__MapModel(Class6D430 *self) {
     GsMapModelingData((u32 *)self->buffer + 1);
 }
 /* D_8006F13C +0x07C: the address of record `index`, 0x1C bytes each,
@@ -498,7 +498,7 @@ typedef struct Buf6F13C {
     /* +0x0C */ Rec6F13C recs[1];
 } Buf6F13C;
 
-Rec6F13C *func_80043B3C(Class6D430 *self, s32 index) {
+Rec6F13C *LinkResource__GetRecord(Class6D430 *self, s32 index) {
     return &((Buf6F13C *)self->buffer)->recs[index];
 }
 /* D_8006F13C +0x080: returns entry `index` of the word array at +0x2C
@@ -508,14 +508,14 @@ typedef struct Obj6F13C {
     /* +0x02C */ s32 *entries;
 } Obj6F13C;
 
-s32 func_80043B58(Obj6F13C *self, s32 index) {
+s32 LinkResource__GetEntry(Obj6F13C *self, s32 index) {
     return self->entries[index];
 }
-void func_80043B70(void) {
+void LinkResource__NoOp(void) {
 }
 extern s32 D_8006F13C[];
 
-void *func_80043B78(void) {
+void *GetLinkResourceMethods(void) {
     return D_8006F13C;
 }
 /* Allocate and construct a D_8006F1C4 object. */
@@ -984,7 +984,7 @@ s32 func_80044858(DataSrc33808 *self) {
 
     if (self->unk34 != 0) {
         SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
-        self->unk2C = (s32)func_80043840((s32)&req);
+        self->unk2C = (s32)New_LinkResource((s32)&req);
         if ((void *)self->unk2C != NULL) {
             req.buffer = (u8 *)self->buffer + 0xC;
             self->unk30 = func_800451B8((s32)&req);

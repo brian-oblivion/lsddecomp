@@ -25,7 +25,7 @@ void Obj865C8__Obj865C8(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     self->unk44->methods->slot5C(self->unk44);
     req.type = 0;
     req.path = D_800113F8;
-    self->unk48 = func_80043840(&req);
+    self->unk48 = New_LinkResource(&req);
     tmp = PickWeeklyGroup(0);
     self->unk40 = New_WBgm(tmp, 0, 1);
     func_8004A070(1);

@@ -291,7 +291,7 @@ one real call site, `Class866E8__OnNotifyTag1`'s `self->methods->slot104(self, e
 4. Reload `info` (fresh read of `hdr->field10`, NOT cached -- retail
    genuinely re-derives it). Build a 0x10-byte load-request local
    (`BE54LoadReq`, only `field0` written = `info + info->unk4 +
-   info->unk8`) and call `func_80043840(&req)`, storing the result into
+   info->unk8`) and call `New_LinkResource(&req)`, storing the result into
    `target->unk2C`. Zero the "found" flag in the loop's outBuf.
 5. Loop forever: `idxVal = target->methods->slot78(target, &outBuf, i)`.
    - `idxVal == 0`: return (done).
@@ -418,7 +418,7 @@ typedef struct BE54LoadReq {
     u8 pad4[0xC];
 } BE54LoadReq;
 
-extern LinkResource *func_80043840(BE54LoadReq *req);
+extern LinkResource *New_LinkResource(BE54LoadReq *req);
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
 void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
@@ -453,7 +453,7 @@ void Class866E8__LoadElementResources(Obj866E8 *self, Elem *entry) {
     }
     info = hdr->field10;
     req.field0 = (s32)info + info->unk4 + info->unk8;
-    target->unk2C = func_80043840(&req);
+    target->unk2C = New_LinkResource(&req);
     outBuf.found = 0;
 
     i = 0;
@@ -595,7 +595,7 @@ a compiler-materialized literal rather than a field read.
 
 `info` (`ResInfo866E8*`, `hdr->field10`) lives in `$v0` in retail, `$a1`
 here -- consistent across BOTH of its uses (the `target->unk10` computation
-and the `req.field0` computation before `func_80043840`). A handful of
+and the `req.field0` computation before `New_LinkResource`). A handful of
 other pointers in the `idxVal`-is-a-pointer branch (the second/third `gpu`
 reload, one `vec` reload) show the same single-register swap with
 otherwise byte-identical surrounding instructions. Tried and confirmed
@@ -826,4 +826,4 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BE54` | `Class866E8__LoadElementResources` | B | Occupant of `D_800866E8` +0x104 (`slot104`), and its own identity slot -- `Class866E8__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `func_80043840` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/class_3ac78.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
+| `func_8004BE54` | `Class866E8__LoadElementResources` | B | Occupant of `D_800866E8` +0x104 (`slot104`), and its own identity slot -- `Class866E8__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/class_3ac78.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |

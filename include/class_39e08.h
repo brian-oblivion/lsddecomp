@@ -477,10 +477,10 @@ typedef struct LoadRequest {
 
 /* Uncarved, asm/psyq_memset.s: loads a resource named by `req->path`,
  * returns a handle/object. Already declared elsewhere (Class6D3C8.h) as
- * `extern void *func_80043840(void *arg)`; this unit's own local view types
+ * `extern void *New_LinkResource(void *arg)`; this unit's own local view types
  * the return `SubObjG *` to match where it's stored here
  * (`Obj865C8::unk48`). */
-extern SubObjG *func_80043840(LoadRequest *req);
+extern SubObjG *New_LinkResource(LoadRequest *req);
 
 /* Uncarved, asm/psyq_memset.s: a magic-multiply division idiom over its one
  * argument (not an allocator -- no `BMemPMgrAlloc` call in its own body).

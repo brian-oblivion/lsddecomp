@@ -1,4 +1,6 @@
-# func_800439EC -- MATCHED (75/75 words)
+# LinkResource__BuildModels -- MATCHED (75/75 words)
+
+> Renamed from `func_800439EC` on 2026-09-25 (tools/rename.py). Address 0x800439ec.
 
 Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocate a (count + 1)-word array (count at buffer +0x08) into +0x2C (1 when that fails), map the TMD through its own +0x078 (func_80043B18), then build one New_TmdModel object per 0x1C-byte record from buffer +0x0C into the array. On a NULL, walk back releasing (slot +0x004) every one already built, free the array and return 1. Otherwise NULL-terminate the array (the terminator func_80043954's finalize walks to), call the active driver's setFlag and return 0.
+Allocate a (count + 1)-word array (count at buffer +0x08) into +0x2C (1 when that fails), map the TMD through its own +0x078 (LinkResource__MapModel), then build one New_TmdModel object per 0x1C-byte record from buffer +0x0C into the array. On a NULL, walk back releasing (slot +0x004) every one already built, free the array and return 1. Otherwise NULL-terminate the array (the terminator LinkResource__Finalize's finalize walks to), call the active driver's setFlag and return 0.
 
 Table slot (`tools/classtable.py`): D_8006F13C +0x064 (setFlag override).
 
@@ -32,7 +34,7 @@ typedef struct Buf439EC {
 
 extern void *New_TmdModel(void *arg);
 
-s32 func_800439EC(DataSrc33808 *self) {
+s32 LinkResource__BuildModels(DataSrc33808 *self) {
     DataSrc33808 **objs;
     u32 i;
 

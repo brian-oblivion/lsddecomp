@@ -1,4 +1,6 @@
-# func_800438B0 -- MATCHED (41/41 words)
+# LinkResource__LinkResource -- MATCHED (41/41 words)
+
+> Renamed from `func_800438B0` on 2026-09-25 (tools/rename.py). Address 0x800438b0.
 
 Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
@@ -7,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Constructor: active driver's ctor, install D_8006F13C (func_80043B78); with a non-NULL { buffer, name } descriptor: adopt a given buffer (+0x10, size +0x14 = 0) and call its own +0x064 (func_800439EC), returning NULL on a nonzero result; or, with no buffer, call its own requestLoadFile (+0x06C) with the name. Returns self otherwise.
+Constructor: active driver's ctor, install D_8006F13C (GetLinkResourceMethods); with a non-NULL { buffer, name } descriptor: adopt a given buffer (+0x10, size +0x14 = 0) and call its own +0x064 (LinkResource__BuildModels), returning NULL on a nonzero result; or, with no buffer, call its own requestLoadFile (+0x06C) with the name. Returns self otherwise.
 
 Table slot (`tools/classtable.py`): D_8006F13C +0x008.
 
@@ -27,9 +29,9 @@ typedef struct Src6F240 {
 /* D_8006F13C +0x008: constructor -- the active driver's, then this table;
  * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
  * nonzero result fails the construction (NULL), or else request its file. */
-void *func_800438B0(DataSrc33808 *self, Src6F240 *src) {
+void *LinkResource__LinkResource(DataSrc33808 *self, Src6F240 *src) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80043B78();
+    self->methods = GetLinkResourceMethods();
     if (src != NULL) {
         if (src->buffer != NULL) {
             self->buffer = src->buffer;
