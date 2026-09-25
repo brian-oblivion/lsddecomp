@@ -37,7 +37,7 @@ void IntermediateBase__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     if (arg1->unkC != NULL) {
         self->unk14 = (s32)arg1->unkC;
     } else {
-        self->unk14 = (s32)New_D8006EFAC();
+        self->unk14 = (s32)New_LightRig();
     }
     if (arg1->unk10 != NULL) {
         self->unk18 = arg1->unk10;
@@ -153,3 +153,7 @@ caller-overridable defaults" idiom this project uses elsewhere. Paired with
 ## Track 4 (2026-09-25, round 82, charlie)
 
 The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Init (class prefix). Occupies +0x044, slot `init(self, IntermediateBaseInitArgs *args, s32 mode)`, typed s32 because the callers use the result: Class6D3C8__RunPollTask returns `task->methods->slot44(task, extra, 0)` and Class6D3C8__PollStatusObj switches on it; the overrides Class86668__Init and TaskCore__Init call this base and return a field (eventCode, +0x038). This occupant itself returns nothing. Obj86B60InitArgs is IntermediateBaseInitArgs; its five fields and +0x010/+0x014/+0x018 are only ever added, removed or released through BasicClass slots here, so they are `BasicClass *` (casts dropped). +0x04C, called after the children are added, is `onInit` (NULL here; Obj865C8__StartSubA, ObjM__InitStyleAndWorld, TaskCore__OnInit). The name is kept, tier B: with mode 0 the body also runs setState(2) and deinit, so "Init" says less than it does.
+
+## Track 4 (2026-09-26, round 86, delta)
+
+Class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; its NULL-args fallback is `self->unk14 = (BasicClass *)New_LightRig();`, the allocator's prototype now coming from include/LightRig.h (was `void *New_LightRig(void)` in include/code_2cc8c.h). `unk14` stays IntermediateBase's `BasicClass *`; a pointer cast emits no code; image byte-identical.

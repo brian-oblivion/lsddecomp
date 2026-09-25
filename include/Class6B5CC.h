@@ -10,7 +10,7 @@
  * Methods in src/code_d294.c, code_d294_b.c and code_d294_c.c; sixteen classes
  * derive from it (`typeviews.py --tree`), among them gActorMethods (0x34, the
  * base of Class65650, Entity and DreamSys), Class86AA0 (0x24), gBoxFillMethods
- * (0x64) and D_8006EFAC (0x14, the base of Class866E8).
+ * (0x64) and LightRig (0x14, include/LightRig.h, the base of Class866E8).
  *
  * Objects form a transform hierarchy: attachToParent sets `parent` and points
  * the coordinate's `super` at the parent's coordinate, and the parent chain is

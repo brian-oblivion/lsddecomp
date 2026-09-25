@@ -31,15 +31,17 @@
  * D_8006EF50 (class id 0x5) is a BasicClass subclass holding a parentRefs
  * cursor; NotifyParents walks it, picking event 4/3/2 from two flags and a
  * counter. D_8006EED8 (class id 0xB03) is a GetActiveDataSourceMethods
- * subclass that copies a name string to slot +0x06C. D_8006EFAC (class id
- * 0x14, "the base of Class866E8" per include/Class6B5CC.h) is a Class6B5CC
- * subclass owning three FlatLightObj children and an ambient colour
- * (SetAmbientColor -> GsSetAmbient); its GetChild (+0x0B8) is inherited
- * unchanged by Class866E8's own table (D_800866E8), which is why one
- * function occupies the same slot in both.
+ * subclass that copies a name string to slot +0x06C.
+ * LightRig (include/LightRig.h, gLightRigMethods, id 0x14) is unified too: a
+ * Class6B5CC subclass owning three FlatLightObj children and an ambient
+ * colour (SetAmbientColor -> GsSetAmbient); its own methods (New_LightRig,
+ * LightRig__*, GetLightRigMethods) live here. Its getLight (+0x0B8) is
+ * inherited unchanged by Class866E8's own table (D_800866E8), which is why
+ * one function occupies the same slot in both.
  */
 #include "common.h"
 #include "CharSprite.h"
+#include "LightRig.h"
 
 /* Local view of a D_8006EF50 (class id 0x5) object: only the three words its
  * +0x048..+0x058 accessors touch. */
@@ -60,24 +62,6 @@ struct D_8006EF50Methods {
     void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = D8006EF50__Reset */
 };
 
-/* Local view of a D_8006EFAC/D_800866E8 object: a child array at +0x44. */
-typedef struct ChildArrayObj_322b4 {
-    u8 pad00[0x44];
-    void *children[1];
-} ChildArrayObj_322b4;
-
-/* Local view of a D_8006EFAC (class id 0x14) object: a Class6B5CC with
- * three FlatLightObj children at +0x44 and an ambient colour at +0x50. */
-typedef struct D_8006EFACMethods D_8006EFACMethods;
-typedef struct D_8006EFACObj {
-    CLASS6B5CC_FIELDS(D_8006EFACMethods);
-    BasicClass *lights[3]; /* +0x044, New_FlatLightObj(0..2) */
-    SpriteRgb ambient;     /* +0x050, GsSetAmbient's colour >> 4 */
-} D_8006EFACObj;
-struct D_8006EFACMethods {
-    CLASS6B5CC_SLOTS(D_8006EFACObj, (D_8006EFACObj *self));
-    /* +0x0B8 */ BasicClass *(*getChild)(D_8006EFACObj *self, s32 index); /* D8006EFAC__GetChild */
-};
 extern BasicClass *New_FlatLightObj(s32 lightId);
 extern void GsSetAmbient(long r, long g, long b);
 
@@ -101,7 +85,6 @@ extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
 /* The method tables the getters below return. */
 extern s32 D_8006EED8[];
 extern s32 D_8006EF50[];
-extern s32 D_8006EFAC[];
 
 /* Local view of a D_8006EED8 (class id 0xB03) object: D8006EED8__SetFlag2C sets +0x2C. */
 typedef struct D_8006EED8Methods D_8006EED8Methods;
@@ -150,7 +133,6 @@ typedef struct CtorArg1Methods_322b4 {
     u8 pad00[0x8];
     void (*ctor)(void *self, s32 arg); /* +0x008 */
 } CtorArg1Methods_322b4;
-void *Get_vtable_D8006EFAC(void);
 
 /* Allocate and construct a CharSprite (0xAC bytes): one character cell. */
 CharSprite *New_CharSprite(void *texture, u8 cell) {
@@ -476,57 +458,57 @@ void D8006EF50__SetFlag14(D_8006EF50Obj *self) {
 void *Get_vtable_D8006EF50(void) {
     return D_8006EF50;
 }
-/* Allocate and construct a D_8006EFAC object (0x54 bytes). */
-void *New_D8006EFAC(void) {
-    void *obj = BMemPMgrAlloc(0x54);
+/* Allocate and construct a LightRig (0x54 bytes). */
+LightRig *New_LightRig(void) {
+    LightRig *obj = BMemPMgrAlloc(0x54);
 
     if (obj != NULL) {
-        ((Slot08Methods_322b4 *)Get_vtable_D8006EFAC())->init(obj);
+        GetLightRigMethods()->ctor(obj);
         return obj;
     }
     return NULL;
 }
-/* D_8006EFAC slot +0x008 (ctor): the Class6B5CC ctor, install the table,
+/* LightRig slot +0x008 (ctor): the Class6B5CC ctor, install the table,
  * create and add the three flat lights, then reset. */
-void D8006EFAC__D8006EFAC(D_8006EFACObj *self) {
+void LightRig__LightRig(LightRig *self) {
     s32 i;
     BasicClass **light;
 
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
-    self->methods = Get_vtable_D8006EFAC();
+    self->methods = GetLightRigMethods();
     for (i = 0, light = self->lights; i < 3; i++, light++) {
         *light = New_FlatLightObj(i);
         self->methods->addChild(self, *light);
     }
     self->methods->reset(self);
 }
-/* D_8006EFAC slot +0x00C (finalize): release the three lights, then the
+/* LightRig slot +0x00C (finalize): release the three lights, then the
  * Class6B5CC finalize. */
-void D8006EFAC__Finalize(D_8006EFACObj *self) {
+void LightRig__Finalize(LightRig *self) {
     s32 i;
     BasicClass *light;
 
     for (i = 0; i < 3; i++) {
-        light = self->methods->getChild(self, i);
+        light = self->methods->getLight(self, i);
         light->methods->release(light);
     }
     GetClass6B5CCMethods()->finalize((Class6B5CC *)self);
 }
-/* D_8006EFAC slot +0x040 (reset): mark the coordinate for recompute. */
-void D8006EFAC__Reset(Class6B5CC *self) {
+/* LightRig slot +0x040 (reset): mark the coordinate for recompute. */
+void LightRig__Reset(LightRig *self) {
     self->coord2->flg = 0;
 }
-/* D_8006EFAC slot +0x09C (dispatchLinkCommand): empty override. */
-void D8006EFAC__DispatchLinkCommand(Class6B5CC *self, void *sender, s32 event) {
+/* LightRig slot +0x09C (dispatchLinkCommand): empty override. */
+void LightRig__DispatchLinkCommand(LightRig *self, void *sender, s32 event) {
 }
-/* D_8006EFAC and D_800866E8 slot +0x0B8 (getChild). */
-void *D8006EFAC__GetChild(ChildArrayObj_322b4 *self, s32 index) {
-    return self->children[index];
+/* LightRig slot +0x0B8 (getLight), inherited unchanged by D_800866E8. */
+BasicClass *LightRig__GetLight(LightRig *self, s32 index) {
+    return self->lights[index];
 }
-/* D_8006EFAC slot +0x0BC: set the ambient colour (swapping the old one out
+/* LightRig slot +0x0BC: set the ambient colour (swapping the old one out
  * into *rgb when asked) and hand it to GsSetAmbient. */
-void D8006EFAC__SetAmbientColor(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
-    SpriteRgb old;
+void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
+    LightRigRgb old;
 
     if (swap) {
         old = self->ambient;
@@ -537,7 +519,7 @@ void D8006EFAC__SetAmbientColor(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
     }
     GsSetAmbient((u8)self->ambient.r << 4, (u8)self->ambient.g << 4, (u8)self->ambient.b << 4);
 }
-/* Returns the D_8006EFAC method table. */
-void *Get_vtable_D8006EFAC(void) {
-    return D_8006EFAC;
+/* Returns the LightRig method table. */
+LightRigMethods *GetLightRigMethods(void) {
+    return &gLightRigMethods;
 }

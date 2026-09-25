@@ -27,8 +27,8 @@ just the `unk2C` field `Class866E8__ResetAllElements` already established); refr
 and-discards a new field `entry->unkC`; scans a 0x668-byte array of
 `GenericObject*` at `entry->unk10`, refreshing-and-discarding every
 non-NULL entry; frees `entry->unk10` via `BMemPMgrFree`. After the loop:
-calls `((*(void***)Get_vtable_D8006EFAC(self))[3])(self)` — resolves a table
-through the return of `Get_vtable_D8006EFAC(self)` and calls its slot `+0xC`.
+calls `((*(void***)GetLightRigMethods(self))[3])(self)` — resolves a table
+through the return of `GetLightRigMethods(self)` and calls its slot `+0xC`.
 
 New struct/vtable knowledge added regardless of the stall: `UnkSlotEntry_
 3ac78::unkC` (`GenericObject *`) and `::unk10` (`GenericObject **`, a
@@ -52,7 +52,7 @@ needs a complete type).
 #if 0
 extern void *GetDrawSystem(Class866E8 *self);
 extern void BMemPMgrFree(void *arg1);
-extern void *Get_vtable_D8006EFAC(Class866E8 *self);
+extern void *GetLightRigMethods(Class866E8 *self);
 
 void Class866E8__Finalize(Class866E8 *self)
 {
@@ -102,7 +102,7 @@ void Class866E8__Finalize(Class866E8 *self)
         offset += 0x1C;
     }
 
-    fn = *(void (**)(Class866E8 *))((u8 *)Get_vtable_D8006EFAC(self) + 0xC);
+    fn = *(void (**)(Class866E8 *))((u8 *)GetLightRigMethods(self) + 0xC);
     fn(self);
 }
 #endif
@@ -191,10 +191,10 @@ Restored to `INCLUDE_ASM`.
 
 Re-verified the "62/113, drifted" claim first: the preserved body above
 does NOT compile as-is against the CURRENT header (`GetDrawSystem` and
-`Get_vtable_D8006EFAC` have both since been given real, no-argument signatures
+`GetLightRigMethods` have both since been given real, no-argument signatures
 by the sibling ctor `Class866E8__Class866E8`'s own successful match -- see
 `src/class_3ac78.c`'s own declarations, `extern s32 GetDrawSystem(void);`
-and `extern BaseCtorTable_3ac78 *Get_vtable_D8006EFAC(void);` -- rather than the
+and `extern BaseCtorTable_3ac78 *GetLightRigMethods(void);` -- rather than the
 `(self)`-taking guesses this report's preserved body used). This alone
 means the round-13 62/113 score was measuring a body that would not even
 build against today's header; it was not re-derivable verbatim.
@@ -206,12 +206,12 @@ build against today's header; it was not re-derivable verbatim.
 was read directly rather than re-guessing the idiom from scratch:
 
 1. **`self->methods->slot14(self, (void *)GetDrawSystem())`** and
-   **`Get_vtable_D8006EFAC()->dtor(self)`** (a new `dtor` slot added to the
+   **`GetLightRigMethods()->dtor(self)`** (a new `dtor` slot added to the
    locally-declared `BaseCtorTable_3ac78`, at `+0x00C`, immediately after
    the already-established `ctor` slot at `+0x008` -- purely additive,
    mirrors the "further-base ctor/dtor" pattern already documented on
    `ctor`) -- both call shapes copied directly from the ctor's own
-   `Get_vtable_D8006EFAC()->ctor(self)` / `self->methods->slot10(self,
+   `GetLightRigMethods()->ctor(self)` / `self->methods->slot10(self,
    GetDrawSystem())` pattern, just the destructor's own slots.
 2. **The array-scan loop's pointer idiom, copied verbatim from the
    ctor's own matched body**: a THREE-variable chain --
@@ -302,7 +302,7 @@ void Class866E8__Finalize(Class866E8 *self)
         BMemPMgrFree(entry->unk10);
     }
 
-    Get_vtable_D8006EFAC()->dtor(self);
+    GetLightRigMethods()->dtor(self);
 }
 ```
 
@@ -355,3 +355,7 @@ the `x = x->methods->release(x)` release-and-store-back shape on
 `entry->target`, `entry->list->unk2C`, `entry->list` itself and
 `entry->cellParent`. The local views' `unk04` slots were renamed `release`
 on that basis.
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the last call is `GetLightRigMethods()->finalize((LightRig *)self)` through include/LightRig.h (was `->dtor(self)` on the unit-local `BaseCtorTable_3ac78`: `dtor` was BasicClass's +0x00C `finalize` slot under another name). A pointer cast emits no code; image byte-identical.

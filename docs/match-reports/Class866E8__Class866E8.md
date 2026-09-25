@@ -18,7 +18,7 @@ struct BaseCtorTable_3ac78 {
     void (*ctor)(void *self); /* +0x008, standard "further-base ctor first" slot */
 };
 
-extern BaseCtorTable_3ac78 *Get_vtable_D8006EFAC(void);
+extern BaseCtorTable_3ac78 *GetLightRigMethods(void);
 extern UnkSlotChildObj_3ac78 *New_DataSrc39094(void);
 extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
@@ -35,7 +35,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     u8 *end;
     s32 buf[3];
 
-    Get_vtable_D8006EFAC()->ctor(self);
+    GetLightRigMethods()->ctor(self);
     self->methods = GetClass866E8Methods();
 
     if (arg1 != NULL) {
@@ -107,7 +107,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
 
 ## What it does
 
-Class866E8's own ctor. Calls a further-base ctor (`Get_vtable_D8006EFAC()->ctor(self)`,
+Class866E8's own ctor. Calls a further-base ctor (`GetLightRigMethods()->ctor(self)`,
 the standard "base ctor first, then set own vtable pointer" idiom already
 established elsewhere in this project), sets `self->methods`, copies a
 3-word block into `self->unk54` (from `arg1` if given, else a default
@@ -236,3 +236,7 @@ twice over (`class_3bb8c_b`'s matched `Class866E8__SetFootprintCellFlag`, and
 `gDefaultGridSpan >> 11`). This function is byte-exact, so both constants are
 certainly right; what the extra column and the 10 spare pointers are for is
 unknown. Do not "correct" the stride to 21 on this function's evidence alone.
+
+## Track 4
+
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the first call is `GetLightRigMethods()->ctor((LightRig *)self)` through include/LightRig.h (was a unit-local `BaseCtorTable_3ac78 *` view of the same getter). A pointer cast emits no code; image byte-identical. Class866E8's own view is unchanged.
