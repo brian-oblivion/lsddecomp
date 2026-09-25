@@ -193,7 +193,14 @@ Rec1C *func_80049240(s32 *countOut) {
     }
     return &((Rec1C *)func_80048D48(NULL))[0x238];
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049270);
+Rec1C *func_80049270(s32 *countOut, s32 sub) {
+    s32 count;
+    Rec1C *rec = func_80049240(&count);
+    if (countOut != NULL) {
+        *countOut = sub + count;
+    }
+    return &rec[sub];
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800492D0);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80049334);
 s32 func_800493C8(s32 index) {
