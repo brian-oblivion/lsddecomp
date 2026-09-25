@@ -302,7 +302,7 @@ struct Obj865C8 {
     u8 pad14[0x18 - 0x14];
     SubObjA *subA;                /* +0x018, Obj865C8__RunSubUpdates */
     /* +0x01C. Renamed from `unk1C`: code_2cc8c.h's own local view of this
-     * SAME base offset (Obj86B60, the ultimate base class) already names it
+     * SAME base offset (then Obj86B60, TaskCore's view; IntermediateBase.h now) names it
      * `frameCounter` (round 12, "a running count"). Class86668__CheckTimeout
      * reads it directly after forwarding to the base's own +0x05C
      * (IncrementFrameCounter), and compares it against `timeoutFrames`. */

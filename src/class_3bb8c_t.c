@@ -15,9 +15,9 @@
  *   local view). None of these five functions has enough of a body to name
  *   past its own address; see the naming pass note above each.
  * - The WHOLE of `GraphRoomObj` (round 75 name; table `gGraphRoomMethods`,
- *   73 slots, resolved via `tools/classtable.py`), a `TaskCoreObj` subclass
- *   that is itself a derived override of `Obj86B60`/`gClass86B60Methods`
- *   (`include/code_2cc8c.h`). This unit owns the entire class -- ctor, dtor
+ *   73 slots, resolved via `tools/classtable.py`), a TaskCore subclass
+ *   (include/TaskCore.h; Class86B60 and StreamTaskObj are its siblings).
+ *   This unit owns the entire class -- ctor, dtor
  *   and every slot referenced from within it are all in this file.
  *
  * `GraphRoomObj`'s identity (round 75, track 3 naming pass; tier B -- the
@@ -41,6 +41,7 @@
  * comment below).
  */
 #include "common.h"
+#include "TaskCore.h"
 
 /* The class allocated by this unit's own New_GraphRoomObj, table D_800879C4
  * (49 slots, resolved via tools/classtable.py). Its ctor (D800879C4__D800879C4)
@@ -61,41 +62,10 @@ extern void *BMemPMgrAlloc(s32 size);
 
 typedef struct GraphRoomObj GraphRoomObj;
 
-/* This unit's own local view of the shared base-class table returned by
- * Get_vtable_TaskCore() (a plain no-argument getter, established elsewhere --
- * e.g. include/code_2c054.h, include/class_3bb8c.h -- as returning
- * &gTaskCoreMethods). Only the slots this unit's own functions dispatch
- * through are typed, per the project's "per-call-site signature"
- * convention (multiple units already carry independent local views of
- * this same table with different slot arities). Slot names past +0x008
- * match the field names include/code_2c054.h's own independent view of
- * this same table already uses, for cross-unit readability; +0x008 is
- * renamed `ctor` here since `tools/classtable.py gTaskCoreMethods` resolves
- * it to `TaskCore__TaskCore`, an already-established real name. */
-typedef struct TaskCoreBaseTable {
-    u8 pad00[0x8];
-    /* +0x008, called by this unit's own GraphRoomObj__GraphRoomObj as (self, 0, str,
-     * 0). Resolves to TaskCore__TaskCore (tools/classtable.py gTaskCoreMethods). */
-    void (*ctor)(GraphRoomObj *self, s32 arg1, char *str, s32 arg2);
-    u8 pad0C[0x44 - 0xC];
-    /* +0x044, called by this unit's own GraphRoomObj__func_80058390 as (self, arg1,
-     * arg2). Not this unit's own function; still func_8003C1DC elsewhere. */
-    void (*slot44)(GraphRoomObj *self, void *arg1, void *arg2);
-    u8 pad48[0x5C - 0x48];
-    /* +0x05C, called by this unit's own GraphRoomObj__UpdateFromLog as (self, arg1,
-     * arg2). Not this unit's own function; still TaskCore__Update elsewhere. */
-    void (*slot5C)(GraphRoomObj *self, void *arg1, void *arg2);
-    u8 pad60[0xDC - 0x60];
-    /* +0x0DC, called by this unit's own GraphRoomObj__Destroy as (self) -- the
-     * base-class dtor step. Not this unit's own function; still TaskCore__ReleaseTarget
-     * elsewhere. */
-    void (*slotDC)(GraphRoomObj *self);
-    /* +0x0E0, called by this unit's own GraphRoomObj__PopulateGraphPoints as (self, arg1) --
-     * the FIRST thing that function does, before touching anything else
-     * (round 19). Not this unit's own function; still TaskCore__UpdateSlotElements elsewhere. */
-    void (*slotE0)(GraphRoomObj *self, void *arg1);
-} TaskCoreBaseTable;
-extern TaskCoreBaseTable *Get_vtable_TaskCore(void);
+/* GraphRoomObj's parent is TaskCore (include/TaskCore.h, track 4 round 84);
+ * the base implementations are reached through Get_vtable_TaskCore() with
+ * `self` upcast. This unit's local view of that table (TaskCoreBaseTable)
+ * is gone. */
 
 /* Round 75 naming pass: no body to read past `jr $ra; nop` -- splat matched
  * these itself. They are D_800879C4's own leaf overrides
@@ -314,7 +284,7 @@ void *New_GraphRoomObj(void *arg1) {
 extern char D_8001176C[];
 
 void *GraphRoomObj__GraphRoomObj(GraphRoomObj *self, void *arg1) {
-    Get_vtable_TaskCore()->ctor(self, 0, D_8001176C, 0);
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, 0, D_8001176C, 0);
     self->methods = GetGraphRoomMethods();
     self->unk48->methods->slot9C(self->unk48, -1);
     self->dayLog = arg1;
@@ -332,7 +302,7 @@ void GraphRoomObj__InitDisplay(GraphRoomObj *self) {
 }
 
 void GraphRoomObj__UpdateFromLog(GraphRoomObj *self, void *arg1, void *arg2) {
-    Get_vtable_TaskCore()->slot5C(self, arg1, arg2);
+    Get_vtable_TaskCore()->update((TaskCore *)self, arg1, (s32)arg2);
     if (self->unk_0x3C == 1) {
         DayLog *result = self->dayLog->methods->getData(self->dayLog, 0);
         if (result->fullScan != 0 || result->dayCount != 0) {
@@ -394,12 +364,12 @@ void GraphRoomObj__Destroy(GraphRoomObj *self) {
     for (i = 0; i < 100; i++) {
         self->points[i]->methods->destroy(self->points[i]);
     }
-    Get_vtable_TaskCore()->slotDC(self);
+    Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
 }
 
 s32 GraphRoomObj__func_80058390(GraphRoomObj *self, void *arg1, void *arg2) {
     s32 result;
-    Get_vtable_TaskCore()->slot44(self, arg1, arg2);
+    Get_vtable_TaskCore()->init((TaskCore *)self, arg1, (s32)arg2);
     result = 2;
     if (self->scored == 0) {
         result = self->unk_0x38;
@@ -424,7 +394,7 @@ void GraphRoomObj__PopulateGraphPoints(GraphRoomObj *self, void *arg1) {
     Point2 point;
     Point2 firstPoint;
 
-    Get_vtable_TaskCore()->slotE0(self, arg1);
+    Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, arg1);
     result = self->dayLog->methods->getData(self->dayLog, 0);
     self->scored = GraphRoomObj__ScoreDayLog(self, result);
 
