@@ -12,21 +12,89 @@
  */
 #include "common.h"
 
+/* The four words the class copies in through its slot +0x040. */
+typedef struct Quad_fa50 {
+    s32 w[4];
+} Quad_fa50;
+
+/* One 28-byte record of the model data slot +0x048 indexes. */
+typedef struct Rec28_fa50 {
+    u8 pad[0x1C];
+} Rec28_fa50;
+
+typedef struct ModelData_fa50 {
+    u32 head[3];            /* +0x000; GsMapModelingData gets &head[1] */
+    Rec28_fa50 recs[1];     /* +0x00C */
+} ModelData_fa50;
+
+typedef struct Class6BEA0 {
+    void *vtable;           /* +0x000 */
+    u8 pad4[0x8];           /* +0x004 */
+    ModelData_fa50 *data;   /* +0x00C */
+    void *unk10;            /* +0x010 */
+    Quad_fa50 quad;         /* +0x014 */
+} Class6BEA0;
+
+typedef struct Target_fa50 {
+    u8 pad0[0x6];
+    s16 unk6;               /* +0x006 */
+} Target_fa50;
+
+typedef struct Inner_fa50 {
+    u8 pad0[0x10];
+    Target_fa50 *unk10;     /* +0x010 */
+} Inner_fa50;
+
+typedef struct Outer_fa50 {
+    u8 pad0[0x10];
+    Inner_fa50 *unk10;      /* +0x010 */
+} Outer_fa50;
+
+extern void GsMapModelingData(unsigned long *p);
+extern s32 func_8001F3B0(void *self, void *buf);
+extern s32 D_8008AC4C;
+extern s32 D_8008B21C[];
+extern s32 D_8006BEA0[];
+
 INCLUDE_ASM("asm/nonmatchings/code_fa50", new_class_6bea0);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F2B0);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F314);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F33C);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F360);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F37C);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F384);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F394);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F3A4);
+void func_8001F314(Class6BEA0 *self, Quad_fa50 *src) {
+    self->quad = *src;
+}
+void func_8001F33C(Class6BEA0 *self) {
+    GsMapModelingData((unsigned long *)&self->data->head[1]);
+}
+Rec28_fa50 *func_8001F360(Class6BEA0 *self, s32 i) {
+    return &self->data->recs[i];
+}
+void func_8001F37C(void) {
+}
+void *func_8001F384(void) {
+    return D_8006BEA0;
+}
+void func_8001F394(void) {
+    D_8008AC4C = 1;
+}
+s32 func_8001F3A4(void *self) {
+    return D_8008AC4C;
+}
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F3B0);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F4E4);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F50C);
+void func_8001F4E4(void *self) {
+    func_8001F3B0(self, D_8008B21C);
+}
+void *func_8001F50C(void *self, s32 i) {
+    return D_8008B21C;
+}
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F51C);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F66C);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F8B8);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_80020050);
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_800204D0);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_80020510);
+void func_80020510(Outer_fa50 *self, s16 *xy) {
+    Target_fa50 *t = self->unk10->unk10;
+    s32 v;
+
+    v = xy[0] / 16;
+    t->unk6 = v;
+    t->unk6 = v + xy[1] * 64;
+}
