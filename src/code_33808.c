@@ -393,7 +393,78 @@ void func_80043C60(DataSrc33808 *self) {
     BMemPMgrFree(self->unk30);
     GetActiveDataSourceMethods()->finalize((Class6D430 *)self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043CB8);
+/* D_8006F1C4 +0x064: when the buffer is there (or flag 0x200 is set),
+ * build one TimImage (func_8003B39C(NULL)) per image of the buffer -- a
+ * count, then that many offsets -- into an array at +0x30 (+0x2C entries),
+ * each adopting its image in place (size 0), and set each one's +0x4C from
+ * the CLUT row its GsGetTimInfo reports (from y 0x1E0, >> D_8008A934, 16
+ * bytes a step past +0x34); then mark +0x38 and the active driver's
+ * setFlag. */
+typedef struct Image43CB8 {      /* LIBGS.H GsIMAGE */
+    /* +0x00 */ u32 pmode;
+    /* +0x04 */ s16 px;
+    /* +0x06 */ s16 py;
+    /* +0x08 */ u16 pw;
+    /* +0x0A */ u16 ph;
+    /* +0x0C */ u32 *pixel;
+    /* +0x10 */ s16 cx;
+    /* +0x12 */ s16 cy;
+    /* +0x14 */ u16 cw;
+    /* +0x16 */ u16 ch;
+    /* +0x18 */ u32 *clut;
+} Image43CB8;
+
+typedef struct Tim43CB8 Tim43CB8;
+
+typedef struct TimMethods43CB8 {
+    CLASS6D430_SLOTS(Tim43CB8, (Tim43CB8 *self, char *name));
+    /* +0x07C */ u8 pad7C[0x20];
+    /* +0x09C */ void (*getTimInfo)(Tim43CB8 *self, Image43CB8 *info);
+} TimMethods43CB8;
+
+struct Tim43CB8 {                /* TimImage (code_2bb9c.c) */
+    CLASS6D430_FIELDS(TimMethods43CB8);
+    /* +0x02C */ u8 pad2C[0x20];
+    /* +0x04C */ s32 clutBase;
+};
+
+typedef struct Obj43CB8 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ s32 count;
+    /* +0x030 */ Tim43CB8 **images;
+    /* +0x034 */ s32 base;
+    /* +0x038 */ s32 ready;
+} Obj43CB8;
+
+extern Tim43CB8 *func_8003B39C(char *name);
+extern s16 D_8008A934;
+
+void func_80043CB8(Obj43CB8 *self) {
+    Image43CB8 info;
+    Tim43CB8 **objs;
+    s32 i;
+    s32 *offs;
+
+    if ((self->flags & 0x200) || self->buffer != NULL) {
+        self->count = *(s32 *)self->buffer;
+        self->images = BMemPMgrAlloc(*(s32 *)self->buffer * 4);
+        if (self->images != NULL) {
+            objs = self->images;
+            offs = (s32 *)self->buffer + 1;
+            for (i = 0; i < self->count; i++) {
+                *objs = func_8003B39C(NULL);
+                (*objs)->buffer = (u8 *)self->buffer + *offs;
+                (*objs)->bufferSize = 0;
+                (*objs)->methods->getTimInfo(*objs, &info);
+                (*objs)->clutBase = ((info.cy - 0x1E0) >> D_8008A934) * 16 + self->base;
+                offs++;
+                objs++;
+            }
+            self->ready = 1;
+            GetActiveDataSourceMethods()->setFlag((Class6D430 *)self);
+        }
+    }
+}
 /* D_8006F1C4 +0x078: slot +0x078 of every object in the array at +0x30
  * (+0x2C entries). */
 void func_80043DFC(DataSrc33808 *self) {
