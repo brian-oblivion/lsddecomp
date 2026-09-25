@@ -55,7 +55,12 @@ INCLUDE_ASM("asm/nonmatchings/code_3311c", func_8004297C);
 void func_800429E0(FlatLightObj *self, s32 lightId) {
     self->lightId = lightId;
 }
-INCLUDE_ASM("asm/nonmatchings/code_3311c", func_800429E8);
+void func_800429E8(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
+    if (update) {
+        self->light.rgb = *rgb;
+    }
+    GsSetFlatLight(self->lightId, &self->light);
+}
 INCLUDE_ASM("asm/nonmatchings/code_3311c", func_80042A2C);
 FlatLightObjMethods *func_80042A7C(void) {
     return &D_8006F06C;
