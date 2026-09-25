@@ -146,7 +146,19 @@ void *func_80048D48(s32 *out) {
 void *func_80048D64(void) {
     return D_800819CC;
 }
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048D74);
+s32 func_80048D74(s32 arg) {
+    u32 r = (u32)func_80048CFC(0, arg) % 7;
+    s32 *table = func_80048D64();
+    s32 *entry;
+    s32 index;
+    if (D_8008A964 != 0) {
+        index = D_8008A964 - 1;
+        entry = &table[index];
+    } else {
+        entry = &table[r];
+    }
+    return *entry;
+}
 char **func_80048DF8(void) {
     return &D_8008A96C;
 }
