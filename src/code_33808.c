@@ -404,7 +404,19 @@ void *func_80044A0C(s32 arg0) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044A7C);
+/* D_8006F40C +0x008: constructor -- the parent D_8006F384's (third argument
+ * 0), then this table; when the argument's first word is set, its own
+ * +0x064 runs, and a nonzero result fails the construction (NULL). */
+void *func_80044A7C(DataSrc33808 *self, s32 *arg) {
+    ((Ctor33808 *)func_800449FC())->ctor(self, arg, 0);
+    self->methods = func_80044CC4();
+    if (*arg != 0) {
+        if (((s32 (*)())self->methods->setFlag)(self)) {
+            return NULL;
+        }
+    }
+    return self;
+}
 /* D_8006F40C +0x00C: finalize -- slot +0x07C, then the parent D_8006F384's. */
 void func_80044B04(DataSrc33808 *self) {
     self->methods->slot7C();
