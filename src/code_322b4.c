@@ -12,6 +12,22 @@
  * Nothing here is matched yet: every function is fresh track-1 ground.
  */
 #include "common.h"
+#include "Class6B5CC.h"
+
+/* Local view of a D_8006EF50 (class id 0x5) object: only the three words its
+ * +0x048..+0x058 accessors touch. */
+typedef struct D_8006EF50Obj {
+    u8 pad00[0xC];
+    s32 unkC;  /* +0x00C, read by func_8004264C */
+    s32 unk10; /* +0x010, set to 1 by func_80042658, cleared by func_80042664, read by func_8004266C */
+    s32 unk14; /* +0x014, set to 1 by func_80042678 */
+} D_8006EF50Obj;
+
+/* Local view of a D_8006EED8 (class id 0xB03) object: func_800423E4 sets +0x2C. */
+typedef struct D_8006EED8Obj {
+    u8 pad00[0x2C];
+    s32 unk2C;
+} D_8006EED8Obj;
 
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041AB4);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041B20);
@@ -22,7 +38,9 @@ INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C3C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C4C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041C9C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041D18);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041DA4);
+/* D_8006ED4C slot +0x040 (reset): empty override. */
+void func_80041DA4(Class6B5CC *self) {
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041DAC);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041E2C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041E58);
