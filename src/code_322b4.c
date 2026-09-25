@@ -413,7 +413,18 @@ void func_800426E4(D_8006EFACObj *self) {
     }
     self->methods->reset(self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042790);
+/* D_8006EFAC slot +0x00C (finalize): release the three lights, then the
+ * Class6B5CC finalize. */
+void func_80042790(D_8006EFACObj *self) {
+    s32 i;
+    BasicClass *light;
+
+    for (i = 0; i < 3; i++) {
+        light = self->methods->getChild(self, i);
+        light->methods->release(light);
+    }
+    GetClass6B5CCMethods()->finalize((Class6B5CC *)self);
+}
 /* D_8006EFAC slot +0x040 (reset): mark the coordinate for recompute. */
 void func_80042814(Class6B5CC *self) {
     self->coord2->flg = 0;
