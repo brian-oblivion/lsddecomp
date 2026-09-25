@@ -1,4 +1,6 @@
-# func_80048CE0 -- MATCHED (4/4 words), round 81
+# GetDataSrc39094Methods -- MATCHED (4/4 words), round 81
+
+> Renamed from `func_80048CE0` on 2026-09-25 (tools/rename.py). Address 0x80048ce0.
 
 Round 81, runner echo. Unit `src/code_39094.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
@@ -12,7 +14,7 @@ the first build; whole-image SHA1 green.
 ## Source
 
 ```c
-void *func_80048CE0(void) {
+void *GetDataSrc39094Methods(void) {
     return D_80081940;
 }
 ```

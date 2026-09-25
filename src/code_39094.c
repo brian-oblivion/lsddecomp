@@ -23,8 +23,8 @@ typedef struct D_80081940Obj D_80081940Obj;
 typedef struct D_80081940Methods {
     CLASS6D430_SLOTS(D_80081940Obj, (D_80081940Obj *self));
     /* +0x07C */ void *slot7C;
-    /* +0x080 */ s32 (*slot80)();  /* func_80048BC0(self); unprototyped: DataSrc39094__SetFlag calls it with no argument */
-    /* +0x084 */ void (*releaseAlloc)();  /* func_80048C98(self); unprototyped: func_80048BC0 calls it with no argument */
+    /* +0x080 */ s32 (*slot80)();  /* DataSrc39094__LoadDataBlock(self); unprototyped: DataSrc39094__SetFlag calls it with no argument */
+    /* +0x084 */ void (*releaseAlloc)();  /* DataSrc39094__ReleaseDataBlock(self); unprototyped: DataSrc39094__LoadDataBlock calls it with no argument */
 } D_80081940Methods;
 
 /* The D_80081940 object: a Class6D430 data source with its own fields from
@@ -50,13 +50,13 @@ extern void srand(unsigned int seed);
 extern void *BMemPMgrFree(void *ptr);
 extern Class6D430Methods *GetActiveDataSourceMethods(void);
 extern void *BMemPMgrAlloc(s32 size);
-void *func_80048CE0(void);
+void *GetDataSrc39094Methods(void);
 
 /* allocator: new D_80081940 object */
 D_80081940Obj *New_DataSrc39094(void) {
     D_80081940Obj *obj = BMemPMgrAlloc(0x3C);
     if (obj != NULL) {
-        ((Class6D430Methods *)func_80048CE0())->ctor((Class6D430 *)obj);
+        ((Class6D430Methods *)GetDataSrc39094Methods())->ctor((Class6D430 *)obj);
         return obj;
     }
     return NULL;
@@ -64,7 +64,7 @@ D_80081940Obj *New_DataSrc39094(void) {
 /* slot +0x008 of D_80081940 (ctor) */
 void DataSrc39094__DataSrc39094(D_80081940Obj *self) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80048CE0();
+    self->methods = GetDataSrc39094Methods();
     self->unk30 = -1;
     self->unk2C = 0;
     self->unk2E = 0;
@@ -107,7 +107,7 @@ void DataSrc39094__CancelRequests(D_80081940Obj *self) {
     self->unk2A = 0;
 }
 /* slot +0x078 of D_80081940: start streaming a file into the buffer */
-void func_80048AAC(D_80081940Obj *self, char *name) {
+void DataSrc39094__LoadHeader(D_80081940Obj *self, char *name) {
     if (self->buffer != NULL && name != NULL) {
         if (self->unk2A == 0) {
             self->unk2C = 0;
@@ -120,7 +120,7 @@ void func_80048AAC(D_80081940Obj *self, char *name) {
         self->methods->read(self, self->buffer, 0xB358);
     }
 }
-void func_80048B78(D_80081940Obj *self) {
+void DataSrc39094__ReleaseHeader(D_80081940Obj *self) {
     self->methods->freeBuffer(self);
     self->unk2C = 0;
     self->unk30 = -1;
@@ -135,7 +135,7 @@ typedef struct StreamHdr {
 } StreamHdr;
 
 /* slot +0x080 of D_80081940: load the data block the header describes */
-s32 func_80048BC0(D_80081940Obj *self) {
+s32 DataSrc39094__LoadDataBlock(D_80081940Obj *self) {
     s32 size;
     if (((StreamHdr *)self->buffer)->hasData == 0) {
         return 0;
@@ -155,7 +155,7 @@ s32 func_80048BC0(D_80081940Obj *self) {
     return 1;
 }
 /* slot +0x084 of D_80081940 */
-void func_80048C98(D_80081940Obj *self) {
+void DataSrc39094__ReleaseDataBlock(D_80081940Obj *self) {
     self->unk2E = 0;
     if (self->unk34 != NULL) {
         self->unk34 = BMemPMgrFree(self->unk34);
@@ -173,10 +173,10 @@ extern s16 D_80086170[];
 extern s16 D_800819E8[];
 
 /* slot +0x088 of D_80081940 */
-void func_80048CD8(D_80081940Obj *self, s32 value) {
+void DataSrc39094__SetAutoLoadData(D_80081940Obj *self, s32 value) {
     self->unk38 = value;
 }
-void *func_80048CE0(void) {
+void *GetDataSrc39094Methods(void) {
     return D_80081940;
 }
 s32 func_80048CF0(void) {

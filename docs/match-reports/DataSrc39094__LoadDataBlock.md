@@ -1,4 +1,6 @@
-# func_80048BC0 -- MATCHED (54/54 words)
+# DataSrc39094__LoadDataBlock -- MATCHED (54/54 words)
+
+> Renamed from `func_80048BC0` on 2026-09-25 (tools/rename.py). Address 0x80048bc0.
 
 Round 82, runner echo (third echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the third build; whole-image SHA1 green, funcdiff 54/54.
@@ -28,7 +30,7 @@ typedef struct StreamHdr {
 } StreamHdr;
 
 /* slot +0x080 of D_80081940: load the data block the header describes */
-s32 func_80048BC0(D_80081940Obj *self) {
+s32 DataSrc39094__LoadDataBlock(D_80081940Obj *self) {
     s32 size;
     if (((StreamHdr *)self->buffer)->hasData == 0) {
         return 0;

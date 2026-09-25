@@ -1,4 +1,6 @@
-# func_80048CD8 -- MATCHED (2/2 words), round 81
+# DataSrc39094__SetAutoLoadData -- MATCHED (2/2 words), round 81
+
+> Renamed from `func_80048CD8` on 2026-09-25 (tools/rename.py). Address 0x80048cd8.
 
 Round 81, runner echo. Unit `src/code_39094.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
@@ -31,7 +33,7 @@ extern const char D_800113DC[];
 extern s16 D_80086170[];
 
 /* slot +0x088 of D_80081940 */
-void func_80048CD8(D_80081940Obj *self, s32 value) {
+void DataSrc39094__SetAutoLoadData(D_80081940Obj *self, s32 value) {
     self->unk38 = value;
 }
 ```

@@ -9,7 +9,7 @@ Byte-exact on the first build; whole-image SHA1 green, funcdiff 45/45.
 
 Slot +0x064 (setFlag override) of D_80081940. State `unk2A` 9 with flag bit
 0x80: clear state, `unk2C = 1`, and if `unk38` call slot +0x080
-(func_80048BC0). State 10 with bit 0x80: `unk2E = 1`, clear state. Then the
+(DataSrc39094__LoadDataBlock). State 10 with bit 0x80: `unk2E = 1`, clear state. Then the
 active data source's setFlag(self).
 
 ## Source
@@ -39,9 +39,9 @@ void DataSrc39094__SetFlag(D_80081940Obj *self) {
 
 The local view's `D_80081940Methods.slot80` was retyped from `void *` to
 `void (*)(void)` (local to `src/code_39094.c`, no other reader), and later in
-the same session to the unprototyped `s32 (*)()` once func_80048BC0 (its
+the same session to the unprototyped `s32 (*)()` once DataSrc39094__LoadDataBlock (its
 occupant, which returns s32 and reads `self`) was matched; still byte-exact. Retail does
 not set `$a0` before `jalr` on slot +0x080 even though its occupant
-func_80048BC0 surely reads `self`: `$a0` still holds `self` from entry, but
+DataSrc39094__LoadDataBlock surely reads `self`: `$a0` still holds `self` from entry, but
 GCC 2.6.3 would have emitted `move a0,s0` for an explicit argument (as it
 does for the setFlag call), so the source call has no arguments.

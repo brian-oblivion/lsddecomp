@@ -1,4 +1,6 @@
-# func_80048B78 -- MATCHED (18/18 words)
+# DataSrc39094__ReleaseHeader -- MATCHED (18/18 words)
+
+> Renamed from `func_80048B78` on 2026-09-25 (tools/rename.py). Address 0x80048b78.
 
 Round 82, runner echo (second echo session), 2026-09-25. Unit `code_39094`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
@@ -15,7 +17,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/Class6D430.h`.
 
 ```c
-void func_80048B78(D_80081940Obj *self) {
+void DataSrc39094__ReleaseHeader(D_80081940Obj *self) {
     self->methods->freeBuffer(self);
     self->unk2C = 0;
     self->unk30 = -1;
@@ -26,7 +28,7 @@ void func_80048B78(D_80081940Obj *self) {
 ## Notes
 
 - The unit now has a local `D_80081940Methods` view (CLASS6D430_SLOTS plus
-  slots +0x07C..+0x084, +0x084 = func_80048C98) and the object's
+  slots +0x07C..+0x084, +0x084 = DataSrc39094__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `func_80048CFC`'s local definition gained an unused second parameter

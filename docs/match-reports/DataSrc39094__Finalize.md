@@ -9,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Slot +0x00C (finalize) of D_80081940: calls its own slot +0x084 (func_80048C98, frees the +0x34 allocation), then the active data source's `finalize(self)` via GetActiveDataSourceMethods().
+Slot +0x00C (finalize) of D_80081940: calls its own slot +0x084 (DataSrc39094__ReleaseDataBlock, frees the +0x34 allocation), then the active data source's `finalize(self)` via GetActiveDataSourceMethods().
 
 ## Source
 
@@ -28,7 +28,7 @@ void DataSrc39094__Finalize(D_80081940Obj *self) {
 ## Notes
 
 - The unit now has a local `D_80081940Methods` view (CLASS6D430_SLOTS plus
-  slots +0x07C..+0x084, +0x084 = func_80048C98) and the object's
+  slots +0x07C..+0x084, +0x084 = DataSrc39094__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `func_80048CFC`'s local definition gained an unused second parameter

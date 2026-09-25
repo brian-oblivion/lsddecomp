@@ -1,4 +1,6 @@
-# func_80048C98 -- MATCHED (16/16 words)
+# DataSrc39094__ReleaseDataBlock -- MATCHED (16/16 words)
+
+> Renamed from `func_80048C98` on 2026-09-25 (tools/rename.py). Address 0x80048c98.
 
 Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
@@ -17,7 +19,7 @@ Method slot +0x084 of D_80081940 (table word at 0x800819C4). Clears `unk2E`, the
 extern void *BMemPMgrFree(void *ptr);
 
 /* slot +0x084 of D_80081940 */
-void func_80048C98(D_80081940Obj *self) {
+void DataSrc39094__ReleaseDataBlock(D_80081940Obj *self) {
     self->unk2E = 0;
     if (self->unk34 != NULL) {
         self->unk34 = BMemPMgrFree(self->unk34);

@@ -9,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Allocator for the D_80081940 object: BMemPMgrAlloc(0x3C), and when non-NULL runs slot +0x008 (ctor) of the table func_80048CE0 returns (D_80081940). Delta's round-82 allocator shape (`if (obj != NULL) { ctor; return obj; } return NULL;`) matches as written.
+Allocator for the D_80081940 object: BMemPMgrAlloc(0x3C), and when non-NULL runs slot +0x008 (ctor) of the table GetDataSrc39094Methods returns (D_80081940). Delta's round-82 allocator shape (`if (obj != NULL) { ctor; return obj; } return NULL;`) matches as written.
 
 ## Source
 
@@ -21,7 +21,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 D_80081940Obj *New_DataSrc39094(void) {
     D_80081940Obj *obj = BMemPMgrAlloc(0x3C);
     if (obj != NULL) {
-        ((Class6D430Methods *)func_80048CE0())->ctor((Class6D430 *)obj);
+        ((Class6D430Methods *)GetDataSrc39094Methods())->ctor((Class6D430 *)obj);
         return obj;
     }
     return NULL;
@@ -32,7 +32,7 @@ D_80081940Obj *New_DataSrc39094(void) {
 ## Notes
 
 - The unit now has a local `D_80081940Methods` view (CLASS6D430_SLOTS plus
-  slots +0x07C..+0x084, +0x084 = func_80048C98) and the object's
+  slots +0x07C..+0x084, +0x084 = DataSrc39094__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `func_80048CFC`'s local definition gained an unused second parameter

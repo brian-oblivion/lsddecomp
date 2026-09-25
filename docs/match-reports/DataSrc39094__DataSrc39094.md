@@ -9,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Slot +0x008 (ctor) of D_80081940: runs the active data source's ctor on self, installs its own table (func_80048CE0), initialises +0x30=-1, +0x2C/+0x2E/+0x32=0, +0x34=NULL, +0x38=1, then allocates a 0xB358-byte file buffer into Class6D430's `buffer`, setting `bufferSize` only on success. Written in natural order; the scheduler produced retail's store order.
+Slot +0x008 (ctor) of D_80081940: runs the active data source's ctor on self, installs its own table (GetDataSrc39094Methods), initialises +0x30=-1, +0x2C/+0x2E/+0x32=0, +0x34=NULL, +0x38=1, then allocates a 0xB358-byte file buffer into Class6D430's `buffer`, setting `bufferSize` only on success. Written in natural order; the scheduler produced retail's store order.
 
 ## Source
 
@@ -20,7 +20,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 /* slot +0x008 of D_80081940 (ctor) */
 void DataSrc39094__DataSrc39094(D_80081940Obj *self) {
     GetActiveDataSourceMethods()->ctor((Class6D430 *)self);
-    self->methods = func_80048CE0();
+    self->methods = GetDataSrc39094Methods();
     self->unk30 = -1;
     self->unk2C = 0;
     self->unk2E = 0;
@@ -38,7 +38,7 @@ void DataSrc39094__DataSrc39094(D_80081940Obj *self) {
 ## Notes
 
 - The unit now has a local `D_80081940Methods` view (CLASS6D430_SLOTS plus
-  slots +0x07C..+0x084, +0x084 = func_80048C98) and the object's
+  slots +0x07C..+0x084, +0x084 = DataSrc39094__ReleaseDataBlock) and the object's
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `func_80048CFC`'s local definition gained an unused second parameter
