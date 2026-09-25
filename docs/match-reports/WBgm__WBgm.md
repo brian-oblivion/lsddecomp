@@ -11,15 +11,38 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
 - **Levers:** none; the `lw v0,0(s0)` reload after the `sw` to `self->methods` falls out of writing `self->methods->...` plainly.
-- **Name:** kept as the bare `func_` name (the class has no confirmed name;
-  rodata `D_80010FEC` calls the code around it `WBgmHandleMonitorEvent`, a
-  lead for naming the class `WBgm...`, not evidence yet).
+- **Name:** renamed round 82 to `WBgm__WBgm` (see `## Naming` below).
+
+## Naming
+
+`WBgm__WBgm`, tier A. the ctor slot (+0x008); matches `Class__Class` convention (BasicClass.h). Body is the whole object's field init, confirmed by every setter it calls.
+
+## Proposed names for symbols defined outside this unit
+
+Not renamed here -- both are defined in a unit this round did not touch, and
+one of them (`code_10ee0.c`) has a live matching runner this round
+(`func_80020C5C`, per the round-82 broadcast: alpha finished it just before
+this pass started). Recorded as proposals for the head to apply with
+`tools/rename.py` once safe.
+
+- `func_80020C5C` (defined `src/code_10ee0.c`, returns `Class6C070 *`): called
+  here only as `addChild`/`removeChild`'s argument, registering `WBgm` as a
+  child of that singleton for lifecycle notification -- the same pattern
+  `class_3ac78.c` and `code_2bb9c.c` use it for. No WBgm-specific evidence for
+  its own name; not proposing one.
+- `func_800422CC` (defined `src/code_322b4.c`, an un-matched `INCLUDE_ASM`
+  stall, signature `SeqData *func_800422CC(s32 arg)`): the only function that
+  produces a `SeqData` object (the +0x10 child this unit reads `addr`/`loaded`
+  from). A name like `GetSeqData`/`LoadSeqData` is plausible from this call
+  site alone but not confirmed -- the function itself is still assembly, so
+  its own body is not available as evidence. Low confidence; flagging only
+  because it is the sole producer of a type this unit named.
 
 ## View changes (additive, unit-local)
 
-Round 81 delta extended echo's `SeqObj` view in `src/code_2a0e0.c`: the ctor
-slot's parameter list is now `(SeqObj *self, s32 vabArg, s32 seqArg, s32
-autoPlay)` (was `(SeqObj *self)`; no matched function called it), slots
+Round 81 delta extended echo's `WBgm` view in `src/code_2a0e0.c`: the ctor
+slot's parameter list is now `(WBgm *self, s32 vabArg, s32 seqArg, s32
+autoPlay)` (was `(WBgm *self)`; no matched function called it), slots
 +0x048..+0x060 are declared, and +0x0C / +0x10 are typed as the local views
 `SeqVab` / `SeqData` instead of `void *`. Every other function in the unit
 still matches after the change.
@@ -27,16 +50,16 @@ still matches after the change.
 ## Source
 
 ```c
-void WBgm__WBgm(SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
+void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_WBgm();
-    self->unkC = NULL;
-    self->unk10 = NULL;
+    self->vab = NULL;
+    self->seqData = NULL;
     self->seqId = 0;
-    self->state = 0;
+    self->openState = 0;
     self->paused = 0;
     self->playing = 0;
-    self->unk20 = autoPlay;
+    self->autoPlay = autoPlay;
     gWBgmActive = 1;
     self->methods->setSeq(self, seqArg);
     self->methods->setVab(self, vabArg);
@@ -51,20 +74,20 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 
 /* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
-typedef struct SeqObj SeqObj;
-typedef struct SeqObjMethods SeqObjMethods;
+typedef struct WBgm WBgm;
+typedef struct WBgmMethods WBgmMethods;
 
-struct SeqObjMethods {
-    BASICCLASS_SLOTS(SeqObj, (SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay)); /* WBgm__WBgm */
-    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* WBgm__Update */
-    /* +0x044 */ void (*play)(SeqObj *self);                       /* WBgm__Play */
-    /* +0x048 */ void (*stop)(SeqObj *self);                       /* WBgm__Stop */
-    /* +0x04C */ void (*pause)(SeqObj *self);                      /* WBgm__Pause */
-    /* +0x050 */ void (*resume)(SeqObj *self);                     /* WBgm__Resume */
-    /* +0x054 */ void (*setVol)(SeqObj *self, s16 l, s16 r);       /* WBgm__SetVol */
-    /* +0x058 */ void (*crescendo)(SeqObj *self, s16 v, s32 s);    /* WBgm__Crescendo */
-    /* +0x05C */ void (*setSeq)(SeqObj *self, s32 arg);            /* WBgm__SetSeq */
-    /* +0x060 */ void (*setVab)(SeqObj *self, s32 arg);            /* WBgm__SetVab */
+struct WBgmMethods {
+    BASICCLASS_SLOTS(WBgm, (WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay)); /* WBgm__WBgm */
+    /* +0x040 */ void (*update)(WBgm *self, s32 arg1, s32 arg2); /* WBgm__Update */
+    /* +0x044 */ void (*play)(WBgm *self);                       /* WBgm__Play */
+    /* +0x048 */ void (*stop)(WBgm *self);                       /* WBgm__Stop */
+    /* +0x04C */ void (*pause)(WBgm *self);                      /* WBgm__Pause */
+    /* +0x050 */ void (*resume)(WBgm *self);                     /* WBgm__Resume */
+    /* +0x054 */ void (*setVol)(WBgm *self, s16 l, s16 r);       /* WBgm__SetVol */
+    /* +0x058 */ void (*crescendo)(WBgm *self, s16 v, s32 s);    /* WBgm__Crescendo */
+    /* +0x05C */ void (*setSeq)(WBgm *self, s32 arg);            /* WBgm__SetSeq */
+    /* +0x060 */ void (*setVab)(WBgm *self, s32 arg);            /* WBgm__SetVab */
 };
 
 /* What +0x0C holds: a New_VabStreamObj object. Only the fields read here. */
@@ -85,16 +108,16 @@ typedef struct SeqData {
     /* +0x02C */ s32 loaded;
 } SeqData;
 
-struct SeqObj {
-    BASICCLASS_FIELDS(SeqObjMethods);
-    /* +0x00C */ SeqVab *unkC;
-    /* +0x010 */ SeqData *unk10;
+struct WBgm {
+    BASICCLASS_FIELDS(WBgmMethods);
+    /* +0x00C */ SeqVab *vab;
+    /* +0x010 */ SeqData *seqData;
     /* +0x014 */ s16 seqId;
     /* +0x016 */ u8 pad16[0x1A - 0x16];
-    /* +0x01A */ u16 state;
+    /* +0x01A */ u16 openState;
     /* +0x01C */ u16 paused;
     /* +0x01E */ u16 playing;
-    /* +0x020 */ s32 unk20;
+    /* +0x020 */ s32 autoPlay;
 };
 
 /* libsnd (LIBSND.H) */
@@ -113,12 +136,12 @@ extern SeqData *func_800422CC(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-SeqObjMethods *Get_vtable_WBgm(void);
+WBgmMethods *Get_vtable_WBgm(void);
 
 extern s32 func_8002CC28(void);
-s32 WBgm__HandleMonitorEvent(SeqObj *self);
+s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern SeqObjMethods D_8006E48C;
+extern WBgmMethods D_8006E48C;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```

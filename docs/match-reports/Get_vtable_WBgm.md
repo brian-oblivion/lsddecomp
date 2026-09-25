@@ -10,13 +10,16 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 0
   insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`). No levers were needed.
-- **Name:** kept as the bare `func_` name. The class (D_8006E48C, a SEQ
-  player whose ctor calls New_VabStreamObj) has no confirmed name yet.
+- **Name:** renamed round 82 to `Get_vtable_WBgm` (see `## Naming` below).
+
+## Naming
+
+`Get_vtable_WBgm`, tier A. matches the `Get_vtable_<Class>` convention (`Get_vtable_BasicClass`, BasicClass.h); returns `&D_8006E48C`, the table this class installs in its own ctor.
 
 ## Source
 
 ```c
-SeqObjMethods *Get_vtable_WBgm(void) {
+WBgmMethods *Get_vtable_WBgm(void) {
     return &D_8006E48C;
 }
 ```
@@ -29,25 +32,25 @@ The unit-local view it needs, from the top of `src/code_2a0e0.c`:
 
 /* Local view of D_8006E48C's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */
-typedef struct SeqObj SeqObj;
-typedef struct SeqObjMethods SeqObjMethods;
+typedef struct WBgm WBgm;
+typedef struct WBgmMethods WBgmMethods;
 
-struct SeqObjMethods {
-    BASICCLASS_SLOTS(SeqObj, (SeqObj *self));
-    /* +0x040 */ void (*update)(SeqObj *self, s32 arg1, s32 arg2); /* WBgm__Update */
-    /* +0x044 */ void (*play)(SeqObj *self);                       /* WBgm__Play */
+struct WBgmMethods {
+    BASICCLASS_SLOTS(WBgm, (WBgm *self));
+    /* +0x040 */ void (*update)(WBgm *self, s32 arg1, s32 arg2); /* WBgm__Update */
+    /* +0x044 */ void (*play)(WBgm *self);                       /* WBgm__Play */
 };
 
-struct SeqObj {
-    BASICCLASS_FIELDS(SeqObjMethods);
-    /* +0x00C */ void *unkC;
-    /* +0x010 */ void *unk10;
+struct WBgm {
+    BASICCLASS_FIELDS(WBgmMethods);
+    /* +0x00C */ void *vab;
+    /* +0x010 */ void *seqData;
     /* +0x014 */ s16 seqId;
     /* +0x016 */ u8 pad16[0x1A - 0x16];
-    /* +0x01A */ u16 state;
+    /* +0x01A */ u16 openState;
     /* +0x01C */ u16 paused;
     /* +0x01E */ u16 playing;
-    /* +0x020 */ s32 unk20;
+    /* +0x020 */ s32 autoPlay;
 };
 
 /* libsnd (LIBSND.H) */
@@ -60,9 +63,9 @@ extern void SsSeqSetCrescendo(short, short, long);
 extern void SsSeqClose(short);
 
 extern s32 func_8002CC28(void);
-s32 WBgm__HandleMonitorEvent(SeqObj *self);
+s32 WBgm__HandleMonitorEvent(WBgm *self);
 
-extern SeqObjMethods D_8006E48C;
+extern WBgmMethods D_8006E48C;
 extern s32 gWBgmActive;
 extern u8 gSsSizeTableBuf[];
 ```
