@@ -76,7 +76,8 @@ INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800474C8);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047574);
 void func_800475C8(CdStreamObj *self) {
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800475D0);
+void func_800475D0(CdStreamObj *self) {
+}
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800475D8);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047638);
 INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047694);
