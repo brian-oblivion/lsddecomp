@@ -51,7 +51,15 @@ extern Class6D430Methods *GetActiveDataSourceMethods(void);
 extern void *BMemPMgrAlloc(s32 size);
 void *func_80048CE0(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048894);
+/* allocator: new D_80081940 object */
+D_80081940Obj *func_80048894(void) {
+    D_80081940Obj *obj = BMemPMgrAlloc(0x3C);
+    if (obj != NULL) {
+        ((Class6D430Methods *)func_80048CE0())->ctor((Class6D430 *)obj);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800488E4);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048960);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_800489B4);
