@@ -700,7 +700,80 @@ void func_80044380(Obj6F2C4 *self, s32 set, Ratio44380 *src) {
         self->unk64 += v;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_8004441C);
+/* D_8006F2C4 +0x048: the two ratios of `src` (+0 over +2, +4 over +6) in
+ * 20.12 fixed point become the GsBG's scale -- stored when `set` (0x1000
+ * for a zero divisor, at most 30000), else added, a sum over 30000 giving
+ * 30000, or 1 when either term of that ratio was negative. */
+typedef struct Scale4441C {
+    /* +0x00 */ s16 xnum;
+    /* +0x02 */ s16 xden;
+    /* +0x04 */ s16 ynum;
+    /* +0x06 */ s16 yden;
+} Scale4441C;
+
+void func_8004441C(Obj6F2C4 *self, s32 set, Scale4441C *src) {
+    s32 negX;
+    s32 negY;
+    s32 den;
+    s16 sx;
+    s16 sy;
+    s32 v;
+
+    negX = 0;
+    negY = 0;
+    if (src->xnum < 0 || src->xden < 0) {
+        negX = 1;
+    }
+    if (src->ynum < 0 || src->yden < 0) {
+        negY = 1;
+    }
+    den = src->xden;
+    if (den != 0) {
+        sx = ((src->xnum / den) << 12) + (((src->xnum % den) << 12) / den);
+    }
+    if (src->yden != 0) {
+        sy = ((src->ynum / src->yden) << 12) + (((src->ynum % src->yden) << 12) / src->yden);
+    }
+    if (set) {
+        if (den == 0) {
+            self->scalex = 0x1000;
+        } else {
+            v = sx;
+            if (v > 30000) {
+                v = 30000;
+            }
+            self->scalex = v;
+        }
+        if (src->yden == 0) {
+            self->scaley = 0x1000;
+        } else {
+            v = sy;
+            if (v > 30000) {
+                v = 30000;
+            }
+            self->scaley = v;
+        }
+    } else {
+        if (self->scalex + sx > 30000) {
+            if (negX) {
+                self->scalex = 1;
+            } else {
+                self->scalex = 30000;
+            }
+        } else {
+            self->scalex = sx + self->scalex;
+        }
+        if (self->scaley + sy > 30000) {
+            if (negY) {
+                self->scaley = 1;
+            } else {
+                self->scaley = 30000;
+            }
+        } else {
+            self->scaley = sy + self->scaley;
+        }
+    }
+}
 /* D_8006F2C4 (a Class6B5CC subclass) +0x0B8: when `enable`, copy a
  * three-byte vector to +0x54. */
 void func_8004464C(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
