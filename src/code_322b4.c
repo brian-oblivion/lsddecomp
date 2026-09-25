@@ -29,7 +29,9 @@ typedef struct D_8006EF50Obj {
     s32 unk18; /* +0x018, cleared by func_800425D8 */
 } D_8006EF50Obj;
 struct D_8006EF50Methods {
-    u8 pad00[0x40];
+    u8 pad00[0x30];
+    void (*notifyParents)(D_8006EF50Obj *self, s32 event); /* +0x030 = func_80042550 */
+    u8 pad34[0x40 - 0x34];
     void (*reset)(D_8006EF50Obj *self, s32 a1); /* +0x040 = func_800425D8 */
 };
 
@@ -231,7 +233,21 @@ void func_800425D8(D_8006EF50Obj *self, s32 a1) {
     self->unk10 = 0;
     self->unk18 = 0;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800425EC);
+/* D_8006EF50 slot +0x044: notify event 4 if unk14, else 3 if unk10, else
+ * count unkC up and notify 2. */
+void func_800425EC(D_8006EF50Obj *self) {
+    s32 event;
+
+    if (self->unk14 != 0) {
+        event = 4;
+    } else if (self->unk10 != 0) {
+        event = 3;
+    } else {
+        self->unkC++;
+        event = 2;
+    }
+    self->methods->notifyParents(self, event);
+}
 /* D_8006EF50 slot +0x048. */
 s32 func_8004264C(D_8006EF50Obj *self) {
     return self->unkC;
