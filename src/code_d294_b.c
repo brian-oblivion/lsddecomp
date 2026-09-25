@@ -89,13 +89,13 @@ void Class6B5CC__GetRotMatrix(Class6B5CC *self, s32 a1, s32 a2) {
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
  * func_8001F3A4(self->model) reports true, fills a stack buffer through
  * this class's own +0x8C slot (Class6B5CC__ReadUnk20Data, already matched in this
- * unit -- fills it via func_8001F51C(self->model, dest)) then forwards
+ * unit -- fills it via TmdModel__GetHull(self->model, dest)) then forwards
  * that same buffer, retyped as a GenericCountList_d294, into +0x90
  * (Class6B5CC__TransformAndNotifyParents, also already matched in this unit), with the original
  * a1 passed through as Class6B5CC__TransformAndNotifyParents's own a2. */
 void Class6B5CC__NotifyIfUnk20Active(Class6B5CC *self, s32 a1) {
     /* Sized to reproduce retail's own frame (0x58): Class6B5CC__ReadUnk20Data's own
-     * target (func_8001F51C, PsyQ, asm/psyq_fa50.s, not
+     * target (TmdModel__GetHull, PsyQ, asm/psyq_fa50.s, not
      * decompiled here) fills fields out past +0x32 of its own `dest`
      * argument, so the true destination struct is bigger than the 8 bytes
      * GenericCountList_d294 alone would reserve -- not derived beyond its
@@ -121,11 +121,11 @@ void Class6B5CC__NotifyIfUnk20Active(Class6B5CC *self, s32 a1) {
 
 /* Forwards self->model (still opaque, retyped `void *` this round -- see
  * include/code_d294.h) and its own 2nd argument straight through to
- * func_8001F51C, untouched. func_8001F51C's own body (psyq_fa50.s)
+ * TmdModel__GetHull, untouched. TmdModel__GetHull's own body (psyq_fa50.s)
  * has no deliberate return value -- see the extern's own comment -- so this
- * wrapper is void, not `return func_8001F51C(...)`. */
+ * wrapper is void, not `return TmdModel__GetHull(...)`. */
 void Class6B5CC__ReadUnk20Data(Class6B5CC *self, void *dest) {
-    func_8001F51C(self->model, dest);
+    TmdModel__GetHull(self->model, dest);
 }
 
 /* Copies a1's own count*8 elements into self->unk14->unk24 (via

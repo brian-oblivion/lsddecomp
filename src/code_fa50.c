@@ -33,7 +33,7 @@ typedef struct Box_fa50 {
     Vec3_fa50 max;          /* +0x006 */
 } Box_fa50;
 
-/* A box with a leading word: func_8001F51C's local. */
+/* A box with a leading word: TmdModel__GetHull's local. */
 typedef struct TypedBox_fa50 {
     s32 type;               /* +0x000 */
     Box_fa50 box;           /* +0x004 */
@@ -44,7 +44,7 @@ typedef struct Corners_fa50 {
     Vec3_fa50 f[2][4];
 } Corners_fa50;
 
-/* A counted list of boxes' corners; func_8001F51C writes a list of one. */
+/* A counted list of boxes' corners; TmdModel__GetHull writes a list of one. */
 typedef struct Hull_fa50 {
     s32 type;               /* +0x000, the count */
     Vec3_fa50 v[8];         /* +0x004 */
@@ -209,7 +209,7 @@ void UpdateTmdModelBoundsBuffer(Class6BEA0 *self) {
 void *GetTmdModelBoundsBuffer(void *self, s32 i) {
     return gTmdModelBoundsBuf;
 }
-void func_8001F51C(Class6BEA0 *self, Hull_fa50 *out) {
+void TmdModel__GetHull(Class6BEA0 *self, Hull_fa50 *out) {
     TypedBox_fa50 b;
 
     TmdModel__ComputeBounds(self, &b.box);

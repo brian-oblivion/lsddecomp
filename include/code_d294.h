@@ -133,19 +133,19 @@ extern u8 SCALE_ONE[0xC];
 extern void GsInitCoordinate2(s32 arg0, void *dest);
 
 
-/* func_8001F51C (asm/psyq_fa50.s, Psy-Q library, not game code):
+/* TmdModel__GetHull (asm/psyq_fa50.s, Psy-Q library, not game code):
  * fills a caller-supplied struct (its own arg1) from a small on-stack
  * buffer via TmdModel__ComputeBounds (its own arg0 forwarded straight through). Its
  * own last write to $v0 is leftover from an unrelated `lhu` a few
  * instructions earlier, not a deliberate return value -- read as `void`.
- * Class6B5CC__ReadUnk20Data (this unit, round 12) calls it as `func_8001F51C(self->unk20,
+ * Class6B5CC__ReadUnk20Data (this unit, round 12) calls it as `TmdModel__GetHull(self->unk20,
  * dest)`; declared here only with the opaque `void *` shape that call site
  * needs. */
-extern void func_8001F51C(void *arg0, void *dest);
+extern void TmdModel__GetHull(void *arg0, void *dest);
 
 /* func_8001F3A4 (asm/psyq_fa50.s, Psy-Q library, not game code): a
  * predicate over the same opaque `self->unk20` pointer Class6B5CC__ReadUnk20Data and
- * func_8001F51C above already treat as `void *` -- Class6B5CC__NotifyIfUnk20Active (round 13,
+ * TmdModel__GetHull above already treat as `void *` -- Class6B5CC__NotifyIfUnk20Active (round 13,
  * this unit) tests its `$v0` result for non-zero, so declared `s32`
  * (boolean-ish) here. Not decompiled in this project. */
 extern s32 func_8001F3A4(void *arg0);
