@@ -289,7 +289,7 @@ void func_8001F66C(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
  * VECTOR locals are scratch named by their frame slot; v60 is never used but
  * holds retail's slot, and dist is an 8-byte array because retail keeps it in
  * memory at the slot after uF0. */
-s32 func_8001F8B8(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
+s32 TmdModel__RaycastFaces(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
     Vec3_fa50 tri[4];
     Vec4_fa50 plane;
     Ray_fa50 ray;

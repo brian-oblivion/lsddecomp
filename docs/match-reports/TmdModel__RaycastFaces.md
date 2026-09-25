@@ -1,4 +1,6 @@
-# func_8001F8B8 -- MATCHED (486/486 words), round 82
+# TmdModel__RaycastFaces -- MATCHED (486/486 words), round 82
+
+> Renamed from `func_8001F8B8` on 2026-09-25 (tools/rename.py). Address 0x8001f8b8.
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
@@ -30,7 +32,7 @@ extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
 extern s32 SquareRoot0(s32 a);
 /* TmdPrim_fa50 / Class6BEA0 / TmdModel__NextPrimitive: see TmdModel__NextPrimitive.md */
 
-s32 func_8001F8B8(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
+s32 TmdModel__RaycastFaces(Class6BEA0 *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
     Vec3_fa50 tri[4];
     Vec4_fa50 plane;
     Ray_fa50 ray;

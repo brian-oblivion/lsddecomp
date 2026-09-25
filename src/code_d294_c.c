@@ -121,13 +121,13 @@ void Class6B5CC__UnlinkModel(Class6B5CC *self) {
     self->model = 0;
 }
 
-extern s32 func_8001F8B8(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
+extern s32 TmdModel__RaycastFaces(void *arg0, void *arg1, void *arg2, s32 arg3, void *arg4, s16 *arg5);
 extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
 
 /* MATCHED round 57 (revisit) -- see docs/match-reports/func_8001E7BC.md.
  *
  * Kept as `func_8001E7BC` on purpose (track 3, tier C): the whole second
- * half hangs off `func_8001F8B8`, which is still undecompiled Psy-Q
+ * half hangs off `TmdModel__RaycastFaces`, which is still undecompiled Psy-Q
  * (`psyq_fa50`), so any verb for the function as a whole would be a guess.
  * What it DOES is settled. First it maintains the object's world
  * translation: `unk14->unk38` is GsCOORDINATE2.workm.t, and the guarded
@@ -135,7 +135,7 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  * coord.t, walking the `self->unkC` owner list. Then it takes the target
  * point `arg2` relative to that world translation, rotates the delta into
  * the object's own frame through slotA4 (Class6B5CC__ComposeAndApplyRotation, the
- * inverse-chain matrix), and probes `func_8001F8B8` twice -- Y minus 0x400
+ * inverse-chain matrix), and probes `TmdModel__RaycastFaces` twice -- Y minus 0x400
  * and, on failure, Y plus 0x400, i.e. -90 and +90 degrees in BAM. On
  * success `arg1` receives `buf28 - buf18` and the function returns 1.
  *
@@ -209,12 +209,12 @@ s32 func_8001E7BC(Class6B5CC *self, s32 *arg1, s32 *arg2) {
         delta[0] = buf18[0];
         delta[1] = (u16)buf18[1] - 0x400;
         delta[2] = buf18[2];
-        if (func_8001F8B8(self->model, buf30, buf28, 0, buf18, delta)) {
+        if (TmdModel__RaycastFaces(self->model, buf30, buf28, 0, buf18, delta)) {
             SubVec3S16(arg1, buf18, buf28);
             return 1;
         }
         delta[1] = (u16)buf18[1] + 0x400;
-        if (func_8001F8B8(self->model, buf30, buf28, 0, buf18, delta)) {
+        if (TmdModel__RaycastFaces(self->model, buf30, buf28, 0, buf18, delta)) {
             SubVec3S16(arg1, buf18, buf28);
             return 1;
         }
@@ -227,7 +227,7 @@ s32 func_8001E7BC(Class6B5CC *self, s32 *arg1, s32 *arg2) {
  * argument, the value subtracted FROM is the 3rd. What the two vectors
  * represent is not established -- func_8001E7BC is the only known caller,
  * and it passes `buf18` (slotA4's rotated delta) as `from` and `buf28`
- * (func_8001F8B8's own output) as `to`. */
+ * (TmdModel__RaycastFaces's own output) as `to`. */
 void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
     dest[0] = to[0] - from[0];
     dest[1] = to[1] - from[1];

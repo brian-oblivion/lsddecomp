@@ -359,7 +359,7 @@ s32 Class6B5CC__CheckBoundsOverlap(Class6B5CC *self, void *arg1, Vec3S16_d294 *d
  * the D_8008A838 gate is two arms that each set the bit, so loop.c sees two
  * equal constant-1 loads (savings 2) and hoists the 1 into $s1; Part 1 walks
  * `p`, `v` and `hi` as pointers. */
-extern s32 func_8001F8B8(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
+extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 D_8008A838;
 
 s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d294 *diff, AttachCornerList_d294b *list) {
@@ -396,7 +396,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
     for (i = 0; i < count1; i++) {
         plane = GetTmdModelBoundsBuffer(self->model, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
-            if (func_8001F8B8(self->model, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
+            if (TmdModel__RaycastFaces(self->model, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
                 if (D_8008A838 == 0) {
                     self->hitMask |= 1 << i;
                 } else if (outWord >= 0x201) {
@@ -423,7 +423,7 @@ s32 Class6B5CC__ClassifyAgainstPlanes(Class6B5CC *self, s32 *outFlag, Vec3S16_d2
             for (m = 0; m < 4; m++) {
                 if (m == 1 || m == 2) {
                     if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, v, v + 4)) {
-                        if (func_8001F8B8(self->model, &bigConst, diff, &outWord, v, v + 4)) {
+                        if (TmdModel__RaycastFaces(self->model, &bigConst, diff, &outWord, v, v + 4)) {
                             if (outWord >= 0x201) {
                                 self->hitMask |= 1 << i;
                                 *outFlag |= 1 << k;
