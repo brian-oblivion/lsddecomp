@@ -251,9 +251,22 @@ def sdk_surface(info, units):
     minus the ones the park rule has closed."""
     info = {n: (a, 0) for n, a in all_symbols().items()} or info
     referenced = set()
+    queued = set()
     for c in srcpath.src_files():
         live = progress.strip_dead_code(c.read_text(errors="replace"))
         referenced.update(re.findall(r"\b([A-Za-z_]\w*)\s*\(", live))
+        queued.update(progress.INCLUDE_RE.findall(live))
+    # Game code still INCLUDE_ASM calls the SDK too, and its call sites become
+    # C as track 1 matches it. Revision 18 carved 299 such functions calling
+    # 14 still-func_ Sony functions that no C call site showed yet: read their
+    # `jal`s from the image so track 2 sees them now, not one match at a time.
+    import gameinsdk
+    img = gameinsdk.Image()
+    by_name = {n: a for a, n, _ in img.funcs}
+    for fn in queued:
+        a = by_name.get(fn)
+        if a is not None and not progress.is_library(a):
+            referenced.update(img.name[t] for t in img.calls[a])
     named, unnamed, parked = [], [], []
     closed = parked_sdk_names()
     sony = sdk_in_game_names()
@@ -415,6 +428,11 @@ def track1_status(st, fresh, stalled):
         return t["status"], t.get("reason", "")
     if fresh == 0 and stalled == 0:
         return "done", "queue empty"
+    # The stop rule below bounds STALL matching. Fresh ground is never parked
+    # by it: revision 18 carved 299 fresh game functions out of psyq_*
+    # segments after calibration had parked the (then empty-of-fresh) track.
+    if fresh:
+        return "open", f"{fresh} fresh function(s): fresh ground is not subject to the stall stop rule"
     per = calibration_tally(st)
     need_att = st["stop_rule"].get("attempts_per_model", 6)
     need = st["stop_rule"]["min_matches"]
@@ -450,9 +468,14 @@ def collect(st):
 
     # track 3
     done = st["tracks"]["3"]["units_done"]
-    todo3 = sorted((u for u in units if u not in done and (units[u]["defs"] or units[u]["include_asm"])),
+    # A unit with FRESH ground is track 1's until it is matched: naming it
+    # now would name INCLUDE_ASM, and counting it would move the 80% gate
+    # that opens track 4 (revision 18 carved eleven all-fresh units at once).
+    fresh_units = {u for u, m in pj["units"].items() if m.get("fresh")}
+    todo3 = sorted((u for u in units if u not in done and u not in fresh_units
+                    and (units[u]["defs"] or units[u]["include_asm"])),
                    key=lambda u: (-units[u]["centrality"], -units[u]["func_named"]))
-    pct3 = len(done) / max(1, len(units))
+    pct3 = len(done) / max(1, len([u for u in units if u not in fresh_units or u in done]))
 
     # Stall ordering is by ATTEMPT COST, read from the report (revision 5).
     # nearmiss.py ranks by size and revision 4 ranked by report date; both put
@@ -539,8 +562,9 @@ def collect(st):
             "2": {"status": "open" if unnamed_sdk else "done",
                   "named": len(named_sdk), "unnamed": len(unnamed_sdk), "parked": len(parked_sdk),
                   "unnamed_list": unnamed_sdk},
-            "3": {"status": "done" if not todo3 else st["tracks"]["3"]["status"],
+            "3": {"status": "done" if not todo3 and not fresh_units else st["tracks"]["3"]["status"],
                   "units_total": len(units), "units_done": len(done),
+                  "units_fresh": len(fresh_units - set(done)),
                   "func_named_defs": sum(u["func_named"] for u in units.values()),
                   "defs": sum(u["defs"] for u in units.values()),
                   "unk_refs": sum(u["unk_refs"] for u in units.values()),
@@ -583,6 +607,12 @@ def track4_classes(st):
     shared = typeviews.shared_globals()
     ledger = st["tracks"]["4"].get("classes", {})
     byname = {c["table"]: c for c in cen}
+    info = progress.text_symbols()
+    queued = set()
+    for f in srcpath.src_files():
+        for fn in progress.INCLUDE_RE.findall(progress.strip_dead_code(f.read_text(errors="replace"))):
+            if fn in info and not progress.is_library(info[fn][0]):
+                queued.add(fn)
     kids = {}
     for c in cen:
         kids.setdefault(c["parent"], []).append(c["table"])
@@ -613,7 +643,11 @@ def track4_classes(st):
         if led:
             state = "parked" if led.get("parked") else "unified"
         elif not c["owned_c"] and not c["objects"] and not c["tables"]:
-            state = "no C"
+            # Revision 18: a class whose own methods are carved INCLUDE_ASM in
+            # a game unit is not "no C" for good -- track 1 will match them,
+            # and then it is an ordinary ready/waiting class. Until then it
+            # settles like "no C" so it does not stall its subclasses.
+            state = "no C yet" if any(f in queued for f in c["owned"]) else "no C"
         else:
             state = "ready" if ok else "waiting"
         files = sorted({f for kind in ("objects", "tables") for d in c[kind].values() for f in d["defined"]
@@ -636,6 +670,8 @@ def nm_defined(unit):
     return _nm_cache[unit]
 
 
+# a fresh job carries this many functions of one unit (revision 18)
+FRESH_PER_RUNNER = 10
 STALLS_PER_RUNNER = 3
 
 
@@ -670,8 +706,20 @@ def jobs(d, n):
     types, close-out. A head with K slots takes the top K, one unit each."""
     t = d["tracks"]
     queues = []
-    q_fresh = [("1", f"match {func} ({unit}, {words}w, fresh)", t["1"]["next_match_model"])
-               for words, unit, func, title in sorted(d["_fresh"])]
+    # Fresh ground, one job per unit (chunked), cheapest first inside it:
+    # revision 18 reopened 299 fresh functions in eleven units, and one line
+    # per function put nine two-word stubs at the top and hid the unit sizes.
+    by_unit = {}
+    for words, unit, func, title in sorted(d["_fresh"]):
+        by_unit.setdefault(unit, []).append((words, func))
+    q_fresh = []
+    for unit in sorted(by_unit, key=lambda u: (sum(w for w, _ in by_unit[u]), u)):
+        fs = by_unit[unit]
+        for i in range(0, len(fs), FRESH_PER_RUNNER):
+            chunk = fs[i:i + FRESH_PER_RUNNER]
+            names = ", ".join(f"{f} ({w}w)" for w, f in chunk)
+            q_fresh.append(("1", f"match fresh ground in {unit} ({len(fs)} fresh, "
+                                 f"{sum(w for w, _ in fs)}w): {names}", t["1"]["next_match_model"]))
     q_naming = []
     for unit in d["_todo3"]:
         u = d["units"][unit]
@@ -749,7 +797,7 @@ def jobs(d, n):
 
 
 RENAMES = ("naming pass on", "identify and name", "extern review")
-JOB_UNIT_RES = (r"naming pass on (\w+)", r"runner on (\w+):", r"in (\w+) to #ifdef", r"match \w+ \((\w+),")
+JOB_UNIT_RES = (r"naming pass on (\w+)", r"runner on (\w+):", r"in (\w+) to #ifdef", r"match \w+ \((\w+),", r"match fresh ground in (\w+) \(")
 RENAMES = RENAMES + ("unify class", "unify global")   # rewrites accessors in every unit that sees the type
 
 
@@ -779,7 +827,7 @@ def select_jobs(d, order, n):
     already taken would rewrite (or that would rewrite a taken job's units):
     call-graph contention, headercontention.py's test. Rounds 73 to 75 each
     skipped two or three top jobs by hand for exactly this (plan revision 15).
-    Returns the first n kept; d["_deferred"] gets (job, reason) for the rest
+    Returns the first n kept; d["_deferred"] gets (job, reason, taken job) for the rest
     that collided before n were kept."""
     import headercontention
     taken, deferred = [], []
@@ -799,16 +847,19 @@ def select_jobs(d, order, n):
             break
         units = job_units(d, job[1])
         reason = None
-        for i, (tj, tu) in enumerate(taken, 1):
+        for tj, tu in taken:
             if units & tu:
-                reason = f"same unit as #{i}"
+                reason = "same unit as {#}"
             elif units and tu and ((job[1].startswith(RENAMES) and rewrites(units, tu))
                                    or (tj[1].startswith(RENAMES) and rewrites(tu, units))):
-                reason = f"call-graph contention with #{i} (a rename in one rewrites the other)"
+                reason = "call-graph contention with {#} (a rename in one rewrites the other)"
             if reason:
                 break
         if reason:
-            deferred.append((job, reason))
+            # `{#}` is resolved at print time against the SHOWN numbering: a
+            # premium job is taken here but printed apart, so a taken-list index
+            # was off by one for every job after it (revision 18).
+            deferred.append((job, reason, tj))
         else:
             taken.append((job, units))
     d["_deferred"] = deferred
@@ -843,7 +894,8 @@ def print_status(d, n, st):
     print(f"  2      {t['2']['status']:<10} SDK call surface: {t['2']['named']} named, "
           f"{t['2']['unnamed']} still func_, {t['2']['parked']} parked (unidentified, done for this track)")
     t3 = t["3"]
-    print(f"  3      {t3['status']:<10} readability: {t3['units_done']}/{t3['units_total']} units passed; "
+    print(f"  3      {t3['status']:<10} readability: {t3['units_done']}/{t3['units_total']} units passed"
+          f"{' (' + str(t3['units_fresh']) + ' wait for track 1: fresh ground)' if t3.get('units_fresh') else ''}; "
           f"{t3['func_named_defs']}/{t3['defs']} defs still func_; {t3['unk_refs']} unk refs, "
           f"{t3['slot_refs']} slotNN calls, {t3['d_refs']} D_ globals; naming runner {t3['naming_model']}")
     t4 = t["4"]
@@ -881,7 +933,9 @@ def print_status(d, n, st):
         print(f"        [{track:<2}] {desc}")
     if d.get("_deferred"):
         print("  DEFERRED (would collide with a job above; staff after that one merges, or in a later slot):")
-        for (track, desc, model), why in d["_deferred"]:
+        for (track, desc, model), why, tj in d["_deferred"]:
+            ref = f"#{shown.index(tj) + 1}" if tj in shown else "the premium job"
+            why = why.replace("{#}", ref)
             print(f"        [{track:<2}] {model:<7} {desc[:90]}{'...' if len(desc) > 90 else ''}  <- {why}")
     review = [u for u in d["_todo3"] if not any(d["units"][u][k] for k in
               ("func_named", "unk_refs", "slot_refs", "d_refs"))]
@@ -902,7 +956,7 @@ def print_classes(d):
 
     def show(c, depth):
         tag = {"unified": "UNIFIED", "parked": "PARKED", "ready": "ready", "waiting": "waiting",
-               "no C": "no C"}[c["state"]]
+               "no C": "no C", "no C yet": "no C yet"}[c["state"]]
         name = f" = {c['name']}" if c.get("name") else ""
         print(f"  {'  ' * depth}0x{c['id']:X} {c['table']}{name}  [{tag}]  below={c['below']} "
               f"C={len(c['owned_c'])}/{len(c['owned'])} views={c['nviews']}"
@@ -913,8 +967,9 @@ def print_classes(d):
             show(k, depth + 1)
     for r in sorted(kids.get(None, []), key=lambda k: k["id"]):
         show(r, 0)
-    print("\n  C=a/b: a of the class's b own methods are C. 'no C': every own method is asm (most in psyq_*")
-    print("  segments, PROGRESS round 80) and no view exists; it does not block its subclasses.")
+    print("\n  C=a/b: a of the class's b own methods are C. 'no C': no own method is C and no view exists;")
+    print("  'no C yet': the same, but its methods are carved INCLUDE_ASM game code, track 1's ground")
+    print("  (revision 18). Neither blocks its subclasses; a 'no C yet' class turns ready once one matches.")
 
 
 def print_units(d):
