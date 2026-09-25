@@ -133,7 +133,12 @@ INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800209A0);
 s32 func_80020A1C(Class6C070 *self) {
     return 0;
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020A24);
+void func_80020A24(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) {
+    RECT rect;
+
+    func_80020970(&rect, src);
+    MoveImage(&rect, x, y);
+}
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020A74);
 INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_80020AF4);
 void func_80020B4C(Class6C070 *self, s32 value) {
