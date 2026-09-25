@@ -330,6 +330,16 @@
           "note": "fresh revision-18 ground: 11 opus matching sessions over code_3311c, code_2b78c, code_2bb9c, code_39094, code_2864, code_10ee0, code_2a0e0, code_3770c; 86/86 byte-exact, no stalls, no searches",
           "round": 81,
           "runners": 11
+        },
+        {
+          "attempts": 213,
+          "calibration": false,
+          "date": "2026-09-25",
+          "matches": 213,
+          "model": "opus",
+          "note": "fresh revision-18 ground, finished: 19 opus matching sessions over code_10ee0, code_3770c, code_39094, code_322b4, code_fa50, code_33808; 213/213 byte-exact, no stalls, one permuter search (func_80043FE4, killed at ~31k iterations once a hand lever matched). Game code 100% matched; track 1 done again. Six sonnet naming passes and three opus track-4 classes (IntermediateBase, Sprite, Actor) ran alongside.",
+          "round": 82,
+          "runners": 19
         }
       ],
       "status": "open"

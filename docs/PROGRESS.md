@@ -6,6 +6,78 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — round 82: game code 100% matched (213/213), six units named, three classes unified
+
+Opus head, operator cap 5, slots re-staffed as they emptied: 29 runner
+sessions (19 Opus matching, 6 Sonnet naming, 4 Opus track-4 and review).
+Every merge was followed by `build-and-verify.sh`; the image matched retail
+after each one.
+
+- **Track 1: done again.** 213 fresh functions, 213 byte-exact, zero stalls,
+  one permuter search (func_80043FE4, killed at ~31k iterations when a hand
+  lever closed it). code_10ee0, code_3770c, code_39094, code_322b4, code_fa50
+  and code_33808 are complete; `progress.py` reports every game function
+  matched and nothing queued, so 1b is done too. Once the list had small
+  bodies left, the head gave code_33808 runners two job lines (20 functions)
+  per session: they finished in minutes and head triage was the bottleneck.
+- **Track 3: six units marked**, all Sonnet: code_2a0e0 (WBgm, from the
+  rodata string in its own printf), code_3770c (CdStreamObj; the "CD-XA"
+  banner checked against read mode bit 0x40), code_10ee0 (DrawSystem),
+  code_39094 (DataSrc39094 plus the record-table helpers), code_fa50
+  (TmdModel), code_322b4 (Sprite subclasses, named `D8006EC74__X` after the
+  tree's existing `D800879C4__` precedent). Head review changed no name.
+  code_39094 had seven tier-A names whose purpose word (Weekly, Daily,
+  Cinematic, GraphRoom) rests on callers' inherited names, not on the body;
+  the head downgraded them to B in the reports, which is a tier correction
+  and not a send-back, so the naming runner stays Sonnet. At merge the head
+  applied charlie's three held-back code_fa50 names once class_3bb8c_o was no
+  longer live, and corrected code_d294.h's "Psy-Q library" banners on
+  code_fa50 functions.
+- **Track 4: IntermediateBase, Sprite and Actor unified** (`include/<Class>.h`
+  each; no stray views, oracles green, three sampled names each agree with
+  their occupants). That is three classes in one round against §3 track 4's
+  "one class per round"; they were staffed and merged strictly in sequence,
+  so the rule's reason (a class merge touches every unit that sees it) held,
+  but the letter did not. Raised for the operator. **Actor** (D_800878D4, the
+  base of DreamSys, Entity, Class65650 and Class876FC) was named from its
+  behaviour: step 2 would give `BaseObj` or `Class878D4`. Raised too.
+- **Merge mechanics.** Five symbols-file conflicts, all two branches
+  appending new lines at the same end-of-file spot (resolved by keeping
+  both); two single-line conflicts where two renames hit one extern (kept
+  both renames); one link failure: code_33808 called `new_class_6bea0`,
+  renamed `New_TmdModel` by the code_fa50 naming pass in the same round.
+  The head once chained a verify onto a conflicted merge and read a red
+  build; the conflict, not the code, was the cause, and nothing was
+  committed from it.
+- **Head scheduling decisions.** code_39094's naming was deferred until
+  alpha's Sprite unification merged, because both would touch class_3ac78
+  (§2.1 call-graph contention). code_fa50 and code_322b4 naming ran while
+  delta's Actor was live, with the three code_fa50 symbols class_3bb8c_o
+  calls fenced off in the prompt.
+- **`-Wall` baseline rewritten** for eight warnings that come from this
+  round's byte-exact bodies: five deliberate frame-reserving unused locals
+  (code_322b4 `pad`, code_33808 `unused` ×3, code_fa50 `v60`) and four
+  "might be used uninitialized" (code_39094 ×2, code_fa50 `p`, `size`).
+  The code_39094 pair is func_8004913C passing an uninitialised local to
+  fill `$a1` for `SeedAndRandom`, whose other caller passes two arguments:
+  mixed arity in retail usually means an unprototyped original declaration.
+  It is byte-exact and legal C89 but not readable C; left for track 3 or the
+  extern review below to express honestly.
+- **Learnings promoted**: the zero-argument slot call through an
+  unprototyped slot when `$a0` still holds self (with the counter-case: the
+  same situation matched as `slot(self)` elsewhere); the bottom-only loop
+  call as `for (f(); cond; f())`; clauses on multiplying by the just-stored
+  field / `s32 grey = 0x80`, and on narrowing a `u8` or `u32` parameter.
+  Three process entries moved verbatim to the archive to stay in budget.
+- **Open, recorded in reports and headers:** Class6B5CC's `reset` and
+  `tryAttachNearby` slots are typed `(Self *)` but Sprite and Actor call
+  them with more arguments (cast at the call sites; a Class6B5CC retype is a
+  track-4 revisit); DreamSys, Class65650 and Class876FC views disagree with
+  Actor on `pendingExtra`'s type and `setLastOffsetValue`'s parameter width;
+  `Class6D430::unk2A` → `loadState` proposed from one subclass only, not
+  applied; alpha's class hypotheses for D_8006ED4C/D_8006EC74/D_8006EFAC are
+  in the code_322b4 reports.
+
 ## 2026-09-25 — premium session: plan revision 19 (round 81's escalations, round 79-80's open items)
 
 The operator handed over every open item. Each was decided, measured where it
