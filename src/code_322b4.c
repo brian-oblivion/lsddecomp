@@ -79,7 +79,10 @@ void func_80041DA4(Class6B5CC *self) {
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041DAC);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041E2C);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041E58);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041ED8);
+/* Returns the D_8006ED4C method table. */
+void *func_80041ED8(void) {
+    return D_8006ED4C;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041EE8);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80041F88);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004202C);
