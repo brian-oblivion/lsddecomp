@@ -111,7 +111,19 @@ void func_8003995C(SeqObj *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
     self->methods->setVab(self, vabArg);
     self->methods->addChild(self, func_80020C5C());
 }
-INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_80039A34);
+void func_80039A34(SeqObj *self) {
+    D_8008A8D8 = 0;
+    self->methods->stop(self);
+    SsSeqClose(self->seqId);
+    if (self->unkC != NULL) {
+        self->unkC->methods->release((BasicClass *)self->unkC);
+    }
+    if (self->unk10 != NULL) {
+        self->unk10->methods->release((BasicClass *)self->unk10);
+    }
+    self->methods->removeChild(self, func_80020C5C());
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+}
 INCLUDE_ASM("asm/nonmatchings/code_2a0e0", func_80039B04);
 void func_80039B90(SeqObj *self, s32 arg1, s32 arg2) {
     if (arg2 == 2 && self->state == 1 && func_80039C04(self) && self->unk20 != 0) {
