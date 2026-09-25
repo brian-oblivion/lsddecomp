@@ -11,8 +11,6 @@ D_8008A854
 D_8008A860
 D_8008A8CC
 D_8008A8D8
-D_8008A8DC
-D_8008A8E0
 D_8008A8E8
 D_8008A8F0
 D_8008A8F4
@@ -143,6 +141,7 @@ gCdBusy
 gCdCallbackInstalled
 gCdFileVersionSuffix
 gCdIdle
+gCdInitDone
 gCdLock
 gCdOperation
 gCdQueueEnabled
@@ -162,6 +161,7 @@ gClass86F88RowOriginX
 gClass86F88RowOriginY
 gDefaultBMemPMgr
 gDefaultGridSpan
+gDefaultScreenDims
 gDreamAuxStage
 gDreamAuxWorld
 gEntityDefaultOffset

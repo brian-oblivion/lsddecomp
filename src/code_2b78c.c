@@ -26,7 +26,7 @@
 typedef struct Class6E4F0 Class6E4F0;
 typedef struct Class6E4F0Methods Class6E4F0Methods;
 
-/* A {width, height} pair: the ctor's default is D_8008A8E0 = {320, 240}. */
+/* A {width, height} pair: the ctor's default is gDefaultScreenDims = {320, 240}. */
 typedef struct ScreenDims {
     s32 w;
     s32 h;
@@ -75,8 +75,8 @@ struct Class6E4F0 {
 };
 
 extern Class6E4F0Methods D_8006E4F0;
-extern s32 D_8008A8DC;           /* CdInit has been called */
-extern ScreenDims D_8008A8E0;    /* {320, 240} */
+extern s32 gCdInitDone;           /* CdInit has been called */
+extern ScreenDims gDefaultScreenDims;    /* {320, 240} */
 
 Class6E4F0Methods *func_8003B20C(void);
 
@@ -92,13 +92,13 @@ extern void *BMemPMgrAlloc(s32 size);
 void Class6E4F0__Class6E4F0(Class6E4F0 *self, s32 source) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = func_8003B20C();
-    if (D_8008A8DC == 0) {
+    if (gCdInitDone == 0) {
         CdInit();
-        D_8008A8DC = 1;
+        gCdInitDone = 1;
     }
     self->initialized = 0;
     SetActiveDataSource(source);
-    self->methods->setDims(self, &D_8008A8E0, 0);
+    self->methods->setDims(self, &gDefaultScreenDims, 0);
 }
 
 void Class6E4F0__Finalize(Class6E4F0 *self) {
