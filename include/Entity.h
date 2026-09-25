@@ -2,7 +2,7 @@
 #define ENTITY_H
 
 #include "common.h"
-#include "Class6B5CC.h"
+#include "Class65650.h"
 
 /* The Entity class. `src/Entity.c` is the first 25 of a 142-function block
  * split at Entity__UpdateTargetProximity; the remainder is Entity_b, still a monolithic asm
@@ -22,20 +22,9 @@
  * comments on `notifyParents`/`slot60`/`slot114`/`slot130` below name a CALLER
  * of that slot (found by reading that caller's own disassembly), while
  * "this unit's own slot" comments elsewhere name the function occupying a
- * slot in the table. Early slots (+0x004, +0x010, +0x014, +0x01C..+0x038)
- * hold `BasicClass__func_*`/`Actor__AddChild`/`Actor__RemoveChild` -- the SAME
- * addresses `code_55dd4.h`'s `Class65650Methods` holds at its own +0x004/
- * +0x010/+0x014, confirming Entity and Class65650 share the identical
- * "BasicClass" ancestor and its vtable layout convention (ctor at +0x008,
- * dtor at +0x00C universally). `Get_vtable_Class65650()` (matched in code_55dd4.c)
- * returns that SHARED ancestor's own vtable (`&gClass65650Methods`) directly -- so
- * a `Get_vtable_Class65650()->slotNN(...)` call from Entity's own functions is a
- * call into a function inherited from the same base as Class65650, not a
- * Class65650-specific call, even though the accessor's name and declared
- * return type come from that unit. `Class65650MethodsView` below is Entity's
- * OWN minimal, local view of exactly that shared table -- only the slots
- * this unit's functions actually reach through it, independent of (and not
- * editing) `code_55dd4.h`'s own `Class65650Methods` view of the same table.
+ * slot in the table. Entity derives from Class65650 (include/Class65650.h):
+ * `tools/classtable.py ENTITY_METHODS --vs gClass65650Methods` lists its
+ * overrides, and `Get_vtable_Class65650()` returns the parent's table.
  */
 typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
@@ -50,7 +39,6 @@ typedef struct Unk4CMethods Unk4CMethods;
 typedef struct Unk70Obj Unk70Obj;
 typedef struct Unk70Sub Unk70Sub;
 typedef struct Unk70SubMethods Unk70SubMethods;
-typedef struct Class65650MethodsView Class65650MethodsView;
 typedef struct EntityPos EntityPos;
 typedef struct EntityMoodRow EntityMoodRow;
 typedef struct EntityRegionSlot EntityRegionSlot;
@@ -103,29 +91,10 @@ struct EntityMethods {
     /* +0x180 */ void (*updateSoundCueStop)(Entity *self);                     /* called by Entity__Update */
 };
 
-/* Entity's local view of its PARENT's method table, gClass65650Methods,
- * returned by `Get_vtable_Class65650()` (Entity is class 0x1F234, a
- * Class65650 [0x234] subclass: `tools/typeviews.py --tree`). The canonical
- * type is code_55dd4.h's `Class65650Methods`; this view merges into it when
- * Class65650 is unified (FINISHING-PLAN track 4). It was tagged
- * `BasicClassMethods` until then, which is BasicClass's table
- * (include/BasicClass.h), not this one. Only the offsets Entity's functions
- * reach are named. */
-struct Class65650MethodsView {
-    /* +0x000 */ u8 pad00[0x08];
-    /* +0x008 */ void *(*ctor)(void *self, s32 arg1, s32 arg2); /* Entity__Entity's base-class construction call */
-    /* +0x00C */ void (*dtor)(void *self);                       /* called by Entity__Destructor */
-    /* +0x010 */ u8 pad10[0x4C - 0x10];
-    /* +0x04C */ void (*slot4C)(void *self, s32 arg1, s32 arg2, void *arg3, s32 arg4); /* called by Entity__AttachUnk4C, forwarding (arg1, arg2, arg3, arg4) straight through; arg3 is also stored into this->unk4C by the caller right after, so it is Unk4CObj* at that call site even though this shared ancestor slot takes it opaquely */
-    /* +0x050 */ void (*slot50)(void *self);                       /* called by Entity__DetachUnk4C */
-    /* +0x054 */ u8 pad54[0x98 - 0x54];
-    /* +0x098 */ void (*slot98)(void *self, s32 arg1, s32 arg2);      /* called by Entity__Update */
-    /* +0x09C */ u8 pad9C[0xDC - 0x9C];
-    /* +0x0DC */ void (*slotDC)(void *self, s32 arg1, s32 arg2);      /* called by Entity__NotifyLinkStage, forwarding (arg1, arg2) straight through */
-    /* +0x0E0 */ void (*slotE0)(void *self, s32 arg1, s32 arg2);        /* called by Entity__NotifyReset */
-};
-
-extern Class65650MethodsView *Get_vtable_Class65650(void);
+/* Entity's parent is Class65650 (include/Class65650.h, class 0x234; Entity
+ * is 0x1F234, and Entity__Entity runs Class65650's ctor first). Entity's
+ * functions reach the base implementations through Get_vtable_Class65650()
+ * and upcast. */
 
 /* An object cached in `Entity::unk100`/`unk104`, unrelated to `EntityMethods`
  * -- its own method table, dispatched through in Entity__Destructor/Entity__GetOrCreateUnk100.
