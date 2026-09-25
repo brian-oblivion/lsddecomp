@@ -1,4 +1,6 @@
-# Pad__Destroy -- MATCHED (21/21 words)
+# Pad__Finalize -- MATCHED (21/21 words)
+
+> Renamed from `Pad__Destroy` on 2026-09-25 (tools/rename.py). Address 0x80025c30.
 
 > Renamed from `func_80025C30` on 2026-09-24 (tools/rename.py). Address 0x80025c30.
 
@@ -23,7 +25,7 @@ base-class destructor through the method table.
 ## C
 
 ```c
-void *Pad__Destroy(Pad *self) {
+void *Pad__Finalize(Pad *self) {
     if (--sPadRefCount == 0) {
         PadStop();
     }
@@ -47,9 +49,12 @@ right but the specific callee name (`func_80025F2C` vs. the already-known
 
 ## Naming
 
-**Tier A.** Destructor: vtable slot `+0x0C`, which `classtable.py`'s diff
-shows overrides `BasicClass__Finalize`. Named `Pad__Destroy` rather than
-`Pad__Finalize` to match this round's `VabDriver__Destroy` precedent for the
-same overridden slot on a different class (round 77, code_179d8_d, see
-broadcast from charlie) -- the project's convention for a Finalize-slot
-override is `Class__Destroy`, not a literal `Finalize` transcription.
+**Tier A.** Occupies vtable slot `+0x0C`, BasicClass's `finalize`
+(`classtable.py gPadMethods --vs D_8006B58C`), and forwards to
+`BasicClass__Finalize` after stopping the pad library on the last instance.
+Named `Pad__Destroy` in round 77 after `VabDriver__Destroy`; renamed
+2026-09-25 (track 4, BasicClass unification) to `Pad__Finalize`, because an
+override is named for the slot it occupies and 24 of the finalize-slot
+occupants already say `Finalize` against 7 `Destroy` (FINISHING-PLAN track 4
+recipe). Return type `void`, like the base it forwards to: the old `void *`
+returned `finalize`'s result and was byte-identical either way.

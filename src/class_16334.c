@@ -23,7 +23,7 @@ void Pad__Pad(Pad *self, void *arg1, s32 port) {
     self->methods->init(self, port);
 }
 
-void Pad__Destroy(Pad *self) {
+void Pad__Finalize(Pad *self) {
     if (--sPadRefCount == 0) {
         PadStop();
     }
@@ -54,7 +54,7 @@ u32 Pad__UpdateMasks(Pad *self) {
 
 void Pad__DispatchEvents(Pad *self) {
     s32 events[16];
-    void (*onButtonEvent)(Pad *self, s32 event);
+    void (*notifyParents)(Pad *self, s32 event);
     u32 held;
     u32 released;
     u32 pressed;
@@ -92,9 +92,9 @@ void Pad__DispatchEvents(Pad *self) {
         }
     }
 
-    onButtonEvent = self->methods->onButtonEvent;
+    notifyParents = self->methods->notifyParents;
     for (p--; p >= events; p--) {
-        onButtonEvent(self, *p);
+        notifyParents(self, *p);
     }
 }
 

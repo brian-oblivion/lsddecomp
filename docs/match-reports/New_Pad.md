@@ -116,5 +116,5 @@ one shared epilogue. Try both before spending attempts on scheduling barriers.
 through `BMemPMgrAlloc`, then calls the class's own ctor slot through
 `Get_vtable_Pad()`. `Pad` is the class name established for this whole unit
 (see `include/class_16334.h`'s header comment, confirmed by the direct
-`PadInit`/`PadRead`/`PadStop` calls in `Pad__Pad`/`Pad__Destroy`/
+`PadInit`/`PadRead`/`PadStop` calls in `Pad__Pad`/`Pad__Finalize`/
 `Pad__UpdateMasks`). Only caller: `src/main.c`'s `New_Pad(0, 0)`.
