@@ -424,7 +424,16 @@ extern s32 D_8006F498[];
 void *func_80044F20(void) {
     return D_8006F498;
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044F30);
+/* Allocate and construct a D_8006F514 object. */
+void *func_80044F30(s32 arg0) {
+    void *obj = BMemPMgrAlloc(0x38);
+
+    if (obj != NULL) {
+        ((Ctor33808 *)func_800451A8())->ctor(obj, arg0);
+        return obj;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80044F90);
 /* D_8006F514 +0x00C: finalize -- free +0x34 and +0x2C, then the active
  * driver's. */
