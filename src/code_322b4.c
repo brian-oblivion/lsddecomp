@@ -85,7 +85,10 @@ void func_80042658(D_8006EF50Obj *self) {
 void func_80042664(D_8006EF50Obj *self) {
     self->unk10 = 0;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004266C);
+/* D_8006EF50 slot +0x054. */
+s32 func_8004266C(D_8006EF50Obj *self) {
+    return self->unk10;
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042678);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042684);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042694);
