@@ -6,8 +6,7 @@
  * those, and no Sony fingerprint). What it holds: the 18 methods of
  * D_800817E0.
  *
- * Round 81 matched the ten smallest methods (empty slots, the table getter,
- * the libcd/libspu wrappers); the rest are still INCLUDE_ASM.
+ * Round 82 matched all 18 methods (the unit has no INCLUDE_ASM left).
  */
 #include "common.h"
 #include "BasicClass.h"
@@ -33,6 +32,9 @@ struct CdStreamObjMethods {
     /* +0x068 */ void (*demute)(CdStreamObj *self);                       /* func_80047638 */
     /* +0x06C */ void *slot6C;                                            /* func_80047694 */
     /* +0x070 */ u32 (*freeRing)(CdStreamObj *self, u32 *base);           /* func_80047870 */
+    /* +0x074 */ void (*unsetRing)(CdStreamObj *self);                    /* func_80047890 */
+    /* +0x078 */ void (*clearRing)(CdStreamObj *self);                    /* func_800478B0 */
+    /* +0x07C */ void (*slot7C)(CdStreamObj *self);                       /* func_800478F8, empty */
 };
 
 struct CdStreamObj {
@@ -41,18 +43,24 @@ struct CdStreamObj {
     /* +0x024 */ u8 cdResult[8];      /* CdSync result buffer (func_800478D0) */
     /* +0x02C */ s32 unk2C;           /* state: 0 idle, 1 seeking, 2, 4 */
     /* +0x030 */ s32 muted;           /* func_800475D8 / func_80047638 */
-    /* +0x034 */ u8 pad34[0x44 - 0x34];
+    /* +0x034 */ s32 unk34;           /* < 4 selects read mode 0x1C0, else 0x140 */
+    /* +0x038 */ s32 unk38;           /* ctor: (speed / arg2 / 2) * 2054 */
+    /* +0x03C */ s32 unk3C;
+    /* +0x040 */ s32 unk40;
     /* +0x044 */ void *cbArg;
     /* +0x048 */ void (*cb48)(void *arg);
     /* +0x04C */ void (*cb4C)(void *arg);
     /* +0x050 */ u32 *ring;           /* StSetRing's ring_addr (func_800470C8) */
     /* +0x054 */ void (*cb54)(void *arg);
-    /* +0x058 */ u8 pad58[0x5C - 0x58];
+    /* +0x058 */ s32 unk58;
 };
 
 extern CdStreamObjMethods D_800817E0;  /* the class's method table */
 CdStreamObjMethods *func_80047900(void);
 void func_80047388(u8 status, u8 *result);
+void func_800477B0(CdStreamObj *self, u32 *base, u32 frame);
+void func_80047810(CdStreamObj *self);
+s32 func_80047240(CdStreamObj *self);
 
 /* LIBCD.H */
 extern void StSetRing(u32 *ring_addr, u32 ring_size);
@@ -63,6 +71,18 @@ extern int CdSync(int mode, u8 *result);
 extern void *CdSyncCallback(void (*func)(u8 status, u8 *result));
 extern int CdControl(u8 com, u8 *param, u8 *result);
 extern int CdControlF(u8 com, u8 *param);
+extern int CdRead2(u32 mode);
+extern int StGetNext(u32 **addr, u32 **header);
+extern void *CdSearchFile(void *fp, char *name);
+
+/* libc2 (Sony's, linked) */
+extern char *strcpy(char *dest, char *src);
+extern char *strcat(char *dest, char *src);
+
+void *func_800270B8(void);   /* code_171e0.c: the data directory string */
+extern s32 D_8008A94C;
+extern char D_8008A954[];    /* ";1" */
+extern void StSetStream(u32 mode, u32 start_frame, u32 end_frame, void (*func1)(), void (*func2)());
 
 extern void *BMemPMgrAlloc(s32 size);
 extern CdStreamObj *D_8008A950;  /* the active stream object */
@@ -99,7 +119,19 @@ CdStreamObj *func_80046F0C(s32 arg1, s32 arg2, s32 arg3) {
     }
     return NULL;
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80046F88);
+void func_80046F88(CdStreamObj *self, u32 arg1, s32 arg2, s32 arg3) {
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = func_80047900();
+    self->unk34 = arg1;
+    self->muted = 0;
+    self->unk38 = (((arg1 < 4) ? 300 : 150) / arg2 / 2) * 2054;
+    self->unk3C = arg3;
+    self->ring = NULL;
+    self->cb4C = NULL;
+    self->cb48 = NULL;
+    self->cb54 = NULL;
+    self->unk2C = 0;
+}
 void func_80047074(CdStreamObj *self) {
     self->methods->slot48(self);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
@@ -110,7 +142,35 @@ void func_800470C8(CdStreamObj *self, u32 *ring, u32 size) {
         self->ring = ring;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047114);
+s32 func_80047114(CdStreamObj *self, char *name, s32 tries) {
+    char path[0x20];
+    s32 n;
+
+    n = tries;
+    if (self->unk2C == 0) {
+        if (self->ring == NULL) {
+            return 1;
+        }
+        if (D_8008A950 != NULL) {
+            return 0;
+        }
+        path[0] = '\\';
+        strcpy(&path[1], func_800270B8());
+        strcat(path, name);
+        strcat(path, D_8008A954);
+        while (CdSearchFile(self->loc, path) == 0) {
+            if (n >= 0 && --tries < 0) {
+                return 1;
+            }
+        }
+        self->unk40 = *(u32 *)&self->loc[4] / self->unk38;
+        D_8008A94C = func_80047240(self);
+        D_8008A950 = self;
+        self->methods->seek(self, self->loc);
+        return 0;
+    }
+    return 1;
+}
 s32 func_80047240(CdStreamObj *self) {
     SpuCommonAttr attr;
 
@@ -155,8 +215,36 @@ void func_80047388(u8 status, u8 *result) {
         }
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800473E4);
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_800474C8);
+void func_800473E4(CdStreamObj *self, u32 startFrame, s32 arg2) {
+    u32 mode;
+
+    if (self->unk2C == 1 && D_8008A950 == self) {
+        mode = 0x140;
+        if (self->unk34 < 4) {
+            mode = 0x1C0;
+        }
+        if (arg2 != 0) {
+            self->unk40 = arg2;
+        }
+        self->unk58 = 0;
+        StSetStream(0, startFrame, -1, 0, 0);
+        self->methods->mute(self);
+        while (CdControl(2, self->loc, 0) == 0 || CdRead2(mode) == 0) {
+        }
+        self->methods->demute(self);
+        self->unk2C = 2;
+    }
+}
+void func_800474C8(CdStreamObj *self) {
+    if (self->unk2C == 2 && D_8008A950 == self) {
+        self->methods->mute(self);
+        self->methods->clearRing(self);
+        self->methods->unsetRing(self);
+        while (CdControl(9, 0, 0) == 0) {
+        }
+        self->unk2C = 4;
+    }
+}
 void func_80047574(CdStreamObj *self) {
     CdStreamObj *cur;
 
@@ -186,8 +274,36 @@ void func_80047638(CdStreamObj *self) {
         self->muted = 0;
     }
 }
-INCLUDE_ASM("asm/nonmatchings/code_3770c", func_80047694);
-void func_800477B0(CdStreamObj *self, u32 *base) {
+s32 func_80047694(CdStreamObj *self, u32 **addr, u32 *frame, s32 tries) {
+    u32 *header;
+    u32 n;
+
+    if (tries < 0) {
+        tries = 0x800000;
+    }
+    while (StGetNext(addr, &header) != 0) {
+        if (--tries < 0) {
+            self->methods->freeRing(self, (u32 *)addr);
+            return 0;
+        }
+    }
+    n = header[2];
+    *frame = n;
+    if (self->unk40 > 0) {
+        if (n >= self->unk40 || n < self->unk58) {
+            if (n < self->unk58) {
+                *frame = 0;
+            }
+            func_800477B0(self, *addr, *frame);
+            func_80047810(self);
+            return -1;
+        }
+        self->unk58 = n;
+    }
+    func_800477B0(self, *addr, *frame);
+    return 1;
+}
+void func_800477B0(CdStreamObj *self, u32 *base, u32 frame) {
     if (self->cb48 != NULL) {
         self->cb48(self->cbArg);
         self->methods->freeRing(self, base);
