@@ -46,4 +46,11 @@ reads.
 
 ## Naming
 
-Kept. Suggested `Class6E4F0__InitSystems` (tier B).
+**Round 81 (delta), track 3.** Renamed `func_8003B044` -> `Class6E4F0__InitSystems`.
+**Tier B**: the body does one-time init of multiple genuine Psy-Q subsystems
+(`SsInit` sound, `GsInit3D` graphics, plus forwarding to the source object's
+own display-setup slot and allocating the aux block) guarded by
+`self->initialized`, so "init" and "systems" (plural) are both evident from
+the body. It stops short of A because the overall GAME purpose of this
+one-time setup -- what it is initializing the game system FOR -- is not
+established, only which SDK calls it makes.

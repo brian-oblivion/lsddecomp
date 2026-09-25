@@ -68,4 +68,9 @@ usual switch.
 
 ## Naming
 
-Kept. Suggested `Class6E4F0__RunMainLoop` (tier B).
+**Round 81 (delta), track 3.** Renamed `func_8003B110` -> `Class6E4F0__RunMainLoop`.
+**Tier B**: "runs forever while initialized, dispatching the subclass's own
+state-machine slots" is evident from the body alone; "main loop" is
+corroborated by `include/Class6D3C8.h`'s own note that this is the slot
+"first dispatched by main" (`src/main.c`), but that is one caller, not two
+agreeing ones, so it stays B rather than A.

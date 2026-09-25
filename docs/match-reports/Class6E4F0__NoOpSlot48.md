@@ -17,4 +17,7 @@ void Class6E4F0__NoOpSlot48(Class6E4F0 *self) {
 
 ## Naming
 
-Kept. Suggested `Class6E4F0__NoOpSlot48`.
+**Round 81 (delta), track 3.** Renamed `func_8003B108` -> `Class6E4F0__NoOpSlot48`.
+**Tier A**: a pure empty leaf at the +0x048 slot (no established method
+name to dispatch as, since no carved caller invokes it by name); the
+mechanics -- it is slot 48 and it does nothing -- are the whole claim.

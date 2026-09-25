@@ -21,5 +21,8 @@ void Class6E4F0__Finalize(Class6E4F0 *self) {
 
 ## Naming
 
-Kept as `Class6E4F0__Finalize`: renaming is head work (symbols file). Suggested
-tier-B name `Class6E4F0__Finalize` (slot identity, from the table).
+**Round 81 (delta), track 3.** Renamed `func_8003B024` -> `Class6E4F0__Finalize`
+(slot named like the method it dispatches: it is the +0x00C dtor/finalize
+override the `BASICCLASS_SLOTS` macro types). **Tier A**: a pure empty leaf
+whose mechanics ARE its purpose -- it is the finalize slot and it does
+nothing, full stop; nothing about "why" is claimed.
