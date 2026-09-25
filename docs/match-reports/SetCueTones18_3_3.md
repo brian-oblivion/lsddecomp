@@ -26,3 +26,18 @@ exactly the shape where "the value looks like the one above it" produces
 a plausible-but-wrong guess** — verify each `sw`'s SOURCE register's most
 recent assignment individually rather than pattern-matching against a
 neighboring store's literal.
+
+## Naming
+
+Round 79, runner alpha.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `SetCueTones18_3_3` | B | the whole body; callers `Entity__MoodCue85` (x2) and `Entity__MoodCue86` |
+
+Free function, only argument the `SoundCueSet`. Attenuation 0, voice 0
+tone 18 (0x12), voices 1 and 2 tone 3, pitch offsets untouched (left at
+ServiceSoundCueSet's per-tick 0). Tone numbers in decimal, like the MoodCue
+row numbers. `Entity__MoodCue82` and `Entity__MoodCue89` write the same
+voice 0/1 pair inline without voice 2, so this is not a unique
+"the" cue; purpose not established, tier B.

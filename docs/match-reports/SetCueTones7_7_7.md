@@ -19,3 +19,20 @@ argument is `out` (`EntityMoodHandlerArg*`), unlike this unit's usual
 Direct transcription; the single-parameter signature is unambiguous from
 the raw bytes (every store is `sw $vN, OFFSET($a0)`, never touching `$a1`).
 No residue.
+
+## Naming
+
+Round 79, runner alpha.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `SetCueTones7_7_7` | B | the whole body; callers `Entity__MoodCue85` (x3) only |
+
+Free function (no `this`; the only argument is the `SoundCueSet`), so
+`VerbNoun`. Read with the `SoundCueSet` field readings (`Entity__MoodCue07.md`
+`## Proposed field names`; `ServiceSoundCueSet`): attenuation 0, and voices
+0, 1 and 2 each request tone 7 with pitch offset -2. The name records the
+tone triple, which is what the body does; the -2 pitch is left out of it for
+length and is written here. What the chord is for is not established, hence
+tier B. Replaces a report line that called it a "reset to state 7" helper:
+nothing in it touches a state field.

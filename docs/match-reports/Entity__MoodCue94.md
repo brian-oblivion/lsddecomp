@@ -18,3 +18,27 @@ slotC4(this,-0x80,1); }`.
 ## Derivation
 
 Direct transcription. No residue.
+
+## Naming
+
+Round 79, runner alpha.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `Entity__MoodCue94` | B | `gEntityMoodHandlerTable` row 94 |
+
+Why `MoodCue94`: the function's address is the `handler` word of
+`gEntityMoodHandlerTable` row 94 (base 0x80089EB0, stride 0x10; the row's
+first word), read from `disk/SLPS_015.56` directly rather than inferred from
+address order (rounds 76-77 measured that row order does not track code
+address). Nothing else references it. `Entity__StartSoundCue` hands the row's
+handler to `InitSoundCueSet`, and `ServiceSoundCueSet` calls it once per tick
+as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
+is Entity.h's local view; field readings in `Entity__MoodCue07.md`
+`## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
+voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
+Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
+row mapping is a fact of the binary, which dream object or state a row is
+for is not established. Row kept decimal so names sort in table order.
+
+What it does, in the unit's current field names: At tick 0, `moodState = 0xB` unless `target->slot200()` is 7; voice-0 tone 14 every 10 set ticks; at `moodDuration`: `slot128(1)`, and when `moodState != 0` a coin-flip `updateScale(1, SCALE_SIX)` + `slotCC(0x800, 0)`, and a 1/3 `updateRotation(0, ROTATION_YAW_PLUS180)`; `slotC4(-0x80, 1)` while `unk7C != 0`.

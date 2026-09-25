@@ -21,3 +21,27 @@ retail's `div`/`break 7`/`break 6`/`mfhi` sequence automatically, matching
 this project's documented maspsx-expansion policy for non-constant
 divisors (see CLAUDE.md's "maspsx-expanded macros" residue class and
 `Entity__MoodCue96`'s own use of `mfhi` for the remainder). No residue.
+
+## Naming
+
+Round 79, runner alpha.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `Entity__MoodCue96` | B | `gEntityMoodHandlerTable` row 96 |
+
+Why `MoodCue96`: the function's address is the `handler` word of
+`gEntityMoodHandlerTable` row 96 (base 0x80089EB0, stride 0x10; the row's
+first word), read from `disk/SLPS_015.56` directly rather than inferred from
+address order (rounds 76-77 measured that row order does not track code
+address). Nothing else references it. `Entity__StartSoundCue` hands the row's
+handler to `InitSoundCueSet`, and `ServiceSoundCueSet` calls it once per tick
+as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
+is Entity.h's local view; field readings in `Entity__MoodCue07.md`
+`## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
+voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
+Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
+row mapping is a fact of the binary, which dream object or state a row is
+for is not established. Row kept decimal so names sort in table order.
+
+What it does, in the unit's current field names: `slot128(rand() % 4)` at tick 0; every `moodDuration` ticks another random `slot128`, attenuation from proximity, and a voice-0 tone 22 request with pitch +2 and the slot's two remaining words (`unk24`/`unk28`, ServiceSoundCueSet's `word2`/`word3`, per-tick defaults 0x7F/0x40) set to 0x40/0x20.

@@ -19,3 +19,27 @@ this->unk80 - 1`, sets `out->unk10=0; out->unk30=0x12;` and calls
 Direct transcription, reusing `EntityMethods::slot134`/`Entity::unk88`
 established by `Entity__MoodCue91` (earlier in ROM order, same unit). No new
 header entries needed here. No residue.
+
+## Naming
+
+Round 79, runner alpha.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `Entity__MoodCue92` | B | `gEntityMoodHandlerTable` row 92 |
+
+Why `MoodCue92`: the function's address is the `handler` word of
+`gEntityMoodHandlerTable` row 92 (base 0x80089EB0, stride 0x10; the row's
+first word), read from `disk/SLPS_015.56` directly rather than inferred from
+address order (rounds 76-77 measured that row order does not track code
+address). Nothing else references it. `Entity__StartSoundCue` hands the row's
+handler to `InitSoundCueSet`, and `ServiceSoundCueSet` calls it once per tick
+as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
+is Entity.h's local view; field readings in `Entity__MoodCue07.md`
+`## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
+voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
+Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
+row mapping is a fact of the binary, which dream object or state a row is
+for is not established. Row kept decimal so names sort in table order.
+
+What it does, in the unit's current field names: With `unk7C` (TOD index, proposed) 0: if `targetReached`, faces the target, `slot128(1)` (SetTod) and `target->slot130(1)`, else fast-forwards 24 TOD frames as `Entity__MoodCue91` does; with `unk7C` nonzero: voice-0 tone 22 at frame 0, voice-1 tone 18 and `notifyParents(0xA)` at the last frame (`moodDuration - 1`); `updateScale(1, D_80089DE4)` every tick.

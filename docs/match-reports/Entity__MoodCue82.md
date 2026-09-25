@@ -55,3 +55,27 @@ in one function this round, and again in `Entity__MoodCue85`'s
 `rand() % 5` ternary in the same unit (see that report) — cheap enough
 (a rebuild is under a
 second) to just try before writing up a residue.
+
+## Naming
+
+Round 79, runner alpha.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `Entity__MoodCue82` | B | `gEntityMoodHandlerTable` row 82 |
+
+Why `MoodCue82`: the function's address is the `handler` word of
+`gEntityMoodHandlerTable` row 82 (base 0x80089EB0, stride 0x10; the row's
+first word), read from `disk/SLPS_015.56` directly rather than inferred from
+address order (rounds 76-77 measured that row order does not track code
+address). Nothing else references it. `Entity__StartSoundCue` hands the row's
+handler to `InitSoundCueSet`, and `ServiceSoundCueSet` calls it once per tick
+as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
+is Entity.h's local view; field readings in `Entity__MoodCue07.md`
+`## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
+voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
+Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
+row mapping is a fact of the binary, which dream object or state a row is
+for is not established. Row kept decimal so names sort in table order.
+
+What it does, in the unit's current field names: State machine on `moodState` 0/0xB/0xC: at tick 0 picks 0xB or 0xC (2/3) or stops the cue and calls `slotC4(-0x5000, 0)`; 0xC faces the target, requests tones 18/3 at full volume at `moodTimer` 20 and calls `target->slot130(1)`, `slotC4(-0x28, 0)` after 20, `notifyParents(0xA)` at 40; 0xB calls `slot130` (StopTod, see Proposed field names in `Entity__MoodCue93.md`) and, within 0x200 of the target, deactivates (2/3) or stops the cue.

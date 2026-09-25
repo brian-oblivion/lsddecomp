@@ -72,3 +72,48 @@ fixed together, not independently. **When any chain has 3+ links, trace
 assigning C bodies to conditions**, and write the `if`/`else if` chain in
 the SAME order as the traced links, not in numeric or "natural" order of
 the constants themselves.
+
+## Naming
+
+Round 79, runner alpha.
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `Entity__MoodCue85` | B | `gEntityMoodHandlerTable` row 85 |
+
+Why `MoodCue85`: the function's address is the `handler` word of
+`gEntityMoodHandlerTable` row 85 (base 0x80089EB0, stride 0x10; the row's
+first word), read from `disk/SLPS_015.56` directly rather than inferred from
+address order (rounds 76-77 measured that row order does not track code
+address). Nothing else references it. `Entity__StartSoundCue` hands the row's
+handler to `InitSoundCueSet`, and `ServiceSoundCueSet` calls it once per tick
+as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
+is Entity.h's local view; field readings in `Entity__MoodCue07.md`
+`## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
+voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
+Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
+row mapping is a fact of the binary, which dream object or state a row is
+for is not established. Row kept decimal so names sort in table order.
+
+What it does, in the unit's current field names: Five-state machine (0, 0xA..0xE) that calls `SetCueTones7_7_7`/`SetCueTones18_3_3` at its transitions, yaws with `updateRotation(ROTATION_YAW_PLUS9 / ROTATION_ZMINUS9)`, rotates the target with `target->slot44(ROTATION_ZPLUS1 / ROTATION_YAW_PLUS180)`, drives `unk100` (via `Entity__GetOrCreateUnk100`) with `slotD4(unk50, 7, 0)`/`slotD8(unk50, 0, 0)`, and ends with `notifyParents(0xA or 0xC)` or stopping the cue.
+
+### Data constants named (round 79)
+
+Decoded from `disk/SLPS_015.56` in the format of the existing rotation
+tables (three s16 `{num, den}` pairs, X / Y(yaw) / Z, e.g. `ROTATION_ZPLUS9`
+= `(0,1, 0,1, 9,1)`):
+
+| old | new | tier | bytes |
+| --- | --- | --- | --- |
+| `D_80089CD0` | `ROTATION_ZPLUS1` | A | `(0,1, 0,1, 1,1)` -- same spelling as `ROTATION_ZPLUS9`/`ROTATION_ZPLUS4`/`ROTATION_YAW_PLUS1`. Its consumer here is `target->methods->slot44(target, 0, ...)`, the same Unk94Methods slot that takes `ROTATION_YAW_PLUS180` two lines later and `ROTATION_YAW_MINUS90` in `Entity__MoodCue49` |
+| `D_80089CDC` | `ROTATION_ZMINUS9` | A | `(0,1, 0,1, -9,1)`, passed to `updateRotation(this, 0, ...)` like every other `ROTATION_*` |
+
+The name describes the table's contents, which is all the bytes establish;
+the units of the middle numbers (degrees, per the existing names) are the
+existing names' reading, not re-derived here.
+
+## Proposed field names
+
+| field | proposed | tier | evidence | accessor outside Entity_f |
+| --- | --- | --- | --- | --- |
+| `Entity::unk50` (+0x50) | `companion2` | B | Entity is a Class65650 subclass (`Entity__Entity` calls `Get_vtable_Class65650()->ctor`; ENTITY_METHODS keeps Class65650's slots), and `code_55dd4.h` names Class65650's +0x50 `companion2` (the tag-5 BaseObjO companion). Here and in `Entity__MoodCue57` it is only passed opaquely as `unk100->slotD4/slotD8`'s arg1, so nothing in this unit contradicts or confirms it beyond the offset. | Entity_g (first compiler failure, `Entity_g.c:78`; make stops there, so a witness, not the full list) |
