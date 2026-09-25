@@ -50,7 +50,16 @@ extern int GsSetFlatLight(int id, FlatLightParams *lt);
 extern FlatLightObjMethods D_8006F06C;
 FlatLightObjMethods *func_80042A7C(void);
 
-INCLUDE_ASM("asm/nonmatchings/code_3311c", func_8004291C);
+FlatLightObj *func_8004291C(s32 lightId) {
+    FlatLightObj *self;
+
+    self = BMemPMgrAlloc(sizeof(FlatLightObj));
+    if (self != NULL) {
+        func_80042A7C()->ctor(self, lightId);
+        return self;
+    }
+    return NULL;
+}
 INCLUDE_ASM("asm/nonmatchings/code_3311c", func_8004297C);
 void func_800429E0(FlatLightObj *self, s32 lightId) {
     self->lightId = lightId;
