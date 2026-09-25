@@ -79,7 +79,7 @@ struct Class6C070 {
     /* +0x00C */ s32 unkC;            /* 80020AF4 sets to 1 once unk24 reaches unk20 */
     /* +0x010 */ s32 unk10;           /* cleared by 8002089C; 80020B4C stores unk20 only while 0 */
     /* +0x014 */ Class6C070Size size; /* 80020C08 returns its address */
-    /* +0x01C */ u8 pad1C[0x20 - 0x1C];
+    /* +0x01C */ s32 unk1C;           /* 800207DC: GsInitGraph vram mode */
     /* +0x020 */ s32 unk20;           /* 80020B4C sets, 80020B68 gets */
     /* +0x024 */ s32 unk24;           /* 80020AF4 counts up to unk20 */
     /* +0x028 */ u8 pad28[0x2C - 0x28];
@@ -91,6 +91,11 @@ extern Class6C070Methods D_8006C070;  /* the class's method table */
 extern Class6C070 *D_8008A83C;        /* sdata: the singleton func_80020C5C returns */
 
 extern void GsSwapDispBuff(void);     /* LIBGS.H */
+extern void GsInitGraph(unsigned short x_res, unsigned short y_res,
+                        unsigned short intmode, unsigned short dith,
+                        unsigned short varmmode);   /* LIBGS.H */
+extern void GsDefDispBuff(unsigned short x0, unsigned short y0,
+                          unsigned short x1, unsigned short y1); /* LIBGS.H */
 extern int GsGetActiveBuff(void);     /* LIBGS.H */
 extern int LoadImage(RECT *rect, u_long *p);        /* LIBGPU.H */
 extern int MoveImage(RECT *rect, int x, int y);     /* LIBGPU.H */
@@ -122,7 +127,12 @@ void func_80020784(Class6C070 *self) {
     self->methods->slot80(self, 1);
     self->unk30 = 0;
 }
-INCLUDE_ASM("asm/nonmatchings/code_10ee0", func_800207DC);
+void func_800207DC(Class6C070 *self, Class6C070Size *size, s32 vramMode) {
+    GsInitGraph(size->w, size->h, 0, 1, vramMode);
+    GsDefDispBuff(0, 0, 0, size->h);
+    self->size = *size;
+    self->unk1C = vramMode;
+}
 void func_8002085C(Class6C070 *self) {
     if (self->unk10 == 0) {
         self->unk10 = 1;
