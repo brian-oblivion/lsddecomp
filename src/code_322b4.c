@@ -173,7 +173,7 @@ typedef struct CtorArg1Methods_322b4 {
     u8 pad00[0x8];
     void (*ctor)(void *self, s32 arg); /* +0x008 */
 } CtorArg1Methods_322b4;
-void *func_800428E4(void);
+void *Get_vtable_D8006EFAC(void);
 void GetCellRect(SpriteRect *dst, u32 cell);
 
 /* Allocate and construct a D_8006EC74 object (0xAC bytes): one cell. */
@@ -508,7 +508,7 @@ void *New_D8006EFAC(void) {
     void *obj = BMemPMgrAlloc(0x54);
 
     if (obj != NULL) {
-        ((Slot08Methods_322b4 *)func_800428E4())->init(obj);
+        ((Slot08Methods_322b4 *)Get_vtable_D8006EFAC())->init(obj);
         return obj;
     }
     return NULL;
@@ -520,7 +520,7 @@ void D8006EFAC__D8006EFAC(D_8006EFACObj *self) {
     BasicClass **light;
 
     GetClass6B5CCMethods()->ctor((Class6B5CC *)self);
-    self->methods = func_800428E4();
+    self->methods = Get_vtable_D8006EFAC();
     for (i = 0, light = self->lights; i < 3; i++, light++) {
         *light = New_FlatLightObj(i);
         self->methods->addChild(self, *light);
@@ -565,6 +565,6 @@ void D8006EFAC__SetAmbientColor(D_8006EFACObj *self, SpriteRgb *rgb, s32 swap) {
     GsSetAmbient((u8)self->ambient.r << 4, (u8)self->ambient.g << 4, (u8)self->ambient.b << 4);
 }
 /* Returns the D_8006EFAC method table. */
-void *func_800428E4(void) {
+void *Get_vtable_D8006EFAC(void) {
     return D_8006EFAC;
 }

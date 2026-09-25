@@ -2,7 +2,7 @@
  * class_3ac78 -- the front half of Class866E8, the class whose method table is
  * D_800866E8 (80 slots, header 0x114; tools/classtable.py D_800866E8). It
  * derives from Class6B5CC (code_d294) through the intermediate base whose
- * table func_800428E4 returns (D_8006EFAC), and the game builds exactly one,
+ * table Get_vtable_D8006EFAC returns (D_8006EFAC), and the game builds exactly one,
  * at boot, in class_39e08's Obj865C8__Obj865C8 via New_Class866E8(0, 1).
  *
  * What it manages is a GRID. The object owns seven elements (elems[7]), each
@@ -70,7 +70,7 @@ struct BaseCtorTable_3ac78 {
     void (*dtor)(void *self); /* +0x00C, Class866E8__Finalize: standard "further-base dtor" slot, mirroring ctor */
 };
 
-extern BaseCtorTable_3ac78 *func_800428E4(void);
+extern BaseCtorTable_3ac78 *Get_vtable_D8006EFAC(void);
 extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
@@ -88,7 +88,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     u8 *end;
     s32 buf[3];
 
-    func_800428E4()->ctor(self);
+    Get_vtable_D8006EFAC()->ctor(self);
     self->methods = GetClass866E8Methods();
 
     if (arg1 != NULL) {
@@ -201,7 +201,7 @@ void Class866E8__Finalize(Class866E8 *self)
         BMemPMgrFree(entry->cells);
     }
 
-    func_800428E4()->dtor(self);
+    Get_vtable_D8006EFAC()->dtor(self);
 }
 
 /* GetClass6B5CCMethods: include/Class6B5CC.h. Round 59 measured the two

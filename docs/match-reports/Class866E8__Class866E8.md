@@ -18,7 +18,7 @@ struct BaseCtorTable_3ac78 {
     void (*ctor)(void *self); /* +0x008, standard "further-base ctor first" slot */
 };
 
-extern BaseCtorTable_3ac78 *func_800428E4(void);
+extern BaseCtorTable_3ac78 *Get_vtable_D8006EFAC(void);
 extern UnkSlotChildObj_3ac78 *func_80048894(void);
 extern UnkSlotListObj_3ac78 *New_Class6D940(s32 arg1);
 extern GenericObject *New_Class86AA0(void);
@@ -35,7 +35,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
     u8 *end;
     s32 buf[3];
 
-    func_800428E4()->ctor(self);
+    Get_vtable_D8006EFAC()->ctor(self);
     self->methods = GetClass866E8Methods();
 
     if (arg1 != NULL) {
@@ -107,7 +107,7 @@ void Class866E8__Class866E8(Class866E8 *self, Vec3_3ac78 *arg1, s32 arg2)
 
 ## What it does
 
-Class866E8's own ctor. Calls a further-base ctor (`func_800428E4()->ctor(self)`,
+Class866E8's own ctor. Calls a further-base ctor (`Get_vtable_D8006EFAC()->ctor(self)`,
 the standard "base ctor first, then set own vtable pointer" idiom already
 established elsewhere in this project), sets `self->methods`, copies a
 3-word block into `self->unk54` (from `arg1` if given, else a default
