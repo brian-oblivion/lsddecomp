@@ -40,6 +40,15 @@ Rec1C *GetStreamChannelInit(s32 *countOut) {
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, Class6D3C8.h) are independent and untouched.
 
+## Arity (round 82, alpha, track 3 externcheck)
+
+externcheck flags Class6D3C8.h's 2-parameter extern against this
+1-parameter definition. The body reads only `$a0` and does not forward
+`$a1` (GetStreamPool2 takes one argument), so this is not the forwarding
+idiom; but the caller's second argument is retail (`move a1,zero` in the
+jal's delay slot at 0x80026974), so the extern cannot drop it. The extern
+line carries `/* arity-ok: ... */`.
+
 ## Naming
 
 - **Name:** `GetStreamChannelInit`
