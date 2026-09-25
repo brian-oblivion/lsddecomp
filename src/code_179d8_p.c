@@ -29,44 +29,18 @@
  * second copy and shifts the whole image).
  *
  * READ THIS BEFORE STARTING: SsUtAllKeyOff touches the same global family as
- * `code_179d8_m` -- _svm_voice/98A/98C/98E/996/998/99A/99C/9A3 and
+ * `code_179d8_m` -- libsnd's _svm_voice table (include/SvmVoice.h) and
  * D_8006DAD4.  The "split scaled index" entry in
  * docs/DECOMPILATION_LEARNINGS.md (a mask on the PRODUCT means a halfword
  * array indexed by a truncated `idx*8`, NOT a struct array indexed by a cast
  * index) was derived on exactly those globals, together with its
  * loop-versus-non-loop refinement.  It is very likely to apply here.
  *
- * This unit's extern declarations stay LOCAL to this file; it shares no
- * project header with any other unit and should not acquire one.
+ * This unit's extern declarations stay LOCAL to this file, except Sony's
+ * _svm_voice, whose one type is include/SvmVoice.h (round 86, track 2).
  */
 #include "common.h"
-
-/*
- * This function's own local view of the shared 0x34-stride channel-
- * configuration record family that code_179d8_j.c/code_179d8_m.c already
- * document (Rec34D994/Rec34Half/Rec34Byte there) -- kept LOCAL per the
- * project's multiple-independent-local-views convention, not a shared
- * header. Every symbol here is 0x34 bytes from its neighbor; only the
- * one field this function writes is named per symbol.
- */
-typedef struct {
-    u16 unk0; /* +0x0 */
-    u8 pad2[0x34 - 0x2];
-} Rec34U16;
-extern Rec34U16 _svm_voice[];
-extern Rec34U16 D_8008D98A[];
-extern Rec34U16 D_8008D98C[];
-extern Rec34U16 D_8008D98E[];
-extern Rec34U16 D_8008D996[];
-extern Rec34U16 D_8008D998[];
-extern Rec34U16 D_8008D99A[];
-extern Rec34U16 D_8008D99C[];
-
-typedef struct {
-    u8 unk0; /* +0x0 */
-    u8 pad1[0x34 - 0x1];
-} Rec34U8;
-extern Rec34U8 D_8008D9A3[];
+#include "SvmVoice.h"
 
 /* code_179d8_m.c's own comment on this exact symbol: "written as a side
  * effect, then re-read from the global (not a cached register) a few
@@ -132,15 +106,15 @@ void SsUtAllKeyOff(void)
 
     for (i = 0; i < D_8008E9D0; i++) {
         woff = i * 8;
-        D_8008D98A[i].unk0 = 0x18;
-        _svm_voice[i].unk0 = 0xFF;
-        D_8008D9A3[i].unk0 = 0;
-        D_8008D98C[i].unk0 = 0;
-        D_8008D98E[i].unk0 = 0;
-        D_8008D996[i].unk0 = 0xFF;
-        D_8008D998[i].unk0 = 0;
-        D_8008D99A[i].unk0 = 0;
-        D_8008D99C[i].unk0 = 0xFF;
+        _svm_voice[i].unk02 = 0x18;
+        _svm_voice[i].unk00 = 0xFF;
+        _svm_voice[i].unk1B = 0;
+        _svm_voice[i].unk04 = 0;
+        _svm_voice[i].unk06 = 0;
+        _svm_voice[i].unk0E = 0xFF;
+        _svm_voice[i].unk10 = 0;
+        _svm_voice[i].unk12 = 0;
+        _svm_voice[i].unk14 = 0xFF;
 
         D_8006DAD4[woff + 3] = 0x200;
         D_8006DAD4[woff + 2] = 0x1000;
@@ -159,9 +133,9 @@ void SsUtAllKeyOff(void)
             bitHi = 1u << (bitpos - 0x10);
         }
 
-        D_8008D9A3[bitpos & 0xFFFF].unk0 = 0;
-        D_8008D98C[bitpos & 0xFFFF].unk0 = 0;
-        _svm_voice[bitpos & 0xFFFF].unk0 = 0;
+        _svm_voice[bitpos & 0xFFFF].unk1B = 0;
+        _svm_voice[bitpos & 0xFFFF].unk04 = 0;
+        _svm_voice[bitpos & 0xFFFF].unk00 = 0;
 
         hw0 = D_80090C60;
         hw1 = D_80090C64;
