@@ -25,8 +25,12 @@ round 2026-09-02, runner echo, unit code_2cc8c. 1 attempt.
 
 ## Naming (round 78, delta)
 
-**Tier A** (pure setter). `func_8003CBB8` -> `TaskCore__SetFadeRate`. Body:
+**Tier A** (pure setter). `func_8003CBB8` -> `Obj86B60__SetFadeRate`. Body:
 `self->unk84 = a1;`, nothing else. Corroborated by `TaskCore__TickColorFade`,
 the sole reader of `unk84`, which multiplies it against `frameCounter` to
 build the per-tick colour delta -- exactly what a "rate" describes
 mechanically, without asserting what the fade itself means in the game.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__SetFadeRate (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

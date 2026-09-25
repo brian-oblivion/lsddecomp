@@ -50,9 +50,13 @@ round 2026-09-02, runner echo, unit code_2cc8c. 2 attempts.
 
 ## Naming (round 78, delta)
 
-**Tier C.** `func_8003C858` -> `TaskCore__OnPadConfirm`. Message-0x19
+**Tier C.** `func_8003C858` -> `Obj86B60__func_8003C858`. Message-0x19
 handler (slot78, corrected occupant -- see the header). Body: when
 `self->unk4C` is set, calls `slot70(self, 0x10)` then `slot60(self, reason)`
 with `reason` = 0xB when `unk3C == 1`, else 0xF. Same "gate on unk4C, forward
 to child, transition state" shape as its siblings; the specific reason codes
 and message code have no independent evidence of game meaning. Tier C.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__func_8003C858 (tools/rename.py). Occupant of +0x078 (`onPadConfirm`, onPadEvent's 0x19 case). Named from what it reaches: setState(0xB) runs tick (inputMode 1: begin scrolling or finish on the target's unkC slot) and setState(0xF) commitElementScroll (inputMode 2). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

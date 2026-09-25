@@ -26,7 +26,7 @@ round 2026-09-02, runner echo, unit code_2cc8c. 1 attempt.
 
 ## Naming (round 78, delta)
 
-**Tier A** (pure setter). `func_8003CAEC` -> `TaskCore__SetCallback`. Body:
+**Tier A** (pure setter). `func_8003CAEC` -> `Obj86B60__SetCallback`. Body:
 `self->unk9C = a1; self->unkA0 = a2;` -- stores a callback pointer and its
 context argument verbatim, no other logic. Corroborated by
 `TaskCore__RefreshViewValue`, the sole invoker of this pair
@@ -43,3 +43,7 @@ code_179d8_i.c (unrelated structs sharing the name), so proposal only.
 
 
 **Head disposition, round 78.** `unk9C`/`unkA0` -> `viewCallback`/`viewCallbackCtx` APPLIED (type scope, 3 + 2 accessors).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__SetCallback (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

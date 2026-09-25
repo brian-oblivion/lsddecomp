@@ -122,4 +122,8 @@ registers vs. retail's 5), not a register-identity swap.
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__BroadcastToSlots`. **Tier B**: Forwards `a1` through every slot element's own `slotB8`, plus a secondary per-slot callback for slots with a target entry, saving/restoring `activeSlot` around the walk -- a broadcast to every slot, as opposed to TaskCore__BroadcastToSlotElements which broadcasts only within the CURRENT slot's own item list.
+Renamed `func_` -> `Obj86B60__BroadcastToSlots`. **Tier B**: Forwards `a1` through every slot element's own `slotB8`, plus a secondary per-slot callback for slots with a target entry, saving/restoring `activeSlot` around the walk -- a broadcast to every slot, as opposed to TaskCore__BroadcastToSlotElements which broadcasts only within the CURRENT slot's own item list.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__BroadcastToSlots (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

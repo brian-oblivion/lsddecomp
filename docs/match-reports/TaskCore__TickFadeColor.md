@@ -80,4 +80,8 @@ comparison) rather than typing the local at its "natural" narrow width.
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__TickFadeColor`. **Tier B**: Computes a decreasing grey/colour byte from `frameCounter*unk84` each call, forwards the 3-byte buffer to two colour-consuming slots (`slotE4`, `unk78->slotB8` -- both established elsewhere as colour consumers, see `Unk4CObj::unk10`'s own "3-byte colour buffer" comment), and returns whether the byte has wrapped past a threshold -- the shape of a per-frame fade/countdown with a completion flag. Mechanics are solid; the game-visible purpose (what fades) is not.
+Renamed `func_` -> `Obj86B60__TickFadeColor`. **Tier B**: Computes a decreasing grey/colour byte from `frameCounter*unk84` each call, forwards the 3-byte buffer to two colour-consuming slots (`slotE4`, `unk78->slotB8` -- both established elsewhere as colour consumers, see `Unk4CObj::unk10`'s own "3-byte colour buffer" comment), and returns whether the byte has wrapped past a threshold -- the shape of a per-frame fade/countdown with a completion flag. Mechanics are solid; the game-visible purpose (what fades) is not.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__TickFadeColor (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

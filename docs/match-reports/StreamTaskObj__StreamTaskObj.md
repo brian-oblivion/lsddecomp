@@ -104,3 +104,7 @@ all sources before storing any of them.
 own ctor slot `+0x008` (`classtable.py`), matching the established
 `Class__Class` constructor convention already used elsewhere in this
 codebase (`IntermediateBase__IntermediateBase`, `Class866E8__Class866E8`).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

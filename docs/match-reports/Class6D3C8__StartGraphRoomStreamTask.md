@@ -112,3 +112,7 @@ this unit), then starts it. Named for its one and only caller:
 same "GraphRoom" vocabulary as that report's naming, not a guess (evidence:
 the call-site gate, not the function body alone, which by itself doesn't
 mention GraphRoom).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Class6D3C8.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see Class6D3C8__StartCinematicStream for the bytes that settled the return type). Byte-identical.

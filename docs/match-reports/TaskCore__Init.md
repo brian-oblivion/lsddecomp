@@ -84,10 +84,14 @@ under-describe the function.
 
 ## Naming
 
-**TaskCore__Init** -- tier C. Occupies `gTaskCoreMethods` slot
+**TaskCoreObj__func_8003C1DC** -- tier C. Occupies `gTaskCoreMethods` slot
 `+0x044`; up-calls `IntermediateBase`'s own slot `+0x044`, then returns
 `self->unk38` as a status/result word (the report's own "return-type
 discrepancy" section). The mechanics are fully known (an up-call followed
 by a status read), but neither `unk38` nor the base slot's own game meaning
 is established, so left `Class__func_xxxxx` rather than name it as a getter
 for something unconfirmed.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from TaskCoreObj__func_8003C1DC (tools/rename.py). Occupant of +0x044 (`init`), named for the slot: IntermediateBase's init, then returns +0x038, now `result` (onInit clears it, setState(6) sets 1, StreamTaskObj sets 2). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -114,7 +114,7 @@ is its first realised match.
 
 ## Naming (round 78, delta)
 
-**Tier A.** `func_8003C48C` -> `TaskCore__OnPadEvent`. Occupies slot58 in
+**Tier A.** `func_8003C48C` -> `Obj86B60__OnTag2Notify`. Occupies slot58 in
 `gTaskCoreMethods` (the base table), `gClass86B60Methods` and
 `gGraphRoomMethods` identically (unoverridden by either derived class --
 `tools/classtable.py gTaskCoreMethods`/`gClass86B60Methods`/`gGraphRoomMethods`).
@@ -123,3 +123,7 @@ is its first realised match.
 already-established `onTag1Notify` (header==1, slot54) naming convention one
 slot up. Two independent pieces of evidence agree (the dispatcher's own
 switch and the slot's universal, unoverridden occupancy), so tier A.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__OnTag2Notify (tools/rename.py). Occupant of +0x058 (`onPadEvent`: IntermediateBase__OnNotify's case for a Pad sender), named for the slot. Its cases call +0x074..+0x084 with self alone (byte-identical to passing the sender, which stays in $a1). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -60,12 +60,12 @@ first build.
 
 ## Naming
 
-**TaskCore__GetActiveSlotCount** (renamed from `func_8003DFA0`, round 55, runner alpha).
+**Obj86B60__GetActiveSlotCount** (renamed from `func_8003DFA0`, round 55, runner alpha).
 Tier A: pure leaf getter (a pure leaf whose mechanics ARE its purpose,
 CLAUDE.md/track 3's own definition) -- returns `self->unk60[self->unk58]`,
 the running count for the currently-active ring-buffer slot (`unk60` is an
 array indexed by the `unk58` slot index, established across
-`TaskCore__GetActiveSlotCount`/TaskCore__AdvanceSlotCursor/TaskCore__RetreatSlotCursor, code_2cc8c_b.c). No purpose beyond
+`Obj86B60__GetActiveSlotCount`/TaskCore__AdvanceSlotCursor/TaskCore__RetreatSlotCursor, code_2cc8c_b.c). No purpose beyond
 the getter itself is claimed.
 
 ## Proposed field names
@@ -83,3 +83,7 @@ the getter itself is claimed.
   -- this function is the plain getter for the active slot's own entry.
   NOT renamed directly: shared with `code_2cc8c_b.c`. Head applies by type
   scope.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__GetActiveSlotCount (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

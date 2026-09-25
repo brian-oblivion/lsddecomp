@@ -69,8 +69,12 @@ occurrences.
 
 ## Naming
 
-**TaskCore__Reset** -- tier A. Occupies `gTaskCoreMethods` slot `+0x040`,
+**TaskCoreObj__Reset** -- tier A. Occupies `gTaskCoreMethods` slot `+0x040`,
 the same cross-class "Reset" slot number as `StreamTaskObj__Reset`
 (`Class866E8__Reset`/`Class6B5CC__Reset` precedent); sets eight fields to
 fixed literal defaults, the same shape as every other confirmed `Reset` in
 this codebase.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from TaskCoreObj__Reset (tools/rename.py): the class prefix. Occupant of +0x040 (IntermediateBase's `resetCounters`, the ctor's last call). Keeps "Reset" rather than the slot's name: it sets eight defaults and makes four slot calls and does not up-call. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

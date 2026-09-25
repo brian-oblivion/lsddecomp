@@ -153,9 +153,13 @@ design for this function).
 
 ## Naming (round 78, delta)
 
-**Tier A.** `func_8003C51C` -> `TaskCore__Update`. Occupies slot5C in
+**Tier A.** `func_8003C51C` -> `Obj86B60__OnTag5Notify`. Occupies slot5C in
 `gTaskCoreMethods` and `gClass86B60Methods` identically (only `GraphRoomObj`
 overrides this slot, with its own `GraphRoomObj__UpdateFromLog`).
 `IntermediateBase__OnNotify` dispatches `EventArg`s with `target->header & 0xF == 5`
 through `self->methods->slot5C`, same evidence shape as `OnTag2Notify` above.
 Tier A.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__OnTag5Notify (tools/rename.py). Occupant of +0x05C (`update`), named for the slot: up-calls IntermediateBase's update (the frame counter) and steps the state machine (include/TaskCore.h banner). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

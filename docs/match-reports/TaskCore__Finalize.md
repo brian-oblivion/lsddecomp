@@ -102,7 +102,11 @@ and when the correction comes, retype-and-rebuild-full-unit is cheap
 
 ## Naming
 
-**TaskCore__Finalize** -- tier A. Occupies `gTaskCoreMethods`'s dtor slot
+**TaskCoreObj__Destroy** -- tier A. Occupies `gTaskCoreMethods`'s dtor slot
 `+0x00C`; tears down five sub-objects then up-calls `IntermediateBase`'s own
 dtor at the same slot. Same `Class__Destroy` convention as
 `StreamTaskObj__Destroy`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from TaskCoreObj__Destroy (tools/rename.py). Occupant of +0x00C (`finalize`), named for the slot: releases bgLayer, tileMap, tileAtlas, `sound` when the ctor made it and `subHandle` when owned, runs releaseTarget, then IntermediateBase's finalize. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

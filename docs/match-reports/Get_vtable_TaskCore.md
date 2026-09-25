@@ -38,3 +38,7 @@ table) -- this rename aligns the function's own name with the established
 type name (`Get_vtable_BasicClass` naming precedent already used in this
 project for exactly this shape: a no-argument getter returning a shared
 static vtable).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Returns `TaskCoreMethods *` (`&gTaskCoreMethods`); it returned `void *` over an `extern u8 gTaskCoreMethods[]`. Byte-identical.

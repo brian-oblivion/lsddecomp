@@ -89,4 +89,8 @@ does.
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__SetActiveSlot`. **Tier B**: Switches `self->activeSlot` to `a1`: un-highlights the old slot's representative element, highlights the new one (both via `slotElements[idx]->methods->slotB8`), then notifies (`slot70`) and fires a closing `slot60(self, 9)`. Same old/new-highlight-swap shape as TaskCore__SetSlotCursor one level down (items within a slot instead of slots/tabs themselves) -- cross-confirms the pairing. Mechanics (switch the active slot, with a visible highlight swap) are clear; kept tier B since it has real side effects beyond a plain setter.
+Renamed `func_` -> `Obj86B60__SetActiveSlot`. **Tier B**: Switches `self->activeSlot` to `a1`: un-highlights the old slot's representative element, highlights the new one (both via `slotElements[idx]->methods->slotB8`), then notifies (`slot70`) and fires a closing `slot60(self, 9)`. Same old/new-highlight-swap shape as TaskCore__SetSlotCursor one level down (items within a slot instead of slots/tabs themselves) -- cross-confirms the pairing. Mechanics (switch the active slot, with a visible highlight swap) are clear; kept tier B since it has real side effects beyond a plain setter.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__SetActiveSlot (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

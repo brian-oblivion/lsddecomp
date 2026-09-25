@@ -56,3 +56,7 @@ when the argument is non-negative) for `self->unk40`; a pure leaf whose
 mechanics are its whole purpose, matching the `Class__SetUnkNN` convention
 already used elsewhere for a field of unconfirmed game meaning
 (`Entity__SetTargetReached`, `src/Entity.c`).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+StreamTaskObj now expands TASKCORE_FIELDS/TASKCORE_SLOTS (include/TaskCore.h, round 84): the field this sets is TaskCore's +0x040 `frameBound`, and this function is StreamTaskObj's override of TaskCore's +0x06C setFrameBound (x15 where TaskCore__SetFrameBound multiplies by 20). Byte-identical.

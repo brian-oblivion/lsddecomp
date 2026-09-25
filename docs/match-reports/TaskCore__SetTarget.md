@@ -148,7 +148,7 @@ rather than a localized diff.
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__SetTarget`. **Tier B**: Stores `a1` into `self->unk4C` (the cross-unit 'target' descriptor, named from six independent functions' evidence, see Unk4CObj's own header comment) and builds four parallel per-slot arrays from it. Mechanics (constructor for the target association) are clear; what the target itself represents in the game is not.
+Renamed `func_` -> `Obj86B60__SetTarget`. **Tier B**: Stores `a1` into `self->unk4C` (the cross-unit 'target' descriptor, named from six independent functions' evidence, see Unk4CObj's own header comment) and builds four parallel per-slot arrays from it. Mechanics (constructor for the target association) are clear; what the target itself represents in the game is not.
 
 ## Proposed field names
 
@@ -179,3 +179,7 @@ accessors the compiler lists, in both units):
 
 
 **Head disposition, round 78.** `unk4C` -> `target` APPLIED (type scope, 36 accessors across code_2cc8c*). `Unk4CObj::unk10` -> `unselectedColor` APPLIED (5 accessors). `Unk4CObj::unk24` -> `slotEntries` + retype NOT applied: the retype needs a cast at `TaskCore__Tick`'s call site, which is a type change, left for track 4.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__SetTarget (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

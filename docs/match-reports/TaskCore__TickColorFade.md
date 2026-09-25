@@ -65,7 +65,7 @@ round 2026-09-02, runner echo, unit code_2cc8c. 2 attempts.
 
 ## Naming (round 78, delta)
 
-**Tier B.** `func_8003CC2C` -> `TaskCore__TickColorFade`. Body: `prod =
+**Tier B.** `func_8003CC2C` -> `Obj86B60__TickColorFade`. Body: `prod =
 frameCounter * unk84` (the fade rate, see `SetFadeRate`); builds a 3-byte
 buffer `{unk90[i] + prod : i in 0..2}` (the base colour, see `SetColors`);
 forwards that buffer to `self->methods->slotE4` and to
@@ -76,3 +76,7 @@ Mechanically this is a per-tick RGB fade computation forwarded to a display
 target; occupies slotB0 (also read as DATA -- a function pointer value, not
 called -- by `SetFadeCallbackEnabled`). What the fade represents in-game
 (and what `unk78` is) is not established, so tier B rather than A.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__TickColorFade (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

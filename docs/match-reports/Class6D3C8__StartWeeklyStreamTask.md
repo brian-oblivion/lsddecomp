@@ -81,3 +81,7 @@ configures and starts the task. "Weekly" is grounded in that documented
 `/7` derivation inside `PickWeeklyStreamChannel` (real evidence, not a guess from the
 function's own body, which is otherwise the same generic StreamTask-launch
 shape as its three siblings in this unit).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Class6D3C8.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see Class6D3C8__StartCinematicStream for the bytes that settled the return type). Byte-identical.

@@ -35,3 +35,7 @@ None new.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004DC08` -> `Class86B60__DestroyNameField`. **Tier B**: Unconditionally releases `self->nameField` (the sub-object `Class86B60__CreateNameField` constructs) then forwards to the base class's own `slotDC`. Mirror-image counterpart to `CreateNameField`; not the class's own destructor (that is `Class86B60__Dtor`, a different base slot).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

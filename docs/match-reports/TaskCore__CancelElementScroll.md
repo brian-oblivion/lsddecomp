@@ -73,4 +73,8 @@ since only this one access is confirmed; a future function establishing
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__CancelElementScroll`. **Tier B**: Also gated on `self->unk3C == 2` (state 2 -> 1), but reads a NEW cursor value out of `SlotEntry::savedCursor` (the SAME field TaskCore__CommitElementScroll just wrote) instead of keeping whatever the interactive scroll left in `slotCounts[idx]`, then installs THAT value as the new `slotCounts[idx]` -- i.e. it discards the in-progress scroll and reverts to the last-committed position. 'Cancel' follows directly from reading back the persisted value rather than keeping the live one.
+Renamed `func_` -> `Obj86B60__CancelElementScroll`. **Tier B**: Also gated on `self->unk3C == 2` (state 2 -> 1), but reads a NEW cursor value out of `SlotEntry::savedCursor` (the SAME field TaskCore__CommitElementScroll just wrote) instead of keeping whatever the interactive scroll left in `slotCounts[idx]`, then installs THAT value as the new `slotCounts[idx]` -- i.e. it discards the in-progress scroll and reverts to the last-committed position. 'Cancel' follows directly from reading back the persisted value rather than keeping the live one.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__CancelElementScroll (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

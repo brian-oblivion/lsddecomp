@@ -91,7 +91,7 @@ tell for this class, distinguishable at a glance from a same-size residue.
 
 ## Naming
 
-**TaskCore__OnDeinit** -- tier C. Occupies slot `+0x050` in BOTH
+**TaskCoreObj__func_8003C3D0** -- tier C. Occupies slot `+0x050` in BOTH
 `gTaskCoreMethods` and `gStreamTaskObjMethods` at the identical address --
 i.e. StreamTaskObj does NOT override this slot, so the function genuinely
 belongs to `TaskCoreObj` (confirmed by `classtable.py`'s slot-for-slot
@@ -102,3 +102,7 @@ down `self->unk18` through two slots, then `unk78`'s own slot `+0x050`,
 then conditionally the `TaskText` sub-object -- teardown-shaped but not the
 dtor slot, so left `Class__func_xxxxx` rather than assert "Stop" or
 "Deactivate".
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from TaskCoreObj__func_8003C3D0 (tools/rename.py). Occupant of +0x050 (`onDeinit`, IntermediateBase__Deinit's first call), named for the slot. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

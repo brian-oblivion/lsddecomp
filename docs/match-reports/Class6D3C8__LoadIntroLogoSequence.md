@@ -127,3 +127,7 @@ loaded in sequence. "Intro logo sequence" describes what the function DOES
 (loads these three specific assets, gated, in this order); it does not
 assert why the game shows them (splash-screen framing is a reasonable
 inference from the filenames but not confirmed by any code in this unit).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Class6D3C8.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see Class6D3C8__StartCinematicStream for the bytes that settled the return type). Byte-identical.

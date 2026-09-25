@@ -73,8 +73,12 @@ round 2026-09-02, runner echo, unit code_2cc8c. 2 attempts.
 
 ## Naming (round 78, delta)
 
-**Tier A.** `func_8003CA1C` -> `TaskCore__Tick`. Occupies slot90 in
+**Tier A.** `func_8003CA1C` -> `Obj86B60__Tick`. Occupies slot90 in
 `gTaskCoreMethods`; `gClass86B60Methods` overrides the same slot with the
 independently-named `Class86B60__Tick`, settling the name the same way as
 `SetState` above. `GraphRoomObj` inherits this exact function unmodified
 (unoverridden occupant of its own table too).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__Tick (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

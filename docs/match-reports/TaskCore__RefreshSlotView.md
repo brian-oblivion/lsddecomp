@@ -769,4 +769,8 @@ misunderstanding.
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__RefreshSlotView`. **Tier B**: Pings every element of the current slot's item list, rebuilds the position buffer (`SlotPos`, the same shape TaskCore__CommitElementScroll builds from the SAME `SlotEntry` record -- cross-confirms that struct), then either shows the list through `self->listView` with a size descriptor or hides it, re-walks the list installing the position on each element, and finally highlights the element at the target's own stashed cursor. The clearest single function establishing `listView`'s role (show/position/hide the item list).
+Renamed `func_` -> `Obj86B60__RefreshSlotView`. **Tier B**: Pings every element of the current slot's item list, rebuilds the position buffer (`SlotPos`, the same shape TaskCore__CommitElementScroll builds from the SAME `SlotEntry` record -- cross-confirms that struct), then either shows the list through `self->listView` with a size descriptor or hides it, re-walks the list installing the position on each element, and finally highlights the element at the target's own stashed cursor. The clearest single function establishing `listView`'s role (show/position/hide the item list).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__RefreshSlotView (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

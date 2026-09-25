@@ -135,3 +135,7 @@ slot. Fixed the one call site, oracle green. Same name and same evidence
 shape ("runs right after self->methods is installed") as
 `Class869D8Methods::onConstruct`, which this unit's other ctor
 (`Class869D8__Class869D8`) already established.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

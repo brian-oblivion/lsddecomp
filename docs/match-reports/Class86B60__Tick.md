@@ -101,3 +101,7 @@ struct definition, rebuilt default build and
 rather than proposed. `unk58` also names unrelated fields on other structs
 in this same header (e.g. `TaskObjF::unk58`) -- untouched, since their own
 definitions were not edited.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -79,4 +79,8 @@ order, not from logical necessity.
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__BroadcastToSlotElements`. **Tier B**: Forwards `a1` through `slotB8` of every element in the CURRENT slot's own item list (`self->itemLists[activeSlot]`) -- narrower in scope than TaskCore__BroadcastToSlots (which walks every SLOT, not one slot's items). Confirmed as a real vtable slot (Obj86B60Methods, slot104) by `asm/data/76DC8.data.s`/`asm/data/57070.data.s` even though nothing in this unit dispatches through this exact slot.
+Renamed `func_` -> `Obj86B60__BroadcastToSlotElements`. **Tier B**: Forwards `a1` through `slotB8` of every element in the CURRENT slot's own item list (`self->itemLists[activeSlot]`) -- narrower in scope than TaskCore__BroadcastToSlots (which walks every SLOT, not one slot's items). Confirmed as a real vtable slot (Obj86B60Methods, slot104) by `asm/data/76DC8.data.s`/`asm/data/57070.data.s` even though nothing in this unit dispatches through this exact slot.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__BroadcastToSlotElements (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

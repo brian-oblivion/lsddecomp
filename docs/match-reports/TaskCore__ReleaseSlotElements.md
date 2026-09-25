@@ -43,4 +43,8 @@ disassembly, no m2c seed needed.
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__ReleaseSlotElements`. **Tier B**: Releases and frees `self->itemLists[activeSlot]` through two already-matched helpers -- the exact teardown counterpart of TaskCore__CreateSlotElements.
+Renamed `func_` -> `Obj86B60__ReleaseSlotElements`. **Tier B**: Releases and frees `self->itemLists[activeSlot]` through two already-matched helpers -- the exact teardown counterpart of TaskCore__CreateSlotElements.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__ReleaseSlotElements (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

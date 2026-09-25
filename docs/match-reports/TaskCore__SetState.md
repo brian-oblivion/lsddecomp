@@ -139,7 +139,7 @@ wrong rather than the C.
 
 ## Naming (round 78, delta)
 
-**Tier A.** `func_8003C63C` -> `TaskCore__SetState`. Occupies slot60 in
+**Tier A.** `func_8003C63C` -> `Obj86B60__SetState`. Occupies slot60 in
 `gTaskCoreMethods`; `gClass86B60Methods` overrides the SAME slot with the
 independently-named `Class86B60__SetState` (`tools/classtable.py
 gClass86B60Methods`), which is what settles both the slot's role (a
@@ -180,3 +180,7 @@ notify-handling) but not of the name. Do not apply both.
 
 
 **Head disposition, round 78.** `unk3C` DECLINED (see TaskCore__BeginElementScroll.md): two competing readings, value range unconfirmed.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__SetState (tools/rename.py): the class prefix. Occupant of +0x060 (`setState`), named for the slot. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

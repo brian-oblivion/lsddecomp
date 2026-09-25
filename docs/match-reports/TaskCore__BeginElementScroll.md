@@ -72,7 +72,7 @@ for a computation this unit alone needs.
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__BeginElementScroll`. **Tier B**: Gated on `self->unk3C == 1`. Notifies the target (`slot100`), highlights the item at the slot's PERSISTED cursor (`slotCounts[idx]`, the same field TaskCore__AdvanceSlotCursor/RetreatSlotCursor step), advances `unk3C` to 2, fires a closing notification. Opens interactive scrolling of the current slot's item list -- state 1 -> 2. Paired with TaskCore__CommitElementScroll/TaskCore__CancelElementScroll, both gated on state 2 and both returning to state 1; the data flow (DA10 highlights `slotCounts[idx]`, DAD4 later WRITES that same value into `SlotEntry::savedCursor`, DCAC READS `savedCursor` back out) is what grounds 'scroll session that a later step commits or cancels' rather than a guess.
+Renamed `func_` -> `Obj86B60__BeginElementScroll`. **Tier B**: Gated on `self->unk3C == 1`. Notifies the target (`slot100`), highlights the item at the slot's PERSISTED cursor (`slotCounts[idx]`, the same field TaskCore__AdvanceSlotCursor/RetreatSlotCursor step), advances `unk3C` to 2, fires a closing notification. Opens interactive scrolling of the current slot's item list -- state 1 -> 2. Paired with TaskCore__CommitElementScroll/TaskCore__CancelElementScroll, both gated on state 2 and both returning to state 1; the data flow (DA10 highlights `slotCounts[idx]`, DAD4 later WRITES that same value into `SlotEntry::savedCursor`, DCAC READS `savedCursor` back out) is what grounds 'scroll session that a later step commits or cancels' rather than a guess.
 
 ## Proposed field names
 
@@ -93,3 +93,7 @@ merge:
 
 
 **Head disposition, round 78.** `unk3C` DECLINED this round: echo (`scrollState`) and delta (`notifyMode`) read it differently, and this report itself asks for its full value range to be confirmed first. It stays `unk3C` with both readings on file.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__BeginElementScroll (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

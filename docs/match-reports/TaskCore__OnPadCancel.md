@@ -29,9 +29,13 @@ round 2026-09-02, runner echo, unit code_2cc8c. 1 attempt.
 
 ## Naming (round 78, delta)
 
-**Tier C.** `func_8003C8D0` -> `TaskCore__OnPadCancel`. Message-0x17
+**Tier C.** `func_8003C8D0` -> `Obj86B60__func_8003C8D0`. Message-0x17
 handler (slot7C -- the one slot in this group of five whose occupant the old,
 reversed header comment happened to get right, since it is its own mirror
 image). Body: when `self->unk4C` is set AND `self->unk3C != 1`, calls
 `slot70(self, 0x10)` then `slot60(self, 0x11)`. Same shape as siblings, no
 independent purpose evidence. Tier C.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__func_8003C8D0 (tools/rename.py). Occupant of +0x07C (`onPadCancel`, 0x17): setState(0x11), which runs cancelElementScroll, when not in inputMode 1. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

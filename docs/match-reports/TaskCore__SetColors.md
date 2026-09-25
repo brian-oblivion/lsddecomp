@@ -107,7 +107,7 @@ the cautionary precedent this is deliberately not repeating.
 
 ## Naming (round 78, delta)
 
-**Tier A** (pure setter). `func_8003CB68` -> `TaskCore__SetColors`. Body:
+**Tier A** (pure setter). `func_8003CB68` -> `Obj86B60__SetColors`. Body:
 copies three independent 3-byte (`s8 r,g,b`) triples from `a1`, `a2`, `a3`
 into `self->unk90`, `self->unk93`, `self->unk96` respectively -- no other
 logic, a pure multi-field assignment.
@@ -125,3 +125,7 @@ unrelated units, so proposal only.
 
 
 **Head disposition, round 78.** `unk90` -> `baseColor` APPLIED (type scope, 4 accessors).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__SetColors (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

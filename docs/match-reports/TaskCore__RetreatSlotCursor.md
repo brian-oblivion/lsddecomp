@@ -43,4 +43,8 @@ No new header changes beyond what `TaskCore__AdvanceSlotCursor` already added
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__RetreatSlotCursor`. **Tier B**: The exact mirror of TaskCore__AdvanceSlotCursor, stepping backward with wraparound at 0. Same reasoning.
+Renamed `func_` -> `Obj86B60__RetreatSlotCursor`. **Tier B**: The exact mirror of TaskCore__AdvanceSlotCursor, stepping backward with wraparound at 0. Same reasoning.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__RetreatSlotCursor (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

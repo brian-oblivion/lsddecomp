@@ -39,9 +39,13 @@ round 2026-09-02, runner echo, unit code_2cc8c.
 
 ## Naming (round 78, delta)
 
-**Tier B.** `func_8003C7B4` -> `TaskCore__PlaySound`. Occupies slot70.
+**Tier B.** `func_8003C7B4` -> `Obj86B60__ForwardToChild`. Occupies slot70.
 Body: when `self->unk48` (a distinct, still-`Unk48Obj`-typed child) is
 non-NULL, forwards `(child, a1, 0x60, 0x60)` to `child->methods->slot80`.
 Mechanics are clear (a conditional forward to a child object, two args
 fixed); what the fixed `0x60, 0x60` pair or the child's real identity
 represent in the game is not established, so tier B rather than A.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__ForwardToChild (tools/rename.py). Occupant of +0x070 (`playSound`). The "child" is +0x048, New_VabStreamObj(soundBankPath) with "ETC\ETCSE" at both subclass ctors, and the call is its +0x080, VabStreamObj__PlayTone (tone, 0x60, 0x60). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

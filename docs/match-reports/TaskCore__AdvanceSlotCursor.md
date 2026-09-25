@@ -73,4 +73,8 @@ explicit local". (`TaskCore__AdvanceSlotCursor`, `TaskCore__RetreatSlotCursor`, 
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__AdvanceSlotCursor`. **Tier B**: Advances `slotCounts[activeSlot]` by one, wrapping at `itemCounts[activeSlot]`, and forwards the new value through `slot11C` (== TaskCore__SetSlotCursor, confirmed by classtable.py). Kept tier B rather than A since it dispatches into a second function with its own further side effects, not a self-contained leaf.
+Renamed `func_` -> `Obj86B60__AdvanceSlotCursor`. **Tier B**: Advances `slotCounts[activeSlot]` by one, wrapping at `itemCounts[activeSlot]`, and forwards the new value through `slot11C` (== TaskCore__SetSlotCursor, confirmed by classtable.py). Kept tier B rather than A since it dispatches into a second function with its own further side effects, not a self-contained leaf.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__AdvanceSlotCursor (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

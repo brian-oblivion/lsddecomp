@@ -88,4 +88,8 @@ Unk74ObjMethods slot4/slot78/slot5C)
 
 ## Naming (round 78, naming runner echo)
 
-Renamed `func_` -> `TaskCore__SetSubHandle`. **Tier A**: A setter for `self->unk74`/`self->unk70` (load-by-path-or-install-directly): pure load-or-install mechanics, no purpose beyond that to guess at -- tier A by the 'a setter is tier A by definition' rule.
+Renamed `func_` -> `Obj86B60__SetSubHandle`. **Tier A**: A setter for `self->unk74`/`self->unk70` (load-by-path-or-install-directly): pure load-or-install mechanics, no purpose beyond that to guess at -- tier A by the 'a setter is tier A by definition' rule.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__SetSubHandle (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -78,7 +78,7 @@ round 2026-09-02, runner echo, unit code_2cc8c. 3 attempts.
 
 ## Naming (round 78, delta)
 
-**Tier B.** `func_8003CAF8` -> `TaskCore__SetFadeCallbackEnabled`. Body:
+**Tier B.** `func_8003CAF8` -> `Obj86B60__SetFadeCallbackEnabled`. Body:
 `switch(a1) { case 0: self->unk88 = NULL; break; case 1: self->unk88 =
 methods->slotB0; break; }`. In this unit's evidence, `slotB0` is ALWAYS
 `TaskCore__TickColorFade` (its own IS-occupant, see that report) and nothing
@@ -100,3 +100,7 @@ whole-tree replace.
 
 
 **Head disposition, round 78.** `unk88` -> `fadeCallback` APPLIED (type scope, 4 accessors).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__SetFadeCallbackEnabled (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

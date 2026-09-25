@@ -57,3 +57,7 @@ slot `+0x05C`; three sequential early-return guards around a cached status
 field (`unkA4`) and a completion flag (`unkD8`). Mechanics are fully
 described in the report above; nothing pins down what the guarded operation
 actually represents in the game, so left `Class__func_xxxxx`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

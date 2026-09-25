@@ -75,3 +75,7 @@ themselves mean in the game (no caller was found), so a name like
 `SetState` would assert more than the body supports -- kept
 `Class__func_xxxxx` per round 72's tier-B ceiling for unconfirmed data
 meaning.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

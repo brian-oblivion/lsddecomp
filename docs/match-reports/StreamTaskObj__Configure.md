@@ -86,3 +86,7 @@ slot -- the mechanics (store configuration words, then delegate) are clear,
 but the game meaning of the second argument varies by caller (a filename in
 one call, a plain derived count in another), so no more specific verb is
 supported yet.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). This function occupies +0x044 with five parameters where TASKCORE_SLOTS (IntermediateBase) types the slot init(args, mode): a contradiction left for StreamTaskObj's own job.

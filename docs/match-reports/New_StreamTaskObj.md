@@ -61,3 +61,7 @@ updated with what survived and what did not.
 dispatch the ctor slot, return); the class is independently established both
 by `gStreamTaskObjMethods`'s own ctor-slot dispatch (`classtable.py`) and by
 `include/Class6D3C8.h`'s cross-unit `StreamTask` view of the same call site.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+StreamTaskObj's table now expands TASKCORE_SLOTS (include/TaskCore.h, round 84): the ctor call is `ctor` and its fifth argument is cast to the ctor's `StreamTaskInitData *`. Byte-identical.

@@ -96,10 +96,14 @@ round 2026-09-02, runner echo, unit code_2cc8c. 2 attempts.
 
 ## Naming (round 78, delta)
 
-**Tier C.** `func_8003C944` -> `TaskCore__OnPadPrev`. Message-0x12
+**Tier C.** `func_8003C944` -> `Obj86B60__func_8003C944`. Message-0x12
 handler (slot80, corrected occupant). Body: when `self->unk4C` is set, picks
 `self->methods->slotEC` (if `unk3C==1`) or `self->methods->slot118` (if
 `unk3C==2`) and calls it with no further arguments -- a mode-gated indirect
 forward, exact same shape as `TaskCore__OnPadNext` below (differing only
 in which slot pair it forwards to). No independent evidence of what either
 target represents, so tier C.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__func_8003C944 (tools/rename.py). Occupant of +0x080 (`onPadPrev`, 0x12): findPrevFreeSlot (inputMode 1) or retreatSlotCursor (inputMode 2). The retreatSlotCursor slot is now void like its occupant, which removed this function's baseline "assignment from incompatible pointer type" warning. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

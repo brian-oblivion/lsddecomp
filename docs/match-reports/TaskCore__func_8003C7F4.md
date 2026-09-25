@@ -48,7 +48,7 @@ round 2026-09-02, runner echo, unit code_2cc8c.
 ## Naming (round 78, delta)
 
 **Tier C** (`Class__func_xxxxx` -- class established via slot occupancy,
-purpose not). `func_8003C7F4` -> `TaskCore__func_8003C7F4`. One of the five
+purpose not). `func_8003C7F4` -> `Obj86B60__func_8003C7F4`. One of the five
 message handlers `TaskCore__OnPadEvent` dispatches to (message code 0x21,
 slot74 -- see `include/code_2cc8c.h`'s round-78 correction of this slot's
 occupant, which was previously listed reversed). Body: when `self->unk4C` is
@@ -57,3 +57,7 @@ child-forward followed by a state transition. Same shape as the other four
 siblings in this dispatch group with no independent evidence distinguishing
 what message 0x21 specifically represents, so kept at the tier-C
 class-scoped form rather than guessing.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__func_8003C7F4 (tools/rename.py): the class prefix. Occupant of +0x074 (`onPad21`, onPadEvent's 0x21 case). Kept func_: its only effect past playSound(0x10) is setState(0xA), which sets state 5 and nothing else. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -36,3 +36,7 @@ None beyond `StreamTaskObj__func_8003BD74`'s -- same shape, same open return-typ
 slot `+0x084`; identical pure up-call shape to
 `StreamTaskObj__func_8003BD74` one slot over. Same reasoning, left
 `Class__func_xxxxx`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -43,8 +43,8 @@ class's base method table gClass86B60Methods).
 ## Naming (round 78, delta)
 
 **Tier A** (pure setter -- "a getter, a clamp, a list push" per
-FINISHING-PLAN's tier-A-by-definition rule for a pure leaf). `TaskCore__SetFrameBound`
--> `TaskCore__SetFrameBound`. Body: `self->unk40 = a1;` then, when `a1 >= 0`,
+FINISHING-PLAN's tier-A-by-definition rule for a pure leaf). `Obj86B60__SetFrameBound`
+-> `Obj86B60__SetFrameBound`. Body: `self->unk40 = a1;` then, when `a1 >= 0`,
 `self->unk40 = a1 * 20`. Occupies slot6C (round 78: this slot was previously
 padded over in the header as unoccupied -- corrected against the raw table
 bytes, see the header's own comment on that field). Corroborated by
@@ -63,3 +63,7 @@ definition-only rename + rebuild can tell which are this same struct.
 
 
 **Head disposition, round 78.** `unk40` -> `frameBound` DECLINED: the only source of "frame" is this setter's own name, so the field name would restate the function's hypothesis; left for whoever establishes what the bound is compared against.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from Obj86B60__SetFrameBound (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

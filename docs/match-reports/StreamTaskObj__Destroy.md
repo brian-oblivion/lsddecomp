@@ -61,3 +61,7 @@ slot `+0x00C` (a base-class layout convention independently confirmed in
 `unkB4` sub-object, then up-calls `TaskCore__Finalize` at the same slot --
 the "override, do extra work, call the base" shape this whole unit's slot
 comparison confirms (see the unit header comment).
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

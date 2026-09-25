@@ -51,3 +51,7 @@ slot `+0x078`; up-calls the base slot, then if `unkCC` is set, marks
 `0x12`. Neither `unk38` nor "state `0x12`" has a confirmed game meaning
 (see `TaskCore__Init`'s report for the same `unk38` field from
 the other side), so left `Class__func_xxxxx`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). StreamTaskObj now expands TASKCORE_FIELDS: +0x038 is `result`.

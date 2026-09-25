@@ -72,3 +72,7 @@ conditionally resets a value. No external caller was found (dispatched only
 through the vtable), and no single verb for the combined effect is
 confidently supported by the body alone -- kept `Class__func_xxxxx` rather
 than guess.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). The onInit up-call casts the slot to `void (*)(TaskCore *)`: IntermediateBase types onInit (self, s32, s32, s32) from init's call, and this call passes self alone.

@@ -144,10 +144,14 @@ uniform across every instance and override.
 
 ## Naming
 
-**TaskCore__OnInit** -- tier C. Occupies `gTaskCoreMethods` slot
+**TaskCoreObj__func_8003C238** -- tier C. Occupies `gTaskCoreMethods` slot
 `+0x04C`, the unit's largest function: commits several previously-configured
 fields into `self->unk18` (`StreamTaskUnk18Obj`, this same round's type
 rename -- see the note above) and drives the `TaskText` sub-object twice.
 Every individual call is understood (see "Summary" above), but no single
 verb covers what the function accomplishes as a whole, so left
 `Class__func_xxxxx`.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Renamed from TaskCoreObj__func_8003C238 (tools/rename.py). Occupant of +0x04C (`onInit`, the call IntermediateBase__Init makes after adding the children), named for the slot. IntermediateBase types the slot (self, s32, s32, s32) from that call; this occupant takes self alone. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

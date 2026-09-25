@@ -40,3 +40,7 @@ None new.
 ## Naming (round 77, naming runner delta)
 
 Renamed `func_8004DC64` -> `Class86B60__ForwardToNameField`. **Tier B**: Forwards `arg1` to the base class's `slotE0`, then dispatches `arg1` and a fixed global (`&D_8008A9B4`) through `self->nameField`'s own `slot4C`. Purpose of the forwarded value/event not established.
+
+## Track 4 (2026-09-25, round 84, alpha)
+
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
