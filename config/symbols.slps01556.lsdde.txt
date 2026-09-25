@@ -2517,3 +2517,4 @@ gDataSourceClientGetters = 0x8006D4AC;
 New_FlatLightObj = 0x8004291C; // type:func
 FlatLightObj__FlatLightObj = 0x8004297C; // type:func
 FlatLightObj__SetLightId = 0x800429E0; // type:func
+FlatLightObj__SetColor = 0x800429E8; // type:func

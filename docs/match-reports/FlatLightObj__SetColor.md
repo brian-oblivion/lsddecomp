@@ -1,4 +1,6 @@
-# func_800429E8 -- MATCHED (17/17 words, round 81, alpha)
+# FlatLightObj__SetColor -- MATCHED (17/17 words, round 81, alpha)
+
+> Renamed from `func_800429E8` on 2026-09-25 (tools/rename.py). Address 0x800429e8.
 
 **Unit:** `src/code_3311c.c` (carved from `psyq_3311c` in FINISHING-PLAN revision 18). **Class:** method table `D_8006F06C` (class id 0x6, direct BasicClass child), read here as `FlatLightObj`: a 0x20-byte BasicClass holding a Psy-Q light id at +0x00C and a `GsF_LIGHT` (LIBGS.H) at +0x010. The name is a hypothesis from the `GsSetFlatLight` calls, not evidence. Slots resolved with `python3 tools/classtable.py D_8006F06C`.
 
@@ -11,7 +13,7 @@ slot +0x044 (`setColor`): if `update`, copy a 3-byte colour into the light's r,g
 ## Source
 
 ```c
-void func_800429E8(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
+void FlatLightObj__SetColor(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
     if (update) {
         self->light.rgb = *rgb;
     }

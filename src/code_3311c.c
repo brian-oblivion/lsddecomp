@@ -21,7 +21,7 @@
 typedef struct FlatLightObj FlatLightObj;
 typedef struct FlatLightObjMethods FlatLightObjMethods;
 
-/* The colour triple. Copied as a whole struct (func_800429E8): GCC's block
+/* The colour triple. Copied as a whole struct (FlatLightObj__SetColor): GCC's block
  * move is what loads all three bytes before storing any. */
 typedef struct {
     s8 r, g, b;
@@ -68,7 +68,7 @@ void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId) {
 void FlatLightObj__SetLightId(FlatLightObj *self, s32 lightId) {
     self->lightId = lightId;
 }
-void func_800429E8(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
+void FlatLightObj__SetColor(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
     if (update) {
         self->light.rgb = *rgb;
     }
