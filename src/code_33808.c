@@ -545,7 +545,35 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045AD8);
 void func_80045BC0(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045BC8);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045C94);
+/* D_8006F614 +0x064: while +0x54 is set, count calls in D_8008A948 and
+ * once the count before the increment passes 100, resets it to 1 and calls
+ * slot +0x044; returns 0. Otherwise
+ * clears D_8008A940 and returns 1. */
+typedef struct Methods45C94 {
+    /* +0x000 */ u8 pad0[0x44];
+    /* +0x044 */ void (*slot44)();
+} Methods45C94;
+
+typedef struct Obj45C94 {
+    /* +0x000 */ Methods45C94 *methods;
+    /* +0x004 */ u8 pad4[0x50];
+    /* +0x054 */ s32 unk54;
+} Obj45C94;
+
+extern s32 D_8008A948;
+extern DataSrc33808 *D_8008A940;
+
+s32 func_80045C94(Obj45C94 *self) {
+    if (self->unk54 != 0) {
+        if (D_8008A948++ > 100) {
+            D_8008A948 = 1;
+            self->methods->slot44(self);
+        }
+        return 0;
+    }
+    D_8008A940 = NULL;
+    return 1;
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80045CFC);
 extern DataSrc33808 *D_8008A940;
 
