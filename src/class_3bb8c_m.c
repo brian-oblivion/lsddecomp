@@ -60,6 +60,7 @@
  */
 #include "common.h"
 #include "class_3bb8c.h"
+#include "BoxFill.h"
 
 /* Forward declaration: defined later in this same unit, but called by
  * ObjM__EnterState7/ObjM__EnterState8/ObjM__EnterStateA above its own definition. */
@@ -293,23 +294,8 @@ void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
     style->unk14 = cfg[0];
 }
 
-/* Local view only -- New_BoxFill is already declared elsewhere
- * (include/code_2cc8c.h) returning `ClassEAC0Obj *`, a header this unit
- * does not own. This unit only ever reaches slots 0x4C/0x64/0x68 on the
- * returned object, so it gets its own minimal local type rather than
- * pulling in that header (multiple-independent-local-views convention). */
-typedef struct LocalM4D0Obj LocalM4D0Obj;
-typedef struct LocalM4D0Methods LocalM4D0Methods;
-struct LocalM4D0Methods {
-    u8 pad00[0x4C];
-    void (*slot4C)(LocalM4D0Obj *self, s32 arg1, void *arg2); /* +0x04C */
-    u8 pad50[0x64 - 0x50];
-    void (*slot64)(LocalM4D0Obj *self, s32 arg1);              /* +0x064 */
-    void (*slot68)(LocalM4D0Obj *self, s32 arg1);              /* +0x068 */
-};
-struct LocalM4D0Obj {
-    LocalM4D0Methods *methods;
-};
+/* gStyleDecorObj is a BoxFill (include/BoxFill.h), kept in an s32 global
+ * (track 4b's to retype). */
 
 /* gStyleTargetObj's own local reading here: only its +0xC field (a "self"
  * pointer into a THIRD object, dispatched only through +0xAC) is ever
@@ -331,19 +317,19 @@ typedef struct FieldAC7CHolder {
 extern s32 gStyleDecorObj;
 extern s32 D_8008AB60;
 extern s32 D_8008AB58;
-extern LocalM4D0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
     if (gStyleDecorColor != 0) {
         gStyleDecorObj = (s32) New_BoxFill(&D_8008AB60, (void *) gStyleDecorColor, 0);
-        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
-        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
+        ((BoxFill *) gStyleDecorObj)->methods->setSemiTrans((BoxFill *) gStyleDecorObj, 1);
+        ((BoxFill *) gStyleDecorObj)->methods->setSemiTransRate((BoxFill *) gStyleDecorObj, 0);
 
         tmp = ((FieldAC7CHolder *) gStyleTargetObj)->unkC->methods->slotAC(
                 ((FieldAC7CHolder *) gStyleTargetObj)->unkC);
 
-        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) gStyleDecorObj, tmp, &D_8008AB58);
+        ((BoxFillAttachToParentFn)((BoxFill *) gStyleDecorObj)->methods->attachToParent)(
+            (BoxFill *) gStyleDecorObj, (Class6B5CC *) tmp, (Pair32E99C *) &D_8008AB58);
     }
 }
