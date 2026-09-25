@@ -1,4 +1,6 @@
-# func_80042684 -- MATCHED (4/4 words), round 82
+# Get_vtable_D8006EF50 -- MATCHED (4/4 words), round 82
+
+> Renamed from `func_80042684` on 2026-09-25 (tools/rename.py). Address 0x80042684.
 
 Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
@@ -11,7 +13,7 @@ Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322
 
 ```c
 /* Returns the D_8006EF50 method table. */
-void *func_80042684(void) {
+void *Get_vtable_D8006EF50(void) {
     return D_8006EF50;
 }
 ```

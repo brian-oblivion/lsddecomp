@@ -144,7 +144,7 @@ typedef struct Slot08Methods_322b4 {
     u8 pad00[0x8];
     void (*init)(void *self); /* +0x008 */
 } Slot08Methods_322b4;
-void *func_80042684(void);
+void *Get_vtable_D8006EF50(void);
 void *Get_vtable_D8006EED8(void);
 
 void *Get_vtable_D8006EC74(void);
@@ -422,7 +422,7 @@ void *New_D8006EF50(void) {
     void *obj = BMemPMgrAlloc(0x1C);
 
     if (obj != NULL) {
-        ((Slot08Methods_322b4 *)func_80042684())->init(obj);
+        ((Slot08Methods_322b4 *)Get_vtable_D8006EF50())->init(obj);
         return obj;
     }
     return NULL;
@@ -430,7 +430,7 @@ void *New_D8006EF50(void) {
 /* D_8006EF50 slot +0x008 (ctor): the BasicClass ctor, install the table, reset(0). */
 void D8006EF50__D8006EF50(D_8006EF50Obj *self) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = func_80042684();
+    self->methods = Get_vtable_D8006EF50();
     self->methods->reset(self, 0);
 }
 /* D_8006EF50 slot +0x00C (finalize): the BasicClass finalize. */
@@ -500,7 +500,7 @@ void D8006EF50__SetFlag14(D_8006EF50Obj *self) {
     self->unk14 = 1;
 }
 /* Returns the D_8006EF50 method table. */
-void *func_80042684(void) {
+void *Get_vtable_D8006EF50(void) {
     return D_8006EF50;
 }
 /* Allocate and construct a D_8006EFAC object (0x54 bytes). */
