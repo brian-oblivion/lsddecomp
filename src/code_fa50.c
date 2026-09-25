@@ -55,10 +55,25 @@ typedef struct HullList_fa50 {
     Corners_fa50 c[1];      /* +0x004 */
 } HullList_fa50;
 
+/* One TMD primitive: a 4-byte header, then u16 words (vertex indices among
+ * them, at mode-dependent positions). */
+typedef struct TmdPrim_fa50 {
+    u8 olen;                /* +0x000 */
+    u8 ilen;                /* +0x001 */
+    u8 flag;                /* +0x002 */
+    u8 mode;                /* +0x003 */
+    u16 h[20];              /* +0x004 */
+} TmdPrim_fa50;
+
+/* One TMD object-table entry (28 bytes). */
 typedef struct Rec28_fa50 {
     SVec_fa50 *verts;       /* +0x000 */
     s32 nverts;             /* +0x004 */
-    u8 pad8[0x14];
+    void *normals;          /* +0x008 */
+    s32 nnormals;           /* +0x00C */
+    TmdPrim_fa50 *prims;    /* +0x010 */
+    u32 nprims;             /* +0x014 */
+    s32 scale;              /* +0x018 */
 } Rec28_fa50;
 
 typedef struct ModelData_fa50 {
@@ -246,7 +261,188 @@ void func_8001F66C(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
     }
 }
 INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F8B8);
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_80020050);
+TmdPrim_fa50 *func_80020050(Class6BEA0 *self, TmdPrim_fa50 *p, s32 *n, Vec3_fa50 *out, u32 *count) {
+    s32 idx[4];
+    Rec28_fa50 *rec = self->unk10;
+    SVec_fa50 *verts;
+    s32 size;
+    s32 i;
+
+    if (rec->nprims == 0 || *count >= rec->nprims) {
+        return NULL;
+    }
+    if (*count == 0) {
+        p = rec->prims;
+    }
+    *n = 4;
+    switch (p->mode) {
+    case 0x20:
+    case 0x22:
+        if (p->flag & 4) {
+            idx[0] = p->h[7];
+            idx[1] = p->h[8];
+            idx[2] = p->h[9];
+            size = 0x18;
+            goto tri;
+        } else {
+            idx[0] = p->h[3];
+            idx[1] = p->h[4];
+            idx[2] = p->h[5];
+            size = 0x10;
+            goto tri;
+        }
+        break;
+    case 0x21:
+    case 0x23:
+        idx[0] = p->h[2];
+        idx[1] = p->h[3];
+        idx[2] = p->h[4];
+        size = 0x10;
+        goto tri;
+    case 0x24:
+    case 0x26:
+        idx[0] = p->h[7];
+        idx[1] = p->h[8];
+        idx[2] = p->h[9];
+        size = 0x18;
+        goto tri;
+    case 0x25:
+    case 0x27:
+        idx[0] = p->h[8];
+        idx[1] = p->h[9];
+        idx[2] = p->h[10];
+        size = 0x1C;
+        goto tri;
+    case 0x28:
+    case 0x2A:
+        if (p->flag & 4) {
+            idx[0] = p->h[9];
+            idx[1] = p->h[10];
+            idx[2] = p->h[11];
+            idx[3] = p->h[12];
+            size = 0x20;
+        } else {
+            idx[0] = p->h[3];
+            idx[1] = p->h[4];
+            idx[2] = p->h[5];
+            idx[3] = p->h[6];
+            size = 0x14;
+        }
+        break;
+    case 0x29:
+    case 0x2B:
+        idx[0] = p->h[2];
+        idx[1] = p->h[3];
+        idx[2] = p->h[4];
+        idx[3] = p->h[5];
+        size = 0x10;
+        break;
+    case 0x2C:
+    case 0x2E:
+        idx[0] = p->h[9];
+        idx[1] = p->h[10];
+        idx[2] = p->h[11];
+        idx[3] = p->h[12];
+        size = 0x20;
+        break;
+    case 0x2D:
+    case 0x2F:
+        idx[0] = p->h[10];
+        idx[1] = p->h[11];
+        idx[2] = p->h[12];
+        idx[3] = p->h[13];
+        size = 0x20;
+        break;
+    case 0x30:
+    case 0x32:
+        if (p->flag & 4) {
+            idx[0] = p->h[7];
+            idx[1] = p->h[9];
+            idx[2] = p->h[11];
+            size = 0x1C;
+            goto tri;
+        } else {
+            idx[0] = p->h[3];
+            idx[1] = p->h[5];
+            idx[2] = p->h[7];
+            size = 0x14;
+            goto tri;
+        }
+        break;
+    case 0x31:
+    case 0x33:
+        idx[0] = p->h[6];
+        idx[1] = p->h[7];
+        idx[2] = p->h[8];
+        size = 0x18;
+        goto tri;
+    case 0x34:
+    case 0x36:
+        idx[0] = p->h[7];
+        idx[1] = p->h[9];
+        idx[2] = p->h[11];
+        size = 0x1C;
+        goto tri;
+    case 0x35:
+    case 0x37:
+        idx[0] = p->h[12];
+        idx[1] = p->h[13];
+        idx[2] = p->h[14];
+        size = 0x24;
+    tri:
+        *n = 3;
+        break;
+    case 0x38:
+    case 0x3A:
+        if (p->flag & 4) {
+            idx[0] = p->h[9];
+            idx[1] = p->h[11];
+            idx[2] = p->h[13];
+            idx[3] = p->h[15];
+            size = 0x24;
+        } else {
+            idx[0] = p->h[3];
+            idx[1] = p->h[5];
+            idx[2] = p->h[7];
+            idx[3] = p->h[9];
+            size = 0x18;
+        }
+        break;
+    case 0x39:
+    case 0x3B:
+        idx[0] = p->h[8];
+        idx[1] = p->h[9];
+        idx[2] = p->h[10];
+        idx[3] = p->h[11];
+        size = 0x1C;
+        break;
+    case 0x3C:
+    case 0x3E:
+        idx[0] = p->h[9];
+        idx[1] = p->h[11];
+        idx[2] = p->h[13];
+        idx[3] = p->h[15];
+        size = 0x24;
+        break;
+    case 0x3D:
+    case 0x3F:
+        idx[0] = p->h[16];
+        idx[1] = p->h[17];
+        idx[2] = p->h[18];
+        idx[3] = p->h[19];
+        size = 0x2C;
+        break;
+    default:
+        *n = 0;
+        break;
+    }
+    verts = self->unk10->verts;
+    for (i = 0; i < *n; i++) {
+        out[i] = *(Vec3_fa50 *)((u8 *)verts + (idx[i] << 3));
+    }
+    (*count)++;
+    return (TmdPrim_fa50 *)((u8 *)p + size);
+}
 void func_800204D0(Outer_fa50 *self, s32 *xy) {
     Target_fa50 *t = self->unk10->unk10;
 
