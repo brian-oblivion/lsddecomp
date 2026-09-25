@@ -862,6 +862,11 @@
           "class": "Sprite",
           "date": "2026-09-25",
           "header": "include/Sprite.h"
+        },
+        "gTaskCoreMethods": {
+          "class": "TaskCore",
+          "date": "2026-09-25",
+          "header": "include/TaskCore.h"
         }
       },
       "reason": "",

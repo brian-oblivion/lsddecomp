@@ -475,7 +475,7 @@ three are live rather than transcribed:
   `objdump -d build/src/<unit>.c.o` before believing a bad number.
 
   **Round 12 added a second instance of that, and this one has a one-command
-  discriminator.** `Obj86B60__RefreshSlotView` scores 40/145 with *exactly correct total
+  discriminator.** `TaskCore__RefreshSlotView` scores 40/145 with *exactly correct total
   length* and zero inserted or deleted instructions — every non-matching word
   is the same instruction on a different register. The cause is that retail
   saturates the callee-saved file, so a body needing one more live cross-call
@@ -490,8 +490,8 @@ three are live rather than transcribed:
   register-identity stall and one with a specific permitted lever (reduce
   values live across calls).
 
-  **It also caught a report mis-grouping two stalls.** `Obj86B60__RefreshSlotView`'s report
-  described itself as the same class as its sibling `Obj86B60__CommitElementScroll` (114/118);
+  **It also caught a report mis-grouping two stalls.** `TaskCore__RefreshSlotView`'s report
+  described itself as the same class as its sibling `TaskCore__CommitElementScroll` (114/118);
   the census says 8 registers versus 6, so one is saturated and the other has
   two s-regs and `$fp` spare. The report had even recorded that the sibling's
   fixes did not transfer — which is the tell. **When two stalls in one unit are
@@ -500,7 +500,7 @@ three are live rather than transcribed:
 
   **Round 75 falsified that example's conclusion, and the correction is the
   point.** Both functions matched on the SAME lever, an 8-byte pair written as
-  one struct copy (plus a missing third argument on `Obj86B60__RefreshSlotView`), and the
+  one struct copy (plus a missing third argument on `TaskCore__RefreshSlotView`), and the
   saturated file was a symptom of the wrong shape, not a class. The census is
   still a fine staffing screen; a count of 8 is not evidence that a stall is
   terminal, and a shared residue label can be right while every "register"
