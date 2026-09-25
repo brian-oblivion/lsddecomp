@@ -66,7 +66,9 @@ void func_8001F37C(void) {
 void *func_8001F384(void) {
     return D_8006BEA0;
 }
-INCLUDE_ASM("asm/nonmatchings/code_fa50", func_8001F394);
+void func_8001F394(void) {
+    D_8008AC4C = 1;
+}
 s32 func_8001F3A4(void *self) {
     return D_8008AC4C;
 }
