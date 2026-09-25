@@ -272,7 +272,16 @@ void func_80041E58(Sprite *self, u32 anchor) {
 void *func_80041ED8(void) {
     return D_8006ED4C;
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", New_Sprite);
+/* Allocate and construct a Sprite (0xA0 bytes). */
+Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg4) {
+    Sprite *obj = BMemPMgrAlloc(0xA0);
+
+    if (obj != NULL) {
+        GetSpriteMethods()->ctor(obj, texture, abr, rect, arg3, arg4);
+        return obj;
+    }
+    return NULL;
+}
 /* Sprite's reset as its ctor calls it: with all five ctor arguments (the
  * slot is Class6B5CC's, typed without them; Sprite.h, "Not settled"). */
 typedef void *(*SpriteCtorReset_322b4)(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5);
