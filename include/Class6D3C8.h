@@ -65,7 +65,7 @@ typedef struct MiddleClassMethods {
 extern MiddleClassMethods *func_8003B20C(void);
 
 /* The constructor argument block for Class6D3C8 (Class6D3C8__Class6D3C8). Observed
- * from its one call site (asm/main.s, D_80066828: {0x13, 0, 1, 1, 1, 1}) --
+ * from its one call site (asm/main.s, gClass6D3C8CtorArgs: {0x13, 0, 1, 1, 1, 1}) --
  * only offsets +0x00 and +0x14 are actually read by Class6D3C8__Class6D3C8, so the
  * rest stays opaque padding until another caller needs it. */
 typedef struct Class6D3C8CtorArgs {
@@ -100,11 +100,11 @@ typedef struct Class6D3C8Methods {
     void (*forwardToBaseSlot44UnlessFlagged)(Class6D3C8 *self, void *a1, void *a2);  /* +0x044 Class6D3C8__ForwardToBaseSlot44UnlessFlagged.
                                                              * NOT renamed to match its occupant: src/main.c
                                                              * dispatches this slot by name directly
-                                                             * (D_8008AC20->methods->slot44(...)), outside this
+                                                             * (gClass6D3C8->methods->slot44(...)), outside this
                                                              * unit's ownership -- see the header's top comment
                                                              * and the round 77 proposed-field-names note. */
     void *unk48;                                            /* +0x048 func_8003B108 */
-    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C func_8003B110, first dispatched by func_800118DC
+    void (*slot4C)(Class6D3C8 *self);                       /* +0x04C func_8003B110, first dispatched by GameMain
                                                              * (src/main.c) -- same cross-unit-slot44 reason, not renamed. */
     void (*loadIntroLogoSequence)(Class6D3C8 *self);        /* +0x050 Class6D3C8__LoadIntroLogoSequence */
     void (*startWeeklyStreamTask)(Class6D3C8 *self);        /* +0x054 Class6D3C8__StartWeeklyStreamTask */

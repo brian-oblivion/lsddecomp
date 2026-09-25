@@ -120,7 +120,7 @@ function).
 `$a1` on any path — the definition in `src/code_8220.c`
 (`void *BMemPMgrInit(s32 poolSize)`) is right, one argument.
 
-**Why the extern must keep saying nothing.** `func_800118DC` (src/main.c) calls
+**Why the extern must keep saying nothing.** `GameMain` (src/main.c) calls
 it as `BMemPMgrInit(0x166C00, 0)`, and that second argument is *byte-load-bearing*:
 retail emits it.
 

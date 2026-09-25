@@ -2495,3 +2495,7 @@ TRANSLATE_Y_MINUS256 = 0x80089D90;
 // neighbours already identified as that object. Round 79 (bravo's finding
 // as a naming runner, applied by the head).
 KeyOnCheck = 0x800303FC; // type:func
+GameMain = 0x800118DC; // type:func
+gStartupBMemPMgr = 0x8008A808;
+gClass6D3C8 = 0x8008AC20;
+gClass6D3C8CtorArgs = 0x80066828;

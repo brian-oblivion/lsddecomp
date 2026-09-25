@@ -1,3 +1,22 @@
+/*
+ * The game's entry point. `GameMain` (formerly `func_800118DC`) is called
+ * directly by Sony's `crt0` (config/splat.slps01556.lsdde.yaml, the `main`
+ * c-segment) and runs once: it sets the Psy-Q memory mode, stands up the
+ * game's `BMemPMgr` heap, constructs the root `Class6D3C8` object from a
+ * fixed ctor-args block, opens a `Pad`, and dispatches into the root
+ * object's own vtable (+0x044, +0x04C) before returning. It never loops --
+ * the real game loop lives inside whatever the dispatched vtable slots (or
+ * a callee reached from them) do.
+ *
+ * `func_80011994`, called as `GameMain`'s first statement, is left
+ * unrenamed: it is likely the toolchain's own `__main` ritual stub, not
+ * authored game code (docs/match-reports/func_80011994.md has the
+ * evidence, including a build-level experiment, not just a corpus
+ * fingerprint). `GameMain` itself is deliberately NOT spelled literally
+ * `main` -- GCC 2.6.3 auto-inserts a `jal __main` for any function named
+ * exactly that, which breaks the link under this project's pinned flags
+ * (see the same report).
+ */
 #include "common.h"
 #include "Class6D3C8.h"
 #include "class_16334.h"
@@ -37,28 +56,28 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
  * of THIS call, not of the one whose delay slot it sits in. */
 extern void *new_class_6c078(void);
 
-extern BMemPMgr *D_8008A808;
-extern Class6D3C8 *D_8008AC20;
-extern Class6D3C8CtorArgs D_80066828;
+extern BMemPMgr *gStartupBMemPMgr;
+extern Class6D3C8 *gClass6D3C8;
+extern Class6D3C8CtorArgs gClass6D3C8CtorArgs;
 
 /* Matched in code_1677c.c; not yet declared in any header (no other carved
  * caller existed until now). */
 extern Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg);
 
-void func_800118DC(void)
+void GameMain(void)
 {
     void *obj;
     Pad *pad;
 
     func_80011994();
     SetMem(2);
-    D_8008A808 = BMemPMgrInit(0x166C00, 0);
-    SetDefaultBMemPMgr(D_8008A808);
-    D_8008AC20 = New_Class6D3C8(&D_80066828);
+    gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
+    SetDefaultBMemPMgr(gStartupBMemPMgr);
+    gClass6D3C8 = New_Class6D3C8(&gClass6D3C8CtorArgs);
     obj = new_class_6c078();
     pad = New_Pad(0, 0);
-    D_8008AC20->methods->forwardToBaseSlot44UnlessFlagged(D_8008AC20, obj, pad);
-    D_8008AC20->methods->slot4C(D_8008AC20);
+    gClass6D3C8->methods->forwardToBaseSlot44UnlessFlagged(gClass6D3C8, obj, pad);
+    gClass6D3C8->methods->slot4C(gClass6D3C8);
 }
 
 void func_80011994(void) {
