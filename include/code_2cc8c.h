@@ -1620,7 +1620,7 @@ extern Obj6EAC0Methods *func_80041C3C(void); /* returns &D_8006EC74, a
                                        DECOMPILATION_LEARNINGS about the
                                        psyq_memset boundary) */
 
-extern Obj6EAC0 *func_80041AB4(s32 a1, s32 a2); /* another New_X-shaped
+extern Obj6EAC0 *New_D8006EC74(s32 a1, s32 a2); /* another New_X-shaped
                                        allocator over this same class
                                        family (0xAC bytes, ctor via
                                        func_80041C3C()->slot08, "return-

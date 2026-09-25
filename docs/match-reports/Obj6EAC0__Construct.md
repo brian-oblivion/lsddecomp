@@ -27,7 +27,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
         i = 0;
         if (i < a2) {
             do {
-                *cursor = func_80041AB4(a1, 0x20);
+                *cursor = New_D8006EC74(a1, 0x20);
                 i++;
                 cursor++;
             } while (i < a2);
@@ -45,7 +45,7 @@ through `func_80041C3C()`, same shape as `New_Obj6EAC0` calling
 `Obj6EAC0__GetDerivedMethods()->slot08`), then sets up `self->methods` to the
 DERIVED table, zeroes/initialises the slice-index fields, allocates an
 `a2`-element child array via `BMemPMgrAlloc`, fills each slot by
-calling the external New_X-shaped allocator `func_80041AB4(a1, 0x20)`
+calling the external New_X-shaped allocator `New_D8006EC74(a1, 0x20)`
 (itself a "return-regardless" New_X variant, not this unit's function
 to attempt), and — only if the array allocation succeeded — dispatches
 `self->methods->slot40(self, a3)`.
@@ -152,7 +152,7 @@ table's own `slot08` first (base-class-style construction), sets
 `self->methods` to the derived table, initialises the child-slice fields
 (`totalChildCount`, `childCount`, `childStart`, `gapIndex`), allocates an
 `a2`-element `children` array and fills each slot via the external
-New_X-shaped `func_80041AB4`, then dispatches `self->methods->slot40`.
+New_X-shaped `New_D8006EC74`, then dispatches `self->methods->slot40`.
 This is unambiguously a constructor by mechanics (allocates + wires up
 the object this class needs); named `Construct` per the project's
 `Class__Class`-shaped constructor convention rather than `Class__Class`

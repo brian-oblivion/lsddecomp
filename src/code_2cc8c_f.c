@@ -133,7 +133,7 @@ void Obj6EAC0__Construct(Obj6EAC0 *self, s32 a1, s32 a2, s32 a3) {
         i = 0;
         if (i < a2) {
             do {
-                *cursor = func_80041AB4(a1, 0x20);
+                *cursor = New_D8006EC74(a1, 0x20);
                 i++;
                 cursor++;
             } while (i < a2);

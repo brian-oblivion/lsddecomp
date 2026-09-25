@@ -177,7 +177,7 @@ void *func_800428E4(void);
 void func_80041C4C(SpriteRect *dst, u32 cell);
 
 /* Allocate and construct a D_8006EC74 object (0xAC bytes): one cell. */
-void *func_80041AB4(void *texture, u8 cell) {
+void *New_D8006EC74(void *texture, u8 cell) {
     void *obj = BMemPMgrAlloc(0xAC);
 
     if (obj != NULL) {

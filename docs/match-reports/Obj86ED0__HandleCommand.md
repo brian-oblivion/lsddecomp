@@ -187,7 +187,7 @@ the head to apply by type scope:
   handle (also the readiness/"is attached" gate every other function in
   this unit tests), `unk44` from `New_Obj6EAC0` on the `FONTICON.TIM`
   handle with `nameLen`/`workName` forwarded (renders the name text), `unk40`
-  from `func_80041AB4` on the same `FONTICON.TIM` handle with a `0x5F`
+  from `New_D8006EC74` on the same `FONTICON.TIM` handle with a `0x5F`
   literal (a distinct icon sub-resource of the same TIM). Also accessed by
   class_3bb8c_j's Dispatch* pair (`unk40`/`unk44` only, not `unk48`).
 - `slot60` -> `notifyTarget` (tier B). This IS `Obj86ED0__NotifyTarget`'s own
