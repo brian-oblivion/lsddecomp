@@ -6,6 +6,59 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-25 — round 83: track 3 done (code_33808 named), TimBlockSrc unified
+
+Opus head, operator cap 5, but `plan.py` listed one runner job (the Sonnet
+naming pass on code_33808) with the track-4 class job deferred behind it on
+the same unit; the head staffed the class job once the naming pass merged.
+Two runner sessions: alpha (Sonnet, naming), bravo (Opus, track 4). Every
+merge was followed by `make extract` where the symbols file changed,
+`build-and-verify.sh`, `check-nonmatching.sh` and `typeviews.py --warnings`
+(0 new each time).
+
+- **Track 3: done.** alpha named all 97 definitions and 7 unit-local globals
+  of code_33808 with `rename.py`, eleven tables: TimBlockSrc, LinkResource,
+  TimArraySrc, Tod, TodSet, ModelData, TriggerWorld, TileMap, TileAtlas
+  (Class6D430 data-source subclasses), BgLayer (Class6B5CC, a GsBG layer) and
+  MoviePlayer (BasicClass, CD-streamed MDEC playback: `DecDCTReset`,
+  `DecDCToutCallback`). No field proposals: every view is unit-local. Head
+  review sampled MoviePlayer, gMdecInitialized, ModelData__ForwardScanPackets,
+  New_LinkResource/New_TriggerWorld and TileMap__Load. Not sent back; five
+  tier-A labels downgraded to B in the reports: the LinkResource and
+  TriggerWorld class names rest on one caller's local view type, invented by
+  earlier runners (class_3bb8c.c round 20, code_4cd08.c round 43), not on
+  these bodies, and TileMap__Load's body builds the map (slot +0x078) and
+  sets +0x42, which says nothing about "load". That is round 82's
+  tier-correction pattern again, so the naming runner stays Sonnet.
+- **Track 4: TimBlockSrc (D_8006F0B8, 0xF03) unified** in
+  `include/TimBlockSrc.h`, 0x84 bytes: fields from their accessors
+  (`blocks`/`blockCount` through `ReleaseBasicClassArray`; a per-entry CLUT
+  RECT `clutX..clutH` filled as (0, 0x1E0 + i*mask, 0x100, 1)), own slots
+  `fadeAllEntries`/`fadeEntry` from their occupants. Head sampled those three
+  against the code. No stray view. Byte-identical retypes of
+  FadeAllEntries' colour argument and the getter.
+- **Finding, escalated: the id tree is not inheritance under 0xF03.**
+  `typeviews.py --tree` puts Tod (0x4F03, TodSet under it) and ModelData
+  (0x5F03, TriggerWorld under it) below TimBlockSrc. Their objects are 0x2C
+  to 0x3C bytes against TimBlockSrc's 0x84. Their constructors chain to
+  `GetActiveDataSourceMethods()->ctor`, which returns Class6D4E8's or
+  VabDriver's table depending on `gActiveDataSource`, not TimBlockSrc's.
+  Their +0x07C/+0x080 slots have unrelated signatures, and Tod overrides only
+  6 of the 32 slots. bravo therefore wrote no `TIMBLOCKSRC_FIELDS`/`_SLOTS`
+  macros and left those views expanding `CLASS6D430_*`. FINISHING-PLAN
+  track 4 and CLAUDE.md both call the nibble-path tree mechanical, and
+  `plan.py` will offer these four classes "below" TimBlockSrc, so the next
+  runner on Tod or ModelData must be told to ignore that. Operator's call.
+- **Round size.** The head staffed one class this round, following track 4's
+  "one class per round". The next ready job is gTaskCoreMethods. Round 82's
+  question about sequential classes in one round is still open.
+- **Housekeeping.** `include/Class6D3C8.h`'s New_LinkResource comment no
+  longer calls it uncarved. Left alone: `src/class_3bb8c_l.c` declares
+  `extern s32 New_TimBlockSrc(s32)` against the header's `void *`. That unit
+  is not in TimBlockSrc's census, and the bytes are identical.
+
+---
+
 ## 2026-09-25 — round 82: game code 100% matched (213/213), six units named, three classes unified
 
 Opus head, operator cap 5, slots re-staffed as they emptied: 29 runner

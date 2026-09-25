@@ -156,7 +156,7 @@ extern const char sModelPathDreamE5[];       /* "ETC\DREAME5.TMD", asm/data/FA4.
 
 extern s32 func_80048CF0(void);        /* reads a small-data global, unnamed so far */
 extern void func_800270AC(s32 value);   /* stores its arg to a small-data global */
-extern void *New_LinkResource(void *arg); /* code_1677c's own alloc+ctor shape, uncarved (psyq_memset.s); not this unit's to write */
+extern void *New_LinkResource(void *arg); /* defined in code_33808.c (LinkResource allocator) */
 
 /* A "New_X"-shaped task object allocated by New_StreamTaskObj -- 0xDC bytes,
  * constructed through Get_vtable_StreamTaskObj's slot +0x008. `New_StreamTaskObj`
