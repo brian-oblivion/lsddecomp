@@ -35,12 +35,12 @@ typedef struct IntermediateBaseMethods IntermediateBaseMethods;
 typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
 
 /* init's argument. The caller owns it; the object keeps the pointer at
- * +0x00C. Obj865C8__Obj865C8 fills +0x008..+0x010 itself (func_80042400(),
+ * +0x00C. Obj865C8__Obj865C8 fills +0x008..+0x010 itself (New_D8006EF50(),
  * New_Class866E8(0, 1), New_Class869D8()). */
 struct IntermediateBaseInitArgs {
     /* +0x000 */ BasicClass *unk0;     /* added as a child; onState2 calls its +0x048, onState3 its +0x04C */
     /* +0x004 */ BasicClass *unk4;     /* added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */
-    /* +0x008 */ BasicClass *unk8;     /* becomes unk10; NULL: init makes one with func_80042400() */
+    /* +0x008 */ BasicClass *unk8;     /* becomes unk10; NULL: init makes one with New_D8006EF50() */
     /* +0x00C */ BasicClass *unkC;     /* becomes unk14; NULL: init makes one with func_80042694() */
     /* +0x010 */ BasicClass *viewport; /* becomes viewport; NULL: init makes one with New_Unk18Obj() */
 };
@@ -62,7 +62,7 @@ struct IntermediateBaseInitArgs {
 #define INTERMEDIATEBASE_FIELDS(Methods)                                                           \
     BASICCLASS_FIELDS(Methods);                                                                    \
     /* +0x00C */ IntermediateBaseInitArgs *initArgs; /* init's argument, kept */                   \
-    /* +0x010 */ BasicClass *unk10;     /* initArgs->unk8, or init's own func_80042400() object */ \
+    /* +0x010 */ BasicClass *unk10;     /* initArgs->unk8, or init's own New_D8006EF50() object */ \
     /* +0x014 */ BasicClass *unk14;     /* initArgs->unkC, or init's own func_80042694() object */ \
     /* +0x018 */ BasicClass *viewport;  /* initArgs->viewport, or init's own New_Unk18Obj() */     \
     /* +0x01C */ s32 frameCounter;      /* update adds 1; resetCounters, onState2, onState3 clear it */ \

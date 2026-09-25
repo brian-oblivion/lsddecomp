@@ -874,7 +874,7 @@ Unk18Obj *Unk18Obj__GetTail(Unk18Obj *self);
    caller, Unk18Obj__Update in src/code_2cc8c_d.c, declares it
    locally with LIBGS.H's own shape. */
 
-extern void *func_80042400(void); /* external, no args; local view returns
+extern void *New_D8006EF50(void); /* external, no args; local view returns
                                     void* (used as a generic word/child
                                     pointer here); same callee as
                                     class_39e08.h's own `SubObjG *` view */

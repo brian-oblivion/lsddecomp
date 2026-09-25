@@ -32,7 +32,7 @@ void IntermediateBase__Init(Obj86B60 *self, Obj86B60InitArgs *arg1, s32 arg2)
     if (arg1->unk8 != NULL) {
         self->unk10 = (s32)arg1->unk8;
     } else {
-        self->unk10 = (s32)func_80042400();
+        self->unk10 = (s32)New_D8006EF50();
     }
     if (arg1->unkC != NULL) {
         self->unk14 = (s32)arg1->unkC;
