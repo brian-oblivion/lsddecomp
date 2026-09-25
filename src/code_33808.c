@@ -16,6 +16,41 @@
  * Matching began in round 82: `grep -c INCLUDE_ASM` gives what is left.
  */
 #include "common.h"
+#include "BasicClass.h"
+#include "Class6B5CC.h"
+#include "Class6D430.h"
+
+typedef struct DataSrc33808 DataSrc33808;
+
+/* Unit-local view of this unit's Class6D430 data-source subclasses: the
+ * interface plus the extra slots their methods call. Unprototyped where a
+ * caller passes no argument. */
+typedef struct DataSrc33808Methods {
+    CLASS6D430_SLOTS(DataSrc33808, (DataSrc33808 *self));
+    /* +0x07C */ s32 (*slot7C)();
+    /* +0x080 */ void *(*slot80)();
+} DataSrc33808Methods;
+
+struct DataSrc33808 {
+    CLASS6D430_FIELDS(DataSrc33808Methods);
+    /* +0x02C */ s32 unk2C;
+    /* +0x030 */ DataSrc33808 *unk30;  /* forwarded to by +0x080/+0x084 of D_8006F384/D_8006F40C */
+    /* +0x034 */ s32 unk34;
+    /* +0x038 */ s32 unk38;            /* D_8006F40C: count; D_8006F498: an allocation */
+};
+
+/* A buffer that starts with a word, a count, then that many words. */
+typedef struct CountedBuf33808 {
+    /* +0x00 */ s32 unk0;
+    /* +0x04 */ u32 count;
+    /* +0x08 */ s32 entries[1];
+} CountedBuf33808;
+
+extern Class6D430Methods *GetActiveDataSourceMethods(void);
+extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
+extern void BMemPMgrFree(void *arg);
+void *func_800441A4(void);
+void *func_800449FC(void);
 
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043008);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043068);
@@ -36,7 +71,20 @@ INCLUDE_ASM("asm/nonmatchings/code_33808", func_800438B0);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043954);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_800439EC);
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B18);
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043B3C);
+/* D_8006F13C +0x07C: the address of record `index`, 0x1C bytes each,
+ * from +0x0C of the buffer. */
+typedef struct Rec6F13C {
+    u8 data[0x1C];
+} Rec6F13C;
+
+typedef struct Buf6F13C {
+    /* +0x00 */ u8 pad0[0xC];
+    /* +0x0C */ Rec6F13C recs[1];
+} Buf6F13C;
+
+Rec6F13C *func_80043B3C(Class6D430 *self, s32 index) {
+    return &((Buf6F13C *)self->buffer)->recs[index];
+}
 /* D_8006F13C +0x080: returns entry `index` of the word array at +0x2C
  * (the first field past the 0x2C-byte Class6D430 base). */
 typedef struct Obj6F13C {
