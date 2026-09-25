@@ -106,3 +106,12 @@ runner's ownership. See `## Proposed field names` below.
   Left as `slot4C` for whoever carves `Class6E4F0__RunMainLoop`'s own unit.
 
 Posted to `tools/broadcast.sh post --from echo`.
+
+## Track 4
+
+**2026-09-25, round 84 (echo).** The parent class is declared once, in
+`include/Class6E4F0.h`, and `MiddleClassMethods` is gone. The base call is
+now `GetClass6E4F0Methods()->initSystems((Class6E4F0 *)self, a1, a2, 0)`: the
+slot is named for its occupant, Class6E4F0__InitSystems, typed `void` (the
+occupant's; nothing here reads $v0), and keeps the fourth argument this
+body's `move a3,zero` shows. The upcast emits no code. Bytes unchanged.

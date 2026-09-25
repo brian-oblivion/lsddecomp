@@ -32,7 +32,7 @@ Class6D3C8 *New_Class6D3C8(Class6D3C8CtorArgs *arg) {
 void Class6D3C8__Class6D3C8(Class6D3C8 *self, Class6D3C8CtorArgs *arg) {
     LoadModelRequest req;
 
-    GetClass6E4F0Methods()->ctor(self, arg->unk00);
+    GetClass6E4F0Methods()->ctor((Class6E4F0 *)self, arg->unk00);
     self->methods = GetClass6D3C8Methods();
     self->arg = arg;
     func_800270AC(func_80048CF0());
@@ -56,7 +56,7 @@ void Class6D3C8__SetDayFromTickCount(void) {
  * object hasn't been given an override (unk18 == 0). */
 void Class6D3C8__ForwardToBaseSlot44UnlessFlagged(Class6D3C8 *self, void *a1, void *a2) {
     if (self->unk18 == 0) {
-        GetClass6E4F0Methods()->slot44(self, a1, a2, 0);
+        GetClass6E4F0Methods()->initSystems((Class6E4F0 *)self, a1, a2, 0);
     }
 }
 
