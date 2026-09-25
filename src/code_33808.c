@@ -107,11 +107,20 @@ u32 func_800434DC(Class6D430 *self) {
     }
     return max;
 }
+/* A three-byte vector. */
+typedef struct Vec3S8 {
+    s8 x;
+    s8 y;
+    s8 z;
+} Vec3S8;
+
 /* D_8006F0B8 +0x078: set entry `index`'s shift, and its mask from it. */
 typedef struct Ent6F0B8 {
     /* +0x00 */ u16 shift;
     /* +0x02 */ u16 mask;
-    /* +0x04 */ u8 pad4[0xC];
+    /* +0x04 */ u8 pad4[8];
+    /* +0x0C */ Vec3S8 vec;
+    /* +0x0F */ u8 padF;
 } Ent6F0B8;
 
 typedef struct Obj6F0B8 {
@@ -139,7 +148,19 @@ void func_8004355C(DataSrc33808 *self, s32 arg) {
     }
     UnlockActiveDataSource();
 }
-INCLUDE_ASM("asm/nonmatchings/code_33808", func_800435D0);
+/* D_8006F0B8 +0x080: under the data-source lock, set entry `index`'s
+ * three-byte vector and hand the entry to func_80043648. */
+void func_80043648(Ent6F0B8 *entry, s32 index);
+
+void func_800435D0(Obj6F0B8 *self, s32 index, Vec3S8 *src) {
+    Ent6F0B8 *e;
+
+    LockActiveDataSource();
+    e = &self->entries[index];
+    e->vec = *src;
+    func_80043648(e, index);
+    UnlockActiveDataSource();
+}
 INCLUDE_ASM("asm/nonmatchings/code_33808", func_80043648);
 extern s32 D_8006F0B8[];
 
@@ -270,13 +291,7 @@ void *func_800441B4(s32 arg0, s32 arg1) {
     }
     return NULL;
 }
-/* A three-byte vector, and the D_8006F2C4 object (a Class6B5CC subclass). */
-typedef struct Vec3S8 {
-    s8 x;
-    s8 y;
-    s8 z;
-} Vec3S8;
-
+/* The D_8006F2C4 object (a Class6B5CC subclass). */
 typedef struct Obj6F2C4 {
     CLASS6B5CC_FIELDS(Class6B5CCMethods);
     /* +0x044 */ u8 pad44[0x10];
