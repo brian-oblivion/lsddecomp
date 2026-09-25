@@ -65,17 +65,20 @@
 
 typedef struct Obj6D4E8Methods Obj6D4E8Methods;
 struct Obj6D4E8Methods {
-    s32 header;                    /* +0x000, not a pointer -- 0x13 for D_8006D4E8, 0 for BasicClass's own table */
-    void *unk04;                   /* +0x004, DestroyChained for this class -- unused by this unit's own functions */
-    void (*ctor)(void *self);      /* +0x008, confirmed via classtable.py: BasicClass's OWN table has
-                                     * BasicClass__BasicClass at this exact slot */
+    s32 header;                    /* +0x000, not a pointer -- 0x13 (DATASOURCE_CD in code_171e0.c) for D_8006D4E8 */
+    void *ownDtorChain;            /* +0x004, DestroyChained -- unused by this unit's own functions */
+    void (*ctor)(void *self);      /* +0x008, Class6D4E8__Class6D4E8 (classtable.py; BasicClass__BasicClass
+                                     * and Class6D430__Class6D430 sit at this slot in the base tables) */
     u8 pad00C[0x05C - 0x00C];
-    void (*slot5C)(void *self);    /* +0x05C, Class6D4E8__Destroy's second vtable call */
+    void (*freeBuffer)(void *self);      /* +0x05C, inherited Class6D430__FreeBuffer */
     u8 pad060[0x074 - 0x060];
-    void (*slot74)(void);          /* +0x074, Class6D4E8__Destroy's first vtable call -- confirmed zero-argument:
-                                     * retail's jalr for this slot carries a plain `nop` delay slot with no
-                                     * register load anywhere above it, unlike the +0x05C call three
-                                     * instructions later which explicitly sets $a0 = self. */
+    void (*cancelRequests)(void *self);  /* +0x074, Class6D4E8__CancelRequests (code_179d8_q), which reads
+                                           * its `self` in $a0.  Round 79 correction: this slot was typed
+                                           * `void (*)(void)` on the strength of the nop delay slot, but $a0
+                                           * still holds Class6D4E8__Destroy's own `self` there (the entry
+                                           * `move s0,a0` leaves it intact), so passing `self` is
+                                           * byte-identical -- the same shape as Class6D430__Destroy's
+                                           * `onBufferChanged(this)` in code_171e0.c. */
 };
 
 typedef struct {
@@ -132,8 +135,8 @@ void Class6D4E8__Class6D4E8(Obj6D4E8 *self)
 
 void Class6D4E8__Destroy(Obj6D4E8 *self)
 {
-    self->methods->slot74();
-    self->methods->slot5C(self);
+    self->methods->cancelRequests(self);
+    self->methods->freeBuffer(self);
 }
 
 void Class6D4E8__NoOpSlot40(void)
