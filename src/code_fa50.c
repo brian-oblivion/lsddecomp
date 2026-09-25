@@ -166,7 +166,7 @@ void TmdModel__MapModelingData(Class6BEA0 *self) {
 Rec28_fa50 *TmdModel__GetObject(Class6BEA0 *self, s32 i) {
     return &self->data->recs[i];
 }
-void func_8001F37C(void) {
+void TmdModel__func_8001F37C(void) {
 }
 Class6BEA0Methods *Get_vtable_TmdModel(void) {
     return (Class6BEA0Methods *)D_8006BEA0;
