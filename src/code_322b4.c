@@ -178,7 +178,11 @@ void *func_800422BC(void) {
 }
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800422CC);
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_8004232C);
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800423A8);
+/* D_8006EED8 slot +0x00C (finalize): clear +0x2C, then the base finalize. */
+void func_800423A8(D_8006EED8Obj *self) {
+    self->unk2C = 0;
+    GetActiveDataSourceMethods()->slot0C(self);
+}
 /* D_8006EED8 slot +0x064. */
 void func_800423E4(D_8006EED8Obj *self) {
     self->unk2C = 1;
