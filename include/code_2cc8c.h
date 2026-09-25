@@ -4,6 +4,7 @@
 #include "common.h"
 #include "BasicClass.h"
 #include "Class6B5CC.h"
+#include "IntermediateBase.h"
 
 /* Forward typedefs, used by `extern` declarations further up this file
  * than their own struct bodies (round 14, code_2cc8c_e's own local views,
@@ -68,19 +69,12 @@ typedef struct Unk68ObjMethods Unk68ObjMethods;
 typedef struct SrcDesc SrcDesc;
 typedef struct HeaderObj HeaderObj;
 typedef struct EventArg EventArg;
-typedef struct Unk14Obj Unk14Obj;
-typedef struct Unk14ObjMethods Unk14ObjMethods;
 typedef struct Unk18Obj Unk18Obj;
 typedef struct Unk18ObjMethods Unk18ObjMethods;
 typedef struct SubHandleObj SubHandleObj;
 typedef struct SubHandleObjMethods SubHandleObjMethods;
 typedef struct GenericObj GenericObj;
 typedef struct GenericObjMethods GenericObjMethods;
-typedef struct Obj86B60InitArgs Obj86B60InitArgs;
-typedef struct Unk10Obj Unk10Obj;
-typedef struct Unk10ObjMethods Unk10ObjMethods;
-typedef struct Unk4ArgObj Unk4ArgObj;
-typedef struct Unk4ArgObjMethods Unk4ArgObjMethods;
 
 /*
  * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
@@ -885,135 +879,6 @@ extern void *func_80042400(void); /* external, no args; local view returns
 extern void *func_80042694(void); /* external, no args; not yet seen
                                     elsewhere in this project */
 
-/*
- * An ALTERNATE reading of self->unk14 (round 13, IntermediateBase__Init only): the
- * field itself stays `s32` in `Obj86B60` below (already established,
- * generic-word usage confirmed by a sibling unit's Obj86B60__BeginElementScroll forwarding
- * it untyped to slot100) -- same "keep the general field, cast locally"
- * shape already used for Unk4CObj->unk24[idx]/Unk64Elem's own
- * Obj86B60__BroadcastToSlotElements alternate reading. Here IntermediateBase__Init dispatches through it
- * as a pointer to an object with its own vtable; only the one slot it
- * reaches is modelled.
- */
-struct Unk14ObjMethods {
-    u8 pad000[0x004];
-    void *(*release)(Unk14Obj *self);            /* +0x004, inherited
-                                                    BasicClass "release";
-                                                    OBSERVED: IntermediateBase__Deinit
-                                                    (round 13). Renamed from
-                                                    slot4, round 55 --
-                                                    exclusive to this unit
-                                                    (Unk14Obj is this unit's
-                                                    own local type, unused by
-                                                    any other code_2cc8c
-                                                    sibling), matches the
-                                                    canonical BasicClassMethods
-                                                    name at this offset
-                                                    (include/code_8220.h). */
-    u8 pad008[0x010 - 0x008];
-    void (*addChild)(Unk14Obj *self, void *a1);  /* +0x010, inherited
-                                                    BasicClass addChild;
-                                                    OBSERVED: IntermediateBase__Init.
-                                                    Renamed from slot10, round
-                                                    55, same exclusivity/
-                                                    evidence as release
-                                                    above. */
-    void (*removeChild)(Unk14Obj *self, void *a1);  /* +0x014, inherited
-                                                    BasicClass removeChild;
-                                                    OBSERVED: IntermediateBase__Deinit
-                                                    (round 13). Renamed from
-                                                    slot14, round 55, same
-                                                    exclusivity/evidence as
-                                                    release above. */
-};
-struct Unk14Obj {
-    Unk14ObjMethods *methods; /* +0x000 */
-};
-
-/*
- * A THIRD alternate reading of the same shape, this time for self->unk10
- * (round 13, IntermediateBase__Deinit only): released through the identical inherited
- * BasicClass "release" slot self->unk14/unk18's own pointee types use.
- * self->unk10 itself stays `s32` in `Obj86B60` (already established,
- * generic-word/child-pointer usage confirmed by IntermediateBase__Init) -- cast
- * locally here, same convention as `Unk14Obj`.
- */
-struct Unk10ObjMethods {
-    u8 pad000[0x004];
-    void *(*release)(Unk10Obj *self);            /* +0x004, inherited
-                                                    BasicClass "release";
-                                                    OBSERVED: IntermediateBase__Deinit.
-                                                    Renamed from slot4, round
-                                                    55 -- exclusive to this
-                                                    unit (Unk10Obj is this
-                                                    unit's own local type),
-                                                    matches the canonical
-                                                    BasicClassMethods name at
-                                                    this offset
-                                                    (include/code_8220.h). */
-    u8 pad008[0x044 - 0x008];
-    void (*slot44)(Unk10Obj *self);            /* +0x044, OBSERVED:
-                                                    IntermediateBase__OnTag1Notify (round 13) */
-};
-struct Unk10Obj {
-    Unk10ObjMethods *methods; /* +0x000 */
-};
-
-/*
- * self->initArgs->unk4's pointee (round 13, IntermediateBase__OnTag1Notify) -- the SAME field
- * `IntermediateBase__Init` forwards as an opaque `addChild` child and `IntermediateBase__Deinit`
- * forwards as a `removeChild` target; this function is the first to
- * dereference it as a real class instance. Only the two slots it dispatches
- * through are modelled.
- */
-struct Unk4ArgObjMethods {
-    u8 pad000[0x044];
-    void (*slot44)(Unk4ArgObj *self); /* +0x044, OBSERVED: IntermediateBase__OnTag1Notify */
-    void (*slot48)(Unk4ArgObj *self); /* +0x048, OBSERVED: IntermediateBase__OnTag1Notify */
-};
-struct Unk4ArgObj {
-    Unk4ArgObjMethods *methods; /* +0x000 */
-};
-
-/*
- * self->initArgs->unk0's pointee (round 13, IntermediateBase__OnState3) -- the SAME field
- * `IntermediateBase__Init`/`IntermediateBase__Deinit` forward as an opaque `addChild`/
- * `removeChild` child; this function is the first to dereference it as a
- * real class instance (same "one field, multiple independent-evidence
- * readings" shape as `Unk4ArgObj` for the adjacent `unk4` field). Only the
- * one slot this function dispatches through is modelled.
- */
-typedef struct Unk0ArgObj Unk0ArgObj;
-typedef struct Unk0ArgObjMethods Unk0ArgObjMethods;
-struct Unk0ArgObjMethods {
-    u8 pad000[0x04C];
-    void (*slot4C)(Unk0ArgObj *self); /* +0x04C, OBSERVED: IntermediateBase__OnState3 */
-};
-struct Unk0ArgObj {
-    Unk0ArgObjMethods *methods; /* +0x000 */
-};
-
-/*
- * IntermediateBase__Init's 2nd parameter (round 13) -- a small "init args" struct:
- * two children forwarded to the inherited BasicClass addChild (self->
- * methods->slot10), and three optional fields each read with a "use if
- * set, else derive from a helper call" idiom mirroring self->unk10/unk14/
- * unk18's own construction. Only the five fields IntermediateBase__Init touches are
- * modelled.
- */
-struct Obj86B60InitArgs {
-    Unk0ArgObj *unk0; /* +0x000, forwarded to self->methods->slot10 (child)
-                          as `void *`; ALSO OBSERVED (round 13) dereferenced
-                          directly by IntermediateBase__OnState3 as a real class instance
-                          -- see Unk0ArgObj's own comment */
-    Unk4ArgObj *unk4; /* +0x004, forwarded to self->methods->slot10 (child)
-                          as `void *`; ALSO OBSERVED (round 13) dereferenced
-                          directly by IntermediateBase__OnTag1Notify as a real class instance
-                          -- see Unk4ArgObj's own comment */
-    void *unk8;      /* +0x008, fallback source for self->unk10 */
-    void *unkC;      /* +0x00C, fallback source for self->unk14 */
-    Unk18Obj *unk10; /* +0x010, fallback source for self->viewport */
-};
 
 /*
  * self->methods. Only the slots this unit's functions actually CALL
@@ -1512,34 +1377,8 @@ struct Obj86B60 {
                                     unk9C by Obj86B60__RefreshViewValue */
 };
 
-/*
- * Shared "IntermediateBase" utility class, reached through Get_vtable_IntermediateBase().
- * UPDATED (round 12, runner alpha): Get_vtable_IntermediateBase has now been carved into
- * THIS unit's own code_2cc8c_c.c and is defined there -- this comment
- * previously said "not this unit's function to write" because it was
- * written before that carve. Same idiom already established in
- * src/code_2c054.c (TaskUtilMethods) and src/class_39e08.c
- * (IntermediateBaseMethods): each unit that reaches it keeps its own local
- * view, self typed `void *` since it is shared across unrelated classes.
- * Only the two slots this unit's Obj86B60__OnTag5Notify (and Obj86B60__SetState)
- * actually reach are modelled.
- */
-typedef struct IntermediateBaseMethods IntermediateBaseMethods;
-struct IntermediateBaseMethods {
-    u8 pad000[0x05C];
-    void (*slot5C)(void *self, s32 a1, s32 a2);  /* +0x05C */
-    void (*slot60)(void *self, s32 a1);           /* +0x060 */
-};
-
-extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void); /* returns &gIntermediateBaseMethods,
-                                                          same static table
-                                                          as code_2c054.h's
-                                                          and class_39e08.h's
-                                                          own views */
-extern IntermediateBaseMethods gIntermediateBaseMethods; /* the table itself, so
-                                                Get_vtable_IntermediateBase's own
-                                                definition (code_2cc8c_c.c)
-                                                can return &gIntermediateBaseMethods */
+/* IntermediateBase (gIntermediateBaseMethods, TaskCore's parent):
+ * include/IntermediateBase.h (track 4). */
 
 
 /*
