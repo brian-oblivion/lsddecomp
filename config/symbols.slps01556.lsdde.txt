@@ -2631,3 +2631,4 @@ D8006EC74__GetCell = 0x80041C28; // type:func
 GetCellRect = 0x80041C4C; // type:func
 D8006ED4C__D8006ED4C = 0x80041D18; // type:func
 D8006ED4C__Reset = 0x80041DA4; // type:func
+D8006ED4C__AttachToParent = 0x80041DAC; // type:func

@@ -1,4 +1,6 @@
-# func_80041DAC -- MATCHED (32/32 words), round 82
+# D8006ED4C__AttachToParent -- MATCHED (32/32 words), round 82
+
+> Renamed from `func_80041DAC` on 2026-09-25 (tools/rename.py). Address 0x80041dac.
 
 Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior attempt.
 
@@ -14,7 +16,7 @@ Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fre
     void (*slotBC)(SpriteView_322b4 *self, Pair_322b4 *src);   /* +0x0BC = func_80041E2C */
 extern Vec3_d294 D_8006EE10;
 
-void func_80041DAC(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
+void D8006ED4C__AttachToParent(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
     if (self->unkC == 0) {
         GetSpriteMethods()->attachToParent((Sprite *)self, parent, &D_8006EE10);
         self->methods->slotBC(self, pos);

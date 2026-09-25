@@ -124,7 +124,7 @@ struct SpriteMethods_322b4 {
     void (*setCell)(SpriteView_322b4 *self, u8 cell); /* +0x0C4 = D8006EC74__SetCell */
 };
 
-/* The zero offset func_80041DAC attaches with. */
+/* The zero offset D8006ED4C__AttachToParent attaches with. */
 extern Vec3_d294 D_8006EE10;
 extern char *strcpy(char *dst, char *src);
 
@@ -249,7 +249,7 @@ void D8006ED4C__Reset(Class6B5CC *self) {
 /* D_8006EC74 and D_8006ED4C slot +0x04C (attachToParent): when not yet
  * attached, attach through Sprite's with a zero offset, then hand the
  * caller's third argument to slot +0x0BC. */
-void func_80041DAC(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
+void D8006ED4C__AttachToParent(SpriteView_322b4 *self, Class6B5CC *parent, Pair_322b4 *pos) {
     if (self->unkC == 0) {
         GetSpriteMethods()->attachToParent((Sprite *)self, parent, &D_8006EE10);
         self->methods->slotBC(self, pos);
