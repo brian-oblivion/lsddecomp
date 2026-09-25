@@ -307,7 +307,14 @@ void func_80042450(D_8006EF50Obj *self) {
 void func_800424A8(BasicClass *self) {
     Get_vtable_BasicClass()->finalize(self);
 }
-INCLUDE_ASM("asm/nonmatchings/code_322b4", func_800424E0);
+/* D_8006EF50 slot +0x024 (removeParentRef): step the cursor past the parent
+ * being removed, then the BasicClass removeParentRef. */
+void func_800424E0(D_8006EF50Obj *self, BasicClass *parent) {
+    if (self->unk18 != NULL && parent == self->unk18->value) {
+        self->unk18 = self->unk18->next;
+    }
+    Get_vtable_BasicClass()->removeParentRef((BasicClass *)self, parent);
+}
 INCLUDE_ASM("asm/nonmatchings/code_322b4", func_80042550);
 /* D_8006EF50 slot +0x040 (reset). */
 void func_800425D8(D_8006EF50Obj *self, s32 a1) {
