@@ -42,7 +42,13 @@ INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048A68);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048AAC);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048B78);
 INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048BC0);
-INCLUDE_ASM("asm/nonmatchings/code_39094", func_80048C98);
+/* slot +0x084 of D_80081940 */
+void func_80048C98(D_80081940Obj *self) {
+    self->unk2E = 0;
+    if (self->unk34 != NULL) {
+        self->unk34 = BMemPMgrFree(self->unk34);
+    }
+}
 extern u8 D_80081940[];   /* method table, 34 slots */
 extern s32 D_8008A960;
 extern s32 D_8008A964;
