@@ -97,11 +97,11 @@ typedef struct {
     s16 unk2; /* +0x2 */
     u8 pad4[0x10 - 0x4];
 } Rec16D7F0;
-extern Rec16D7F0 D_8008D7F0[];
+extern Rec16D7F0 _svm_sreg_buf[];
 extern Rec16D7F0 D_8008D7F4[]; /* independent array, same shape */
 
 /* Per-slot flag byte, same 0..0x17 id as several of the tables above. */
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 /* STALL -- see docs/match-reports/SsUtChangePitch.md.  HEAD SALVAGE, round 31,
  * confirmed round 32 (permuter, ~54k iterations, not closed). Round 36:
@@ -119,7 +119,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_c", SsUtChangePitch);
  * every function in this unit that needs it -- see the comment there.
  * See SsUtSetDetVVol's report for why D_8008D7F8/D_8008D7FA are modeled
  * as independent arrays rather than fields of one struct (each access
- * computes its own address), unlike D_8008D7F0/D_8008D7F4 above. */
+ * computes its own address), unlike _svm_sreg_buf/D_8008D7F4 above. */
 extern Rec16D7F0 D_8008D7F8[];
 extern Rec16D7F0 D_8008D7FA[];
 
@@ -145,7 +145,7 @@ s32 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
         __asm__("");
         D_8008D7FA[idx].unk0 = p5;
         __asm__("");
-        D_8008D970[idx] |= 0x30;
+        _svm_sreg_dirty[idx] |= 0x30;
         return 0;
     }
     if (0) {
@@ -172,9 +172,9 @@ s32 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2)
     s32 unused[2];
 
     if ((u16) idx < 0x18) {
-        D_8008D7F0[idx].unk2 = p2;
-        D_8008D970[idx] |= 3;
-        D_8008D7F0[idx].unk0 = p1;
+        _svm_sreg_buf[idx].unk2 = p2;
+        _svm_sreg_dirty[idx] |= 3;
+        _svm_sreg_buf[idx].unk0 = p1;
         return 0;
     }
     return -1;
@@ -206,9 +206,9 @@ s32 SsUtSetVVol(s16 idx, s16 p1, s16 p2)
     if ((u16) idx < 0x18) {
         t1 = p1 * 129;
         t2 = p2 * 129;
-        D_8008D7F0[idx].unk2 = t2;
-        D_8008D970[idx] |= 3;
-        D_8008D7F0[idx].unk0 = t1;
+        _svm_sreg_buf[idx].unk2 = t2;
+        _svm_sreg_dirty[idx] |= 3;
+        _svm_sreg_buf[idx].unk0 = t1;
         return 0;
     }
     return -1;

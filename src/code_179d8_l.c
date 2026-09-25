@@ -227,7 +227,7 @@ extern u8 D_8008EA1A;
 extern s16 D_8008E8C0;
 extern u16 D_8008EA22;
 extern u8 D_8008EA20;
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 extern u16 D_80090C60;
@@ -324,7 +324,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D_8008D7F4[(u16)chanIdx - 2] = pan1out;
     D_8008D7F4[(u16)chanIdx - 1] = (s16)(pan2sq / 16383);
 
-    D_8008D970[D_8008EA26[0]] |= 7;
+    _svm_sreg_dirty[D_8008EA26[0]] |= 7;
     _svm_voice[D_8008EA26[0]].unk04 = (s16)a1;
     _svm_voice[D_8008EA26[0]].unk1B = 1;
 
@@ -378,12 +378,12 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
 /* D800902E8Entry, D_800902E8 and the blend-cascade globals
  * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, D_80090C60/64,
- * D_8008E230/234, D_8008D970/98C/9A3) are already declared above, before
+ * D_8008E230/234, _svm_sreg_dirty/98C/9A3) are already declared above, before
  * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
 extern u16 *D_8006DAD4;
-extern u8 D_8008D7F0[];
+extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
 extern u8 D_8008E9D0;
 
@@ -411,10 +411,10 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     a0 = (u8)a0;
     off16 = a0 << 4;
     *(u16 *)(D_8008D7F2 + off16) = a2;
-    v1 = D_8008D970[a0];
-    *(u16 *)(D_8008D7F0 + off16) = a1;
+    v1 = _svm_sreg_dirty[a0];
+    *(u16 *)(_svm_sreg_buf + off16) = a1;
     v1 |= 3;
-    D_8008D970[a0] = v1;
+    _svm_sreg_dirty[a0] = v1;
     if ((u32)a0 < 16) {
         lowBit = 1 << a0;
         highBit = 0;
@@ -518,7 +518,7 @@ s32 note2pitch2(s32 a0, s32 a1) {
 
 /* Matched round 73 -- docs/match-reports/SePitchBend.md. */
 extern s16 D_8008EA26[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 void SePitchBend(s32 chan, s32 bend) {
     s32 off;
@@ -547,8 +547,8 @@ void SePitchBend(s32 chan, s32 bend) {
             note = (u16)_svm_voice[(chan & 0xFF)].unk0C + q - 1;
             fine = q + 127;
         }
-        ((u16 *)D_8008D7F0)[off + 2] = note2pitch2((u16)note, (u16)fine);
-        D_8008D970[(chan & 0xFF)] |= 4;
+        ((u16 *)_svm_sreg_buf)[off + 2] = note2pitch2((u16)note, (u16)fine);
+        _svm_sreg_dirty[(chan & 0xFF)] |= 4;
     }
 }
 

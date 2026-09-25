@@ -193,8 +193,8 @@ typedef struct {
 extern ObjE970 *D_8008E970;
 
 extern s16 D_8008E8C0;
-extern u8 D_8008D7F0[];
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_buf[];
+extern u8 _svm_sreg_dirty[];
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 315/324 words, 9 words short; raw word-match 10/324,
@@ -284,11 +284,11 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     pan2sq = pan2 * pan2;
 
                     off16 = i << 4;
-                    *(u16 *)(D_8008D7F0 + off16) = (u16)(pan1sq / 16383);
-                    *(u16 *)(D_8008D7F0 + off16 + 2) = (u16)(pan2sq / 16383);
+                    *(u16 *)(_svm_sreg_buf + off16) = (u16)(pan1sq / 16383);
+                    *(u16 *)(_svm_sreg_buf + off16 + 2) = (u16)(pan2sq / 16383);
 
                     result++;
-                    D_8008D970[i] |= 3;
+                    _svm_sreg_dirty[i] |= 3;
                 }
             }
             i++;

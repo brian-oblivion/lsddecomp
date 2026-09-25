@@ -83,10 +83,10 @@ typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x10 - 0x2];
 } Rec16D7F0;
-extern Rec16D7F0 D_8008D7F0[];
+extern Rec16D7F0 _svm_sreg_buf[];
 extern Rec16D7F0 D_8008D7F2[];
 
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 typedef struct {
     u8 pad[0x12];
@@ -186,9 +186,9 @@ void SetAutoVol(s16 voice)
         }
     }
 
-    ((s16 *) D_8008D7F0)[off + 1] = val2;
-    ((s16 *) D_8008D7F0)[off] = val1;
-    D_8008D970[v] |= 3;
+    ((s16 *) _svm_sreg_buf)[off + 1] = val2;
+    ((s16 *) _svm_sreg_buf)[off] = val1;
+    _svm_sreg_dirty[v] |= 3;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoVol);
@@ -295,9 +295,9 @@ void SetAutoPan(s16 voice)
         }
     }
 
-    ((s16 *) D_8008D7F0)[off + 1] = val2;
-    ((s16 *) D_8008D7F0)[off] = val1;
-    D_8008D970[v] |= 3;
+    ((s16 *) _svm_sreg_buf)[off + 1] = val2;
+    ((s16 *) _svm_sreg_buf)[off] = val1;
+    _svm_sreg_dirty[v] |= 3;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoPan);
@@ -358,11 +358,11 @@ void SpuVmInit(s32 a0) {
     SpuInitMalloc(0x20, gSpuMallocArea);
 
     for (i = 0; (u16) i < 0xC0; i++) {
-        ((u16 *) D_8008D7F0)[(u16) i] = 0;
+        ((u16 *) _svm_sreg_buf)[(u16) i] = 0;
     }
 
     for (i = 0; (u16) i < 0x18; i++) {
-        D_8008D970[(u16) i] = 0;
+        _svm_sreg_dirty[(u16) i] = 0;
     }
 
     D_80090BD0 = 0;
@@ -553,7 +553,7 @@ typedef struct {
 extern Tbl32E978 *D_8008E978;
 
 /* Same 0x10-byte-stride record family code_179d8_j.c documents as
- * Rec16D7F0 (that unit's D_8008D7F0/D_8008D7F4 pair); local view. */
+ * Rec16D7F0 (that unit's _svm_sreg_buf/D_8008D7F4 pair); local view. */
 typedef struct {
     s16 unk0; /* +0x0 */
     u8 pad2[0x10 - 0x2];
@@ -562,7 +562,7 @@ extern Rec16D7F4 D_8008D7F4[];
 
 /* Plain byte-stride flags array (no per-record multiply in its own
  * addressing -- unlike every 0x34/0x10-stride array above). */
-extern u8 D_8008D970[];
+extern u8 _svm_sreg_dirty[];
 
 /* Selected-channel debug byte, write-only here. */
 extern u8 D_8008EA18;
@@ -627,7 +627,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4)
     D_8008EA26 = a0;
     D_8008EA18 = byteVal;
     D_8008D7F4[a0].unk0 = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
-    D_8008D970[a0] |= 4;
+    _svm_sreg_dirty[a0] |= 4;
     return 1;
 }
 #else
@@ -686,7 +686,7 @@ extern void SetAutoVol(s16 a0);
 extern void SetAutoPan(s16 a0);
 extern Rec16D7F4 D_8008D7F6[];
 
-/* Same 0x10-byte-stride record family as `Rec16D7F0`/D_8008D7F0's other
+/* Same 0x10-byte-stride record family as `Rec16D7F0`/_svm_sreg_buf's other
  * field (declared above, `unk0` only) -- this function ALSO reads this
  * array's `+0x2`, `+0x8` and `+0xA` sub-fields, so it needs a wider
  * local view of the same base symbol, reached via a cast per this
@@ -781,25 +781,25 @@ void SpuVmFlush(void) {
     }
 
     {
-    Rec16D7F0Wide *p7F0 = D_8008D7F0;
+    Rec16D7F0Wide *p7F0 = _svm_sreg_buf;
 
     for (i = 0; i < 0x18; i++) {
-        if (D_8008D970[i] & 1) {
+        if (_svm_sreg_dirty[i] & 1) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk0 = p7F0->unk0;
             ((Rec16DAD4C *) D_8006DAD4)[i].unk2 = p7F0->unk2;
         }
-        if (D_8008D970[i] & 4) {
+        if (_svm_sreg_dirty[i] & 4) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = D_8008D7F4[i].unk0;
         }
-        if (D_8008D970[i] & 8) {
+        if (_svm_sreg_dirty[i] & 8) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = D_8008D7F6[i].unk0;
         }
-        if (D_8008D970[i] & 0x10) {
+        if (_svm_sreg_dirty[i] & 0x10) {
             ((Rec16DAD4C *) D_8006DAD4)[i].unk8 = p7F0->unk8;
             ((Rec16DAD4C *) D_8006DAD4)[i].unkA = p7F0->unkA;
         }
 
-        D_8008D970[i] = 0;
+        _svm_sreg_dirty[i] = 0;
         p7F0++;
     }
     }
